@@ -970,8 +970,10 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
       return;
 
   /* check the type      */
-  if (compareType (type, val->type) == 0)
+  if (compareType (type, val->type) == 0) {
     werror (W_INIT_WRONG);
+    printFromToType (type, val->type);
+  }
 
   /* if val is literal */
   if (IS_LITERAL (val->etype))
@@ -1026,6 +1028,9 @@ printIval (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
 {
   if (!ilist)
     return;
+
+  /* update line number for error msgs */
+  lineno=sym->lineDef;
 
   /* if structure then    */
   if (IS_STRUCT (type))

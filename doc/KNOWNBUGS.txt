@@ -2,6 +2,10 @@ SDCC known bugs
 ---------------
 $Id$
 
+* Postincrement doesn't work correcly for structure members.
+
 z80 port:
 * Longs and floats are minimally supported.
 
+ds390 port:
+* The linker does not yet supports segments >64k.

@@ -239,9 +239,11 @@ typedef struct
     bool eq_nne;		/* transform a == b --> ! (a != b)  */
 
     bool arrayInitializerSuppported;  
-    
     bool (*cseOk) (iCode *ic, iCode *pdic);
-    builtins *builtintable;    /* table of builtin functions */
+    builtins *builtintable;     /* table of builtin functions */
+    int unqualified_pointer;	/* unqualified pointers type is  */    
+    int reset_labelKey  ;	/* reset Label no 1 at the start of a function */
+    int globals_allowed ;       /* global & static locals not allowed ?  0 ONLY TININative*/
 #define PORT_MAGIC 0xAC32
 /** Used at runtime to detect if this structure has been completly filled in. */
     int magic;
@@ -273,6 +275,9 @@ extern PORT i186_port;
 #endif
 #if !OPT_DISABLE_TLCS900H
 extern PORT tlcs900h_port;
+#endif
+#if !OPT_DISABLE_TININative
+extern PORT tininative_port;
 #endif
 
 #endif /* PORT_INCLUDE*/

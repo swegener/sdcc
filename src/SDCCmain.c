@@ -304,6 +304,7 @@ static PORT *_ports[] =
 #if !OPT_DISABLE_DS400
   &ds400_port,	
 #endif	
+  &hc08_port,
 };
 
 #define NUM_PORTS (sizeof(_ports)/sizeof(_ports[0]))
@@ -490,7 +491,7 @@ setParseWithComma (set **dest, char *src)
   /* skip the initial white spaces */
   while (isspace(*src))
     src++;
-
+  
   /* skip the trailing white spaces */
   length = strlen(src);
   while (length && isspace(src[length-1]))
@@ -1387,7 +1388,7 @@ linkEdit (char **envp)
   /* standard library path */
     if (!options.nostdlib)
     {
-        if (!(TARGET_IS_Z80 || TARGET_IS_GBZ80)) /*Not for the z80, gbz80*/
+        if (!(TARGET_IS_Z80 || TARGET_IS_GBZ80 || TARGET_IS_HC08)) /*Not for the z80, gbz80*/
         {
             switch (options.model)
             {
@@ -1426,7 +1427,9 @@ linkEdit (char **envp)
         }
         else /*for the z80, gbz80*/
         {
-            if (TARGET_IS_Z80)
+            if (TARGET_IS_HC08)
+                c = "hc08";
+            else if (TARGET_IS_Z80)
                 c = "z80";
             else
                 c = "gbz80";
@@ -1465,12 +1468,17 @@ linkEdit (char **envp)
         }
 #endif
 #endif
-        if (!(TARGET_IS_Z80 || TARGET_IS_GBZ80)) /*Not for the z80, gbz80*/
+        if (!(TARGET_IS_Z80 || TARGET_IS_GBZ80
+              || TARGET_IS_HC08)) /*Not for the z80, gbz80*/
         { /*Why the z80 port is not using the standard libraries?*/
             fprintf (lnkfile, "-l %s\n", STD_LIB);
             fprintf (lnkfile, "-l %s\n", STD_INT_LIB);
             fprintf (lnkfile, "-l %s\n", STD_LONG_LIB);
             fprintf (lnkfile, "-l %s\n", STD_FP_LIB);
+        }
+        else if (TARGET_IS_HC08)
+        {
+            fprintf (lnkfile, "-l hc08\n");
         }
         else if (TARGET_IS_Z80)
         {

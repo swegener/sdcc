@@ -15,7 +15,7 @@ SDCC_DOC        = doc
 # Parts that are not normally compiled but need to be cleaned
 SDCC_EXTRA      = support/regression
 
-SDCC_ASLINK	= as/mcs51 as link
+SDCC_ASLINK	= as/mcs51 as link as/hc08
 SDCC_PACKIHX	= packihx
 SDCC_LIBRARIAN	= support/librarian
 

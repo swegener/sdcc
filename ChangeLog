@@ -1,3 +1,25 @@
+2003-10-15 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	New target "hc08" for the Motorola 68hc08 family of micros
+        
+	* configure
+	* configure.in
+	* Makefile
+	* src/hc08/*
+	* src/SDCCmain.c
+	* src/port.h
+	* sim/ucsim/hc08.src/*
+	* sim/ucsim/configure.in
+	* src/ucsim/configure
+	* sim/ucsim/packages_in.mk
+	* as/hc08/*
+	* as/Makefile
+	* device/include/mc68hc908qy.h
+	* device/lib/hc08/*
+	* device/lib/Makefile.in
+	* support/regression/ports/hc08/*
+	* support/regression/Makefile
+
 2003-10-14 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 	
 	* src/z80/gen.c: fixed bug revealed by ast_constant_folding.c

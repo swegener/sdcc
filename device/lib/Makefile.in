@@ -119,13 +119,38 @@ XA51SOURCES      = _atof.c _atoi.c _atol.c _schar2fs.c \
 
 XA51OBJECTS      = $(XA51SOURCES:%.c=$(PORTDIR)/%.rel)
 
+HC08SOURCES	= _atof.c _atoi.c _atol.c _schar2fs.c \
+		  _divsint.c _divslong.c \
+		  _fs2schar.c _fs2sint.c _fs2slong.c \
+		  _fs2uchar.c _fs2uint.c _fs2ulong.c _fsadd.c \
+		  _fsdiv.c _fseq.c _fsgt.c _fslt.c _fsmul.c \
+		  _fsneq.c _fssub.c \
+		  _sint2fs.c _iscntrl.c _isdigit.c _isgraph.c \
+		  _islower.c _isprint.c _ispunct.c _isspace.c \
+		  _isupper.c _isxdigit.c _itoa.c _ltoa.c \
+                  _slong2fs.c _memcmp.c \
+		  _memcpy.c _memmove.c _memset.c _modsint.c _modslong.c \
+		  _moduint.c _modulong.c _mulint.c _mullong.c \
+		  _spx.c _startup.c _strchr.c _strcmp.c _strcpy.c \
+		  _strcspn.c _strlen.c _strncat.c _strncmp.c \
+		  _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
+		  _strstr.c _strtok.c _uchar2fs.c _uint2fs.c \
+		  _ulong2fs.c malloc.c \
+		  assert.c _strcat.c time.c \
+		  fabsf.c frexpf.c ldexpf.c expf.c powf.c sincosf.c sinf.c \
+		  cosf.c logf.c log10f.c sqrtf.c tancotf.c tanf.c cotf.c \
+		  asincosf.c asinf.c acosf.c atanf.c atan2f.c sincoshf.c \
+		  sinhf.c coshf.c tanhf.c floorf.c ceilf.c modff.c
+
+HC08OBJECTS	= $(patsubst %.c,$(PORTDIR)/%.rel,$(HC08SOURCES))
+
 OEXT            = .rel
 
 include incl.mk
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf models model-ds390 model-ds400 model-z80 model-gbz80
+all: checkconf models model-ds390 model-ds400 model-z80 model-gbz80 model-hc08
 
 objects: build-dir $(OBJECTS) port-specific-objects lib-files clean_intermediate
 
@@ -167,6 +192,14 @@ model-gbz80:
 objects-z80: build-dir $(Z80OBJECTS) port-specific-objects clean_intermediate
 	cd $(PORTDIR); ls *$(OEXT) > $(PORT).lib
 
+model-hc08:
+	if [ "`grep hc08 ../../ports.build`" = hc08 ]; then \
+	  $(MAKE) MODELFLAGS="-mhc08" PORT=hc08 objects-hc08; \
+	fi	
+
+objects-hc08: build-dir $(HC08OBJECTS) port-specific-objects clean_intermediate
+	cd $(PORTDIR); ls *$(OEXT) > $(PORT).lib
+
 build-dir: $(PORTDIR)
 
 $(PORTDIR):
@@ -188,7 +221,7 @@ clean_intermediate:
 # ---------------------------------------------------
 install: all installdirs
 	cp -r $(BUILDDIR)/* $(sdcc_libdir)
-	cp -r ds390 ds400 gbz80 z80 *.c $(sdcc_libdir)/src
+	cp -r ds390 ds400 gbz80 z80 hc08 *.c $(sdcc_libdir)/src
 	rm `find $(sdcc_libdir)/src -name '*.rel' -or -name '*.dump*' -or -name '*.sym' -or -name '*.o' -or -name '*.lst' -or -name '*.asm'`
 
 # Deleting all the installed files
@@ -216,6 +249,7 @@ installdirs:
 	done
 	[ -d $(sdcc_libdir)/ds390 ] || mkdir -p $(sdcc_libdir)/ds390
 	[ -d $(sdcc_libdir)/ds400 ] || mkdir -p $(sdcc_libdir)/ds400	
+	[ -d $(sdcc_libdir)/hc08 ] || mkdir -p $(sdcc_libdir)/hc08	
 	mkdir -p $(sdcc_libdir)/src
 
 # Creating dependencies

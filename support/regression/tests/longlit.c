@@ -9,7 +9,7 @@
 
 #define T1_RELOAD_VALUE -(2*OSCILLATOR)/(32*12*BAUD)
 
-char T1=T1_RELOAD_VALUE;
+unsigned char T1=T1_RELOAD_VALUE;
 
 void test (void) {
   ASSERT(T1==0xfd);

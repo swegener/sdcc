@@ -375,6 +375,69 @@ void printChar (FILE * ofile, char *s, int plen)
 }
 
 /*-----------------------------------------------------------------*/
+/* return the generic pointer high byte for a given pointer type.  */
+/*-----------------------------------------------------------------*/
+int pointerTypeToGPByte(const int p_type)
+{
+    switch (p_type) 
+    {
+	    case IPOINTER:
+	    case POINTER:
+		return 0;
+	    case GPOINTER:
+		/* hack - if we get a generic pointer, we just assume
+		 * it's an FPOINTER (i.e. in XDATA space).
+		 */
+	    case FPOINTER:
+		return 1;
+	    case CPOINTER:
+		return 2;
+	    case PPOINTER:
+		return 3;
+	    default:
+	        fprintf(stderr, "*** internal error: unknown pointer type %d in GPByte.\n",
+			p_type);
+		break;
+    }
+    return -1;
+}
+    
+    
+/*-----------------------------------------------------------------*/
+/* printPointerType - generates ival for pointer type              */
+/*-----------------------------------------------------------------*/
+void _printPointerType(FILE *oFile, const char *name)
+{
+    if (IS_DS390_PORT)
+    {
+	fprintf(oFile, "\t.byte %s,(%s >> 8),(%s >> 16)",name,name,name);
+    }
+    else
+    {
+	fprintf(oFile, "\t.byte %s,(%s >> 8)",name,name);
+    }
+}
+
+/*-----------------------------------------------------------------*/
+/* printPointerType - generates ival for pointer type              */
+/*-----------------------------------------------------------------*/
+void printPointerType(FILE *oFile, const char *name)
+{
+    _printPointerType(oFile, name);
+    fprintf(oFile, "\n");
+}
+
+/*-----------------------------------------------------------------*/
+/* printGPointerType - generates ival for generic pointer type     */
+/*-----------------------------------------------------------------*/
+void printGPointerType(FILE *oFile, const char *name, 
+		      const unsigned int type)
+{
+    _printPointerType(oFile,name);
+    fprintf(oFile, ",#0x%02x\n", pointerTypeToGPByte(type)); 
+}
+
+/*-----------------------------------------------------------------*/
 /* printIvalType - generates ival for int/char                     */
 /*-----------------------------------------------------------------*/
 void printIvalType (link * type, initList * ilist, FILE * oFile)
@@ -543,15 +606,23 @@ void printIvalFuncPtr (link * type, initList * ilist, FILE * oFile)
     /* now generate the name */
     if (!val->sym) {
         if (port->use_dw_for_init)
+	{
 	    tfprintf(oFile, "\t!dws\n", val->name);
+	}
 	else  
-	    fprintf(oFile, "\t.byte %s,(%s >> 8)\n", val->name,val->name);
+	{
+	    printPointerType(oFile, val->name);
+	}
     }
     else
 	if (port->use_dw_for_init)
+    	{
 	    tfprintf(oFile, "\t!dws\n", val->sym->rname);
-	else 
-	    fprintf(oFile, "\t.byte %s,(%s >> 8)\n", val->sym->rname,val->sym->rname);
+	}
+	else
+    	{
+	    printPointerType(oFile, val->sym->rname);
+	}
     
     return;
 }
@@ -570,27 +641,37 @@ int printIvalCharPtr (symbol * sym, link * type, value * val, FILE * oFile)
     size = getSize (type);
 
     if (val->name && strlen(val->name)) {
-	switch (size) {
-	case 1:
+	if (size == 1) /* This appears to be Z80 specific?? */
+	{
 	    tfprintf(oFile,
-		    "\t!dbs\n", val->name) ;
-	    break;
-	case 2:
+		    "\t!dbs\n", val->name);
+	}
+	else if (size == FPTRSIZE)
+	{
 	    if (port->use_dw_for_init)
+	    {
 	    	tfprintf(oFile, "\t!dws\n", val->name);
+	    }
 	    else
-	    	fprintf(oFile, "\t.byte %s,(%s >> 8)\n", val->name, val->name);
-	    break;
-	    /* PENDING: probably just 3 */
-	default:
+	    {
+		printPointerType(oFile, val->name);
+	    }
+	}
+	else  if (size == GPTRSIZE)
+	{
 	    /* PENDING: 0x02 or 0x%02x, CDATA? */
-	    fprintf (oFile,
-		     "\t.byte %s,(%s >> 8),#0x%02x\n",
-		     val->name, val->name, (IS_PTR(val->type) ? DCL_TYPE(val->type) :
-					    PTR_TYPE(SPEC_OCLS(val->etype))));
+	    printGPointerType(oFile, val->name, 
+		     	      (IS_PTR(val->type) ? DCL_TYPE(val->type) :
+			      PTR_TYPE(SPEC_OCLS(val->etype))));
+	}
+	else
+	{
+	    fprintf(stderr, "*** internal error: unknown size in "
+		    	    "printIvalCharPtr.\n");
 	}
     }
     else {
+	/* What is this case? Are these pointers? */
 	switch (size) {
 	case 1:
 	    tfprintf(oFile, "\t!dbs\n", aopLiteral(val, 0));
@@ -625,6 +706,7 @@ int printIvalCharPtr (symbol * sym, link * type, value * val, FILE * oFile)
 void printIvalPtr (symbol * sym, link * type, initList * ilist, FILE * oFile)
 {
     value *val;
+    int size;
     
     /* if deep then   */
     if (ilist->type == INIT_DEEP)
@@ -668,18 +750,21 @@ void printIvalPtr (symbol * sym, link * type, initList * ilist, FILE * oFile)
     }
     
     
-    switch (getSize (type)) {
-    case 1:
+    size = getSize (type);
+    
+    if (size == 1)  /* Z80 specific?? */
+    {
 	tfprintf (oFile, "\t!dbs\n", val->name);
-	break;
-    case 2:
+    }
+    else if (size == FPTRSIZE)
+    {
 	tfprintf (oFile, "\t!dws\n", val->name);
-	break;
-	
-    case 3:
-	fprintf (oFile, "\t.byte %s,(%s >> 8),#0x%02x\n",
-		 val->name, val->name,(IS_PTR(val->type) ? DCL_TYPE(val->type) :
-					    PTR_TYPE(SPEC_OCLS(val->etype))));
+    }
+    else if (size == GPTRSIZE)
+    {
+	printGPointerType(oFile, val->name, 
+		      (IS_PTR(val->type) ? DCL_TYPE(val->type) :
+		      PTR_TYPE(SPEC_OCLS(val->etype))));
     }
     return;
 }
@@ -1266,7 +1351,9 @@ FILE *tempfile(void)
 	if (name) {
 	    FILE *fp = fopen(name, "w+b");
 	    if (fp)
+	    {
 		addSetHead(&tmpfileNameSet, name);
+	    }
 	    return fp;
 	}
 	return NULL;

@@ -972,7 +972,7 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
   /* check the type      */
   if (compareType (type, val->type) == 0) {
     werror (W_INIT_WRONG);
-    printFromToType (val->type, from);
+    printFromToType (val->type, type);
   }
 
   /* if val is literal */

@@ -360,7 +360,7 @@ int summary2(struct area * areap)
 
 	char buff[128];
 	int j, toreturn=0;
-    long int Stack_Start=0;
+    long int Stack_Start=0, Stack_size;
 
 	struct area * xp;
 	FILE * of;
@@ -441,6 +441,12 @@ int summary2(struct area * areap)
             break;
         }
     }
+
+    for(j=Stack_Start, Stack_size=0; j<256; j++)
+    {
+        if((idatamap[j]=='S')||(idatamap[j]==' ')) Stack_size++;
+        else break;
+    }
     
 	xp=areap;
 	while (xp)
@@ -457,8 +463,8 @@ int summary2(struct area * areap)
 
 	/*Report the position of the begining of the stack*/
     if(Stack_Start!=256)
-	    fprintf(of, "\n%stack starts at: 0x%02lx (sp set to 0x%02lx)",
-		    rflag ? "16 bit mode initial s" : "S", Stack_Start, Stack_Start-1);
+	    fprintf(of, "\n%stack starts at: 0x%02lx (sp set to 0x%02lx) with %ld bytes available.",
+		    rflag ? "16 bit mode initial s" : "S", Stack_Start, Stack_Start-1, Stack_size);
     else
         fprintf(of, "\nI don't have a clue where the stack ended up! Sorry...");
 

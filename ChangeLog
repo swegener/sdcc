@@ -1,6 +1,7 @@
 2004-02-08  Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
-	* doc/sdccman.lyx: added section 3.14: sdcclib.
+	* doc/sdccman.lyx: added section 3.1.4: sdcclib.
+	* as/mcs51/lkmem.c: report the size of the stack in .mem file.
 
 2004-02-08 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 

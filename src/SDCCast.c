@@ -2761,7 +2761,7 @@ decorateType (ast * tree)
       /* make sure the type is complete and sane */
       checkTypeSanity(LETYPE(tree), "(cast)");
 
-#if 0
+#if 1
       /* if the right is a literal replace the tree */
       if (IS_LITERAL (RETYPE (tree))) {
 	      if (!IS_PTR (LTYPE (tree))) {
@@ -2773,7 +2773,8 @@ decorateType (ast * tree)
 		      tree->right = NULL;
 		      TTYPE (tree) = tree->opval.val->type;
 		      tree->values.literalFromCast = 1;
-	      } else if (IS_GENPTR(LTYPE(tree)) && !IS_PTR(RTYPE(tree))) {
+	      } else if (IS_GENPTR(LTYPE(tree)) && !IS_PTR(RTYPE(tree)) && 
+			 ((int)floatFromVal(valFromType(RETYPE(tree)))) !=0 ) /* special case of NULL */  {
 		      sym_link *rest = LTYPE(tree)->next;
 		      werror(W_LITERAL_GENERIC);		      
 		      TTYPE(tree) = newLink();

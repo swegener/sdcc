@@ -810,25 +810,28 @@ algebraicOpts (iCode * ic)
 	}
       break;
     case CAST:
-      /* if this is a cast of a literal value */
-      if (IS_OP_LITERAL (IC_RIGHT (ic)))
-	{
-	  ic->op = '=';
-	  IC_RIGHT (ic) =
-	    operandFromValue (valCastLiteral (operandType (IC_LEFT (ic)),
-					  operandLitValue (IC_RIGHT (ic))));
-	  IC_LEFT (ic) = NULL;
-	  SET_ISADDR (IC_RESULT (ic), 0);
-	}
-      /* if casting to the same */
-      if (compareType (operandType (IC_RESULT (ic)),
-		     operandType (IC_RIGHT (ic))) == 1)
-	{
-	  ic->op = '=';
-	  IC_LEFT (ic) = NULL;
-	  SET_ISADDR (IC_RESULT (ic), 0);
-	}
-      break;
+	    {
+		    sym_link *otype = operandType(IC_RIGHT(ic));
+		    sym_link *ctype = operandType(IC_LEFT(ic));
+		    /* if this is a cast of a literal value */
+		    if (IS_OP_LITERAL (IC_RIGHT (ic)) &&
+			!(IS_GENPTR(ctype) && (IS_PTR(otype) && !IS_GENPTR(otype)))) {
+			    ic->op = '=';
+			    IC_RIGHT (ic) =
+				    operandFromValue (valCastLiteral (operandType (IC_LEFT (ic)),
+								      operandLitValue (IC_RIGHT (ic))));
+			    IC_LEFT (ic) = NULL;
+			    SET_ISADDR (IC_RESULT (ic), 0);
+		    }
+		    /* if casting to the same */
+		    if (compareType (operandType (IC_RESULT (ic)),
+				     operandType (IC_RIGHT (ic))) == 1) {
+			    ic->op = '=';
+			    IC_LEFT (ic) = NULL;
+			    SET_ISADDR (IC_RESULT (ic), 0);
+		    }
+	    }
+	    break;
     case '!':
       if (IS_OP_LITERAL (IC_LEFT (ic)))
 	{

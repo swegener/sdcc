@@ -954,7 +954,7 @@ operandOperation (operand * left, operand * right,
       break;
     case RRC:
       {
-	long i = operandLitValue (left);
+	long i = (long) operandLitValue (left);
 
 	retval = operandFromLit ((i >> (getSize (operandType (left)) * 8 - 1)) |
 				 (i << 1));
@@ -962,7 +962,7 @@ operandOperation (operand * left, operand * right,
       break;
     case RLC:
       {
-	long i = operandLitValue (left);
+	long i = (long) operandLitValue (left);
 
 	retval = operandFromLit ((i << (getSize (operandType (left)) * 8 - 1)) |
 				 (i >> 1));
@@ -1294,7 +1294,7 @@ operandFromLink (sym_link * type)
 /* operandFromLit - makes an operand from a literal value          */
 /*-----------------------------------------------------------------*/
 operand *
-operandFromLit (float i)
+operandFromLit (double i)
 {
   return operandFromValue (valueFromLit (i));
 }
@@ -1407,7 +1407,7 @@ usualUnaryConversions (operand * op)
 {
   if (IS_INTEGRAL (operandType (op)))
     {
-      if (getSize (operandType (op)) < INTSIZE)
+      if (getSize (operandType (op)) < (unsigned int) INTSIZE)
 	{
 	  /* Widen to int. */
 	  return geniCodeCast (INTTYPE, op, TRUE);
@@ -2393,7 +2393,7 @@ geniCodeLogic (operand * left, operand * right, int op)
   if (IS_INTEGRAL (ltype) && IS_LITERAL (rtype))
     {
       int nbits = bitsForType (ltype);
-      long v = operandLitValue (right);
+      long v = (long) operandLitValue (right);
 
       if (v > ((LONG_LONG) 1 << nbits) && v > 0)
 	werror (W_CONST_RANGE, " compare operation ");
@@ -2489,7 +2489,7 @@ geniCodeAssign (operand * left, operand * right, int nosupdate)
   if (IS_INTEGRAL (ltype) && right->type == VALUE && IS_LITERAL (rtype))
     {
       int nbits = bitsForType (ltype);
-      long v = operandLitValue (right);
+      long v = (long) operandLitValue (right);
 
       if (v > ((LONG_LONG) 1 << nbits) && v > 0)
 	werror (W_CONST_RANGE, " = operation");

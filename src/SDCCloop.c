@@ -758,8 +758,8 @@ basicInduction (region * loopReg, eBBlock ** ebbs, int count)
 	    continue;
 
 	  aSym = (IS_OP_LITERAL (IC_RIGHT (dic)) ?
-	      (litValue = operandLitValue (IC_RIGHT (dic)), IC_LEFT (dic)) :
-	      (litValue = operandLitValue (IC_LEFT (dic)), IC_RIGHT (dic)));
+	      (litValue = (unsigned long) operandLitValue (IC_RIGHT (dic)), IC_LEFT (dic)) :
+	      (litValue = (unsigned long) operandLitValue (IC_LEFT (dic)), IC_RIGHT (dic)));
 
 	  if (!isOperandEqual (IC_RESULT (ic), aSym) &&
 	      !isOperandEqual (IC_RIGHT (ic), aSym))
@@ -937,8 +937,8 @@ loopInduction (region * loopReg, eBBlock ** ebbs, int count)
 	    continue;
 
 	  aSym = (IS_SYMOP (IC_LEFT (ic)) ?
-	  (lr = 1, litVal = operandLitValue (IC_RIGHT (ic)), IC_LEFT (ic)) :
-		  (litVal = operandLitValue (IC_LEFT (ic)), IC_RIGHT (ic)));
+	  (lr = 1, litVal = (unsigned long) operandLitValue (IC_RIGHT (ic)), IC_LEFT (ic)) :
+		  (litVal = (unsigned long) operandLitValue (IC_LEFT (ic)), IC_RIGHT (ic)));
 
 	  ip = NULL;
 	  /* check if this is an induction variable */
@@ -947,8 +947,8 @@ loopInduction (region * loopReg, eBBlock ** ebbs, int count)
 
 	  /* ask port for size not worth if native instruction
 	     exist for multiply & divide */
-	  if (getSize (operandType (IC_LEFT (ic))) <= port->muldiv.native_below ||
-	  getSize (operandType (IC_RIGHT (ic))) <= port->muldiv.native_below)
+	  if (getSize (operandType (IC_LEFT (ic))) <= (unsigned long) port->muldiv.native_below ||
+	  getSize (operandType (IC_RIGHT (ic))) <= (unsigned long) port->muldiv.native_below)
 	    continue;
 
 	  /* if this is a division then the remainder should be zero

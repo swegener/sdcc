@@ -33,7 +33,7 @@ extern symbol *interrupts[256];
 void printIval (symbol *, sym_link *, initList *, FILE *);
 extern int noAlloc;
 extern set *publics;
-extern int maxInterrupts;
+extern unsigned maxInterrupts;
 extern int maxRegBank;
 extern symbol *mainf;
 extern char *VersionString;
@@ -806,7 +806,7 @@ pic14emitMaps ()
 static void
 pic14createInterruptVect (FILE * vFile)
 {
-  int i = 0;
+  unsigned i = 0;
   mainf = newSymbol ("main", 0);
   mainf->block = 0;
 

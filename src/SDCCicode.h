@@ -282,7 +282,7 @@ iCodeTable *getTableEntry (int);
 int isOperandLiteral (operand *);
 operand *operandOperation (operand *, operand *, int, sym_link *);
 double operandLitValue (operand *);
-operand *operandFromLit (float);
+operand *operandFromLit (double);
 operand *operandFromOperand (operand *);
 int isParameterToCall (value *, operand *);
 iCode *newiCodeLabelGoto (int, symbol *);

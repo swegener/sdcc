@@ -89,7 +89,7 @@ value *valCompare (value *, value *, int);
 value *valBitwise (value *, value *, int);
 value *valLogicAndOr (value *, value *, int);
 value *valCastLiteral (sym_link *, double);
-value *valueFromLit (float);
+value *valueFromLit (double);
 initList *newiList (int, void *);
 initList *revinit (initList *);
 initList *copyIlist (initList *);

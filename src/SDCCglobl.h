@@ -255,6 +255,10 @@ struct options
     int xram_size;		/* external ram size (used only for error checking) */
 	bool xram_size_set; /* since xram_size=0 is a possibility */
     int code_size;		/* code size (used only for error checking) */    
+    int verboseExec;            /* show what we are doing */
+    int noXinitOpt;             /* don't optimize initialized xdata */
+    int noCcodeInAsm;           /* hide c-code from asm */
+    int iCodeInAsm;             /* show i-code in asm */
   };
 
 /* forward definition for variables accessed globally */
@@ -296,9 +300,6 @@ extern char *libFiles[128];
 extern int nlibFiles;
 extern char *libPaths[128];
 extern int nlibPaths;
-
-extern bool verboseExec;
-extern bool noXinitOpt;
 
 void parseWithComma (char **, char *);
 

@@ -118,6 +118,10 @@ _ds390_parseOptions (int *pargc, char **argv, int *i)
 static void
 _ds390_finaliseOptions (void)
 {
+  if (options.noXinitOpt) {
+    port->genXINIT=0;
+  }
+
   /* Hack-o-matic: if we are using the flat24 model,
    * adjust pointer sizes.
    */

@@ -7248,10 +7248,15 @@ genZ80Code (iCode * lic)
 
       if (cln != ic->lineno)
 	{
-	  emit2 ("; %s:%d: %s", ic->filename, ic->lineno,
-		 printCLine(ic->filename, ic->lineno));
+	  if (!options.noCcodeInAsm) {
+	    emit2 (";%s:%d: %s", ic->filename, ic->lineno,
+		   printCLine(ic->filename, ic->lineno));
+	  }
 	  cln = ic->lineno;
 	}
+      if (options.iCodeInAsm) {
+	emit2 (";ic:%d: %s", ic->key, printILine(ic));
+      }
       /* if the result is marked as
          spilt and rematerializable or code for
          this has already been generated then

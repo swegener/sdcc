@@ -77,7 +77,6 @@ char *relFiles[128];
 int nrelFiles = 0;
 bool verboseExec = FALSE;
 char *preOutName;
-bool noXinitOpt = FALSE;
 
 /* uncomment JAMIN_DS390 to always override and use ds390 port
   for mcs51 work.  This is temporary, for compatibility testing. */
@@ -125,6 +124,8 @@ char DefaultExePath[128];
 #define OPTION_NO_XINIT_OPT     "--no-xinit-opt"
 #define OPTION_XRAM_SIZE	"--xram-size"
 #define OPTION_CODE_SIZE	"--code-size"
+#define OPTION_NO_CCODE_IN_ASM	"--no-c-code-in-asm"
+#define OPTION_ICODE_IN_ASM	"--i-code-in-asm"
 
 static const OPTION 
 optionsTable[] = {
@@ -207,7 +208,9 @@ optionsTable[] = {
     { 0,    "--tini-libid",   	    NULL,"<nnnn> LibraryID used in -mTININative"},
     { 0,    "--protect-sp-update",  &options.protect_sp_update,"DS390 - will disable interrupts during ESP:SP updates"},
     { 0,    "--parms-in-bank1",	    &options.parms_in_bank1,"MCS51/DS390 - use Bank1 for parameter passing"},
-    { 0,    OPTION_NO_XINIT_OPT,    &noXinitOpt, "don't memcpy initialized xram from code"},
+    { 0,    OPTION_NO_XINIT_OPT,    &options.noXinitOpt, "don't memcpy initialized xram from code"},
+    { 0,    OPTION_NO_CCODE_IN_ASM, &options.noCcodeInAsm, "don't include c-code as comments in the asm file"},
+    { 0,    OPTION_ICODE_IN_ASM,    &options.iCodeInAsm, "include i-code as comments in the asm file"},
     /* End of options */
     { 0,    NULL }
 };

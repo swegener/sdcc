@@ -105,7 +105,7 @@ _mcs51_parseOptions (int *pargc, char **argv, int *i)
 static void
 _mcs51_finaliseOptions (void)
 {
-  if (noXinitOpt /* || options.model==MODEL_SMALL */) {
+  if (options.noXinitOpt) {
     port->genXINIT=0;
   }
 

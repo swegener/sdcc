@@ -9954,13 +9954,18 @@ void genpic14Code (iCode *lic)
 	      pic14_emitcode ("", ";\t%s:%d: %s", ic->filename, ic->lineno, 
 	      printCLine(ic->filename, ic->lineno));
 	    */
-	    addpCode2pBlock(pb,
-			    newpCodeCSource(ic->lineno, 
-					    ic->filename, 
-					    printCLine(ic->filename, ic->lineno)));
+	    if (!options.noCcodeInAsm) {
+	      addpCode2pBlock(pb,
+			      newpCodeCSource(ic->lineno, 
+					      ic->filename, 
+					      printCLine(ic->filename, ic->lineno)));
+	    }
 
 	    cln = ic->lineno ;
 	}
+
+	// if you want printILine too, look at ../mcs51/gen.c, i don't understand this :)
+
 	/* if the result is marked as
 	   spilt and rematerializable or code for
 	   this has already been generated then

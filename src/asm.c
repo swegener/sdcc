@@ -9,6 +9,11 @@
 #include "common.h"
 #include "asm.h"
 
+#if !defined(__BORLANDC__) && !defined(_MSC_VER)
+// for pipe and close
+#include <unistd.h>
+#endif
+
 /* A 'token' is like !blah or %24f and is under the programmers
    control. */
 #define MAX_TOKEN_LEN		64
@@ -204,7 +209,38 @@ asm_addTree (const ASM_MAPPINGS * pMappings)
 }
 
 /*-----------------------------------------------------------------*/
-/* printCLine - try to find the c-code for this lineno             */
+/* printILine - return the readable i-code for this ic             */
+/*                                                                 */
+/* iCodePrint wants a file stream so we need a pipe to fool it     */
+/*-----------------------------------------------------------------*/
+static char verbalICode[1024];
+
+char *printILine (iCode *ic) {
+  int filedes[2];
+  FILE *pipeStream;
+  iCodeTable *icTab=getTableEntry(ic->op);
+  
+  assert(pipe(filedes)!=-1); // forget it
+
+  // stuff the pipe with the readable icode
+  pipeStream=fdopen(filedes[1],"w");
+  icTab->iCodePrint(pipeStream, ic, icTab->printName);
+  // it really needs an extra push
+  fflush(pipeStream);
+  // now swallow it
+  pipeStream=fdopen(filedes[0],"r");
+  fgets(verbalICode, sizeof(verbalICode), pipeStream);
+  // clean up the mess, we'll return here for all icodes!!
+  assert(!close (filedes[0]));
+  assert(!close (filedes[1]));
+  // kill the trailing NL
+  verbalICode[strlen(verbalICode)-1]='\0';
+  // and throw it up
+  return verbalICode;
+}
+
+/*-----------------------------------------------------------------*/
+/* printCLine - return the c-code for this lineno                  */
 /*-----------------------------------------------------------------*/
 static FILE *inFile=NULL;
 static char inLineString[1024];

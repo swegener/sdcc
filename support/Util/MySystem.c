@@ -78,7 +78,7 @@ my_system (const char *cmd)
       i++;
     }
 
-  if (verboseExec)
+  if (options.verboseExec)
     {
       printf ("+ %s\n", cmdLine ? cmdLine : cmd);
     }

@@ -2290,6 +2290,24 @@ cyclomatic complexity
 -V
 \series default 
  Shows the actual commands the compiler is executing.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+---no-c-code-in-asm
+\series default 
+ Hides your ugly and inefficient c-code from the asm file, so you can always
+ blame the compiler :).
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+---i-code-in-asm
+\series default 
+ Include i-codes in the asm file.
+ Looks like noise but is most helpfull for debugging the compiler itself.
 \layout Subsubsection
 
 Intermediate Dump Options

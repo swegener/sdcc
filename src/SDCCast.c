@@ -344,7 +344,7 @@ hasSEFcalls (ast * tree)
 /*-----------------------------------------------------------------*/
 /* isAstEqual - compares two asts & returns 1 if they are equal    */
 /*-----------------------------------------------------------------*/
-int 
+static int
 isAstEqual (ast * t1, ast * t2)
 {
   if (!t1 && !t2)
@@ -2382,7 +2382,7 @@ decorateType (ast * tree)
 	  }
 
 	  TTYPE (tree) =
-	    computeType (LTYPE (tree), RTYPE (tree));
+	    computeType (LTYPE (tree), RTYPE (tree), FALSE);
 	  TETYPE (tree) = getSpec (TTYPE (tree));
 
           /* if left is a literal exchange left & right */
@@ -2595,7 +2595,8 @@ decorateType (ast * tree)
       LRVAL (tree) = RRVAL (tree) = 1;
       TETYPE (tree) = getSpec (TTYPE (tree) =
 			       computeType (LTYPE (tree),
-					    RTYPE (tree)));
+					    RTYPE (tree),
+					    FALSE));
 
       /*------------------------------------------------------------------*/
       /*----------------------------*/
@@ -2623,7 +2624,8 @@ decorateType (ast * tree)
       LRVAL (tree) = RRVAL (tree) = 1;
       TETYPE (tree) = getSpec (TTYPE (tree) =
 			       computeType (LTYPE (tree),
-					    RTYPE (tree)));
+					    RTYPE (tree),
+					    TRUE));
 
       /* if right is a literal and */
       /* left is also a division by a literal then */
@@ -2688,7 +2690,8 @@ decorateType (ast * tree)
       LRVAL (tree) = RRVAL (tree) = 1;
       TETYPE (tree) = getSpec (TTYPE (tree) =
 			       computeType (LTYPE (tree),
-					    RTYPE (tree)));
+					    RTYPE (tree),
+					    TRUE));
       return tree;
 
       /*------------------------------------------------------------------*/
@@ -2800,13 +2803,16 @@ decorateType (ast * tree)
       LRVAL (tree) = RRVAL (tree) = 1;
       TETYPE (tree) = getSpec (TTYPE (tree) =
 			       computeType (LTYPE (tree),
-					    RTYPE (tree)));
+					    RTYPE (tree),
+					    TRUE));
 
       /* promote result to int if left & right are char
 	 this will facilitate hardware multiplies 8bit x 8bit = 16bit */
+      /* now done by computeType
       if (IS_CHAR(LETYPE(tree)) && IS_CHAR(RETYPE(tree))) {
 	SPEC_NOUN(TETYPE(tree)) = V_INT;
       }
+      */
 
       return tree;
 
@@ -2937,7 +2943,8 @@ decorateType (ast * tree)
       else
 	TETYPE (tree) = getSpec (TTYPE (tree) =
 				 computeType (LTYPE (tree),
-					      RTYPE (tree)));
+					      RTYPE (tree),
+					      FALSE));
       return tree;
 
       /*------------------------------------------------------------------*/
@@ -3036,7 +3043,8 @@ decorateType (ast * tree)
       else
 	TETYPE (tree) = getSpec (TTYPE (tree) =
 				 computeType (LTYPE (tree),
-					      RTYPE (tree)));
+					      RTYPE (tree),
+					      FALSE));
 
       LRVAL (tree) = RRVAL (tree) = 1;
 
@@ -3459,16 +3467,18 @@ decorateType (ast * tree)
 	}
       /* if unsigned value < 0  then always false */
       /* if (unsigned value) > 0 then (unsigned value) */
-      if (SPEC_USIGN(LETYPE(tree)) && IS_LITERAL(RTYPE(tree))  && 
-	  ((int) floatFromVal (valFromType (RETYPE (tree)))) == 0) {
-
-	  if (tree->opval.op == '<') {
+      if (SPEC_USIGN(LETYPE(tree)) && IS_LITERAL(RTYPE(tree))  &&
+	  ((int) floatFromVal (valFromType (RETYPE (tree)))) == 0)
+	{
+	  if (tree->opval.op == '<')
+	    {
 	      return tree->right;
-	  }
-	  if (tree->opval.op == '>') {
+	    }
+	  if (tree->opval.op == '>')
+	    {
 	      return tree->left;
-	  }
-      }
+	    }
+        }
       /* if they are both literal then */
       /* rewrite the tree */
       if (IS_LITERAL (RTYPE (tree)) &&
@@ -3607,7 +3617,7 @@ decorateType (ast * tree)
 	  goto errorTreeReturn;
 	}
 
-      TTYPE (tree) = computeType (LTYPE (tree), RTYPE (tree));
+      TTYPE (tree) = computeType (LTYPE (tree), RTYPE (tree), FALSE);
       TETYPE (tree) = getSpec (TTYPE (tree));
       return tree;
 
@@ -3689,7 +3699,8 @@ decorateType (ast * tree)
       RRVAL (tree) = 1;
       TETYPE (tree) = getSpec (TTYPE (tree) =
 			       computeType (LTYPE (tree),
-					    RTYPE (tree)));
+					    RTYPE (tree),
+					    FALSE));
 
       if (!tree->initMode && IS_CONSTANT (LETYPE (tree)))
 	werror (E_CODE_WRITE, "-=");
@@ -3730,7 +3741,8 @@ decorateType (ast * tree)
       RRVAL (tree) = 1;
       TETYPE (tree) = getSpec (TTYPE (tree) =
 			       computeType (LTYPE (tree),
-					    RTYPE (tree)));
+					    RTYPE (tree),
+					    FALSE));
 
       if (!tree->initMode && IS_CONSTANT (LETYPE (tree)))
 	werror (E_CODE_WRITE, "+=");
@@ -5140,7 +5152,7 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 				fprintf(outfile,"%u", (TYPE_UDWORD) floatFromVal(tree->opval.val));
 			else
 				fprintf(outfile,"%d", (TYPE_DWORD) floatFromVal(tree->opval.val));
-			fprintf(outfile,", 0x%x, %g", (TYPE_UDWORD) floatFromVal(tree->opval.val),
+			fprintf(outfile,", 0x%x, %f", (TYPE_UDWORD) floatFromVal(tree->opval.val),
 			                              floatFromVal(tree->opval.val));
 		} else if (tree->opval.val->sym) {
 			/* if the undefined flag is set then give error message */

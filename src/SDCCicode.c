@@ -53,6 +53,7 @@ operand *geniCodeRValue (operand *, bool);
 operand *geniCodeDerefPtr (operand *,int);
 int isLvaluereq(int lvl);
 void  setOClass (sym_link * ptr, sym_link * spec);
+static operand *geniCodeCast (sym_link *, operand *, bool);
 
 #define PRINTFUNC(x) void x (FILE *of, iCode *ic, char *s)
 /* forward definition of ic print functions */
@@ -144,14 +145,14 @@ void checkConstantRange(sym_link *ltype, value *val, char *msg,
 
   max = pow ((double)2.0, (double)bitsForType(ltype));
 
-  if (SPEC_LONG(val->type)) {
-    if (SPEC_USIGN(val->type)) {
+  if (IS_LONG(val->type)) {
+    if (IS_UNSIGNED(val->type)) {
       v=SPEC_CVAL(val->type).v_ulong;
     } else {
       v=SPEC_CVAL(val->type).v_long;
     }
   } else {
-    if (SPEC_USIGN(val->type)) {
+    if (IS_UNSIGNED(val->type)) {
       v=SPEC_CVAL(val->type).v_uint;
     } else {
       v=SPEC_CVAL(val->type).v_int;
@@ -165,21 +166,21 @@ void checkConstantRange(sym_link *ltype, value *val, char *msg,
     pedantic=2;
 #endif
 
-  if (SPEC_NOUN(ltype)==FLOAT) {
+  if (IS_FLOAT(ltype)) {
     // anything will do
     return;
   }
 
-  if (!SPEC_USIGN(val->type) && v<0) {
+  if (!IS_UNSIGNED(val->type) && v<0) {
     negative=1;
-    if (SPEC_USIGN(ltype) && (pedantic>1)) {
+    if (IS_UNSIGNED(ltype) && (pedantic>1)) {
       warnings++;
     }
     v=-v;
   }
 
   // if very pedantic: "char c=200" is not allowed
-  if (pedantic>1 && !SPEC_USIGN(ltype)) {
+  if (pedantic>1 && !IS_UNSIGNED(ltype)) {
     max = max/2 + negative;
   }
 
@@ -190,7 +191,7 @@ void checkConstantRange(sym_link *ltype, value *val, char *msg,
 #if 0 // temporary disabled, leaving the warning as a reminder
   if (warnings) {
     SNPRINTF (message, sizeof(message), "for %s %s in %s", 
-	     SPEC_USIGN(ltype) ? "unsigned" : "signed",
+	     IS_UNSIGNED(ltype) ? "unsigned" : "signed",
 	     nounName(ltype), msg);
     werror (W_CONST_RANGE, message);
 
@@ -222,7 +223,7 @@ printOperand (operand * op, FILE * file)
 
     case VALUE:
       opetype = getSpec (operandType (op));
-      if (SPEC_NOUN (opetype) == V_FLOAT)
+      if (IS_FLOAT (opetype))
 	fprintf (file, "%g {", SPEC_CVAL (opetype).v_float);
       else
 	fprintf (file, "0x%x {", (unsigned) floatFromVal (op->operand.valOperand));
@@ -1065,7 +1066,7 @@ iCode *getBuiltinParms (iCode *ic, int *pcount, operand **parms)
 	ic = ic->next;
 	(*pcount)++;
     }
-    
+
     ic->generated = 1;
     /* make sure this is a builtin function call */
     assert(IS_SYMOP(IC_LEFT(ic)));
@@ -1123,14 +1124,14 @@ operandOperation (operand * left, operand * right,
           !IS_SPEC (type))
         {
 	  /* long is handled here, because it can overflow with double */
-	  if (SPEC_LONG (type) ||
+	  if (IS_LONG (type) ||
 	      !IS_SPEC (type))
 	  /* signed and unsigned mul are the same, as long as the precision
 	     of the result isn't bigger than the precision of the operands. */
 	    retval = operandFromValue (valCastLiteral (type,
 		     (TYPE_UDWORD) operandLitValue (left) *
 		     (TYPE_UDWORD) operandLitValue (right)));
-	  else if (SPEC_USIGN (type)) /* unsigned int */
+	  else if (IS_UNSIGNED (type)) /* unsigned int */
 	    {
 	      /* unsigned int is handled here in order to detect overflow */
 	      TYPE_UDWORD ul = (TYPE_UWORD) operandLitValue (left) *
@@ -1165,23 +1166,35 @@ operandOperation (operand * left, operand * right,
 
 	}
       else
-	retval = operandFromValue (valCastLiteral (type,
-						   operandLitValue (left) /
-						   operandLitValue (right)));
+        {
+	  if (IS_UNSIGNED (type))
+	    {
+	      SPEC_USIGN (let) = 1;
+	      SPEC_USIGN (ret) = 1;
+	      retval = operandFromValue (valCastLiteral (type,
+					(TYPE_UDWORD) operandLitValue (left) /
+					(TYPE_UDWORD) operandLitValue (right)));
+	    }
+	  else
+	    {
+              retval = operandFromValue (valCastLiteral (type,
+						     operandLitValue (left) /
+						     operandLitValue (right)));
+	    }
+	}
       break;
     case '%':
-      if ((TYPE_UDWORD) operandLitValue (right) == 0) {
+      if ((TYPE_UDWORD) operandLitValue (right) == 0)
+        {
 	  werror (E_DIVIDE_BY_ZERO);
 	  retval = right;
-      }
+        }
       else
         {
-          if (SPEC_USIGN(let) || SPEC_USIGN(ret))
-	    /* one of the operands is unsigned */
+          if (IS_UNSIGNED (type))
 	    retval = operandFromLit ((TYPE_UDWORD) operandLitValue (left) %
 				     (TYPE_UDWORD) operandLitValue (right));
 	  else
-	    /* both operands are signed */
 	    retval = operandFromLit ((TYPE_DWORD) operandLitValue (left) %
 				     (TYPE_DWORD) operandLitValue (right));
         }
@@ -1195,7 +1208,7 @@ operandOperation (operand * left, operand * right,
     case RIGHT_OP:
       /* The number of right shifts is always unsigned. Signed doesn't make
 	 sense here. Shifting by a negative number is impossible. */
-      if (SPEC_USIGN(let))
+      if (IS_UNSIGNED(let))
         /* unsigned: logic shift right */
         retval = operandFromLit ((TYPE_UDWORD) operandLitValue (left) >>
 				 (TYPE_UDWORD) operandLitValue (right));
@@ -1210,14 +1223,14 @@ operandOperation (operand * left, operand * right,
 	TYPE_UDWORD l, r;
 
 	l = (TYPE_UDWORD) operandLitValue (left);
-	if (SPEC_NOUN(OP_VALUE(left)->type) == V_CHAR)
+	if (IS_CHAR(OP_VALUE(left)->type))
 	  l &= 0xff;
-	else if (!SPEC_LONG (OP_VALUE(left)->type))
+	else if (!IS_LONG (OP_VALUE(left)->type))
 	  l &= 0xffff;
 	r = (TYPE_UDWORD) operandLitValue (right);
-	if (SPEC_NOUN(OP_VALUE(right)->type) == V_CHAR)
+	if (IS_CHAR(OP_VALUE(right)->type))
 	  r &= 0xff;
-	else if (!SPEC_LONG (OP_VALUE(right)->type))
+	else if (!IS_LONG (OP_VALUE(right)->type))
 	  r &= 0xffff;
 	retval = operandFromLit (l == r);
       }
@@ -1736,18 +1749,29 @@ usualUnaryConversions (operand * op)
 /*-----------------------------------------------------------------*/
 /* perform "usual binary conversions"                              */
 /*-----------------------------------------------------------------*/
-sym_link *
-usualBinaryConversions (operand ** op1, operand ** op2)
+static sym_link *
+usualBinaryConversions (operand ** op1, operand ** op2,
+                        bool promoteCharToInt, bool isMul)
 {
   sym_link *ctype;
   sym_link *rtype = operandType (*op2);
   sym_link *ltype = operandType (*op1);
-  
-  ctype = computeType (ltype, rtype);
+
+  ctype = computeType (ltype, rtype, promoteCharToInt);
+
+  /* special for multiplication:
+     This if for 'mul a,b', which takes two chars and returns an int */
+  if (   isMul
+      /* && promoteCharToInt	superfluous, already handled by computeType() */
+      && IS_CHAR (getSpec (ltype))
+      && IS_CHAR (getSpec (rtype))
+      && !(IS_UNSIGNED (getSpec (rtype)) ^ IS_UNSIGNED (getSpec (ltype)))
+      && IS_INT  (getSpec (ctype)))
+    return ctype;
 
   *op1 = geniCodeCast (ctype, *op1, TRUE);
   *op2 = geniCodeCast (ctype, *op2, TRUE);
-  
+
   return ctype;
 }
 
@@ -1812,7 +1836,7 @@ geniCodeRValue (operand * op, bool force)
 /*-----------------------------------------------------------------*/
 /* geniCodeCast - changes the value from one type to another       */
 /*-----------------------------------------------------------------*/
-operand *
+static operand *
 geniCodeCast (sym_link * type, operand * op, bool implicit)
 {
   iCode *ic;
@@ -1834,14 +1858,16 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
 
   /* if this is a literal then just change the type & return */
   if (IS_LITERAL (opetype) && op->type == VALUE && !IS_PTR (type) && !IS_PTR (optype))
-    return operandFromValue (valCastLiteral (type,
-					     operandLitValue (op)));
+    {
+      return operandFromValue (valCastLiteral (type,
+					       operandLitValue (op)));
+    }
 
   /* if casting to/from pointers, do some checking */
   if (IS_PTR(type)) { // to a pointer
     if (!IS_PTR(optype) && !IS_FUNC(optype) && !IS_AGGREGATE(optype)) { // from a non pointer
-      if (IS_INTEGRAL(optype)) { 
-	// maybe this is NULL, than it's ok. 
+      if (IS_INTEGRAL(optype)) {
+	// maybe this is NULL, than it's ok.
 	if (!(IS_LITERAL(optype) && (SPEC_CVAL(optype).v_ulong ==0))) {
 	  if (port->s.gptr_size > port->s.fptr_size && IS_GENPTR(type)) {
 	    // no way to set the storage
@@ -1857,9 +1883,9 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
 	    errors++;
 	  }
 	}
-      }	else { 
+      }	else {
 	// shouldn't do that with float, array or structure unless to void
-	if (!IS_VOID(getSpec(type)) && 
+	if (!IS_VOID(getSpec(type)) &&
 	    !(IS_CODEPTR(type) && IS_FUNC(type->next) && IS_FUNC(optype))) {
 	  werror(E_INCOMPAT_TYPES);
 	  errors++;
@@ -1869,7 +1895,7 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
       if (port->s.gptr_size > port->s.fptr_size /*!TARGET_IS_Z80 && !TARGET_IS_GBZ80*/) {
 	// if not a pointer to a function
 	if (!(IS_CODEPTR(type) && IS_FUNC(type->next) && IS_FUNC(optype))) {
-	  if (implicit) { // if not to generic, they have to match 
+	  if (implicit) { // if not to generic, they have to match
 	    if ((!IS_GENPTR(type) && (DCL_TYPE(optype) != DCL_TYPE(type)))) {
 	      werror(E_INCOMPAT_PTYPES);
 	      errors++;
@@ -1903,11 +1929,10 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
       ((IS_SPEC (type) && IS_SPEC (optype)) ||
        (!IS_SPEC (type) && !IS_SPEC (optype))))
     {
-
       ic = newiCode ('=', NULL, op);
       IC_RESULT (ic) = newiTempOperand (type, 0);
       SPIL_LOC (IC_RESULT (ic)) =
-	(IS_TRUE_SYMOP (op) ? OP_SYMBOL (op) : NULL);
+        (IS_TRUE_SYMOP (op) ? OP_SYMBOL (op) : NULL);
       IC_RESULT (ic)->isaddr = 0;
     }
   else
@@ -1932,7 +1957,7 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
 /*-----------------------------------------------------------------*/
 /* geniCodeLabel - will create a Label                             */
 /*-----------------------------------------------------------------*/
-void 
+void
 geniCodeLabel (symbol * label)
 {
   iCode *ic;
@@ -1944,7 +1969,7 @@ geniCodeLabel (symbol * label)
 /*-----------------------------------------------------------------*/
 /* geniCodeGoto  - will create a Goto                              */
 /*-----------------------------------------------------------------*/
-void 
+void
 geniCodeGoto (symbol * label)
 {
   iCode *ic;
@@ -1957,7 +1982,7 @@ geniCodeGoto (symbol * label)
 /* geniCodeMultiply - gen intermediate code for multiplication     */
 /*-----------------------------------------------------------------*/
 operand *
-geniCodeMultiply (operand * left, operand * right,int resultIsInt)
+geniCodeMultiply (operand * left, operand * right, int resultIsInt)
 {
   iCode *ic;
   int p2 = 0;
@@ -1970,20 +1995,16 @@ geniCodeMultiply (operand * left, operand * right,int resultIsInt)
 				      right->operand.valOperand));
 
   if (IS_LITERAL(retype)) {
-    p2 = powof2 ((unsigned long) floatFromVal (right->operand.valOperand));
+    p2 = powof2 ((TYPE_UDWORD) floatFromVal (right->operand.valOperand));
   }
 
-  resType = usualBinaryConversions (&left, &right);
+  resType = usualBinaryConversions (&left, &right, resultIsInt, TRUE);
 #if 1
   rtype = operandType (right);
   retype = getSpec (rtype);
   ltype = operandType (left);
   letype = getSpec (ltype);
 #endif
-  if (resultIsInt)
-    {
-      SPEC_NOUN(getSpec(resType))=V_INT;
-    }
 
   /* if the right is a literal & power of 2 */
   /* then make it a left shift              */
@@ -2030,15 +2051,15 @@ geniCodeDivision (operand * left, operand * right)
   sym_link *ltype = operandType (left);
   sym_link *letype = getSpec (ltype);
 
-  resType = usualBinaryConversions (&left, &right);
+  resType = usualBinaryConversions (&left, &right, TRUE, FALSE);
 
   /* if the right is a literal & power of 2
      and left is unsigned then make it a
      right shift */
   if (IS_LITERAL (retype) &&
       !IS_FLOAT (letype) &&
-      SPEC_USIGN(letype) &&
-      (p2 = powof2 ((unsigned long)
+      IS_UNSIGNED(letype) &&
+      (p2 = powof2 ((TYPE_UDWORD)
 		    floatFromVal (right->operand.valOperand)))) {
     ic = newiCode (RIGHT_OP, left, operandFromLit (p2)); /* right shift */
   }
@@ -2069,7 +2090,7 @@ geniCodeModulus (operand * left, operand * right)
     return operandFromValue (valMod (left->operand.valOperand,
 				     right->operand.valOperand));
 
-  resType = usualBinaryConversions (&left, &right);
+  resType = usualBinaryConversions (&left, &right, TRUE, FALSE);
 
   /* now they are the same size */
   ic = newiCode ('%', left, right);
@@ -2148,7 +2169,7 @@ geniCodeSubtract (operand * left, operand * right)
     }
   else
     {				/* make them the same size */
-      resType = usualBinaryConversions (&left, &right);
+      resType = usualBinaryConversions (&left, &right, FALSE, FALSE);
     }
 
   ic = newiCode ('-', left, right);
@@ -2174,6 +2195,7 @@ geniCodeAdd (operand * left, operand * right, int lvl)
   sym_link *resType;
   operand *size;
   int isarray = 0;
+  bool indexUnsigned;
   LRTYPE;
 
   /* if the right side is LITERAL zero */
@@ -2190,15 +2212,22 @@ geniCodeAdd (operand * left, operand * right, int lvl)
     {
       isarray = left->isaddr;
       // there is no need to multiply with 1
-      if (getSize(ltype->next)!=1) {
-	size  =	operandFromLit (getSize (ltype->next));
-	right = geniCodeMultiply (right, size, (getArraySizePtr(left) >= INTSIZE));
-      }
+      if (getSize (ltype->next) != 1)
+        {
+	  size  = operandFromLit (getSize (ltype->next));
+	  indexUnsigned = IS_UNSIGNED (getSpec (operandType (right)));
+	  right = geniCodeMultiply (right, size, (getArraySizePtr(left) >= INTSIZE));
+	  /* Even if right is a 'unsigned char',
+	     the result will be a 'signed int' due to the promotion rules.
+	     It doesn't make sense when accessing arrays, so let's fix it here: */
+	  if (indexUnsigned)
+	    SPEC_USIGN (getSpec (operandType (right))) = 1;
+	}
       resType = copyLinkChain (ltype);
     }
   else
     { // make them the same size
-      resType = usualBinaryConversions (&left, &right);
+      resType = usualBinaryConversions (&left, &right, FALSE, FALSE);
     }
 
   /* if they are both literals then we know */
@@ -2270,20 +2299,24 @@ geniCodeArray (operand * left, operand * right,int lvl)
 {
   iCode *ic;
   sym_link *ltype = operandType (left);
-  
+  bool indexUnsigned;
+
   if (IS_PTR (ltype))
     {
       if (IS_PTR (ltype->next) && left->isaddr)
 	{
 	  left = geniCodeRValue (left, FALSE);
 	}
-      
+
       return geniCodeDerefPtr (geniCodeAdd (left, right, lvl), lvl);
     }
-
+  indexUnsigned = IS_UNSIGNED (getSpec (operandType (right)));
   right = geniCodeMultiply (right,
 			    operandFromLit (getSize (ltype->next)), (getArraySizePtr(left) >= INTSIZE));
-
+  /* Even if right is a 'unsigned char', the result will be a 'signed int' due to the promotion rules.
+     It doesn't make sense when accessing arrays, so let's fix it here: */
+  if (indexUnsigned)
+    SPEC_USIGN (getSpec (operandType (right))) = 1;
   /* we can check for limits here */
   if (isOperandLiteral (right) &&
       IS_ARRAY (ltype) &&
@@ -2308,7 +2341,7 @@ geniCodeArray (operand * left, operand * right,int lvl)
 }
 
 /*-----------------------------------------------------------------*/
-/* geniCodeStruct - generates intermediate code for structres      */
+/* geniCodeStruct - generates intermediate code for structures     */
 /*-----------------------------------------------------------------*/
 operand *
 geniCodeStruct (operand * left, operand * right, bool islval)
@@ -2779,7 +2812,7 @@ geniCodeLogic (operand * left, operand * right, int op)
         }
     }
 
-  ctype = usualBinaryConversions (&left, &right);
+  ctype = usualBinaryConversions (&left, &right, FALSE, FALSE);
 
   ic = newiCode (op, left, right);
   IC_RESULT (ic) = newiTempOperand (newCharLink (), 1);
@@ -3347,7 +3380,7 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
       sym_link *cetype = getSpec (operandType (cond));
       /* no need to check the lower bound if
          the condition is unsigned & minimum value is zero */
-      if (!(min == 0 && SPEC_USIGN (cetype)))
+      if (!(min == 0 && IS_UNSIGNED (cetype)))
 	{
 	  boundary = geniCodeLogic (cond, operandFromLit (min), '<');
 	  ic = newiCodeCondition (boundary, falseLabel, NULL);

@@ -1338,7 +1338,7 @@ checkSClass (symbol * sym, int isProto)
       }
     }
   }
-  
+
   /* automatic symbols cannot be given   */
   /* an absolute address ignore it      */
   if (sym->level &&
@@ -1513,7 +1513,7 @@ cleanUpLevel (bucket ** table, int level)
 /* computeType - computes the resultant type from two types         */
 /*------------------------------------------------------------------*/
 sym_link *
-computeType (sym_link * type1, sym_link * type2)
+computeType (sym_link * type1, sym_link * type2, bool promoteCharToInt)
 {
   sym_link *rType;
   sym_link *reType;
@@ -1546,14 +1546,18 @@ computeType (sym_link * type1, sym_link * type2)
     rType = copyLinkChain (type2);
 
   reType = getSpec (rType);
-#if 0
-  if (SPEC_NOUN (reType) == V_CHAR)
-    SPEC_NOUN (reType) = V_INT;
-#endif
 
-  /* if either of them unsigned but not val then make this unsigned */
-  if ((SPEC_USIGN (etype1) || SPEC_USIGN (etype2)) &&
-      !IS_FLOAT (reType))
+  /* avoid conflicting types */
+  reType->select.s._signed = 0;
+
+  if (IS_CHAR (reType) && promoteCharToInt)
+    SPEC_NOUN (reType) = V_INT;
+
+  if (   (   (   SPEC_USIGN (etype1)
+	      && (getSize (etype1) >= getSize (reType)))
+	  || (   SPEC_USIGN (etype2)
+	      && (getSize (etype2) >= getSize (reType))))
+      && !IS_FLOAT (reType))
     SPEC_USIGN (reType) = 1;
   else
     SPEC_USIGN (reType) = 0;
@@ -2628,8 +2632,8 @@ printTypeChainRaw (sym_link * start, FILE * of)
 /*-----------------------------------------------------------------*/
 /* powof2 - returns power of two for the number if number is pow 2 */
 /*-----------------------------------------------------------------*/
-int 
-powof2 (unsigned long num)
+int
+powof2 (TYPE_UDWORD num)
 {
   int nshifts = 0;
   int n1s = 0;
@@ -2672,7 +2676,7 @@ sym_link *floatType;
 static char *
 _mangleFunctionName(char *in)
 {
-  if (port->getMangledFunctionName) 
+  if (port->getMangledFunctionName)
     {
       return port->getMangledFunctionName(in);
     }

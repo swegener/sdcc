@@ -1,3 +1,32 @@
+2004-01-01 Bernhard Held <bernhard@bernhardheld.de>
+
+	Many signedness and type propagation fixes:
+	* src/SDCCicode.c: made geniCodeCast() static
+	replaced SPEC_ by IS_ (cosmetic)
+	(operandOperation): fixed div and mod operation
+	(usualBinaryConversions): added support for promotion of char
+	(geniCodeMultiply): replaced (unsigned long) by (TYPE_UDWORD)
+	(geniCodeDivision): replaced (unsigned long) by (TYPE_UDWORD)
+	(geniCodeAdd): an array index will stay unsigned, even if promoted
+	from char to int
+	(geniCodeArray): ditto
+	* src/SDCCicode.h: made geniCodeCast() static: removed prototype
+	* src/SDCCsymt.c (computeType): added more support for char;
+	promotion of char is selectable by promoteCharToInt, fixed signedness
+	for all cases
+	(powof2): replaced (unsigned long) by (TYPE_UDWORD)
+	* src/SDCCsymt.h (powof2): replaced (unsigned long) by (TYPE_UDWORD)
+	* src/SDCCval (val*): replaced signedness calculation by
+	computeType()
+	rearranged if-branches (cosmetic)
+	(valShift): added warning W_SHIFT_CHANGED
+	(valCompare): fixed problem with different types
+	* src/hc08/rallo.c (leastUsedLR): fixed gcc 3.3 warning
+	* support/regression/tests/literalop.c: added many cases
+	* support/regression/tests/ast_constant_folding.c: changed finally to
+	'unsigned int'
+	* .version: new year, new version: 2.3.7
+
 2004-01-01 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCCsymt.h: missing from yesterday's commits
@@ -22,7 +51,7 @@
 
 2003-12-22 Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
-	* src/mcs51/gen.c (genPlus): added special handling for 256 byte 
+	* src/mcs51/gen.c (genPlus): added special handling for 256 byte
 	aligned xdata arrays. Erik helped me with the if clause.
 
 2003-12-20 Erik Petrich <epetrich@ivorytower.norman.ok.us>
@@ -104,8 +133,8 @@
 
 2003-12-13 Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
-	* src/mcs51/main.c: fixed bug #737001 for the mcs51. SDCC clears 
-	xdata and data memory on startup. Set the environment variable 
+	* src/mcs51/main.c: fixed bug #737001 for the mcs51. SDCC clears
+	xdata and data memory on startup. Set the environment variable
 	SDCC_NOGENRAMCLEAR to disable this.
 	* src/mcs51/peephole.def,
 	* src/ds390/peephole.def: using the atomic test and clear instruction jbc

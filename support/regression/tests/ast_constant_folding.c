@@ -48,7 +48,7 @@ foo_mul (void)
 unsigned
 foo_div (void)
 {
-  return 33971 / i / 5 / i / i / 12;
+  return 33971u / i / 5 / i / i / 12;
 }
 
 unsigned

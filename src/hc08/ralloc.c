@@ -434,7 +434,7 @@ leastUsedLR (set * sset)
 
     }
 
-  setToNull ((void **) &sset);
+  setToNull ((void *) &sset);
   sym->blockSpil = 0;
   return sym;
 }

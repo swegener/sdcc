@@ -14,8 +14,6 @@
 typedef   signed {type} stype;
 typedef unsigned {type} utype;
 
-#define _{type}
-
 #if defined(PORT_HOST) || defined(SDCC_z80) || defined(SDCC_gbz80)
 #  define idata
 #  define code
@@ -23,9 +21,9 @@ typedef unsigned {type} utype;
 
 volatile char is8 = 8;
 
-signed char  sc;
-signed short ss;
-signed LONG  sl;
+  signed char  sc;
+  signed short ss;
+  signed LONG  sl;
 unsigned char  uc;
 unsigned short us;
 unsigned LONG  ul;
@@ -45,7 +43,33 @@ unsigned LONG t1, t2;
 void
 testOpOp(void)
 {
-  /* mul ast */
+  /* mul signedness: usualBinaryConversions() */
+  vsc = 0x7f;
+  vuc = 0xfe;
+
+  sc = vsc * vsc;
+  ASSERT(sc == 1);
+  sc = vuc * vsc;
+  ASSERT(sc == 2);
+  sc = vuc * vuc;
+  ASSERT(sc == 4);
+
+  ss = vsc * vsc;
+  ASSERT(ss == 0x3f01);
+  ss = vuc * vsc;
+  ASSERT(ss == 0x7e02);
+  ss = vuc * vuc;
+  ASSERT(ss == (short) 0xfc04);
+  /* after promotion the result of the multiplication is 'signed int', which overflows! */
+  if (sizeof (int) == 2)
+    ASSERT(vuc * vuc < 1);
+  else
+    {
+      vus = 0xfffe;
+      ASSERT(vus * vus < 1);
+    }
+
+  /* mul ast: valMult() */
   ASSERT((stype) -3 * (stype) -1 == (stype)  3);
   ASSERT((stype) -3 * (stype)  1 == (stype) -3);
   ASSERT((stype)  3 * (stype) -1 == (stype) -3);
@@ -77,11 +101,17 @@ testOpOp(void)
   ASSERT(1 *  40000  * is8 == 320000);				     /* LONG	 */
   ASSERT(1 * 0x4000  * is8 == (sizeof(int) == 2 ? 0 : 0x20000));     /* unsigned */
 
-  ASSERT(-1 * 1  < 0);
-  ASSERT(-1 * 1u > 0);
+  ASSERT(-2 * 1  < 1); /* comparison with 0 is optimized, so let's use 1 instead */
+  ASSERT(-2 * 1u > 1);
+  ASSERT(0x7fffu     * 2  > 1);
+  ASSERT(0x7fffffffu * 2  > 1);
+  if (sizeof (int) == 2)
+    ASSERT(0x7fff * (unsigned char) 2 < 1);
+  else
+    ASSERT(0x7fffffff * (unsigned char) 2 < 1);
+  ASSERT(0x7fffffff  * (unsigned short) 2 < 1);
 
-
-  /* mul icode */
+  /* mul icode: operandOperation() */
   s = -3;
   ASSERT(s * (stype) -1 == (stype)  3);
   ASSERT(s * (stype)  1 == (stype) -3);
@@ -108,26 +138,85 @@ testOpOp(void)
   ASSERT((signed short) -2 * (unsigned short) 0x8004 == (sizeof(int) == 2 ? 0xfff8 : 0xfffefff8));
   ASSERT((signed LONG ) -2 * (unsigned LONG ) 0x8004 == 0xfffefff8);
 
-
-
+  /* div ast: valDiv() */
   ASSERT((stype) -12 / (stype) -3 == (stype)  4);
   ASSERT((stype) -12 / (stype)  3 == (stype) -4);
   ASSERT((stype)  12 / (stype) -3 == (stype) -4);
 
-//  ASSERT((stype) -12 / (utype) -3 == (stype)  4);
-//  ASSERT((utype) -12 / (stype) -3 == (stype)  4);
-//  ASSERT((utype) -12 / (utype) -3 == (stype)  4);
+  ASSERT((unsigned char ) -12 / (signed char ) -3 == (sizeof(int) == 2 ? 0xffaf : 0xffffffaf));
+  ASSERT((unsigned short) -12 / (signed short) -3 == (sizeof(int) == 2 ?      0 : 0xffffaaaf));
+  ASSERT((unsigned LONG ) -12 / (signed LONG ) -3 == 0);
+  ASSERT((utype)          -12 / (stype)         3 == (stype) 0x55555551);
+  ASSERT((unsigned char )  12 / (signed char ) -3 == -4);
+  ASSERT((unsigned short)  12 / (signed short) -3 == (sizeof(int) == 2 ?      0 : 0xfffffffc));
+  ASSERT((unsigned LONG )  12 / (signed LONG ) -3 == 0);
 
+  ASSERT((stype)        -12 / (utype)          -3 == 0);
+  ASSERT((signed char ) -12 / (unsigned char )  3 == -4);
+  ASSERT((signed short) -12 / (unsigned short)  3 == (sizeof(int) == 2 ? 0x5551 :  -4));
+  ASSERT((signed LONG ) -12 / (unsigned LONG )  3 == 0x55555551);
+  ASSERT((stype)         12 / (utype)          -3 == 0);
 
   ASSERT(12u / 3 * 10000 == 40000);
 
   ASSERT(-1 / 1 < 0);
 
+  /* div icode: operandOperation() */
+  s = -12;
+  ASSERT(s / (stype) -3 == (stype)  4);
+  s = -12;
+  ASSERT(s / (stype)  3 == (stype) -4);
+  s = 12;
+  ASSERT(s / (stype) -3 == (stype) -4);
+
+  uc = -12;
+  ASSERT(uc / (signed char ) -3 == (sizeof(int) == 2 ? 0xffaf : 0xffffffaf));
+  us = -12;
+  ASSERT(us / (signed short) -3 == (sizeof(int) == 2 ?      0 : 0xffffaaaf));
+  ul = -12;
+  ASSERT(ul / (signed LONG ) -3 == 0);
+  u  = -12;
+  ASSERT(u  / (stype)         3 == (stype) 0x55555551);
+  uc = 12;
+  ASSERT(uc / (signed char ) -3 == -4);
+  us = 12;
+  ASSERT(us / (signed short) -3 == (sizeof(int) == 2 ?      0 : 0xfffffffc));
+  ul = 12;
+  ASSERT(ul / (signed LONG ) -3 == 0);
+
+  s  = -12;
+  ASSERT(s  / (utype)          -3 == 0);
+  sc = -12;
+  ASSERT(sc / (unsigned char )  3 == -4);
+  ss = -12;
+  ASSERT(ss / (unsigned short)  3 == (sizeof(int) == 2 ? 0x5551 :  -4));
+  sl = -12;
+  ASSERT(sl / (unsigned LONG )  3 == 0x55555551);
+  s  = 12;
+  ASSERT(s  / (utype)          -3 == 0);
 
 
-  ASSERT((stype) -14 % (stype) -3 == (stype) -2);
-  ASSERT((stype) -14 % (stype)  3 == (stype) -2);
-  ASSERT((stype)  14 % (stype) -3 == (stype)  2);
+  /* mod ast: valMod() */
+  /* -11 : 0xfff5 */
+  /* -17 : 0xffef */
+  ASSERT((stype) -17 % (stype) -11 == (stype) -6);
+  ASSERT((stype) -17 % (stype)  11 == (stype) -6);
+  ASSERT((stype)  17 % (stype) -11 == (stype)  6);
+  ASSERT((unsigned char ) -17 % (signed char ) -11 ==   8);
+  ASSERT((unsigned short) -17 % (signed short) -11 == (sizeof(int) == 2 ? -17 : 3));
+  ASSERT((unsigned LONG ) -17 % (signed LONG ) -11 == -17);
+  ASSERT((unsigned char ) -17 % (signed char )  11 ==   8);
+  ASSERT((unsigned short) -17 % (signed short)  11 ==   3);
+  ASSERT((unsigned LONG ) -17 % (signed LONG )  11 ==   9);
+  ASSERT((unsigned char )  17 % (signed char ) -11 ==   6);
+  ASSERT((unsigned short)  17 % (signed short) -11 == (sizeof(int) == 2 ? 17 : 6));
+  ASSERT((unsigned LONG )  17 % (signed LONG ) -11 ==  17);
 
   ASSERT(-3 % 2 < 0);
+
+
+  /* add */
+  ASSERT( 80  +  80  == 160);
+  ASSERT(150  + 150  == 300);
+  ASSERT(160u + 160u == 320);
 }

@@ -1932,6 +1932,14 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
   }
 
   /* if they are the same size create an assignment */
+  
+  /* This seems very dangerous to me, since there are several */
+  /* optimizations (for example, gcse) that don't notice the  */
+  /* cast hidden in this assignement and may simplify an      */
+  /* iCode to use the original (uncasted) operand.            */
+  /* Unfortunately, other things break when this cast is      */
+  /* made explicit. Need to fix this someday.                 */
+  /* -- EEP, 2004/01/21                                       */
   if (getSize (type) == getSize (optype) &&
       !IS_BITFIELD (type) &&
       !IS_FLOAT (type) &&
@@ -3040,7 +3048,10 @@ geniCodeParms (ast * parms, value *argVals, int *stack,
 
   if (argVals==NULL) {
     // first argument
-    argVals=FUNC_ARGS(func->type);
+    if (IS_CODEPTR(func->type))
+      argVals = FUNC_ARGS (func->type->next);
+    else
+      argVals = FUNC_ARGS (func->type);
   }
 
   /* if this is a param node then do the left & right */

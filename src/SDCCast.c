@@ -652,6 +652,7 @@ processParms (ast *func,
 	      bool rightmost)
 {
   RESULT_TYPE resultType;
+  sym_link *functype;
   
   /* if none of them exist */
   if (!defParm && !actParm)
@@ -667,10 +668,15 @@ processParms (ast *func,
       checkTypeSanity(defParm->etype, defParm->name);
     }
 
+  if (IS_CODEPTR (func->ftype))
+    functype = func->ftype->next;
+  else
+    functype = func->ftype;
+    
   /* if the function is being called via a pointer &   */
   /* it has not been defined a reentrant then we cannot */
   /* have parameters                                   */
-  if (func->type != EX_VALUE && !IFFUNC_ISREENT (func->ftype) && !options.stackAuto)
+  if (func->type != EX_VALUE && !IFFUNC_ISREENT (functype) && !options.stackAuto)
     {
       werror (W_NONRENT_ARGS);
       return 1;
@@ -678,10 +684,8 @@ processParms (ast *func,
 
   /* if defined parameters ended but actual parameters */
   /* exist and this is not defined as a variable arg   */
-  if (!defParm && actParm && !IFFUNC_HASVARARGS(func->ftype))
+  if (!defParm && actParm && !IFFUNC_HASVARARGS(functype))
     {
-      /* if (func->type==EX_VALUE && func->opval.val->sym->undefined) */
-      /*  return 1; *//* Already gave them an undefined function error */
       werror (E_TOO_MANY_PARMS);
       return 1;
     }
@@ -729,7 +733,7 @@ processParms (ast *func,
     }
 
   /* If this is a varargs function... */
-  if (!defParm && actParm && IFFUNC_HASVARARGS(func->ftype))
+  if (!defParm && actParm && IFFUNC_HASVARARGS(functype))
     {
       ast *newType = NULL;
       sym_link *ftype;
@@ -780,7 +784,7 @@ processParms (ast *func,
   /* if defined parameters ended but actual has not & */
   /* reentrant */
   if (!defParm && actParm &&
-      (options.stackAuto || IFFUNC_ISREENT (func->ftype)))
+      (options.stackAuto || IFFUNC_ISREENT (functype)))
     return 0;
 
   resolveSymbols (actParm);
@@ -4027,10 +4031,28 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /*       function call        */
       /*----------------------------*/
     case CALL:
+      
+      /* undo any explicit pointer derefernce; PCALL will handle it instead */
+      if (IS_FUNC (LTYPE (tree)) && tree->left->type == EX_OP)
+        {
+	  if (tree->left->opval.op == '*' && !tree->left->right)
+	    tree->left = tree->left->left;
+	}
+
+      /* require a function or pointer to function */
+      if (!IS_FUNC (LTYPE (tree))
+          && !(IS_CODEPTR (LTYPE (tree)) && IS_FUNC (LTYPE (tree)->next)))
+	{
+	  werrorfl (tree->filename, tree->lineno, E_FUNCTION_EXPECTED);
+	  goto errorTreeReturn;
+	}
+	      
       parmNumber = 1;
 
       if (processParms (tree->left,
-			FUNC_ARGS(tree->left->ftype),
+			IS_CODEPTR(LTYPE(tree)) ?
+			  FUNC_ARGS(tree->left->ftype->next)
+			  : FUNC_ARGS(tree->left->ftype),
 			tree->right, &parmNumber, TRUE)) {
 	goto errorTreeReturn;
       }

@@ -1653,7 +1653,7 @@ link *aggrToPtr ( link *type, bool force)
     ptype->next = type;
     /* if the output class is generic */
     if ((DCL_TYPE(ptype) = PTR_TYPE(SPEC_OCLS(etype))) == CPOINTER)
-	DCL_PTR_CONST(ptype) = 1;
+	DCL_PTR_CONST(ptype) = port->mem.code_ro;
 
     /* if the variable was declared a constant */
     /* then the pointer points to a constant */
@@ -1676,7 +1676,7 @@ operand *geniCodeArray2Ptr (operand *op)
 
     /* set the pointer depending on the storage class */    
     if ((DCL_TYPE(optype) = PTR_TYPE(SPEC_OCLS(opetype))) == CPOINTER)
-	DCL_PTR_CONST(optype) = 1;
+	DCL_PTR_CONST(optype) = port->mem.code_ro;
 
     
     /* if the variable was declared a constant */
@@ -1943,7 +1943,7 @@ operand *geniCodeAddressOf (operand *op)
     
     /* set the pointer depending on the storage class */
     if ((DCL_TYPE(p) = PTR_TYPE(SPEC_OCLS(opetype))) == CPOINTER)
-	DCL_PTR_CONST(p) = 1;
+	DCL_PTR_CONST(p) = port->mem.code_ro;
 
     /* make sure we preserve the const & volatile */
     if (IS_CONSTANT(opetype)) 

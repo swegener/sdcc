@@ -293,7 +293,7 @@ void pointerTypes (link *ptr, link *type)
 	    DCL_TYPE(ptr) = POINTER ;
 	    break;
 	case S_CODE:
-	    DCL_PTR_CONST(ptr) = 1;
+	    DCL_PTR_CONST(ptr) = port->mem.code_ro;
 	    DCL_TYPE(ptr) = CPOINTER ;
 	    break;
 	case S_EEPROM:
@@ -930,13 +930,15 @@ static void  checkSClass ( symbol *sym )
 
     /* global variables declared const put into code */
     if (sym->level == 0 && 
-	SPEC_SCLS(sym->etype) == S_CONSTANT) 
+	SPEC_SCLS(sym->etype) == S_CONSTANT) {
 	SPEC_SCLS(sym->etype) = S_CODE ;
-    
+	SPEC_CONST(sym->etype) = 1;
+    }
 
     /* global variable in code space is a constant */
     if (sym->level == 0 && 
-	SPEC_SCLS(sym->etype) == S_CODE) 
+	SPEC_SCLS(sym->etype) == S_CODE &&
+	port->mem.code_ro )
 	SPEC_CONST(sym->etype) = 1;
     
 
@@ -1003,6 +1005,7 @@ static void  checkSClass ( symbol *sym )
     if (SPEC_SCLS(sym->etype) == S_CODE && 
 	sym->ival == NULL               &&
 	!sym->level                     &&
+	port->mem.code_ro               &&
 	!IS_EXTERN(sym->etype)) 
 	werror(E_CODE_NO_INIT,sym->name);
     

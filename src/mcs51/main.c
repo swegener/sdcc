@@ -221,7 +221,8 @@ PORT mcs51_port = {
 	"OSEG    (OVR,DATA)",
 	"GSFINAL (CODE)",
 	NULL,
-	NULL
+	NULL,
+	1
     },
     { 
 	+1, 1, 4, 1, 1

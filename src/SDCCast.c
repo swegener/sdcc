@@ -1756,7 +1756,7 @@ ast *decorateType (ast *tree)
 	}
 	if (SPEC_SCLS(tree->left->etype) == S_CODE) {
 	    DCL_TYPE(p) = CPOINTER ;
-	    DCL_PTR_CONST(p) = 1;
+	    DCL_PTR_CONST(p) = port->mem.code_ro;
 	}
 	else
 	    if (SPEC_SCLS(tree->left->etype) == S_XDATA)

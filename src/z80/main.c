@@ -121,7 +121,8 @@ PORT z80_port = {
 	"_OVERLAY",
 	"_GSFINAL",
 	NULL,
-	NULL
+	NULL,
+	1
     },
     { 
 	-1, 0, 0, 8, 0

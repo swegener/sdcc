@@ -1201,7 +1201,7 @@ value *valForArray (ast *arrExpr)
     val->type = newLink();    
     if (SPEC_SCLS(arrExpr->left->etype) == S_CODE) {
 	DCL_TYPE(val->type) = CPOINTER ;
-	DCL_PTR_CONST(val->type) = 1;
+	DCL_PTR_CONST(val->type) = port->mem.code_ro;
     }
     else
 	if (SPEC_SCLS(arrExpr->left->etype) == S_XDATA)
@@ -1270,7 +1270,7 @@ value *valForStructElem(ast *structT, ast *elemT)
     val->type = newLink();
     if (SPEC_SCLS(structT->etype) == S_CODE) {
 	DCL_TYPE(val->type) = CPOINTER ;
-	DCL_PTR_CONST(val->type) = 1;
+	DCL_PTR_CONST(val->type) = port->mem.code_ro;
     }
     else
 	if (SPEC_SCLS(structT->etype) == S_XDATA)

@@ -214,7 +214,7 @@ value *initPointer (initList *ilist)
 	    val->type = newLink();
 	    if (SPEC_SCLS(expr->left->etype) == S_CODE) {
 		DCL_TYPE(val->type) = CPOINTER ;
-		DCL_PTR_CONST(val->type) = 1;
+		DCL_PTR_CONST(val->type) = port->mem.code_ro;
 	    }
 	    else
 		if (SPEC_SCLS(expr->left->etype) == S_XDATA)

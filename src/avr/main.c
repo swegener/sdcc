@@ -165,6 +165,7 @@ PORT avr_port = {
 	"GSFINAL (CODE)",
 	NULL,
 	NULL,
+	0,
     },
     { 
 	-1, 1, 4, 1, 1

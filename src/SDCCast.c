@@ -2633,6 +2633,9 @@ decorateType (ast * tree)
 	  werror (E_CAST_ILLEGAL);
 	  goto errorTreeReturn;
 	}
+      
+      /* make sure the type is complete and sane */
+      checkTypeSanity(LETYPE(tree), "(cast)");
 
       /* if the right is a literal replace the tree */
       if (IS_LITERAL (RETYPE (tree)) && !IS_PTR (LTYPE (tree)))
@@ -3166,6 +3169,9 @@ value *
 sizeofOp (sym_link * type)
 {
   char buff[10];
+
+  /* make sure the type is complete and sane */
+  checkTypeSanity(type, "(sizeof)");
 
   /* get the size and convert it to character  */
   sprintf (buff, "%d", getSize (type));

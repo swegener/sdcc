@@ -41,8 +41,10 @@
 */
 
 #include <stdarg.h>
-#include <reg51.h>
 #include <stdio.h>
+#ifndef __ds390
+#include <reg51.h> // for the SP
+#endif
 
 static data volatile char ch;
 static data char radix ;

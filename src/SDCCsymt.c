@@ -104,10 +104,13 @@ addSym (bucket ** stab,
   bucket *bp;			/* temp bucket    *         */
 
   if (getenv("DEBUG_SANITY")) {
-    fprintf (stderr, "addSym: %s\n", sname);
+    fprintf (stderr, "addSym: %s ", sname);
   }
   /* Make sure sym is a symbol and not a structdef */
-  if (StructTab!=stab) checkTypeSanity((symbol *)sym);
+  if (1 || StructTab!=stab) {
+    /* make sure the type is complete and sane */
+    checkTypeSanity(((symbol *)sym)->etype, ((symbol *)sym)->name);
+  }
 
   /* the symbols are always added at the head of the list  */
   i = hashKey (sname);
@@ -455,14 +458,19 @@ addDecl (symbol * sym, int type, sym_link * p)
   checkTypeSanity: prevent the user from doing e.g.:
   unsigned float uf;
   ------------------------------------------------------------------*/
-void checkTypeSanity(symbol *sym) {
+void checkTypeSanity(sym_link *etype, char *name) {
   char *noun;
-  sym_link *etype=sym->etype;
-  char *name=sym->name;
 
   if (!etype) {
     if (getenv("DEBUG_SANITY")) {
-      printf ("sanity check skipped for %s\n", name);
+      fprintf (stderr, "sanity check skipped for %s (etype==0)\n", name);
+    }
+    return;
+  }
+
+  if (!IS_SPEC(etype)) {
+    if (getenv("DEBUG_SANITY")) {
+      fprintf (stderr, "sanity check skipped for %s (!IS_SPEC)\n", name);
     }
     return;
   }
@@ -470,7 +478,7 @@ void checkTypeSanity(symbol *sym) {
   noun=nounName(etype);
 
   if (getenv("DEBUG_SANITY")) {
-    printf ("checking sanity for %s\n", name);
+    fprintf (stderr, "checking sanity for %s\n", name);
   }
 
   if ((SPEC_NOUN(etype)==V_CHAR || 
@@ -489,14 +497,21 @@ void checkTypeSanity(symbol *sym) {
     werror (E_SIGNED_OR_UNSIGNED_INVALID, noun, name);
   }
 
-  // special case for "signed" and "unsigned"
-  if (!SPEC_NOUN(etype) && (SPEC_SIGNED(etype) || SPEC_USIGN(etype))) {
+  if (!SPEC_NOUN(etype)) {
+    // special case for just "signed" or "unsigned" or "long"
+    if (SPEC_SIGNED(etype) || SPEC_USIGN(etype) || SPEC_LONG(etype)) {
       SPEC_NOUN(etype)=V_INT;
     }
+    // special case for just "short"
+    if (SPEC_SHORT(etype)) {
+      SPEC_NOUN(etype)=V_CHAR; // or maybe V_INT
+      SPEC_SHORT(etype)=0;
+    }
+  }
 
-  // special case for const globals
-  if (!SPEC_SCLS(etype) && SPEC_CONST(etype) && sym->level==0) {
-    SPEC_SCLS(etype)=S_CODE;
+  // if still no noun (e.g. "const a;" or "data b;") assume an int
+  if (!SPEC_NOUN(etype)) {
+    SPEC_NOUN(etype)=V_INT;
   }
 
   if (SPEC_SIGNED(etype) && SPEC_USIGN(etype)) {
@@ -917,7 +932,7 @@ addSymChain (symbol * symHead)
 	{
 
 	  /* previous definition extern ? */
-	  if (1 || IS_EXTERN (csym->etype))
+	  if (IS_EXTERN (csym->etype))
 	    {
 	      /* do types match ? */
 	      if (checkType (csym->type, sym->type) != 1)
@@ -1583,6 +1598,13 @@ checkFunction (symbol * sym)
   symbol *csym;
   value *exargs, *acargs;
   int argCnt = 0;
+
+  if (getenv("DEBUG_SANITY")) {
+    fprintf (stderr, "checkFunction: %s ", sym->name);
+  }
+
+  /* make sure the type is complete and sane */
+  checkTypeSanity(((symbol *)sym)->etype, ((symbol *)sym)->name);
 
   /* if not type then some kind of error */
   if (!sym->type)

@@ -350,6 +350,7 @@ struct
 { W_EXESS_ARRAY_INITIALIZERS, ERROR_LEVEL_WARNING,
     "excess elements in array initializer after `%s' at line %d" },
 };
+
 /*
 -------------------------------------------------------------------------------
 SetErrorOut - Set the error output file

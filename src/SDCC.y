@@ -565,7 +565,6 @@ type_specifier2
    | SHORT  {
                $$=newLink();
                $$->class = SPECIFIER   ;
-               SPEC_NOUN($$) = V_INT   ;
 	       SPEC_SHORT($$) = 1      ;
             }
    | INT    {
@@ -576,7 +575,6 @@ type_specifier2
    | LONG   {
                $$=newLink();
                $$->class = SPECIFIER   ;
-               SPEC_NOUN($$) = V_INT   ;
 	       SPEC_LONG($$) = 1       ;
             }
    | SIGNED {
@@ -658,7 +656,6 @@ type_specifier2
          {
             symbol *sym;
             sym_link   *p  ;
-
             sym = findSym(TypedefTab,NULL,$1) ;
             $$ = p = copyLinkChain(sym->type);
 	    SPEC_TYPEDEF(getSpec(p)) = 0;
@@ -756,10 +753,11 @@ struct_declaration
 	       if (!sym->type) {
 		   sym->type = copyLinkChain($1);
 		   sym->etype = getSpec(sym->type);
+		   /* make sure the type is complete and sane */
+		   checkTypeSanity(sym->etype, sym->name);
 	       }
 	       else
 		   addDecl (sym,0,cloneSpec($1));   	       
-	       
 	   }
            $$ = $2;
        }

@@ -57,7 +57,7 @@ struct target *targ_list=NULL;
 int lineno=1;
 int p1=0, p2=0, p3=0;
 int expr_result, expr_ok, jump_dest, inst;
-int opcode, operand;
+int opcode;
 char symbol_name[1000];
 struct area_struct area[NUM_AREAS];
 int current_area=0;
@@ -76,9 +76,9 @@ char *areaToString (int area) {
     case AREA_XISEG: return "XISEG";
     case AREA_XINIT: return "XINIT";
     case AREA_GSINIT: return "GSINIT";
-    case AREA_GSFINAL: return "GSFINAL";
-    case AREA_HOME: return "HOME";
-    case AREA_SSEG: return "SSEG";
+      //case AREA_GSFINAL: return "GSFINAL";
+      //case AREA_HOME: return "HOME";
+      //case AREA_SSEG: return "SSEG";
     }
   return ("UNKNOW");
 }
@@ -96,9 +96,12 @@ struct symbol * build_sym_list(char *thename)
 	struct symbol *new, *p;
 
 	if ((p=findSymbol(thename))) {
-	  p->area=current_area;
-	  //fprintf (stderr, "warning, symbol %s already defined\n", thename);
-	  return p;
+	  if (p->isdef) {
+	    fprintf (stderr, "error: symbol %s already defined\n", thename);
+	    exit (1);
+	  } else {
+	    return p;
+	  }
 	}
 
 	//printf("  Symbol: %s  Line: %d\n", thename, lineno);
@@ -131,22 +134,22 @@ struct symbol *findSymbol (char *thename) {
   return NULL;
 }
 
-int assign_value(char *thename, int thevalue, char mode)
-{
-	struct symbol *p;
-
-	p = sym_list;
- 	while (p != NULL) {
-		if (!(strcasecmp(thename, p->name))) {
-			p->value = thevalue;
-			p->isdef = 1;
-			p->mode = mode;
-			return (0);
-		}
-		p = p->next;
-	}
-	fprintf(stderr, "Internal Error!  Couldn't find symbol\n");
-	exit(1);
+int assign_value(char *thename, int thevalue, char mode) {
+  struct symbol *p;
+  
+  p = sym_list;
+  while (p != NULL) {
+    if (!(strcasecmp(thename, p->name))) {
+      p->area=current_area;
+      p->value = thevalue;
+      p->isdef = 1;
+      p->mode = mode;
+      return (0);
+    }
+    p = p->next;
+  }
+  fprintf(stderr, "Internal Error!  Couldn't find symbol\n");
+  exit(1);
 }
 
 int mk_bit(char *thename, int area)
@@ -223,7 +226,7 @@ int get_value(char *thename)
   while (p != NULL) {
     if (!(strcasecmp(thename, p->name))) {
       if (p->mode=='=')
-	return 0;
+	;//return 0;
       return (p->value);
     }
     p = p->next;
@@ -425,7 +428,6 @@ void out(int *byte_list, int num) {
   }
   if (current_area==AREA_CSEG ||
       current_area==AREA_GSINIT ||
-      current_area==AREA_GSFINAL ||
       current_area==AREA_XINIT) {
     if (num) {
       for (i=0; i<num; i++) {
@@ -460,8 +462,8 @@ void out(int *byte_list, int num) {
   } else {
     if (num % 4) fprintf(list_fp, "\n");
   }
-  expr_var[0][0]='\0';
-  expr_var[1][0]='\0';
+  operand[0][0]='\0';
+  operand[1][0]='\0';
   rel_line[0][0]='\0';
   rel_line[1][0]='\0';
 }
@@ -489,27 +491,6 @@ void boob_error()
 	fprintf(stderr, " in line %d\n", lineno);
 	exit(1);
 }
-
-/* output the jump either direction on carry */
-/* jump_dest and MEM_POS must have the proper values */
-
-/* 
-void do_jump_on_carry()
-{
-	if (p3) {
-		operand = REL4(jump_dest, MEM_POS);
-		if (operand < 0) {
-			operand *= -1;
-			operand -= 1;
-			if (operand > 15) boob_error();
-			out(0x20 + (operand & 15));
-		} else {
-			if (operand > 15) boob_error();
-			out(0x30 + (operand & 15));
-		}
-	}
-}
-*/ 
 
 /* turn a string like "10010110b" into an int */
 

@@ -96,7 +96,7 @@ extern struct symbol * is_ref(char *thename);
 extern int get_value(char *thename);
 extern struct symbol *findSymbol (char *thename);
 extern char rel_line[2][132];
-extern char expr_var[2][MAX_SYMBOL];
+extern char operand[2][MAX_SYMBOL];
 extern void error(char*);
 int mk_bit(char*, int);
 int mk_sfr(char*);

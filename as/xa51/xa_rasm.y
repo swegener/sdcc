@@ -33,7 +33,7 @@ int stack_addr_opcode, stack_reg_opcode, branch_opcode;
 int rlist_reg_bank, rlist_bitmask, rlist_size;
 int db_count, dw_count, i;
 char symbol_name[MAX_SYMBOL], base_symbol_name[MAX_SYMBOL]={'\0'};
-char expr_var[2][MAX_SYMBOL]={{'\0'},{'\0'}};
+char operand[2][MAX_SYMBOL]={{'\0'},{'\0'}};
 
 extern char lex_sym_name[];
 extern int yylex();
@@ -46,8 +46,8 @@ void error(char *s);
 void RELOC_FF(unsigned where, unsigned pc, short rl) {
   // pc = PC of the next instruction
   struct symbol *sym;
-  if ((sym=findSymbol(yytext))) {
-    if (sym->mode=='X') {
+  if ((sym=findSymbol(operand[0]))) {
+    if (sym->mode=='X' || sym->area!=current_area) {
       sprintf (rel_line[rl], "R %04x REL_FF %s %04x", 
 	       where, sym->name, pc);
     }
@@ -56,84 +56,78 @@ void RELOC_FF(unsigned where, unsigned pc, short rl) {
  
 void RELOC_FFFF(unsigned where, unsigned pc, short rl) {
   struct symbol *sym;
-  if ((sym=findSymbol(yytext))) {
-    if (sym->mode=='X') {
+  if ((sym=findSymbol(operand[0]))) {
+    if (sym->mode=='X' || sym->area!=current_area) {
       sprintf (rel_line[rl], "R %04x REL_FFFF %s %04x", 
 	       where, sym->name, pc);
     }
   }
 }
  
-void RELOC_ABS_0F(unsigned where, int expr) {
+void RELOC_ABS_0F(unsigned where, int seq) {
   struct symbol *sym;
-  if ((sym=findSymbol(expr_var[expr]))) {
-    if (sym->mode=='X') {
-      sprintf (rel_line[expr], "R %04x ABS_0F %s 0", where, sym->name);
-    }
+  if ((sym=findSymbol(operand[seq])) && sym->mode!='A') {
+    sprintf (rel_line[seq], "R %04x ABS_0F %s 0", where, sym->name);
   }
 }
 
-void RELOC_ABS_FF(unsigned where, int expr) {
+void RELOC_BIT_03FF(unsigned where, int seq) {
   struct symbol *sym;
-  if ((sym=findSymbol(expr_var[expr]))) {
-    if (sym->mode=='X') {
-      sprintf (rel_line[expr], "R %04x ABS_FF %s 0", where, sym->name);
-    }
+  if ((sym=findSymbol(operand[seq])) && sym->mode!='A') {
+    sprintf (rel_line[seq], "R %04x BIT_03FF %s 0", where, sym->name);
   }
 }
 
-void RELOC_ABS_03FF(unsigned where, int expr) {
+void RELOC_DIR_07FF(unsigned where, int seq) {
   struct symbol *sym;
-  if (expr_var[0]) {
-    if ((sym=findSymbol(expr_var[expr]))) {
-      if (sym->mode=='X') {
-	sprintf (rel_line[expr], "R %04x ABS_03FF %s 0", where, sym->name);
-      }
-    }
+  if ((sym=findSymbol(operand[seq])) && sym->mode!='A') {
+    sprintf (rel_line[seq], "R %04x DIR_07FF %s 0", where, sym->name);
   }
 }
 
-void RELOC_ABS_07ff(unsigned where, int expr) {
+void RELOC_DIR_70FF(unsigned where, int seq) {
   struct symbol *sym;
-  if (expr_var[0]) {
-    if ((sym=findSymbol(expr_var[expr]))) {
-      if (sym->mode=='X') {
-	sprintf (rel_line[expr], "R %04x ABS_07ff %s 0", where, sym->name);
-      }
-    }
+  if ((sym=findSymbol(operand[seq])) && sym->mode!='A') {
+    sprintf (rel_line[seq], "R %04x DIR_70FF %s 0", where, sym->name);
   }
 }
 
-void RELOC_ABS_F0FF(unsigned where, int expr) {
+void RELOC_ABS_FF(unsigned where, int seq) {
   struct symbol *sym;
-  if (expr_var[0]) {
-    if ((sym=findSymbol(expr_var[expr]))) {
-      if (sym->mode=='X') {
-	sprintf (rel_line[expr], "R %04x ABS_F0FF %s", where, sym->name);
-      }
+  if ((sym=findSymbol(operand[seq])) && sym->mode!='A') {
+    sprintf (rel_line[seq], "R %04x DIR_FF %s 0", where, sym->name);
+  }
+}
+
+void RELOC_ABS_FFFF(unsigned where, int seq) {
+  struct symbol *sym;
+  if ((sym=findSymbol(operand[seq]))) {
+    switch (sym->mode) {
+    case 'A':
+      // sfr or sbit, already in instruction
+    case '=':
+      // equat, already in instruction
+      break;
+    case 'X':
+      // external reference
+      sprintf (rel_line[seq], "R %04x ABS_FFFF %s %04x", where, sym->name,
+	       sym->value);
+      break;
+    case 'R':
+      // absolute in current segment
+      sprintf (rel_line[seq], "R %04x ABS_PC PC %04x", where, sym->value);
+      break;
+    default:
+      fprintf (stderr, "unknown ABS_FFFF\n");
+      exit (1);
     }
   }
 }
  
-void RELOC_ABS_FFFF(unsigned where, int expr) {
+void RELOC_DIR_0700FF(unsigned where, int seq) {
   struct symbol *sym;
-  if (expr_var[0]) {
-    if ((sym=findSymbol(expr_var[expr]))) {
-      if (sym->mode=='X') {
-	sprintf (rel_line[expr], "R %04x ABS_FFFF %s 0", where, sym->name);
-      }
-    }
-  }
-}
- 
-void RELOC_ABS_0F00FF(unsigned where, int expr) {
-  struct symbol *sym;
-  if (expr_var[0]) {
-    if ((sym=findSymbol(expr_var[expr]))) {
-      if (sym->mode=='X') {
-	sprintf (rel_line[expr], "R %04x ABS_0F00FF %s", where, sym->name);
-      }
-    }
+  if ((sym=findSymbol(operand[seq])) && sym->mode!='A') {
+    sprintf (rel_line[seq], "R %04x ABS_0700FF %s 0", where, sym->name);
   }
 }
  
@@ -159,7 +153,6 @@ void RELOC_ABS_0F00FF(unsigned where, int expr) {
 %nonassoc UNARY
 
 %%
-
 all:           line
              | line all;
 
@@ -408,15 +401,7 @@ expr:	value	{$$ = $1;}
 
 value:	  NUMBER {$$ = $1;}
 	| CHAR {$$ = $1;}
-	| WORD {
-	  $$ = $1; 
-	  if (expr_var[0][0]=='\0') {
-	    strcpy(expr_var[0], yytext);
-	  } else {
-	    strcpy(expr_var[1], yytext);
-	  }
-	}
-
+        | WORD { $$ = $1;}
 
 rlist:	REG {
 		rlist_bitmask = 1<<(reg($1) % 8);
@@ -507,7 +492,7 @@ instruction:
 	op[0] = arith_opcode * 16 + size * 8 + 6;
 	op[1] = reg($4) * 16 + 8 + msb(direct_addr($2));
 	op[2] = lsb(direct_addr($2));
-	RELOC_ABS_07ff(MEM_POS+1, 0);
+	RELOC_DIR_07FF(MEM_POS+1, 0);
   }
 | arith_inst REG ',' WORD {
 	$$ = 3;
@@ -515,7 +500,7 @@ instruction:
 	op[0] = arith_opcode * 16 + size * 8 + 6;
 	op[1] = reg($2) * 16 + msb(direct_addr($4));
 	op[2] = lsb(direct_addr($4));
-	RELOC_ABS_07ff(MEM_POS+1, 0);
+	RELOC_DIR_07FF(MEM_POS+1, 0);
   }
 | arith_inst REG ',' '#' expr {
 	size = find_size1(inst_size, $2);
@@ -620,7 +605,7 @@ instruction:
 		op[1] = msb(direct_addr($2)) * 16 + arith_opcode;
 		op[2] = lsb(direct_addr($2));
 		op[3] = imm_data8($5);
-		RELOC_ABS_F0FF(MEM_POS+1,0);
+		RELOC_DIR_70FF(MEM_POS+1,0);
 		RELOC_ABS_FF(MEM_POS+3,1);
 	} else {
 		$$ = 5;
@@ -629,7 +614,7 @@ instruction:
 		op[2] = lsb(direct_addr($2));
 		op[3] = msb(imm_data16($5));
 		op[4] = lsb(imm_data16($5));
-		RELOC_ABS_F0FF(MEM_POS+1,0);
+		RELOC_DIR_70FF(MEM_POS+1,0);
 		RELOC_ABS_FFFF (MEM_POS+3,1);
 	}
   }
@@ -655,7 +640,7 @@ instruction:
 	op[0] = 0xA0 + size * 8;
 	op[1] = 128 + reg_indirect($5) * 16 + msb(direct_addr($2));
 	op[2] = lsb(direct_addr($2));
-	RELOC_ABS_07ff(MEM_POS+1, 0);
+	RELOC_DIR_07FF(MEM_POS+1, 0);
   }
 | arith_inst '[' REG ']' ',' WORD {
 	/* this addr mode is only valid for MOV */
@@ -665,7 +650,7 @@ instruction:
 	op[0] = 0xA0 + size * 8;
 	op[1] = reg_indirect($3) * 16 + msb(direct_addr($6));
 	op[2] = lsb(direct_addr($6));
-	RELOC_ABS_07ff(MEM_POS+1, 0);
+	RELOC_DIR_07FF(MEM_POS+1, 0);
   }
 | arith_inst WORD ',' WORD {
 	/* this addr mode is only valid for MOV */
@@ -676,8 +661,8 @@ instruction:
 	op[1] = msb(direct_addr($2)) * 16 + msb(direct_addr($4));
 	op[2] = lsb(direct_addr($2));
 	op[3] = lsb(direct_addr($4));
-	RELOC_ABS_F0FF(MEM_POS+1, 0);
-	RELOC_ABS_0F00FF(MEM_POS+1, 1);
+	RELOC_DIR_70FF(MEM_POS+1, 0);
+	RELOC_DIR_0700FF(MEM_POS+1, 1);
   }
 | arith_inst REG ',' USP {
 	/* this addr mode is only valid for MOV */
@@ -700,7 +685,7 @@ instruction:
 	op[0] = 0x08;
 	op[1] = 0x20 + msb(bit_addr($4));
 	op[2] = lsb(bit_addr($4));
-	RELOC_ABS_03FF(MEM_POS+1, 0);
+	RELOC_BIT_03FF(MEM_POS+1, 0);
   }
 | arith_inst bit ',' C {
 	/* this addr mode is only valid for MOV */
@@ -709,7 +694,7 @@ instruction:
 	op[0] = 0x08;
 	op[1] = 0x30 + msb(bit_addr($2));
 	op[2] = lsb(bit_addr($2));
-	RELOC_ABS_03FF(MEM_POS+1, 0);
+	RELOC_BIT_03FF(MEM_POS+1, 0);
   }
 
 | MOVC REG ',' '[' REG '+' ']' {
@@ -758,7 +743,7 @@ instruction:
 	op[0] = 0xA0 + size * 8;
 	op[1] = reg($2) * 16 + msb(direct_addr($4));
         op[2] = lsb(direct_addr($4));
-	RELOC_ABS_07ff(MEM_POS+1, 0);
+	RELOC_DIR_07FF(MEM_POS+1, 0);
   }
 | short_data_inst REG ',' '#' expr {
 	$$ = 2;
@@ -813,14 +798,14 @@ instruction:
 	op[0] = 0x08;
 	op[1] = 0x40 + msb(bit_addr($4));
 	op[2] = lsb(bit_addr($4));
-	RELOC_ABS_03FF(MEM_POS+1, 0);
+	RELOC_BIT_03FF(MEM_POS+1, 0);
   }
 | ANL C ',' '/' bit {
 	$$ = 3;
 	op[0] = 0x08;
 	op[1] = 0x50 + msb(bit_addr($5));
 	op[2] = lsb(bit_addr($5));
-	RELOC_ABS_03FF(MEM_POS+1, 0);
+	RELOC_BIT_03FF(MEM_POS+1, 0);
   }
 
 | ORL C ',' bit {
@@ -828,28 +813,28 @@ instruction:
 	op[0] = 0x08;
 	op[1] = 0x60 + msb(bit_addr($4));
 	op[2] = lsb(bit_addr($4));
-	RELOC_ABS_03FF(MEM_POS+1, 0);
+	RELOC_BIT_03FF(MEM_POS+1, 0);
   }
 | ORL C ',' '/' bit {
 	$$ = 3;
 	op[0] = 0x08;
 	op[1] = 0x70 + msb(bit_addr($5));
 	op[2] = lsb(bit_addr($5));
-	RELOC_ABS_03FF(MEM_POS+1, 0);
+	RELOC_BIT_03FF(MEM_POS+1, 0);
   }
 | CLR bit {
 	$$ = 3;
 	op[0] = 0x08;
 	op[1] = msb(bit_addr($2));
 	op[2] = lsb(bit_addr($2));
-	RELOC_ABS_03FF(MEM_POS+1, 0);
+	RELOC_BIT_03FF(MEM_POS+1, 0);
   }
 | SETB bit {
 	$$ = 3;
 	op[0] = 0x08;
 	op[1] = 0x10 + msb(bit_addr($2));
 	op[2] = lsb(bit_addr($2));
-	RELOC_ABS_03FF(MEM_POS+1, 0);
+	RELOC_BIT_03FF(MEM_POS+1, 0);
   }
 | logical_shift_inst REG ',' REG {
 	size = find_size1(inst_size, $2);
@@ -949,7 +934,7 @@ instruction:
 	op[0] = msb(stack_addr_opcode) + size * 8;
 	op[1] = lsb(stack_addr_opcode) + msb(direct_addr($2));
 	op[2] = lsb(direct_addr($2));
-	RELOC_ABS_07ff(MEM_POS+1, 0);
+	RELOC_DIR_07FF(MEM_POS+1, 0);
   }
 | stack_inst rlist {
 	$$ = 2;
@@ -1008,7 +993,7 @@ instruction:
 	size = find_size2(inst_size, $2, $4);
 	switch (size) {
 	case SIZE8:
-		error("Singed DIV can't be 8 bit size"); break;
+		error("Signed DIV can't be 8 bit size"); break;
 	case SIZE16:
 		op[0] = 0xE7;
 		op[1] = reg($2) * 16 + reg($4);
@@ -1149,7 +1134,7 @@ instruction:
 	op[1] = reg($2) * 16 + msb(direct_addr($4));
 	op[2] = lsb(direct_addr($4));
 	op[3] = rel8(MEM_POS + $$, $6);
-	RELOC_ABS_07ff(MEM_POS+1, 0);
+	RELOC_DIR_07FF(MEM_POS+1, 0);
 	RELOC_FF(MEM_POS+3, MEM_POS + $$, 1);
   }
 | CJNE REG ',' '#' expr ',' jmpaddr {
@@ -1207,7 +1192,7 @@ instruction:
 	op[1] = msb(direct_addr($2)) + 8;
 	op[2] = lsb(direct_addr($2));
 	op[3] = rel8(MEM_POS + $$, $4);
-	RELOC_ABS_07ff(MEM_POS+1, 0);
+	RELOC_DIR_07FF(MEM_POS+1, 0);
 	RELOC_FF(MEM_POS+3, MEM_POS + $$, 1)
   }
 
@@ -1217,7 +1202,7 @@ instruction:
 	op[1] = 0x80 + msb(bit_addr($2));
 	op[2] = lsb(bit_addr($2));
 	op[3] = rel8(MEM_POS + $$, $4);
-	RELOC_ABS_03FF(MEM_POS+1, 0);
+	RELOC_BIT_03FF(MEM_POS+1, 0);
 	RELOC_FF(MEM_POS+3, MEM_POS + $$, 1);
   }
 
@@ -1227,7 +1212,7 @@ instruction:
 	op[1] = 0xC0 + msb(bit_addr($2));
 	op[2] = lsb(bit_addr($2));
 	op[3] = rel8(MEM_POS + $$, $4);
-	RELOC_ABS_03FF(MEM_POS+1, 0);
+	RELOC_BIT_03FF(MEM_POS+1, 0);
 	RELOC_FF(MEM_POS+3, MEM_POS + $$, 1);
   }
 
@@ -1237,7 +1222,7 @@ instruction:
 	op[1] = 0xA0 + msb(bit_addr($2));
 	op[2] = lsb(bit_addr($2));
 	op[3] = rel8(MEM_POS + $$, $4);
-	RELOC_ABS_03FF(MEM_POS+1, 0);
+	RELOC_BIT_03FF(MEM_POS+1, 0);
 	RELOC_FF(MEM_POS+3, MEM_POS + $$, 1);
   }
 

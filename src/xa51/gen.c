@@ -1549,6 +1549,7 @@ static void genAssign (iCode * ic) {
     return;
   }
 
+  // TODO: if (-8 >= right==lit <= 7) instr=MOVS
   /* general case */
   if (size>1) {
     instr=MOVW;

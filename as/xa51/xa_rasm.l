@@ -247,6 +247,14 @@ R[0-7]H		{LIST; yylval = (yytext[1] - '0') * 2 + 1 + BYTE_REG; return REG;}
 					if (is_bit(lex_sym_name)) return BIT;
 					if (is_reg(lex_sym_name)) return REG;
 				}
+                                if (p3) {
+                                 if (*operand[0]) {
+                                   // first one in use
+                                   strcpy (operand[1], yytext);
+                                 } else {
+                                   strcpy (operand[0], yytext);
+                                 }
+                                }
 				return WORD;
 			}
 [0-9]+\$		{

@@ -526,8 +526,15 @@ cl_xa::disass(t_addr addr, char *sep)
 	      get_bit_name((code&0x0003)<<8) + get_mem(MEM_ROM, addr+2),
 	      ((signed char)get_mem(MEM_ROM, addr+3)*2+addr+len)&0xfffe);
     break;
+    case DATA4:
+      sprintf(parm_str, "#0x%02x", code&0x0f);
+      break;
     case ADDR24 :
-      strcpy(parm_str, "ADDR24");
+      sprintf(parm_str, "0x%06x", 
+	     (get_mem(MEM_ROM, addr+3)<<16) + 
+	     (get_mem(MEM_ROM, addr+1)<<8) + 
+	     get_mem(MEM_ROM, addr+2));
+      break;
     break;
     case REG_REL8 :
       sprintf(parm_str, "%s,0x%04x",

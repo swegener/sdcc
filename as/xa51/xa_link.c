@@ -29,7 +29,7 @@
    "T xxxx <how> <symbol> 0"
    "R xxxx <how> <symbol> <pc+>" the relocation info. xxxx is the address
      within relative code space. How is something like REL_FF, REL_FFFF, 
-     ABS_F0FF. Symbol is the referenced symbol and pc+ is the program 
+     ABS_70FF. Symbol is the referenced symbol and pc+ is the program 
      counter that will be used to calculate the relative address (that is
      the address of the following instruction).
 
@@ -63,13 +63,14 @@ enum {
 enum {
   REL_FF=1,
   REL_FFFF,
+  BIT_03FF,
+  DIR_07FF,
+  DIR_70FF,
+  DIR_0700FF,
   ABS_0F,
   ABS_FF,
-  ABS_03FF,
-  ABS_07FF,
-  ABS_F0FF,
   ABS_FFFF,
-  ABS_0F00FF,
+  ABS_PC,
   MAX_REFS
 };
 
@@ -77,13 +78,14 @@ char *refModes[]={
   "???",
   "REL_FF",
   "REL_FFFF",
+  "BIT_03FF",
+  "DIR_07FF",
+  "DIR_70FF",
+  "DIR_0700FF",
   "ABS_0F",
   "ABS_FF",
-  "ABS_03FF",
-  "ABS_07FF",
-  "ABS_F0FF",
   "ABS_FFFF",
-  "ABS_0F00FF",
+  "ABS_PC"
 };
 
 #define CODESIZE 0x10000
@@ -141,6 +143,7 @@ struct SYMBOL {
 struct REFERENCE {
   char *name;
   struct MODULE *module;
+  struct SEGMENT *segment;
   int lineno;
   unsigned address, pc;
   short how;
@@ -226,9 +229,13 @@ void addToRefs(char *ref, int address, char *how, int pc) {
   reference=calloc(1, sizeof(struct REFERENCE));
   reference->name=strdup(ref);
   reference->module=currentModule;
+  reference->segment=currentSegment;
   reference->lineno=currentLine;
   reference->address=address;
   reference->how=howToReference(how);
+  if (reference->how==ABS_PC) {
+    reference->resolved=1;
+  }
   reference->pc=pc;
   if (!references) {
     references=reference;
@@ -241,7 +248,7 @@ void addToRefs(char *ref, int address, char *how, int pc) {
 void resolve() {
   struct REFERENCE *reference;
   for (reference=references; reference; reference=reference->next) {
-    if (findSymbolByName(reference->name)) {
+    if ((reference->how==ABS_PC) || findSymbolByName(reference->name)) {
       reference->resolved=1;
     }
   }
@@ -467,22 +474,21 @@ void writeModule(char *outFileName) {
   if ((fOut=fopen(outFileName, "w"))==NULL) {
     perror (outFileName);
   }
-  fprintf (fOut, "Just for now, make it a little bit more readable\n");
 
   while (size) {
     len = size>16 ? 16 : size;
     size-=len;
-    fprintf (fOut, ":%02X.%04X.%02X >", len, address, 0);
+    fprintf (fOut, ":%02X%04X%02X", len, address, 0);
     checksum = len + (address>>8) + (address&0xff);
     while (len--) {
       checksum += gsfinalImage[address];
-      fprintf (fOut, " %02X", gsfinalImage[address++]);
+      fprintf (fOut, "%02X", gsfinalImage[address++]);
     }
     checksum &= 0xff;
     if (checksum) {
       checksum = 0x100 - checksum;
     }
-    fprintf (fOut, " < %02X\n", checksum);
+    fprintf (fOut, "%02X\n", checksum);
   }
   fprintf (fOut, ":00000001FF\n");
 
@@ -552,45 +558,66 @@ int relocate() {
   }
   // and the references
   for (reference=references; reference; reference=reference->next) {
-    if (!(symbol=findSymbolByName(reference->name))) {
-      // this reference isn't defined after all
+    symbol=findSymbolByName(reference->name);
+    if (!reference->resolved && !symbol && reference->how!=ABS_PC) {
+      // this reference isn't resolved after all
       fprintf (stderr, "*** %s:%d undefined symbol %s\n",
 	       reference->module->name, reference->lineno,
 	       reference->name);
       fatalErrors++;
     } else {
-      reference->address += symbol->segment->start;
-      reference->pc += symbol->segment->start;
+      reference->address += 
+	reference->module->offset[reference->segment->id]+
+	reference->segment->start;
+      reference->pc += 
+	reference->module->offset[reference->segment->id]+
+	reference->segment->start;
       switch (reference->how) 
 	{
-	case REL_FFFF: {
-	  int rel16 = symbol->address-reference->pc;
-	  if (rel16<-65536 || rel16>65534) {
-	    fprintf (stderr, 
-		     "rel16 target for %s is out of range in module %s\n",
-		     reference->name, reference->module->name);
-	    fatalErrors++;
-	  }
-	  gsinitImage[reference->address+1]=(rel16/2)>>8;
-	  gsinitImage[reference->address]=rel16/2;
-	  break;
-	}
 	case REL_FF: {
-	  int rel8 = symbol->address-reference->pc;
+	  int rel8 = symbol->address-(reference->pc & ~1);
 	  if (rel8<-256 || rel8>256) {
 	    fprintf (stderr,
 		     "rel8 target for %s is out of range in module %s\n",
 		     reference->name, reference->module->name);
 	    fatalErrors++;
 	  }
-	  gsinitImage[reference->address]=rel8/2;
+	  gsfinalImage[reference->address]=rel8/2;
 	  break;
 	}
+	case REL_FFFF: {
+	  int rel16 = symbol->address-(reference->pc & ~1);
+	  if (rel16<-65536 || rel16>65534) {
+	    fprintf (stderr, 
+		     "rel16 target for %s is out of range in module %s\n",
+		     reference->name, reference->module->name);
+	    fatalErrors++;
+	  }
+	  gsfinalImage[reference->address]=(rel16/2)>>8;
+	  gsfinalImage[reference->address+1]=rel16/2;
+	  break;
+	}
+	case DIR_70FF:
+	  gsfinalImage[reference->address] = (symbol->address<<4)&0x70;
+	  gsfinalImage[reference->address+1] = symbol->address;
+	  break;
 	case ABS_FFFF:
-	  gsinitImage[reference->address+1] = symbol->address>>8;
-	  // fall through
+	  gsfinalImage[reference->address] = symbol->address>>8;
+	  gsfinalImage[reference->address+1] = symbol->address;
+	  break;
 	case ABS_FF:
-	  gsinitImage[reference->address] = symbol->address;
+	  gsfinalImage[reference->address] = symbol->address;
+	  break;
+	case ABS_PC: 
+	  {
+	    unsigned int address=
+	      (gsfinalImage[reference->address]<<8) +
+	      gsfinalImage[reference->address+1];
+	    address += reference->module->offset[reference->segment->id];
+	    address += segments[reference->segment->id].start;
+	    gsfinalImage[reference->address] = address>>8;
+	    gsfinalImage[reference->address+1] = address;
+	  };
 	  break;
 	default:
 	  fprintf (stderr, "unsupported reference mode %d.\n",

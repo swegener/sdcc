@@ -791,7 +791,6 @@ int cl_xa::inst_NEG(uint code, int operands)
 }
 int cl_xa::inst_NOP(uint code, int operands)
 {
-  NOTDONE_ASSERT;
   return(resGO);
 }
 int cl_xa::inst_NORM(uint code, int operands)

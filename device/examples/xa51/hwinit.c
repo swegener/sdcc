@@ -80,7 +80,7 @@ int kbhit(void) {
 int puts(char *string) {
   int chars=0;
   while (*string) {
-    putchar (*string);
+    putchar (*string++);
     chars++;
   }
   putchar ('\n');

@@ -1,20 +1,20 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 
-<!--Converted with LaTeX2HTML 2K.1beta (1.47)
+<!--Converted with LaTeX2HTML 99.1 release (March 30, 1999)
 original version by:  Nikos Drakos, CBLU, University of Leeds
 * revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
 * with significant contributions from:
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>lSDCC Compiler User Guide</TITLE>
-<META NAME="description" CONTENT="lSDCC Compiler User Guide">
+<TITLE>SDCC Compiler User Guide</TITLE>
+<META NAME="description" CONTENT="SDCC Compiler User Guide">
 <META NAME="keywords" CONTENT="SDCCUdoc">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
-<META NAME="Generator" CONTENT="LaTeX2HTML v2K.1beta">
+<META NAME="Generator" CONTENT="LaTeX2HTML v99.1 release">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="SDCCUdoc.css">
@@ -23,12 +23,12 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<IMG WIDTH="81" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next_inactive"
- SRC="file:/usr/share/latex2html/icons/nx_grp_g.png"> 
+<IMG WIDTH="81" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next_group"
+ SRC="/home/johan/latex2html/icons.gif/next_group_motif_gr.gif"> 
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
- SRC="file:/usr/share/latex2html/icons/up_g.png"> 
+ SRC="/home/johan/latex2html/icons.gif/up_motif_gr.gif"> 
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
- SRC="file:/usr/share/latex2html/icons/prev_g.png">   
+ SRC="/home/johan/latex2html/icons.gif/previous_motif_gr.gif">   
 <BR>
 <BR>
 <BR>
@@ -37,7 +37,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <P>
 
 <P>
-<H1 ALIGN="CENTER">lSDCC Compiler User Guide</H1>
+ 
+<H1 ALIGN="CENTER">SDCC Compiler User Guide</H1>
 <BR>
 
 <H2><A NAME="SECTION00010000000000000000">
@@ -46,152 +47,151 @@ Contents</A>
 <!--Table of Contents-->
 
 <UL>
-<LI><A NAME="tex2html122"
-  HREF="SDCCUdoc.html">1 Introduction</A>
-<UL>
-<LI><A NAME="tex2html123"
-  HREF="#SECTION00021000000000000000">1.1 About SDCC</A>
 <LI><A NAME="tex2html124"
-  HREF="#SECTION00022000000000000000">1.2 Open Source</A>
+ HREF="SDCCUdoc.html">Contents</A>
 <LI><A NAME="tex2html125"
-  HREF="#SECTION00023000000000000000">1.3 Typographic conventions</A>
+ HREF="SDCCUdoc.html#SECTION00020000000000000000">1. Introduction</A>
+<UL>
 <LI><A NAME="tex2html126"
-  HREF="#SECTION00024000000000000000">1.4 Pending: compatibilaty with previous versions</A>
+ HREF="SDCCUdoc.html#SECTION00021000000000000000">1.1 About SDCC</A>
 <LI><A NAME="tex2html127"
-  HREF="#SECTION00025000000000000000">1.5 System Requirements</A>
+ HREF="SDCCUdoc.html#SECTION00022000000000000000">1.2 Open Source</A>
 <LI><A NAME="tex2html128"
-  HREF="#SECTION00026000000000000000">1.6 Other Resources</A>
-</UL>
-<BR>
+ HREF="SDCCUdoc.html#SECTION00023000000000000000">1.3 Typographic conventions</A>
 <LI><A NAME="tex2html129"
-  HREF="#SECTION00030000000000000000">2 Installation</A>
-<UL>
+ HREF="SDCCUdoc.html#SECTION00024000000000000000">1.4 Compatibility with previous versions</A>
 <LI><A NAME="tex2html130"
-  HREF="#SECTION00031000000000000000">2.1 Linux/Unix Installation</A>
+ HREF="SDCCUdoc.html#SECTION00025000000000000000">1.5 System Requirements</A>
 <LI><A NAME="tex2html131"
-  HREF="#SECTION00032000000000000000">2.2 Windows Installation</A>
+ HREF="SDCCUdoc.html#SECTION00026000000000000000">1.6 Other Resources</A>
 <LI><A NAME="tex2html132"
-  HREF="#SECTION00033000000000000000">2.3 Testing out the SDCC Compiler</A>
+ HREF="SDCCUdoc.html#SECTION00027000000000000000">1.7 Wishes for the future</A>
+</UL>
 <LI><A NAME="tex2html133"
-  HREF="#SECTION00034000000000000000">2.4 Install Trouble-shooting</A>
+ HREF="SDCCUdoc.html#SECTION00030000000000000000">2. Installation</A>
+<UL>
 <LI><A NAME="tex2html134"
-  HREF="#SECTION00035000000000000000">2.5 Additional Information for Windows Users</A>
+ HREF="SDCCUdoc.html#SECTION00031000000000000000">2.1 Linux/Unix Installation</A>
 <LI><A NAME="tex2html135"
-  HREF="#SECTION00036000000000000000">2.6 SDCC on Other Platforms</A>
+ HREF="SDCCUdoc.html#SECTION00032000000000000000">2.2 Windows Installation</A>
 <LI><A NAME="tex2html136"
-  HREF="#SECTION00037000000000000000">2.7 Advanced Install Options</A>
+ HREF="SDCCUdoc.html#SECTION00033000000000000000">2.3 Testing out the SDCC Compiler</A>
 <LI><A NAME="tex2html137"
-  HREF="#SECTION00038000000000000000">2.8 Components of SDCC</A>
-</UL>
-<BR>
+ HREF="SDCCUdoc.html#SECTION00034000000000000000">2.4 Install Trouble-shooting</A>
 <LI><A NAME="tex2html138"
-  HREF="#SECTION00040000000000000000">3 Using SDCC</A>
-<UL>
+ HREF="SDCCUdoc.html#SECTION00035000000000000000">2.5 Additional Information for Windows Users</A>
 <LI><A NAME="tex2html139"
-  HREF="#SECTION00041000000000000000">3.1 Compiling</A>
+ HREF="SDCCUdoc.html#SECTION00036000000000000000">2.6 SDCC on Other Platforms</A>
 <LI><A NAME="tex2html140"
-  HREF="#SECTION00042000000000000000">3.2 Command Line Options</A>
+ HREF="SDCCUdoc.html#SECTION00037000000000000000">2.7 Advanced Install Options</A>
 <LI><A NAME="tex2html141"
-  HREF="#SECTION00043000000000000000">3.3 MCS51/DS390 Storage Class Language Extensions</A>
+ HREF="SDCCUdoc.html#SECTION00038000000000000000">2.8 Components of SDCC</A>
+</UL>
 <LI><A NAME="tex2html142"
-  HREF="#SECTION00044000000000000000">3.4 Pointers</A>
+ HREF="SDCCUdoc.html#SECTION00040000000000000000">3. Using SDCC</A>
+<UL>
 <LI><A NAME="tex2html143"
-  HREF="#SECTION00045000000000000000">3.5 Parameters &amp; Local Variables</A>
+ HREF="SDCCUdoc.html#SECTION00041000000000000000">3.1 Compiling</A>
 <LI><A NAME="tex2html144"
-  HREF="#SECTION00046000000000000000">3.6 Overlaying</A>
+ HREF="SDCCUdoc.html#SECTION00042000000000000000">3.2 Command Line Options</A>
 <LI><A NAME="tex2html145"
-  HREF="#SECTION00047000000000000000">3.7 Interrupt Service Routines</A>
+ HREF="SDCCUdoc.html#SECTION00043000000000000000">3.3 MCS51/DS390 Storage Class Language Extensions</A>
 <LI><A NAME="tex2html146"
-  HREF="#SECTION00048000000000000000">3.8 Critical Functions</A>
+ HREF="SDCCUdoc.html#SECTION00044000000000000000">3.4 Pointers</A>
 <LI><A NAME="tex2html147"
-  HREF="#SECTION00049000000000000000">3.9 Naked Functions</A>
+ HREF="SDCCUdoc.html#SECTION00045000000000000000">3.5 Parameters &amp; Local Variables</A>
 <LI><A NAME="tex2html148"
-  HREF="#SECTION000410000000000000000">3.10 Functions using private banks</A>
+ HREF="SDCCUdoc.html#SECTION00046000000000000000">3.6 Overlaying</A>
 <LI><A NAME="tex2html149"
-  HREF="#SECTION000411000000000000000">3.11 Absolute Addressing</A>
+ HREF="SDCCUdoc.html#SECTION00047000000000000000">3.7 Interrupt Service Routines</A>
 <LI><A NAME="tex2html150"
-  HREF="#SECTION000412000000000000000">3.12 Startup Code</A>
+ HREF="SDCCUdoc.html#SECTION00048000000000000000">3.8 Critical Functions</A>
 <LI><A NAME="tex2html151"
-  HREF="#SECTION000413000000000000000">3.13 Inline Assembler Code</A>
+ HREF="SDCCUdoc.html#SECTION00049000000000000000">3.9 Naked Functions</A>
 <LI><A NAME="tex2html152"
-  HREF="#SECTION000414000000000000000">3.14 int(16 bit) and long (32 bit) Support</A>
+ HREF="SDCCUdoc.html#SECTION000410000000000000000">3.10 Functions using private banks</A>
 <LI><A NAME="tex2html153"
-  HREF="#SECTION000415000000000000000">3.15 Floating Point Support</A>
+ HREF="SDCCUdoc.html#SECTION000411000000000000000">3.11 Absolute Addressing</A>
 <LI><A NAME="tex2html154"
-  HREF="#SECTION000416000000000000000">3.16 MCS51 Memory Models</A>
+ HREF="SDCCUdoc.html#SECTION000412000000000000000">3.12 Startup Code</A>
 <LI><A NAME="tex2html155"
-  HREF="#SECTION000417000000000000000">3.17 DS390 Memory Models</A>
+ HREF="SDCCUdoc.html#SECTION000413000000000000000">3.13 Inline Assembler Code</A>
 <LI><A NAME="tex2html156"
-  HREF="#SECTION000418000000000000000">3.18 Defines Created by the Compiler</A>
-</UL>
-<BR>
+ HREF="SDCCUdoc.html#SECTION000414000000000000000">3.14 int(16 bit) and long (32 bit) Support</A>
 <LI><A NAME="tex2html157"
-  HREF="#SECTION00050000000000000000">4 SDCC Technical Data</A>
-<UL>
+ HREF="SDCCUdoc.html#SECTION000415000000000000000">3.15 Floating Point Support</A>
 <LI><A NAME="tex2html158"
-  HREF="#SECTION00051000000000000000">4.1 Optimizations</A>
+ HREF="SDCCUdoc.html#SECTION000416000000000000000">3.16 MCS51 Memory Models</A>
 <LI><A NAME="tex2html159"
-  HREF="#SECTION00052000000000000000">4.2 Pragmas</A>
+ HREF="SDCCUdoc.html#SECTION000417000000000000000">3.17 DS390 Memory Models</A>
 <LI><A NAME="tex2html160"
-  HREF="#SECTION00053000000000000000">4.3 Library Routines</A>
+ HREF="SDCCUdoc.html#SECTION000418000000000000000">3.18 Defines Created by the Compiler</A>
+</UL>
 <LI><A NAME="tex2html161"
-  HREF="#SECTION00054000000000000000">4.4 Interfacing with Assembly Routines</A>
+ HREF="SDCCUdoc.html#SECTION00050000000000000000">4. SDCC Technical Data</A>
+<UL>
 <LI><A NAME="tex2html162"
-  HREF="#SECTION00055000000000000000">4.5 Global Registers used for Parameter Passing</A>
+ HREF="SDCCUdoc.html#SECTION00051000000000000000">4.1 Optimizations</A>
 <LI><A NAME="tex2html163"
-  HREF="#SECTION00056000000000000000">4.6 External Stack</A>
+ HREF="SDCCUdoc.html#SECTION00052000000000000000">4.2 Pragmas</A>
 <LI><A NAME="tex2html164"
-  HREF="#SECTION00057000000000000000">4.7 ANSI-Compliance</A>
+ HREF="SDCCUdoc.html#SECTION00053000000000000000">4.3 &lt;pending: this is messy and incomplete&gt; Library Routines</A>
 <LI><A NAME="tex2html165"
-  HREF="#SECTION00058000000000000000">4.8 Cyclomatic Complexity</A>
-</UL>
-<BR>
+ HREF="SDCCUdoc.html#SECTION00054000000000000000">4.4 Interfacing with Assembly Routines</A>
 <LI><A NAME="tex2html166"
-  HREF="#SECTION00060000000000000000">5 TIPS</A>
+ HREF="SDCCUdoc.html#SECTION00055000000000000000">4.5 External Stack</A>
 <LI><A NAME="tex2html167"
-  HREF="#SECTION00070000000000000000">6 Retargetting for other MCUs.</A>
+ HREF="SDCCUdoc.html#SECTION00056000000000000000">4.6 ANSI-Compliance</A>
 <LI><A NAME="tex2html168"
-  HREF="#SECTION00080000000000000000">7 SDCDB - Source Level Debugger</A>
-<UL>
+ HREF="SDCCUdoc.html#SECTION00057000000000000000">4.7 Cyclomatic Complexity</A>
+</UL>
 <LI><A NAME="tex2html169"
-  HREF="#SECTION00081000000000000000">7.1 Compiling for Debugging</A>
+ HREF="SDCCUdoc.html#SECTION00060000000000000000">5. TIPS</A>
+<UL>
 <LI><A NAME="tex2html170"
-  HREF="#SECTION00082000000000000000">7.2 How the Debugger Works</A>
+ HREF="SDCCUdoc.html#SECTION00061000000000000000">5.1 Notes on MCS51 memory layout</A>
+</UL>
 <LI><A NAME="tex2html171"
-  HREF="#SECTION00083000000000000000">7.3 Starting the Debugger</A>
+ HREF="SDCCUdoc.html#SECTION00070000000000000000">6. Retargetting for other MCUs.</A>
 <LI><A NAME="tex2html172"
-  HREF="#SECTION00084000000000000000">7.4 Command Line Options.</A>
+ HREF="SDCCUdoc.html#SECTION00080000000000000000">7. SDCDB - Source Level Debugger</A>
+<UL>
 <LI><A NAME="tex2html173"
-  HREF="#SECTION00085000000000000000">7.5 Debugger Commands.</A>
+ HREF="SDCCUdoc.html#SECTION00081000000000000000">7.1 Compiling for Debugging</A>
 <LI><A NAME="tex2html174"
-  HREF="#SECTION00086000000000000000">7.6 Interfacing with XEmacs.</A>
-</UL>
-<BR>
+ HREF="SDCCUdoc.html#SECTION00082000000000000000">7.2 How the Debugger Works</A>
 <LI><A NAME="tex2html175"
-  HREF="#SECTION00090000000000000000">8 Other Processors</A>
-<UL>
+ HREF="SDCCUdoc.html#SECTION00083000000000000000">7.3 Starting the Debugger</A>
 <LI><A NAME="tex2html176"
-  HREF="#SECTION00091000000000000000">8.1 The Z80 and gbz80 port</A>
-</UL>
-<BR>
+ HREF="SDCCUdoc.html#SECTION00084000000000000000">7.4 Command Line Options.</A>
 <LI><A NAME="tex2html177"
-  HREF="#SECTION000100000000000000000">9 Support</A>
-<UL>
+ HREF="SDCCUdoc.html#SECTION00085000000000000000">7.5 Debugger Commands.</A>
 <LI><A NAME="tex2html178"
-  HREF="#SECTION000101000000000000000">9.1 Reporting Bugs</A>
+ HREF="SDCCUdoc.html#SECTION00086000000000000000">7.6 Interfacing with XEmacs.</A>
+</UL>
 <LI><A NAME="tex2html179"
-  HREF="#SECTION000102000000000000000">9.2 Acknowledgments</A>
-</UL>
-<BR>
+ HREF="SDCCUdoc.html#SECTION00090000000000000000">8. Other Processors</A>
+<UL>
 <LI><A NAME="tex2html180"
-  HREF="#SECTION000110000000000000000">About this document ...</A>
+ HREF="SDCCUdoc.html#SECTION00091000000000000000">8.1 The Z80 and gbz80 port</A>
 </UL>
-<!--End of Table of Contents-->
+<LI><A NAME="tex2html181"
+ HREF="SDCCUdoc.html#SECTION000100000000000000000">9. Support</A>
+<UL>
+<LI><A NAME="tex2html182"
+ HREF="SDCCUdoc.html#SECTION000101000000000000000">9.1 Reporting Bugs</A>
+</UL>
+<LI><A NAME="tex2html183"
+ HREF="SDCCUdoc.html#SECTION000110000000000000000">10. Acknowledgments</A>
+<LI><A NAME="tex2html184"
+ HREF="SDCCUdoc.html#SECTION000120000000000000000">Index</A>
+</UL>
+<!--End of Table of Contents--> 
 
 <P>
 
 <H1><A NAME="SECTION00020000000000000000">
-1 Introduction</A>
+1. Introduction</A>
 </H1>
 
 <P>
@@ -201,36 +201,73 @@ Contents</A>
 </H2>
 
 <P>
-<I>&lt;pending: tabularise these features, this is unreadeble&gt;</I>
-<BR>
-<BR><B>SDCC</B> is a Free ware, retargettable, optimizing ANSI-C compiler
+ 
+<B>SDCC</B> is a Freeware, retargettable, optimizing ANSI-C compiler
 by <B>Sandeep Dutta</B> designed for 8 bit Microprocessors. The
 current version targets Intel MCS51 based Microprocessors(8051,8052,
-etc), Zilog Z80 based MCUs, and the Dallas 80C390 MCS51 variant. It
-can be retargetted for other microprocessors, support for PIC, AVR
-and 186 is under development. The entire source code for the compiler
+etc), Zilog Z80 based MCUs, and the Dallas DS80C390 variant. It can
+be retargetted for other microprocessors, support for PIC, AVR and
+186 is under development. The entire source code for the compiler
 is distributed under GPL. SDCC uses ASXXXX &amp; ASLINK, a Freeware,
 retargettable assembler &amp; linker. SDCC has extensive language extensions
-suitable for utilizing various microcontrollers underlying hardware
-effectively. In addition to the MCU specific optimizations SDCC also
-does a host of standard optimizations like <I>global sub expression
-elimination, loop optimizations (loop invariant, strength reduction
-of induction variables and loop reversing), constant folding &amp; propagation,
-copy propagation, dead code elimination and jumptables for 'switch'
-statements.</I> For the back-end SDCC uses a global register allocation
-scheme which should be well suited for other 8 bit MCUs. The peep
-hole optimizer uses a rule based substitution mechanism which is MCU
-dependent. Supported data-types are <I>char (8 bits, 1 byte), short
-and int (16 bits, 2 bytes), long (32 bit, 4 bytes)</I> and <I>float
-(4 byte IEEE).</I> The compiler also allows <I>inline assembler code</I>
-to be embedded anywhere in a function. In addition routines developed
-in assembly can also be called. SDCC also provides an option to report
-the relative complexity of a function, these functions can then be
-further optimized, or hand coded in assembly if needed. SDCC also
-comes with a companion source level debugger SDCDB, the debugger currently
-uses ucSim a freeware simulator for 8051 and other micro-controllers.
-The latest version can be downloaded from <B>http://sdcc.sourceforge.net/
-.</B>
+suitable for utilizing various microcontrollers and underlying hardware
+effectively. 
+<BR>
+
+<BR>
+In addition to the MCU specific optimizations SDCC also does a host
+of standard optimizations like:
+
+<P>
+
+<UL>
+<LI>global sub expression elimination, </LI>
+<LI>loop optimizations (loop invariant, strength reduction of induction
+variables and loop reversing), </LI>
+<LI>constant folding &amp; propagation, </LI>
+<LI>copy propagation, </LI>
+<LI>dead code elimination </LI>
+<LI>jumptables for <I>switch</I> statements.</LI>
+</UL>
+For the back-end SDCC uses a global register allocation scheme which
+should be well suited for other 8 bit MCUs. 
+<BR>
+
+<BR>
+The peep hole optimizer uses a rule based substitution mechanism which
+is MCU independent. 
+<BR>
+
+<BR>
+Supported data-types are:
+
+<P>
+
+<UL>
+<LI>char (8 bits, 1 byte), </LI>
+<LI>short and int (16 bits, 2 bytes), </LI>
+<LI>long (32 bit, 4 bytes)</LI>
+<LI>float (4 byte IEEE). </LI>
+</UL>
+The compiler also allows <I>inline assembler code</I> to be embedded
+anywhere in a function. In addition, routines developed in assembly
+can also be called.
+<BR>
+
+<BR>
+SDCC also provides an option (-cyclomatic) to report the relative
+complexity of a function. These functions can then be further optimized,
+or hand coded in assembly if needed. 
+<BR>
+
+<BR>
+SDCC also comes with a companion source level debugger SDCDB, the
+debugger currently uses ucSim a freeware simulator for 8051 and other
+micro-controllers. 
+<BR>
+
+<BR>
+The latest version can be downloaded from  http://sdcc.sourceforge.net/<B>.</B>
 
 <P>
 
@@ -258,8 +295,6 @@ if not, write to the Free Software Foundation, 59 Temple Place - Suite
 use, share and improve this program. You are forbidden to forbid anyone
 else to use, share and improve what you give them. Help stamp out
 software-hoarding! 
-<BR>
-<BR><I>&lt;pending: add a link to gnu&gt;</I>
 
 <P>
 
@@ -277,28 +312,36 @@ type.</I>
 <P>
 
 <H2><A NAME="SECTION00024000000000000000">
-1.4 Pending: compatibilaty with previous versions</A>
+1.4 Compatibility with previous versions</A>
 </H2>
 
 <P>
-This version has numerous bug fixes comperated with the previous version.
-But we also introduced some incompatibilaties with older versions.
+This version has numerous bug fixes compared with the previous version.
+But we also introduced some incompatibilities with older versions.
 Not just for the fun of it, but to make the compiler more stable,
 efficient and ANSI compliant. 
 <BR>
+
+<P>
+
+<UL>
+<LI>short is now equivalent to int (16 bits), it used to be equivalent
+to char (8 bits)</LI>
+<LI>the default directory where include, library and documention files
+are stored is no in /usr/local/share</LI>
+<LI>char type parameters to vararg functions are casted to int unless
+explicitly casted, e.g.: 
 <BR>
-short char
+<TT>&nbsp;&nbsp;char a=3;</TT>&nbsp;
 <BR>
-directory structure (2.7)
+<TT>&nbsp;&nbsp;printf (&#34;%d %c&#92;n&#34;,
+a, (char)a);</TT>
 <BR>
-vararg pars expl int unless casted
-<BR>
-never had a regextend
-<BR>
-no -noreparms anymore
-<BR>
-<BR>
-more?
+will push a as an int and as a char resp.</LI>
+<LI>option -regextend has been removed</LI>
+<LI>option -noreparms has been removed</LI>
+</UL>
+<I>&lt;pending: more incompatibilities?&gt;</I>
 
 <P>
 
@@ -309,7 +352,7 @@ more?
 <P>
 What do you need before you start installation of SDCC? A computer,
 and a desire to compute. The preferred method of installation is to
-compile SDCC from source using GNU GCC and make. For Windows some
+compile SDCC from source using GNU gcc and make. For Windows some
 pre-compiled binary distributions are available for your convenience.
 You should have some experience with command line tools and compiler
 use.
@@ -321,7 +364,7 @@ use.
 </H2>
 
 <P>
-The SDCC home page at http://sdcc.sourceforge.net/ is a great
+The SDCC home page at  http://sdcc.sourceforge.net/ is a great
 place to find distribution sets. You can also find links to the user
 mailing lists that offer help or discuss SDCC with other SDCC users.
 Web links to other SDCC related sites can also be found here. This
@@ -334,8 +377,36 @@ on cvs.sdcc.sourceforge.net.
 
 <P>
 
+<H2><A NAME="SECTION00027000000000000000">
+1.7 Wishes for the future</A>
+</H2>
+
+<P>
+There are (and always will be) some things that could be done. Here
+are some I can think of:
+<BR>
+
+<P>
+ 
+<I><B>sdcc -c -model-large -o large _atoi.c</B></I> (where large
+could be a different basename or a directory)
+<BR>
+
+<P>
+ 
+<TT>char KernelFunction3(char p) at 0x340;</TT>&nbsp;
+<BR>&nbsp;
+<BR>
+If you can think of some more, please send them to the list.
+<BR>
+
+<BR>
+<I>&lt;pending: And then of course a proper index-table<A NAME="67"></A>&gt;</I>
+
+<P>
+
 <H1><A NAME="SECTION00030000000000000000">
-2 Installation</A>
+2. Installation</A>
 </H1>
 
 <P>
@@ -347,26 +418,20 @@ on cvs.sdcc.sourceforge.net.
 <P>
 
 <OL>
-<LI>Download the source package, it will be named something like sdcc-2.x.x.tgz.
-</LI>
-<LI>Bring up a command line terminal, such as xterm.
-</LI>
+<LI>Download the source package, it will be named something like sdcc-2.x.x.tgz.</LI>
+<LI>Bring up a command line terminal, such as xterm.</LI>
 <LI>Unpack the file using a command like: <I><B>&#34;tar
--xzf sdcc-2.x.x.tgz&#34;</B></I>, this will create a sub-directory
-called sdcc with all of the sources.
-</LI>
+-xzf sdcc-2.x.x.tgz</B></I>&#34;, this will create a sub-directory
+called sdcc with all of the sources.</LI>
 <LI>Change directory into the main SDCC directory, for example type: <I><B>&#34;cd
-sdcc&#34;</B></I><I>.</I>
-</LI>
-<LI>Type <I><B>&#34;./configure&#34;</B></I>. This configures
-the package for compilation on your system.
-</LI>
-<LI>Type <I><B>&#34;make&#34;</B></I>. All of the source
-packages will compile, this can take a while.
-</LI>
+sdcc</B></I><I>&#34;.</I></LI>
+<LI>Type <I><B>&#34;./configure</B></I>&#34;. This configures
+the package for compilation on your system.</LI>
+<LI>Type <I><B>&#34;make</B></I>&#34;. All of the source
+packages will compile, this can take a while.</LI>
 <LI>Type <I><B>&#34;make install&#34;</B></I> as root. This
-copies the binary executables to the install directories.
-</LI>
+copies the binary executables, the include files, the libraries and
+the documentation to the install directories.</LI>
 </OL>
 
 <P>
@@ -376,6 +441,7 @@ copies the binary executables to the install directories.
 </H2>
 
 <P>
+ 
 <I>&lt;pending: is this complete? where is borland, mingw&gt;</I>
 <BR>
 <BR>
@@ -402,16 +468,13 @@ tool (gunzip, WinZip, etc). This should unpack to a group of sub-directories.
 An example directory structure after unpacking is: c:&#92;usr&#92;local&#92;bin
 for the executables, c:&#92;usr&#92;local&#92;share&#92;sdcc&#92;include
 and c:&#92;usr&#92;local&#92;share&#92;sdcc&#92;lib
-for the include and libraries.
-</LI>
+for the include and libraries.</LI>
 <LI>Adjust your environment PATH to include the location of the bin directory.
-For example, make a setsdcc.bat file with the following: set PATH=c:&#92;usr&#92;local&#92;bin;%PATH%
-</LI>
+For example, make a setsdcc.bat file with the following: set PATH=c:&#92;usr&#92;local&#92;bin;%PATH%</LI>
 <LI>When you compile with sdcc, you may need to specify the location of
 the lib and include folders. For example, sdcc -I c:&#92;usr&#92;local&#92;share&#92;sdcc&#92;include
 -L c:&#92;usr&#92;local&#92;share&#92;sdcc&#92;lib&#92;small
-test.c
-</LI>
+test.c</LI>
 </OL>
 
 <P>
@@ -423,15 +486,12 @@ test.c
 <P>
 
 <OL>
-<LI>Download and install the cygwin package from the redhat sitehttp://sources.redhat.com/cygwin/.
+<LI>Download and install the cygwin package from the redhat site http://sources.redhat.com/cygwin/.
 Currently, this involved downloading a small install program which
 then automates downloading and installing selected parts of the package
-(a large 80M byte sized dowload for the whole thing). 
-</LI>
-<LI>Bring up a Unix/Bash command line terminal from the Cygwin menu.
-</LI>
-<LI>Follow the instructions in the preceding Linux/Unix installation section.
-</LI>
+(a large 80M byte sized dowload for the whole thing). </LI>
+<LI>Bring up a Unix/Bash command line terminal from the Cygwin menu.</LI>
+<LI>Follow the instructions in the preceding Linux/Unix installation section.</LI>
 </OL>
 
 <P>
@@ -451,11 +511,13 @@ PATH environment setting (see the Trouble-shooting section for suggestions).
 Make sure that the sdcc program is in the bin folder, if not perhaps
 something did not install correctly.
 <BR>
+
 <BR>
 SDCC binaries are commonly installed in a directory arrangement like
 this:
 <BR>
-<P>
+
+<BR>
 <TABLE CELLPADDING=3 BORDER="1">
 <TR><TD ALIGN="LEFT">/usr/local/bin</TD>
 <TD ALIGN="LEFT">Holds executables(sdcc, s51, aslink, ...)</TD>
@@ -468,35 +530,50 @@ this:
 </TR>
 </TABLE>
 <BR>
+
 <BR>
 Make sure the compiler works on a very simple example. Type in the
 following test.c program using your favorite editor:
 <BR>
 <BR>
+<TT>int test(int t) {</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;return t+3;</TT>&nbsp;
+<BR>
+<TT>}</TT>
+<BR>
+<BR>
 Compile this using the following command: <I><B>&#34;sdcc
--c test.c&#34;</B></I> If all goes well, the compiler will generate
+-c test.c&#34;.</B></I> If all goes well, the compiler will generate
 a test.asm and test.rel file. Congratulations, you've just compiled
 your first program with SDCC. We used the -c option to tell SDCC not
 to link the generated code, just to keep things simple for this step.
 <BR>
+
 <BR>
 The next step is to try it with the linker. Type in <I><B>&#34;sdcc
-test.c&#34;</B></I>. If all goes well the compiler will link with the
+test.c</B></I>&#34;. If all goes well the compiler will link with the
 libraries and produce a test.ihx output file. If this step fails (no
 test.ihx, and the linker generates warnings), then the problem is
 most likely that sdcc cannot find the /usr/local/share/sdcc/lib directory
 (see the Install trouble-shooting section for suggestions).
 <BR>
+
 <BR>
 The final test is to ensure sdcc can use the standard header files
 and libraries. Edit test.c and change it to the following:
 <BR>
-<BR>#include &lt;string.h&gt;
+
+<BR>
+#include &lt;string.h&gt;
 <BR>
 main() {
-<BR><TT>char str1[10];</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;strcpy(str1, &#34;testing&#34;);</TT>&nbsp;
-<BR><TT>}</TT>&nbsp;
+<BR>
+<TT>char str1[10];</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;strcpy(str1, &#34;testing&#34;);</TT>&nbsp;
+<BR>
+<TT>}</TT>&nbsp;
 <BR>&nbsp;
 <BR>
 Compile this by typing <I><B>&#34;sdcc test.c&#34;</B></I>.
@@ -533,8 +610,11 @@ this: <I><B>&#34;sdcc&nbsp;-L&nbsp;/usr/local/sdcc/lib/small&nbsp;-I&nbsp;/usr/l
 A thing to try is starting from scratch by unpacking the .tgz source
 package again in an empty directory. Confure it again and build like:
 <BR>
-<BR><I><B>make 2SPMamp;&gt;1 | tee make.log</B></I>
+
 <BR>
+<I><B>make 2SPMamp;&gt;1 | tee make.log</B></I>
+<BR>
+
 <BR>
 After this you can review the make.log file to locate the problem.
 Or a relevant part of this be attached to an email that could be helpful
@@ -581,6 +661,7 @@ executables to /usr/local/bin and the libraries and header files to
 </H2>
 
 <P>
+ 
 <I>&lt;pending: is this up to date?&gt;</I>
 <BR>
 <BR>
@@ -660,12 +741,10 @@ the Borland 32-bit compiler you would run <I><B>&#34;make
 
 <UL>
 <LI><B>FreeBSD and other non-GNU Unixes</B> - Make sure the GNU make
-is installed as the default make tool.
-</LI>
+is installed as the default make tool.</LI>
 <LI>SDCC has been ported to run under a variety of operating systems and
 processors. If you can run GNU GCC/make then chances are good SDCC
-can be compiled and run on your system.
-</LI>
+can be compiled and run on your system.</LI>
 </UL>
 
 <P>
@@ -682,6 +761,7 @@ location is /usr/local). The installation process will create the
 following directory structure under the &lt;directory name&gt; specified
 (if they do not already exist). 
 <BR>
+
 <BR>
 bin/ - binary exectables (add to PATH environment variable)
 <BR>
@@ -699,9 +779,10 @@ library
 <BR>
 bin/share/sdcc/lib/ds390/ - Object &amp; library files forDS80C390 library
 <BR>
+
 <BR>
 The command <I><B>''./configure -prefix=/usr/local''</B></I>
-will configure the compiler to be installed in directory /usr/local/bin.
+will configure the compiler to be installed in directory /usr/local.
 
 <P>
 
@@ -718,25 +799,51 @@ you can find in the source package in their respective directories.
 As SDCC grows to include support for other processors, other packages
 from various developers are included and may have their own sets of
 documentation.
+<BR>
+
+<BR>
+You might want to look at the files which are installed in &lt;installdir&gt;.
+At the time of this writing, we find the following programs:
+<BR>
+ 
+<BR>
+In &lt;installdir&gt;/bin:
 
 <P>
-You might want to look at the various executables which are installed
-in the bin directory. At the time of this writing, we find the following
-programs:
-<BR>
-<BR><I>&lt;pending: tabularize this&gt;</I>
-<BR>
-<BR><B>sdcc</B> - The compiler.
-<BR><B>sdcpp</B> - The C preprocessor.
-<BR><B>asx8051</B> - The assembler for 8051 type processors.
-<BR><B>as-z80, as-gbz80</B> - The Z80 and GameBoy Z80 assemblers.
-<BR><B>aslink</B> -The linker for 8051 type processors.
-<BR><B>link-z80, link-gbz80</B> - The Z80 and GameBoy Z80 linkers.
-<BR><B>s51</B> - The ucSim 8051 simulator.
-<BR><B>sdcdb</B> - The source debugger.
-<BR><B>packihx</B> - A tool to pack Intel hex files.
-<BR>
-<BR>
+
+<UL>
+<LI>sdcc - The compiler.</LI>
+<LI>sdcpp - The C preprocessor.</LI>
+<LI>asx8051 - The assembler for 8051 type processors.</LI>
+<LI>as-z80<B>,</B> as-gbz80 - The Z80 and GameBoy Z80 assemblers.</LI>
+<LI>aslink -The linker for 8051 type processors.</LI>
+<LI>link-z80<B>,</B> link-gbz80 - The Z80 and GameBoy Z80 linkers.</LI>
+<LI>s51 - The ucSim 8051 simulator.</LI>
+<LI>sdcdb - The source debugger.</LI>
+<LI>packihx - A tool to pack Intel hex files.</LI>
+</UL>
+In &lt;installdir&gt;/share/sdcc/include
+
+<P>
+
+<UL>
+<LI>the include files</LI>
+</UL>
+In &lt;installdir&gt;/share/sdcc/lib
+
+<P>
+
+<UL>
+<LI>the sources of the runtime library and the subdirs small large and
+ds390 with the precompiled relocatables.</LI>
+</UL>
+In &lt;installdir&gt;/share/sdcc/doc
+
+<P>
+
+<UL>
+<LI>the documentation</LI>
+</UL>
 As development for other processors proceeds, this list will expand
 to include executables to support processors like AVR, PIC, etc.
 
@@ -782,9 +889,9 @@ properly with the SDCC.
 
 <P>
 S51 is a freeware, opensource simulator developed by Daniel Drotos
-(mailto:drdani@mazsola.iit.uni-miskolc.hu). The simulator is
+( mailto:drdani@mazsola.iit.uni-miskolc.hu). The simulator is
 built as part of the build process. For more information visit Daniel's
-website at: http://mazsola.iit.uni-miskolc.hu/&nbsp;drdani/embedded/s51
+website at:  http://mazsola.iit.uni-miskolc.hu/&nbsp;drdani/embedded/s51
 .
 
 <P>
@@ -801,7 +908,7 @@ to use other simulators.
 <P>
 
 <H1><A NAME="SECTION00040000000000000000">
-3 Using SDCC</A>
+3. Using SDCC</A>
 </H1>
 
 <P>
@@ -822,6 +929,7 @@ your programs with the following command <I><B>&#34;sdcc
 sourcefile.c&#34;.</B></I> This will compile, assemble and link your
 source file. Output files are as follows
 <BR>
+
 <BR>
 sourcefile.asm - Assembler source file created by the compiler
 <BR>
@@ -845,6 +953,7 @@ the Motorola S19 format with -out-fmt-s19)
 sourcefile.cdb - An optional file (with -debug) containing debug
 information
 <BR>
+
 <P>
 
 <H3><A NAME="SECTION00041200000000000000">
@@ -855,6 +964,7 @@ information
 SDCC can compile only ONE file at a time. Let us for example assume
 that you have a project containing the following files:
 <BR>
+
 <BR>
 foo1.c (contains some functions)
 <BR>
@@ -862,24 +972,34 @@ foo2.c (contains some more functions)
 <BR>
 foomain.c (contains more functions and the function main)
 <BR>
+
 <BR>
 The first two files will need to be compiled separately with the commands:
 
 <BR>
-<BR><I><B>sdcc&nbsp;-c&nbsp;foo1.c</B></I>
-<BR><I><B>sdcc&nbsp;-c&nbsp;foo2.c</B></I>
+
 <BR>
+<I><B>sdcc&nbsp;-c&nbsp;foo1.c</B></I>
+<BR>
+<I><B>sdcc&nbsp;-c&nbsp;foo2.c</B></I>
+<BR>
+
 <BR>
 Then compile the source file containing the <I>main()</I> function
 and link the files together with the following command: 
 <BR>
-<BR><I><B>sdcc&nbsp;foomain.c&nbsp;foo1.rel&nbsp;foo2.rel</B></I>
+
 <BR>
+<I><B>sdcc&nbsp;foomain.c&nbsp;foo1.rel&nbsp;foo2.rel</B></I>
+<BR>
+
 <BR>
 Alternatively, <I>foomain.c</I> can be separately compiled as well:
 <BR>
-<BR><I><B>sdcc&nbsp;-c&nbsp;foomain.c</B></I>
-<BR><I><B>sdcc foomain.rel foo1.rel foo2.rel</B></I>
+<BR>
+<I><B>sdcc&nbsp;-c&nbsp;foomain.c</B></I>
+<BR>
+<I><B>sdcc foomain.rel foo1.rel foo2.rel</B></I>
 <BR>
 <BR>
 The file containing the <I>main()</I> function <SMALL>MUST</SMALL>
@@ -903,11 +1023,14 @@ assuming you have the source file <I>foomain.c</I> and a library <I>foolib.lib</
 in the directory <I>mylib</I> (if that is not the same as your current
 project):
 <BR>
-<BR><I><B>sdcc foomain.c foolib.lib -L mylib</B></I>
+
+<BR>
+<I><B>sdcc foomain.c foolib.lib -L mylib</B></I>
 <BR>
 <BR>
 Note here that <I>mylib</I> must be an absolute path name.
 <BR>
+
 <BR>
 The most efficient way to use libraries is to keep seperate modules
 in seperate source files. The lib file now should name all the modules.rel
@@ -930,23 +1053,16 @@ in the directory &lt;installdir&gt;/share/lib/small.
 
 <UL>
 <LI>[<B>-mmcs51</B>]Generate code for the MCS51 (8051) family of processors.
-This is the default processor target.
-</LI>
-<LI>[<B>-mds390</B>]Generate code for the DS80C390 processor.
-</LI>
-<LI>[<B>-mz80</B>]Generate code for the Z80 family of processors.
-</LI>
-<LI>[<B>-mgbz80</B>]Generate code for the GameBoy Z80 processor.
-</LI>
+This is the default processor target.</LI>
+<LI>[<B>-mds390</B>]Generate code for the DS80C390 processor.</LI>
+<LI>[<B>-mz80</B>]Generate code for the Z80 family of processors.</LI>
+<LI>[<B>-mgbz80</B>]Generate code for the GameBoy Z80 processor.</LI>
 <LI>[<B>-mavr</B>]Generate code for the Atmel AVR processor(In development,
-not complete).
-</LI>
+not complete).</LI>
 <LI>[<B>-mpic14</B>]Generate code for the PIC 14-bit processors(In development,
-not complete).
-</LI>
+not complete).</LI>
 <LI>[<B>-mtlcs900h</B>]Generate code for the Toshiba TLCS-900H processor(In
-development, not complete).
-</LI>
+development, not complete).</LI>
 </UL>
 <P>
 
@@ -958,11 +1074,9 @@ development, not complete).
 
 <UL>
 <LI>[<B>-I&lt;path&gt;</B>]The additional location where the pre processor
-will look for &lt;..h&gt; or ``..h'' files.
-</LI>
+will look for &lt;..h&gt; or ``..h'' files.</LI>
 <LI>[<B>-D&lt;macro[=value]&gt;</B>]Command line definition of macros.
-Passed to the pre processor.
-</LI>
+Passed to the pre processor.</LI>
 <LI>[<B>-M</B>]Tell the preprocessor to output a rule suitable for make
 describing the dependencies of each object file. For each source file,
 the preprocessor outputs one make-rule whose target is the object
@@ -970,38 +1084,29 @@ file name for that source file and whose dependencies are all the
 files `#include'd in it. This rule may be a single line or may be
 continued with `&#92;'-newline if it is long. The list
 of rules is printed on standard output instead of the preprocessed
-C program. `-M' implies `-E'.
-</LI>
+C program. `-M' implies `-E'.</LI>
 <LI>[<B>-C</B>]Tell the preprocessor not to discard comments. Used with
-the `-E' option.
-</LI>
+the `-E' option.</LI>
 <LI>[<B>-MM</B>]Like `-M' but the output mentions only the user header
 files included with `#include ``file&#34;'. System header
-files included with `#include &lt;file&gt;' are omitted.
-</LI>
+files included with `#include &lt;file&gt;' are omitted.</LI>
 <LI>[<B>-Aquestion(answer)</B>]Assert the answer answer for question,
 in case it is tested with a preprocessor conditional such as `#if
 #question(answer)'. `-A-' disables the standard assertions that normally
-describe the target machine.
-</LI>
+describe the target machine.</LI>
 <LI>[<B>-Aquestion</B>](answer) Assert the answer answer for question,
 in case it is tested with a preprocessor conditional such as `#if
 #question(answer)'. `-A-' disables the standard assertions that normally
-describe the target machine.
-</LI>
+describe the target machine.</LI>
 <LI>[<B>-Umacro</B>]Undefine macro macro. `-U' options are evaluated
-after all `-D' options, but before any `-include' and `-imacros' options.
-</LI>
+after all `-D' options, but before any `-include' and `-imacros' options.</LI>
 <LI>[<B>-dM</B>]Tell the preprocessor to output only a list of the macro
 definitions that are in effect at the end of preprocessing. Used with
-the `-E' option.
-</LI>
+the `-E' option.</LI>
 <LI>[<B>-dD</B>]Tell the preprocessor to pass all macro definitions
-into the output, in their proper sequence in the rest of the output.
-</LI>
+into the output, in their proper sequence in the rest of the output.</LI>
 <LI>[<B>-dN</B>]Like `-dD' except that the macro arguments and contents
-are omitted. Only `#define name' is included in the output.
-</LI>
+are omitted. Only `#define name' is included in the output.</LI>
 </UL>
 <P>
 
@@ -1016,18 +1121,15 @@ are omitted. Only `#define name' is included in the output.
 option is passed to the linkage editor's additional libraries search
 path. The path name must be absolute. Additional library files may
 be specified in the command line. See section Compiling programs for
-more details.
-</LI>
+more details.</LI>
 <LI>[<B>-xram-loc</B>&lt;Value&gt;]The start location of the external ram,
 default value is 0. The value entered can be in Hexadecimal or Decimal
-format, e.g.: -xram-loc 0x8000 or -xram-loc 32768.
-</LI>
+format, e.g.: -xram-loc 0x8000 or -xram-loc 32768.</LI>
 <LI>[<B>-code-loc</B>&lt;Value&gt;]The start location of the code segment,
 default value 0. Note when this option is used the interrupt vector
 table is also relocated to the given address. The value entered can
 be in Hexadecimal or Decimal format, e.g.: -code-loc 0x8000 or -code-loc
-32768.
-</LI>
+32768.</LI>
 <LI>[<B>-stack-loc</B>&lt;Value&gt;]The initial value of the stack pointer.
 The default value of the stack pointer is 0x07 if only register bank
 0 is used, if other register banks are used then the stack pointer
@@ -1036,26 +1138,20 @@ eg. if register banks 1 &amp; 2 are used the stack pointer will default
 to location 0x18. The value entered can be in Hexadecimal or Decimal
 format, eg. -stack-loc 0x20 or -stack-loc 32. If all four register
 banks are used the stack will be placed after the data segment (equivalent
-to -stack-after-data)
-</LI>
+to -stack-after-data)</LI>
 <LI>[<B>-stack-after-data</B>]This option will cause the stack to be
-located in the internal ram after the data segment.
-</LI>
+located in the internal ram after the data segment.</LI>
 <LI>[<B>-data-loc</B>&lt;Value&gt;]The start location of the internal ram
 data segment, the default value is 0x30.The value entered can be in
-Hexadecimal or Decimal format, eg. -data-loc 0x20 or -data-loc 32.
-</LI>
+Hexadecimal or Decimal format, eg. -data-loc 0x20 or -data-loc 32.</LI>
 <LI>[<B>-idata-loc</B>&lt;Value&gt;]The start location of the indirectly
 addressable internal ram, default value is 0x80. The value entered
 can be in Hexadecimal or Decimal format, eg. -idata-loc 0x88 or -idata-loc
-136.
-</LI>
+136.</LI>
 <LI>[<B>-out-fmt-ihx</B>]The linker output (final object code) is in
-Intel Hex format. (This is the default option).
-</LI>
+Intel Hex format. (This is the default option).</LI>
 <LI>[<B>-out-fmt-s19</B>]The linker output (final object code) is in
-Motorola S19 format.
-</LI>
+Motorola S19 format.</LI>
 </UL>
 <P>
 
@@ -1070,11 +1166,9 @@ Motorola S19 format.
 section Memory Models for more details. If this option is used all
 source files in the project should be compiled with this option. In
 addition the standard library routines are compiled with small model,
-they will need to be recompiled.
-</LI>
+they will need to be recompiled.</LI>
 <LI>[<B>-model-small</B>]Generate code for Small Model programs see
-section Memory Models for more details. This is the default model.
-</LI>
+section Memory Models for more details. This is the default model.</LI>
 </UL>
 <P>
 
@@ -1088,8 +1182,7 @@ section Memory Models for more details. This is the default model.
 <LI>[<B>-model-flat24</B>]Generate 24-bit flat mode code. This is the
 one and only that the ds390 code generator supports right now and
 is default when using <I>-mds390</I>. See section Memory Models for
-more details.
-</LI>
+more details.</LI>
 <LI>[<B>-stack-10bit</B>]Generate code for the 10 bit stack mode of
 the Dallas DS80C390 part. This is the one and only that the ds390
 code generator supports right now and is default when using <I>-mds390</I>.
@@ -1105,8 +1198,7 @@ mode before calling any re-entrant functions compiled with this option.
 In principle, this should work with the <I>-stack-auto</I> option,
 but that has not been tested. It is incompatible with the <I>-xstack</I>
 option. It also only makes sense if the processor is in 24 bit contiguous
-addressing mode (see the <I>-model-flat24 option</I>).
-</LI>
+addressing mode (see the <I>-model-flat24 option</I>).</LI>
 </UL>
 <P>
 
@@ -1123,28 +1215,23 @@ spaces to store compiler temporaries. A warning message will be generated
 when this happens and the compiler will indicate the number of extra
 bytes it allocated. It recommended that this option NOT be used, #pragma&nbsp;NOGCSE
 can be used to turn off global subexpression elimination for a given
-function only.
-</LI>
+function only.</LI>
 <LI>[<B>-noinvariant</B>]Will not do loop invariant optimizations,
 this may be turned off for reasons explained for the previous option.
 For more details of loop optimizations performed see section Loop
 Invariants.It recommended that this option NOT be used, #pragma&nbsp;NOINVARIANT
 can be used to turn off invariant optimizations for a given function
-only.
-</LI>
+only.</LI>
 <LI>[<B>-noinduction</B>]Will not do loop induction optimizations,
 see section strength reduction for more details.It is recommended
 that this option is NOT used, #pragma&nbsp;NOINDUCTION can be used to
-turn off induction optimizations for a given function only.
-</LI>
+turn off induction optimizations for a given function only.</LI>
 <LI>[<B>-nojtbound</B>] Will not generate boundary condition check
 when switch statements are implemented using jump-tables. See section
 Switch Statements for more details. It is recommended that this option
 is NOT used, #pragma&nbsp;NOJTBOUND can be used to turn off boundary
-checking for jump tables for a given function only.
-</LI>
-<LI>[<B>-noloopreverse</B>]Will not do loop reversal optimization.
-</LI>
+checking for jump tables for a given function only.</LI>
+<LI>[<B>-noloopreverse</B>]Will not do loop reversal optimization.</LI>
 </UL>
 <P>
 
@@ -1156,21 +1243,17 @@ checking for jump tables for a given function only.
 
 <UL>
 <LI>[<B>-c&nbsp;-compile-only</B>]will compile and assemble the source,
-but will not call the linkage editor.
-</LI>
+but will not call the linkage editor.</LI>
 <LI>[<B>-E</B>]Run only the C preprocessor. Preprocess all the C source
-files specified and output the results to standard output.
-</LI>
+files specified and output the results to standard output.</LI>
 <LI>[<B>-stack-auto</B>]All functions in the source file will be compiled
 as <I>reentrant</I>, i.e. the parameters and local variables will
 be allocated on the stack. see section Parameters and Local Variables
 for more details. If this option is used all source files in the project
-should be compiled with this option. 
-</LI>
+should be compiled with this option. </LI>
 <LI>[<B>-xstack</B>]Uses a pseudo stack in the first 256 bytes in the
 external ram for allocating variables and passing parameters. See
-section on external stack for more details.
-</LI>
+section on external stack for more details.</LI>
 <LI>[<B>-callee-saves</B>]<B>function1[,function2][,function3]....</B>
 The compiler by default uses a caller saves convention for register
 saving across function calls, however this can cause unneccessary
@@ -1187,75 +1270,55 @@ functions such as _muluint..., if this option is used for a library
 function the appropriate library function needs to be recompiled with
 the same option. If the project consists of multiple source files
 then all the source file should be compiled with the same -callee-saves
-option string. Also see #pragma&nbsp;CALLEE-SAVES.
-</LI>
+option string. Also see #pragma&nbsp;CALLEE-SAVES.</LI>
 <LI>[<B>-debug</B>]When this option is used the compiler will generate
 debug information, that can be used with the SDCDB. The debug information
 is collected in a file with .cdb extension. For more information see
-documentation for SDCDB.
-</LI>
+documentation for SDCDB.</LI>
 <LI>[<B><I>-regextend</I></B>] <I>This option is obsolete and isn't
-supported anymore.</I>
-</LI>
+supported anymore.</I></LI>
 <LI>[<B><I>-noregparms</I></B>]<I>This option is obsolete and isn't
-supported anymore.</I>
-</LI>
+supported anymore.</I></LI>
 <LI>[<B>-peep-file</B>&lt;filename&gt;]This option can be used to use additional
 rules to be used by the peep hole optimizer. See section Peep Hole
-optimizations for details on how to write these rules.
-</LI>
+optimizations for details on how to write these rules.</LI>
 <LI>[<B>-S</B>]Stop after the stage of compilation proper; do not assemble.
-The output is an assembler code file for the input file specified.
-</LI>
+The output is an assembler code file for the input file specified.</LI>
 <LI>[<B>-Wa_asmOption[,asmOption]</B>...]Pass the asmOption to
-the assembler.
-</LI>
+the assembler.</LI>
 <LI>[<B>-Wl_linkOption[,linkOption]</B>...]Pass the linkOption
-to the linker.
-</LI>
+to the linker.</LI>
 <LI>[<B>-int-long-reent</B>] Integer (16 bit) and long (32 bit) libraries
 have been compiled as reentrant. Note by default these libraries are
-compiled as non-reentrant. See section Installation for more details.
-</LI>
+compiled as non-reentrant. See section Installation for more details.</LI>
 <LI>[<B>-cyclomatic</B>]This option will cause the compiler to generate
 an information message for each function in the source file. The message
 contains some <I>important</I> information about the function. The
 number of edges and nodes the compiler detected in the control flow
 graph of the function, and most importantly the <I>cyclomatic complexity</I>
-see section on Cyclomatic Complexity for more details.
-</LI>
+see section on Cyclomatic Complexity for more details.</LI>
 <LI>[<B>-float-reent</B>] Floating point library is compiled as reentrant.See
-section Installation for more details.
-</LI>
+section Installation for more details.</LI>
 <LI>[<B>-nooverlay</B>] The compiler will not overlay parameters and
 local variables of any function, see section Parameters and local
-variables for more details.
-</LI>
+variables for more details.</LI>
 <LI>[<B>-main-return</B>]This option can be used when the code generated
 is called by a monitor program. The compiler will generate a 'ret'
 upon return from the 'main' function. The default option is to lock
-up i.e. generate a 'ljmp '.
-</LI>
-<LI>[<B>-no-peep</B>] Disable peep-hole optimization.
-</LI>
+up i.e. generate a 'ljmp '.</LI>
+<LI>[<B>-no-peep</B>] Disable peep-hole optimization.</LI>
 <LI>[<B>-peep-asm</B>] Pass the inline assembler code through the peep
 hole optimizer. This can cause unexpected changes to inline assembler
 code, please go through the peephole optimizer rules defined in the
-source file tree '&lt;target&gt;/peeph.def' before using this option.
-</LI>
+source file tree '&lt;target&gt;/peeph.def' before using this option.</LI>
 <LI>[<B>-iram-size</B>&lt;Value&gt;]Causes the linker to check if the interal
-ram usage is within limits of the given value.
-</LI>
+ram usage is within limits of the given value.</LI>
 <LI>[<B>-nostdincl</B>]This will prevent the compiler from passing
-on the default include path to the preprocessor.
-</LI>
+on the default include path to the preprocessor.</LI>
 <LI>[<B>-nostdlib</B>]This will prevent the compiler from passing on
-the default library path to the linker.
-</LI>
-<LI>[<B>-verbose</B>]Shows the various actions the compiler is performing.
-</LI>
-<LI>[<B>-V</B>]Shows the actual commands the compiler is executing.
-</LI>
+the default library path to the linker.</LI>
+<LI>[<B>-verbose</B>]Shows the various actions the compiler is performing.</LI>
+<LI>[<B>-V</B>]Shows the actual commands the compiler is executing.</LI>
 </UL>
 <P>
 
@@ -1277,30 +1340,21 @@ intermediate code into a file of named <I>&lt;source filename&gt;.dumpraw</I>
 just after the intermediate code has been generated for a function,
 i.e. before any optimizations are done. The basic blocks at this stage
 ordered in the depth first number, so they may not be in sequence
-of execution.
-</LI>
+of execution.</LI>
 <LI>[<B>-dumpgcse</B>]Will create a dump of iCode's, after global subexpression
-elimination, into a file named <I>&lt;source filename&gt;.dumpgcse.</I>
-</LI>
+elimination, into a file named <I>&lt;source filename&gt;.dumpgcse.</I></LI>
 <LI>[<B>-dumpdeadcode</B>]Will create a dump of iCode's, after deadcode
-elimination, into a file named <I>&lt;source filename&gt;.dumpdeadcode.</I>
-</LI>
+elimination, into a file named <I>&lt;source filename&gt;.dumpdeadcode.</I></LI>
 <LI>[<B>-dumploop</B>]Will create a dump of iCode's, after loop optimizations,
-into a file named <I>&lt;source filename&gt;.dumploop.</I>
-</LI>
+into a file named <I>&lt;source filename&gt;.dumploop.</I></LI>
 <LI>[<B>-dumprange</B>]Will create a dump of iCode's, after live range
-analysis, into a file named <I>&lt;source filename&gt;.dumprange.</I>
-</LI>
-<LI>[<B>-dumlrange</B>]Will dump the life ranges for all symbols.
-</LI>
+analysis, into a file named <I>&lt;source filename&gt;.dumprange.</I></LI>
+<LI>[<B>-dumlrange</B>]Will dump the life ranges for all symbols.</LI>
 <LI>[<B>-dumpregassign</B>]Will create a dump of iCode's, after register
-assignment, into a file named <I>&lt;source filename&gt;.dumprassgn.</I>
-</LI>
-<LI>[<B>-dumplrange</B>]Will create a dump of the live ranges of iTemp's
-</LI>
+assignment, into a file named <I>&lt;source filename&gt;.dumprassgn.</I></LI>
+<LI>[<B>-dumplrange</B>]Will create a dump of the live ranges of iTemp's</LI>
 <LI>[<B>-dumpall</B>]Will cause all the above mentioned dumps to be
-created.
-</LI>
+created.</LI>
 </UL>
 <P>
 
@@ -1323,7 +1377,9 @@ Variables declared with this storage class will be placed in the extern
 RAM. This is the <B>default</B> storage class for Large Memory model,
 e.g.:
 <BR>
-<BR><TT>xdata unsigned char xduc;</TT>
+
+<BR>
+<TT>xdata unsigned char xduc;</TT>
 
 <P>
 
@@ -1336,7 +1392,9 @@ This is the <B>default</B> storage class for Small Memory model.
 Variables declared with this storage class will be allocated in the
 internal RAM, e.g.:
 <BR>
-<BR><TT>data int iramdata;</TT>
+
+<BR>
+<TT>data int iramdata;</TT>
 
 <P>
 
@@ -1349,7 +1407,9 @@ Variables declared with this storage class will be allocated into
 the indirectly addressable portion of the internal ram of a 8051,
 e.g.:
 <BR>
-<BR><TT>idata int idi;</TT>
+
+<BR>
+<TT>idata int idi;</TT>
 
 <P>
 
@@ -1362,7 +1422,9 @@ This is a data-type and a storage class specifier. When a variable
 is declared as a bit, it is allocated into the bit addressable memory
 of 8051, e.g.:
 <BR>
-<BR><TT>bit iFlag;</TT>
+
+<BR>
+<TT>bit iFlag;</TT>
 
 <P>
 
@@ -1375,9 +1437,12 @@ Like the bit keyword, <I>sfr / sbit</I> signifies both a data-type
 and storage class, they are used to describe the special function
 registers and special bit variables of a 8051, eg:
 <BR>
-<BR><TT>sfr at 0x80 P0; /* special function register P0 at location
+
+<BR>
+<TT>sfr at 0x80 P0; /* special function register P0 at location
 0x80 */</TT>&nbsp;
-<BR><TT>sbit at 0xd7 CY; /* CY (Carry Flag) */</TT>
+<BR>
+<TT>sbit at 0xd7 CY; /* CY (Carry Flag) */</TT>
 
 <P>
 
@@ -1391,48 +1456,69 @@ to any of the memory spaces of the 8051. In addition to the explicit
 pointers, the compiler also allows a <I>_generic</I> class of pointers
 which can be used to point to any of the memory spaces.
 <BR>
+
 <BR>
 Pointer declaration examples:
 <BR>
-<BR><TT>/* pointer physically in xternal ram pointing to object
-in internal ram */ </TT>&nbsp;
-<BR><TT>data unsigned char * xdata p;</TT>&nbsp;
-<BR>&nbsp;
-<BR><TT>/* pointer physically in code rom pointing to data in xdata
-space */ </TT>&nbsp;
-<BR><TT>xdata unsigned char * code p;</TT>&nbsp;
-<BR>&nbsp;
-<BR><TT>/* pointer physically in code space pointing to data in
-code space */ </TT>&nbsp;
-<BR><TT>code unsigned char * code p;</TT>&nbsp;
-<BR>&nbsp;
-<BR><TT>/* the folowing is a generic pointer physically located
-in xdata space */</TT>&nbsp;
-<BR><TT>char * xdata p;</TT>
+
 <BR>
+<TT>/* pointer physically in xternal ram pointing to object
+in internal ram */ </TT>&nbsp;
+<BR>
+<TT>data unsigned char * xdata p;</TT>&nbsp;
+<BR>&nbsp;
+<BR>
+<TT>/* pointer physically in code rom pointing to data in xdata
+space */ </TT>&nbsp;
+<BR>
+<TT>xdata unsigned char * code p;</TT>&nbsp;
+<BR>&nbsp;
+<BR>
+<TT>/* pointer physically in code space pointing to data in
+code space */ </TT>&nbsp;
+<BR>
+<TT>code unsigned char * code p;</TT>&nbsp;
+<BR>&nbsp;
+<BR>
+<TT>/* the folowing is a generic pointer physically located
+in xdata space */</TT>&nbsp;
+<BR>
+<TT>char * xdata p;</TT>
+<BR>
+
 <BR>
 Well you get the idea. 
 <BR>
-<BR><I>For compatibility with the previous version of the compiler,
+
+<BR>
+<I>For compatibility with the previous version of the compiler,
 the following syntax for pointer declaration is still supported but
 will disappear int the near future. </I>
 <BR>
-<BR><TT><I>unsigned char _xdata *ucxdp; /* pointer to data
+<BR>
+<TT><I>unsigned char _xdata *ucxdp; /* pointer to data
 in external ram */ </I></TT>&nbsp;
-<BR><TT><I>unsigned char _data &nbsp;*ucdp ; /* pointer to data
+<BR>
+<TT><I>unsigned char _data &nbsp;*ucdp ; /* pointer to data
 in internal ram */ </I></TT>&nbsp;
-<BR><TT><I>unsigned char _code &nbsp;*uccp ; /* pointer to data
+<BR>
+<TT><I>unsigned char _code &nbsp;*uccp ; /* pointer to data
 in R/O code space */</I></TT>&nbsp;
-<BR><TT><I>unsigned char _idata *uccp; &nbsp;/* pointer to upper
+<BR>
+<TT><I>unsigned char _idata *uccp; &nbsp;/* pointer to upper
 128 bytes of ram */</I></TT>
 <BR>
+
 <BR>
 All unqualified pointers are treated as 3-byte (4-byte for the ds390)
 <I>generic</I> pointers. These type of pointers can also to be explicitly
 declared.
 <BR>
-<BR><TT>unsigned char _generic *ucgp;</TT>
+
 <BR>
+<TT>unsigned char _generic *ucgp;</TT>
+<BR>
+
 <BR>
 The highest order byte of the <I>generic</I> pointers contains the
 data space information. Assembler support routines are called whenever
@@ -1459,11 +1545,17 @@ They can be placed on the stack either by using the <I>-stack-auto</I>
 compiler option or by using the <I>reentrant</I> keyword in the function
 declaration, e.g.:
 <BR>
-<BR><TT>unsigned char foo(char i) reentrant </TT>&nbsp;
-<BR><TT>{ </TT>&nbsp;
-<BR><TT>... </TT>&nbsp;
-<BR><TT>}</TT>&nbsp;
+
 <BR>
+<TT>unsigned char foo(char i) reentrant </TT>&nbsp;
+<BR>
+<TT>{ </TT>&nbsp;
+<BR>
+<TT>... </TT>&nbsp;
+<BR>
+<TT>}</TT>&nbsp;
+<BR>
+
 <BR>
 Since stack space on 8051 is limited, the <I>reentrant</I> keyword
 or the <I>-stack-auto</I> option should be used sparingly. Note that
@@ -1471,16 +1563,24 @@ the reentrant keyword just means that the parameters &amp; local variables
 will be allocated to the stack, it <I>does not</I> mean that the function
 is register bank independent.
 <BR>
+
 <BR>
 Local variables can be assigned storage classes and absolute addresses,
 e.g.: 
 <BR>
-<BR><TT>unsigned char foo() {</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;xdata unsigned char i;</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;bit bvar;</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;data at 0x31 unsiged char j;</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;... </TT>&nbsp;
-<BR><TT>}</TT>&nbsp;
+
+<BR>
+<TT>unsigned char foo() {</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;xdata unsigned char i;</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;bit bvar;</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;data at 0x31 unsiged char j;</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;... </TT>&nbsp;
+<BR>
+<TT>}</TT>&nbsp;
 <BR>&nbsp;
 <BR>
 In the above example the variable <I>i</I> will be allocated in the
@@ -1526,20 +1626,34 @@ Parameters and Local variables of functions that contain 16 or 32
 bit multiplication or division will NOT be overlayed since these are
 implemented using external functions, e.g.:
 <BR>
-<BR><TT>#pragma SAVE </TT>&nbsp;
-<BR><TT>#pragma NOOVERLAY </TT>&nbsp;
-<BR><TT>void set_error(unsigned char errcd) </TT>&nbsp;
-<BR><TT>{</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;P3 = errcd;</TT>&nbsp;
-<BR><TT>} </TT>&nbsp;
-<BR><TT>#pragma RESTORE </TT>&nbsp;
+
+<BR>
+<TT>#pragma SAVE </TT>&nbsp;
+<BR>
+<TT>#pragma NOOVERLAY </TT>&nbsp;
+<BR>
+<TT>void set_error(unsigned char errcd) </TT>&nbsp;
+<BR>
+<TT>{</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;P3 = errcd;</TT>&nbsp;
+<BR>
+<TT>} </TT>&nbsp;
+<BR>
+<TT>#pragma RESTORE </TT>&nbsp;
 <BR>&nbsp;
-<BR><TT>void some_isr () interrupt 2 using 1 </TT>&nbsp;
-<BR><TT>{</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;...</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;set_error(10);</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;... </TT>&nbsp;
-<BR><TT>}</TT>&nbsp;
+<BR>
+<TT>void some_isr () interrupt 2 using 1 </TT>&nbsp;
+<BR>
+<TT>{</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;...</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;set_error(10);</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;... </TT>&nbsp;
+<BR>
+<TT>}</TT>&nbsp;
 <BR>&nbsp;
 <BR>
 In the above example the parameter <I>errcd</I> for the function <I>set_error</I>
@@ -1558,10 +1672,15 @@ and local variables for the function are NOT overlayed.
 SDCC allows interrupt service routines to be coded in C, with some
 extended keywords.
 <BR>
-<BR><TT>void timer_isr (void) interrupt 2 using 1 </TT>&nbsp;
-<BR><TT>{ </TT>&nbsp;
-<BR><TT>.. </TT>&nbsp;
-<BR><TT>}</TT>&nbsp;
+
+<BR>
+<TT>void timer_isr (void) interrupt 2 using 1 </TT>&nbsp;
+<BR>
+<TT>{ </TT>&nbsp;
+<BR>
+<TT>.. </TT>&nbsp;
+<BR>
+<TT>}</TT>&nbsp;
 <BR>&nbsp;
 <BR>
 The number following the <I>interrupt</I> keyword is the interrupt
@@ -1591,7 +1710,9 @@ Interrupt Numbers and the corresponding address &amp; descriptions for
 the Standard 8051 are listed below. SDCC will automatically adjust
 the interrupt vector table to the maximum interrupt number specified.
 <BR>
+
 <P>
+ 
 <TABLE CELLPADDING=3 BORDER="1">
 <TR><TD ALIGN="CENTER">Interrupt #</TD>
 <TD ALIGN="CENTER">Description</TD>
@@ -1619,6 +1740,7 @@ the interrupt vector table to the maximum interrupt number specified.
 </TR>
 </TABLE>
 <BR>
+
 <BR>
 If the interrupt service routine is defined without <I>using</I> a
 register bank or with register bank 0 (using 0), the compiler will
@@ -1640,6 +1762,7 @@ larger interrupt service routines.
 Calling other functions from an interrupt service routine is not recommended,
 avoid it if possible.
 <BR>
+
 <BR>
 Also see the _naked modifier.
 
@@ -1655,12 +1778,19 @@ A special keyword may be associated with a function declaring it as
 upon entry to a critical function and enable them back before returning.
 Note that nesting critical functions may cause unpredictable results.
 <BR>
-<BR><TT>int foo () critical </TT>&nbsp;
-<BR><TT>{ </TT>&nbsp;
-<BR><TT>... </TT>&nbsp;
-<BR><TT>... </TT>&nbsp;
-<BR><TT>}</TT>&nbsp;
+
 <BR>
+<TT>int foo () critical </TT>&nbsp;
+<BR>
+<TT>{ </TT>&nbsp;
+<BR>
+<TT>... </TT>&nbsp;
+<BR>
+<TT>... </TT>&nbsp;
+<BR>
+<TT>}</TT>&nbsp;
+<BR>
+
 <BR>
 The critical attribute maybe used with other attributes like <I>reentrant.</I>
 
@@ -1683,47 +1813,82 @@ interrupt functions, which can have a large (and often unnecessary)
 prologue/epilogue. For example, compare the code generated by these
 two functions:
 <BR>
-<BR><TT>data unsigned char counter;</TT>&nbsp;
-<BR><TT>void simpleInterrupt(void) interrupt 1</TT>&nbsp;
-<BR><TT>{</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;counter++;</TT>&nbsp;
-<BR><TT>}</TT>&nbsp;
-<BR>&nbsp;
-<BR><TT>void nakedInterrupt(void) interrupt 2 _naked</TT>&nbsp;
-<BR><TT>{</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;_asm</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;inc&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_counter</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;reti&nbsp;&nbsp;&nbsp;&nbsp;; MUST explicitly include ret in _naked
-function.</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;_endasm;</TT>&nbsp;
-<BR><TT>}</TT>
+
 <BR>
+<TT>data unsigned char counter;</TT>&nbsp;
+<BR>
+<TT>void simpleInterrupt(void) interrupt 1</TT>&nbsp;
+<BR>
+<TT>{</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;counter++;</TT>&nbsp;
+<BR>
+<TT>}</TT>&nbsp;
+<BR>&nbsp;
+<BR>
+<TT>void nakedInterrupt(void) interrupt 2 _naked</TT>&nbsp;
+<BR>
+<TT>{</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;_asm</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;inc&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_counter</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;reti&nbsp;&nbsp;&nbsp;&nbsp;; MUST explicitly include ret in _naked
+function.</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;_endasm;</TT>&nbsp;
+<BR>
+<TT>}</TT>
+<BR>
+
 <BR>
 For an 8051 target, the generated simpleInterrupt looks like:
 <BR>
-<BR><TT>_simpleIterrupt:</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;push&nbsp;&nbsp;&nbsp;&nbsp;acc</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;push&nbsp;&nbsp;&nbsp;&nbsp;b</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;push&nbsp;&nbsp;&nbsp;&nbsp;dpl</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;push&nbsp;&nbsp;&nbsp;&nbsp;dph</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;push&nbsp;&nbsp;&nbsp;&nbsp;psw</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;mov&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;psw,#0x00</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;inc&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_counter</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;pop&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;psw</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;pop&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dph</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;pop&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dpl</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;pop&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;pop&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;acc</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;reti</TT>
+
 <BR>
+<TT>_simpleIterrupt:</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;push&nbsp;&nbsp;&nbsp;&nbsp;acc</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;push&nbsp;&nbsp;&nbsp;&nbsp;b</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;push&nbsp;&nbsp;&nbsp;&nbsp;dpl</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;push&nbsp;&nbsp;&nbsp;&nbsp;dph</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;push&nbsp;&nbsp;&nbsp;&nbsp;psw</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;mov&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;psw,#0x00</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;inc&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_counter</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;pop&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;psw</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;pop&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dph</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;pop&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dpl</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;pop&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;pop&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;acc</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;reti</TT>
+<BR>
+
 <BR>
 whereas nakedInterrupt looks like:
 <BR>
-<BR><TT>_nakedInterrupt:</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;inc&nbsp;&nbsp;&nbsp;&nbsp;_counter</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;reti&nbsp;&nbsp;&nbsp;; MUST explicitly include ret(i) in _naked
+
+<BR>
+<TT>_nakedInterrupt:</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;inc&nbsp;&nbsp;&nbsp;&nbsp;_counter</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;reti&nbsp;&nbsp;&nbsp;; MUST explicitly include ret(i) in _naked
 function.</TT>
 <BR>
+
 <BR>
 While there is nothing preventing you from writing C code inside a
 _naked function, there are many ways to shoot yourself in the foot
@@ -1746,8 +1911,9 @@ registers on the stack.
 The <I>using</I> attribute will have no effect on the generated code
 for a <I>non-interrupt</I> function (but may occasionally be useful
 anyway<A NAME="tex2html1"
-  HREF="#foot513"><SUP>1</SUP></A>).
-<BR><I>(pending: I don't think this has been done yet)</I>
+ HREF="#foot530"><SUP>1</SUP></A>).
+<BR>
+<I>(pending: I don't think this has been done yet)</I>
 
 <P>
 An <I>interrupt</I> function using a non-zero bank will assume that
@@ -1780,8 +1946,11 @@ a function using a different, non-zero bank from an ISR.
 Data items can be assigned an absolute address with the <I>at &lt;address&gt;</I>
 keyword, in addition to a storage class, e.g.:
 <BR>
-<BR><TT>xdata at 0x8000 unsigned char PORTA_8255 ;</TT>&nbsp;
+
 <BR>
+<TT>xdata at 0x8000 unsigned char PORTA_8255 ;</TT>&nbsp;
+<BR>
+
 <BR>
 In the above example the PORTA_8255 will be allocated to the location
 0x8000 of the external ram. Note that this feature is provided to
@@ -1794,11 +1963,14 @@ the absolute address. The assembler listing file (.lst) and the linker
 output files (.rst) and (.map) are a good places to look for such
 overlaps.
 <BR>
+
 <BR>
 Absolute address can be specified for variables in all storage classes,
 e.g.:
 <BR>
-<BR><TT>bit at 0x02 bvar;</TT>&nbsp;
+
+<BR>
+<TT>bit at 0x02 bvar;</TT>&nbsp;
 <BR>&nbsp;
 <BR>
 The above example will allocate the variable at offset 0x02 in the
@@ -1843,37 +2015,59 @@ optimizer. This might cause some unexpected changes in the inline
 assembler code. Please go throught the peephole optimizer rules defined
 in file <I>SDCCpeeph.def</I> carefully before using this option.
 <BR>
-<BR><TT>_asm </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;mov&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b,#10 </TT>&nbsp;
-<BR><TT>00001$: </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;djnz&nbsp;&nbsp;&nbsp;&nbsp;b,00001$ </TT>&nbsp;
-<BR><TT>_endasm ;</TT>
+
 <BR>
+<TT>_asm </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;mov&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b,#10 </TT>&nbsp;
+<BR>
+<TT>00001$: </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;djnz&nbsp;&nbsp;&nbsp;&nbsp;b,00001$ </TT>&nbsp;
+<BR>
+<TT>_endasm ;</TT>
+<BR>
+
 <BR>
 The inline assembler code can contain any valid code understood by
 the assembler, this includes any assembler directives and comment
 lines. The compiler does not do any validation of the code within
 the <TT>_asm ... _endasm;</TT> keyword pair. 
 <BR>
+
 <BR>
 Inline assembler code cannot reference any C-Labels, however it can
 reference labels defined by the inline assembler, e.g.:
 <BR>
-<BR><TT>foo() { </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;/* some c code */ </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;_asm </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; some assembler code </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ljmp $0003 </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;_endasm; </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;/* some more c code */ </TT>&nbsp;
-<BR><TT>clabel:&nbsp;&nbsp;/* inline assembler cannot reference this label
+
+<BR>
+<TT>foo() { </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;/* some c code */ </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;_asm </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; some assembler code </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ljmp $0003 </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;_endasm; </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;/* some more c code */ </TT>&nbsp;
+<BR>
+<TT>clabel:&nbsp;&nbsp;/* inline assembler cannot reference this label
 */ </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;_asm</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;$0003: ;label (can be reference by inline assembler
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;_asm</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;$0003: ;label (can be reference by inline assembler
 only) </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;_endasm ; </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;/* some more c code */</TT>&nbsp;
-<BR><TT>}</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;_endasm ; </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;/* some more c code */</TT>&nbsp;
+<BR>
+<TT>}</TT>&nbsp;
 <BR>&nbsp;
 <BR>
 In other words inline assembly code can access labels defined in inline
@@ -1897,8 +2091,11 @@ to other MCUs, although some model specific assembler optimations
 are used. The following files contain the described routine, all of
 them can be found in &lt;installdir&gt;/share/sdcc/lib.
 <BR>
-<BR><I>&lt;pending: tabularise this&gt;</I>
+
 <BR>
+<I>&lt;pending: tabularise this&gt;</I>
+<BR>
+
 <BR>
 _mulsint.c - signed 16 bit multiplication (calls _muluint)
 <BR>
@@ -1924,6 +2121,7 @@ _modslong.c - signed 32 bit modulus (calls _modulong)
 <BR>
 _modulong.c - unsigned 32 bit modulus 
 <BR>
+
 <BR>
 Since they are compiled as <I>non-reentrant</I>, interrupt service
 routines should not do any of the above operations. If this is unavoidable
@@ -1942,8 +2140,11 @@ SDCC supports IEEE (single precision 4bytes) floating point numbers.The
 floating point support routines are derived from gcc's floatlib.c
 and consists of the following routines:
 <BR>
-<BR><I>&lt;pending: tabularise this&gt;</I>
+
 <BR>
+<I>&lt;pending: tabularise this&gt;</I>
+<BR>
+
 <BR>
 _fsadd.c - add floating point numbers
 <BR>
@@ -1977,6 +2178,7 @@ _ulong2fs.c - convert unsigned long to floating point number
 <BR>
 _long2fs.c - convert long to floating point number
 <BR>
+
 <BR>
 Note if all these routines are used simultaneously the data space
 might overflow. For serious floating point usage it is strongly recommended
@@ -2023,11 +2225,13 @@ mode, up to four meg of external RAM or code space can be directly
 addressed. See the data sheets at www.dalsemi.com for further information
 on this part.
 <BR>
+
 <BR>
 In older versions of the compiler, this option was used with the MCS51
 code generator (<I>-mmcs51</I>). Now, however, the '390 has it's own
 code generator, selected by the <I>-mds390</I> switch. 
 <BR>
+
 <BR>
 Note that the compiler does not generate any code to place the processor
 into 24 bitmode (although <I>tinibios</I> in the ds390 libraries will
@@ -2035,10 +2239,12 @@ do that for you). If you don't use <I>tinibios</I>, the boot loader
 or similar code must ensure that the processor is in 24 bit contiguous
 addressing mode before calling the SDCC startup code.
 <BR>
+
 <BR>
 Like the <I>-model-large</I> option, variables will by default be
 placed into the XDATA segment. 
 <BR>
+
 <BR>
 Segments may be placed anywhere in the 4 meg address space using the
 usual -*-loc options. Note that if any segments are located above
@@ -2060,33 +2266,24 @@ The compiler creates the following #defines.
 <P>
 
 <UL>
-<LI>SDCC - this Symbol is always defined.
-</LI>
+<LI>SDCC - this Symbol is always defined.</LI>
 <LI>SDCC_mcs51 or SDCC_ds390 or SDCC_z80, etc - depending on the model
-used (e.g.: -mds390)
-</LI>
+used (e.g.: -mds390)</LI>
 <LI>__mcs51 or __ds390 or __z80, etc - depending on the model used
-(e.g. -mz80)
-</LI>
+(e.g. -mz80)</LI>
 <LI>SDCC_STACK_AUTO - this symbol is defined when <I>-stack-auto</I>
-option is used.
-</LI>
-<LI>SDCC_MODEL_SMALL - when <I>-model-small</I> is used.
-</LI>
-<LI>SDCC_MODEL_LARGE - when <I>-model-large</I> is used.
-</LI>
-<LI>SDCC_USE_XSTACK - when <I>-xstack</I> option is used.
-</LI>
-<LI>SDCC_STACK_TENBIT - when <I>-mds390</I> is used
-</LI>
-<LI>SDCC_MODEL_FLAT24 - when <I>-mds390</I> is used
-</LI>
+option is used.</LI>
+<LI>SDCC_MODEL_SMALL - when <I>-model-small</I> is used.</LI>
+<LI>SDCC_MODEL_LARGE - when <I>-model-large</I> is used.</LI>
+<LI>SDCC_USE_XSTACK - when <I>-xstack</I> option is used.</LI>
+<LI>SDCC_STACK_TENBIT - when <I>-mds390</I> is used</LI>
+<LI>SDCC_MODEL_FLAT24 - when <I>-mds390</I> is used</LI>
 </UL>
 
 <P>
 
 <H1><A NAME="SECTION00050000000000000000">
-4 SDCC Technical Data</A>
+4. SDCC Technical Data</A>
 </H1>
 
 <P>
@@ -2109,30 +2306,48 @@ MCU specific optimizations.
 The compiler does local and global common subexpression elimination,
 e.g.: 
 <BR>
-<BR><TT>i = x + y + 1; </TT>&nbsp;
-<BR><TT>j = x + y;</TT>
+
 <BR>
+<TT>i = x + y + 1; </TT>&nbsp;
+<BR>
+<TT>j = x + y;</TT>
+<BR>
+
 <BR>
 will be translated to
 <BR>
-<BR><TT>iTemp = x + y </TT>&nbsp;
-<BR><TT>i = iTemp + 1 </TT>&nbsp;
-<BR><TT>j = iTemp</TT>&nbsp;
+
 <BR>
+<TT>iTemp = x + y </TT>&nbsp;
+<BR>
+<TT>i = iTemp + 1 </TT>&nbsp;
+<BR>
+<TT>j = iTemp</TT>&nbsp;
+<BR>
+
 <BR>
 Some subexpressions are not as obvious as the above example, e.g.:
 <BR>
-<BR><TT>a-&gt;b[i].c = 10; </TT>&nbsp;
-<BR><TT>a-&gt;b[i].d = 11;</TT>
+
 <BR>
+<TT>a-&gt;b[i].c = 10; </TT>&nbsp;
+<BR>
+<TT>a-&gt;b[i].d = 11;</TT>
+<BR>
+
 <BR>
 In this case the address arithmetic a-&gt;b[i] will be computed only
 once; the equivalent code in C would be.
 <BR>
-<BR><TT>iTemp = a-&gt;b[i]; </TT>&nbsp;
-<BR><TT>iTemp.c = 10; </TT>&nbsp;
-<BR><TT>iTemp.d = 11;</TT>
+
 <BR>
+<TT>iTemp = a-&gt;b[i]; </TT>&nbsp;
+<BR>
+<TT>iTemp.c = 10; </TT>&nbsp;
+<BR>
+<TT>iTemp.d = 11;</TT>
+<BR>
+
 <BR>
 The compiler will try to keep these temporary variables in registers.
 
@@ -2143,24 +2358,40 @@ The compiler will try to keep these temporary variables in registers.
 </H3>
 
 <P>
+ 
 <TT>int global; </TT>&nbsp;
-<BR><TT>void f () { </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;int i; </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;i = 1; &nbsp;/* dead store */ </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;global = 1;&nbsp;/* dead store */ </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;global = 2; </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;return; </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;global = 3;&nbsp;/* unreachable */ </TT>&nbsp;
-<BR><TT>}</TT>
 <BR>
+<TT>void f () { </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;int i; </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;i = 1; &nbsp;/* dead store */ </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;global = 1;&nbsp;/* dead store */ </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;global = 2; </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;return; </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;global = 3;&nbsp;/* unreachable */ </TT>&nbsp;
+<BR>
+<TT>}</TT>
+<BR>
+
 <BR>
 will be changed to
 <BR>
-<BR><TT>int global; void f () </TT>&nbsp;
-<BR><TT>{</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;global = 2; </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;return; </TT>&nbsp;
-<BR><TT>}</TT>
+
+<BR>
+<TT>int global; void f () </TT>&nbsp;
+<BR>
+<TT>{</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;global = 2; </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;return; </TT>&nbsp;
+<BR>
+<TT>}</TT>
 
 <P>
 
@@ -2169,22 +2400,36 @@ will be changed to
 </H3>
 
 <P>
+ 
 <TT>int f() { </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;int i, j; </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;i = 10; </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;j = i; </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;return j; </TT>&nbsp;
-<BR><TT>}</TT>
 <BR>
+<TT>&nbsp;&nbsp;int i, j; </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;i = 10; </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;j = i; </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;return j; </TT>&nbsp;
+<BR>
+<TT>}</TT>
+<BR>
+
 <BR>
 will be changed to 
 <BR>
-<BR><TT>int f() { </TT>&nbsp;
-<BR><TT>&nbsp; &nbsp; int i,j; </TT>&nbsp;
-<BR><TT>&nbsp; &nbsp; i = 10; </TT>&nbsp;
-<BR><TT>&nbsp; &nbsp; j = 10; </TT>&nbsp;
-<BR><TT>&nbsp; &nbsp; return 10; </TT>&nbsp;
-<BR><TT>}</TT>&nbsp;
+
+<BR>
+<TT>int f() { </TT>&nbsp;
+<BR>
+<TT>&nbsp; &nbsp; int i,j; </TT>&nbsp;
+<BR>
+<TT>&nbsp; &nbsp; i = 10; </TT>&nbsp;
+<BR>
+<TT>&nbsp; &nbsp; j = 10; </TT>&nbsp;
+<BR>
+<TT>&nbsp; &nbsp; return 10; </TT>&nbsp;
+<BR>
+<TT>}</TT>&nbsp;
 <BR>&nbsp;
 <BR>
 Note: the dead stores created by this copy propagation will be eliminated
@@ -2211,41 +2456,65 @@ then induction optimization can be eliminated either for the entire
 source file (with -noinduction option) or for a given function only
 using #pragma&nbsp;NOINDUCTION.
 <BR>
+
 <BR>
 Loop Invariant:
 <BR>
-<BR><TT>for (i = 0 ; i &lt; 100 ; i ++) </TT>&nbsp;
-<BR> <TT>&nbsp; &nbsp;f += k + l;</TT>
+
 <BR>
+<TT>for (i = 0 ; i &lt; 100 ; i ++) </TT>&nbsp;
+<BR>
+ <TT>&nbsp; &nbsp;f += k + l;</TT>
+<BR>
+
 <BR>
 changed to
 <BR>
-<BR><TT>itemp = k + l; </TT>&nbsp;
-<BR><TT>for (i = 0; i &lt; 100; i++) </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;f += itemp;</TT>
+
 <BR>
+<TT>itemp = k + l; </TT>&nbsp;
+<BR>
+<TT>for (i = 0; i &lt; 100; i++) </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;f += itemp;</TT>
+<BR>
+
 <BR>
 As mentioned previously some loop invariants are not as apparent,
 all static address computations are also moved out of the loop.
 <BR>
+
 <BR>
 Strength Reduction, this optimization substitutes an expression by
 a cheaper expression:
 <BR>
-<BR><TT>for (i=0;i &lt; 100; i++)</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;ar[i*5] = i*3;</TT>
+
 <BR>
+<TT>for (i=0;i &lt; 100; i++)</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;ar[i*5] = i*3;</TT>
+<BR>
+
 <BR>
 changed to
 <BR>
-<BR><TT>itemp1 = 0; </TT>&nbsp;
-<BR><TT>itemp2 = 0; </TT>&nbsp;
-<BR><TT>for (i=0;i&lt; 100;i++) { </TT>&nbsp;
-<BR> <TT>&nbsp; &nbsp;ar[itemp1] = itemp2; </TT>&nbsp;
-<BR> <TT>&nbsp; &nbsp;itemp1 += 5; </TT>&nbsp;
-<BR> <TT>&nbsp; &nbsp;itemp2 += 3; </TT>&nbsp;
-<BR><TT>}</TT>
+
 <BR>
+<TT>itemp1 = 0; </TT>&nbsp;
+<BR>
+<TT>itemp2 = 0; </TT>&nbsp;
+<BR>
+<TT>for (i=0;i&lt; 100;i++) { </TT>&nbsp;
+<BR>
+ <TT>&nbsp; &nbsp;ar[itemp1] = itemp2; </TT>&nbsp;
+<BR>
+ <TT>&nbsp; &nbsp;itemp1 += 5; </TT>&nbsp;
+<BR>
+ <TT>&nbsp; &nbsp;itemp2 += 3; </TT>&nbsp;
+<BR>
+<TT>}</TT>
+<BR>
+
 <BR>
 The more expensive multiplication is changed to a less expensive addition.
 
@@ -2269,24 +2538,20 @@ analysis).
 <UL>
 <LI>The 'for' loop is of the form 
 <BR>
-<BR><TT>for (&lt;symbol&gt; = &lt;expression&gt; ; &lt;sym&gt; [&lt; | &lt;=] &lt;expression&gt;
+
+<BR>
+<TT>for (&lt;symbol&gt; = &lt;expression&gt; ; &lt;sym&gt; [&lt; | &lt;=] &lt;expression&gt;
 ; [&lt;sym&gt;++ | &lt;sym&gt; += 1])</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;&lt;for body&gt;</TT>
-</LI>
-<LI>The &lt;for body&gt; does not contain ``continue'' or 'break''.
-</LI>
-<LI>All goto's are contained within the loop.
-</LI>
-<LI>No function calls within the loop.
-</LI>
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;&lt;for body&gt;</TT></LI>
+<LI>The &lt;for body&gt; does not contain ``continue'' or 'break''.</LI>
+<LI>All goto's are contained within the loop.</LI>
+<LI>No function calls within the loop.</LI>
 <LI>The loop control variable &lt;sym&gt; is not assigned any value within the
-loop
-</LI>
+loop</LI>
 <LI>The loop control variable does NOT participate in any arithmetic operation
-within the loop.
-</LI>
-<LI>There are NO switch statements in the loop.
-</LI>
+within the loop.</LI>
+<LI>There are NO switch statements in the loop.</LI>
 </UL>
 Note djnz instruction can be used for 8-bit values <I>only</I>, therefore
 it is advantageous to declare loop control symbols as <I>char</I>.
@@ -2302,11 +2567,17 @@ Ofcourse this may not be possible on all situations.
 SDCC does numerous algebraic simplifications, the following is a small
 sub-set of these optimizations.
 <BR>
-<BR><TT>i = j + 0 ; /* changed to */ i = j; </TT>&nbsp;
-<BR><TT>i /= 2; /* changed to */ i &gt;&gt;= 1; </TT>&nbsp;
-<BR><TT>i = j - j ; /* changed to */ i = 0; </TT>&nbsp;
-<BR><TT>i = j / 1 ; /* changed to */ i = j;</TT>
+
 <BR>
+<TT>i = j + 0 ; /* changed to */ i = j; </TT>&nbsp;
+<BR>
+<TT>i /= 2; /* changed to */ i &gt;&gt;= 1; </TT>&nbsp;
+<BR>
+<TT>i = j - j ; /* changed to */ i = 0; </TT>&nbsp;
+<BR>
+<TT>i = j / 1 ; /* changed to */ i = j;</TT>
+<BR>
+
 <BR>
 Note the subexpressions given above are generally introduced by macro
 expansions or as a result of copy/constant propagation.
@@ -2326,63 +2597,88 @@ are true.
 <UL>
 <LI>The case labels are in numerical sequence, the labels need not be
 in order, and the starting number need not be one or zero.
-</LI>
-</UL>
+<BR>
+
+<BR>
 <TT>switch(i) {&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;switch (i)
 { </TT>&nbsp;
-<BR><TT>case 4:... &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;case 1: ... </TT>&nbsp;
-<BR><TT>case 5:... &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;case 2: ... </TT>&nbsp;
-<BR><TT>case 3:... &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;case 3: ... </TT>&nbsp;
-<BR><TT>case 6:... &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;case 4: ... </TT>&nbsp;
-<BR><TT>}&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;}</TT>&nbsp;
+<BR>
+<TT>case 4:... &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;case 1: ... </TT>&nbsp;
+<BR>
+<TT>case 5:... &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;case 2: ... </TT>&nbsp;
+<BR>
+<TT>case 3:... &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;case 3: ... </TT>&nbsp;
+<BR>
+<TT>case 6:... &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;case 4: ... </TT>&nbsp;
+<BR>
+<TT>}&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;}</TT>&nbsp;
 <BR>&nbsp;
 <BR>
-Both the above switch statements will be implemented using a jump-table.
-
-<P>
-
-<UL>
+Both the above switch statements will be implemented using a jump-table.</LI>
 <LI>The number of case labels is at least three, since it takes two conditional
-statements to handle the boundary conditions.
-</LI>
+statements to handle the boundary conditions.</LI>
 <LI>The number of case labels is less than 84, since each label takes
-3 bytes and a jump-table can be utmost 256 bytes long. 
-</LI>
+3 bytes and a jump-table can be utmost 256 bytes long. </LI>
 </UL>
 Switch statements which have gaps in the numeric sequence or those
 that have more that 84 case labels can be split into more than one
 switch statement for efficient code generation, e.g.:
 <BR>
-<BR><TT>switch (i) { </TT>&nbsp;
-<BR><TT>case 1: ... </TT>&nbsp;
-<BR><TT>case 2: ... </TT>&nbsp;
-<BR><TT>case 3: ... </TT>&nbsp;
-<BR><TT>case 4: ... </TT>&nbsp;
-<BR><TT>case 9: ... </TT>&nbsp;
-<BR><TT>case 10: ... </TT>&nbsp;
-<BR><TT>case 11: ... </TT>&nbsp;
-<BR><TT>case 12: ... </TT>&nbsp;
-<BR><TT>}</TT>
+
 <BR>
+<TT>switch (i) { </TT>&nbsp;
+<BR>
+<TT>case 1: ... </TT>&nbsp;
+<BR>
+<TT>case 2: ... </TT>&nbsp;
+<BR>
+<TT>case 3: ... </TT>&nbsp;
+<BR>
+<TT>case 4: ... </TT>&nbsp;
+<BR>
+<TT>case 9: ... </TT>&nbsp;
+<BR>
+<TT>case 10: ... </TT>&nbsp;
+<BR>
+<TT>case 11: ... </TT>&nbsp;
+<BR>
+<TT>case 12: ... </TT>&nbsp;
+<BR>
+<TT>}</TT>
+<BR>
+
 <BR>
 If the above switch statement is broken down into two switch statements
 <BR>
-<BR><TT>switch (i) { </TT>&nbsp;
-<BR><TT>case 1: ... </TT>&nbsp;
-<BR><TT>case 2: ... </TT>&nbsp;
-<BR><TT>case 3: ... </TT>&nbsp;
-<BR><TT>case 4: ... </TT>&nbsp;
-<BR><TT>}</TT>&nbsp;
+
+<BR>
+<TT>switch (i) { </TT>&nbsp;
+<BR>
+<TT>case 1: ... </TT>&nbsp;
+<BR>
+<TT>case 2: ... </TT>&nbsp;
+<BR>
+<TT>case 3: ... </TT>&nbsp;
+<BR>
+<TT>case 4: ... </TT>&nbsp;
+<BR>
+<TT>}</TT>&nbsp;
 <BR>&nbsp;
 <BR>
 and&nbsp;
 <BR>&nbsp;
-<BR><TT>switch (i) { </TT>&nbsp;
-<BR><TT>case 9: &nbsp;... </TT>&nbsp;
-<BR><TT>case 10: ... </TT>&nbsp;
-<BR><TT>case 11: ... </TT>&nbsp;
-<BR><TT>case 12:&nbsp;... </TT>&nbsp;
-<BR><TT>}</TT>&nbsp;
+<BR>
+<TT>switch (i) { </TT>&nbsp;
+<BR>
+<TT>case 9: &nbsp;... </TT>&nbsp;
+<BR>
+<TT>case 10: ... </TT>&nbsp;
+<BR>
+<TT>case 11: ... </TT>&nbsp;
+<BR>
+<TT>case 12:&nbsp;... </TT>&nbsp;
+<BR>
+<TT>}</TT>&nbsp;
 <BR>&nbsp;
 <BR>
 then both the switch statements will be implemented using jump-tables
@@ -2398,44 +2694,61 @@ whereas the unmodified switch statement will not be.
 Bit shifting is one of the most frequently used operation in embedded
 programming. SDCC tries to implement bit-shift operations in the most
 efficient way possible, e.g.:
+<BR>&nbsp;
 <BR>
+<TT>unsigned char i;</TT>&nbsp;
 <BR>
-unsigned char i;
-<BR>... 
+<TT>... </TT>&nbsp;
 <BR>
-i&gt;&gt;= 4; 
-<BR>...
+<TT>i&gt;&gt;= 4; </TT>&nbsp;
 <BR>
+<TT>...</TT>&nbsp;
+<BR>
+
 <BR>
 generates the following code:
+<BR>&nbsp;
 <BR>
+<TT>mov a,_i </TT>&nbsp;
 <BR>
-mov a,_i 
+<TT>swap a </TT>&nbsp;
 <BR>
-swap a 
+<TT>anl a,#0x0f </TT>&nbsp;
 <BR>
-anl a,#0x0f 
+<TT>mov _i,a</TT>
 <BR>
-mov _i,a
-<BR>
+
 <BR>
 In general SDCC will never setup a loop if the shift count is known.
 Another example:
 <BR>
-<BR><TT>unsigned int i; </TT>&nbsp;
-<BR><TT>... </TT>&nbsp;
-<BR><TT>i &gt;&gt;= 9; </TT>&nbsp;
-<BR><TT>...</TT>
+
 <BR>
+<TT>unsigned int i; </TT>&nbsp;
+<BR>
+<TT>... </TT>&nbsp;
+<BR>
+<TT>i &gt;&gt;= 9; </TT>&nbsp;
+<BR>
+<TT>...</TT>
+<BR>
+
 <BR>
 will generate:
 <BR>
-<BR><TT>mov a,(_i + 1) </TT>&nbsp;
-<BR><TT>mov (_i + 1),#0x00 </TT>&nbsp;
-<BR><TT>clr c </TT>&nbsp;
-<BR><TT>rrc a </TT>&nbsp;
-<BR><TT>mov _i,a</TT>
+
 <BR>
+<TT>mov a,(_i + 1) </TT>&nbsp;
+<BR>
+<TT>mov (_i + 1),#0x00 </TT>&nbsp;
+<BR>
+<TT>clr c </TT>&nbsp;
+<BR>
+<TT>rrc a </TT>&nbsp;
+<BR>
+<TT>mov _i,a</TT>
+<BR>
+
 <BR>
 Note that SDCC stores numbers in little-endian format (i.e. lowest
 order first).
@@ -2450,24 +2763,37 @@ order first).
 A special case of the bit-shift operation is bit rotation, SDCC recognizes
 the following expression to be a left bit-rotation:
 <BR>
-<BR><TT>unsigned char i; </TT>&nbsp;
-<BR><TT>... </TT>&nbsp;
-<BR><TT>i = ((i &lt;&lt; 1) | (i &gt;&gt;
-7));</TT> 
-<BR>...
+
 <BR>
+<TT>unsigned char i; </TT>&nbsp;
+<BR>
+<TT>... </TT>&nbsp;
+<BR>
+<TT>i = ((i &lt;&lt; 1) | (i &gt;&gt;
+7));</TT> 
+<BR>
+...
+<BR>
+
 <BR>
 will generate the following code:
 <BR>
-<BR><TT>mov a,_i </TT>&nbsp;
-<BR><TT>rl a </TT>&nbsp;
-<BR><TT>mov _i,a</TT>
+
 <BR>
+<TT>mov a,_i </TT>&nbsp;
+<BR>
+<TT>rl a </TT>&nbsp;
+<BR>
+<TT>mov _i,a</TT>
+<BR>
+
 <BR>
 SDCC uses pattern matching on the parse tree to determine this operation.Variations
 of this case will also be recognized as bit-rotation, i.e.: 
 <BR>
-<BR><TT>i = ((i &gt;&gt; 7) | (i &lt;&lt;
+
+<BR>
+<TT>i = ((i &gt;&gt; 7) | (i &lt;&lt;
 1)); /* left-bit rotation */</TT>
 
 <P>
@@ -2482,29 +2808,44 @@ type (long, int, short or char types). SDCC recognizes the following
 expression to yield the highest order bit and generates optimized
 code for it, e.g.:
 <BR>
-<BR> <TT>unsigned int gint; </TT>&nbsp;
-<BR>&nbsp;
-<BR><TT>foo () { </TT>&nbsp;
-<BR><TT>unsigned char hob; </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;... </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;hob = (gint &gt;&gt; 15) &amp; 1; </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;.. </TT>&nbsp;
-<BR><TT>}</TT>
+
 <BR>
+ <TT>unsigned int gint; </TT>&nbsp;
+<BR>&nbsp;
+<BR>
+<TT>foo () { </TT>&nbsp;
+<BR>
+<TT>unsigned char hob; </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;... </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;hob = (gint &gt;&gt; 15) &amp; 1; </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;.. </TT>&nbsp;
+<BR>
+<TT>}</TT>
+<BR>
+
 <BR>
 will generate the following code:
 <BR>&nbsp;
-<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 61
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 61
 ;&nbsp; hob.c 7 </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp; 000A E5*01&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 62&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<BR>
+<TT>&nbsp;&nbsp; 000A E5*01&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 62&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 mov&nbsp; a,(_gint + 1) </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp; 000C 33&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 63&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<BR>
+<TT>&nbsp;&nbsp; 000C 33&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 63&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 rlc&nbsp; a </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp; 000D E4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 64&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<BR>
+<TT>&nbsp;&nbsp; 000D E4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 64&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 clr&nbsp; a </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp; 000E 13&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 65&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<BR>
+<TT>&nbsp;&nbsp; 000E 13&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 65&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 rrc&nbsp; a </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp; 000F F5*02&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 66&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<BR>
+<TT>&nbsp;&nbsp; 000F F5*02&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 66&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 mov&nbsp; _foo_hob_1_1,a</TT>&nbsp;
 <BR>&nbsp;
 <BR>
@@ -2513,8 +2854,11 @@ is a standard C expression, so I heartily recommend this be the only
 way to get the highest order bit, (it is portable). Of course it will
 be recognized even if it is embedded in other expressions, e.g.:
 <BR>
-<BR><TT>xyz = gint + ((gint &gt;&gt; 15) &amp; 1);</TT>
+
 <BR>
+<TT>xyz = gint + ((gint &gt;&gt; 15) &amp; 1);</TT>
+<BR>
+
 <BR>
 will still be recognized.
 
@@ -2532,43 +2876,67 @@ set of rules are compiled into the compiler, additional rules may
 be added with the <I>-peep-file &lt;filename&gt;</I> option. The rule language
 is best illustrated with examples.
 <BR>
-<BR><TT>replace { </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;mov %1,a </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;mov a,%1</TT>&nbsp;
-<BR><TT>} by {</TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;mov %1,a</TT>&nbsp;
-<BR><TT>}</TT>
+
 <BR>
+<TT>replace { </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;mov %1,a </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;mov a,%1</TT>&nbsp;
+<BR>
+<TT>} by {</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;mov %1,a</TT>&nbsp;
+<BR>
+<TT>}</TT>
+<BR>
+
 <BR>
 The above rule will change the following assembly sequence:
 <BR>
-<BR><TT>&nbsp;&nbsp;mov r1,a </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;mov a,r1</TT>
+
 <BR>
+<TT>&nbsp;&nbsp;mov r1,a </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;mov a,r1</TT>
+<BR>
+
 <BR>
 to
 <BR>
-<BR><TT>mov r1,a</TT>
+
 <BR>
+<TT>mov r1,a</TT>
+<BR>
+
 <BR>
 Note: All occurrences of a <I>%n</I> (pattern variable) must denote
 the same string. With the above rule, the assembly sequence:
 <BR>
-<BR><TT>&nbsp;&nbsp;mov r1,a </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;mov a,r2</TT>
+
 <BR>
+<TT>&nbsp;&nbsp;mov r1,a </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;mov a,r2</TT>
+<BR>
+
 <BR>
 will remain unmodified.
 <BR>
+
 <BR>
 Other special case optimizations may be added by the user (via <I>-peep-file
 option</I>). E.g. some variants of the 8051 MCU allow only <TT>ajmp</TT>
 and <TT>acall</TT>. The following two rules will change all <TT>ljmp</TT>
 and <TT>lcall</TT> to <TT>ajmp</TT> and <TT>acall</TT>
 <BR>
-<BR><TT>replace { lcall %1 } by { acall %1 } </TT>&nbsp;
-<BR><TT>replace { ljmp %1 } by { ajmp %1 }</TT>
+
 <BR>
+<TT>replace { lcall %1 } by { acall %1 } </TT>&nbsp;
+<BR>
+<TT>replace { ljmp %1 } by { ajmp %1 }</TT>
+<BR>
+
 <BR>
 The <I>inline-assembler code</I> is also passed through the peep hole
 optimizer, thus the peephole optimizer can also be used as an assembly
@@ -2576,21 +2944,30 @@ level macro expander. The rules themselves are MCU dependent whereas
 the rule language infra-structure is MCU independent. Peephole optimization
 rules for other MCU can be easily programmed using the rule language.
 <BR>
+
 <BR>
 The syntax for a rule is as follows:
 <BR>
-<BR><TT>rule := replace [ restart ] '{' &lt;assembly sequence&gt; '&#92;n'
+
+<BR>
+<TT>rule := replace [ restart ] '{' &lt;assembly sequence&gt; '&#92;n'
 </TT>&nbsp;
-<BR><TT>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; '}' by '{' '&#92;n'
+<BR>
+<TT>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; '}' by '{' '&#92;n'
 </TT>&nbsp;
-<BR><TT>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;assembly
+<BR>
+<TT>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;assembly
 sequence&gt; '&#92;n' </TT>&nbsp;
-<BR><TT>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; '}' [if &lt;functionName&gt;
+<BR>
+<TT>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; '}' [if &lt;functionName&gt;
 ] '&#92;n' </TT>&nbsp;
 <BR>
-<BR>&lt;assembly sequence&gt; := assembly instruction (each instruction including
+
+<BR>
+&lt;assembly sequence&gt; := assembly instruction (each instruction including
 labels must be on a separate line).
 <BR>
+
 <BR>
 The optimizer will apply to the rules one by one from the top in the
 sequence of their appearance, it will terminate when all rules are
@@ -2600,47 +2977,80 @@ a rule is expensive (performance), it is intended to be used in situations
 where a transformation will trigger the same rule again. A good example
 of this the following rule:
 <BR>
+
 <BR>
-replace restart { 
-<BR>&nbsp;&nbsp;pop %1 
-<BR>&nbsp;&nbsp;push %1 } by { 
-<BR>&nbsp;&nbsp;; nop 
-<BR>}
+<TT>replace restart { </TT>&nbsp;
 <BR>
+<TT>&nbsp;&nbsp;pop %1 </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;push %1 } by { </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;; nop </TT>&nbsp;
+<BR>
+<TT>}</TT>
+<BR>
+
 <BR>
 Note that the replace pattern cannot be a blank, but can be a comment
 line. Without the 'restart' option only the inner most 'pop' 'push'
 pair would be eliminated, i.e.:
 <BR>
-<BR><TT>&nbsp;&nbsp;pop ar1 </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;pop ar2 </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;push ar2 </TT>&nbsp;
-<BR><TT>&nbsp;&nbsp;push ar1</TT>
+
 <BR>
+<TT>&nbsp;&nbsp;pop ar1 </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;pop ar2 </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;push ar2 </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;push ar1</TT>
+<BR>
+
 <BR>
 would result in:
 <BR>
-<BR><TT>pop ar1 </TT>&nbsp;
-<BR><TT>; nop </TT>&nbsp;
-<BR><TT>push ar1</TT>
+
 <BR>
-<BR><I>with</I> the restart option the rule will be applied again to the
+<TT>&nbsp;&nbsp;pop ar1 </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;; nop </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;push ar1</TT>
+<BR>
+
+<BR>
+<I>with</I> the restart option the rule will be applied again to the
 resulting code and then all the pop-push pairs will be eliminated
 to yield:
 <BR>
-<BR><TT>; nop </TT>&nbsp;
-<BR><TT>; nop</TT>
+
 <BR>
+<TT>&nbsp;&nbsp;; nop </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;; nop</TT>
+<BR>
+
 <BR>
 A conditional function can be attached to a rule. Attaching rules
 are somewhat more involved, let me illustrate this with an example.
 <BR>
-<BR><TT>replace { </TT>&nbsp;
-<BR><TT>&nbsp; &nbsp; &nbsp;ljmp %5 </TT>&nbsp;
-<BR><TT>%2:} by { </TT>&nbsp;
-<BR><TT>&nbsp; &nbsp; &nbsp;sjmp %5 </TT>&nbsp;
-<BR><TT>%2:} if labelInRange</TT>
+
 <BR>
+<TT>replace { </TT>&nbsp;
+<BR>
+<TT>&nbsp; &nbsp; &nbsp;ljmp %5 </TT>&nbsp;
+<BR>
+<TT>%2:</TT>&nbsp;
+<BR>
+<TT>} by { </TT>&nbsp;
+<BR>
+<TT>&nbsp; &nbsp; &nbsp;sjmp %5 </TT>&nbsp;
+<BR>
+<TT>%2:</TT>&nbsp;
+<BR>
+<TT>} if labelInRange</TT>
+<BR>
+
 <BR>
 The optimizer does a look-up of a function name table defined in function
 <I>callFuncByName</I> in the source file SDCCpeeph.c, with the name
@@ -2656,8 +3066,6 @@ will have some better means. If you are looking at this file, you
 will also see the default rules that are compiled into the compiler,
 you can add your own rules in the default set there if you get tired
 of specifying the -peep-file option.
-<BR>
-<BR><I>&lt;pending: this is as far as I got&gt;</I>
 
 <P>
 
@@ -2672,31 +3080,23 @@ applicable only at a function level.
 <P>
 
 <UL>
-<LI>SAVE - this will save all the current options.
-</LI>
+<LI>SAVE - this will save all the current options.</LI>
 <LI>RESTORE - will restore the saved options from the last save. Note
 that SAVES &amp; RESTOREs cannot be nested. SDCC uses the same buffer
-to save the options each time a SAVE is called.
-</LI>
-<LI>NOGCSE - will stop global subexpression elimination.
-</LI>
-<LI>NOINDUCTION - will stop loop induction optimizations.
-</LI>
+to save the options each time a SAVE is called.</LI>
+<LI>NOGCSE - will stop global subexpression elimination.</LI>
+<LI>NOINDUCTION - will stop loop induction optimizations.</LI>
 <LI>NOJTBOUND - will not generate code for boundary value checking, when
-switch statements are turned into jump-tables.
-</LI>
+switch statements are turned into jump-tables.</LI>
 <LI>NOOVERLAY - the compiler will not overlay the parameters and local
-variables of a function.
-</LI>
-<LI>NOLOOPREVERSE - Will not do loop reversal optimization
-</LI>
+variables of a function.</LI>
+<LI>NOLOOPREVERSE - Will not do loop reversal optimization</LI>
 <LI>EXCLUDE NONE | {acc[,b[,dpl[,dph]]] - The exclude pragma
 disables generation of pair of push/pop instruction in ISR function
 (using interrupt keyword). The directive should be placed immediately
 before the ISR function definition and it affects ALL ISR functions
 following it. To enable the normal register saving for ISR functions
-use #pragma&nbsp;EXCLUDE&nbsp;none.
-</LI>
+use #pragma&nbsp;EXCLUDE&nbsp;none.</LI>
 <LI>CALLEE-SAVES function1[,function2[,function3...]] - The compiler
 by default uses a caller saves convention for register saving across
 function calls, however this can cause unneccessary register pushing
@@ -2710,8 +3110,7 @@ run time performance of the generated code. In future the compiler
 (with interprocedural analysis) will be able to determine the appropriate
 scheme to use for each function call. If -callee-saves command line
 option is used, the function names specified in #pragma&nbsp;CALLEE-SAVES
-is appended to the list of functions specified inthe command line.
-</LI>
+is appended to the list of functions specified inthe command line.</LI>
 </UL>
 The pragma's are intended to be used to turn-off certain optimizations
 which might cause the compiler to generate extra stack / data space
@@ -2721,25 +3120,33 @@ following example, they are used to control options &amp; optimizations
 for a given function; pragmas should be placed before and/or after
 a function, placing pragma's inside a function body could have unpredictable
 results.
-
-<P>
-eg
-
-<P>
-#pragma SAVE &nbsp; /* save the current settings */ 
-<BR>#pragma NOGCSE /* turnoff global subexpression elimination */
-
-<BR>#pragma NOINDUCTION /* turn off induction optimizations */ 
 <BR>
-int foo () 
-<BR>{ 
-<BR>&nbsp; &nbsp; ... 
-<BR>&nbsp; &nbsp; /* large code */ 
-<BR>&nbsp; &nbsp; ... 
-<BR>} 
-<BR>#pragma RESTORE /* turn the optimizations back on */
 
-<P>
+<BR>
+<TT>#pragma SAVE /* save the current settings */ </TT>&nbsp;
+<BR>
+<TT>#pragma NOGCSE /* turnoff global subexpression elimination
+*/ </TT>&nbsp;
+<BR>
+<TT>#pragma NOINDUCTION /* turn off induction optimizations
+*/ </TT>&nbsp;
+<BR>
+<TT>int foo () </TT>&nbsp;
+<BR>
+<TT>{ </TT>&nbsp;
+<BR>
+<TT>&nbsp; &nbsp; ... </TT>&nbsp;
+<BR>
+<TT>&nbsp; &nbsp; /* large code */ </TT>&nbsp;
+<BR>
+<TT>&nbsp; &nbsp; ... </TT>&nbsp;
+<BR>
+<TT>} </TT>&nbsp;
+<BR>
+<TT>#pragma RESTORE /* turn the optimizations back on */</TT>
+<BR>
+
+<BR>
 The compiler will generate a warning message when extra space is allocated.
 It is strongly recommended that the SAVE and RESTORE pragma's be used
 when changing options for a function.
@@ -2747,7 +3154,7 @@ when changing options for a function.
 <P>
 
 <H2><A NAME="SECTION00053000000000000000">
-4.3 Library Routines</A>
+4.3 <I>&lt;pending: this is messy and incomplete&gt;</I> Library Routines</A>
 </H2>
 
 <P>
@@ -2758,48 +3165,71 @@ stdio.h - Contains the following functions printf &amp; sprintf these
 routines are developed by Martijn van Balen &lt;balen@natlab.research.philips.com&gt;. 
 
 <P>
+ 
 %[flags][width][b|B|l|L]type
 
 <P>
+ 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; flags: -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; left justify output in
 specified field width 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; prefix output with
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; prefix output with
 +/- sign if output is signed type 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; space&nbsp;&nbsp;&nbsp; prefix output with a
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; space&nbsp;&nbsp;&nbsp; prefix output with a
 blank if it's a signed positive value 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; width:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; specifies minimum number
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; width:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; specifies minimum number
 of characters outputted for numbers 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; or strings. 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - For numbers,
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; or strings. 
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - For numbers,
 spaces are added on the left when needed. 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If width starts
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If width starts
 with a zero character, zeroes and used 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; instead of
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; instead of
 spaces. 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - For strings,
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - For strings,
 spaces are are added on the left or right (when 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; flag '-' is
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; flag '-' is
 used) when needed. 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; b/B:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; byte argument (used
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; b/B:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; byte argument (used
 by d, u, o, x, X) 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l/L:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; long argument (used
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l/L:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; long argument (used
 by d, u, o, x, X)
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; type:&nbsp; d&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; decimal number 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; u&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; unsigned decimal
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; type:&nbsp; d&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; decimal number 
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; u&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; unsigned decimal
 number 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; o&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; unsigned octal number
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; o&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; unsigned octal number
 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; unsigned hexadecimal
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; unsigned hexadecimal
 number (0-9, a-f) 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; unsigned hexadecimal
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; unsigned hexadecimal
 number (0-9, A-F) 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; c&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; character 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; string (generic pointer)
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; c&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; character 
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; string (generic pointer)
 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; generic pointer (I:data/idata,
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; generic pointer (I:data/idata,
 C:code, X:xdata, P:paged) 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; f&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; float (still to be
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; f&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; float (still to be
 implemented)
 
 <P>
@@ -2808,17 +3238,28 @@ simplified version of printf supports only the following formats.
 
 <P>
 format&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;output&nbsp;type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;argument-type 
-<BR>%d &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;decimal &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; short/int 
-<BR>%ld&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;decimal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;long 
-<BR>%hd&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;decimal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;char 
-<BR>%x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hexadecimal&nbsp;&nbsp;&nbsp;&nbsp;short/int 
-<BR>%lx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hexadecimal&nbsp;&nbsp;&nbsp;&nbsp;long 
-<BR>%hx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hexadecimal&nbsp;&nbsp;&nbsp;&nbsp;char 
-<BR>%o&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;octal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;short/int 
-<BR>%lo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;octal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;long 
-<BR>%ho&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;octal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;char 
-<BR>%c&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;character&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;char 
-<BR>%s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;character&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_generic pointer
+<BR>
+%d &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;decimal &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; short/int 
+<BR>
+%ld&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;decimal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;long 
+<BR>
+%hd&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;decimal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;char 
+<BR>
+%x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hexadecimal&nbsp;&nbsp;&nbsp;&nbsp;short/int 
+<BR>
+%lx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hexadecimal&nbsp;&nbsp;&nbsp;&nbsp;long 
+<BR>
+%hx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hexadecimal&nbsp;&nbsp;&nbsp;&nbsp;char 
+<BR>
+%o&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;octal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;short/int 
+<BR>
+%lo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;octal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;long 
+<BR>
+%ho&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;octal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;char 
+<BR>
+%c&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;character&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;char 
+<BR>
+%s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;character&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_generic pointer
 
 <P>
 The routine is very stack intesive, -stack-after-data parameter should
@@ -2842,22 +3283,21 @@ parameter list if and only if it is 'reentrant'
 va_list, va_start, va_arg, va_end.
 
 <P>
-</LI>
+ </LI>
 <LI>setjmp.h - contains defintion for ANSI setjmp &amp; longjmp routines.
 Note in this case setjmp &amp; longjmp can be used between functions
 executing within the same register bank, if long jmp is executed from
 a function that is using a different register bank from the function
 issuing the setjmp function, the results may be unpredictable. The
 jump buffer requires 3 bytes of data (the stack pointer &amp; a 16 byte
-return address), and can be placed in any address space.
-</LI>
+return address), and can be placed in any address space.</LI>
 <LI>stdlib.h - contains the following functions.
 
 <P>
 atoi, atol.
 
 <P>
-</LI>
+ </LI>
 <LI>string.h - contains the following functions.
 
 <P>
@@ -2866,7 +3306,7 @@ strspn, strcspn, strpbrk, strstr, strlen, strtok, memcpy, memcmp,
 memset.
 
 <P>
-</LI>
+ </LI>
 <LI>ctype.h - contains the following routines.
 
 <P>
@@ -2874,50 +3314,59 @@ iscntrl, isdigit, isgraph, islower, isupper, isprint, ispunct, isspace,
 isxdigit, isalnum, isalpha.
 
 <P>
-</LI>
+ </LI>
 <LI>malloc.h - The malloc routines are developed by Dmitry S. Obukhov
 (dso@usa.net). These routines will allocate memory from the external
 ram. Here is a description on how to use them (as described by the
 author).
 
 <P>
+ 
 //Example: 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp;&nbsp;&nbsp;&nbsp; #define DYNAMIC_MEMORY_SIZE 0x2000 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp;&nbsp;&nbsp;&nbsp; ..... 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp;&nbsp;&nbsp;&nbsp; unsigned char xdata dynamic_memory_pool[DYNAMIC_MEMORY_SIZE];
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp;&nbsp;&nbsp;&nbsp; #define DYNAMIC_MEMORY_SIZE 0x2000 
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp;&nbsp;&nbsp;&nbsp; ..... 
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp;&nbsp;&nbsp;&nbsp; unsigned char xdata dynamic_memory_pool[DYNAMIC_MEMORY_SIZE];
 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp;&nbsp;&nbsp;&nbsp; unsigned char xdata * current_buffer; 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp;&nbsp;&nbsp;&nbsp; ..... 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp;&nbsp;&nbsp;&nbsp; void main(void) 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp;&nbsp;&nbsp;&nbsp; { 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ... 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; init_dynamic_memory(dynamic_memory_pool,DYNAMIC_MEMORY_SIZE);
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp;&nbsp;&nbsp;&nbsp; unsigned char xdata * current_buffer; 
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp;&nbsp;&nbsp;&nbsp; ..... 
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp;&nbsp;&nbsp;&nbsp; void main(void) 
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp;&nbsp;&nbsp;&nbsp; { 
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ... 
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; init_dynamic_memory(dynamic_memory_pool,DYNAMIC_MEMORY_SIZE);
 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //Now it's possible to use malloc. 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ... 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; current_buffer = malloc(0x100); 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp; //
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //Now it's possible to use malloc. 
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ... 
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; current_buffer = malloc(0x100); 
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp; //
 
 <P>
-</LI>
+ </LI>
 <LI>serial.h - Serial IO routines are also developed by Dmitry S. Obukhov
 (dso@usa.net). These routines are interrupt driven with a 256 byte
 circular buffer, they also expect external ram to be present. Please
 see documentation in file SDCCDIR/sdcc51lib/serial.c. Note the header
 file ``serial.h'' MUST be included in the file containing the
-'main' function.
-</LI>
+'main' function.</LI>
 <LI>ser.h - Alternate serial routine provided by Wolfgang Esslinger &lt;wolfgang@WiredMinds.com&gt;
 these routines are more compact and faster. Please see documentation
-in file SDCCDIR/sdcc51lib/ser.c
-</LI>
+in file SDCCDIR/sdcc51lib/ser.c</LI>
 <LI>ser_ir.h - Another alternate set of serial routines provided by Josef
-Wolf &lt;jw@raven.inka.de&gt;, these routines do not use the external ram.
-</LI>
-<LI>reg51.h - contains register definitions for a standard 8051
-</LI>
-<LI>float.h - contains min, max and other floating point related stuff.
-</LI>
+Wolf &lt;jw@raven.inka.de&gt;, these routines do not use the external ram.</LI>
+<LI>reg51.h - contains register definitions for a standard 8051</LI>
+<LI>float.h - contains min, max and other floating point related stuff.</LI>
 </UL>
 All library routines are compiled as -model-small, they are all non-reentrant,
 if you plan to use the large model or want to make these routines
@@ -2936,62 +3385,79 @@ get to them shortly.
 
 <P>
 
-<H2><A NAME="SECTION00055000000000000000">
-4.5 Global Registers used for Parameter Passing</A>
-</H2>
+<H3><A NAME="SECTION00054100000000000000">
+4.4.1 Global Registers used for Parameter Passing</A>
+</H3>
 
 <P>
-By default the compiler uses the global registers ``DPL,DPH,B,ACC''
-to pass the first parameter to a routine, the second parameter onwards
-is either allocated on the stack (for reentrant routines or -stack-auto
-is used) or in the internal / external ram (depending on the memory
-model). 
+The compiler always uses the global registers <I>DPL,DPH,B</I> and
+<I>ACC</I> to pass the first parameter to a routine. The second parameter
+onwards is either allocated on the stack (for reentrant routines or
+if -stack-auto is used) or in the internal / external ram (depending
+on the memory model). 
 
 <P>
 
-<H3><A NAME="SECTION00055100000000000000">
-4.5.1 Assembler Routine(non-reentrant)</A>
+<H3><A NAME="SECTION00054200000000000000">
+4.4.2 Assembler Routine(non-reentrant)</A>
 </H3>
 
 <P>
 In the following example the function cfunc calls an assembler routine
 asm_func, which takes two parameters.
-
-<P>
-extern int asm_func(unsigned char, unsigned char);
-
-<P>
-&nbsp;
 <BR>
-int c_func (unsigned char i, unsigned char j) 
-<BR>{ 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return asm_func(i,j); 
-<BR>} 
-<BR>
-int main() 
-<BR>{ 
-<BR>&nbsp;&nbsp;&nbsp;return c_func(10,9); 
-<BR>}
 
-<P>
-The corresponding assembler function is:-
-
-<P>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .globl _asm_func_PARM_2 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .globl _asm_func 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .area OSEG 
 <BR>
-_asm_func_PARM_2:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .ds&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .area CSEG 
+<TT>extern int asm_func(unsigned char, unsigned char);</TT>&nbsp;
+<BR>&nbsp;
 <BR>
-_asm_func: 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mov&nbsp;&nbsp;&nbsp;&nbsp; a,dpl 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; add&nbsp;&nbsp;&nbsp;&nbsp; a,_asm_func_PARM_2 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mov&nbsp;&nbsp;&nbsp;&nbsp; dpl,a 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mov&nbsp;&nbsp;&nbsp;&nbsp; dpl,#0x00 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret
+<TT>int c_func (unsigned char i, unsigned char j)</TT>&nbsp;
+<BR>
+<TT>{</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;return asm_func(i,j);</TT>&nbsp;
+<BR>
+<TT>}</TT>&nbsp;
+<BR>&nbsp;
+<BR>
+<TT>int main()</TT>&nbsp;
+<BR>
+<TT>{</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;return c_func(10,9);</TT>&nbsp;
+<BR>
+<TT>}</TT>&nbsp;
+<BR>&nbsp;
+<BR>
+The corresponding assembler function is:
+<BR>
 
-<P>
+<BR>
+<TT>.globl _asm_func_PARM_2 </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.globl _asm_func </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.area OSEG </TT>&nbsp;
+<BR>
+<TT>_asm_func_PARM_2:</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.ds      1 </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.area CSEG </TT>&nbsp;
+<BR>
+<TT>_asm_func: </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mov     a,dpl </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add     a,_asm_func_PARM_2 </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mov     dpl,a </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mov     dpl,#0x00 </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ret</TT>&nbsp;
+<BR>&nbsp;
+<BR>
 Note here that the return values are placed in 'dpl' - One byte return
 value, 'dpl' LSB &amp; 'dph' MSB for two byte values. 'dpl', 'dph' and
 'b' for three byte values (generic pointers) and 'dpl','dph','b' &amp;
@@ -3002,75 +3468,101 @@ The parameter naming convention is _&lt;function_name&gt;_PARM_&lt;n&gt;,
 where n is the parameter number starting from 1, and counting from
 the left. The first parameter is passed in ``dpl'' for One bye
 parameter, ``dptr'' if two bytes, ``b,dptr'' for three bytes
-and ``acc,b,dptr'' for four bytes, the varaible name for the second
+and ``acc,b,dptr'' for four bytes, the varible name for the second
 parameter will be _&lt;function_name&gt;_PARM_2.
+<BR>
 
-<P>
-Assemble the assembler routine with the following command.
+<BR>
+Assemble the assembler routine with the following command:
+<BR>
 
-<P>
-asx8051 -losg asmfunc.asm
-
-<P>
+<BR>
+<I><B>asx8051 -losg asmfunc.asm</B></I>
+<BR>
+<BR>
 Then compile and link the assembler routine to the C source file with
-the following command,
+the following command:
+<BR>
+
+<BR>
+<I><B>sdcc cfunc.c asmfunc.rel</B></I>
 
 <P>
-sdcc cfunc.c asmfunc.rel
 
-<P>
-
-<H3><A NAME="SECTION00055200000000000000">
-4.5.2 Assembler Routine(reentrant)</A>
+<H3><A NAME="SECTION00054300000000000000">
+4.4.3 Assembler Routine(reentrant)</A>
 </H3>
 
 <P>
 In this case the second parameter onwards will be passed on the stack,
 the parameters are pushed from right to left i.e. after the call the
-left most parameter will be on the top of the stack. Here is an example.
-
-<P>
-extern int asm_func(unsigned char, unsigned char);
-
-<P>
-&nbsp;
-
-<P>
-int c_func (unsigned char i, unsigned char j) reentrant 
-<BR>{ 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return asm_func(i,j); 
-<BR>} 
+left most parameter will be on the top of the stack. Here is an example:
 <BR>
-int main() 
-<BR>{ 
-<BR>&nbsp;&nbsp;&nbsp;return c_func(10,9); 
-<BR>}
 
-<P>
-The corresponding assembler routine is.
-
-<P>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .globl _asm_func 
 <BR>
-_asm_func: 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; push&nbsp; _bp 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mov&nbsp; _bp,sp 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mov&nbsp; r2,dpl
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mov&nbsp; a,_bp 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; clr&nbsp; c 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; add&nbsp; a,#0xfd 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mov&nbsp; r0,a 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; add&nbsp; a,#0xfc
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mov&nbsp; r1,a 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mov&nbsp; a,@r0 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; add&nbsp; a,r2
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mov&nbsp; dpl,a 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mov&nbsp; dph,#0x00 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mov&nbsp; sp,_bp 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pop&nbsp; _bp 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret
+<TT>extern int asm_func(unsigned char, unsigned char);</TT>&nbsp;
+<BR>&nbsp;
+<BR>
+<TT>int c_func (unsigned char i, unsigned char j) reentrant </TT>&nbsp;
+<BR>
+<TT>{ </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;return asm_func(i,j); </TT>&nbsp;
+<BR>
+<TT>} </TT>&nbsp;
+<BR>&nbsp;
+<BR>
+<TT>int main() </TT>&nbsp;
+<BR>
+<TT>{ </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;return c_func(10,9); </TT>&nbsp;
+<BR>
+<TT>}</TT>&nbsp;
+<BR>
 
-<P>
+<BR>
+The corresponding assembler routine is:
+<BR>
+
+<BR>
+<TT>.globl _asm_func </TT>&nbsp;
+<BR>
+<TT>_asm_func: </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;push  _bp </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;mov  _bp,sp </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;mov  r2,dpl</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;mov  a,_bp </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;clr  c </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;add  a,#0xfd </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;mov  r0,a </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;add  a,#0xfc</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;mov  r1,a </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;mov  a,@r0 </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;add  a,r2</TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;mov  dpl,a </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;mov  dph,#0x00 </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;mov  sp,_bp </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;pop  _bp </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;ret</TT>&nbsp;
+<BR>&nbsp;
+<BR>
 The compiling and linking procedure remains the same, however note
 the extra entry &amp; exit linkage required for the assembler code, _bp
 is the stack frame pointer and is used to compute the offset into
@@ -3078,8 +3570,8 @@ the stack for parameters and local variables.
 
 <P>
 
-<H2><A NAME="SECTION00056000000000000000">
-4.6 External Stack</A>
+<H2><A NAME="SECTION00055000000000000000">
+4.5 External Stack</A>
 </H2>
 
 <P>
@@ -3098,8 +3590,8 @@ option, this port MAY NOT be used by the application program.
 
 <P>
 
-<H2><A NAME="SECTION00057000000000000000">
-4.7 ANSI-Compliance</A>
+<H2><A NAME="SECTION00056000000000000000">
+4.6 ANSI-Compliance</A>
 </H2>
 
 <P>
@@ -3107,86 +3599,77 @@ Deviations from the compliancy.
 
 <P>
 
-<OL>
-<LI>functions are not always reentrant.
-</LI>
+<UL>
+<LI>functions are not always reentrant.</LI>
 <LI>structures cannot be assigned values directly, cannot be passed as
 function parameters or assigned to each other and cannot be a return
-value from a function.
-
-<P>
-eg
-
-<P>
-</LI>
-</OL>
-struct s { ... }; 
+value from a function, e.g.:&nbsp;
+<BR>&nbsp;
 <BR>
-struct s s1, s2; 
+<TT>struct s { ... }; </TT>&nbsp;
 <BR>
-foo() 
-<BR>{ 
-<BR>... 
+<TT>struct s s1, s2; </TT>&nbsp;
 <BR>
-s1 = s2 ; /* is invalid in SDCC although allowed in ANSI */ 
-<BR>... 
-<BR>}
-
-<P>
-struct s foo1 (struct s parms) /* is invalid in SDCC although allowed
-in ANSI */ 
-<BR>{ 
+<TT>foo() </TT>&nbsp;
 <BR>
-struct s rets; 
-<BR>... 
+<TT>{ </TT>&nbsp;
 <BR>
-return rets;/* is invalid in SDCC although allowed in ANSI */
-
-<BR>}
-
-<P>
-
-<OL>
-<LI>'long long' (64 bit integers) not supported.
-</LI>
-<LI>'double' precision floating point not supported.
-</LI>
-<LI>integral promotions are suppressed. What does this mean ? The compiler
-will not implicitly promote an integer expression to a higher order
-integer, exception is an assignment or parameter passing. 
-</LI>
-<LI>No support for setjmp and longjmp (for now).
-</LI>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;... </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;s1 = s2 ; /* is invalid in SDCC although allowed
+in ANSI */ </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;... </TT>&nbsp;
+<BR>
+<TT>}</TT>&nbsp;
+<BR>
+<TT>struct s foo1 (struct s parms) /* is invalid in SDCC although
+allowed in ANSI */ </TT>&nbsp;
+<BR>
+<TT>{ </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;struct s rets; </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;... </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;return rets;/* is invalid in SDCC although allowed
+in ANSI */ </TT>&nbsp;
+<BR>
+<TT>}</TT></LI>
+<LI>'long long' (64 bit integers) not supported.</LI>
+<LI>'double' precision floating point not supported.</LI>
+<LI>No support for setjmp and longjmp (for now).</LI>
 <LI>Old K&amp;R style function declarations are NOT allowed.
-</LI>
-</OL>
-foo(i,j) /* this old style of function declarations */ 
+<BR>&nbsp;
 <BR>
-int i,j; /* are valid in ANSI .. not valid in SDCC */ 
-<BR>{ 
-<BR>... 
-<BR>}
-
-<P>
-
-<OL>
+<TT>foo(i,j) /* this old style of function declarations */
+</TT>&nbsp;
+<BR>
+<TT>int i,j; /* are valid in ANSI but not valid in SDCC */
+</TT>&nbsp;
+<BR>
+<TT>{ </TT>&nbsp;
+<BR>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;... </TT>&nbsp;
+<BR>
+<TT>}</TT></LI>
 <LI>functions declared as pointers must be dereferenced during the call.
+<BR>&nbsp;
+<BR>
+<TT>int (*foo)();</TT>&nbsp;
+<BR>
+<TT>... </TT>&nbsp;
+<BR>
+<TT>/* has to be called like this */ </TT>&nbsp;
+<BR>
+<TT>(*foo)(); /* ansi standard allows calls to be made like
+'foo()' */</TT></LI>
+</UL>
 
 <P>
-int (*foo)();
 
-<P>
-</LI>
-</OL>
-&nbsp; &nbsp;... 
-<BR>&nbsp; &nbsp;/* has to be called like this */ 
-<BR>&nbsp; &nbsp;(*foo)();/* ansi standard allows calls to be made like 'foo()'
-*/
-
-<P>
-
-<H2><A NAME="SECTION00058000000000000000">
-4.8 Cyclomatic Complexity</A>
+<H2><A NAME="SECTION00057000000000000000">
+4.7 Cyclomatic Complexity</A>
 </H2>
 
 <P>
@@ -3196,23 +3679,25 @@ is an important number since it defines the number test cases you
 have to generate to validate the function. The accepted industry standard
 for complexity number is 10, if the cyclomatic complexity reported
 by SDCC exceeds 10 you should think about simplification of the function
-logic.
+logic. Note that the complexity level is not related to the number
+of lines of code in a function. Large functions can have low complexity,
+and small functions can have large complexity levels. 
+<BR>
+
+<BR>
+SDCC uses the following formula to compute the complexity:
+<BR>
 
 <P>
-Note that the complexity level is not related to the number of lines
-of code in a function. Large functions can have low complexity, and
-small functions can have large complexity levels. SDCC uses the following
-formula to compute the complexity.
+complexity = (number of edges in control flow graph) - (number of
+nodes in control flow graph) + 2;
+<BR>
 
-<P>
-complexity = (number of edges in control flow graph) - 
-<BR>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;(number of nodes in control flow graph) + 2;
-
-<P>
+<BR>
 Having said that the industry standard is 10, you should be aware
-that in some cases it may unavoidable to have a complexity level of
-less than 10. For example if you have switch statement with more than
-10 case labels, each case label adds one to the complexity level.
+that in some cases it be may unavoidable to have a complexity level
+of less than 10. For example if you have switch statement with more
+than 10 case labels, each case label adds one to the complexity level.
 The complexity level is by no means an absolute measure of the algorithmic
 complexity of the function, it does however provide a good starting
 point for which functions you might look at for further optimization.
@@ -3220,11 +3705,11 @@ point for which functions you might look at for further optimization.
 <P>
 
 <H1><A NAME="SECTION00060000000000000000">
-5 TIPS</A>
+5. TIPS</A>
 </H1>
 
 <P>
-Here are a few guide-lines that will help the compiler generate more
+Here are a few guidelines that will help the compiler generate more
 efficient code, some of the tips are specific to this compiler others
 are generally good programming practice.
 
@@ -3233,66 +3718,74 @@ are generally good programming practice.
 <UL>
 <LI>Use the smallest data type to represent your data-value. If it is
 known in advance that the value is going to be less than 256 then
-use a 'char' instead of a 'short' or 'int'.
-</LI>
+use a 'char' instead of a 'short' or 'int'.</LI>
 <LI>Use unsigned when it is known in advance that the value is not going
 to be negative. This helps especially if you are doing division or
-multiplication.
-</LI>
-<LI>NEVER jump into a LOOP.
-</LI>
+multiplication.</LI>
+<LI>NEVER jump into a LOOP.</LI>
 <LI>Declare the variables to be local whenever possible, especially loop
-control variables (induction).
-</LI>
+control variables (induction).</LI>
 <LI>Since the compiler does not do implicit integral promotion, the programmer
-should do an explicit cast when integral promotion is required.
-</LI>
+should do an explicit cast when integral promotion is required.</LI>
 <LI>Reducing the size of division, multiplication &amp; modulus operations
-can reduce code size substantially. Take the following code for example.
+can reduce code size substantially. Take the following code for example.&nbsp;
+<BR>&nbsp;
+<BR>
+<TT>foobar(unsigned int p1, unsigned char ch)</TT>&nbsp;
+<BR>
+<TT>{</TT>&nbsp;
+<BR>
+ <TT>   unsigned char ch1 = p1 % ch ;</TT>&nbsp;
+<BR>
+ <TT>   ....    </TT>&nbsp;
+<BR>
+<TT>}</TT>&nbsp;
+<BR>
 
-<P>
-foobar(unsigned int p1, unsigned char ch)
-<BR>{
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;unsigned char ch1 = p1 % ch ;
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;....&nbsp;&nbsp;&nbsp;&nbsp;
-<BR>}
-
-<P>
+<BR>
 For the modulus operation the variable ch will be promoted to unsigned
 int first then the modulus operation will be performed (this will
-lead to a call to a support routine). If the code is changed to 
+lead to a call to support routine _muduint()), and the result will
+be casted to an int. If the code is changed to 
+<BR>&nbsp;
+<BR>
+<TT>foobar(unsigned int p1, unsigned char ch)</TT>&nbsp;
+<BR>
+<TT>{</TT>&nbsp;
+<BR>
+ <TT>   unsigned char ch1 = (unsigned char)p1 % ch ;</TT>&nbsp;
+<BR>
+ <TT>   ....    </TT>&nbsp;
+<BR>
+<TT>}</TT>&nbsp;
+<BR>
 
-<P>
-foobar(unsigned int p1, unsigned char ch)
-<BR>{
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;unsigned char ch1 = (unsigned char)p1 % ch ;
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;....&nbsp;&nbsp;&nbsp;&nbsp;
-<BR>}
-
-<P>
+<BR>
 It would substantially reduce the code generated (future versions
-of the compiler will be smart enough to detect such optimization oppurtunities).
+of the compiler will be smart enough to detect such optimization oppurtunities).</LI>
+</UL>
 
 <P>
-</LI>
-</UL>
-Notes on MCS51 memory layout(Trefor@magera.freeserve.co.uk)
+
+<H2><A NAME="SECTION00061000000000000000">
+5.1 Notes on MCS51 memory layout</A>
+</H2>
 
 <P>
 The 8051 family of micro controller have a minimum of 128 bytes of
 internal memory which is structured as follows
+<BR>
 
-<P>
+<BR>
 - Bytes 00-1F - 32 bytes to hold up to 4 banks of the registers R7
 to R7 
-
-<P>
+<BR>
 - Bytes 20-2F - 16 bytes to hold 128 bit variables and 
-
-<P>
+<BR>
 - Bytes 30-7F - 60 bytes for general purpose use.
+<BR>
 
-<P>
+<BR>
 Normally the SDCC compiler will only utilise the first bank of registers,
 but it is possible to specify that other banks of registers should
 be used in interrupt routines. By default, the compiler will place
@@ -3316,18 +3809,19 @@ this from happening.
 
 <P>
 The amount of stack being used is affected by the use of the &#34;internal
-stack&#34; to save registers before a subroutine call is made,
-- -stack-auto will declare parameters and local variables on the
-stack - the number of nested subroutines.
+stack&#34; to save registers before a subroutine call is made
+(-stack-auto will declare parameters and local variables on the stack)
+and the number of nested subroutines.
 
 <P>
 If you detect that the stack is over writing you data, then the following
 can be done. -xstack will cause an external stack to be used for
 saving registers and (if -stack-auto is being used) storing parameters
-and local variables. However this will produce more and code which
-will be slower to execute. 
+and local variables. However this will produce more code which will
+be slower to execute. 
 
 <P>
+ 
 -stack-loc will allow you specify the start of the stack, i.e. you
 could start it after any data in the general purpose area. However
 this may waste the memory not used by the register banks and if the
@@ -3335,28 +3829,32 @@ size of the &#34;near data&#34; increases, it may creep
 into the bottom of the stack.
 
 <P>
+ 
 -stack-after-data, similar to the -stack-loc, but it automatically
 places the stack after the end of the &#34;near data&#34;.
 Again this could waste any spare register space.
 
 <P>
+ 
 -data-loc allows you to specify the start address of the near data.
 This could be used to move the &#34;near data&#34; further
 away from the stack giving it more room to grow. This will only work
 if no bit variables are being used and the stack can grow to use the
 bit variable space.
+<BR>
 
-<P>
+<BR>
 Conclusion.
+<BR>
 
-<P>
+<BR>
 If you find that the stack is over writing your bit variables or &#34;near
 data&#34; then the approach which best utilised the internal
 memory is to position the &#34;near data&#34; after the
 last bank of used registers or, if you use bit variables, after the
 last bit variable by using the -data-loc, e.g. if two register banks
-are being used and no data variables, -data-loc 16, and - use the
--stack-after-data option.
+are being used and no bit variables, -data-loc 16, and use the -stack-after-data
+option.
 
 <P>
 If bit variables are being used, another method would be to try and
@@ -3366,7 +3864,7 @@ and start the stack after the last bit variable.
 <P>
 
 <H1><A NAME="SECTION00070000000000000000">
-6 Retargetting for other MCUs.</A>
+6. Retargetting for other MCUs.</A>
 </H1>
 
 <P>
@@ -3376,78 +3874,67 @@ of the seven phases of the compiler and its MCU dependency.
 
 <P>
 
-<OL>
+<UL>
 <LI>Parsing the source and building the annotated parse tree. This phase
 is largely MCU independent (except for the language extensions). Syntax
 &amp; semantic checks are also done in this phase, along with some initial
 optimizations like back patching labels and the pattern matching optimizations
-like bit-rotation etc.
-</LI>
+like bit-rotation etc.</LI>
 <LI>The second phase involves generating an intermediate code which can
 be easy manipulated during the later phases. This phase is entirely
 MCU independent. The intermediate code generation assumes the target
 machine has unlimited number of registers, and designates them with
 the name iTemp. The compiler can be made to dump a human readable
-form of the code generated by using the -dumpraw option.
-</LI>
+form of the code generated by using the -dumpraw option.</LI>
 <LI>This phase does the bulk of the standard optimizations and is also
-MCU independent. This phase can be broken down into several sub-phases.
+MCU independent. This phase can be broken down into several sub-phases:
+<BR>
 
-<P>
-
-<UL>
-<LI>Break down intermediate code (iCode) into basic blocks.
-</LI>
-<LI>Do control flow &amp; data flow analysis on the basic blocks.
-</LI>
-<LI>Do local common subexpression elimination, then global subexpression
+<BR>
+Break down intermediate code (iCode) into basic blocks.
+<BR>
+Do control flow &amp; data flow analysis on the basic blocks.
+<BR>
+Do local common subexpression elimination, then global subexpression
 elimination
-</LI>
-<LI>dead code elimination
-</LI>
-<LI>loop optimizations
-</LI>
-<LI>if loop optimizations caused any changes then do 'global subexpression
-elimination' and 'dead code elimination' again.
-</LI>
-</UL>
-</LI>
+<BR>
+Dead code elimination
+<BR>
+Loop optimizations
+<BR>
+If loop optimizations caused any changes then do 'global subexpression
+elimination' and 'dead code elimination' again.</LI>
 <LI>This phase determines the live-ranges; by live range I mean those
 iTemp variables defined by the compiler that still survive after all
 the optimizations. Live range analysis is essential for register allocation,
 since these computation determines which of these iTemps will be assigned
-to registers, and for how long.
-</LI>
+to registers, and for how long.</LI>
 <LI>Phase five is register allocation. There are two parts to this process.
+<BR>
 
-<P>
-
-<OL>
-<LI>The first part I call 'register packing' (for lack of a better term).
+<BR>
+The first part I call 'register packing' (for lack of a better term).
 In this case several MCU specific expression folding is done to reduce
 register pressure.
-</LI>
-<LI>The second part is more MCU independent and deals with allocating
+<BR>
+
+<BR>
+The second part is more MCU independent and deals with allocating
 registers to the remaining live ranges. A lot of MCU specific code
 does creep into this phase because of the limited number of index
-registers available in the 8051.
-</LI>
-</OL>
-</LI>
+registers available in the 8051.</LI>
 <LI>The Code generation phase is (unhappily), entirely MCU dependent and
 very little (if any at all) of this code can be reused for other MCU.
 However the scheme for allocating a homogenized assembler operand
-for each iCode operand may be reused.
-</LI>
+for each iCode operand may be reused.</LI>
 <LI>As mentioned in the optimization section the peep-hole optimizer is
-rule based system, which can reprogrammed for other MCUs.
-</LI>
-</OL>
+rule based system, which can reprogrammed for other MCUs.</LI>
+</UL>
 
 <P>
 
 <H1><A NAME="SECTION00080000000000000000">
-7 SDCDB - Source Level Debugger</A>
+7. SDCDB - Source Level Debugger</A>
 </H1>
 
 <P>
@@ -3466,7 +3953,7 @@ source and at the ASM source level.
 </H2>
 
 <P>
-The -debug option must be specified for all files for which debug
+The debug option must be specified for all files for which debug
 information is to be generated. The complier generates a .cdb file
 for each of these files. The linker updates the .cdb file with the
 address information. This .cdb is used by the debugger.
@@ -3496,27 +3983,23 @@ commands for the simulator.
 
 <P>
 The debugger can be started using the following command line. (Assume
-the file you are debugging has
+the file you are debugging has the file name foo).
+<BR>
 
-<P>
-the file name foo).
+<BR>
+<I><B>sdcdb foo</B></I>
+<BR>
 
-<P>
-&gt;sdcdb foo
-
-<P>
+<BR>
 The debugger will look for the following files.
 
 <P>
 
-<OL>
-<LI>foo.c - the source file.
-</LI>
-<LI>foo.cdb - the debugger symbol information file.
-</LI>
-<LI>foo.ihx - the intel hex format object file.
-</LI>
-</OL>
+<UL>
+<LI>foo.c - the source file.</LI>
+<LI>foo.cdb - the debugger symbol information file.</LI>
+<LI>foo.ihx - the intel hex format object file.</LI>
+</UL>
 
 <P>
 
@@ -3533,22 +4016,17 @@ list specified for source, cdb &amp; ihx files. The items in the directory
 list must be separated by ':', e.g. if the source files can be in
 the directories /home/src1 and /home/src2, the -directory option
 should be -directory=/home/src1:/home/src2. Note there can be no
-spaces in the option. 
-</LI>
-<LI>-cd &lt;directory&gt; - change to the &lt;directory&gt;.
-</LI>
-<LI>-fullname - used by GUI front ends.
-</LI>
+spaces in the option. </LI>
+<LI>-cd &lt;directory&gt; - change to the &lt;directory&gt;.</LI>
+<LI>-fullname - used by GUI front ends.</LI>
 <LI>-cpu &lt;cpu-type&gt; - this argument is passed to the simulator please
-see the simulator docs for details.
-</LI>
+see the simulator docs for details.</LI>
 <LI>-X &lt;Clock frequency &gt; this options is passed to the simulator please
-see simulator docs for details.
-</LI>
-<LI>-s &lt;serial port file&gt; passed to simulator see simulator docs for details.
-</LI>
-<LI>-S &lt;serial in,out&gt; passed to simulator see simulator docs for details.
-</LI>
+see the simulator docs for details.</LI>
+<LI>-s &lt;serial port file&gt; passed to simulator see the simulator docs for
+details.</LI>
+<LI>-S &lt;serial in,out&gt; passed to simulator see the simulator docs for
+details.</LI>
 </UL>
 
 <P>
@@ -3559,8 +4037,8 @@ see simulator docs for details.
 
 <P>
 As mention earlier the command interface for the debugger has been
-deliberately kept as close the GNU debugger gdb, as possible, this
-will help int integration with existing graphical user interfaces
+deliberately kept as close the GNU debugger gdb, as possible. This
+will help the integration with existing graphical user interfaces
 (like ddd, xxgdb or xemacs) existing for the GNU debugger.
 
 <P>
@@ -3570,16 +4048,17 @@ will help int integration with existing graphical user interfaces
 </H3>
 
 <P>
-Set breakpoint at specified line or function.
+Set breakpoint at specified line or function:
+<BR>
 
-<P>
-sdcdb&gt;break 100 
 <BR>
-sdcdb&gt;break foo.c:100
+<I><B>sdcdb&gt;break 100 </B></I>
 <BR>
-sdcdb&gt;break funcfoo
+<I><B>sdcdb&gt;break foo.c:100</B></I>
 <BR>
-sdcdb&gt;break foo.c:funcfoo
+<I><B>sdcdb&gt;break funcfoo</B></I>
+<BR>
+<I><B>sdcdb&gt;break foo.c:funcfoo</B></I>
 
 <P>
 
@@ -3588,16 +4067,17 @@ sdcdb&gt;break foo.c:funcfoo
 </H3>
 
 <P>
-Clear breakpoint at specified line or function.
+Clear breakpoint at specified line or function:
+<BR>
 
-<P>
-sdcdb&gt;clear 100
 <BR>
-sdcdb&gt;clear foo.c:100
+<I><B>sdcdb&gt;clear 100</B></I>
 <BR>
-sdcdb&gt;clear funcfoo
+<I><B>sdcdb&gt;clear foo.c:100</B></I>
 <BR>
-sdcdb&gt;clear foo.c:funcfoo
+<I><B>sdcdb&gt;clear funcfoo</B></I>
+<BR>
+<I><B>sdcdb&gt;clear foo.c:funcfoo</B></I>
 
 <P>
 
@@ -3636,14 +4116,10 @@ user defined break points.
 <P>
 
 <UL>
-<LI>info break - list all breakpoints
-</LI>
-<LI>info stack - show the function call stack.
-</LI>
-<LI>info frame - show information about the current execution frame.
-</LI>
-<LI>info registers - show content of all registers.
-</LI>
+<LI>info break - list all breakpoints</LI>
+<LI>info stack - show the function call stack.</LI>
+<LI>info frame - show information about the current execution frame.</LI>
+<LI>info registers - show content of all registers.</LI>
 </UL>
 
 <P>
@@ -3738,6 +4214,7 @@ can loose its execution context and may display incorrect values.
 </H3>
 
 <P>
+ 
 &#34;Watch me now. Iam going Down. My name is Bobby Brown&#34;
 
 <P>
@@ -3747,93 +4224,133 @@ can loose its execution context and may display incorrect values.
 </H2>
 
 <P>
-Two files are (in emacs lisp) are provided for the interfacing with
-XEmacs, sdcdb.el and sdcdbsrc.el. These two files can be found in
-the $(prefix)/bin directory after the installation is complete. These
-files need to be loaded into XEmacs for the interface to work, this
-can be done at XEmacs startup time by inserting the following into
-your '.xemacs' file (which can be found in your HOME directory) (load-file
-sdcdbsrc.el) [ .xemacs is a lisp file so the () around the command
-is REQUIRED), the files can also be loaded dynamically while XEmacs
-is running, set the environment variable 'EMACSLOADPATH' to the installation
-bin directory [$(prefix)/bin], then enter the following command
-ESC-x load-file sdcdbsrc. To start the interface enter the following
-command ESC-x sdcdbsrc, you will prompted to enter the file name to
-be debugged. 
+Two files (in emacs lisp) are provided for the interfacing with XEmacs,
+sdcdb.el and sdcdbsrc.el. These two files can be found in the $(prefix)/bin
+directory after the installation is complete. These files need to
+be loaded into XEmacs for the interface to work. This can be done
+at XEmacs startup time by inserting the following into your '.xemacs'
+file (which can be found in your HOME directory): 
+<BR>
 
-<P>
+<BR>
+<TT>(load-file sdcdbsrc.el)</TT> 
+<BR>
+
+<BR>
+.xemacs is a lisp file so the () around the command is REQUIRED. The
+files can also be loaded dynamically while XEmacs is running, set
+the environment variable 'EMACSLOADPATH' to the installation bin directory
+(&lt;installdir&gt;/bin), then enter the following command ESC-x load-file
+sdcdbsrc. To start the interface enter the following command: 
+<BR>
+
+<BR>
+<I><B>ESC-x sdcdbsrc</B></I>
+<BR>
+
+<BR>
+You will prompted to enter the file name to be debugged. 
+<BR>
+
+<BR>
 The command line options that are passed to the simulator directly
-are bound to default values in the file sdcdbsrc.el the variables
-are listed below these values maybe changed as required.
+are bound to default values in the file sdcdbsrc.el. The variables
+are listed below, these values maybe changed as required.
 
 <P>
 
 <UL>
-<LI>sdcdbsrc-cpu-type '51
-</LI>
-<LI>sdcdbsrc-frequency '11059200
-</LI>
-<LI>sdcdbsrc-serial nil
-</LI>
+<LI>sdcdbsrc-cpu-type '51</LI>
+<LI>sdcdbsrc-frequency '11059200</LI>
+<LI>sdcdbsrc-serial nil</LI>
 </UL>
 The following is a list of key mapping for the debugger interface.
 
 <P>
-&nbsp;
-<BR>;; Current Listing :: 
-<BR>;;key&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;binding&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Comment
-
-<BR>;;--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;----
-
-<BR>;; 
-<BR>;; n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdb-next-from-src&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SDCDB
-next command 
-<BR>;; b&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdb-back-from-src&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SDCDB
-back command 
-<BR>;; c&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdb-cont-from-src&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SDCDB
-continue command
-<BR>;; s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdb-step-from-src&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SDCDB
-step command 
-<BR>;; ?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdb-whatis-c-sexp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SDCDB
-ptypecommand for data at 
-<BR>;;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-buffer point 
-<BR>;; x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdbsrc-delete&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SDCDB
-Delete all breakpoints if no arg 
-<BR>;;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;given
-or delete arg (C-u arg x) 
-<BR>;; m&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdbsrc-frame&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SDCDB
-Display current frame if no arg, 
-<BR>;;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;given
-or display frame arg 
-<BR>;;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;buffer
-point 
-<BR>;; !&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdbsrc-goto-sdcdb&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Goto
-the SDCDB output buffer 
-<BR>;; p&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdb-print-c-sexp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SDCDB
-print command for data at 
-<BR>;;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-buffer point 
-<BR>;; g&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdbsrc-goto-sdcdb&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Goto
-the SDCDB output buffer 
-<BR>;; t&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdbsrc-mode&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Toggles
-Sdcdbsrc mode (turns it off) 
-<BR>;; 
-<BR>;; C-c C-f&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdb-finish-from-src&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SDCDB
-finish command 
-<BR>;; 
-<BR>;; C-x SPC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdb-break&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Set
-break for line with point 
-<BR>;; ESC t&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdbsrc-mode&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Toggle
-Sdcdbsrc mode 
-<BR>;; ESC m&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdbsrc-srcmode&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Toggle list mode 
-<BR>;; 
+ 
+&nbsp;&nbsp;
 <BR>
+<TT>;; Current Listing :: </TT>&nbsp;
+<BR>
+<TT>;;key&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;binding&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Comment
+</TT>&nbsp;
+<BR>
+<TT>;;--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;----
+</TT>&nbsp;
+<BR>
+<TT>;; </TT>&nbsp;
+<BR>
+<TT>;; n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdb-next-from-src&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SDCDB
+next command </TT>&nbsp;
+<BR>
+<TT>;; b&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdb-back-from-src&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SDCDB
+back command </TT>&nbsp;
+<BR>
+<TT>;; c&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdb-cont-from-src&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SDCDB
+continue command</TT>&nbsp;
+<BR>
+<TT>;; s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdb-step-from-src&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SDCDB
+step command </TT>&nbsp;
+<BR>
+<TT>;; ?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdb-whatis-c-sexp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SDCDB
+ptypecommand for data at </TT>&nbsp;
+<BR>
+<TT>;;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+buffer point </TT>&nbsp;
+<BR>
+<TT>;; x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdbsrc-delete&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SDCDB
+Delete all breakpoints if no arg </TT>&nbsp;
+<BR>
+<TT>;;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;given
+or delete arg (C-u arg x) </TT>&nbsp;
+<BR>
+<TT>;; m&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdbsrc-frame&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SDCDB
+Display current frame if no arg, </TT>&nbsp;
+<BR>
+<TT>;;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;given
+or display frame arg </TT>&nbsp;
+<BR>
+<TT>;;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;buffer
+point </TT>&nbsp;
+<BR>
+<TT>;; !&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdbsrc-goto-sdcdb&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Goto
+the SDCDB output buffer </TT>&nbsp;
+<BR>
+<TT>;; p&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdb-print-c-sexp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SDCDB
+print command for data at </TT>&nbsp;
+<BR>
+<TT>;;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+buffer point </TT>&nbsp;
+<BR>
+<TT>;; g&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdbsrc-goto-sdcdb&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Goto
+the SDCDB output buffer </TT>&nbsp;
+<BR>
+<TT>;; t&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdbsrc-mode&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Toggles
+Sdcdbsrc mode (turns it off) </TT>&nbsp;
+<BR>
+<TT>;; </TT>&nbsp;
+<BR>
+<TT>;; C-c C-f&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdb-finish-from-src&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SDCDB
+finish command </TT>&nbsp;
+<BR>
+<TT>;; </TT>&nbsp;
+<BR>
+<TT>;; C-x SPC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdb-break&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Set
+break for line with point </TT>&nbsp;
+<BR>
+<TT>;; ESC t&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdbsrc-mode&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Toggle
+Sdcdbsrc mode </TT>&nbsp;
+<BR>
+<TT>;; ESC m&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdcdbsrc-srcmode&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Toggle list mode </TT>&nbsp;
+<BR>
+<TT>;;</TT> 
+<BR>
+
 <P>
 
 <H1><A NAME="SECTION00090000000000000000">
-8 Other Processors</A>
+8. Other Processors</A>
 </H1>
 
 <P>
@@ -3846,7 +4363,7 @@ Toggle list mode
 SDCC can target both the Zilog Z80 and the Nintendo Gameboy's Z80-like
 gbz80. The port is incomplete - long support is incomplete (mul, div
 and mod are unimplimented), and both float and bitfield support is
-missing, but apart from that the code generated is correct.
+missing. Apart from that the code generated is correct.
 
 <P>
 As always, the code is the authoritave reference - see z80/ralloc.c
@@ -3860,16 +4377,16 @@ is limited to 127 bytes - this will be fixed in a later version.
 <P>
 
 <H1><A NAME="SECTION000100000000000000000">
-9 Support</A>
+9. Support</A>
 </H1>
 
 <P>
-SDCC has grown to be large project, the compiler alone (without the
-Assembler Package, Preprocessor) is about 40,000 lines of code (blank
-stripped). The open source nature of this project is a key to its
-continued growth and support. You gain the benefit and support of
-many active software developers and end users. Is SDCC perfect? No,
-that's why we need your help. The developers take pride in fixing
+SDCC has grown to be a large project. The compiler alone (without
+the preprocessor, assembler and linker) is about 40,000 lines of code
+(blank stripped). The open source nature of this project is a key
+to its continued growth and support. You gain the benefit and support
+of many active software developers and end users. Is SDCC perfect?
+No, that's why we need your help. The developers take pride in fixing
 reported bugs. You can help by reporting the bugs and helping other
 SDCC users. There are lots of ways to contribute, and we encourage
 you to take part in making SDCC a great software package.
@@ -3891,13 +4408,13 @@ locating optimization problems.
 
 <P>
 
-<H2><A NAME="SECTION000102000000000000000">
-9.2 Acknowledgments</A>
-</H2>
+<H1><A NAME="SECTION000110000000000000000">
+10. Acknowledgments</A>
+</H1>
 
 <P>
-Sandeep Dutta(sandeep.dutta@usa.net) - SDCC, the compiler, MCS51 code
-generator, Debugger, AVR port
+Sandeep Dutta (sandeep.dutta@usa.net) - SDCC, the compiler, MCS51
+code generator, Debugger, AVR port
 <BR>
 Alan Baldwin (baldwin@shop-pdp.kent.edu) - Initial version of ASXXXX
 &amp; ASLINK. 
@@ -3907,7 +4424,7 @@ John Hartman (jhartman@compuserve.com) - Porting ASXXX &amp; ASLINK for
 <BR>
 Dmitry S. Obukhov (dso@usa.net) - malloc &amp; serial i/o routines. 
 <BR>
-Daniel Drotos &lt;drdani@mazsola.iit.uni-miskolc.hu&gt; - for his Freeware
+Daniel Drotos (drdani@mazsola.iit.uni-miskolc.hu) - for his Freeware
 simulator
 <BR>
 Malini Dutta(malini_dutta@hotmail.com) - my wife for her patience
@@ -3919,29 +4436,41 @@ Michael Hope - The Z80 and Z80GB port, 186 development
 <BR>
 Kevin Vigor - The DS390 port.
 <BR>
-Johan Knol - DS390/TINI libs, lots of fixes and enhancements.
+Johan Knol - Lots of fixes and enhancements, DS390/TINI libs.
 <BR>
-Scott Datallo - PIC port.
-<BR>(Thanks to all the other volunteer developers who have helped with
-coding, testing, web-page creation, distribution sets, etc. You know
-who you are :-)
+Scott Datallo - The PIC port.
 <BR>
+
+<BR>
+<I>Thanks to all the other volunteer developers who have helped
+with coding, testing, web-page creation, distribution sets, etc. You
+know who you are :-)</I>
+<BR>
+
 <P>
-This document initially written by Sandeep Dutta
+This document was initially written by Sandeep Dutta
 
 <P>
 All product names mentioned herein may be trademarks of their respective
 companies. 
 
 <P>
-<A NAME="959"></A>
+<BR>
 
-<H1><A NAME="SECTION000110000000000000000">
+<H2><A NAME="SECTION000120000000000000000">
+Index</A>
+</H2><DL COMPACT>
+<DT><STRONG>index</STRONG>
+<DD><A HREF="SDCCUdoc.html#67">1.7 Wishes for the</A>
+
+</DL>
+
+<H1><A NAME="SECTION000130000000000000000">
 About this document ...</A>
 </H1>
- <STRONG>lSDCC Compiler User Guide</STRONG><P>
+ <STRONG>SDCC Compiler User Guide</STRONG><P>
 This document was generated using the
-<A HREF="http://www-dsed.llnl.gov/files/programs/unix/latex2html/manual/"><STRONG>LaTeX</STRONG>2<tt>HTML</tt></A> translator Version 2K.1beta (1.47)
+<A HREF="http://www-dsed.llnl.gov/files/programs/unix/latex2html/manual/"><STRONG>LaTeX</STRONG>2<tt>HTML</tt></A> translator Version 99.1 release (March 30, 1999)
 <P>
 Copyright &#169; 1993, 1994, 1995, 1996,
 <A HREF="http://cbl.leeds.ac.uk/nikos/personal.html">Nikos Drakos</A>, 
@@ -3952,13 +4481,13 @@ Copyright &#169; 1997, 1998, 1999,
 Mathematics Department, Macquarie University, Sydney.
 <P>
 The command line arguments were: <BR>
- <STRONG>latex2html</STRONG> <TT>-no_subdir -split 0 -show_section_numbers /tmp/lyx_tmpdir1913F54AWM/lyx_tmpbuf1913544rwj/SDCCUdoc.tex</TT>
+ <STRONG>latex2html</STRONG> <TT>-split 0 -show_section_numbers -dir fullhtml SDCCUdoc</TT>
 <P>
-The translation was initiated by Karl Bongers on 2001-07-05
+The translation was initiated by Johan Knol on 2001-07-07
 <BR><HR><H4>Footnotes</H4>
 <DL>
-<DT><A NAME="foot513">...
-anyway</A><A NAME="foot513"
+<DT><A NAME="foot530">...
+anyway</A><A NAME="foot530"
  HREF="SDCCUdoc.html#tex2html1"><SUP>1</SUP></A>
 <DD>possible exception: if a function is called ONLY from 'interrupt'
 functions using a particular bank, it can be declared with the same
@@ -3971,17 +4500,17 @@ to the stack on entry and switch to bank zero before calling the function
 
 </DL><HR>
 <!--Navigation Panel-->
-<IMG WIDTH="81" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next_inactive"
- SRC="file:/usr/share/latex2html/icons/nx_grp_g.png"> 
+<IMG WIDTH="81" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next_group"
+ SRC="/home/johan/latex2html/icons.gif/next_group_motif_gr.gif"> 
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
- SRC="file:/usr/share/latex2html/icons/up_g.png"> 
+ SRC="/home/johan/latex2html/icons.gif/up_motif_gr.gif"> 
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
- SRC="file:/usr/share/latex2html/icons/prev_g.png">   
+ SRC="/home/johan/latex2html/icons.gif/previous_motif_gr.gif">   
 <BR>
 <!--End of Navigation Panel-->
 <ADDRESS>
-Karl Bongers
-2001-07-05
+<I>Johan Knol</I>
+<BR><I>2001-07-07</I>
 </ADDRESS>
 </BODY>
 </HTML>

@@ -1178,7 +1178,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 	         then mark it */
 	      if (POINTER_GET (ic) && IS_SYMOP (IC_LEFT (ic))
 		  && getSize (OP_SYMBOL (IC_LEFT (ic))->type)
-		  <= PTRSIZE)
+		  <= (unsigned int) PTRSIZE)
 		{
 		  mcs51_ptrRegReq++;
 		  ptrRegSet = 1;

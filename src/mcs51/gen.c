@@ -385,9 +385,9 @@ aopForRemat (symbol * sym)
   for (;;)
     {
       if (ic->op == '+')
-	val += operandLitValue (IC_RIGHT (ic));
+	val += (int) operandLitValue (IC_RIGHT (ic));
       else if (ic->op == '-')
-	val -= operandLitValue (IC_RIGHT (ic));
+	val -= (int) operandLitValue (IC_RIGHT (ic));
       else
 	break;
 
@@ -603,7 +603,7 @@ aopOp (operand * op, iCode * ic, bool result)
 
       if (sym->ruonly)
 	{
-	  int i;
+	  unsigned i;
 	  aop = op->aop = sym->aop = newAsmop (AOP_STR);
 	  aop->size = getSize (sym->type);
 	  for (i = 0; i < fReturnSizeMCS51; i++)
@@ -2567,7 +2567,7 @@ genPlusIncr (iCode * ic)
 
   /* if the literal value of the right hand side
      is greater than 4 then it is not worth it */
-  if ((icount = floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit)) > 4)
+  if ((icount = (unsigned int) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit)) > 4)
     return FALSE;
 
   /* if increment 16 bits in register */
@@ -4078,7 +4078,7 @@ hasInc (operand *op, iCode *ic)
       return lic;
     }
     /* if the operand used or deffed */
-    if (bitVectBitValue(ic->uses,op->key) || ic->defKey == op->key) {
+    if (bitVectBitValue(ic->uses,op->key) || (unsigned) ic->defKey == op->key) {
       return NULL;
     }
     lic = lic->next;

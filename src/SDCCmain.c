@@ -76,7 +76,6 @@ char *libPaths[128];
 int nlibPaths = 0;
 char *relFiles[128];
 int nrelFiles = 0;
-static char *preOutName;
 
 /* uncomment JAMIN_DS390 to always override and use ds390 port
   for mcs51 work.  This is temporary, for compatibility testing. */
@@ -1606,16 +1605,16 @@ preProcess (char **envp)
 
       setMainValue ("cppextraopts", join(preArgv));
 
-      if (preProcOnly)
-        {
-          if (fullDstFileName)
-	    {
-              preOutName = Safe_strdup (fullDstFileName);
-	    }
-        }
-
-      /* Have to set cppoutfilename to something, even if just pre-processing. */
-      setMainValue ("cppoutfilename", preOutName ? preOutName : "");
+      if (preProcOnly && fullDstFileName)
+	{
+	  /* -E and -o given */
+	  setMainValue ("cppoutfilename", fullDstFileName);
+	}
+      else
+	{
+	  /* Have to set cppoutfilename to something, even if piping */
+	  setMainValue ("cppoutfilename", "");
+	}
 
       if (options.verbose)
 	printf ("sdcc: Calling preprocessor...\n");

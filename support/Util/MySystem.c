@@ -22,20 +22,19 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
-#include "common.h"
-#include "MySystem.h"
-#include "newalloc.h"
 #ifdef _WIN32
+#undef DATADIR
+#include <windows.h>
+/* avoid DATADIR definition clash :-( */
 #include <io.h>
 #else
 #include <unistd.h>
 #endif
-
-#ifdef _WIN32
-#define EXE_EXT ".exe"
-#else
-#define EXE_EXT ""
-#endif
+#include <ctype.h>
+#include "SDCCglobl.h"
+#include "SDCCutil.h"
+#include "MySystem.h"
+#include "newalloc.h"
 
 
 set *binPathSet = NULL; /* set of binary paths */
@@ -100,19 +99,145 @@ split_command(const char *cmd_line, char **command, char **params)
 
 
 /*!
+ * find the command:
+ * 1) if the command is specified by path, try it
+ * 2) try to find the command in predefined path's
+ * 3) trust on $PATH
+ */
+
+#ifdef _WIN32
+/* WIN32 version */
+
+/*
+ * I don't like this solution, but unfortunately cmd.exe and command.com
+ * don't accept something like this:
+ * "program" "argument"
+ * Cmd.exe accepts the following:
+ * ""program" "argument""
+ * but command.com doesn't.
+ * The following is accepted by both:
+ * program "argument"
+ *
+ * So the most portable WIN32 solution is to use GetShortPathName() for
+ * program to get rid of spaces, so that quotes are not needed :-(
+ * Using spawnvp() instead of system() is more portable cross platform approach,
+ * but then also a substitute for _popen() should be developed...
+ */
+
+#define EXE_EXT ".exe"
+
+/*!
  * merge command and parameters to command line
  */
 
 static char *
 merge_command(const char *command, const char *params)
 {
-  char *cmd_line;
-  size_t len;
-
   /* allocate extra space for ' ' and '\0' */
-  len = strlen(command) + strlen(params) + 2;
-  cmd_line = (char *)Safe_alloc(len);
-  SNPRINTF(cmd_line, len, "%s %s", command, params);
+  char *cmd_line = (char *)Safe_alloc(strlen(command) + strlen(params) + 2);
+  sprintf(cmd_line, "%s %s", command, params);
+
+  return cmd_line;
+}
+
+
+/*!
+ * check if path/command exist by converting it to short file name
+ * if it exists, compose with args and return it
+ */
+
+static char *
+compose_command_line(const char *path, const char *command, const char *args)
+{
+  unsigned len;
+  char cmdPath[PATH_MAX];
+  char shortPath[PATH_MAX];
+
+  if (path != NULL)
+    SNPRINTF(cmdPath, sizeof cmdPath,
+      "%s" DIR_SEPARATOR_STRING "%s", path, command);
+  else
+    strncpyz(cmdPath, command, sizeof cmdPath);
+
+  /* Try if cmdPath or cmdPath.exe exist by converting it to the short path name */
+  len = GetShortPathName(cmdPath, shortPath, sizeof shortPath);
+  assert(len < sizeof shortPath);
+  if (0 == len) {
+    len = GetShortPathName(strncatz(cmdPath, EXE_EXT, sizeof cmdPath), shortPath, sizeof shortPath);
+    assert(len < sizeof shortPath);
+  }
+  if (0 != len) {
+    /* compose the command line */
+    return merge_command(shortPath, args);
+  }
+  else {
+    /* path/command not found */
+    return NULL;
+  }
+}
+
+
+static char *
+get_path(const char *cmd)
+{
+  char *cmdLine;
+  char *command;
+  char *args;
+  char *path;
+
+  /* get the command */
+  split_command(cmd, &command, &args);
+
+  if (NULL == (cmdLine = compose_command_line(NULL, command, args))) {
+    /* not an absolute path: try to find the command in predefined binary paths */
+    if (NULL != (path = (char *)setFirstItem(binPathSet))) {
+      while (NULL == (cmdLine  = compose_command_line(path, command, args)) &&
+        NULL != (path = (char *)setNextItem(binPathSet)))
+        ;
+    }
+
+    if (NULL == cmdLine) {
+      /* didn't found the command in predefined binary paths: try with PATH */
+      char *envPath;
+
+      if (NULL != (envPath = getenv("PATH"))) {
+        /* make a local copy; strtok() will modify it */
+        envPath = Safe_strdup(envPath);
+
+        if (NULL != (path = strtok(envPath, ";"))) {
+          while (NULL == (cmdLine = compose_command_line(path, command, args)) &&
+           NULL != (path = strtok(NULL, ";")))
+           ;
+        }
+
+        Safe_free(envPath);
+      }
+    }
+
+    /* didn't found it; probably this won't help neither :-( */
+    if (NULL == cmdLine)
+      cmdLine = merge_command(command, args);
+  }
+
+  Safe_free(command);
+  Safe_free(args);
+
+  return cmdLine;
+}
+
+#else
+/* *nix version */
+
+/*!
+ * merge command and parameters to command line
+ */
+
+static char *
+merge_command(const char *command, const char *params)
+{
+  /* allocate extra space for 2x'"', ' ' and '\0' */
+  char *cmd_line = (char *)Safe_alloc(strlen(command) + strlen(params) + 4);
+  sprintf(cmd_line, "\"%s\" %s", command, params);
 
   return cmd_line;
 }
@@ -127,7 +252,7 @@ has_path(const char *path)
 {
   if (strrchr(path, DIR_SEPARATOR_CHAR) == NULL)
 #ifdef _WIN32
-    /* try *nix deir separator on WIN32 */
+    /* try *nix dir separator on WIN32 */
     if (strrchr(path, UNIX_DIR_SEPARATOR_CHAR) == NULL)
 #endif
       return 0;
@@ -135,13 +260,6 @@ has_path(const char *path)
   return 1;
 }
 
-
-/*!
- * find the command:
- * 1) if the command is specified by absolute or relative path, try it
- * 2) try to find the command in predefined path's
- * 3) trust on $PATH
- */
 
 static char *
 get_path(const char *cmd)
@@ -158,42 +276,40 @@ get_path(const char *cmd)
 
   if (!has_path(command)) {
     /* try to find the command in predefined binary paths */
-    if ((path = (char *)setFirstItem(binPathSet)) != NULL) {
+    if (NULL != (path = (char *)setFirstItem(binPathSet))) {
       do
       {
         SNPRINTF(cmdPath, sizeof cmdPath,
           "%s" DIR_SEPARATOR_STRING "%s", path, command);
 
-#ifdef _WIN32
-        /* Try if cmdPath or cmdPath.exe exist */
-        if (0 == access(cmdPath, 0) ||
-          0 == access(strncatz(cmdPath, EXE_EXT, sizeof cmdPath), 0)) {
-#else
         /* Try if cmdPath */
         if (0 == access(cmdPath, X_OK)) {
-#endif
           /* compose the command line */
           cmdLine = merge_command(cmdPath, args);
           break;
         }
-      } while ((path = (char *)setNextItem(binPathSet)) != NULL);
+      } while (NULL != (path = (char *)setNextItem(binPathSet)));
     }
-    if (cmdLine == NULL)
+    if (NULL == cmdLine)
       cmdLine = merge_command(command, args);
+
+    Safe_free(command);
+    Safe_free(args);
+
+    return cmdLine;
   }
   else {
     /*
      * the command is defined with absolute path:
      * just return it
      */
+    Safe_free(command);
+    Safe_free(args);
+
     return Safe_strdup(cmd);
   }
-
-  Safe_free(command);
-  Safe_free(args);
-
-  return cmdLine;
 }
+#endif
 
 
 /*!
@@ -206,7 +322,7 @@ my_system(const char *cmd)
   int e;
   char *cmdLine = get_path(cmd);
 
-  assert(cmdLine != NULL);
+  assert(NULL != cmdLine);
 
   if (options.verboseExec) {
       printf("+ %s\n", cmdLine);
@@ -235,7 +351,7 @@ my_popen(const char *cmd)
   FILE *fp;
   char *cmdLine = get_path(cmd);
 
-  assert(cmdLine != NULL);
+  assert(NULL != cmdLine);
 
   if (options.verboseExec) {
       printf("+ %s\n", cmdLine);

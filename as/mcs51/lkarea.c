@@ -382,7 +382,7 @@ lnkarea()
 		/*JCF: Since area BSEG is defined just before BSEG_BYTES, use the bit size of BSEG
 		to compute the byte size of BSEG_BYTES: */
 		if (!strcmp(ap->a_id, "BSEG")) {
-			ap->a_ap->a_axp->a_size=(ap->a_size+7)/8; /*Bits to bytes*/
+			ap->a_ap->a_axp->a_size=(ap->a_addr/8)+((ap->a_size+7)/8); /*Bits to bytes*/
 		}
 		else if (!strcmp(ap->a_id, "REG_BANK_0")) ta[0]=ap;
 		else if (!strcmp(ap->a_id, "REG_BANK_1")) ta[1]=ap;

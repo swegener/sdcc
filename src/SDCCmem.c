@@ -322,7 +322,7 @@ allocGlobal (symbol * sym)
       SPEC_OCLS (sym->etype) = code;
       /* if this is an interrupt service routine
          then put it in the interrupt service array */
-      if (FUNC_ISISR (sym->type))
+      if (FUNC_ISISR (sym->type) && !options.noiv)
 	{
 
 	  if (interrupts[FUNC_INTNO (sym->type)])

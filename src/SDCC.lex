@@ -76,6 +76,7 @@ struct options  save_options  ;
      P_NOGCSE    ,
      P_CALLEE_SAVES,
      P_EXCLUDE   ,
+     P_NOIV      ,
      P_LOOPREV   ,
      P_OVERLAY_	     /* I had a strange conflict with P_OVERLAY while */
      		     /* cross-compiling for MINGW32 with gcc 3.2 */
@@ -458,6 +459,9 @@ void doPragma (int op, char *cp)
     case P_EXCLUDE:
 	parseWithComma(options.excludeRegs, Safe_strdup(cp));
 	break;
+    case P_NOIV:
+	options.noiv = 1;
+	break;
     case P_LOOPREV:
 	optimize.noLoopReverse = 1;
 	break;
@@ -540,6 +544,11 @@ int process_pragma(char *s)
     
     if (strncmp(cp,PRAGMA_EXCLUDE,strlen(PRAGMA_EXCLUDE)) == 0) {
 	doPragma(P_EXCLUDE,cp+strlen(PRAGMA_EXCLUDE));
+	return 0;
+    }
+
+    if (strncmp(cp,PRAGMA_NOIV,strlen(PRAGMA_NOIV)) == 0) {
+	doPragma(P_NOIV,cp+strlen(PRAGMA_NOIV));
 	return 0;
     }
 

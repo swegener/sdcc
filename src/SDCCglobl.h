@@ -97,6 +97,7 @@ typedef int bool;
 #define PRAGMA_NOOVERLAY   "NOOVERLAY"
 #define PRAGMA_CALLEESAVES "CALLEE-SAVES"
 #define PRAGMA_EXCLUDE     "EXCLUDE"
+#define PRAGMA_NOIV        "NOIV"
 #define PRAGMA_OVERLAY     "OVERLAY"
 #define  SMALL_MODEL 0
 #define  LARGE_MODEL 1
@@ -236,6 +237,7 @@ struct options
     int useAccelerator;		/* use ds390 Arithmetic Accelerator */
     char *calleeSaves[128];	/* list of functions using callee save */
     char *excludeRegs[32];	/* registers excluded from saving */
+    int noiv;			/* do not generate irq vector table entries */
     int all_callee_saves; 	/* callee saves for all functions */
     int stack_probe;            /* insert call to function __stack_probe */
     int tini_libid;		/* library ID for TINI */

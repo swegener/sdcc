@@ -1,3 +1,10 @@
+2003-02-10  Bernhard Held <bernhard@bernhardheld.de>
+
+	* doc/sdccman.lyx: new pragma NOIV by "Johannes Stezenbach" <js@convergence.de>
+	* src/SDCC.lex: new pragma NOIV
+	* src/SDCCglobl.h: new pragma NOIV
+	* src/SDCCmem.c: new pragma NOIV
+
 2003-02-09  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCmain.c: signal handling is switched off by SDCC_LEAVE_SIGNALS

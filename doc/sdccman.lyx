@@ -5570,6 +5570,13 @@ EXCLUDE\SpecialChar ~
 none.
 \layout Itemize
 
+NOIV - Do not generate interrupt vector table entries for all ISR functions
+ defined after the pragma. This is useful in cases where the interrupt
+ vector table must be defined manually, or when there is a secondary, manually
+ defined interrupt vector table (e.g. for the autovector feature of the Cypress
+ EZ-USB FX2).
+\layout Itemize
+
 CALLEE-SAVES function1[,function2[,function3...]] - The compiler by default
  uses a caller saves convention for register saving across function calls,
  however this can cause unneccessary register pushing & popping when calling

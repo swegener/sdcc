@@ -1475,7 +1475,7 @@ ast *reverseLoop (ast *loop, symbol *sym, ast *init, ast *end)
 	        forbody
 		<sym> -= 1;
 		if (sym) goto for_continue ; 
-		<sym> = end - 1; */
+		<sym> = end */
     
     /* put it together piece by piece */
     rloop = newNode (NULLOP,
@@ -1485,8 +1485,7 @@ ast *reverseLoop (ast *loop, symbol *sym, ast *init, ast *end)
 				      NULL),NULL),
 		     newNode('=',
 			     newAst_VALUE(symbolVal(sym)),
-			     newNode('-', end,
-				     newAst_VALUE(constVal("1")))));
+			     end));
 
     replLoopSym(loop->left, sym);
 

@@ -109,6 +109,7 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
       if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
 	{
 	  newic = newiCode (SEND, IC_LEFT (ic), NULL);
+	  newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
 	}
       else
 	{
@@ -122,7 +123,8 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
       /* second one */
       if (IS_REGPARM (FUNC_ARGS(func->type)->next->etype))
 	{
-	  newic = newiCode (SEND, IC_LEFT (ic), NULL);
+	  newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+	  newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->next->etype);
 	}
       else
 	{
@@ -140,6 +142,7 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
       if (IS_REGPARM (FUNC_ARGS(func->type)->next->etype))
 	{
 	  newic = newiCode (SEND, right, NULL);
+	  newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->next->etype);
 	}
       else
 	{
@@ -155,6 +158,7 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
       if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
 	{
 	  newic = newiCode (SEND, left, NULL);
+	  newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
 	}
       else
 	{
@@ -207,8 +211,11 @@ found:
   if (!options.float_rent)
     {
       /* first one */
-      if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
-	newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+	if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) 
+	    {
+		newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+		newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+	    }
       else
 	{
 	  newic = newiCode ('=', NULL, IC_RIGHT (ic));
@@ -221,8 +228,10 @@ found:
   else
     {
       /* push the left */
-      if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
-	newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+	if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
+	    newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+	    newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+	}
       else
 	{
 	  newic = newiCode (IPUSH, IC_RIGHT (ic), NULL);
@@ -276,8 +285,10 @@ found:
   if (!options.float_rent)
     {
       /* first one */
-      if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
-	newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+	if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
+	    newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+	    newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+	}
       else
 	{
 	  newic = newiCode ('=', NULL, IC_RIGHT (ic));
@@ -291,8 +302,10 @@ found:
     {
 
       /* push the left */
-      if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
-	newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+	if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
+	    newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+	    newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+	}
       else
 	{
 	  newic = newiCode (IPUSH, IC_RIGHT (ic), NULL);
@@ -360,8 +373,10 @@ found:
   if (!options.intlong_rent)
     {
       /* first one */
-      if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
-	newic = newiCode (SEND, IC_LEFT (ic), NULL);
+	if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
+	    newic = newiCode (SEND, IC_LEFT (ic), NULL);
+	    newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+	}
       else
 	{
 	  newic = newiCode ('=', NULL, IC_LEFT (ic));
@@ -371,8 +386,10 @@ found:
       newic->lineno = lineno;
 
       /* second one */
-      if (IS_REGPARM (FUNC_ARGS(func->type)->next->etype))
-	newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+      if (IS_REGPARM (FUNC_ARGS(func->type)->next->etype)) {
+	  newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+	  newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->next->etype);
+      }
       else
 	{
 	  newic = newiCode ('=', NULL, IC_RIGHT (ic));
@@ -389,6 +406,7 @@ found:
       if (IS_REGPARM (FUNC_ARGS(func->type)->next->etype))
         {
           newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+	  newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->next->etype);
         }
       else
 	{
@@ -404,6 +422,7 @@ found:
       if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
         {
           newic = newiCode (SEND, IC_LEFT (ic), NULL);
+	  newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
         }
       else
 	{

@@ -1,3 +1,12 @@
+2004-10-22 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* device/lib/ser_ir_cts_rts.c: integer promotion caused a call to the
+	non-reentrant function __modsint in the interrupt function (thus 
+	corrupting math operations during serial I/O)
+	* device/lib/ser_ir.c: as above, changed buffersize 
+	* src/mcs51/peeph.def: added 259.a,b for removing redundant ret
+	* doc/Makefile: added option -t for rsync
+
 2004-10-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.h (struct ast),
@@ -44,7 +53,7 @@
 
 	* src/mcs51/ralloc.c (packRegisters): fixed bug #1044601
 
-2004-10-17 Maarten Brock <sourceforge.brock AT dse.nl>
+2004-10-19 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/mcs51/lkarea.c: removed old K&R style,
 	  (lnksect): changed check on boundary error,

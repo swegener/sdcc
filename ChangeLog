@@ -1,3 +1,8 @@
+2003-10-06  Borut Razem <borut.razem@siol.net>
+
+	* src/SDCC.lex: removed definition of unused variables
+	  save_optimize and save_options
+
 2003-10-06 Bernhard Held <bernhard@bernhardheld.de>
 
 	* clean.mk: removed '=' in "-maxdepth=1"

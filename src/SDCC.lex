@@ -48,8 +48,6 @@ char *currFname;
 int mylineno = 1;
 
 /* local definitions */
-static struct optimize save_optimize;
-static struct options save_options;
 static struct dbuf_s asmbuff;
 
 /* forward declarations */

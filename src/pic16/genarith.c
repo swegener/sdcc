@@ -48,6 +48,10 @@
 #include "pcode.h"
 #include "gen.h"
 
+//#define D_POS(txt) DEBUGpic16_emitcode ("; TECODEV::: " txt, " (%s:%d (%s))", __FILE__, __LINE__, __FUNCTION__)
+
+#define D_POS(msg)	DEBUGpic16_emitcode("; ", msg, "%s:%d (%s)", __FILE__, __LINE__, __FUNCTION__)
+
 #if 1
 #define pic16_emitcode	DEBUGpic16_emitcode
 #endif
@@ -74,6 +78,7 @@ const char *pic16_AopType(short type)
   case AOP_CRY:		return "AOP_CRY";
   case AOP_ACC:		return "AOP_ACC";
   case AOP_PCODE:	return "AOP_PCODE";
+  case AOP_STA:		return "AOP_STA";
   }
 
   return "BAD TYPE";
@@ -193,7 +198,7 @@ bool pic16_genPlusIncr (iCode *ic)
       //pic16_emitcode("incf","%s,f",pic16_aopGet(AOP(IC_RESULT(ic)),LSB,FALSE,FALSE));
 
       while(--size) {
-	emitSKPNZ;
+	emitSKPNC;
 	pic16_emitpcode(POC_INCF, pic16_popGet(AOP(IC_RESULT(ic)),offset++));
 	//pic16_emitcode(" incf","%s,f",pic16_aopGet(AOP(IC_RESULT(ic)),offset++,FALSE,FALSE));
       }
@@ -256,6 +261,8 @@ void pic16_outBitAcc(operand *result)
     symbol *tlbl = newiTempLabel(NULL);
     /* if the result is a bit */
     DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+
+    assert(0); // not implemented for PIC16?
 
     if (AOP_TYPE(result) == AOP_CRY){
         pic16_aopPut(AOP(result),"a",0);
@@ -523,6 +530,14 @@ static void genAddLit (iCode *ic, int lit)
 	  pic16_emitpcode(POC_INCFSZW, pic16_popGet(AOP(result),0));
 	  pic16_emitpcode(POC_INCF, pic16_popGet(AOP(result),MSB16));
 	  pic16_emitpcode(POC_INCF, pic16_popGet(AOP(result),MSB16));
+	  break;
+	default: /* 0x01LL */
+	  D_POS("FIXED: added default case for adding 0x01??");
+	  pic16_emitpcode(POC_MOVLW,pic16_popGetLit(lo));
+	  pic16_emitpcode(POC_ADDWF,pic16_popGet(AOP(result),0));
+	  emitSKPNC;
+	  pic16_emitpcode(POC_INCF, pic16_popGet(AOP(result),MSB16));
+	  pic16_emitpcode(POC_INCF, pic16_popGet(AOP(result),MSB16));
 	}	  
 	break;
 
@@ -562,10 +577,11 @@ static void genAddLit (iCode *ic, int lit)
 	  genAddLit2byte (result, MSB16, hi);
 	  break;
 	case 1:  /* 0xHH01 */
-	  pic16_emitpcode(POC_MOVLW,pic16_popGetLit((hi+1)&0xff));
-	  pic16_emitpcode(POC_INCFSZ, pic16_popGet(AOP(result),0));
+	  D_POS(">>> IMPROVED");
+	  pic16_emitpcode(POC_INCF, pic16_popGet(AOP(result),0));
 	  pic16_emitpcode(POC_MOVLW,pic16_popGetLit(hi));
-	  pic16_emitpcode(POC_ADDWF,pic16_popGet(AOP(result),MSB16));
+	  pic16_emitpcode(POC_ADDWFC,pic16_popGet(AOP(result),MSB16));
+	  D_POS("<<< IMPROVED");
 	  break;
 /*	case 0xff: * 0xHHff *
 	  pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(result),0,FALSE,FALSE));
@@ -577,9 +593,9 @@ static void genAddLit (iCode *ic, int lit)
 	  pic16_emitpcode(POC_MOVLW,pic16_popGetLit(lo));
 	  pic16_emitpcode(POC_ADDWF, pic16_popGet(AOP(result),0));
 	  pic16_emitpcode(POC_MOVLW,pic16_popGetLit(hi));
-	  emitSKPNC;
-	  pic16_emitpcode(POC_MOVLW,pic16_popGetLit((hi+1) & 0xff));
-	  pic16_emitpcode(POC_ADDWF,pic16_popGet(AOP(result),MSB16));
+	  D_POS(">>> IMPROVED");
+	  pic16_emitpcode(POC_ADDWFC,pic16_popGet(AOP(result),MSB16));
+	  D_POS("<<< IMPROVED");
 	  break;
 	}
 
@@ -596,40 +612,22 @@ static void genAddLit (iCode *ic, int lit)
 	if(carry_info) {
 	  switch(lo) {
 	  case 0:
-	    switch(carry_info) {
-	    case 1:
-	      emitSKPNZ;
-	      pic16_emitpcode(POC_INCF, pic16_popGet(AOP(result),offset));
-	      break;
-	    case 2:
-	      pic16_emitpcode(POC_RLCFW, pic16_popGet(AOP(result),offset));
-	      pic16_emitpcode(POC_ANDLW, pic16_popGetLit(1));
-	      pic16_emitpcode(POC_ADDWF, pic16_popGet(AOP(result),offset));
-	      break;
-	    default: /* carry_info = 3  */
-	      emitSKPNC;
-	      pic16_emitpcode(POC_INCF, pic16_popGet(AOP(result),offset));
-	      carry_info = 1;
-	      break;
-	    }
+	    D_POS(">>> IMPROVED and compacted");
+	    emitSKPNC;
+	    pic16_emitpcode(POC_INCF, pic16_popGet(AOP(result),offset));
+	    D_POS("<<< IMPROVED and compacted");
 	    break;
 	  case 0xff:
 	    pic16_emitpcode(POC_MOVLW,pic16_popGetLit(lo));
-	    if(carry_info==1) 
-	      emitSKPZ;
-	    else
-	      emitSKPC;
+	    D_POS(">>> Changed from SKPZ/SKPC to always SKPC");
+	    emitSKPC;
 	    pic16_emitpcode(POC_ADDWF, pic16_popGet(AOP(result),offset));
 	    break;
 	  default:
+	    D_POS(">>> IMPROVED and compacted");
 	    pic16_emitpcode(POC_MOVLW,pic16_popGetLit(lo));
-	    if(carry_info==1) 
-	      emitSKPNZ;
-	    else
-	      emitSKPNC;
-	    pic16_emitpcode(POC_MOVLW,pic16_popGetLit(lo+1));
-	    pic16_emitpcode(POC_ADDWF, pic16_popGet(AOP(result),offset));
-	    carry_info=2;
+	    pic16_emitpcode(POC_ADDWFC, pic16_popGet(AOP(result),offset));
+	    D_POS("<<< IMPROVED and compacted");
 	    break;
 	  }
 	}else {
@@ -705,8 +703,7 @@ static void genAddLit (iCode *ic, int lit)
 	case 0:
 	  pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left),0));
 	  emitMOVWF(result, 0);
-	  //pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),0,FALSE,FALSE));
-	  emitMOVWF(result,0);
+	  D_POS(">>> REMOVED double assignment");
 	  break;
 	case 1:
 	  pic16_emitpcode(POC_INCFW, pic16_popGet(AOP(left),0));
@@ -750,25 +747,26 @@ static void genAddLit (iCode *ic, int lit)
 
 	    pic16_emitpcode(POC_MOVLW, pic16_popGetLit(lit & 0xff));
 	    pic16_emitpcode(POC_ADDFW,  pic16_popGet(AOP(left),offset));
-	    pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(left),offset));
+	    D_POS(">>> FIXED from left to result");
+	    pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset));
+	    D_POS("<<< FIXED from left to result");
 
 	    clear_carry = 0;
 
 	  } else {
+	    D_POS(">>> FIXED");
 	    pic16_emitpcode(POC_MOVLW, pic16_popGetLit(lit & 0xff));
-	    //pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset,FALSE,FALSE));
-	    emitMOVWF(result,offset);
-	    pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left),offset));
-	    emitSKPNC;
-	    pic16_emitpcode(POC_INCFSZW,pic16_popGet(AOP(left),offset));
-	    pic16_emitpcode(POC_ADDWF,  pic16_popGet(AOP(result),offset));
+	    pic16_emitpcode(POC_ADDFWC, pic16_popGet(AOP(left),offset));
+	    pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset));
+	    D_POS("<<< FIXED");
 	  }
 
 	} else {
+	  D_POS(">>> IMPROVED");
 	  pic16_emitpcode(POC_CLRF,  pic16_popGet(AOP(result),offset));
-	  pic16_emitpcode(POC_RLCF,  pic16_popGet(AOP(result),offset));
 	  pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left),offset));
-	  pic16_emitpcode(POC_ADDWF, pic16_popGet(AOP(result),offset));
+	  pic16_emitpcode(POC_ADDWFC, pic16_popGet(AOP(result),offset));
+	  D_POS("<<< IMPROVED");
 	}
 	offset++;
       }
@@ -924,7 +922,7 @@ void pic16_genPlus (iCode *ic)
 				pic16_emitcode(" incf","%s,f", pic16_aopGet(AOP(IC_RESULT(ic)),0,FALSE,FALSE));
 
 			} else {
-
+				emitCLRZ; // needed here as well: INCFW is not always executed, Z is undefined then
 				pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(IC_LEFT(ic)),0));
 				pic16_emitpcode(POC_BTFSC, pic16_popGet(AOP(IC_RIGHT(ic)),0));
 				pic16_emitpcode(POC_INCFW, pic16_popGet(AOP(IC_LEFT(ic)),0));
@@ -1014,7 +1012,9 @@ void pic16_genPlus (iCode *ic)
 				// right is signed, oh dear ...
 				for(i=size; i< AOP_SIZE(result); i++) {
 					pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(result),i));
-					pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(result),size-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
+					D_POS(">>> FIXED sign test from result to right");
+					pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(right),size-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
+					D_POS("<<< FIXED sign test from result to right");
 					pic16_emitpcode(POC_COMF, pic16_popGet(AOP(result),i));
 					pic16_emitpcode(POC_MOVLW, pic16_popGet(AOP(left),i));
 					pic16_emitpcode(POC_ADDWFC, pic16_popGet(AOP(result),i));
@@ -1056,8 +1056,11 @@ void pic16_genPlus (iCode *ic)
 						pic16_emitpcode(POC_CLRF, pic16_popCopyReg(&pic16_pc_wreg));
 						pic16_emitpcode(POC_ADDWFC, pic16_popGet(AOP(left),i));
 					} else { // not same
-						pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left),i));
-						pic16_emitpcode(POC_ADDWFC, pic16_popGet(AOP(result),i));
+						D_POS (">>> FIXED added to uninitialized result");
+						pic16_emitpcode(POC_CLRF, pic16_popCopyReg(&pic16_pc_wreg));
+						pic16_emitpcode(POC_ADDFWC, pic16_popGet(AOP(left),i));
+						pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),i));
+						D_POS ("<<< FIXED");
 					}
 				}
 			} else {
@@ -1417,7 +1420,8 @@ void pic16_genMinus (iCode *ic)
 	  if(AOP_TYPE(IC_RESULT(ic)) == AOP_CRY) {
 	    if (pic16_sameRegs(AOP(IC_RIGHT(ic)), AOP(IC_RESULT(ic))) ) {
 	      if(lit & 1) {
-		pic16_emitpcode(POC_MOVLW , pic16_popGet(AOP(IC_RIGHT(ic)),0));
+		D_POS(">>> FIXED from MOVLW right(=result) to MOVLW left(=literal,left&1==1)");
+		pic16_emitpcode(POC_MOVLW , pic16_popGetLit(1));
 		pic16_emitpcode(POC_XORWF , pic16_popGet(AOP(IC_RIGHT(ic)),0));
 	      }
 	    }else{
@@ -1433,7 +1437,8 @@ void pic16_genMinus (iCode *ic)
 	    pic16_emitpcode(POC_MOVLW , pic16_popGetLit(lit & 0xff));
 	    pic16_emitpcode(POC_BTFSC , pic16_popGet(AOP(IC_RIGHT(ic)),0));
 	    pic16_emitpcode(POC_MOVLW , pic16_popGetLit((lit-1) & 0xff));
-	    pic16_emitpcode(POC_MOVWF , pic16_popGet(AOP(IC_RESULT(ic)),0));
+	    D_POS(">>> IMPROVED removed following assignment W-->result");
+	    //pic16_emitpcode(POC_MOVWF , pic16_popGet(AOP(IC_RESULT(ic)),0));
 
 	  }
 
@@ -1473,8 +1478,9 @@ void pic16_genMinus (iCode *ic)
     if( (size == 1) && ((lit & 0xff) == 0) ) {
       /* res = 0 - right */
       if (pic16_sameRegs(AOP(IC_RIGHT(ic)), AOP(IC_RESULT(ic))) ) {
-	pic16_emitpcode(POC_COMF,  pic16_popGet(AOP(IC_RIGHT(ic)),0));
-	pic16_emitpcode(POC_INCF,  pic16_popGet(AOP(IC_RIGHT(ic)),0));
+	D_POS(">>> IMPROVED changed comf,incf to negf");
+	pic16_emitpcode(POC_NEGF,  pic16_popGet(AOP(IC_RIGHT(ic)),0));
+	D_POS("<<< IMPROVED changed comf,incf to negf");
       } else { 
 	pic16_emitpcode(POC_COMFW,  pic16_popGet(AOP(IC_RIGHT(ic)),0));
 	pic16_emitpcode(POC_MOVWF,  pic16_popGet(AOP(IC_RESULT(ic)),0));
@@ -1488,62 +1494,21 @@ void pic16_genMinus (iCode *ic)
     pic16_emitpcode(POC_MOVWF,pic16_popGet(AOP(IC_RESULT(ic)),0));
 
 
-    offset = 1;
+    offset = 0;
     while(--size) {
       lit >>= 8;
-
-      if(size == 1) {
-	/* This is the last byte in a multibyte subtraction 
-	 * There are a couple of tricks we can do by not worrying about 
-	 * propogating the carry */
-	if(lit == 0xff) {
-	  /* 0xff - x == ~x */
-	  if(same) {
-	    pic16_emitpcode(POC_COMF,  pic16_popGet(AOP(IC_RESULT(ic)),offset));
-	    emitSKPC;
-	    pic16_emitpcode(POC_DECF,  pic16_popGet(AOP(IC_RESULT(ic)),offset));
-	  } else {
-	    pic16_emitpcode(POC_COMFW, pic16_popGet(AOP(IC_RIGHT(ic)),offset));
-	    pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(IC_RESULT(ic)),offset));
-	    emitSKPC;
-	    pic16_emitpcode(POC_DECF,  pic16_popGet(AOP(IC_RESULT(ic)),offset));
-	  }
-	} else {
-	    pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(IC_RIGHT(ic)),offset));
-	    emitSKPC;
-	    pic16_emitpcode(POC_INCFW, pic16_popGet(AOP(IC_RIGHT(ic)),offset));
-	    pic16_emitpcode(POC_SUBLW, pic16_popGetLit(lit & 0xff));
-	    pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(IC_RESULT(ic)),offset));
-	}
-
-	goto release;
-      }
-
+      offset++;
+      D_POS(">>> FIXED and compacted");
       if(same) {
-
-	if(lit & 0xff) {
-	  pic16_emitpcode(POC_MOVLW, pic16_popGetLit(lit & 0xff));
-	  emitSKPC;
-	  pic16_emitpcode(POC_MOVLW, pic16_popGetLit((lit & 0xff)-1));
-	  pic16_emitpcode(POC_SUBWF,  pic16_popGet(AOP(IC_RESULT(ic)),offset));
-	} else {
-	  emitSKPNC;
-	  pic16_emitpcode(POC_SUBWF,  pic16_popGet(AOP(IC_RESULT(ic)),offset));
-
-	}
+	// here we have x = lit - x   for sizeof(x)>1
+	pic16_emitpcode(POC_MOVLW, pic16_popGetLit(lit & 0xff));
+	pic16_emitpcode(POC_SUBFWB_D1,  pic16_popGet(AOP(IC_RESULT(ic)),offset));
       } else {
-
-	if(lit & 0xff) {
-	  pic16_emitpcode(POC_MOVLW, pic16_popGetLit(lit & 0xff));
-	  pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(IC_RESULT(ic)),offset));
-	} else
-	  pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(IC_RESULT(ic)),offset));
-
-	pic16_emitpcode(POC_MOVFW,  pic16_popGet(AOP(IC_RIGHT(ic)),offset));
-	emitSKPC;
-	pic16_emitpcode(POC_INCFSZW,pic16_popGet(AOP(IC_RIGHT(ic)),offset));
-	pic16_emitpcode(POC_SUBWF,  pic16_popGet(AOP(IC_RESULT(ic)),offset));
+	pic16_emitpcode(POC_MOVLW, pic16_popGetLit(lit & 0xff));
+	pic16_emitpcode(POC_SUBFWB_D0,  pic16_popGet(AOP(IC_RIGHT(ic)),offset));
+	pic16_emitpcode(POC_MOVWF,  pic16_popGet(AOP(IC_RESULT(ic)),offset));
       }
+      D_POS("<<< FIXED and compacted");
     }
   
 
@@ -1558,15 +1523,9 @@ void pic16_genMinus (iCode *ic)
       DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
       pic16_emitpcode(POC_SUBFW, pic16_popGet(AOP(IC_RIGHT(ic)),0));
       pic16_emitpcode(POC_SUBLW, pic16_popGetLit(0));
-      pic16_emitpcode(POC_MOVWF,pic16_popGet(AOP(IC_RESULT(ic)),0));
+      if ( AOP_TYPE(IC_RESULT(ic)) != AOP_ACC)
+	pic16_emitpcode(POC_MOVWF,pic16_popGet(AOP(IC_RESULT(ic)),0));
     } else {
-
-      if ( AOP_TYPE(IC_LEFT(ic)) == AOP_ACC) {
-	pic16_emitpcode(POC_SUBFW, pic16_popGet(AOP(IC_RIGHT(ic)),0));
-	pic16_emitpcode(POC_SUBLW, pic16_popGetLit(0));
-	if ( AOP_TYPE(IC_RESULT(ic)) != AOP_ACC)
-	  pic16_emitpcode(POC_MOVWF,pic16_popGet(AOP(IC_RESULT(ic)),0));
-      } else {
 
 	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	if(AOP_TYPE(IC_RIGHT(ic)) != AOP_ACC) 
@@ -1590,7 +1549,6 @@ void pic16_genMinus (iCode *ic)
 	      pic16_emitpcode(POC_MOVWF,pic16_popGet(AOP(IC_RESULT(ic)),0));
 	  }
 	}
-      }
     }
 
     /*
@@ -1607,15 +1565,17 @@ void pic16_genMinus (iCode *ic)
     size--;
 
     while(size--){
-      if (!pic16_sameRegs(AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic))) ) {
-	pic16_emitpcode(POC_MOVFW,  pic16_popGet(AOP(IC_LEFT(ic)),offset));
+      if (pic16_sameRegs(AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic)))) {
+	pic16_emitpcode(POC_MOVFW,  pic16_popGet(AOP(IC_RIGHT(ic)),offset));
+	D_POS(">>> IMPROVED by replacing emitSKPC, incfszw by subwfb");
+	pic16_emitpcode(POC_SUBWFB_D1,  pic16_popGet(AOP(IC_RESULT(ic)),offset));
+	D_POS("<<< IMPROVED by replacing emitSKPC, incfszw by subwfb");
+      } else {
+	D_POS(">>> FIXED for same regs right and result");
+	pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(IC_RIGHT(ic)),offset));
+	pic16_emitpcode(POC_SUBWFB_D0,  pic16_popGet(AOP(IC_LEFT(ic)),offset));
 	pic16_emitpcode(POC_MOVWF,  pic16_popGet(AOP(IC_RESULT(ic)),offset));
-      }
-      pic16_emitpcode(POC_MOVFW,  pic16_popGet(AOP(IC_RIGHT(ic)),offset));
-      emitSKPC;
-      pic16_emitpcode(POC_INCFSZW,pic16_popGet(AOP(IC_RIGHT(ic)),offset));
-      pic16_emitpcode(POC_SUBWF,  pic16_popGet(AOP(IC_RESULT(ic)),offset));
-
+      }	
       offset++;
     }
 
@@ -1738,10 +1698,10 @@ void pic16_genUMult16XLit_16 (operand *left,
 			default: {
 				DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
-				pct1 = pic16_popGetTempReg();
-				pct2 = pic16_popGetTempReg();
-				pct3 = pic16_popGetTempReg();
-				pct4 = pic16_popGetTempReg();
+				pct1 = pic16_popGetTempReg(1);
+				pct2 = pic16_popGetTempReg(1);
+				pct3 = pic16_popGetTempReg(1);
+				pct4 = pic16_popGetTempReg(1);
 
 				pic16_emitpcode(POC_MOVLW, pic16_popGetLit( lit & 0xff));
 				pic16_emitpcode(POC_MULWF, pic16_popGet(AOP(left), 0));
@@ -1768,10 +1728,10 @@ void pic16_genUMult16XLit_16 (operand *left,
 				pic16_emitpcode(POC_ADDFWC, pic16_pCodeOpCopy(pct4));
 				pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result), 1));
 
-				pic16_popReleaseTempReg( pct4 );
-				pic16_popReleaseTempReg( pct3 );
-				pic16_popReleaseTempReg( pct2 );
-				pic16_popReleaseTempReg( pct1 );
+				pic16_popReleaseTempReg(pct4,1);
+				pic16_popReleaseTempReg(pct3,1);
+				pic16_popReleaseTempReg(pct2,1);
+				pic16_popReleaseTempReg(pct1,1);
 			}; return;
 		}
 	} else {
@@ -1911,10 +1871,10 @@ void pic16_genUMult16X16_16 (operand *left,
 
 	if(pic16_sameRegs(AOP(result), AOP(left))) {
 
-		pct1 = pic16_popGetTempReg();
-		pct2 = pic16_popGetTempReg();
-		pct3 = pic16_popGetTempReg();
-		pct4 = pic16_popGetTempReg();
+		pct1 = pic16_popGetTempReg(1);
+		pct2 = pic16_popGetTempReg(1);
+		pct3 = pic16_popGetTempReg(1);
+		pct4 = pic16_popGetTempReg(1);
 
 		pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left), 0));
 		pic16_emitpcode(POC_MULWF, pic16_popGet(AOP(right), 0));
@@ -1941,10 +1901,10 @@ void pic16_genUMult16X16_16 (operand *left,
 		pic16_emitpcode(POC_ADDFWC, pic16_pCodeOpCopy(pct4));
 		pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result), 1));
 
-		pic16_popReleaseTempReg( pct4 );
-		pic16_popReleaseTempReg( pct3 );
-		pic16_popReleaseTempReg( pct2 );
-		pic16_popReleaseTempReg( pct1 );
+		pic16_popReleaseTempReg( pct4, 1 );
+		pic16_popReleaseTempReg( pct3, 1 );
+		pic16_popReleaseTempReg( pct2, 1 );
+		pic16_popReleaseTempReg( pct1, 1 );
 
 	} else {
 
@@ -2082,10 +2042,10 @@ void pic16_genUMult32XLit_32 (operand *left,
 			default: {
 				DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
-				pct1 = pic16_popGetTempReg();
-				pct2 = pic16_popGetTempReg();
-				pct3 = pic16_popGetTempReg();
-				pct4 = pic16_popGetTempReg();
+				pct1 = pic16_popGetTempReg(1);
+				pct2 = pic16_popGetTempReg(1);
+				pct3 = pic16_popGetTempReg(1);
+				pct4 = pic16_popGetTempReg(1);
 
 				pic16_emitpcode(POC_MOVLW, pic16_popGetLit( lit & 0xff));
 				pic16_emitpcode(POC_MULWF, pic16_popGet(AOP(left), 0));
@@ -2112,10 +2072,10 @@ void pic16_genUMult32XLit_32 (operand *left,
 				pic16_emitpcode(POC_ADDFWC, pic16_pCodeOpCopy(pct4));
 				pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result), 1));
 
-				pic16_popReleaseTempReg( pct4 );
-				pic16_popReleaseTempReg( pct3 );
-				pic16_popReleaseTempReg( pct2 );
-				pic16_popReleaseTempReg( pct1 );
+				pic16_popReleaseTempReg( pct4, 1 );
+				pic16_popReleaseTempReg( pct3, 1 );
+				pic16_popReleaseTempReg( pct2, 1 );
+				pic16_popReleaseTempReg( pct1, 1 );
 			}; return;
 		}
 	} else {
@@ -2190,10 +2150,10 @@ void pic16_genUMult32X32_32 (operand *left,
 
 	if(pic16_sameRegs(AOP(result), AOP(left))) {
 
-		pct1 = pic16_popGetTempReg();
-		pct2 = pic16_popGetTempReg();
-		pct3 = pic16_popGetTempReg();
-		pct4 = pic16_popGetTempReg();
+		pct1 = pic16_popGetTempReg(1);
+		pct2 = pic16_popGetTempReg(1);
+		pct3 = pic16_popGetTempReg(1);
+		pct4 = pic16_popGetTempReg(1);
 
 		pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left), 0));
 		pic16_emitpcode(POC_MULWF, pic16_popGet(AOP(right), 0));
@@ -2220,10 +2180,10 @@ void pic16_genUMult32X32_32 (operand *left,
 		pic16_emitpcode(POC_ADDFWC, pic16_pCodeOpCopy(pct4));
 		pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result), 1));
 
-		pic16_popReleaseTempReg( pct4 );
-		pic16_popReleaseTempReg( pct3 );
-		pic16_popReleaseTempReg( pct2 );
-		pic16_popReleaseTempReg( pct1 );
+		pic16_popReleaseTempReg( pct4, 1 );
+		pic16_popReleaseTempReg( pct3, 1 );
+		pic16_popReleaseTempReg( pct2, 1 );
+		pic16_popReleaseTempReg( pct1, 1 );
 
 	} else {
 

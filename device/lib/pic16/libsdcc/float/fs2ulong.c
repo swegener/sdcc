@@ -29,8 +29,7 @@ union float_long
 };
 
 /* convert float to unsigned long */
-unsigned long __fs2ulong (float a1)
-// reentrant
+unsigned long __fs2ulong (float a1) _FS_REENTRANT
 {
   volatile union float_long fl1;
   volatile int exp;

@@ -18,6 +18,34 @@ Scott Dattalo	<scott AT dattalo.com>
 
 ======================================================================
 ======================================================================
+2004-Sep-27 Vangelis Rokas
+1. Function parameters have been extended to cover functions with
+variable arguments. Now function parameters follow the rules below:
+
+  a) void foo(long a, int b, char c)
+     void foo(long a, int b, char c) reentrant
+
+Stack layout: c, b+1, b, a+3, a+2, a+1 and WREG = a
+
+  b) prototype: void foo(long a, int b, ...)
+
+	example: foo(0xaaffeedd, 0xbbcc, 0x4455, 0x7788);
+
+Stack layout: 0x77, 0x88, 0x44, 0x55, 0xbb, 0xcc, 0xaa, 0xff, 0xee, 0xdd
+
+WREG is not used in functions with variable arguments so that the address
+of the first parameter can be taken.
+
+
+
+
+2004-Sep-24 Vangelis Rokas
+1. Began implementation of generic pointers, current specs are:
+	0x0 xxxxxxx -> code pointer
+	0x8 xxxxxxx -> data pointer
+	0x4 xxxxxxx -> eeprom pointer (currently unimplemented)
+
+
 2004-Aug-30 Vangelis Rokas
 1. A few months ago Hans Dorn had the idea to support general pointer
 for accessing all code, eeprom data and data ram memory. These pointers

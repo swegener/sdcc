@@ -32,8 +32,7 @@
 #include <float.h>
 
 /* convert signed long to float */
-float __slong2fs (signed long sl)
-//reentrant
+float __slong2fs (signed long sl) _FS_REENTRANT
 {
   if (sl<0) 
     return -__ulong2fs(-sl);

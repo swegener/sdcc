@@ -516,7 +516,7 @@ allocReg (short type)
 
 	reg->isFree=0;
 
-//	debugLog ("%s of type %s for register rIdx: %d\n", __FUNCTION__, debugLogRegType (type), dynrIdx-1);
+	debugLog ("%s of type %s for register rIdx: %d (0x%x)\n", __FUNCTION__, debugLogRegType (type), dynrIdx-1, dynrIdx-1);
 
 //	fprintf(stderr,"%s:%d: %s\t%s addr= 0x%x\trIdx= 0x%02x isFree: %d\n",
 //		__FILE__, __LINE__, __FUNCTION__, reg->name, reg->address, reg->rIdx, reg->isFree);
@@ -752,7 +752,8 @@ pic16_allocDirReg (operand *op )
 		return NULL;
 	}
 
-
+	if(IS_ITEMP(op))return NULL;
+	
 	debugLog ("%s:%d symbol name %s\n", __FUNCTION__, __LINE__, name);
 //	fprintf(stderr, "%s symbol name %s\n", __FUNCTION__,name);
 
@@ -803,10 +804,12 @@ pic16_allocDirReg (operand *op )
 		}
 
 
+#if 0
 		if(OP_SYMBOL(op)->onStack) {
 			fprintf(stderr, "%s:%d onStack %s offset: %d\n", __FILE__, __LINE__,
 				OP_SYMBOL(op)->name, OP_SYMBOL(op)->stack);
 		}
+#endif
 
 		if(!IN_DIRSPACE( SPEC_OCLS( OP_SYM_ETYPE(op)))
 			|| !IN_FARSPACE(SPEC_OCLS( OP_SYM_ETYPE(op))) ) {
@@ -4147,9 +4150,10 @@ pic16_assignRegisters (eBBlock ** ebbs, int count)
   /* and serially allocate registers */
   serialRegAssign (ebbs, count);
 
-//  debugLog ("ebbs after serialRegAssign:\n");
-//  dumpEbbsToDebug (ebbs, count);
-
+#if 0
+  debugLog ("ebbs after serialRegAssign:\n");
+  dumpEbbsToDebug (ebbs, count);
+#endif
 
   //pic16_freeAllRegs();
 

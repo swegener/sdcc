@@ -3863,11 +3863,13 @@ pCodeOp *pic16_newpCodeOpLit(int lit)
   pcop->type = PO_LITERAL;
 
   pcop->name = NULL;
-  if(lit>=0) {
-    sprintf(s,"0x%02x",lit);
-    if(s)
-      pcop->name = Safe_strdup(s);
-  }
+//  if(lit>=0)
+    sprintf(s,"0x%02hhx",(char)(lit));
+//  else
+//    sprintf(s, "%i", lit);
+  
+  if(s)
+    pcop->name = Safe_strdup(s);
 
   ((pCodeOpLit *)pcop)->lit = lit;
 
@@ -4707,7 +4709,7 @@ char *pic16_pCode2str(char *str, size_t size, pCode *pc)
 	if(isPCI(pc) && (PCI(pc)->pci_magic != PCI_MAGIC)) {
 		fprintf(stderr, "%s:%d: pCodeInstruction initialization error in instruction %s, magic is %x (defaut: %x)\n",
 			__FILE__, __LINE__, PCI(pc)->mnemonic, PCI(pc)->pci_magic, PCI_MAGIC);
-		exit(-1);
+//		exit(-1);
 	}
 #endif
 
@@ -6107,7 +6109,7 @@ static void insertBankSwitch(unsigned char position, pCode *pc)
 				len = sizeof(pCodeInstruction) - ofs1 - sizeof( char const * const *);
 				ofs1 += strlen( PCI(pcprev)->mnemonic) + 1;
 				ofs2 += strlen( PCI(npci)->mnemonic) + 1;
-				memcpy(&PCI(npci)->from, &PCI(pcprev)->from, (unsigned int)(&(PCI(npci)->pci_magic)) - (unsigned int)(&(PCI(npci)->from)));
+				memcpy(&PCI(npci)->from, &PCI(pcprev)->from, (char *)(&(PCI(npci)->pci_magic)) - (char *)(&(PCI(npci)->from)));
 				PCI(npci)->op = PCI(pcprev)->inverted_op;
 				
 				/* unlink old pCode */
@@ -6118,7 +6120,7 @@ static void insertBankSwitch(unsigned char position, pCode *pc)
 				
 				/* extra instructions to handle invertion */
 				pcnext = pic16_newpCode(POC_GOTO, pic16_popGetLabel(tlbl->key));
-			  	pic16_pCodeInsertAfter(pc->prev, pcnext);
+			  	pic16_pCodeInsertAfter(npci, pcnext);
 			  	pic16_pCodeInsertAfter(pc->prev, new_pc);
 			  	
 			  	pcnext = pic16_newpCodeLabel(NULL,tlbl->key+100+pic16_labelOffset);

@@ -32,8 +32,7 @@
 #include <float.h>
 
 /* convert signed char to float */
-float __schar2fs (signed char sc)
-// reentrant
+float __schar2fs (signed char sc) _FS_REENTRANT
 {
   return __slong2fs(sc);
 }

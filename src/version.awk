@@ -1,7 +1,7 @@
 BEGIN {
 print "/*"
 print " * version.h"
-print " * controllong build version number"
+print " * control long build version number"
 print " *"
 print " * Created automatically with version.awk script"
 print " *"

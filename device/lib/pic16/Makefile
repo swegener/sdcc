@@ -50,4 +50,3 @@ all-dep:
 	for temp in $(DIRS) ; do \
 		$(MAKE) -C $$temp dep ; \
 	done
-	

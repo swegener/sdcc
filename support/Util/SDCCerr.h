@@ -194,6 +194,7 @@ SDCCERR - SDCC Standard error handler
 #define E_SIZEOF_INCOMPLETE_TYPE      176 /* sizeof applied to an incomplete type */
 #define E_PREVIOUS_DEF                177 /* previously defined here */
 #define W_SIZEOF_VOID                 178 /* size of void is zero */
+#define W_POSSBUG2                    179 /* possible bug, new format */
 
 #define MAX_ERROR_WARNING             256 /* size of disable warnings array */
 

@@ -27,35 +27,23 @@
    has the same precision as the input.
 */
 
+#include <sdcc-lib.h>
+
 union uu {
 	struct { unsigned char lo,hi ;} s;
         unsigned int t;
 } ;
 
-int _mulint (int a, int b)
+int _mulint (int a, int b) _IL_REENTRANT
 {
-#if 0
-  register union uu *x;
-  register union uu *y;
-  union uu t;
-
-	x = (union uu *)&a;
-	y = (union uu *)&b;
-
-        t.t = x->s.lo * y->s.lo;
-        t.s.hi += (x->s.lo * y->s.hi) + (x->s.hi * y->s.lo);
-
-       return t.t;
-#else
   union uu x;
   union uu y;
   union uu t;
 
-        x.t = a;
-        y.t = b;
-        t.t = x.s.lo * y.s.lo;
-        t.s.hi += (x.s.lo * y.s.hi) + (x.s.hi * y.s.lo);
+    x.t = a;
+    y.t = b;
+    t.t = x.s.lo * y.s.lo;
+    t.s.hi += (x.s.lo * y.s.hi) + (x.s.hi * y.s.lo);
 
   return t.t;
-#endif
 }

@@ -15,7 +15,8 @@
 DIRS	=	char \
 		int \
 		long \
-		float
+		float \
+		gptr
 
 
 LIB	= libsdcc.lib
@@ -28,7 +29,7 @@ build-libraries:
 	for dir in $(DIRS) ; do	 \
 		$(MAKE) -C $$dir ; \
 	done;
-	gplib -c $(LIB) char/*.o int/*.o long/*.o float/*.o
+	gplib -c $(LIB) char/*.o int/*.o long/*.o float/*.o gptr/*.o
 	mv -v $(LIB) ../bin
 	
 

@@ -33,8 +33,7 @@
 #include <float.h>
 
 /* convert float to signed char */
-signed char __fs2schar (float f)
-// reentrant
+signed char __fs2schar (float f) _FS_REENTRANT
 {
   signed long sl=__fs2slong(f);
   if (sl>=CHAR_MAX)

@@ -29,8 +29,7 @@ union float_long
   };
 
 /* compare two floats */
-char __fslt (float a1, float a2)
-// reentrant
+char __fslt (float a1, float a2) _FS_REENTRANT
 {
   volatile union float_long fl1, fl2;
 

@@ -25,10 +25,11 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
+#include <sdcc-lib.h>
 
 #define MSB_SET(x) ((x >> (8*sizeof(x)-1)) & 1) 
 
-unsigned char _moduchar (unsigned char a, unsigned char b)
+unsigned char _moduchar (unsigned char a, unsigned char b) _IL_REENTRANT
 {
   unsigned char count = 0;
     

@@ -22,9 +22,11 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
+#include <sdcc-lib.h>
+
 unsigned long _modulong (unsigned long a, unsigned long b);
 
-long _modslong (long a, long b)
+long _modslong (long a, long b) _IL_REENTRANT
 {
   long r;
 

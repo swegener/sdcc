@@ -76,8 +76,6 @@ extern void initialComments (FILE * afile);
 extern void printPublics (FILE * afile);
 
 void  pic16_pCodeInitRegisters(void);
-pCodeOp *pic16_popGetLit(unsigned int lit);
-pCodeOp *pic16_popGetLit2(unsigned int lit, pCodeOp *arg2);
 pCodeOp *pic16_popCopyReg(pCodeOpReg *pc);
 extern void pic16_pCodeConstString(char *name, char *value);
 
@@ -298,8 +296,11 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 					  sectSym *ssym;
 					  int found=0;
 				  
+#if 0
 					  	fprintf(stderr, "%s:%d sym->rname: %s reg: %p reg->name: %s\n", __FILE__, __LINE__,
 					  		sym->rname, reg, (reg?reg->name:"<<NULL>>"));
+#endif
+
 #if 1
 					  	for(ssym=setFirstItem(sectSyms); ssym; ssym=setNextItem(sectSyms)) {
 					  		if(!strcmp(ssym->name, reg->name))found=1;
@@ -558,18 +559,27 @@ void pic16_printPointerType (const char *name, char ptype, void *p)
 /* printGPointerType - generates ival for generic pointer type     */
 /*-----------------------------------------------------------------*/
 void pic16_printGPointerType (const char *iname, const char *oname, const unsigned int itype,
-                   const unsigned int type, char ptype, void *p)
+  const unsigned int type, char ptype, void *p)
 {
-  _pic16_printPointerType (iname, ptype, p);
+  char buf[256];
+  
+    _pic16_printPointerType (iname, ptype, p);
 
-  if(itype == FPOINTER || itype == CPOINTER) {	// || itype == GPOINTER) {
-    char buf[256];
+    switch( itype ) {
+      case FPOINTER:
+      case CPOINTER:
+        {
+          sprintf(buf, "UPPER(%s)", iname);
+          pic16_emitDS(buf, ptype, p);
+        }; break;
+      case POINTER:
+      case IPOINTER:
+        sprintf(buf, "0x80");
+        pic16_emitDS(buf, ptype, p);
+        break;
+    }
 
-	sprintf(buf, "UPPER(%s)", iname);
-	pic16_emitDS(buf, ptype, p);
-  }
-
-  pic16_flushDB(ptype, p);
+    pic16_flushDB(ptype, p);
 }
 
 
@@ -1055,7 +1065,9 @@ void pic16_printIvalPtr (symbol * sym, sym_link * type, initList * ilist, char p
             pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
             pic16_emitDB(pic16aopLiteral(val, 1), ptype, p);
             pic16_emitDB(pic16aopLiteral(val, 2), ptype, p);
+            break;
         default:
+        	fprintf(stderr, "%s:%d size = %d\n", __FILE__, __LINE__, getSize(type));
         	assert(0);
         }
       return;

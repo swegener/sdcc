@@ -34,8 +34,7 @@
 #include <float.h>
 
 /* convert float to signed int */
-signed int __fs2sint (float f)
-// reentrant
+signed int __fs2sint (float f) _FS_REENTRANT
 {
   signed long sl=__fs2slong(f);
   if (sl>=INT_MAX)

@@ -1907,7 +1907,8 @@ static int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 
       /* Compare the operands */
       if(PCI(pcd)->pcop) {
-	if (PCI(pcd)->pcop->type == PO_WILD) {
+	/* assert that optimizations do not touch operations that work on SFRs or INDF registers */
+	if ((PCI(pcd)->pcop->type == PO_WILD) && (!(PCI(pcs)->pcop) || ((PCI(pcs)->pcop->type != PO_SFR_REGISTER) && (PCI(pcs)->pcop->type != PO_INDF0)))) {
 	  index = PCOW(PCI(pcd)->pcop)->id;
 	  //DFPRINTF((stderr,"destination is wild\n"));
 #ifdef DEBUG_PCODEPEEP
@@ -1961,9 +1962,10 @@ static int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 //	      return 1;
 	    }
 	  }
-  
+
 	  /* now check whether the second operand matches */
-	  if(PCOW2(PCI(pcd)->pcop) && (PCOR2(PCI(pcd)->pcop)->pcop2->type == PO_WILD)) {
+	  /* assert that optimizations do not touch operations that work on SFRs or INDF registers */
+	  if(PCOW2(PCI(pcd)->pcop) && (PCOR2(PCI(pcd)->pcop)->pcop2->type == PO_WILD) && (!(PCOR2(PCI(pcs)->pcop)->pcop2) || ((PCOR2(PCI(pcs)->pcop)->pcop2->type != PO_SFR_REGISTER) && (PCOR2(PCI(pcs)->pcop)->pcop2) && (PCOR2(PCI(pcs)->pcop)->pcop2->type != PO_INDF0)))) {
 	
 //		fprintf(stderr, "%s:%d %s second operand is wild\n", __FILE__, __LINE__, __FUNCTION__);
 	
@@ -2018,11 +2020,16 @@ static int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 			}
 		}
 	  
-	} else return (havematch);
+	  } else if (PCOW2(PCI(pcd)->pcop) && (PCOR2(PCI(pcd)->pcop)->pcop2->type == PO_WILD) && PCOR2(PCI(pcs)->pcop)->pcop2)
+	    {
+	      return 0;
+	    } else {
+	      return havematch;
+	    }
 #if 0
 	 else if (PCI(pcd)->pcop->type == PO_LITERAL) {
 	  return (havematch &&
-	  	pCodeOpCompare(PCOR2(PCI(pcs)->pcop)->pcop2, PCOR2(PCI(pcd)->pcop)->pcop2);
+	  	pCodeOpCompare(PCOR2(PCI(pcs)->pcop)->pcop2, PCOR2(PCI(pcd)->pcop)->pcop2));
 
 	}
 #endif

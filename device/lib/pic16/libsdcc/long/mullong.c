@@ -24,6 +24,8 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
+#include <sdcc-lib.h>
+
 union bil {
         struct {unsigned char b0,b1,b2,b3 ;} b;
         struct {unsigned short lo,hi ;} i;
@@ -52,7 +54,7 @@ union bil {
                           |-------> only this side 32 x 32 -> 32
 */
 
-long _mullong (long a, long b)
+long _mullong (long a, long b) _IL_REENTRANT
 {
 #if 0
         union bil t;

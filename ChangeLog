@@ -1,3 +1,75 @@
+2004-10-01 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* .version: bumped version number to 2.4.5
+	* support/Util/SDCCerr.h: added warning W_POSSBUG2.
+	* support/Util/SDCCerr.c (messages structure): added entry for
+	W_POSSBUG2
+	
+	Large cumulative patch for pic16 port and libraries.
+	* device/include/pic16/sdcc-lib.h,
+	* device/include/pic16/stdarg.h,
+	* device/include/asm/pic16/features.h: NEW,
+	* device/include/pic16/float.h: changes reentrant keyword with
+	_FS_REENTRANT, added prototype for __fsneq, included sdcc-lib.h
+	* device/lib/pic16/libsdcc/Makefile: added target directory gptr,
+	updated target build-libraries to include objects from gptr,
+	* device/lib/pic16/libsdcc/{char,int,long}/*.c: added macro
+	_IL_REENTRANT to all function headings, included sdcc-lib.h header,
+	* device/lib/pic16/libsdcc/float/*.c: added macro _FS_REENTRANT to
+	all function headings,
+	* src/SDCCmain.c: added global parameter userIncDirsSet,
+	* (parseCmdLine): when option -I is encountered add directory to
+	userIncDirsSet too,
+	* src/version.awk: added space between control and long,
+	* src/pic16/NOTES: added some notes for the port,
+	* src/pic16/gen.c: added prototype for mov2fp function,
+	* (fReturnpic16[]): properly named return value registers,
+	* (_G structure): added fields stackRegSet, fregsUsed, stack_lat,
+	* (aopForSym): added code to handle symbols with onStack flag set,
+	symbols onStack are allocated PTRSIZE bytes,
+	* (aopFreeAsmop): handles special case where asmops are stack objects,
+	* (aopGet, pic16_popGet): adde cod to handle new asmop AOP_STA,
+	* (pic16_popGetTempReg, pic16_popGetTempRegCond, pic16_popReleaseTempReg):
+	added argument lock to trace flaws in allocating temporary registers
+	when developing port,
+	* (pic16_popGetLit, pic16_popGetLit2): changed lit from unsigned to signed
+	* (pic16_popRegFromString): reenabled allocating a direct register
+	from string,
+	* (assignResultValue): various beautifications,
+	* fixed bug #1037717 (patch from R. Neider & D. Wrinkler) with mistaken
+	referenced function argument,
+	* (genIpush): reenabled to allow stacked arguments, handles only
+	ic->parmPush iCodes,
+	* (genCall, genPcall): major changes to allow for variable argument
+	functions, fixed a bug with falsely restoring stack pointer after
+	returning from call,
+	* (genFunction): pending code for critical function,
+	* (shiftR1Left2ResultSigned, shiftR1Left2Result, shiftL2Left2Result,
+	* (shiftR2Left2Result, shiftLLong) applied patch #1032155 from R.Neider,
+	* (genNearPointerGet): fixed bug with indirect reading, was always
+	reading from INDF0
+	* (genGenPointerGet, genGenPointerSet): rewrote to support generic
+	pointers,
+	* (genAddrOf): rewrote code to take address of a stacked function parameter
+	* (genCast): fixed casting to generic pointer type,
+	* src/pic16/gen.h: added AOP_STA,
+	* (struct asmop): added field stk,
+	* src/pic16/genarith.c (pic16_AopType): handle AOP_STA,
+	* (pic16_genPlusIncr): changed emitSKPNZ to emitSKPNZ,
+	* (pic16_genAddLit, pic16_genPlus): applied patch #1034042 by tecodev,
+	* (pic16_genMinus): fixed bug #1035119 with patch submitted by tecodev,
+	* src/pic16/genutils.c (pic16_genNot): removed symbol *tlbl,
+	* src/pic16/glue.c (pic16_printGPPointerType): fixed to support new
+	generic pointers,
+	* src/pic16/main.c (_pic16_initPaths): ignores default SDCC include
+	and library paths,
+	* (pic16_port structure): generic pointer size is set to 3,
+	* src/pic16/pcode.c (pic16_newpCodeOpLit): correctly print literal integer,
+	* (insertBankSwitch): cast to (char *) to prevent 64bit CPUs'
+	compiler warning,
+	* src/pic16/ralloc.c (allocReg): prevent allocating register when
+	operand is an iTemp,
+
 2004-09-24 Martin Helmling <mh AT octo-soft.de>
 
 	* debugger/mcs51/cmd.c: set PC if a symbol at pc reg is set

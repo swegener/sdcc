@@ -414,6 +414,9 @@ struct
    "previously defined here" },
 { W_SIZEOF_VOID, ERROR_LEVEL_WARNING,
    "size of void is zero" },
+{ W_POSSBUG2, ERROR_LEVEL_WARNING,
+   "possible code generation error at %s line %d,\n"
+   " please report problem and send source code at SDCC-USER list on SF.Net"},
 };
 
 /*

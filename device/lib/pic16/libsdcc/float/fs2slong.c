@@ -32,8 +32,7 @@
 #include <float.h>
 
 /* convert float to signed long */
-signed long __fs2slong (float f)
-// reentrant
+signed long __fs2slong (float f) _FS_REENTRANT
 {
 
   if (!f)

@@ -69,7 +69,7 @@
 void pic16_genNot (iCode *ic)
 {
   int size;
-  symbol *tlbl;
+//  symbol *tlbl;
 
 /*
  * result[AOP_CRY,AOP_REG]  = ! left[AOP_CRY, AOP_REG]
@@ -106,8 +106,6 @@ void pic16_genNot (iCode *ic)
 #endif
 
 	pic16_toBoolean( IC_LEFT(ic) );
-	
-	tlbl = newiTempLabel(NULL);
 	emitSETC;
 	pic16_emitpcode(POC_TSTFSZ, pic16_popCopyReg( &pic16_pc_wreg ));
 	emitCLRC;
@@ -299,6 +297,8 @@ void pic16_DumpAop(char *prefix, asmop *aop)
 		DEBUGpic16_emitcode (";", " %s type:AOP_R1",prefix);
 	if (aop->type == AOP_STK)
 		DEBUGpic16_emitcode (";", " %s type:AOP_STK",prefix);
+	if (aop->type == AOP_STA)
+		DEBUGpic16_emitcode (";", " %s type:AOP_STA",prefix);
 	if (aop->type == AOP_IMMD)
 	{
 		DEBUGpic16_emitcode (";", " %s type:AOP_IMMD",prefix);

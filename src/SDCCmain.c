@@ -76,6 +76,7 @@ set *libPathsSet = NULL;
 set *relFilesSet = NULL;
 set *dataDirsSet = NULL;        /* list of data search directories */
 set *includeDirsSet = NULL;     /* list of include search directories */
+set *userIncDirsSet = NULL;	/* list of user include directories */
 set *libDirsSet = NULL;         /* list of lib search directories */
 
 /* uncomment JAMIN_DS390 to always override and use ds390 port
@@ -1234,7 +1235,10 @@ parseCmdLine (int argc, char **argv)
                 SNPRINTF (buffer, sizeof(buffer),
                   ((sOpt == 'I') ? "-%c\"%s\"": "-%c%s"), sOpt, rest);
                 addSet(&preArgvSet, Safe_strdup(buffer));
-                if(sOpt == 'I')addSet(&includeDirsSet, Safe_strdup(rest));
+                if(sOpt == 'I') {
+                  addSet(&includeDirsSet, Safe_strdup(rest));
+                  addSet(&userIncDirsSet, Safe_strdup(rest));
+                }
               }
               break;
 
@@ -2224,6 +2228,7 @@ main (int argc, char **argv, char **envp)
   parseCmdLine (argc, argv);
 
   initValues ();
+
   setBinPaths(argv[0]);
   setDataPaths(argv[0]);
 

@@ -46,7 +46,8 @@ enum
     AOP_FSR0,
     AOP_FSR1,
     AOP_FSR2,
-    AOP_PCODE
+    AOP_PCODE,
+    AOP_STA		// asmop on stack
   };
 
 /* type asmop : a homogenised type for 
@@ -85,6 +86,10 @@ typedef struct asmop
 	char *aop_str[4];	/* just a string array containing the location */
 /*	regs *aop_alloc_reg;     * points to a dynamically allocated register */
 	pCodeOp *pcop;
+	struct {
+	  int stk;
+	  pCodeOp *pop[4];
+        } stk;
       }
     aopu;
   }
@@ -173,12 +178,13 @@ void pic16_genMinus (iCode *ic);
 pCodeOp *pic16_popGetLabel(unsigned int key);
 pCodeOp *pic16_popCopyReg(pCodeOpReg *pc);
 pCodeOp *pic16_popCopyGPR2Bit(pCodeOp *pc, int bitval);
-pCodeOp *pic16_popGetLit(unsigned int lit);
-pCodeOp *pic16_popGetLit2(unsigned int lit, pCodeOp *arg2);
+pCodeOp *pic16_popGetLit(int lit);
+pCodeOp *pic16_popGetLit2(int lit, pCodeOp *arg2);
 pCodeOp *popGetWithString(char *str);
 pCodeOp *pic16_popGet (asmop *aop, int offset);//, bool bit16, bool dname);
-pCodeOp *pic16_popGetTempReg(void);
-void pic16_popReleaseTempReg(pCodeOp *pcop);
+pCodeOp *pic16_popGetTempReg(int lock);
+pCodeOp *pic16_popGetTempRegCond(bitVect *, int lock);
+void pic16_popReleaseTempReg(pCodeOp *pcop, int lock);
 
 pCodeOp *pic16_popCombine2(pCodeOpReg *src, pCodeOpReg *dst, int noalloc);
 

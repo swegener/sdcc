@@ -28,8 +28,7 @@ union float_long
     long l;
   };
 
-float __ulong2fs (unsigned long a )
-// reentrant
+float __ulong2fs (unsigned long a ) _FS_REENTRANT
 {
   int exp = 24 + EXCESS;
   volatile union float_long fl;

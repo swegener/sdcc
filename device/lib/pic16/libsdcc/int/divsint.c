@@ -23,10 +23,11 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
+#include <sdcc-lib.h>
 
 unsigned unsigned _divuint (unsigned a, unsigned b);
 
-int _divsint (int a, int b)
+int _divsint (int a, int b) _IL_REENTRANT
 {
   register int r;
 

@@ -29,8 +29,7 @@ union float_long
   };
 
 /* subtract two floats */
-float __fssub (float a1, float a2)
-// reentrant
+float __fssub (float a1, float a2) _FS_REENTRANT
 {
   volatile union float_long fl1, fl2;
 

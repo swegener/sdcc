@@ -22,9 +22,11 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
+#include <sdcc-lib.h>
+
 unsigned unsigned _moduint (unsigned a, unsigned b);
 
-int _modsint (int a, int b)
+int _modsint (int a, int b) _IL_REENTRANT
 {
        register int r;
        

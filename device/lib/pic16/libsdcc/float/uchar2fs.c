@@ -32,8 +32,7 @@
 #include <float.h>
 
 /* convert unsigned char to float */
-float __uchar2fs (unsigned char uc)
-// reentrant
+float __uchar2fs (unsigned char uc) _FS_REENTRANT
 {
   return __ulong2fs(uc);
 }

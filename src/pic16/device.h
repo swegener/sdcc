@@ -85,23 +85,21 @@ typedef struct PIC16_device {
 
 /* Given a pointer to a register, this macro returns the bank that it is in */
 #define REG_ADDR(r)        ((r)->isBitField ? (((r)->address)>>3) : (r)->address)
-//#define REG_BANK(r)        (pic16_finalMapping[REG_ADDR(r)].bank)
-//#define REG_isALIASED(r)   (pic16_finalMapping[REG_ADDR(r)].alias != 0)
-//#define REG_isVALID(r)     (pic16_finalMapping[REG_ADDR(r)].isValid)
 
 
 typedef struct {
-	int no_banksel;
-	int opt_banksel;
-	int omit_configw;
-	int omit_ivt;
-	int leave_reset;
-	int stack_model;
-	int ivt_loc;
-	int nodefaultlibs;
-	int dumpcalltree;
-	char *crt_name;
-	int no_crt;
+  int no_banksel;
+  int opt_banksel;
+  int omit_configw;
+  int omit_ivt;
+  int leave_reset;
+  int stack_model;
+  int ivt_loc;
+  int nodefaultlibs;
+  int dumpcalltree;
+  char *crt_name;
+  int no_crt;
+  int ip_stack;
 } pic16_options_t;
 
 #define STACK_MODEL_SMALL	(pic16_options.stack_model == 0)

@@ -27,8 +27,7 @@ union float_long
   };
 
 /* add two floats */
-float __fsadd (float a1, float a2)
-// reentrant
+float __fsadd (float a1, float a2) _FS_REENTRANT
 {
   volatile long mant1, mant2;
   volatile union float_long fl1, fl2;

@@ -25,10 +25,11 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
+#include <sdcc-lib.h>
 
 unsigned char _divuchar (unsigned char a, unsigned char b);
 
-char _divschar (char a, char b)
+char _divschar (char a, char b) _IL_REENTRANT
 {
   register char r;
   char ta, tb;

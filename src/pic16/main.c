@@ -100,41 +100,32 @@ extern void pic16_emitIDRegs(FILE *of);
 static void
 _pic16_init (void)
 {
-	asm_addTree (&asm_asxxxx_mapping);
-	pic16_pCodeInitRegisters();
-	maxInterrupts = 2;
-
-	/* set pic16 port options to defaults */
-	pic16_options.no_banksel = 0;
-	pic16_options.opt_banksel = 0;
-	pic16_options.omit_configw = 0;
-	pic16_options.omit_ivt = 0;
-	pic16_options.leave_reset = 0;
-	pic16_options.stack_model = 0;			/* 0 for 'small', 1 for 'large' */
-	pic16_options.ivt_loc = 0x000000;		/* default location of interrupt vectors */
-	pic16_options.nodefaultlibs = 0;		/* link default libraries */
-	pic16_options.dumpcalltree = 0;
+  asm_addTree (&asm_asxxxx_mapping);
+  pic16_pCodeInitRegisters();
+  maxInterrupts = 2;
 }
 
 static void
-_pic16_reset_regparm ()
+_pic16_reset_regparm (void)
 {
-	regParmFlg = 0;
+  regParmFlg = 0;
 }
 
 static int
 _pic16_regparm (sym_link * l)
 {
-	/* for this processor it is simple
-	 * can pass only the first parameter in a register */
-	if(pic16_fstack) {
-		if(regParmFlg)return 0;
-		regParmFlg = 1;
-	  return 1;
-	} else {
-		regParmFlg++;// = 1;
-	  return 1;
-	}
+  /* force all parameters via SEND/RECEIVE */
+  if(0 /*pic16_options.ip_stack*/) {
+    /* for this processor it is simple
+     * can pass only the first parameter in a register */
+    if(regParmFlg)return 0;
+      regParmFlg++;
+      return 1;	//regParmFlg;
+  } else {
+    /* otherwise pass all arguments in registers via SEND/RECEIVE */
+    regParmFlg++;// = 1;
+    return regParmFlg;
+  }
 }
 
 
@@ -412,12 +403,14 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
   return FALSE;
 }
 
+extern set *userIncDirsSet;
+
 static void _pic16_initPaths(void)
 {
   char pic16incDir[512];
   char pic16libDir[512];
-  set *pic16incDirsSet;
-  set *pic16libDirsSet;
+  set *pic16incDirsSet=NULL;
+  set *pic16libDirsSet=NULL;
   char devlib[512];
 
     setMainValue("mcu", pic16->name[2] );
@@ -426,16 +419,22 @@ static void _pic16_initPaths(void)
     sprintf(pic16incDir, "%s%cpic16", INCLUDE_DIR_SUFFIX, DIR_SEPARATOR_CHAR);
     sprintf(pic16libDir, "%s%cpic16", LIB_DIR_SUFFIX, DIR_SEPARATOR_CHAR);
 
+
     if(!options.nostdinc) {
       /* setup pic16 include directory */
       pic16incDirsSet = appendStrSet(dataDirsSet, NULL, pic16incDir);
-      mergeSets(&includeDirsSet, pic16incDirsSet);
+      includeDirsSet = pic16incDirsSet;
+//      mergeSets(&includeDirsSet, pic16incDirsSet);
     }
+    /* pic16 port should not search to the SDCC standard include directories,
+     * so add here the deleted include dirs that user has issued in command line */
+    mergeSets(&pic16incDirsSet, userIncDirsSet);
 
     if(!options.nostdlib) {
       /* setup pic16 library directory */
       pic16libDirsSet = appendStrSet(dataDirsSet, NULL, pic16libDir);
-      mergeSets(&libDirsSet, pic16libDirsSet);
+      libDirsSet = pic16libDirsSet;
+//      mergeSets(&libDirsSet, pic16libDirsSet);
     }
 
     if(!pic16_options.nodefaultlibs) {
@@ -520,8 +519,11 @@ _pic16_finaliseOptions (void)
       options.nopeep = 0;
 
     options.all_callee_saves = 1;		// always callee saves
-//    options.float_rent = 1;
-//    options.intlong_rent = 1;
+
+#if 0
+    options.float_rent = 1;
+    options.intlong_rent = 1;
+#endif
 	
 
     if(alt_asm && strlen(alt_asm))
@@ -573,21 +575,26 @@ _pic16_finaliseOptions (void)
 static void
 _pic16_setDefaultOptions (void)
 {
-	/* initialize to defaults section locations, names and addresses */
-	pic16_sectioninfo.at_udata	= "udata";
+  options.stackAuto = 0;		/* implicit declaration */
+  /* port is not capable yet to allocate separate registers 
+   * dedicated for passing certain parameters */
+  
+  /* initialize to defaults section locations, names and addresses */
+  pic16_sectioninfo.at_udata	= "udata";
 
-	/* set pic16 port options to defaults */
-	pic16_options.no_banksel = 0;
-	pic16_options.opt_banksel = 0;
-	pic16_options.omit_configw = 0;
-	pic16_options.omit_ivt = 0;
-	pic16_options.leave_reset = 0;
-	pic16_options.stack_model = 0;			/* 0 for 'small', 1 for 'large' */
-	pic16_options.ivt_loc = 0x000000;
-	pic16_options.nodefaultlibs = 0;
-	pic16_options.dumpcalltree = 0;
-	pic16_options.crt_name = "crt0i.o";		/* the default crt to link */
-	pic16_options.no_crt = 0;			/* use crt by default */
+  /* set pic16 port options to defaults */
+  pic16_options.no_banksel = 0;
+  pic16_options.opt_banksel = 0;
+  pic16_options.omit_configw = 0;
+  pic16_options.omit_ivt = 0;
+  pic16_options.leave_reset = 0;
+  pic16_options.stack_model = 0;			/* 0 for 'small', 1 for 'large' */
+  pic16_options.ivt_loc = 0x000000;
+  pic16_options.nodefaultlibs = 0;
+  pic16_options.dumpcalltree = 0;
+  pic16_options.crt_name = "crt0i.o";		/* the default crt to link */
+  pic16_options.no_crt = 0;			/* use crt by default */
+  pic16_options.ip_stack = 1;		/* set to 1 to enable ipop/ipush for stack */
 }
 
 static const char *
@@ -820,7 +827,7 @@ PORT pic16_port =
     4,		/* long */
     2,		/* ptr */
     3,		/* fptr, far pointers (see Microchip) */
-    2,		/* gptr */
+    3,		/* gptr */
     1,		/* bit */
     4,		/* float */
     4		/* max */

@@ -585,7 +585,7 @@ int processParms (ast *func, value *defParm,
     
     /* if defined parameters present but no actual parameters */
     if ( defParm && ! actParm) {
-      werror(E_TO_FEW_PARMS);
+      werror(E_TOO_FEW_PARMS);
       return 1;
     }
         
@@ -652,7 +652,7 @@ int processParms (ast *func, value *defParm,
     } else {
       /* if more defined parameters present but no more actual parameters */
       if (defParm->next) {
-	werror(E_TO_FEW_PARMS);
+	werror(E_TOO_FEW_PARMS);
 	return 1;
       }
     }

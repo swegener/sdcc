@@ -2,7 +2,7 @@
 
 	Some hc08 related updates that I missed earlier
 	* sim/ucsim/stypes.h
-        * support/regression/ports/spec.mk      
+        * support/regression/ports/hc08/spec.mk      
 
 2003-10-15 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 

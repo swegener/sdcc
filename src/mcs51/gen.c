@@ -326,14 +326,6 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
          * far data space.
          */
          
-         if (result)
-         {
-             fprintf(stderr, 
-             	     "*** Internal error: 10 bit stack var used as result.\n");
-             emitcode(";", "look at me!");
-         }
-         
-        
         if ( _G.accInUse )
         	emitcode("push","acc");
 
@@ -2051,7 +2043,19 @@ static void genFunction (iCode *ic)
 	if (!inExcludeList("dph"))
 	    emitcode ("push","dph");
 	if (options.model == MODEL_FLAT24 && !inExcludeList("dpx"))
-	    emitcode ("push", "dpx");	
+	{
+	    emitcode ("push", "dpx");
+	    /* Make sure we're using standard DPTR */
+	    emitcode ("push", "dps");
+	    emitcode ("mov", "dps, #0x00");
+	    if (options.stack10bit)
+	    {	
+	    	/* This ISR could conceivably use DPTR2. Better save it. */
+	    	emitcode ("push", "dpl1");
+	    	emitcode ("push", "dph1");
+	    	emitcode ("push", "dpx1");
+	    }
+	}
 	/* if this isr has no bank i.e. is going to
 	   run with bank 0 , then we need to save more
 	   registers :-) */
@@ -2222,7 +2226,16 @@ static void genEndFunction (iCode *ic)
 	}
 
 	if (options.model == MODEL_FLAT24 && !inExcludeList("dpx"))
+	{
+	    if (options.stack10bit)
+	    {
+	        emitcode ("pop", "dpx1");
+	        emitcode ("pop", "dph1");
+	        emitcode ("pop", "dpl1");
+	    }	
+	    emitcode ("pop", "dps");
 	    emitcode ("pop", "dpx");
+	}
 	if (!inExcludeList("dph"))
 	    emitcode ("pop","dph");
 	if (!inExcludeList("dpl"))

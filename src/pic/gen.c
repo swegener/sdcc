@@ -8818,6 +8818,7 @@ static void genCast (iCode *ic)
 {
     operand *result = IC_RESULT(ic);
     sym_link *ctype = operandType(IC_LEFT(ic));
+    sym_link *rtype = operandType(IC_RIGHT(ic));
     operand *right = IC_RIGHT(ic);
     int size, offset ;
 
@@ -9013,7 +9014,7 @@ static void genCast (iCode *ic)
     /* now depending on the sign of the destination */
     size = AOP_SIZE(result) - AOP_SIZE(right);
     /* if unsigned or not an integral type */
-    if (SPEC_USIGN(ctype) || !IS_SPEC(ctype)) {
+    if (SPEC_USIGN(rtype) || !IS_SPEC(rtype)) {
       while (size--)
 	emitpcode(POC_CLRF,   popGet(AOP(result),offset++));
     } else {

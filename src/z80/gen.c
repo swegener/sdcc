@@ -6546,7 +6546,7 @@ static void
 genCast (iCode * ic)
 {
   operand *result = IC_RESULT (ic);
-  sym_link *ctype = operandType (IC_LEFT (ic));
+  sym_link *rtype = operandType (IC_RIGHT (ic));
   operand *right = IC_RIGHT (ic);
   int size, offset;
 
@@ -6600,7 +6600,7 @@ genCast (iCode * ic)
   /* now depending on the sign of the destination */
   size = AOP_SIZE (result) - AOP_SIZE (right);
   /* Unsigned or not an integral type - right fill with zeros */
-  if (SPEC_USIGN (ctype) || !IS_SPEC (ctype))
+  if (SPEC_USIGN (rtype) || !IS_SPEC (rtype) || AOP_TYPE(right)==AOP_CRY)
     {
       while (size--)
 	aopPut (AOP (result), "!zero", offset++);

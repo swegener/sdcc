@@ -1242,7 +1242,7 @@ checkSClass (symbol * sym, int isProto)
     /* initializers if not an extern */
     if (SPEC_SCLS (sym->etype) == S_CODE &&
 	sym->ival == NULL &&
-	!sym->level &&
+	//!sym->level &&
 	port->mem.code_ro &&
 	!IS_EXTERN (sym->etype) &&
 	!funcInChain (sym->type))
@@ -1428,9 +1428,9 @@ computeType (sym_link * type1, sym_link * type2)
   return rType;
 }
 
-/*------------------------------------------------------------------*/
-/* compareType - will do type check return 1 if match                 */
-/*------------------------------------------------------------------*/
+/*--------------------------------------------------------------------*/
+/* compareType - will do type check return 1 if match, -1 if castable */
+/*--------------------------------------------------------------------*/
 int 
 compareType (sym_link * dest, sym_link * src)
 {
@@ -1508,7 +1508,7 @@ compareType (sym_link * dest, sym_link * src)
     return -1;
 
   if (SPEC_USIGN (dest) != SPEC_USIGN (src))
-    return -2;
+    return -1;
 
   return 1;
 }

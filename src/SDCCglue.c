@@ -99,6 +99,11 @@ aopLiteralLong (value * val, int offset, int size)
 	}
 	fl;
 
+	if (!val) {
+	  // assuming we have been warned before
+	  val=constVal("0");
+	}
+
 	/* if it is a float then it gets tricky */
 	/* otherwise it is fairly simple */
 	if (!IS_FLOAT (val->type)) {
@@ -268,6 +273,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	    segment = SPEC_OCLS (symIval->etype);
 	    deleteSetItem (&segment->syms, symIval);
 	  }
+
 	  sym->ival = NULL;
 	}
     }
@@ -377,7 +383,7 @@ initPointer (initList * ilist)
 	}
  wrong:
 	werror (W_INIT_WRONG);
-	return constVal("0");
+	return NULL;
 
 }
 

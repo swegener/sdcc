@@ -1221,6 +1221,7 @@ processBlockVars (ast * tree, int *stack, int action)
 
 /*-----------------------------------------------------------------*/
 /* constExprValue - returns the value of a constant expression     */
+/*                  or NULL if it is not a constant expression     */
 /*-----------------------------------------------------------------*/
 value *
 constExprValue (ast * cexpr, int check)
@@ -1258,7 +1259,7 @@ constExprValue (ast * cexpr, int check)
       if (check)
 	werror (E_CONST_EXPECTED, "found expression");
 
-      return constVal("0");
+      return NULL;
     }
 
   /* return the value */

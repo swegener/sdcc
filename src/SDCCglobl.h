@@ -131,12 +131,12 @@ typedef int bool;
                                 ? (STACK_ERR(0, stack), *p_##stack)   \
                                 : *p_##stack                          )
 
-#define  STACK_ERR(o, stack)    (werror(E_STACK_VIOLATION, #stack,    \
+#define  STACK_ERR(o, stack)    (fatal(1, E_STACK_VIOLATION, #stack,  \
                                         (o < 0)                       \
                                         ? "underflow"                 \
                                         : (o > 0)                     \
                                           ? "overflow"                \
-                                          : "empty"), exit(1))
+                                          : "empty"))
 
 /* optimization options */
 struct optimize

@@ -22,6 +22,7 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
+#include <io.h>
 #include <signal.h>
 #include "common.h"
 #include <ctype.h>
@@ -1271,7 +1272,8 @@ parseCmdLine (int argc, char **argv)
 	werror (E_FILE_OPEN_ERR, scratchFileName);
     }
   MSVC_style(options.vc_err_style);
-  if(options.use_stdout) SetErrorOut(stdout);
+  if(options.use_stdout) dup2(STDOUT_FILENO, STDERR_FILENO);
+
   return 0;
 }
 

@@ -671,11 +671,11 @@ int yyerror(char *s)
 
    if (mylineno && filename) {
 	 if(options.vc_err_style)
-		fprintf(stdout,"\n%s(%d) : %s: token -> '%s' ; column %d\n",
+		fprintf(stderr,"\n%s(%d) : %s: token -> '%s' ; column %d\n",
 			filename,mylineno,
 			s,yytext,column);
 	  else
-		fprintf(stdout,"\n%s:%d: %s: token -> '%s' ; column %d\n",
+		fprintf(stderr,"\n%s:%d: %s: token -> '%s' ; column %d\n",
 			filename,mylineno,
 			s,yytext,column);
      fatalError++;

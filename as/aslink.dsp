@@ -150,6 +150,10 @@ SOURCE=mcs51\lkstore.c
 
 SOURCE=mcs51\lksym.c
 # End Source File
+# Begin Source File
+
+SOURCE=.\mcs51\strcmpi.c
+# End Source File
 # End Group
 # Begin Group "Header Files"
 

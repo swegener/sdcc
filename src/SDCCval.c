@@ -496,40 +496,34 @@ value *constVal (char *s)
     /param src Pointer to 'x' from start of hex character value
 */
 
-char hexEscape(char **src)
-
+unsigned char hexEscape(char **src)
 {
-char *s ;
-unsigned long value ;
-
-(*src)++ ;	/* Skip over the 'x' */
-s = *src ;	/* Save for error detection */
-
-value = strtol (*src, src, 16);
-
-if (s == *src) 
-  {
-  // no valid hex found
-  werror(E_INVALID_HEX);
-  } 
-
-else 
-  {
-  if (value > 255) 
-    {
-    werror(W_ESC_SEQ_OOR_FOR_CHAR);
+  char *s ;
+  unsigned long value ;
+  
+  (*src)++ ;	/* Skip over the 'x' */
+  s = *src ;	/* Save for error detection */
+  
+  value = strtol (*src, src, 16);
+  
+  if (s == *src) {
+      // no valid hex found
+      werror(E_INVALID_HEX);
+  } else {
+    if (value > 255) {
+      werror(W_ESC_SEQ_OOR_FOR_CHAR);
     }
   }
-
-return (char) value;
+  return (char) value;
 }
+
 /*------------------------------------------------------------------*/
 /* octalEscape - process an octal constant of max three digits      */
 /* return the octal value, throw a warning for illegal octal        */
 /* adjust src to point at the last proccesed char                   */
 /*------------------------------------------------------------------*/
 
-char octalEscape (char **str) {
+unsigned char octalEscape (char **str) {
   int digits;
   unsigned value=0;
 
@@ -818,20 +812,20 @@ charVal (char *s)
 	case '5' :
 	case '6' :
 	case '7' :
-	  SPEC_CVAL (val->type).v_int = octalEscape(&s);
+	  SPEC_CVAL (val->type).v_uint = octalEscape(&s);
 	  break;
 
 	case 'x':
-	  SPEC_CVAL (val->type).v_int = hexEscape(&s) ;
+	  SPEC_CVAL (val->type).v_uint = hexEscape(&s) ;
 	  break;
 
 	default:
-	  SPEC_CVAL (val->type).v_int = *s;
+	  SPEC_CVAL (val->type).v_uint = (unsigned char)*s;
 	  break;
 	}
     }
   else				/* not a backslash */
-    SPEC_CVAL (val->type).v_int = *s;
+    SPEC_CVAL (val->type).v_int = (unsigned char)*s;
 
   return val;
 }

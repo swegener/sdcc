@@ -45,7 +45,7 @@ symbol *entryLabel;		/* function entry  label */
 
 /*-----------------------------------------------------------------*/
 /* forward definition of some functions */
-operand *geniCodeAssign (operand *, operand *, int);
+operand *geniCodeAssign (operand *, operand *, int, int);
 static operand *geniCodeArray (operand *, operand *,int);
 static operand *geniCodeArray2Ptr (operand *);
 operand *geniCodeRValue (operand *, bool);
@@ -2469,7 +2469,7 @@ geniCodePostInc (operand * op)
   if (IS_ITEMP (rv))
     OP_SYMBOL(rv)->noSpilLoc = 1;
 
-  geniCodeAssign (rOp, rv, 0);
+  geniCodeAssign (rOp, rv, 0, 0);
 
   size = (IS_PTR (rvtype) ? getSize (rvtype->next) : 1);
   if (IS_FLOAT (rvtype))
@@ -2480,7 +2480,7 @@ geniCodePostInc (operand * op)
   IC_RESULT (ic) = result = newiTempOperand (rvtype, 0);
   ADDTOCHAIN (ic);
 
-  geniCodeAssign (op, result, 0);
+  geniCodeAssign (op, result, 0, 0);
 
   return rOp;
 
@@ -2516,7 +2516,7 @@ geniCodePreInc (operand * op, bool lvalue)
   IC_RESULT (ic) = result = newiTempOperand (roptype, 0);
   ADDTOCHAIN (ic);
 
-  (void) geniCodeAssign (op, result, 0);
+  (void) geniCodeAssign (op, result, 0, 0);
   if (lvalue || IS_TRUE_SYMOP (op))
     return op;
   else
@@ -2552,7 +2552,7 @@ geniCodePostDec (operand * op)
   if (IS_ITEMP (rv))
     OP_SYMBOL(rv)->noSpilLoc = 1;
 
-  geniCodeAssign (rOp, rv, 0);
+  geniCodeAssign (rOp, rv, 0, 0);
 
   size = (IS_PTR (rvtype) ? getSize (rvtype->next) : 1);
   if (IS_FLOAT (rvtype))
@@ -2563,7 +2563,7 @@ geniCodePostDec (operand * op)
   IC_RESULT (ic) = result = newiTempOperand (rvtype, 0);
   ADDTOCHAIN (ic);
 
-  geniCodeAssign (op, result, 0);
+  geniCodeAssign (op, result, 0, 0);
 
   return rOp;
 
@@ -2599,7 +2599,7 @@ geniCodePreDec (operand * op, bool lvalue)
   IC_RESULT (ic) = result = newiTempOperand (roptype, 0);
   ADDTOCHAIN (ic);
 
-  (void) geniCodeAssign (op, result, 0);
+  (void) geniCodeAssign (op, result, 0, 0);
   if (lvalue || IS_TRUE_SYMOP (op))
     return op;
   else
@@ -2950,12 +2950,12 @@ geniCodeLogicAndOr (ast *tree, int lvl)
   result = newiTempOperand (newCharLink(), 1);
   
   geniCodeLabel (falseLabel);
-  geniCodeAssign (result, operandFromLit (0), 0);
+  geniCodeAssign (result, operandFromLit (0), 0, 0);
   /* generate an unconditional goto */
   geniCodeGoto (exitLabel);
 
   geniCodeLabel (trueLabel);
-  geniCodeAssign (result, operandFromLit (1), 0);
+  geniCodeAssign (result, operandFromLit (1), 0, 0);
 
   geniCodeLabel (exitLabel);
 
@@ -2995,7 +2995,7 @@ geniCodeConditional (ast * tree,int lvl)
 
   /* move the value to a new Operand */
   result = newiTempOperand (tree->right->ftype, 0);
-  geniCodeAssign (result, geniCodeRValue (true, FALSE), 0);
+  geniCodeAssign (result, geniCodeRValue (true, FALSE), 0, 0);
 
   /* generate an unconditional goto */
   geniCodeGoto (exitLabel);
@@ -3004,7 +3004,7 @@ geniCodeConditional (ast * tree,int lvl)
   geniCodeLabel (falseLabel);
 
   false = ast2iCode (tree->right->right,lvl+1);
-  geniCodeAssign (result, geniCodeRValue (false, FALSE), 0);
+  geniCodeAssign (result, geniCodeRValue (false, FALSE), 0, 0);
 
   /* create the exit label */
   geniCodeLabel (exitLabel);
@@ -3016,13 +3016,13 @@ geniCodeConditional (ast * tree,int lvl)
 /* geniCodeAssign - generate code for assignment                   */
 /*-----------------------------------------------------------------*/
 operand *
-geniCodeAssign (operand * left, operand * right, int nosupdate)
+geniCodeAssign (operand * left, operand * right, int nosupdate, int strictLval)
 {
   iCode *ic;
   sym_link *ltype = operandType (left);
   sym_link *rtype = operandType (right);
 
-  if (!left->isaddr && !IS_ITEMP (left))
+  if (!left->isaddr && (!IS_ITEMP (left) || strictLval))
     {
       werror (E_LVALUE_REQUIRED, "assignment");
       return left;
@@ -3200,7 +3200,7 @@ geniCodeParms (ast * parms, value *argVals, int *stack,
 	  operand *top = operandFromSymbol (argVals->sym);
 	  /* clear useDef and other bitVectors */
 	  OP_USES(top)=OP_DEFS(top)=OP_SYMBOL(top)->clashes = NULL;
-	  geniCodeAssign (top, pval, 1);
+	  geniCodeAssign (top, pval, 1, 0);
 	}
       else
 	{
@@ -4014,7 +4014,7 @@ ast2iCode (ast * tree,int lvl)
 	else
 	  right = geniCodeRValue (right, FALSE);
 
-	geniCodeAssign (left, right, 0);
+	geniCodeAssign (left, right, 0, 1);
 	return right;
       }
     case MUL_ASSIGN:
@@ -4022,8 +4022,9 @@ ast2iCode (ast * tree,int lvl)
 	geniCodeAssign (left,
 		geniCodeMultiply (geniCodeRValue (operandFromOperand (left),
 						  FALSE),
-				  geniCodeRValue (right, FALSE), FALSE),
-				  getResultTypeFromType (tree->ftype));
+				  geniCodeRValue (right, FALSE), 
+				  getResultTypeFromType (tree->ftype)),
+			0, 1);
 
     case DIV_ASSIGN:
       return
@@ -4032,7 +4033,7 @@ ast2iCode (ast * tree,int lvl)
 						  FALSE),
 				  geniCodeRValue (right, FALSE),
 				  getResultTypeFromType (tree->ftype)),
-			0);
+			0, 1);
     case MOD_ASSIGN:
       return
 	geniCodeAssign (left,
@@ -4040,7 +4041,7 @@ ast2iCode (ast * tree,int lvl)
 						  FALSE),
 				  geniCodeRValue (right, FALSE),
 				  getResultTypeFromType (tree->ftype)),
-			0);
+			0, 1);
     case ADD_ASSIGN:
       {
 	sym_link *rtype = operandType (right);
@@ -4058,7 +4059,7 @@ ast2iCode (ast * tree,int lvl)
 				  right,
 				  getResultTypeFromType (tree->ftype),
 				  lvl),
-			       0);
+			       0, 1);
       }
     case SUB_ASSIGN:
       {
@@ -4079,7 +4080,7 @@ ast2iCode (ast * tree,int lvl)
 						  FALSE),
 				  right,
 				  getResultTypeFromType (tree->ftype)),
-			  0);
+			  0, 1);
       }
     case LEFT_ASSIGN:
       return
@@ -4088,13 +4089,13 @@ ast2iCode (ast * tree,int lvl)
 						   ,FALSE),
 				   geniCodeRValue (right, FALSE),
 				   getResultTypeFromType (tree->ftype)),
-			0);
+			0, 1);
     case RIGHT_ASSIGN:
       return
 	geniCodeAssign (left,
 	       geniCodeRightShift (geniCodeRValue (operandFromOperand (left)
 						   ,FALSE),
-				   geniCodeRValue (right, FALSE)), 0);
+				   geniCodeRValue (right, FALSE)), 0, 1);
     case AND_ASSIGN:
       return
 	geniCodeAssign (left,
@@ -4102,7 +4103,7 @@ ast2iCode (ast * tree,int lvl)
 						  FALSE),
 				  geniCodeRValue (right, FALSE),
 				  BITWISEAND,
-				  operandType (left)), 0);
+				  operandType (left)), 0, 1);
     case XOR_ASSIGN:
       return
 	geniCodeAssign (left,
@@ -4110,7 +4111,7 @@ ast2iCode (ast * tree,int lvl)
 						  FALSE),
 				  geniCodeRValue (right, FALSE),
 				  '^',
-				  operandType (left)), 0);
+				  operandType (left)), 0, 1);
     case OR_ASSIGN:
       return
 	geniCodeAssign (left,
@@ -4118,7 +4119,7 @@ ast2iCode (ast * tree,int lvl)
 						   ,FALSE),
 				   geniCodeRValue (right, FALSE),
 				   '|',
-				   operandType (left)), 0);
+				   operandType (left)), 0, 1);
     case ',':
       return geniCodeRValue (right, FALSE);
 

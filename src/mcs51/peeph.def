@@ -676,8 +676,8 @@ replace {
 }
 
 replace {
-        mov     %1,dpl
-        mov     dpl,%1
+        mov     r%1,dpl
+        mov     dpl,r%1
 %9:
         ret
 } by {
@@ -687,10 +687,10 @@ replace {
 }
 
 replace {
-        mov     %1,dpl
-        mov     %2,dph
-        mov     dpl,%1
-        mov     dph,%2
+        mov     r%1,dpl
+        mov     r%2,dph
+        mov     dpl,r%1
+        mov     dph,r%2
 %9:
         ret
 } by {
@@ -700,9 +700,9 @@ replace {
 }
 
 replace {
-        mov     %1,dpl
-        mov     %2,dph
-        mov     dpl,%1
+        mov     r%1,dpl
+        mov     r%2,dph
+        mov     dpl,r%1
 %9:
         ret
 } by {
@@ -712,12 +712,12 @@ replace {
 }
 
 replace {
-        mov     %1,dpl
-        mov     %2,dph
-        mov     %3,b
-        mov     dpl,%1
-        mov     dph,%2
-        mov     b,%3
+        mov     r%1,dpl
+        mov     r%2,dph
+        mov     r%3,b
+        mov     dpl,r%1
+        mov     dph,r%2
+        mov     b,r%3
 %9:
         ret
 } by {
@@ -727,10 +727,10 @@ replace {
 }
 
 replace {
-        mov     %1,dpl
-        mov     %2,dph
-        mov     %3,b
-        mov     dpl,%1
+        mov     r%1,dpl
+        mov     r%2,dph
+        mov     r%3,b
+        mov     dpl,r%1
 %9:
         ret
 } by {
@@ -740,11 +740,11 @@ replace {
 }
 
 replace {
-        mov     %1,dpl
-        mov     %2,dph
-        mov     %3,b
-        mov     dpl,%1
-        mov     dph,%2
+        mov     r%1,dpl
+        mov     r%2,dph
+        mov     r%3,b
+        mov     dpl,r%1
+        mov     dph,r%2
 %9:
         ret
 } by {
@@ -754,14 +754,14 @@ replace {
 }
 
 replace {
-        mov     %1,dpl
-        mov     %2,dph
-        mov     %3,b
-        mov     %4,a
-        mov     dpl,%1
-        mov     dph,%2
-        mov     b,%3
-        mov     a,%4
+        mov     r%1,dpl
+        mov     r%2,dph
+        mov     r%3,b
+        mov     r%4,a
+        mov     dpl,r%1
+        mov     dph,r%2
+        mov     b,r%3
+        mov     a,r%4
 %9:
         ret
 } by {
@@ -771,12 +771,12 @@ replace {
 }
 
 replace {
-        mov     %1,dpl
-        mov     %2,dph
-        mov     %3,b
-        mov     %4,a
-        mov     dpl,%1
-        mov     dph,%2
+        mov     r%1,dpl
+        mov     r%2,dph
+        mov     r%3,b
+        mov     r%4,a
+        mov     dpl,r%1
+        mov     dph,r%2
 %9:
         ret
 } by {
@@ -786,11 +786,11 @@ replace {
 }
 
 replace {
-        mov     %1,dpl
-        mov     %2,dph
-        mov     %3,b
-        mov     %4,a
-        mov     dpl,%1
+        mov     r%1,dpl
+        mov     r%2,dph
+        mov     r%3,b
+        mov     r%4,a
+        mov     dpl,r%1
 %9:
         ret
 } by {

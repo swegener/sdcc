@@ -55,28 +55,6 @@ replace restart {
 	;	z80 removed redundant pop/push
 	ld	%1,%2
 }
-;
-;replace restart {
-	ld	a,%1
-	add	a,#0x01
-	ld	l,a
-} by {
-	;	z80 improved usage of 'inc'
-	ld	l,%1
-	inc	l
-	ld	a,l
-}
-
-replace restart {
-	ld	a,%1
-	add	a,#0xFF
-	ld	l,a
-} by {
-	;	z80 improved usage of 'dec'
-	ld	l,%1
-	dec	l
-	ld	a,l
-}
 
 replace restart {
 	ld	l,a
@@ -123,23 +101,6 @@ replace restart {
 	ld	c,a
 }
 
-; I don't think this works. neg does a unary minus of A, not HL  -- EEP
-;
-;replace {
-;	ld	a,c
-;	sub	a,%1
-;	ld	l,a
-;	ld	a,b
-;	sbc	a,%2
-;	ld	h,a
-;} by {
-;	;	z80/z180 peephole byte pointer subtraction
-;	xor	a
-;	ld	h,%1
-;	ld	l,%2
-;	sbc	hl,bc
-;	neg
-;}
 
 replace {
 %1:

@@ -1,3 +1,16 @@
+2004-04-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/z80/peeph-z80.def: removed some peephole rules that don't
+	work with multibyte arithmetic (fixed bug #937126)
+	* src/mcs51/peeph.def: fixed peephole rules 150-158 to apply only
+	to registers and not global variables
+	* src/SDCCicode.c (geniCodeAssign, ast2iCode, geniCodePostInc,
+	geniCodePreInc, geniCodePostDec, geniCodePreDec,
+	geniCodeLogicAndOr, geniCodeConditional): enforce strict lvalue
+	checking for assignments not internally generated (fixed bug #931895)
+	* src/SDCC.y (postfix_expr): ignore typedefs when looking for a
+	structure member (fixed bug #930072)
+
 2004-04-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCmain.c (linkEdit),

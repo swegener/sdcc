@@ -256,18 +256,20 @@ postfix_expr
           { 	   
 	    $$ = newNode  (CALL,$1,$3) ; $$->left->funcName = 1;
 	  }
-   | postfix_expr '.' identifier       
+   | postfix_expr '.' { ignoreTypedefType = 1; } identifier       
 		      {    
-			$3 = newSymbol($3->name,NestLevel);
-			$3->implicit = 1;
-			$$ = newNode(PTR_OP,newNode('&',$1,NULL),newAst_VALUE(symbolVal($3)));
-/* 			$$ = newNode('.',$1,newAst(EX_VALUE,symbolVal($3))) ;		        */
+			ignoreTypedefType = 0;
+			$4 = newSymbol($4->name,NestLevel);
+			$4->implicit = 1;
+			$$ = newNode(PTR_OP,newNode('&',$1,NULL),newAst_VALUE(symbolVal($4)));
+/* 			$$ = newNode('.',$1,newAst(EX_VALUE,symbolVal($4))) ;		        */
 		      }
-   | postfix_expr PTR_OP identifier    
+   | postfix_expr PTR_OP { ignoreTypedefType = 1; } identifier    
                       { 
-			$3 = newSymbol($3->name,NestLevel);
-			$3->implicit = 1;			
-			$$ = newNode(PTR_OP,$1,newAst_VALUE(symbolVal($3)));
+			ignoreTypedefType = 0;
+			$4 = newSymbol($4->name,NestLevel);
+			$4->implicit = 1;			
+			$$ = newNode(PTR_OP,$1,newAst_VALUE(symbolVal($4)));
 		      }
    | postfix_expr INC_OP   
                       {	$$ = newNode(INC_OP,$1,NULL);}

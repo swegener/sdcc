@@ -297,10 +297,16 @@ void pic16_emitpcode(PIC_OPCODE poc, pCodeOp *pcop)
     pic16_addpCode2pBlock(pb,pic16_newpCode(poc,pcop));
   else
     DEBUGpic16_emitcode(";","%s  ignoring NULL pcop",__FUNCTION__);
-    
-//    fprintf(stderr, "%s\n", pcop->name);
 }
 
+void pic16_emitpinfo(INFO_TYPE itype, pCodeOp *pcop)
+{
+  if(pcop)
+    pic16_addpCode2pBlock(pb, pic16_newpCodeInfo(itype, pcop));
+  else
+    DEBUGpic16_emitcode(";","%s  ignoring NULL pcop",__FUNCTION__);
+}
+  
 void pic16_emitpcodeNULLop(PIC_OPCODE poc)
 {
 
@@ -3547,6 +3553,7 @@ static void genFunction (iCode *ic)
         if (sym->regsUsed) {
           /* save the registers used */
           DEBUGpic16_emitcode("; **", "Saving used registers in stack");
+          pic16_emitpinfo(INF_LOCALREGS, pic16_newpCodeOpLocalRegs(LR_ENTRY_BEGIN));
           for ( i = 0 ; i < sym->regsUsed->size ; i++) {
             if (bitVectBitValue(sym->regsUsed,i)) {
               pic16_pushpCodeOp( pic16_popRegFromIdx(i) );
@@ -3559,6 +3566,7 @@ static void genFunction (iCode *ic)
               }
             }
           }
+          pic16_emitpinfo(INF_LOCALREGS, pic16_newpCodeOpLocalRegs(LR_ENTRY_END));
         }
     }
 	
@@ -3602,6 +3610,7 @@ static void genEndFunction (iCode *ic)
     if (sym->regsUsed) {
       int i;
 
+        pic16_emitpinfo(INF_LOCALREGS, pic16_newpCodeOpLocalRegs(LR_EXIT_BEGIN));
         /* restore registers used */
         DEBUGpic16_emitcode("; **", "Restoring used registers from stack");
         for ( i = sym->regsUsed->size; i >= 0; i--) {
@@ -3610,6 +3619,8 @@ static void genEndFunction (iCode *ic)
             _G.nRegsSaved--;
           }
         }
+        pic16_emitpinfo(INF_LOCALREGS, pic16_newpCodeOpLocalRegs(LR_EXIT_END));
+
     }
 
     if(strcmp(sym->name, "main")) {
@@ -10826,19 +10837,32 @@ static void genDataPointerSet(operand *right,
 
 	while (size--) {
 		if (AOP_TYPE(right) == AOP_LIT) {
-		  unsigned int lit = (unsigned int) floatFromVal (AOP(IC_RIGHT(ic))->aopu.aop_lit);
+		  unsigned int lit;
 
-			lit = lit >> (8*offset);
-			if(lit&0xff) {
-				pic16_emitpcode(POC_MOVLW, pic16_popGetLit(lit&0xff));
-				pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset)); // pstch 8
-			} else {
-				pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(result),offset)); // patch 8
-			}
-		} else {
-			mov2w(AOP(right), offset);
-			pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset)); // patch 8
-		}
+		    if(!IS_FLOAT(operandType( right )))
+		      lit = (unsigned long)floatFromVal(AOP(IC_RIGHT(ic))->aopu.aop_lit);
+                    else {
+                      union {
+                        unsigned long lit_int;
+                        float lit_float;
+                      } info;
+	
+                        /* take care if literal is a float */
+                        info.lit_float = floatFromVal(AOP(IC_RIGHT(ic))->aopu.aop_lit);
+                        lit = info.lit_int;
+                    }
+
+                    lit = lit >> (8*offset);
+                    if(lit&0xff) {
+                      pic16_emitpcode(POC_MOVLW, pic16_popGetLit(lit&0xff));
+                      pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset)); // pstch 8
+                    } else {
+                      pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(result),offset)); // patch 8
+                    }
+                } else {
+                  mov2w(AOP(right), offset);
+                  pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset)); // patch 8
+                }
 		offset++;
 		resoffset++;
 	}

@@ -313,6 +313,7 @@ typedef enum
 typedef enum
 {
   INF_OPTIMIZATION,      /* structure contains optimization information */
+  INF_LOCALREGS          /* structure contains local register information */
 } INFO_TYPE;
 
 
@@ -327,6 +328,17 @@ typedef enum
   OPT_END,               /* mark ending of optimization block */
 } OPT_TYPE;
 
+/***********************************************************************
+ *  LR_TYPE  - optimization node types
+ ***********************************************************************/
+
+typedef enum
+{
+  LR_ENTRY_BEGIN,             /* mark beginning of optimization block */
+  LR_ENTRY_END,               /* mark ending of optimization block */
+  LR_EXIT_BEGIN,
+  LR_EXIT_END
+} LR_TYPE;
 
 
 /************************************************/
@@ -481,7 +493,12 @@ typedef struct pCodeOpOpt
   char *key;              /* key by which a block is identified */
 } pCodeOpOpt;
 
-  
+typedef struct pCodeOpLocalReg
+{
+  pCodeOp pcop;
+
+  LR_TYPE type;
+} pCodeOpLocalReg;  
 
 /*************************************************
     pCode
@@ -746,14 +763,14 @@ typedef struct pCodeWild
     
     Here are stored generic informaton
 *************************************************/
-typedef struct pInfo
+typedef struct pCodeInfo
 {
-  pCode pc;
+  pCodeInstruction pci;
   
   INFO_TYPE type;	/* info node type */
   
   pCodeOp *oper1;	/* info node arguments */
-} pInfo;
+} pCodeInfo;
   
 
 /*************************************************
@@ -907,6 +924,7 @@ typedef struct peepCommand {
 #define PCW(x)    ((pCodeWild *)(x))
 #define PCCS(x)   ((pCodeCSource *)(x))
 #define PCAD(x)	  ((pCodeAsmDir *)(x))
+#define PCINF(x)  ((pCodeInfo *)(x))
 
 #define PCOP(x)   ((pCodeOp *)(x))
 //#define PCOB(x)   ((pCodeOpBit *)(x))
@@ -917,6 +935,7 @@ typedef struct peepCommand {
 #define PCOR2(x)  ((pCodeOpReg2 *)(x))
 #define PCORB(x)  ((pCodeOpRegBit *)(x))
 #define PCOO(x)   ((pCodeOpOpt *)(x))
+#define PCOLR(x)  ((pCodeOpLocalReg *)(x))
 #define PCOW(x)   ((pCodeOpWild *)(x))
 #define PCOW2(x)  (PCOW(PCOW(x)->pcop2))
 #define PBR(x)    ((pBranch *)(x))
@@ -966,6 +985,7 @@ void pic16_addpBlock(pBlock *pb);                  // Add a pBlock to a pFile
 void pic16_copypCode(FILE *of, char dbName);       // Write all pBlocks with dbName to *of
 void pic16_movepBlock2Head(char dbName);           // move pBlocks around
 void pic16_AnalyzepCode(char dbName);
+void pic16_OptimizeLocalRegs(void);
 void pic16_AssignRegBanks(void);
 void pic16_printCallTree(FILE *of);
 void pCodePeepInit(void);
@@ -986,6 +1006,10 @@ pCodeOp *pic16_newpCodeOpBit(char *name, int bit,int inBitSpace, PIC_OPTYPE subt
 pCodeOp *pic16_newpCodeOpRegFromStr(char *name);
 pCodeOp *pic16_newpCodeOp(char *name, PIC_OPTYPE p);
 pCodeOp *pic16_pCodeOpCopy(pCodeOp *pcop);
+
+pCode *pic16_newpCodeInfo(INFO_TYPE type, pCodeOp *pcop);
+pCodeOp *pic16_newpCodeOpOpt(OPT_TYPE type, char *key);
+pCodeOp *pic16_newpCodeOpLocalRegs(LR_TYPE type);
 
 pCode * pic16_findNextInstruction(pCode *pci);
 pCode * pic16_findNextpCode(pCode *pc, PC_TYPE pct);

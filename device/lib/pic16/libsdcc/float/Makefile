@@ -38,9 +38,6 @@ SRCS	=	fs2schar \
 
 include ../Makefile.rules
 
-CFLAGS	+= -I$(LIBC_INC_DIR)
-
-
 all: build-library
 
 build-library: $(LIB)

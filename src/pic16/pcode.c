@@ -115,6 +115,9 @@ pCodeOpReg pic16_pc_ssave     = {{PO_GPR_REGISTER,  "SSAVE"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_gpsimio   = {{PO_GPR_REGISTER, "GPSIMIO"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_gpsimio2  = {{PO_GPR_REGISTER, "GPSIMIO2"}, -1, NULL, 0, NULL};
 
+char *OPT_TYPE_STR[] = { "begin", "end" };
+char *LR_TYPE_STR[] = { "entry begin", "entry end", "exit begin", "exit end" };
+
 
 static int mnemonics_initialized = 0;
 
@@ -171,8 +174,14 @@ extern void pic16_pCodeInsertAfter(pCode *pc1, pCode *pc2);
 extern pCodeOp *pic16_popCopyReg(pCodeOpReg *pc);
 pCodeOp *pic16_popCopyGPR2Bit(pCodeOp *pc, int bitval);
 void pic16_pCodeRegMapLiveRanges(pBlock *pb);
+void OptimizeLocalRegs(void);
 
 char *dumpPicOptype(PIC_OPTYPE type);
+
+pCodeOp *pic16_popGetLit2(int, pCodeOp *);
+pCodeOp *pic16_popGetLit(int);
+pCodeOp *pic16_popGetWithString(char *);
+
 
 /****************************************************************/
 /*                    PIC Instructions                          */
@@ -3778,12 +3787,24 @@ pCode *pic16_newpCodeLabelFORCE(char *name, int key)
   return ( (pCode *)pcl );
 }
 
-#if 0
 pCode *pic16_newpCodeInfo(INFO_TYPE type, pCodeOp *pcop)
 {
+  pCodeInfo *pci;
 
+    pci = Safe_calloc(1, sizeof(pCodeInfo));
+    pci->pci.pc.type = PC_INFO;
+    pci->pci.pc.prev = pci->pci.pc.next = NULL;
+    pci->pci.pc.pb = NULL;
+    pci->pci.label = NULL;
+	
+    pci->pci.pc.destruct = genericDestruct;
+    pci->pci.pc.print = genericPrint;
+    
+    pci->type = type;
+    pci->oper1 = pcop;
+  
+  return ((pCode *)pci);
 }
-#endif
 
 
 /*-----------------------------------------------------------------*/
@@ -4114,6 +4135,19 @@ pCodeOp *pic16_newpCodeOpOpt(OPT_TYPE type, char *key)
   return (PCOP(pcop));
 }
 
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+pCodeOp *pic16_newpCodeOpLocalRegs(LR_TYPE type)
+{
+  pCodeOpLocalReg *pcop;
+
+  	pcop = Safe_calloc(1, sizeof(pCodeOpLocalReg));
+  	
+  	pcop->type = type;
+
+  return (PCOP(pcop));
+}
+
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
@@ -4263,9 +4297,11 @@ void pic16_pCodeConstString(char *name, char *value)
 
   pic16_addpBlock(pb);
 
-  sprintf(buffer,"; %s = %s",name,value);
-  
-  pic16_addpCode2pBlock(pb,pic16_newpCodeCharP(buffer));
+//  sprintf(buffer,"; %s = ", name);
+//  strcat(buffer, value);
+//  fputs(buffer, stderr);
+
+//  pic16_addpCode2pBlock(pb,pic16_newpCodeCharP(buffer));
   pic16_addpCode2pBlock(pb,pic16_newpCodeLabel(name,-1));
 
   do {
@@ -4791,6 +4827,17 @@ char *pic16_pCode2str(char *str, size_t size, pCode *pc)
     SAFE_snprintf(&s,&size,";%s", ((pCodeComment *)pc)->comment);
     break;
 
+  case PC_INFO:
+    SAFE_snprintf(&s,&size,"; info ==>");
+    switch(((pCodeInfo *)pc)->type) {
+      case INF_OPTIMIZATION:
+          SAFE_snprintf(&s,&size, " [optimization] %s\n", OPT_TYPE_STR[ PCOO(PCINF(pc)->oper1)->type ]);
+          break;
+      case INF_LOCALREGS:
+          SAFE_snprintf(&s,&size, " [localregs] %s\n", LR_TYPE_STR[ PCOLR(PCINF(pc)->oper1)->type ]);
+          break;
+    }; break;
+
   case PC_INLINE:
     /* assuming that inline code ends with a \n */
     SAFE_snprintf(&s,&size,"%s", ((pCodeComment *)pc)->comment);
@@ -4826,10 +4873,6 @@ char *pic16_pCode2str(char *str, size_t size, pCode *pc)
   case PC_BAD:
     SAFE_snprintf(&s,&size,";A bad pCode is being used\n");
     break;
-
-  case PC_INFO:
-    SAFE_snprintf(&s,&size,"; PC INFO pcode\n");
-    break;
   }
 
   return str;
@@ -4847,8 +4890,29 @@ static void genericPrint(FILE *of, pCode *pc)
 
   switch(pc->type) {
   case PC_COMMENT:
-    fprintf(of,";%s\n", ((pCodeComment *)pc)->comment);
+//    fputs(((pCodeComment *)pc)->comment, of);
+    fprintf(of,"; %s\n", ((pCodeComment *)pc)->comment);
     break;
+
+  case PC_INFO:
+    {
+      pBranch *pbl = PCI(pc)->label;
+      while(pbl && pbl->pc) {
+        if(pbl->pc->type == PC_LABEL)
+          pCodePrintLabel(of, pbl->pc);
+        pbl = pbl->next;
+      }
+    }
+          
+    fprintf(of, "; info ==>");
+    switch(((pCodeInfo *)pc)->type) {
+      case INF_OPTIMIZATION:
+          fprintf(of, " [optimization] %s\n", OPT_TYPE_STR[ PCOO(PCINF(pc)->oper1)->type ]);
+          break;
+      case INF_LOCALREGS:
+          fprintf(of, " [localregs] %s\n", LR_TYPE_STR[ PCOLR(PCINF(pc)->oper1)->type ]);
+          break;
+    }; break;
 
   case PC_INLINE:
     fprintf(of,"%s\n", ((pCodeComment *)pc)->comment);
@@ -7043,8 +7107,161 @@ void pic16_AnalyzepCode(char dbName)
 
   } while(changes && (i++ < MAX_PASSES));
 
+  
   buildCallTree();
 }
+
+
+/* convert a series of movff's of local regs to stack, with a single call to
+ * a support functions which does the same thing via loop */
+static void pic16_convertLocalRegs2Support(pCode *pcstart, pCode *pcend, int count, regs *r, int entry)
+{
+  pBranch *pbr;
+  pCode *pc, *pct;
+  char *fname[]={"__lr_store", "__lr_restore"};
+
+//    pc = pic16_newpCode(POC_CALL, pic16_popGetFromString( (entry?fname[0]:fname[1]) ));
+
+    pct = pic16_findNextInstruction(pcstart->next);
+    do {
+      pc = pct;
+      pct = pc->next;	//pic16_findNextInstruction(pc->next);
+//      pc->print(stderr, pc);
+      if(isPCI(pc) && PCI(pc)->label) {
+        pbr = PCI(pc)->label;
+        while(pbr && pbr->pc) {
+          PCI(pcstart)->label = pic16_pBranchAppend(PCI(pcstart)->label, pbr);
+          pbr = pbr->next;
+        }
+
+//        pc->print(stderr, pc);
+        /* unlink pCode */
+        pc->prev->next = pct;
+        pct->prev = pc->prev;
+//        pc->next = NULL;
+//        pc->prev = NULL;
+      }
+    } while ((pc) && (pc != pcend));
+
+    /* unlink movff instructions */
+    pcstart->next = pcend;
+    pcend->prev = pcstart;
+
+    pic16_pCodeInsertAfter(pcstart, (pct=pic16_newpCode(POC_LFSR, pic16_popGetLit2(0, pic16_popGetWithString(r->name))))); pc = pct;
+    pic16_pCodeInsertAfter(pc, pct=pic16_newpCode(POC_MOVLW, pic16_popGetLit( count ))); pc = pct;
+    pic16_pCodeInsertAfter(pc, pct=pic16_newpCode(POC_CALL, pic16_popGetWithString( fname[ (entry==1?0:1) ] )));
+    
+    {
+      symbol *sym;
+
+        sym = newSymbol( fname[ entry?0:1 ], 0 );
+        strcpy(sym->rname, fname[ entry?0:1 ]);
+        checkAddSym(&externs, sym);
+        
+//        fprintf(stderr, "%s:%d adding extern symbol %s in externs\n", __FILE__, __LINE__, fname[ entry?0:1 ]);
+    }
+
+}
+
+
+/*-----------------------------------------------------------------*/
+/* OptimizeLocalRegs - turn sequence of MOVFF instructions for     */
+/*    local registers to a support function call                   */
+/*-----------------------------------------------------------------*/
+void pic16_OptimizeLocalRegs(void)
+{
+  pBlock  *pb;
+  pCode   *pc;
+  pCodeInfo *pci;
+  pCodeOpLocalReg *pclr;
+  int regCount=0;
+  int inRegCount=0;
+  regs *r, *lastr=NULL, *firstr=NULL;
+  pCode *pcstart=NULL, *pcend=NULL;
+  int inEntry=0;
+
+	/* Overview:
+	 *   local_regs begin mark
+	 *      MOVFF r0x01, POSTDEC1
+	 *	MOVFF r0x02, POSTDEC1
+	 *	...
+	 *	...
+	 *	MOVFF r0x0n, POSTDEC1
+	 *   local_regs end mark
+	 *
+	 * convert the above to the below:
+	 *	MOVLW	starting_register_index
+	 *	MOVWF	PRODL
+	 *	MOVLW	register_count
+	 *	call	__save_registers_in_stack
+	 */
+
+    if(!the_pFile)
+      return;
+
+    for(pb = the_pFile->pbHead; pb; pb = pb->next) {
+      inRegCount = regCount = 0;
+      firstr = lastr = NULL;
+      for(pc = pb->pcHead; pc; pc = pc->next) {
+        if(pc && (pc->type == PC_INFO)) {
+          pci = PCINF(pc);
+
+          if(pci->type == INF_LOCALREGS) {
+            pclr = PCOLR(pci->oper1);
+            
+            if((pclr->type == LR_ENTRY_BEGIN)
+              || (pclr->type == LR_ENTRY_END))inEntry = 1;
+            else inEntry = 0;
+            
+            switch(pclr->type) {
+              case LR_ENTRY_BEGIN:
+              case LR_EXIT_BEGIN:
+              		inRegCount = 1; regCount = 0;
+              		pcstart = pc;	//pic16_findNextInstruction(pc->next);
+              		firstr = lastr = NULL;
+              		break;
+              
+              case LR_ENTRY_END:
+              case LR_EXIT_END:
+              		inRegCount = -1;
+              		pcend = pc; 	//pic16_findPrevInstruction(pc->prev);
+
+#if 1
+                        if(regCount>2) {
+                          pic16_convertLocalRegs2Support(pcstart, pcend, regCount,
+				firstr, inEntry);
+                        }
+#endif
+                        firstr = lastr = NULL;
+              		break;
+            }
+            
+            if(inRegCount == -1) {
+//              fprintf(stderr, "%s:%d registers used [%s] %d\n", __FILE__, __LINE__, inEntry?"entry":"exit", regCount);
+              regCount = 0;
+              inRegCount = 0;
+            }
+          }
+        } else {
+          if(isPCI(pc) && (PCI(pc)->op == POC_MOVFF) && (inRegCount == 1)) {
+            if(inEntry)
+              r = pic16_getRegFromInstruction(pc);
+            else
+              r = pic16_getRegFromInstruction2(pc);
+            if(r && (r->type == REG_GPR) && (r->pc_type == PO_GPR_TEMP)) {
+              if(!firstr)firstr = r;
+              regCount++;
+//              fprintf(stderr, "%s:%d\t%s\t%i\t%d/%d\n", __FILE__, __LINE__, r->name, r->rIdx);
+            }
+          }
+        }
+      }
+    }
+}
+              
+            
+
+
 
 /*-----------------------------------------------------------------*/
 /* ispCodeFunction - returns true if *pc is the pCode of a         */

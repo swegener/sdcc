@@ -1,3 +1,35 @@
+2004-10-20 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* device/lib/pic16/libsdcc/Makefile: added lregs directory in
+	makefile targets,
+	* device/lib/pic16/libsdcc/lregs/{Makefile,lrst.c,lrrest.c}: NEW
+	support functions to replace long sequences of MOVFF's from access
+	bank registers to stack and vice versa,
+	* src/pic16/device.h: added new field opt_flags, where optimization
+	flags can be set to enable certain features,
+	* src/pic16/gen.c (pic16_emitpinfo): NEW to add PC_INFO pCode in
+	* pBlock, (genFunction, genEndFunction): surroung loop for
+	saving/loading used registers in stack with PC_INFO pCodes,
+	INF_LREGS. Code in between can then be optimized by pCode optimizer
+	to support function calls,
+	* (genDataPointerSet): fixed bug which loaded float fields in
+	structures with corrupt data,
+	* src/pic16/genutils.c (debugf, _debugf): macro/function which emits
+	in a standard way debug info on stderr. Feature used for developing
+	and debugging only,
+	* src/pic16/glue.c (pic16glue): reformatted, deleted some old and
+	obsolete chunks of code,
+	* if optimization flag OF_LR_SUPPORT was set, call pic16_OptimizeLocalRegs,
+	* src/pic16/main.c (_pic16_parseOptions): added handler for --flr-support,
+	* pic16/src/pcode.c (pic16_newpCodeInfo,
+	* (pic16_newpCodeOpLocalRegs),
+	* (pic16_convertLocalRegs2Support): NEW, to support new optimization
+	feature,
+	* (pic16_pCodeConstString): printing of the initial value of a
+	symbol as a comment is inhibited since parsing was already done by
+	copyStr and output is corrupt,
+	* (pic16_pCode2str, genericPrint): handle PC_INFO pCode,
+
 2004-10-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/mcs51/ralloc.c (packRegisters): fixed bug #1044601

@@ -296,6 +296,9 @@ _process_pragma(const char *sz)
 #define NL_OPT		"--nl="
 #define USE_CRT		"--use-crt="
 
+#define	OFMSG_LRSUPPORT	"--flr-support"
+
+
 char *alt_asm=NULL;
 char *alt_link=NULL;
 
@@ -334,6 +337,7 @@ OPTION pic16_optionsTable[]= {
 	{ 0,	NL_OPT,		NULL,				"new line, \"lf\" or \"crlf\""},
 	{ 0,	USE_CRT,	NULL,	"use <crt-o> run-time initialization module"},
 	{ 0,	"--no-crt",	&pic16_options.no_crt,	"do not link any default run-time initialization module"},
+	{ 0,	OFMSG_LRSUPPORT,	NULL,		"use support functions for local register store/restore"},
 	{ 0,	NULL,		NULL,	NULL}
 	};
 
@@ -352,71 +356,76 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
   /* TODO: allow port-specific command line options to specify
    * segment names here.
    */
-	/* check for arguments that have associated an integer variable */
-	while(pic16_optionsTable[j].pparameter) {
-		if(ISOPT( pic16_optionsTable[j].longOpt )) {
-			(*pic16_optionsTable[j].pparameter)++;
-			return TRUE;
-		}
-		j++;
-	}
+  
+    /* check for arguments that have associated an integer variable */
+    while(pic16_optionsTable[j].pparameter) {
+      if(ISOPT( pic16_optionsTable[j].longOpt )) {
+        (*pic16_optionsTable[j].pparameter)++;
+        return TRUE;
+      }
+      j++;
+    }
 
+    if(ISOPT(STACK_MODEL)) {
+      stkmodel = getStringArg(STACK_MODEL, argv, i, *pargc);
+      if(!STRCASECMP(stkmodel, "small"))pic16_options.stack_model = 0;
+      else if(!STRCASECMP(stkmodel, "large"))pic16_options.stack_model = 1;
+      else {
+        fprintf(stderr, "Unknown stack model: %s", stkmodel);
+        exit(-1);
+      }
+      return TRUE;
+    }
 
-	if(ISOPT(STACK_MODEL)) {
-		stkmodel = getStringArg(STACK_MODEL, argv, i, *pargc);
-		if(!STRCASECMP(stkmodel, "small"))pic16_options.stack_model = 0;
-		else if(!STRCASECMP(stkmodel, "large"))pic16_options.stack_model = 1;
-		else {
-			fprintf(stderr, "Unknown stack model: %s", stkmodel);
-			exit(-1);
-		}
-		return TRUE;
-	}
+    if(ISOPT(OPT_BANKSEL)) {
+      pic16_options.opt_banksel = getIntArg(OPT_BANKSEL, argv, i, *pargc);
+      return TRUE;
+    }
 
-	if(ISOPT(OPT_BANKSEL)) {
-		pic16_options.opt_banksel = getIntArg(OPT_BANKSEL, argv, i, *pargc);
-		return TRUE;
-	}
-
-	if(ISOPT(REP_UDATA)) {
-		pic16_sectioninfo.at_udata = Safe_strdup(getStringArg(REP_UDATA, argv, i, *pargc));
-		return TRUE;
-	}
+    if(ISOPT(REP_UDATA)) {
+      pic16_sectioninfo.at_udata = Safe_strdup(getStringArg(REP_UDATA, argv, i, *pargc));
+      return TRUE;
+    }
 	
-	if(ISOPT(ALT_ASM)) {
-		alt_asm = Safe_strdup(getStringArg(ALT_ASM, argv, i, *pargc));
-		return TRUE;
-	}
+    if(ISOPT(ALT_ASM)) {
+      alt_asm = Safe_strdup(getStringArg(ALT_ASM, argv, i, *pargc));
+      return TRUE;
+    }
 	
-	if(ISOPT(ALT_LINK)) {
-		alt_link = Safe_strdup(getStringArg(ALT_LINK, argv, i, *pargc));
-		return TRUE;
-	}
+    if(ISOPT(ALT_LINK)) {
+      alt_link = Safe_strdup(getStringArg(ALT_LINK, argv, i, *pargc));
+      return TRUE;
+    }
 
-	if(ISOPT(IVT_LOC)) {
-		pic16_options.ivt_loc = getIntArg(IVT_LOC, argv, i, *pargc);
-		return TRUE;
-	}
+    if(ISOPT(IVT_LOC)) {
+      pic16_options.ivt_loc = getIntArg(IVT_LOC, argv, i, *pargc);
+      return TRUE;
+    }
 	
-	if(ISOPT(NL_OPT)) {
-          char *tmp;
+    if(ISOPT(NL_OPT)) {
+      char *tmp;
             
-            tmp = Safe_strdup( getStringArg(NL_OPT, argv, i, *pargc) );
-            if(!STRCASECMP(tmp, "lf"))pic16_nl = 0;
-            else if(!STRCASECMP(tmp, "crlf"))pic16_nl = 1;
-            else {
-                  fprintf(stderr, "invalid termination character id\n");
-                  exit(-1);
-            }
-            return TRUE;
+        tmp = Safe_strdup( getStringArg(NL_OPT, argv, i, *pargc) );
+        if(!STRCASECMP(tmp, "lf"))pic16_nl = 0;
+        else if(!STRCASECMP(tmp, "crlf"))pic16_nl = 1;
+        else {
+          fprintf(stderr, "invalid termination character id\n");
+          exit(-1);
         }
+        return TRUE;
+    }
 
-        if(ISOPT(USE_CRT)) {
-            pic16_options.no_crt = 0;
-            pic16_options.crt_name = Safe_strdup( getStringArg(USE_CRT, argv, i, *pargc) );
+    if(ISOPT(USE_CRT)) {
+      pic16_options.no_crt = 0;
+      pic16_options.crt_name = Safe_strdup( getStringArg(USE_CRT, argv, i, *pargc) );
 
-            return TRUE;
-        }
+      return TRUE;
+    }
+
+    if(ISOPT(OFMSG_LRSUPPORT)) {
+      pic16_options.opt_flags |= OF_LR_SUPPORT;
+      return TRUE;
+    }
         
   return FALSE;
 }

@@ -78,6 +78,9 @@ void  pic16_pCodeInitRegisters(void);
 pCodeOp *pic16_popCopyReg(pCodeOpReg *pc);
 extern void pic16_pCodeConstString(char *name, char *value);
 
+#define debugf(frm, rest)       _debugf(__FILE__, __LINE__, frm, rest)
+extern void _debugf(char *f, int l, char *frm, ...);
+
 /*-----------------------------------------------------------------*/
 /* aopLiteral - string from a literal value                        */
 /*-----------------------------------------------------------------*/
@@ -659,30 +662,24 @@ pic16_printIvalChar (sym_link * type, initList * ilist, char *s, char ptype, voi
   fprintf(stderr, "%s\n",__FUNCTION__);
 #endif
 
-  if (!s)
-    {
+  if(!s) {
+    val = list2val (ilist);
+    /* if the value is a character string  */
+    if(IS_ARRAY (val->type) && IS_CHAR (val->etype)) {
+      if(!DCL_ELEM (type))
+        DCL_ELEM (type) = strlen (SPEC_CVAL (val->etype).v_char) + 1;
 
-      val = list2val (ilist);
-      /* if the value is a character string  */
-      if (IS_ARRAY (val->type) && IS_CHAR (val->etype))
-	{
-	  if (!DCL_ELEM (type))
-	    DCL_ELEM (type) = strlen (SPEC_CVAL (val->etype).v_char) + 1;
-
- 	    for(remain=0; remain<DCL_ELEM(type); remain++)
-		pic16_emitDB(SPEC_CVAL(val->etype).v_char[ remain ], ptype, p);
-			
-	  if ((remain = (DCL_ELEM (type) - strlen (SPEC_CVAL (val->etype).v_char) - 1)) > 0) {
-	      while (remain--) {
-                  pic16_emitDB(0x00, ptype, p);
-              }
-          }
-	  return 1;
-	}
-      else
-	return 0;
-    }
-  else {
+      for(remain=0; remain<strlen(SPEC_CVAL(val->etype).v_char)+1; remain++)
+        pic16_emitDB(SPEC_CVAL(val->etype).v_char[ remain ], ptype, p);
+      
+      if((remain = (DCL_ELEM (type) - strlen (SPEC_CVAL (val->etype).v_char) - 1)) > 0) {
+        while(remain--) {
+          pic16_emitDB(0x00, ptype, p);
+        }
+      }
+      return 1;
+    } else return 0;
+  } else {
     for(remain=0; remain<strlen(s); remain++) {
         pic16_emitDB(s[remain], ptype, p);
     }
@@ -1355,7 +1352,7 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
 	      if (IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) &&
 		  SPEC_CVAL (sym->etype).v_char) {
 		
-//		fprintf(stderr, "%s:%d printing code string from %s\n", __FILE__, __LINE__, sym->rname);
+//		fprintf(stderr, "%s:%d printing code string for %s\n", __FILE__, __LINE__, sym->rname);
 
 		pic16_pCodeConstString(sym->rname , SPEC_CVAL (sym->etype).v_char);
 	      } else {
@@ -1610,233 +1607,218 @@ pic16emitOverlay (FILE * afile)
 void
 pic16glue ()
 {
-
   FILE *vFile;
   FILE *asmFile;
   FILE *ovrFile = tempfile();
 
+    mainf = newSymbol ("main", 0);
+    mainf->block = 0;
 
-	mainf = newSymbol ("main", 0);
-	mainf->block = 0;
+    mainf = findSymWithLevel(SymbolTab, mainf);
 
-	mainf = findSymWithLevel(SymbolTab, mainf);
-#if 0
-	/* only if the main function exists */
-	if (!(mainf = findSymWithLevel (SymbolTab, mainf))) {
-		if (!options.cc_only)
-			werror (E_NO_MAIN);
-		return;
-	}
-#endif
+    addSetHead(&tmpfileSet,ovrFile);
+    pic16_pCodeInitRegisters();
 
-// 	fprintf(stderr, "main function= %p (%s)\thas body= %d\n", mainf, (mainf?mainf->name:NULL), mainf?IFFUNC_HASBODY(mainf->type):-1);
+    if(pic16_options.no_crt && mainf && IFFUNC_HASBODY(mainf->type)) {
+      pBlock *pb = pic16_newpCodeChain(NULL,'X',pic16_newpCodeCharP("; Starting pCode block"));
 
-	addSetHead(&tmpfileSet,ovrFile);
-	pic16_pCodeInitRegisters();
+        pic16_addpBlock(pb);
 
+        /* entry point @ start of CSEG */
+        pic16_addpCode2pBlock(pb,pic16_newpCodeLabel("__sdcc_program_startup",-1));
 
-	if (pic16_options.no_crt && mainf && IFFUNC_HASBODY(mainf->type)) {
-	  pBlock *pb = pic16_newpCodeChain(NULL,'X',pic16_newpCodeCharP("; Starting pCode block"));
+        if(initsfpnt) {
+          pic16_addpCode2pBlock(pb, pic16_newpCode(POC_LFSR,
+                  pic16_popGetLit2(1, pic16_newpCodeOpRegFromStr("_stack_end"))));
+          pic16_addpCode2pBlock(pb, pic16_newpCode(POC_LFSR,
+                  pic16_popGetLit2(2, pic16_newpCodeOpRegFromStr("_stack_end"))));
+        }
 
-		pic16_addpBlock(pb);
+        /* put in the call to main */
+        pic16_addpCode2pBlock(pb,pic16_newpCode(POC_CALL,pic16_newpCodeOp("_main",PO_STR)));
 
-		/* entry point @ start of CSEG */
-		pic16_addpCode2pBlock(pb,pic16_newpCodeLabel("__sdcc_program_startup",-1));
+        if (options.mainreturn) {
+          pic16_addpCode2pBlock(pb,pic16_newpCodeCharP(";\treturn from main will return to caller\n"));
+          pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETURN,NULL));
+        } else {
+          pic16_addpCode2pBlock(pb,pic16_newpCodeCharP(";\treturn from main will lock up\n"));
+          pic16_addpCode2pBlock(pb,pic16_newpCode(POC_GOTO,pic16_newpCodeOp("$",PO_STR)));
+        }
+    }
 
-		if(initsfpnt) {
-			pic16_addpCode2pBlock(pb, pic16_newpCode(POC_LFSR,
-				pic16_popGetLit2(1, pic16_newpCodeOpRegFromStr("_stack_end"))));
-			pic16_addpCode2pBlock(pb, pic16_newpCode(POC_LFSR,
-				pic16_popGetLit2(2, pic16_newpCodeOpRegFromStr("_stack_end"))));
-		}
+    /* At this point we've got all the code in the form of pCode structures */
+    /* Now it needs to be rearranged into the order it should be placed in the */
+    /* code space */
 
-		/* put in the call to main */
-		pic16_addpCode2pBlock(pb,pic16_newpCode(POC_CALL,pic16_newpCodeOp("_main",PO_STR)));
+    pic16_movepBlock2Head('P');              // Last
+    pic16_movepBlock2Head(code->dbName);
+    pic16_movepBlock2Head('X');
+    pic16_movepBlock2Head(statsg->dbName);   // First
 
-		if (options.mainreturn) {
-			pic16_addpCode2pBlock(pb,pic16_newpCodeCharP(";\treturn from main will return to caller\n"));
-			pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETURN,NULL));
-		} else {
-			pic16_addpCode2pBlock(pb,pic16_newpCodeCharP(";\treturn from main will lock up\n"));
-			pic16_addpCode2pBlock(pb,pic16_newpCode(POC_GOTO,pic16_newpCodeOp("$",PO_STR)));
-		}
-	}
+    /* print the global struct definitions */
 
-	/* At this point we've got all the code in the form of pCode structures */
-	/* Now it needs to be rearranged into the order it should be placed in the */
-	/* code space */
+    vFile = tempfile();
+    /* PENDING: this isnt the best place but it will do */
+    if (port->general.glue_up_main) {
+      /* create the interrupt vector table */
+      pic16createInterruptVect (vFile);
+    }
 
-	pic16_movepBlock2Head('P');              // Last
-	pic16_movepBlock2Head(code->dbName);
-	pic16_movepBlock2Head('X');
-	pic16_movepBlock2Head(statsg->dbName);   // First
-
-	/* print the global struct definitions */
-//	if (options.debug)
-//		cdbStructBlock (0);	//,cdbFile);
-
-	vFile = tempfile();
-	/* PENDING: this isnt the best place but it will do */
-	if (port->general.glue_up_main) {
-		/* create the interrupt vector table */
-		pic16createInterruptVect (vFile);
-	}
-
-	addSetHead(&tmpfileSet,vFile);
+    addSetHead(&tmpfileSet,vFile);
     
-	/* emit code for the all the variables declared */
-	pic16emitMaps ();
-	/* do the overlay segments */
-	pic16emitOverlay(ovrFile);
-	pic16_AnalyzepCode('*');
+    /* emit code for the all the variables declared */
+    pic16emitMaps ();
+
+    /* do the overlay segments */
+    pic16emitOverlay(ovrFile);
+    pic16_AnalyzepCode('*');
 
 #if 1
-	if(pic16_options.dumpcalltree) {
-	  FILE *cFile;
-		sprintf(buffer, dstFileName);
-		strcat(buffer, ".calltree");
-		cFile = fopen(buffer, "w");
-		pic16_printCallTree( cFile );
-		fclose(cFile);
-	}
+    if(pic16_options.dumpcalltree) {
+      FILE *cFile;
+        
+        sprintf(buffer, dstFileName);
+        strcat(buffer, ".calltree");
+        cFile = fopen(buffer, "w");
+        pic16_printCallTree( cFile );
+        fclose(cFile);
+    }
 #endif
 
-	pic16_InlinepCode();
-	pic16_AnalyzepCode('*');
+    pic16_InlinepCode();
+    pic16_AnalyzepCode('*');
 
-	if(pic16_debug_verbose)
-		pic16_pcode_test();
 
-	/* now put it all together into the assembler file */
-	/* create the assembler file name */
-	if ((noAssemble || options.c1mode)  && fullDstFileName) {
-		sprintf (buffer, fullDstFileName);
-	} else {
-		sprintf (buffer, dstFileName);
-		strcat (buffer, ".asm");
-	}
+    if(pic16_debug_verbose)
+      pic16_pcode_test();
 
-	if (!(asmFile = fopen (buffer, "w"))) {
-		werror (E_FILE_OPEN_ERR, buffer);
-		exit (1);
-	}
+    /* now put it all together into the assembler file */
+    /* create the assembler file name */
+    if((noAssemble || options.c1mode)  && fullDstFileName) {
+      sprintf (buffer, fullDstFileName);
+    } else {
+      sprintf (buffer, dstFileName);
+      strcat (buffer, ".asm");
+    }
+
+    if(!(asmFile = fopen (buffer, "w"))) {
+      werror (E_FILE_OPEN_ERR, buffer);
+      exit (1);
+    }
     
-	/* initial comments */
-	pic16initialComments (asmFile);
+    /* initial comments */
+    pic16initialComments (asmFile);
 
-	/* print module name */
-	if(options.debug)
-		fprintf(asmFile, "\t.file\t\"%s\"\n", fullSrcFileName);
+    /* print module name */
+    if(options.debug)
+      fprintf(asmFile, "\t.file\t\"%s\"\n", fullSrcFileName);
 
-	/* Let the port generate any global directives, etc. */
-	if (port->genAssemblerPreamble) {
-		port->genAssemblerPreamble(asmFile);
-	}
+    /* Let the port generate any global directives, etc. */
+    if(port->genAssemblerPreamble) {
+      port->genAssemblerPreamble(asmFile);
+    }
 	
-	/* print the extern variables to this module */
-	pic16_printExterns(asmFile);
+    /* Put all variables into a cblock */
+    pic16_AnalyzeBanking();
+
+    if(pic16_options.opt_flags & OF_LR_SUPPORT) {
+      pic16_OptimizeLocalRegs();
+    }
+
+    /* print the extern variables to this module */
+    pic16_printExterns(asmFile);
 	
-	/* print the global variables in this module */
-	pic16printPublics (asmFile);
+    /* print the global variables in this module */
+    pic16printPublics (asmFile);
+
+    pic16_writeUsedRegs(asmFile);
 
 #if 0
-	/* copy the sfr segment */
-	fprintf (asmFile, "%s", iComments2);
-	fprintf (asmFile, "; special function registers\n");
-	fprintf (asmFile, "%s", iComments2);
-	copyFile (asmFile, sfr->oFile);
-#endif
-
-	/* Put all variables into a cblock */
-	pic16_AnalyzeBanking();
-	pic16_writeUsedRegs(asmFile);
-
-#if 0
-	/* no xdata in pic */
-	/* if external stack then reserve space of it */
-	if (mainf && IFFUNC_HASBODY(mainf->type) && options.useXstack ) {
-		fprintf (asmFile, "%s", iComments2);
-		fprintf (asmFile, "; external stack \n");
-		fprintf (asmFile, "%s", iComments2);
-		fprintf (asmFile,";\t.area XSEG (XDATA)\n"); /* MOF */
-		fprintf (asmFile,";\t.ds 256\n");
-	}
+    /* no xdata in pic */
+    /* if external stack then reserve space of it */
+    if(mainf && IFFUNC_HASBODY(mainf->type) && options.useXstack ) {
+      fprintf (asmFile, "%s", iComments2);
+      fprintf (asmFile, "; external stack \n");
+      fprintf (asmFile, "%s", iComments2);
+      fprintf (asmFile,";\t.area XSEG (XDATA)\n"); /* MOF */
+      fprintf (asmFile,";\t.ds 256\n");
+    }
 #endif
 
 #if 0	
-	/* no xdata in pic */
-	/* copy xtern ram data */
-	fprintf (asmFile, "%s", iComments2);
-	fprintf (asmFile, "; external ram data\n");
-	fprintf (asmFile, "%s", iComments2);
-	copyFile (asmFile, xdata->oFile);
+    /* no xdata in pic */
+    /* copy xtern ram data */
+    fprintf (asmFile, "%s", iComments2);
+    fprintf (asmFile, "; external ram data\n");
+    fprintf (asmFile, "%s", iComments2);
+    copyFile (asmFile, xdata->oFile);
 #endif
 
 #if 0
-	/* copy the bit segment */
-	fprintf (asmFile, "%s", iComments2);
-	fprintf (asmFile, "; bit data\n");
-	fprintf (asmFile, "%s", iComments2);
-	copyFile (asmFile, bit->oFile);
+    /* copy the bit segment */
+    fprintf (asmFile, "%s", iComments2);
+    fprintf (asmFile, "; bit data\n");
+    fprintf (asmFile, "%s", iComments2);
+    copyFile (asmFile, bit->oFile);
 #endif
 
-	/* copy the interrupt vector table */
-	if(mainf && IFFUNC_HASBODY(mainf->type)) {
-		fprintf (asmFile, "\n%s", iComments2);
-		fprintf (asmFile, "; interrupt vector \n");
-		fprintf (asmFile, "%s", iComments2);
-		copyFile (asmFile, vFile);
-	}
+    /* copy the interrupt vector table */
+    if(mainf && IFFUNC_HASBODY(mainf->type)) {
+      fprintf (asmFile, "\n%s", iComments2);
+      fprintf (asmFile, "; interrupt vector \n");
+      fprintf (asmFile, "%s", iComments2);
+      copyFile (asmFile, vFile);
+    }
     
-	/* copy global & static initialisations */
-	fprintf (asmFile, "\n%s", iComments2);
-	fprintf (asmFile, "; global & static initialisations\n");
-	fprintf (asmFile, "%s", iComments2);
+    /* copy global & static initialisations */
+    fprintf (asmFile, "\n%s", iComments2);
+    fprintf (asmFile, "; global & static initialisations\n");
+    fprintf (asmFile, "%s", iComments2);
     
-	if(pic16_debug_verbose)
-		fprintf(asmFile, "; A code from now on!\n");
-	pic16_copypCode(asmFile, 'A');
+    if(pic16_debug_verbose)
+      fprintf(asmFile, "; A code from now on!\n");
+    
+    pic16_copypCode(asmFile, 'A');
 
+    if(pic16_options.no_crt) {
+      if(mainf && IFFUNC_HASBODY(mainf->type)) {
+        fprintf(asmFile, "\tcode\n");
+        fprintf(asmFile,"__sdcc_gsinit_startup:\n");
+      }
+    }
 
-	if(pic16_options.no_crt) {
-		if(mainf && IFFUNC_HASBODY(mainf->type)) {
-			fprintf(asmFile, "\tcode\n");
-			fprintf(asmFile,"__sdcc_gsinit_startup:\n");
-		}
-	}
+//    copyFile (stderr, code->oFile);
 
-//	copyFile (stderr, code->oFile);
+    fprintf(asmFile, "; I code from now on!\n");
+    pic16_copypCode(asmFile, 'I');
 
-	fprintf(asmFile, "; I code from now on!\n");
-	pic16_copypCode(asmFile, 'I');
+    if(pic16_debug_verbose)
+      fprintf(asmFile, "; dbName from now on!\n");
+    
+    pic16_copypCode(asmFile, statsg->dbName);
 
-	if(pic16_debug_verbose)
-		fprintf(asmFile, "; dbName from now on!\n");
-	pic16_copypCode(asmFile, statsg->dbName);
-
-
-	if(pic16_options.no_crt) {
-		if (port->general.glue_up_main && mainf && IFFUNC_HASBODY(mainf->type)) {
-			fprintf (asmFile,"\tgoto\t__sdcc_program_startup\n");
-		}
-	}
+    if(pic16_options.no_crt) {
+      if (port->general.glue_up_main && mainf && IFFUNC_HASBODY(mainf->type)) {
+        fprintf (asmFile,"\tgoto\t__sdcc_program_startup\n");
+      }
+    }
 	
+    if(pic16_debug_verbose)
+      fprintf(asmFile, "; X code from now on!\n");
 
-	if(pic16_debug_verbose)
-		fprintf(asmFile, "; X code from now on!\n");
-	pic16_copypCode(asmFile, 'X');
+    pic16_copypCode(asmFile, 'X');
 
-	if(pic16_debug_verbose)
-		fprintf(asmFile, "; M code from now on!\n");
-	pic16_copypCode(asmFile, 'M');
+    if(pic16_debug_verbose)
+      fprintf(asmFile, "; M code from now on!\n");
 
+    pic16_copypCode(asmFile, 'M');
 
-	pic16_copypCode(asmFile, code->dbName);
+    pic16_copypCode(asmFile, code->dbName);
+    
+    pic16_copypCode(asmFile, 'P');
 
-	pic16_copypCode(asmFile, 'P');
-
-	fprintf (asmFile,"\tend\n");
-	fclose (asmFile);
-
-	rm_tmpfiles();
+    fprintf (asmFile,"\tend\n");
+    fclose (asmFile);
+    
+    rm_tmpfiles();
 }

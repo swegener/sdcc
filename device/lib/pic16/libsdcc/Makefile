@@ -16,7 +16,8 @@ DIRS	=	char \
 		int \
 		long \
 		float \
-		gptr
+		gptr \
+		lregs
 
 
 LIB	= libsdcc.lib

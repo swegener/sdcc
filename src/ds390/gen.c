@@ -63,6 +63,9 @@ static char *spname;
 
 #define D(x) x
 
+#define TR_DPTR(s) if (options.model != MODEL_FLAT24) { emitcode(";", " Use_DPTR1 %s ", s); }
+#define TR_AP(s) if (options.model != MODEL_FLAT24) { emitcode(";", " Use_AP %s ", s); }
+
 unsigned fReturnSizeDS390 = 5;	/* shared with ralloc.c */
 static char *fReturn24[] =
 {"dpl", "dph", "dpx", "b", "a"};
@@ -289,6 +292,7 @@ genSetDPTR (int n)
     }
   else
     {
+      TR_DPTR("#1");
       emitcode ("mov", "dps, #0x01");
     }
 }
@@ -461,6 +465,7 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool useDP2)
 	{
 	  if (options.model == MODEL_FLAT24)
 	    emitcode ("mov", "dpx1,#0x40");
+   TR_DPTR("#2");
 	  emitcode ("mov", "dph1,#0x00");
 	  emitcode ("mov", "dpl1, a");
 	}
@@ -978,6 +983,7 @@ aopGet (asmop * aop,
 	  genSetDPTR (1);
 	  if (!canClobberACC)
 	    {
+       TR_AP("#1");
 	      emitcode ("xch", "a, %s", DP2_RESULT_REG);
 	    }
 	}
@@ -1012,6 +1018,7 @@ aopGet (asmop * aop,
 	  genSetDPTR (0);
 	  if (!canClobberACC)
 	    {
+       TR_AP("#2");
 	      emitcode ("xch", "a, %s", DP2_RESULT_REG);
 	      return DP2_RESULT_REG;
 	    }
@@ -3532,6 +3539,7 @@ genPlus (iCode * ic)
 	       * above branch.
 	       */
 	      assert(AOP_NEEDSACC(IC_RIGHT(ic)));
+       TR_AP("#3");
 	      D(emitcode(";", "+ AOP_ACC special case."););
 	      emitcode("xch", "a, %s", DP2_RESULT_REG);
 	  }
@@ -3540,6 +3548,7 @@ genPlus (iCode * ic)
 	  {
 	    if (AOP_TYPE(IC_LEFT(ic)) == AOP_ACC)
 	    {
+         TR_AP("#4");
 	        emitcode("add", "a, %s", DP2_RESULT_REG); 
 	    }
 	    else
@@ -5078,6 +5087,7 @@ genFarFarLogicOp(iCode *ic, char *logicOp)
       int size, resultSize, compSize;
       int offset = 0;
       
+      TR_AP("#5");
       D(emitcode(";", "%s special case for 3 far operands.", logicOp););
       compSize = AOP_SIZE(IC_LEFT(ic)) < AOP_SIZE(IC_RIGHT(ic)) ? 
       		  AOP_SIZE(IC_LEFT(ic)) : AOP_SIZE(IC_RIGHT(ic));
@@ -6745,6 +6755,7 @@ _loadLeftIntoAx(char 	**lsb,
        	   leftByte = aopGet (AOP(left), offl, FALSE, FALSE, TRUE);
            if (strcmp(leftByte, DP2_RESULT_REG))
            {
+               TR_AP("#7");
                emitcode("mov","%s,%s", DP2_RESULT_REG, leftByte);
        	   }
        	   // And MSB in A.
@@ -9395,6 +9406,28 @@ genFarFarAssign (operand * result, operand * right, iCode * ic)
       }
       emitcode("mov", "dps, #0");
       freeAsmop (right, NULL, ic, FALSE);
+#if 0
+some alternative code for processors without auto-toggle
+no time to test now, so later well put in...kpb
+        D(emitcode(";","genFarFarAssign (dual-dptr fun)"););
+        emitcode("mov", "dps, #0x01"); 	/* Select DPTR2. */
+        emitcode ("mov", "dptr,#%s", rSym->rname); 
+        /* DP2 = result, DP1 = right, DP1 is current. */
+        while (size)
+        {
+          --size;
+          emitcode("movx", "a,@dptr");
+          if (size)
+            emitcode("inc", "dptr");
+          emitcode("inc", "dps");
+          emitcode("movx", "@dptr,a");
+          if (size)
+            emitcode("inc", "dptr");
+          emitcode("inc", "dps");
+        }
+        emitcode("mov", "dps, #0");
+        freeAsmop (right, NULL, ic, FALSE);
+#endif
   }
   else
   {

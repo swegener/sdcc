@@ -2137,7 +2137,10 @@ packRegsDPTRuse (operand * op)
 	    if (OP_SYMBOL(IC_RESULT(ic))->liveTo == 
 		OP_SYMBOL(IC_RESULT(ic))->liveFrom) continue ;
 	    etype = getSpec(type = operandType(IC_RESULT(ic)));
+#if 0
 	    if (getSize(type) == 0 || isOperandEqual(op,IC_RESULT(ic))) 
+#endif
+	    if (getSize(type) == 0)
 		continue ;
 	    return NULL ;
 	}

@@ -44,6 +44,7 @@ enum
 #define REG_GPR 0x02
 #define REG_CND 0x04
 #define REG_SFR 0x08
+#define REG_STK 0x10  /* Use a register as a psuedo stack */
 
 /* definition for the registers */
 typedef struct regs
@@ -64,23 +65,11 @@ typedef struct regs
 regs;
 extern regs regspic14[];
 extern int pic14_nRegs;
+extern int Gstack_base_addr;
 
 regs *pic14_regWithIdx (int);
 void  pic14_freeAllRegs ();
 void  pic14_deallocateAllRegs ();
-regs *pic14_findFreeReg(void);
-
-enum PIC_register_types
-  {
-    PIC_INDF,
-    PIC_TMR0,
-    PIC_FSR,
-    PIC_STATUS,
-    PIC_IOPORT,
-    PIC_IOTRIS,
-    PIC_GPR,			/*  A general purpose file register */
-    PIC_SFR			/*  A special function register */
-  };
-
+regs *pic14_findFreeReg(short type);
 
 #endif

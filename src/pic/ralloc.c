@@ -88,6 +88,9 @@ regs regspic14[] =
 
 };
 #else
+
+int Gstack_base_addr=0x38; /* The starting address of registers that
+			    * are used to pass and return parameters */
 regs regspic14[] =
 {
   {REG_GPR, PO_GPR_TEMP, 0x20, "r0x20", "r0x20", 0x20, 1, 0},
@@ -114,6 +117,22 @@ regs regspic14[] =
   {REG_GPR, PO_GPR_TEMP, 0x35, "r0x35", "r0x35", 0x35, 1, 0},
   {REG_GPR, PO_GPR_TEMP, 0x36, "r0x36", "r0x36", 0x36, 1, 0},
   {REG_GPR, PO_GPR_TEMP, 0x37, "r0x37", "r0x37", 0x37, 1, 0},
+  {REG_STK, PO_GPR_TEMP, 0x38, "r0x38", "r0x38", 0x38, 1, 0},
+  {REG_STK, PO_GPR_TEMP, 0x39, "r0x39", "r0x39", 0x39, 1, 0},
+  {REG_STK, PO_GPR_TEMP, 0x3A, "r0x3A", "r0x3A", 0x3A, 1, 0},
+  {REG_STK, PO_GPR_TEMP, 0x3B, "r0x3B", "r0x3B", 0x3B, 1, 0},
+  {REG_STK, PO_GPR_TEMP, 0x3C, "r0x3C", "r0x3C", 0x3C, 1, 0},
+  {REG_STK, PO_GPR_TEMP, 0x3D, "r0x3D", "r0x3D", 0x3D, 1, 0},
+  {REG_STK, PO_GPR_TEMP, 0x3E, "r0x3E", "r0x3E", 0x3E, 1, 0},
+  {REG_STK, PO_GPR_TEMP, 0x3F, "r0x3F", "r0x3F", 0x3F, 1, 0},
+  {REG_STK, PO_GPR_TEMP, 0x40, "r0x40", "r0x40", 0x40, 1, 0},
+  {REG_STK, PO_GPR_TEMP, 0x41, "r0x41", "r0x41", 0x41, 1, 0},
+  {REG_STK, PO_GPR_TEMP, 0x42, "r0x42", "r0x42", 0x42, 1, 0},
+  {REG_STK, PO_GPR_TEMP, 0x43, "r0x43", "r0x43", 0x43, 1, 0},
+  {REG_STK, PO_GPR_TEMP, 0x44, "r0x44", "r0x44", 0x44, 1, 0},
+  {REG_STK, PO_GPR_TEMP, 0x45, "r0x45", "r0x45", 0x45, 1, 0},
+  {REG_STK, PO_GPR_TEMP, 0x46, "r0x46", "r0x46", 0x46, 1, 0},
+  {REG_STK, PO_GPR_TEMP, 0x47, "r0x47", "r0x47", 0x47, 1, 0},
 
   {REG_PTR, PO_FSR, 4, "FSR", "FSR", 4, 1, 0},
 
@@ -505,8 +524,8 @@ pic14_regWithIdx (int idx)
     if (regspic14[i].rIdx == idx)
       return &regspic14[i];
 
-  return &regspic14[0];
-
+  //return &regspic14[0];
+  fprintf(stderr,"%s %d - requested register: 0x%x\n",__FUNCTION__,__LINE__,idx);
   werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
 	  "regWithIdx not found");
   exit (1);
@@ -515,14 +534,17 @@ pic14_regWithIdx (int idx)
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 regs *
-pic14_findFreeReg(void)
+pic14_findFreeReg(short type)
 {
   int i;
 
-  for (i = 0; i < pic14_nRegs; i++)
-    if (regspic14[i].isFree)
+  for (i = 0; i < pic14_nRegs; i++) {
+    if (!type && regspic14[i].isFree)
       return &regspic14[i];
-
+    if (regspic14[i].isFree &&
+	regspic14[i].type == type)
+      return &regspic14[i];
+  }
   return NULL;
 }
 /*-----------------------------------------------------------------*/

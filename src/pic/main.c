@@ -67,10 +67,10 @@ _pic14_regparm (sym_link * l)
 {
   /* for this processor it is simple
      can pass only the first parameter in a register */
-  if (regParmFlg)
-    return 0;
+  //if (regParmFlg)
+  //  return 0;
 
-  regParmFlg = 1;
+  regParmFlg++;// = 1;
   return 1;
 }
 

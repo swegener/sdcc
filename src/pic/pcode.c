@@ -70,6 +70,7 @@ static void pCodeOpPrint(FILE *of, pCodeOp *pcop);
 static char *get_op( pCodeInstruction *pcc);
 int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd);
 int pCodePeepMatchRule(pCode *pc);
+void pBlockStats(FILE *of, pBlock *pb);
 
 
 pCodeInstruction pciADDWF = {
@@ -958,8 +959,10 @@ void copypCode(FILE *of, char dbName)
     return;
 
   for(pb = the_pFile->pbHead; pb; pb = pb->next) {
-    if(getpBlock_dbName(pb) == dbName)
+    if(getpBlock_dbName(pb) == dbName) {
+      pBlockStats(of,pb);
       printpBlock(of,pb);
+    }
   }
 
 }
@@ -999,6 +1002,13 @@ void pcode_test(void)
     }
   }
 }
+/*-----------------------------------------------------------------*/
+/* int RegCond(pCodeOp *pcop) - if pcop points to the STATUS reg-  */
+/*      ister, RegCond will return the bit being referenced.       */
+/*                                                                 */
+/* fixme - why not just OR in the pcop bit field                   */
+/*-----------------------------------------------------------------*/
+
 static int RegCond(pCodeOp *pcop)
 {
 
@@ -1175,6 +1185,9 @@ pCode *newpCodeFunction(char *mod,char *f)
 
 }
 
+/*-----------------------------------------------------------------*/
+/* pCodeLabelDestruct - free memory used by a label.               */
+/*-----------------------------------------------------------------*/
 static void pCodeLabelDestruct(pCode *pc)
 {
 
@@ -1250,7 +1263,7 @@ pBlock *newpBlock(void)
 }
 
 /*-----------------------------------------------------------------*/
-/* newpCodeChai0n - create a new chain of pCodes                    */
+/* newpCodeChain - create a new chain of pCodes                    */
 /*-----------------------------------------------------------------*
  *
  *  This function will create a new pBlock and the pointer to the
@@ -1298,6 +1311,8 @@ pCodeOp *newpCodeOpLabel(int key)
   return pcop;
 }
 
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
 pCodeOp *newpCodeOpLit(int lit)
 {
   char *s = buffer;
@@ -1319,6 +1334,8 @@ pCodeOp *newpCodeOpLit(int lit)
   return pcop;
 }
 
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
 pCodeOp *newpCodeOpWild(int id, pCodePeep *pcp, pCodeOp *subtype)
 {
   char *s = buffer;
@@ -1343,6 +1360,8 @@ pCodeOp *newpCodeOpWild(int id, pCodePeep *pcp, pCodeOp *subtype)
   return pcop;
 }
 
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
 pCodeOp *newpCodeOpBit(char *s, int bit, int inBitSpace)
 {
   pCodeOp *pcop;
@@ -1512,6 +1531,8 @@ static void genericDestruct(pCode *pc)
 }
 
 
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
 void pBlockRegs(FILE *of, pBlock *pb)
 {
 
@@ -1785,6 +1806,8 @@ static void unlinkpCodeFromBranch(pCode *pcl , pCode *pc)
 
 }
 
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
 static pBranch * pBranchAppend(pBranch *h, pBranch *n)
 {
   pBranch *b;
@@ -1915,6 +1938,8 @@ static void genericAnalyze(pCode *pc)
 	} else
 	  npc = npc->next;
       }
+      /* reached the end of the pcode chain without finding
+       * an instruction we could link to. */
     }
   }
 }
@@ -2035,6 +2060,8 @@ static void AnalyzeRETURN(pCode *pc)
 
 }
 
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
 
 void AnalyzepBlock(pBlock *pb)
 {
@@ -2049,7 +2076,7 @@ void AnalyzepBlock(pBlock *pb)
       if(PCI(pc)->pcop && PCI(pc)->pcop->type == PO_GPR_TEMP) {
 
 	/* Loop through all of the registers declared so far in
-	   this block and see if we find this new there */
+	   this block and see if we find this one there */
 
 	regs *r = setFirstItem(pb->registers);
 
@@ -2075,6 +2102,8 @@ void AnalyzepBlock(pBlock *pb)
   }
 }
 
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
 int OptimizepBlock(pBlock *pb)
 {
   pCode *pc;
@@ -2395,25 +2424,26 @@ void pBlockStats(FILE *of, pBlock *pb)
   pCode *pc;
   regs  *r;
 
-  fprintf(of,"***\n  pBlock Stats\n***\n");
+  fprintf(of,";***\n;  pBlock Stats\n;***\n");
 
   // for now just print the first element of each set
   pc = setFirstItem(pb->function_entries);
   if(pc) {
-    fprintf(of,"entry\n");
+    fprintf(of,";entry:  ");
     pc->print(of,pc);
   }
   pc = setFirstItem(pb->function_exits);
   if(pc) {
-    fprintf(of,"has an exit\n");
-    pc->print(of,pc);
+    fprintf(of,";has an exit\n");
+    //pc->print(of,pc);
   }
 
   pc = setFirstItem(pb->function_calls);
   if(pc) {
-    fprintf(of,"functions called\n");
+    fprintf(of,";functions called:\n");
 
     while(pc) {
+      fprintf(of,";   ");
       pc->print(of,pc);
       pc = setNextItem(pb->function_calls);
     }
@@ -2423,10 +2453,10 @@ void pBlockStats(FILE *of, pBlock *pb)
   if(r) {
     int n = elementsInSet(pb->registers);
 
-    fprintf(of,"%d compiler assigned register%c:\n",n, ( (n!=1) ? 's' : ' '));
+    fprintf(of,";%d compiler assigned register%c:\n",n, ( (n!=1) ? 's' : ' '));
 
     while (r) {
-      fprintf(of,"   %s\n",r->name);
+      fprintf(of,";   %s\n",r->name);
       r = setNextItem(pb->registers);
     }
   }
@@ -2504,10 +2534,10 @@ set *register_usage(pBlock *pb)
 
       r2 = setFirstItem(pb->registers);
 
-      while(r2) {
+      while(r2 && (r1->type != REG_STK)) {
 
 	if(r2->rIdx == r1->rIdx) {
-	  newreg = pic14_findFreeReg();
+	  newreg = pic14_findFreeReg(REG_GPR);
 
 
 	  if(!newreg) {
@@ -2535,8 +2565,10 @@ set *register_usage(pBlock *pb)
     /* Collisions have been resolved. Now free the registers in the call path */
     r1 = setFirstItem(registersInCallPath);
     while(r1) {
-      newreg = pic14_regWithIdx(r1->rIdx);
-      newreg->isFree = 1;
+      if(r1->type != REG_STK) {
+	newreg = pic14_regWithIdx(r1->rIdx);
+	newreg->isFree = 1;
+      }
       r1 = setNextItem(registersInCallPath);
     }
 

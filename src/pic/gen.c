@@ -83,6 +83,8 @@ static int optimized_for_speed = 0;
    for the next function.
 */
 static int max_key=0;
+static int GpsuedoStkPtr=0;
+
 unsigned int pic14aopLiteral (value *val, int offset);
 const char *AopType(short type);
 
@@ -1137,6 +1139,25 @@ pCodeOp *popRegFromString(char *str)
   return pcop;
 }
 
+pCodeOp *popRegFromIdx(int rIdx)
+{
+  pCodeOp *pcop;
+
+  DEBUGpic14_emitcode ("; ***","%s,%d  , rIdx=0x%x",
+		       __FUNCTION__,__LINE__,rIdx);
+
+  pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
+
+  PCOR(pcop)->rIdx = rIdx;
+  PCOR(pcop)->r = pic14_regWithIdx(rIdx);
+  PCOR(pcop)->r->isFree = 0;
+  PCOR(pcop)->r->wasUsed = 1;
+
+  pcop->type = PCOR(pcop)->r->pc_type;
+
+
+  return pcop;
+}
 /*-----------------------------------------------------------------*/
 /* popGet - asm operator to pcode operator conversion              */
 /*-----------------------------------------------------------------*/
@@ -1943,6 +1964,7 @@ static void unsaveRegisters (iCode *ic)
 /*-----------------------------------------------------------------*/
 static void pushSide(operand * oper, int size)
 {
+#if 0
 	int offset = 0;
     DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	while (size--) {
@@ -1955,6 +1977,7 @@ static void pushSide(operand * oper, int size)
 		} else
 			pic14_emitcode("push","%s",l);
 	}
+#endif
 }
 
 /*-----------------------------------------------------------------*/
@@ -1962,21 +1985,29 @@ static void pushSide(operand * oper, int size)
 /*-----------------------------------------------------------------*/
 static void assignResultValue(operand * oper)
 {
-	int offset = 0;
-	int size = AOP_SIZE(oper);
+  int offset = 0;
+  int size = AOP_SIZE(oper);
 
-    DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+  DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
-    // The last byte in the assignment is in W
-    aopPut(AOP(oper),"W",size-1);
+  if(!GpsuedoStkPtr) {
+    /* The last byte in the assignment is in W */
+    //aopPut(AOP(oper),"W",size-1);
+    emitpcode(POC_MOVWF, popGet(AOP(oper),0,FALSE,FALSE));
+    GpsuedoStkPtr++;
+    if(size == 1)
+      return;
+    size--;
+    offset++;
+  }
 
-    if(size>1) {
-      while (--size) {
-	aopPut(AOP(oper),fReturn[offset],offset);
-	offset++;
+  while (size--) {
+    emitpcode(POC_MOVFW,popRegFromIdx(GpsuedoStkPtr-1 + Gstack_base_addr));
+    emitpcode(POC_MOVWF, popGet(AOP(oper),offset,FALSE,FALSE));
+    offset++;
+    GpsuedoStkPtr++;
 
-      }
-    }
+  }
 }
 
 
@@ -2198,105 +2229,133 @@ static void saverbank (int bank, iCode *ic, bool pushPsw)
 /*-----------------------------------------------------------------*/
 static void genCall (iCode *ic)
 {
-    sym_link *dtype;   
+  sym_link *dtype;   
 
-    DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+  DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
-    /* if caller saves & we have not saved then */
-    if (!ic->regsSaved)
-        saveRegisters(ic);
+  /* if caller saves & we have not saved then */
+  if (!ic->regsSaved)
+    saveRegisters(ic);
 
-    /* if we are calling a function that is not using
-    the same register bank then we need to save the
-    destination registers on the stack */
-    dtype = operandType(IC_LEFT(ic));
-    if (dtype        && 
-        (FUNC_REGBANK(currFunc->type) != FUNC_REGBANK(dtype)) &&
-	IFFUNC_ISISR(currFunc->type) &&
-        !ic->bankSaved) 
+  /* if we are calling a function that is not using
+     the same register bank then we need to save the
+     destination registers on the stack */
+  dtype = operandType(IC_LEFT(ic));
+  if (dtype        && 
+      (FUNC_REGBANK(currFunc->type) != FUNC_REGBANK(dtype)) &&
+      IFFUNC_ISISR(currFunc->type) &&
+      !ic->bankSaved) 
 
-        saverbank(FUNC_REGBANK(dtype),ic,TRUE);
+    saverbank(FUNC_REGBANK(dtype),ic,TRUE);
 
-    /* if send set is not empty the assign */
-    if (_G.sendSet) {
-	iCode *sic ;
+  /* if send set is not empty the assign */
+  if (_G.sendSet) {
+    iCode *sic;
+    /* For the Pic port, there is no data stack.
+     * So parameters passed to functions are stored
+     * in registers. (The pCode optimizer will get
+     * rid of most of these :).
+     */
+    int psuedoStkPtr=0; 
+    int firstTimeThruLoop = 1;
 
-	for (sic = setFirstItem(_G.sendSet) ; sic ; 
-	     sic = setNextItem(_G.sendSet)) {
-	    int size, offset = 0;
+    for (sic = setFirstItem(_G.sendSet) ; sic ; 
+	 sic = setNextItem(_G.sendSet)) {
+      int size, offset = 0;
 
-	    aopOp(IC_LEFT(sic),sic,FALSE);
-	    size = AOP_SIZE(IC_LEFT(sic));
-	    while (size--) {
-		char *l = aopGet(AOP(IC_LEFT(sic)),offset,
-				FALSE,FALSE);
-		DEBUGpic14_emitcode(";","%d - left type %d",__LINE__,AOP(IC_LEFT(sic))->type);
+      aopOp(IC_LEFT(sic),sic,FALSE);
+      size = AOP_SIZE(IC_LEFT(sic));
 
-		if (strcmp(l,fReturn[offset])) {
 
-		  if ( ((AOP(IC_LEFT(sic))->type) == AOP_IMMD) ||
-		       ((AOP(IC_LEFT(sic))->type) == AOP_LIT) )
-		    emitpcode(POC_MOVLW,popGet(AOP(IC_LEFT(sic)),size,FALSE,FALSE));
-		  //pic14_emitcode("movlw","%s",l);
-		  else
-		    emitpcode(POC_MOVFW,popGet(AOP(IC_LEFT(sic)),size,FALSE,FALSE));
-		  //pic14_emitcode("movf","%s,w",l);
+      while (size--) {
+	char *l = aopGet(AOP(IC_LEFT(sic)),offset,
+			 FALSE,FALSE);
+	DEBUGpic14_emitcode ("; ","%d left %s",__LINE__,
+			     AopType(AOP_TYPE(IC_LEFT(sic))));
 
-		  // The last one is passed in W
-		  if(size)
-		    pic14_emitcode("movwf","%s",fReturn[offset]);
-		}
-		offset++;
-	    }
-	    freeAsmop (IC_LEFT(sic),NULL,sic,TRUE);
+	if(!firstTimeThruLoop) {
+	  /* If is not the first time we've been through the loop
+	   * then we need to save the parameter in a temporary
+	   * register. The last byte of the last parameter is
+	   * passed in W. */
+	  pic14_emitcode("movwf","%s",fReturn[offset]);
+	  emitpcode(POC_MOVWF,popRegFromIdx(psuedoStkPtr + Gstack_base_addr));
+	  psuedoStkPtr++;
+	  DEBUGpic14_emitcode ("; ","%d save param in %d",__LINE__,
+			       psuedoStkPtr+Gstack_base_addr);
 	}
-	_G.sendSet = NULL;
+	firstTimeThruLoop=0;
+
+	if (strcmp(l,fReturn[offset])) {
+
+	  if ( ((AOP(IC_LEFT(sic))->type) == AOP_IMMD) ||
+	       ((AOP(IC_LEFT(sic))->type) == AOP_LIT) )
+	    emitpcode(POC_MOVLW,popGet(AOP(IC_LEFT(sic)),size,FALSE,FALSE));
+	  //pic14_emitcode("movlw","%s",l);
+	  else
+	    emitpcode(POC_MOVFW,popGet(AOP(IC_LEFT(sic)),size,FALSE,FALSE));
+	  //pic14_emitcode("movf","%s,w",l);
+
+	  /* The last one is passed in W but all others are passed on 
+	     the psuedo stack */
+	  /*
+	  if(size) {
+	    pic14_emitcode("movwf","%s",fReturn[offset]);
+	    emitpcode(POC_MOVWF,popRegFromIdx(offset + Gstack_base_addr));
+	  }
+	  */
+	}
+	offset++;
+      }
+      freeAsmop (IC_LEFT(sic),NULL,sic,TRUE);
     }
-    /* make the call */
-    emitpcode(POC_CALL,popGetWithString(OP_SYMBOL(IC_LEFT(ic))->rname[0] ?
-					OP_SYMBOL(IC_LEFT(ic))->rname :
-					OP_SYMBOL(IC_LEFT(ic))->name));
+    _G.sendSet = NULL;
+  }
+  /* make the call */
+  emitpcode(POC_CALL,popGetWithString(OP_SYMBOL(IC_LEFT(ic))->rname[0] ?
+				      OP_SYMBOL(IC_LEFT(ic))->rname :
+				      OP_SYMBOL(IC_LEFT(ic))->name));
 
-    pic14_emitcode("call","%s",(OP_SYMBOL(IC_LEFT(ic))->rname[0] ?
-                           OP_SYMBOL(IC_LEFT(ic))->rname :
-                           OP_SYMBOL(IC_LEFT(ic))->name));
+  GpsuedoStkPtr=0;
+  /* if we need assign a result value */
+  if ((IS_ITEMP(IC_RESULT(ic)) && 
+       (OP_SYMBOL(IC_RESULT(ic))->nRegs ||
+	OP_SYMBOL(IC_RESULT(ic))->spildir )) ||
+      IS_TRUE_SYMOP(IC_RESULT(ic)) ) {
 
-    /* if we need assign a result value */
-    if ((IS_ITEMP(IC_RESULT(ic)) && 
-         (OP_SYMBOL(IC_RESULT(ic))->nRegs ||
-          OP_SYMBOL(IC_RESULT(ic))->spildir )) ||
-        IS_TRUE_SYMOP(IC_RESULT(ic)) ) {
+    _G.accInUse++;
+    aopOp(IC_RESULT(ic),ic,FALSE);
+    _G.accInUse--;
 
-        _G.accInUse++;
-        aopOp(IC_RESULT(ic),ic,FALSE);
-        _G.accInUse--;
+    assignResultValue(IC_RESULT(ic));
 
-	assignResultValue(IC_RESULT(ic));
+    DEBUGpic14_emitcode ("; ","%d left %s",__LINE__,
+			 AopType(AOP_TYPE(IC_RESULT(ic))));
 		
-        freeAsmop(IC_RESULT(ic),NULL, ic,TRUE);
-    }
+    freeAsmop(IC_RESULT(ic),NULL, ic,TRUE);
+  }
 
-    /* adjust the stack for parameters if 
-    required */
-    if (ic->parmBytes) {
-        int i;
-        if (ic->parmBytes > 3) {
-            pic14_emitcode("mov","a,%s",spname);
-            pic14_emitcode("add","a,#0x%02x", (- ic->parmBytes) & 0xff);
-            pic14_emitcode("mov","%s,a",spname);
-        } else 
-            for ( i = 0 ; i <  ic->parmBytes ;i++)
-                pic14_emitcode("dec","%s",spname);
+  /* adjust the stack for parameters if 
+     required */
+  if (ic->parmBytes) {
+    int i;
+    if (ic->parmBytes > 3) {
+      pic14_emitcode("mov","a,%s",spname);
+      pic14_emitcode("add","a,#0x%02x", (- ic->parmBytes) & 0xff);
+      pic14_emitcode("mov","%s,a",spname);
+    } else 
+      for ( i = 0 ; i <  ic->parmBytes ;i++)
+	pic14_emitcode("dec","%s",spname);
 
-    }
+  }
 
-    /* if register bank was saved then pop them */
-    if (ic->bankSaved)
-        unsaverbank(FUNC_REGBANK(dtype),ic,TRUE);
+  /* if register bank was saved then pop them */
+  if (ic->bankSaved)
+    unsaverbank(FUNC_REGBANK(dtype),ic,TRUE);
 
-    /* if we hade saved some registers then unsave them */
-    if (ic->regsSaved && !IFFUNC_CALLEESAVES(dtype))
-        unsaveRegisters (ic);
+  /* if we hade saved some registers then unsave them */
+  if (ic->regsSaved && !IFFUNC_CALLEESAVES(dtype))
+    unsaveRegisters (ic);
 
 
 }
@@ -2468,7 +2527,7 @@ static void genFunction (iCode *ic)
 
     labelOffset += (max_key+4);
     max_key=0;
-
+    GpsuedoStkPtr=0;
     _G.nRegsSaved = 0;
     /* create the function header */
     pic14_emitcode(";","-----------------------------------------");
@@ -2787,63 +2846,68 @@ static void genEndFunction (iCode *ic)
 /*-----------------------------------------------------------------*/
 static void genRet (iCode *ic)
 {
-    int size,offset = 0 , pushed = 0;
+  int size,offset = 0 , pushed = 0;
     
-    DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    /* if we have no return value then
-       just generate the "ret" */
-    if (!IC_LEFT(ic)) 
-	goto jumpret;       
+  DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+  /* if we have no return value then
+     just generate the "ret" */
+  if (!IC_LEFT(ic)) 
+    goto jumpret;       
     
-    /* we have something to return then
-       move the return value into place */
-    aopOp(IC_LEFT(ic),ic,FALSE);
-    size = AOP_SIZE(IC_LEFT(ic));
+  /* we have something to return then
+     move the return value into place */
+  aopOp(IC_LEFT(ic),ic,FALSE);
+  size = AOP_SIZE(IC_LEFT(ic));
     
-    while (size--) {
-	    char *l ;
-	    if (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR) {
-	    	    /* #NOCHANGE */
-		    l = aopGet(AOP(IC_LEFT(ic)),offset++,
-			   FALSE,TRUE);
-		    pic14_emitcode("push","%s",l);
-		    pushed++;
-	    } else {
-		    l = aopGet(AOP(IC_LEFT(ic)),offset,
-			       FALSE,FALSE);
-		    if (strcmp(fReturn[offset],l)) {
-		      if( ( (AOP(IC_LEFT(ic))->type) == AOP_IMMD) ||
-			  ((AOP(IC_LEFT(ic))->type) == AOP_LIT) )
-			pic14_emitcode("movlw","%s",l);
-		      else
-			pic14_emitcode("movf","%s,w",l);
-		      if(size)
-			pic14_emitcode("movwf","%s",fReturn[offset]);
-		      offset++;
-		    }
-	    }
-    }    
-
-    if (pushed) {
-	while(pushed) {
-	    pushed--;
-	    if (strcmp(fReturn[pushed],"a"))
-		pic14_emitcode("pop",fReturn[pushed]);
-	    else
-		pic14_emitcode("pop","acc");
+  while (size--) {
+    char *l ;
+    if (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR) {
+      /* #NOCHANGE */
+      l = aopGet(AOP(IC_LEFT(ic)),offset++,
+		 FALSE,TRUE);
+      pic14_emitcode("push","%s",l);
+      pushed++;
+    } else {
+      l = aopGet(AOP(IC_LEFT(ic)),offset,
+		 FALSE,FALSE);
+      if (strcmp(fReturn[offset],l)) {
+	if( ( (AOP(IC_LEFT(ic))->type) == AOP_IMMD) ||
+	    ((AOP(IC_LEFT(ic))->type) == AOP_LIT) ) {
+	  emitpcode(POC_MOVLW, popGet(AOP(IC_LEFT(ic)),offset,FALSE,FALSE));
+	  pic14_emitcode("movlw","%s",l);
+	}else {
+	  emitpcode(POC_MOVFW, popGet(AOP(IC_LEFT(ic)),offset,FALSE,FALSE));
+	  pic14_emitcode("movf","%s,w",l);
 	}
+	if(size) {
+	  emitpcode(POC_MOVWF,popRegFromIdx(offset + Gstack_base_addr));
+	  pic14_emitcode("movwf","%s",fReturn[offset]);
+	}
+	offset++;
+      }
     }
-    freeAsmop (IC_LEFT(ic),NULL,ic,TRUE);
+  }    
+
+  if (pushed) {
+    while(pushed) {
+      pushed--;
+      if (strcmp(fReturn[pushed],"a"))
+	pic14_emitcode("pop",fReturn[pushed]);
+      else
+	pic14_emitcode("pop","acc");
+    }
+  }
+  freeAsmop (IC_LEFT(ic),NULL,ic,TRUE);
     
  jumpret:
-	/* generate a jump to the return label
-	   if the next is not the return statement */
-    if (!(ic->next && ic->next->op == LABEL &&
-	  IC_LABEL(ic->next) == returnLabel)) {
+  /* generate a jump to the return label
+     if the next is not the return statement */
+  if (!(ic->next && ic->next->op == LABEL &&
+	IC_LABEL(ic->next) == returnLabel)) {
 	
-	emitpcode(POC_GOTO,popGetLabel(returnLabel->key));
-	pic14_emitcode("goto","_%05d_DS_",returnLabel->key+100 + labelOffset);
-    }
+    emitpcode(POC_GOTO,popGetLabel(returnLabel->key));
+    pic14_emitcode("goto","_%05d_DS_",returnLabel->key+100 + labelOffset);
+  }
     
 }
 

@@ -23,24 +23,30 @@ uninstall:
 $(MANUAL).html: $(MANUAL).tex $(MANUAL).ind ;#$(MANUAL).glo
 	mkdir -p $@
 	# fixes latex2html problems with two consecutive dashes for long-options: --stack-auto
+	# fixes latex2html problems with \tabularnewline
 	mv $< `basename $< .tex`.orig.tex
-	sed 's,-\\/-,-\\/-\\/-,g' < `basename $< .tex`.orig.tex > $<
+	sed 's,-\\/-,-\\/-\\/-,g' < `basename $< .tex`.orig.tex | \
+	sed 's,\\tabularnewline$$,\\\\,g' > $<
 	-latex2html -split 5 -show_section_numbers -dir $(MANUAL).html $(MANUAL)
 	mv `basename $< .tex`.orig.tex $<
 
 $(TSS).html: $(TSS).tex
 	mkdir -p $@
 	# fixes latex2html problems with two consecutive dashes for long-options: --stack-auto
+	# fixes latex2html problems with \tabularnewline
 	mv $< `basename $< .tex`.orig.tex
-	sed 's,-\\/-,-\\/-\\/-,g' < `basename $< .tex`.orig.tex > $<
+	sed 's,-\\/-,-\\/-\\/-,g' < `basename $< .tex`.orig.tex | \
+	sed 's,\\tabularnewline$$,\\\\,g' > $<
 	-latex2html -split 0 -dir $(TSS).html $(TSS)
 	mv `basename $< .tex`.orig.tex $<
 
 $(CDB).html: $(CDB).tex
 	mkdir -p $@
 	# fixes latex2html problems with two consecutive dashes for long-options: --stack-auto
+	# fixes latex2html problems with \tabularnewline
 	mv $< `basename $< .tex`.orig.tex
-	sed 's,-\\/-,-\\/-\\/-,g' < `basename $< .tex`.orig.tex > $<
+	sed 's,-\\/-,-\\/-\\/-,g' < `basename $< .tex`.orig.tex | \
+	sed 's,\\tabularnewline$$,\\\\,g' > $<
 	-latex2html -split 0 -show_section_numbers -dir $(CDB).html $(CDB)
 	mv `basename $< .tex`.orig.tex $<
 

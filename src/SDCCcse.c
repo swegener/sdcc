@@ -88,6 +88,35 @@ void replaceAllSymBySym (iCode *ic, operand *from , operand *to)
     for (lic = ic ; lic ; lic = lic->next ) {
 	int siaddr ;
 
+	/* do the special cases first */
+	if (lic->op == IFX) {
+		if (IS_SYMOP(to) &&
+		    IC_COND(lic)->key == from->key) {
+			
+			bitVectUnSetBit (OP_USES(from),lic->key);
+			OP_USES(to) = bitVectSetBit(OP_USES(to),lic->key);
+			siaddr = IC_COND(lic)->isaddr ;
+			IC_COND(lic) = operandFromOperand(to);
+			IC_COND(lic)->isaddr = siaddr ;
+			
+		}
+		continue ;
+	}
+
+	if (lic->op == JUMPTABLE) {
+		if (IS_SYMOP(to) &&
+		    IC_JTCOND(lic)->key == from->key) {
+			
+			bitVectUnSetBit (OP_USES(from),lic->key);
+			OP_USES(to) = bitVectSetBit(OP_USES(to),lic->key);
+			siaddr = IC_COND(lic)->isaddr ;
+			IC_JTCOND(lic) = operandFromOperand(to);
+			IC_JTCOND(lic)->isaddr = siaddr ;
+			
+		}
+		continue ;
+	}
+
 	if (IC_RESULT(lic) && IC_RESULT(lic)->key == from->key ) {
 	    /* maintain du chains */
 	    if (POINTER_SET(lic)) {

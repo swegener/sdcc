@@ -861,6 +861,9 @@ static regs *getRegPtrNoSpil()
     return reg;
 
   assert(0);
+
+  /* just to make the compiler happy */
+  return 0;
 }
 
 /*-----------------------------------------------------------------*/
@@ -878,6 +881,9 @@ static regs *getRegGprNoSpil()
       return reg;
 
   assert(0);
+
+  /* just to make the compiler happy */
+  return 0;
 }
 
 /*-----------------------------------------------------------------*/

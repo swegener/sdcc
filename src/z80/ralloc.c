@@ -796,6 +796,9 @@ static regs *getRegGprNoSpil()
       return reg;
     }
   assert(0);
+
+  /* just to make the compiler happy */
+  return 0;
 }
 
 /** Symbol has a given register.

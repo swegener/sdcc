@@ -465,11 +465,15 @@ void allocParms ( value  *val )
 		   note here that we put it into the overlay segment
 		   first, we will remove it from the overlay segment
 		   after the overlay determination has been done */
-		SPEC_OCLS(lval->etype) = SPEC_OCLS(lval->sym->etype) = 
-		    ( options.model == MODEL_SMALL ? port->mem.default_local_map : 
-		      (options.noOverlay ? port->mem.default_local_map
-		       :overlay ));
-	    
+		if (options.model == MODEL_SMALL) {
+		    SPEC_OCLS(lval->etype) = SPEC_OCLS(lval->sym->etype) = 
+			( options.model == MODEL_SMALL ? port->mem.default_local_map : 
+			  (options.noOverlay ? port->mem.default_local_map
+			   :overlay ));
+		} else {
+		    SPEC_SCLS(lval->etype) = S_XDATA;
+		    SPEC_OCLS(lval->etype) = SPEC_OCLS(lval->sym->etype) = xdata;
+		}
 	    allocIntoSeg(lval->sym);
 	}
     }

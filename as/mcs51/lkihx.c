@@ -136,7 +136,7 @@ hexRecord(unsigned addr, int rtvalIndex)
 	if (chksum == 0)
 		return;			// nothing to output
 
-	if (lastHexAddr > addr) {
+	if ( (lastHexAddr > addr) && (rflag) ) {
 		overrun = hexPageOverrun + 1;
 		ihxEntendedLinearAddress(lastExtendedAddress + overrun);
 		hexPageOverrun = overrun;

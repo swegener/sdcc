@@ -1,3 +1,10 @@
+2004-01-31 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* device/include/c8051f000.h,
+	* device/include/c8051f120.h,
+	* device/include/c8051f300.h: added header files for Silicon
+	Laboratories (formerly Cygnal) CPUs. Contributed by Maarten Brock.
+
 2004-01-31 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCast.c (processParams): added new type flow and restructured

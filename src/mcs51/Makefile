@@ -5,7 +5,7 @@ include $(PRJDIR)/Makefile.common
 OBJ = gen.o ralloc.o main.o
 LIB = port.a
 
-CFLAGS = -ggdb -Wall
+CFLAGS = -ggdb -Wall -O2
 CFLAGS += -I.. -I. -I../..
 
 all: $(LIB)

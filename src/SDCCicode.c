@@ -1649,25 +1649,6 @@ link *aggrToPtr ( link *type, bool force)
     if ((DCL_TYPE(ptype) = PTR_TYPE(SPEC_OCLS(etype))) == CPOINTER)
 	DCL_PTR_CONST(ptype) = 1;
 
-/*     if (SPEC_OCLS(etype) == generic) */
-/* 	DCL_TYPE(ptype) = GPOINTER; */
-/*     else */
-/* 	if (SPEC_OCLS(etype)->codesp ) { */
-/* 	    DCL_TYPE(ptype) = CPOINTER ; */
-/* 	    DCL_PTR_CONST(ptype) = 1; */
-/* 	} */
-/* 	else */
-/* 	    if (SPEC_OCLS(etype)->fmap && !SPEC_OCLS(etype)->paged) */
-/* 		DCL_TYPE(ptype) = FPOINTER ; */
-/* 	    else */
-/* 		if (SPEC_OCLS(etype)->fmap && SPEC_OCLS(etype)->paged) */
-/* 		    DCL_TYPE(ptype) = PPOINTER ; */
-/* 		else */
-/* 		    if (SPEC_OCLS(etype) == idata) */
-/* 			DCL_TYPE(ptype) = IPOINTER; */
-/* 		    else */
-/* 			DCL_TYPE(ptype) = POINTER ; */
-    
     /* if the variable was declared a constant */
     /* then the pointer points to a constant */
     if (IS_CONSTANT(etype) )
@@ -1686,26 +1667,11 @@ operand *geniCodeArray2Ptr (operand *op)
 {
     link *optype = operandType(op);
     link *opetype = getSpec(optype);
-    
+
+    /* set the pointer depending on the storage class */    
     if ((DCL_TYPE(optype) = PTR_TYPE(SPEC_OCLS(opetype))) == CPOINTER)
 	DCL_PTR_CONST(optype) = 1;
 
-    /* set the pointer depending on the storage class */
-/*     if (SPEC_OCLS(opetype)->codesp ) { */
-/* 	DCL_TYPE(optype) = CPOINTER ; */
-/* 	DCL_PTR_CONST(optype) = 1; */
-/*     } */
-/*     else */
-/* 	if (SPEC_OCLS(opetype)->fmap && !SPEC_OCLS(opetype)->paged) */
-/* 	    DCL_TYPE(optype) = FPOINTER ; */
-/* 	else */
-/* 	    if (SPEC_OCLS(opetype)->fmap && SPEC_OCLS(opetype)->paged) */
-/* 		DCL_TYPE(optype) = PPOINTER ; */
-/* 	    else */
-/* 		if (SPEC_OCLS(opetype) == idata) */
-/* 		    DCL_TYPE(optype) = IPOINTER; */
-/* 		else */
-/* 		    DCL_TYPE(optype) = POINTER ; */
     
     /* if the variable was declared a constant */
     /* then the pointer points to a constant */
@@ -1728,10 +1694,12 @@ operand *geniCodeArray (operand *left,operand *right)
     link *ltype = operandType(left);
     
     if (IS_PTR(ltype)) {
+	if (IS_PTR(ltype->next) && left->isaddr)
+	    left = geniCodeRValue(left,FALSE);
 	return geniCodeDerefPtr(geniCodeAdd(left,right));
     }
 
-   /* array access */
+    /* array access */
     right = geniCodeMultiply(right,
 			     operandFromLit(getSize(ltype->next)));
 
@@ -1966,30 +1934,10 @@ operand *geniCodeAddressOf (operand *op)
     p = newLink();
     p->class = DECLARATOR ;
     
+    /* set the pointer depending on the storage class */
     if ((DCL_TYPE(p) = PTR_TYPE(SPEC_OCLS(opetype))) == CPOINTER)
 	DCL_PTR_CONST(p) = 1;
 
-    /* set the pointer depending on the storage class */
-/*     if (SPEC_OCLS(opetype)->codesp ) { */
-/* 	DCL_TYPE(p) = CPOINTER ; */
-/* 	DCL_PTR_CONST(p) = 1; */
-/*     } */
-/*     else */
-/* 	if (SPEC_OCLS(opetype)->fmap && !SPEC_OCLS(opetype)->paged) */
-/* 	    DCL_TYPE(p) = FPOINTER ; */
-/* 	else */
-/* 	    if (SPEC_OCLS(opetype)->fmap && SPEC_OCLS(opetype)->paged) */
-/* 		DCL_TYPE(p) = PPOINTER ; */
-/* 	    else */
-/* 		if (SPEC_OCLS(opetype) == idata) */
-/* 		    DCL_TYPE(p) = IPOINTER; */
-/* 		else */
-/* 		    if (SPEC_OCLS(opetype) == data || */
-/* 			SPEC_OCLS(opetype) == overlay) */
-/* 			DCL_TYPE(p) = POINTER ; */
-/* 		    else */
-/* 			DCL_TYPE(p) = GPOINTER; */
-    
     /* make sure we preserve the const & volatile */
     if (IS_CONSTANT(opetype)) 
 	DCL_PTR_CONST(p) = 1;
@@ -2064,7 +2012,7 @@ operand *geniCodeDerefPtr (operand *op)
     }
     
     /* now get rid of the pointer part */
-    if (lvaluereq && IS_ITEMP(op) && !IS_PTR(optype->next))
+    if (lvaluereq && IS_ITEMP(op) )
     {
 	retype = getSpec(rtype = copyLinkChain(optype)) ;
     }
@@ -2077,16 +2025,6 @@ operand *geniCodeDerefPtr (operand *op)
     if (IS_PTR(optype)) 
 	setOClass(optype,retype);    
         
-    #if 0
-    /* This block moved here from its original location
-     * ten lines later by KV, 2/27/2000.
-     * 
-     * This allows code of the form "&array[const]" to
-     * compile properly.
-     */
-    if (!lvaluereq)
-    	op = geniCodeRValue(op, TRUE);
-    #endif
     op->isGptr = IS_GENPTR(optype);
 
     /* if the pointer was declared as a constant */
@@ -2100,11 +2038,9 @@ operand *geniCodeDerefPtr (operand *op)
 		  IS_CHAR(rtype)   ||
 		  IS_FLOAT(rtype) );
 
-    #if 1
-    /* Moved upwards */
     if (!lvaluereq)
 	op = geniCodeRValue(op,TRUE);
-    #endif
+
     setOperandType(op,rtype);
     
     return op;    
@@ -2273,6 +2209,7 @@ operand *geniCodeAssign (operand *left, operand *right, int nosupdate)
 	if (v > ((LONG_LONG)1 << nbits) && v > 0)
 	    werror(W_CONST_RANGE," = operation");
     }
+
     /* if the left & right type don't exactly match */
     /* if pointer set then make sure the check is
        done with the type & not the pointer */
@@ -2819,7 +2756,7 @@ operand *ast2iCode (ast *tree)
     switch (tree->opval.op) {
 	
     case '[' :    /* array operation */
-	left= geniCodeRValue (left,FALSE);
+	left= geniCodeRValue (left,TRUE);
 	right=geniCodeRValue (right,TRUE);		   
 	
 	return geniCodeArray (left,right);

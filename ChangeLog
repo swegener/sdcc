@@ -1,3 +1,13 @@
+2003-03-16    <johan@balder>
+
+	Undid the hackup of const and volatile, the problem is much bigger
+	* src/SDCC.y:1.65
+	* src/SDCCast.c:1.171
+	* src/SDCCglue.c:1.138
+	* src/SDCCicode.c:1.146
+	* src/SDCCsymt.c:1.150
+	* src/SDCCval.c:1.65
+
 2003-03-15  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/mcs51/ralloc.c (packRegsForAssign): fixed bug #703541

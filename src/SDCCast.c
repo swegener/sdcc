@@ -1782,7 +1782,7 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
 
       if (astHasVolatile (pbody->left))
 	return FALSE;
-      
+
       if (astHasDeref(pbody->right)) return FALSE;
 
       return isConformingBody (pbody->left, sym, body) &&
@@ -3488,11 +3488,15 @@ decorateType (ast * tree)
 	    }
 	  if (tree->opval.op == '>')
 	    {
-	      tree->opval.op = '!';
-	      tree->right = NULL;
-	      LRVAL (tree) = 1;
-	      TTYPE (tree) = TETYPE (tree) = newCharLink ();
-	      return tree;
+	      /* if the parent is an ifx, then we could do */
+	      /* return tree->left; */
+	      tree->opval.op = '?';
+	      tree->right = newNode (':',
+				     newAst_VALUE (constVal ("1")),
+				     tree->right); /* val 0 */
+	      tree->right->lineno = tree->lineno;
+	      tree->right->left->lineno = tree->lineno;
+	      decorateType (tree->right);
 	    }
         }
       /* if they are both literal then */
@@ -5562,7 +5566,7 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		ast_print(tree->left,outfile,indent+2);
 		ast_print(tree->right,outfile,indent+2);
 		return ;
-		
+
 		/*------------------------------------------------------------------*/
 		/*----------------------------*/
 		/*    assignment operators    */

@@ -338,6 +338,7 @@ void cdbTypeInfo (sym_link * type)
 	    
 	    case V_SBIT: fprintf (cdbFilePtr, "SX"); break;
 	    case V_BIT: 
+	    case V_BITFIELD: 
 	      fprintf (cdbFilePtr, "SB%d$%d", SPEC_BSTR (type), 
 		       SPEC_BLEN (type));
 	      break;

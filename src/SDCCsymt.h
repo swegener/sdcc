@@ -42,6 +42,7 @@ enum {
     TYPEOF_LONG,
     TYPEOF_FLOAT,
     TYPEOF_BIT,
+    TYPEOF_BITFIELD,
     TYPEOF_SBIT,
     TYPEOF_SFR,
     TYPEOF_VOID,
@@ -98,6 +99,7 @@ typedef enum
     V_STRUCT,
     V_LABEL,
     V_BIT,
+    V_BITFIELD,
     V_SBIT,
     V_DOUBLE
   }
@@ -444,10 +446,12 @@ extern sym_link *validateLink(sym_link 	*l,
 			   x->select.d.ptr_volatile)
 #define IS_INTEGRAL(x) (IS_SPEC(x) && (x->select.s.noun == V_INT ||  \
                                        x->select.s.noun == V_CHAR || \
+                                       x->select.s.noun == V_BITFIELD || \
                                        x->select.s.noun == V_BIT ||  \
                                        x->select.s.noun == V_SBIT ))
-#define IS_BITFIELD(x) (IS_SPEC(x) && (x->select.s.noun == V_BIT))
-#define IS_BITVAR(x) (IS_SPEC(x) && (x->select.s.noun  == V_BIT ||   \
+#define IS_BITFIELD(x) (IS_SPEC(x) && (x->select.s.noun == V_BITFIELD))
+#define IS_BITVAR(x) (IS_SPEC(x) && (x->select.s.noun == V_BITFIELD || \
+                                     x->select.s.noun  == V_BIT ||   \
                                      x->select.s.noun == V_SBIT ))
 #define IS_FLOAT(x)  (IS_SPEC(x) && x->select.s.noun == V_FLOAT)
 #define IS_ARITHMETIC(x) (IS_INTEGRAL(x) || IS_FLOAT(x))

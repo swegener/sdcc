@@ -5469,6 +5469,7 @@ AccRol (int shCount)
 {
   shCount &= 0x0007;		// shCount : 0..7
 
+#if 0
   switch (shCount)
     {
     case 0:
@@ -5504,6 +5505,43 @@ AccRol (int shCount)
       emit2 ("srl a");
       break;
     }
+#else
+  switch (shCount)
+    {
+    case 0:
+      break;
+    case 1:
+      emit2 ("rlca");
+      break;
+    case 2:
+      emit2 ("rlca");
+      emit2 ("rlca");
+      break;
+    case 3:
+      emit2 ("rlca");
+      emit2 ("rlca");
+      emit2 ("rlca");
+      break;
+    case 4:
+      emit2 ("rlca");
+      emit2 ("rlca");
+      emit2 ("rlca");
+      emit2 ("rlca");
+      break;
+    case 5:
+      emit2 ("rrca");
+      emit2 ("rrca");
+      emit2 ("rrca");
+      break;
+    case 6:
+      emit2 ("rrca");
+      emit2 ("rrca");
+      break;
+    case 7:
+      emit2 ("rrca");
+      break;
+    }
+#endif
 }
 
 /*-----------------------------------------------------------------*/
@@ -6015,6 +6053,82 @@ genRightShift (iCode * ic)
   freeAsmop (result, NULL, ic);
 }
 
+
+/*-----------------------------------------------------------------*/
+/* genUnpackBits - generates code for unpacking bits               */
+/*-----------------------------------------------------------------*/
+static void
+genUnpackBits (operand * result, int pair)
+{
+  int offset = 0;	/* result byte offset */
+  int rsize;		/* result size */
+  int rlen = 0;		/* remaining bitfield length */
+  sym_link *etype;	/* bitfield type information */
+  int blen;		/* bitfield length */
+  int bstr;		/* bitfield starting bit within byte */
+
+  emitDebug ("; genUnpackBits");
+
+  etype = getSpec (operandType (result));
+  rsize = getSize (operandType (result));
+  blen = SPEC_BLEN (etype);
+  bstr = SPEC_BSTR (etype);
+
+  /* If the bitfield length is less than a byte */
+  if (blen < 8)
+    {
+      emit2 ("ld a,!*pair", _pairs[pair].name);
+      AccRsh (bstr);
+      emit2 ("and a,!immedbyte", ((unsigned char) -1) >> (8 - blen));
+      aopPut (AOP (result), "a", offset++);
+      goto finish;
+    }
+
+  /* TODO: what if pair == PAIR_DE ? */
+  if (getPairId (AOP (result)) == PAIR_HL)
+    {
+      wassertl (rsize == 2, "HL must be of size 2");
+      emit2 ("ld a,!*hl");
+      emit2 ("inc hl");
+      emit2 ("ld h,!*hl");
+      emit2 ("ld l,a");
+      emit2 ("ld a,h");
+      emit2 ("and a,!immedbyte", ((unsigned char) -1) >> (16 - blen));
+      emit2 ("ld h,a");
+      spillPair (PAIR_HL);
+      return;
+    }
+
+  /* Bit field did not fit in a byte. Copy all
+     but the partial byte at the end.  */
+  for (rlen=blen;rlen>=8;rlen-=8)
+    {
+      emit2 ("ld a,!*pair", _pairs[pair].name);
+      aopPut (AOP (result), "a", offset++);
+      if (rlen>8)
+        {
+          emit2 ("inc %s", _pairs[pair].name);
+          _G.pairs[pair].offset++;
+        }
+    }
+
+  /* Handle the partial byte at the end */
+  if (rlen)
+    {
+      emit2 ("ld a,!*pair", _pairs[pair].name);
+      emit2 ("and a,!immedbyte", ((unsigned char) -1) >> (8 - rlen));
+      aopPut (AOP (result), "a", offset++);
+    }
+
+finish:
+  if (offset < rsize)
+    {
+      rsize -= offset;
+      while (rsize--)
+	aopPut (AOP (result), "!zero", offset++);
+    }
+}
+
 /*-----------------------------------------------------------------*/
 /* genGenPointerGet -  get value from generic pointer space        */
 /*-----------------------------------------------------------------*/
@@ -6034,7 +6148,7 @@ genGenPointerGet (operand * left,
 
   size = AOP_SIZE (result);
 
-  if (isPair (AOP (left)) && size == 1)
+  if (isPair (AOP (left)) && size == 1 && !IS_BITVAR (retype))
     {
       /* Just do it */
       if (isPtrPair (AOP (left)))
@@ -6052,7 +6166,7 @@ genGenPointerGet (operand * left,
       goto release;
     }
 
-  if (getPairId (AOP (left)) == PAIR_IY)
+  if (getPairId (AOP (left)) == PAIR_IY && !IS_BITVAR (retype))
     {
       /* Just do it */
       offset = 0;
@@ -6075,7 +6189,10 @@ genGenPointerGet (operand * left,
   /* if bit then unpack */
   if (IS_BITVAR (retype))
     {
-      wassert (0);
+      genUnpackBits (result, pair);
+      freeAsmop (left, NULL, ic);
+      goto release;
+      //wassert (0);
     }
   else if (getPairId (AOP (result)) == PAIR_HL)
     {
@@ -6175,6 +6292,149 @@ isRegOrLit (asmop * aop)
   return FALSE;
 }
 
+
+/*-----------------------------------------------------------------*/
+/* genPackBits - generates code for packed bit storage             */
+/*-----------------------------------------------------------------*/
+static void
+genPackBits (sym_link * etype,
+	     operand * right,
+	     int pair,
+	     iCode *ic)
+{
+  int offset = 0;	/* source byte offset */
+  int rlen = 0;		/* remaining bitfield length */
+  int blen;		/* bitfield length */
+  int bstr;		/* bitfield starting bit within byte */
+  int litval;		/* source literal value (if AOP_LIT) */
+  unsigned char mask;	/* bitmask within current byte */
+  int extraPair;	/* a tempory register */
+  bool needPopExtra=0;	/* need to restore original value of temp reg */
+
+  emitDebug (";     genPackBits","");
+
+  blen = SPEC_BLEN (etype);
+  bstr = SPEC_BSTR (etype);
+
+  /* If the bitfield length is less than a byte */
+  if (blen < 8)
+    {
+      mask = ((unsigned char) (0xFF << (blen + bstr)) |
+	      (unsigned char) (0xFF >> (8 - bstr)));
+
+      if (AOP_TYPE (right) == AOP_LIT)
+        {
+          /* Case with a bitfield length <8 and literal source
+          */
+          litval = (int) floatFromVal (AOP (right)->aopu.aop_lit);
+          litval <<= bstr;
+          litval &= (~mask) & 0xff;
+          emit2 ("ld a,!*pair", _pairs[pair].name);
+          if ((mask|litval)!=0xff)
+            emit2 ("and a,!immedbyte", mask);
+          if (litval)
+            emit2 ("or a,!immedbyte", litval);
+          emit2 ("ld !*pair,a", _pairs[pair].name);
+          return;
+        }
+      else
+        {
+          /* Case with a bitfield length <8 and arbitrary source
+          */
+          _moveA (aopGet (AOP (right), 0, FALSE));
+          /* shift and mask source value */
+          AccLsh (bstr);
+          emit2 ("and a,!immedbyte", (~mask) & 0xff);
+
+          extraPair = getFreePairId(ic);
+          if (extraPair == PAIR_INVALID)
+            {
+              extraPair = PAIR_BC;
+              if (getPairId (AOP (right)) != PAIR_BC
+                  || !isLastUse (ic, right))
+                {
+                  _push (extraPair);
+                  needPopExtra = 1;
+                }
+            }
+          emit2 ("ld %s,a", _pairs[extraPair].l);
+          emit2 ("ld a,!*pair", _pairs[pair].name);
+
+          emit2 ("and a,!immedbyte", mask);
+          emit2 ("or a,%s", _pairs[extraPair].l);
+          emit2 ("ld !*pair,a", _pairs[pair].name);
+          if (needPopExtra)
+            _pop (extraPair);
+          return;
+        }
+    }
+
+  /* Bit length is greater than 7 bits. In this case, copy  */
+  /* all except the partial byte at the end                 */
+  for (rlen=blen;rlen>=8;rlen-=8)
+    {
+      emit2 ("ld a,%s", aopGet (AOP (right), offset++, FALSE) );
+      emit2 ("ld !*pair,a", _pairs[pair].name);
+      if (rlen>8)
+        {
+          emit2 ("inc %s", _pairs[pair].name);
+          _G.pairs[pair].offset++;
+        }
+    }
+
+  /* If there was a partial byte at the end */
+  if (rlen)
+    {
+      mask = (((unsigned char) -1 << rlen) & 0xff);
+      
+      if (AOP_TYPE (right) == AOP_LIT)
+        {
+          /* Case with partial byte and literal source
+          */
+          litval = (int) floatFromVal (AOP (right)->aopu.aop_lit);
+          litval >>= (blen-rlen);
+          litval &= (~mask) & 0xff;
+          emit2 ("ld a,!*pair", _pairs[pair].name);
+          if ((mask|litval)!=0xff)
+            emit2 ("and a,!immedbyte", mask);
+          if (litval)
+            emit2 ("or a,!immedbyte", litval);
+        }
+      else
+        {
+          /* Case with partial byte and arbitrary source
+          */
+          _moveA (aopGet (AOP (right), offset++, FALSE));
+          emit2 ("and a,!immedbyte", (~mask) & 0xff);
+
+          extraPair = getFreePairId(ic);
+          if (extraPair == PAIR_INVALID)
+            {
+              extraPair = getPairId (AOP (right));
+              if (!isLastUse (ic, right) || (extraPair == PAIR_INVALID))
+                extraPair = PAIR_BC;
+
+              if (getPairId (AOP (right)) != PAIR_BC
+                  || !isLastUse (ic, right))
+                {
+                  _push (extraPair);
+                  needPopExtra = 1;
+                }
+            }
+          emit2 ("ld %s,a", _pairs[extraPair].l);
+          emit2 ("ld a,!*pair", _pairs[pair].name);
+
+          emit2 ("and a,!immedbyte", mask);
+          emit2 ("or a,%s", _pairs[extraPair].l);
+          if (needPopExtra)
+            _pop (extraPair);
+
+        }
+      emit2 ("ld !*pair,a", _pairs[pair].name);
+    }
+}
+
+
 /*-----------------------------------------------------------------*/
 /* genGenPointerSet - stores the value into a pointer location        */
 /*-----------------------------------------------------------------*/
@@ -6184,7 +6444,9 @@ genGenPointerSet (operand * right,
 {
   int size, offset;
   sym_link *retype = getSpec (operandType (right));
+  sym_link *letype = getSpec (operandType (result));
   PAIR_ID pairId = PAIR_HL;
+  bool isBitvar;
   
   aopOp (result, ic, FALSE, FALSE);
   aopOp (right, ic, FALSE, FALSE);
@@ -6194,8 +6456,11 @@ genGenPointerSet (operand * right,
 
   size = AOP_SIZE (right);
 
+  isBitvar = IS_BITVAR(retype) || IS_BITVAR(letype);
+  emitDebug("; isBitvar = %d", isBitvar);
+
   /* Handle the exceptions first */
-  if (isPair (AOP (result)) && size == 1)
+  if (isPair (AOP (result)) && size == 1 && !isBitvar)
     {
       /* Just do it */
       const char *l = aopGet (AOP (right), 0, FALSE);
@@ -6212,7 +6477,7 @@ genGenPointerSet (operand * right,
       goto release;
     }
   
-  if ( getPairId( AOP (result)) == PAIR_IY)
+  if ( getPairId( AOP (result)) == PAIR_IY && !isBitvar)
     {
       /* Just do it */
       const char *l = aopGet (AOP (right), 0, FALSE);
@@ -6233,7 +6498,8 @@ genGenPointerSet (operand * right,
         }
       goto release;
     }
-  else if (getPairId (AOP (result)) == PAIR_HL && !isLastUse (ic, result))
+  else if (getPairId (AOP (result)) == PAIR_HL && !isLastUse (ic, result)
+           && !isBitvar)
     {
       offset = 0;
 
@@ -6275,9 +6541,11 @@ genGenPointerSet (operand * right,
   freeAsmop (result, NULL, ic);
 
   /* if bit then unpack */
-  if (IS_BITVAR (retype))
+  if (isBitvar)
     {
-      wassert (0);
+      genPackBits ((IS_BITVAR (retype) ? retype : letype), right, pairId, ic);
+      goto release;
+      //wassert (0);
     }
   else
     {

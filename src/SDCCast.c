@@ -2994,6 +2994,9 @@ decorateType (ast * tree)
 		case V_STRUCT:
 		    typeofv = TYPEOF_STRUCT;
 		    break;
+		case V_BITFIELD:
+		    typeofv = TYPEOF_BITFIELD;
+		    break;
 		case V_BIT:
 		    typeofv = TYPEOF_BIT;
 		    break;

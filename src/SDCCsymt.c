@@ -48,6 +48,7 @@ char *nounName(sym_link *sl) {
     case V_VOID: return "void";
     case V_STRUCT: return "struct";
     case V_LABEL: return "label";
+    case V_BITFIELD: return "bitfield";
     case V_BIT: return "bit";
     case V_SBIT: return "sbit";
     case V_DOUBLE: return "double";
@@ -754,8 +755,9 @@ getSize (sym_link * p)
 	case V_LABEL:
 	  return 0;
 	case V_SBIT:
-	  return BITSIZE;
 	case V_BIT:
+	  return BITSIZE;
+	case V_BITFIELD:
 	  return ((SPEC_BLEN (p) / 8) + (SPEC_BLEN (p) % 8 ? 1 : 0));
 	default:
 	  return 0;
@@ -818,8 +820,9 @@ bitsForType (sym_link * p)
 	case V_LABEL:
 	  return 0;
 	case V_SBIT:
-	  return 1;
 	case V_BIT:
+	  return 1;
+	case V_BITFIELD:
 	  return SPEC_BLEN (p);
 	default:
 	  return 0;
@@ -1076,7 +1079,7 @@ compStructSize (int su, structdef * sdef)
 	if (loop->bitVar) {
 
 	    /* change it to a unsigned bit */
-	    SPEC_NOUN (loop->etype) = V_BIT;
+	    SPEC_NOUN (loop->etype) = V_BITFIELD;
 	    SPEC_USIGN (loop->etype) = 1;
 	    SPEC_BLEN (loop->etype) = loop->bitVar;
 
@@ -1256,6 +1259,7 @@ checkSClass (symbol * sym, int isProto)
   if ((IS_ARRAY (sym->type) || IS_PTR (sym->type)) &&
       (SPEC_NOUN (sym->etype) == V_BIT ||
        SPEC_NOUN (sym->etype) == V_SBIT ||
+       SPEC_NOUN (sym->etype) == V_BITFIELD ||
        SPEC_SCLS (sym->etype) == S_SFR))
     werror (E_BIT_ARRAY, sym->name);
 
@@ -1985,6 +1989,7 @@ void
 printTypeChain (sym_link * start, FILE * of)
 {
   int nlr = 0;
+  value *args;
   sym_link * type, * search;
   STORAGE_CLASS scls;
 
@@ -2044,6 +2049,15 @@ printTypeChain (sym_link * start, FILE * of)
 	      fprintf (of, "function %s %s", 
 		       (IFFUNC_ISBUILTIN(type) ? "__builtin__" : " "),
 		       (IFFUNC_ISJAVANATIVE(type) ? "_JavaNative" : " "));
+	      fprintf (of, "( ");
+	      for (args = FUNC_ARGS(type); 
+	           args; 
+		   args=args->next) {
+		printTypeChain(args->type, of);
+		if (args->next)
+		  fprintf(of, ", ");
+	      }
+	      fprintf (of, ") ");
 	      break;
 	    case GPOINTER:
 	      fprintf (of, "generic* ");
@@ -2115,7 +2129,11 @@ printTypeChain (sym_link * start, FILE * of)
 	      break;
 
 	    case V_BIT:
-	      fprintf (of, "bit {%d,%d}", SPEC_BSTR (type), SPEC_BLEN (type));
+	      fprintf (of, "bit");
+	      break;
+
+	    case V_BITFIELD:
+	      fprintf (of, "bitfield {%d,%d}", SPEC_BSTR (type), SPEC_BLEN (type));
 	      break;
 
 	    case V_DOUBLE:

@@ -126,7 +126,6 @@ testBitfieldSizeof(void)
 void
 testBitfieldsSingleBitLiteral(void)
 {
-#if !defined(SDCC_z80) && !defined(SDCC_gbz80)
   size2b_bf.b0 = 0; 
   size2b_bf.b1 = 0; 
   size2b_bf.b2 = 0; 
@@ -174,13 +173,11 @@ testBitfieldsSingleBitLiteral(void)
   ASSERT(size2b_bf.b7==0);
   ASSERT(size2b_bf.b8==0);
   ASSERT(size2b_bf.b9==1);
-#endif
 }
 
 void
 testBitfieldsSingleBit(void)
 {
-#if !defined(SDCC_z80) && !defined(SDCC_gbz80)
   volatile unsigned char c;
 
   c = 0;
@@ -233,13 +230,11 @@ testBitfieldsSingleBit(void)
   ASSERT(size2b_bf.b7==0);
   ASSERT(size2b_bf.b8==0);
   ASSERT(size2b_bf.b9==1);
-#endif
 }
 
 void
-testBitfieldsMultibit(void)
+testBitfieldsMultibitLiteral(void)
 {
-#if !defined(SDCC_z80) && !defined(SDCC_gbz80)
   size2c_bf.b0 = 0xff;	/* should truncate to 0x0f */
   size2c_bf.b1 = 0;
   ASSERT(size2c_bf.b0==0x0f);
@@ -269,7 +264,48 @@ testBitfieldsMultibit(void)
   size2d_bf.b1 = 5;
   ASSERT(size2d_bf.b0==0x0a46);
   ASSERT(size2d_bf.b1==5);
-#endif
+}
+
+void
+testBitfieldsMultibit(void)
+{
+  volatile int allones = 0xffff;
+  volatile int zero = 0;
+  volatile int x;
+  
+  size2c_bf.b0 = allones;	/* should truncate to 0x0f */
+  size2c_bf.b1 = zero;
+  ASSERT(size2c_bf.b0==0x0f);
+  ASSERT(size2c_bf.b1==0);
+
+  size2c_bf.b1 = allones;	/* should truncate to 0x1f */
+  size2c_bf.b0 = zero;
+  ASSERT(size2c_bf.b0==0);
+  ASSERT(size2c_bf.b1==0x1f);
+
+  size2d_bf.b0 = allones; /* should truncate to 0x0fff */
+  size2d_bf.b1 = zero;
+  ASSERT(size2d_bf.b0==0x0fff);
+  ASSERT(size2d_bf.b1==0);
+
+  size2d_bf.b1 = allones; /* should truncate to 0x07 */
+  size2d_bf.b0 = zero;
+  ASSERT(size2d_bf.b0==0);
+  ASSERT(size2d_bf.b1==0x07);
+
+  x = 0x0321;
+  size2d_bf.b0 = x;
+  x = 1;
+  size2d_bf.b1 = x;
+  ASSERT(size2d_bf.b0==0x0321);
+  ASSERT(size2d_bf.b1==1);
+
+  x = 0x0a46;
+  size2d_bf.b0 = x;
+  x = 5;
+  size2d_bf.b1 = x;
+  ASSERT(size2d_bf.b0==0x0a46);
+  ASSERT(size2d_bf.b1==5);
 }
 
 void

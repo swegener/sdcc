@@ -1,3 +1,20 @@
+2003-08-18  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	Made bitfield a distinct type from bit so that bitfields
+	convert as per ANSI C and bits retain their traditional
+	boolean style behaviour. Implemented bitfield support in
+	the z80 port.
+
+	* src/SDCCsymt.h,
+	* src/SDCCsymt.c,
+	* src/SDCCast.c,
+	* src/cdbFile.c,
+	* src/mcs51/gen.c,
+	* src/ds390/gen.c: bit v bitfield split
+	* src/z80/gen.c: New support for bitfields
+	* support/regression/tests/bitfields.c: reenabled z80,
+	added more tests
+
 2003-08-17  Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
 	Rules 246.x, 247.x relate to bitfields, the others speed up

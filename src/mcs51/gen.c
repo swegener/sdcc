@@ -8613,7 +8613,9 @@ genCast (iCode * ic)
   aopOp (result, ic, FALSE);
 
   /* if the result is a bit (and not a bitfield) */
-  if (AOP_TYPE (result) == AOP_CRY)
+  // if (AOP_TYPE (result) == AOP_CRY)
+  if (IS_BITVAR (OP_SYMBOL (result)->type)
+      && !IS_BITFIELD (OP_SYMBOL (result)->type) )
     {
       /* if the right size is a literal then
          we know what the value is */

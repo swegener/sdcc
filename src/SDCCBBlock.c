@@ -305,7 +305,9 @@ void addiCodeToeBBlock ( eBBlock *ebp, iCode *ic , iCode *ip)
 
     /* if the last instruction is a goto */
     /* we add it just before the goto    */
-    if ( ebp->ech->op == GOTO || ebp->ech->op == JUMPTABLE) {
+    if ( ebp->ech->op == GOTO || ebp->ech->op == JUMPTABLE
+      || ebp->ech->op == RETURN) 
+    {
 	ic->lineno = ebp->ech->lineno;
 	ic->prev = ebp->ech->prev;       
 	ebp->ech->prev = ic;

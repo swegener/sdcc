@@ -233,9 +233,13 @@ unsupportedOptTable[] = {
     { 'Y',  NULL,	"use -I instead" }
 };
 
+/** List of all default constant macros.
+ */
 static const char *_baseValues[] = {
-  "cpp", "{bindir}/sdcpp",
+  "cpp", "{bindir}{sep}sdcpp",
   "cppextraopts", "",
+  /* Path seperator character */
+  "sep", DIR_SEPARATOR_STRING,
   NULL
 };
 
@@ -1163,7 +1167,6 @@ linkEdit (char **envp)
     }
   else
     {
-      printf("Here 1\n");
       buildCmdLine2 (buffer, port->linker.mcmd);
     }
 

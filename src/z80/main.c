@@ -271,8 +271,8 @@ _setValues(void)
 {
   if (options.nostdlib == FALSE)
     {
-      setMainValue ("z80libspec", "-k{libdir}/{port} -l{port}.lib");
-      setMainValue ("z80crt0", "{libdir}/{port}/crt0{objext}");
+      setMainValue ("z80libspec", "-k{libdir}{sep}{port} -l{port}.lib");
+      setMainValue ("z80crt0", "{libdir}{sep}{port}{sep}crt0{objext}");
     }
   else
     {
@@ -387,7 +387,7 @@ _getRegName (struct regs *reg)
 }
 
 #define LINKCMD \
-    "{bindir}/link-{port} -n -c -- {z80bases} -m -j" \
+    "{bindir}{sep}link-{port} -n -c -- {z80bases} -m -j" \
     " {z80libspec}" \
     " {z80extralibfiles} {z80extralibpaths}" \
     " {z80outputtypeflag} {srcfilename}{z80outext}" \
@@ -396,7 +396,7 @@ _getRegName (struct regs *reg)
     " {z80extraobj}" 
 
 #define ASMCMD \
-    "{bindir}/as-{port} -plosgff {srcfilename}{objext} {srcfilename}{asmext}"
+    "{bindir}{sep}as-{port} -plosgff {srcfilename}{objext} {srcfilename}{asmext}"
 
 /* Globals */
 PORT z80_port =

@@ -1143,6 +1143,33 @@ static void reAdjustPreg (asmop *aop)
                       (x->aopu.aop_reg[0] == ds390_regWithIdx(R0_IDX) || \
                       x->aopu.aop_reg[0] == ds390_regWithIdx(R1_IDX) )))
 
+/* Workaround for DS80C390 bug: div ab may return bogus results
+ * if A is accessed in instruction immediately before the div.
+ *
+ * Will be fixed in B4 rev of processor, Dallas claims.
+ */
+ 
+#define LOAD_AB_FOR_DIV(LEFT, RIGHT, L) 			\
+    if (!AOP_NEEDSACC(RIGHT))					\
+    {								\
+    	/* We can load A first, then B, since			\
+    	 * B (the RIGHT operand) won't clobber A,		\
+    	 * thus avoiding touching A right before the div.	\
+    	 */							\
+    	D(emitcode(";", "DS80C390 div bug: rearranged ops.");); \
+    	L = aopGet(AOP(LEFT),0,FALSE,FALSE); 			\
+    	MOVA(L);						\
+    	emitcode("mov","b,%s",aopGet(AOP(RIGHT),0,FALSE,FALSE));\
+    }								\
+    else							\
+    {								\
+    	/* Just stuff in a nop after loading A. */		\
+    	emitcode("mov","b,%s",aopGet(AOP(RIGHT),0,FALSE,FALSE));\
+    	L = aopGet(AOP(LEFT),0,FALSE,FALSE);			\
+    	MOVA(L);						\
+    	emitcode("nop", "; workaround for DS80C390 div bug.");	\
+    }
+
 /*-----------------------------------------------------------------*/
 /* genNotFloat - generates not for float operations              */
 /*-----------------------------------------------------------------*/
@@ -3303,13 +3330,8 @@ static void genDivbits (operand *left,
 
     char *l;
 
-    /* the result must be bit */    
-    emitcode("mov","b,%s",aopGet(AOP(right),0,FALSE,FALSE));
-    l = aopGet(AOP(left),0,FALSE,FALSE);
-
-    MOVA(l);    
-
-    emitcode("clr","c"); //jwk
+    /* the result must be bit */
+    LOAD_AB_FOR_DIV(left, right, l);
     emitcode("div","ab");
     emitcode("rrc","a");
     aopPut(AOP(result),"c",0);
@@ -3332,10 +3354,7 @@ static void genDivOneByte (operand *left,
     /* signed or unsigned */
     if (SPEC_USIGN(opetype)) {
         /* unsigned is easy */
-        emitcode("mov","b,%s", aopGet(AOP(right),0,FALSE,FALSE));
-        l = aopGet(AOP(left),0,FALSE,FALSE);
-        MOVA(l);        
-	emitcode("clr","c"); //jwk
+        LOAD_AB_FOR_DIV(left, right, l);
         emitcode("div","ab");
         aopPut(AOP(result),"a",0);
         while (size--)
@@ -3372,7 +3391,7 @@ static void genDivOneByte (operand *left,
     emitcode("","%05d$:",(lbl->key+100));
 
     /* now the division */
-    emitcode("clr","c"); //jwk
+    emitcode("nop", "; workaround for DS80C390 div bug.");
     emitcode("div","ab");
     /* we are interested in the lower order
     only */
@@ -3453,12 +3472,7 @@ static void genModbits (operand *left,
     char *l;
 
     /* the result must be bit */    
-    emitcode("mov","b,%s",aopGet(AOP(right),0,FALSE,FALSE));
-    l = aopGet(AOP(left),0,FALSE,FALSE);
-
-    MOVA(l);       
-
-    emitcode("clr","c"); //jwk
+    LOAD_AB_FOR_DIV(left, right, l);
     emitcode("div","ab");
     emitcode("mov","a,b");
     emitcode("rrc","a");
@@ -3479,10 +3493,7 @@ static void genModOneByte (operand *left,
     /* signed or unsigned */
     if (SPEC_USIGN(opetype)) {
         /* unsigned is easy */
-        emitcode("mov","b,%s", aopGet(AOP(right),0,FALSE,FALSE));
-        l = aopGet(AOP(left),0,FALSE,FALSE);
-        MOVA(l);    
-	emitcode("clr","c"); //jwk
+        LOAD_AB_FOR_DIV(left, right, l);
         emitcode("div","ab");
         aopPut(AOP(result),"b",0);
         return ;
@@ -3519,7 +3530,7 @@ static void genModOneByte (operand *left,
     emitcode("","%05d$:",(lbl->key+100));
 
     /* now the multiplication */
-    emitcode("clr","c"); //jwk
+    emitcode("nop", "; workaround for DS80C390 div bug.");
     emitcode("div","ab");
     /* we are interested in the lower order
     only */

@@ -125,6 +125,23 @@ file
 external_definition
    : function_definition     { blockNo=0;}
    | declaration             { 
+			       if ($1 && $1->type
+				&& IS_FUNC($1->type))
+			       {
+ 				   /* The only legal storage classes for 
+				    * a function prototype (declaration)
+				    * are extern and static. extern is the
+				    * default. Thus, if this function isn't
+				    * explicitly marked static, mark it
+				    * extern.
+				    */
+				   if ($1->etype 
+				    && IS_SPEC($1->etype)
+				    && !SPEC_STAT($1->etype))
+				   {
+				   	SPEC_EXTR($1->etype) = 1;
+				   }
+			       }
                                addSymChain ($1);
                                allocVariables ($1) ;
 			       cleanUpLevel (SymbolTab,1);

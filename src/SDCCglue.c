@@ -1032,7 +1032,7 @@ void glue ()
     
     addSetHead(&tmpfileSet,ovrFile);
     /* print the global struct definitions */
-    if (options.debug)
+    if (options.debug && !options.nodebug)
 	cdbStructBlock (0,cdbFile);
 
     vFile = tempfile();

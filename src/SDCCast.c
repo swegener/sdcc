@@ -3639,7 +3639,7 @@ ast  *createFunction   (symbol  *name,   ast  *body )
     addSet(&operKeyReset,name);
     applyToSet(operKeyReset,resetParmKey);
        
-    if (options.debug)
+    if (options.debug && !options.nodebug)
 	cdbStructBlock(1,cdbFile);
 
     cleanUpLevel(LabelTab,0);

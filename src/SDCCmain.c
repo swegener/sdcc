@@ -118,6 +118,7 @@ char    *preOutName;
 #define OPTION_NOPEEP      "-no-peep"
 #define OPTION_ASMPEEP     "-peep-asm"
 #define OPTION_DEBUG       "-debug"
+#define OPTION_NODEBUG	   "-nodebug"
 #define OPTION_VERSION     "-version"
 #define OPTION_STKAFTRDATA "-stack-after-data"
 #define OPTION_PREPROC_ONLY "-preprocessonly"
@@ -654,6 +655,11 @@ int   parseCmdLine ( int argc, char **argv )
                 continue;
 	    }
 
+	    if (strcmp(&argv[i][1],OPTION_NODEBUG) == 0) {
+		options.nodebug = 1;		
+                continue;
+	    }
+
 	    if (strcmp(&argv[i][1],OPTION_NOREGPARMS) == 0) {
 		options.noregparms = 1;		
                 continue;
@@ -1028,7 +1034,7 @@ int   parseCmdLine ( int argc, char **argv )
 	options.xstack_loc = options.xdata_loc ;
 
     /* if debug option is set the open the cdbFile */
-    if (/* options.debug && */ srcFileName) {
+    if (!options.nodebug && srcFileName) {
 	sprintf(cdbfnbuf,"%s.cdb",srcFileName);
 	if ((cdbFile = fopen(cdbfnbuf,"w")) == NULL)
 	    werror(E_FILE_OPEN_ERR,cdbfnbuf);
@@ -1338,7 +1344,7 @@ int main ( int argc, char **argv , char **envp)
 {
     /* turn all optimizations off by default */
     memset(&optimize,0,sizeof(struct optimize));
-    
+
     /*printVersionInfo ();*/
 
     _findPort(argc, argv);

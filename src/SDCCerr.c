@@ -2,7 +2,7 @@
 
 #include "common.h"
 
-#define USE_STDOUT_FOR_ERRORS		0
+#define USE_STDOUT_FOR_ERRORS		1
 
 #if USE_STDOUT_FOR_ERRORS
 #define ERRSINK		stdout
@@ -156,25 +156,28 @@ struct  {
 { WARNING,"warning *** Indirect call to a banked function not implemented.\n"},
 { WARNING,"warning *** Model '%s' not supported for %s, ignored.\n"},
 { WARNING,"warning *** Both banked and nonbanked attributes used.  nonbanked wins.\n"},
-{ WARNING,"warning *** Both banked and static used.  static wins.\n"},
+{ WARNING,"warning *** Both banked and static used.  static wins.\n"}
 };
+
+void	vwerror (int errNum, va_list marker)
+{
+    if ( ErrTab[errNum].errType== ERROR )
+	fatalError++ ;
+    
+    if ( filename && lineno ) {
+	fprintf(ERRSINK, "%s(%d):",filename,lineno);
+    }
+    vfprintf(ERRSINK, ErrTab[errNum].errText,marker);
+}
 
 /****************************************************************************/
 /* werror - writes an error to the listing file & to standarderr	    */
 /****************************************************************************/
 void	werror (int errNum, ... )
 {
-	va_list	marker;
-
-	
-	if ( ErrTab[errNum].errType== ERROR )
-		fatalError++ ;
-	
-	if ( filename && lineno ) {
-		fprintf(ERRSINK, "%s(%d):",filename,lineno);
-	}
-	va_start(marker,errNum);
-	vfprintf(ERRSINK, ErrTab[errNum].errText,marker);
-	va_end( marker );
+    va_list	marker;
+    va_start(marker,errNum);
+    vwerror(errNum, marker);
+    va_end( marker );
 }
 

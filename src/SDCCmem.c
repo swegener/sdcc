@@ -865,7 +865,7 @@ void redoStackOffsets ()
 
     /* if the debug option is set then output the
        symbols to the map file */
-    if (options.debug) {
+    if (options.debug && !options.nodebug) {
 	for (sym = setFirstItem(istack->syms); sym;
 	     sym = setNextItem(istack->syms))
 	    cdbSymbol(sym,cdbFile,FALSE,FALSE);

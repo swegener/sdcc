@@ -6,6 +6,8 @@ PRJDIR		= ..
 
 include $(PRJDIR)/Makefile.common
 
+USE_ALT_LEX	= 0
+
 PORTS		= mcs51 z80 avr ds390
 PORT_LIBS	= $(PORTS:%=%/port.a)
 
@@ -20,12 +22,20 @@ ifdef SDCC_SUB_VERSION
 CFLAGS		+= -DSDCC_SUB_VERSION_STR=\"$(SDCC_SUB_VERSION)\"
 endif
 
-OBJECTS 	= SDCCy.o SDCClex.o SDCCerr.o SDCChasht.o SDCCmain.o \
+OBJECTS 	= SDCCy.o SDCCerr.o SDCChasht.o SDCCmain.o \
 		  SDCCsymt.o SDCCopt.o SDCCast.o SDCCmem.o SDCCval.o \
 		  SDCCicode.o SDCCbitv.o SDCCset.o SDCClabel.o \
 		  SDCCBBlock.o SDCCloop.o SDCCcse.o SDCCcflow.o SDCCdflow.o \
 		  SDCClrange.o SDCCptropt.o SDCCpeeph.o SDCCglue.o spawn.o \
 		  asm.o
+
+SPECIAL		= SDCCy.h 
+ifeq ($(USE_ALT_LEX), 1)
+OBJECTS		+= altlex.o
+SPECIAL		+= reswords.h
+else
+OBJECTS		+= SDCClex.o
+endif
 
 SOURCES		= $(patsubst %.o,%.c,$(OBJECTS))
 
@@ -73,7 +83,7 @@ installdirs:
 # ---------------------
 dep: Makefile.dep
 
-Makefile.dep: $(SOURCES) *.h $(PRJDIR)/*.h
+Makefile.dep: $(SOURCES) $(SPECIAL) *.h $(PRJDIR)/*.h
 	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(SOURCES) >Makefile.dep
 
 include Makefile.dep
@@ -87,6 +97,11 @@ $(TARGET): $(OBJECTS) $(PORT_LIBS)
 
 .c.o:
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+
+reswords.h: reswords.gperf Makefile
+	gperf -o -k1,2,4 -t -C -N is_reserved_word $< > $@
+
+altlex.o: altlex.c SDCCy.h reswords.h
 
 SDCCy.h: SDCCy.c
 

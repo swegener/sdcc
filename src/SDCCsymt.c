@@ -1846,7 +1846,8 @@ void cdbStructBlock (int block , FILE *of)
     int i ;
     bucket **table = StructTab;
     bucket  *chain;
-    
+    wassert(of);
+
     /* go thru the entire  table  */
     for ( i = 0 ; i < 256; i++ ) {
 	for ( chain = table[i]; chain ; chain = chain->next ) {

@@ -10,6 +10,9 @@ UCZ80 = $(shell if [ -f $(SZ80A) ]; then echo $(SZ80A); else echo $(SZ80B); fi)
 
 SDCCFLAGS +=-mz80 --less-pedantic --profile -DREENTRANT=
 #SDCCFLAGS +=--less-pedantic -DREENTRANT=reentrant
+LINKFLAGS = --nostdlib
+LINKFLAGS += z80.lib
+LIBDIR = $(SDCC_DIR)/device/lib/build/z80
 
 #OBJEXT = .o
 EXEEXT = .ihx
@@ -17,10 +20,8 @@ EXEEXT = .ihx
 EXTRAS = $(PORTS_DIR)/$(PORT)/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJEXT)
 
 # Rule to link into .ihx
-#%$(EXEEXT): %$(OBJEXT) $(EXTRAS)
-
-%$(EXEEXT): %.c $(EXTRAS)
-	$(SDCC) $(SDCCFLAGS) $< $(EXTRAS) -o $@
+%.ihx: %.c $(EXTRAS)
+	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) -L $(LIBDIR) $(EXTRAS) $< -o $@
 
 %$(OBJEXT): %.asm
 	$(SDCC_DIR)/bin/as-z80 -plosgff $@ $<

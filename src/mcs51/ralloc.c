@@ -2212,10 +2212,14 @@ packForPush (iCode * ic, eBBlock * ebp)
     if (bitVectBitValue(dbv,lic->key)) 
       return ;
   }
+  /* extend the live range of replaced operand if needed */
+  if (OP_SYMBOL(IC_RIGHT(dic))->liveTo < ic->seq) {
+	  OP_SYMBOL(IC_RIGHT(dic))->liveTo = ic->seq;
+  }
   /* we now we know that it has one & only one def & use
      and the that the definition is an assignment */
   IC_LEFT (ic) = IC_RIGHT (dic);
-
+   
   remiCodeFromeBBlock (ebp, dic);
   hTabDeleteItem (&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
 }
@@ -2413,7 +2417,7 @@ packRegisters (eBBlock * ebp)
 	      if (dic)
 		{
 		  if (IS_ARITHMETIC_OP (dic))
-		    {
+		    {		       
 		      IC_RESULT (dic) = IC_RESULT (ic);
 		      remiCodeFromeBBlock (ebp, ic);
 		      hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);

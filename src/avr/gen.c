@@ -4585,8 +4585,7 @@ genAddrOf (iCode * ic)
 	   need to get the stack offset of this
 	   variable */
 	if (sym->onStack) {
-		/* if it has an offset then we need to compute
-		   it */
+		/* if it has an offset then we need to compute it */
 		if (sym->stack) {
 			emitcode ("mov", "a,_bp");
 			emitcode ("add", "a,#0x%02x",
@@ -4598,24 +4597,10 @@ genAddrOf (iCode * ic)
 			aopPut (AOP (IC_RESULT (ic)), "_bp", 0);
 		}
 		/* fill the result with zero */
-		size = AOP_SIZE (IC_RESULT (ic)) - 1;
-
-
-		if (options.stack10bit && size < (FPTRSIZE - 1)) {
-			fprintf (stderr,
-				 "*** warning: pointer to stack var truncated.\n");
-		}
-
-		offset = 1;
+		size = AOP_SIZE (IC_RESULT (ic)) - 2;
+		offset = 2;
 		while (size--) {
-			/* Yuck! */
-			if (options.stack10bit && offset == 2) {
-				aopPut (AOP (IC_RESULT (ic)), "0x40",
-					offset++);
-			}
-			else {
-				aopPut (AOP (IC_RESULT (ic)), zero, offset++);
-			}
+			aopPut (AOP (IC_RESULT (ic)), zero, offset++);
 		}
 
 		goto release;

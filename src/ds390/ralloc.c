@@ -2210,7 +2210,10 @@ packForPush (iCode * ic, eBBlock * ebp)
   for (lic = ic; lic != dic ; lic = lic->prev) {
 	  if (bitVectBitValue(dbv,lic->key)) return ;
   }
-
+  /* extend the live range of replaced operand if needed */
+  if (OP_SYMBOL(IC_RIGHT(dic))->liveTo < ic->seq) {
+	  OP_SYMBOL(IC_RIGHT(dic))->liveTo = ic->seq;
+  }
   /* we now we know that it has one & only one def & use
      and the that the definition is an assignment */
   IC_LEFT (ic) = IC_RIGHT (dic);

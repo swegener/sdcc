@@ -763,8 +763,8 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
     }
 
   iloop = ilist->init.deep;
-  lcnt = 1;
-  for (last_type = type; last_type; last_type = last_type->next)
+  lcnt = DCL_ELEM (type);
+  for (last_type = type->next; last_type && DCL_ELEM (last_type); last_type = last_type->next)
     lcnt *= DCL_ELEM (last_type);
 
   for (;;)

@@ -24,7 +24,11 @@
 
 #include "common.h"
 #include "newalloc.h"
+#if defined(_MSC_VER)
 #include <io.h>
+#else
+#include <sys/stat.h>
+#endif
 
 #define X_OK 1
 

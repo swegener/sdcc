@@ -1379,6 +1379,7 @@ void  processFuncArgs   (symbol *func, int ignoreName)
     value *val ;
     int pNum = 1;   
     
+
     /* if this function has variable argument list */
     /* then make the function a reentrant one	   */
     if (func->hasVargs)
@@ -1395,19 +1396,23 @@ void  processFuncArgs   (symbol *func, int ignoreName)
 	func->args = NULL ;
 	return ;
     }
-    
+
+    /* reset regparm for the port */
+    (*port->reset_regparms)();
     /* if any of the arguments is an aggregate */
     /* change it to pointer to the same type */
     while (val) {
 
 	/* mark it as a register parameter if
-	   the function does nit have VA_ARG
-	   and MAX_REG_PARMS not exceeded &&
+	   the function does not have VA_ARG
+	   and as port dictates
 	   not inhibited by command line option or #pragma */
-	if (pNum <= MAX_REG_PARMS && 
+	if (!func->hasVargs       && 	    
 	    !options.noregparms   &&
-	    !func->hasVargs)
+	    (*port->reg_parm)(val->type)) {
+
 	    SPEC_REGPARM(val->etype) = 1;
+	}
 	
 	if ( IS_AGGREGATE(val->type)) {
 	    /* if this is a structure */

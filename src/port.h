@@ -126,6 +126,12 @@ typedef struct {
      * will be used. 
      */
     int (*genIVT)(FILE *of, symbol **intTable, int intCount); 
+
+
+    /* parameter passing in register related functions */
+    void (*reset_regparms)();          /* reset the register count */
+    int  (*reg_parm)(struct link *);   /* will return 1 if can be passed in register */
+   
 } PORT;
 
 extern PORT *port;

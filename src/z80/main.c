@@ -15,6 +15,25 @@ static void _z80_init(void)
     z80_opts.sub = SUB_Z80;
 }
 
+static int regParmFlg = 0; /* determine if we can register a parameter */
+
+static void _z80_reset_regparm()
+{
+    regParmFlg = 0;
+}
+
+static int _z80_reg_parm(link *l)
+{
+        /* for this processor it is simple
+       can pass only the first parameter in a register */
+    if (regParmFlg)
+	return 0;
+
+    regParmFlg = 1;
+    return 1;
+
+}
+
 static bool _z80_parseOptions(int *pargc, char **argv, int *i)
 {
     return FALSE;
@@ -120,5 +139,7 @@ PORT z80_port = {
     _z80_keywords,
     0,	/* no assembler preamble */
     0,	/* no local IVT generation code */
+    _z80_reset_regparm,
+    _z80_reg_parm
 };
 

@@ -44,6 +44,24 @@ static char *_mcs51_keywords[] =     {
 
 void mcs51_assignRegisters (eBBlock **ebbs, int count);
 
+static int regParmFlg = 0; /* determine if we can register a parameter */
+
+static void _mcs51_reset_regparm()
+{
+    regParmFlg = 0;
+}
+
+static int _mcs51_regparm( link *l)
+{
+    /* for this processor it is simple
+       can pass only the first parameter in a register */
+    if (regParmFlg)
+	return 0;
+
+    regParmFlg = 1;
+    return 1;
+}
+
 static bool _mcs51_parseOptions(int *pargc, char **argv, int *i)
 {
     /* TODO: allow port-specific command line options to specify
@@ -220,6 +238,8 @@ PORT mcs51_port = {
     _mcs51_getRegName ,
     _mcs51_keywords,
     _mcs51_genAssemblerPreamble,
-    _mcs51_genIVT
+    _mcs51_genIVT ,
+    _mcs51_reset_regparm,
+    _mcs51_regparm
 };
 

@@ -3,7 +3,7 @@ replace {
 } by {
 	ERROR - peephole - caught (hl),(hl)
 }
-replace {
+replace restart {
 	ld %1,%1
 } by {
         ; Removed redundent load
@@ -191,4 +191,13 @@ replace {
 	jp	m,%3
 	cp	a,#%4
 	jp	p,%5
+}
+replace {
+	ld	e,l
+	ld	d,h
+	ld	l,e
+	ld	h,d
+} by {
+	ld	e,l
+	ld	d,h
 }

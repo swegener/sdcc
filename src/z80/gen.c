@@ -60,7 +60,9 @@
   9. With asm optimised strings		17030 192 2223
 
   10 and below are with asm strings off.
-  
+
+  10 Mucho optimisations		13562 201 1FCC
+
   Apparent advantage of turning on regparams:
   1.  Cost of push
         Decent case is push of a constant 
@@ -252,6 +254,30 @@ static const char *aopNames[] = {
   "AOP_PAIRPT"
 };
 
+static bool
+isLastUse (iCode *ic, operand *op)
+{
+  bitVect *uses = bitVectCopy (OP_USES (op));
+
+  while (!bitVectIsZero (uses))
+    {
+      if (bitVectFirstBit (uses) == ic->key)
+        {
+          if (bitVectnBitsOn (uses) == 1)
+            {
+              return TRUE;
+            }
+          else
+            {
+              return FALSE;
+            }
+        }
+      bitVectUnSetBit (uses, bitVectFirstBit (uses));
+    }
+
+  return FALSE;
+}
+
 static PAIR_ID
 _getTempPairId(void)
 {
@@ -271,14 +297,50 @@ _getTempPairName(void)
   return _pairs[_getTempPairId()].name;
 }
 
+static bool
+isPairInUse (PAIR_ID id, iCode *ic)
+{
+  if (id == PAIR_DE)
+    {
+      return bitVectBitValue (ic->rMask, D_IDX) || bitVectBitValue(ic->rMask, E_IDX);
+    }
+  else if (id == PAIR_BC)
+    {
+      return bitVectBitValue (ic->rMask, B_IDX) || bitVectBitValue(ic->rMask, C_IDX);
+    }
+  else
+    {
+      wassertl (0, "Only implemented for DE and BC");
+      return TRUE;
+    }
+}
+
+static bool
+isPairInUseNotInRet(PAIR_ID id, iCode *ic)
+{
+  bitVect *rInUse;
+  
+  rInUse = bitVectCplAnd (bitVectCopy (ic->rMask), ic->rUsed);
+  
+  if (id == PAIR_DE)
+    {
+      return bitVectBitValue (rInUse, D_IDX) || bitVectBitValue(rInUse, E_IDX);
+    }
+  else
+    {
+      wassertl (0, "Only implemented for DE");
+      return TRUE;
+    }
+}
+
 static PAIR_ID
 getFreePairId (iCode *ic)
 {
-  if (!(bitVectBitValue (ic->rMask, B_IDX) || bitVectBitValue(ic->rMask, C_IDX)))
+  if (!isPairInUse (PAIR_BC, ic))
     {
       return PAIR_BC;
     }
-  else if (IS_Z80 && !(bitVectBitValue (ic->rMask, D_IDX) || bitVectBitValue(ic->rMask, E_IDX)))
+  else if (IS_Z80 && !isPairInUse (PAIR_DE, ic))
     {
       return PAIR_DE;
     }
@@ -1175,8 +1237,36 @@ fetchLitPair (PAIR_ID pairId, asmop * left, int offset)
   emit2 ("ld %s,!hashedstr", pair, l);
 }
 
+static PAIR_ID
+makeFreePairId (iCode *ic, bool *pisUsed)
+{
+  *pisUsed = FALSE;
+
+  if (ic != NULL)
+    {
+      if (!bitVectBitValue (ic->rMask, B_IDX) && !bitVectBitValue(ic->rMask, C_IDX))
+        {
+          return PAIR_BC;
+        }
+      else if (IS_Z80 && !bitVectBitValue (ic->rMask, D_IDX) && !bitVectBitValue(ic->rMask, E_IDX))
+        {
+          return PAIR_DE;
+        }
+      else
+        {
+          *pisUsed = TRUE;
+          return PAIR_HL;
+        }
+    }
+  else
+    {
+      *pisUsed = TRUE;
+      return PAIR_HL;
+    }
+}
+
 static void
-fetchPairLong (PAIR_ID pairId, asmop * aop, int offset)
+fetchPairLong (PAIR_ID pairId, asmop * aop, iCode *ic, int offset)
 {
     /* if this is remateriazable */
     if (isLitWord (aop)) {
@@ -1228,19 +1318,24 @@ fetchPairLong (PAIR_ID pairId, asmop * aop, int offset)
               }
             else
               {
-                _push (PAIR_HL);
+                bool isUsed;
+                PAIR_ID id = makeFreePairId (ic, &isUsed);
+                if (isUsed)
+                  _push (id);
                 /* Can't load into parts, so load into HL then exchange. */
-                emit2 ("ld %s,%s", _pairs[PAIR_HL].l, aopGet (aop, offset, FALSE));
-                emit2 ("ld %s,%s", _pairs[PAIR_HL].h, aopGet (aop, offset + 1, FALSE));
-                emit2 ("push hl");
+                emit2 ("ld %s,%s", _pairs[id].l, aopGet (aop, offset, FALSE));
+                emit2 ("ld %s,%s", _pairs[id].h, aopGet (aop, offset + 1, FALSE));
+                emit2 ("push %s", _pairs[id].name);
                 emit2 ("pop iy");
-                _pop (PAIR_HL);
+                if (isUsed)
+                  _pop (id);
               }
           }
-        else {
+        else 
+          {
             emit2 ("ld %s,%s", _pairs[pairId].l, aopGet (aop, offset, FALSE));
             emit2 ("ld %s,%s", _pairs[pairId].h, aopGet (aop, offset + 1, FALSE));
-        }
+          }
         /* PENDING: check? */
         if (pairId == PAIR_HL)
             spillPair (PAIR_HL);
@@ -1250,7 +1345,7 @@ fetchPairLong (PAIR_ID pairId, asmop * aop, int offset)
 static void
 fetchPair (PAIR_ID pairId, asmop * aop)
 {
-  fetchPairLong (pairId, aop, 0);
+  fetchPairLong (pairId, aop, NULL, 0);
 }
 
 static void
@@ -2044,7 +2139,7 @@ _gbz80_emitAddSubLongLong (iCode *ic, asmop *left, asmop *right, bool isAdd)
   aopPut ( AOP (IC_RESULT (ic)), "a", MSB16);
   aopPut ( AOP (IC_RESULT (ic)), "e", LSB);
 
-  fetchPairLong (PAIR_DE, left, MSB24);
+  fetchPairLong (PAIR_DE, left, NULL, MSB24);
   aopGet (right, MSB24, FALSE);
 
   _pop (PAIR_AF);
@@ -2333,11 +2428,11 @@ genIpush (iCode * ic)
 	}
       if (size == 4)
 	{
-	  fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), 2);
+	  fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), ic, 2);
 	  emit2 ("push hl");
 	  spillPair (PAIR_HL);
 	  _G.stack.pushed += 2;
-	  fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), 0);
+	  fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), ic, 0);
 	  emit2 ("push hl");
 	  spillPair (PAIR_HL);
 	  _G.stack.pushed += 2;
@@ -2952,7 +3047,7 @@ genRet (iCode * ic)
       if (IS_GB && size == 4 && requiresHL (AOP (IC_LEFT (ic))))
 	{
 	  fetchPair (PAIR_DE, AOP (IC_LEFT (ic)));
-	  fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), 2);
+	  fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), ic, 2);
 	}
       else
 	{
@@ -3690,8 +3785,9 @@ genMult (iCode * ic)
   //  wassertl (val > 0, "Multiply must be positive");
   wassertl (val != 1, "Can't multiply by 1");
 
-  if (IS_Z80) {
+  if (IS_Z80 && isPairInUseNotInRet (PAIR_DE, ic)) {
     _push (PAIR_DE);
+    _G.stack.pushedDE = TRUE;
   }
 
   if ( AOP_SIZE (IC_LEFT (ic)) == 1 && !SPEC_USIGN (getSpec (operandType ( IC_LEFT (ic)))))
@@ -3735,9 +3831,10 @@ genMult (iCode * ic)
 
   spillCached();
 
-  if (IS_Z80)
+  if (IS_Z80 && _G.stack.pushedDE)
     {
       _pop (PAIR_DE);
+      _G.stack.pushedDE = FALSE;
     }
 
   commitPair ( AOP (IC_RESULT (ic)), PAIR_HL);
@@ -5273,9 +5370,13 @@ shiftL2Left2Result (operand * left, int offl,
       movLeft2Result (left, offl, result, offr, 0);
       movLeft2Result (left, offl + 1, result, offr + 1, 0);
     }
-  /* PENDING: for now just see if it'll work. */
-  /*if (AOP(result)->type == AOP_REG) { */
-  {
+
+  if (shCount == 1 && getPairId (AOP (result)) == PAIR_HL)
+    {
+      emit2 ("add hl,hl");
+    }
+  else
+    {
     int size = 2;
     int offset = 0;
     symbol *tlbl, *tlbl1;
@@ -5897,7 +5998,7 @@ genGenPointerGet (operand * left,
       goto release;
     }
 
-  if ( getPairId( AOP (left)) == PAIR_IY)
+  if (getPairId (AOP (left)) == PAIR_IY)
     {
       /* Just do it */
       offset = 0;
@@ -5917,20 +6018,47 @@ genGenPointerGet (operand * left,
   /* if this is remateriazable */
   fetchPair (pair, AOP (left));
 
-  freeAsmop (left, NULL, ic);
-
   /* if bit then unpack */
   if (IS_BITVAR (retype))
     {
       wassert (0);
     }
-  else if ( getPairId( AOP (result)) == PAIR_HL)
+  else if (getPairId (AOP (result)) == PAIR_HL)
     {
       wassertl (size == 2, "HL must be of size 2");
       emit2 ("ld a,!*hl");
       emit2 ("inc hl");
       emit2 ("ld h,!*hl");
       emit2 ("ld l,a");
+    }
+  else if (getPairId (AOP (left)) == PAIR_HL && !isLastUse (ic, left))
+    {
+      size = AOP_SIZE (result);
+      offset = 0;
+
+      while (size--)
+	{
+	  /* PENDING: make this better */
+	  if (!IS_GB && AOP_TYPE (result) == AOP_REG)
+	    {
+	      aopPut (AOP (result), "!*hl", offset++);
+	    }
+	  else
+	    {
+	      emit2 ("ld a,!*pair", _pairs[pair].name);
+	      aopPut (AOP (result), "a", offset++);
+	    }
+	  if (size)
+	    {
+	      emit2 ("inc %s", _pairs[pair].name);
+	      _G.pairs[pair].offset++;
+	    }
+	}
+      /* Fixup HL back down */
+      for (size = AOP_SIZE (result)-1; size; size--)
+        {
+          emit2 ("dec %s", _pairs[pair].name);
+        }
     }
   else
     {
@@ -5940,7 +6068,8 @@ genGenPointerGet (operand * left,
       while (size--)
 	{
 	  /* PENDING: make this better */
-	  if (!IS_GB && AOP (result)->type == AOP_REG)
+	  if (!IS_GB && 
+              (AOP_TYPE (result) == AOP_REG || AOP_TYPE (result) == AOP_HLREG))
 	    {
 	      aopPut (AOP (result), "!*hl", offset++);
 	    }
@@ -5956,6 +6085,8 @@ genGenPointerGet (operand * left,
 	    }
 	}
     }
+
+  freeAsmop (left, NULL, ic);
 
 release:
   freeAsmop (result, NULL, ic);
@@ -6044,6 +6175,37 @@ genGenPointerSet (operand * right,
               emit2 ("ld !*iyx,a", offset);
             }
           offset++;
+        }
+      goto release;
+    }
+  else if (getPairId (AOP (result)) == PAIR_HL && !isLastUse (ic, result))
+    {
+      offset = 0;
+
+      while (size--)
+	{
+	  const char *l = aopGet (AOP (right), offset, FALSE);
+	  if (isRegOrLit (AOP (right)) && !IS_GB)
+	    {
+	      emit2 ("ld !*pair,%s", _pairs[PAIR_HL].name, l);
+	    }
+	  else
+	    {
+	      _moveA (l);
+	      emit2 ("ld !*pair,a", _pairs[PAIR_HL].name);
+	    }
+	  if (size)
+	    {
+	      emit2 ("inc %s", _pairs[PAIR_HL].name);
+	      _G.pairs[PAIR_HL].offset++;
+	    }
+	  offset++;
+	}
+
+      /* Fixup HL back down */
+      for (size = AOP_SIZE (right)-1; size; size--)
+        {
+          emit2 ("dec %s", _pairs[PAIR_HL].name);
         }
       goto release;
     }
@@ -6242,12 +6404,12 @@ genAssign (iCode * ic)
 
   if (AOP_TYPE (right) == AOP_LIT)
     {
-    lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
+      lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
     }
 
   if (isPair (AOP (result)))
     {
-      fetchPair (getPairId (AOP (result)), AOP (right));
+      fetchPairLong (getPairId (AOP (result)), AOP (right), ic, LSB);
     }
   else if ((size > 1) &&
 	   (AOP_TYPE (result) != AOP_REG) &&

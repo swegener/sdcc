@@ -1,3 +1,13 @@
+2001-12-05  Michael Hope  <michaelh@juju.net.nz>
+
+	* src/diff.1 (Index): Many, many optmisiations.  Dhrystone up to 201.
+
+1904-01-06  Michael Hope  <michaelh@juju.net.nz>
+
+	* src/z80/ralloc.c (packRegsForIYUse): Fixed the case where an operand is in direct space.
+
+	* src/z80/gen.c (makeFreePairId): Optimised IY load by using a spare pair.
+
 2001-12-02  Bernhard Held  <bernhard@bernhardheld.de>
 
 	* src/mcs51/gen.c (genFunction): avoid excess "inc sp"

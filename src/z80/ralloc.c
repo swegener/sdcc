@@ -54,6 +54,7 @@ enum
     DISABLE_PACK_ASSIGN = 0,
     DISABLE_PACK_ONE_USE = 0,
     DISABLE_PACK_HL = 0,
+    DISABLE_PACK_IY = 0
   };
 
 /* Flags to turn on debugging code.
@@ -67,7 +68,9 @@ enum
     D_HLUSE = 0,
     D_HLUSE2 = 0,
     D_HLUSE2_VERBOSE = 0,
-    D_FILL_GAPS = 0
+    D_FILL_GAPS = 0,
+    D_PACK_IY = 0,
+    D_PACK_HLUSE3 = 0
   };
 
 #if 1
@@ -2232,10 +2235,9 @@ packRegsForHLUse3 (iCode * lic, operand * op, eBBlock * ebp)
   iCode *ic, *dic;
   bool isFirst = TRUE;
 
-#if 0
-  printf("Checking:\n");
-  piCode(lic, NULL);
-#endif
+  D (D_PACK_HLUSE3, ("Checking HL on %p lic key %u first def %u line %u:\n", OP_SYMBOL(op), lic->key, bitVectFirstBit(OP_DEFS(op)), lic->lineno));
+  if (D_PACK_HLUSE3)
+    piCode(lic, NULL);
 
   if ( OP_SYMBOL(op)->accuse)
     {
@@ -2282,18 +2284,20 @@ packRegsForHLUse3 (iCode * lic, operand * op, eBBlock * ebp)
   dic = ic = hTabFirstItemWK(iCodeSeqhTab,OP_SYMBOL(op)->liveFrom);
 
   for (; ic && ic->seq <= OP_SYMBOL(op)->liveTo;
-       ic = hTabNextItem(iCodeSeqhTab,&key)) 
+       ic = hTabNextItem(iCodeSeqhTab, &key)) 
     {
-#if 0
-      piCode(ic, NULL);
-      printf("(op: %u)\n", ic->op);
-#endif
+      if (D_PACK_HLUSE3)
+        piCode(ic, NULL);
+      D (D_PACK_HLUSE3, ("(On %p: op: %u next: %p)\n", ic, ic->op, ic->next));
+
       if (isFirst)
         {
           isFirst = FALSE;
           if (ic->op == ADDRESS_OF)
             continue;
           if (POINTER_GET (ic))
+            continue;
+          if (ic->op == '=' && !POINTER_SET(ic))
             continue;
         }
 
@@ -2330,11 +2334,23 @@ packRegsForHLUse3 (iCode * lic, operand * op, eBBlock * ebp)
       if (ic->op == CALL && isOperandEqual (op, IC_RESULT (ic)))
         continue;
 
+      if (ic->op == LEFT_OP && isOperandLiteral (IC_RIGHT (ic)))
+        continue;
+
       if ((ic->op == '=' && !POINTER_SET(ic)) ||
           ic->op == UNARYMINUS ||
           ic->op == '+' ||
           ic->op == '-' ||
+          ic->op == '>' ||
+          ic->op == '<' ||
+          ic->op == EQ_OP ||
           0)
+        continue;
+
+      if (ic->op == '*' && isOperandEqual (op, IC_LEFT (ic)))
+        continue;
+
+      if (POINTER_SET (ic) && isOperandEqual (op, IC_RESULT (ic)))
         continue;
 
       if (POINTER_GET (ic) && isOperandEqual (op, IC_LEFT (ic)))
@@ -2351,11 +2367,9 @@ packRegsForHLUse3 (iCode * lic, operand * op, eBBlock * ebp)
       return NULL;
     }
 
-#if 0
-  printf("Succeeded!\n");
-#endif
-  OP_SYMBOL (op)->accuse = ACCUSE_SCRATCH;
+  D (D_PACK_HLUSE3, ("Succeeded!\n"))
 
+  OP_SYMBOL (op)->accuse = ACCUSE_SCRATCH;
   return dic;
 }
 
@@ -2367,10 +2381,9 @@ packRegsForIYUse (iCode * lic, operand * op, eBBlock * ebp)
   iCode *ic, *dic;
   bitVect *uses;
 
-#if 0
-  printf("Checking IY on %p lic key %u first def %u:\n", OP_SYMBOL(op), lic->key, bitVectFirstBit(OP_DEFS(op)));
-  piCode(lic, NULL);
-#endif
+  D (D_PACK_IY, ("Checking IY on %p lic key %u first def %u line %u:\n", OP_SYMBOL(op), lic->key, bitVectFirstBit(OP_DEFS(op)), lic->lineno));
+  if (D_PACK_IY)
+    piCode(lic, NULL);
 
   if ( OP_SYMBOL(op)->accuse)
     {
@@ -2423,10 +2436,8 @@ packRegsForIYUse (iCode * lic, operand * op, eBBlock * ebp)
   for (; ic && ic->seq <= OP_SYMBOL(op)->liveTo;
        ic = hTabNextItem(iCodeSeqhTab,&key)) 
     {
-#if 0
-      piCode(ic, NULL);
-      printf("(op: %u uses %u)\n", ic->op, bitVectBitValue(uses, ic->key));
-#endif
+      if (D_PACK_IY)
+        piCode(ic, NULL);
 
       if (ic->op == PCALL || 
           ic->op == CALL ||
@@ -2437,13 +2448,32 @@ packRegsForIYUse (iCode * lic, operand * op, eBBlock * ebp)
       if (SKIP_IC2(ic))
         continue;
 
+      /* Be pessamistic. */
+      if (ic->op == IFX)
+        return NULL;
+
+      D (D_PACK_IY, ("  op: %u uses %u result: %d left: %d right: %d\n", ic->op, bitVectBitValue(uses, ic->key),
+                     IC_RESULT(ic) && IS_SYMOP(IC_RESULT(ic)) ? isOperandInDirSpace(IC_RESULT(ic)) : -1,
+                     IC_LEFT(ic) && IS_SYMOP(IC_LEFT(ic)) ? isOperandInDirSpace(IC_LEFT(ic)) : -1,
+                     IC_RIGHT(ic) && IS_SYMOP(IC_RIGHT(ic)) ? isOperandInDirSpace(IC_RIGHT(ic)) : -1
+                     ));
+
+      if (IC_RESULT(ic) && IS_SYMOP(IC_RESULT(ic)) && 
+          isOperandInDirSpace(IC_RESULT(ic)))
+        return NULL;
+      
+      if (IC_RIGHT(ic) && IS_SYMOP(IC_RIGHT(ic)) && 
+          isOperandInDirSpace(IC_RIGHT(ic)))
+        return NULL;
+      
+      if (IC_LEFT(ic) && IS_SYMOP(IC_LEFT(ic)) && 
+          isOperandInDirSpace(IC_LEFT(ic)))
+        return NULL;
+
       /* Only certain rules will work against IY.  Check if this iCode uses
          this symbol. */
       if (bitVectBitValue(uses, ic->key) != 0)
         {
-          if (ic->op == IFX)
-            return NULL;
-
           if (ic->op == '=' &&
               isOperandEqual(IC_RESULT(ic), op))
             continue;
@@ -2470,23 +2500,8 @@ packRegsForIYUse (iCode * lic, operand * op, eBBlock * ebp)
         }
       else
         {
-          if (ic->op == IFX)
-            continue;
-
           /* This iCode doesn't use the sym.  See if this iCode preserves IY.
            */
-          if (IC_RESULT(ic) && IS_SYMOP(IC_RESULT(ic)) && 
-              isOperandInDirSpace(IC_RESULT(ic)))
-            return NULL;
-          
-          if (IC_RIGHT(ic) && IS_SYMOP(IC_RIGHT(ic)) && 
-              isOperandInFarSpace(IC_RIGHT(ic)))
-            return NULL;
-
-          if (IC_LEFT(ic) && IS_SYMOP(IC_LEFT(ic)) && 
-              isOperandInFarSpace(IC_LEFT(ic)))
-            return NULL;
-          
           continue;
         }
 
@@ -2494,11 +2509,9 @@ packRegsForIYUse (iCode * lic, operand * op, eBBlock * ebp)
       return NULL;
     }
 
-#if 0
-  printf("Succeeded IY!\n");
-#endif
-  OP_SYMBOL (op)->accuse = ACCUSE_IY;
+  D (D_PACK_IY, ("Succeeded IY!\n"));
 
+  OP_SYMBOL (op)->accuse = ACCUSE_IY;
   return dic;
 }
 
@@ -2647,11 +2660,14 @@ packRegsForAccUse2 (iCode * ic)
   iCode *uic;
 
   D (D_ACCUSE2, ("packRegsForAccUse2: running on ic %p line %u\n", ic, ic->lineno));
+  if (D_ACCUSE2)
+    piCode (ic, NULL);
 
   /* Filter out all but those 'good' commands */
   if (
        !POINTER_GET (ic) &&
        ic->op != '+' &&
+       ic->op != '-' &&
        !IS_BITWISE_OP (ic) &&
        ic->op != '=' &&
        ic->op != EQ_OP &&
@@ -2902,7 +2918,7 @@ packRegisters (eBBlock * ebp)
             packRegsForHLUse3 (ic, IC_RESULT (ic), ebp);
 	}
 
-      if (!DISABLE_PACK_HL && IS_ITEMP (IC_RESULT (ic)) && IS_Z80)
+      if (!DISABLE_PACK_IY && IS_ITEMP (IC_RESULT (ic)) && IS_Z80)
 	{
           packRegsForIYUse (ic, IC_RESULT (ic), ebp);
 	}

@@ -31,3 +31,15 @@ replace {
 	rlca
         and     a,#0x01
 }
+replace {
+	ld	%3,a
+	ld	l,%1)
+	ld	h,%2)
+	ld	l,(hl)
+	ld	a,%3
+} by {
+	ld	%3,a
+	ld	l,%1)
+	ld	h,%2)
+	ld	l,(hl)
+}

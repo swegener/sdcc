@@ -219,3 +219,24 @@ Cleaning up the arguments to a call:
 
 
 So for 8 bytes and above use the first form.
+
+Pointer assign:
+        ld      hl,bc           ; 4+4
+        ld      e,(hl)          ; 7
+        inc     hl              ; 6
+        ld      d,(hl)          ; 7
+
+vs:
+        ld      a,(bc)          ; 7
+        ld      e,a             ; 4
+        inc     bc              ; 6
+        ld      a,(bc)          ; 7
+        ld      d,a             ; 4
+
+Same cost.  Not worth it, although is does free up HL.
+
+Shift left signed on HL
+      sla  l
+      rl   h                    ; 8+8 = 16
+
+      add  hl,hl                ; 11

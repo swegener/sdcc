@@ -51,19 +51,21 @@ SOURCES		= _atof.c _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
 		  _sint2fs.c _iscntrl.c _isdigit.c _isgraph.c \
 		  _islower.c _isprint.c _ispunct.c _isspace.c \
 		  _isupper.c _isxdigit.c _itoa.c _ltoa.c \
-                  _slong2fs.c _memcmp.c \
-		  _memcpy.c _memmove.c _memset.c _modsint.c _modslong.c \
-		  _moduint.c _modulong.c _mulint.c _mullong.c \
+		  _slong2fs.c \
+		  _memcmp.c _memcpy.c _memmove.c _memset.c \
+		  _modsint.c _modslong.c _moduint.c _modulong.c \
+		  _mulint.c _mullong.c \
 		  _ser.c _setjmp.c \
-		  _spx.c _startup.c _strchr.c _strcmp.c _strcpy.c \
+		  _spx.c _startup.c \
+		  _strcat.c _strchr.c _strcmp.c _strcpy.c \
 		  _strcspn.c _strlen.c _strncat.c _strncmp.c \
 		  _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
 		  _strstr.c _strtok.c \
 		  _uchar2fs.c _uint2fs.c _ulong2fs.c \
 		  calloc.c malloc.c realloc.c free.c \
 		  serial.c ser_ir.c printfl.c \
-		  printf_large.c vprintf.c puts.c gets.c \
-		  assert.c _strcat.c time.c printf_fast.c bpx.c \
+		  printf_large.c sprintf.c vprintf.c puts.c gets.c \
+		  assert.c time.c printf_fast.c bpx.c \
 		  fabsf.c frexpf.c ldexpf.c expf.c powf.c sincosf.c sinf.c \
 		  cosf.c logf.c log10f.c sqrtf.c tancotf.c tanf.c cotf.c \
 		  asincosf.c asinf.c acosf.c atanf.c atan2f.c sincoshf.c \
@@ -74,14 +76,15 @@ OBJECTS		= $(patsubst %.c,$(PORTDIR)/%.rel,$(SOURCES))
 Z80SOURCES      = _atof.c _atoi.c \
 		  _iscntrl.c _isdigit.c _isgraph.c \
 		  _islower.c _isprint.c _ispunct.c _isspace.c \
-		  _isupper.c _isxdigit.c _memcmp.c \
-		  _memcpy.c _memmove.c _memset.c \
-		  _startup.c _strchr.c _strcmp.c _strcpy.c \
+		  _isupper.c _isxdigit.c \
+		  _memcmp.c _memcpy.c _memmove.c _memset.c \
+		  _startup.c \
+		  _strcat.c _strchr.c _strcmp.c _strcpy.c \
 		  _strcspn.c _strlen.c _strncat.c _strncmp.c \
 		  _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
 		  _strstr.c _strtok.c \
 		  puts.c gets.c \
-		  assert.c _strcat.c \
+		  assert.c \
 		  _modslong.c _modulong.c \
 		  _mullong.c \
 		  _divslong.c _divulong.c \
@@ -107,7 +110,7 @@ XA51SOURCES      = _atof.c _atoi.c _atol.c _schar2fs.c \
 		  _isupper.c _isxdigit.c _slong2fs.c _memcmp.c \
 		  _memcpy.c _memmove.c _memset.c _modsint.c _modslong.c \
 		  _moduint.c _modulong.c _mulint.c _mullong.c \
-		  _strchr.c _strcmp.c _strcpy.c \
+		  _strcat.c _strchr.c _strcmp.c _strcpy.c \
 		  _strcspn.c _strlen.c _strncat.c _strncmp.c \
 		  _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
 		  _strstr.c _strtok.c \
@@ -115,7 +118,7 @@ XA51SOURCES      = _atof.c _atoi.c _atol.c _schar2fs.c \
 		  calloc.c malloc.c realloc.c free.c \
 		  puts.c gets.c \
 		  printf_large.c puts.c gets.c \
-		  assert.c _strcat.c time.c \
+		  assert.c time.c \
 		  fabsf.c frexpf.c ldexpf.c expf.c powf.c sincosf.c sinf.c \
 		  cosf.c logf.c log10f.c sqrtf.c tancotf.c tanf.c cotf.c \
 		  asincosf.c asinf.c acosf.c atanf.c atan2f.c sincoshf.c \
@@ -132,16 +135,18 @@ HC08SOURCES	= _atof.c _atoi.c _atol.c _schar2fs.c \
 		  _sint2fs.c _iscntrl.c _isdigit.c _isgraph.c \
 		  _islower.c _isprint.c _ispunct.c _isspace.c \
 		  _isupper.c _isxdigit.c _itoa.c _ltoa.c \
-                  _slong2fs.c _memcmp.c \
-		  _memcpy.c _memmove.c _memset.c _modsint.c _modslong.c \
-		  _moduint.c _modulong.c \
-		  _spx.c _startup.c _strchr.c _strcmp.c _strcpy.c \
+		  _slong2fs.c \
+		  _memcmp.c _memcpy.c _memmove.c _memset.c \
+		  _modsint.c _modslong.c _moduint.c _modulong.c \
+		  _spx.c _startup.c \
+		  _strcat.c _strchr.c _strcmp.c _strcpy.c \
 		  _strcspn.c _strlen.c _strncat.c _strncmp.c \
 		  _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
 		  _strstr.c _strtok.c \
 		  _uchar2fs.c _uint2fs.c _ulong2fs.c \
 		  calloc.c malloc.c realloc.c free.c \
-		  assert.c _strcat.c time.c \
+		  printf_large.c sprintf.c vprintf.c \
+		  assert.c time.c \
 		  fabsf.c frexpf.c ldexpf.c expf.c powf.c sincosf.c sinf.c \
 		  cosf.c logf.c log10f.c sqrtf.c tancotf.c tanf.c cotf.c \
 		  asincosf.c asinf.c acosf.c atanf.c atan2f.c sincoshf.c \

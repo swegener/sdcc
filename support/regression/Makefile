@@ -38,7 +38,7 @@
 
 # Uncomment this to show only errors and the summary.
 # Comment this out for debugging.
-#.SILENT:
+.SILENT:
 
 # All original tests live in TESTS_DIR and below
 TESTS_DIR = tests
@@ -60,7 +60,7 @@ GENERATE_CASES = generate-cases.py
 # Each directory under ports/ is used as a port name.  Each port is tested.
 # Each port must have a spec.mk which describes how to build the object
 # files and how to run the emulator.
-ALL_PORTS = $(filter-out CVS xa51 mcs51 mcs51-large mcs51-stack-auto ds390 gbz80 hc08,$(notdir $(wildcard $(PORTS_DIR)/*)))
+ALL_PORTS = $(filter-out CVS xa51 ucz80 gbz80,$(notdir $(wildcard $(PORTS_DIR)/*)))
 
 # These  ports will be cleaned with 'make clean'
 CLEAN_PORTS = $(filter-out CVS,$(notdir $(wildcard $(PORTS_DIR)/*)))

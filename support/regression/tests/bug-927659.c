@@ -16,7 +16,7 @@ foo(unsigned char a, ...) REENTRANT
   va_start (argptr, a);
   b = va_arg (argptr, int);
   va_end (argptr);
-  
+
   return b;
 }
 
@@ -34,17 +34,10 @@ testReverse(void)
 
 /*************************************************************/
 
-#if !defined(PORT_HOST) && !defined(SDCC_ds390)
-void putchar (char c)
-{
-  c;
-}
-#endif
-
 void
 testAddFunc(void)
 {
-#if !defined(SDCC_z80) && !defined(SDCC_hc08)
+#ifndef SDCC_z80
   char buf[5];
   unsigned char count = 0;
 
@@ -56,4 +49,3 @@ testAddFunc(void)
   ASSERT(1);
 #endif
 }
-//#endif

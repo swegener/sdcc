@@ -1,4 +1,21 @@
-2004-08-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+2004-08-31 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/stdio.h: added NULL, size_t, typedef pfn_outputchar,
+	  _print_format; updated printf, sprintf, vsprintf
+	* device/include/asm/default/features.h: corrected comment/define
+	* device/lib/Makefile.in: added sprintf.c
+	* device/lib/libsdcc.lib: added sprintf module
+	* device/lib/printf_large.c,
+	* device/lib/vprintf.c,
+	* device/lib/sprintf.c: totally refactored printf_large and vprintf
+	  into these 3 files
+	* support/regression/Makefile: changed ALL_PORTS into a usefull default
+	* support/regression/ports/mcs51-stack-auto/spec.mk: added sprintf
+	* support/regression/tests/bug-927659.c: removed dummy putchar, enabled
+	  hc08 test
+	* support/regression/tests/zeropad.c: define idata as data for hc08
+
+2004-08-31 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCpeeph.c (labelIsReturnOnly): support hc08 rts opcode also
 	* src/SDCCpeeph.c (buildLabelRefCountHash): assume function entry point

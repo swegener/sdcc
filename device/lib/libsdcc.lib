@@ -9,12 +9,12 @@ _isupper
 _isxdigit
 _itoa
 _ltoa
+_strcat
 _strchr
 _strcmp
 _strcpy
 _strcspn
 _strlen
-_strcat
 _strncat
 _strncmp
 _strncpy
@@ -48,6 +48,7 @@ gets
 printfl
 printf_large
 printf_fast
+sprintf
 vprintf
 assert
 time

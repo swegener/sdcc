@@ -30,15 +30,16 @@ SOURCES = _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
           _modsint.c _modslong.c _moduint.c _modulong.c \
           _mulint.c _mullong.c \
           _ser.c _setjmp.c \
-          _spx.c _startup.c _strchr.c _strcmp.c _strcpy.c \
+          _spx.c _startup.c \
+          _strcat.c _strchr.c _strcmp.c _strcpy.c \
           _strcspn.c _strlen.c _strncat.c _strncmp.c \
           _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
           _strstr.c _strtok.c \
           _uchar2fs.c _uint2fs.c _ulong2fs.c \
           calloc.c malloc.c realloc.c free.c \
           serial.c ser_ir.c printfl.c \
-          printf_large.c vprintf.c puts.c gets.c \
-          assert.c _strcat.c time.c printf_fast.c bpx.c
+          printf_large.c sprintf.c vprintf.c puts.c gets.c \
+          assert.c time.c printf_fast.c bpx.c
 
 OBJECTS = $(patsubst %.c,$(LIBDIR)/%.rel,$(SOURCES))
 MODULES = $(patsubst %.c,%,$(SOURCES))

@@ -276,6 +276,7 @@ DEFSETFUNC (findCheaperOp)
 		IS_ITEMP (IC_RESULT (cdp->diCode)) &&
 		IS_ITEMP (IC_RIGHT (cdp->diCode)) &&
 		!OP_SYMBOL (IC_RIGHT (cdp->diCode))->isind &&
+		!OP_SYMBOL(IC_RIGHT (cdp->diCode))->isreqv &&
 		((!SPIL_LOC (IC_RIGHT (cdp->diCode)) &&
 		  SPIL_LOC (IC_RESULT (cdp->diCode))) ||
 		 (SPIL_LOC (IC_RESULT (cdp->diCode)) &&
@@ -301,7 +302,8 @@ DEFSETFUNC (findCheaperOp)
     *opp = IC_RESULT (cdp->diCode);
 
   if ((*opp) && 
-      (isOperandLiteral(*opp) ||
+      (isOperandLiteral(*opp) || 
+       getSize(operandType(*opp)) == getSize(operandType(cop)) ||
        (SPEC_USIGN(operandType (cop))==SPEC_USIGN(operandType (*opp)) &&
 	(SPEC_LONG(operandType (cop))==SPEC_LONG(operandType (*opp))))))
     {

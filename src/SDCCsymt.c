@@ -943,56 +943,37 @@ addSymChain (symbol * symHead)
 {
   symbol *sym = symHead;
   symbol *csym = NULL;
-  int bothSymbolsExtern;
-
 
   for (; sym != NULL; sym = sym->next)
     {
       changePointer(sym);
+      checkTypeSanity(sym->etype, sym->name);
 
       /* if already exists in the symbol table then check if
          one of them is an extern definition if yes then
          then check if the type match, if the types match then
          delete the current entry and add the new entry      */
       if ((csym = findSymWithLevel (SymbolTab, sym)) &&
-	  csym->level == sym->level)
-	{
-
-	  /* one definition extern ? */
-	  if (IS_EXTERN (csym->etype) || IS_EXTERN (sym->etype))
-	    {
-	      bothSymbolsExtern=
-		IS_EXTERN (csym->etype) && IS_EXTERN (sym->etype);
-	      /* do types match ? */
-	      if (compareType (csym->type, sym->type) != 1)
-		/* no then error */
-		werror (E_DUPLICATE, csym->name);
-
-	      /* delete current entry */
-	      deleteSym (SymbolTab, csym, csym->name);
-
-	      /* this isn't really needed, but alla */
-	      sym->etype->select.s._extern=bothSymbolsExtern;
-
-	      /* add new entry */
-	      addSym (SymbolTab, sym, sym->name, sym->level, sym->block, 1);
-	    }
-	  else			/* not extern */
-	    werror (E_DUPLICATE, sym->name);
+	  csym->level == sym->level) {
+	
+	/* one definition extern ? */
+	if (IS_EXTERN (csym->etype) || IS_EXTERN (sym->etype)) {
+	  /* do types match ? */
+	  if (compareType (csym->type, sym->type) != 1) {
+	    /* no then error */
+	    werror (E_EXTERN_MISMATCH, csym->name);
+	    continue;
+	  }
+	  /* delete current entry */
+	  deleteSym (SymbolTab, csym, csym->name);
+	} else {
+	  /* not extern */
+	  werror (E_DUPLICATE, sym->name);
 	  continue;
 	}
+      }
 
-      /* check if previously defined */
-      if (csym && csym->level == sym->level)
-	{
-	  /* if the previous one was declared as extern */
-	  /* then check the type with the current one         */
-	  if (IS_EXTERN (csym->etype))
-	    {
-	      if (compareType (csym->type, sym->type) <= 0)
-		werror (W_EXTERN_MISMATCH, csym->name);
-	    }
-	}
+      /* add new entry */
       addSym (SymbolTab, sym, sym->name, sym->level, sym->block, 1);
     }
 }

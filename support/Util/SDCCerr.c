@@ -233,7 +233,7 @@ struct
    "%s '%s' address out of range" },
 { E_BITVAR_STORAGE, ERROR_LEVEL_ERROR,
    "storage class CANNOT be specified for bit variable '%s'" },
-{ W_EXTERN_MISMATCH, ERROR_LEVEL_WARNING,
+{ E_EXTERN_MISMATCH, ERROR_LEVEL_ERROR,
    "extern definition for '%s' mismatches with declaration." },
 { E_NONRENT_ARGS, ERROR_LEVEL_WARNING,
    "Functions called via pointers must be 'reentrant' to take arguments" },

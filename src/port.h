@@ -188,6 +188,9 @@ extern PORT avr_port;
 #if !OPT_DISABLE_DS390
 extern PORT ds390_port;
 #endif
+#if !OPT_DISABLE_PIC
+extern PORT pic14_port;
+#endif
 
 /* Test to see if we are current compiling in DS390 mode. */
 #define IS_MCS51_PORT (port == &mcs51_port)
@@ -195,5 +198,6 @@ extern PORT ds390_port;
 #define IS_Z80_PORT (port == &z80_port)
 #define IS_AVR_PORT (port == &avr_port)
 #define IS_DS390_PORT (port == &ds390_port)
+#define IS_PIC_PORT (port == &pic14_port)
 
 #endif

@@ -191,7 +191,7 @@ static void pic14emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	    if (IS_AGGREGATE (sym->type))
 		ival = initAggregates (sym, sym->ival, NULL);
 	    else
-		ival = newNode ('=', newAst (EX_VALUE, symbolVal (sym)),
+		ival = newNode ('=', newAst_VALUE(symbolVal (sym)),
 				decorateType (resolveSymbols (list2expr (sym->ival))));
 	    codeOutFile = statsg->oFile;
 	    eBBlockFromiCode (iCodeFromAst (ival));

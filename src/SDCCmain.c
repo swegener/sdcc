@@ -146,9 +146,17 @@ static PORT *_ports[] = {
 #if !OPT_DISABLE_DS390
     &ds390_port,
 #endif
+#if !OPT_DISABLE_PIC
+    &pic14_port,
+#endif
 };
 
 #define NUM_PORTS (sizeof(_ports)/sizeof(_ports[0]))
+
+/**
+   remove me - TSD a hack to force sdcc to generate gpasm format .asm files.
+ */
+extern void             pic14glue();
 
 /** Sets the port to the one given by the command line option.
     @param		The name minus the option (eg 'mcs51')
@@ -1391,6 +1399,9 @@ int main ( int argc, char **argv , char **envp)
 
 	if (!fatalError) 
 	{
+	  if(IS_PIC_PORT)
+	    pic14glue();
+	  else
 	    glue();
 	    if (fatalError)
 	    {

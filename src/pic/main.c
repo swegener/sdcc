@@ -14,7 +14,7 @@ static char _defaultRules[] =
 #include "peeph.rul"
 };
 
-/* list of key words used by pic14 */
+/* list of key words used by msc51 */
 static char *_pic14_keywords[] =     {
     "at",
     "bit",
@@ -45,6 +45,11 @@ static char *_pic14_keywords[] =     {
 void pic14_assignRegisters (eBBlock **ebbs, int count);
 
 static int regParmFlg = 0; /* determine if we can register a parameter */
+
+static void _pic14_init(void)
+{
+    asm_addTree(&asm_asxxxx_mapping);
+}
 
 static void _pic14_reset_regparm()
 {
@@ -77,6 +82,11 @@ static void _pic14_finaliseOptions(void)
      */
     if (options.model == MODEL_FLAT24)
     {
+	
+	fprintf(stderr, "*** WARNING: you should use the '-mds390' option "
+			"for DS80C390 support. This code generator is "
+			"badly out of date and probably broken.\n");
+	
         port->s.fptr_size = 3;
         port->s.gptr_size = 4;
         port->stack.isr_overhead++;   /* Will save dpx on ISR entry. */
@@ -91,7 +101,7 @@ static void _pic14_finaliseOptions(void)
         fReturnSize = 5;
     } 
 
-    if (options.model) {
+    if (options.model == MODEL_LARGE) {
 	port->mem.default_local_map = xdata;
 	port->mem.default_globl_map = xdata;
     } else {
@@ -123,11 +133,6 @@ static void _pic14_setDefaultOptions(void)
 {
 }
 
-static void _pic14_init(void)
-{
-  printf("cool init was called for pic14\n");
-
-}
 static const char *_pic14_getRegName(struct regs *reg)
 {
     if (reg)
@@ -140,7 +145,6 @@ static void _pic14_genAssemblerPreamble(FILE *of)
   fprintf(of,"\tlist\tp=16c84\n");
   fprintf(of,"\t__config _wdt_off\n");
   fprintf(of,"\ninclude \"p16c84.inc\"\n");
-
 }
 
 /* Generate interrupt vector table. */
@@ -154,18 +158,18 @@ static int _pic14_genIVT(FILE *of, symbol **interrupts, int maxInterrupts)
     	return FALSE;
     }
     
-    fprintf (of, ";\tajmp\t__sdcc_gsinit_startup\n");
+    fprintf (of, "\t;ajmp\t__sdcc_gsinit_startup\n");
     
     /* now for the other interrupts */
     for (i = 0; i < maxInterrupts; i++) 
     {
 	if (interrupts[i])
 	{
-	    fprintf(of, ";\tljmp\t%s\n;\t.ds\t4\n", interrupts[i]->rname);
+	    fprintf(of, "\t;ljmp\t%s\n\t.ds\t4\n", interrupts[i]->rname);
 	}
 	else
 	{
-	    fprintf(of, ";\treti\n;\t.ds\t7\n");
+	    fprintf(of, "\t;reti\n\t.ds\t7\n");
 	}
     }
     
@@ -183,23 +187,31 @@ static const char *_linkCmd[] = {
 };
 
 static const char *_asmCmd[] = {
-    "asxpic14", "-plosgffc", "$1.asm", NULL
+ "gpasm", NULL, NULL, NULL
+
 };
 
 /* Globals */
 PORT pic14_port = {
     "pic14",
-    "MCU pic14",			/* Target name */
+    "MCU pic",			/* Target name */
     {
 	TRUE,			/* Emit glue around main */
+	MODEL_SMALL | MODEL_LARGE | MODEL_FLAT24,
+	MODEL_SMALL
     },
     {	
-	_asmCmd,
-	"-plosgffc",		/* Options with debug */
-	"-plosgff",		/* Options without debug */
+      _asmCmd,
+	NULL,
+	NULL,
+	//"-plosgffc",		/* Options with debug */
+	//"-plosgff",		/* Options without debug */
+	0
     },
     {
-	_linkCmd
+	_linkCmd,
+	NULL,
+	".rel"
     },
     {
 	_defaultRules
@@ -220,17 +232,19 @@ PORT pic14_port = {
 	"GSINIT  (CODE)",
 	"OSEG    (OVR,DATA)",
 	"GSFINAL (CODE)",
+	"HOME	 (CODE)",
 	NULL,
 	NULL,
 	1
     },
     { 
-	+1, 1, 4, 1, 1
+	+1, 1, 4, 1, 1, 0
     },
-    /* pic14 does not have an 8 bit mul */
+    /* pic14 has an 8 bit mul */
     {
-	0
+	1, 0
     },
+    "_",
     _pic14_init,
     _pic14_parseOptions,
     _pic14_finaliseOptions,
@@ -242,6 +256,13 @@ PORT pic14_port = {
     _pic14_genIVT ,
     _pic14_reset_regparm,
     _pic14_regparm,
-    NULL
+    NULL,
+    FALSE,
+    0,  /* leave lt */
+    0,  /* leave gt */
+    1,  /* transform <= to ! > */
+    1,  /* transform >= to ! < */
+    1,  /* transform != to !(a == b) */
+    0   /* leave == */
 };
 

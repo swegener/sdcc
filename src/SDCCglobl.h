@@ -1,11 +1,16 @@
 /* SDCCglobl.h - global macros etc required by all files */
+
 #ifndef SDCCGLOBL_H
 #define SDCCGLOBL_H
+
 #include <memory.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <setjmp.h>
 #include <stdio.h>
+
+#include "SDCCset.h"
+
 
 /*
  * Define host port dependant constants etc.
@@ -294,6 +299,7 @@ extern int nlibFiles;
 extern char *libPaths[128];
 extern int nlibPaths;
 
+void setParseWithComma (set **, char *);
 void parseWithComma (char **, char *);
 
 /** Creates a temporary file a'la tmpfile which avoids the bugs

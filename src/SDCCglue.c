@@ -45,7 +45,6 @@ set *externs = NULL;		/* Varibles that are declared as extern */
 unsigned maxInterrupts = 6;
 int allocInfo = 1;
 symbol *mainf;
-extern char *VersionString;
 set *pipeSet = NULL;            /* set of pipes */
 set *tmpfileSet = NULL;		/* set of tmp file created by the compiler */
 set *tmpfileNameSet = NULL;	/* All are unlinked at close. */
@@ -1331,7 +1330,7 @@ initialComments (FILE * afile)
   time_t t;
   time (&t);
   fprintf (afile, "%s", iComments1);
-  fprintf (afile, "; Version %s %s\n", VersionString, asctime (localtime (&t)));
+  fprintf (afile, "; Version " SDCC_VERSION_STR " %s\n", asctime (localtime (&t)));
   fprintf (afile, "%s", iComments2);
 }
 
@@ -1468,6 +1467,30 @@ emitOverlay (FILE * afile)
     }
 }
 
+
+/*-----------------------------------------------------------------*/
+/* spacesToUnderscores - replace spaces with underscores        */
+/*-----------------------------------------------------------------*/
+static char *
+spacesToUnderscores (char *dest, const char *src, size_t len)
+{
+  int i;
+  char *p;
+
+  assert(dest != NULL);
+  assert(src != NULL);
+  assert(len > 0);
+
+  --len;
+  for (p = dest, i = 0; *src != '\0' && i < len; ++src, ++i) {
+    *p++ = isspace(*src) ? '_' : *src;
+  }
+  *p = '\0';
+
+  return dest;
+}
+
+
 /*-----------------------------------------------------------------*/
 /* glue - the final glue that hold the whole thing together        */
 /*-----------------------------------------------------------------*/
@@ -1477,6 +1500,7 @@ glue (void)
   FILE *vFile;
   FILE *asmFile;
   FILE *ovrFile = tempfile ();
+  char moduleBuf[PATH_MAX];
 
   addSetHead (&tmpfileSet, ovrFile);
   /* print the global struct definitions */
@@ -1524,7 +1548,8 @@ glue (void)
   initialComments (asmFile);
 
   /* print module name */
-  tfprintf (asmFile, "\t!module\n", moduleName);
+  tfprintf (asmFile, "\t!module\n",
+    spacesToUnderscores (moduleBuf, moduleName, sizeof moduleBuf));
   tfprintf (asmFile, "\t!fileprelude\n");
 
   /* Let the port generate any global directives, etc. */

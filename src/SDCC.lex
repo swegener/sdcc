@@ -281,8 +281,8 @@ int checkCurrFile ( char *s)
     /* set the current line number to   */
     /* line number if printFlag is on   */
     if (!*s) {		
-	yylineno = lNum ;
-	return 0;
+      lineno = yylineno = lNum ;
+      return 0;
     }
     
     /* if we have a filename then check */
@@ -291,8 +291,8 @@ int checkCurrFile ( char *s)
     s++ ;
 
     if ( strncmp(s,fullSrcFileName,strlen(fullSrcFileName)) == 0) {
-	    yylineno = lNum - 2;					
-	    currFname = fullSrcFileName ;
+      lineno = yylineno = lNum;					
+      currFname = fullSrcFileName ;
     }  else {
 	char *sb = s;
 	/* mark the end of the filename */
@@ -300,7 +300,7 @@ int checkCurrFile ( char *s)
 	*s = '\0';
 	currFname = Safe_calloc(1,strlen(sb)+1);
 	strcpy(currFname,sb);
-	yylineno = lNum - 2;
+	lineno = yylineno = lNum;
     }
     filename = currFname ;
     return 0;

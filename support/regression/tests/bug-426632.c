@@ -1,3 +1,5 @@
+#include <testfwk.h>
+
 typedef struct { 
     unsigned char year; /* Current 
 			 * year (with offset 1900) */ 
@@ -11,7 +13,7 @@ unsigned char year;
 unsigned char month; 
 unsigned char day; 
 
-void *main() 
+void *__main()
 { 
     float i; 
     float y; 

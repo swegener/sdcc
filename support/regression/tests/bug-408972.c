@@ -1,3 +1,7 @@
+/* Fake header.
+ */
+#include <testfwk.h>
+
 long leftShiftLong (long l) { 
   /* PENDING: Disabled.
      return (l << 3); 

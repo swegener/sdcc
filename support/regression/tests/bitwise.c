@@ -1,6 +1,6 @@
 /** Test the bitwise operators.
     
-    type: char, int
+    type: char, int, long
     attr: volatile,
     storage: static,
  */
@@ -29,4 +29,3 @@ testTwoOpBitwise(void)
     ASSERT(({type})(left ^ 0xc1ec) == ({type})0xFC1B);
     ASSERT(({type})(0x3df7 ^ right) == ({type})0xFC1B);
 }
-

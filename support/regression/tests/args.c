@@ -1,9 +1,9 @@
 /** Tests argument passing to functions.
     Assumes that up to the first two arguments can be passed in registers.
 
-    type1: char, int
-    type2: char, int
-    type3: char, int
+    type1: char, int, long
+    type2: char, int, long
+    type3: char, int, long
  */
 #include <testfwk.h>
 

@@ -1,6 +1,7 @@
 /** Tests covering the shift operators.
 
-    type: char, int
+    sign: signed, unsigned
+    type: char, int, long
     storage: static, 
     attr: volatile
 
@@ -10,10 +11,10 @@
 */
 #include <testfwk.h>
 
-static void
+void
 testShiftClasses(void)
 {
-    {attr} {storage} {type} i, result;
+    {attr} {storage} {sign} {type} i, result;
 
     i = 30;
     ASSERT(i>>3 == 3);
@@ -28,11 +29,25 @@ testShiftClasses(void)
     ASSERT(result == 120);
 }
 
+void
+testShiftRight(void)
+{
+    {attr} {storage} {type} i, result;
+
+    i = -120;
+    ASSERT(i>>2 == -30);
+
+    result = i;
+    result >>= 3;
+    ASSERT(result == -15); 
+}
+
 /** PENDING: Disabled. */
 static void
 testShiftByteMultiples(void)
 {
 #if 0
+    /* PENDING */
     {attr} {storage} {type} i;
 
     i = ({type}){vals};
@@ -50,8 +65,8 @@ testShiftByteMultiples(void)
 static void
 testShiftOne(void)
 {
-    {attr} {storage} {type} i;
-    {type} result;
+    {attr} {storage} {sign} {type} i;
+    {sign} {type} result;
 
     i = ({type}){vals};
 

@@ -12,14 +12,14 @@ struct {
     unsigned char index; 
 } s; 
 
-static unsigned char 
+unsigned char 
 foo(void) 
 { 
     // BUG, there will be a PRE-increment 
     return p[s.index++];
 } 
 
-static void
+void
 testPostIncrement(void)
 {
     p = _data;

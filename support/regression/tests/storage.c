@@ -2,7 +2,7 @@
 
     source_storage: static, register,
     dest_storage: static, register, 
-    type: char, int
+    type: char, int, long
  */
 #include <testfwk.h>
 

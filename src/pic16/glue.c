@@ -1061,7 +1061,7 @@ void pic16_printIvalPtr (symbol * sym, sym_link * type, initList * ilist, char p
 /*-----------------------------------------------------------------*/
 void pic16_printIval (symbol * sym, sym_link * type, initList * ilist, char ptype, void *p)
 {
-  sym_link *itype;
+//  sym_link *itype;
   
   if (!p)
     return;

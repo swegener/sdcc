@@ -60,7 +60,8 @@ test_ser.ihx: test_ser.rel
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) -s s51 $(bindir)
+	if test -f s51.exe; then $(INSTALL) -s s51.exe $(bindir);fi
+	if test -f s51; then $(INSTALL) -s s51 $(bindir);fi
 
 
 # Deleting all the installed files

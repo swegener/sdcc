@@ -1,0 +1,83 @@
+//        ; Peephole 2     removed pop %1 push %1 (not push pop)
+//        mov  %2,%3 
+//}
+
+// peep 1
+replace restart {
+        skpz
+        goto   %1
+	incf   %2,f
+%1:
+} by {
+	;peep 1
+	skpnz
+	incf   %2,f
+%1:
+}
+
+// like peep1
+replace restart {
+        skpz
+        goto   %1
+%2:
+	incf   %3,f
+%1:
+} by {
+	;peep 2
+	skpnz
+%2:
+	incf   %3,f
+%1:
+}
+
+replace restart {
+        skpnz
+        goto   %1
+	incf   %2,f
+%1:
+} by {
+	;peep 3
+	skpz
+	incf   %2,f
+%1:
+}
+
+replace restart {
+        skpnz
+        goto   %1
+%2:
+	incf   %3,f
+%1:
+} by {
+	;peep 4
+	skpz
+%2:
+	incf   %3,f
+%1:
+}
+
+// peep 5
+replace restart {
+        skpc
+        goto   %1
+	incf   %2,f
+%1:
+} by {
+	;peep 5
+	skpnc
+	incf   %2,f
+%1:
+}
+
+// peep 6
+replace restart {
+        skpnc
+        goto   %1
+	incf   %2,f
+%1:
+} by {
+	;peep 6
+	skpc
+	incf   %2,f
+%1:
+}

@@ -7,8 +7,8 @@ PRJDIR		= ..
 
 # !include $(PRJDIR)/Makefile.common
 
-PORTS		= mcs51 z80 avr ds390
-PORT_LIBS       = mcs51/port.lib z80/port.lib avr/port.lib ds390/port.lib
+PORTS		= mcs51 z80 avr ds390 pic
+PORT_LIBS       = mcs51/port.lib z80/port.lib avr/port.lib ds390/port.lib pic/port.lib
 
 LIBS		= -lgc 
 LIBDIRS		= -L$(PRJDIR)/support/gc

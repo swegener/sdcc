@@ -1,3 +1,10 @@
+2003-12-12 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/ds390/main.c (PORT tininative_port): fixed bug #858416
+	* src/SDCCglue.c (printChar, printIvalChar, emitStaticSeg),
+	* src/SDCCast.c (createIvalCharPtr, stringToSymbol): handle strings
+	with embedded nulls (fixed bug #753752)
+
 2003-12-12 Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
 	* src/mcs51/main.c(_mcs51_genRAMCLEAR): using r0 instead of r1/r2.

@@ -42,7 +42,14 @@ About SDCC
 \layout Standard
 
 
+\emph on 
+<pending: tabularise these features, this is unreadeble>
+\newline 
+
+\newline 
+
 \series bold 
+\emph default 
 SDCC
 \series default 
  is a Free ware, retargettable, optimizing ANSI-C compiler by 
@@ -73,8 +80,8 @@ For the back-end SDCC uses a global register allocation scheme which should
  is MCU dependent.
  Supported data-types are 
 \emph on 
-char (8 bits, 1 byte), short and int (16 bits, 2 bytes ), long (32 bit,
- 4 bytes) 
+char (8 bits, 1 byte), short and int (16 bits, 2 bytes), long (32 bit, 4
+ bytes) 
 \emph default 
 and
 \emph on 
@@ -109,8 +116,12 @@ All packages used in this compiler system are
 \emph on 
 opensource
 \emph default 
- (freeware); source code for all the sub-packages (asxxxx assembler/linker,
- pre-processor) are distributed with the package.
+ and 
+\emph on 
+freeware
+\emph default 
+; source code for all the sub-packages (asxxxx assembler/linker, pre-processor)
+ is distributed with the package.
  This documentation is maintained using a freeware word processor (LyX).
  
 \layout Standard
@@ -129,6 +140,12 @@ This program is free software; you can redistribute it and/or modify it
  You are forbidden to forbid anyone else to use, share and improve what
  you give them.
  Help stamp out software-hoarding! 
+\newline 
+
+\newline 
+
+\emph on 
+<pending: add a link to gnu>
 \layout Subsection
 
 Typographic conventions
@@ -151,6 +168,32 @@ typewriter font.
  Interesting items and new terms are printed in 
 \emph on 
 italicised type.
+\layout Subsection
+
+Pending: compatibilaty with previous versions
+\layout Standard
+
+This version has numerous bug fixes comperated with the previous version.
+ But we also introduced some incompatibilaties with older versions.
+ Not just for the fun of it, but to make the compiler more stable, efficient
+ and ANSI compliant.
+ 
+\newline 
+
+\newline 
+short char
+\newline 
+directory structure (2.7)
+\newline 
+vararg pars expl int unless casted
+\newline 
+never had a regextend
+\newline 
+no --noreparms anymore
+\newline 
+
+\newline 
+more?
 \layout Subsection
 
 System Requirements
@@ -265,6 +308,14 @@ Type
 Windows Installation
 \layout Standard
 
+
+\emph on 
+<pending: is this complete? where is borland, mingw>
+\newline 
+
+\newline 
+
+\emph default 
 For installation under Windows you first need to pick between a pre-compiled
  binary package, or installing the source package along with the Cygwin
  package.
@@ -355,7 +406,6 @@ Windows Install Using Cygwin
 \series medium 
 Download and install the cygwin package from the redhat site
 \series default 
-\emph on 
 
 \begin_inset LatexCommand \htmlurl{http://sources.redhat.com/cygwin/}
 
@@ -363,7 +413,6 @@ Download and install the cygwin package from the redhat site
 
 
 \series medium 
-\emph default 
 .
  Currently, this involved downloading a small install program which then
  automates downloading and installing 
@@ -581,32 +630,31 @@ standard
 \series medium 
  header files and libraries.
  Edit test.c and change it to the following:
-\layout LyX-Code
+\series default 
 
+\newline 
+
+\newline 
 #include <string.h>
-\layout LyX-Code
-
+\newline 
 main() {
-\layout LyX-Code
+\newline 
 
-  
 \family typewriter 
 char str1[10];
-\layout LyX-Code
-
-  
-\family typewriter 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 strcpy(str1, "testing");
-\layout LyX-Code
-
-
-\family typewriter 
+\newline 
 }
-\layout LyX-Code
+\newline 
 
-\layout Standard
+\newline 
 
-
+\family default 
 \series medium 
 Compile this by typing 
 \family sans 
@@ -653,7 +701,12 @@ The default installation assumes the libraries and header files are located
  
 \family sans 
 \series bold 
-"sdcc -L /usr/local/sdcc/lib/small -I /usr/local/sdcc/include test.c"
+"sdcc\SpecialChar ~
+-L\SpecialChar ~
+/usr/local/sdcc/lib/small\SpecialChar ~
+-I\SpecialChar ~
+/usr/local/sdcc/include\SpecialChar ~
+test.c"
 \family default 
 \series default 
 .
@@ -743,6 +796,14 @@ This will install the compiler, other executables and libraries in to the
 Additional Information for Windows Users
 \layout Standard
 
+
+\emph on 
+<pending: is this up to date?>
+\newline 
+
+\newline 
+
+\emph default 
 The standard method of installing on a Unix system involves compiling the
  source package.
  This is easily done under Unix, but under Windows it can be a more difficult
@@ -937,26 +998,19 @@ configure
  
 \newline 
 
-\layout Standard
-
+\newline 
 bin/ - binary exectables (add to PATH environment variable)
-\layout Standard
-
+\newline 
 bin/share/
-\layout Standard
-
+\newline 
 bin/share/sdcc/include/ - include header files
-\layout Standard
-
+\newline 
 bin/share/sdcc/lib/
-\layout Standard
-
+\newline 
 bin/share/sdcc/lib/small/ - Object & library files for small model library
-\layout Standard
-
+\newline 
 bin/share/sdcc/lib/large/ - Object & library files for large model library
-\layout Standard
-
+\newline 
 bin/share/sdcc/lib/ds390/ - Object & library files forDS80C390 library
 \newline 
 
@@ -995,64 +1049,63 @@ You might want to look at the various executables which are installed in
  At the time of this writing, we find the following programs:
 \newline 
 
-\layout Standard
+\newline 
 
+\emph on 
+<pending: tabularize this>
+\emph default 
+
+\newline 
+
+\newline 
 
 \series bold 
 sdcc
 \series default 
  - The compiler.
-\layout Standard
-
-
-\series bold 
-aslink
-\series default 
- -The linker for 8051 type processors.
-\layout Standard
-
-
-\series bold 
-asx8051
-\series default 
- - The assembler for 8051 type processors.
-\layout Standard
-
+\newline 
 
 \series bold 
 sdcpp
 \series default 
  - The C preprocessor.
-\layout Standard
-
-
-\series bold 
-sdcdb
-\series default 
- - The source debugger.
-\layout Standard
-
+\newline 
 
 \series bold 
-s51
+asx8051
 \series default 
- - The ucSim 8051 simulator.
-\layout Standard
-
-
-\series bold 
-link-z80, link-gbz80
-\series default 
- - The Z80 and GameBoy Z80 linkers.
-\layout Standard
-
+ - The assembler for 8051 type processors.
+\newline 
 
 \series bold 
 as-z80, as-gbz80
 \series default 
  - The Z80 and GameBoy Z80 assemblers.
-\layout Standard
+\newline 
 
+\series bold 
+aslink
+\series default 
+ -The linker for 8051 type processors.
+\newline 
+
+\series bold 
+link-z80, link-gbz80
+\series default 
+ - The Z80 and GameBoy Z80 linkers.
+\newline 
+
+\series bold 
+s51
+\series default 
+ - The ucSim 8051 simulator.
+\newline 
+
+\series bold 
+sdcdb
+\series default 
+ - The source debugger.
+\newline 
 
 \series bold 
 packihx
@@ -1065,7 +1118,14 @@ As development for other processors proceeds, this list will expand to include
  executables to support processors like AVR, PIC, etc.
 \layout Subsubsection
 
-cpp ( C-Preprocessor)
+sdcc - The Compiler
+\layout Standard
+
+This is the actual compiler, it in turn uses the c-preprocessor and invokes
+ the assembler and linkage editor.
+\layout Subsubsection
+
+sdcpp (C-Preprocessor)
 \layout Standard
 
 The preprocessor is a modified version of the GNU preprocessor.
@@ -1073,7 +1133,8 @@ The preprocessor is a modified version of the GNU preprocessor.
  statements, #defines and so on.
 \layout Subsubsection
 
-asxxxx & aslink ( The Assembler and Linkage Editor)
+asx8051, as-z80, as-gbz80, aslink, link-z80, link-gbz80 (The Assemblers
+ and Linkage Editors)
 \layout Standard
 
 This is retargettable assembler & linkage editor, it was developed by Alan
@@ -1082,29 +1143,22 @@ This is retargettable assembler & linkage editor, it was developed by Alan
  enhancements and bug fixes for it to work properly with the SDCC.
 \layout Subsubsection
 
-sdcc - The Compiler
-\layout Standard
-
-This is the actual compiler, it in turn uses the c-preprocessor and invokes
- the assembler and linkage editor.
-\layout Subsubsection
-
 s51 - Simulator
 \layout Standard
 
-S51 is a freeware, opensource simulator developed by Daniel Drotos 
+S51 is a freeware, opensource simulator developed by Daniel Drotos (
 \begin_inset LatexCommand \url{mailto:drdani@mazsola.iit.uni-miskolc.hu}
 
 \end_inset 
 
-.
- The executable is built as part of the build process.
- For more information visit Daniel's website at 
+).
+ The simulator is built as part of the build process.
+ For more information visit Daniel's website at: 
 \begin_inset LatexCommand \url{http://mazsola.iit.uni-miskolc.hu/~drdani/embedded/s51}
 
 \end_inset 
 
-.
+ .
 \layout Subsubsection
 
 sdcdb - Source Level Debugger
@@ -1133,47 +1187,29 @@ For single source file 8051 projects the process is very simple.
 \family default 
 \series default 
  This will compile, assemble and link your source file.
- Output files are as follows.
-\layout Itemize
+ Output files are as follows
+\newline 
 
-
-\size footnotesize 
+\newline 
 sourcefile.asm - Assembler source file created by the compiler
-\layout Itemize
-
-
-\size footnotesize 
+\newline 
 sourcefile.lst - Assembler listing file created by the Assembler
-\layout Itemize
-
-
-\size footnotesize 
-sourcefile.rst - Assembler listing file updated with linkedit information
- , created by linkage editor
-\layout Itemize
-
-
-\size footnotesize 
-sourcefile.sym - symbol listing for the sourcefile, created by the assembler.
-\layout Itemize
-
-
-\size footnotesize 
-sourcefile.rel - Object file created by the assembler, input to Linkage editor.
-\layout Itemize
-
-
-\size footnotesize 
-sourcefile.map - The memory map for the load module, created by the Linker.
-\layout Itemize
-
-
-\size footnotesize 
+\newline 
+sourcefile.rst - Assembler listing file updated with linkedit information,
+ created by linkage editor
+\newline 
+sourcefile.sym - symbol listing for the sourcefile, created by the assembler
+\newline 
+sourcefile.rel - Object file created by the assembler, input to Linkage editor
+\newline 
+sourcefile.map - The memory map for the load module, created by the Linker
+\newline 
 sourcefile.ihx - The load module in Intel hex format (you can select the
  Motorola S19 format with --out-fmt-s19)
-\layout Itemize
+\newline 
+sourcefile.cdb - An optional file (with --debug) containing debug information
+\newline 
 
-sourcefile.cdb - An optional file (with --debug) containing debug information.
 \layout Subsubsection
 
 Projects with Multiple Source Files
@@ -1181,101 +1217,112 @@ Projects with Multiple Source Files
 
 SDCC can compile only ONE file at a time.
  Let us for example assume that you have a project containing the following
- files.
+ files:
 \newline 
 
-\layout Standard
-
-
-\size footnotesize 
-foo1.c ( contains some functions )
-\layout Standard
-
-
-\size footnotesize 
+\newline 
+foo1.c (contains some functions)
+\newline 
 foo2.c (contains some more functions)
-\layout Standard
-
-
-\size footnotesize 
+\newline 
 foomain.c (contains more functions and the function main)
 \newline 
 
+\size footnotesize 
+
 \newline 
 
 \size default 
-The first two files will need to be compiled separately with the commands
+The first two files will need to be compiled separately with the commands:
 \size footnotesize 
  
+\size default 
+
+\newline 
+
+\newline 
+
 \family sans 
 \series bold 
-\size default 
-"sdcc\SpecialChar ~
+sdcc\SpecialChar ~
 -c\SpecialChar ~
-foo1.c"
+foo1.c
 \family default 
 \series default 
 \size footnotesize 
- and 
+
+\newline 
+
 \family sans 
 \series bold 
 \size default 
-"sdcc\SpecialChar ~
+sdcc\SpecialChar ~
 -c\SpecialChar ~
-foo2.c"
+foo2.c
 \family default 
 \series default 
-\size footnotesize 
-.
- 
-\size default 
-Then compile the source file containing the main() function and link the
- files together with the following command: 
+
+\newline 
+
+\newline 
+Then compile the source file containing the 
+\emph on 
+main()
+\emph default 
+ function and link the files together with the following command: 
+\newline 
+
+\newline 
+
 \family sans 
 \series bold 
-"sdcc\SpecialChar ~
+sdcc\SpecialChar ~
 foomain.c\SpecialChar ~
 foo1.rel\SpecialChar ~
-foo2.rel"
+foo2.rel
 \family default 
 \series default 
-.
- Alternatively, foomain.c
+
+\newline 
+
+\newline 
+Alternatively, 
 \emph on 
- 
+foomain.c 
 \emph default 
 can be separately compiled as well: 
 \family sans 
 \series bold 
-"sdcc\SpecialChar ~
+
+\newline 
+
+\newline 
+sdcc\SpecialChar ~
 -c\SpecialChar ~
-foomain.c"
-\family default 
-\series default 
-\size footnotesize 
- and 
-\family sans 
-\series bold 
-\size default 
-
-\begin_inset Quotes sld
-\end_inset 
-
-sdcc foomain.rel foo1.rel foo2.rel"
+foomain.c
+\newline 
+sdcc foomain.rel foo1.rel foo2.rel
 \newline 
 
 \newline 
 
 \family default 
 \series default 
-The file containing the main function
+The file containing the 
 \emph on 
+main()
+\emph default 
+ function
+\emph on 
+ 
+\emph default 
+\noun on 
 must
-\emph default 
+\noun default 
  be the 
-\emph on 
+\noun on 
 first
-\emph default 
+\noun default 
  file specified in the command line, since the linkage editor processes
  file in the order they are presented to it.
 \layout Subsubsection
@@ -1284,49 +1331,57 @@ Projects with Additional Libraries
 \layout Standard
 
 Some reusable routines may be compiled into a library, see the documentation
- for the assembler and linkage editor in the directory 
-\emph on 
-SDCCDIR/asxxxx/asxhtm.htm 
-\emph default 
-this describes how to create a 
+ for the assembler and linkage editor (which are in <installdir>/share/sdcc/doc)
+ for how to create a 
 \emph on 
 .lib
 \emph default 
- library file, the libraries created in this manner may be included using
- the command line, make sure you include the -L <library-path> option to
- tell the linker where to look for these files.
+ library file.
+ Libraries created in this manner can be included in the command line.
+ Make sure you include the -L <library-path> option to tell the linker where
+ to look for these files if they are not in the current directory.
  Here is an example, assuming you have the source file 
 \emph on 
-'foomain.c
+foomain.c
 \emph default 
-' and a library
+ and a library
 \emph on 
- 'foolib.lib'
+ foolib.lib
 \emph default 
  in the directory 
 \emph on 
-'mylib
+mylib
 \emph default 
-' (if that is not the same as your current project).
-\layout Standard
+ (if that is not the same as your current project):
+\newline 
 
+\newline 
 
-\size footnotesize 
+\family sans 
+\series bold 
 sdcc foomain.c foolib.lib -L mylib
-\layout Standard
+\newline 
 
-Note here that 
+\newline 
+
+\family default 
+\series default 
+Note here that
 \emph on 
-'mylib
+ mylib
 \emph default 
-' must be an absolute path name.
-\layout Standard
+ must be an absolute path name.
+\newline 
 
-The view of the way the linkage editor processes the library files, it is
- recommended that you put each source routine in a separate file and combine
- them using the .lib file.
- For an example see the standard library file 'libsdcc.lib' in the directory
- SDCCDIR/sdcc51lib.
+\newline 
+The most efficient way to use libraries is to keep seperate modules in seperate
+ source files.
+ The lib file now should name all the modules.rel files.
+ For an example see the standard library file 
+\emph on 
+libsdcc.lib
+\emph default 
+ in the directory <installdir>/share/lib/small.
 \layout Subsection
 
 Command Line Options
@@ -1565,7 +1620,7 @@ Linker Options
 \series bold 
 --code-loc
 \series default 
-<Value> The start location of the code segment , default value 0.
+<Value> The start location of the code segment, default value 0.
  Note when this option is used the interrupt vector table is also relocated
  to the given address.
  The value entered can be in Hexadecimal or Decimal format, e.g.: --code-loc
@@ -1656,8 +1711,8 @@ MCS51 Options
  details.
  If this option is used all source files in the project should be compiled
  with this option.
- In addition the standard library routines are compiled with small model
- , they will need to be recompiled.
+ In addition the standard library routines are compiled with small model,
+ they will need to be recompiled.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -1673,83 +1728,6 @@ MCS51 Options
 Generate code for Small Model programs see section Memory Models for more
  details.
  This is the default model.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---xstack
-\series default 
- Uses a pseudo stack in the first 256 bytes in the external ram for allocating
- variables and passing parameters.
- See section on external stack for more details.
-\layout Subsubsection
-
-Optimization Options
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---nogcse
-\series default 
- Will not do global subexpression elimination, this option may be used when
- the compiler creates undesirably large stack/data spaces to store compiler
- temporaries.
- A warning message will be generated when this happens and the compiler
- will indicate the number of extra bytes it allocated.
- It recommended that this option NOT be used , #pragma NOGCSE can be used
- to turn off global subexpression elimination for a given function only.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---noinvariant
-\series default 
- Will not do loop invariant optimizations, this may be turned off for reasons
- explained for the previous option.
- For more details of loop optimizations performed see section Loop Invariants.It
- recommended that this option NOT be used , #pragma NOINVARIANT can be used
- to turn off invariant optimizations for a given function only.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---noinduction
-\series default 
- Will not do loop induction optimizations, see section Strength reduction
- for more details.It recommended that this option NOT be used , #pragma NOINDUCTI
-ON can be used to turn off induction optimizations for given function only.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---nojtbound
-\size large 
-\bar under 
- 
-\series default 
-\size default 
-\bar default 
- Will not generate boundary condition check when switch statements are implement
-ed using jump-tables.
- See section Switch Statements for more details.It recommended that this
- option NOT be used , #pragma NOJTBOUND can be used to turn off boundary
- checking for jump tables for a given function only.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---noloopreverse
-\series default 
-\size large 
- 
-\size default 
-Will not do loop reversal optimization
 \layout Subsubsection
 
 DS390 Options
@@ -1767,7 +1745,11 @@ DS390 Options
 \emph default 
 Generate 24-bit flat mode code.
  This is the one and only that the ds390 code generator supports right now
- and is default when using -mds390.
+ and is default when using 
+\emph on 
+-mds390
+\emph default 
+.
  See section Memory Models for more details.
 \layout List
 \labelwidthstring 00.00.0000
@@ -1778,7 +1760,11 @@ Generate 24-bit flat mode code.
 \series default 
  Generate code for the 10 bit stack mode of the Dallas DS80C390 part.
  This is the one and only that the ds390 code generator supports right now
- and is default when using -mds390.
+ and is default when using 
+\emph on 
+-mds390
+\emph default 
+.
  In this mode, the stack is located in the lower 1K of the internal RAM,
  which is mapped to 0x400000.
  Note that the support is incomplete, since it still uses a single byte
@@ -1791,11 +1777,95 @@ Generate 24-bit flat mode code.
  stack mode.
  It is important to ensure that the processor is in this mode before calling
  any re-entrant functions compiled with this option.
- In principle, this should work with the --stack-auto option, but that has
- not been tested.
- It is incompatible with the --xstack option.
+ In principle, this should work with the 
+\emph on 
+--stack-auto
+\emph default 
+ option, but that has not been tested.
+ It is incompatible with the 
+\emph on 
+--xstack
+\emph default 
+ option.
  It also only makes sense if the processor is in 24 bit contiguous addressing
- mode (see the --model-flat24 option).
+ mode (see the 
+\emph on 
+--model-flat24 option
+\emph default 
+).
+\layout Subsubsection
+
+Optimization Options
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--nogcse
+\series default 
+ Will not do global subexpression elimination, this option may be used when
+ the compiler creates undesirably large stack/data spaces to store compiler
+ temporaries.
+ A warning message will be generated when this happens and the compiler
+ will indicate the number of extra bytes it allocated.
+ It recommended that this option NOT be used, #pragma\SpecialChar ~
+NOGCSE can be used
+ to turn off global subexpression elimination for a given function only.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--noinvariant
+\series default 
+ Will not do loop invariant optimizations, this may be turned off for reasons
+ explained for the previous option.
+ For more details of loop optimizations performed see section Loop Invariants.It
+ recommended that this option NOT be used, #pragma\SpecialChar ~
+NOINVARIANT can be used
+ to turn off invariant optimizations for a given function only.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--noinduction
+\series default 
+ Will not do loop induction optimizations, see section strength reduction
+ for more details.It is recommended that this option is NOT used, #pragma\SpecialChar ~
+NOINDUCT
+ION can be used to turn off induction optimizations for a given function
+ only.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--nojtbound
+\size large 
+\bar under 
+ 
+\series default 
+\size default 
+\bar default 
+ Will not generate boundary condition check when switch statements are implement
+ed using jump-tables.
+ See section Switch Statements for more details.
+ It is recommended that this option is NOT used, #pragma\SpecialChar ~
+NOJTBOUND can be
+ used to turn off boundary checking for jump tables for a given function
+ only.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--noloopreverse
+\series default 
+\size large 
+ 
+\size default 
+Will not do loop reversal optimization.
 \layout Subsubsection
 
 Other Options
@@ -1845,6 +1915,16 @@ reentrant
 
 
 \series bold 
+--xstack
+\series default 
+ Uses a pseudo stack in the first 256 bytes in the external ram for allocating
+ variables and passing parameters.
+ See section on external stack for more details.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
 --callee-saves function1[,function2][,function3]....
 
 \series default 
@@ -1864,7 +1944,8 @@ reentrant
  needs to be recompiled with the same option.
  If the project consists of multiple source files then all the source file
  should be compiled with the same --callee-saves option string.
- Also see Pragma Directive CALLEE-SAVES.
+ Also see #pragma\SpecialChar ~
+CALLEE-SAVES.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -1875,8 +1956,8 @@ reentrant
  
 \series default 
 \bar default 
-When this option is used the compiler will generate debug information ,
- that can be used with the SDCDB.
+When this option is used the compiler will generate debug information, that
+ can be used with the SDCDB.
  The debug information is collected in a file with .cdb extension.
  For more information see documentation for SDCDB.
 \layout List
@@ -2168,7 +2249,7 @@ Will create a dump of iCode's, after live range analysis, into a file named
  
 \series default 
 \bar default 
-Will create a dump of iCode's, after register assignment , into a file named
+Will create a dump of iCode's, after register assignment, into a file named
  
 \emph on 
 <source filename>.dumprassgn.
@@ -2255,7 +2336,7 @@ bit
 \layout Standard
 
 This is a data-type and a storage class specifier.
- When a variable is declared as a bit , it is allocated into the bit addressable
+ When a variable is declared as a bit, it is allocated into the bit addressable
  memory of 8051, e.g.:
 \newline 
 
@@ -2297,7 +2378,7 @@ _generic
 \newline 
 
 \newline 
-Pointer declaration examples.
+Pointer declaration examples:
 \newline 
 
 \size small 
@@ -2337,7 +2418,13 @@ char * xdata p;
 
 \size default 
 Well you get the idea.
- For compatibility with the previous version of the compiler, the following
+ 
+\newline 
+
+\newline 
+
+\emph on 
+For compatibility with the previous version of the compiler, the following
  syntax for pointer declaration is still supported but will disappear int
  the near future.
  
@@ -2358,13 +2445,17 @@ unsigned char _idata *uccp; \SpecialChar ~
 /* pointer to upper 128 bytes of ram */
 \family default 
 \size small 
+\emph default 
 
 \newline 
 
 \newline 
 
 \size default 
-All unqualified pointers are treated as 3-byte (4-byte for the ds390) '_generic'
+All unqualified pointers are treated as 3-byte (4-byte for the ds390) 
+\emph on 
+generic
+\emph default 
  pointers.
  These type of pointers can also to be explicitly declared.
 \newline 
@@ -2381,14 +2472,21 @@ unsigned char _generic *ucgp;
 \newline 
 
 \size default 
-The highest order byte of the generic pointers contains the data space informati
-on.
+The highest order byte of the 
+\emph on 
+generic
+\emph default 
+ pointers contains the data space information.
  Assembler support routines are called whenever data is stored or retrieved
- using _generic pointers.
+ using 
+\emph on 
+generic
+\emph default 
+ pointers.
  These are useful for developing reusable library routines.
  Explicitly specifying the pointer type will generate the most efficient
  code.
- Pointers declared using a mixture of OLD/NEW style could have unpredictable
+ Pointers declared using a mixture of OLD and NEW style could have unpredictable
  results.
 \layout Subsection
 
@@ -2398,13 +2496,23 @@ Parameters & Local Variables
 Automatic (local) variables and parameters to functions can either be placed
  on the stack or in data-space.
  The default action of the compiler is to place these variables in the internal
- RAM ( for small model) or external RAM (for Large model).
- They can be placed on the stack either by using the
+ RAM (for small model) or external RAM (for Large model).
+ This in fact makes them 
+\emph on 
+static
+\emph default 
+ so by default functions are non-reentrant.
+\layout Standard
+
+They can be placed on the stack either by using the
 \emph on 
  --stack-auto
 \emph default 
- compiler option or by using the 'reentrant' keyword in the function declaration
-, e.g.:
+ compiler option or by using the 
+\emph on 
+reentrant
+\emph default 
+ keyword in the function declaration, e.g.:
 \newline 
 
 \size small 
@@ -2413,7 +2521,7 @@ Automatic (local) variables and parameters to functions can either be placed
 
 \family typewriter 
 \size default 
-unsigned char foo( char i) reentrant 
+unsigned char foo(char i) reentrant 
 \newline 
 { 
 \newline 
@@ -2426,56 +2534,64 @@ unsigned char foo( char i) reentrant
 \family default 
 
 \newline 
-Note that when the parameters & local variables are declared in the internal/ext
-ernal ram the functions are non-reentrant.
- Since stack space on 8051 is limited the 
+Since stack space on 8051 is limited, the 
 \emph on 
-'reentrant' 
+reentrant 
 \emph default 
 keyword or the
 \emph on 
  --stack-auto
 \emph default 
  option should be used sparingly.
- Note the reentrant keyword just means that the parameters & local variables
- will be allocated to the stack, it DOES NOT mean that the function is register
- bank independent.
-\layout Standard
+ Note that the reentrant keyword just means that the parameters & local
+ variables will be allocated to the stack, it 
+\emph on 
+does not
+\emph default 
+ mean that the function is register bank independent.
+\newline 
 
-When compiled with the default option (i.e.
- non-reentrant ), local variables can be assigned storage classes and absolute
- addresses, e.g.: (jwk: pending: this is obsolete and need a rewrite)
+\newline 
+Local variables can be assigned storage classes and absolute addresses,
+ e.g.: 
 \newline 
 
 \newline 
 
 \family typewriter 
 unsigned char foo() {
-\layout Standard
-
-
-\family typewriter 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 xdata unsigned char i;
-\layout Standard
-
-
-\family typewriter 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 bit bvar;
-\layout Standard
-
-
-\family typewriter 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 data at 0x31 unsiged char j;
-\layout Standard
-
-
-\family typewriter 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 ...
  
 \newline 
 }
-\layout Standard
+\newline 
 
+\newline 
+
+\family default 
 In the above example the variable 
 \emph on 
 i
@@ -2489,20 +2605,20 @@ bvar
  j
 \emph default 
  in internal ram.
- When compiled with the 
+ When compiled with 
 \emph on 
 --stack-auto
 \emph default 
  or when a function is declared as 
 \emph on 
-'reentrant'
+reentrant
 \emph default 
- local variables cannot be assigned storage classes or absolute addresses.
+ this can only be done for static variables.
 \layout Standard
 
 Parameters however are not allowed any storage class, (storage classes for
  parameters will be ignored), their allocation is governed by the memory
- model in use , and the reentrancy options.
+ model in use, and the reentrancy options.
 \layout Subsection
 
 Overlaying
@@ -2517,19 +2633,23 @@ no other function calls and the function is non-reentrant and the memory
  model is small.
 
 \emph default 
- If an explicit storage class is specified for a local variable , it will
- NOT be overplayed.
+ If an explicit storage class is specified for a local variable, it will
+ NOT be overlayed.
 \layout Standard
 
 Note that the compiler (not the linkage editor) makes the decision for overlayin
 g the data items.
  Functions that are called from an interrupt service routine should be preceded
- by a #pragma NOOVERLAY if they are not reentrant Along the same lines the
- compiler does not do any processing with the inline assembler code so the
- compiler might incorrectly assign local variables and parameters of a function
- into the overlay segment if the only function call from a function is from
- inline assembler code, it is safe to use the #pragma NOOVERLAY for functions
- which call other functions using inline assembler code.
+ by a #pragma\SpecialChar ~
+NOOVERLAY if they are not reentrant.
+\layout Standard
+
+Also note that the compiler does not do any processing of inline assembler
+ code, so the compiler might incorrectly assign local variables and parameters
+ of a function into the overlay segment if the inline assembler code calls
+ other c-functions that might use the overlay.
+ In that case the #pragma\SpecialChar ~
+NOOVERLAY should be used.
 \layout Standard
 
 Parameters and Local variables of functions that contain 16 or 32 bit multiplica
@@ -2544,7 +2664,7 @@ tion or division will NOT be overlayed since these are implemented using
 \newline 
 #pragma NOOVERLAY 
 \newline 
-void set_error( unsigned char errcd) 
+void set_error(unsigned char errcd) 
 \newline 
 {
 \newline 
@@ -2584,8 +2704,11 @@ set_error(10);
  
 \newline 
 }
-\layout Standard
+\newline 
 
+\newline 
+
+\family default 
 In the above example the parameter 
 \emph on 
 errcd
@@ -2594,10 +2717,12 @@ errcd
 \emph on 
 set_error
 \emph default 
- would be assigned to the overlayable segment (if the #pragma NOOVERLAY
- was not present) , this could cause unpredictable runtime behavior when
- called from an ISR.
- The pragma NOOVERLAY ensures that the parameters and local variables for
+ would be assigned to the overlayable segment if the #pragma\SpecialChar ~
+NOOVERLAY was
+ not present, this could cause unpredictable runtime behavior when called
+ from an ISR.
+ The #pragma\SpecialChar ~
+NOOVERLAY ensures that the parameters and local variables for
  the function are NOT overlayed.
 \layout Subsection
 
@@ -2624,28 +2749,42 @@ void timer_isr (void) interrupt 2 using 1
 \newline 
 
 \family default 
-The number following the 'interrupt' keyword is the interrupt number this
- routine will service.
+The number following the 
+\emph on 
+interrupt
+\emph default 
+ keyword is the interrupt number this routine will service.
  The compiler will insert a call to this routine in the interrupt vector
  table for the interrupt number specified.
- The 'using' keyword is used to tell the compiler to use the specified register
- bank (8051 specific) when generating code for this function.
+ The 
+\emph on 
+using
+\emph default 
+ keyword is used to tell the compiler to use the specified register bank
+ (8051 specific) when generating code for this function.
  Note that when some function is called from an interrupt service routine
- it should be preceded by a #pragma NOOVERLAY (if it is not reentrant).
+ it should be preceded by a #pragma\SpecialChar ~
+NOOVERLAY if it is not reentrant.
  A special note here, int (16 bit) and long (32 bit) integer division, multiplic
 ation & modulus operations are implemented using external support routines
  developed in ANSI-C, if an interrupt service routine needs to do any of
  these operations then the support routines (as mentioned in a following
- section) will have to recompiled using the --stack-auto option and the
- source file will need to be compiled using the --int-long-rent compiler
- option.
+ section) will have to be recompiled using the
+\emph on 
+ --stack-auto
+\emph default 
+ option and the source file will need to be compiled using the 
+\emph on 
+--int-long-ren
+\emph default 
+t compiler option.
 \layout Standard
 
 If you have multiple source files in your project, interrupt service routines
  can be present in any of them, but a prototype of the isr MUST be present
- in the file that contains the function 
+ or included in the file that contains the function 
 \emph on 
-'main'
+main
 \emph default 
 .
 \layout Standard
@@ -2828,15 +2967,14 @@ Serial
 
 \newline 
 
-\layout Standard
-
+\newline 
 If the interrupt service routine is defined without 
 \emph on 
-'using'
+using
 \emph default 
  a register bank or with register bank 0 (using 0), the compiler will save
- the registers used by itself on the stack (upon entry and restore them
- at exit), however if such an interrupt service routine calls another function
+ the registers used by itself on the stack upon entry and restore them at
+ exit, however if such an interrupt service routine calls another function
  then the entire register bank will be saved on the stack.
  This scheme may be advantageous for small interrupt service routines which
  have low register usage.
@@ -2844,51 +2982,34 @@ If the interrupt service routine is defined without
 
 If the interrupt service routine is defined to be using a specific register
  bank then only 
-\begin_inset Quotes eld
-\end_inset 
-
-a
-\begin_inset Quotes erd
-\end_inset 
-
-,
-\begin_inset Quotes erd
-\end_inset 
-
-b
-\begin_inset Quotes erd
-\end_inset 
-
- & 
-\begin_inset Quotes eld
-\end_inset 
-
-dptr
-\begin_inset Quotes erd
-\end_inset 
-
+\emph on 
+a, b & dptr
+\emph default 
  are save and restored, if such an interrupt service routine calls another
  function (using another register bank) then the entire register bank of
  the called function will be saved on the stack.
  This scheme is recommended for larger interrupt service routines.
 \layout Standard
 
-Calling other functions from an interrupt service routine is not recommended
+Calling other functions from an interrupt service routine is not recommended,
  avoid it if possible.
+\newline 
+
+\newline 
+Also see the _naked modifier.
 \layout Subsection
 
 Critical Functions
 \layout Standard
 
-A special keyword may be associated with a function declaring it as '
+A special keyword may be associated with a function declaring it as 
 \emph on 
 critical
 \emph default 
-'.
+.
  SDCC will generate code to disable all interrupts upon entry to a critical
  function and enable them back before returning.
  Note that nesting critical functions may cause unpredictable results.
- 
 \newline 
 
 \size small 
@@ -2923,12 +3044,12 @@ Naked Functions
 
 A special keyword may be associated with a function declaring it as 
 \emph on 
-'_naked'.
+_naked.
  
 \emph default 
 The 
 \emph on 
-'_naked'
+_naked
 \emph default 
  function modifier attribute prevents the compiler from generating prologue
  and epilogue code for that function.
@@ -2936,7 +3057,7 @@ The
  any registers that may need to be preserved, selecting the proper register
  bank, generating the 
 \emph on 
-'return'
+return
 \emph default 
  instruction at the end, etc.
  Practically, this means that the contents of the function must be written
@@ -2951,7 +3072,7 @@ The
 \family typewriter 
 data unsigned char counter;
 \newline 
-void simpleIterrupt(void) interrupt 1
+void simpleInterrupt(void) interrupt 1
 \newline 
 {
 \newline 
@@ -3198,22 +3319,25 @@ Functions using private banks
 
 The 
 \emph on 
-'using'
+using
 \emph default 
  attribute (which tells the compiler to use a register bank other than the
- default bank zero) should only be applied to 'interrupt' functions (see
- note A below).
+ default bank zero) should only be applied to 
+\emph on 
+interrupt
+\emph default 
+ functions (see note 1 below).
  This will in most circumstances make the generated ISR code more efficient
  since it will not have to save registers on the stack.
 \layout Standard
 
 The 
 \emph on 
-'using'
+using
 \emph default 
  attribute will have no effect on the generated code for a 
 \emph on 
-non-'interrupt'
+non-interrupt
 \emph default 
  function (but may occasionally be useful anyway
 \begin_float footnote 
@@ -3229,17 +3353,32 @@ possible exception: if a function is called ONLY from 'interrupt' functions
 \end_float 
 ).
 \newline 
-(jwk: todo: I don't think this has been done yet)
+
+\emph on 
+(pending: I don't think this has been done yet)
 \layout Standard
 
-An 'interrupt' function using a non-zero bank will assume that it can trash
- that register bank, and will not save it.
+An 
+\emph on 
+interrupt
+\emph default 
+ function using a non-zero bank will assume that it can trash that register
+ bank, and will not save it.
  Since high-priority interrupts can interrupt low-priority ones on the 8051
- and friends, this means that if a high-priority ISR 'using' a particular
- bank occurs while processing a low-priority ISR 'using' the same bank,
- terrible and bad things can happen.
- To prevent this, no single register bank should be 'used' by both a high
- priority and a low priority ISR.
+ and friends, this means that if a high-priority ISR 
+\emph on 
+using
+\emph default 
+ a particular bank occurs while processing a low-priority ISR 
+\emph on 
+using
+\emph default 
+ the same bank, terrible and bad things can happen.
+ To prevent this, no single register bank should be 
+\emph on 
+used
+\emph default 
+ by both a high priority and a low priority ISR.
  This is probably most easily done by having all high priority ISRs use
  one bank and all low priority ISRs use another.
  If you have an ISR which can change priority at runtime, you're on your
@@ -3249,7 +3388,7 @@ An 'interrupt' function using a non-zero bank will assume that it can trash
 
 It is most efficient if your ISR calls no other functions.
  If your ISR must call other functions, it is most efficient if those functions
- use the same bank as the ISR (see note A below); the next best is if the
+ use the same bank as the ISR (see note 1 below); the next best is if the
  called functions use bank zero.
  It is very inefficient to call a function using a different, non-zero bank
  from an ISR.
@@ -3275,22 +3414,19 @@ xdata at 0x8000 unsigned char PORTA_8255 ;
 \family default 
 
 \newline 
-In the above example the 
-\emph on 
-PORTA_8255
-\emph default 
- will be allocated to the location 0x8000 of the external ram.
+In the above example the PORTA_8255 will be allocated to the location 0x8000
+ of the external ram.
  Note that this feature is provided to give the programmer access to 
 \emph on 
 memory mapped
 \emph default 
  devices attached to the controller.
  The compiler does not actually reserve any space for variables declared
- in this way (they are implemented with an equate in the assembler), thus
- it is left to the programmer to make sure there are no overlaps with other
- variables that are declared without the absolute address, the assembler
- listing file (.lst) and the linker output files (<filename>.rst) and (<filename>.m
-ap) are a good places to look for such overlaps.
+ in this way (they are implemented with an equate in the assembler).
+ Thus it is left to the programmer to make sure there are no overlaps with
+ other variables that are declared without the absolute address.
+ The assembler listing file (.lst) and the linker output files (.rst) and
+ (.map) are a good places to look for such overlaps.
 \newline 
 
 \newline 
@@ -3310,33 +3446,32 @@ bit at 0x02 bvar;
 The above example will allocate the variable at offset 0x02 in the bit-addressab
 le space.
  There is no real advantage to assigning absolute addresses to variables
- in this manner , unless you want strict control over all the variables
- allocated.
+ in this manner, unless you want strict control over all the variables allocated.
 \layout Subsection
 
 Startup Code
 \layout Standard
 
-The compiler inserts a jump to the C routine 
+The compiler inserts a call to the C routine 
+\emph on 
+_sdcc__external__startup()
 \series bold 
-_sdcc__external__startup() 
+\emph default 
+ 
 \series default 
 at the start of the CODE area.
- This routine can be found in the file 
-\series bold 
-SDCCDIR/sdcc51lib/_startup.c
-\series default 
-, by default this routine returns 0, if this routine returns a non-zero
- value , the static & global variable initialization will be skipped and
- the function main will be invoked, other wise static & global variables
- will be initialized before the function main is invoked.
+ This routine is in the runtime library.
+ By default this routine returns 0, if this routine returns a non-zero value,
+ the static & global variable initialization will be skipped and the function
+ main will be invoked Other wise static & global variables will be initialized
+ before the function main is invoked.
  You could add a 
-\series bold 
+\emph on 
 _sdcc__external__startup()
-\series default 
- routine to your program to override the default if you needed to setup
- hardware or perform some other critical operation prior to static & global
- variable initialization.
+\emph default 
+ routine to your program to override the default if you need to setup hardware
+ or perform some other critical operation prior to static & global variable
+ initialization.
 \layout Subsection
 
 Inline Assembler Code
@@ -3344,26 +3479,36 @@ Inline Assembler Code
 
 SDCC allows the use of in-line assembler with a few restriction as regards
  labels.
- All labels defined within inline assembler code HAS TO BE of the form 
+ All labels defined within inline assembler code 
+\emph on 
+has to be
+\emph default 
+ of the form 
 \emph on 
 nnnnn$
 \emph default 
  where nnnn is a number less than 100 (which implies a limit of utmost 100
  inline assembler labels 
+\emph on 
+per function
+\emph default 
 \noun on 
-per function)
+)
 \noun default 
 .
  It is strongly recommended that each assembly instruction (including labels)
  be placed in a separate line (as the example shows).
  When the 
-\series bold 
+\emph on 
 --peep-asm
-\series default 
+\emph default 
  command line option is used, the inline assembler code will be passed through
- the peephole optimizer, this might cause some unexpected changes in the
- inline assembler code.
- Please go throught the peephole optimizer rules defined in file 'SDCCpeeph.def'
+ the peephole optimizer.
+ This might cause some unexpected changes in the inline assembler code.
+ Please go throught the peephole optimizer rules defined in file 
+\emph on 
+SDCCpeeph.def
+\emph default 
  carefully before using this option.
 \newline 
 
@@ -3373,14 +3518,27 @@ per function)
 _asm 
 \newline 
 \SpecialChar ~
- \SpecialChar ~
- mov b,#10 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+b,#10 
 \newline 
 00001$: 
 \newline 
 \SpecialChar ~
- \SpecialChar ~
- djnz b,00001$ 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+djnz\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+b,00001$ 
 \newline 
 _endasm ;
 \family default 
@@ -3392,7 +3550,7 @@ _endasm ;
 
 \size default 
 The inline assembler code can contain any valid code understood by the assembler
- (this includes any assembler directives and comment lines).
+, this includes any assembler directives and comment lines.
  The compiler does not do any validation of the code within the 
 \family typewriter 
 _asm ...
@@ -3487,87 +3645,79 @@ _endasm ;
 
 \family default 
 In other words inline assembly code can access labels defined in inline
- assembly.
- The same goes the other way, ie.
+ assembly within the scope of the funtion.
+ 
+\layout Standard
+
+The same goes the other way, ie.
  labels defines in inline assembly CANNOT be accessed by C statements.
 \layout Subsection
 
-int(16 bit) and long (32 bit ) Support
+int(16 bit) and long (32 bit) Support
 \layout Standard
 
 For signed & unsigned int (16 bit) and long (32 bit) variables, division,
  multiplication and modulus operations are implemented by support routines.
  These support routines are all developed in ANSI-C to facilitate porting
- to other MCUs.
+ to other MCUs, although some model specific assembler optimations are used.
  The following files contain the described routine, all of them can be found
- in the directory default SDCC library path.
-\layout Itemize
+ in <installdir>/share/sdcc/lib.
+\newline 
 
+\newline 
 
-\size footnotesize 
+\emph on 
+<pending: tabularise this>
+\emph default 
+
+\newline 
+
+\newline 
 _mulsint.c - signed 16 bit multiplication (calls _muluint)
-\layout Itemize
-
-
-\size footnotesize 
+\newline 
 _muluint.c - unsigned 16 bit multiplication
-\layout Itemize
-
-
-\size footnotesize 
+\newline 
 _divsint.c - signed 16 bit division (calls _divuint)
-\layout Itemize
-
-
-\size footnotesize 
-_divuint.c - unsigned 16 bit division.
-\layout Itemize
-
-
-\size footnotesize 
+\newline 
+_divuint.c - unsigned 16 bit division
+\newline 
 _modsint.c - signed 16 bit modulus (call _moduint)
-\layout Itemize
-
-
-\size footnotesize 
-_moduint.c - unsigned 16 bit modulus.
-\layout Itemize
-
-
-\size footnotesize 
+\newline 
+_moduint.c - unsigned 16 bit modulus
+\newline 
 _mulslong.c - signed 32 bit multiplication (calls _mululong)
-\layout Itemize
-
-
-\size footnotesize 
-_mululong.c - unsigned32 bit multiplication.
-\layout Itemize
-
-
-\size footnotesize 
+\newline 
+_mululong.c - unsigned32 bit multiplication
+\newline 
 _divslong.c - signed 32 division (calls _divulong)
-\layout Itemize
-
-
+\newline 
+_divulong.c - unsigned 32 division
+\newline 
+_modslong.c - signed 32 bit modulus (calls _modulong)
+\newline 
+_modulong.c - unsigned 32 bit modulus 
 \size footnotesize 
-_divulong.c - unsigned 32 division.
-\layout Itemize
 
+\newline 
 
-\size footnotesize 
-_modslong.c - signed 32 bit modulus (calls _modulong).
-\layout Itemize
+\newline 
 
-
-\size footnotesize 
-_modulong.c - unsigned 32 bit modulus.
-\layout Standard
-
-Since they are compiled as non-reentrant, interrupt service routines should
- not do any of the above operations.
- If this unavoidable then the above routines will need to be compiled with
- the --stack-auto option, after which the source program will have to be
- compiled with --int-long-rent option.
+\size default 
+Since they are compiled as 
+\emph on 
+non-reentrant
+\emph default 
+, interrupt service routines should not do any of the above operations.
+ If this is unavoidable then the above routines will need to be compiled
+ with the 
+\emph on 
+--stack-auto
+\emph default 
+ option, after which the source program will have to be compiled with 
+\emph on 
+--int-long-rent
+\emph default 
+ option.
 \layout Subsection
 
 Floating Point Support
@@ -3575,95 +3725,60 @@ Floating Point Support
 
 SDCC supports IEEE (single precision 4bytes) floating point numbers.The floating
  point support routines are derived from gcc's floatlib.c and consists of
- the following routines.
- 
-\layout Itemize
+ the following routines:
+\newline 
 
+\newline 
 
-\size footnotesize 
-_fsadd.c - add floating point numbers.
-\layout Itemize
+\emph on 
+<pending: tabularise this>
+\emph default 
 
+\newline 
 
-\size footnotesize 
+\newline 
+_fsadd.c - add floating point numbers
+\newline 
 _fssub.c - subtract floating point numbers
-\layout Itemize
-
-
-\size footnotesize 
+\newline 
 _fsdiv.c - divide floating point numbers
-\layout Itemize
-
-
-\size footnotesize 
+\newline 
 _fsmul.c - multiply floating point numbers
-\layout Itemize
-
-
-\size footnotesize 
+\newline 
 _fs2uchar.c - convert floating point to unsigned char
-\layout Itemize
-
-
-\size footnotesize 
-_fs2char.c - convert floating point to signed char.
-\layout Itemize
-
-
-\size footnotesize 
-_fs2uint.c - convert floating point to unsigned int.
-\layout Itemize
-
-
-\size footnotesize 
-_fs2int.c - convert floating point to signed int.
-\layout Itemize
-
-
-\size footnotesize 
-_fs2ulong.c - convert floating point to unsigned long.
-\layout Itemize
-
-
-\size footnotesize 
-_fs2long.c - convert floating point to signed long.
-\layout Itemize
-
-
-\size footnotesize 
+\newline 
+_fs2char.c - convert floating point to signed char
+\newline 
+_fs2uint.c - convert floating point to unsigned int
+\newline 
+_fs2int.c - convert floating point to signed int
+\newline 
+_fs2ulong.c - convert floating point to unsigned long
+\newline 
+_fs2long.c - convert floating point to signed long
+\newline 
 _uchar2fs.c - convert unsigned char to floating point
-\layout Itemize
-
-
-\size footnotesize 
+\newline 
 _char2fs.c - convert char to floating point number
-\layout Itemize
-
-
-\size footnotesize 
+\newline 
 _uint2fs.c - convert unsigned int to floating point
-\layout Itemize
-
-
-\size footnotesize 
+\newline 
 _int2fs.c - convert int to floating point numbers
-\layout Itemize
-
-
-\size footnotesize 
+\newline 
 _ulong2fs.c - convert unsigned long to floating point number
-\layout Itemize
-
-
+\newline 
+_long2fs.c - convert long to floating point number
 \size footnotesize 
-_long2fs.c - convert long to floating point number.
-\layout Standard
 
+\newline 
+
+\newline 
+
+\size default 
 Note if all these routines are used simultaneously the data space might
  overflow.
- For serious floating point usage it is strongly recommended that the Large
- model be used (in which case the floating point routines mentioned above
- will need to recompiled with the --model-large option)
+ For serious floating point usage it is strongly recommended that the large
+ model be used.
 \layout Subsection
 
 MCS51 Memory Models
@@ -3710,24 +3825,40 @@ The only model supported is Flat 24.
 
 \newline 
 In older versions of the compiler, this option was used with the MCS51 code
- generator (-mmcs51).
- Now, however, the '390 has it's own code generator, selected by the -mds390
+ generator (
+\emph on 
+-mmcs51
+\emph default 
+).
+ Now, however, the '390 has it's own code generator, selected by the 
+\emph on 
+-mds390
+\emph default 
  switch.
  
 \newline 
 
 \newline 
 Note that the compiler does not generate any code to place the processor
- into 24 bitmode (although the tinibios in the ds390 libraries will do that
- for you).
- If you don't use tinibios, the boot loader or similar code must ensure
- that the processor is in 24 bit contiguous addressing mode before calling
- the SDCC startup code.
+ into 24 bitmode (although 
+\emph on 
+tinibios
+\emph default 
+ in the ds390 libraries will do that for you).
+ If you don't use 
+\emph on 
+tinibios
+\emph default 
+, the boot loader or similar code must ensure that the processor is in 24
+ bit contiguous addressing mode before calling the SDCC startup code.
 \newline 
 
 \newline 
-Like the --model-large option, variables will by default be placed into
- the XDATA segment.
+Like the 
+\emph on 
+--model-large
+\emph default 
+ option, variables will by default be placed into the XDATA segment.
  
 \newline 
 
@@ -3737,8 +3868,11 @@ Segments may be placed anywhere in the 4 meg address space using the usual
  Note that if any segments are located above 64K, the -r flag must be passed
  to the linker to generate the proper segment relocations, and the Intel
  HEX output format must be used.
- The -r flag can be passed to the linker by using the option -Wl-r on the
- sdcc command line.
+ The -r flag can be passed to the linker by using the option 
+\emph on 
+-Wl-r
+\emph default 
+ on the sdcc command line.
  However, currently the linker can not handle code segments > 64k.
 \layout Subsection
 
@@ -3759,22 +3893,46 @@ __mcs51 or __ds390 or __z80, etc - depending on the model used (e.g.
  -mz80)
 \layout Itemize
 
-SDCC_STACK_AUTO - this symbol is defined when --stack-auto option is used.
+SDCC_STACK_AUTO - this symbol is defined when 
+\emph on 
+--stack-auto
+\emph default 
+ option is used.
 \layout Itemize
 
-SDCC_MODEL_SMALL - when small model is used.
+SDCC_MODEL_SMALL - when 
+\emph on 
+--model-small
+\emph default 
+ is used.
 \layout Itemize
 
-SDCC_MODEL_LARGE - when --model-large is used.
+SDCC_MODEL_LARGE - when 
+\emph on 
+--model-large
+\emph default 
+ is used.
 \layout Itemize
 
-SDCC_USE_XSTACK - when --xstack option is used.
+SDCC_USE_XSTACK - when 
+\emph on 
+--xstack
+\emph default 
+ option is used.
 \layout Itemize
 
-SDCC_STACK_TENBIT - when -mds390 is used
+SDCC_STACK_TENBIT - when 
+\emph on 
+-mds390
+\emph default 
+ is used
 \layout Itemize
 
-SDCC_MODEL_FLAT24 - when -mds390 is used
+SDCC_MODEL_FLAT24 - when 
+\emph on 
+-mds390
+\emph default 
+ is used
 \layout Section
 
 SDCC Technical Data
@@ -3783,91 +3941,84 @@ SDCC Technical Data
 Optimizations
 \layout Standard
 
-SDCC performs a a host of standard optimizations in addition to some MCU
- specific optimizations.
+SDCC performs a host of standard optimizations in addition to some MCU specific
+ optimizations.
  
 \layout Subsubsection
 
 Sub-expression Elimination
 \layout Standard
 
-The compiler does 
-\emph on 
-local and global 
-\emph default 
-common subexpression elimination.
-\layout Standard
-
-
-\family typewriter 
-\size scriptsize 
-eg.
+The compiler does local and global common subexpression elimination, e.g.:
  
-\layout Standard
-
-
-\size small 
-i = x + y + 1; 
-\size default 
+\newline 
 
 \newline 
-j 
-\size small 
-= x + y;
-\layout Standard
 
+\family typewriter 
+i = x + y + 1; 
+\newline 
+j = x + y;
+\family default 
+
+\newline 
+
+\newline 
 will be translated to
-\layout Standard
+\newline 
 
+\newline 
 
-\size small 
+\family typewriter 
 iTemp = x + y 
 \newline 
 i = iTemp + 1 
 \newline 
 j = iTemp
-\layout Standard
+\newline 
 
-Some subexpressions are not as obvious as the above example.
-\layout Standard
+\family default 
 
-eg.
-\layout Standard
+\newline 
+Some subexpressions are not as obvious as the above example, e.g.:
+\newline 
 
+\newline 
 
-\size small 
+\family typewriter 
 a->b[i].c = 10; 
 \newline 
 a->b[i].d = 11;
-\layout Standard
+\family default 
 
-In this case the address arithmetic 
-\emph on 
-a->b[i] 
-\emph default 
-will be computed only once; the equivalent code in C would be.
-\layout Standard
+\newline 
 
+\newline 
+In this case the address arithmetic a->b[i] will be computed only once;
+ the equivalent code in C would be.
+\newline 
 
-\size small 
+\newline 
+
+\family typewriter 
 iTemp = a->b[i]; 
 \newline 
 iTemp.c = 10; 
 \newline 
 iTemp.d = 11;
-\layout Standard
+\family default 
 
+\newline 
+
+\newline 
 The compiler will try to keep these temporary variables in registers.
 \layout Subsubsection
 
 Dead-Code Elimination
 \layout Standard
 
-eg.
-\layout Standard
 
-
-\size small 
+\family typewriter 
 int global; 
 \newline 
 void f () { 
@@ -3879,13 +4030,12 @@ int i;
 \SpecialChar ~
 \SpecialChar ~
 i = 1; \SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
 /* dead store */ 
 \newline 
 \SpecialChar ~
 \SpecialChar ~
-global = 1; /* dead store */ 
+global = 1;\SpecialChar ~
+/* dead store */ 
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -3897,27 +4047,30 @@ return;
 \newline 
 \SpecialChar ~
 \SpecialChar ~
-global = 3; /* unreachable */ 
+global = 3;\SpecialChar ~
+/* unreachable */ 
 \newline 
 }
-\layout Standard
+\family default 
 
+\newline 
+
+\newline 
 will be changed to
-\layout Standard
+\newline 
 
+\newline 
 
-\size footnotesize 
+\family typewriter 
 int global; void f () 
 \newline 
-{ \SpecialChar ~
- \SpecialChar ~
- 
+{
 \newline 
 \SpecialChar ~
-global = 2; \SpecialChar ~
- \SpecialChar ~
- 
+\SpecialChar ~
+global = 2; 
 \newline 
+\SpecialChar ~
 \SpecialChar ~
 return; 
 \newline 
@@ -3927,41 +4080,38 @@ return;
 Copy-Propagation
 \layout Standard
 
-eg.
-\layout Standard
 
-
-\size footnotesize 
+\family typewriter 
 int f() { 
 \newline 
-\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 int i, j; 
 \newline 
 \SpecialChar ~
 \SpecialChar ~
-\SpecialChar ~
 i = 10; 
 \newline 
-\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 j = i; 
 \newline 
 \SpecialChar ~
 \SpecialChar ~
-\SpecialChar ~
 return j; 
 \newline 
 }
-\layout Standard
+\family default 
 
+\newline 
+
+\newline 
 will be changed to 
-\layout Standard
+\newline 
 
+\newline 
 
-\size small 
+\family typewriter 
 int f() { 
 \newline 
 \SpecialChar ~
@@ -3981,8 +4131,11 @@ int f() {
  return 10; 
 \newline 
 }
-\layout Standard
+\newline 
 
+\newline 
+
+\family default 
 Note: the dead stores created by this copy propagation will be eliminated
  by dead-code elimination.
 \layout Subsubsection
@@ -3991,101 +4144,112 @@ Loop Optimizations
 \layout Standard
 
 Two types of loop optimizations are done by SDCC loop invariant lifting
- and strength reduction of loop induction variables.In addition to the strength
- reduction the optimizer marks the induction variables and the register
- allocator tries to keep the induction variables in registers for the duration
- of the loop.
- Because of this preference of the register allocator , loop induction optimizat
-ion causes an increase in register pressure, which may cause unwanted spilling
+ and strength reduction of loop induction variables.
+ In addition to the strength reduction the optimizer marks the induction
+ variables and the register allocator tries to keep the induction variables
+ in registers for the duration of the loop.
+ Because of this preference of the register allocator, loop induction optimizati
+on causes an increase in register pressure, which may cause unwanted spilling
  of other temporary variables into the stack / data space.
  The compiler will generate a warning message when it is forced to allocate
  extra space either on the stack or data space.
  If this extra space allocation is undesirable then induction optimization
- can be eliminated either for the entire source file ( with --noinduction
- option) or for a given function only (#pragma NOINDUCTION).
-\layout Itemize
+ can be eliminated either for the entire source file (with --noinduction
+ option) or for a given function only using #pragma\SpecialChar ~
+NOINDUCTION.
+\newline 
 
-
-\series bold 
+\newline 
 Loop Invariant:
-\layout Standard
+\newline 
 
-eg
-\layout Standard
+\newline 
 
-
-\size small 
+\family typewriter 
 for (i = 0 ; i < 100 ; i ++) 
 \newline 
-\SpecialChar ~
  \SpecialChar ~
  \SpecialChar ~
 f += k + l;
-\layout Standard
+\family default 
 
+\newline 
+
+\newline 
 changed to
-\layout Standard
+\newline 
 
+\newline 
 
-\size small 
+\family typewriter 
 itemp = k + l; 
 \newline 
-for ( i = 0; i < 100; i++ ) f += itemp;
-\layout Standard
+for (i = 0; i < 100; i++) 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+f += itemp;
+\family default 
 
+\newline 
+
+\newline 
 As mentioned previously some loop invariants are not as apparent, all static
  address computations are also moved out of the loop.
-\layout Itemize
+\newline 
 
+\newline 
+Strength Reduction, this optimization substitutes an expression by a cheaper
+ expression:
+\newline 
 
-\series bold 
-Strength Reduction :
-\layout Standard
+\newline 
 
-This optimization substitutes an expression by a cheaper expression.
-\layout Standard
+\family typewriter 
+for (i=0;i < 100; i++)
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+ar[i*5] = i*3;
+\family default 
 
-eg.
-\layout Standard
+\newline 
 
-
-\size small 
-for (i=0;i < 100; i++) ar[i*5] = i*3;
-\layout Standard
-
+\newline 
 changed to
-\layout Standard
+\newline 
 
+\newline 
 
-\size small 
+\family typewriter 
 itemp1 = 0; 
 \newline 
 itemp2 = 0; 
 \newline 
 for (i=0;i< 100;i++) { 
 \newline 
-\SpecialChar ~
  \SpecialChar ~
  \SpecialChar ~
 ar[itemp1] = itemp2; 
 \newline 
-\SpecialChar ~
  \SpecialChar ~
  \SpecialChar ~
 itemp1 += 5; 
 \newline 
-\SpecialChar ~
  \SpecialChar ~
  \SpecialChar ~
 itemp2 += 3; 
 \newline 
 }
-\layout Standard
+\family default 
 
+\newline 
+
+\newline 
 The more expensive multiplication is changed to a less expensive addition.
 \layout Subsubsection
 
-Loop Reversing:
+Loop Reversing
 \layout Standard
 
 This optimization is done to reduce the overhead of checking loop boundaries
@@ -4100,31 +4264,24 @@ decrement and jump if not zero
 
  instruction.
  SDCC checks for the following criterion to determine if a loop is reversible
- (note: more sophisticated compiers use data-dependency analysis to make
+ (note: more sophisticated compilers use data-dependency analysis to make
  this determination, SDCC uses a more simple minded analysis).
 \layout Itemize
 
 The 'for' loop is of the form 
 \newline 
 
-\begin_inset Quotes eld
-\end_inset 
+\newline 
 
-for ( <symbol> = <expression> ; <sym> [< | <=] <expression> ; [<sym>++ |
+\family typewriter 
+for (<symbol> = <expression> ; <sym> [< | <=] <expression> ; [<sym>++ |
  <sym> += 1])
 \newline 
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
 <for body>
-\begin_inset Quotes erd
-\end_inset 
-
-
 \layout Itemize
 
 The <for body> does not contain 
@@ -4158,9 +4315,16 @@ The loop control variable does NOT participate in any arithmetic operation
 There are NO switch statements in the loop.
 \layout Standard
 
-Note djnz instruction can be used for 8-bit values ONLY, therefore it is
- advantageous to declare loop control symbols as either 'char', ofcourse
- this may not be possible on all situations.
+Note djnz instruction can be used for 8-bit values 
+\emph on 
+only
+\emph default 
+, therefore it is advantageous to declare loop control symbols as 
+\emph on 
+char
+\emph default 
+.
+ Ofcourse this may not be possible on all situations.
 \layout Subsubsection
 
 Algebraic Simplifications
@@ -4168,16 +4332,11 @@ Algebraic Simplifications
 
 SDCC does numerous algebraic simplifications, the following is a small sub-set
  of these optimizations.
-\layout Standard
-
-
-\size small 
-eg
-\emph on 
- 
-\emph default 
+\newline 
 
 \newline 
+
+\family typewriter 
 i = j + 0 ; /* changed to */ i = j; 
 \newline 
 i /= 2; /* changed to */ i >>= 1; 
@@ -4185,8 +4344,11 @@ i /= 2; /* changed to */ i >>= 1;
 i = j - j ; /* changed to */ i = 0; 
 \newline 
 i = j / 1 ; /* changed to */ i = j;
-\layout Standard
+\family default 
 
+\newline 
+
+\newline 
 Note the subexpressions given above are generally introduced by macro expansions
  or as a result of copy/constant propagation.
 \layout Subsubsection
@@ -4199,15 +4361,12 @@ SDCC changes switch statements to jump tables when the following conditions
  
 \layout Itemize
 
-The case labels are in numerical sequence , the labels need not be in order,
+The case labels are in numerical sequence, the labels need not be in order,
  and the starting number need not be one or zero.
 \layout Standard
 
-eg 
-\layout Standard
 
-
-\size small 
+\family typewriter 
 switch(i) {\SpecialChar ~
  \SpecialChar ~
  \SpecialChar ~
@@ -4310,8 +4469,11 @@ case 4: ...
  \SpecialChar ~
  \SpecialChar ~
 }
-\layout Standard
+\newline 
 
+\newline 
+
+\family default 
 Both the above switch statements will be implemented using a jump-table.
 \layout Itemize
 
@@ -4326,14 +4488,12 @@ The number of case labels is less than 84, since each label takes 3 bytes
 
 Switch statements which have gaps in the numeric sequence or those that
  have more that 84 case labels can be split into more than one switch statement
- for efficient code generation.
-\layout Standard
+ for efficient code generation, e.g.:
+\newline 
 
-eg
-\layout Standard
+\newline 
 
-
-\size small 
+\family typewriter 
 switch (i) { 
 \newline 
 case 1: ...
@@ -4361,13 +4521,17 @@ case 12: ...
  
 \newline 
 }
-\layout Standard
+\family default 
 
+\newline 
+
+\newline 
 If the above switch statement is broken down into two switch statements
-\layout Standard
+\newline 
 
+\newline 
 
-\size small 
+\family typewriter 
 switch (i) { 
 \newline 
 case 1: ...
@@ -4383,13 +4547,21 @@ case 4: ...
  
 \newline 
 }
-\layout Standard
+\newline 
 
+\newline 
 
-\size small 
+\family default 
+and
+\family typewriter 
+
+\newline 
+
+\newline 
 switch (i) { 
 \newline 
-case 9: ...
+case 9: \SpecialChar ~
+...
  
 \newline 
 case 10: ...
@@ -4398,12 +4570,16 @@ case 10: ...
 case 11: ...
  
 \newline 
-case 12:...
+case 12:\SpecialChar ~
+...
  
 \newline 
 }
-\layout Standard
+\newline 
 
+\newline 
+
+\family default 
 then both the switch statements will be implemented using jump-tables whereas
  the unmodified switch statement will not be.
 \layout Subsubsection
@@ -4414,32 +4590,25 @@ Bit-shifting Operations.
 Bit shifting is one of the most frequently used operation in embedded programmin
 g.
  SDCC tries to implement bit-shift operations in the most efficient way
- possible.
-\layout Standard
+ possible, e.g.:
+\newline 
 
-eg.
-\layout Standard
-
-
-\size small 
+\newline 
 unsigned char i;
-\layout Standard
-
-
-\size small 
+\newline 
 ...
  
 \newline 
 i>>= 4; 
 \newline 
-..
-\layout Standard
+...
+\newline 
 
-generates the following code.
-\layout Standard
+\newline 
+generates the following code:
+\newline 
 
-
-\size small 
+\newline 
 mov a,_i 
 \newline 
 swap a 
@@ -4447,14 +4616,16 @@ swap a
 anl a,#0x0f 
 \newline 
 mov _i,a
-\layout Standard
+\newline 
 
+\newline 
 In general SDCC will never setup a loop if the shift count is known.
- Another example
-\layout Standard
+ Another example:
+\newline 
 
+\newline 
 
-\size small 
+\family typewriter 
 unsigned int i; 
 \newline 
 ...
@@ -4463,13 +4634,17 @@ unsigned int i;
 i >>= 9; 
 \newline 
 ...
-\layout Standard
+\family default 
 
-will generate
-\layout Standard
+\newline 
 
+\newline 
+will generate:
+\newline 
 
-\size small 
+\newline 
+
+\family typewriter 
 mov a,(_i + 1) 
 \newline 
 mov (_i + 1),#0x00 
@@ -4479,53 +4654,62 @@ clr c
 rrc a 
 \newline 
 mov _i,a
-\layout Standard
+\family default 
 
-Note that SDCC stores numbers in 
-\noun on 
-little-endian 
-\noun default 
-format (i.e.
- lowest order first)
+\newline 
+
+\newline 
+Note that SDCC stores numbers in little-endian format (i.e.
+ lowest order first).
 \layout Subsubsection
 
 Bit-rotation
 \layout Standard
 
 A special case of the bit-shift operation is bit rotation, SDCC recognizes
- the following expression to be a left bit-rotation.
-\layout Standard
+ the following expression to be a left bit-rotation:
+\newline 
 
+\newline 
 
-\size small 
+\family typewriter 
 unsigned char i; 
 \newline 
 ...
  
 \newline 
-i = ( ( i << 1) | ( i >> 7)); 
+i = ((i << 1) | (i >> 7)); 
+\family default 
+
 \newline 
 ...
-\layout Standard
+\newline 
 
-will generate the following code.
-\layout Standard
+\newline 
+will generate the following code:
+\newline 
 
+\newline 
 
-\size small 
+\family typewriter 
 mov a,_i 
 \newline 
 rl a 
 \newline 
 mov _i,a
-\layout Standard
+\family default 
 
+\newline 
+
+\newline 
 SDCC uses pattern matching on the parse tree to determine this operation.Variatio
-ns of this case will also be recognized as bit-rotation i.e
-\emph on 
- i = ((i >> 7) | (i << 1)); 
-\emph default 
-/* left-bit rotation */
+ns of this case will also be recognized as bit-rotation, i.e.: 
+\newline 
+
+\newline 
+
+\family typewriter 
+i = ((i >> 7) | (i << 1)); /* left-bit rotation */
 \layout Subsubsection
 
 Highest Order Bit
@@ -4534,14 +4718,15 @@ Highest Order Bit
 It is frequently required to obtain the highest order bit of an integral
  type (long, int, short or char types).
  SDCC recognizes the following expression to yield the highest order bit
- and generates optimized code for it.
-\layout Standard
-
-
-\size small 
-eg 
+ and generates optimized code for it, e.g.:
 \newline 
+
+\newline 
+ 
+\family typewriter 
 unsigned int gint; 
+\newline 
+
 \newline 
 foo () { 
 \newline 
@@ -4549,29 +4734,30 @@ unsigned char hob;
 \newline 
 \SpecialChar ~
 \SpecialChar ~
-\SpecialChar ~
 ...
  
 \newline 
-\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 hob = (gint >> 15) & 1; 
 \newline 
 \SpecialChar ~
 \SpecialChar ~
-\SpecialChar ~
 ..
  
 \newline 
 }
-\layout Standard
+\family default 
 
-Will generate the following code.
-\layout Standard
+\newline 
 
+\newline 
+will generate the following code:
+\newline 
 
-\size small 
+\family typewriter 
+
+\newline 
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -4751,110 +4937,200 @@ Will generate the following code.
 \SpecialChar ~
  mov\SpecialChar ~
  _foo_hob_1_1,a
-\layout Standard
+\newline 
 
-Variations of this case however will NOT be recognized.
- It is a standard C expression , so I heartily recommend this be the only
+\newline 
+
+\family default 
+Variations of this case however will 
+\emph on 
+not
+\emph default 
+ be recognized.
+ It is a standard C expression, so I heartily recommend this be the only
  way to get the highest order bit, (it is portable).
- Of course it will be recognized even if it is embedded in other expressions.
-\layout Standard
+ Of course it will be recognized even if it is embedded in other expressions,
+ e.g.:
+\newline 
 
+\newline 
 
-\size small 
-eg.
-\layout Standard
-
-
-\size small 
+\family typewriter 
 xyz = gint + ((gint >> 15) & 1);
-\layout Standard
+\family default 
 
+\newline 
+
+\newline 
 will still be recognized.
 \layout Subsubsection
 
 Peep-hole Optimizer
 \layout Standard
 
-The compiler uses a rule based , pattern matching and re-writing mechanism
+The compiler uses a rule based, pattern matching and re-writing mechanism
  for peep-hole optimization.
- It is inspired by '
+ It is inspired by 
 \emph on 
-copt'
+copt
 \emph default 
  a peep-hole optimizer by Christopher W.
  Fraser (cwfraser@microsoft.com).
  A default set of rules are compiled into the compiler, additional rules
- may be added with the --peep-file <filename> option.
+ may be added with the 
+\emph on 
+--peep-file <filename>
+\emph default 
+ option.
  The rule language is best illustrated with examples.
-\layout Standard
+\newline 
 
+\newline 
 
-\size small 
+\family typewriter 
 replace { 
 \newline 
+\SpecialChar ~
+\SpecialChar ~
 mov %1,a 
 \newline 
-mov a,%1 } by { mov %1,a }
-\layout Standard
+\SpecialChar ~
+\SpecialChar ~
+mov a,%1
+\newline 
+} by {
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+mov %1,a
+\newline 
+}
+\family default 
 
-The above rule will the following assembly sequence
-\layout Standard
+\newline 
 
+\newline 
+The above rule will change the following assembly sequence:
+\newline 
 
-\size small 
+\newline 
+
+\family typewriter 
+\SpecialChar ~
+\SpecialChar ~
 mov r1,a 
 \newline 
+\SpecialChar ~
+\SpecialChar ~
 mov a,r1
-\layout Standard
+\family default 
 
+\newline 
+
+\newline 
 to
-\layout Standard
+\newline 
 
+\newline 
 
-\size small 
+\family typewriter 
 mov r1,a
-\layout Standard
+\family default 
 
-Note: All occurrences of a '%n' ( pattern variable ) must denote the same
- string.
- With the above rule, the assembly sequence
-\layout Standard
+\newline 
 
+\newline 
+Note: All occurrences of a 
+\emph on 
+%n
+\emph default 
+ (pattern variable) must denote the same string.
+ With the above rule, the assembly sequence:
+\newline 
 
-\size small 
+\newline 
+
+\family typewriter 
+\SpecialChar ~
+\SpecialChar ~
 mov r1,a 
 \newline 
+\SpecialChar ~
+\SpecialChar ~
 mov a,r2
-\layout Standard
+\family default 
 
+\newline 
+
+\newline 
 will remain unmodified.
- Other special case optimizations may be added by the user (via --peep-file
- option), eg.
- some variants of the 8051 MCU allow only 'AJMP' and 'ACALL' , the following
- two rules will change all 'LJMP' & 'LCALL' to 'AJMP' & 'ACALL'.
-\layout Standard
+\newline 
 
+\newline 
+Other special case optimizations may be added by the user (via 
+\emph on 
+--peep-file option
+\emph default 
+).
+ E.g.
+ some variants of the 8051 MCU allow only 
+\family typewriter 
+ajmp
+\family default 
+ and 
+\family typewriter 
+acall
+\family default 
+.
+ The following two rules will change all 
+\family typewriter 
+ljmp
+\family default 
+ and 
+\family typewriter 
+lcall
+\family default 
+ to 
+\family typewriter 
+ajmp
+\family default 
+ and 
+\family typewriter 
+acall
+\family default 
 
-\size small 
+\newline 
+
+\newline 
+
+\family typewriter 
 replace { lcall %1 } by { acall %1 } 
 \newline 
 replace { ljmp %1 } by { ajmp %1 }
-\layout Standard
+\family default 
 
-The inline-assembler' code is also passed through the peep hole optimizer,
- thus the peephole optimizer can also be used as an assembly level macro
- expander.
+\newline 
+
+\newline 
+The 
+\emph on 
+inline-assembler code
+\emph default 
+ is also passed through the peep hole optimizer, thus the peephole optimizer
+ can also be used as an assembly level macro expander.
  The rules themselves are MCU dependent whereas the rule language infra-structur
 e is MCU independent.
  Peephole optimization rules for other MCU can be easily programmed using
  the rule language.
-\layout Standard
+\newline 
 
-The syntax for a rule is as follows ,
-\layout Standard
+\newline 
+The syntax for a rule is as follows:
+\newline 
 
+\newline 
 
-\size small 
+\family typewriter 
 rule := replace [ restart ] '{' <assembly sequence> '
 \backslash 
 n' 
@@ -4915,96 +5191,114 @@ n'
 \backslash 
 n' 
 \newline 
+
+\family default 
+
+\newline 
 <assembly sequence> := assembly instruction (each instruction including
- labels must be on a separate line).\SpecialChar ~
- \SpecialChar ~
+ labels must be on a separate line).
+\newline 
 
-\layout Standard
-
+\newline 
 The optimizer will apply to the rules one by one from the top in the sequence
  of their appearance, it will terminate when all rules are exhausted.
- If the '
-\emph on 
-restart
-\emph default 
-' option is specified, then the optimizer will start matching the rules
- again from the top, this option for a rule is expensive (performance),
- it is intended to be used in situations where a transformation will trigger
+ If the 'restart' option is specified, then the optimizer will start matching
+ the rules again from the top, this option for a rule is expensive (performance)
+, it is intended to be used in situations where a transformation will trigger
  the same rule again.
- A good example of this the following rule.
-\layout Standard
+ A good example of this the following rule:
+\newline 
 
-
-\size small 
+\newline 
 replace restart { 
 \newline 
+\SpecialChar ~
+\SpecialChar ~
 pop %1 
 \newline 
+\SpecialChar ~
+\SpecialChar ~
 push %1 } by { 
 \newline 
+\SpecialChar ~
+\SpecialChar ~
 ; nop 
 \newline 
 }
-\layout Standard
+\newline 
 
+\newline 
 Note that the replace pattern cannot be a blank, but can be a comment line.
- Without the '
-\emph on 
-restart
-\emph default 
-' option only the inner most 'pop' 'push' pair would be eliminated.
- i.e.
-\layout Standard
+ Without the 'restart' option only the inner most 'pop' 'push' pair would
+ be eliminated, i.e.:
+\newline 
 
+\newline 
 
-\size small 
+\family typewriter 
+\SpecialChar ~
+\SpecialChar ~
 pop ar1 
 \newline 
+\SpecialChar ~
+\SpecialChar ~
 pop ar2 
 \newline 
+\SpecialChar ~
+\SpecialChar ~
 push ar2 
 \newline 
+\SpecialChar ~
+\SpecialChar ~
 push ar1
-\layout Standard
+\family default 
 
-would result in
-\layout Standard
+\newline 
 
+\newline 
+would result in:
+\newline 
 
-\size small 
+\newline 
+
+\family typewriter 
 pop ar1 
 \newline 
 ; nop 
 \newline 
 push ar1
-\layout Standard
+\family default 
 
-with the '
+\newline 
+
+\newline 
+
 \emph on 
-restart
+with
 \emph default 
-' option the rule will be applied again to the resulting code and the all
- the '
-\emph on 
-pop' 'push'
-\emph default 
- pairs will be eliminated to yield
-\layout Standard
+ the restart option the rule will be applied again to the resulting code
+ and then all the pop-push pairs will be eliminated to yield:
+\newline 
 
+\newline 
 
-\size small 
+\family typewriter 
 ; nop 
 \newline 
 ; nop
-\layout Standard
+\family default 
 
+\newline 
+
+\newline 
 A conditional function can be attached to a rule.
  Attaching rules are somewhat more involved, let me illustrate this with
  an example.
-\layout Standard
+\newline 
 
+\newline 
 
-\size small 
+\family typewriter 
 replace { 
 \newline 
 \SpecialChar ~
@@ -5020,144 +5314,93 @@ ljmp %5
 sjmp %5 
 \newline 
 %2:} if labelInRange
-\layout Standard
+\family default 
 
+\newline 
+
+\newline 
 The optimizer does a look-up of a function name table defined in function
- '
+ 
 \emph on 
-callFuncByName'
+callFuncByName
 \emph default 
- in the source file 
+ in the source file SDCCpeeph.c, with the name 
 \emph on 
-SDCCpeeph.c
+labelInRange
 \emph default 
- , with the name 
-\emph on 
-'labelInRange
-\emph default 
-', if it finds a corresponding entry the function is called.
+.
+ If it finds a corresponding entry the function is called.
  Note there can be no parameters specified for these functions, in this
  case the use of 
 \emph on 
-'%5
+%5
 \emph default 
-' is crucial, since the function 
+ is crucial, since the function 
 \emph on 
 labelInRange
 \emph default 
  expects to find the label in that particular variable (the hash table containin
 g the variable bindings is passed as a parameter).
- If you want to code more such functions , take a close look at the function
- 
-\emph on 
-labelInRange
-\emph default 
- and the calling mechanism in source file 
-\emph on 
-SDCCpeeph.c
-\emph default 
-.
- I know this whole thing is a little kludgey , may be some day we will have
- some better means.
+ If you want to code more such functions, take a close look at the function
+ labelInRange and the calling mechanism in source file SDCCpeeph.c.
+ I know this whole thing is a little kludgey, but maybe some day we will
+ have some better means.
  If you are looking at this file, you will also see the default rules that
- are compiled into the compiler, you can your own rules in the default set
- there if you get tired of specifying the 
+ are compiled into the compiler, you can add your own rules in the default
+ set there if you get tired of specifying the --peep-file option.
+\newline 
+
+\newline 
+
 \emph on 
---peep-file
-\emph default 
- option.
+<pending: this is as far as I got>
 \layout Subsection
 
 Pragmas
 \layout Standard
 
-SDCC supports the following 
-\emph on 
-#pragma 
-\emph default 
-directives.
+SDCC supports the following #pragma directives.
  This directives are applicable only at a function level.
 \layout Itemize
 
-
-\series bold 
-SAVE
-\series default 
- - this will save all the current options.
+SAVE - this will save all the current options.
 \layout Itemize
 
-
-\series bold 
-RESTORE 
-\series default 
-- will restore the saved options from the last save.
+RESTORE - will restore the saved options from the last save.
  Note that SAVES & RESTOREs cannot be nested.
  SDCC uses the same buffer to save the options each time a SAVE is called.
 \layout Itemize
 
-
-\series bold 
-NOGCSE
-\series default 
- - will stop global subexpression elimination.
+NOGCSE - will stop global subexpression elimination.
 \layout Itemize
 
-
-\series bold 
-NOINDUCTION
-\series default 
- - will stop loop induction optimizations.
+NOINDUCTION - will stop loop induction optimizations.
 \layout Itemize
 
-
-\series bold 
-NOJTBOUND
-\series default 
- - will not generate code for boundary value checking , when switch statements
- are turned into jump-tables.
+NOJTBOUND - will not generate code for boundary value checking, when switch
+ statements are turned into jump-tables.
 \layout Itemize
 
-
-\series bold 
-NOOVERLAY 
-\series default 
-- the compiler will not overlay the parameters and local variables of a
- function.
+NOOVERLAY - the compiler will not overlay the parameters and local variables
+ of a function.
 \layout Itemize
 
-
-\series bold 
-NOLOOPREVERSE
-\series default 
- - Will not do loop reversal optimization
+NOLOOPREVERSE - Will not do loop reversal optimization
 \layout Itemize
 
-
-\series bold 
-EXCLUDE NONE | {acc[,b[,dpl[,dph]]]
-\series default 
- - The exclude pragma disables generation of pair of push/pop instruction
- in ISR function (using interrupt keyword).
+EXCLUDE NONE | {acc[,b[,dpl[,dph]]] - The exclude pragma disables generation
+ of pair of push/pop instruction in ISR function (using interrupt keyword).
  The directive should be placed immediately before the ISR function definition
  and it affects ALL ISR functions following it.
- To enable the normal register saving for ISR functions use 
-\begin_inset Quotes eld
-\end_inset 
-
-#pragma EXCLUDE none
-\begin_inset Quotes erd
-\end_inset 
-
-
+ To enable the normal register saving for ISR functions use #pragma\SpecialChar ~
+EXCLUDE\SpecialChar ~
+none.
 \layout Itemize
 
-
-\series bold 
-CALLEE-SAVES function1[,function2[,function3...]]
-\series default 
- - The compiler by default uses a caller saves convention for register saving
- across function calls, however this can cause unneccessary register pushing
- & popping when calling small functions from larger functions.
+CALLEE-SAVES function1[,function2[,function3...]] - The compiler by default
+ uses a caller saves convention for register saving across function calls,
+ however this can cause unneccessary register pushing & popping when calling
+ small functions from larger functions.
  This option can be used to switch the register saving convention for the
  function names specified.
  The compiler will not save registers when calling these functions, extra
@@ -5167,8 +5410,9 @@ CALLEE-SAVES function1[,function2[,function3...]]
  In future the compiler (with interprocedural analysis) will be able to
  determine the appropriate scheme to use for each function call.
  If --callee-saves command line option is used, the function names specified
- in #pragma CALLEE-SAVES is appended to the list of functions specified
- inthe command line.
+ in #pragma\SpecialChar ~
+CALLEE-SAVES is appended to the list of functions specified inthe
+ command line.
 \layout Standard
 
 The pragma's are intended to be used to turn-off certain optimizations which
@@ -5177,25 +5421,13 @@ The pragma's are intended to be used to turn-off certain optimizations which
  This usually happens in large functions.
  Pragma directives should be used as shown in the following example, they
  are used to control options & optimizations for a given function; pragmas
- should be placed 
-\noun on 
-before
-\noun default 
- and/or 
-\noun on 
-after
-\noun default 
- a function, placing pragma's inside a function body could have unpredictable
- results.
+ should be placed before and/or after a function, placing pragma's inside
+ a function body could have unpredictable results.
 \layout Standard
 
-
-\size scriptsize 
 eg
 \layout Standard
 
-
-\size scriptsize 
 #pragma SAVE \SpecialChar ~
  /* save the current settings */ 
 \newline 
@@ -5237,26 +5469,14 @@ Library Routines
 The following library routines are provided for your convenience.
 \layout Standard
 
-
-\series bold 
-\size large 
-stdio.h 
-\series default 
-\size default 
-- Contains the following functions printf & sprintf these routines are developed
- by 
-\emph on 
-Martijn van Balen <balen@natlab.research.philips.com>.
+stdio.h - Contains the following functions printf & sprintf these routines
+ are developed by Martijn van Balen <balen@natlab.research.philips.com>.
  
 \layout Standard
 
-
-\size scriptsize 
 %[flags][width][b|B|l|L]type
 \layout Standard
 
-
-\size scriptsize 
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -5805,17 +6025,10 @@ Martijn van Balen <balen@natlab.research.philips.com>.
  float (still to be implemented)
 \layout Standard
 
-Also contains a very simple version of printf (
-\series bold 
-printf_small
-\series default 
-).
+Also contains a very simple version of printf (printf_small).
  This simplified version of printf supports only the following formats.
 \layout Standard
 
-
-\size scriptsize 
-\bar under 
 format\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -5827,16 +6040,8 @@ type\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-argument-type
-\bar default 
- 
-\series bold 
-\size default 
-
+argument-type 
 \newline 
-
-\series default 
-\size scriptsize 
 %d \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -6016,24 +6221,16 @@ character\SpecialChar ~
 _generic pointer
 \layout Standard
 
-The routine is 
-\series bold 
-very stack intesive 
-\series default 
-, --stack-after-data parameter should be used when using this routine, the
- routine also takes about 1K of code space.
- It also expects an external function named 
-\emph on 
-putchar(char )
-\emph default 
- to be present (this can be changed).
+The routine is very stack intesive, --stack-after-data parameter should
+ be used when using this routine, the routine also takes about 1K of code
+ space.
+ It also expects an external function named putchar(char) to be present
+ (this can be changed).
  When using the %s format the string / pointer should be cast to a generic
  pointer.
  eg.
 \layout Standard
 
-
-\size scriptsize 
 printf_small(
 \begin_inset Quotes eld
 \end_inset 
@@ -6047,39 +6244,17 @@ n
 ,(char _generic *)mystr,myint);
 \layout Itemize
 
-
-\series bold 
-\size large 
-stdarg.h 
-\series default 
-\size default 
-- contains definition for the following macros to be used for variable parameter
- list, note that a function can have a variable parameter list if and only
- if it is 'reentrant'
+stdarg.h - contains definition for the following macros to be used for variable
+ parameter list, note that a function can have a variable parameter list
+ if and only if it is 'reentrant'
 \begin_deeper 
 \layout Standard
 
-
-\size small 
 va_list, va_start, va_arg, va_end.
 \end_deeper 
 \layout Itemize
 
-
-\series bold 
-\size large 
-setjmp.h 
-\series default 
-\size default 
-- contains defintion for ANSI
-\series bold 
- setjmp 
-\series default 
-& 
-\series bold 
-longjmp
-\series default 
- routines.
+setjmp.h - contains defintion for ANSI setjmp & longjmp routines.
  Note in this case setjmp & longjmp can be used between functions executing
  within the same register bank, if long jmp is executed from a function
  that is using a different register bank from the function issuing the setjmp
@@ -6088,71 +6263,39 @@ longjmp
  return address), and can be placed in any address space.
 \layout Itemize
 
-
-\series bold 
-\size large 
-stdlib.h
-\series default 
-\size default 
- - contains the following functions.
+stdlib.h - contains the following functions.
 \begin_deeper 
 \layout Standard
 
-
-\size footnotesize 
 atoi, atol.
 \end_deeper 
 \layout Itemize
 
-
-\series bold 
-\size large 
-string.h 
-\series default 
-\size default 
-- contains the following functions.
+string.h - contains the following functions.
 \begin_deeper 
 \layout Standard
 
-
-\size footnotesize 
 strcpy, strncpy, strcat, strncat, strcmp, strncmp, strchr, strrchr, strspn,
  strcspn, strpbrk, strstr, strlen, strtok, memcpy, memcmp, memset.
 \end_deeper 
 \layout Itemize
 
-
-\series bold 
-\size large 
-ctype.h
-\series default 
-\size default 
- - contains the following routines.
+ctype.h - contains the following routines.
 \begin_deeper 
 \layout Standard
 
-
-\size footnotesize 
 iscntrl, isdigit, isgraph, islower, isupper, isprint, ispunct, isspace,
  isxdigit, isalnum, isalpha.
 \end_deeper 
 \layout Itemize
 
-
-\series bold 
-\size large 
-malloc.h
-\series default 
-\size default 
- - The malloc routines are developed by Dmitry S.
+malloc.h - The malloc routines are developed by Dmitry S.
  Obukhov (dso@usa.net).
  These routines will allocate memory from the external ram.
  Here is a description on how to use them (as described by the author).
 \begin_deeper 
 \layout Standard
 
-
-\size scriptsize 
 //Example: 
 \newline 
 \SpecialChar ~
@@ -6309,13 +6452,7 @@ malloc.h
 \end_deeper 
 \layout Itemize
 
-
-\series bold 
-\size large 
-serial.h
-\series default 
-\size default 
- - Serial IO routines are also developed by Dmitry S.
+serial.h - Serial IO routines are also developed by Dmitry S.
  Obukhov (dso@usa.net).
  These routines are interrupt driven with a 256 byte circular buffer, they
  also expect external ram to be present.
@@ -6331,46 +6468,22 @@ serial.h
  MUST be included in the file containing the 'main' function.
 \layout Itemize
 
-
-\series bold 
-\size large 
-ser.h 
-\series default 
-\size default 
-- Alternate serial routine provided by Wolfgang Esslinger <wolfgang@WiredMinds.co
-m> these routines are more compact and faster.
+ser.h - Alternate serial routine provided by Wolfgang Esslinger <wolfgang@WiredMi
+nds.com> these routines are more compact and faster.
  Please see documentation in file SDCCDIR/sdcc51lib/ser.c
 \layout Itemize
 
-
-\series bold 
-\size large 
-ser_ir.h 
-\series default 
-\size default 
-- Another alternate set of serial routines provided by Josef Wolf <jw@raven.inka.d
-e> , these routines do not use the external ram.
+ser_ir.h - Another alternate set of serial routines provided by Josef Wolf
+ <jw@raven.inka.de>, these routines do not use the external ram.
 \layout Itemize
 
-
-\series bold 
-\size large 
-reg51.h
-\series default 
-\size default 
- - contains register definitions for a standard 8051
+reg51.h - contains register definitions for a standard 8051
 \layout Itemize
 
-
-\series bold 
-\size large 
-float.h
-\series default 
-\size default 
- - contains min, max and other floating point related stuff.
+float.h - contains min, max and other floating point related stuff.
 \layout Standard
 
-All library routines are compiled as --model-small , they are all non-reentrant,
+All library routines are compiled as --model-small, they are all non-reentrant,
  if you plan to use the large model or want to make these routines reentrant,
  then they will have to be recompiled with the appropriate compiler option.
 \layout Standard
@@ -6402,24 +6515,13 @@ DPL,DPH,B,ACC
 Assembler Routine(non-reentrant)
 \layout Standard
 
-In the following example the function
-\series bold 
- cfunc
-\series default 
- calls an assembler routine 
-\series bold 
-asm_func
-\series default 
-, which takes two parameters.
+In the following example the function cfunc calls an assembler routine asm_func,
+ which takes two parameters.
 \layout Standard
 
-
-\size footnotesize 
-extern int asm_func( unsigned char, unsigned char);
+extern int asm_func(unsigned char, unsigned char);
 \layout Standard
 
-
-\size footnotesize 
 \SpecialChar ~
 
 \newline 
@@ -6436,11 +6538,7 @@ int c_func (unsigned char i, unsigned char j)
 \SpecialChar ~
  return asm_func(i,j); 
 \newline 
-}
-\size default 
- 
-\size scriptsize 
-
+} 
 \newline 
 int main() 
 \newline 
@@ -6457,8 +6555,6 @@ return c_func(10,9);
 The corresponding assembler function is:-
 \layout Standard
 
-
-\size scriptsize 
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -6578,12 +6674,8 @@ Note here that the return values are placed in 'dpl' - One byte return value,
 b' & 'acc' for four byte values.
 \layout Standard
 
-The parameter naming convention is 
-\series bold 
-_<function_name>_PARM_<n>,
-\series default 
- where n is the parameter number starting from 1, and counting from the
- left.
+The parameter naming convention is _<function_name>_PARM_<n>, where n is
+ the parameter number starting from 1, and counting from the left.
  The first parameter is passed in 
 \begin_inset Quotes eld
 \end_inset 
@@ -6616,11 +6708,8 @@ acc,b,dptr
 \begin_inset Quotes erd
 \end_inset 
 
- for four bytes, the 
-\family typewriter 
-\series bold 
-\size footnotesize 
-varaible name for the second parameter will be _<function_name>_PARM_2.
+ for four bytes, the varaible name for the second parameter will be _<function_n
+ame>_PARM_2.
 \layout Standard
 
 Assemble the assembler routine with the following command.
@@ -6639,25 +6728,19 @@ sdcc cfunc.c asmfunc.rel
 Assembler Routine(reentrant)
 \layout Standard
 
-In this case the second parameter onwards will be passed on the stack ,
- the parameters are pushed from right to left i.e.
+In this case the second parameter onwards will be passed on the stack, the
+ parameters are pushed from right to left i.e.
  after the call the left most parameter will be on the top of the stack.
  Here is an example.
 \layout Standard
 
-
-\size footnotesize 
-extern int asm_func( unsigned char, unsigned char);
+extern int asm_func(unsigned char, unsigned char);
 \layout Standard
 
-
-\size footnotesize 
 \SpecialChar ~
 
 \layout Standard
 
-
-\size footnotesize 
 int c_func (unsigned char i, unsigned char j) reentrant 
 \newline 
 { 
@@ -6671,11 +6754,7 @@ int c_func (unsigned char i, unsigned char j) reentrant
 \SpecialChar ~
  return asm_func(i,j); 
 \newline 
-}
-\size default 
- 
-\size scriptsize 
-
+} 
 \newline 
 int main() 
 \newline 
@@ -6692,8 +6771,6 @@ return c_func(10,9);
 The corresponding assembler routine is.
 \layout Standard
 
-
-\size scriptsize 
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -6875,7 +6952,7 @@ The compiling and linking procedure remains the same, however note the extra
 External Stack
 \layout Standard
 
-The external stack is located at the start of the external ram segment ,
+The external stack is located at the start of the external ram segment,
  and is 256 bytes in size.
  When --xstack option is used to compile the program, the parameters and
  local variables of all reentrant functions are allocated in this area.
@@ -6905,14 +6982,10 @@ structures cannot be assigned values directly, cannot be passed as function
 \begin_deeper 
 \layout Standard
 
-
-\size small 
 eg
 \end_deeper 
 \layout Standard
 
-
-\size small 
 struct s { ...
  }; 
 \newline 
@@ -6933,8 +7006,6 @@ s1 = s2 ; /* is invalid in SDCC although allowed in ANSI */
 }
 \layout Standard
 
-
-\size small 
 struct s foo1 (struct s parms) /* is invalid in SDCC although allowed in
  ANSI */ 
 \newline 
@@ -6963,23 +7034,13 @@ integral promotions are suppressed.
  
 \layout Enumerate
 
-No support for 
-\emph on 
-setjmp
-\emph default 
- and 
-\emph on 
-longjmp
-\emph default 
- (for now).
+No support for setjmp and longjmp (for now).
 \layout Enumerate
 
 Old K&R style function declarations are NOT allowed.
 \layout Standard
 
-
-\size footnotesize 
-foo( i,j) /* this old style of function declarations */ 
+foo(i,j) /* this old style of function declarations */ 
 \newline 
 int i,j; /* are valid in ANSI ..
  not valid in SDCC */ 
@@ -6996,14 +7057,10 @@ functions declared as pointers must be dereferenced during the call.
 \begin_deeper 
 \layout Standard
 
-
-\size small 
 int (*foo)();
 \end_deeper 
 \layout Standard
 
-
-\size small 
 \SpecialChar ~
  \SpecialChar ~
 ...
@@ -7037,8 +7094,6 @@ Note that the complexity level is not related to the number of lines of
  SDCC uses the following formula to compute the complexity.
 \layout Standard
 
-
-\size small 
 complexity = (number of edges in control flow graph) - 
 \newline 
 \SpecialChar ~
@@ -7089,15 +7144,13 @@ Since the compiler does not do implicit integral promotion, the programmer
  should do an explicit cast when integral promotion is required.
 \layout Itemize
 
-Reducing the size of division , multiplication & modulus operations can
- reduce code size substantially.
+Reducing the size of division, multiplication & modulus operations can reduce
+ code size substantially.
  Take the following code for example.
 \begin_deeper 
 \layout Standard
 
-
-\size footnotesize 
-foobar( unsigned int p1, unsigned char ch)
+foobar(unsigned int p1, unsigned char ch)
 \newline 
 {
 \newline 
@@ -7126,9 +7179,7 @@ For the modulus operation the variable ch will be promoted to unsigned int
  If the code is changed to 
 \layout Standard
 
-
-\size footnotesize 
-foobar( unsigned int p1, unsigned char ch)
+foobar(unsigned int p1, unsigned char ch)
 \newline 
 {
 \newline 
@@ -7156,8 +7207,6 @@ It would substantially reduce the code generated (future versions of the
 \end_deeper 
 \layout Standard
 
-
-\series bold 
 Notes on MCS51 memory layout(Trefor@magera.freeserve.co.uk)
 \layout Standard
 
@@ -7260,9 +7309,9 @@ The issues for retargetting the compiler are far too numerous to be covered
 
 Parsing the source and building the annotated parse tree.
  This phase is largely MCU independent (except for the language extensions).
- Syntax & semantic checks are also done in this phase , along with some
- initial optimizations like back patching labels and the pattern matching
- optimizations like bit-rotation etc.
+ Syntax & semantic checks are also done in this phase, along with some initial
+ optimizations like back patching labels and the pattern matching optimizations
+ like bit-rotation etc.
 \layout Enumerate
 
 The second phase involves generating an intermediate code which can be easy
@@ -7340,7 +7389,7 @@ SDCDB - Source Level Debugger
 
 SDCC is distributed with a source level debugger.
  The debugger uses a command line interface, the command repertoire of the
- debugger has been kept as close to gdb ( the GNU debugger) as possible.
+ debugger has been kept as close to gdb (the GNU debugger) as possible.
  The configuration and build process is part of the standard compiler installati
 on, which also builds and installs the debugger in the target directory
  specified during configuration.
@@ -7351,36 +7400,20 @@ on, which also builds and installs the debugger in the target directory
 Compiling for Debugging
 \layout Standard
 
-The 
-\emph on 
---debug
-\emph default 
- option must be specified for all files for which debug information is to
- be generated.
- The complier generates a 
-\emph on 
-.cdb
-\emph default 
- file for each of these files.
- The linker updates the 
-\emph on 
-.cdb
-\emph default 
- file with the address information.
+The --debug option must be specified for all files for which debug information
+ is to be generated.
+ The complier generates a .cdb file for each of these files.
+ The linker updates the .cdb file with the address information.
  This .cdb is used by the debugger.
 \layout Subsection
 
 How the Debugger Works
 \layout Standard
 
-When the 
-\emph on 
---debug
-\emph default 
- option is specified the compiler generates extra symbol information some
- of which are put into the the assembler source and some are put into the
- .cdb file, the linker updates the .cdb file with the address information
- for the symbols.
+When the --debug option is specified the compiler generates extra symbol
+ information some of which are put into the the assembler source and some
+ are put into the .cdb file, the linker updates the .cdb file with the address
+ information for the symbols.
  The debugger reads the symbolic information generated by the compiler &
  the address information generated by the linker.
  It uses the SIMULATOR (Daniel's S51) to execute the program, the program
@@ -7419,9 +7452,9 @@ Command Line Options.
 
 --directory=<source file directory> this option can used to specify the
  directory search list.
- The debugger will look into the directory list specified for source , cdb
+ The debugger will look into the directory list specified for source, cdb
  & ihx files.
- The items in the directory list must be separated by ':' , e.g.
+ The items in the directory list must be separated by ':', e.g.
  if the source files can be in the directories /home/src1 and /home/src2,
  the --directory option should be --directory=/home/src1:/home/src2.
  Note there can be no spaces in the option.
@@ -7452,8 +7485,8 @@ Debugger Commands.
 \layout Standard
 
 As mention earlier the command interface for the debugger has been deliberately
- kept as close the GNU debugger gdb , as possible, this will help int integratio
-n with existing graphical user interfaces (like ddd, xxgdb or xemacs) existing
+ kept as close the GNU debugger gdb, as possible, this will help int integration
+ with existing graphical user interfaces (like ddd, xxgdb or xemacs) existing
  for the GNU debugger.
 \layout Subsubsection
 
@@ -7592,52 +7625,24 @@ Interfacing with XEmacs.
 \layout Standard
 
 Two files are (in emacs lisp) are provided for the interfacing with XEmacs,
-\emph on 
- sdcdb.el
-\emph default 
- and 
-\emph on 
-sdcdbsrc.el
-\emph default 
-.
+ sdcdb.el and sdcdbsrc.el.
  These two files can be found in the $(prefix)/bin directory after the installat
 ion is complete.
  These files need to be loaded into XEmacs for the interface to work, this
  can be done at XEmacs startup time by inserting the following into your
- 
-\emph on 
-'.xemacs'
-\emph default 
- file (which can be found in your HOME directory) 
-\emph on 
-(load-file sdcdbsrc.el) 
-\emph default 
-[ .xemacs is a lisp file so the () around the command is REQUIRED), the files
- can also be loaded dynamically while XEmacs is running, set the environment
- variable 
-\emph on 
-'EMACSLOADPATH' 
-\emph default 
-to the installation bin directory [$(prefix)/bin], then enter the following
- command 
-\emph on 
-ESC-x load-file sdcdbsrc.
- 
-\emph default 
-To start the interface enter the following command 
-\emph on 
-ESC-x sdcdbsrc
-\emph default 
- , you will prompted to enter the file name to be debugged.
+ '.xemacs' file (which can be found in your HOME directory) (load-file sdcdbsrc.el
+) [ .xemacs is a lisp file so the () around the command is REQUIRED), the
+ files can also be loaded dynamically while XEmacs is running, set the environme
+nt variable 'EMACSLOADPATH' to the installation bin directory [$(prefix)/bin],
+ then enter the following command ESC-x load-file sdcdbsrc.
+ To start the interface enter the following command ESC-x sdcdbsrc, you
+ will prompted to enter the file name to be debugged.
  
 \layout Standard
 
 The command line options that are passed to the simulator directly are bound
- to default values in the file 
-\emph on 
-sdcdbsrc.el 
-\emph default 
-the variables are listed below these values maybe changed as required.
+ to default values in the file sdcdbsrc.el the variables are listed below
+ these values maybe changed as required.
 \layout Itemize
 
 sdcdbsrc-cpu-type '51
@@ -7653,8 +7658,6 @@ The following is a list of key mapping for the debugger interface.
 \layout Standard
 
 \SpecialChar ~
-
-\size scriptsize 
 
 \newline 
 ;; Current Listing :: 

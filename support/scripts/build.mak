@@ -106,3 +106,4 @@ logged_in:
 	cvs -d$(ROOT_GBDK) login
 	cvs -d$(ROOT_SDCC) login
 	touch logged_in
+	make update

@@ -985,7 +985,13 @@ serialRegAssign (eBBlock ** ebbs, int count)
 	bitVect *spillable;
 	int willCS;
 	
-	/* if it does not need or is spilt 
+	/* Make sure any spill location is definately allocated */
+	if (sym->isspilt && !sym->remat && sym->usl.spillLoc &&
+	    !sym->usl.spillLoc->allocreq) {
+	  sym->usl.spillLoc->allocreq++;
+	}
+	
+        /* if it does not need or is spilt 
 	   or is already assigned to registers
 	   or will not live beyond this instructions */
 	if (!sym->nRegs ||

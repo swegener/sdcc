@@ -1,3 +1,14 @@
+2004-02-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/avr/ralloc.c (serialRegAssign),
+	* src/ds390/ralloc.c (serialRegAssign),
+	* src/hc08/ralloc.c (serialRegAssign),
+	* src/mcs51/ralloc.c (serialRegAssign),
+	* src/pic/ralloc.c (serialRegAssign),
+	* src/pic16/ralloc.c (serialRegAssign),
+	* src/xa51/ralloc.c (serialRegAssign),
+	* src/z80/ralloc.c (serialRegAssign): fixed bug #1105154
+
 2005-02-22 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCast.c (decorateType): fixed bug 1124787

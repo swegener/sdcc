@@ -1365,6 +1365,12 @@ serialRegAssign (eBBlock ** ebbs, int count)
 				int willCS;
 				int j=0;
 
+				/* Make sure any spill location is definately allocated */
+				if (sym->isspilt && !sym->remat && sym->usl.spillLoc &&
+				    !sym->usl.spillLoc->allocreq) {
+					sym->usl.spillLoc->allocreq++;
+				}
+
 				/* if it does not need or is spilt 
 				   or is already assigned to registers
 				   or will not live beyond this instructions */

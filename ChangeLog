@@ -1,3 +1,8 @@
+2004-10-25 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/mcs51/peeph.def: disabled 259.a,b for removing redundant ret,
+	thanks to Martin Helmling for reporting (mail on sdcc-devel 2004-10-25)
+
 2004-10-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (reverseParms): fixed bug #1040577 (part 2)

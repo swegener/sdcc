@@ -27,10 +27,6 @@
 
 //#define USE_LCD
 
-#ifdef USE_LCD
-#include "lcd.h"
-#endif
-
 int ScanInt(int current) {
   char reply[32], *r;
 

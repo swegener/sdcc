@@ -82,7 +82,7 @@ SDCC Compiler User Guide
 
 
 \size normal 
-SDCC 2.4.0
+SDCC 2.4.1
 \size footnotesize 
 
 \newline 
@@ -456,6 +456,12 @@ The SDCC home page at
  Web links to other SDCC related sites can also be found here.
  This document can be found in the DOC directory of the source package as
  a text or HTML file.
+ A pdf version of this document is available at 
+\begin_inset LatexCommand \url{http://sdcc.sourceforge.net/doc/sdccman.pdf}
+
+\end_inset 
+
+.
  Some of the other tools (simulator and assembler) included with SDCC contain
  their own documentation and can be found in the source distribution.
  If you want the latest unreleased software, the complete source package
@@ -1719,10 +1725,10 @@ Install paths
 \begin_inset  Tabular
 <lyxtabular version="3" rows="5" columns="4">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -3457,13 +3463,6 @@ x).
 \end_inset 
 
  as editor this is straightforward.
- If you want to avoid installing the tools you will have some success with
- a bootable Knoppix CD 
-\begin_inset LatexCommand \url{http://www.knoppix.net}
-
-\end_inset 
-
-.
  Prebuilt documentation in html and pdf format is available from 
 \begin_inset LatexCommand \url{http://sdcc.sourceforge.net/snap.php}
 
@@ -4282,7 +4281,7 @@ sourcefile.adb
  - An intermediate file containing debug information needed to create the
  .cdb file (with -
 \begin_inset ERT
-status Collapsed
+status Open
 
 \layout Standard
 
@@ -4648,26 +4647,31 @@ To create a new library file, start by compiling all the required modules.
 \layout Standard
 
 
+\family sans 
 \series bold 
 sdcc -c _divsint.c
 \layout Standard
 
 
+\family sans 
 \series bold 
 sdcc -c _divuint.c
 \layout Standard
 
 
+\family sans 
 \series bold 
 sdcc -c _modsint.c
 \layout Standard
 
 
+\family sans 
 \series bold 
 sdcc -c _moduint.c
 \layout Standard
 
 
+\family sans 
 \series bold 
 sdcc -c _mulint.c
 \newline 
@@ -4682,8 +4686,11 @@ This will create files _divsint.rel, _divuint.rel, _modsint.rel, _moduint.rel,
 \layout Standard
 
 
+\family sans 
 \series bold 
 sdcclib libint.lib _divsint.rel
+\family default 
+
 \begin_inset LatexCommand \index{sdcclib}
 
 \end_inset 
@@ -4692,21 +4699,25 @@ sdcclib libint.lib _divsint.rel
 \layout Standard
 
 
+\family sans 
 \series bold 
 sdcclib libint.lib _divuint.rel
 \layout Standard
 
 
+\family sans 
 \series bold 
 sdcclib libint.lib _modsint.rel
 \layout Standard
 
 
+\family sans 
 \series bold 
 sdcclib libint.lib _moduint.rel
 \layout Standard
 
 
+\family sans 
 \series bold 
 sdcclib libint.lib _mulint.rel
 \series default 
@@ -4723,114 +4734,138 @@ If the file already exists in the library, it will be replaced.
 
 \newline 
 
+\family sans 
 \series bold 
 sdcclib -s libint.lib
+\family default 
+
 \begin_inset LatexCommand \index{sdcclib}
 
 \end_inset 
 
 
 \newline 
+
+\family typewriter 
+\series default 
 _divsint.rel:
 \layout Standard
 
 
-\series bold 
+\family typewriter 
 __divsint_a_1_1
 \layout Standard
 
 
-\series bold 
+\family typewriter 
 __divsint_PARM_2
 \layout Standard
 
 
-\series bold 
+\family typewriter 
 __divsint
 \newline 
 _divuint.rel:
 \layout Standard
 
 
-\series bold 
+\family typewriter 
 __divuint_a_1_1
 \layout Standard
 
 
-\series bold 
+\family typewriter 
 __divuint_PARM_2
 \layout Standard
 
 
-\series bold 
+\family typewriter 
 __divuint_reste_1_1
 \layout Standard
 
 
-\series bold 
+\family typewriter 
 __divuint_count_1_1
 \layout Standard
 
 
-\series bold 
+\family typewriter 
 __divuint
 \newline 
 _modsint.rel:
 \layout Standard
 
 
-\series bold 
+\family typewriter 
 __modsint_a_1_1
 \layout Standard
 
 
-\series bold 
+\family typewriter 
 __modsint_PARM_2
 \layout Standard
 
 
-\series bold 
+\family typewriter 
 __modsint
 \newline 
 _moduint.rel:
 \layout Standard
 
 
-\series bold 
+\family typewriter 
 __moduint_a_1_1
 \layout Standard
 
 
-\series bold 
+\family typewriter 
 __moduint_PARM_2
 \layout Standard
 
 
-\series bold 
+\family typewriter 
 __moduint_count_1_1
 \layout Standard
 
 
-\series bold 
+\family typewriter 
 __moduint
 \newline 
 _mulint.rel:
 \layout Standard
 
 
-\series bold 
+\family typewriter 
 __mulint_PARM_2
 \layout Standard
 
 
-\series bold 
+\family typewriter 
 __mulint
+\family default 
+\series bold 
+
 \newline 
 
 \layout Standard
 
-If the source files are compiled using --debug, the corresponding debug
- information file .adb will be include in the library file as well.
+If the source files are compiled using -
+\begin_inset ERT
+status Open
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-debug
+\begin_inset LatexCommand \index{-\/-debug}
+
+\end_inset 
+
+, the corresponding debug information file .adb will be include in the library
+ file as well.
  The library files created with sdcclib are plain text files, so they can
  be viewed with a text editor.
  It is not recomended to modify a library file created with sdcclib using
@@ -4991,6 +5026,11 @@ Processor Selection Options
  processor (In development, not complete).
  AVR users should probably have a look at avr-gcc 
 \begin_inset LatexCommand \url{ http://savannah.nongnu.org/download/avr-libc/snapshots/}
+
+\end_inset 
+
+ or winavr 
+\begin_inset LatexCommand \url{http://winavr.sourceforge.net}
 
 \end_inset 
 
@@ -6858,7 +6898,7 @@ callee_saves
 \series bold 
 -
 \begin_inset ERT
-status Collapsed
+status Open
 
 \layout Standard
 
@@ -7024,14 +7064,16 @@ status Collapsed
 
 
 \series default 
- This option can be used when the code generated is called by a monitor
- program.
- The compiler will generate a 'ret' upon return from the 'main'
+ This option can be used if the code generated is called by a monitor program
+ or if the main routine includes an endless loop.
+ This option might result in slightly smaller code and save two bytes of
+ stack space.
+ The return from the 'main'
 \begin_inset LatexCommand \index{main return}
 
 \end_inset 
 
- function.
+ function will return to the function calling main.
  The default setting is to lock up i.e.
  generate a '
 \family typewriter 
@@ -7149,7 +7191,30 @@ status Collapsed
 
 \series default 
  Hides your ugly and inefficient c-code from the asm file, so you can always
- blame the compiler :).
+ blame the compiler :)
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-no-peep-comments
+\begin_inset LatexCommand \index{-\/-no-peep-comments}
+
+\end_inset 
+
+
+\series default 
+ Will not include peep-hole comments in the generated files.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -8305,22 +8370,12 @@ _test_bit
 The bit addressable memory consists of 128 bits which are located from 0x20
  to 0x2f in data memory.
  
-\layout Standard
-
+\newline 
 Apart from this 8051 specific storage class most architectures support ANSI-C
  bitfields
 \begin_inset LatexCommand \index{bitfields}
 
 \end_inset 
-
-
-\newline 
-
-\layout Standard
-
-In accordance with ISO/IEC 9899 bits and bitfields without an explicit signed
- modifier are implemented as unsigned.
-\layout Standard
 
 
 \begin_inset Foot
@@ -8333,6 +8388,8 @@ Not really meant as examples, but nevertheless showing what bitfields are
 \end_inset 
 
 .
+ In accordance with ISO/IEC 9899 bits and bitfields without an explicit
+ signed modifier are implemented as unsigned.
 \layout Subsubsection
 
 sfr
@@ -9050,7 +9107,7 @@ In case of memory mapped I/O devices the keyword
 \emph on 
 volatile
 \emph default 
- should be used to tell the compiler that accesses might not be optimized
+ have to be used to tell the compiler that accesses might not be optimized
  away:
 \layout Verse
 
@@ -9735,11 +9792,9 @@ using
 \layout Standard
 
 Interrupt service routines open the door for some very interesting bugs:
- 
-\layout Standard
-
-If the interrupt service routines changes variables which are accessed by
- other functions these variables should be declared 
+\newline 
+If an interrupt service routine changes variables which are accessed by
+ other functions these variables have to be declared 
 \emph on 
 volatile
 \emph default 
@@ -9763,7 +9818,7 @@ atomic
 \emph default 
  (i.e.
  the processor needs more than one instruction for the access and could
- be interrupted while accessing the variable) the interrupt must disabled
+ be interrupted while accessing the variable) the interrupt must be disabled
  during the access to avoid inconsistent data.
  Access to 16 or 32 bit variables is obviously not atomic on 8 bit CPUs
  and should be protected by disabling interrupts.
@@ -9825,6 +9880,36 @@ counter
  is located in data memory.
  Bugs like these are hard to reproduce and can cause a lot of trouble.
  
+\layout Standard
+
+The return address and the registers used in the interrupt service routine
+ are saved on the stack
+\begin_inset LatexCommand \index{stack}
+
+\end_inset 
+
+ so there must be sufficient stack space.
+ If there isn't variables or registers (or even the return address itself)
+ will be corrupted.
+ This 
+\emph on 
+stack overflow
+\emph default 
+
+\begin_inset LatexCommand \index{stack overflow}
+
+\end_inset 
+
+ is most likely to happen if the interrupt occurs during the 
+\begin_inset Quotes sld
+\end_inset 
+
+deepest
+\begin_inset Quotes srd
+\end_inset 
+
+ subroutine when the stack is already in use for f.e.
+ many return addresses.
 \layout Standard
 
 A special note here, int (16 bit) and long (32 bit) integer division
@@ -10501,7 +10586,12 @@ interrupt priorities
  On some architectures which don't support interrupt priorities these can
  be implemented by manipulating the interrupt mask and reenabling interrupts
  within the interrupt routine.
- Don't add complexity unless you have to.
+ Check there is sufficient space on the stack
+\begin_inset LatexCommand \index{stack}
+
+\end_inset 
+
+ and don't add complexity unless you have to.
  
 \layout Section
 
@@ -10664,7 +10754,12 @@ _sdcc_external_startup()
  initialization.
  On some mcs51 variants xdata has to be explicitly enabled before it can
  be accessed, this is the place to do it.
- See also the compiler option 
+ The startup code clears the complete 256 byte of idata memory, this might
+ cause problems for 128 byte devices (endless loop reported for Chipcon
+ CC1010).
+\layout Standard
+
+See also the compiler option 
 \emph on 
 -
 \begin_inset ERT
@@ -10801,7 +10896,11 @@ if( head != tail-1 )
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-buf[ head++ ] = c; 
+buf[ head++ ] = c;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/* access to a 256 byte aligned array */
 \newline 
 } 
 \layout Standard
@@ -12307,8 +12406,8 @@ For signed & unsigned int (16 bit) and long (32 bit) variables, division,
 \begin_inset  Tabular
 <lyxtabular version="3" rows="11" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -12601,8 +12700,8 @@ SDCC supports IEEE (single precision 4 bytes) floating point numbers.The
 \begin_inset  Tabular
 <lyxtabular version="3" rows="17" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -13933,8 +14032,8 @@ The compiler creates the following #defines
 \begin_inset  Tabular
 <lyxtabular version="3" rows="10" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -14313,8 +14412,16 @@ sfr
  is where the chip designers decided to put it.
  Needless to say that they didn't agree on a common name either.
  So that the startup code can correctly initialize xdata variables, you
- should define an sfr with the name _XPAGE at the appropriate location if
- the default, port P2, is not used for this.
+ should define an sfr with the name _XPAGE
+\family typewriter 
+
+\begin_inset LatexCommand \index{\_XPAGE (mcs51)}
+
+\end_inset 
+
+
+\family default 
+ at the appropriate location if the default, port P2, is not used for this.
  Some examples are:
 \layout Verse
 
@@ -14517,16 +14624,23 @@ void Intr(void) interrupt 0
 T0IF = 0; /* Clear timer interrupt */
 \newline 
 }
-\layout Standard
+\layout Subsection
 
 Linking and assembling
-\newline 
+\layout Standard
+
 For assembling you can use either GPUTILS'
 \begin_inset LatexCommand \index{gputils (pic tools)}
 
 \end_inset 
 
  gpasm.exe or MPLAB's mpasmwin.exe.
+ GPUTILS is available from 
+\begin_inset LatexCommand \url{http://gputils.sourceforge.net/}
+
+\end_inset 
+
+.
  For linking you can use either GPUTIL's gplink or MPLAB's mplink.exe.
  If you use MPLAB and an interrupt function then the linker script file
  vectors section will need to be enlarged to link with mplink.
@@ -14623,6 +14737,13 @@ $(PRJ).hex: $(OBJS)
 \SpecialChar ~
 \SpecialChar ~
 mplink /v $(PRJ).lkr /m $(PRJ).map /o $(PRJ).hex $(OBJS)
+\layout Standard
+
+Please note that indentations within a
+\family typewriter 
+ Makefile
+\family default 
+ have to be done with a tabulator character.
 \layout Section
 
 The PIC16
@@ -14748,6 +14869,11 @@ status Collapsed
 \layout Subsection
 
 Port Specific Options
+\begin_inset LatexCommand \index{Options PIC16}
+
+\end_inset 
+
+
 \layout Standard
 
 The port specific options appear after the global options in the sdcc --help
@@ -14889,7 +15015,22 @@ status Collapsed
 /
 \end_inset 
 
--debug-xtra Similar to --debug, but dumps more information.
+-debug-xtra Similar to -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-debug
+\begin_inset LatexCommand \index{-\/-debug}
+
+\end_inset 
+
+, but dumps more information.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -14933,8 +15074,8 @@ PIC16 port defines the following preprocessor macros while translating a
 \begin_inset  Tabular
 <lyxtabular version="3" rows="2" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -14987,18 +15128,22 @@ xxxx
 Directories
 \layout Standard
 
-PIC16 port uses the following directories for searching header files and
- libraries.
+PIC16
+\begin_inset LatexCommand \index{PIC16}
+
+\end_inset 
+
+ port uses the following directories for searching header files and libraries.
 \layout Standard
 \align center 
 
 \begin_inset  Tabular
 <lyxtabular version="3" rows="3" columns="4">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
-<column alignment="center" valignment="top" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -15109,6 +15254,11 @@ Linker
 \layout Subsection
 
 Pragmas
+\begin_inset LatexCommand \label{sub:PIC16_Pragmas}
+
+\end_inset 
+
+
 \layout Standard
 
 PIC16 port currently supports the following pragmas:
@@ -15146,7 +15296,7 @@ Example:
 
 \layout LyX-Code
 
-/* initializes stack at RAM address 0x5ff*/
+/* initializes stack at RAM address 0x5ff */
 \layout LyX-Code
 
 #pragma stack 0x5ff
@@ -15155,6 +15305,11 @@ Example:
 \layout Subsection
 
 Header Files
+\begin_inset LatexCommand \label{sub:PIC16_Header-Files}
+
+\end_inset 
+
+
 \layout Standard
 
 There is one main header file that can be included to the source files using
@@ -15165,7 +15320,7 @@ pic18fregs.h
 \series default 
 .
  This header file contains the definitions for the processor special registers,
- so it is necessery if the soruce accesses them.
+ so it is necessary if the source accesses them.
  It can be included by adding the following line in the beginning of the
  file:
 \layout LyX-Code
@@ -15180,9 +15335,13 @@ The specific microcontroller is selected within the pic18fregs.h automatically,
 Libraries
 \layout Standard
 
-The libraries that pic16 port depends on are the microcontroller device
- libraries which contain the symbol definitions for the microcontroller
- special function registers.
+The libraries that PIC16
+\begin_inset LatexCommand \index{PIC16}
+
+\end_inset 
+
+ port depends on are the microcontroller device libraries which contain
+ the symbol definitions for the microcontroller special function registers.
  These libraries have the format pic18fxxxx.lib, where 
 \emph on 
 xxxx
@@ -15203,7 +15362,7 @@ Libraries are created with gplib which is part of the gputils package
 Memory Models
 \layout Standard
 
-The following memory models are supported by PIC16 port:
+The following memory models are supported by the PIC16 port:
 \layout Itemize
 
 small model
@@ -15220,9 +15379,9 @@ Memory model affects the default size of pointers within the source.
 \begin_inset  Tabular
 <lyxtabular version="3" rows="3" columns="3">
 <features>
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -15324,8 +15483,13 @@ near
  model's pointers.
 \layout Standard
 
-The standard device libraries (see 4.5.6) contain no reference to pointers,
- so they can be used with both memory models.
+The standard device libraries (see 
+\begin_inset LatexCommand \ref{sub:PIC16_Header-Files}
+
+\end_inset 
+
+) contain no reference to pointers, so they can be used with both memory
+ models.
 \layout Subsection
 
 Stack
@@ -15343,7 +15507,7 @@ FSR1 is assigned as stack pointer
 FSR2 is assigned as frame pointer
 \layout Standard
 
-The following stack models are supported by PIC16 port
+The following stack models are supported by the PIC16 port
 \layout Itemize
 
 small model
@@ -15372,9 +15536,9 @@ large
 \begin_inset  Tabular
 <lyxtabular version="3" rows="3" columns="3">
 <features>
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -15463,7 +15627,12 @@ Frame pointer FSR2
 
 \series bold 
 Currently stack and frame pointers should be initialized explicit by the
- user at the desired Data RAM position (see 4.5.5 Pragma Stack).
+ user at the desired Data RAM position (see 
+\begin_inset LatexCommand \ref{sub:PIC16_Pragmas}
+
+\end_inset 
+
+ Pragma stack).
  Uninitialized stack and frame pointers can result in unexpected behavior
  of the resulting binary.
 \layout Subsection
@@ -15480,8 +15649,8 @@ Return values from functions are placed to the appropriate registers following
 \begin_inset  Tabular
 <lyxtabular version="3" rows="6" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -15600,8 +15769,12 @@ on stack, FSR0 points to the beginning
 Interrupts
 \layout Standard
 
-When entering an interrupt, currently the PIC16 port automatically saves
- the following registers:
+When entering an interrupt, currently the PIC16
+\begin_inset LatexCommand \index{PIC16}
+
+\end_inset 
+
+ port automatically saves the following registers:
 \layout Itemize
 
 WREG
@@ -15669,10 +15842,23 @@ on, which also builds and installs the debugger in the target directory
 Compiling for Debugging
 \layout Standard
 
-The \SpecialChar \-
-\SpecialChar \-
-debug option must be specified for all files for which debug information
- is to be generated.
+The -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-debug
+\begin_inset LatexCommand \index{-\/-debug}
+
+\end_inset 
+
+ option must be specified for all files for which debug information is to
+ be generated.
  The complier generates a .adb file for each of these files.
  The linker creates the .cdb
 \begin_inset LatexCommand \index{<file>.cdb}
@@ -16043,10 +16229,10 @@ The following is a list of key mapping for the debugger interface.
 \family typewriter 
 
 \newline 
-;; Current Listing :: 
+;;\SpecialChar ~
+Current Listing :: 
 \newline 
 ;;key\SpecialChar ~
-\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16098,9 +16284,7 @@ Comment
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-\SpecialChar ~
-------\SpecialChar ~
-\SpecialChar ~
+-------\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16121,11 +16305,13 @@ Comment
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
---------
+\SpecialChar ~
+-------
 \newline 
 ;; 
 \newline 
-;; n\SpecialChar ~
+;;\SpecialChar ~
+n\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16139,7 +16325,8 @@ Comment
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- sdcdb-next-from-src\SpecialChar ~
+\SpecialChar ~
+sdcdb-next-from-src\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16151,7 +16338,8 @@ Comment
 \SpecialChar ~
 SDCDB next command 
 \newline 
-;; b\SpecialChar ~
+;;\SpecialChar ~
+b\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16165,7 +16353,8 @@ SDCDB next command
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- sdcdb-back-from-src\SpecialChar ~
+\SpecialChar ~
+sdcdb-back-from-src\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16177,7 +16366,8 @@ SDCDB next command
 \SpecialChar ~
 SDCDB back command 
 \newline 
-;; c\SpecialChar ~
+;;\SpecialChar ~
+c\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16191,7 +16381,8 @@ SDCDB back command
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- sdcdb-cont-from-src\SpecialChar ~
+\SpecialChar ~
+sdcdb-cont-from-src\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16203,7 +16394,8 @@ SDCDB back command
 \SpecialChar ~
 SDCDB continue command
 \newline 
-;; s\SpecialChar ~
+;;\SpecialChar ~
+s\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16217,7 +16409,8 @@ SDCDB continue command
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- sdcdb-step-from-src\SpecialChar ~
+\SpecialChar ~
+sdcdb-step-from-src\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16229,7 +16422,8 @@ SDCDB continue command
 \SpecialChar ~
 SDCDB step command 
 \newline 
-;; ?\SpecialChar ~
+;;\SpecialChar ~
+?\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16243,7 +16437,8 @@ SDCDB step command
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- sdcdb-whatis-c-sexp\SpecialChar ~
+\SpecialChar ~
+sdcdb-whatis-c-sexp\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16301,9 +16496,11 @@ SDCDB ptypecommand for data at
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- buffer point 
+\SpecialChar ~
+buffer point 
 \newline 
-;; x\SpecialChar ~
+;;\SpecialChar ~
+x\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16317,7 +16514,8 @@ SDCDB ptypecommand for data at
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- sdcdbsrc-delete\SpecialChar ~
+\SpecialChar ~
+sdcdbsrc-delete\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16379,9 +16577,11 @@ SDCDB Delete all breakpoints if no arg
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
+\SpecialChar ~
 given or delete arg (C-u arg x) 
 \newline 
-;; m\SpecialChar ~
+;;\SpecialChar ~
+m\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16395,7 +16595,8 @@ given or delete arg (C-u arg x)
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- sdcdbsrc-frame\SpecialChar ~
+\SpecialChar ~
+sdcdbsrc-frame\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16510,7 +16711,8 @@ given or display frame arg
 \SpecialChar ~
 buffer point 
 \newline 
-;; !\SpecialChar ~
+;;\SpecialChar ~
+!\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16524,7 +16726,8 @@ buffer point
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- sdcdbsrc-goto-sdcdb\SpecialChar ~
+\SpecialChar ~
+sdcdbsrc-goto-sdcdb\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16536,7 +16739,8 @@ buffer point
 \SpecialChar ~
 Goto the SDCDB output buffer 
 \newline 
-;; p\SpecialChar ~
+;;\SpecialChar ~
+p\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16550,7 +16754,8 @@ Goto the SDCDB output buffer
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- sdcdb-print-c-sexp\SpecialChar ~
+\SpecialChar ~
+sdcdb-print-c-sexp\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16609,9 +16814,11 @@ SDCDB print command for data at
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- buffer point 
+\SpecialChar ~
+buffer point 
 \newline 
-;; g\SpecialChar ~
+;;\SpecialChar ~
+g\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16625,7 +16832,8 @@ SDCDB print command for data at
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- sdcdbsrc-goto-sdcdb\SpecialChar ~
+\SpecialChar ~
+sdcdbsrc-goto-sdcdb\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16637,7 +16845,8 @@ SDCDB print command for data at
 \SpecialChar ~
 Goto the SDCDB output buffer 
 \newline 
-;; t\SpecialChar ~
+;;\SpecialChar ~
+t\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16651,7 +16860,8 @@ Goto the SDCDB output buffer
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- sdcdbsrc-mode\SpecialChar ~
+\SpecialChar ~
+sdcdbsrc-mode\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16671,7 +16881,9 @@ Toggles Sdcdbsrc mode (turns it off)
 \newline 
 ;; 
 \newline 
-;; C-c C-f\SpecialChar ~
+;;\SpecialChar ~
+C-c\SpecialChar ~
+C-f\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16679,7 +16891,8 @@ Toggles Sdcdbsrc mode (turns it off)
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- sdcdb-finish-from-src\SpecialChar ~
+\SpecialChar ~
+sdcdb-finish-from-src\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16691,7 +16904,9 @@ SDCDB finish command
 \newline 
 ;; 
 \newline 
-;; C-x SPC\SpecialChar ~
+;;\SpecialChar ~
+C-x\SpecialChar ~
+SPC\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16699,7 +16914,8 @@ SDCDB finish command
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- sdcdb-break\SpecialChar ~
+\SpecialChar ~
+sdcdb-break\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16719,7 +16935,9 @@ SDCDB finish command
 \SpecialChar ~
 Set break for line with point 
 \newline 
-;; ESC t\SpecialChar ~
+;;\SpecialChar ~
+ESC\SpecialChar ~
+t\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16729,7 +16947,8 @@ Set break for line with point
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- sdcdbsrc-mode\SpecialChar ~
+\SpecialChar ~
+sdcdbsrc-mode\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16747,17 +16966,9 @@ Set break for line with point
 \SpecialChar ~
 Toggle Sdcdbsrc mode 
 \newline 
-;; ESC m\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- sdcdbsrc-srcmode\SpecialChar ~
+;;\SpecialChar ~
+ESC\SpecialChar ~
+m\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -16768,8 +16979,20 @@ Toggle Sdcdbsrc mode
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
+sdcdbsrc-srcmode\SpecialChar ~
 \SpecialChar ~
- Toggle list mode 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+Toggle list mode 
 \newline 
 ;; 
 \newline 
@@ -16791,7 +17014,7 @@ Use the smallest data type to represent your data-value.
  promoted to 'signed int' before doing any operation.
  This promotion can be omitted, if the result is the same.
  The effect of the promotion rules together with the sign-extension is often
- supprising:
+ surprising:
 \begin_deeper 
 \layout Verse
 
@@ -17387,7 +17610,7 @@ Documentation
 \begin_inset  Tabular
 <lyxtabular version="3" rows="10" columns="2">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="0(null)">
+<column alignment="left" valignment="top" leftline="true" width="0">
 <column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -17962,7 +18185,7 @@ splint
 
 \layout Standard
 
-Statically checks c sources
+Statically checks c sources (has anyone adapted splint for SDCC?)
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -18318,7 +18541,7 @@ The SDCC project is hosted on the SDCC sourceforge site at
 
 .
  You'll find the complete set of mailing lists
-\begin_inset LatexCommand \index{Mailing list}
+\begin_inset LatexCommand \index{Mailing list(s)}
 
 \end_inset 
 
@@ -18535,8 +18758,16 @@ Traffic on sdcc-devel and sdcc-user is about 100 mails/month each not counting
 
 \end_inset 
 
-, lists and forums are archived and searchable so if you are lucky someone
- already had a similar problem.
+, lists
+\begin_inset LatexCommand \index{Mailing list(s)}
+
+\end_inset 
+
+ and forums are archived and searchable so if you are lucky someone already
+ had a similar problem.
+ While mails to the lists themselves are delivered promptly their web front
+ end on sourceforge sometimes shows a severe time lag (up to several weeks),
+ if you're seriously using SDCC please consider subscribing to the lists.
 \layout Section
 
 ChangeLog
@@ -20194,7 +20425,12 @@ status Collapsed
 \emph default 
 ).
  E.g.
- some variants of the 8051 MCU allow only 
+ some variants of the 8051 MCU
+\begin_inset LatexCommand \index{MCS51 variants}
+
+\end_inset 
+
+ allow only 
 \family typewriter 
 ajmp
 \family default 

@@ -1,3 +1,10 @@
+2003-04-02    <johan@balder>
+
+	* src/ds390/gen.c (genCmp): no comments
+	* src/mcs51/gen.c (genCmp): no comments
+	* src/SDCCopt.c (eBBlockFromiCode): detect missing return values
+	* src/SDCCast.c (ast_print): fixed the function type in --dumptree
+
 2003-04-01  Bernhard Held <bernhard@bernhardheld.de>
 
 	* support/regression/generate-cases.py: place generated file in given sub directory

@@ -1457,7 +1457,7 @@ getNelements (sym_link * type, initList * ilist)
   if (!ilist)
     return 0;
 
-  if (ilist->type == INIT_DEEP)
+  while (ilist->type == INIT_DEEP)
     ilist = ilist->init.deep;
 
   /* if type is a character array and there is only one

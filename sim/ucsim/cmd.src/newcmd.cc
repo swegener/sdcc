@@ -792,7 +792,9 @@ cl_commander::init(void)
       exec_on(con, Config);
       need_config= DD_FALSE;
     }
-  if (need_config)
+  if (need_config &&
+      Config &&
+      *Config)
     {
       FILE *fc= fopen(Config, "r");
       if (!fc)

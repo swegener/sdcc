@@ -1,5 +1,7 @@
 2003-11-28 Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
+	* sdcc/src/mcs51/gen.c (genMultOneByte): help peephole 105
+	* sdcc/src/mcs51/peeph.def: added peephole 186.e array access in code space
 	* device/lib/_gptrget.c,
 	* device/lib/_gptrput.c: P2 not used any more (related to #850747, #785979)
 

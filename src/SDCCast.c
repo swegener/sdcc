@@ -2902,15 +2902,25 @@ decorateType (ast * tree)
 			       tree->opval.val->type);
       return tree;
 
-/*------------------------------------------------------------------*/
-/*----------------------------*/
+      /*------------------------------------------------------------------*/
+      /*----------------------------*/
       /* conditional operator  '?'  */
-/*----------------------------*/
+      /*----------------------------*/
     case '?':
       /* the type is value of the colon operator (on the right) */
       assert(IS_COLON_OP(tree->right));
-      TTYPE (tree) = RTYPE(tree); // #HACK LTYPE(tree).
-      TETYPE (tree) = getSpec (TTYPE (tree));
+      /* if already known then replace the tree : optimizer will do it
+	 but faster to do it here */
+      if (IS_LITERAL (LTYPE(tree))) {
+	  if ( ((int) floatFromVal (valFromType (LETYPE (tree)))) != 0) {
+	      return tree->right->left ;
+	  } else {
+	      return tree->right->right ;
+	  }
+      } else {
+	  TTYPE (tree) = RTYPE(tree); // #HACK LTYPE(tree).
+	  TETYPE (tree) = getSpec (TTYPE (tree));
+      }
       return tree;
 
     case ':':
@@ -4728,6 +4738,7 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,")\n");
 		ast_print(tree->left,outfile,indent+4);
 		ast_print(tree->right,outfile,indent+4);
+		return;
 
 	case ':':
 		fprintf(outfile,"COLON(:) (%p) type (",tree);

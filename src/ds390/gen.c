@@ -93,6 +93,8 @@ static struct
     short inLine;
     short debugLine;
     short nRegsSaved;
+    short dptrInUse;
+    short dptr1InUse;
     set *sendSet;
   }
 _G;
@@ -483,9 +485,18 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool useDP2)
 	short stack_val = -((sym->stack < 0) ?
 			    ((short) (sym->stack - _G.nRegsSaved)) :
 			    ((short) sym->stack)) ;
+	if (useDP2 && _G.dptr1InUse) {
+	    emitcode ("push","dpl1");
+	    emitcode ("push","dph1");
+	    emitcode ("push","dpx1");
+	} else if (_G.dptrInUse	) {
+	    emitcode ("push","dpl");
+	    emitcode ("push","dph");
+	    emitcode ("push","dpx");
+	}
       /* It's on the 10 bit stack, which is located in
        * far data space.
-       */
+       */	    
 	if (stack_val < 0 && stack_val > -5) { /* between -5 & -1 */
 	    if (useDP2) {
 		if (options.model == MODEL_FLAT24)
@@ -1010,8 +1021,21 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
 	    _G.r1Pushed--;
 	  }
       }
+    case AOP_DPTR2:
+	if (_G.dptr1InUse) {
+	    emitcode ("pop","dpx1");
+	    emitcode ("pop","dph1");
+	    emitcode ("pop","dpl1");
+	}
+	break;
+    case AOP_DPTR:
+	if (_G.dptrInUse) {
+	    emitcode ("pop","dpx");
+	    emitcode ("pop","dph");
+	    emitcode ("pop","dpl");
+	}
+	break;
     }
-
 dealloc:
   /* all other cases just dealloc */
   if (op)
@@ -1386,7 +1410,7 @@ aopPut (asmop * aop, char *s, int offset)
 		}
 	      {
 		/* set C, if a >= 1 */
-		emitcode ("add", "a,#0xff");
+		emitcode ("add", "a,#!constbyte",0xff);
 		emitcode ("mov", "%s,c", aop->aopu.aop_dir);
 	      }
 	    }
@@ -2115,7 +2139,7 @@ genIpush (iCode * ic)
     {
 
       /* and the item is spilt then do nothing */
-      if (OP_SYMBOL (IC_LEFT (ic))->isspilt)
+      if (OP_SYMBOL (IC_LEFT (ic))->isspilt || OP_SYMBOL(IC_LEFT(ic))->dptr)
 	return;
 
       aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
@@ -2187,7 +2211,7 @@ genIpop (iCode * ic)
 
 
   /* if the temp was not pushed then */
-  if (OP_SYMBOL (IC_LEFT (ic))->isspilt)
+  if (OP_SYMBOL (IC_LEFT (ic))->isspilt || OP_SYMBOL (IC_LEFT (ic))->dptr)
     return;
 
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
@@ -3510,6 +3534,23 @@ genPlusIncr (iCode * ic)
 	}
       return TRUE;
     }
+
+  if (AOP_TYPE(IC_RESULT(ic))==AOP_STR && IS_ITEMP(IC_RESULT(ic)) &&
+      !AOP_USESDPTR(IC_LEFT(ic)) && icount <= 5 && size <= 3 && 
+      options.model == MODEL_FLAT24 ) {
+
+      switch (size) {
+      case 3:
+	  emitcode ("mov","dpx,%s",aopGet(AOP (IC_LEFT (ic)), 2, FALSE, FALSE, FALSE));
+      case 2:
+	  emitcode ("mov","dph,%s",aopGet(AOP (IC_LEFT (ic)), 1, FALSE, FALSE, FALSE));
+      case 1:
+	  emitcode ("mov","dpl,%s",aopGet(AOP (IC_LEFT (ic)), 0, FALSE, FALSE, FALSE));
+	  break;
+      }
+      while (icount--) emitcode ("inc","dptr");      
+      return TRUE;
+  }
 
   if (AOP_INDPTRn(IC_LEFT(ic)) && AOP_INDPTRn(IC_RESULT(ic)) &&
       AOP(IC_LEFT(ic))->aopu.dptr == AOP(IC_RESULT(ic))->aopu.dptr &&
@@ -10202,14 +10243,14 @@ genAddrOf (iCode * ic)
 	  char buff[10];
 	  tsprintf(buff,"#!constbyte",(options.stack_loc >> 16) & 0xff);
 	  /* if it has an offset then we need to compute it */
-	  emitcode ("subb", "a,#!constbyte",
-		    -((sym->stack < 0) ?
-		      ((short) (sym->stack - _G.nRegsSaved)) :
-		      ((short) sym->stack)) & 0xff);
-	  emitcode ("mov","b,a");
-	  emitcode ("mov","a,#!constbyte",(-((sym->stack < 0) ?
-					 ((short) (sym->stack - _G.nRegsSaved)) :
-					 ((short) sym->stack)) >> 8) & 0xff);
+/* 	  emitcode ("subb", "a,#!constbyte", */
+/* 		    -((sym->stack < 0) ? */
+/* 		      ((short) (sym->stack - _G.nRegsSaved)) : */
+/* 		      ((short) sym->stack)) & 0xff); */
+/* 	  emitcode ("mov","b,a"); */
+/* 	  emitcode ("mov","a,#!constbyte",(-((sym->stack < 0) ? */
+/* 					 ((short) (sym->stack - _G.nRegsSaved)) : */
+/* 					 ((short) sym->stack)) >> 8) & 0xff); */
 	  if (sym->stack) {
 	      emitcode ("mov", "a,_bpx");
 	      emitcode ("add", "a,#!constbyte", ((sym->stack < 0) ? 
@@ -11089,32 +11130,27 @@ static void genMemcpyX2X( iCode *ic, int nparms, operand **parms, int fromc)
 	}
     }
     freeAsmop (to, NULL, ic, FALSE);
-
+    _G.dptrInUse = _G.dptr1InUse = 1;
     aopOp (count, ic->next->next, FALSE,FALSE);
     lbl =newiTempLabel(NULL);
 
     /* now for the actual copy */
     if (AOP_TYPE(count) == AOP_LIT && 
 	(int)floatFromVal (AOP(count)->aopu.aop_lit) <= 256) {
-	emitcode (";","OH  JOY auto increment with djnz (very fast)");
-	emitcode ("mov", "dps,#!constbyte",0x21); 	/* Select DPTR2 & auto-toggle. */
 	emitcode ("mov", "b,%s",aopGet(AOP(count),0,FALSE,FALSE,FALSE));
-	emitcode ("","!tlabeldef",lbl->key+100);
 	if (fromc) {
-	    emitcode ("clr","a");
-	    emitcode ("movc", "a,@a+dptr");
-	} else 
-	    emitcode ("movx", "a,@dptr");
-	emitcode ("movx", "@dptr,a");
-	emitcode ("inc", "dptr");
-	emitcode ("inc", "dptr");
-	emitcode ("djnz","b,!tlabel",lbl->key+100);
+	    emitcode ("lcall","__bi_memcpyc2x_s");
+	} else {
+	    emitcode ("lcall","__bi_memcpyx2x_s");
+	}
+	freeAsmop (count, NULL, ic, FALSE);
     } else {
 	symbol *lbl1 = newiTempLabel(NULL);
 	
 	emitcode (";"," Auto increment but no djnz");
 	emitcode ("mov","_ap,%s",aopGet (AOP (count), 0, FALSE, TRUE, TRUE));
 	emitcode ("mov","b,%s",aopGet (AOP (count), 1, FALSE, TRUE, TRUE));
+	freeAsmop (count, NULL, ic, FALSE);
 	emitcode ("mov", "dps,#!constbyte",0x21); 	/* Select DPTR2 & auto-toggle. */
 	emitcode ("","!tlabeldef",lbl->key+100);
 	if (fromc) {
@@ -11138,7 +11174,7 @@ static void genMemcpyX2X( iCode *ic, int nparms, operand **parms, int fromc)
 	emitcode ("","!tlabeldef",lbl1->key+100);
     }
     emitcode ("mov", "dps,#0"); 
-    freeAsmop (count, NULL, ic, FALSE);
+    _G.dptrInUse = _G.dptr1InUse = 0;
     unsavermask(rsave);
 
 }
@@ -11209,39 +11245,31 @@ static void genMemcmpX2X( iCode *ic, int nparms, operand **parms, int fromc)
 	}
     }
     freeAsmop (to, NULL, ic, FALSE);
-
+    _G.dptrInUse = _G.dptr1InUse = 1;
     aopOp (count, ic->next->next, FALSE,FALSE);
     lbl =newiTempLabel(NULL);
     lbl2 =newiTempLabel(NULL);
 
     /* now for the actual compare */
-    emitcode("push","ar0");
     if (AOP_TYPE(count) == AOP_LIT && 
 	(int)floatFromVal (AOP(count)->aopu.aop_lit) <= 256) {
-	emitcode (";","OH  JOY auto increment with djnz (very fast)");
-	emitcode ("mov", "dps,#!constbyte",0x21); 	/* Select DPTR2 & auto-toggle. */
 	emitcode ("mov", "b,%s",aopGet(AOP(count),0,FALSE,FALSE,FALSE));
-	emitcode ("","!tlabeldef",lbl->key+100);
-	if (fromc) {
-	    emitcode ("clr","a");
-	    emitcode ("movc", "a,@a+dptr");
-	} else 
-	    emitcode ("movx", "a,@dptr");
-	emitcode ("mov","r0,a");
-	emitcode ("movx", "a,@dptr");
-	emitcode ("clr","c");
-	emitcode ("subb","a,r0");
-	emitcode ("jnz","!tlabel",lbl2->key+100);
-	emitcode ("inc", "dptr");
-	emitcode ("inc", "dptr");
-	emitcode ("djnz","b,!tlabel",lbl->key+100);
-	emitcode ("clr","a");	
+	if (fromc)
+	    emitcode("lcall","__bi_memcmpc2x_s");
+	else
+	    emitcode("lcall","__bi_memcmpx2x_s");
+	freeAsmop (count, NULL, ic, FALSE);
+	aopOp (IC_RESULT(ic), ic, FALSE,FALSE);
+	aopPut(AOP(IC_RESULT(ic)),"a",0);
+	freeAsmop (IC_RESULT(ic), NULL, ic, FALSE);
     } else {
 	symbol *lbl1 = newiTempLabel(NULL);
-	
+
+	emitcode("push","ar0"); 	
 	emitcode (";"," Auto increment but no djnz");
 	emitcode ("mov","_ap,%s",aopGet (AOP (count), 0, FALSE, TRUE, TRUE));
 	emitcode ("mov","b,%s",aopGet (AOP (count), 1, FALSE, TRUE, TRUE));
+	freeAsmop (count, NULL, ic, FALSE);
 	emitcode ("mov", "dps,#!constbyte",0x21); 	/* Select DPTR2 & auto-toggle. */
 	emitcode ("","!tlabeldef",lbl->key+100);
 	if (fromc) {
@@ -11268,15 +11296,14 @@ static void genMemcmpX2X( iCode *ic, int nparms, operand **parms, int fromc)
 	emitcode ("sjmp","!tlabel",lbl->key+100);
 	emitcode ("","!tlabeldef",lbl1->key+100);
 	emitcode ("clr","a");
+	emitcode ("","!tlabeldef",lbl2->key+100);
+	aopOp (IC_RESULT(ic), ic, FALSE,FALSE);
+	aopPut(AOP(IC_RESULT(ic)),"a",0);
+	freeAsmop (IC_RESULT(ic), NULL, ic, FALSE);
+	emitcode("pop","ar0");
+	emitcode ("mov", "dps,#0");      
     }
-    freeAsmop (count, NULL, ic, FALSE);
-    emitcode ("","!tlabeldef",lbl2->key+100);
-    aopOp (IC_RESULT(ic), ic, FALSE,FALSE);
-    aopPut(AOP(IC_RESULT(ic)),"a",0);
-    freeAsmop (IC_RESULT(ic), NULL, ic, FALSE);
-    emitcode("pop","ar0");
-    emitcode ("mov", "dps,#0"); 
-    
+    _G.dptrInUse = _G.dptr1InUse = 0;
     unsavermask(rsave);
 
 }
@@ -11350,6 +11377,7 @@ static void genInp( iCode *ic, int nparms, operand **parms)
     }
     freeAsmop (to, NULL, ic, FALSE);
 
+    _G.dptrInUse = _G.dptr1InUse = 1;
     aopOp (count, ic->next->next, FALSE,FALSE);
     lbl =newiTempLabel(NULL);
 
@@ -11359,6 +11387,7 @@ static void genInp( iCode *ic, int nparms, operand **parms)
 	emitcode (";","OH  JOY auto increment with djnz (very fast)");
 	emitcode ("mov", "dps,#!constbyte",0x1); 	/* Select DPTR2 */
 	emitcode ("mov", "b,%s",aopGet(AOP(count),0,FALSE,FALSE,FALSE));
+	freeAsmop (count, NULL, ic, FALSE);
 	emitcode ("","!tlabeldef",lbl->key+100);
 	emitcode ("movx", "a,@dptr");	/* read data from port */
 	emitcode ("dec","dps");		/* switch to DPTR */
@@ -11372,6 +11401,7 @@ static void genInp( iCode *ic, int nparms, operand **parms)
 	emitcode (";"," Auto increment but no djnz");
 	emitcode ("mov","_ap,%s",aopGet (AOP (count), 0, FALSE, TRUE, TRUE));
 	emitcode ("mov","b,%s",aopGet (AOP (count), 1, FALSE, TRUE, TRUE));
+	freeAsmop (count, NULL, ic, FALSE);
 	emitcode ("mov", "dps,#!constbyte",0x1); 	/* Select DPTR2 */
 	emitcode ("","!tlabeldef",lbl->key+100);
 	emitcode ("movx", "a,@dptr");
@@ -11394,7 +11424,7 @@ static void genInp( iCode *ic, int nparms, operand **parms)
 	emitcode ("","!tlabeldef",lbl1->key+100);
     }
     emitcode ("mov", "dps,#0"); 
-    freeAsmop (count, NULL, ic, FALSE);
+    _G.dptrInUse = _G.dptr1InUse = 0;
     unsavermask(rsave);
 
 }
@@ -11468,6 +11498,7 @@ static void genOutp( iCode *ic, int nparms, operand **parms)
     }
     freeAsmop (to, NULL, ic, FALSE);
 
+    _G.dptrInUse = _G.dptr1InUse = 1;
     aopOp (count, ic->next->next, FALSE,FALSE);
     lbl =newiTempLabel(NULL);
 
@@ -11484,23 +11515,21 @@ static void genOutp( iCode *ic, int nparms, operand **parms)
 	emitcode ("inc", "dptr");	/* point to next area */
 	emitcode ("dec","dps");		/* switch to DPTR */
 	emitcode ("djnz","b,!tlabel",lbl->key+100);
+	freeAsmop (count, NULL, ic, FALSE);
     } else {
 	symbol *lbl1 = newiTempLabel(NULL);
 	
 	emitcode (";"," Auto increment but no djnz");
 	emitcode ("mov","_ap,%s",aopGet (AOP (count), 0, FALSE, TRUE, TRUE));
 	emitcode ("mov","b,%s",aopGet (AOP (count), 1, FALSE, TRUE, TRUE));
+	freeAsmop (count, NULL, ic, FALSE);
 	emitcode ("mov", "dps,#!constbyte",0x0); 	/* Select DPTR */
 	emitcode ("","!tlabeldef",lbl->key+100);
-/* 	emitcode ("push","acc"); */
 	emitcode ("movx", "a,@dptr");
 	emitcode ("inc", "dptr");
 	emitcode ("inc","dps");		/* switch to DPTR2 */
 	emitcode ("movx", "@dptr,a");
 	emitcode ("dec","dps");		/* switch to DPTR */
-/* 	emitcode ("pop","acc"); */
-/* 	emitcode ("djnz","acc,!tlabel",lbl->key+100); */
-/* 	emitcode ("djnz","b,!tlabel",lbl->key+100); */
 	emitcode ("mov","a,b");
 	emitcode ("orl","a,_ap");
 	emitcode ("jz","!tlabel",lbl1->key+100);
@@ -11514,7 +11543,7 @@ static void genOutp( iCode *ic, int nparms, operand **parms)
 	emitcode ("","!tlabeldef",lbl1->key+100);
     }
     emitcode ("mov", "dps,#0"); 
-    freeAsmop (count, NULL, ic, FALSE);
+    _G.dptrInUse = _G.dptr1InUse = 0;
     unsavermask(rsave);
 
 }

@@ -198,7 +198,7 @@ static void _mcs51_genXINIT (FILE * of) {
   fprintf (of, "00003$:\n");
   fprintf (of, ";	_mcs51_genXINIT() end\n");
   
-  if (getenv("SDCC_GENRAMCLEAR")) _mcs51_genRAMCLEAR (of);
+  if (!getenv("SDCC_NOGENRAMCLEAR")) _mcs51_genRAMCLEAR (of);
 }
 
 

@@ -5,7 +5,7 @@ PORT = gb
 
 CC = /home/michaelh/projects/gbdk-support/lcc/lcc
 # -DNOENUM is here to make the results more predictable
-CFLAGS =
+CFLAGS = -v -mz80/consolez80 --gbdkdir=/home/michaelh/projects/gbdk-current --ihx
 CFLAGS += -DREG= -DNOSTRUCTASSIGN -DNOENUM
 LIBDIR = /home/michaelh/projects/gbdk-lib/build/
 LD = link-$(PROC)
@@ -16,8 +16,12 @@ OBJ = dhry.o
 
 all: dhry
 
-dhry: $(OBJ)
-	$(CC) -o dhry.gb dhry.o
+dhry: dhry.s $(OBJ)
+	-$(CC) $(CFLAGS) -o dhry.ihx dhry.o
+	cat dhry.ihx | ../../makebin/makebin  > dhry.rom
+
+dhry.s: dhry.c
+	$(CC) $(CFLAGS) -S -o dhry.s dhry.c
 
 native:
 	gcc -g -O2 -DREG= -DNOSTRUCTASSIGN -DNOENUM -o dhry dhry.c

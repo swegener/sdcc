@@ -45,6 +45,7 @@
 #include <stdio.h>
 /** For clock() */
 #include <time.h>
+#include <types.h>
 
 /** Print the number of t-states this program has been executing for.
     Optional :)

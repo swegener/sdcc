@@ -1377,6 +1377,7 @@ static void fillGaps()
     symbol *sym =NULL;
     int key =0;    
     int loop = 0, change;
+    int pass;
 
     if (getenv("DISABLE_FILL_GAPS")) return;
     
@@ -1468,44 +1469,53 @@ static void fillGaps()
 		    sym->regs[i] = getRegGprNoSpil ();		  
 	    }
 	    
-	    /* for all its definitions & uses check if the registers
+	    /* For all its definitions check if the registers
 	       allocated needs positioning NOTE: we can position
 	       only ONCE if more than One positioning required 
-	       then give up */
+	       then give up.
+	       We may need to perform the checks twice; once to
+	       position the registers as needed, the second to
+	       verify any register repositioning is still
+	       compatible.
+              */
 	    sym->isspilt = 0;
-	    for (i = 0 ; i < sym->defs->size ; i++ ) {
-		if (bitVectBitValue(sym->defs,i)) {
-		    iCode *ic;
-		    if (!(ic = hTabItemWithKey(iCodehTab,i))) continue ;
-		    if (SKIP_IC(ic)) continue;
-		    assert(isSymbolEqual(sym,OP_SYMBOL(IC_RESULT(ic)))); /* just making sure */
-		    /* if left is assigned to registers */
-		    if (IS_SYMOP(IC_LEFT(ic)) && 
-			bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_LEFT(ic))->key)) {
-			pdone += (positionRegs(sym,OP_SYMBOL(IC_LEFT(ic)))>0);
+            for (pass=0; pass<2; pass++) {
+	        for (i = 0 ; i < sym->defs->size ; i++ ) {
+	            if (bitVectBitValue(sym->defs,i)) {
+		        iCode *ic;
+		        if (!(ic = hTabItemWithKey(iCodehTab,i))) continue ;
+		        if (SKIP_IC(ic)) continue;
+		        assert(isSymbolEqual(sym,OP_SYMBOL(IC_RESULT(ic)))); /* just making sure */
+                        /* if left is assigned to registers */
+                        if (IS_SYMOP(IC_LEFT(ic)) && 
+		          bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_LEFT(ic))->key)) {
+		            pdone += (positionRegs(sym,OP_SYMBOL(IC_LEFT(ic)))>0);
+		        }
+		        if (IS_SYMOP(IC_RIGHT(ic)) && 
+		          bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_RIGHT(ic))->key)) {
+		            pdone += (positionRegs(sym,OP_SYMBOL(IC_RIGHT(ic)))>0);
+		        }
+		        if (pdone > 1) break;
 		    }
-		    if (IS_SYMOP(IC_RIGHT(ic)) && 
-			bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_RIGHT(ic))->key)) {
-			pdone += (positionRegs(sym,OP_SYMBOL(IC_RIGHT(ic)))>0);
+	        }
+	        for (i = 0 ; i < sym->uses->size ; i++ ) {
+	            if (bitVectBitValue(sym->uses,i)) {
+		        iCode *ic;
+		        if (!(ic = hTabItemWithKey(iCodehTab,i))) continue ;
+		        if (SKIP_IC(ic)) continue;
+		        if (POINTER_SET(ic) || POINTER_GET(ic)) continue ;
+
+		        /* if result is assigned to registers */
+		        if (IS_SYMOP(IC_RESULT(ic)) && 
+		          bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_RESULT(ic))->key)) {
+		            pdone += (positionRegs(sym,OP_SYMBOL(IC_RESULT(ic)))>0);
+		        }
+		        if (pdone > 1) break;
 		    }
-		    if (pdone > 1) break;
-		}
-	    }
-	    for (i = 0 ; i < sym->uses->size ; i++ ) {
-		if (bitVectBitValue(sym->uses,i)) {
-		    iCode *ic;
-		    if (!(ic = hTabItemWithKey(iCodehTab,i))) continue ;
-		    if (SKIP_IC(ic)) continue;
-		    if (POINTER_SET(ic) || POINTER_GET(ic)) continue ;
-		    
-		    /* if result is assigned to registers */
-		    if (IS_SYMOP(IC_RESULT(ic)) && 
-			bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_RESULT(ic))->key)) {
-			pdone += (positionRegs(sym,OP_SYMBOL(IC_RESULT(ic)))>0);
-		    }
-		    if (pdone > 1) break;
-		}
-	    }
+	        }
+                if (pdone == 0) break; /* second pass only if regs repositioned */
+	        if (pdone > 1) break;
+            }
 	    /* had to position more than once GIVE UP */
 	    if (pdone > 1) {
 		/* UNDO all the changes we made to try this */

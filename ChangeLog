@@ -1,3 +1,9 @@
+2003-09-21  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/mcs51/ralloc.c (fillGaps),
+	* src/ds390/ralloc.c (fillGaps): fixed bug #810093 (yet another
+	register positioning bug)
+
 2003-09-21  Bernhard Held <bernhard@bernhardheld.de>
 
 	* device/lib/_fsdiv.c: replaced (1<<31) by (1ul<<31)

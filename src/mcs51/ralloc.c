@@ -1257,7 +1257,8 @@ serialRegAssign (eBBlock ** ebbs, int count)
 static void fillGaps()
 {
     symbol *sym =NULL;
-    int key =0;    
+    int key =0;
+    int pass;
     
     if (getenv("DISABLE_FILL_GAPS")) return;
     
@@ -1294,52 +1295,89 @@ static void fillGaps()
 	    continue ;
 	}
 
+        D(printf("Atemping fillGaps on %s: [",sym->name));
 	/* THERE IS HOPE !!!! */
 	for (i=0; i < sym->nRegs ; i++ ) {
 	    if (sym->regType == REG_PTR)
 		sym->regs[i] = getRegPtrNoSpil ();
 	    else
 		sym->regs[i] = getRegGprNoSpil ();		  
+            D(printf("%s ", sym->regs[i]->name));
 	}
+        D(printf("]\n"));
 
-	/* for all its definitions check if the registers
+	/* For all its definitions check if the registers
 	   allocated needs positioning NOTE: we can position
 	   only ONCE if more than One positioning required 
-	   then give up */
+	   then give up.
+	   We may need to perform the checks twice; once to
+	   position the registers as needed, the second to
+	   verify any register repositioning is still
+	   compatible.
+          */
 	sym->isspilt = 0;
-	for (i = 0 ; i < sym->defs->size ; i++ ) {
-	    if (bitVectBitValue(sym->defs,i)) {
-		iCode *ic;
-		if (!(ic = hTabItemWithKey(iCodehTab,i))) continue ;
-		if (SKIP_IC(ic)) continue;
-		assert(isSymbolEqual(sym,OP_SYMBOL(IC_RESULT(ic)))); /* just making sure */
-                /* if left is assigned to registers */
-		if (IS_SYMOP(IC_LEFT(ic)) && 
-		    bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_LEFT(ic))->key)) {
-		    pdone += (positionRegs(sym,OP_SYMBOL(IC_LEFT(ic)))>0);
+        for (pass=0; pass<2; pass++) {
+            D(printf(" checking definitions\n"));
+	    for (i = 0 ; i < sym->defs->size ; i++ ) {
+	        if (bitVectBitValue(sym->defs,i)) {
+		    iCode *ic;
+		    if (!(ic = hTabItemWithKey(iCodehTab,i))) continue ;
+                    D(printf("  ic->seq = %d\n", ic->seq));
+		    if (SKIP_IC(ic)) continue;
+		    assert(isSymbolEqual(sym,OP_SYMBOL(IC_RESULT(ic)))); /* just making sure */
+                    /* if left is assigned to registers */
+		    if (IS_SYMOP(IC_LEFT(ic)))
+                      {
+                        D(printf("   left = "));
+                        D(printOperand(IC_LEFT(ic),NULL));
+                      }
+                    if (IS_SYMOP(IC_LEFT(ic)) && 
+		      bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_LEFT(ic))->key)) {
+		        pdone += (positionRegs(sym,OP_SYMBOL(IC_LEFT(ic)))>0);
+		    }
+		    if (IS_SYMOP(IC_RIGHT(ic)))
+                      {
+                        D(printf("   right = "));
+                        D(printOperand(IC_RIGHT(ic),NULL));
+                      }
+		    if (IS_SYMOP(IC_RIGHT(ic)) && 
+		      bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_RIGHT(ic))->key)) {
+		        pdone += (positionRegs(sym,OP_SYMBOL(IC_RIGHT(ic)))>0);
+		    }
+                    D(printf("   pdone = %d\n", pdone));
+		    if (pdone > 1) break;
 		}
-		if (IS_SYMOP(IC_RIGHT(ic)) && 
-		    bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_RIGHT(ic))->key)) {
-		    pdone += (positionRegs(sym,OP_SYMBOL(IC_RIGHT(ic)))>0);
-		}
-		if (pdone > 1) break;
 	    }
-	}
-	for (i = 0 ; i < sym->uses->size ; i++ ) {
-	    if (bitVectBitValue(sym->uses,i)) {
-		iCode *ic;
-		if (!(ic = hTabItemWithKey(iCodehTab,i))) continue ;
-		if (SKIP_IC(ic)) continue;
-		if (POINTER_SET(ic) || POINTER_GET(ic)) continue ;
+            D(printf(" checking uses\n"));
+	    for (i = 0 ; i < sym->uses->size ; i++ ) {
+	        if (bitVectBitValue(sym->uses,i)) {
+		    iCode *ic;
+		    if (!(ic = hTabItemWithKey(iCodehTab,i))) continue ;
+                    D(printf("  ic->seq = %d\n", ic->seq));
+		    if (SKIP_IC(ic)) continue;
+		    if (POINTER_SET(ic) || POINTER_GET(ic)) continue ;
 
-		/* if result is assigned to registers */
-		if (IS_SYMOP(IC_RESULT(ic)) && 
-		    bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_RESULT(ic))->key)) {
-		    pdone += (positionRegs(sym,OP_SYMBOL(IC_RESULT(ic)))>0);
+		    /* if result is assigned to registers */
+		    if (IS_SYMOP(IC_RESULT(ic)))
+                      {
+                        D(printf("   result = "));
+                        D(printOperand(IC_RESULT(ic),NULL));
+                      }
+		    if (IS_SYMOP(IC_RESULT(ic)) && 
+		        bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_RESULT(ic))->key)) {
+		        pdone += (positionRegs(sym,OP_SYMBOL(IC_RESULT(ic)))>0);
+		    }
+                    D(printf("   pdone = %d\n", pdone));
+		    if (pdone > 1) break;
 		}
-		if (pdone > 1) break;
 	    }
-	}
+            if (pdone == 0) break; /* second pass only if regs repositioned */
+	    if (pdone > 1) break;
+        }
+        D(printf(" sym->regs = ["));
+	for (i=0; i < sym->nRegs ; i++ )
+          D(printf("%s ", sym->regs[i]->name));
+        D(printf("]\n"));
 	/* had to position more than once GIVE UP */
 	if (pdone > 1) {
 	    /* UNDO all the changes we made to try this */

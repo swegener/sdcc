@@ -1950,7 +1950,9 @@ printTypeChain (sym_link * start, FILE * of)
 	  switch (DCL_TYPE (type))
 	    {
 	    case FUNCTION:
-	      fprintf (of, "function %s", (IFFUNC_ISBUILTIN(type) ? "__builtin__" : " "));
+	      fprintf (of, "function %s %s", 
+		       (IFFUNC_ISBUILTIN(type) ? "__builtin__" : " "),
+		       (IFFUNC_ISJAVANATIVE(type) ? "_JavaNative" : " "));
 	      break;
 	    case GPOINTER:
 	      if (DCL_PTR_CONST (type))

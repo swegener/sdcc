@@ -51,7 +51,7 @@ testLogicalAnd(void)
     ASSERT(true && !false);
     ASSERT(!false && true);
 
-#if 0
+#if 1
     /* PENDING: Doesn't work. */
     /* Test that the evaluation is aborted on the first false. */
     if (true && false && neverGetHere()) {

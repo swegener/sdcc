@@ -1319,17 +1319,10 @@ main (int argc, char **argv, char **envp)
   setDefaultOptions ();
   parseCmdLine (argc, argv);
 
-  initMem ();
-
-  port->finaliseOptions ();
-
   /* if no input then printUsage & exit */
   if ((!options.c1mode && !srcFileName && !nrelFiles) || 
       (options.c1mode && !srcFileName && !options.out_name))
     {
-      #if defined (__MINGW32__) || defined (__CYGWIN__) || defined (_MSC_VER)
-      rm_tmpfiles();
-      #endif
       printUsage ();
       exit (0);
     }
@@ -1337,6 +1330,10 @@ main (int argc, char **argv, char **envp)
   if (srcFileName)
     {
       preProcess (envp);
+
+      initMem ();
+
+      port->finaliseOptions ();
 
       initSymt ();
       initiCode ();

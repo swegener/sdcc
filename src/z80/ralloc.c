@@ -66,6 +66,9 @@ enum
 #define D(_a, _s)
 #endif
 
+#define DISABLE_PACKREGSFORSUPPORT	1
+#define DISABLE_PACKREGSFORACCUSE	1
+
 /*-----------------------------------------------------------------*/
 /* At this point we start getting processor specific although      */
 /* some routines are non-processor specific & can be reused when   */
@@ -1613,6 +1616,9 @@ findAssignToSym (operand * op, iCode * ic)
 
 }
 
+#if !DISABLE_PACKREGSFORSUPPORT
+// PENDING
+
 /*-----------------------------------------------------------------*/
 /* packRegsForSupport :- reduce some registers for support calls   */
 /*-----------------------------------------------------------------*/
@@ -1672,6 +1678,7 @@ right:
 
   return change;
 }
+#endif
 
 #define IS_OP_RUONLY(x) (x && IS_SYMOP(x) && OP_SYMBOL(x)->ruonly)
 
@@ -1826,6 +1833,9 @@ genAssign (ptr)
     ld	(iy),(hl)
 */
 
+#if !DISABLE_PACKREGSFORACCUSE
+// PENDING
+
 /** Pack registers for acc use.
     When the result of this operation is small and short lived it may
     be able to be stored in the accumelator.
@@ -1955,6 +1965,7 @@ packRegsForAccUse (iCode * ic)
 accuse:
   OP_SYMBOL (IC_RESULT (ic))->accuse = ACCUSE_A;
 }
+#endif
 
 static void 
 packRegsForHLUse (iCode * ic)

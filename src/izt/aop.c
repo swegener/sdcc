@@ -87,7 +87,7 @@ asmop *_newForRemat(symbol *sym)
 asmop *_newForTemporary(operand *op, iCode *ic)
 {
     symbol *sym = OP_SYMBOL(op);
-    asmop *aop;
+    asmop *aop = NULL;
 
     if (sym->regType == REG_TYPE_CND) {
 	// Conditionals have no size due to being stored in carry.

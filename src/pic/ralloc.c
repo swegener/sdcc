@@ -2646,7 +2646,6 @@ static void
 packForReceive (iCode * ic, eBBlock * ebp)
 {
   iCode *dic;
-  bool can_remove = 1;		// assume that we can remove temporary
 
   debugLog ("%s\n", __FUNCTION__);
   debugAopGet ("  result:", IC_RESULT (ic));

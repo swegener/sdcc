@@ -95,6 +95,343 @@ int avr_fReg = 0;		/* first allocatable register */
 
 static void spillThis (symbol *);
 
+#if 0
+// PENDING: Unused
+/*-----------------------------------------------------------------*/
+/* findAssignToSym : scanning backwards looks for first assig found */
+/*-----------------------------------------------------------------*/
+static iCode *
+findAssignToSym (operand * op, iCode * ic)
+{
+	iCode *dic;
+
+	for (dic = ic->prev; dic; dic = dic->prev) {
+
+		/* if definition by assignment */
+		if (dic->op == '=' &&
+		    !POINTER_SET (dic) && IC_RESULT (dic)->key == op->key
+/*          &&  IS_TRUE_SYMOP(IC_RIGHT(dic)) */
+			) {
+
+			/* we are interested only if defined in far space */
+			/* or in stack space in case of + & - */
+
+			/* if assigned to a non-symbol then return
+			   true */
+			if (!IS_SYMOP (IC_RIGHT (dic)))
+				break;
+
+			/* if the symbol is in far space then
+			   we should not */
+			if (isOperandInFarSpace (IC_RIGHT (dic)))
+				return NULL;
+
+			/* for + & - operations make sure that
+			   if it is on the stack it is the same
+			   as one of the three operands */
+			if ((ic->op == '+' || ic->op == '-') &&
+			    OP_SYMBOL (IC_RIGHT (dic))->onStack) {
+
+				if (IC_RESULT (ic)->key != IC_RIGHT (dic)->key
+				    && IC_LEFT (ic)->key !=
+				    IC_RIGHT (dic)->key
+				    && IC_RIGHT (ic)->key !=
+				    IC_RIGHT (dic)->key) return NULL;
+			}
+
+			break;
+
+		}
+
+		/* if we find an usage then we cannot delete it */
+		if (IC_LEFT (dic) && IC_LEFT (dic)->key == op->key)
+			return NULL;
+
+		if (IC_RIGHT (dic) && IC_RIGHT (dic)->key == op->key)
+			return NULL;
+
+		if (POINTER_SET (dic) && IC_RESULT (dic)->key == op->key)
+			return NULL;
+	}
+
+	/* now make sure that the right side of dic
+	   is not defined between ic & dic */
+	if (dic) {
+		iCode *sic = dic->next;
+
+		for (; sic != ic; sic = sic->next)
+			if (IC_RESULT (sic) &&
+			    IC_RESULT (sic)->key == IC_RIGHT (dic)->key)
+				return NULL;
+	}
+
+	return dic;
+
+
+}
+
+/*-----------------------------------------------------------------*/
+/* packForPush - hueristics to reduce iCode for pushing            */
+/*-----------------------------------------------------------------*/
+static void
+packForPush (iCode * ic, eBBlock * ebp)
+{
+	iCode *dic;
+
+	if (ic->op != IPUSH || !IS_ITEMP (IC_LEFT (ic)))
+		return;
+
+	/* must have only definition & one usage */
+	if (bitVectnBitsOn (OP_DEFS (IC_LEFT (ic))) != 1 ||
+	    bitVectnBitsOn (OP_USES (IC_LEFT (ic))) != 1)
+		return;
+
+	/* find the definition */
+	if (!(dic = hTabItemWithKey (iCodehTab,
+				     bitVectFirstBit (OP_DEFS
+						      (IC_LEFT (ic))))))
+			return;
+
+	if (dic->op != '=' || POINTER_SET (dic))
+		return;
+
+	/* we now we know that it has one & only one def & use
+	   and the that the definition is an assignment */
+	IC_LEFT (ic) = IC_RIGHT (dic);
+
+	remiCodeFromeBBlock (ebp, dic);
+	hTabDeleteItem (&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
+}
+
+/*-----------------------------------------------------------------*/
+/* packRegsForSupport :- reduce some registers for support calls   */
+/*-----------------------------------------------------------------*/
+static int
+packRegsForSupport (iCode * ic, eBBlock * ebp)
+{
+	int change = 0;
+	/* for the left & right operand :- look to see if the
+	   left was assigned a true symbol in far space in that
+	   case replace them */
+	if (IS_ITEMP (IC_LEFT (ic)) &&
+	    OP_SYMBOL (IC_LEFT (ic))->liveTo <= ic->seq) {
+		iCode *dic = findAssignToSym (IC_LEFT (ic), ic);
+		iCode *sic;
+
+		if (!dic)
+			goto right;
+
+		/* found it we need to remove it from the
+		   block */
+		for (sic = dic; sic != ic; sic = sic->next)
+			bitVectUnSetBit (sic->rlive, IC_LEFT (ic)->key);
+
+		IC_LEFT (ic)->operand.symOperand =
+			IC_RIGHT (dic)->operand.symOperand;
+		IC_LEFT (ic)->key = IC_RIGHT (dic)->operand.symOperand->key;
+		remiCodeFromeBBlock (ebp, dic);
+		hTabDeleteItem (&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
+		change++;
+	}
+
+	/* do the same for the right operand */
+      right:
+	if (!change &&
+	    IS_ITEMP (IC_RIGHT (ic)) &&
+	    OP_SYMBOL (IC_RIGHT (ic))->liveTo <= ic->seq) {
+		iCode *dic = findAssignToSym (IC_RIGHT (ic), ic);
+		iCode *sic;
+
+		if (!dic)
+			return change;
+
+		/* if this is a subtraction & the result
+		   is a true symbol in far space then don't pack */
+		if (ic->op == '-' && IS_TRUE_SYMOP (IC_RESULT (dic))) {
+			sym_link *etype =
+				getSpec (operandType (IC_RESULT (dic)));
+			if (IN_FARSPACE (SPEC_OCLS (etype)))
+				return change;
+		}
+		/* found it we need to remove it from the
+		   block */
+		for (sic = dic; sic != ic; sic = sic->next)
+			bitVectUnSetBit (sic->rlive, IC_RIGHT (ic)->key);
+
+		IC_RIGHT (ic)->operand.symOperand =
+			IC_RIGHT (dic)->operand.symOperand;
+		IC_RIGHT (ic)->key = IC_RIGHT (dic)->operand.symOperand->key;
+
+		remiCodeFromeBBlock (ebp, dic);
+		hTabDeleteItem (&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
+		change++;
+	}
+
+	return change;
+}
+
+/*-----------------------------------------------------------------*/
+/* farSpacePackable - returns the packable icode for far variables */
+/*-----------------------------------------------------------------*/
+static iCode *
+farSpacePackable (iCode * ic)
+{
+	iCode *dic;
+
+	/* go thru till we find a definition for the
+	   symbol on the right */
+	for (dic = ic->prev; dic; dic = dic->prev) {
+
+		/* if the definition is a call then no */
+		if ((dic->op == CALL || dic->op == PCALL) &&
+		    IC_RESULT (dic)->key == IC_RIGHT (ic)->key) {
+			return NULL;
+		}
+
+		/* if shift by unknown amount then not */
+		if ((dic->op == LEFT_OP || dic->op == RIGHT_OP) &&
+		    IC_RESULT (dic)->key == IC_RIGHT (ic)->key)
+			return NULL;
+
+		/* if pointer get and size > 1 */
+		if (POINTER_GET (dic) &&
+		    getSize (aggrToPtr (operandType (IC_LEFT (dic)), FALSE)) >
+		    1) return NULL;
+
+		if (POINTER_SET (dic) &&
+		    getSize (aggrToPtr (operandType (IC_RESULT (dic)), FALSE))
+		    > 1)
+			return NULL;
+
+		/* if any three is a true symbol in far space */
+		if (IC_RESULT (dic) &&
+		    IS_TRUE_SYMOP (IC_RESULT (dic)) &&
+		    isOperandInFarSpace (IC_RESULT (dic)))
+			return NULL;
+
+		if (IC_RIGHT (dic) &&
+		    IS_TRUE_SYMOP (IC_RIGHT (dic)) &&
+		    isOperandInFarSpace (IC_RIGHT (dic)) &&
+		    !isOperandEqual (IC_RIGHT (dic), IC_RESULT (ic)))
+			return NULL;
+
+		if (IC_LEFT (dic) &&
+		    IS_TRUE_SYMOP (IC_LEFT (dic)) &&
+		    isOperandInFarSpace (IC_LEFT (dic)) &&
+		    !isOperandEqual (IC_LEFT (dic), IC_RESULT (ic)))
+			return NULL;
+
+		if (isOperandEqual (IC_RIGHT (ic), IC_RESULT (dic))) {
+			if ((dic->op == LEFT_OP ||
+			     dic->op == RIGHT_OP ||
+			     dic->op == '-') &&
+			    IS_OP_LITERAL (IC_RIGHT (dic))) return NULL;
+			else
+				return dic;
+		}
+	}
+
+	return NULL;
+}
+
+/*-----------------------------------------------------------------*/
+/* rematStr - returns the rematerialized string for a remat var    */
+/*-----------------------------------------------------------------*/
+static char *
+rematStr (symbol * sym)
+{
+	char *s = buffer;
+	iCode *ic = sym->rematiCode;
+
+	while (1) {
+
+		/* if plus or minus print the right hand side */
+		if (ic->op == '+' || ic->op == '-') {
+			sprintf (s, "0x%04x %c ",
+				 (int) operandLitValue (IC_RIGHT (ic)),
+				 ic->op);
+			s += strlen (s);
+			ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
+			continue;
+		}
+
+		/* we reached the end */
+		sprintf (s, "%s", OP_SYMBOL (IC_LEFT (ic))->rname);
+		break;
+	}
+
+	return buffer;
+}
+
+/*-----------------------------------------------------------------*/
+/* isSpiltOnStack - returns true if the spil location is on stack  */
+/*-----------------------------------------------------------------*/
+static bool
+isSpiltOnStack (symbol * sym)
+{
+	sym_link *etype;
+
+	if (!sym)
+		return FALSE;
+
+	if (!sym->isspilt)
+		return FALSE;
+
+
+	if (!sym->usl.spillLoc)
+		return FALSE;
+
+	etype = getSpec (sym->usl.spillLoc->type);
+	if (IN_STACK (etype))
+		return TRUE;
+
+	return FALSE;
+}
+
+/*-----------------------------------------------------------------*/
+/* spillLRWithPtrReg :- will spil those live ranges which use PTR  */
+/*-----------------------------------------------------------------*/
+static void
+spillLRWithPtrReg (symbol * forSym)
+{
+	symbol *lrsym;
+	regs *X, *Z, *X1, *Z1;
+	int k;
+
+	if (!_G.regAssigned || bitVectIsZero (_G.regAssigned))
+		return;
+
+	X = avr_regWithIdx (R26_IDX);
+	X1= avr_regWithIdx (R27_IDX);
+	Z = avr_regWithIdx (R30_IDX);
+	Z1= avr_regWithIdx (R31_IDX);
+
+	/* for all live ranges */
+	for (lrsym = hTabFirstItem (liveRanges, &k); lrsym;
+	     lrsym = hTabNextItem (liveRanges, &k)) {
+		int j;
+
+		/* if no registers assigned to it or
+		   spilt */
+		/* if it does not overlap with this then 
+		   not need to spill it */
+
+		if (lrsym->isspilt || !lrsym->nRegs ||
+		    (lrsym->liveTo < forSym->liveFrom)) continue;
+
+		/* go thru the registers : if it is either
+		   r0 or r1 then spil it */
+		for (j = 0; j < lrsym->nRegs; j++)
+			if (lrsym->regs[j] == X || lrsym->regs[j] == Z ||
+			    lrsym->regs[j] == X1 || lrsym->regs[j] == Z1) {
+				spillThis (lrsym);
+				break;
+			}
+	}
+
+}
+#endif
+
 /*-----------------------------------------------------------------*/
 /* allocReg - allocates register of given type                     */
 /*-----------------------------------------------------------------*/
@@ -443,49 +780,6 @@ DEFSETFUNC (isFree)
 }
 
 /*-----------------------------------------------------------------*/
-/* spillLRWithPtrReg :- will spil those live ranges which use PTR  */
-/*-----------------------------------------------------------------*/
-static void
-spillLRWithPtrReg (symbol * forSym)
-{
-	symbol *lrsym;
-	regs *X, *Z, *X1, *Z1;
-	int k;
-
-	if (!_G.regAssigned || bitVectIsZero (_G.regAssigned))
-		return;
-
-	X = avr_regWithIdx (R26_IDX);
-	X1= avr_regWithIdx (R27_IDX);
-	Z = avr_regWithIdx (R30_IDX);
-	Z1= avr_regWithIdx (R31_IDX);
-
-	/* for all live ranges */
-	for (lrsym = hTabFirstItem (liveRanges, &k); lrsym;
-	     lrsym = hTabNextItem (liveRanges, &k)) {
-		int j;
-
-		/* if no registers assigned to it or
-		   spilt */
-		/* if it does not overlap with this then 
-		   not need to spill it */
-
-		if (lrsym->isspilt || !lrsym->nRegs ||
-		    (lrsym->liveTo < forSym->liveFrom)) continue;
-
-		/* go thru the registers : if it is either
-		   r0 or r1 then spil it */
-		for (j = 0; j < lrsym->nRegs; j++)
-			if (lrsym->regs[j] == X || lrsym->regs[j] == Z ||
-			    lrsym->regs[j] == X1 || lrsym->regs[j] == Z1) {
-				spillThis (lrsym);
-				break;
-			}
-	}
-
-}
-
-/*-----------------------------------------------------------------*/
 /* createStackSpil - create a location on the stack to spil        */
 /*-----------------------------------------------------------------*/
 static symbol *
@@ -568,31 +862,6 @@ createStackSpil (symbol * sym)
 	   of the spill location */
 	addSetHead (&sloc->usl.itmpStack, sym);
 	return sym;
-}
-
-/*-----------------------------------------------------------------*/
-/* isSpiltOnStack - returns true if the spil location is on stack  */
-/*-----------------------------------------------------------------*/
-static bool
-isSpiltOnStack (symbol * sym)
-{
-	sym_link *etype;
-
-	if (!sym)
-		return FALSE;
-
-	if (!sym->isspilt)
-		return FALSE;
-
-
-	if (!sym->usl.spillLoc)
-		return FALSE;
-
-	etype = getSpec (sym->usl.spillLoc->type);
-	if (IN_STACK (etype))
-		return TRUE;
-
-	return FALSE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1361,34 +1630,6 @@ createRegMask (eBBlock ** ebbs, int count)
 	}
 }
 
-/*-----------------------------------------------------------------*/
-/* rematStr - returns the rematerialized string for a remat var    */
-/*-----------------------------------------------------------------*/
-static char *
-rematStr (symbol * sym)
-{
-	char *s = buffer;
-	iCode *ic = sym->rematiCode;
-
-	while (1) {
-
-		/* if plus or minus print the right hand side */
-		if (ic->op == '+' || ic->op == '-') {
-			sprintf (s, "0x%04x %c ",
-				 (int) operandLitValue (IC_RIGHT (ic)),
-				 ic->op);
-			s += strlen (s);
-			ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
-			continue;
-		}
-
-		/* we reached the end */
-		sprintf (s, "%s", OP_SYMBOL (IC_LEFT (ic))->rname);
-		break;
-	}
-
-	return buffer;
-}
 
 /*-----------------------------------------------------------------*/
 /* regTypeNum - computes the type & number of registers required   */
@@ -1488,70 +1729,6 @@ DEFSETFUNC (deallocStackSpil)
 
 	deallocLocal (sym);
 	return 0;
-}
-
-/*-----------------------------------------------------------------*/
-/* farSpacePackable - returns the packable icode for far variables */
-/*-----------------------------------------------------------------*/
-static iCode *
-farSpacePackable (iCode * ic)
-{
-	iCode *dic;
-
-	/* go thru till we find a definition for the
-	   symbol on the right */
-	for (dic = ic->prev; dic; dic = dic->prev) {
-
-		/* if the definition is a call then no */
-		if ((dic->op == CALL || dic->op == PCALL) &&
-		    IC_RESULT (dic)->key == IC_RIGHT (ic)->key) {
-			return NULL;
-		}
-
-		/* if shift by unknown amount then not */
-		if ((dic->op == LEFT_OP || dic->op == RIGHT_OP) &&
-		    IC_RESULT (dic)->key == IC_RIGHT (ic)->key)
-			return NULL;
-
-		/* if pointer get and size > 1 */
-		if (POINTER_GET (dic) &&
-		    getSize (aggrToPtr (operandType (IC_LEFT (dic)), FALSE)) >
-		    1) return NULL;
-
-		if (POINTER_SET (dic) &&
-		    getSize (aggrToPtr (operandType (IC_RESULT (dic)), FALSE))
-		    > 1)
-			return NULL;
-
-		/* if any three is a true symbol in far space */
-		if (IC_RESULT (dic) &&
-		    IS_TRUE_SYMOP (IC_RESULT (dic)) &&
-		    isOperandInFarSpace (IC_RESULT (dic)))
-			return NULL;
-
-		if (IC_RIGHT (dic) &&
-		    IS_TRUE_SYMOP (IC_RIGHT (dic)) &&
-		    isOperandInFarSpace (IC_RIGHT (dic)) &&
-		    !isOperandEqual (IC_RIGHT (dic), IC_RESULT (ic)))
-			return NULL;
-
-		if (IC_LEFT (dic) &&
-		    IS_TRUE_SYMOP (IC_LEFT (dic)) &&
-		    isOperandInFarSpace (IC_LEFT (dic)) &&
-		    !isOperandEqual (IC_LEFT (dic), IC_RESULT (ic)))
-			return NULL;
-
-		if (isOperandEqual (IC_RIGHT (ic), IC_RESULT (dic))) {
-			if ((dic->op == LEFT_OP ||
-			     dic->op == RIGHT_OP ||
-			     dic->op == '-') &&
-			    IS_OP_LITERAL (IC_RIGHT (dic))) return NULL;
-			else
-				return dic;
-		}
-	}
-
-	return NULL;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1665,146 +1842,6 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 	hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);
 	return 1;
 
-}
-
-/*-----------------------------------------------------------------*/
-/* findAssignToSym : scanning backwards looks for first assig found */
-/*-----------------------------------------------------------------*/
-static iCode *
-findAssignToSym (operand * op, iCode * ic)
-{
-	iCode *dic;
-
-	for (dic = ic->prev; dic; dic = dic->prev) {
-
-		/* if definition by assignment */
-		if (dic->op == '=' &&
-		    !POINTER_SET (dic) && IC_RESULT (dic)->key == op->key
-/*          &&  IS_TRUE_SYMOP(IC_RIGHT(dic)) */
-			) {
-
-			/* we are interested only if defined in far space */
-			/* or in stack space in case of + & - */
-
-			/* if assigned to a non-symbol then return
-			   true */
-			if (!IS_SYMOP (IC_RIGHT (dic)))
-				break;
-
-			/* if the symbol is in far space then
-			   we should not */
-			if (isOperandInFarSpace (IC_RIGHT (dic)))
-				return NULL;
-
-			/* for + & - operations make sure that
-			   if it is on the stack it is the same
-			   as one of the three operands */
-			if ((ic->op == '+' || ic->op == '-') &&
-			    OP_SYMBOL (IC_RIGHT (dic))->onStack) {
-
-				if (IC_RESULT (ic)->key != IC_RIGHT (dic)->key
-				    && IC_LEFT (ic)->key !=
-				    IC_RIGHT (dic)->key
-				    && IC_RIGHT (ic)->key !=
-				    IC_RIGHT (dic)->key) return NULL;
-			}
-
-			break;
-
-		}
-
-		/* if we find an usage then we cannot delete it */
-		if (IC_LEFT (dic) && IC_LEFT (dic)->key == op->key)
-			return NULL;
-
-		if (IC_RIGHT (dic) && IC_RIGHT (dic)->key == op->key)
-			return NULL;
-
-		if (POINTER_SET (dic) && IC_RESULT (dic)->key == op->key)
-			return NULL;
-	}
-
-	/* now make sure that the right side of dic
-	   is not defined between ic & dic */
-	if (dic) {
-		iCode *sic = dic->next;
-
-		for (; sic != ic; sic = sic->next)
-			if (IC_RESULT (sic) &&
-			    IC_RESULT (sic)->key == IC_RIGHT (dic)->key)
-				return NULL;
-	}
-
-	return dic;
-
-
-}
-
-/*-----------------------------------------------------------------*/
-/* packRegsForSupport :- reduce some registers for support calls   */
-/*-----------------------------------------------------------------*/
-static int
-packRegsForSupport (iCode * ic, eBBlock * ebp)
-{
-	int change = 0;
-	/* for the left & right operand :- look to see if the
-	   left was assigned a true symbol in far space in that
-	   case replace them */
-	if (IS_ITEMP (IC_LEFT (ic)) &&
-	    OP_SYMBOL (IC_LEFT (ic))->liveTo <= ic->seq) {
-		iCode *dic = findAssignToSym (IC_LEFT (ic), ic);
-		iCode *sic;
-
-		if (!dic)
-			goto right;
-
-		/* found it we need to remove it from the
-		   block */
-		for (sic = dic; sic != ic; sic = sic->next)
-			bitVectUnSetBit (sic->rlive, IC_LEFT (ic)->key);
-
-		IC_LEFT (ic)->operand.symOperand =
-			IC_RIGHT (dic)->operand.symOperand;
-		IC_LEFT (ic)->key = IC_RIGHT (dic)->operand.symOperand->key;
-		remiCodeFromeBBlock (ebp, dic);
-		hTabDeleteItem (&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
-		change++;
-	}
-
-	/* do the same for the right operand */
-      right:
-	if (!change &&
-	    IS_ITEMP (IC_RIGHT (ic)) &&
-	    OP_SYMBOL (IC_RIGHT (ic))->liveTo <= ic->seq) {
-		iCode *dic = findAssignToSym (IC_RIGHT (ic), ic);
-		iCode *sic;
-
-		if (!dic)
-			return change;
-
-		/* if this is a subtraction & the result
-		   is a true symbol in far space then don't pack */
-		if (ic->op == '-' && IS_TRUE_SYMOP (IC_RESULT (dic))) {
-			sym_link *etype =
-				getSpec (operandType (IC_RESULT (dic)));
-			if (IN_FARSPACE (SPEC_OCLS (etype)))
-				return change;
-		}
-		/* found it we need to remove it from the
-		   block */
-		for (sic = dic; sic != ic; sic = sic->next)
-			bitVectUnSetBit (sic->rlive, IC_RIGHT (ic)->key);
-
-		IC_RIGHT (ic)->operand.symOperand =
-			IC_RIGHT (dic)->operand.symOperand;
-		IC_RIGHT (ic)->key = IC_RIGHT (dic)->operand.symOperand->key;
-
-		remiCodeFromeBBlock (ebp, dic);
-		hTabDeleteItem (&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
-		change++;
-	}
-
-	return change;
 }
 
 #define IS_OP_RUONLY(x) (x && IS_SYMOP(x) && OP_SYMBOL(x)->ruonly)
@@ -1950,39 +1987,6 @@ isBitwiseOptimizable (iCode * ic)
 			return TRUE;
 	else
 		return FALSE;
-}
-
-/*-----------------------------------------------------------------*/
-/* packForPush - hueristics to reduce iCode for pushing            */
-/*-----------------------------------------------------------------*/
-static void
-packForPush (iCode * ic, eBBlock * ebp)
-{
-	iCode *dic;
-
-	if (ic->op != IPUSH || !IS_ITEMP (IC_LEFT (ic)))
-		return;
-
-	/* must have only definition & one usage */
-	if (bitVectnBitsOn (OP_DEFS (IC_LEFT (ic))) != 1 ||
-	    bitVectnBitsOn (OP_USES (IC_LEFT (ic))) != 1)
-		return;
-
-	/* find the definition */
-	if (!(dic = hTabItemWithKey (iCodehTab,
-				     bitVectFirstBit (OP_DEFS
-						      (IC_LEFT (ic))))))
-			return;
-
-	if (dic->op != '=' || POINTER_SET (dic))
-		return;
-
-	/* we now we know that it has one & only one def & use
-	   and the that the definition is an assignment */
-	IC_LEFT (ic) = IC_RIGHT (dic);
-
-	remiCodeFromeBBlock (ebp, dic);
-	hTabDeleteItem (&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
 }
 
 /*-----------------------------------------------------------------*/

@@ -64,9 +64,21 @@ static char *spname;
 char *fReturnAVR[] = { "r16", "r17", "r18", "r19" };
 unsigned fAVRReturnSize = 4;	/* shared with ralloc.c */
 char **fAVRReturn = fReturnAVR;
-static short rbank = -1;
 static char *larray[4] = { "lo8", "hi8", "hlo8", "hhi8" };
+
+#if 0
+// PENDING: Unused
+static short rbank = -1;
 static char *tscr[4] = { "r0", "r1", "r24", "r25" };
+static unsigned char SLMask[] = { 0xFF, 0xFE, 0xFC, 0xF8, 0xF0,
+	0xE0, 0xC0, 0x80, 0x00
+};
+static unsigned char SRMask[] = { 0xFF, 0x7F, 0x3F, 0x1F, 0x0F,
+	0x07, 0x03, 0x01, 0x00
+};
+
+#endif
+
 static struct {
 	short xPushed;
 	short zPushed;
@@ -80,7 +92,6 @@ static struct {
 extern int avr_ptrRegReq;
 extern int avr_nRegs;
 extern FILE *codeOutFile;
-static void saverbank (int, iCode *, bool);
 #define RESULTONSTACK(x) \
                          (IC_RESULT(x) && IC_RESULT(x)->aop && \
                          IC_RESULT(x)->aop->type == AOP_STK )
@@ -96,17 +107,131 @@ static void saverbank (int, iCode *, bool);
 static lineNode *lineHead = NULL;
 static lineNode *lineCurr = NULL;
 
-static unsigned char SLMask[] = { 0xFF, 0xFE, 0xFC, 0xF8, 0xF0,
-	0xE0, 0xC0, 0x80, 0x00
-};
-static unsigned char SRMask[] = { 0xFF, 0x7F, 0x3F, 0x1F, 0x0F,
-	0x07, 0x03, 0x01, 0x00
-};
-
 #define LSB     0
 #define MSB16   1
 #define MSB24   2
 #define MSB32   3
+
+#if 0
+// PENDING: Unused.
+/*-----------------------------------------------------------------*/
+/* reAdjustPreg - points a register back to where it should        */
+/*-----------------------------------------------------------------*/
+static void
+reAdjustPreg (asmop * aop)
+{
+	int size;
+
+	aop->coff = 0;
+	if ((size = aop->size) <= 1)
+		return;
+	size--;
+	switch (aop->type) {
+	case AOP_X:
+	case AOP_Z:
+		emitcode ("sbiw", "%s,%d", aop->aopu.aop_ptr->name, size);
+		break;
+	}
+
+}
+
+/*-----------------------------------------------------------------*/
+/* outBitC - output a bit C                                        */
+/*-----------------------------------------------------------------*/
+static void
+outBitC (operand * result)
+{
+	emitcode ("clr", "r0");
+	emitcode ("rol", "r0");
+	outAcc (result);
+}
+
+/*-----------------------------------------------------------------*/
+/* inExcludeList - return 1 if the string is in exclude Reg list   */
+/*-----------------------------------------------------------------*/
+static bool
+inExcludeList (char *s)
+{
+	int i = 0;
+
+	if (options.excludeRegs[i] &&
+	    STRCASECMP (options.excludeRegs[i], "none") == 0)
+		return FALSE;
+
+	for (i = 0; options.excludeRegs[i]; i++) {
+		if (options.excludeRegs[i] &&
+		    STRCASECMP (s, options.excludeRegs[i]) == 0)
+			return TRUE;
+	}
+	return FALSE;
+}
+
+/*-----------------------------------------------------------------*/
+/* findLabelBackwards: walks back through the iCode chain looking  */
+/* for the given label. Returns number of iCode instructions     */
+/* between that label and given ic.          */
+/* Returns zero if label not found.          */
+/*-----------------------------------------------------------------*/
+static int
+findLabelBackwards (iCode * ic, int key)
+{
+	int count = 0;
+
+	while (ic->prev) {
+		ic = ic->prev;
+		count++;
+
+		if (ic->op == LABEL && IC_LABEL (ic)->key == key) {
+			/* printf("findLabelBackwards = %d\n", count); */
+			return count;
+		}
+	}
+
+	return 0;
+}
+
+/*-----------------------------------------------------------------*/
+/* addSign - complete with sign                                    */
+/*-----------------------------------------------------------------*/
+static void
+addSign (operand * result, int offset, int sign)
+{
+	int size = (getDataSize (result) - offset);
+	if (size > 0) {
+		if (sign) {
+			emitcode ("rlc", "a");
+			emitcode ("subb", "a,acc");
+			while (size--)
+				aopPut (AOP (result), "a", offset++);
+		}
+		else
+			while (size--)
+				aopPut (AOP (result), zero, offset++);
+	}
+}
+
+/*-----------------------------------------------------------------*/
+/* isLiteralBit - test if lit == 2^n                               */
+/*-----------------------------------------------------------------*/
+static int
+isLiteralBit (unsigned long lit)
+{
+	unsigned long pw[32] = { 1L, 2L, 4L, 8L, 16L, 32L, 64L, 128L,
+		0x100L, 0x200L, 0x400L, 0x800L,
+		0x1000L, 0x2000L, 0x4000L, 0x8000L,
+		0x10000L, 0x20000L, 0x40000L, 0x80000L,
+		0x100000L, 0x200000L, 0x400000L, 0x800000L,
+		0x1000000L, 0x2000000L, 0x4000000L, 0x8000000L,
+		0x10000000L, 0x20000000L, 0x40000000L, 0x80000000L
+	};
+	int idx;
+
+	for (idx = 0; idx < 32; idx++)
+		if (lit == pw[idx])
+			return idx + 1;
+	return 0;
+}
+#endif	// End Unused code section
 
 /*-----------------------------------------------------------------*/
 /* emitcode - writes the code into a file : for now it is simple    */
@@ -986,27 +1111,6 @@ aopPut (asmop * aop, char *s, int offset)
 
 }
 
-/*-----------------------------------------------------------------*/
-/* reAdjustPreg - points a register back to where it should        */
-/*-----------------------------------------------------------------*/
-static void
-reAdjustPreg (asmop * aop)
-{
-	int size;
-
-	aop->coff = 0;
-	if ((size = aop->size) <= 1)
-		return;
-	size--;
-	switch (aop->type) {
-	case AOP_X:
-	case AOP_Z:
-		emitcode ("sbiw", "%s,%d", aop->aopu.aop_ptr->name, size);
-		break;
-	}
-
-}
-
 #define AOP(op) op->aop
 #define AOP_TYPE(op) AOP(op)->type
 #define AOP_SIZE(op) AOP(op)->size
@@ -1110,17 +1214,6 @@ outAcc (operand * result)
 			aopPut (AOP (result), zero, offset++);
 		}
 	}
-}
-
-/*-----------------------------------------------------------------*/
-/* outBitC - output a bit C                                        */
-/*-----------------------------------------------------------------*/
-static void
-outBitC (operand * result)
-{
-	emitcode ("clr", "r0");
-	emitcode ("rol", "r0");
-	outAcc (result);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1601,26 +1694,6 @@ resultRemat (iCode * ic)
 #endif
 
 /*-----------------------------------------------------------------*/
-/* inExcludeList - return 1 if the string is in exclude Reg list   */
-/*-----------------------------------------------------------------*/
-static bool
-inExcludeList (char *s)
-{
-	int i = 0;
-
-	if (options.excludeRegs[i] &&
-	    STRCASECMP (options.excludeRegs[i], "none") == 0)
-		return FALSE;
-
-	for (i = 0; options.excludeRegs[i]; i++) {
-		if (options.excludeRegs[i] &&
-		    STRCASECMP (s, options.excludeRegs[i]) == 0)
-			return TRUE;
-	}
-	return FALSE;
-}
-
-/*-----------------------------------------------------------------*/
 /* genFunction - generated code for function entry                 */
 /*-----------------------------------------------------------------*/
 static void
@@ -1817,30 +1890,6 @@ static void
 genGoto (iCode * ic)
 {
 	emitcode ("rjmp", "L%05d", (IC_LABEL (ic)->key + 100));
-}
-
-/*-----------------------------------------------------------------*/
-/* findLabelBackwards: walks back through the iCode chain looking  */
-/* for the given label. Returns number of iCode instructions     */
-/* between that label and given ic.          */
-/* Returns zero if label not found.          */
-/*-----------------------------------------------------------------*/
-static int
-findLabelBackwards (iCode * ic, int key)
-{
-	int count = 0;
-
-	while (ic->prev) {
-		ic = ic->prev;
-		count++;
-
-		if (ic->op == LABEL && IC_LABEL (ic)->key == key) {
-			/* printf("findLabelBackwards = %d\n", count); */
-			return count;
-		}
-	}
-
-	return 0;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2078,26 +2127,6 @@ genMinusDec (iCode * ic)
 		  icount);
 	return TRUE;
 
-}
-
-/*-----------------------------------------------------------------*/
-/* addSign - complete with sign                                    */
-/*-----------------------------------------------------------------*/
-static void
-addSign (operand * result, int offset, int sign)
-{
-	int size = (getDataSize (result) - offset);
-	if (size > 0) {
-		if (sign) {
-			emitcode ("rlc", "a");
-			emitcode ("subb", "a,acc");
-			while (size--)
-				aopPut (AOP (result), "a", offset++);
-		}
-		else
-			while (size--)
-				aopPut (AOP (result), zero, offset++);
-	}
 }
 
 /*-----------------------------------------------------------------*/
@@ -2564,28 +2593,6 @@ genOrOp (iCode * ic)
 	freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
 	freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
 	freeAsmop (result, NULL, ic, TRUE);
-}
-
-/*-----------------------------------------------------------------*/
-/* isLiteralBit - test if lit == 2^n                               */
-/*-----------------------------------------------------------------*/
-static int
-isLiteralBit (unsigned long lit)
-{
-	unsigned long pw[32] = { 1L, 2L, 4L, 8L, 16L, 32L, 64L, 128L,
-		0x100L, 0x200L, 0x400L, 0x800L,
-		0x1000L, 0x2000L, 0x4000L, 0x8000L,
-		0x10000L, 0x20000L, 0x40000L, 0x80000L,
-		0x100000L, 0x200000L, 0x400000L, 0x800000L,
-		0x1000000L, 0x2000000L, 0x4000000L, 0x8000000L,
-		0x10000000L, 0x20000000L, 0x40000000L, 0x80000000L
-	};
-	int idx;
-
-	for (idx = 0; idx < 32; idx++)
-		if (lit == pw[idx])
-			return idx + 1;
-	return 0;
 }
 
 enum {
@@ -4919,8 +4926,11 @@ genCast (iCode * ic)
 	}
 	else {
 		/* we need to extend the sign :{ */
+                // PENDING: Does nothing on avr
+#if 0
 		char *l = aopGet (AOP (right), AOP_SIZE (right) - 1);
 		MOVA (l);
+#endif
 		emitcode ("rlc", "a");
 		emitcode ("subb", "a,acc");
 		while (size--)
@@ -4992,7 +5002,8 @@ genDjnz (iCode * ic, iCode * ifx)
 static char *recvregs[8] = {
 	"r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23"
 };
-static recvCnt = 0;
+
+static int recvCnt = 0;
 
 /*-----------------------------------------------------------------*/
 /* genReceive - generate code for a receive iCode                  */

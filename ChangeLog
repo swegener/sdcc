@@ -1,3 +1,71 @@
+2004-07-24 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* .version: increased version number to 2.4.3
+
+	Adding version extension according to ChangeLog CVS revision
+	* src/Makefile.in (target all): added dependency 'version.h'
+	* (rule version.h): added rule to create version.h from ChangeLog
+	* src/version.awk: AWK script to create version.h
+	* src/SDCCdwarf2.c (dwWriteModule),
+	* src/SDCCglue.c (initialComments),
+	* src/SDCCmain.c (printVersionInfo): modified to write after
+	version string the version extension number,
+	* src/SDCCutil.c: included "version.h"
+	* (getBuildNumber): NEW, returns SDCC's ChangeLog minor revision
+	number,
+	* src/SDCCutil.h: added prototype for getBuildNumber
+
+	* src/SDCCmain.c (parseCmdLine): when sOpt is 'I' add rest in
+	includeDirsSet, too,
+	* src/SDCCsymt.c (checkSClass): don't emit error when a variable,
+	const char [] is found in function prototype...
+
+	* src/pic16/genarith.c (pic16_genUMult8XLit_8): optimization to omit
+	moving to WREG with source is already in WREG,
+	* src/pic16/gen.h: added AOP_FSR0 and AOP_FSR2 in enum,
+	* src/pic16/gen.c (getFreePtr): updated to look for FSR0 and FSR2,
+	* (aopForSym): stack'ed symbols are partially supported, added
+	if-clause to support symbols in FARSPACE,
+	* (sameRegs): added test for AOP_ACC to see if registers are same,
+	* (pic16_freeAsmop): added case for AOP_FSR0 and AOP_FSR2,
+	* (pic16_aopGet): added case for AOP_FSR0 and AOP_FSR2,
+	* (pic16_popRegFromString): will not allocate a new register if it
+	doesn't find one by name, bug may have introduced...
+	* (pic16_popGet): added case for AOP_FSR0 and AOP_FSR2,
+	* (genIpush): revived to use pic16 port's stack,
+	* (genAddrOf): added incomplete case for stack'ed operand,
+	* (genCast): optimized a pair of MOVFW,MOVWF to MOVFF
+	* src/pic16/genutils.c (pic16_genNot): almot new vesrion for NOT,
+	can handle multibyte operands,
+	* src/pic16/glue.c (pic16_printIval*): some debug info added,
+	* (pic16initialComments): added message for MPLAB compatibility
+	mode enabled,
+	* src/pic16/main.h: prototype for pic16_mplab_comp,
+	* src/pic16/main.c (pic16_optionsTable): new option --mplab-comp,
+	which enabled MPLAB compatibility mode (i.e. no #LINE/#FILE, BANKED)
+	* (_pic16_linkEdit): NEW, handles link stage, transferred here
+	because of increased complexity of procedure,
+	* (_process_pragma): stack pragma changed to format 'stack pos len',
+	emit symbol '_stack_end' to conform with gplink,
+	* src/pic16/pcode.c (pic16_newpCodeOpBit): using pic16_regWithName
+	to search for register,
+	* (pic16_get_op, pic16_get_op2): added case for PO_W, PO_WREG and
+	PO_GPR_REGISTER,
+	* (pic16_pCode2str): when in MPLAB compatibility mode, comment out
+	#LINE directives and replace 'B' with 'BANKED' in instruction opcodes
+	* (pic16_getRegFromInstruction, pic16_getRegFromInstruction2): added
+	case for PO_GPR_REGISTER,
+	* (pic16_AnalyzeBanking): removed the old message for inc2h.pl, past
+	dies, the new era is ahead !...
+	* src/pic16/ralloc.c: added hash reposits pic16_dynAllocRegNames and
+	pic16_dynInternalRegs,
+	* (pic16_allocregWithName, pic16_procregWithName, pic16_regWithname): NEW,
+	* (pic16_allocDirReg): minor optimizations and bug fixes,
+	* (pic16_allocWithIdx): when searching pic16_dynProcessorRegs use fixed,
+
+	* device/lib/pic16/startup/crt0*.c: extern definition of stack_end,
+	load stack and frame pointer with address of 'stack_end' symbol
+
 2004-07-23 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/glue.c (pic16emitStaticSeg): fixed bug with files

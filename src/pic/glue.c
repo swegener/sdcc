@@ -819,7 +819,7 @@ pic14createInterruptVect (FILE * vFile)
     }
 
   /* if the main is only a prototype ie. no body then do nothing */
-  if (!mainf->fbody)
+  if (!IFFUNC_HASBODY(mainf->type))
     {
       /* if ! compile only then main function should be present */
       if (!options.cc_only)
@@ -1003,7 +1003,7 @@ picglue ()
   addSetHead(&tmpfileSet,ovrFile);
 
 
-  if (mainf && mainf->fbody) {
+  if (mainf && IFFUNC_HASBODY(mainf->type)) {
 
     pBlock *pb = newpCodeChain(NULL,'X',newpCodeCharP("; Starting pCode block"));
     addpBlock(pb);
@@ -1145,7 +1145,7 @@ picglue ()
   copyFile (asmFile, ovrFile);
 
   /* create the stack segment MOF */
-  if (mainf && mainf->fbody) {
+  if (mainf && IFFUNC_HASBODY(mainf->type)) {
     fprintf (asmFile, "%s", iComments2);
     fprintf (asmFile, "; Stack segment in internal ram \n");
     fprintf (asmFile, "%s", iComments2);    
@@ -1160,7 +1160,7 @@ picglue ()
   copyFile (asmFile, idata->oFile);
     
   /* if external stack then reserve space of it */
-  if (mainf && mainf->fbody && options.useXstack ) {
+  if (mainf && IFFUNC_HASBODY(mainf->type) && options.useXstack ) {
     fprintf (asmFile, "%s", iComments2);
     fprintf (asmFile, "; external stack \n");
     fprintf (asmFile, "%s", iComments2);
@@ -1189,7 +1189,7 @@ picglue ()
   fprintf (asmFile, "\tORG 0\n");
 
   /* copy the interrupt vector table */
-  if (mainf && mainf->fbody) {
+  if (mainf && IFFUNC_HASBODY(mainf->type)) {
     fprintf (asmFile, "%s", iComments2);
     fprintf (asmFile, "; interrupt vector \n");
     fprintf (asmFile, "%s", iComments2);
@@ -1211,7 +1211,7 @@ picglue ()
   fprintf (asmFile, ";\t.area %s\n", port->mem.post_static_name);
   fprintf (asmFile, ";\t.area %s\n", port->mem.static_name);
     
-  if (mainf && mainf->fbody) {
+  if (mainf && IFFUNC_HASBODY(mainf->type)) {
     fprintf (asmFile,"__sdcc_gsinit_startup:\n");
     /* if external stack is specified then the
        higher order byte of the xdatalocation is
@@ -1226,7 +1226,7 @@ picglue ()
 
   }
 
-  if (port->general.glue_up_main && mainf && mainf->fbody)
+  if (port->general.glue_up_main && mainf && IFFUNC_HASBODY(mainf->type))
     {
       /* This code is generated in the post-static area.
        * This area is guaranteed to follow the static area

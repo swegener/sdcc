@@ -106,28 +106,28 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
     {
 
       /* first one */
-      if (IS_REGPARM (func->args->etype))
+      if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
 	{
 	  newic = newiCode (SEND, IC_LEFT (ic), NULL);
 	}
       else
 	{
 	  newic = newiCode ('=', NULL, IC_LEFT (ic));
-	  IC_RESULT (newic) = operandFromValue (func->args);
+	  IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type));
 	}
 
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
 
       /* second one */
-      if (IS_REGPARM (func->args->next->etype))
+      if (IS_REGPARM (FUNC_ARGS(func->type)->next->etype))
 	{
 	  newic = newiCode (SEND, IC_LEFT (ic), NULL);
 	}
       else
 	{
 	  newic = newiCode ('=', NULL, IC_RIGHT (ic));
-	  IC_RESULT (newic) = operandFromValue (func->args->next);
+	  IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type)->next);
 	}
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
@@ -137,7 +137,7 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
     {
 
       /* push right */
-      if (IS_REGPARM (func->args->next->etype))
+      if (IS_REGPARM (FUNC_ARGS(func->type)->next->etype))
 	{
 	  newic = newiCode (SEND, right, NULL);
 	}
@@ -152,7 +152,7 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
       newic->lineno = lineno;
 
       /* insert push left */
-      if (IS_REGPARM (func->args->etype))
+      if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
 	{
 	  newic = newiCode (SEND, left, NULL);
 	}
@@ -207,12 +207,12 @@ found:
   if (!options.float_rent)
     {
       /* first one */
-      if (IS_REGPARM (func->args->etype))
+      if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
 	newic = newiCode (SEND, IC_RIGHT (ic), NULL);
       else
 	{
 	  newic = newiCode ('=', NULL, IC_RIGHT (ic));
-	  IC_RESULT (newic) = operandFromValue (func->args);
+	  IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type));
 	}
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = linenno;
@@ -221,7 +221,7 @@ found:
   else
     {
       /* push the left */
-      if (IS_REGPARM (func->args->etype))
+      if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
 	newic = newiCode (SEND, IC_RIGHT (ic), NULL);
       else
 	{
@@ -276,12 +276,12 @@ found:
   if (!options.float_rent)
     {
       /* first one */
-      if (IS_REGPARM (func->args->etype))
+      if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
 	newic = newiCode (SEND, IC_RIGHT (ic), NULL);
       else
 	{
 	  newic = newiCode ('=', NULL, IC_RIGHT (ic));
-	  IC_RESULT (newic) = operandFromValue (func->args);
+	  IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type));
 	}
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
@@ -291,7 +291,7 @@ found:
     {
 
       /* push the left */
-      if (IS_REGPARM (func->args->etype))
+      if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
 	newic = newiCode (SEND, IC_RIGHT (ic), NULL);
       else
 	{
@@ -360,23 +360,23 @@ found:
   if (!options.intlong_rent)
     {
       /* first one */
-      if (IS_REGPARM (func->args->etype))
+      if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
 	newic = newiCode (SEND, IC_LEFT (ic), NULL);
       else
 	{
 	  newic = newiCode ('=', NULL, IC_LEFT (ic));
-	  IC_RESULT (newic) = operandFromValue (func->args);
+	  IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type));
 	}
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
 
       /* second one */
-      if (IS_REGPARM (func->args->next->etype))
+      if (IS_REGPARM (FUNC_ARGS(func->type)->next->etype))
 	newic = newiCode (SEND, IC_RIGHT (ic), NULL);
       else
 	{
 	  newic = newiCode ('=', NULL, IC_RIGHT (ic));
-	  IC_RESULT (newic) = operandFromValue (func->args->next);
+	  IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type)->next);
 	}
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
@@ -386,7 +386,7 @@ found:
     {
       /* compiled as reentrant then push */
       /* push right */
-      if (IS_REGPARM (func->args->next->etype))
+      if (IS_REGPARM (FUNC_ARGS(func->type)->next->etype))
         {
           newic = newiCode (SEND, IC_RIGHT (ic), NULL);
         }
@@ -401,7 +401,7 @@ found:
       newic->lineno = lineno;
 
       /* insert push left */
-      if (IS_REGPARM (func->args->etype))
+      if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
         {
           newic = newiCode (SEND, IC_LEFT (ic), NULL);
         }

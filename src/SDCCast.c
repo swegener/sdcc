@@ -257,7 +257,6 @@ copyAst (ast * src)
   dest->lineno = src->lineno;
   dest->level = src->level;
   dest->funcName = src->funcName;
-  dest->argSym = src->argSym;
 
   /* if this is a leaf */
   /* if value */
@@ -542,12 +541,18 @@ funcOfType (char *name, sym_link * type, sym_link * argType,
   /* create the symbol */
   sym = newSymbol (name, 0);
 
+  /* setup return value */
+  sym->type = newLink ();
+  DCL_TYPE (sym->type) = FUNCTION;
+  sym->type->next = copyLinkChain (type);
+  sym->etype = getSpec (sym->type);
+  FUNC_ISREENT(sym->type) = rent;
+
   /* if arguments required */
   if (nArgs)
     {
-
       value *args;
-      args = sym->args = newValue ();
+      args = FUNC_ARGS(sym->type) = newValue ();
 
       while (nArgs--)
 	{
@@ -558,13 +563,6 @@ funcOfType (char *name, sym_link * type, sym_link * argType,
 	  args = args->next = newValue ();
 	}
     }
-
-  /* setup return value */
-  sym->type = newLink ();
-  DCL_TYPE (sym->type) = FUNCTION;
-  sym->type->next = copyLinkChain (type);
-  sym->etype = getSpec (sym->type);
-  SPEC_RENT (sym->etype) = rent;
 
   /* save it */
   addSymChain (sym);
@@ -603,13 +601,11 @@ reverseParms (ast * ptree)
 /*-----------------------------------------------------------------*/
 int 
 processParms (ast * func,
-	      value * defParm,
+	      value *defParm,
 	      ast * actParm,
 	      int *parmNumber, // unused, although updated
 	      bool rightmost) // double checked?
 {
-  sym_link *fetype = func->etype;
-
   /* if none of them exist */
   if (!defParm && !actParm)
     return 0;
@@ -625,7 +621,7 @@ processParms (ast * func,
   /* if the function is being called via a pointer &   */
   /* it has not been defined a reentrant then we cannot */
   /* have parameters                                   */
-  if (func->type != EX_VALUE && !IS_RENT (fetype) && !options.stackAuto)
+  if (func->type != EX_VALUE && !IFFUNC_ISREENT (func->ftype) && !options.stackAuto)
     {
       werror (W_NONRENT_ARGS);
       return 1;
@@ -633,9 +629,7 @@ processParms (ast * func,
 
   /* if defined parameters ended but actual parameters */
   /* exist and this is not defined as a variable arg   */
-  /* also check if statckAuto option is specified      */ // jwk: WHY?
-  if ((!defParm) && actParm && (!func->hasVargs) 
-      /* && !options.stackAuto && !IS_RENT (fetype) */)
+  if (!defParm && actParm && !IFFUNC_HASVARARGS(func->ftype))
     {
       werror (E_TOO_MANY_PARMS);
       return 1;
@@ -649,7 +643,7 @@ processParms (ast * func,
     }
 
   /* If this is a varargs function... */
-  if (!defParm && actParm && func->hasVargs)
+  if (!defParm && actParm && IFFUNC_HASVARARGS(func->ftype))
     {
       ast *newType = NULL;
       sym_link *ftype;
@@ -691,6 +685,7 @@ processParms (ast * func,
 
       if (IS_AGGREGATE (ftype))
 	{
+	  // jwk: don't we need aggregateToPointer here?
 	  newType = newAst_LINK (copyLinkChain (ftype));
 	  DCL_TYPE (newType->opval.lnk) = GPOINTER;
 	}
@@ -716,7 +711,7 @@ processParms (ast * func,
   /* if defined parameters ended but actual has not & */
   /* stackAuto                */
   if (!defParm && actParm &&
-      (options.stackAuto || IS_RENT (fetype)))
+      (options.stackAuto || IFFUNC_ISREENT (func->ftype)))
     return 0;
 
   resolveSymbols (actParm);
@@ -734,7 +729,7 @@ processParms (ast * func,
        * Therefore, if there are more defined parameters, the caller didn't
        * supply enough.
        */
-      if (rightmost && defParm->next)
+      if (0 && rightmost && defParm->next)
 	{
 	  werror (E_TOO_FEW_PARMS);
 	  return 1;
@@ -767,9 +762,6 @@ processParms (ast * func,
       actParm->ftype = defParm->type;
     }
 
-/*    actParm->argSym = resolveFromTable(defParm)->sym ; */
-
-  actParm->argSym = defParm->sym;
   /* make a copy and change the regparm type to the defined parm */
   actParm->etype = getSpec (actParm->ftype = copyLinkChain (actParm->ftype));
   SPEC_REGPARM (actParm->etype) = SPEC_REGPARM (defParm->etype);
@@ -1915,11 +1907,6 @@ decorateType (ast * tree)
 
 	  /* otherwise just copy the type information */
 	  COPYTYPE (TTYPE (tree), TETYPE (tree), tree->opval.val->type);
-	  if (funcInChain (tree->opval.val->type))
-	    {
-	      tree->hasVargs = tree->opval.val->sym->hasVargs;
-	      tree->args = copyValueChain (tree->opval.val->sym->args);
-	    }
 	  return tree;
 	}
 
@@ -1950,13 +1937,6 @@ decorateType (ast * tree)
 
 		  /* and mark it as referenced */
 		  tree->opval.val->sym->isref = 1;
-		  /* if this is of type function or function pointer */
-		  if (funcInChain (tree->opval.val->type))
-		    {
-		      tree->hasVargs = tree->opval.val->sym->hasVargs;
-		      tree->args = copyValueChain (tree->opval.val->sym->args);
-
-		    }
 		}
 	    }
 	}
@@ -2044,7 +2024,7 @@ decorateType (ast * tree)
 	}
       TTYPE (tree) = structElemType (LTYPE (tree),
 				     (tree->right->type == EX_VALUE ?
-			       tree->right->opval.val : NULL), &tree->args);
+			       tree->right->opval.val : NULL));
       TETYPE (tree) = getSpec (TTYPE (tree));
       return tree;
 
@@ -2068,7 +2048,7 @@ decorateType (ast * tree)
 
       TTYPE (tree) = structElemType (LTYPE (tree)->next,
 				     (tree->right->type == EX_VALUE ?
-			       tree->right->opval.val : NULL), &tree->args);
+			       tree->right->opval.val : NULL));
       TETYPE (tree) = getSpec (TTYPE (tree));
       return tree;
 
@@ -2356,9 +2336,7 @@ decorateType (ast * tree)
 	    }
 	  TTYPE (tree) = copyLinkChain ((IS_PTR (LTYPE (tree)) || IS_ARRAY (LTYPE (tree))) ?
 					LTYPE (tree)->next : NULL);
-	  TETYPE (tree) = getSpec (TTYPE (tree));
-	  tree->args = tree->left->args;
-	  tree->hasVargs = tree->left->hasVargs;
+ 	  TETYPE (tree) = getSpec (TTYPE (tree));
 	  SPEC_CONST (TETYPE (tree)) = DCL_PTR_CONST (LTYPE(tree));
 	  return tree;
 	}
@@ -3149,17 +3127,17 @@ decorateType (ast * tree)
       parmNumber = 1;
 
       if (processParms (tree->left,
-			tree->left->args,
+			FUNC_ARGS(tree->left->ftype),
 			tree->right, &parmNumber, TRUE))
 	goto errorTreeReturn;
 
-      if (options.stackAuto || IS_RENT (LETYPE (tree)))
+      if (options.stackAuto || IFFUNC_ISREENT (LTYPE (tree)))
 	{
-	  tree->left->args = reverseVal (tree->left->args);
+	  //IFFUNC_ARGS(tree->left->ftype) = 
+	  //reverseVal (IFFUNC_ARGS(tree->left->ftype));
 	  reverseParms (tree->right);
 	}
 
-      tree->args = tree->left->args;
       TETYPE (tree) = getSpec (TTYPE (tree) = LTYPE (tree)->next);
       return tree;
 
@@ -4167,7 +4145,7 @@ createFunction (symbol * name, ast * body)
   iCode *piCode = NULL;
 
   /* if check function return 0 then some problem */
-  if (checkFunction (name) == 0)
+  if (checkFunction (name, NULL) == 0)
     return NULL;
 
   /* create a dummy block if none exists */
@@ -4201,22 +4179,22 @@ createFunction (symbol * name, ast * body)
   /* set the stack pointer */
   /* PENDING: check this for the mcs51 */
   stackPtr = -port->stack.direction * port->stack.call_overhead;
-  if (IS_ISR (name->etype))
+  if (IFFUNC_ISISR (name->type))
     stackPtr -= port->stack.direction * port->stack.isr_overhead;
-  if (IS_RENT (name->etype) || options.stackAuto)
+  if (IFFUNC_ISREENT (name->type) || options.stackAuto)
     stackPtr -= port->stack.direction * port->stack.reent_overhead;
 
   xstackPtr = -port->stack.direction * port->stack.call_overhead;
 
   fetype = getSpec (name->type);	/* get the specifier for the function */
   /* if this is a reentrant function then */
-  if (IS_RENT (fetype))
+  if (IFFUNC_ISREENT (name->type))
     reentrant++;
 
-  allocParms (name->args);	/* allocate the parameters */
+  allocParms (FUNC_ARGS(name->type));	/* allocate the parameters */
 
   /* do processing for parameters that are passed in registers */
-  processRegParms (name->args, body);
+  processRegParms (FUNC_ARGS(name->type), body);
 
   /* set the stack pointer */
   stackPtr = 0;
@@ -4239,7 +4217,7 @@ createFunction (symbol * name, ast * body)
 
   ex = newAst_VALUE (symbolVal (name));		/* create name       */
   ex = newNode (FUNCTION, ex, body);
-  ex->values.args = name->args;
+  ex->values.args = FUNC_ARGS(name->type);
 
   if (fatalError)
     {
@@ -4274,16 +4252,16 @@ skipall:
   /* dealloc the block variables */
   processBlockVars (body, &stack, DEALLOCATE);
   /* deallocate paramaters */
-  deallocParms (name->args);
+  deallocParms (FUNC_ARGS(name->type));
 
-  if (IS_RENT (fetype))
+  if (IFFUNC_ISREENT (name->type))
     reentrant--;
 
   /* we are done freeup memory & cleanup */
   noLineno--;
   labelKey = 1;
   name->key = 0;
-  name->fbody = 1;
+  FUNC_HASBODY(name->type) = 1;
   addSet (&operKeyReset, name);
   applyToSet (operKeyReset, resetParmKey);
 

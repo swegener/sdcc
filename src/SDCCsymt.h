@@ -102,20 +102,11 @@ typedef struct specifier
     unsigned _static:1;		/* 1=static keyword found     */
     unsigned _extern:1;		/* 1=extern found             */
     unsigned _absadr:1;		/* absolute address specfied  */
-    unsigned _reent:1;		/* function is reentrant      */
-    unsigned _intrtn:1;		/* this is an interrupt routin */
-    unsigned _rbank:1;		/* seperate register bank     */
     unsigned _volatile:1;	/* is marked as volatile      */
     unsigned _const:1;		/* is a constant              */
-    unsigned _critical:1;	/* critical function          */
-    unsigned _naked:1;		/* naked function	      */
     unsigned _typedef:1;	/* is typedefed               */
     unsigned _isregparm:1;	/* is the first parameter     */
     unsigned _isenum:1;		/* is an enumerated type      */
-    unsigned nonbanked:1;	/* function has the nonbanked attribute */
-    unsigned banked:1;		/* function has the banked attribute */
-    unsigned _IntNo;		/* 1=Interrupt svc routine    */
-    short _regbank;		/* register bank 2b used      */
     unsigned _addr;		/* address of symbol          */
     unsigned _stack;		/* stack offset for stacked v */
     unsigned _bitStart;		/* bit start position         */
@@ -158,7 +149,7 @@ typedef struct declarator
     unsigned int num_elem;	/* # of elems if type==array  */
     short ptr_const:1;		/* pointer is constant        */
     short ptr_volatile:1;	/* pointer is volatile        */
-    struct sym_link *tspec;	/* pointer type specifier      */
+    struct sym_link *tspec;	/* pointer type specifier     */
   }
 declarator;
 
@@ -174,8 +165,27 @@ typedef struct sym_link
       {
 	specifier s;		/* if CLASS == SPECIFIER      */
 	declarator d;		/* if CLASS == DECLARATOR     */
-      }
-    select;
+      } select;
+
+    /* function attributes */
+    struct {
+      struct value *args;       /* the defined arguments      */
+      unsigned hasVargs:1;      /* functions has varargs      */
+      unsigned calleeSaves:1;	/* functions uses callee save */
+      unsigned hasbody:1;     	/* function body defined      */
+      //unsigned ret:1;		/* return statement for a function */
+      unsigned hasFcall:1;	/* does it call other functions */
+      unsigned reent:1;		/* function is reentrant      */
+      unsigned naked:1;		/* naked function	      */
+
+      unsigned nonbanked:1;	/* function has the nonbanked attribute */
+      unsigned banked:1;	/* function has the banked attribute */
+      unsigned critical:1;	/* critical function          */
+      unsigned intrtn:1;	/* this is an interrupt routin */
+      unsigned rbank:1;		/* seperate register bank     */
+      unsigned intno;		/* 1=Interrupt svc routine    */
+      unsigned regbank;		/* register bank 2b used      */
+    } funcAttrs;
 
     struct sym_link *next;	/* next element on the chain  */
   }
@@ -189,11 +199,8 @@ typedef struct symbol
     short level;		/* declration lev,fld offset */
     short block;		/* sequential block # of defintion */
     int key;
-    unsigned fbody:1;		/* function body defined             */
     unsigned implicit:1;	/* implicit flag                     */
     unsigned undefined:1;	/* undefined variable                */
-    unsigned ret:1;		/* return statement for a function   */
-    unsigned hasVargs:1;	/* has a variable argument list      */
     unsigned _isparm:1;		/* is a parameter          */
     unsigned ismyparm:1;	/* is parameter of the function being generated */
     unsigned isitmp:1;		/* is an intermediate temp */
@@ -206,8 +213,6 @@ typedef struct symbol
     unsigned allocreq:1;	/* allocation is required for this variable */
     unsigned addrtaken:1;	/* address of the symbol was taken */
     unsigned isreqv:1;		/* is the register quivalent of a symbol */
-    unsigned hasFcall:1;	/* for functions does it call other functions */
-    unsigned calleeSave:1;	/* for functions uses callee save paradigm */
     unsigned udChked:1;		/* use def checking has been already done */
 
     /* following flags are used by the backend
@@ -258,7 +263,6 @@ typedef struct symbol
     int lastLine;		/* for functions the last line */
     struct sym_link *type;	/* 1st link to declator chain */
     struct sym_link *etype;	/* last link to declarator chn */
-    struct value *args;		/* arguments if function      */
     struct symbol *next;	/* crosslink to next symbol   */
     struct symbol *localof;	/* local variable of which function */
     struct initList *ival;	/* ptr to initializer if any  */
@@ -278,6 +282,42 @@ symbol;
 #define DCL_PTR_CONST(l) l->select.d.ptr_const
 #define DCL_PTR_VOLATILE(l) l->select.d.ptr_volatile
 #define DCL_TSPEC(l) l->select.d.tspec
+
+#define FUNC_DEBUG //assert(IS_FUNC(x));
+#define FUNC_HASVARARGS(x) (x->funcAttrs.hasVargs)
+#define IFFUNC_HASVARARGS(x) (IS_FUNC(x) && FUNC_HASVARARGS(x))
+#define FUNC_ARGS(x) (x->funcAttrs.args)
+#define IFFUNC_ARGS(x) (IS_FUNC(x) && FUNC_ARGS(x))
+#define FUNC_HASFCALL(x) (x->funcAttrs.hasFcall)
+#define IFFUNC_HASFCALL(x) (IS_FUNC(x) && FUNC_HASFCALL(x))
+#define FUNC_HASBODY(x) (x->funcAttrs.hasbody)
+#define IFFUNC_HASBODY(x) (IS_FUNC(x) && FUNC_HASBODY(x))
+#define FUNC_CALLEESAVES(x) (x->funcAttrs.calleeSaves)
+#define IFFUNC_CALLEESAVES(x) (IS_FUNC(x) && FUNC_CALLEESAVES(x))
+#define FUNC_ISISR(x) (x->funcAttrs.intrtn)
+#define IFFUNC_ISISR(x) (IS_FUNC(x) && FUNC_ISISR(x))
+//#define FUNC_RBANK(x) (x->funcAttrs.rbank)
+#define IFFUNC_RBANK(x) (IS_FUNC(x) && FUNC_RBANK(x))
+#define FUNC_INTNO(x) (x->funcAttrs.intno)
+#define FUNC_REGBANK(x) (x->funcAttrs.regbank)
+
+#define FUNC_ISREENT(x) (x->funcAttrs.reent)
+#define IFFUNC_ISREENT(x) (IS_FUNC(x) && FUNC_ISREENT(x))
+#define FUNC_ISNAKED(x) (x->funcAttrs.naked)
+#define IFFUNC_ISNAKED(x) (IS_FUNC(x) && FUNC_ISNAKED(x))
+#define FUNC_NONBANKED(x) (x->funcAttrs.nonbanked)
+#define IFFUNC_NONBANKED(x) (IS_FUNC(x) && FUNC_NONBANKED(x))
+#define FUNC_BANKED(x) (x->funcAttrs.banked)
+#define IFFUNC_BANKED(x) (IS_FUNC(x) && FUNC_BANKED(x))
+#define FUNC_ISCRITICAL(x) (x->funcAttrs.critical)
+#define IFFUNC_ISCRITICAL(x) (IS_FUNC(x) && FUNC_ISCRITICAL(x))
+
+// jwk: I am not sure about this
+#define IFFUNC_ISBANKEDCALL(x) (!IFFUNC_NONBANKED(x) && \
+  (options.model == MODEL_LARGE || \
+   options.model == MODEL_MEDIUM || \
+  IFFUNC_BANKED(x)))
+
 #define SPEC_NOUN(x) x->select.s.noun
 #define SPEC_LONG(x) x->select.s._long
 #define SPEC_USIGN(x) x->select.s._unsigned
@@ -287,8 +327,6 @@ symbol;
 #define SPEC_STAT(x) x->select.s._static
 #define SPEC_EXTR(x) x->select.s._extern
 #define SPEC_CODE(x) x->select.s._codesg
-#define SPEC_RENT(x) x->select.s._reent
-#define SPEC_INTN(x) x->select.s._IntNo
 #define SPEC_ABSA(x) x->select.s._absadr
 #define SPEC_BANK(x) x->select.s._regbank
 #define SPEC_ADDR(x) x->select.s._addr
@@ -303,17 +341,11 @@ symbol;
  * _bitStart field instead of defining a new field.
  */
 #define SPEC_ISR_SAVED_BANKS(x) x->select.s._bitStart
-#define SPEC_BNKF(x) x->select.s._rbank
-#define SPEC_INTRTN(x) x->select.s._intrtn
-#define SPEC_CRTCL(x) x->select.s._critical
-#define SPEC_NAKED(x) x->select.s._naked
 #define SPEC_VOLATILE(x) x->select.s._volatile
 #define SPEC_CONST(x) x->select.s._const
 #define SPEC_STRUCT(x) x->select.s.v_struct
 #define SPEC_TYPEDEF(x) x->select.s._typedef
 #define SPEC_REGPARM(x) x->select.s._isregparm
-#define SPEC_NONBANKED(x) x->select.s.nonbanked
-#define SPEC_BANKED(x) x->select.s.banked
 
 /* type check macros */
 #define IS_DECL(x)   ( x && x->class == DECLARATOR	)
@@ -357,11 +389,7 @@ symbol;
 #define IS_ARITHMETIC(x) (IS_INTEGRAL(x) || IS_FLOAT(x))
 #define IS_AGGREGATE(x) (IS_ARRAY(x) || IS_STRUCT(x))
 #define IS_LITERAL(x)   (IS_SPEC(x)  && x->select.s.sclass == S_LITERAL)
-#define IS_ISR(x)	(IS_SPEC(x)  && SPEC_INTRTN(x))
 #define IS_REGPARM(x)   (IS_SPEC(x) && SPEC_REGPARM(x))
-#define IS_NONBANKED(x) (IS_SPEC(x) && SPEC_NONBANKED(x))
-#define IS_BANKED(x)	(IS_SPEC(x) && SPEC_BANKED(x))
-#define IS_BANKEDCALL(x) (IS_SPEC(x) && !SPEC_NONBANKED(x) && !SPEC_STAT(x) && (options.model == MODEL_LARGE || options.model == MODEL_MEDIUM || SPEC_BANKED(x)))
 
 /* forward declaration for the global vars */
 extern bucket *SymbolTab[];
@@ -433,12 +461,12 @@ sym_link *newIntLink ();
 sym_link *newCharLink ();
 sym_link *newLongLink ();
 int compareType (sym_link *, sym_link *);
-int checkFunction (symbol *);
+int checkFunction (symbol *, symbol *);
 void cleanUpLevel (bucket **, int);
 void cleanUpBlock (bucket **, int);
 int funcInChain (sym_link *);
 void addSymChain (symbol *);
-sym_link *structElemType (sym_link *, value *, value **);
+sym_link *structElemType (sym_link *, value *);
 symbol *getStructElement (structdef *, symbol *);
 sym_link *computeType (sym_link *, sym_link *);
 void processFuncArgs (symbol *, int);

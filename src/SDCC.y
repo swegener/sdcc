@@ -98,11 +98,11 @@ value *cenum = NULL  ;  /* current enumeration  type chain*/
 %type <sym> struct_declarator_list  struct_declaration   struct_declaration_list
 %type <sym> declaration init_declarator_list init_declarator
 %type <sym> declaration_list identifier_list parameter_identifier_list
-%type <sym> declarator2_using_reentrant while do for
+%type <sym> declarator2_function_attributes while do for
 %type <lnk> pointer type_specifier_list type_specifier type_name
 %type <lnk> storage_class_specifier struct_or_union_specifier
 %type <lnk> declaration_specifiers  sfr_reg_bit type_specifier2
-%type <lnk> using_reentrant using_reentrant_interrupt enum_specifier
+%type <lnk> function_attribute function_attributes enum_specifier
 %type <lnk> abstract_declarator abstract_declarator2 unqualified_pointer
 %type <val> parameter_type_list parameter_list parameter_declaration opt_assign_expr
 %type <sdef> stag opt_stag
@@ -128,7 +128,9 @@ file
    ;
 
 external_definition
-   : function_definition     { blockNo=0;}
+   : function_definition     { 
+                               blockNo=0;
+                             }
    | declaration             { 
 			       if ($1 && $1->type
 				&& IS_FUNC($1->type))
@@ -167,41 +169,41 @@ function_definition
 				}
    ;
 
-using_reentrant
-   : using_reentrant_interrupt
-   | using_reentrant_interrupt using_reentrant { $$ = mergeSpec($1,$2,"using_reentrant"); }
+function_attribute
+   : function_attributes
+   | function_attributes function_attribute { $$ = mergeSpec($1,$2,"function_attribute"); }
    ;
 
-using_reentrant_interrupt
+function_attributes
    :  USING CONSTANT {
                         $$ = newLink() ;
                         $$->class = SPECIFIER   ;
-                        SPEC_BNKF($$) = 1;
-                        SPEC_BANK($$) = (int) floatFromVal($2);                       
+			FUNC_REGBANK($$) = (int) floatFromVal($2);
+                        //FUNC_RBANK($$) = 1;
                      }
    |  REENTRANT      {  $$ = newLink ();
                         $$->class = SPECIFIER   ;
-                        SPEC_RENT($$) = 1;
+			FUNC_ISREENT($$)=1;
                      }
    |  CRITICAL       {  $$ = newLink ();
                         $$->class = SPECIFIER   ;
-                        SPEC_CRTCL($$) = 1;
+			FUNC_ISCRITICAL($$) = 1;
                      }
    |  NAKED          {  $$ = newLink ();
                         $$->class = SPECIFIER   ;
-                        SPEC_NAKED($$) = 1;
+			FUNC_ISNAKED($$)=1;
                      }
    |  NONBANKED      {$$ = newLink ();
                         $$->class = SPECIFIER   ;
-                        SPEC_NONBANKED($$) = 1;
-			if (SPEC_BANKED($$)) {
+                        FUNC_NONBANKED($$) = 1;
+			if (FUNC_BANKED($$)) {
 			    werror(W_BANKED_WITH_NONBANKED);
 			}
                      }
    |  BANKED         {$$ = newLink ();
                         $$->class = SPECIFIER   ;
-                        SPEC_BANKED($$) = 1;
-			if (SPEC_NONBANKED($$)) {
+                        FUNC_BANKED($$) = 1;
+			if (FUNC_NONBANKED($$)) {
 			    werror(W_BANKED_WITH_NONBANKED);
 			}
 			if (SPEC_STAT($$)) {
@@ -212,8 +214,8 @@ using_reentrant_interrupt
                      {
                         $$ = newLink () ;
                         $$->class = SPECIFIER ;
-                        SPEC_INTN($$) = $1 ;
-                        SPEC_INTRTN($$) = 1;
+                        FUNC_INTNO($$) = $1 ;
+                        FUNC_ISISR($$) = 1;
                      }
    ;
 
@@ -867,17 +869,34 @@ opt_assign_expr
    ;
 
 declarator
-   : declarator2_using_reentrant	{ $$ = $1; }
-   | pointer declarator2_using_reentrant
+   : declarator2_function_attributes	{ $$ = $1; }
+   | pointer declarator2_function_attributes
          {
 	     addDecl ($2,0,reverseLink($1));
 	     $$ = $2 ;
          }
    ;
 
-declarator2_using_reentrant
+declarator2_function_attributes
    : declarator2		  { $$ = $1 ; } 
-   | declarator2 using_reentrant  { addDecl ($1,0,$2); }     
+   | declarator2 function_attribute  { 
+       // do the functionAttributes (not the args and hasVargs !!)
+       sym_link *funcType=$1->etype;
+       struct value *args=FUNC_ARGS(funcType);
+       unsigned hasVargs=FUNC_HASVARARGS(funcType);
+
+       memcpy (&funcType->funcAttrs, &$2->funcAttrs, 
+	       sizeof($2->funcAttrs));
+
+       FUNC_ARGS(funcType)=args;
+       FUNC_HASVARARGS(funcType)=hasVargs;
+
+       // just to be sure
+       memset (&$2->funcAttrs, 0,
+	       sizeof($2->funcAttrs));
+       
+       addDecl ($1,0,$2); 
+   }     
    ;
 
 declarator2
@@ -914,20 +933,22 @@ declarator2
 	   
 	     addDecl ($1,FUNCTION,NULL) ;
 	   
-	     $1->hasVargs = IS_VARG($4);
-	     $1->args = reverseVal($4)  ;
-	     
+	     FUNC_HASVARARGS($1->type) = IS_VARG($4);
+	     FUNC_ARGS($1->type) = reverseVal($4);
 	     
 	     /* nest level was incremented to take care of the parms  */
 	     NestLevel-- ;
 	     currBlockno--;
 
-	     // if this was a pointer to a function, remove the symbol args
-	     // (if any)
-	     if (IS_PTR($1->type) && IS_FUNC($1->etype)) {
+	     // if this was a pointer (to a function)
+	     if (IS_PTR($1->type)) {
+	       // move the args and hasVargs to the function
+	       FUNC_ARGS($1->etype)=FUNC_ARGS($1->type);
+	       FUNC_HASVARARGS($1->etype)=FUNC_HASVARARGS($1->type);
+	       memset (&$1->type->funcAttrs, 0,
+		       sizeof($1->type->funcAttrs));
+	       // remove the symbol args (if any)
 	       cleanUpLevel(SymbolTab,NestLevel+1);
-	       /* fprintf (stderr, "Removed parm symbols of %s in line %d\n", 
-		  $1->name, yylineno); */
 	     }
 	     
 	     $$ = $1;

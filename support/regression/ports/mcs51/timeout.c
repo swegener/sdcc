@@ -44,6 +44,9 @@
 	The child will be killed.
 */
 
+#include <sys/time.h>
+#include <sys/resource.h>
+
 #include <signal.h>
 #include <stdio.h>
 #include <sys/wait.h>

@@ -1119,7 +1119,7 @@ void genMinusBits (iCode *ic)
 /*-----------------------------------------------------------------*/
 void genMinus (iCode *ic)
 {
-  int size, offset = 0,same;
+  int size, offset = 0, same=0;
   unsigned long lit = 0L;
 
   DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);

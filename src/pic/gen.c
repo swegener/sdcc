@@ -1773,7 +1773,7 @@ static void saveRegisters(iCode *lic)
     int i;
     iCode *ic;
     bitVect *rsave;
-    sym_link *detype;
+    sym_link *dtype;
 
     DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
     /* look for call */
@@ -1788,7 +1788,7 @@ static void saveRegisters(iCode *lic)
 
     /* if the registers have been saved already then
     do nothing */
-    if (ic->regsSaved || (OP_SYMBOL(IC_LEFT(ic))->calleeSave))
+    if (ic->regsSaved || IFFUNC_CALLEESAVES(OP_SYMBOL(IC_LEFT(ic))->type))
         return ;
 
     /* find the registers in use at this time 
@@ -1820,13 +1820,13 @@ static void saveRegisters(iCode *lic)
 		pic14_emitcode("push","%s",pic14_regWithIdx(i)->dname);
 	}
 
-    detype = getSpec(operandType(IC_LEFT(ic)));
-    if (detype        && 
-        (SPEC_BANK(currFunc->etype) != SPEC_BANK(detype)) &&
-	IS_ISR(currFunc->etype) &&
+    dtype = operandType(IC_LEFT(ic));
+    if (dtype        && 
+        (FUNC_REGBANK(currFunc->type) != FUNC_REGBANK(dtype)) &&
+	IFFUNC_ISISR(currFunc->type) &&
         !ic->bankSaved) 
 
-        saverbank(SPEC_BANK(detype),ic,TRUE);
+        saverbank(FUNC_REGBANK(dtype),ic,TRUE);
 
 }
 /*-----------------------------------------------------------------*/
@@ -2128,7 +2128,7 @@ static void saverbank (int bank, iCode *ic, bool pushPsw)
 /*-----------------------------------------------------------------*/
 static void genCall (iCode *ic)
 {
-    sym_link *detype;   
+    sym_link *dtype;   
 
     DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
@@ -2139,13 +2139,13 @@ static void genCall (iCode *ic)
     /* if we are calling a function that is not using
     the same register bank then we need to save the
     destination registers on the stack */
-    detype = getSpec(operandType(IC_LEFT(ic)));
-    if (detype        && 
-        (SPEC_BANK(currFunc->etype) != SPEC_BANK(detype)) &&
-	IS_ISR(currFunc->etype) &&
+    dtype = operandType(IC_LEFT(ic));
+    if (dtype        && 
+        (FUNC_REGBANK(currFunc->type) != FUNC_REGBANK(dtype)) &&
+	IFFUNC_ISISR(currFunc->type) &&
         !ic->bankSaved) 
 
-        saverbank(SPEC_BANK(detype),ic,TRUE);
+        saverbank(FUNC_REGBANK(dtype),ic,TRUE);
 
     /* if send set is not empty the assign */
     if (_G.sendSet) {
@@ -2222,10 +2222,10 @@ static void genCall (iCode *ic)
 
     /* if register bank was saved then pop them */
     if (ic->bankSaved)
-        unsaverbank(SPEC_BANK(detype),ic,TRUE);
+        unsaverbank(FUNC_REGBANK(dtype),ic,TRUE);
 
     /* if we hade saved some registers then unsave them */
-    if (ic->regsSaved && !(OP_SYMBOL(IC_LEFT(ic))->calleeSave))
+    if (ic->regsSaved && !IFFUNC_CALLEESAVES(dtype))
         unsaveRegisters (ic);
 
 
@@ -2236,7 +2236,7 @@ static void genCall (iCode *ic)
 /*-----------------------------------------------------------------*/
 static void genPcall (iCode *ic)
 {
-    sym_link *detype;
+    sym_link *dtype;
     symbol *rlbl = newiTempLabel(NULL);
 
 
@@ -2248,11 +2248,11 @@ static void genPcall (iCode *ic)
     /* if we are calling a function that is not using
     the same register bank then we need to save the
     destination registers on the stack */
-    detype = getSpec(operandType(IC_LEFT(ic)));
-    if (detype        && 
-	IS_ISR(currFunc->etype) &&
-        (SPEC_BANK(currFunc->etype) != SPEC_BANK(detype)))
-        saverbank(SPEC_BANK(detype),ic,TRUE);
+    dtype = operandType(IC_LEFT(ic));
+    if (dtype        && 
+	IFFUNC_ISISR(currFunc->type) &&
+        (FUNC_REGBANK(currFunc->type) != FUNC_REGBANK(dtype)))
+        saverbank(FUNC_REGBANK(dtype),ic,TRUE);
 
 
     /* push the return address on to the stack */
@@ -2331,10 +2331,9 @@ static void genPcall (iCode *ic)
     }
 
     /* if register bank was saved then unsave them */
-    if (detype        && 
-        (SPEC_BANK(currFunc->etype) != 
-         SPEC_BANK(detype)))
-        unsaverbank(SPEC_BANK(detype),ic,TRUE);
+    if (dtype        && 
+        (FUNC_REGBANK(currFunc->type) != FUNC_REGBANK(dtype)))
+        unsaverbank(FUNC_REGBANK(dtype),ic,TRUE);
 
     /* if we hade saved some registers then
     unsave them */
@@ -2393,7 +2392,7 @@ static bool inExcludeList(char *s)
 static void genFunction (iCode *ic)
 {
     symbol *sym;
-    sym_link *fetype;
+    sym_link *ftype;
 
     DEBUGpic14_emitcode ("; ***","%s  %d previous max_key=%d ",__FUNCTION__,__LINE__,max_key);
 
@@ -2409,19 +2408,19 @@ static void genFunction (iCode *ic)
     pic14_emitcode("","%s:",sym->rname);
     addpCode2pBlock(pb,newpCodeFunction(NULL,sym->rname));
 
-    fetype = getSpec(operandType(IC_LEFT(ic)));
+    ftype = operandType(IC_LEFT(ic));
 
     /* if critical function then turn interrupts off */
-    if (SPEC_CRTCL(fetype))
+    if (IFFUNC_ISCRITICAL(ftype))
         pic14_emitcode("clr","ea");
 
     /* here we need to generate the equates for the
        register bank if required */
 #if 0
-    if (SPEC_BANK(fetype) != rbank) {
+    if (FUNC_REGBANK(ftype) != rbank) {
         int i ;
 
-        rbank = SPEC_BANK(fetype);
+        rbank = FUNC_REGBANK(ftype);
         for ( i = 0 ; i < pic14_nRegs ; i++ ) {
             if (strcmp(regspic14[i].base,"0") == 0)
                 pic14_emitcode("","%s = 0x%02x",
@@ -2438,7 +2437,7 @@ static void genFunction (iCode *ic)
 
     /* if this is an interrupt service routine then
     save acc, b, dpl, dph  */
-    if (IS_ISR(sym->etype)) {
+    if (IFFUNC_ISISR(sym->type)) {
         
 	if (!inExcludeList("acc")) 	    
 	    pic14_emitcode ("push","acc");	
@@ -2465,12 +2464,12 @@ static void genFunction (iCode *ic)
 	/* if this isr has no bank i.e. is going to
 	   run with bank 0 , then we need to save more
 	   registers :-) */
-	if (!SPEC_BANK(sym->etype)) {
+	if (!FUNC_REGBANK(sym->type)) {
 
 	    /* if this function does not call any other
 	       function then we can be economical and
 	       save only those registers that are used */
-	    if (! sym->hasFcall) {
+	    if (! IFFUNC_HASFCALL(sym->type)) {
 		int i;
 
 		/* if any registers used */
@@ -2493,7 +2492,7 @@ static void genFunction (iCode *ic)
     } else {
 	/* if callee-save to be used for this function
 	   then save the registers being used in this function */
-	if (sym->calleeSave) {
+	if (IFFUNC_CALLEESAVES(sym->type)) {
 	    int i;
 	    
 	    /* if any registers used */
@@ -2511,12 +2510,12 @@ static void genFunction (iCode *ic)
     }
 
     /* set the register bank to the desired value */
-    if (SPEC_BANK(sym->etype) || IS_ISR(sym->etype)) {
+    if (FUNC_REGBANK(sym->type) || FUNC_ISISR(sym->type)) {
         pic14_emitcode("push","psw");
-        pic14_emitcode("mov","psw,#0x%02x",(SPEC_BANK(sym->etype) << 3)&0x00ff);   
+        pic14_emitcode("mov","psw,#0x%02x",(FUNC_REGBANK(sym->type) << 3)&0x00ff);   
     }
 
-    if (IS_RENT(sym->etype) || options.stackAuto) {
+    if (IFFUNC_ISREENT(sym->type) || options.stackAuto) {
 
 	if (options.useXstack) {
 	    pic14_emitcode("mov","r0,%s",spname);
@@ -2569,7 +2568,7 @@ static void genEndFunction (iCode *ic)
 
     DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
-    if (IS_RENT(sym->etype) || options.stackAuto)
+    if (IFFUNC_ISREENT(sym->type) || options.stackAuto)
     {
         pic14_emitcode ("mov","%s,_bp",spname);
     }
@@ -2584,7 +2583,7 @@ static void genEndFunction (iCode *ic)
     }
 
 
-    if ((IS_RENT(sym->etype) || options.stackAuto)) {
+    if ((IFFUNC_ISREENT(sym->type) || options.stackAuto)) {
 	if (options.useXstack) {
 	    pic14_emitcode("mov","r0,%s",spname);
 	    pic14_emitcode("movx","a,@r0");
@@ -2598,21 +2597,21 @@ static void genEndFunction (iCode *ic)
     }
 
     /* restore the register bank  */    
-    if (SPEC_BANK(sym->etype) || IS_ISR(sym->etype))
+    if (FUNC_REGBANK(sym->type) || FUNC_ISISR(sym->type))
         pic14_emitcode ("pop","psw");
 
-    if (IS_ISR(sym->etype)) {
+    if (IFFUNC_ISISR(sym->type)) {
 
 	/* now we need to restore the registers */
 	/* if this isr has no bank i.e. is going to
 	   run with bank 0 , then we need to save more
 	   registers :-) */
-	if (!SPEC_BANK(sym->etype)) {
+	if (!FUNC_REGBANK(sym->type)) {
 	    
 	    /* if this function does not call any other
 	       function then we can be economical and
 	       save only those registers that are used */
-	    if (! sym->hasFcall) {
+	    if (! IFFUNC_HASFCALL(sym->type)) {
 		int i;
 		
 		/* if any registers used */
@@ -2653,7 +2652,7 @@ static void genEndFunction (iCode *ic)
 	if (!inExcludeList("acc"))
 	    pic14_emitcode ("pop","acc");
 
-        if (SPEC_CRTCL(sym->etype))
+        if (IFFUNC_ISCRITICAL(sym->type))
             pic14_emitcode("setb","ea");
 
 	/* if debug then send end of function */
@@ -2673,10 +2672,10 @@ static void genEndFunction (iCode *ic)
         pic14_emitcode ("reti","");
     }
     else {
-        if (SPEC_CRTCL(sym->etype))
+        if (IFFUNC_ISCRITICAL(sym->type))
             pic14_emitcode("setb","ea");
 	
-	if (sym->calleeSave) {
+	if (IFFUNC_CALLEESAVES(sym->type)) {
 	    int i;
 	    
 	    /* if any registers used */

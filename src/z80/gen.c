@@ -2241,7 +2241,7 @@ _opUsesPair (operand * op, iCode * ic, PAIR_ID pairId)
 static void
 emitCall (iCode * ic, bool ispcall)
 {
-  sym_link *detype = getSpec (operandType (IC_LEFT (ic)));
+  sym_link *dtype = operandType (IC_LEFT (ic));
 
   bitVect *rInUse = bitVectCplAnd (bitVectCopy (ic->rMask), ic->rUsed);
 
@@ -2315,7 +2315,7 @@ emitCall (iCode * ic, bool ispcall)
 
   if (ispcall)
     {
-      if (IS_BANKEDCALL (detype))
+      if (IFFUNC_ISBANKEDCALL (dtype) && !SPEC_STAT(getSpec(dtype)))
 	{
 	  werror (W_INDIR_BANKED);
 	}
@@ -2345,7 +2345,7 @@ emitCall (iCode * ic, bool ispcall)
       char *name = OP_SYMBOL (IC_LEFT (ic))->rname[0] ?
       OP_SYMBOL (IC_LEFT (ic))->rname :
       OP_SYMBOL (IC_LEFT (ic))->name;
-      if (IS_BANKEDCALL (detype))
+      if (IFFUNC_ISBANKEDCALL (dtype) && !SPEC_STAT(getSpec(dtype)))
 	{
 	  emit2 ("call banked_call");
 	  emit2 ("!dws", name);
@@ -2511,14 +2511,14 @@ static void
 genFunction (iCode * ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
-  sym_link *fetype;
+  sym_link *ftype;
 
 #if CALLEE_SAVES
   bool bcInUse = FALSE;
   bool deInUse = FALSE;
 #endif
 
-  setArea (IS_NONBANKED (sym->etype));
+  setArea (IFFUNC_NONBANKED (sym->type));
 
   /* PENDING: Reset the receive offset as it doesn't seem to get reset anywhere
      else.
@@ -2539,14 +2539,14 @@ genFunction (iCode * ic)
       emit2 ("!profileenter");
     }
 
-  fetype = getSpec (operandType (IC_LEFT (ic)));
+  ftype = operandType (IC_LEFT (ic));
 
   /* if critical function then turn interrupts off */
-  if (SPEC_CRTCL (fetype))
+  if (IFFUNC_ISCRITICAL (ftype))
     emit2 ("!di");
 
   /* if this is an interrupt service routine then save all potentially used registers. */
-  if (IS_ISR (sym->etype))
+  if (IFFUNC_ISISR (sym->type))
     {
       emit2 ("!pusha");
     }
@@ -2621,13 +2621,13 @@ genEndFunction (iCode * ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
 
-  if (IS_ISR (sym->etype))
+  if (IFFUNC_ISISR (sym->type))
     {
       wassertl (0, "Tried to close an interrupt support function");
     }
   else
     {
-      if (SPEC_CRTCL (sym->etype))
+      if (IFFUNC_ISCRITICAL (sym->type))
 	emit2 ("!ei");
 
       /* PENDING: calleeSave */

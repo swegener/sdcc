@@ -252,7 +252,7 @@ iCode2eBBlock (iCode * ic)
 	{
 	  ebb->hasFcall = 1;
 	  if (currFunc)
-	    currFunc->hasFcall = 1;
+	    FUNC_HASFCALL(currFunc->type) = 1;
 	}
 
       /* if the next one is a label */

@@ -291,19 +291,19 @@ allocGlobal (symbol * sym)
       SPEC_OCLS (sym->etype) = code;
       /* if this is an interrupt service routine
          then put it in the interrupt service array */
-      if (IS_ISR (sym->etype))
+      if (FUNC_ISISR (sym->type))
 	{
 
-	  if (interrupts[SPEC_INTN (sym->etype)])
+	  if (interrupts[FUNC_INTNO (sym->type)])
 	    werror (E_INT_DEFINED,
-		    SPEC_INTN (sym->etype),
-		    interrupts[SPEC_INTN (sym->etype)]->name);
+		    FUNC_INTNO (sym->type),
+		    interrupts[FUNC_INTNO (sym->type)]->name);
 	  else
-	    interrupts[SPEC_INTN (sym->etype)] = sym;
+	    interrupts[FUNC_INTNO (sym->type)] = sym;
 
 	  /* automagically extend the maximum interrupts */
-	  if (SPEC_INTN (sym->etype) >= maxInterrupts)
-	    maxInterrupts = SPEC_INTN (sym->etype) + 1;
+	  if (FUNC_INTNO (sym->type) >= maxInterrupts)
+	    maxInterrupts = FUNC_INTNO (sym->type) + 1;
 	}
       /* if it is not compiler defined */
       if (!sym->cdef)
@@ -434,7 +434,7 @@ allocParms (value * val)
 
 
       /* if automatic variables r 2b stacked */
-      if (options.stackAuto || IS_RENT (currFunc->etype))
+      if (options.stackAuto || IFFUNC_ISREENT (currFunc->type))
 	{
 
 	  if (lval->sym)
@@ -456,9 +456,9 @@ allocParms (value * val)
 	      if (port->stack.direction > 0)
 		{
 		  SPEC_STAK (lval->etype) = SPEC_STAK (lval->sym->etype) = lval->sym->stack =
-		    stackPtr - (SPEC_BANK (currFunc->etype) ? port->stack.bank_overhead : 0) -
+		    stackPtr - (FUNC_REGBANK (currFunc->type) ? port->stack.bank_overhead : 0) -
 		    getSize (lval->type) -
-		    (IS_ISR (currFunc->etype) ? port->stack.isr_overhead : 0);
+		    (FUNC_ISISR (currFunc->type) ? port->stack.isr_overhead : 0);
 		  stackPtr -= getSize (lval->type);
 		}
 	      else
@@ -467,8 +467,8 @@ allocParms (value * val)
 		  /* PENDING: isr, bank overhead, ... */
 		  SPEC_STAK (lval->etype) = SPEC_STAK (lval->sym->etype) = lval->sym->stack =
 		    stackPtr +
-		    (IS_BANKEDCALL (currFunc->etype) ? port->stack.banked_overhead : 0) +
-		    (IS_ISR (currFunc->etype) ? port->stack.isr_overhead : 0) +
+		    ((IFFUNC_ISBANKEDCALL (currFunc->type) && !SPEC_STAT(getSpec(currFunc->etype)))? port->stack.banked_overhead : 0) +
+		    (FUNC_ISISR (currFunc->type) ? port->stack.isr_overhead : 0) +
 		    0;
 		  stackPtr += getSize (lval->type);
 		}
@@ -802,8 +802,8 @@ allocVariables (symbol * symChain)
 
 	  processFuncArgs (csym, 1);
 	  /* if register bank specified then update maxRegBank */
-	  if (maxRegBank < SPEC_BANK (csym->etype))
-	    maxRegBank = SPEC_BANK (csym->etype);
+	  if (maxRegBank < FUNC_REGBANK (csym->type))
+	    maxRegBank = FUNC_REGBANK (csym->type);
 	}
 
       /* if this is a extern variable then change the */
@@ -1002,8 +1002,8 @@ canOverlayLocals (eBBlock ** ebbs, int count)
   if (options.noOverlay ||
       options.stackAuto ||
       (currFunc &&
-       (IS_RENT (currFunc->etype) ||
-	IS_ISR (currFunc->etype))) ||
+       (IFFUNC_ISREENT (currFunc->type) ||
+	FUNC_ISISR (currFunc->type))) ||
       elementsInSet (overlay->syms) == 0)
 
     return FALSE;

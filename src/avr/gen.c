@@ -1710,7 +1710,7 @@ static void
 genFunction (iCode * ic)
 {
 	symbol *sym;
-	sym_link *fetype;
+	sym_link *ftype;
 	int i = 0;
 
 	_G.nRegsSaved = 0;
@@ -1721,13 +1721,13 @@ genFunction (iCode * ic)
 	emitcode (";", "-----------------------------------------");
 
 	emitcode ("", "%s:", sym->rname);
-	fetype = getSpec (operandType (IC_LEFT (ic)));
+	ftype = operandType (IC_LEFT (ic));
 
 	/* if critical function then turn interrupts off */
-	if (SPEC_CRTCL (fetype))
+	if (IFFUNC_ISCRITICAL (ftype))
 		emitcode ("cli", "");
 
-	if (IS_ISR (sym->etype)) {
+	if (IFFUNC_ISISR (sym->type)) {
 	}
 
 	/* save the preserved registers that are used in this function */
@@ -1821,10 +1821,10 @@ genEndFunction (iCode * ic)
 		}
 	}
 
-	if (SPEC_CRTCL (sym->etype))
+	if (IFFUNC_ISCRITICAL (sym->type))
 		emitcode ("sti", "");
 
-	if (IS_ISR (sym->etype)) {
+	if (IFFUNC_ISISR (sym->type)) {
 		emitcode ("rti", "");
 	}
 	else {

@@ -538,28 +538,7 @@ void checkTypeSanity(sym_link *etype, char *name) {
 sym_link *
 mergeSpec (sym_link * dest, sym_link * src, char *name)
 {
-
   sym_link *symlink=dest;
-
-#if 0
-  if (!IS_SPEC(dest)) {
-    // This can happen for pointers, find the end type
-    while (dest && !IS_SPEC(dest))
-      dest=dest->next;
-  }
-  if (!IS_SPEC(src)) {
-    // here we have a declarator as source, reverse them
-    symlink=src;
-    src=dest;
-    dest=symlink;
-    while (dest && !IS_SPEC(dest)) {
-      // and find the specifier
-      dest=dest->next;
-    }
-  } else {
-    symlink=dest;
-  }
-#endif
 
   if (!IS_SPEC(dest) || !IS_SPEC(src)) {
     werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "cannot merge declarator");
@@ -614,21 +593,23 @@ mergeSpec (sym_link * dest, sym_link * src, char *name)
   SPEC_STAT (dest) |= SPEC_STAT (src);
   SPEC_EXTR (dest) |= SPEC_EXTR (src);
   SPEC_ABSA (dest) |= SPEC_ABSA (src);
-  SPEC_RENT (dest) |= SPEC_RENT (src);
-  SPEC_INTN (dest) |= SPEC_INTN (src);
-  SPEC_BANK (dest) |= SPEC_BANK (src);
   SPEC_VOLATILE (dest) |= SPEC_VOLATILE (src);
-  SPEC_CRTCL (dest) |= SPEC_CRTCL (src);
   SPEC_ADDR (dest) |= SPEC_ADDR (src);
   SPEC_OCLS (dest) = SPEC_OCLS (src);
   SPEC_BLEN (dest) |= SPEC_BLEN (src);
   SPEC_BSTR (dest) |= SPEC_BSTR (src);
   SPEC_TYPEDEF (dest) |= SPEC_TYPEDEF (src);
-  SPEC_NONBANKED (dest) |= SPEC_NONBANKED (src);
-  SPEC_NAKED (dest) |= SPEC_NAKED (src);
 
   if (IS_STRUCT (dest) && SPEC_STRUCT (dest) == NULL)
     SPEC_STRUCT (dest) = SPEC_STRUCT (src);
+
+  /* these are the only function attributes that will be set 
+     in a specifier while parsing */
+  FUNC_NONBANKED(dest) |= FUNC_NONBANKED(src);
+  FUNC_BANKED(dest) |= FUNC_BANKED(src);
+  FUNC_ISCRITICAL(dest) |= FUNC_ISCRITICAL(src);
+  FUNC_ISREENT(dest) |= FUNC_ISREENT(src);
+  FUNC_ISNAKED(dest) |= FUNC_ISNAKED(src);
 
   return symlink;
 }
@@ -890,9 +871,7 @@ copySymbol (symbol * src)
   dest->type = copyLinkChain (src->type);
   dest->etype = getSpec (dest->type);
   dest->next = NULL;
-  dest->args = copyValueChain (src->args);
   dest->key = src->key;
-  dest->calleeSave = src->calleeSave;
   dest->allocreq = src->allocreq;
   return dest;
 }
@@ -1010,7 +989,7 @@ funcInChain (sym_link * lnk)
 /* structElemType - returns the type info of a sturct member        */
 /*------------------------------------------------------------------*/
 sym_link *
-structElemType (sym_link * stype, value * id, value ** argsp)
+structElemType (sym_link * stype, value * id)
 {
   symbol *fields = (SPEC_STRUCT (stype) ? SPEC_STRUCT (stype)->fields : NULL);
   sym_link *type, *etype;
@@ -1024,10 +1003,6 @@ structElemType (sym_link * stype, value * id, value ** argsp)
     {
       if (strcmp (fields->rname, id->name) == 0)
 	{
-	  if (argsp)
-	    {
-	      *argsp = fields->args;
-	    }
 	  type = copyLinkChain (fields->type);
 	  etype = getSpec (type);
 	  SPEC_SCLS (etype) = (SPEC_SCLS (petype) == S_REGISTER ?
@@ -1263,7 +1238,7 @@ checkSClass (symbol * sym, int isProto)
   if (sym->level && SPEC_SCLS (sym->etype) == S_FIXED &&
       !IS_STATIC(sym->etype))
     {
-      if (options.stackAuto || (currFunc && IS_RENT (currFunc->etype)))
+      if (options.stackAuto || (currFunc && IFFUNC_ISREENT (currFunc->type)))
 	{
 	  SPEC_SCLS (sym->etype) = (options.useXstack ?
 				    S_XSTACK : S_STACK);
@@ -1461,8 +1436,12 @@ compareType (sym_link * dest, sym_link * src)
     {
       if (IS_DECL (src))
 	{
-	  if (DCL_TYPE (src) == DCL_TYPE (dest))
+	  if (DCL_TYPE (src) == DCL_TYPE (dest)) {
+	    if (IS_FUNC(src)) {
+	      //checkFunction(src,dest);
+	    }
 	    return compareType (dest->next, src->next);
+	  }
 	  if (IS_PTR (src) && IS_GENPTR (dest))
 	    return -1;
 	  if (IS_PTR (dest) && IS_ARRAY (src)) {
@@ -1624,9 +1603,8 @@ aggregateToPointer (value * val)
 /* checkFunction - does all kinds of check on a function            */
 /*------------------------------------------------------------------*/
 int 
-checkFunction (symbol * sym)
+checkFunction (symbol * sym, symbol *csym)
 {
-  symbol *csym;
   value *exargs, *acargs;
   value *checkValue;
   int argCnt = 0;
@@ -1662,21 +1640,23 @@ checkFunction (symbol * sym)
 
   /* check if this function is defined as calleeSaves
      then mark it as such */
-  sym->calleeSave = inCalleeSaveList (sym->name);
+    FUNC_CALLEESAVES(sym->type) = inCalleeSaveList (sym->name);
 
   /* if interrupt service routine  */
   /* then it cannot have arguments */
-  if (sym->args && IS_ISR (sym->etype) && !IS_VOID (sym->args->type))
+  if (IFFUNC_ARGS(sym->type) && FUNC_ISISR (sym->type))
     {
-      werror (E_INT_ARGS, sym->name);
-      sym->args = NULL;
+      if (!IS_VOID(FUNC_ARGS(sym->type)->type)) {
+	werror (E_INT_ARGS, sym->name);
+	FUNC_ARGS(sym->type)=NULL;
+      }
     }
 
-  if (!(csym = findSym (SymbolTab, sym, sym->name)))
+  if (!csym && !(csym = findSym (SymbolTab, sym, sym->name)))
     return 1;			/* not defined nothing more to check  */
 
   /* check if body already present */
-  if (csym && csym->fbody)
+  if (csym && IFFUNC_HASBODY(csym->type))
     {
       werror (E_FUNC_BODY, sym->name);
       return 0;
@@ -1695,24 +1675,24 @@ checkFunction (symbol * sym)
       return 0;
     }
 
-  if (SPEC_INTRTN (csym->etype) != SPEC_INTRTN (sym->etype))
+  if (FUNC_ISISR (csym->type) != FUNC_ISISR (sym->type))
     {
       werror (E_PREV_DEF_CONFLICT, csym->name, "interrupt");
     }
 
-  if (SPEC_BANK (csym->etype) != SPEC_BANK (sym->etype))
+  if (FUNC_REGBANK (csym->type) != FUNC_REGBANK (sym->type))
     {
       werror (E_PREV_DEF_CONFLICT, csym->name, "using");
     }
 
-  if (SPEC_NAKED (csym->etype) != SPEC_NAKED (sym->etype))
+  if (IFFUNC_ISNAKED (csym->type) != IFFUNC_ISNAKED (sym->type))
     {
       werror (E_PREV_DEF_CONFLICT, csym->name, "_naked");
     }
 
   /* compare expected args with actual args */
-  exargs = csym->args;
-  acargs = sym->args;
+  exargs = FUNC_ARGS(csym->type);
+  acargs = FUNC_ARGS(sym->type);
 
   /* for all the expected args do */
   for (argCnt = 1;
@@ -1774,19 +1754,20 @@ processFuncArgs (symbol * func, int ignoreName)
 
   /* if this function has variable argument list */
   /* then make the function a reentrant one    */
-  if (func->hasVargs)
-    SPEC_RENT (func->etype) = 1;
+  if (IFFUNC_HASVARARGS(func->type))
+    FUNC_ISREENT(func->type)=1;
 
   /* check if this function is defined as calleeSaves
      then mark it as such */
-  func->calleeSave = inCalleeSaveList (func->name);
+  FUNC_CALLEESAVES(func->type) = inCalleeSaveList (func->name);
 
-  val = func->args;		/* loop thru all the arguments   */
+  /* loop thru all the arguments   */
+  val = FUNC_ARGS(func->type);
 
   /* if it is void then remove parameters */
   if (val && IS_VOID (val->type))
     {
-      func->args = NULL;
+      FUNC_ARGS(func->type) = NULL;
       return;
     }
 
@@ -1799,7 +1780,7 @@ processFuncArgs (symbol * func, int ignoreName)
       /* mark it as a register parameter if
          the function does not have VA_ARG
          and as port dictates */
-      if (!func->hasVargs &&
+      if (!IFFUNC_HASVARARGS(func->type) &&
 	  (*port->reg_parm) (val->type))
 	{
 	  SPEC_REGPARM (val->etype) = 1;
@@ -1817,17 +1798,17 @@ processFuncArgs (symbol * func, int ignoreName)
   if (func->cdef) {
     /* ignore --stack-auto for this one, we don't know how it is compiled */
     /* simply trust on --int-long-reent or --float-reent */
-    if (IS_RENT(func->etype)) {
+    if (IFFUNC_ISREENT(func->type)) {
       return;
     }
   } else {
     /* if this function is reentrant or */
     /* automatics r 2b stacked then nothing */
-    if (IS_RENT (func->etype) || options.stackAuto)
+    if (IFFUNC_ISREENT (func->type) || options.stackAuto)
       return;
   }
 
-  val = func->args;
+  val = FUNC_ARGS(func->type);
   pNum = 1;
   while (val)
     {
@@ -2194,8 +2175,8 @@ cdbSymbol (symbol * sym, FILE * of, int isStructSym, int isFunc)
      if is it an interrupt routine & interrupt number
      and the register bank it is using */
   if (isFunc)
-    fprintf (of, ",%d,%d,%d", SPEC_INTRTN (sym->etype),
-	     SPEC_INTN (sym->etype), SPEC_BANK (sym->etype));
+    fprintf (of, ",%d,%d,%d", FUNC_ISISR (sym->type),
+	     FUNC_INTNO (sym->type), FUNC_REGBANK (sym->type));
   /* alternate location to find this symbol @ : eg registers
      or spillication */
 
@@ -2404,7 +2385,7 @@ initCSupport ()
 		       ssu[su],
 		       sbwd[bwd]);
               __muldiv[muldivmod][bwd][su] = funcOfType (_mangleFunctionName(buffer), __multypes[bwd][su], __multypes[bwd][su], 2, options.intlong_rent);
-	      SPEC_NONBANKED (__muldiv[muldivmod][bwd][su]->etype) = 1;
+	      FUNC_NONBANKED (__muldiv[muldivmod][bwd][su]->type) = 1;
 	    }
 	}
     }
@@ -2420,7 +2401,7 @@ initCSupport ()
 		       ssu[su],
 		       sbwd[bwd]);
               __rlrr[rlrr][bwd][su] = funcOfType (_mangleFunctionName(buffer), __multypes[bwd][su], __multypes[0][0], 2, options.intlong_rent);
-	      SPEC_NONBANKED (__rlrr[rlrr][bwd][su]->etype) = 1;
+	      FUNC_NONBANKED (__rlrr[rlrr][bwd][su]->type) = 1;
 	    }
 	}
     }

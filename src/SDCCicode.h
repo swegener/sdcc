@@ -169,7 +169,7 @@ typedef struct iCode
     union
       {
 	symbol *label;		/* for a goto statement     */
-	value *args;
+	value *args;            /* for a function */
       }
     argLabel;
 

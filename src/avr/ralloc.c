@@ -2239,7 +2239,7 @@ setDefaultRegs (eBBlock ** ebbs, int count)
 		regsAVR[i].type = (regsAVR[i].type & ~REG_MASK) | REG_SCR;
 		regsAVR[i].isFree = 1;
 	}
-	if (!currFunc->hasFcall) {
+	if (!IFFUNC_HASFCALL(currFunc->type)) {
 		preAssignParms (ebbs[0]->sch);
 	}
 	/* Y - is not allocated (it is the stack frame) */

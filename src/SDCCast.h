@@ -43,7 +43,6 @@ typedef struct ast
 
     unsigned type:3;
     unsigned decorated:1;
-    unsigned hasVargs:1;
     unsigned isError:1;
     unsigned funcName:1;
     unsigned rvalue:1;
@@ -102,7 +101,6 @@ typedef struct ast
     sym_link *etype;		/* end of type chain for this subtree   */
 
     symbol *argSym;		/* argument symbols            */
-    value *args;		/* args of a function          */
     struct ast *left;		/* pointer to left tree        */
     struct ast *right;		/* pointer to right tree       */
     symbol *trueLabel;		/* if statement trueLabel */

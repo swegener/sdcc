@@ -1266,7 +1266,6 @@ operandFromSymbol (symbol * sym)
      register equivalent for a local symbol */
   if (sym->level && sym->etype && SPEC_OCLS (sym->etype) &&
       (IN_FARSPACE (SPEC_OCLS (sym->etype)) &&
-      /* (!TARGET_IS_DS390)) && */
       (!(options.model == MODEL_FLAT24)) ) &&
       options.stackAuto == 0)
     ok = 0;
@@ -1329,8 +1328,6 @@ operandFromSymbol (symbol * sym)
     }
   else
     IC_RESULT (ic)->isaddr = (!IS_AGGREGATE (sym->type));
-
-  IC_RESULT (ic)->operand.symOperand->args = sym->args;
 
   ADDTOCHAIN (ic);
 
@@ -1572,10 +1569,6 @@ geniCodeRValue (operand * op, bool force)
 
 /*     ic->supportRtn = ((IS_GENPTR(type) | op->isGptr) & op->isaddr); */
 
-  /* if the right is a symbol */
-  if (op->type == SYMBOL)
-    IC_RESULT (ic)->operand.symOperand->args =
-      op->operand.symOperand->args;
   ADDTOCHAIN (ic);
 
   return IC_RESULT (ic);
@@ -2701,21 +2694,32 @@ geniCodeSEParms (ast * parms,int lvl)
 /*-----------------------------------------------------------------*/
 /* geniCodeParms - generates parameters                            */
 /*-----------------------------------------------------------------*/
-static void 
-geniCodeParms (ast * parms, int *stack, sym_link * fetype, symbol * func,int lvl)
+value *
+geniCodeParms (ast * parms, value *argVals, int *stack, 
+	       sym_link * fetype, symbol * func,int lvl)
 {
   iCode *ic;
   operand *pval;
 
   if (!parms)
-    return;
+    return argVals;
+
+  if (argVals==NULL) {
+    // first argument
+    argVals=FUNC_ARGS(func->type);
+  }
+
+  if (parms->argSym || 
+      (parms->type!=EX_OP && parms->type!=EX_OPERAND)) {
+    fprintf (stderr, "What the fuck??\n");
+  }
 
   /* if this is a param node then do the left & right */
   if (parms->type == EX_OP && parms->opval.op == PARAM)
     {
-      geniCodeParms (parms->left, stack, fetype, func,lvl);
-      geniCodeParms (parms->right, stack, fetype, func,lvl);
-      return;
+      argVals=geniCodeParms (parms->left, argVals, stack, fetype, func,lvl);
+      argVals=geniCodeParms (parms->right, argVals, stack, fetype, func,lvl);
+      return argVals;
     }
 
   /* get the parameter value */
@@ -2737,9 +2741,13 @@ geniCodeParms (ast * parms, int *stack, sym_link * fetype, symbol * func,int lvl
       pval = geniCodeRValue (ast2iCode (parms,lvl+1), FALSE);
     }
 
-  /* if register parm then make it a send */
-  if (((parms->argSym && IS_REGPARM (parms->argSym->etype)) ||
-       IS_REGPARM (parms->etype)) && !func->hasVargs)
+  /* if register arg then make it a send */
+  if (((argVals->sym && IS_REGPARM (argVals->sym->etype)) ||
+       IS_REGPARM (parms->etype)) && !IFFUNC_HASVARARGS(func->type))
+    //!DECL_HASVARARGS(func->type) && 
+    //!options.stackAuto &&
+    //!IS_RENT(func->etype) &&
+    //IS_REGPARM (argVals->sym->etype))
     {
       ic = newiCode (SEND, pval, NULL);
       ADDTOCHAIN (ic);
@@ -2747,11 +2755,11 @@ geniCodeParms (ast * parms, int *stack, sym_link * fetype, symbol * func,int lvl
   else
     {
       /* now decide whether to push or assign */
-      if (!(options.stackAuto || IS_RENT (fetype)))
+      if (!(options.stackAuto || IFFUNC_ISREENT (func->type)))
 	{
 
 	  /* assign */
-	  operand *top = operandFromSymbol (parms->argSym);
+	  operand *top = operandFromSymbol (argVals->sym);
 	  geniCodeAssign (top, pval, 1);
 	}
       else
@@ -2766,6 +2774,8 @@ geniCodeParms (ast * parms, int *stack, sym_link * fetype, symbol * func,int lvl
 	}
     }
 
+  argVals=argVals->next;
+  return argVals;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2791,7 +2801,7 @@ geniCodeCall (operand * left, ast * parms,int lvl)
   geniCodeSEParms (parms,lvl);
 
   /* first the parameters */
-  geniCodeParms (parms, &stack, getSpec (operandType (left)), OP_SYMBOL (left),lvl);
+  geniCodeParms (parms, NULL, &stack, getSpec (operandType (left)), OP_SYMBOL (left),lvl);
 
   /* now call : if symbol then pcall */
   if (IS_OP_POINTER (left) || IS_ITEMP(left))
@@ -2799,7 +2809,7 @@ geniCodeCall (operand * left, ast * parms,int lvl)
   else
     ic = newiCode (CALL, left, NULL);
 
-  IC_ARGS (ic) = left->operand.symOperand->args;
+  IC_ARGS (ic) = FUNC_ARGS(left->operand.symOperand->type);
   type = copyLinkChain (operandType (left)->next);
   etype = getSpec (type);
   SPEC_EXTR (etype) = 0;

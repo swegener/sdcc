@@ -204,7 +204,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	   (sym->_isparm && !IS_REGPARM (sym->etype))) &&
 	  addPublics &&
 	  !IS_STATIC (sym->etype) &&
-          (IS_FUNC(sym->type) ? (sym->used || sym->fbody) : 1))
+          (IS_FUNC(sym->type) ? (sym->used || IFFUNC_HASBODY(sym->type)) : 1))
 	{
 	  addSetHead (&publics, sym);
 	}
@@ -1104,7 +1104,7 @@ createInterruptVect (FILE * vFile)
     }
 
   /* if the main is only a prototype ie. no body then do nothing */
-  if (!mainf->fbody)
+  if (!IFFUNC_HASBODY(mainf->type))
     {
       /* if ! compile only then main function should be present */
       if (!options.cc_only && !noAssemble)
@@ -1388,7 +1388,7 @@ glue ()
   copyFile (asmFile, ovrFile);
 
   /* create the stack segment MOF */
-  if (mainf && mainf->fbody)
+  if (mainf && IFFUNC_HASBODY(mainf->type))
     {
       fprintf (asmFile, "%s", iComments2);
       fprintf (asmFile, "; Stack segment in internal ram \n");
@@ -1410,7 +1410,7 @@ glue ()
   copyFile (asmFile, bit->oFile);
 
   /* if external stack then reserve space of it */
-  if (mainf && mainf->fbody && options.useXstack)
+  if (mainf && IFFUNC_HASBODY(mainf->type) && options.useXstack)
     {
       fprintf (asmFile, "%s", iComments2);
       fprintf (asmFile, "; external stack \n");
@@ -1427,7 +1427,7 @@ glue ()
   copyFile (asmFile, xdata->oFile);
 
   /* copy the interrupt vector table */
-  if (mainf && mainf->fbody)
+  if (mainf && IFFUNC_HASBODY(mainf->type))
     {
       fprintf (asmFile, "%s", iComments2);
       fprintf (asmFile, "; interrupt vector \n");
@@ -1450,7 +1450,7 @@ glue ()
   tfprintf (asmFile, "\t!area\n", port->mem.post_static_name);
   tfprintf (asmFile, "\t!area\n", port->mem.static_name);
 
-  if (mainf && mainf->fbody)
+  if (mainf && IFFUNC_HASBODY(mainf->type))
     {
       fprintf (asmFile, "__sdcc_gsinit_startup:\n");
       /* if external stack is specified then the
@@ -1485,7 +1485,7 @@ glue ()
     }
   copyFile (asmFile, statsg->oFile);
 
-  if (port->general.glue_up_main && mainf && mainf->fbody)
+  if (port->general.glue_up_main && mainf && IFFUNC_HASBODY(mainf->type))
     {
       /* This code is generated in the post-static area.
        * This area is guaranteed to follow the static area
@@ -1507,7 +1507,7 @@ glue ()
   fprintf (asmFile, "; code\n");
   fprintf (asmFile, "%s", iComments2);
   tfprintf (asmFile, "\t!areacode\n", CODE_NAME);
-  if (mainf && mainf->fbody)
+  if (mainf && IFFUNC_HASBODY(mainf->type))
     {
 
       /* entry point @ start of CSEG */

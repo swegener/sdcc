@@ -1,3 +1,10 @@
+2002-08-29  Borut Razem <borut.razem@siol.net>
+	* sdcc/src/ds390/ralloc.c, sdcc/src/mcs51/ralloc.c, sdcc/src/z80/ralloc.c:
+	corrected improper use of assert: the assignment to clr variable was done inside the assert.
+	In case that NDEBUG was defined, the assert macro was substituted with no-op, so the assignment
+	was not executed, and the compiler (cl) launched a warning:
+	ralloc.c(1442) : warning C4700: local variable 'clr' used without having been initialized
+
 2002-08-28  Bernhard Held <bernhard@bernhardheld.de>
         * src/SDCCglue.c (printIvalArray): iterative calculation of array length
 

@@ -1267,7 +1267,8 @@ static void fillGaps()
 		bitVectBitValue(_G.totRegAssigned,i) == 0) /* and are still assigned to registers */
 		continue ;
 
-	    assert (clr = hTabItemWithKey(liveRanges,i));
+		clr = hTabItemWithKey(liveRanges,i);
+	    assert(clr);
 	 
 	    /* mark these registers as used */
 	    for (k = 0 ; k < clr->nRegs ; k++ ) 

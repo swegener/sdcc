@@ -2334,7 +2334,7 @@ packRegisters (eBBlock * ebp)
 	  (IS_SYMOP (IC_LEFT (ic)) &&
 	   IS_ITEMP (IC_RESULT (ic)) &&
 	   OP_SYMBOL (IC_LEFT (ic))->remat &&
-	   !IS_CAST_ICODE(OP_SYMBOL (IC_LEFT (ic))->rematiCode) &&
+	   (!IS_SYMOP (IC_RIGHT (ic)) || !IS_CAST_ICODE(OP_SYMBOL (IC_RIGHT (ic))->rematiCode)) &&
 	   bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 &&
 	   IS_OP_LITERAL (IC_RIGHT (ic))))
 	{

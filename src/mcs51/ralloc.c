@@ -2322,11 +2322,12 @@ packRegisters (eBBlock * ebp)
       if ((ic->op == '+' || ic->op == '-') &&
 	  (IS_SYMOP (IC_LEFT (ic)) &&
 	   IS_ITEMP (IC_RESULT (ic)) &&
+	   IS_OP_LITERAL (IC_RIGHT (ic))) &&
 	   OP_SYMBOL (IC_LEFT (ic))->remat &&
-	  !IS_CAST_ICODE(OP_SYMBOL (IC_RIGHT (ic))->rematiCode) &&
-	   bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 &&
-	   IS_OP_LITERAL (IC_RIGHT (ic))))
+	  (!IS_SYMOP (IC_RIGHT (ic)) || !IS_CAST_ICODE(OP_SYMBOL (IC_RIGHT (ic))->rematiCode)) &&
+	   bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1)
 	{
+	  fprintf(stderr, "ogga booga!\n");
 	  OP_SYMBOL (IC_RESULT (ic))->remat = 1;
 	  OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
 	  OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;

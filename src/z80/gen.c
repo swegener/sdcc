@@ -221,6 +221,7 @@ static struct
   bool in_home;
   const char *lastFunctionName;
   iCode *current_iCode;
+  bool preserveCarry;
   
   set *sendSet;
 
@@ -1481,6 +1482,12 @@ setupPairFromSP (PAIR_ID id, int offset)
 {
   wassertl (id == PAIR_HL, "Setup relative to SP only implemented for HL");
 
+  if (_G.preserveCarry)
+    {
+      _push (PAIR_AF);
+      offset += 2;
+    }
+  
   if (offset < INT8MIN || offset > INT8MAX)
     {
       emit2 ("ld hl,!immedword", offset);
@@ -1488,7 +1495,13 @@ setupPairFromSP (PAIR_ID id, int offset)
     }
   else
     {
-      emit2 ("!ldahlsp", offset);
+          emit2 ("!ldahlsp", offset);
+    }
+
+  if (_G.preserveCarry)
+    {
+      _pop (PAIR_AF);
+      offset -= 2;
     }
 }
 
@@ -1524,11 +1537,15 @@ setupPair (PAIR_ID pairId, asmop * aop, int offset)
         else
           {
             /* PENDING: Do this better. */
+            if (_G.preserveCarry)
+              _push (PAIR_AF);
             sprintf (buffer, "%d", offset + _G.stack.pushed);
             emit2 ("ld %s,!hashedstr", _pairs[pairId].name, buffer);
             emit2 ("add %s,sp", _pairs[pairId].name);
             _G.pairs[pairId].last_type = aop->type;
             _G.pairs[pairId].offset = offset;
+            if (_G.preserveCarry)
+              _pop (PAIR_AF);
           }
       }
       break;
@@ -3481,7 +3498,10 @@ setupToPreserveCarry (asmop *result, asmop *left, asmop *right)
         }
       else if (couldDestroyCarry (right))
         {
-          shiftIntoPair (0, right);
+          if (getPairId (result) == PAIR_HL)
+            _G.preserveCarry = TRUE;
+          else
+            shiftIntoPair (0, right);
         }
       else if (couldDestroyCarry (result))
         {
@@ -3712,6 +3732,7 @@ genPlus (iCode * ic)
     }
 
 release:
+  _G.preserveCarry = FALSE;
   freeAsmop (IC_LEFT (ic), NULL, ic);
   freeAsmop (IC_RIGHT (ic), NULL, ic);
   freeAsmop (IC_RESULT (ic), NULL, ic);
@@ -3915,6 +3936,7 @@ genMinus (iCode * ic)
     }
 
 release:
+  _G.preserveCarry = FALSE;
   freeAsmop (IC_LEFT (ic), NULL, ic);
   freeAsmop (IC_RIGHT (ic), NULL, ic);
   freeAsmop (IC_RESULT (ic), NULL, ic);

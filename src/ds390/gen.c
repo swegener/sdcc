@@ -11047,7 +11047,7 @@ genCast (iCode * ic)
     return;
 
   aopOp (right, ic, FALSE, FALSE);
-  aopOp (result, ic, FALSE, AOP_USESDPTR(right));
+  aopOp (result, ic, FALSE, (AOP_TYPE(right) == AOP_DPTR));
 
   /* if the result is a bit */
   if (IS_BITVAR (OP_SYMBOL (result)->type)

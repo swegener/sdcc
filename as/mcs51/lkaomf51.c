@@ -25,7 +25,7 @@
 
 #define EQ(A,B) !strcmp((A),(B))
 #define MEMSIZE 0x10000
-//#define DODUMP 1
+#define DODUMP 1
 
 typedef struct
 {
@@ -308,7 +308,7 @@ void OutputAOEMF51(void)
 		/*Public symbols defined in this module*/
 		recsize=2;
 		for(k=0; k<numsym; k++)/*Compute the record length*/
-			if ( (symbol[k].FileNameNumber==j) &&
+			if ( (symbol[k].FileNameNumber==j) && (symbol[k].Address!=-1) &&
 				 (symbol[k].Procedure==-1) &&
 				 (symbol[k].Static==-1) ) recsize+=((strlen(symbol[k].name)+1)+5);
 
@@ -319,7 +319,7 @@ void OutputAOEMF51(void)
 			OutputByte(0x01);	/*DEF TYPE: Public symbols*/
 			for(k=0; k<numsym; k++)
 			{
-				if ( (symbol[k].FileNameNumber==j) &&
+				if ( (symbol[k].FileNameNumber==j) && (symbol[k].Address!=-1) &&
 					 (symbol[k].Procedure==-1) &&
 					 (symbol[k].Static==-1) )
 				{
@@ -336,7 +336,7 @@ void OutputAOEMF51(void)
 		/*Local symbols defined in this module*/
 		recsize=2;
 		for(k=0; k<numsym; k++)/*Compute the record length*/
-			if ( (symbol[k].FileNameNumber==j) &&
+			if ( (symbol[k].FileNameNumber==j) && (symbol[k].Address!=-1) &&
 				 (symbol[k].Procedure==-1) &&
 				 (symbol[k].Static==j) ) recsize+=((strlen(symbol[k].name)+1)+5);
 
@@ -347,7 +347,7 @@ void OutputAOEMF51(void)
 			OutputByte(0x00);	/*DEF TYPE: Local symbols*/
 			for(k=0; k<numsym; k++)
 			{
-				if ( (symbol[k].FileNameNumber==j) && 
+				if ( (symbol[k].FileNameNumber==j) && (symbol[k].Address!=-1) &&
 					 (symbol[k].Procedure==-1) &&
 					 (symbol[k].Static==j) )
 				{
@@ -827,6 +827,11 @@ void CollectInfoFromCDB(void)
 		}
 	}
 
+	/*Make sure each procedure has an end*/
+	for(k=0; k<(numproc-1); k++)
+	{
+		if (procedure[k].EndAdd==-1) procedure[k].EndAdd=procedure[k+1].BeginAdd-1;
+	}
 	/*Asign each line number to a procedure*/
 	for(j=0; j<numlinenum; j++)
 	{

@@ -1111,7 +1111,7 @@ printIval (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
 
   if (compareType(type, itype)==0) {
     // special case for literal strings
-    if (IS_ARRAY (itype) && IS_CHAR (getSpec(type)) &&
+    if (IS_ARRAY (itype) && IS_CHAR (getSpec(itype)) &&
 	// which are really code pointers
 	IS_PTR(type) && DCL_TYPE(type)==CPOINTER) {
       // no sweat

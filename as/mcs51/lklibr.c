@@ -18,14 +18,6 @@
 #define EQ(A,B) !strcmp((A),(B))
 #define MAXLINE 254 /*when using fgets*/
 
-#if defined(__APPLE__) && defined(__MACH__)
-#include <sys/types.h>
-#include <sys/malloc.h>
-#else
-#ifdef HAVE_MALLOC_H
-#include <malloc.h>
-#endif
-#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

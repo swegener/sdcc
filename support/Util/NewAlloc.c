@@ -28,13 +28,6 @@ functions.
 */
 
 #include <stdio.h>
-#if defined(__APPLE__) && defined(__MACH__)
-#include <sys/malloc.h>
-#else
-#ifdef HAVE_MALLOC_H
-#include <malloc.h>
-#endif
-#endif
 #include <stdlib.h>
 #include <string.h>
 #include <memory.h>

@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------
  * packihx.c:
  *
- * utility to pack an Inter HEX format file by removing redundant 
+ * utility to pack an Intel HEX format file by removing redundant 
  * extended offset records and accumulating data records up to
  * OUTPUT_CHUNK (currently 16) bytes.
  *

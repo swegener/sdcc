@@ -75,7 +75,11 @@ SDCC Compiler User Guide
 \layout Date
 
 
+\size normal 
+2.3.6
 \size footnotesize 
+
+\newline 
 $Date$ 
 \newline 
 $Revision$
@@ -5575,6 +5579,29 @@ status Collapsed
 /
 \end_inset 
 
+-protect-sp-update
+\begin_inset LatexCommand \index{-\/-protect-sp-update}
+
+\end_inset 
+
+
+\series default 
+ disable interrupts during ESP:SP updates
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
 -stack-10bit
 \series default 
 
@@ -5657,6 +5684,75 @@ status Collapsed
 -model-flat24 option
 \emph default 
 ).
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-probe
+\begin_inset LatexCommand \index{-\/-stack-probe}
+
+\end_inset 
+
+
+\series default 
+ insert call to function __stack_probe at each function prologue 
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-tini-libid
+\begin_inset LatexCommand \index{-\/-tini-libid}
+
+\end_inset 
+
+
+\series default 
+ <nnnn> LibraryID used in -mTININative 
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-use-accelerator
+\begin_inset LatexCommand \index{-\/-use-accelerator}
+
+\end_inset 
+
+
+\series default 
+ generate code for DS390 Arithmetic Accelerator 
 \layout Subsection
 
 Z80 Options
@@ -7291,6 +7387,9 @@ There are some more environment variables recognized by SDCC, but these
  They can change or disappear very quickly, and will never be documented.
 \layout Section
 
+Storage Class Language Extensions
+\layout Subsection
+
 MCS51/DS390 Storage Class
 \begin_inset LatexCommand \index{Storage class}
 
@@ -7300,8 +7399,8 @@ MCS51/DS390 Storage Class
 \layout Standard
 
 In addition to the ANSI storage classes SDCC allows the following MCS51
- specific storage classes.
-\layout Subsection
+ specific storage classes:
+\layout Subsubsection
 
 data
 \begin_inset LatexCommand \index{data}
@@ -7336,7 +7435,7 @@ Writing 0x01 to this variable generates the assembly code:
 mov\SpecialChar ~
 \SpecialChar ~
 _test_data,#0x01 
-\layout Subsection
+\layout Subsubsection
 
 xdata
 \begin_inset LatexCommand \index{xdata}
@@ -7394,7 +7493,7 @@ F0\SpecialChar ~
 \SpecialChar ~
 movx\SpecialChar ~
 @dptr,a 
-\layout Subsection
+\layout Subsubsection
 
 idata
 \begin_inset LatexCommand \index{idata}
@@ -7439,8 +7538,20 @@ r0,#_test_idata
 \SpecialChar ~
 mov\SpecialChar ~
 \SpecialChar ~
-@r0,#0x01 
-\layout Subsection
+@r0,#0x01
+\layout Standard
+
+Please note, the first 128 byte of idata physically access the same RAM
+ as the data memory.
+ The original 8051 had 128 byte idata memory, nowadays most devices have
+ 256 byte idata memory.
+ The stack
+\begin_inset LatexCommand \index{stack}
+
+\end_inset 
+
+ is located in idata memory.
+\layout Subsubsection
 
 pdata
 \begin_inset LatexCommand \index{pdata}
@@ -7545,7 +7656,7 @@ status Collapsed
 \end_inset 
 
  option.
-\layout Subsection
+\layout Subsubsection
 
 code
 \begin_inset LatexCommand \index{code}
@@ -7595,7 +7706,55 @@ clr a
 \SpecialChar ~
 \SpecialChar ~
 movc a,@a+dptr 
-\layout Subsection
+\layout Standard
+
+
+\family typewriter 
+char
+\family default 
+ indexed arrays of characters in code memory can be accessed efficiently:
+\layout Verse
+
+
+\family typewriter 
+code char test_array[] = {'c','h','e','a','p'}; 
+\layout Standard
+
+Read access to this array using an 8-bit index generates the assembly code:
+\layout Verse
+
+
+\family typewriter 
+E5*00\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov a,_index 
+\layout Verse
+
+
+\family typewriter 
+90s00r41\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov dptr,#_test_array
+\layout Verse
+
+
+\family typewriter 
+93\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+movc a,@a+dptr 
+\layout Subsubsection
 
 bit
 \begin_inset LatexCommand \index{bit}
@@ -7631,6 +7790,11 @@ setb\SpecialChar ~
 _test_bit
 \layout Standard
 
+The bit addressable memory consists of 128 bits which are located from 0x20
+ to 0x2f in data memory.
+ 
+\layout Standard
+
 Apart from this 8051 specific storage class most architectures support ANSI-C
  bitfields
 \begin_inset LatexCommand \index{bitfields}
@@ -7648,7 +7812,7 @@ Not really meant as examples, but nevertheless showing what bitfields are
 \end_inset 
 
 .
-\layout Subsection
+\layout Subsubsection
 
 sfr
 \begin_inset LatexCommand \index{sfr}
@@ -7668,7 +7832,27 @@ Like the bit keyword,
 sfr / sbit 
 \emph default 
 signifies both a data-type and storage class, they are used to describe
- the special function registers and special bit variables of a 8051, eg:
+ the 
+\emph on 
+s
+\emph default 
+pecial 
+\emph on 
+f
+\emph default 
+unction 
+\emph on 
+r
+\emph default 
+egisters and 
+\emph on 
+s
+\emph default 
+pecial 
+\emph on 
+bit
+\emph default 
+ variables of a 8051, eg:
 \layout Verse
 
 
@@ -7692,7 +7876,15 @@ sbit at 0xd7 CY; /* CY (Carry Flag
 \end_inset 
 
 ) */
-\layout Subsection
+\layout Standard
+
+Special function registers which are located on an address dividable by
+ 8 are bit-addressable, an
+\emph on 
+ sbit
+\emph default 
+ addresses a specific bit within these sfr.
+\layout Subsubsection
 
 Pointers
 \begin_inset LatexCommand \index{Pointers}
@@ -7788,6 +7980,168 @@ generic
  routines.
  Explicitly specifying the pointer type will generate the most efficient
  code.
+\layout Subsection
+
+Z80/Z180 Storage Class
+\begin_inset LatexCommand \index{Storage class}
+
+\end_inset 
+
+ Language Extensions
+\layout Subsubsection
+
+sfr
+\begin_inset LatexCommand \index{sfr}
+
+\end_inset 
+
+ (in/out to 8-bit addresses)
+\layout Standard
+
+The Z80
+\begin_inset LatexCommand \index{Z80}
+
+\end_inset 
+
+ family has separate address spaces for memory and 
+\emph on 
+i
+\emph default 
+nput/
+\emph on 
+o
+\emph default 
+utput memory.
+ I/O memory
+\begin_inset LatexCommand \index{I/O memory (Z80/Z180)}
+
+\end_inset 
+
+ is accessed with special instructions, e.g.:
+\layout Verse
+
+
+\family typewriter 
+sfr at 0x78 IoPort;\SpecialChar ~
+\SpecialChar ~
+/* define a var in I/O space at 78h called IoPort */
+ 
+\layout Standard
+
+Writing 0x01 to this variable generates the assembly code:
+\layout Verse
+
+
+\family typewriter 
+3E 01\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ld a,#0x01
+\newline 
+D3 78\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+out (_IoPort),a 
+\layout Subsubsection
+
+banked sfr
+\begin_inset LatexCommand \index{sfr}
+
+\end_inset 
+
+ (in/out to 16-bit addresses)
+\layout Standard
+
+The keyword 
+\emph on 
+banked
+\emph default 
+ is used to support 16 bit addresses in I/O memory e.g.:
+\layout Verse
+
+
+\family typewriter 
+sfr banked at 0x123 IoPort; 
+\layout Standard
+
+Writing 0x01 to this variable generates the assembly code:
+\layout Verse
+
+
+\family typewriter 
+01 23 01\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ld bc,#_IoPort
+\newline 
+3E 01\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ld a,#0x01 
+\newline 
+ED 79\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+out (c),a 
+\layout Subsubsection
+
+sfr
+\begin_inset LatexCommand \index{sfr}
+
+\end_inset 
+
+ (in0/out0 to 8 bit addresses on Z180
+\begin_inset LatexCommand \index{Z180}
+
+\end_inset 
+
+/HD64180
+\begin_inset LatexCommand \index{HD64180}
+
+\end_inset 
+
+)
+\layout Standard
+
+The compiler option -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-portmode=z180 (?) and a compiler #pragma\SpecialChar ~
+portmode
+\begin_inset LatexCommand \index{\#pragma portmode}
+
+\end_inset 
+
+=z180 (z80) is used to turn on (off) the Z180/HD64180 port addressing instructio
+ns 
+\family typewriter 
+in0/out0
+\family default 
+ instead of 
+\family typewriter 
+in/out
+\family default 
+.
+ If you include the file z180.h this will be set automatically.
 \layout Section
 
 Absolute Addressing
@@ -7827,8 +8181,12 @@ xdata
 
 In the above example the variable chksum will located at 0x7ffe and 0x7fff
  of the external ram.
- The compiler does not actually reserve any space for variables declared
- in this way (they are implemented with an equate in the assembler).
+ The compiler does 
+\emph on 
+not
+\emph default 
+ reserve any space for variables declared in this way (they are implemented
+ with an equate in the assembler).
  Thus it is left to the programmer to make sure there are no overlaps with
  other variables that are declared without the absolute address.
  The assembler listing file (.lst
@@ -7847,6 +8205,11 @@ In the above example the variable chksum will located at 0x7ffe and 0x7fff
 \end_inset 
 
 ) are good places to look for such overlaps.
+ Variables with an absolute address are 
+\emph on 
+not
+\emph default 
+ initialized.
 \layout Standard
 
 In case of memory mapped I/O devices the keyword 
@@ -12134,6 +12497,15 @@ CALLEE-SAVES
 \end_inset 
 
  is appended to the list of functions specified in the command line.
+\layout Itemize
+
+preproc_asm
+\begin_inset LatexCommand \index{\#pragma preproc\_asm}
+
+\end_inset 
+
+ (+ | -) - switch _asm _endasm block preprocessing on / off.
+ Default is on.
 \layout Standard
 
 The pragma's are intended to be used to turn-on or off certain optimizations
@@ -14466,7 +14838,7 @@ Related open source tools
 \align center 
 
 \begin_inset  Tabular
-<lyxtabular version="3" rows="8" columns="3">
+<lyxtabular version="3" rows="9" columns="3">
 <features>
 <column alignment="center" valignment="top" leftline="true" width="0pt">
 <column alignment="block" valignment="top" leftline="true" width="30line%">
@@ -14557,6 +14929,42 @@ PIC programmer
 
 
 \begin_inset LatexCommand \url{http://digilander.libero.it/fbradasc/FLP5.html}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+indent
+\begin_inset LatexCommand \index{indent}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Formats C source - Master of the white spaces
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset LatexCommand \url{http://home.hccnet.nl/d.ingamells/beautify.html}
 
 \end_inset 
 
@@ -14795,34 +15203,6 @@ Where to get
 
 \layout Standard
 
-S.
- S.
- Muchnick
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Advanced Compiler Design and Implementation
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-bookstore
-\end_inset 
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
 
 \family roman 
 \series medium 
@@ -14859,6 +15239,34 @@ C Reference Card
 \end_inset 
 
 
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+S.
+ S.
+ Muchnick
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Advanced Compiler Design and Implementation
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+bookstore
 \end_inset 
 </cell>
 </row>

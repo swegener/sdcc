@@ -1,0 +1,106 @@
+replace {
+	pula
+	psha
+	lda	%1
+} by {
+	; Peephole 1a	- removed redundant pula/psha
+	lda	%1
+}
+
+replace {
+	pula
+	psha
+	lda	%1,s
+} by {
+	; Peephole 1b	- removed redundant pula/psha
+	lda	%1,s
+}
+
+replace {
+	pula
+	psha
+	clra
+} by {
+	; Peephole 1c	- removed redundant pula/psha
+	clra
+}
+
+
+replace {
+	bcs	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2a	- eliminated jmp
+	bcc	%5
+%1:
+} if labelInRange
+
+replace {
+	bcc	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2b	- eliminated jmp
+	bcs	%5
+%1:
+} if labelInRange
+
+replace {
+	beq	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2c	- eliminated jmp
+	bne	%5
+%1:
+} if labelInRange
+
+replace {
+	bne	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2d	- eliminated jmp
+	beq	%5
+%1:
+} if labelInRange
+
+replace {
+	jmp	%5
+} by {
+	; Peephole 3	- shortened jmp to bra
+	bra	%5
+} if labelInRange
+
+replace {
+	lda	%1
+	tsta
+} by {
+	; Peephole 4a	- eliminated redundant tsta
+	lda	%1
+}
+
+replace {
+	lda	%1,s
+	tsta
+} by {
+	; Peephole 4b	- eliminated redundant tsta
+	lda	%1,s
+}
+
+replace {
+	ldx	%1
+	tstx
+} by {
+	; Peephole 4c	- eliminated redundant tstx
+	ldx	%1
+}
+
+replace {
+	ldx	%1,s
+	tstx
+} by {
+	; Peephole 4d	- eliminated redundant tstx
+	ldx	%1,s
+}

@@ -38,7 +38,9 @@ void gpsimio2_lit(unsigned char lit);
 
 void gpsimDebug_StackDump(char *fname, int line, char *info);
 
+#ifndef debugf
 #define debugf(frm, rest)       _debugf(__FILE__, __LINE__, frm, rest)
+#endif
 void _debugf(char *f, int l, char *frm, ...);
 
 #endif	/* __GENUTILS_H__ */

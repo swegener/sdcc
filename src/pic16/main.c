@@ -135,12 +135,13 @@ set *absSymSet;
 
 set *sectNames=NULL;			/* list of section listed in pragma directives */
 set *sectSyms=NULL;			/* list of symbols set in a specific section */
-
+set *wparamList=NULL;
 
 static int
 _process_pragma(const char *sz)
 {
   static const char *WHITE = " \t\n";
+  static const char *WHITECOMMA = " \t\n,";
   
   char	*ptr = strtok((char *)sz, WHITE);
 
@@ -277,6 +278,19 @@ _process_pragma(const char *sz)
 
 	  return 0;
 	}
+	
+	if(startsWith(ptr, "wparam")) {
+	  char *fname = strtok((char *)NULL, WHITECOMMA);
+	  
+            while(fname) {
+              addSet(&wparamList, Safe_strdup(fname));
+              
+//              debugf("passing with WREG to %s\n", fname);
+              fname = strtok((char *)NULL, WHITECOMMA);
+            }
+            
+          return 0;
+        }
 	
   return 1;
 }

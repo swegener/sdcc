@@ -80,8 +80,6 @@ void  pic16_pCodeInitRegisters(void);
 pCodeOp *pic16_popCopyReg(pCodeOpReg *pc);
 extern void pic16_pCodeConstString(char *name, char *value);
 
-#define debugf(frm, rest)       _debugf(__FILE__, __LINE__, frm, rest)
-extern void _debugf(char *f, int l, char *frm, ...);
 
 /*-----------------------------------------------------------------*/
 /* aopLiteral - string from a literal value                        */
@@ -180,12 +178,8 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 				&& !(sym->ival && !sym->level)
 			) {
 			  regs *reg;
-				/* add it to udata list */
-
-//				fprintf(stderr, "%s:%d adding %s (%s) remat=%d\n", __FILE__, __LINE__,
-//					sym->name, sym->rname, sym->remat);
-					
-						//, OP_SYMBOL(operandFromSymbol(sym))->name);
+                          sectSym *ssym;
+                          int found=0;
 #define SET_IMPLICIT	1
 
 #if SET_IMPLICIT
@@ -195,22 +189,18 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 
 				reg = pic16_allocDirReg( operandFromSymbol( sym ));
 				
-				{
-				  sectSym *ssym;
-				  int found=0;
-				  
+				if(reg) {
 #if 1
-				  	for(ssym=setFirstItem(sectSyms); ssym; ssym=setNextItem(sectSyms)) {
-				  		if(!strcmp(ssym->name, reg->name))found=1;
-					}
+                                  for(ssym=setFirstItem(sectSyms); ssym; ssym=setNextItem(sectSyms)) {
+				    if(!strcmp(ssym->name, reg->name))found=1;
+                                  }
 #endif
+                                  if(!found)
+                                    checkAddReg(&pic16_rel_udata, reg);
+                                  else
+				    checkAddSym(&publics, sym);
 
-					if(!found)
-						checkAddReg(&pic16_rel_udata, reg);
-					else
-						checkAddSym(&publics, sym);
-
-				}
+                                }
 			}
 
 		/* if extern then do nothing or is a function
@@ -309,17 +299,16 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 					  		sym->rname, reg, (reg?reg->name:"<<NULL>>"));
 #endif
 
-#if 1
-					  	for(ssym=setFirstItem(sectSyms); ssym; ssym=setNextItem(sectSyms)) {
-					  		if(!strcmp(ssym->name, reg->name))found=1;
-						}
-#endif
+                                                if(reg) {
+					  	  for(ssym=setFirstItem(sectSyms); ssym; ssym=setNextItem(sectSyms)) {
+					  	    if(!strcmp(ssym->name, reg->name))found=1;
+                                                  }
 
-						if(!found)
-							if(checkAddReg(&pic16_rel_udata, reg)) {
-								addSetHead(&publics, sym);
-							}
-
+                                                  if(!found)
+                                                    if(checkAddReg(&pic16_rel_udata, reg)) {
+                                                      addSetHead(&publics, sym);
+                                                    }
+                                                }
 					}
 
 
@@ -566,8 +555,8 @@ void pic16_printPointerType (const char *name, char ptype, void *p)
 /*-----------------------------------------------------------------*/
 /* printGPointerType - generates ival for generic pointer type     */
 /*-----------------------------------------------------------------*/
-void pic16_printGPointerType (const char *iname, const char *oname, const unsigned int itype,
-  const unsigned int type, char ptype, void *p)
+void pic16_printGPointerType (const char *iname, const unsigned int itype,
+  char ptype, void *p)
 {
   char buf[256];
   
@@ -576,6 +565,7 @@ void pic16_printGPointerType (const char *iname, const char *oname, const unsign
     switch( itype ) {
       case FPOINTER:
       case CPOINTER:
+      case FUNCTION:
         {
           sprintf(buf, "UPPER(%s)", iname);
           pic16_emitDS(buf, ptype, p);
@@ -585,6 +575,9 @@ void pic16_printGPointerType (const char *iname, const char *oname, const unsign
         sprintf(buf, "0x80");
         pic16_emitDS(buf, ptype, p);
         break;
+      default:
+//        debugf("itype = %d\n", itype );
+        assert( 0 );
     }
 
     pic16_flushDB(ptype, p);
@@ -906,7 +899,7 @@ int pic16_printIvalCharPtr (symbol * sym, sym_link * type, value * val, char pty
             // this is a literal string
             type=CPOINTER;
           }
-          pic16_printGPointerType(val->name, sym->name, type, type, ptype, p);
+          pic16_printGPointerType(val->name, type, ptype, p);
         }
       else
         {
@@ -987,22 +980,20 @@ void pic16_printIvalFuncPtr (sym_link * type, initList * ilist, char ptype, void
 
   /* now generate the name */
   if (!val->sym) {
-      pic16_printPointerType (val->name, ptype, p);
+      pic16_printGPointerType (val->name, DCL_TYPE(val->type), ptype, p);
   } else {
-      pic16_printPointerType (val->sym->rname, ptype, p);
+      pic16_printGPointerType (val->sym->rname, DCL_TYPE(val->type), ptype, p);
 
-      if(IS_FUNC(val->sym->type) && !val->sym->used) {
+      if(IS_FUNC(val->sym->type) && !val->sym->used && !IS_STATIC(val->sym->etype)) {
         
         if(!checkSym(publics, val->sym))
-	  checkAddSym(&externs, val->sym);
-        
-      	/* this has not been declared as extern
-      	 * so declare it as a 'late extern' just after the symbol */
-	if(ptype == 'f') {
-	 	fprintf((FILE *)p, "declare symbol as extern");
-	 	fprintf((FILE *)p, "\textern\t%s\n", val->sym->rname);
-	 	fprintf((FILE *)p, "continue variable declaration");
-	}
+	  if(checkAddSym(&externs, val->sym) && (ptype == 'f')) {
+	    /* this has not been declared as extern
+	     * so declare it as a 'late extern' just after the symbol */
+	    fprintf((FILE *)p, ";\tdeclare symbol as extern\n");
+	    fprintf((FILE *)p, "\textern\t%s\n", val->sym->rname);
+	    fprintf((FILE *)p, ";\tcontinue variable declaration\n");
+          }
       }
   }
 
@@ -1085,9 +1076,8 @@ void pic16_printIvalPtr (symbol * sym, sym_link * type, initList * ilist, char p
     }
   else if (size == 3)
     {
-      pic16_printGPointerType (val->name, sym->name, (IS_PTR(type)?DCL_TYPE(type):PTR_TYPE(SPEC_OCLS(sym->etype))),
-                         (IS_PTR (val->type) ? DCL_TYPE (val->type) :
-                          PTR_TYPE (SPEC_OCLS (val->etype))), ptype, p);
+      pic16_printGPointerType (val->name, (IS_PTR(type)?DCL_TYPE(type):PTR_TYPE(SPEC_OCLS(sym->etype))),
+                          ptype, p);
     } else
     	assert(0);
   return;

@@ -17,7 +17,8 @@ include ./Makefile.common
 
 DIRS	=	libdev	\
 		libsdcc	\
-		startup
+		startup \
+		debug
 
 
 all: build-all-libraries

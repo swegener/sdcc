@@ -1023,6 +1023,14 @@ extern void pic16_pcode_test(void);
 extern int pic16_debug_verbose;
 extern int pic16_pcode_verbose;
 
+#ifndef debugf
+//#define debugf(frm, rest...)       _debugf(__FILE__, __LINE__, frm, rest)
+#define debugf(frm, rest)	_debug(__FILE__, __LINE__, frm, rest)
+#endif
+
+extern void _debugf(char *f, int l, char *frm, ...);
+
+
 /*-----------------------------------------------------------------*
  * pCode objects.
  *-----------------------------------------------------------------*/

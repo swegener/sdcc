@@ -418,8 +418,6 @@ void pic16_DumpOp(char *prefix, operand *op)
 
 }
 
-//#define	debugf(frm, rest)	_debugf(__FILE__, __LINE__, frm, rest)
-
 void _debugf(char *f, int l, char *frm, ...)
 {
   va_list ap;

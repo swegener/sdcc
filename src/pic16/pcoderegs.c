@@ -527,13 +527,18 @@ static int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *re
 
   }  else if(PCI(pc1)->op == POC_MOVWF) {
 
+    reg1 = pic16_getRegFromInstruction(pc1);
+
+    if(reg1->type == REG_SFR)return (total_registers_saved != t);
+
     pct2 = pic16_findNextInstruction(pc2->next);
 
     if(PCI(pc2)->op == POC_MOVFW) {
-      /*
+
+#if 0
 	fprintf(stderr, "   MOVWF/MOVFW. instruction after MOVFW is:\n");
 	pct2->print(stderr,pct2);
-      */
+#endif
 
       if(PCI(pct2)->op == POC_MOVWF) {
 	/*
@@ -551,8 +556,8 @@ static int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *re
 	    
 	*/
 	reg2 = pic16_getRegFromInstruction(pct2);
-	//if(reg2 && !regUsedinRange(pc1,pc2,reg2) && (reg2->type != REG_SFR)) {
-	if(reg2 && !regUsedinRange(pc1,pc2,reg2)) {
+	if(reg2 && !regUsedinRange(pc1,pc2,reg2) && (reg2->type != REG_SFR)) {
+//	if(reg2 && !regUsedinRange(pc1,pc2,reg2)) 
 
 	  if(pic16_pCodeSearchCondition(pct2, PCC_Z) < 1) {
 	    pCode *pct3 = pic16_findNextInstruction(pct2->next);
@@ -573,13 +578,13 @@ static int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *re
 	      //fprintf(stderr,"didn't optimize because Z bit is used\n");
 	    }
 	}
-/*
+#if 0
 	fprintf(stderr, " couldn't optimize\n");
 	if(reg2)
 	  fprintf(stderr, " %s is used in range\n",reg2->name);
 	else
 	  fprintf(stderr, " reg2 is NULL\n");
-*/
+#endif
       }
     }
 
@@ -642,7 +647,9 @@ static int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *re
 	}
       } else if ( (PCI(pct1)->op == POC_MOVWF) &&
 	   (PCI(pc2)->op == POC_MOVFW)) {
-	//fprintf(stderr,"movwf MOVWF/MOVFW\n");
+
+//	   fprintf(stderr,"movwf MOVWF/MOVFW\n");
+
 	if(optimize_level > 1 && can_free) {
 	  pct2 = pic16_newpCode(POC_MOVFW, PCI(pc1)->pcop);
 	  pic16_pCodeInsertAfter(pc2, pct2);

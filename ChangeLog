@@ -1,3 +1,38 @@
+2004-11-04 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/main.c (options): added command line --gstack, to trace
+	stack over/under flows,
+	* added pragma 'wparam' to allow passing first byte of function
+	parameters via WREG, syntax is #pragma wparam my_function[, func2...]
+	* src/pic16/gen.c (pic16_testStackOverflow): function which emits a
+	call to __gstack_test function and sets up the symbol as extern,
+	* (pic16_pushpCodeOp, pic16_poppCodeOp, pushw, pushaop, popaopidx,
+	* popaop): added call to pic16_testStackOverflow,
+	* (wParamCmp, inWparamList): NEW, test existence of a symbol in
+	wparamList list,
+	* (genCall, genPcall): now all parameters are passed via stack
+	except in functions that are pass to wparam pragma in which WREG is
+	used too,
+	* (genPcall): REENTRANT flag is checked to see if variable prototype
+	contains reentrant keyword, don't call a non-reentrant function, via
+	a reentrant function pointer or vice versa, functions are never
+	passed via WREG,
+	* (genJumpTab): applied patch from bug #1057478 by R.Neider and
+	D.Winkler,
+	* src/pic16/glue.c (pic16emitRegularMap): fixed bug which caused a
+	SIGSEGV when accessing a NULL register stucture,
+	* (pic16_printGPointerType): modified to handle UPPER modifier for
+	function initializers, changed prototype of function to simpler one,
+	* (pic16_printIvalFuncPtr): check to see if function is already
+	added in externs list,
+	* src/pic16/pcoderegs.c (pCodeOptime2pCodes): fixed bug which
+	optimized a move from W to SFR with a move to the same register
+	later after a CALL,
+	* device/lib/pic16/debug: NEW directory, contains debug features
+	which are enabled when linking with libdebug.lib, currently command
+	line option --gstack enables stack pointer tracing for over/under
+	flow, corresponding sources are in debug/gstack
+
 2004-10-30 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* doc/sdccman.lyx: updated SDCC version,

@@ -72,6 +72,8 @@ static int optimized_for_speed = 0;
 
 */
 
+extern set *externs;
+
 /* max_key keeps track of the largest label number used in 
    a function. This is then used to adjust the label offset
    for the next function.
@@ -2235,18 +2237,38 @@ static void mov2fp(pCodeOp *dst, asmop *src, int offset)
   }
 }
 
+void pic16_testStackOverflow(void)
+{
+#define	GSTACK_TEST_NAME	"__gstack_test"
+
+  pic16_emitpcode(POC_CALL, pic16_popGetWithString( GSTACK_TEST_NAME ));
+  
+  {
+    symbol *sym;
+
+      sym = newSymbol( GSTACK_TEST_NAME , 0 );
+      strcpy(sym->rname, GSTACK_TEST_NAME);
+      checkAddSym(&externs, sym);
+  }
+
+}
 
 /* push pcop into stack */
 void pic16_pushpCodeOp(pCodeOp *pcop)
 {
 //	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-	pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pcop, pic16_popCopyReg(&pic16_pc_postdec1)));
+  pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pcop, pic16_popCopyReg(&pic16_pc_postdec1)));
+  if(pic16_options.gstack)
+    pic16_testStackOverflow();
+    
 }
 
 /* pop pcop from stack */
 void pic16_poppCodeOp(pCodeOp *pcop)
 {
-	pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_preinc1), pcop));
+  pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_preinc1), pcop));
+  if(pic16_options.gstack)
+    pic16_testStackOverflow();
 }
 
 
@@ -2255,8 +2277,10 @@ void pic16_poppCodeOp(pCodeOp *pcop)
 /*-----------------------------------------------------------------*/
 void pushw(void)
 {
-        DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-	pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_postdec1));
+  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+  pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_postdec1));
+  if(pic16_options.gstack)
+    pic16_testStackOverflow();
 }
 
                 
@@ -2265,8 +2289,19 @@ void pushw(void)
 /*-----------------------------------------------------------------*/
 void pushaop(asmop *aop, int offset)
 {
-        DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-        pic16_emitpcode(POC_MOVFF, pic16_popCombine2(PCOR(pic16_popGet(aop, offset)), &pic16_pc_postdec1, 0));
+  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+
+  if(is_LitAOp(aop)) {
+    pic16_emitpcode(POC_MOVLW, pic16_popGet(aop, offset));
+    pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_postdec1));
+  } else {
+    pic16_emitpcode(POC_MOVFF,
+      pic16_popGet2p(pic16_popGet(aop, offset), pic16_popCopyReg(&pic16_pc_postdec1)));
+  }
+
+//  pic16_emitpcode(POC_MOVFF, pic16_popCombine2(PCOR(pic16_popGet(aop, offset)), &pic16_pc_postdec1, 0));
+  if(pic16_options.gstack)
+    pic16_testStackOverflow();
 }
 
 /*-----------------------------------------------------------------*/
@@ -2274,20 +2309,24 @@ void pushaop(asmop *aop, int offset)
 /*-----------------------------------------------------------------*/
 void popaop(asmop *aop, int offset)
 {
-	DEBUGpic16_emitcode("; ***", "%s  %d", __FUNCTION__, __LINE__);
-	pic16_emitpcode(POC_MOVFF, pic16_popCombine2(&pic16_pc_preinc1, PCOR(pic16_popGet(aop, offset)), 0));
+  DEBUGpic16_emitcode("; ***", "%s  %d", __FUNCTION__, __LINE__);
+  pic16_emitpcode(POC_MOVFF, pic16_popCombine2(&pic16_pc_preinc1, PCOR(pic16_popGet(aop, offset)), 0));
+  if(pic16_options.gstack)
+    pic16_testStackOverflow();
 }
 
 void popaopidx(asmop *aop, int offset, int index)
 {
   int ofs=1;
 
-        DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
-	if(STACK_MODEL_LARGE)ofs++;
+    if(STACK_MODEL_LARGE)ofs++;
 
-	pic16_emitpcode(POC_MOVLW, pic16_popGetLit(index + ofs));
-        pic16_emitpcode(POC_MOVFF, pic16_popCombine2(&pic16_pc_plusw2, PCOR(pic16_popGet(aop, offset)), 0));
+    pic16_emitpcode(POC_MOVLW, pic16_popGetLit(index + ofs));
+    pic16_emitpcode(POC_MOVFF, pic16_popCombine2(&pic16_pc_plusw2, PCOR(pic16_popGet(aop, offset)), 0));
+    if(pic16_options.gstack)
+      pic16_testStackOverflow();
 }
 
 /*-----------------------------------------------------------------*/
@@ -2814,6 +2853,7 @@ static void assignResultValue(operand * oper, int rescall)
         /* >32-bits, result on stack, and FSR0 points to beginning.
 	 * Fix stack when done */
 	/* FIXME FIXME */
+//	debugf("WARNING: Possible bug when returning more than 4-bytes\n");
 	while (size--) {
 //	    DEBUGpic16_emitcode("; ", "POC_MOVLW %d", GpsuedoStkPtr);
 //          DEBUGpic16_emitcode("; ", "POC_MOVFW PLUSW2");
@@ -2833,7 +2873,7 @@ static void assignResultValue(operand * oper, int rescall)
     } else {
       int areg = 0;		/* matching argument register */
       
-      debugf("_G.useWreg = %d\n", _G.useWreg);
+//      debugf("_G.useWreg = %d\tGpsuedoStkPtr = %d\n", _G.useWreg, GpsuedoStkPtr);
       areg = SPEC_ARGREG( OP_SYM_ETYPE( oper ) ) - 1;
 
 
@@ -2846,6 +2886,7 @@ static void assignResultValue(operand * oper, int rescall)
           size--;
           pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(oper), offset /*size*/));
           offset++;
+//          debugf("receive from WREG\n", 0);
         }
       }
 //      GpsuedoStkPtr++;
@@ -2855,6 +2896,7 @@ static void assignResultValue(operand * oper, int rescall)
         size--;
         GpsuedoStkPtr++;
         popaopidx(AOP(oper), offset, GpsuedoStkPtr);
+//        debugf("receive from STACK\n", 0);
         offset++;
       }
     }
@@ -2869,7 +2911,6 @@ static void genIpush (iCode *ic)
 //  int size, offset=0;
 
   DEBUGpic16_emitcode ("; ***","%s  %d - WARNING no code generated",__FUNCTION__,__LINE__);
-
 
   if(ic->parmPush) {
     pic16_aopOp(IC_LEFT(ic), ic, FALSE );
@@ -3036,6 +3077,17 @@ static void saverbank (int bank, iCode *ic, bool pushPsw)
 #endif	/* 0 */
 
 
+static int wparamCmp(void *p1, void *p2)
+{
+  return (!strcmp((char *)p1, (char *)p2));
+}
+
+int inWparamList(char *s)
+{
+  return isinSetWith(wparamList, s, wparamCmp);
+} 
+
+
 /*-----------------------------------------------------------------*/
 /* genCall - generates a call statement                            */
 /*-----------------------------------------------------------------*/
@@ -3044,6 +3096,7 @@ static void genCall (iCode *ic)
   sym_link *ftype;   
   int stackParms=0;
   int use_wreg=0;
+  int inwparam=0;
   char *fname;
   
     DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
@@ -3057,6 +3110,7 @@ static void genCall (iCode *ic)
 //	stackParms = psuedoStkPtr;
 //	fprintf(stderr, "%s:%d ic parmBytes = %d\n", __FILE__, __LINE__, ic->parmBytes);
     fname = OP_SYMBOL(IC_LEFT(ic))->rname[0]?OP_SYMBOL(IC_LEFT(ic))->rname:OP_SYMBOL(IC_LEFT(ic))->name;
+    inwparam = inWparamList(OP_SYMBOL(IC_LEFT(ic))->name);
 
 #if 0
     gpsimDebug_StackDump(__FILE__, __LINE__, fname );
@@ -3066,85 +3120,76 @@ static void genCall (iCode *ic)
     if (_G.sendSet) {
       iCode *sic;
       int psuedoStkPtr=-1; 
-#if USE_WREG_IN_FUNC_PARAMS
       int firstTimeThruLoop = 1;
-#endif
 
-#if 1
+
         /* reverse sendSet if function is not reentrant */
         if(!IFFUNC_ISREENT(ftype))
           _G.sendSet = reverseSet(_G.sendSet);
-#endif
 
 	/* First figure how many parameters are getting passed */
-
-/*	do we really need to know this ? -- VR 
-	for (sic = setFirstItem(_G.sendSet) ; sic ; sic = setNextItem(_G.sendSet)) {
-	  pic16_aopOp(IC_LEFT(sic),sic,FALSE);
-          psuedoStkPtr += AOP_SIZE(IC_LEFT(sic));
-          pic16_freeAsmop (IC_LEFT(sic),NULL,sic,FALSE);
-        }
-*/
-
-
-//        stackParms = psuedoStkPtr;
         stackParms = 0;
         use_wreg = 0;
         
         for (sic = setFirstItem(_G.sendSet) ; sic ; sic = setNextItem(_G.sendSet)) {
           int size;
-#if USE_WREG_IN_FUNC_PARAMS
-          int offset = 0;
-#endif
+//          int offset = 0;
+
             pic16_aopOp(IC_LEFT(sic),sic,FALSE);
             size = AOP_SIZE(IC_LEFT(sic));
 
             stackParms += size;
 
-            /* set the following to 1 to enable passing arguments via WREG */
-#if USE_WREG_IN_FUNC_PARAMS
-            while (size--) {
-              DEBUGpic16_emitcode ("; ","%d left %s",__LINE__,
-                    pic16_AopType(AOP_TYPE(IC_LEFT(sic))));
-              DEBUGpic16_emitcode("; ", "push %d", psuedoStkPtr-1);
+            /* pass the last byte through WREG */
+            if(inwparam) {
 
-              if(!firstTimeThruLoop) {
-                /* If this is not the first time we've been through the loop
-                 * then we need to save the parameter in a temporary
-                 * register. The last byte of the last parameter is
-                 * passed in W. */
+              while (size--) {
+                DEBUGpic16_emitcode ("; ","%d left %s",__LINE__,
+                      pic16_AopType(AOP_TYPE(IC_LEFT(sic))));
+                DEBUGpic16_emitcode("; ", "push %d", psuedoStkPtr-1);
 
-                pushw();
-//                --psuedoStkPtr;		// sanity check
-                use_wreg = 1;
-              }
+                if(!firstTimeThruLoop) {
+                  /* If this is not the first time we've been through the loop
+                   * then we need to save the parameter in a temporary
+                   * register. The last byte of the last parameter is
+                   * passed in W. */
+
+                  pushw();
+//                  --psuedoStkPtr;		// sanity check
+                  use_wreg = 1;
+                }
                 
-              firstTimeThruLoop=0;
+                firstTimeThruLoop=0;
 
-              mov2w (AOP(IC_LEFT(sic)), size);
+                mov2w (AOP(IC_LEFT(sic)), size);
 
-              offset++;
+//                offset++;
+              }
+            } else {
+              /* all arguments are passed via stack */
+              use_wreg = 0;
+
+              while (size--) {
+                DEBUGpic16_emitcode ("; ","%d left %s",__LINE__,
+                      pic16_AopType(AOP_TYPE(IC_LEFT(sic))));
+                DEBUGpic16_emitcode("; ", "push %d", psuedoStkPtr-1);
+
+//                pushaop(AOP(IC_LEFT(sic)), size);
+                mov2w (AOP(IC_LEFT(sic)), size);
+                pushw();
+              }
             }
-#else
-            /* all arguments are passed via stack */
-            while (size--) {
-              DEBUGpic16_emitcode ("; ","%d left %s",__LINE__,
-                    pic16_AopType(AOP_TYPE(IC_LEFT(sic))));
-              DEBUGpic16_emitcode("; ", "push %d", psuedoStkPtr-1);
-
-              mov2w (AOP(IC_LEFT(sic)), size);
-              pushw();
-            }
-#endif
 
             pic16_freeAsmop (IC_LEFT(sic),NULL,sic,TRUE);
           }
 
-#if USE_WREG_IN_FUNC_PARAMS
-          /* save last parameter to stack if functions has varargs */
-          if(IFFUNC_HASVARARGS(ftype) || IFFUNC_ISREENT(ftype))pushw();
-          else use_wreg = 1;		/* last parameter in WREG */
-#endif
+          if(inwparam) {
+            if(IFFUNC_HASVARARGS(ftype) || IFFUNC_ISREENT(ftype)) {
+              pushw();	/* save last parameter to stack if functions has varargs */
+              use_wreg = 0;
+            } else
+              use_wreg = 1;
+          } else use_wreg = 0;
 
           _G.stackRegSet = _G.sendSet;
           _G.sendSet = NULL;
@@ -3154,6 +3199,7 @@ static void genCall (iCode *ic)
     pic16_emitpcode(POC_CALL,pic16_popGetWithString(fname));
 
     GpsuedoStkPtr=0;
+    
     /* if we need to assign a result value */
     if ((IS_ITEMP(IC_RESULT(ic))
           && (OP_SYMBOL(IC_RESULT(ic))->nRegs
@@ -3217,82 +3263,36 @@ static void genCall (iCode *ic)
 /*-----------------------------------------------------------------*/
 static void genPcall (iCode *ic)
 {
-  sym_link *ftype;
+  sym_link *ftype, *fntype;
   int stackParms=0;
-  int use_wreg=0;
   symbol *retlbl = newiTempLabel(NULL);
   pCodeOp *pcop_lbl = pic16_popGetLabel(retlbl->key);
   
     DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
     ftype = OP_SYM_TYPE(IC_LEFT(ic));
-    
+    fntype = operandType( IC_LEFT(ic) )->next;
+
     /* if send set is not empty the assign */
     if (_G.sendSet) {
       iCode *sic;
       int psuedoStkPtr=-1; 
-#if USE_WREG_IN_FUNC_PARAMS
-      int firstTimeThruLoop = 1;
-#endif
 
-      /* For the Pic port, there is no data stack.
-       * So parameters passed to functions are stored
-       * in registers. (The pCode optimizer will get
-       * rid of most of these :). */
-
-
-#if 1
       /* reverse sendSet if function is not reentrant */
-      if(!IFFUNC_ISREENT(ftype))
+      if(!IFFUNC_ISREENT(fntype))
         _G.sendSet = reverseSet(_G.sendSet);
-#endif
 
-      /* First figure how many parameters are getting passed */
-#if 0
-      for (sic = setFirstItem(_G.sendSet) ; sic ; sic = setNextItem(_G.sendSet)) {
-        pic16_aopOp(IC_LEFT(sic),sic,FALSE);
-        psuedoStkPtr += AOP_SIZE(IC_LEFT(sic));
-        pic16_freeAsmop (IC_LEFT(sic),NULL,sic,FALSE);
-      }
-#endif
-
-//      stackParms = psuedoStkPtr;
       stackParms = 0;
-
+      
       for (sic = setFirstItem(_G.sendSet) ; sic ; sic = setNextItem(_G.sendSet)) {
         int size;
-#if USE_WREG_IN_FUNC_PARAMS
-        int offset = 0;
-#endif
 
           pic16_aopOp(IC_LEFT(sic),sic,FALSE);
           size = AOP_SIZE(IC_LEFT(sic));
           stackParms += size;
 
-#if USE_WREG_IN_FUNC_PARAMS
-          while (size--) {
-            DEBUGpic16_emitcode ("; ","%d left %s",__LINE__,
-            pic16_AopType(AOP_TYPE(IC_LEFT(sic))));
-            DEBUGpic16_emitcode("; ", "push %d", psuedoStkPtr-1);
-
-            if(!firstTimeThruLoop) {
-              /* If this is not the first time we've been through the loop
-               * then we need to save the parameter in a temporary
-               * register. The last byte of the last parameter is
-               * passed in W. */
-
-              pushw();
-              --psuedoStkPtr;		// sanity check
-            }
-			
-            firstTimeThruLoop=0;
-
-            mov2w (AOP(IC_LEFT(sic)), size);
-            use_wreg = 1;
-
-            offset++;
-          }
-#else
+          /* all parameters are passed via stack, since WREG is clobbered
+           * by the calling sequence */
           while (size--) {
             DEBUGpic16_emitcode ("; ","%d left %s",__LINE__,
             pic16_AopType(AOP_TYPE(IC_LEFT(sic))));
@@ -3301,15 +3301,9 @@ static void genPcall (iCode *ic)
             mov2w (AOP(IC_LEFT(sic)), size);
             pushw();
           }
-#endif
 
           pic16_freeAsmop (IC_LEFT(sic),NULL,sic,TRUE);
       }
-
-#if USE_WREG_IN_FUNC_PARAMS
-      if(IFFUNC_HASVARARGS(ftype) || IFFUNC_ISREENT(ftype))pushw();
-      else use_wreg = 1;		/* last parameter in WREG */
-#endif
 
       _G.stackRegSet = _G.sendSet;
       _G.sendSet = NULL;
@@ -3362,7 +3356,7 @@ static void genPcall (iCode *ic)
       pic16_freeAsmop(IC_RESULT(ic),NULL, ic,TRUE);
     }
 
-    stackParms -= use_wreg;
+//    stackParms -= use_wreg;
     
     if(stackParms>0) {
       pic16_emitpcode(POC_MOVLW, pic16_popGetLit(stackParms));
@@ -3565,7 +3559,10 @@ static void genFunction (iCode *ic)
     if(strcmp(sym->name, "main")) {
       if(1  /*!options.ommitFramePtr || sym->regsUsed*/) {
         /* setup the stack frame */
-        pic16_emitpcode(POC_MOVFF, pic16_popCombine2( &pic16_pc_fsr2l, &pic16_pc_postdec1, 0));
+        if(STACK_MODEL_LARGE)
+          pic16_pushpCodeOp(pic16_popCopyReg(&pic16_pc_fsr2h));
+        pic16_pushpCodeOp(pic16_popCopyReg(&pic16_pc_fsr2l));
+//        pic16_emitpcode(POC_MOVFF, pic16_popCombine2( &pic16_pc_fsr2l, &pic16_pc_postdec1, 0));
         pic16_emitpcode(POC_MOVFF, pic16_popCombine2( &pic16_pc_fsr1l, &pic16_pc_fsr2l, 0));
         if(STACK_MODEL_LARGE)
           pic16_emitpcode(POC_MOVFF, pic16_popCombine2( &pic16_pc_fsr1h, &pic16_pc_fsr2h, 0));
@@ -3583,13 +3580,13 @@ static void genFunction (iCode *ic)
       pic16_emitpcode(POC_DECF, pic16_popCopyReg(&pic16_pc_fsr1h));
     }
           
-#if USE_WREG_IN_FUNC_PARAMS
-    if(IFFUNC_HASVARARGS(sym->type) || IFFUNC_ISREENT(sym->type))
+    if(inWparamList(sym->name)) {
+      if(IFFUNC_HASVARARGS(sym->type) || IFFUNC_ISREENT(sym->type))
+        _G.useWreg = 0;
+      else
+        _G.useWreg = 1;
+    } else
       _G.useWreg = 0;
-    else _G.useWreg = 1;
-#else
-    _G.useWreg = 0;
-#endif
 
     /* if callee-save to be used for this function
      * then save the registers being used in this function */
@@ -3675,8 +3672,10 @@ static void genEndFunction (iCode *ic)
       if(1/*!options.ommitFramePtr ||*/ /*sym->regsUsed*/) {
         /* restore stack frame */
         if(STACK_MODEL_LARGE)
-          pic16_emitpcode(POC_MOVFF, pic16_popCombine2( &pic16_pc_preinc1, &pic16_pc_fsr2h, 0));
-        pic16_emitpcode(POC_MOVFF, pic16_popCombine2( &pic16_pc_preinc1, &pic16_pc_fsr2l, 0));
+          pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_fsr2h ));
+//          pic16_emitpcode(POC_MOVFF, pic16_popCombine2( &pic16_pc_preinc1, &pic16_pc_fsr2h, 0));
+        pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_fsr2l ));
+//        pic16_emitpcode(POC_MOVFF, pic16_popCombine2( &pic16_pc_preinc1, &pic16_pc_fsr2l, 0));
       }
     }
 
@@ -10427,7 +10426,6 @@ static void genGenPointerGet (operand *left,
 }
 #endif
 
-extern set *externs;
 
 /*-----------------------------------------------------------------*/
 /* genGenPointerGet - gget value from generic pointer space        */
@@ -11347,7 +11345,8 @@ static void genGenPointerSet (operand *right,
      * by the support function this restoring the stack. The important
      * thing is that there is no need to manually restore stack pointer
      * here */
-    mov2fp(pic16_popCopyReg(&pic16_pc_postdec1), AOP(right), 0);
+    pushaop(AOP(right), 0);
+//    mov2fp(pic16_popCopyReg(&pic16_pc_postdec1), AOP(right), 0);
     if(size>1)mov2fp(pic16_popCopyReg(&pic16_pc_prodh), AOP(right), 1);
     if(size>2)mov2fp(pic16_popCopyReg(&pic16_pc_tblptrl), AOP(right), 2);
     if(size>3)mov2fp(pic16_popCopyReg(&pic16_pc_tblptrh), AOP(right), 3);
@@ -11789,7 +11788,7 @@ static void genAssign (iCode *ic)
     } else if (AOP_TYPE(right) == AOP_CRY) {
       pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(result),offset));
       if(offset == 0) {
-        debugf("%s: BTFSS offset == 0\n", __FUNCTION__);
+//        debugf("%s: BTFSS offset == 0\n", __FUNCTION__);
 	pic16_emitpcode(POC_BTFSS, pic16_popGet(AOP(right),0));
 	pic16_emitpcode(POC_INCF, pic16_popGet(AOP(result),0));
       }
@@ -11834,6 +11833,7 @@ static void genJumpTab (iCode *ic)
     pic16_emitcode("jmp","@a+dptr");
     pic16_emitcode("","%05d_DS_:",jtab->key+100);
 
+#if 0
     pic16_emitpcode(POC_MOVLW, pic16_popGetLabel(jtab->key));
     pic16_emitpcode(POC_ADDFW, pic16_popGet(AOP(IC_JTCOND(ic)),0));
     emitSKPNC;
@@ -11841,6 +11841,49 @@ static void genJumpTab (iCode *ic)
     pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_pcl));
     pic16_emitpLabel(jtab->key);
 
+#else
+
+    pCodeOp *jt_offs = pic16_popGetTempReg(0);
+    pCodeOp *jt_offs_hi = pic16_popGetTempReg(1);
+    pCodeOp *jt_label = pic16_popGetLabel (jtab->key);
+    //fprintf (stderr, "Creating jump table...\n");
+
+    // calculate offset into jump table (idx * sizeof (GOTO))
+    pic16_emitpcode(POC_CLRF  , jt_offs_hi);
+    pic16_emitpcode(POC_RLCFW , pic16_popGet(AOP(IC_JTCOND(ic)),0));
+    pic16_emitpcode(POC_RLCF  , jt_offs_hi);
+    pic16_emitpcode(POC_RLCFW , pic16_popCopyReg(&pic16_pc_wreg));
+    pic16_emitpcode(POC_RLCF  , jt_offs_hi);
+    pic16_emitpcode(POC_ANDLW , pic16_popGetLit (0xFC));
+    pic16_emitpcode(POC_MOVWF , jt_offs);
+
+    // prepare PCLATx (set to first entry in jump table)
+    pic16_emitpcode(POC_MOVLW , pic16_popGetImmd(jt_label->name, 2, 0));
+    pic16_emitpcode(POC_MOVWF , pic16_popCopyReg(&pic16_pc_pclatu));
+    pic16_emitpcode(POC_MOVLW , pic16_popGetImmd(jt_label->name, 1, 0));
+    pic16_emitpcode(POC_MOVWF , pic16_popCopyReg(&pic16_pc_pclath));
+    pic16_emitpcode(POC_MOVLW , pic16_popGetImmd(jt_label->name, 0, 0));
+
+    // set PCLATx to selected entry (new PCL is stored in jt_offs)
+    pic16_emitpcode(POC_ADDWF , jt_offs);
+    pic16_emitpcode(POC_MOVFW , jt_offs_hi);
+    pic16_emitpcode(POC_ADDWFC, pic16_popCopyReg(&pic16_pc_pclath));
+    emitSKPNC;
+    pic16_emitpcode(POC_INCF  , pic16_popCopyReg(&pic16_pc_pclatu));
+
+    // release temporaries and prepare jump into table (new PCL --> WREG)
+    pic16_emitpcode(POC_MOVFW , jt_offs);
+    pic16_popReleaseTempReg (jt_offs_hi, 1);
+    pic16_popReleaseTempReg (jt_offs, 0);
+
+    // jump into the table
+    pic16_emitpcode(POC_MOVWF , pic16_popCopyReg(&pic16_pc_pcl));
+
+    // this goto prevents the next label from being removed...
+    pic16_emitpcode(POC_GOTO, jt_label);
+    pic16_emitpLabel(jtab->key);
+
+#endif
     pic16_freeAsmop(IC_JTCOND(ic),NULL,ic,TRUE);
 
     /* now generate the jump labels */

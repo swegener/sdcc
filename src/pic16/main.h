@@ -31,6 +31,7 @@ typedef struct sectSym {
 extern set *absSymSet;
 extern set *sectNames;
 extern set *sectSyms;
+extern set *wparamList;
 
 extern int pic16_mplab_comp;
 extern int pic16_fstack;

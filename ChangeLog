@@ -1,3 +1,7 @@
+2004-04-20 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* as/link_hc08.dsp: Added as/hc08/lkelf.c to project.
+
 2004-04-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/z80/peeph-z80.def: removed some peephole rules that don't

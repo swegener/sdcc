@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "xa_main.h"
-#include "xa_asm.tab.h"
+#include "xa_rasm.tab.h"
 
 extern int inst_size, yylval;
 char line_text[MAX_LINE]={'\0'}, last_line_text[MAX_LINE];
@@ -222,7 +222,6 @@ high		{LIST; return HIGH;}
 >>		{LIST; return RSHIFT;}
 \<\<		{LIST; return LSHIFT;}
 
-
 R[0-9]		{LIST; yylval = yytext[1] - '0' + WORD_REG; return REG;}
 R1[0-5]		{LIST; yylval = yytext[2] - '0' + 10 + WORD_REG; return REG;}
 R[0-7]L		{LIST; yylval = (yytext[1] - '0') * 2 + BYTE_REG; return REG;}
@@ -234,8 +233,9 @@ R[0-7]H		{LIST; yylval = (yytext[1] - '0') * 2 + 1 + BYTE_REG; return REG;}
 				if (is_def(yytext)) {
 					yylval = get_value(yytext);
 				} else {
+                                        if (p1) build_sym_list(yytext);
 					yylval = 0;
-					if (p3) error("Symbol undefined");
+                                        //if (p3) error("Symbol undefined");
 				}
 				/* keep name in lex_sym_name since yytext */
 				/* could be overwritten if the parser does */

@@ -95,6 +95,10 @@ test-ds390:
 test-ucz80:
 	$(MAKE) inter-port-clean test-port PORT=ucz80
 
+# Helper rule for testing the xa51 port only(use ucSim simulator)
+test-xa51:
+	$(MAKE) inter-port-clean test-port PORT=xa51
+
 ### Helper rule for testing the host cc only
 test-host:
 	$(MAKE) inter-port-clean test-port PORT=host

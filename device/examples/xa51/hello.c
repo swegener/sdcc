@@ -1,8 +1,14 @@
 #include <xa.h>
 
 bit b1, b2=1;
+code c1=0;
 data d1, d2=2;
 xdata x1, x2=3;
+
+extern bit be;
+extern code ce;
+extern data de;
+extern xdata xe;
 
 #define	BAUD_RATE 9600
 #define	OSC 20000000L	/* Xtal frequency */
@@ -10,6 +16,7 @@ xdata x1, x2=3;
 #define	DIVIDER	(OSC/(64L*BAUD_RATE))
 
 void external_startup(void) {
+  xe=0;
   _asm
     mov.b	_WDCON,#0	;shut down the watchdog
     mov.b	_WFEED1,#0a5h
@@ -55,6 +62,7 @@ void putchar(char c) {
 }
 #endif
 
+#if 0
 char getchar(void) {
   char	c;
   
@@ -64,6 +72,9 @@ char getchar(void) {
   RI0=0;
   return c;
 }
+#else
+char getchar();
+#endif
 
 void puts(char *s) {
   while (*s) {
@@ -76,6 +87,7 @@ int kbhit(void) {
 }
 
 void main(void) {
+  xe=getchar();
   putchar('1');
   putchar('2');
   putchar('3');

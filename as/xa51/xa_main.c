@@ -17,6 +17,7 @@
 /* adapted from the osu8asm project, 1995 */
 /* http://www.pjrc.com/tech/osu8/index.html */
 
+#define D(x) x
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,13 +29,18 @@
 #include "xa_main.h"
 
 extern void yyrestart(FILE *new_file);
-extern void hexout(int byte, int memory_location, int end);
 extern int yyparse();
 
 
+char modulename[PATH_MAX];
+char infilename[PATH_MAX];
+char outfilename[PATH_MAX];
+char listfilename[PATH_MAX];
+char symfilename[PATH_MAX];
+
 /* global variables */
 
-FILE *fhex, *fmem, *list_fp, *sym_fp;
+FILE *frel, *fmem, *list_fp, *sym_fp;
 extern FILE *yyin;
 extern char *yytext;
 extern char last_line_text[];
@@ -48,6 +54,7 @@ char symbol_name[1000];
 struct area_struct area[NUM_AREAS];
 int current_area=AREA_CSEG;
 
+char rel_line[2][132];
 
 char *areaToString (int area) {
   switch (area) 
@@ -80,7 +87,13 @@ struct symbol * build_sym_list(char *thename)
 {
 	struct symbol *new, *p;
 
-/*	printf("  Symbol: %s  Line: %d\n", thename, lineno); */
+	if ((p=findSymbol(thename))) {
+	  p->area=current_area;
+	  //fprintf (stderr, "warning, symbol %s already defined\n", thename);
+	  return p;
+	}
+
+	//printf("  Symbol: %s  Line: %d\n", thename, lineno);
 	new = (struct symbol *) malloc(sizeof(struct symbol));
 	new->name = (char *) malloc(strlen(thename)+1);
 	strcpy(new->name, thename);
@@ -91,6 +104,7 @@ struct symbol * build_sym_list(char *thename)
 	new->isreg = 0;
 	new->line_def = lineno - 1;
 	new->area = current_area;
+	new->mode = 'X'; // start with an external
 	new->next = NULL;
 	if (sym_list == NULL) return (sym_list = new);
 	p = sym_list;
@@ -99,7 +113,17 @@ struct symbol * build_sym_list(char *thename)
 	return (new);
 }
 
-int assign_value(char *thename, int thevalue)
+struct symbol *findSymbol (char *thename) {
+  struct symbol *p;
+  for (p=sym_list; p; p=p->next) {
+    if (strcasecmp(thename, p->name)==0) {
+      return p;
+    }
+  }
+  return NULL;
+}
+
+int assign_value(char *thename, int thevalue, char mode)
 {
 	struct symbol *p;
 
@@ -108,6 +132,7 @@ int assign_value(char *thename, int thevalue)
 		if (!(strcasecmp(thename, p->name))) {
 			p->value = thevalue;
 			p->isdef = 1;
+			p->mode = mode;
 			return (0);
 		}
 		p = p->next;
@@ -116,7 +141,7 @@ int assign_value(char *thename, int thevalue)
 	exit(1);
 }
 
-int mk_bit(char *thename)
+int mk_bit(char *thename, int area)
 {
         struct symbol *p;
 
@@ -124,6 +149,7 @@ int mk_bit(char *thename)
         while (p != NULL) {
                 if (!(strcasecmp(thename, p->name))) {
                         p->isbit = 1;
+			p->area = area;
                         return (0);
                 }
                 p = p->next;
@@ -140,6 +166,7 @@ int mk_sfr(char *thename)
         while (p != NULL) {
                 if (!(strcasecmp(thename, p->name))) {
                         p->issfr = 1;
+			p->area = 0;
                         return (0);
                 }
                 p = p->next;
@@ -251,20 +278,21 @@ void print_symbol_table()
 
 void check_redefine()
 {
-	struct symbol *p1, *p2;
-	p1 = sym_list;
-	while (p1 != NULL) {
-		p2 = p1->next;
-		while (p2 != NULL) {
-			if (!strcasecmp(p1->name, p2->name)) {
-				fprintf(stderr, "Error: symbol '%s' redefined on line %d", p1->name, p2->line_def);
-				fprintf(stderr, ", first defined on line %d\n", p1->line_def);
-			exit(1);
-			}
-			p2 = p2->next;
-		}
-		p1 = p1->next;
-	}
+  struct symbol *p1, *p2;
+  p1 = sym_list;
+  while (p1 != NULL) {
+    p2 = p1->next;
+    while (p2 != NULL) {
+      if (!strcasecmp(p1->name, p2->name)) {
+	fprintf(stderr, "Error: symbol '%s' redefined on line %d", 
+		p1->name, p2->line_def);
+	fprintf(stderr, ", first defined on line %d\n", p1->line_def);
+	exit(1);
+      }
+      p2 = p2->next;
+    }
+    p1 = p1->next;
+  }
 }
 
 int is_target(char *thename)
@@ -301,15 +329,27 @@ int is_reg(char *thename)
 }
 
 
-int is_def(char *thename)
+struct symbol *is_def(char *thename)
 {
-	struct symbol *p;
-	p = sym_list;
-	while (p != NULL) {
-		if (!strcasecmp(thename, p->name) && p->isdef) return(1);
-		p = p->next;
-	}
-	return (0);
+  struct symbol *p;
+  p = sym_list;
+  while (p != NULL) {
+    if (!strcasecmp(thename, p->name) && p->isdef) 
+      return p;
+    p = p->next;
+  }
+  return NULL;
+}
+
+struct symbol *is_ref(char *thename) {
+  struct symbol *p;
+  p = sym_list;
+  while (p != NULL) {
+    if (strcasecmp(thename, p->name)==0) 
+      return p;
+    p = p->next;
+  }
+  return NULL;
 }
 
 /* this routine is used to dump a group of bytes to the output */
@@ -319,33 +359,72 @@ int is_def(char *thename)
 /* though is it expected that the lexer has placed all the actual */
 /* original text from the line in "last_line_text" */
 
-void out(int *byte_list, int num)
-{
-	int i, first=1;
+static short last_area=-1;
 
-	if (num > 0) fprintf(list_fp, "%06X: ", MEM_POS);
-	else fprintf(list_fp, "\t");
+int debug=0;
 
-	if (current_area==AREA_CSEG || current_area==AREA_XINIT) {
-	  for (i=0; i<num; i++) {
-	    hexout(byte_list[i], MEM_POS + i, 0);
-	    if (!first && (i % 4) == 0) fprintf(list_fp, "\t");
-	    fprintf(list_fp, "%02X", byte_list[i]);
-	    if ((i+1) % 4 == 0) {
-	      if (first) fprintf(list_fp, "\t%s\n", last_line_text);
-	      else fprintf(list_fp, "\n");
-	      first = 0;
-	    } else {
-	      if (i<num-1) fprintf(list_fp, " ");
-	    }
+void out(int *byte_list, int num) {
+  struct symbol *p;
+  int i, first=1;
+  
+  if (num > 0) fprintf(list_fp, "%06X: ", MEM_POS);
+  else fprintf(list_fp, "\t");
+  
+  if (last_area!=current_area) {
+    // emit area information
+    fprintf (frel, "A %s size %d flags 0\n", 
+	     areaToString(current_area),
+	     area[current_area].size);
+    area[current_area].defsEmitted=1;
+    if  (!area[current_area].defsEmitted) {
+      for (p=sym_list; p; p=p->next) {
+	if (p->isdef && p->area==current_area) {
+	  if (debug || p->name[strlen(p->name)-1]!='$') {
+	    fprintf (frel, "S %s Def%04x\n", p->name, p->value);
 	  }
 	}
-	if (first) {
-		if (num < 3) fprintf(list_fp, "\t");
-		fprintf(list_fp, "\t%s\n", last_line_text);
-	} else {
-		if (num % 4) fprintf(list_fp, "\n");
+      }
+    }
+    last_area=current_area;
+  }
+  if (current_area==AREA_CSEG ||
+      current_area==AREA_GSFINAL ||
+      current_area==AREA_XINIT) {
+    if (num) {
+      fprintf (frel, "T %02x %02x", (MEM_POS>>16)&0xff, MEM_POS&0xff);
+      for (i=0; i<num; i++) {
+	fprintf (frel, " %02x", byte_list[i]);
+      }
+      fprintf (frel, "\n");
+      if (rel_line[0][0]) {
+	fprintf (frel, "%s\n", rel_line[0]);
+	if (rel_line[1][0]) {
+	  fprintf (frel, "%s\n", rel_line[1]);
 	}
+      }
+    }
+    for (i=0; i<num; i++) {
+      if (!first && (i % 4) == 0) fprintf(list_fp, "\t");
+      fprintf(list_fp, "%02X", byte_list[i]);
+      if ((i+1) % 4 == 0) {
+	if (first) fprintf(list_fp, "\t%s\n", last_line_text);
+	else fprintf(list_fp, "\n");
+	first = 0;
+      } else {
+	if (i<num-1) fprintf(list_fp, " ");
+      }
+    }
+  }
+  if (first) {
+    if (num < 3) fprintf(list_fp, "\t");
+    fprintf(list_fp, "\t%s\n", last_line_text);
+  } else {
+    if (num % 4) fprintf(list_fp, "\n");
+  }
+  expr_var[0][0]='\0';
+  expr_var[1][0]='\0';
+  rel_line[0][0]='\0';
+  rel_line[1][0]='\0';
 }
 
 
@@ -429,16 +508,36 @@ void init_areas(void)
 }
 
 void addAreaSymbols() {
-  char buffer[132];
-  int i;
+  //char buffer[132];
+  int i, areas=0, globals=0;
+  struct symbol *p;
+
+  fprintf (frel, "XH\n");
   for (i=0; i<NUM_AREAS; i++) {
+    if ((area[i].size=area[i].alloc_position-area[i].start)) {
+      areas++;
+    }
+#if 0
     current_area=i;
     sprintf (buffer, "s_%s", areaToString(i));
     build_sym_list (buffer);
-    assign_value (buffer, area[i].start);
     buffer[0]='l';
     build_sym_list (buffer);
-    assign_value (buffer, area[i].alloc_position-area[i].start);
+#endif
+  }
+  for (p=sym_list; p; p=p->next) {
+    if (p->isdef) {
+      if (debug || p->name[strlen(p->name)-1]!='$') {
+	globals++;
+      }
+    }
+  }
+  fprintf (frel, "H %d areas %d global symbols\n", areas, globals);
+  fprintf (frel, "M %s\n", modulename);
+  for (p=sym_list; p; p=p->next) {
+    if (!p->isdef) {
+      fprintf (frel, "S %s Ref0000\n", p->name);
+    }
   }
 }
 
@@ -452,12 +551,6 @@ void printVersion() {
   printf("but WITHOUT ANY WARRANTY; without even the implied warranty of\n");
   printf("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
 }
-
-char infilename[PATH_MAX];
-char outfilename[PATH_MAX];
-char listfilename[PATH_MAX];
-char symfilename[PATH_MAX];
-//char mapfilename[PATH_MAX];
 
 int verbose=0, createSymbolFile=0;
 
@@ -498,17 +591,13 @@ void process_args(int argc, char **argv)
     print_usage(1);
   }
 
-  strcpy(outfilename, infilename);
-  outfilename[strlen(outfilename)-3] = '\0';
-  strcpy(listfilename, outfilename);
+  strcpy(modulename, infilename);
+  modulename[strlen(modulename)-3] = '\0';
+  sprintf (outfilename, "%s.rel", modulename);
+  sprintf (listfilename, "%s.lst", modulename);
   if (createSymbolFile) {
-    strcpy(symfilename, outfilename);
-    strcat(symfilename, ".sym");
+    sprintf (symfilename, "%s.sym", modulename);
   }
-  //strcpy(mapfilename, outfilename);
-  strcat(outfilename, ".hex");
-  strcat(listfilename, ".lst");
-  //strcat(mapfilename, ".map");
 }
 
 /* pass #1 (p1=1) find all symbol defs and branch target names */
@@ -524,8 +613,8 @@ int main(int argc, char **argv)
 		fprintf(stderr, "Can't open file '%s'.\n", infilename);
 		exit(1);
 	}
-	fhex = fopen(outfilename, "w");
-	if (fhex == NULL) {
+	frel = fopen(outfilename, "w");
+	if (frel == NULL) {
 		fprintf(stderr, "Can't write file '%s'.\n", outfilename);
 		exit(1);
 	}
@@ -571,7 +660,6 @@ int main(int argc, char **argv)
 	yyparse();
 
 	fclose(yyin);
-	hexout(0, 0, 1);  /* flush and close intel hex file output */
 	return 0;
 }
 

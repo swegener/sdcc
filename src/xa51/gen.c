@@ -332,7 +332,7 @@ static asmop *aopForSym(symbol *sym,
 	}
     } else {
       aop->type=AOP_FAR;
-      emitcode ("mov", "r0,#%s ; aopForSym:far", sym->rname);
+      emitcode ("mov.w", "r0,#%s ; aopForSym:far", sym->rname);
       sprintf (aop->name[0], "[r0]");
       if (size>2) {
 	sprintf (aop->name[1], "[r0+2]");
@@ -1221,7 +1221,11 @@ static void genPointerGet (iCode * ic, iCode *pi) {
   bool codePointer=IS_CODEPTR(operandType(left));
   int size;
 
-  printIc ("genPointerGet", ic, 1,1,0);
+  if (pi) {
+    printIc ("genPointerGet pi", ic, 1,1,0);
+  } else {
+    printIc ("genPointerGet", ic, 1,1,0);
+  }
 
   if (!IS_PTR(operandType(left))) {
     bailOut ("genPointerGet: pointer required");
@@ -1400,7 +1404,7 @@ static void genIfx (iCode * ic, iCode * popIc) {
   int size;
   char *instr;
   bool trueOrFalse;
-  symbol *jlbl, *tlbl;
+  symbol *jlbl, *tlbl=newiTempLabel(NULL);
   operand *cond=IC_COND(ic);
 
   emitcode (";", "genIfx(%d) cond=%s trueLabel:%s falseLabel:%s", 
@@ -1421,14 +1425,15 @@ static void genIfx (iCode * ic, iCode * popIc) {
   switch (AOP_TYPE(cond) )
     {
     case AOP_BIT:
-      emitcode (trueOrFalse ? "jb" : "jnb", "%s,%05d$", 
-		AOP_NAME(cond)[0], jlbl->key+100);
+      emitcode (trueOrFalse ? "jnb" : "jb", "%s,%05d$", 
+		AOP_NAME(cond)[0], tlbl->key+100);
+      emitcode ("jmp", "%05d$", jlbl->key+100);
+      emitcode ("", "%05d$:", tlbl->key+100);
       return;
     case AOP_REG:
     case AOP_DIR:
     case AOP_FAR:
     case AOP_STK:
-      tlbl=newiTempLabel(NULL);
       if (size>1) {
 	instr="cmp.w";
       } else {
@@ -1632,6 +1637,7 @@ static void genCast (iCode * ic) {
       } else {
 	/* we have to go by the storage class */
 	if (!SPEC_OCLS(etype)) {
+	  ptrType=0; // hush the compiler
 	  bailOut("genCast: unknown storage class");
 	} else {
 	  ptrType = PTR_TYPE (SPEC_OCLS (etype));
@@ -1672,13 +1678,21 @@ static void genCast (iCode * ic) {
     case 0x11:
       emitcode("mov", "%s,%s", AOP_NAME(result)[0], AOP_NAME(right)[0]);
       return;
+    case 0x42:
+      emitcode("mov", "%s,%s", AOP_NAME(result)[0], AOP_NAME(right)[0]);
+      if (signedness) {
+	emitcode("sext", "%s", AOP_NAME(result)[1]);
+      } else {
+	emitcode("mov", "%s,#0", AOP_NAME(result)[1]);
+      }
+      return;
     case 0x41:
     case 0x21:
       emitcode("mov", "r1l,%s", AOP_NAME(right)[0]);
       if (signedness) {
 	emitcode("sext", "r1h");
       } else {
-	emitcode("mov", "rlh,#0");
+	emitcode("mov", "r1h,#0");
       }
       emitcode("mov", "%s,r1", AOP_NAME(result)[0]);
       if (size==2)
@@ -1686,15 +1700,14 @@ static void genCast (iCode * ic) {
       // fall through: case 0x41
       emitcode("sext", AOP_NAME(result)[1]);
       return;
-    case 14:
-    case 12:
+    case 0x14:
+    case 0x12:
       emitcode("mov", "r1,%s", AOP_NAME(right)[0]);
       emitcode("mov", "%s,r1l", AOP_NAME(result)[0]);
       return;
-    case 24:
-      emitcode("mov", "%s,%s", AOP_NAME(result)[0], AOP_NAME(right)[0]);
-      return;
     }
+  fprintf(stderr, "genCast: unknown size: %d:%d\n",
+	  AOP_SIZE(result), AOP_SIZE(right));
   bailOut("genCast: unknown size");
 }
 

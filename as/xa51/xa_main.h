@@ -34,7 +34,9 @@ struct symbol {
         int isbit;      /* 1 if a bit address, 0 otherwise */
         int issfr;
 	int isreg;	/* 1 if a register, 0 otehrwise */
-  int area;       /* the area that this symbol is in */
+        char mode;      /* Absolute, Relative, Tmplabel, eXternal */
+        short lk_index; /* symbol index for the linker */
+        int area;       /* the area that this symbol is in */
         struct symbol *next; };
 
 /* a list of all the symbols that are branch targets */
@@ -47,6 +49,8 @@ struct target {
 struct area_struct {
         int start;
 	int alloc_position;
+        int defsEmitted;
+        int size;
 };
 
 extern int current_area;
@@ -54,7 +58,7 @@ extern int current_area;
 #define MEM_POS (area[current_area].alloc_position)
 
 enum {
-  AREA_CSEG=0,
+  AREA_CSEG=1,
   AREA_DSEG,
   // AREA_OSEG,
   // AREA_ISEG,
@@ -66,7 +70,7 @@ enum {
   AREA_GSFINAL,
   AREA_HOME,
   AREA_SSEG,
-  NUM_AREAS
+  NUM_AREAS=AREA_SSEG
 };
 
 extern struct area_struct area[NUM_AREAS];
@@ -77,13 +81,46 @@ extern int lineno;
 extern int p1, p2, p3, mem, m_len;
 
 extern struct symbol * build_sym_list(char *thename);
-extern int assign_value(char *thename, int thevalue);
-extern int mk_bit(char *thename);
+extern int assign_value(char *thename, int thevalue, char mode);
+extern int mk_bit(char *thename, int current_area);
 extern int mk_reg(char *thename);
 extern void out(int *byte_list, int num);
 extern int is_target(char *thename);
 extern void pad_with_nop();
 extern int binary2int(char *str);
-extern int is_def(char *thename);
+extern int is_bit(char *thename);
+extern int is_reg(char *thename);
+extern struct symbol * is_def(char *thename);
+extern struct symbol * is_ref(char *thename);
 extern int get_value(char *thename);
+extern struct symbol *findSymbol (char *thename);
+extern char rel_line[2][132];
+extern char expr_var[2][MAX_SYMBOL];
+extern void error(char*);
+int mk_bit(char*, int);
+int mk_sfr(char*);
+struct target * build_target_list(char *thename);
+struct symbol * build_sym_list(char *);
+int find_size_reg(int op1spec);
+int find_size0(int isize);
+int find_size1(int isize, int op1spec);
+int find_size2(int isize, int op1spec, int op2spec);
+int yyerror(char *s);
+int imm_data4_signed(int value);
+int imm_data4_unsigned(int value);
+int imm_data5_unsigned(int value);
+int imm_data8(int value);
+int imm_data16(int value);
+int reg(int reg_spec);
+int reg_indirect(int reg_spec);
+int lsb(int value);
+int msb(int value);
+int direct_addr(int value);
+int bit_addr(int value);
+int rel16(int pos, int dest);
+int rel8(int pos, int dest);
+char *areaToString (int area);
 
+FILE *frel, *fmem, *list_fp, *sym_fp;
+
+extern void relout();

@@ -139,8 +139,6 @@ _xa51_genAssemblerPreamble (FILE * of)
   symbol *mainExists=newSymbol("main", 0);
   mainExists->block=0;
 
-  fprintf (of, "_errno\tsfr\t0x00; to keep the fp-lib's happy for now\n\n");
-
   if ((mainExists=findSymWithLevel(SymbolTab, mainExists))) {
     fprintf (of, "\t.area CSEG\t(CODE)\n");
     fprintf (of, "__interrupt_vect:\n");
@@ -199,7 +197,7 @@ static const char *_linkCmd[] =
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
 static const char *_asmCmd[] =
 {
-  "xa_asm", "$l", "$3", "$1.xa", NULL
+  "xa_rasm", "$l", "$3", "$1.xa", NULL
 };
 
 /* Globals */

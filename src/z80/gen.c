@@ -426,11 +426,11 @@ emitDebug (const char *szFormat,...)
   if (!DISABLE_DEBUG)
     {
       va_list ap;
-      
+
       va_start (ap, szFormat);
-      
+
       _vemit2 (szFormat, ap);
-      
+
       va_end (ap);
     }
 }
@@ -1832,11 +1832,9 @@ commitPair (asmop * aop, PAIR_ID id)
   if (id == PAIR_HL && requiresHL (aop) && IS_GB)
     {
       emit2 ("ld a,l");
-      if (aop->size>1)
-        emit2 ("ld d,h");
+      emit2 ("ld d,h");
       aopPut (aop, "a", 0);
-      if (aop->size>1)
-        aopPut (aop, "d", 1);
+      aopPut (aop, "d", 1);
     }
   else
     {
@@ -1851,8 +1849,7 @@ commitPair (asmop * aop, PAIR_ID id)
       else
         {
           aopPut (aop, _pairs[id].l, 0);
-          if (aop->size>1)
-            aopPut (aop, _pairs[id].h, 1);
+          aopPut (aop, _pairs[id].h, 1);
         }
     }
 }
@@ -6709,6 +6706,17 @@ genReceive (iCode * ic)
   freeAsmop (IC_RESULT (ic), NULL, ic);
 }
 
+/*-----------------------------------------------------------------*/
+/* genDummyRead - generate code for dummy read of volatiles        */
+/*-----------------------------------------------------------------*/
+static void
+genDummyRead (iCode * ic)
+{
+  emit2 ("; genDummyRead not implemented");
+
+  ic;
+}
+
 enum
   {
     /** Maximum number of bytes to emit per line. */
@@ -7512,7 +7520,11 @@ genZ80Code (iCode * lic)
 	  emitDebug ("; genArrayInit");
           genArrayInit(ic);
           break;
-	    
+
+	case DUMMY_READ_VOLATILE:
+	  genDummyRead (ic);
+	  break;
+
 	default:
 	  ic = ic;
 	}

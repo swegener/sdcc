@@ -42,7 +42,6 @@ cseDef;
 cseDef *newCseDef (operand *, iCode *);
 int isCseDefEqual (void *, void *);
 int pcseDef (void *, va_list);
-void algebraicOpts (iCode *);
 DEFSETFUNC (ifDiCodeIsX);
 int ifDiCodeIs (set *, iCode *);
 DEFSETFUNC (ifDefSymIsX);

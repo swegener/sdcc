@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-  SDCCgen51.c - source file for code generation for 8051
+  gen.c - source file for code generation for pic
   
   Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
          and -  Jean-Louis VERN.jlvern@writeme.com (1999)
@@ -9871,10 +9871,10 @@ static int genDjnz (iCode *ic, iCode *ifx)
 /* genReceive - generate code for a receive iCode                  */
 /*-----------------------------------------------------------------*/
 static void genReceive (iCode *ic)
-{    
+{
   DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
-  if (isOperandInFarSpace(IC_RESULT(ic)) && 
+  if (isOperandInFarSpace(IC_RESULT(ic)) &&
       ( OP_SYMBOL(IC_RESULT(ic))->isspilt ||
 	IS_TRUE_SYMOP(IC_RESULT(ic))) ) {
 
@@ -9885,22 +9885,34 @@ static void genReceive (iCode *ic)
 				    fReturn[fReturnSizePic - offset - 1] : "acc"));
       offset++;
     }
-    aopOp(IC_RESULT(ic),ic,FALSE);  
+    aopOp(IC_RESULT(ic),ic,FALSE);
     size = AOP_SIZE(IC_RESULT(ic));
     offset = 0;
     while (size--) {
       pic14_emitcode ("pop","acc");
       aopPut (AOP(IC_RESULT(ic)),"a",offset++);
     }
-	
+
   } else {
     _G.accInUse++;
-    aopOp(IC_RESULT(ic),ic,FALSE);  
+    aopOp(IC_RESULT(ic),ic,FALSE);
     _G.accInUse--;
-    assignResultValue(IC_RESULT(ic));	
+    assignResultValue(IC_RESULT(ic));
   }
 
   freeAsmop(IC_RESULT(ic),NULL,ic,TRUE);
+}
+
+/*-----------------------------------------------------------------*/
+/* genDummyRead - generate code for dummy read of volatiles        */
+/*-----------------------------------------------------------------*/
+static void
+genDummyRead (iCode * ic)
+{
+  pic14_emitcode ("; genDummyRead","");
+  pic14_emitcode ("; not implemented","");
+
+  ic;
 }
 
 /*-----------------------------------------------------------------*/
@@ -10160,13 +10172,17 @@ void genpic14Code (iCode *lic)
 	    addSet(&_G.sendSet,ic);
 	    break;
 
+	case DUMMY_READ_VOLATILE:
+	  genDummyRead (ic);
+	  break;
+
 	default :
 	    ic = ic;
         }
     }
-    
 
-    /* now we are ready to call the 
+
+    /* now we are ready to call the
        peep hole optimizer */
     if (!options.nopeep) {
       peepHole (&lineHead);

@@ -92,6 +92,7 @@ value *cenum = NULL  ;  /* current enumeration  type chain*/
 %token BITWISEAND UNARYMINUS IPUSH IPOP PCALL  ENDFUNCTION JUMPTABLE
 %token RRC RLC 
 %token CAST CALL PARAM NULLOP BLOCK LABEL RECEIVE SEND ARRAYINIT
+%token DUMMY_READ_VOLATILE
 
 %type <yyint>  Interrupt_storage
 %type <sym> identifier  declarator  declarator2 enumerator_list enumerator

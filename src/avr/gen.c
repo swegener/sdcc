@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-  avrgen.c - source file for code generation for ATMEL AVR
+  gen.c - source file for code generation for ATMEL AVR
 
   Written By -  Sandeep Dutta . sandeep.dutta@usa.net (2000)
 
@@ -5087,6 +5087,18 @@ genReceive (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* genDummyRead - generate code for dummy read of volatiles        */
+/*-----------------------------------------------------------------*/
+static void
+genDummyRead (iCode * ic)
+{
+  emitcode (";     genDummyRead","");
+  emitcode (";     not implemented,"");
+
+  ic;
+}
+
+/*-----------------------------------------------------------------*/
 /* gen51Code - generate code for 8051 based controllers            */
 /*-----------------------------------------------------------------*/
 void
@@ -5315,6 +5327,10 @@ genAVRCode (iCode * lic)
 
 		case SEND:
 			addSet (&_G.sendSet, ic);
+			break;
+
+		case DUMMY_READ_VOLATILE:
+			genDummyRead (ic);
 			break;
 
 		default:

@@ -12605,6 +12605,42 @@ static void genSystemGetCurrentID(iCode *ic,int nparms, operand **parms,char *na
 }
 
 /*-----------------------------------------------------------------*/
+/* genDummyRead - generate code for dummy read of volatiles        */
+/*-----------------------------------------------------------------*/
+static void
+genDummyRead (iCode * ic)
+{
+  operand *right;
+  int size, offset;
+
+  D(emitcode(";     genDummyRead",""));
+
+  right = IC_RIGHT (ic);
+
+  aopOp (right, ic, FALSE, FALSE);
+
+  /* if the result is a bit */
+  if (AOP_TYPE (right) == AOP_CRY)
+    {
+      emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
+      goto release;
+    }
+
+  /* bit variables done */
+  /* general case */
+  size = AOP_SIZE (right);
+  offset = 0;
+  while (size--)
+    {
+      emitcode ("mov", "a,%s", aopGet (AOP (right), offset, FALSE, FALSE, FALSE));
+      offset++;
+    }
+
+release:
+  freeAsmop (right, NULL, ic, TRUE);
+}
+
+/*-----------------------------------------------------------------*/
 /* genBuiltIn - calls the appropriate function to  generating code */
 /* for a built in function 					   */
 /*-----------------------------------------------------------------*/
@@ -12971,6 +13007,10 @@ gen390Code (iCode * lic)
 	case SEND:
 	  if (ic->builtinSEND) genBuiltIn(ic);
 	  else addSet (&_G.sendSet, ic);
+	  break;
+
+	case DUMMY_READ_VOLATILE:
+	  genDummyRead (ic);
 	  break;
 
 #if 0 // obsolete, and buggy for != xdata

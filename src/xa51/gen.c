@@ -1890,14 +1890,23 @@ static void genReceive (iCode * ic) {
 }
 
 /*-----------------------------------------------------------------*/
+/* genDummyRead - generate code for dummy read of volatiles        */
+/*-----------------------------------------------------------------*/
+static void
+genDummyRead (iCode * ic)
+{
+  emitcode (";     genDummyRead","");
+}
+
+/*-----------------------------------------------------------------*/
 /* gen51Code - generate code for 8051 based controllers            */
 /*-----------------------------------------------------------------*/
 void genXA51Code (iCode * lic) {
   iCode *ic;
   int cln = 0;
-  
+
   lineHead = lineCurr = NULL;
-  
+
   /* if debug information required */
   if (options.debug && currFunc)
     {
@@ -1909,7 +1918,7 @@ void genXA51Code (iCode * lic) {
 	emitcode ("", "G$%s$0$0 ==.", currFunc->name);
       _G.debugLine = 0;
     }
-  
+
   for (ic = lic; ic; ic = ic->next) {
     if (ic->lineno && cln != ic->lineno) {
       if (options.debug) {
@@ -1920,7 +1929,7 @@ void genXA51Code (iCode * lic) {
 	_G.debugLine = 0;
       }
       if (!options.noCcodeInAsm) {
-	emitcode ("", ";\t%s:%d: %s", ic->filename, ic->lineno, 
+	emitcode ("", ";\t%s:%d: %s", ic->filename, ic->lineno,
 		  printCLine(ic->filename, ic->lineno));
       }
       cln = ic->lineno;
@@ -1928,25 +1937,25 @@ void genXA51Code (iCode * lic) {
     if (options.iCodeInAsm) {
       emitcode("", ";ic:%d: %s", ic->key, printILine(ic));
     }
-    
+
     /* if the result is marked as
        spilt and rematerializable or code for
        this has already been generated then
        do nothing */
     if (resultRemat (ic) || ic->generated)
       continue;
-    
+
     /* depending on the operation */
     switch (ic->op)
       {
       case '!':
 	genNot (ic);
 	break;
-	
+
       case '~':
 	genCpl (ic);
 	break;
-	
+
       case UNARYMINUS:
 	genUminus (ic);
 	break;
@@ -2072,7 +2081,7 @@ void genXA51Code (iCode * lic) {
       case RLC:
 	genRLC (ic);
 	break;
-	
+
       case GETHBIT:
 	genGetHbit (ic);
 	break;
@@ -2115,22 +2124,26 @@ void genXA51Code (iCode * lic) {
       case RECEIVE:
 	genReceive (ic);
 	break;
-	
+
       case SEND:
 	addSet (&_G.sendSet, ic);
 	break;
-	
+
+      case DUMMY_READ_VOLATILE:
+	genDummyRead (ic);
+	break;
+
       default:
 	ic = ic;
       }
   }
-  
-  
+
+
   /* now we are ready to call the
      peep hole optimizer */
   if (!options.nopeep)
     peepHole (&lineHead);
-  
+
   /* now do the actual printing */
   printLine (lineHead, codeOutFile);
   return;

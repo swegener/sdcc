@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------
-  SDCCgen51.c - source file for code generation for 8051
-  
+  gen.c - source file for code generation for pic16
+
   Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
          and -  Jean-Louis VERN.jlvern@writeme.com (1999)
   Bug Fixes  -  Wojciech Stryjewski  wstryj1@tiger.lsu.edu (1999 v2.1.9a)
@@ -9964,6 +9964,18 @@ static void genReceive (iCode *ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* genDummyRead - generate code for dummy read of volatiles        */
+/*-----------------------------------------------------------------*/
+static void
+genDummyRead (iCode * ic)
+{
+  pic16_emitcode ("; genDummyRead","");
+  pic16_emitcode ("; not implemented","");
+
+  ic;
+}
+
+/*-----------------------------------------------------------------*/
 /* genpic16Code - generate code for pic16 based controllers        */
 /*-----------------------------------------------------------------*/
 /*
@@ -9987,7 +9999,7 @@ void genpic16Code (iCode *lic)
 
 #if 0
     /* if debug information required */
-    if (options.debug && currFunc) { 
+    if (options.debug && currFunc) {
       if (currFunc) {
 	cdbSymbol(currFunc,cdbFile,FALSE,TRUE);
 	_G.debugLine = 1;
@@ -10220,13 +10232,17 @@ void genpic16Code (iCode *lic)
 	    addSet(&_G.sendSet,ic);
 	    break;
 
+	case DUMMY_READ_VOLATILE:
+	  genDummyRead (ic);
+	  break;
+
 	default :
 	    ic = ic;
         }
     }
-    
 
-    /* now we are ready to call the 
+
+    /* now we are ready to call the
        peep hole optimizer */
     if (!options.nopeep) {
       peepHole (&lineHead);

@@ -1,3 +1,18 @@
+2003-07-23  Bernhard Held <bernhard@bernhardheld.de>
+
+	added DUMMY_READ_VOLATILE:
+	* src/SDCC.y:
+	* src/avr/gen.c:
+	* src/xa51/gen.c:
+	* src/z80/gen.c:
+	* src/pic/gen.c:
+	* src/pic16/gen.c:
+	* src/mcs51/gen.c:
+	* src/ds390/gen.c:
+	* src/SDCCcse.c (algebraicOpts): many improvements
+	* src/SDCCcse.h: removed algebraicOpts()
+	* src/SDCCicode.c (picDummyRead): added
+
 2003-07-23  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	* as/mcs51/lkmem.c: Changed message "Insufficient DRAM memory" to

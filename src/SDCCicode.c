@@ -67,6 +67,7 @@ PRINTFUNC (picIfx);
 PRINTFUNC (picJumpTable);
 PRINTFUNC (picInline);
 PRINTFUNC (picReceive);
+PRINTFUNC (picDummyRead);
 
 iCodeTable codeTable[] =
 {
@@ -113,6 +114,7 @@ iCodeTable codeTable[] =
   {RECEIVE, "recv", picReceive, NULL},
   {SEND, "send", picGenericOne, NULL},
   {ARRAYINIT, "arrayInit", picGenericOne, NULL},
+  {DUMMY_READ_VOLATILE, "dummy = (volatile)", picDummyRead, NULL}
 };
 
 /*-----------------------------------------------------------------*/
@@ -126,7 +128,7 @@ iCodeTable codeTable[] =
      pedantic>1: "char c=200" is not allowed (evaluates to -56)
 */
 
-void checkConstantRange(sym_link *ltype, value *val, char *msg, 
+void checkConstantRange(sym_link *ltype, value *val, char *msg,
 			int pedantic) {
   double max;
   int warnings=0;
@@ -461,10 +463,18 @@ PRINTFUNC (picReceive)
   fprintf (of, "\n");
 }
 
+PRINTFUNC (picDummyRead)
+{
+  fprintf (of, "\t");
+  fprintf (of, "%s ", s);
+  printOperand (IC_RIGHT (ic), of);
+  fprintf (of, "\n");
+}
+
 /*-----------------------------------------------------------------*/
 /* piCode - prints one iCode                                       */
 /*-----------------------------------------------------------------*/
-int 
+int
 piCode (void *item, FILE * of)
 {
   iCode *ic = item;
@@ -488,7 +498,7 @@ void PICC(iCode *ic)
 /*-----------------------------------------------------------------*/
 /* printiCChain - prints intermediate code for humans              */
 /*-----------------------------------------------------------------*/
-void 
+void
 printiCChain (iCode * icChain, FILE * of)
 {
   iCode *loop;
@@ -722,7 +732,7 @@ copyiCode (iCode * ic)
 iCodeTable *
 getTableEntry (int oper)
 {
-  int i;
+  unsigned i;
 
   for (i = 0; i < (sizeof (codeTable) / sizeof (iCodeTable)); i++)
     if (oper == codeTable[i].icode)
@@ -1028,7 +1038,7 @@ operandOperation (operand * left, operand * right,
 {
   sym_link *let , *ret=NULL;
   operand *retval = (operand *) 0;
-  
+
   assert (isOperandLiteral (left));
   let = getSpec(operandType(left));
   if (right) {
@@ -1070,27 +1080,27 @@ operandOperation (operand * left, operand * right,
 	  werror (E_DIVIDE_BY_ZERO);
 	  retval = right;
       }
-      else 
-	retval = operandFromLit ((SPEC_USIGN(let) ? 
+      else
+	retval = operandFromLit ((SPEC_USIGN(let) ?
 				  (unsigned long) operandLitValue (left) :
 				  (long) operandLitValue (left)) %
-				 (SPEC_USIGN(ret) ? 
+				 (SPEC_USIGN(ret) ?
 				  (unsigned long) operandLitValue (right) :
 				  (long) operandLitValue (right)));
 
       break;
     case LEFT_OP:
-      retval = operandFromLit ((SPEC_USIGN(let) ? 
+      retval = operandFromLit ((SPEC_USIGN(let) ?
 				  (unsigned long) operandLitValue (left) :
 				  (long) operandLitValue (left)) <<
-				 (SPEC_USIGN(ret) ? 
+				 (SPEC_USIGN(ret) ?
 				  (unsigned long) operandLitValue (right) :
 				  (long) operandLitValue (right)));
       break;
     case RIGHT_OP: {
       double lval = operandLitValue(left), rval = operandLitValue(right);
       double res=0;
-      switch ((SPEC_USIGN(let) ? 2 : 0) + (SPEC_USIGN(ret) ? 1 : 0)) 
+      switch ((SPEC_USIGN(let) ? 2 : 0) + (SPEC_USIGN(ret) ? 1 : 0))
 	{
 	case 0: // left=unsigned right=unsigned
 	  res=(unsigned long)lval >> (unsigned long)rval;

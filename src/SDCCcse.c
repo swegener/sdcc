@@ -633,8 +633,8 @@ iCode *findBackwardDef(operand *op,iCode *ic)
 /*-----------------------------------------------------------------*/
 /* algebraicOpts - does some algebraic optimizations               */
 /*-----------------------------------------------------------------*/
-void 
-algebraicOpts (iCode * ic)
+static void
+algebraicOpts (iCode * ic, eBBlock * ebp)
 {
   /* we don't deal with the following iCodes
      here */
@@ -951,29 +951,30 @@ algebraicOpts (iCode * ic)
 	}
       break;
     case BITWISEAND:
+      /* if both operands are equal */
+      /* if yes turn it into assignment */
+      if (isOperandEqual (IC_LEFT (ic), IC_RIGHT (ic)))
+        {
+          if (IS_OP_VOLATILE (IC_LEFT (ic)))
+	    {
+	      iCode *newic = newiCode (DUMMY_READ_VOLATILE, NULL, IC_LEFT (ic));
+	      IC_RESULT (newic) = IC_LEFT (ic);
+	      newic->lineno = ic->lineno;
+	      addiCodeToeBBlock (ebp, newic, ic->next);
+	    }
+	  ic->op = '=';
+	  IC_LEFT (ic) = NULL;
+	  SET_RESULT_RIGHT (ic);
+	  return;
+	}
+      /* swap literal to right ic */
       if (IS_OP_LITERAL (IC_LEFT (ic)))
         {
-	  /* if BITWISEAND then check if one of them is a zero */
-	  /* if yes turn it into 0 assignment */
-	  if (operandLitValue (IC_LEFT (ic)) == 0.0)
-	    {
-	      if (IS_OP_VOLATILE (IC_RIGHT (ic)))
-	        return;
-	      ic->op = '=';
-	      IC_RIGHT (ic) = IC_LEFT (ic);
-	      IC_LEFT (ic) = NULL;
-	      SET_RESULT_RIGHT (ic);
-	      return;
-	    }
-	  /* if BITWISEAND then check if one of them is 0xff... */
-	  /* if yes turn it into assignment */
-	  if (operandLitValue (IC_LEFT (ic)) == -1.0)
-	    {
-	      ic->op = '=';
-	      IC_LEFT (ic) = NULL;
-	      SET_RESULT_RIGHT (ic);
-	      return;
-	    }
+	  operand *op;
+
+	  op = IC_LEFT (ic);
+	  IC_LEFT (ic) = IC_RIGHT (ic);
+	  IC_RIGHT (ic) = op;
 	}
       if (IS_OP_LITERAL (IC_RIGHT (ic)))
         {
@@ -982,7 +983,12 @@ algebraicOpts (iCode * ic)
 	  if (operandLitValue (IC_RIGHT (ic)) == 0.0)
 	    {
 	      if (IS_OP_VOLATILE (IC_LEFT (ic)))
-	        return;
+		{
+		  iCode *newic = newiCode (DUMMY_READ_VOLATILE, NULL, IC_LEFT (ic));
+		  IC_RESULT (newic) = IC_LEFT (ic);
+		  newic->lineno = ic->lineno;
+		  addiCodeToeBBlock (ebp, newic, ic->next);
+		}
 	      ic->op = '=';
 	      IC_LEFT (ic) = NULL;
 	      SET_RESULT_RIGHT (ic);
@@ -990,7 +996,24 @@ algebraicOpts (iCode * ic)
 	    }
 	  /* if BITWISEAND then check if one of them is 0xff... */
 	  /* if yes turn it into assignment */
-	  if (operandLitValue (IC_RIGHT (ic)) == -1.0)
+	  {
+	    long val;
+
+	    switch (getSize (operandType (IC_RIGHT (ic))))
+	      {
+	      case 1:
+	        val = 0xff;
+		break;
+	      case 2:
+	        val = 0xffff;
+		break;
+	      case 4:
+	        val = 0xffffffff;
+		break;
+	      default:
+	        return;
+	      }
+	    if (((long) operandLitValue (IC_RIGHT (ic)) & val) == val)
 	    {
 	      ic->op = '=';
 	      IC_RIGHT (ic) = IC_LEFT (ic);
@@ -998,30 +1021,34 @@ algebraicOpts (iCode * ic)
 	      SET_RESULT_RIGHT (ic);
 	      return;
 	    }
+	  }
 	}
       break;
     case '|':
+      /* if both operands are equal */
+      /* if yes turn it into assignment */
+      if (isOperandEqual (IC_LEFT (ic), IC_RIGHT (ic)))
+        {
+          if (IS_OP_VOLATILE (IC_LEFT (ic)))
+	    {
+	      iCode *newic = newiCode (DUMMY_READ_VOLATILE, NULL, IC_LEFT (ic));
+	      IC_RESULT (newic) = IC_LEFT (ic);
+	      newic->lineno = ic->lineno;
+	      addiCodeToeBBlock (ebp, newic, ic->next);
+	    }
+	    ic->op = '=';
+	    IC_LEFT (ic) = NULL;
+	    SET_RESULT_RIGHT (ic);
+	    return;
+	}
+      /* swap literal to right ic */
       if (IS_OP_LITERAL (IC_LEFT (ic)))
         {
-	  /* if BITWISEOR then check if one of them is a zero */
-	  /* if yes turn it into assignment */
-	  if (operandLitValue (IC_LEFT (ic)) == 0.0)
-	    {
-	      ic->op = '=';
-	      IC_LEFT (ic) = NULL;
-	      SET_RESULT_RIGHT (ic);
-	      return;
-	    }
-	  /* if BITWISEOR then check if one of them is 0xff... */
-	  /* if yes turn it into 0xff... assignment */
-	  if (operandLitValue (IC_LEFT (ic)) == -1.0)
-	    {
-	      ic->op = '=';
-	      IC_RIGHT (ic) = IC_LEFT (ic);
-	      IC_LEFT (ic) = NULL;
-	      SET_RESULT_RIGHT (ic);
-	      return;
-	    }
+	  operand *op;
+
+	  op = IC_LEFT (ic);
+	  IC_LEFT (ic) = IC_RIGHT (ic);
+	  IC_RIGHT (ic) = op;
 	}
       if (IS_OP_LITERAL (IC_RIGHT (ic)))
         {
@@ -1037,34 +1064,84 @@ algebraicOpts (iCode * ic)
 	    }
 	  /* if BITWISEOR then check if one of them is 0xff... */
 	  /* if yes turn it into 0xff... assignment */
-	  if (operandLitValue (IC_RIGHT (ic)) == -1.0)
+	  {
+	    long val;
+
+	    switch (getSize (operandType (IC_RIGHT (ic))))
+	      {
+	      case 1:
+	        val = 0xff;
+		break;
+	      case 2:
+	        val = 0xffff;
+		break;
+	      case 4:
+	        val = 0xffffffff;
+		break;
+	      default:
+	        return;
+	      }
+	    if (((long) operandLitValue (IC_RIGHT (ic)) & val) == val)
+	      {
+		if (IS_OP_VOLATILE (IC_LEFT (ic)))
+		{
+		  iCode *newic = newiCode (DUMMY_READ_VOLATILE, NULL, IC_LEFT (ic));
+		  IC_RESULT (newic) = IC_LEFT (ic);
+		  newic->lineno = ic->lineno;
+		  addiCodeToeBBlock (ebp, newic, ic->next);
+		}
+		ic->op = '=';
+		IC_LEFT (ic) = NULL;
+		SET_RESULT_RIGHT (ic);
+		return;
+	      }
+	  }
+	}
+      break;
+    case '^':
+      /* if both operands are equal */
+      /* if yes turn it into 0 assignment */
+      if (isOperandEqual (IC_LEFT (ic), IC_RIGHT (ic)))
+        {
+          if (IS_OP_VOLATILE (IC_LEFT (ic)))
+	    {
+	      iCode *newic = newiCode (DUMMY_READ_VOLATILE, NULL, IC_LEFT (ic));
+	      IC_RESULT (newic) = IC_LEFT (ic);
+	      newic->lineno = ic->lineno;
+	      addiCodeToeBBlock (ebp, newic, ic->next);
+
+	      newic = newiCode (DUMMY_READ_VOLATILE, NULL, IC_LEFT (ic));
+	      IC_RESULT (newic) = IC_LEFT (ic);
+	      newic->lineno = ic->lineno;
+	      addiCodeToeBBlock (ebp, newic, ic->next);
+	    }
+	    ic->op = '=';
+	    IC_RIGHT (ic) = operandFromLit (0);
+	    IC_LEFT (ic) = NULL;
+	    SET_RESULT_RIGHT (ic);
+	    return;
+	}
+      /* swap literal to right ic */
+      if (IS_OP_LITERAL (IC_LEFT (ic)))
+        {
+	  operand *op;
+
+	  op = IC_LEFT (ic);
+	  IC_LEFT (ic) = IC_RIGHT (ic);
+	  IC_RIGHT (ic) = op;
+	}
+      /* if XOR then check if one of them is a zero */
+      /* if yes turn it into assignment */
+      if (IS_OP_LITERAL (IC_RIGHT (ic)))
+	{
+	  if (operandLitValue (IC_RIGHT (ic)) == 0.0)
 	    {
 	      ic->op = '=';
+	      IC_RIGHT (ic) = IC_LEFT (ic);
 	      IC_LEFT (ic) = NULL;
 	      SET_RESULT_RIGHT (ic);
 	      return;
 	    }
-	}
-      break;
-    case '^':
-      /* if XOR then check if one of them is a zero */
-      /* if yes turn it into assignment */
-      if (IS_OP_LITERAL (IC_LEFT (ic)) &&
-	  operandLitValue (IC_LEFT (ic)) == 0.0)
-	{
-	  ic->op = '=';
-	  IC_LEFT (ic) = NULL;
-	  SET_RESULT_RIGHT (ic);
-	  return;
-	}
-      if (IS_OP_LITERAL (IC_RIGHT (ic)) &&
-	  operandLitValue (IC_RIGHT (ic)) == 0.0)
-	{
-	  ic->op = '=';
-	  IC_RIGHT (ic) = IC_LEFT (ic);
-	  IC_LEFT (ic) = NULL;
-	  SET_RESULT_RIGHT (ic);
-	  return;
 	}
       break;
     }
@@ -1409,9 +1486,9 @@ deleteGetPointers (set ** cseSet, set ** pss, operand * op, eBBlock * ebb)
 	     list . This will take care of situations like
 	     iTemp1 = iTemp0 + 8;
 	     iTemp2 = iTemp1 + 8; */
-	  if (isinSetWith (compItems, (void*)IC_LEFT (cdp->diCode), 
+	  if (isinSetWith (compItems, (void*)IC_LEFT (cdp->diCode),
 			   (insetwithFunc)isOperandEqual) ||
-	      isinSetWith (compItems, (void*)IC_RIGHT (cdp->diCode), 
+	      isinSetWith (compItems, (void*)IC_RIGHT (cdp->diCode),
 			   (insetwithFunc)isOperandEqual))
 	    {
 	      addSet (&compItems, IC_RESULT (cdp->diCode));
@@ -1459,7 +1536,7 @@ DEFSETFUNC (delGetPointerSucc)
 /*-----------------------------------------------------------------*/
 /* fixUpTypes - KLUGE HACK fixup a lowering problem                */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 fixUpTypes (iCode * ic)
 {
   sym_link *t1 = operandType (IC_LEFT (ic)), *t2;
@@ -1536,7 +1613,7 @@ static int isSignedOp (iCode *ic)
 /*             system. also the most important, since almost all   */
 /*             data flow related information is computed by it     */
 /*-----------------------------------------------------------------*/
-int 
+int
 cseBBlock (eBBlock * ebb, int computeOnly,
 	   eBBlock ** ebbs, int count)
 {
@@ -1670,7 +1747,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 
       if (!computeOnly) {
 	/* do some algebraic optimizations if possible */
-	algebraicOpts (ic);
+	algebraicOpts (ic, ebb);
 	while (constFold (ic, cseSet));
       }
 
@@ -1781,7 +1858,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
       /* if left or right changed then do algebraic */
       if (!computeOnly && change)
 	{
-	  algebraicOpts (ic);
+	  algebraicOpts (ic, ebb);
 	  while (constFold (ic, cseSet));
 	}
 
@@ -1946,7 +2023,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 /*-----------------------------------------------------------------*/
 /* cseAllBlocks - will sequentially go thru & do cse for all blocks */
 /*-----------------------------------------------------------------*/
-int 
+int
 cseAllBlocks (eBBlock ** ebbs, int count, int computeOnly)
 {
   int i;

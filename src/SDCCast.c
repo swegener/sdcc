@@ -1057,42 +1057,7 @@ createIval (ast * sym, sym_link * type, initList * ilist, ast * wid)
 /*-----------------------------------------------------------------*/
 /* initAggregates - initialises aggregate variables with initv     */
 /*-----------------------------------------------------------------*/
-
-/* this has to go */ void printIval (symbol *, sym_link *, initList *, FILE *);
-
 ast * initAggregates (symbol * sym, initList * ival, ast * wid) {
-  ast *ast;
-  symbol *newSym;
-
-  if (getenv("TRY_THE_NEW_INITIALIZER")) {
-
-    if (!TARGET_IS_MCS51 || !(options.model==MODEL_LARGE)) {
-      fprintf (stderr, "Can't \"TRY_THE_NEW_INITIALIZER\" unless "
-	       "with -mmcs51 and --model-large\n");
-      exit(404);
-    }
-
-    if (SPEC_OCLS(sym->etype)==xdata &&
-	getSize(sym->type) > 16) { // else it isn't worth it: do it the old way
-
-      // copy this symbol
-      newSym=copySymbol (sym);
-      SPEC_OCLS(newSym->etype)=code;
-      sprintf (newSym->name, "%s_init__", sym->name);
-      sprintf (newSym->rname,"%s_init__", sym->rname);
-      addSym (SymbolTab, newSym, newSym->name, 0, 0, 1);
-
-      // emit it in the static segment
-      addSet(&statsg->syms, newSym);
-
-      // now memcpy() the entire array from cseg
-      ast=newNode (ARRAYINIT, // ASSIGN_AGGREGATE
-		   newAst_VALUE (symbolVal (sym)), 
-		   newAst_VALUE (symbolVal (newSym)));
-      return decorateType(resolveSymbols(ast));
-    }
-  }
-  
   return createIval (newAst_VALUE (symbolVal (sym)), sym->type, ival, wid);
 }
 

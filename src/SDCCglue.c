@@ -170,11 +170,12 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
       else
 	tfprintf (map->oFile, "\t!area\n", map->sname);
     }
-
-  /* print the area name */
+ 
   for (sym = setFirstItem (map->syms); sym;
        sym = setNextItem (map->syms))
     {
+      symbol *newSym=NULL;
+
 
       /* if extern then add it into the extern list */
       if (IS_EXTERN (sym->etype))
@@ -228,6 +229,67 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	fprintf (map->oFile, "%s$%d$%d", sym->name, sym->level, sym->block);
       }
       
+      /* if it has an initial value then do it only if
+         it is a global variable */
+      if (sym->ival && sym->level == 0) {
+	// can we copy xidata from xinit?
+	if (port->genXINIT &&
+	    SPEC_OCLS(sym->etype)==xdata &&
+	    !SPEC_ABSA(sym->etype)) {
+
+	  // create a new "XINIT (CODE)" symbol
+	  newSym=copySymbol (sym);
+	  SPEC_OCLS(newSym->etype)=xinit;
+	  sprintf (newSym->name, "_xinit_%s", sym->name);
+	  sprintf (newSym->rname,"_xinit_%s", sym->rname);
+	  SPEC_CONST(newSym->etype)=1;
+	  //SPEC_STAT(newSym->etype)=1;
+	  addSym (SymbolTab, newSym, newSym->name, 0, 0, 1);
+	  
+	  // add it to the "XINIT (CODE)" segment
+	  addSet(&xinit->syms, newSym);
+
+	  // move sym from "XSEG (XDATA)" to "XISEG (XDATA)" segment
+	  //deleteSetItem(&xdata->syms, sym);
+	  addSet(&xidata->syms, sym);
+	  SPEC_OCLS(sym->etype)=xidata;
+
+	  //fprintf (stderr, "moved %s from xdata to xidata\n", sym->rname);
+	  
+	} else {
+	  if (IS_AGGREGATE (sym->type)) {
+	    ival = initAggregates (sym, sym->ival, NULL);
+	  } else {
+	    if (getNelements(sym->type, sym->ival)>1) {
+	      werror (W_EXCESS_INITIALIZERS, "scalar", 
+		      sym->name, sym->lineDef);
+	    }
+	    ival = newNode ('=', newAst_VALUE (symbolVal (sym)),
+			    decorateType (resolveSymbols (list2expr (sym->ival))));
+	  }
+	  codeOutFile = statsg->oFile;
+	  allocInfo = 0;
+	  
+	  // set ival's lineno to where the symbol was defined
+	  if (ival) ival->lineno=sym->lineDef;
+	  eBBlockFromiCode (iCodeFromAst (ival));
+	  allocInfo = 1;
+	}	  
+
+	/* if the ival is a symbol assigned to an aggregate,
+	   (bug #458099 -> #462479)
+	   we don't need it anymore, so delete it from its segment */
+	if (sym->ival->type == INIT_NODE &&
+	    IS_AST_SYM_VALUE(sym->ival->init.node) &&
+	    IS_AGGREGATE (sym->type) ) {
+	  symIval=AST_SYMBOL(sym->ival->init.node);
+	  segment = SPEC_OCLS (symIval->etype);
+	  deleteSetItem (&segment->syms, symIval);
+	}
+	
+	sym->ival = NULL;
+      }
+
       /* if is has an absolute address then generate
          an equate for this no need to allocate space */
       if (SPEC_ABSA (sym->etype))
@@ -241,52 +303,20 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	}
       else
 	{
-	  /* allocate space */
-	  if (options.debug) {
-	    fprintf (map->oFile, "==.\n");
-	  }
-	  if (IS_STATIC (sym->etype))
-	    tfprintf (map->oFile, "!slabeldef\n", sym->rname);
-	  else
-	    tfprintf (map->oFile, "!labeldef\n", sym->rname);
-	  tfprintf (map->oFile, "\t!ds\n", 
-		    (unsigned int) getSize (sym->type) & 0xffff);
-	}
-
-      /* if it has an initial value then do it only if
-         it is a global variable */
-      if (sym->ival && sym->level == 0)
-	{
-	  if (IS_AGGREGATE (sym->type)) {
-	    ival = initAggregates (sym, sym->ival, NULL);
+	  if (newSym) {
+	    // this has been moved to another segment
 	  } else {
-	    if (getNelements(sym->type, sym->ival)>1) {
-	      werror (W_EXCESS_INITIALIZERS, "scalar", 
-		      sym->name, sym->lineDef);
+	    /* allocate space */
+	    if (options.debug) {
+	      fprintf (map->oFile, "==.\n");
 	    }
-	    ival = newNode ('=', newAst_VALUE (symbolVal (sym)),
-		     decorateType (resolveSymbols (list2expr (sym->ival))));
+	    if (IS_STATIC (sym->etype))
+	      tfprintf (map->oFile, "!slabeldef\n", sym->rname);
+	    else
+	      tfprintf (map->oFile, "!labeldef\n", sym->rname);
+	    tfprintf (map->oFile, "\t!ds\n", 
+		      (unsigned int) getSize (sym->type) & 0xffff);
 	  }
-	  codeOutFile = statsg->oFile;
-	  allocInfo = 0;
-
-	  // set ival's lineno to where the symbol was defined
-	  if (ival) ival->lineno=sym->lineDef;
-	  eBBlockFromiCode (iCodeFromAst (ival));
-	  allocInfo = 1;
-
-	  /* if the ival is a symbol assigned to an aggregate,
-	     (bug #458099 -> #462479)
-	     we don't need it anymore, so delete it from its segment */
-	  if (sym->ival->type == INIT_NODE &&
-	      IS_AST_SYM_VALUE(sym->ival->init.node) &&
-	      IS_AGGREGATE (sym->type) ) {
-	    symIval=AST_SYMBOL(sym->ival->init.node);
-	    segment = SPEC_OCLS (symIval->etype);
-	    deleteSetItem (&segment->syms, symIval);
-	  }
-
-	  sym->ival = NULL;
 	}
     }
 }
@@ -849,9 +879,19 @@ printIvalCharPtr (symbol * sym, sym_link * type, value * val, FILE * oFile)
 		      aopLiteral (val, 0), aopLiteral (val, 1));
 	  break;
 	case 3:
-	  /* PENDING: 0x02 or 0x%02x, CDATA? */
-	  fprintf (oFile, "\t.byte %s,%s,#0x02\n",
-		   aopLiteral (val, 0), aopLiteral (val, 1));
+	  werror (E_LITERAL_GENERIC);
+	  fprintf (oFile, "\t.byte %s,%s,%s\n",
+		   aopLiteral (val, 0), 
+		   aopLiteral (val, 1),
+		   aopLiteral (val, 2));
+	  break;
+	case 4:
+	  werror (E_LITERAL_GENERIC);
+	  fprintf (oFile, "\t.byte %s,%s,%s,%s\n",
+		   aopLiteral (val, 0), 
+		   aopLiteral (val, 1), 
+		   aopLiteral (val, 2),
+		   aopLiteral (val, 3));
 	  break;
 	default:
 	  assert (0);
@@ -988,9 +1028,7 @@ emitStaticSeg (memmap * map, FILE * out)
 {
   symbol *sym;
 
-  /*     fprintf(map->oFile,"\t.area\t%s\n",map->sname); */
-  if (!out)
-    out = code->oFile;
+  fprintf(out, "\t.area\t%s\n", map->sname);
 
   /* for all variables in this segment do */
   for (sym = setFirstItem (map->syms); sym;
@@ -1077,12 +1115,18 @@ emitMaps ()
   emitRegularMap (idata, TRUE, TRUE);
   emitRegularMap (bit, TRUE, FALSE);
   emitRegularMap (xdata, TRUE, TRUE);
+  if (port->genXINIT) {
+    emitRegularMap (xidata, TRUE, TRUE);
+  }
   emitRegularMap (sfr, FALSE, FALSE);
   emitRegularMap (sfrbit, FALSE, FALSE);
   emitRegularMap (home, TRUE, FALSE);
   emitRegularMap (code, TRUE, FALSE);
 
   emitStaticSeg (statsg, code->oFile);
+  if (port->genXINIT) {
+    emitStaticSeg (xinit, code->oFile);
+  }
   inInitMode--;
 }
 
@@ -1131,7 +1175,6 @@ createInterruptVect (FILE * vFile)
   if (!port->genIVT || !(port->genIVT (vFile, interrupts, maxInterrupts)))
     {
       /* "generic" interrupt table header (if port doesn't specify one).
-
        * Look suspiciously like 8051 code to me...
        */
 
@@ -1442,6 +1485,12 @@ glue ()
   fprintf (asmFile, "%s", iComments2);
   copyFile (asmFile, xdata->oFile);
 
+  /* copy xternal initialized ram data */
+  fprintf (asmFile, "%s", iComments2);
+  fprintf (asmFile, "; external initialized ram data\n");
+  fprintf (asmFile, "%s", iComments2);
+  copyFile (asmFile, xidata->oFile);
+
   /* copy the interrupt vector table */
   if (mainf && IFFUNC_HASBODY(mainf->type))
     {
@@ -1497,6 +1546,11 @@ glue ()
       fprintf (asmFile, "\tjz\t__sdcc_init_data\n");
       fprintf (asmFile, "\tljmp\t__sdcc_program_startup\n");
       fprintf (asmFile, "__sdcc_init_data:\n");
+
+      // if the port can copy the XINIT segment to XISEG
+      if (port->genXINIT) {
+	port->genXINIT(asmFile);
+      }
 
     }
   copyFile (asmFile, statsg->oFile);

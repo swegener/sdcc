@@ -134,8 +134,10 @@ typedef struct
 	const char *overlay_name;
 	const char *post_static_name;
 	const char *home_name;
-	struct memmap *default_local_map;	/* default location for auto vars */
-	struct memmap *default_globl_map;	/* default location for globl vars */
+	const char *xidata_name; // initialized xdata
+	const char *xinit_name; // a code copy of xidata
+	struct memmap *default_local_map; // default location for auto vars
+	struct memmap *default_globl_map; // default location for globl vars
 	int code_ro;		/* code space read-only 1=yes */
       }
     mem;
@@ -204,6 +206,7 @@ typedef struct
      */
     int (*genIVT) (FILE * of, symbol ** intTable, int intCount);
 
+    void (*genXINIT) (FILE * of);
 
     /* parameter passing in register related functions */
     void (*reset_regparms) ();	/* reset the register count */

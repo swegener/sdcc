@@ -5,14 +5,16 @@
 #include "common.h"
 
 /* memory segments */
-memmap *xstack = NULL;		/* xternal stack data         */
-memmap *istack = NULL;		/* internal stack             */
-memmap *code = NULL;		/* code segment               */
-memmap *data = NULL;		/* internal data upto 128     */
-memmap *xdata = NULL;		/* external data              */
-memmap *idata = NULL;		/* internal data upto 256     */
-memmap *bit = NULL;		/* bit addressable space      */
-memmap *statsg = NULL;		/* the constant data segment  */
+memmap *xstack = NULL;		/* xternal stack data          */
+memmap *istack = NULL;		/* internal stack              */
+memmap *code = NULL;		/* code segment                */
+memmap *data = NULL;		/* internal data upto 128      */
+memmap *xdata = NULL;		/* external data               */
+memmap *xidata = NULL;          /* the initialized xdata       */
+memmap *xinit = NULL;           /* the initializers for xidata */
+memmap *idata = NULL;		/* internal data upto 256      */
+memmap *bit = NULL;		/* bit addressable space       */
+memmap *statsg = NULL;		/* the constant data segment   */
 memmap *sfr = NULL;		/* register space              */
 memmap *reg = NULL;		/* register space              */
 memmap *sfrbit = NULL;		/* sfr bit space               */
@@ -175,6 +177,8 @@ initMem ()
      POINTER-TYPE   -   FPOINTER
    */
   xdata = allocMap (0, 1, 0, 0, 0, 0, options.xdata_loc, XDATA_NAME, 'F', FPOINTER);
+  xidata = allocMap (0, 1, 0, 0, 0, 0, 0, XIDATA_NAME, 'F', FPOINTER);
+  xinit = allocMap (0, 1, 0, 0, 0, 1, 0, XINIT_NAME, 'C', CPOINTER);
 
   /* Inderectly addressed internal data segment
      SFRSPACE       -   NO

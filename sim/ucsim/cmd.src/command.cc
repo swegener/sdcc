@@ -371,22 +371,19 @@ cl_cmdline::syntax_match(class cl_uc *uc, char *syntax)
 	switch (*p)
 	  {
 	  case SY_ADDR:
-	    if (!parm->as_address(uc))
+	    if (!uc || !parm->as_address(uc))
 	      return(DD_FALSE);
 	    //printf("ADDRESS match %lx\n",parm->value.address);
 	    break;
 	  case SY_MEMORY:
-	    if (!parm->as_memory(uc))
+	    if (!uc || !parm->as_memory(uc))
 	      return(DD_FALSE);
 	    //printf("MEMORY match %s\n",parm->value.memory->class_name);
 	    break;
 	  case SY_BIT:
-	    if (!parm->as_bit(uc))
+	    if (!uc || !parm->as_bit(uc))
 	      return(DD_FALSE);
 	    break;
-	  }
-      switch (*p)
-	{
 	case SY_NUMBER:
 	  if (!parm->as_number())
 	    return(DD_FALSE);

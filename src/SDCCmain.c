@@ -1643,6 +1643,10 @@ linkEdit (char **envp)
           *q = 0;
           strncatz(buffer, ".cdb", sizeof(buffer));
           rename (scratchFileName, buffer);
+          /* and the OMF file without extension: */
+          *p = 0;
+          *q = 0;
+          rename (scratchFileName, buffer);
         }
     }
   if (system_ret)

@@ -2131,6 +2131,12 @@ genFunction (iCode * ic)
   emitcode ("", "%s:", sym->rname);
   fetype = getSpec (operandType (IC_LEFT (ic)));
 
+  if (SPEC_NAKED(fetype))
+  {
+      emitcode(";", "naked function: no prologue.");
+      return;
+  }
+
   /* if critical function then turn interrupts off */
   if (SPEC_CRTCL (fetype))
     emitcode ("clr", "ea");
@@ -2383,6 +2389,12 @@ genEndFunction (iCode * ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
 
+  if (SPEC_NAKED(sym->etype))
+  {
+      emitcode(";", "naked function: no epilogue.");
+      return;
+  }
+
   if (IS_RENT (sym->etype) || options.stackAuto)
     {
       emitcode ("mov", "%s,_bp", spname);
@@ -2504,7 +2516,7 @@ genEndFunction (iCode * ic)
 	emitcode ("setb", "ea");
 
       /* if debug then send end of function */
-/*  if (options.debug && currFunc) { */
+/*  if (options.debug && currFunc)  */
       if (currFunc)
 	{
 	  _G.debugLine = 1;

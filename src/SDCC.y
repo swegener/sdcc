@@ -82,7 +82,8 @@ value *cenum = NULL  ;  /* current enumeration  type chain*/
 %token REENTRANT USING  XDATA DATA IDATA PDATA VAR_ARGS CRITICAL NONBANKED BANKED
 %token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID BIT
 %token STRUCT UNION ENUM ELIPSIS RANGE FAR _XDATA _CODE _GENERIC _NEAR _PDATA _IDATA _EEPROM
-%token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN 
+%token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
+%token NAKED
 %token <yyinline> INLINEASM
 %token IFX ADDRESS_OF GET_VALUE_AT_ADDRESS SPIL UNSPIL GETHBIT
 %token BITWISEAND UNARYMINUS IPUSH IPOP PCALL  ENDFUNCTION JUMPTABLE
@@ -183,6 +184,10 @@ using_reentrant_interrupt
    |  CRITICAL       {  $$ = newLink ();
                         $$->class = SPECIFIER   ;
                         SPEC_CRTCL($$) = 1;
+                     }
+   |  NAKED          {  $$ = newLink ();
+                        $$->class = SPECIFIER   ;
+                        SPEC_NAKED($$) = 1;
                      }
    |  NONBANKED      {$$ = newLink ();
                         $$->class = SPECIFIER   ;

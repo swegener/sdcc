@@ -458,6 +458,7 @@ mergeSpec (sym_link * dest, sym_link * src)
   SPEC_BSTR (dest) |= SPEC_BSTR (src);
   SPEC_TYPEDEF (dest) |= SPEC_TYPEDEF (src);
   SPEC_NONBANKED (dest) |= SPEC_NONBANKED (src);
+  SPEC_NAKED (dest) |= SPEC_NAKED (src);
 
   if (IS_STRUCT (dest) && SPEC_STRUCT (dest) == NULL)
     SPEC_STRUCT (dest) = SPEC_STRUCT (src);

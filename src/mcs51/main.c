@@ -39,6 +39,7 @@ static char *_mcs51_keywords[] =
   "_xdata",
   "_pdata",
   "_idata",
+  "_naked",
   NULL
 };
 

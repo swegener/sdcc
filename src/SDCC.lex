@@ -169,6 +169,7 @@ struct options  save_options  ;
 "void"         { count(); return(VOID); }
 "volatile"     { count(); return(VOLATILE); }
 "using"        { count(); TKEYWORD(USING); }
+"_naked"       { count(); TKEYWORD(NAKED); }
 "while"        { count(); return(WHILE); }
 "xdata"        { count(); TKEYWORD(XDATA); }
 "_data"	       { count(); TKEYWORD(_NEAR); }

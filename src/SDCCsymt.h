@@ -115,6 +115,7 @@ typedef struct specifier
     unsigned _volatile:1;	/* is marked as volatile      */
     unsigned _const:1;		/* is a constant              */
     unsigned _critical:1;	/* critical function          */
+    unsigned _naked:1;		/* naked function	      */
     unsigned _typedef:1;	/* is typedefed               */
     unsigned _isregparm:1;	/* is the first parameter     */
     unsigned _isenum:1;		/* is an enumerated type      */
@@ -312,6 +313,7 @@ symbol;
 #define SPEC_BNKF(x) x->select.s._rbank
 #define SPEC_INTRTN(x) x->select.s._intrtn
 #define SPEC_CRTCL(x) x->select.s._critical
+#define SPEC_NAKED(x) x->select.s._naked
 #define SPEC_VOLATILE(x) x->select.s._volatile
 #define SPEC_CONST(x) x->select.s._const
 #define SPEC_STRUCT(x) x->select.s.v_struct

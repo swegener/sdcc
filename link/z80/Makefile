@@ -1,6 +1,6 @@
-TOPDIR 	= ../..
+PRJDIR 	= ../..
 
-include $(TOPDIR)/Makefile.common
+include $(PRJDIR)/Makefile.common
 
 OBJS	= lkarea.o lkdata.o lkeval.o lkhead.o lkihx.o lklex.o \
 	  lklibr.o lklist.o lkmain.o lkrloc.o lks19.o lksym.o \

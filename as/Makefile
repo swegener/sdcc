@@ -1,5 +1,5 @@
-TOPDIR = ..
-include $(TOPDIR)/Makefile.common
+PRJDIR = ..
+include $(PRJDIR)/Makefile.common
 
 PORTS = _z80 _gbz80
 
@@ -8,11 +8,11 @@ all:
 
 _z80: clean
 	make -C z80
-	cp z80/as $(TOPDIR)/bin/as-z80
+	cp z80/as$(E) $(TOPDIR)/bin/as-z80$(E)
 
 _gbz80: clean
 	make -C z80 "OPTS=-DGAMEBOY"
-	cp z80/as $(TOPDIR)/bin/as-gb
+	cp z80/as$(E) $(TOPDIR)/bin/as-gbz80$(E)
 
 clean:
 	make -C z80 clean

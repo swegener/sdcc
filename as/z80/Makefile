@@ -1,4 +1,4 @@
-PRJDIR 	= ../..
+PRJDIR = ../..
 
 include $(PRJDIR)/Makefile.common
 

@@ -1,5 +1,5 @@
-TOPDIR = ..
-include $(TOPDIR)/Makefile.common
+PRJDIR = ..
+include $(PRJDIR)/Makefile.common
 
 PORTS = _z80 _gbz80
 

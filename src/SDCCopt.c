@@ -464,10 +464,21 @@ convertToFcall (eBBlock ** ebbs, int count)
 	  /* if long / int mult or divide or mod */
 	  if (ic->op == '*' || ic->op == '/' || ic->op == '%')
 	    {
-	      sym_link *type = operandType (IC_LEFT (ic));
-	      if (IS_INTEGRAL (type) && getSize (type) > port->support.muldiv)
+	      sym_link *leftType = operandType (IC_LEFT (ic));
+
+	      if (IS_INTEGRAL (leftType) && getSize (leftType) > port->support.muldiv)
                 {
-                  convilong (ic, ebbs[i], type, ic->op);
+                  sym_link *rightType = operandType (IC_RIGHT (ic));
+
+                  if (port->hasNativeMulFor != NULL &&
+                      port->hasNativeMulFor (ic, leftType, rightType))
+                    {
+                      /* Leave as native */
+                    }
+                  else
+                    {
+                      convilong (ic, ebbs[i], leftType, ic->op);
+                    }
                 }
 	    }
           

@@ -1,3 +1,11 @@
+2001-10-21  Michael Hope  <michaelh@juju.net.nz>
+
+	* src/z80/ralloc.c: Turned off faulty pack for one use.
+
+	* src/z80/peeph-gbz80.def: Removed redundent restart options.
+
+	* src/z80/gen.c (genMult): Added native mul for constants on the z80 and gbz80.
+
 2001-10-21  Bernhard Held  <bernhard@bernhardheld.de>
 
 	* support/regression/Makefile: Improved clean
@@ -12,6 +20,13 @@
 
 	* support/regression/ports/mcs51/timeout.c: little improvements
 
+2001-10-17  Michael Hope  <michaelh@juju.net.nz>
+
+	* device/lib/malloc.c (MEMHEADER): Fixed against new pedantic pointers.
+
+	* support/regression/fwk/include/testfwk.h: Fixed up to use function pts correctly.
+
+	* support/regression/generate-cases.py: Fixed up to use function pts correctly.
 
 2001-10-16  Bernhard Held  <bernhard@bernhardheld.de>
 
@@ -20,6 +35,9 @@
 	* support/regression/port/mcs51/timeout.c: add timeout for uCsim
 
 2001-10-13  Michael Hope  <michaelh@juju.net.nz>
+	* src/z80/gen.c (emitCall): Fixed up missing spill of HL when used to assign the result value.
+
+	* src/z80/ralloc.c: Turned off pack for one use as it's quite broken.
 
 	* src/SDCCmain.c (linkEdit): Added support for passing a legacy command line through the processor.
 

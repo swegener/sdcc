@@ -275,6 +275,7 @@ PORT ds390_port =
   _ds390_regparm,
   NULL,
   NULL,
+  NULL,
   FALSE,
   0,				/* leave lt */
   0,				/* leave gt */

@@ -200,6 +200,7 @@ PORT i186_port = {
     _i186_regparm,
     NULL,
     NULL,
+    NULL,
     FALSE,
     0,  /* leave lt */
     0,  /* leave gt */

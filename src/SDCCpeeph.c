@@ -748,6 +748,7 @@ replaceRule (lineNode ** shead, lineNode * stail, peepRule * pr)
       lbp = lb;
 
       l = pl->line;
+
       while (*l)
 	{
 	  /* if the line contains a variable */
@@ -982,8 +983,6 @@ peepHole (lineNode ** pls)
       /* for all rules */
       for (pr = rootRules; pr; pr = pr->next)
         {
-          fflush(stdout);
-          
           for (spl = *pls; spl; spl = spl->next)
             {
               /* if inline assembler then no peep hole */
@@ -991,7 +990,7 @@ peepHole (lineNode ** pls)
                 continue;
               
               mtail = NULL;
-              
+
               /* Tidy up any data stored in the hTab */
               
               /* if it matches */

@@ -209,6 +209,7 @@ PORT avr_port = {
 	_avr_regparm,
         NULL,
 	NULL,
+        NULL,
 	FALSE,
 	0,			/* leave lt */
 	1,			/* transform gt ==> not le */

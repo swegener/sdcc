@@ -485,6 +485,14 @@ isPtrPair (asmop * aop)
       return FALSE;
     }
 }
+
+static void
+spillPair (PAIR_ID pairId)
+{
+  _G.pairs[pairId].last_type = AOP_INVALID;
+  _G.pairs[pairId].base = NULL;
+}
+
 /** Push a register pair onto the stack */
 void
 genPairPush (asmop * aop)
@@ -504,6 +512,7 @@ _pop (PAIR_ID pairId)
 {
   emit2 ("pop %s", _pairs[pairId].name);
   _G.stack.pushed -= 2;
+  spillPair (pairId);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1035,13 +1044,6 @@ adjustPair (const char *pair, int *pold, int new)
       emit2 ("dec %s", pair);
       (*pold)--;
     }
-}
-
-static void
-spillPair (PAIR_ID pairId)
-{
-  _G.pairs[pairId].last_type = AOP_INVALID;
-  _G.pairs[pairId].base = NULL;
 }
 
 static void
@@ -2403,9 +2405,10 @@ emitCall (iCode * ic, bool ispcall)
 	      if (i)
 		emit2 ("inc sp");
 	    }
-	  spillCached ();
 	}
     }
+
+  spillCached ();
 
   if (_G.stack.pushedDE) 
     {
@@ -3037,6 +3040,15 @@ genPlus (iCode * ic)
       goto release;
     }
 
+  if (isPair (AOP (IC_RIGHT (ic))) && AOP_TYPE (IC_LEFT (ic)) == AOP_IMMD)
+    {
+      fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
+      emit2 ("add hl,%s", getPairName (AOP (IC_RIGHT (ic))));
+      spillCached();
+      commitPair ( AOP (IC_RESULT (ic)), PAIR_HL);
+      goto release;
+    }
+
   /* Special case:
      ld hl,sp+n trashes C so we cant afford to do it during an
      add with stack based varibles.  Worst case is:
@@ -3348,8 +3360,92 @@ release:
 static void
 genMult (iCode * ic)
 {
+  int val;
+  int count, i;
+  /* If true then the final operation should be a subtract */
+  bool active = FALSE;
+
   /* Shouldn't occur - all done through function calls */
-  wassertl (0, "Multiplication is handled through support function calls");
+  aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
+  aopOp (IC_RIGHT (ic), ic, FALSE, FALSE);
+  aopOp (IC_RESULT (ic), ic, TRUE, FALSE);
+
+  if (AOP_SIZE (IC_LEFT (ic)) > 2 ||
+      AOP_SIZE (IC_RIGHT (ic)) > 2 ||
+      AOP_SIZE (IC_RESULT (ic)) > 2)
+    {
+      wassertl (0, "Multiplication is handled through support function calls");
+    }
+
+  /* Swap left and right such that right is a literal */
+  if ((AOP_TYPE (IC_LEFT (ic)) == AOP_LIT))
+    {
+      operand *t = IC_RIGHT (ic);
+      IC_RIGHT (ic) = IC_LEFT (ic);
+      IC_LEFT (ic) = t;
+    }
+
+  wassertl (AOP_TYPE (IC_RIGHT (ic)) == AOP_LIT, "Right must be a literal");
+
+  val = (int)floatFromVal ( AOP (IC_RIGHT (ic))->aopu.aop_lit);
+  //  wassertl (val > 0, "Multiply must be positive");
+  wassertl (val != 1, "Can't multiply by 1");
+
+  if (IS_Z80) {
+    _push (PAIR_DE);
+  }
+
+  if ( AOP_SIZE (IC_LEFT (ic)) == 1 && !SPEC_USIGN (getSpec (operandType ( IC_LEFT (ic)))))
+    {
+      emit2 ("ld e,%s", aopGet (AOP (IC_LEFT (ic)), LSB, FALSE));
+      emit2 ("ld a,e");
+      emit2 ("rlc a");
+      emit2 ("sbc a,a");
+      emit2 ("ld d,a");
+    }
+  else
+    {
+      fetchPair (PAIR_DE, AOP (IC_LEFT (ic)));
+    }
+
+  i = val;
+
+  /* Fully unroled version of mul.s.  Not the most efficient.
+   */
+  for (count = 0; count < 16; count++)
+    {
+      if (count != 0 && active)
+        {
+          emit2 ("add hl,hl");
+        }
+      if (i & 0x8000U)
+        {
+          if (active == FALSE)
+            {
+              emit2 ("ld l,e");
+              emit2 ("ld h,d");
+            }
+          else
+            {
+              emit2 ("add hl,de");
+            }
+          active = TRUE;
+        }
+      i <<= 1;
+    }
+
+  spillCached();
+
+  if (IS_Z80)
+    {
+      _pop (PAIR_DE);
+    }
+
+  commitPair ( AOP (IC_RESULT (ic)), PAIR_HL);
+
+  freeAsmop (IC_LEFT (ic), NULL, ic);
+  freeAsmop (IC_RIGHT (ic), NULL, ic);
+  freeAsmop (IC_RESULT (ic), NULL, ic);
 }
 
 /*-----------------------------------------------------------------*/

@@ -51,7 +51,8 @@ enum
   {
     DISABLE_PACK_ACC = 0,
     DISABLE_PACK_ASSIGN = 0,
-    DISABLE_PACK_ONE_USE = 0,
+    /* Pack for one use is quite broken. */
+    DISABLE_PACK_ONE_USE = 1,
     DISABLE_PACK_HL = 0,
   };
 
@@ -2485,14 +2486,6 @@ packRegisters (eBBlock * ebp)
 	packRegsForSupport (ic, ebp);
 #endif
 
-#if 0
-      /* some cases the redundant moves can
-         can be eliminated for return statements */
-      if ((ic->op == RETURN || ic->op == SEND) &&
-	  !isOperandInFarSpace (IC_LEFT (ic)) &&
-	  !options.model)
-	packRegsForOneuse (ic, IC_LEFT (ic), ebp);
-#endif
       /* if pointer set & left has a size more than
          one and right is not in far space */
       if (!DISABLE_PACK_ONE_USE &&
@@ -2519,6 +2512,7 @@ packRegisters (eBBlock * ebp)
 
 	  packRegsForOneuse (ic, IC_LEFT (ic), ebp);
 	}
+
       /* pack registers for accumulator use, when the result of an
          arithmetic or bit wise operation has only one use, that use is
          immediately following the defintion and the using iCode has
@@ -2530,21 +2524,12 @@ packRegisters (eBBlock * ebp)
 	{
 	  packRegsForHLUse (ic);
 	}
-#if 0
-      if ((IS_ARITHMETIC_OP (ic)
-	   || IS_BITWISE_OP (ic)
-	   || ic->op == LEFT_OP || ic->op == RIGHT_OP
-	  ) &&
-	  IS_ITEMP (IC_RESULT (ic)) &&
-	  getSize (operandType (IC_RESULT (ic))) <= 2)
-	packRegsForAccUse (ic);
-#else
+
       if (!DISABLE_PACK_ACC && IS_ITEMP (IC_RESULT (ic)) &&
 	  getSize (operandType (IC_RESULT (ic))) == 1)
 	{
 	  packRegsForAccUse2 (ic);
 	}
-#endif
     }
 }
 

@@ -386,6 +386,40 @@ _getRegName (struct regs *reg)
   return "err";
 }
 
+static bool
+_hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
+{
+  sym_link *test = NULL;
+  value *val;
+
+  if ( ic->op != '*')
+    {
+      return FALSE;
+    }
+
+  if ( IS_LITERAL (left))
+    {
+      test = left;
+      val = OP_VALUE (IC_LEFT (ic));
+    }
+  else if ( IS_LITERAL (right))
+    {
+      test = left;
+      val = OP_VALUE (IC_RIGHT (ic));
+    }
+  else
+    {
+      return FALSE;
+    }
+
+  if ( getSize (test) <= 2)
+    {
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
 #define LINKCMD \
     "{bindir}{sep}link-{port} -n -c -- {z80bases} -m -j" \
     " {z80libspec}" \
@@ -468,6 +502,7 @@ PORT z80_port =
   _reg_parm,
   _process_pragma,
   _mangleSupportFunctionName,
+  _hasNativeMulFor,
   TRUE,
   0,				/* leave lt */
   0,				/* leave gt */
@@ -549,6 +584,7 @@ PORT gbz80_port =
   _reg_parm,
   _process_pragma,
   _mangleSupportFunctionName,
+  _hasNativeMulFor,
   TRUE,
   0,				/* leave lt */
   0,				/* leave gt */

@@ -5,6 +5,8 @@
 #ifndef PORT_INCLUDE
 #define PORT_INCLUDE
 
+#include "SDCCicode.h"
+
 #define TARGET_ID_MCS51    1
 #define TARGET_ID_GBZ80    2
 #define TARGET_ID_Z80      3
@@ -205,6 +207,11 @@ typedef struct
     /** Mangles a support function name to reflect the calling model. 
      */
     char *(*getMangledFunctionName) (char *szOrginial);
+
+    /** Returns true if the port can multiply the two types nativly
+        without using support functions.
+    */
+    bool (*hasNativeMulFor) (iCode *ic, sym_link *left, sym_link *right);
 
     /** If TRUE, then tprintf and !dw will be used for some initalisers
      */

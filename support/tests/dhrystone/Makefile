@@ -21,7 +21,7 @@ dhry.gb: dhry.c
 dhry.c: dhry.h
 
 dhry.bin: dhry.ihx
-	cat $< | ../../makebin/makebin > $@
+	cat $< | $(TOPDIR)/bin/makebin > $@
 
 native:
 	gcc -g -O2 -DREG= -DNOSTRUCTASSIGN -DNOENUM -o dhry dhry.c

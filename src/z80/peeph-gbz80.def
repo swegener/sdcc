@@ -1,40 +1,40 @@
-replace restart {
+replace {
+	ld      (hl),a
+        dec     hl
+} by {
+        ld      (hl-),a
+}
+replace {
 	ld	(hl),a
 	inc	hl
 } by {
 	ld	(hl+),a
 }
-replace restart {
+replace {
 	ld	a,(hl)
 	inc	hl
 } by {
 	ld	a,(hl+)
 }
-replace restart {
-        ld      (hl),a
-        dec     hl
-} by {
-        ld      (hl-),a
-}
-replace restart {
+replace {
 	ld	a,[hl]
 	inc	hl
 } by {
 	ld	a,[hl+]
 }
-replace restart {
+replace {
 	ld	a,[hl]
 	inc	hl
 } by {
 	ld	a,[hl+]
 }
-replace restart {
+replace {
 	ld	[hl],a
 	inc	hl
 } by {
 	ld	[hl+],a
 }
-replace restart {
+replace {
 	ld	[hl],a
 	dec	hl
 } by {

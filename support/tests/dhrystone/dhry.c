@@ -274,9 +274,9 @@ int main(void)
     printf ("        should be:   %d\n", (int)7);
     printf ("Enum_Loc:            %d\n", Enum_Loc);
     printf ("        should be:   %d\n", (int)1);
-    printf ("Str_1_Loc:           %s\n", (char _generic *)Str_1_Loc);
+    printf ("Str_1_Loc:           %s\n", (char *)Str_1_Loc);
     printf ("        should be:   DHRYSTONE PROGRAM, 1'ST STRING\n");
-    printf ("Str_2_Loc:           %s\n", (char _generic *)Str_2_Loc);
+    printf ("Str_2_Loc:           %s\n", (char *)Str_2_Loc);
     printf ("        should be:   DHRYSTONE PROGRAM, 2'ND STRING\n");
     printf ("\n");
 #endif

@@ -1,9 +1,9 @@
-replace restart {
+replace {
 	ld (hl),(hl)
 } by {
 	ERROR - peephole - caught (hl),(hl)
 }
-replace restart {
+replace {
 	ld %1,%1
 } by {
         ; Removed redundent load

@@ -1,4 +1,10 @@
+2004-11-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/z80/gen.c (genFunction, genEndFunction): avoided generating
+	  *_start and *_end symbols for static functions
+
 2004-11-11 Maarten Brock <sourceforge.brock AT dse.nl>
+	
 	* src/SDCCmain.c (linkEdit): don't suppress crt0 if --nostdlib is used
 	  and search crt0.o in all library paths,
 	  (setIncludePath): proper handling of --nostdinc,

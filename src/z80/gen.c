@@ -3102,8 +3102,11 @@ genFunction (iCode * ic)
   
   /* Create the function header */
   emit2 ("!functionheader", sym->name);
-  sprintf (buffer, "%s_start", sym->rname);
-  emit2 ("!labeldef", buffer);
+  if (!IS_STATIC(sym->etype))
+    {
+      sprintf (buffer, "%s_start", sym->rname);
+      emit2 ("!labeldef", buffer);
+    }
   emit2 ("!functionlabeldef", sym->rname);
 
   if (options.profile) 
@@ -3296,8 +3299,11 @@ genEndFunction (iCode * ic)
       emit2 ("ret");
     }
       
-  sprintf (buffer, "%s_end", sym->rname);
-  emit2 ("!labeldef", buffer);
+  if (!IS_STATIC(sym->etype))
+    {
+      sprintf (buffer, "%s_end", sym->rname);
+      emit2 ("!labeldef", buffer);
+    }
   
   _G.flushStatics = 1;
   _G.stack.pushed = 0;

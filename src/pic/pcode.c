@@ -75,7 +75,7 @@ static pBlock *pb_dead_pcodes = NULL;
 /* Hardcoded flags to change the behavior of the PIC port */
 static int peepOptimizing = 1;        /* run the peephole optimizer if nonzero */
 static int functionInlining = 1;      /* inline functions if nonzero */
-int debug_verbose = 0;                /* Set true to inundate .asm file */
+int debug_verbose = 1;                /* Set true to inundate .asm file */
 
 static int GpCodeSequenceNumber = 1;
 int GpcFlowSeq = 1;

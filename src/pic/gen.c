@@ -3763,6 +3763,8 @@ static void genCmp (operand *left,operand *right,
   truelbl  = newiTempLabel(NULL);
   size = max(AOP_SIZE(left),AOP_SIZE(right));
 
+  DEBUGpic14_AopType(__LINE__,left,right,result);
+
 #define _swapp
 
   /* if literal is on the right then swap with left */
@@ -4040,7 +4042,8 @@ static void genCmp (operand *left,operand *right,
 
 
     }
-#endif
+#endif  // _swapp
+
     if(AOP_TYPE(left) == AOP_LIT) {
       //symbol *lbl = newiTempLabel(NULL);
 
@@ -4116,12 +4119,18 @@ static void genCmp (operand *left,operand *right,
 	    emitpcode(POC_SUBFW, popGet(AOP(right),0));
 	    DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	    rFalseIfx.condition ^= 1;
-	    genSkipc(&rFalseIfx);
+	    if (AOP_TYPE(result) == AOP_CRY)
+	      genSkipc(&rFalseIfx);
+	    else {
+	      emitpcode(POC_CLRF, popGet(AOP(result),0));
+	      emitpcode(POC_RLF, popGet(AOP(result),0));
+	    }	      
 	    break;
 	  }
 	}
 
 	if(ifx) ifx->generated = 1;
+	//goto check_carry;
 	return;
 
       } else {
@@ -4371,15 +4380,26 @@ static void genCmp (operand *left,operand *right,
     emitpLabel(lbl->key);
 
     DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    genSkipc(&rFalseIfx);
+    if ((AOP_TYPE(result) == AOP_CRY && AOP_SIZE(result)) || 
+	(AOP_TYPE(result) == AOP_REG)) {
+      emitpcode(POC_CLRF, popGet(AOP(result),0));
+      emitpcode(POC_RLF, popGet(AOP(result),0));
+    } else {
+      genSkipc(&rFalseIfx);
+    }	      
+    //genSkipc(&rFalseIfx);
     if(ifx) ifx->generated = 1;
+
     return;
 
   }
 
+ check_carry:
   if (AOP_TYPE(result) == AOP_CRY && AOP_SIZE(result)) {
+    DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
     pic14_outBitC(result);
   } else {
+    DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
     /* if the result is used in the next
        ifx conditional branch then generate
        code a little differently */

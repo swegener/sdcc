@@ -263,6 +263,10 @@ _setDefaultOptions (void)
   /* first the options part */
   options.intlong_rent = 1;
 
+  /* Default code and data locations. */
+  options.code_loc = 0x200;
+  options.data_loc = 0x8000;
+
   optimize.global_cse = 1;
   optimize.label1 = 1;
   optimize.label2 = 1;
@@ -304,6 +308,80 @@ static const char *_z80_linkCmd[] =
     "$1.o",                     // Actual code
     NULL
 };
+
+/* sprintf that appends to the string. */
+static void
+_saprintf(char *pinto, const char *format, ...)
+{
+    va_list ap;
+    va_start(ap, format);
+
+    vsprintf(pinto + strlen(pinto), format, ap);
+    va_end(ap);
+}
+
+static void
+_z80_link(void)
+{
+    int i;
+    // PENDING
+    char buffer[2048];
+
+    sprintf(buffer, 
+            "link-z80 "
+            "-n "                       // Don't echo output
+            "-c "                       // Command line input
+            "-- "                       // Again, command line input...
+            "-b_CODE=0x%04X "           // Code starts at 0x200
+            "-b_DATA=0x%04X "           // RAM starts at 0x8000
+            "-j ",                      // Output a symbol file as well
+            options.code_loc,
+            options.data_loc
+            );
+
+    // Add the standard lib in.
+    if (options.nostdlib == FALSE) {
+        _saprintf(buffer,
+                  "-k" SDCC_LIB_DIR "/z80 "   // Library path
+                  "-lz80.lib "                // Library to use
+                  );
+    }
+
+    // Add in the library paths and libraries
+    for (i = 0; i < nlibFiles; i++) {
+        _saprintf(buffer, "-k%s ", libFiles[i]);
+    }
+    for (i = 0; i < nlibPaths; i++) {
+        _saprintf(buffer, "-l%s ", libPaths[i]);
+    }
+
+    _saprintf(buffer,
+              "-i "                       // Output Intel IHX
+              "%s.ihx ",                  // Output to
+              srcFileName
+              );
+
+    if (options.nostdlib == FALSE) {
+        _saprintf(buffer, 
+                  SDCC_LIB_DIR "/z80/crt0.o " // Link in crt0 first
+                  );
+    }
+
+    _saprintf(buffer,
+              "%s.o ",                    // Actual code
+              srcFileName
+              );
+
+    // Append all the other targets
+    for (i = 0; i < nrelFiles; i++) {
+        _saprintf(buffer, "%s ", relFiles[i]);
+    }
+
+    // Do it.
+    if (my_system (buffer)) {
+        exit(1);
+    }
+}
 
 static const char *_z80_asmCmd[] =
 {
@@ -347,7 +425,7 @@ PORT z80_port =
   },
   {
     _z80_linkCmd,
-    NULL,
+    _z80_link,
     ".o"
   },
   {

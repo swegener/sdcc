@@ -4,20 +4,20 @@
   Benchmarks on dhry.c 2.1 with 32766 loops and a 10ms clock:
             ticks dhry  size
   Base with asm strcpy / strcmp / memcpy: 23198 141 1A14
-  Improved WORD push        22784 144 19AE
-  With label1 on        22694 144 197E
-  With label2 on        22743 144 198A
-  With label3 on        22776 144 1999
-  With label4 on        22776 144 1999
-  With all 'label' on       22661 144 196F
-  With loopInvariant on       20919 156 19AB
-  With loopInduction on       Breaks    198B
-  With all working on       20796 158 196C
-  Slightly better genCmp(signed)    20597 159 195B
+  Improved WORD push                    22784 144 19AE
+  With label1 on                        22694 144 197E
+  With label2 on                        22743 144 198A
+  With label3 on                        22776 144 1999
+  With label4 on                        22776 144 1999
+  With all 'label' on                   22661 144 196F
+  With loopInvariant on                 20919 156 19AB
+  With loopInduction on                 Breaks    198B
+  With all working on                   20796 158 196C
+  Slightly better genCmp(signed)        20597 159 195B
   Better reg packing, first peephole    20038 163 1873
-  With assign packing       19281 165 1849
-  5/3/00          17741 185 17B6
-  With reg params for mul and div   16234 202 162D
+  With assign packing                   19281 165 1849
+  5/3/00                                17741 185 17B6
+  With reg params for mul and div       16234 202 162D
 
   Michael Hope <michaelh@earthling.net> 2000
   Based on the mcs51 generator -
@@ -65,7 +65,22 @@
    stuff. This is what it is all about CODE GENERATION for a specific MCU.
    Some of the routines may be reusable, will have to see */
 
-static char *spname;
+/* Z80 calling convention description.
+   Parameters are passed right to left.  As the stack grows downwards,
+   the parameters are arranged in left to right in memory.
+   Parameters may be passed in the HL and DE registers with one
+   parameter per pair.
+   PENDING: What if the parameter is a long?
+   Everything is caller saves. i.e. the caller must save any registers
+   that it wants to preserve over the call.
+   The return value is returned in DEHL.  DE is normally used as a
+   working register pair.  Caller saves allows it to be used for a
+   return value.
+   va args functions do not use register parameters.  All arguments
+   are passed on the stack.
+   IX is used as an index register to the top of the local variable
+   area.  ix-0 is the top most local variable.
+*/
 static char *_z80_return[] =
 {"l", "h", "e", "d"};
 static char *_gbz80_return[] =
@@ -76,12 +91,7 @@ static char **_fTmp;
 /* PENDING: messy */
 static char zero[20];
 
-static char *accUse[] =
-{"a"};
-static char *hlUse[] =
-{"l", "h"};
 short rbank = -1;
-short accInUse = 0;
 short inLine = 0;
 short debugLine = 0;
 short nregssaved = 0;
@@ -91,56 +101,38 @@ extern FILE *codeOutFile;
 set *sendSet = NULL;
 
 typedef enum
-  {
+{
     PAIR_INVALID,
+    PAIR_AF,
     PAIR_BC,
     PAIR_DE,
     PAIR_HL,
     PAIR_IY,
     PAIR_IX,
     NUM_PAIRS
-  }
-PAIR_ID;
+} PAIR_ID;
 
 static struct
-  {
+{
     const char *name;
     const char *l;
     const char *h;
-  }
-_pairs[NUM_PAIRS] =
-{
-  {
-    "??", "?", "?"
-  }
-  ,
-  {
-    "bc", "c", "b"
-  }
-  ,
-  {
-    "de", "e", "d"
-  }
-  ,
-  {
-    "hl", "l", "h"
-  }
-  ,
-  {
-    "iy", "iy.l?", "iy.h?"
-  }
-  ,
-  {
-    "ix", "ix.l?", "ix.h?"
-  }
+} _pairs[NUM_PAIRS] = {
+    {    "??", "?", "?" },
+    {    "af", "f", "a" },
+    {    "bc", "c", "b" },
+    {    "de", "e", "d" },
+    {    "hl", "l", "h" },
+    {    "iy", "iy.l?", "iy.h?" },
+    {    "ix", "ix.l?", "ix.h?" }
 };
+
+// PENDING
+#define ACC_NAME	_pairs[PAIR_AF].h
 
 #define RESULTONSTACK(x) \
                          (IC_RESULT(x) && IC_RESULT(x)->aop && \
                          IC_RESULT(x)->aop->type == AOP_STK )
-
-#define MOVA(x) if (strcmp(x,"a")) emitcode("ld","a,%s",x);
-#define CLRC    emitcode("xor","a,a");
 
 lineNode *lineHead = NULL;
 lineNode *lineCurr = NULL;
@@ -181,10 +173,11 @@ static struct {
     int receiveOffset;
     bool flush_statics;
     bool in_home;
+    const char *lastFunctionName;
   }
 _G;
 
-static char *aopGet (asmop * aop, int offset, bool bit16);
+static const char *aopGet (asmop * aop, int offset, bool bit16);
 
 static void
 _tidyUp (char *buf)
@@ -260,25 +253,30 @@ emitcode (const char *inst, const char *fmt,...)
   va_end (ap);
 }
 
-/* Z80:
-   { "adjustsp",
-   "\tld hl,#-%d\n"
-   "\tadd hl,sp\n"
-   "\tld sp,hl"
-   }
-   { "prelude",
-   "push bc"
-   "push de"
-   "push ix"
-   "ld ix,#0"
-   "add ix,sp"
-   { "leave"
-   emitcode("ld", "sp,ix");
-   emitcode("pop", "ix");
-   emitcode("pop", "de");
-   }
-   }
- */
+static void
+_emitMove(const char *to, const char *from)
+{
+    if (strcasecmp(to, from) != 0) {
+        emit2("ld %s,%s", to, from);
+    }
+    else {
+        // Optimise it out.
+        // Could leave this to the peephole, but sometimes the peephole is inhibited.
+    }
+}
+
+static void
+_MoveA(const char *moveFrom)
+{
+    // Let the peephole optimiser take care of redundent loads
+    _emitMove(ACC_NAME, moveFrom);
+}
+
+static void
+_ClearCarry(void)
+{
+    emit2("xor a,a");
+}
 
 const char *
 getPairName (asmop * aop)
@@ -696,19 +694,23 @@ aopOp (operand * op, iCode * ic, bool result, bool requires_a)
 	    {
 	      aop = op->aop = sym->aop = newAsmop (AOP_ACC);
 	      aop->size = getSize (sym->type);
-	      for (i = 0; i < 2; i++)
-		aop->aopu.aop_str[i] = accUse[i];
+              wassertl(aop->size == 1, "Internal error: Caching in A, but too big to fit in A");
+
+              aop->aopu.aop_str[i] = _pairs[PAIR_AF].h;
 	    }
 	  else if (sym->accuse == ACCUSE_HL)
 	    {
 	      wassert (!IS_GB);
 	      aop = op->aop = sym->aop = newAsmop (AOP_HLREG);
 	      aop->size = getSize (sym->type);
-	      for (i = 0; i < 2; i++)
-		aop->aopu.aop_str[i] = hlUse[i];
+              wassertl(aop->size <= 2, "Internal error: Caching in HL, but too big to fit in HL");
+              aop->aopu.aop_str[0] = _pairs[PAIR_HL].l;
+              aop->aopu.aop_str[1] = _pairs[PAIR_HL].h;
 	    }
-	  else
-	    wassert (0);
+	  else 
+              {
+                  wassert (0);
+              }
 	  return;
 	}
 
@@ -1094,7 +1096,7 @@ emitLabel (int key)
 /*-----------------------------------------------------------------*/
 /* aopGet - for fetching value of the aop                          */
 /*-----------------------------------------------------------------*/
-static char *
+static const char *
 aopGet (asmop * aop, int offset, bool bit16)
 {
   char *s = buffer;
@@ -1431,7 +1433,7 @@ static void
 movLeft2Result (operand * left, int offl,
 		operand * result, int offr, int sign)
 {
-  char *l;
+    const char *l;
   if (!sameRegs (AOP (left), AOP (result)) || (offl != offr))
     {
       l = aopGet (AOP (left), offl, FALSE);
@@ -1514,7 +1516,7 @@ toBoolean (operand * oper)
     {
       if (AOP (oper)->type != AOP_ACC)
 	{
-	  CLRC;
+	  _ClearCarry();
 	  emitcode ("or", "a,%s", aopGet (AOP (oper), 0, FALSE));
 	}
     }
@@ -1583,9 +1585,9 @@ genCpl (iCode * ic)
   size = AOP_SIZE (IC_RESULT (ic));
   while (size--)
     {
-      char *l = aopGet (AOP (IC_LEFT (ic)), offset, FALSE);
-      MOVA (l);
-      emitcode ("cpl", "");
+      const char *l = aopGet (AOP (IC_LEFT (ic)), offset, FALSE);
+      _MoveA (l);
+      emit2("cpl");
       aopPut (AOP (IC_RESULT (ic)), "a", offset++);
     }
 
@@ -1629,10 +1631,10 @@ genUminus (iCode * ic)
   /* otherwise subtract from zero */
   size = AOP_SIZE (IC_LEFT (ic));
   offset = 0;
-  CLRC;
+  _ClearCarry();
   while (size--)
     {
-      char *l = aopGet (AOP (IC_LEFT (ic)), offset, FALSE);
+      const char *l = aopGet (AOP (IC_LEFT (ic)), offset, FALSE);
       emit2 ("ld a,!zero");
       emit2 ("sbc a,%s", l);
       aopPut (AOP (IC_RESULT (ic)), "a", offset++);
@@ -1712,7 +1714,7 @@ static void
 genIpush (iCode * ic)
 {
   int size, offset = 0;
-  char *l;
+  const char *l;
 
   /* if this is not a parm push : ie. it is spill push
      and spill push is always done on the local stack */
@@ -2026,6 +2028,7 @@ emitCall (iCode * ic, bool ispcall)
       if (isLitWord (AOP (IC_LEFT (ic))))
 	{
 	  emitcode ("", "; Special case where the pCall is to a constant");
+          
 	  emitcode ("call", aopGetLitWordLong (AOP (IC_LEFT (ic)), 0, FALSE));
 	}
       else
@@ -2069,9 +2072,7 @@ emitCall (iCode * ic, bool ispcall)
       IS_TRUE_SYMOP (IC_RESULT (ic)))
     {
 
-      accInUse++;
       aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
-      accInUse--;
 
       assignResultValue (IC_RESULT (ic));
 
@@ -2172,6 +2173,8 @@ genFunction (iCode * ic)
     {
       addSetIfnotP (&publics, sym);
     }
+
+  _G.lastFunctionName = sym->rname;
 
   /* create the function header */
   emit2 ("!functionheader", sym->name);
@@ -2306,7 +2309,7 @@ genEndFunction (iCode * ic)
 static void
 genRet (iCode * ic)
 {
-  char *l;
+    const char *l;
   /* Errk.  This is a hack until I can figure out how
      to cause dehl to spill on a call */
   int size, offset = 0;
@@ -2652,7 +2655,7 @@ genPlus (iCode * ic)
     {
       if (AOP_TYPE (IC_LEFT (ic)) == AOP_ACC)
 	{
-	  MOVA (aopGet (AOP (IC_LEFT (ic)), offset, FALSE));
+	  _MoveA (aopGet (AOP (IC_LEFT (ic)), offset, FALSE));
 	  if (offset == 0)
 	    emit2 ("add a,%s",
 		   aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
@@ -2662,7 +2665,7 @@ genPlus (iCode * ic)
 	}
       else
 	{
-	  MOVA (aopGet (AOP (IC_LEFT (ic)), offset, FALSE));
+	  _MoveA (aopGet (AOP (IC_LEFT (ic)), offset, FALSE));
 	  if (offset == 0)
 	    emit2 ("add a,%s",
 		   aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
@@ -2843,7 +2846,7 @@ genMinus (iCode * ic)
   /* if literal, add a,#-lit, else normal subb */
   while (size--)
     {
-      MOVA (aopGet (AOP (IC_LEFT (ic)), offset, FALSE));
+      _MoveA (aopGet (AOP (IC_LEFT (ic)), offset, FALSE));
       if (AOP_TYPE (IC_RIGHT (ic)) != AOP_LIT)
 	{
 	  if (!offset)
@@ -3073,12 +3076,12 @@ genCmp (operand * left, operand * right,
 		  if (!sign)
 		    {
 		      /* No sign so it's always false */
-		      CLRC;
+		      _ClearCarry();
 		    }
 		  else
 		    {
 		      /* Just load in the top most bit */
-		      MOVA (aopGet (AOP (left), AOP_SIZE (left) - 1, FALSE));
+		      _MoveA (aopGet (AOP (left), AOP_SIZE (left) - 1, FALSE));
 		      if (!(AOP_TYPE (result) == AOP_CRY && AOP_SIZE (result)) && ifx)
 			{
 			  genIfxJump (ifx, "7");
@@ -3123,18 +3126,18 @@ genCmp (operand * left, operand * right,
 		  fDidXor = TRUE;
 		}
 	      if (!fDidXor)
-		CLRC;
+		_ClearCarry();
 	    }
 	  else
 	    {
-	      CLRC;
+	      _ClearCarry();
 	    }
 	  while (size--)
 	    {
 	      /* Do a long subtract */
 	      if (!sign || size)
 		{
-		  MOVA (aopGet (AOP (left), offset, FALSE));
+		  _MoveA (aopGet (AOP (left), offset, FALSE));
 		}
 	      if (sign && size == 0)
 		{
@@ -3292,7 +3295,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
     {
       while (size--)
 	{
-	  MOVA (aopGet (AOP (left), offset, FALSE));
+	  _MoveA (aopGet (AOP (left), offset, FALSE));
 	  if ((AOP_TYPE (left) == AOP_DIR && AOP_TYPE (right) == AOP_LIT) &&
 	      ((unsigned int) ((lit >> (offset * 8)) & 0x0FFL) == 0))
 	    /* PENDING */
@@ -3311,7 +3314,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
       /* PENDING: is this required? */
       while (size--)
 	{
-	  MOVA (aopGet (AOP (right), offset, FALSE));
+	  _MoveA (aopGet (AOP (right), offset, FALSE));
 	  emitcode ("cp", "%s ; 5", aopGet (AOP (left), offset, FALSE));
 	  emit2 ("!shortjp nz,!tlabel", lbl->key + 100);
 	  offset++;
@@ -3639,7 +3642,7 @@ genAnd (iCode * ic, iCode * ifx)
       if (posbit)
 	{
 	  posbit--;
-	  MOVA (aopGet (AOP (left), posbit >> 3, FALSE));
+	  _MoveA (aopGet (AOP (left), posbit >> 3, FALSE));
 	  // bit = left & 2^n
 	  if (size)
 	    {
@@ -3674,7 +3677,7 @@ genAnd (iCode * ic, iCode * ifx)
 	    {
 	      if ((bytelit = ((lit >> (offset * 8)) & 0x0FFL)) != 0x0L)
 		{
-		  MOVA (aopGet (AOP (left), offset, FALSE));
+		  _MoveA (aopGet (AOP (left), offset, FALSE));
 		  // byte ==  2^n ?
 		  if ((posbit = isLiteralBit (bytelit)) != 0)
 		    {
@@ -3727,7 +3730,7 @@ genAnd (iCode * ic, iCode * ifx)
 		    aopPut (AOP (result), zero, offset);
 		  else
 		    {
-		      MOVA (aopGet (AOP (left), offset, FALSE));
+		      _MoveA (aopGet (AOP (left), offset, FALSE));
 		      emitcode ("and", "a,%s",
 				aopGet (AOP (right), offset, FALSE));
 		      aopPut (AOP (left), "a", offset);
@@ -3743,7 +3746,7 @@ genAnd (iCode * ic, iCode * ifx)
 		}
 	      else
 		{
-		  MOVA (aopGet (AOP (left), offset, FALSE));
+		  _MoveA (aopGet (AOP (left), offset, FALSE));
 		  emitcode ("and", "a,%s",
 			    aopGet (AOP (right), offset, FALSE));
 		  aopPut (AOP (left), "a", offset);
@@ -3785,7 +3788,7 @@ genAnd (iCode * ic, iCode * ifx)
 		emitcode ("and", "a,%s", aopGet (AOP (right), offset, FALSE));
 	      else
 		{
-		  MOVA (aopGet (AOP (left), offset, FALSE));
+		  _MoveA (aopGet (AOP (left), offset, FALSE));
 		  emitcode ("and", "a,%s",
 			    aopGet (AOP (right), offset, FALSE));
 		}
@@ -3879,7 +3882,7 @@ genOr (iCode * ic, iCode * ifx)
 		continue;
 	      else
 		{
-		  MOVA (aopGet (AOP (left), offset, FALSE));
+		  _MoveA (aopGet (AOP (left), offset, FALSE));
 		  emitcode ("or", "a,%s",
 			    aopGet (AOP (right), offset, FALSE));
 		  aopPut (AOP (result), "a", offset);
@@ -3891,7 +3894,7 @@ genOr (iCode * ic, iCode * ifx)
 		emitcode ("or", "a,%s", aopGet (AOP (right), offset, FALSE));
 	      else
 		{
-		  MOVA (aopGet (AOP (left), offset, FALSE));
+		  _MoveA (aopGet (AOP (left), offset, FALSE));
 		  emitcode ("or", "a,%s",
 			    aopGet (AOP (right), offset, FALSE));
 		  aopPut (AOP (result), "a", offset);
@@ -3927,7 +3930,7 @@ genOr (iCode * ic, iCode * ifx)
 	      emitcode ("or", "a,%s", aopGet (AOP (right), offset, FALSE));
 	    else
 	      {
-		MOVA (aopGet (AOP (left), offset, FALSE));
+		_MoveA (aopGet (AOP (left), offset, FALSE));
 		emitcode ("or", "a,%s",
 			  aopGet (AOP (right), offset, FALSE));
 	      }
@@ -4013,7 +4016,7 @@ genXor (iCode * ic, iCode * ifx)
 		continue;
 	      else
 		{
-		  MOVA (aopGet (AOP (right), offset, FALSE));
+		  _MoveA (aopGet (AOP (right), offset, FALSE));
 		  emitcode ("xor", "a,%s",
 			    aopGet (AOP (left), offset, FALSE));
 		  aopPut (AOP (result), "a", 0);
@@ -4025,7 +4028,7 @@ genXor (iCode * ic, iCode * ifx)
 		emitcode ("xor", "a,%s", aopGet (AOP (right), offset, FALSE));
 	      else
 		{
-		  MOVA (aopGet (AOP (right), offset, FALSE));
+		  _MoveA (aopGet (AOP (right), offset, FALSE));
 		  emitcode ("xor", "a,%s",
 			    aopGet (AOP (left), offset, FALSE));
 		  aopPut (AOP (result), "a", 0);
@@ -4061,7 +4064,7 @@ genXor (iCode * ic, iCode * ifx)
 	      emitcode ("xor", "a,%s", aopGet (AOP (right), offset, FALSE));
 	    else
 	      {
-		MOVA (aopGet (AOP (right), offset, FALSE));
+		_MoveA (aopGet (AOP (right), offset, FALSE));
 		emitcode ("xor", "a,%s",
 			  aopGet (AOP (left), offset, FALSE));
 		aopPut (AOP (result), "a", 0);
@@ -4157,7 +4160,7 @@ shiftR2Left2Result (operand * left, int offl,
       int size = 2;
       int offset = 0;
       symbol *tlbl, *tlbl1;
-      char *l;
+      const char *l;
 
       tlbl = newiTempLabel (NULL);
       tlbl1 = newiTempLabel (NULL);
@@ -4210,7 +4213,7 @@ shiftL2Left2Result (operand * left, int offl,
     int size = 2;
     int offset = 0;
     symbol *tlbl, *tlbl1;
-    char *l;
+    const char *l;
 
     tlbl = newiTempLabel (NULL);
     tlbl1 = newiTempLabel (NULL);
@@ -4317,9 +4320,9 @@ static void
 shiftL1Left2Result (operand * left, int offl,
 		    operand * result, int offr, int shCount)
 {
-  char *l;
+  const char *l;
   l = aopGet (AOP (left), offl, FALSE);
-  MOVA (l);
+  _MoveA (l);
   /* shift left accumulator */
   AccLsh (shCount);
   aopPut (AOP (result), "a", offr);
@@ -4443,7 +4446,7 @@ static void
 genLeftShift (iCode * ic)
 {
   int size, offset;
-  char *l;
+  const char *l;
   symbol *tlbl, *tlbl1;
   operand *left, *right, *result;
 
@@ -4528,7 +4531,7 @@ genrshOne (operand * result, operand * left, int shCount)
 {
   /* Errk */
   int size = AOP_SIZE (result);
-  char *l;
+  const char *l;
 
   wassert (size == 1);
   wassert (shCount < 8);
@@ -4543,7 +4546,7 @@ genrshOne (operand * result, operand * left, int shCount)
     }
   else
     {
-      MOVA (l);
+      _MoveA (l);
       while (shCount--)
 	{
 	  emitcode ("srl", "a");
@@ -4575,7 +4578,7 @@ shiftR1Left2Result (operand * left, int offl,
 		    operand * result, int offr,
 		    int shCount, int sign)
 {
-  MOVA (aopGet (AOP (left), offl, FALSE));
+  _MoveA (aopGet (AOP (left), offl, FALSE));
   if (sign)
     {
       wassert (0);
@@ -4678,7 +4681,7 @@ genRightShift (iCode * ic)
   operand *right, *left, *result;
   sym_link *retype;
   int size, offset, first = 1;
-  char *l;
+  const char *l;
   bool is_signed;
 
   symbol *tlbl, *tlbl1;
@@ -4886,7 +4889,7 @@ genGenPointerSet (operand * right,
   if (isPair (AOP (result)) && (AOP_SIZE (right) == 1))
     {
       /* Just do it */
-      char *l = aopGet (AOP (right), 0, FALSE);
+      const char *l = aopGet (AOP (right), 0, FALSE);
       const char *pair = getPairName (AOP (result));
       if (canAssignToPtr (l) && isPtr (pair))
 	{
@@ -4894,7 +4897,7 @@ genGenPointerSet (operand * right,
 	}
       else
 	{
-	  MOVA (l);
+	  _MoveA (l);
 	  emit2 ("ld !*pair,a", pair);
 	}
       goto release;
@@ -4921,14 +4924,14 @@ genGenPointerSet (operand * right,
 
       while (size--)
 	{
-	  char *l = aopGet (AOP (right), offset, FALSE);
+	  const char *l = aopGet (AOP (right), offset, FALSE);
 	  if (isRegOrLit (AOP (right)) && !IS_GB)
 	    {
 	      emit2 ("ld !*pair,%s", _pairs[pairId].name, l);
 	    }
 	  else
 	    {
-	      MOVA (l);
+	      _MoveA (l);
 	      emit2 ("ld !*pair,a", _pairs[pairId].name);
 	    }
 	  if (size)
@@ -5143,7 +5146,7 @@ genAssign (iCode * ic)
   else if (size == 2 && requiresHL (AOP (right)) && requiresHL (AOP (result)) && IS_GB)
     {
       /* Special case.  Load into a and d, then load out. */
-      MOVA (aopGet (AOP (right), 0, FALSE));
+      _MoveA (aopGet (AOP (right), 0, FALSE));
       emitcode ("ld", "e,%s", aopGet (AOP (right), 1, FALSE));
       aopPut (AOP (result), "a", 0);
       aopPut (AOP (result), "e", 1);
@@ -5155,7 +5158,7 @@ genAssign (iCode * ic)
 	  /* PENDING: do this check better */
 	  if (requiresHL (AOP (right)) && requiresHL (AOP (result)))
 	    {
-	      MOVA (aopGet (AOP (right), offset, FALSE));
+	      _MoveA (aopGet (AOP (right), offset, FALSE));
 	      aopPut (AOP (result), "a", offset);
 	    }
 	  else
@@ -5178,7 +5181,7 @@ static void
 genJumpTab (iCode * ic)
 {
   symbol *jtab;
-  char *l;
+  const char *l;
 
   aopOp (IC_JTCOND (ic), ic, FALSE, FALSE);
   /* get the condition into accumulator */
@@ -5282,9 +5285,9 @@ genCast (iCode * ic)
   else
     {
       /* we need to extend the sign :{ */
-      char *l = aopGet (AOP (right), AOP_SIZE (right) - 1,
+        const char *l = aopGet (AOP (right), AOP_SIZE (right) - 1,
 			FALSE);
-      MOVA (l);
+      _MoveA (l);
       emitcode ("", "; genCast: sign extend untested.");
       emitcode ("rla", "");
       emitcode ("sbc", "a,a");
@@ -5361,9 +5364,6 @@ genZ80Code (iCode * lic)
 	emitcode ("", "G$%s$0$0 ==.", currFunc->name);
       debugLine = 0;
     }
-  /* stack pointer name */
-  spname = "sp";
-
 
   for (ic = lic; ic; ic = ic->next)
     {

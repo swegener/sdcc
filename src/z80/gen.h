@@ -61,19 +61,19 @@ AOP_TYPE;
 typedef struct asmop
   {
     AOP_TYPE type;
-    short coff;			/* current offset */
-    short size;			/* total size */
-    unsigned code:1;		/* is in Code space */
-    unsigned paged:1;		/* in paged memory  */
-    unsigned freed:1;		/* already freed    */
+    short coff;                 /* current offset */
+    short size;                 /* total size */
+    unsigned code:1;            /* is in Code space */
+    unsigned paged:1;           /* in paged memory  */
+    unsigned freed:1;           /* already freed    */
     union
       {
-	value *aop_lit;		/* if literal */
-	regs *aop_reg[4];	/* array of registers */
-	char *aop_dir;		/* if direct  */
-	char *aop_immd;		/* if immediate others are implied */
-	int aop_stk;		/* stack offset when AOP_STK */
-	char *aop_str[4];	/* just a string array containing the location */
+        value *aop_lit;         /* if literal */
+        regs *aop_reg[4];       /* array of registers */
+        char *aop_dir;          /* if direct  */
+        char *aop_immd;         /* if immediate others are implied */
+        int aop_stk;            /* stack offset when AOP_STK */
+        const char *aop_str[4]; /* just a string array containing the location */
       }
     aopu;
   }

@@ -1594,7 +1594,7 @@ astHasSymbol (ast * tree, symbol * sym)
       else
 	return FALSE;
     }
-  
+
   return astHasSymbol (tree->left, sym) ||
     astHasSymbol (tree->right, sym);
 }
@@ -2509,8 +2509,6 @@ decorateType (ast * tree)
 	wtree = optimizeSWAP (tree);
 	if (wtree != tree)
 	  return decorateType (wtree);
-        
-	// fall through
       }
 
       /* if left is a literal exchange left & right */
@@ -2537,6 +2535,8 @@ decorateType (ast * tree)
 	      decorateType (parent);
 	    }
         }
+      /* fall through */
+
       /*------------------------------------------------------------------*/
       /*----------------------------*/
       /*  bitwise xor               */
@@ -2578,7 +2578,8 @@ decorateType (ast * tree)
       /* if right is a literal and */
       /* we can find a 2nd literal in a xor-tree then */
       /* rearrange the tree */
-      if (IS_LITERAL (RTYPE (tree)))
+      if (IS_LITERAL (RTYPE (tree)) &&
+          tree->opval.op == '^') /* the same source is used by 'bitwise or' */
 	{
 	  ast *parent;
 	  ast *litTree = searchLitOp (tree, &parent, "^");
@@ -2597,6 +2598,8 @@ decorateType (ast * tree)
 			       computeType (LTYPE (tree),
 					    RTYPE (tree),
 					    FALSE));
+
+      return tree;
 
       /*------------------------------------------------------------------*/
       /*----------------------------*/

@@ -7,6 +7,7 @@
 	* sim/ucsim/gui.src/Makefile.in: fixed an old typo
 	* src/mcs51/gen.c (genRightShift): fixed bug #870788
 	* src/ds390/gen.c (genRightShift): fixed bug #870788
+	* src/SDCCast.c (decorateType): fixed bug #870781
 
 2004-01-06 Vangelis Rokas <vrokas@otenet.gr>
 
@@ -19,7 +20,7 @@
 	genFunction,genEndFunction: setup stack frame for the
 	generated function,
 	genAddrOf: will be changed according to bug 863624
-	
+
 	* added files genutils.c and genutils.h which contain gen*
 	debugged and optimised functions extracted from gen.c
 	

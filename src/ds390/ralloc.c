@@ -2907,23 +2907,31 @@ packRegisters (eBBlock * ebp)
 	{
 	  /* if we are using a symbol on the stack
 	     then we should say ds390_ptrRegReq */
+	  if (options.useXstack && ic->parmPush
+	      && (ic->op == IPUSH || ic->op == IPOP))
+	    ds390_ptrRegReq++;
 	  if (ic->op == IFX && IS_SYMOP (IC_COND (ic)))
 		  ds390_ptrRegReq += ((OP_SYMBOL (IC_COND (ic))->onStack ? !options.stack10bit : 0) +
-				      OP_SYMBOL (IC_COND (ic))->iaccess);
+				      OP_SYMBOL (IC_COND (ic))->iaccess +
+				      (SPEC_OCLS(OP_SYMBOL (IC_COND (ic))->etype) == idata));
 	  else if (ic->op == JUMPTABLE && IS_SYMOP (IC_JTCOND (ic)))
 		  ds390_ptrRegReq += ((OP_SYMBOL (IC_JTCOND (ic))->onStack ? !options.stack10bit : 0) +
-				      OP_SYMBOL (IC_JTCOND (ic))->iaccess);
+				      OP_SYMBOL (IC_JTCOND (ic))->iaccess +
+				      (SPEC_OCLS(OP_SYMBOL (IC_JTCOND (ic))->etype) == idata));
 	  else
 	    {
 	      if (IS_SYMOP (IC_LEFT (ic)))
 		      ds390_ptrRegReq += ((OP_SYMBOL (IC_LEFT (ic))->onStack ? !options.stack10bit : 0) +
-					  OP_SYMBOL (IC_LEFT (ic))->iaccess);
+					  OP_SYMBOL (IC_LEFT (ic))->iaccess +
+					  (SPEC_OCLS(OP_SYMBOL (IC_LEFT (ic))->etype) == idata));
 	      if (IS_SYMOP (IC_RIGHT (ic)))
 		      ds390_ptrRegReq += ((OP_SYMBOL (IC_RIGHT (ic))->onStack ? !options.stack10bit : 0) +
-					  OP_SYMBOL (IC_RIGHT (ic))->iaccess);
+					  OP_SYMBOL (IC_RIGHT (ic))->iaccess +
+					  (SPEC_OCLS(OP_SYMBOL (IC_RIGHT (ic))->etype) == idata));
 	      if (IS_SYMOP (IC_RESULT (ic)))
 		      ds390_ptrRegReq += ((OP_SYMBOL (IC_RESULT (ic))->onStack ? !options.stack10bit : 0) +
-					  OP_SYMBOL (IC_RESULT (ic))->iaccess);
+					  OP_SYMBOL (IC_RESULT (ic))->iaccess +
+					  (SPEC_OCLS(OP_SYMBOL (IC_RESULT (ic))->etype) == idata));
 	    }
 	}
 

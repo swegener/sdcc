@@ -9335,12 +9335,12 @@ genNearPointerGet (operand * left,
   aopOp (left, ic, FALSE, FALSE);
 
   /* if left is rematerialisable and
-     result is not bit variable type and
+     result is not bitfield variable type and
      the left is pointer to data space i.e
      lower 128 bytes of space */
   if (AOP_TYPE (left) == AOP_IMMD &&
-      !IS_BITVAR (retype) &&
-      !IS_BITVAR (letype) &&
+      !IS_BITFIELD (retype) &&
+      !IS_BITFIELD (letype) &&
       DCL_TYPE (ltype) == POINTER)
     {
       genDataPointerGet (left, result, ic);

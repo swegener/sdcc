@@ -1,3 +1,11 @@
+2004-02-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/ds390/gen.c (genNearPointerGet),
+	* src/mcs51/gen.c (genNearPointerGet): allow the genDataPointerGet()
+	optimization with bits, but not bitfields.
+	* src/ds390/ralloc.c (packRegisters),
+	* src/mcs51/ralloc.c (packRegisters): fixed bug #884453 & #880832
+
 2004-02-09 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCcse.c (algebraicOpts): copy operands before modification

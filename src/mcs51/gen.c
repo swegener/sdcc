@@ -135,7 +135,7 @@ emitcode (char *inst, const char *fmt,...)
   while (isspace (*lbp))
     lbp++;
 
-  //printf ("%s\n", lb);
+  // printf ("%s\n", lb);
   
   if (lbp && *lbp)
     lineCurr = (lineCurr ?
@@ -7572,11 +7572,11 @@ genNearPointerGet (operand * left,
   aopOp (left, ic, FALSE);
 
   /* if left is rematerialisable and
-     result is not bit variable type and
+     result is not bitfield variable type and
      the left is pointer to data space i.e
      lower 128 bytes of space */
   if (AOP_TYPE (left) == AOP_IMMD &&
-      !IS_BITVAR (retype) &&
+      !IS_BITFIELD (retype) &&
       DCL_TYPE (ltype) == POINTER)
     {
       genDataPointerGet (left, result, ic);

@@ -2791,23 +2791,31 @@ packRegisters (eBBlock ** ebpp, int blockno)
 	{
 	  /* if we are using a symbol on the stack
 	     then we should say mcs51_ptrRegReq */
+	  if (options.useXstack && ic->parmPush
+	      && (ic->op == IPUSH || ic->op == IPOP))
+	    mcs51_ptrRegReq++;
 	  if (ic->op == IFX && IS_SYMOP (IC_COND (ic)))
 	    mcs51_ptrRegReq += ((OP_SYMBOL (IC_COND (ic))->onStack ||
-				 OP_SYMBOL (IC_COND (ic))->iaccess) ? 1 : 0);
+				 OP_SYMBOL (IC_COND (ic))->iaccess ||
+				 SPEC_OCLS(OP_SYMBOL (IC_COND (ic))->etype) == idata) ? 1 : 0);
 	  else if (ic->op == JUMPTABLE && IS_SYMOP (IC_JTCOND (ic)))
 	    mcs51_ptrRegReq += ((OP_SYMBOL (IC_JTCOND (ic))->onStack ||
-			      OP_SYMBOL (IC_JTCOND (ic))->iaccess) ? 1 : 0);
+			      OP_SYMBOL (IC_JTCOND (ic))->iaccess ||
+			      SPEC_OCLS(OP_SYMBOL (IC_JTCOND (ic))->etype) == idata) ? 1 : 0);
 	  else
 	    {
 	      if (IS_SYMOP (IC_LEFT (ic)))
 		mcs51_ptrRegReq += ((OP_SYMBOL (IC_LEFT (ic))->onStack ||
-				OP_SYMBOL (IC_LEFT (ic))->iaccess) ? 1 : 0);
+				OP_SYMBOL (IC_LEFT (ic))->iaccess ||
+				SPEC_OCLS(OP_SYMBOL (IC_LEFT (ic))->etype) == idata) ? 1 : 0);
 	      if (IS_SYMOP (IC_RIGHT (ic)))
 		mcs51_ptrRegReq += ((OP_SYMBOL (IC_RIGHT (ic))->onStack ||
-			       OP_SYMBOL (IC_RIGHT (ic))->iaccess) ? 1 : 0);
+			       OP_SYMBOL (IC_RIGHT (ic))->iaccess ||
+			       SPEC_OCLS(OP_SYMBOL (IC_RIGHT (ic))->etype) == idata) ? 1 : 0);
 	      if (IS_SYMOP (IC_RESULT (ic)))
 		mcs51_ptrRegReq += ((OP_SYMBOL (IC_RESULT (ic))->onStack ||
-			      OP_SYMBOL (IC_RESULT (ic))->iaccess) ? 1 : 0);
+			      OP_SYMBOL (IC_RESULT (ic))->iaccess ||
+			      SPEC_OCLS(OP_SYMBOL (IC_RESULT (ic))->etype) == idata) ? 1 : 0);
 	    }
 	}
 

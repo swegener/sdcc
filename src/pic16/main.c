@@ -269,29 +269,27 @@ _pic16_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 #endif
 
 #if 0
-  if (options.model != MODEL_FLAT24)
-    {
-      /* Let the default code handle it. */
-      return FALSE;
-    }
+	if (options.model != MODEL_FLAT24) {
+	/* Let the default code handle it. */
+	  return FALSE;
+	}
 #endif
 
 	/* PIC18F family has only two interrupts, the high and the low
-	 * priority interrupts, which reside in 0x0008 and 0x0018 respectively */
+	 * priority interrupts, which reside at 0x0008 and 0x0018 respectively - VR */
 
 	fprintf(of, "; RESET vector\n");
 	fprintf(of, "\tgoto\t__sdcc_gsinit_startup\n");
-	fprintf(of, "\tres 2\n");
+	fprintf(of, "\tres 6\n");
 
 
 	fprintf(of, "; High priority interrupt vector 0x0008\n");
-	
 	if(interrupts[1]) {
 		fprintf(of, "\tgoto\t%s\n", interrupts[1]->rname);
-		fprintf(of, "\tres\t6\n");
+		fprintf(of, "\tres\t8\n");
 	} else {
 		fprintf(of, "\tretfie\n");
-		fprintf(of, "\tres\t14\n");
+		fprintf(of, "\tres\t8\n");
 	}
 
 	fprintf(of, "; Low priority interrupt vector 0x0018\n");

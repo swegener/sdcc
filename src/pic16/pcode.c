@@ -5963,10 +5963,11 @@ static void pic16_FixRegisterBanking(pBlock *pb)
 	}
 #endif
 
+#warning Fix this if-conditional
 	/* the !(reg->rIdx==-1) is a temporary hack. It should be changed - VR 6-Jun-2003 */
-	if( ( (reg && !(reg->rIdx==-1) && !isACCESS_BANK(reg) /*&& REG_BANK(reg)!=cur_bank*/ && !isBankInstruction(pc)) || 
-	      ((PCI(pc)->op != POC_CALL) /*&& (cur_bank != 0)*/ ) ) &&
-	    (!isPCI_LIT(pc)) ) {
+	if( ( (reg /*&& !(reg->rIdx==-1)*/ && !isACCESS_BANK(reg) && (isBankInstruction(pc)==-1) && !(reg->alias == 0x80) )
+		 /*|| (PCI(pc)->op != POC_CALL)*/ )
+	      && (!isPCI_LIT(pc)) ) {
 
 
 	  /* Examine the instruction before this one to make sure it is
@@ -5978,8 +5979,10 @@ static void pic16_FixRegisterBanking(pBlock *pb)
 
 		reg_bank =  (reg) ? REG_BANK(reg) : 0;
 
-//		fprintf(stderr, "%s:%d add bank = %d\n", __FUNCTION__, __LINE__, reg_bank);
-//		pc->print(stderr, pc);
+#if 0
+		fprintf(stderr, "%s:%d add bank = %d\n", __FUNCTION__, __LINE__, reg_bank);
+		pc->print(stderr, pc);
+#endif
 
 //		if (cur_bank != reg_bank) {
 			cur_bank = reg_bank;

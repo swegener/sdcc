@@ -1,3 +1,7 @@
+2003-06-25  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/mcs51/gen.c (gencjneshort): fixed bug #760345
+
 2003-06-20  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	* as/mcs51/aomf51.c: Make sure the size of the last procedure is correct.

@@ -648,7 +648,7 @@ right_shift (
 
 #define COMPARE(OP) \
   top->unsignedp = 0;\
-  top->value = (unsigned1 || unsigned2) ? (unsigned long) v1 OP v2 : (v1 OP v2)
+  top->value = (unsigned1 || unsigned2) ? (unsigned long) v1 OP (unsigned long) v2 : (v1 OP v2)
 
 /* Parse and evaluate a C expression, reading from PFILE.
    Returns the value of the expression.  */

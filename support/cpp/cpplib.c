@@ -631,23 +631,24 @@ make_assertion (
      U_CHAR *str)
 {
   cpp_buffer *ip;
-  struct directive *kt;
-  U_CHAR *buf, *p, *q;
+/*  struct directive *kt; */
+  U_CHAR *buf, *p  /*, *q */ ;
 
   /* Copy the entire option so we can modify it.  */
   buf = (U_CHAR *) alloca (strlen (str) + 1);
   strcpy ((char *) buf, str);
+
+#if 0
   /* Scan for any backslash-newline and remove it.  */
   p = q = buf;
   while (*p) {
-#if 0
     if (*p == '\\' && p[1] == '\n')
       p += 2;
     else
-#endif
       *q++ = *p++;
   }
   *q = 0;
+#endif
 
   p = buf;
   if (!is_idstart[*p]) {
@@ -1996,10 +1997,10 @@ cpp_expand_to_buffer (
      int length)
 {
   register cpp_buffer *ip;
-  cpp_buffer obuf;
   U_CHAR *limit = buf + length;
   U_CHAR *buf1;
 #if 0
+  cpp_buffer obuf;
   int odepth = indepth;
 #endif
 
@@ -2135,8 +2136,8 @@ output_line_command (
      int conditional,
      enum file_change_code file_change)
 {
-  int len;
-  char *line_cmd_buf, *line_end;
+/*  int len;*/
+/*  char *line_cmd_buf, *line_end;*/
   long line, col;
   cpp_buffer *ip = CPP_BUFFER (pfile);
 
@@ -2189,9 +2190,9 @@ output_line_command (
 
 // modification for SDC51
   if (*ip->nominal_fname == '\0')
-  quote_string (pfile,"standard input");
+		quote_string (pfile,"standard input");
   else
-  quote_string (pfile, ip->nominal_fname);
+		quote_string (pfile, ip->nominal_fname);
   if (file_change != same_file) {
     CPP_PUTC_Q (pfile, ' ');
     CPP_PUTC_Q (pfile, file_change == enter_file ? '1' : '2');
@@ -2343,7 +2344,7 @@ special_symbol (
      cpp_reader *pfile)
 {
   char *buf;
-  int i, len;
+  int /* i, */ len;
   int true_indepth;
   cpp_buffer *ip = NULL;
   struct tm *timebuf;
@@ -3157,7 +3158,7 @@ do_include (
   int skip_dirs = (keyword->type == T_INCLUDE_NEXT);
   char *fname;    /* Dynamically allocated fname buffer */
   char *pcftry;
-  char *pcfname;
+/*  char *pcfname;*/
   U_CHAR *fbeg, *fend;    /* Beginning and end of fname */
   enum cpp_token token;
 
@@ -3176,7 +3177,7 @@ do_include (
   int angle_brackets = 0; /* 0 for "...", 1 for <...> */
   int pcf = -1;
   char *pcfbuf;
-  char *pcfbuflimit;
+/*  char *pcfbuflimit;*/
   int pcfnum;
   f= -1;      /* JF we iz paranoid! */
 
@@ -3772,7 +3773,7 @@ do_line (
   long old_written = CPP_WRITTEN (pfile);
   enum file_change_code file_change = same_file;
   enum cpp_token token;
-  int i;
+/*  int i;*/
 
   token = get_directive_token (pfile);
 
@@ -4014,7 +4015,7 @@ do_ident (
      U_CHAR *buf, U_CHAR *limit)
 {
 /*  long old_written = CPP_WRITTEN (pfile);*/
-  int len;
+/*  int len;*/
 
   /* Allow #ident in system headers, since that's not user's fault.  */
   if (CPP_PEDANTIC (pfile) && !CPP_BUFFER (pfile)->system_header_p)
@@ -4339,7 +4340,7 @@ skip_if_group (
   U_CHAR *beg_of_line = bp;
 #endif
   register int ident_length;
-  U_CHAR *ident, *after_ident;
+  U_CHAR *ident /*, *after_ident */ ;
   struct parse_marker line_start_mark;
 
   parse_set_mark (&line_start_mark, pfile);
@@ -4698,7 +4699,7 @@ cpp_get_token (
     if (opts->put_out_comments)
       {
         cpp_buffer *pbuf = CPP_BUFFER (pfile);
-        long dummy;
+        /* long dummy; */
         U_CHAR *start = pbuf->buf + start_mark.position;
         int len = pbuf->cur - start;
         CPP_RESERVE(pfile, 1 + len);
@@ -5581,7 +5582,7 @@ open_include_file (
     p = filename;
   if (searchptr
       && searchptr->fname
-      && strlen (searchptr->fname) == p - filename
+      && (int) strlen (searchptr->fname) == p - filename
       && ! strncmp (searchptr->fname, filename, p - filename))
     {
       /* FILENAME is in SEARCHPTR, which we've already checked.  */
@@ -6644,7 +6645,7 @@ cpp_handle_options (
                 Let's include also any that were specified earlier
                 on the command line.  That way we can get rid of any
                 that were passed automatically in from GCC.  */
-                int j;
+                /* int j; */
                 opts->inhibit_predefs = 1;
                 for (ptr = &opts->pending; *ptr != NULL; )
                 {
@@ -7394,7 +7395,6 @@ cpp_error_with_line (pfile, line, column, msg, arg1, arg2, arg3)
      char *msg;
      char *arg1, *arg2, *arg3;
 {
-  int i;
   cpp_buffer *ip = cpp_file_buffer (pfile);
 
   cpp_print_containing_files (pfile);
@@ -7412,7 +7412,6 @@ cpp_warning_with_line (pfile, line, column, msg, arg1, arg2, arg3)
      char *msg;
      char *arg1, *arg2, *arg3;
 {
-  int i;
   cpp_buffer *ip;
 
   if (CPP_OPTIONS (pfile)->inhibit_warnings)
@@ -7527,9 +7526,6 @@ cpp_error_from_errno (
      cpp_reader *pfile,
      char *name)
 {
-  int i;
-
-
   cpp_buffer *ip = cpp_file_buffer (pfile);
 
   cpp_print_containing_files (pfile);

@@ -821,7 +821,7 @@ aopGetLitWordLong (asmop * aop, int offset, bool with_hash)
 	/* otherwise it is fairly simple */
 	if (!IS_FLOAT (val->type))
 	  {
-	    unsigned long v = floatFromVal (val);
+	    unsigned long v = (unsigned long) floatFromVal (val);
 
 	    if (offset == 2)
 	      v >>= 16;
@@ -922,7 +922,7 @@ fetchLitSpecial (asmop * aop, bool negate, bool xor)
   wassert (aop->type == AOP_LIT);
   wassert (!IS_FLOAT (val->type));
 
-  v = floatFromVal (val);
+  v = (unsigned long) floatFromVal (val);
 
   if (xor)
     v ^= 0x8000;
@@ -2394,7 +2394,7 @@ genPlusIncr (iCode * ic)
 
   emitcode ("", "; genPlusIncr");
 
-  icount = floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
+  icount = (unsigned int) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
 
   /* If result is a pair */
   if (resultId != PAIR_INVALID)

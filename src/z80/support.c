@@ -12,9 +12,9 @@ convertFloat (Z80_FLOAT * f, double native)
   if (native != 0)
     {
       f2 = floor (log (fabs (native)) / log (2)) + 1;
-      mantissa = 0x1000000 * fabs (native) / exp (f2 * log (2));
+      mantissa = (unsigned long) (0x1000000 * fabs (native) / exp (f2 * log (2))) ;
       mantissa &= 0xffffff;
-      exponent = f2 + 0x40;
+      exponent = (unsigned long) (f2 + 0x40) ;
       if (native < 0)
 	exponent |= 0x80;
     }

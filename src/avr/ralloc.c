@@ -1174,7 +1174,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 				/* we assign registers to it */
 				_G.regAssigned = bitVectSetBit (_G.regAssigned, sym->key);
 				if (needsPair(ic)) {
-					int regtype ;
+					short regtype ;
 					regs *preg;
 					if (sym->regType == REG_PTR) regtype = REG_PTR;
 					else if (sym->regType == REG_SCR) regtype = REG_SCR;

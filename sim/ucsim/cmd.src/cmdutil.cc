@@ -291,6 +291,10 @@ proc_escape(char *string, int *len)
 }
 
 
+
+extern "C" int vasprintf(char **strp, const  char *format, va_list ap);
+extern "C" int vsnprintf(char *str, size_t size,const char *format,va_list ap);
+
 int
 cmd_vfprintf(FILE *f, char *format, va_list ap)
 {

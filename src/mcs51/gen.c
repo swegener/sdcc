@@ -7582,19 +7582,42 @@ genNearPointerSet (operand * right,
      then don't need anything more */
   if (!AOP_INPREG (AOP (result)))
     {
-      /* otherwise get a free pointer register */
-      aop = newAsmop (0);
-      preg = getFreePtr (ic, &aop, FALSE);
-      emitcode ("mov", "%s,%s",
-		preg->name,
-		aopGet (AOP (result), 0, FALSE, TRUE));
-      rname = preg->name;
+	if (
+	    //AOP_TYPE (result) == AOP_STK
+	    IS_AOP_PREG(result)
+	    )
+	{
+	    // Aha, it is a pointer, just in disguise.
+	    rname = aopGet (AOP (result), 0, FALSE, FALSE);
+	    if (*rname != '@')
+	    {
+		fprintf(stderr, "probable internal error: unexpected rname @ %s:%d\n",
+			__FILE__, __LINE__);
+	    }
+	    else
+	    {
+		// Expected case.
+		rname++;  // skip the '@'.
+	    }
+	}
+	else
+	{
+	    /* otherwise get a free pointer register */
+	    aop = newAsmop (0);
+	    preg = getFreePtr (ic, &aop, FALSE);
+	    emitcode ("mov", "%s,%s",
+		      preg->name,
+		      aopGet (AOP (result), 0, FALSE, TRUE));
+	    rname = preg->name;
+	}
     }
-  else
-    rname = aopGet (AOP (result), 0, FALSE, FALSE);
+    else
+    {
+	rname = aopGet (AOP (result), 0, FALSE, FALSE);
+    }
 
   aopOp (right, ic, FALSE);
-
+    
   /* if bitfield then unpack the bits */
   if (IS_BITVAR (retype) || IS_BITVAR (letype))
     genPackBits ((IS_BITVAR (retype) ? retype : letype), right, rname, POINTER);

@@ -3919,10 +3919,12 @@ release:
 static void
 genMultbits (operand * left,
 	     operand * right,
-	     operand * result)
+	     operand * result,
+	     iCode   * ic)
 {
   emitcode ("mov", "c,%s", AOP (left)->aopu.aop_dir);
   emitcode ("anl", "c,%s", AOP (right)->aopu.aop_dir);
+  aopOp(result, ic, TRUE, FALSE);
   outBitC (result);
 }
 
@@ -3933,18 +3935,12 @@ genMultbits (operand * left,
 static void
 genMultOneByte (operand * left,
 		operand * right,
-		operand * result)
+		operand * result,
+		iCode   * ic)
 {
   sym_link *opetype = operandType (result);
   symbol *lbl;
-  int size=AOP_SIZE(result);
 
-  if (size<1 || size>2) {
-    // this should never happen
-      fprintf (stderr, "size!=1||2 (%d) in %s at line:%d \n", 
-	       AOP_SIZE(result), __FILE__, lineno);
-      exit (1);
-  }
 
   /* (if two literals: the value is computed before) */
   /* if one literal, literal on the right */
@@ -3965,8 +3961,22 @@ genMultOneByte (operand * left,
     emitcode ("mov", "b,%s", aopGet (AOP (right), 0, FALSE, FALSE, TRUE));
     MOVA (aopGet (AOP (left), 0, FALSE, FALSE, TRUE));
     emitcode ("mul", "ab");
+   
+    _G.accInUse++;
+    aopOp(result, ic, TRUE, FALSE);
+      
+      if (AOP_SIZE(result)<1 || AOP_SIZE(result)>2) 
+      {
+	  // this should never happen
+	  fprintf (stderr, "size!=1||2 (%d) in %s at line:%d \n", 
+		   AOP_SIZE(result), __FILE__, lineno);
+	  exit (1);
+      }      
+      
     aopPut (AOP (result), "a", 0);
-    if (size==2) {
+    _G.accInUse--;
+    if (AOP_SIZE(result)==2) 
+    {
       aopPut (AOP (result), "b", 1);
     }
     return;
@@ -4010,11 +4020,22 @@ genMultOneByte (operand * left,
   }
   emitcode ("mul", "ab");
     
+  _G.accInUse++;
+  aopOp(result, ic, TRUE, FALSE);
+    
+  if (AOP_SIZE(result)<1 || AOP_SIZE(result)>2) 
+  {
+    // this should never happen
+      fprintf (stderr, "size!=1||2 (%d) in %s at line:%d \n", 
+	       AOP_SIZE(result), __FILE__, lineno);
+      exit (1);
+  }    
+    
   lbl=newiTempLabel(NULL);
   emitcode ("jnb", "F0,%05d$", lbl->key+100);
   // only ONE op was negative, we have to do a 8/16-bit two's complement
   emitcode ("cpl", "a"); // lsb
-  if (size==1) {
+  if (AOP_SIZE(result)==1) {
     emitcode ("inc", "a");
   } else {
     emitcode ("add", "a,#1");
@@ -4026,7 +4047,8 @@ genMultOneByte (operand * left,
 
   emitcode ("", "%05d$:", lbl->key+100);
   aopPut (AOP (result), "a", 0);
-  if (size==2) {
+  _G.accInUse--;
+  if (AOP_SIZE(result)==2) {
     aopPut (AOP (result), "b", 1);
   }
 }
@@ -4044,14 +4066,14 @@ genMult (iCode * ic)
   D (emitcode (";", "genMult "););
 
   /* assign the amsops */
-  AOP_OP_3 (ic);
+  AOP_OP_2 (ic);
 
   /* special cases first */
   /* both are bits */
   if (AOP_TYPE (left) == AOP_CRY &&
       AOP_TYPE (right) == AOP_CRY)
     {
-      genMultbits (left, right, result);
+      genMultbits (left, right, result, ic);
       goto release;
     }
 
@@ -4059,7 +4081,7 @@ genMult (iCode * ic)
   if (AOP_SIZE (left) == 1 &&
       AOP_SIZE (right) == 1)
     {
-      genMultOneByte (left, right, result);
+      genMultOneByte (left, right, result, ic);
       goto release;
     }
 
@@ -4078,7 +4100,8 @@ release:
 static void
 genDivbits (operand * left,
 	    operand * right,
-	    operand * result)
+	    operand * result,
+	    iCode   * ic)
 {
 
   char *l;
@@ -4087,6 +4110,8 @@ genDivbits (operand * left,
   LOAD_AB_FOR_DIV (left, right, l);
   emitcode ("div", "ab");
   emitcode ("rrc", "a");
+  aopOp(result, ic, TRUE, FALSE);
+    
   aopPut (AOP (result), "c", 0);
 }
 
@@ -4096,24 +4121,33 @@ genDivbits (operand * left,
 static void
 genDivOneByte (operand * left,
 	       operand * right,
-	       operand * result)
+	       operand * result,
+	       iCode   * ic)
 {
   sym_link *opetype = operandType (result);
   char *l;
   symbol *lbl;
   int size, offset;
 
-  size = AOP_SIZE (result) - 1;
   offset = 1;
   /* signed or unsigned */
   if (SPEC_USIGN (opetype))
     {
-      /* unsigned is easy */
-      LOAD_AB_FOR_DIV (left, right, l);
-      emitcode ("div", "ab");
-      aopPut (AOP (result), "a", 0);
-      while (size--)
-	aopPut (AOP (result), zero, offset++);
+	/* unsigned is easy */
+	LOAD_AB_FOR_DIV (left, right, l);
+	emitcode ("div", "ab");
+
+	_G.accInUse++;
+	aopOp(result, ic, TRUE, FALSE);
+	aopPut (AOP (result), "a", 0);
+	_G.accInUse--;
+
+	size = AOP_SIZE (result) - 1;
+	
+	while (size--)
+	{
+	    aopPut (AOP (result), zero, offset++);
+	}
       return;
     }
 
@@ -4164,14 +4198,23 @@ genDivOneByte (operand * left,
   emitcode ("", "%05d$:", (lbl->key + 100));
 
   /* now we are done */
-  aopPut (AOP (result), "b", 0);
-  if (size > 0)
+    _G.accInUse++;
+    aopOp(result, ic, TRUE, FALSE);
+    
+    aopPut (AOP (result), "b", 0);
+    
+    size = AOP_SIZE (result) - 1;
+    
+    if (size > 0)
     {
       emitcode ("mov", "c,b.7");
       emitcode ("subb", "a,acc");
     }
-  while (size--)
-    aopPut (AOP (result), "a", offset++);
+    while (size--)
+    {
+	aopPut (AOP (result), "a", offset++);
+    }
+    _G.accInUse--;
 
 }
 
@@ -4185,18 +4228,17 @@ genDiv (iCode * ic)
   operand *right = IC_RIGHT (ic);
   operand *result = IC_RESULT (ic);
 
-  D (emitcode (";", "genDiv ");
-    );
+  D (emitcode (";", "genDiv "););
 
   /* assign the amsops */
-  AOP_OP_3 (ic);
+  AOP_OP_2 (ic);
 
   /* special cases first */
   /* both are bits */
   if (AOP_TYPE (left) == AOP_CRY &&
       AOP_TYPE (right) == AOP_CRY)
     {
-      genDivbits (left, right, result);
+      genDivbits (left, right, result, ic);
       goto release;
     }
 
@@ -4204,7 +4246,7 @@ genDiv (iCode * ic)
   if (AOP_SIZE (left) == 1 &&
       AOP_SIZE (right) == 1)
     {
-      genDivOneByte (left, right, result);
+      genDivOneByte (left, right, result, ic);
       goto release;
     }
 

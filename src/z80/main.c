@@ -40,18 +40,31 @@ static const char *_z80_getRegName(struct regs *reg)
     return "err";
 }
 
+/** $1 is always the basename.
+    $2 is always the output file.
+    $3 varies
+    $l is the list of extra options that should be there somewhere...
+    MUST be terminated with a NULL.
+*/
+static const char *_linkCmd[] = {
+    "link-z80", "-nf", "$1", NULL
+};
+
+static const char *_asmCmd[] = {
+    "as-z80", "-plosgff", "$1.o", "$1.asm", NULL
+};
+
 /* Globals */
 PORT z80_port = {
     "z80",
     "Zilog Z80",		/* Target name */
     {	
-	"as-z80",		/* Assembler executable name */
+	_asmCmd,
 	"-plosgff",		/* Options with debug */
 	"-plosgff",		/* Options without debug */
-	TRUE			/* TRUE if the assembler requires an output name */
     },
     {
-	"link-z80",		/* Linker executable name */
+	_linkCmd
     },
     {
     	/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */

@@ -50,7 +50,7 @@ FILE  *cdbFile = NULL  ;/* debugger information output file */
 char  *fullSrcFileName ;/* full name for the source file */
 char  *srcFileName     ;/* source file name with the .c stripped */
 char  *moduleName      ;/* module name is srcFilename stripped of any path */
-char *preArgv[128]	   ;/* pre-processor arguments	*/
+const char *preArgv[128]	   ;/* pre-processor arguments	*/
 int   currRegBank = 0 ;
 struct optimize optimize ;
 struct options  options ;
@@ -58,7 +58,7 @@ char *VersionString = SDCC_VERSION_STR /*"Version 2.1.8a"*/;
 short preProcOnly = 0;
 short noAssemble = 0;
 char *linkOptions[128];
-char *asmOptions[128];
+const char *asmOptions[128];
 char *libFiles[128] ;
 int nlibFiles = 0;
 char *libPaths[128] ;
@@ -115,19 +115,10 @@ char    *preOutName;
 #define OPTION_CALLEE_SAVES "-callee-saves"
 #define OPTION_NOREGPARMS   "-noregparms"
 
-static const char *linkCmd[] = {
-    "$1", "-nf", "$2", NULL
-};
-
-static const char *preCmd[] = {
+static const char *_preCmd[] = {
     "sdcpp", "-version", "-Wall", "-lang-c++", "-DSDCC=1", 
     "-I" SDCC_INCLUDE_DIR, "$l", "$1", "$2", NULL
 };
-
-static const char *asmCmd[] = {
-    "$1", "-plosgffc", "$2.asm", NULL
-};
-
 
 extern PORT mcs51_port;
 extern PORT z80_port;
@@ -408,7 +399,7 @@ static void processFile (char *s)
   
 }
 
-static void _addToList(char **list, const char *str)
+static void _addToList(const char **list, const char *str)
 {
     /* This is the bad way to do things :) */
     while (*list)
@@ -1052,7 +1043,7 @@ static void linkEdit (char **envp)
     fprintf (lnkfile,"\n-e\n");
     fclose(lnkfile);
 
-    _buildCmdLine(buffer, argv, linkCmd, port->linker.exec_name, srcFileName, NULL, NULL);
+    _buildCmdLine(buffer, argv, port->linker.cmd, srcFileName, NULL, NULL, NULL);
 
     /* call the linker */
     if (my_system(argv[0], argv)) {
@@ -1076,7 +1067,7 @@ static void assemble (char **envp)
 {
     char *argv[128];  /* assembler arguments */
 
-    _buildCmdLine(buffer, argv, asmCmd, port->assembler.exec_name, srcFileName, NULL, asmOptions);
+    _buildCmdLine(buffer, argv, port->assembler.cmd, srcFileName, NULL, NULL, asmOptions);
 
     if (my_system(argv[0], argv)) {
 	perror("Cannot exec assember");
@@ -1112,7 +1103,7 @@ static int preProcess (char **envp)
     if (!preProcOnly)
 	preOutName = strdup(tmpnam(NULL));
 
-    _buildCmdLine(buffer, argv, preCmd, fullSrcFileName, 
+    _buildCmdLine(buffer, argv, _preCmd, fullSrcFileName, 
 		  preOutName, srcFileName, preArgv);
 
     if (my_system(argv[0], argv)) {

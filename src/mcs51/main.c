@@ -58,18 +58,31 @@ static const char *_mcs51_getRegName(struct regs *reg)
     return "err";
 }
 
+/** $1 is always the basename.
+    $2 is always the output file.
+    $3 varies
+    $l is the list of extra options that should be there somewhere...
+    MUST be terminated with a NULL.
+*/
+static const char *_linkCmd[] = {
+    "aslink", "-nf", "$1", NULL
+};
+
+static const char *_asmCmd[] = {
+    "asx8051", "-plosgffc", "$1.asm", NULL
+};
+
 /* Globals */
 PORT mcs51_port = {
     "mcs51",
     "MCU 8051",			/* Target name */
     {	
-	"asx8051",		/* Assembler executable name */
+	_asmCmd,
 	"-plosgffc",		/* Options with debug */
 	"-plosgff",		/* Options without debug */
-	FALSE			/* TRUE if the assembler requires an output name */
     },
     {
-	"aslink",		/* Linker executable name */
+	_linkCmd
     },
     {
     	/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */

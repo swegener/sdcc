@@ -15,20 +15,18 @@ typedef struct {
 
     /* assembler related information */
     struct {
-	/** Command to run (eg as-z80) */
-	const char *exec_name;
-	/** Arguments for debug mode */
+	/** Command to run and arguments (eg as-z80) */
+	const char **cmd;
+	/** Arguments for debug mode.  PENDING: ignored */
 	const char *debug_opts;
-	/** Arguments for normal assembly mode */
+	/** Arguments for normal assembly mode.  PENDING: ignored */
 	const char *plain_opts;
-	/** TRUE if the output file name should be pre-pended to the args */
-	bool requires_output_name;
     } assembler;
 
     /* linker related info */
     struct {
 	/** Command to run (eg link-z80) */
-	const char *exec_name;
+	const char **cmd;
     } linker;
 
     /** Basic type sizes */

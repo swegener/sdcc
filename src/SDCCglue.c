@@ -28,17 +28,7 @@
 #include "newalloc.h"
 
 #if !defined(__BORLANDC__) && !defined(_MSC_VER)
-#if 0				/* This should no longer be necessary. */
-// This is a bit messy because we define link ourself
-#define link NoLiNk
 #include <unistd.h>
-#undef link
-#else
-
-#include <unistd.h>
-#endif
-#else
-// No unistd.h in Borland C++
 #endif
 
 symbol *interrupts[256];

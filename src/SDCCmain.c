@@ -35,18 +35,8 @@
 #include "spawn.h"
 #endif
 
-// This is a bit messy because we define link ourself
 #if !defined(__BORLANDC__) && !defined(_MSC_VER)
-
 #include <unistd.h>
-
-#else
-// No unistd.h in Borland C++
-/*
-extern int access (const char *, int);
-#define X_OK 1
-*/
-
 #endif
 
 //REMOVE ME!!!

@@ -20,6 +20,9 @@ testSmallDense(void)
     ASSERT(smallDense[5] == 6);
 }
 
+#ifdef __mcs51
+idata
+#endif
 static {type} smallSparse[] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1
 };
@@ -38,6 +41,9 @@ testSmallSparse(void)
     ASSERT(smallSparse[8] == 1);
 }
 
+#ifdef __mcs51
+idata
+#endif
 static {type} smallSparseZero[] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0
 };
@@ -60,6 +66,9 @@ testSmallSparseZero(void)
     ASSERT(smallSparseZero[8] == 0);
 }
 
+#ifdef __mcs51
+xdata
+#endif
 static {type} largeMixed[] = {
     1, 2, 3, 4, 5, 6, 7,	/* 0-6 */
     1, 1, 1, 1, 1, 1, 1, 1,

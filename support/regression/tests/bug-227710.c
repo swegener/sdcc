@@ -2,7 +2,7 @@
  */
 #include <testfwk.h>
 
-static unsigned char _data[] = {
+static unsigned char __data[] = {
     1, 2, 3, 4
 };
 
@@ -17,12 +17,12 @@ foo(void)
 { 
     // BUG, there will be a PRE-increment 
     return p[s.index++];
-} 
+}
 
 void
 testPostIncrement(void)
 {
-    p = _data;
+    p = __data;
     ASSERT(foo() == 1);
     ASSERT(foo() == 2);
     ASSERT(foo() == 3);

@@ -5,6 +5,9 @@
  */
 #include <testfwk.h>
 
+#ifdef __mcs51
+xdata
+#endif
 static unsigned int
 testArray[130];
 

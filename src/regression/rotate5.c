@@ -203,9 +203,34 @@ void main(void)
   achar0 = 0x40;
   shift_right_6();
 
+
+  achar0 = 0xff;
+  achar1 = 0xff;
+  shift_right_1();
+
+  achar0 = 0xfe;
+  achar1 = 0xff;
+  shift_right_1();
+
+  achar0 = 0xfc;
+  shift_right_2();
+
+  achar0 = 0xf8;
+  shift_right_3();
+
+  achar0 = 0xf0;
+  shift_right_4();
+
+  achar0 = 0xe0;
+  shift_right_5();
+
+  achar0 = 0xc0;
+  shift_right_6();
+
   achar0 = 0x80;
   achar1 = 0xff;
   shift_right_7();
+
 
   success=failures;
   done();

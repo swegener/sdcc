@@ -1414,27 +1414,28 @@ int pCodeOpCompare(pCodeOp *pcops, pCodeOp *pcopd)
 
   if(!pcops || !pcopd)
     return 0;
-
+  /*
   fprintf(stderr," Comparing operands %s",
 	  get_op( pcops));
 
   fprintf(stderr," to %s\n",
 	  get_op( pcopd));
+  */
 
   if(pcops->type != pcopd->type) {
-    fprintf(stderr,"  - fail - diff types\n");
+    //fprintf(stderr,"  - fail - diff types\n");
     return 0;  // different types
   }
 
   if(!pcops->name ||  !pcopd->name || strcmp(pcops->name,pcopd->name)) {
-    fprintf(stderr,"  - fail - diff names\n");
+    //fprintf(stderr,"  - fail - diff names\n");
     return 0;  // different names
   }
 
   switch(pcops->type) {
   case PO_DIR:
     if( PCOR(pcops)->instance != PCOR(pcopd)->instance) {
-      fprintf(stderr, "  - fail different instances\n");
+      //fprintf(stderr, "  - fail different instances\n");
       return 0;
     }
     break;
@@ -1442,7 +1443,7 @@ int pCodeOpCompare(pCodeOp *pcops, pCodeOp *pcopd)
     break;
   }
 
-  fprintf(stderr,"  - pass\n");
+  //fprintf(stderr,"  - pass\n");
 
   return 1;
 }
@@ -1556,12 +1557,14 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 	    //if(PCI(pcs)->pcop->type == PO_GPR_TEMP) 
 
 	  } else {
-	    pcs->print(stderr,pcs);
-	    pcd->print(stderr,pcd);
+	    /*
+	      pcs->print(stderr,pcs);
+	      pcd->print(stderr,pcd);
 
-	    fprintf(stderr, "comparing operands of these instructions, result %d\n",
-		    pCodeOpCompare(PCI(pcs)->pcop, peepBlock->target.wildpCodeOps[index])
-		    );
+	      fprintf(stderr, "comparing operands of these instructions, result %d\n",
+	      pCodeOpCompare(PCI(pcs)->pcop, peepBlock->target.wildpCodeOps[index])
+	      );
+	    */
 
 	    return pCodeOpCompare(PCI(pcs)->pcop, peepBlock->target.wildpCodeOps[index]);
 	  }
@@ -1778,7 +1781,7 @@ pCodeOp *pCodeOpCopy(pCodeOp *pcop)
     break;
 
   case PO_DIR:
-    fprintf(stderr,"pCodeOpCopy PO_DIR\n");
+    //fprintf(stderr,"pCodeOpCopy PO_DIR\n");
     pcopnew = Safe_calloc(1,sizeof(pCodeOpReg) );
     PCOR(pcopnew)->r = PCOR(pcop)->r;
     PCOR(pcopnew)->rIdx = PCOR(pcop)->rIdx;
@@ -1884,8 +1887,10 @@ int pCodePeepMatchRule(pCode *pc)
       pct = pct->next;
       //debug:
       //DFPRINTF((stderr,"    matched\n"));
-      if(!pcin)
-	DFPRINTF((stderr," end of code\n"));
+      if(!pcin && pct) {
+	DFPRINTF((stderr," partial match... no more code\n"));
+	matched = 0; 
+      }
       if(!pct)
 	DFPRINTF((stderr," end of rule\n"));
     }

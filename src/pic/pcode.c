@@ -2802,7 +2802,10 @@ pCode * findNextInstruction(pCode *pc)
   while(pc) {
     if((pc->type == PC_OPCODE) || (pc->type == PC_WILD))
       return pc;
-
+#ifdef PCODE_DEBUG
+    fprintf(stderr,"findNextInstruction:  ");
+    printpCode(stderr, pc);
+#endif
     pc = pc->next;
   }
 

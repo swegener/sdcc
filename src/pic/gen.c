@@ -7299,97 +7299,140 @@ static void genRightShiftLiteral (operand *left,
 /*-----------------------------------------------------------------*/
 static void genSignedRightShift (iCode *ic)
 {
-    operand *right, *left, *result;
-    int size, offset;
-    char *l;
-    symbol *tlbl, *tlbl1 ;
+  operand *right, *left, *result;
+  int size, offset;
+  //  char *l;
+  symbol *tlbl, *tlbl1 ;
+  pCodeOp *pctemp;
 
-    /* we do it the hard way put the shift count in b
-    and loop thru preserving the sign */
-    DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+  //same = ((left == result) || (AOP(left) == AOP(result))) && (offl == offr);
 
-    right = IC_RIGHT(ic);
-    left  = IC_LEFT(ic);
-    result = IC_RESULT(ic);
+  /* we do it the hard way put the shift count in b
+     and loop thru preserving the sign */
+  DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
-    aopOp(right,ic,FALSE);  
+  right = IC_RIGHT(ic);
+  left  = IC_LEFT(ic);
+  result = IC_RESULT(ic);
+
+  aopOp(right,ic,FALSE);  
+  aopOp(left,ic,FALSE);
+  aopOp(result,ic,FALSE);
 
 
-    if ( AOP_TYPE(right) == AOP_LIT) {
-	genRightShiftLiteral (left,right,result,ic,1);
-	return ;
-    }
-        /* shift count is unknown then we have to form 
-       a loop get the loop count in B : Note: we take
-       only the lower order byte since shifting
-       more that 32 bits make no sense anyway, ( the
-       largest size of an object can be only 32 bits ) */  
+  if ( AOP_TYPE(right) == AOP_LIT) {
+    genRightShiftLiteral (left,right,result,ic,1);
+    return ;
+  }
+  /* shift count is unknown then we have to form 
+     a loop get the loop count in B : Note: we take
+     only the lower order byte since shifting
+     more that 32 bits make no sense anyway, ( the
+     largest size of an object can be only 32 bits ) */  
 
-    pic14_emitcode("mov","b,%s",aopGet(AOP(right),0,FALSE,FALSE));
-    pic14_emitcode("inc","b");
-    freeAsmop (right,NULL,ic,TRUE);
-    aopOp(left,ic,FALSE);
-    aopOp(result,ic,FALSE);
+  //pic14_emitcode("mov","b,%s",aopGet(AOP(right),0,FALSE,FALSE));
+  //pic14_emitcode("inc","b");
+  //freeAsmop (right,NULL,ic,TRUE);
+  //aopOp(left,ic,FALSE);
+  //aopOp(result,ic,FALSE);
 
-    /* now move the left to the result if they are not the
-    same */
-    if (!pic14_sameRegs(AOP(left),AOP(result)) && 
-        AOP_SIZE(result) > 1) {
-
-        size = AOP_SIZE(result);
-        offset=0;
-        while (size--) {
-            l = aopGet(AOP(left),offset,FALSE,TRUE);
-            if (*l == '@' && IS_AOP_PREG(result)) {
-
-                pic14_emitcode("mov","a,%s",l);
-                aopPut(AOP(result),"a",offset);
-            } else
-                aopPut(AOP(result),l,offset);
-            offset++;
-        }
-    }
-
-    /* mov the highest order bit to OVR */    
-    tlbl = newiTempLabel(NULL);
-    tlbl1= newiTempLabel(NULL);
+  /* now move the left to the result if they are not the
+     same */
+  if (!pic14_sameRegs(AOP(left),AOP(result)) && 
+      AOP_SIZE(result) > 1) {
 
     size = AOP_SIZE(result);
-    offset = size - 1;
-    pic14_emitcode("mov","a,%s",aopGet(AOP(left),offset,FALSE,FALSE));
-    pic14_emitcode("rlc","a");
-    pic14_emitcode("mov","ov,c");
-    /* if it is only one byte then */
-    if (size == 1) {
-        l = aopGet(AOP(left),0,FALSE,FALSE);
-        MOVA(l);
-	pic14_emitcode("sjmp","%05d_DS_",tlbl1->key+100);
-        pic14_emitcode("","%05d_DS_:",tlbl->key+100);
-        pic14_emitcode("mov","c,ov");
-        pic14_emitcode("rrc","a");
-	pic14_emitcode("","%05d_DS_:",tlbl1->key+100);
-        pic14_emitcode("djnz","b,%05d_DS_",tlbl->key+100);
-        aopPut(AOP(result),"a",0);
-        goto release ;
-    }
+    offset=0;
+    while (size--) { 
+      /*
+	l = aopGet(AOP(left),offset,FALSE,TRUE);
+	if (*l == '@' && IS_AOP_PREG(result)) {
 
-    reAdjustPreg(AOP(result));
-    pic14_emitcode("sjmp","%05d_DS_",tlbl1->key+100);
-    pic14_emitcode("","%05d_DS_:",tlbl->key+100);    
-    pic14_emitcode("mov","c,ov");
-    while (size--) {
-        l = aopGet(AOP(result),offset,FALSE,FALSE);
-        MOVA(l);
-        pic14_emitcode("rrc","a");         
-        aopPut(AOP(result),"a",offset--);
+	pic14_emitcode("mov","a,%s",l);
+	aopPut(AOP(result),"a",offset);
+	} else
+	aopPut(AOP(result),l,offset);
+      */
+      emitpcode(POC_MOVFW,  popGet(AOP(left),offset));
+      emitpcode(POC_MOVWF,  popGet(AOP(result),offset));
+
+      offset++;
     }
-    reAdjustPreg(AOP(result));
+  }
+
+  /* mov the highest order bit to OVR */    
+  tlbl = newiTempLabel(NULL);
+  tlbl1= newiTempLabel(NULL);
+
+  size = AOP_SIZE(result);
+  offset = size - 1;
+
+  pctemp = popGetTempReg();  /* grab a temporary working register. */
+
+  emitpcode(POC_MOVFW, popGet(AOP(right),0));
+
+  /* offset should be 0, 1 or 3 */
+  emitpcode(POC_ANDLW, popGetLit(0x07 + ((offset&3) << 3)));
+  emitSKPNZ;
+  emitpcode(POC_GOTO,  popGetLabel(tlbl1->key));
+
+  emitpcode(POC_MOVWF, pctemp);
+
+
+  emitpLabel(tlbl->key);
+
+  emitpcode(POC_RLFW,  popGet(AOP(result),offset));
+  emitpcode(POC_RRF,   popGet(AOP(result),offset));
+
+  while(--size) {
+    emitpcode(POC_RRF,   popGet(AOP(result),--offset));
+  }
+
+  emitpcode(POC_DECFSZ,  pctemp);
+  emitpcode(POC_GOTO,popGetLabel(tlbl->key));
+  emitpLabel(tlbl1->key);
+
+  popReleaseTempReg(pctemp);
+#if 0
+  size = AOP_SIZE(result);
+  offset = size - 1;
+  pic14_emitcode("mov","a,%s",aopGet(AOP(left),offset,FALSE,FALSE));
+  pic14_emitcode("rlc","a");
+  pic14_emitcode("mov","ov,c");
+  /* if it is only one byte then */
+  if (size == 1) {
+    l = aopGet(AOP(left),0,FALSE,FALSE);
+    MOVA(l);
+    pic14_emitcode("sjmp","%05d_DS_",tlbl1->key+100);
+    pic14_emitcode("","%05d_DS_:",tlbl->key+100);
+    pic14_emitcode("mov","c,ov");
+    pic14_emitcode("rrc","a");
     pic14_emitcode("","%05d_DS_:",tlbl1->key+100);
     pic14_emitcode("djnz","b,%05d_DS_",tlbl->key+100);
+    aopPut(AOP(result),"a",0);
+    goto release ;
+  }
 
-release:
-    freeAsmop(left,NULL,ic,TRUE);
-    freeAsmop(result,NULL,ic,TRUE);
+  reAdjustPreg(AOP(result));
+  pic14_emitcode("sjmp","%05d_DS_",tlbl1->key+100);
+  pic14_emitcode("","%05d_DS_:",tlbl->key+100);    
+  pic14_emitcode("mov","c,ov");
+  while (size--) {
+    l = aopGet(AOP(result),offset,FALSE,FALSE);
+    MOVA(l);
+    pic14_emitcode("rrc","a");         
+    aopPut(AOP(result),"a",offset--);
+  }
+  reAdjustPreg(AOP(result));
+  pic14_emitcode("","%05d_DS_:",tlbl1->key+100);
+  pic14_emitcode("djnz","b,%05d_DS_",tlbl->key+100);
+
+ release:
+#endif
+
+  freeAsmop(left,NULL,ic,TRUE);
+  freeAsmop(result,NULL,ic,TRUE);
+  freeAsmop(right,NULL,ic,TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7470,32 +7513,22 @@ static void genRightShift (iCode *ic)
 
     /* if it is only one byte then */
     if (size == 1) {
-/*
-        l = aopGet(AOP(left),0,FALSE,FALSE);
-        MOVA(l);
-	pic14_emitcode("sjmp","%05d_DS_",tlbl1->key+100);
-        pic14_emitcode("","%05d_DS_:",tlbl->key+100);
-        CLRC;
-        pic14_emitcode("rrc","a");
-	pic14_emitcode("","%05d_DS_:",tlbl1->key+100);
-        pic14_emitcode("djnz","b,%05d_DS_",tlbl->key+100);
-        aopPut(AOP(result),"a",0);
-*/
-	tlbl = newiTempLabel(NULL);
-	if (!pic14_sameRegs(AOP(left),AOP(result))) {
-	  emitpcode(POC_MOVFW,  popGet(AOP(left),0));
-	  emitpcode(POC_MOVWF,  popGet(AOP(result),0));
-	}
 
-	emitpcode(POC_COMFW,  popGet(AOP(right),0));
-	emitpcode(POC_RLF,    popGet(AOP(result),0));
-	emitpLabel(tlbl->key);
-	emitpcode(POC_RRF,    popGet(AOP(result),0));
-	emitpcode(POC_ADDLW,  popGetLit(1));
-	emitSKPC;
-	emitpcode(POC_GOTO,popGetLabel(tlbl->key));
+      tlbl = newiTempLabel(NULL);
+      if (!pic14_sameRegs(AOP(left),AOP(result))) {
+	emitpcode(POC_MOVFW,  popGet(AOP(left),0));
+	emitpcode(POC_MOVWF,  popGet(AOP(result),0));
+      }
 
-        goto release ;
+      emitpcode(POC_COMFW,  popGet(AOP(right),0));
+      emitpcode(POC_RLF,    popGet(AOP(result),0));
+      emitpLabel(tlbl->key);
+      emitpcode(POC_RRF,    popGet(AOP(result),0));
+      emitpcode(POC_ADDLW,  popGetLit(1));
+      emitSKPC;
+      emitpcode(POC_GOTO,popGetLabel(tlbl->key));
+
+      goto release ;
     }
 
     reAdjustPreg(AOP(result));

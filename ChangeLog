@@ -1,3 +1,8 @@
+2003-11-15 Frieder Ferlemann <Frieder.Ferlemann@web.de>
+
+	* src/mcs51/gen.c (genPlus): generate shortcut for adding 0xab00
+	* support/regression/tests/addsub.c: testing genPlus shortcut
+
 2003-11-15  Borut Razem <borut.razem@siol.net>
 
 	* src/SDCCmain.c: fixed bug #841645: -MM command line option passed to sdcpp

@@ -29,9 +29,22 @@
 peepRule *rootRules = NULL;
 peepRule *currRule  = NULL;
 
+#define HTAB_SIZE 53
+typedef struct
+{
+    char name[SDCC_NAME_MAX + 1];
+    int refCount;
+} labelHashEntry;
+
+hTab *labelHash = NULL;
+
+static int hashSymbolName(const char *name);
+static void buildLabelRefCountHash(lineNode *head);
+
 static bool matchLine (char *, char *, hTab **);
 
-#define FBYNAME(x) int x (hTab *vars, lineNode *currPl, lineNode *head)
+#define FBYNAME(x) int x (hTab *vars, lineNode *currPl, lineNode *head, \
+			  const char *cmdLine)
 
 /*-----------------------------------------------------------------*/
 /* pcDistance - afinds a label back ward or forward                */
@@ -125,6 +138,77 @@ FBYNAME(operandsNotSame)
     return TRUE;
 }
 
+/* labelRefCount: 
+ *
+ * takes two parameters: a variable (bound to a label name)
+ * and an expected reference count.
+ *
+ * Returns TRUE if that label is defined and referenced exactly
+ * the given number of times.
+ */ 
+FBYNAME(labelRefCount)
+{
+    int  varNumber, expectedRefCount;
+    bool rc = FALSE;
+
+    /* If we don't have the label hash table yet, build it. */
+    if (!labelHash)
+    {
+    	buildLabelRefCountHash(head);
+    }
+
+    if (sscanf(cmdLine, "%*[ \t%]%d %d", &varNumber, &expectedRefCount) == 2)
+    {
+        char *label = hTabItemWithKey(vars, varNumber);
+        
+        if (label)
+        {
+	    labelHashEntry *entry;
+	    
+	    entry = hTabFirstItemWK(labelHash, hashSymbolName(label));
+	    
+	    while (entry)
+	    {
+	        if (!strcmp(label, entry->name))
+	        {
+	            break;
+	        }
+	        entry = hTabNextItemWK(labelHash);
+	    }
+	    if (entry)
+	    {
+#if 0
+		/* debug spew. */	       
+	        fprintf(stderr, "labelRefCount: %s has refCount %d, want %d\n",
+	        	label, entry->refCount, expectedRefCount);
+#endif
+	        	
+	        rc = (expectedRefCount == entry->refCount);
+	    }
+	    else
+	    {
+	        fprintf(stderr, "*** internal error: no label has entry for"
+	        	       " %s in labelRefCount peephole.\n",
+	        	       label);
+	    }
+        }
+        else
+        {
+            fprintf(stderr, "*** internal error: var %d not bound"
+            		    " in peephole labelRefCount rule.\n",
+            		    varNumber);
+        }
+        
+    }
+    else
+    {
+ 	  fprintf(stderr, 
+ 	      	  "*** internal error: labelRefCount peephole restriction"
+ 	      	  " malformed: %s\n", cmdLine);
+    }
+    return rc;
+}
+
 /*-----------------------------------------------------------------*/
 /* callFuncByName - calls a function as defined in the table       */
 /*-----------------------------------------------------------------*/
@@ -133,19 +217,25 @@ int callFuncByName ( char *fname,
              lineNode *currPl,
              lineNode *head)
 {
-    struct ftab {
-    char *fname ;
-    int (*func)(hTab *,lineNode *,lineNode *) ;
-    }  ftab[] = {
-    {"labelInRange",   labelInRange },
-    {"operandsNotSame", operandsNotSame },
-    {"24bitMode", flat24bitMode },
+    struct ftab 
+    {
+    	char *fname ;
+    	int (*func)(hTab *,lineNode *,lineNode *,const char *) ;
+    }  ftab[] = 
+    {
+    	{"labelInRange",   labelInRange },
+    	{"operandsNotSame", operandsNotSame },
+    	{"24bitMode", flat24bitMode },
+    	{"labelRefCount", labelRefCount },
     };
     int i;
 
     for ( i = 0 ; i < ((sizeof (ftab))/(sizeof(struct ftab))); i++)
-    if (strcmp(ftab[i].fname,fname) == 0)
-        return (*ftab[i].func)(vars,currPl,head);
+    if (strncmp(ftab[i].fname,fname,strlen(ftab[i].fname)) == 0)
+    {
+        return (*ftab[i].func)(vars,currPl,head,
+                 fname + strlen(ftab[i].fname));
+    }
     fprintf(stderr,"could not find named function in function table\n");
     return TRUE;
 }
@@ -357,7 +447,7 @@ static void readRules (char *bp)
 
     /* look for the condition */
     lp = lines;
-    while (isalnum(*bp)) {
+    while (*bp && (*bp != '\n')) {
         *lp++ = *bp++;
     }
     *lp = '\0';
@@ -614,6 +704,143 @@ static void replaceRule (lineNode **shead, lineNode *stail, peepRule *pr)
     }
 }
 
+/* Returns TRUE if this line is a label definition.
+ *
+ * If so, start will point to the start of the label name,
+ * and len will be it's length.
+ */
+bool isLabelDefinition(const char *line, const char **start, int *len)
+{
+    const char *cp = line;
+    
+    /* This line is a label if if consists of:
+     * [optional whitespace] followed by identifier chars 
+     * (alnum | $ | _ ) followed by a colon.
+     */
+    
+    while (*cp && isspace(*cp))
+    {
+        cp++;
+    } 
+    
+    if (!*cp)
+    {
+       return FALSE;
+    }
+    
+    *start = cp;
+    
+    while (isalnum(*cp) || (*cp == '$') || (*cp == '_'))
+    {
+    	cp++;
+    }
+    
+    if ((cp == *start) || (*cp != ':'))
+    {
+        return FALSE;
+    }
+    
+    *len = (cp - (*start));
+    return TRUE;
+}
+
+/* Quick & dirty string hash function. */
+static int hashSymbolName(const char *name)
+{
+    int hash = 0;
+    
+    while (*name)
+    {
+       hash = (hash << 6) ^ *name;
+       name++;
+    }
+    
+    if (hash < 0)
+    {
+    	hash = -hash;
+    }
+    
+    return hash % HTAB_SIZE;
+}
+
+/* Build a hash of all labels in the passed set of lines
+ * and how many times they are referenced.
+ */
+static void buildLabelRefCountHash(lineNode *head)
+{
+    lineNode 	*line;
+    const char 	*label;
+    int 	labelLen;
+    int		i;
+
+    assert(labelHash == NULL);
+    labelHash = newHashTable(HTAB_SIZE);
+    
+    /* First pass: locate all the labels. */
+    line = head;
+    
+    while (line)
+    {
+    	if (isLabelDefinition(line->line, &label, &labelLen)
+    	 && labelLen <= SDCC_NAME_MAX)
+    	{
+    	    labelHashEntry *entry;
+    	    
+    	    ALLOC(entry, sizeof(labelHashEntry));
+
+	    assert(entry != NULL);
+    	    
+    	    memcpy(entry->name, label, labelLen);
+    	    entry->name[labelLen] = 0;
+    	    entry->refCount = -1;
+
+    	    hTabAddItem(&labelHash, hashSymbolName(entry->name), entry);
+    	}
+        line = line->next;
+    }
+
+
+    /* Second pass: for each line, note all the referenced labels. */
+    /* This is ugly, O(N^2) stuff. Optimizations welcome... */
+    line = head;
+    while (line)
+    {
+    	for (i = 0; i < HTAB_SIZE; i++)
+    	{
+            labelHashEntry *thisEntry;
+        
+            thisEntry = hTabFirstItemWK(labelHash, i);
+        
+            while (thisEntry)
+            {
+                if (strstr(line->line, thisEntry->name))
+                {
+                    thisEntry->refCount++;
+                }
+            	thisEntry = hTabNextItemWK(labelHash);
+            }
+        }    
+        line = line->next;
+    }
+
+#if 0
+    /* Spew the contents of the table. Debugging fun only. */    
+    for (i = 0; i < HTAB_SIZE; i++)
+    {
+        labelHashEntry *thisEntry;
+        
+        thisEntry = hTabFirstItemWK(labelHash, i);
+        
+        while (thisEntry)
+        {
+            fprintf(stderr, "label: %s ref %d\n", 
+            	     thisEntry->name, thisEntry->refCount);
+            thisEntry = hTabNextItemWK(labelHash);
+        }
+    }
+#endif    
+}
+
 /*-----------------------------------------------------------------*/
 /* peepHole - matches & substitutes rules                          */
 /*-----------------------------------------------------------------*/
@@ -622,6 +849,12 @@ void peepHole (lineNode **pls )
     lineNode *spl ;
     peepRule *pr ;
     lineNode *mtail = NULL;
+
+    if (labelHash)
+    {
+    	hTabDeleteAll(labelHash);
+    }
+    labelHash = NULL;
 
  top:
     /* for all rules */

@@ -1504,7 +1504,7 @@ replace {
         cjne %1,%2,%5
         sjmp %4
 %3:
-}
+} if labelRefCount %3 1
 
 replace {
         sjmp %1

@@ -30,8 +30,8 @@ static void dummy(void) _naked
 	.globl	___fsmul
 ___fsmul:
 	// extract the two inputs, placing them into:
-	//      sign     exponent   mantiassa
-	//      ----     --------   ---------
+	//      sign     exponent   mantissa
+	//      ----     --------   --------
 	//  a:  sign_a   exp_a      r4/r3/r2
 	//  b:  sign_b   exp_b      r7/r6/r5
 
@@ -67,7 +67,7 @@ ___fsmul:
 	//	r4 * r7					<< 32
 	//
 	// This adds quite a bit of code, but it is a LOT faster
-	// that three calls to __mululong...
+	// than three calls to __mululong...
 
 	// output goes into r4/r3/r2/r1/r0/xx
 

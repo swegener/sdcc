@@ -82,7 +82,7 @@ char __fsqt (float, float);
 // This adds about 66 bytes to the code size and
 // significantly speeds up shift operations more
 // than 8 bits (common when subtracting numbers
-// of siginifantly different magnitude and scaling
+// of significantly different magnitude and scaling
 // to fixed point)
 #define FLOAT_SHIFT_SPEEDUP
 

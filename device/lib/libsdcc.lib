@@ -33,6 +33,8 @@ _gptrput
 _decdptr
 _bp
 _spx
+abs
+labs
 _atoi
 _atol
 calloc

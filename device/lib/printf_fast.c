@@ -19,13 +19,13 @@
 /******************************************************************/
 /**                                                              **/
 /**    Major features.  These determine what capabilities your   **/
-/**    comiled printf_fast will have.                            **/
+/**    compiled printf_fast will have.                           **/
 /**                                                              **/
 /******************************************************************/
 
 // Include support for 32 bit base 10 integers (%ld and %lu).  Without
 // this, you won't be able to print 32 bit integers as base 10.  They
-// will appear in hexidecimal.
+// will appear in hexadecimal.
 #define LONG
 
 // Include support for floating point numbers (%f).  Don't forget to
@@ -88,6 +88,8 @@
 
 /* extern void putchar(char ); */
 
+// Warning: using static/global variables makes these functions NON-reentrant!
+// reentrant keyword is only used for parameter passing method
 
 static bit long_flag, short_flag, print_zero_flag, negative_flag;
 
@@ -134,7 +136,7 @@ static data unsigned int i2bcd_tmp;  // slow 32 int conversion needs temp space
 
 void PRINTF_FAST(code char *fmt, ...) reentrant
 {
-	fmt;	/* supress unreferenced variable warning */
+	fmt;	/* suppress unreferenced variable warning */
 
 	_asm
 

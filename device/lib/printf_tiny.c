@@ -68,7 +68,7 @@
 
 void printf_tiny(code char *fmt, ...) reentrant
 {
-	fmt;	/* supress unreferenced variable warning */
+	fmt;	/* suppress unreferenced variable warning */
 
 	_asm
 

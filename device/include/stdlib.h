@@ -31,6 +31,9 @@
 
 #include <malloc.h>
 
+int abs(int j);
+long int labs(long int j);
+
 extern float atof (char *);
 extern int atoi (char *);
 extern long atol (char *);

@@ -1,3 +1,15 @@
+2005-03-17 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/stdint.h: added
+	* device/lib/abs.c: added
+	* device/lib/labs.c: added
+	* device/include/stdlib.h: added abs() and labs() prototypes
+	* device/lib/libsdcc.lib: added abs and labs
+	* device/include/float.h,
+	* device/lib/_fsmul.c,
+	* device/lib/printf_fast.c,
+	* device/lib/printf_tiny.c: updated comments
+
 2005-03-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCicode.c (geniCodeSwitch, geniCodeJumpTable): fixed

@@ -3002,7 +3002,7 @@ SDCC sources use the unix line ending LF.
  Make sure not to commit files with windows line endings.
 \layout Subsubsection
 
-Windows Install Using Microsoft Visual C++ 6.0/NET
+Building SDCC Using Microsoft Visual C++ 6.0/NET (MSVC)
 \layout Standard
 
 
@@ -3024,7 +3024,8 @@ Download the source package
 
 \series default 
  SDCC is distributed with all the projects, workspaces, and files you need
- to build it using Visual C++ 6.0/NET.
+ to build it using Visual C++ 6.0/NET (except for sdcdb.exe which currently
+ doesn't build under MSVC).
  The workspace name is 'sdcc.dsw'.
  Please note that as it is now, all the executables are created in a folder
  called sdcc
@@ -3034,13 +3035,13 @@ bin_vc.
 \backslash 
 bin_vc to sdcc
 \backslash 
-bin before runnng SDCC.
+bin before runing SDCC.
  
 \newline 
 
 \newline 
-In order to build SDCC with Visual C++ 6.0/NET you need win32 executables
- of bison.exe, flex.exe, and gawk.exe.
+In order to build SDCC with MSVC you need win32 executables of bison.exe,
+ flex.exe, and gawk.exe.
  One good place to get them is 
 \begin_inset LatexCommand \url[here]{http://unxutils.sourceforge.net}
 
@@ -3056,8 +3057,8 @@ Download the file UnxUtils
 \end_inset 
 
 .zip.
- Now you have to install the utilities and setup Visual C++ so it can locate
- the required programs.
+ Now you have to install the utilities and setup MSVC so it can locate the
+ required programs.
  Here there are two alternatives (choose one!):
 \layout Enumerate
 
@@ -3180,7 +3181,7 @@ bin_vc to sdcc
 bin, and you can compile using sdcc.
 \layout Subsubsection
 
-Windows Install Using Borland
+Building SDCC Using Borland
 \layout Enumerate
 
 From the sdcc directory, run the command "make -f Makefile.bcc".
@@ -8055,6 +8056,175 @@ The above example will allocate the variable at offset 0x02 in the bit-addressab
 le space.
  There is no real advantage to assigning absolute addresses to variables
  in this manner, unless you want strict control over all the variables allocated.
+ One possible use would be to write hardware portable code.
+ For example, if you have a routine that uses one or more of the microcontroller
+ I/O pins, and such pins are different for two different hardwares, you
+ can declare the I/O pins in you routine using
+\newline 
+
+\family typewriter 
+
+\newline 
+extern bit SDI;
+\newline 
+extern bit SCLK;
+\newline 
+extern bit CPOL;
+\newline 
+
+\newline 
+void DS1306_put(unsigned char value)
+\newline 
+{
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+unsigned char mask=0x80;
+\newline 
+
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+while(mask)
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+{
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+SDI=(value & mask)?1:0;
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+SCLK=!CPOL;
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+SCLK=CPOL;
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mask/=2;
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+}
+\newline 
+}
+\newline 
+
+\newline 
+
+\family default 
+Then, someplace in the code for the first hardware you would use
+\newline 
+
+\newline 
+
+\family typewriter 
+bit at 0x80 SDI;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/*I/O port 0, bit 0*/
+\newline 
+bit at 0x81 SCLK;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/*I/O port 0, bit 1*/
+\newline 
+bit CPOL;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/*This is a variable, let the linker allocate this one*/
+\newline 
+
+\newline 
+
+\family default 
+Similarly, for the second hardware you would use
+\newline 
+
+\newline 
+
+\family typewriter 
+bit at 0x83 SDI;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/*I/O port 0, bit 3*/
+\newline 
+bit at 0x91 SCLK;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/*I/O port 1, bit 1*/
+\newline 
+bit CPOL;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/*This is a variable, let the linker allocate this one*/
+\newline 
+
+\newline 
+
+\family default 
+and you can use the same hardware dependant routine without changes, as
+ for example in a library.
+ This is somehow similar to sbit, but only one absolute address has to be
+ specified in the whole project.
+\family typewriter 
+
+\newline 
+
 \layout Subsection
 
 Startup Code
@@ -8309,10 +8479,7 @@ _endasm ;
 \family default 
 In other words inline assembly code can access labels defined in inline
  assembly within the scope of the funtion.
- 
-\layout Standard
-
-The same goes the other way, ie.
+ The same goes the other way, ie.
  labels defines in inline assembly CANNOT be accessed by C statements.
 \layout Subsection
 
@@ -8338,37 +8505,223 @@ For signed & unsigned int (16 bit) and long (32 bit) variables, division,
 \newline 
 
 \newline 
+ 
+\begin_inset  Tabular
+<lyxtabular version="3" rows="11" columns="2">
+<features>
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
 
-\emph on 
-<pending: tabularise this>
-\emph default 
+\layout Standard
+
+
+\series bold 
+Function
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\series bold 
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+_mulint.c 
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+16 bit multiplication
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+_divsint.c 
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+ signed 16 bit division (calls _divuint)
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+_divuint.c 
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+ unsigned 16 bit division
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+_modsint.c
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+signed 16 bit modulus (calls _moduint)
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+_moduint.c
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+unsigned 16 bit modulus
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+_mullong.c
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+32 bit multiplication
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+_divslong.c 
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+ signed 32 division (calls _divulong)
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+_divulong.c 
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+unsigned 32 division
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+_modslong.c
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+ signed 32 bit modulus (calls _modulong)
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+_modulong.c
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+unsigned 32 bit modulus
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
 
 \newline 
 
-\newline 
-_mulint.c - 16 bit multiplication
-\newline 
-_divsint.c - signed 16 bit division (calls _divuint)
-\newline 
-_divuint.c - unsigned 16 bit division
-\newline 
-_modsint.c - signed 16 bit modulus (call _moduint)
-\newline 
-_moduint.c - unsigned 16 bit modulus
-\newline 
-_mullong.c - 32 bit multiplication
-\newline 
-_divslong.c - signed 32 division (calls _divulong)
-\newline 
-_divulong.c - unsigned 32 division
-\newline 
-_modslong.c - signed 32 bit modulus (calls _modulong)
-\newline 
-_modulong.c - unsigned 32 bit modulus 
 \size footnotesize 
-
-\newline 
-
+ 
 \newline 
 
 \size default 
@@ -8427,6 +8780,9 @@ status Collapsed
 
 \emph default 
  option.
+ Notice that you don't have to call this routines directly.
+ The compiler will use them automatically every time a integer operation
+ is required.
 \layout Subsection
 
 Floating Point Support
@@ -8444,55 +8800,642 @@ SDCC supports IEEE (single precision 4bytes) floating point numbers.The floating
 
 \newline 
 
-\emph on 
-<pending: tabularise this>
-\emph default 
-
-\newline 
-
-\newline 
-_fsadd.c - add floating point numbers
-\newline 
-_fssub.c - subtract floating point numbers
-\newline 
-_fsdiv.c - divide floating point numbers
-\newline 
-_fsmul.c - multiply floating point numbers
-\newline 
-_fs2uchar.c - convert floating point to unsigned char
-\newline 
-_fs2char.c - convert floating point to signed char
-\newline 
-_fs2uint.c - convert floating point to unsigned int
-\newline 
-_fs2int.c - convert floating point to signed int
-\newline 
-_fs2ulong.c - convert floating point to unsigned long
-\newline 
-_fs2long.c - convert floating point to signed long
-\newline 
-_uchar2fs.c - convert unsigned char to floating point
-\newline 
-_char2fs.c - convert char to floating point number
-\newline 
-_uint2fs.c - convert unsigned int to floating point
-\newline 
-_int2fs.c - convert int to floating point numbers
-\newline 
-_ulong2fs.c - convert unsigned long to floating point number
-\newline 
-_long2fs.c - convert long to floating point number
 \size footnotesize 
+ 
+\begin_inset  Tabular
+<lyxtabular version="3" rows="17" columns="2">
+<features>
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
 
-\newline 
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+Function 
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+_fsadd.c
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+add floating point numbers
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+_fssub.c 
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+subtract floating point numbers 
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+_fsdiv.c 
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+divide floating point numbers 
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+_fsmul.c 
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+multiply floating point numbers 
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+_fs2uchar.c
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+convert floating point to unsigned char
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+_fs2char.c
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+convert floating point to signed char
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+_fs2uint.c
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+convert floating point to unsigned int
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+_fs2int.c
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+convert floating point to signed int
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+_fs2ulong.
+\family default 
+\series default 
+\shape default 
+\size default 
+\emph default 
+\bar default 
+\noun default 
+\color default
+c
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+convert floating point to unsigned long
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+_fs2long.c
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+convert floating point to signed long
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+_uchar2fs.c
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+convert unsigned char to floating point
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+_char2fs.c
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+convert char to floating point number
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+_uint2fs.c
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+convert unsigned int to floating point
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+_int2fs.c
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+convert int to floating point numbers
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+_ulong2fs.c
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+convert unsigned long to floating point number
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+_long2fs.c
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+convert long to floating point number
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
 
 \newline 
 
 \size default 
+
+\newline 
 Note if all these routines are used simultaneously the data space might
  overflow.
  For serious floating point usage it is strongly recommended that the large
  model be used.
+ Also notice that you don't have to call this routines directly.
+ The compiler will use them automatically every time a floating point operation
+ is required.
 \layout Subsection
 
 MCS51 Memory Models
@@ -11921,7 +12864,7 @@ sdcc/bin
 \end_inset 
 </cell>
 </row>
-<row topline="true" bottomline="true">
+<row topline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -11956,7 +12899,7 @@ sdcc/bin
 \end_inset 
 </cell>
 </row>
-<row topline="true" bottomline="true">
+<row topline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -11991,7 +12934,7 @@ sdcc/bin
 \end_inset 
 </cell>
 </row>
-<row topline="true" bottomline="true">
+<row topline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 

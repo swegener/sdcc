@@ -1058,15 +1058,38 @@ static void genNotFloat (operand *op, operand *res)
 }
 
 /*-----------------------------------------------------------------*/
+/* opIsGptr: returns non-zero if the passed operand is		   */ 	
+/* a generic pointer type.					   */
+/*-----------------------------------------------------------------*/ 
+static int opIsGptr(operand *op)
+{
+    link *type = operandType(op);
+    
+    if ((AOP_SIZE(op) == GPTRSIZE) && IS_GENPTR(type))
+    {
+        return 1;
+    }
+    return 0;        
+}
+
+/*-----------------------------------------------------------------*/
 /* getDataSize - get the operand data size                         */
 /*-----------------------------------------------------------------*/
 static int getDataSize(operand *op)
 {
     int size;
     size = AOP_SIZE(op);
-    if(size == 3)
-        /* pointer */
-        size--;
+    if (size == GPTRSIZE)
+    {
+        link *type = operandType(op);
+        if (IS_GENPTR(type))
+        {
+            /* generic pointer; arithmetic operations
+             * should ignore the high byte (pointer type).
+             */
+            size--;
+        }
+    }
     return size;
 }
 
@@ -2256,7 +2279,8 @@ static bool genPlusIncr (iCode *ic)
 	}
     
 	emitcode("inc","%s",aopGet(AOP(IC_RESULT(ic)),MSB16,FALSE,FALSE));
-	if(size == 4){
+	if (size > 2)
+	{
 	    if(AOP_TYPE(IC_RESULT(ic)) == AOP_REG ||
 	       IS_AOP_PREG(IC_RESULT(ic)))
 		emitcode("cjne","%s,#0x00,%05d$"
@@ -2268,6 +2292,9 @@ static bool genPlusIncr (iCode *ic)
 			 ,tlbl->key+100);
 	    
 	    emitcode("inc","%s",aopGet(AOP(IC_RESULT(ic)),MSB24,FALSE,FALSE));
+       }
+       if (size > 3)
+       {
 	    if(AOP_TYPE(IC_RESULT(ic)) == AOP_REG ||
 	       IS_AOP_PREG(IC_RESULT(ic)))
 		emitcode("cjne","%s,#0x00,%05d$"
@@ -2351,6 +2378,75 @@ static void genPlusBits (iCode *ic)
     }
 }
 
+#if 0
+/* This is the original version of this code.
+ *
+ * This is being kept around for reference, 
+ * because I am not entirely sure I got it right...
+ */
+static void adjustArithmeticResult(iCode *ic)
+{
+    if (AOP_SIZE(IC_RESULT(ic)) == 3 && 
+	AOP_SIZE(IC_LEFT(ic)) == 3   &&
+	!sameRegs(AOP(IC_RESULT(ic)),AOP(IC_LEFT(ic))))
+	aopPut(AOP(IC_RESULT(ic)),
+	       aopGet(AOP(IC_LEFT(ic)),2,FALSE,FALSE),
+	       2);
+
+    if (AOP_SIZE(IC_RESULT(ic)) == 3 && 
+	AOP_SIZE(IC_RIGHT(ic)) == 3   &&
+	!sameRegs(AOP(IC_RESULT(ic)),AOP(IC_RIGHT(ic))))
+	aopPut(AOP(IC_RESULT(ic)),
+	       aopGet(AOP(IC_RIGHT(ic)),2,FALSE,FALSE),
+	       2);
+    
+    if (AOP_SIZE(IC_RESULT(ic)) == 3 &&
+	AOP_SIZE(IC_LEFT(ic)) < 3    &&
+	AOP_SIZE(IC_RIGHT(ic)) < 3   &&
+	!sameRegs(AOP(IC_RESULT(ic)),AOP(IC_LEFT(ic))) &&
+	!sameRegs(AOP(IC_RESULT(ic)),AOP(IC_RIGHT(ic)))) {
+	char buffer[5];
+	sprintf(buffer,"#%d",pointerCode(getSpec(operandType(IC_LEFT(ic)))));
+	aopPut(AOP(IC_RESULT(ic)),buffer,2);
+    }
+}
+#else
+/* This is the pure and virtuous version of this code.
+ * I'm pretty certain it's right, but not enough to toss the old 
+ * code just yet...
+ */
+static void adjustArithmeticResult(iCode *ic)
+{
+    if (opIsGptr(IC_RESULT(ic)) &&
+    	opIsGptr(IC_LEFT(ic))   &&
+	!sameRegs(AOP(IC_RESULT(ic)),AOP(IC_LEFT(ic))))
+    {
+	aopPut(AOP(IC_RESULT(ic)),
+	       aopGet(AOP(IC_LEFT(ic)), GPTRSIZE - 1,FALSE,FALSE),
+	       GPTRSIZE - 1);
+    }
+
+    if (opIsGptr(IC_RESULT(ic)) &&
+        opIsGptr(IC_RIGHT(ic))   &&
+	!sameRegs(AOP(IC_RESULT(ic)),AOP(IC_RIGHT(ic))))
+    {
+	aopPut(AOP(IC_RESULT(ic)),
+	       aopGet(AOP(IC_RIGHT(ic)),GPTRSIZE - 1,FALSE,FALSE),
+	       GPTRSIZE - 1);
+    }
+
+    if (opIsGptr(IC_RESULT(ic)) 	   &&
+        AOP_SIZE(IC_LEFT(ic)) < GPTRSIZE   &&
+        AOP_SIZE(IC_RIGHT(ic)) < GPTRSIZE  &&
+	 !sameRegs(AOP(IC_RESULT(ic)),AOP(IC_LEFT(ic))) &&
+	 !sameRegs(AOP(IC_RESULT(ic)),AOP(IC_RIGHT(ic)))) {
+	 char buffer[5];
+	 sprintf(buffer,"#%d",pointerCode(getSpec(operandType(IC_LEFT(ic)))));
+	 aopPut(AOP(IC_RESULT(ic)),buffer,GPTRSIZE - 1);
+     }
+}
+#endif
+
 /*-----------------------------------------------------------------*/
 /* genPlus - generates code for addition                           */
 /*-----------------------------------------------------------------*/
@@ -2431,29 +2527,8 @@ static void genPlus (iCode *ic)
         aopPut(AOP(IC_RESULT(ic)),"a",offset++);      
     }
 
-    if (AOP_SIZE(IC_RESULT(ic)) == 3 && 
-	AOP_SIZE(IC_LEFT(ic)) == 3   &&
-	!sameRegs(AOP(IC_RESULT(ic)),AOP(IC_LEFT(ic))))
-	aopPut(AOP(IC_RESULT(ic)),
-	       aopGet(AOP(IC_LEFT(ic)),2,FALSE,FALSE),
-	       2);
+    adjustArithmeticResult(ic);
 
-     if (AOP_SIZE(IC_RESULT(ic)) == 3 && 
-	AOP_SIZE(IC_RIGHT(ic)) == 3   &&
-	!sameRegs(AOP(IC_RESULT(ic)),AOP(IC_RIGHT(ic))))
-	aopPut(AOP(IC_RESULT(ic)),
-	       aopGet(AOP(IC_RIGHT(ic)),2,FALSE,FALSE),
-	       2);
-     
-     if (AOP_SIZE(IC_RESULT(ic)) == 3 &&
-	 AOP_SIZE(IC_LEFT(ic)) < 3    &&
-	 AOP_SIZE(IC_RIGHT(ic)) < 3   &&
-	 !sameRegs(AOP(IC_RESULT(ic)),AOP(IC_LEFT(ic))) &&
-	 !sameRegs(AOP(IC_RESULT(ic)),AOP(IC_RIGHT(ic)))) {
-	 char buffer[5];
-	 sprintf(buffer,"#%d",pointerCode(getSpec(operandType(IC_LEFT(ic)))));
-	 aopPut(AOP(IC_RESULT(ic)),buffer,2);
-     }
 release:
     freeAsmop(IC_LEFT(ic),NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
     freeAsmop(IC_RIGHT(ic),NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
@@ -2498,7 +2573,8 @@ static bool genMinusDec (iCode *ic)
 					 ,tlbl->key+100);
 		}
 		emitcode("dec","%s",aopGet(AOP(IC_RESULT(ic)),MSB16,FALSE,FALSE));
-		if(size == 4){
+		if (size > 2)
+		{
 			if(AOP_TYPE(IC_RESULT(ic)) == AOP_REG ||
 			   IS_AOP_PREG(IC_RESULT(ic)))
 				emitcode("cjne","%s,#0xff,%05d$"
@@ -2510,6 +2586,9 @@ static bool genMinusDec (iCode *ic)
 						 ,tlbl->key+100);
 			}
 			emitcode("dec","%s",aopGet(AOP(IC_RESULT(ic)),MSB24,FALSE,FALSE));
+		}
+		if (size > 3)
+		{
 			if(AOP_TYPE(IC_RESULT(ic)) == AOP_REG ||
 			   IS_AOP_PREG(IC_RESULT(ic)))
 				emitcode("cjne","%s,#0xff,%05d$"
@@ -2639,30 +2718,9 @@ static void genMinus (iCode *ic)
         }
         aopPut(AOP(IC_RESULT(ic)),"a",offset++);      
     }
-    
-    if (AOP_SIZE(IC_RESULT(ic)) == 3 && 
-	AOP_SIZE(IC_LEFT(ic)) == 3   &&
-	!sameRegs(AOP(IC_RESULT(ic)),AOP(IC_LEFT(ic))))
-	aopPut(AOP(IC_RESULT(ic)),
-	       aopGet(AOP(IC_LEFT(ic)),2,FALSE,FALSE),
-	       2);
 
-    if (AOP_SIZE(IC_RESULT(ic)) == 3 && 
-	AOP_SIZE(IC_RIGHT(ic)) == 3   &&
-	!sameRegs(AOP(IC_RESULT(ic)),AOP(IC_RIGHT(ic))))
-	aopPut(AOP(IC_RESULT(ic)),
-	       aopGet(AOP(IC_RIGHT(ic)),2,FALSE,FALSE),
-	       2);
-    
-    if (AOP_SIZE(IC_RESULT(ic)) == 3 &&
-	AOP_SIZE(IC_LEFT(ic)) < 3    &&
-	AOP_SIZE(IC_RIGHT(ic)) < 3   &&
-	!sameRegs(AOP(IC_RESULT(ic)),AOP(IC_LEFT(ic))) &&
-	!sameRegs(AOP(IC_RESULT(ic)),AOP(IC_RIGHT(ic)))) {
-	char buffer[5];
-	sprintf(buffer,"#%d",pointerCode(getSpec(operandType(IC_LEFT(ic)))));
-	aopPut(AOP(IC_RESULT(ic)),buffer,2);
-    }
+    adjustArithmeticResult(ic);
+        
 release:
     freeAsmop(IC_LEFT(ic),NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
     freeAsmop(IC_RIGHT(ic),NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
@@ -4888,10 +4946,9 @@ static void genlshOne (operand *result, operand *left, int shCount)
 /*-----------------------------------------------------------------*/
 static void genlshTwo (operand *result,operand *left, int shCount)
 {
-    int size = AOP_SIZE(result);
-
-    if (size == 3)
-        size--;
+    int size;
+    
+    size = getDataSize(result);
 
     /* if shCount >= 8 */
     if (shCount >= 8) {

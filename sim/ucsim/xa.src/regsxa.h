@@ -66,6 +66,10 @@ struct t_regs
 #define get1(addr) ram->get((t_addr) (addr))
 #define get2(addr) (ram->get((t_addr) (addr)) | (ram->get((t_addr) (addr+1)) << 8) )
 
+/* get from code */
+#define getcode1(addr) rom->get((t_addr) (addr))
+#define getcode2(addr) (rom->get((t_addr) (addr)) | (rom->get((t_addr) (addr+1)) << 8) )
+
 /* fetch from opcode code space */
 #define fetch2() ((fetch() << 8) | fetch())
 #define fetch1() fetch()

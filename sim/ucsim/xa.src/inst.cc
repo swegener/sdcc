@@ -235,6 +235,30 @@ cl_xa::inst_MOVS(uint code, int operands)
 int
 cl_xa::inst_MOVC(uint code, int operands)
 {
+  switch (operands) {
+    case REG_IREGINC:
+    {
+      short srcreg = reg2(RI_07);
+      if (code & 0x0800) {  /* word op */
+        set_reg2( RI_F0,
+                  mov2( reg2(RI_F0),
+                        getcode2(srcreg)
+                      )
+                );
+      } else {
+        set_reg1( RI_F0,
+                  mov1( reg1(RI_F0),
+                        getcode1(srcreg)
+                      )
+                );
+      }
+      if (operands == REG_IREGINC) {
+        set_reg2(RI_07,  srcreg+1);
+      }
+    }
+    break;
+    // fixme, 2 more
+  }
   return(resGO);
 }
 int
@@ -245,11 +269,56 @@ cl_xa::inst_MOVX(uint code, int operands)
 int
 cl_xa::inst_PUSH(uint code, int operands)
 {
+  switch(operands) {
+    case DIRECT_ALONE:
+    {
+      unsigned short sp;
+      unsigned short direct_addr = ((operands & 0x7) << 8) | fetch();
+
+      sp = get_sp()-2;
+      set_sp(sp);
+      if (code & 0x0800) {  /* word op */
+        store2( sp, get_word_direct(direct_addr));
+      } else {
+        store2( sp, get_byte_direct(direct_addr));
+      }
+    }
+    break;
+
+    case RLIST:
+      // fixme: implement
+      unsigned char rlist = fetch();
+      rlist = rlist; //shutup compiler
+    break;
+  }
+  
   return(resGO);
 }
 int
 cl_xa::inst_POP(uint code, int operands)
 {
+  switch(operands) {
+    case DIRECT_ALONE:
+    {
+      unsigned short sp;
+      unsigned short direct_addr = ((operands & 0x7) << 8) | fetch();
+
+      sp = get_sp();
+      if (code & 0x0800) {  /* word op */
+        set_word_direct(direct_addr, get2(sp) );
+      } else {
+        set_byte_direct(direct_addr, get2(sp) & 0xff );
+      }
+      set_sp(sp+2);
+    }
+    break;
+
+    case RLIST:
+      // fixme: implement
+      unsigned char rlist = fetch();
+      rlist = rlist; //shutup compiler
+    break;
+  }
   return(resGO);
 }
 int
@@ -304,11 +373,12 @@ cl_xa::inst_JMP(uint code, int operands)
       saddr = fetch2();
       jmpaddr = saddr;
       jmpaddr *= 2;
-      PC = (PC + 3) + jmpaddr;
+      PC = (PC + jmpaddr) & 0xfffffffe;
     }
     break;
     case IREG:
-      PC = reg2(RI_07) & 0xfffe;  /* word aligned */
+      PC &= 0xffff0000;
+      PC |= (reg2(RI_07) & 0xfffe);  /* word aligned */
     break;
     /* fixme 2 more... */
   }
@@ -317,11 +387,45 @@ cl_xa::inst_JMP(uint code, int operands)
 int
 cl_xa::inst_CALL(uint code, int operands)
 {
+  unsigned int jmpaddr;
+  unsigned int sp;
+
+  switch(operands) {
+    case REL16:
+    {
+      jmpaddr = fetch2();
+      sp = get_sp() - 4;
+      set_sp(sp);
+      store2(sp, PC);
+      store2(sp+2, 0);  /* segment(not sure about ordering...) */
+      jmpaddr *= 2;
+      PC = (PC + jmpaddr) & 0xfffffffe;
+    }
+    break;
+    case IREG:
+    {
+      sp = get_sp() - 4;
+      set_sp(sp);
+      store2(sp, PC);
+      store2(sp+2, 0);  /* segment(not sure about ordering...) */
+      jmpaddr = reg2(RI_07);
+      jmpaddr *= 2;
+      PC = (PC + jmpaddr) & 0xfffffffe;
+    }
+    break;
+    /* fixme 2 more... */
+  }
   return(resGO);
 }
 int
 cl_xa::inst_RET(uint code, int operands)
 {
+  unsigned int retaddr;
+  unsigned short sp;
+  sp = get_sp();
+  retaddr = get2(sp);
+  //retaddr |= get2(sp+2) << 16);
+  PC = retaddr;
   return(resGO);
 }
 int
@@ -352,11 +456,19 @@ cl_xa::inst_DJNZ(uint code, int operands)
 int
 cl_xa::inst_JZ(uint code, int operands)
 {
+  short saddr = (fetch1() * 2);
+  if (get_psw() & BIT_Z) {
+      PC += saddr;
+  }
   return(resGO);
 }
 int
 cl_xa::inst_JNZ(uint code, int operands)
 {
+  short saddr = (fetch1() * 2);
+  if (!(get_psw() & BIT_Z)) {
+      PC += saddr;
+  }
   return(resGO);
 }
 int

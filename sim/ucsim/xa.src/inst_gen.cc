@@ -45,7 +45,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
     case REG_IREGINC :
     case REG_IREG:
     {
-      short srcreg = reg2(RI_0F);
+      short srcreg = reg2(RI_07);
       if (code & 0x0800) {  /* word op */
         set_reg2( RI_F0,
                   FUNC2( reg2(RI_F0),
@@ -60,7 +60,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
                 );
       }
       if (operands == REG_IREGINC) {
-        set_reg2(RI_0F,  srcreg+1);
+        set_reg2(RI_07,  srcreg+1);
       }
     }
     break;
@@ -79,7 +79,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
         store1(addr, total);
       }
       if (operands == IREGINC_REG) {
-        set_reg2(RI_0F, addr+1);
+        set_reg2(RI_07, addr+1);
       }
     }
     break;
@@ -94,13 +94,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
         offset = (int)((short)fetch2());
       }
       if (code & 0x0800) {  /* word op */
-        t_mem addr = reg2(RI_07) + offset;
+        t_mem addr = reg2(RI_70) + offset;
         unsigned short wtmp, wtotal;
         wtmp = get2(addr);
         wtotal = FUNC2( wtmp, reg2(RI_F0) );
         store2(addr, wtotal);
       } else {
-        t_mem addr = reg2(RI_07) + ((short) fetch2());
+        t_mem addr = reg2(RI_70) + ((short) fetch2());
         unsigned char total;
         total = FUNC1( get1(addr), reg1(RI_F0) );
         store1(addr, total);
@@ -137,7 +137,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
     case DIRECT_REG :
     {
-      int addr = ((code & 0x3) << 8) | fetch();
+      int addr = ((code & 0x7) << 8) | fetch();
       if (code & 0x0800) {  /* word op */
         unsigned short wtmp = get_word_direct(addr);
         set_word_direct( addr,
@@ -154,7 +154,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
     case REG_DIRECT :
     {
-      int addr = ((code & 0x3) << 8) | fetch();
+      int addr = ((code & 0x7) << 8) | fetch();
       if (code & 0x0800) {  /* word op */
         set_reg2( RI_F0,
                   FUNC2( reg2(RI_F0),
@@ -176,7 +176,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
     break;
 
     case REG_DATA16 :
-      set_reg2( RI_F0, FUNC2( reg2(RI_F0), fetch()) );
+      set_reg2( RI_F0, FUNC2( reg2(RI_F0), fetch2()) );
     break;
 
     case IREGINC_DATA8 :
@@ -184,12 +184,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
     {
       unsigned char total;
       unsigned char tmp;
-      t_mem addr = reg2(RI_07);
+      t_mem addr = reg2(RI_70);
       tmp = get1(addr);
       total = FUNC1(tmp, fetch() );
       store1(addr, total);
       if (operands == IREGINC_DATA8) {
-        set_reg2(RI_07, addr+1);
+        set_reg2(RI_70, addr+1);
       }
     }
     break;
@@ -204,7 +204,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
       total = FUNC2(tmp, fetch2() );
       store2(addr, total);
       if (operands == IREGINC_DATA16) {
-        set_reg2(RI_07, addr+1);
+        set_reg2(RI_70, addr+1);
       }
     }
     break;
@@ -221,9 +221,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
         offset = (int)((short)fetch2());
       }
       tmp = fetch();
-      addr = reg2(RI_07);
+      addr = reg2(RI_70);
 
-      store1( addr, 
+      store1( addr+offset,
                   FUNC1( tmp,
                         get1(addr+offset)
                       )
@@ -243,9 +243,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
         offset = (int)((short)fetch2());
       }
       tmp = fetch2();
-      addr = reg2(RI_07);
+      addr = reg2(RI_70);
 
-      store2( addr, 
+      store2( addr+offset,
                   FUNC2( tmp,
                         get2(addr+offset)
                       )
@@ -255,7 +255,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
     case DIRECT_DATA8 :
     {
-      int addr = ((code & 0x3) << 8) | fetch();
+      int addr = ((code & 0x70) << 4) | fetch();
       unsigned char bdir = get_byte_direct(addr);
       unsigned char bdat = fetch();
       set_byte_direct( addr,  FUNC1( bdir, bdat) );
@@ -264,7 +264,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
     case DIRECT_DATA16 :
     {
-      int addr = ((code & 0x3) << 8) | fetch();
+      int addr = ((code & 0x70) << 4) | fetch();
       unsigned short wdir = get_word_direct(addr);
       unsigned short wdat = fetch2();
       set_word_direct( addr,  FUNC2( wdir, wdat) );

@@ -23,7 +23,7 @@
 #Boston MA 02111-1307, USA.
 
 PRJDIR = ../..
-TARGET = $(PRJDIR)/bin/sdcpp2
+TARGET = $(PRJDIR)/bin/sdcpp
 
 # This is the default target.
 all: $(TARGET)

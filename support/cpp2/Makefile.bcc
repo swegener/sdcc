@@ -6,7 +6,7 @@ OBJECTS         = cppmain.obj intl.obj \
 		hashtable.obj mkdeps.obj prefix.obj version.obj mbchar.obj \
 		safe-ctype.obj obstack.obj splay-tree.obj lbasename.obj
 
-TARGET          = $(PRJDIR)/bin/sdcpp2.exe
+TARGET          = $(PRJDIR)/bin/sdcpp.exe
 
 # Compiling entire program or any subproject
 # ------------------------------------------

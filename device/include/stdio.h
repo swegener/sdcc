@@ -31,8 +31,8 @@
 #include <tinibios.h>
 #endif
 
-extern printf_small (char *,...) reentrant;
-extern printf (const char *,...) reentrant;
+extern void printf_small (char *,...) reentrant;
+extern int printf (const char *,...) reentrant;
 extern int vprintf (const char *, va_list);
 extern int sprintf (const char *, const char *, ...) reentrant;
 extern int vsprintf (const char *, const char *, va_list);

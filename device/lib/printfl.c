@@ -20,7 +20,10 @@
     In other words, you are welcome to use, share and improve this program.
     You are forbidden to forbid anyone else to use, share and improve
     what you give them.   Help stamp out software-hoarding!
+    
+    2001060401: Improved by was@icb.snz.chel.su
 -------------------------------------------------------------------------*/
+
 
 /* following formats are supported :-
    format     output type       argument-type
@@ -39,7 +42,7 @@
 
 #include <stdarg.h>
 #include <reg51.h>
-extern void putchar(char );
+#include <stdio.h>
 
 static data volatile char ch;
 static data char radix ;
@@ -50,94 +53,51 @@ static bit sign;
 static char * data str ;
 static data long val;
 
-static void pvalhex( long val)
+static void pval(void)
 {
-  volatile char sp = SP;
-  unsigned long lval = val;
+        char sp;
+        unsigned long lval;
+        sp = SP;
 
-  if (!long_flag)
-    lval &= 0x0000ffff;
-
-  if (short_flag)
-    lval &= 0x000000ff;
-
-  do {
-    ch = "0123456789ABCDEF"[(unsigned short)lval & 0x0f];
-    _asm push _ch _endasm;
-    lval /= 16;
-  } while (lval);
-
-  while (sp != SP) {
-    _asm pop _ch _endasm;
-    putchar(ch);
-  }
-
-}
-
-static void pvaloct(long val)
-{
-  char sp ;
-  unsigned long lval;
-  sp = SP;
-  if (val < 0) {
-    lval = -val;
-    sign = 1;
-  } else {
-    lval = val;
-    sign = 0;
-  }
-
-  if (!long_flag)
-    lval &= 0x0000ffff;
-        if (short_flag)
-    lval &= 0x000000ff;
-
-  do {
-    ch = (lval % 8) + '0';
-    _asm push _ch _endasm;
-     lval = lval / 8;
-  } while (lval);
-
-  if (sign) {
-    ch = '-';
-    _asm push _ch _endasm;
-  }
-
-
-  while (sp != SP) {
-    _asm pop _ch _endasm;
-    putchar(ch);
+        if (val < 0 && radix != 16)
+        {
+           lval = -val;
+           sign = 1;
         }
-}
+        else { sign = 0; lval = val;}
 
-static void pvaldec(long val )
-{
-  char sp ;
-  unsigned long lval;
-  sp = SP;
-  if (val < 0) {
-    lval = -val;
-    sign = 1;
-  } else {
-    lval = val;
-    sign = 0;
-  }
+	if (!long_flag) {
+	  lval &= 0x0000ffff;
+	}
+        if (short_flag) {
+	  lval &= 0x000000ff;
+	}
 
-  do {
-    ch = (lval % 10) + '0';
-    _asm push _ch _endasm;
-    lval = lval / 10;
-  } while (lval);
+        do
+        {
+#if 1
+                if(radix != 16)  ch = (lval % radix) + '0';
+                else ch = "0123456789ABCDEF"[(unsigned short)lval & 0x0f];
+                _asm push _ch _endasm;
+                lval /= radix;
+#else
+		// This only looks more efficient, but isn't. see the .map
+                ch = (lval % radix) + '0'; 
+                if (ch>'9') ch+=7; 
+                _asm push _ch _endasm; 
+                lval /= radix;
+#endif
+        }
+        while (lval);
 
-  if (sign) {
-    ch = '-';
-    _asm push _ch _endasm;
-  }
+        if (sign) {
+                ch = '-';
+                _asm push _ch _endasm;
+        }
 
-
-  while (sp != SP) {
-    _asm pop _ch _endasm;
-    putchar(ch);
+        while (sp != SP) {
+                _asm pop _ch _endasm;
+                putchar(ch);
         }
 }
 
@@ -148,67 +108,55 @@ void printf_small (char * fmt, ... ) reentrant
     va_start(ap,fmt);
 
     for (; *fmt ; fmt++ ) {
-  if (*fmt == '%') {
-      long_flag = string_flag = short_flag = 0;
-      fmt++ ;
-      switch (*fmt) {
-      case 'l':
-    long_flag = 1;
-    fmt++;
-    break;
-      case 'h':
-    short_flag = 1;
-    fmt++;
-      }
+        if (*fmt == '%') {
+            long_flag = string_flag = short_flag = 0;
+            fmt++ ;
+            switch (*fmt) {
+            case 'l':
+                long_flag = 1;
+                fmt++;
+                break;
+            case 'h':
+                short_flag = 1;
+                fmt++;
+            }
 
-      switch (*fmt) {
-      case 's':
-    string_flag = 1;
-    break;
-      case 'd':
-    radix = 10;
-    break;
-      case 'x':
-    radix = 16;
-    break;
-      case 'c':
-    radix = 0;
-    break;
-      case 'o':
-    radix = 8;
-    break;
-      }
+            switch (*fmt) {
+            case 's':
+                string_flag = 1;
+                break;
+            case 'd':
+                radix = 10;
+                break;
+            case 'x':
+                radix = 16;
+                break;
+            case 'c':
+                radix = 0;
+                break;
+            case 'o':
+                radix = 8;
+                break;
+            }
 
-      if (string_flag) {
-    str = va_arg(ap,char _generic *);
-    while (*str) putchar(*str++);
-    continue ;
-      }
+            if (string_flag) {
+                str = va_arg(ap, char _generic *);
+                while (*str) putchar(*str++);
+                continue ;
+            }
 
-      if (long_flag)
-    val = va_arg(ap,long);
-      else
-    if (short_flag)
-        val = va_arg(ap,short);
-    else
-        val = va_arg(ap,int);
+            if (long_flag)
+                val = va_arg(ap,long);
+            else
+                if (short_flag)
+                    val = va_arg(ap,short);
+                else
+                    val = va_arg(ap,int);
 
-            switch (radix) {
-      case 10:
-    pvaldec(val) ;
-    break;
-      case 16:
-    pvalhex (val);
-    break;
-      case 0:
-    putchar((char)val);
-    break;
-      case 8:
-    pvaloct(val) ;
-    break;
-      }
+            if (radix) pval();
+            else putchar((char)val);
 
-  } else
-      putchar(*fmt);
+        } else
+            putchar(*fmt);
     }
 }

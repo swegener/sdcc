@@ -1,3 +1,9 @@
+2004-07-26 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* doc/sdccman.lyx: updated example in section "Absolute Addressing"
+	* src/mcs51/peeph.def: added contributed fix for "bug" #995347 as 
+	peephole 177.e. Thanks to anonymous
+
 2004-07-25 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/glue.c (pic16_printIvalFuncPtr): when an extern

@@ -1,13 +1,17 @@
+2003-10-13 Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCval.c (valMinus): fixed bug #826041
+
 2003-10-15 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	Some hc08 related updates that I missed earlier
 	* sim/ucsim/stypes.h
-        * support/regression/ports/hc08/spec.mk      
+        * support/regression/ports/hc08/spec.mk
 
 2003-10-15 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	New target "hc08" for the Motorola 68hc08 family of micros
-        
+
 	* configure
 	* configure.in
 	* Makefile
@@ -27,7 +31,7 @@
 	* support/regression/Makefile
 
 2003-10-14 Erik Petrich <epetrich@ivorytower.norman.ok.us>
-	
+
 	* src/z80/gen.c: fixed bug revealed by ast_constant_folding.c
 	regression test
 	* src/ds390/gen.c (genCast): fixed bug #821957

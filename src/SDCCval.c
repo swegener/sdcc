@@ -1297,7 +1297,7 @@ valMinus (value * lval, value * rval)
     }
   SPEC_USIGN (val->type) = (SPEC_USIGN (lval->etype) | SPEC_USIGN (rval->etype));
   if (IS_FLOAT (val->type))
-    SPEC_CVAL (val->type).v_float = floatFromVal (lval) + floatFromVal (rval);
+    SPEC_CVAL (val->type).v_float = floatFromVal (lval) - floatFromVal (rval);
   else
     {
       if (SPEC_USIGN (val->type))

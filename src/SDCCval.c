@@ -790,37 +790,37 @@ charVal (char *s)
       switch (*s)
 	{
 	case 'n':
-	  SPEC_CVAL (val->type).v_int = '\n';
+	  SPEC_CVAL (val->type).v_uint = '\n';
 	  break;
 	case 't':
-	  SPEC_CVAL (val->type).v_int = '\t';
+	  SPEC_CVAL (val->type).v_uint = '\t';
 	  break;
 	case 'v':
-	  SPEC_CVAL (val->type).v_int = '\v';
+	  SPEC_CVAL (val->type).v_uint = '\v';
 	  break;
 	case 'b':
-	  SPEC_CVAL (val->type).v_int = '\b';
+	  SPEC_CVAL (val->type).v_uint = '\b';
 	  break;
 	case 'r':
-	  SPEC_CVAL (val->type).v_int = '\r';
+	  SPEC_CVAL (val->type).v_uint = '\r';
 	  break;
 	case 'f':
-	  SPEC_CVAL (val->type).v_int = '\f';
+	  SPEC_CVAL (val->type).v_uint = '\f';
 	  break;
 	case 'a':
-	  SPEC_CVAL (val->type).v_int = '\a';
+	  SPEC_CVAL (val->type).v_uint = '\a';
 	  break;
 	case '\\':
-	  SPEC_CVAL (val->type).v_int = '\\';
+	  SPEC_CVAL (val->type).v_uint = '\\';
 	  break;
 	case '\?':
-	  SPEC_CVAL (val->type).v_int = '\?';
+	  SPEC_CVAL (val->type).v_uint = '\?';
 	  break;
 	case '\'':
-	  SPEC_CVAL (val->type).v_int = '\'';
+	  SPEC_CVAL (val->type).v_uint = '\'';
 	  break;
 	case '\"':
-	  SPEC_CVAL (val->type).v_int = '\"';
+	  SPEC_CVAL (val->type).v_uint = '\"';
 	  break;
 
 	case '0' :

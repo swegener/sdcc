@@ -119,6 +119,18 @@ static data unsigned int i2bcd_tmp;  // slow 32 int conversion needs temp space
 #define PRINTF_FAST printf_fast
 #endif
 
+
+#if !defined(SDCC_mcs51) || defined(SDCC_USE_XSTACK) || defined(_SDCC_NO_ASM_LIB_FUNCS)
+// Does printf_fast really work on ds390 and ds400?
+// If it does, enable them in the line above
+#if defined(SDCC_USE_XSTACK)
+#warning "printf_fast not built, does not support --xstack"
+#elif defined(_SDCC_NO_ASM_LIB_FUNCS)
+#warning "printf_fast not built, _SDCC_NO_ASM_LIB_FUNCS defined"
+#endif
+#else // defines are compatible with printf_fast
+
+
 void PRINTF_FAST(code char *fmt, ...) reentrant
 {
 	fmt;	/* supress unreferenced variable warning */
@@ -1735,5 +1747,5 @@ static code unsigned char frac2bcd[] = {
 #endif // FLOAT
 
 
-
+#endif // defines compatible with printf_fast
 

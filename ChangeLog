@@ -1,3 +1,17 @@
+2004-12-28 Paul Stoffregen <paul AT pjrc.com>
+
+	* device/lib/printf_fast.c: only build on supported arch.
+	* device/lib/printf_tiny.c: only build on supported arch.
+	* device/lib/printf_fast_f.c: only build if asm float lib
+	* device/lib/_fsget1arg.c: only build if asm float lib
+	* device/lib/_fsget2args.c: only build if asm float lib
+	* device/lib/_fsnormalize.c: only build if asm float lib
+	* device/lib/_fsreturnval.c: only build if asm float lib
+	* device/lib/_fsrshift.c: only build if asm float lib
+	* device/lib/_fsswapargs.c: only build if asm float lib
+	* device/include/stdio.h: don't provide print_fast,
+	  print_fast_f, print_tiny prototypes if --xstack used
+
 2004-12-28 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/sincosf.c (sincosf): don't invert bit/bool by ~

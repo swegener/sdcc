@@ -22,7 +22,7 @@
 #include <float.h>
 
 
-
+#ifdef FLOAT_ASM_MCS51
 
 static void dummy(void) _naked
 {
@@ -72,6 +72,7 @@ fsgetargs:
 	_endasm;
 }
 
+#endif
 
 
 

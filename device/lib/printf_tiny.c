@@ -54,6 +54,18 @@
 #define print_zero_flag PSW.5
 
 
+#if !defined(SDCC_mcs51) || defined(SDCC_USE_XSTACK) || defined(_SDCC_NO_ASM_LIB_FUNCS)
+// Does printf_tiny really work on ds390 and ds400?
+// If it does, enable them in the line above
+#if defined(SDCC_USE_XSTACK)
+#warning "printf_tiny not built, does not support --xstack"
+#elif defined(_SDCC_NO_ASM_LIB_FUNCS)
+#warning "printf_tiny not built, _SDCC_NO_ASM_LIB_FUNCS defined"
+#endif
+#else // defines are compatible with printf_tiny
+
+
+
 void printf_tiny(code char *fmt, ...) reentrant
 {
 	fmt;	/* supress unreferenced variable warning */
@@ -272,4 +284,6 @@ printf_end:
 	_endasm;
 }
 
+
+#endif // defines compatible with printf_tiny
 

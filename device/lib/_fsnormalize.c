@@ -21,6 +21,9 @@
 #define SDCC_FLOAT_LIB
 #include <float.h>
 
+
+#ifdef FLOAT_ASM_MCS51
+
 static void dummy(void) _naked
 {
 	_asm
@@ -70,3 +73,6 @@ fs_normalize_a:
 	ret
 	_endasm;
 }
+
+#endif
+

@@ -2887,6 +2887,18 @@ genPlusIncr (iCode * ic)
       AOP_SIZE (IC_LEFT (ic)) > 1)
     return FALSE;
 
+  /* If the result is in a register then we can load then increment.
+   */
+  if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG)
+    {
+      aopPut (AOP (IC_RESULT (ic)), aopGet (AOP (IC_LEFT (ic)), LSB, FALSE), LSB);
+      while (icount--)
+        {
+          emit2 ("inc %s", aopGet (AOP (IC_RESULT (ic)), LSB, FALSE));
+        }
+      return TRUE;
+    }
+
   /* we can if the aops of the left & result match or
      if they are in registers and the registers are the
      same */
@@ -3995,7 +4007,7 @@ genCmpEq (iCode * ic, iCode * ifx)
   aopOp ((right = IC_RIGHT (ic)), ic, FALSE, FALSE);
   aopOp ((result = IC_RESULT (ic)), ic, TRUE, FALSE);
 
-  emitDebug ("; genCmpEq: left %u, right %u, result %u\n", AOP_SIZE(IC_LEFT(ic)), AOP_SIZE(IC_RIGHT(ic)), AOP_SIZE(IC_RESULT(ic)));
+  emitDebug ("; genCmpEq: left %u, right %u, result %u", AOP_SIZE(IC_LEFT(ic)), AOP_SIZE(IC_RIGHT(ic)), AOP_SIZE(IC_RESULT(ic)));
 
   /* Swap operands if it makes the operation easier. ie if:
      1.  Left is a literal.

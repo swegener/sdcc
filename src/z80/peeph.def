@@ -108,3 +108,14 @@ replace restart {
 } by {
         ld	%1,a
 }
+replace restart {
+	jp	%1,%2
+	jr	%3
+%2:
+	jp	%4
+} by {
+	jp	%1,%4
+	jr	%3
+%2:
+	jp	%4
+}

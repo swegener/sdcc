@@ -40,4 +40,33 @@ replace {
 } by {
 	ld	[hl-],a
 }
-
+replace {
+	ld	(hl+),a
+	ld	(hl),d
+	dec	hl
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	a,(de)
+} by {
+	ld	(hl+),a
+	ld	(hl),d
+	ld	e,a
+	ld	a,(de)
+}
+replace {
+	ld	(hl),a
+	ld	%1,(hl)
+} by {
+        ld      (hl),a
+        ld      %1,a
+}
+replace {
+	ld	(hl),%1
+	ld	a,%2
+	sub	a,(hl)
+} by {
+	ld	(hl),%1
+	ld	a,%2
+	sub	a,%1
+}

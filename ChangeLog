@@ -1,3 +1,25 @@
+2001-11-03  Michael Hope  <michaelh@juju.net.nz>
+
+	* support/regression/tests/bug-477927.c: Added.
+
+	* src/z80/peeph.def: Added minor rules.
+
+	* src/z80/gen.c (genPlusIncr): Added an extra plusinc rule.
+
+	* src/z80/peeph.def: Added jump optimisation modification.
+
+2001-11-01  Michael Hope  <michaelh@juju.net.nz>
+
+	* src/SDCCmain.c (linkEdit): Added runtime path detection to the mcs51 port.
+
+2001-10-30  Michael Hope  <michaelh@juju.net.nz>
+
+	* support/regression/tests/funptrs.c: Added.
+
+2001-10-29  Michael Hope  <michaelh@juju.net.nz>
+
+	* src/z80/ralloc.c (packRegsForHLUse): Fixed up bad spill due to pushing one byte via HL.
+
 2001-10-28  Michael Hope  <michaelh@juju.net.nz>
 
 	* src/z80/gen.c (genArrayInit): Made it work for on stack arrays.

@@ -1027,6 +1027,8 @@ pointer
          {
 	     $$ = $1  ;		
 	     DCL_TSPEC($1) = $2;
+             DCL_PTR_CONST($1) = SPEC_CONST($2);
+             DCL_PTR_VOLATILE($1) = SPEC_VOLATILE($2);
 	 }
    | unqualified_pointer pointer         
          {
@@ -1054,7 +1056,6 @@ pointer
 		     DCL_TYPE($3) = POINTER ;
 		     break;
 		 case S_CODE:
-		     DCL_PTR_CONST($3) = 1;
 		     DCL_TYPE($3) = CPOINTER ;
 		     break;
 		 case S_EEPROM:

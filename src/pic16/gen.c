@@ -612,12 +612,20 @@ static asmop *aopForRemat (operand *op) // x symbol *sym)
 
   offset = OP_SYMBOL(IC_LEFT(ic))->offset;
   aop->aopu.pcop = pic16_popGetImmd(OP_SYMBOL(IC_LEFT(ic))->rname,0,val);
+#if 0
   PCOI(aop->aopu.pcop)->_const = IS_PTR_CONST(operandType(op));
+#else
+  PCOI(aop->aopu.pcop)->_const = IS_CODEPTR(operandType(op));
+#endif
   PCOI(aop->aopu.pcop)->index = val;
 
   DEBUGpic16_emitcode(";","%d: rname %s, val %d, const = %d",
 		      __LINE__,OP_SYMBOL(IC_LEFT(ic))->rname,
+#if 0
 		      val, IS_PTR_CONST(operandType(op)));
+#else
+		      val, IS_CODEPTR(operandType(op)));
+#endif
 
   //    DEBUGpic16_emitcode(";","aop type  %s",pic16_AopType(AOP_TYPE(IC_LEFT(ic))));
 
@@ -765,7 +773,11 @@ void pic16_aopOp (operand *op, iCode *ic, bool result)
 
     {
       sym_link *type = operandType(op);
+#if 0
       if(IS_PTR_CONST(type))
+#else
+      if(IS_CODEPTR(type))
+#endif
 	DEBUGpic16_emitcode(";","%d aop type is const pointer",__LINE__);
     }
 
@@ -872,7 +884,11 @@ void pic16_aopOp (operand *op, iCode *ic, bool result)
 
     {
       sym_link *type = operandType(op);
+#if 0
       if(IS_PTR_CONST(type)) 
+#else
+      if(IS_CODEPTR(type)) 
+#endif
 	DEBUGpic16_emitcode(";","%d aop type is const pointer",__LINE__);
     }
 
@@ -8402,7 +8418,11 @@ static void genPointerGet (iCode *ic)
     type = operandType(left);
     etype = getSpec(type);
 
+#if 0
     if (IS_PTR_CONST(type))
+#else
+    if (IS_CODEPTR(type))
+#endif
       DEBUGpic16_emitcode ("; ***","%d - const pointer",__LINE__);
 
     /* if left is of type of pointer then it is simple */
@@ -8458,9 +8478,11 @@ static void genPointerGet (iCode *ic)
 	break;
 
     case GPOINTER:
+#if 0
       if (IS_PTR_CONST(type))
 	genConstPointerGet (left,result,ic);
       else
+#endif
 	genGenPointerGet (left,result,ic);
       break;
     }
@@ -9637,9 +9659,17 @@ static void genCast (iCode *ic)
 	goto release;
 
       DEBUGpic16_emitcode("; ***","%s  %d",__FUNCTION__,__LINE__);
+#if 0
       if (IS_PTR_CONST(rtype))
+#else
+      if (IS_CODEPTR(rtype))
+#endif
 	DEBUGpic16_emitcode ("; ***","%d - right is const pointer",__LINE__);
+#if 0
       if (IS_PTR_CONST(operandType(IC_RESULT(ic))))
+#else
+      if (IS_CODEPTR(operandType(IC_RESULT(ic))))
+#endif
 	DEBUGpic16_emitcode ("; ***","%d - result is const pointer",__LINE__);
 
       if ((AOP_TYPE(right) == AOP_PCODE) && AOP(right)->aopu.pcop->type == PO_IMMEDIATE) {

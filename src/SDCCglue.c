@@ -289,7 +289,10 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	  SPEC_OCLS(newSym->etype)=xinit;
 	  SNPRINTF (newSym->name, sizeof(newSym->name), "__xinit_%s", sym->name);
 	  SNPRINTF (newSym->rname, sizeof(newSym->rname), "__xinit_%s", sym->rname);
-	  SPEC_CONST(newSym->etype)=1;
+	  if (IS_SPEC (newSym->type))
+            SPEC_CONST (newSym->type) = 1;
+          else
+            DCL_PTR_CONST (newSym->type) = 1;
 	  SPEC_STAT(newSym->etype)=1;
 	  resolveIvalSym(newSym->ival);
 

@@ -25,6 +25,7 @@
 #include "newalloc.h"
 
 value *aggregateToPointer (value *val);
+void printTypeChainRaw (sym_link * start, FILE * of);
 
 void printFromToType(sym_link *from, sym_link *to) {
   fprintf (stderr, "from type '");
@@ -349,8 +350,6 @@ pointerTypes (sym_link * ptr, sym_link * type)
      storage class of the type */
   if (IS_SPEC (type))
     {
-      DCL_PTR_CONST (ptr) = SPEC_CONST (type);
-      DCL_PTR_VOLATILE (ptr) = SPEC_VOLATILE (type);
       switch (SPEC_SCLS (type))
 	{
 	case S_XDATA:
@@ -366,7 +365,6 @@ pointerTypes (sym_link * ptr, sym_link * type)
 	  DCL_TYPE (ptr) = POINTER;
 	  break;
 	case S_CODE:
-	  DCL_PTR_CONST (ptr) = port->mem.code_ro;
 	  DCL_TYPE (ptr) = CPOINTER;
 	  break;
 	case S_EEPROM:
@@ -377,9 +375,7 @@ pointerTypes (sym_link * ptr, sym_link * type)
 	  break;
 	}
       /* the storage class of type ends here */
-      SPEC_SCLS (type) = 
-	SPEC_CONST (type) =
-	SPEC_VOLATILE (type) = 0;
+      SPEC_SCLS (type) = 0;
     }
 
   /* now change all the remaining unknown pointers
@@ -399,7 +395,6 @@ pointerTypes (sym_link * ptr, sym_link * type)
 	DCL_TYPE (type) = port->unqualified_pointer;
       type = type->next;
     }
-
 }
 
 /*------------------------------------------------------------------*/
@@ -472,8 +467,6 @@ addDecl (symbol * sym, int type, sym_link * p)
 	  sym->etype = sym->etype->next = newLink (SPECIFIER);
 	}
       SPEC_SCLS (sym->etype) = SPEC_SCLS (DCL_TSPEC (p));
-      SPEC_CONST (sym->etype) = SPEC_CONST (DCL_TSPEC (p));
-      SPEC_VOLATILE (sym->etype) = SPEC_VOLATILE (DCL_TSPEC (p));
       DCL_TSPEC (p) = NULL;
     }
 
@@ -1161,11 +1154,13 @@ compStructSize (int su, structdef * sdef)
 static void 
 checkSClass (symbol * sym, int isProto)
 {
+  sym_link *t;
+  
   if (getenv("DEBUG_SANITY")) {
     fprintf (stderr, "checkSClass: %s \n", sym->name);
   }
   
-  /* type is literal can happen foe enums change
+  /* type is literal can happen for enums change
      to auto */
   if (SPEC_SCLS (sym->etype) == S_LITERAL && !SPEC_ENUM (sym->etype))
     SPEC_SCLS (sym->etype) = S_AUTO;
@@ -1188,24 +1183,46 @@ checkSClass (symbol * sym, int isProto)
     if (IS_ABSOLUTE (sym->etype))
       SPEC_VOLATILE (sym->etype) = 1;
   
+  /* If code memory is read only, then pointers to code memory */
+  /* implicitly point to constants -- make this explicit       */
+  t = sym->type;
+  while (t && t->next) {
+    if (IS_CODEPTR(t) && port->mem.code_ro) {
+      if (IS_SPEC(t->next)) {
+        SPEC_CONST (t->next) = 1;
+      } else {
+        DCL_PTR_CONST (t->next) = 1;
+      }
+    }
+    t = t->next;
+  }
 
   /* global variables declared const put into code */
   /* if no other storage class specified */
   if (sym->level == 0 &&
-      SPEC_CONST (sym->etype) &&
       SPEC_SCLS(sym->etype) == S_FIXED &&
       !IS_FUNC(sym->type)) {
-    SPEC_SCLS (sym->etype) = S_CODE;
+    /* find the first non-array link */
+    t = sym->type;
+    while (IS_ARRAY(t))
+      t = t->next;
+    if (IS_CONSTANT (t)) {
+      SPEC_SCLS (sym->etype) = S_CODE;
+    }
   }
 
   /* global variable in code space is a constant */
   if (sym->level == 0 &&
       SPEC_SCLS (sym->etype) == S_CODE &&
       port->mem.code_ro) {
-    if (IS_SPEC(sym->type)) {
-      SPEC_CONST (sym->type) = 1;
+    /* find the first non-array link */
+    t = sym->type;
+    while (IS_ARRAY(t))
+      t = t->next;
+    if (IS_SPEC(t)) {
+      SPEC_CONST (t) = 1;
     } else {
-      DCL_PTR_CONST (sym->type) = 1;
+      DCL_PTR_CONST (t) = 1;
     }
   }
 
@@ -1228,7 +1245,7 @@ checkSClass (symbol * sym, int isProto)
       sym->ival = NULL;
     }
 
-  /* if this is an atomatic symbol */
+  /* if this is an automatic symbol */
   if (sym->level && (options.stackAuto || reentrant)) {
     if ((SPEC_SCLS (sym->etype) == S_AUTO ||
 	 SPEC_SCLS (sym->etype) == S_FIXED ||
@@ -1451,6 +1468,10 @@ computeType (sym_link * type1, sym_link * type2)
     rType = copyLinkChain (type2);
 
   reType = getSpec (rType);
+#if 0
+  if (SPEC_NOUN (reType) == V_CHAR)
+    SPEC_NOUN (reType) = V_INT;
+#endif
 
   /* if either of them unsigned but not val then make this unsigned */
   if (((/*!IS_LITERAL(type1) &&*/ SPEC_USIGN (etype1)) ||
@@ -2011,7 +2032,10 @@ printTypeChain (sym_link * start, FILE * of)
 
   for (type = start; type && type->next; type = type->next)
     ;
-  scls=SPEC_SCLS(type);
+  if (IS_SPEC (type))
+    scls=SPEC_SCLS(type);
+  else
+    scls=0;
   while (type)
     {
       if (type==start) {
@@ -2081,7 +2105,7 @@ printTypeChain (sym_link * start, FILE * of)
 	      fprintf (of, "pdata* ");
 	      break;
 	    case UPOINTER:
-	      fprintf (of, "unkown* ");
+	      fprintf (of, "unknown* ");
 	      break;
 	    case ARRAY:
 	      if (DCL_ELEM(type)) {
@@ -2149,6 +2173,176 @@ printTypeChain (sym_link * start, FILE * of)
       for (search = start; search && search->next != type;)
 	search = search->next;
       type = search;
+      if (type)
+	fputc (' ', of);
+    }
+  if (nlr)
+    fprintf (of, "\n");
+}
+
+/*--------------------------------------------------------------------*/
+/* printTypeChainRaw - prints the type chain in human readable form   */
+/*                     in the raw data structure ordering             */
+/*--------------------------------------------------------------------*/
+void
+printTypeChainRaw (sym_link * start, FILE * of)
+{
+  int nlr = 0;
+  value *args;
+  sym_link * type;
+
+  if (!of)
+    {
+      of = stdout;
+      nlr = 1;
+    }
+
+  if (start==NULL) {
+    fprintf (of, "void");
+    return;
+  }
+
+  type = start;
+  
+  while (type)
+    {
+      if (IS_DECL (type))
+	{
+	  if (!IS_FUNC(type)) {
+	    if (DCL_PTR_VOLATILE (type)) {
+	      fprintf (of, "volatile-");
+	    }
+	    if (DCL_PTR_CONST (type)) {
+	      fprintf (of, "const-");
+	    }
+	  }
+	  switch (DCL_TYPE (type))
+	    {
+	    case FUNCTION:
+	      fprintf (of, "function %s %s", 
+		       (IFFUNC_ISBUILTIN(type) ? "__builtin__" : " "),
+		       (IFFUNC_ISJAVANATIVE(type) ? "_JavaNative" : " "));
+	      fprintf (of, "( ");
+	      for (args = FUNC_ARGS(type); 
+	           args; 
+		   args=args->next) {
+		printTypeChain(args->type, of);
+		if (args->next)
+		  fprintf(of, ", ");
+	      }
+	      fprintf (of, ") ");
+	      break;
+	    case GPOINTER:
+	      fprintf (of, "generic* ");
+	      break;
+	    case CPOINTER:
+	      fprintf (of, "code* ");
+	      break;
+	    case FPOINTER:
+	      fprintf (of, "xdata* ");
+	      break;
+	    case EEPPOINTER:
+	      fprintf (of, "eeprom* ");
+	      break;
+	    case POINTER:
+	      fprintf (of, "near* ");
+	      break;
+	    case IPOINTER:
+	      fprintf (of, "idata* ");
+	      break;
+	    case PPOINTER:
+	      fprintf (of, "pdata* ");
+	      break;
+	    case UPOINTER:
+	      fprintf (of, "unknown* ");
+	      break;
+	    case ARRAY:
+	      if (DCL_ELEM(type)) {
+		fprintf (of, "[%d] ", DCL_ELEM(type));
+	      } else {
+		fprintf (of, "[] ");
+	      }
+	      break;
+	    }
+          if (DCL_TSPEC(type))
+            {
+              fprintf (of, "{");
+              printTypeChainRaw(DCL_TSPEC(type), of);
+              fprintf (of, "}");
+            }
+	}
+      else if (IS_SPEC (type))
+	{
+	switch (SPEC_SCLS (type)) 
+	  {
+	  case S_DATA: fprintf (of, "data-"); break;
+	  case S_XDATA: fprintf (of, "xdata-"); break;
+	  case S_SFR: fprintf (of, "sfr-"); break;
+	  case S_SBIT: fprintf (of, "sbit-"); break;
+	  case S_CODE: fprintf (of, "code-"); break;
+	  case S_IDATA: fprintf (of, "idata-"); break;
+	  case S_PDATA: fprintf (of, "pdata-"); break;
+	  case S_LITERAL: fprintf (of, "literal-"); break;
+	  case S_STACK: fprintf (of, "stack-"); break;
+	  case S_XSTACK: fprintf (of, "xstack-"); break;
+	  case S_BIT: fprintf (of, "bit-"); break;
+	  case S_EEPROM: fprintf (of, "eeprom-"); break;
+	  default: break;
+	  }
+	  if (SPEC_VOLATILE (type))
+	    fprintf (of, "volatile-");
+	  if (SPEC_CONST (type))
+	    fprintf (of, "const-");
+	  if (SPEC_USIGN (type))
+	    fprintf (of, "unsigned-");
+	  switch (SPEC_NOUN (type))
+	    {
+	    case V_INT:
+	      if (IS_LONG (type))
+		fprintf (of, "long-");
+	      fprintf (of, "int");
+	      break;
+
+	    case V_CHAR:
+	      fprintf (of, "char");
+	      break;
+
+	    case V_VOID:
+	      fprintf (of, "void");
+	      break;
+
+	    case V_FLOAT:
+	      fprintf (of, "float");
+	      break;
+
+	    case V_STRUCT:
+	      fprintf (of, "struct %s", SPEC_STRUCT (type)->tag);
+	      break;
+
+	    case V_SBIT:
+	      fprintf (of, "sbit");
+	      break;
+
+	    case V_BIT:
+	      fprintf (of, "bit");
+	      break;
+
+	    case V_BITFIELD:
+	      fprintf (of, "bitfield {%d,%d}", SPEC_BSTR (type), SPEC_BLEN (type));
+	      break;
+
+	    case V_DOUBLE:
+	      fprintf (of, "double");
+	      break;
+
+	    default:
+	      fprintf (of, "unknown type");
+	      break;
+	    }
+	}
+      else
+        fprintf (of, "NOT_SPEC_OR_DECL");
+      type = type->next;
       if (type)
 	fputc (' ', of);
     }

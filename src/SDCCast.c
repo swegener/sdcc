@@ -2056,9 +2056,6 @@ decorateType (ast * tree)
 	}
       RRVAL (tree) = 1;
       COPYTYPE (TTYPE (tree), TETYPE (tree), LTYPE (tree)->next);
-      if (IS_PTR(LTYPE(tree))) {
-	SPEC_CONST (TETYPE (tree)) = DCL_PTR_CONST (LTYPE(tree));
-      }
       return tree;
 
       /*------------------------------------------------------------------*/
@@ -2134,12 +2131,12 @@ decorateType (ast * tree)
       /*----------------------------*/
       /*  ++/-- operation           */
       /*----------------------------*/
-    case INC_OP:		/* incerement operator unary so left only */
+    case INC_OP:		/* increment operator unary so left only */
     case DEC_OP:
       {
 	sym_link *ltc = (tree->right ? RTYPE (tree) : LTYPE (tree));
 	COPYTYPE (TTYPE (tree), TETYPE (tree), ltc);
-	if (!tree->initMode && IS_CONSTANT(TETYPE(tree)))
+        if (!tree->initMode && IS_CONSTANT(TTYPE(tree)))
 	  werror (E_CODE_WRITE, tree->opval.op==INC_OP ? "++" : "--");
 
 	if (tree->right)
@@ -2235,10 +2232,7 @@ decorateType (ast * tree)
 	  goto errorTreeReturn;
 	}
       if (SPEC_SCLS (tree->left->etype) == S_CODE)
-	{
-	  DCL_TYPE (p) = CPOINTER;
-	  DCL_PTR_CONST (p) = port->mem.code_ro;
-	}
+	DCL_TYPE (p) = CPOINTER;
       else if (SPEC_SCLS (tree->left->etype) == S_XDATA)
 	DCL_TYPE (p) = FPOINTER;
       else if (SPEC_SCLS (tree->left->etype) == S_XSTACK)
@@ -2261,8 +2255,6 @@ decorateType (ast * tree)
       p->next = LTYPE (tree);
       TTYPE (tree) = p;
       TETYPE (tree) = getSpec (TTYPE (tree));
-      DCL_PTR_CONST (p) = SPEC_CONST (TETYPE (tree));   
-      DCL_PTR_VOLATILE (p) = SPEC_VOLATILE (TETYPE (tree)); 
       LLVAL (tree) = 1;
       TLVAL (tree) = 1;
       return tree;
@@ -2393,8 +2385,7 @@ decorateType (ast * tree)
 	      goto errorTreeReturn;
 	    }
 	  TTYPE (tree) = copyLinkChain (LTYPE (tree)->next);
- 	  TETYPE (tree) = getSpec (TTYPE (tree));
-	  SPEC_CONST (TETYPE (tree)) = DCL_PTR_CONST (LTYPE(tree));
+	  TETYPE (tree) = getSpec (TTYPE (tree));
 	  return tree;
 	}
 
@@ -3245,7 +3236,7 @@ decorateType (ast * tree)
       RRVAL (tree) = 1;
       LLVAL (tree) = 1;
       if (!tree->initMode ) {
-	if ((IS_SPEC(LETYPE(tree)) && IS_CONSTANT (LETYPE (tree))))
+        if (IS_CONSTANT(LTYPE(tree)))
 	  werror (E_CODE_WRITE, "=");
       }
       if (LRVAL (tree))

@@ -541,6 +541,7 @@ void processFuncArgs (symbol *);
 int isSymbolEqual (symbol *, symbol *);
 int powof2 (unsigned long);
 void printTypeChain (sym_link *, FILE *);
+void printTypeChainRaw (sym_link *, FILE *);
 void initCSupport ();
 void initBuiltIns ();
 void pointerTypes (sym_link *, sym_link *);

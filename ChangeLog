@@ -1,3 +1,22 @@
+2003-09-12  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	Fixed bug #621531 (const & volatile confusion in the type chain).
+	DCL_PTR_CONST, DCL_PTR_VOLATILE, & IS_PTR_CONST now exclusively
+	refer to the const or volatile state of the pointer itself.
+
+	* src/SDCCast.c
+	* src/SDCCglue.c
+	* src/SDCCicode.c
+	* src/SDCCsymt.c
+	* src/SDCCval.c
+	* src/SDCC.y
+	* src/SDCCsymt.h 
+	* src/pic/gen.c
+	* src/pic/ralloc.c
+	* src/pic16/gen.c
+	* src/pic16/ralloc.c
+	* support/regression/tests/const.c
+
 2003-09-10  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	When checking for duplicated modules, use absolute paths

@@ -2504,7 +2504,11 @@ regTypeNum ()
 		    getSize (sym->type));
 
 
+#if 0
     if(IS_PTR_CONST (sym->type)) {
+#else
+    if(IS_CODEPTR (sym->type)) {
+#endif
       debugLog ("  %d const pointer type requires %d registers, changing to 2\n",__LINE__,sym->nRegs);
       sym->nRegs = 2;
     }
@@ -3501,7 +3505,11 @@ packRegisters (eBBlock * ebp)
       sym_link *etype = getSpec (operandType (IC_LEFT (ic)));
 
       debugAopGet ("  left:", IC_LEFT (ic));
+#if 0
       if(IS_PTR_CONST(OP_SYMBOL(IC_LEFT(ic))->type))
+#else
+      if(IS_CODEPTR(OP_SYMBOL(IC_LEFT(ic))->type))
+#endif
 	debugLog ("    is a pointer\n");
 
       if(IS_OP_VOLATILE(IC_LEFT(ic)))

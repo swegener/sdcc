@@ -1078,10 +1078,10 @@ ast * initAggregates (symbol * sym, initList * ival, ast * wid) {
       fprintf (statsg->oFile, ";	copy initial data from cseg _init_%s to %s\n", 
 	       sym->name, sym->name);
       fprintf (statsg->oFile, "	mov dptr,#_memcpy_PARM_2\n");
-      fprintf (statsg->oFile, "	mov a,#_%s\n", sym->name);
+      fprintf (statsg->oFile, "	mov a,#_init_%s\n", sym->name);
       fprintf (statsg->oFile, "	movx @dptr,a\n");
       fprintf (statsg->oFile, "	inc dptr\n");
-      fprintf (statsg->oFile, "	mov a,#(_%s>>8)\n", sym->name);
+      fprintf (statsg->oFile, "	mov a,#(_init_%s>>8)\n", sym->name);
       fprintf (statsg->oFile, "	movx @dptr,a\n");
       fprintf (statsg->oFile, "	inc dptr\n");
       fprintf (statsg->oFile, "	mov a,#%02x;	from cseg\n", 1);
@@ -1092,7 +1092,7 @@ ast * initAggregates (symbol * sym, initList * ival, ast * wid) {
       fprintf (statsg->oFile, "	inc dptr\n");
       fprintf (statsg->oFile, "	mov a,#(%d>>8)\n", count);
       fprintf (statsg->oFile, "	movx @dptr,a\n");
-      fprintf (statsg->oFile, "	mov dptr,#_init_%s\n", sym->name);
+      fprintf (statsg->oFile, "	mov dptr,#_%s\n", sym->name);
       fprintf (statsg->oFile, "	mov b,#%02x;	only to xseg for now\n", 2);
       fprintf (statsg->oFile, "	lcall _memcpy\n");
       

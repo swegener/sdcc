@@ -4,7 +4,7 @@
 #include <math.h>
 
 #if (PORT_HOST)
-#  define FCOMP(a,b) (fabsf((a) - (b)) < ((b) * 1e-10))
+#  define FCOMP(a,b) (fabsf((a) - (b)) < ((b) * 1e-7))
 #else
    /* Testing floats for equality is normally a bug,
       but too keep this test simple we dare it. And

@@ -685,7 +685,6 @@ processParms (ast * func,
 
       if (IS_AGGREGATE (ftype))
 	{
-	  // jwk: don't we need aggregateToPointer here?
 	  newType = newAst_LINK (copyLinkChain (ftype));
 	  DCL_TYPE (newType->opval.lnk) = GPOINTER;
 	}
@@ -1828,31 +1827,6 @@ pushTypeCastToLeaves (sym_link * type, ast * node, ast ** parentPtr)
 #endif
 
 /*-----------------------------------------------------------------*/
-/* Given an assignment operation in a tree, determine if the LHS   */
-/* (the result) has a different (integer) type than the RHS.     */
-/* If so, walk the RHS and add a typecast to the type of the LHS   */
-/* to all leaf nodes.              */
-/*-----------------------------------------------------------------*/
-void 
-propAsgType (ast * tree)
-{
-#ifdef DEMAND_INTEGER_PROMOTION
-  if (!IS_INTEGRAL (LTYPE (tree)) || !IS_INTEGRAL (RTYPE (tree)))
-    {
-      /* Nothing to do here... */
-      return;
-    }
-
-  if (getSize (LTYPE (tree)) > getSize (RTYPE (tree)))
-    {
-      pushTypeCastToLeaves (LTYPE (tree), tree->right, &(tree->right));
-    }
-#else
-  (void) tree;
-#endif
-}
-
-/*-----------------------------------------------------------------*/
 /* decorateType - compute type for this tree also does type cheking */
 /*          this is done bottom up, since type have to flow upwards */
 /*          it also does constant folding, and paramater checking  */
@@ -2940,8 +2914,6 @@ decorateType (ast * tree)
 	}
       LLVAL (tree) = 1;
 
-      propAsgType (tree);
-
       return tree;
 
     case AND_ASSIGN:
@@ -2968,8 +2940,6 @@ decorateType (ast * tree)
 	  goto errorTreeReturn;
 	}
       LLVAL (tree) = 1;
-
-      propAsgType (tree);
 
       return tree;
 
@@ -3005,8 +2975,6 @@ decorateType (ast * tree)
 	  goto errorTreeReturn;
 	}
       LLVAL (tree) = 1;
-
-      propAsgType (tree);
 
       return tree;
 
@@ -3050,8 +3018,6 @@ decorateType (ast * tree)
 
       tree->right = decorateType (newNode ('+', copyAst (tree->left), tree->right));
       tree->opval.op = '=';
-
-      propAsgType (tree);
 
       return tree;
 
@@ -3106,8 +3072,6 @@ decorateType (ast * tree)
 	  werror (E_LVALUE_REQUIRED, "=");
 	  goto errorTreeReturn;
 	}
-
-      propAsgType (tree);
 
       return tree;
 
@@ -3171,19 +3135,10 @@ decorateType (ast * tree)
       /* if there is going to be a casing required then add it */
       if (compareType (currFunc->type->next, RTYPE (tree)) < 0)
 	{
-#if 0 && defined DEMAND_INTEGER_PROMOTION
-	  if (IS_INTEGRAL (currFunc->type->next))
-	    {
-	      pushTypeCastToLeaves (currFunc->type->next, tree->right, &(tree->right));
-	    }
-	  else
-#endif
-	    {
-	      tree->right =
-		decorateType (newNode (CAST,
-			 newAst_LINK (copyLinkChain (currFunc->type->next)),
-				       tree->right));
-	    }
+	  tree->right =
+	    decorateType (newNode (CAST,
+			   newAst_LINK (copyLinkChain (currFunc->type->next)),
+				   tree->right));
 	}
 
       RRVAL (tree) = 1;

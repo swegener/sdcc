@@ -91,7 +91,8 @@ static void saverbank (int, iCode *,bool);
                          IC_RESULT(x)->aop->type == AOP_STK )
 
 #define MOVA(x) if (strcmp(x,"a") && strcmp(x,"acc")) emitcode("mov","a,%s",x);
-#define CLRC    emitcode("clr","c");
+#define CLRC    emitcode("clr","c")
+#define SETC    emitcode("setb","c")
 
 static lineNode *lineHead = NULL;
 static lineNode *lineCurr = NULL;
@@ -1368,15 +1369,19 @@ static void genUminus (iCode *ic)
     /* otherwise subtract from zero */
     size = AOP_SIZE(IC_LEFT(ic));
     offset = 0 ;
-    CLRC ;
+    //CLRC ;
     while(size--) {
         char *l = aopGet(AOP(IC_LEFT(ic)),offset,FALSE,FALSE);
         if (!strcmp(l,"a")) {
-            emitcode("cpl","a");
-            emitcode("inc","a");
+	  if (offset==0)
+	    SETC;
+	  emitcode("cpl","a");
+	  emitcode("addc","a,#0");
         } else {
-            emitcode("clr","a");
-            emitcode("subb","a,%s",l);
+	  if (offset==0)
+	    CLRC;
+	  emitcode("clr","a");
+	  emitcode("subb","a,%s",l);
         }       
         aopPut(AOP(IC_RESULT(ic)),"a",offset++);
     }

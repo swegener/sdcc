@@ -1,3 +1,14 @@
+2003-10-30 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	Fixed a number of problems revealed by bug #827883.
+	* src/SDCCloop.c (loopInvariants): Spill location of the
+	result operand should be recomputed if extracted from
+	a loop. Also, don't extract assignments of an iTemp
+	from a literal.
+	* src/SDCCast.c (isConformingBody): loop reversal should
+	not occur if the control variable is involved with a
+	relational operator.
+
 2003-10-28 Bernhard Held <bernhard@bernhardheld.de>
 
 	* .version: bumped to 2.3.6 to reflect the big improvements

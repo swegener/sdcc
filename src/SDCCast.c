@@ -1682,6 +1682,14 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
     case '?':
     case ':':
     case SIZEOF:		/* evaluate wihout code generation */
+      
+      if (IS_AST_SYM_VALUE (pbody->left) &&
+	  isSymbolEqual (AST_SYMBOL (pbody->left), sym))
+	return FALSE;
+
+      if (IS_AST_SYM_VALUE (pbody->right) &&
+	  isSymbolEqual (AST_SYMBOL (pbody->right), sym))
+	return FALSE;
 
       return isConformingBody (pbody->left, sym, body) &&
 	isConformingBody (pbody->right, sym, body);

@@ -464,6 +464,13 @@ loopInvariants (region * theLoop, eBBlock ** ebbs, int count)
 
 	  if (SKIP_IC (ic) || POINTER_SET (ic) || ic->op == IFX)
 	    continue;
+	  
+	  /* iTemp assignment from a literal may be invariant, but it
+	     will needlessly increase register pressure if the
+	     iCode(s) that use this iTemp are not also invariant */
+	  if (ic->op=='=' && IS_ITEMP (IC_RESULT (ic))
+	      && IS_OP_LITERAL (IC_RIGHT (ic)))
+	    continue;
 
 	  /* if result is volatile then skip */
 	  if (IC_RESULT (ic) &&
@@ -507,7 +514,8 @@ loopInvariants (region * theLoop, eBBlock ** ebbs, int count)
 	      applyToSet (theLoop->regBlocks, hasNonPtrUse, IC_LEFT (ic)))
 	    continue;
 
-	  /* if both the left & right are invariants : then check that */
+
+          /* if both the left & right are invariants : then check that */
 	  /* this definition exists in the out definition of all the  */
 	  /* blocks, this will ensure that this is not assigned any   */
 	  /* other value in the loop , and not used in this block     */
@@ -518,7 +526,7 @@ loopInvariants (region * theLoop, eBBlock ** ebbs, int count)
 	      eBBlock *sBlock;
 	      set *lSet = setFromSet (theLoop->regBlocks);
 
-	      /* if this block does not dominate all exists */
+	      /* if this block does not dominate all exits */
 	      /* make sure this defintion is not used anywhere else */
 	      if (!domsAllExits)
 		{
@@ -567,7 +575,9 @@ loopInvariants (region * theLoop, eBBlock ** ebbs, int count)
 	      /* now we know it is a true invariant */
 	      /* remove it from the insts chain & put */
 	      /* in the invariant set                */
-	      OP_SYMBOL (IC_RESULT (ic))->isinvariant = 1;
+	      
+              OP_SYMBOL (IC_RESULT (ic))->isinvariant = 1;
+              SPIL_LOC (IC_RESULT (ic)) = NULL;
 	      remiCodeFromeBBlock (lBlock, ic);
 
 	      /* maintain the data flow */

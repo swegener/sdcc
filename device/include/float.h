@@ -48,27 +48,27 @@
 #define NORM            0xff000000
 #define PACK(s,e,m)	((s) | ((e) << 23) | (m))
 
-float _uchar2fs (unsigned char);
-float _schar2fs (signed char);
-float _uint2fs (unsigned int);
-float _sint2fs (signed int);
-float _ulong2fs (unsigned long);
-float _slong2fs (signed long);
-unsigned char _fs2uchar (float);
-signed char _fs2schar (float);
-unsigned int _fs2uint (float);
-signed int _fs2sint (float);
-unsigned long _fs2ulong (float);
-signed long _fs2slong (float);
+float __uchar2fs (unsigned char);
+float __schar2fs (signed char);
+float __uint2fs (unsigned int);
+float __sint2fs (signed int);
+float __ulong2fs (unsigned long);
+float __slong2fs (signed long);
+unsigned char __fs2uchar (float);
+signed char __fs2schar (float);
+unsigned int __fs2uint (float);
+signed int __fs2sint (float);
+unsigned long __fs2ulong (float);
+signed long __fs2slong (float);
 
-float _fsadd (float, float);
-float _fssub (float, float);
-float _fsmul (float, float);
-float _fsdiv (float, float);
+float __fsadd (float, float);
+float __fssub (float, float);
+float __fsmul (float, float);
+float __fsdiv (float, float);
 
-char _fslt (float, float);
-char _fseq (float, float);
-char _fsqt (float, float);
+char __fslt (float, float);
+char __fseq (float, float);
+char __fsqt (float, float);
 
 #endif
 

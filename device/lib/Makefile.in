@@ -57,7 +57,8 @@ SOURCES		= _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
 		  _strstr.c _strtok.c _uchar2fs.c _uint2fs.c \
 		  _ulong2fs.c malloc.c serial.c ser_ir.c printfl.c \
 		  printf_large.c vprintf.c puts.c gets.c \
-		  assert.c _strcat.c time.c printf_fast.c
+		  assert.c _strcat.c time.c printf_fast.c \
+		  _mulint.c _mullong.c
 
 OBJECTS		= $(patsubst %.c,$(PORTDIR)/%.rel,$(SOURCES))
 
@@ -73,7 +74,7 @@ Z80SOURCES      = _atoi.c \
 		  puts.c gets.c \
 		  assert.c _strcat.c \
 		  _modslong.c _modulong.c \
-		  _mulslong.c _mululong.c \
+		  _mulslong.c _mululong.c _mulint.c _mullong.c \
 		  _divslong.c _divulong.c
 
 Z80OBJECTS      = $(Z80SOURCES:%.c=$(PORTDIR)/%.o)

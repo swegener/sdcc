@@ -1,3 +1,8 @@
+2003-10-12 Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/mcs51/gen.c (genCpl): fixed bug
+	http://sf.net/mailarchive/message.php?msg_id=6263915
+
 2003-10-10 Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCast.c (decorateType): added extended constant folding

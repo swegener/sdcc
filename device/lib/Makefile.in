@@ -23,6 +23,7 @@ exec_prefix     = @exec_prefix@
 bindir          = @bindir@
 libdir          = @libdir@
 datadir         = @datadir@
+sdcc_datadir    = @sdcc_datadir@
 includedir      = @includedir@
 mandir          = @mandir@
 man1dir         = $(mandir)/man1
@@ -83,26 +84,26 @@ modelDS390:
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: installDS390
-	$(CP) *.c $(datadir)/lib/
+	$(CP) *.c $(sdcc_datadir)/lib/
 	for model in $(MODELS); do \
 	 [ -d $$model ] || $(MAKE) all; \
-	 $(CP) $$model/*.rel *.lib $(datadir)/lib/$$model/; \
-	 $(CP) $$model/*.asm $(datadir)/lib/$$model/; \
-	 $(CP) $$model/*.cdb $(datadir)/lib/$$model/; \
+	 $(CP) $$model/*.rel *.lib $(sdcc_datadir)/lib/$$model/; \
+	 $(CP) $$model/*.asm $(sdcc_datadir)/lib/$$model/; \
+	 $(CP) $$model/*.cdb $(sdcc_datadir)/lib/$$model/; \
 	done
 
 installDS390: installdirs
-	$(CP) ds390/*.lib ds390/*.rel ds390/*.asm ds390/*.cdb $(datadir)/lib/ds390
+	$(CP) ds390/*.lib ds390/*.rel ds390/*.asm ds390/*.cdb $(sdcc_datadir)/lib/ds390
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	for hdr in ../include/*.h; do rm -f $(datadir)/include/$$hdr; done
-	for cfl in *.c; do rm -f $(datadir)/lib/$$cfl; done
+	for hdr in ../include/*.h; do rm -f $(sdcc_datadir)/include/$$hdr; done
+	for cfl in *.c; do rm -f $(sdcc_datadir)/lib/$$cfl; done
 	for model in $(MODELS); do \
-	  rm -rf $(datadir)/lib/$$model; \
+	  rm -rf $(sdcc_datadir)/lib/$$model; \
 	done
-	rm -rf $(datadir)/lib/ds390
+	rm -rf $(sdcc_datadir)/lib/ds390
 
 
 # Performing self-test
@@ -118,12 +119,12 @@ installcheck:
 # Creating installation directories
 # ---------------------------------
 installdirs:
-	[ -d $(datadir)/lib ] || mkdir -p $(datadir)/lib
+	[ -d $(sdcc_datadir)/lib ] || mkdir -p $(sdcc_datadir)/lib
 	for model in $(MODELS); do \
-	 [ -d $(datadir)/lib/$$model ] || \
-	 mkdir -p $(datadir)/lib/$$model; \
+	 [ -d $(sdcc_datadir)/lib/$$model ] || \
+	 mkdir -p $(sdcc_datadir)/lib/$$model; \
 	done
-	[ -d $(datadir)/lib/ds390 ] || mkdir -p $(datadir)/lib/ds390
+	[ -d $(sdcc_datadir)/lib/ds390 ] || mkdir -p $(sdcc_datadir)/lib/ds390
 
 # Creating dependencies
 # ---------------------

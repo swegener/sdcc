@@ -182,14 +182,24 @@ if test "${prefix}" = "NONE"; then
 fi
 
 config_in=`pwd`
+sdcc_datadir=${datadir}/sdcc
+AC_SUBST(sdcc_datadir)
+
+# For some unknown reason, putting this assignment in a subshell
+# like this causes the rvalue to be fully substituted. We need this
+# for the defines below to generate the right thing. We keep this
+# separate from the substituted sdcc_datadir because we want the
+# latter for makefiles.
 if test "${datadir}" = "\${prefix}/share"; then
-  sdcc_datadir=${prefix}/share
+    sdcc_datadir_tmp=${prefix}/share
 else
-  sdcc_datadir=${datadir}
+    sdcc_datadir_tmp=${datadir}
 fi
-AC_DEFINE_UNQUOTED(STANDARD_INCLUDE_DIR, "${sdcc_datadir}/include")
-AC_DEFINE_UNQUOTED(SDCC_INCLUDE_DIR, "${sdcc_datadir}/include")
-AC_DEFINE_UNQUOTED(SDCC_LIB_DIR, "${sdcc_datadir}/lib")
+
+
+AC_DEFINE_UNQUOTED(STANDARD_INCLUDE_DIR, "${sdcc_datadir_tmp}/include")
+AC_DEFINE_UNQUOTED(SDCC_INCLUDE_DIR, "${sdcc_datadir_tmp}/include")
+AC_DEFINE_UNQUOTED(SDCC_LIB_DIR, "${sdcc_datadir_tmp}/lib")
 AC_DEFINE_UNQUOTED(STD_LIB, "libsdcc")
 AC_DEFINE_UNQUOTED(STD_INT_LIB, "libint")
 AC_DEFINE_UNQUOTED(STD_LONG_LIB, "liblong")
@@ -197,8 +207,9 @@ AC_DEFINE_UNQUOTED(STD_FP_LIB, "libfloat")
 AC_DEFINE_UNQUOTED(STD_DS390_LIB, "libds390")
 
 AC_DEFINE_UNQUOTED(PREFIX, "${prefix}")
-AC_DEFINE_UNQUOTED(DATADIR, "${sdcc_datadir}")
+AC_DEFINE_UNQUOTED(DATADIR, "${sdcc_datadir_tmp}")
 AC_DEFINE_UNQUOTED(SRCDIR, "${config_in}")
+
 
 
 # Now handle the port selection

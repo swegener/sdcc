@@ -2454,21 +2454,31 @@ if test "${prefix}" = "NONE"; then
 fi
 
 config_in=`pwd`
+sdcc_datadir=${datadir}/sdcc
+
+
+# For some unknown reason, putting this assignment in a subshell
+# like this causes the rvalue to be fully substituted. We need this
+# for the defines below to generate the right thing. We keep this
+# separate from the substituted sdcc_datadir because we want the
+# latter for makefiles.
 if test "${datadir}" = "\${prefix}/share"; then
-  sdcc_datadir=${prefix}/share
+    sdcc_datadir_tmp=${prefix}/share
 else
-  sdcc_datadir=${datadir}
+    sdcc_datadir_tmp=${datadir}
 fi
+
+
 cat >> confdefs.h <<EOF
-#define STANDARD_INCLUDE_DIR "${sdcc_datadir}/include"
+#define STANDARD_INCLUDE_DIR "${sdcc_datadir_tmp}/include"
 EOF
 
 cat >> confdefs.h <<EOF
-#define SDCC_INCLUDE_DIR "${sdcc_datadir}/include"
+#define SDCC_INCLUDE_DIR "${sdcc_datadir_tmp}/include"
 EOF
 
 cat >> confdefs.h <<EOF
-#define SDCC_LIB_DIR "${sdcc_datadir}/lib"
+#define SDCC_LIB_DIR "${sdcc_datadir_tmp}/lib"
 EOF
 
 cat >> confdefs.h <<EOF
@@ -2497,12 +2507,13 @@ cat >> confdefs.h <<EOF
 EOF
 
 cat >> confdefs.h <<EOF
-#define DATADIR "${sdcc_datadir}"
+#define DATADIR "${sdcc_datadir_tmp}"
 EOF
 
 cat >> confdefs.h <<EOF
 #define SRCDIR "${config_in}"
 EOF
+
 
 
 
@@ -2748,6 +2759,7 @@ s%@AUTOCONF@%$AUTOCONF%g
 s%@AS@%$AS%g
 s%@CP@%$CP%g
 s%@M_OR_MM@%$M_OR_MM%g
+s%@sdcc_datadir@%$sdcc_datadir%g
 s%@subdirs@%$subdirs%g
 
 CEOF

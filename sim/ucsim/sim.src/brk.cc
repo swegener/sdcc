@@ -38,7 +38,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * Base object of breakpoints
  */
 
-cl_brk::cl_brk(class cl_mem *imem, int inr, t_addr iaddr,
+cl_brk::cl_brk(class cl_address_space *imem, int inr, t_addr iaddr,
 	       enum brk_perm iperm, int ihit):
   cl_base()
 {
@@ -84,7 +84,7 @@ cl_brk::do_hit(void)
  * FETCH type of breakpoint
  */
 
-cl_fetch_brk::cl_fetch_brk(class cl_mem *imem, int inr, t_addr iaddr,
+cl_fetch_brk::cl_fetch_brk(class cl_address_space *imem, int inr, t_addr iaddr,
 			   enum brk_perm iperm, int ihit):
   cl_brk(imem, inr, iaddr, iperm, ihit)
 {
@@ -102,7 +102,7 @@ cl_fetch_brk::type(void)
  * Base of EVENT type of breakpoints
  */
 
-cl_ev_brk::cl_ev_brk(class cl_mem *imem, int inr, t_addr iaddr,
+cl_ev_brk::cl_ev_brk(class cl_address_space *imem, int inr, t_addr iaddr,
 		     enum brk_perm iperm, int ihit,
 		     enum brk_event ievent, const char *iid):
   cl_brk(imem, inr, iaddr, iperm, ihit)
@@ -112,7 +112,7 @@ cl_ev_brk::cl_ev_brk(class cl_mem *imem, int inr, t_addr iaddr,
   mem  = imem;
 }
 
-cl_ev_brk::cl_ev_brk(class cl_mem *imem, int inr, t_addr iaddr,
+cl_ev_brk::cl_ev_brk(class cl_address_space *imem, int inr, t_addr iaddr,
 		     enum brk_perm iperm, int ihit, char op):
   cl_brk(imem, inr, iaddr, iperm, ihit)
 {
@@ -148,125 +148,14 @@ cl_ev_brk::match(struct event_rec *ev)
 
 
 /*
- * WRITE IRAM type of EVENT breakpoints
- */
-
-/*cl_wi_brk::cl_wi_brk(class cl_mem *imem, int inr, t_addr iaddr,
-		     enum brk_perm iperm, int ihit):
-  cl_ev_brk(imem, inr, iaddr, iperm, ihit, brkWIRAM, "wi")
-{}
-
-bool
-cl_wi_brk::match(struct event_rec *ev)
-{
-  return(ev->wi == addr);
-}*/
-
-
-/*
- * READ IRAM type of EVENT breakpoints
- */
-
-/*cl_ri_brk::cl_ri_brk(class cl_mem *imem, int inr, t_addr iaddr,
-		     enum brk_perm iperm, int ihit):
-  cl_ev_brk(imem, inr, iaddr, iperm, ihit, brkRIRAM, "ri")
-{}
-
-bool
-cl_ri_brk::match(struct event_rec *ev)
-{
-  return(ev->ri == addr);
-}*/
-
-
-/*
- * WRITE XRAM type of EVENT breakpoints
- */
-
-/*cl_wx_brk::cl_wx_brk(class cl_mem *imem, int inr, t_addr iaddr,
-		     enum brk_perm iperm, int ihit):
-  cl_ev_brk(imem, inr, iaddr, iperm, ihit, brkWXRAM, "wx")
-{}
-
-bool
-cl_wx_brk::match(struct event_rec *ev)
-{
-  return(ev->wx == addr);
-}*/
-
-
-/*
- * READ XRAM type of EVENT breakpoints
- */
-
-/*cl_rx_brk::cl_rx_brk(class cl_mem *imem, int inr, t_addr iaddr,
-		     enum brk_perm iperm, int ihit):
-  cl_ev_brk(imem, inr, iaddr, iperm, ihit, brkRXRAM, "rx")
-{}
-
-bool
-cl_rx_brk::match(struct event_rec *ev)
-{
-  return(ev->rx == addr);
-}*/
-
-
-/*
- * WRITE SFR type of EVENT breakpoints
- */
-
-/*cl_ws_brk::cl_ws_brk(class cl_mem *imem, int inr, t_addr iaddr,
-		     enum brk_perm iperm, int ihit):
-  cl_ev_brk(imem, inr, iaddr, iperm, ihit, brkWSFR, "ws")
-{}
-
-bool
-cl_ws_brk::match(struct event_rec *ev)
-{
-  return(ev->ws == addr);
-}*/
-
-
-/*
- * READ SFR type of EVENT breakpoints
- */
-
-/*cl_rs_brk::cl_rs_brk(class cl_mem *imem, int inr, t_addr iaddr,
-		     enum brk_perm iperm, int ihit):
-  cl_ev_brk(imem, inr, iaddr, iperm, ihit, brkRSFR, "rs")
-{}
-
-bool
-cl_rs_brk::match(struct event_rec *ev)
-{
-  return(ev->rs == addr);
-}*/
-
-
-/*
- * READ CODE type of EVENT breakpoints
- */
-
-/*cl_rc_brk::cl_rc_brk(class cl_mem *imem, int inr, t_addr iaddr,
-		     enum brk_perm iperm, int ihit):
-  cl_ev_brk(imem, inr, iaddr, iperm, ihit, brkRCODE, "rc")
-{}
-
-bool
-cl_rc_brk::match(struct event_rec *ev)
-{
-  return(ev->rc == addr);
-}*/
-
-
-/*
  * Collection of break-points
  *
  * This is a sorted collection, sorted by nr field of brk items.
  */
 
-brk_coll::brk_coll(t_index alimit, t_index adelta, class cl_mem *arom):
-  cl_sorted_list(alimit, adelta)
+brk_coll::brk_coll(t_index alimit, t_index adelta,
+		   class cl_address_space *arom):
+  cl_sorted_list(alimit, adelta, "breakpoints")
 {
   rom= arom;
 }
@@ -374,9 +263,8 @@ class cl_brk *
 brk_coll::get_bp(t_addr addr, int *idx)
 {
   if (rom &&
-      addr < rom->size &&
-      /*rom->bp_map->get(addr)*/
-      rom->get_cell_flag(addr,  CELL_FETCH_BRK))
+      rom->valid_address(addr) &&
+      rom->get_cell_flag(addr, CELL_FETCH_BRK))
     {
       for (*idx= 0; *idx < count; (*idx)++)
 	{
@@ -406,8 +294,7 @@ bool
 brk_coll::bp_at(t_addr addr)
 {
   return(rom &&
-	 addr < rom->size &&
-	 /*rom->bp_map->get(addr)*/
+	 rom->valid_address(addr) &&
 	 rom->get_cell_flag(addr, CELL_FETCH_BRK));
 }
 

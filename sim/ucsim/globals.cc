@@ -66,6 +66,12 @@ struct id_element cpu_states[]= {
   { 0, 0 }
 };
 
+struct id_element error_type_names[]= {
+  { err_unknown,	"unclassified" },
+  { err_error,		"error" },
+  { err_warning,	"warning" }
+};
+
 
 char *warranty= 
 "                            NO WARRANTY\n"
@@ -88,7 +94,8 @@ char *warranty=
 "TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY\n"
 "YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER\n"
 "PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE\n"
-"POSSIBILITY OF SUCH DAMAGES.\n";
+"POSSIBILITY OF SUCH DAMAGES.\n"
+;
 
 
 char *copying=
@@ -275,7 +282,7 @@ char *copying=
 "signed it.  However, nothing else grants you permission to modify or\n"
 "distribute the Program or its derivative works.  These actions are\n"
 "prohibited by law if you do not accept this License.  Therefore, by\n"
-"modifying or distributing the Program (or any work based on the\n"
+"odifying or distributing the Program (or any work based on the\n"
 "Program), you indicate your acceptance of this License to do so, and\n"
 "all its terms and conditions for copying, distributing or modifying\n"
 "the Program or works based on it.\n"
@@ -347,7 +354,58 @@ char *copying=
 "Software Foundation, write to the Free Software Foundation; we sometimes\n"
 "make exceptions for this.  Our decision will be guided by the two goals\n"
 "of preserving the free status of all derivatives of our free software and\n"
-"of promoting the sharing and reuse of software generally.\n";
+"of promoting the sharing and reuse of software generally.\n"
+;
+
+
+/*
+ * Information about different type of CPUs
+ */
+
+struct cpu_entry *cpus= NIL;
+
+struct cpu_entry cpus_51[]=
+{
+  {"51"    , CPU_51, CPU_HMOS},
+  {"8051"  , CPU_51, CPU_HMOS},
+  {"8751"  , CPU_51, CPU_HMOS},
+  {"C51"   , CPU_51, CPU_CMOS},
+  {"80C51" , CPU_51, CPU_CMOS},
+  {"87C51" , CPU_51, CPU_CMOS},
+  {"31"    , CPU_31, CPU_HMOS},
+  {"8031"  , CPU_31, CPU_HMOS},
+  {"C31"   , CPU_31, CPU_CMOS},
+  {"80C31" , CPU_31, CPU_CMOS},
+
+  {"52"    , CPU_52, CPU_HMOS},
+  {"8052"  , CPU_52, CPU_HMOS},
+  {"8752"  , CPU_52, CPU_HMOS},
+  {"C52"   , CPU_52, CPU_CMOS},
+  {"80C52" , CPU_52, CPU_CMOS},
+  {"87C52" , CPU_52, CPU_CMOS},
+  {"32"    , CPU_32, CPU_HMOS},
+  {"8032"  , CPU_32, CPU_HMOS},
+  {"C32"   , CPU_32, CPU_CMOS},
+  {"80C32" , CPU_32, CPU_CMOS},
+
+  {"51R"   , CPU_51R, CPU_CMOS},
+  {"51RA"  , CPU_51R, CPU_CMOS},
+  {"51RB"  , CPU_51R, CPU_CMOS},
+  {"51RC"  , CPU_51R, CPU_CMOS},
+  {"C51R"  , CPU_51R, CPU_CMOS},
+  {"C51RA" , CPU_51R, CPU_CMOS},
+  {"C51RB" , CPU_51R, CPU_CMOS},
+  {"C51RC" , CPU_51R, CPU_CMOS},
+
+  {"89C51R", CPU_89C51R, CPU_CMOS},
+
+  {"251"   , CPU_251, CPU_CMOS},
+  {"C251"  , CPU_251, CPU_CMOS},
+
+  {"DS390" , CPU_DS390, CPU_CMOS},
+  {"DS390F", CPU_DS390F, CPU_CMOS},
+  {NULL, 0, 0}
+};
 
 
 /* End of globals.cc */

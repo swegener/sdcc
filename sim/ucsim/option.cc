@@ -7,22 +7,24 @@
  *
  */
 
-/* This file is part of microcontroller simulator: ucsim.
+/*
+  This file is part of microcontroller simulator: ucsim.
 
-UCSIM is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-UCSIM is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with UCSIM; see the file COPYING.  If not, write to the Free
-Software Foundation, 59 Temple Place - Suite 330, Boston, MA
-02111-1307, USA. */
+  UCSIM is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+  
+  UCSIM is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with UCSIM; see the file COPYING.  If not, write to the Free
+  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+  02111-1307, USA.
+*/
 /*@1@*/
 
 #include "ddconfig.h"
@@ -42,6 +44,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "simcl.h"
 
 
+/*struct id_element option_type_names[]= {
+  { non_opt	, "non" },
+  { integer_opt	, "integer" },
+  { float_opt	, "float" },
+  { bool_opt	, "boolean" },
+  { string_opt	, "string" },
+  { pointer_opt	, "pointer" },
+  { 0, 0 }
+  };*/
+
 /*
  * Base class for option's objects
  *____________________________________________________________________________
@@ -54,8 +66,12 @@ cl_option::cl_option(class cl_base *the_creator, char *aname, char *Ihelp):
   creator= the_creator;
   set_name(aname);
   help= strdup(Ihelp);
-  users= new cl_list(2, 2);
+  char *s= (char*)malloc(strlen(aname)+100);
+  sprintf(s, "users of option \"%s\"", aname);
+  users= new cl_list(2, 2, s);
+  free(s);
   memset(&value, 0, sizeof(value));
+  show();
 }
 
 class cl_option &
@@ -149,6 +165,51 @@ cl_option::set_value(char *opt)
   else
     value.sval= strdup("");
   //fprintf(stderr,"new value=%p\"%s\"\n",value.sval,value.sval);
+  inform_users();
+}
+
+
+void
+cl_option::get_value(void **val)
+{
+  if (val)
+    *val= value.pval;
+}
+
+void
+cl_option::set_value(void *opt)
+{
+  value.pval= opt;
+  inform_users();
+}
+
+
+void
+cl_option::get_value(long *val)
+{
+  if (val)
+    *val= value.ival;
+}
+
+void
+cl_option::set_value(long opt)
+{
+  value.ival= opt;
+  inform_users();
+}
+
+
+void
+cl_option::get_value(double *val)
+{
+  if (val)
+    *val= value.fval;
+}
+
+void
+cl_option::set_value(double opt)
+{
+  value.fval= opt;
   inform_users();
 }
 
@@ -334,6 +395,36 @@ cl_options::set_value(char *the_name, cl_base *creator, char *value)
   return(o);
 }
 
+class cl_option *
+cl_options::set_value(char *the_name, cl_base *creator, void *value)
+{
+  class cl_option *o= get_option(the_name, creator);
+
+  if (o)
+    o->set_value(value);
+  return(o);
+}
+
+class cl_option *
+cl_options::set_value(char *the_name, cl_base *creator, long value)
+{
+  class cl_option *o= get_option(the_name, creator);
+
+  if (o)
+    o->set_value(value);
+  return(o);
+}
+
+class cl_option *
+cl_options::set_value(char *the_name, cl_base *creator, double value)
+{
+  class cl_option *o= get_option(the_name, creator);
+
+  if (o)
+    o->set_value(value);
+  return(o);
+}
+
 
 /*
  * Reference to an option
@@ -379,21 +470,21 @@ cl_optref::create(class cl_base *creator,
     case non_opt:
       option= 0;
       break;
-      /*case integer_opt:
-      option= new cl_option(creator, the_name, help);
-      break;*/
-      /*case float_opt:
-      option= new cl_option(creator, the_name, help);
-      break;*/
+    case integer_opt:
+      option= new cl_number_option(creator, the_name, help);
+      break;
+    case float_opt:
+      option= new cl_float_option(creator, the_name, help);
+      break;
     case bool_opt:
       option= new cl_bool_option(creator, the_name, help);
       break;
     case string_opt:
       option= new cl_string_option(creator, the_name, help);
       break;
-      /*case pointer_opt:
-      option= new cl_option(creator, the_name, help);
-      break;*/
+    case pointer_opt:
+      option= new cl_pointer_option(creator, the_name, help);
+      break;
     default:
       option= 0;
       break;
@@ -489,6 +580,57 @@ cl_optref::get_value(char *)
     }
 }
 
+void *
+cl_optref::get_value(void *)
+{
+  if (!option)
+    {
+      fprintf(stderr, "Warning: \"%s\" is sdereferencing a non-existent "
+	      "pointer option: %s\n", object_name(owner), get_name());
+      return(NIL);
+    }
+  else
+    {
+      void *p= NIL;
+      option->get_value(&p);
+      return(p);
+    }
+}
+
+long
+cl_optref::get_value(long)
+{
+  if (!option)
+    {
+      fprintf(stderr, "Warning: \"%s\" is sdereferencing a non-existent "
+	      "number option: %s\n", object_name(owner), get_name());
+      return(0);
+    }
+  else
+    {
+      long l= 0;
+      option->get_value(&l);
+      return(l);
+    }
+}
+
+double
+cl_optref::get_value(double)
+{
+  if (!option)
+    {
+      fprintf(stderr, "Warning: \"%s\" is sdereferencing a non-existent "
+	      "float option: %s\n", object_name(owner), get_name());
+      return(0);
+    }
+  else
+    {
+      double d= 0;
+      option->get_value(&d);
+      return(d);
+    }
+}
+
 
 /*
  * BOOL type of option
@@ -558,10 +700,39 @@ cl_string_option::print(class cl_console *con)
     con->dd_printf("(null)");
 }
 
+
+/*
+ * PONITER type of option
+ *____________________________________________________________________________
+ *
+ */
+
+cl_pointer_option::cl_pointer_option(class cl_base *the_creator,
+				     char *aname, char *Ihelp):
+  cl_option(the_creator, aname, Ihelp)
+{}
+
+class cl_option &
+cl_pointer_option::operator=(class cl_option &o)
+{
+  set_value((o.get_value())->pval);
+  return(*this);
+}
+
+void
+cl_pointer_option::print(class cl_console *con)
+{
+  if (value.pval)
+    con->dd_printf("\"%p\"", value.pval);
+  else
+    con->dd_printf("(null)");
+}
+
+
 /*
  * Debug on console
  */
-
+/*
 cl_cons_debug_opt::cl_cons_debug_opt(class cl_app *the_app,
 				     char *Iid,
 				     char *Ihelp):
@@ -573,8 +744,7 @@ cl_cons_debug_opt::cl_cons_debug_opt(class cl_app *the_app,
 void
 cl_cons_debug_opt::print(class cl_console *con)
 {
-  if (/*sim->cmd->actual_console &&
-	sim->cmd->actual_console*/con->flags & CONS_DEBUG)
+  if (con->flags & CONS_DEBUG)
     con->dd_printf("TRUE");
   else
     con->dd_printf("FALSE");
@@ -613,12 +783,62 @@ cl_cons_debug_opt::set_value(char *s)
       if (c == '1' ||
 	  c == 'T' ||
 	  c == 'Y')
-	//app->get_commander()->actual_console->flags|= CONS_DEBUG;
 	set_value(1);
       else
-	//app->get_commander()->actual_console->flags&= ~CONS_DEBUG;
 	set_value(0);
     }
+}
+*/
+
+/*
+ * NUMBER type of option
+ *____________________________________________________________________________
+ *
+ */
+
+cl_number_option::cl_number_option(class cl_base *the_creator,
+				   char *aname, char *Ihelp):
+  cl_option(the_creator, aname, Ihelp)
+{}
+
+void
+cl_number_option::print(class cl_console *con)
+{
+  con->dd_printf("%ld", value.ival);
+}
+
+void
+cl_number_option::set_value(char *s)
+{
+  if (s)
+    value.ival= strtol(s, NIL, 0);
+  inform_users();
+}
+
+
+/*
+ * FLOAT type of option
+ *____________________________________________________________________________
+ *
+ */
+
+cl_float_option::cl_float_option(class cl_base *the_creator,
+				 char *aname, char *Ihelp):
+  cl_option(the_creator, aname, Ihelp)
+{}
+
+void
+cl_float_option::print(class cl_console *con)
+{
+  con->dd_printf("%.3f", value.fval);
+}
+
+void
+cl_float_option::set_value(char *s)
+{
+  if (s)
+    value.fval= strtod(s, NIL);
+  inform_users();
 }
 
 

@@ -49,6 +49,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 cl_base::cl_base(void)
 {
   name= 0;
+  parent= 0;
+  children= 0;
 }
 
 
@@ -60,6 +62,16 @@ cl_base::~cl_base(void)
 {
   if (name)
     free(name);
+  if (children)
+    {
+      int i;
+      for (i= 0; i < children->count; i++)
+	{
+	}
+      children->disconn_all();
+      delete children;
+    }
+  parent= 0;
 }
 
 int cl_base::init(void) {return(0);}
@@ -86,6 +98,161 @@ cl_base::set_name(char *new_name)
   return(name);
 }
 
+char *
+cl_base::set_name(char *new_name, char *def_name)
+{
+  char *def;
+
+  if (!def_name ||
+      *def_name == '\0')
+    def= strdup("");
+  else
+    def= strdup(def_name);
+  if (name)
+    free(name);
+  if (!new_name)
+    name= def;
+  else if (*new_name)
+    name= strdup(new_name);
+  else
+    name= def;
+  return(name);
+}
+
+bool
+cl_base::is_named(char *the_name)
+{
+  if (!name ||
+      !*name ||
+      !the_name ||
+      !*the_name)
+    return(DD_FALSE);
+  return(strcmp(name, the_name) == 0);
+}
+
+bool
+cl_base::is_inamed(char *the_name)
+{
+  if (!name ||
+      !*name ||
+      !the_name ||
+      !*the_name)
+    return(DD_FALSE);
+  return(strcasecmp(name, the_name) == 0);
+}
+
+
+int
+cl_base::nuof_children(void)
+{
+  if (!children)
+    return(0);
+  return(children->count);
+}
+
+void
+cl_base::add_child(class cl_base *child)
+{
+  if (!children)
+    {
+      char *s;
+      s= (char*)malloc(strlen(get_name("?"))+100);
+      sprintf(s, "childs of %s", get_name("?"));
+      children= new cl_list(1, 1, s);
+      free(s);
+    }
+  if (child)
+    {
+      children->add(child);
+      child->parent= this;
+    }
+}
+
+void
+cl_base::remove_child(class cl_base *child)
+{
+  if (child &&
+      children)
+    {
+      child->unlink();
+      children->disconn(child);
+    }
+}
+
+void
+cl_base::remove_from_chain(void)
+{
+  if (parent)
+    parent->remove_child(this);
+}
+
+void
+cl_base::unlink(void)
+{
+  parent= 0;
+}
+
+class cl_base *
+cl_base::first_child(void)
+{
+  if (!children ||
+      children->count == 0)
+    return(0);
+  return(dynamic_cast<class cl_base *>(children->object_at(0)));
+}
+
+class cl_base *
+cl_base::next_child(class cl_base *child)
+{
+  if (!children ||
+      !child)
+    return(0);
+  return((class cl_base *)(children->next(child)));
+}
+
+
+bool
+cl_base::handle_event(class cl_event &event)
+{
+  return(pass_event_down(event));
+}
+
+bool
+cl_base::pass_event_down(class cl_event &event)
+{
+  int i;
+  if (!children)
+    return(DD_FALSE);
+  for (i= 0; i < children->count; i++)
+    {
+      class cl_base *child=
+	dynamic_cast<class cl_base *>(children->object_at(i));
+      if (child)
+	{
+	  child->handle_event(event);
+	  if (event.is_handled())
+	    return(DD_TRUE);
+	}
+    }
+  return(DD_FALSE);
+}
+
+
+/*
+ * Event
+ */
+
+cl_event::cl_event(enum event what_event):
+  cl_base()
+{
+  handled= DD_FALSE;
+  what= what_event;
+}
+
+cl_event::~cl_event(void)
+{
+}
+
 
 /*									    *
   ==========================================================================*
@@ -98,7 +265,7 @@ cl_base::set_name(char *new_name)
  * Initializing a collection
  */
 
-cl_list::cl_list(t_index alimit, t_index adelta):
+cl_list::cl_list(t_index alimit, t_index adelta, char *aname):
   cl_base()
 {
   count= 0;
@@ -106,6 +273,7 @@ cl_list::cl_list(t_index alimit, t_index adelta):
   Limit= 0;
   Delta= adelta;
   set_limit(alimit);
+  set_name(aname, "unnamed list");
 }
 
 
@@ -133,6 +301,15 @@ cl_list::at(t_index index)
   return(Items[index]);
 }
 
+class cl_base *
+cl_list::object_at(t_index index)
+{
+  if (index < 0 ||
+      index >= count)
+    error(1, index);
+  return((class cl_base *)(Items[index]));
+}
+
 /*void *
 cl_list::operator[](t_index index)
 {
@@ -146,7 +323,7 @@ cl_list::operator[](t_index index)
 /*
  * Deleting the indexed item from the collection
  */
-
+#include "globals.h"
 void
 cl_list::disconn_at(t_index index)
 {
@@ -154,6 +331,16 @@ cl_list::disconn_at(t_index index)
       index >= count)
     error(1, 0);
   count--;
+  /*{ char s[1000];
+  s[0]='\0';
+  sprintf(s, "disconn_at(%d) PC=0x%x", index,
+	  application?
+	  ((application->sim)?
+	   ((application->sim->uc)?(application->sim->uc->PC):
+	    -3):
+	   -1):
+	  -2);
+	  strcat(s,"\n");}*/
   memmove(&Items[index], &Items[index+1], (count-index)*sizeof(void *));
 }
 
@@ -222,6 +409,16 @@ cl_list::add_at(t_index index, void *item)
   if (count == Limit)
     set_limit(count + Delta);
 
+  { char s[1000];
+  s[0]='\0';
+  sprintf(s, "%s add_at(%d,%p) PC=0x%x (count=%d)", get_name("?"), index, item,
+	  application?
+	  ((application->sim)?
+	   ((application->sim->uc)?(application->sim->uc->PC):
+	    -3):
+	   -1):
+	  -2, count);
+  strcat(s,"\n");}
   memmove(&Items[index+1], &Items[index], (count-index)*sizeof(void *));
   count++;
 
@@ -355,6 +552,19 @@ cl_list::index_of(void *item, t_index *idx)
   return(DD_FALSE);
 }
 
+void *
+cl_list::next(void *item)
+{
+  for (t_index i= 0; i < count; i++)
+    if (item == Items[i])
+      {
+	if (count >= 2 &&
+	    i < count-1)
+	  return(Items[i+1]);
+      }
+  return(0);
+}
+
 
 /* 
  * Inserting a new item to the collection.
@@ -369,6 +579,13 @@ cl_list::add(void *item)
   return(loc);
 }
 
+t_index
+cl_list::add(class cl_base *item, class cl_base *parent)
+{
+  if (parent && item)
+    parent->add_child(item);
+  return(add(item));
+}
 
 void
 cl_list::push(void *item)
@@ -460,8 +677,8 @@ cl_list::set_limit(t_index alimit)
  * Initilizing the sorted collection
  */
 
-cl_sorted_list::cl_sorted_list(t_index alimit, t_index adelta):
-  cl_list(alimit, adelta)
+cl_sorted_list::cl_sorted_list(t_index alimit, t_index adelta, char *aname):
+  cl_list(alimit, adelta, aname)
 {
   Duplicates= DD_FALSE;
 }
@@ -567,8 +784,8 @@ cl_sorted_list::search(void *key, t_index &index)
  * Initilizing the string collection
  */
 
-cl_strings::cl_strings(t_index alimit, t_index adelta):
-  cl_sorted_list(alimit, adelta)
+cl_strings::cl_strings(t_index alimit, t_index adelta, char *aname):
+  cl_sorted_list(alimit, adelta, aname)
 {
   Duplicates= DD_TRUE;
 }
@@ -610,8 +827,8 @@ cl_strings::free_item(void* item)
  * Initilizing the unsorted string collection
  */
 
-cl_ustrings::cl_ustrings(t_index alimit, t_index adelta):
-  cl_strings(alimit, adelta)
+cl_ustrings::cl_ustrings(t_index alimit, t_index adelta, char *aname):
+  cl_strings(alimit, adelta, aname)
 {}
 
 

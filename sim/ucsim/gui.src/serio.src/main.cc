@@ -2,6 +2,8 @@
  * to emulate the serial input and output of an 8051 controller               *
  * main.cc - the main stuff                                                   *
  ******************************************************************************/
+#include "ddconfig.h"
+
 #include <sys/types.h>
 #include <iostream>
 #include <stdlib.h>
@@ -92,7 +94,7 @@ int main(int argc, char **argv)
 
 		if(string[0] != 0)
 			fobj->SendByte(string[0]);
-
+		
 		if(fobj->RecvStr(string) > 0)
 			view->AddStrOutWin(string);
 

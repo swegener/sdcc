@@ -42,7 +42,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  */
 
 int
-t_uc51::inst_rr(uchar code)
+cl_51core::inst_rr(uchar code)
 {
   uchar ac;
 
@@ -62,7 +62,7 @@ t_uc51::inst_rr(uchar code)
  */
 
 int
-t_uc51::inst_rrc(uchar code)
+cl_51core::inst_rrc(uchar code)
 {
   bool cy;
   uchar ac;
@@ -84,7 +84,7 @@ t_uc51::inst_rrc(uchar code)
  */
 
 int
-t_uc51::inst_rl(uchar code)
+cl_51core::inst_rl(uchar code)
 {
   uchar ac;
 
@@ -104,7 +104,7 @@ t_uc51::inst_rl(uchar code)
  */
 
 int
-t_uc51::inst_add_a_Sdata(uchar code)
+cl_51core::inst_add_a_Sdata(uchar code)
 {
   uchar data, ac;
   bool newC, newA, c6;
@@ -129,11 +129,11 @@ t_uc51::inst_add_a_Sdata(uchar code)
  */
 
 int
-t_uc51::inst_add_a_addr(uchar code)
+cl_51core::inst_add_a_addr(uchar code)
 {
   uchar data, ac;
   bool newC, newA, c6;
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
   t_addr a;
 
   cell= get_direct(a= fetch());
@@ -157,11 +157,11 @@ t_uc51::inst_add_a_addr(uchar code)
  */
 
 int
-t_uc51::inst_add_a_Sri(uchar code)
+cl_51core::inst_add_a_Sri(uchar code)
 {
   uchar data, ac;
   bool newC, newA, c6;
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
 
   cell= iram->get_cell(get_reg(code & 0x01)->read());
   ac  = acc->get();
@@ -184,7 +184,7 @@ t_uc51::inst_add_a_Sri(uchar code)
  */
 
 int
-t_uc51::inst_add_a_rn(uchar code)
+cl_51core::inst_add_a_rn(uchar code)
 {
   uchar data, ac;
   bool newC, newA, c6;
@@ -209,7 +209,7 @@ t_uc51::inst_add_a_rn(uchar code)
  */
 
 int
-t_uc51::inst_rlc(uchar code)
+cl_51core::inst_rlc(uchar code)
 {
   bool cy;
   uchar ac;
@@ -231,7 +231,7 @@ t_uc51::inst_rlc(uchar code)
  */
 
 int
-t_uc51::inst_addc_a_Sdata(uchar code)
+cl_51core::inst_addc_a_Sdata(uchar code)
 {
   uchar data, ac;
   bool orgC, newC, newA, c6;
@@ -256,11 +256,11 @@ t_uc51::inst_addc_a_Sdata(uchar code)
  */
 
 int
-t_uc51::inst_addc_a_addr(uchar code)
+cl_51core::inst_addc_a_addr(uchar code)
 {
   uchar data, ac;
   bool orgC, newC, newA, c6;
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
   t_addr a;
 
   cell= get_direct(a= fetch());
@@ -284,11 +284,11 @@ t_uc51::inst_addc_a_addr(uchar code)
  */
 
 int
-t_uc51::inst_addc_a_Sri(uchar code)
+cl_51core::inst_addc_a_Sri(uchar code)
 {
   uchar data, ac;
   bool orgC, newC, newA, c6;
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
   
   cell= iram->get_cell(get_reg(code & 0x01)->read());
   ac  = acc->get();
@@ -311,7 +311,7 @@ t_uc51::inst_addc_a_Sri(uchar code)
  */
 
 int
-t_uc51::inst_addc_a_rn(uchar code)
+cl_51core::inst_addc_a_rn(uchar code)
 {
   uchar data, ac;
   bool orgC, newC, newA, c6;
@@ -336,7 +336,7 @@ t_uc51::inst_addc_a_rn(uchar code)
  */
 
 int
-t_uc51::inst_div_ab(uchar code)
+cl_51core::inst_div_ab(uchar code)
 {
   uchar temp, pw, b, ac;
 
@@ -364,7 +364,7 @@ t_uc51::inst_div_ab(uchar code)
  */
 
 int
-t_uc51::inst_subb_a_Sdata(uchar code)
+cl_51core::inst_subb_a_Sdata(uchar code)
 {
   uchar data, ac, result, pw, c;
 
@@ -392,10 +392,10 @@ t_uc51::inst_subb_a_Sdata(uchar code)
  */
 
 int
-t_uc51::inst_subb_a_addr(uchar code)
+cl_51core::inst_subb_a_addr(uchar code)
 {
   uchar data, ac, result, pw, c;
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
   
   cell= get_direct(fetch());
   ac  = acc->get();
@@ -422,10 +422,10 @@ t_uc51::inst_subb_a_addr(uchar code)
  */
 
 int
-t_uc51::inst_subb_a_Sri(uchar code)
+cl_51core::inst_subb_a_Sri(uchar code)
 {
   uchar data, ac, result, pw, c;
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
 
   cell= iram->get_cell(get_reg(code & 0x01)->read());
   data= cell->read();
@@ -452,7 +452,7 @@ t_uc51::inst_subb_a_Sri(uchar code)
  */
 
 int
-t_uc51::inst_subb_a_rn(uchar code)
+cl_51core::inst_subb_a_rn(uchar code)
 {
   uchar data, ac, result, pw, c;
 
@@ -480,7 +480,7 @@ t_uc51::inst_subb_a_rn(uchar code)
  */
 
 int
-t_uc51::inst_mul_ab(uchar code)
+cl_51core::inst_mul_ab(uchar code)
 {
   uint temp, pw, ac, b, x;
 
@@ -503,7 +503,7 @@ t_uc51::inst_mul_ab(uchar code)
  */
 
 int
-t_uc51::inst_da_a(uchar code)
+cl_51core::inst_da_a(uchar code)
 {
   uchar ac, pw;
 

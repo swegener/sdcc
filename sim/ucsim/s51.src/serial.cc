@@ -48,7 +48,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 cl_serial::cl_serial(class cl_uc *auc):
   cl_hw(auc, HW_UART, 0, "uart")
-{}
+{
+  serial_in= serial_out= NIL;
+}
 
 cl_serial::~cl_serial(void)
 {
@@ -64,16 +66,18 @@ cl_serial::~cl_serial(void)
 	tcsetattr(fileno(serial_in), TCSANOW, &saved_attributes_in);
       fclose(serial_in);
     }
+  delete serial_in_file_option;
+  delete serial_out_file_option;
 }
 
 int
 cl_serial::init(void)
 {
-  class cl_mem *sfr;
   int i;
   struct termios tattr;
 
-  sfr= uc->mem(MEM_SFR);
+  set_name("mcs51_uart");
+  sfr= uc->address_space(MEM_SFR_ID);
   if (sfr)
     {
       //sbuf= sfr->register_hw(SBUF, this, 0);
@@ -84,8 +88,23 @@ cl_serial::init(void)
       register_cell(sfr, SCON, &scon, wtd_restore_write);
     }
 
-  serial_in = (FILE*)application->args->get_parg(0, "Ser_in");
-  serial_out= (FILE*)application->args->get_parg(0, "Ser_out");
+  serial_in_file_option= new cl_optref(this);
+  serial_in_file_option->init();
+  serial_in_file_option->use("serial_in_file");
+  serial_out_file_option= new cl_optref(this);
+  serial_out_file_option->init();
+  serial_out_file_option->use("serial_out_file");
+
+  //char *fni, *fno;
+  /*if ((fni= serial_in_file_option->get_value((char*)0)))
+    serial_in= fopen(fni, "r");
+  if ((fno= serial_out_file_option->get_value((char*)0)))
+  serial_out= fopen(fno, "w");*/
+  
+  //serial_in = (FILE*)application->args->get_parg(0, "Ser_in");
+  //serial_out= (FILE*)application->args->get_parg(0, "Ser_out");
+  serial_in = (FILE*)serial_in_file_option->get_value((void*)0);
+  serial_out= (FILE*)serial_out_file_option->get_value((void*)0);
   if (serial_in)
     {
       // making `serial' unbuffered
@@ -156,7 +175,7 @@ cl_serial::new_hw_added(class cl_hw *new_hw)
       new_hw->id == 2)
     {
       there_is_t2= DD_TRUE;
-      t_mem d= uc->mem(MEM_SFR)->get(T2CON);
+      t_mem d= sfr->get(T2CON);
       t2_baud= d & (bmRCLK | bmTCLK);
     }
 }
@@ -171,7 +190,7 @@ cl_serial::added_to_uc(void)
 }
 
 t_mem
-cl_serial::read(class cl_cell *cell)
+cl_serial::read(class cl_memory_cell *cell)
 {
   if (cell == sbuf)
     return(s_in);
@@ -180,7 +199,7 @@ cl_serial::read(class cl_cell *cell)
 }
 
 void
-cl_serial::write(class cl_cell *cell, t_mem *val)
+cl_serial::write(class cl_memory_cell *cell, t_mem *val)
 {
   if (cell == sbuf)
     {
@@ -236,9 +255,8 @@ cl_serial::write(class cl_cell *cell, t_mem *val)
 }
 
 /*void
-cl_serial::mem_cell_changed(class cl_mem *mem, t_addr addr)
+cl_serial::mem_cell_changed(class cl_m *mem, t_addr addr)
 {
-  class cl_mem *sfr= uc->mem(MEM_SFR);
   t_mem d;
 
   d= sbuf->get();
@@ -421,7 +439,7 @@ cl_serial::print_info(class cl_console *con)
     con->dd_printf(" (timer%d)", (t2_baud)?2:1);
   con->dd_printf(" MultiProc=%s",
 		 (mode&2)?((sc&bmSM2)?"ON":"OFF"):"none");
-  con->dd_printf(" irq=%s", (uc->get_mem(MEM_SFR, IE)&bmES)?"en":"dis");
+  con->dd_printf(" irq=%s", (sfr->get(IE)&bmES)?"en":"dis");
   con->dd_printf(" prio=%d", uc->it_priority(bmPS));
   con->dd_printf("\n");
 

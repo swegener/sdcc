@@ -89,9 +89,9 @@ realclean: distclean
 # ---------------------
 dist: distclean
 	@if [ -f devel ]; then\
-	  rm -f devel; mkdist ucsim; touch devel;\
+	  rm -f devel; mkdist; touch devel;\
 	else\
-	  mkdist ucsim;\
+	  mkdist;\
 	fi
 
 
@@ -163,22 +163,33 @@ lines:
 # ----------------------
 configure: configure.in
 	@$(PRJDIR)/mkecho $(PRJDIR) "RE-CREATING CONFIGURE"
-	$(SHELL) autoconf configure.in >configure
+	autoconf configure.in >configure
 	chmod 755 configure
 
 config.status: configure
-	@$(PRJDIR)/mkecho $(PRJDIR) "RE-CHECKING CONFIGURATION"
-	./config.status -recheck
+	@$(PRJDIR)/mkecho $(PRJDIR) "RE-CHECKING CONFIGURATION (re-creating config.status from configure)"
+	@if [ -x ./config.status ]; then \
+	  ./config.status -recheck;\
+	else\
+	  if [ -x ./conf ]; then\
+	    ./conf;\
+	  else\
+	    ./configure;\
+	  fi\
+	fi
 
 makefiles: config.status
 	@$(PRJDIR)/mkecho $(PRJDIR) "RE-MAKING MAKEFILES"
 	$(SHELL) ./config.status
 
-main.mk: $(srcdir)/main_in.mk $(srcdir)/configure.in
+main.mk: $(srcdir)/main_in.mk config.status
 	@$(PRJDIR)/mkecho $(PRJDIR) "RE-MAKING MAIN.MK"
 	$(SHELL) ./config.status
 
-freshconf: echo_freshconf configure main.mk
+freshconf: echo_freshconf configure main.mk ddconfig.h
+
+ddconfig.h: ddconfig_in.h config.status
+	$(SHELL) ./config.status
 
 echo_freshconf:
 	@$(PRJDIR)/mkecho $(PRJDIR) "FRESHCONF"

@@ -39,7 +39,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  */
 
 int
-t_uc51::inst_inc_a(uchar code)
+cl_51core::inst_inc_a(uchar code)
 {
   acc->wadd(1);
   return(resGO);
@@ -53,9 +53,9 @@ t_uc51::inst_inc_a(uchar code)
  */
 
 int
-t_uc51::inst_inc_addr(uchar code)
+cl_51core::inst_inc_addr(uchar code)
 {
-  class cl_cell *cell= get_direct(fetch());
+  class cl_memory_cell *cell= get_direct(fetch());
 
   t_mem d= cell->read(HW_PORT);
   cell->write(d+1);
@@ -70,9 +70,9 @@ t_uc51::inst_inc_addr(uchar code)
  */
 
 int
-t_uc51::inst_inc_Sri(uchar code)
+cl_51core::inst_inc_Sri(uchar code)
 {
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
 
   cell= iram->get_cell(get_reg(code & 0x01)->read());
   cell->wadd(1);
@@ -87,9 +87,9 @@ t_uc51::inst_inc_Sri(uchar code)
  */
 
 int
-t_uc51::inst_inc_rn(uchar code)
+cl_51core::inst_inc_rn(uchar code)
 {
-  class cl_cell *reg= get_reg(code & 0x07);
+  class cl_memory_cell *reg= get_reg(code & 0x07);
 
   reg->wadd(1);
   return(resGO);
@@ -103,7 +103,7 @@ t_uc51::inst_inc_rn(uchar code)
  */
 
 int
-t_uc51::inst_dec_a(uchar code)
+cl_51core::inst_dec_a(uchar code)
 {
   acc->wadd(-1);
 
@@ -118,9 +118,9 @@ t_uc51::inst_dec_a(uchar code)
  */
 
 int
-t_uc51::inst_dec_addr(uchar code)
+cl_51core::inst_dec_addr(uchar code)
 {
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
 
   cell= get_direct(fetch());
   t_mem d= cell->read(HW_PORT);
@@ -136,9 +136,9 @@ t_uc51::inst_dec_addr(uchar code)
  */
 
 int
-t_uc51::inst_dec_Sri(uchar code)
+cl_51core::inst_dec_Sri(uchar code)
 {
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
 
   cell= iram->get_cell(get_reg(code & 0x01)->read());
   cell->add(-1);
@@ -153,9 +153,9 @@ t_uc51::inst_dec_Sri(uchar code)
  */
 
 int
-t_uc51::inst_dec_rn(uchar code)
+cl_51core::inst_dec_rn(uchar code)
 {
-  class cl_cell *reg= get_reg(code & 0x07);
+  class cl_memory_cell *reg= get_reg(code & 0x07);
 
   reg->wadd(-1);
   return(resGO);
@@ -169,7 +169,7 @@ t_uc51::inst_dec_rn(uchar code)
  */
 
 int
-t_uc51::inst_inc_dptr(uchar code)
+cl_51core::inst_inc_dptr(uchar code)
 {
   uint dptr;
 

@@ -81,7 +81,7 @@ cl_timer0::cl_timer0(class cl_uc *auc, int aid, char *aid_string):
 int
 cl_timer0::init(void)
 {
-  class cl_mem *sfr= uc->mem(MEM_SFR);
+  class cl_address_space *sfr= uc->address_space(MEM_SFR_ID);
 
   if (sfr)
     {
@@ -129,7 +129,7 @@ cl_timer0::read(class cl_cell *cell)
 }*/
 
 void
-cl_timer0::write(class cl_cell *cell, t_mem *val)
+cl_timer0::write(class cl_memory_cell *cell, t_mem *val)
 {
   if (cell == cell_tmod)
     {
@@ -154,9 +154,9 @@ cl_timer0::write(class cl_cell *cell, t_mem *val)
 }
 
 /*void
-cl_timer0::mem_cell_changed(class cl_mem *mem, t_addr addr)
+cl_timer0::mem_cell_changed(class cl_m *mem, t_addr addr)
 {
-  //class cl_mem *sfr= uc->mem(MEM_SFR);
+  //class cl_m *sfr= uc->mem(MEM_SFR);
   //t_mem d;
 
   cl_hw::mem_cell_changed(mem, addr);
@@ -375,6 +375,7 @@ cl_timer0::print_info(class cl_console *con)
   char *modes[]= { "13 bit", "16 bit", "8 bit autoreload", "2x8 bit" };
   //t_mem tmod= cell_tmod->get();
   int on;
+  class cl_address_space *sfr= uc->address_space(MEM_SFR_ID);
 
   con->dd_printf("%s[%d] 0x%04x", id_string, id,
 		 256*cell_th->get()+cell_tl->get());
@@ -384,13 +385,13 @@ cl_timer0::print_info(class cl_console *con)
   if (/*tmod&bm*/GATE/*0*/)
     {
       con->dd_printf(" gated");
-      on= /*uc->get_mem(MEM_SFR, P3) & uc->port_pins[3] & mask_*/INT/*bm_INT0*/;
+      on= INT;
     }
   else
-    on= TR/*cell_tcon->get(TCON) & mask_TR*/;
+    on= TR;
   con->dd_printf(" %s", on?"ON":"OFF");
   con->dd_printf(" irq=%c", (cell_tcon->get()&mask_TF)?'1':'0');
-  con->dd_printf(" %s", (uc->get_mem(MEM_SFR, IE)&bmET0)?"en":"dis");
+  con->dd_printf(" %s", sfr?"?":((sfr->get(IE)&bmET0)?"en":"dis"));
   con->dd_printf(" prio=%d", uc->it_priority(bmPT0));
   con->dd_printf("\n");
 }

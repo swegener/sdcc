@@ -47,10 +47,13 @@ cl_pca::cl_pca(class cl_uc *auc, int aid):
 int
 cl_pca::init(void)
 {
-  class cl_mem *sfr= uc->mem(MEM_SFR);
-  t_addr CCAPL[5]= {CCAPL[0], CCAPL[1], CCAPL[2], CCAPL[3], CCAPL[4]};
-  t_addr CCAPH[5]= {CCAPH[0], CCAPH[1], CCAPH[2], CCAPH[3], CCAPH[4]};
-  t_addr CCAPM[5]= {CCAPM[0], CCAPM[1], CCAPM[2], CCAPM[3], CCAPM[4]};
+  sfr= uc->address_space(MEM_SFR_ID);
+  //t_addr CCAPL[5]= {CCAPL[0], CCAPL[1], CCAPL[2], CCAPL[3], CCAPL[4]};
+  //t_addr CCAPH[5]= {CCAPH[0], CCAPH[1], CCAPH[2], CCAPH[3], CCAPH[4]};
+  //t_addr CCAPM[5]= {CCAPM[0], CCAPM[1], CCAPM[2], CCAPM[3], CCAPM[4]};
+  t_addr CCAPL[5]= {CCAP0L, CCAP1L, CCAP2L, CCAP3L, CCAP4L};
+  t_addr CCAPH[5]= {CCAP0H, CCAP1H, CCAP2H, CCAP3H, CCAP4H};
+  t_addr CCAPM[5]= {CCAPM0, CCAPM1, CCAPM2, CCAPM3, CCAPM4};
   int i;
 
   if (!sfr)
@@ -88,7 +91,7 @@ cl_pca::added_to_uc(void)
 }
 
 void
-cl_pca::write(class cl_cell *cell, t_mem *val)
+cl_pca::write(class cl_memory_cell *cell, t_mem *val)
 {
   //uchar bmCEX[5]= {bmCEX0, bmCEX1, bmCEX2, bmCEX3, bmCEX4};
   //uchar bmCCF[5]= {bmCCF0, bmCCF1, bmCCF2, bmCCF3, bmCCF4};
@@ -139,9 +142,9 @@ cl_pca::write(class cl_cell *cell, t_mem *val)
 }
 
 /*void
-cl_pca::mem_cell_changed(class cl_mem *mem, t_addr addr)
+cl_pca::mem_cell_changed(class cl_m *mem, t_addr addr)
 {
-  class cl_mem *sfr= uc->mem(MEM_SFR);
+  class cl_m *sfr= uc->mem(MEM_SFR);
 
   if (mem && sfr && mem == sfr)
     {
@@ -188,7 +191,7 @@ cl_pca::tick(int cycles)
 void
 cl_pca::do_pca_counter(int cycles)
 {
-  //class cl_mem *sfr= uc->mem(MEM_SFR);
+  //class cl_m *sfr= uc->mem(MEM_SFR);
 
   while (cycles--)
     {
@@ -215,8 +218,6 @@ cl_pca::do_pca_counter(int cycles)
 void
 cl_pca::do_pca_module(int nr)
 {
-  class cl_mem *sfr= uc->mem(MEM_SFR);
-
   uchar bmCEX[5]= {bmCEX0, bmCEX1, bmCEX2, bmCEX3, bmCEX4};
   uchar bmCCF[5]= {bmCCF0, bmCCF1, bmCCF2, bmCCF3, bmCCF4};
   //uint p1= sfr->get(P1);

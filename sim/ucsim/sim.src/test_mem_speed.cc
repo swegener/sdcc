@@ -72,13 +72,13 @@ main(void)
   signal(SIGALRM, alarmed);
   con= new cl_console(stdin, stdout, 0);
 
-  mem= new cl_mem(MEM_SFR, "egy", 0x10000, 8);
+  mem= new cl_mem(MEM_SFR, "egy", 0x10000, 8, 0);
   mem->init();
   printf("%g operations on classic memory within 5 sec\n",
 	 do_rw_test(mem, 5));
   //mem->dump(con);
 
-  m2= new cl_m(MEM_TYPES, "test", 0x10000, 8);
+  m2= new cl_m(MEM_TYPES, "test", 0x10000, 8, 0);
   m2->init();
   printf("%g operations on new memory within 5 sec\n",
 	 do_rw_test(m2, 5));
@@ -87,8 +87,9 @@ main(void)
   for (i= 0; i < 0x10000; i++)
     {
       class cl_cell *c= m2->get_cell(i);
+      int dummy;
       if (c)
-	c->add_hw(hw);
+	c->add_hw(hw, &dummy);
     }
   printf("%g operations on new memory within 5 sec with hw read\n",
 	 do_rw_test(m2, 5));

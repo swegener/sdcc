@@ -1,4 +1,4 @@
-EXEEXT          = @EXEEXT@
+EXEEXT		= @EXEEXT@
 
 enable_51	= @enable_51@
 enable_avr	= @enable_avr@

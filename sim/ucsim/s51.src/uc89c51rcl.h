@@ -33,7 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "uc51rcl.h"
 
 
-class t_uc89c51r: public t_uc51r
+class cl_uc89c51r: public cl_uc51r
 {
 public:
   //int t0_overflows;
@@ -41,8 +41,9 @@ public:
   uchar dpl1, dph1;
 
 public:
-  t_uc89c51r(int Itype, int Itech, class cl_sim *asim);
+  cl_uc89c51r(int Itype, int Itech, class cl_sim *asim);
   virtual void mk_hw_elements(void);
+  virtual void make_memories(void);
 
   virtual void  reset(void);
   virtual void  pre_inst(void);
@@ -59,12 +60,12 @@ public:
 class cl_89c51r_dummy_hw: public cl_hw
 {
 protected:
-  class cl_cell *auxr;
+  class cl_memory_cell *auxr;
 public:
   cl_89c51r_dummy_hw(class cl_uc *auc);
   virtual int init(void);
 
-  virtual void write(class cl_cell *cell, t_mem *val);
+  virtual void write(class cl_memory_cell *cell, t_mem *val);
 };
 
 #endif

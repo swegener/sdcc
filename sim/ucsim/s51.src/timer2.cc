@@ -40,8 +40,12 @@ cl_timer2::cl_timer2(class cl_uc *auc, int aid, char *aid_string,
   mask_TCLK= bmTCLK;
   mask_CP_RL2= bmCP_RL2;
   make_partner(HW_UART, 0);
+  sfr= uc->address_space(MEM_SFR_ID);
   if (features & (t2_down|t2_clock_out))
-    register_cell(uc->mem(MEM_SFR), T2MOD, &cell_t2mod, wtd_restore_write);
+    {
+      register_cell(sfr, T2MOD, &cell_t2mod,
+		    wtd_restore_write);
+    }
 }
 
 int
@@ -50,9 +54,10 @@ cl_timer2::init(void)
   cl_timer0::init();
   //cell_rcap2l= uc->mem(MEM_SFR)->get_cell(RCAP2L);
   //cell_rcap2h= uc->mem(MEM_SFR)->get_cell(RCAP2H);
-  use_cell(uc->mem(MEM_SFR), RCAP2L, &cell_rcap2l, wtd_restore);
-  use_cell(uc->mem(MEM_SFR), RCAP2H, &cell_rcap2h, wtd_restore);
-  bit_t2ex= uc->read_mem(MEM_SFR, P1) & bmT2EX;
+  use_cell(sfr, RCAP2L, &cell_rcap2l, wtd_restore);
+  use_cell(sfr, RCAP2H, &cell_rcap2h, wtd_restore);
+  if (sfr)
+    bit_t2ex= sfr->read(P1) & bmT2EX;
   return(0);
 }
 
@@ -102,7 +107,7 @@ cl_timer2::added(class cl_hw *new_hw)
 }*/
 
 void
-cl_timer2::write(class cl_cell *cell, t_mem *val)
+cl_timer2::write(class cl_memory_cell *cell, t_mem *val)
 {
   int oldmode= mode;
   bool oldtr= TR;
@@ -316,10 +321,12 @@ cl_timer2::do_t2_down(int cycles)
 	    toggle= DD_TRUE;
 	  }
       }
-  if (toggle)
+  if (toggle &&
+      sfr)
     {
-      class cl_cell *p1= uc->mem(MEM_SFR)->get_cell(P1);
-      p1->set(p1->get() ^ bmEXF2);
+      class cl_memory_cell *p1= sfr->get_cell(P1);
+      if (p1)
+	p1->set(p1->get() ^ bmEXF2);
     }
 }
 
@@ -348,11 +355,13 @@ cl_timer2::do_t2_clock_out(int cycles)
 	    cell_th->set(cell_rcap2h->get());
 	    cell_tl->set(cell_rcap2l->get());
 	    inform_partners(EV_OVERFLOW, 0);
-	    if (!C_T)
+	    if (!C_T &&
+		sfr)
 	      {
 		// toggle T2 on P1
-		class cl_cell *p1= uc->mem(MEM_SFR)->get_cell(P1);
-		p1->set(p1->get() ^ bmT2);
+		class cl_memory_cell *p1= sfr->get_cell(P1);
+		if (p1)
+		  p1->set(p1->get() ^ bmT2);
 	      }
 	  }
     }
@@ -401,7 +410,7 @@ cl_timer2::print_info(class cl_console *con)
   con->dd_printf(" %s", (C_T)?"counter":"timer");
   con->dd_printf(" %s", (TR)?"ON":"OFF");
   con->dd_printf(" irq=%c", (t2con&bmTF2)?'1':'0');
-  con->dd_printf(" %s", (uc->get_mem(MEM_SFR, IE)&bmET2)?"en":"dis");
+  con->dd_printf(" %s", sfr?"?":((sfr->get(IE)&bmET2)?"en":"dis"));
   con->dd_printf(" prio=%d", uc->it_priority(bmPT2));
   con->dd_printf("\n");
 }

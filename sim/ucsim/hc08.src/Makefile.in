@@ -26,7 +26,7 @@ SHAREDLIB	= @SHAREDLIB@
 
 EXEEXT          = @EXEEXT@
 
-LIBS		= @LIBS@ -L$(PRJDIR) -lutil -lsim -lutil -lcmd -lguiucsim
+LIBS		= @LIBS@ -L$(PRJDIR) -Wl,--start-group -lutil -lsim -lcmd -lguiucsim -Wl,--end-group
 DL		= @DL@
 dl_ok		= @dl_ok@
 

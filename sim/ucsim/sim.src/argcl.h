@@ -59,7 +59,7 @@ public:
   virtual double get_fvalue(void);
   virtual void *get_pvalue(void);
   virtual bool get_bit_address(class cl_uc *uc, // input
-			       class cl_mem **mem, // outputs
+			       class cl_address_space **mem, // outputs
 			       t_addr *mem_addr,
 			       t_mem *bit_mask) { return(DD_FALSE); }
 };
@@ -73,13 +73,16 @@ class cl_cmd_arg: public cl_arg
 {
 public:
   //class cl_uc *uc;
-
   bool interpreted_as_string;
   union {
     long number;
     t_addr address;
     t_mem data;
-    class cl_mem *memory;
+    struct {
+      class cl_memory *memory;
+      class cl_address_space *address_space;
+      class cl_memory_chip *memchip;
+    } memory;
     class cl_hw *hw;
     struct {
       int len;
@@ -90,7 +93,7 @@ public:
       int len;
     } data_list;
     struct {
-      class cl_mem *mem;
+      class cl_address_space *mem;
       t_addr mem_address;
       t_mem mask;
     } bit;
@@ -121,7 +124,7 @@ public:
 
   virtual bool get_address(class cl_uc *uc, t_addr *addr);
   virtual bool get_bit_address(class cl_uc *uc, // input
-			       class cl_mem **mem, // outputs
+			       class cl_address_space **mem, // outputs
 			       t_addr *mem_addr,
 			       t_mem *bit_mask);
   virtual bool as_string(void);
@@ -134,10 +137,11 @@ public:
 
   virtual bool get_address(class cl_uc *uc, t_addr *addr);
   virtual bool get_bit_address(class cl_uc *uc, // input
-			       class cl_mem **mem, // outputs
+			       class cl_address_space **mem, // outputs
 			       t_addr *mem_addr,
 			       t_mem *bit_mask);
   virtual bool as_address(class cl_uc *uc);
+  virtual bool as_number(void) { return(DD_FALSE); }
   virtual bool as_string(void);
   virtual bool as_hw(class cl_uc *uc);
 };
@@ -148,6 +152,7 @@ public:
   cl_cmd_str_arg(/*class cl_uc *iuc,*/ char *str);
 
   virtual int is_string(void) { return(1); }
+  virtual bool as_number(void) { return(DD_FALSE); }
 };
 
 class cl_cmd_bit_arg: public cl_cmd_arg
@@ -162,7 +167,7 @@ public:
 
   virtual bool get_address(class cl_uc *uc, t_addr *addr);
   virtual bool get_bit_address(class cl_uc *uc, // input
-			       class cl_mem **mem, // outputs
+			       class cl_address_space **mem, // outputs
 			       t_addr *mem_addr,
 			       t_mem *bit_mask);
 };
@@ -184,7 +189,7 @@ public:
  * Program arguments
  */
 
-class cl_prg_arg: public cl_arg
+/*class cl_prg_arg: public cl_arg
 {
 public:
   char short_name;
@@ -196,14 +201,14 @@ public:
   cl_prg_arg(char sn, char *ln, double fv);
   cl_prg_arg(char sn, char *ln, void *pv);
   virtual ~cl_prg_arg(void);
-};
+};*/
 
 
 /*
  * List of arguments
  */
 
-class cl_arguments: public cl_list
+/*class cl_arguments: public cl_list
 {
 public:
   cl_arguments(void): cl_list(5, 5) {}
@@ -214,7 +219,7 @@ public:
   virtual char *get_sarg(char sname, char *lname);
   virtual double get_farg(char sname, char *lname);
   virtual void *get_parg(char sname, char *lname);
-};
+};*/
 
 
 #endif

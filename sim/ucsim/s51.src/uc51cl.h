@@ -7,22 +7,24 @@
  *
  */
 
-/* This file is part of microcontroller simulator: ucsim.
+/*
+  This file is part of microcontroller simulator: ucsim.
 
-UCSIM is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-UCSIM is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with UCSIM; see the file COPYING.  If not, write to the Free
-Software Foundation, 59 Temple Place - Suite 330, Boston, MA
-02111-1307, USA. */
+  UCSIM is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+  
+  UCSIM is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with UCSIM; see the file COPYING.  If not, write to the Free
+  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+  02111-1307, USA.
+*/
 /*@1@*/
 
 #ifndef UC51CL_HEADER
@@ -43,16 +45,29 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "interruptcl.h"
 
 
-class t_uc51: public cl_uc
+class t_uc51;
+
+class cl_irq_stop_option: public cl_optref
+{
+protected:
+  class cl_51core *uc51;
+public:
+  cl_irq_stop_option(class cl_51core *the_uc51);
+  virtual int init(void);
+  virtual void option_changed(void);
+};
+
+class cl_51core: public cl_uc
 {
 public:
   // Options
-  bool debug;
+  //bool debug;
+  class cl_irq_stop_option *irq_stop_option;
   bool stop_at_it;
 
   // memories and cells for faster access
-  class cl_mem *sfr, *iram;
-  class cl_cell *acc, *psw;
+  class cl_address_space *sfr, *iram, *xram;
+  class cl_memory_cell *acc, *psw;
 
 public:
   // Help to detect external it requests (falling edge)
@@ -68,23 +83,26 @@ public:
 public:
   int result;		// result of instruction execution
 
-  t_uc51(int Itype, int Itech,
-	 class cl_sim *asim);
-  virtual ~t_uc51(void);
+  cl_51core(int Itype, int Itech, class cl_sim *asim);
+  virtual ~cl_51core(void);
   virtual int    init(void);
   virtual char  *id_string(void);
   virtual void mk_hw_elements(void);
-  virtual class cl_mem *mk_mem(enum mem_class type, char *class_name);
+  virtual void build_cmdset(class cl_cmdset *cmdset);
+  //virtual class cl_m *mk_mem(enum mem_class type, char *class_name);
+  virtual void make_memories(void);
 
-          void   write_rom(t_addr addr, ulong data);
   virtual int clock_per_cycle(void) { return(12); }
   virtual struct dis_entry *dis_tbl(void);
   virtual struct name_entry *sfr_tbl(void);
   virtual struct name_entry *bit_tbl(void);
   virtual char *disass(t_addr addr, char *sep);
   virtual void   print_regs(class cl_console *con);
-  virtual class cl_mem *bit2mem(t_addr bitaddr,
-				t_addr *memaddr, t_mem *bitmask);
+  virtual class cl_address_space *bit2mem(t_addr bitaddr,
+					  t_addr *memaddr, t_mem *bitmask);
+  virtual t_addr bit_address(class cl_memory *mem,
+			     t_addr mem_address,
+			     int bit_number);
   virtual void   reset(void);
   virtual void   clear_sfr(void);
   virtual void   analyze(t_addr addr);
@@ -92,7 +110,7 @@ public:
 
   virtual int    do_inst(int step);
 
-  virtual void mem_cell_changed(class cl_mem *mem, t_addr addr);
+  //virtual void mem_cell_changed(class cl_m *mem, t_addr addr);
 
 protected:
   virtual int  do_interrupt(void);
@@ -100,13 +118,13 @@ protected:
 protected:
   virtual int  idle_pd(void);
 
-  virtual class cl_cell *get_direct(t_mem addr);
-  virtual class cl_cell *get_reg(uchar regnum);
+  virtual class cl_memory_cell *get_direct(t_mem addr);
+  virtual class cl_memory_cell *get_reg(uchar regnum);
 
   virtual int   exec_inst(void);
   //virtual void  post_inst(void);
 
-  virtual int inst_unknown(uchar code);
+  virtual int inst_unknown(void);
   virtual int inst_nop(uchar code);			/* 00 */
   virtual int inst_ajmp_addr(uchar code);		/* [02468ace]1 */
   virtual int inst_ljmp(uchar code);			/* 02 */
@@ -117,7 +135,7 @@ protected:
   virtual int inst_inc_rn(uchar code);			/* 08-0f */
   virtual int inst_jbc_bit_addr(uchar code);		/* 10 */
   virtual int inst_acall_addr(uchar code);		/* [13579bdf]1 */
-  virtual int inst_lcall(uchar code, uint addr);	/* 12 */
+  virtual int inst_lcall(uchar code, uint addr, bool intr);/* 12 */
   virtual int inst_rrc(uchar code);			/* 13 */
   virtual int inst_dec_a(uchar code);			/* 14 */
   virtual int inst_dec_addr(uchar code);		/* 15 */
@@ -179,6 +197,7 @@ protected:
   virtual int inst_subb_a_addr(uchar code);		/* 95 */
   virtual int inst_subb_a_Sri(uchar code);		/* 96,97 */
   virtual int inst_subb_a_rn(uchar code);		/* 98-9f */
+  virtual int inst_orl_c_Sbit(uchar code);		/* a0 */
   virtual int inst_mov_c_bit(uchar code);		/* a2 */
   virtual int inst_inc_dptr(uchar code);		/* a3 */
   virtual int inst_mul_ab(uchar code);			/* a4 */
@@ -224,12 +243,12 @@ class cl_uc51_dummy_hw: public cl_hw
 {
 protected:
   //class t_uc51 *uc51;
-  class cl_cell *cell_acc, *cell_sp, *cell_psw;
+  class cl_memory_cell *cell_acc, *cell_sp, *cell_psw/*, *cell_pcon*/;
 public:
   cl_uc51_dummy_hw(class cl_uc *auc);
   virtual int init(void);
 
-  virtual void write(class cl_cell *cell, t_mem *val);
+  virtual void write(class cl_memory_cell *cell, t_mem *val);
   //virtual void happen(class cl_hw *where, enum hw_event he, void *params);
 };
 

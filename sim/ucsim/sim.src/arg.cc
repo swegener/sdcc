@@ -130,8 +130,7 @@ cl_cmd_arg::~cl_cmd_arg(void)
 bool
 cl_cmd_arg::as_address(class cl_uc *uc)
 {
-  bool b= get_address(uc, &(value.address));
-  return(b);
+  return(get_address(uc, &(value.address)));    
 }
 
 bool
@@ -152,8 +151,19 @@ cl_cmd_arg::as_data(void)
 bool
 cl_cmd_arg::as_memory(class cl_uc *uc)
 {
-  value.memory= uc->mem(s_value);
-  return(value.memory != 0);
+  value.memory.memory= uc->memory(s_value);
+  value.memory.address_space= 0;
+  value.memory.memchip= 0;
+  if (value.memory.memory)
+    {
+      if (value.memory.memory->is_chip())
+	value.memory.memchip=
+	  dynamic_cast<class cl_memory_chip *>(value.memory.memory);
+      if (value.memory.memory->is_address_space())
+	value.memory.address_space=
+	  dynamic_cast<class cl_address_space *>(value.memory.memory);
+    }
+  return(value.memory.memory != 0);
 }
 
 bool
@@ -207,7 +217,7 @@ cl_cmd_int_arg::get_address(class cl_uc *uc, t_addr *addr)
 
 bool
 cl_cmd_int_arg::get_bit_address(class cl_uc *uc, // input
-				class cl_mem **mem, // outputs
+				class cl_address_space **mem, // outputs
 				t_addr *mem_addr,
 				t_mem *bit_mask)
 {
@@ -266,15 +276,14 @@ cl_cmd_sym_arg::get_address(class cl_uc *uc, t_addr *addr)
 
 bool
 cl_cmd_sym_arg::get_bit_address(class cl_uc *uc, // input
-				class cl_mem **mem, // outputs
+				class cl_address_space **mem, // outputs
 				t_addr *mem_addr,
 				t_mem *bit_mask)
 {
   struct name_entry *ne;
 
-  if ((ne= get_name_entry(uc->bit_tbl(),
-			  get_svalue(),
-			  uc)) == NULL)
+  ne= get_name_entry(uc->bit_tbl(), get_svalue(), uc);
+  if (ne == NULL)
     return(DD_FALSE);
   if (mem)
     *mem= uc->bit2mem(ne->addr, mem_addr, bit_mask);
@@ -316,7 +325,8 @@ cl_cmd_sym_arg::as_hw(class cl_uc *uc)
 
 cl_cmd_str_arg::cl_cmd_str_arg(/*class cl_uc *iuc,*/ char *str):
   cl_cmd_arg(/*iuc,*/ str)
-{}
+{
+}
 
 
 /* Bit */
@@ -347,12 +357,16 @@ cl_cmd_bit_arg::get_address(class cl_uc *uc, t_addr *addr)
 
 bool
 cl_cmd_bit_arg::get_bit_address(class cl_uc *uc, // input
-				class cl_mem **mem, // outputs
+				class cl_address_space **mem, // outputs
 				t_addr *mem_addr,
 				t_mem *bit_mask)
 {
   if (mem)
-    *mem= uc->mem(MEM_SFR);
+    {
+      *mem= uc->address_space(MEM_SFR_ID);
+      if (!*mem)
+	return(DD_FALSE);
+    }
   if (mem_addr)
     {
       if (!sfr ||
@@ -413,7 +427,7 @@ cl_cmd_array_arg::as_hw(class cl_uc *uc)
  * Program arguments
  *----------------------------------------------------------------------------
  */
-
+/*
 cl_prg_arg::cl_prg_arg(char sn, char *ln, long lv):
   cl_arg(lv)
 {
@@ -447,13 +461,13 @@ cl_prg_arg::~cl_prg_arg(void)
   if (long_name)
     free(long_name);
 }
-
+*/
 
 /*
  * List of arguments
  *----------------------------------------------------------------------------
  */
-
+/*
 int
 cl_arguments::arg_avail(char nam)
 {
@@ -556,6 +570,6 @@ cl_arguments::get_parg(char sname, char *lname)
     }
   return(0);
 }
-
+*/
 
 /* End of arg.cc */

@@ -183,8 +183,15 @@ cl_sim::stop(int reason)
 	  cmd->frozen_console->dd_printf("User stopped\n");
 	  break;
 	case resINV_INST:
-	  cmd->frozen_console->dd_printf("Invalid instruction 0x%04x\n",
-				      uc->get_mem(MEM_ROM, uc->PC));
+	  {
+	    cmd->frozen_console->dd_printf("Invalid instruction");
+	    if (uc->rom)
+	      cmd->frozen_console->dd_printf(" 0x%04x\n",
+					     uc->rom->get(uc->PC));
+	  }
+         break;
+	case resERROR:
+	  // uc::check_error prints error messages...
 	  break;
 	default:
 	  cmd->frozen_console->dd_printf("Unknown reason\n");
@@ -197,6 +204,31 @@ cl_sim::stop(int reason)
       cmd->frozen_console= 0;
     }
   cmd->set_fd_set();
+}
+
+void
+cl_sim::stop(class cl_ev_brk *brk)
+{
+  class cl_commander *cmd= app->get_commander();
+
+  state&= ~SIM_GO;
+  if (cmd->frozen_console)
+    {
+      class cl_console *con= cmd->frozen_console;
+      /*
+      if (reason == resUSER &&
+	  cmd->frozen_console->input_avail())
+	cmd->frozen_console->read_line();
+      */
+      //con->dd_printf("Stop at 0x%06x\n", uc->PC);
+      con->dd_printf("Event `%s' at %s[0x%"_A_"x]: 0x%"_A_"x %s\n",
+		     brk->id, brk->get_mem()->get_name(), brk->addr,
+		     uc->instPC,
+		     uc->disass(uc->instPC, " "));
+      //con->flags&= ~CONS_FROZEN;
+      //con->print_prompt();
+      //cmd->frozen_console= 0;
+    }
 }
 
 
@@ -221,13 +253,13 @@ cl_sim::build_cmdset(class cl_cmdset *cmdset)
 "long help of stop"));
   cmd->init();
 
-  cmdset->add(cmd= new cl_step_cmd("step", 0,
+  cmdset->add(cmd= new cl_step_cmd("step", DD_TRUE,
 "step               Step",
 "long help of step"));
   cmd->init();
   cmd->add_name("s");
 
-  cmdset->add(cmd= new cl_next_cmd("next", 0,
+  cmdset->add(cmd= new cl_next_cmd("next", DD_TRUE,
 "next               Next",
 "long help of next"));
   cmd->init();
@@ -255,15 +287,15 @@ cl_sim::build_cmdset(class cl_cmdset *cmdset)
 /*
  * Messages to broadcast
  */
-
+/*
 void
-cl_sim::mem_cell_changed(class cl_mem *mem, t_addr addr)
+cl_sim::mem_cell_changed(class cl_address_space *mem, t_addr addr)
 {
   if (uc)
     uc->mem_cell_changed(mem, addr);
   else
     printf("JAJ sim\n");
 }
-
+*/
 
 /* End of sim.src/sim.cc */

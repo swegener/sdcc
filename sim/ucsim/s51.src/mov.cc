@@ -49,7 +49,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  */
 
 int
-t_uc51::inst_mov_a_Sdata(uchar code)
+cl_51core::inst_mov_a_Sdata(uchar code)
 {
   acc->write(fetch());
   return(resGO);
@@ -63,9 +63,9 @@ t_uc51::inst_mov_a_Sdata(uchar code)
  */
 
 int
-t_uc51::inst_mov_addr_Sdata(uchar code)
+cl_51core::inst_mov_addr_Sdata(uchar code)
 {
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
 
   cell= get_direct(fetch());
   cell->write(fetch());
@@ -81,9 +81,9 @@ t_uc51::inst_mov_addr_Sdata(uchar code)
  */
 
 int
-t_uc51::inst_mov_Sri_Sdata(uchar code)
+cl_51core::inst_mov_Sri_Sdata(uchar code)
 {
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
   
   cell= iram->get_cell(get_reg(code & 0x01)->read());
   t_mem d= fetch();
@@ -99,9 +99,9 @@ t_uc51::inst_mov_Sri_Sdata(uchar code)
  */
 
 int
-t_uc51::inst_mov_rn_Sdata(uchar code)
+cl_51core::inst_mov_rn_Sdata(uchar code)
 {
-  class cl_cell *reg;
+  class cl_memory_cell *reg;
 
   reg= get_reg(code & 0x07);
   reg->write(fetch());
@@ -116,9 +116,9 @@ t_uc51::inst_mov_rn_Sdata(uchar code)
  */
 
 int
-t_uc51::inst_movc_a_Sa_pc(uchar code)
+cl_51core::inst_movc_a_Sa_pc(uchar code)
 {
-  acc->write(mem(MEM_ROM)->read(PC + acc->read()));
+  acc->write(rom->read(PC + acc->read()));
   tick(1);
   return(resGO);
 }
@@ -131,9 +131,9 @@ t_uc51::inst_movc_a_Sa_pc(uchar code)
  */
 
 int
-t_uc51::inst_mov_addr_addr(uchar code)
+cl_51core::inst_mov_addr_addr(uchar code)
 {
-  class cl_cell *d, *s;
+  class cl_memory_cell *d, *s;
 
   /* SD reversed s & d here */
   s= get_direct(fetch());
@@ -151,9 +151,9 @@ t_uc51::inst_mov_addr_addr(uchar code)
  */
 
 int
-t_uc51::inst_mov_addr_Sri(uchar code)
+cl_51core::inst_mov_addr_Sri(uchar code)
 {
-  class cl_cell *d, *s;
+  class cl_memory_cell *d, *s;
 
   d= get_direct(fetch());
   s= iram->get_cell(get_reg(code & 0x01)->read());
@@ -170,9 +170,9 @@ t_uc51::inst_mov_addr_Sri(uchar code)
  */
 
 int
-t_uc51::inst_mov_addr_rn(uchar code)
+cl_51core::inst_mov_addr_rn(uchar code)
 {
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
 
   cell= get_direct(fetch());
   cell->write(get_reg(code & 0x07)->read());
@@ -188,7 +188,7 @@ t_uc51::inst_mov_addr_rn(uchar code)
  */
 
 int
-t_uc51::inst_mov_dptr_Sdata(uchar code)
+cl_51core::inst_mov_dptr_Sdata(uchar code)
 {
   sfr->write(DPH, fetch());
   sfr->write(DPL, fetch());
@@ -204,11 +204,9 @@ t_uc51::inst_mov_dptr_Sdata(uchar code)
  */
 
 int
-t_uc51::inst_movc_a_Sa_dptr(uchar code)
+cl_51core::inst_movc_a_Sa_dptr(uchar code)
 {
-  acc->write(get_mem(MEM_ROM,
-		     sfr->read(DPH)*256+sfr->read(DPL) +
-		     acc->read()));
+  acc->write(rom->read(sfr->read(DPH)*256+sfr->read(DPL) +  acc->read()));
   tick(1);
   return(resGO);
 }
@@ -221,9 +219,9 @@ t_uc51::inst_movc_a_Sa_dptr(uchar code)
  */
 
 int
-t_uc51::inst_mov_Sri_addr(uchar code)
+cl_51core::inst_mov_Sri_addr(uchar code)
 {
-  class cl_cell *d, *s;
+  class cl_memory_cell *d, *s;
 
   d= iram->get_cell(get_reg(code & 0x01)->read());
   s= get_direct(fetch());
@@ -240,9 +238,9 @@ t_uc51::inst_mov_Sri_addr(uchar code)
  */
 
 int
-t_uc51::inst_mov_rn_addr(uchar code)
+cl_51core::inst_mov_rn_addr(uchar code)
 {
-  class cl_cell *reg, *cell;
+  class cl_memory_cell *reg, *cell;
 
   reg = get_reg(code & 0x07);
   cell= get_direct(fetch());
@@ -259,15 +257,21 @@ t_uc51::inst_mov_rn_addr(uchar code)
  */
 
 int
-t_uc51::inst_push(uchar code)
+cl_51core::inst_push(uchar code)
 {
-  t_addr sp;
-  class cl_cell *stck, *cell;
+  t_addr sp, sp_before/*, sp_after*/;
+  t_mem data;
+  class cl_memory_cell *stck, *cell;
 
   cell= get_direct(fetch());
-  sp= sfr->wadd(SP, 1);
+  sp_before= sfr->get(SP);
+  sp= /*sp_after= */sfr->wadd(SP, 1);
   stck= iram->get_cell(sp);
-  stck->write(cell->read());
+  stck->write(data= cell->read());
+  class cl_stack_op *so=
+    new cl_stack_push(instPC, data, sp_before, sp/*_after*/);
+  so->init();
+  stack_write(so);
   tick(1);
   return(resGO);
 }
@@ -280,10 +284,10 @@ t_uc51::inst_push(uchar code)
  */
 
 int
-t_uc51::inst_xch_a_addr(uchar code)
+cl_51core::inst_xch_a_addr(uchar code)
 {
   t_mem temp;
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
 
   cell= get_direct(fetch());
   temp= acc->read();
@@ -300,10 +304,10 @@ t_uc51::inst_xch_a_addr(uchar code)
  */
 
 int
-t_uc51::inst_xch_a_Sri(uchar code)
+cl_51core::inst_xch_a_Sri(uchar code)
 {
   t_mem temp;
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
 
   cell= iram->get_cell(get_reg(code & 0x01)->read());
   temp= acc->read();
@@ -320,10 +324,10 @@ t_uc51::inst_xch_a_Sri(uchar code)
  */
 
 int
-t_uc51::inst_xch_a_rn(uchar code)
+cl_51core::inst_xch_a_rn(uchar code)
 {
   t_mem temp;
-  class cl_cell *reg;
+  class cl_memory_cell *reg;
 
   reg = get_reg(code & 0x07);
   temp= acc->read();
@@ -340,16 +344,22 @@ t_uc51::inst_xch_a_rn(uchar code)
  */
 
 int
-t_uc51::inst_pop(uchar code)
+cl_51core::inst_pop(uchar code)
 {
-  t_addr sp;
-  class cl_cell *cell, *stck;
+  t_addr sp, sp_before/*, sp_after*/;
+  t_mem data;
+  class cl_memory_cell *cell, *stck;
 
+  sp_before= sfr->get(SP);
   cell= get_direct(fetch());
   stck= iram->get_cell(sfr->get(SP));
-  cell->write(stck->read());
-  sp= sfr->wadd(SP, -1);
+  cell->write(data= stck->read());
+  sp= /*sp_after= */sfr->wadd(SP, -1);
   tick(1);
+  class cl_stack_op *so=
+    new cl_stack_pop(instPC, data, sp_before, sp/*_after*/);
+  so->init();
+  stack_read(so);
   return(resGO);
 }
 
@@ -361,10 +371,10 @@ t_uc51::inst_pop(uchar code)
  */
 
 int
-t_uc51::inst_xchd_a_Sri(uchar code)
+cl_51core::inst_xchd_a_Sri(uchar code)
 {
   t_mem temp, d;
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
 
   cell= iram->get_cell(get_reg(code & 0x01)->read());
   temp= (d= cell->read()) & 0x0f;
@@ -381,10 +391,9 @@ t_uc51::inst_xchd_a_Sri(uchar code)
  */
 
 int
-t_uc51::inst_movx_a_Sdptr(uchar code)
+cl_51core::inst_movx_a_Sdptr(uchar code)
 {
-  acc->write(read_mem(MEM_XRAM,
-		      sfr->read(DPH)*256 + sfr->read(DPL)));
+  acc->write(xram->read(sfr->read(DPH)*256 + sfr->read(DPL)));
   tick(1);
   return(resGO);
 }
@@ -397,12 +406,12 @@ t_uc51::inst_movx_a_Sdptr(uchar code)
  */
 
 int
-t_uc51::inst_movx_a_Sri(uchar code)
+cl_51core::inst_movx_a_Sri(uchar code)
 {
   t_mem d;
 
   d= get_reg(code & 0x01)->read();
-  acc->write(read_mem(MEM_XRAM, sfr->read(P2)*256 + d));
+  acc->write(xram->read(sfr->read(P2)*256 + d));
   tick(1);
   return(resGO);
 }
@@ -415,26 +424,24 @@ t_uc51::inst_movx_a_Sri(uchar code)
  */
 
 int
-t_uc51::inst_mov_a_addr(uchar code)
+cl_51core::inst_mov_a_addr(uchar code)
 {
-  class cl_cell *cell;
-  int address = fetch();
-
+  class cl_memory_cell *cell;
+  t_addr address= fetch();
+  
   /* If this is ACC, it is an invalid instruction */
   if (address == ACC)
     {
-      sim->app->get_commander()->
-        debug ("Invalid Instruction : E5 E0  MOV A,ACC  at  %06x\n", PC);
-
-      return(resHALT);
+      //sim->app->get_commander()->
+      //debug("Invalid Instruction : E5 E0  MOV A,ACC  at  %06x\n", PC);
+      inst_unknown();
     }
   else
     {
       cell= get_direct(address);
       acc->write(cell->read());
-      return(resGO);
     }
-  
+  return(resGO);
 }
 
 
@@ -445,9 +452,9 @@ t_uc51::inst_mov_a_addr(uchar code)
  */
 
 int
-t_uc51::inst_mov_a_Sri(uchar code)
+cl_51core::inst_mov_a_Sri(uchar code)
 {
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
 
   cell= iram->get_cell(get_reg(code & 0x01)->read());
   acc->write(cell->read());
@@ -462,7 +469,7 @@ t_uc51::inst_mov_a_Sri(uchar code)
  */
 
 int
-t_uc51::inst_mov_a_rn(uchar code)
+cl_51core::inst_mov_a_rn(uchar code)
 {
   acc->write(get_reg(code & 0x07)->read());
   return(resGO);
@@ -476,9 +483,9 @@ t_uc51::inst_mov_a_rn(uchar code)
  */
 
 int
-t_uc51::inst_movx_Sdptr_a(uchar code)
+cl_51core::inst_movx_Sdptr_a(uchar code)
 {
-  write_mem(MEM_XRAM, sfr->read(DPH)*256 + sfr->read(DPL), acc->read());
+  xram->write(sfr->read(DPH)*256 + sfr->read(DPL), acc->read());
   tick(1);
   return(resGO);
 }
@@ -491,12 +498,12 @@ t_uc51::inst_movx_Sdptr_a(uchar code)
  */
 
 int
-t_uc51::inst_movx_Sri_a(uchar code)
+cl_51core::inst_movx_Sri_a(uchar code)
 {
   t_mem d;
 
   d= get_reg(code & 0x01)->read();
-  write_mem(MEM_XRAM, sfr->read(P2)*256 + d, acc->read());
+  xram->write(sfr->read(P2)*256 + d, acc->read());
   tick(1);
   return(resGO);
 }
@@ -509,9 +516,9 @@ t_uc51::inst_movx_Sri_a(uchar code)
  */
 
 int
-t_uc51::inst_mov_addr_a(uchar code)
+cl_51core::inst_mov_addr_a(uchar code)
 {
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
   
   cell= get_direct(fetch());
   cell->write(acc->read());
@@ -526,9 +533,9 @@ t_uc51::inst_mov_addr_a(uchar code)
  */
 
 int
-t_uc51::inst_mov_Sri_a(uchar code)
+cl_51core::inst_mov_Sri_a(uchar code)
 {
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
 
   cell= iram->get_cell(get_reg(code & 0x01)->read());
   cell->write(acc->read());
@@ -543,9 +550,9 @@ t_uc51::inst_mov_Sri_a(uchar code)
  */
 
 int
-t_uc51::inst_mov_rn_a(uchar code)
+cl_51core::inst_mov_rn_a(uchar code)
 {
-  class cl_cell *reg;
+  class cl_memory_cell *reg;
 
   reg= get_reg(code &0x07);
   reg->write(acc->read());

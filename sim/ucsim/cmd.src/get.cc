@@ -53,7 +53,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //			class cl_cmdline *cmdline, class cl_console *con)
 COMMAND_DO_WORK_UC(cl_get_sfr_cmd)
 {
-  class cl_mem *mem= uc->mem(MEM_SFR);
+  class cl_address_space *mem= uc->address_space(MEM_SFR_ID);
   class cl_cmd_arg *parm;
   int i;
 
@@ -66,7 +66,8 @@ COMMAND_DO_WORK_UC(cl_get_sfr_cmd)
        parm;
        i++, parm= cmdline->param(i))
     {
-      if (!parm->as_address(uc))
+      if (!parm->as_address(uc) ||
+	  !mem->valid_address(parm->value.address))
 	con->dd_printf("Warning: Invalid address %s\n",
 		       (char*)cmdline->tokens->at(i+1));
       else
@@ -103,13 +104,22 @@ COMMAND_DO_WORK_APP(cl_get_option_cmd)
     {
       class cl_option *o= (class cl_option *)(/*uc*/app->options->at(i));
       if ((!s ||
-	   !strcmp(s, o->get_name())) &&
-	  !o->hidden)
+	   !strcmp(s, o->get_name())))
 	{
-	  con->dd_printf("%2d. %s(by %s): ", i, object_name(o),
-			 object_name(o->get_creator()));
-	  o->print(con);
-	  con->dd_printf(" - %s\n", o->help);
+	  if (!o->hidden)
+	    {
+	      con->dd_printf("%2d. %s(by %s): ", i, object_name(o),
+			     object_name(o->get_creator()));
+	      o->print(con);
+	      con->dd_printf(" - %s\n", o->help);
+	    }
+	  else
+	    {
+	      /*
+	      con->dd_printf("%2d. %s(by %s) is hidden!\n", i, object_name(o),
+			   object_name(o->get_creator()));
+	      */
+	    }
 	}
     }
   

@@ -33,51 +33,40 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "uc89c51rcl.h"
 #include "regs51.h"
 #include "pcacl.h"
+#include "wdtcl.h"
 
 
-t_uc89c51r::t_uc89c51r(int Itype, int Itech, class cl_sim *asim):
-  t_uc51r(Itype, Itech, asim)
+cl_uc89c51r::cl_uc89c51r(int Itype, int Itech, class cl_sim *asim):
+  cl_uc51r(Itype, Itech, asim)
 {
-  /*it_sources->add_at(4, new cl_it_src(bmEC, CCON, bmCCF4, 0x0033, false,
-				      "PCA module #4"));
-  it_sources->add_at(4, new cl_it_src(bmEC, CCON, bmCCF3, 0x0033, false,
-				      "PCA module #3"));
-  it_sources->add_at(4, new cl_it_src(bmEC, CCON, bmCCF2, 0x0033, false,
-				      "PCA module #2"));
-  it_sources->add_at(4, new cl_it_src(bmEC, CCON, bmCCF1, 0x0033, false,
-				      "PCA module #1"));
-  it_sources->add_at(4, new cl_it_src(bmEC, CCON, bmCCF0, 0x0033, false,
-				      "PCA module #0"));
-  it_sources->add_at(4, new cl_it_src(bmEC, CCON, bmCF, 0x0033, false,
-  "PCA counter"));*/
 }
 
 
 void
-t_uc89c51r::mk_hw_elements(void)
+cl_uc89c51r::mk_hw_elements(void)
 {
   class cl_hw *h;
 
-  t_uc51r::mk_hw_elements();
+  cl_uc52::mk_hw_elements();
+  hws->add(h= new cl_wdt(this, 0x3fff));
+  h->init();
   hws->add(h= new cl_pca(this, 0));
   h->init();
-  /*hws->add(h= new cl_pca(this, 1));
-  h->init();
-  hws->add(h= new cl_pca(this, 2));
-  h->init();
-  hws->add(h= new cl_pca(this, 3));
-  h->init();
-  hws->add(h= new cl_pca(this, 4));
-  h->init();*/
   hws->add(h= new cl_89c51r_dummy_hw(this));
   h->init();
 }
 
+void
+cl_uc89c51r::make_memories(void)
+{
+  cl_uc52::make_memories();
+}
+
 
 void
-t_uc89c51r::reset(void)
+cl_uc89c51r::reset(void)
 {
-  t_uc51r::reset();
+  cl_uc51r::reset();
   sfr->set_bit1(CCAPM0, bmECOM);
   sfr->set_bit1(CCAPM1, bmECOM);
   sfr->set_bit1(CCAPM2, bmECOM);
@@ -85,11 +74,11 @@ t_uc89c51r::reset(void)
   sfr->set_bit1(CCAPM4, bmECOM);
   //t0_overflows= 0;
   dpl0= dph0= dpl1= dph1= 0;
-  sfr->set(IPH, 0);
+  sfr->write(IPH, 0);
 }
 
 int
-t_uc89c51r::it_priority(uchar ie_mask)
+cl_uc89c51r::it_priority(uchar ie_mask)
 {
   uchar l, h;
 
@@ -107,7 +96,7 @@ t_uc89c51r::it_priority(uchar ie_mask)
 }
 
 void
-t_uc89c51r::pre_inst(void)
+cl_uc89c51r::pre_inst(void)
 {
   if (sfr->get(AUXR1) & bmDPS)
     {
@@ -119,11 +108,11 @@ t_uc89c51r::pre_inst(void)
       sfr->set(DPL, dpl0);
       sfr->set(DPH, dph0);
     }
-  t_uc51r::pre_inst();
+  cl_uc51r::pre_inst();
 }
 
 void
-t_uc89c51r::post_inst(void)
+cl_uc89c51r::post_inst(void)
 {
   if (sfr->get(AUXR1) & bmDPS)
     {
@@ -135,7 +124,7 @@ t_uc89c51r::post_inst(void)
       dpl0= sfr->get(DPL);
       dph0= sfr->get(DPH);
     }
-  t_uc51r::post_inst();
+  cl_uc51r::post_inst();
 }
 
 
@@ -149,7 +138,7 @@ cl_89c51r_dummy_hw::cl_89c51r_dummy_hw(class cl_uc *auc):
 int
 cl_89c51r_dummy_hw::init(void)
 {
-  class cl_mem *sfr= uc->mem(MEM_SFR);
+  class cl_address_space *sfr= uc->address_space(MEM_SFR_ID);
   if (!sfr)
     {
       fprintf(stderr, "No SFR to register %s[%d] into\n", id_string, id);
@@ -160,7 +149,7 @@ cl_89c51r_dummy_hw::init(void)
 }
 
 void
-cl_89c51r_dummy_hw::write(class cl_cell *cell, t_mem *val)
+cl_89c51r_dummy_hw::write(class cl_memory_cell *cell, t_mem *val)
 {
   if (cell == auxr)
     auxr->set_bit0(0x04);

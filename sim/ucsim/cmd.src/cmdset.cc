@@ -27,6 +27,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "ddconfig.h"
 
+#include "cmdlexcl.h"
+#include "cmdpars.h"
+
 // prj
 #include "i_string.h"
 #include "utils.h"
@@ -86,7 +89,7 @@ COMMAND_DO_WORK_SIM(cl_run_cmd)
 	    }
 	  else
 	    {
-	      b= new cl_fetch_brk(sim->uc->mem(MEM_ROM),
+	      b= new cl_fetch_brk(sim->uc->address_space(MEM_ROM_ID),
 				  sim->uc->make_new_brknr(), end,
 				  brkDYNAMIC, 1);
 	      sim->uc->fbrk->add_bp(b);
@@ -172,7 +175,7 @@ COMMAND_DO_WORK_SIM(cl_next_cmd)
       next= sim->uc->PC + inst_len;
       if (!sim->uc->fbrk_at(next))
 	{
-	  b= new cl_fetch_brk(sim->uc->mem(MEM_ROM),
+	  b= new cl_fetch_brk(sim->uc->address_space(MEM_ROM_ID),
 			      sim->uc->make_new_brknr(),
 			      next, brkDYNAMIC, 1);
 
@@ -206,29 +209,87 @@ COMMAND_DO_WORK_SIM(cl_next_cmd)
 COMMAND_DO_WORK_APP(cl_help_cmd)
 {
   class cl_sim *sim;
-  class cl_commander *cmd;
+  class cl_commander *commander;
   class cl_cmdset *cmdset= 0;
-  class cl_cmd *c;
   int i;
   class cl_cmd_arg *parm= cmdline->param(0);
 
   sim= app->get_sim();
-  if ((cmd= app->get_commander()) != 0)
-    cmdset= cmd->cmdset;
+  if ((commander= app->get_commander()) != 0)
+    cmdset= commander->cmdset;
   if (!cmdset)
     return(DD_FALSE);
   if (!parm) {
     for (i= 0; i < cmdset->count; i++)
       {
-	c= (class cl_cmd *)(cmdset->at(i));
+	class cl_cmd *c= (class cl_cmd *)(cmdset->at(i));
 	if (c->short_help)
 	  con->dd_printf("%s\n", c->short_help);
 	else
 	  con->dd_printf("%s\n", (char*)(c->names->at(0)));
       }
   }
-  else if (cmdline->syntax_match(/*sim*/0, STRING)) {
-    int matches= 0;
+  else
+    {
+      matches= 0;
+      do_set(cmdline, 0, cmdset, con);
+      if (matches == 1 &&
+	  cmd_found)
+	{
+	  int names;
+	  con->dd_printf("Names of command:");
+	  for (names= 0; names < cmd_found->names->count; names++)
+	    con->dd_printf(" %s", (char*)(cmd_found->names->at(names)));
+	  con->dd_printf("\n");
+	  class cl_cmdset *subset= cmd_found->get_subcommands();
+	  if (subset)
+	    {
+	      con->dd_printf("\"%s\" must be followed by the name of a "
+			     "subcommand\nList of subcommands:\n",
+			     (char*)(cmd_found->names->at(0)));
+	      for (i= 0; i < subset->count; i++)
+		{
+		  class cl_cmd *c=
+		    dynamic_cast<class cl_cmd *>(subset->object_at(i));
+		  con->dd_printf("%s\n", c->short_help);
+		}
+	    }
+	  if (cmd_found->long_help)
+	    con->dd_printf("%s\n", cmd_found->long_help);
+	}
+      if (!matches ||
+	  !cmd_found)
+	con->dd_printf("No such command.\n");
+      //return(DD_FALSE);
+      /*
+      int pari;
+      for (pari= 0; pari < cmdline->nuof_params(); pari++)
+	{
+	  class cl_cmd_arg *act_param;
+	  act_param= (class cl_cmd_arg *)(cmdline->param(pari));
+	  for (i= 0; i < cmdset->count; i++)
+	    {
+	      class cl_cmd *c= (class cl_cmd *)(cmdset->at(i));
+	      if (!c->name_match(act_param->s_value, DD_FALSE))
+		continue;
+	      if (c->short_help)
+		con->dd_printf("%s\n", c->short_help);
+	      else
+		con->dd_printf("%s\n", (char*)(c->names->at(0)));
+	      if (pari < cmdline->nuof_params()-1)
+		continue;
+	      cmdset= c->get_subcommands();
+	      if (!cmdset)
+		return(DD_FALSE);
+	    }
+	}
+      return(DD_FALSE);
+      */
+    }
+  return(DD_FALSE);
+  /*
+  if (cmdline->syntax_match(0, STRING)) {
+    matches= 0;
     for (i= 0; i < cmdset->count; i++)
       {
 	c= (class cl_cmd *)(cmdset->at(i));
@@ -273,6 +334,44 @@ COMMAND_DO_WORK_APP(cl_help_cmd)
     con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax");
 
   return(0);
+  */
+}
+
+bool
+cl_help_cmd::do_set(class cl_cmdline *cmdline, int pari,
+		    class cl_cmdset *cmdset,
+		    class cl_console *con)
+{
+  int i;
+  for (i= 0; i < cmdset->count; i++)
+    {
+      class cl_cmd *cmd= dynamic_cast<class cl_cmd *>(cmdset->object_at(i));
+      if (!cmd)
+	continue;
+      if (pari >= cmdline->nuof_params())
+	return(DD_FALSE);
+      class cl_cmd_arg *param= cmdline->param(pari);
+      if (!param)
+	return(DD_FALSE);
+      class cl_cmdset *next_set= cmd->get_subcommands();
+      if (cmd->name_match(param->s_value, DD_FALSE))
+	{
+	  if (pari+1 >= cmdline->nuof_params())
+	    {
+	      matches++;
+	      cmd_found= cmd;
+	      if (cmd->short_help)
+		con->dd_printf("%s\n", cmd->short_help);
+	      else
+		con->dd_printf("%s\n", (char*)(cmd->names->at(0)));
+	      //continue;
+	    }
+	  else
+	    if (next_set)
+	      do_set(cmdline, pari+1, next_set, con);
+	}
+    }
+  return(DD_TRUE);
 }
 
 
@@ -330,6 +429,33 @@ COMMAND_DO_WORK_APP(cl_exec_cmd)
       c->add_console(cons);
     }
 
+  return(DD_FALSE);
+}
+
+
+/*
+ * expression expression
+ */
+
+COMMAND_DO_WORK_APP(cl_expression_cmd)
+{
+  //con->dd_printf("\"%s\"\n", cmdline->cmd);
+  char *s= cmdline->cmd;
+  if (!s ||
+      !*s)
+    return(DD_FALSE);
+  int i= strspn(s, " \t\v\n");
+  s+= i;
+  //con->dd_printf("\"%s\"\n", s);
+  i= strspn(s, "abcdefghijklmnopqrstuvwxyz");
+  s+= i;
+  //con->dd_printf("\"%s\"\n", s);
+  class YY_cl_ucsim_parser_CLASS *pars;
+  class cl_ucsim_lexer *lexer;
+  lexer= new cl_ucsim_lexer(s);
+  pars= new YY_cl_ucsim_parser_CLASS(lexer);
+  pars->yyparse();
+  delete pars;
   return(DD_FALSE);
 }
 

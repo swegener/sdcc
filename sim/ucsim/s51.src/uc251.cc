@@ -36,8 +36,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * Making an 251 CPU object
  */
 
-t_uc251::t_uc251(int Itype, int Itech, class cl_sim *asim):
-  t_uc89c51r(Itype, Itech, asim)
+cl_uc251::cl_uc251(int Itype, int Itech, class cl_sim *asim):
+  cl_uc89c51r(Itype, Itech, asim)
 {
 }
 

@@ -34,7 +34,7 @@ man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
 
-OBJECTS         = mem.o sim.o itsrc.o brk.o arg.o stack.o \
+OBJECTS         = stack.o mem.o sim.o itsrc.o brk.o arg.o \
 		  guiobj.o uc.o hw.o
 
 
@@ -43,7 +43,7 @@ OBJECTS         = mem.o sim.o itsrc.o brk.o arg.o stack.o \
 all: checkconf sim_lib
 
 test_mem_speed: $(PRJDIR)/lib*.a test_mem_speed.o
-	$(CC) -o $@ test_mem_speed.o -L$(PRJDIR) -lsim -lutil -lcmd -lsim
+	$(CXX) -o $@ test_mem_speed.o -L$(PRJDIR) -Wl,--start-group -lsim -lutil -lcmd -Wl,--end-group
 
 sim.src: all
 

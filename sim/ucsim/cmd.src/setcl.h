@@ -43,6 +43,9 @@ COMMAND_ON(uc,cl_set_hw_cmd);
 // SET OPTION
 COMMAND_ON(app,cl_set_option_cmd);
 
+// SET ERROR
+COMMAND_ON(app,cl_set_error_cmd);
+
 
 #endif
 

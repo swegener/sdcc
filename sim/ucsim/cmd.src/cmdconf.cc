@@ -57,50 +57,44 @@ COMMAND_DO_WORK_UC(cl_conf_cmd)
       class cl_hw *hw= (class cl_hw *)(uc->hws->at(i));
       con->dd_printf("  %s[%d]\n", hw->id_string, hw->id);
     }
-  con->dd_printf("Memories:\n");
-  for (i= MEM_ROM; i < MEM_TYPES; i++)
-    {
-      class cl_mem *mem= (class cl_mem *)(uc->mems->at(i));
-      if (mem)
-	con->dd_printf("  %s size= 0x%06x %6d width= %2d class= \"%s\"\n",
-		       mem->id_string(), mem->size, mem->size, mem->width,
-		       (mem->class_name)?(mem->class_name):"unknown");
-    }
   return(0);
 }
 
 /*
- * Command: conf addmem
+ * Command: conf objects
  *----------------------------------------------------------------------------
  */
+
+static void
+conf_objects_cmd_print_node(class cl_console *con,
+			    int indent, class cl_base *node)
+{
+  if (!node)
+    return;
+  int i;
+  for (i= 0; i < indent; i++)
+    con->dd_printf(" ");
+  char *name= node->get_name("unknown");
+  con->dd_printf("%s\n", name);
+  class cl_base *c= node->first_child();
+  while (c)
+    {
+      conf_objects_cmd_print_node(con, indent+2, c);
+      c= node->next_child(c);
+    }
+}
 
 //int
 //cl_conf_addmem_cmd::do_work(class cl_sim *sim,
 //			    class cl_cmdline *cmdline, class cl_console *con)
-COMMAND_DO_WORK_UC(cl_conf_addmem_cmd)
+COMMAND_DO_WORK_APP(cl_conf_objects_cmd)
 {
-  class cl_mem *mem= 0;
-  class cl_cmd_arg *params[4]= { cmdline->param(0),
+  //class cl_address_space *mem= 0;
+  /*class cl_cmd_arg *params[4]= { cmdline->param(0),
 				 cmdline->param(1),
 				 cmdline->param(2),
-				 cmdline->param(3) };
-  char *mem_class;
-
-  if (cmdline->syntax_match(uc, STRING)) {
-    mem_class= params[0]->value.string.string;
-    enum mem_class type;
-    type= (enum mem_class)get_string_id(mem_classes, mem_class, -1);
-    mem= uc->mk_mem(type, mem_class);
-    if (mem)
-      {
-	class cl_mem *m= uc->mem(type);
-	if (m)
-	  delete m;
-	uc->mems->put_at(type, mem);
-      }
-    else
-      con->dd_printf("Can not make memory \"%s\"\n", mem_class);
-  }
+				 cmdline->param(3) };*/
+  conf_objects_cmd_print_node(con, 0, application);
   return(DD_FALSE);
 }
 

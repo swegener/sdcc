@@ -42,11 +42,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class cl_xa: public cl_uc
 {
 public:
-  cl_mem *ram;
-  cl_mem *rom;
+  class cl_address_space *ram;
+  class cl_address_space *rom;
   struct t_regs regs;
 
-  class cl_mem *sfr, *iram;
+  class cl_address_space *sfr, *iram;
 
   // for now make it as simple as possible
 //  TYPE_UBYTE mem_direct[1024*2];
@@ -59,9 +59,10 @@ public:
   virtual int init(void);
   virtual char *id_string(void);
 
-  virtual class cl_mem *mk_mem(enum mem_class type, char *class_name);
-  virtual t_addr get_mem_size(enum mem_class type);
+  //virtual class cl_m *mk_mem(enum mem_class type, char *class_name);
+  //virtual t_addr get_mem_size(enum mem_class type);
   virtual void mk_hw_elements(void);
+  virtual void make_memories(void);
 
   virtual struct dis_entry *dis_tbl(void);
 

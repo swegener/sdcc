@@ -15,7 +15,7 @@ INSTALL		= @INSTALL@
 
 PRJDIR		= ..
 
-EXEEXT          = @EXEEXT@
+EXEEXT		= @EXEEXT@
 
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 CPPFLAGS        = @CPPFLAGS@ -I. -I$(PRJDIR) \
@@ -24,7 +24,7 @@ CFLAGS          = @CFLAGS@ -Wall
 CXXFLAGS        = @CXXFLAGS@ -Wall
 M_OR_MM         = @M_OR_MM@
 
-LIBS		= @LIBS@ -L$(PRJDIR) -lsim -lutil -lcmd -lguiucsim
+LIBS		= @LIBS@ -L$(PRJDIR) -Wl,--start-group -lutil -lcmd -lsim -lguiucsim -Wl,--end-group
 
 prefix          = @prefix@
 exec_prefix     = @exec_prefix@

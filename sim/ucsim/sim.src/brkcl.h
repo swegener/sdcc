@@ -45,7 +45,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class cl_brk: public cl_base
 {
 protected:
-  class cl_mem *mem;
+  class cl_address_space *mem;
 public:
   int nr;
   t_addr addr;
@@ -53,9 +53,11 @@ public:
   int   hit;
   int   cnt;
 
-  cl_brk(class cl_mem *imem, int inr, t_addr iaddr,
+  cl_brk(class cl_address_space *imem, int inr, t_addr iaddr,
 	 enum brk_perm iperm, int ihit);
   virtual ~cl_brk(void);
+
+  class cl_address_space *get_mem(void) { return(mem); }
 
   virtual void activate(void);
   virtual void inactivate(void);
@@ -74,7 +76,7 @@ class cl_fetch_brk: public cl_brk
 public:
   uchar code;
 
-  cl_fetch_brk(class cl_mem *imem, int inr, t_addr iaddr,
+  cl_fetch_brk(class cl_address_space *imem, int inr, t_addr iaddr,
 	       enum brk_perm iperm, int ihit);
 
   virtual enum brk_type type(void);
@@ -89,9 +91,11 @@ public:
 class cl_ev_brk: public cl_brk
 {
 public:
-  cl_ev_brk(class cl_mem *imem, int inr, t_addr iaddr, enum brk_perm iperm,
+  cl_ev_brk(class cl_address_space *imem, int inr, t_addr iaddr,
+	    enum brk_perm iperm,
 	    int ihit, enum brk_event ievent, const char *iid);
-  cl_ev_brk(class cl_mem *imem, int inr, t_addr iaddr, enum brk_perm iperm,
+  cl_ev_brk(class cl_address_space *imem, int inr, t_addr iaddr,
+	    enum brk_perm iperm,
 	    int ihit, char op);
   enum brk_event event;
   const char *id;
@@ -102,104 +106,6 @@ public:
 };
 
 
-/* 
- * WRITE IRAM
- */
-
-/*class cl_wi_brk: public cl_ev_brk
-{
-public:
-  cl_wi_brk(class cl_mem *imem, int inr, t_addr iaddr, enum brk_perm iperm,
-	    int ihit);
-
-  virtual bool match(struct event_rec *ev);
-};*/
-
-
-/* 
- * READ IRAM
- */
-
-/*class cl_ri_brk: public cl_ev_brk
-{
-public:
-  cl_ri_brk(class cl_mem *imem, int inr, t_addr iaddr, enum brk_perm iperm,
-	    int ihit);
-
-  virtual bool match(struct event_rec *ev);
-};*/
-
-
-/* 
- * WRITE XRAM
- */
-
-/*class cl_wx_brk: public cl_ev_brk
-{
-public:
-  cl_wx_brk(class cl_mem *imem, int inr, t_addr iaddr, enum brk_perm iperm,
-	    int ihit);
-
-  virtual bool match(struct event_rec *ev);
-};*/
-
-
-/* 
- * READ XRAM
- */
-
-/*class cl_rx_brk: public cl_ev_brk
-{
-public:
-  cl_rx_brk(class cl_mem *imem, int inr, t_addr iaddr, enum brk_perm iperm,
-	    int ihit);
-
-  virtual bool match(struct event_rec *ev);
-};*/
-
-
-/* 
- * WRITE SFR
- */
-
-/*class cl_ws_brk: public cl_ev_brk
-{
-public:
-  cl_ws_brk(class cl_mem *imem, int inr, t_addr iaddr, enum brk_perm iperm,
-	    int ihit);
-
-  virtual bool match(struct event_rec *ev);
-};*/
-
-
-/* 
- * READ SFR
- */
-
-/*class cl_rs_brk: public cl_ev_brk
-{
-public:
-  cl_rs_brk(class cl_mem *imem, int inr, t_addr iaddr, enum brk_perm iperm,
-	    int ihit);
-
-  virtual bool match(struct event_rec *ev);
-};*/
-
-
-/* 
- * READ CODE
- */
-
-/*class cl_rc_brk: public cl_ev_brk
-{
-public:
-  cl_rc_brk(class cl_mem *imem, int inr, t_addr iaddr, enum brk_perm iperm,
-	    int ihit);
-
-  virtual bool match(struct event_rec *ev);
-};*/
-
-
 /*
  * Collection of breakpoint sorted by address
  */
@@ -207,9 +113,9 @@ public:
 class brk_coll: public cl_sorted_list
 {
 public:
-  class cl_mem/*rom*/ *rom;
+  class cl_address_space/*rom*/ *rom;
 public:
-  brk_coll(t_index alimit, t_index adelta, class cl_mem/*rom*/ *arom);
+  brk_coll(t_index alimit, t_index adelta, class cl_address_space/*rom*/*arom);
   virtual void *key_of(void *item);
   virtual int  compare(void *key1, void *key2);
 

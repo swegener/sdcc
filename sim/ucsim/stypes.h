@@ -31,17 +31,23 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ddconfig.h"
 
 
-typedef unsigned char uchar;
-typedef unsigned int  uint;
-typedef unsigned long ulong;
-typedef TYPE_UDWORD t_addr;	/* 32 bit max */
-typedef TYPE_UWORD  t_mem;	/* 16 bit max */
-typedef TYPE_WORD   t_smem;	/* signed 16 bit memory */
+typedef unsigned char	uchar;
+typedef unsigned int	uint;
+typedef unsigned long	ulong;
+typedef TYPE_DWORD	t_addr;		/* 32 bit max */
+typedef TYPE_UWORD	t_mem;		/* 16 bit max */
+typedef TYPE_WORD	t_smem;		/* signed 16 bit memory */
 
 struct id_element
 {
   int id;
   char *id_string;
+};
+
+enum error_type {
+  err_unknown  = 0x01,
+  err_error    = 0x02,
+  err_warning  = 0x04
 };
 
 // table of dissassembled instructions
@@ -56,9 +62,9 @@ struct dis_entry
 // table entry of SFR and BIT names
 struct name_entry
 {
-  int  cpu_type;
-  uint addr;
-  char *name;
+  int		cpu_type;
+  t_addr	addr;
+  char		*name;
 };
 
 
@@ -90,8 +96,8 @@ struct cpu_entry
 #define CPU_XA		0x0001
 #define CPU_ALL_XA	(CPU_XA)
 
-#define CPU_HC08	0x0001
-#define CPU_ALL_HC08	(CPU_HC08)
+#define CPU_HC08       0x0001
+#define CPU_ALL_HC08   (CPU_HC08)
 
 #define CPU_CMOS	0x0001
 #define CPU_HMOS	0x0002
@@ -107,6 +113,12 @@ enum mem_class
   MEM_IXRAM,
   MEM_TYPES
 };
+
+#define MEM_ROM_ID	"rom"
+#define MEM_SFR_ID	"sfr"
+#define MEM_XRAM_ID	"xram"
+#define MEM_IXRAM_ID	"ixram"
+#define MEM_IRAM_ID	"iram"
 
 // States of simulator
 #define SIM_NONE	0
@@ -130,16 +142,17 @@ enum mem_class
 #define resUSER		105	/* Stopped by user */
 #define resINV_INST	106	/* Invalid instruction */
 #define resBITADDR	107	/* Bit address is uninterpretable */
+#define resERROR	108	/* Error happened during instruction exec */
 
 #define BIT_MASK(bitaddr) (1 << (bitaddr & 0x07))
 
-#define IRAM_SIZE 256	  /* Size of Internal RAM */
-#define SFR_SIZE  256     /* Size of SFR area */
-#define SFR_START 128     /* Start address of SFR area */
-#define ERAM_SIZE 256     /* Size of ERAM in 51R */
-#define XRAM_SIZE 0x10000 /* Size of External RAM */
+//#define IRAM_SIZE 256	  /* Size of Internal RAM */
+//#define SFR_SIZE  256     /* Size of SFR area */
+//#define SFR_START 128     /* Start address of SFR area */
+//#define ERAM_SIZE 256     /* Size of ERAM in 51R */
+//#define XRAM_SIZE 0x10000 /* Size of External RAM */
 //#define IROM_SIZE 0x1000  /* Size of Internal ROM */
-#define EROM_SIZE 0x10000 /* Size of External ROM */
+//#define EROM_SIZE 0x10000 /* Size of External ROM */
 
 
 /* Type of breakpoints */
@@ -209,6 +222,14 @@ enum hw_event {
 #define HWF_INSIDE	0x0001
 #define HWF_OUTSIDE	0x0002
 #define HWF_MISC	0x0004
+
+
+/* Letter cases */
+enum letter_case {
+  case_upper,  /* all is upper case */
+  case_lower,  /* all is lower case */
+  case_case    /* first letter is upper, others are lower case */
+};
 
 
 #endif

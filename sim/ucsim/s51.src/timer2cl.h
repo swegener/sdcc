@@ -54,12 +54,13 @@ enum t2_features {
 class cl_timer2: public cl_timer0
 {
 protected:
+  class cl_address_space *sfr;
   int features;
   class cl_it_src *exf2it;
   t_mem mask_RCLK, mask_TCLK, mask_CP_RL2;
   t_mem RCLK, TCLK, CP_RL2, EXEN2;
   long t2ex_edge;
-  class cl_cell *cell_rcap2l, *cell_rcap2h, *cell_t2mod;
+  class cl_memory_cell *cell_rcap2l, *cell_rcap2h, *cell_t2mod;
   bool bit_dcen, bit_t2oe, bit_t2ex;
 public:
   cl_timer2(class cl_uc *auc, int aid, char *aid_string, int afeautres);
@@ -69,7 +70,7 @@ public:
   //virtual void new_hw_added(class cl_hw *new_hw);
 
   //virtual ulong read(class cl_mem *mem, long addr);
-  virtual void write(class cl_cell *cell, t_mem *val);
+  virtual void write(class cl_memory_cell *cell, t_mem *val);
 
   //virtual void mem_cell_changed(class cl_mem *mem, t_addr addr);
 

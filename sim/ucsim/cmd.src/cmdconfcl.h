@@ -34,8 +34,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // CONF
 COMMAND_ON(uc,cl_conf_cmd);
 
-// CONF ADDMEM
-COMMAND_ON(uc,cl_conf_addmem_cmd);
+// CONF OBJECTS
+COMMAND_ON(app,cl_conf_objects_cmd);
 
 
 #endif

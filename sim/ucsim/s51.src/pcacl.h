@@ -40,10 +40,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class cl_pca: public cl_hw
 {
 public:
-  class cl_cell *cell_cl, *cell_ch;
-  class cl_cell *cell_ccapl[5], *cell_ccaph[5], *cell_ccapm[5];
+  class cl_address_space *sfr;
+  class cl_memory_cell *cell_cl, *cell_ch;
+  class cl_memory_cell *cell_ccapl[5], *cell_ccaph[5], *cell_ccapm[5];
   t_mem ccapm[5];
-  class cl_cell *cell_cmod, *cell_ccon;
+  class cl_memory_cell *cell_cmod, *cell_ccon;
   long t0_overflows, ECI_edge;
   t_mem clk_source;
   bool bit_CIDL, bit_WDTE, bit_ECF, bit_CR;
@@ -54,11 +55,11 @@ public:
 
   virtual void added_to_uc(void);
 
-  //virtual t_mem read(class cl_cell *cell);
-  virtual void write(class cl_cell *cell, t_mem *val);
+  //virtual t_mem read(class cl_memory_cell *cell);
+  virtual void write(class cl_memory_cell *cell, t_mem *val);
 
   //virtual t_mem set_cmd(t_mem value);
-  //virtual void mem_cell_changed(class cl_mem *mem, t_addr addr);
+  //virtual void mem_cell_changed(class cl_m *mem, t_addr addr);
  
   virtual int tick(int cycles);
   virtual void do_pca_counter(int cycles);

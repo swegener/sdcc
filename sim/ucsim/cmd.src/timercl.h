@@ -31,27 +31,25 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "newcmdcl.h"
 
 
+
 COMMAND_HEAD(cl_timer_cmd)
 public:
   class cl_ticker *ticker;
-  long what;
-//char *name;
+  bool as_nr;
+  int id_nr;
+  char *id_str;
 COMMAND_METHODS_ON(uc,cl_timer_cmd)
   void set_ticker(class cl_uc *uc,
 		  class cl_cmd_arg *param);
-  virtual int add(class cl_uc *uc,
-		  class cl_cmdline *cmdline, class cl_console *con);
-  virtual int del(class cl_uc *uc,
-		  class cl_cmdline *cmdline, class cl_console *con);
-  virtual int get(class cl_uc *uc,
-		  class cl_cmdline *cmdline, class cl_console *con);
-  virtual int run(class cl_uc *uc,
-		  class cl_cmdline *cmdline, class cl_console *con);
-  virtual int stop(class cl_uc *uc,
-		   class cl_cmdline *cmdline, class cl_console *con);
-  virtual int val(class cl_uc *uc,
-		  class cl_cmdline *cmdline, class cl_console *con);
 COMMAND_TAIL;
+
+
+COMMAND_ANCESTOR_ON(uc,cl_timer_add_cmd,cl_timer_cmd);
+COMMAND_ANCESTOR_ON(uc,cl_timer_delete_cmd,cl_timer_cmd);
+COMMAND_ANCESTOR_ON(uc,cl_timer_get_cmd,cl_timer_cmd);
+COMMAND_ANCESTOR_ON(uc,cl_timer_run_cmd,cl_timer_cmd);
+COMMAND_ANCESTOR_ON(uc,cl_timer_stop_cmd,cl_timer_cmd);
+COMMAND_ANCESTOR_ON(uc,cl_timer_value_cmd,cl_timer_cmd);
 
 
 #endif

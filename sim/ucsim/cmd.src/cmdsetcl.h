@@ -32,15 +32,27 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "commandcl.h"
 #include "newcmdcl.h"
 
+
 // STATE
 COMMAND_ON(sim,cl_run_cmd);
 COMMAND_ON(sim,cl_stop_cmd);
 COMMAND_ON(uc,cl_step_cmd);
 COMMAND_ON(sim,cl_next_cmd);
-COMMAND_ON(app,cl_help_cmd);
+
+//COMMAND_ON(app,cl_help_cmd);
+COMMAND_HEAD(cl_help_cmd)
+COMMAND_METHODS_ON(app,cl_help_cmd)
+  private:
+int matches;
+class cl_cmd *cmd_found;
+bool do_set(class cl_cmdline *cmdline, int pari, class cl_cmdset *cmdset,
+	    class cl_console *con);
+COMMAND_TAIL;
+
 COMMAND(cl_quit_cmd);
 COMMAND_ON(app,cl_kill_cmd);
 COMMAND_ON(app,cl_exec_cmd);
+COMMAND_ON(app,cl_expression_cmd);
 
 
 #endif

@@ -37,6 +37,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // sim
 #include "simcl.h"
+#include "memcl.h"
 
 // local
 #include "portcl.h"
@@ -60,8 +61,8 @@ int
 cl_avr::init(void)
 {
   cl_uc::init(); /* Memories now exist */
-  ram= mem(MEM_IRAM);
-  rom= mem(MEM_ROM);
+  ram= address_space(MEM_IRAM_ID);
+  rom= address_space(MEM_ROM_ID);
   return(0);
 }
 
@@ -75,7 +76,7 @@ cl_avr::id_string(void)
 /*
  * Making elements of the controller
  */
-
+/*
 t_addr
 cl_avr::get_mem_size(enum mem_class type)
 {
@@ -88,7 +89,8 @@ cl_avr::get_mem_size(enum mem_class type)
   //return(0);
   //return(cl_uc::get_mem_size(type));
 }
-
+*/
+/*
 int
 cl_avr::get_mem_width(enum mem_class type)
 {
@@ -96,6 +98,7 @@ cl_avr::get_mem_width(enum mem_class type)
     return(16);
   return(cl_uc::get_mem_width(type));
 }
+*/
 
 void
 cl_avr::mk_hw_elements(void)
@@ -104,6 +107,41 @@ cl_avr::mk_hw_elements(void)
   /* t_uc::mk_hw() does nothing */
   hws->add(o= new cl_port(this));
   o->init();
+}
+
+
+void
+cl_avr::make_memories(void)
+{
+  class cl_address_space *as;
+
+  rom= as= new cl_address_space(MEM_ROM_ID, 0, 0x10000, 16);
+  as->init();
+  address_spaces->add(as);
+  ram= as= new cl_address_space(MEM_IRAM_ID, 0, 0x10000, 8);
+  as->init();
+  address_spaces->add(as);
+
+  class cl_address_decoder *ad;
+  class cl_memory_chip *chip;
+
+  chip= new cl_memory_chip("rom_chip", 0x10000, 16);
+  chip->init();
+  memchips->add(chip);
+  ad= new cl_address_decoder(as= rom/*address_space(MEM_ROM_ID)*/,
+			     chip, 0, 0xffff, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+
+  chip= new cl_memory_chip("iram_chip", 0x80, 8);
+  chip->init();
+  memchips->add(chip);
+  ad= new cl_address_decoder(as= ram/*address_space(MEM_IRAM_ID)*/,
+			     chip, 0, 0x7f, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
 }
 
 
@@ -140,7 +178,7 @@ cl_avr::disass(t_addr addr, char *sep)
 
   p= work;
   
-  code= get_mem(MEM_ROM, addr);
+  code= get_mem(MEM_ROM_ID, addr);
   i= 0;
   while ((code & dis_tbl()[i].mask) != dis_tbl()[i].code &&
 	 dis_tbl()[i].mnemonic)
@@ -202,7 +240,7 @@ cl_avr::disass(t_addr addr, char *sep)
 	              //      kkkk kkkk kkkk kkkk  0<=k<=4M
 	      sprintf(temp, "0x%06x",
 		      (((code&0x1f0)>>3)|(code&1))*0x10000+
-		      (uint)get_mem(MEM_ROM, addr+1));
+		      (uint)get_mem(MEM_ROM_ID, addr+1));
 	      break;
 	    case 'P': // P    .... .... pppp p...  0<=P<=31
 	      data= (code&0xf8)>>3;
@@ -219,7 +257,7 @@ cl_avr::disass(t_addr addr, char *sep)
 		      ((code&0x2000)>>8)|((code&0xc00)>>7)|(code&7));
 	      break;
 	    case 'R': // k    SRAM address on second word 0<=k<=65535
-	      sprintf(temp, "0x%06x", (uint)get_mem(MEM_ROM, addr+1));
+	      sprintf(temp, "0x%06x", (uint)get_mem(MEM_ROM_ID, addr+1));
 	      break;
 	    case 'a': // k    .... kkkk kkkk kkkk  -2k<=k<=2k
 	      {
@@ -227,7 +265,7 @@ cl_avr::disass(t_addr addr, char *sep)
 		if (code&0x800)
 		  k|= -4096;
 		sprintf(temp, "0x%06"_A_"x",
-			t_addr((k+1+(signed int)addr) % rom->size));
+			rom->validate_address(k+1+(signed int)addr));
 		break;
 	      }
 	    default:
@@ -316,6 +354,7 @@ cl_avr::exec_inst(void)
 {
   t_mem code;
 
+  instPC= PC;
   if (fetch(&code))
     return(resBREAKPOINT);
   tick(1);
@@ -390,158 +429,208 @@ cl_avr::exec_inst(void)
   switch (code & 0xf000)
     {
     case 0x0000:
-      // 0x0...
-      switch (code & 0xfc00)
-	{
-	case 0x0000:
-	  switch (code & 0xff00)
+      {
+	// 0x0...
+	switch (code & 0xfc00)
+	  {
+	  case 0x0000:
 	    {
-	    case 0x0100: return(movw_Rd_Rr(code));
-	    case 0x0200: return(muls_Rd_Rr(code));
-	    case 0x0300:
-	      switch (code & 0xff88)
+	      switch (code & 0xff00)
 		{
-		case 0x0300: return(mulsu_Rd_Rr(code));
-		case 0x0308: return(fmul_Rd_Rr(code));
-		case 0x0380: return(fmuls_Rd_Rr(code));
-		case 0x0388: return(fmulsu_Rd_Rr(code));
+		case 0x0100: return(movw_Rd_Rr(code));
+		case 0x0200: return(muls_Rd_Rr(code));
+		case 0x0300:
+		  {
+		    switch (code & 0xff88)
+		      {
+		      case 0x0300: return(mulsu_Rd_Rr(code));
+		      case 0x0308: return(fmul_Rd_Rr(code));
+		      case 0x0380: return(fmuls_Rd_Rr(code));
+		      case 0x0388: return(fmulsu_Rd_Rr(code));
+		      }
+		    break;
+		  }
+		  break;
 		}
+	      break;
 	    }
-	case 0x0400: return(cpc_Rd_Rr(code));
-	case 0x0800: return(sbc_Rd_Rr(code));
-	case 0x0c00: return(add_Rd_Rr(code));
-	}
+	  case 0x0400: return(cpc_Rd_Rr(code));
+	  case 0x0800: return(sbc_Rd_Rr(code));
+	  case 0x0c00: return(add_Rd_Rr(code));
+	  }
+	break;
+      }
     case 0x1000:
-      // 0x1...
-      switch (code & 0xfc00)
-	{
-	case 0x1000: return(cpse_Rd_Rr(code));
-	case 0x1400: return(cp_Rd_Rr(code));
-	case 0x1800: return(sub_Rd_Rr(code));
-	case 0x1c00: return(adc_Rd_Rr(code));
-	}
+      {
+	// 0x1...
+	switch (code & 0xfc00)
+	  {
+	  case 0x1000: return(cpse_Rd_Rr(code));
+	  case 0x1400: return(cp_Rd_Rr(code));
+	  case 0x1800: return(sub_Rd_Rr(code));
+	  case 0x1c00: return(adc_Rd_Rr(code));
+	  }
+	break;
+      }
     case 0x2000:
-      // 0x2...
-      switch (code & 0xfc00)
-	{
-	case 0x2000: return(and_Rd_Rr(code));
-	case 0x2400: return(eor_Rd_Rr(code));
-	case 0x2800: return(or_Rd_Rr(code));
-	case 0x2c00: return(mov_Rd_Rr(code));
+      {
+	// 0x2...
+	switch (code & 0xfc00)
+	  {
+	  case 0x2000: return(and_Rd_Rr(code));
+	  case 0x2400: return(eor_Rd_Rr(code));
+	  case 0x2800: return(or_Rd_Rr(code));
+	  case 0x2c00: return(mov_Rd_Rr(code));
 	}
+	break;
+      }
     case 0x8000:
-      // 0x8...
-      switch (code &0xf208)
-	{
-	case 0x8000: return(ldd_Rd_Z_q(code));
-	case 0x8008: return(ldd_Rd_Y_q(code));
-	case 0x8200: return(std_Z_q_Rr(code));
-	case 0x8208: return(std_Y_q_Rr(code));
-	}
+      {
+	// 0x8...
+	switch (code &0xf208)
+	  {
+	  case 0x8000: return(ldd_Rd_Z_q(code));
+	  case 0x8008: return(ldd_Rd_Y_q(code));
+	  case 0x8200: return(std_Z_q_Rr(code));
+	  case 0x8208: return(std_Y_q_Rr(code));
+	  }
+	break;
+      }
     case 0x9000:
-      // 0x9...
-      if ((code & 0xff0f) == 0x9509)
-	return(icall(code));
-      if ((code & 0xff0f) == 0x9409)
-	return(ijmp(code));
-      if ((code & 0xff00) == 0x9600)
-	return(adiw_Rdl_K(code));
-      if ((code & 0xff00) == 0x9700)
-	return(sbiw_Rdl_K(code));
-      switch (code & 0xfc00)
-	{
-	case 0x9000:
-	  switch (code & 0xfe0f)
+      {
+	// 0x9...
+	if ((code & 0xff0f) == 0x9509)
+	  return(icall(code));
+	if ((code & 0xff0f) == 0x9409)
+	  return(ijmp(code));
+	if ((code & 0xff00) == 0x9600)
+	  return(adiw_Rdl_K(code));
+	if ((code & 0xff00) == 0x9700)
+	  return(sbiw_Rdl_K(code));
+	switch (code & 0xfc00)
+	  {
+	  case 0x9000:
 	    {
-	    case 0x9000: return(lds_Rd_k(code));
-	    case 0x9001: return(ld_Rd_ZS(code));
-	    case 0x9002: return(ld_Rd_SZ(code));
-	    case 0x9004: return(lpm_Rd_Z(code));
-	    case 0x9005: return(lpm_Rd_ZS(code));
-	    case 0x9006: return(elpm_Rd_Z(code));
-	    case 0x9007: return(elpm_Rd_ZS(code));
-	    case 0x9009: return(ld_Rd_YS(code));
-	    case 0x900a: return(ld_Rd_SY(code));
-	    case 0x900c: return(ld_Rd_X(code));
-	    case 0x900d: return(ld_Rd_XS(code));
-	    case 0x900e: return(ld_Rd_SX(code));
-	    case 0x900f: return(pop_Rd(code));
-	    case 0x9200: return(sts_k_Rr(code));
-	    case 0x9201: return(st_ZS_Rr(code));
-	    case 0x9202: return(st_SZ_Rr(code));
-	    case 0x9209: return(st_YS_Rr(code));
-	    case 0x920a: return(st_SY_Rr(code));
-	    case 0x920c: return(st_X_Rr(code));
-	    case 0x920d: return(st_XS_Rr(code));
-	    case 0x920e: return(st_SX_Rr(code));
-	    case 0x920f: return(push_Rr(code));
+	      switch (code & 0xfe0f)
+		{
+		case 0x9000: return(lds_Rd_k(code));
+		case 0x9001: return(ld_Rd_ZS(code));
+		case 0x9002: return(ld_Rd_SZ(code));
+		case 0x9004: return(lpm_Rd_Z(code));
+		case 0x9005: return(lpm_Rd_ZS(code));
+		case 0x9006: return(elpm_Rd_Z(code));
+		case 0x9007: return(elpm_Rd_ZS(code));
+		case 0x9009: return(ld_Rd_YS(code));
+		case 0x900a: return(ld_Rd_SY(code));
+		case 0x900c: return(ld_Rd_X(code));
+		case 0x900d: return(ld_Rd_XS(code));
+		case 0x900e: return(ld_Rd_SX(code));
+		case 0x900f: return(pop_Rd(code));
+		case 0x9200: return(sts_k_Rr(code));
+		case 0x9201: return(st_ZS_Rr(code));
+		case 0x9202: return(st_SZ_Rr(code));
+		case 0x9209: return(st_YS_Rr(code));
+		case 0x920a: return(st_SY_Rr(code));
+		case 0x920c: return(st_X_Rr(code));
+		case 0x920d: return(st_XS_Rr(code));
+		case 0x920e: return(st_SX_Rr(code));
+		case 0x920f: return(push_Rr(code));
+		}
+	      break;
 	    }
-	case 0x9400:
-	  switch (code & 0xfe0f)
+	  case 0x9400:
 	    {
-	    case 0x9400: return(com_Rd(code));
-	    case 0x9401: return(neg_Rd(code));
-	    case 0x9402: return(swap_Rd(code));
-	    case 0x9403: return(inc_Rd(code));
-	    case 0x9405: return(asr_Rd(code));
-	    case 0x9406: return(lsr_Rd(code));
-	    case 0x9407: return(ror_Rd(code));
-	    case 0x940a: return(dec_Rd(code));
-	    case 0x940c: case 0x940d: return(jmp_k(code));
-	    case 0x940e: case 0x940f: return(call_k(code));
+	      switch (code & 0xfe0f)
+		{
+		case 0x9400: return(com_Rd(code));
+		case 0x9401: return(neg_Rd(code));
+		case 0x9402: return(swap_Rd(code));
+		case 0x9403: return(inc_Rd(code));
+		case 0x9405: return(asr_Rd(code));
+		case 0x9406: return(lsr_Rd(code));
+		case 0x9407: return(ror_Rd(code));
+		case 0x940a: return(dec_Rd(code));
+		case 0x940c: case 0x940d: return(jmp_k(code));
+		case 0x940e: case 0x940f: return(call_k(code));
+		}
+	      break;
 	    }
-	case 0x9800:
-	  switch (code & 0xff00)
+	  case 0x9800:
 	    {
-	    case 0x9800: return(cbi_A_b(code));
-	    case 0x9900: return(sbic_P_b(code));
-	    case 0x9a00: return(sbi_A_b(code));
-	    case 0x9b00: return(sbis_P_b(code));
+	      switch (code & 0xff00)
+		{
+		case 0x9800: return(cbi_A_b(code));
+		case 0x9900: return(sbic_P_b(code));
+		case 0x9a00: return(sbi_A_b(code));
+		case 0x9b00: return(sbis_P_b(code));
+		}
+	      break;
 	    }
-	case 0x9c00: return(mul_Rd_Rr(code));
-	}
+	  case 0x9c00: return(mul_Rd_Rr(code));
+	  }
+	break;
+      }
     case 0xa000:
-      // 0xa...
-      switch (code &0xf208)
-	{
-	case 0xa000: return(ldd_Rd_Z_q(code));
-	case 0xa008: return(ldd_Rd_Y_q(code));
-	case 0xa200: return(std_Z_q_Rr(code));
-	case 0xa208: return(std_Y_q_Rr(code));
-	}
+      {
+	// 0xa...
+	switch (code &0xf208)
+	  {
+	  case 0xa000: return(ldd_Rd_Z_q(code));
+	  case 0xa008: return(ldd_Rd_Y_q(code));
+	  case 0xa200: return(std_Z_q_Rr(code));
+	  case 0xa208: return(std_Y_q_Rr(code));
+	  }
+	break;
+      }
     case 0xb000:
-      // 0xb...
-      switch (code & 0xf800)
-	{
-	case 0xb000: return(in_Rd_A(code));
-	case 0xb800: return(out_A_Rr(code));
-	}
+      {
+	// 0xb...
+	switch (code & 0xf800)
+	  {
+	  case 0xb000: return(in_Rd_A(code));
+	  case 0xb800: return(out_A_Rr(code));
+	  }
+	break;
+      }
     case 0xe000:
-      // 0xe...
-      switch (code & 0xff0f)
-	{
-	case 0xef0f: return(ser_Rd(code));
-	}
+      {
+	// 0xe...
+	switch (code & 0xff0f)
+	  {
+	  case 0xef0f: return(ser_Rd(code));
+	  }
+	break;
+      }
     case 0xf000:
-      // 0xf...
-      switch (code & 0xfc00)
-	{
-	case 0xf000: return(brbs_s_k(code));
-	case 0xf400: return(brbc_s_k(code));
-	case 0xf800: case 0xfc00:
-	  switch (code & 0xfe08)
+      {
+	// 0xf...
+	switch (code & 0xfc00)
+	  {
+	  case 0xf000: return(brbs_s_k(code));
+	  case 0xf400: return(brbc_s_k(code));
+	  case 0xf800: case 0xfc00:
 	    {
-	    case 0xf800: return(bld_Rd_b(code));
-	    case 0xfa00: return(bst_Rd_b(code));
-	    case 0xfc00: case 0xfc08: return(sbrc_Rr_b(code));
-	    case 0xfe00: case 0xfe08: return(sbrs_Rr_b(code));
+	      switch (code & 0xfe08)
+		{
+		case 0xf800: return(bld_Rd_b(code));
+		case 0xfa00: return(bst_Rd_b(code));
+		case 0xfc00: case 0xfc08: return(sbrc_Rr_b(code));
+		case 0xfe00: case 0xfe08: return(sbrs_Rr_b(code));
+		}
+	      break;
 	    }
-	}
+	  }
+	break;
+      }
     }
-  if (PC)
+  /*if (PC)
     PC--;
   else
-    PC= get_mem_size(MEM_ROM)-1;
+  PC= get_mem_size(MEM_ROM_ID)-1;*/
+  class cl_error_unknown_code *e= new cl_error_unknown_code(this);
+  error(e);
+  return(resGO);
+  PC= rom->inc_address(PC, -1);
   //tick(-clock_per_cycle());
   sim->stop(resINV_INST);
   return(resINV_INST);

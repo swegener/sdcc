@@ -135,8 +135,12 @@ COMMAND_DO_WORK_UC(cl_pc_cmd)
 	  con->dd_printf("Error: wrong parameter\n");
 	  return(DD_FALSE);
 	}
-      if (addr >= uc->get_mem_size(MEM_ROM))
-	addr= 0;
+      class cl_address_space *rom= uc->address_space(MEM_ROM_ID);
+      if (rom)
+	{
+	  if (addr > rom->highest_valid_address())
+	    addr= rom->highest_valid_address();
+	}
       if (!uc->inst_at(addr))
 	con->dd_printf("Warning: maybe not instruction at 0x%06x\n", addr);
       uc->PC= addr;
@@ -171,7 +175,7 @@ COMMAND_DO_WORK_UC(cl_reset_cmd)
 //		     class cl_cmdline *cmdline, class cl_console *con)
 COMMAND_DO_WORK_UC(cl_dump_cmd)
 {
-  class cl_mem *mem= 0;
+  class cl_memory *mem= 0;
   long bpl= 8;
   t_addr start= 0, end;
   class cl_cmd_arg *params[4]= { cmdline->param(0),
@@ -205,32 +209,41 @@ COMMAND_DO_WORK_UC(cl_dump_cmd)
       if (params[0])
 	con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
     }
-  else if (cmdline->syntax_match(uc, MEMORY))
-    {
-      mem= params[0]->value.memory;
-      mem->dump(con);
-    }
-  else if (cmdline->syntax_match(uc, MEMORY ADDRESS)) {
-    mem  = params[0]->value.memory;
-    start= params[1]->value.address;
-    end  = start+10*8-1;
-    mem->dump(start, end, bpl, con);
-  }
-  else if (cmdline->syntax_match(uc, MEMORY ADDRESS ADDRESS)) {
-    mem  = params[0]->value.memory;
-    start= params[1]->value.address;
-    end  = params[2]->value.address;
-    mem->dump(start, end, bpl, con);
-  }
-  else if (cmdline->syntax_match(uc, MEMORY ADDRESS ADDRESS NUMBER)) {
-    mem  = params[0]->value.memory;
-    start= params[1]->value.address;
-    end  = params[2]->value.address;
-    bpl  = params[3]->value.number;
-    mem->dump(start, end, bpl, con);
-  }
   else
-    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    {
+      if (!params[0] ||
+	  !params[0]->as_memory(uc))
+	{
+	  con->dd_printf("No memory specified. Use \"info memory\" for available memories\n");
+	  return(DD_FALSE);
+	}
+      if (cmdline->syntax_match(uc, MEMORY))
+	{
+	  mem= params[0]->value.memory.memory;
+	  mem->dump(con);
+	}
+      else if (cmdline->syntax_match(uc, MEMORY ADDRESS)) {
+	mem  = params[0]->value.memory.memory;
+	start= params[1]->value.address;
+	end  = start+10*8-1;
+	mem->dump(start, end, bpl, con);
+      }
+      else if (cmdline->syntax_match(uc, MEMORY ADDRESS ADDRESS)) {
+	mem  = params[0]->value.memory.memory;
+	start= params[1]->value.address;
+	end  = params[2]->value.address;
+	mem->dump(start, end, bpl, con);
+      }
+      else if (cmdline->syntax_match(uc, MEMORY ADDRESS ADDRESS NUMBER)) {
+	mem  = params[0]->value.memory.memory;
+	start= params[1]->value.address;
+	end  = params[2]->value.address;
+	bpl  = params[3]->value.number;
+	mem->dump(start, end, bpl, con);
+      }
+      else
+	con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    }
 
   return(DD_FALSE);;
 }
@@ -246,7 +259,7 @@ COMMAND_DO_WORK_UC(cl_dump_cmd)
 //		   class cl_cmdline *cmdline, class cl_console *con)
 COMMAND_DO_WORK_UC(cl_di_cmd)
 {
-  cmdline->insert_param(0, new cl_cmd_sym_arg("i"));
+  cmdline->insert_param(0, new cl_cmd_sym_arg("iram"));
   cl_dump_cmd::do_work(uc, cmdline, con);
   return(0);
 }
@@ -262,7 +275,7 @@ COMMAND_DO_WORK_UC(cl_di_cmd)
 //		   class cl_cmdline *cmdline, class cl_console *con)
 COMMAND_DO_WORK_UC(cl_dx_cmd)
 {
-  cmdline->insert_param(0, new cl_cmd_sym_arg("x"));
+  cmdline->insert_param(0, new cl_cmd_sym_arg("xram"));
   cl_dump_cmd::do_work(uc, cmdline, con);
   return(0);
 }
@@ -278,7 +291,7 @@ COMMAND_DO_WORK_UC(cl_dx_cmd)
 //		    class cl_cmdline *cmdline, class cl_console *con)
 COMMAND_DO_WORK_UC(cl_dch_cmd)
 {
-  cmdline->insert_param(0, new cl_cmd_sym_arg("r"));
+  cmdline->insert_param(0, new cl_cmd_sym_arg("rom"));
   cl_dump_cmd::do_work(uc, cmdline, con);
   return(0);
 }
@@ -294,7 +307,7 @@ COMMAND_DO_WORK_UC(cl_dch_cmd)
 //		   class cl_cmdline *cmdline, class cl_console *con)
 COMMAND_DO_WORK_UC(cl_ds_cmd)
 {
-  cmdline->insert_param(0, new cl_cmd_sym_arg("s"));
+  cmdline->insert_param(0, new cl_cmd_sym_arg("sfr"));
   cl_dump_cmd::do_work(uc, cmdline, con);
   return(0);
 }
@@ -313,7 +326,7 @@ COMMAND_DO_WORK_UC(cl_dc_cmd)
   t_addr start= last, end= last+20;
   class cl_cmd_arg *params[2]= { cmdline->param(0),
 				 cmdline->param(1) };
-  class cl_mem *rom= uc->mem(MEM_ROM);
+  class cl_address_space *rom= uc->address_space(MEM_ROM_ID);
 
   if (!rom)
     return(DD_FALSE);
@@ -327,14 +340,14 @@ COMMAND_DO_WORK_UC(cl_dc_cmd)
     start= params[0]->value.address;
     end= params[1]->value.address;
   }
-  if (start >= rom->size)
+  if (start > rom->highest_valid_address())
     {
-      con->dd_printf("Error: start address is wrong\n");
+      con->dd_printf("Error: start address is too high\n");
       return(DD_FALSE);
     }
-  if (end >= rom->size)
+  if (end > rom->highest_valid_address())
     {
-      con->dd_printf("Error: end address is wrong\n");
+      con->dd_printf("Error: end address is too high\n");
       return(DD_FALSE);
     }
 
@@ -394,10 +407,10 @@ COMMAND_DO_WORK_UC(cl_disassemble_cmd)
   if (!uc->there_is_inst())
     return(DD_FALSE);
   realstart= start;
-  class cl_mem *rom= uc->mem(MEM_ROM);
+  class cl_address_space *rom= uc->address_space(MEM_ROM_ID);
   if (!rom)
     return(DD_FALSE);
-  while (realstart < rom->size &&
+  while (realstart <= rom->highest_valid_address() &&
 	 !uc->inst_at(realstart))
     realstart= realstart+1;
   if (offset)
@@ -405,9 +418,9 @@ COMMAND_DO_WORK_UC(cl_disassemble_cmd)
       dir= (offset < 0)?-1:+1;
       while (offset)
 	{
-	  realstart= (realstart+dir) % rom->size;
+	  realstart= rom->inc_address(realstart, dir);
 	  while (!uc->inst_at(realstart))
-	    realstart= (realstart+dir) % rom->size;
+	    realstart= rom->inc_address(realstart, dir);
 	  offset+= -dir;
 	}
     }
@@ -415,9 +428,9 @@ COMMAND_DO_WORK_UC(cl_disassemble_cmd)
   while (lines)
     {
       uc->print_disass(realstart, con);
-      realstart= (realstart+1) % rom->size;
+      realstart= rom->inc_address(realstart, +1) + rom->start_address;
       while (!uc->inst_at(realstart))
-	realstart= (realstart+1) % rom->size;
+	realstart= rom->inc_address(realstart, +1) + rom->start_address;
       lines--;
     }
 
@@ -437,7 +450,7 @@ COMMAND_DO_WORK_UC(cl_disassemble_cmd)
 //		     class cl_cmdline *cmdline, class cl_console *con)
 COMMAND_DO_WORK_UC(cl_fill_cmd)
 {
-  class cl_mem *mem= 0;
+  class cl_memory *mem= 0;
   t_mem what= 0;
   t_addr start= 0, end;
   class cl_cmd_arg *params[4]= { cmdline->param(0),
@@ -446,7 +459,7 @@ COMMAND_DO_WORK_UC(cl_fill_cmd)
 				 cmdline->param(3) };
 
   if (cmdline->syntax_match(uc, MEMORY ADDRESS ADDRESS NUMBER)) {
-    mem  = params[0]->value.memory;
+    mem  = params[0]->value.memory.memory;
     start= params[1]->value.address;
     end  = params[2]->value.address;
     what = params[3]->value.number;
@@ -475,12 +488,12 @@ cl_where_cmd::do_real_work(class cl_uc *uc,
 			   class cl_cmdline *cmdline, class cl_console *con,
 			   bool case_sensitive)
 {
-  class cl_mem *mem= 0;
+  class cl_memory *mem= 0;
   class cl_cmd_arg *params[2]= { cmdline->param(0),
 				 cmdline->param(1) };
 
   if (cmdline->syntax_match(uc, MEMORY DATALIST)) {
-    mem= params[0]->value.memory;
+    mem= params[0]->value.memory.memory;
     t_mem *array= params[1]->value.data_list.array;
     int len= params[1]->value.data_list.len;
     if (!len)

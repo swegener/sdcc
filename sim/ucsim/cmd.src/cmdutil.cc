@@ -118,7 +118,10 @@ get_name_entry(struct name_entry tabl[], char *name, class cl_uc *uc)
   while (tabl[i].name &&
 	 (!(tabl[i].cpu_type & uc->type) ||
 	 (strcmp(tabl[i].name, name) != 0)))
-    i++;
+    {
+      //printf("tabl[%d].name=%s <-> %s\n",i,tabl[i].name,name);
+      i++;
+    }
   if (tabl[i].name != NULL)
     return(&tabl[i]);
   else

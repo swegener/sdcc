@@ -42,14 +42,14 @@ class cl_wdt: public cl_hw
 {
 protected:
   long wdt, reset_value;
-  class cl_cell *wdtrst;
+  class cl_memory_cell *wdtrst;
   bool written_since_reset;
 public:
   cl_wdt(class cl_uc *auc, long resetvalue);
   virtual int init(void);
 
-  //virtual t_mem read(class cl_cell *cell);
-  virtual void write(class cl_cell *cell, t_mem *val);
+  //virtual t_mem read(class cl_memory_cell *cell);
+  virtual void write(class cl_memory_cell *cell, t_mem *val);
 
   //virtual t_mem set_cmd(t_mem value);
 

@@ -43,7 +43,7 @@ cl_wdt::cl_wdt(class cl_uc *auc, long resetvalue):
 int
 cl_wdt::init(void)
 {
-  class cl_mem *sfr= uc->mem(MEM_SFR);
+  class cl_address_space *sfr= uc->address_space(MEM_SFR_ID);
 
   if (!sfr)
     {
@@ -55,7 +55,7 @@ cl_wdt::init(void)
 }
 
 void
-cl_wdt::write(class cl_cell *cell, t_mem *val)
+cl_wdt::write(class cl_memory_cell *cell, t_mem *val)
 {
   if (cell == wdtrst &&
       (((*val)&0xff) == 0xe1) &&

@@ -47,9 +47,7 @@ cl_interrupt::cl_interrupt(class cl_uc *auc):
 int
 cl_interrupt::init(void)
 {
-  class cl_mem *sfr;
-
-  sfr= uc->mem(MEM_SFR);
+  sfr= uc->address_space(MEM_SFR_ID);
   if (sfr)
     {
       //sfr->register_hw(IE, this, 0);
@@ -71,7 +69,7 @@ cl_interrupt::added_to_uc(void)
 }
 
 void
-cl_interrupt::write(class cl_cell *cell, t_mem *val)
+cl_interrupt::write(class cl_memory_cell *cell, t_mem *val)
 {
   if (cell == cell_tcon)
     {
@@ -84,7 +82,7 @@ cl_interrupt::write(class cl_cell *cell, t_mem *val)
 }
 
 /*void
-cl_interrupt::mem_cell_changed(class cl_mem *mem, t_addr addr)
+cl_interrupt::mem_cell_changed(class cl_m *mem, t_addr addr)
 {
 }*/
 
@@ -132,7 +130,7 @@ cl_interrupt::happen(class cl_hw *where, enum hw_event he, void *params)
 void
 cl_interrupt::print_info(class cl_console *con)
 {
-  int ie= uc->get_mem(MEM_SFR, IE);
+  int ie= sfr->get(IE);
   int i;
 
   con->dd_printf("Interrupts are %s. Interrupt sources:\n",
@@ -145,7 +143,7 @@ cl_interrupt::print_info(class cl_console *con)
       con->dd_printf(" %-3s", (ie&(is->ie_mask))?"en":"dis");
       con->dd_printf(" %2d", uc->it_priority(is->ie_mask));
       con->dd_printf(" %-3s",
-		     (uc->get_mem(MEM_SFR, is->src_reg)&(is->src_mask))?
+		     (sfr->get(is->src_reg)&(is->src_mask))?
 		     "YES":"no");
       con->dd_printf(" %-3s", (is->active)?"act":"no");
       con->dd_printf(" %s", object_name(is));

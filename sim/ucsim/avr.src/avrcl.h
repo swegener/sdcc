@@ -28,7 +28,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef AVRCL_HEADER
 #define AVRCL_HEADER
 
+// sim.src
 #include "uccl.h"
+#include "memcl.h"
 
 
 /*
@@ -38,17 +40,18 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class cl_avr: public cl_uc
 {
 public:
-  cl_mem *ram;
-  cl_mem *rom;
+  class cl_address_space *ram;
+  class cl_address_space *rom;
   int sleep_executed;
 public:
   cl_avr(class cl_sim *asim);
   virtual int init(void);
   virtual char *id_string(void);
 
-  virtual t_addr get_mem_size(enum mem_class type);
-  virtual int get_mem_width(enum mem_class type);
+  //virtual t_addr get_mem_size(enum mem_class type);
+  //virtual int get_mem_width(enum mem_class type);
   virtual void mk_hw_elements(void);
+  virtual void make_memories(void);
 
   virtual struct dis_entry *dis_tbl(void);
   virtual struct name_entry *sfr_tbl(void);

@@ -94,7 +94,7 @@ cl_it_src::deactivate(void)
  */
 
 cl_irqs::cl_irqs(t_index alimit, t_index adelta):
-  cl_sorted_list(alimit, adelta)
+  cl_sorted_list(alimit, adelta, "irqs")
 {
   Duplicates= DD_TRUE;
 }

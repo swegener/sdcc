@@ -39,18 +39,18 @@ class cl_port: public cl_hw
 {
 public:
   t_addr addr_p;
-  class cl_cell *cell_p;
+  class cl_memory_cell *cell_p;
   t_mem port_pins;
   t_mem prev;
 public:
   cl_port(class cl_uc *auc, int aid);
   virtual int init(void);
 
-  virtual t_mem read(class cl_cell *cell);
-  virtual void write(class cl_cell *cell, t_mem *val);
+  virtual t_mem read(class cl_memory_cell *cell);
+  virtual void write(class cl_memory_cell *cell, t_mem *val);
 
   virtual void set_cmd(class cl_cmdline *cmdline, class cl_console *con);
-  //virtual void mem_cell_changed(class cl_mem *mem, t_addr addr);
+  //virtual void mem_cell_changed(class cl_m *mem, t_addr addr);
 
   //virtual int tick(int cycles);
   virtual void print_info(class cl_console *con);

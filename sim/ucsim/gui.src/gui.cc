@@ -32,7 +32,7 @@ cl_gui::cl_gui(class cl_sim *asim):
   cl_base()
 {
   sim= asim;
-  ifs= new cl_list(2, 2);
+  ifs= new cl_list(2, 2, "ifs of a gui");
 }
 
 cl_gui::~cl_gui(void)

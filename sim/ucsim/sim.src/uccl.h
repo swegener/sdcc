@@ -36,6 +36,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "hwcl.h"
 #include "memcl.h"
 #include "brkcl.h"
+#include "stackcl.h"
 
 
 /* Counter to count clock ticks */
@@ -61,6 +62,16 @@ public:
 };
 
 
+/* Options of the microcontroller */
+class cl_xtal_option: public cl_optref
+{
+protected:
+  class cl_uc *uc;
+public:
+  cl_xtal_option(class cl_uc *the_uc);
+  virtual void option_changed(void);
+};
+
 /* Abstract microcontroller */
 
 class cl_uc: public cl_base
@@ -70,6 +81,7 @@ public:
   int technology;		// CMOS, HMOS
   int state;			// GO, IDLE, PD
   //class cl_list *options;
+  class cl_xtal_option *xtal_option;
 
   t_addr PC, instPC;		// Program Counter
   bool inst_exec;		// Instruction is executed
@@ -84,12 +96,18 @@ public:
   class brk_coll *fbrk;		// Collection of FETCH break-points
   class brk_coll *ebrk;		// Collection of EVENT breakpoints
   class cl_sim *sim;
-  class cl_list *mems;
+  //class cl_list *mems;
   class cl_hws *hws;
+  
+  class cl_list *memchips;	// v3
+  class cl_address_space_list *address_spaces;
+  class cl_address_space *rom;	// Required for almost every uc
+
+  //class cl_list *address_decoders;
 
   class cl_irqs *it_sources;	// Sources of interrupts
   class cl_list *it_levels;	// Follow interrupt services
-  class cl_list *st_ops;	// Track stack operations
+  class cl_list *stack_ops;	// Track stack operations
 
   class cl_list *errors;	// Errors of instruction execution
   class cl_list *events;	// Events happened during inst exec
@@ -105,19 +123,20 @@ public:
   virtual void reset(void);
 
   // making objects
-  virtual class cl_mem *mk_mem(enum mem_class type, char *class_name);
-  virtual t_addr get_mem_size(enum mem_class type);
-  virtual int get_mem_width(enum mem_class type);
+  //virtual class cl_m *mk_mem(enum mem_class type, char *class_name);
+  virtual void make_memories(void);
+  //virtual t_addr get_mem_size(char *id);
+  //virtual int get_mem_width(char *id);
   virtual void mk_hw_elements(void);
   virtual void build_cmdset(class cl_cmdset *cmdset);
 
   // manipulating memories
-  virtual t_mem read_mem(enum mem_class type, t_addr addr);
-  virtual t_mem get_mem(enum mem_class type, t_addr addr);
-  virtual void write_mem(enum mem_class type, t_addr addr, t_mem val);
-  virtual void set_mem(enum mem_class type, t_addr addr, t_mem val);
-  virtual class cl_mem *mem(enum mem_class type);
-  virtual class cl_mem *mem(char *class_name);
+  virtual t_mem read_mem(char *id, t_addr addr);
+  virtual t_mem get_mem(char *id, t_addr addr);
+  virtual void write_mem(char *id, t_addr addr, t_mem val);
+  virtual void set_mem(char *id, t_addr addr, t_mem val);
+  virtual class cl_address_space *address_space(char *id);
+  virtual class cl_memory *memory(char *id);
 
   // file handling
   virtual long read_hex_file(const char *nam);
@@ -159,10 +178,8 @@ public:
   virtual int it_priority(uchar ie_mask) {return(0);}
 
   // stack tracking
-  virtual void st_push(class cl_stack_op *op);
-  virtual void st_call(class cl_stack_op *op);
-  virtual int st_pop(class cl_stack_op *op);
-  virtual int st_ret(class cl_stack_op *op);
+  virtual void stack_write(class cl_stack_op *op);
+  virtual void stack_read(class cl_stack_op *op);
 
   // breakpoints
   virtual class cl_fetch_brk *fbrk_at(t_addr addr);
@@ -174,7 +191,8 @@ public:
   virtual void put_breaks(void);
   virtual void remove_all_breaks(void);
   virtual int make_new_brknr(void);
-  virtual class cl_ev_brk *mk_ebrk(enum brk_perm perm, class cl_mem *mem,
+  virtual class cl_ev_brk *mk_ebrk(enum brk_perm perm,
+				   class cl_address_space *mem,
 				   char op, t_addr addr, int hit);
   virtual void check_events(void);
 
@@ -189,17 +207,25 @@ public:
   virtual int inst_branch(t_addr addr);
   virtual int longest_inst(void);
   virtual bool get_name(t_addr addr, struct name_entry tab[], char *buf);
+  virtual bool symbol2address(char *sym, struct name_entry tab[],
+			      t_addr *addr);
   virtual char *symbolic_bit_name(t_addr bit_address,
-				  class cl_mem *mem,
+				  class cl_memory *mem,
 				  t_addr mem_addr,
 				  t_mem bit_mask);
 
   /* Converting abstract address spaces into real ones */
-  virtual class cl_mem *bit2mem(t_addr bitaddr,
-				t_addr *memaddr, t_mem *bitmask);
-
+  virtual class cl_address_space *bit2mem(t_addr bitaddr,
+					  t_addr *memaddr,
+					  t_mem *bitmask);
+  virtual t_addr bit_address(class cl_memory *mem,
+			     t_addr mem_address,
+			     int bit_number) { return(-1); }
+  
   // messages from app to handle and broadcast
-  virtual void mem_cell_changed(class cl_mem *mem, t_addr addr);
+  virtual bool handle_event(class cl_event &event);
+  //virtual void mem_cell_changed(class cl_address_space *mem, t_addr addr);
+  virtual void address_space_added(class cl_address_space *as);
 
   // Error handling
   virtual void error(class cl_error *error);
@@ -210,6 +236,23 @@ public:
 public:
   virtual void eram2xram(void) {} // Dirty hack for 51R
   virtual void xram2eram(void) {}
+};
+
+
+/*
+ * Errors
+ */
+
+#include "errorcl.h"
+
+ERROR_CLASS_DECL(unknown_code): public cl_error
+{
+ protected:
+  class cl_uc *uc;
+ public:
+  cl_error_unknown_code(class cl_uc *the_uc);
+
+  virtual void print(class cl_commander *c);
 };
 
 

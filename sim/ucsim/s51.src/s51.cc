@@ -47,7 +47,8 @@ main(int argc, char *argv[])
   int retval;
   //class cl_app *app;
   class cl_sim *sim;
-  
+
+  cpus= cpus_51;
   application= new cl_app();
   application->init(argc, argv);
   sim= new cl_sim51(application);

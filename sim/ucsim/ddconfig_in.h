@@ -30,7 +30,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define DD_TRUE  1
 #define DD_FALSE 0
-#define bool     int
+  //#define bool     int
+#define NIL	0
 
 #undef STDC_HEADERS
 #undef HAVE_GETOPT_H
@@ -76,6 +77,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #undef HAVE_FGETS
 
 #undef HAVE_YYLEX
+#undef HAVE_FLEX
+#undef YYTEXT_POINTER
 
 #undef RETSIGTYPE
 #undef SIZEOF_CHAR

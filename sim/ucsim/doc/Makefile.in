@@ -22,6 +22,7 @@ man1dir         = $(mandir)/man1
 man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
+#docdir		= $(prefix)/share/doc/ucsim
 docdir		= @docdir@/ucsim
 
 

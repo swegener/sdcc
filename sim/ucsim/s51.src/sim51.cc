@@ -57,12 +57,16 @@ class cl_uc *
 cl_sim51::mk_controller(void)
 {
   int i;
+  char *typ= NIL;
+  class cl_optref type_option(this);
 
+  type_option.init();
+  type_option.use("cpu_type");
   i= 0;
-  if (app->args->get_sarg('t', 0) == NULL)
-    app->args->add(new cl_prg_arg('t', 0, "C51"));
+  if ((typ= type_option.get_value(typ)) == NIL)
+    typ= "C51";
   while ((cpus_51[i].type_str != NULL) &&
-	 (strcmp(app->args->get_sarg('t', 0), cpus_51[i].type_str) != 0))
+	 (strcmp(typ, cpus_51[i].type_str) != 0))
     i++;
   if (cpus_51[i].type_str == NULL)
     {
@@ -73,17 +77,17 @@ cl_sim51::mk_controller(void)
   switch (cpus_51[i].type)
     {
     case CPU_51: case CPU_31:
-      return(new t_uc51(cpus_51[i].type, cpus_51[i].technology, this));
+      return(new cl_51core(cpus_51[i].type, cpus_51[i].technology, this));
     case CPU_52: case CPU_32:
-      return(new t_uc52(cpus_51[i].type, cpus_51[i].technology, this));
+      return(new cl_uc52(cpus_51[i].type, cpus_51[i].technology, this));
     case CPU_51R:
-      return(new t_uc51r(cpus_51[i].type, cpus_51[i].technology, this));
+      return(new cl_uc51r(cpus_51[i].type, cpus_51[i].technology, this));
     case CPU_89C51R:
-      return(new t_uc89c51r(cpus_51[i].type, cpus_51[i].technology, this));
+      return(new cl_uc89c51r(cpus_51[i].type, cpus_51[i].technology, this));
     case CPU_251:
-      return(new t_uc251(cpus_51[i].type, cpus_51[i].technology, this));
+      return(new cl_uc251(cpus_51[i].type, cpus_51[i].technology, this));
     case CPU_DS390: case CPU_DS390F:
-      return(new t_uc390(cpus_51[i].type, cpus_51[i].technology, this));
+      return(new cl_uc390(cpus_51[i].type, cpus_51[i].technology, this));
     }
   return(NULL);
 }

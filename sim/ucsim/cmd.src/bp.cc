@@ -51,7 +51,7 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
   t_addr addr= 0;
   int hit= 1;
   char op;
-  class cl_mem *mem;
+  class cl_address_space *mem;
   class cl_cmd_arg *params[4]= { cmdline->param(0),
 				 cmdline->param(1),
 				 cmdline->param(2),
@@ -68,14 +68,14 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
     do_fetch(uc, addr, hit, con);
   }
   else if (cmdline->syntax_match(uc, MEMORY STRING ADDRESS)) {
-    mem= params[0]->value.memory;
+    mem= params[0]->value.memory.address_space;
     op= *(params[1]->get_svalue());
     addr= params[2]->value.address;
     hit= 1;
     do_event(uc, mem, op, addr, hit, con);
   }
   else if (cmdline->syntax_match(uc, MEMORY STRING ADDRESS NUMBER)) {
-    mem= params[0]->value.memory;
+    mem= params[0]->value.memory.address_space;
     op= *(params[1]->get_svalue());
     addr= params[2]->value.address;
     hit= params[3]->value.number;
@@ -102,7 +102,7 @@ cl_break_cmd::do_fetch(class cl_uc *uc,
     con->dd_printf("Breakpoint at 0x%06x is already set.\n", addr);
   else
     {
-      class cl_brk *b= new cl_fetch_brk(uc->mem(MEM_ROM),
+      class cl_brk *b= new cl_fetch_brk(uc->address_space(MEM_ROM_ID),
 					uc->make_new_brknr(),
 					addr, perm, hit);
       b->init();
@@ -115,7 +115,8 @@ cl_break_cmd::do_fetch(class cl_uc *uc,
 
 void
 cl_break_cmd::do_event(class cl_uc *uc,
-		       class cl_mem *mem, char op, t_addr addr, int hit,
+		       class cl_address_space *mem,
+		       char op, t_addr addr, int hit,
 		       class cl_console *con)
 {
   class cl_ev_brk *b= NULL;

@@ -40,7 +40,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class cl_timer0: public cl_hw
 {
 protected:
-  class cl_cell *cell_tmod, *cell_tcon, *cell_tl, *cell_th;
+  class cl_memory_cell *cell_tmod, *cell_tcon, *cell_tl, *cell_th;
   t_mem mask_M0, mask_M1, mask_C_T, mask_GATE, mask_TR, mask_INT,
     mask_T, mask_TF;
   t_addr addr_tl, addr_th;
@@ -52,7 +52,7 @@ public:
   virtual void added_to_uc(void);
 
   //virtual t_mem read(class cl_cell *cell);
-  virtual void write(class cl_cell *cell, t_mem *val);
+  virtual void write(class cl_memory_cell *cell, t_mem *val);
   
   //virtual void mem_cell_changed(class cl_mem *mem, t_addr addr);
 

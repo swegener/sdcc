@@ -32,6 +32,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ddconfig.h"
 
 #include <stdio.h>
+#include <stdarg.h>
 #include <sys/types.h>
 #if FD_HEADER_OK
 # include HEADER_FD
@@ -106,12 +107,14 @@ protected:
   class cl_prompt_option *prompt_option;
   class cl_optref *null_prompt_option;
   class cl_debug_option *debug_option;
+  class cl_ustrings *lines_printed;
+  class cl_cmd *last_command;
+  class cl_cmdline *last_cmdline;
 public:
   class cl_app *app;
-  char *last_command;
   int flags; // See CONS_XXXX
   char *prompt;
-
+  
 public:
   cl_console(void): cl_base() { app= 0; in= out= 0; flags= 0; }
   cl_console(char *fin, char *fout, class cl_app *the_app);
@@ -124,12 +127,16 @@ public:
   virtual class cl_console *cl_console::clone_for_exec(char *fin);
   virtual int init(void);
 
+  virtual bool accept_last(void);
+
   virtual void welcome(void);
   virtual void redirect(char *fname, char *mode);
   virtual void un_redirect(void);
   virtual FILE *get_out(void) { return(rout?rout:out); }
+  int cmd_do_print(FILE *f, char *format, va_list ap);
   virtual void print_prompt(void);
   virtual int  dd_printf(char *format, ...);
+  virtual int  debug(char *format, ...);
   virtual void print_bin(long data, int bits);
   virtual void print_char_octal(char c);
   virtual int  match(int fdnum);
@@ -208,12 +215,15 @@ public:
   int all_printf(char *format, ...);	// print to all consoles
   int all_print(char *string, int length);
   int dd_printf(char *format, ...);	// print to actual_console
+  int dd_printf(char *format, va_list ap);// print to actual_console
   int debug(char *format, ...);		// print consoles with debug flag set
+  int debug(char *format, va_list ap);	// print consoles with debug flag set
   int flag_printf(int iflags, char *format, ...);
   int input_avail(void);
   int input_avail_on_frozen(void);
   int wait_input(void);
   int proc_input(void);
+  void exec_on(class cl_console *cons, char *file_name);
 };
 
 

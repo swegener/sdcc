@@ -29,7 +29,7 @@ SDCC		= sdcc
 SDCFLAGS	= --debug --stack-after-data --model-small
 SDCPPFLAGS	= 
 
-LIBS		= @LIBS@ -L$(PRJDIR) -lsim -lutil -lsim -lcmd -lguiucsim
+LIBS		= @LIBS@ -L$(PRJDIR) -Wl,--start-group -lutil -lsim -lcmd -lguiucsim -Wl,--end-group
 DL		= @DL@
 dl_ok		= @dl_ok@
 
@@ -45,7 +45,7 @@ man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
 
-EXEEXT          = @EXEEXT@
+EXEEXT		= @EXEEXT@
 
 OBJECTS_SHARED	= glob.o sim51.o \
 		  inc.o jmp.o mov.o logic.o arith.o bit.o \
@@ -132,6 +132,7 @@ $(PRJDIR)/s51.so: $(OBJECTS_SHARED)
 	$(CXX) -shared $(OBJECTS_SHARED) -o $@
 
 otherlibs:
+	cd $(PRJDIR) && $(MAKE) libs
 	cd $(PRJDIR)/cmd.src && $(MAKE) all
 	cd $(PRJDIR)/sim.src && $(MAKE) all
 	$(MAKE) -C $(PRJDIR)/gui.src checkconf ucsim_lib

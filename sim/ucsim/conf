@@ -35,6 +35,9 @@ case $TARGET in
 	--enable-xa \
 	"$@"
 	;;
+    *)
+	echo >&2 "Do not know how to configure!"
+	;;
 esac
 
 # End of conf

@@ -18,12 +18,14 @@ developer</a> ]
 
 <h1>Software simulator for microcontrollers</h1>
 
-<b><i>uCsim</i></b> can be used to simulate microcontrollers. It
-supports MCS51 family. AVR and Z80 support is under development.
+<b><i>&micro;Csim</i></b> can be used to simulate microcontrollers. It
+supports MCS51 family. AVR core, Z80, HC08 and XA are supported by
+UNIX version only.
 
 <a name="download"><h2>Download</h2></a>
 
-Simulator is available for two platforms: DOS and UNIX but DOS version
+Simulator is available for two platforms: DOS (MCS51 only)
+and UNIX but DOS version
 is not supported any more. DOS version is not finished so I call it
 demo version and it is available in binary only. Limitations of DOS
 version are:
@@ -74,9 +76,10 @@ subdirectory.
 
 <li>Compile the package with <tt><b>make</b></tt> command.
 
-<li>Install executable <b>s51</b> to any directory you want. It can be
-done with <tt><b>make install</b></tt> command which will place files
-in installation directory specified with <tt><b>--<!-- --
+<li>Install executables <b>s51</b>, <b>savr</b>, <b>shc08</b>,
+<b>sxa</b>, <b>sz80</b> to any directory you want. It can be done with
+<tt><b>make install</b></tt> command which will place files in
+installation directory specified with <tt><b>--<!-- --
 -->prefix=<i>dir</i></b></tt> option of
 <tt><b>configure</b></tt>. Note that you may have to have special
 privilege to do this if installation directory is not writable by you.
@@ -136,9 +139,13 @@ debugger interfaces.
 <li><a href="serial.html">Serial interfaces</a>. <br>The simulator can
 virtually connect a terminal to serial interface of the simulated CPU.
 
+<li><a href="memory.html">Memory simulation</a>. <br>Simulated CPU
+provides address spaces, storage is simulated by memory chips, address
+decoders conects them together.
+
 <li><a href="syntax.html">Command syntax</a> and <a
 href="cmd.html">command reference</a>. <i>(Now updated up to
-0.2.38)</i> <br>The simulator can be controlled via a command line
+0.5.0)</i> <br>The simulator can be controlled via a command line
 interface. It accepts simple commands.
 
 </ul>

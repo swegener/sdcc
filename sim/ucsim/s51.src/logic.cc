@@ -42,9 +42,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  */
 
 int
-t_uc51::inst_orl_addr_a(uchar code)
+cl_51core::inst_orl_addr_a(uchar code)
 {
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
 
   cell= get_direct(fetch());
   cell->write(cell->read(HW_PORT) | acc->read());
@@ -59,9 +59,9 @@ t_uc51::inst_orl_addr_a(uchar code)
  */
 
 int
-t_uc51::inst_orl_addr_Sdata(uchar code)
+cl_51core::inst_orl_addr_Sdata(uchar code)
 {
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
   int res= resGO;
 
   cell= get_direct(fetch());
@@ -79,7 +79,7 @@ t_uc51::inst_orl_addr_Sdata(uchar code)
  */
 
 int
-t_uc51::inst_orl_a_Sdata(uchar code)
+cl_51core::inst_orl_a_Sdata(uchar code)
 {
   uchar d;
 
@@ -96,10 +96,10 @@ t_uc51::inst_orl_a_Sdata(uchar code)
  */
 
 int
-t_uc51::inst_orl_a_addr(uchar code)
+cl_51core::inst_orl_a_addr(uchar code)
 {
   t_mem d;
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
 
   cell= get_direct(fetch());
   d= acc->read();
@@ -115,10 +115,10 @@ t_uc51::inst_orl_a_addr(uchar code)
  */
 
 int
-t_uc51::inst_orl_a_Sri(uchar code)
+cl_51core::inst_orl_a_Sri(uchar code)
 {
   t_mem d;
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
 
   cell= iram->get_cell(get_reg(code & 0x01)->read());
   d= acc->read();
@@ -134,7 +134,7 @@ t_uc51::inst_orl_a_Sri(uchar code)
  */
 
 int
-t_uc51::inst_orl_a_rn(uchar code)
+cl_51core::inst_orl_a_rn(uchar code)
 {
   t_mem d;
 
@@ -151,9 +151,9 @@ t_uc51::inst_orl_a_rn(uchar code)
  */
 
 int
-t_uc51::inst_anl_addr_a(uchar code)
+cl_51core::inst_anl_addr_a(uchar code)
 {
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
   
   cell= get_direct(fetch());
   cell->write(cell->read(HW_PORT) & acc->read());
@@ -168,9 +168,9 @@ t_uc51::inst_anl_addr_a(uchar code)
  */
 
 int
-t_uc51::inst_anl_addr_Sdata(uchar code)
+cl_51core::inst_anl_addr_Sdata(uchar code)
 {
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
   t_mem d;
 
   cell= get_direct(fetch());
@@ -188,7 +188,7 @@ t_uc51::inst_anl_addr_Sdata(uchar code)
  */
 
 int
-t_uc51::inst_anl_a_Sdata(uchar code)
+cl_51core::inst_anl_a_Sdata(uchar code)
 {
   uchar d;
 
@@ -205,10 +205,10 @@ t_uc51::inst_anl_a_Sdata(uchar code)
  */
 
 int
-t_uc51::inst_anl_a_addr(uchar code)
+cl_51core::inst_anl_a_addr(uchar code)
 {
   t_mem d;
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
 
   cell= get_direct(fetch());
   d= acc->read();
@@ -224,10 +224,10 @@ t_uc51::inst_anl_a_addr(uchar code)
  */
 
 int
-t_uc51::inst_anl_a_Sri(uchar code)
+cl_51core::inst_anl_a_Sri(uchar code)
 {
   t_mem d;
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
 
   cell= iram->get_cell(get_reg(code & 0x01)->read());
   d= acc->read();
@@ -243,7 +243,7 @@ t_uc51::inst_anl_a_Sri(uchar code)
  */
 
 int
-t_uc51::inst_anl_a_rn(uchar code)
+cl_51core::inst_anl_a_rn(uchar code)
 {
   uchar d;
 
@@ -260,9 +260,9 @@ t_uc51::inst_anl_a_rn(uchar code)
  */
 
 int
-t_uc51::inst_xrl_addr_a(uchar code)
+cl_51core::inst_xrl_addr_a(uchar code)
 {
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
 
   cell= get_direct(fetch());
   cell->write(cell->read(HW_PORT) ^ acc->read());
@@ -277,9 +277,9 @@ t_uc51::inst_xrl_addr_a(uchar code)
  */
 
 int
-t_uc51::inst_xrl_addr_Sdata(uchar code)
+cl_51core::inst_xrl_addr_Sdata(uchar code)
 {
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
 
   cell= get_direct(fetch());
   cell->write(cell->read(HW_PORT) ^ fetch());
@@ -295,7 +295,7 @@ t_uc51::inst_xrl_addr_Sdata(uchar code)
  */
 
 int
-t_uc51::inst_xrl_a_Sdata(uchar code)
+cl_51core::inst_xrl_a_Sdata(uchar code)
 {
   uchar d;
 
@@ -312,10 +312,10 @@ t_uc51::inst_xrl_a_Sdata(uchar code)
  */
 
 int
-t_uc51::inst_xrl_a_addr(uchar code)
+cl_51core::inst_xrl_a_addr(uchar code)
 {
   t_mem d;
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
 
   cell= get_direct(fetch());
   d= acc->read();
@@ -331,10 +331,10 @@ t_uc51::inst_xrl_a_addr(uchar code)
  */
 
 int
-t_uc51::inst_xrl_a_Sri(uchar code)
+cl_51core::inst_xrl_a_Sri(uchar code)
 {
   t_mem d;
-  class cl_cell *cell;
+  class cl_memory_cell *cell;
 
   cell= iram->get_cell(get_reg(code & 0x01)->read());
   d= acc->read();
@@ -350,7 +350,7 @@ t_uc51::inst_xrl_a_Sri(uchar code)
  */
 
 int
-t_uc51::inst_xrl_a_rn(uchar code)
+cl_51core::inst_xrl_a_rn(uchar code)
 {
   t_mem d;
 
@@ -367,7 +367,7 @@ t_uc51::inst_xrl_a_rn(uchar code)
  */
 
 int
-t_uc51::inst_cpl_a(uchar code)
+cl_51core::inst_cpl_a(uchar code)
 {
   acc->write(~(acc->read()));
   return(resGO);

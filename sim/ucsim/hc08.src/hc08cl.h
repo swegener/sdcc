@@ -40,16 +40,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class cl_hc08: public cl_uc
 {
 public:
-  cl_mem *ram;
-  cl_mem *rom;
+  class cl_memory *ram;
+  class cl_memory *rom;
   struct t_regs regs;
 public:
   cl_hc08(class cl_sim *asim);
   virtual int init(void);
   virtual char *id_string(void);
 
-  virtual t_addr get_mem_size(enum mem_class type);
+  //virtual t_addr get_mem_size(enum mem_class type);
   virtual void mk_hw_elements(void);
+  virtual void make_memories(void);
 
   virtual struct dis_entry *dis_tbl(void);
   virtual int inst_length(t_addr addr);

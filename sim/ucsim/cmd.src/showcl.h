@@ -40,6 +40,9 @@ COMMAND(cl_show_warranty_cmd);
 // SHOW OPTION
 COMMAND_ON(app,cl_show_option_cmd);
 
+// SHOW ERROR
+COMMAND_ON(app,cl_show_error_cmd);
+
 
 #endif
 

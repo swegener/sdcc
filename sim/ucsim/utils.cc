@@ -182,4 +182,48 @@ object_name(class cl_base *o)
 }
 
 
+char *
+case_string(enum letter_case lcase, char *str)
+{
+  char *p= strdup(str);
+  char *s= p;
+
+  switch (lcase)
+    {
+    case case_upper:
+      while (p && *p) {
+	*p= toupper(*p);
+	p++;
+      }
+      break;
+    case case_lower:
+      while (p && *p) {
+	*p= tolower(*p);
+	p++;
+      }
+      break;
+    case case_case:
+      if (!p || *p == '\0')
+	break;
+      while (isspace(*p)) p++;
+      if (*p)
+	*p= toupper(*p);
+      break;
+    }
+  return(s);
+}
+
+/*char *
+case_string(enum letter_case lcase, const char *str)
+{
+  char *p= NIL;
+
+  if (!str ||
+      !*str)
+    return(NIL);
+  p= strdup(str);
+  return case_string(lcase, p);
+}*/
+
+
 /* End of utils.cc */

@@ -39,7 +39,8 @@ COMMAND_METHODS_ON(uc,cl_break_cmd)
   virtual void do_fetch(class cl_uc *uc,
 			t_addr addr, int hit, class cl_console *con);
   virtual void do_event(class cl_uc *uc,
-			class cl_mem *mem, char op, t_addr addr, int hit,
+			class cl_address_space *mem,
+			char op, t_addr addr, int hit,
 			class cl_console *con);
 COMMAND_TAIL;
 

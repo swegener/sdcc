@@ -13,6 +13,10 @@ CXXCPP		= @CXXCPP@
 RANLIB		= @RANLIB@
 INSTALL		= @INSTALL@
 
+LEX		= @LEX@
+YACC		= @YACC@
+BISON_PLUS_PLUS	= @BISON_PLUS_PLUS@
+
 PRJDIR		= ..
 
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
@@ -36,7 +40,8 @@ srcdir          = @srcdir@
 
 OBJECTS		= cmdset.o command.o newcmd.o cmdutil.o syntax.o \
 		  get.o set.o timer.o bp.o info.o show.o cmdgui.o cmdconf.o \
-		  cmduc.o cmdstat.o
+		  cmduc.o cmdstat.o cmdmem.o \
+		  cmdpars.o cmdlex.o
 
 
 # Compiling entire program or any subproject
@@ -83,9 +88,9 @@ Makefile.dep: *.cc *.h
 include Makefile.dep
 include clean.mk
 
-#parser.cc: parser.y
+cmdpars.cc: cmdpars.y
 
-#plex.cc: plex.l
+cmdlex.cc: cmdlex.l cmdpars.h
 
 # My rules
 # --------
@@ -99,15 +104,19 @@ $(PRJDIR)/libcmd.a: $(OBJECTS)
 .cc.o:
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
 
+#.y.cc:
+#	rm -f $*.cc $*.h
+#	$(YACC) -d $<
+#	mv y.tab.c $*.cc
+#	mv y.tab.h $*.h
+
 .y.cc:
 	rm -f $*.cc $*.h
-	$(YACC) -d $<
-	mv y.tab.c $*.cc
-	mv y.tab.h $*.h
+	$(BISON_PLUS_PLUS) -d -o $*.cc $<
 
 .l.cc:
 	rm -f $*.cc
-	$(LEX) -t $< >$*.cc
+	$(LEX) --c++ -o $*.cc $<
 
 
 # Remaking configuration

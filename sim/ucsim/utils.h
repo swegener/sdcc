@@ -30,6 +30,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <stdio.h>
 
+// prj
+#include "stypes.h"
+
 
 extern int get_sub_opt(char **option,
 		       const char * const *tokens,
@@ -41,6 +44,7 @@ extern int get_string_id(struct id_element *ids, char *str, int def);
 extern char *format_string(char *format, ...);
 extern void print_char_octal(char c, FILE *f);
 extern char *object_name(class cl_base *o);
+extern char *case_string(enum letter_case lcase, char *str);
 
 
 #endif

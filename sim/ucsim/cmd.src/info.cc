@@ -117,4 +117,94 @@ COMMAND_DO_WORK_UC(cl_info_hw_cmd)
 }
 
 
+/*
+ * INFO STACK command
+ */
+
+//int
+//cl_info_stack_cmd::do_work(class cl_sim *sim,
+//                          class cl_cmdline *cmdline, class cl_console *con)
+COMMAND_DO_WORK_UC(cl_info_stack_cmd)
+{
+  int i;
+
+  cl_stack_op::info_head(con);
+  for (i= uc->stack_ops->count-1; i >= 0; i--)
+    {
+      class cl_stack_op *so= (class cl_stack_op *)(uc->stack_ops->at(i));
+      so->info(con, uc);
+    }
+  return(DD_FALSE);
+}
+
+
+/*
+ * INFO MMEORY command
+ *----------------------------------------------------------------------------
+ */
+
+COMMAND_DO_WORK_UC(cl_info_memory_cmd)
+{
+  int i;
+
+  con->dd_printf("Memory chips:\n");
+  for (i= 0; i < uc->memchips->count; i++)
+    {
+      class cl_memory_chip *m= (class cl_memory_chip *)(uc->memchips->at(i));
+      if (m)
+	con->dd_printf("  0x%06x-0x%06x %8d %s (%d,%s,%s)\n",
+		       m->get_start_address(),
+		       m->highest_valid_address(),
+		       m->get_size(),
+		       m->get_name(),
+		       m->width, m->data_format, m->addr_format);
+    }
+  con->dd_printf("Address spaces:\n");
+  for (i= 0; i < uc->address_spaces->count; i++)
+    {
+      class cl_address_space *m=
+	(class cl_address_space *)(uc->address_spaces->at(i));
+      if (m)
+	con->dd_printf("  0x%06x-0x%06x %8d %s (%d,%s,%s)\n",
+		       m->get_start_address(),
+		       m->highest_valid_address(),
+		       m->get_size(),
+		       m->get_name(),
+		       m->width, m->data_format, m->addr_format);
+    }
+  con->dd_printf("Address decoders:\n");
+  for (i= 0; i < uc->address_spaces->count; i++)
+    {
+      class cl_address_space *m=
+	(class cl_address_space *)(uc->address_spaces->at(i));
+      int j;
+      for (j= 0; j < m->decoders->count; j++)
+	{
+	  class cl_address_decoder *d=
+	    (class cl_address_decoder *)(m->decoders->at(j));
+	  con->dd_printf("%2d ", j);
+	  if (d->address_space)
+	    {
+	      con->dd_printf("%s ", d->address_space->get_name("unknown"));
+	      con->dd_printf(d->address_space->addr_format, d->as_begin);
+	      con->dd_printf(" ");
+	      con->dd_printf(d->address_space->addr_format, d->as_end);
+	    }
+	  else
+	    con->dd_printf("x");
+	  con->dd_printf(" -> ");
+	  if (d->memchip)
+	    {
+	      con->dd_printf("%s ", d->memchip->get_name("unknown"));
+	      con->dd_printf(d->memchip->addr_format, d->chip_begin);
+	    }
+	  else
+	    con->dd_printf("x");
+	  con->dd_printf(" %s\n", (d->activated)?"activated":"inactive");
+	}
+    }
+  return(0);
+}
+
+
 /* End of cmd.src/info.cc */

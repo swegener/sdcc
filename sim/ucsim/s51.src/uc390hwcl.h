@@ -36,11 +36,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class cl_uc390_hw: public cl_hw
 {
 protected:
-  class cl_cell *cell_dps, *cell_exif, *cell_p4cnt, *cell_acon,
-		*cell_p5cnt, *cell_c0c, *cell_pmr, *cell_mcon,
-		*cell_ta, *cell_cor, *cell_mcnt0, *cell_mcnt1,
-		*cell_ma, *cell_mb, *cell_mc, *cell_wdcon, *cell_c1c;
-  class t_uc390 *uc390;
+  class cl_address_space *sfr;
+  class cl_memory_cell *cell_dps, *cell_exif, *cell_p4cnt, *cell_acon,
+    *cell_p5cnt, *cell_c0c, *cell_pmr, *cell_mcon,
+    *cell_ta, *cell_cor, *cell_mcnt0, *cell_mcnt1,
+    *cell_ma, *cell_mb, *cell_mc, *cell_wdcon, *cell_c1c;
+  class cl_uc390 *uc390;
   unsigned long ctm_ticks; /* mini-state-machine for "crystal multiplier" */
   unsigned long timed_access_ticks;
   int timed_access_state; /* 0: idle; 1: $aa written; 2: $55 written */
@@ -48,8 +49,8 @@ public:
   cl_uc390_hw (class cl_uc *auc);
   virtual int init (void);
 
-  virtual t_mem read (class cl_cell *cell);
-  virtual void write (class cl_cell *cell, t_mem *val);
+  virtual t_mem read (class cl_memory_cell *cell);
+  virtual void write (class cl_memory_cell *cell, t_mem *val);
 
   //virtual void mem_cell_changed (class cl_mem *mem, t_addr addr);
 

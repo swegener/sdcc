@@ -23,10 +23,9 @@ CXXFLAGS        = @CXXFLAGS@ -Wall
 M_OR_MM         = @M_OR_MM@
 PICOPT		= @PICOPT@
 SHAREDLIB	= @SHAREDLIB@
+EXEEXT		= @EXEEXT@
 
-EXEEXT          = @EXEEXT@
-
-LIBS		= @LIBS@ -L$(PRJDIR) -lsim -lutil -lsim -lcmd -lguiucsim
+LIBS		= @LIBS@ -L$(PRJDIR) -Wl,--start-group -lsim -lutil -lcmd -lguiucsim -Wl,--end-group
 DL		= @DL@
 dl_ok		= @dl_ok@
 
@@ -71,7 +70,7 @@ install: all installdirs
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(bindir)/savr$(EXEEXT)
+	rm -f $(bindir)/savr
 
 
 # Performing self-test

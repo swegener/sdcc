@@ -17,7 +17,7 @@ M_OR_MM         = @M_OR_MM@
 
 LIBS		= @CURSES_LIBS@ @LIBS@
 
-EXEEXT          = @EXEEXT@
+EXEEXT		= @EXEEXT@
 
 curses_ok	= @curses_ok@
 

@@ -82,7 +82,7 @@ protected:
 public:
   class cl_sim *sim;
   class cl_ustrings *in_files;
-  class cl_arguments *args;
+  //class cl_arguments *args;
   class cl_options *options;
   int going;
 
@@ -105,7 +105,7 @@ public:
   virtual class cl_cmd *get_cmd(class cl_cmdline *cmdline);
 
 public: // messages to broadcast
-  virtual void mem_cell_changed(class cl_mem *mem, t_addr addr);
+  //virtual void mem_cell_changed(class cl_m *mem, t_addr addr);
 
 public:
   virtual void set_simulator(class cl_sim *simulator);
@@ -114,6 +114,10 @@ public:
 protected:
   virtual void build_cmdset(class cl_cmdset *cs);
   virtual void mk_options(void);
+
+public: // output functions
+  virtual int dd_printf(char *format, ...);
+  virtual int debug(char *format, ...);
 };
 
 

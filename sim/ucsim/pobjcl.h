@@ -7,22 +7,24 @@
  *
  */
 
-/* This file is part of microcontroller simulator: ucsim.
+/*
+  This file is part of microcontroller simulator: ucsim.
 
-UCSIM is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-UCSIM is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with UCSIM; see the file COPYING.  If not, write to the Free
-Software Foundation, 59 Temple Place - Suite 330, Boston, MA
-02111-1307, USA. */
+  UCSIM is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+  
+  UCSIM is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with UCSIM; see the file COPYING.  If not, write to the Free
+  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+  02111-1307, USA.
+*/
 /*@1@*/
 
 #ifndef POBJ_HEADER
@@ -32,6 +34,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "pobjt.h"
 
+#include "eventcl.h"
+
 
 /*									    #
   ==========================================================================#
@@ -40,10 +44,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 									    #
 */
 
+class cl_list;
+class cl_event;
+
 class cl_base
 {
 private:
   char *name;
+  class cl_base *parent;
+  class cl_list *children;
 public:
   cl_base(void);
   virtual ~cl_base(void);
@@ -54,6 +63,41 @@ public:
   virtual bool have_name(void) { return(name != 0); }
   virtual bool have_real_name(void) { return(name != 0 && *name != '\0'); }
   char *set_name(char *new_name);
+  char *set_name(char *new_name, char *def_name);
+  bool is_named(char *the_name);
+  bool is_inamed(char *the_name);
+
+  class cl_base *get_parent(void) { return(parent); }
+  int nuof_children(void);
+
+  virtual void add_child(class cl_base *child);
+  virtual void remove_child(class cl_base *child);
+  virtual void remove_from_chain(void);
+  virtual void unlink(void);
+  virtual class cl_base *first_child(void);
+  virtual class cl_base *next_child(class cl_base *child);
+
+  virtual bool handle_event(class cl_event &event);
+  virtual bool pass_event_down(class cl_event &event);
+};
+
+
+/*
+ * Event
+ */
+
+class cl_event: public cl_base
+{
+protected:
+  bool handled;
+public:
+  enum event what;
+public:
+  cl_event(enum event what_event);
+  virtual ~cl_event(void);
+  
+  bool is_handled(void) { return(handled); }
+  virtual void handle(void) { handled= DD_TRUE; }
 };
 
 
@@ -74,12 +118,14 @@ protected:
   t_index	   Delta;
 
 public:
-  cl_list(t_index alimit, t_index adelta);
+  cl_list(t_index alimit, t_index adelta, char *aname);
   virtual ~cl_list(void);
 
 	  void	   *at(t_index index);
+  class cl_base *object_at(t_index index);
   virtual t_index  index_of(void *item);
   virtual bool     index_of(void *item, t_index *idx);
+  virtual void     *next(void *item);
   	  int	   get_count(void);
   virtual void     *pop(void);
   virtual void     *top(void);
@@ -96,6 +142,7 @@ public:
 	  void	   add_at(t_index index, void *item);
 	  void	   put_at(t_index index, void *item);
   virtual t_index  add(void *item);
+  virtual t_index  add(class cl_base *item, class cl_base *parent);
   virtual void     push(void *item);
 
 	  void	   *first_that(match_func test, void *arg);
@@ -119,8 +166,8 @@ class cl_sorted_list: public cl_list
 {
 public:
   bool		   Duplicates;
-
-  cl_sorted_list(t_index alimit, t_index adelta);
+public:
+  cl_sorted_list(t_index alimit, t_index adelta, char *aname);
   virtual ~cl_sorted_list(void);
   
   virtual bool	   search(void *key, t_index& index);
@@ -142,7 +189,7 @@ private:
 class cl_strings: public cl_sorted_list
 {
 public:
-  cl_strings(t_index alimit, t_index adelta);
+  cl_strings(t_index alimit, t_index adelta, char *aname);
   virtual ~cl_strings(void);
   
 private:
@@ -161,7 +208,7 @@ private:
 class cl_ustrings: public cl_strings
 {
 public:
-  cl_ustrings(t_index alimit, t_index adelta);
+  cl_ustrings(t_index alimit, t_index adelta, char *aname);
   virtual ~cl_ustrings(void);
   
 private:

@@ -47,8 +47,8 @@ cl_cmdline::cl_cmdline(class cl_app *the_app,
 {
   app= the_app;
   cmd= strdup(acmd);
-  params= new cl_list(2, 2);
-  tokens= new cl_ustrings(2, 2);
+  params= new cl_list(2, 2, "command line params");
+  tokens= new cl_ustrings(2, 2, "command line tokens");
   set_name(0);
   matched_syntax= 0;
   con= acon;
@@ -87,7 +87,7 @@ cl_cmdline::split(void)
   class cl_cmd_arg *arg;
 
   //sim= app->get_sim();
-  set_name(0);
+  set_name("\n");
   if (!cmd ||
       !*cmd)
     return(0);
@@ -115,170 +115,25 @@ cl_cmdline::split(void)
   // skip delimiters
   while (*start)
     {
-      char *end, *param_str;
+      char *end= start, *param_str;
       if (*start == '"')
-	{
-	  // string
-	  start++;
-	  end= start;
-	  while (*end &&
-		 *end != '"')
-	    {
-	      if (*end == '\\')
-		{
-		  end++;
-		  if (*end)
-		    end++;
-		}
-	      else
-		end++;
-	    }
-	  if (*end == '"')
-	    end--;
-	  else
-	    con->dd_printf("Unterminated string\n");
-	  param_str= (char *)malloc(end-start+2);
-	  strncpy(param_str, start, 1+end-start);
-	  param_str[1+end-start]= '\0';
-	  tokens->add(strdup(param_str));
-	  params->add(arg= new cl_cmd_str_arg(param_str));
-	  arg->init();
-	  free(param_str);
-	  if (*end)
-	    end++;
-	  if (*end == '"')
-	    end++;
-	}
+	split_out_string(&start, &end);
+      else if (*start == '>')
+	split_out_output_redirection(&start, &end);
       else
 	{
 	  char *dot;
-	  i= strcspn(start, " \t\v\r,");
-	  end= start+i;
-	  param_str= (char *)malloc(i+1);
-	  strncpy(param_str, start, i);
+          i= strcspn(start, " \t\v\r,");
+          end= start+i;
+          param_str= (char *)malloc(i+1);
+          strncpy(param_str, start, i);
 	  param_str[i]= '\0';
-	  if (strchr(">", *start))
-	    {
-	      char *fn, mode[3]= "w\0";
-	      switch (*start)
-		{
-		case '>':
-		  if (i == 1 ||
-		      (i == 2 &&
-		       start[1] == '>')) {
-		    con->dd_printf("Unspecified redirection\n");
-		    break;
-		  }
-		  fn= start+1;
-		  if (*fn == '>') {
-		    fn++;
-		    mode[0]= 'a';
-		  }
-		  con->redirect(fn, mode);
-		  break;
-		default:
-		  break;
-		}
-	      free(param_str);
-	      start= end;
-	      start= skip_delims(start);
-	      continue;
-	    }
 	  tokens->add(strdup(param_str));
 	  if ((dot= strchr(param_str, '.')) != NULL)
-	    {
-	      // bit
-	      class cl_cmd_arg *sfr, *bit;
-	      *dot= '\0';
-	      dot++;
-	      if (strchr("0123456789", *param_str) != NULL)
-		{
-		  sfr= new cl_cmd_int_arg((long)strtol(param_str, 0, 0));
-		  sfr->init();
-		}
-	      else
-		{
-		  sfr= new cl_cmd_sym_arg(param_str);
-		  sfr->init();
-		}
-	      if (*dot == '\0')
-		{
-		  bit= 0;
-		  con->dd_printf("Uncomplete bit address\n");
-		  delete sfr;
-		}
-	      else
-		{
-		  if (strchr("0123456789", *dot) != NULL)
-		    {
-		      bit= new cl_cmd_int_arg((long)strtol(dot, 0, 0));
-		      bit->init();
-		    }
-		  else
-		    {
-		      bit= new cl_cmd_sym_arg(dot);
-		      bit->init();
-		    }
-		  params->add(arg= new cl_cmd_bit_arg(sfr, bit));
-		  arg->init();
-		}
-	    }
+	    split_out_bit(dot, param_str);
 	  else if ((dot= strchr(param_str, '[')) != NULL)
-	    {
-	      // array
-	      class cl_cmd_arg *aname, *aindex;
-	      *dot= '\0';
-	      dot++;
-	      if (strchr("0123456789", *param_str) != NULL)
-		{
-		  aname= new cl_cmd_int_arg((long)strtol(param_str, 0, 0));
-		  aname->init();
-		}
-	      else
-		{
-		  aname= new cl_cmd_sym_arg(param_str);
-		  aname->init();
-		}
-	      if (*dot == '\0')
-		{
-		  aname= 0;
-		  con->dd_printf("Uncomplete array\n");
-		}
-	      else
-		{
-		  char *p;
-		  p= dot + strlen(dot) - 1;
-		  while (p > dot &&
-			 *p != ']')
-		    {
-		      *p= '\0';
-		      p--;
-		    }
-		  if (*p == ']')
-		    *p= '\0';
-		  if (strlen(dot) == 0)
-		    {
-		      con->dd_printf("Uncomplete array index\n");
-		      delete aname;
-		    }
-		  else    
-		    {
-		      if (strchr("0123456789", *dot) != NULL)
-			{
-			  aindex= new cl_cmd_int_arg((long)strtol(dot, 0, 0));
-			  aindex->init();
-			}
-		      else
-			{
-			  aindex= new cl_cmd_sym_arg(dot);
-			  aindex->init();
-			}
-		      params->add(arg= new cl_cmd_array_arg(aname, aindex));
-		      arg->init();
-		    }
-		}
-	    }
-	  else if (strchr("0123456789", *param_str) != NULL)
+	    split_out_array(dot, param_str);
+	  else if (strchr("0123456789-+", *param_str) != NULL)
 	    {
 	      // number
 	      params->add(arg= new cl_cmd_int_arg((long)
@@ -299,6 +154,172 @@ cl_cmdline::split(void)
   return(0);
 }
 
+void
+cl_cmdline::split_out_string(char **_start, char **_end)
+{
+  char *start= *_start, *end;
+  start++;
+  end= start;
+  while (*end &&
+        *end != '"')
+    {
+      if (*end == '\\')
+       {
+         end++;
+         if (*end)
+           end++;
+       }
+      else
+       end++;
+    }
+  if (*end == '"')
+    end--;
+  else
+    con->dd_printf("Unterminated string\n");
+  char *param_str= (char *)malloc(end-start+2);
+  strncpy(param_str, start, 1+end-start);
+  param_str[1+end-start]= '\0';
+  tokens->add(strdup(param_str));
+  class cl_cmd_arg *arg;
+  params->add(arg= new cl_cmd_str_arg(param_str));
+  arg->init();
+  free(param_str);
+  if (*end)
+    end++;
+  if (*end == '"')
+    end++;
+  *_start= start;
+  *_end= end;
+}
+
+void
+cl_cmdline::split_out_output_redirection(char **_start, char **_end)
+{
+  char *start= *_start, *end/*= *_end*/;
+  int i;
+  char mode[2];
+
+  mode[0]= 'w';
+  mode[1]= '\0';
+  start++;
+  i= strcspn(start, " \t\v\r,");
+  end= start+i;
+  char *param_str= (char *)malloc(i+1);
+  char *n= param_str;
+  strncpy(param_str, start, i);
+  param_str[i]= '\0';
+  if (param_str &&
+      param_str[0] == '>')
+    {
+      n++;
+      mode[0]= 'a';
+    }
+  tokens->add(strdup(n));
+  con->redirect(n, mode);
+  free(param_str);
+  *_start= start;
+  *_end= end;
+}
+
+void
+cl_cmdline::split_out_bit(char *dot, char *param_str)
+{
+  class cl_cmd_arg *sfr, *bit;
+
+  *dot= '\0';
+  dot++;
+  if (strchr("0123456789", *param_str) != NULL)
+    {
+      sfr= new cl_cmd_int_arg((long)strtol(param_str, 0, 0));
+      sfr->init();
+    }
+  else
+    {
+      sfr= new cl_cmd_sym_arg(param_str);
+      sfr->init();
+    }
+  if (*dot == '\0')
+    {
+      bit= 0;
+      con->dd_printf("Uncomplete bit address\n");
+      delete sfr;
+    }
+  else
+    {
+      if (strchr("0123456789", *dot) != NULL)
+       {
+         bit= new cl_cmd_int_arg((long)strtol(dot, 0, 0));
+         bit->init();
+       }
+      else
+       {
+         bit= new cl_cmd_sym_arg(dot);
+         bit->init();
+       }
+      class cl_cmd_arg *arg;
+      params->add(arg= new cl_cmd_bit_arg(sfr, bit));
+      arg->init();
+    }
+}
+
+void
+cl_cmdline::split_out_array(char *dot, char *param_str)
+{
+  class cl_cmd_arg *aname, *aindex;
+       
+  *dot= '\0';
+  dot++;
+  if (strchr("0123456789", *param_str) != NULL)
+    {
+      aname= new cl_cmd_int_arg((long)strtol(param_str, 0, 0));
+      aname->init();
+    }
+  else
+    {
+      aname= new cl_cmd_sym_arg(param_str);
+      aname->init();
+    }
+  if (*dot == '\0')
+    {
+      aname= 0;
+      con->dd_printf("Uncomplete array\n");
+    }
+  else
+    {
+      char *p;
+      p= dot + strlen(dot) - 1;
+      while (p > dot &&
+            *p != ']')
+       {
+         *p= '\0';
+         p--;
+       }
+      if (*p == ']')
+       *p= '\0';
+      if (strlen(dot) == 0)
+       {
+         con->dd_printf("Uncomplete array index\n");
+         delete aname;
+       }
+      else    
+       {
+         if (strchr("0123456789", *dot) != NULL)
+           {
+             aindex= new cl_cmd_int_arg((long)strtol(dot, 0, 0));
+             aindex->init();
+           }
+         else
+           {
+             aindex= new cl_cmd_sym_arg(dot);
+             aindex->init();
+           }
+         class cl_cmd_arg *arg;
+         params->add(arg= new cl_cmd_array_arg(aname, aindex));
+         arg->init();
+       }
+    }
+}
+
 int
 cl_cmdline::shift(void)
 {
@@ -315,8 +336,10 @@ cl_cmdline::shift(void)
       free(cmd);
       cmd= p;
       delete params;
-      params= new cl_list(2, 2);
+      params= new cl_list(2, 2, "params");
       split();
+      if (strcmp(get_name(), "\n") == 0)
+	set_name(0);
     }
   return(have_real_name());
 }
@@ -363,23 +386,20 @@ cl_cmdline::syntax_match(class cl_uc *uc, char *syntax)
   char *p= syntax;
   int iparam= 0;
   class cl_cmd_arg *parm= (class cl_cmd_arg *)(params->at(iparam));
-  bool match;
   while (*p &&
 	 parm)
     {
-      //printf("Checking %s as %c\n",parm->get_svalue(),*p);
+      //printf("***Checking %s as %c\n",parm->get_svalue(),*p);
       if (uc)
 	switch (*p)
 	  {
 	  case SY_ADDR:
-	    match= parm->as_address(uc);
-	    if (!match)
-	      return(match);
+	    if (!parm->as_address(uc))
+	      return(DD_FALSE);
 	    //printf("ADDRESS match %lx\n",parm->value.address);
 	    break;
 	  case SY_MEMORY:
-	    match= parm->as_memory(uc);
-	    if (!match)
+	    if (!parm->as_memory(uc))
 	      return(DD_FALSE);
 	    //printf("MEMORY match %s\n",parm->value.memory->class_name);
 	    break;
@@ -498,7 +518,7 @@ cl_cmd::cl_cmd(enum cmd_operate_on op_on,
   cl_base()
 {
   operate_on= op_on;
-  names= new cl_strings(1, 1);
+  names= new cl_strings(1, 1, "names of a command");
   names->add(aname?strdup(aname):strdup("unknown"));
   can_repeat= can_rep;
   short_help= short_hlp?strdup(short_hlp):NULL;
@@ -652,10 +672,10 @@ cl_cmd::do_work(class cl_uc *uc,
  */
 
 cl_cmdset::cl_cmdset(void):
-  cl_list(5, 5)
+  cl_list(5, 5, "cmdset")
 {
   //sim= 0;
-  last_command= 0;
+  //last_command= 0;
 }
 
 /*cl_cmdset::cl_cmdset(class cl_sim *asim):
@@ -666,17 +686,10 @@ cl_cmdset::cl_cmdset(void):
 }*/
 
 class cl_cmd *
-cl_cmdset::get_cmd(class cl_cmdline *cmdline)
+cl_cmdset::get_cmd(class cl_cmdline *cmdline, bool accept_last)
 {
   int i;
 
-  if (cmdline->repeat())
-    {
-      if (last_command)
-	return(last_command);
-      else
-	return(0);
-    }
   // exact match
   for (i= 0; i < count; i++)
     {
@@ -793,7 +806,7 @@ cl_super_cmd::work(class cl_app *app,
 	}
       return(0);
     }
-  if ((cmd= commands->get_cmd(cmdline)) == NULL)
+  if ((cmd= commands->get_cmd(cmdline, con->accept_last())) == NULL)
     {
       con->dd_printf("Undefined subcommand: \"%s\". Try \"help %s\".\n",
 		     cmdline->get_name(), (char*)(names->at(0)));

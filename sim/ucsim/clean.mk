@@ -2,7 +2,7 @@
 # --------------------------------------------------
 clean:
 	rm -f *core *[%~] *.[oa] *.so ucsim$(EXEEXT)
-	rm -f .[a-z]*~
+	rm -f .[a-z]*~ ptt
 
 
 # Deleting all files created by configuring or building the program
@@ -10,6 +10,7 @@ clean:
 distclean: clean
 	rm -f config.cache config.log config.status
 	rm -f ddconfig.h main.mk *.dep
+	rm -rf autom4te.cache
 
 
 # Like clean but some files may still exist

@@ -40,13 +40,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  */
 
 int
-t_uc51::inst_orl_c_bit(uchar code)
+cl_51core::inst_orl_c_bit(uchar code)
 {
   uchar bitaddr;
 
   t_addr a;
   t_mem m;
-  class cl_mem *mem;
+  class cl_address_space *mem;
   mem= bit2mem(bitaddr= fetch(), &a, &m);
   SFR_SET_C(SFR_GET_C ||
 	    (mem->read(a) & m));
@@ -62,11 +62,11 @@ t_uc51::inst_orl_c_bit(uchar code)
  */
 
 int
-t_uc51::inst_anl_c_bit(uchar code)
+cl_51core::inst_anl_c_bit(uchar code)
 {
   t_mem m;
   t_addr a;
-  class cl_mem *mem;
+  class cl_address_space *mem;
 
   mem= bit2mem(fetch(), &a, &m);
   SFR_SET_C(SFR_GET_C &&
@@ -83,11 +83,11 @@ t_uc51::inst_anl_c_bit(uchar code)
  */
 
 int
-t_uc51::inst_mov_bit_c(uchar code)
+cl_51core::inst_mov_bit_c(uchar code)
 {
   t_addr a;
   t_mem m, d;
-  class cl_mem *mem;
+  class cl_address_space *mem;
 
   mem= bit2mem(fetch(), &a, &m);
   d= mem->read(a, HW_PORT);
@@ -107,14 +107,35 @@ t_uc51::inst_mov_bit_c(uchar code)
  */
 
 int
-t_uc51::inst_mov_c_bit(uchar code)
+cl_51core::inst_mov_c_bit(uchar code)
 {
   t_addr a;
   t_mem m;
-  class cl_mem *mem;
+  class cl_address_space *mem;
 
   mem= bit2mem(fetch(), &a, &m);
   SFR_SET_C(mem->read(a) & m);
+  return(resGO);
+}
+
+
+/*
+ * 0xa0 2 24 ORL C,/bit
+ *____________________________________________________________________________
+ *
+ */
+
+int
+cl_51core::inst_orl_c_Sbit(uchar code)
+{
+  t_mem m;
+  t_addr a;
+  class cl_address_space *mem;
+
+  mem= bit2mem(fetch(), &a, &m);
+  SFR_SET_C(SFR_GET_C ||
+	    !(mem->read(a) & m));
+  tick(1);
   return(resGO);
 }
 
@@ -126,11 +147,11 @@ t_uc51::inst_mov_c_bit(uchar code)
  */
 
 int
-t_uc51::inst_anl_c_Sbit(uchar code)
+cl_51core::inst_anl_c_Sbit(uchar code)
 {
   t_mem m;
   t_addr a;
-  class cl_mem *mem;
+  class cl_address_space *mem;
 
   mem= bit2mem(fetch(), &a, &m);
   SFR_SET_C(SFR_GET_C &&
@@ -147,11 +168,11 @@ t_uc51::inst_anl_c_Sbit(uchar code)
  */
 
 int
-t_uc51::inst_cpl_bit(uchar code)
+cl_51core::inst_cpl_bit(uchar code)
 {
   t_addr a;
   t_mem m, d;
-  class cl_mem *mem;
+  class cl_address_space *mem;
 
   mem= bit2mem(fetch(), &a, &m);
   d= mem->read(a, HW_PORT);
@@ -167,7 +188,7 @@ t_uc51::inst_cpl_bit(uchar code)
  */
 
 int
-t_uc51::inst_cpl_c(uchar code)
+cl_51core::inst_cpl_c(uchar code)
 {
   psw->write(psw->read() ^ bmCY);
   return(resGO);
@@ -181,11 +202,11 @@ t_uc51::inst_cpl_c(uchar code)
  */
 
 int
-t_uc51::inst_clr_bit(uchar code)
+cl_51core::inst_clr_bit(uchar code)
 {
   t_addr a;
   t_mem m;
-  class cl_mem *mem;
+  class cl_address_space *mem;
 
   mem= bit2mem(fetch(), &a, &m);
   t_mem d= mem->read(a, HW_PORT);
@@ -201,7 +222,7 @@ t_uc51::inst_clr_bit(uchar code)
  */
 
 int
-t_uc51::inst_clr_c(uchar code)
+cl_51core::inst_clr_c(uchar code)
 {
   psw->write(psw->read() & ~bmCY);
   return(resGO);
@@ -215,11 +236,11 @@ t_uc51::inst_clr_c(uchar code)
  */
 
 int
-t_uc51::inst_setb_bit(uchar code)
+cl_51core::inst_setb_bit(uchar code)
 {
   t_addr a;
   t_mem m, d;
-  class cl_mem *mem;
+  class cl_address_space *mem;
 
   mem= bit2mem(fetch(), &a, &m);
   d= mem->read(a, HW_PORT);
@@ -235,7 +256,7 @@ t_uc51::inst_setb_bit(uchar code)
  */
 
 int
-t_uc51::inst_setb_c(uchar code)
+cl_51core::inst_setb_c(uchar code)
 {
   psw->write(psw->read() | bmCY);
   return(resGO);

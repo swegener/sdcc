@@ -68,7 +68,7 @@ cl_z80::init(void)
 {
   cl_uc::init(); /* Memories now exist */
 
-  rom= mem(MEM_ROM);
+  rom= address_space(MEM_ROM_ID);
 //  ram= mem(MEM_XRAM);
   ram= rom;
 
@@ -90,7 +90,7 @@ cl_z80::id_string(void)
 /*
  * Making elements of the controller
  */
-
+/*
 t_addr
 cl_z80::get_mem_size(enum mem_class type)
 {
@@ -102,12 +102,34 @@ cl_z80::get_mem_size(enum mem_class type)
     }
  return(cl_uc::get_mem_size(type));
 }
+*/
 
 void
 cl_z80::mk_hw_elements(void)
 {
   //class cl_base *o;
   /* t_uc::mk_hw() does nothing */
+}
+
+void
+cl_z80::make_memories(void)
+{
+  class cl_address_space *as;
+
+  as= new cl_address_space("rom", 0, 0x10000, 8);
+  as->init();
+  address_spaces->add(as);
+
+  class cl_address_decoder *ad;
+  class cl_memory_chip *chip;
+
+  chip= new cl_memory_chip("rom_chip", 0x10000, 8);
+  chip->init();
+  memchips->add(chip);
+  ad= new cl_address_decoder(as= address_space("rom"), chip, 0, 0xffff, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
 }
 
 
@@ -177,12 +199,12 @@ cl_z80::get_disasm_info(t_addr addr,
   int start_addr = addr;
   struct dis_entry *dis_e;
 
-  code= get_mem(MEM_ROM, addr++);
+  code= get_mem(MEM_ROM_ID, addr++);
   dis_e = NULL;
 
   switch(code) {
     case 0xcb:  /* ESC code to lots of op-codes, all 2-byte */
-      code= get_mem(MEM_ROM, addr++);
+      code= get_mem(MEM_ROM_ID, addr++);
       i= 0;
       while ((code & disass_z80_cb[i].mask) != disass_z80_cb[i].code &&
         disass_z80_cb[i].mnemonic)
@@ -194,7 +216,7 @@ cl_z80::get_disasm_info(t_addr addr,
     break;
 
     case 0xed: /* ESC code to about 80 opcodes of various lengths */
-      code= get_mem(MEM_ROM, addr++);
+      code= get_mem(MEM_ROM_ID, addr++);
       i= 0;
       while ((code & disass_z80_ed[i].mask) != disass_z80_ed[i].code &&
         disass_z80_ed[i].mnemonic)
@@ -206,11 +228,11 @@ cl_z80::get_disasm_info(t_addr addr,
     break;
 
     case 0xdd: /* ESC codes,about 284, vary lengths, IX centric */
-      code= get_mem(MEM_ROM, addr++);
+      code= get_mem(MEM_ROM_ID, addr++);
       if (code == 0xcb) {
         immed_n = 2;
         addr++;  // pass up immed data
-        code= get_mem(MEM_ROM, addr++);
+        code= get_mem(MEM_ROM_ID, addr++);
         i= 0;
         while ((code & disass_z80_ddcb[i].mask) != disass_z80_ddcb[i].code &&
           disass_z80_ddcb[i].mnemonic)
@@ -232,11 +254,11 @@ cl_z80::get_disasm_info(t_addr addr,
     break;
 
     case 0xfd: /* ESC codes,sme as dd but IY centric */
-      code= get_mem(MEM_ROM, addr++);
+      code= get_mem(MEM_ROM_ID, addr++);
       if (code == 0xcb) {
         immed_n = 2;
         addr++;  // pass up immed data
-        code= get_mem(MEM_ROM, addr++);
+        code= get_mem(MEM_ROM_ID, addr++);
         i= 0;
         while ((code & disass_z80_fdcb[i].mask) != disass_z80_fdcb[i].code &&
           disass_z80_fdcb[i].mnemonic)
@@ -315,18 +337,18 @@ cl_z80::disass(t_addr addr, char *sep)
 	  switch (*(b++))
 	    {
 	    case 'd': // d    jump relative target, signed? byte immediate operand
-	      sprintf(temp, "#%d", (char)get_mem(MEM_ROM, addr+immed_offset));
+	      sprintf(temp, "#%d", (char)get_mem(MEM_ROM_ID, addr+immed_offset));
 	      ++immed_offset;
 	      break;
 	    case 'w': // w    word immediate operand
 	      sprintf(temp, "#0x%04x",
-	         (uint)((get_mem(MEM_ROM, addr+immed_offset)) |
-	                (get_mem(MEM_ROM, addr+immed_offset+1)<<8)) );
+	         (uint)((get_mem(MEM_ROM_ID, addr+immed_offset)) |
+	                (get_mem(MEM_ROM_ID, addr+immed_offset+1)<<8)) );
 	      ++immed_offset;
 	      ++immed_offset;
 	      break;
 	    case 'b': // b    byte immediate operand
-	      sprintf(temp, "#0x%02x", (uint)get_mem(MEM_ROM, addr+immed_offset));
+	      sprintf(temp, "#0x%02x", (uint)get_mem(MEM_ROM_ID, addr+immed_offset));
 	      ++immed_offset;
 	      break;
 	    default:
@@ -593,10 +615,11 @@ cl_z80::exec_inst(void)
     case 0xff: return(inst_rst(code));
     }
 
-  if (PC)
+  /*if (PC)
     PC--;
   else
-    PC= get_mem_size(MEM_ROM)-1;
+  PC= get_mem_size(MEM_ROM_ID)-1;*/
+  PC= rom->inc_address(PC, -1);
 
   sim->stop(resINV_INST);
   return(resINV_INST);

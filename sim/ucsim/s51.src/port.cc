@@ -73,7 +73,7 @@ cl_port::init(void)
       }
     default: addr_p= P0; return(1);
     }
-  class cl_mem *sfr= uc->mem(MEM_SFR);
+  class cl_address_space *sfr= uc->address_space(MEM_SFR_ID);
   if (!sfr)
     {
       fprintf(stderr, "No SFR to register port into\n");
@@ -85,14 +85,14 @@ cl_port::init(void)
 }
 
 t_mem
-cl_port::read(class cl_cell *cell)
+cl_port::read(class cl_memory_cell *cell)
 {
   //printf("port[%d] read\n",id);
   return(cell->get() & port_pins);
 }
 
 void
-cl_port::write(class cl_cell *cell, t_mem *val)
+cl_port::write(class cl_memory_cell *cell, t_mem *val)
 {
   struct ev_port_changed ep;
 
@@ -131,13 +131,14 @@ cl_port::set_cmd(class cl_cmdline *cmdline, class cl_console *con)
     }
   else
     {
-      con->dd_printf("Error: wrong systax\n");
+      con->dd_printf("set hardware port[%d] pins_value\n                   Set port pins\n",
+		     id);
       value= 0;
     }
 }
 
 /*void
-cl_port::mem_cell_changed(class cl_mem *mem, t_addr addr)
+cl_port::mem_cell_changed(class cl_m *mem, t_addr addr)
 {
   cl_hw::mem_cell_changed(mem, addr);
   t_mem d= sfr->get();
@@ -150,7 +151,7 @@ cl_port::print_info(class cl_console *con)
   uchar data;
 
   con->dd_printf("%s[%d]\n", id_string, id);
-  data= cell_p->get();//uc->get_mem(MEM_SFR, sfr);
+  data= cell_p->get();
   con->dd_printf("P%d    ", id);
   con->print_bin(data, 8);
   con->dd_printf(" 0x%02x %3d %c (Value in SFR register)\n",
@@ -162,7 +163,6 @@ cl_port::print_info(class cl_console *con)
   con->dd_printf(" 0x%02x %3d %c (Output of outside circuits)\n",
 		 data, data, isprint(data)?data:'.');
 
-  //data= /*uc->*/port_pins/*[id]*/ & sfr->get();//uc->get_mem(MEM_SFR, sfr);
   data= cell_p->read();
   con->dd_printf("Port%d ", id);
   con->print_bin(data, 8);

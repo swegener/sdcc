@@ -43,9 +43,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // prj
 #include "utils.h"
+#include "globals.h"
 
 // sim
 #include "optioncl.h"
+
+//cmd.src
+#include "cmduccl.h"
 
 // local
 #include "uc51cl.h"
@@ -60,100 +64,46 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 /*
+ * Options of uc51
+ */
+
+cl_irq_stop_option::cl_irq_stop_option(class cl_51core *the_uc51):
+  cl_optref(the_uc51)
+{
+  uc51= the_uc51;
+}
+
+int
+cl_irq_stop_option::init(void)
+{
+  cl_optref::init();
+  create(uc51, bool_opt, "irq_stop", "Stop when IRQ accepted");
+  return(0);
+}
+
+void
+cl_irq_stop_option::option_changed(void)
+{
+  if (!uc51)
+    return;
+  bool b;
+  option->get_value(&b);
+  uc51->stop_at_it= b;
+}
+
+
+/*
  * Making a new micro-controller and reset it
  */
 
-t_uc51::t_uc51(int Itype, int Itech, class cl_sim *asim):
+cl_51core::cl_51core(int Itype, int Itech, class cl_sim *asim):
   cl_uc(asim)
 {
-  //int i;
-  /*
-  struct termios tattr;
-  */  
   type= Itype;
   technology= Itech;
 
-  debug= asim->app->args->get_iarg('V', 0);
+  irq_stop_option= new cl_irq_stop_option(this);
   stop_at_it= DD_FALSE;
-  /*class cl_option *opt;
-  options->add(opt= new cl_bool_opt("verbose", "Verbose flag."));
-  opt->init();
-  opt->set_value((bool)debug);
-  options->add(opt= new cl_bool_opt("stopit", "Stop if interrupt accepted."));
-  opt->init();
-  opt->set_value((bool)stop_at_it);
-  options->add(new cl_cons_debug_opt(asim->app, "debug",
-  "Debug messages appears on this console."));*/
-
-  /*
-  serial_in = (FILE*)asim->app->args->get_parg(0, "Ser_in");
-  serial_out= (FILE*)asim->app->args->get_parg(0, "Ser_out");
-  if (serial_in)
-    {
-      // making `serial' unbuffered
-      if (setvbuf(serial_in, NULL, _IONBF, 0))
-	perror("Unbuffer serial input channel");
-      // setting O_NONBLOCK
-      if ((i= fcntl(fileno(serial_in), F_GETFL, 0)) < 0)
-	perror("Get flags of serial input");
-      i|= O_NONBLOCK;
-      if (fcntl(fileno(serial_in), F_SETFL, i) < 0)
-	perror("Set flags of serial input");
-      // switching terminal to noncanonical mode
-      if (isatty(fileno(serial_in)))
-	{
-	  tcgetattr(fileno(serial_in), &saved_attributes_in);
-	  tcgetattr(fileno(serial_in), &tattr);
-	  tattr.c_lflag&= ~(ICANON|ECHO);
-	  tattr.c_cc[VMIN] = 1;
-	  tattr.c_cc[VTIME]= 0;
-	  tcsetattr(fileno(serial_in), TCSAFLUSH, &tattr);
-	}
-      else
-	fprintf(stderr, "Warning: serial input interface connected to a "
-		"non-terminal file.\n");
-    }
-  if (serial_out)
-    {
-      // making `serial' unbuffered
-      if (setvbuf(serial_out, NULL, _IONBF, 0))
-	perror("Unbuffer serial output channel");
-      // setting O_NONBLOCK
-      if ((i= fcntl(fileno(serial_out), F_GETFL, 0)) < 0)
-	perror("Get flags of serial output");
-      i|= O_NONBLOCK;
-      if (fcntl(fileno(serial_out), F_SETFL, i) < 0)
-	perror("Set flags of serial output");
-      // switching terminal to noncanonical mode
-      if (isatty(fileno(serial_out)))
-	{
-	  tcgetattr(fileno(serial_out), &saved_attributes_out);
-	  tcgetattr(fileno(serial_out), &tattr);
-	  tattr.c_lflag&= ~(ICANON|ECHO);
-	  tattr.c_cc[VMIN] = 1;
-	  tattr.c_cc[VTIME]= 0;
-	  tcsetattr(fileno(serial_out), TCSAFLUSH, &tattr);
-	}
-      else
-	fprintf(stderr, "Warning: serial output interface connected to a "
-		"non-terminal file.\n");
-    }
-  */
-
-  /*for (i= 0; i < 4; i++)
-    port_pins[i]= 0xff;*/
-  /*it_sources->add(new cl_it_src(bmEX0, TCON, bmIE0, 0x0003, true,
-    "external #0"));*/
-  /*it_sources->add(new cl_it_src(bmET0, TCON, bmTF0, 0x000b, true,
-    "timer #0"));*/
-  /*it_sources->add(new cl_it_src(bmEX1, TCON, bmIE1, 0x0013, true,
-    "external #1"));*/
-  /*it_sources->add(new cl_it_src(bmET1, TCON, bmTF1, 0x001b, true,
-    "timer #1"));*/
-  /*it_sources->add(new cl_it_src(bmES , SCON, bmTI , 0x0023, false,
-				"serial transmit"));
-  it_sources->add(new cl_it_src(bmES , SCON, bmRI , 0x0023, false,
-  "serial receive"));*/
 }
 
 
@@ -163,9 +113,11 @@ t_uc51::t_uc51(int Itype, int Itech, class cl_sim *asim):
  */
 
 int
-t_uc51::init(void)
+cl_51core::init(void)
 {
+  irq_stop_option->init();
   cl_uc::init();
+  set_name("mcs51_controller");
   reset();
   return(0);
 }
@@ -173,7 +125,7 @@ t_uc51::init(void)
 static char id_string_51[100];
 
 char *
-t_uc51::id_string(void)
+cl_51core::id_string(void)
 {
   int i;
 
@@ -185,7 +137,7 @@ t_uc51::id_string(void)
 }
 
 void
-t_uc51::mk_hw_elements(void)
+cl_51core::mk_hw_elements(void)
 {
   class cl_hw *h;
 
@@ -216,15 +168,103 @@ t_uc51::mk_hw_elements(void)
   */
 }
 
-class cl_mem *
-t_uc51::mk_mem(enum mem_class type, char *class_name)
+void
+cl_51core::build_cmdset(class cl_cmdset *cmdset)
 {
-  class cl_mem *m= cl_uc::mk_mem(type, class_name);
+  class cl_cmd *cmd;
+  //class cl_super_cmd *super_cmd;
+  //class cl_cmdset *cset;
+
+  cl_uc::build_cmdset(cmdset);
+
+  cmdset->add(cmd= new cl_di_cmd("di", DD_TRUE,
+"di [start [stop]]  Dump Internal RAM",
+"long help of di"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_dx_cmd("dx", DD_TRUE,
+"dx [start [stop]]  Dump External RAM",
+"long help of dx"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_ds_cmd("ds", DD_TRUE,
+"ds [start [stop]]  Dump SFR",
+"long help of ds"));
+  cmd->init();
+}
+
+/*
+class cl_m *
+cl_51core::mk_mem(enum mem_class type, char *class_name)
+{
+  class cl_address_space *m= cl_uc::mk_mem(type, class_name);
   if (type == MEM_SFR)
     sfr= m;
   if (type == MEM_IRAM)
     iram= m;
   return(m);
+}
+*/
+
+void
+cl_51core::make_memories(void)
+{
+  class cl_address_space *as;
+
+  rom= as= new cl_address_space(MEM_ROM_ID/*"rom"*/, 0, 0x10000, 8);
+  as->init();
+  address_spaces->add(as);
+  iram= as= new cl_address_space(MEM_IRAM_ID/*"iram"*/, 0, 0x80, 8);
+  as->init();
+  address_spaces->add(as);
+  sfr= as= new cl_address_space(MEM_SFR_ID/*"sfr"*/, 0x80, 0x80, 8);
+  as->init();
+  address_spaces->add(as);
+  xram= as= new cl_address_space(MEM_XRAM_ID/*"xram"*/, 0, 0x10000, 8);
+  as->init();
+  address_spaces->add(as);
+
+  class cl_address_decoder *ad;
+  class cl_memory_chip *chip;
+
+  chip= new cl_memory_chip("rom_chip", 0x10000, 8, 0xff);
+  chip->init();
+  memchips->add(chip);
+  ad= new cl_address_decoder(as= rom/*address_space(MEM_ROM_ID)*/,
+			     chip, 0, 0xffff, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+
+  chip= new cl_memory_chip("iram_chip", 0x80, 8);
+  chip->init();
+  memchips->add(chip);
+  ad= new cl_address_decoder(as= iram/*address_space(MEM_IRAM_ID)*/,
+			     chip, 0, 0x7f, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+
+  chip= new cl_memory_chip("xram_chip", 0x10000, 8);
+  chip->init();
+  memchips->add(chip);
+  ad= new cl_address_decoder(as= xram/*address_space(MEM_XRAM_ID)*/,
+			     chip, 0, 0xffff, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+
+  chip= new cl_memory_chip("sfr_chip", 0x80, 8, 0);
+  chip->init();
+  memchips->add(chip);
+  ad= new cl_address_decoder(as= sfr/*address_space(MEM_SFR_ID)*/,
+			     chip, 0x80, 0xff, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+
+  acc= sfr->get_cell(ACC);
+  psw= sfr->get_cell(PSW);
 }
 
 
@@ -232,7 +272,7 @@ t_uc51::mk_mem(enum mem_class type, char *class_name)
  * Destroying the micro-controller object
  */
 
-t_uc51::~t_uc51(void)
+cl_51core::~cl_51core(void)
 {
   /*
   if (serial_out)
@@ -248,18 +288,7 @@ t_uc51::~t_uc51(void)
       fclose(serial_in);
     }
   */
-}
-
-
-/*
- * Writing data to EROM
- */
-
-void
-t_uc51::write_rom(t_addr addr, ulong data)
-{
-  if (addr < EROM_SIZE)
-    set_mem(MEM_ROM, addr, data);
+  delete irq_stop_option;
 }
 
 
@@ -268,29 +297,29 @@ t_uc51::write_rom(t_addr addr, ulong data)
  */
 
 struct dis_entry *
-t_uc51::dis_tbl(void)
+cl_51core::dis_tbl(void)
 {
   return(disass_51);
 }
 
 struct name_entry *
-t_uc51::sfr_tbl(void)
+cl_51core::sfr_tbl(void)
 {
   return(sfr_tab51);
 }
 
 struct name_entry *
-t_uc51::bit_tbl(void)
+cl_51core::bit_tbl(void)
 {
   return(bit_tab51);
 }
 
 char *
-t_uc51::disass(t_addr addr, char *sep)
+cl_51core::disass(t_addr addr, char *sep)
 {
   char work[256], temp[20], c[2];
   char *buf, *p, *b, *t;
-  t_mem code= get_mem(MEM_ROM, addr);
+  t_mem code= rom->get(addr);
 
   p= work;
   b= dis_tbl()[code].mnemonic;
@@ -305,25 +334,25 @@ t_uc51::disass(t_addr addr, char *sep)
 	      sprintf(temp, "%04"_A_"x",
 		      t_addr((addr&0xf800)|
 			     (((code>>5)&0x07)*256 +
-			      get_mem(MEM_ROM, addr+1))));
+			      rom->get(addr+1))));
 	      break;
 	    case 'l': // long address
 	      sprintf(temp, "%04"_A_"x",
-		      t_addr(get_mem(MEM_ROM, addr+1)*256 +
-			     get_mem(MEM_ROM, addr+2)));
+		      t_addr(rom->get(addr+1)*256 +
+			     rom->get(addr+2)));
 	      break;
 	    case 'a': // addr8 (direct address) at 2nd byte
- 	      if (!get_name(get_mem(MEM_ROM, addr+1), sfr_tbl(), temp))
-		sprintf(temp, "%02"_M_"x", get_mem(MEM_ROM, addr+1));
+ 	      if (!get_name(rom->get(addr+1), sfr_tbl(), temp))
+		sprintf(temp, "%02"_M_"x", rom->get(addr+1));
 	      break;
 	    case '8': // addr8 (direct address) at 3rd byte
- 	      if (!get_name(get_mem(MEM_ROM, addr+2), sfr_tbl(), temp))
-		sprintf(temp, "%02"_M_"x", get_mem(MEM_ROM, addr+2));
-	      //sprintf(temp, "%02"_M_"x", get_mem(MEM_ROM, addr+2));
+ 	      if (!get_name(rom->get(addr+2), sfr_tbl(), temp))
+		sprintf(temp, "%02"_M_"x", rom->get(addr+2));
+	      //sprintf(temp, "%02"_M_"x", rom->get(addr+2));
 	      break;
 	    case 'b': // bitaddr at 2nd byte
 	      {
-		t_addr ba= get_mem(MEM_ROM, addr+1);
+		t_addr ba= rom->get(addr+1);
 		if (get_name(ba, bit_tbl(), temp))
 		  break;
 		if (get_name((ba<128)?((ba/8)+32):(ba&0xf8), sfr_tbl(), temp))
@@ -339,22 +368,22 @@ t_uc51::disass(t_addr addr, char *sep)
 	      }
 	    case 'r': // rel8 address at 2nd byte
 	      sprintf(temp, "%04"_A_"x",
-		      t_addr(addr+2+(signed char)(get_mem(MEM_ROM, addr+1))));
+		      t_addr(addr+2+(signed char)(rom->get(addr+1))));
 	      break;
 	    case 'R': // rel8 address at 3rd byte
 	      sprintf(temp, "%04"_A_"x",
-		      t_addr(addr+3+(signed char)(get_mem(MEM_ROM, addr+2))));
+		      t_addr(addr+3+(signed char)(rom->get(addr+2))));
 	      break;
 	    case 'd': // data8 at 2nd byte
-	      sprintf(temp, "%02"_M_"x", get_mem(MEM_ROM, addr+1));
+	      sprintf(temp, "%02"_M_"x", rom->get(addr+1));
 	      break;
 	    case 'D': // data8 at 3rd byte
-	      sprintf(temp, "%02"_M_"x", get_mem(MEM_ROM, addr+2));
+	      sprintf(temp, "%02"_M_"x", rom->get(addr+2));
 	      break;
 	    case '6': // data16 at 2nd(H)-3rd(L) byte
 	      sprintf(temp, "%04"_A_"x",
-		      t_addr(get_mem(MEM_ROM, addr+1)*256 +
-			     get_mem(MEM_ROM, addr+2)));
+		      t_addr(rom->get(addr+1)*256 +
+			     rom->get(addr+2)));
 	      break;
 	    default:
 	      strcpy(temp, "?");
@@ -396,7 +425,7 @@ t_uc51::disass(t_addr addr, char *sep)
 
 
 void
-t_uc51::print_regs(class cl_console *con)
+cl_51core::print_regs(class cl_console *con)
 {
   t_addr start;
   uchar data;
@@ -411,8 +440,8 @@ t_uc51::print_regs(class cl_console *con)
 
   con->dd_printf("  ACC= 0x%02x %3d %c  B= 0x%02x", sfr->get(ACC), sfr->get(ACC),
 	      isprint(sfr->get(ACC))?(sfr->get(ACC)):'.', sfr->get(B)); 
-  eram2xram();
-  data= get_mem(MEM_XRAM, sfr->get(DPH)*256+sfr->get(DPL));
+  //eram2xram();
+  data= xram->get(sfr->get(DPH)*256+sfr->get(DPL));
   con->dd_printf("   DPTR= 0x%02x%02x @DPTR= 0x%02x %3d %c\n", sfr->get(DPH),
 	      sfr->get(DPL), data, data, isprint(data)?data:'.');
 
@@ -432,10 +461,10 @@ t_uc51::print_regs(class cl_console *con)
  * Converting bit address into real memory
  */
 
-class cl_mem *
-t_uc51::bit2mem(t_addr bitaddr, t_addr *memaddr, t_mem *bitmask)
+class cl_address_space *
+cl_51core::bit2mem(t_addr bitaddr, t_addr *memaddr, t_mem *bitmask)
 {
-  class cl_mem *m;
+  class cl_address_space *m;
   t_addr ma;
 
   bitaddr&= 0xff;
@@ -456,13 +485,45 @@ t_uc51::bit2mem(t_addr bitaddr, t_addr *memaddr, t_mem *bitmask)
   return(m);
 }
 
+t_addr
+cl_51core::bit_address(class cl_memory *mem,
+		       t_addr mem_address, int bit_number)
+{
+  if (bit_number < 0 ||
+      bit_number > 7 ||
+      mem_address < 0)
+    return(-1);
+  class cl_memory *sfrchip= memory("sfr_chip");
+  if (mem == sfrchip)
+    {
+      mem= sfr;
+      mem_address+= sfr->start_address;
+    }
+  if (mem == sfr)
+    {
+      if (mem_address < 128 ||
+	  mem_address % 8 != 0 ||
+	  mem_address > 255)
+	return(-1);
+      return(128 + (mem_address-128) + bit_number);
+    }
+  if (mem == iram)
+    {
+      if (mem_address < 0x20 ||
+	  mem_address >= 0x20+32)
+	return(-1);
+      return((mem_address-0x20)*8 + bit_number);
+    }
+  return(-1);
+}
+
 
 /*
  * Resetting the micro-controller
  */
 
 void
-t_uc51::reset(void)
+cl_51core::reset(void)
 {
   cl_uc::reset();
 
@@ -479,19 +540,35 @@ t_uc51::reset(void)
  */
 
 void
-t_uc51::clear_sfr(void)
+cl_51core::clear_sfr(void)
 {
   int i;
   
-  for (i= 0; i < SFR_SIZE; i++)
+  for (i= 0x80; i <= 0xff; i++)
     sfr->set(i, 0);
   sfr->/*set*/write(P0, 0xff);
   sfr->/*set*/write(P1, 0xff);
   sfr->/*set*/write(P2, 0xff);
   sfr->/*set*/write(P3, 0xff);
-  sfr->/*set*/write(SP, 7);
   prev_p1= /*port_pins[1] &*/ sfr->/*get*/read(P1);
   prev_p3= /*port_pins[3] &*/ sfr->/*get*/read(P3);
+  sfr->write(ACC, 0);
+  sfr->write(B, 0);
+  sfr->write(PSW, 0);
+  sfr->write(SP, 7);
+  sfr->write(DPL, 0);
+  sfr->write(DPH, 0);
+  sfr->write(IP, 0);
+  sfr->write(IE, 0);
+  sfr->write(TMOD, 0);
+  sfr->write(TCON, 0);
+  sfr->write(TH0, 0);
+  sfr->write(TL0, 0);
+  sfr->write(TH1, 0);
+  sfr->write(TL1, 0);
+  sfr->write(SCON, 0);
+  sfr->write(PCON, 0);
+
   sfr->set_nuof_writes(0);
   sfr->set_nuof_reads(0);
 }
@@ -502,12 +579,12 @@ t_uc51::clear_sfr(void)
  */
 
 void
-t_uc51::analyze(t_addr addr)
+cl_51core::analyze(t_addr addr)
 {
   uint code;
   struct dis_entry *tabl;
 
-  code= get_mem(MEM_ROM, addr);
+  code= rom->get(addr);
   tabl= &(dis_tbl()[code]);
   while (!inst_at(addr) &&
 	 code != 0xa5 /* break point */)
@@ -517,46 +594,44 @@ t_uc51::analyze(t_addr addr)
 	{
 	case 'a': // acall
 	  analyze((addr & 0xf800)|
-		  ((get_mem(MEM_ROM, addr+1)&0x07)*256+
-		   get_mem(MEM_ROM, addr+2)));
+		  ((rom->get(addr+1)&0x07)*256+
+		   rom->get(addr+2)));
 	  analyze(addr+tabl->length);
 	  break;
 	case 'A': // ajmp
 	  addr= (addr & 0xf800)|
-	    ((get_mem(MEM_ROM, addr+1) & 0x07)*256 + get_mem(MEM_ROM, addr+2));
+	    ((rom->get(addr+1) & 0x07)*256 + rom->get(addr+2));
 	  break;
 	case 'l': // lcall
-	  analyze(get_mem(MEM_ROM, addr+1)*256 + get_mem(MEM_ROM, addr+2));
+	  analyze(rom->get(addr+1)*256 + rom->get(addr+2));
 	  analyze(addr+tabl->length);
 	  break;
 	case 'L': // ljmp
-	  addr= get_mem(MEM_ROM, addr+1)*256 + get_mem(MEM_ROM, addr+2);
+	  addr= rom->get(addr+1)*256 + rom->get(addr+2);
 	  break;
 	case 'r': // reljmp (2nd byte)
-	  analyze((addr + (signed char)(get_mem(MEM_ROM, addr+1))) &
-		  (EROM_SIZE - 1));
+	  analyze(rom->validate_address(addr+(signed char)(rom->get(addr+1))));
 	  analyze(addr+tabl->length);
 	  break;
 	case 'R': // reljmp (3rd byte)
-	  analyze((addr+
-		   (signed char)(get_mem(MEM_ROM, addr+2)))&(EROM_SIZE-1));
+	  analyze(rom->validate_address(addr+(signed char)(rom->get(addr+2))));
 	  analyze(addr+tabl->length);
 	  break;
 	case 's': // sjmp
 	  {
 	    signed char target;
-	    target= get_mem(MEM_ROM, addr+1);
+	    target= rom->get(addr+1);
 	    addr+= 2;
-	    addr= (addr+target)&(EROM_SIZE-1);
+	    addr= rom->validate_address(addr+target);
 	    break;
 	  }
 	case '_':
 	  return;
 	default:
-	  addr= (addr+tabl->length) & (EROM_SIZE - 1);
+	  addr= rom->validate_address(addr+tabl->length);
 	  break;
 	}
-      code= get_mem(MEM_ROM, addr);
+      code= rom->get(addr);
       tabl= &(dis_tbl()[code]);
     }
 }
@@ -567,7 +642,7 @@ t_uc51::analyze(t_addr addr)
  */
 
 /*int
-t_uc51::tick_hw(int cycles)
+cl_51core::tick_hw(int cycles)
 {
   cl_uc::tick_hw(cycles);
   //do_hardware(cycles);
@@ -575,7 +650,7 @@ t_uc51::tick_hw(int cycles)
 }*/
 
 /*int
-t_uc51::tick(int cycles)
+cl_51core::tick(int cycles)
 {
   cl_uc::tick(cycles);
   //do_hardware(cycles);
@@ -590,10 +665,10 @@ t_uc51::tick(int cycles)
  * or an SFR.
  */
 
-class cl_cell *
-t_uc51::get_direct(t_mem addr)
+class cl_memory_cell *
+cl_51core::get_direct(t_mem addr)
 {
-  if (addr < SFR_START)
+  if (addr < sfr->start_address)
     return(iram->get_cell(addr));
   else
     return(sfr->get_cell(addr));
@@ -604,8 +679,8 @@ t_uc51::get_direct(t_mem addr)
  * Calculating address of specified register cell in IRAM
  */
 
-class cl_cell *
-t_uc51::get_reg(uchar regnum)
+class cl_memory_cell *
+cl_51core::get_reg(uchar regnum)
 {
   t_addr a= (psw->get() & (bmRS0|bmRS1)) | (regnum & 0x07);
   return(iram->get_cell(a));
@@ -617,10 +692,10 @@ t_uc51::get_reg(uchar regnum)
  */
 
 int
-t_uc51::exec_inst(void)
+cl_51core::exec_inst(void)
 {
   t_mem code;
-  int res;
+  int res= resGO;
 
   //pr_inst();
   instPC= PC;
@@ -643,7 +718,7 @@ t_uc51::exec_inst(void)
     case 0x10: res= inst_jbc_bit_addr(code); break;
     case 0x11: case 0x31: case 0x51: case 0x71:
     case 0x91: case 0xb1: case 0xd1: case 0xf1:res=inst_acall_addr(code);break;
-    case 0x12: res= inst_lcall(code, 0); break;
+    case 0x12: res= inst_lcall(code, 0, DD_FALSE); break;
     case 0x13: res= inst_rrc(code); break;
     case 0x14: res= inst_dec_a(code); break;
     case 0x15: res= inst_dec_addr(code); break;
@@ -714,10 +789,11 @@ t_uc51::exec_inst(void)
     case 0x96: case 0x97: res= inst_subb_a_Sri(code); break;
     case 0x98: case 0x99: case 0x9a: case 0x9b:
     case 0x9c: case 0x9d: case 0x9e: case 0x9f:res= inst_subb_a_rn(code);break;
+    case 0xa0: res= inst_orl_c_Sbit(code); break;
     case 0xa2: res= inst_mov_c_bit(code); break;
     case 0xa3: res= inst_inc_dptr(code); break;
     case 0xa4: res= inst_mul_ab(code); break;
-    case 0xa5: res= inst_unknown(code); break;
+    case 0xa5: res= inst_unknown(); break;
     case 0xa6: case 0xa7: res= inst_mov_Sri_addr(code); break;
     case 0xa8: case 0xa9: case 0xaa: case 0xab:
     case 0xac: case 0xad: case 0xae: case 0xaf:res=inst_mov_rn_addr(code);break;
@@ -760,7 +836,7 @@ t_uc51::exec_inst(void)
     case 0xf8: case 0xf9: case 0xfa: case 0xfb:
     case 0xfc: case 0xfd: case 0xfe: case 0xff: res= inst_mov_rn_a(code);break;
     default:
-      res= inst_unknown(code);
+      res= inst_unknown();
       break;
     }
   //post_inst();
@@ -780,9 +856,9 @@ t_uc51::exec_inst(void)
  * (inp_avail will be TRUE if ENTER is pressed) and it can confuse
  * command interepter.
  */
-
+//static class cl_console *c= NULL;
 int
-t_uc51::do_inst(int step)
+cl_51core::do_inst(int step)
 {
   result= resGO;
   while ((result == resGO) &&
@@ -797,12 +873,33 @@ t_uc51::do_inst(int step)
 	  pre_inst();
 	  result= exec_inst();
 	  post_inst();
+	  /*
+	  {
+	    if (c)
+	      print_regs(c);
+	    else
+	      {
+		if (sim->app->get_commander()==NULL)
+		  printf("no commander PC=0x%x\n",PC);
+		else
+		  if (sim->app->get_commander()->frozen_console==NULL)
+		    printf("no frozen console PC=0x%x\n",PC);
+		  else
+		    c= sim->app->get_commander()->frozen_console;
+		if (c)
+		  print_regs(c);
+		else
+		  printf("no console PC=0x%x\n",PC);
+	      }
+	  }
+	  */
 	  /*if (result == resGO)
 	    result= check_events();*/
 	}
       else
 	{
 	  // tick hw in idle state
+	  inst_ticks= 1;
 	  post_inst();
 	  tick(1);
 	}
@@ -847,7 +944,7 @@ t_uc51::do_inst(int step)
 }
 
 /*void
-t_uc51::post_inst(void)
+cl_51core::post_inst(void)
 {*/
   //uint tcon= sfr->get(TCON);
   //uint p3= sfr->read(P3);
@@ -905,7 +1002,7 @@ t_uc51::post_inst(void)
  */
 
 /*int
-t_uc51::do_wdt(int cycles)
+cl_51core::do_wdt(int cycles)
 {
   return(resGO);
 }*/
@@ -916,7 +1013,7 @@ t_uc51::do_wdt(int cycles)
  */
 
 int
-t_uc51::do_interrupt(void)
+cl_51core::do_interrupt(void)
 {
   int i, ie= 0;
 
@@ -959,7 +1056,7 @@ t_uc51::do_interrupt(void)
 }
 
 int
-t_uc51::it_priority(uchar ie_mask)
+cl_51core::it_priority(uchar ie_mask)
 {
   if (sfr->get(IP) & ie_mask)
     return(1);
@@ -972,13 +1069,13 @@ t_uc51::it_priority(uchar ie_mask)
  */
 
 int
-t_uc51::accept_it(class it_level *il)
+cl_51core::accept_it(class it_level *il)
 {
   state= stGO;
   sfr->set_bit0(PCON, bmIDL);
   it_levels->push(il);
   tick(1);
-  int res= inst_lcall(0, il->addr);
+  int res= inst_lcall(0, il->addr, DD_TRUE);
   if (res != resGO)
     return(res);
   else
@@ -991,7 +1088,7 @@ t_uc51::accept_it(class it_level *il)
  */
 
 int
-t_uc51::idle_pd(void)
+cl_51core::idle_pd(void)
 {
   uint pcon= sfr->get(PCON);
 
@@ -1001,8 +1098,8 @@ t_uc51::idle_pd(void)
     {
       if (state != stIDLE)
 	sim->app->get_commander()->
-	  debug("%g sec (%d clks): CPU in Idle mode\n",
-		get_rtime(), ticks->ticks);
+	  debug("%g sec (%d clks): CPU in Idle mode (PC=0x%x, PCON=0x%x)\n",
+		get_rtime(), ticks->ticks, PC, pcon);
       state= stIDLE;
       //was_reti= 1;
     }
@@ -1023,7 +1120,7 @@ t_uc51::idle_pd(void)
  */
 
 /*int
-t_uc51::check_events(void)
+cl_51core::check_events(void)
 {
   int i;
   class cl_ev_brk *eb;
@@ -1043,8 +1140,9 @@ t_uc51::check_events(void)
 /*
  */
 
+/*
 void
-t_uc51::mem_cell_changed(class cl_mem *mem, t_addr addr)
+cl_51core::mem_cell_changed(class cl_m *mem, t_addr addr)
 {
   if (mem == sfr)
     switch (addr)
@@ -1054,6 +1152,7 @@ t_uc51::mem_cell_changed(class cl_mem *mem, t_addr addr)
       }
   cl_uc::mem_cell_changed(mem, addr);
 }
+*/
 
 
 /*
@@ -1064,13 +1163,12 @@ t_uc51::mem_cell_changed(class cl_mem *mem, t_addr addr)
  */
 
 int
-t_uc51::inst_unknown(uchar code)
+cl_51core::inst_unknown(void)
 {
-  PC--;
-  if (1)//debug)// && sim->cmd_out())
-    sim->app->get_commander()->
-      debug("Unknown instruction %02x at %06x\n", code, PC);
-  return(resHALT);
+  //PC--;
+  class cl_error_unknown_code *e= new cl_error_unknown_code(this);
+  error(e);
+  return(resGO);
 }
 
 
@@ -1079,7 +1177,7 @@ t_uc51::inst_unknown(uchar code)
  */
 
 int
-t_uc51::inst_nop(uchar code)
+cl_51core::inst_nop(uchar code)
 {
   return(resGO);
 }
@@ -1090,7 +1188,7 @@ t_uc51::inst_nop(uchar code)
  */
 
 int
-t_uc51::inst_clr_a(uchar code)
+cl_51core::inst_clr_a(uchar code)
 {
   acc->write(0);
   return(resGO);
@@ -1102,7 +1200,7 @@ t_uc51::inst_clr_a(uchar code)
  */
 
 int
-t_uc51::inst_swap(uchar code)
+cl_51core::inst_swap(uchar code)
 {
   uchar temp;
 
@@ -1118,13 +1216,13 @@ t_uc51::inst_swap(uchar code)
 cl_uc51_dummy_hw::cl_uc51_dummy_hw(class cl_uc *auc):
   cl_hw(auc, HW_DUMMY, 0, "_51_dummy")
 {
-  //uc51= (class t_uc51 *)uc;
+  //uc51= (class cl_51core *)uc;
 }
 
 int
 cl_uc51_dummy_hw::init(void)
 {
-  class cl_mem *sfr= uc->mem(MEM_SFR);
+  class cl_address_space *sfr= uc->address_space(MEM_SFR_ID);
   if (!sfr)
     {
       fprintf(stderr, "No SFR to register %s[%d] into\n", id_string, id);
@@ -1134,11 +1232,12 @@ cl_uc51_dummy_hw::init(void)
   use_cell(sfr, PSW, &cell_psw, wtd_restore);
   register_cell(sfr, ACC, &cell_acc, wtd_restore_write);
   register_cell(sfr, SP , &cell_sp , wtd_restore);
+  //register_cell(sfr, PCON, &cell_pcon, wtd_restore);
   return(0);
 }
 
 void
-cl_uc51_dummy_hw::write(class cl_cell *cell, t_mem *val)
+cl_uc51_dummy_hw::write(class cl_memory_cell *cell, t_mem *val)
 {
   if (cell == cell_acc)
     {
@@ -1165,6 +1264,11 @@ cl_uc51_dummy_hw::write(class cl_cell *cell, t_mem *val)
 	uc->sp_max= *val;
       uc->sp_avg= (uc->sp_avg+(*val))/2;
     }
+  /*else if (cell == cell_pcon)
+    {
+      printf("PCON write 0x%x (PC=0x%x)\n", *val, uc->PC);
+      uc->sim->stop(0);
+      }*/
 }
 
 /*void

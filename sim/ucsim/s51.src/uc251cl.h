@@ -33,10 +33,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "uc89c51rcl.h"
 
 
-class t_uc251: public t_uc89c51r
+class cl_uc251: public cl_uc89c51r
 {
 public:
-  t_uc251(int Itype, int Itech, class cl_sim *asim);
+  cl_uc251(int Itype, int Itech, class cl_sim *asim);
 };
 
 

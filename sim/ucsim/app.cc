@@ -29,6 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <unistd.h>
 #ifdef HAVE_GETOPT_H
 # include <getopt.h>
@@ -44,6 +45,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "utils.h"
 #include "appcl.h"
 #include "optioncl.h"
+#include "globals.h"
 
 // sim.src
 #include "simcl.h"
@@ -109,21 +111,16 @@ cl_option::get_value(int index)
 
 cl_app::cl_app(void)
 {
-  //options= new cl_options();
   sim= 0;
-  args= new cl_arguments();
-  in_files= new cl_ustrings(2, 2);
+  in_files= new cl_ustrings(2, 2, "input files");
   options= new cl_options();
   going= 1;
 }
 
 cl_app::~cl_app(void)
 {
-  //delete options;
   remove_simulator();
   delete commander;
-  //delete cmdset;
-  delete args;
   delete in_files;
   delete options;
 }
@@ -239,58 +236,53 @@ cl_app::proc_arguments(int argc, char *argv[])
   int i, c;
   char opts[100], *cp, *subopts, *value;
   char *cpu_type= NULL;
+  bool s_done= DD_FALSE, k_done= DD_FALSE;
+  bool S_i_done= DD_FALSE, S_o_done= DD_FALSE;
 
   strcpy(opts, "c:C:p:PX:vVt:s:S:hHk:");
 #ifdef SOCKET_AVAIL
   strcat(opts, "Z:r:");
 #endif
-  //int opterr= 0;
+
   while((c= getopt(argc, argv, opts)) != -1)
     switch (c)
       {
       case 'c':
-	//args->add(new cl_prg_arg('c', 0, optarg));
 	if (!options->set_value("console_on", this, optarg))
 	  fprintf(stderr, "Warning: No \"console_on\" option found "
 		  "to set by -c\n");
 	break;
       case 'C':
-	args->add(new cl_prg_arg(0, "Config", optarg));
+	if (!options->set_value("config_file", this, optarg))
+	  fprintf(stderr, "Warning: No \"config_file\" option found to set "
+		  "parameter of -C as config file\n");
 	break;
 #ifdef SOCKET_AVAIL
-      case 'Z':
-	// By Sandeep
-	args->add(new cl_prg_arg('Z', 0, (long)1));
-	if (!optarg || !isdigit(*optarg))
-	  fprintf(stderr, "expected portnumber to follow -Z\n");
-	else {
-	  char *p;
-	  long l= strtol(optarg, &p, 0);
-	  args->add(new cl_prg_arg(0, "Zport", l));
+      case 'Z': case 'r':
+	{
+	  // By Sandeep
+	  // Modified by DD
+	  class cl_option *o;
+	  options->new_option(o= new cl_number_option(this, "port_number",
+						      "Listen on port (-Z)"));
+	  o->init();
+	  o->hide();
+	  if (!options->set_value("port_number", this, strtol(optarg, NULL, 0)))
+	    fprintf(stderr, "Warning: No \"port_number\" option found"
+		    " to set parameter of -Z as pot number to listen on\n");
+	  break;
 	}
-	break;
 #endif
       case 'p': {
-	//args->add(new cl_prg_arg(0, "prompt", optarg));
-	//class cl_option *o= options->get_option("prompt", this);
-	if (/*o*/!options->set_value("prompt", this, optarg))
-	    /*o->set_value(optarg);
-	      else*/
+	if (!options->set_value("prompt", this, optarg))
 	  fprintf(stderr, "Warning: No \"prompt\" option found to set "
 		  "parameter of -p as default prompt\n");
 	break;
       }
       case 'P':
-	args->add(new cl_prg_arg('P', 0, (long)1));
 	if (!options->set_value("null_prompt", this, bool(DD_TRUE)))
 	  fprintf(stderr, "Warning: No \"null_prompt\" option found\n");
 	break;
-#ifdef SOCKET_AVAIL
-      case 'r':
-	args->add(new cl_prg_arg('r', 0,
-				 (long)strtol(optarg, NULL, 0)));
-	break;
-#endif
       case 'X':
 	{
 	  double XTAL;
@@ -305,7 +297,9 @@ cl_app::proc_arguments(int argc, char *argv[])
 	      fprintf(stderr, "Xtal frequency must be greather than 0\n");
 	      exit(1);
 	    }
-	  args->add(new cl_prg_arg('X', 0, XTAL));
+	  if (!options->set_value("xtal", this, XTAL))
+	    fprintf(stderr, "Warning: No \"xtal\" option found to set "
+		    "parameter of -X as XTAL frequency\n");
 	  break;
 	}
       case 'v':
@@ -313,41 +307,47 @@ cl_app::proc_arguments(int argc, char *argv[])
         exit(0);
         break;
       case 'V':
-	args->add(new cl_prg_arg('V', 0, (long)1));
 	if (!options->set_value("debug", this, (bool)DD_TRUE))
 	  fprintf(stderr, "Warning: No \"debug\" option found to set "
 		  "by -V parameter\n");	
 	break;
       case 't':
-	if (cpu_type)
-	  free(cpu_type);
-	cpu_type= strdup(optarg);
-	for (cp= cpu_type; *cp; *cp= toupper(*cp), cp++);
-	args->add(new cl_prg_arg('t', 0, cpu_type));
-	break;
+	{
+	  if (cpu_type)
+	    free(cpu_type);
+	  cpu_type= case_string(case_upper, optarg);
+	  if (!options->set_value("cpu_type", this, /*optarg*/cpu_type))
+	    fprintf(stderr, "Warning: No \"cpu_type\" option found to set "
+		    "parameter of -t as type of controller\n");	
+	  break;
+	}
       case 's':
       {
 	FILE *Ser_in, *Ser_out;
-	if (args->arg_avail('s'))
+	if (s_done)
 	  {
 	    fprintf(stderr, "-s option can not be used more than once.\n");
 	    break;
 	  }
-	args->add(new cl_prg_arg('s', 0, (long)1));
+	s_done= DD_TRUE;
 	if ((Ser_in= fopen(optarg, "r")) == NULL)
 	  {
 	    fprintf(stderr,
 		    "Can't open `%s': %s\n", optarg, strerror(errno));
 	    return(4);
 	  }
-	args->add(new cl_prg_arg(0, "Ser_in", Ser_in));
+	if (!options->set_value("serial_in_file", this, (void*)Ser_in))
+	  fprintf(stderr, "Warning: No \"serial_in_file\" option found to set "
+		  "parameter of -s as serial input file\n");
 	if ((Ser_out= fopen(optarg, "w")) == NULL)
 	  {
 	    fprintf(stderr,
 		    "Can't open `%s': %s\n", optarg, strerror(errno));
 	    return(4);
 	  }
-	args->add(new cl_prg_arg(0, "Ser_out", Ser_out));
+	if (!options->set_value("serial_out_file", this, Ser_out))
+	  fprintf(stderr, "Warning: No \"serial_out_file\" option found "
+		  "to set parameter of -s as serial output file\n");
 	break;
       }
 #ifdef SOCKET_AVAIL
@@ -358,13 +358,11 @@ cl_app::proc_arguments(int argc, char *argv[])
 	  int  sock;
 	  unsigned short serverport;
 	  int client_sock;
-
-	  if (args->arg_avail("Ser_in")) {
+	  
+	  if (k_done) {
 	    fprintf(stderr, "Serial input specified more than once.\n");
 	  }
-	  if (args->arg_avail("Ser_out")) {
-	    fprintf(stderr, "Serial output specified more than once.\n");
-	  }
+	  k_done= DD_TRUE;
 
 	  serverport = atoi(optarg);
 	  sock= make_server_socket(serverport);
@@ -384,12 +382,16 @@ cl_app::proc_arguments(int argc, char *argv[])
 	    fprintf(stderr, "Can't create input stream: %s\n", strerror(errno));
 	    return (4);
 	  }
-	  args->add(new cl_prg_arg(0, "Ser_in", Ser_in));
+	  if (!options->set_value("serial_in_file", this, (void*)Ser_in))
+	    fprintf(stderr, "Warning: No \"serial_in_file\" option found to "
+		    "set parameter of -s as serial input file\n");
 	  if ((Ser_out= fdopen(client_sock, "w")) == NULL) {
 	    fprintf(stderr, "Can't create output stream: %s\n", strerror(errno));
 	    return (4);
 	  }
-	  args->add(new cl_prg_arg(0, "Ser_out", Ser_out));
+	  if (!options->set_value("serial_out_file", this, Ser_out))
+	    fprintf(stderr, "Warning: No \"serial_out_file\" option found "
+		    "to set parameter of -s as serial output file\n");
 	  break;
 	}
 #endif
@@ -404,25 +406,28 @@ cl_app::proc_arguments(int argc, char *argv[])
 		fprintf(stderr, "No value for -S in\n");
 		exit(1);
 	      }
-	      if (args->arg_avail("Ser_in"))
+	      if (S_i_done)
 		{
 		  fprintf(stderr, "Serial input specified more than once.\n");
 		  break;
 		}
+	      S_i_done= DD_TRUE;
 	      if ((Ser_in= fopen(value, "r")) == NULL)
 		{
 		  fprintf(stderr,
 			  "Can't open `%s': %s\n", value, strerror(errno));
 		  exit(4);
 		}
-	      args->add(new cl_prg_arg(0, "Ser_in", Ser_in));
+	      if (!options->set_value("serial_in_file", this, (void*)Ser_in))
+		fprintf(stderr, "Warning: No \"serial_in_file\" option found "
+			"to set parameter of -s as serial input file\n");
 	      break;
 	    case SOPT_OUT:
 	      if (value == NULL) {
 		fprintf(stderr, "No value for -S out\n");
 		exit(1);
 	      }
-	      if (args->arg_avail("Ser_out"))
+	      if (S_o_done)
 		{
 		  fprintf(stderr, "Serial output specified more than once.\n");
 		  break;
@@ -433,7 +438,9 @@ cl_app::proc_arguments(int argc, char *argv[])
 			  "Can't open `%s': %s\n", value, strerror(errno));
 		  exit(4);
 		}
-	      args->add(new cl_prg_arg(0, "Ser_out", Ser_out));
+	      if (!options->set_value("serial_out_file", this, Ser_out))
+		fprintf(stderr, "Warning: No \"serial_out_file\" option found "
+			"to set parameter of -s as serial output file\n");
 	      break;
 	    default:
 	      /* Unknown suboption. */
@@ -447,14 +454,21 @@ cl_app::proc_arguments(int argc, char *argv[])
 	exit(0);
 	break;
       case 'H':
-	/*i= 0;
-	while (cpus_51[i].type_str != NULL)
-	  {
-	    printf("%s\n", cpus_51[i].type_str);
-	    i++;
-	    }*/
-	exit(0);
-	break;
+	{
+	  if (!cpus)
+	    {
+	      fprintf(stderr, "CPU type is not selectable\n");
+	      exit(0);
+	    }
+	  i= 0;
+	  while (cpus[i].type_str != NULL)
+	    {
+	      printf("%s\n", cpus[i].type_str);
+	      i++;
+	    }
+	  exit(0);
+	  break;
+	}
       case '?':
 	if (isprint(optopt))
 	  fprintf(stderr, "Unknown option `-%c'.\n", optopt);
@@ -465,8 +479,6 @@ cl_app::proc_arguments(int argc, char *argv[])
       default:
 	exit(c);
       }
-  if (!args->arg_avail("prompt"))
-    args->add(new cl_prg_arg(0, "prompt", "> "));
 
   for (i= optind; i < argc; i++)
     in_files->add(argv[i]);
@@ -497,12 +509,14 @@ cl_app::get_cmd(class cl_cmdline *cmdline)
  * Messages to broadcast
  */
 
+/*
 void
-cl_app::mem_cell_changed(class cl_mem *mem, t_addr addr)
+cl_app::mem_cell_changed(class cl_m *mem, t_addr addr)
 {
   if (sim)
     sim->mem_cell_changed(mem, addr);
 }
+*/
 
 
 /* Adding and removing components */
@@ -539,10 +553,9 @@ cl_app::build_cmdset(class cl_cmdset *cmdset)
 "conf               Configuration",
 "long help of conf"));
     cmd->init();
-    cset->add(cmd= new cl_conf_addmem_cmd("addmem", 0,
-"conf addmem\n"
-"                   Make memory",
-"long help of conf addmem"));
+    cset->add(cmd= new cl_conf_objects_cmd("objects", 0, 
+"conf objects       Show object tree",
+"long help of conf objects"));
     cmd->init();
   }
   cmdset->add(cmd= new cl_super_cmd("conf", 0,
@@ -572,9 +585,20 @@ cl_app::build_cmdset(class cl_cmdset *cmdset)
 "long help of exec"));
   cmd->init();
 
+  cmdset->add(cmd= new cl_expression_cmd("expression", 0,
+"expression expr    Evaluate the expression",
+"long help of expression "));
+  cmd->init();
+  cmd->add_name("let");
+
   {
-    cset= new cl_cmdset();
-    cset->init();
+    super_cmd= (class cl_super_cmd *)(cmdset->get_cmd("show"));
+    if (super_cmd)
+      cset= super_cmd->commands;
+    else {
+      cset= new cl_cmdset();
+      cset->init();
+    }
     cset->add(cmd= new cl_show_copying_cmd("copying", 0, 
 "show copying       Conditions for redistributing copies of uCsim",
 "long help of show copying"));
@@ -587,11 +611,18 @@ cl_app::build_cmdset(class cl_cmdset *cmdset)
 "show option [name] Show internal data of options",
 "long help of show option"));
     cmd->init();
+    cset->add(cmd= new cl_show_error_cmd("error", 0,
+"show error         Show class of errors",
+"long help of show error"));
+    cmd->init();
   }
-  cmdset->add(cmd= new cl_super_cmd("show", 0,
+  if (!super_cmd)
+    {
+      cmdset->add(cmd= new cl_super_cmd("show", 0,
 "show subcommand    Generic command for showing things about the uCsim",
 "long help of show", cset));
-  cmd->init();
+      cmd->init();
+    }
 
   {
     super_cmd= (class cl_super_cmd *)(cmdset->get_cmd("get"));
@@ -627,6 +658,11 @@ cl_app::build_cmdset(class cl_cmdset *cmdset)
 "                   Set value of an option",
 "long help of set option"));
     cmd->init();
+    cset->add(cmd= new cl_set_error_cmd("error", 0,
+"set error error_name on|off|unset\n"
+"                   Set value of an error",
+"long help of set error"));
+    cmd->init();
   }
   if (!super_cmd)
     {
@@ -645,25 +681,73 @@ cl_app::mk_options(void)
   options->new_option(o= new cl_bool_option(this, "null_prompt",
 					    "Use \\0 as prompt (-P)"));
   o->init();
-  options->new_option(o= new cl_bool_option(this, "stopit",
-					    "Stop if interrupt accepted"));
+
+  options->new_option(o= new cl_pointer_option(this, "serial_in_file",
+					       "Input file for serial line (-s)"));
   o->init();
-  options->new_option(o= new cl_string_option(this, "serial_in_file",
-					      "Input file for serial line (-s)"));
+  o->hide();
+
+  options->new_option(o= new cl_pointer_option(this, "serial_out_file",
+					       "Output file for serial line (-s)"));
   o->init();
-  options->new_option(o= new cl_string_option(this, "serial_out_file",
-					      "Output file for serial line (-s)"));
-  o->init();
+  o->hide();
+
   options->new_option(o= new cl_string_option(this, "prompt",
 					      "String of prompt (-p)"));
   o->init();
+
   options->new_option(o= new cl_bool_option(this, "debug",
 					    "Print debug messages (-V)"));
   o->init();
+
   options->new_option(o= new cl_string_option(this, "console_on",
 					      "Open console on this file (-c)"));
   o->init();
   o->hide();
+
+  options->new_option(o= new cl_string_option(this, "config_file",
+					      "Execute this file at startup (-C)"));
+  o->init();
+  o->hide();
+
+  options->new_option(o= new cl_float_option(this, "xtal",
+					     "Frequency of XTAL in Hz"));
+  o->init();
+  o->set_value(11059200.0);
+
+  options->new_option(o= new cl_string_option(this, "cpu_type",
+					      "Type of controller (-t)"));
+  o->init();
+  o->hide();
+}
+
+
+int
+cl_app::dd_printf(char *format, ...)
+{
+  va_list ap;
+
+  if (!commander)
+    return(0);
+
+  va_start(ap, format);
+  int i= commander->dd_printf(format, ap);
+  va_end(ap);
+  return(i);
+}
+
+int
+cl_app::debug(char *format, ...)
+{
+  va_list ap;
+
+  if (!commander)
+    return(0);
+
+  va_start(ap, format);
+  int i= commander->debug(format, ap);
+  va_end(ap);
+  return(i);
 }
 
 

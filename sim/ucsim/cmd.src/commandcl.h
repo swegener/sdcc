@@ -65,6 +65,12 @@ public:
   virtual ~cl_cmdline(void);
   virtual int init(void);
 
+private:
+  virtual void split_out_string(char **_start, char **_end);
+  virtual void split_out_output_redirection(char **_start, char **_end);
+  virtual void split_out_bit(char *dot, char *param_str);
+  virtual void split_out_array(char *dot, char *param_str);
+public:
   virtual int split(void);
   virtual int shift(void);
   virtual int repeat(void);
@@ -72,6 +78,7 @@ public:
   virtual void insert_param(int pos, class cl_cmd_arg *param);
   virtual bool syntax_match(class cl_uc *uc, char *syntax);
   virtual bool set_data_list(class cl_cmd_arg *parm, int *iparm);
+  virtual int nuof_params(void) { return(params->get_count()); }
 private:
   char *skip_delims(char *start);
 };
@@ -80,6 +87,8 @@ private:
 /*
  * Command and container
  */
+
+class cl_cmdset;
 
 // simple command
 class cl_cmd: public cl_base
@@ -99,6 +108,7 @@ public:
 	 char *long_hlp);
   virtual ~cl_cmd(void);
 
+  virtual class cl_cmdset *get_subcommands(void) { return(0); }
   virtual void add_name(char *nam);
   virtual int name_match(char *aname, int strict);
   virtual int name_match(class cl_cmdline *cmdline, int strict);
@@ -222,13 +232,13 @@ class cl_cmdset: public cl_list
 {
 public:
   //class cl_sim *sim;
-  class cl_cmd *last_command;
+  //class cl_cmd *last_command;
 
 public:
   cl_cmdset(void);
   //cl_cmdset(class cl_sim *asim);
 
-  virtual class cl_cmd *get_cmd(class cl_cmdline *cmdline);
+  virtual class cl_cmd *get_cmd(class cl_cmdline *cmdline, bool accept_last);
   virtual class cl_cmd *get_cmd(char *cmd_name);
   virtual void del(char *nam);
   virtual void replace(char *nam, class cl_cmd *cmd);
@@ -248,6 +258,7 @@ public:
 	       class cl_cmdset *acommands);
   virtual ~cl_super_cmd(void);
 
+  virtual class cl_cmdset *get_subcommands(void) { return(commands); }
   virtual int work(class cl_app *app,
 		   class cl_cmdline *cmdline, class cl_console *con);
 };

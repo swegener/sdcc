@@ -34,7 +34,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "itsrccl.h"
 
 
-class t_uc52: public t_uc51
+class cl_uc52: public cl_51core
 {
 protected:
   //class cl_it_src *exf2it;
@@ -42,11 +42,14 @@ protected:
   //int   s_tr_t2;	// T2 overflows for sending
 
 public:
-  t_uc52(int Itype, int Itech, class cl_sim *asim);
+  cl_uc52(int Itype, int Itech, class cl_sim *asim);
   virtual void mk_hw_elements(void);
+  virtual void make_memories(void);
 
-  virtual class cl_cell *get_indirect(uchar addr, int *res);
-  virtual t_addr get_mem_size(enum mem_class type);
+  virtual void clear_sfr(void);
+
+  virtual class cl_memory_cell *get_indirect(uchar addr, int *res);
+  //virtual t_addr get_mem_size(enum mem_class type);
 
   /*virtual void do_extra_hw(int cycles);
   virtual int  do_timer2(int cycles);

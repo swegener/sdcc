@@ -39,280 +39,103 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * Making an 8052 CPU object
  */
 
-t_uc52::t_uc52(int Itype, int Itech, class cl_sim *asim):
-  t_uc51(Itype, Itech, asim)
+cl_uc52::cl_uc52(int Itype, int Itech, class cl_sim *asim):
+  cl_51core(Itype, Itech, asim)
 {
-  /*it_sources->add(new cl_it_src(bmET2, T2CON, bmTF2, 0x002b, false,
-    "timer #2 TF2"));*/
-  /*exf2it= new cl_it_src(bmET2, T2CON, bmEXF2, 0x002b, false,
-			"timer #2 EXF2");
-			it_sources->add(exf2it);*/
 }
 
 
 void
-t_uc52::mk_hw_elements(void)
+cl_uc52::mk_hw_elements(void)
 {
   class cl_hw *h;
 
-  t_uc51::mk_hw_elements();
+  cl_51core::mk_hw_elements();
   hws->add(h= new cl_timer2(this, 2, "timer2", t2_default|t2_down));
   h->init();
 }
 
-
-t_addr
-t_uc52::get_mem_size(enum mem_class type)
+void
+cl_uc52::make_memories(void)
 {
-  switch (type)
-    {
-    case MEM_IRAM: return(0x100);
-    default: return(t_uc51::get_mem_size(type));
-    }
-  return(0);
+  class cl_address_space *as;
+
+  rom= as= new cl_address_space("rom", 0, 0x10000, 8);
+  as->init();
+  address_spaces->add(as);
+  iram= as= new cl_address_space("iram", 0, 0x100, 8);
+  as->init();
+  address_spaces->add(as);
+  sfr= as= new cl_address_space("sfr", 0x80, 0x80, 8);
+  as->init();
+  address_spaces->add(as);
+  xram= as= new cl_address_space("xram", 0, 0x10000, 8);
+  as->init();
+  address_spaces->add(as);
+
+  class cl_address_decoder *ad;
+  class cl_memory_chip *chip;
+
+  chip= new cl_memory_chip("rom_chip", 0x10000, 8);
+  chip->init();
+  memchips->add(chip);
+  ad= new cl_address_decoder(as= address_space("rom"), chip, 0, 0xffff, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+
+  chip= new cl_memory_chip("iram_chip", 0x100, 8);
+  chip->init();
+  memchips->add(chip);
+  ad= new cl_address_decoder(as= address_space("iram"), chip, 0, 0xff, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+
+  chip= new cl_memory_chip("xram_chip", 0x10000, 8);
+  chip->init();
+  memchips->add(chip);
+  ad= new cl_address_decoder(as= address_space("xram"), chip, 0, 0xffff, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+
+  chip= new cl_memory_chip("sfr_chip", 0x80, 8);
+  chip->init();
+  memchips->add(chip);
+  ad= new cl_address_decoder(as= address_space("sfr"), chip, 0x80, 0xff, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+
+  acc= sfr->get_cell(ACC);
+  psw= sfr->get_cell(PSW);
+}
+
+
+void
+cl_uc52::clear_sfr(void)
+{
+  cl_51core::clear_sfr();
+  sfr->write(T2CON, 0);
+  sfr->write(TH2, 0);
+  sfr->write(TL2, 0);
+  sfr->write(RCAP2L, 0);
+  sfr->write(RCAP2H, 0);
 }
 
 
 /*
  * Calculating address of indirectly addressed IRAM cell
  *
- * If CPU is 8051 and addr is over 127, it must be illegal! But in 52
- * it is legal.
- *
  */
 
-class cl_cell *
-t_uc52::get_indirect(uchar addr, int *res)
+class cl_memory_cell *
+cl_uc52::get_indirect(uchar addr, int *res)
 {
   *res= resGO;
   return(iram->get_cell(addr));
 }
-
-
-/*
- * Simulating timers
- *
- * Calling inherited method to simulate timer #0 and #1 and then 
- * simulating timer #2.
- *
- */
-
-/*void
-t_uc52::do_extra_hw(int cycles)
-{
-  do_timer2(cycles);
-}*/
-
-
-/*
- * Simulating timer 2
- */
-
-/*int
-t_uc52::do_timer2(int cycles)
-{
-  bool nocount= DD_FALSE;
-  uint t2con= get_mem(MEM_SFR, T2CON);
-
-  exf2it->activate();
-  if (!(t2con & bmTR2))
-    // Timer OFF
-    return(resGO);
-
-  if (t2con & (bmRCLK | bmTCLK))
-    return(do_t2_baud(cycles));
-
-  // Determining nr of input clocks
-  if (!(t2con & bmTR2))
-    nocount= DD_TRUE; // Timer OFF
-  else
-    if (t2con & bmC_T2)
-      {
-	// Counter mode, falling edge on P1.0 (T2)
-	if ((prev_p1 & bmT2) &&
-	    !(sfr->read(P1) & bmT2))
-	  cycles= 1;
-	else
-	  nocount= DD_TRUE;
-      }
-  // Counting
-  while (cycles--)
-    {
-      if (t2con & bmCP_RL2)
-	do_t2_capture(&cycles, nocount);
-      else
-	do_t2_reload(&cycles, nocount);
-    }// while cycles
-  
-  return(resGO);
-}*/
-
-
-/*
- * Baud rate generator mode of Timer #2
- */
-
-/*int
-t_uc52::do_t2_baud(int cycles)
-{
-  t_mem t2con= sfr->get(T2CON);
-  //uint p1= get_mem(MEM_SFR, P1);
-
-  // Baud Rate Generator
-  if ((prev_p1 & bmT2EX) &&
-      !(sfr->read(P1) & bmT2EX) &&
-      (t2con & bmEXEN2))
-    mem(MEM_SFR)->set_bit1(T2CON, bmEXF2);
-  if (t2con & bmC_T2)
-    {
-      if ((prev_p1 & bmT2) &&
-	  !(sfr->read(P1) & bmT2))
-	cycles= 1;
-      else
-	cycles= 0;
-    }
-  else
-    cycles*= 6;
-  if (t2con & bmTR2)
-    while (cycles--)
-      {
-	if (!sfr->add(TL2, 1))
-	  if (!sfr->add(TH2, 1))
-	    {
-	      sfr->set(TH2, sfr->get(RCAP2H));
-	      sfr->set(TL2, sfr->get(RCAP2L));
-	      s_rec_t2++;
-	      s_tr_t2++;
-	    }
-      }
-  return(resGO);
-}*/
-
-
-/*
- * Capture function of Timer #2
- */
-
-/*void
-t_uc52::do_t2_capture(int *cycles, bool nocount)
-{
-  //uint p1= get_mem(MEM_SFR, P1);
-  t_mem t2con= sfr->get(T2CON);
-
-  // Capture mode
-  if (nocount)
-    *cycles= 0;
-  else
-    {
-      if (!sfr->add(TL2, 1))
-	{
-	  if (!sfr->add(TH2, 1))
-	    mem(MEM_SFR)->set_bit1(T2CON, bmTF2);
-	}
-    }
-  // capture
-  if ((prev_p1 & bmT2EX) &&
-      !(sfr->read(P1) & bmT2EX) &&
-      (t2con & bmEXEN2))
-    {
-      sfr->set(RCAP2H, sfr->get(TH2));
-      sfr->set(RCAP2L, sfr->get(TL2));
-      mem(MEM_SFR)->set_bit1(T2CON, bmEXF2);
-      prev_p1&= ~bmT2EX; // Falling edge has been handled
-    }
-}*/
-
-
-/*
- * Auto Reload mode of Timer #2, counting UP
- */
-
-/*void
-t_uc52::do_t2_reload(int *cycles, bool nocount)
-{
-  int overflow;
-  bool ext2= 0;
-  
-  // Auto-Relode mode
-  overflow= 0;
-  if (nocount)
-    *cycles= 0;
-  else
-    {
-      if (!sfr->add(TL2, 1))
-	{
-	  if (!sfr->add(TH2, 1))
-	    {
-	      sfr->set_bit1(T2CON, bmTF2);
-	      overflow++;
-	    }
-	}
-    }
-  // reload
-  if ((prev_p1 & bmT2EX) &&
-      !(sfr->read(P1) & bmT2EX) &&
-      (sfr->get(T2CON) & bmEXEN2))
-    {
-      ext2= DD_TRUE;
-      sfr->set_bit1(T2CON, bmEXF2);
-      prev_p1&= ~bmT2EX; // Falling edge has been handled
-    }
-  if (overflow ||
-      ext2)
-    {
-      sfr->set(TH2, sfr->get(RCAP2H));
-      sfr->set(TL2, sfr->get(RCAP2L));
-    }
-}*/
-
-
-/*
- *
- */
-
-/*int
-t_uc52::serial_bit_cnt(int mode)
-{
-  int divby= 12;
-  int *tr_src= 0, *rec_src= 0;
-
-  switch (mode)
-    {
-    case 0:
-      divby  = 12;
-      tr_src = &s_tr_tick;
-      rec_src= &s_rec_tick;
-      break;
-    case 1:
-    case 3:
-      divby  = (get_mem(MEM_SFR, PCON)&bmSMOD)?16:32;
-      tr_src = (get_mem(MEM_SFR, T2CON)&bmTCLK)?(&s_tr_t2):(&s_tr_t1);
-      rec_src= (get_mem(MEM_SFR, T2CON)&bmTCLK)?(&s_rec_t2):(&s_rec_t1);
-      break;
-    case 2:
-      divby  = (get_mem(MEM_SFR, PCON)&bmSMOD)?16:32;
-      tr_src = &s_tr_tick;
-      rec_src= &s_rec_tick;
-      break;
-    }
-  if (s_sending)
-    {
-      while (*tr_src >= divby)
-	{
-	  (*tr_src)-= divby;
-	  s_tr_bit++;
-	}
-    }
-  if (s_receiving)
-    {
-      while (*rec_src >= divby)
-	{
-	  (*rec_src)-= divby;
-	  s_rec_bit++;
-	}
-	}
-  return(0);
-}*/
 
 
 /* End of s51.src/uc52.cc */

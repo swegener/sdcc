@@ -684,10 +684,11 @@ cl_z80::inst_XXcb(void)
     case 0xFF: // SET 7,A
       return (inst_XXcb_set(code));
     }
-  if (PC)
+  /*if (PC)
     PC--;
   else
-    PC= get_mem_size(MEM_ROM)-1;
+  PC= get_mem_size(MEM_ROM_ID)-1;*/
+  PC= rom->inc_address(PC, -1);
   return(resINV_INST);
 }
 

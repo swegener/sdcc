@@ -33,22 +33,23 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "uc52cl.h"
 
-class t_uc390: public t_uc52
+class cl_uc390: public cl_uc52
 {
 public:
-  t_uc390(int Itype, int Itech, class cl_sim *asim);
+  cl_uc390(int Itype, int Itech, class cl_sim *asim);
   virtual void mk_hw_elements (void);
+  virtual void make_memories(void);
 
   virtual void clear_sfr (void);
 
   // making objects
-  virtual t_addr get_mem_size (enum mem_class type);
+  //virtual t_addr get_mem_size (enum mem_class type);
 
   // manipulating memories
-  virtual t_mem read_mem (enum mem_class type, t_addr addr);
-  virtual t_mem get_mem (enum mem_class type, t_addr addr);
-  virtual void  write_mem (enum mem_class type, t_addr addr, t_mem val);
-  virtual void  set_mem (enum mem_class type, t_addr addr, t_mem val);
+  virtual t_mem read_mem (char *id/*enum mem_class type*/, t_addr addr);
+  virtual t_mem get_mem (char *id/*enum mem_class type*/, t_addr addr);
+  virtual void  write_mem (char *id/*enum mem_class type*/, t_addr addr, t_mem val);
+  virtual void  set_mem (char *id/*enum mem_class type*/, t_addr addr, t_mem val);
 
   /* mods for dual-dptr */
   virtual int inst_inc_dptr(uchar code);
@@ -62,7 +63,7 @@ public:
   virtual int inst_ajmp_addr(uchar code);
   virtual int inst_ljmp(uchar code);
   virtual int inst_acall_addr(uchar code);
-  virtual int inst_lcall(uchar code, uint addr);
+  virtual int inst_lcall(uchar code, uint addr, bool intr);/* 12 */
   virtual int inst_ret(uchar code);
   virtual int inst_reti(uchar code);
 

@@ -39,15 +39,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 cl_uc390_hw::cl_uc390_hw (class cl_uc *auc):
   cl_hw (auc, HW_DUMMY, 0, "ds390hw")
 {
-  uc390 = (class t_uc390 *) uc;
+  uc390 = (class cl_uc390 *) uc;
 }
 
 int
 cl_uc390_hw::init(void)
 {
-  class cl_mem *sfr;
-
-  sfr = uc->mem (MEM_SFR);
+  sfr = uc->address_space(MEM_SFR_ID);
   if (sfr)
     {
       /*cell_dps   = sfr->register_hw (DPS  , this, 0);
@@ -89,7 +87,7 @@ cl_uc390_hw::init(void)
 }
 
 t_mem
-cl_uc390_hw::read (class cl_cell *cell)
+cl_uc390_hw::read (class cl_memory_cell *cell)
 {
   if (cell == cell_exif)
     {
@@ -104,7 +102,7 @@ cl_uc390_hw::read (class cl_cell *cell)
 }
 
 void
-cl_uc390_hw::write (class cl_cell *cell, t_mem *val)
+cl_uc390_hw::write (class cl_memory_cell *cell, t_mem *val)
 {
   if (cell == cell_dps)
     *val = (*val & 0xe5) | 0x04;
@@ -240,9 +238,9 @@ cl_uc390_hw::write (class cl_cell *cell, t_mem *val)
 }
 
 /*void
-cl_uc390_hw::mem_cell_changed (class cl_mem *mem, t_addr addr)
+cl_uc390_hw::mem_cell_changed (class cl_m *mem, t_addr addr)
 {
-  class cl_mem *sfr = uc->mem (MEM_SFR);
+  class cl_m *sfr = uc->mem (MEM_SFR);
 
   if (mem && sfr && mem == sfr)
     switch (addr)
@@ -280,7 +278,7 @@ cl_uc390_hw::print_info(class cl_console *con)
   int i;
   long l;
 
-  i = uc->get_mem (MEM_SFR, EXIF);
+  i = sfr->get (EXIF);
   con->dd_printf ("%s"
                   " EXIF 0x%02x: IE5 %c IE4 %c IE3 %c IE2 %c CKRDY %c RGMD %c RGSL %c BGS %c\n",
                   id_string,
@@ -293,20 +291,20 @@ cl_uc390_hw::print_info(class cl_console *con)
                   (i & 0x04) ? '1' : '0',
                   (i & 0x02) ? '1' : '0',
                   (i & 0x01) ? '1' : '0');
-  i = uc->get_mem (MEM_SFR, DPS);
+  i = sfr->get (DPS);
   con->dd_printf ("\tDPS  0x%02x: ID1 %c ID0 %c TSL %c SEL %c\n",
 		  i,
                   (i & 0x80) ? '1' : '0',
                   (i & 0x40) ? '1' : '0',
                   (i & 0x20) ? '1' : '0',
                   (i & 0x01) ? '1' : '0');
-  l = uc->get_mem (MEM_SFR, DPX) * 256*256 +
-      uc->get_mem (MEM_SFR, DPH) * 256 +
-      uc->get_mem (MEM_SFR, DPL);
+  l = sfr->get (DPX) * 256*256 +
+      sfr->get (DPH) * 256 +
+      sfr->get (DPL);
   con->dd_printf ("\tDPTR  0x%06x\n", l);
-  l = uc->get_mem (MEM_SFR, DPX1) * 256*256 +
-      uc->get_mem (MEM_SFR, DPH1) * 256 +
-      uc->get_mem (MEM_SFR, DPL1);
+  l = sfr->get (DPX1) * 256*256 +
+      sfr->get (DPH1) * 256 +
+      sfr->get (DPL1);
   con->dd_printf ("\tDPTR1 0x%06x\n", l);
 }
 

@@ -1172,7 +1172,7 @@ replace {
         movc    a,@a+dptr
         mov     %4,a
         inc     dptr
-        clr     a       
+        clr     a
 } by {
         ;       Peephole 186.a  optimized movc sequence
         mov     dptr,#%1
@@ -1180,11 +1180,12 @@ replace {
         movc    a,@a+dptr
         mov     %2,a
         mov     acc,b
-        inc     dptr    
+        inc     dptr
         movc    a,@a+dptr
         mov     %3,a
         mov     acc,b
         inc     dptr
+        movc    a,@a+dptr
         mov     %4,a
         mov     acc,b
         inc     dptr

@@ -17,6 +17,7 @@
 	code / RAM are in the same page / bank. This means the linker can
 	safely allocate code/RAM of separate ASM files to different pages/banks.
 	* doc/sdccman.lyx: added Slade's tips
+	* src/mcs51/peeph.def: fixed bug #880768
 
 2004-01-20 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 

@@ -169,7 +169,7 @@ _ds390_finaliseOptions (void)
      */
     istack->fmap = 1;
     istack->ptrType = FPOINTER;
-    options.parms_in_bank1=1;
+
     if (options.parms_in_bank1) {
 	addToList (preArgv, "-DSDCC_PARMS_IN_BANK1");
     }

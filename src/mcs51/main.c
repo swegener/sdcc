@@ -114,7 +114,7 @@ _mcs51_finaliseOptions (void)
       port->mem.default_local_map = data;
       port->mem.default_globl_map = data;
     }
-  options.parms_in_bank1=1;
+
   if (options.parms_in_bank1) {
       addToList (preArgv, "-DSDCC_PARMS_IN_BANK1");
   }

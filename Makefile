@@ -12,7 +12,7 @@ srcdir          = .
 include $(srcdir)/Makefile.common
 
 SDCC_MISC	= debugger/mcs51 sim/ucsim
-SDCC_LIBS	= support/cpp
+SDCC_LIBS	= support/cpp support/cpp2
 SDCC_ASLINK	= as/mcs51 as link
 SDCC_PACKIHX	= packihx
 

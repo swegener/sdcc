@@ -207,7 +207,7 @@ static bool isGlobalInNearSpace (operand *op)
        suggested by Jean-Louis VERN, with 8051s we have no
        advantage of putting variables in near space into
        registers */
-    if (isOperandGlobal(op)  &&
+    if (isOperandGlobal(op)  && !IN_FARSPACE(SPEC_OCLS(type)) &&
 	IN_DIRSPACE(SPEC_OCLS(type)))
 	return TRUE;
     else

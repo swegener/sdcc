@@ -2884,6 +2884,19 @@ static void genPlus (iCode *ic)
 
         size = getDataSize(IC_LEFT(ic));
 
+	/* If the pushed data is bigger than the result,
+	 * simply discard unused bytes. Icky, but works.
+	 *
+	 * Should we throw a warning here? We're losing data...
+	 */
+	while (size > getDataSize(IC_RESULT(ic)))
+	{
+	   emitcode(";", "discarding unused result byte.");
+	   emitcode("pop", "acc");
+	   size--;
+	   offset--; 
+	}
+
         while(size--)
         {
             emitcode("pop", "acc");

@@ -73,7 +73,6 @@ typedef enum
     S_FIXED = 0,
     S_AUTO,
     S_REGISTER,
-    S_CONSTANT,
     S_SFR,
     S_SBIT,
     S_CODE,
@@ -279,9 +278,7 @@ symbol;
 #define DCL_TSPEC(l) l->select.d.tspec
 #define SPEC_NOUN(x) x->select.s.noun
 #define SPEC_LONG(x) x->select.s._long
-//#define SPEC_SHORT(x) x->select.s._short // only for type checking
 #define SPEC_USIGN(x) x->select.s._unsigned
-//#define SPEC_SIGNED(x) x->select.s._signed // only for type checking
 #define SPEC_SCLS(x) x->select.s.sclass
 #define SPEC_ENUM(x) x->select.s._isenum
 #define SPEC_OCLS(x) x->select.s.oclass
@@ -334,7 +331,6 @@ symbol;
 #define IS_GENPTR(x) (IS_DECL(x) && DCL_TYPE(x) == GPOINTER)
 #define IS_FUNC(x)   (IS_DECL(x) && DCL_TYPE(x) == FUNCTION)
 #define IS_LONG(x)   (IS_SPEC(x) && x->select.s._long)
-//#define IS_SHORT(x)   (IS_SPEC(x) && x->select.s._short)
 #define IS_TYPEDEF(x)(IS_SPEC(x) && x->select.s._typedef)
 #define IS_CONSTANT(x)  (IS_SPEC(x) && ( x->select.s._const == 1))
 #define IS_STRUCT(x) (IS_SPEC(x) && x->select.s.noun == V_STRUCT)

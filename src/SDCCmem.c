@@ -376,13 +376,11 @@ allocGlobal (symbol * sym)
     }
 
   /* if code change to constant */
-  if (SPEC_SCLS (sym->etype) == S_CODE ||
-      SPEC_SCLS (sym->etype) == S_CONSTANT)
-    {
-      SPEC_OCLS (sym->etype) = statsg;
-      allocIntoSeg (sym);
-      return;
-    }
+  if (SPEC_SCLS (sym->etype) == S_CODE) {
+    SPEC_OCLS (sym->etype) = statsg;
+    allocIntoSeg (sym);
+    return;
+  }
 
   if (SPEC_SCLS (sym->etype) == S_XDATA)
     {
@@ -622,15 +620,12 @@ allocLocal (symbol * sym)
       return;
     }
 
-  if ((SPEC_SCLS (sym->etype) == S_CODE ||
-       SPEC_SCLS (sym->etype) == S_CONSTANT) &&
-      !sym->_isparm)
-    {
-      SPEC_OCLS (sym->etype) = statsg;
-      allocIntoSeg (sym);
-      return;
-    }
-
+  if (SPEC_SCLS (sym->etype) == S_CODE && !sym->_isparm) {
+    SPEC_OCLS (sym->etype) = statsg;
+    allocIntoSeg (sym);
+    return;
+  }
+  
   if (SPEC_SCLS (sym->etype) == S_IDATA)
     {
       SPEC_OCLS (sym->etype) = idata;

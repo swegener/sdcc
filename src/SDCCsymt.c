@@ -1108,11 +1108,18 @@ compStructSize (int su, structdef * sdef)
 static void 
 checkSClass (symbol * sym)
 {
+  if (getenv("DEBUG_SANITY")) {
+    fprintf (stderr, "checkSClass: %s \n", sym->name);
+  }
+  if (strcmp(sym->name, "_testsGlobal")==0) {
+    printf ("oach\n");
+  }
+  
   /* type is literal can happen foe enums change
      to auto */
   if (SPEC_SCLS (sym->etype) == S_LITERAL && !SPEC_ENUM (sym->etype))
     SPEC_SCLS (sym->etype) = S_AUTO;
-
+  
   /* if sfr or sbit then must also be */
   /* volatile the initial value will be xlated */
   /* to an absolute address */
@@ -1129,26 +1136,24 @@ checkSClass (symbol * sym)
 	  sym->ival = NULL;
 	}
     }
-
+  
   /* if absolute address given then it mark it as
      volatile */
   if (IS_ABSOLUTE (sym->etype))
     SPEC_VOLATILE (sym->etype) = 1;
-
+  
   /* global variables declared const put into code */
   if (sym->level == 0 &&
-      SPEC_SCLS (sym->etype) == S_CONSTANT)
-    {
-      SPEC_SCLS (sym->etype) = S_CODE;
-      SPEC_CONST (sym->etype) = 1;
-    }
-
+      SPEC_CONST (sym->etype)) {
+    SPEC_SCLS (sym->etype) = S_CODE;
+  }
+  
   /* global variable in code space is a constant */
   if (sym->level == 0 &&
       SPEC_SCLS (sym->etype) == S_CODE &&
       port->mem.code_ro)
     SPEC_CONST (sym->etype) = 1;
-
+  
 
   /* if bit variable then no storage class can be */
   /* specified since bit is already a storage */
@@ -1179,13 +1184,12 @@ checkSClass (symbol * sym)
        SPEC_SCLS (sym->etype) != S_FIXED &&
        SPEC_SCLS (sym->etype) != S_REGISTER &&
        SPEC_SCLS (sym->etype) != S_STACK &&
-       SPEC_SCLS (sym->etype) != S_XSTACK &&
-       SPEC_SCLS (sym->etype) != S_CONSTANT))
+       SPEC_SCLS (sym->etype) != S_XSTACK))
     {
       werror (E_AUTO_ASSUMED, sym->name);
       SPEC_SCLS (sym->etype) = S_AUTO;
     }
-
+  
   /* automatic symbols cannot be given   */
   /* an absolute address ignore it      */
   if (sym->level &&

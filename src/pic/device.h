@@ -101,5 +101,6 @@ int REGallBanks(regs *reg);
 void addMemRange(memRange *r, int type);
 void setMaxRAM(int size);
 void setDefMaxRam(void);
+unsigned getMaxRam(void);
 
 #endif  /* __DEVICE_H__ */

@@ -1,5 +1,12 @@
 2004-09-06 Slade Rich <slade_rich AT users.sourceforge.net>
 
+	* src/pic/device.h,
+	* src/pic/device.c,
+	* src/pic/port.c : Changed PIC14 code to not set bit RP1 when
+	 maxram is less than 0x100.
+
+2004-09-06 Slade Rich <slade_rich AT users.sourceforge.net>
+
 	* Bug fixes for PIC14 - signed RSHIFT problem. Patch supplied by Allen(agschrum).
 
 2004-09-06 Erik Petrich <epetrich AT ivorytower.norman.ok.us>

@@ -93,8 +93,6 @@ static PIC_device Pics[] = {
 
 static int num_of_supported_PICS = sizeof(Pics)/sizeof(PIC_device);
 
-#define DEFAULT_PIC "f877"
-
 static PIC_device *pic=NULL;
 
 AssignedMemory *finalMapping=NULL;
@@ -631,4 +629,12 @@ int getConfigWord(int address)
 void setDefMaxRam(void)
 {
 	setMaxRAM(pic->defMaxRAMaddrs); // Max RAM has not been included, so use default setting
+}
+
+/*-----------------------------------------------------------------*
+*  
+*-----------------------------------------------------------------*/
+unsigned getMaxRam(void)
+{
+	return pic->defMaxRAMaddrs;
 }

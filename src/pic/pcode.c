@@ -4413,7 +4413,8 @@ static int BankSelect(pCodeInstruction *pci, int cur_bank, regs *reg)
 		insertBankSel(pci, reg->name); // Let linker choose the bank selection
 	} else if ((cur_bank == -1)||(cur_bank == 'L')||(cur_bank == 'E')) { // Current bank unknown and new register bank is known then can set bank bits
 		insertBankSwitch(pci, bank&1, PIC_RP0_BIT);
-		insertBankSwitch(pci, bank&2, PIC_RP1_BIT);
+		if (getMaxRam()&0x100)
+			insertBankSwitch(pci, bank&2, PIC_RP1_BIT);
 	} else { // Current bank and new register banks known - can set bank bits
 		switch((cur_bank^bank) & 3) {
 		case 0:
@@ -4426,7 +4427,8 @@ static int BankSelect(pCodeInstruction *pci, int cur_bank, regs *reg)
 			break;
 		case 3:
 			insertBankSwitch(pci, bank&1, PIC_RP0_BIT);
-			insertBankSwitch(pci, bank&2, PIC_RP1_BIT);
+			if (getMaxRam()&0x100)
+				insertBankSwitch(pci, bank&2, PIC_RP1_BIT);
 			break;
 		}
 	}

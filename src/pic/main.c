@@ -7,6 +7,7 @@
 #include "common.h"
 #include "main.h"
 #include "ralloc.h"
+#include "device.h"
 //#include "gen.h"
 
 
@@ -173,7 +174,7 @@ _pic14_genAssemblerPreamble (FILE * of)
   }
 
   fprintf (of, "\tlist\tp=%s\n",&name[1]);
-  fprintf (of, "\t__config _wdt_off\n");
+  fprintf (of, "\t__CONFIG 0x%x\n",getConfigWord(0x2007));
   fprintf (of, "\ninclude \"%s.inc\"\n",name);
 }
 

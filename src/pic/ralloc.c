@@ -575,6 +575,12 @@ dirregWithName (char *name)
   return NULL; // name wasn't found in the hash table
 }
 
+int IS_CONFIG_ADDRESS(int address)
+{
+
+  return address == 0x2007;
+}
+
 /*-----------------------------------------------------------------*/
 /* allocDirReg - allocates register of given type                  */
 /*-----------------------------------------------------------------*/
@@ -626,25 +632,35 @@ allocDirReg (operand *op )
   reg = dirregWithName(name);
 
   if(!reg) {
+    int address = 0;
+
+    /* if this is at an absolute address, then get the address. */
+    if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
+      address = SPEC_ADDR ( OP_SYM_ETYPE(op));
+    }
 
     /* Register wasn't found in hash, so let's create
      * a new one and put it in the hash table AND in the 
      * dynDirectRegNames set */
+    if(!IS_CONFIG_ADDRESS(address)) {
+      reg = newReg(REG_GPR, PO_DIR, rDirectIdx++, name,getSize (OP_SYMBOL (op)->type),0 );
+      debugLog ("  -- added %s to hash, size = %d\n", name,reg->size);
 
-    reg = newReg(REG_GPR, PO_DIR, rDirectIdx++, name,getSize (OP_SYMBOL (op)->type),0 );
-    debugLog ("  -- added %s to hash, size = %d\n", name,reg->size);
+      if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
+	reg->isFixed = 1;
+	reg->address = SPEC_ADDR ( OP_SYM_ETYPE(op));
+	debugLog ("  -- and it is at a fixed address 0x%02x\n",reg->address);
+      }
 
-    if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
-      reg->isFixed = 1;
-      reg->address = SPEC_ADDR ( OP_SYM_ETYPE(op));
-      debugLog ("  -- and it is at a fixed address 0x%02x\n",reg->address);
+      hTabAddItem(&dynDirectRegNames, regname2key(name), reg);
+      if (IS_BITVAR (OP_SYM_ETYPE(op)))
+	addSet(&dynDirectBitRegs, reg);
+      else
+	addSet(&dynDirectRegs, reg);
+    } else {
+      debugLog ("  -- %s is declared at address 0x2007\n",name);
+
     }
-
-    hTabAddItem(&dynDirectRegNames, regname2key(name), reg);
-    if (IS_BITVAR (OP_SYM_ETYPE(op)))
-      addSet(&dynDirectBitRegs, reg);
-    else
-      addSet(&dynDirectRegs, reg);
   }
 
   return reg;
@@ -2586,6 +2602,28 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
   debugAopGet ("  result:", IC_RESULT (ic));
   debugAopGet ("  left:", IC_LEFT (ic));
   debugAopGet ("  right:", IC_RIGHT (ic));
+
+  /* if this is at an absolute address, then get the address. */
+  if (SPEC_ABSA ( OP_SYM_ETYPE(IC_RESULT(ic))) ) {
+    if(IS_CONFIG_ADDRESS( SPEC_ADDR ( OP_SYM_ETYPE(IC_RESULT(ic))))) {
+      debugLog ("  %d - found config word declaration\n", __LINE__);
+      if(IS_VALOP(IC_RIGHT(ic))) {
+	debugLog ("  setting config word to %x\n", 
+		  (int) floatFromVal (IC_RIGHT(ic)->operand.valOperand));
+	assignConfigWordValue(  SPEC_ADDR ( OP_SYM_ETYPE(IC_RESULT(ic))),
+				(int) floatFromVal (IC_RIGHT(ic)->operand.valOperand));
+      }
+
+      /* remove the assignment from the iCode chain. */
+
+      remiCodeFromeBBlock (ebp, ic);
+      bitVectUnSetBit(OP_SYMBOL(IC_RESULT(ic))->defs,ic->key);
+      hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);
+
+      return 1;
+
+    }
+  }
 
   if (!IS_ITEMP (IC_RESULT (ic))) {
     allocDirReg(IC_RESULT (ic));

@@ -152,6 +152,12 @@ static int num_of_supported_PICS = sizeof(Pics)/sizeof(PIC_device);
 static PIC_device *pic=NULL;
 
 AssignedMemory *finalMapping=NULL;
+
+#define CONFIG_WORD_ADDRESS 0x2007
+#define DEFAULT_CONFIG_WORD 0x3fff
+
+static unsigned int config_word = DEFAULT_CONFIG_WORD;
+
 /*-----------------------------------------------------------------*
  *
  * void addMem(memRange *ranges,int type)
@@ -264,6 +270,7 @@ void dump_cblock(FILE *of)
 {
   int start=-1;
   int addr=0;
+  int bank_base;
 
   //dump_map();   /* display the register map */
 
@@ -276,9 +283,17 @@ void dump_cblock(FILE *of)
     } else {
       if(start>=0) {
 
+	/* clear the lower 7-bits of the start address of the first
+	 * variable declared in this bank. The upper bits for the mid
+	 * range pics are the bank select bits.
+	 */
+
+	bank_base = start & 0xfff8;
+
 	/* The bank number printed in the cblock comment tacitly
 	 * assumes that the first register in the contiguous group
 	 * of registers represents the bank for the whole group */
+
 	fprintf(of,"  cblock  0X%04X\t; Bank %d\n",start,finalMapping[start].bank);
 
 	for( ; start < addr; start++) {
@@ -288,7 +303,7 @@ void dump_cblock(FILE *of)
 	    /* If this register is aliased in multiple banks, then
 	     * mangle the variable name with the alias address: */
 	    if(finalMapping[start].alias & start)
-	      fprintf(of,"_%x",finalMapping[start].alias);
+	      fprintf(of,"_%x",bank_base);
 
 	    if(finalMapping[start].instance)
 	      fprintf(of,"_%d",finalMapping[start].instance);
@@ -567,3 +582,36 @@ void assignRelocatableRegisters(set *regset, int used)
 
 }
 
+
+/*-----------------------------------------------------------------*
+ *  void assignConfigWordValue(int address, int value)
+ *
+ * All midrange PICs have one config word at address 0x2007.
+ * This routine will assign a value to that address.
+ *
+ *-----------------------------------------------------------------*/
+
+void assignConfigWordValue(int address, int value)
+{
+  if(CONFIG_WORD_ADDRESS == address)
+    config_word = value;
+
+  fprintf(stderr,"setting config word to 0x%x\n",value);
+
+}
+/*-----------------------------------------------------------------*
+ * int getConfigWord(int address)
+ *
+ * Get the current value of the config word.
+ *
+ *-----------------------------------------------------------------*/
+
+int getConfigWord(int address)
+{
+  if(CONFIG_WORD_ADDRESS == address)
+    return config_word;
+
+  else
+    return 0;
+
+}

@@ -89,4 +89,9 @@ typedef struct PIC_device {
 #define REG_isALIASED(r)   (finalMapping[(r)->address].alias != 0)
 #define REG_isVALID(r)     (finalMapping[(r)->address].isValid)
 
+
+/****************************************/
+void assignConfigWordValue(int address, int value);
+int getConfigWord(int address);
+
 #endif  /* __DEVICE_H__ */

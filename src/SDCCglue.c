@@ -1078,13 +1078,13 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
 	case 3: // how about '390??
 	  if (port->little_endian)
 	    {
-	      fprintf (oFile, "\t.byte %s,%s,#0x%d\n",
-		       aopLiteral (val, 0), aopLiteral (val, 1), GPTYPE_CODE);
+	      fprintf (oFile, "\t.byte %s,%s,%s\n",
+		       aopLiteral (val, 0), aopLiteral (val, 1), aopLiteral (val, 2));
 	    }
 	  else
 	    {
-	      fprintf (oFile, "\t.byte %s,%s,#0x%d\n",
-		       aopLiteral (val, 1), aopLiteral (val, 0), GPTYPE_CODE);
+	      fprintf (oFile, "\t.byte %s,%s,%s\n",
+		       aopLiteral (val, 2), aopLiteral (val, 1), aopLiteral (val, 0));
 	    }
 	}
       return;

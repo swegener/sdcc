@@ -467,10 +467,10 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool useDP2)
 		  ((short) (sym->stack - _G.nRegsSaved)) :
 		  ((short) sym->stack)) & 0xff);
       emitcode ("mov","b,a");
-      emitcode ("mov","a,#0x%02x",(-((sym->stack < 0) ?
+      emitcode ("mov","a,_bpx+1");
+      emitcode ("subb","a,#0x%02x",(-((sym->stack < 0) ?
 				     ((short) (sym->stack - _G.nRegsSaved)) :
 				     ((short) sym->stack)) >> 8) & 0xff);
-      emitcode ("subb","a,_bpx+1");
       if (useDP2) {
 	  if (options.model == MODEL_FLAT24)
 	      emitcode ("mov", "dpx1,#0x40");
@@ -2875,7 +2875,7 @@ genFunction (iCode * ic)
 	  emitcode ("add","a,#0x%02x", ((short) sym->stack & 0xff));
 	  emitcode ("mov","sp,a");
 	  emitcode ("mov","a,esp");
-	  emitcode ("addc","a,0x%02x", (((short) sym->stack) >> 8) & 0xff);
+	  emitcode ("addc","a,#0x%02x", (((short) sym->stack) >> 8) & 0xff);
 	  emitcode ("mov","esp,a");
       } else {
 	  if (i > 256)

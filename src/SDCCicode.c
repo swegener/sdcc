@@ -1097,9 +1097,9 @@ operandOperation (operand * left, operand * right,
 		  ul != (TYPE_UWORD) ul)
 		werror (W_INT_OVL);
 	    }
-	  else /* int */
+	  else /* signed int */
 	    {
-	      /* int is handled here in order to detect overflow */
+	      /* signed int is handled here in order to detect overflow */
 	      TYPE_DWORD l = (TYPE_WORD) operandLitValue (left) *
 			     (TYPE_WORD) operandLitValue (right);
 
@@ -1989,8 +1989,8 @@ geniCodeDivision (operand * left, operand * right)
 
   resType = usualBinaryConversions (&left, &right);
 
-  /* if the right is a literal & power of 2 
-     and left is unsigned then make it a    
+  /* if the right is a literal & power of 2
+     and left is unsigned then make it a
      right shift */
   if (IS_LITERAL (retype) &&
       !IS_FLOAT (letype) &&
@@ -3656,9 +3656,21 @@ ast2iCode (ast * tree,int lvl)
     case NE_OP:
     case AND_OP:
     case OR_OP:
+      /* different compilers (even different gccs) evaluate
+	 the two calls in a different order. to get the same
+	 result on all machines we've to specify a clear sequence.
       return geniCodeLogic (geniCodeRValue (left, FALSE),
-			    geniCodeRValue (right, FALSE),
-			    tree->opval.op);
+                            geniCodeRValue (right, FALSE),
+                            tree->opval.op);
+      */
+      {
+	operand *leftOp, *rightOp;
+
+	rightOp = geniCodeRValue (right, FALSE);
+	leftOp  = geniCodeRValue (left , FALSE);
+
+	return geniCodeLogic (leftOp, rightOp, tree->opval.op);
+      }
     case '?':
       return geniCodeConditional (tree,lvl);
 

@@ -10393,8 +10393,10 @@ static void genRightShiftLiteral (operand *left,
 
   /* I suppose that the left size >= result size */
   if(shCount == 0){
-    while(res_size--)
-      movLeft2Result(left, lsize, result, res_size);
+    assert (res_size <= lsize);
+    while (res_size--) {
+      mov2f (AOP(result), AOP(left), res_size);
+    } // for
   }
 
   else if(shCount >= (lsize * 8)){

@@ -1,3 +1,7 @@
+2005-03-02 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c (genRightShiftLiteral): fixed bug #1154256
+
 2004-02-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/avr/ralloc.c (serialRegAssign),

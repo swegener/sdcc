@@ -29,6 +29,10 @@
 
 #define	VERSION	"V01.70 + NoICE + SDCC mods + Flat24 Feb-1999"
 
+#if !defined(__BORLANDC__) && !defined(_MSC_VER)
+#include <unistd.h>
+#endif
+
 /*
  * Case Sensitivity Flag
  */

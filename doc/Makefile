@@ -2,15 +2,18 @@ include ../Makefile.common
 
 MANUAL = sdccman
 TSS = test_suite_spec
+CDB = cdbfileformat
 
 all: $(MANUAL).html $(MANUAL).pdf $(MANUAL).txt \
-	$(TSS).html $(TSS).pdf $(TSS).txt
+	$(TSS).html $(TSS).pdf $(TSS).txt \
+	$(CDB).html $(CDB).pdf $(CDB).txt
 
 install:
 	$(INSTALL) -d $(docdir)
 	cp -rf *.html *.txt z80 avr $(docdir)
 	$(shell if [ -f $(MANUAL).html ]; then cp -rf $(MANUAL).html $(docdir); fi)
 	$(shell if [ -f $(TSS).html    ]; then cp -rf $(TSS).html    $(docdir); fi)
+	$(shell if [ -f $(CDB).html    ]; then cp -rf $(CDB).html    $(docdir); fi)
 	$(shell if [ -f *.pdf          ]; then cp -rf *.pdf          $(docdir); fi)
 
 uninstall:
@@ -24,6 +27,10 @@ $(MANUAL).html: $(MANUAL).tex $(MANUAL).ind ;#$(MANUAL).glo
 $(TSS).html: $(TSS).tex
 	mkdir -p $@
 	latex2html -split 0 -dir $(TSS).html $(TSS)
+
+$(CDB).html: $(CDB).tex
+	mkdir -p $@
+	latex2html -split 0 -show_section_numbers -dir $(CDB).html $(CDB)
 
 %.txt: %.lyx
 	lyx -e text $<

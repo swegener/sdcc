@@ -1,6 +1,9 @@
 2003-03-21  Bernhard Held <bernhard@bernhardheld.de>
 
 	* support/scripts/sdcc_mingw32: adapted to configure from autoconf 2.54
+	* src/doc/cdbfileformat.lyx: added, written by Lenny Story
+	* src/doc/Makefile: added cdbfileformat.lyx
+	* src/doc/clean.mk: added cdbfileformat.lyx
 
 2003-03-20  Bernhard Held <bernhard@bernhardheld.de>
 

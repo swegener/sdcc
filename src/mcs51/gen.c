@@ -3192,7 +3192,8 @@ static void
 genPlus (iCode * ic)
 {
   int size, offset = 0;
-  char *add;
+  int skip_bytes = 0;
+  char *add = "add";
   asmop *leftOp, *rightOp;
 
   /* special cases :- */
@@ -3256,32 +3257,59 @@ genPlus (iCode * ic)
 
   size = getDataSize (IC_RESULT (ic));
 
+  /* if the lower bytes of a literal are zero skip the addition */
+  if (AOP_TYPE (IC_RIGHT (ic)) == AOP_LIT )
+    {          
+       while ((0 == ((unsigned int) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit) & (0xff << skip_bytes*8))) &&
+              (skip_bytes+1 < size))
+         {  
+           skip_bytes++;
+	 }
+       if (skip_bytes)
+         D(emitcode (";     genPlus shortcut",""));
+    }
+
   leftOp = AOP(IC_LEFT(ic));
   rightOp = AOP(IC_RIGHT(ic));
-  add = "add";
-
+  
   while (size--)
     {
-      if (aopGetUsesAcc (leftOp, offset) && aopGetUsesAcc (rightOp, offset))
-	{
-	  emitcode("mov", "b,a");
-	  MOVA (aopGet (leftOp,  offset, FALSE, TRUE));
-	  emitcode("xch", "a,b");
-	  MOVA (aopGet (rightOp, offset, FALSE, TRUE));
-	  emitcode (add, "a,b");
-	}
-      else if (aopGetUsesAcc (leftOp, offset))
-	{
-	  MOVA (aopGet (leftOp, offset, FALSE, TRUE));
-	  emitcode (add, "a,%s", aopGet (rightOp, offset, FALSE, TRUE));
-	}
+      if( offset >= skip_bytes )
+        {	
+	  if (aopGetUsesAcc (leftOp, offset) && aopGetUsesAcc (rightOp, offset))
+	    {
+	      emitcode("mov", "b,a");
+	      MOVA (aopGet (leftOp,  offset, FALSE, TRUE));
+	      emitcode("xch", "a,b");
+	      MOVA (aopGet (rightOp, offset, FALSE, TRUE));
+	      emitcode (add, "a,b");
+	    }
+	  else if (aopGetUsesAcc (leftOp, offset))
+	    {
+	      MOVA (aopGet (leftOp, offset, FALSE, TRUE));
+	      emitcode (add, "a,%s", aopGet (rightOp, offset, FALSE, TRUE));
+	    }
+	  else
+	    {
+	      MOVA (aopGet (rightOp, offset, FALSE, TRUE));
+	      emitcode (add, "a,%s", aopGet (leftOp, offset, FALSE, TRUE));
+	    }
+	  aopPut (AOP (IC_RESULT (ic)), "a", offset, isOperandVolatile (IC_RESULT (ic), FALSE));
+	  add = "addc";  /* further adds must propagate carry */
+        }
       else
-	{
-	  MOVA (aopGet (rightOp, offset, FALSE, TRUE));
-	  emitcode (add, "a,%s", aopGet (leftOp, offset, FALSE, TRUE));
+        {
+          if( !sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) || 
+	      isOperandVolatile (IC_RESULT (ic), FALSE))
+	    {
+	      /* just move */
+              aopPut (AOP (IC_RESULT (ic)),
+		      aopGet (leftOp, offset, FALSE, FALSE),
+		      offset,
+		      isOperandVolatile (IC_RESULT (ic), FALSE));
+	    }
 	}
-      aopPut (AOP (IC_RESULT (ic)), "a", offset++, isOperandVolatile (IC_RESULT (ic), FALSE));
-      add = "addc";  /* further adds must propagate carry */
+      offset++;
     }
 
   adjustArithmeticResult (ic);

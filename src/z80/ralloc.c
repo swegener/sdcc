@@ -84,7 +84,7 @@ int dataExtend  = 0;
 /** Set to help debug register pressure related problems */
 #define DEBUG_FAKE_EXTRA_REGS	0
 
-regs regsZ80[] = 
+static regs regsZ80[] = 
 {
     { REG_GPR, C_IDX , "c", 1 },
     { REG_GPR, B_IDX , "b", 1 },
@@ -108,9 +108,7 @@ regs regsZ80[] =
 /** Number of usable registers (all but C) */
 #define MAX_REGS ((sizeof(regsZ80)/sizeof(regs))-1)
 
-int nRegs = MAX_REGS;
-
-void spillThis (symbol *);
+static void spillThis (symbol *);
 
 /** Allocates register of given type.
     'type' is not used on the z80 version.  It was used to select
@@ -118,11 +116,11 @@ void spillThis (symbol *);
 
     @return 		Pointer to the newly allocated register.
  */
-regs *allocReg (short type)
+static regs *allocReg (short type)
 {
     int i;
 
-    for ( i = 0 ; i < nRegs ; i++ ) {
+    for ( i = 0 ; i < MAX_REGS ; i++ ) {
 	/* For now we allocate from any free */
 	if (regsZ80[i].isFree ) {
 	    regsZ80[i].isFree = 0;
@@ -141,7 +139,7 @@ regs *regWithIdx (int idx)
 {
     int i;
     
-    for (i=0;i < nRegs;i++)
+    for (i=0;i < MAX_REGS;i++)
 	if (regsZ80[i].rIdx == idx)
 	    return &regsZ80[i];
 
@@ -152,7 +150,7 @@ regs *regWithIdx (int idx)
 
 /** Frees a register.
  */
-void freeReg (regs *reg)
+static void freeReg (regs *reg)
 {
     assert(!reg->isFree);
     reg->isFree = 1;
@@ -161,12 +159,12 @@ void freeReg (regs *reg)
 
 /** Returns number of free registers.
  */
-int nFreeRegs (int type)
+static int nFreeRegs (int type)
 {
     int i;
     int nfr=0;
     
-    for (i = 0 ; i < nRegs; i++ ) {
+    for (i = 0 ; i < MAX_REGS; i++ ) {
 	/* For now only one reg type */
 	if (regsZ80[i].isFree)
 	    nfr++;
@@ -176,7 +174,7 @@ int nFreeRegs (int type)
 
 /** Free registers with type.
  */
-int nfreeRegsType (int type)
+static int nfreeRegsType (int type)
 {
     int nfr ;
     if (type == REG_PTR) {
@@ -188,10 +186,11 @@ int nfreeRegsType (int type)
 }
 
 
+#if 0
 /*-----------------------------------------------------------------*/
 /* allDefsOutOfRange - all definitions are out of a range          */
 /*-----------------------------------------------------------------*/
-bool allDefsOutOfRange (bitVect *defs,int fseq, int toseq) 
+static bool allDefsOutOfRange (bitVect *defs,int fseq, int toseq) 
 {
     int i ;
 
@@ -211,11 +210,12 @@ bool allDefsOutOfRange (bitVect *defs,int fseq, int toseq)
     
     return TRUE;
 }
+#endif
   
 /*-----------------------------------------------------------------*/
 /* computeSpillable - given a point find the spillable live ranges */
 /*-----------------------------------------------------------------*/
-bitVect *computeSpillable (iCode *ic)
+static bitVect *computeSpillable (iCode *ic)
 {
     bitVect *spillable ;
 
@@ -240,7 +240,7 @@ bitVect *computeSpillable (iCode *ic)
 /*-----------------------------------------------------------------*/
 /* noSpilLoc - return true if a variable has no spil location      */
 /*-----------------------------------------------------------------*/
-int noSpilLoc (symbol *sym, eBBlock *ebp,iCode *ic)
+static int noSpilLoc (symbol *sym, eBBlock *ebp,iCode *ic)
 {
     return (sym->usl.spillLoc ? 0 : 1);
 }
@@ -248,31 +248,9 @@ int noSpilLoc (symbol *sym, eBBlock *ebp,iCode *ic)
 /*-----------------------------------------------------------------*/
 /* hasSpilLoc - will return 1 if the symbol has spil location      */
 /*-----------------------------------------------------------------*/
-int hasSpilLoc (symbol *sym, eBBlock *ebp, iCode *ic)
+static int hasSpilLoc (symbol *sym, eBBlock *ebp, iCode *ic)
 {
     return (sym->usl.spillLoc ? 1 : 0);
-}
-
-/*-----------------------------------------------------------------*/
-/* directSpilLoc - will return 1 if the splilocation is in direct  */
-/*-----------------------------------------------------------------*/
-int directSpilLoc (symbol *sym, eBBlock *ebp, iCode *ic)
-{
-    /* No such thing as direct space */
-    return 0;
-}
-
-/*-----------------------------------------------------------------*/
-/* hasSpilLocnoUptr - will return 1 if the symbol has spil location*/
-/*                    but is not used as a pointer                 */
-/*-----------------------------------------------------------------*/
-int hasSpilLocnoUptr (symbol *sym, eBBlock *ebp, iCode *ic)
-{
-#if 0
-    return sym->usl.spillLoc ? 1:0;
-#else
-    return ((sym->usl.spillLoc && !sym->uptr) ? 1 : 0);
-#endif
 }
 
 /** Will return 1 if the remat flag is set.
@@ -280,34 +258,15 @@ int hasSpilLocnoUptr (symbol *sym, eBBlock *ebp, iCode *ic)
     into registers at creation as it can be re-created at any time -
     i.e. it's constant in some way.
 */
-int rematable (symbol *sym, eBBlock *ebp, iCode *ic)
+static int rematable (symbol *sym, eBBlock *ebp, iCode *ic)
 {
     return sym->remat;
 }
 
 /*-----------------------------------------------------------------*/
-/* notUsedInBlock - not used in this block                         */
-/*-----------------------------------------------------------------*/
-int notUsedInBlock (symbol *sym, eBBlock *ebp, iCode *ic)
-{   
-    return (!bitVectBitsInCommon(sym->defs,ebp->usesDefs) &&
-	    allDefsOutOfRange (sym->defs,ebp->fSeq,ebp->lSeq));
-/*     return (!bitVectBitsInCommon(sym->defs,ebp->usesDefs)); */
-}
-
-/*-----------------------------------------------------------------*/
-/* notUsedInRemaining - not used or defined in remain of the block */
-/*-----------------------------------------------------------------*/
-int notUsedInRemaining (symbol *sym, eBBlock *ebp, iCode *ic)
-{
-    return ((usedInRemaining (operandFromSymbol(sym),ic) ? 0 : 1) &&
-	    allDefsOutOfRange (sym->defs,ic->seq,ebp->lSeq));
-}
-
-/*-----------------------------------------------------------------*/
 /* allLRs - return true for all                                    */
 /*-----------------------------------------------------------------*/
-int allLRs (symbol *sym, eBBlock *ebp, iCode *ic)
+static int allLRs (symbol *sym, eBBlock *ebp, iCode *ic)
 {
     return 1;
 }
@@ -379,7 +338,7 @@ symbol *leastUsedLR (set *sset)
 /*-----------------------------------------------------------------*/
 /* noOverLap - will iterate through the list looking for over lap  */
 /*-----------------------------------------------------------------*/
-int noOverLap (set *itmpStack, symbol *fsym)
+static int noOverLap (set *itmpStack, symbol *fsym)
 {
     symbol *sym;
    
@@ -424,7 +383,7 @@ DEFSETFUNC(isFree)
 /*-----------------------------------------------------------------*/
 /* spillLRWithPtrReg :- will spil those live ranges which use PTR  */
 /*-----------------------------------------------------------------*/
-void spillLRWithPtrReg (symbol *forSym)
+static void spillLRWithPtrReg (symbol *forSym)
 {
     /* Always just return */
 }
@@ -517,7 +476,7 @@ bool isSpiltOnStack (symbol *sym)
 /*-----------------------------------------------------------------*/
 /* spillThis - spils a specific operand                            */
 /*-----------------------------------------------------------------*/
-void spillThis (symbol *sym)
+static void spillThis (symbol *sym)
 {
     int i;
     /* if this is rematerializable or has a spillLocation
@@ -750,7 +709,7 @@ static bool symHasReg(symbol *sym,regs *reg)
 /** Check the live to and if they have registers & are not spilt then
     free up the registers 
 */
-void deassignLRs (iCode *ic, eBBlock *ebp)
+static void deassignLRs (iCode *ic, eBBlock *ebp)
 {
     symbol *sym;
     int k;
@@ -840,7 +799,7 @@ void deassignLRs (iCode *ic, eBBlock *ebp)
 
 /** Reassign this to registers.
  */
-void reassignLR (operand *op)
+static void reassignLR (operand *op)
 {
     symbol *sym = OP_SYMBOL(op);
     int i;
@@ -859,7 +818,7 @@ void reassignLR (operand *op)
 
 /** Determines if allocating will cause a spill.
  */
-int willCauseSpill ( int nr, int rt)
+static int willCauseSpill ( int nr, int rt)
 {
     /* first check if there are any avlb registers
        of te type required */
@@ -908,7 +867,7 @@ bool tryAllocatingRegPair(symbol *sym)
 {
     int i;
     assert(sym->nRegs == 2);
-    for ( i = 0 ; i < nRegs ; i+=2 ) {
+    for ( i = 0 ; i < MAX_REGS ; i+=2 ) {
 	if ((regsZ80[i].isFree)&&(regsZ80[i+1].isFree)) {
 	    regsZ80[i].isFree = 0;
 	    sym->regs[0] = &regsZ80[i];
@@ -930,7 +889,7 @@ bool tryAllocatingRegPair(symbol *sym)
     This is the main register allocation function.  It is called after
     packing.
  */
-void serialRegAssign (eBBlock **ebbs, int count)
+static void serialRegAssign (eBBlock **ebbs, int count)
 {
     int i;
 
@@ -1078,7 +1037,7 @@ bitVect *rUmaskForOp (operand *op)
     if (sym->isspilt || !sym->nRegs)
 	return NULL;
 
-    rumask = newBitVect(nRegs);
+    rumask = newBitVect(MAX_REGS);
 
     for (j = 0; j < sym->nRegs; j++) {
 	rumask = bitVectSetBit(rumask,
@@ -1092,7 +1051,7 @@ bitVect *rUmaskForOp (operand *op)
  */
 bitVect *regsUsedIniCode (iCode *ic)
 {
-    bitVect *rmask = newBitVect(nRegs);
+    bitVect *rmask = newBitVect(MAX_REGS);
 
     /* do the special cases first */
     if (ic->op == IFX ) {
@@ -1129,7 +1088,7 @@ bitVect *regsUsedIniCode (iCode *ic)
 
 /** For each instruction will determine the regsUsed.
  */
-void createRegMask (eBBlock **ebbs, int count)
+static void createRegMask (eBBlock **ebbs, int count)
 {
     int i;
 
@@ -1158,7 +1117,7 @@ void createRegMask (eBBlock **ebbs, int count)
 	    /* now create the register mask for those 
 	       registers that are in use : this is a
 	       super set of ic->rUsed */
-	    ic->rMask = newBitVect(nRegs+1);
+	    ic->rMask = newBitVect(MAX_REGS+1);
 
 	    /* for all live Ranges alive at this point */
 	    for (j = 1; j < ic->rlive->size; j++ ) {
@@ -1218,7 +1177,7 @@ char *rematStr (symbol *sym)
 /*-----------------------------------------------------------------*/
 /* regTypeNum - computes the type & number of registers required   */
 /*-----------------------------------------------------------------*/
-void regTypeNum ()
+static void regTypeNum ()
 {
     symbol *sym;
     int k;
@@ -1271,11 +1230,11 @@ void regTypeNum ()
 
 /** Mark all registers as free.
  */
-void freeAllRegs()
+static void freeAllRegs()
 {
     int i;
 
-    for (i=0;i< nRegs;i++ )
+    for (i=0;i< MAX_REGS;i++ )
 	regsZ80[i].isFree = 1;
 }
 
@@ -1292,7 +1251,7 @@ DEFSETFUNC(deallocStackSpil)
 
 /** Register reduction for assignment.
  */
-int packRegsForAssign (iCode *ic,eBBlock *ebp)
+static int packRegsForAssign (iCode *ic,eBBlock *ebp)
 {
     iCode *dic, *sic;
     
@@ -1474,10 +1433,11 @@ iCode *findAssignToSym (operand *op,iCode *ic)
 	
 }
 
+#if 0
 /*-----------------------------------------------------------------*/
 /* packRegsForSupport :- reduce some registers for support calls   */
 /*-----------------------------------------------------------------*/
-int packRegsForSupport (iCode *ic, eBBlock *ebp)
+static int packRegsForSupport (iCode *ic, eBBlock *ebp)
 {
     int change = 0 ;
     /* for the left & right operand :- look to see if the
@@ -1528,6 +1488,7 @@ int packRegsForSupport (iCode *ic, eBBlock *ebp)
    
     return change ;
 }
+#endif
 
 #define IS_OP_RUONLY(x) (x && IS_SYMOP(x) && OP_SYMBOL(x)->ruonly)
 
@@ -1677,7 +1638,7 @@ genAssign (ptr)
     When the result of this operation is small and short lived it may
     be able to be stored in the accumelator.
  */
-void packRegsForAccUse (iCode *ic)
+static void packRegsForAccUse (iCode *ic)
 {
     iCode *uic;
     
@@ -1803,7 +1764,7 @@ void packRegsForAccUse (iCode *ic)
 
 /** Does some transformations to reduce register pressure.
  */
-void packRegisters (eBBlock *ebp)
+static void packRegisters (eBBlock *ebp)
 {
     iCode *ic ;
     int change = 0 ;
@@ -1910,7 +1871,7 @@ void packRegisters (eBBlock *ebp)
 	   result of that operation is not on stack then we can leave the
 	   result of this operation in acc:b combination */
 	if ((IS_ARITHMETIC_OP(ic) 
-	     || IS_BITWISE_OP(ic) 
+	     || IS_BITWISE_OP(ic)
 	     || ic->op == LEFT_OP || ic->op == RIGHT_OP
 	     ) &&
 	    IS_ITEMP(IC_RESULT(ic)) &&
@@ -1929,9 +1890,6 @@ void z80_assignRegisters (eBBlock **ebbs, int count)
 
     setToNull((void *)&funcrUsed);
     ptrRegReq = stackExtend = dataExtend = 0;
-    /* if not register extentions then reduce number
-       of registers */
-    nRegs = MAX_REGS;
 
     /* change assignments this will remove some
        live ranges reducing some register pressure */

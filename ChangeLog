@@ -1,3 +1,9 @@
+2003-11-03  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+	* Added MSVC projects for hc08 assembler and linker:
+	all.dsp, config.dsp, sdcc.dsw, /as/hc08/as_hc08.dsp,
+	/as/hc08/link_hc08.dsp
+
 2003-11-03 Martin Helmling <Martin.Helmling@octo-soft.de>
 
         * debugger/mcs51/cmd.c: allows filename starting with digit(+ some debug)

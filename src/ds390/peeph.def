@@ -245,7 +245,7 @@ replace {
         cjne %1,%2,%3
         setb %4
 %3:
-}
+} if labelRefCount %3 1
 
 replace {
         clr  a
@@ -262,7 +262,7 @@ replace {
         cjne %10,%11,%3
         setb %4
 %3:
-}
+} if labelRefCount %3 2
 
 replace {
         clr  a
@@ -275,7 +275,7 @@ replace {
         cjne %1,%2,%3
         sjmp %4
 %3:
-}
+} if labelRefCount %3 1
 
 replace {
         clr  a
@@ -290,7 +290,7 @@ replace {
         cjne %9,%10,%3
         sjmp %4
 %3:
-}
+} if labelRefCount %3 2
 
 replace {
         clr  a
@@ -307,7 +307,7 @@ replace {
         cjne %11,%12,%3
         sjmp %4
 %3:
-}
+} if labelRefCount %3 3
 
 replace {
         clr  a
@@ -326,7 +326,8 @@ replace {
         cjne %13,%14,%3
         sjmp %4
 %3:
-}
+} if labelRefCount %3 4
+
 replace {
         mov  a,#0x01
         cjne %1,%2,%3
@@ -337,7 +338,7 @@ replace {
         ; Peephole 119   jump optimization
         cjne %1,%2,%4
 %3:
-}
+} if labelRefCount %3 1
 
 replace {
         mov  a,#0x01
@@ -351,7 +352,8 @@ replace {
         cjne %1,%2,%4
         cjne %10,%11,%4
 %3:
-}
+} if labelRefCount %3 2
+
 replace {
         mov  a,#0x01
         cjne %1,%2,%3
@@ -366,7 +368,7 @@ replace {
         cjne %10,%11,%4
         cjne %12,%13,%4
 %3:
-}
+} if labelRefCount %3 3
 
 replace {
         mov  a,#0x01
@@ -384,7 +386,7 @@ replace {
         cjne %12,%13,%4
         cjne %14,%15,%4
 %3:
-}
+} if labelRefCount %3 4
 
 replace {
         mov  a,#0x01
@@ -397,7 +399,8 @@ replace {
         cjne %1,%2,%3
         smp  %4
 %3:
-}
+} if labelRefCount %3 1
+
 replace {
         mov  a,#0x01
         cjne %1,%2,%3
@@ -409,9 +412,9 @@ replace {
         ; Peephole 124   jump optimization
         cjne %1,%2,%3
         cjne %10,%11,%3
-        smp  %4
+        sjmp  %4
 %3:
-}
+} if labelRefCount %3 2
 
 replace {
         mov  a,#0x01
@@ -428,7 +431,7 @@ replace {
         cjne %12,%13,%3
         sjmp %4
 %3:
-}
+} if labelRefCount %3 3
 
 replace {
         mov  a,#0x01
@@ -447,7 +450,7 @@ replace {
         cjne %14,%15,%3
         sjmp %4
 %3:
-}
+} if labelRefCount %3 4
 
 replace {
         push psw
@@ -462,7 +465,7 @@ replace {
 } by {
         ; Peephole 127   removed misc sequence
         ret
-}
+} if labelRefCount %3 0
 
 replace {
         clr  a
@@ -562,36 +565,37 @@ replace {
         mov  dph,%3
 }
 
-replace {
-        mov  b,#0x00
-        mov  a,%1
-        cjne %2,%3,%4
-        mov  b,#0x01
-%4:
-        mov  a,b
-        jz   %5
-} by {
-        ; Peephole 137   optimized misc jump sequence
-        mov  a,%1
-        cjne %2,%3,%5
-%4:
-}
-
-replace {
-        mov  b,#0x00
-        mov  a,%1
-        cjne %2,%3,%4
-        mov  b,#0x01
-%4:
-        mov  a,b
-        jnz  %5
-} by {
-        ; Peephole 138   optimized misc jump sequence
-        mov  a,%1
-        cjne %2,%3,%4
-        sjmp %5
-%4:
-}
+// WTF? Doesn't look sensible to me...
+//replace {
+//        mov  b,#0x00
+//        mov  a,%1
+//        cjne %2,%3,%4
+//        mov  b,#0x01
+//%4:
+//        mov  a,b
+//        jz   %5
+//} by {
+//        ; Peephole 137   optimized misc jump sequence
+//        mov  a,%1
+//        cjne %2,%3,%5
+//%4:
+//} if labelRefCount %4 1
+//
+//replace {
+//        mov  b,#0x00
+//        mov  a,%1
+//        cjne %2,%3,%4
+//        mov  b,#0x01
+//%4:
+//        mov  a,b
+//        jnz  %5
+//} by {
+//        ; Peephole 138   optimized misc jump sequence
+//        mov  a,%1
+//        cjne %2,%3,%4
+//        sjmp %5
+//%4:
+//} if labelRefCount %4 1
 
 replace {
         mov  r%1,a
@@ -915,7 +919,8 @@ replace {
 } by {
         ; Peephole 170   jump optimization
         cjne %1,%2,%4
-%3:}
+%3:
+} if labelRefCount %3 1
 
 replace {
         clr  a
@@ -928,7 +933,8 @@ replace {
         ; Peephole 171   jump optimization
         cjne %1,%2,%4
         cjne %9,%10,%4
-%3:}
+%3:
+} if labelRefCount %3 2
 
 replace {
         clr  a
@@ -943,7 +949,8 @@ replace {
         cjne %1,%2,%4
         cjne %9,%10,%4
         cjne %11,%12,%4
-%3:}
+%3:
+} if labelRefCount %3 3
 
 replace {
         clr  a
@@ -960,7 +967,8 @@ replace {
         cjne %9,%10,%4
         cjne %11,%12,%4
         cjne %13,%14,%4
-%3:}
+%3:
+} if labelRefCount %3 4
 
 replace {
         mov  r%1,%2
@@ -1287,8 +1295,8 @@ replace {
         mov  a,%12
         cjne %13,%14,%8
         sjmp %7
-%3:
-}
+;%3:
+} if labelRefCount %3 4
 
 replace {
         cjne %1,%2,%3
@@ -1311,8 +1319,8 @@ replace {
         mov  a,%12
         cjne %13,%14,%8
         sjmp %7
-%3:
-}
+;%3:
+} if labelRefCount %3 4
 
 replace {
         cjne @%1,%2,%3
@@ -1335,8 +1343,8 @@ replace {
         inc  %1
         cjne @%1,%14,%8
         sjmp %7
-%3:
-}
+;%3:
+} if labelRefCount %3 4
 
 replace {
         cjne %1,%2,%3
@@ -1353,8 +1361,8 @@ replace {
         cjne %10,%11,%8
         cjne %13,%14,%8
         sjmp %7
-%3:
-}
+;%3:
+} if labelRefCount %3 4
 
 replace {
         jnz  %3
@@ -1373,8 +1381,8 @@ replace {
         mov  a,%9
         cjne %10,%11,%8
         sjmp %7
-%3:
-}
+;%3:
+} if labelRefCount %3 3
 
 replace {
         cjne %1,%2,%3
@@ -1393,8 +1401,8 @@ replace {
         mov  a,%9
         cjne %10,%11,%8
         sjmp %7
-%3:
-}
+;%3:
+} if labelRefCount %3 3
 
 replace {
         cjne @%1,%2,%3
@@ -1413,8 +1421,8 @@ replace {
         inc  %1
         cjne @%1,%11,%8
         sjmp %7
-%3:
-}
+;%3:
+} if labelRefCount %3 3
 
 replace {
         cjne %1,%2,%3
@@ -1429,8 +1437,8 @@ replace {
         cjne %5,%6,%8
         cjne %10,%11,%8
         sjmp %7
-%3:
-}
+;%3:
+} if labelRefCount %3 3
 
 replace {
         jnz  %3
@@ -1445,8 +1453,8 @@ replace {
         mov  a,%4
         cjne %5,%6,%8
         sjmp %7
-%3:     
-}
+;%3:     
+} if labelRefCount %3 2
 
 replace {
         cjne %1,%2,%3
@@ -1461,8 +1469,8 @@ replace {
         mov  a,%4
         cjne %5,%6,%8
         sjmp %7
-%3:
-}
+;%3:
+} if labelRefCount %3 2
 
 replace {
         cjne @%1,%2,%3
@@ -1477,8 +1485,8 @@ replace {
         inc   %1
         cjne @%1,%6,%8
         sjmp %7
-%3:
-}
+;%3:
+} if labelRefCount %3 2
 
 replace {
         cjne %1,%2,%3
@@ -1491,8 +1499,8 @@ replace {
         cjne %1,%2,%8
         cjne %5,%6,%8
         sjmp %7
-%3:
-}
+;%3:
+} if labelRefCount %3 2
 
 replace {
         cjne %1,%2,%3
@@ -1503,7 +1511,7 @@ replace {
         ; Peephole 199   optimized misc jump sequence
         cjne %1,%2,%5
         sjmp %4
-%3:
+;%3:
 } if labelRefCount %3 1
 
 replace {
@@ -1563,7 +1571,7 @@ replace {
         djnz %1,%4
 %2:
 %3:
-}
+} if labelRefCount %2 1
 
 replace {
         mov  %1,%1

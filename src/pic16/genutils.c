@@ -500,13 +500,15 @@ int pic16_genCmp_special(operand *left, operand *right, operand *result,
   int offs=0;
   symbol *tmplbl;
   unsigned long lit;
-  int op, cmp_op=0;
+  int op, cmp_op=0, cond_pre;
 
     FENTRY;
     
     if(!(pic16_options.opt_flags & OF_OPTIMIZE_CMP))return 0;
 
     size = max(AOP_SIZE(left), AOP_SIZE(right));
+
+    cond_pre = rIfx->condition; // must restore old value on return with 0!!!
     
     if(!isAOP_REGlike(left)) {
       operand *dummy;
@@ -554,5 +556,6 @@ int pic16_genCmp_special(operand *left, operand *right, operand *result,
 
     }		/* */
       
+  rIfx->condition = cond_pre;
   return 0;
 }

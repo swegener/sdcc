@@ -1,3 +1,11 @@
+2005-03-26 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c (genSkipc): fixed semantics (execute branch
+	  if condition == CARRY)
+	* (genCmp): adapted to new genSkipc semantics
+	* src/pic16/genutils.c (pic6_genCmp_special): removed side effect
+	  on rIfx (genCmp was broken)
+
 2005-03-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCmain.c (setDefaultOptions, optionsTable[], parseCmdLine),

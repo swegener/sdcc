@@ -4837,9 +4837,9 @@ static void genSkipc(resolvedIfx *rifx)
     return;
 
   if(rifx->condition)
-    emitSKPC;
-  else
     emitSKPNC;
+  else
+    emitSKPC;
 
   pic16_emitpcode(POC_GOTO, pic16_popGetLabel(rifx->lbl->key));
   rifx->generated = 1;
@@ -5040,7 +5040,7 @@ static void genCmp (operand *left,operand *right,
     } // if
 
     // This fails for lit = 0xFF (unsigned) AND lit = 0x7F (signed),
-    // that's we handled it above.
+    // that's why we handled it above.
     lit++;
 
     dummy = left;
@@ -5144,7 +5144,7 @@ result_in_carry:
    * now CARRY contains the result of the comparison: *
    * SUBWF sets CARRY iff                             *
    * F-W >= 0 <==> F >= W <==> !(F < W)               *
-   * (F=left, W=right)
+   * (F=left, W=right)                                *
    ****************************************************/
 
   if (performedLt) {
@@ -5170,10 +5170,8 @@ correct_result_in_carry:
   } // if (result)
 
   // perform conditional jump
-  // genSkipc branches to rifx->label if (rifx->condition != CARRY)
   if (ifx) {
     //DEBUGpc ("generate control flow");
-    rIfx.condition ^= 1;
     genSkipc (&rIfx);
     ifx->generated = 1;
   } // if

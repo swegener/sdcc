@@ -5,6 +5,7 @@
 	* configure.in: find appropriate data-types on host for SDCC's int and long
 	* sdccconf_in.h: find appropriate data-types on host for SDCC's int and long
 	* src/xa51/gen.c: use %d, not %ld for 4 byte variables
+	* sdcc_vc_in.h: use appropriate data-types on host for SDCC's int and long
 
 2003-03-07    <johan@balder>
 

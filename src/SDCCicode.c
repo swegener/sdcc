@@ -2498,6 +2498,9 @@ geniCodeAssign (operand * left, operand * right, int nosupdate)
      check if the literal value is within bounds */
   if (IS_INTEGRAL (ltype) && right->type == VALUE && IS_LITERAL (rtype))
     {
+      /* TODO: this won't warn for e.g. int = -12345678, or bit = -1
+	 we need a checkConstant2Type(constVal,sym_link *)
+	 also for send and return */
       int nbits = bitsForType (ltype);
       long v = (long) operandLitValue (right);
 

@@ -264,9 +264,9 @@ extern regs* newReg(short type, short pc_type, int rIdx, char *name, int size, i
 
 void pic16_setMaxRAM(int size)
 {
+  regs * reg;
   pic->maxRAMaddress = size;
   stackPos = pic->RAMsize-1;
-  regs * reg;
 
 	reg=newReg(REG_SFR, PO_SFR_REGISTER, stackPos, "stack", 1, 0, NULL);
 	addSet(&pic16_fix_udata, reg);

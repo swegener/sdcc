@@ -4000,7 +4000,7 @@ genPlus (iCode * ic)
   if ( AOP_IS_STR(IC_LEFT(ic)) &&
       isOperandLiteral(IC_RIGHT(ic)) && OP_SYMBOL(IC_RESULT(ic))->ruonly) {
       aopOp (IC_RIGHT (ic), ic, TRUE, FALSE);
-      size = floatFromVal (AOP (IC_RIGHT(ic))->aopu.aop_lit);
+      size = (int)floatFromVal (AOP (IC_RIGHT(ic))->aopu.aop_lit);
       if (size <= 9) {
 	  while (size--) emitcode ("inc","dptr");
       } else {
@@ -4586,7 +4586,7 @@ genMultOneByte (operand * left,
 
   /* if literal */
   if (AOP_TYPE(right)==AOP_LIT) {
-    signed char val=floatFromVal (AOP (right)->aopu.aop_lit);
+    signed char val=(signed char)floatFromVal (AOP (right)->aopu.aop_lit);
     /* AND literal negative */
     if ((int) val < 0) {
       emitcode ("cpl", "F0"); // complement sign flag
@@ -4667,7 +4667,7 @@ static void genMultTwoByte (operand *left, operand *right,
 	if (!umult) {
 		emitcode("clr","F0");
 		if (AOP_TYPE(right) == AOP_LIT) {
-			int val=floatFromVal (AOP (right)->aopu.aop_lit);
+			int val=(int)floatFromVal (AOP (right)->aopu.aop_lit);
 			if (val < 0) {
 				emitcode("setb","F0");
 				val = -val;
@@ -5010,7 +5010,7 @@ static void genDivTwoByte (operand *left, operand *right,
 	/* load up MB with right */
 	if (!umult) {
 		if (AOP_TYPE(right) == AOP_LIT) {
-			int val=floatFromVal (AOP (right)->aopu.aop_lit);
+			int val=(int)floatFromVal (AOP (right)->aopu.aop_lit);
 			if (val < 0) {
 				lbl = newiTempLabel(NULL);
 				emitcode ("jbc","F0,!tlabel",lbl->key+100);
@@ -5267,7 +5267,7 @@ static void genModTwoByte (operand *left, operand *right,
 	/* load up MB with right */
 	if (!umult) {
 		if (AOP_TYPE(right) == AOP_LIT) {
-			int val=floatFromVal (AOP (right)->aopu.aop_lit);
+			int val=(int)floatFromVal (AOP (right)->aopu.aop_lit);
 			if (val < 0) {
 				val = -val;
 			} 

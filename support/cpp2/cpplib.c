@@ -1135,7 +1135,7 @@ do_pragma_sdcc_hash (pfile)
      cpp_reader *pfile;
 {
     cpp_token tok;
-    cpp_hashnode *hp;
+    /*cpp_hashnode *hp;*/
 
     _cpp_lex_token (pfile, &tok);
     if (tok.type == CPP_PLUS)

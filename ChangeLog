@@ -1,3 +1,22 @@
+2003-08-04  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+	Fixed some warnings when building with MSVC:
+
+	* as\mcs51\asdata.c
+	* as\z80\asdata.c
+	* as\mcs51\asm.h
+	* as\z80\asm.h
+	* link\z80\aslink.h
+	* link\z80\lkdata.c
+	* link\z80\lkeval.c
+	* link\z80\lkgb.c
+	* link\z80\lkihx.c
+	* link\z80\lks19.c
+	* link\z80\lksym.c
+	* support\cpp2\cpplib.c
+	* src\ds390\gen.c
+	* src\mcs51\gen.c
+    
 2003-08-03  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCast.c (constExprTree): fix bug #781827 by Carl Worth <cworth@isi.edu>

@@ -3579,7 +3579,7 @@ genMultOneByte (operand * left,
 
   /* if literal */
   if (AOP_TYPE(right)==AOP_LIT) {
-    signed char val=floatFromVal (AOP (right)->aopu.aop_lit);
+    signed char val=(signed char)floatFromVal (AOP (right)->aopu.aop_lit);
     /* AND literal negative */
     if (val < 0) {
       emitcode ("cpl", "F0"); // complement sign flag

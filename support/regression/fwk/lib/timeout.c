@@ -49,6 +49,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/resource.h>
 
 /* Get the status from all child processes that have terminated, without ever waiting.
    This function is designed to be a handler for SIGCHLD, the signal that indicates

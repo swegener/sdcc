@@ -1,3 +1,7 @@
+2004-01-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/z80/gen.c (aopPut): fixed bug #1103902
+
 2004-01-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* device/lib/expf.c: fixed bug #1095792

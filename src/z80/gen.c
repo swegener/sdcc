@@ -1879,48 +1879,46 @@ aopPut (asmop * aop, const char *s, int offset)
 
     case AOP_SFR:
       if( IS_GB )
-      {
-        //  wassert (IS_GB);
-        if (strcmp (s, "a"))
-          emit2 ("ld a,%s", s);
-        emit2 ("ldh (%s+%d),a", aop->aopu.aop_dir, offset);
-      }
+        {
+          //  wassert (IS_GB);
+          if (strcmp (s, "a"))
+            emit2 ("ld a,%s", s);
+          emit2 ("ldh (%s+%d),a", aop->aopu.aop_dir, offset);
+        }
       else
-      { /*.p.t.20030716 handling for i/o port read access for Z80 */
-        if( aop->paged )
-        { /* banked mode */
-          if( aop->bcInUse )  emit2( "push bc" );
+        { /*.p.t.20030716 handling for i/o port read access for Z80 */
+          if (aop->paged)
+            { /* banked mode */
+              if (aop->bcInUse)
+                emit2( "push bc" );
 
-          emit2( "ld bc,#%s", aop->aopu.aop_dir );
-
-          if(( s[0] == '#'    ) /* immediate number */
-           ||( s[0] == '('    ) /* indirect register (ix or iy ??)*/
-           ||( isdigit( s[0] )))/* indirect register with offset (ix or iy ??)*/
-          {
-            emit2( "ld a,%s", s );
-            emit2( "out (c),a"  );
-          }
-          else
-          {
-            emit2( "out (c),%s", s );
-          }
+              if (strlen(s) != 1
+                  || (s[0] != 'a' && s[0] != 'd' && s[0] != 'e'
+                      && s[0] != 'h' && s[0] != 'l'))
+                {
+                  emit2( "ld a,%s", s );
+                  s = "a";
+                }
+              
+              emit2( "ld bc,#%s", aop->aopu.aop_dir );
+              emit2( "out (c),%s", s );
         
-          if( aop->bcInUse )
-            emit2( "pop bc"    );
+              if( aop->bcInUse )
+                emit2( "pop bc"    );
+              else
+                spillPair (PAIR_BC);
+            }
+          else if( z80_opts.port_mode == 180 )
+            { /* z180 in0/out0 mode */
+              emit2( "ld a,%s", s );
+              emit2( "out0 (%s),a", aop->aopu.aop_dir );
+            }
           else
-            spillPair (PAIR_BC);
+            { /* 8 bit mode */
+              emit2( "ld a,%s", s );
+              emit2( "out (%s),a", aop->aopu.aop_dir );
+            }
         }
-        else if( z80_opts.port_mode == 180 )
-        { /* z180 in0/out0 mode */
-          emit2( "ld a,%s", s );
-          emit2( "out0 (%s),a", aop->aopu.aop_dir );
-        }
-        else
-        { /* 8 bit mode */
-          emit2( "ld a,%s", s );
-          emit2( "out (%s),a", aop->aopu.aop_dir );
-        }
-      }
       break;
 
     case AOP_REG:

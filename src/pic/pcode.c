@@ -83,7 +83,7 @@ int GpcFlowSeq = 1;
 extern void RemoveUnusedRegisters(void);
 extern void RegsUnMapLiveRanges(void);
 extern void BuildFlowTree(pBlock *pb);
-extern void pCodeRegOptimizeRegUsage(void);
+extern void pCodeRegOptimizeRegUsage(int level);
 
 /****************************************************************/
 /*                      Forward declarations                    */
@@ -4581,9 +4581,14 @@ void mergepBlocks(char dbName)
 /*-----------------------------------------------------------------*/
 /* AnalyzeFlow - Examine the flow of the code and optimize         */
 /*                                                                 */
+/* level 0 == minimal optimization                                 */
+/*   optimize registers that are used only by two instructions     */
+/* level 1 == maximal optimization                                 */
+/*   optimize by looking at pairs of instructions that use the     */
+/*   register.                                                     */
 /*-----------------------------------------------------------------*/
 
-void AnalyzeFlow(void)
+void AnalyzeFlow(int level)
 {
   static int times_called=0;
 
@@ -4661,7 +4666,7 @@ void AnalyzeFlow(void)
   RemoveUnusedRegisters();
 
   //  for(pb = the_pFile->pbHead; pb; pb = pb->next)
-  pCodeRegOptimizeRegUsage();
+  pCodeRegOptimizeRegUsage(level);
 
   OptimizepCode('*');
 
@@ -4710,8 +4715,8 @@ void AnalyzeBanking(void)
    * to determine the Register Banks they use
    */
 
-  AnalyzeFlow();
-  AnalyzeFlow();
+  AnalyzeFlow(0);
+  AnalyzeFlow(1);
 
   for(pb = the_pFile->pbHead; pb; pb = pb->next)
     BanksUsedFlow(pb);

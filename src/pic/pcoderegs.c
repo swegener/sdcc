@@ -41,8 +41,10 @@ extern void dbg_dumpregusage(void);
 extern pCode * findPrevInstruction(pCode *pci);
 extern pBranch * pBranchAppend(pBranch *h, pBranch *n);
 void unlinkpCode(pCode *pc);
+extern int pCodeSearchCondition(pCode *pc, unsigned int cond);
 
 int total_registers_saved=0;
+int register_optimization=1;
 
 /*-----------------------------------------------------------------*
  * void AddRegToFlow(regs *reg, pCodeFlow *pcfl)
@@ -431,8 +433,11 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
     pc2 = pc1;
     pc1 = pct1;
   }
-
-
+/*
+  fprintf(stderr,"pCodeOptime2pCodes\n");
+  pc1->print(stderr,pc1);
+  pc2->print(stderr,pc2);
+*/
   if((PCI(pc1)->op == POC_CLRF) && (PCI(pc2)->op == POC_MOVFW) ){
 
     /*
@@ -449,7 +454,6 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
     pCode *newpc;
     //fprintf(stderr, "   CLRF/MOVFW. instruction after MOVFW is:\n");
     pct1 = findNextInstruction(pc2->next);
-    //t->print(stderr,t);
 
     if(PCI(pct1)->op == POC_MOVWF) {
       newpc = newpCode(POC_CLRF, PCI(pct1)->pcop);
@@ -468,6 +472,14 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
   } else if((PCI(pc1)->op == POC_CLRF) && (PCI(pc2)->op == POC_IORFW) ){
     //fprintf(stderr, "   CLRF/IORFW.\n");
 
+    pct2 = findNextInstruction(pc2->next);
+
+    if(pCodeSearchCondition(pct2, PCC_Z) > 0) {
+      pct2 = newpCode(POC_IORLW, newpCodeOpLit(0));
+      pct2->seq = pc2->seq;
+      PCI(pct2)->pcflow = PCFL(pcfl_used);
+      pCodeInsertAfter(pc1,pct2);
+    }
     Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
     total_registers_saved++;  // debugging stats.
 
@@ -476,18 +488,48 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
     pct2 = findNextInstruction(pc2->next);
 
     if(PCI(pc2)->op == POC_MOVFW) {
-      //fprintf(stderr, "   MOVWF/MOVFW. instruction after MOVFW is:\n");
-      //pct2->print(stderr,pct2);
+      /*
+	fprintf(stderr, "   MOVWF/MOVFW. instruction after MOVFW is:\n");
+	pct2->print(stderr,pct2);
+      */
 
       if(PCI(pct2)->op == POC_MOVWF) {
+	/*
+	  Change:
+
+	    movwf   reg
+
+	    stuff...
+
+	    movf    reg,w
+            movwf   reg2
+
+	  To:
+
+	    
+	*/
 	reg2 = getRegFromInstruction(pct2);
-	if(reg2 && !regUsedinRange(pc1,pc2,reg2) && (reg2->type != REG_SFR)) {
-	  pct2->seq = pc1->seq;
-	  unlinkpCode(pct2);
-	  pCodeInsertAfter(pc1,pct2);
-	  Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
-	  total_registers_saved++;  // debugging stats.
-	  return 1;
+	//if(reg2 && !regUsedinRange(pc1,pc2,reg2) && (reg2->type != REG_SFR)) {
+	if(reg2 && !regUsedinRange(pc1,pc2,reg2)) {
+
+	  if(pCodeSearchCondition(pct2, PCC_Z) < 1) {
+	    pCode *pct3 = findNextInstruction(pct2->next);
+	    pct2->seq = pc1->seq;
+	    unlinkpCode(pct2);
+	    pCodeInsertAfter(findPrevInstruction(pc1->prev),pct2);
+
+#define usesW(x)       ((x) && (isPCI(x)) && ( (PCI(x)->inCond & PCC_W) != 0))
+
+	    if(usesW(pct3))
+	      ; // Remove2pcodes(pcfl_used, pc1, NULL, reg, can_free);
+	    else
+	      Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
+
+	    total_registers_saved++;  // debugging stats.
+	    return 1;
+	    } else {
+	      //fprintf(stderr,"didn't optimize because Z bit is used\n");
+	    }
 	}
 /*
 	fprintf(stderr, " couldn't optimize\n");
@@ -502,24 +544,56 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
     pct1 = findPrevInstruction(pc1->prev);
     if(pct1 && 
        (PCI(pct1)->pcflow == PCI(pc1)->pcflow) && 
-       (PCI(pct1)->op == POC_MOVFW)) {
+       (PCI(pct1)->op == POC_MOVFW) &&
+       (PCI(pc2)->op == POC_MOVFW)) {
 
       reg1 = getRegFromInstruction(pct1);
       if(reg1 && !regUsedinRange(pc1,pc2,reg1)) {
-	//fprintf(stderr, "   MOVF/MOVFW. \n");
 	/*
-	  movf   reg1,w
-	  movwf  reg
+	  fprintf(stderr, "   MOVF/MOVFW. \n");
+	  fprintf(stderr, "     ...optimizing\n");
+	*/
 
-	  stuff...
-	  opcode reg,w
+	/*
+	  Change:
+
+	    movf   reg1,w
+	    movwf  reg
+
+	    stuff...
+	    movf   reg,w
+
+	  To:
+
+	    stuff...
+
+	    movf   reg1,w
+
+	  Or, if we're not deleting the register then the "To" is:
+
+	    stuff...
+
+	    movf   reg1,w
+	    movwf  reg
+
+
 	*/
 	pct2 = newpCode(PCI(pc2)->op, PCI(pct1)->pcop);
 	pCodeInsertAfter(pc2, pct2);
 	PCI(pct2)->pcflow = PCFL(pcfl_used);
 	pct2->seq = pc2->seq;
 
-	Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
+	if(can_free) {
+	  Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
+	} else {
+	  /* If we're not freeing the register then that means (probably)
+	   * the register is needed somewhere else.*/
+	  unlinkpCode(pc1);
+	  pCodeInsertAfter(pct2, pc1);
+
+	  Remove2pcodes(pcfl_used, pc2, NULL, reg, can_free);
+	}
+
 	Remove2pcodes(pcfl_used, pct1, NULL, reg1, 0);
 	total_registers_saved++;  // debugging stats.
 
@@ -655,22 +729,19 @@ void OptimizeRegUsage(set *fregs, int optimize_multi_uses)
 
 	  if(pc1 && isPCI(pc1) &&  ( (pcfl1 = PCI(pc1)->pcflow) != NULL) ) {
 
-	    while(rset2 && searching) {
+	    //while(rset2 && searching) {
+	    if(rset2) {
 
 	      pc2 = rset2->item;
 	      if(pc2 && isPCI(pc2)  &&  ( (pcfl2 = PCI(pc2)->pcflow) != NULL) )  {
 		if(pcfl2 == pcfl1) {
-/*
-		  fprintf(stderr, " two instruction in same flow\n");
-		  pc1->print(stderr, pc1);
-		  pc2->print(stderr, pc2);
-*/
-		  //if(pCodeOptime2pCodes(pc1, pc2, pcfl_used, reg, 1))
-		  //  searching = 0;
+
+		  if(pCodeOptime2pCodes(pc1, pc2, pcfl_used, reg, 0))
+		  searching = 0;
 		}
 	      }
 
-	      rset2 = rset2->next;
+	      //rset2 = rset2->next;
 	      
 	    }
 	  }
@@ -685,35 +756,31 @@ void OptimizeRegUsage(set *fregs, int optimize_multi_uses)
 /*-----------------------------------------------------------------*
  * void pCodeRegOptimeRegUsage(pBlock *pb) 
  *-----------------------------------------------------------------*/
-void pCodeRegOptimizeRegUsage(void)
+void pCodeRegOptimizeRegUsage(int level)
 {
 
   int passes;
   int saved = 0;
   int t = total_registers_saved;
-  int optimize_multi = 0;
+
+  if(!register_optimization)
+    return;
+
+  passes = 4;
 
   do {
-    passes = 4;
+    saved = total_registers_saved;
 
-    //fprintf(stderr, " multi opti %d\n",optimize_multi);
+    /* Identify registers used in one flow sequence */
+    OptimizeRegUsage(dynAllocRegs,level);
+    OptimizeRegUsage(dynStackRegs,level);
+    OptimizeRegUsage(dynDirectRegs,0);
 
-    do {
-      saved = total_registers_saved;
-
-      /* Identify registers used in one flow sequence */
-      OptimizeRegUsage(dynAllocRegs,optimize_multi);
-      OptimizeRegUsage(dynStackRegs,0);
-      OptimizeRegUsage(dynDirectRegs,0);
-
-      if(total_registers_saved != saved)
-	fprintf(stderr, " *** Saved %d registers, total saved %d ***\n", total_registers_saved-saved,total_registers_saved);
+    if(total_registers_saved != saved)
+      fprintf(stderr, " *** pass %d, Saved %d registers, total saved %d ***\n", (5-passes),total_registers_saved-saved,total_registers_saved);
       
 
-    } while( passes-- && (total_registers_saved != saved));
-
-    optimize_multi++;  
-  } while (optimize_multi < 2);
+  } while( passes-- && (total_registers_saved != saved) );
 
   if(total_registers_saved == t) 
     fprintf(stderr, "No registers saved on this pass\n");

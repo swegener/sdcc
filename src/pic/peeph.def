@@ -247,3 +247,23 @@ replace restart {
 	movf	%1,w
 	movwf	%2
 }
+
+replace restart {
+	movwf	%1
+	movf	%1,w
+	movwf	%2
+} by {
+	; peep 9d - Removed redundant move
+	movwf	%1
+	movwf	%2
+} if NZ
+
+replace restart {
+	movwf	%1
+	iorlw	0
+	movf	%1,w
+} by {
+	; peep 10 - Removed unnecessary iorlw
+	movwf	%1
+	movf	%1
+}

@@ -19,6 +19,24 @@ void done(void)
   dummy++;
 
 }
+
+void
+delay_1ms(void)
+{
+  unsigned char cnt1m = 2;
+  unsigned char cnt500u = 249;
+
+  do {
+    do {
+      _asm
+        nop
+        nop
+      _endasm;
+    } while (--cnt500u > 0);
+  } while (--cnt1m > 0);
+}
+
+
 void main(void)
 {
   dummy = 0;

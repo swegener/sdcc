@@ -151,6 +151,8 @@ bitVectUnion (bitVect * bvp1, bitVect * bvp2)
 {
   int i;
   bitVect *newBvp;
+  unsigned int *pn, *p1, *p2;
+  int nbits;
 
   /* if both null */
   if (!bvp1 && !bvp2)
@@ -171,8 +173,20 @@ bitVectUnion (bitVect * bvp1, bitVect * bvp2)
     bvp2 = bitVectResize (bvp2, bvp1->size);
 
   newBvp = newBitVect (bvp1->size);
+  nbits = bvp1->bSize;
+  i = 0;
 
-  for (i = 0; i < bvp1->bSize; i++)
+  pn = (unsigned int *)newBvp->vect; 
+  p1 = (unsigned int *)bvp1->vect;
+  p2 = (unsigned int *)bvp2->vect;
+
+  while ((nbits - i) >= sizeof(*pn))
+    {
+      *pn++ = *p1++ | *p2++;
+      i += sizeof(*pn);
+    }
+
+  for (; i < nbits; i++)
     newBvp->vect[i] = bvp1->vect[i] | bvp2->vect[i];
 
 
@@ -187,6 +201,8 @@ bitVectIntersect (bitVect * bvp1, bitVect * bvp2)
 {
   int i;
   bitVect *newBvp;
+  unsigned int *pn, *p1, *p2;
+  int nbits;
 
   if (!bvp2 || !bvp1)
     return NULL;
@@ -199,8 +215,20 @@ bitVectIntersect (bitVect * bvp1, bitVect * bvp2)
     bvp2 = bitVectResize (bvp2, bvp1->size);
 
   newBvp = newBitVect (bvp1->size);
+  nbits = bvp1->bSize;
+  i = 0;
 
-  for (i = 0; i < bvp1->bSize; i++)
+  pn = (unsigned int *)newBvp->vect; 
+  p1 = (unsigned int *)bvp1->vect;
+  p2 = (unsigned int *)bvp2->vect;
+
+  while ((nbits - i) >= sizeof(*pn))
+    {
+      *pn++ = *p1++ & *p2++;
+      i += sizeof(*pn);
+    }
+
+  for (; i < nbits; i++)
     newBvp->vect[i] = bvp1->vect[i] & bvp2->vect[i];
 
   return newBvp;
@@ -214,11 +242,27 @@ int
 bitVectBitsInCommon (bitVect * bvp1, bitVect * bvp2)
 {
   int i;
+  int nbits;
+  unsigned int *p1, *p2;
 
   if (!bvp1 || !bvp2)
     return 0;
 
-  for (i = 0; i < min (bvp1->bSize, bvp2->bSize); i++)
+  nbits = min (bvp1->bSize, bvp2->bSize);
+  i = 0;
+
+  p1 = (unsigned int *)bvp1->vect;
+  p2 = (unsigned int *)bvp2->vect;
+
+  while ((nbits-i) >= sizeof(*p1))
+    {
+      if (*p1 & *p2)
+        return 1;
+      p1++; p2++;
+      i += sizeof(*p1);
+    }
+
+  for (; i < nbits; i++)
     if (bvp1->vect[i] & bvp2->vect[i])
       return 1;
 
@@ -232,6 +276,8 @@ bitVect *
 bitVectCplAnd (bitVect * bvp1, bitVect * bvp2)
 {
   int i;
+  unsigned int *p1, *p2;
+  int nbits;
 
   if (!bvp2)
     return bvp1;
@@ -246,7 +292,20 @@ bitVectCplAnd (bitVect * bvp1, bitVect * bvp2)
   else if (bvp2->size < bvp1->size)
     bvp2 = bitVectResize (bvp2, bvp1->size);
 
-  for (i = 0; i < bvp1->bSize; i++)
+  nbits = bvp1->bSize;
+  i = 0;
+
+  p1 = (unsigned int *)bvp1->vect;
+  p2 = (unsigned int *)bvp2->vect;
+
+  while ((nbits - i) >= sizeof(*p1))
+    {
+      *p1 = *p1 & (~*p2);
+      p2++; p1++;
+      i += sizeof(*p1);
+    }
+
+  for (; i < nbits; i++)
     bvp1->vect[i] = bvp1->vect[i] & (~bvp2->vect[i]);
 
   return bvp1;
@@ -319,31 +378,59 @@ bitVectCopy (bitVect * bvp)
 int 
 bitVectnBitsOn (bitVect * bvp)
 {
-  int i, j, k;
+  int i, j;
   unsigned char byte;
   int count = 0;
+  unsigned int *p1;
+
+  /* The bit vector is highest to lowest.  Interesting. */
+  unsigned int mask[] = {
+    0, 128, 128+64, 128+64+32, 128+64+32+16,
+    128+64+32+16+8, 128+64+32+16+8+4, 128+64+32+16+8+4+2
+  };
 
   if (!bvp)
     return 0;
 
-  /* rip through most of the data in byte sized chunks */
-  j = (bvp->size) / 8;
-  for (i = 0; i < j; i++)
+  /* j is the number of bytes in the bitvect */
+  j = (bvp->size+7) / 8;
+
+  /* Fix up the highest bits in the top byte so that we can iterate over
+     all of them. */
+  if (bvp->size%8 != 0)
     {
-      byte = bvp->vect[i];
-      for (k = 0; k < 8; k++)
-	{
-	  count += byte & 1;
-	  byte = byte >> 1;
-	}
+      bvp->vect[j-1] &= mask[bvp->size&7];
     }
 
-  /* finish up the last fractional byte, if any */
-  for (i = j * 8; i < bvp->size; i++)
-    count += bitVectBitValue (bvp, i);
+  /* Take care of things in machine word chunks if possible.  As we
+     are only counting bits it does not matter which order they are
+     counted in.
+  */
+  i = 0;
+  p1 = (unsigned int *)bvp->vect;
 
+  while ((j-i) >= sizeof(*p1))
+    {
+      unsigned int word = *p1++;
+      while (word)
+        {
+          count++;
+          word &= word-1;
+        }
+      i += sizeof(*p1);
+    }
+
+  /* Take care of the rest of the bitvect. */
+  for (; i < j; i++)
+    {
+      byte = bvp->vect[i];
+      while (byte)
+        {
+          count++;
+          byte &= byte-1;
+        }
+    }
   return count;
-
 }
 
 /*-----------------------------------------------------------------*/

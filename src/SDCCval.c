@@ -39,7 +39,7 @@ newValue ()
 {
   value *val;
 
-  val = Safe_calloc (1, sizeof (value));
+  val = Safe_alloc (sizeof (value));
 
   return val;
 }
@@ -53,7 +53,7 @@ newiList (int type, void *ilist)
   initList *nilist;
 
 
-  nilist = Safe_calloc (1, sizeof (initList));
+  nilist = Safe_alloc (sizeof (initList));
 
   nilist->type = type;
   nilist->lineno = yylineno;
@@ -139,7 +139,7 @@ convertIListToConstList(initList *src, literalList **lList)
 	}
 	else
 	{
-	    newL = Safe_malloc(sizeof(literalList));
+	    newL = Safe_alloc(sizeof(literalList));
 	    newL->literalValue = val;
 	    newL->count = 1;
 	    newL->next = NULL;
@@ -175,7 +175,7 @@ copyLiteralList(literalList *src)
     
     while (src)
     {
-	newL = Safe_malloc(sizeof(literalList));
+	newL = Safe_alloc(sizeof(literalList));
 	
 	newL->literalValue = src->literalValue;
 	newL->count = src->count;
@@ -652,7 +652,7 @@ strVal (char *s)
   SPEC_NOUN (val->etype) = V_CHAR;
   SPEC_SCLS (val->etype) = S_LITERAL;
 
-  SPEC_CVAL (val->etype).v_char = Safe_calloc (1, strlen (s) + 1);
+  SPEC_CVAL (val->etype).v_char = Safe_alloc (strlen (s) + 1);
   DCL_ELEM (val->type) = copyStr (SPEC_CVAL (val->etype).v_char, s);
 
   return val;

@@ -11,6 +11,7 @@ SHELL		= /bin/sh
 CC		= @CC@
 CPP		= @CPP@
 INSTALL		= @INSTALL@
+STRIP           = @STRIP@
 
 PRJDIR		= ../..
 SLIB		= $(PRJDIR)/support/Util
@@ -53,7 +54,8 @@ all: checkconf $(TARGET)
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) -s $(TARGET) $(bindir)/sdcdb
+	$(INSTALL) $(TARGET) $(bindir)/sdcdb
+	$(STRIP) $(bindir)/sdcdb
 	cp $(PRJDIR)/debugger/mcs51/sdcdb.el $(bindir)/sdcdb.el
 	cp $(PRJDIR)/debugger/mcs51/sdcdbsrc.el $(bindir)/sdcdbsrc.el
 

@@ -91,7 +91,7 @@ struct options  save_options  ;
 <asm>"_endasm" { 
   count();
   *asmp = '\0';
-  yylval.yyinline = Safe_calloc (1, strlen(asmbuff)+1);
+  yylval.yyinline = Safe_alloc (strlen(asmbuff)+1);
   strcpy(yylval.yyinline,asmbuff);
   BEGIN(INITIAL);
   return (INLINEASM);
@@ -288,7 +288,7 @@ int checkCurrFile ( char *s)
 	/* mark the end of the filename */
 	while (*s != '"') s++;
 	*s = '\0';
-	currFname = Safe_calloc(1,strlen(sb)+1);
+	currFname = Safe_alloc (strlen(sb)+1);
 	strcpy(currFname,sb);
 	lineno = yylineno = lNum;
     }

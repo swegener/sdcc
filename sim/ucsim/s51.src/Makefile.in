@@ -12,6 +12,7 @@ CPP		= @CPP@
 CXXCPP		= @CXXCPP@
 RANLIB		= @RANLIB@
 INSTALL		= @INSTALL@
+STRIP		= @STRIP@
 
 PRJDIR		= ..
 
@@ -66,8 +67,8 @@ test_ser.ihx: test_ser.rel
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	if test -f s51.exe; then $(INSTALL) -s s51.exe $(bindir);fi
-	if test -f s51; then $(INSTALL) -s s51 $(bindir);fi
+	if test -f s51.exe; then $(INSTALL) s51.exe $(bindir); $(STRIP) $(bindir)/s51.exe; fi
+	if test -f s51; then $(INSTALL) s51 $(bindir); $(STRIP) $(bindir)/s51; fi
 
 
 # Deleting all the installed files

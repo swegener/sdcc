@@ -34,7 +34,7 @@ newCseDef (operand * sym, iCode * ic)
   cseDef *cdp;
 
   assert (sym);
-  cdp = Safe_calloc (1, sizeof (cseDef));
+  cdp = Safe_alloc (sizeof (cseDef));
 
   cdp->sym = sym;
   cdp->diCode = ic;

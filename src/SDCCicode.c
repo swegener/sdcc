@@ -499,7 +499,7 @@ newOperand ()
 {
   operand *op;
 
-  op = Safe_calloc (1, sizeof (operand));
+  op = Safe_alloc ( sizeof (operand));
 
   op->key = 0;
   return op;
@@ -513,7 +513,7 @@ newiCode (int op, operand * left, operand * right)
 {
   iCode *ic;
 
-  ic = Safe_calloc (1, sizeof (iCode));
+  ic = Safe_alloc ( sizeof (iCode));
 
   ic->lineno = lineno;
   ic->filename = filename;
@@ -3167,7 +3167,7 @@ lvalItem;
 /*-----------------------------------------------------------------*/
 void addLvaluereq(int lvl)
 {
-  lvalItem * lpItem = (lvalItem *)Safe_calloc (1, sizeof (lvalItem));
+  lvalItem * lpItem = (lvalItem *)Safe_alloc ( sizeof (lvalItem));
   lpItem->req=1;
   lpItem->lvl=lvl;
   addSetHead(&lvaluereqSet,lpItem);
@@ -3180,7 +3180,7 @@ void delLvaluereq()
 {
   lvalItem * lpItem;
   lpItem = getSet(&lvaluereqSet);
-  if(lpItem) free(lpItem);
+  if(lpItem) Safe_free(lpItem);
 }
 /*-----------------------------------------------------------------*/
 /* clearLvaluereq - clear lvalreq flag			           */

@@ -220,8 +220,13 @@ static struct
     lineNode *head;
     lineNode *current;
     int isInline;
+    allocTrace trace;
   } lines;
 
+  struct
+  {
+    allocTrace aops;
+  } trace;
 } _G;
 
 static const char *aopGet (asmop * aop, int offset, bool bit16);
@@ -268,6 +273,17 @@ _tidyUp (char *buf)
     }
 }
 
+static lineNode *
+_newLineNode (char *line)
+{
+  lineNode *pl;
+
+  pl = traceAlloc(&_G.lines.trace, Safe_alloc ( sizeof (lineNode)));
+  pl->line = traceAlloc(&_G.lines.trace, Safe_strdup (line));
+
+  return pl;
+}
+
 static void
 _vemit2 (const char *szFormat, va_list ap)
 {
@@ -277,8 +293,8 @@ _vemit2 (const char *szFormat, va_list ap)
 
   _tidyUp (buffer);
   _G.lines.current = (_G.lines.current ?
-	      connectLine (_G.lines.current, newLineNode (buffer)) :
-	      (_G.lines.head = newLineNode (buffer)));
+	      connectLine (_G.lines.current, _newLineNode (buffer)) :
+	      (_G.lines.head = _newLineNode (buffer)));
 
   _G.lines.current->isInline = _G.lines.isInline;
 }
@@ -336,8 +352,8 @@ _emit2 (const char *inst, const char *fmt,...)
   if (lbp && *lbp)
     {
       _G.lines.current = (_G.lines.current ?
-                  connectLine (_G.lines.current, newLineNode (lb)) :
-                  (_G.lines.head = newLineNode (lb)));
+                  connectLine (_G.lines.current, _newLineNode (lb)) :
+                  (_G.lines.head = _newLineNode (lb)));
     }
   _G.lines.current->isInline = _G.lines.isInline;
   va_end (ap);
@@ -496,7 +512,7 @@ newAsmop (short type)
 {
   asmop *aop;
 
-  aop = Safe_calloc (1, sizeof (asmop));
+  aop = traceAlloc(&_G.trace.aops, Safe_alloc (sizeof (asmop)));
   aop->type = type;
   return aop;
 }
@@ -534,8 +550,7 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool requires_a)
   if (IS_FUNC (sym->type))
     {
       sym->aop = aop = newAsmop (AOP_IMMD);
-      aop->aopu.aop_immd = Safe_calloc (1, strlen (sym->rname) + 1);
-      strcpy (aop->aopu.aop_immd, sym->rname);
+      aop->aopu.aop_immd = traceAlloc(&_G.trace.aops, Safe_strdup (sym->rname));
       aop->size = 2;
       return aop;
     }
@@ -601,8 +616,7 @@ aopForRemat (symbol * sym)
       break;
     }
 
-  aop->aopu.aop_immd = Safe_calloc (1, strlen (buffer) + 1);
-  strcpy (aop->aopu.aop_immd, buffer);
+  aop->aopu.aop_immd = traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
   return aop;
 }
 
@@ -918,7 +932,7 @@ aopGetLitWordLong (asmop * aop, int offset, bool with_hash)
         {
           tsprintf (s, "%s + %d", aop->aopu.aop_immd, offset);
         }
-      return gc_strdup(s);
+      return traceAlloc(&_G.trace.aops, Safe_strdup(s));
 
     case AOP_LIT:
       {
@@ -947,7 +961,7 @@ aopGetLitWordLong (asmop * aop, int offset, bool with_hash)
 	    else
 	      tsprintf (buffer, "!constword", v);
 
-            return gc_strdup(buffer);
+            return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
 	  }
 	else
 	  {
@@ -1060,7 +1074,7 @@ fetchLitPair (PAIR_ID pairId, asmop * left, int offset)
 	    }
 	}
       _G.pairs[pairId].last_type = left->type;
-      _G.pairs[pairId].base = gc_strdup (base);
+      _G.pairs[pairId].base = traceAlloc(&_G.trace.aops, Safe_strdup (base));
       _G.pairs[pairId].offset = offset;
     }
   /* Both a lit on the right and a true symbol on the left */
@@ -1190,7 +1204,7 @@ aopGet (asmop * aop, int offset, bool bit16)
       aop->type != AOP_LIT) 
     {
       tsprintf (s, "!zero");
-      return gc_strdup(s);
+      return traceAlloc(&_G.trace.aops, Safe_strdup(s));
     }
 
   /* depending on type */
@@ -1216,21 +1230,21 @@ aopGet (asmop * aop, int offset, bool bit16)
 	    wassertl (0, "Fetching from beyond the limits of an immediate value.");
 	  }
 
-      return gc_strdup(s);
+      return traceAlloc(&_G.trace.aops, Safe_strdup(s));
 
     case AOP_DIR:
       wassert (IS_GB);
       emit2 ("ld a,(%s+%d)", aop->aopu.aop_dir, offset);
       sprintf (s, "a");
 
-      return gc_strdup(s);
+      return traceAlloc(&_G.trace.aops, Safe_strdup(s));
 
     case AOP_SFR:
       wassert (IS_GB);
       emit2 ("ldh a,(%s+%d)", aop->aopu.aop_dir, offset);
       sprintf (s, "a");
 
-      return gc_strdup(s);
+      return traceAlloc(&_G.trace.aops, Safe_strdup(s));
 
     case AOP_REG:
       return aop->aopu.aop_reg[offset]->name;
@@ -1240,14 +1254,14 @@ aopGet (asmop * aop, int offset, bool bit16)
       setupPair (PAIR_HL, aop, offset);
       tsprintf (s, "!*hl");
 
-      return gc_strdup (s);
+      return traceAlloc(&_G.trace.aops, Safe_strdup (s));
 
     case AOP_IY:
       wassert (IS_Z80);
       setupPair (PAIR_IY, aop, offset);
       tsprintf (s, "!*iyx", offset);
 
-      return gc_strdup(s);
+      return traceAlloc(&_G.trace.aops, Safe_strdup(s));
 
     case AOP_STK:
       if (IS_GB)
@@ -1262,7 +1276,7 @@ aopGet (asmop * aop, int offset, bool bit16)
 	  tsprintf (s, "!*ixx", aop->aopu.aop_stk + offset);
 	}
 
-      return gc_strdup(s);
+      return traceAlloc(&_G.trace.aops, Safe_strdup(s));
 
     case AOP_CRY:
       wassertl (0, "Tried to fetch from a bit variable");
@@ -1275,7 +1289,7 @@ aopGet (asmop * aop, int offset, bool bit16)
       else
         {
           tsprintf(s, "!zero");
-          return gc_strdup(s);
+          return traceAlloc(&_G.trace.aops, Safe_strdup(s));
         }
 
     case AOP_HLREG:
@@ -1292,7 +1306,7 @@ aopGet (asmop * aop, int offset, bool bit16)
         v >>= (offset * 8);
         tsprintf (s, "!immedbyte", (unsigned int) v & 0xff);
         
-        return gc_strdup(s);
+        return traceAlloc(&_G.trace.aops, Safe_strdup(s));
       }
     case AOP_STR:
       aop->coff = offset;
@@ -6206,6 +6220,9 @@ genZ80Code (iCode * lic)
       }
     codeOutFile = fp;
   }
+
+  freeTrace(&_G.lines.trace);
+  freeTrace(&_G.trace.aops);
 }
 
 /*
@@ -6246,7 +6263,7 @@ fetchLitSpecial (asmop * aop, bool negate, bool xor)
   v &= 0xFFFF;
 
   tsprintf (buffer, "!immedword", v);
-  return gc_strdup (buffer);
+  return traceAlloc(&_G.trace.aops, Safe_strdup (buffer));
 }
 
 

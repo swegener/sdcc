@@ -1135,7 +1135,7 @@ statement
    | jump_statement
    | INLINEASM  ';'      {
                             ast *ex = newNode(INLINEASM,NULL,NULL);
-			    ex->values.inlineasm = Safe_calloc(1,strlen($1)+1);
+			    ex->values.inlineasm = Safe_alloc(strlen($1)+1);
 			    strcpy(ex->values.inlineasm,$1);			    
 			    $$ = ex;
                          }   

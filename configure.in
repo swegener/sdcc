@@ -300,9 +300,18 @@ AC_ARG_ENABLE(device-lib-build,[  --disable-device-lib-build Disables automatica
 OPT_ENABLE_DEVICE_LIB_BUILD=$enable_device_lib_build
 AC_SUBST(OPT_ENABLE_DEVICE_LIB_BUILD)
 
-AC_ARG_ENABLE(packihx,[  -disable-packihx     Disables building packihx])
+AC_ARG_ENABLE(packihx,[  --disable-packihx       Disables building packihx])
 OPT_ENABLE_PACKIHX=$enable_packihx
 AC_SUBST(OPT_ENABLE_PACKIHX)
+
+AC_ARG_ENABLE(libgc,[  --enable-libgc          Use the Bohem memory allocator.  Lower runtime footprint.])
+if test "$enable_libgc" = "yes"; then
+        AC_CHECK_LIB(gc, GC_malloc)
+        OPT_ENABLE_LIBGC=1
+else
+        OPT_ENABLE_LIBGC=0
+fi
+AC_DEFINE_UNQUOTED(OPT_ENABLE_LIBGC, $OPT_ENABLE_LIBGC)
 
 #remove duplicates
 cat ports.all | uniq >ports

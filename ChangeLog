@@ -1,3 +1,23 @@
+2001-10-06  Michael Hope  <michaelh@juju.net.nz>
+
+	* src/SDCCpeeph.c (peepHole): Fixed all leaks.  Added trace support for freeing lines.  Optimised restart logic to re-run instead of restart.  Now compiles dscan.c on ~60MB instead of ~200MB.
+
+	* support/Util/NewAlloc.c: Added ability to use libgc instead of malloc.  Added Safe_free and Safe_strdup.  Added trace support where you can log allocations and free all at once.
+
+	* src/z80/gen.c (genZ80Code): Added de-allocation via trace support.
+
+	* src/pic/gen.c: Removed Safe_strdup.
+
+	* configure.in: Added option to enable libgc support.
+
+	* src/SDCCbitv.c (bitVectnBitsOn): Optimised.
+	(bitVectUnion): Optimised.
+	(bitVectIntersect): Optimised.
+	(bitVectBitsInCommon): Optimised.
+	(bitVectCplAnd): Optimised.
+
+	* support/makebin/makebin.c (usage): Removed getopt as mingw32 doesn't have it.  Sigh.
+
 2001-10-03 Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCmain.c: distinguish between assembler debug and plain options
@@ -55,6 +75,12 @@
 	* support/regression/ports/host/spec.mk: removed GENERIC
 	* support/regression/ports/mcs51/spec.mk: removed GENERIC
 	* support/regression/ports/z80/spec.mk: removed GENERIC
+
+2001-10-01  Michael Hope  <michaelh@juju.net.nz>
+
+	* support/regression/fwk/lib/testfwk.c (__printf): Removed GENERIC.
+
+	* support/regression/tests/bug-467035.c: Created.
 
 2001-10-01    <johan@FRIJA>
 

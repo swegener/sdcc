@@ -32,3 +32,5 @@
 
 #include "asm.h"
 #include "port.h"
+
+#include "newalloc.h"

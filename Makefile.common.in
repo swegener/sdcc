@@ -50,6 +50,8 @@ CPPFLAGS        = $(INCLUDEFLAGS) -I. -I$(PRJDIR) -I$(SLIB)
 CFLAGS          = @CFLAGS@ -Wall
 M_OR_MM         = @M_OR_MM@
 
+EXTRALIBS	= @LIBS@
+
 # Shared settings between all the sub Makefiles
 # Done here so that we don't have to start a Make from the top levelport
 # directory.

@@ -46,7 +46,7 @@ allocMap (char rspace,		/* sfr space            */
 {
   memmap *map;
 
-  if (!(map = calloc (sizeof (memmap), 1)))
+  if (!(map = Safe_alloc (sizeof (memmap))))
     {
       werror (E_OUT_OF_MEM, __FILE__, sizeof (memmap));
       exit (1);

@@ -72,7 +72,7 @@ newBucket ()
 {
   bucket *bp;
 
-  bp = Safe_calloc (1, sizeof (bucket));
+  bp = Safe_alloc ( sizeof (bucket));
 
   return bp;
 }
@@ -121,7 +121,7 @@ addSym (bucket ** stab,
   /* the symbols are always added at the head of the list  */
   i = hashKey (sname);
   /* get a free entry */
-  bp = Safe_calloc (1, sizeof (bucket));
+  bp = Safe_alloc ( sizeof (bucket));
 
   bp->sym = sym;		/* update the symbol pointer  */
   bp->level = level;		/* update the nest level      */
@@ -273,7 +273,7 @@ newSymbol (char *name, int scope)
 {
   symbol *sym;
 
-  sym = Safe_calloc (1, sizeof (symbol));
+  sym = Safe_alloc ( sizeof (symbol));
 
   strcpy (sym->name, name);	/* copy the name    */
   sym->level = scope;		/* set the level    */
@@ -290,7 +290,7 @@ newLink ()
 {
   sym_link *p;
 
-  p = Safe_calloc (1, sizeof (sym_link));
+  p = Safe_alloc ( sizeof (sym_link));
 
   return p;
 }
@@ -303,7 +303,7 @@ newStruct (char *tag)
 {
   structdef *s;
 
-  s = Safe_calloc (1, sizeof (structdef));
+  s = Safe_alloc ( sizeof (structdef));
 
   strcpy (s->tag, tag);		/* copy the tag            */
   return s;

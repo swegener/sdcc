@@ -23,11 +23,6 @@
 -------------------------------------------------------------------------*/
 
 #include <stdio.h>
-#if defined(__APPLE__) && defined(__MACH__)
-#include <sys/malloc.h>
-#else
-#include <malloc.h>
-#endif
 #include "newalloc.h"
 #include <assert.h>
 #include "SDCCset.h"
@@ -40,7 +35,7 @@ newSet ()
 {
   set *lp;
 
-  lp = Safe_calloc (1, sizeof (set));
+  lp = Safe_alloc ( sizeof (set));
 //  if (lp == 0) {
   //  fprintf(stderr, "out of virtual memory: %s\n", __FILE__);
   //  exit(1);
@@ -558,6 +553,6 @@ setToNull (void **item)
 
   if (!*item)
     return;
-  free (*item);
+  Safe_free (*item);
   *item = NULL;
 }

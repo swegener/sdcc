@@ -93,8 +93,6 @@ static struct {
     set *sendSet;
 } _G;
 
-char *Safe_strdup(char *str);  // in pcode.c
-
 extern int pic14_ptrRegReq ;
 extern int pic14_nRegs;
 extern FILE *codeOutFile;

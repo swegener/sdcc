@@ -509,7 +509,7 @@ processFile (char *s)
 
       /* get rid of the "." */
       strtok (buffer, ".");
-      srcFileName = Safe_calloc (1, strlen (buffer) + 1);
+      srcFileName = Safe_alloc ( strlen (buffer) + 1);
       strcpy (srcFileName, buffer);
 
       /* get rid of any path information
@@ -522,7 +522,7 @@ processFile (char *s)
 	     *(fext - 1) != '/' &&
 	     *(fext - 1) != ':')
 	fext--;
-      moduleName = Safe_calloc (1, strlen (fext) + 1);
+      moduleName = Safe_alloc ( strlen (fext) + 1);
       strcpy (moduleName, fext);
 
       return;
@@ -1076,7 +1076,7 @@ linkEdit (char **envp)
     segName = strdup(N); \
     c = strtok(segName, " \t"); \
     fprintf (lnkfile,"-b %s = 0x%04x\n", c, L); \
-    if (segName) { free(segName); }
+    if (segName) { Safe_free(segName); }
 
   /* code segment start */
   WRITE_SEG_LOC (CODE_NAME, options.code_loc);
@@ -1268,7 +1268,7 @@ preProcess (char **envp)
       setMainValue ("cppextraopts", join(preArgv));
       
       if (!preProcOnly)
-          preOutName = strdup (tempfilename ());
+          preOutName = Safe_strdup (tempfilename ());
 
       /* Have to set cppoutfilename to something, even if just pre-processing. */
       setMainValue ("cppoutfilename", preOutName ? preOutName : "");
@@ -1284,7 +1284,7 @@ preProcess (char **envp)
           if (preOutName)
             {
               unlink (preOutName);
-              free (preOutName);
+              Safe_free (preOutName);
             }
           // EndFix
 	  exit (1);
@@ -1544,7 +1544,7 @@ main (int argc, char **argv, char **envp)
                   if (yyin && yyin != stdin)
                     fclose (yyin);
                   unlink (preOutName);
-                  free (preOutName);
+                  Safe_free (preOutName);
                 }
               // EndFix
 	      return 1;
@@ -1564,7 +1564,7 @@ main (int argc, char **argv, char **envp)
               if (yyin && yyin != stdin)
                 fclose (yyin);
               unlink (preOutName);
-              free (preOutName);
+              Safe_free (preOutName);
             }
           // EndFix
           #if defined (__MINGW32__) || defined (__CYGWIN__) || defined (_MSC_VER)
@@ -1583,7 +1583,7 @@ main (int argc, char **argv, char **envp)
   if (preOutName && !options.c1mode)
     {
       unlink (preOutName);
-      free (preOutName);
+      Safe_free (preOutName);
     }
 
   if (!options.cc_only &&

@@ -38,6 +38,8 @@
 #undef OPT_DISABLE_I186
 #undef OPT_DISABLE_TLCS900H
 
+#undef OPT_ENABLE_LIBGC
+
 #endif
 
 /* End of config.h */

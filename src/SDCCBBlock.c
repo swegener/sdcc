@@ -24,7 +24,6 @@
 -------------------------------------------------------------------------*/
 
 #include "common.h"
-#include "newalloc.h"
 
 int eBBNum = 0;
 set *graphEdges = NULL;		/* list of edges in this flow graph */
@@ -65,7 +64,7 @@ neweBBlock ()
 {
   eBBlock *ebb;
 
-  ebb = Safe_calloc (1, sizeof (eBBlock));
+  ebb = Safe_alloc (sizeof (eBBlock));
   return ebb;
 }
 
@@ -77,7 +76,7 @@ newEdge (eBBlock * from, eBBlock * to)
 {
   edge *ep;
 
-  ep = Safe_calloc (1, sizeof (edge));
+  ep = Safe_alloc (sizeof (edge));
 
   ep->from = from;
   ep->to = to;
@@ -437,7 +436,7 @@ iCodeBreakDown (iCode * ic, int *count)
 
   /* allocate for the first entry */
 
-  ebbs = Safe_calloc (1, sizeof (eBBlock **));
+  ebbs = Safe_alloc (sizeof (eBBlock **));
 
   while (loop)
     {

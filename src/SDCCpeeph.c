@@ -24,11 +24,9 @@
 -------------------------------------------------------------------------*/
 
 #include "common.h"
-#include "SDCCpeeph.h"
-#include "newalloc.h"
 
-peepRule *rootRules = NULL;
-peepRule *currRule = NULL;
+static peepRule *rootRules = NULL;
+static peepRule *currRule = NULL;
 
 #define HTAB_SIZE 53
 typedef struct
@@ -38,7 +36,13 @@ typedef struct
   }
 labelHashEntry;
 
-hTab *labelHash = NULL;
+static hTab *labelHash = NULL;
+
+static struct
+{
+  allocTrace values;
+  allocTrace labels;
+} _G;
 
 static int hashSymbolName (const char *name);
 static void buildLabelRefCountHash (lineNode * head);
@@ -105,7 +109,7 @@ FBYNAME (labelInRange)
   if (!lbl)
     return FALSE;
 
-  /* if the previous teo instructions are "ljmp"s then don't
+  /* if the previous two instructions are "ljmp"s then don't
      do it since it can be part of a jump table */
   if (currPl->prev && currPl->prev->prev &&
       strstr (currPl->prev->line, "ljmp") &&
@@ -300,14 +304,14 @@ newPeepRule (lineNode * match,
 {
   peepRule *pr;
 
-  pr = Safe_calloc (1, sizeof (peepRule));
+  pr = Safe_alloc ( sizeof (peepRule));
   pr->match = match;
   pr->replace = replace;
   pr->restart = restart;
 
   if (cond && *cond)
     {
-      pr->cond = Safe_calloc (1, strlen (cond) + 1);
+      pr->cond = Safe_alloc ( strlen (cond) + 1);
       strcpy (pr->cond, cond);
     }
   else
@@ -332,8 +336,8 @@ newLineNode (char *line)
 {
   lineNode *pl;
 
-  pl = Safe_calloc (1, sizeof (lineNode));
-  pl->line = Safe_calloc (1, strlen (line) + 1);
+  pl = Safe_alloc ( sizeof (lineNode));
+  pl->line = Safe_alloc ( strlen (line) + 1);
   strcpy (pl->line, line);
   return pl;
 }
@@ -568,10 +572,10 @@ bindVar (int key, char **s, hTab ** vtab)
   *s = vvx;
   *vv = '\0';
   /* got value */
-  vvx = Safe_calloc (1, strlen (vval) + 1);
+  vvx = traceAlloc (&_G.values, Safe_alloc(strlen (vval) + 1));
   strcpy (vvx, vval);
-  hTabAddItem (vtab, key, vvx);
 
+  hTabAddItem (vtab, key, vvx);
 }
 
 /*-----------------------------------------------------------------*/
@@ -659,7 +663,6 @@ matchRule (lineNode * pl,
   lineNode *spl;		/* source pl */
   lineNode *rpl;		/* rule peep line */
 
-  hTabClearAll (pr->vars);
 /*     setToNull((void **) &pr->vars);    */
 /*     pr->vars = newHashTable(100); */
 
@@ -891,7 +894,7 @@ buildLabelRefCountHash (lineNode * head)
 	{
 	  labelHashEntry *entry;
 
-	  entry = Safe_calloc (1, sizeof (labelHashEntry));
+	  entry = traceAlloc (&_G.labels, Safe_alloc(sizeof (labelHashEntry)));
 
 	  memcpy (entry->name, label, labelLen);
 	  entry->name[labelLen] = 0;
@@ -944,6 +947,21 @@ buildLabelRefCountHash (lineNode * head)
 #endif
 }
 
+/* How does this work?
+   peepHole
+    For each rule,
+     For each line,
+      Try to match
+      If it matches,
+       replace and restart.
+
+    matchRule
+     matchLine
+
+  Where is stuff allocated?
+  
+*/
+
 /*-----------------------------------------------------------------*/
 /* peepHole - matches & substitutes rules                          */
 /*-----------------------------------------------------------------*/
@@ -953,43 +971,65 @@ peepHole (lineNode ** pls)
   lineNode *spl;
   peepRule *pr;
   lineNode *mtail = NULL;
+  bool restart;
+
+  assert(labelHash == NULL);
+
+  do
+    {
+      restart = FALSE;
+
+      /* for all rules */
+      for (pr = rootRules; pr; pr = pr->next)
+        {
+          fflush(stdout);
+          
+          for (spl = *pls; spl; spl = spl->next)
+            {
+              /* if inline assembler then no peep hole */
+              if (spl->isInline)
+                continue;
+              
+              mtail = NULL;
+              
+              /* Tidy up any data stored in the hTab */
+              
+              /* if it matches */
+              if (matchRule (spl, &mtail, pr, *pls))
+                {
+                  
+                  /* then replace */
+                  if (spl == *pls)
+                    replaceRule (pls, mtail, pr);
+                  else
+                    replaceRule (&spl, mtail, pr);
+                  
+                  /* if restart rule type then
+                     start at the top again */
+                  if (pr->restart)
+                    {
+                      restart = TRUE;
+                    }
+                }
+              
+              if (pr->vars)
+                {
+                  hTabDeleteAll (pr->vars);
+                  Safe_free (pr->vars);
+                  pr->vars = NULL;
+                }
+              
+              freeTrace (&_G.values);
+            }
+        }
+    } while (restart == TRUE);
 
   if (labelHash)
     {
       hTabDeleteAll (labelHash);
+      freeTrace (&_G.labels);
     }
   labelHash = NULL;
-
-top:
-  /* for all rules */
-  for (pr = rootRules; pr; pr = pr->next)
-    {
-
-      for (spl = *pls; spl; spl = spl->next)
-	{
-	  /* if inline assembler then no peep hole */
-	  if (spl->isInline)
-	    continue;
-
-	  mtail = NULL;
-
-	  /* if it matches */
-	  if (matchRule (spl, &mtail, pr, *pls))
-	    {
-
-	      /* then replace */
-	      if (spl == *pls)
-		replaceRule (pls, mtail, pr);
-	      else
-		replaceRule (&spl, mtail, pr);
-
-	      /* if restart rule type then
-	         start at the top again */
-	      if (pr->restart)
-		goto top;
-	    }
-	}
-    }
 }
 
 
@@ -1027,7 +1067,7 @@ readFileIntoBuffer (char *fname)
 	    }
 	  else
 	    {
-	      rs = Safe_calloc (1, strlen (lb) + 1);
+	      rs = Safe_alloc ( strlen (lb) + 1);
 	      strcpy (rs, lb);
 	    }
 	  nch = 0;
@@ -1046,7 +1086,7 @@ readFileIntoBuffer (char *fname)
 	}
       else
 	{
-	  rs = Safe_calloc (1, strlen (lb) + 1);
+	  rs = Safe_alloc ( strlen (lb) + 1);
 	  strcpy (rs, lb);
 	}
     }

@@ -737,24 +737,6 @@ pCodeInstruction pciXORLW = {
 #define MAX_PIC14MNEMONICS 100
 pCodeInstruction *pic14Mnemonics[MAX_PIC14MNEMONICS];
 
-char *Safe_strdup(char *str)
-{
-  char *copy;
-
-  if(!str)
-    return NULL;
-
-  copy = strdup(str);
-  if(!copy) {
-    fprintf(stderr, "out of memory %s,%d\n",__FUNCTION__,__LINE__);
-    exit(1);
-  }
-
-  return copy;
-    
-}
-
-
 /*-----------------------------------------------------------------*/
 /* SAFE_snprintf - like snprintf except the string pointer is      */
 /*                 after the string has been printed to. This is   */

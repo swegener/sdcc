@@ -23,7 +23,6 @@
 -------------------------------------------------------------------------*/
 
 #include "common.h"
-#include "newalloc.h"
 
 int currLineno = 0;
 set *astList = NULL;
@@ -75,7 +74,7 @@ newAst (int type, void *op)
   ast *ex;
   static int oldLineno = 0;
 
-  Safe_calloc (1, ex, sizeof (ast));
+  ex = Safe_alloc ( sizeof (ast));
 
   ex->type = type;
   ex->lineno = (noLineno ? oldLineno : yylineno);
@@ -110,7 +109,7 @@ newAst_ (unsigned type)
   ast *ex;
   static int oldLineno = 0;
 
-  ex = Safe_calloc (1, sizeof (ast));
+  ex = Safe_alloc ( sizeof (ast));
 
   ex->type = type;
   ex->lineno = (noLineno ? oldLineno : yylineno);
@@ -221,7 +220,7 @@ copyAstValues (ast * dest, ast * src)
       break;
 
     case INLINEASM:
-      dest->values.inlineasm = Safe_calloc (1, strlen (src->values.inlineasm) + 1);
+      dest->values.inlineasm = Safe_alloc (strlen (src->values.inlineasm) + 1);
       strcpy (dest->values.inlineasm, src->values.inlineasm);
       break;
 
@@ -252,7 +251,7 @@ copyAst (ast * src)
   if (!src)
     return NULL;
 
-  dest = Safe_calloc (1, sizeof (ast));
+  dest = Safe_alloc ( sizeof (ast));
 
   dest->type = src->type;
   dest->lineno = src->lineno;

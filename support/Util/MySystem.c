@@ -57,7 +57,7 @@ my_system (const char *cmd)
   // try to find the command in predefined path's
   while (ExePathList[i])
     {
-      cmdLine = (char *) Safe_malloc (strlen (ExePathList[i]) + strlen (cmd) + 10);
+      cmdLine = (char *) Safe_alloc (strlen (ExePathList[i]) + strlen (cmd) + 10);
       strcpy (cmdLine, ExePathList[i]);	// the path
 
       strcat (cmdLine, DIR_SEPARATOR_STRING);
@@ -73,7 +73,7 @@ my_system (const char *cmd)
 	  strcat (cmdLine, cmd + argsStart);
 	  break;
 	}
-      free (cmdLine);
+      Safe_free (cmdLine);
       cmdLine = NULL;
       i++;
     }
@@ -87,7 +87,7 @@ my_system (const char *cmd)
     {
       // command found in predefined path
       e = system (cmdLine);
-      free (cmdLine);
+      Safe_free (cmdLine);
     }
   else
     {

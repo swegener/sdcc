@@ -39,7 +39,7 @@ newInduction (operand * sym, unsigned int op,
 {
   induction *ip;
 
-  ip = Safe_calloc (1, sizeof (induction));
+  ip = Safe_alloc ( sizeof (induction));
 
   ip->sym = sym;
   ip->asym = asym;
@@ -58,7 +58,7 @@ newRegion ()
 {
   region *lp;
 
-  lp = Safe_calloc (1, sizeof (region));
+  lp = Safe_alloc ( sizeof (region));
 
   return lp;
 }

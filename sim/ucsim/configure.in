@@ -34,6 +34,7 @@ AC_PROG_INSTALL
 AC_PROG_RANLIB
 AC_LANG_CPLUSPLUS
 
+AC_CHECK_PROG(STRIP, strip, strip, :)
 
 # Checking for header files.
 # ===========================================================================

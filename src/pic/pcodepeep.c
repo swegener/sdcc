@@ -40,7 +40,6 @@ pCodeOp *popCopyGPR2Bit(pCodeOpReg *pc, int bitval);
 pCodeOp *newpCodeOpWild(int id, pCodePeep *pcp, pCodeOp *subtype);
 pCode *newpCodeWild(int pCodeID, pCodeOp *optional_operand, pCodeOp *optional_label);
 pCode * findNextInstruction(pCode *pc);
-char *Safe_strdup(char *str);
 int getpCode(char *mnem,int dest);
 void pBlockMergeLabels(pBlock *pb);
 char *pCode2str(char *str, int size, pCode *pc);

@@ -40,7 +40,7 @@ _newHashtItem (int key, void *pkey, void *item)
 {
   hashtItem *htip;
 
-  htip = Safe_calloc (1, sizeof (hashtItem));
+  htip = Safe_alloc ( sizeof (hashtItem));
 
   htip->key = key;
   htip->pkey = pkey;
@@ -57,9 +57,9 @@ newHashTable (int size)
 {
   hTab *htab;
 
-  htab = Safe_calloc (1, sizeof (hTab));
+  htab = Safe_alloc ( sizeof (hTab));
 
-  if (!(htab->table = calloc ((size + 1), sizeof (hashtItem *))))
+  if (!(htab->table = Safe_alloc ((size + 1) * sizeof (hashtItem *))))
     {
       fprintf (stderr, "out of virtual memory %s %d\n",
 	       __FILE__, (size + 1) * sizeof (hashtItem *));
@@ -193,13 +193,13 @@ hTabDeleteAll (hTab * p)
 	  jn = jc->next;
 	  while (jc)
 	    {
-	      free (jc);
+	      Safe_free (jc);
 	      if ((jc = jn))
 		jn = jc->next;
 	    }
 	  p->table[i] = NULL;
 	}
-      free (p->table);
+      Safe_free (p->table);
     }
 }
 

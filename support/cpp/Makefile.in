@@ -35,7 +35,7 @@ STD_INC		= @sdcc_include_dir@
 CPPFLAGS	= @CPPFLAGS@ -I. -I$(PRJDIR) -I$(SLIB) -D_FORASXXXX_
 CFLAGS		= @CFLAGS@
 M_OR_MM		= @M_OR_MM@
-LDFLAGS		= @LDFLAGS@
+LDFLAGS		= @LDFLAGS@ @LIBS@
 
 SLIBOBJS	= NewAlloc.o
 

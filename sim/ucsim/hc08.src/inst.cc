@@ -1,0 +1,1154 @@
+/*
+ * Simulator of microcontrollers (inst.cc)
+ *
+ * hc08 code base from Erik Petrich  epetrich@users.sourceforge.net
+ *
+ * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * 
+ * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ *
+ */
+
+/* This file is part of microcontroller simulator: ucsim.
+
+UCSIM is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+UCSIM is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with UCSIM; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA. */
+/*@1@*/
+
+#include "ddconfig.h"
+#include "stdio.h"
+#include <stdlib.h>
+
+// local
+#include "hc08cl.h"
+#include "regshc08.h"
+#include "hc08mac.h"
+
+
+
+void
+cl_hc08::incx(void)
+{
+  int hx = (regs.H << 8) | (regs.X);
+  hx++;
+  regs.H = (hx >> 8) & 0xff;
+  regs.X = hx & 0xff;
+}
+
+int
+cl_hc08::fetchea(t_mem code, bool prefix)
+{
+  switch ((code >> 4) & 0x0f) {
+    case 0x0: 
+    case 0x1:
+    case 0x3:
+    case 0xb:
+      return fetch(); // Direct
+    case 0x7:
+    case 0xf:
+      return (regs.H << 8) | regs.X;  // IX
+    case 0x6:
+    case 0xe:
+      if (!prefix)
+        return ((unsigned char)fetch())+((regs.H << 8) | regs.X); // IX1
+      else
+        return ((unsigned char)fetch())+regs.SP; // SP1
+    case 0xd:
+      if (!prefix)
+        return fetch2()+((regs.H << 8) | regs.X); // IX2
+      else
+        return fetch2()+regs.SP; // SP2
+    case 0xc:
+      return fetch2();
+    default:
+      return(resHALT);
+  }
+}
+
+
+int
+cl_hc08::inst_nop(t_mem code, bool prefix)
+{
+  return(resGO);
+}
+
+
+int
+cl_hc08::inst_transfer(t_mem code, bool prefix)
+{
+  int hx;
+  
+  switch (code) {
+    case 0x84: // TAP
+      regs.P = regs.A | 0x60;
+      break;
+    case 0x85: // TPA
+      regs.A = regs.P | 0x60;
+      break;
+    case 0x97: // TAX
+      regs.X = regs.A;
+      break;
+    case 0x9f: // TXA
+      regs.A = regs.X;
+      break;
+    case 0x94: // TXS
+      hx = (regs.H << 8) | regs.X;
+      regs.SP = (hx - 1) & 0xffff;
+      break;
+    case 0x95: // TSX
+      hx = regs.SP +1;
+      regs.H = (hx >> 8) & 0xff;
+      regs.X = hx & 0xff;
+      break;
+    default:
+      return(resHALT);
+  }
+  return(resGO);
+}
+
+
+int
+cl_hc08::inst_setclearflags(t_mem code, bool prefix)
+{
+  switch (code) {
+    case 0x98:
+      regs.P &= ~BIT_C;
+      break;
+    case 0x99:
+      regs.P |= BIT_C;
+      break;
+    case 0x9a:
+      regs.P &= ~BIT_I;
+      break;
+    case 0x9b:
+      regs.P |= BIT_I;
+      break;
+    default:
+      return(resHALT);
+  }
+  return(resGO);
+}
+
+
+int
+cl_hc08::inst_rsp(t_mem code, bool prefix)
+{
+  regs.SP = 0x00ff;
+  return(resGO);
+}
+
+
+int
+cl_hc08::inst_nsa(t_mem code, bool prefix)
+{
+  regs.A = ((regs.A & 0xf0)>>4) | ((regs.A & 0x0f)<<4);
+  return(resGO);
+}
+
+
+
+int
+cl_hc08::inst_lda(t_mem code, bool prefix)
+{
+  regs.A = OPERAND(code, prefix);
+  FLAG_CLEAR(BIT_V);
+  FLAG_NZ(regs.A);
+  return(resGO);
+}
+
+int
+cl_hc08::inst_ldx(t_mem code, bool prefix)
+{
+  regs.X = OPERAND(code, prefix);
+  FLAG_CLEAR(BIT_V);
+  FLAG_NZ(regs.X);
+  return(resGO);
+}
+
+int
+cl_hc08::inst_sta(t_mem code, bool prefix)
+{
+  int ea = fetchea(code, prefix);
+
+  //fprintf (stdout, "ea = 0x%04x\n", ea);
+    
+  FLAG_CLEAR(BIT_V);
+  FLAG_NZ(regs.A);
+  store1(ea, regs.A);
+  return(resGO);
+}
+
+int
+cl_hc08::inst_stx(t_mem code, bool prefix)
+{
+  int ea = fetchea(code, prefix);
+
+  FLAG_CLEAR(BIT_V);
+  FLAG_NZ(regs.X);
+  store1(ea, regs.X);
+  return(resGO);
+}
+
+int
+cl_hc08::inst_add(t_mem code, bool prefix)
+{
+  int result;
+  uchar operand;
+
+  operand = OPERAND(code, prefix);
+  result = (regs.A + operand) & 0xff;
+  FLAG_NZ (result);
+  FLAG_ASSIGN (BIT_V, 0x80 & ((regs.A & operand & ~result)
+                              | (~regs.A & ~operand & result)));
+  FLAG_ASSIGN (BIT_H, 0x10 & ((regs.A & operand)
+                              | (operand & ~result)
+                              | (~result & regs.A)));
+  FLAG_ASSIGN (BIT_C, 0x80 & ((regs.A & operand)
+                              | (operand & ~result)
+                              | (~result & regs.A)));
+  regs.A = result;
+  return(resGO);
+}
+
+int
+cl_hc08::inst_adc(t_mem code, bool prefix)
+{
+  int result;
+  uchar operand;
+
+  operand = OPERAND(code, prefix);
+  result = (regs.A + operand + ((regs.P & BIT_C)!=0)) & 0xff;
+  FLAG_NZ (result);
+  FLAG_ASSIGN (BIT_V, 0x80 & ((regs.A & operand & ~result)
+                              | (~regs.A & ~operand & result)));
+  FLAG_ASSIGN (BIT_H, 0x10 & ((regs.A & operand)
+                              | (operand & ~result)
+                              | (~result & regs.A)));
+  FLAG_ASSIGN (BIT_C, 0x80 & ((regs.A & operand)
+                              | (operand & ~result)
+                              | (~result & regs.A)));
+  regs.A = result;
+  return(resGO);
+}
+
+int
+cl_hc08::inst_sub(t_mem code, bool prefix)
+{
+  int result;
+  uchar operand;
+
+  operand = OPERAND(code, prefix);
+  result = (regs.A - operand) & 0xff;
+  FLAG_NZ (result);
+  FLAG_ASSIGN (BIT_V, 0x80 & ((regs.A & ~operand & ~result)
+                              | (~regs.A & operand & result)));
+  FLAG_ASSIGN (BIT_C, 0x80 & ((~regs.A & operand)
+                              | (operand & result)
+                              | (result & ~regs.A)));
+  regs.A = result;
+  return(resGO);
+}
+
+int
+cl_hc08::inst_sbc(t_mem code, bool prefix)
+{
+  int result;
+  uchar operand;
+
+  operand = OPERAND(code, prefix);
+  result = (regs.A - operand - ((regs.P & BIT_C)!=0) ) & 0xff;
+  FLAG_NZ (result);
+  FLAG_ASSIGN (BIT_V, 0x80 & ((regs.A & ~operand & ~result)
+                              | (~regs.A & operand & result)));
+  FLAG_ASSIGN (BIT_C, 0x80 & ((~regs.A & operand)
+                              | (operand & result)
+                              | (result & ~regs.A)));
+  regs.A = result;
+  return(resGO);
+}
+
+int
+cl_hc08::inst_cmp(t_mem code, bool prefix)
+{
+  int result;
+  uchar operand;
+
+  operand = OPERAND(code, prefix);
+  result = (regs.A - operand) & 0xff;
+  FLAG_NZ (result);
+  FLAG_ASSIGN (BIT_V, 0x80 & ((regs.A & ~operand & ~result)
+                              | (~regs.A & operand & result)));
+  FLAG_ASSIGN (BIT_C, 0x80 & ((~regs.A & operand)
+                              | (operand & result)
+                              | (result & ~regs.A)));
+  return(resGO);
+}
+
+int
+cl_hc08::inst_cpx(t_mem code, bool prefix)
+{
+  int result;
+  uchar operand;
+
+  operand = OPERAND(code, prefix);
+  result = (regs.X - operand) & 0xff;
+  FLAG_NZ (result);
+  FLAG_ASSIGN (BIT_V, 0x80 & ((regs.X & ~operand & ~result)
+                              | (~regs.X & operand & result)));
+  FLAG_ASSIGN (BIT_C, 0x80 & ((~regs.X & operand)
+                              | (operand & result)
+                              | (result & ~regs.X)));
+  return(resGO);
+}
+
+int
+cl_hc08::inst_jmp(t_mem code, bool prefix)
+{
+  PC = fetchea(code, prefix);
+
+  return(resGO);
+}
+
+int
+cl_hc08::inst_jsr(t_mem code, bool prefix)
+{
+  int newPC = fetchea(code, prefix);
+  
+  push2(PC);
+  PC = newPC;
+
+  return(resGO);
+}
+
+int
+cl_hc08::inst_bsr(t_mem code, bool prefix)
+{
+  signed char ofs = fetch();
+  
+  push2(PC);
+  PC += ofs;
+
+  return(resGO);
+}
+
+int
+cl_hc08::inst_ais(t_mem code, bool prefix)
+{
+  regs.SP = regs.SP + (signed char)fetch();
+  return(resGO);
+}
+
+int
+cl_hc08::inst_aix(t_mem code, bool prefix)
+{
+  regs.X = regs.X + (signed char)fetch();
+  return(resGO);
+}
+
+int
+cl_hc08::inst_and(t_mem code, bool prefix)
+{
+  regs.A = regs.A & OPERAND(code, prefix);
+  FLAG_CLEAR(BIT_V);
+  FLAG_NZ(regs.A);
+  return(resGO);
+}
+
+int
+cl_hc08::inst_bit(t_mem code, bool prefix)
+{
+  uchar operand = regs.A & OPERAND(code, prefix);
+  FLAG_CLEAR(BIT_V);
+  FLAG_NZ(operand);
+  return(resGO);
+}
+
+int
+cl_hc08::inst_ora(t_mem code, bool prefix)
+{
+  regs.A = regs.A | OPERAND(code, prefix);
+  FLAG_CLEAR(BIT_V);
+  FLAG_NZ(regs.A);
+  return(resGO);
+}
+
+int
+cl_hc08::inst_eor(t_mem code, bool prefix)
+{
+  regs.A = regs.A ^ OPERAND(code, prefix);
+  FLAG_CLEAR(BIT_V);
+  FLAG_NZ(regs.A);
+  return(resGO);
+}
+
+int
+cl_hc08::inst_asr(t_mem code, bool prefix)
+{
+  int ea = 0xffff;
+  uchar operand;
+  
+  if ((code & 0xf0) == 0x40)
+    operand = regs.A;
+  else if ((code & 0xf0) == 0x50)
+    operand = regs.X;
+  else {
+    ea = fetchea(code,prefix);
+    operand = get1(ea);
+  }
+
+  FLAG_ASSIGN (BIT_C, operand & 1);
+  operand = (operand >> 1) | (operand & 0x80);
+  FLAG_NZ (operand);
+  FLAG_ASSIGN (BIT_V, ((regs.P & BIT_C)!=0) ^ ((regs.P & BIT_N)!=0));
+
+  if ((code & 0xf0) == 0x40)
+    regs.A = operand;
+  else if ((code & 0xf0) == 0x50)
+    regs.X = operand;
+  else {
+    store1(ea, operand);
+  }
+
+  return(resGO);
+}
+
+
+int
+cl_hc08::inst_lsr(t_mem code, bool prefix)
+{
+  int ea = 0xffff;
+  uchar operand;
+  
+  if ((code & 0xf0) == 0x40)
+    operand = regs.A;
+  else if ((code & 0xf0) == 0x50)
+    operand = regs.X;
+  else {
+    ea = fetchea(code,prefix);
+    operand = get1(ea);
+  }
+
+  FLAG_ASSIGN (BIT_C, operand & 1);
+  operand = (operand >> 1) & 0x7f;
+  FLAG_NZ (operand);
+  FLAG_ASSIGN (BIT_V, ((regs.P & BIT_C)!=0) ^ ((regs.P & BIT_N)!=0));
+
+  if ((code & 0xf0) == 0x40)
+    regs.A = operand;
+  else if ((code & 0xf0) == 0x50)
+    regs.X = operand;
+  else {
+    store1(ea, operand);
+  }
+  return(resGO);
+}
+
+
+int
+cl_hc08::inst_lsl(t_mem code, bool prefix)
+{
+  int ea = 0xffff;
+  uchar operand;
+  
+  if ((code & 0xf0) == 0x40)
+    operand = regs.A;
+  else if ((code & 0xf0) == 0x50)
+    operand = regs.X;
+  else {
+    ea = fetchea(code,prefix);
+    operand = get1(ea);
+  }
+
+  FLAG_ASSIGN (BIT_C, operand & 0x80);
+  operand = (operand << 1);
+  FLAG_NZ (operand);
+  FLAG_ASSIGN (BIT_V, ((regs.P & BIT_C)!=0) ^ ((regs.P & BIT_N)!=0));
+
+  if ((code & 0xf0) == 0x40)
+    regs.A = operand;
+  else if ((code & 0xf0) == 0x50)
+    regs.X = operand;
+  else {
+    store1(ea, operand);
+  }
+  return(resGO);
+}
+
+
+int
+cl_hc08::inst_rol(t_mem code, bool prefix)
+{
+  uchar c = (regs.P & BIT_C)!=0;
+  int ea = 0xffff;
+  uchar operand;
+  
+  if ((code & 0xf0) == 0x40)
+    operand = regs.A;
+  else if ((code & 0xf0) == 0x50)
+    operand = regs.X;
+  else {
+    ea = fetchea(code,prefix);
+    operand = get1(ea);
+  }
+
+  FLAG_ASSIGN (BIT_C, operand & 0x80);
+  operand = (operand << 1) | c;
+  FLAG_NZ (operand);
+  FLAG_ASSIGN (BIT_V, ((regs.P & BIT_C)!=0) ^ ((regs.P & BIT_N)!=0));
+
+  if ((code & 0xf0) == 0x40)
+    regs.A = operand;
+  else if ((code & 0xf0) == 0x50)
+    regs.X = operand;
+  else {
+    store1(ea, operand);
+  }
+  return(resGO);
+}
+
+
+int
+cl_hc08::inst_ror(t_mem code, bool prefix)
+{
+  uchar c = (regs.P & BIT_C)!=0;
+  int ea = 0xffff;
+  uchar operand;
+  
+  if ((code & 0xf0) == 0x40)
+    operand = regs.A;
+  else if ((code & 0xf0) == 0x50)
+    operand = regs.X;
+  else {
+    ea = fetchea(code,prefix);
+    operand = get1(ea);
+  }
+
+  FLAG_ASSIGN (BIT_C, operand & 1);
+  operand = (operand >> 1) | (c << 7);
+  FLAG_NZ (operand);
+  FLAG_ASSIGN (BIT_V, ((regs.P & BIT_C)!=0) ^ ((regs.P & BIT_N)!=0));
+
+  if ((code & 0xf0) == 0x40)
+    regs.A = operand;
+  else if ((code & 0xf0) == 0x50)
+    regs.X = operand;
+  else {
+    store1(ea, operand);
+  }
+  return(resGO);
+}
+
+
+int
+cl_hc08::inst_inc(t_mem code, bool prefix)
+{
+  int ea = 0xffff;
+  uchar operand;
+  
+  if ((code & 0xf0) == 0x40)
+    operand = regs.A;
+  else if ((code & 0xf0) == 0x50)
+    operand = regs.X;
+  else {
+    ea = fetchea(code,prefix);
+    operand = get1(ea);
+  }
+
+  operand++;
+  FLAG_NZ (operand);
+  FLAG_ASSIGN (BIT_V, operand == 0x80);
+
+  if ((code & 0xf0) == 0x40)
+    regs.A = operand;
+  else if ((code & 0xf0) == 0x50)
+    regs.X = operand;
+  else {
+    store1(ea, operand);
+  }
+  return(resGO);
+}
+
+
+int
+cl_hc08::inst_dec(t_mem code, bool prefix)
+{
+  int ea = 0xffff;
+  uchar operand;
+  
+  if ((code & 0xf0) == 0x40)
+    operand = regs.A;
+  else if ((code & 0xf0) == 0x50)
+    operand = regs.X;
+  else {
+    ea = fetchea(code,prefix);
+    operand = get1(ea);
+  }
+
+  operand--;
+  FLAG_NZ (operand);
+  FLAG_ASSIGN (BIT_V, operand == 0x7f);
+
+  if ((code & 0xf0) == 0x40)
+    regs.A = operand;
+  else if ((code & 0xf0) == 0x50)
+    regs.X = operand;
+  else {
+    store1(ea, operand);
+  }
+  return(resGO);
+}
+
+int
+cl_hc08::inst_dbnz(t_mem code, bool prefix)
+{
+  int ea = 0xffff;
+  uchar operand;
+  signed char ofs;
+  
+  if ((code & 0xf0) == 0x40)
+    operand = regs.A;
+  else if ((code & 0xf0) == 0x50)
+    operand = regs.X;
+  else {
+    ea = fetchea(code,prefix);
+    operand = get1(ea);
+  }
+
+  operand--;
+  FLAG_NZ (operand);
+  FLAG_ASSIGN (BIT_V, operand == 0x7f);
+
+  if ((code & 0xf0) == 0x40)
+    regs.A = operand;
+  else if ((code & 0xf0) == 0x50)
+    regs.X = operand;
+  else {
+    store1(ea, operand);
+  }
+
+  ofs = fetch();
+  if (operand)
+    PC += ofs;
+
+  return(resGO);
+}
+
+
+int
+cl_hc08::inst_tst(t_mem code, bool prefix)
+{
+  int ea = 0xffff;
+  uchar operand;
+  
+  if ((code & 0xf0) == 0x40)
+    operand = regs.A;
+  else if ((code & 0xf0) == 0x50)
+    operand = regs.X;
+  else {
+    ea = fetchea(code,prefix);
+    operand = get1(ea);
+  }
+
+  FLAG_NZ (operand);
+  FLAG_CLEAR (BIT_V);
+
+  return(resGO);
+}
+
+
+int
+cl_hc08::inst_clr(t_mem code, bool prefix)
+{
+  int ea = 0xffff;
+  uchar operand;
+  
+  operand = 0;
+  FLAG_CLEAR (BIT_V);
+  FLAG_CLEAR (BIT_N);
+  FLAG_SET (BIT_Z);
+
+  if ((code & 0xf0) == 0x40)
+    regs.A = operand;
+  else if ((code & 0xf0) == 0x50)
+    regs.X = operand;
+  else {
+    store1(ea, operand);
+  }
+  return(resGO);
+}
+
+
+int
+cl_hc08::inst_clrh(t_mem code, bool prefix)
+{
+  FLAG_CLEAR (BIT_V);
+  FLAG_CLEAR (BIT_N);
+  FLAG_SET (BIT_Z);
+  regs.H = 0;
+  return(resGO);
+}
+
+
+int
+cl_hc08::inst_com(t_mem code, bool prefix)
+{
+  int ea = 0xffff;
+  uchar operand;
+  
+  if ((code & 0xf0) == 0x40)
+    operand = regs.A;
+  else if ((code & 0xf0) == 0x50)
+    operand = regs.X;
+  else {
+    ea = fetchea(code,prefix);
+    operand = get1(ea);
+  }
+
+  operand = ~operand;
+  FLAG_SET (BIT_C);
+  FLAG_NZ (operand);
+  FLAG_CLEAR (BIT_V);
+
+  if ((code & 0xf0) == 0x40)
+    regs.A = operand;
+  else if ((code & 0xf0) == 0x50)
+    regs.X = operand;
+  else {
+    store1(ea, operand);
+  }
+  return(resGO);
+}
+
+
+int
+cl_hc08::inst_neg(t_mem code, bool prefix)
+{
+  int ea = 0xffff;
+  uchar operand;
+  
+  if ((code & 0xf0) == 0x40)
+    operand = regs.A;
+  else if ((code & 0xf0) == 0x50)
+    operand = regs.X;
+  else {
+    ea = fetchea(code,prefix);
+    operand = get1(ea);
+  }
+
+  FLAG_ASSIGN (BIT_V, operand==0x80);
+  FLAG_ASSIGN (BIT_C, operand!=0x00);
+  operand = -operand;
+  FLAG_NZ (operand);
+
+  if ((code & 0xf0) == 0x40)
+    regs.A = operand;
+  else if ((code & 0xf0) == 0x50)
+    regs.X = operand;
+  else {
+    store1(ea, operand);
+  }
+  return(resGO);
+}
+
+
+
+int
+cl_hc08::inst_pushpull(t_mem code, bool prefix)
+{
+  switch (code) {
+    case 0x86:
+      pop1(regs.A);
+      break;
+    case 0x87:
+      push1(regs.A);
+      break;
+    case 0x88:
+      pop1(regs.X);
+      break;
+    case 0x89:
+      push1(regs.X);
+      break;
+    case 0x8a:
+      pop1(regs.H);
+      break;
+    case 0x8b:
+      push1(regs.H);
+      break;
+    default:
+      return(resHALT);
+  }
+  return(resGO);
+}
+
+
+
+
+int
+cl_hc08::inst_stop(t_mem code, bool prefix)
+{
+  FLAG_CLEAR (BIT_I);
+  return(resGO);
+}
+
+
+int
+cl_hc08::inst_wait(t_mem code, bool prefix)
+{
+  FLAG_CLEAR (BIT_I);
+  return(resGO);
+}
+
+
+int
+cl_hc08::inst_daa(t_mem code, bool prefix)
+{
+  uchar lsn, msn;
+
+  lsn = regs.A & 0xf;
+  msn = (regs.A >> 4) & 0xf;
+  if (regs.P & BIT_H) {
+    lsn += 16;
+    msn = (msn-1) & 0xf;
+  }
+  if (regs.P & BIT_C)
+    msn += 16;
+
+  FLAG_CLEAR (BIT_C);
+  while (lsn>9) {
+    lsn -= 10;
+    msn++;
+  }
+  if (msn>9) {
+    msn = msn % 10;
+    FLAG_SET (BIT_C);
+  }
+
+  return(resGO);
+}
+
+int
+cl_hc08::inst_mul(t_mem code, bool prefix)
+{
+  int result = regs.A * regs.X;
+  regs.A = result & 0xff;
+  regs.X = (result >> 8) & 0xff;
+  FLAG_CLEAR (BIT_C);
+  FLAG_CLEAR (BIT_H);
+  return(resGO);
+}
+
+int
+cl_hc08::inst_div(t_mem code, bool prefix)
+{
+  int dividend = (regs.H << 8) | regs.A;
+  int quotient;
+
+  if (regs.X) {
+    quotient = dividend / regs.X;
+    if (quotient<=0xff) {
+      regs.A = quotient;
+      regs.H = dividend % regs.X;
+      FLAG_CLEAR (BIT_C);
+      FLAG_ASSIGN (BIT_Z, quotient==0);
+    }
+    else
+      FLAG_SET (BIT_C);  // overflow
+  } else
+    FLAG_SET (BIT_C);    // division by zero
+
+  return(resGO);
+}
+
+
+int
+cl_hc08::inst_condbranch(t_mem code, bool prefix)
+{
+  bool taken;
+  signed char ofs;
+  
+  if ((code & 0xf0)==0x20) {
+    switch ((code>>1) & 7) {
+      case 0: // BRA
+        taken = 1;
+        break;
+      case 1: // BHI
+        taken = (regs.P & BIT_C) || !(regs.P & BIT_Z);
+        break;
+      case 2: // BCC
+        taken = !(regs.P & BIT_C);
+        break;
+      case 3: // BNE
+        taken = !(regs.P & BIT_Z);
+        break;
+      case 4: // BHCC
+        taken = !(regs.P & BIT_H);
+        break;
+      case 5: // BPL
+        taken = !(regs.P & BIT_N);
+        break;
+      case 6: // BMC
+        taken = !(regs.P & BIT_I);
+        break;
+      case 7: // BIL
+        taken = 0; // TODO: should read simulated IRQ# pin
+      default:
+        return(resHALT);
+    } 
+  }
+  else if ((code & 0xf0)==0x90) {
+    switch ((code>>1) & 7) {
+      case 0: // BGE
+        taken = !(((regs.P & BIT_N)!=0) ^ ((regs.P & BIT_V)!=0));
+        break;
+      case 1: // BLT
+        taken = (!(((regs.P & BIT_N)!=0) ^ ((regs.P & BIT_V)!=0)))
+                || (regs.P & BIT_Z);
+        break;
+      default:
+        return(resHALT);
+    }
+  }
+  else
+    return(resHALT);
+  
+  if (code & 1)
+    taken = ! taken;
+  
+  ofs = fetch();
+  if (taken)
+    PC += ofs;
+
+  return(resGO);
+}
+
+int
+cl_hc08::inst_bitsetclear(t_mem code, bool prefix)
+{
+  uchar bit = (code >> 1) & 7;
+  int ea = fetchea(code, prefix);
+  uchar operand = get1(ea);
+
+  if (code & 1)
+    operand &= ~(1 << bit);
+  else
+    operand |= (1 << bit);
+  store1(ea, operand);
+  return(resGO);
+}
+
+int
+cl_hc08::inst_bittestsetclear(t_mem code, bool prefix)
+{
+  uchar bit = (code >> 1) & 7;
+  int ea = fetchea(code, prefix);
+  uchar operand = get1(ea);
+  signed char ofs;
+  bool taken;
+  
+  if (code & 1)
+    taken = operand & (1 << bit);
+  else
+    taken = !(operand & (1 << bit));
+
+  ofs = fetch();
+  if (taken)
+    PC += ofs;
+
+  FLAG_ASSIGN (BIT_C, operand & (1 << bit));
+  return(resGO);
+}
+
+int
+cl_hc08::inst_cbeq(t_mem code, bool prefix)
+{
+  int ea;
+  uchar operand1, operand2;
+  signed char ofs;
+    
+  if ((code & 0xf0) == 0x40) {
+    operand1 = regs.A;
+    operand2 = fetch();
+  }
+  else if ((code & 0xf0) == 0x50) {
+    operand1 = regs.X;
+    operand2 = fetch();
+  }
+  else {
+    ea = fetchea(code,prefix);
+    operand1 = get1(ea);
+    operand2 = regs.A;
+  }
+
+  ofs = fetch();
+  if (operand1==operand2)
+    PC += ofs;  
+
+  if (code==0x71)
+    incx();
+    
+  return(resGO);
+}
+
+int
+cl_hc08::inst_rti(t_mem code, bool prefix)
+{
+  pop1(regs.P);
+  regs.P |= 0x60;
+  pop1(regs.A);
+  pop1(regs.X);
+  pop2(PC);
+  
+  return(resGO);
+}
+
+int
+cl_hc08::inst_rts(t_mem code, bool prefix)
+{
+  pop2(PC);
+  
+  return(resGO);
+}
+
+
+int
+cl_hc08::inst_mov(t_mem code, bool prefix)
+{
+  int ea;
+  uchar operand;
+  bool aix;
+  
+  switch (code) {
+    case 0x4e:
+      operand = get1(fetch());
+      ea = fetch();
+      aix = 0;
+      break;
+    case 0x5e:
+      operand = get1(fetch());
+      ea = regs.X;
+      aix = 1;
+      break;
+    case 0x6e:
+      operand = fetch();
+      ea = fetch();
+      aix = 0;
+      break;
+    case 0x7e:
+      operand = get1(regs.X);
+      ea = fetch();
+      aix = 1;
+      break;
+    default:
+      return(resHALT);
+  }
+  
+  store1(ea, operand);
+  if (aix)
+    incx();
+
+  FLAG_NZ(operand);
+  FLAG_CLEAR(BIT_V);
+    
+  return(resGO);
+}
+
+
+int
+cl_hc08::inst_sthx(t_mem code, bool prefix)
+{
+  int ea = fetch1();
+  
+  store1(ea, regs.H);
+  store1((ea+1) & 0xffff, regs.X);
+
+  FLAG_CLEAR(BIT_V);
+  FLAG_ASSIGN(BIT_N, regs.X & 0x80);
+  FLAG_ASSIGN(BIT_Z, !regs.X && !regs.A);
+  return(resGO);
+}
+
+int
+cl_hc08::inst_ldhx(t_mem code, bool prefix)
+{
+  int ea;
+  
+  if (code == 0x45) {
+    regs.H = fetch();
+    regs.X = fetch();
+  }
+  else if (code == 0x55) {
+    ea = fetch();
+    regs.H = get1(ea);
+    regs.X = get1(ea+1);
+  }
+  else
+    return(resHALT);
+  
+  FLAG_CLEAR(BIT_V);
+  FLAG_ASSIGN(BIT_N, regs.X & 0x80);
+  FLAG_ASSIGN(BIT_Z, !regs.X && !regs.A);
+  return(resGO);
+}
+
+
+int
+cl_hc08::inst_cphx(t_mem code, bool prefix)
+{
+  int ea;
+  int hx;
+  int operand;
+  int result;
+  
+  if (code == 0x65) {
+    operand = fetch2();
+  }
+  else if (code == 0x75) {
+    ea = fetch();
+    operand = (get1(ea) << 8) | get1(ea+1);
+  }
+  else
+    return(resHALT);
+
+  hx = (regs.H << 8) | regs.X;
+
+  result = (hx-operand) & 0xffff;
+
+  FLAG_ASSIGN (BIT_V, 0x8000 & ((hx & ~operand & ~result)
+                              | (~hx & operand & result)));
+  FLAG_ASSIGN (BIT_C, 0x8000 & ((~hx & operand)
+                              | (operand & result)
+                              | (result & ~hx)));
+  FLAG_ASSIGN(BIT_N, result & 0x8000);
+  FLAG_ASSIGN(BIT_Z, !result);
+                              
+  return(resGO);
+}
+
+int
+cl_hc08::inst_swi(t_mem code, bool prefix)
+{
+  push2(PC);
+  push1(regs.X);
+  push1(regs.A);
+  push1(regs.P);
+  FLAG_CLEAR(BIT_I);
+  
+  PC = get2(0xfffc);
+
+  return(resGO);
+}
+
+
+/* End of hc08.src/inst.cc */

@@ -300,7 +300,7 @@ DEFSETFUNC (findCheaperOp)
       IS_ITEMP (IC_RESULT (cdp->diCode)))
     *opp = IC_RESULT (cdp->diCode);
 
-  if (*opp)
+  if ((*opp)&&(SPEC_USIGN(operandType (cop))==SPEC_USIGN(operandType (*opp))))
     {
 
       if ((isGlobalInNearSpace (cop) &&
@@ -327,7 +327,7 @@ DEFSETFUNC (findCheaperOp)
       return 1;
 
     }
-
+  *opp=NULL;
   return 0;
 }
 

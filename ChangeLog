@@ -1,33 +1,47 @@
+2003-07-30  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+	Adding sdcclib to the build.  MSVC project coming soon.
+	Files added/changed:
+
+	* support\librarian\clean.mk
+	* support\librarian\configure
+	* support\librarian\configure.in
+	* support\librarian\config_in.h
+	* support\librarian\Makefile.bcc
+	* support\librarian\Makefile.in
+	* support\librarian\sdcclib.c
+	* Makefile.bcc
+
 2003-07-29  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
-    Linker now complaints if linked modules have conflicting options, for
-    example, one compiled using --model-large and another one compiled with
-    --model-small.  The following files were modified:
+	Linker now complaints if linked modules have conflicting options, for
+	example, one compiled using --model-large and another one compiled with
+	--model-small.  The following files were modified:
 
-    * as\mcs51\asdata.c
-    * as\mcs51\aslink.h
-    * as\mcs51\asm.h
-    * as\mcs51\asmain.c
-    * as\mcs51\asout.c
-    * as\mcs51\i51pst.c
-    * as\mcs51\lkdata.c
-    * as\mcs51\lklibr.c
-    * as\mcs51\lkmain.c
-    * as\z80\asdata.c
-    * as\z80\asm.h
-    * as\z80\asmain.c
-    * as\z80\asout.c
-    * as\z80\z80pst.c
-    * link\z80\aslink.h
-    * link\z80\lkdata.c
-    * link\z80\lklibr.c
-    * link\z80\lkmain.c
-    * src\SDCCglue.c 
+	* as\mcs51\asdata.c
+	* as\mcs51\aslink.h
+	* as\mcs51\asm.h
+	* as\mcs51\asmain.c
+	* as\mcs51\asout.c
+	* as\mcs51\i51pst.c
+	* as\mcs51\lkdata.c
+	* as\mcs51\lklibr.c
+	* as\mcs51\lkmain.c
+	* as\z80\asdata.c
+	* as\z80\asm.h
+	* as\z80\asmain.c
+	* as\z80\asout.c
+	* as\z80\z80pst.c
+	* link\z80\aslink.h
+	* link\z80\lkdata.c
+	* link\z80\lklibr.c
+	* link\z80\lkmain.c
+	* src\SDCCglue.c 
 
 2003-07-28  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
-    *link/z80/aslink.h, link/z80/lklibr.c, as/mcs51/aslink.h,
-    as/mcs51/lklibr.c: Generate a warning when a library is not found.
+	*link/z80/aslink.h, link/z80/lklibr.c, as/mcs51/aslink.h,
+	as/mcs51/lklibr.c: Generate a warning when a library is not found.
 
 2003-07-28  Bernhard Held <bernhard@bernhardheld.de>
 
@@ -35,7 +49,7 @@
 
 2003-07-26  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
-    *src/SDCCmain.c: do not search for crt0.o when using --nostdlib
+	*src/SDCCmain.c: do not search for crt0.o when using --nostdlib
 
 2003-07-24  Bernhard Held <bernhard@bernhardheld.de>
 
@@ -50,11 +64,11 @@
 
 2003-07-24  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
-    added support for new library format to z80, gbz80 linkers:
-    *link/z80/aslink.h
-    *link/z80/lklex.c
-    *link/z80/lklib.c
-    *link/z80/lklist.c
+	added support for new library format to z80, gbz80 linkers:
+	*link/z80/aslink.h
+	*link/z80/lklex.c
+	*link/z80/lklib.c
+	*link/z80/lklist.c
 
 2003-07-24  Bernhard Held <bernhard@bernhardheld.de>
 

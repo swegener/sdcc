@@ -32,3 +32,9 @@ packihx:
         cd packihx
         make -f Makefile.bcc
         cd ..
+
+librarian:
+        cd support\librarian
+        make -f Makefile.bcc
+        cd ..\..
+

@@ -1,7 +1,11 @@
+2002-01-13  Bernhard Held  <bernhard@bernhardheld.de>
+
+	* support/regression/Makefile: don't include test-mcs51-stack-auto in target all
+
 2002-01-11  Johan Knol
 
 	* Added math lib of Jesus Calvino-Fraga
-	
+
 2002-01-08  Bernhard Held  <bernhard@bernhardheld.de>
 
 	* src/SDCCmain.c (processFile): fix processing of ../../src.c

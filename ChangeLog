@@ -1,3 +1,7 @@
+2001-10-24 Karl Bongers <karl@turbobit.com>
+
+	* configure.in, configure, Makefile, support/cpp: Removed cpp folder, since we have new cpp2 preprocessor code.
+
 2001-10-21  Michael Hope  <michaelh@juju.net.nz>
 
 	* src/z80/ralloc.c: Turned off faulty pack for one use.

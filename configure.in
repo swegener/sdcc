@@ -330,7 +330,6 @@ AC_CONFIG_SUBDIRS(sim/ucsim)
 AC_OUTPUT(main.mk:main_in.mk
 src/Makefile
 as/mcs51/Makefile
-support/cpp/Makefile
 device/include/Makefile
 device/lib/Makefile
 debugger/mcs51/Makefile

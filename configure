@@ -2998,7 +2998,6 @@ ac_given_INSTALL="$INSTALL"
 trap 'rm -fr `echo "main.mk:main_in.mk
 src/Makefile
 as/mcs51/Makefile
-support/cpp/Makefile
 device/include/Makefile
 device/lib/Makefile
 debugger/mcs51/Makefile
@@ -3104,7 +3103,6 @@ cat >> $CONFIG_STATUS <<EOF
 CONFIG_FILES=\${CONFIG_FILES-"main.mk:main_in.mk
 src/Makefile
 as/mcs51/Makefile
-support/cpp/Makefile
 device/include/Makefile
 device/lib/Makefile
 debugger/mcs51/Makefile

@@ -98,10 +98,10 @@ char *aopLiteralLong(value *val, int offset, int size)
         v >>= (offset * 8);
 	switch (size) {
 	case 1:
-	    sprintf(buffer,"#0x%02x", (unsigned int)v & 0xff);
+	    tsprintf(buffer, "!immedbyte", (unsigned int)v & 0xff);
 	    break;
 	case 2:
-	    sprintf(buffer,"#0x%04x", (unsigned int)v & 0xffff);
+	    tsprintf(buffer, "!immedword", (unsigned int)v & 0xffff);
 	    break;
 	default:
 	    /* Hmm.  Too big for now. */
@@ -116,10 +116,10 @@ char *aopLiteralLong(value *val, int offset, int size)
 
     /* it is type float */
     fl.f = (float) floatFromVal(val);
-#ifdef _BIG_ENDIAN    
-    sprintf(buffer,"#0x%02x",fl.c[3-offset]);
+#ifdef _BIG_ENDIAN
+    tsprintf(buffer, "!immedbyte", fl.c[3-offset]);
 #else
-    sprintf(buffer,"#0x%02x",fl.c[offset]);
+    tsprintf(buffer, "!immedbyte", fl.c[offset]);
 #endif
     ALLOC_ATOMIC(rs,strlen(buffer)+1);
     return strcpy (rs,buffer);
@@ -141,7 +141,7 @@ static void emitRegularMap (memmap * map, bool addPublics, bool arFlag)
     symbol *sym;
     
     if (addPublics)
-	asm_printf(map->oFile, asm_port->area, map->sname);
+	tfprintf(map->oFile, "\t!area\n", map->sname);
     
     /* print the area name */
     for (sym = setFirstItem (map->syms); sym;
@@ -202,8 +202,8 @@ static void emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	    /* allocate space */
 	    if ((options.debug || sym->level == 0) && !options.nodebug)
 		fprintf(map->oFile,"==.\n");
-	    asm_printf(map->oFile, asm_port->label, sym->rname);
-	    asm_printf(map->oFile, asm_port->ds, (unsigned int)getSize (sym->type) & 0xffff);
+	    tfprintf(map->oFile, "!labeldef\n", sym->rname);
+	    tfprintf(map->oFile, "\t!ds\n", (unsigned int)getSize (sym->type) & 0xffff);
 	}
 	
 	/* if it has a initial value then do it only if
@@ -309,12 +309,13 @@ void printChar (FILE * ofile, char *s, int plen)
     char *p = buf;
 
     while (len && pplen < plen) {
+	i = 60;
 	while (i && *s && pplen < plen) {
 	    if (*s < ' ' || *s == '\"') {
 		*p = '\0';
 		if (p != buf) 
-		    asm_printf(ofile, asm_port->ascii, buf);
-		asm_printf(ofile, asm_port->db, *s);
+		    tfprintf(ofile, "\t!ascii\n", buf);
+		tfprintf(ofile, "\t!db\n", *s);
 		p = buf;
 	    }
 	    else {
@@ -327,7 +328,7 @@ void printChar (FILE * ofile, char *s, int plen)
 	}
 	if (p != buf) {
 	    *p = '\0';
-	    asm_printf(ofile, asm_port->ascii, buf);
+	    tfprintf(ofile, "\t!ascii\n", buf);
 	}
 	
 	if (len > 60)
@@ -335,32 +336,7 @@ void printChar (FILE * ofile, char *s, int plen)
 	else
 	    len = 0;
     }
-    asm_printf(ofile, asm_port->db, 0);
-#if 0
-    if (pplen < plen)
-	fprintf(ofile,"\t.byte\t0\n");
-	
-	fprintf (ofile, "\t.ascii /");
-	i = 60;
-	while (i && *s && pplen < plen) {
-	    if (*s < ' ' || *s == '/') {	       
-		fprintf (ofile, "/\n\t.byte 0x%02x\n\t.ascii /", *s++);
-	    }
-	    else 
-		fprintf (ofile, "%c", *s++);
-	    pplen++;
-	    i--;
-	}
-	fprintf (ofile, "/\n");
-	
-	if (len > 60)
-	    len -= 60;
-	else
-	    len = 0;
-    }
-    if (pplen < plen)
-	fprintf(ofile,"\t.byte\t0\n");
-#endif
+    tfprintf(ofile, "\t!db\n", 0);
 }
 
 /*-----------------------------------------------------------------*/
@@ -378,26 +354,27 @@ void printIvalType (link * type, initList * ilist, FILE * oFile)
     switch (getSize (type)) {
     case 1:
 	if (!val)
-	    fprintf (oFile, "\t.byte 0\n");
+	    tfprintf(oFile, "\t!db\n", 0);
 	else
-	    fprintf (oFile, "\t.byte %s\n",
+	    tfprintf(oFile, "\t!dbs\n",
 		     aopLiteral (val, 0));
 	break;
 
     case 2:
-    fprintf(oFile, "\t.word %s\n", aopLiteralLong(val, 0, 2));
-break;
+	tfprintf(oFile, "\t!dws\n", aopLiteralLong(val, 0, 2));
+	break;
     case 4:
-	if (!val)
-	    fprintf (oFile, "\t.word 0,0\n");
-	else
+	if (!val) {
+	    tfprintf (oFile, "\t!dw\n", 0);
+	    tfprintf (oFile, "\t!dw\n", 0);
+	}
+	else {
 	    fprintf (oFile, "\t.byte %s,%s,%s,%s\n",
 		     aopLiteral (val, 0), aopLiteral (val, 1),
 		     aopLiteral (val, 2), aopLiteral (val, 3));
+	}
 	break;
     }
-    
-    return;
 }
 
 /*-----------------------------------------------------------------*/
@@ -447,7 +424,7 @@ int printIvalChar (link * type, initList * ilist, FILE * oFile, char *s)
 	    
 	    if ((remain = (DCL_ELEM (type) - strlen (SPEC_CVAL (val->etype).v_char) -1))>0)
 		while (remain--)
-		    fprintf (oFile, "\t.byte 0\n");
+		    tfprintf (oFile, "\t!db\n", 0);
 	    
 	    return 1;
 	}
@@ -521,23 +498,19 @@ void printIvalFuncPtr (link * type, initList * ilist, FILE * oFile)
     val = list2val (ilist);
     /* check the types   */
     if ((dLvl = checkType (val->type, type->next)) <= 0) {
-	
-	fprintf (oFile, "\t.word 0\n");
+	tfprintf(oFile, "\t!dw\n", 0);
 	return;
     }
     
     /* now generate the name */
     if (!val->sym) {
 	if (IS_LITERAL (val->etype))
-	    fprintf (oFile, "\t.byte %s,%s\n",
-		     aopLiteral (val, 0), aopLiteral (val, 1));
+	    tfprintf(oFile, "\t!dws\n", aopLiteralLong(val, 0, 2));
 	else
-	    fprintf (oFile, "\t.byte %s,(%s >> 8)\n",
-		     val->name, val->name);
+	    tfprintf(oFile, "\t!dws\n", val->name);
     }
     else 
-	fprintf (oFile, "\t.byte %s,(%s >> 8)\n",
-		 val->sym->rname, val->sym->rname);
+	tfprintf(oFile, "\t!dws\n", val->sym->rname);
     
     return;
 }
@@ -558,11 +531,11 @@ int printIvalCharPtr (symbol * sym, link * type, value * val, FILE * oFile)
     if (val->name && strlen(val->name)) {
 	switch (size) {
 	case 1:
-	    fprintf(oFile,
-		    "\t.byte %s\n", val->name) ;
+	    tfprintf(oFile,
+		    "\t!dbs\n", val->name) ;
 	    break;
 	case 2:
-	    fprintf(oFile, "\t.word %s\n", val->name);
+	    tfprintf(oFile, "\t!dws\n", val->name);
 	    break;
 	    /* PENDING: probably just 3 */
 	default:
@@ -575,10 +548,10 @@ int printIvalCharPtr (symbol * sym, link * type, value * val, FILE * oFile)
     else {
 	switch (size) {
 	case 1:
-	    fprintf(oFile, "\t.byte %s\n", aopLiteral(val, 0));
+	    tfprintf(oFile, "\t!dbs\n", aopLiteral(val, 0));
 	    break;
 	case 2:
-	    fprintf(oFile, "\t.word %s\n", 
+	    tfprintf(oFile, "\t!dws\n", 
 		    aopLiteralLong(val, 0, 2));
 	    break;
 	case 3:
@@ -631,10 +604,10 @@ void printIvalPtr (symbol * sym, link * type, initList * ilist, FILE * oFile)
     if (IS_LITERAL (val->etype)) {
 	switch (getSize (type)) {
 	case 1:
-	    fprintf (oFile, "\t.byte 0x%02x\n", ((char) floatFromVal (val)) & 0xff);
+	    tfprintf(oFile, "\t!db\n", (unsigned int)floatFromVal(val) & 0xff);
 	    break;
 	case 2:
-	    fprintf (oFile, "\t.word %s\n", aopLiteralLong(val, 0, 2));
+	    tfprintf (oFile, "\t!dws\n", aopLiteralLong(val, 0, 2));
 	    break;
 	case 3:
 	    fprintf (oFile, "\t.byte %s,%s,0x%02x\n",
@@ -646,10 +619,10 @@ void printIvalPtr (symbol * sym, link * type, initList * ilist, FILE * oFile)
     
     switch (getSize (type)) {
     case 1:
-	fprintf (oFile, "\t.byte %s\n", val->name);
+	tfprintf (oFile, "\t!dbs\n", val->name);
 	break;
     case 2:
-	fprintf (oFile, "\t.byte %s,(%s >> 8)\n", val->name, val->name);
+	tfprintf (oFile, "\t!dws\n", val->name);
 	break;
 	
     case 3:
@@ -764,7 +737,7 @@ void emitStaticSeg (memmap * map)
 			       SPEC_CVAL (sym->etype).v_char,
 			       strlen(SPEC_CVAL (sym->etype).v_char)+1);
 		else 
-		    asm_printf(code->oFile, asm_port->ds, (unsigned int)getSize (sym->type)& 0xffff);
+		    tfprintf(code->oFile, "\t!ds\n", (unsigned int)getSize (sym->type)& 0xffff);
 	    }
 	}
     }
@@ -811,7 +784,7 @@ void createInterruptVect (FILE * vFile)
 	return;
     }
     
-    fprintf (vFile, "\t.area\t%s\n", CODE_NAME);
+    tfprintf(vFile, "\t!area\n", CODE_NAME);
     fprintf (vFile, "__interrupt_vect:\n");
 
     
@@ -870,7 +843,7 @@ void printPublics (FILE * afile)
     
     for (sym = setFirstItem (publics); sym;
 	 sym = setNextItem (publics))
-	asm_printf(afile, asm_port->global, sym->rname);
+	tfprintf(afile, "\t!global\n", sym->rname);
 }
 
 /*-----------------------------------------------------------------*/
@@ -881,7 +854,7 @@ static void emitOverlay(FILE *afile)
     set *ovrset;
     
     if (!elementsInSet(ovrSetSets))
-	fprintf(afile,"\t.area\t%s\n", port->mem.overlay_name);
+	tfprintf(afile,"\t!area\n", port->mem.overlay_name);
 
     /* for each of the sets in the overlay segment do */
     for (ovrset = setFirstItem(ovrSetSets); ovrset;
@@ -959,8 +932,8 @@ static void emitOverlay(FILE *afile)
 		    fprintf(afile,"==.\n");
 	
 		/* allocate space */
-		asm_printf(afile, asm_port->label, sym->rname);
-		asm_printf(afile, asm_port->ds, (unsigned int)getSize (sym->type) & 0xffff);
+		tfprintf(afile, "\t!labeldef\n", sym->rname);
+		tfprintf(afile, "\t!ds\n", (unsigned int)getSize (sym->type) & 0xffff);
 	    }
 	    
 	}
@@ -1015,8 +988,9 @@ void glue ()
     initialComments (asmFile);
     
     /* print module name */
-    asm_printf(asmFile, asm_port->module, moduleName);
-    
+    tfprintf(asmFile, "\t!module\n", moduleName);
+    tfprintf(asmFile, "\t!fileprelude\n");
+
     /* Let the port generate any global directives, etc. */
     if (port->genAssemblerPreamble)
     {
@@ -1055,7 +1029,7 @@ void glue ()
     if (mainf && mainf->fbody) {
 	fprintf (asmFile, "%s", iComments2);
 	fprintf (asmFile, "; Stack segment in internal ram \n");
-	fprintf (asmFile, "%s", iComments2);    
+	fprintf (asmFile, "%s", iComments2);
 	fprintf (asmFile, "\t.area\tSSEG\t(DATA)\n"
 		 "__start__stack:\n\t.ds\t1\n\n");
     }
@@ -1107,9 +1081,9 @@ void glue ()
      * the post_static_name area will immediately follow the static_name
      * area.
      */
-    fprintf (asmFile, "\t.area %s\n", port->mem.static_name); /* MOF */
-    fprintf (asmFile, "\t.area %s\n", port->mem.post_static_name);
-    fprintf (asmFile, "\t.area %s\n", port->mem.static_name);
+    tfprintf(asmFile, "\t!area\n", port->mem.static_name); /* MOF */
+    tfprintf(asmFile, "\t!area\n", port->mem.post_static_name);
+    tfprintf(asmFile, "\t!area\n", port->mem.static_name);
     
     if (mainf && mainf->fbody) {
 	fprintf (asmFile,"__sdcc_gsinit_startup:\n");
@@ -1150,7 +1124,7 @@ void glue ()
          * This area is guaranteed to follow the static area
          * by the ugly shucking and jiving about 20 lines ago.
          */
-    	fprintf(asmFile, "\t.area %s\n", port->mem.post_static_name);
+    	tfprintf(asmFile, "\t!area %s\n", port->mem.post_static_name);
 	fprintf (asmFile,"\tljmp\t__sdcc_program_startup\n");
     }
 	
@@ -1158,7 +1132,7 @@ void glue ()
     fprintf (asmFile, "%s", iComments2);
     fprintf (asmFile, "; code\n");
     fprintf (asmFile, "%s", iComments2);
-    fprintf (asmFile, "\t.area %s\n", port->mem.code_name);
+    tfprintf(asmFile, "\t!area\n", port->mem.code_name);
     if (mainf && mainf->fbody) {
 	
 	/* entry point @ start of CSEG */

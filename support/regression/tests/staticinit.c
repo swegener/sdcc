@@ -21,7 +21,7 @@ testSmallDense(void)
 }
 
 #ifdef __mcs51
-idata
+idata at 0xa0	/* leave space for the stack */
 #endif
 static {type} smallSparse[] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1
@@ -42,7 +42,7 @@ testSmallSparse(void)
 }
 
 #ifdef __mcs51
-idata
+idata at 0xd0
 #endif
 static {type} smallSparseZero[] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0

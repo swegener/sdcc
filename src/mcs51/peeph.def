@@ -157,7 +157,7 @@ replace {
         clr     c
         mov     a,%1
 } by {
-        ;       Peephole 106    removed redundant mov 
+        ;       Peephole 106    removed redundant mov
         mov     %1,a
         clr     c
 } if notVolatile %1
@@ -3147,7 +3147,15 @@ replace {
 replace {
         ljmp    %5
 } by {
-        ;       Peephole 251    replaced ljmp to ret with ret
+        ;       Peephole 251.a  replaced ljmp to ret with ret
+        ret
+} if labelIsReturnOnly
+
+// not before peephole 250.b
+replace {
+        sjmp    %5
+} by {
+        ;       Peephole 251.b  replaced sjmp to ret with ret
         ret
 } if labelIsReturnOnly
 
@@ -3169,4 +3177,35 @@ replace {
         mov     a,(%2 + 1)
         rlc     a
         mov     r%3,a
+}
+
+// applies to: void test( char c ) { if( c ) func1(); else func2(); }
+replace {
+        lcall   %1
+        ret
+} by {
+        ;       Peephole 253.a  replaced lcall/ret with ljmp
+        ljmp    %1
+}
+
+// applies to: void test( char c ) { if( c ) func1(); else func2(); }
+replace {
+        lcall   %1
+%2:
+        ret
+} by {
+        ;       Peephole 253.b  replaced lcall/ret with ljmp
+        ljmp    %1
+} if labelRefCount %2 0
+
+// applies to f.e. scott-bool1.c
+replace {
+        lcall   %1
+%2:
+        ret
+} by {
+        ;       Peephole 253.c  replaced lcall with ljmp
+        ljmp    %1
+%2:
+        ret
 }

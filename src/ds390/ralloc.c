@@ -80,6 +80,7 @@ regs regs390[] =
 int ds390_nRegs = 13;
 static void spillThis (symbol *);
 static void freeAllRegs ();
+static iCode * packRegsDPTRuse (operand *);
 
 /*-----------------------------------------------------------------*/
 /* allocReg - allocates register of given type                     */
@@ -210,6 +211,16 @@ allDefsOutOfRange (bitVect * defs, int fseq, int toseq)
     }
 
   return TRUE;
+}
+
+/*-----------------------------------------------------------------*/
+/* isOperandInReg - returns true if operand is currently in regs   */
+/*-----------------------------------------------------------------*/
+static int isOperandInReg(operand *op)
+{
+    if (!IS_SYMOP(op)) return 0;
+
+    return bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(op)->key);
 }
 
 /*-----------------------------------------------------------------*/
@@ -523,6 +534,7 @@ createStackSpil (symbol * sym)
   }
   SPEC_EXTR (sloc->etype) = 0;
   SPEC_STAT (sloc->etype) = 0;
+  SPEC_VOLATILE(sloc->etype) = 0;
 
   /* we don't allow it to be allocated`
      onto the external stack since : so we
@@ -1285,6 +1297,30 @@ static void fillGaps()
     int key =0;    
     
     if (getenv("DISABLE_FILL_GAPS")) return;
+    
+    /* First try to do DPTRuse once more since now we know what got into
+       registers */
+#if 1
+    for (sym = hTabFirstItem(liveRanges,&key) ; sym ; 
+	 sym = hTabNextItem(liveRanges,&key)) {
+
+	if (sym->uptr && !sym->ruonly && getSize(sym->type) < 4) {
+	    if (packRegsDPTRuse(operandFromSymbol(sym))) {
+
+		printf("FILL GAPS: found more DPTR use for %s in func %s\n",sym->name, currFunc ? currFunc->name : "UNKNOWN");
+		/* if this was ssigned to registers then */
+		if (bitVectBitValue(_G.totRegAssigned,sym->key)) {
+
+		    /* take it out of the register assigned set */
+		    bitVectUnSetBit(_G.totRegAssigned,sym->key);
+		    sym->nRegs = 0;		    
+		} else if (sym->usl.spillLoc) sym->usl.spillLoc->allocreq--;
+
+		sym->isspilt = sym->spillA = 0;
+	    }
+	}
+    }
+#endif    
     /* look for livernages that was spilt by the allocator */
     for (sym = hTabFirstItem(liveRanges,&key) ; sym ; 
 	 sym = hTabNextItem(liveRanges,&key)) {
@@ -1293,7 +1329,7 @@ static void fillGaps()
 	int pdone = 0;
 
 	if (!sym->spillA || !sym->clashes || sym->remat) continue ;
-	
+
 	/* find the liveRanges this one clashes with, that are
 	   still assigned to registers & mark the registers as used*/
 	for ( i = 0 ; i < sym->clashes->size ; i ++) {
@@ -2037,7 +2073,7 @@ right:
 /* packRegsDPTRuse : - will reduce some registers for single Use */
 /*-----------------------------------------------------------------*/
 static iCode *
-packRegsDPTRuse (iCode * lic, operand * op, eBBlock * ebp)
+packRegsDPTRuse (operand * op)
 {
     /* go thru entire liveRange of this variable & check for
        other possible usage of DPTR , if we don't find it the
@@ -2084,20 +2120,25 @@ packRegsDPTRuse (iCode * lic, operand * op, eBBlock * ebp)
 	/* special case of add with a [remat] */
 	if (ic->op == '+' && 
 	    OP_SYMBOL(IC_LEFT(ic))->remat &&
-	    !isOperandInFarSpace(IC_RIGHT(ic))) continue ;
+	    (!isOperandInFarSpace(IC_RIGHT(ic)) || 
+	     isOperandInReg(IC_RIGHT(ic)))) continue ;
 
 	/* special case */
 	/* pointerGet */
-	if (POINTER_GET(ic) && isOperandEqual(IC_RESULT(ic),op) &&
-	    getSize(operandType(IC_LEFT(ic))) > 1) return NULL ;
+	if (POINTER_GET(ic) && !isOperandEqual(IC_LEFT(ic),op) &&
+	    getSize(operandType(IC_LEFT(ic))) > 1 ) return NULL ;
 
-	if (POINTER_SET(ic) && isOperandEqual(IC_RIGHT(ic),op) &&
-	    getSize(operandType(IC_RESULT(ic))) > 1) return NULL;
+	/* pointerSet */
+	if (POINTER_SET(ic) && !isOperandEqual(IC_RESULT(ic),op) &&
+	    getSize(operandType(IC_RESULT(ic))) > 1 ) return NULL;
+
+	/* conditionals can destroy 'b' */
+	if (IS_CONDITIONAL(ic) && getSize(operandType(op)) > 3) return NULL;
 
 	/* general case */
 	if (IC_RESULT(ic) && IS_SYMOP(IC_RESULT(ic)) && 
 	    !isOperandEqual(IC_RESULT(ic),op) &&
-	    (isOperandInFarSpace(IC_RESULT(ic)) || 
+	    ((isOperandInFarSpace(IC_RESULT(ic)) && !isOperandInReg(IC_RESULT(ic))) || 
 	     OP_SYMBOL(IC_RESULT(ic))->ruonly   ||
 	     OP_SYMBOL(IC_RESULT(ic))->onStack)) return NULL;
 
@@ -2106,7 +2147,7 @@ packRegsDPTRuse (iCode * lic, operand * op, eBBlock * ebp)
 	    (OP_SYMBOL(IC_RIGHT(ic))->liveTo > ic->seq || 
 	     IS_TRUE_SYMOP(IC_RIGHT(ic))	       ||
 	     OP_SYMBOL(IC_RIGHT(ic))->ruonly) &&
-	    (isOperandInFarSpace(IC_RIGHT(ic)) || 
+	    ((isOperandInFarSpace(IC_RIGHT(ic)) && !isOperandInReg(IC_RIGHT(ic)))|| 
 	     OP_SYMBOL(IC_RIGHT(ic))->onStack)) return NULL;
 
 	if (IC_LEFT(ic) && IS_SYMOP(IC_LEFT(ic)) && 
@@ -2114,12 +2155,13 @@ packRegsDPTRuse (iCode * lic, operand * op, eBBlock * ebp)
 	    (OP_SYMBOL(IC_LEFT(ic))->liveTo > ic->seq || 
 	     IS_TRUE_SYMOP(IC_LEFT(ic))  	      ||
 	     OP_SYMBOL(IC_LEFT(ic))->ruonly) &&
-	    (isOperandInFarSpace(IC_LEFT(ic)) || 
+	    ((isOperandInFarSpace(IC_LEFT(ic)) && !isOperandInReg(IC_LEFT(ic)))|| 
 	     OP_SYMBOL(IC_LEFT(ic))->onStack)) return NULL;
 	
 	if (IC_LEFT(ic) && IC_RIGHT(ic) && 
 	    IS_ITEMP(IC_LEFT(ic)) && IS_ITEMP(IC_RIGHT(ic)) &&
-	    isOperandInFarSpace(IC_LEFT(ic)) && isOperandInFarSpace(IC_RIGHT(ic)))
+	    (isOperandInFarSpace(IC_LEFT(ic)) && !isOperandInReg(IC_LEFT(ic))) && 
+	    (isOperandInFarSpace(IC_RIGHT(ic)) && !isOperandInReg(IC_RIGHT(ic))))
 	    return NULL;
     }
     OP_SYMBOL(op)->ruonly = 1;
@@ -2526,11 +2568,11 @@ packRegisters (eBBlock * ebp)
 	  !isOperandInFarSpace (IC_LEFT (ic)) &&
 	  !options.model) {
 	 
-	  packRegsDPTRuse (ic, IC_LEFT (ic), ebp);
+	  packRegsDPTRuse (IC_LEFT (ic));
       }
 
       if ((ic->op == CALL && getSize(operandType(IC_RESULT(ic))) <= 4)) {
-	  packRegsDPTRuse (ic, IC_RESULT (ic), ebp);	  
+	  packRegsDPTRuse (IC_RESULT (ic));	  
       }
 
       /* if pointer set & left has a size more than
@@ -2541,7 +2583,7 @@ packRegisters (eBBlock * ebp)
 	  !IS_OP_RUONLY (IC_RIGHT (ic)) &&
 	  getSize (aggrToPtr (operandType (IC_RESULT (ic)), FALSE)) > 1) {
 	  
-	  packRegsDPTRuse (ic, IC_RESULT (ic), ebp);
+	  packRegsDPTRuse (IC_RESULT (ic));
       }
 
       /* if pointer get */
@@ -2551,7 +2593,7 @@ packRegisters (eBBlock * ebp)
 	  !IS_OP_RUONLY (IC_RESULT (ic)) &&
 	  getSize (aggrToPtr (operandType (IC_LEFT (ic)), FALSE)) > 1) {
 
-	  packRegsDPTRuse (ic, IC_LEFT (ic), ebp);
+	  packRegsDPTRuse (IC_LEFT (ic));
       }
 
       /* if this is cast for intergral promotion then
@@ -2569,7 +2611,7 @@ packRegisters (eBBlock * ebp)
 	      SPEC_USIGN (fromType) == SPEC_USIGN (toType))
 	    {
 
-	      iCode *dic = packRegsDPTRuse (ic, IC_RIGHT (ic), ebp);
+	      iCode *dic = packRegsDPTRuse (IC_RIGHT (ic));
 	      if (dic)
 		{
 		  if (IS_ARITHMETIC_OP (dic))
@@ -2594,7 +2636,7 @@ packRegisters (eBBlock * ebp)
 	      if (compareType (operandType (IC_RIGHT (ic)),
 			     operandType (IC_LEFT (ic))) == 1)
 		{
-		  iCode *dic = packRegsDPTRuse (ic, IC_RIGHT (ic), ebp);
+		  iCode *dic = packRegsDPTRuse (IC_RIGHT (ic));
 		  if (dic)
 		    {
 		      bitVectUnSetBit(OP_SYMBOL(IC_RESULT(ic))->defs,ic->key);

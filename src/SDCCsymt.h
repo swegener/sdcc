@@ -132,7 +132,7 @@ typedef struct specifier
     unsigned _stack;		/* stack offset for stacked v */
     unsigned _bitStart;		/* bit start position         */
     int _bitLength;		/* bit length                 */
-
+    int argreg;  	        /* reg no for regparm 	      */
     union
       {				/* Values if constant or enum */
 	short int v_int;		/* int and char values        */
@@ -264,7 +264,9 @@ typedef struct symbol
 				   ACCUSE_A and ACCUSE_HL as the idea
 				   is quite similar.
 				 */
-
+    unsigned dptr;		/* 8051 variants with multiple DPTRS
+				   currently implemented in DS390 only
+				*/
     int allocreq ;		/* allocation is required for this variable */
     int stack;			/* offset on stack      */
     int xstack;			/* offset on xternal stack */
@@ -380,6 +382,7 @@ symbol;
 #define SPEC_STRUCT(x) x->select.s.v_struct
 #define SPEC_TYPEDEF(x) x->select.s._typedef
 #define SPEC_REGPARM(x) x->select.s._isregparm
+#define SPEC_ARGREG(x) x->select.s.argreg
 
 /* type check macros */
 #define IS_DECL(x)   ( x && x->class == DECLARATOR	)

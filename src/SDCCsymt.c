@@ -622,7 +622,9 @@ mergeSpec (sym_link * dest, sym_link * src, char *name)
   SPEC_BSTR (dest) |= SPEC_BSTR (src);
   SPEC_TYPEDEF (dest) |= SPEC_TYPEDEF (src);
   SPEC_ENUM (dest) |= SPEC_ENUM (src);
-
+  if (SPEC_ARGREG(src) && !SPEC_ARGREG(dest))
+      SPEC_ARGREG(dest) = SPEC_ARGREG(src);
+  
   if (IS_STRUCT (dest) && SPEC_STRUCT (dest) == NULL)
     SPEC_STRUCT (dest) = SPEC_STRUCT (src);
 
@@ -1842,13 +1844,15 @@ processFuncArgs (symbol * func)
   /* change it to pointer to the same type */
   while (val)
     {
+	int argreg = 0;
       /* mark it as a register parameter if
          the function does not have VA_ARG
          and as port dictates */
       if (!IFFUNC_HASVARARGS(funcType) &&
-	  (*port->reg_parm) (val->type))
+	  (argreg = (*port->reg_parm) (val->type)))
 	{
 	  SPEC_REGPARM (val->etype) = 1;
+	  SPEC_ARGREG(val->etype) = argreg;
 	} else if (IFFUNC_ISREENT(funcType)) {
 	    FUNC_HASSTACKPARM(funcType) = 1;
 	}
@@ -2047,7 +2051,6 @@ printTypeChain (sym_link * start, FILE * of)
 	    fprintf (of, "unsigned ");
 	  if (SPEC_CONST (type))
 	    fprintf (of, "const ");
-
 	  switch (SPEC_NOUN (type))
 	    {
 	    case V_INT:

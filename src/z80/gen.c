@@ -1018,27 +1018,6 @@ requiresHL (asmop * aop)
     }
 }
 
-static char *
-fetchLitSpecial (asmop * aop, bool negate, bool xor)
-{
-  unsigned long v;
-  value *val = aop->aopu.aop_lit;
-
-  wassert (aop->type == AOP_LIT);
-  wassert (!IS_FLOAT (val->type));
-
-  v = (unsigned long) floatFromVal (val);
-
-  if (xor)
-    v ^= 0x8000;
-  if (negate)
-    v = 0-v;
-  v &= 0xFFFF;
-
-  tsprintf (buffer, "!immedword", v);
-  return gc_strdup (buffer);
-}
-
 static void
 fetchLitPair (PAIR_ID pairId, asmop * left, int offset)
 {
@@ -3217,11 +3196,13 @@ genIfxJump (iCode * ic, char *jval)
   ic->generated = 1;
 }
 
+#if DISABLED
 static const char *
 _getPairIdName (PAIR_ID id)
 {
   return _pairs[id].name;
 }
+#endif
 
 /** Generic compare for > or <
  */
@@ -6201,5 +6182,27 @@ _isPairUsed (iCode * ic, PAIR_ID pairId)
     }
   return ret;
 }
+
+static char *
+fetchLitSpecial (asmop * aop, bool negate, bool xor)
+{
+  unsigned long v;
+  value *val = aop->aopu.aop_lit;
+
+  wassert (aop->type == AOP_LIT);
+  wassert (!IS_FLOAT (val->type));
+
+  v = (unsigned long) floatFromVal (val);
+
+  if (xor)
+    v ^= 0x8000;
+  if (negate)
+    v = 0-v;
+  v &= 0xFFFF;
+
+  tsprintf (buffer, "!immedword", v);
+  return gc_strdup (buffer);
+}
+
 
 */

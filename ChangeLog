@@ -1,3 +1,9 @@
+2001-10-16  Bernhard Held  <bernhard@bernhardheld.de>
+
+	* support/regression/port/mcs51/spec.mk: add timeout for uCsim
+
+	* support/regression/port/mcs51/timeout.c: add timeout for uCsim
+
 2001-10-13  Michael Hope  <michaelh@juju.net.nz>
 
 	* src/SDCCmain.c (linkEdit): Added support for passing a legacy command line through the processor.

@@ -1,5 +1,6 @@
 # Port specification for the mcs51 port running with uCsim
 
+# path to uCsim
 S51 = ../../sim/ucsim/s51.src/s51
 
 SDCCFLAGS += --lesspedantic -DREENTRANT=reentrant --stack-after-data
@@ -7,7 +8,6 @@ SDCCFLAGS += --lesspedantic -DREENTRANT=reentrant --stack-after-data
 OBJEXT = .rel
 EXEEXT = .ihx
 
-# Needs parts of gbdk-lib, namely the internal mul/div/mod functions.
 EXTRAS = fwk/lib/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
 
 # Rule to link into .ihx
@@ -19,8 +19,10 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
 %$(OBJEXT): %.c
 	$(SDCC) $(SDCCFLAGS) -c $<
 
-# PENDING: Path to sdcc-extra
-%.out: %$(EXEEXT)
+# run simulator with 5 seconds timeout
+%.out: %$(EXEEXT) ports/$(PORT)/timeout
 	mkdir -p `dirname $@`
-	$(S51) -t32 -S in=$(shell tty),out=$@ $< < ports/mcs51/uCsim.cmd >/dev/null 2>&1
+	-ports/$(PORT)/timeout 5 $(S51) -t32 -S in=/dev/null,out=$@ $< < ports/mcs51/uCsim.cmd >/dev/null 2>&1 || \
+          echo -e --- FAIL: \"timeout, simulation killed\" in $(<:.ihx=.c)"\n"--- Summary: 1/1/1: timeout >> $@
 	-grep -n FAIL $@ /dev/null || true
+

@@ -689,6 +689,14 @@ forceload:
           }
         break;
       case H_IDX:
+        {
+          char * l = aopAdrStr (aop, loffset, FALSE);
+          if (!strcmp (l, zero))
+            {
+              emitcode ("clrh", "");
+              break;
+            }
+        }
         if (hc08_reg_a->isFree)
           {
             loadRegFromAop (hc08_reg_a, aop, loffset);
@@ -2869,15 +2877,17 @@ inExcludeList (char *s)
 static void
 genFunction (iCode * ic)
 {
-  symbol *sym;
+  symbol *sym = OP_SYMBOL (IC_LEFT (ic));
   sym_link *ftype;
-  int calleesaves_saved_register = -1;
+  iCode *ric = (ic->next && ic->next->op == RECEIVE) ? ic->next : NULL;
+  int stackAdjust = sym->stack;
+  int accIsFree = sym->recvSize != 0;
 
   _G.nRegsSaved = 0;
   _G.stackPushes = 0;
   /* create the function header */
   emitcode (";", "-----------------------------------------");
-  emitcode (";", " function %s", (sym = OP_SYMBOL (IC_LEFT (ic)))->name);
+  emitcode (";", " function %s", sym->name);
   emitcode (";", "-----------------------------------------");
 
   emitcode ("", "%s:", sym->rname);
@@ -2893,8 +2903,6 @@ genFunction (iCode * ic)
       return;
   }
 
-
-
   /* if this is an interrupt service routine then
      save h  */
   if (IFFUNC_ISISR (sym->type))
@@ -2903,47 +2911,52 @@ genFunction (iCode * ic)
       if (!inExcludeList ("h"))
         pushReg (hc08_reg_h, FALSE);
     }
-  else
+
+  /* For some cases it is worthwhile to perform a RECEIVE iCode */
+  /* before setting up the stack frame completely. */
+  while (ric && ric->next && ric->next->op == RECEIVE)
+    ric = ric->next;
+  while (ric && IC_RESULT (ric))
     {
-      /* if callee-save to be used for this function
-         then save the registers being used in this function */
-      if (IFFUNC_CALLEESAVES(sym->type))
-	{
-	  int i;
+      symbol * rsym = OP_SYMBOL (IC_RESULT (ric));
+      int rsymSize = rsym ? getSize(rsym->type) : 0;
 
-	  /* if any registers used */
-	  if (sym->regsUsed)
-	    {
-	      /* save the registers used */
-	      for (i = 0; i < sym->regsUsed->size; i++)
-		{
-		  if (bitVectBitValue (sym->regsUsed, i))
-		    {
-		      /* remember one saved register for later usage */
-		      if (calleesaves_saved_register < 0)
-		        calleesaves_saved_register = i;
-                      pushReg (hc08_regWithIdx (i), FALSE);
-		      _G.nRegsSaved++;
-		    }
-		}
-	    }
-	}
-    }
+      if (rsym->isitmp)
+        {
+          if (rsym && rsym->regType == REG_CND)
+            rsym = NULL;
+          if (rsym && (rsym->accuse || rsym->ruonly))
+            rsym = NULL;
+          if (rsym && (rsym->isspilt || rsym->nRegs == 0) && rsym->usl.spillLoc)
+            rsym = rsym->usl.spillLoc;
+        }
 
-  if (IFFUNC_ISREENT (sym->type) || options.stackAuto)
-    {
+      /* If the RECEIVE operand immediately spills to the first entry on the  */
+      /* stack, we can push it directly rather than use an sp relative store. */
+      if (rsym && rsym->onStack && rsym->stack == -_G.stackPushes-rsymSize)
+        {
+          int ofs;
 
+          _G.current_iCode = ric;
+          D(emitcode (";     genReceive",""));
+          for (ofs=0; ofs < rsymSize; ofs++)
+            {
+              regs * reg = hc08_aop_pass[ofs+(ric->argreg-1)]->aopu.aop_reg[0];
+              pushReg (reg, TRUE);
+              if (reg->rIdx == A_IDX)
+                accIsFree = 1;
+              stackAdjust--;
+            }
+          _G.current_iCode = ic;
+          ric->generated = 1;
+        }
+      ric = (ric->prev && ric->prev->op == RECEIVE) ? ric->prev : NULL;
     }
 
   /* adjust the stack for the function */
-  if (sym->stack)
+  if (stackAdjust)
     {
-
-      int i = sym->stack;
-//      if (i > 256)
-//	werror (W_STACK_OVERFLOW, sym->name);
-
-      adjustStack (-i);
+      adjustStack (-stackAdjust);
     }
   _G.stackOfs = sym->stack;
   _G.stackPushes = 0;
@@ -2951,7 +2964,7 @@ genFunction (iCode * ic)
   /* if critical function then turn interrupts off */
   if (IFFUNC_ISCRITICAL (ftype))
     {
-      if (IFFUNC_ARGS (ftype))
+      if (!accIsFree)
         {
           /* Function was passed parameters, so make sure A is preserved */
           pushReg (hc08_reg_a, FALSE);
@@ -4462,7 +4475,7 @@ genPointerGetSetOfs (iCode *ic)
 {
   iCode *lic = ic->next;
   bool pset, pget;
-  int offset, size;
+  int size;
   symbol *sym;
   asmop *derefaop;
 
@@ -4542,14 +4555,13 @@ genPointerGetSetOfs (iCode *ic)
         loadRegFromAop (hc08_reg_hx, AOP (IC_RIGHT (ic)), 0);
       size = AOP_SIZE (IC_RESULT(lic));
       derefaop->size = size;
-      offset=0;
       
       while (size--)
         {
           emitcode ("lda", "%s,x",
-                    aopAdrStr (derefaop, offset, TRUE));
+                    aopAdrStr (derefaop, size, TRUE));
           hc08_useReg (hc08_reg_a);
-          storeRegToAop (hc08_reg_a, AOP (IC_RESULT (lic)), offset++);
+          storeRegToAop (hc08_reg_a, AOP (IC_RESULT (lic)), size);
           hc08_freeReg (hc08_reg_a);
         }
 
@@ -4595,15 +4607,13 @@ genPointerGetSetOfs (iCode *ic)
         loadRegFromAop (hc08_reg_hx, AOP (IC_RIGHT (ic)), 0);
       size = AOP_SIZE (IC_RIGHT(lic));
       derefaop->size = size;
-      offset=0;
       
       while (size--)
         {
-          loadRegFromAop (hc08_reg_a, AOP (IC_RIGHT (lic)), offset);
+          loadRegFromAop (hc08_reg_a, AOP (IC_RIGHT (lic)), size);
           emitcode ("sta", "%s,x",
-                    aopAdrStr (derefaop, offset, TRUE));
+                    aopAdrStr (derefaop, size, TRUE));
           hc08_freeReg (hc08_reg_a);
-          offset++;
         }
 
       lic->generated = 1;
@@ -7013,7 +7023,7 @@ genDataPointerGet (operand * left,
 		   iCode * ic,
                    iCode * ifx)
 {
-  int size, offset = 0;
+  int size;
   asmop *derefaop;
   
   D(emitcode (";     genDataPointerGet",""));
@@ -7028,10 +7038,9 @@ genDataPointerGet (operand * left,
   while (size--)
     {
       if (!ifx)
-        transferAopAop (derefaop, offset, AOP (result), offset);
+        transferAopAop (derefaop, size, AOP (result), size);
       else
-        loadRegFromAop (hc08_reg_a, derefaop, offset);
-      offset++;
+        loadRegFromAop (hc08_reg_a, derefaop, size);
     }
 
   freeAsmop (NULL, derefaop, ic, TRUE);
@@ -7415,7 +7424,7 @@ genDataPointerSet (operand * right,
 		   operand * result,
 		   iCode * ic)
 {
-  int size, offset = 0;
+  int size;
   asmop *derefaop;
 
   D(emitcode (";     genDataPointerSet",""));
@@ -7429,8 +7438,7 @@ genDataPointerSet (operand * right,
   
   while (size--)
     {
-      transferAopAop (AOP (right), offset, derefaop, offset);
-      offset++;
+      transferAopAop (AOP (right), size, derefaop, size);
     }
 
   freeAsmop (right, NULL, ic, TRUE);
@@ -7616,7 +7624,7 @@ static void
 genAssign (iCode * ic)
 {
   operand *result, *right;
-  int size, offset;
+  int size;
 //  unsigned long lit = 0L;
 
   D(emitcode(";     genAssign",""));
@@ -7645,12 +7653,9 @@ genAssign (iCode * ic)
     
   /* general case */
   size = AOP_SIZE (result);
-  offset = 0;
-
   while (size--)
     {
-      transferAopAop (AOP (right), offset, AOP (result), offset);
-      offset++;
+      transferAopAop (AOP (right), size, AOP (result), size);
     }
 
 release:

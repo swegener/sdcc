@@ -1,3 +1,11 @@
+2004-11-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c (genAssign, genPointerGetSetOfs, genDataPointerGet,
+	  genDataPointerSet): ensure assignments always copy in MSB to LSB
+	  order,
+	  (loadRegFromAop): recognize CLRH optimization,
+	  (genFunction): optimize RECEIVE iCodes in reentrant functions
+
 2004-11-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCmain.c (parseCmdLine, optionsTable[]): fixed bug with

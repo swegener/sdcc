@@ -1066,8 +1066,6 @@ _cpp_lex_token (pfile, result)
           skip_asm_block (pfile);
           /* Save the _asm block as a token in its own right.  */
           save_asm (pfile, result, comment_start);
-          /* Don't do MI optimisation.  */
-          return;
         }
       /* Convert named operators to their proper types.  */
       else if (result->val.node->flags & NODE_OPERATOR)
@@ -1135,8 +1133,11 @@ _cpp_lex_token (pfile, result)
 
       /* Save the comment as a token in its own right.  */
       save_comment (pfile, result, comment_start);
-      /* Don't do MI optimisation.  */
-      return;
+      /* fixed for SDCPP:
+         when executed with -C option, comments
+         were included even if they where in skipped #if block.
+         Applied solution from GCC cpp 3.3.2 */
+      break;
 
     case '<':
       if (pfile->state.angled_headers)

@@ -1,5 +1,12 @@
 2003-10-31  Borut Razem <borut.razem@siol.net>
 
+	* support\cpp2\cpplex.c: fixed for SDCPP:
+	  comments(when executed with -C option) and _asm blocks
+	  were included even if they where in skipped #if block.
+	  Applied solution from GCC cpp 3.3.2
+
+2003-10-31  Borut Razem <borut.razem@siol.net>
+
 	* src/SDCC.lex: sdcc now understands both formats:
 	  '# <line_number> <file_name>' and
 	  '#line <line_number> <file_name>'

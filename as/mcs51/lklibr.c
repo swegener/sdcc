@@ -126,13 +126,17 @@ addlib()
 
 	unget(getnb());
 
-	if (lbphead == NULL) {
-		addfile(NULL,ip);
-		return;
-	}	
-	for (lbph=lbphead; lbph; lbph=lbph->next) {
-		foundcount+=addfile(lbph->path,ip);
+	if (lbphead == NULL)
+    {
+		foundcount+=addfile(NULL,ip);
 	}
+    else
+    {
+	    for (lbph=lbphead; lbph; lbph=lbph->next)
+        {
+		    foundcount+=addfile(lbph->path,ip);
+	    }
+    }
     if(foundcount==0)
     {
         printf("?ASlink-Warning-Couldn't find library '%s'\n", ip);

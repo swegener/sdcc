@@ -6,7 +6,7 @@ SHELL		= /bin/sh
 AUTOCONF	= autoconf
 
 PRJDIR		= .
-SDCC_MISC	= debugger/mcs51 sim/ucsim binutils-2.9.5.0.13
+SDCC_MISC	= debugger/mcs51 sim/ucsim
 SDCC_LIBS	= support/cpp
 SDCC_ASLINK	= as/mcs51 as link
 

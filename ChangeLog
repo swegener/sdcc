@@ -1,3 +1,8 @@
+2004-04-16 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* doc/sdccman.lyx: Added instructons on how to convert MSVC .dsw and
+	.dsp files from Unix to DOS.
+
 2004-04-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* doc/sdccman.lyx: removed the ANSI-C noncompliance note regarding

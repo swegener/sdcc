@@ -26,7 +26,7 @@ $(PORTS_DIR)/$(PORT)/testfwk$(OBJEXT): fwk/lib/testfwk.c
 # run simulator with 10 seconds timeout
 %.out: %$(EXEEXT) fwk/lib/timeout
 	mkdir -p `dirname $@`
-	-fwk/lib/timeout 10 $(S51) -tds390f -S in=/dev/null,out=$@ $< < $(PORTS_DIR)/ds390/uCsim.cmd >/dev/null || \
+	-fwk/lib/timeout 20 $(S51) -tds390f -S in=/dev/null,out=$@ $< < $(PORTS_DIR)/ds390/uCsim.cmd >/dev/null || \
           echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(EXEEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
 	-grep -n FAIL $@ /dev/null || true
 

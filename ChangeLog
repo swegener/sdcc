@@ -1,3 +1,12 @@
+2003-02-02    <johan@balder>
+
+	* src/mcs51/ralloc.c (packForPush): fixed bug #631653, maybe other ports need this too? At least now some new alerts in SDCCBBlock.c and SDCCicode.c gives an early warning
+	* support/regression/fwk/lib/testfwk.c: div and mod isn't broken anymore
+	* regressions ds390/spec.mk and mcs51/spec.mk (timeout): my good old balder isn't fast enough for some tests
+	* src/z80/gen.c (genZ80Code): added c-lines in asm comments
+	* as/z80/asm.h (NINPUT): increased for long c-comments in regression tests
+	* src/z80/gen.c (genRightShiftLiteral): fixed the (char)(-3)>>8 (I think)
+
 2003-02-01  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	* src/SDCCmain.c: Fixed bug 678574: "ds390: ASlink-Error-Stack overlaps

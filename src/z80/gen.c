@@ -5890,9 +5890,19 @@ genRightShiftLiteral (operand * left,
       wassert (0);
     }
 
-  else if (shCount >= (size * 8))
+  else if (shCount >= (size * 8)) {
+    const char *s;
+    if (!SPEC_USIGN(getSpec(operandType(left)))) {
+      _moveA(aopGet (AOP (left), 0, FALSE));
+      emit2 ("rlc a");
+      emit2 ("sbc a,a");
+      s=ACC_NAME;
+    } else {
+      s="!zero";
+    }
     while (size--)
-      aopPut (AOP (result), "!zero", size);
+      aopPut (AOP (result), s, size);
+  }
   else
     {
       switch (size)
@@ -7238,7 +7248,8 @@ genZ80Code (iCode * lic)
 
       if (cln != ic->lineno)
 	{
-	  emit2 ("; %s %d", ic->filename, ic->lineno);
+	  emit2 ("; %s:%d: %s", ic->filename, ic->lineno,
+		 printCLine(ic->filename, ic->lineno));
 	  cln = ic->lineno;
 	}
       /* if the result is marked as

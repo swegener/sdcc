@@ -10,7 +10,7 @@
 /** Define this if the port's div or mod functions are broken.
     A slow loop based method will be substituded.
 */
-#define BROKEN_DIV_MOD		1
+//#define BROKEN_DIV_MOD		1
 
 void _putchar(char c);
 void _exitEmu(void);

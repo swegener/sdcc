@@ -2745,6 +2745,8 @@ geniCodeParms (ast * parms, value *argVals, int *stack,
 
 	  /* assign */
 	  operand *top = operandFromSymbol (argVals->sym);
+	  /* clear useDef and other bitVectors */
+	  OP_USES (top) = OP_DEFS (top) = OP_SYMBOL(top)->clashes = NULL;
 	  geniCodeAssign (top, pval, 1);
 	}
       else

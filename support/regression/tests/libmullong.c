@@ -4,10 +4,17 @@
  */
 #include <testfwk.h>
 
+#define type_{type}
+
 #if defined(PORT_HOST)
-#  define _mullong(a,b) (a*b)
+#  if defined(type_c)
+#    define _SDCC_NO_ASM_LIB_FUNCS 1
+#    define near
+#    include "../../../../../device/lib/_mullong.c"
+#  else
+#    define _mullong(a,b) (a*b)
+#  endif
 #else
-#  define type_{type}
 #  if defined(type_c)
 #    define _SDCC_NO_ASM_LIB_FUNCS 1
 #  endif

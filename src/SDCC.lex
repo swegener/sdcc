@@ -169,12 +169,12 @@ static int checkCurrFile(char *s);
 "=="           { count(); return(EQ_OP); }
 "!="           { count(); return(NE_OP); }
 ";"            { count(); return(';'); }
-"{"            { count(); NestLevel++ ;  return('{'); }
+"{"            { count(); NestLevel++ ; ignoreTypedefType = 0; return('{'); }
 "}"            { count(); NestLevel--; return('}'); }
 ","            { count(); return(','); }
 ":"            { count(); return(':'); }
 "="            { count(); return('='); }
-"("            { count(); return('('); }
+"("            { count(); ignoreTypedefType = 0; return('('); }
 ")"            { count(); return(')'); }
 "["            { count(); return('['); }
 "]"            { count(); return(']'); }
@@ -296,8 +296,11 @@ static void count(void)
 
 static int check_type(void)
 {
-  /* check if it is in the typedef table */
-  if (findSym(TypedefTab, NULL, yytext)) {
+  symbol *sym = findSym(SymbolTab, NULL, yytext);
+
+  /* check if it is in the table as a typedef */
+  if (!ignoreTypedefType && sym && IS_SPEC (sym->etype)
+      && SPEC_TYPEDEF (sym->etype)) {
     strncpyz(yylval.yychar, yytext, SDCC_NAME_MAX);
     return (TYPE_NAME);
   }
@@ -309,7 +312,7 @@ static int check_type(void)
 
 /*
  * Change by JTV 2001-05-19 to not concantenate strings
- * to support ANSI hex and octal escape sequences in string liteals
+ * to support ANSI hex and octal escape sequences in string literals
  */
 
 static char *stringLiteral(void)

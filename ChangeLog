@@ -1,3 +1,10 @@
+2003-12-28 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCC.y (external_definition, type_specifier2, sfr_reg_bit,
+	sft_attributes, struct_declaration, parameter_declaration,
+	type_name, start_block, declaration_list),
+	* src/SDCC.lex (check_type): support redefinition of typedef names
+
 2003-12-22 Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
 	* src/mcs51/gen.c (genPlus): added special handling for 256 byte 

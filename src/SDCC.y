@@ -46,6 +46,7 @@ int blockNo   = 0 ;     /* sequential block number  */
 int currBlockno=0 ;
 int inCritical= 0 ;
 int seqPointNo= 1 ;	/* sequence point number */
+int ignoreTypedefType=0;
 extern int yylex();
 int yyparse(void);
 extern int noLineno ;
@@ -60,6 +61,8 @@ STACK_DCL(blockNum,int,MAX_NEST_LEVEL*3)
 
 value *cenum = NULL  ;  /* current enumeration  type chain*/
 bool uselessDecl = TRUE;
+
+#define YYDEBUG 1
 
 %}
 %expect 6
@@ -138,6 +141,7 @@ external_definition
                                blockNo=0;
                              }
    | declaration             { 
+			       ignoreTypedefType = 0;
 			       if ($1 && $1->type
 				&& IS_FUNC($1->type))
 			       {
@@ -581,7 +585,7 @@ type_specifier
    : type_specifier2
    | type_specifier2 AT constant_expr
         {
-           /* add this to the storage class specifier  */
+	   /* add this to the storage class specifier  */
            SPEC_ABSA($1) = 1;   /* set the absolute addr flag */
            /* now get the abs addr from value */
            SPEC_ADDR($1) = (int) floatFromVal(constExprValue($3,TRUE)) ;
@@ -592,30 +596,37 @@ type_specifier2
    : CHAR   {
                $$=newLink(SPECIFIER);
                SPEC_NOUN($$) = V_CHAR  ;
+	       ignoreTypedefType = 1;
             }
    | SHORT  {
                $$=newLink(SPECIFIER);
 	       $$->select.s._short = 1 ;
+	       ignoreTypedefType = 1;
             }
    | INT    {
                $$=newLink(SPECIFIER);
                SPEC_NOUN($$) = V_INT   ;
+	       ignoreTypedefType = 1;
             }
    | LONG   {
                $$=newLink(SPECIFIER);
 	       SPEC_LONG($$) = 1       ;
+	       ignoreTypedefType = 1;
             }
    | SIGNED {
                $$=newLink(SPECIFIER);
                $$->select.s._signed = 1;
+	       ignoreTypedefType = 1;
             }
    | UNSIGNED  {
                $$=newLink(SPECIFIER);
                SPEC_USIGN($$) = 1      ;
+	       ignoreTypedefType = 1;
             }
    | VOID   {
                $$=newLink(SPECIFIER);
                SPEC_NOUN($$) = V_VOID  ;
+	       ignoreTypedefType = 1;
             }
    | CONST  {
                $$=newLink(SPECIFIER);
@@ -628,6 +639,7 @@ type_specifier2
    | FLOAT  {
                $$=newLink(SPECIFIER);
 	       SPEC_NOUN($$) = V_FLOAT;
+	       ignoreTypedefType = 1;
             }
    | XDATA     {
                   $$ = newLink (SPECIFIER);
@@ -659,15 +671,18 @@ type_specifier2
 	       SPEC_SCLS($$) = S_BIT   ;
 	       SPEC_BLEN($$) = 1;
 	       SPEC_BSTR($$) = 0;
+	       ignoreTypedefType = 1;
             }
 
    | struct_or_union_specifier  {
                                    uselessDecl = FALSE;
                                    $$ = $1 ;
+	                           ignoreTypedefType = 1;
                                 }
    | enum_specifier     {                           
                            cenum = NULL ;
                            uselessDecl = FALSE;
+                           ignoreTypedefType = 1;
                            $$ = $1 ;                              
                         }
    | TYPE_NAME    
@@ -677,6 +692,7 @@ type_specifier2
             sym = findSym(TypedefTab,NULL,$1) ;
             $$ = p = copyLinkChain(sym->type);
 	    SPEC_TYPEDEF(getSpec(p)) = 0;
+            ignoreTypedefType = 1;
          }
    | sfr_reg_bit
    ;
@@ -686,6 +702,7 @@ sfr_reg_bit
                $$ = newLink(SPECIFIER) ;
                SPEC_NOUN($$) = V_SBIT;
                SPEC_SCLS($$) = S_SBIT;
+	       ignoreTypedefType = 1;
             }
    |  sfr_attributes
    ;
@@ -697,6 +714,7 @@ sfr_attributes
                SPEC_NOUN($$)    = V_CHAR;
                SPEC_SCLS($$)    = S_SFR ;
                SPEC_USIGN($$)   = 1 ;
+	       ignoreTypedefType = 1;
             }
    | SFR BANKED {
                $$ = newLink(SPECIFIER) ;
@@ -704,6 +722,7 @@ sfr_attributes
                SPEC_NOUN($$)    = V_CHAR;
                SPEC_SCLS($$)    = S_SFR ;
                SPEC_USIGN($$)   = 1 ;
+	       ignoreTypedefType = 1;
             }
    ;
 
@@ -808,7 +827,8 @@ struct_declaration
 	       /* make sure the type is complete and sane */
 	       checkTypeSanity(sym->etype, sym->name);
 	   }
-           $$ = $2;
+	   ignoreTypedefType = 0;
+	   $$ = $2;
        }
    ;
 
@@ -1032,7 +1052,8 @@ declarator2
 
 function_declarator2
    : declarator2 '('  ')'	{  addDecl ($1,FUNCTION,NULL) ;   }
-   | declarator2 '(' { NestLevel++ ; currBlockno++; } parameter_type_list ')'
+   | declarator2 '('            { NestLevel++ ; currBlockno++;  }
+                     parameter_type_list ')'
          {
 	   
 	     addDecl ($1,FUNCTION,NULL) ;
@@ -1168,11 +1189,11 @@ parameter_type_list
 	;
 
 parameter_list
-   : parameter_declaration 
+   : parameter_declaration
    | parameter_list ',' parameter_declaration
          {
             $3->next = $1 ;
-            $$ = $3 ;	    
+            $$ = $3 ;
          }
    ;
 
@@ -1185,16 +1206,18 @@ parameter_declaration
 		  for (loop=$2;loop;loop->_isparm=1,loop=loop->next);
 		  addSymChain ($2);
 		  $$ = symbolVal($2);
+		  ignoreTypedefType = 0;
                }
    | type_name { 
                   $$ = newValue() ; 
                   $$->type = $1;
                   $$->etype = getSpec($$->type);
+                  ignoreTypedefType = 0;
                }
    ;
 
 type_name
-   : type_specifier_list  { $$ = $1 ;}
+   : type_specifier_list  { $$ = $1; ignoreTypedefType = 0;}
    | type_specifier_list abstract_declarator 
                {
 		 /* go to the end of the list */
@@ -1207,6 +1230,7 @@ type_name
 		   p->next = $1 ;
 		 }
 		 $$ = $2 ;
+		 ignoreTypedefType = 0;
                }   
    ;
 
@@ -1344,7 +1368,12 @@ labeled_statement
      }
    ;
 
-start_block : '{' { STACK_PUSH(blockNum,currBlockno); currBlockno = ++blockNo ;  }
+start_block : '{'
+              {
+	        STACK_PUSH(blockNum,currBlockno);
+		currBlockno = ++blockNo ;
+		ignoreTypedefType = 0;
+	      }
             ;
 
 end_block   : '}'     { currBlockno = STACK_POP(blockNum); }           
@@ -1373,6 +1402,7 @@ declaration_list
        }
        else
 	 $$ = $1 ;
+       ignoreTypedefType = 0;
      }
 
    | declaration_list declaration
@@ -1395,6 +1425,7 @@ declaration_list
 	 else
 	   $$ = $2 ;
        }
+       ignoreTypedefType = 0;
      }
    ;
 

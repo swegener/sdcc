@@ -2452,10 +2452,8 @@ packForPush (iCode * ic, eBBlock ** ebpp, int blockno)
 
   if (dic->seq < ebp->fSeq) { // Evelyn did this
     int i;
-    printf ("packForPush: dic in previous block\n");
-    ebp=ebpp[0];
     for (i=0; i<blockno; i++) {
-      if (dic->seq >= ebp->fSeq && dic->seq <= ebp->lSeq) {
+      if (dic->seq >= ebpp[i]->fSeq && dic->seq <= ebpp[i]->lSeq) {
 	ebp=ebpp[i];
 	break;
       }

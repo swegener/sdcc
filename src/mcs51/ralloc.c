@@ -1574,30 +1574,6 @@ regTypeNum (eBBlock *ebbs)
 	      continue;
 	    }
 
-#ifdef RANGEHUNT
-	  /* if this symbol has only one usage and that is an assignment
-	     to a ruonly, we don't need registers */
-	  // if this symbol has only one def
-	  if (bitVectnBitsOn (sym->defs)==1) {
-	    printf ("sym: %s has only one usage", sym->name);
-	    // find that usage
-	    if ((ic = hTabItemWithKey (iCodehTab, bitVectFirstBit (sym->defs)))) {
-	      if (ic->op==CALL) {
-		printf (" for a call ");
-		// if this is only assigned to a ruonly
-		if ((ic = hTabItemWithKey (iCodehTab, bitVectFirstBit (sym->defs)))) {
-		  if (ic->op=='=') {
-		    if (OP_SYMBOL(IC_RESULT(ic))->ruonly) {
-		      printf("regTypeNum: %s assigned to %s\n", \
-			     sym->name, OP_SYMBOL(IC_RESULT(ic))->name); 
-		    }
-		  }
-		}
-	      }
-	    }
-	  }
-#endif
-
 	  /* if the symbol has only one definition &
 	     that definition is a get_pointer */
 	  if (bitVectnBitsOn (sym->defs) == 1 &&
@@ -2601,7 +2577,8 @@ packRegisters (eBBlock ** ebpp, int blockno)
 	 cast is remat, then we can remat this cast as well */
       if (ic->op == CAST && 
 	  IS_SYMOP(IC_RIGHT(ic)) &&
-	  OP_SYMBOL(IC_RIGHT(ic))->remat ) {
+	  OP_SYMBOL(IC_RIGHT(ic))->remat &&
+	  bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1) {
 	      sym_link *to_type = operandType(IC_LEFT(ic));
 	      sym_link *from_type = operandType(IC_RIGHT(ic));
 	      if (IS_GENPTR(to_type) && IS_PTR(from_type)) {		      

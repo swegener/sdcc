@@ -2244,6 +2244,17 @@ packRegsForAccUse (iCode * ic)
     return;
   }
 
+  /* if we are calling a reentrant function that has stack parameters */
+  if (ic->op == CALL &&
+       IFFUNC_ISREENT(operandType(IC_LEFT(ic))) &&
+       FUNC_HASSTACKPARM(operandType(IC_LEFT(ic))))
+      return;
+
+  if (ic->op == PCALL &&
+       IFFUNC_ISREENT(operandType(IC_LEFT(ic))->next) &&
+       FUNC_HASSTACKPARM(operandType(IC_LEFT(ic))->next))
+      return;
+
   /* if + or - then it has to be one byte result */
   if ((ic->op == '+' || ic->op == '-')
       && getSize (operandType (IC_RESULT (ic))) > 1)

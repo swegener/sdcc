@@ -139,8 +139,7 @@ static void emitcode (char *inst, char *fmt,...) {
 
 char *getStackOffset(int stack) {
   static char gsoBuf[1024];
-  // dit slaat natuurlijk nergens op, maar ja voor nou
-  sprintf (gsoBuf, "r7+(%+d+0%+d%+d)", stack,
+  sprintf (gsoBuf, "r7+(%d%+d%+d)", stack,
 	   FUNC_ISISR(currFunc->type) ? 
 	     port->stack.isr_overhead : port->stack.call_overhead,
 	   _G.nRegsSaved);
@@ -1337,7 +1336,7 @@ void genXA51Code (iCode * lic) {
     }
   
   for (ic = lic; ic; ic = ic->next) {
-    if (cln != ic->lineno) {
+    if (ic->lineno && cln != ic->lineno) {
       if (options.debug) {
 	_G.debugLine = 1;
 	emitcode ("", "C$%s$%d$%d$%d ==.",

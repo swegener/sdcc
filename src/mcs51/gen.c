@@ -8808,7 +8808,7 @@ gen51Code (iCode * lic)
   for (ic = lic; ic; ic = ic->next)
     {
 
-      if (cln != ic->lineno)
+      if (ic->lineno && cln != ic->lineno)
 	{
 	  if (options.debug)
 	    {

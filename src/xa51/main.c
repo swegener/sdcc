@@ -127,7 +127,10 @@ _xa51_genAssemblerPreamble (FILE * of)
 static int
 _xa51_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 {
-  return FALSE;
+  fprintf (of, "\t.dw\t0x8f00\n");
+  fprintf (of, "\t.dw\t__sdcc_gsinit_startup\n");
+  // no IVT yet
+  return TRUE;
 }
 
 /* Generate code to copy XINIT to XISEG */
@@ -181,7 +184,7 @@ static const char *_linkCmd[] =
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
 static const char *_asmCmd[] =
 {
-  "xa_asm", "$l", "$3", "$1.xa", NULL
+  "xa_asm -dontcomplain", "$l", "$3", "$1.xa", NULL
 };
 
 /* Globals */

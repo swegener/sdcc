@@ -7691,6 +7691,9 @@ cc@sdcc.sourceforge.net'.
  in locating optimization problems.
 \layout Section
 
+Compiler internals
+\layout Subsection
+
 The anatomy of the compiler
 \layout Standard
 
@@ -8943,10 +8946,53 @@ mov dpl,a
 \SpecialChar ~
 \SpecialChar ~
 ret
-\size default 
-
 \newline 
 
+\layout Subsection
+
+A few words about basic block successors, predecessors and dominators
+\layout Standard
+
+Successors are basic blocks that might execute after this basic block.
+\newline 
+Predecessors are basic blocks that might execute before reaching this basic
+ block.
+\newline 
+Dominators are basic blocks that WILL execute before reaching this basic
+ block.
+\newline 
+
+\layout Standard
+
+[basic block 1]
+\layout Standard
+
+if (something)
+\layout Standard
+
+[basic block 2]
+\layout Standard
+
+else
+\layout Standard
+
+[basic block 3]
+\layout Standard
+
+[basic block 4]
+\newline 
+
+\layout Standard
+
+a) succList of [BB2] = [BB4], of [BB3] = [BB4], of [BB1] = [BB2,BB3]
+\layout Standard
+
+b) predList of [BB2] = [BB1], of [BB3] = [BB1], of [BB4] = [BB2,BB3]
+\layout Standard
+
+c) domVect of [BB4] = BB1 ...
+ here we are not sure if BB2 or BB3 was executed but we are SURE that BB1
+ was executed.
 \layout Section
 
 Acknowledgments

@@ -13,6 +13,7 @@
   With loopInvariant on				20919	156	19AB
   With loopInduction on				Breaks		198B
   With all working on				20796	158	196C
+  Slightly better genCmp(signed)		20597	159	195B
 
   Michael Hope <michaelh@earthling.net>	2000
   Based on the mcs51 generator - Sandeep Dutta . sandeep.dutta@usa.net (1998)
@@ -1617,7 +1618,6 @@ static void genMinus (iCode *ic)
     size = getDataSize(IC_RESULT(ic));   
 
     if (AOP_TYPE(IC_RIGHT(ic)) != AOP_LIT){
-        CLRC;
     }
     else{
         lit = (unsigned long)floatFromVal(AOP(IC_RIGHT(ic))->aopu.aop_lit);
@@ -1628,9 +1628,14 @@ static void genMinus (iCode *ic)
     /* if literal, add a,#-lit, else normal subb */
     while (size--) {
 	MOVA(aopGet(AOP(IC_LEFT(ic)),offset,FALSE));    
-	if (AOP_TYPE(IC_RIGHT(ic)) != AOP_LIT)  
-	    emitcode("sbc","a,%s",
-		     aopGet(AOP(IC_RIGHT(ic)),offset,FALSE));
+	if (AOP_TYPE(IC_RIGHT(ic)) != AOP_LIT) {
+	    if (!offset)
+		emitcode("sub","a,%s",
+			 aopGet(AOP(IC_RIGHT(ic)),offset,FALSE));
+	    else
+		emitcode("sbc","a,%s",
+			 aopGet(AOP(IC_RIGHT(ic)),offset,FALSE));
+	}
 	else{
 	    /* first add without previous c */
 	    if (!offset)
@@ -1789,20 +1794,20 @@ static void genCmp (operand *left,operand *right,
 		    emitcode("push", "af");
 		    emitcode("xor", "a,#0x80");
 		    emitcode("ld", "l,a");
-		    emitcode("pop", "af");
-		    emitcode("ld", "a,l");
                     if (AOP_TYPE(right) == AOP_LIT){
                         unsigned long lit = (unsigned long)
 			    floatFromVal(AOP(right)->aopu.aop_lit);
-                        emitcode("sbc","a,#0x%02x",
+			emitcode("pop", "af");
+			emitcode("ld", "a,l");
+			emitcode("sbc","a,#0x%02x",
 				 0x80 ^ (unsigned int)((lit >> (offset*8)) & 0x0FFL));                       
                     } else {
-			emitcode("push", "af");
 			emitcode("ld", "a,%s",aopGet(AOP(right),offset++,FALSE));
 			emitcode("xor", "a,#0x80");
-			emitcode("ld", "l,a");
+			emitcode("ld", "h,a");
 			emitcode("pop", "af");
-                        emitcode("sbc", "a,l");
+			emitcode("ld", "a,l");
+                        emitcode("sbc", "a,h");
                     }
 		}
 		else {

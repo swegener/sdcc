@@ -1624,9 +1624,12 @@ operand *geniCodeAdd (operand *left, operand *right )
 	isarray = left->isaddr;
 	size = 
 	    operandFromLit(getSize(ltype->next));
+	if (getSize(ltype) > 1 && (getSize(rtype) < INTSIZE)) 
+	{
+	    right = geniCodeCast(INTTYPE,right,TRUE);	    
+	}
 	right = geniCodeMultiply (right ,size);
-	if (getSize(ltype) > 1) 
-		right = geniCodeCast(INTTYPE,right,TRUE);
+
 	resType = copyLinkChain(ltype);
     }
     else { /* make them the same size */
@@ -1723,11 +1726,18 @@ operand *geniCodeArray (operand *left,operand *right)
     
     if (IS_PTR(ltype)) {
 	if (IS_PTR(ltype->next) && left->isaddr)
+	{
 	    left = geniCodeRValue(left,FALSE);
+	}
 	return geniCodeDerefPtr(geniCodeAdd(left,right));
     }
 
     /* array access */
+    if (/* getSize(ltype) > 1 &&  */(getSize(operandType(right)) < INTSIZE)) 
+    {
+        /* Widen the index type to int first. */
+	right = geniCodeCast(INTTYPE,right,TRUE);	    
+    }
     right = geniCodeMultiply(right,
 			     operandFromLit(getSize(ltype->next)));
 

@@ -1102,9 +1102,13 @@ type_name
 		 /* go to the end of the list */
 		 sym_link *p;
 		 pointerTypes($2,$1);
-		 for ( p = $2 ; p->next ; p=p->next);
-                  p->next = $1 ;
-                  $$ = $2 ;
+		 for ( p = $2 ; p && p->next ; p=p->next);
+		 if (!p) {
+		   werror(E_SYNTAX_ERROR, yytext);
+		 } else {
+		   p->next = $1 ;
+		 }
+		 $$ = $2 ;
                }   
    ;
 

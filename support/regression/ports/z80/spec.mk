@@ -3,6 +3,8 @@
 
 # PENDING: Path to gbdk-lib for stdarg
 GBDK_LIB = ../../../gbdk-lib
+RRZ80 = $(SDCC_EXTRA_DIR)/emu/rrz80/rrz80
+
 SDCCFLAGS += -I$(GBDK_LIB)/include
 
 EXEEXT = .bin
@@ -32,5 +34,5 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT) \
 # PENDING: Path to sdcc-extra
 %.out: %$(EXEEXT)
 	mkdir -p `dirname $@`
-	java -cp ../../../sdcc-extra/emu/rose ConsoleZ80 $< > $@
+	$(RRZ80) $< > $@
 	if grep -q FAIL $@; then echo FAILURES in $@; fi

@@ -14,6 +14,18 @@
 # re-run.  Changing one suite causes just that to be run.  Changing
 # one of the library files should cause all to re-run
 
+# Dependancies:
+#   * The sdcc-extra package, available from CVS.
+#       o cvs -d cvs.sdcc.sourceforge.net:/cvsroot/sdcc co sdcc-extra
+#       o Provides the emulators
+#   * The gbdk-lib package from gbdk.
+#       o cvs -d cvs.gbdk.sourceforge.net:/cvsroot/gbdk co gbdk-lib
+#       o Provildes mul, div, and include files for the z80 tests.
+#   * python 1.5 or above
+#
+# The paths below assume that sdcc, sdcc-extra, and gbdk-lib all reside in
+# the same directory.
+
 # Old nores:
 # Starting at the bottom
 # Set of source test suites
@@ -63,9 +75,12 @@ PORT_RESULTS_DIR = $(RESULTS_DIR)/$(PORT)
 # Each test generates a result log file
 PORT_RESULTS = $(ALL_TESTS:$(TESTS_DIR)/%.c=$(PORT_RESULTS_DIR)/%.out)
 
+SDCC_DIR = ../..
+SDCC_EXTRA_DIR = ../../../sdcc-extra
+
 # Defaults.  Override in spec.mk if required.
 # Path to SDCC
-SDCC = ../../bin/sdcc
+SDCC = $(SDCC_DIR)/bin/sdcc
 # Base flags.
 SDCCFLAGS = -m$(PORT)
 # Extension of object intermediate files

@@ -1,3 +1,10 @@
+2003-04-12  Borut Razem <borut.razem@siol.net>
+
+	* fixed "#pragma SAVE/RESTORE can not be nested":
+	* src/SDCC.lex: reworked pragma handling functions
+	* sdcc/src/SDCCglobl.h: reworked stack handling macros
+	* support/Util/SDCCerr.c, support/Util/SDCCerr.h: added E_STACK_VIOLATION error
+
 2003-04-12  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCutil.c (pathEquivalent): defined but not used

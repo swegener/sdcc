@@ -26,7 +26,7 @@
 
 \layout Comment
 
-Please note: double dashed options (e.g.
+Please note: double dashed longoptions (e.g.
  --version) need three dashes in this document to be visable in html and
  pdf output.
 \layout Title
@@ -133,7 +133,7 @@ inline assembler code
 \newline 
 
 \newline 
-SDCC also provides an option (---cyclomatic) to report the relative complexity
+SDCC also provides an option (--cyclomatic) to report the relative complexity
  of a function.
  These functions can then be further optimized, or hand coded in assembly
  if needed.
@@ -148,7 +148,7 @@ SDCC also comes with a companion source level debugger SDCDB, the debugger
 
 \newline 
 The latest version can be downloaded from 
-\begin_inset LatexCommand \htmlurl{http://sdcc.sourceforge.net/}
+\begin_inset LatexCommand \url{http://sdcc.sourceforge.net/}
 
 \end_inset 
 
@@ -280,7 +280,7 @@ Other Resources
 \layout Standard
 
 The SDCC home page at 
-\begin_inset LatexCommand \htmlurl{http://sdcc.sourceforge.net/}
+\begin_inset LatexCommand \url{http://sdcc.sourceforge.net/}
 
 \end_inset 
 
@@ -392,7 +392,11 @@ SDCC_INCLUDE_PATH
 \begin_inset Quotes sld
 \end_inset 
 
-SDCCHOME)/include
+SDCCHOME
+\begin_inset Quotes srd
+\end_inset 
+
+)/include
 \newline 
 - /usr/local/share/sdcc/include (gcc builds)
 \newline 
@@ -473,7 +477,9 @@ SDCCHOME
 \layout Standard
 
 So, for windoze it is highly recommended to set the environment variable
- SDCCHOME to prevent needless usage of -I and -L.
+ SDCCHOME to prevent needless usage of -I and -L options.
+ For gcc-builds SDCCHOME should only be set when sdcc is installed in non-standa
+rd paths.
 \layout Subsection
 
 Linux and other gcc-based systems (cygwin, mingw, osx)
@@ -793,12 +799,49 @@ bin_vc to sdcc
 bin, and you can compile using sdcc.
 \layout Subsubsection
 
-Windows Install Using Borland ......
-\layout Standard
+Windows Install Using Borland
+\layout Enumerate
 
+From the sdcc directory, run the command "make -f Makefile.bcc".
+ This should regenerate all the .exe files in the bin directory except for
+ sdcdb.exe (which currently doesn't build under Borland C++).
+\layout Enumerate
 
-\shape italic 
-<pending>
+If you modify any source files and need to rebuild, be aware that the dependanci
+es may not be correctly calculated.
+ The safest option is to delete all .obj files and run the build again.
+ From a Cygwin BASH prompt, this can easily be done with the commmand:
+\newline 
+
+\newline 
+
+\family sans 
+\series bold 
+find .
+ 
+\backslash 
+( -name '*.obj' -o -name '*.lib' -o -name '*.rul' 
+\backslash 
+) -print -exec rm {} 
+\backslash 
+;
+\family default 
+\series default 
+
+\newline 
+
+\newline 
+or on Windows NT/2000/XP from the command prompt with the commmand:
+\newline 
+
+\family sans 
+\series bold 
+
+\newline 
+del /s *.obj *.lib *.rul
+\family default 
+\series default 
+ from the sdcc directory.
 \layout Subsection
 
 Testing out the SDCC Compiler
@@ -825,92 +868,14 @@ The first thing you should do after installing your SDCC compiler is to
 \newline 
 
 \series medium 
-SDCC binaries are commonly installed in a directory arrangement like this:
+SDCC 
 \series default 
-
-\newline 
-
-\newline 
-
-\begin_inset  Tabular
-<lyxtabular version="3" rows="3" columns="2">
-<features>
-<column alignment="left" valignment="top" leftline="true" width="0(null)">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0(null)">
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-/
-\series medium 
-usr/local/bin
+is commonly installed as described in section 
+\begin_inset Quotes sld
 \end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
 
-\layout Standard
-
-
-\series medium 
-Holds executables(sdcc, s51, aslink, 
-\series default 
-...
-\series medium 
-)
-\end_inset 
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-/
-\series medium 
-usr/local/share/sdcc/lib 
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-
-\series medium 
-Holds common C 
-\series default 
-libraries
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-/
-\series medium 
-usr/local/share/sdcc/include
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-
-\series medium 
-Holds common C header files
-\end_inset 
-</cell>
-</row>
-</lyxtabular>
-
+Install and search paths
+\begin_inset Quotes srd
 \end_inset 
 
 
@@ -920,7 +885,11 @@ Holds common C header files
 
 \series medium 
 Make sure the compiler works on a very simple example.
- Type in the following test.c program using your favorite editor:
+ Type in the following test.c program using your favorite 
+\series default 
+ascii 
+\series medium 
+editor:
 \series default 
 
 \newline 
@@ -1068,9 +1037,11 @@ A thing to try is starting from scratch by unpacking the .tgz source package
 
 \newline 
 
-\family typewriter 
+\family sans 
+\series bold 
 ./configure 2>&1 | tee configure.log
 \family default 
+\series default 
 
 \newline 
 
@@ -1080,9 +1051,11 @@ and build it like:
 
 \newline 
 
-\family typewriter 
+\family sans 
+\series bold 
 make 2>&1 | tee make.log
 \family default 
+\series default 
 
 \newline 
 
@@ -1143,67 +1116,19 @@ make install
  command does.
 \layout Standard
 
-This will install the compiler, other executables and libraries in to the
- appropriate system directories.
- The default is to copy the executables to /usr/local/bin and the libraries
- and header files to /usr/local/share/sdcc/lib and /usr/local/share/sdcc/include.
- On most systems you will need super-user privilages to do this.
-\layout Subsection
-
-Advanced Install Options
-\layout Standard
-
-The 
-\begin_inset Quotes eld
-\end_inset 
-
-configure
-\begin_inset Quotes erd
-\end_inset 
-
- command has several options.
- The most commonly used option is ---prefix=<directory name>, where <directory
- name> is the final location for the sdcc executables and libraries, (default
- location is /usr/local).
- The installation process will create the following directory structure
- under the <directory name> specified (if they do not already exist).
- 
-\newline 
-
-\newline 
-bin/ - binary exectables (add to PATH environment variable)
-\newline 
-bin/share/
-\newline 
-bin/share/sdcc/include/ - include header files
-\newline 
-bin/share/sdcc/lib/
-\newline 
-bin/share/sdcc/lib/small/ - Object & library files for small model library
-\newline 
-bin/share/sdcc/lib/large/ - Object & library files for large model library
-\newline 
-bin/share/sdcc/lib/ds390/ - Object & library files for DS80C390 library
-\newline 
-bin/share/sdcc/lib/z80/ - Object & library files for Z80 library
-\newline 
-
-\newline 
-The command 
-\family sans 
-\series bold 
-
+This will install the compiler, other executables libraries and include
+ files in to the appropriate directories.
+ See section 
 \begin_inset Quotes sld
 \end_inset 
 
-./configure ---prefix=/usr/local
-\begin_inset Quotes erd
+Install and Search PATHS
+\begin_inset Quotes srd
 \end_inset 
 
- 
-\family default 
-\series default 
-will configure the compiler to be installed in directory /usr/local.
+.
+\newline 
+On most systems you will need super-user privilages to do this.
 \layout Subsection
 
 Components of SDCC
@@ -1220,7 +1145,7 @@ SDCC is not just a compiler, but a collection of tools by various developers.
 
 \newline 
 You might want to look at the files which are installed in <installdir>.
- At the time of this writing, we find the following programs:
+ At the time of this writing, we find the following programs for gcc-builds:
 \newline 
  
 \newline 
@@ -1271,8 +1196,8 @@ the include files
 In <installdir>/share/sdcc/lib
 \layout Itemize
 
-the sources of the runtime library and the subdirs small large and ds390
- with the precompiled relocatables.
+the subdirs src and small, large, z80, gbz80 and ds390 with the precompiled
+ relocatables.
 \layout Standard
 
 In <installdir>/share/sdcc/doc
@@ -1336,7 +1261,7 @@ sdcdb - Source Level Debugger
 
 \family typewriter 
 \shape italic 
-<todo: is this thing alive?>
+<todo: is this thing still alive?>
 \newline 
 
 \newline 
@@ -1388,7 +1313,16 @@ sourcefile.ihx - The load module in Intel hex format (you can select the
 \newline 
 sourcefile.cdb - An optional file (with ---debug) containing debug information
 \newline 
+sourcefile.dump* - Dump file to debug the compiler it self (with ---dumpall)
+ (see section 
+\begin_inset Quotes sld
+\end_inset 
 
+Anatomy of the compiler
+\begin_inset Quotes srd
+\end_inset 
+
+).
 \layout Subsubsection
 
 Projects with Multiple Source Files

@@ -66,7 +66,7 @@ void __printf(const char *szFormat, ...) REENTRANT
         if (*szFormat == '%') {
             switch (*++szFormat) {
             case 's': {
-                char GENERIC *sz = va_arg(ap, char GENERIC *);
+                char *sz = va_arg(ap, char *);
                 while (*sz) {
                     _putchar(*sz++);
                 }

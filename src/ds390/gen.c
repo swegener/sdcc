@@ -3728,11 +3728,11 @@ bool aopOp3(iCode * ic)
     // First, generate the right opcode. DPTR may be used if neither left nor result are
     // of type AOP_STR.
     
-    D(emitcode(";", "aopOp3: AOP_IS_STR left: %s right %s result: %s",
-	       AOP_IS_STR(IC_LEFT(ic)) ? "true" : "false",
-	       AOP_IS_STR(IC_RIGHT(ic)) ? "true" : "false",
-	       AOP_IS_STR(IC_RESULT(ic)) ? "true" : "false");
-      );
+//    D(emitcode(";", "aopOp3: AOP_IS_STR left: %s right: %s result: %s",
+//	       AOP_IS_STR(IC_LEFT(ic)) ? "true" : "false",
+//	       AOP_IS_STR(IC_RIGHT(ic)) ? "true" : "false",
+//	       AOP_IS_STR(IC_RESULT(ic)) ? "true" : "false");
+//      );
     
     aopOp (IC_RIGHT(ic),ic,FALSE, AOP_IS_STR(IC_LEFT(ic)) || AOP_IS_STR(IC_RESULT(ic)));
     
@@ -3745,7 +3745,7 @@ bool aopOp3(iCode * ic)
     // will succeed, and we can just do it & bail.
     if (isOperandEqual(IC_LEFT(ic),IC_RESULT(ic)))
     {
-	D(emitcode(";", "aopOp3: left & result equal"););
+//	D(emitcode(";", "aopOp3: left & result equal"););
 	aopOp(IC_RESULT(ic),ic,TRUE, FALSE);
 	return TRUE;
     }
@@ -9518,6 +9518,9 @@ genGenPointerGet (operand * left,
 
       while (size--)
 	{
+// Whoops; uncooked experimental code which was accidentally committed.
+// Kevin should either finish cooking this or yank it soon.
+#if 0
 	    if (size)
 	    {
 		emitcode("push", "b");
@@ -9528,6 +9531,7 @@ genGenPointerGet (operand * left,
 		size--;
 	    }
 	    else
+#endif		
 	    {
 		emitcode ("lcall", "__gptrget");
 		aopPut (AOP (result), "a", offset++);

@@ -33,12 +33,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "uc52cl.h"
 
-
 class t_uc390: public t_uc52
 {
 public:
   t_uc390(int Itype, int Itech, class cl_sim *asim);
+  int flat24_flag; /* true if flat24 mode code: ((ACON:9Dh & 3) == 0x2) */
 
+/* mods for dual-dptr */
 virtual int inst_inc_addr(uchar code);
 virtual int inst_inc_dptr(uchar code);
 virtual int inst_jmp_$a_dptr(uchar code);
@@ -47,9 +48,19 @@ virtual int inst_movc_a_$a_dptr(uchar code);
 virtual int inst_movx_a_$dptr(uchar code);
 virtual int inst_movx_$dptr_a(uchar code);
 
+/* mods for flat24 */
+virtual int inst_ajmp_addr(uchar code);
+virtual int inst_ljmp(uchar code);
+virtual int inst_acall_addr(uchar code);
+virtual int inst_lcall(uchar code, uint addr);
+virtual int inst_ret(uchar code);
+virtual int inst_reti(uchar code);
+
+/* mods for disassembly of flat24 */
+virtual struct dis_entry *dis_tbl(void);
+virtual char * disass(t_addr addr, char *sep);
+
 };
 
-
 #endif
-
 /* End of s51.src/uc390cl.h */

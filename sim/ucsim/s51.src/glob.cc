@@ -329,9 +329,9 @@ struct name_entry sfr_tab51[]=
   {CPU_ALL_52|CPU_251, 0xcb, "RCAP2H"},
   {CPU_ALL_52|CPU_251, 0xca, "RCAP2L"},
   {CPU_251, 0x84, "DPXL"},
-  {CPU_DS390, 0x84, "DPL1"},
-  {CPU_DS390, 0x85, "DPH1"},
-  {CPU_DS390, 0x86, "DPS"},
+  {CPU_DS390|CPU_DS390F, 0x84, "DPL1"},
+  {CPU_DS390|CPU_DS390F, 0x85, "DPH1"},
+  {CPU_DS390|CPU_DS390F, 0x86, "DPS"},
   {CPU_89C51R|CPU_51R, 0x8e, "AUXR"},
   {CPU_51R|CPU_89C51R|CPU_251, 0xa6, "WDTRST"},
   {CPU_51R|CPU_89C51R|CPU_251, 0xa9, "SADDR"},
@@ -498,6 +498,7 @@ struct cpu_entry cpus_51[]=
   {"251"   , CPU_251, CPU_CMOS},
   {"C251"  , CPU_251, CPU_CMOS},
   {"DS390" , CPU_DS390, CPU_CMOS},
+  {"DS390F" , CPU_DS390F, CPU_CMOS},
   {NULL, 0, 0}
 };
 

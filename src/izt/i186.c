@@ -138,6 +138,7 @@ PORT i186_port = {
     "Intel 80186",      /* Target name */
     NULL,
     {
+        glue,
         FALSE,          /* Emit glue around main */
         MODEL_SMALL,
         MODEL_SMALL

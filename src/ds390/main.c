@@ -339,6 +339,7 @@ PORT ds390_port =
   "DS80C390",			/* Target name */
   NULL,
   {
+    glue,
     TRUE,			/* Emit glue around main */
     MODEL_SMALL | MODEL_LARGE | MODEL_FLAT24,
     MODEL_SMALL
@@ -836,6 +837,7 @@ PORT ds400_port =
   "DS80C400",			/* Target name */
   NULL,
   {
+    glue,
     TRUE,			/* Emit glue around main */
     MODEL_SMALL | MODEL_LARGE | MODEL_FLAT24,
     MODEL_SMALL

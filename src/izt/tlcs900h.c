@@ -137,6 +137,7 @@ PORT tlcs900h_port =
   "Toshiba TLCS-900H",		/* Target name */
   NULL,
   {
+    glue,
     TRUE,			/* Emit glue around main */
     MODEL_SMALL,
     MODEL_SMALL

@@ -306,13 +306,6 @@ static PORT *_ports[] =
 
 #define NUM_PORTS (sizeof(_ports)/sizeof(_ports[0]))
 
-#if !OPT_DISABLE_PIC
-extern void picglue ();
-#endif
-#if !OPT_DISABLE_PIC16
-extern void pic16glue();
-#endif
-
 /** Sets the port to the one given by the command line option.
     @param    The name minus the option (eg 'mcs51')
     @return     0 on success.
@@ -407,7 +400,7 @@ _findProcessor (int argc, char **argv)
 /* printVersionInfo - prints the version info        */
 /*-----------------------------------------------------------------*/
 void
-printVersionInfo ()
+printVersionInfo (void)
 {
   int i;
 
@@ -460,7 +453,7 @@ printOptions(const OPTION *optionsTable)
 /* printUsage - prints command line syntax         */
 /*-----------------------------------------------------------------*/
 void
-printUsage ()
+printUsage (void)
 {
     int i;
     printVersionInfo();
@@ -1998,29 +1991,15 @@ main (int argc, char **argv, char **envp)
         exit (1);
       }
 
-      if (TARGET_IS_PIC) {
-        /* TSD PIC port hack - if the PIC port option is enabled
-           and SDCC is used to generate PIC code, then we will
-           generate .asm files in gpasm's format instead of SDCC's
-           assembler's format
-        */
-#if !OPT_DISABLE_PIC
-        picglue ();
-#endif
-
-      } else
-      if(TARGET_IS_PIC16) {
-	/* PIC16 port misc improvements Vangelis Rokas - 6-May-2003
-	  Generate .asm files for gpasm (just like PIC target) but use
-	  pic16glue()
-	*/
-      
-#if !OPT_DISABLE_PIC16
-	pic16glue();
-#endif
-      } else {
-        glue ();
-      }
+      if (port->general.do_glue != NULL)
+        (*port->general.do_glue)();
+      else
+        {
+          /* this shouldn't happen */
+          assert(FALSE);
+          /* in case of NDEBUG */
+          glue();
+        }
 
       if (!options.c1mode && !noAssemble)
         {

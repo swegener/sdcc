@@ -213,6 +213,7 @@ PORT xa51_port =
   "MCU 80C51XA",       		/* Target name */
   NULL,				/* Processor name */
   {
+    glue,
     FALSE,			/* Emit glue around main */
     MODEL_PAGE0,
     MODEL_PAGE0

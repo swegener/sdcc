@@ -57,6 +57,8 @@ typedef struct
 
     struct
       {
+        /** Pointer to glue function */
+        void (*do_glue)(void);
 	/** TRUE if all types of glue functions should be inserted into
 	    the file that also defines main.
 	    We dont want this in cases like the z80 where the startup

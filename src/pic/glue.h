@@ -21,15 +21,10 @@
    You are forbidden to forbid anyone else to use, share and improve
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
-#include "SDCCglobl.h"
-#include "SDCCmem.h"
 
-#ifndef SDCCGLUE_H
-#define SDCCGLUE_H 1
+#ifndef PIC_GLUE_H
+#define PIC_GLUE_H
 
-void glue ();
-/* drdani Jan 30 2000
-   This is needed in gen.c of z80 port */
-char *aopLiteral (value *, int);
+void picglue (void);
 
 #endif

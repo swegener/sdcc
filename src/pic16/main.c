@@ -9,6 +9,7 @@
 #include "ralloc.h"
 #include "device.h"
 #include "SDCCutil.h"
+#include "glue.h"
 //#include "gen.h"
 
 
@@ -361,6 +362,7 @@ PORT pic16_port =
   "MCU PIC16",			/* Target name */
   "p18f452",                    /* Processor */
   {
+    pic16glue,
     TRUE,			/* Emit glue around main */
     MODEL_SMALL | MODEL_LARGE | MODEL_FLAT24,
     MODEL_SMALL

@@ -1,3 +1,12 @@
+2003-07-02  Borut Razem <borut.razem@siol.net>
+
+	* src/port.h, src/SDCCmain.c, src/pic/glue.h, src/pic/main.c,
+	src/pic16/glue.h, sdcc/src/pic16/main.c, src/izt/i186.c,
+	src/izt/tlcs900h.c, src/avr/main.c, src/ds390/main.c, src/mcs51/main.c,
+	src/xa51/main.c, src/z80/main.c:
+	virtualization of glue() function: each port has it's own glue function,
+	which is accessed by do_glue function pointer in PORT.general structure
+
 2003-07-01 Kevin Vigor <kevin@vigor.nu>
 
         * DS800C400 fun, improved ROM interface and tinibios.

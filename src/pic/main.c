@@ -9,6 +9,7 @@
 #include "ralloc.h"
 #include "device.h"
 #include "SDCCutil.h"
+#include "glue.h"
 //#include "gen.h"
 
 
@@ -344,6 +345,7 @@ PORT pic_port =
   "MCU pic",			/* Target name */
   "",                    /* Processor */
   {
+    picglue,
     TRUE,			/* Emit glue around main */
     MODEL_SMALL | MODEL_LARGE | MODEL_FLAT24,
     MODEL_SMALL

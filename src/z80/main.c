@@ -498,6 +498,7 @@ PORT z80_port =
   "Zilog Z80",			/* Target name */
   NULL,				/* Processor name */
   {
+    glue,
     FALSE,
     MODEL_MEDIUM | MODEL_SMALL,
     MODEL_SMALL
@@ -592,6 +593,7 @@ PORT gbz80_port =
   "Gameboy Z80-like",		/* Target name */
   NULL,
   {
+    glue,
     FALSE,
     MODEL_MEDIUM | MODEL_SMALL,
     MODEL_SMALL

@@ -2076,17 +2076,15 @@ static void packRegisters (eBBlock *ebp)
 	    getSize(operandType(IC_RESULT(ic))) <= 2)
 	    packRegsForAccUse (ic);
 #else
-	if (!IS_GB) {
-	    if ((POINTER_GET(ic) ||
-		 IS_ARITHMETIC_OP(ic) ||
-		 IS_BITWISE_OP(ic) ||
-		 ic->op == LEFT_OP ||
-		 ic->op == RIGHT_OP
-		 ) &&
-		IS_ITEMP(IC_RESULT(ic)) &&
-		getSize(operandType(IC_RESULT(ic))) == 1)
-		packRegsForAccUse2(ic);
-	}
+	if ((POINTER_GET(ic) ||
+	     IS_ARITHMETIC_OP(ic) ||
+	     IS_BITWISE_OP(ic) ||
+	     ic->op == LEFT_OP ||
+	     ic->op == RIGHT_OP
+	     ) &&
+	    IS_ITEMP(IC_RESULT(ic)) &&
+	    getSize(operandType(IC_RESULT(ic))) == 1)
+	    packRegsForAccUse2(ic);
 #endif
     }
 }

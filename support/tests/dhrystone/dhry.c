@@ -72,7 +72,6 @@ char            Ch_1_Glob,
                 Ch_2_Glob;
 int             Arr_1_Glob [50];
 int             Arr_2_Glob [50] [50];
-char		silly;
 
 /* Used instead of malloc() */
 static Rec_Type _r[2];
@@ -107,10 +106,11 @@ int main(void)
     REG   int             Number_Of_Runs;
     unsigned runTime;
 
-    printf("[dhry]\n");
+    //    printf("[dhry]\n");
 
     Next_Ptr_Glob = &_r[0];
     Ptr_Glob = &_r[1];
+
 
     Ptr_Glob->Ptr_Comp                    = Next_Ptr_Glob;
     Ptr_Glob->Discr                       = Ident_1;
@@ -294,7 +294,6 @@ void Proc_1 (REG Rec_Pointer Ptr_Val_Par)
 	}
     else /* not executed */
 	structassign (*Ptr_Val_Par, *Ptr_Val_Par->Ptr_Comp);
-    silly = 1;
 } /* Proc_1 */
 
 

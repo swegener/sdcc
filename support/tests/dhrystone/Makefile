@@ -1,10 +1,8 @@
 # Simple Makefile for dhrystone and sdcc
 
-#CC = /home/michaelh/projects/sdcc/bin/sdcc
+CC = /home/michaelh/projects/sdcc/bin/sdcc
 # -DNOENUM is here to make the results more predictable
-#CFLAGS = -mgbz80 -v --dumpall
-CC = lcc-gb
-CFLAGS = -int16 -DSDCC=1 -v
+CFLAGS = -mgbz80 -v --dumpall
 CFLAGS += -DREG= -DNOSTRUCTASSIGN -DNOENUM -DBROKEN_SDCC=0 -DHZ=100
 LIBDIR = /home/michaelh/projects/sdcc/device/lib/gbz80/
 LD = link-gb
@@ -29,8 +27,3 @@ dhry.c:
 
 clean:
 	rm -r *~ dhry
-
-dhry.o: dhry.c
-	/usr/lib/SDK/gbz80-gb/2.1.0/bin/cpp -DINT_16_BITS -D__STDC__=1 -DZ80 -DGB -DGAMEBOY -D__LCC__ -DSDCC=1 -DREG= -DNOSTRUCTASSIGN -DNOENUM -DBROKEN_SDCC=0 -DHZ=100 -I/usr/lib/sdcc/include dhry.c dhry.i
-	/usr/lib/SDK/gbz80-gb/2.1.0/bin/rcc -target=gbz80/int16 -optimize -v dhry.i dhry.asm
-	$(AS) -plosff dhry.o dhry.asm

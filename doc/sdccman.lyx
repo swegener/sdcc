@@ -14275,24 +14275,24 @@ sfr
  is where the chip designers decided to put it.
  Needless to say that they didn't agree on a common name either.
  So that the startup code can correctly initialize xdata variables, you
- should define an sfr with the name _PAGESFR at the appropriate location
- if the default, port P2, is not used for this.
+ should define an sfr with the name _XPAGE at the appropriate location if
+ the default, port P2, is not used for this.
  Some examples are:
 \layout Verse
 
 
 \family typewriter 
-sfr at 0x92 _PAGESFR; /* Cypress EZ-USB family */
+sfr at 0x92 _XPAGE; /* Cypress EZ-USB family */
 \layout Verse
 
 
 \family typewriter 
-sfr at 0xaf _PAGESFR; /* some Silicon Labs (Cygnal) chips */
+sfr at 0xaf _XPAGE; /* some Silicon Labs (Cygnal) chips */
 \layout Verse
 
 
 \family typewriter 
-sfr at 0xaa _PAGESFR; /* some Silicon Labs (Cygnal) chips */
+sfr at 0xaa _XPAGE; /* some Silicon Labs (Cygnal) chips */
 \layout Standard
 
 For more exotic implementations further customizations may be needed.

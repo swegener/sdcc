@@ -21,4 +21,4 @@
 ;    what you give them.   Help stamp out software-hoarding!  
 ; -------------------------------------------------------------------------*/
 
-__PAGESFR == 0xa0	; 0xa0 is P2 on the original 8051
+__XPAGE == 0xa0	; 0xa0 is P2 on the original 8051

@@ -32,7 +32,7 @@
 	.area GSFINAL (CODE)
 
 	.globl __start__xstack
-	.globl __PAGESFR
+	.globl __XPAGE
 
 	.area GSINIT1 (CODE)
 
@@ -41,7 +41,7 @@ __sdcc_init_xstack::
 ; Need to initialize in GSINIT1 in case the user's __sdcc_external_startup
 ; uses the xstack.
 	
-	mov	__PAGESFR,#(__start__xstack >> 8)
+	mov	__XPAGE,#(__start__xstack >> 8)
 	mov	_spx,#__start__xstack
 
 	.area GSINIT5 (CODE)
@@ -49,5 +49,5 @@ __sdcc_init_xstack::
 ; Need to initialize in GSINIT5 because __mcs51_genXINIT modifies __PAGESFR
 ; and __mcs51_genRAMCLEAR modifies _spx.
 	
-	mov	__PAGESFR,#(__start__xstack >> 8)
+	mov	__XPAGE,#(__start__xstack >> 8)
 	mov	_spx,#__start__xstack

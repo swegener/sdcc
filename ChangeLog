@@ -1,3 +1,12 @@
+2004-03-18 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* doc/sdccman.lyx,
+	* device/lib/mcs51/crtpagesfr.asm,
+	* device/lib/mcs51/crtxinit.asm,
+	* device/lib/mcs51/crtxstack.asm: Changed name of _PAGESFR to _XPAGE
+	to avoid confusion with Si Lab's SFRPAGE register.
+
+
 2004-03-17 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCglue.c (emitMaps): allow public sfr variables

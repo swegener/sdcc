@@ -166,6 +166,8 @@ directive:     '.' ORG expr {
 		}
 	     | '.' MODULE WORD {
 			/* ignore module definition */
+	                build_sym_list(lex_sym_name);
+			assign_value(lex_sym_name, 0);
 			$$ = 0;
 		}
 	     | '.' GLOBL WORD {

@@ -2,7 +2,7 @@
 
 S51 = ../../sim/ucsim/s51.src/s51
 
-SDCCFLAGS += --lesspedantic -DREENTRANT=reentrant -DGENERIC=_generic --stack-after-data
+SDCCFLAGS += --lesspedantic -DREENTRANT=reentrant -DGENERIC= --stack-after-data
 
 OBJEXT = .rel
 EXEEXT = .ihx

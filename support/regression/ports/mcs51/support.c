@@ -10,5 +10,5 @@ _putchar (char c)
 void
 _exitEmu (void)
 {
-  * (char idata *) 0 = * (char _xdata *) 0x7654;
+  * (char idata *) 0 = * (char xdata *) 0x7654;
 }

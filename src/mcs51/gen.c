@@ -2417,6 +2417,18 @@ genFunction (iCode * ic)
 	  emitcode ("mov", "sp,a");
 
 	}
+      else if (i > 5)
+	{
+
+	  /* ISRs will be handled by the code above, because they
+	     can't have parameters. Therefore it's save to use r0 */
+	  emitcode ("mov", "r0,a");
+	  emitcode ("mov", "a,sp");
+	  emitcode ("add", "a,#0x%02x", ((char) sym->stack & 0xff));
+	  emitcode ("mov", "sp,a");
+	  emitcode ("mov", "a,r0");
+
+	}
       else
 	while (i--)
 	  emitcode ("inc", "sp");

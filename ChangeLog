@@ -1,4 +1,8 @@
-2004-01-19 Bernhard Held <bernhard@bernhardheld.de>
+2004-01-23 Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/pic/pcode.c (PCodeID): commented out left over debug code
+
+2004-01-20 Bernhard Held <bernhard@bernhardheld.de>
 
 	* support/valdiag/tests/overflow.c: added shift tests
 	* src/pic/device.c,

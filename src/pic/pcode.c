@@ -1251,14 +1251,14 @@ pCodeInstruction *pic14Mnemonics[MAX_PIC14MNEMONICS];
 /* return a unique ID number to assist pCodes debuging             */
 /*-----------------------------------------------------------------*/
 unsigned PCodeID(void) {
-  static unsigned int pcodeId = 1; // unique ID number to be assigned to all pCodes
-/**/
+  static unsigned int pcodeId = 1; /* unique ID number to be assigned to all pCodes */
+/*
   static unsigned int stop;
   if (pcodeId == 5801)
 	  stop++;
   if ((pcodeId >= 855)&&(pcodeId <= 856))
 	  stop++;
-/**/
+*/
   return pcodeId++;
 }
 

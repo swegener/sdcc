@@ -1,3 +1,7 @@
+2003-04-04    <johan@balder>
+
+	* src/SDCC.y: fixed bug #702907
+
 2003-04-03    <johan@balder>
 
 	* device/lib/_mulint.c (_muluint): new #pragma LESS_PEDANTIC

@@ -662,8 +662,19 @@ struct_or_union_specifier
    : struct_or_union opt_stag '{' struct_declaration_list '}'
         {
            structdef *sdef ;
+	   symbol *sym, *dsym;
 
-           /* Create a structdef   */
+	   // check for duplicate structure members
+	   for (sym=$4; sym; sym=sym->next) {
+	     for (dsym=sym->next; dsym; dsym=dsym->next) {
+	       if (strcmp(sym->name, dsym->name)==0) {
+		 werror(E_DUPLICATE_MEMBER, 
+			$1==STRUCT ? "struct" : "union", sym->name);
+	       }
+	     }
+	   }
+
+           /* Create a structdef   */	   
            sdef = $2 ;
            sdef->fields   = reverseSyms($4) ;   /* link the fields */
            sdef->size  = compStructSize($1,sdef);   /* update size of  */
@@ -709,11 +720,12 @@ struct_declaration_list
    : struct_declaration
    | struct_declaration_list struct_declaration
        {
-	   symbol *sym = $2;
-	   /* go to the end of the chain */
-	   while (sym->next) sym = sym->next;
+	   symbol *sym=$2;
 
+	   /* go to the end of the chain */
+	   while (sym->next) sym=sym->next;
            sym->next = $1 ;
+	 
            $$ = $2;
        }
    ;
@@ -765,39 +777,55 @@ struct_declarator
 
 enum_specifier
    : ENUM            '{' enumerator_list '}' {
-                                                //addSymChain ($3);
-                                                //allocVariables(reverseSyms($3)) ;
-                                                $$ = copyLinkChain(cenum->type);
-                                             }
+           symbol *sym, *dsym;
+	   char _error=0;
+
+	   // check for duplicate enums
+	   for (sym=$3; sym; sym=sym->next) {
+	     for (dsym=sym->next; dsym; dsym=dsym->next) {
+	       if (strcmp(sym->name, dsym->name)==0) {
+		 werror(E_DUPLICATE_MEMBER, "enum", sym->name);
+		 _error++;
+	       }
+	     }
+	   }
+	   if (_error==0) {
+	     $$ = copyLinkChain(cenum->type);
+	   } else {
+	     $$ = newIntLink();
+	     SPEC_NOUN($$)=0;
+	   }
+         }
+
    | ENUM identifier '{' enumerator_list '}' {
-                                                symbol *csym ;
-
-                                                $2->type = copyLinkChain(cenum->type);
-                                                $2->etype = getSpec($2->type);
-                                                /* add this to the enumerator table */
-                                                if (!(csym=findSym(enumTab,$2,$2->name)) && 
-						    (csym && csym->level == $2->level))
-                                                   werror(E_DUPLICATE_TYPEDEF,csym->name);
-
-                                                addSym ( enumTab,$2,$2->name,$2->level,$2->block, 0);
-						//addSymChain ($4);
-                                                //allocVariables (reverseSyms($4));
-                                                $$ = copyLinkChain(cenum->type);
-                                                SPEC_SCLS(getSpec($$)) = 0 ;
-                                             }
+     symbol *csym ;
+     
+     $2->type = copyLinkChain(cenum->type);
+     $2->etype = getSpec($2->type);
+     /* add this to the enumerator table */
+     if (!(csym=findSym(enumTab,$2,$2->name)) && 
+	 (csym && csym->level == $2->level))
+       werror(E_DUPLICATE_TYPEDEF,csym->name);
+     
+     addSym ( enumTab,$2,$2->name,$2->level,$2->block, 0);
+     //addSymChain ($4);
+     //allocVariables (reverseSyms($4));
+     $$ = copyLinkChain(cenum->type);
+     SPEC_SCLS(getSpec($$)) = 0 ;
+   }
    | ENUM identifier                         {
-                                                symbol *csym ;
-
-                                                /* check the enumerator table */
-                                                if ((csym = findSym(enumTab,$2,$2->name)))
-                                                   $$ = copyLinkChain(csym->type);
-                                                else  {
-                                                   $$ = newLink(SPECIFIER) ;
-                                                   SPEC_NOUN($$) = V_INT   ;
-                                                }
-
-                                                SPEC_SCLS(getSpec($$)) = 0 ;
-                                             }
+     symbol *csym ;
+     
+     /* check the enumerator table */
+     if ((csym = findSym(enumTab,$2,$2->name)))
+       $$ = copyLinkChain(csym->type);
+     else  {
+       $$ = newLink(SPECIFIER) ;
+       SPEC_NOUN($$) = V_INT   ;
+     }
+     
+     SPEC_SCLS(getSpec($$)) = 0 ;
+   }
    ;
 
 enumerator_list

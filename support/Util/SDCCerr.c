@@ -380,6 +380,8 @@ struct
     "must specify assembler file name with -o in c1 mode" },
 { W_ILLEGAL_OPT_COMBINATION, ERROR_LEVEL_WARNING,
     "illegal combination of options (--c1mode, -E, -S -c)" },
+{ E_DUPLICATE_MEMBER, ERROR_LEVEL_ERROR,
+    "duplicate %s member '%s'" },
 };
 
 /*

@@ -178,6 +178,7 @@ SDCCERR - SDCC Standard error handler
 #define W_NO_FILE_ARG_IN_C1 160
 #define E_NEED_OPT_O_IN_C1 161
 #define W_ILLEGAL_OPT_COMBINATION 162
+#define E_DUPLICATE_MEMBER 163
 
 /** Describes the maximum error level that will be logged.  Any level
  *  includes all of the levels listed after it.

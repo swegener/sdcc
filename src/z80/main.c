@@ -312,6 +312,7 @@ PORT z80_port = {
 	"GSINIT",
 	"OVERLAY",
 	"GSFINAL",
+	"HOME",
 	NULL,
 	NULL,
 	1
@@ -376,6 +377,7 @@ PORT gbz80_port = {
 	"GSINIT",
 	"OVERLAY",
 	"GSFINAL",
+	"HOME",
 	NULL,
 	NULL,
 	1

@@ -1974,6 +1974,7 @@ void initCSupport ()
 			ssu[su],
 			sbwd[bwd]);
 		__muldiv[muldivmod][bwd][su] = funcOfType(buffer, __multypes[bwd][su], __multypes[bwd][su], 2, options.intlong_rent);
+		SPEC_NONBANKED(__muldiv[muldivmod][bwd][su]->etype) = 1;
 #if ENABLE_MICHAELH_REGPARM_HACK
 		if (bwd < 2) 
 		    _makeRegParam(__muldiv[muldivmod][bwd][su]);

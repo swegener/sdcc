@@ -76,6 +76,7 @@ typedef struct {
 	const char *static_name;
 	const char *overlay_name;
 	const char *post_static_name;
+	const char *home_name;
 	struct memmap *default_local_map ; /* default location for auto vars */
 	struct memmap *default_globl_map ; /* default location for globl vars*/
 	int         code_ro;               /* code space read-only 1=yes */

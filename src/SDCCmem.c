@@ -19,6 +19,7 @@ memmap  *sfrbit= NULL;   /* sfr bit space               */
 memmap  *generic=NULL;   /* is a generic pointer        */
 memmap  *overlay=NULL;   /* overlay segment             */
 memmap  *eeprom =NULL;   /* eeprom location             */
+memmap	*home	=NULL;	 /* Unswitchable code bank 	*/
 
 /* this is a set of sets each set containing
    symbols in a single overlay */
@@ -113,6 +114,18 @@ void initMem ()
 		   POINTER-TYPE   -   CPOINTER
 	*/
 	code 	  = allocMap (0, 1, 0, 0, 0, 1, options.code_loc, CODE_NAME,'C',CPOINTER);
+
+	/* home  segment ;   
+	           SFRSPACE       -   NO
+		   FAR-SPACE      -   YES
+		   PAGED          -   NO
+		   DIRECT-ACCESS  -   NO
+		   BIT-ACCESS     -   NO
+		   CODE-ACESS     -   YES 
+		   DEBUG-NAME     -   'C'
+		   POINTER-TYPE   -   CPOINTER
+	*/
+	home 	  = allocMap (0, 1, 0, 0, 0, 1, options.code_loc, CODE_NAME,'C',CPOINTER);
 
 	/* Static segment (code for variables );
 	           SFRSPACE       -   NO

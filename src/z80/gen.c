@@ -148,6 +148,8 @@ static struct {
 	int pushed_de;
     } stack;
     int frameId;
+    bool flush_statics;
+    bool in_home;
 } _G;
 
 static char *aopGet(asmop *aop, int offset, bool bit16);
@@ -804,7 +806,7 @@ static void fetchLitPair(PAIR_ID pairId, asmop *left, int offset)
 {
     const char *l;
     const char *pair = _pairs[pairId].name;
-    l = aopGetLitWordLong(left, offset, FALSE);
+    l = aopGetLitWordLong(left, 0, FALSE);
     wassert(l && pair);
 
     if (isPtr(pair)) {
@@ -825,13 +827,21 @@ static void fetchLitPair(PAIR_ID pairId, asmop *left, int offset)
 	_G.pairs[pairId].lit = gc_strdup(l);
 	_G.pairs[pairId].offset = offset;
     }
+    if (IS_GB && pairId == PAIR_DE) {
+	if (_G.pairs[pairId].lit && !strcmp(_G.pairs[pairId].lit, l)) {
+	    if (abs(_G.pairs[pairId].offset - offset) < 3) {
+		adjustPair(pair, &_G.pairs[pairId].offset, offset);
+		return;
+	    }
+	}
+	_G.pairs[pairId].last_type = left->type;
+	_G.pairs[pairId].lit = gc_strdup(l);
+	_G.pairs[pairId].offset = offset;
+    }
     /* Both a lit on the right and a true symbol on the left */
-    /* PENDING: for re-target */
-#if 0
     if (offset)
-	emit2("ld %s,!hashedstr + %d", pair, l, offset);
-    else 
-#endif
+	emit2("ld %s,!hashedstr + %u", pair, l, offset);
+    else
 	emit2("ld %s,!hashedstr", pair, l);
 }
 
@@ -1643,8 +1653,9 @@ static int _opUsesPair(operand *op, iCode *ic, PAIR_ID pairId)
 static void setArea(int inHome)
 {
     static int lastArea = 0;
-    
-    if (lastArea != inHome) {
+
+    /*    
+    if (_G.in_home != inHome) {
 	if (inHome) {
 	    const char *sz = port->mem.code_name;
 	    port->mem.code_name = "HOME";
@@ -1652,9 +1663,14 @@ static void setArea(int inHome)
 	    port->mem.code_name = sz;
 	}
 	else
-	    emit2("!area", CODE_NAME);
-	lastArea = inHome;
-    }
+	emit2("!area", CODE_NAME);*/
+	_G.in_home = inHome;
+	//    }
+}
+
+static bool isInHome(void)
+{
+    return _G.in_home;
 }
 
 /** Emit the code for a call statement 
@@ -1968,6 +1984,7 @@ static void genEndFunction (iCode *ic)
 	/* PENDING: portability. */
 	emit2("__%s_end:", sym->rname);
     }
+    _G.flush_statics = 1;
     _G.stack.pushed = 0;
     _G.stack.offset = 0;
 }
@@ -4126,6 +4143,7 @@ static void genGenPointerGet (operand *left,
 	    }
 	    if (size) {
 		emit2("inc %s", _pairs[pair].name);
+		_G.pairs[pair].offset++;
 	    }
         }
     }
@@ -4218,6 +4236,7 @@ static void genGenPointerSet (operand *right,
 	    }
 	    if (size) {
 		emitcode("inc", _pairs[pairId].name);
+		_G.pairs[pairId].offset++;
 	    }
 	    offset++;
         }
@@ -4855,7 +4874,17 @@ void genZ80Code (iCode *lic)
     if (!options.nopeep)
 	peepHole (&lineHead);
 
+    /* This is unfortunate */
     /* now do the actual printing */
-    printLine (lineHead, codeOutFile);
-    return;
+    {
+	FILE *fp = codeOutFile;
+	if (isInHome() && codeOutFile == code->oFile)
+	    codeOutFile = home->oFile;
+	printLine (lineHead, codeOutFile);
+	if (_G.flush_statics) {
+	    flushStatics();
+	    _G.flush_statics = 0;
+	}
+	codeOutFile = fp;
+    }
 }

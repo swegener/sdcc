@@ -155,6 +155,7 @@ static const ASM_MAPPING _asxxxx_mapping[] = {
     { "area", ".area %s" },
     { "areacode", ".area %s" },
     { "areadata", ".area %s" },
+    { "areahome", ".area %s" },
     { "ascii", ".ascii \"%s\"" },
     { "ds", ".ds %d" },
     { "db", ".db" },

@@ -144,8 +144,12 @@ static void emitRegularMap (memmap * map, bool addPublics, bool arFlag)
     
     if (addPublics) {
 	/* PENDING: special case here - should remove */
-	if (!strcmp(map->sname, DATA_NAME))
+	if (!strcmp(map->sname, CODE_NAME))
+	    tfprintf(map->oFile, "\t!areacode\n", map->sname);
+	else if (!strcmp(map->sname, DATA_NAME)) 
 	    tfprintf(map->oFile, "\t!areadata\n", map->sname);
+	else if (!strcmp(map->sname, HOME_NAME)) 
+	    tfprintf(map->oFile, "\t!areahome\n", map->sname);
 	else
 	    tfprintf(map->oFile, "\t!area\n", map->sname);
     }
@@ -390,7 +394,10 @@ void printIvalType (link * type, initList * ilist, FILE * oFile)
 	break;
 
     case 2:
-	fprintf(oFile, "\t.byte %s,%s\n", aopLiteral(val, 0),aopLiteral(val, 1));
+	if (port->use_dw_for_init)
+	    tfprintf(oFile, "\t!dws\n", aopLiteralLong(val, 0, 2));
+	else
+	    fprintf(oFile, "\t.byte %s,%s\n", aopLiteral(val, 0),aopLiteral(val, 1));
 	break;
     case 4:
 	if (!val) {
@@ -587,8 +594,11 @@ int printIvalCharPtr (symbol * sym, link * type, value * val, FILE * oFile)
 	    tfprintf(oFile, "\t!dbs\n", aopLiteral(val, 0));
 	    break;
 	case 2:
-	    tfprintf(oFile, "\t.byte %s,%s\n", 
-		    aopLiteral(val, 0),aopLiteral(val, 1));
+	    if (port->use_dw_for_init)
+		tfprintf(oFile, "\t!dws\n", aopLiteralLong(val, 0, size));
+	    else 
+		tfprintf(oFile, "\t.byte %s,%s\n", 
+			 aopLiteral(val, 0),aopLiteral(val, 1));
 	    break;
 	case 3:
 	    /* PENDING: 0x02 or 0x%02x, CDATA? */
@@ -643,7 +653,10 @@ void printIvalPtr (symbol * sym, link * type, initList * ilist, FILE * oFile)
 	    tfprintf(oFile, "\t!db !constbyte\n", (unsigned int)floatFromVal(val) & 0xff);
 	    break;
 	case 2:
-	    tfprintf (oFile, "\t.byte %s,%s\n", aopLiteral(val, 0),aopLiteral(val, 1));
+	    if (port->use_dw_for_init)
+		tfprintf(oFile, "\t!dws\n", aopLiteralLong(val, 0, 2));
+	    else
+		tfprintf (oFile, "\t.byte %s,%s\n", aopLiteral(val, 0),aopLiteral(val, 1));
 	    break;
 	case 3:
 	    fprintf (oFile, "\t.byte %s,%s,#0x02\n",
@@ -711,7 +724,9 @@ void emitStaticSeg (memmap * map)
     
     /*     fprintf(map->oFile,"\t.area\t%s\n",map->sname); */
     
-    
+    if (!codeOutFile)
+	codeOutFile = code->oFile;
+
     /* for all variables in this segment do */
     for (sym = setFirstItem (map->syms); sym;
 	 sym = setNextItem (map->syms)) {
@@ -732,49 +747,49 @@ void emitStaticSeg (memmap * map)
 
 	    if (!sym->level) { /* global */
 		if (IS_STATIC(sym->etype))
-		    fprintf(code->oFile,"F%s$",moduleName); /* scope is file */
+		    fprintf(codeOutFile,"F%s$",moduleName); /* scope is file */
 		else
-		    fprintf(code->oFile,"G$"); /* scope is global */
+		    fprintf(codeOutFile,"G$"); /* scope is global */
 	    }
 	    else
 		/* symbol is local */
-		fprintf(code->oFile,"L%s$",
+		fprintf(codeOutFile,"L%s$",
 			(sym->localof ? sym->localof->name : "-null-"));
-	    fprintf(code->oFile,"%s$%d$%d",sym->name,sym->level,sym->block);
+	    fprintf(codeOutFile,"%s$%d$%d",sym->name,sym->level,sym->block);
 	}
 	
 	/* if it has an absolute address */
 	if (SPEC_ABSA (sym->etype)) {
 	    if ((options.debug || sym->level == 0) && !options.nodebug)
-		fprintf(code->oFile," == 0x%04x\n", SPEC_ADDR (sym->etype));
+		fprintf(codeOutFile," == 0x%04x\n", SPEC_ADDR (sym->etype));
 
-	    fprintf (code->oFile, "%s\t=\t0x%04x\n",
+	    fprintf (codeOutFile, "%s\t=\t0x%04x\n",
 		     sym->rname,
 		     SPEC_ADDR (sym->etype));
 	}
 	else {
 	    if ((options.debug || sym->level == 0) && !options.nodebug)
-		fprintf(code->oFile," == .\n");	
+		fprintf(codeOutFile," == .\n");	
 
 	    /* if it has an initial value */
 	    if (sym->ival) {
-		fprintf (code->oFile, "%s:\n", sym->rname);
+		fprintf (codeOutFile, "%s:\n", sym->rname);
 		noAlloc++;
 		resolveIvalSym (sym->ival);
-		printIval (sym, sym->type, sym->ival, code->oFile);
+		printIval (sym, sym->type, sym->ival, codeOutFile);
 		noAlloc--;
 	    }
 	    else {
 		/* allocate space */
-		fprintf (code->oFile, "%s:\n", sym->rname);
+		fprintf (codeOutFile, "%s:\n", sym->rname);
 		/* special case for character strings */
 		if (IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) &&
 		    SPEC_CVAL (sym->etype).v_char)
-		    printChar (code->oFile,
+		    printChar (codeOutFile,
 			       SPEC_CVAL (sym->etype).v_char,
 			       strlen(SPEC_CVAL (sym->etype).v_char)+1);
 		else 
-		    tfprintf(code->oFile, "\t!ds\n", (unsigned int)getSize (sym->type)& 0xffff);
+		    tfprintf(codeOutFile, "\t!ds\n", (unsigned int)getSize (sym->type)& 0xffff);
 	    }
 	}
     }
@@ -793,8 +808,19 @@ void emitMaps ()
     emitRegularMap (xdata, TRUE,TRUE);
     emitRegularMap (sfr, FALSE,FALSE);
     emitRegularMap (sfrbit, FALSE,FALSE);
+    emitRegularMap (home, TRUE,FALSE);
     emitRegularMap (code, TRUE,FALSE);
     emitStaticSeg (statsg);
+}
+
+/*-----------------------------------------------------------------*/
+/* flushStatics - flush all currently defined statics out to file  */
+/*  and delete.  Temporary function                                */
+/*-----------------------------------------------------------------*/
+void flushStatics(void)
+{
+    emitStaticSeg(statsg);
+    statsg->syms = NULL;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1182,7 +1208,14 @@ void glue ()
     	tfprintf(asmFile, "\t!area\n", port->mem.post_static_name);
 	fprintf (asmFile,"\tljmp\t__sdcc_program_startup\n");
     }
-	
+
+    fprintf (asmFile,
+	     "%s"
+	     "; Home\n"
+	     "%s", iComments2, iComments2);
+    tfprintf(asmFile, "\t!areahome\n", HOME_NAME);
+    copyFile (asmFile, home->oFile);
+
     /* copy over code */
     fprintf (asmFile, "%s", iComments2);
     fprintf (asmFile, "; code\n");

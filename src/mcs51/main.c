@@ -228,6 +228,7 @@ PORT mcs51_port = {
 	"GSINIT  (CODE)",
 	"OSEG    (OVR,DATA)",
 	"GSFINAL (CODE)",
+	"HOME	 (CODE)",
 	NULL,
 	NULL,
 	1

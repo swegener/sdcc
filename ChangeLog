@@ -1,3 +1,7 @@
+2004-07-01 Borut Razem <borut.razem AT siol.net>
+
+	* support/scripts/sdcc.nsi: added include/pic16 to setup
+
 2004-06-30 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* device/lib/Makefile.in: fixed bug in target objects-pic16,

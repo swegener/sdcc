@@ -166,6 +166,8 @@ Section "SDCC include files"
   File "${DEV_ROOT}\include\asm\gbz80\features.h"
   SetOutPath "$INSTDIR\include\asm\z80"
   File "${DEV_ROOT}\include\asm\z80\features.h"
+  SetOutPath "$INSTDIR\include\pic16"
+  File "${DEV_ROOT}\include\pic16\*.h"
   SetOutPath "$INSTDIR\include"
   File "${DEV_ROOT}\include\*.h"
 SectionEnd
@@ -385,6 +387,7 @@ Section Uninstall
   Delete "$INSTDIR\include\asm\z80\*.h"
   Delete "$INSTDIR\include\asm\gbz80\*.h"
   Delete "$INSTDIR\include\asm\default\*.h"
+  Delete "$INSTDIR\include\pic16\*.h"
   Delete "$INSTDIR\include\*.h"
 
   Delete "$INSTDIR\doc\README.TXT"
@@ -418,6 +421,7 @@ Section Uninstall
   RMDir "$INSTDIR\include\asm\gbz80"
   RMDir "$INSTDIR\include\asm\default"
   RMDir "$INSTDIR\include\asm"
+  RMDir "$INSTDIR\include\pic16"
   RMDir "$INSTDIR\include"
 
   RMDir "$INSTDIR\doc"

@@ -65,6 +65,13 @@ int nrelFiles = 0;
 bool verboseExec = FALSE;
 char *preOutName;
 
+/* uncomment JAMIN_DS390 to always override and use ds390 port
+  for mcs51 work.  This is temporary, for compatibility testing. */
+/* #define JAMIN_DS390 */
+#ifdef JAMIN_DS390
+int ds390_jammed = 0;
+#endif
+
 // Globally accessible scratch buffer for file names.
 char scratchFileName[FILENAME_MAX];
 
@@ -1304,6 +1311,13 @@ main (int argc, char **argv, char **envp)
   }
 
   _findPort (argc, argv);
+#ifdef JAMIN_DS390
+  if (strcmp(port->target, "mcs51") == 0) {
+    printf("DS390 jammed in A\n");
+ 	  _setPort ("ds390");
+    ds390_jammed = 1;
+  }
+#endif
   /* Initalise the port. */
   if (port->init)
     port->init ();
@@ -1321,6 +1335,12 @@ main (int argc, char **argv, char **envp)
 
 
   setDefaultOptions ();
+#ifdef JAMIN_DS390
+  if (ds390_jammed) {
+    options.model = MODEL_SMALL;
+    options.stack10bit=0;
+  }
+#endif
   parseCmdLine (argc, argv);
 
   if (getenv("SDCPP"))

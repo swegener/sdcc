@@ -486,12 +486,26 @@ _emitMove(const char *to, const char *from)
 void
 aopDump(const char *plabel, asmop *aop)
 {
+  int i;
+  char regbuf[9];
+  char *rbp = regbuf;
+  
   emitDebug("; Dump of %s: type %s size %u", plabel, aopNames[aop->type], aop->size);
   switch (aop->type)
     {
+    case AOP_EXSTK:
     case AOP_STK:
       emitDebug(";  aop_stk %d", aop->aopu.aop_stk);
       break;
+    case AOP_REG:
+      for (i=aop->size-1;i>=0;i--)
+        *rbp++ = *(aop->aopu.aop_reg[i]->name);
+      *rbp = '\0';
+      emitDebug(";  reg = %s", regbuf);
+      break;
+    case AOP_PAIRPTR:
+      emitDebug(";  pairptr = (%s)", _pairs[aop->aopu.aop_pairId].name);
+        
     default:
       /* No information. */
       break;
@@ -669,6 +683,39 @@ _pop (PAIR_ID pairId)
   _G.stack.pushed -= 2;
   spillPair (pairId);
 }
+
+void
+genMovePairPair (PAIR_ID srcPair, PAIR_ID dstPair)
+{
+  switch (dstPair)
+    {
+    case PAIR_IX:
+    case PAIR_IY:
+    case PAIR_AF:
+      _push(srcPair);
+      _pop(dstPair);
+      break;
+    case PAIR_BC:
+    case PAIR_DE:
+    case PAIR_HL:
+      if (srcPair == PAIR_IX || srcPair == PAIR_IY)
+        {
+          _push(srcPair);
+          _pop(dstPair);
+        }
+      else
+        {
+          emit2("ld %s,%s",_pairs[dstPair].l,_pairs[srcPair].l);
+          emit2("ld %s,%s",_pairs[dstPair].h,_pairs[srcPair].h);
+        }
+     default:
+       wassertl (0, "Tried to move a nonphysical pair");
+    }
+  _G.pairs[dstPair].last_type = _G.pairs[srcPair].last_type;
+  _G.pairs[dstPair].base = _G.pairs[srcPair].base;
+  _G.pairs[dstPair].offset = _G.pairs[srcPair].offset;
+}
+
 
 /*-----------------------------------------------------------------*/
 /* newAsmop - creates a new asmOp                                  */
@@ -1496,6 +1543,8 @@ setupPair (PAIR_ID pairId, asmop * aop, int offset)
       }
 
     case AOP_PAIRPTR:
+      if (pairId != aop->aopu.aop_pairId)
+        genMovePairPair(aop->aopu.aop_pairId, pairId);
       adjustPair (_pairs[pairId].name, &_G.pairs[pairId].offset, offset);
       break;
       
@@ -1645,8 +1694,15 @@ aopGet (asmop * aop, int offset, bool bit16)
 
     case AOP_PAIRPTR:
       setupPair (aop->aopu.aop_pairId, aop, offset);
-      SNPRINTF (buffer, sizeof(buffer), 
-		"(%s)", _pairs[aop->aopu.aop_pairId].name);
+      if (aop->aopu.aop_pairId==PAIR_IX)
+        SNPRINTF (buffer, sizeof(buffer), 
+		  "!*ixx", 0);
+      else if (aop->aopu.aop_pairId==PAIR_IY)
+        SNPRINTF (buffer, sizeof(buffer), 
+		  "!*iyx", 0);
+      else
+        SNPRINTF (buffer, sizeof(buffer), 
+		  "(%s)", _pairs[aop->aopu.aop_pairId].name);
 
       return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
 
@@ -1861,7 +1917,12 @@ aopPut (asmop * aop, const char *s, int offset)
 
     case AOP_PAIRPTR:
       setupPair (aop->aopu.aop_pairId, aop, offset);
-      emit2 ("ld (%s),%s", _pairs[aop->aopu.aop_pairId].name, s);
+      if (aop->aopu.aop_pairId==PAIR_IX)
+        emit2 ("ld !*ixx,%s", 0, s);
+      else if (aop->aopu.aop_pairId==PAIR_IY)
+        emit2 ("ld !*ixy,%s", 0, s);
+      else
+        emit2 ("ld (%s),%s", _pairs[aop->aopu.aop_pairId].name, s);
       break;
 
     default:
@@ -3357,7 +3418,9 @@ setupToPreserveCarry (asmop *result, asmop *left, asmop *right)
       if (couldDestroyCarry (right) && couldDestroyCarry (result))
         {
           shiftIntoPair (0, right);
-          shiftIntoPair (1, result);
+          /* check result again, in case right == result */
+          if (couldDestroyCarry (result))
+            shiftIntoPair (1, result);
         }
       else if (couldDestroyCarry (right))
         {
@@ -3563,7 +3626,7 @@ genPlus (iCode * ic)
           goto release;
         }
     }
-
+  
   setupToPreserveCarry (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic)), AOP (IC_RIGHT (ic)));
 
   while (size--)

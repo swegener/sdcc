@@ -1,5 +1,12 @@
 2003-09-21  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
+	* src/z80/gen.c (setupToPreserveCarry): Fixed bug #796955
+	* src/z80/gen.c (setupPair, genMovePairPair): Fixed setupPair
+	to correctly handle general case of AOP_PAIRPTR
+	* src/z80/gen.c (aopGet, aopPut): Generalized AOP_PAIRPTR handling
+
+2003-09-21  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
 	* src/mcs51/ralloc.c (fillGaps),
 	* src/ds390/ralloc.c (fillGaps): fixed bug #810093 (yet another
 	register positioning bug)

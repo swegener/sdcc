@@ -87,6 +87,7 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <stdlib.h>
 #endif
 
+// PENDING: Straighten this out into configure
 #ifdef __MINGW32__
 #include <time.h>
 #else
@@ -96,6 +97,8 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef VMS
 #ifndef USG
 #if !defined(_MSC_VER)
+// PENDING
+#include <time.h>
 #include <sys/time.h>   /* for __DATE__ and __TIME__ */
 #include <sys/resource.h>
 #else

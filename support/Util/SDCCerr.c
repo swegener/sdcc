@@ -20,6 +20,7 @@
 
 #include "SDCCerr.h"
 
+
 #define USE_STDOUT_FOR_ERRORS		0
 
 #if USE_STDOUT_FOR_ERRORS
@@ -28,10 +29,17 @@
 #define DEFAULT_ERROR_OUT	stderr
 #endif
 
-static FILE *ErrorOut ;
+static struct {
+    ERROR_LOG_LEVEL logLevel;
+    FILE *out;
+} _SDCCERRG;
 
-#define ERROR		0
-#define WARNING		1
+enum {
+    PEDANTIC,
+    WARNING,
+    ERROR
+};
+
 
 extern char *filename ;
 extern int lineno ;
@@ -123,7 +131,7 @@ struct  {
 { WARNING,"warning *** pointer being cast to incompatible type \n"                        },
 { WARNING,"warning *** 'while' loop with 'zero' constant.loop eliminated\n"	      },
 { WARNING,"warning *** %s expression has NO side effects.expr eliminated\n"	      },
-{ WARNING,"warning *** constant value '%s', out of range.\n"		      },
+{ PEDANTIC,"warning *** constant value '%s', out of range.\n"		      },
 { WARNING,"warning *** comparison will either, ALWAYs succeed or ALWAYs fail\n"   },
 { ERROR  ,"error *** Compiler Terminating , contact author with source\n"	      },
 { WARNING,"warning *** 'auto' variable '%s' may be used before initialization at %s(%d)\n"      },
@@ -152,13 +160,13 @@ struct  {
 { ERROR  ,"error *** switch value not an integer\n"},
 { ERROR  ,"error *** case label not an integer\n"},
 { WARNING,"warning *** function '%s' too large for global optimization\n"},
-{ WARNING,"warning *** conditional flow changed by optimizer '%s(%d)':so said EVELYN the modified DOG\n"},
+{ PEDANTIC,"warning *** conditional flow changed by optimizer '%s(%d)':so said EVELYN the modified DOG\n"},
 { WARNING,"warning *** invalid type specifier for pointer type specifier ignored\n"},
 { WARNING,"warning *** function '%s' implicit declaration\n"},
 { WARNING,"warning *** %s"},
 { WARNING,"info *** %s extended by %d bytes for compiler temp(s) :in function  '%s': %s \n"},
 { WARNING,"warning *** unknown or unsupported #pragma directive '%s'\n"},
-{ WARNING,"warning *** %s shifting more than size of object changed to zero\n"},
+{ PEDANTIC, "warning *** %s shifting more than size of object changed to zero\n"},
 { WARNING,"warning *** unknown compiler option '%s' ignored\n"},
 { WARNING,"warning *** option '%s' no longer supported  '%s' \n"},
 { WARNING,"warning *** don't know what to do with file '%s'. file extension unsupported\n"},
@@ -168,7 +176,7 @@ struct  {
 { ERROR  ,"error *** function cannot return 'bit'\n"},
 { ERROR  ,"error *** casting from to type 'void' is illegal\n"},
 { WARNING,"warning *** constant is out of range %s\n" },
-{ WARNING,"warning *** unreachable code %s(%d)\n"},
+{ PEDANTIC,"warning *** unreachable code %s(%d)\n"},
 { WARNING,"warning *** non-pointer type cast to _generic pointer\n"},
 { WARNING,"warning *** possible code generation error at line %d,\n send source to sandeep.dutta@usa.net\n"},
 { WARNING,"warning *** pointer types incompatible \n" },
@@ -190,10 +198,17 @@ SetErrorOut - Set the error output file
 FILE *SetErrorOut(FILE *NewErrorOut)
 
 {
-ErrorOut = NewErrorOut ;
+    _SDCCERRG.out = NewErrorOut ;
 
 return NewErrorOut ;
 }
+
+void
+setErrorLogLevel (ERROR_LOG_LEVEL level)
+{
+    _SDCCERRG.logLevel = level;
+}
+
 /*
 -------------------------------------------------------------------------------
 vwerror - Output a standard eror message with variable number of arguements
@@ -203,19 +218,25 @@ vwerror - Output a standard eror message with variable number of arguements
 
 void vwerror (int errNum, va_list marker)
 {
-  if (!ErrorOut)
-    ErrorOut = DEFAULT_ERROR_OUT ;
+    if (_SDCCERRG.out == NULL) {
+        _SDCCERRG.out = DEFAULT_ERROR_OUT;
+    }
+
+    if (ErrTab[errNum].errType >= _SDCCERRG.logLevel) {
+        if ( ErrTab[errNum].errType == ERROR )
+            fatalError++ ;
   
-  if ( ErrTab[errNum].errType == ERROR )
-    fatalError++ ;
-  
-  if ( filename && lineno ) {
-    fprintf(ErrorOut, "%s(%d):",filename,lineno);
-  } else if (lineno) {
-    fprintf(ErrorOut, "at %d:", lineno);
-  }
-  
-  vfprintf(ErrorOut, ErrTab[errNum].errText,marker);
+        if ( filename && lineno ) {
+            fprintf(_SDCCERRG.out, "%s(%d):",filename,lineno);
+        } else if (lineno) {
+            fprintf(_SDCCERRG.out, "at %d:", lineno);
+        }
+    
+        vfprintf(_SDCCERRG.out, ErrTab[errNum].errText,marker);
+    }
+    else {
+        // Below the logging level, drop.
+    }
 }
 /*
 -------------------------------------------------------------------------------
@@ -225,11 +246,10 @@ werror - Output a standard eror message with variable number of arguements
 */
 
 void werror (int errNum, ... )
-
 {
-va_list	marker;
-va_start(marker,errNum);
-vwerror(errNum, marker);
-va_end( marker );
+    va_list	marker;
+    va_start(marker,errNum);
+    vwerror(errNum, marker);
+    va_end( marker );
 }
 

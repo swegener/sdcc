@@ -61,6 +61,8 @@ GENERATE_CASES = generate-cases.py
 # files and how to run the emulator.
 ALL_PORTS = $(filter-out CVS,$(notdir $(wildcard $(PORTS_DIR)/*)))
 
+all: test-ports
+
 # Test all of the ports
 test-ports:
 	for i in $(ALL_PORTS); do $(MAKE) inter-port-clean test-port PORT=$$i; done
@@ -69,7 +71,10 @@ test-ports:
 test-z80:
 	$(MAKE) inter-port-clean clean test-port PORT=z80
 
-test-z80:
+# Helper rule for testing the host cc only
+test-host:
+	$(MAKE) inter-port-clean clean test-port PORT=host
+
 # Begin per-port rules
 # List of all of the known source test suites.
 ALL_TESTS = $(shell find $(TESTS_DIR) -name "*.c")

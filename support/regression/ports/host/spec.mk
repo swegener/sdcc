@@ -10,7 +10,7 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
 %.out: %$(EXEEXT)
 	mkdir -p `dirname $@`
 	-$< > $@
-	if grep -q FAIL $@; then echo FAILURES in $@; fi
+	-grep -n FAIL $@ /dev/null || true	
 
 %$(EXEEXT): %$(OBJEXT) $(EXTRAS)
 	$(SDCC) $(SDCCFLAGS) -o $@ $< $(EXTRAS)

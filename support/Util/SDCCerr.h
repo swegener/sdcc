@@ -13,7 +13,7 @@ SDCCERR - SDCC Standard error handler
 #include <stdio.h>
 #include <stdarg.h>
 
-/* ERROR MEssage Definition */
+/* ERROR Message Definition */
 
 #define  E_DUPLICATE       0         /* Duplicate variable   */
 #define  E_SYNTAX_ERROR    1         /* Syntax Error         */
@@ -152,6 +152,29 @@ SDCCERR - SDCC Standard error handler
 #define	 W_BANKED_WITH_NONBANKED 134	/* banked and nonbanked attributes mixed */
 #define	 W_BANKED_WITH_STATIC 135	/* banked and static mixed */
 #define  W_INT_TO_GEN_PTR_CAST 136	/* Converting integer type to generic pointer. */
+
+/** Describes the maximum error level that will be logged.  Any level
+    includes all of the levels listed after it.
+ */
+enum _ERROR_LOG_LEVEL {
+    /** Everything.  Currently the same as PEDANTIC. */
+    ERROR_LEVEL_ALL,
+    /** All warnings, including those considered 'reasonable to use,
+        on occasion, in clean programs' (man 3 gcc). */
+    ERROR_LEVEL_PEDANTIC,
+    /** Most warnings. */
+    ERROR_LEVEL_WARNINGS,
+    /** Errors only. */
+    ERROR_LEVEL_ERRORS
+};
+
+typedef enum _ERROR_LOG_LEVEL ERROR_LOG_LEVEL;
+
+/** Sets the maximum error level to log.
+    See MAX_ERROR_LEVEL.  The default is ERROR_LEVEL_ALL.
+*/
+void
+setErrorLogLevel (ERROR_LOG_LEVEL level);
 
 /*
 -------------------------------------------------------------------------------

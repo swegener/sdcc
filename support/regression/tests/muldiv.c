@@ -48,19 +48,24 @@ testDiv(void)
 }
 
 static void
-disabled_testMod(void)
+testMod(void)
 {
     {attr} {storage} {type} i;
 
+    // Disabled the LOG functions due to a bug in sdcc involving
+    // vaargs.
     i = 100;
-    LOG(("i%%17 == 15 = %u\n", (int)(i%9)));
+    //    LOG(("i%%17 == 15 = %u\n", (int)(i%9)));
     ASSERT(i%17 == 15);
-    LOG(("i%%-7 == 2 = %u\n", (int)i%-7));
+
+#if MOD_SIGN_FOLLOWS_DIVIDEND
+    //    LOG(("i%%-7 == 2 = %u\n", (int)i%-7));
     ASSERT(i%-7 == 2);
 
     i = -49;
-    LOG(("i%%3 == -1 = %u\n", (int)i%3));
+    //    LOG(("i%%3 == -1 = %u\n", (int)i%3));
     ASSERT(i%3 == -1);
-    LOG(("i%%-5 == -4 = %u\n", (int)i%-5));
+    //    LOG(("i%%-5 == -4 = %u\n", (int)i%-5));
     ASSERT(i%-5 == -4);
+#endif
 }

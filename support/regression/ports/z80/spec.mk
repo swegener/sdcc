@@ -5,7 +5,7 @@
 GBDK_LIB = ../../../gbdk-lib
 RRZ80 = $(SDCC_EXTRA_DIR)/emu/rrz80/rrz80
 
-SDCCFLAGS += -I$(GBDK_LIB)/include
+SDCCFLAGS += -I$(GBDK_LIB)/include --lesspedantic
 
 EXEEXT = .bin
 

@@ -303,8 +303,10 @@ static PORT *_ports[] =
 #endif
 #if !OPT_DISABLE_DS400
   &ds400_port,	
-#endif	
+#endif
+#if !OPT_DISABLE_HC08
   &hc08_port,
+#endif
 };
 
 #define NUM_PORTS (sizeof(_ports)/sizeof(_ports[0]))

@@ -4263,12 +4263,14 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
      if the right is in a pointer register and left
      is not */
   if ((AOP_TYPE (left) == AOP_LIT) ||
+      (AOP_TYPE (left) == AOP_IMMD) ||
       (IS_AOP_PREG (right) && !IS_AOP_PREG (left)))
     {
       operand *t = right;
       right = left;
       left = t;
     }
+  
   if (AOP_TYPE (right) == AOP_LIT)
     lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
 
@@ -4292,6 +4294,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
   else if (AOP_TYPE (right) == AOP_REG ||
 	   AOP_TYPE (right) == AOP_DIR ||
 	   AOP_TYPE (right) == AOP_LIT ||
+           AOP_TYPE (right) == AOP_IMMD ||
 	   (AOP_TYPE (left) == AOP_DIR && AOP_TYPE (right) == AOP_LIT) ||
 	   (IS_AOP_PREG (left) && !IS_AOP_PREG (right)))
     {

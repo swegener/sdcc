@@ -643,6 +643,11 @@ processParms (ast * func,
       return 1;
     }
 
+  if (IS_VOID(actParm->etype)) {
+    werror (E_VOID_VALUE_USED);
+    return 1;
+  }
+
   /* If this is a varargs function... */
   if (!defParm && actParm && IFFUNC_HASVARARGS(func->ftype))
     {

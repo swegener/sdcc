@@ -1,3 +1,7 @@
+2003-07-28  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/z80/mappings.i: fix _mul[us][int,long] entries
+
 2003-07-26  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
     *src/SDCCmain.c: do not search for crt0.o when using --nostdlib

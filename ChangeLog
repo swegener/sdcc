@@ -1,3 +1,7 @@
+2003-04-28  Bernhard Held <bernhard@bernhardheld.de>
+
+	* debugger/mcs51/cmd.c: added header newalloc.h
+
 2003-04-26  Bernhard Held <bernhard@bernhardheld.de>
 
 	* as/Makefile: new EXEEXT

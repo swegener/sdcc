@@ -27,6 +27,7 @@
 #include "simi.h"
 #include "break.h"
 #include "cmd.h"
+#include "newalloc.h"
 
 /* default number of lines to list out */
 int listLines = 16;

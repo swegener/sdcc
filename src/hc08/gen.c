@@ -6444,11 +6444,12 @@ genRightShift (iCode * ic)
   freeAsmop (right, NULL, ic, TRUE);
 }
 
+
 /*-----------------------------------------------------------------*/
 /* genUnpackBits - generates code for unpacking bits               */
 /*-----------------------------------------------------------------*/
 static void
-genUnpackBits (operand * result)
+genUnpackBits (operand * result, iCode *ifx)
 {
   int offset = 0;	/* result byte offset */
   int rsize;		/* result size */
@@ -6469,9 +6470,17 @@ genUnpackBits (operand * result)
     {
       emitcode ("lda", ",x");
       hc08_dirtyReg (hc08_reg_a, FALSE);
-      AccRsh (bstr, FALSE);
-      emitcode ("and", "#0x%02x", ((unsigned char) -1) >> (8 - blen));
-      storeRegToAop (hc08_reg_a, AOP (result), offset++);
+      if (!ifx)
+        {
+          AccRsh (bstr, FALSE);
+          emitcode ("and", "#0x%02x", ((unsigned char) -1) >> (8 - blen));
+          storeRegToAop (hc08_reg_a, AOP (result), offset++);
+        }
+      else
+        {
+          emitcode ("and", "#0x%02x",
+                    (((unsigned char) -1) >> (8 - blen)) << bstr);
+        }
       goto finish;
     }
 
@@ -6481,7 +6490,9 @@ genUnpackBits (operand * result)
     {
       emitcode ("lda", ",x");
       hc08_dirtyReg (hc08_reg_a, FALSE);
-      storeRegToAop (hc08_reg_a, AOP (result), offset++);
+      if (!ifx)
+        storeRegToAop (hc08_reg_a, AOP (result), offset);
+      offset++;
       if (rlen>8)
         emitcode ("aix", "#1");
     }
@@ -6501,6 +6512,147 @@ finish:
       while (rsize--)
         storeConstToAop (zero, AOP (result), offset++);
     }
+  
+  if (ifx && !ifx->generated)
+    {
+      genIfxJump (ifx, "a");
+    }
+}
+
+
+/*-----------------------------------------------------------------*/
+/* genUnpackBitsImmed - generates code for unpacking bits          */
+/*-----------------------------------------------------------------*/
+static void
+genUnpackBitsImmed (operand * left,
+                    operand * result,
+                    iCode *ic,
+                    iCode *ifx)
+{
+  int size;
+  int offset = 0;	/* result byte offset */
+  int rsize;		/* result size */
+  int rlen = 0;		/* remaining bitfield length */
+  sym_link *etype;	/* bitfield type information */
+  int blen;		/* bitfield length */
+  int bstr;		/* bitfield starting bit within byte */
+  asmop *derefaop;
+  
+  D(emitcode (";     genUnpackBitsImmed",""));
+
+  aopOp (result, ic, TRUE);
+  size = AOP_SIZE (result);
+
+  derefaop = aopDerefAop (AOP (left));
+  freeAsmop (left, NULL, ic, TRUE);
+  derefaop->size = size;
+  
+  etype = getSpec (operandType (result));
+  rsize = getSize (operandType (result));
+  blen = SPEC_BLEN (etype);
+  bstr = SPEC_BSTR (etype);
+
+  /* if the bitfield is a single bit in the direct page */
+  if (blen == 1 && derefaop->type == AOP_DIR)
+    {
+      if (!ifx && bstr)
+        {
+          symbol *tlbl = newiTempLabel (NULL);
+          
+          loadRegFromConst (hc08_reg_a, zero);
+          emitcode ("brclr", "#%d,%s,%05d$",
+                    bstr, aopAdrStr (derefaop, 0, FALSE),
+                    (tlbl->key + 100));
+          rmwWithReg ("inc", hc08_reg_a);
+          emitLabel (tlbl);
+          storeRegToAop (hc08_reg_a, AOP (result), offset);
+          hc08_freeReg (hc08_reg_a);
+          offset++;
+          goto finish;
+        }
+      else if (ifx)
+        {
+          symbol *tlbl = newiTempLabel (NULL);
+          symbol *jlbl;
+          char * inst;
+          
+          if (IC_TRUE (ifx))
+            {
+              jlbl = IC_TRUE (ifx);
+              inst = "brclr";
+            }
+          else
+            {
+              jlbl = IC_FALSE (ifx);
+              inst = "brset";
+            }
+          emitcode (inst, "#%d,%s,%05d$",
+                    bstr, aopAdrStr (derefaop, 0, FALSE),
+                    (tlbl->key + 100));
+          emitBranch ("jmp", jlbl);
+          emitLabel (tlbl);
+          ifx->generated = 1;
+          offset++;
+          goto finish;
+        }
+    }
+
+  /* If the bitfield length is less than a byte */
+  if (blen < 8)
+    {
+      loadRegFromAop (hc08_reg_a, derefaop, 0);
+      if (!ifx)
+        {
+          AccRsh (bstr, FALSE);
+          emitcode ("and", "#0x%02x", ((unsigned char) -1) >> (8 - blen));
+          hc08_dirtyReg (hc08_reg_a, FALSE);
+          storeRegToAop (hc08_reg_a, AOP (result), offset);
+        }
+      else
+        {
+          emitcode ("and", "#0x%02x",
+                    (((unsigned char) -1) >> (8 - blen)) << bstr);
+          hc08_dirtyReg (hc08_reg_a, FALSE);
+        }
+      offset++;
+      goto finish;
+    }
+
+  /* Bit field did not fit in a byte. Copy all
+     but the partial byte at the end.  */
+  for (rlen=blen;rlen>=8;rlen-=8)
+    {
+      loadRegFromAop (hc08_reg_a, derefaop, size-offset);
+      if (!ifx)
+        storeRegToAop (hc08_reg_a, AOP (result), offset);
+      else
+        emitcode ("tsta", "");
+      offset++;
+    }
+
+  /* Handle the partial byte at the end */
+  if (rlen)
+    {
+      loadRegFromAop (hc08_reg_a, derefaop, size-offset);
+      emitcode ("and", "#0x%02x", ((unsigned char) -1) >> (8-rlen));
+      storeRegToAop (hc08_reg_a, AOP (result), offset++);
+    }
+
+finish:
+  if (offset < rsize)
+    {
+      rsize -= offset;
+      while (rsize--)
+        storeConstToAop (zero, AOP (result), offset++);
+    }
+  
+  freeAsmop (NULL, derefaop, ic, TRUE);
+  freeAsmop (result, NULL, ic, TRUE);
+  
+  if (ifx && !ifx->generated)
+    {
+      genIfxJump (ifx, "a");
+    }
 }
 
 
@@ -6510,7 +6662,8 @@ finish:
 static void
 genDataPointerGet (operand * left,
 		   operand * result,
-		   iCode * ic)
+		   iCode * ic,
+                   iCode * ifx)
 {
   int size, offset = 0;
   asmop *derefaop;
@@ -6526,114 +6679,55 @@ genDataPointerGet (operand * left,
   
   while (size--)
     {
-      transferAopAop(derefaop, offset, AOP (result), offset);
+      if (!ifx)
+        transferAopAop (derefaop, offset, AOP (result), offset);
+      else
+        loadRegFromAop (hc08_reg_a, derefaop, offset);
       offset++;
     }
 
   freeAsmop (NULL, derefaop, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
-}
-
-#if 0
-/*-----------------------------------------------------------------*/
-/* genNearPointerGet - emitcode for near pointer fetch             */
-/*-----------------------------------------------------------------*/
-static void
-genNearPointerGet (operand * left,
-		   operand * result,
-		   iCode * ic,
-		   iCode * pi)
-{
-  int size, offset;
-  sym_link *retype = getSpec (operandType (result));
-
-  D(emitcode (";     genNearPointerGet",""));
-
-  aopOp (left, ic, FALSE);
-
-  /* if left is rematerialisable and
-     result is not bit variable type and
-     the left is pointer to data space i.e
-     lower 128 bytes of space */
-  if ((AOP_TYPE (left) == AOP_IMMD)
-      || (AOP_TYPE (left) == AOP_LIT) 
-      /* !IS_BITVAR (retype) */
-      /* && DCL_TYPE (ltype) == POINTER */ )
-    {
-      genDataPointerGet (left, result, ic);
-      return;
-    }
-
-  /* if the operand is already in hx
-     then we do nothing else we move the value to hx */
-  if (AOP_TYPE (left) != AOP_STR)
-    {
-      /* if this is remateriazable */
-      loadRegFromAop (hc08_reg_x, AOP (left), 0);
-      loadRegFromConst (hc08_reg_h, zero);
-    }
-
-  /* so hx now contains the address */
-  aopOp (result, ic, FALSE);
-
-  /* if bit then unpack */
-  if (IS_BITVAR (retype))
-    genUnpackBits (result);
-  else
-    {
-      size = AOP_SIZE (result);
-      offset = size-1;
-
-      while (size--)
-	{
-	  accopWithMisc ("lda", ",x");
-	  if (size || pi)
-            {
-              rmwWithReg ("inc", hc08_reg_x);
-            }
-          storeRegToAop (hc08_reg_a, AOP (result), offset--);
-          hc08_freeReg (hc08_reg_a);
-	}
-    }
-
-  freeAsmop (left, NULL, ic, TRUE);
-  freeAsmop (result, NULL, ic, TRUE);
   
-  if (pi /* && AOP_TYPE (left) != AOP_IMMD && AOP_TYPE (left) != AOP_STR */) {
-    aopOp (IC_RESULT (pi), pi, FALSE);
-    storeRegToAop (hc08_reg_x, AOP (IC_RESULT (pi)), 0);
-    freeAsmop (IC_RESULT (pi), NULL, pi, TRUE);
-    pi->generated = 1;
-  }
-
-  hc08_freeReg (hc08_reg_hx);
+  if (ifx && !ifx->generated)
+    {
+      genIfxJump (ifx, "a");
+    }
 }
-#endif
+
 
 /*-----------------------------------------------------------------*/
-/* genFarPointerGet - get value from far space                     */
+/* genPointerGet - generate code for pointer get                   */
 /*-----------------------------------------------------------------*/
 static void
-genFarPointerGet (operand * left,
-		  operand * result, iCode * ic, iCode * pi)
+genPointerGet (iCode * ic, iCode *pi, iCode *ifx)
 {
+  operand *left = IC_LEFT (ic);
+  operand *result = IC_RESULT (ic);
   int size, offset;
   sym_link *retype = getSpec (operandType (result));
 
-  D(emitcode (";     genFarPointerGet",""));
+  D(emitcode (";     genPointerGet",""));
 
+  if (getSize (operandType (result))>1)
+    ifx = NULL;
+  
   aopOp (left, ic, FALSE);
 
   /* if left is rematerialisable and
-     result is not bit variable type and
-     the left is pointer to data space i.e
-     lower 128 bytes of space */
-  if (AOP_TYPE (left) == AOP_IMMD &&
-      !IS_BITVAR (retype)
-      /* && DCL_TYPE (ltype) == POINTER */ )
+     result is not bit variable type */
+  if (AOP_TYPE (left) == AOP_IMMD || AOP_TYPE (left) == AOP_LIT)
     {
-      genDataPointerGet (left, result, ic);
-      return;
+      if (!IS_BITVAR (retype))
+        {
+          genDataPointerGet (left, result, ic, ifx);
+          return;
+        }
+      else
+        {
+          genUnpackBitsImmed (left, result, ic, ifx);
+          return;
+        }
     }
 
   /* if the operand is already in hx
@@ -6649,7 +6743,7 @@ genFarPointerGet (operand * left,
 
   /* if bit then unpack */
   if (IS_BITVAR (retype))
-    genUnpackBits (result);
+    genUnpackBits (result, ifx);
   else
     {
       size = AOP_SIZE (result);
@@ -6663,7 +6757,9 @@ genFarPointerGet (operand * left,
 	      emitcode ("aix", "#1");
 	      hc08_dirtyReg (hc08_reg_hx, FALSE);
             }
-          storeRegToAop (hc08_reg_a, AOP (result), offset--);
+          if (!ifx)
+            storeRegToAop (hc08_reg_a, AOP (result), offset);
+          offset--;
           hc08_freeReg (hc08_reg_a);
 	}
     }
@@ -6671,73 +6767,20 @@ genFarPointerGet (operand * left,
   freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
   
-  if (pi /* && AOP_TYPE (left) != AOP_IMMD && AOP_TYPE (left) != AOP_STR */) {
+  if (pi) {
     aopOp (IC_RESULT (pi), pi, FALSE);
     storeRegToAop (hc08_reg_hx, AOP (IC_RESULT (pi)), 0);
     freeAsmop (IC_RESULT (pi), NULL, pi, TRUE);
     pi->generated = 1;
   }
+  
+  if (ifx && !ifx->generated)
+    {
+      genIfxJump (ifx, "a");
+    }
 
   hc08_freeReg (hc08_reg_hx);
   
-}
-
-
-
-/*-----------------------------------------------------------------*/
-/* genPointerGet - generate code for pointer get                   */
-/*-----------------------------------------------------------------*/
-static void
-genPointerGet (iCode * ic, iCode *pi)
-{
-  operand *left, *result;
-  sym_link *type, *etype;
-  int p_type;
-
-  D(emitcode (";     genPointerGet",""));
-
-  left = IC_LEFT (ic);
-  result = IC_RESULT (ic);
-
-  /* depending on the type of pointer we need to
-     move it to the correct pointer register */
-  type = operandType (left);
-  etype = getSpec (type);
-  /* if left is of type of pointer then it is simple */
-  if (IS_PTR (type) && !IS_FUNC (type->next))
-    p_type = DCL_TYPE (type);
-  else
-    {
-      /* we have to go by the storage class */
-      p_type = PTR_TYPE (SPEC_OCLS (etype));
-    }
-
-  /* special case when cast remat */
-  if (p_type == GPOINTER && IS_SYMOP(left) && OP_SYMBOL(left)->remat &&
-      IS_CAST_ICODE(OP_SYMBOL(left)->rematiCode)) {
-	  left = IC_RIGHT(OP_SYMBOL(left)->rematiCode);
-	  type = operandType (left);
-	  p_type = DCL_TYPE (type);
-  }
-  /* now that we have the pointer type we assign
-     the pointer values */
-  switch (p_type)
-    {
-
-    case POINTER:
-    case IPOINTER:
-#if 0
-      genNearPointerGet (left, result, ic, pi);
-      break;
-#endif
-    case GPOINTER:
-    case CPOINTER:
-    case FPOINTER:
-      genFarPointerGet (left, result, ic, pi);
-      break;
-
-    }
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -6759,7 +6802,7 @@ genPackBits (sym_link * etype,
 
   blen = SPEC_BLEN (etype);
   bstr = SPEC_BSTR (etype);
-  
+
   /* If the bitfield length is less than a byte */
   if (blen < 8)
     {
@@ -6864,6 +6907,159 @@ genPackBits (sym_link * etype,
 }
 
 /*-----------------------------------------------------------------*/
+/* genPackBits - generates code for packed bit storage             */
+/*-----------------------------------------------------------------*/
+static void
+genPackBitsImmed (operand *result, sym_link * etype, operand * right, iCode * ic)
+{
+  asmop *derefaop;
+  int size;
+  int offset = 0;	/* source byte offset */
+  int rlen = 0;		/* remaining bitfield length */
+  int blen;		/* bitfield length */
+  int bstr;		/* bitfield starting bit within byte */
+  int litval;		/* source literal value (if AOP_LIT) */
+  unsigned char mask;	/* bitmask within current byte */
+
+  D(emitcode (";     genPackBitsImmed",""));
+
+  blen = SPEC_BLEN (etype);
+  bstr = SPEC_BSTR (etype);
+
+  aopOp (right, ic, FALSE);
+  size = AOP_SIZE (right);
+
+  derefaop = aopDerefAop (AOP (result));
+  freeAsmop (result, NULL, ic, TRUE);
+  derefaop->size = size;
+
+  /* if the bitfield is a single bit in the direct page */
+  if (blen == 1 && derefaop->type == AOP_DIR)
+    {
+      if (AOP_TYPE (right) == AOP_LIT)
+        {
+          litval = (int) floatFromVal (AOP (right)->aopu.aop_lit);
+      
+          emitcode ((litval & 1) ? "bset" : "bclr", 
+                    "#%d,%s", bstr, aopAdrStr (derefaop, 0, FALSE));
+        }
+      else
+        {
+          symbol *tlbl1 = newiTempLabel (NULL);
+          symbol *tlbl2 = newiTempLabel (NULL);
+          
+          loadRegFromAop (hc08_reg_a, AOP (right), 0);
+          emitcode ("bit", "#1");
+          emitBranch ("bne", tlbl1);
+          emitcode ("bclr", "#%d,%s", bstr, aopAdrStr (derefaop, 0, FALSE));
+          emitBranch ("bra", tlbl2);
+          emitLabel (tlbl1);
+          emitcode ("bset", "#%d,%s", bstr, aopAdrStr (derefaop, 0, FALSE));
+          emitLabel (tlbl2);
+          hc08_freeReg (hc08_reg_a);
+        }
+      goto release;
+    }
+    
+  /* If the bitfield length is less than a byte */
+  if (blen < 8)
+    {
+      mask = ((unsigned char) (0xFF << (blen + bstr)) |
+	      (unsigned char) (0xFF >> (8 - bstr)));
+
+      if (AOP_TYPE (right) == AOP_LIT)
+        {
+          /* Case with a bitfield length <8 and literal source
+          */
+          litval = (int) floatFromVal (AOP (right)->aopu.aop_lit);
+          litval <<= bstr;
+          litval &= (~mask) & 0xff;
+
+          loadRegFromAop (hc08_reg_a, derefaop, 0);
+          if ((mask|litval)!=0xff)
+            emitcode ("and","#0x%02x", mask);
+          if (litval)
+            emitcode ("ora","#0x%02x", litval);
+          hc08_dirtyReg (hc08_reg_a, FALSE);
+          storeRegToAop (hc08_reg_a, derefaop, 0);
+          
+          hc08_freeReg (hc08_reg_a);
+          goto release;
+        }
+          
+      /* Case with a bitfield length < 8 and arbitrary source
+      */
+      loadRegFromAop (hc08_reg_a, AOP (right), 0);
+      /* shift and mask source value */
+      AccLsh (bstr);
+      emitcode ("and", "#0x%02x", (~mask) & 0xff);
+      hc08_dirtyReg (hc08_reg_a, FALSE);
+      pushReg (hc08_reg_a, TRUE);
+
+      loadRegFromAop (hc08_reg_a, derefaop, 0);
+      emitcode ("and", "#0x%02x", mask);
+      emitcode ("ora", "1,s");
+      storeRegToAop (hc08_reg_a, derefaop, 0);
+      pullReg (hc08_reg_a);
+     
+      hc08_freeReg (hc08_reg_a);
+      goto release;
+    }
+
+  /* Bit length is greater than 7 bits. In this case, copy  */
+  /* all except the partial byte at the end                 */
+  for (rlen=blen;rlen>=8;rlen-=8)
+    {
+      transferAopAop (AOP (right), offset, derefaop, size-offset);
+      offset++;
+    }
+
+  /* If there was a partial byte at the end */
+  if (rlen)
+    {
+      mask = (((unsigned char) -1 << rlen) & 0xff);
+      
+      if (AOP_TYPE (right) == AOP_LIT)
+        {
+          /* Case with partial byte and literal source
+          */
+          litval = (int) floatFromVal (AOP (right)->aopu.aop_lit);
+          litval >>= (blen-rlen);
+          litval &= (~mask) & 0xff;
+          loadRegFromAop (hc08_reg_a, derefaop, size-offset);
+          if ((mask|litval)!=0xff)
+            emitcode ("and","#0x%02x", mask);
+          if (litval)
+            emitcode ("ora","#0x%02x", litval);
+          hc08_dirtyReg (hc08_reg_a, FALSE);
+          storeRegToAop (hc08_reg_a, derefaop, size-offset);
+          hc08_dirtyReg (hc08_reg_a, FALSE);
+          hc08_freeReg (hc08_reg_a);
+          goto release;
+        }
+      
+      /* Case with partial byte and arbitrary source
+      */
+      loadRegFromAop (hc08_reg_a, AOP (right), offset);
+      emitcode ("and", "#0x%02x", (~mask) & 0xff);
+      hc08_dirtyReg (hc08_reg_a, FALSE);
+      pushReg (hc08_reg_a, TRUE);
+
+      loadRegFromAop (hc08_reg_a, derefaop, size-offset);
+      emitcode ("and", "#0x%02x", mask);
+      emitcode ("ora", "1,s");
+      storeRegToAop (hc08_reg_a, derefaop, size-offset);
+      pullReg (hc08_reg_a);
+    }
+
+  hc08_freeReg (hc08_reg_a);
+
+release:  
+  freeAsmop (right, NULL, ic, TRUE);
+  freeAsmop (NULL, derefaop, ic, TRUE);
+}
+
+/*-----------------------------------------------------------------*/
 /* genDataPointerSet - remat pointer to data space                 */
 /*-----------------------------------------------------------------*/
 static void
@@ -6893,104 +7089,40 @@ genDataPointerSet (operand * right,
   freeAsmop (NULL, derefaop, ic, TRUE);
 }
 
-#if 0
+
 /*-----------------------------------------------------------------*/
-/* genNearPointerSet - emitcode for near pointer put                */
+/* genPointerSet - stores the value into a pointer location        */
 /*-----------------------------------------------------------------*/
 static void
-genNearPointerSet (operand * right,
-		   operand * result,
-		   iCode * ic,
-		   iCode * pi)
+genPointerSet (iCode * ic, iCode *pi)
 {
+  operand *right = IC_RIGHT (ic);
+  operand *result = IC_RESULT (ic);
+  sym_link *type, *etype;
   int size, offset;
   sym_link *retype = getSpec (operandType (right));
   sym_link *letype = getSpec (operandType (result));
 
-  D(emitcode (";     genNearPointerSet",""));
+  D(emitcode (";     genPointerSet",""));
 
-  aopOp (result, ic, FALSE);
-
-  /* if the result is rematerializable &
-     in data space & not a bit variable */
-  if (AOP_TYPE (result) == AOP_IMMD &&
-      /* DCL_TYPE (ptype) == POINTER && */
-      !IS_BITVAR (retype) &&
-      !IS_BITVAR (letype))
-    {
-      genDataPointerSet (right, result, ic);
-      return;
-    }
-
-  /* if the operand is already in hx
-     then we do nothing else we move the value to hx */
-  if (AOP_TYPE (result) != AOP_STR)
-    {
-      loadRegFromAop (hc08_reg_x, AOP (result), 0);
-      loadRegFromConst (hc08_reg_h, zero);
-    }
-  /* so hx now contains the address */
-  aopOp (right, ic, FALSE);
-
-  /* if bit then unpack */
-  if (IS_BITVAR (retype) || IS_BITVAR (letype))
-    genPackBits ((IS_BITVAR (retype) ? retype : letype), right);
-  else
-    {
-      size = AOP_SIZE (right);
-      offset = size-1;
-
-      while (size--)
-	{
-          loadRegFromAop (hc08_reg_a, AOP (right), offset--);
-	  accopWithMisc ("sta", ",x");
-	  if (size || pi)
-	    {
-	      rmwWithReg ("inc", hc08_reg_x);
-	    }
-          hc08_freeReg (hc08_reg_a);
-	}
-    }
-
-  freeAsmop (result, NULL, ic, TRUE);
-  freeAsmop (right, NULL, ic, TRUE);
-
-  if (pi /* && AOP_TYPE (result) != AOP_STR && AOP_TYPE (result) != AOP_IMMD */) {
-    aopOp (IC_RESULT (pi), pi, FALSE);
-    storeRegToAop (hc08_reg_x, AOP (IC_RESULT (pi)), 0);
-    freeAsmop (IC_RESULT (pi), NULL, pi, TRUE);
-    pi->generated=1;
-  }
-
-  hc08_freeReg (hc08_reg_hx);
+  type = operandType (result);
+  etype = getSpec (type);
   
-}
-#endif
-
-/*-----------------------------------------------------------------*/
-/* genFarPointerSet - set value from far space                     */
-/*-----------------------------------------------------------------*/
-static void
-genFarPointerSet (operand * right,
-		  operand * result, iCode * ic, iCode * pi)
-{
-  int size, offset;
-  sym_link *retype = getSpec (operandType (right));
-  sym_link *letype = getSpec (operandType (result));
-
-  D(emitcode (";     genFarPointerSet",""));
-
   aopOp (result, ic, FALSE);
 
-  /* if the result is rematerializable &
-     in data space & not a bit variable */
-  if (AOP_TYPE (result) == AOP_IMMD &&
-      /* DCL_TYPE (ptype) == POINTER && */
-      !IS_BITVAR (retype) &&
-      !IS_BITVAR (letype))
+  /* if the result is rematerializable */
+  if (AOP_TYPE (result) == AOP_IMMD || AOP_TYPE (result) == AOP_LIT)
     {
-      genDataPointerSet (right, result, ic);
-      return;
+      if (!IS_BITVAR (retype) && !IS_BITVAR (letype))
+        {
+          genDataPointerSet (right, result, ic);
+          return;
+        }
+      else
+        {
+          genPackBitsImmed (result, (IS_BITVAR (retype) ? retype : letype), right, ic);
+          return;
+        }
     }
 
   /* if the operand is already in hx
@@ -7025,7 +7157,7 @@ genFarPointerSet (operand * right,
   freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, TRUE);
 
-  if (pi /* && AOP_TYPE (result) != AOP_STR && AOP_TYPE (result) != AOP_IMMD  */) {
+  if (pi) {
     aopOp (IC_RESULT (pi), pi, FALSE);
     storeRegToAop (hc08_reg_hx, AOP (IC_RESULT (pi)), 0);
     freeAsmop (IC_RESULT (pi), NULL, pi, TRUE);
@@ -7033,69 +7165,6 @@ genFarPointerSet (operand * right,
   }
 
   hc08_freeReg (hc08_reg_hx);
-  
-
-}
-
-
-/*-----------------------------------------------------------------*/
-/* genPointerSet - stores the value into a pointer location        */
-/*-----------------------------------------------------------------*/
-static void
-genPointerSet (iCode * ic, iCode *pi)
-{
-  operand *right, *result;
-  sym_link *type, *etype;
-  int p_type;
-
-  D(emitcode (";     genPointerSet",""));
-
-  right = IC_RIGHT (ic);
-  result = IC_RESULT (ic);
-
-  /* depending on the type of pointer we need to
-     move it to the correct pointer register */
-  type = operandType (result);
-  etype = getSpec (type);
-  /* if left is of type of pointer then it is simple */
-  if (IS_PTR (type) && !IS_FUNC (type->next))
-    {
-      p_type = DCL_TYPE (type);
-    }
-  else
-    {
-      /* we have to go by the storage class */
-      p_type = PTR_TYPE (SPEC_OCLS (etype));
-    }
-
-  /* special case when cast remat */
-  if (p_type == GPOINTER && OP_SYMBOL(result)->remat &&
-      IS_CAST_ICODE(OP_SYMBOL(result)->rematiCode)) {
-	  result = IC_RIGHT(OP_SYMBOL(result)->rematiCode);
-	  type = operandType (result);
-	  p_type = DCL_TYPE (type);
-  }
-  /* now that we have the pointer type we assign
-     the pointer values */
-  switch (p_type)
-    {
-
-    case POINTER:
-    case IPOINTER:
-#if 0
-      genNearPointerSet (right, result, ic, pi);
-      break;
-#endif
-
-    case GPOINTER:
-    case FPOINTER:
-      genFarPointerSet (right, result, ic, pi);
-      break;
-
-    default:
-      werror (E_INTERNAL_ERROR, __FILE__, __LINE__, 
-	      "genPointerSet: illegal pointer type");
-    }
 
 }
 
@@ -7903,7 +7972,10 @@ genhc08Code (iCode * lic)
 	  break;
 
 	case GET_VALUE_AT_ADDRESS:
-	  genPointerGet (ic, hasInc(IC_LEFT(ic),ic,getSize(operandType(IC_RESULT(ic)))));
+	  genPointerGet (ic,
+                         hasInc (IC_LEFT (ic), ic,
+                                 getSize (operandType (IC_RESULT (ic)))),
+                         ifxForOp (IC_RESULT (ic), ic) );
 	  break;
 
 	case '=':

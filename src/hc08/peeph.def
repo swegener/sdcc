@@ -67,6 +67,26 @@ replace {
 } if labelInRange
 
 replace {
+	brclr	%3,%2,%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2e	- eliminated jmp
+	brset	%3,%2,%5
+%1:
+} if labelInRange
+
+replace {
+	brset	%3,%2,%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2f	- eliminated jmp
+	brclr	%3,%2,%5
+%1:
+} if labelInRange
+
+replace {
 	jmp	%5
 } by {
 	; Peephole 3	- shortened jmp to bra

@@ -1,9 +1,25 @@
+2004-08-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c (genPointerSet, genFarPointerSet): moved code from
+	genFarPointerSet into genPointerSet; eliminated genFarPointerSet
+	* src/hc08/gen.c (genPointerGet, genFarPointerGet): moved code from
+	genFarPointerGet into genPointerGet; eliminated genFarPointerGet
+	* src/hc08/gen.c (genPackBitsImmed): generate optimized code for
+	assignments to bitfields at known addresses
+	* src/hc08/gen.c (genUnpackBitsImmed): generate optimized code for
+	reads from bitfields at known addresses
+	* src/hc08/ralloc.c (packRegisters),
+	* src/hc08/gen.c (genPointerGet, genUnpackBits, genUnpackBitsImmed,
+	genhc08Code): optimize pointer get values used as conditionals
+	* src/hc08/peeph.def: added rules 2e & 2f to optimize bit test
+	and branch
+
 2004-08-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/mcs51/gen.c (genPointerGet, genNearPointerGet, genPagedPointerGet,
 	genFarPointerGet, genCodePointerGet, genGenPointerGet, genUnpackBits),
-	* src/mcs51/ralloc.c (packRegisters): optimze pointer get values used as
-	conditionals
+	* src/mcs51/ralloc.c (packRegisters): optimize pointer get values used
+	as conditionals
 
 2004-08-22 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 

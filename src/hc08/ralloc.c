@@ -2892,6 +2892,20 @@ packRegisters (eBBlock ** ebpp, int blockno)
 	  continue;
 	}
 
+      /* if the condition of an if instruction
+         is defined in the previous GET_POINTER instruction and
+	 this is the only usage then
+         mark the itemp as accumulator use */
+      if ((POINTER_GET (ic) && getSize (operandType (IC_RESULT (ic))) <=1) &&
+          ic->next && ic->next->op == IFX &&
+          bitVectnBitsOn (OP_USES(IC_RESULT(ic)))==1 &&
+          isOperandEqual (IC_RESULT (ic), IC_COND (ic->next)) &&
+          OP_SYMBOL (IC_RESULT (ic))->liveTo <= ic->next->seq)
+        {
+          OP_SYMBOL (IC_RESULT (ic))->accuse = 1;
+          continue;
+        }
+
       /* reduce for support function calls */
       if (ic->supportRtn || (ic->op != IFX && ic->op != JUMPTABLE))
 	packRegsForSupport (ic, ebp);
@@ -3011,6 +3025,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
 	   || ic->op == LEFT_OP || ic->op == RIGHT_OP || ic->op == CALL
 	   || (ic->op == ADDRESS_OF && isOperandOnStack (IC_LEFT (ic)))
            || ic->op == RECEIVE
+           || POINTER_GET (ic)
 	  ) &&
 	  IS_ITEMP (IC_RESULT (ic)) &&
 	  getSize (operandType (IC_RESULT (ic))) <= 1)

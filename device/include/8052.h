@@ -22,14 +22,14 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
+#ifndef REG8052_H
+#define REG8052_H
+
 #include <8051.h>     /* load difinitions for the 8051 core */
 
 #ifdef REG8051_H
 #undef REG8051_H
 #endif
-
-#ifndef REG8052_H
-#define REG8052_H
 
 /* define 8052 specific registers only */
 

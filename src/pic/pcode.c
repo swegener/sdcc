@@ -689,6 +689,31 @@ char *Safe_strdup(char *str)
     
 }
 
+
+/*-----------------------------------------------------------------*/
+/* SAFE_snprintf - like snprintf except the string pointer is      */
+/*                 after the string has been printed to. This is   */
+/*                 useful for printing to string as though if it   */
+/*                 were a stream.                                  */
+/*-----------------------------------------------------------------*/
+void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...)
+{
+  va_list val;
+  int len;
+
+  if(!str || !*str)
+    return;
+
+  va_start(val, format);
+  vsnprintf(*str, *size, format, val);
+  va_end (val);
+
+  len = strlen(*str);
+  *str += len;
+  *size -= len;
+
+}
+
 void  pCodeInitRegisters(void)
 {
 
@@ -1157,7 +1182,7 @@ pBlock *newpBlock(void)
 }
 
 /*-----------------------------------------------------------------*/
-/* newpCodeChain - create a new chain of pCodes                    */
+/* newpCodeChai0n - create a new chain of pCodes                    */
 /*-----------------------------------------------------------------*
  *
  *  This function will create a new pBlock and the pointer to the
@@ -1297,12 +1322,18 @@ pCodeOp *newpCodeOp(char *name, PIC_OPTYPE type)
 /*-----------------------------------------------------------------*/
 void addpCode2pBlock(pBlock *pb, pCode *pc)
 {
-
-  pb->pcTail->next = pc;
-  pc->prev = pb->pcTail;
-  pc->next = NULL;
-  pc->pb = pb;
-  pb->pcTail = pc;
+  if(!pb->pcHead) {
+    /* If this is the first pcode to be added to a block that
+     * was initialized with a NULL pcode, then go ahead and
+     * make this pcode the head and tail */
+    pb->pcHead  = pb->pcTail = pc;
+  } else {
+    pb->pcTail->next = pc;
+    pc->prev = pb->pcTail;
+    pc->next = NULL;
+    pc->pb = pb;
+    pb->pcTail = pc;
+  }
 }
 
 /*-----------------------------------------------------------------*/
@@ -1394,7 +1425,6 @@ void pBlockRegs(FILE *of, pBlock *pb)
 
   r = setFirstItem(pb->registers);
   while (r) {
-    fprintf(of,"   %s\n",r->name);
     r = setNextItem(pb->registers);
   }
 }
@@ -1412,7 +1442,7 @@ static char *get_op( pCodeInstruction *pcc)
     case PO_FSR:
     case PO_GPR_TEMP:
       r = pic14_regWithIdx(PCOR(pcc->pcop)->r->rIdx);
-      fprintf(stderr,"getop: getting %s\nfrom:\n",r->name); //pcc->pcop->name);
+      //fprintf(stderr,"getop: getting %s\nfrom:\n",r->name); //pcc->pcop->name);
       pBlockRegs(stderr,pcc->pc.pb);
       return r->name;
 
@@ -1432,6 +1462,70 @@ static void pCodeOpPrint(FILE *of, pCodeOp *pcop)
 {
 
   fprintf(of,"pcodeopprint\n");
+}
+
+char *pCode2str(char *str, int size, pCode *pc)
+{
+  char *s = str;
+
+  switch(pc->type) {
+
+  case PC_OPCODE:
+
+    SAFE_snprintf(&s,&size, "\t%s\t", PCI(pc)->mnemonic);
+
+    if( (PCI(pc)->num_ops >= 1) && (PCI(pc)->pcop)) {
+
+      if(PCI(pc)->bit_inst) {
+	if(PCI(pc)->pcop->type == PO_BIT) {
+	  if( (((pCodeOpBit *)(PCI(pc)->pcop))->inBitSpace) )
+	    SAFE_snprintf(&s,&size,"(%s >> 3), (%s & 7)", 
+			  PCI(pc)->pcop->name ,
+			  PCI(pc)->pcop->name );
+	  else
+	    SAFE_snprintf(&s,&size,"%s,%d", get_op(PCI(pc)), 
+			  (((pCodeOpBit *)(PCI(pc)->pcop))->bit ));
+	} else
+	  SAFE_snprintf(&s,&size,"%s,0 ; ?bug", get_op(PCI(pc)));
+	//PCI(pc)->pcop->t.bit );
+      } else {
+
+	if(PCI(pc)->pcop->type == PO_BIT) {
+	  if( PCI(pc)->num_ops == 2)
+	    SAFE_snprintf(&s,&size,"(%s >> 3),%c",get_op(PCI(pc)),((PCI(pc)->dest) ? 'F':'W'));
+	  else
+	    SAFE_snprintf(&s,&size,"(1 << (%s & 7))",get_op(PCI(pc)));
+
+	}else {
+	  SAFE_snprintf(&s,&size,"%s",get_op(PCI(pc)));
+
+	  if( PCI(pc)->num_ops == 2)
+	    SAFE_snprintf(&s,&size,",%c", ( (PCI(pc)->dest) ? 'F':'W'));
+	}
+      }
+
+    }
+    break;
+
+  case PC_COMMENT:
+    /* assuming that comment ends with a \n */
+    SAFE_snprintf(&s,&size,";%s", ((pCodeComment *)pc)->comment);
+    break;
+
+  case PC_LABEL:
+    SAFE_snprintf(&s,&size,";label=%s, key=%d\n",PCL(pc)->label,PCL(pc)->key);
+    break;
+  case PC_FUNCTION:
+    SAFE_snprintf(&s,&size,";modname=%s,function=%s: id=%d\n",PCF(pc)->modname,PCF(pc)->fname);
+    break;
+  case PC_WILD:
+    SAFE_snprintf(&s,&size,";\tWild opcode: id=%d\n",PCW(pc)->id);
+    break;
+
+  }
+
+  return str;
+
 }
 
 /*-----------------------------------------------------------------*/
@@ -1459,41 +1553,13 @@ static void genericPrint(FILE *of, pCode *pc)
       }
     }
 
-    fprintf(of, "\t%s\t", PCI(pc)->mnemonic);
-    if( (PCI(pc)->num_ops >= 1) && (PCI(pc)->pcop)) {
 
-      if(PCI(pc)->bit_inst) {
-	if(PCI(pc)->pcop->type == PO_BIT) {
-	  if( (((pCodeOpBit *)(PCI(pc)->pcop))->inBitSpace) )
-	    fprintf(of,"(%s >> 3), (%s & 7)", 
-		    PCI(pc)->pcop->name ,
-		    PCI(pc)->pcop->name );
-	  else
-	    fprintf(of,"%s,%d", get_op(PCI(pc)), (((pCodeOpBit *)(PCI(pc)->pcop))->bit ));
-	} else
-	  fprintf(of,"%s,0 ; ?bug", get_op(PCI(pc)));
-	//PCI(pc)->pcop->t.bit );
-      } else {
+    {
+      char str[256];
+      
+      pCode2str(str, 256, pc);
 
-	if(PCI(pc)->pcop->type == PO_BIT) {
-	  if( PCI(pc)->num_ops == 2)
-	    fprintf(of,"(%s >> 3),%c",get_op(PCI(pc)),((PCI(pc)->dest) ? 'F':'W'));
-	  else
-	    fprintf(of,"(1 << (%s & 7))",get_op(PCI(pc)));
-
-/*
-	  if( PCI(pc)->num_ops == 2)
-	    fprintf(of,"(%s >> 3),%c",PCI(pc)->pcop->name,((PCI(pc)->dest) ? 'F':'W'));
-	  else
-	    fprintf(of,"(1 << (%s & 7))",PCI(pc)->pcop->name);
-*/
-	}else {
-	  fprintf(of,"%s",get_op(PCI(pc)));
-
-	  if( PCI(pc)->num_ops == 2)
-	    fprintf(of,",%c", ( (PCI(pc)->dest) ? 'F':'W'));
-	}
-      }
+      fprintf(of,"%s",str);
     }
 
     {
@@ -1522,6 +1588,9 @@ static void genericPrint(FILE *of, pCode *pc)
 
   case PC_WILD:
     fprintf(of,";\tWild opcode: id=%d\n",PCW(pc)->id);
+    if(pc->label)
+      pCodePrintLabel(of, pc->label->pc);
+
     if(PCW(pc)->operand) {
       fprintf(of,";\toperand  ");
       pCodeOpPrint(of,PCW(pc)->operand );
@@ -1583,7 +1652,7 @@ static void pCodePrintLabel(FILE *of, pCode *pc)
   else if (PCL(pc)->key >=0) 
     fprintf(of,"_%05d_DS_:\n",PCL(pc)->key);
   else
-    fprintf(of,";wild card label\n");
+    fprintf(of,";wild card label: id=%d\n",-PCL(pc)->key);
 
 }
 /*-----------------------------------------------------------------*/
@@ -1766,7 +1835,7 @@ pCode * findNextInstruction(pCode *pc)
 {
 
   while(pc) {
-    if(pc->type == PC_OPCODE)
+    if((pc->type == PC_OPCODE) || (pc->type == PC_WILD))
       return pc;
 
     pc = pc->next;

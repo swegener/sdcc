@@ -48,6 +48,10 @@ static bool matchLine (char *, char *, hTab **);
 #define FBYNAME(x) int x (hTab *vars, lineNode *currPl, lineNode *head, \
         const char *cmdLine)
 
+#if !OPT_DISABLE_PIC
+void  peepRules2pCode(peepRule *);
+#endif
+
 /*-----------------------------------------------------------------*/
 /* pcDistance - afinds a label back ward or forward                */
 /*-----------------------------------------------------------------*/
@@ -1050,7 +1054,7 @@ readFileIntoBuffer (char *fname)
 }
 
 /*-----------------------------------------------------------------*/
-/* initPeepHole - initiaises the peep hole optimizer stuff         */
+/* initPeepHole - initialises the peep hole optimizer stuff        */
 /*-----------------------------------------------------------------*/
 void 
 initPeepHole ()
@@ -1066,4 +1070,15 @@ initPeepHole ()
       readRules (s = readFileIntoBuffer (options.peep_file));
       setToNull ((void **) &s);
     }
+
+
+#if !OPT_DISABLE_PIC
+  /* Convert the peep rules into pcode.
+     NOTE: this is only support in the PIC port (at the moment)
+  */
+  if (TARGET_IS_PIC) {
+    peepRules2pCode(rootRules);
+  }
+#endif
+
 }

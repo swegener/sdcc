@@ -1,5 +1,6 @@
 
 unsigned char success = 0;
+unsigned char dummy = 0;
 
 unsigned char uchar0=0;
 unsigned char uchar1=0;
@@ -8,7 +9,7 @@ unsigned char uchar2=0;
 
 void done(void)
 {
-  success++;
+  dummy++;
 }
 /*
 void incptr(unsigned char *ucP)

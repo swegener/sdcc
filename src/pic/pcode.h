@@ -499,8 +499,11 @@ typedef struct pCodePeep {
 
   int     nvars;       // Number of wildcard registers in target.
   char  **vars;        // array of pointers to them
+  int     nops;             // Number of wildcard operands in target.
+  pCodeOp **wildpCodeOps;   // array of pointers to the pCodeOp's.
+
   int     nwildpCodes; // Number of wildcard pCodes in target/replace
-  pCode **wildpCodes;  // array of pointers to the pCodeOp's.
+  pCode **wildpCodes;  // array of pointers to the pCode's.
 
 
   /* (Note: a wildcard register is a place holder. Any register

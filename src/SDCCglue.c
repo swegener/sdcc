@@ -738,12 +738,16 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
   /* take care of the special   case  */
   /* array of characters can be init  */
   /* by a string                      */
-  if (IS_CHAR (type->next))
+  if (IS_CHAR (type->next)) {
+    if (!IS_LITERAL(list2val(ilist)->etype)) {
+      werror (W_INIT_WRONG);
+      return;
+    }
     if (printIvalChar (type,
 		       (ilist->type == INIT_DEEP ? ilist->init.deep : ilist),
 		       oFile, SPEC_CVAL (sym->etype).v_char))
       return;
-
+  }
   /* not the special case             */
   if (ilist->type != INIT_DEEP)
     {

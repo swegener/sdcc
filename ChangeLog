@@ -1,3 +1,7 @@
+2003-03-02  Borut Razem <borut.razem@siol.net>
+
+	* src/SDCCmain.c: added BORLANDC, corrected MSVC in printVersionInfo()
+
 2003-02-26  Bernhard Held <bernhard@bernhardheld.de>
 
 	* configure.in: test for mkstemp

@@ -391,16 +391,14 @@ printVersionInfo ()
 	   " (CYGWIN)\n"
 #elif defined __MINGW32__
 	   " (MINGW32) \n"
-#else
-#  ifdef __DJGPP__
+#elif defined __DJGPP__
 	   " (DJGPP) \n"
-#  else
-#    if defined(_MSC_VER)
-	   " (WIN32) \n"
-#    else
+#elif defined(_MSC_VER)
+	   " (MSVC) \n"
+#elif defined(__BORLANDC__)
+	   " (BORLANDC) \n"
+#else
 	   " (UNIX) \n"
-#    endif
-#  endif
 #endif
 
 	   ,VersionString

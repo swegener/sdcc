@@ -79,6 +79,8 @@ typedef struct
 	int externGlobal;
 	/* assembler file extension */
 	const char *file_ext;
+        /** If non-null will be used to execute the assembler. */
+	void (*do_assemble) (const char * const*);	
       }
     assembler;
 
@@ -199,6 +201,8 @@ typedef struct
 
     /* Write any port specific assembler output. */
     void (*genAssemblerPreamble) (FILE * of);
+      /* invoked at end assembler file */  
+    void (*genAssemblerEnd) (FILE * of);
 
     /* Write the port specific IVT. If genIVT is NULL or if
      * it returns zero, default (8051) IVT generation code

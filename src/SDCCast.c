@@ -595,7 +595,7 @@ ast *createIvalType ( ast *sym,link  *type, initList *ilist)
 	ilist =  ilist->init.deep  ;
     
     iExpr = decorateType(resolveSymbols(list2expr(ilist)));
-    return newNode('=',sym,iExpr);
+    return decorateType(newNode('=',sym,iExpr));
 }
 
 /*-----------------------------------------------------------------*/
@@ -622,8 +622,8 @@ ast *createIvalStruct (ast *sym,link *type,initList *ilist)
 	if (!iloop)
 	    break;
 	sflds->implicit = 1;
-	lAst = decorateType(resolveSymbols(newNode('.',sym,
-						   newAst(EX_VALUE,symbolVal(sflds)))));
+	lAst = newNode(PTR_OP,newNode('&',sym,NULL),newAst(EX_VALUE,symbolVal(sflds)));
+	lAst = decorateType(resolveSymbols(lAst));
 	rast = createIval (lAst, sflds->type, iloop,rast);
     }
     return rast ;
@@ -788,7 +788,7 @@ ast  *createIval  (ast *sym, link *type, initList *ilist, ast *wid)
 }
 
 /*-----------------------------------------------------------------*/
-/* initAggregates - initialises aggregate variables with initv */
+/* initAggregates - initialises aggregate variables with initv     */
 /*-----------------------------------------------------------------*/
 ast *initAggregates ( symbol *sym, initList *ival, ast *wid)
 {

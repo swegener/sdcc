@@ -630,7 +630,7 @@ ast *createIvalStruct (ast *sym,link *type,initList *ilist)
 	sflds->implicit = 1;
 	lAst = newNode(PTR_OP,newNode('&',sym,NULL),newAst(EX_VALUE,symbolVal(sflds)));
 	lAst = decorateType(resolveSymbols(lAst));
-	rast = createIval (lAst, sflds->type, iloop,rast);
+	rast = decorateType(resolveSymbols(createIval (lAst, sflds->type, iloop,rast)));
     }
     return rast ;
 }
@@ -653,7 +653,7 @@ ast *createIvalArray (ast  *sym, link *type, initList *ilist)
 				       type,
 				       decorateType(resolveSymbols(list2expr(ilist))))))
 	    
-	    return rast;
+	    return decorateType(resolveSymbols(rast));
     
     /* not the special case             */
     if (ilist->type != INIT_DEEP) {
@@ -689,7 +689,7 @@ ast *createIvalArray (ast  *sym, link *type, initList *ilist)
     if (!DCL_ELEM(type))
 	DCL_ELEM(type) = size;
     
-    return rast;
+    return decorateType(resolveSymbols(rast));
 }
 
 
@@ -734,7 +734,7 @@ ast *createIvalCharPtr (ast *sym, link *type, ast *iexpr)
 				   newNode('[',	sym,
 					   newAst(EX_VALUE,valueFromLit(i))),
 				   newAst(EX_VALUE,valueFromLit(*s))));
-	return rast;
+	return decorateType(resolveSymbols(rast));
     }
 
     return NULL ;
@@ -788,9 +788,9 @@ ast  *createIval  (ast *sym, link *type, initList *ilist, ast *wid)
 		if (IS_SPEC(type))
 		    rast =  createIvalType (sym,type,ilist);
     if ( wid )
-	return newNode(NULLOP,wid,rast);
+	return decorateType(resolveSymbols(newNode(NULLOP,wid,rast)));
     else
-	return rast ;
+	return decorateType(resolveSymbols(rast)) ;
 }
 
 /*-----------------------------------------------------------------*/

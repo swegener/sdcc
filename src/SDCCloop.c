@@ -379,7 +379,22 @@ DEFSETFUNC (pointerAssigned)
   eBBlock *ebp = item;
   V_ARG (operand *, op);
 
-  return ebp->hasFcall || bitVectBitValue (ebp->ptrsSet, op->key);
+  if (ebp->hasFcall)
+    return 1;
+
+  if (bitVectBitValue (ebp->ptrsSet, op->key))
+    return 1;
+
+  /* Unfortunately, one of the other pointer set operations  */
+  /* may be using an alias of this operand, and the above    */
+  /* test would miss it. To be thorough, some aliasing       */
+  /* analysis should be done here. In the meantime, be       */
+  /* conservative and assume any other pointer set operation */
+  /* is dangerous                                            */
+  if (!bitVectIsZero (ebp->ptrsSet))
+    return 1;
+  
+  return 0;
 }
 
 /*-----------------------------------------------------------------*/

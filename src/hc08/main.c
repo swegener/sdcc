@@ -12,9 +12,8 @@
 
 void copyFile(FILE *dest, FILE *src);
 extern char * iComments2;
-extern FILE * dwarf2FilePtr;
 extern DEBUGFILE dwarf2DebugFile;
-extern int dwarf2FinalizeFile(void);
+extern int dwarf2FinalizeFile(FILE *);
 
 static char _defaultRules[] =
 {
@@ -240,8 +239,7 @@ _hc08_genAssemblerEnd (FILE * of)
 {
   if (options.out_fmt == 2 && options.debug)
     {
-      dwarf2FinalizeFile();
-      copyFile(of, dwarf2FilePtr);
+      dwarf2FinalizeFile (of);
     }
 }
 

@@ -990,7 +990,7 @@ dwWriteAttr (dwattr * ap)
 	    break;
 	  case DW_AT_location:
 	  case DW_AT_frame_base:
-	    dwWriteWord (NULL, ap->val.loclist->baseOffset, NULL);
+	    dwWriteWord ("Ldebug_loc_start", ap->val.loclist->baseOffset, NULL);
 	    break;
 	  default:
 	    dwWriteWord (NULL, ap->val.data, NULL);
@@ -2432,29 +2432,22 @@ dwTagFromType (sym_link * type, dwtag * parent)
 
 
 /*-----------------------------------------------------------------------*/
-/* dwOpenFile - opens a temporary file for debugging information         */
+/* dwOpenFile - open the debugging file (just initialize, since all      */
+/*              DWARF data goes into the assembly output file)           */
 /*-----------------------------------------------------------------------*/
 int dwOpenFile(char *file)
 {
-  dwarf2FilePtr = tempfile();
-  if(!dwarf2FilePtr) return 0;
-  
   dwTypeTagTable = newHashTable (128);
   
   return 1;
 }
 
 /*-----------------------------------------------------------------------*/
-/* dwCloseFile - close (and deletes) the temporary file for debugging    */
-/*               information                                             */
+/* dwCloseFile - close the debugging file (do nothing, since all DWARF   */
+/*               data goes into the assembly output file)                */
 /*-----------------------------------------------------------------------*/
 int dwCloseFile(void)
 {
-  if(!dwarf2FilePtr) return 0;
-  
-  /* Don't explicitly close the file; this will be done automatically */
-  dwarf2FilePtr = NULL;
-  
   return 1;
 }
   
@@ -2681,8 +2674,6 @@ int dwWriteFunction(symbol *sym, iCode *ic)
   dwtag * tp;
   value * args;
     
-  if(!dwarf2FilePtr) return 0;
-  
   dwFuncTag = tp = dwNewTag (DW_TAG_subprogram);
   
   dwAddTagAttr (dwFuncTag, dwNewAttrString (DW_AT_name, sym->name));
@@ -2875,14 +2866,8 @@ int dwWriteType(structdef *sdef, int block, int inStruct, char *tag)
 int dwWriteModule(char *name)
 {
   dwtag * tp;
-  char * s;
-  
-  if(!dwarf2FilePtr) return 0;
   
   dwModuleName = Safe_strdup (name);
-  for (s = dwModuleName; *s; s++)
-    if (ispunct (*s) || isspace (*s))
-      *s = '_';
     
   tp = dwNewTag (DW_TAG_compile_unit);
   dwAddTagAttr (tp, dwNewAttrString (DW_AT_producer, "SDCC version "
@@ -2909,8 +2894,6 @@ int dwWriteCLine(iCode *ic)
   dwline * lp;
   char * debugSym;
   
-  if(!dwarf2FilePtr) return 0;
-
   lp = Safe_alloc (sizeof (dwline));
 
   lp->line = ic->lineno;
@@ -2947,8 +2930,6 @@ dwWriteFrameAddress(char *variable, struct regs *reg, int offset)
   dwloc * lp;
   int regNum;
     
-  if(!dwarf2FilePtr) return 0;
-
   /* If there was a region open, close it */
   if (dwFrameLastLoc)
     {
@@ -3024,8 +3005,6 @@ dwWriteFrameAddress(char *variable, struct regs *reg, int offset)
 /*-----------------------------------------------------------------------*/
 int dwWriteALine(char *module, int Line)
 {
-  if(!dwarf2FilePtr) return 0;
-  
   return 1;
 }
 
@@ -3037,14 +3016,14 @@ int dwWriteALine(char *module, int Line)
 /*                      debug file                                       */
 /*-----------------------------------------------------------------------*/
 int
-dwarf2FinalizeFile(void)
+dwarf2FinalizeFile(FILE *of)
 {
   int tagAddress = 11;
   int abbrevNum = 0;
   int attr;
-  
-  if(!dwarf2FilePtr) return 1;
 
+  dwarf2FilePtr = of;
+  
   /* Write the .debug_line section */
   dwWriteLineNumbers ();
  

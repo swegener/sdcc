@@ -1,6 +1,16 @@
+2004-05-18 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/main.c (_hc08_genAssemblerEnd),
+	* src/SDCCdwarf2.c (dwOpenFile, dwCloseFile, dwWriteFunction,
+	dwWriteModule, dwWriteCLine, dwWriteALine, dwarf2FinalizeFile):
+	completely eliminated the use of a temporary file
+	* src/SDCCdwarf2.c (dwWriteAttr): fixed bug with location list offset
+	when more than one file linked
+	* src/SDCCloop.c (pointerAssigned): fixed bug #954163
+
 2004-05-17 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
-	* src/SDCCval.c (valForArray): applied Maarteen Brock's patch #947682
+	* src/SDCCval.c (valForArray): applied Maarten Brock's patch #947682
 	which fixes bug #543481
 	* support/regression/tests/bug-751703.c: fixed comments left from a
 	cut and paste error

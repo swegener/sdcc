@@ -1,3 +1,9 @@
+2005-01-22 Daniel Winkler <post AT danielwinkler.de>
+
+	* src/pic16/pcoderegs.c (pCodeOptime2pCodes): reenabled optimization
+	* (OptimizeRegUsage): make sure that there is really no other flow where
+	  the first pCode is used
+
 2005-01-22 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/pcoderegs.c (pCodeOptime2pCodes): disabled optimization

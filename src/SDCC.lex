@@ -76,7 +76,8 @@ struct options  save_options  ;
      P_NOGCSE    ,
      P_CALLEE_SAVES,
      P_EXCLUDE   ,
-     P_LOOPREV
+     P_LOOPREV   ,
+     P_OVERLAY
  };
 
 %}
@@ -172,6 +173,8 @@ struct options  save_options  ;
 "xdata"        { count(); TKEYWORD(XDATA); }
 "..."	       { count(); return(VAR_ARGS);}
 "__typeof"     { count(); return TYPEOF;}
+"_JavaNative"  { count(); TKEYWORD(JAVANATIVE);}
+"_overlay"     { count(); TKEYWORD(OVERLAY);}
 {L}({L}|{D})*  { count(); return(check_type()); }
 0[xX]{H}+{IS}? { count(); yylval.val = constVal(yytext); return(CONSTANT); }
 0{D}+{IS}?     { count(); yylval.val = constVal(yytext); return(CONSTANT); }
@@ -457,6 +460,8 @@ void doPragma (int op, char *cp)
     case P_LOOPREV:
 	optimize.noLoopReverse = 1;
 	break;
+    case P_OVERLAY:
+	break; /* notyet */
     }
 }
 

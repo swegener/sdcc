@@ -22,30 +22,51 @@ int getbyte(char **p)
   return (getnibble(p) << 4) | getnibble(p);
 }
 
+void usage(void)
+{
+  fprintf(stderr, 
+          "makebin: convert a Intel IHX file to binary.\n"
+          "Usage: makebin [-p] [-s romsize] [-h]\n");
+}
+
 int main(int argc, char **argv)
 {
-    int opt;
     int size = 32768, pack = 0, real_size = 0;
     BYTE *rom;
     char line[256];
     char *p;
 
-    while ((opt = getopt(argc, argv, "ps:h"))!=-1) {
-	switch (opt) {
+    argc--;
+    argv++;
+
+    while (argc--) {
+        if (**argv != '-') {
+            usage();
+            return -1;
+        }
+        switch (argv[0][1]) {
 	case 's':
-	    size = atoi(optarg);
+            if (argc < 1) {
+                usage();
+                return -1;
+            }
+            argc--;
+            argv++;
+	    size = atoi(*argv);
 	    break;
 	case 'h':
-	    printf("makebin: convert a Intel IHX file to binary.\n"
-		   "Usage: %s [-p] [-s romsize] [-h]\n", argv[0]);
+            usage();
 	    return 0;
 	case 'p':
 	    pack = 1;
 	    break;
 	default:
-	    return 1;
+            usage();
+            return -1;
 	}
+        argv++;
     }
+
     rom = malloc(size);
     if (rom == NULL) {
 	fprintf(stderr, "error: couldn't allocate room for the image.\n");

@@ -1,3 +1,7 @@
+2003-12-03 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCsymt.c (addSymChain, compareTypeExact): fixed bug #838241 again
+
 2003-12-01 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* device/lib/hc08/_mullong.c: Removed extra #endif

@@ -973,43 +973,57 @@ addSymChain (symbol * symHead)
 {
   symbol *sym = symHead;
   symbol *csym = NULL;
+  int error = 0;
 
   for (; sym != NULL; sym = sym->next)
     {
       changePointer(sym);
       checkTypeSanity(sym->etype, sym->name);
 
+      if (!sym->level && !(IS_SPEC(sym->etype) && IS_TYPEDEF(sym->etype)))
+        checkDecl (sym, 0);
+      
       /* if already exists in the symbol table then check if
          one of them is an extern definition if yes then
          then check if the type match, if the types match then
          delete the current entry and add the new entry      */
       if ((csym = findSymWithLevel (SymbolTab, sym)) &&
 	  csym->level == sym->level) {
-	
-	/* one definition extern ? */
-	if (IS_EXTERN (csym->etype) || IS_EXTERN (sym->etype)) {
-	  /* do types match ? */
-	  //checkDecl (sym, IS_EXTERN (sym->etype));
-	  if (compareTypeExact (csym->type, sym->type, sym->level) != 1) {
-	    /* no then error */
-	    werror (E_EXTERN_MISMATCH, csym->name);
-	    printFromToType (csym->type, sym->type);
-	    continue;
+
+	/* If the previous definition was for an array with incomplete */
+	/* type, and the new definition has completed the type, update */
+	/* the original type to match */
+	if (IS_DECL(csym->type) && DCL_TYPE(csym->type)==ARRAY
+	    && IS_DECL(sym->type) && DCL_TYPE(sym->type)==ARRAY)
+	  {
+	    if (!DCL_ELEM(csym->type) && DCL_ELEM(sym->type))
+	      DCL_ELEM(csym->type) = DCL_ELEM(sym->type);
 	  }
-	} else {
-	  /* not extern */
-	  //checkDecl (sym, 0);
-	  if (compareTypeExact (csym->type, sym->type, sym->level) != 1) {
+
+        error = 0;        
+        if (csym->ival && sym->ival)
+          error = 1;
+	if (compareTypeExact (csym->type, sym->type, sym->level) != 1)
+          error = 1;
+        
+        if (error) {
+          /* one definition extern ? */
+	  if (IS_EXTERN (csym->etype) || IS_EXTERN (sym->etype))
+	    werror (E_EXTERN_MISMATCH, sym->name);
+          else
 	    werror (E_DUPLICATE, sym->name);
-	    printFromToType (csym->type, sym->type);
-	    continue;
-	  }
+	  printFromToType (csym->type, sym->type);
+	  continue;
 	}
+
+	if (csym->ival && !sym->ival)
+	  sym->ival = csym->ival;
+
 	/* delete current entry */
 	deleteSym (SymbolTab, csym, csym->name);
 	deleteFromSeg(csym);
       }
-
+      
       /* add new entry */
       addSym (SymbolTab, sym, sym->name, sym->level, sym->block, 1);
     }
@@ -1653,7 +1667,52 @@ compareTypeExact (sym_link * dest, sym_link * src, int level)
 	    if (DCL_PTR_VOLATILE (src) != DCL_PTR_VOLATILE (dest))
 	      return 0;
 	    if (IS_FUNC(src))
-	      return compareTypeExact (dest->next, src->next, -1);
+              {
+		value *exargs, *acargs, *checkValue;
+
+                /* verify function return type */
+	        if (!compareTypeExact (dest->next, src->next, -1))
+		  return 0;
+  		if (FUNC_ISISR (dest) != FUNC_ISISR (src))
+		  return 0;
+		if (FUNC_REGBANK (dest) != FUNC_REGBANK (src))
+		  return 0;
+		if (IFFUNC_ISNAKED (dest) != IFFUNC_ISNAKED (src))
+		  return 0;
+		#if 0
+                if (IFFUNC_ISREENT (dest) != IFFUNC_ISREENT (src) && argCnt>1)
+		  return 0;
+                #endif
+
+		/* compare expected args with actual args */
+		exargs = FUNC_ARGS(dest);
+		acargs = FUNC_ARGS(src);
+
+		/* for all the expected args do */
+		for (; exargs && acargs; exargs = exargs->next, acargs = acargs->next)
+		  {
+		    //checkTypeSanity(acargs->etype, acargs->name);
+
+		    if (IS_AGGREGATE (acargs->type))
+		      {
+			checkValue = copyValue (acargs);
+			aggregateToPointer (checkValue);
+		      }
+		    else
+		      checkValue = acargs;
+
+                    #if 0
+		    if (!compareTypeExact (exargs->type, checkValue->type, -1))
+                      return 0;
+                    #endif
+		  }
+
+		  /* if one them ended we have a problem */
+		  if ((exargs && !acargs && !IS_VOID (exargs->type)) ||
+		      (!exargs && acargs && !IS_VOID (acargs->type)))
+		    return 0;                  
+                  return 1;
+              }
 	    return compareTypeExact (dest->next, src->next, level);
 	  }
           return 0;
@@ -1701,7 +1760,11 @@ compareTypeExact (sym_link * dest, sym_link * src, int level)
     return 0;
   if (SPEC_STAT (dest) != SPEC_STAT (src))
     return 0;
-  
+  if (SPEC_ABSA (dest) != SPEC_ABSA (src))
+    return 0;
+  if (SPEC_ABSA (dest) && SPEC_ADDR (dest) != SPEC_ADDR (src))
+    return 0;
+      
   destScls = SPEC_SCLS (dest);
   srcScls = SPEC_SCLS (src);
   
@@ -1739,16 +1802,16 @@ compareTypeExact (sym_link * dest, sym_link * src, int level)
 	}
     }
 
-  #if 0
   if (srcScls != destScls)
     {
+      #if 0
       printf ("level = %d\n", level);
       printf ("SPEC_SCLS (src) = %d, SPEC_SCLS (dest) = %d\n",
 		SPEC_SCLS (src), SPEC_SCLS (dest));
       printf ("srcScls = %d, destScls = %d\n",srcScls, destScls);
+      #endif
       return 0;
     }
-  #endif
   
   return 1;
 }

@@ -2,9 +2,9 @@ CC = sdcc
 
 MFLAGS = -mds390 --model-flat24 --stack-10bit
 MFLAGS += -DREG= -DNOSTRUCTASSIGN -DNOENUM
-LFLAGS = --xram-loc 0x180000 --code-loc 0x10000 -Wl-r
+LFLAGS = --xram-loc 0x100080 --code-loc 0x10000 -Wl-r
 
-OBJECTS = dhry.rel clock.rel
+OBJECTS = dhry.rel
 
 all: dhry.hex
 

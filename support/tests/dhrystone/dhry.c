@@ -49,8 +49,9 @@
 #include <stdio.h>
 
 #ifdef SDCC_ds390
-#include "clock.h"
-#include <serial390.h>
+#include <tinibios.h>
+#define clock() ClockTicks()
+#define CLOCKS_PER_SEC 1000
 #undef PRINT_T_STATES
 #else
 /** For clock() */
@@ -71,7 +72,7 @@ void _printTStates(void);
 #define DEBUG	0
 
 #if DEBUG
-#define DPRINTF(_a)  printf _a
+#define DPRINTF(_a) printf _a
 #else
 #define DPRINTF(_a)
 #endif
@@ -116,10 +117,6 @@ int main(void)
     REG   int             Number_Of_Runs;
     unsigned  long runTime;
 
-#ifdef SDCC_ds390
-    startTimer();
-#endif
-    
     printf("[dhry]\n");
 
     Next_Ptr_Glob = &_r[0];

@@ -2307,6 +2307,7 @@ operand *
 geniCodeArray (operand * left, operand * right,int lvl)
 {
   iCode *ic;
+  operand *size;
   sym_link *ltype = operandType (left);
   bool indexUnsigned;
 
@@ -2319,9 +2320,10 @@ geniCodeArray (operand * left, operand * right,int lvl)
 
       return geniCodeDerefPtr (geniCodeAdd (left, right, lvl), lvl);
     }
+  size = operandFromLit (getSize (ltype->next));
+  SPEC_USIGN (getSpec (operandType (size))) = 1;
   indexUnsigned = IS_UNSIGNED (getSpec (operandType (right)));
-  right = geniCodeMultiply (right,
-			    operandFromLit (getSize (ltype->next)), (getArraySizePtr(left) >= INTSIZE));
+  right = geniCodeMultiply (right, size, (getArraySizePtr(left) >= INTSIZE));
   /* Even if right is a 'unsigned char', the result will be a 'signed int' due to the promotion rules.
      It doesn't make sense when accessing arrays, so let's fix it here: */
   if (indexUnsigned)

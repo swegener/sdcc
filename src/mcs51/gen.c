@@ -6319,7 +6319,8 @@ genInline (iCode * ic)
         }
       else
         {
-          if (*bp == ':')
+          /* Add \n for labels, not dirs such as c:\mydir */
+          if ( (*bp == ':') && (isspace(bp[1])) )
             {
               bp++;
               *bp = '\0';

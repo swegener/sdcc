@@ -1,3 +1,8 @@
+2004-08-04 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* src/mcs51/gen.c (genInline): Add \n for labels, not DOS/WIN dirs
+	  such as c:\mydir.
+
 2004-08-03 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCloop.c (loopInvariants): fixed bug 983545, hope this

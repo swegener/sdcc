@@ -619,11 +619,13 @@ static symbol *selectSpil (iCode *ic, eBBlock *ebp, symbol *forSym)
 	if (!_G.blockSpil && 
 	    (selectS = liveRangesWith(lrcs,notUsedInRemaining,ebp,ic))) {
 	    sym = leastUsedLR (selectS);
-	    if (!sym->remat) {
-		sym->remainSpil = 1;
-		_G.blockSpil++;
+	    if (sym != forSym) {
+		if (!sym->remat) {
+		    sym->remainSpil = 1;
+		    _G.blockSpil++;
+		}
+		return sym;
 	    }
-	    return sym;
 	}
     }   
 
@@ -1310,13 +1312,17 @@ static void regTypeNum ()
 	    /* determine the type of register required */
 	    if (sym->nRegs == 2   && /* size is two */
 		IS_PTR(sym->type) && /* is a pointer */
-		sym->uptr)   {        /* has has pointer usage i.e. get/set pointer */
+		sym->uptr)   {        /* has pointer usage i.e. get/set pointer */
  		sym->regType = REG_PTR ;
 		avr_ptrRegReq++;
 	    }
- 	    else 
-		sym->regType = REG_GPR ;
-	    
+ 	    else {
+		/* live accross a function call then gpr else scratch */
+		if (sym->isLiveFcall)
+		    sym->regType = REG_GPR ;
+		else
+		    sym->regType = REG_SCR ;
+	    }
 	} else 
 	    /* for the first run we don't provide */
 	    /* registers for true symbols we will */
@@ -2211,6 +2217,7 @@ static void preAssignParms (iCode *ic)
 /*-----------------------------------------------------------------*/
 static void setDefaultRegs(eBBlock **ebbs,int count)
 {
+    int i ;
 
     /* if no pointer registers required in this function
        then mark r26-27 & r30-r31 as GPR & free */
@@ -2239,17 +2246,25 @@ static void setDefaultRegs(eBBlock **ebbs,int count)
 	regsAVR[R1_IDX].isFree =
 	regsAVR[R24_IDX].isFree =
 	regsAVR[R25_IDX].isFree = 0;
-
+    
     /* if this has no function calls then we need
        to do something special 
        a) pre-assign registers to parameters RECEIVE
        b) mark the remaining parameter regs as free */
     if (!currFunc->hasFcall) {
+	/* mark the parameter regs as GPR */
+	for (i= R16_IDX ; i <= R23_IDX ;i++) {
+	    regsAVR[i].type = REG_GPR;
+	    regsAVR[i].isFree = 1;
+	}
 	preAssignParms(ebbs[0]->sch);
     } else {
-	int i=0;
-	for (i= R16_IDX ; i <= R23_IDX ;i++)
-	    regsAVR[i].isFree = 0;
+
+	/* otherwise mark them as free scratch */
+	for (i= R16_IDX ; i <= R23_IDX ;i++) {
+	    regsAVR[i].type = REG_SCR;
+	    regsAVR[i].isFree = 1;
+	}
     }
 
     /* Y - is not allocated (it is the stack frame) */
@@ -2268,7 +2283,6 @@ void avr_assignRegisters (eBBlock **ebbs, int count)
     setToNull((void *)&_G.funcrUsed);
     avr_ptrRegReq = _G.stackExtend = _G.dataExtend = 0;
 
-    /* setup other default register allocation */
     /* change assignments this will remove some
        live ranges reducing some register pressure */
     for (i = 0 ; i < count ;i++ )

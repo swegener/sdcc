@@ -38,6 +38,7 @@ enum { R0_IDX = 0, R1_IDX , R2_IDX , R3_IDX , R4_IDX ,
 
 #define REG_PTR 0x01
 #define REG_GPR 0x02
+#define REG_SCR 0x03
 #define REG_CND 0x04
 
 /* definition for the registers */

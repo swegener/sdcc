@@ -514,9 +514,12 @@ void rlivePoint (eBBlock **ebbs, int count)
 	    for ( lrange = hTabFirstItem(liveRanges,&k); lrange;
 		  lrange = hTabNextItem(liveRanges,&k)) {
 
+		    /* if it is live then add the lrange to ic->rlive */
 		if (lrange->liveFrom <= ic->seq &&
-		    lrange->liveTo   >= ic->seq )
-		    ic->rlive = bitVectSetBit(ic->rlive,lrange->key);
+		    lrange->liveTo   >= ic->seq ) {
+			lrange->isLiveFcall = (ic->op == CALL || ic->op == PCALL);
+			ic->rlive = bitVectSetBit(ic->rlive,lrange->key);
+		}
 	    }
 	}
     }	

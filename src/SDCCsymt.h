@@ -190,7 +190,7 @@ typedef struct symbol {
     /* following flags are used by the backend
        for code generation and can be changed
        if a better scheme for backend is thought of */
-
+    unsigned isLiveFcall:1      ;  /* is live at or across a function call */
     unsigned isspilt    :1      ;  /* has to be spilt */
     unsigned remat      :1      ;  /* can be remateriazed */
     unsigned isptr      :1      ;  /* is a pointer */

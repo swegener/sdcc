@@ -569,11 +569,13 @@ symbol *selectSpil (iCode *ic, eBBlock *ebp, symbol *forSym)
 	   used in the remainder of the block */
 	if (!blockSpil && (selectS = liveRangesWith(lrcs,notUsedInRemaining,ebp,ic))) {
 	    sym = leastUsedLR (selectS);
-	    if (!sym->remat) {
-		sym->remainSpil = 1;
-		blockSpil++;
+	    if (sym != ForSym) {
+		if (!sym->remat) {
+		    sym->remainSpil = 1;
+		    blockSpil++;
+		}
+		return sym;
 	    }
-	    return sym;
 	}
     }
     /* find live ranges with spillocation && not used as pointers */

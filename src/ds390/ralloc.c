@@ -629,11 +629,13 @@ static symbol *selectSpil (iCode *ic, eBBlock *ebp, symbol *forSym)
 	   used in the remainder of the block */
 	if (!_G.blockSpil && (selectS = liveRangesWith(lrcs,notUsedInRemaining,ebp,ic))) {
 	    sym = leastUsedLR (selectS);
-	    if (!sym->remat) {
-		sym->remainSpil = 1;
-		_G.blockSpil++;
+	    if (sym != forSym) {
+		if (!sym->remat) {
+		    sym->remainSpil = 1;
+		    _G.blockSpil++;
+		}
+		return sym;
 	    }
-	    return sym;
 	}
     }   
 

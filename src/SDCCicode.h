@@ -67,6 +67,7 @@ typedef enum {
 #define OP_LIVEFROM(op)    op->operand.symOperand->liveFrom
 #define OP_LIVETO(op)      op->operand.symOperand->liveTo
 #define OP_REQV(op)        op->operand.symOperand->reqv
+#define OP_ISLIVE_FCALL(op) (IS_ITEMP(op) && OP_SYMBOL(op)->isLiveFcall)
 
 /* typedef for operand */
 typedef struct operand {
@@ -79,7 +80,7 @@ typedef struct operand {
     unsigned int  isParm   :1 ;  /* is a parameter        */
     unsigned int  isLiteral:1 ;  /* operand is literal    */
     unsigned int  noSpilLoc:1 ;  /* cannot be assigned a spil location */
-    
+
     unsigned key ;
     int      parmBytes;
     union {

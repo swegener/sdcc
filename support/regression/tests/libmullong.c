@@ -7,7 +7,8 @@
 #define type_{type}
 
 #if defined(PORT_HOST)
-#  if defined(type_c)
+#  include "../../../../../sdccconf.h"
+#  if defined(type_c) && !defined(WORDS_BIGENDIAN)
 #    define _SDCC_NO_ASM_LIB_FUNCS 1
 #    define near
 #    define long int

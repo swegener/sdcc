@@ -886,6 +886,9 @@ eBBlockFromiCode (iCode * ic)
 
     }
 
+  /* sort it back by block number */
+  qsort (ebbs, saveCount, sizeof (eBBlock *), bbNumCompare);
+
   if (!options.lessPedantic) {
     // this is a good place to check missing return values
     if (currFunc) {
@@ -902,9 +905,6 @@ eBBlockFromiCode (iCode * ic)
       }
     }
   }
-
-  /* sort it back by block number */
-  qsort (ebbs, saveCount, sizeof (eBBlock *), bbNumCompare);
 
   /* if cyclomatic info requested then print it */
   if (options.cyclomatic)

@@ -2890,7 +2890,7 @@ genInline (iCode * ic)
 
 	_G.inLine += (!options.asmpeep);
 
-	buffer = bp = bp1 = Safe_calloc(1, strlen(IC_INLINE(ic)+1));
+	buffer = bp = bp1 = Safe_calloc(1, strlen(IC_INLINE(ic))+1);
 	strcpy (buffer, IC_INLINE (ic));
 
 	/* emit each line as a code */

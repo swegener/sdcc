@@ -1,3 +1,4 @@
+void CatchMe() {}
 /*-------------------------------------------------------------------------
   SDCCgen51.c - source file for code generation for 8051
 
@@ -1618,7 +1619,7 @@ genIpush (iCode * ic)
   int size, offset = 0;
   char *l;
 
-
+  CatchMe();
   /* if this is not a parm push : ie. it is spill push
      and spill push is always done on the local stack */
   if (!ic->parmPush)
@@ -4991,6 +4992,7 @@ release:
 /*-----------------------------------------------------------------*/
 /* genInline - write the inline code out                           */
 /*-----------------------------------------------------------------*/
+char *johan;
 static void
 genInline (iCode * ic)
 {
@@ -4998,7 +5000,7 @@ genInline (iCode * ic)
 
   _G.inLine += (!options.asmpeep);
 
-  buffer = bp = bp1 = Safe_calloc(1, strlen(IC_INLINE(ic)+1));
+  buffer = bp = bp1 = Safe_calloc(1, strlen(IC_INLINE(ic))+1);
   strcpy (buffer, IC_INLINE (ic));
 
   /* emit each line as a code */
@@ -5007,6 +5009,7 @@ genInline (iCode * ic)
       if (*bp == '\n')
 	{
 	  *bp++ = '\0';
+	  johan=bp;
 	  emitcode (bp1, "");
 	  bp1 = bp;
 	}
@@ -5017,6 +5020,7 @@ genInline (iCode * ic)
 	      bp++;
 	      *bp = '\0';
 	      bp++;
+	      johan=bp;
 	      emitcode (bp1, "");
 	      bp1 = bp;
 	    }

@@ -1,5 +1,10 @@
 2004-09-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
+	* doc/sdccman.lyx: fixed a problem with my new index entries (thanks
+	Frieder) and clarified the default code optimization mode
+
+2004-09-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
 	* src/SDCC.lex (doPragma, process_pragma),
 	* src/SDCCglobl.h (struct optimize): added pragmas "opt_code_speed",
 	"opt_code_size", and "opt_code_balanced"

@@ -14267,7 +14267,7 @@ status Collapsed
 \layout Itemize
 
 opt_code_speed 
-\begin_inset LatexCommand \index{\#pragma opt_code_speed}
+\begin_inset LatexCommand \index{\#pragma opt\_code\_speed}
 
 \end_inset 
 
@@ -14276,7 +14276,7 @@ opt_code_speed
 \layout Itemize
 
 opt_code_size 
-\begin_inset LatexCommand \index{\#pragma opt_code_size}
+\begin_inset LatexCommand \index{\#pragma opt\_code\_size}
 
 \end_inset 
 
@@ -14285,12 +14285,13 @@ opt_code_size
 \layout Itemize
 
 opt_code_balanced 
-\begin_inset LatexCommand \index{\#pragma opt_code_balanced}
+\begin_inset LatexCommand \index{\#pragma opt\_code\_balanced}
 
 \end_inset 
 
 - The compiler will attempt to generate code that is both compact and fast,
- as long as meeting one goal is not a detriment to the other.
+ as long as meeting one goal is not a detriment to the other (this is the
+ default).
  
 \layout Standard
 

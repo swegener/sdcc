@@ -1475,6 +1475,7 @@ value *
 valCastLiteral (sym_link * dtype, double fval)
 {
   value *val;
+  TYPE_UDWORD l = (TYPE_UDWORD)fval;
 
   if (!dtype)
     return NULL;
@@ -1482,7 +1483,6 @@ valCastLiteral (sym_link * dtype, double fval)
   val = newValue ();
   val->etype = getSpec (val->type = copyLinkChain (dtype));
   SPEC_SCLS (val->etype) = S_LITERAL;
-  TYPE_UDWORD l = (TYPE_UDWORD)fval;
 
   /* if it is not a specifier then we can assume that */
   /* it will be an unsigned long                      */

@@ -366,7 +366,7 @@ void printIvalType (link * type, initList * ilist, FILE * oFile)
 	break;
 
     case 2:
-	tfprintf(oFile, "\t!dws\n", aopLiteralLong(val, 0, 2));
+	fprintf(oFile, "\t.byte %s,%s\n", aopLiteral(val, 0),aopLiteral(val, 1));
 	break;
     case 4:
 	if (!val) {
@@ -510,12 +510,12 @@ void printIvalFuncPtr (link * type, initList * ilist, FILE * oFile)
     /* now generate the name */
     if (!val->sym) {
 	if (IS_LITERAL (val->etype))
-	    tfprintf(oFile, "\t!dws\n", aopLiteralLong(val, 0, 2));
+	    fprintf(oFile, "\t.byte %s,%s\n", aopLiteral(val, 0),aopLiteral(val, 1));
 	else
-	    tfprintf(oFile, "\t!dws\n", val->name);
+	    fprintf(oFile, "\t.byte %s,(%s >> 8)\n", val->name,val->name);
     }
     else 
-	tfprintf(oFile, "\t!dws\n", val->sym->rname);
+	fprintf(oFile, "\t.byte %s,(%s >> 8)\n", val->sym->rname,val->sym->rname);
     
     return;
 }
@@ -556,12 +556,12 @@ int printIvalCharPtr (symbol * sym, link * type, value * val, FILE * oFile)
 	    tfprintf(oFile, "\t!dbs\n", aopLiteral(val, 0));
 	    break;
 	case 2:
-	    tfprintf(oFile, "\t!dws\n", 
-		    aopLiteralLong(val, 0, 2));
+	    tfprintf(oFile, "\t.byte %s,%s\n", 
+		    aopLiteral(val, 0),aopLiteral(val, 1));
 	    break;
 	case 3:
 	    /* PENDING: 0x02 or 0x%02x, CDATA? */
-	    fprintf(oFile, "\t.byte %s,%s,0x02\n",
+	    fprintf(oFile, "\t.byte %s,%s,#0x02\n",
 		    aopLiteral (val, 0), aopLiteral (val, 1));
 	    break;
 	default:
@@ -612,11 +612,11 @@ void printIvalPtr (symbol * sym, link * type, initList * ilist, FILE * oFile)
 	    tfprintf(oFile, "\t!db\n", (unsigned int)floatFromVal(val) & 0xff);
 	    break;
 	case 2:
-	    tfprintf (oFile, "\t!dws\n", aopLiteralLong(val, 0, 2));
+	    tfprintf (oFile, "\t.byte %s,%s\n", aopLiteral(val, 0),aopLiteral(val, 1));
 	    break;
 	case 3:
-	    fprintf (oFile, "\t.byte %s,%s,0x%02x\n",
-		     aopLiteral (val, 0), aopLiteral (val, 1), CPOINTER);
+	    fprintf (oFile, "\t.byte %s,%s,#0x02\n",
+		     aopLiteral (val, 0), aopLiteral (val, 1));
 	}
 	return;
     }
@@ -631,8 +631,8 @@ void printIvalPtr (symbol * sym, link * type, initList * ilist, FILE * oFile)
 	break;
 	
     case 3:
-	fprintf (oFile, "\t.byte %s,(%s >> 8),0x%02x\n",
-		 val->name, val->name, DCL_TYPE(val->type));
+	fprintf (oFile, "\t.byte %s,(%s >> 8),#0x02\n",
+		 val->name, val->name);
     }
     return;
 }

@@ -2780,9 +2780,15 @@ findLabelBackwards (iCode * ic, int key)
       ic = ic->prev;
       count++;
 
+      /* If we have any pushes or pops, we cannot predict the distance.
+	 I don't like this at all, this should be dealt with in the 
+	 back-end */
+      if (ic->op == IPUSH || ic->op == IPOP) {
+	return 0;
+      }
+
       if (ic->op == LABEL && IC_LABEL (ic)->key == key)
 	{
-	  /* printf("findLabelBackwards = %d\n", count); */
 	  return count;
 	}
     }
@@ -2841,15 +2847,15 @@ genPlusIncr (iCode * ic)
       emitcode ("inc", "%s", aopGet (AOP (IC_RESULT (ic)), LSB, FALSE, FALSE));
       if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
 	  IS_AOP_PREG (IC_RESULT (ic)))
-	emitcode ("cjne", "%s,#0x00,%05d$"
-		  ,aopGet (AOP (IC_RESULT (ic)), LSB, FALSE, FALSE)
-		  ,tlbl->key + 100);
+	emitcode ("cjne", "%s,#0x00,%05d$",
+		  aopGet (AOP (IC_RESULT (ic)), LSB, FALSE, FALSE),
+		  tlbl->key + 100);
       else
 	{
 	  emitcode ("clr", "a");
-	  emitcode ("cjne", "a,%s,%05d$"
-		    ,aopGet (AOP (IC_RESULT (ic)), LSB, FALSE, FALSE)
-		    ,tlbl->key + 100);
+	  emitcode ("cjne", "a,%s,%05d$",
+		    aopGet (AOP (IC_RESULT (ic)), LSB, FALSE, FALSE),
+		    tlbl->key + 100);
 	}
 
       emitcode ("inc", "%s", aopGet (AOP (IC_RESULT (ic)), MSB16, FALSE, FALSE));
@@ -2857,13 +2863,13 @@ genPlusIncr (iCode * ic)
 	{
 	  if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
 	      IS_AOP_PREG (IC_RESULT (ic)))
-	    emitcode ("cjne", "%s,#0x00,%05d$"
-		      ,aopGet (AOP (IC_RESULT (ic)), MSB16, FALSE, FALSE)
-		      ,tlbl->key + 100);
+	    emitcode ("cjne", "%s,#0x00,%05d$",
+		      aopGet (AOP (IC_RESULT (ic)), MSB16, FALSE, FALSE),
+		      tlbl->key + 100);
 	  else
-	    emitcode ("cjne", "a,%s,%05d$"
-		      ,aopGet (AOP (IC_RESULT (ic)), MSB16, FALSE, FALSE)
-		      ,tlbl->key + 100);
+	    emitcode ("cjne", "a,%s,%05d$",
+		      aopGet (AOP (IC_RESULT (ic)), MSB16, FALSE, FALSE),
+		      tlbl->key + 100);
 
 	  emitcode ("inc", "%s", aopGet (AOP (IC_RESULT (ic)), MSB24, FALSE, FALSE));
 	}
@@ -2871,14 +2877,14 @@ genPlusIncr (iCode * ic)
 	{
 	  if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
 	      IS_AOP_PREG (IC_RESULT (ic)))
-	    emitcode ("cjne", "%s,#0x00,%05d$"
-		      ,aopGet (AOP (IC_RESULT (ic)), MSB24, FALSE, FALSE)
-		      ,tlbl->key + 100);
+	    emitcode ("cjne", "%s,#0x00,%05d$",
+		      aopGet (AOP (IC_RESULT (ic)), MSB24, FALSE, FALSE),
+		      tlbl->key + 100);
 	  else
 	    {
-	      emitcode ("cjne", "a,%s,%05d$"
-			,aopGet (AOP (IC_RESULT (ic)), MSB24, FALSE, FALSE)
-			,tlbl->key + 100);
+	      emitcode ("cjne", "a,%s,%05d$",
+			aopGet (AOP (IC_RESULT (ic)), MSB24, FALSE, FALSE),
+			tlbl->key + 100);
 	    }
 	  emitcode ("inc", "%s", aopGet (AOP (IC_RESULT (ic)), MSB32, FALSE, FALSE));
 	}

@@ -3316,6 +3316,13 @@ findLabelBackwards (iCode * ic, int key)
       ic = ic->prev;
       count++;
 
+      /* If we have any pushes or pops, we cannot predict the distance.
+	 I don't like this at all, this should be dealt with in the 
+	 back-end */
+      if (ic->op == IPUSH || ic->op == IPOP) {
+	return 0;
+      }
+
       if (ic->op == LABEL && IC_LABEL (ic)->key == key)
 	{
 	  /* printf("findLabelBackwards = %d\n", count); */

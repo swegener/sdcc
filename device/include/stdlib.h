@@ -29,6 +29,8 @@
 # define NULL (void *)0
 #endif
 
+#include <malloc.h>
+
 extern float atof (char *);
 extern int atoi (char *);
 extern long atol (char *);

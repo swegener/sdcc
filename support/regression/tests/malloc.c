@@ -1,7 +1,7 @@
 /* Simple malloc tests.
  */
 #include <testfwk.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 /* PENDING */
 #if defined(__gbz80) || defined(__z80) || defined(__GNUC__)

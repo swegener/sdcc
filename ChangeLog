@@ -1,3 +1,8 @@
+2003-11-08 Bernhard Held <bernhard@bernhardheld.de>
+
+	* device/include/stdlib.h: include malloc.h to comply with ANSI
+	* support/regression/tests/malloc.c: include stdlib.h instead of malloc.h
+
 2003-11-07 Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
 	* doc/Makefile: sdccman.pdf should build with correct references (more info in commit msg)
@@ -24,7 +29,7 @@
 2003-11-06 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* device/lib/hc08/Makefile: need to clean .rel not .o files
-	* src/hc08/gen.c (genDjnz): can't use djnz with extended addressing mode        
+	* src/hc08/gen.c (genDjnz): can't use djnz with extended addressing mode
 
 2003-11-06 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 

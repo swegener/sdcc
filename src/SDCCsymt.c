@@ -856,8 +856,6 @@ int   compStructSize (int su, structdef  *sdef )
 	    else  /* does not fit */
 		{
 		    bitOffset = 0 ;
-		    loop->offset++;   /* go to the next byte  */
-		    sum++         ;
 		    SPEC_BSTR(loop->etype) = bitOffset   ;
 		    sum += (loop->bitVar / 8)  ;
 		    bitOffset += (loop->bitVar % 8);

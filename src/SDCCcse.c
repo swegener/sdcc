@@ -1295,7 +1295,8 @@ int cseBBlock ( eBBlock *ebb, int computeOnly,
 	    /* update the spill location for this */
 	    updateSpillLocation (ic);
 
-	    if (POINTER_SET(ic)) {
+	    if (POINTER_SET(ic) &&
+		!(IS_BITFIELD(OP_SYMBOL(IC_RESULT(ic))->etype))) {
 		pdop = NULL ;
 		applyToSetFTrue (cseSet,findCheaperOp,IC_RESULT(ic),&pdop);
 		if (pdop && IS_ITEMP(pdop) && !computeOnly) 		    

@@ -1558,6 +1558,10 @@ ast *decorateType (ast *tree)
 	    
 	    /* otherwise just copy the type information */
 	    COPYTYPE(TTYPE(tree),TETYPE(tree),tree->opval.val->type);
+	    if (funcInChain(tree->opval.val->type)) {
+		    tree->hasVargs = tree->opval.val->sym->hasVargs;
+		    tree->args = copyValueChain(tree->opval.val->sym->args) ;
+	    }
 	    return tree ;
 	}
 	

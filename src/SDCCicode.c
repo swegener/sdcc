@@ -1087,7 +1087,7 @@ operand *operandFromSymbol (symbol *sym)
     /* under the following conditions create a
        register equivalent for a local symbol */
     if (sym->level && sym->etype && SPEC_OCLS(sym->etype) &&
-	IN_FARSPACE(SPEC_OCLS(sym->etype))  &&
+	(IN_FARSPACE(SPEC_OCLS(sym->etype)) && (!IS_DS390_PORT)) &&
 	options.stackAuto == 0)
 	ok =0;
 
@@ -2423,8 +2423,9 @@ static void geniCodeReceive (value *args)
 	       and before liveRange calculation */	    
 	    if (!sym->addrtaken && !IS_VOLATILE(sym->etype)) {
 
-		if(IN_FARSPACE(SPEC_OCLS(sym->etype)) &&
-		   options.stackAuto == 0) {
+		if (IN_FARSPACE(SPEC_OCLS(sym->etype)) &&
+		   options.stackAuto == 0 &&
+		   !IS_DS390_PORT) {
 		} else {
 		    opl = newiTempOperand(args->type,0);
 		    sym->reqv = opl ;	    

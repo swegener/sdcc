@@ -1126,9 +1126,7 @@ static void fixUpTypes(iCode *ic)
 {
 	link *t1 = operandType(IC_LEFT(ic)) ,*t2;
 	
-	extern PORT ds390_port;
-	
-	if (port == &ds390_port)
+	if (IS_DS390_PORT)
 	{
 	    /* hack-o-matic! */
 	    return;

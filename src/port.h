@@ -165,4 +165,8 @@ typedef struct {
 
 extern PORT *port;
 
+/* Ugly test to see if we are current compiling in DS390 mode. */
+extern PORT ds390_port;
+#define IS_DS390_PORT (port == &ds390_port)
+
 #endif

@@ -1024,8 +1024,7 @@ static void  checkSClass ( symbol *sym )
 	     * control this allcoation, but the code was originally that way, and
 	     * changing it for non-390 ports breaks the compiler badly.
 	     */
-	    extern PORT ds390_port;
-	    bool useXdata = (port == &ds390_port) ? options.model : options.useXstack;
+	    bool useXdata = IS_DS390_PORT ? options.model : options.useXstack;
 	    SPEC_SCLS(sym->etype) = (useXdata  ?
 				     S_XDATA : S_FIXED ) ;
 	}

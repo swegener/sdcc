@@ -7069,6 +7069,7 @@ void pic16_OptimizeJumps ()
   pCode *pc_prev = NULL;
   pCode *pc_next = NULL;
   pBlock *pb;
+	int isHandled = 0;
   int opt=0, toofar=0, jumptabs=0, opt_cond = 0, cond_toofar=0, opt_reorder = 0;
   
   if (!the_pFile) return;
@@ -7084,7 +7085,6 @@ void pic16_OptimizeJumps ()
 	int condBraType = isSkipOnStatus(pc_prev);
 	int dist = findpCodeLabel(pc, label, MAX_DIST_BRA);
 	if (dist < 0) dist = -dist;
-	int isHandled = 0;
 	//fprintf (stderr, "distance: %d (", dist); pc->print(stderr, pc);fprintf (stderr, ")\n");
 
 	if (condBraType != -1 && hasNoLabel(pc)) {
@@ -7178,8 +7178,8 @@ void pic16_OptimizeJumps ()
 	  // now just turn GOTO into BRA
 	  if (!isJumptable(pc, pc_prev, pc_next)) {
 	    if (dist < MAX_DIST_BRA) {
-	      isHandled = 1;
 	      pCode *newBra = pic16_newpCode (POC_BRA, PCI(pc)->pcop);
+	      isHandled = 1;
 	      PCI(newBra)->label = PCI(pc)->label;
 	      pic16_pCodeInsertAfter (pc, newBra);
 	      pic16_pCodeInsertAfter(pc_prev, pic16_newpCodeCharP("goto-optimization 3"));

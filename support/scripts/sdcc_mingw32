@@ -8,7 +8,8 @@ export RANLIB=$TOOLSPREFIX/ranlib
 export STRIP=$TOOLSPREFIX/strip
 
 export SDCCCONFIGUREFLAGS="--prefix=/sdcc --disable-device-lib-build \
---disable-ucsim --program-suffix=.exe --datadir=/sdcc"
+--disable-ucsim --program-suffix=.exe --datadir=/sdcc \
+--host=i586-mingw32msvc --build=unknown-unknown-linux-gnu"
 
 ./configure $SDCCCONFIGUREFLAGS
 make 2>&1 | tee make.log

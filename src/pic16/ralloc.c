@@ -75,7 +75,7 @@ set *pic16_dynDirectBitRegs=NULL;
 set *pic16_dynInternalRegs=NULL;
 
 static hTab  *dynDirectRegNames= NULL;
-static hTab  *regHash = NULL;    /* a hash table containing ALL registers */
+//static hTab  *regHash = NULL;    /* a hash table containing ALL registers */
 
 static int dynrIdx=0x20;
 static int rDirectIdx=0;
@@ -931,7 +931,7 @@ nfreeRegsType (int type)
 
   return nFreeRegs (type);
 }
-
+#if 0
 static void writeSetUsedRegs(FILE *of, set *dRegs)
 {
 
@@ -945,6 +945,8 @@ static void writeSetUsedRegs(FILE *of, set *dRegs)
   }
 
 }
+#endif
+
 extern void pic16_assignFixedRegisters(set *regset);
 extern void pic16_assignRelocatableRegisters(set *regset,int used);
 extern void pic16_dump_map(void);

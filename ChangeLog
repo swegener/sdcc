@@ -1,3 +1,9 @@
+2003-05-19  Scott Dattalo  <scott@dattalo.com>
+
+	* src/pic16/pcode.c: Cleaned warnings
+	* src/pic16/pcodepeep.c: Cleaned warnings
+	* src/pic16/ralloc.c: Cleaned warnings
+
 2003-05-19  Bernhard Held <bernhard@bernhardheld.de>
 
 	* doc/sdccman.lyx: fixed bug 739745

@@ -81,7 +81,7 @@ static int peepOptimizing = 1;        /* run the peephole optimizer if nonzero *
 static int functionInlining = 1;      /* inline functions if nonzero */
 int pic16_debug_verbose = 1;                /* Set true to inundate .asm file */
 
-static int GpCodeSequenceNumber = 1;
+//static int GpCodeSequenceNumber = 1;
 static int GpcFlowSeq = 1;
 
 extern void pic16_RemoveUnusedRegisters(void);
@@ -3334,6 +3334,7 @@ void pic16_pCodeConstString(char *name, char *value)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
+#if 0
 static void pCodeReadCodeTable(void)
 {
   pBlock *pb;
@@ -3356,7 +3357,7 @@ static void pCodeReadCodeTable(void)
 
 
 }
-
+#endif
 /*-----------------------------------------------------------------*/
 /* pic16_addpCode2pBlock - place the pCode into the pBlock linked list   */
 /*-----------------------------------------------------------------*/
@@ -3532,7 +3533,7 @@ static void genericDestruct(pCode *pc)
 
 }
 
-
+#if 0
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 static void pBlockRegs(FILE *of, pBlock *pb)
@@ -3545,7 +3546,7 @@ static void pBlockRegs(FILE *of, pBlock *pb)
     r = setNextItem(pb->tregisters);
   }
 }
-
+#endif
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
@@ -4151,7 +4152,7 @@ static pCode * findLabelinpBlock(pBlock *pb,pCodeOpLabel *pcop_label)
     
   return NULL;
 }
-
+#if 0
 /*-----------------------------------------------------------------*/
 /* findLabel - Search the pCode for a particular label             */
 /*-----------------------------------------------------------------*/
@@ -4171,7 +4172,7 @@ static pCode * findLabel(pCodeOpLabel *pcop_label)
   fprintf(stderr,"Couldn't find label %s", pcop_label->pcop.name);
   return NULL;
 }
-
+#endif
 /*-----------------------------------------------------------------*/
 /* pic16_findNextpCode - given a pCode, find the next of type 'pct'      */
 /*                 in the linked list                              */
@@ -4236,7 +4237,7 @@ pCode * pic16_findPrevInstruction(pCode *pci)
 {
   return findPrevpCode(pci, PC_OPCODE);
 }
-
+#if 0
 /*-----------------------------------------------------------------*/
 /* findFunctionEnd - given a pCode find the end of the function    */
 /*                   that contains it                              */
@@ -4254,7 +4255,7 @@ static pCode * findFunctionEnd(pCode *pc)
   fprintf(stderr,"Couldn't find function end\n");
   return NULL;
 }
-
+#endif
 #if 0
 /*-----------------------------------------------------------------*/
 /* AnalyzeLabel - if the pCode is a label, then merge it with the  */
@@ -4557,7 +4558,7 @@ static void unBuildFlow(pBlock *pb)
 
 
 }
-
+#if 0
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 static void dumpCond(int cond)
@@ -4588,7 +4589,9 @@ static void dumpCond(int cond)
       fprintf(stderr, "  %s\n",pcc_str[i]);
 
 }
+#endif
 
+#if 0
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 static void FlowStats(pCodeFlow *pcflow)
@@ -4615,7 +4618,7 @@ static void FlowStats(pCodeFlow *pcflow)
   dumpCond(pcflow->outCond);
 
 }
-
+#endif
 /*-----------------------------------------------------------------*
  * int isBankInstruction(pCode *pc) - examine the pCode *pc to determine
  *    if it affects the banking bits. 
@@ -5197,7 +5200,7 @@ static void FixBankFlow(pBlock *pb)
 	    PCFL(pcflow_max_From)->FromConflicts);
 */
 }
-
+#if 0
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 static void DumpFlow(pBlock *pb)
@@ -5252,7 +5255,7 @@ static void DumpFlow(pBlock *pb)
   }
 
 }
-
+#endif
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 static int OptimizepBlock(pBlock *pb)

@@ -151,7 +151,7 @@ typedef struct parsedPattern {
 
 #define MAX_PARSEDPATARR 50
 parsedPattern parsedPatArr[MAX_PARSEDPATARR];
-static unsigned int parsedPatIdx=0;
+//static unsigned int parsedPatIdx=0;
 
 
 typedef enum {
@@ -1400,7 +1400,7 @@ void  pic16_peepRules2pCode(peepRule *rules)
   }
 
 }
-
+#if 0
 static void printpCodeString(FILE *of, pCode *pc, int max)
 {
   int i=0;
@@ -1410,7 +1410,7 @@ static void printpCodeString(FILE *of, pCode *pc, int max)
     pc = pc->next;
   }
 }
-
+#endif
 /*-----------------------------------------------------------------*/
 /* _DLL * DLL_append                                               */
 /*                                                                 */ 
@@ -1963,7 +1963,7 @@ pCodeOp *pic16_pCodeOpCopy(pCodeOp *pcop)
   case PO_INTCON:
   case PO_PCL:
   case PO_PCLATH:
-
+  case PO_REL_ADDR:
     //DFPRINTF((stderr,"pCodeOpCopy register type %d\n", pcop->type));
     pcopnew = Safe_calloc(1,sizeof(pCodeOp) );
 

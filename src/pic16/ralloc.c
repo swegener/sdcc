@@ -77,7 +77,9 @@ set *pic16_dynDirectRegs=NULL;
 set *pic16_dynDirectBitRegs=NULL;
 set *pic16_dynInternalRegs=NULL;
 
-static hTab  *dynDirectRegNames= NULL;
+static hTab *dynDirectRegNames=NULL;
+static hTab *dynAllocRegNames=NULL;
+static hTab *dynProcRegNames=NULL;
 //static hTab  *regHash = NULL;    /* a hash table containing ALL registers */
 
 extern set *sectNames;
@@ -459,6 +461,8 @@ pic16_allocProcessorRegister(int rIdx, char * name, short po_type, int alias)
 	reg->wasUsed = 0;		// we do not know if they are going to be used at all
 	reg->accessBank = 1;		// implicit add access Bank
 
+	hTabAddItem(&dynProcRegNames, regname2key(reg->name), reg);
+
   return addSet(&pic16_dynProcessorRegs, reg);
 }
 
@@ -505,6 +509,7 @@ allocReg (short type)
 	}
 
 	addSet(&pic16_dynAllocRegs, reg);
+	hTabAddItem(&dynAllocRegNames, regname2key(reg->name), reg);
 
 	reg->isFree=0;
 
@@ -552,6 +557,7 @@ pic16_dirregWithName (char *name)
   while(reg) {
 
     if(STRCASECMP(reg->name, name) == 0) {
+//	fprintf(stderr, "%s:%d: FOUND name = %s\thash = %d\n", __FUNCTION__, __LINE__, reg->name, hkey);
       return(reg);
     }
 
@@ -560,6 +566,91 @@ pic16_dirregWithName (char *name)
   }
 
   return NULL; // name wasn't found in the hash table
+}
+
+/*-----------------------------------------------------------------*/
+/* pic16_allocregWithName - search for register by name                    */
+/*-----------------------------------------------------------------*/
+regs *
+pic16_allocregWithName (char *name)
+{
+  int hkey;
+  regs *reg;
+
+  if(!name)
+    return NULL;
+
+  /* hash the name to get a key */
+
+  hkey = regname2key(name);
+
+//	fprintf(stderr, "%s:%d: name = %s\thash = %d\n", __FUNCTION__, __LINE__, name, hkey);
+
+  reg = hTabFirstItemWK(dynAllocRegNames, hkey);
+
+  while(reg) {
+
+    if(STRCASECMP(reg->name, name) == 0) {
+      return(reg);
+    }
+
+    reg = hTabNextItemWK (dynAllocRegNames);
+  
+  }
+
+  return NULL; // name wasn't found in the hash table
+
+}
+
+
+/*-----------------------------------------------------------------*/
+/* pic16_procregWithName - search for register by name                    */
+/*-----------------------------------------------------------------*/
+regs *
+pic16_procregWithName (char *name)
+{
+  int hkey;
+  regs *reg;
+
+  if(!name)
+    return NULL;
+
+  /* hash the name to get a key */
+
+  hkey = regname2key(name);
+
+//	fprintf(stderr, "%s:%d: name = %s\thash = %d\n", __FUNCTION__, __LINE__, name, hkey);
+
+  reg = hTabFirstItemWK(dynProcRegNames, hkey);
+
+  while(reg) {
+
+    if(STRCASECMP(reg->name, name) == 0) {
+      return(reg);
+    }
+
+    reg = hTabNextItemWK (dynProcRegNames);
+  
+  }
+
+  return NULL; // name wasn't found in the hash table
+
+}
+
+regs *pic16_regWithName(char *name)
+{
+  regs *reg;
+
+  	reg = pic16_dirregWithName( name );
+  	if(reg)return reg;
+  	
+  	reg = pic16_procregWithName( name );
+  	if(reg)return reg;
+  	
+  	reg = pic16_allocregWithName( name );
+  	if(reg)return reg;
+
+  return NULL;
 }
 
 
@@ -579,6 +670,35 @@ pic16_allocDirReg (operand *op )
 	}
 
 	name = OP_SYMBOL (op)->rname[0] ? OP_SYMBOL (op)->rname : OP_SYMBOL (op)->name;
+
+	if(!IN_DIRSPACE( SPEC_OCLS( OP_SYM_ETYPE(op)))
+		|| !IN_FARSPACE(SPEC_OCLS( OP_SYM_ETYPE(op))) ) {
+
+#if 0
+		if(pic16_debug_verbose) {
+			fprintf(stderr, "dispace:%d farspace:%d codespace:%d regspace:%d stack:%d eeprom: %d regparm: %d isparm: %d\n",
+				IN_DIRSPACE( SPEC_OCLS( OP_SYM_ETYPE(op))),
+				IN_FARSPACE( SPEC_OCLS( OP_SYM_ETYPE(op))),
+				IN_CODESPACE( SPEC_OCLS( OP_SYM_ETYPE(op))),
+				IN_REGSP( SPEC_OCLS( OP_SYM_ETYPE(op))),
+				IN_STACK( OP_SYM_ETYPE(op)),
+				SPEC_OCLS(OP_SYM_ETYPE(op)) == eeprom,
+				IS_REGPARM(OP_SYM_ETYPE(op)),
+				IS_PARM(op));
+
+			fprintf(stderr, "%s:%d symbol %s NOT in dirspace\n", __FILE__, __LINE__,
+	    		OP_SYMBOL(op)->name);
+		}
+#endif
+
+	}
+
+
+
+	if (IS_CODE ( OP_SYM_ETYPE(op)) ) {
+//		fprintf(stderr, "%s:%d sym: %s in codespace\n", __FUNCTION__, __LINE__, OP_SYMBOL(op)->name);
+		return NULL;
+	}
 
 	if(!SPEC_OCLS( OP_SYM_ETYPE(op))) {
 		if(pic16_debug_verbose)
@@ -617,27 +737,8 @@ pic16_allocDirReg (operand *op )
 		debugAopGet(NULL, op);
 	}
 
-	if (IS_CODE ( OP_SYM_ETYPE(op)) )
-		return NULL;
 
-	/* First, search the hash table to see if there is a register with this name */
-	if (SPEC_ABSA ( OP_SYM_ETYPE(op)) && !(IS_BITVAR (OP_SYM_ETYPE(op))) ) {
-		reg=NULL;
-//		reg = regWithIdx (pic16_dynProcessorRegs, SPEC_ADDR ( OP_SYM_ETYPE(op)), 1);
-
-#if 0
-		if(!reg) 
-			fprintf(stderr,"%s:%d: ralloc %s is at fixed address but not a processor reg, addr=0x%x\n",
-					__FUNCTION__, __LINE__, name, SPEC_ADDR ( OP_SYM_ETYPE(op)));
-		else
-			fprintf(stderr,"%s:%d: ralloc %s at fixed address has already been declared, addr=0x%x\n",
-					__FUNCTION__, __LINE__, name, SPEC_ADDR ( OP_SYM_ETYPE(op)));
-#endif
-	} else {
-//		fprintf(stderr,"ralloc:%d %s \n", __LINE__,name);
-    
-		reg = pic16_dirregWithName(name);
-	}
+	reg = pic16_dirregWithName(name);
 
 	if(!reg) {
 	  int address = 0;
@@ -652,24 +753,21 @@ pic16_allocDirReg (operand *op )
 		/* Register wasn't found in hash, so let's create
 		 * a new one and put it in the hash table AND in the 
 		 * dynDirectRegNames set */
-		if(IN_CODESPACE( SPEC_OCLS( OP_SYM_ETYPE(op)))) {
+		if(IS_CODE(OP_SYM_ETYPE(op)) || IN_CODESPACE( SPEC_OCLS( OP_SYM_ETYPE(op)))) {
 			debugLog("%s:%d sym: %s in codespace\n", __FUNCTION__, __LINE__, OP_SYMBOL(op)->name);
 	    	  return NULL;
 		}
 
 
-#ifndef USE_ONSTACK
 		if(OP_SYMBOL(op)->onStack) {
 			fprintf(stderr, "%s:%d onStack %s offset: %d\n", __FILE__, __LINE__,
 				OP_SYMBOL(op)->name, OP_SYMBOL(op)->stack);
-			OP_SYMBOL(op)->onStack = 0;
-			SPEC_OCLS(OP_SYM_ETYPE(op)) = data;
-			regtype = REG_GPR;
-			return (reg);
-#endif			
 		}
 
-		if(!IN_DIRSPACE( SPEC_OCLS( OP_SYM_ETYPE(op)))) {
+		if(!IN_DIRSPACE( SPEC_OCLS( OP_SYM_ETYPE(op)))
+			|| !IN_FARSPACE(SPEC_OCLS( OP_SYM_ETYPE(op))) ) {
+
+#if 0
 			if(pic16_debug_verbose)
 			{
 				fprintf(stderr, "dispace:%d farspace:%d codespace:%d regspace:%d stack:%d eeprom: %d\n",
@@ -683,6 +781,7 @@ pic16_allocDirReg (operand *op )
 					fprintf(stderr, "%s:%d symbol %s NOT in dirspace\n", __FILE__, __LINE__,
 			    		OP_SYMBOL(op)->name);
 			}
+#endif
 		}
 
 		reg = newReg(regtype, PO_DIR, rDirectIdx++, name,getSize (OP_SYMBOL (op)->type),0, op);
@@ -701,12 +800,14 @@ pic16_allocDirReg (operand *op )
 		} else {
 //			fprintf(stderr, "%s:%d adding %s in direct registers\n", __FILE__, __LINE__, reg->name);
 //			addSet(&pic16_dynDirectRegs, reg);
+
 			checkAddReg(&pic16_dynDirectRegs, reg);
 		}
 	
 	} else {
 //		debugLog ("  -- %s is declared at address 0x30000x\n",name);
-	  return NULL;
+	  return (reg);			/* This was NULL before, but since we found it
+					 * why not just return it?! */
 	}
 
 	if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
@@ -747,7 +848,7 @@ pic16_allocRegByName (char *name, int size, operand *op)
      * a new one and put it in the hash table AND in the 
      * dynDirectRegNames set */
 
-//	fprintf (stderr,"%s:%d symbol name %s\tregop= %p\n", __FUNCTION__, __LINE__, name, op);
+	fprintf (stderr,"%s:%d symbol name %s\tregop= %p\n", __FUNCTION__, __LINE__, name, op);
 
     reg = newReg(REG_GPR, PO_DIR, rDirectIdx++, name,size,0, op);
 
@@ -847,7 +948,7 @@ pic16_allocWithIdx (int idx)
     debugLog ("Found a Dynamic Register!\n");
   } else if( (dReg = regWithIdx ( pic16_dynStackRegs, idx,0)) != NULL ) {
     debugLog ("Found a Stack Register!\n");
-  } else if( (dReg = regWithIdx ( pic16_dynProcessorRegs, idx,0)) != NULL ) {
+  } else if( (dReg = regWithIdx ( pic16_dynProcessorRegs, idx,1)) != NULL ) {
     debugLog ("Found a Processor Register!\n");
     fprintf(stderr, "Found a processor register! %s\n", dReg->name);
   } else if( (dReg = regWithIdx ( pic16_dynInternalRegs, idx,0)) != NULL ) {
@@ -1047,11 +1148,22 @@ void pic16_writeUsedRegs(FILE *of)
 {
 	packBits(pic16_dynDirectBitRegs);
 
+//	fprintf(stderr, "%s: pic16_dynAllocRegs\n", __FUNCTION__);
 	pic16_groupRegistersInSection(pic16_dynAllocRegs);
+
+//	fprintf(stderr, "%s: pic16_dynInternalRegs\n", __FUNCTION__);
 	pic16_groupRegistersInSection(pic16_dynInternalRegs);
+
+//	fprintf(stderr, "%s: pic16_dynStackRegs\n", __FUNCTION__);
 	pic16_groupRegistersInSection(pic16_dynStackRegs);
+
+//	fprintf(stderr, "%s: pic16_dynDirectRegs\n", __FUNCTION__);
 	pic16_groupRegistersInSection(pic16_dynDirectRegs);
+
+//	fprintf(stderr, "%s: pic16_dynDirectBitsRegs\n", __FUNCTION__);
 	pic16_groupRegistersInSection(pic16_dynDirectBitRegs);
+
+//	fprintf(stderr, "%s: pic16_dynProcessorRegs\n", __FUNCTION__);
 	pic16_groupRegistersInSection(pic16_dynProcessorRegs);
 	
 	
@@ -2851,16 +2963,6 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
   if (OP_SYMBOL (IC_RESULT (ic))->onStack ||
       OP_SYMBOL (IC_RESULT (ic))->iaccess)
     {
-
-#ifndef USE_ONSTACK
-	/* clear the onStack flag, the port doesn't support it yet! FIXME */
-	if(OP_SYMBOL(IC_RESULT(ic))->onStack) {
-		OP_SYMBOL(IC_RESULT(ic))->onStack = 0;
-	  return 0;
-	}
-#endif
-	
-
       /* the operation has only one symbol
          operator then we can pack */
       if ((IC_LEFT (dic) && !IS_SYMOP (IC_LEFT (dic))) ||
@@ -2957,14 +3059,6 @@ findAssignToSym (operand * op, iCode * ic)
 	  if ((ic->op == '+' || ic->op == '-') &&
 	      OP_SYMBOL (IC_RIGHT (dic))->onStack)
 	    {
-
-#if USE_ONSTACK
-		if(OP_SYMBOL(IC_RESULT(ic))->onStack) {
-			OP_SYMBOL(IC_RESULT(ic))->onStack = 0;
-		  return NULL;
-		}
-#endif
-
 	      if (IC_RESULT (ic)->key != IC_RIGHT (dic)->key &&
 		  IC_LEFT (ic)->key != IC_RIGHT (dic)->key &&
 		  IC_RIGHT (ic)->key != IC_RIGHT (dic)->key)

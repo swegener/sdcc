@@ -27,9 +27,6 @@ void pic16_genCpl(iCode *ic);
 /*
  * global function definitions
  */
-void DEBUGpic16_pic16_AopType(int line_no, operand *left, operand *right, operand *result);
-
-
 void pic16_DumpValue(char *prefix, value *val);
 void pic16_DumpPcodeOp(char *prefix, pCodeOp *pcop);
 void pic16_DumpAop(char *prefix, asmop *aop);

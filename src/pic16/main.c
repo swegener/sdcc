@@ -118,19 +118,22 @@ _pic16_init (void)
 static void
 _pic16_reset_regparm ()
 {
-  regParmFlg = 0;
+	regParmFlg = 0;
 }
 
 static int
 _pic16_regparm (sym_link * l)
 {
-  /* for this processor it is simple
-     can pass only the first parameter in a register */
-  //if (regParmFlg)
-  //  return 0;
-
-  regParmFlg++;// = 1;
+	/* for this processor it is simple
+	 * can pass only the first parameter in a register */
+#if 0
+	if(regParmFlg)return 0;
+	regParmFlg = 1;
   return 1;
+#else
+	regParmFlg++;// = 1;
+  return 1;
+#endif
 }
 
 
@@ -163,21 +166,42 @@ _process_pragma(const char *sz)
 		}
 	}
 	
-	/* #pragma stack [stack-position] */
+	/* #pragma stack [stack-position] [stack-len] */
 	if(startsWith(ptr, "stack")) {
 	  char *stackPosS = strtok((char *)NULL, WHITE);
+	  char *stackLenS = strtok((char *)NULL, WHITE);
 	  value *stackPosVal;
+	  value *stackLenVal;
 	  regs *reg;
 	  symbol *sym;
 
-//	  	fprintf(stderr, "Initializing stack pointer to 0x%x\n", (int)floatFromVal(constVal(stackPos)));
 		stackPosVal = constVal( stackPosS );
 		stackPos = (unsigned int)floatFromVal( stackPosVal );
 
-		reg=newReg(REG_SFR, PO_SFR_REGISTER, stackPos, "_stack", 1, 0, NULL);
+		
+		if(stackLenS) {
+			stackLenVal = constVal( stackLenS );
+			stackLen = (unsigned int)floatFromVal( stackLenVal );
+		}
+
+		if(stackLen < 1) {
+			stackLen = 64;
+			fprintf(stderr, "%s:%d setting stack to default size 0x%x\n", __FILE__, __LINE__, stackLen);
+		}
+
+//	  	fprintf(stderr, "Initializing stack pointer at 0x%x len 0x%x\n", stackPos, stackLen);
+				
+		reg=newReg(REG_SFR, PO_SFR_REGISTER, stackPos, "_stack", stackLen-1, 0, NULL);
+		addSet(&pic16_fix_udata, reg);
+		
+		reg = newReg(REG_SFR, PO_SFR_REGISTER, stackPos + stackLen-1, "_stack_end", 1, 0, NULL);
 		addSet(&pic16_fix_udata, reg);
 
 		sym = newSymbol("stack", 0);
+		sprintf(sym->rname, "_%s", sym->name);
+		addSet(&publics, sym);
+
+		sym = newSymbol("stack_end", 0);
 		sprintf(sym->rname, "_%s", sym->name);
 		addSet(&publics, sym);
 		
@@ -259,11 +283,12 @@ _process_pragma(const char *sz)
 
 #define IVT_LOC		"--ivt-loc"
 #define NO_DEFLIBS	"--nodefaultlibs"
-
+#define MPLAB_COMPAT	"--mplab-comp"
 
 char *alt_asm=NULL;
 char *alt_link=NULL;
 
+int pic16_mplab_comp=0;
 extern int pic16_debug_verbose;
 extern int pic16_ralloc_debug;
 extern int pic16_pcode_verbose;
@@ -291,6 +316,7 @@ OPTION pic16_optionsTable[]= {
 	{ 0,	"--denable-peeps",	&pic16_enable_peeps,	"explicit enable of peepholes"},
 	{ 0,	IVT_LOC,	NULL,	"<nnnn> interrupt vector table location"},
 	{ 0,	"--calltree",		&pic16_options.dumpcalltree,	"dump call tree in .calltree file"},
+	{ 0,	MPLAB_COMPAT,		&pic16_mplab_comp,	"enable compatibility mode for MPLAB utilities (MPASM/MPLINK)"},
 	{ 0,	NULL,		NULL,	NULL}
 	};
 
@@ -382,13 +408,65 @@ static void _pic16_initPaths(void)
 		/* setup pic16 library directory */
 		pic16libDirsSet = appendStrSet(dataDirsSet, NULL, pic16libDir);
 		mergeSets(&libDirsSet, pic16libDirsSet);
-
-		if(!pic16_options.nodefaultlibs) {
-			/* now add the library for the device */
-			sprintf(devlib, "%s.lib", pic16->name[2]);
-			addSet(&libFilesSet, Safe_strdup(devlib));
-		}
 	}
+	
+	if(!pic16_options.nodefaultlibs) {
+		/* now add the library for the device */
+		sprintf(devlib, "%s.lib", pic16->name[2]);
+		addSet(&libFilesSet, Safe_strdup(devlib));
+	}
+}
+
+extern set *linkOptionsSet;
+char *msprintf(hTab *pvals, const char *pformat, ...);
+int my_system(const char *cmd);
+
+/* custom function to link objects */
+static void _pic16_linkEdit(void)
+{
+  hTab *linkValues=NULL;
+  char lfrm[256];
+  char *lcmd;
+  char temp[128];
+  set *tSet=NULL;
+  int ret;
+  
+  	/*
+  	 * link command format:
+  	 * {linker} {incdirs} {lflags} -o {outfile} {spec_ofiles} {ofiles} {libs}
+  	 *
+  	 */
+  	 
+  	sprintf(lfrm, "{linker} {incdirs} {lflags} -o {outfile} {spec_ofiles} {ofiles} {libs}");
+  	   	 
+  	shash_add(&linkValues, "linker", "gplink");
+
+  	mergeSets(&tSet, libDirsSet);
+  	mergeSets(&tSet, libPathsSet);
+  	
+  	shash_add(&linkValues, "incdirs", joinStrSet( appendStrSet(tSet, "-I\"", "\"")));
+  	shash_add(&linkValues, "lflags", joinStrSet(linkOptionsSet));
+  
+	shash_add(&linkValues, "outfile", dstFileName);
+
+  	if(fullSrcFileName) {
+		sprintf(temp, "%s.o", dstFileName);
+//		shash_add(&linkValues, "srcofile", temp);
+		addSetHead(&relFilesSet, temp);
+	}
+
+//  	shash_add(&linkValues, "spec_ofiles", "crt0i.o");
+  	shash_add(&linkValues, "ofiles", joinStrSet(relFilesSet));
+  	shash_add(&linkValues, "libs", joinStrSet(libFilesSet));
+  	
+  	lcmd = msprintf(linkValues, lfrm);
+  	 
+  	ret = my_system( lcmd );
+  	 
+  	Safe_free( lcmd );
+  	 
+  	if(ret)
+  		exit(1);
 }
 
 
@@ -711,9 +789,9 @@ PORT pic16_port =
     NULL			/* no do_assemble function */
   },
   {
-    pic16_linkCmd,		/* linker command and arguments */
+    NULL,			//    pic16_linkCmd,		/* linker command and arguments */
     NULL,			/* alternate macro based form */
-    NULL,			/* no do_link function */
+    _pic16_linkEdit,		//NULL,			/* no do_link function */
     ".o",			/* extension for object files */
     0				/* no need for linker file */
   },

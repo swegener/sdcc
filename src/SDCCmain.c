@@ -1179,6 +1179,7 @@ parseCmdLine (int argc, char **argv)
                 SNPRINTF (buffer, sizeof(buffer),
                   ((sOpt == 'I') ? "-%c\"%s\"": "-%c%s"), sOpt, rest);
 		addSet(&preArgvSet, Safe_strdup(buffer));
+		if(sOpt == 'I')addSet(&includeDirsSet, Safe_strdup(rest));
 	      }
 	      break;
 

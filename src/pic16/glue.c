@@ -132,17 +132,17 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms)) {
 
 #if 0
-		fprintf(stderr, "%s\t%s: sym: %s\tused: %d\textern: %d\tstatic: %d\taggregate: %d\n",
+		fprintf(stderr, "%s\t%s: sym: %s\tused: %d\textern: %d\tstatic: %d\taggregate: %d\tregister: 0x%x\tfunction: %d\n",
 			__FUNCTION__,
 			map->sname, sym->name, sym->used, IS_EXTERN(sym->etype), IS_STATIC(sym->etype),
-			IS_AGGREGATE(sym->type));
+			IS_AGGREGATE(sym->type), SPEC_SCLS(sym->etype), IS_FUNC(sym->type));
 		printTypeChain( sym->type, stderr );
 		fprintf(stderr, "\n");
 #endif
 
 		/* if extern then add to externs */
 		if (IS_EXTERN (sym->etype)) {
-			
+
 			/* reduce overhead while linking by not declaring
 			 * extern unused external functions (usually declared
 			 * in header files) */
@@ -297,6 +297,8 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 					  sectSym *ssym;
 					  int found=0;
 				  
+					  	fprintf(stderr, "%s:%d sym->rname: %s reg: %p reg->name: %s\n", __FILE__, __LINE__,
+					  		sym->rname, reg, (reg?reg->name:"<<NULL>>"));
 #if 1
 					  	for(ssym=setFirstItem(sectSyms); ssym; ssym=setNextItem(sectSyms)) {
 					  		if(!strcmp(ssym->name, reg->name))found=1;
@@ -570,6 +572,8 @@ void pic16_printGPointerType (const char *iname, const char *oname, const unsign
 }
 
 
+/* set to 0 to disable debug messages */
+#define DEBUG_PRINTIVAL	1
 
 /*-----------------------------------------------------------------*/
 /* pic16_printIvalType - generates ival for int/char               */
@@ -581,6 +585,11 @@ pic16_printIvalType (symbol *sym, sym_link * type, initList * ilist, char ptype,
   unsigned long ulval;
 
 //  fprintf(stderr, "%s for symbol %s\n",__FUNCTION__, sym->rname);
+
+#if DEBUG_PRINTIVAL
+  fprintf(stderr, "%s\n",__FUNCTION__);
+#endif
+
 
   /* if initList is deep */
   if (ilist && ilist->type == INIT_DEEP)
@@ -635,8 +644,10 @@ pic16_printIvalChar (sym_link * type, initList * ilist, char *s, char ptype, voi
   if(!p)
     return 0;
 
+#if DEBUG_PRINTIVAL
+  fprintf(stderr, "%s\n",__FUNCTION__);
+#endif
 
-  // fprintf(stderr, "%s\n",__FUNCTION__);
   if (!s)
     {
 
@@ -682,6 +693,9 @@ pic16_printIvalArray (symbol * sym, sym_link * type, initList * ilist,
     return;
 
 
+#if DEBUG_PRINTIVAL
+  fprintf(stderr, "%s\n",__FUNCTION__);
+#endif
   /* take care of the special   case  */
   /* array of characters can be init  */
   /* by a string                      */
@@ -748,6 +762,11 @@ void pic16_printIvalBitFields(symbol **sym, initList **ilist, char ptype, void *
   int size =0;
 
 
+#if DEBUG_PRINTIVAL
+  fprintf(stderr, "%s\n",__FUNCTION__);
+#endif
+
+
   do {
     unsigned long i;
     val = list2val(lilist);
@@ -804,6 +823,11 @@ void pic16_printIvalStruct (symbol * sym, sym_link * type,
   symbol *sflds;
   initList *iloop = NULL;
 
+
+#if DEBUG_PRINTIVAL
+  fprintf(stderr, "%s\n",__FUNCTION__);
+#endif
+
   sflds = SPEC_STRUCT (type)->fields;
 
   if (ilist) {
@@ -843,7 +867,10 @@ int pic16_printIvalCharPtr (symbol * sym, sym_link * type, value * val, char pty
      VR - Attempting to port this function to pic16 port - 8-Jun-2004
    */
 
-//	fprintf(stderr, "%s\n",__FUNCTION__);
+
+#if DEBUG_PRINTIVAL
+  fprintf(stderr, "%s\n",__FUNCTION__);
+#endif
 
   size = getSize (type);
 
@@ -1259,6 +1286,7 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
 //		fprintf(stderr, "%s:%d spec_absa is false for symbol: %s\n",
 //			__FILE__, __LINE__, sym->name);
 
+		
 	  /* if it has an initial value */
 	  if (sym->ival) {
 	      pBlock *pb;
@@ -1380,10 +1408,11 @@ pic16createInterruptVect (FILE * vFile)
 static void
 pic16initialComments (FILE * afile)
 {
-  initialComments (afile);
-  fprintf (afile, "; PIC16 port for the Microchip 16-bit core micros\n");
-  fprintf (afile, iComments2);
-
+	initialComments (afile);
+	fprintf (afile, "; PIC16 port for the Microchip 16-bit core micros\n");
+	if(pic16_mplab_comp)
+		fprintf(afile, "; MPLAB/MPASM/MPASMWIN/MPLINK compatibility mode enabled\n");
+	fprintf (afile, iComments2);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1394,7 +1423,7 @@ pic16printPublics (FILE *afile)
 {
   symbol *sym;
 
-	fprintf (afile, "%s", iComments2);
+	fprintf (afile, "\n%s", iComments2);
 	fprintf (afile, "; public variables in this module\n");
 	fprintf (afile, "%s", iComments2);
 
@@ -1410,7 +1439,11 @@ pic16_printExterns(FILE *afile)
 {
   symbol *sym;
 
-	fprintf(afile, "%s", iComments2);
+  	/* print nothing if no externs to declare */
+	if(!elementsInSet(externs) && !elementsInSet(pic16_builtin_functions))
+		return;
+
+	fprintf(afile, "\n%s", iComments2);
 	fprintf(afile, "; extern variables in this module\n");
 	fprintf(afile, "%s", iComments2);
 	
@@ -1569,9 +1602,9 @@ pic16glue ()
 
 		if(initsfpnt) {
 			pic16_addpCode2pBlock(pb, pic16_newpCode(POC_LFSR,
-				pic16_popGetLit2(1, pic16_newpCodeOpRegFromStr("_stack"))));
+				pic16_popGetLit2(1, pic16_newpCodeOpRegFromStr("_stack_end"))));
 			pic16_addpCode2pBlock(pb, pic16_newpCode(POC_LFSR,
-				pic16_popGetLit2(2, pic16_newpCodeOpRegFromStr("_stack"))));
+				pic16_popGetLit2(2, pic16_newpCodeOpRegFromStr("_stack_end"))));
 		}
 
 		/* put in the call to main */

@@ -32,5 +32,6 @@ extern set *absSymSet;
 extern set *sectNames;
 extern set *sectSyms;
 
+extern int pic16_mplab_comp;
 
 #endif

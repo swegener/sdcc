@@ -59,45 +59,21 @@ pCodeOp *pic16_popGet2p(pCodeOp *src, pCodeOp *dst);
 const char *pic16_AopType(short type)
 {
   switch(type) {
-  case AOP_LIT:
-    return "AOP_LIT";
-    break;
-  case AOP_REG:
-    return "AOP_REG";
-    break;
-  case AOP_DIR:
-    return "AOP_DIR";
-    break;
-  case AOP_DPTR:
-    return "AOP_DPTR";
-    break;
-  case AOP_DPTR2:
-    return "AOP_DPTR2";
-    break;
-  case AOP_R0:
-    return "AOP_R0";
-    break;
-  case AOP_R1:
-    return "AOP_R1";
-    break;
-  case AOP_STK:
-    return "AOP_STK";
-    break;
-  case AOP_IMMD:
-    return "AOP_IMMD";
-    break;
-  case AOP_STR:
-    return "AOP_STR";
-    break;
-  case AOP_CRY:
-    return "AOP_CRY";
-    break;
-  case AOP_ACC:
-    return "AOP_ACC";
-    break;
-  case AOP_PCODE:
-    return "AOP_PCODE";
-    break;
+  case AOP_LIT:		return "AOP_LIT";
+  case AOP_REG: 	return "AOP_REG";
+  case AOP_DIR: 	return "AOP_DIR";
+  case AOP_DPTR:	return "AOP_DPTR";
+  case AOP_DPTR2:	return "AOP_DPTR2";
+  case AOP_FSR0:	return "AOP_FSR0";
+  case AOP_FSR2:	return "AOP_FSR2";
+  case AOP_R0:		return "AOP_R0";
+  case AOP_R1:		return "AOP_R1";
+  case AOP_STK:		return "AOP_STK";
+  case AOP_IMMD:	return "AOP_IMMD";
+  case AOP_STR:		return "AOP_STR";
+  case AOP_CRY:		return "AOP_CRY";
+  case AOP_ACC:		return "AOP_ACC";
+  case AOP_PCODE:	return "AOP_PCODE";
   }
 
   return "BAD TYPE";
@@ -110,58 +86,32 @@ const char *pic16_pCodeOpType(pCodeOp *pcop)
 
     switch(pcop->type) {
 
-    case  PO_NONE:
-      return "PO_NONE";
-    case  PO_W:
-      return  "PO_W";
-    case  PO_WREG:
-      return  "PO_WREG";
-    case  PO_STATUS:
-      return  "PO_STATUS";
-    case  PO_BSR:
-      return  "PO_BSR";
-    case  PO_FSR0:
-      return  "PO_FSR0";
-    case  PO_INDF0:
-      return  "PO_INDF0";
-    case  PO_INTCON:
-      return  "PO_INTCON";
-    case  PO_GPR_REGISTER:
-      return  "PO_GPR_REGISTER";
-    case  PO_GPR_BIT:
-      return  "PO_GPR_BIT";
-    case  PO_GPR_TEMP:
-      return  "PO_GPR_TEMP";
-    case  PO_SFR_REGISTER:
-      return  "PO_SFR_REGISTER";
-    case  PO_PCL:
-      return  "PO_PCL";
-    case  PO_PCLATH:
-      return  "PO_PCLATH";
-    case  PO_PCLATU:
-      return  "PO_PCLATU";
-    case  PO_PRODL:
-      return  "PO_PRODL";
-    case  PO_PRODH:
-      return  "PO_PRODH";
-    case PO_LITERAL:
-      return  "PO_LITERAL";
-    case PO_REL_ADDR:
-      return "PO_REL_ADDR";
-    case  PO_IMMEDIATE:
-      return  "PO_IMMEDIATE";
-    case  PO_DIR:
-      return  "PO_DIR";
-    case  PO_CRY:
-      return  "PO_CRY";
-    case  PO_BIT:
-      return  "PO_BIT";
-    case  PO_STR:
-      return  "PO_STR";
-    case  PO_LABEL:
-      return  "PO_LABEL";
-    case  PO_WILD:
-      return  "PO_WILD";
+    case PO_NONE:		return "PO_NONE";
+    case PO_W:			return  "PO_W";
+    case PO_WREG:		return  "PO_WREG";
+    case PO_STATUS:		return  "PO_STATUS";
+    case PO_BSR:		return  "PO_BSR";
+    case PO_FSR0:		return  "PO_FSR0";
+    case PO_INDF0:		return  "PO_INDF0";
+    case PO_INTCON:		return  "PO_INTCON";
+    case PO_GPR_REGISTER:	return  "PO_GPR_REGISTER";
+    case PO_GPR_BIT:		return  "PO_GPR_BIT";
+    case PO_GPR_TEMP:		return  "PO_GPR_TEMP";
+    case PO_SFR_REGISTER:	return  "PO_SFR_REGISTER";
+    case PO_PCL:		return  "PO_PCL";
+    case PO_PCLATH:		return  "PO_PCLATH";
+    case PO_PCLATU:		return  "PO_PCLATU";
+    case PO_PRODL:		return  "PO_PRODL";
+    case PO_PRODH:		return  "PO_PRODH";
+    case PO_LITERAL:		return  "PO_LITERAL";
+    case PO_REL_ADDR:		return "PO_REL_ADDR";
+    case PO_IMMEDIATE:		return  "PO_IMMEDIATE";
+    case PO_DIR:		return  "PO_DIR";
+    case PO_CRY:		return  "PO_CRY";
+    case PO_BIT:		return  "PO_BIT";
+    case PO_STR:		return  "PO_STR";
+    case PO_LABEL:		return  "PO_LABEL";
+    case PO_WILD:		return  "PO_WILD";
     }
   }
 
@@ -175,58 +125,32 @@ const char *pic16_pCodeOpSubType(pCodeOp *pcop)
 
     switch(PCORB(pcop)->subtype) {
 
-    case  PO_NONE:
-      return "PO_NONE";
-    case  PO_W:
-      return  "PO_W";
-    case  PO_WREG:
-      return  "PO_WREG";
-    case  PO_STATUS:
-      return  "PO_STATUS";
-    case  PO_BSR:
-      return  "PO_BSR";
-    case  PO_FSR0:
-      return  "PO_FSR0";
-    case  PO_INDF0:
-      return  "PO_INDF0";
-    case  PO_INTCON:
-      return  "PO_INTCON";
-    case  PO_GPR_REGISTER:
-      return  "PO_GPR_REGISTER";
-    case  PO_GPR_BIT:
-      return  "PO_GPR_BIT";
-    case  PO_GPR_TEMP:
-      return  "PO_GPR_TEMP";
-    case  PO_SFR_REGISTER:
-      return  "PO_SFR_REGISTER";
-    case  PO_PCL:
-      return  "PO_PCL";
-    case  PO_PCLATH:
-      return  "PO_PCLATH";
-    case  PO_PCLATU:
-      return  "PO_PCLATU";
-    case  PO_PRODL:
-      return  "PO_PRODL";
-    case  PO_PRODH:
-      return  "PO_PRODH";
-    case PO_LITERAL:
-      return  "PO_LITERAL";
-    case PO_REL_ADDR:
-      return "PO_REL_ADDR";
-    case  PO_IMMEDIATE:
-      return  "PO_IMMEDIATE";
-    case  PO_DIR:
-      return  "PO_DIR";
-    case  PO_CRY:
-      return  "PO_CRY";
-    case  PO_BIT:
-      return  "PO_BIT";
-    case  PO_STR:
-      return  "PO_STR";
-    case  PO_LABEL:
-      return  "PO_LABEL";
-    case  PO_WILD:
-      return  "PO_WILD";
+    case PO_NONE:		return "PO_NONE";
+    case PO_W:			return  "PO_W";
+    case PO_WREG:		return  "PO_WREG";
+    case PO_STATUS:		return  "PO_STATUS";
+    case PO_BSR:		return  "PO_BSR";
+    case PO_FSR0:		return  "PO_FSR0";
+    case PO_INDF0:		return  "PO_INDF0";
+    case PO_INTCON:		return  "PO_INTCON";
+    case PO_GPR_REGISTER:	return  "PO_GPR_REGISTER";
+    case PO_GPR_BIT:		return  "PO_GPR_BIT";
+    case PO_GPR_TEMP:		return  "PO_GPR_TEMP";
+    case PO_SFR_REGISTER:	return  "PO_SFR_REGISTER";
+    case PO_PCL:		return  "PO_PCL";
+    case PO_PCLATH:		return  "PO_PCLATH";
+    case PO_PCLATU:		return  "PO_PCLATU";
+    case PO_PRODL:		return  "PO_PRODL";
+    case PO_PRODH:		return  "PO_PRODH";
+    case PO_LITERAL:		return  "PO_LITERAL";
+    case PO_REL_ADDR:		return "PO_REL_ADDR";
+    case PO_IMMEDIATE:		return  "PO_IMMEDIATE";
+    case PO_DIR:		return  "PO_DIR";
+    case PO_CRY:		return  "PO_CRY";
+    case PO_BIT:		return  "PO_BIT";
+    case PO_STR:		return  "PO_STR";
+    case PO_LABEL:		return  "PO_LABEL";
+    case PO_WILD:		return  "PO_WILD";
     }
   }
 
@@ -1720,7 +1644,8 @@ void pic16_genUMult8XLit_8 (operand *left,
 
 
 	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-
+	DEBUGpic16_pic16_AopType(__LINE__,left,right,result);
+  
 	if (AOP_TYPE(right) != AOP_LIT){
 		fprintf(stderr,"%s %d - right operand is not a literal\n",__FILE__,__LINE__);
 		exit(1);
@@ -1744,7 +1669,8 @@ void pic16_genUMult8XLit_8 (operand *left,
 				return;
 
 			default:
-				pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left), 0));
+				if(AOP_TYPE(left) != AOP_ACC)
+					pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left), 0));
 				pic16_emitpcode(POC_MULLW, pic16_popGetLit(lit));
 				pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_prodl),
 					pic16_popGet(AOP(result), 0)));
@@ -1762,7 +1688,8 @@ void pic16_genUMult8XLit_8 (operand *left,
 				pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result), 0));
 				return;
 			default:
-				pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left), 0));
+				if(AOP_TYPE(left) != AOP_ACC)
+					pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left), 0));
 				pic16_emitpcode(POC_MULLW, pic16_popGetLit(lit));
 				pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_prodl),
 					pic16_popGet(AOP(result), 0)));

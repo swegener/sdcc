@@ -465,6 +465,7 @@ static int num_of_supported_PICS = sizeof(Pics16)/sizeof(PIC16_device);
 
 PIC16_device *pic16=NULL;
 unsigned int stackPos = 0;
+unsigned int stackLen = 0;
 
 extern regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alias, operand *refop);
 
@@ -962,10 +963,11 @@ void pic16_groupRegistersInSection(set *regset)
 				continue;
 
 #if 0
-			fprintf(stderr, "%s:%d register %s alias:%d fix:%d ival=%i level=%i\n",
+			fprintf(stderr, "%s:%d register %s alias:%d fix:%d ival=%i level=%i code=%i\n",
 				__FILE__, __LINE__, reg->name, reg->alias, reg->isFixed,
 					(reg->regop?(OP_SYMBOL(reg->regop)->ival?1:0):-1),
-					(reg->regop?(OP_SYMBOL(reg->regop)->level):-1) );
+					(reg->regop?(OP_SYMBOL(reg->regop)->level):-1),
+					(reg->regop?(IS_CODE(OP_SYM_ETYPE(reg->regop))):-1) );
 #endif
 			
 			docontinue=0;

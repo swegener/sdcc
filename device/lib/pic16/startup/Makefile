@@ -47,3 +47,13 @@ clean:
 
 clean-intermediate:
 	$(RM) -f *.lst *.asm *.dump*
+
+dep .depend:
+	rm -f .depend
+	for temp in $(CFILES); do		\
+		$(CPP) $(MM) $(CFLAGS) $$temp > .tmpdepend;	\
+		$(SED) s/.rel/.o/g .tmpdepend >> .depend;	\
+		$(RM) -f .tmpdepend;	\
+	done
+	
+include .depend

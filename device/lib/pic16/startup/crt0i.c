@@ -11,6 +11,7 @@
  */
 
 extern stack;
+extern stack_end;
 
 extern TBLPTRU;
 extern TBLPTRH;
@@ -45,8 +46,8 @@ void _startup (void)
 {
 	_asm
 		// Initialize the stack pointer
-		lfsr 1, _stack
-		lfsr 2, _stack
+		lfsr 1, _stack_end
+		lfsr 2, _stack_end
 		clrf _TBLPTRU, 0	// 1st silicon doesn't do this on POR
     
 		// initialize the flash memory access configuration. this is harmless

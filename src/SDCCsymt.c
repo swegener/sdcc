@@ -1475,6 +1475,7 @@ checkSClass (symbol * sym, int isProto)
     /* initializers if not an extern */
     if (SPEC_SCLS (sym->etype) == S_CODE &&
         sym->ival == NULL &&
+        !sym->_isparm &&
         //!sym->level &&
         port->mem.code_ro &&
         !IS_EXTERN (sym->etype) &&

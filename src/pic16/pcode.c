@@ -2871,12 +2871,11 @@ void  pic16_pCodeInitRegisters(void)
 	pic16_pc_tosh.rIdx = IDX_TOSH;
 	pic16_pc_tosu.rIdx = IDX_TOSU;
 
-	pic16_pc_tblptrl.rIdx = IDX_TBLPTRL; // patch 15
-	pic16_pc_tblptrh.rIdx = IDX_TBLPTRH; // patch 15
-	pic16_pc_tblptru.rIdx = IDX_TBLPTRU; // patch 15
-	pic16_pc_tablat.rIdx = IDX_TABLAT;   // patch 15
+	pic16_pc_tblptrl.rIdx = IDX_TBLPTRL;
+	pic16_pc_tblptrh.rIdx = IDX_TBLPTRH;
+	pic16_pc_tblptru.rIdx = IDX_TBLPTRU;
+	pic16_pc_tablat.rIdx = IDX_TABLAT;
 
-//	pic16_pc_fsr0.rIdx = IDX_FSR0;
 	pic16_pc_fsr0l.rIdx = IDX_FSR0L;
 	pic16_pc_fsr0h.rIdx = IDX_FSR0H;
 	pic16_pc_fsr1l.rIdx = IDX_FSR1L;
@@ -3989,7 +3988,8 @@ pCodeOp *pic16_newpCodeOpBit(char *s, int bit, int inBitSpace, PIC_OPTYPE subt)
   PCORB(pcop)->subtype = subt;
 
   /* pCodeOpBit is derived from pCodeOpReg. We need to init this too */
-  PCOR(pcop)->r = pic16_dirregWithName(s);	//NULL;
+  PCOR(pcop)->r = pic16_regWithName(s);	//NULL;
+//  fprintf(stderr, "%s:%d %s for reg: %s\treg= %p\n", __FILE__, __LINE__, __FUNCTION__, s, PCOR(pcop)->r);
 //  PCOR(pcop)->rIdx = 0;
   return pcop;
 }
@@ -4447,6 +4447,8 @@ char *pic16_get_op(pCodeOp *pcop,char *buffer, size_t size)
 
 	if(pcop) {
 		switch(pcop->type) {
+			case PO_W:
+			case PO_WREG:
 			case PO_PRODL:
 			case PO_PRODH:
 			case PO_INDF0:
@@ -4492,6 +4494,7 @@ char *pic16_get_op(pCodeOp *pcop,char *buffer, size_t size)
 				}
 				return buffer;
 
+			case PO_GPR_REGISTER:
 			case PO_DIR:
 				s = buffer;
 //				size = sizeof(buffer);
@@ -4543,6 +4546,8 @@ char *pic16_get_op2(pCodeOp *pcop,char *buffer, size_t size)
 
 	if(pcop) {
 		switch(PCOR2(pcop)->pcop2->type) {
+			case PO_W:
+			case PO_WREG:
 			case PO_PRODL:
 			case PO_PRODH:
 			case PO_INDF0:
@@ -4706,7 +4711,7 @@ char *pic16_pCode2str(char *str, size_t size, pCode *pc)
 //			fprintf(stderr, "%s:%d reg = %p\tname= %s, accessBank= %d\n",
 //					__FUNCTION__, __LINE__, r, (r)?r->name:"<null>", (r)?r->accessBank:-1);
 
-			if(r && !r->accessBank)SAFE_snprintf(&s,&size,", %s", "B");
+			if(r && !r->accessBank)SAFE_snprintf(&s,&size,", %s", (!pic16_mplab_comp?"B":"BANKED"));
 	  }
 	}
       }
@@ -4738,7 +4743,8 @@ char *pic16_pCode2str(char *str, size_t size, pCode *pc)
     break;
   case PC_CSOURCE:
 //    SAFE_snprintf(&s,&size,";#CSRC\t%s %d\t%s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
-      SAFE_snprintf(&s,&size,"#LINE\t%d; %s\t%s\n", PCCS(pc)->line_number, PCCS(pc)->file_name, PCCS(pc)->line);
+      SAFE_snprintf(&s,&size,"%s#LINE\t%d; %s\t%s\n", (pic16_mplab_comp?";":""),
+      	PCCS(pc)->line_number, PCCS(pc)->file_name, PCCS(pc)->line);
     break;
   case PC_ASMDIR:
 	if(PCAD(pc)->directive) {
@@ -4829,7 +4835,8 @@ static void genericPrint(FILE *of, pCode *pc)
 
   case PC_CSOURCE:
 //    fprintf(of,";#CSRC\t%s %d\t\t%s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
-    fprintf(of,"#LINE\t%d; %s\t%s\n", PCCS(pc)->line_number, PCCS(pc)->file_name, PCCS(pc)->line);
+    fprintf(of,"%s#LINE\t%d; %s\t%s\n", (pic16_mplab_comp?";":""),
+    	PCCS(pc)->line_number, PCCS(pc)->file_name, PCCS(pc)->line);
          
     break;
 
@@ -5396,6 +5403,7 @@ regs * pic16_getRegFromInstruction(pCode *pc)
   case PO_GPR_BIT:
     return PCOR(PCI(pc)->pcop)->r;
 
+  case PO_GPR_REGISTER:
   case PO_DIR:
 //	fprintf(stderr, "pic16_getRegFromInstruction - dir\n");
     return PCOR(PCI(pc)->pcop)->r;
@@ -5475,6 +5483,7 @@ regs * pic16_getRegFromInstruction2(pCode *pc)
 	break;
 //    return PCOR2(PCI(pc)->pcop)->r;
 
+  case PO_GPR_REGISTER:
   case PO_DIR:
     //fprintf(stderr, "pic16_getRegFromInstruction2 - dir\n");
     return PCOR(PCOR2(PCI(pc)->pcop)->pcop2)->r;
@@ -5987,17 +5996,13 @@ extern int pic16_labelOffset;
 static void insertBankSwitch(int position, pCode *pc)
 {
   pCode *new_pc;
-  regs *reg;
 
 	if(!pc)
 		return;
 
 	/* emit BANKSEL [symbol] */
 
-	reg = pic16_getRegFromInstruction(pc);
-	if(!reg) {
-		if(!(PCI(pc)->pcop && PCI(pc)->pcop->type == PO_GPR_BIT))return;
-	}
+
 	new_pc = pic16_newpCodeAsmDir("BANKSEL", "%s", pic16_get_op_from_instruction(PCI(pc)));
 	
 //	position = 0;		// position is always before (sanity check!)
@@ -6535,13 +6540,9 @@ static void pic16_FixRegisterBanking(pBlock *pb)
 		}
 #endif
 
-		/* we can be 99% that within a pBlock, between two consequtive
-		 * refernces to the same register, the extra banksel is needless */
-	 
-	 
 		/* now make some tests to make sure that instruction needs bank switch */
 
-		/* if not no register exists, and if not a bit opcode goto loop */
+		/* if no register exists, and if not a bit opcode goto loop */
 		if(!reg) {
 			if(!(PCI(pc)->pcop && PCI(pc)->pcop->type == PO_GPR_BIT))goto loop;
 		}
@@ -6549,7 +6550,9 @@ static void pic16_FixRegisterBanking(pBlock *pb)
 		if(isPCI_SKIP(pc)) {
 //			fprintf(stderr, "instruction is SKIP instruction\n");
 		}
-		if((reg && isACCESS_BANK(reg)) || !isBankInstruction(pc))goto loop;
+		if(reg && isACCESS_BANK(reg))goto loop;
+
+		if(!isBankInstruction(pc))goto loop;
 
 		if(isPCI_LIT(pc))goto loop;
 	 
@@ -6779,17 +6782,6 @@ void pic16_AnalyzeBanking(void)
 {
   pBlock  *pb;
 
-	if(!pic16_picIsInitialized()) {
-		fprintf(stderr,"Temporary ERROR: at the moment you have to use\n");
-		fprintf(stderr,"an include file create by inc2h.pl. See SDCC source:\n");
-		fprintf(stderr,"support/scripts/inc2h.pl\n");
-		fprintf(stderr,"this is a nuisance bug that will be fixed shortly\n");
-
-		/* I think it took a long long time to fix this bug! ;-) -- VR */
-
-		exit(1);
-	}
-
 
 	/* Phase x - Flow Analysis - Used Banks
 	 *
@@ -6800,12 +6792,8 @@ void pic16_AnalyzeBanking(void)
 	AnalyzeFlow(0);
 	AnalyzeFlow(1);
 
-//	for(pb = the_pFile->pbHead; pb; pb = pb->next)
-//		BanksUsedFlow(pb);
-
 	if(!the_pFile)return;
 
-	
 	if(!pic16_options.no_banksel) {
 		for(pb = the_pFile->pbHead; pb; pb = pb->next) {
 //			fprintf(stderr, "%s:%d: Fix register banking in pb= 0x%p\n", __FILE__, __LINE__, pb);

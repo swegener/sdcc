@@ -32,6 +32,7 @@
 #include "pcoderegs.h"
 
 extern unsigned int stackPos;
+extern unsigned int stackLen;
 
 enum
   {
@@ -111,6 +112,8 @@ extern set *pic16_int_regs;
 regs *pic16_regWithIdx (int);
 regs *pic16_typeRegWithIdx(int, int, int);
 regs *pic16_dirregWithName (char *name );
+regs *pic16_allocregWithName(char *name);
+regs *pic16_regWithName(char *name);
 void  pic16_freeAllRegs ();
 void  pic16_deallocateAllRegs ();
 regs *pic16_findFreeReg(short type);
@@ -143,8 +146,12 @@ regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alia
 #define IDX_FSR0    0xfe9
 #define IDX_FSR0L   0xfe9
 #define IDX_FSR0H   0xfea
+
+#define IDX_FSR1    0xfe1
 #define IDX_FSR1L   0xfe1
 #define IDX_FSR1H   0xfe2
+
+#define IDX_FSR2    0xfd9
 #define IDX_FSR2L   0xfd9
 #define IDX_FSR2H   0xfda
 

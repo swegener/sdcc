@@ -69,12 +69,14 @@
 void pic16_genNot (iCode *ic)
 {
   int size;
+  symbol *tlbl;
 
 /*
  * result[AOP_CRY,AOP_REG]  = ! left[AOP_CRY, AOP_REG]
  */
 
 	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+
 	/* assign asmOps to operand & result */
 	pic16_aopOp (IC_LEFT(ic),ic,FALSE);
 	pic16_aopOp (IC_RESULT(ic),ic,TRUE);
@@ -94,12 +96,22 @@ void pic16_genNot (iCode *ic)
 	}
 
 	size = AOP_SIZE(IC_LEFT(ic));
+#if 0
 	if(size == 1) {
 		pic16_emitpcode(POC_COMFW,pic16_popGet(AOP(IC_LEFT(ic)),0));
 		pic16_emitpcode(POC_ANDLW,pic16_popGetLit(1));
 		pic16_emitpcode(POC_MOVWF,pic16_popGet(AOP(IC_RESULT(ic)),0));
 		goto release;
 	}
+#endif
+
+	pic16_toBoolean( IC_LEFT(ic) );
+	
+	tlbl = newiTempLabel(NULL);
+	emitCLRC;
+	pic16_emitpcode(POC_TSTFSZ, pic16_popCopyReg( &pic16_pc_wreg ));
+	emitSETC;
+	pic16_outBitC( IC_RESULT(ic) );
 
 release:    
 	/* release the aops */

@@ -1674,10 +1674,10 @@ Install paths
 \begin_inset  Tabular
 <lyxtabular version="3" rows="5" columns="4">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="left" valignment="top" leftline="true" width="0">
+<column alignment="left" valignment="top" leftline="true" width="0">
+<column alignment="left" valignment="top" leftline="true" width="0">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -2070,9 +2070,9 @@ $PATH
 \begin_inset  Tabular
 <lyxtabular version="3" rows="6" columns="3">
 <features>
-<column alignment="block" valignment="top" leftline="true" width="1.5in">
-<column alignment="block" valignment="top" leftline="true" width="1.5in">
-<column alignment="block" valignment="top" leftline="true" rightline="true" width="0in">
+<column alignment="left" valignment="top" leftline="true" width="0">
+<column alignment="left" valignment="top" leftline="true" width="0">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0in">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -2161,6 +2161,8 @@ status Collapsed
 
 \layout Standard
 
+
+\size small 
 $SDCC_INCLUDE
 \end_inset 
 </cell>
@@ -2187,13 +2189,11 @@ $SDCC_INCLUDE
 
 \layout Standard
 
-$SDCC_HOME/
-\newline 
 
+\size footnotesize 
+$SDCC_HOME/
 \emph on 
-$PREFIX2DATA_DIR/
-\newline 
-$INCLUDE_DIR_SUFFIX
+$PREFIX2DATA_DIR/$INCLUDE_DIR_SUFFIX
 \end_inset 
 </cell>
 <cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
@@ -2201,11 +2201,9 @@ $INCLUDE_DIR_SUFFIX
 
 \layout Standard
 
-$SDCC_ HOME/
-\newline 
-share/sdcc/
-\newline 
-include
+
+\size small 
+$SDCC_ HOME/share/sdcc/include
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -2213,6 +2211,8 @@ include
 
 \layout Standard
 
+
+\size small 
 $SDCC_HOME
 \backslash 
 include
@@ -2225,17 +2225,11 @@ include
 
 \layout Standard
 
+
+\size small 
 path(argv[0])/
-\newline 
-
 \emph on 
-$BIN2DATADIR/
-\emph default 
-
-\newline 
-
-\emph on 
-$INCLUDE_DIR_SUFFIX
+$BIN2DATADIR/$INCLUDE_DIR_SUFFIX
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -2243,49 +2237,7 @@ $INCLUDE_DIR_SUFFIX
 
 \layout Standard
 
-path(argv[0])/
-\newline 
-../sdcc/include
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-
+path(argv[0])/../sdcc/include
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -2308,14 +2260,9 @@ include
 \layout Standard
 
 
+\size small 
 \emph on 
-$DATADIR/
-\emph default 
-
-\newline 
-
-\emph on 
-$INCLUDE_DIR_SUFFIX
+$DATADIR/$INCLUDE_DIR_SUFFIX
 \end_inset 
 </cell>
 <cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
@@ -2323,9 +2270,7 @@ $INCLUDE_DIR_SUFFIX
 
 \layout Standard
 
-/usr/local/share/sdcc/
-\newline 
-include
+/usr/local/share/sdcc/include
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -3303,8 +3248,12 @@ Windows Install Using a Binary Package
 
 \layout Enumerate
 
-Download the binary package and unpack it using your favorite unpacking
- tool (gunzip, WinZip, etc).
+Download the binary package from 
+\begin_inset LatexCommand \url{http://sdcc.sourceforge.net/snap.php}
+
+\end_inset 
+
+ and unpack it using your favorite unpacking tool (gunzip, WinZip, etc).
  This should unpack to a group of sub-directories.
  An example directory structure after unpacking the mingw32 package is:
  c:
@@ -6087,7 +6036,8 @@ status Collapsed
 
 \end_inset 
 
-.See section Installation for more details.
+.
+ See section Installation for more details.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -6143,7 +6093,11 @@ status Collapsed
 
  function.
  The default option is to lock up i.e.
- generate a 'ljmp '.
+ generate a '
+\family typewriter 
+ljmp .
+\family default 
+'.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -7391,7 +7345,14 @@ Pointer declaration examples:
 
 
 \family typewriter 
-/* pointer physically in xternal ram pointing to object in internal ram
+/* pointer physically in internal ram pointing to object in external ram
+ */ 
+\newline 
+xdata unsigned char * data p;
+\newline 
+
+\newline 
+/* pointer physically in external ram pointing to object in internal ram
  */ 
 \newline 
 data unsigned char * xdata p;
@@ -8216,8 +8177,8 @@ Interrupt numbers and the corresponding address & descriptions for the Standard
 <lyxtabular version="3" rows="7" columns="3">
 <features>
 <column alignment="center" valignment="top" leftline="true" width="0in">
-<column alignment="center" valignment="top" leftline="true" width="0in">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0in">
+<column alignment="left" valignment="top" leftline="true" width="0in">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0in">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -8931,6 +8892,11 @@ It is most efficient if your ISR calls no other functions.
 \layout Subsection
 
 Startup Code
+\begin_inset LatexCommand \label{sub:Startup-Code}
+
+\end_inset 
+
+
 \begin_inset LatexCommand \index{Startup code}
 
 \end_inset 
@@ -9687,8 +9653,8 @@ For signed & unsigned int (16 bit) and long (32 bit) variables, division,
 \begin_inset  Tabular
 <lyxtabular version="3" rows="11" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="left" valignment="top" leftline="true" width="0">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -9981,8 +9947,8 @@ SDCC supports IEEE (single precision 4 bytes) floating point numbers.The
 \begin_inset  Tabular
 <lyxtabular version="3" rows="17" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="left" valignment="top" leftline="true" width="0">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -11028,8 +10994,8 @@ The compiler creates the following #defines
 \begin_inset  Tabular
 <lyxtabular version="3" rows="10" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="left" valignment="top" leftline="true" width="0">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -12594,7 +12560,12 @@ The 8051 family of microcontrollers have a minimum of 128 bytes of internal
 - Bytes 00-1F - 32 bytes to hold up to 4 banks of the registers R0 to R7,
  
 \newline 
-- Bytes 20-2F - 16 bytes to hold 128 bit variables and, 
+- Bytes 20-2F - 16 bytes to hold 128 bit
+\begin_inset LatexCommand \index{bit}
+
+\end_inset 
+
+ variables and, 
 \newline 
 - Bytes 30-7F - 80 bytes for general purpose use.
 \newline 
@@ -12606,16 +12577,31 @@ Additionally some members of the MCS51 family may have up to 128 bytes of
 \emph on 
 idata
 \emph default 
+
+\begin_inset LatexCommand \index{idata}
+
+\end_inset 
+
 ).
  Furthermore, some chips may have some built in external memory (
 \emph on 
 xdata
 \emph default 
+
+\begin_inset LatexCommand \index{xdata}
+
+\end_inset 
+
 ) which should not be confused with the internal, directly addressable RAM
  memory (
 \emph on 
 data
 \emph default 
+
+\begin_inset LatexCommand \index{data}
+
+\end_inset 
+
 ).
  Sometimes this built in 
 \emph on 
@@ -12820,9 +12806,9 @@ Tools
 \begin_inset  Tabular
 <lyxtabular version="3" rows="12" columns="3">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -13228,9 +13214,9 @@ Related open source tools
 \begin_inset  Tabular
 <lyxtabular version="3" rows="8" columns="3">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="block" valignment="top" leftline="true" width="30line%">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" width="30line%">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -13520,9 +13506,9 @@ Related documentation / recommended reading
 \begin_inset  Tabular
 <lyxtabular version="3" rows="5" columns="3">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="block" valignment="top" leftline="true" width="30line%">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" width="30line%">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -13716,7 +13702,7 @@ Support
 
 SDCC has grown to be a large project.
  The compiler alone (without the preprocessor, assembler and linker) is
- about 40,000 lines of code (blank stripped).
+ well over 100,000 lines of code (blank stripped).
  The open source nature of this project is a key to its continued growth
  and support.
  You gain the benefit and support of many active software developers and
@@ -14701,7 +14687,7 @@ case 3: ...
 
 Both the above switch statements will be implemented using a jump-table.
  The example to the right side is slightly more efficient as the check for
- the lower bound of the jump-table is not needed.
+ the lower boundary of the jump-table is not needed.
 \end_deeper 
 \layout Itemize
 
@@ -14804,18 +14790,21 @@ switch (i) {
 \newline 
 \SpecialChar ~
 \SpecialChar ~
-case 9: \SpecialChar ~
+case 9:\SpecialChar ~
+\SpecialChar ~
 ...
  
 \newline 
 \SpecialChar ~
 \SpecialChar ~
-case 10: ...
+case 10:\SpecialChar ~
+...
  
 \newline 
 \SpecialChar ~
 \SpecialChar ~
-case 11: ...
+case 11:\SpecialChar ~
+...
  
 \newline 
 \SpecialChar ~
@@ -14881,13 +14870,16 @@ generates the following code:
 
 
 \family typewriter 
-mov a,_i 
+mov\SpecialChar ~
+ a,_i 
 \newline 
 swap a 
 \newline 
-anl a,#0x0f 
+anl\SpecialChar ~
+ a,#0x0f 
 \newline 
-mov _i,a
+mov\SpecialChar ~
+ _i,a
 \layout Standard
 
 In general SDCC will never setup a loop if the shift count is known.
@@ -14932,7 +14924,17 @@ mov\SpecialChar ~
 _i,a
 \layout Standard
 
-Note that SDCC stores numbers in little-endian format (i.e.
+Note that SDCC stores numbers in little-endian
+\begin_inset LatexCommand \index{little-endian}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{Endianness}
+
+\end_inset 
+
+ format (i.e.
  lowest order first).
 \layout Subsubsection
 
@@ -15629,8 +15631,11 @@ LGPL
 \layout Comment
 
 license statements for the libraries are missing.
- sdcc/device/lib/ser_ir.c f.e.
- comes with a GPL (as opposed to LGPL) License - this will not be liberal
+ sdcc/device/lib/ser_ir.c
+\layout Comment
+
+or _decdptr f.e.
+ come with a GPL (as opposed to LGPL) License - this will not be liberal
  enough for many embedded programmers.
 \layout Subsection
 
@@ -15652,8 +15657,23 @@ External Stack
 
 \layout Standard
 
-The external stack is located at the start of the external ram segment,
- and is 256 bytes in size.
+The external stack (-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-xstack option
+\begin_inset LatexCommand \index{-\/-xstack}
+
+\end_inset 
+
+) is located at the start of the external ram segment, and is 256 bytes
+ in size.
  When -
 \begin_inset ERT
 status Collapsed
@@ -15677,9 +15697,14 @@ status Collapsed
 /
 \end_inset 
 
--stack-auto option, all parameters and local variables are allocated on
- the external stack (note support libraries will need to be recompiled with
- the same options).
+-stack-auto
+\begin_inset LatexCommand \index{-\/-stack-auto}
+
+\end_inset 
+
+ option, all parameters and local variables are allocated on the external
+ stack (note support libraries will need to be recompiled with the same
+ options).
 \layout Standard
 
 The compiler outputs the higher order address byte of the external ram segment
@@ -15886,6 +15911,62 @@ Having said that the industry standard is 10, you should be aware that in
 \layout Subsection
 
 Other Processors
+\layout Subsubsection
+
+MCS51 variants
+\begin_inset LatexCommand \index{MCS51 variants}
+
+\end_inset 
+
+
+\layout Standard
+
+MCS51 processors are available from many vendors and come in many different
+ flavours.
+ While they might differ considerably in respect to Special Function Registers
+ the core MCS51 is usually not modified or is kept compatible.
+ 
+\layout Subsubsection*
+
+pdata access by SFR 
+\layout Standard
+
+With the upcome of devices with internal xdata and flash memory devices
+ using port P2 as dedicated I/O port is becoming more popular.
+ Switching the high byte for pdata
+\begin_inset LatexCommand \index{pdata}
+
+\end_inset 
+
+ access which was formerly done by port P2 is then achieved by a Special
+ Function Register.
+ In well-established MCS51 tradition the address of this 
+\emph on 
+sfr
+\emph default 
+ is where the chip designers decided to put it.
+ As pdata addressing is used in the startup code for the initialization
+ of xdata variables a separate startup code should be used as described
+ in section 
+\begin_inset LatexCommand \ref{sub:Startup-Code}
+
+\end_inset 
+
+.
+\layout Subsubsection*
+
+Other Features available by SFR
+\layout Standard
+
+Some MCS51 variants offer features like Double DPTR
+\begin_inset LatexCommand \index{DPTR}
+
+\end_inset 
+
+, multiple DPTR, decrementing DPTR, 16x16 Multiply.
+ These are currently not used for the MCS51 port.
+ If you absolutely need them you can fall back to inline assembly or submit
+ a patch to SDCC.
 \layout Subsubsection
 
 The Z80 and gbz80 port

@@ -1,3 +1,7 @@
+2004-12-02 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/mcs51/peeph.def: fixed bug #1076940
+
 2004-12-02 Slade Rich <slade_rich AT users.sourceforge.net>
 
 	* device/include/pic/pic16f877.h : added an include file for the PIC16F877 device.

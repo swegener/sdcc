@@ -12,7 +12,7 @@
 /*
  * Extensions: P. Felber
  */
-#include <linux/limits.h>
+#include <limits.h>
 
 #define	VERSION	"V01.75"
 

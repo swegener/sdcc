@@ -1772,8 +1772,3 @@ replace {
 	mov     dp%1,a
         mov     dps, #0x01
 }
-replace {
-	mov	(%1 + %2 + 3),((%2 + %1) + %3)
-} by {
-	; Peephole 223 remove redundant move
-}

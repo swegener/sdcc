@@ -460,27 +460,29 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool useDP2)
       if (_G.accInUse)
 	emitcode ("push", "acc");
 
-      emitcode ("mov", "a,_bp");
-      emitcode ("add", "a,#0x%02x",
-		((sym->stack < 0) ?
-		 ((char) (sym->stack - _G.nRegsSaved)) :
-		 ((char) sym->stack)) & 0xff);
-
-      if (useDP2)
-	{
+      emitcode ("mov", "a,_bpx");
+      emitcode ("clr","c");
+      emitcode ("subb", "a,#0x%02x",
+		-((sym->stack < 0) ?
+		  ((short) (sym->stack - _G.nRegsSaved)) :
+		  ((short) sym->stack)) & 0xff);
+      emitcode ("mov","b,a");
+      emitcode ("mov","a,#0x%02x",(-((sym->stack < 0) ?
+				     ((short) (sym->stack - _G.nRegsSaved)) :
+				     ((short) sym->stack)) >> 8) & 0xff);
+      emitcode ("subb","a,_bpx+1");
+      if (useDP2) {
 	  if (options.model == MODEL_FLAT24)
-	    emitcode ("mov", "dpx1,#0x40");
+	      emitcode ("mov", "dpx1,#0x40");
 	  TR_DPTR("#2");
-	  emitcode ("mov", "dph1,#0x00");
-	  emitcode ("mov", "dpl1, a");
-	}
-      else
-	{
+	  emitcode ("mov", "dph1,a");
+	  emitcode ("mov", "dpl1,b");
+      } else {
 	  if (options.model == MODEL_FLAT24)
- 	    emitcode ("mov", "dpx,#0x40");
-	  emitcode ("mov", "dph,#0x00");
-	  emitcode ("mov", "dpl, a");
-	}
+	      emitcode ("mov", "dpx,#0x40");
+	  emitcode ("mov", "dph,a");
+	  emitcode ("mov", "dpl,b");
+      }
 
       if (_G.accInUse)
 	emitcode ("pop", "acc");
@@ -2353,19 +2355,26 @@ genCall (iCode * ic)
 
   /* adjust the stack for parameters if
      required */
-  if (ic->parmBytes)
-    {
-      int i;
-      if (ic->parmBytes > 3)
-	{
-	  emitcode ("mov", "a,%s", spname);
-	  emitcode ("add", "a,#0x%02x", (-ic->parmBytes) & 0xff);
-	  emitcode ("mov", "%s,a", spname);
-	}
-      else
-	for (i = 0; i < ic->parmBytes; i++)
-	  emitcode ("dec", "%s", spname);
-    }
+  if (ic->parmBytes) {
+      if (options.stack10bit) {
+	  emitcode ("clr","c");
+	  emitcode ("mov","a,sp");
+	  emitcode ("subb","a,#0x%02x",ic->parmBytes & 0xff);
+	  emitcode ("mov","sp,a");
+	  emitcode ("mov","a,#0x%02x",(ic->parmBytes >> 8) & 0xff);
+	  emitcode ("subb","a,_ESP");
+	  emitcode ("mov","_ESP,a");	  
+      } else {
+	  int i;
+	  if (ic->parmBytes > 3) {
+	      emitcode ("mov", "a,%s", spname);
+	      emitcode ("add", "a,#0x%02x", (-ic->parmBytes) & 0xff);
+	      emitcode ("mov", "%s,a", spname);
+	  } else
+	      for (i = 0; i < ic->parmBytes; i++)
+		  emitcode ("dec", "%s", spname);
+      }
+  }
 
   /* if we hade saved some registers then unsave them */
   if (ic->regsSaved && !IFFUNC_CALLEESAVES(dtype))
@@ -2789,44 +2798,54 @@ genFunction (iCode * ic)
       emitcode ("mov", "psw,#0x%02x", (FUNC_REGBANK (sym->type) << 3) & 0x00ff);
     }
 
-  if (IFFUNC_ISREENT (sym->type) || options.stackAuto)
-    {
-
-      if (options.useXstack)
-	{
-	  emitcode ("mov", "r0,%s", spname);
-	  emitcode ("mov", "a,_bp");
-	  emitcode ("movx", "@r0,a");
-	  emitcode ("inc", "%s", spname);
-	}
-      else
-	{
-	  /* set up the stack */
-	  emitcode ("push", "_bp");	/* save the callers stack  */
-	}
-      emitcode ("mov", "_bp,%s", spname);
-    }
+  if (IFFUNC_ISREENT (sym->type) || options.stackAuto) {
+      if (options.stack10bit) {
+	  emitcode ("push","_bpx");
+	  emitcode ("push","_bpx+1");
+	  emitcode ("mov","_bpx,%s",spname);
+	  emitcode ("mov","_bpx+1,_ESP");
+	  emitcode ("anl","_bpx+1,#3");
+      } else {
+	  if (options.useXstack) {
+	      emitcode ("mov", "r0,%s", spname);
+	      emitcode ("mov", "a,_bp");
+	      emitcode ("movx", "@r0,a");
+	      emitcode ("inc", "%s", spname);
+	  } else {
+	      /* set up the stack */
+	      emitcode ("push", "_bp");	/* save the callers stack  */
+	  }
+	  emitcode ("mov", "_bp,%s", spname);
+      }
+  }
 
   /* adjust the stack for the function */
-  if (sym->stack)
-    {
-
+  if (sym->stack) {
       int i = sym->stack;
-      if (i > 256)
-	werror (W_STACK_OVERFLOW, sym->name);
-
-      if (i > 3 && sym->recvSize < 4)
-	{
-
-	  emitcode ("mov", "a,sp");
-	  emitcode ("add", "a,#0x%02x", ((char) sym->stack & 0xff));
-	  emitcode ("mov", "sp,a");
-
-	}
-      else
-	while (i--)
-	  emitcode ("inc", "sp");
-    }
+      if (options.stack10bit) {
+	  if ( i > 1024) werror (W_STACK_OVERFLOW, sym->name);
+	  assert (sym->recvSize <= 4);
+	  emitcode ("mov","a,sp");
+	  emitcode ("add","a,#0x%02x", ((short) sym->stack & 0xff));
+	  emitcode ("mov","sp,a");
+	  emitcode ("mov","a,_ESP");
+	  emitcode ("addc","a,0x%02x", (((short) sym->stack) >> 8) & 0xff);
+	  emitcode ("mov","_ESP,a");
+      } else {
+	  if (i > 256)
+	      werror (W_STACK_OVERFLOW, sym->name);
+	  
+	  if (i > 3 && sym->recvSize < 4) {
+	      
+	      emitcode ("mov", "a,sp");
+	      emitcode ("add", "a,#0x%02x", ((char) sym->stack & 0xff));
+	      emitcode ("mov", "sp,a");
+	      
+	  } else
+	      while (i--)
+		  emitcode ("inc", "sp");
+      }
+  }
 
   if (sym->xstack)
     {
@@ -2854,36 +2873,40 @@ genEndFunction (iCode * ic)
       return;
   }
 
-  if (IFFUNC_ISREENT (sym->type) || options.stackAuto)
-    {
-      emitcode ("mov", "%s,_bp", spname);
-    }
+  if (IFFUNC_ISREENT (sym->type) || options.stackAuto) {
+      if (options.stack10bit) {
+	  emitcode ("mov", "sp,_bpx", spname);
+	  emitcode ("mov", "_ESP,_bpx+1", spname);
+      } else {
+	  emitcode ("mov", "%s,_bp", spname);
+      }
+  }
 
   /* if use external stack but some variables were
      added to the local stack then decrement the
      local stack */
-  if (options.useXstack && sym->stack)
-    {
+  if (options.useXstack && sym->stack) {
       emitcode ("mov", "a,sp");
       emitcode ("add", "a,#0x%02x", ((char) -sym->stack) & 0xff);
       emitcode ("mov", "sp,a");
-    }
+  }
 
 
-  if ((IFFUNC_ISREENT (sym->type) || options.stackAuto))
-    {
-      if (options.useXstack)
-	{
+  if ((IFFUNC_ISREENT (sym->type) || options.stackAuto)) {
+      if (options.useXstack) {
 	  emitcode ("mov", "r0,%s", spname);
 	  emitcode ("movx", "a,@r0");
 	  emitcode ("mov", "_bp,a");
 	  emitcode ("dec", "%s", spname);
-	}
-      else
-	{
-	  emitcode ("pop", "_bp");
-	}
-    }
+      } else {
+	  if (options.stack10bit) {
+	      emitcode ("pop", "_bpx+1");
+	      emitcode ("pop", "_bpx");
+	  } else {
+	      emitcode ("pop", "_bp");
+	  }
+      }
+  }
 
   /* restore the register bank  */
   if (FUNC_REGBANK (sym->type) || IFFUNC_ISISR (sym->type))
@@ -3409,9 +3432,10 @@ adjustArithmeticResult (iCode * ic)
 // that the IC_RESULT operand is not aopOp'd.
 #define AOP_OP_3_NOFATAL(ic, rc) \
     aopOp (IC_RIGHT(ic),ic,FALSE, FALSE); \
-    aopOp (IC_LEFT(ic),ic,FALSE, (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR)); \
+    aopOp (IC_LEFT(ic),ic,FALSE, (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR) || \
+                                  (OP_SYMBOL(IC_RESULT(ic))->ruonly)); \
     if (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR2 && \
-        isOperandInFarSpace(IC_RESULT(ic))) \
+        (isOperandInFarSpace(IC_RESULT(ic)) || OP_SYMBOL(IC_RESULT(ic))->ruonly )) \
     { \
        /* No can do; DPTR & DPTR2 in use, and we need another. */ \
        rc = TRUE; \
@@ -3485,7 +3509,22 @@ genPlus (iCode * ic)
   D (emitcode (";", "genPlus "););
 
   /* special cases :- */
-
+  if (isOperandEqual(IC_LEFT(ic),IC_RESULT(ic)) &&
+      isOperandLiteral(IC_RIGHT(ic)) && OP_SYMBOL(IC_RESULT(ic))->ruonly) {
+      aopOp (IC_RIGHT (ic), ic, TRUE, FALSE);
+      size = floatFromVal (AOP (IC_RIGHT(ic))->aopu.aop_lit);
+      while (size--) emitcode ("inc","dptr");
+      freeAsmop (IC_RIGHT (ic), NULL, ic, FALSE);
+      return ;
+  }
+  if ( IS_SYMOP(IC_LEFT(ic)) && 
+       OP_SYMBOL(IC_LEFT(ic))->remat &&
+       isOperandInFarSpace(IC_RIGHT(ic))) {
+      operand *op = IC_RIGHT(ic);
+      IC_RIGHT(ic) = IC_LEFT(ic);
+      IC_LEFT(ic) = op;
+  }
+		
   AOP_OP_3_NOFATAL (ic, pushResult);
   if (pushResult)
     {
@@ -5397,18 +5436,20 @@ hasInc (operand *op, iCode *ic)
   if (IS_BITVAR(retype)||!IS_PTR(type)) return NULL;
   isize = getSize(type->next);
   while (lic) {
-    /* if operand of the form op = op + <sizeof *op> */
-    if (lic->op == '+' && isOperandEqual(IC_LEFT(lic),op) &&
-	isOperandEqual(IC_RESULT(lic),op) && 
-	isOperandLiteral(IC_RIGHT(lic)) &&
-	operandLitValue(IC_RIGHT(lic)) == isize) {
-      return lic;
-    }
-    /* if the operand used or deffed */
-    if (bitVectBitValue(OP_USES(op),lic->key) || (unsigned) lic->defKey == op->key) {
-      return NULL;
-    }
-    lic = lic->next;
+      /* if operand of the form op = op + <sizeof *op> */
+      if (lic->op == '+' && isOperandEqual(IC_LEFT(lic),op) &&
+	  isOperandEqual(IC_RESULT(lic),op) && 
+	  isOperandLiteral(IC_RIGHT(lic)) &&
+	  operandLitValue(IC_RIGHT(lic)) == isize) {
+	  return lic;
+      }
+      /* if the operand used or deffed */
+      if (bitVectBitValue(OP_USES(op),lic->key) || (unsigned) lic->defKey == op->key) {
+	  return NULL;
+      }
+      /* if GOTO or IFX */
+      if (lic->op == IFX || lic->op == GOTO) break;
+      lic = lic->next;
   }
   return NULL;
 }
@@ -8826,7 +8867,6 @@ genFarPointerGet (operand * left,
 	}
     }
   /* so dptr know contains the address */
-  freeAsmop (left, NULL, ic, TRUE);
   aopOp (result, ic, FALSE, TRUE);
 
   /* if bit then unpack */
@@ -8858,8 +8898,14 @@ genFarPointerGet (operand * left,
     if (options.model == MODEL_FLAT24)
 	    aopPut ( AOP (left), "dpx", 2);
     pi->generated = 1;
+  } else if (OP_SYMBOL(left)->ruonly && AOP_SIZE(result) > 1 &&
+	     (OP_SYMBOL (left)->liveTo > ic->seq || ic->depth)) {
+      
+      size = AOP_SIZE (result) - 1;
+      while (size--) emitcode ("lcall","__decdptr");
   }
 
+  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
 }
 
@@ -8935,13 +8981,18 @@ emitcodePointerGet (operand * left,
       _endLazyDPSEvaluation ();
     }
   if (pi && AOP_TYPE (left) != AOP_IMMD) {
-    aopPut ( AOP (left), "dpl", 0);
-    aopPut ( AOP (left), "dph", 1);
-    if (options.model == MODEL_FLAT24)
-	    aopPut ( AOP (left), "dpx", 2);
-    pi->generated = 1;
+      aopPut ( AOP (left), "dpl", 0);
+      aopPut ( AOP (left), "dph", 1);
+      if (options.model == MODEL_FLAT24)
+	  aopPut ( AOP (left), "dpx", 2);
+      pi->generated = 1;
+  } else if (OP_SYMBOL(left)->ruonly && AOP_SIZE(result) > 1 &&
+	     (OP_SYMBOL (left)->liveTo > ic->seq || ic->depth)) {
+      
+      size = AOP_SIZE (result) - 1;
+      while (size--) emitcode ("lcall","__decdptr");
   }
-
+  
   freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
 }
@@ -9033,11 +9084,17 @@ genGenPointerGet (operand * left,
     aopPut ( AOP (left), "dpl", 0);
     aopPut ( AOP (left), "dph", 1);
     if (options.model == MODEL_FLAT24) {
-	    aopPut ( AOP (left), "dpx", 2);
-	    aopPut ( AOP (left), "b", 3);	
+	aopPut ( AOP (left), "dpx", 2);
+	aopPut ( AOP (left), "b", 3);	
     } else  aopPut ( AOP (left), "b", 2);	
     pi->generated = 1;
+  } else if (OP_SYMBOL(left)->ruonly && AOP_SIZE(result) > 1 &&
+	     (OP_SYMBOL (left)->liveTo > ic->seq || ic->depth)) {
+      
+      size = AOP_SIZE (result) - 1;
+      while (size--) emitcode ("lcall","__decdptr");
   }
+
   freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
 }
@@ -9577,11 +9634,16 @@ genFarPointerSet (operand * right,
     }
 
   if (pi && AOP_TYPE (result) != AOP_IMMD) {
-    aopPut (AOP(result),"dpl",0);
-    aopPut (AOP(result),"dph",1);
-    if (options.model == MODEL_FLAT24)
-	aopPut (AOP(result),"dpx",2);
-    pi->generated=1;
+      aopPut (AOP(result),"dpl",0);
+      aopPut (AOP(result),"dph",1);
+      if (options.model == MODEL_FLAT24)
+	  aopPut (AOP(result),"dpx",2);
+      pi->generated=1;
+  } else if (OP_SYMBOL(result)->ruonly && AOP_SIZE(right) > 1 &&
+	     (OP_SYMBOL (result)->liveTo > ic->seq || ic->depth)) {
+      
+      size = AOP_SIZE (right) - 1;
+      while (size--) emitcode ("lcall","__decdptr");
   }
   freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, TRUE);
@@ -9655,15 +9717,20 @@ genGenPointerSet (operand * right,
     }
 
   if (pi && AOP_TYPE (result) != AOP_IMMD) {
-    aopPut (AOP(result),"dpl",0);
-    aopPut (AOP(result),"dph",1);
-    if (options.model == MODEL_FLAT24) {
-	aopPut (AOP(result),"dpx",2);
-	aopPut (AOP(result),"b",3);
-    } else {
-	aopPut (AOP(result),"b",2);
-    }
-    pi->generated=1;
+      aopPut (AOP(result),"dpl",0);
+      aopPut (AOP(result),"dph",1);
+      if (options.model == MODEL_FLAT24) {
+	  aopPut (AOP(result),"dpx",2);
+	  aopPut (AOP(result),"b",3);
+      } else {
+	  aopPut (AOP(result),"b",2);
+      }
+      pi->generated=1;
+  } else if (OP_SYMBOL(result)->ruonly && AOP_SIZE(right) > 1 &&
+	     (OP_SYMBOL (result)->liveTo > ic->seq || ic->depth)) {
+      
+      size = AOP_SIZE (right) - 1;
+      while (size--) emitcode ("lcall","__decdptr");
   }
   freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, TRUE);
@@ -9786,47 +9853,52 @@ genAddrOf (iCode * ic)
   /* if the operand is on the stack then we
      need to get the stack offset of this
      variable */
-  if (sym->onStack)
-    {
-      /* if it has an offset then we need to compute
-         it */
-      if (sym->stack)
-	{
-	  emitcode ("mov", "a,_bp");
-	  emitcode ("add", "a,#0x%02x", ((char) sym->stack & 0xff));
-	  aopPut (AOP (IC_RESULT (ic)), "a", 0);
-	}
-      else
-	{
-	  /* we can just move _bp */
-	  aopPut (AOP (IC_RESULT (ic)), "_bp", 0);
-	}
-      /* fill the result with zero */
-      size = AOP_SIZE (IC_RESULT (ic)) - 1;
+  if (sym->onStack) {
+      
+      /* if 10 bit stack */
+      if (options.stack10bit) {
+	  /* if it has an offset then we need to compute it */
+	  if (sym->stack) {
+	      emitcode ("mov", "a,_bpx");
+	      emitcode ("add", "a,#0x%02x", ((char) sym->stack & 0xff));
+	      emitcode ("mov", "b,a");
+	      emitcode ("mov", "a,_bpx+1");
+	      emitcode ("addc","a,#0x%02x", (((short) sym->stack) >> 8) & 0xff);
+	      aopPut (AOP (IC_RESULT (ic)), "b", 0);
+	      aopPut (AOP (IC_RESULT (ic)), "a", 1);
+	      aopPut (AOP (IC_RESULT (ic)), "#0x40", 2);
+	  } else {
+	      /* we can just move _bp */
+	      aopPut (AOP (IC_RESULT (ic)), "_bpx", 0);
+	      aopPut (AOP (IC_RESULT (ic)), "_bpx+1", 1);
+	      aopPut (AOP (IC_RESULT (ic)), "#0x40", 2);
+	  }	  
+      } else {
+	  /* if it has an offset then we need to compute it */
+	  if (sym->stack) {
+	      emitcode ("mov", "a,_bp");
+	      emitcode ("add", "a,#0x%02x", ((char) sym->stack & 0xff));
+	      aopPut (AOP (IC_RESULT (ic)), "a", 0);
+	  } else {
+	      /* we can just move _bp */
+	      aopPut (AOP (IC_RESULT (ic)), "_bp", 0);
+	  }
+	  /* fill the result with zero */
+	  size = AOP_SIZE (IC_RESULT (ic)) - 1;
+	  
+	  
+	  if (options.stack10bit && size < (FPTRSIZE - 1)) {
+	      fprintf (stderr,
+		       "*** warning: pointer to stack var truncated.\n");
+	  }
 
-
-      if (options.stack10bit && size < (FPTRSIZE - 1))
-	{
-	  fprintf (stderr,
-		   "*** warning: pointer to stack var truncated.\n");
-	}
-
-      offset = 1;
-      while (size--)
-	{
-	  /* Yuck! */
-	  if (options.stack10bit && offset == 2)
-	    {
-	      aopPut (AOP (IC_RESULT (ic)), "#0x40", offset++);
-	    }
-	  else
-	    {
+	  offset = 1;
+	  while (size--) {
 	      aopPut (AOP (IC_RESULT (ic)), zero, offset++);
-	    }
-	}
-
+	  }      
+      }
       goto release;
-    }
+  }
 
   /* object not on stack then we need the name */
   size = AOP_SIZE (IC_RESULT (ic));

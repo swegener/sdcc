@@ -42,6 +42,7 @@ static struct
     bitVect *spiltSet;
     set *stackSpil;
     bitVect *regAssigned;
+    bitVect *totRegAssigned;    /* final set of LRs that got into registers */
     short blockSpil;
     int slocNum;
     bitVect *funcrUsed;		/* registers used in a function */
@@ -78,6 +79,7 @@ regs regs390[] =
 };
 int ds390_nRegs = 13;
 static void spillThis (symbol *);
+static void freeAllRegs ();
 
 /*-----------------------------------------------------------------*/
 /* allocReg - allocates register of given type                     */
@@ -140,6 +142,15 @@ static void
 freeReg (regs * reg)
 {
   reg->isFree = 1;
+}
+
+/*-----------------------------------------------------------------*/
+/* useReg - marks a register  as used                              */
+/*-----------------------------------------------------------------*/
+static void
+useReg (regs * reg)
+{
+  reg->isFree = 0;
 }
 
 
@@ -482,9 +493,10 @@ createStackSpil (symbol * sym)
   if (applyToSet (_G.stackSpil, isFree, &sloc, sym))
     {
       /* found a free one : just update & return */
-      sym->usl.spillLoc = sloc;
+      sym->usl.spillLoc = sloc;      
       sym->stackSpil = 1;
       sloc->isFree = 0;
+      sloc->allocreq++;
       addSetHead (&sloc->usl.itmpStack, sym);
       return sym;
     }
@@ -596,10 +608,11 @@ spillThis (symbol * sym)
 
 
   /* mark it has spilt & put it in the spilt set */
-  sym->isspilt = 1;
+  sym->isspilt = sym->spillA = 1;
   _G.spiltSet = bitVectSetBit (_G.spiltSet, sym->key);
 
   bitVectUnSetBit (_G.regAssigned, sym->key);
+  bitVectUnSetBit (_G.totRegAssigned, sym->key);
 
   for (i = 0; i < sym->nRegs; i++)
 
@@ -619,7 +632,7 @@ spillThis (symbol * sym)
     }
 
   if (sym->usl.spillLoc && !sym->remat)
-    sym->usl.spillLoc->allocreq = 1;
+    sym->usl.spillLoc->allocreq++;
   return;
 }
 
@@ -653,7 +666,7 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
 			   sym->usl.spillLoc->name));
       sym->spildir = 1;
       /* mark it as allocation required */
-      sym->usl.spillLoc->allocreq = 1;
+      sym->usl.spillLoc->allocreq++;
       return sym;
     }
 
@@ -698,7 +711,7 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
 
       sym = leastUsedLR (selectS);
       /* mark this as allocation required */
-      sym->usl.spillLoc->allocreq = 1;
+      sym->usl.spillLoc->allocreq++;
       return sym;
     }
 
@@ -707,7 +720,7 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
     {
 
       sym = leastUsedLR (selectS);
-      sym->usl.spillLoc->allocreq = 1;
+      sym->usl.spillLoc->allocreq++;
       return sym;
     }
 
@@ -719,7 +732,7 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
 
       /* return a created spil location */
       sym = createStackSpil (leastUsedLR (selectS));
-      sym->usl.spillLoc->allocreq = 1;
+      sym->usl.spillLoc->allocreq++;
       return sym;
     }
 
@@ -743,12 +756,13 @@ spilSomething (iCode * ic, eBBlock * ebp, symbol * forSym)
   ssym = selectSpil (ic, ebp, forSym);
 
   /* mark it as spilt */
-  ssym->isspilt = 1;
+  ssym->isspilt = ssym->spillA = 1;
   _G.spiltSet = bitVectSetBit (_G.spiltSet, ssym->key);
 
   /* mark it as not register assigned &
      take it away from the set */
   bitVectUnSetBit (_G.regAssigned, ssym->key);
+  bitVectUnSetBit (_G.totRegAssigned, ssym->key);
 
   /* mark the registers as free */
   for (i = 0; i < ssym->nRegs; i++)
@@ -850,6 +864,41 @@ tryAgain:
 }
 
 /*-----------------------------------------------------------------*/
+/* getRegPtrNoSpil - get it cannot split                           */
+/*-----------------------------------------------------------------*/
+static regs *getRegPtrNoSpil()
+{
+  regs *reg;
+
+  /* try for a ptr type */
+  if ((reg = allocReg (REG_PTR)))
+    return reg;
+
+  /* try for gpr type */
+  if ((reg = allocReg (REG_GPR)))
+    return reg;
+
+  assert(0);
+}
+
+/*-----------------------------------------------------------------*/
+/* getRegGprNoSpil - get it cannot split                           */
+/*-----------------------------------------------------------------*/
+static regs *getRegGprNoSpil()
+{
+
+  regs *reg;
+  if ((reg = allocReg (REG_GPR)))
+    return reg;
+
+  if (!ds390_ptrRegReq)
+    if ((reg = allocReg (REG_PTR)))
+      return reg;
+
+  assert(0);
+}
+
+/*-----------------------------------------------------------------*/
 /* symHasReg - symbol has a given register                         */
 /*-----------------------------------------------------------------*/
 static bool
@@ -948,6 +997,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 		  result->regs[i] = getRegGpr (ic, ebp, result);
 
 	      _G.regAssigned = bitVectSetBit (_G.regAssigned, result->key);
+	      _G.totRegAssigned = bitVectSetBit (_G.totRegAssigned, result->key);
 
 	    }
 
@@ -977,10 +1027,11 @@ reassignLR (operand * op)
   int i;
 
   /* not spilt any more */
-  sym->isspilt = sym->blockSpil = sym->remainSpil = 0;
+  sym->isspilt = sym->spillA = sym->blockSpil = sym->remainSpil = 0;
   bitVectUnSetBit (_G.spiltSet, sym->key);
 
   _G.regAssigned = bitVectSetBit (_G.regAssigned, sym->key);
+  _G.totRegAssigned = bitVectSetBit (_G.totRegAssigned, sym->key);
 
   _G.blockSpil--;
 
@@ -1030,15 +1081,16 @@ willCauseSpill (int nr, int rt)
 /* ult and operand, if this happens make sure they are in the same */
 /* position as the operand otherwise chaos results                 */
 /*-----------------------------------------------------------------*/
-static void
+static int
 positionRegs (symbol * result, symbol * opsym, int lineno)
 {
   int count = min (result->nRegs, opsym->nRegs);
   int i, j = 0, shared = 0;
+  int change = 0;
 
   /* if the result has been spilt then cannot share */
   if (opsym->isspilt)
-    return;
+    return 0;
 again:
   shared = 0;
   /* first make sure that they actually share */
@@ -1059,8 +1111,10 @@ xchgPositions:
       regs *tmp = result->regs[i];
       result->regs[i] = result->regs[j];
       result->regs[j] = tmp;
+      change ++;
       goto again;
     }
+  return change ;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1094,7 +1148,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 	  /* if result is present && is a true symbol */
 	  if (IC_RESULT (ic) && ic->op != IFX &&
 	      IS_TRUE_SYMOP (IC_RESULT (ic)))
-	    OP_SYMBOL (IC_RESULT (ic))->allocreq = 1;
+	    OP_SYMBOL (IC_RESULT (ic))->allocreq++;
 
 	  /* take away registers from live
 	     ranges that end at this instruction */
@@ -1182,6 +1236,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 		}
 	      /* else we assign registers to it */
 	      _G.regAssigned = bitVectSetBit (_G.regAssigned, sym->key);
+	      _G.totRegAssigned = bitVectSetBit (_G.totRegAssigned, sym->key);
 
 	      for (j = 0; j < sym->nRegs; j++)
 		{
@@ -1215,6 +1270,61 @@ serialRegAssign (eBBlock ** ebbs, int count)
 
 	    }
 	}
+    }
+}
+
+/*-----------------------------------------------------------------*/
+/* fillGaps - Try to fill in the Gaps left by Pass1                */
+/*-----------------------------------------------------------------*/
+static void fillGaps()
+{
+    symbol *sym =NULL;
+    int key =0;    
+    
+    return ; /* NOT YET .. MORE TESTING IN PROGRESS */
+    /* look for livernages that was spilt by the allocator */
+    for (sym = hTabFirstItem(liveRanges,&key) ; sym ; 
+	 sym = hTabNextItem(liveRanges,&key)) {
+
+	int i;
+
+	if (!sym->spillA || !sym->clashes || sym->remat) continue ;
+	
+	/* find the liveRanges this one clashes with, that are
+	   still assigned to registers & mark the registers as used*/
+	for ( i = 0 ; i < sym->clashes->size ; i ++) {
+	    int k;
+	    symbol *clr;
+
+	    if (bitVectBitValue(sym->clashes,i) == 0 ||    /* those that clash with this */
+		bitVectBitValue(_G.totRegAssigned,i) == 0) /* and are still assigned to registers */
+		continue ;
+
+	    assert (clr = hTabItemWithKey(liveRanges,i));
+	 
+	    /* mark these registers as used */
+	    for (k = 0 ; k < clr->nRegs ; k++ ) 
+		useReg(clr->regs[k]);
+	}
+
+	if (willCauseSpill(sym->nRegs,sym->regType)) {
+	    /* NOPE :( clear all registers & and continue */
+	    freeAllRegs();
+	    continue ;
+	}
+
+	/* THERE IS HOPE !!!! */
+	for (i=0; i < sym->nRegs ; i++ ) {
+	    if (sym->regType == REG_PTR)
+		sym->regs[i] = getRegPtrNoSpil ();
+	    else
+		sym->regs[i] = getRegGprNoSpil ();		  
+	}
+	printf("FILLED GAP for %s in function %s\n",sym->name, currFunc ? currFunc->name : "UNKNOWN");
+	_G.totRegAssigned = bitVectSetBit(_G.totRegAssigned,sym->key);
+	sym->isspilt = sym->spillA = 0 ;
+	sym->usl.spillLoc->allocreq--;
+	freeAllRegs();
     }
 }
 
@@ -1896,7 +2006,7 @@ packRegsDPTRuse (iCode * lic, operand * op, eBBlock * ebp)
     sym_link *type, *etype;
     
     if (!IS_SYMOP(op)) return NULL;
-    if (OP_SYMBOL(op)->remat) return NULL; 
+    if (OP_SYMBOL(op)->remat || OP_SYMBOL(op)->ruonly) return NULL; 
 
     /* first check if any overlapping liverange has already been
        assigned to DPTR */
@@ -1928,28 +2038,44 @@ packRegsDPTRuse (iCode * lic, operand * op, eBBlock * ebp)
 
 	/* special case of add with a [remat] */
 	if (ic->op == '+' && 
-	    OP_SYMBOL(IC_LEFT(ic))->remat ) continue ;
+	    OP_SYMBOL(IC_LEFT(ic))->remat &&
+	    !isOperandInFarSpace(IC_RIGHT(ic))) continue ;
+
+	/* special case */
+	/* pointerGet */
+	if (POINTER_GET(ic) && isOperandEqual(IC_RESULT(ic),op) &&
+	    getSize(operandType(IC_LEFT(ic))) > 1) return NULL ;
+
+	if (POINTER_SET(ic) && isOperandEqual(IC_RIGHT(ic),op) &&
+	    getSize(operandType(IC_RESULT(ic))) > 1) return NULL;
 
 	/* general case */
 	if (IC_RESULT(ic) && IS_SYMOP(IC_RESULT(ic)) && 
 	    !isOperandEqual(IC_RESULT(ic),op) &&
 	    (isOperandInFarSpace(IC_RESULT(ic)) || 
+	     OP_SYMBOL(IC_RESULT(ic))->ruonly   ||
 	     OP_SYMBOL(IC_RESULT(ic))->onStack)) return NULL;
 
 	if (IC_RIGHT(ic) && IS_SYMOP(IC_RIGHT(ic)) && 
 	    !isOperandEqual(IC_RIGHT(ic),op) &&
 	    (OP_SYMBOL(IC_RIGHT(ic))->liveTo > ic->seq || 
-	     IS_TRUE_SYMOP(IC_RIGHT(ic))) &&
+	     IS_TRUE_SYMOP(IC_RIGHT(ic))	       ||
+	     OP_SYMBOL(IC_RIGHT(ic))->ruonly) &&
 	    (isOperandInFarSpace(IC_RIGHT(ic)) || 
 	     OP_SYMBOL(IC_RIGHT(ic))->onStack)) return NULL;
 
 	if (IC_LEFT(ic) && IS_SYMOP(IC_LEFT(ic)) && 
 	    !isOperandEqual(IC_LEFT(ic),op) &&
 	    (OP_SYMBOL(IC_LEFT(ic))->liveTo > ic->seq || 
-	     IS_TRUE_SYMOP(IC_LEFT(ic)))&&
+	     IS_TRUE_SYMOP(IC_LEFT(ic))  	      ||
+	     OP_SYMBOL(IC_LEFT(ic))->ruonly) &&
 	    (isOperandInFarSpace(IC_LEFT(ic)) || 
 	     OP_SYMBOL(IC_LEFT(ic))->onStack)) return NULL;
-
+	
+	if (IC_LEFT(ic) && IC_RIGHT(ic) && 
+	    IS_ITEMP(IC_LEFT(ic)) && IS_ITEMP(IC_RIGHT(ic)) &&
+	    isOperandInFarSpace(IC_LEFT(ic)) && isOperandInFarSpace(IC_RIGHT(ic)))
+	    return NULL;
     }
     OP_SYMBOL(op)->ruonly = 1;
     return dic;
@@ -2347,6 +2473,10 @@ packRegisters (eBBlock * ebp)
 	  packRegsDPTRuse (ic, IC_LEFT (ic), ebp);
       }
 
+      if ((ic->op == CALL && getSize(operandType(IC_RESULT(ic))) <= 4)) {
+	  packRegsDPTRuse (ic, IC_RESULT (ic), ebp);	  
+      }
+
       /* if pointer set & left has a size more than
          one and right is not in far space */
       if (POINTER_SET (ic) &&
@@ -2462,7 +2592,10 @@ ds390_assignRegisters (eBBlock ** ebbs, int count)
   iCode *ic;
   int i;
 
-  setToNull ((void *) &_G.funcrUsed);
+  setToNull ((void *) &_G.funcrUsed);  
+  setToNull ((void *) &_G.regAssigned);  
+  setToNull ((void *) &_G.totRegAssigned);  
+  setToNull ((void *) &_G.funcrUsed);  
   ds390_ptrRegReq = _G.stackExtend = _G.dataExtend = 0;
   ds390_nRegs = 18;
   if (options.model != MODEL_FLAT24) options.stack10bit = 0;
@@ -2480,6 +2613,11 @@ ds390_assignRegisters (eBBlock ** ebbs, int count)
 
   /* and serially allocate registers */
   serialRegAssign (ebbs, count);
+
+  ds390_nRegs = 8;
+  freeAllRegs ();
+  fillGaps();
+  ds390_nRegs = 18;
 
   /* if stack was extended then tell the user */
   if (_G.stackExtend)

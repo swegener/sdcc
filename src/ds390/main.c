@@ -105,9 +105,9 @@ _ds390_finaliseOptions (void)
     port->s.fptr_size = 3;
     port->s.gptr_size = 4;
 
-    port->stack.isr_overhead++;	/* Will save dpx on ISR entry. */
+    port->stack.isr_overhead += 2;	/* Will save dpx on ISR entry. */
 
-    port->stack.call_overhead++;	/* This acounts for the extra byte 
+    port->stack.call_overhead += 2;	/* This acounts for the extra byte 
 				 * of return addres on the stack.
 				 * but is ugly. There must be a 
 				 * better way.

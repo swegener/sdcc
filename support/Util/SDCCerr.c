@@ -29,12 +29,7 @@
 #define DEFAULT_ERROR_OUT	stderr
 #endif
 
-static struct {
-    ERROR_LOG_LEVEL logLevel;
-    FILE *out;
-    int style;                        /* 1=MSVC */
-    char disabled[MAX_ERROR_WARNING]; /* 1=warning disabled*/
-} _SDCCERRG;
+struct SDCCERRG _SDCCERRG; 
 
 extern char *filename ;
 extern int lineno ;

@@ -221,6 +221,15 @@ enum _ERROR_LOG_LEVEL {
 
 typedef enum _ERROR_LOG_LEVEL ERROR_LOG_LEVEL;
 
+struct SDCCERRG {
+    ERROR_LOG_LEVEL logLevel;
+    FILE *out;
+    int style;                        /* 1=MSVC */
+    char disabled[MAX_ERROR_WARNING]; /* 1=warning disabled*/
+};
+
+extern struct SDCCERRG _SDCCERRG;
+
 /** Sets the maximum error level to log.
     See MAX_ERROR_LEVEL.  The default is ERROR_LEVEL_ALL.
 */

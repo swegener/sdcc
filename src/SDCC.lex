@@ -430,6 +430,7 @@ enum pragma_id {
 
 STACK_DCL(options_stack, struct options *, SAVE_RESTORE_SIZE)
 STACK_DCL(optimize_stack, struct optimize *, SAVE_RESTORE_SIZE)
+STACK_DCL(SDCCERRG_stack, struct SDCCERRG *, SAVE_RESTORE_SIZE)
 
 /*
  * cloneXxx functions should be updated every time a new set is
@@ -458,12 +459,24 @@ static struct optimize *cloneOptimize(struct optimize *opt)
 {
   struct optimize *new_opt;
 
-  new_opt = Safe_malloc(sizeof (struct options));
+  new_opt = Safe_malloc(sizeof (struct optimize));
 
   /* clone scalar values */
   *new_opt = *opt;
 
   return new_opt;
+}
+
+static struct SDCCERRG *cloneSDCCERRG (struct SDCCERRG *val)
+{
+  struct SDCCERRG *new_val;
+
+  new_val = Safe_malloc(sizeof (struct SDCCERRG));
+
+  /* clone scalar values */
+  *new_val = *val;
+
+  return new_val;
 }
 
 static void copyAndFreeOptions(struct options *dest, struct options *src)
@@ -474,7 +487,7 @@ static void copyAndFreeOptions(struct options *dest, struct options *src)
   /* not implemented yet: */
   /* deleteSet(&dest->olaysSet); */
 
-  /* dopy src to dest */
+  /* copy src to dest */
   *dest = *src;
 
   Safe_free(src);
@@ -482,7 +495,15 @@ static void copyAndFreeOptions(struct options *dest, struct options *src)
 
 static void copyAndFreeOptimize(struct optimize *dest, struct optimize *src)
 {
-  /* dopy src to dest */
+  /* copy src to dest */
+  *dest = *src;
+
+  Safe_free(src);
+}
+
+static void copyAndFreeSDCCERRG(struct SDCCERRG *dest, struct SDCCERRG *src)
+{
+  /* copy src to dest */
   *dest = *src;
 
   Safe_free(src);
@@ -497,6 +518,7 @@ static void doPragma(int op, char *cp)
     {
       STACK_PUSH(options_stack, cloneOptions(&options));
       STACK_PUSH(optimize_stack, cloneOptimize(&optimize));
+      STACK_PUSH(SDCCERRG_stack, cloneSDCCERRG(&_SDCCERRG));
     }
     break;
 
@@ -504,12 +526,16 @@ static void doPragma(int op, char *cp)
     {
       struct options *optionsp;
       struct optimize *optimizep;
+      struct SDCCERRG *sdccerrgp;
 
       optionsp = STACK_POP(options_stack);
       copyAndFreeOptions(&options, optionsp);
 
       optimizep = STACK_POP(optimize_stack);
       copyAndFreeOptimize(&optimize, optimizep);
+
+      sdccerrgp = STACK_POP(SDCCERRG_stack);
+      copyAndFreeSDCCERRG(&_SDCCERRG, sdccerrgp);
     }
     break;
 
@@ -543,6 +569,7 @@ static void doPragma(int op, char *cp)
 
   case P_LESSPEDANTIC:
     options.lessPedantic = 1;
+    setErrorLogLevel(ERROR_LEVEL_WARNING);
     break;
 
   case P_CALLEE_SAVES:

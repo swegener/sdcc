@@ -1,4 +1,14 @@
-2004-02-03 Maarten Brock <sourceforge.brock AT dse.nl>
+2005-02-09 Raphael Neider <rneider AT web.de>
+
+	* src/SDCC.lex(doPragma) : save and restore warning options as well
+	  (also added new stack plus clone- and copyAndFreeSDCCERRG())
+	* have #pragma less_pedantic set the errorlevel to WARNING
+	  (fixes #1117001)
+	* (cloneOptimize) : fixed wrong malloc's size
+	* support/Util/SDCCerr.[ch] : made SDCCERRG globally accessible to
+	  facilitate correct handling of #pragma (save|restore)
+
+2005-02-09 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c: removed non-standard C nameless struct/union
 

@@ -595,6 +595,12 @@ void allocLocal ( symbol *sym  )
 	return  ;
     }
 
+    if ( SPEC_SCLS(sym->etype) == S_DATA  )    {
+	SPEC_OCLS(sym->etype) = (options.noOverlay ? data : overlay );
+	allocIntoSeg(sym)  ;
+	return ;
+    }
+    
     /* again note that we have put it into the overlay segment
        will remove and put into the 'data' segment if required after 
        overlay  analysis has been done */   

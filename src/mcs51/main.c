@@ -320,7 +320,7 @@ instructionSize(char *inst, char *op1, char *op2)
   if (ISINST ("xchd")) return 1;
   if (ISINST ("reti")) return 1;
   if (ISINST ("nop")) return 1;
-  if (ISINST ("acall")) return 1;
+  if (ISINST ("acall")) return 2;
   if (ISINST ("ajmp")) return 2;
 
     
@@ -462,12 +462,12 @@ updateOpRW (asmLineNode *aln, char *op, char *optype)
         aln->regsRead = bitVectSetBit (aln->regsRead, R0_IDX);
       if (!strcmp(op, "@r1"))
         aln->regsRead = bitVectSetBit (aln->regsRead, R1_IDX);
-      if (!strstr(op, "dptr"))
+      if (strstr(op, "dptr"))
 	{
 	  aln->regsRead = bitVectSetBit (aln->regsRead, DPL_IDX);
 	  aln->regsRead = bitVectSetBit (aln->regsRead, DPH_IDX);
 	}
-      if (!strstr(op, "a+"))
+      if (strstr(op, "a+"))
 	aln->regsRead = bitVectSetBit (aln->regsRead, A_IDX);
     }
 }

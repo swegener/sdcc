@@ -1,3 +1,8 @@
+2004-03-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/mcs51/main.c (instructionSize): fixed ACALL size
+	* src/mcs51/main.c (updateOpRW): fixed bug with @dptr, @a+dptr operands
+
 2004-03-01 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/device.c (pic16_dump_section): fixed a bug that allowed

@@ -4,7 +4,7 @@
 
 typedef struct _Foo
 {
-  char sz[100];
+  char sz[90];
 } Foo;
 
 typedef struct _Bar

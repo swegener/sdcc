@@ -840,8 +840,6 @@ bitsForType (sym_link * p)
   /* this is a specifier  */
   switch (DCL_TYPE (p))
     {
-    case FUNCTION:
-      return 2;
     case ARRAY:
       return DCL_ELEM (p) * getSize (p->next) * 8;
     case IPOINTER:
@@ -851,6 +849,7 @@ bitsForType (sym_link * p)
     case EEPPOINTER:
     case FPOINTER:
     case CPOINTER:
+    case FUNCTION:
       return (FPTRSIZE * 8);
     case GPOINTER:
       return (GPTRSIZE * 8);

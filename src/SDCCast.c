@@ -2061,9 +2061,6 @@ decorateType (ast * tree)
 	}
       RRVAL (tree) = 1;
       COPYTYPE (TTYPE (tree), TETYPE (tree), LTYPE (tree)->next);
-      if (IS_PTR(LTYPE(tree))) {
-	      SPEC_CONST (TETYPE (tree)) = DCL_PTR_CONST (LTYPE(tree));
-      }
       return tree;
 
       /*------------------------------------------------------------------*/
@@ -2144,8 +2141,8 @@ decorateType (ast * tree)
       {
 	sym_link *ltc = (tree->right ? RTYPE (tree) : LTYPE (tree));
 	COPYTYPE (TTYPE (tree), TETYPE (tree), ltc);
-	if (!tree->initMode && IS_CONSTANT(TETYPE(tree)))
-	  werror (E_CODE_WRITE, "++/--");
+	if (!tree->initMode && IS_CONSTANT (TTYPE (tree)))
+	  werror (E_CODE_WRITE, tree->opval.op==INC_OP ? "++" : "--");
 
 	if (tree->right)
 	  RLVAL (tree) = 1;
@@ -2241,10 +2238,7 @@ decorateType (ast * tree)
 	  goto errorTreeReturn;
 	}
       if (SPEC_SCLS (tree->left->etype) == S_CODE)
-	{
-	  DCL_TYPE (p) = CPOINTER;
-	  DCL_PTR_CONST (p) = port->mem.code_ro;
-	}
+	DCL_TYPE (p) = CPOINTER;
       else if (SPEC_SCLS (tree->left->etype) == S_XDATA)
 	DCL_TYPE (p) = FPOINTER;
       else if (SPEC_SCLS (tree->left->etype) == S_XSTACK)
@@ -2267,8 +2261,6 @@ decorateType (ast * tree)
       p->next = LTYPE (tree);
       TTYPE (tree) = p;
       TETYPE (tree) = getSpec (TTYPE (tree));
-      DCL_PTR_CONST (p) = SPEC_CONST (TETYPE (tree));
-      DCL_PTR_VOLATILE (p) = SPEC_VOLATILE (TETYPE (tree));
       LLVAL (tree) = 1;
       TLVAL (tree) = 1;
       return tree;
@@ -2401,7 +2393,6 @@ decorateType (ast * tree)
 	  TTYPE (tree) = copyLinkChain ((IS_PTR (LTYPE (tree)) || IS_ARRAY (LTYPE (tree))) ?
 					LTYPE (tree)->next : NULL);
  	  TETYPE (tree) = getSpec (TTYPE (tree));
-	  SPEC_CONST (TETYPE (tree)) = DCL_PTR_CONST (LTYPE(tree));
 	  return tree;
 	}
 
@@ -3099,12 +3090,12 @@ decorateType (ast * tree)
       RRVAL (tree) = 1;
       TETYPE (tree) = getSpec (TTYPE (tree) = LTYPE (tree));
 
-      if (!tree->initMode && IS_CONSTANT (LETYPE (tree)))
-	werror (E_CODE_WRITE, " ");
+      if (!tree->initMode && IS_CONSTANT (LTYPE (tree)))
+	werror (E_CODE_WRITE, *tree->opval.op==MUL_ASSIGN ? "*=" : "/=");
 
       if (LRVAL (tree))
 	{
-	  werror (E_LVALUE_REQUIRED, "*= or /=");
+	  werror (E_LVALUE_REQUIRED, *tree->opval.op==MUL_ASSIGN ? "*=" : "/=");
 	  goto errorTreeReturn;
 	}
       LLVAL (tree) = 1;
@@ -3126,8 +3117,8 @@ decorateType (ast * tree)
       RRVAL (tree) = 1;
       TETYPE (tree) = getSpec (TTYPE (tree) = LTYPE (tree));
 
-      if (!tree->initMode && IS_CONSTANT (LETYPE (tree)))
-	werror (E_CODE_WRITE, " ");
+      if (!tree->initMode && IS_CONSTANT (LTYPE (tree)))
+	werror (E_CODE_WRITE, "&= or |= or ^= or >>= or <<=");
 
       if (LRVAL (tree))
 	{
@@ -3161,8 +3152,8 @@ decorateType (ast * tree)
 			       computeType (LTYPE (tree),
 					    RTYPE (tree)));
 
-      if (!tree->initMode && IS_CONSTANT (LETYPE (tree)))
-	werror (E_CODE_WRITE, " ");
+      if (!tree->initMode && IS_CONSTANT (LTYPE (tree)))
+	werror (E_CODE_WRITE, "-=");
 
       if (LRVAL (tree))
 	{
@@ -3202,8 +3193,8 @@ decorateType (ast * tree)
 			       computeType (LTYPE (tree),
 					    RTYPE (tree)));
 
-      if (!tree->initMode && IS_CONSTANT (LETYPE (tree)))
-	werror (E_CODE_WRITE, " ");
+      if (!tree->initMode && IS_CONSTANT (LTYPE (tree)))
+	werror (E_CODE_WRITE, "+=");
 
       if (LRVAL (tree))
 	{
@@ -3250,8 +3241,8 @@ decorateType (ast * tree)
       RRVAL (tree) = 1;
       LLVAL (tree) = 1;
       if (!tree->initMode ) {
-	if ((IS_SPEC(LETYPE(tree)) && IS_CONSTANT (LETYPE (tree))))
-	  werror (E_CODE_WRITE, " ");
+	if (IS_CONSTANT (LTYPE (tree)))
+	  werror (E_CODE_WRITE, "=");
       }
       if (LRVAL (tree))
 	{
@@ -4426,7 +4417,7 @@ skipall:
 }
 
 
-#define INDENT(x,f) { int i ; for (i=0;i < x; i++) fprintf(f," "); }
+#define INDENT(x,f) { int i ; fprintf (f, "%d:", tree->lineno); for (i=0;i < x; i++) fprintf(f," "); }
 /*-----------------------------------------------------------------*/
 /* ast_print : prints the ast (for debugging purposes)             */
 /*-----------------------------------------------------------------*/
@@ -4916,14 +4907,14 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		ast_print(tree->right,outfile,indent+2);
 		return;
 	case OR_ASSIGN:
-		fprintf(outfile,"ORASS(*=) (%p) type (",tree);
+		fprintf(outfile,"ORASS(|=) (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
 		ast_print(tree->left,outfile,indent+2);
 		ast_print(tree->right,outfile,indent+2);
 		return;
 	case XOR_ASSIGN:
-		fprintf(outfile,"XORASS(*=) (%p) type (",tree);
+		fprintf(outfile,"XORASS(^=) (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
 		ast_print(tree->left,outfile,indent+2);
@@ -4937,7 +4928,7 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		ast_print(tree->right,outfile,indent+2);
 		return;
 	case LEFT_ASSIGN:
-		fprintf(outfile,"LSHFTASS(*=) (%p) type (",tree);
+		fprintf(outfile,"LSHFTASS(<<=) (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
 		ast_print(tree->left,outfile,indent+2);

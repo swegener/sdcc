@@ -347,8 +347,6 @@ pointerTypes (sym_link * ptr, sym_link * type)
      storage class of the type */
   if (IS_SPEC (type))
     {
-      DCL_PTR_CONST (ptr) = SPEC_CONST (type);
-      DCL_PTR_VOLATILE (ptr) = SPEC_VOLATILE (type);
       switch (SPEC_SCLS (type))
 	{
 	case S_XDATA:
@@ -364,7 +362,6 @@ pointerTypes (sym_link * ptr, sym_link * type)
 	  DCL_TYPE (ptr) = POINTER;
 	  break;
 	case S_CODE:
-	  DCL_PTR_CONST (ptr) = port->mem.code_ro;
 	  DCL_TYPE (ptr) = CPOINTER;
 	  break;
 	case S_EEPROM:
@@ -457,22 +454,26 @@ addDecl (symbol * sym, int type, sym_link * p)
     }
 
   /* if the type is an unknown pointer and has
-     a tspec then take the storage class const & volatile
+     a tspec then take the const & volatile
      attribute from the tspec & make it those of this
      symbol */
+
   if (p &&
-      !IS_SPEC (p) &&
-      //DCL_TYPE (p) == UPOINTER &&
+      IS_DECL (p) &&
+      DCL_TYPE (p) == UPOINTER &&
       DCL_TSPEC (p))
     {
+      // only for declarators
+      wassert (IS_DECL(sym->type));
+
       if (!IS_SPEC (sym->etype))
 	{
 	  sym->etype = sym->etype->next = newLink ();
 	  sym->etype->class = SPECIFIER;
 	}
-      SPEC_SCLS (sym->etype) = SPEC_SCLS (DCL_TSPEC (p));
-      SPEC_CONST (sym->etype) = SPEC_CONST (DCL_TSPEC (p));
-      SPEC_VOLATILE (sym->etype) = SPEC_VOLATILE (DCL_TSPEC (p));
+      
+      DCL_PTR_CONST (sym->type) = SPEC_CONST (DCL_TSPEC (p));
+      DCL_PTR_VOLATILE (sym->type) = SPEC_VOLATILE (DCL_TSPEC (p));
       DCL_TSPEC (p) = NULL;
     }
 
@@ -2096,12 +2097,12 @@ printTypeChain (sym_link * start, FILE * of)
 	      break;
 	    }
 	}
-	/* search entry in list before "type" */
-    for (search = start; search && search->next != type;)
-       search = search->next;
-    type = search;
-    if (type)
-      fputc (' ', of);
+      /* search entry in list before "type" */
+      for (search = start; search && search->next != type;)
+	search = search->next;
+      type = search;
+      if (type)
+	fputc (' ', of);
     }
   if (nlr)
     fprintf (of, "\n");

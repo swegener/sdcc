@@ -408,7 +408,6 @@ initPointer (initList * ilist, sym_link *toType)
 			val->type = newLink ();
 			if (SPEC_SCLS (expr->left->etype) == S_CODE) {
 				DCL_TYPE (val->type) = CPOINTER;
-				DCL_PTR_CONST (val->type) = port->mem.code_ro;
 			}
 			else if (SPEC_SCLS (expr->left->etype) == S_XDATA)
 				DCL_TYPE (val->type) = FPOINTER;
@@ -467,7 +466,6 @@ initPointer (initList * ilist, sym_link *toType)
 		val->type = newLink ();
 		if (SPEC_SCLS (expr->right->etype) == S_CODE) {
 			DCL_TYPE (val->type) = CPOINTER;
-			DCL_PTR_CONST (val->type) = port->mem.code_ro;
 		}
 		else if (SPEC_SCLS (expr->right->etype) == S_XDATA)
 			DCL_TYPE (val->type) = FPOINTER;

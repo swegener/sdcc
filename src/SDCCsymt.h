@@ -177,8 +177,8 @@ typedef struct declarator
   {
     DECLARATOR_TYPE dcl_type;	/* POINTER,ARRAY or FUNCTION  */
     unsigned int num_elem;	/* # of elems if type==array  */
-    short ptr_const:1;		/* pointer is constant        */
-    short ptr_volatile:1;	/* pointer is volatile        */
+    unsigned ptr_const:1;	/* pointer is constant        */
+    unsigned ptr_volatile:1;	/* pointer is volatile        */
     struct sym_link *tspec;	/* pointer type specifier     */
   }
 declarator;
@@ -203,7 +203,6 @@ typedef struct sym_link
       unsigned hasVargs:1;      /* functions has varargs      */
       unsigned calleeSaves:1;	/* functions uses callee save */
       unsigned hasbody:1;     	/* function body defined      */
-      //unsigned ret:1;		/* return statement for a function */
       unsigned hasFcall:1;	/* does it call other functions */
       unsigned reent:1;		/* function is reentrant      */
       unsigned naked:1;		/* naked function	      */
@@ -414,7 +413,10 @@ symbol;
 #define IS_LONG(x)   (IS_SPEC(x) && x->select.s._long)
 #define IS_UNSIGNED(x) (IS_SPEC(x) && x->select.s._unsigned)
 #define IS_TYPEDEF(x)(IS_SPEC(x) && x->select.s._typedef)
-#define IS_CONSTANT(x)  (IS_SPEC(x) && ( x->select.s._const == 1))
+#define IS_CONSTANT(x)  (!x ? 0 : \
+                           IS_SPEC(x) ? \
+                           x->select.s._const == 1 : \
+                           x->select.d.ptr_const)
 #define IS_STRUCT(x) (IS_SPEC(x) && x->select.s.noun == V_STRUCT)
 #define IS_ABSOLUTE(x)  (IS_SPEC(x) && x->select.s._absadr )
 #define IS_REGISTER(x)  (IS_SPEC(x) && SPEC_SCLS(x) == S_REGISTER)
@@ -424,7 +426,10 @@ symbol;
 #define IS_VOID(x)   (IS_SPEC(x) && x->select.s.noun == V_VOID)
 #define IS_CHAR(x)   (IS_SPEC(x) && x->select.s.noun == V_CHAR)
 #define IS_EXTERN(x)	(IS_SPEC(x) && x->select.s._extern)
-#define IS_VOLATILE(x)  (IS_SPEC(x) && x->select.s._volatile )
+#define IS_VOLATILE(x)  (!x ? 0 : \
+			   IS_SPEC(x) ? \
+			   x->select.s._volatile : \
+			   x->select.d.ptr_volatile)
 #define IS_INTEGRAL(x) (IS_SPEC(x) && (x->select.s.noun == V_INT ||  \
                                        x->select.s.noun == V_CHAR || \
                                        x->select.s.noun == V_BIT ||  \

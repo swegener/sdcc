@@ -19,9 +19,9 @@ typedef	unsigned char * va_list ;
 
 #elif defined(SDCC_USE_XSTACK)
 
-typedef	unsigned char _pdata * va_list ;
+typedef	unsigned char pdata * va_list ;
 #define va_arg(marker,type) *((type data *)(marker -= sizeof(type)))
-#define	va_start(marker,first) { marker = (va_list)((char _pdata *)&first); }
+#define	va_start(marker,first) { marker = (va_list)((char pdata *)&first); }
 
 #else
 

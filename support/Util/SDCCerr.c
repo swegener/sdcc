@@ -352,7 +352,7 @@ struct
 { E_ARGUMENT_MISSING, ERROR_LEVEL_ERROR,
    "Option %s requires an argument." },
 { W_STRAY_BACKSLASH, ERROR_LEVEL_WARNING,
-    "stray '\\' in program" },
+    "stray '\\' at column %d" },
 { W_NEWLINE_IN_STRING, ERROR_LEVEL_WARNING,
     "newline in string constant" },
 };

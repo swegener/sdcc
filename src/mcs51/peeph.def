@@ -1046,11 +1046,42 @@ replace {
         mov     b,a
 }
 
+// applies to:
+// volatile xdata char t; t=0x01; t=0x03;
+replace {
+        mov     dptr,%1
+        mov     a,%2
+        movx    @dptr,a
+        mov     dptr,%1
+} by {
+        ;       Peephole 180.a  removed redundant mov to dptr
+        mov     dptr,%1
+        mov     a,%2
+        movx    @dptr,a
+}
+
+// volatile xdata char t; t=0x01; t=0x03; t=0x01;
+replace {
+        mov     dptr,%1
+        mov     a,%2
+        movx    @dptr,a
+        mov     a,%3
+        movx    @dptr,a
+        mov     dptr,%1
+} by {
+        ;       Peephole 180.b  removed redundant mov to dptr
+        mov     dptr,%1
+        mov     a,%2
+        movx    @dptr,a
+        mov     a,%3
+        movx    @dptr,a
+}
+
 // saving 1 byte, 0 cycles
 replace {
         mov     a,#0x00
 } by {
-        ;       Peephole 180    changed mov to clr
+        ;       Peephole 181    changed mov to clr
         clr     a
 }
 

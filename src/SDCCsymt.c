@@ -1429,6 +1429,8 @@ computeType (sym_link * type1, sym_link * type2)
        (!IS_LITERAL(type2) && SPEC_USIGN (etype2))) && 
       !IS_FLOAT (reType))
     SPEC_USIGN (reType) = 1;
+  else
+    SPEC_USIGN (reType) = 0;
   
   /* if result is a literal then make not so */
   if (IS_LITERAL (reType))

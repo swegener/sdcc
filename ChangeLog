@@ -1,3 +1,43 @@
+2002-08-10  Borut Razem <borut.razem@siol.net>
+	* src/SDCCmain.c (main):
+	file preOutName was unlinked before closed. This seems to be OK on UNIX and cygwin
+	platforms, but it doesn't work with Visual Studio: the opened file can not be removed.
+	The consequence was that some temporary files were not removed.
+
+	* src/SDCCglue.c:
+	unification of code in functions tempfilename() and tempfile():
+	function tempnam() is defined in Visual Studio 6.0 and .NET
+
+	* sdcc/sdcc.dsw: removed project sdcpp, added project xa51a
+
+	* sdcc/src/src.dsp, sdcc/src/avr/avr.dsp, sdcc/src/ds390/ds390.dsp,
+	  sdcc/src/mcs51/mcs51.dsp, sdcc/src/pic/pic.dsp, sdcc/src/z80/z80.dsp:
+	- removed compiler command line option /WX: Treats all warnings as errors
+	- update a list of source files, included into the project
+
+	* sdcc/src/avr/avra.dsp, sdcc/src/ds390/ds390a.dsp, sdcc/src/mcs51/mcs51a.dsp,
+	  sdcc/src/pic/pica.dsp, sdcc/src/z80/z80a.dsp:
+	changed project type to Generic Project so that can be correcly converted to VS.NET project
+
+	* sdcc/as/mcs51/asm.h: definition of PATH_MAX for MSC
+
+	* sdcc/src/SDCCast.c: solved MSC error in function decorateType()
+  
+	* sdcc/src/SDCC.y: added missing ending ';' to rules to get rid of bison warnings
+  
+	* dcc/src/ds390/ralloc.c, sdcc/src/mcs51/ralloc.c:
+	added return 0 statements after assert() to make compiler happy
+  
+	* sdcc/src/xa51/peeph.rul, sdcc/src/xa51/peeph.def, sdcc/src/z80/ralloc.c:
+	added newline in the def file to keep MSC compiler satisfied
+
+	* sdcc/src/z80/gen.c:
+	- function strcasecmp() is not defined in MSC (and probably also in BORLANDC),
+	  so it is replaced with STRCASECMP, which is defined as stricmp in case of MSC and BORLANDC
+	- solved MSC error in function aopDump()
+
+	* sdcc_vc.h: define PREFIX as "\\sdcc"
+
 2002-07-18  Bernhard Held <bernhard@bernhardheld.de>
 	* src/SDCCast.c (decorateType): fixed access to array of structures http://sourceforge.net/mailarchive/forum.php?thread_id=902690&forum_id=4107
 

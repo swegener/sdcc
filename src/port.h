@@ -94,7 +94,7 @@ typedef struct
         const char *mcmd;
         /** If non-null will be used to execute the link. */
 	void (*do_link) (void);
-        /** Extention for object files (.rel, .obj, ...) */
+        /** Extension for object files (.rel, .obj, ...) */
 	const char *rel_ext;
       }
     linker;

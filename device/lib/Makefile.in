@@ -124,7 +124,7 @@ include incl.mk
 # ------------------------------------------
 all: checkconf models model-ds390 model-z80 model-gbz80
 
-objects: build-dir $(OBJECTS) port-specific-objects lib-files
+objects: build-dir $(OBJECTS) port-specific-objects lib-files clean_intermediate
 
 models:
 	if [ "`grep mcs51 ../../ports.build`" = mcs51 ]; then \
@@ -156,7 +156,7 @@ model-gbz80:
 	  $(MAKE) MODELFLAGS="-mgbz80" PORT=gbz80 objects-z80 OEXT=.o; \
 	fi
 
-objects-z80: build-dir $(Z80OBJECTS) port-specific-objects
+objects-z80: build-dir $(Z80OBJECTS) port-specific-objects clean_intermediate
 	cd $(PORTDIR); ls *$(OEXT) > $(PORT).lib
 
 build-dir: $(PORTDIR)
@@ -172,6 +172,9 @@ port-specific-objects:
 
 lib-files:
 	cp *.lib $(PORTDIR)
+
+clean_intermediate:
+	rm -f $(PORTDIR)/*.lst $(PORTDIR)/*.sym
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------

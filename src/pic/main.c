@@ -337,7 +337,7 @@ static const char *_linkCmd[] =
  */
 static const char *_asmCmd[] =
 {
-  "gpasm", "-c  -I /usr/local/share/gpasm/header", "$1.asm", NULL
+  "gpasm", "-c  -I /usr/local/share/gpasm/header -o $2", "$1.asm", NULL
 
 };
 

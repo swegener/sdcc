@@ -1,5 +1,13 @@
 2003-01-11  Bernhard Held <bernhard@bernhardheld.de>
 
+	* src/SDCCmain.c (assemble, linkEdit): preparations for -o
+	* src/port.h: typo
+	* src/pic/main.c (_asmCmd): gpasm supports -o
+	* src/z80/main.c: more general macros
+	* device/lib/Makefile.in: remove intermediate files
+
+2003-01-11  Bernhard Held <bernhard@bernhardheld.de>
+
 	* .version: Bumped version number to 2.3.3
 	* src/SDCCBBlock.c: new option -o
 	* src/SDCCglobl.h: new option -o

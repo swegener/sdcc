@@ -1341,10 +1341,33 @@ linkEdit (char **envp)
   if (options.verbose)
     printf ("sdcc: Calling linker...\n");
 
+  /* build linker output filename */
+
+  /* -o option overrides default name? */
+  if (fullDstFileName)
+    {
+      strcpy (scratchFileName, fullDstFileName);
+    }
+  else
+    {
+      /* the linked file gets the name of the first modul */
+      if (fullSrcFileName)
+        {
+          strcpy (scratchFileName, dstFileName);
+        }
+      else
+        {
+          strcpy (scratchFileName, relFiles[0]);
+          /* strip ".rel" extension */
+          *strrchr (scratchFileName, '.') = '\0';
+        }
+      strcat (scratchFileName, options.out_fmt ? ".S19" : ".ihx");
+    }
+
   if (port->linker.cmd)
     {
       char buffer2[PATH_MAX];
-      buildCmdLine (buffer2, port->linker.cmd, dstFileName, NULL, NULL, NULL);
+      buildCmdLine (buffer2, port->linker.cmd, dstFileName, scratchFileName, NULL, NULL);
       buildCmdLine2 (buffer, buffer2);
     }
   else
@@ -1356,6 +1379,7 @@ linkEdit (char **envp)
     {
       exit (1);
     }
+  /* TODO: most linker don't have a -o parameter */
   /* -o option overrides default name? */
   if (fullDstFileName)
     {
@@ -1381,11 +1405,22 @@ linkEdit (char **envp)
 static void
 assemble (char **envp)
 {
+    /* build assembler output filename */
+
+    /* -o option overrides default name? */
+    if (options.cc_only && fullDstFileName) {
+        strcpy (scratchFileName, fullDstFileName);
+    } else {
+        /* the assembled file gets the name of the first modul */
+        strcpy (scratchFileName, dstFileName);
+        strcat (scratchFileName, port->linker.rel_ext);
+    }
+
     if (port->assembler.do_assemble) {
 	port->assembler.do_assemble(asmOptions);
 	return ;
     } else if (port->assembler.cmd) {
-        buildCmdLine (buffer, port->assembler.cmd, dstFileName, NULL,
+        buildCmdLine (buffer, port->assembler.cmd, dstFileName, scratchFileName,
 		      options.debug ? port->assembler.debug_opts : port->assembler.plain_opts,
 		      asmOptions);
     } else {
@@ -1398,10 +1433,11 @@ assemble (char **envp)
 	*/
 	exit (1);
     }
+    /* TODO: most assembler don't have a -o parameter */
     /* -o option overrides default name? */
     if (options.cc_only && fullDstFileName) {
         strcpy (scratchFileName, dstFileName);
-        strcat (scratchFileName, ".rel");
+        strcat (scratchFileName, port->linker.rel_ext);
         rename (scratchFileName, fullDstFileName);
     }
 }
@@ -1469,7 +1505,12 @@ preProcess (char **envp)
 
       setMainValue ("cppextraopts", join(preArgv));
       
-      if (!preProcOnly)
+      if (preProcOnly)
+        {
+          if (fullDstFileName)
+              preOutName = Safe_strdup (fullDstFileName);
+        }
+      else
           preOutName = Safe_strdup (tempfilename ());
 
       /* Have to set cppoutfilename to something, even if just pre-processing. */
@@ -1655,20 +1696,20 @@ initValues (void)
   if (options.cc_only && fullDstFileName)
     /* compile + assemble and -o given: -o specifies name of object file */
     {
-      setMainValue ("z80objdstfilename", fullDstFileName);
+      setMainValue ("objdstfilename", fullDstFileName);
     }
   else
     {
-      setMainValue ("z80objdstfilename", "{z80stdobjdstfilename}");
+      setMainValue ("objdstfilename", "{stdobjdstfilename}");
     }
   if (fullDstFileName)
     /* if we're linking, -o gives the final file name */
     {
-      setMainValue ("z80linkdstfilename", fullDstFileName);
+      setMainValue ("linkdstfilename", fullDstFileName);
     }
   else
     {
-      setMainValue ("z80linkdstfilename", "{z80stdlinkdstfilename}");
+      setMainValue ("linkdstfilename", "{stdlinkdstfilename}");
     }
 
 }

@@ -1044,9 +1044,10 @@ void glue ()
 	
     }
     copyFile (asmFile, statsg->oFile);
-    if (port->general.glue_up_main)
-	fprintf (asmFile,"\tljmp\t__sdcc_program_startup\n");
 
+    if (port->general.glue_up_main && mainf && mainf->fbody)
+	fprintf (asmFile,"\tljmp\t__sdcc_program_startup\n");
+	
     /* copy over code */
     fprintf (asmFile, "%s", iComments2);
     fprintf (asmFile, "; code\n");

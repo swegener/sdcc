@@ -52,7 +52,7 @@ struct
 { E_DUPLICATE, ERROR_LEVEL_ERROR,
    "Duplicate symbol '%s', symbol IGNORED" },
 { E_SYNTAX_ERROR, ERROR_LEVEL_ERROR,
-   "Syntax Error Declaration ignored" },
+   "Syntax error, declaration ignored at '%s'" },
 { E_CONST_EXPECTED, ERROR_LEVEL_ERROR,
    "Constant Expected Found Variable" },
 { E_OUT_OF_MEM, ERROR_LEVEL_ERROR,

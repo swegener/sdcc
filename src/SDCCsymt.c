@@ -549,8 +549,14 @@ mergeSpec (sym_link * dest, sym_link * src, char *name)
   sym_link *symlink=dest;
 
   if (!IS_SPEC(dest) || !IS_SPEC(src)) {
+#if 0
     werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "cannot merge declarator");
     exit (1);
+#else
+    werror (E_SYNTAX_ERROR, yytext);
+    // the show must go on
+    return newIntLink();
+#endif
   }
 
   if (SPEC_NOUN(src)) {

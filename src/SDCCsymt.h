@@ -297,6 +297,7 @@ typedef struct symbol
     struct iCode *fuse;		/* furthest use */
     struct iCode *rematiCode;	/* rematerialse with which instruction */
     struct operand *reqv;	/* register equivalent of a local variable */
+    struct symbol *prereqv;	/* symbol before register equiv. substituion */
     union
       {
 	struct symbol *spillLoc;	/* register spil location */
@@ -307,6 +308,7 @@ typedef struct symbol
     unsigned offset;		/* offset from top if struct */
 
     int lineDef;		/* defined line number        */
+    char *fileDef;		/* defined filename           */
     int lastLine;		/* for functions the last line */
     struct sym_link *type;	/* 1st link to declator chain */
     struct sym_link *etype;	/* last link to declarator chn */

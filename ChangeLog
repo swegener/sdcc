@@ -1,3 +1,23 @@
+2004-02-09 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCsymt.h,
+	* src/SDCCicode.c (operandFromSymbol),
+	* src/mcs51/ralloc.c (verifyRegsAssigned, serialRegAssign),
+	* src/ds390/ralloc.c (verifyRegsAssigned, serialRegAssign),
+	* src/z80/ralloc.c (verifyRegsAssigned, serialRegAssign),
+	* src/hc08/ralloc.c (verifyRegsAssigned, serialRegAssign),
+	* src/pic/ralloc.c (verifyRegsAssigned, serialRegAssign),
+	* src/pic16/ralloc.c (verifyRegsAssigned, serialRegAssign): fixed
+	bug #892038
+	* src/SDCCast.c (createIvalStruct, createIvalArray, gatherAutoInit),
+	* src/SDCCglue.c (emitRegularMap, printIvalStruct, printIvalArray,
+	printIvalCharPtr, printIvalPtr, printIval, emitStaticSeg, emitOverlay)
+	* src/SDCCsymt.c (newSymbol),
+	* src/SDCC.y (struct_or_union_specifier, enum_specifier, 
+	enumerator_list),
+	* src/SDCCval.h,
+	* src/SDCCval.c (newiList): fixed bug #885705
+
 2004-02-08  Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* doc/sdccman.lyx: added section 3.1.4: sdcclib.

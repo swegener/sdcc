@@ -1210,6 +1210,31 @@ void reassignUnusedLRs (bitVect *unused)
     }
 }
 
+/*------------------------------------------------------------------*/
+/* verifyRegsAssigned - make sure an iTemp is properly initialized; */
+/* it should either have registers or have beed spilled. Otherwise, */
+/* there was an uninitialized variable, so just spill this to get   */
+/* the operand in a valid state.                                    */
+/*------------------------------------------------------------------*/
+static void
+verifyRegsAssigned (operand *op, iCode * ic)
+{
+  symbol * sym;
+  
+  if (!op) return;
+  if (!IS_ITEMP (op)) return;
+  
+  sym = OP_SYMBOL (op);
+  if (sym->isspilt) return;
+  if (!sym->nRegs) return;
+  if (sym->regs[0]) return;
+  
+  werrorfl (ic->filename, ic->lineno, W_LOCAL_NOINIT, 
+	    sym->prereqv ? sym->prereqv->name : sym->name);
+  spillThis (sym);
+}
+
+
 /*-----------------------------------------------------------------*/
 /* serialRegAssign - serially allocate registers to the variables  */
 /*-----------------------------------------------------------------*/
@@ -1379,6 +1404,40 @@ serialRegAssign (eBBlock ** ebbs, int count)
 	}
       reassignUnusedLRs(unusedLRs);
     }
+
+    /* Check for and fix any problems with uninitialized operands */
+    for (i = 0; i < count; i++)
+      {
+	iCode *ic;
+
+	if (ebbs[i]->noPath &&
+	    (ebbs[i]->entryLabel != entryLabel &&
+	     ebbs[i]->entryLabel != returnLabel))
+	    continue;
+
+	for (ic = ebbs[i]->sch; ic; ic = ic->next)
+	  {
+	    if (SKIP_IC2 (ic))
+	      continue;
+
+	    if (ic->op == IFX)
+	      {
+	        verifyRegsAssigned (IC_COND (ic), ic);
+	        continue;
+	      }
+
+	    if (ic->op == JUMPTABLE)
+	      {
+	        verifyRegsAssigned (IC_JTCOND (ic), ic);
+	        continue;
+	      }
+
+	    verifyRegsAssigned (IC_RESULT (ic), ic);
+	    verifyRegsAssigned (IC_LEFT (ic), ic);
+	    verifyRegsAssigned (IC_RIGHT (ic), ic);
+          }
+      }    
+    
 }
 
 /*-----------------------------------------------------------------*/

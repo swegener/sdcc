@@ -57,6 +57,7 @@ newiList (int type, void *ilist)
 
   nilist->type = type;
   nilist->lineno = mylineno;
+  nilist->filename = currFname;
 
   switch (type)
     {

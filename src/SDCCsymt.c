@@ -293,6 +293,7 @@ newSymbol (char *name, int scope)
   sym->level = scope;		/* set the level    */
   sym->block = currBlockno;
   sym->lineDef = mylineno;	/* set the line number */
+  sym->fileDef = currFname;
   return sym;
 }
 

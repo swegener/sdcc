@@ -748,17 +748,17 @@ struct_or_union_specifier
 	   // check for errors in structure members
 	   for (sym=$5; sym; sym=sym->next) {
 	     if (IS_ABSOLUTE(sym->etype)) {
-	       werrorfl(filename, sym->lineDef, E_NOT_ALLOWED, "'at'");
+	       werrorfl(sym->fileDef, sym->lineDef, E_NOT_ALLOWED, "'at'");
 	       SPEC_ABSA(sym->etype) = 0;
 	     }
 	     if (IS_SPEC(sym->etype) && SPEC_SCLS(sym->etype)) {
-	       werrorfl(filename, sym->lineDef, E_NOT_ALLOWED, "storage class");
+	       werrorfl(sym->fileDef, sym->lineDef, E_NOT_ALLOWED, "storage class");
 	       printTypeChainRaw (sym->type,NULL);
 	       SPEC_SCLS(sym->etype) = 0;
 	     }
 	     for (dsym=sym->next; dsym; dsym=dsym->next) {
 	       if (strcmp(sym->name, dsym->name)==0) {
-		 werrorfl(filename, sym->lineDef, E_DUPLICATE_MEMBER, 
+		 werrorfl(sym->fileDef, sym->lineDef, E_DUPLICATE_MEMBER, 
 			$1==STRUCT ? "struct" : "union", sym->name);
 	       }
 	     }
@@ -909,7 +909,7 @@ enum_specifier
 
      csym=findSym(enumTab,$2,$2->name);
      if ((csym && csym->level == $2->level))
-       werrorfl(filename, $2->lineDef, E_DUPLICATE_TYPEDEF,csym->name);
+       werrorfl($2->fileDef, $2->lineDef, E_DUPLICATE_TYPEDEF,csym->name);
      
      enumtype = newEnumType ($4);	//copyLinkChain(cenum->type);
      SPEC_SCLS(getSpec(enumtype)) = 0;
@@ -944,7 +944,7 @@ enumerator_list
        for (dsym=$1; dsym; dsym=dsym->next)
          {
 	   if (strcmp($3->name, dsym->name)==0)
-	     werrorfl(filename, $3->lineDef, E_DUPLICATE_MEMBER, "enum", $3->name);
+	     werrorfl($3->fileDef, $3->lineDef, E_DUPLICATE_MEMBER, "enum", $3->name);
 	 }
        
        $3->next = $1 ;

@@ -1533,6 +1533,7 @@ operandFromSymbol (symbol * sym)
          and before liveRange calculation */
       sym->reqv = newiTempOperand (sym->type, 0);
       sym->reqv->key = sym->key;
+      OP_SYMBOL (sym->reqv)->prereqv = sym;
       OP_SYMBOL (sym->reqv)->key = sym->key;
       OP_SYMBOL (sym->reqv)->isreqv = 1;
       OP_SYMBOL (sym->reqv)->islocal = 1;

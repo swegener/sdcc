@@ -871,7 +871,7 @@ createIvalStruct (ast * sym, sym_link * type, initList * ilist)
     }
 
   if (iloop) {
-    werrorfl (filename, sym->opval.val->sym->lineDef,
+    werrorfl (sym->opval.val->sym->fileDef, sym->opval.val->sym->lineDef,
 	      W_EXCESS_INITIALIZERS, "struct", 
 	      sym->opval.val->sym->name);
   }
@@ -932,6 +932,7 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist)
 	    // Array size was specified, and we have more initializers than needed.
 	    char *name=sym->opval.val->sym->name;
 	    int lineno=sym->opval.val->sym->lineDef;
+	    char *filename=sym->opval.val->sym->fileDef;
 	    
 	    werrorfl (filename, lineno, W_EXCESS_INITIALIZERS, "array", name);
 	}
@@ -958,6 +959,7 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist)
 		// there has to be a better way
 		char *name=sym->opval.val->sym->name;
 		int lineno=sym->opval.val->sym->lineDef;
+		char *filename=sym->opval.val->sym->fileDef;
 		werrorfl (filename, lineno, W_EXCESS_INITIALIZERS, "array", name);
 		
 		break;
@@ -1132,7 +1134,7 @@ gatherAutoInit (symbol * autoChain)
 	    work = initAggregates (sym, sym->ival, NULL);
 	  } else {
 	    if (getNelements(sym->type, sym->ival)>1) {
-	      werrorfl (filename, sym->lineDef,
+	      werrorfl (sym->fileDef, sym->lineDef,
 			W_EXCESS_INITIALIZERS, "scalar", 
 			sym->name);
 	    }
@@ -1168,7 +1170,7 @@ gatherAutoInit (symbol * autoChain)
 	    work = initAggregates (sym, sym->ival, NULL);
 	  } else {
 	    if (getNelements(sym->type, sym->ival)>1) {
-	      werrorfl (filename, sym->lineDef,
+	      werrorfl (sym->fileDef, sym->lineDef,
 			W_EXCESS_INITIALIZERS, "scalar", 
 			sym->name);
 	    }

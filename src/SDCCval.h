@@ -57,6 +57,7 @@ typedef struct initList
   {
     int type;
     int lineno;
+    char *filename;
     union
       {
 	struct ast *node;

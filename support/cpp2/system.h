@@ -235,24 +235,8 @@ extern long atol PARAMS ((const char *));
 extern void free PARAMS ((PTR));
 #endif
 
-#if defined (HAVE_DECL_GETCWD) && !HAVE_DECL_GETCWD
-extern char *getcwd PARAMS ((char *, size_t));
-#endif
-
 #if defined (HAVE_DECL_GETENV) && !HAVE_DECL_GETENV
 extern char *getenv PARAMS ((const char *));
-#endif
-
-#if defined (HAVE_DECL_GETOPT) && !HAVE_DECL_GETOPT
-extern int getopt PARAMS ((int, char * const *, const char *));
-#endif
-
-#if defined (HAVE_DECL_GETWD) && !HAVE_DECL_GETWD
-extern char *getwd PARAMS ((char *));
-#endif
-
-#if defined (HAVE_DECL_SBRK) && !HAVE_DECL_SBRK
-extern PTR sbrk PARAMS ((int));
 #endif
 
 #if defined (HAVE_DECL_STRSTR) && !HAVE_DECL_STRSTR
@@ -273,28 +257,6 @@ extern PTR calloc PARAMS ((size_t, size_t));
 
 #if defined (HAVE_DECL_REALLOC) && !HAVE_DECL_REALLOC
 extern PTR realloc PARAMS ((PTR, size_t));
-#endif
-
-#ifdef HAVE_GETRLIMIT
-# if defined (HAVE_DECL_GETRLIMIT) && !HAVE_DECL_GETRLIMIT
-#  ifndef getrlimit
-#   ifdef ANSI_PROTOTYPES
-struct rlimit;
-#   endif
-extern int getrlimit PARAMS ((int, struct rlimit *));
-#  endif
-# endif
-#endif
-
-#ifdef HAVE_SETRLIMIT
-# if defined (HAVE_DECL_SETRLIMIT) && !HAVE_DECL_SETRLIMIT
-#  ifndef setrlimit
-#   ifdef ANSI_PROTOTYPES
-struct rlimit;
-#   endif
-extern int setrlimit PARAMS ((int, const struct rlimit *));
-#  endif
-# endif
 #endif
 
 #if !defined(__STDC__) && !defined(volatile)

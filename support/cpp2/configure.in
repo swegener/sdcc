@@ -164,20 +164,6 @@ else
     AC_MSG_RESULT(no)
 fi
 
-AC_MSG_CHECKING(for GNU C library)
-AC_CACHE_VAL(gcc_cv_glibc,
-[AC_TRY_COMPILE(
-  [#include <features.h>],[
-#if ! (defined __GLIBC__ || defined __GNU_LIBRARY__)
-#error Not a GNU C library system
-#endif], 
-  [gcc_cv_glibc=yes], 
-  gcc_cv_glibc=no)])
-AC_MSG_RESULT($gcc_cv_glibc)
-if test $gcc_cv_glibc = yes; then
-  AC_DEFINE(_GNU_SOURCE, 1, [Always define this when using the GNU C Library])
-fi
-
 # Find some useful tools
 gcc_AC_PROG_LN
 gcc_AC_PROG_LN_S
@@ -190,8 +176,8 @@ gcc_AC_HEADER_STRING
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS(limits.h stddef.h string.h strings.h stdlib.h time.h \
 		 fcntl.h unistd.h sys/file.h sys/time.h \
-		 sys/resource.h sys/param.h sys/times.h sys/stat.h \
-		 direct.h malloc.h langinfo.h)
+		 sys/param.h sys/stat.h \
+		 direct.h malloc.h)
 
 # Check for thread headers.
 
@@ -208,26 +194,10 @@ AC_CHECK_PROG(STRIP, strip, strip, :)
 # preprocessor stringification operator.  (Used by symcat.h.)
 AC_C_STRINGIZE
 
-# Use <inttypes.h> only if it exists,
-# doesn't clash with <sys/types.h>, and declares intmax_t.
-AC_MSG_CHECKING(for inttypes.h)
-AC_CACHE_VAL(gcc_cv_header_inttypes_h,
-[AC_TRY_COMPILE(
-  [#include <sys/types.h>
-#include <inttypes.h>],
-  [intmax_t i = -1;],
-  [gcc_cv_header_inttypes_h=yes],
-  gcc_cv_header_inttypes_h=no)])
-AC_MSG_RESULT($gcc_cv_header_inttypes_h)
-if test $gcc_cv_header_inttypes_h = yes; then
-  AC_DEFINE(HAVE_INTTYPES_H, 1,
-	[Define if you have a working <inttypes.h> header file.])
-fi
-
 dnl Disabled until we have a complete test for buggy enum bitfields.
 dnl gcc_AC_C_ENUM_BF_UNSIGNED
 
-AC_CHECK_FUNCS(times clock strchr strrchr lstat)
+AC_CHECK_FUNCS(clock strchr strrchr lstat)
 
 AC_CHECK_TYPE(ssize_t, int)
 
@@ -238,43 +208,9 @@ AC_FUNC_MMAP_FILE
 saved_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS -I${srcdir} -I${srcdir}/../include"
 gcc_AC_CHECK_DECLS(getenv abort errno \
-	malloc realloc calloc free getopt clock, , ,[
+	malloc realloc calloc free clock, , ,[
 #include "ansidecl.h"
 #include "system.h"])
-
-gcc_AC_CHECK_DECLS(times, , ,[
-#include "ansidecl.h"
-#include "system.h"
-#ifdef HAVE_SYS_TIMES_H
-#include <sys/times.h>
-#endif
-])
-
-# More time-related stuff.
-AC_CACHE_CHECK(for struct tms, ac_cv_struct_tms, [
-AC_TRY_COMPILE([
-#include "ansidecl.h"
-#include "system.h"
-#ifdef HAVE_SYS_TIMES_H
-#include <sys/times.h>
-#endif
-], [struct tms tms;], ac_cv_struct_tms=yes, ac_cv_struct_tms=no)])
-if test $ac_cv_struct_tms = yes; then
-  AC_DEFINE(HAVE_STRUCT_TMS, 1,
-  [Define if <sys/times.h> defines struct tms.])
-fi
-
-# use gcc_cv_* here because this doesn't match the behavior of AC_CHECK_TYPE.
-# revisit after autoconf 2.50.
-AC_CACHE_CHECK(for clock_t, gcc_cv_type_clock_t, [
-AC_TRY_COMPILE([
-#include "ansidecl.h"
-#include "system.h"
-], [clock_t x;], gcc_cv_type_clock_t=yes, gcc_cv_type_clock_t=no)])
-if test $gcc_cv_type_clock_t = yes; then
-  AC_DEFINE(HAVE_CLOCK_T, 1,
-  [Define if <time.h> defines clock_t.])
-fi
 
 # Restore CFLAGS from before the gcc_AC_NEED_DECLARATIONS tests.
 CFLAGS="$saved_CFLAGS"
@@ -603,11 +539,11 @@ AC_SUBST(symbolic_link)
 AC_SUBST(thread_file)
 AC_SUBST(c_target_objs)
 
-AC_SUBST_FILE(target_overrides)
-AC_SUBST_FILE(host_overrides)
-AC_SUBST(cross_defines)
-AC_SUBST_FILE(cross_overrides)
-AC_SUBST_FILE(build_overrides)
+#AC_SUBST_FILE(target_overrides)
+#AC_SUBST_FILE(host_overrides)
+#AC_SUBST(cross_defines)
+#AC_SUBST_FILE(cross_overrides)
+#AC_SUBST_FILE(build_overrides)
 
 # Create the Makefile
 # and configure language subdirectories

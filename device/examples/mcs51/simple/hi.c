@@ -8,7 +8,7 @@
    program to compile and play with.
 
    The simulator can be used to run this program:
-   s51 -Sout=testout.txt hi.ihx (run, stop, quit)
+   s51 -Sout=serial.txt hi.ihx (run, stop, quit)
 
  6-28-01  Written by Karl Bongers(karl@turbobit.com)
 |------------------------------------------------------------------------*/

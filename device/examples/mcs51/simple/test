@@ -6,5 +6,5 @@
 # stop
 # quit
 
-s51 -Sout=testout.txt hi.ihx
+s51 -Sout=serial.txt hi.ihx
 

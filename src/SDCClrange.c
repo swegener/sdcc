@@ -124,7 +124,7 @@ isLastUse (operand * op, eBBlock * ebp, iCode * ic,
   if (usedInRemaining (op, ic))
     return 0;
 
-  if (getenv ("LRKLAUS"))
+  if (getenv ("SDCC_LRKLAUS"))
     {
       /* if not then check any of the following blocks use it */
       for (i = 0; i < count; i++)
@@ -337,7 +337,7 @@ operandLUse (operand * op, eBBlock ** ebbs,
       /* if this is the last use then if this block belongs
          to a  loop &  some definition  comes into the loop
          then extend the live range to  the end of the loop */
-      if (getenv ("LRKLAUS"))
+      if (getenv ("SDCC_LRKLAUS"))
         {
 	  if (ebp->KpartOfLoop)
             {
@@ -748,7 +748,7 @@ computeLiveRanges (eBBlock ** ebbs, int count)
   iCodeSeqhTab = newHashTable (iCodeKey);
   sequenceiCode (ebbs, count);
 
-  if (getenv ("LRKLAUS"))
+  if (getenv ("SDCC_LRKLAUS"))
     {
       /* add blocks between loop blocks as part of that loop */
       addLoopBlocks (ebbs, count);

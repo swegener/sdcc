@@ -235,7 +235,7 @@ DEFSETFUNC (addToExitsMarkDepth)
   if (ebp->depth<depth)
     ebp->depth = depth;
 
-  if (getenv ("LRKLAUS"))
+  if (getenv ("SDCC_LRKLAUS"))
     {
       /* put the loop region info in the block */
       if (!isinSet (ebp->KpartOfLoop, lr))

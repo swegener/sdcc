@@ -114,6 +114,13 @@ _xa51_getRegName (struct regs *reg)
 static void
 _xa51_genAssemblerPreamble (FILE * of)
 {
+  // this needs to be an include file someday
+  fputs ("pswl\tsfr\t0x400\n", of);
+  fputs ("z\tbit\tpswl.0\n", of);
+  fputs ("n\tbit\tpswl.1\n", of);
+  fputs ("v\tbit\tpswl.2\n", of);
+  fputs ("ac\tbit\tpswl.6\n", of);
+  fputs ("cy\tbit\tpswl.7\n", of);
 }
 
 /* Generate interrupt vector table. */
@@ -126,31 +133,14 @@ _xa51_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 /* Generate code to copy XINIT to XISEG */
 static void _xa51_genXINIT (FILE * of) {
   fprintf (of, ";	_xa51_genXINIT() start\n");
-  fprintf (of, "	mov	a,#l_XINIT\n");
-  fprintf (of, "	orl	a,#l_XINIT>>8\n");
-  fprintf (of, "	jz	00003$\n");
-  fprintf (of, "	mov	a,#s_XINIT\n");
-  fprintf (of, "	add	a,#l_XINIT\n");
-  fprintf (of, "	mov	r1,a\n");
-  fprintf (of, "	mov	a,#s_XINIT>>8\n");
-  fprintf (of, "	addc	a,#l_XINIT>>8\n");
-  fprintf (of, "	mov	r2,a\n");
-  fprintf (of, "	mov	dptr,#s_XINIT\n");
-  fprintf (of, "	mov	r0,#s_XISEG\n");
-  fprintf (of, "	mov	p2,#(s_XISEG >> 8)\n");
-  fprintf (of, "00001$:	clr	a\n");
-  fprintf (of, "	movc	a,@a+dptr\n");
-  fprintf (of, "	movx	@r0,a\n");
-  fprintf (of, "	inc	dptr\n");
-  fprintf (of, "	inc	r0\n");
-  fprintf (of, "	cjne	r0,#0,00002$\n");
-  fprintf (of, "	inc	p2\n");
-  fprintf (of, "00002$:	mov	a,dpl\n");
-  fprintf (of, "	cjne	a,ar1,00001$\n");
-  fprintf (of, "	mov	a,dph\n");
-  fprintf (of, "	cjne	a,ar2,00001$\n");
-  fprintf (of, "	mov	p2,#0xFF\n");
-  fprintf (of, "00003$:\n");
+  fprintf (of, "	mov	r0,#l_XINIT\n");
+  fprintf (of, "	beq	00002$\n");
+  fprintf (of, "	mov	r1,#s_XINIT\n");
+  fprintf (of, "        mov     r2,#s_XISEG\n");
+  fprintf (of, "00001$  movc    r3l,[r1+]\n");
+  fprintf (of, "        mov     [r2+],r3l\n");
+  fprintf (of, "        djnz    r0,00001$\n");
+  fprintf (of, "00002$:\n");
   fprintf (of, ";	_xa51_genXINIT() end\n");
 }
 
@@ -191,7 +181,7 @@ static const char *_linkCmd[] =
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
 static const char *_asmCmd[] =
 {
-  "xa_asm", "$l", "$3", "$1.asm", NULL
+  "xa_asm", "$l", "$3", "$1.xa", NULL
 };
 
 /* Globals */
@@ -208,10 +198,10 @@ PORT xa51_port =
   {
     _asmCmd,
     NULL,
-    "-plosgffc",		/* Options with debug */
-    "-plosgff",			/* Options without debug */
+    "",				/* Options with debug */
+    "",				/* Options without debug */
     0,
-    ".asm",
+    ".xa",
     NULL			/* no do_assemble function */
   },
   {

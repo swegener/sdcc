@@ -663,14 +663,14 @@ valUnaryPM (value * val)
       if (SPEC_LONG (val->etype))
 	{
 	  if (SPEC_USIGN (val->etype))
-	    SPEC_CVAL (val->etype).v_ulong = -SPEC_CVAL (val->etype).v_ulong;
+	    SPEC_CVAL (val->etype).v_ulong = 0-SPEC_CVAL (val->etype).v_ulong;
 	  else
 	    SPEC_CVAL (val->etype).v_long = -SPEC_CVAL (val->etype).v_long;
 	}
       else
 	{
 	  if (SPEC_USIGN (val->etype))
-	    SPEC_CVAL (val->etype).v_uint = -SPEC_CVAL (val->etype).v_uint;
+	    SPEC_CVAL (val->etype).v_uint = 0-SPEC_CVAL (val->etype).v_uint;
 	  else
 	    SPEC_CVAL (val->etype).v_int = -SPEC_CVAL (val->etype).v_int;
 	}

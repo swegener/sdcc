@@ -1,3 +1,19 @@
+2004-03-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/Util/SDCCerr.h,
+	* support/Util/SDCCerr.c,
+	* src/SDCC.y (struct_or_union_specifier, enum_specifier,
+	enumerator_list),
+	* src/SDCCsymt.c (addSymChain): show location of oriignal definition
+	for symbol conflicts.
+	* support/valdiags/tests/enum.c,
+	* support/valdiags/tests/tentdecl.c,
+	* support/valdiags/tests/struct.c: expect possible error messages
+	referring to original symbol definitions.
+	* src/SDCC.y (struct_or_union_specifier, struct_declarator),
+	* src/SDCCsymt.h,
+	* src/SDCCsymt.c (promoteAnonStructs): support anonymous struct/union
+
 2004-03-03 Hans Dorn <hjdorn AT users.sourceforge.net>
 
 	* src/pic16/gen.c (gencjne): fixed for right=REG / left=LIT

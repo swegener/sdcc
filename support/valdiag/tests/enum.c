@@ -63,7 +63,7 @@ enum tag
 #endif
 
 #ifdef TEST7
-enum tag
+enum tag	/* IGNORE */
 {
   first,
   second,

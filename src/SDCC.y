@@ -757,9 +757,10 @@ struct_or_union_specifier
 	       SPEC_SCLS(sym->etype) = 0;
 	     }
 	     for (dsym=sym->next; dsym; dsym=dsym->next) {
-	       if (strcmp(sym->name, dsym->name)==0) {
+	       if (*dsym->name && strcmp(sym->name, dsym->name)==0) {
 		 werrorfl(sym->fileDef, sym->lineDef, E_DUPLICATE_MEMBER, 
 			$1==STRUCT ? "struct" : "union", sym->name);
+		 werrorfl(dsym->fileDef, dsym->lineDef, E_PREVIOUS_DEF);
 	       }
 	     }
 	   }
@@ -768,7 +769,8 @@ struct_or_union_specifier
            sdef = $2 ;
            sdef->fields   = reverseSyms($5) ;   /* link the fields */
            sdef->size  = compStructSize($1,sdef);   /* update size of  */
-
+	   promoteAnonStructs ($1, sdef);
+	   
            /* Create the specifier */
            $$ = newLink (SPECIFIER) ;
            SPEC_NOUN($$) = V_STRUCT;
@@ -895,6 +897,8 @@ struct_declarator
 			  else
 			    $1->bitVar = bitsize;
                         }
+   | { $$ = newSymbol ("", NestLevel) ; }
+   
    ;
 
 enum_specifier
@@ -909,7 +913,10 @@ enum_specifier
 
      csym=findSym(enumTab,$2,$2->name);
      if ((csym && csym->level == $2->level))
-       werrorfl($2->fileDef, $2->lineDef, E_DUPLICATE_TYPEDEF,csym->name);
+       {
+         werrorfl($2->fileDef, $2->lineDef, E_DUPLICATE_TYPEDEF,csym->name);
+         werrorfl(csym->fileDef, csym->lineDef, E_PREVIOUS_DEF);
+       }
      
      enumtype = newEnumType ($4);	//copyLinkChain(cenum->type);
      SPEC_SCLS(getSpec(enumtype)) = 0;
@@ -944,7 +951,10 @@ enumerator_list
        for (dsym=$1; dsym; dsym=dsym->next)
          {
 	   if (strcmp($3->name, dsym->name)==0)
-	     werrorfl($3->fileDef, $3->lineDef, E_DUPLICATE_MEMBER, "enum", $3->name);
+	     {
+	       werrorfl($3->fileDef, $3->lineDef, E_DUPLICATE_MEMBER, "enum", $3->name);
+	       werrorfl(dsym->fileDef, dsym->lineDef, E_PREVIOUS_DEF);
+	     }
 	 }
        
        $3->next = $1 ;

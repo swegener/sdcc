@@ -409,6 +409,8 @@ struct
    "pragma %s is deprecated, please see documentation for details" },
 { E_SIZEOF_INCOMPLETE_TYPE, ERROR_LEVEL_ERROR,
    "sizeof applied to an incomplete type" },
+{ E_PREVIOUS_DEF, ERROR_LEVEL_ERROR,
+   "previously defined here" },
 };
 
 /*

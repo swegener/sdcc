@@ -1030,6 +1030,8 @@ addSymChain (symbol * symHead)
 	    werror (E_EXTERN_MISMATCH, sym->name);
           else
 	    werror (E_DUPLICATE, sym->name);
+	  werrorfl (csym->fileDef, csym->lineDef, E_PREVIOUS_DEF);
+	  #if 0
 	  fprintf (stderr, "from type '");
 	  printTypeChain (csym->type, stderr);
 	  if (IS_SPEC (csym->etype) && SPEC_ABSA (csym->etype))
@@ -1039,6 +1041,7 @@ addSymChain (symbol * symHead)
 	  if (IS_SPEC (sym->etype) && SPEC_ABSA (sym->etype))
 	    fprintf(stderr, " at 0x%x", SPEC_ADDR (sym->etype));
 	  fprintf (stderr, "'\n");
+	  #endif
 	  continue;
 	}
 
@@ -1226,6 +1229,71 @@ compStructSize (int su, structdef * sdef)
 
     return (su == UNION ? usum : sum);
 }
+
+/*-------------------------------------------------------------------*/
+/* promoteAnonStructs - promote anonymous struct/union's fields into */
+/*                      an enclosing struct/union                    */
+/*-------------------------------------------------------------------*/
+void
+promoteAnonStructs (int su, structdef * sdef)
+{
+  symbol *field;
+  symbol *subfield;
+  symbol **tofield;
+  symbol *nextfield;
+  symbol *dupfield;
+  int base;
+
+  tofield = &sdef->fields;
+  field = sdef->fields;
+  while (field)
+    {
+      nextfield = field->next;
+      if (!*field->name && IS_STRUCT (field->type))
+	{
+	  /* Found an anonymous struct/union. Replace it */
+	  /* with the fields it contains and adjust all  */
+	  /* the offsets */
+	  
+	  base = field->offset;
+	  subfield = copySymbolChain (SPEC_STRUCT (field->type)->fields);
+	  if (!subfield)
+	    continue;		/* just in case it's empty */
+	  
+	  *tofield = subfield;
+	  for (;;)
+	    {
+	      /* check for field name conflicts resulting from promotion */
+	      dupfield = sdef->fields;
+	      while (dupfield && dupfield != subfield)
+	        {
+		  if (*subfield->name && !strcmp (dupfield->name, subfield->name))
+		    {
+		      werrorfl (subfield->fileDef, subfield->lineDef,
+				E_DUPLICATE_MEMBER,
+				su==STRUCT ? "struct" : "union",
+				subfield->name);
+		      werrorfl (dupfield->fileDef, dupfield->lineDef,
+				E_PREVIOUS_DEF);
+		    }
+		  dupfield = dupfield->next;
+		}
+	      
+	      subfield->offset += base;
+	      if (subfield->next)
+		subfield = subfield->next;
+	      else
+		break;
+	    }
+	  subfield->next = nextfield;
+	  tofield = &subfield->next;
+	}
+      else
+	tofield = &field->next;
+      field = nextfield;
+    }
+}
+
 
 /*------------------------------------------------------------------*/
 /* checkSClass - check the storage class specification              */

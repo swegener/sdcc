@@ -71,14 +71,14 @@ int a=1;	/* ERROR */
 
 #ifdef TEST9
 #ifdef SDCC
-XDATA int a;
+XDATA int a;	/* IGNORE */
 DATA int a;	/* ERROR(SDCC && !(__z80 || __gbz80)) */
 #endif
 #endif
 
 #ifdef TEST9b
 #ifdef SDCC
-DATA int a;
+DATA int a;	/* IGNORE */
 XDATA int a;	/* ERROR(SDCC && !(__z80 || __gbz80)) */
 #endif
 #endif
@@ -99,21 +99,21 @@ XDATA int a;
 
 #ifdef TEST9e
 #ifdef SDCC
-extern XDATA int a;
+extern XDATA int a; /* IGNORE */
 DATA int a;	/* ERROR(SDCC && !(__z80 || __gbz80)) */
 #endif
 #endif
 
 #ifdef TEST9f
 #ifdef SDCC
-extern DATA int a;
+extern DATA int a; /* IGNORE */
 XDATA int a;	/* ERROR(SDCC && !(__z80 || __gbz80)) */
 #endif
 #endif
 
 #ifdef TEST10
 #if defined(SDCC) && !(defined(__z80) || defined(__gbz80))
-extern volatile XDATA at 0 int a;
+extern volatile XDATA at 0 int a; /* IGNORE */
 volatile XDATA int a;	/* ERROR(SDCC && !(__z80 || __gbz80)) */
 #endif
 #endif

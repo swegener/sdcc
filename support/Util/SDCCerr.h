@@ -192,6 +192,7 @@ SDCCERR - SDCC Standard error handler
 #define E_ENUM_NON_INTEGER 174      /* enumeration constant not an integer */
 #define W_DEPRECATED_PRAGMA 175     /* deprecated pragma */
 #define E_SIZEOF_INCOMPLETE_TYPE 176 /* sizeof applied to an incomplete type */
+#define E_PREVIOUS_DEF 177          /* previously defined here */
 
 /** Describes the maximum error level that will be logged.  Any level
  *  includes all of the levels listed after it.

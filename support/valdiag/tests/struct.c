@@ -10,7 +10,7 @@ struct tag {
 #ifdef TEST2
 struct tag {
   int good1;
-  int bad;
+  int bad;	/* IGNORE */
   int bad;	/* ERROR */
   int good2;
 } badstruct;
@@ -73,4 +73,32 @@ struct tag {
   union tag *next;	/* ERROR */
   int x;
 } ll;
+#endif
+
+#ifdef TEST8a
+struct tag {
+  int a;		/* IGNORE */
+  struct {
+    int a;		/* ERROR(SDCC) */ /* IGNORE(GCC) */
+    int b;
+  };
+} ll;  
+#endif
+
+#ifdef TEST8b
+struct tag {
+  int a;
+  struct {
+    int b;
+    int c;
+  };
+} ll;  
+
+void test(void)
+{
+  ll.a = 1;
+  ll.b = 2;
+  ll.c = 3;
+}
+
 #endif

@@ -55,7 +55,9 @@ int	mflag;		/*	Map output flag
 			 */
 int	sflag;		/*	JCF: Memory usage output flag
 			 */
-int	packflag_and_stacksize=0;	/*	JCF: Pack internal memory flag
+int	packflag=0;	/*	JCF: Pack internal memory flag
+			 */
+int	stacksize=0;    /*	JCF: Stack size
 			 */
 int	aflag;		/*	Overlapping area warning flag
 			 */

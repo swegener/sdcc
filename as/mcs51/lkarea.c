@@ -658,6 +658,23 @@ void lnksect2 (struct area *tap, int rloc)
                 for(j=0, size=0; j<ramlimit; j++)
                     if(idatamap[j]==fchar) size++;
 
+                if( (fchar=='S') && (stacksize==0) )
+                {
+                   /*Search for the largest space available and use it for stack*/
+                    for(j=0, k=0, taxp->a_size=0; j<ramlimit; j++)
+                    {
+                        if(idatamap[j]==' ')
+                        {
+                            if((++k)>(int)taxp->a_size) taxp->a_size=k;
+                        }
+                        else
+                        {
+                            k=0;
+                        }
+                    }
+                    stacksize=taxp->a_size;
+                }
+
                 /*If more space required, release the previously allocated areax in 
                 internal RAM and search for a bigger one*/
                 if((int)taxp->a_size>size)

@@ -73,12 +73,14 @@ int summary(struct area * areap)
 		{0x7f,	0,	128, "DATA",       0x0020},
 		{0,		0,	128, "TOTAL:",     0x0000}
 	};
-	
+
 	_Mem IRam= {0xff,   0,   128, "INDIRECT RAM",		0x0080};
 	_Mem Stack={0xff,   0,     1, "STACK",				0x0000};
 	_Mem XRam= {0xffff, 0, 65536, "EXTERNAL RAM",		0x0100};
 	_Mem Rom=  {0xffff, 0, 65536, "ROM/EPROM/FLASH",	0x0200};
-	
+
+	if(stacksize==0) stacksize=MIN_STACK;
+
 	if(rflag) /*For the DS390*/
 	{
 		XRam.Max=0x1000000; /*24 bits*/
@@ -285,7 +287,7 @@ int summary(struct area * areap)
 	{
 		for(j=Stack.Start, k=0; (j<(int)iram_size)&&(dram[j]==0); j++, k++);
 		fprintf(of, " with %d bytes available\n", k);
-		if (k<MIN_STACK)
+		if ((int)k<stacksize)
 		{
 			sprintf(buff, "Only %d byte%s available for stack.\n",
 				k, (k==1)?"":"s");
@@ -356,7 +358,6 @@ extern char idatamap[]; //0:not used, 1:used
 int summary2(struct area * areap) 
 {
 	#define EQ(A,B) !as_strcmpi((A),(B))
-	#define MIN_STACK 16
 
 	char buff[128];
 	int j, toreturn=0;

@@ -1,3 +1,10 @@
+2004-02-18  Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* as/mcs51/aslink.h, as/mcs51/lkarea.c, as/mcs51/lkdata.c, as/mcs51/lkmain.c,
+	as/mcs51/lkmem.c, src/SDCCglob.h, src/SDCCmain.c: added options --stack-size and
+	--pack-iram.
+	* doc/sdccman.lyx: described options --stack-size and --pack-iram.
+
 2004-02-17 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* device/include/c8051f320.h: added. Contributed by Maarten Brock.

@@ -578,7 +578,9 @@ extern	int	mflag;		/*	Map output flag
 				 */
 extern	int	sflag;		/*	JCF: Memory usage output flag
 				 */
-extern	int	packflag_and_stacksize;	/*	Pack data memory flag
+extern	int	packflag;	/*	Pack data memory flag
+				 */
+extern	int	stacksize;	/*	Pack data memory flag
 				 */
 extern	int	jflag;		/*	NoICE output flag
 				 */

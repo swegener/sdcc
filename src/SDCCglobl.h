@@ -226,6 +226,8 @@ struct options
     int tini_libid;		/* library ID for TINI */
     int protect_sp_update;	/* DS390 - will disable interrupts during ESP:SP updates */
     int parms_in_bank1;       	/* DS390 - use reg bank1 to pass parameters */
+    int stack_size;       	/* MCS51/DS390 - Tells the linker to allocate this space for stack */
+    int pack_iram;       	/* MCS51/DS390 - Tells the linker to pack variables in internal ram */
     /* starting address of the segments */
     int xstack_loc;		/* initial location of external stack */
     int stack_loc;		/* initial value of internal stack pointer */

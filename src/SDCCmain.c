@@ -124,6 +124,8 @@ char buffer[PATH_MAX * 2];
 #define OPTION_PRINT_SEARCH_DIRS "--print-search-dirs"
 #define OPTION_MSVC_ERROR_STYLE "--vc"
 #define OPTION_USE_STDOUT       "--use-stdout"
+#define OPTION_STACK_SIZE	"--stack-size"
+#define OPTION_PACK_IRAM	"--pack-iram"
 
 static const OPTION
 optionsTable[] = {
@@ -218,6 +220,8 @@ optionsTable[] = {
 #endif
 #if !OPT_DISABLE_DS390 || !OPT_DISABLE_MCS51
     { 0,    "--parms-in-bank1",	    &options.parms_in_bank1,"MCS51/DS390 - use Bank1 for parameter passing"},
+    { 0,    OPTION_STACK_SIZE,	    NULL,"MCS51/DS390 - Tells the linker to allocate this space for stack"},
+    { 0,    OPTION_PACK_IRAM,	    &options.pack_iram,"MCS51/DS390 - Tells the linker to pack variables in internal ram"},
 #endif
     { 0,    OPTION_NO_XINIT_OPT,    &options.noXinitOpt, "don't memcpy initialized xram from code"},
     { 0,    OPTION_NO_CCODE_IN_ASM, &options.noCcodeInAsm, "don't include c-code as comments in the asm file"},
@@ -908,6 +912,12 @@ parseCmdLine (int argc, char **argv)
                 options.stack_loc = getIntArg(OPTION_STACK_LOC, argv, &i, argc);
                 continue;
 	    }
+	  
+      if (strcmp (argv[i], OPTION_STACK_SIZE) == 0)
+	    {
+                options.stack_size = getIntArg(OPTION_STACK_SIZE, argv, &i, argc);
+                continue;
+	    }
 
 	  if (strcmp (argv[i], OPTION_XRAM_LOC) == 0)
 	    {
@@ -1307,6 +1317,8 @@ linkEdit (char **envp)
       else /*For all the other ports.  Including pics???*/
         {
           fprintf (lnkfile, "-myux%c\n", (options.out_fmt ? 's' : 'i'));
+          if(options.pack_iram)
+              fprintf (lnkfile, "-Y\n");
         }
 
       if (!(TARGET_IS_Z80 || TARGET_IS_GBZ80)) /*Not for the z80, gbz80*/
@@ -1314,6 +1326,10 @@ linkEdit (char **envp)
           /* if iram size specified */
           if (options.iram_size)
             fprintf (lnkfile, "-a 0x%04x\n", options.iram_size);
+
+          /* if stack size specified*/
+          if(options.stack_size)
+              fprintf (lnkfile, "-A 0x%02x\n", options.stack_size);
 
           /* if xram size specified */
           if (options.xram_size_set)

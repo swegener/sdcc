@@ -108,7 +108,7 @@ void Areas51 (void)
 	};
 	int j;
 
-    if(packflag_and_stacksize)
+    if(packflag)
     {
 	    for (j=0; rel2[j][0]!=0; j++)
 	    {
@@ -135,7 +135,7 @@ void Areas51 (void)
 		else if (!strcmp(ap->a_id, "BSEG_BYTES")) { ap->a_addr=0x20; ap->a_type=1; }
 		else if (!strcmp(ap->a_id, "SSEG"))
         {
-            if(packflag_and_stacksize>1) ap->a_axp->a_size=packflag_and_stacksize;
+            if(stacksize) ap->a_axp->a_size=stacksize;
         }
 	}
 }
@@ -340,7 +340,7 @@ char *argv[];
 			/*
 			 * Link all area addresses.
 			 */
-			if(!packflag_and_stacksize)
+			if(!packflag)
                 lnkarea();
             else
                 lnkarea2();
@@ -371,7 +371,7 @@ char *argv[];
 
 			if (sflag) /*JCF: memory usage summary output*/
             {
-                if(!packflag_and_stacksize)
+                if(!packflag)
                 {
 				    if(summary(areap)) lkexit(1);
                 }
@@ -381,7 +381,7 @@ char *argv[];
                 }
             }
 
-			if ((iram_size) && (!packflag_and_stacksize))
+			if ((iram_size) && (!packflag))
 				iramcheck();
 
 			/*
@@ -825,9 +825,18 @@ parse()
 
                 case 'Y':
                     unget(getnb());
-                    /*The stack segment default size is 16 bytes.  Use -Yxx for xx bytes*/
-                    packflag_and_stacksize=(ip && *ip)?expr(0):16;
+                    packflag=1;
                     break;
+
+                case 'A':
+                    unget(getnb());
+                    if (ip && *ip)
+                    {
+                        stacksize=expr(0);
+                        if(stacksize>256) stacksize=256;
+                        else if(stacksize<0) stacksize=0;
+                    }
+ 					return(0);
 
 				case 'j':
 				case 'J':
@@ -892,7 +901,6 @@ parse()
 					return(0);
 
 				case 'a':
-				case 'A':
 					iramsav();
 					return(0);
 
@@ -1367,7 +1375,8 @@ char *usetxt[] = {
 	"  -v	[xram-size] Check for external RAM overflow",
 	"  -w	[code-size] Check for code overflow",
 	"  -y	Generate memory usage summary file[mem]",
-	"  -Y	[stack-size] Pack internal ram and allocate space for stack",
+	"  -Y	Pack internal ram",
+	"  -A	[stack-size] Allocate space for stack",
 	"End:",
 	"  -e	or null line terminates input",
 	0

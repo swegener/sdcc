@@ -80,8 +80,11 @@ Z80SOURCES      = _atof.c _atoi.c \
 		  _strstr.c _strtok.c \
 		  puts.c gets.c \
 		  assert.c _strcat.c \
+		  _modsint.c _moduint.c \
 		  _modslong.c _modulong.c \
+		  _mulint.c \
 		  _mullong.c \
+		  _divsint.c _divuint.c \
 		  _divslong.c _divulong.c \
 		  malloc.c \
 		  _fs2schar.c _fs2sint.c _fs2slong.c \

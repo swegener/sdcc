@@ -1,3 +1,7 @@
+2003-07-16  Bernhard Held <bernhard@bernhardheld.de>
+
+	* device/lib/Makefile.in: added missing z80 object files
+
 2003-07-14  Bernhard Held <bernhard@bernhardheld.de>
 
         * src/SDCCcse.c (algebraicOpts): CSE fun with &|^ and 0x00/0xff literals

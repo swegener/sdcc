@@ -9,6 +9,10 @@
 #define SDCC_VERSION_P 1
 #define SDCC_VERSION_STR "2.2.2"
 
+/* MSVC 6 does not have __FUNCTION__ preprocessor macro defined */
+
+#define __FUNCTION__ __FILE__
+
 #undef PREFIX
 #undef DATADIR
 #undef SRCDIR

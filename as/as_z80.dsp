@@ -66,7 +66,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /G3 /Zp8 /ML /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "INDEXLIB" /D "MLH_MAP" /D "SDK" /J /FD /GZ /c
+# ADD CPP /nologo /G3 /ML /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "INDEXLIB" /D "MLH_MAP" /D "SDK" /J /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -138,6 +138,22 @@ SOURCE=.\z80\z80pst.c
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=.\z80\alloc.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\z80\asm.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\z80\string.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\z80\z80.h
+# End Source File
 # End Group
 # Begin Group "Resource Files"
 

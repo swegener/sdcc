@@ -24,10 +24,6 @@ Written by Per Bothner 1994. */
 
 /* Parse a C expression from text in a string  */
 
-//#if defined(_MSC_VER)
-//#include <malloc.h>
-//#endif
-
 #include "config.h"   
 #include "cpplib.h"
 
@@ -230,7 +226,7 @@ parse_number (
     if (largest_digit < digit)
       largest_digit = digit;
     nd = n * base + digit;
-    overflow |= ULONG_MAX_over_base < n | nd < n;
+    overflow |= ((ULONG_MAX_over_base < n) | (nd < n)) ;
     n = nd;
   }
 
@@ -286,7 +282,7 @@ cpp_lex (
 cpp_reader *pfile)
 {
   register int c;
-  register int namelen;
+/*  register int namelen; */
   register struct token *toktab;
   enum cpp_token token;
   struct operation op;
@@ -371,7 +367,7 @@ cpp_reader *pfile)
 	      {
 		c = cpp_parse_escape (pfile, &ptr);
 		if (width < HOST_BITS_PER_INT
-		  && (unsigned) c >= (1 << width))
+		  && (unsigned) c >= (1U << width))
 		    cpp_pedwarn (pfile,
 				 "escape sequence out of range for character");
 	      }

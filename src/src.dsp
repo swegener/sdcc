@@ -68,7 +68,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /G3 /Zp8 /ML /W3 /Gm /GX /ZI /Od /I ".." /I "..\support\util" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FR /J /FD /GZ /c
+# ADD CPP /nologo /G3 /ML /W3 /Gm /GX /ZI /Od /I ".." /I "..\support\util" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FR /J /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -250,7 +250,19 @@ SOURCE=.\sdccy.c
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
+SOURCE=.\asm.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\common.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\support\Util\newalloc.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\port.h
 # End Source File
 # Begin Source File
 
@@ -258,7 +270,27 @@ SOURCE=..\sdcc_vc.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\SDCCast.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\SDCCBBlock.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCCbitv.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCCcflow.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCCcse.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCCdflow.h
 # End Source File
 # Begin Source File
 
@@ -266,12 +298,241 @@ SOURCE=.\SDCCglobl.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\SDCCglue.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCChasht.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCCicode.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCClabel.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCCloop.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCClrange.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCCmem.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCCopt.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCCpeeph.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCCptropt.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\SDCCset.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCCsymt.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCCval.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\sdccy.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\spawn.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"
 
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+# End Group
+# Begin Group "Regression Test"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\regression\add.c
+
+!IF  "$(CFG)" == "src - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "src - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\regression\arrays.c
+
+!IF  "$(CFG)" == "src - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "src - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\regression\b.c
+
+!IF  "$(CFG)" == "src - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "src - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\regression\bool1.c
+
+!IF  "$(CFG)" == "src - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "src - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\regression\call1.c
+
+!IF  "$(CFG)" == "src - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "src - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\regression\compare.c
+
+!IF  "$(CFG)" == "src - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "src - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\regression\compare2.c
+
+!IF  "$(CFG)" == "src - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "src - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\regression\for.c
+
+!IF  "$(CFG)" == "src - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "src - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\regression\pointer1.c
+
+!IF  "$(CFG)" == "src - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "src - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\regression\struct1.c
+
+!IF  "$(CFG)" == "src - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "src - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\regression\sub.c
+
+!IF  "$(CFG)" == "src - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "src - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\regression\TempTest.c
+
+!IF  "$(CFG)" == "src - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "src - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\regression\while.c
+
+!IF  "$(CFG)" == "src - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "src - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
 # End Group
 # End Target
 # End Project

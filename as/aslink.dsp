@@ -67,7 +67,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /G3 /Zp8 /ML /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FR /J /FD /GZ /c
+# ADD CPP /nologo /G3 /ML /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FR /J /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -75,8 +75,8 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 /nologo /subsystem:console /incremental:no /debug /machine:I386 /out:"..\bin\aslink.exe" /pdbtype:sept
-# SUBTRACT LINK32 /nodefaultlib
+# ADD LINK32 /nologo /subsystem:console /debug /machine:I386 /out:"..\bin\aslink.exe" /pdbtype:sept
+# SUBTRACT LINK32 /incremental:no /nodefaultlib
 
 !ENDIF 
 
@@ -147,6 +147,26 @@ SOURCE=mcs51\lksym.c
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=.\mcs51\alloc.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\mcs51\aslink.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\mcs51\asm.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\mcs51\i8051.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\mcs51\string.h
+# End Source File
 # End Group
 # Begin Group "Resource Files"
 

@@ -65,7 +65,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir ""
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /nologo /G3 /Zp8 /ML /W3 /Gm /GX /ZI /Od /I ".." /I "." /I "..\.." /I "..\..\support\util" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /FR /J /FD /Zm500 /GZ /c
+# ADD CPP /nologo /G3 /ML /W3 /Gm /GX /ZI /Od /I ".." /I "." /I "..\.." /I "..\..\support\util" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /FR /J /FD /Zm500 /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -90,11 +90,23 @@ SOURCE=.\gen.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\genarith.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\glue.c
 # End Source File
 # Begin Source File
 
 SOURCE=.\main.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\pcode.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\pcodepeep.c
 # End Source File
 # Begin Source File
 
@@ -144,6 +156,10 @@ SOURCE=.\glue.h
 # Begin Source File
 
 SOURCE=.\main.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\pcode.h
 # End Source File
 # Begin Source File
 

@@ -65,7 +65,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir ""
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /nologo /G3 /Zp8 /ML /W3 /Gm /GX /ZI /Od /I ".." /I "." /I "..\.." /I "..\..\support\util" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /FR /J /FD /Zm500 /GZ /c
+# ADD CPP /nologo /G3 /ML /W3 /Gm /GX /ZI /Od /I ".." /I "." /I "..\.." /I "..\..\support\util" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /FR /J /FD /Zm500 /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -91,6 +91,24 @@ SOURCE=.\gen.c
 # Begin Source File
 
 SOURCE=.\main.c
+
+!IF  "$(CFG)" == "mcs51 - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "mcs51 - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+USERDEP__MAIN_="peeph.rul"	
+# Begin Custom Build
+TargetName=port
+InputPath=.\main.c
+
+"$(TargetName)" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	cl /nologo /G3 /ML /W3 /Gm /GX /ZI /Od /I ".." /I "." /I "..\.." /I "..\..\support\util" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /FR /J /FD /Zm500 /GZ /c $(InputPath)
+
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
@@ -98,17 +116,9 @@ SOURCE=.\peeph.def
 
 !IF  "$(CFG)" == "mcs51 - Win32 Release"
 
-# Begin Custom Build
-InputPath=.\peeph.def
-
-"peeph.rul" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	echo on 
-	gawk -f ../SDCCpeeph.awk $(InputPath) >peeph.rul 
-	
-# End Custom Build
-
 !ELSEIF  "$(CFG)" == "mcs51 - Win32 Debug"
 
+# PROP Ignore_Default_Tool 1
 # Begin Custom Build
 InputPath=.\peeph.def
 
@@ -139,7 +149,22 @@ SOURCE=.\main.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\peeph.rul
+
+!IF  "$(CFG)" == "mcs51 - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "mcs51 - Win32 Debug"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\ralloc.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\sdcc_vc.h
 # End Source File
 # End Group
 # End Target

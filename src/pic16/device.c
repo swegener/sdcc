@@ -825,7 +825,7 @@ void pic16_groupRegistersInSection(set *regset)
 					(reg->regop?(OP_SYMBOL(reg->regop)->level):-1) );
 #endif
 
-			if(reg->alias) {
+			if(reg->alias == 0x80) {
 				checkAddReg(&pic16_equ_data, reg);
 			} else
 			if(reg->isFixed) {

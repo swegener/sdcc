@@ -9642,11 +9642,13 @@ static void genConstPointerGet (operand *left,
       pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_tablat), pic16_popGet(AOP(result),offset)));
       offset++;
     }
-									// .... patch 15
+    
   pic16_freeAsmop(left,NULL,ic,TRUE);
   pic16_freeAsmop(result,NULL,ic,TRUE);
 
 }
+
+
 /*-----------------------------------------------------------------*/
 /* genPointerGet - generate code for pointer get                   */
 /*-----------------------------------------------------------------*/
@@ -9733,6 +9735,11 @@ static void genPointerGet (iCode *ic)
 #endif
 	genGenPointerGet (left,result,ic);
       break;
+
+    default:
+      werror (E_INTERNAL_ERROR, __FILE__, __LINE__, 
+	      "genPointerGet: illegal pointer type");
+    
     }
 
 }

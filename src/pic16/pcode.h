@@ -983,6 +983,11 @@ extern pCodeOpReg pic16_pc_plusw2;
 extern pCodeOpReg pic16_pc_prodl;
 extern pCodeOpReg pic16_pc_prodh;
 
+extern pCodeOpReg pic16_pc_eecon1;
+extern pCodeOpReg pic16_pc_eecon2;
+extern pCodeOpReg pic16_pc_eedata;
+extern pCodeOpReg pic16_pc_eeadr;
+
 extern pCodeOpReg pic16_pc_kzero;
 extern pCodeOpReg pic16_pc_wsave;     /* wsave and ssave are used to save W and the Status */
 extern pCodeOpReg pic16_pc_ssave;     /* registers during an interrupt */

@@ -366,7 +366,8 @@ value *pic16_initPointer (initList * ilist, sym_link *toType)
       return valCastLiteral(toType, 0.0);
   }
 
-  expr = list2expr (ilist);
+  expr = decorateType(resolveSymbols( list2expr (ilist) ), FALSE);
+//  expr = list2expr( ilist );
   
   if (!expr)
     goto wrong;
@@ -406,7 +407,7 @@ value *pic16_initPointer (initList * ilist, sym_link *toType)
     if (IS_AST_SYM_VALUE (expr->left)) {
       val = copyValue (AST_VALUE (expr->left));
       val->type = newLink (DECLARATOR);
-      if (SPEC_SCLS (expr->left->etype) == S_CODE) {
+      if(SPEC_SCLS (expr->left->etype) == S_CODE) {
         DCL_TYPE (val->type) = CPOINTER;
         DCL_PTR_CONST (val->type) = port->mem.code_ro;
       }
@@ -420,6 +421,7 @@ value *pic16_initPointer (initList * ilist, sym_link *toType)
         DCL_TYPE (val->type) = EEPPOINTER;
       else
         DCL_TYPE (val->type) = POINTER;
+
       val->type->next = expr->left->ftype;
       val->etype = getSpec (val->type);
       return val;
@@ -483,6 +485,7 @@ value *pic16_initPointer (initList * ilist, sym_link *toType)
     val->etype = getSpec (val->type);
     return val;
   }
+
  wrong:
   if (expr)
     werrorfl (expr->filename, expr->lineno, E_INCOMPAT_PTYPES);
@@ -490,41 +493,6 @@ value *pic16_initPointer (initList * ilist, sym_link *toType)
     werror (E_INCOMPAT_PTYPES);
   return NULL;
 
-}
-
-
-/*-----------------------------------------------------------------*/
-/* return the generic pointer high byte for a given pointer type.  */
-/*-----------------------------------------------------------------*/
-int pic16_pointerTypeToGPByte (const int p_type, const char *iname, const char *oname)
-{
-  switch (p_type)
-    {
-    case IPOINTER:
-    case POINTER:
-	fprintf(stderr, "%s:%d pointer is IPOINTER/POINTER\n", __FILE__, __LINE__);
-      return GPTYPE_NEAR;
-    case GPOINTER:
-	fprintf(stderr, "%s:%d pointer is GPOINTER\n", __FILE__, __LINE__);
-      werror (E_CANNOT_USE_GENERIC_POINTER, 
-              iname ? iname : "<null>", 
-              oname ? oname : "<null>");
-      exit (1);
-    case FPOINTER:
-	fprintf(stderr, "%s:%d pointer is FPOINTER\n", __FILE__, __LINE__);
-      return GPTYPE_FAR;
-    case CPOINTER:
-	fprintf(stderr, "%s:%d pointer is CPOINTER\n", __FILE__, __LINE__);
-      return GPTYPE_CODE;
-    case PPOINTER:
-	fprintf(stderr, "%s:%d pointer is PPOINTER\n", __FILE__, __LINE__);
-      return GPTYPE_XSTACK;
-    default:
-      fprintf (stderr, "*** internal error: unknown pointer type %d in GPByte.\n",
-               p_type);
-      break;
-    }
-  return -1;
 }
 
 
@@ -553,11 +521,18 @@ void pic16_printPointerType (const char *name, char ptype, void *p)
 /*-----------------------------------------------------------------*/
 /* printGPointerType - generates ival for generic pointer type     */
 /*-----------------------------------------------------------------*/
-void pic16_printGPointerType (const char *iname, const char *oname,
+void pic16_printGPointerType (const char *iname, const char *oname, const unsigned int itype,
                    const unsigned int type, char ptype, void *p)
 {
   _pic16_printPointerType (iname, ptype, p);
-  pic16_emitDB(pic16_pointerTypeToGPByte(type, iname, oname), ptype, p);
+
+  if(itype == FPOINTER || itype == CPOINTER) {	// || itype == GPOINTER) {
+    char buf[256];
+
+	sprintf(buf, "UPPER(%s)", iname);
+	pic16_emitDS(buf, ptype, p);
+  }
+
   pic16_flushDB(ptype, p);
 }
 
@@ -572,7 +547,7 @@ pic16_printIvalType (symbol *sym, sym_link * type, initList * ilist, char ptype,
   value *val;
   unsigned long ulval;
 
-  //fprintf(stderr, "%s\n",__FUNCTION__);
+//  fprintf(stderr, "%s for symbol %s\n",__FUNCTION__, sym->rname);
 
   /* if initList is deep */
   if (ilist && ilist->type == INIT_DEEP)
@@ -780,6 +755,7 @@ void pic16_printIvalBitFields(symbol **sym, initList **ilist, char ptype, void *
   default:
 	/* VR - only 1,2,4 size long can be handled???? Why? */
   	fprintf(stderr, "%s:%d: unhandled case. Contact author.\n", __FILE__, __LINE__);
+  	assert(0);
   }
   *sym = lsym;
   *ilist = lilist;
@@ -834,7 +810,7 @@ int pic16_printIvalCharPtr (symbol * sym, sym_link * type, value * val, char pty
      VR - Attempting to port this function to pic16 port - 8-Jun-2004
    */
 
-	fprintf(stderr, "%s\n",__FUNCTION__);
+//	fprintf(stderr, "%s\n",__FUNCTION__);
 
   size = getSize (type);
 
@@ -844,11 +820,11 @@ int pic16_printIvalCharPtr (symbol * sym, sym_link * type, value * val, char pty
         {
 	  pic16_emitDS(val->name, ptype, p);
         }
-      else if (size == FPTRSIZE)
+      else if (size == 2)
         {
           pic16_printPointerType (val->name, ptype, p);
         }
-      else if (size == GPTRSIZE)
+      else if (size == 3)
         {
           int type;
           if (IS_PTR (val->type)) {
@@ -860,7 +836,7 @@ int pic16_printIvalCharPtr (symbol * sym, sym_link * type, value * val, char pty
             // this is a literal string
             type=CPOINTER;
           }
-          pic16_printGPointerType(val->name, sym->name, type, ptype, p);
+          pic16_printGPointerType(val->name, sym->name, type, type, ptype, p);
         }
       else
         {
@@ -874,45 +850,19 @@ int pic16_printIvalCharPtr (symbol * sym, sym_link * type, value * val, char pty
       switch (size)
         {
         case 1:
-	  pic16_emitDS(aopLiteral(val, 0), ptype, p);
-//          tfprintf (oFile, "\t!dbs\n", aopLiteral (val, 0));
+	  pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
           break;
         case 2:
-	  pic16_emitDS(aopLiteral(val, 0), ptype, p);
-	  pic16_emitDS(aopLiteral(val, 1), ptype, p);
-//            tfprintf (oFile, "\t.byte %s,%s\n",
-//                      aopLiteral (val, 0), aopLiteral (val, 1));
+	  pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
+	  pic16_emitDB(pic16aopLiteral(val, 1), ptype, p);
           break;
         case 3:
-          if (IS_GENPTR(type) && floatFromVal(val)!=0) {
-            // non-zero mcs51 generic pointer
-            werrorfl (sym->fileDef, sym->lineDef, E_LITERAL_GENERIC);
-          }
-
-	  pic16_emitDS(aopLiteral(val, 0), ptype, p);
-	  pic16_emitDS(aopLiteral(val, 1), ptype, p);
-	  pic16_emitDS(aopLiteral(val, 2), ptype, p);
+	  pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
+	  pic16_emitDB(pic16aopLiteral(val, 1), ptype, p);
+	  pic16_emitDB(pic16aopLiteral(val, 2), ptype, p);
 	  
-//          fprintf (oFile, "\t.byte %s,%s,%s\n",
-//                     aopLiteral (val, 0), 
-//                     aopLiteral (val, 1),
-//                    aopLiteral (val, 2));
           break;
 
-
-/* no 4 bytes size long for pic16 port */
-        case 4:
-          if (IS_GENPTR(type) && floatFromVal(val)!=0) {
-            // non-zero ds390 generic pointer
-            werrorfl (sym->fileDef, sym->lineDef, E_LITERAL_GENERIC);
-          }
-
-//          fprintf (oFile, "\t.byte %s,%s,%s,%s\n",
-//                     aopLiteral (val, 0), 
-//                     aopLiteral (val, 1), 
-//                     aopLiteral (val, 2),
-//                     aopLiteral (val, 3));
-          break;
         default:
           assert (0);
         }
@@ -960,14 +910,11 @@ void pic16_printIvalFuncPtr (sym_link * type, initList * ilist, char ptype, void
     }
 
   /* now generate the name */
-  if (!val->sym)
-    {
+  if (!val->sym) {
       pic16_printPointerType (val->name, ptype, p);
-    }
-  else
-    {
+  } else {
       pic16_printPointerType (val->sym->rname, ptype, p);
-    }
+  }
 
   return;
 }
@@ -980,6 +927,12 @@ void pic16_printIvalPtr (symbol * sym, sym_link * type, initList * ilist, char p
 {
   value *val;
   int size;
+
+
+#if 0
+	fprintf(stderr, "%s:%d initialising pointer: %s size: %d\n", __FILE__, __LINE__,
+		sym->rname, getSize(sym->type));
+#endif
 
   /* if deep then   */
   if (ilist && (ilist->type == INIT_DEEP))
@@ -1013,22 +966,14 @@ void pic16_printIvalPtr (symbol * sym, sym_link * type, initList * ilist, char p
         {
         case 1:
             pic16_emitDB((unsigned int)floatFromVal(val) & 0xff, ptype, p);
-//            tfprintf (oFile, "\t!db !constbyte\n", (unsigned int) floatFromVal (val) & 0xff);
             break;
         case 2:
             pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
             pic16_emitDB(pic16aopLiteral(val, 1), ptype, p);
-//            tfprintf (oFile, "\t.byte %s,%s\n", aopLiteral (val, 0), aopLiteral (val, 1));
             break;
         case 3:
             pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
             pic16_emitDB(pic16aopLiteral(val, 1), ptype, p);
-
-          if (IS_GENPTR (val->type))
-            pic16_emitDB(pic16aopLiteral(val, 2), ptype, p);
-          else if (IS_PTR (val->type))
-            pic16_emitDB(pic16_pointerTypeToGPByte(DCL_TYPE(val->type), NULL, NULL), ptype, p);
-          else
             pic16_emitDB(pic16aopLiteral(val, 2), ptype, p);
         }
       return;
@@ -1041,13 +986,13 @@ void pic16_printIvalPtr (symbol * sym, sym_link * type, initList * ilist, char p
     {
       pic16_emitDS(val->name, ptype, p);
     }
-  else if (size == FPTRSIZE)
+  else if (size == 2)
     {
         pic16_printPointerType (val->name, ptype, p);
     }
-  else if (size == GPTRSIZE)
+  else if (size == 3)
     {
-      pic16_printGPointerType (val->name, sym->name,
+      pic16_printGPointerType (val->name, sym->name, (IS_PTR(type)?DCL_TYPE(type):PTR_TYPE(SPEC_OCLS(sym->etype))),
                          (IS_PTR (val->type) ? DCL_TYPE (val->type) :
                           PTR_TYPE (SPEC_OCLS (val->etype))), ptype, p);
     }
@@ -1068,15 +1013,15 @@ void pic16_printIval (symbol * sym, sym_link * type, initList * ilist, char ptyp
 
 //	fprintf(stderr, "%s:%d generating init for %s\n", __FILE__, __LINE__, sym->name);
 
-  /* if structure then    */
+  /* if structure then */
   if (IS_STRUCT (type))
     {
-      fprintf(stderr,"%s struct\n",__FUNCTION__);
+//      fprintf(stderr,"%s struct\n",__FUNCTION__);
       pic16_printIvalStruct (sym, type, ilist, ptype, p);
       return;
     }
 
-  /* if this is an array   */
+  /* if this is an array */
   if (IS_ARRAY (type))
     {
 //	fprintf(stderr,"%s array\n",__FUNCTION__);
@@ -1098,7 +1043,7 @@ void pic16_printIval (symbol * sym, sym_link * type, initList * ilist, char ptyp
         }
       }
 
-#if 1
+#if 0
       // and the type must match
       itype=ilist->init.node->ftype;
 
@@ -1120,7 +1065,7 @@ void pic16_printIval (symbol * sym, sym_link * type, initList * ilist, char ptyp
   /* if this is a pointer */
   if (IS_PTR (type))
     {
-      fprintf(stderr,"%s pointer\n",__FUNCTION__);
+//      fprintf(stderr,"%s pointer\n",__FUNCTION__);
       pic16_printIvalPtr (sym, type, ilist, ptype, p);
       return;
     }
@@ -1171,7 +1116,6 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n",
 #endif
 
         if(SPEC_ABSA(sym->etype) && PIC16_IS_CONFIG_ADDRESS(SPEC_ADDR(sym->etype))) {
-             
 		pic16_assignConfigWordValue(SPEC_ADDR(sym->etype),
 			(int) floatFromVal(list2val(sym->ival)));
 
@@ -1179,12 +1123,8 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n",
         }
 
 	/* if it is "extern" then do nothing */
-	if (IS_EXTERN (sym->etype)) {
-
-		/* do not emit if it is a config word declaration */
-		if(!SPEC_ABSA(sym->etype)
-			|| (SPEC_ABSA(sym->etype) && !PIC16_IS_CONFIG_ADDRESS(SPEC_ADDR(sym->etype))))
-			checkAddSym(&externs, sym);
+	if (IS_EXTERN (sym->etype) && !SPEC_ABSA(sym->etype)) {
+		checkAddSym(&externs, sym);
 	  continue;
 	}
 
@@ -1195,44 +1135,18 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n",
 		checkAddSym(&publics, sym);
 	}
 
-#if 0
       /* print extra debug info if required */
-      if (options.debug || sym->level == 0)
-	{
+      if (options.debug || sym->level == 0) {
 	  /* NOTE to me - cdbFile may be null in which case,
 	   * the sym name will be printed to stdout. oh well */
-	  if(cdbFile)
-	    cdbSymbol (sym, cdbFile, FALSE, FALSE);
-
-	  if (!sym->level)
-	    {			/* global */
-	      if (IS_STATIC (sym->etype))
-		fprintf (code->oFile, "F%s_", moduleName);	/* scope is file */
-	      else
-		fprintf (code->oFile, "G_");	/* scope is global */
-	    }
-	  else
-	    /* symbol is local */
-	    fprintf (code->oFile, "L%s_",
-		     (sym->localof ? sym->localof->name : "-null-"));
-	  fprintf (code->oFile, "%s_%d_%d", sym->name, sym->level, sym->block);
-
-	}
-#endif
-
+	   debugFile->writeSymbol(sym);
+      }
+	 
       /* if it has an absolute address */
-      if (SPEC_ABSA (sym->etype))
-	{
-		fprintf(stderr, "%s:%d spec_absa is true for symbol: %s\n",
-			__FILE__, __LINE__, sym->name);
+      if (SPEC_ABSA (sym->etype)) {
+//		fprintf(stderr, "%s:%d spec_absa is true for symbol: %s\n",
+//			__FILE__, __LINE__, sym->name);
 			
-	  if (options.debug || sym->level == 0)
-	    fprintf (code->oFile, " == 0x%04x\n", SPEC_ADDR (sym->etype));
-
-	  fprintf (code->oFile, "%s\t=\t0x%04x\n",
-		   sym->rname,
-		   SPEC_ADDR (sym->etype));
-
 	  /* if it has an initial value */
 	  if (sym->ival)
 	    {
@@ -1241,6 +1155,7 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n",
               absSym *abSym;
               pCode *pcf;
               
+              /* symbol has absolute address and initial value */
 	      noAlloc++;
 	      resolveIvalSym (sym->ival, sym->type);
 	      asym = newSymbol(sym->rname, 0);
@@ -1266,31 +1181,30 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n",
 	  else
 	    {
 
+	      /* symbol has absolute address but no initial value */
+	      
 	      /* allocate space */
 	      fprintf (code->oFile, "%s:\n", sym->rname);
+
 	      /* special case for character strings */
 	      if (IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) &&
 		  SPEC_CVAL (sym->etype).v_char)
 		pic16_pCodeConstString(sym->rname , SPEC_CVAL (sym->etype).v_char);
-		/*printChar (code->oFile,
-			   SPEC_CVAL (sym->etype).v_char,
-			   strlen (SPEC_CVAL (sym->etype).v_char) + 1);*/
-	      else
+	      else {
+	      	assert(0);
 		fprintf (code->oFile, "\t.ds\t0x%04x\n", (unsigned int) getSize (sym->type) & 0xffff);
+	      }
 	    }
   
 	} else {
 //		fprintf(stderr, "%s:%d spec_absa is false for symbol: %s\n",
 //			__FILE__, __LINE__, sym->name);
 
-	  if (options.debug || sym->level == 0)
-	    fprintf (code->oFile, " == .\n");
-
 	  /* if it has an initial value */
-	  if (sym->ival)
-	    {
+	  if (sym->ival) {
 	      pBlock *pb;
 
+	      /* symbol doesn't have absolute address but has initial value */
 	      fprintf (code->oFile, "%s:\n", sym->rname);
 	      noAlloc++;
 	      resolveIvalSym (sym->ival, sym->type);
@@ -1302,21 +1216,19 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n",
 	      pic16_printIval(sym, sym->type, sym->ival, 'p', (void *)pb);
               pic16_flushDB('p', (void *)pb);
 	      noAlloc--;
-	    }
-	  else
-	    {
+	    } else {
 
+	      /* symbol doesn't have absolute address and no initial value */
 	      /* allocate space */
 	      fprintf (code->oFile, "%s:\n", sym->rname);
 	      /* special case for character strings */
 	      if (IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) &&
 		  SPEC_CVAL (sym->etype).v_char)
 		pic16_pCodeConstString(sym->rname , SPEC_CVAL (sym->etype).v_char);
-		/*printChar (code->oFile,
-			   SPEC_CVAL (sym->etype).v_char,
-			   strlen (SPEC_CVAL (sym->etype).v_char) + 1);*/
-	      else
+	      else {
+	        assert(0);
 		fprintf (code->oFile, "\t.ds\t0x%04x\n", (unsigned int) getSize (sym->type) & 0xffff);
+	      }
 	    }
 	}
     }

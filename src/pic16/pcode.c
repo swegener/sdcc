@@ -100,6 +100,14 @@ pCodeOpReg pic16_pc_plusw2	= {{PO_INDF0,	"PLUSW2"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_prodl	= {{PO_PRODL, "PRODL"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_prodh	= {{PO_PRODH, "PRODH"}, -1, NULL, 0, NULL};
 
+/* EEPROM registers */
+pCodeOpReg pic16_pc_eecon1	= {{PO_SFR_REGISTER, "EECON1"}, -1, NULL, 0, NULL};
+pCodeOpReg pic16_pc_eecon2	= {{PO_SFR_REGISTER, "EECON2"}, -1, NULL, 0, NULL};
+pCodeOpReg pic16_pc_eedata	= {{PO_SFR_REGISTER, "EEDATA"}, -1, NULL, 0, NULL};
+pCodeOpReg pic16_pc_eeadr	= {{PO_SFR_REGISTER, "EEADR"}, -1, NULL, 0, NULL};
+
+
+
 pCodeOpReg pic16_pc_kzero     = {{PO_GPR_REGISTER,  "KZ"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_wsave     = {{PO_GPR_REGISTER,  "WSAVE"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_ssave     = {{PO_GPR_REGISTER,  "SSAVE"}, -1, NULL,0,NULL};
@@ -2784,13 +2792,10 @@ void  pic16_pCodeInitRegisters(void)
 	pic16_pc_tosh.r = pic16_allocProcessorRegister(IDX_TOSH,"TOSH", PO_SFR_REGISTER, 0x80);
 	pic16_pc_tosu.r = pic16_allocProcessorRegister(IDX_TOSU,"TOSU", PO_SFR_REGISTER, 0x80);
 
-	pic16_pc_tblptrl.r = pic16_allocProcessorRegister(IDX_TBLPTRL,"TBLPTRL", PO_SFR_REGISTER, 0x80); // patch 15
-	pic16_pc_tblptrh.r = pic16_allocProcessorRegister(IDX_TBLPTRH,"TBLPTRH", PO_SFR_REGISTER, 0x80); // patch 15
-	pic16_pc_tblptru.r = pic16_allocProcessorRegister(IDX_TBLPTRU,"TBLPTRU", PO_SFR_REGISTER, 0x80); // patch 15
-	pic16_pc_tablat.r = pic16_allocProcessorRegister(IDX_TABLAT,"TABLAT", PO_SFR_REGISTER, 0x80); // patch 15
-
-
-//	pic16_pc_fsr0.r = pic16_allocProcessorRegister(IDX_FSR0,"FSR0", PO_FSR0, 0x80); // deprecated !
+	pic16_pc_tblptrl.r = pic16_allocProcessorRegister(IDX_TBLPTRL,"TBLPTRL", PO_SFR_REGISTER, 0x80);
+	pic16_pc_tblptrh.r = pic16_allocProcessorRegister(IDX_TBLPTRH,"TBLPTRH", PO_SFR_REGISTER, 0x80);
+	pic16_pc_tblptru.r = pic16_allocProcessorRegister(IDX_TBLPTRU,"TBLPTRU", PO_SFR_REGISTER, 0x80);
+	pic16_pc_tablat.r = pic16_allocProcessorRegister(IDX_TABLAT,"TABLAT", PO_SFR_REGISTER, 0x80);
 
 	pic16_pc_fsr0l.r = pic16_allocProcessorRegister(IDX_FSR0L, "FSR0L", PO_FSR0, 0x80);
 	pic16_pc_fsr0h.r = pic16_allocProcessorRegister(IDX_FSR0H, "FSR0H", PO_FSR0, 0x80);
@@ -2819,6 +2824,13 @@ void  pic16_pCodeInitRegisters(void)
 	
 	pic16_pc_prodl.r = pic16_allocProcessorRegister(IDX_PRODL, "PRODL", PO_PRODL, 0x80);
 	pic16_pc_prodh.r = pic16_allocProcessorRegister(IDX_PRODH, "PRODH", PO_PRODH, 0x80);
+
+
+	pic16_pc_eecon1.r = pic16_allocProcessorRegister(IDX_EECON1, "EECON1", PO_SFR_REGISTER, 0x80);
+	pic16_pc_eecon2.r = pic16_allocProcessorRegister(IDX_EECON2, "EECON2", PO_SFR_REGISTER, 0x80);
+	pic16_pc_eedata.r = pic16_allocProcessorRegister(IDX_EEDATA, "EEDATA", PO_SFR_REGISTER, 0x80);
+	pic16_pc_eeadr.r = pic16_allocProcessorRegister(IDX_EEADR, "EEADR", PO_SFR_REGISTER, 0x80);
+
 	
 	pic16_pc_status.rIdx = IDX_STATUS;
 	pic16_pc_intcon.rIdx = IDX_INTCON;
@@ -2869,6 +2881,12 @@ void  pic16_pCodeInitRegisters(void)
 	pic16_pc_kzero.rIdx = IDX_KZ;
 	pic16_pc_wsave.rIdx = IDX_WSAVE;
 	pic16_pc_ssave.rIdx = IDX_SSAVE;
+
+	pic16_pc_eecon1.rIdx = IDX_EECON1;
+	pic16_pc_eecon2.rIdx = IDX_EECON2;
+	pic16_pc_eedata.rIdx = IDX_EEDATA;
+	pic16_pc_eeadr.rIdx = IDX_EEADR;
+	
 
 	/* probably should put this in a separate initialization routine */
 	pb_dead_pcodes = newpBlock();
@@ -4025,6 +4043,7 @@ pCodeOp *pic16_newpCodeOp(char *name, PIC_OPTYPE type)
   return pcop;
 }
 
+#define DB_ITEMS_PER_LINE	8
 
 typedef struct DBdata
   {
@@ -4086,7 +4105,7 @@ void pic16_emitDB(char c, char ptype, void *p)
 	sprintf(DBd.buffer+l,"%s0x%02x", (DBd.count>0?", ":""), c & 0xff);
 
 	DBd.count++;
-	if (DBd.count>=16)
+	if (DBd.count>= DB_ITEMS_PER_LINE)
 		pic16_flushDB(ptype, p);
 }
 
@@ -6430,6 +6449,8 @@ static void pic16_FixRegisterBanking(pBlock *pb)
 				prevreg = reg;
 				if(!pic16_options.no_banksel)
 					insertBankSwitch(0, pc);
+			} else {
+//				if(pcprev && isPCI_SKIP(pcprev))assert(0);
 			}
 		}
 

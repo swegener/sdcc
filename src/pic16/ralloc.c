@@ -656,7 +656,7 @@ pic16_allocDirReg (operand *op )
 	    	  return NULL;
 		}
 
-		if(1) {	//!PIC16_IS_CONFIG_ADDRESS(address)) {
+		if(1) {	//!PIC16_IS_CONFIG_ADDRESS(address)) 
 //			fprintf(stderr,"%s:allocating new reg %s\n",__FUNCTION__, name);
 
 			/* this is an error, why added? -- VR */
@@ -672,23 +672,22 @@ pic16_allocDirReg (operand *op )
 			if(!IN_DIRSPACE( SPEC_OCLS( OP_SYM_ETYPE(op)))) {						// patch 13
 				if(pic16_debug_verbose)									//
 				{											//
-					fprintf(stderr, "dispace:%d farspace:%d codespace:%d regspace:%d stack:%d\n",
+					fprintf(stderr, "dispace:%d farspace:%d codespace:%d regspace:%d stack:%d eeprom: %d\n",
 						IN_DIRSPACE( SPEC_OCLS( OP_SYM_ETYPE(op))),
 						IN_FARSPACE( SPEC_OCLS( OP_SYM_ETYPE(op))),
 						IN_CODESPACE( SPEC_OCLS( OP_SYM_ETYPE(op))),
 						IN_REGSP( SPEC_OCLS( OP_SYM_ETYPE(op))),
-						IN_STACK( OP_SYM_ETYPE(op)));
+						IN_STACK( OP_SYM_ETYPE(op)),
+						SPEC_OCLS(OP_SYM_ETYPE(op)) == eeprom);
 
 					fprintf(stderr, "%s:%d symbol %s NOT in dirspace\n", __FILE__, __LINE__,	//
 				    		OP_SYMBOL(op)->name);							//
 				}											//
-//				return NULL;										//
 			}												// patch 13
 
 			reg = newReg(regtype, PO_DIR, rDirectIdx++, name,getSize (OP_SYMBOL (op)->type),0, op);
 			debugLog ("%d  -- added %s to hash, size = %d\n", __LINE__, name,reg->size);
 
-//			hTabAddItem(&dynDirectRegNames, regname2key(name), reg);	/* commented out */
 
 //			if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
 //				fprintf(stderr, " ralloc.c at fixed address: %s - changing to REG_SFR\n",name);
@@ -707,7 +706,6 @@ pic16_allocDirReg (operand *op )
 	
 		} else {
 			debugLog ("  -- %s is declared at address 0x30000x\n",name);
-//			fprintf(stderr, "  -- %s is declared at address 0x30000x\n",name);
 	
 		  return NULL;
 		}
@@ -1115,30 +1113,15 @@ void pic16_writeUsedRegs(FILE *of)
 	pic16_groupRegistersInSection(pic16_dynProcessorRegs);
 	
 	
-#if 0
-	pic16_assignFixedRegisters(pic16_dynAllocRegs);
-	pic16_assignFixedRegisters(pic16_dynStackRegs);
-	pic16_assignFixedRegisters(pic16_dynDirectRegs);
-	pic16_assignFixedRegisters(pic16_dynProcessorRegs);
-
-	pic16_assignRelocatableRegisters(pic16_dynDirectBitRegs, 0);
-	pic16_assignRelocatableRegisters(pic16_dynInternalRegs,0);
-	pic16_assignRelocatableRegisters(pic16_dynAllocRegs,0);
-	pic16_assignRelocatableRegisters(pic16_dynStackRegs,0);
-	pic16_assignRelocatableRegisters(pic16_dynDirectRegs,0);
-#endif
-
-//	pic16_dump_map();
-//	pic16_dump_cblock(of);
-
 	/* dump equates */
 	pic16_dump_equates(of, pic16_equ_data);
+
+//	pic16_dump_esection(of, pic16_rel_eedata, 0);
+//	pic16_dump_esection(of, pic16_fix_eedata, 0);
 
 	/* dump initialised data */
 	pic16_dump_isection(of, rel_idataSymSet, 0);
 	pic16_dump_isection(of, fix_idataSymSet, 1);
-
-//	pic16_dump_idata(of, idataSymSet);
 
 	/* dump internal registers */
 	pic16_dump_int_registers(of, pic16_int_regs);

@@ -169,6 +169,12 @@ regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alia
 #define IDX_PRODL       0xff3
 #define IDX_PRODH       0xff4
 
+/* EEPROM registers */
+#define IDX_EECON1	0xfa6
+#define IDX_EECON2	0xfa7
+#define IDX_EEDATA	0xfa8
+#define IDX_EEADR	0xfa9
+
 #define IDX_KZ      0x7fff   /* Known zero - actually just a general purpose reg. */
 #define IDX_WSAVE   0x7ffe
 #define IDX_SSAVE   0x7ffd

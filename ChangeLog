@@ -1,3 +1,17 @@
+2004-06-12 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/gen.c (genPointerGet): added E_INTERNAL_ERROR for
+	default case in switch statement,
+	* glue.c (pic16_initPointer): expr is initialised via decoarteType
+	to eliminate problem with initialisation of pointers, but problem
+	still exists,
+	* (pic16_pointerTypeToGPByte): removed, no needed for pic16,
+	* (emitStaticSegment): removed various lines emitting debug info,
+	* src/pic16/pcode.c, src/pic16/pcode.h, src/pic16/ralloc.h:
+	added processor registers for utilizing EEPROM,
+	* src/pic16/pcode.c (pic16_emitDB): number of DBs emitted is not
+	configurable and set 8
+
 2004-06-07 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* .version: increased version number to 2.4.2,

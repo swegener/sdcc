@@ -12,12 +12,26 @@ srcdir          = .
 include $(srcdir)/Makefile.common
 
 SDCC_MISC	= debugger/mcs51 sim/ucsim
+
 SDCC_LIBS	= support/cpp support/cpp2
+
 SDCC_ASLINK	= as/mcs51 as link
 SDCC_PACKIHX	= packihx
 
-PKGS		= src $(SDCC_ASLINK) $(SDCC_PACKIHX) $(SDCC_MISC) \
-		  $(SDCC_LIBS) device/include device/lib
+TARGETS         = sdcc-libs sdcc-cc sdcc-aslink sdcc-packihx
+
+PKGS		= $(SDCC_LIBS) src $(SDCC_ASLINK) $(SDCC_PACKIHX)
+
+ifneq ($(OPT_ENABLE_UCSIM), no)
+TARGETS         += sdcc-misc 
+PKGS            += $(SDCC_MISC)
+endif
+
+ifneq ($(OPT_ENABLE_DEVICE_LIB_BUILD), no)
+TARGETS         += sdcc-device
+PKGS            += device/include device/lib
+endif
+
 PKGS_TINI	= $(SDCC_LIBS) $(SDCC_ASLINK) \
 		  src device/include $(SDCC_PACKIHX)
 PORTS		= $(shell cat ports.build)
@@ -52,8 +66,8 @@ sdcc-device-tini:
 	$(MAKE) -C device/include
 	$(MAKE) -C device/lib modelDS390
 
-sdcc: sdcc-cc sdcc-aslink sdcc-misc sdcc-device sdcc-packihx
-	$(MAKE) -f main.mk all
+sdcc: $(TARGETS)
+	echo $(TARGETS)
 
 sdcc-tini: sdcc-cc sdcc-aslink sdcc-device-tini sdcc-packihx
 	$(MAKE) -f main.mk all

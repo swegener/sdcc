@@ -33,6 +33,10 @@ man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
 
+# Modules to enable/disable
+OPT_ENABLE_UCSIM = @OPT_ENABLE_UCSIM@
+OPT_ENABLE_DEVICE_LIB_BUILD = @OPT_ENABLE_DEVICE_LIB_BUILD@
+
 SLIB			= $(PRJDIR)/support/Util
 
 transform       = @program_transform_name@

@@ -5757,6 +5757,7 @@ genOr (iCode * ic, iCode * ifx)
 	}
       else
 	{
+	    _startLazyDPSEvaluation();
 	  for (; (size--); offset++)
 	    {
 	      // normal case
@@ -5770,8 +5771,7 @@ genOr (iCode * ic, iCode * ifx)
 			      offset);
 		      continue;
 		    }
-		  D (emitcode (";", "better literal OR.");
-		    );
+		  D (emitcode (";", "better literal OR."););
 		  MOVA (aopGet (AOP (left), offset, FALSE, FALSE, TRUE));
 		  emitcode ("orl", "a, %s", aopGet (AOP (right), offset,
 						    FALSE, FALSE, FALSE));
@@ -5788,13 +5788,20 @@ genOr (iCode * ic, iCode * ifx)
 		    }
 		  else
 		    {
-		      MOVA (aopGet (AOP (right), offset, FALSE, FALSE, TRUE));
-		      emitcode ("orl", "a,%s",
-			  aopGet (AOP (left), offset, FALSE, FALSE, FALSE));
+		      char *rOp = aopGet (AOP (right), offset, FALSE, FALSE, TRUE);
+		      if (!strcmp(rOp, "a") || !strcmp(rOp, "acc"))
+		      {
+			  emitcode("mov", "b,a");
+			  rOp = "b";
+		      }
+			
+		      MOVA (aopGet (AOP (left), offset, FALSE, FALSE, TRUE));
+		      emitcode ("orl", "a,%s", rOp);
 		    }
 		}
 	      aopPut (AOP (result), "a", offset);
 	    }
+	    _endLazyDPSEvaluation();
 	}
     }
 

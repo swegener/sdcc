@@ -19,5 +19,9 @@
 #define _FS_REENTRANT
 #define _MATH_REENTRANT
 
+#define _CODE	code
+#define _DATA	data
+#define _AUTOMEM
+#define _STATMEM
 
 #endif	/* __PIC16_ASM_FEATURES_H */

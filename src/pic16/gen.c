@@ -1998,16 +1998,12 @@ pCodeOp *pic16_popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 			  __LINE__, 
 			  ((aop->aopu.pcop->name)? (aop->aopu.pcop->name) : "no name"), offset);
       pcop = pic16_pCodeOpCopy(aop->aopu.pcop);
-#if 1
-	switch( aop->aopu.pcop->type ) {
-		case PO_DIR: PCOR(pcop)->instance += offset; break; // patch 8
-		case PO_IMMEDIATE: PCOI(pcop)->offset = offset; break;
-		default:
-			assert( 0 );	/* should never reach here */;
-	}
-#else
-      PCOI(pcop)->offset = offset;
-#endif
+      switch( aop->aopu.pcop->type ) {
+        case PO_DIR: PCOR(pcop)->instance += offset; break;
+        case PO_IMMEDIATE: PCOI(pcop)->offset = offset; break;
+        default:
+          assert( 0 );	/* should never reach here */;
+      }
       return pcop;
     }
 
@@ -4566,6 +4562,33 @@ static void genIfxJump (iCode *ic, char *jval)
 	pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_FALSE(ic)->key));
 	pic16_emitcode(" goto","_%05d_DS_",IC_FALSE(ic)->key+100 + pic16_labelOffset);
 
+    }
+
+
+    /* mark the icode as generated */
+    ic->generated = 1;
+}
+
+static void genIfxpCOpJump (iCode *ic, pCodeOp *jop)
+{
+  FENTRY;
+  
+    /* if true label then we jump if condition
+    supplied is true */
+    if ( IC_TRUE(ic) ) {
+      DEBUGpic16_emitcode ("; ***","%d - assuming is in bit space",__LINE__);	  
+      pic16_emitpcode(POC_BTFSC, jop);
+
+      pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_TRUE(ic)->key));
+      pic16_emitcode(" goto","_%05d_DS_",IC_TRUE(ic)->key+100 + pic16_labelOffset);
+
+    } else {
+      /* false label is present */
+      DEBUGpic16_emitcode ("; ***","%d - assuming is in bit space",__LINE__);
+      pic16_emitpcode(POC_BTFSS, jop);
+	  
+      pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_FALSE(ic)->key));
+      pic16_emitcode(" goto","_%05d_DS_",IC_FALSE(ic)->key+100 + pic16_labelOffset);
     }
 
 
@@ -10989,6 +11012,50 @@ static void genNearPointerGet (operand *left,
     }
     
     DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+    pic16_aopOp (result,ic,FALSE);
+    
+    DEBUGpic16_pic16_AopType(__LINE__, left, NULL, result);
+
+#if 1
+    if(IS_BITFIELD( retype )
+      && (SPEC_BLEN(operandType(result))==1)
+    ) {
+      iCode *nextic;
+      pCodeOp *jop;
+      int bitstrt, bytestrt;
+
+        /* if this is bitfield of size 1, see if we are checking the value
+         * of a single bit in an if-statement,
+         * if yes, then don't generate usual code, but execute the
+         * genIfx directly -- VR */
+
+        nextic = ic->next;
+
+        /* CHECK: if next iCode is IFX
+         * and current result operand is nextic's conditional operand
+         * and current result operand live ranges ends at nextic's key number
+         */
+        if((nextic->op == IFX)
+          && (result == IC_COND(nextic))
+          && (OP_LIVETO(result) == nextic->seq)
+          ) {
+            /* everything is ok then */
+            /* find a way to optimize the genIfx iCode */
+
+            bytestrt = SPEC_BSTR(operandType(result))/8;
+            bitstrt = SPEC_BSTR(operandType(result))%8;
+            
+            jop = pic16_popCopyGPR2Bit(pic16_popGet(AOP(left), 0), bitstrt);
+
+            genIfxpCOpJump(nextic, jop);
+            
+            pic16_freeAsmop(left, NULL, ic, TRUE);
+            pic16_freeAsmop(result, NULL, ic, TRUE);
+            return;
+        }
+    }
+#endif
+
 
     /* if the value is already in a pointer register
      * then don't need anything more */
@@ -11009,12 +11076,6 @@ static void genNearPointerGet (operand *left,
         }
       }
     }
-//    else
-//    rname = pic16_aopGet(AOP(left),0,FALSE,FALSE);
-    
-    pic16_aopOp (result,ic,FALSE);
-    
-    DEBUGpic16_pic16_AopType(__LINE__, left, NULL, result);
 
     /* if bitfield then unpack the bits */
     if (IS_BITFIELD(retype)) 
@@ -11220,6 +11281,7 @@ static void genFarPointerGet (operand *left,
 
     pic16_freeAsmop(result,NULL,ic,TRUE);
 }
+
 #if 0
 /*-----------------------------------------------------------------*/
 /* genCodePointerGet - get value from code space                  */
@@ -11272,6 +11334,7 @@ static void genCodePointerGet (operand *left,
     pic16_freeAsmop(result,NULL,ic,TRUE);
 }
 #endif
+
 #if 0
 /*-----------------------------------------------------------------*/
 /* genGenPointerGet - gget value from generic pointer space        */
@@ -11440,29 +11503,11 @@ static void genConstPointerGet (operand *left,
   DEBUGpic16_pic16_AopType(__LINE__,left,NULL,result);
 
   DEBUGpic16_emitcode ("; "," %d getting const pointer",__LINE__);
-#if 0									// patch 15
-  pic16_emitpcode(POC_CALL,pic16_popGetLabel(albl->key));
-  pic16_emitpcode(POC_GOTO,pic16_popGetLabel(blbl->key));
-  pic16_emitpLabel(albl->key);
-
-  poc = ( (AOP_TYPE(left) == AOP_PCODE) ? POC_MOVLW : POC_MOVFW);
-  
-  /* this performs a goto to the specified address -- Why not to use pointer? -- VR */
-  pic16_emitpcode(poc,pic16_popGet(AOP(left),1));
-  pic16_emitpcode(POC_MOVWF,pic16_popCopyReg(&pic16_pc_pclath));
-  pic16_emitpcode(poc,pic16_popGet(AOP(left),0));
-  pic16_emitpcode(POC_MOVWF,pic16_popCopyReg(&pic16_pc_pcl));
-
-  pic16_emitpLabel(blbl->key);
-
-  pic16_emitpcode(POC_MOVWF,pic16_popGet(AOP(result),0));
-#endif									// patch 15
-
 
   // set up table pointer
   if( (AOP_TYPE(left) == AOP_PCODE) 
       && ((AOP(left)->aopu.pcop->type == PO_IMMEDIATE)
-          || (AOP(left)->aopu.pcop->type == PO_DIR))) 			// patch 15 ......
+          || (AOP(left)->aopu.pcop->type == PO_DIR)))
     {
       pic16_emitpcode(POC_MOVLW,pic16_popGet(AOP(left),0));
       pic16_emitpcode(POC_MOVWF,pic16_popCopyReg(&pic16_pc_tblptrl));
@@ -11470,25 +11515,20 @@ static void genConstPointerGet (operand *left,
       pic16_emitpcode(POC_MOVWF,pic16_popCopyReg(&pic16_pc_tblptrh));
       pic16_emitpcode(POC_MOVLW,pic16_popGet(AOP(left),2));
       pic16_emitpcode(POC_MOVWF,pic16_popCopyReg(&pic16_pc_tblptru));
-    }
-  else
-    {
-      pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(left),0), pic16_popCopyReg(&pic16_pc_tblptrl)));
-      pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(left),1), pic16_popCopyReg(&pic16_pc_tblptrh)));
-      pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(left),2), pic16_popCopyReg(&pic16_pc_tblptru)));
-    }
+  } else {
+    pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(left),0), pic16_popCopyReg(&pic16_pc_tblptrl)));
+    pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(left),1), pic16_popCopyReg(&pic16_pc_tblptrh)));
+    pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(left),2), pic16_popCopyReg(&pic16_pc_tblptru)));
+  }
 
-
-  while(size--)
-    {
-      pic16_emitpcodeNULLop(POC_TBLRD_POSTINC);
-      pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_tablat), pic16_popGet(AOP(result),offset)));
-      offset++;
-    }
+  while(size--) {
+    pic16_emitpcodeNULLop(POC_TBLRD_POSTINC);
+    pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_tablat), pic16_popGet(AOP(result),offset)));
+    offset++;
+  }
     
   pic16_freeAsmop(left,NULL,ic,TRUE);
   pic16_freeAsmop(result,NULL,ic,TRUE);
-
 }
 
 
@@ -11497,9 +11537,9 @@ static void genConstPointerGet (operand *left,
 /*-----------------------------------------------------------------*/
 static void genPointerGet (iCode *ic)
 {
-    operand *left, *result ;
-    sym_link *type, *etype;
-    int p_type;
+  operand *left, *result ;
+  sym_link *type, *etype;
+  int p_type;
 
     FENTRY;
     
@@ -11520,57 +11560,56 @@ static void genPointerGet (iCode *ic)
 
     /* if left is of type of pointer then it is simple */
     if (IS_PTR(type) && !IS_FUNC(type->next)) 
-        p_type = DCL_TYPE(type);
+      p_type = DCL_TYPE(type);
     else {
-	/* we have to go by the storage class */
-	p_type = PTR_TYPE(SPEC_OCLS(etype));
+      /* we have to go by the storage class */
+      p_type = PTR_TYPE(SPEC_OCLS(etype));
 
-	DEBUGpic16_emitcode ("; ***","%d - resolve pointer by storage class",__LINE__);
+      DEBUGpic16_emitcode ("; ***","%d - resolve pointer by storage class",__LINE__);
 
-	if (SPEC_OCLS(etype)->codesp ) {
-	  DEBUGpic16_emitcode ("; ***","%d - cpointer",__LINE__);
-	  //p_type = CPOINTER ;	
-	}
-	else
-	    if (SPEC_OCLS(etype)->fmap && !SPEC_OCLS(etype)->paged)
-	      DEBUGpic16_emitcode ("; ***","%d - fpointer",__LINE__);
-	       /*p_type = FPOINTER ;*/ 
-	    else
-		if (SPEC_OCLS(etype)->fmap && SPEC_OCLS(etype)->paged)
-		  DEBUGpic16_emitcode ("; ***","%d - ppointer",__LINE__);
-/* 		    p_type = PPOINTER; */
-		else
-		    if (SPEC_OCLS(etype) == idata )
-		      DEBUGpic16_emitcode ("; ***","%d - ipointer",__LINE__);
-/* 			p_type = IPOINTER; */
-		    else
-		      DEBUGpic16_emitcode ("; ***","%d - pointer",__LINE__);
-/* 			p_type = POINTER ; */
+      if (SPEC_OCLS(etype)->codesp ) {
+        DEBUGpic16_emitcode ("; ***","%d - cpointer",__LINE__);
+        //p_type = CPOINTER ;	
+      } else
+      if (SPEC_OCLS(etype)->fmap && !SPEC_OCLS(etype)->paged) {
+        DEBUGpic16_emitcode ("; ***","%d - fpointer",__LINE__);
+        /*p_type = FPOINTER ;*/ 
+      } else
+      if (SPEC_OCLS(etype)->fmap && SPEC_OCLS(etype)->paged) {
+        DEBUGpic16_emitcode ("; ***","%d - ppointer",__LINE__);
+        /* p_type = PPOINTER; */
+      } else
+      if (SPEC_OCLS(etype) == idata ) {
+        DEBUGpic16_emitcode ("; ***","%d - ipointer",__LINE__);
+        /* p_type = IPOINTER; */
+      } else {
+        DEBUGpic16_emitcode ("; ***","%d - pointer",__LINE__);
+        /* p_type = POINTER ; */
+      }
     }
 
     /* now that we have the pointer type we assign
     the pointer values */
     switch (p_type) {
-
-    case POINTER:	
-    case IPOINTER:
+      case POINTER:	
+      case IPOINTER:
 	genNearPointerGet (left,result,ic);
 	break;
 
-    case PPOINTER:
+      case PPOINTER:
 	genPagedPointerGet(left,result,ic);
 	break;
 
-    case FPOINTER:
+      case FPOINTER:
 	genFarPointerGet (left,result,ic);
 	break;
 
-    case CPOINTER:
+      case CPOINTER:
 	genConstPointerGet (left,result,ic);
 	//pic16_emitcodePointerGet (left,result,ic);
 	break;
 
-    case GPOINTER:
+      case GPOINTER:
 #if 0
       if (IS_PTR_CONST(type))
 	genConstPointerGet (left,result,ic);
@@ -11584,7 +11623,6 @@ static void genPointerGet (iCode *ic)
 	      "genPointerGet: illegal pointer type");
     
     }
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -11952,24 +11990,24 @@ static void genNearPointerSet (operand *right,
 				pic16_emitcode("movf","indf0,w ;1");
 			} else {
 
-				if (AOP_TYPE(right) == AOP_LIT) {							// patch 10
-					pic16_emitpcode(POC_MOVLW, pic16_popGet(AOP(right),offset));			// 
-					if (size) {									// 
-						pic16_emitpcode(POC_MOVWF,pic16_popCopyReg(&pic16_pc_postinc0));	// 
-					} else {									// 
-						pic16_emitpcode(POC_MOVWF,pic16_popCopyReg(&pic16_pc_indf0));		// 
-					}										// 
-				} else { // no literal									// 
-					if(size) {									// 
-						pic16_emitpcode(POC_MOVFF, 						// 
-								pic16_popGet2p(pic16_popGet(AOP(right),offset), 	// 
-									pic16_popCopyReg(&pic16_pc_postinc0)));		// 
-					} else {									// 
-						pic16_emitpcode(POC_MOVFF, 						// 
-								pic16_popGet2p(pic16_popGet(AOP(right),offset), 	// 
-									pic16_popCopyReg(&pic16_pc_indf0)));		//
-					}										//
-				}											// patch 10
+				if (AOP_TYPE(right) == AOP_LIT) {
+					pic16_emitpcode(POC_MOVLW, pic16_popGet(AOP(right),offset));
+					if (size) {
+						pic16_emitpcode(POC_MOVWF,pic16_popCopyReg(&pic16_pc_postinc0));
+					} else {
+						pic16_emitpcode(POC_MOVWF,pic16_popCopyReg(&pic16_pc_indf0));
+					}
+				} else { // no literal
+					if(size) {
+						pic16_emitpcode(POC_MOVFF,
+								pic16_popGet2p(pic16_popGet(AOP(right),offset),
+									pic16_popCopyReg(&pic16_pc_postinc0)));
+					} else {
+						pic16_emitpcode(POC_MOVFF,
+								pic16_popGet2p(pic16_popGet(AOP(right),offset),
+									pic16_popCopyReg(&pic16_pc_indf0)));
+					}
+				}
 			}
 			offset++;
 		}
@@ -12385,27 +12423,26 @@ static void genPointerSet (iCode *ic)
     /* now that we have the pointer type we assign
     the pointer values */
     switch (p_type) {
+      case POINTER:
+      case IPOINTER:
+        genNearPointerSet (right,result,ic);
+        break;
 
-    case POINTER:
-    case IPOINTER:
-	genNearPointerSet (right,result,ic);
+      case PPOINTER:
+        genPagedPointerSet (right,result,ic);
 	break;
 
-    case PPOINTER:
-	genPagedPointerSet (right,result,ic);
-	break;
+      case FPOINTER:
+        genFarPointerSet (right,result,ic);
+        break;
+        
+      case GPOINTER:
+        genGenPointerSet (right,result,ic);
+        break;
 
-    case FPOINTER:
-	genFarPointerSet (right,result,ic);
-	break;
-
-    case GPOINTER:
-	genGenPointerSet (right,result,ic);
-	break;
-
-    default:
-      werror (E_INTERNAL_ERROR, __FILE__, __LINE__, 
-	      "genPointerSet: illegal pointer type");
+      default:
+        werror (E_INTERNAL_ERROR, __FILE__, __LINE__, 
+          "genPointerSet: illegal pointer type");
     }
 }
 
@@ -12500,10 +12537,6 @@ static void genAddrOf (iCode *ic)
     pic16_aopOp((left=IC_LEFT(ic)), ic, FALSE);
     size = AOP_SIZE(IC_RESULT(ic));
 
-
-    /* Assume that what we want the address of is in data space
-     * since there is no stack on the PIC, yet! -- VR */
-  
     pcop0 = PCOP(pic16_newpCodeOpImmd(sym->rname, 0, 0, IN_CODESPACE( SPEC_OCLS(sym->etype))));
     pcop1 = PCOP(pic16_newpCodeOpImmd(sym->rname, 1, 0, IN_CODESPACE( SPEC_OCLS(sym->etype))));
     pcop2 = PCOP(pic16_newpCodeOpImmd(sym->rname, 2, 0, IN_CODESPACE( SPEC_OCLS(sym->etype))));
@@ -13476,7 +13509,7 @@ void genpic16Code (iCode *lic)
 
     for (ic = lic ; ic ; ic = ic->next ) {
 
-      DEBUGpic16_emitcode(";ic ", "\t%c 0x%x",ic->op, ic->op);
+      DEBUGpic16_emitcode(";ic ", "\t%c 0x%x\t(%s)",ic->op, ic->op, pic16_decodeOp(ic->op));
       if ( cln != ic->lineno ) {
         if ( options.debug ) {
           debugFile->writeCLine (ic);

@@ -42,7 +42,7 @@
 #endif
 void _debugf(char *f, int l, char *frm, ...);
 
-
+#define NEWREG_DEBUG	0
 //#define USE_ONSTACK
 
 
@@ -203,8 +203,8 @@ debugAopGet (char *str, operand * op)
   return NULL;
 }
 
-static char *
-decodeOp (unsigned int op)
+char *
+pic16_decodeOp (unsigned int op)
 {
 	if (op < 128 && op > ' ') {
 		buffer[0] = (op & 0xff);
@@ -390,8 +390,9 @@ regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alia
 		dReg->accessBank = 0;
 	}
 
-//	fprintf(stderr,"newReg: %s, rIdx = 0x%02x\taccess= %d\tregop= %p\n",dReg->name,rIdx, dReg->accessBank, refop);
-
+#if NEWREG_DEBUG
+	fprintf(stderr,"newReg: %s, rIdx = 0x%02x\taccess= %d\tregop= %p\n",dReg->name,rIdx, dReg->accessBank, refop);
+#endif
 	dReg->size = size;
 	dReg->alias = alias;
 	dReg->reg_alias = NULL;
@@ -540,9 +541,10 @@ allocReg (short type)
 
 	debugLog ("%s of type %s for register rIdx: %d (0x%x)\n", __FUNCTION__, debugLogRegType (type), dynrIdx-1, dynrIdx-1);
 
-//	fprintf(stderr,"%s:%d: %s\t%s addr= 0x%x\trIdx= 0x%02x isFree: %d\n",
-//		__FILE__, __LINE__, __FUNCTION__, reg->name, reg->address, reg->rIdx, reg->isFree);
-
+#if 0
+	fprintf(stderr,"%s:%d: %s\t%s addr= 0x%x\trIdx= 0x%02x isFree: %d\n",
+		__FILE__, __LINE__, __FUNCTION__, reg->name, reg->address, reg->rIdx, reg->isFree);
+#endif
 	if(reg) {
 		reg->accessBank = 1;	/* this is a temporary register alloc in accessBank */
 		reg->isLocal = 1;	/* this is a local frame register */
@@ -2210,14 +2212,12 @@ static void
 serialRegAssign (eBBlock ** ebbs, int count)
 {
   int i;
-
+  iCode *ic;
+  
   debugLog ("%s\n", __FUNCTION__);
   /* for all blocks */
   for (i = 0; i < count; i++)
     {
-
-      iCode *ic;
-
       if (ebbs[i]->noPath &&
 	  (ebbs[i]->entryLabel != entryLabel &&
 	   ebbs[i]->entryLabel != returnLabel))
@@ -2227,7 +2227,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
 	{
 
-	  debugLog ("  op: %s\n", decodeOp (ic->op));
+	  debugLog ("  op: %s\n", pic16_decodeOp (ic->op));
 
 		if(IC_RESULT(ic) && !IS_ITEMP( IC_RESULT(ic)))
 			pic16_allocDirReg(IC_RESULT(ic));
@@ -2339,6 +2339,19 @@ serialRegAssign (eBBlock ** ebbs, int count)
 
 	      if (ic->op == RECEIVE)
 		debugLog ("When I get clever, I'll optimize the receive logic\n");
+
+              if(POINTER_GET(ic) && IS_BITFIELD(getSpec(operandType(IC_RESULT(ic))))
+                && (SPEC_BLEN(getSpec(operandType(IC_RESULT(ic))))==1)
+                && (ic->next->op == IFX)
+                && (OP_LIVETO(IC_RESULT(ic)) == ic->next->seq)) {
+
+                /* skip register allocation since none will be used */
+                for(j=0;j<sym->nRegs;j++)
+                  sym->regs[j] = newReg(REG_TMP, PO_GPR_TEMP, 0, "bad", 1, 0, NULL);
+//                OP_SYMBOL(IC_RESULT(ic))->nRegs = 0;
+                
+                continue;
+              }
 
 	      /* if we need ptr regs for the right side
 	         then mark it */
@@ -2913,7 +2926,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
   iCode *dic, *sic;
 
   debugLog ("%d\t%s\n", __LINE__, __FUNCTION__);
-  debugLog ("ic->op = %s\n", decodeOp( ic->op ) );
+  debugLog ("ic->op = %s\n", pic16_decodeOp( ic->op ) );
   debugAopGet ("  result:", IC_RESULT (ic));
   debugAopGet ("  left:", IC_LEFT (ic));
   debugAopGet ("  right:", IC_RIGHT (ic));
@@ -3625,20 +3638,16 @@ packForReceive (iCode * ic, eBBlock * ebp)
 
   for (dic = ic->next; dic; dic = dic->next)
     {
-
-
-
       if (IC_LEFT (dic) && (IC_RESULT (ic)->key == IC_LEFT (dic)->key))
-	debugLog ("    used on left\n");
+        debugLog ("    used on left\n");
       if (IC_RIGHT (dic) && IC_RESULT (ic)->key == IC_RIGHT (dic)->key)
-	debugLog ("    used on right\n");
+        debugLog ("    used on right\n");
       if (IC_RESULT (dic) && IC_RESULT (ic)->key == IC_RESULT (dic)->key)
-	debugLog ("    used on result\n");
+        debugLog ("    used on result\n");
 
       if ((IC_LEFT (dic) && (IC_RESULT (ic)->key == IC_LEFT (dic)->key)) ||
-	  (IC_RESULT (dic) && IC_RESULT (ic)->key == IC_RESULT (dic)->key))
+        (IC_RESULT (dic) && IC_RESULT (ic)->key == IC_RESULT (dic)->key))
 	return;
-
     }
 
   debugLog ("  hey we can remove this unnecessary assign\n");

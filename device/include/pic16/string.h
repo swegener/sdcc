@@ -30,6 +30,8 @@
 #ifndef __STRING_H	/* { */
 #define __STRING_H 1
 
+#define _STRING_SPEC	data
+
 #ifndef NULL
 # define NULL (void *)0
 #endif
@@ -62,6 +64,6 @@ extern int   memcmp (void *, void *, size_t);
 extern void *memcpy (void *, void *, size_t);
 extern void *memmove (void *, void *, size_t);
 extern void *memrchr(void *, char, size_t);
-extern void *memset (void *, unsigned char, size_t );
+extern void *memset (_STRING_SPEC void *, unsigned char, size_t );
 
 #endif	/* } */

@@ -1,3 +1,19 @@
+2005-01-18 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* device/include/asm/pic16/features.h: added _CODE, _DATA, _AUTOMEM,
+	_STATMEM macros,
+	* device/include/pic16/adc.h: added GPL info,
+	* src/pic16/gen.c (genIfxpCOpJump): perform an genIfxJump but using
+	a pCodeOp as tested operand,
+	* (genNearPointerGet): optimized bit testing, does not use
+	intermediate register for bit value, test directly instead with
+	BTFSS, BTFSC, works only for single bits,
+	* (genpic16Code): dump the name of the iCode in the asm,
+	* src/pic16/ralloc.c (decodeOp): removed static declaration and
+	renamed to pic16_decodeOp,
+	* (serialRegAssign): do not allocate a temporary register for iCode
+	sequences that test a single bit for 1/0
+
 2005-01-12 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/pcode.[ch]: introduced pic16_stackpnt_*,

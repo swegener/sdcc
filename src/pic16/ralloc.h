@@ -122,6 +122,7 @@ regs *pic16_allocWithIdx (int idx);
 
 regs *pic16_allocDirReg (operand *op );
 regs *pic16_allocRegByName (char *name, int size, operand *op);
+extern char *pic16_decodeOp(unsigned int op);
 
 regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alias, operand *refop);
 

@@ -25,7 +25,7 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
 # PENDING: Path to sdcc-extra
 %.out: %$(EXEEXT)
 	mkdir -p `dirname $@`
-	$(EMU) -m $< > $@
+	$(EMU) -k -m $< > $@
 	-grep -n FAIL $@ /dev/null || true
 
 _clean:

@@ -66,7 +66,7 @@ sfr at 0xCD TH2         ;
 sfr at 0xD0 PSW         ;
 sfr at 0xD8 ADCON		; /* A/D-converter control register */
 sfr at 0xD9 ADDAT		; /* A/D-converter data register */
-sfr at 0xD8 DAPR		; /* D/A-converter program register */
+sfr at 0xDA DAPR		; /* D/A-converter program register */
 sfr at 0xE0 ACC         ;
 sfr at 0xE0 A           ;
 sfr at 0xE8 P4          ; /* Port 4 - SAB80515 specific */

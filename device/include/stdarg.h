@@ -7,8 +7,6 @@
 
 #if defined(SDCC_STACK_TENBIT)
 
-#error Foo!
-
 typedef	unsigned char _xdata * va_list ;
 #define va_arg(marker,type)   *((type _xdata * )(marker -= sizeof(type)))
 #define	va_start(marker,first)	{ marker = (va_list) ((char _xdata * )&first) ; }

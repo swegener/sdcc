@@ -1,3 +1,7 @@
+2003-04-18    <johan@balder>
+
+	* src/mcs51/gen.c (getFreePtr): fixed bug #635354
+
 2003-04-17    <johan@balder>
 
 	* src/mcs51/ralloc.c (packRegsForAssign): fixed bug #716790 and removes lot's of redundant register usage around function calls

@@ -1,3 +1,10 @@
+2001-09-10  Michael Hope  <michaelh@juju.net.nz>
+
+	* support/regression/tests/bug-460444.c: Added test case.
+
+	* src/z80/gen.c (genOr): bug 460444: if (a ^ lit) was broken for &, |, and ^.
+	(genCast): Added justification for all of the asserts.
+
 2001-09-10  Bernhard Held <bernhard@bernhardheld.de>
 
 	* support/regression/support.c: _xdata replaced by xdata

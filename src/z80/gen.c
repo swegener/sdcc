@@ -120,7 +120,7 @@
 enum 
 {
   /* Set to enable debugging trace statements in the output assembly code. */
-  DISABLE_DEBUG = 1
+  DISABLE_DEBUG = 0
 };
 
 static char *_z80_return[] =
@@ -403,7 +403,7 @@ getPairName (asmop * aop)
 	  break;
 	}
     }
-  wassert (0);
+  wassertl (0, "Tried to get the pair name of something that isn't a pair");
   return NULL;
 }
 
@@ -813,7 +813,7 @@ aopOp (operand * op, iCode * ic, bool result, bool requires_a)
 	    }
 	  else 
               {
-                  wassert (0);
+                  wassertl (0, "Marked as being allocated into A or HL but is actually in neither");
               }
 	  return;
 	}
@@ -1213,7 +1213,7 @@ aopGet (asmop * aop, int offset, bool bit16)
 	    tsprintf (s, "!lsbimmeds", aop->aopu.aop_immd);
 	    break;
 	  default:
-	    wassert (0);
+	    wassertl (0, "Fetching from beyond the limits of an immediate value.");
 	  }
 
       return gc_strdup(s);
@@ -1265,7 +1265,7 @@ aopGet (asmop * aop, int offset, bool bit16)
       return gc_strdup(s);
 
     case AOP_CRY:
-      wassert (0);
+      wassertl (0, "Tried to fetch from a bit variable");
 
     case AOP_ACC:
       if (!offset)
@@ -1449,7 +1449,7 @@ aopPut (asmop * aop, const char *s, int offset)
       else
 	{
 	  /* In bit space but not in C - cant happen */
-	  wassert (0);
+	  wassertl (0, "Tried to write into a bit variable");
 	}
       break;
 
@@ -1521,7 +1521,7 @@ getDataSize (operand * op)
   if (size == 3)
     {
       /* pointer */
-      wassert (0);
+      wassertl (0, "Somehow got a three byte data pointer");
     }
   return size;
 }
@@ -1582,7 +1582,7 @@ outBitCLong (operand * result, bool swap_sense)
   /* if the result is bit */
   if (AOP_TYPE (result) == AOP_CRY)
     {
-      aopPut (AOP (result), "blah", 0);
+      wassertl (0, "Tried to write carry to a bit");
     }
   else
     {
@@ -1640,13 +1640,13 @@ genNot (iCode * ic)
   /* if in bit space then a special case */
   if (AOP_TYPE (IC_LEFT (ic)) == AOP_CRY)
     {
-      wassert (0);
+      wassertl (0, "Tried to negate a bit");
     }
 
   /* if type float then do float */
   if (IS_FLOAT (optype))
     {
-      wassert (0);
+      wassertl (0, "Tried to negate a float");
     }
 
   _toBoolean (IC_LEFT (ic));
@@ -1682,7 +1682,7 @@ genCpl (iCode * ic)
   if (AOP_TYPE (IC_RESULT (ic)) == AOP_CRY &&
       AOP_TYPE (IC_LEFT (ic)) == AOP_CRY)
     {
-      wassert (0);
+      wassertl (0, "Left and the result are in bit space");
     }
 
   size = AOP_SIZE (IC_RESULT (ic));
@@ -1770,7 +1770,7 @@ genUminus (iCode * ic)
   if (AOP_TYPE (IC_RESULT (ic)) == AOP_CRY &&
       AOP_TYPE (IC_LEFT (ic)) == AOP_CRY)
     {
-      wassert (0);
+      wassertl (0, "Left and right are in bit space");
       goto release;
     }
 
@@ -1780,7 +1780,7 @@ genUminus (iCode * ic)
   /* if float then do float stuff */
   if (IS_FLOAT (optype))
     {
-      wassert (0);
+      wassertl (0, "Tried to do a unary minus on a float");
       goto release;
     }
 
@@ -1832,7 +1832,7 @@ assignResultValue (operand * oper)
   int size = AOP_SIZE (oper);
   bool topInA = 0;
 
-  wassert (size <= 4);
+  wassertl (size <= 4, "Got a result that is bigger than four bytes");
   topInA = requiresHL (AOP (oper));
 
   if (IS_GB && size == 4 && requiresHL (AOP (oper)))
@@ -2498,7 +2498,7 @@ genEndFunction (iCode * ic)
 
   if (IS_ISR (sym->etype))
     {
-      wassert (0);
+      wassertl (0, "Tried to close an interrupt support function");
     }
   else
     {
@@ -2737,7 +2737,7 @@ outBitAcc (operand * result)
   /* if the result is a bit */
   if (AOP_TYPE (result) == AOP_CRY)
     {
-      wassert (0);
+      wassertl (0, "Tried to write A into a bit");
     }
   else
     {
@@ -2783,7 +2783,7 @@ genPlus (iCode * ic)
       AOP_TYPE (IC_RIGHT (ic)) == AOP_CRY)
     {
       /* Cant happen */
-      wassert (0);
+      wassertl (0, "Tried to add two bits");
     }
 
   /* if left in bit space & right literal */
@@ -2791,7 +2791,7 @@ genPlus (iCode * ic)
       AOP_TYPE (IC_RIGHT (ic)) == AOP_LIT)
     {
       /* Can happen I guess */
-      wassert (0);
+      wassertl (0, "Tried to add a bit to a literal");
     }
 
   /* if I can do an increment instead
@@ -3026,7 +3026,7 @@ genMinus (iCode * ic)
   if (AOP_TYPE (IC_LEFT (ic)) == AOP_CRY &&
       AOP_TYPE (IC_RIGHT (ic)) == AOP_CRY)
     {
-      wassert (0);
+      wassertl (0, "Tried to subtract two bits");
       goto release;
     }
 
@@ -3122,7 +3122,9 @@ genMinus (iCode * ic)
   if (AOP_SIZE (IC_RESULT (ic)) == 3 &&
       AOP_SIZE (IC_LEFT (ic)) == 3 &&
       !sameRegs (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic))))
-    wassert (0);
+    {
+      wassertl (0, "Tried to subtract on a long pointer");
+    }
 
 release:
   freeAsmop (IC_LEFT (ic), NULL, ic);
@@ -3137,7 +3139,7 @@ static void
 genMult (iCode * ic)
 {
   /* Shouldn't occur - all done through function calls */
-  wassert (0);
+  wassertl (0, "Multiplication is handled through support function calls");
 }
 
 /*-----------------------------------------------------------------*/
@@ -3147,7 +3149,7 @@ static void
 genDiv (iCode * ic)
 {
   /* Shouldn't occur - all done through function calls */
-  wassert (0);
+  wassertl (0, "Division is handled through support function calls");
 }
 
 /*-----------------------------------------------------------------*/
@@ -3258,7 +3260,7 @@ genCmp (operand * left, operand * right,
       AOP_TYPE (right) == AOP_CRY)
     {
       /* Cant happen on the Z80 */
-      wassert (0);
+      wassertl (0, "Tried to compare two bits");
     }
   else
     {
@@ -3621,7 +3623,7 @@ genCmpEq (iCode * ic, iCode * ifx)
       if (AOP_TYPE (left) == AOP_CRY &&
 	  ((AOP_TYPE (right) == AOP_CRY) || (AOP_TYPE (right) == AOP_LIT)))
 	{
-	  wassert (0);
+	  wassertl (0, "Tried to compare two bits");
 	}
       else
 	{
@@ -3651,7 +3653,7 @@ genCmpEq (iCode * ic, iCode * ifx)
   if (AOP_TYPE (left) == AOP_CRY &&
       ((AOP_TYPE (right) == AOP_CRY) || (AOP_TYPE (right) == AOP_LIT)))
     {
-      wassert (0);
+      wassertl (0, "Tried to compare a bit to either a literal or another bit");
     }
   else
     {
@@ -3722,7 +3724,7 @@ genAndOp (iCode * ic)
   if (AOP_TYPE (left) == AOP_CRY &&
       AOP_TYPE (right) == AOP_CRY)
     {
-      wassert (0);
+      wassertl (0, "Tried to and two bits");
     }
   else
     {
@@ -3759,7 +3761,7 @@ genOrOp (iCode * ic)
   if (AOP_TYPE (left) == AOP_CRY &&
       AOP_TYPE (right) == AOP_CRY)
     {
-      wassert (0);
+      wassertl (0, "Tried to OR two bits");
     }
   else
     {
@@ -3868,7 +3870,7 @@ genAnd (iCode * ic, iCode * ifx)
 
   if (AOP_TYPE (left) == AOP_CRY)
     {
-      wassert (0);
+      wassertl (0, "Tried to perform an AND with a bit as an operand");
       goto release;
     }
 
@@ -3878,80 +3880,46 @@ genAnd (iCode * ic, iCode * ifx)
       (AOP_TYPE (result) == AOP_CRY) &&
       (AOP_TYPE (left) != AOP_CRY))
     {
-      int posbit = isLiteralBit (lit);
-      /* left &  2^n */
-      if (posbit)
-	{
-	  posbit--;
-	  _moveA (aopGet (AOP (left), posbit >> 3, FALSE));
-	  // bit = left & 2^n
-	  if (size)
-	    {
-	      wassert (0);
-	      emit2 ("mov c,acc.%d", posbit & 0x07);
-	    }
-	  // if(left &  2^n)
-	  else
-	    {
-	      if (ifx)
-		{
-		  sprintf (buffer, "%d", posbit & 0x07);
-		  genIfxJump (ifx, buffer);
-		}
-	      else
-		{
-		  wassert (0);
-		}
-	      goto release;
-	    }
-	}
-      else
-	{
-	  symbol *tlbl = newiTempLabel (NULL);
-	  int sizel = AOP_SIZE (left);
-	  if (size)
-	    {
-	      wassert (0);
-	      emit2 ("setb c");
-	    }
-	  while (sizel--)
-	    {
-	      if ((bytelit = ((lit >> (offset * 8)) & 0x0FFL)) != 0x0L)
-		{
-		  _moveA (aopGet (AOP (left), offset, FALSE));
-		  // byte ==  2^n ?
-		  if ((posbit = isLiteralBit (bytelit)) != 0)
-		    {
-		      wassert (0);
-		      emit2 ("jb acc.%d,%05d$", (posbit - 1) & 0x07, tlbl->key + 100);
-		    }
-		  else
-		    {
-		      if (bytelit != 0x0FFL)
-			emit2 ("and a,%s",
-				  aopGet (AOP (right), offset, FALSE));
-		      else
-			/* For the flags */
-			emit2 ("or a,a");
-		      emit2 ("!shortjp nz,!tlabel", tlbl->key + 100);
-		    }
-		}
+      symbol *tlbl = newiTempLabel (NULL);
+      int sizel = AOP_SIZE (left);
+      if (size)
+        {
+          /* PENDING: Test case for this. */
+          emit2 ("scf");
+        }
+      while (sizel--)
+        {
+          if ((bytelit = ((lit >> (offset * 8)) & 0x0FFL)) != 0x0L)
+            {
+              _moveA (aopGet (AOP (left), offset, FALSE));
+              if (bytelit != 0x0FFL)
+                {
+                  emit2 ("and a,%s", aopGet (AOP (right), offset, FALSE));
+                }
+              else
+                {
+                  /* For the flags */
+                  emit2 ("or a,a");
+                }
+              emit2 ("!shortjp nz,!tlabel", tlbl->key + 100);
+            }
 	      offset++;
-	    }
-	  // bit = left & literal
-	  if (size)
-	    {
-	      emit2 ("clr c");
-	      emit2 ("!tlabeldef", tlbl->key + 100);
-	    }
-	  // if(left & literal)
-	  else
-	    {
-	      if (ifx)
-		jmpTrueOrFalse (ifx, tlbl);
-	      goto release;
-	    }
-	}
+        }
+      // bit = left & literal
+      if (size)
+        {
+          emit2 ("clr c");
+          emit2 ("!tlabeldef", tlbl->key + 100);
+        }
+      // if(left & literal)
+      else
+        {
+          if (ifx)
+            {
+              jmpTrueOrFalse (ifx, tlbl);
+            }
+          goto release;
+        }
       outBitC (result);
       goto release;
     }
@@ -3983,7 +3951,7 @@ genAnd (iCode * ic, iCode * ifx)
 	    {
 	      if (AOP_TYPE (left) == AOP_ACC)
 		{
-		  wassert (0);
+		  wassertl (0, "Tried to perform an AND where the left operand is allocated into A");
 		}
 	      else
 		{
@@ -4000,7 +3968,7 @@ genAnd (iCode * ic, iCode * ifx)
       // left & result in different registers
       if (AOP_TYPE (result) == AOP_CRY)
 	{
-	  wassert (0);
+	  wassertl (0, "Tried to AND where the result is in carry");
 	}
       else
 	{
@@ -4054,6 +4022,7 @@ genOr (iCode * ic, iCode * ifx)
   operand *left, *right, *result;
   int size, offset = 0;
   unsigned long lit = 0L;
+  int bytelit = 0;
 
   aopOp ((left = IC_LEFT (ic)), ic, FALSE, FALSE);
   aopOp ((right = IC_RIGHT (ic)), ic, FALSE, FALSE);
@@ -4091,15 +4060,39 @@ genOr (iCode * ic, iCode * ifx)
 
   if (AOP_TYPE (left) == AOP_CRY)
     {
-      wassert (0);
+      wassertl (0, "Tried to OR where left is a bit");
       goto release;
     }
 
+  // if(val | 0xZZ)       - size = 0, ifx != FALSE  -
+  // bit = val | 0xZZ     - size = 1, ifx = FALSE -
   if ((AOP_TYPE (right) == AOP_LIT) &&
       (AOP_TYPE (result) == AOP_CRY) &&
       (AOP_TYPE (left) != AOP_CRY))
     {
-      wassert (0);
+      symbol *tlbl = newiTempLabel (NULL);
+      int sizel = AOP_SIZE (left);
+
+      if (size)
+        {
+          wassertl (0, "Result is assigned to a bit");
+        }
+      /* PENDING: Modeled after the AND code which is inefficent. */
+      while (sizel--)
+        {
+          bytelit = (lit >> (offset * 8)) & 0x0FFL;
+
+          _moveA (aopGet (AOP (left), offset, FALSE));
+          /* OR with any literal is the same as OR with itself. */
+          emit2 ("or a,a");
+          emit2 ("!shortjp nz,!tlabel", tlbl->key + 100);
+
+          offset++;
+        }
+      if (ifx)
+        {
+          jmpTrueOrFalse (ifx, tlbl);
+        }
       goto release;
     }
 
@@ -4139,7 +4132,7 @@ genOr (iCode * ic, iCode * ifx)
       // left & result in different registers
       if (AOP_TYPE (result) == AOP_CRY)
 	{
-	  wassert (0);
+	  wassertl (0, "Result of OR is in a bit");
 	}
       else
 	for (; (size--); offset++)
@@ -4225,15 +4218,39 @@ genXor (iCode * ic, iCode * ifx)
 
   if (AOP_TYPE (left) == AOP_CRY)
     {
-      wassert (0);
+      wassertl (0, "Tried to XOR a bit");
       goto release;
     }
 
+  // if(val & 0xZZ)       - size = 0, ifx != FALSE  -
+  // bit = val & 0xZZ     - size = 1, ifx = FALSE -
   if ((AOP_TYPE (right) == AOP_LIT) &&
       (AOP_TYPE (result) == AOP_CRY) &&
       (AOP_TYPE (left) != AOP_CRY))
     {
-      wassert (0);
+      symbol *tlbl = newiTempLabel (NULL);
+      int sizel = AOP_SIZE (left);
+
+      if (size)
+        {
+          /* PENDING: Test case for this. */
+          wassertl (0, "Tried to XOR left against a literal with the result going into a bit");
+        }
+      while (sizel--)
+        {
+          _moveA (aopGet (AOP (left), offset, FALSE));
+          emit2 ("xor a,%s", aopGet (AOP (right), offset, FALSE));
+          emit2 ("!shortjp nz,!tlabel", tlbl->key + 100);
+          offset++;
+        }
+      if (ifx)
+        {
+          jmpTrueOrFalse (ifx, tlbl);
+        }
+      else
+        {
+          wassertl (0, "Result of XOR was destined for a bit");
+        }
       goto release;
     }
 
@@ -4275,7 +4292,7 @@ genXor (iCode * ic, iCode * ifx)
       // left & result in different registers
       if (AOP_TYPE (result) == AOP_CRY)
 	{
-	  wassert (0);
+	  wassertl (0, "Result of XOR is in a bit");
 	}
       else
 	for (; (size--); offset++)
@@ -5401,7 +5418,7 @@ genAssign (iCode * ic)
   /* if the result is a bit */
   if (AOP_TYPE (result) == AOP_CRY)
     {
-      wassert (0);
+      wassertl (0, "Tried to assign to a bit");
     }
 
   /* general case */
@@ -5557,7 +5574,7 @@ genCast (iCode * ic)
   /* if the result is a bit */
   if (AOP_TYPE (result) == AOP_CRY)
     {
-      wassert (0);
+      wassertl (0, "Tried to cast to a bit");
     }
 
   /* if they are the same size : or less */

@@ -9,11 +9,20 @@
 
 #define _{type}
 
-#if defined(_bit) && !defined(PORT_HOST)
+
+#if defined(PORT_HOST) || defined(SDCC_z80) || defined(SDCC_gbz80)
+#  define NO_BIT_TYPE
+#endif
+
+#if defined(_bit) && !defined(NO_BIT_TYPE)
 #  define MASK 1
 #  define idata
-#elif defined(_bit) && defined(PORT_HOST)
-#  define MASK 0xffffffff
+#elif defined(_bit) && defined(NO_BIT_TYPE)
+#  if defined(PORT_HOST)
+#    define MASK 0xffffffff
+#  else
+#    define MASK 0xffff
+#  endif
 #  define idata
 #  define bit int
 #elif defined(_char)
@@ -23,7 +32,7 @@
 #elif defined(_long)
 #  define MASK 0xffffffff
 #else
-#  warn Unknow type
+#  warning Unknow type
 #endif
 
 #if defined(PORT_HOST) || defined(SDCC_z80) || defined(SDCC_gbz80)
@@ -102,19 +111,19 @@ testcse(void)
    ASSERT( a0  ==  0);
    ASSERT( a1  ==  0);
    ASSERT( a2  ==  b);
-#if defined(_bit) && !defined(PORT_HOST)
+#if defined(_bit) && !defined(NO_BIT_TYPE)
    ASSERT( a3  == 1);
 #else
    ASSERT( a3  == ({type}) 0x33);
 #endif
    ASSERT(ua0  == ub);
-#if defined(_bit) && !defined(PORT_HOST)
+#if defined(_bit) && !defined(NO_BIT_TYPE)
    ASSERT(ua1  == 1);
 #else
    ASSERT(ua1  == ({type}) 0x7b);
 #endif
    ASSERT( a4  ==  b);
-#if defined(_bit) && !defined(PORT_HOST)
+#if defined(_bit) && !defined(NO_BIT_TYPE)
    ASSERT( a5  == 1);
 #else
    ASSERT( a5  == ({type}) 0x33);

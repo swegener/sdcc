@@ -13,13 +13,14 @@ CPP		= @CPP@
 INSTALL		= @INSTALL@
 
 PRJDIR		= ../..
+DISABLE_GC	= @DISABLE_GC@
 
 srcdir		= @srcdir@
 prefix		= @prefix@
 exec_prefix     = ${prefix}
 bindir          = ${exec_prefix}/bin
 libdir          = ${exec_prefix}/lib
-datadir         = ${prefix}/share
+datadir         = @datadir@
 includedir      = ${prefix}/include
 mandir          = ${prefix}/man
 man1dir         = $(mandir)/man1
@@ -31,8 +32,14 @@ CPPFLAGS	= @CPPFLAGS@ -I. -I$(PRJDIR) -I$(PRJDIR)/support
 CFLAGS		= @CFLAGS@
 M_OR_MM		= @M_OR_MM@
 LDFLAGS		= @LDFLAGS@
+
+ifeq ($(DISABLE_GC),1)
+LIBS            = @LIBS@
+LIBDIRS         =
+else
 LIBS            = -lgc @LIBS@
 LIBDIRS         = -L$(PRJDIR)/support/gc
+endif
 
 
 OBJECTS		= sdcdb.o symtab.o simi.o $(PRJDIR)/src/SDCCset.o \

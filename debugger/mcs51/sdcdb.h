@@ -32,18 +32,7 @@
 #include <ctype.h>
 #include <limits.h>
 #include "sdccconf.h"
-#ifdef _NO_GC
-
-#define GC_malloc malloc
-#define GC_free free
-#define GC_realloc realloc
-
-#else
-
-#include "gc/gc.h"
-
-#endif
-
+#include "src/SDCCalloc.h"
 #include "src/SDCCset.h"
 #include "src/SDCChasht.h"
 

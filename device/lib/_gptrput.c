@@ -42,13 +42,15 @@ _gptrput (char *gptr, char c)
         dec     a
         jz      00003$	; 2 code
         dec     a
-        jz      00004$
+        jz      00004$  ; 3 pdata
 	dec	a	; 4 skip generic pointer
 	dec	a
 	jz	00001$	; 5 idata
-	pop     acc
-	sjmp    00006$
-;
+
+ 00003$:
+	pop     acc    ; do nothing
+	sjmp    00005$
+;  
 ;       store into near space
 ;
  00001$:
@@ -56,25 +58,19 @@ _gptrput (char *gptr, char c)
 	push	ar0
 	mov     r0,dpl
 	mov     @r0,a
+	pop     ar0
 	sjmp    00005$
 
  00002$:
 	pop     acc
 	movx    @dptr,a
-	sjmp    00006$
-
- 00003$:
-	pop     acc    ; do nothing
-	sjmp    00006$
+	sjmp    00005$
 
  00004$:
 	pop     acc
-	push	ar0
-	mov     r0,dpl
-	movx    @r0,a
+	mov     dph,p2
+	movx    @dptr,a
  00005$:
-	pop     ar0
- 00006$:
 _endasm;
 }
 

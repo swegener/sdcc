@@ -272,19 +272,6 @@ DEFSETFUNC (findCheaperOp)
 	       take into consideration if right side
 	       an induction variable
 	    */
-
-#if SomeOneUnderStandsThis
-	    /* This causes the bug:
-	       
-	       void test (unsigned u) {
-	         // the following cast is ignored
-	         for (; (int) u >= 0;)
-	           ++u;
-	         }
-	       }
-
-	       where casts are ignored */
-
 	    if (!POINTER_SET (cdp->diCode) &&
 		IS_ITEMP (IC_RESULT (cdp->diCode)) &&
 		IS_ITEMP (IC_RIGHT (cdp->diCode)) &&
@@ -297,7 +284,6 @@ DEFSETFUNC (findCheaperOp)
 	      *opp = IC_RESULT (cdp->diCode);
 	    else
 	      *opp = IC_RIGHT (cdp->diCode);
-#endif
 	  }
       }
       else

@@ -2039,11 +2039,14 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
 
       /* found it we need to remove it from the
          block */
-      for (sic = dic; sic != ic; sic = sic->next)
+      for (sic = dic; sic != ic; sic = sic->next) {
 	bitVectUnSetBit (sic->rlive, IC_LEFT (ic)->key);
+	sic->rlive = bitVectSetBit (sic->rlive, IC_RIGHT (dic)->key);
+      }
 
       IC_LEFT (ic)->operand.symOperand =
 	IC_RIGHT (dic)->operand.symOperand;
+      OP_SYMBOL(IC_LEFT(ic))->liveTo = ic->seq;
       IC_LEFT (ic)->key = IC_RIGHT (dic)->operand.symOperand->key;
       bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
       remiCodeFromeBBlock (ebp, dic);
@@ -2073,13 +2076,15 @@ right:
 	}
       /* found it we need to remove it from the
          block */
-      for (sic = dic; sic != ic; sic = sic->next)
+      for (sic = dic; sic != ic; sic = sic->next) {
 	bitVectUnSetBit (sic->rlive, IC_RIGHT (ic)->key);
+	sic->rlive = bitVectSetBit (sic->rlive, IC_RIGHT (dic)->key);
+      }
 
       IC_RIGHT (ic)->operand.symOperand =
 	IC_RIGHT (dic)->operand.symOperand;
       IC_RIGHT (ic)->key = IC_RIGHT (dic)->operand.symOperand->key;
-
+      OP_SYMBOL(IC_RIGHT(ic))->liveTo = ic->seq;
       remiCodeFromeBBlock (ebp, dic);
       bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
       hTabDeleteItem (&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
@@ -2137,10 +2142,7 @@ packRegsDPTRuse (operand * op)
 	    if (OP_SYMBOL(IC_RESULT(ic))->liveTo == 
 		OP_SYMBOL(IC_RESULT(ic))->liveFrom) continue ;
 	    etype = getSpec(type = operandType(IC_RESULT(ic)));
-#if 0
 	    if (getSize(type) == 0 || isOperandEqual(op,IC_RESULT(ic))) 
-#endif
-	    if (getSize(type) == 0)
 		continue ;
 	    return NULL ;
 	}
@@ -2161,7 +2163,8 @@ packRegsDPTRuse (operand * op)
 	    getSize(operandType(IC_RESULT(ic))) > 1 ) return NULL;
 
 	/* conditionals can destroy 'b' - make sure B wont be used in this one*/
-	if ((IS_CONDITIONAL(ic) || ic->op == '*' || ic->op == '/' ) && 
+	if ((IS_CONDITIONAL(ic) || ic->op == '*' || ic->op == '/'  || 
+	     ic->op == LEFT_OP || ic->op == RIGHT_OP ) && 
 	    getSize(operandType(op)) > 3) return NULL;
 
 	/* general case */
@@ -2173,7 +2176,7 @@ packRegsDPTRuse (operand * op)
 
 	if (IC_RIGHT(ic) && IS_SYMOP(IC_RIGHT(ic)) && 
 	    !isOperandEqual(IC_RIGHT(ic),op) &&
-	    (OP_SYMBOL(IC_RIGHT(ic))->liveTo > ic->seq || 
+	    (OP_SYMBOL(IC_RIGHT(ic))->liveTo >= ic->seq || 
 	     IS_TRUE_SYMOP(IC_RIGHT(ic))	       ||
 	     OP_SYMBOL(IC_RIGHT(ic))->ruonly) &&
 	    ((isOperandInFarSpace(IC_RIGHT(ic)) && !isOperandInReg(IC_RIGHT(ic)))|| 
@@ -2590,11 +2593,9 @@ packRegisters (eBBlock * ebp)
 	}
 #endif
 
-#if 0 /* unsafe */
       /* reduce for support function calls */
       if (ic->supportRtn || ic->op == '+' || ic->op == '-')
 	packRegsForSupport (ic, ebp);
-#endif
 
       /* some cases the redundant moves can
          can be eliminated for return statements */

@@ -311,7 +311,7 @@ operandLUse (operand * op, eBBlock ** ebbs,
 	      if (lic->op == CALL || lic->op == PCALL) break;
 	  }
 	  /* found it : mark */
-	  if (lic) torange = lic->seq;
+	  if (lic) torange = lic->prev->seq;
       }
       /* if this is the last use then if this block belongs 
          to a  loop &  some definition  comes into the loop 

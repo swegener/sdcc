@@ -375,27 +375,28 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
 /*-----------------------------------------------------------------*/
 static asmop *aopForRemat (symbol *sym)
 {
-    char *s = buffer;   
     iCode *ic = sym->rematiCode;
     asmop *aop = newAsmop(AOP_IMMD);
+    int val = 0;
 
-    while (1) {
-
-        /* if plus or minus print the right hand side */
-        if (ic->op == '+' || ic->op == '-') {
-	    if (ic->op == '-')
-		sprintf(s,"-0x%04x + ",(int) operandLitValue(IC_RIGHT(ic))) ;
-	    else
-		sprintf(s,"0x%04x + ",(int) operandLitValue(IC_RIGHT(ic)));
-            s += strlen(s);
-            ic = OP_SYMBOL(IC_LEFT(ic))->rematiCode;
-            continue ;
-        }
-
-        /* we reached the end */
-        sprintf(s,"%s",OP_SYMBOL(IC_LEFT(ic))->rname);
-        break;
+    for (;;) {
+    	if (ic->op == '+')
+	    val += operandLitValue(IC_RIGHT(ic));
+	else if (ic->op == '-')
+	    val -= operandLitValue(IC_RIGHT(ic));
+	else
+	    break;
+	
+	ic = OP_SYMBOL(IC_LEFT(ic))->rematiCode;
     }
+
+    if (val)
+    	sprintf(buffer,"(%s %c 0x%04x)",
+	        OP_SYMBOL(IC_LEFT(ic))->rname, 
+		val >= 0 ? '+' : '-',
+		abs(val) & 0xffff);
+    else
+	strcpy(buffer,OP_SYMBOL(IC_LEFT(ic))->rname);
 
     ALLOC_ATOMIC(aop->aopu.aop_immd,strlen(buffer)+1);
     strcpy(aop->aopu.aop_immd,buffer);    
@@ -780,12 +781,12 @@ static char *aopGet (asmop *aop, int offset, bool bit16, bool dname)
         genSetDPTR(0);
     }
 	    
-	return (dname ? "acc" : "a");
+    return (dname ? "acc" : "a");
 	
 	
     case AOP_IMMD:
 	if (bit16) 
-	    sprintf (s,"#(%s)",aop->aopu.aop_immd);
+	    sprintf (s,"#%s",aop->aopu.aop_immd);
 	else
 	    if (offset) 
 		sprintf(s,"#(%s >> %d)",

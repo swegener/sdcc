@@ -2086,11 +2086,8 @@ static void packRegisters (eBBlock *ebp)
 	}
 
 	/* if this is a +/- operation with a rematerizable 
-	   then mark this as rematerializable as well only
-	   if the literal value is within the range -255 and + 255
-	   the assembler cannot handle it other wise */
+	   then mark this as rematerializable as well */
 	if ((ic->op == '+' || ic->op == '-') &&
-
 	    (IS_SYMOP(IC_LEFT(ic)) && 
 	     IS_ITEMP(IC_RESULT(ic)) &&
 	     OP_SYMBOL(IC_LEFT(ic))->remat &&
@@ -2098,11 +2095,9 @@ static void packRegisters (eBBlock *ebp)
 	     IS_OP_LITERAL(IC_RIGHT(ic))) ) {
 
 	    int i = operandLitValue(IC_RIGHT(ic));
-	    if ( i < 255 && i > -255) {
-		OP_SYMBOL(IC_RESULT(ic))->remat = 1;
-		OP_SYMBOL(IC_RESULT(ic))->rematiCode = ic;
-		OP_SYMBOL(IC_RESULT(ic))->usl.spillLoc = NULL;
-	    }
+	    OP_SYMBOL(IC_RESULT(ic))->remat = 1;
+	    OP_SYMBOL(IC_RESULT(ic))->rematiCode = ic;
+	    OP_SYMBOL(IC_RESULT(ic))->usl.spillLoc = NULL;
 	}
 
 	/* mark the pointer usages */

@@ -58,19 +58,19 @@ static void pvalhex( long val)
   if (!long_flag)
     lval &= 0x0000ffff;
 
-        if (short_flag)
+  if (short_flag)
     lval &= 0x000000ff;
 
-  while (lval) {
+  do {
     ch = "0123456789ABCDEF"[(unsigned short)lval & 0x0f];
     _asm push _ch _endasm;
     lval /= 16;
-  }
+  } while (lval);
 
   while (sp != SP) {
     _asm pop _ch _endasm;
     putchar(ch);
-        }
+  }
 
 }
 
@@ -92,11 +92,11 @@ static void pvaloct(long val)
         if (short_flag)
     lval &= 0x000000ff;
 
-        while (lval) {
+  do {
     ch = (lval % 8) + '0';
     _asm push _ch _endasm;
-                lval = lval / 8;
-  }
+     lval = lval / 8;
+  } while (lval);
 
   if (sign) {
     ch = '-';
@@ -123,11 +123,11 @@ static void pvaldec(long val )
     sign = 0;
   }
 
-        while (lval) {
+  do {
     ch = (lval % 10) + '0';
     _asm push _ch _endasm;
-                lval = lval / 10;
-  }
+    lval = lval / 10;
+  } while (lval);
 
   if (sign) {
     ch = '-';

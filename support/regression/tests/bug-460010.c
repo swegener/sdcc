@@ -2,7 +2,7 @@
  */
 #include <testfwk.h>
 
-#ifdef __mcs51
+#if defined __mcs51 || defined __ds390
 #define XDATA xdata
 #else
 #define XDATA

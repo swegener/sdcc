@@ -1,3 +1,15 @@
+2001-11-04  Bernhard Held  <bernhard@bernhardheld.de>
+
+	* sdcc/sim/ucsim/s51.src/uc390cl.h: Improvement for ds390 to run regression tests
+
+        * sdcc/sim/ucsim/s51.src/uc390.h: Improvement for ds390 to run regression tests
+
+        * sdcc/sim/ucsim/s51.src/regs51.h: Improvement for ds390 to run regression tests
+
+        * sdcc/sim/ucsim/s51.src/glob.cc: Improvement for ds390 to run regression tests
+
+	* sdcc/support/regression/tests/bug-460010.c: Small change for ds390
+
 2001-11-04  Michael Hope  <michaelh@juju.net.nz>
 
 	* src/z80/peeph-gbz80.def: Removed a bad sub optimisation.

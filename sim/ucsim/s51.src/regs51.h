@@ -65,6 +65,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define DPL1	0x84 /* 2nd Data Pointer Low byte */
 #define DPH1	0x85 /* 2nd Data Pointer High byte */
 #define DPS	0x86 /* DPS 1H=DPTR is DPL1/DPH1,... */
+#define DPX     0x93 /* Data Pointer HHigh byte */
+#define DPX1    0x95 /* Data Pointer HHigh byte */
+#define ESP     0x9B /* Extended Stack Pointer */
+#define ACON    0x9D /* */
 #define WDTRST	0xa6 /* */
 #define IE0	0xa8 /* */
 #define SADDR	0xa9 /* */
@@ -75,6 +79,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define SPH	0xbd /* */
 #define T2MOD	0xc9 /* */
 #define PSW1	0xd1 /* */
+#define MCNT0   0xd1
+#define MCNT1   0xd2
+#define MA      0xd3 /* MA register from math accelerator */
+#define MB      0xd4 /* MA register from math accelerator */
+#define MC      0xd5 /* MA register from math accelerator */
 #define CCON	0xd8 /* */
 #define CMOD	0xd9 /* */
 #define CCAPM0	0xda /* */

@@ -308,6 +308,7 @@ struct name_entry sfr_tab51[]=
   {CPU_ALL_51|CPU_ALL_52|CPU_251, 0x81, "SP"},
   {CPU_ALL_51|CPU_ALL_52|CPU_251, 0x82, "DPL"},
   {CPU_ALL_51|CPU_ALL_52|CPU_251, 0x83, "DPH"},
+  {CPU_251|CPU_DS390F,            0x93, "DPX"},
   {CPU_ALL_51|CPU_ALL_52|CPU_251, 0x80, "P0"},
   {CPU_ALL_51|CPU_ALL_52|CPU_251, 0x90, "P1"},
   {CPU_ALL_51|CPU_ALL_52|CPU_251, 0xa0, "P2"},
@@ -321,7 +322,9 @@ struct name_entry sfr_tab51[]=
   {CPU_ALL_51|CPU_ALL_52|CPU_251, 0x8d, "TH1"},
   {CPU_ALL_51|CPU_ALL_52|CPU_251, 0x8b, "TL1"},
   {CPU_ALL_51|CPU_ALL_52|CPU_251, 0x98, "SCON"},
-  {CPU_ALL_51|CPU_ALL_52|CPU_251, 0x99, "SBUF"},
+  {CPU_ALL_51|CPU_ALL_52,         0x99, "SBUF"},
+  {CPU_251,                       0x99, "SBUF0"},
+  {CPU_251,                       0xC1, "SBUF1"},
   {CPU_ALL_51|CPU_ALL_52|CPU_251, 0x87, "PCON"},
   {CPU_ALL_52|CPU_251, 0xc8, "T2CON"},
   {CPU_ALL_52|CPU_251, 0xcd, "TH2"},
@@ -362,7 +365,9 @@ struct name_entry sfr_tab51[]=
   {CPU_89C51R|CPU_251, 0xfc, "CCAP2H"},
   {CPU_89C51R|CPU_251, 0xfd, "CCAP3H"},
   {CPU_89C51R|CPU_251, 0xfe, "CCAP4H"},
-  {CPU_89C51R, 0xa2, "AUXR1"},
+  {CPU_89C51R,         0xa2, "AUXR1"},
+  {CPU_DS390F,         0x9B, "ESP"},
+  {CPU_DS390F,         0x9D, "ACON"},
   {0, 0, NULL}
 };
 

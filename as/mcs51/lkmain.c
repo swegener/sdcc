@@ -929,14 +929,14 @@ setbas()
 			}
 			if (ap == NULL) {
 				fprintf(stderr,
-				"No definition of area %s\n", id);
+				"ASlink-Warning-No definition of area %s\n", id);
 				lkerr++;
 			} else {
 				ap->a_addr = v;
                                 ap->a_type = 1;	/* JLH: value set */
 			}
 		} else {
-			fprintf(stderr, "No '=' in base expression");
+			fprintf(stderr, "ASlink-Warning-No '=' in base expression");
 			lkerr++;
 		}
 		bsp = bsp->b_base;

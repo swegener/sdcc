@@ -1,4 +1,8 @@
-#!/usr/local/bin/perl -w
+#!/bin/sh
+exec perl -x "$0" "$@"
+#!perl -w
+# Real script begins here; the above ugliness should locate
+# perl on your path.
 
 # Quick & dirty perl hack to pack an Intel Hex format output file.
 # Will consolidate lines up to $outChunk bytes per line.

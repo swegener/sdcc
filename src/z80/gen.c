@@ -1751,7 +1751,7 @@ aopPut (asmop * aop, const char *s, int offset)
       /* if bit variable */
       if (!aop->aopu.aop_dir)
 	{
-	  emit2 ("ld a,#0");
+	  emit2 ("ld a,!zero");
 	  emit2 ("rla");
 	}
       else
@@ -2719,7 +2719,7 @@ emitCall (iCode * ic, bool ispcall)
 	  spillCached ();
 	  if (i > 8)
 	    {
-	      emit2 ("ld iy,#%d", i);
+	      emit2 ("ld iy,!immedword", i);
 	      emit2 ("add iy,sp");
 	      emit2 ("ld sp,iy");
 	    }
@@ -2864,8 +2864,8 @@ genFunction (iCode * ic)
   
   /* Create the function header */
   emit2 ("!functionheader", sym->name);
-  /* PENDING: portability. */
-  emit2 ("__%s_start:", sym->rname);
+  sprintf (buffer, "%s_start", sym->rname);
+  emit2 ("!labeldef", buffer);
   emit2 ("!functionlabeldef", sym->rname);
 
   if (options.profile) 
@@ -3002,8 +3002,8 @@ genEndFunction (iCode * ic)
       /* Both baned and non-banked just ret */
       emit2 ("ret");
 
-      /* PENDING: portability. */
-      emit2 ("__%s_end:", sym->rname);
+      sprintf (buffer, "%s_end", sym->rname);
+      emit2 ("!labeldef", buffer);
     }
   _G.flushStatics = 1;
   _G.stack.pushed = 0;
@@ -3435,7 +3435,7 @@ genPlus (iCode * ic)
   if (isPair (AOP (IC_RIGHT (ic))) && AOP_TYPE (IC_LEFT (ic)) == AOP_IMMD && getPairId (AOP (IC_RIGHT (ic))) != PAIR_HL)
     {
       fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
-      emit2 ("add hl,%s ; 2", getPairName (AOP (IC_RIGHT (ic))));
+      emit2 ("add hl,%s", getPairName (AOP (IC_RIGHT (ic))));
       spillCached();
       commitPair ( AOP (IC_RESULT (ic)), PAIR_HL);
       goto release;
@@ -4000,10 +4000,10 @@ _getPairIdName (PAIR_ID id)
                   // Save the flags
                   emit2 ("push af");
                   emit2 ("ld a,(de)");
-                  emit2 ("xor #0x80");
+                  emit2 ("xor !immedbyte", 0x80);
                   emit2 ("ld e,a");
                   emit2 ("ld a,(hl)");
-                  emit2 ("xor #0x80");
+                  emit2 ("xor !immedbyte", 0x80);
                   emit2 ("ld d,a");
                   emit2 ("pop af");
                   emit2 ("ld a,e");
@@ -4037,10 +4037,10 @@ _getPairIdName (PAIR_ID id)
                   // Save the flags
                   emit2 ("push af");
                   emit2 ("ld a,(hl)");
-                  emit2 ("xor #0x80");
+                  emit2 ("xor !immedbyte", 0x80);
                   emit2 ("ld l,a");
                   emit2 ("ld a,%d(iy)", offset);
-                  emit2 ("xor #0x80");
+                  emit2 ("xor !immedbyte", 0x80);
                   emit2 ("ld h,a");
                   emit2 ("pop af");
                   emit2 ("ld a,l");
@@ -6348,14 +6348,14 @@ genAddrOf (iCode * ic)
 	{
 	  /* if it has an offset  then we need to compute it */
 	  if (sym->stack > 0)
-	    emit2 ("ld hl,#%d+%d+%d+%d", sym->stack, _G.stack.pushed, _G.stack.offset, _G.stack.param_offset);
+	    emit2 ("ld hl,!immedword", sym->stack + _G.stack.pushed + _G.stack.offset + _G.stack.param_offset);
 	  else
-	    emit2 ("ld hl,#%d+%d+%d", sym->stack, _G.stack.pushed, _G.stack.offset);
+	    emit2 ("ld hl,!immedword", sym->stack + _G.stack.pushed + _G.stack.offset);
 	  emit2 ("add hl,sp");
 	}
       else
 	{
-	  emit2 ("ld hl,#%s", sym->rname);
+	  emit2 ("ld hl,!hashedstr", sym->rname);
 	}
       commitPair (AOP (IC_RESULT (ic)), PAIR_HL);
     }
@@ -6776,7 +6776,7 @@ _rleAppend(RLECTX *self, int c)
           /* Yes, worthwhile. */
           /* Commit whatever was in the buffer. */
           _rleCommit(self);
-          emit2(".db -%u,0x%02X", self->runLen, self->last);
+          emit2("!db !immed-%u,!immedbyte", self->runLen, self->last);
         }
       else
         {
@@ -6801,7 +6801,7 @@ _rleAppend(RLECTX *self, int c)
           /* Commit whatever was in the buffer. */
           _rleCommit(self);
 
-          emit2 (".db -%u,0x%02X", self->runLen, self->last);
+          emit2 ("!db !immed-%u,!immedbyte", self->runLen, self->last);
           self->runLen = 0;
         }
       self->runLen++;

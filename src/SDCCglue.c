@@ -180,7 +180,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
       /* if extern then add it into the extern list */
       if (IS_EXTERN (sym->etype))
 	{
-	  addSetHead (&externs, sym);
+          addSetHead (&externs, sym);
 	  continue;
 	}
 
@@ -1058,7 +1058,9 @@ emitStaticSeg (memmap * map, FILE * out)
       /* if it is not static add it to the public
          table */
       if (!IS_STATIC (sym->etype))
-	addSetHead (&publics, sym);
+        {
+          addSetHead (&publics, sym);
+        }
 
       /* print extra debug info if required */
       if (options.debug) {
@@ -1267,7 +1269,7 @@ printExterns (FILE * afile)
 
   for (sym = setFirstItem (externs); sym;
        sym = setNextItem (externs))
-    tfprintf (afile, "\t!global\n", sym->rname);
+    tfprintf (afile, "\t!extern\n", sym->rname);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1323,7 +1325,9 @@ emitOverlay (FILE * afile)
 	     and addPublics allowed then add it to the public set */
 	  if ((sym->_isparm && !IS_REGPARM (sym->etype))
 	      && !IS_STATIC (sym->etype))
-	    addSetHead (&publics, sym);
+            {
+              addSetHead (&publics, sym);
+            }
 
 	  /* if extern then do nothing or is a function
 	     then do nothing */

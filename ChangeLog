@@ -1,3 +1,15 @@
+2001-12-23  Michael Hope  <michaelh@juju.net.nz>
+
+	* src/z80/mappings.i: Added z80asm support.
+
+	* src/z80/main.c: Added z80asm support on --asm=z80asm
+
+	* src/z80/gen.c: Fixed asm portability issues.
+
+	* src/asm.c (tvsprintf): Removed old code, added 'N' for function name.  For extern support.
+
+	* src/SDCCglue.c (printExterns): Added global/extern split.
+
 2001-12-17  Bernhard Held  <bernhard@bernhardheld.de>
 
 	* support/regression/Makefile: added test for mcs51 model large

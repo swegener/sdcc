@@ -46,7 +46,8 @@ typedef enum
     /* Must be first */
     ASM_TYPE_ASXXXX,
     ASM_TYPE_RGBDS,
-    ASM_TYPE_ISAS
+    ASM_TYPE_ISAS,
+    ASM_TYPE_Z80ASM
   }
 ASM_TYPE;
 
@@ -266,6 +267,13 @@ _parseOptions (int *pargc, char **argv, int *i)
 	      asm_addTree (&_isas_gb);
 	      /* Munge the function prefix */
 	      gbz80_port.fun_prefix = "";
+	      _G.asmType = ASM_TYPE_ISAS;
+	      return TRUE;
+	    }
+	  else if (!strcmp (argv[*i], "--asm=z80asm"))
+	    {
+              port->assembler.externGlobal = TRUE;
+	      asm_addTree (&_z80asm_z80);
 	      _G.asmType = ASM_TYPE_ISAS;
 	      return TRUE;
 	    }

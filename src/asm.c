@@ -42,122 +42,6 @@ _findMapping (const char *szKey)
   return shash_find (_h, szKey);
 }
 
-#if 0
-static void 
-_iprintf (char *pInto, const char *sz, va_list * pap)
-{
-  char format[MAX_TOKEN_LEN];
-  char *pStart = pInto;
-  static int count;
-
-  while (*sz)
-    {
-      if (*sz == '%')
-	{
-	  switch (*++sz)
-	    {
-	      /* See if it's a special emitter */
-	    case 'r':
-	      wassert (0);
-	      break;
-	      /* Name of the code segment */
-	    case 'C':
-	      strcpy (pInto, CODE_NAME);
-	      pInto = pStart + strlen (pStart);
-	      sz++;
-	      break;
-	    case 'F':
-	      strcpy (pInto, srcFileName);
-	      pInto = pStart + strlen (pStart);
-	      sz++;
-	      break;
-	    case 'I':
-	      sprintf (pInto, "%u", ++count);
-	      pInto = pStart + strlen (pStart);
-	      sz++;
-	      break;
-	    default:
-	      {
-		/* Scan out the arg and pass it on to sprintf */
-		char *p = format;
-		*p++ = '%';
-		while (isdigit (*sz))
-		  *p++ = *sz++;
-		*p++ = *sz++;
-		*p = '\0';
-		vsprintf (pInto, format, *pap);
-		/* PENDING: Assume that the arg length was an int */
-		(void) va_arg (*pap, int);
-	      }
-	    }
-	  pInto = pStart + strlen (pStart);
-	}
-      else
-	{
-	  *pInto++ = *sz++;
-	}
-    }
-  *pInto = '\0';
-}
-
-void 
-tvsprintf (char *buffer, const char *sz, va_list ap)
-{
-  char *pInto = buffer;
-  char *p;
-  char token[MAX_TOKEN_LEN];
-
-  buffer[0] = '\0';
-
-  while (*sz)
-    {
-      if (*sz == '!')
-	{
-	  /* Start of a token.  Search until the first
-	     [non alplha, *] and call it a token. */
-	  const char *t;
-	  p = token;
-	  sz++;
-	  while (isalpha (*sz) || *sz == '*')
-	    {
-	      *p++ = *sz++;
-	    }
-	  *p = '\0';
-	  /* Now find the token in the token list */
-	  if ((t = _findMapping (token)))
-	    {
-	      printf ("tvsprintf: found token \"%s\" to \"%s\"\n", token, t);
-	      _iprintf (pInto, t, &ap);
-	      pInto = buffer + strlen (buffer);
-	    }
-	  else
-	    {
-	      fprintf (stderr, "Cant find token \"%s\"\n", token);
-	      wassert (0);
-	    }
-	}
-      else if (*sz == '%')
-	{
-	  p = token;
-	  *p++ = *sz++;
-	  while (!isalpha (*sz))
-	    {
-	      *p++ = *sz++;
-	    }
-	  *p++ = *sz++;
-	  *p = '\0';
-	  vsprintf (pInto, token, ap);
-	  pInto = buffer + strlen (buffer);
-	  (void) va_arg (ap, int);
-	}
-      else
-	{
-	  *pInto++ = *sz++;
-	}
-    }
-  *pInto = '\0';
-}
-#else
 // Append a string onto another, and update the pointer to the end of
 // the new string.
 static char *
@@ -177,14 +61,15 @@ tvsprintf (char *buffer, const char *format, va_list ap)
 
   // Supports:
   //  !tokens
-  //  %[CIF] - special formats with no argument (ie list isnt touched)
+  //  %[CIFN] - special formats with no argument (ie list isnt touched)
   //  All of the system formats
 
   // This is acheived by expanding the tokens and zero arg formats into
   // one big format string, which is passed to the native printf.
   static int count;
-  char newformat[INITIAL_INLINEASM];
-  char *pInto = newformat;
+  char noTokens[INITIAL_INLINEASM];
+  char newFormat[INITIAL_INLINEASM];
+  char *pInto = noTokens;
   char *p;
   char token[MAX_TOKEN_LEN];
   const char *sz = format;
@@ -192,6 +77,7 @@ tvsprintf (char *buffer, const char *format, va_list ap)
   // NULL terminate it to let strlen work.
   *pInto = '\0';
 
+  /* First pass: expand all of the macros */
   while (*sz)
     {
       if (*sz == '!')
@@ -209,7 +95,7 @@ tvsprintf (char *buffer, const char *format, va_list ap)
 	  /* Now find the token in the token list */
 	  if ((t = _findMapping (token)))
 	    {
-	      pInto = _appendAt (pInto, newformat, t);
+	      pInto = _appendAt (pInto, noTokens, t);
 	    }
 	  else
 	    {
@@ -217,7 +103,21 @@ tvsprintf (char *buffer, const char *format, va_list ap)
 	      wassert (0);
 	    }
 	}
-      else if (*sz == '%')
+      else
+        {
+          *pInto++ = *sz++;
+        }
+    }
+
+  *pInto = '\0';
+
+  /* Second pass: Expand any macros that we own */
+  sz = noTokens;
+  pInto = newFormat;
+
+  while (*sz)
+    {
+      if (*sz == '%')
 	{
 	  // See if its one that we handle.
 	  sz++;
@@ -225,18 +125,26 @@ tvsprintf (char *buffer, const char *format, va_list ap)
 	    {
 	    case 'C':
 	      // Code segment name.
-	      pInto = _appendAt (pInto, newformat, CODE_NAME);
+	      pInto = _appendAt (pInto, newFormat, CODE_NAME);
+              sz++;
 	      break;
 	    case 'F':
 	      // Source file name.
-	      pInto = _appendAt (pInto, newformat, srcFileName);
+	      pInto = _appendAt (pInto, newFormat, srcFileName);
+              sz++;
 	      break;
+            case 'N':
+              // Current function name.
+              pInto = _appendAt (pInto, newFormat, currFunc->rname);
+              sz++;
+              break;
 	    case 'I':
 	      {
 		// Unique ID.
 		char id[20];
 		sprintf (id, "%u", ++count);
-		pInto = _appendAt (pInto, newformat, id);
+		pInto = _appendAt (pInto, newFormat, id);
+                sz++;
 		break;
 	      }
 	    default:
@@ -254,12 +162,12 @@ tvsprintf (char *buffer, const char *format, va_list ap)
 	  *pInto++ = *sz++;
 	}
     }
+
   *pInto = '\0';
 
   // Now do the actual printing
-  vsprintf (buffer, newformat, ap);
+  vsprintf (buffer, newFormat, ap);
 }
-#endif
 
 void 
 tfprintf (FILE * fp, const char *szFormat,...)
@@ -375,6 +283,7 @@ static const ASM_MAPPING _gas_mapping[] =
   {"msbimmeds", "#>%s"},
   {"module", ".file \"%s.c\""},
   {"global", ".globl %s"},
+  {"extern", ".globl %s"},
   {"fileprelude", ""},
   {"functionheader",
    "; ---------------------------------\n"

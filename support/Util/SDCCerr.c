@@ -371,7 +371,9 @@ struct
 { W_CAST_STRUCT_PTR,ERROR_LEVEL_WARNING,
 	  "cast of struct %s * to struct %s * " },
 { W_IF_ALWAYS_TRUE, ERROR_LEVEL_WARNING,
-   "if-statement condition always true, if-statement not generated" },
+    "if-statement condition always true, if-statement not generated" },
+{ E_PARAM_NAME_OMITTED, ERROR_LEVEL_ERROR,
+    "in function %s: name omitted for parameter %d" },
 };
 
 /*

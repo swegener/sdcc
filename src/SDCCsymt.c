@@ -1678,7 +1678,7 @@ checkFunction (symbol * sym, symbol *csym)
 
   /* check if this function is defined as calleeSaves
      then mark it as such */
-    FUNC_CALLEESAVES(sym->type) = inCalleeSaveList (sym->name);
+  FUNC_CALLEESAVES(sym->type) = inCalleeSaveList (sym->name);
 
   /* if interrupt service routine  */
   /* then it cannot have arguments */
@@ -1689,6 +1689,26 @@ checkFunction (symbol * sym, symbol *csym)
 	FUNC_ARGS(sym->type)=NULL;
       }
     }
+
+  for (argCnt=1, acargs = FUNC_ARGS(sym->type); 
+       acargs; 
+       acargs=acargs->next, argCnt++) {
+    if (!acargs->sym) { 
+      // this can happen for reentrant functions
+      werror(E_PARAM_NAME_OMITTED, sym->name, argCnt);
+      // the show must go on: synthesize a name and symbol
+      sprintf (acargs->name, "_%s_PARM_%d", sym->name, argCnt);
+      acargs->sym = newSymbol (acargs->name, 1);
+      SPEC_OCLS (acargs->etype) = istack;
+      acargs->sym->type = copyLinkChain (acargs->type);
+      acargs->sym->etype = getSpec (acargs->sym->type);
+      acargs->sym->_isparm = 1;
+      strcpy (acargs->sym->rname, acargs->name);
+    } else if (strcmp(acargs->sym->name, acargs->sym->rname)==0) { 
+      // synthesized name
+      werror(E_PARAM_NAME_OMITTED, sym->name, argCnt);
+    }
+  }
 
   if (!csym && !(csym = findSym (SymbolTab, sym, sym->name)))
     return 1;			/* not defined nothing more to check  */
@@ -1864,7 +1884,6 @@ processFuncArgs (symbol * func)
       /* synthesize a variable name */
       if (!val->sym)
 	{
-
 	  sprintf (val->name, "_%s_PARM_%d", func->name, pNum++);
 	  val->sym = newSymbol (val->name, 1);
 	  SPEC_OCLS (val->etype) = port->mem.default_local_map;

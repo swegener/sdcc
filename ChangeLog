@@ -1,3 +1,7 @@
+2003-11-03 Martin Helmling <Martin.Helmling@octo-soft.de>
+
+        * debugger/mcs51/cmd.c: allows filename starting with digit(+ some debug)
+
 2003-11-02 Bernhard Held <bernhard@bernhardheld.de>
 
         * src/SDCCmain.c (linkEdit): "fixed" again bug #833605

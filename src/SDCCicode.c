@@ -474,6 +474,10 @@ newiCodeCondition (operand * condition,
 {
   iCode *ic;
 
+  if (IS_VOID(OP_SYMBOL(condition)->type)) {
+    werror(E_VOID_VALUE_USED);
+  }
+
   ic = newiCode (IFX, NULL, NULL);
   IC_COND (ic) = condition;
   IC_TRUE (ic) = trueLabel;

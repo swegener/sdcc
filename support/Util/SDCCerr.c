@@ -358,7 +358,9 @@ struct
 { E_CANNOT_USE_GENERIC_POINTER, ERROR_LEVEL_ERROR,
     "cannot use generic pointer %s to initialize %s" },
 { W_EXCESS_SHORT_OPTIONS, ERROR_LEVEL_WARNING,
-    "Only one short option can be specified at a time.  Rest of %s ignored." }
+    "Only one short option can be specified at a time.  Rest of %s ignored." },
+{ E_VOID_VALUE_USED, ERROR_LEVEL_ERROR,
+    "void value not ignored as it ought to be" },
 };
 
 /*

@@ -1,5 +1,7 @@
 2001-09-07    <johan@FRIJA>
 
+	* src/SDCCicode.c (newiCodeCondition): fixed bug #456235 (1.77)
+
 	* src/SDCCglue.c (emitRegularMap): only delete a symbol when it is a symbol
 
 2001-09-06    <johan@FRIJA>

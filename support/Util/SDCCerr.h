@@ -180,6 +180,7 @@ SDCCERR - SDCC Standard error handler
 #define W_ILLEGAL_OPT_COMBINATION 162
 #define E_DUPLICATE_MEMBER 163
 #define E_STACK_VIOLATION 164       /* internal stack violation */
+#define W_INT_OVL 165               /* integer overflow in expression */
 
 /** Describes the maximum error level that will be logged.  Any level
  *  includes all of the levels listed after it.

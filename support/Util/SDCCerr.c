@@ -385,6 +385,8 @@ struct
     "duplicate %s member '%s'" },
 { E_STACK_VIOLATION, ERROR_LEVEL_ERROR,
     "'%s' internal stack %s" },
+{ W_INT_OVL, ERROR_LEVEL_WARNING,
+    "integer overflow in expression" },
 };
 
 /*

@@ -430,7 +430,7 @@ void out(int *byte_list, int num) {
     if (num) {
       for (i=0; i<num; i++) {
 	if ((i%16)==0) {
-	  fprintf (frel, "%sT %04x", i ? "\n" : "", MEM_POS);
+	  fprintf (frel, "%sT %04x", i ? "\n" : "", MEM_POS+i);
 	}
 	fprintf (frel, " %02x", byte_list[i]);
       }

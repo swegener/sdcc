@@ -469,4 +469,5 @@ struct PreDef preDef[] = {
    {"tr2",    0x00CA},
    {"TXD",    0x00B1},
    {"txd",    0x00B1},
+   {"",       0x0000},
 };

@@ -1,3 +1,7 @@
+2004-02-14 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* doc/sdccman.lyx: minor changes, minor changed
+
 2004-02-13 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCicode.c (usualBinaryConversions): removed pic16 from ports

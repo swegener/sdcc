@@ -1,3 +1,10 @@
+2003-05-12  Karl Bongers(apply development patches from Martin Helmling)
+
+	* debugger/mcs51/sdcdb.c,simi.c,cmd.c,break.c and .h files.
+  Fixed so you can set breakpoints prior to run, run does not stop
+  on entry now.  Add tbreak.  Other enhancements and fixes for use
+  with ddd.
+
 2003-05-12  Borut Razem <borut.razem@siol.net>
 
 	* src/SDCCmain.c: fixed the problem with searching the DATADIR as the last resort on *nix

@@ -478,6 +478,9 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
   return FALSE;
 }
 
+
+#define LINKCMD "link-{port} -nf {dstfilename}"
+/*
 #define LINKCMD \
     "link-{port} -n -c -- {z80bases} -m -j" \
     " {z80libspec}" \
@@ -486,6 +489,7 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
     " {z80crt0}" \
     " \"{dstfilename}{objext}\"" \
     " {z80extraobj}"
+*/
 
 #define ASMCMD \
     "as-{port} -plosgff \"{objdstfilename}\" \"{dstfilename}{asmext}\""

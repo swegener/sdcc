@@ -1,24 +1,24 @@
-# Microsoft Developer Studio Project File - Name="linkz80" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="linkgbz80" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Console Application" 0x0103
 
-CFG=linkz80 - Win32 Debug
+CFG=linkgbz80 - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "linkz80.mak".
+!MESSAGE NMAKE /f "linkgbz80.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "linkz80.mak" CFG="linkz80 - Win32 Debug"
+!MESSAGE NMAKE /f "linkgbz80.mak" CFG="linkgbz80 - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "linkz80 - Win32 Release" (based on "Win32 (x86) Console Application")
-!MESSAGE "linkz80 - Win32 Debug" (based on "Win32 (x86) Console Application")
+!MESSAGE "linkgbz80 - Win32 Release" (based on "Win32 (x86) Console Application")
+!MESSAGE "linkgbz80 - Win32 Debug" (based on "Win32 (x86) Console Application")
 !MESSAGE 
 
 # Begin Project
@@ -28,17 +28,17 @@ CFG=linkz80 - Win32 Debug
 CPP=cl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "linkz80 - Win32 Release"
+!IF  "$(CFG)" == "linkgbz80 - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "Release_z80"
-# PROP BASE Intermediate_Dir "Release_z80"
+# PROP BASE Output_Dir "Release_gbz80"
+# PROP BASE Intermediate_Dir "Release_gbz80"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
-# PROP Output_Dir "Release_z80"
-# PROP Intermediate_Dir "Release_z80"
+# PROP Output_Dir "Release_gbz80"
+# PROP Intermediate_Dir "Release_gbz80"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
@@ -50,20 +50,20 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 /nologo /subsystem:console /machine:I386 /out:"..\..\bin_vc\link-z80.exe"
+# ADD LINK32 /nologo /subsystem:console /machine:I386 /out:"..\..\bin_vc\link-gbz80.exe"
 # SUBTRACT LINK32 /pdb:none
 
-!ELSEIF  "$(CFG)" == "linkz80 - Win32 Debug"
+!ELSEIF  "$(CFG)" == "linkgbz80 - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "Debug_z80"
-# PROP BASE Intermediate_Dir "Debug_z80"
+# PROP BASE Output_Dir "Debug_gbz80"
+# PROP BASE Intermediate_Dir "Debug_gbz80"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir "Debug_z80"
-# PROP Intermediate_Dir "Debug_z80"
+# PROP Output_Dir "Debug_gbz80"
+# PROP Intermediate_Dir "Debug_gbz80"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
@@ -75,87 +75,87 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 /nologo /subsystem:console /debug /machine:I386 /out:"..\..\bin_vc\link-z80.exe" /pdbtype:sept
+# ADD LINK32 /nologo /subsystem:console /debug /machine:I386 /out:"..\..\bin_vc\link-gbz80.exe" /pdbtype:sept
 # SUBTRACT LINK32 /pdb:none
 
 !ENDIF 
 
 # Begin Target
 
-# Name "linkz80 - Win32 Release"
-# Name "linkz80 - Win32 Debug"
+# Name "linkgbz80 - Win32 Release"
+# Name "linkgbz80 - Win32 Debug"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
 SOURCE=.\lkarea.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
+# ADD CPP /D "SDK" /D "INDEXLIB" /D "GAMEBOY"
 # End Source File
 # Begin Source File
 
 SOURCE=.\lkdata.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
+# ADD CPP /D "SDK" /D "INDEXLIB" /D "GAMEBOY"
 # End Source File
 # Begin Source File
 
 SOURCE=.\lkeval.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
+# ADD CPP /D "SDK" /D "INDEXLIB" /D "GAMEBOY"
 # End Source File
 # Begin Source File
 
 SOURCE=.\lkgb.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
+# ADD CPP /D "SDK" /D "INDEXLIB" /D "GAMEBOY"
 # End Source File
 # Begin Source File
 
 SOURCE=.\lkgg.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
+# ADD CPP /D "SDK" /D "INDEXLIB" /D "GAMEBOY"
 # End Source File
 # Begin Source File
 
 SOURCE=.\lkhead.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
+# ADD CPP /D "SDK" /D "INDEXLIB" /D "GAMEBOY"
 # End Source File
 # Begin Source File
 
 SOURCE=.\lkihx.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
+# ADD CPP /D "SDK" /D "INDEXLIB" /D "GAMEBOY"
 # End Source File
 # Begin Source File
 
 SOURCE=.\lklex.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
+# ADD CPP /D "SDK" /D "INDEXLIB" /D "GAMEBOY"
 # End Source File
 # Begin Source File
 
 SOURCE=.\lklibr.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
+# ADD CPP /D "SDK" /D "INDEXLIB" /D "GAMEBOY"
 # End Source File
 # Begin Source File
 
 SOURCE=.\lklist.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
+# ADD CPP /D "SDK" /D "INDEXLIB" /D "GAMEBOY"
 # End Source File
 # Begin Source File
 
 SOURCE=.\lkmain.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
+# ADD CPP /D "SDK" /D "INDEXLIB" /D "GAMEBOY"
 # End Source File
 # Begin Source File
 
 SOURCE=.\lkrloc.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
+# ADD CPP /D "SDK" /D "INDEXLIB" /D "GAMEBOY"
 # End Source File
 # Begin Source File
 
 SOURCE=.\lks19.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
+# ADD CPP /D "SDK" /D "INDEXLIB" /D "GAMEBOY"
 # End Source File
 # Begin Source File
 
 SOURCE=.\lksym.c
-# ADD CPP /D "SDK" /D "INDEXLIB"
+# ADD CPP /D "SDK" /D "INDEXLIB" /D "GAMEBOY"
 # End Source File
 # End Group
 # Begin Group "Header Files"

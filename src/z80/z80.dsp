@@ -90,6 +90,15 @@ SOURCE=.\gen.c
 # Begin Source File
 
 SOURCE=.\main.c
+
+!IF  "$(CFG)" == "z80 - Win32 Debug"
+
+!ELSEIF  "$(CFG)" == "z80 - Win32 Release"
+
+# ADD CPP /D "LNK"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 

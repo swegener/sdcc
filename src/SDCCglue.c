@@ -1512,6 +1512,17 @@ glue (void)
   FILE *asmFile;
   FILE *ovrFile = tempfile ();
   char moduleBuf[PATH_MAX];
+  int mcs51_like;
+
+  if(port->general.glue_up_main &&
+    (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_XA51 || TARGET_IS_DS400))
+  {
+      mcs51_like=1; /*So it has bits, sfr, sbits, data, idata, etc...*/
+  }
+  else
+  {
+      mcs51_like=0;
+  }
 
   addSetHead (&tmpfileSet, ovrFile);
   /* print the global struct definitions */
@@ -1574,22 +1585,21 @@ glue (void)
   if (port->assembler.externGlobal)
     printExterns (asmFile);
 
-  /* copy the sfr segment */
-  fprintf (asmFile, "%s", iComments2);
-  fprintf (asmFile, "; special function registers\n");
-  fprintf (asmFile, "%s", iComments2);
-  copyFile (asmFile, sfr->oFile);
-
-  /* copy the sbit segment */
-  fprintf (asmFile, "%s", iComments2);
-  fprintf (asmFile, "; special function bits \n");
-  fprintf (asmFile, "%s", iComments2);
-  copyFile (asmFile, sfrbit->oFile);
-  
-  /*JCF: Create the areas for the register banks*/
-  if(port->general.glue_up_main &&
-     (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_XA51 || TARGET_IS_DS400))
+  if(mcs51_like)
   {
+      /* copy the sfr segment */
+      fprintf (asmFile, "%s", iComments2);
+      fprintf (asmFile, "; special function registers\n");
+      fprintf (asmFile, "%s", iComments2);
+      copyFile (asmFile, sfr->oFile);
+
+      /* copy the sbit segment */
+      fprintf (asmFile, "%s", iComments2);
+      fprintf (asmFile, "; special function bits \n");
+      fprintf (asmFile, "%s", iComments2);
+      copyFile (asmFile, sfrbit->oFile);
+  
+      /*JCF: Create the areas for the register banks*/
 	  if(RegBankUsed[0]||RegBankUsed[1]||RegBankUsed[2]||RegBankUsed[3])
 	  {
 		 fprintf (asmFile, "%s", iComments2);
@@ -1608,7 +1618,7 @@ glue (void)
 
   /* copy the data segment */
   fprintf (asmFile, "%s", iComments2);
-  fprintf (asmFile, "; internal ram data\n");
+  fprintf (asmFile, "; %s ram data\n", mcs51_like?"internal":"");
   fprintf (asmFile, "%s", iComments2);
   copyFile (asmFile, data->oFile);
 
@@ -1616,7 +1626,7 @@ glue (void)
   /* create the overlay segments */
   if (overlay) {
     fprintf (asmFile, "%s", iComments2);
-    fprintf (asmFile, "; overlayable items in internal ram \n");
+    fprintf (asmFile, "; overlayable items in %s ram \n", mcs51_like?"internal":"");
     fprintf (asmFile, "%s", iComments2);
     copyFile (asmFile, ovrFile);
   }
@@ -1632,7 +1642,7 @@ glue (void)
     }
 
   /* create the idata segment */
-  if (idata) {
+  if ( (idata) && (mcs51_like) ) {
     fprintf (asmFile, "%s", iComments2);
     fprintf (asmFile, "; indirectly addressable internal ram data\n");
     fprintf (asmFile, "%s", iComments2);
@@ -1640,10 +1650,12 @@ glue (void)
   }
 
   /* copy the bit segment */
-  fprintf (asmFile, "%s", iComments2);
-  fprintf (asmFile, "; bit data\n");
-  fprintf (asmFile, "%s", iComments2);
-  copyFile (asmFile, bit->oFile);
+  if (mcs51_like) {
+    fprintf (asmFile, "%s", iComments2);
+    fprintf (asmFile, "; bit data\n");
+    fprintf (asmFile, "%s", iComments2);
+    copyFile (asmFile, bit->oFile);
+  }
 
   /* if external stack then reserve space of it */
   if (mainf && IFFUNC_HASBODY(mainf->type) && options.useXstack)
@@ -1657,10 +1669,12 @@ glue (void)
 
 
   /* copy xtern ram data */
-  fprintf (asmFile, "%s", iComments2);
-  fprintf (asmFile, "; external ram data\n");
-  fprintf (asmFile, "%s", iComments2);
-  copyFile (asmFile, xdata->oFile);
+  if (mcs51_like) {
+    fprintf (asmFile, "%s", iComments2);
+    fprintf (asmFile, "; external ram data\n");
+    fprintf (asmFile, "%s", iComments2);
+    copyFile (asmFile, xdata->oFile);
+  }
 
   /* copy xternal initialized ram data */
   fprintf (asmFile, "%s", iComments2);

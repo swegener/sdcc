@@ -88,7 +88,7 @@
  */
 
 #ifdef SDK
-#define	NCPS	32		/* characters per symbol */
+#define	NCPS	80		/* characters per symbol.  Used to be 32... */
 #else /* SDK */
 #define	NCPS	8		/* characters per symbol */
 #endif /* SDK */

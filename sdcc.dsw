@@ -3,6 +3,57 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
+Project: "all"=.\all.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name as_z80
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name aslink
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name asx8051
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name packihx
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name sdcpp
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name src
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name linkz80
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name linkgbz80
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name as_gbz80
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "as_gbz80"=.\as\as_gbz80.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "as_z80"=.\as\as_z80.dsp - Package Owner=<4>
 
 Package=<5>
@@ -117,7 +168,19 @@ Package=<4>
 
 ###############################################################################
 
-Project: "linkz80"=.\link\z80\linkz80.dsp - Package Owner=<4>
+Project: "linkgbz80"=.\link\z80\linkgbz80.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "linkz80"=.\LINK\Z80\linkz80.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

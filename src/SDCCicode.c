@@ -1084,6 +1084,7 @@ operand *operandFromSymbol (symbol *sym)
 	op->key = sym->key ;
 	op->isvolatile = isOperandVolatile(op,TRUE);
 	op->isGlobal   = isOperandGlobal(op);
+	op->parmBytes  = sym->argStack;
 	return op;
     }
     

@@ -53,14 +53,14 @@ _gptrgetc (char *gptr) _naked
     ;   any other value for type
     ;   return xFF
 	mov     a,#0xff
-	sjmp    00005$
+	ret
     ;
     ;   Pointer to data space
     ;
  00001$:
 	mov     r0,dpl     ; use only low order address
 	mov     a,@r0
-        sjmp    00005$
+        ret
 ;
 ;   pointer to xternal data
 ;   pointer to code area
@@ -68,7 +68,7 @@ _gptrgetc (char *gptr) _naked
  00003$:
 	; clr     a  is already 0
         movc    a,@a+dptr
-        sjmp    00005$
+        ret
 ;
 ;   pointer to xternal stack
 ;
@@ -78,7 +78,6 @@ _gptrgetc (char *gptr) _naked
 ;
 ;   restore and return
 ;
- 00005$:
         mov     r0,a
         pop     acc
         xch     a,r0

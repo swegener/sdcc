@@ -36,7 +36,7 @@ _gptrput (char *gptr, char c) _naked
     gptr; c; /* hush the compiler */
 
     _asm
-	ar0 = 0x00
+        ar0 = 0x00
         push     acc
     ;
     ;   depending on the pointer type acc. to SDCCsymt.h
@@ -55,7 +55,7 @@ _gptrput (char *gptr, char c) _naked
 
  00003$:
         pop     acc    ; do nothing
-        sjmp    00005$
+        ret
 ;
 ;       store into near space
 ;
@@ -65,12 +65,12 @@ _gptrput (char *gptr, char c) _naked
         mov     r0,dpl
         mov     @r0,a
         pop     ar0
-        sjmp    00005$
+        ret
 
  00002$:
         pop     acc
         movx    @dptr,a
-        sjmp    00005$
+        ret
 
  00004$:
 #if USE_PDATA_PAGING_REGISTER
@@ -84,8 +84,6 @@ _gptrput (char *gptr, char c) _naked
         movx    @r0,a
         pop     ar0
 #endif
-
- 00005$:
         ret
 _endasm;
 }

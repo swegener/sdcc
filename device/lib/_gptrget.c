@@ -38,7 +38,7 @@ _gptrget (char *gptr) _naked
     gptr; /* hush the compiler */
 
     _asm
-	ar0 = 0x00
+        ar0 = 0x00
     ;   save values passed
     ;
     ;   depending on the pointer type acc. to SDCCsymt.h
@@ -58,7 +58,7 @@ _gptrget (char *gptr) _naked
     ;   any other value for type
     ;   return xFF
         mov     a,#0xff
-        sjmp    00005$
+        ret
     ;
     ;   Pointer to data space
     ;
@@ -70,20 +70,20 @@ _gptrget (char *gptr) _naked
         ;
         pop     ar0
         ;
-        sjmp    00005$
+        ret
     ;
     ;   pointer to xternal data
     ;
  00002$:
         movx    a,@dptr
-        sjmp    00005$
+        ret
 ;
 ;   pointer to code area
 ;
  00003$:
         ; clr     a  is already 0
         movc    a,@a+dptr
-        sjmp    00005$
+        ret
 ;
 ;   pointer to xternal stack or pdata
 ;
@@ -97,11 +97,6 @@ _gptrget (char *gptr) _naked
         movx    a,@r0
         pop     ar0
 #endif
-
-;
-;   return
-;
- 00005$:
         ret
      _endasm ;
 }

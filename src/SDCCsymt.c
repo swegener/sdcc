@@ -782,8 +782,6 @@ getSize (sym_link * p)
   /* this is a specifier  */
   switch (DCL_TYPE (p))
     {
-    case FUNCTION:
-      return 2;
     case ARRAY:
       return DCL_ELEM (p) * getSize (p->next);
     case IPOINTER:
@@ -793,6 +791,7 @@ getSize (sym_link * p)
     case EEPPOINTER:
     case FPOINTER:
     case CPOINTER:
+    case FUNCTION:
       return (FPTRSIZE);
     case GPOINTER:
       return (GPTRSIZE);

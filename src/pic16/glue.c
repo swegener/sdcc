@@ -1271,6 +1271,9 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
 	      pb = pic16_newpCodeChain(NULL, 'P',pic16_newpCodeCharP("; Starting pCode block for Ival"));
 	      pic16_addpBlock(pb);
 
+              /* make sure that 'code' directive is emitted before */
+              pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir("code", NULL));
+                            
 //	      fprintf(stderr, "%s:%d [2] generating init for label: %s\n", __FILE__, __LINE__, sym->rname);
 
 	      pic16_addpCode2pBlock(pb,pic16_newpCodeLabel(sym->rname,-1));

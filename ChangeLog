@@ -1,3 +1,8 @@
+2004-07-23 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/glue.c (pic16emitStaticSeg): fixed bug with files
+	without source code but only variable initializers
+
 2004-07-20 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/glue.c (pic16emitRegularMap): unused functions marked as

@@ -62,7 +62,7 @@ newHashTable (int size)
   if (!(htab->table = Safe_alloc ((size + 1) * sizeof (hashtItem *))))
     {
       fprintf (stderr, "out of virtual memory %s %d\n",
-	       __FILE__, (size + 1) * sizeof (hashtItem *));
+	       __FILE__, (size + 1) * (int) sizeof (hashtItem *));
       exit (1);
     }
   htab->minKey = htab->size = size;

@@ -105,7 +105,7 @@ static void pCodePrintLabel(FILE *of, pCode *pc);
 static void pCodePrintFunction(FILE *of, pCode *pc);
 static void pCodeOpPrint(FILE *of, pCodeOp *pcop);
 static char *get_op_from_instruction( pCodeInstruction *pcc);
-char *get_op( pCodeOp *pcop,char *buff,int buf_size);
+char *get_op( pCodeOp *pcop,char *buff,size_t buf_size);
 int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd);
 int pCodePeepMatchRule(pCode *pc);
 void pBlockStats(FILE *of, pBlock *pb);
@@ -1228,7 +1228,7 @@ void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...)
   len = strlen(*str);
   if(len > *size) {
     fprintf(stderr,"WARNING, it looks like %s has overflowed\n",__FUNCTION__);
-    fprintf(stderr,"len = %d is > str size %d\n",len,*size);
+    fprintf(stderr,"len = %d is > str size %d\n",len,(int)*size);
   }
 
   *str += len;
@@ -2490,7 +2490,7 @@ void pBlockRegs(FILE *of, pBlock *pb)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-char *get_op(pCodeOp *pcop,char *buffer, int size)
+char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 {
   regs *r;
   static char b[50];
@@ -2587,7 +2587,7 @@ static char *get_op_from_instruction( pCodeInstruction *pcc)
 
   if(pcc )
     return get_op(pcc->pcop,NULL,0);
-  
+
   /* gcc 3.2:  warning: concatenation of string literals with __FUNCTION__ is deprecated 
   return ("ERROR Null: "__FUNCTION__);
   */
@@ -2605,7 +2605,7 @@ static void pCodeOpPrint(FILE *of, pCodeOp *pcop)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-char *pCode2str(char *str, int size, pCode *pc)
+char *pCode2str(char *str, size_t size, pCode *pc)
 {
   char *s = str;
 

@@ -1,4 +1,12 @@
-2003-02-26  Bernhard Held <bernhard@bernhardheld.de>
+2003-03-06  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/pic/pcode.c (get_op): fix 64 bit warnings
+	* src/pic/pcode.c (pCode2str): fix 64 bit warnings
+	* src/SDCChasht.c (newHashTable): fix 64 bit warnings
+	* src/SDCCsymt.c (checkTypeSanity): fix 64 bit warnings
+	* support/regression/tests/malloc.c: fix 64 bit warnings
+
+2003-03-04  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/mcs51/gen.c (genMinus): fixed bug 696436
 

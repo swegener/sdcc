@@ -23,15 +23,27 @@ testMalloc(void)
 
   p1 = malloc(5);
   ASSERT(p1 != NULL);
+#ifdef HOST
+  LOG(("p1: %p\n", p1));
+#else
   LOG(("p1: %u\n", (unsigned) p1));
+#endif
 
   p2 = malloc(20);
   ASSERT(p2 != NULL);
+#ifdef HOST
+  LOG(("p2: %p\n", p2));
+#else
   LOG(("p2: %u\n", (unsigned) p2));
+#endif
 
   free(p2);
 
   p3 = malloc(10);
   ASSERT(p3 != NULL);
+#ifdef HOST
+  LOG(("p3, after freeing p2: %p\n", p3));
+#else
   LOG(("p3, after freeing p2: %u\n", (unsigned) p3));
+#endif
 }

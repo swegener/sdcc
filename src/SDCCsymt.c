@@ -508,7 +508,7 @@ void checkTypeSanity(sym_link *etype, char *name) {
   noun=nounName(etype);
 
   if (getenv("DEBUG_SANITY")) {
-    fprintf (stderr, "checking sanity for %s %x\n", name, (int)etype);
+    fprintf (stderr, "checking sanity for %s %p\n", name, etype);
   }
 
   if ((SPEC_NOUN(etype)==V_CHAR || 

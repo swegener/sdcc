@@ -1611,9 +1611,8 @@ genCpl (iCode * ic)
     {
       if (AOP_TYPE (IC_LEFT (ic)) == AOP_CRY)
 	{
-	  emitcode ("mov", "c,%s", IC_LEFT (ic)->aop->aopu.aop_dir);
-	  emitcode ("cpl", "c");
-	  emitcode ("mov", "%s,c", IC_RESULT (ic)->aop->aopu.aop_dir);
+	  /* promotion rules are responsible for this strange result: */
+	  emitcode ("setb", "%s", IC_RESULT (ic)->aop->aopu.aop_dir);
 	  goto release;
 	}
 

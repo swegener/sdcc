@@ -1683,6 +1683,9 @@ main (int argc, char **argv, char **envp)
   if (cdbFile)
     fclose (cdbFile);
 
+  if (yyin && yyin != stdin)
+    fclose (yyin);
+
   if (preOutName && !options.c1mode)
     {
       unlink (preOutName);
@@ -1701,9 +1704,5 @@ main (int argc, char **argv, char **envp)
 	linkEdit (envp);
     }
 
-  if (yyin && yyin != stdin)
-    fclose (yyin);
-
   return 0;
-
 }

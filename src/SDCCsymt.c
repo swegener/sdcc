@@ -1450,14 +1450,13 @@ compareType (sym_link * dest, sym_link * src)
 	{
 	  if (DCL_TYPE (src) == DCL_TYPE (dest))
 	    return compareType (dest->next, src->next);
-	  else if (IS_PTR (src) && IS_PTR (dest))
+	  if (IS_PTR (src) && IS_PTR (dest))
 	    return -1;
-	  else if (IS_PTR (dest) && IS_ARRAY (src))
+	  if (IS_PTR (dest) && IS_ARRAY (src))
 	    return -1;
-	  else if (IS_PTR (dest) && IS_FUNC (dest->next) && IS_FUNC (src))
+	  if (IS_PTR (dest) && IS_FUNC (dest->next) && IS_FUNC (src))
 	    return -1 * compareType (dest->next, src);
-	  else
-	    return 0;
+	  return 0;
 	}
       else if (IS_PTR (dest) && IS_INTEGRAL (src))
 	return -1;
@@ -1664,10 +1663,10 @@ checkFunction (symbol * sym)
   if (compareType (csym->type, sym->type) <= 0)
     {
       werror (E_PREV_DEF_CONFLICT, csym->name, "type");
-      werror (E_CONTINUE, "previous definition type ");
+      werror (W_CONTINUE, "previous definition type ");
       printTypeChain (csym->type, stderr);
       fprintf (stderr, "\n");
-      werror (E_CONTINUE, "current definition type ");
+      werror (W_CONTINUE, "current definition type ");
       printTypeChain (sym->type, stderr);
       fprintf (stderr, "\n");
       return 0;

@@ -1539,7 +1539,7 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
       (DCL_TYPE (optype) != DCL_TYPE (type)) &&
       !IS_GENPTR (type))
     {
-      werror (E_INCOMPAT_CAST);
+      werror (W_INCOMPAT_CAST);
       fprintf (stderr, "from type '");
       printTypeChain (optype, stderr);
       fprintf (stderr, "' to type '");

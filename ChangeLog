@@ -1,3 +1,12 @@
+2001-09-16    <johan@FRIJA>
+
+	* support/Util/SDCCerr.c: fixed up the error/warning/info database. I only changed the E_ W_ I_ prefix to what SDCCerr.c says it is.
+
+2001-09-15    <johan@FRIJA>
+
+	* src/mcs51/ralloc.c: (findAssignToSym): fixed bug #460662 part 1
+	* src/ds390/ralloc.c (findAssignToSym): fixed bug #460662 part 1
+
 2001-09-11    <johan@FRIJA>
 
 	* src/SDCCval.c (valDiv Mod Minus Plus Shift): keep litteral expressions as small as possible (bug #460010)

@@ -30,10 +30,10 @@ SDCCERR - SDCC Standard error handler
 #define  E_FUNCTION_EXPECTED  12     /* function expected    */
 #define  E_USING_ERROR     13        /* using in error       */
 #define  E_SFR_INIT        14        /* init error for sbit  */
-#define  E_INIT_IGNORED    15        /* initialiser ignored  */
+#define  W_INIT_IGNORED    15        /* initialiser ignored  */
 #define  E_AUTO_ASSUMED    16        /* sclass auto assumed  */
 #define  E_AUTO_ABSA       17        /* abs addr for auto var*/
-#define  E_INIT_WRONG      18        /* initializer type !=  */
+#define  W_INIT_WRONG      18        /* initializer type !=  */
 #define  E_FUNC_REDEF      19        /* func name redefined  */
 #define  E_ID_UNDEF        20        /* identifer undefined  */
 #define  W_STACK_OVERFLOW  21        /* stack overflow       */
@@ -47,7 +47,7 @@ SDCCERR - SDCC Standard error handler
 #define  E_CONV_ERR        29        /* conversion error     */
 #define  E_INT_REQD        30        /* bit field must be int*/
 #define  E_BITFLD_SIZE     31        /* bit field size > 16  */
-#define  E_TRUNCATION      32        /* high order trucation */
+#define  W_TRUNCATION      32        /* high order trucation */
 #define  E_CODE_WRITE      33        /* trying 2 write to code */
 #define  E_LVALUE_CONST    34        /* lvalue is a const   */   
 #define  E_ILLEGAL_ADDR    35        /* address of bit      */
@@ -75,7 +75,7 @@ SDCCERR - SDCC Standard error handler
 #define  E_LABEL_UNDEF     57        /* undefined label used   */
 #define  E_FUNC_VOID       58        /* void func ret value    */
 #define  E_VOID_FUNC       59        /* func must return value */
-#define  E_RETURN_MISMATCH 60        /* return value mismatch  */
+#define  W_RETURN_MISMATCH 60        /* return value mismatch  */
 #define  E_CASE_CONTEXT    61        /* case stmnt without switch */
 #define  E_CASE_CONSTANT   62        /* case expression ! const*/
 #define  E_BREAK_CONTEXT   63        /* break statement invalid*/
@@ -93,10 +93,10 @@ SDCCERR - SDCC Standard error handler
 #define	 E_EXTERN_INIT	   75	     /* extern variable initialised	*/
 #define  E_PRE_PROC_FAILED 76	     /* preprocessor failed		*/
 #define  E_DUP_FAILED	   77	     /* file DUP failed             */
-#define  E_INCOMPAT_CAST   78	     /* incompatible pointer casting */
-#define  E_LOOP_ELIMINATE  79	     /* loop eliminated			      */	  
+#define  W_INCOMPAT_CAST   78	     /* incompatible pointer casting */
+#define  W_LOOP_ELIMINATE  79	     /* loop eliminated			      */	  
 #define  W_NO_SIDE_EFFECTS  80	     /* expression has no side effects */
-#define  E_CONST_TOO_LARGE  81	     /* constant out of range		  */
+#define  W_CONST_TOO_LARGE  81	     /* constant out of range		  */
 #define	 W_BAD_COMPARE	    82	     /* bad comparison				  */
 #define  E_TERMINATING      83       /* compiler terminating			  */
 #define  W_LOCAL_NOINIT	    84	     /* local reference before assignment */
@@ -107,7 +107,7 @@ SDCCERR - SDCC Standard error handler
 #define  E_SFR_ADDR_RANGE   89		/* sfr address out of range			*/
 #define	 E_BITVAR_STORAGE   90		/* storage given for 'bit' variable	*/
 #define  E_EXTERN_MISMATCH  91		/* extern declaration mismatches    */
-#define  E_NONRENT_ARGS	    92	        /* fptr non reentrant has args		*/
+#define  W_NONRENT_ARGS	    92	        /* fptr non reentrant has args		*/
 #define  W_DOUBLE_UNSUPPORTED 93	/* 'double' not supported yet			*/
 #define  W_IF_NEVER_TRUE    94		/* if always false					*/
 #define  W_FUNC_NO_RETURN   95		/* no return statement found		*/
@@ -124,12 +124,12 @@ SDCCERR - SDCC Standard error handler
 #define  E_INVALID_OP      106          /* invalid operand for some operation */
 #define  E_SWITCH_NON_INTEGER 107       /* switch value not integer */
 #define  E_CASE_NON_INTEGER 108         /* case value not integer */
-#define  E_FUNC_TOO_LARGE   109         /* function too large     */
+#define  W_FUNC_TOO_LARGE   109         /* function too large     */
 #define  W_CONTROL_FLOW     110         /* control flow changed due to optimization */
 #define  W_PTR_TYPE_INVALID 111         /* invalid type specifier for pointer       */
 #define  W_IMPLICIT_FUNC    112         /* function declared implicitly             */
-#define  E_CONTINUE         113         /* more than one line                       */
-#define  W_TOOMANY_SPILS    114         /* too many spils occured                   */
+#define  W_CONTINUE         113         /* more than one line                       */
+#define  I_TOOMANY_SPILS    114         /* too many spils occured                   */
 #define  W_UNKNOWN_PRAGMA   115         /* #pragma directive unsupported            */
 #define  W_SHIFT_CHANGED    116         /* shift changed to zero                    */
 #define  W_UNKNOWN_OPTION   117         /* don't know the option                    */

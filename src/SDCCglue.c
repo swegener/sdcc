@@ -374,7 +374,7 @@ initPointer (initList * ilist)
 		return val;
 	}
  wrong:
-	werror (E_INIT_WRONG);
+	werror (W_INIT_WRONG);
 	return NULL;
 
 }
@@ -868,7 +868,7 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
 
   /* check the type      */
   if (compareType (type, val->type) == 0)
-    werror (E_INIT_WRONG);
+    werror (W_INIT_WRONG);
 
   /* if val is literal */
   if (IS_LITERAL (val->etype))

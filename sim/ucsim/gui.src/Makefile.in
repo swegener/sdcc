@@ -80,9 +80,11 @@ gui_api: ucsim_lib tool_lib
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: install_gui_api
+ifeq ($(curses_ok),yes)
 	@for pkg in $(PKGS); do\
 	  cd $$pkg && $(MAKE) install ; cd ..;\
 	done
+endif
 
 install_gui_api:
 

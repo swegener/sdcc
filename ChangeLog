@@ -1,6 +1,7 @@
 2003-04-19  Bernhard Held <bernhard@bernhardheld.de>
 
 	* as/z80/Makefile: fix permanent rebuild of z80
+	* sim/ucsim/gui.src/Makefile.in: target "install" builds the same packages as target "all"
 
 2003-04-18 	Kevin Vigor <kevin@vigor.nu>
 

@@ -1,3 +1,10 @@
+2004-12-28 Paul Stoffregen <paul AT pjrc.com>
+
+	* device/lib/printf_fast_f.c: same as printf_fast, but
+	  with floating point enabled
+	* device/lib/printf_fast.c: minor tweaks
+	* device/include/stdio.h: add printf_fast_f
+
 2004-12-27 Paul Stoffregen <paul AT pjrc.com>
 
 	* src/SDCCmain.c: make --float-reent default for mcs51

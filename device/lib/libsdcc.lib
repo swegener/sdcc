@@ -48,6 +48,7 @@ gets
 printfl
 printf_large
 printf_fast
+printf_fast_f
 printf_tiny
 sprintf
 vprintf

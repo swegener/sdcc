@@ -560,7 +560,6 @@ aopOp (operand * op, iCode * ic, bool result)
 
   sym = OP_SYMBOL (op);
 
-
   /* if the type is a conditional */
   if (sym->regType == REG_CND)
     {
@@ -597,6 +596,7 @@ aopOp (operand * op, iCode * ic, bool result)
       if (sym->ruonly)
 	{
 	  unsigned i;
+
 	  aop = op->aop = sym->aop = newAsmop (AOP_STR);
 	  aop->size = getSize (sym->type);
 	  for (i = 0; i < fReturnSizeMCS51; i++)
@@ -1011,7 +1011,7 @@ aopPut (asmop * aop, char *s, int offset)
 		}
 	      {
 		symbol *lbl = newiTempLabel (NULL);
-		emitcode ("clr", "c; oops");
+		emitcode ("clr", "c");
 		emitcode ("jz", "%05d$", lbl->key + 100);
 		emitcode ("cpl", "c");
 		emitcode ("", "%05d$:", lbl->key + 100);
@@ -1859,19 +1859,30 @@ genCall (iCode * ic)
 	   sic = setNextItem (_G.sendSet))
 	{
 	  int size, offset = 0;
-	  aopOp (IC_LEFT (sic), sic, FALSE);
-	  size = AOP_SIZE (IC_LEFT (sic));
-	  while (size--)
-	    {
-	      char *l = aopGet (AOP (IC_LEFT (sic)), offset,
-				FALSE, FALSE);
-	      if (strcmp (l, fReturn[offset]))
-		emitcode ("mov", "%s,%s",
-			  fReturn[offset],
-			  l);
-	      offset++;
+	  if (IS_VALOP(IC_LEFT(sic)) && IS_OP_LITERAL(IC_LEFT(sic)) 
+	      // PENDING: checkConstant2Type()
+	      // do some range checking here, just bitvars for now
+	      && IS_BITVAR(IC_LEFT(sic)->operand.valOperand->type)) {
+	    if (floatFromVal(IC_LEFT(sic)->operand.valOperand)) {
+	      emitcode ("mov", "%s,#0x01", fReturn[0]);
+	    } else {
+	      emitcode ("mov", "%s,#0x00", fReturn[0]);
 	    }
-	  freeAsmop (IC_LEFT (sic), NULL, sic, TRUE);
+	  } else {
+	    aopOp (IC_LEFT (sic), sic, FALSE);
+	    size = AOP_SIZE (IC_LEFT (sic));
+	    while (size--)
+	      {
+		char *l = aopGet (AOP (IC_LEFT (sic)), offset,
+				  FALSE, FALSE);
+		if (strcmp (l, fReturn[offset]))
+		  emitcode ("mov", "%s,%s",
+			    fReturn[offset],
+			    l);
+		offset++;
+	      }
+	    freeAsmop (IC_LEFT (sic), NULL, sic, TRUE);
+	  }
 	}
       _G.sendSet = NULL;
     }
@@ -8187,7 +8198,8 @@ genCast (iCode * ic)
   aopOp (result, ic, FALSE);
 
   /* if the result is a bit */
-  if (AOP_TYPE (result) == AOP_CRY)
+  // if (AOP_TYPE (result) == AOP_CRY /* works only for true symbols */
+  if (IS_BITVAR(OP_SYMBOL(result)->type))
     {
       /* if the right size is a literal then
          we know what the value is */

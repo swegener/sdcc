@@ -9,7 +9,7 @@
 
 static char _defaultRules[] =
 {
-#include "peeph.rul"
+    ""
 };
 
 static char *_gbz80_keywords[] = { NULL };

@@ -41,7 +41,9 @@ enum {
     /* Is in the carry register */
     AOP_CRY, 
     /* Is pointed to by IY */
-    AOP_IY, 
+    AOP_IY,
+    /* Is pointed to by HL */
+    AOP_HL,
     /* Is in A */
     AOP_ACC };
 

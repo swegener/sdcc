@@ -249,6 +249,7 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
         return aop;
     }
 
+#if 0
     if (IS_GB) {
 	/* if it is in direct space */
 	if (IN_DIRSPACE(space)) {
@@ -259,12 +260,16 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
 	    return aop;
 	}
     }
+#endif
 
     /* only remaining is far space */
     /* in which case DPTR gets the address */
-    sym->aop = aop = newAsmop(AOP_IY);
-    if (!IS_GB)
+    if (IS_GB)
+	sym->aop = aop = newAsmop(AOP_HL);
+    else {
+	sym->aop = aop = newAsmop(AOP_IY);
 	emitcode ("ld","iy,#%s ; a", sym->rname);
+    }
     aop->size = getSize(sym->type);
     aop->aopu.aop_dir = sym->rname;
 
@@ -625,6 +630,13 @@ static char *aopGet (asmop *aop, int offset, bool bit16)
     case AOP_REG:
 	return aop->aopu.aop_reg[offset]->name;
 
+    case AOP_HL:
+	emitcode("ld", "hl,#%s+%d", aop->aopu.aop_dir, offset);
+	sprintf(s, "(hl)");
+	ALLOC_ATOMIC(rs, strlen(s)+1);
+	strcpy(rs,s);
+	return rs;
+
     case AOP_IY:
 	sprintf(s,"%d(iy)", offset);
 	ALLOC_ATOMIC(rs,strlen(s)+1);
@@ -735,7 +747,17 @@ static void aopPut (asmop *aop, char *s, int offset)
 	else
 	    emitcode("ld", "%d(iy),%s", offset, s);
 	break;
-	
+    
+    case AOP_HL:
+	assert(IS_GB);
+	if (!strcmp(s, "(hl)")) {
+	    emitcode("ld", "a,(hl)");
+	    s = "a";
+	}
+	emitcode("ld", "hl,#%s+%d", aop->aopu.aop_dir, offset);
+	emitcode("ld", "(hl),%s", s);
+	break;
+
     case AOP_STK:
 	if (IS_GB) {
 	    if (!strcmp("(hl)", s)) {
@@ -1018,6 +1040,8 @@ release:
 static bool requiresHL(asmop *aop)
 {
     switch (aop->type) {
+    case AOP_DIR:
+    case AOP_HL:
     case AOP_STK:
 	return TRUE;
     default:
@@ -1044,8 +1068,9 @@ void assignResultValue(operand * oper)
 static void fetchHL(asmop *aop)
 {
     if (IS_GB && requiresHL(aop)) {
-	emitcode("ld", "a,%s", aopGet(aop, 0, FALSE));
-	emitcode("ld", "h,%s", aopGet(aop, 1, FALSE));
+	aopGet(aop, 0, FALSE);
+	emitcode("ld", "a,(hl+)");
+	emitcode("ld", "h,(hl)");
 	emitcode("ld", "l,a");
     }
     else {
@@ -1402,7 +1427,12 @@ static void genRet (iCode *ic)
     size = AOP_SIZE(IC_LEFT(ic));
     
     if ((size == 2) && ((l = aopGetWord(AOP(IC_LEFT(ic)), 0)))) {
+	if (IS_GB) {
+	    emitcode("ld", "de,%s", l);
+	}
+	else {
 	    emitcode("ld", "hl,%s", l);
+	}
     }
     else {
 	while (size--) {
@@ -2571,7 +2601,7 @@ static void genOr (iCode *ic, iCode *ifx)
 		    MOVA(aopGet(AOP(right),offset,FALSE));
 		    emitcode("or","a,%s ; 7",
 			     aopGet(AOP(left),offset,FALSE));
-		    aopPut(AOP(result),"a ; 8",0);
+		    aopPut(AOP(result),"a ; 8", offset);
 		}
             }
         }
@@ -3376,9 +3406,13 @@ static void genGenPointerSet (operand *right,
 {    
     int size, offset ;
     link *retype = getSpec(operandType(right));
+    const char *ptr = "hl";
 
     aopOp(result,ic,FALSE);
     aopOp(right,ic,FALSE);
+
+    if (IS_GB)
+	ptr = "de";
 
     /* Handle the exceptions first */
     if (isPair(AOP(result)) && (AOP_SIZE(right)==1)) {
@@ -3396,11 +3430,17 @@ static void genGenPointerSet (operand *right,
         /* if this is remateriazable */
         if (AOP_TYPE(result) == AOP_IMMD) {
 	    emitcode("", "; Error 2");
-	    emitcode("ld", "hl,%s", aopGet(AOP(result), 0, TRUE));
+	    emitcode("ld", "%s,%s", ptr, aopGet(AOP(result), 0, TRUE));
         }
         else { /* we need to get it byte by byte */
-	    /* PENDING: do this better */
-	    fetchHL(AOP(result));
+	    if (IS_GB) {
+		emitcode("ld", "e,%s", aopGet(AOP(result), 0, TRUE));
+		emitcode("ld", "d,%s", aopGet(AOP(result), 1, TRUE));
+	    }
+	    else {
+		/* PENDING: do this better */
+		fetchHL(AOP(result));
+	    }
         }
     }
     /* so hl know contains the address */
@@ -3416,16 +3456,15 @@ static void genGenPointerSet (operand *right,
 
         while (size--) {
             char *l = aopGet(AOP(right),offset,FALSE);
-
-	    if (isRegOrLit(AOP(right))) {
-		emitcode("ld", "(hl),%s", l);
+	    if (isRegOrLit(AOP(right)) && !IS_GB) {
+		emitcode("ld", "(%s),%s", l);
 	    }
 	    else {
 		MOVA(l);
-		emitcode("ld", "(hl),a", offset);
+		emitcode("ld", "(%s),a", ptr, offset);
 	    }
 	    if (size) {
-		emitcode("inc", "hl");
+		emitcode("inc", ptr);
 	    }
 	    offset++;
         }
@@ -3503,7 +3542,7 @@ static void genAddrOf (iCode *ic)
     if (sym->onStack) {
         /* if it has an offset  then we need to compute it */
 	if (IS_GB) {
-	    emitcode("lda", "hl,%d+%d(sp)", sym->stack, _spoffset);
+	    emitcode("lda", "hl,%d+%d+%d(sp)", sym->stack, _pushed, _spoffset);
 	    emitcode("ld", "d,h");
 	    emitcode("ld", "e,l");
 	    aopPut(AOP(IC_RESULT(ic)), "e", 0);

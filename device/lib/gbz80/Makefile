@@ -5,7 +5,7 @@ TOPDIR = ../../..
 SCC = $(TOPDIR)/bin/sdcc -mgbz80 -v
 SAS = as-gb
 
-OBJ = putchar.o string.o printf.o # asm_strings.o div.o mul.o 
+OBJ = putchar.o string.o printf.o div.o mul.o # asm_strings.o
 LIB = z80.lib
 CC = $(SCC)
 AS = $(SAS)

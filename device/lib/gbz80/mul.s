@@ -3,39 +3,34 @@
 	.area	_CODE
 __mulschar::	
 __muluchar::
-	push	de
 	push	bc
-	push	ix
-	ld	ix,#0
-	add	ix,sp
-
-	ld	c,8(ix)
-	ld	e,9(ix)
+	lda	hl,4(sp)
+	ld	c,(hl)
+	inc	hl
+	ld	e,(hl)
 	call	.mulu8
-	
-	pop	ix
+
+	ld	e,l
 	pop	bc
-	pop	de
 	ret
 
 __mulsint::
 __muluint::
-	push	de
 	push	bc
-	push	ix
-	ld	ix,#0
-	add	ix,sp
-
-	ld	c,8(ix)
-	ld	b,9(ix)
-	ld	e,10(ix)
-	ld	d,11(ix)
+	lda	hl,4(sp)
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+	inc	hl
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
 	call	.mulu16
-	
-	pop	ix
+
+	ld	e,l
+	ld	d,h
 	pop	bc
-	pop	de
-	ret
+	ret	
 		
 .mul8:
 .mulu8:
@@ -53,8 +48,8 @@ __muluint::
 	;;   DE = less significant word of product
 	;;
 	;; Register used: AF,BC,DE,HL
-.mul16:
-.mulu16:
+.mul16::	
+.mulu16::	
 	LD	HL,#0x00	; Product = 0
 	LD	A,#15		; Count = bit length - 1
 	;; Shift-and-add algorithm

@@ -1,161 +1,126 @@
 	;; Originally from GBDK by Pascal Felber.
 	.area	_CODE
 
-__divschar::	
-	push	de
+__divschar::
 	push	bc
-	push	ix
-	ld	ix,#0
-	add	ix,sp
-
-	ld	c,8(ix)
-	ld	e,9(ix)
+	lda	hl,4(sp)
+	
+	ld	c,(hl)
+	inc	hl
+	ld	e,(hl)
 	call	.div8
 
-	ld	l,c
-	
-	pop	ix
+	ld	e,c
 	pop	bc
-	pop	de
 	ret
 	
 __modschar::
-	push	de
 	push	bc
-	push	ix
-	ld	ix,#0
-	add	ix,sp
-
-	ld	c,8(ix)
-	ld	e,9(ix)
+	lda	hl,4(sp)
+	ld	c,(hl)
+	inc	hl
+	ld	e,(hl)
 	call	.div8
 
-	ld	l,e
-	
-	pop	ix
+	;;  Result in e
 	pop	bc
-	pop	de
 	ret
 
 __divsint::
-	push	de
 	push	bc
-	push	ix
-	ld	ix,#0
-	add	ix,sp
-
-	ld	c,8(ix)
-	ld	b,9(ix)
-	ld	e,10(ix)
-	ld	d,11(ix)
+	lda	hl,4(sp)
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+	inc	hl
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
 	call	.div16
 
-	ld	l,c
-	ld	h,b
-	
-	pop	ix
+	ld	e,c
+	ld	d,b
+
 	pop	bc
-	pop	de
 	ret
 	
 __modsint::
-	push	de
 	push	bc
-	push	ix
-	ld	ix,#0
-	add	ix,sp
+	lda	hl,4(sp)
 
-	ld	c,8(ix)
-	ld	b,9(ix)
-	ld	e,10(ix)
-	ld	d,11(ix)
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+	inc	hl
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
 	call	.div16
 
-	ld	l,e
-	ld	h,d
-	
-	pop	ix
+	;; Result in de
 	pop	bc
-	pop	de
 	ret
 
 	;; Unsigned
 __divuchar::	
-	push	de
 	push	bc
-	push	ix
-	ld	ix,#0
-	add	ix,sp
-
-	ld	c,8(ix)
-	ld	e,9(ix)
+	lda	hl,4(sp)
+	
+	ld	c,(hl)
+	inc	hl
+	ld	e,(hl)
 	call	.divu8
 
-	ld	l,c
+	ld	e,c
 	
-	pop	ix
 	pop	bc
-	pop	de
 	ret
 	
 __moduchar::
-	push	de
 	push	bc
-	push	ix
-	ld	ix,#0
-	add	ix,sp
-
-	ld	c,8(ix)
-	ld	e,9(ix)
+	lda	hl,4(sp)
+	
+	ld	c,(hl)
+	inc	hl
+	ld	e,(hl)
 	call	.divu8
 
-	ld	l,e
-	
-	pop	ix
+	;; Result in e
 	pop	bc
-	pop	de
 	ret
 
 __divuint::
-	push	de
 	push	bc
-	push	ix
-	ld	ix,#0
-	add	ix,sp
-
-	ld	c,8(ix)
-	ld	b,9(ix)
-	ld	e,10(ix)
-	ld	d,11(ix)
+	lda	hl,4(sp)
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+	inc	hl
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
 	call	.divu16
 
-	ld	l,c
-	ld	h,b
+	ld	e,c
+	ld	d,b
 	
-	pop	ix
 	pop	bc
-	pop	de
 	ret
 	
 __moduint::
-	push	de
 	push	bc
-	push	ix
-	ld	ix,#0
-	add	ix,sp
-
-	ld	c,8(ix)
-	ld	b,9(ix)
-	ld	e,10(ix)
-	ld	d,11(ix)
+	lda	hl,4(sp)
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+	inc	hl
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
 	call	.divu16
 
-	ld	l,e
-	ld	h,d
-	
-	pop	ix
+	;; Result in de
 	pop	bc
-	pop	de
 	ret
 	
 .div8::

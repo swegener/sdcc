@@ -634,9 +634,9 @@ processParms (ast * func,
 
   /* if defined parameters ended but actual parameters */
   /* exist and this is not defined as a variable arg   */
-  /* also check if statckAuto option is specified      */
-  if ((!defParm) && actParm && (!func->hasVargs) &&
-      !options.stackAuto && !IS_RENT (fetype))
+  /* also check if statckAuto option is specified      */ // jwk: WHY?
+  if ((!defParm) && actParm && (!func->hasVargs) 
+      /* && !options.stackAuto && !IS_RENT (fetype) */)
     {
       werror (E_TOO_MANY_PARMS);
       return 1;

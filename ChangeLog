@@ -1,3 +1,9 @@
+2004-08-29 Vangelis Rokas (vrokas AT otenet.gr>
+
+	* src/pic16/gen.c (genFunction, genEndFunction): fixed return
+	instruction for interrupt handlers, use fast returns when returning
+	from high priority interrupts
+
 2004-08-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (genAnd, genOr, transferAopAop, rmwWithAop): optimized

@@ -132,6 +132,7 @@ static struct {
     short ipushRegs;
     set *sendSet;
     int interruptvector;
+    int usefastretfie;
 } _G;
 
 /* Resolved ifx structure. This structure stores information
@@ -414,6 +415,7 @@ static regs *getFreePtr (iCode *ic, asmop **aopp, bool result)
     fprintf(stderr, "%s:%d could not allocate a free pointer\n", __FILE__, __LINE__);
     assert( 0 );
 
+    return NULL;
 #if 0
     /* the logic: if r0 & r1 used in the instruction
     then we are in trouble otherwise */
@@ -3466,17 +3468,22 @@ static void genFunction (iCode *ic)
 	 * save acc, b, dpl, dph  */
 	if (IFFUNC_ISISR(sym->type)) {
 	  int i;
+
+	        _G.usefastretfie = 1;	/* use shadow registers by default */
 		/* an ISR should save: WREG, STATUS, BSR, PRODL, PRODH, FSR0L, FSR0H */
 		if(!(_G.interruptvector == 1)) {
 
 			/* do not save WREG,STATUS,BSR for high priority interrupts
 			 * because they are stored in the hardware shadow registers already */
-			 
+			_G.usefastretfie = 0;
 			pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_wreg ));
 			pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_status ));
 			pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_bsr ));
 		}
 
+
+                /* these should really be optimized somehow, because not all
+                 * interrupt handlers modify them */
 		pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_prodl ));
 		pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_prodh ));
 		pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_fsr0l ));
@@ -3712,7 +3719,11 @@ static void genEndFunction (iCode *ic)
 			debugFile->writeEndFunction (currFunc, ic, 1);
 		}
 	
+		if(_G.usefastretfie)
+			pic16_emitpcode(POC_RETFIE, pic16_newpCodeOpLit(1));
+		else
 		pic16_emitpcodeNULLop(POC_RETFIE);
+		_G.usefastretfie = 0;
 	} else {
 		if (IFFUNC_ISCRITICAL(sym->type))
 			pic16_emitcode("setb","ea");
@@ -3764,7 +3775,6 @@ static void genEndFunction (iCode *ic)
 			}
 		}
 
-	        pic16_emitcode ("return","");
 		pic16_emitpcodeNULLop(POC_RETURN);
 
 		/* Mark the end of a function */

@@ -15,7 +15,8 @@ OBJECTS         = SDCCy.obj SDCClex.obj SDCChasht.obj SDCCmain.obj \
                   SDCClrange.obj SDCCptropt.obj SDCCpeeph.obj SDCCglue.obj \
                   asm.obj SDCCutil.obj SDCCmacro.obj SDCCdebug.obj cdbFile.obj
 
-SLIBOBJS        = $(SLIB)/SDCCerr.obj $(SLIB)/NewAlloc.obj $(SLIB)/MySystem.obj $(SLIB)/BuildCmd.obj
+SLIBOBJS        = $(SLIB)/SDCCerr.obj $(SLIB)/NewAlloc.obj $(SLIB)/MySystem.obj \
+                  $(SLIB)/BuildCmd.obj $(SLIB)/dbuf.obj
 
 TARGET          = $(PRJDIR)/bin/sdcc.exe
 

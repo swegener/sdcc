@@ -100,6 +100,10 @@ SOURCE=.\cdbFile.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\support\Util\dbuf.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\support\Util\MySystem.c
 # End Source File
 # Begin Source File
@@ -250,6 +254,10 @@ SOURCE=.\asm.h
 # Begin Source File
 
 SOURCE=.\common.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\support\Util\dbuf.h
 # End Source File
 # Begin Source File
 

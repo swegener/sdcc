@@ -25,6 +25,7 @@ _memcmp
 _memcpy
 _memset
 _gptrget
+_gptrgetc
 _gptrput
 _decdptr
 _bp

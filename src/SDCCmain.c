@@ -190,6 +190,7 @@ optionsTable[] = {
     { 0,    "--cyclomatic",         &options.cyclomatic, NULL },
     { 0,    "--nooverlay",          &options.noOverlay, NULL },
     { 0,    "--main-return",        &options.mainreturn, "Issue a return after main()" },
+    { 0,    "--xram-movc",          &options.xram_movc, "Use movc instead of movx to read xram (xdata)" },
     { 0,    "--no-peep",            &options.nopeep, "Disable the peephole assembly file optimisation" },
     { 0,    "--no-reg-params",      &options.noRegParams, "On some ports, disable passing some parameters in registers" },
     { 0,    "--peep-asm",           &options.asmpeep, NULL },

@@ -1,3 +1,7 @@
+2002-01-18  Paul Stoffregen  <paul@pjrc.com>
+
+	* Added --xram-movc option
+
 2002-01-13  Bernhard Held  <bernhard@bernhardheld.de>
 
 	* support/regression/Makefile: don't include test-mcs51-stack-auto in target all

@@ -1928,4 +1928,21 @@ replace {
         mov     dptr,#%2
 }
 
+replace {
+        movx    a,@dptr
+} by {
+        ; Peephole 232   using movc to read xdata (--xram-movc)
+        clr     a
+        movc    a,@a+dptr
+} if xramMovcOption
+
+replace {
+        lcall   _gptrget
+} by {
+        ; Peephole 233   using _gptrgetc instead of _gptrget (--xram-movc)
+        lcall   _gptrgetc
+} if xramMovcOption
+
+
+
 

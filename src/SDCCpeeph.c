@@ -115,6 +115,14 @@ FBYNAME (flat24bitMode)
 }
 
 /*-----------------------------------------------------------------*/
+/* xramMovcOption - check if using movc to read xram               */
+/*-----------------------------------------------------------------*/
+FBYNAME (xramMovcOption)
+{
+  return (options.xram_movc && (strcmp(port->target,"mcs51") == 0));
+}
+
+/*-----------------------------------------------------------------*/
 /* labelInRange - will check to see if label %5 is within range    */
 /*-----------------------------------------------------------------*/
 FBYNAME (labelInRange)
@@ -264,6 +272,10 @@ callFuncByName (char *fname,
     ,
     {
       "24bitMode", flat24bitMode
+    }
+    ,
+    {
+      "xramMovcOption", xramMovcOption
     }
     ,
     {

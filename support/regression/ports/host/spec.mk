@@ -3,6 +3,7 @@ SDCC = $(shell ( sh -c "gcc --version" 2>&1 ) > /dev/null  && echo gcc || echo c
 SDCCFLAGS = -DPORT_HOST=1 -Wall -fsigned-char -DREENTRANT=
 
 EXEEXT = .bin
+OBJEXT = .o
 
 # otherwise `make` deletes it and `make -j`will fail
 .PRECIOUS: ports/$(PORT)/testfwk$(OBJEXT)

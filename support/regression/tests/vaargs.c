@@ -1,12 +1,19 @@
 /** Tests argument passing to functions via va_args.
     Assumes that up to the first two arguments can be passed in registers.
 
-    type1: char, int
-    type2: char, int
-    type3: char, int
+    type1: va_char, int
+    type2: va_char, int
+    type3: va_char, int
  */
 #include <testfwk.h>
 #include <stdarg.h>
+
+/* gcc 3.3 throws a warning, if char is in '...' */
+#if defined(PORT_HOST)
+# define va_char int
+#else
+# define va_char char
+#endif
 
 static {type1}
 returnFirstArg(int marker, ...)

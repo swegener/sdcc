@@ -1,3 +1,13 @@
+2003-05-04  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCmain.c (linkEdit): fixed buffer overflow for gbz80
+	* support/regression/Makefile: inter-port-clean is no longer nesessary, the
+	temp files are in the port dir; clean the gen/test directory when
+	generating new test.c
+	* support/regression/ports/host/spec.mk: defined OBJEXT for target clean
+	* support/regression/tests/vaargs.c: fixed gcc 3.3 warning
+	* support/regression/tests/zeropad.c: added
+
 2003-05-09    <johan@balder>
 
 	* src/SDCCglue.c: fixed bug #597940
@@ -32,7 +42,7 @@
 	 
 2003-04-29  Kevin Vigor <kevin@vigor.nu>
 
-	Initial support for DS80C400. "Hello world" runs on TINIm400 
+	Initial support for DS80C400. "Hello world" runs on TINIm400
 	(with polled I/O).
 
 2003-04-28  Karl Bongers(apply patches for Martin Helmling)

@@ -69,39 +69,39 @@ all: test-ports
 
 # Test all of the ports
 test-ports:
-	for i in $(ALL_PORTS); do $(MAKE) inter-port-clean test-port PORT=$$i; done
+	for i in $(ALL_PORTS); do $(MAKE) test-port PORT=$$i; done
 
 # Helper rule for testing the z80 port only
 test-z80:
-	$(MAKE) inter-port-clean test-port PORT=z80
+	$(MAKE) test-port PORT=z80
 
 # Helper rule for testing the z80 port only
 test-gbz80:
-	$(MAKE) inter-port-clean test-port PORT=gbz80
+	$(MAKE) test-port PORT=gbz80
 
 # Helper rule for testing the mcs51 port only
 test-mcs51:
-	$(MAKE) inter-port-clean test-port PORT=mcs51
+	$(MAKE) test-port PORT=mcs51
 test-mcs51-large:
-	$(MAKE) inter-port-clean test-port PORT=mcs51-large
+	$(MAKE) test-port PORT=mcs51-large
 test-mcs51-stack-auto:
-	$(MAKE) inter-port-clean make-library test-port PORT=mcs51-stack-auto
+	$(MAKE) make-library test-port PORT=mcs51-stack-auto
 
 # Helper rule for testing the ds390 port only
 test-ds390:
-	$(MAKE) inter-port-clean test-port PORT=ds390
+	$(MAKE) test-port PORT=ds390
 
 # Helper rule for testing the z80 port only(use ucSim simulator)
 test-ucz80:
-	$(MAKE) inter-port-clean test-port PORT=ucz80
+	$(MAKE) test-port PORT=ucz80
 
 # Helper rule for testing the xa51 port only(use ucSim simulator)
 test-xa51:
-	$(MAKE) inter-port-clean test-port PORT=xa51
+	$(MAKE) test-port PORT=xa51
 
 ### Helper rule for testing the host cc only
 test-host:
-	$(MAKE) inter-port-clean test-port PORT=host
+	$(MAKE) test-port PORT=host
 
 test-host2:
 	$(MAKE) test-port PORT=host
@@ -146,6 +146,7 @@ SDCCFLAGS += -Ifwk/include -Itests
 # Rule to generate the iterations of a test suite off the soure suite.
 $(PORT_CASES_DIR)/%/iterations.stamp: $(TESTS_DIR)/%.c $(GENERATE_CASES)
 	echo Processing $<
+	rm -rf `dirname $@`
 	mkdir -p `dirname $@`
 	python $(GENERATE_CASES) $< `dirname $@` > /dev/null
 	touch $@
@@ -194,10 +195,6 @@ $(RESULTS): $(SUB_RESULTS)
 
 # BeginGeneric rules
 
-clean: inter-port-clean
+clean:
 	rm -rf $(CASES_DIR) $(RESULTS_DIR) *.pyc fwk/lib/timeout fwk/lib/timeout.exe
 	for i in $(CLEAN_PORTS); do $(MAKE) -f $(PORTS_DIR)/$$i/spec.mk _clean PORTS_DIR=$(PORTS_DIR) PORT=$$i; done
-
-inter-port-clean:
-	rm -f  fwk/lib/*.o fwk/lib/*.asm fwk/lib/*.rst fwk/lib/*.lst fwk/lib/*.rel \
-               fwk/lib/*.ihx fwk/lib/*.map fwk/lib/*.sym

@@ -49,7 +49,6 @@ char *fullSrcFileName;		/* full name for the source file; */
 				/* can be NULL while c1mode or linking without compiling */
 char *fullDstFileName;		/* full name for the output file; */
 				/* only given by -o, otherwise NULL */
-size_t fullDstFileNameLen;	/* size of previous string. */
 char *dstFileName;		/* destination file name without extension */
 char *dstPath = "";		/* path for the output files; */
 				/* "" is equivalent with cwd */
@@ -645,20 +644,20 @@ _setModel (int model, const char *sz)
 static char *
 getStringArg(const char *szStart, char **argv, int *pi, int argc)
 {
-  if (argv[*pi][strlen(szStart)]) 
+  if (argv[*pi][strlen(szStart)])
     {
       return &argv[*pi][strlen(szStart)];
     }
-  else 
+  else
     {
       ++(*pi);
-      if (*pi >= argc) 
+      if (*pi >= argc)
         {
           werror (E_ARGUMENT_MISSING, szStart);
           /* Die here rather than checking for errors later. */
           exit(-1);
         }
-      else 
+      else
         {
           return argv[*pi];
         }
@@ -666,7 +665,7 @@ getStringArg(const char *szStart, char **argv, int *pi, int argc)
 }
 
 /** Gets the integer argument to this option using the same rules as
-    getStringArg. 
+    getStringArg.
 */
 static int
 getIntArg(const char *szStart, char **argv, int *pi, int argc)
@@ -1063,7 +1062,6 @@ parseCmdLine (int argc, char **argv)
                 else
                   {
                     fullDstFileName = Safe_strdup (buffer);
-		    fullDstFileNameLen = strlen(fullDstFileName) + 1;
 
                     /* get rid of the "."-extension */
 
@@ -1262,7 +1260,7 @@ parseCmdLine (int argc, char **argv)
   /* if debug option is set then open the cdbFile */
   if (options.debug && fullSrcFileName)
     {
-      SNPRINTF (scratchFileName, sizeof(scratchFileName), 
+      SNPRINTF (scratchFileName, sizeof(scratchFileName),
 		"%s.adb", dstFileName); //JCF: Nov 30, 2002
       if(debugFile->openFile(scratchFileName))
 	debugFile->writeModule(moduleName);
@@ -1283,7 +1281,7 @@ linkEdit (char **envp)
   int i, system_ret;
 
   /* first we need to create the <filename>.lnk file */
-  SNPRINTF (scratchFileName, sizeof(scratchFileName), 
+  SNPRINTF (scratchFileName, sizeof(scratchFileName),
 	    "%s.lnk", dstFileName);
   if (!(lnkfile = fopen (scratchFileName, "w")))
     {
@@ -1404,7 +1402,7 @@ linkEdit (char **envp)
 			"Add support for your FLAT24 target in %s @ line %d\n",
 			__FILE__, __LINE__);
 		exit(-1);
-	    }	    
+	    }
 	}
 #endif
 
@@ -1490,43 +1488,36 @@ linkEdit (char **envp)
       else
         {
           strncpyz (scratchFileName, relFiles[0], sizeof(scratchFileName));
-          /* strip "rel" extension */
+          /* strip ".rel" extension */
           p = strrchr (scratchFileName, '.');
 	  if (p)
 	    {
-		p++;
-		*p = 0;
+	      *p = 0;
 	    }
-	    
         }
       strncatz (scratchFileName,
-		options.out_fmt ? "S19" : "ihx",
+		options.out_fmt ? ".S19" : ".ihx",
 		sizeof(scratchFileName));
       rename (scratchFileName, fullDstFileName);
 
-      q = strrchr (fullDstFileName, '.');
-      if (q)
-        {
-          /* point after the '.' of the extension */
-          q++;
-        }
-      else
+      strncpyz (buffer, fullDstFileName, sizeof(buffer));
+      q = strrchr (buffer, '.');
+      if (!q)
         {
           /* no extension: append new extensions */
-	  /* Don't we want to append a period here ? */
-          q = strlen (fullDstFileName) + fullDstFileName;
+          q = strlen (buffer) + buffer;
         }
-       	
-      *p = 0;	
-      strncatz (scratchFileName, "map", sizeof(scratchFileName));
+
+      *p = 0;
+      strncatz (scratchFileName, ".map", sizeof(scratchFileName));
       *q = 0;
-      strncatz(fullDstFileName, "map", fullDstFileNameLen);
-      rename (scratchFileName, fullDstFileName);
-      *p = 0;	
-      strncatz (scratchFileName, "mem", sizeof(scratchFileName));
+      strncatz(buffer, ".map", sizeof(buffer));
+      rename (scratchFileName, buffer);
+      *p = 0;
+      strncatz (scratchFileName, ".mem", sizeof(scratchFileName));
       *q = 0;
-      strncatz(fullDstFileName, "mem", fullDstFileNameLen);	
-      rename (scratchFileName, fullDstFileName);
+      strncatz(buffer, ".mem", sizeof(buffer));
+      rename (scratchFileName, buffer);
     }
   if (system_ret)
     {

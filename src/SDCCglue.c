@@ -1011,7 +1011,17 @@ void glue ()
     fprintf (asmFile, "%s", iComments2);
     fprintf (asmFile, "; global & static initialisations\n");
     fprintf (asmFile, "%s", iComments2);
+    
+    /* Everywhere we generate a reference to the static_name area, 
+     * (which is currently only here), we immediately follow it with a 
+     * definition of the post_static_name area. This guarantees that
+     * the post_static_name area will immediately follow the static_name
+     * area.
+     */
     fprintf (asmFile, "\t.area %s\n", port->mem.static_name); /* MOF */
+    fprintf (asmFile, "\t.area %s\n", port->mem.post_static_name);
+    fprintf (asmFile, "\t.area %s\n", port->mem.static_name);
+    
     if (mainf && mainf->fbody) {
 	fprintf (asmFile,"__sdcc_gsinit_startup:\n");
 	/* if external stack is specified then the
@@ -1046,7 +1056,14 @@ void glue ()
     copyFile (asmFile, statsg->oFile);
 
     if (port->general.glue_up_main && mainf && mainf->fbody)
+    {
+        /* This code is generated in the post-static area.
+         * This area is guaranteed to follow the static area
+         * by the ugly shucking and jiving about 20 lines ago.
+         */
+    	fprintf(asmFile, "\t.area %s\n", port->mem.post_static_name);
 	fprintf (asmFile,"\tljmp\t__sdcc_program_startup\n");
+    }
 	
     /* copy over code */
     fprintf (asmFile, "%s", iComments2);

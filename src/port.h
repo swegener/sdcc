@@ -69,6 +69,7 @@ typedef struct {
 	const char *reg_name;
 	const char *static_name;
 	const char *overlay_name;
+	const char *post_static_name;
     } mem;
     
     /* stack related information */

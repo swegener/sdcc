@@ -170,7 +170,8 @@ PORT mcs51_port = {
 	"BSEG    (BIT)",
 	"RSEG    (DATA)",
 	"GSINIT  (CODE)",
-	"OSEG    (OVR,DATA)"
+	"OSEG    (OVR,DATA)",
+	"GSFINAL (CODE)"
     },
     { 
 	+1, 1, 4, 1, 1

@@ -96,7 +96,8 @@ PORT z80_port = {
 	"_BSEG",
 	"_RSEG",
 	"_GSINIT",
-	"_OVERLAY"
+	"_OVERLAY",
+	"_GSFINAL"
     },
     { 
 	-1, 0, 0, 8, 0

@@ -142,8 +142,6 @@ char *argv[];
 	register char *p;
 	register int c, i;
 
-	fprintf(stdout, "\n");
-
 	startp = (struct lfile *) new (sizeof (struct lfile));
 
 	pflag = 1;

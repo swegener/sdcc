@@ -344,7 +344,7 @@ operandLUse (operand * op, eBBlock ** ebbs,
 	  !IS_STATIC (etype))
 	{
 
-	  if (bitVectIsZero (op->usesDefs))
+	  if (bitVectIsZero (op->usesDefs) && OP_SYMBOL(op)->ival==NULL)
 	    {
 	      OP_SYMBOL (op)->isspilt = 1;
 

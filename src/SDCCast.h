@@ -208,6 +208,7 @@ symbol * funcOfTypeVarg (char *, char * , int , char **);
 ast *initAggregates (symbol *, initList *, ast *);
 bool hasSEFcalls (ast *);
 void addSymToBlock (symbol *, ast *);
+void freeStringSymbol(symbol *);
 
 // exported variables 
 extern set *operKeyReset;

@@ -241,7 +241,6 @@ typedef struct symbol
     unsigned isref:1;		/* has been referenced  */
     unsigned isind:1;		/* is a induction variable */
     unsigned isinvariant:1;	/* is a loop invariant  */
-    unsigned isstrlit:1;	/* is a string literal  */
     unsigned cdef:1;		/* compiler defined symbol */
     unsigned addrtaken:1;	/* address of the symbol was taken */
     unsigned isreqv:1;		/* is the register quivalent of a symbol */
@@ -267,6 +266,7 @@ typedef struct symbol
     unsigned spildir:1;		/* spilt in direct space */
     unsigned ptrreg:1;		/* this symbol assigned to a ptr reg */
     unsigned noSpilLoc:1;	/* cannot be assigned a spil location */
+    unsigned isstrlit;		/* is a string literal and it's usage count  */
     unsigned accuse;		/* can be left in the accumulator
 				   On the Z80 accuse is devided into
 				   ACCUSE_A and ACCUSE_HL as the idea

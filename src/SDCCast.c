@@ -966,12 +966,9 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr)
 				   newAst_VALUE (valueFromLit ((float) i))),
 			       newAst_VALUE (valueFromLit (*s))));
 
-      // now we don't need iexpr's symbol anymore
-      {
-	symbol *sym=AST_SYMBOL(iexpr);
-	memmap *segment=SPEC_OCLS(sym->etype);
-	deleteSetItem(&segment->syms, sym);
-      }
+      // now WE don't need iexpr's symbol anymore
+      freeStringSymbol(AST_SYMBOL(iexpr));
+
       return decorateType (resolveSymbols (rast));
     }
 
@@ -1136,6 +1133,20 @@ gatherAutoInit (symbol * autoChain)
 }
 
 /*-----------------------------------------------------------------*/
+/* freeStringSymbol - delete a literal string if no more usage     */
+/*-----------------------------------------------------------------*/
+void freeStringSymbol(symbol *sym) {
+  /* make sure this is a literal string */
+  assert (sym->isstrlit);
+  if (--sym->isstrlit == 0) { // lower the usage count
+    memmap *segment=SPEC_OCLS(sym->etype);
+    if (segment) {
+      deleteSetItem(&segment->syms, sym);
+    }
+  }
+}
+  
+/*-----------------------------------------------------------------*/
 /* stringToSymbol - creates a symbol from a literal string         */
 /*-----------------------------------------------------------------*/
 static value *
@@ -1144,6 +1155,18 @@ stringToSymbol (value * val)
   char name[SDCC_NAME_MAX + 1];
   static int charLbl = 0;
   symbol *sym;
+  set *sp;
+
+  // have we heard this before?
+  for (sp=statsg->syms; sp; sp=sp->next) {
+    sym=sp->item;
+    if (sym->isstrlit && 
+	!strcmp(SPEC_CVAL(sym->etype).v_char, SPEC_CVAL(val->etype).v_char)) {
+      // yes, this is old news. Don't publish it again.
+      sym->isstrlit++; // but raise the usage count
+      return symbolVal(sym);
+    }
+  }
 
   sprintf (name, "_str_%d", charLbl++);
   sym = newSymbol (name, 0);	/* make it @ level 0 */
@@ -1227,6 +1250,10 @@ bool constExprTree (ast *cexpr) {
       }
       if (IS_AST_SYM_VALUE(cexpr) && IS_FUNC(AST_SYMBOL(cexpr)->type)) {
 	// a function's address will never change
+	return TRUE;
+      }
+      if (IS_AST_SYM_VALUE(cexpr) && IS_ARRAY(AST_SYMBOL(cexpr)->type)) {
+	// an array's address will never change
 	return TRUE;
       }
       if (IS_AST_SYM_VALUE(cexpr) && 

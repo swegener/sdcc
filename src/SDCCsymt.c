@@ -1584,8 +1584,10 @@ aggregateToPointer (value * val)
 	  if (SPEC_OCLS(val->etype)) {
 	    DCL_TYPE(val->type)=PTR_TYPE(SPEC_OCLS(val->etype));
 	  } else {
-	    // this should not happen
-	    fprintf (stderr, "wild guess about storage type\n");
+#if 1
+	    // this happens for (external) function parameters
+	    DCL_TYPE (val->type) = GPOINTER;
+#else
 	    if (TARGET_IS_DS390) {
 	      /* The AUTO and REGISTER classes should probably
 	       * also become generic pointers, but I haven't yet
@@ -1598,6 +1600,7 @@ aggregateToPointer (value * val)
 	      DCL_TYPE (val->type) = FPOINTER;
 	      break;
 	    }
+#endif
 	  }
 	  break;
 	case S_AUTO:

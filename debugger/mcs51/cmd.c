@@ -734,7 +734,7 @@ void simGo (unsigned int gaddr)
 }
 
 /*-----------------------------------------------------------------*/
-/* preparePrint - common parse function for                        */
+/* preparePrint - common parse function for  set variable,         */
 /*                output, print and display                        */
 /*-----------------------------------------------------------------*/
 static char *preparePrint(char *s, context *cctxt, int *fmt, symbol **sym)
@@ -775,12 +775,13 @@ static char *preparePrint(char *s, context *cctxt, int *fmt, symbol **sym)
         s++;
         while (isspace(*s)) s++;
     }
-    for ( bp = s; *bp && ( isalnum( *bp ) || *bp == '_'); bp++ );
+    for ( bp = s; *bp && ( isalnum( *bp ) || *bp == '_' || *bp == '$'); bp++ );
     save_ch = *bp;
     if ( *bp )
         *bp = '\0';
 
-    *sym = symLookup(s,cctxt);
+    if ( *s )
+        *sym = symLookup(s,cctxt);
     *bp = save_ch;
 
     if ( ! *sym )
@@ -1276,10 +1277,10 @@ int cmdSetOption (char *s, context *cctxt)
         while (*s && *s != '=') s++;
         *s++ = '\0';
         while (isspace(*s)) *s++ = '\0';
-        if (*s)
+        if (*s && sym)
         {
-                printOrSetSymValue(sym,cctxt,0,0,0,rs,s,'\0');
-                return 0;
+            printOrSetSymValue(sym,cctxt,0,0,0,rs,s,'\0');
+            return 0;
         }
         else
             fprintf(stdout,"No new value for \"%s\".\n",s);
@@ -1909,12 +1910,12 @@ static void infoSymbols(context *ctxt)
 /*-----------------------------------------------------------------*/
 static void infoRegisters( int all, context *ctxt)
 {
-    static unsigned int regaddrs[] = {0x81,0x82,0x83,0xd0,0xe0,0xf0,0};
+    static unsigned int regaddrs[] = {0x81,0x82,0x83,0xb8,0xd0,0xe0,0xf0,0};
     unsigned long val;
     int i,j,*r;
 
     i   = simGetValue (0xd0,'I',1);
-    fprintf(stdout,"PC  : 0x%04X  RegisterBank %d:\nR0-7:",ctxt->addr,(i>>3)&3);
+    fprintf(stdout,"IP  : 0x%04X  RegisterBank %d:\nR0-7:",ctxt->addr,(i>>3)&3);
     for ( j = 0; j < 8 ; j++ )
     {
         val = simGetValue (j ,'R',1);
@@ -2756,7 +2757,14 @@ static int printOrSetSymValue (symbol *sym, context *cctxt,
             }
             else
             {
-                simSetValue(addr,sym->addrspace,size,newval);	
+                if ( sym->addrspace == 'I' && addr == 0xb8 )
+                {
+                    /* Symbol with address of IP */
+                    if ( cctxt ) cctxt->addr = newval;
+                    simSetPC(cctxt->addr); 
+                }
+                else
+                    simSetValue(addr,sym->addrspace,size,newval);	
                 return 1;
             }
         }

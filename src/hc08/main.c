@@ -143,7 +143,8 @@ _hc08_getRegName (struct regs *reg)
 static void
 _hc08_genAssemblerPreamble (FILE * of)
 {
-   int i;
+  int i;
+  int needOrg = 1;
   symbol *mainExists=newSymbol("main", 0);
   mainExists->block=0;
 
@@ -161,22 +162,30 @@ _hc08_genAssemblerPreamble (FILE * of)
     {
       // generate interrupt vector table
       fprintf (of, "\t.area\tCODEIVT (ABS)\n");
-      fprintf (of, "\t.org\t0x%4x\n", (0xfffe - (maxInterrupts * 2)));
       
       for (i=maxInterrupts;i>0;i--)
         {
           if (interrupts[i])
-            fprintf (of, "\t.dw\t%s\n", interrupts[i]->rname);
+	    {
+	      if (needOrg)
+		{
+		  fprintf (of, "\t.org\t0x%04x\n", (0xfffe - (i * 2)));
+		  needOrg = 0;
+		}
+	      fprintf (of, "\t.dw\t%s\n", interrupts[i]->rname);
+	    }
           else
-            fprintf (of, "\t.dw\t0\n");
+	    needOrg = 1;
         }
+      if (needOrg)
+	fprintf (of, "\t.org\t0xfffe\n");
       fprintf (of, "\t.dw\t%s", "__sdcc_gs_init_startup\n\n");
         
       fprintf (of, "\t.area GSINIT\n");
       fprintf (of, "__sdcc_gs_init_startup:\n");
       if (options.stack_loc)
         {
-          fprintf (of, "\tldhx\t#0x%4x\n", options.stack_loc+1);
+          fprintf (of, "\tldhx\t#0x%04x\n", options.stack_loc+1);
           fprintf (of, "\ttxs\n");
         }
       else
@@ -213,7 +222,7 @@ static void
 _hc08_genExtraAreas (FILE * asmFile, bool mainExists)
 {
     fprintf (asmFile, "%s", iComments2);
-    fprintf (asmFile, "; external ram data\n");
+    fprintf (asmFile, "; extended address mode data\n");
     fprintf (asmFile, "%s", iComments2);
     copyFile (asmFile, xdata->oFile);
 }
@@ -226,7 +235,7 @@ _hc08_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
   int i;
   
   fprintf (of, "\t.area\tCODEIVT (ABS)\n");
-  fprintf (of, "\t.org\t0x%4x\n",
+  fprintf (of, "\t.org\t0x%04x\n",
     (0xfffe - (maxInterrupts * 2)));
   
   for (i=maxInterrupts;i>0;i--)
@@ -234,7 +243,7 @@ _hc08_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
       if (interrupts[i])
         fprintf (of, "\t.dw\t%s\n", interrupts[i]->rname);
       else
-        fprintf (of, "\t.dw\t0\n");
+        fprintf (of, "\t.dw\t0xffff\n");
     }
   fprintf (of, "\t.dw\t%s", "__sdcc_gs_init_startup\n");
         

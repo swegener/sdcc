@@ -1,3 +1,10 @@
+2004-01-13 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/hc08/main.c (_hc08_genAssemblerPreamble): fixed bug #875487. Also
+	changed interrupt vector table generation to only emit declared vectors.
+	* device/include/Makefile.in: added missing backslash
+	* device/lib/pic16/Makefile.rules: pass $(MODELFLAGS) to compiler
+
 2004-01-13 Vangelis Rokas <vrokas@otenet.gr>
 
 	Mainly changes to support compilation of the device libraries

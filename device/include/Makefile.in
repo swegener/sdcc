@@ -43,7 +43,7 @@ install: all installdirs
 	$(CP) -r asm *.h $(sdcc_includedir)
         if [ "`grep pic16 ../../ports.build`" = pic16 ]; then \
                 $(CP) pic16/*.h $(sdcc_includedir)/pic16 ; \
-        fi
+        fi \
  	find $(sdcc_includedir) -type d -name 'CVS' -exec rm {} \;
 
 

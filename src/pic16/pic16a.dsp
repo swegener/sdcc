@@ -1,24 +1,24 @@
-# Microsoft Developer Studio Project File - Name="pica" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="pic16a" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Generic Project" 0x010a
 
-CFG=pica - Win32 Release
+CFG=pic16a - Win32 Release
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "pica.mak".
+!MESSAGE NMAKE /f "pic16a.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "pica.mak" CFG="pica - Win32 Release"
+!MESSAGE NMAKE /f "pic16a.mak" CFG="pic16a - Win32 Release"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "pica - Win32 Debug" (based on "Win32 (x86) Generic Project")
-!MESSAGE "pica - Win32 Release" (based on "Win32 (x86) Generic Project")
+!MESSAGE "pic16a - Win32 Debug" (based on "Win32 (x86) Generic Project")
+!MESSAGE "pic16a - Win32 Release" (based on "Win32 (x86) Generic Project")
 !MESSAGE 
 
 # Begin Project
@@ -27,7 +27,7 @@ CFG=pica - Win32 Release
 # PROP Scc_LocalPath ""
 MTL=midl.exe
 
-!IF  "$(CFG)" == "pica - Win32 Debug"
+!IF  "$(CFG)" == "pic16a - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -40,7 +40,7 @@ MTL=midl.exe
 # PROP Intermediate_Dir ""
 # PROP Target_Dir ""
 
-!ELSEIF  "$(CFG)" == "pica - Win32 Release"
+!ELSEIF  "$(CFG)" == "pic16a - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -57,13 +57,13 @@ MTL=midl.exe
 
 # Begin Target
 
-# Name "pica - Win32 Debug"
-# Name "pica - Win32 Release"
+# Name "pic16a - Win32 Debug"
+# Name "pic16a - Win32 Release"
 # Begin Source File
 
 SOURCE=.\peeph.def
 
-!IF  "$(CFG)" == "pica - Win32 Debug"
+!IF  "$(CFG)" == "pic16a - Win32 Debug"
 
 # Begin Custom Build
 InputPath=.\peeph.def
@@ -73,7 +73,7 @@ InputPath=.\peeph.def
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "pica - Win32 Release"
+!ELSEIF  "$(CFG)" == "pic16a - Win32 Release"
 
 # Begin Custom Build
 InputPath=.\peeph.def

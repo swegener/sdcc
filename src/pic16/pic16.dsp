@@ -1,24 +1,24 @@
-# Microsoft Developer Studio Project File - Name="pic" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="pic16" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Static Library" 0x0104
 
-CFG=pic - Win32 Release
+CFG=pic16 - Win32 Release
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "pic.mak".
+!MESSAGE NMAKE /f "pic16.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "pic.mak" CFG="pic - Win32 Release"
+!MESSAGE NMAKE /f "pic16.mak" CFG="pic16 - Win32 Release"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "pic - Win32 Debug" (based on "Win32 (x86) Static Library")
-!MESSAGE "pic - Win32 Release" (based on "Win32 (x86) Static Library")
+!MESSAGE "pic16 - Win32 Debug" (based on "Win32 (x86) Static Library")
+!MESSAGE "pic16 - Win32 Release" (based on "Win32 (x86) Static Library")
 !MESSAGE 
 
 # Begin Project
@@ -28,7 +28,7 @@ CFG=pic - Win32 Release
 CPP=cl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "pic - Win32 Debug"
+!IF  "$(CFG)" == "pic16 - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -51,7 +51,7 @@ LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo /out:"Debug\port.lib"
 # ADD LIB32 /nologo /out:"Debug\port.lib"
 
-!ELSEIF  "$(CFG)" == "pic - Win32 Release"
+!ELSEIF  "$(CFG)" == "pic16 - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -78,8 +78,8 @@ LIB32=link.exe -lib
 
 # Begin Target
 
-# Name "pic - Win32 Debug"
-# Name "pic - Win32 Release"
+# Name "pic16 - Win32 Debug"
+# Name "pic16 - Win32 Release"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"

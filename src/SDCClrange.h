@@ -36,5 +36,6 @@ void computeLiveRanges (eBBlock **, int);
 
 void setFromRange (operand *, int);
 void setToRange (operand *, int, bool);
+void hashiCodeKeys (eBBlock **, int);
 
 #endif

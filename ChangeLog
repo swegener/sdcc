@@ -1,3 +1,7 @@
+2003-09-27  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCicode.c (geniCodeJumpTable): Fixed bug #813206
+
 2003-09-26  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCCdflow.c (computeDataFlow): Fixed bug #810746

@@ -3211,6 +3211,8 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
   operand *boundary;
   symbol *falseLabel;
   set *labels = NULL;
+  int needRangeCheck = !optimize.noJTabBoundary
+                       || tree->values.switchVals.swDefault;
 
   if (!tree || !caseVals)
     return 0;
@@ -3246,7 +3248,7 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
   /* if the number of case statements <= 2 then */
   /* it is not economical to create the jump table */
   /* since two compares are needed for boundary conditions */
-  if ((!optimize.noJTabBoundary && cnt <= 2) || max > (255 / 3))
+  if ((needRangeCheck && cnt <= 2) || max > (255 / 3))
     return 0;
 
   if (tree->values.switchVals.swDefault)
@@ -3264,7 +3266,7 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
   /* so we can create a jumptable */
   /* first we rule out the boundary conditions */
   /* if only optimization says so */
-  if (!optimize.noJTabBoundary)
+  if (needRangeCheck)
     {
       sym_link *cetype = getSpec (operandType (cond));
       /* no need to check the lower bound if

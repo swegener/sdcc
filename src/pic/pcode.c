@@ -75,7 +75,7 @@ static pBlock *pb_dead_pcodes = NULL;
 /* Hardcoded flags to change the behavior of the PIC port */
 static int peepOptimizing = 1;        /* run the peephole optimizer if nonzero */
 static int functionInlining = 1;      /* inline functions if nonzero */
-int debug_verbose = 0;                /* Set true to inundate .asm file */
+int debug_verbose = 1;                /* Set true to inundate .asm file */
 
 static int GpCodeSequenceNumber = 1;
 int GpcFlowSeq = 1;
@@ -84,6 +84,7 @@ extern void RemoveUnusedRegisters(void);
 extern void RegsUnMapLiveRanges(void);
 extern void BuildFlowTree(pBlock *pb);
 extern void pCodeRegOptimizeRegUsage(int level);
+extern int picIsInitialized(void);
 
 /****************************************************************/
 /*                      Forward declarations                    */
@@ -4708,6 +4709,15 @@ void AnalyzeFlow(int level)
 void AnalyzeBanking(void)
 {
   pBlock  *pb;
+
+  if(!picIsInitialized()) {
+    fprintf(stderr,"Temporary ERROR: at the moment you have to use\n");
+    fprintf(stderr,"an include file create by inc2h.pl. See SDCC source:\n");
+    fprintf(stderr,"support/scripts/inc2h.pl\n");
+    fprintf(stderr,"this is a nuisance bug that will be fixed shortly\n");
+
+    exit(1);
+  }
 
   /* Phase x - Flow Analysis - Used Banks
    *

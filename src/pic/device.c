@@ -370,6 +370,18 @@ void init_pic(char *pic_type)
 }
 
 /*-----------------------------------------------------------------*
+ *  
+ *-----------------------------------------------------------------*/
+int picIsInitialized(void)
+{
+  if(pic && pic->maxRAMaddress > 0)
+    return 1;
+
+  return 0;
+
+}
+
+/*-----------------------------------------------------------------*
  *  char *processor_base_name(void) - Include file is derived from this.
  *-----------------------------------------------------------------*/
 char *processor_base_name(void)

@@ -627,9 +627,10 @@ pic14printPublics (FILE * afile)
 
   for (sym = setFirstItem (publics); sym;
        sym = setNextItem (publics)) {
-    if(!IS_BITFIELD(sym->type) && ((IS_FUNC(sym->type) || sym->allocreq)))
-      fprintf (afile, "\tglobal %s\n", sym->rname);
-    else
+    if(!IS_BITFIELD(sym->type) && ((IS_FUNC(sym->type) || sym->allocreq))) {
+      if (!IS_BITVAR(sym->type))
+        fprintf (afile, "\tglobal %s\n", sym->rname);
+    } else
       fprintf (afile, ";\tglobal %s\n", sym->rname);
   }
 }

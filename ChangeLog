@@ -1,3 +1,10 @@
+2003-08-26  Bernhard Held <bernhard@bernhardheld.de>
+
+	pic patch provided by Slade Rich <slade_rich@yahoo.com>
+	* src/pic/glue.c (pic14printPublics): fixed bug introduced when symbol
+	type for bits was changed. It resulted in bit variables becoming
+	global, which is not permitted in PIC 14 assembly output.
+
 2003-08-23  Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
 	* doc/sdccman.lyx: various additions and updates. Rearranged sections

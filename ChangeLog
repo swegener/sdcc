@@ -1,3 +1,9 @@
+2004-01-13 Bernhard Held <bernhard@bernhardheld.de>
+
+	* configure,
+	* device/lib/configure.in,
+	* device/lib/configure: fixed for autoconf 2.57
+
 2004-01-13 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/z80/main.c (_parseOptions): fixed the portmode= command line

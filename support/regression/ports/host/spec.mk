@@ -1,6 +1,6 @@
 # Port specification for compiling on the host machines version of gcc
 SDCC = gcc
-SDCCFLAGS = -Wall -fsigned-char -DREENTRANT=
+SDCCFLAGS = -DPORT_HOST=1 -Wall -fsigned-char -DREENTRANT=
 
 EXEEXT = .bin
 

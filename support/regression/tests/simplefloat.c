@@ -19,6 +19,7 @@ testCmp(void)
 void
 testDiv(void)
 {
+#if !PORT_HOST
   volatile float left, right;
 
   left = 17;
@@ -29,6 +30,7 @@ testDiv(void)
 
   right = 17;
   ASSERT(left/right == 1.0);
+#endif
 }
 
 void

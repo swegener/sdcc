@@ -2964,7 +2964,7 @@ joinPushes (iCode *lic)
       first = (int)operandLitValue ( IC_LEFT (ic));
       second = (int)operandLitValue ( IC_LEFT (uic));
 
-      sprintf (buffer, "%u", ((first << 8) | (second & 0xFF)) & 0xFFFFU);
+      sprintf (buffer, "%uu", ((first << 8) | (second & 0xFF)) & 0xFFFFU);
       val = constVal (buffer);
       SPEC_NOUN (val->type) = V_INT;
       IC_LEFT (ic)->operand.valOperand = val;

@@ -303,8 +303,8 @@ operandLUse (operand * op, eBBlock ** ebbs,
       /* if this is the last use then if this block belongs 
          to a  loop &  some definition  comes into the loop 
          then extend the live range to  the end of the loop */
-      if (ebp->partOfLoop &&
-	  hasIncomingDefs (ebp->partOfLoop, op))
+      if (ebp->partOfLoop 
+	  /* && hasIncomingDefs (ebp->partOfLoop, op)*/ )
 	{
 	  torange = findLoopEndSeq (ebp->partOfLoop);
 	}

@@ -1197,9 +1197,18 @@ Examples:
 \layout LyX-Code
 
 ./configure
-\layout LyX-Code
+\newline 
+./configure -
+\begin_inset ERT
+status Collapsed
 
-./configure --prefix=
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-prefix=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1207,7 +1216,17 @@ Examples:
 \begin_inset Quotes srd
 \end_inset 
 
- --datadir=
+ -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-datadir=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1216,9 +1235,28 @@ Examples:
 \end_inset 
 
 
-\layout LyX-Code
+\newline 
+./configure -
+\begin_inset ERT
+status Collapsed
 
-./configure --disable-avr-port --disable-xa51-port
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-disable-avr-port -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-disable-xa51-port
 \layout Standard
 
 To cross compile on linux for Mingw32 (see also 'sdcc/support/scripts/sdcc_mingw
@@ -1228,9 +1266,8 @@ To cross compile on linux for Mingw32 (see also 'sdcc/support/scripts/sdcc_mingw
 ./configure 
 \backslash 
 
-\layout LyX-Code
-
-  CC=
+\newline 
+CC=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1248,10 +1285,9 @@ i586-mingw32msvc-g++
 
  
 \backslash 
-
-\layout LyX-Code
-
-  RANLIB=
+ 
+\newline 
+RANLIB=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1262,9 +1298,8 @@ i586-mingw32msvc-ranlib
  
 \backslash 
 
-\layout LyX-Code
-
-  STRIP=
+\newline 
+STRIP=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1275,9 +1310,18 @@ i586-mingw32msvc-strip
  
 \backslash 
 
-\layout LyX-Code
+\newline 
+-
+\begin_inset ERT
+status Collapsed
 
-  --prefix=
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-prefix=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1288,9 +1332,18 @@ i586-mingw32msvc-strip
  
 \backslash 
 
-\layout LyX-Code
+\newline 
+-
+\begin_inset ERT
+status Collapsed
 
-  --datadir=
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-datadir=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1301,9 +1354,8 @@ i586-mingw32msvc-strip
  
 \backslash 
 
-\layout LyX-Code
-
-  docdir=
+\newline 
+docdir=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1314,9 +1366,8 @@ i586-mingw32msvc-strip
  
 \backslash 
 
-\layout LyX-Code
-
-  include_dir_suffix=
+\newline 
+include_dir_suffix=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1327,9 +1378,8 @@ include
  
 \backslash 
 
-\layout LyX-Code
-
-  lib_dir_suffix=
+\newline 
+lib_dir_suffix=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1340,9 +1390,8 @@ lib
  
 \backslash 
 
-\layout LyX-Code
-
-  sdccconf_h_dir_separator=
+\newline 
+sdccconf_h_dir_separator=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1361,19 +1410,56 @@ lib
  
 \backslash 
 
-\layout LyX-Code
+\newline 
+-
+\begin_inset ERT
+status Collapsed
 
-  --disable-device-lib-build
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-disable-device-lib-build
 \backslash 
 
-\layout LyX-Code
+\newline 
+-
+\begin_inset ERT
+status Collapsed
 
-  --disable-ucsim
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-disable-ucsim
 \backslash 
 
-\layout LyX-Code
+\newline 
+-
+\begin_inset ERT
+status Collapsed
 
-  --host=i586-mingw32msvc --build=unknown-unknown-linux-gnu
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-host=i586-mingw32msvc -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-build=unknown-unknown-linux-gnu
 \layout Standard
 
 To 
@@ -1391,9 +1477,8 @@ compile on Cygwin for Mingw32(see also sdcc/support/scripts/sdcc_cygwin_mingw32)
 ./configure -C 
 \backslash 
 
-\layout LyX-Code
-
-  CFLAGS=
+\newline 
+CFLAGS=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1404,9 +1489,8 @@ compile on Cygwin for Mingw32(see also sdcc/support/scripts/sdcc_cygwin_mingw32)
  
 \backslash 
 
-\layout LyX-Code
-
-  LDFLAGS=
+\newline 
+LDFLAGS=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1417,9 +1501,18 @@ compile on Cygwin for Mingw32(see also sdcc/support/scripts/sdcc_cygwin_mingw32)
  
 \backslash 
 
-\layout LyX-Code
+\newline 
+-
+\begin_inset ERT
+status Collapsed
 
-  --prefix=
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-prefix=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1430,9 +1523,18 @@ compile on Cygwin for Mingw32(see also sdcc/support/scripts/sdcc_cygwin_mingw32)
  
 \backslash 
 
-\layout LyX-Code
+\newline 
+-
+\begin_inset ERT
+status Collapsed
 
-  --datadir=
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-datadir=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1443,9 +1545,8 @@ compile on Cygwin for Mingw32(see also sdcc/support/scripts/sdcc_cygwin_mingw32)
  
 \backslash 
 
-\layout LyX-Code
-
-  docdir=
+\newline 
+docdir=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1455,10 +1556,9 @@ compile on Cygwin for Mingw32(see also sdcc/support/scripts/sdcc_cygwin_mingw32)
 
  
 \backslash 
-
-\layout LyX-Code
-
-  include_dir_suffix=
+ 
+\newline 
+include_dir_suffix=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1469,9 +1569,8 @@ include
  
 \backslash 
 
-\layout LyX-Code
-
-  lib_dir_suffix=
+\newline 
+lib_dir_suffix=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1482,9 +1581,8 @@ lib
  
 \backslash 
 
-\layout LyX-Code
-
-  sdccconf_h_dir_separator=
+\newline 
+sdccconf_h_dir_separator=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1503,9 +1601,18 @@ lib
  
 \backslash 
 
-\layout LyX-Code
+\newline 
+-
+\begin_inset ERT
+status Collapsed
 
-  --disable-ucsim
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-disable-ucsim
 \layout Standard
 
 'configure' is quite slow on Cygwin (at least on windows before Win2000/XP).
@@ -2961,7 +3068,17 @@ rxvt is a nice console with history.
  Replace in your cygwin.bat the line
 \layout LyX-Code
 
-bash --login -i 
+bash -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-login -i 
 \layout Standard
 
 with (one line):
@@ -2970,7 +3087,17 @@ with (one line):
 rxvt -sl 1000 -fn "Lucida Console-12" -sr -cr red
 \layout LyX-Code
 
-     -bg black -fg white -geometry 100x65 -e bash --login
+     -bg black -fg white -geometry 100x65 -e bash -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-login
 \layout Standard
 
 Text selected with the mouse is automatically copied to the clipboard, pasting
@@ -6589,9 +6716,8 @@ Variables declared with this storage class will be placed in the extern
 default
 \series default 
  storage class for Large Memory model, e.g.:
-\newline 
+\layout Verse
 
-\newline 
 
 \family typewriter 
 xdata unsigned char xduc;
@@ -14967,7 +15093,21 @@ mul = 0;
 \newline 
 15.\SpecialChar ~
 \SpecialChar ~
-for (i = 0, j = 10 ; i < 10 ; i++, j--) {
+for (i = 0, j = 10 ; i < 10 ; i++, j
+\family default 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-
+\family typewriter 
+) {
 \newline 
 16.\SpecialChar ~
 \SpecialChar ~

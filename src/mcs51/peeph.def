@@ -3544,3 +3544,24 @@ replace {
 	mov	%1,a
 } if notVolatile %1
 
+// applies to f.e. vprintf.c
+replace {
+	sjmp	%1
+%2:	
+	ret
+} by {
+	sjmp	%1
+	;	Peephole 259.a	removed redundant label %2 and ret
+	;
+} if labelRefCount %2 0
+
+// applies to f.e. gets.c
+replace {
+	ljmp	%1
+%2:	
+	ret
+} by {
+	ljmp	%1
+	;	Peephole 259.b	removed redundant label %2 and ret
+	;
+} if labelRefCount %2 0

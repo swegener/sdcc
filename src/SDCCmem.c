@@ -254,7 +254,7 @@ void allocIntoSeg (symbol *sym)
 void allocGlobal ( symbol *sym )
 {
     /* symbol name is internal name  */
-    sprintf (sym->rname,"_%s",sym->name);
+    sprintf (sym->rname,"%s%s", port->fun_prefix, sym->name);
     
     /* add it to the operandKey reset */
     addSet(&operKeyReset,sym);
@@ -437,7 +437,7 @@ void allocParms ( value  *val )
 	}
 	else   {	/* allocate them in the automatic space */
 	    /* generate a unique name  */
-	    sprintf (lval->sym->rname,"_%s_PARM_%d",currFunc->name,pNum);
+	    sprintf (lval->sym->rname,"%s%s_PARM_%d", port->fun_prefix, currFunc->name,pNum);
 	    strcpy  (lval->name,lval->sym->rname);
 	    
 	    /* if declared in external storage */
@@ -508,7 +508,8 @@ void allocLocal ( symbol *sym  )
 {   
     
     /* generate an unique name */
-    sprintf(sym->rname,"_%s_%s_%d_%d",
+    sprintf(sym->rname,"%s%s_%s_%d_%d",
+	    port->fun_prefix,
 	    currFunc->name,sym->name,sym->level,sym->block);
     
     sym->islocal = 1;

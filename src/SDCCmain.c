@@ -128,18 +128,34 @@ static const char *_preCmd[] = {
     "-I" SDCC_INCLUDE_DIR, "$l", "$1", "$2", NULL
 };
 
+#if !OPT_DISABLE_MCS51
 extern PORT mcs51_port;
-extern PORT z80_port;
+#endif
+#if !OPT_DISABLE_GBZ80
 extern PORT gbz80_port;
+#endif
+#if !OPT_DISABLE_Z80
+extern PORT z80_port;
+#endif
+#if !OPT_DISABLE_AVR
 extern PORT avr_port;
+#endif
 
 PORT *port;
 
 static PORT *_ports[] = {
-    &mcs51_port,
-    &z80_port,
+#if !OPT_DISABLE_MCS51
+   &mcs51_port,
+#endif
+#if !OPT_DISABLE_GBZ80
     &gbz80_port,
-    &avr_port
+#endif
+#if !OPT_DISABLE_Z80
+    &z80_port,
+#endif
+#if !OPT_DISABLE_AVR
+    &avr_port,
+#endif
 };
 
 #define NUM_PORTS (sizeof(_ports)/sizeof(_ports[0]))

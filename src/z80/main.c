@@ -91,6 +91,13 @@ static bool _parseOptions(int *pargc, char **argv, int *i)
 		_G.fsetAsmType = TRUE;
 		return TRUE;
 	    }
+	    else if (!strcmp(argv[*i], "--asm=isas")) {
+		asm_addTree(&_isas_gb);
+		/* Munge the function prefix */
+		gbz80_port.fun_prefix = "";
+		_G.fsetAsmType = TRUE;
+		return TRUE;
+	    }
 	}
     }
     return FALSE;
@@ -205,6 +212,7 @@ PORT z80_port = {
     {  
 	0
     },
+    "_",
     _z80_init,
     _parseOptions,
     _finaliseOptions,
@@ -263,6 +271,7 @@ PORT gbz80_port = {
     {  
 	0
     },
+    "_",
     _gbz80_init,
     _parseOptions,
     _finaliseOptions,

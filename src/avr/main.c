@@ -179,6 +179,7 @@ PORT avr_port = {
     {
 	1
     },
+    "_",
     _avr_init,
     _avr_parseOptions,
     _avr_finaliseOptions,

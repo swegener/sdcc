@@ -26,6 +26,7 @@
 #include <string.h>
 #include <limits.h>
 #include <assert.h>
+#include "SDCCglobl.h"
 #include "SDCChasht.h"
 
 #define DEFAULT_HTAB_SIZE 128

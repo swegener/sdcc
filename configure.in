@@ -193,6 +193,35 @@ AC_DEFINE_UNQUOTED(SRCDIR, "${config_in}")
 AC_CHECK_LIB(gc,GC_malloc,HAVE_LIBGC=1)
 AC_SUBST(HAVE_LIBGC)
 
+# Now handle the port selection
+AC_ARG_ENABLE(z80-port,--disable-z80-port: Excludes the z80 port)
+if test "$enable_z80_port" = "no"; then
+    AC_DEFINE_UNQUOTED(OPT_DISABLE_Z80, 1)
+else
+    AC_DEFINE_UNQUOTED(OPT_DISABLE_Z80, 0)
+fi
+
+AC_ARG_ENABLE(gbz80-port,--disable-gbz80-port: Excludes the Gameboy gbz80 port)
+if test "$enable_gbz80_port" = "no"; then
+    AC_DEFINE_UNQUOTED(OPT_DISABLE_GBZ80, 1)
+else
+    AC_DEFINE_UNQUOTED(OPT_DISABLE_GBZ80, 0)
+fi
+
+AC_ARG_ENABLE(mcs51-port,--disable-mcs51-port: Excludes the Intel mcs51 port)
+if test "$enable_mcs51_port" = "no"; then
+    AC_DEFINE_UNQUOTED(OPT_DISABLE_MCS51, 1)
+else
+    AC_DEFINE_UNQUOTED(OPT_DISABLE_MCS51, 0)
+fi
+
+AC_ARG_ENABLE(avr-port,--disable-avr-port: Excludes the AVR port)
+if test "$enable_avr_port" = "no"; then
+    AC_DEFINE_UNQUOTED(OPT_DISABLE_AVR, 1)
+else
+    AC_DEFINE_UNQUOTED(OPT_DISABLE_AVR, 0)
+fi
+
 # Generating output files
 # ===========================================================================
 AC_CONFIG_SUBDIRS(sim/ucsim)

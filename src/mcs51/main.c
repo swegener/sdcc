@@ -236,6 +236,7 @@ PORT mcs51_port = {
     {
 	1
     },
+    "_",
     _mcs51_init,
     _mcs51_parseOptions,
     _mcs51_finaliseOptions,

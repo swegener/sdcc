@@ -96,6 +96,9 @@ typedef struct {
 	int native_below;
     } muldiv;
 
+    /** Prefix to add to a C function (eg "_") */
+    const char *fun_prefix;
+
     /** Called once the processor target has been selected.
 	First chance to initalise and set any port specific varibles.
 	'port' is set before calling this.  May be NULL.

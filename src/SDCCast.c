@@ -3582,7 +3582,7 @@ ast  *createFunction   (symbol  *name,   ast  *body )
 	name->stack = SPEC_STAK(fetype) = stack;
     
     /* name needs to be mangled */
-    sprintf (name->rname,"_%s",name->name);
+    sprintf (name->rname,"%s%s", port->fun_prefix, name->name);
     
     body = resolveSymbols(body); /* resolve the symbols */
     body = decorateType (body);  /* propagateType & do semantic checks */

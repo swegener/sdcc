@@ -1632,11 +1632,11 @@ replace {
         mov  dptr,#%1
 }
 
-replace {
-        push %1
-        pop  %1
+replace restart {
+        push ar%1
+        pop  ar%1
 } by {
-        ; Peephole 211   removed redundant push %1 pop %1  
+        ; Peephole 211   removed redundant push r%1 pop r%1  
 } 
 
 replace {

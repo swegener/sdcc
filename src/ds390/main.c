@@ -8,6 +8,8 @@
 #include "main.h"
 #include "ralloc.h"
 #include "gen.h"
+#include "BuildCmd.h"
+#include "MySystem.h"
 
 static char _defaultRules[] =
 {
@@ -170,6 +172,7 @@ _ds390_genAssemblerPreamble (FILE * of)
       fputs ("dph1 = 0x85\t\t; dph1 register unknown to assembler\n", of);
       fputs ("dpx1 = 0x95\t\t; dpx1 register unknown to assembler\n", of);
       fputs ("ap = 0x9C\t\t; ap register unknown to assembler\n", of);
+      fputs ("_ap = 0x9C\t\t; _ap register unknown to assembler\n", of);
       fputs ("mcnt0 = 0xD1\t\t; mcnt0 register unknown to assembler\n", of);
       fputs ("mcnt1 = 0xD2\t\t; mcnt1 register unknown to assembler\n", of);
       fputs ("ma = 0xD3\t\t; ma register unknown to assembler\n", of);
@@ -296,7 +299,8 @@ PORT ds390_port =
     "-plosgffc",		/* Options with debug */
     "-plosgff",			/* Options without debug */
     0,
-    ".asm"
+    ".asm",
+    NULL			/* no do_assemble function */
   },
   {
     _linkCmd,
@@ -346,6 +350,7 @@ PORT ds390_port =
   _ds390_getRegName,
   _ds390_keywords,
   _ds390_genAssemblerPreamble,
+  NULL,				/* no genAssemblerEnd */
   _ds390_genIVT,
   _ds390_genXINIT,
   _ds390_reset_regparm,
@@ -427,7 +432,7 @@ static void _tininative_finaliseOptions (void)
     istack->fmap = 1;
     istack->ptrType = FPOINTER;
     options.cc_only =1;
-}  /* MODEL_FLAT24 */
+}
 
 static int _tininative_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts) 
 {
@@ -435,20 +440,52 @@ static int _tininative_genIVT (FILE * of, symbol ** interrupts, int maxInterrupt
 }
 static void _tininative_genAssemblerPreamble (FILE * of)
 {
-    fputs ("_bpx EQU 080h \t\t; _bpx register unknown to assembler\n", of);
-    fputs ("dpx EQU 093h\t\t; dpx register unknown to assembler\n", of);
-    fputs ("dps EQU 086h\t\t; dps register unknown to assembler\n", of);
-    fputs ("dpl1 EQU 084h\t\t; dpl1 register unknown to assembler\n", of);
-    fputs ("dph1 EQU 085h\t\t; dph1 register unknown to assembler\n", of);
-    fputs ("dpx1 EQU 095h\t\t; dpx1 register unknown to assembler\n", of);
-    fputs ("ap EQU 09Ch\t\t; ap register unknown to assembler\n", of);
-    fputs ("mcnt0 EQU 0D1h\t\t; mcnt0 register unknown to assembler\n", of);
-    fputs ("mcnt1 EQU 0D2h\t\t; mcnt1 register unknown to assembler\n", of);
-    fputs ("ma EQU 0D3h\t\t; ma register unknown to assembler\n", of);
-    fputs ("mb EQU 0D4h\t\t; mb register unknown to assembler\n", of);
-    fputs ("mc EQU 0D5h\t\t; mc register unknown to assembler\n", of);
-    fputs ("F1 EQU 0D1h\t\t; F1 user flag unknown to assembler\n", of);
-    fputs ("esp EQU 09Bh\t\t; ESP user flag unknown to assembler\n", of);
+    fputs("$include(tini.inc)\n", of);
+    fputs("$include(ds80c390.inc)\n", of);
+    fputs("$include(tinimacro.inc)\n", of);
+    fputs("$include(apiequ.inc)\n", of);
+    fputs("_bpx EQU 01Eh \t\t; _bpx (frame pointer) mapped to R8_B3:R7_B3\n", of);
+    fputs("_ap  EQU 01Dh \t\t; _ap mapped to R6_B3\n", of);
+    /* Must be first and return 0 */
+    fputs("Lib_Native_Init:\n",of);
+    fputs("\tclr\ta\n",of);
+    fputs("\tret\n",of);
+    fputs("LibraryID:\n",of);
+    fputs("\tdb \"DS\"\n",of);
+    if (options.tini_libid) {
+	fprintf(of,"\tdb 0,0,0%02xh,0%02xh,0%02xh,0%02xh\n",
+		(options.tini_libid>>24 & 0xff),
+		(options.tini_libid>>16 & 0xff),
+		(options.tini_libid>>8 & 0xff),
+		(options.tini_libid  & 0xff));
+    } else {
+	fprintf(of,"\tdb 0,0,0,0,0,1\n");
+    }
+
+}
+static void _tininative_genAssemblerEnd (FILE * of)
+{
+    fputs("\tend\n",of);
+}
+/* tininative assembler , calls "macro", if it succeeds calls "a390" */
+static void _tininative_do_assemble (const char * const *asmOptions)
+{
+    static const char *macroCmd[] = {
+	"macro","$1.a51",NULL
+    };
+    static const char *a390Cmd[] = {
+	"a390","$1.mpp",NULL
+    };
+    char buffer[100];
+
+    buildCmdLine(buffer,macroCmd,srcFileName,NULL,NULL,NULL);
+    if (my_system(buffer)) {
+	exit(1);
+    }
+    buildCmdLine(buffer,a390Cmd,srcFileName,NULL,NULL,asmOptions);
+    if (my_system(buffer)) {
+	exit(1);
+    }    
 }
 
 /* list of key words used by TININative */
@@ -485,12 +522,32 @@ static builtins __tininative_builtins[] = {
     { "__builtin_memcpy_x2x","v",3,{"cx*","cx*","i"}}, /* void __builtin_memcpy_x2x (xdata char *,xdata char *,int) */
     { "__builtin_memcpy_c2x","v",3,{"cx*","cp*","i"}}, /* void __builtin_memcpy_c2x (xdata char *,code  char *,int) */
     { "__builtin_memset_x","v",3,{"cx*","c","i"}},     /* void __builtin_memset     (xdata char *,char,int) 	    */
+    /* TINI NatLib */
+    { "NatLib_LoadByte","c",1,{"c"}},                  /* char  Natlib_LoadByte  (0 based parameter number)         */
+    { "NatLib_LoadShort","s",1,{"c"}},                 /* short Natlib_LoadShort (0 based parameter number)         */
+    { "NatLib_LoadInt","l",1,{"c"}},                   /* long  Natlib_LoadLong  (0 based parameter number)         */
+    { "NatLib_LoadPointer","cx*",1,{"c"}},             /* long  Natlib_LoadPointer  (0 based parameter number)      */
+    /* TINI StateBlock related */
+    { "NatLib_InstallImmutableStateBlock","c",2,{"vx*","us"}},/* char NatLib_InstallImmutableStateBlock(state block *,int handle) */
+    { "NatLib_InstallEphemeralStateBlock","c",2,{"vx*","us"}},/* char NatLib_InstallEphemeralStateBlock(state block *,int handle) */
+    { "NatLib_RemoveImmutableStateBlock","v",0,{NULL}},/* void NatLib_RemoveImmutableStateBlock() */
+    { "NatLib_RemoveEphemeralStateBlock","v",0,{NULL}},/* void NatLib_RemoveEphemeralStateBlock() */
+    { "NatLib_GetImmutableStateBlock","i",0,{NULL}},   /* int  NatLib_GetImmutableStateBlock () */
+    { "NatLib_GetEphemeralStateBlock","i",0,{NULL}},   /* int  NatLib_GetEphemeralStateBlock () */
+    /* Memory manager */
+    { "MM_XMalloc","i",1,{"l"}},                       /* int  MM_XMalloc (long)                */
+    { "MM_Malloc","i",1,{"i"}},                        /* int  MM_Malloc  (int)                 */
+    { "MM_ApplicationMalloc","i",1,{"i"}},             /* int  MM_ApplicationMalloc  (int)      */
+    { "MM_Free","i",1,{"i"}},                          /* int  MM_Free  (int)      		*/
+    { "MM_Deref","cx*",1,{"i"}},                       /* char *MM_Free  (int)      		*/
+    { "MM_UnrestrictedPersist","c",1,{"i"}},           /* char  MM_UnrestrictedPersist  (int)   */
+    { "MM_AppTag","c",2,{"i","c"}},                    /* char *MM_AppTag  (int,char)      	*/
     { NULL , NULL,0, {NULL}} 			   /* mark end of table */
 };    
 
 static const char *_a390Cmd[] =
 {
-  "a390", "$l", "$3", "$1.a51", NULL
+  "macro", "$l", "$3", "$1.a51", NULL
 };
 PORT tininative_port =
 {
@@ -508,7 +565,8 @@ PORT tininative_port =
     "-l",		/* Options with debug */
     "-l",		/* Options without debug */
     0,
-    ".a51"
+    ".a51",
+    _tininative_do_assemble
   },
   {
     NULL,
@@ -558,6 +616,7 @@ PORT tininative_port =
   _ds390_getRegName,
   _tininative_keywords,
   _tininative_genAssemblerPreamble,
+  _tininative_genAssemblerEnd,
   _tininative_genIVT,
   NULL,
   _ds390_reset_regparm,

@@ -79,7 +79,7 @@ static char *fReturn16[] =
 static char **fReturn = fReturn24;
 static char *accUse[] =
 {"a", "b"};
-
+static char *javaRet[] = { "r0","r1","r2","r3"};
 static short rbank = -1;
 
 static struct
@@ -114,7 +114,7 @@ static void saveRBank (int, iCode *, bool);
 
 // A scratch register which will be used to hold
 // result bytes from operands in far space via DPTR2.
-#define DP2_RESULT_REG	"ap"
+#define DP2_RESULT_REG	"_ap"
 
 static lineNode *lineHead = NULL;
 static lineNode *lineCurr = NULL;
@@ -605,6 +605,23 @@ aopForRemat (symbol * sym)
   }
 
   return aop;
+}
+
+/*-----------------------------------------------------------------*/
+/* aopHasRegs - returns true if aop has regs between from-to       */
+/*-----------------------------------------------------------------*/
+static int aopHasRegs(asmop *aop, int from, int to)
+{
+    int size =0;
+
+    if (aop->type != AOP_REG) return 0; /* if not assigned to regs */
+
+    for (; size < aop->size ; size++) {
+	int reg;
+	for (reg = from ; reg <= to ; reg++)
+	    if (aop->aopu.aop_reg[size] == ds390_regWithIdx(reg)) return 1;
+    }
+    return 0;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1807,15 +1824,44 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
+/* savermask - saves registers in the mask                         */
+/*-----------------------------------------------------------------*/
+static void savermask(bitVect *rs_mask)
+{
+    int i;
+    if (options.useXstack) {
+	if (bitVectBitValue (rs_mask, R0_IDX))
+	    emitcode ("mov", "b,r0");
+	emitcode ("mov", "r0,%s", spname);
+	for (i = 0; i < ds390_nRegs; i++) {
+	    if (bitVectBitValue (rs_mask, i)) {
+		if (i == R0_IDX)
+		    emitcode ("mov", "a,b");
+		else
+		    emitcode ("mov", "a,%s", ds390_regWithIdx (i)->name);
+		emitcode ("movx", "@r0,a");
+		emitcode ("inc", "r0");
+	    }
+	}
+	emitcode ("mov", "%s,r0", spname);
+	if (bitVectBitValue (rs_mask, R0_IDX))
+	    emitcode ("mov", "r0,b");
+    } else {
+	for (i = 0; i < ds390_nRegs; i++) {
+	    if (bitVectBitValue (rs_mask, i))
+		emitcode ("push", "%s", ds390_regWithIdx (i)->dname);
+	}
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* saveRegisters - will look for a call and save the registers     */
 /*-----------------------------------------------------------------*/
 static void
 saveRegisters (iCode * lic)
 {
-  int i;
   iCode *ic;
   bitVect *rsave;
-  sym_link *detype;
 
   /* look for call */
   for (ic = lic; ic; ic = ic->next)
@@ -1848,35 +1894,36 @@ saveRegisters (iCode * lic)
 			   ds390_rUmaskForOp (IC_RESULT(ic)));
   }
   ic->regsSaved = 1;
-  if (options.useXstack)
-    {
-      if (bitVectBitValue (rsave, R0_IDX))
-	emitcode ("mov", "b,r0");
-      emitcode ("mov", "r0,%s", spname);
-      for (i = 0; i < ds390_nRegs; i++)
-	{
-	  if (bitVectBitValue (rsave, i))
-	    {
-	      if (i == R0_IDX)
-		emitcode ("mov", "a,b");
-	      else
-		emitcode ("mov", "a,%s", ds390_regWithIdx (i)->name);
-	      emitcode ("movx", "@r0,a");
-	      emitcode ("inc", "r0");
-	    }
-	}
-      emitcode ("mov", "%s,r0", spname);
-      if (bitVectBitValue (rsave, R0_IDX))
-	emitcode ("mov", "r0,b");
-    }
-  else
-    for (i = 0; i < ds390_nRegs; i++)
-      {
-	if (bitVectBitValue (rsave, i))
-	  emitcode ("push", "%s", ds390_regWithIdx (i)->dname);
-      }
+  savermask(rsave);
+}
 
-  detype = getSpec (operandType (IC_LEFT (ic)));
+/*-----------------------------------------------------------------*/
+/* usavermask - restore registers with mask                        */
+/*-----------------------------------------------------------------*/
+static void unsavermask(bitVect *rs_mask)
+{
+    int i;
+    if (options.useXstack) {
+	emitcode ("mov", "r0,%s", spname);
+	for (i = ds390_nRegs; i >= 0; i--) {
+	    if (bitVectBitValue (rs_mask, i)) {
+		emitcode ("dec", "r0");
+		emitcode ("movx", "a,@r0");
+		if (i == R0_IDX)
+		    emitcode ("mov", "b,a");
+		else
+		    emitcode ("mov", "%s,a", ds390_regWithIdx (i)->name);
+	    }	    
+	}
+	emitcode ("mov", "%s,r0", spname);
+	if (bitVectBitValue (rs_mask, R0_IDX))
+	    emitcode ("mov", "r0,b");
+    } else {
+	for (i = ds390_nRegs; i >= 0; i--) {
+	    if (bitVectBitValue (rs_mask, i))
+		emitcode ("pop", "%s", ds390_regWithIdx (i)->dname);
+	}
+    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -1885,7 +1932,6 @@ saveRegisters (iCode * lic)
 static void
 unsaveRegisters (iCode * ic)
 {
-  int i;
   bitVect *rsave;
 
   if (IFFUNC_CALLEESAVES(OP_SYMBOL (IC_LEFT (ic))->type)) {
@@ -1901,33 +1947,7 @@ unsaveRegisters (iCode * ic)
     rsave = bitVectCplAnd (bitVectCopy (ic->rMask), 
 			   ds390_rUmaskForOp (IC_RESULT(ic)));
   }
-  if (options.useXstack)
-    {
-      emitcode ("mov", "r0,%s", spname);
-      for (i = ds390_nRegs; i >= 0; i--)
-	{
-	  if (bitVectBitValue (rsave, i))
-	    {
-	      emitcode ("dec", "r0");
-	      emitcode ("movx", "a,@r0");
-	      if (i == R0_IDX)
-		emitcode ("mov", "b,a");
-	      else
-		emitcode ("mov", "%s,a", ds390_regWithIdx (i)->name);
-	    }
-
-	}
-      emitcode ("mov", "%s,r0", spname);
-      if (bitVectBitValue (rsave, R0_IDX))
-	emitcode ("mov", "r0,b");
-    }
-  else
-    for (i = ds390_nRegs; i >= 0; i--)
-      {
-	if (bitVectBitValue (rsave, i))
-	  emitcode ("pop", "%s", ds390_regWithIdx (i)->dname);
-      }
-
+  unsavermask(rsave);
 }
 
 
@@ -3147,6 +3167,37 @@ genEndFunction (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* genJavaNativeRet - generate code for return JavaNative          */
+/*-----------------------------------------------------------------*/
+static void genJavaNativeRet(iCode *ic)
+{
+    int i, size;
+
+    aopOp (IC_LEFT (ic), ic, FALSE, 
+	   (IS_SYMOP(IC_LEFT(ic)) && OP_SYMBOL(IC_LEFT(ic))->ruonly ? FALSE :TRUE));
+    size = AOP_SIZE (IC_LEFT (ic));
+
+    assert (size <= 4);
+
+    /* it is assigned to GPR0-R3 then push them */
+    if (aopHasRegs(AOP(IC_LEFT(ic)),R0_IDX,R1_IDX) ||
+	aopHasRegs(AOP(IC_LEFT(ic)),R2_IDX,R3_IDX)) {
+	for (i = 0 ; i < size ; i++ ) {
+	    emitcode ("push","%s",aopGet(AOP(IC_LEFT(ic)),i,FALSE,TRUE,FALSE));	    
+	}
+	for (i = (size-1) ; i >= 0 ; i--) {
+	    emitcode ("pop","a%s",javaRet[i]);
+	}
+    } else {
+	for (i = 0 ; i < size ; i++) 
+	    emitcode ("mov","%s,%s",javaRet[i],aopGet(AOP(IC_LEFT(ic)),i,FALSE,TRUE,FALSE));
+    }
+    for (i = size ; i < 4 ; i++ )
+	    emitcode ("mov","%s,#0",javaRet[i]);
+    return;
+}
+
+/*-----------------------------------------------------------------*/
 /* genRet - generate code for return statement                     */
 /*-----------------------------------------------------------------*/
 static void
@@ -3162,6 +3213,12 @@ genRet (iCode * ic)
   if (!IC_LEFT (ic))
     goto jumpret;
 
+  /* if this is a JavaNative function then return 
+     value in different register */
+  if (IFFUNC_ISJAVANATIVE(currFunc->type)) {
+      genJavaNativeRet(ic);
+      goto jumpret;
+  }
   /* we have something to return then
      move the return value into place */
   aopOp (IC_LEFT (ic), ic, FALSE, 
@@ -10782,9 +10839,20 @@ static void genMemcpyX2X( iCode *ic, int nparms, operand **parms, int fromc)
 {
     operand *from , *to , *count;
     symbol *lbl;
+    bitVect *rsave = NULL;
+    int i;
 
     /* we know it has to be 3 parameters */
     assert (nparms == 3);
+    
+    /* save DPTR if it needs to be saved */
+    for (i = DPL_IDX ; i <= B_IDX ; i++ ) {
+	    if (bitVectBitValue(ic->rMask,i))
+		    rsave = bitVectSetBit(rsave,i);
+    }
+    rsave = bitVectIntersect(rsave,bitVectCplAnd (bitVectCopy (ic->rMask),
+						  ds390_rUmaskForOp (IC_RESULT(ic))));
+    savermask(rsave);
     
     to = parms[0];
     from = parms[1];
@@ -10853,7 +10921,7 @@ static void genMemcpyX2X( iCode *ic, int nparms, operand **parms, int fromc)
 	symbol *lbl1 = newiTempLabel(NULL);
 	
 	emitcode (";"," Auto increment but no djnz");
-	emitcode ("mov","ap,%s",aopGet (AOP (count), 0, FALSE, TRUE, TRUE));
+	emitcode ("mov","_ap,%s",aopGet (AOP (count), 0, FALSE, TRUE, TRUE));
 	emitcode ("mov","b,%s",aopGet (AOP (count), 1, FALSE, TRUE, TRUE));
 	emitcode ("mov", "dps,#!constbyte",0x21); 	/* Select DPTR2 & auto-toggle. */
 	emitcode ("","!tlabeldef",lbl->key+100);
@@ -10866,11 +10934,11 @@ static void genMemcpyX2X( iCode *ic, int nparms, operand **parms, int fromc)
 	emitcode ("inc", "dptr");
 	emitcode ("inc", "dptr");
 	emitcode ("mov","a,b");
-	emitcode ("orl","a,ap");
+	emitcode ("orl","a,_ap");
 	emitcode ("jz","!tlabel",lbl1->key+100);
-	emitcode ("mov","a,ap");
+	emitcode ("mov","a,_ap");
 	emitcode ("add","a,#!constbyte",0xFF);
-	emitcode ("mov","ap,a");
+	emitcode ("mov","_ap,a");
 	emitcode ("mov","a,b");
 	emitcode ("addc","a,#!constbyte",0xFF);
 	emitcode ("mov","b,a");
@@ -10879,6 +10947,7 @@ static void genMemcpyX2X( iCode *ic, int nparms, operand **parms, int fromc)
     }
     emitcode ("mov", "dps,#0"); 
     freeAsmop (count, NULL, ic, FALSE);
+    unsavermask(rsave);
 
 }
 
@@ -10890,12 +10959,24 @@ static void genMemsetX(iCode *ic, int nparms, operand **parms)
     operand *to , *val , *count;
     symbol *lbl;
     char *l;
+    int i;
+    bitVect *rsave;
+
     /* we know it has to be 3 parameters */
     assert (nparms == 3);
     
     to = parms[0];
     val = parms[1];
     count = parms[2];
+
+    /* save DPTR if it needs to be saved */
+    for (i = DPL_IDX ; i <= B_IDX ; i++ ) {
+	    if (bitVectBitValue(ic->rMask,i))
+		    rsave = bitVectSetBit(rsave,i);
+    }
+    rsave = bitVectIntersect(rsave,bitVectCplAnd (bitVectCopy (ic->rMask),
+						  ds390_rUmaskForOp (IC_RESULT(ic))));
+    savermask(rsave);
 
     aopOp (to, ic, FALSE, FALSE);
     /* get "to" into DPTR */
@@ -10943,7 +11024,7 @@ static void genMemsetX(iCode *ic, int nparms, operand **parms)
     } else {
 	symbol *lbl1 = newiTempLabel(NULL);
 	
-	emitcode ("mov","ap,%s",aopGet (AOP (count), 0, FALSE, TRUE, TRUE));
+	emitcode ("mov","_ap,%s",aopGet (AOP (count), 0, FALSE, TRUE, TRUE));
 	emitcode ("mov","b,%s",aopGet (AOP (count), 1, FALSE, TRUE, TRUE));
 	emitcode ("","!tlabeldef",lbl->key+100);
 	l = aopGet(AOP (val), 0, FALSE, FALSE, TRUE);
@@ -10951,11 +11032,11 @@ static void genMemsetX(iCode *ic, int nparms, operand **parms)
 	emitcode ("movx", "a,@dptr");
 	emitcode ("inc", "dptr");
 	emitcode ("mov","a,b");
-	emitcode ("orl","a,ap");
+	emitcode ("orl","a,_ap");
 	emitcode ("jz","!tlabel",lbl1->key+100);
-	emitcode ("mov","a,ap");
+	emitcode ("mov","a,_ap");
 	emitcode ("add","a,#!constbyte",0xFF);
-	emitcode ("mov","ap,a");
+	emitcode ("mov","_ap,a");
 	emitcode ("mov","a,b");
 	emitcode ("addc","a,#!constbyte",0xFF);
 	emitcode ("mov","b,a");
@@ -10963,6 +11044,284 @@ static void genMemsetX(iCode *ic, int nparms, operand **parms)
 	emitcode ("","!tlabeldef",lbl1->key+100);
     }
     freeAsmop (count, NULL, ic, FALSE);
+    unsavermask(rsave);
+}
+
+/*-----------------------------------------------------------------*/
+/* genNatLibLoadPrimitive - calls TINI api function to load primitive */
+/*-----------------------------------------------------------------*/
+static void genNatLibLoadPrimitive(iCode *ic, int nparms, operand **parms,int size)
+{
+	bitVect *rsave ;
+	operand *pnum, *result;
+	int i;
+    
+	assert (nparms==1);
+	/* save registers that need to be saved */
+	savermask(rsave = bitVectCplAnd (bitVectCopy (ic->rMask),
+					 ds390_rUmaskForOp (IC_RESULT(ic))));
+    
+	pnum = parms[0]; 
+	aopOp (pnum, ic, FALSE, FALSE);
+	emitcode ("mov","a,%s",aopGet(AOP(pnum),0,FALSE,FALSE,FALSE));
+	freeAsmop (pnum, NULL, ic, FALSE);
+	emitcode ("lcall","NatLib_LoadPrimitive");
+	aopOp (result=IC_RESULT(ic), ic, FALSE, FALSE);
+	if (aopHasRegs(AOP(result),R0_IDX,R1_IDX) || 
+	    aopHasRegs(AOP(result),R2_IDX,R3_IDX) ) {
+		for (i = (size-1) ; i >= 0 ; i-- ) {
+			emitcode ("push","a%s",javaRet[i]);
+		}
+		for (i=0; i < size ; i++ ) {
+			emitcode ("pop","a%s",aopGet(AOP(result),i,FALSE,FALSE,FALSE));
+		}
+	} else {
+		for (i = 0 ; i < size ; i++ ) {
+			aopPut(AOP(result),javaRet[i],i);
+		}
+	}    
+	freeAsmop (result, NULL, ic, FALSE);
+	unsavermask(rsave);
+}
+
+/*-----------------------------------------------------------------*/
+/* genNatLibLoadPointer - calls TINI api function to load pointer  */
+/*-----------------------------------------------------------------*/
+static void genNatLibLoadPointer(iCode *ic, int nparms, operand **parms)
+{
+	bitVect *rsave ;
+	operand *pnum, *result;
+	int size = 3;
+	int i;
+    
+	assert (nparms==1);
+	/* save registers that need to be saved */
+	savermask(rsave = bitVectCplAnd (bitVectCopy (ic->rMask),
+					 ds390_rUmaskForOp (IC_RESULT(ic))));
+    
+	pnum = parms[0]; 
+	aopOp (pnum, ic, FALSE, FALSE);
+	emitcode ("mov","a,%s",aopGet(AOP(pnum),0,FALSE,FALSE,FALSE));
+	freeAsmop (pnum, NULL, ic, FALSE);
+	emitcode ("lcall","NatLib_LoadPointer");
+	aopOp (result=IC_RESULT(ic), ic, FALSE, FALSE);
+	if (AOP_TYPE(result)!=AOP_STR) {
+		for (i = 0 ; i < size ; i++ ) {
+			aopPut(AOP(result),fReturn[i],i);
+		}
+	}    
+	freeAsmop (result, NULL, ic, FALSE);
+	unsavermask(rsave);
+}
+
+/*-----------------------------------------------------------------*/
+/* genNatLibInstallStateBlock - 				   */
+/*-----------------------------------------------------------------*/
+static void genNatLibInstallStateBlock(iCode *ic, int nparms, 
+				       operand **parms, const char *name)
+{
+	bitVect *rsave ;
+	operand *psb, *handle;
+	assert (nparms==2);
+
+	/* save registers that need to be saved */
+	savermask(rsave = bitVectCplAnd (bitVectCopy (ic->rMask),
+					 ds390_rUmaskForOp (IC_RESULT(ic))));
+	psb = parms[0];
+	handle = parms[1];
+
+	/* put pointer to state block into DPTR1 */
+	aopOp (psb, ic, FALSE, FALSE);
+	emitcode ("mov","dpl1,%s",aopGet(AOP(psb),0,FALSE,FALSE,FALSE));
+	emitcode ("mov","dph1,%s",aopGet(AOP(psb),1,FALSE,FALSE,FALSE));
+	emitcode ("mov","dpx1,%s",aopGet(AOP(psb),2,FALSE,FALSE,FALSE));
+	freeAsmop (psb, NULL, ic, FALSE);
+
+	/* put libraryID into DPTR */
+	emitcode ("mov","dptr,#LibraryID");
+
+	/* put handle into r3:r2 */
+	aopOp (handle, ic, FALSE, FALSE);
+	if (aopHasRegs(AOP(handle),R2_IDX,R3_IDX)) {
+		emitcode ("push","%s",aopGet(AOP(handle),0,FALSE,TRUE,FALSE));	
+		emitcode ("push","%s",aopGet(AOP(handle),1,FALSE,TRUE,FALSE));
+		emitcode ("pop","ar3");
+		emitcode ("pop","ar2");
+	} else {	
+		emitcode ("mov","r2,%s",aopGet(AOP(handle),0,FALSE,TRUE,FALSE));	
+		emitcode ("mov","r3,%s",aopGet(AOP(handle),1,FALSE,TRUE,FALSE));
+	}
+	freeAsmop (psb, NULL, ic, FALSE);
+
+	/* make the call */
+	emitcode ("lcall","NatLib_Install%sStateBlock",name);
+
+	/* put return value into place*/
+	_G.accInUse++;
+	aopOp (IC_RESULT(ic), ic, FALSE, FALSE);
+	_G.accInUse--;
+	aopPut(AOP(IC_RESULT(ic)),"a",0);
+	freeAsmop (IC_RESULT(ic), NULL, ic, FALSE);
+	unsavermask(rsave);
+}
+
+/*-----------------------------------------------------------------*/
+/* genNatLibRemoveStateBlock -                                     */
+/*-----------------------------------------------------------------*/
+static void genNatLibRemoveStateBlock(iCode *ic,int nparms,const char *name)
+{
+	bitVect *rsave ;
+
+	assert(nparms==0);
+
+	/* save registers that need to be saved */
+	savermask(rsave = bitVectCplAnd (bitVectCopy (ic->rMask),
+					 ds390_rUmaskForOp (IC_RESULT(ic))));
+
+	/* put libraryID into DPTR */
+	emitcode ("mov","dptr,#LibraryID");
+	/* make the call */
+	emitcode ("lcall","NatLib_Remove%sStateBlock",name);
+	unsavermask(rsave);
+}
+
+/*-----------------------------------------------------------------*/
+/* genNatLibGetStateBlock -                                        */
+/*-----------------------------------------------------------------*/
+static void genNatLibGetStateBlock(iCode *ic,int nparms,
+				   operand **parms,const char *name)
+{
+	bitVect *rsave ;
+	symbol *lbl = newiTempLabel(NULL);
+	
+	assert(nparms==0);
+	/* save registers that need to be saved */
+	savermask(rsave = bitVectCplAnd (bitVectCopy (ic->rMask),
+					 ds390_rUmaskForOp (IC_RESULT(ic))));
+
+	/* put libraryID into DPTR */
+	emitcode ("mov","dptr,#LibraryID");
+	/* make the call */
+	emitcode ("lcall","NatLib_Remove%sStateBlock",name);
+	emitcode ("jnz","!tlabel",lbl->key+100);
+
+	/* put return value into place */
+	aopOp(IC_RESULT(ic),ic,FALSE,FALSE);
+	if (aopHasRegs(AOP(IC_RESULT(ic)),R2_IDX,R3_IDX)) {
+		emitcode ("push","ar3");
+		emitcode ("push","ar2");
+		emitcode ("pop","%s",aopGet(AOP(IC_RESULT(ic)),0,FALSE,TRUE,FALSE));
+		emitcode ("pop","%s",aopGet(AOP(IC_RESULT(ic)),1,FALSE,TRUE,FALSE));
+	} else {
+		aopPut(AOP(IC_RESULT(ic)),"r2",0);
+		aopPut(AOP(IC_RESULT(ic)),"r3",1);
+	}
+	freeAsmop (IC_RESULT(ic), NULL, ic, FALSE);
+	emitcode ("","!tlabeldef",lbl->key+100);
+	unsavermask(rsave);
+}
+
+/*-----------------------------------------------------------------*/
+/* genMMMalloc -                                                   */
+/*-----------------------------------------------------------------*/
+static void genMMMalloc (iCode *ic,int nparms, operand **parms,
+			 int size, const char *name)
+{
+	bitVect *rsave ;
+	operand *bsize;
+	symbol *rsym;
+	symbol *lbl = newiTempLabel(NULL);
+
+	assert (nparms == 1);
+	/* save registers that need to be saved */
+	savermask(rsave = bitVectCplAnd (bitVectCopy (ic->rMask),
+					 ds390_rUmaskForOp (IC_RESULT(ic))));	
+	
+	bsize=parms[0];
+	aopOp (bsize,ic,FALSE,FALSE);
+
+	/* put the size in R4-R2 */
+	if (aopHasRegs(AOP(bsize),R2_IDX, (size==3 ? R4_IDX: R3_IDX))) {
+		emitcode("push","%s",aopGet(AOP(bsize),0,FALSE,TRUE,FALSE));
+		emitcode("push","%s",aopGet(AOP(bsize),1,FALSE,TRUE,FALSE));
+		if (size==3) {
+			emitcode("push","%s",aopGet(AOP(bsize),2,FALSE,TRUE,FALSE));
+			emitcode("pop","ar4");
+		}
+		emitcode("pop","ar3");
+		emitcode("pop","ar2");		
+	} else {
+		emitcode ("mov","r2,%s",aopGet(AOP(bsize),0,FALSE,TRUE,FALSE));
+		emitcode ("mov","r3,%s",aopGet(AOP(bsize),1,FALSE,TRUE,FALSE));
+		if (size==3) {
+			emitcode("mov","r4,%s",aopGet(AOP(bsize),2,FALSE,TRUE,FALSE));
+		}
+	}
+	freeAsmop (bsize, NULL, ic, FALSE);
+
+	/* make the call */
+	emitcode ("lcall","MM_%s",name);
+	emitcode ("jz","!tlabel",lbl->key+100);
+	emitcode ("mov","r2,#!constbyte",0xff);
+	emitcode ("mov","r3,#!constbyte",0xff);
+	emitcode ("","!tlabeldef",lbl->key+100);
+	/* we don't care about the pointer : we just save the handle */
+	rsym = OP_SYMBOL(IC_RESULT(ic));
+	if (rsym->liveFrom != rsym->liveTo) {
+		aopOp(IC_RESULT(ic),ic,FALSE,FALSE);
+		if (aopHasRegs(AOP(IC_RESULT(ic)),R2_IDX,R3_IDX)) {
+			emitcode ("push","ar3");
+			emitcode ("push","ar2");
+			emitcode ("pop","%s",aopGet(AOP(IC_RESULT(ic)),0,FALSE,TRUE,FALSE));
+			emitcode ("pop","%s",aopGet(AOP(IC_RESULT(ic)),1,FALSE,TRUE,FALSE));
+		} else {
+			aopPut(AOP(IC_RESULT(ic)),"r2",0);
+			aopPut(AOP(IC_RESULT(ic)),"r3",1);
+		}
+		freeAsmop (IC_RESULT(ic), NULL, ic, FALSE);
+	}
+	unsavermask(rsave);
+}
+
+/*-----------------------------------------------------------------*/
+/* genMMDeref -                                                    */
+/*-----------------------------------------------------------------*/
+static void genMMDeref (iCode *ic,int nparms, operand **parms)
+{
+	bitVect *rsave ;
+	operand *handle;
+
+	assert (nparms == 1);
+	/* save registers that need to be saved */
+	savermask(rsave = bitVectCplAnd (bitVectCopy (ic->rMask),
+					 ds390_rUmaskForOp (IC_RESULT(ic))));	
+	
+	handle=parms[0];
+	aopOp (handle,ic,FALSE,FALSE);
+
+	/* put the size in R4-R2 */
+	if (aopHasRegs(AOP(handle),R2_IDX,R3_IDX)) {
+		emitcode("push","%s",aopGet(AOP(handle),0,FALSE,TRUE,FALSE));
+		emitcode("push","%s",aopGet(AOP(handle),1,FALSE,TRUE,FALSE));
+		emitcode("pop","ar3");
+		emitcode("pop","ar2");		
+	} else {
+		emitcode ("mov","r2,%s",aopGet(AOP(handle),0,FALSE,TRUE,FALSE));
+		emitcode ("mov","r3,%s",aopGet(AOP(handle),1,FALSE,TRUE,FALSE));
+	}
+	freeAsmop (handle, NULL, ic, FALSE);
+
+	/* make the call */
+	emitcode ("lcall","MM_Deref");
+
+	aopOp (IC_RESULT(ic),ic,FALSE,FALSE);
+	if (AOP_TYPE(IC_RESULT(ic)) != AOP_STR) {
+		aopPut(AOP(IC_RESULT(ic)),"dpl",0);
+		aopPut(AOP(IC_RESULT(ic)),"dph",1);
+		aopPut(AOP(IC_RESULT(ic)),"dpx",2);
+	}
+	freeAsmop (IC_RESULT(ic), NULL, ic, FALSE);
+	unsavermask(rsave);
 }
 
 /*-----------------------------------------------------------------*/
@@ -10987,8 +11346,38 @@ static void genBuiltIn (iCode *ic)
 	genMemcpyX2X(bi_iCode,nbi_parms,bi_parms,1);
     } else if (strcmp(bif->name,"__builtin_memset_x")==0) {
 	genMemsetX(bi_iCode,nbi_parms,bi_parms);
+    } else if (strcmp(bif->name,"NatLib_LoadByte")==0) {
+	genNatLibLoadPrimitive(bi_iCode,nbi_parms,bi_parms,1);
+    } else if (strcmp(bif->name,"NatLib_LoadShort")==0) {
+	genNatLibLoadPrimitive(bi_iCode,nbi_parms,bi_parms,2);
+    } else if (strcmp(bif->name,"NatLib_LoadInt")==0) {
+	genNatLibLoadPrimitive(bi_iCode,nbi_parms,bi_parms,4);
+    } else if (strcmp(bif->name,"NatLib_LoadPointer")==0) {
+	genNatLibLoadPointer(bi_iCode,nbi_parms,bi_parms);
+    } else if (strcmp(bif->name,"NatLib_InstallImmutableStateBlock")==0) {
+	genNatLibInstallStateBlock(bi_iCode,nbi_parms,bi_parms,"Immutable");
+    } else if (strcmp(bif->name,"NatLib_InstallEphemeralStateBlock")==0) {
+	genNatLibInstallStateBlock(bi_iCode,nbi_parms,bi_parms,"Ephemeral");
+    } else if (strcmp(bif->name,"NatLib_RemoveImmutableStateBlock")==0) {
+	genNatLibRemoveStateBlock(bi_iCode,nbi_parms,"Immutable");
+    } else if (strcmp(bif->name,"NatLib_RemoveEphemeralStateBlock")==0) {
+	genNatLibRemoveStateBlock(bi_iCode,nbi_parms,"Ephemeral");
+    } else if (strcmp(bif->name,"NatLib_GetImmutableStateBlock")==0) {
+	genNatLibGetStateBlock(bi_iCode,nbi_parms,bi_parms,"Immutable");
+    } else if (strcmp(bif->name,"NatLib_GetEphemeralStateBlock")==0) {
+	genNatLibGetStateBlock(bi_iCode,nbi_parms,bi_parms,"Ephemeral");
+    } else if (strcmp(bif->name,"MM_XMalloc")==0) {
+	genMMMalloc(bi_iCode,nbi_parms,bi_parms,3,"XMalloc");
+    } else if (strcmp(bif->name,"MM_Malloc")==0) {
+	genMMMalloc(bi_iCode,nbi_parms,bi_parms,2,"Malloc");
+    } else if (strcmp(bif->name,"MM_ApplicationMalloc")==0) {
+	genMMMalloc(bi_iCode,nbi_parms,bi_parms,2,"ApplicationMalloc");
+    } else if (strcmp(bif->name,"MM_Free")==0) {
+	genMMMalloc(bi_iCode,nbi_parms,bi_parms,2,"Free");
+    } else if (strcmp(bif->name,"MM_Deref")==0) {
+	genMMDeref(bi_iCode,nbi_parms,bi_parms);
     } else {
-	werror(E_INTERNAL_ERROR,"unknown builtin function encountered\n");
+	werror(E_INTERNAL_ERROR,__FILE__,__LINE__,"unknown builtin function encountered\n");
 	return ;
     }
     return ;    

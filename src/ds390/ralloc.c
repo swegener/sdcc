@@ -2022,8 +2022,9 @@ findAssignToSym (operand * op, iCode * ic)
 /*-----------------------------------------------------------------*/
 static int
 packRegsForSupport (iCode * ic, eBBlock * ebp)
-{
+{    
   int change = 0;
+  
   /* for the left & right operand :- look to see if the
      left was assigned a true symbol in far space in that
      case replace them */
@@ -2136,9 +2137,8 @@ packRegsDPTRuse (operand * op)
 	    if (OP_SYMBOL(IC_RESULT(ic))->liveTo == 
 		OP_SYMBOL(IC_RESULT(ic))->liveFrom) continue ;
 	    etype = getSpec(type = operandType(IC_RESULT(ic)));
-	    //if (getSize(type) == 0 || isOperandEqual(op,IC_RESULT(ic))) 
-	    if (getSize(type) == 0) 
-	      continue ;
+	    if (getSize(type) == 0 || isOperandEqual(op,IC_RESULT(ic))) 
+		continue ;
 	    return NULL ;
 	}
 
@@ -2587,9 +2587,11 @@ packRegisters (eBBlock * ebp)
 	}
 #endif
 
+#if 0 /* unsafe */
       /* reduce for support function calls */
       if (ic->supportRtn || ic->op == '+' || ic->op == '-')
 	packRegsForSupport (ic, ebp);
+#endif
 
       /* some cases the redundant moves can
          can be eliminated for return statements */
@@ -2600,8 +2602,12 @@ packRegisters (eBBlock * ebp)
 	  packRegsDPTRuse (IC_LEFT (ic));
       }
 
-      if ((ic->op == CALL && getSize(operandType(IC_RESULT(ic))) <= 4)) {
-	  packRegsDPTRuse (IC_RESULT (ic));	  
+      if (ic->op == CALL) {
+	  sym_link *ftype = operandType(IC_LEFT(ic));
+	  if (getSize(operandType(IC_RESULT(ic))) <= 4 &&
+	      !IFFUNC_ISBUILTIN(ftype)) {
+	      packRegsDPTRuse (IC_RESULT (ic));	  
+	  }
       }
 
       /* if pointer set & left has a size more than

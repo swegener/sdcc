@@ -1084,13 +1084,15 @@ void pic16_assignConfigWordValue(int address, int value)
 {
   int i;
 
-	for(i=0;i<pic16->cwInfo.confAddrEnd-pic16->cwInfo.confAddrStart+1;i++) {
-		if(pic16->cwInfo.crInfo[i].mask != -1) {
-//			fprintf(stderr, "setting location 0x%X\n", pic16->cwInfo.confAddrStart+i);
-			pic16->cwInfo.crInfo[i].value = value;
-			pic16->cwInfo.crInfo[i].emit = 1;
-			return;
-		}
-	}
+
+        for(i=0;i<pic16->cwInfo.confAddrEnd-pic16->cwInfo.confAddrStart+1;i++) {
+                if((address == pic16->cwInfo.confAddrStart+i)
+                  && (pic16->cwInfo.crInfo[i].mask != -1)) {
+//                        fprintf(stderr, "setting location 0x%X to value 0x%x\n", /*address*/ pic16->cwInfo.confAddrStart+i, val
+                        pic16->cwInfo.crInfo[i].value = value;
+                        pic16->cwInfo.crInfo[i].emit = 1;
+                        return;
+                }
+        }
 }
 

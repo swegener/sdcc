@@ -1,3 +1,8 @@
+2004-06-06 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/device.c (pic16_assignConfigWord): fixed bug that
+	would only assign 0x300001 register.
+
 2004-06-05 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* device/lib/pic16/startup/Makefile: added $(MODELFLAGS)

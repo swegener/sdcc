@@ -27,10 +27,12 @@
 #include <tinibios.h>
 #include <ds400rom.h>
 
+#include <stdio.h>
+
 #define TIMED_ACCESS(sfr,value) { TA=0xaa; TA=0x55; sfr=value; }
 
 #undef OSCILLATOR
-#define OSCILLATOR 14725600
+#define OSCILLATOR 14745600
 
 unsigned char _sdcc_external_startup(void)
 {
@@ -86,13 +88,26 @@ static data unsigned char serial0Buffered;
    If buffered!=0, characters received are buffered using an interrupt
 */
 
+
+#define SERIAL0_BAUDRATE 115200
+#define TIMER_RELOAD (65536 - ((OSCILLATOR) / (32 * SERIAL0_BAUDRATE)))
+
 void Serial0Init (unsigned long baud, unsigned char buffered) {
   
   ES0 = 0; // disable serial channel 0 interrupt
 
+#if 0    
   // Need no port setup, done by boot rom.
-  
   baud;
+#else
+    SCON0 = 0x5A; // 10 bit serial 0, use timer baud rate, enable recieving
+    RCAP2H = (TIMER_RELOAD >> 8) & 0xff;
+    RCAP2L = TIMER_RELOAD & 0xff;
+    T2CON = 0x30; // Enable timer 2 for serial port
+    TR2 = 1; // Set timer 2 to run
+    
+    baud;
+#endif    
 
   serial0Buffered=buffered;
  
@@ -106,16 +121,6 @@ void Serial0Init (unsigned long baud, unsigned char buffered) {
   }
 }
 
-void Serial0Baud(unsigned long baud) {
-  TR2=0; // stop timer
-  baud=-((long)OSCILLATOR/(32*baud));
-  TL2=RCAP2L= baud;
-  TH2=RCAP2H= baud>>8;
-  TF2=0; // clear overflow flag
-  TR2=1; // start timer
-}  
-
-
 void Serial0SwitchToBuffered(void)
 {
     IE &= ~0x80;
@@ -127,7 +132,6 @@ void Serial0SwitchToBuffered(void)
     
     IE |= 0x80;
 }
-
 
 void Serial0IrqHandler (void) interrupt 4 {
   if (RI_0) {
@@ -168,7 +172,6 @@ void Serial0PutChar (char c)
       ;
     TI_0 = 0;
     SBUF0=c;
-    // TI_0=0;
   }
 }
 
@@ -191,14 +194,11 @@ char Serial0GetChar (void)
   return c;
 }
 
-#if 0 
-// FIXME: no ClockMilliSecondsDelay yet.
 void Serial0SendBreak() {
   P3 &= ~0x02;
   ClockMilliSecondsDelay(2);
   P3 |= 0x02;
 }
-#endif
 
 void Serial0Flush() {
   ES0=0; // disable interrupts
@@ -212,77 +212,24 @@ void Serial0Flush() {
   }
 }
 
-// now let's go for the clock stuff
-
-// these REALLY need to be in data space for the irq routine!
-static data unsigned long milliSeconds=0;
-static data unsigned int timer0ReloadValue;
+// now let's go for the clock stuff - on the DS400, we can just
+// use the ROM's millisecond timer, running off timer 0.
+// 
+// for now, this timer runs too fast by about 20%. We need an implementation of
+// task_settickreload to fix this.
 
 void ClockInit() {
-  unsigned long timerReloadValue= OSCILLATOR / 1000 / 4;
-
-  timer0ReloadValue=~timerReloadValue;
-  // initialise timer 0
-  ET0=0; // disable timer interrupts initially
-  
-  TCON = (TCON&0xcc)|0x00; // stop timer, clear overflow
-  TMOD = (TMOD&0xf0)|0x01; // 16 bit counter
-  CKCON|=0x08; // timer uses xtal/4
-  
-  TL0=timer0ReloadValue&0xff;
-  TH0=timer0ReloadValue>>8;
-  
-  installInterrupt(ClockIrqHandler, 0xB);
-    
-  ET0=1; // enable timer interrupts
-  TR0=1; // start timer
+    // nada, all done by DSS_rom_init
 }
-
-// This needs to be SUPER fast. What we really want is:
-
-#if 0
-void junk_ClockIrqHandler (void) interrupt 10 {
-  TL0=timer0ReloadValue&0xff;
-  TH0=timer0ReloadValue>>8;
-  milliSeconds++;
-}
-#else
-// but look at the code, and the pushes and pops, so:
-void ClockIrqHandler (void) interrupt 1 _naked
-{
-  _asm
-    push acc
-    push psw
-    mov _TL0,_timer0ReloadValue
-    mov _TH0,_timer0ReloadValue+1
-    clr a
-    inc _milliSeconds+0
-    cjne a,_milliSeconds+0,_ClockIrqHandlerDone
-    inc _milliSeconds+1
-    cjne a,_milliSeconds+1,_ClockIrqHandlerDone
-    inc _milliSeconds+2
-    cjne a,_milliSeconds+2,_ClockIrqHandlerDone
-    inc _milliSeconds+3
-   _ClockIrqHandlerDone:
-    pop psw
-    pop acc
-    reti
-  _endasm;
-}
-#endif
 
 // we can't just use milliSeconds
 unsigned long ClockTicks(void) {
-  unsigned long ms;
-  ET0=0;
-  ms=milliSeconds;
-  ET0=1;
-  return ms;
+    return DSS_gettimemillis();
 }
 
 void ClockMilliSecondsDelay(unsigned long delay) {
-  long ms=ClockTicks()+delay;
+  unsigned long ms = DSS_gettimemillis() + delay;
 
-  while (ms>ClockTicks())
-    ;
+    while (ms > DSS_gettimemillis())
+        ;
 }

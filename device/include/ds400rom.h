@@ -3,8 +3,12 @@
 #ifndef DS400ROM_H_
 #define DS400ROM_H_
 
-extern unsigned char rom_init(void xdata *loMem,
-			      void xdata *hiMem) _naked;
+extern unsigned char DSS_rom_init(void xdata *loMem,
+			          void xdata *hiMem) _naked;
+
+extern unsigned long DSS_gettimemillis(void) _naked;
+
+extern unsigned char DSS_getthreadID(void) _naked;
 
 // Utility functions.
 

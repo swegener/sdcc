@@ -2045,8 +2045,8 @@ saveRegisters (iCode * lic)
 
   /* if the registers have been saved already then
      do nothing */
-  if (ic->regsSaved || 
-      (IS_SYMOP(IC_LEFT(ic)) && IFFUNC_ISNAKED(OP_SYM_TYPE(IC_LEFT(ic)))))
+  if (ic->regsSaved 
+      || (IS_SYMOP(IC_LEFT(ic)) && IFFUNC_ISNAKED(OP_SYM_TYPE(IC_LEFT(ic))) && !TARGET_IS_DS400) )
     return ;
 
   /* special case if DPTR alive across a function call then must save it 
@@ -2549,7 +2549,7 @@ genCall (iCode * ic)
      the same register bank then we need to save the
      destination registers on the stack */
   dtype = operandType (IC_LEFT (ic));
-  if (currFunc && dtype && !IFFUNC_ISNAKED(dtype) &&
+  if (currFunc && dtype && (!IFFUNC_ISNAKED(dtype) || TARGET_IS_DS400) &&
       (FUNC_REGBANK (currFunc->type) != FUNC_REGBANK (dtype)) &&
       IFFUNC_ISISR (currFunc->type))
   {
@@ -2705,7 +2705,7 @@ genPcall (iCode * ic)
      the same register bank then we need to save the
      destination registers on the stack */
   dtype = operandType (IC_LEFT (ic));
-  if (currFunc && dtype && !IFFUNC_ISNAKED(dtype) &&
+  if (currFunc && dtype && (!IFFUNC_ISNAKED(dtype) || TARGET_IS_DS400) &&
       IFFUNC_ISISR (currFunc->type) &&
       (FUNC_REGBANK (currFunc->type) != FUNC_REGBANK (dtype))) {
     saveRBank (FUNC_REGBANK (dtype), ic, TRUE);

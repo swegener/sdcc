@@ -41,6 +41,9 @@
 #define R7_B3     0x1F
 
 
+// The top of the redirect function table in RAM.
+#define CALL_TABLE_TOP	256
+    
 // The bank the ROM is stored in.  Should be 0FFh for production
 // 400's.  Change this value when running with a debug ROM.
 
@@ -188,6 +191,42 @@
 #define ROMXT_AUTOBAUD                  (99 * ROMXT_ENTRYSIZE)
 #define ROMXT_TFTP_CLOSE                (100 * ROMXT_ENTRYSIZE)
 
+
+#define ROMRT_ENTRYSIZE  3
+
+//
+// ROM REDIRECT TABLE FUNCTIONS (denoted with ROMRT)
+//
+#define ROMRT_KERNELMALLOC                  ( 1 * ROMRT_ENTRYSIZE)
+#define ROMRT_KERNELFREE                    ( 2 * ROMRT_ENTRYSIZE)
+#define ROMRT_MALLOC                        ( 3 * ROMRT_ENTRYSIZE)
+#define ROMRT_FREE                          ( 4 * ROMRT_ENTRYSIZE)
+#define ROMRT_MALLOCDIRTY                   ( 5 * ROMRT_ENTRYSIZE)
+#define ROMRT_DEREF                         ( 6 * ROMRT_ENTRYSIZE)
+#define ROMRT_GETFREERAM                    ( 7 * ROMRT_ENTRYSIZE)
+#define ROMRT_GETTIMEMILLIS                 ( 8 * ROMRT_ENTRYSIZE)
+#define ROMRT_GETTHREADID                   ( 9 * ROMRT_ENTRYSIZE)
+#define ROMRT_THREADRESUME                  (10 * ROMRT_ENTRYSIZE)
+#define ROMRT_THREADIOSLEEP                 (11 * ROMRT_ENTRYSIZE)
+#define ROMRT_THREADIOSLEEPNC               (12 * ROMRT_ENTRYSIZE)
+#define ROMRT_THREADSAVE                    (13 * ROMRT_ENTRYSIZE)
+#define ROMRT_THREADRESTORE                 (14 * ROMRT_ENTRYSIZE)
+#define ROMRT_SLEEP                         (15 * ROMRT_ENTRYSIZE)
+#define ROMRT_GETTASKID                     (16 * ROMRT_ENTRYSIZE)
+#define ROMRT_INFOSENDCHAR                  (17 * ROMRT_ENTRYSIZE)
+#define ROMRT_IP_COMPUTECHECKSUM_SOFTWARE   (18 * ROMRT_ENTRYSIZE)
+#define ROMRT_0                             (19 * ROMRT_ENTRYSIZE) // undefined
+#define ROMRT_DHCPNOTIFY                    (20 * ROMRT_ENTRYSIZE)
+#define ROMRT_ROM_TASK_CREATE               (21 * ROMRT_ENTRYSIZE)
+#define ROMRT_ROM_TASK_DUPLICATE            (22 * ROMRT_ENTRYSIZE)
+#define ROMRT_ROM_TASK_DESTROY              (23 * ROMRT_ENTRYSIZE)
+#define ROMRT_ROM_TASK_SWITCH_IN            (24 * ROMRT_ENTRYSIZE)
+#define ROMRT_ROM_TASK_SWITCH_OUT           (25 * ROMRT_ENTRYSIZE)
+#define ROMRT_OWIP_READCONFIG               (26 * ROMRT_ENTRYSIZE)
+#define ROMRT_SETMACID                      (27 * ROMRT_ENTRYSIZE)
+#define ROMRT_UNDEREF                       (28 * ROMRT_ENTRYSIZE)
+
+
 #define GETC		\
     clr  a		\
     movc a, @a+dptr
@@ -242,6 +281,44 @@ _asm
 _endasm ;
 }
 
+// expects function number in R6_B3 (low byte) & R7_B3 (high byte)
+void _romredirect(void) _naked
+{
+_asm
+      push  dpx
+      push  dph
+      push  dpl
+      push  acc
+      ; dptr = CALL_TABLE_TOP + function offset.
+      mov   a, #(CALL_TABLE_TOP & 0xff)
+      add   a, R6_B3                          ; add function offset to the table
+      mov   dpl, a
+      mov   a, #((CALL_TABLE_TOP >> 8) & 0xff)
+      addc  a, R7_B3
+      mov   dph, a
+      mov   dpx, #((CALL_TABLE_TOP >> 16) & 0xff)
+      movx  a, @dptr                      ; read high byte
+      mov   R5_B3, a
+      inc   dptr
+      movx  a, @dptr                      ; read mid byte
+      mov   R4_B3, a
+      inc   dptr
+      movx  a, @dptr                      ; read low byte
+      mov   R3_B3, a
+      pop   acc                 ; restore acc and dptr
+      pop   dpl
+      pop   dph
+      pop   dpx
+      push  R3_B3               ; push low byte of target address
+      push  R4_B3
+      push  R5_B3               ; push high byte of target address
+      ret                       ; this is not a ret, it is a call!
+
+      ; the called function ends with a ret which will return to our original caller.
+_endasm;	
+}
+
+
 // This macro is invalid for the standard C preprocessor, since it
 // includes a hash character in the expansion, hence the SDCC specific
 // pragma.
@@ -251,9 +328,14 @@ _endasm ;
 	mov     R7_B3, #((x >> 8) & 0xff)	\
 	lcall   __romcall
 
+#define ROMREDIRECT(x) \
+	mov     R6_B3, #(x & 0xff) 		\
+	mov     R7_B3, #((x >> 8) & 0xff)	\
+	lcall   __romredirect
 
-// rom_init: the ds400 ROM_INIT ROM function.
-unsigned char rom_init(void xdata *loMem,
+
+// DSS_rom_init: the ds400 ROM_INIT ROM function.
+unsigned char DSS_rom_init(void xdata *loMem,
 		       void xdata *hiMem) _naked
 {    
     // shut compiler up about unused parameters.
@@ -266,8 +348,8 @@ _asm
 	mov	r2, dpx
 	mov	r1, dph
 	mov     r0, dpl
-	; hiMem is in _rom_init_PARM_2
-	mov	dptr, #_rom_init_PARM_2
+	; hiMem is in _DSS_rom_init_PARM_2
+	mov	dptr, #_DSS_rom_init_PARM_2
 	mov	r5, dpx
 	mov     r4, dph
 	mov     r3, dpl
@@ -280,7 +362,34 @@ _asm
 _endasm	;
 }
 
-// all other ROM functions should go here, using rom_init as a template...
+// DSS_gettimemillis: note that the ROM actually returns 5 bytes of time,
+// we're discarding the high byte here.
+unsigned long DSS_gettimemillis(void) _naked
+{
+_asm    
+    ; no parameters to load. 
+    ROMREDIRECT(ROMRT_GETTIMEMILLIS)
+   ; results in r4 - r0, return in DPTR/B
+   mov dpl, r0
+   mov dph, r1
+   mov dpx, r2
+   mov b, r3
+   ret
+_endasm;
+}
+
+unsigned char DSS_getthreadID(void) _naked
+{
+_asm    
+    ; no parameters to load. 
+    ROMREDIRECT(ROMRT_GETTHREADID)
+   ; results in acc, return in dpl
+   mov dpl, a
+   ret
+_endasm;    
+}
+
+
 
 // Various utility functions.
 
@@ -336,7 +445,7 @@ unsigned char romInit(unsigned char noisy)
     heapStart = _firstHeapByte();
     heapEnd = (void xdata *)CE0_END;
 
-    rc = rom_init(heapStart, heapEnd);
+    rc = DSS_rom_init(heapStart, heapEnd);
     
     if (noisy)
     {

@@ -363,7 +363,7 @@ t_uc51::inst_jnz_addr(uchar code)
  */
 
 int
-t_uc51::inst_jmp_$a_dptr(uchar code)
+t_uc51::inst_jmp_Sa_dptr(uchar code)
 {
   PC= (sfr->read(DPH)*256 + sfr->read(DPL) + acc->read()) &
     (EROM_SIZE - 1);
@@ -396,7 +396,7 @@ t_uc51::inst_sjmp(uchar code)
  */
 
 int
-t_uc51::inst_cjne_a_$data_addr(uchar code)
+t_uc51::inst_cjne_a_Sdata_addr(uchar code)
 {
   uchar data, jaddr, ac;
 
@@ -441,7 +441,7 @@ t_uc51::inst_cjne_a_addr_addr(uchar code)
  */
 
 int
-t_uc51::inst_cjne_$ri_$data_addr(uchar code)
+t_uc51::inst_cjne_Sri_Sdata_addr(uchar code)
 {
   uchar data, jaddr;
   class cl_cell *cell;
@@ -465,7 +465,7 @@ t_uc51::inst_cjne_$ri_$data_addr(uchar code)
  */
 
 int
-t_uc51::inst_cjne_rn_$data_addr(uchar code)
+t_uc51::inst_cjne_rn_Sdata_addr(uchar code)
 {
   uchar data, jaddr;
   class cl_cell *reg;

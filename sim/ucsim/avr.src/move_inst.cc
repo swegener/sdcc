@@ -223,7 +223,7 @@ cl_avr::lds_Rd_k(t_mem code)
  */
 
 int
-cl_avr::ld_Rd_Z$(t_mem code)
+cl_avr::ld_Rd_ZS(t_mem code)
 {
   t_addr z, d;
 
@@ -247,7 +247,7 @@ cl_avr::ld_Rd_Z$(t_mem code)
  */
 
 int
-cl_avr::ld_Rd_$Z(t_mem code)
+cl_avr::ld_Rd_SZ(t_mem code)
 {
   t_addr z, d;
   t_mem data;
@@ -272,7 +272,7 @@ cl_avr::lpm_Rd_Z(t_mem code)
 
 
 int
-cl_avr::lpm_Rd_Z$(t_mem code)
+cl_avr::lpm_Rd_ZS(t_mem code)
 {
   return(resGO);
 }
@@ -286,7 +286,7 @@ cl_avr::elpm_Rd_Z(t_mem code)
 
 
 int
-cl_avr::elpm_Rd_Z$(t_mem code)
+cl_avr::elpm_Rd_ZS(t_mem code)
 {
   return(resGO);
 }
@@ -300,7 +300,7 @@ cl_avr::elpm_Rd_Z$(t_mem code)
  */
 
 int
-cl_avr::ld_Rd_Y$(t_mem code)
+cl_avr::ld_Rd_YS(t_mem code)
 {
   t_addr y, d;
 
@@ -324,7 +324,7 @@ cl_avr::ld_Rd_Y$(t_mem code)
  */
 
 int
-cl_avr::ld_Rd_$Y(t_mem code)
+cl_avr::ld_Rd_SY(t_mem code)
 {
   t_addr y, d;
   t_mem data;
@@ -370,7 +370,7 @@ cl_avr::ld_Rd_X(t_mem code)
  */
 
 int
-cl_avr::ld_Rd_X$(t_mem code)
+cl_avr::ld_Rd_XS(t_mem code)
 {
   t_addr x, d;
 
@@ -394,7 +394,7 @@ cl_avr::ld_Rd_X$(t_mem code)
  */
 
 int
-cl_avr::ld_Rd_$X(t_mem code)
+cl_avr::ld_Rd_SX(t_mem code)
 {
   t_addr x, d;
   t_mem data;
@@ -463,7 +463,7 @@ cl_avr::sts_k_Rr(t_mem code)
  */
 
 int
-cl_avr::st_Z$_Rr(t_mem code)
+cl_avr::st_ZS_Rr(t_mem code)
 { 
   t_addr z, r;
 
@@ -487,7 +487,7 @@ cl_avr::st_Z$_Rr(t_mem code)
  */
 
 int
-cl_avr::st_$Z_Rr(t_mem code)
+cl_avr::st_SZ_Rr(t_mem code)
 {
   t_addr z, r;
   t_mem data;
@@ -512,7 +512,7 @@ cl_avr::st_$Z_Rr(t_mem code)
  */
 
 int
-cl_avr::st_Y$_Rr(t_mem code)
+cl_avr::st_YS_Rr(t_mem code)
 {
   t_addr y, r;
 
@@ -536,7 +536,7 @@ cl_avr::st_Y$_Rr(t_mem code)
  */
 
 int
-cl_avr::st_$Y_Rr(t_mem code)
+cl_avr::st_SY_Rr(t_mem code)
 {
   t_addr y, r;
   t_mem data;
@@ -583,7 +583,7 @@ cl_avr::st_X_Rr(t_mem code)
  */
 
 int
-cl_avr::st_X$_Rr(t_mem code)
+cl_avr::st_XS_Rr(t_mem code)
 {
   t_addr x, r;
 
@@ -607,7 +607,7 @@ cl_avr::st_X$_Rr(t_mem code)
  */
 
 int
-cl_avr::st_$X_Rr(t_mem code)
+cl_avr::st_SX_Rr(t_mem code)
 {
   t_addr x, r;
   t_mem data;

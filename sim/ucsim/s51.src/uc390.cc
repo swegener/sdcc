@@ -565,7 +565,7 @@ t_uc390::inst_inc_dptr (uchar code)
  */
 
 int
-t_uc390::inst_jmp_$a_dptr (uchar code)
+t_uc390::inst_jmp_Sa_dptr (uchar code)
 {
   uchar pl, ph, px, dps;
 
@@ -599,7 +599,7 @@ t_uc390::inst_jmp_$a_dptr (uchar code)
  */
 
 int
-t_uc390::inst_mov_dptr_$data (uchar code)
+t_uc390::inst_mov_dptr_Sdata (uchar code)
 {
   uchar pl, ph, px, dps;
 
@@ -637,7 +637,7 @@ t_uc390::inst_mov_dptr_$data (uchar code)
  */
 
 int
-t_uc390::inst_movc_a_$a_dptr (uchar code)
+t_uc390::inst_movc_a_Sa_dptr (uchar code)
 {
   uchar pl, ph, px, dps;
 
@@ -714,7 +714,7 @@ t_uc390::inst_pop (uchar code)
  */
 
 int
-t_uc390::inst_movx_a_$dptr (uchar code)
+t_uc390::inst_movx_a_Sdptr (uchar code)
 {
   uchar pl, ph, px, dps;
 
@@ -753,7 +753,7 @@ t_uc390::inst_movx_a_$dptr (uchar code)
  */
 
 int
-t_uc390::inst_movx_$dptr_a (uchar code)
+t_uc390::inst_movx_Sdptr_a (uchar code)
 {
   uchar pl, ph, px, dps;
 

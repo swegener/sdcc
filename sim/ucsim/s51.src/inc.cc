@@ -70,7 +70,7 @@ t_uc51::inst_inc_addr(uchar code)
  */
 
 int
-t_uc51::inst_inc_$ri(uchar code)
+t_uc51::inst_inc_Sri(uchar code)
 {
   class cl_cell *cell;
 
@@ -136,7 +136,7 @@ t_uc51::inst_dec_addr(uchar code)
  */
 
 int
-t_uc51::inst_dec_$ri(uchar code)
+t_uc51::inst_dec_Sri(uchar code)
 {
   class cl_cell *cell;
 

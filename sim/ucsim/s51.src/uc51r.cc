@@ -131,7 +131,7 @@ t_uc51r::received(int c)
  */
 
 int
-t_uc51r::inst_movx_a_$dptr(uchar code)
+t_uc51r::inst_movx_a_Sdptr(uchar code)
 {
   if ((sfr->get(AUXR) & bmEXTRAM) ||
       sfr->get(DPH))
@@ -152,7 +152,7 @@ t_uc51r::inst_movx_a_$dptr(uchar code)
  */
 
 int
-t_uc51r::inst_movx_a_$ri(uchar code)
+t_uc51r::inst_movx_a_Sri(uchar code)
 {
   class cl_cell *cell;
   t_mem d= 0;
@@ -175,7 +175,7 @@ t_uc51r::inst_movx_a_$ri(uchar code)
  */
 
 int
-t_uc51r::inst_movx_$dptr_a(uchar code)
+t_uc51r::inst_movx_Sdptr_a(uchar code)
 {
   if ((sfr->get(AUXR) & bmEXTRAM) ||
       sfr->get(DPH))
@@ -193,7 +193,7 @@ t_uc51r::inst_movx_$dptr_a(uchar code)
  */
 
 int
-t_uc51r::inst_movx_$ri_a(uchar code)
+t_uc51r::inst_movx_Sri_a(uchar code)
 {
   class cl_cell *cell;
   t_mem d= 0;

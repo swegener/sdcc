@@ -55,10 +55,10 @@ public:
 
   virtual void received(int c);
 
-  virtual int inst_movx_a_$dptr(uchar code);		/* e0 */
-  virtual int inst_movx_a_$ri(uchar code);		/* e2,e3 */
-  virtual int inst_movx_$dptr_a(uchar code);		/* f0 */
-  virtual int inst_movx_$ri_a(uchar code);		/* f2,f3 */
+  virtual int inst_movx_a_Sdptr(uchar code);		/* e0 */
+  virtual int inst_movx_a_Sri(uchar code);		/* e2,e3 */
+  virtual int inst_movx_Sdptr_a(uchar code);		/* f0 */
+  virtual int inst_movx_Sri_a(uchar code);		/* f2,f3 */
 };
 
 

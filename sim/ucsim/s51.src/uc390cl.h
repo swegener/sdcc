@@ -52,11 +52,11 @@ public:
 
   /* mods for dual-dptr */
   virtual int inst_inc_dptr(uchar code);
-  virtual int inst_jmp_$a_dptr(uchar code);
-  virtual int inst_mov_dptr_$data(uchar code);
-  virtual int inst_movc_a_$a_dptr(uchar code);
-  virtual int inst_movx_a_$dptr(uchar code);
-  virtual int inst_movx_$dptr_a(uchar code);
+  virtual int inst_jmp_Sa_dptr(uchar code);
+  virtual int inst_mov_dptr_Sdata(uchar code);
+  virtual int inst_movc_a_Sa_dptr(uchar code);
+  virtual int inst_movx_a_Sdptr(uchar code);
+  virtual int inst_movx_Sdptr_a(uchar code);
 
   /* mods for flat24 */
   virtual int inst_ajmp_addr(uchar code);

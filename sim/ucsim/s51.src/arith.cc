@@ -104,7 +104,7 @@ t_uc51::inst_rl(uchar code)
  */
 
 int
-t_uc51::inst_add_a_$data(uchar code)
+t_uc51::inst_add_a_Sdata(uchar code)
 {
   uchar data, ac;
   bool newC, newA, c6;
@@ -157,7 +157,7 @@ t_uc51::inst_add_a_addr(uchar code)
  */
 
 int
-t_uc51::inst_add_a_$ri(uchar code)
+t_uc51::inst_add_a_Sri(uchar code)
 {
   uchar data, ac;
   bool newC, newA, c6;
@@ -231,7 +231,7 @@ t_uc51::inst_rlc(uchar code)
  */
 
 int
-t_uc51::inst_addc_a_$data(uchar code)
+t_uc51::inst_addc_a_Sdata(uchar code)
 {
   uchar data, ac;
   bool orgC, newC, newA, c6;
@@ -284,7 +284,7 @@ t_uc51::inst_addc_a_addr(uchar code)
  */
 
 int
-t_uc51::inst_addc_a_$ri(uchar code)
+t_uc51::inst_addc_a_Sri(uchar code)
 {
   uchar data, ac;
   bool orgC, newC, newA, c6;
@@ -364,7 +364,7 @@ t_uc51::inst_div_ab(uchar code)
  */
 
 int
-t_uc51::inst_subb_a_$data(uchar code)
+t_uc51::inst_subb_a_Sdata(uchar code)
 {
   uchar data, ac, result, pw, c;
 
@@ -422,7 +422,7 @@ t_uc51::inst_subb_a_addr(uchar code)
  */
 
 int
-t_uc51::inst_subb_a_$ri(uchar code)
+t_uc51::inst_subb_a_Sri(uchar code)
 {
   uchar data, ac, result, pw, c;
   class cl_cell *cell;

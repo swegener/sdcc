@@ -113,7 +113,7 @@ protected:
   virtual int inst_rr(uchar code);			/* 03 */
   virtual int inst_inc_a(uchar code);			/* 04 */
   virtual int inst_inc_addr(uchar code);		/* 05 */
-  virtual int inst_inc_$ri(uchar code);			/* 06,07 */
+  virtual int inst_inc_Sri(uchar code);			/* 06,07 */
   virtual int inst_inc_rn(uchar code);			/* 08-0f */
   virtual int inst_jbc_bit_addr(uchar code);		/* 10 */
   virtual int inst_acall_addr(uchar code);		/* [13579bdf]1 */
@@ -121,101 +121,101 @@ protected:
   virtual int inst_rrc(uchar code);			/* 13 */
   virtual int inst_dec_a(uchar code);			/* 14 */
   virtual int inst_dec_addr(uchar code);		/* 15 */
-  virtual int inst_dec_$ri(uchar code);			/* 16,17 */
+  virtual int inst_dec_Sri(uchar code);			/* 16,17 */
   virtual int inst_dec_rn(uchar code);			/* 18-1f */
   virtual int inst_jb_bit_addr(uchar code);		/* 20 */
   virtual int inst_ret(uchar code);			/* 22 */
   virtual int inst_rl(uchar code);			/* 23 */
-  virtual int inst_add_a_$data(uchar code);		/* 24 */
+  virtual int inst_add_a_Sdata(uchar code);		/* 24 */
   virtual int inst_add_a_addr(uchar code);		/* 25 */
-  virtual int inst_add_a_$ri(uchar code);		/* 26,27 */
+  virtual int inst_add_a_Sri(uchar code);		/* 26,27 */
   virtual int inst_add_a_rn(uchar code);		/* 28-2f */
   virtual int inst_jnb_bit_addr(uchar code);		/* 30 */
   virtual int inst_reti(uchar code);			/* 32 */
   virtual int inst_rlc(uchar code);			/* 33 */
-  virtual int inst_addc_a_$data(uchar code);		/* 34 */
+  virtual int inst_addc_a_Sdata(uchar code);		/* 34 */
   virtual int inst_addc_a_addr(uchar code);		/* 35 */
-  virtual int inst_addc_a_$ri(uchar code);		/* 36,37 */
+  virtual int inst_addc_a_Sri(uchar code);		/* 36,37 */
   virtual int inst_addc_a_rn(uchar code);		/* 38-3f */
   virtual int inst_jc_addr(uchar code);			/* 40 */
   virtual int inst_orl_addr_a(uchar code);		/* 42 */
-  virtual int inst_orl_addr_$data(uchar code);		/* 43 */
-  virtual int inst_orl_a_$data(uchar code);		/* 44 */
+  virtual int inst_orl_addr_Sdata(uchar code);		/* 43 */
+  virtual int inst_orl_a_Sdata(uchar code);		/* 44 */
   virtual int inst_orl_a_addr(uchar code);		/* 45 */
-  virtual int inst_orl_a_$ri(uchar code);		/* 46,47 */
+  virtual int inst_orl_a_Sri(uchar code);		/* 46,47 */
   virtual int inst_orl_a_rn(uchar code);		/* 48-4f */
   virtual int inst_jnc_addr(uchar code);		/* 50 */
   virtual int inst_anl_addr_a(uchar code);		/* 52 */
-  virtual int inst_anl_addr_$data(uchar code);		/* 53 */
-  virtual int inst_anl_a_$data(uchar code);		/* 54 */
+  virtual int inst_anl_addr_Sdata(uchar code);		/* 53 */
+  virtual int inst_anl_a_Sdata(uchar code);		/* 54 */
   virtual int inst_anl_a_addr(uchar code);		/* 55 */
-  virtual int inst_anl_a_$ri(uchar code);		/* 56,57 */
+  virtual int inst_anl_a_Sri(uchar code);		/* 56,57 */
   virtual int inst_anl_a_rn(uchar code);		/* 58-5f */
   virtual int inst_jz_addr(uchar code);			/* 60 */
   virtual int inst_xrl_addr_a(uchar code);		/* 62 */
-  virtual int inst_xrl_addr_$data(uchar code);		/* 63 */
-  virtual int inst_xrl_a_$data(uchar code);		/* 64 */
+  virtual int inst_xrl_addr_Sdata(uchar code);		/* 63 */
+  virtual int inst_xrl_a_Sdata(uchar code);		/* 64 */
   virtual int inst_xrl_a_addr(uchar code);		/* 65 */
-  virtual int inst_xrl_a_$ri(uchar code);		/* 66,67 */
+  virtual int inst_xrl_a_Sri(uchar code);		/* 66,67 */
   virtual int inst_xrl_a_rn(uchar code);		/* 68-6f */
   virtual int inst_jnz_addr(uchar code);		/* 70 */
   virtual int inst_orl_c_bit(uchar code);		/* 72 */
-  virtual int inst_jmp_$a_dptr(uchar code);		/* 73 */
-  virtual int inst_mov_a_$data(uchar code);		/* 74 */
-  virtual int inst_mov_addr_$data(uchar code);		/* 75 */
-  virtual int inst_mov_$ri_$data(uchar code);		/* 76,77 */
-  virtual int inst_mov_rn_$data(uchar code);		/* 78-7f */
+  virtual int inst_jmp_Sa_dptr(uchar code);		/* 73 */
+  virtual int inst_mov_a_Sdata(uchar code);		/* 74 */
+  virtual int inst_mov_addr_Sdata(uchar code);		/* 75 */
+  virtual int inst_mov_Sri_Sdata(uchar code);		/* 76,77 */
+  virtual int inst_mov_rn_Sdata(uchar code);		/* 78-7f */
   virtual int inst_sjmp(uchar code);			/* 80 */
   virtual int inst_anl_c_bit(uchar code);		/* 82 */
-  virtual int inst_movc_a_$a_pc(uchar code);		/* 83 */
+  virtual int inst_movc_a_Sa_pc(uchar code);		/* 83 */
   virtual int inst_div_ab(uchar code);			/* 84 */
   virtual int inst_mov_addr_addr(uchar code);		/* 85 */
-  virtual int inst_mov_addr_$ri(uchar code);		/* 86,87 */
+  virtual int inst_mov_addr_Sri(uchar code);		/* 86,87 */
   virtual int inst_mov_addr_rn(uchar code);		/* 88-8f */
-  virtual int inst_mov_dptr_$data(uchar code);		/* 90 */
+  virtual int inst_mov_dptr_Sdata(uchar code);		/* 90 */
   virtual int inst_mov_bit_c(uchar code);		/* 92 */
-  virtual int inst_movc_a_$a_dptr(uchar code);		/* 93 */
-  virtual int inst_subb_a_$data(uchar code);		/* 94 */
+  virtual int inst_movc_a_Sa_dptr(uchar code);		/* 93 */
+  virtual int inst_subb_a_Sdata(uchar code);		/* 94 */
   virtual int inst_subb_a_addr(uchar code);		/* 95 */
-  virtual int inst_subb_a_$ri(uchar code);		/* 96,97 */
+  virtual int inst_subb_a_Sri(uchar code);		/* 96,97 */
   virtual int inst_subb_a_rn(uchar code);		/* 98-9f */
   virtual int inst_mov_c_bit(uchar code);		/* a2 */
   virtual int inst_inc_dptr(uchar code);		/* a3 */
   virtual int inst_mul_ab(uchar code);			/* a4 */
-  virtual int inst_mov_$ri_addr(uchar code);		/* a6,a7 */
+  virtual int inst_mov_Sri_addr(uchar code);		/* a6,a7 */
   virtual int inst_mov_rn_addr(uchar code);		/* a8-af */
-  virtual int inst_anl_c_$bit(uchar code);		/* b0 */
+  virtual int inst_anl_c_Sbit(uchar code);		/* b0 */
   virtual int inst_cpl_bit(uchar code);			/* b2 */
   virtual int inst_cpl_c(uchar code);			/* b3 */
-  virtual int inst_cjne_a_$data_addr(uchar code);	/* b4 */
+  virtual int inst_cjne_a_Sdata_addr(uchar code);	/* b4 */
   virtual int inst_cjne_a_addr_addr(uchar code);	/* b5 */
-  virtual int inst_cjne_$ri_$data_addr(uchar code);	/* b6,b7 */
-  virtual int inst_cjne_rn_$data_addr(uchar code);	/* b8-bf */
+  virtual int inst_cjne_Sri_Sdata_addr(uchar code);	/* b6,b7 */
+  virtual int inst_cjne_rn_Sdata_addr(uchar code);	/* b8-bf */
   virtual int inst_push(uchar code);			/* c0 */
   virtual int inst_clr_bit(uchar code);			/* c2 */
   virtual int inst_clr_c(uchar code);			/* c3*/
   virtual int inst_swap(uchar code);			/* c4 */
   virtual int inst_xch_a_addr(uchar code);		/* c5 */
-  virtual int inst_xch_a_$ri(uchar code);		/* c6,c7 */
+  virtual int inst_xch_a_Sri(uchar code);		/* c6,c7 */
   virtual int inst_xch_a_rn(uchar code);		/* c8-cf */
   virtual int inst_pop(uchar code);			/* d0 */
   virtual int inst_setb_bit(uchar code);		/* d2 */
   virtual int inst_setb_c(uchar code);			/* d3 */
   virtual int inst_da_a(uchar code);			/* d4 */
   virtual int inst_djnz_addr_addr(uchar code);		/* d5 */
-  virtual int inst_xchd_a_$ri(uchar code);		/* d6,d7 */
+  virtual int inst_xchd_a_Sri(uchar code);		/* d6,d7 */
   virtual int inst_djnz_rn_addr(uchar code);		/* d8-df */
-  virtual int inst_movx_a_$dptr(uchar code);		/* e0 */
-  virtual int inst_movx_a_$ri(uchar code);		/* e2,e3 */
+  virtual int inst_movx_a_Sdptr(uchar code);		/* e0 */
+  virtual int inst_movx_a_Sri(uchar code);		/* e2,e3 */
   virtual int inst_clr_a(uchar code);			/* e4 */
   virtual int inst_mov_a_addr(uchar code);		/* e5 */
-  virtual int inst_mov_a_$ri(uchar code);		/* e6,e7 */
+  virtual int inst_mov_a_Sri(uchar code);		/* e6,e7 */
   virtual int inst_mov_a_rn(uchar code);		/* e8-ef */
-  virtual int inst_movx_$dptr_a(uchar code);		/* f0 */
-  virtual int inst_movx_$ri_a(uchar code);		/* f2,f3 */
+  virtual int inst_movx_Sdptr_a(uchar code);		/* f0 */
+  virtual int inst_movx_Sri_a(uchar code);		/* f2,f3 */
   virtual int inst_cpl_a(uchar code);			/* f4 */
   virtual int inst_mov_addr_a(uchar code);		/* f5 */
-  virtual int inst_mov_$ri_a(uchar code);		/* f6,f7 */
+  virtual int inst_mov_Sri_a(uchar code);		/* f6,f7 */
   virtual int inst_mov_rn_a(uchar code);		/* f8-ff */
 };
 

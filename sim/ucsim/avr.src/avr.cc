@@ -454,26 +454,26 @@ cl_avr::exec_inst(void)
 	  switch (code & 0xfe0f)
 	    {
 	    case 0x9000: return(lds_Rd_k(code));
-	    case 0x9001: return(ld_Rd_Z$(code));
-	    case 0x9002: return(ld_Rd_$Z(code));
+	    case 0x9001: return(ld_Rd_ZS(code));
+	    case 0x9002: return(ld_Rd_SZ(code));
 	    case 0x9004: return(lpm_Rd_Z(code));
-	    case 0x9005: return(lpm_Rd_Z$(code));
+	    case 0x9005: return(lpm_Rd_ZS(code));
 	    case 0x9006: return(elpm_Rd_Z(code));
-	    case 0x9007: return(elpm_Rd_Z$(code));
-	    case 0x9009: return(ld_Rd_Y$(code));
-	    case 0x900a: return(ld_Rd_$Y(code));
+	    case 0x9007: return(elpm_Rd_ZS(code));
+	    case 0x9009: return(ld_Rd_YS(code));
+	    case 0x900a: return(ld_Rd_SY(code));
 	    case 0x900c: return(ld_Rd_X(code));
-	    case 0x900d: return(ld_Rd_X$(code));
-	    case 0x900e: return(ld_Rd_$X(code));
+	    case 0x900d: return(ld_Rd_XS(code));
+	    case 0x900e: return(ld_Rd_SX(code));
 	    case 0x900f: return(pop_Rd(code));
 	    case 0x9200: return(sts_k_Rr(code));
-	    case 0x9201: return(st_Z$_Rr(code));
-	    case 0x9202: return(st_$Z_Rr(code));
-	    case 0x9209: return(st_Y$_Rr(code));
-	    case 0x920a: return(st_$Y_Rr(code));
+	    case 0x9201: return(st_ZS_Rr(code));
+	    case 0x9202: return(st_SZ_Rr(code));
+	    case 0x9209: return(st_YS_Rr(code));
+	    case 0x920a: return(st_SY_Rr(code));
 	    case 0x920c: return(st_X_Rr(code));
-	    case 0x920d: return(st_X$_Rr(code));
-	    case 0x920e: return(st_$X_Rr(code));
+	    case 0x920d: return(st_XS_Rr(code));
+	    case 0x920e: return(st_SX_Rr(code));
 	    case 0x920f: return(push_Rr(code));
 	    }
 	case 0x9400:

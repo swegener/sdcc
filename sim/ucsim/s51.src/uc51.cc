@@ -628,7 +628,7 @@ t_uc51::exec_inst(void)
     case 0x03: res= inst_rr(code); break;
     case 0x04: res= inst_inc_a(code); break;
     case 0x05: res= inst_inc_addr(code); break;
-    case 0x06: case 0x07: res= inst_inc_$ri(code); break;
+    case 0x06: case 0x07: res= inst_inc_Sri(code); break;
     case 0x08: case 0x09: case 0x0a: case 0x0b:
     case 0x0c: case 0x0d: case 0x0e: case 0x0f: res= inst_inc_rn(code); break;
     case 0x10: res= inst_jbc_bit_addr(code); break;
@@ -638,94 +638,94 @@ t_uc51::exec_inst(void)
     case 0x13: res= inst_rrc(code); break;
     case 0x14: res= inst_dec_a(code); break;
     case 0x15: res= inst_dec_addr(code); break;
-    case 0x16: case 0x17: res= inst_dec_$ri(code); break;
+    case 0x16: case 0x17: res= inst_dec_Sri(code); break;
     case 0x18: case 0x19: case 0x1a: case 0x1b:
     case 0x1c: case 0x1d: case 0x1e: case 0x1f: res= inst_dec_rn(code); break;
     case 0x20: res= inst_jb_bit_addr(code); break;
     case 0x22: res= inst_ret(code); break;
     case 0x23: res= inst_rl(code); break;
-    case 0x24: res= inst_add_a_$data(code); break;
+    case 0x24: res= inst_add_a_Sdata(code); break;
     case 0x25: res= inst_add_a_addr(code); break;
-    case 0x26: case 0x27: res= inst_add_a_$ri(code); break;
+    case 0x26: case 0x27: res= inst_add_a_Sri(code); break;
     case 0x28: case 0x29: case 0x2a: case 0x2b:
     case 0x2c: case 0x2d: case 0x2e: case 0x2f:res= inst_add_a_rn(code);break;
     case 0x30: res= inst_jnb_bit_addr(code); break;
     case 0x32: res= inst_reti(code); break;
     case 0x33: res= inst_rlc(code); break;
-    case 0x34: res= inst_addc_a_$data(code); break;
+    case 0x34: res= inst_addc_a_Sdata(code); break;
     case 0x35: res= inst_addc_a_addr(code); break;
-    case 0x36: case 0x37: res= inst_addc_a_$ri(code); break;
+    case 0x36: case 0x37: res= inst_addc_a_Sri(code); break;
     case 0x38: case 0x39: case 0x3a: case 0x3b:
     case 0x3c: case 0x3d: case 0x3e: case 0x3f:res= inst_addc_a_rn(code);break;
     case 0x40: res= inst_jc_addr(code); break;
     case 0x42: res= inst_orl_addr_a(code); break;
-    case 0x43: res= inst_orl_addr_$data(code); break;
-    case 0x44: res= inst_orl_a_$data(code); break;
+    case 0x43: res= inst_orl_addr_Sdata(code); break;
+    case 0x44: res= inst_orl_a_Sdata(code); break;
     case 0x45: res= inst_orl_a_addr(code); break;
-    case 0x46: case 0x47: res= inst_orl_a_$ri(code); break;
+    case 0x46: case 0x47: res= inst_orl_a_Sri(code); break;
     case 0x48: case 0x49: case 0x4a: case 0x4b:
     case 0x4c: case 0x4d: case 0x4e: case 0x4f: res= inst_orl_a_rn(code);break;
     case 0x50: res= inst_jnc_addr(code); break;
     case 0x52: res= inst_anl_addr_a(code); break;
-    case 0x53: res= inst_anl_addr_$data(code); break;
-    case 0x54: res= inst_anl_a_$data(code); break;
+    case 0x53: res= inst_anl_addr_Sdata(code); break;
+    case 0x54: res= inst_anl_a_Sdata(code); break;
     case 0x55: res= inst_anl_a_addr(code); break;
-    case 0x56: case 0x57: res= inst_anl_a_$ri(code); break;
+    case 0x56: case 0x57: res= inst_anl_a_Sri(code); break;
     case 0x58: case 0x59: case 0x5a: case 0x5b:
     case 0x5c: case 0x5d: case 0x5e: case 0x5f: res= inst_anl_a_rn(code);break;
     case 0x60: res= inst_jz_addr(code); break;
     case 0x62: res= inst_xrl_addr_a(code); break;
-    case 0x63: res= inst_xrl_addr_$data(code); break;
-    case 0x64: res= inst_xrl_a_$data(code); break;
+    case 0x63: res= inst_xrl_addr_Sdata(code); break;
+    case 0x64: res= inst_xrl_a_Sdata(code); break;
     case 0x65: res= inst_xrl_a_addr(code); break;
-    case 0x66: case 0x67: res= inst_xrl_a_$ri(code); break;
+    case 0x66: case 0x67: res= inst_xrl_a_Sri(code); break;
     case 0x68: case 0x69: case 0x6a: case 0x6b:
     case 0x6c: case 0x6d: case 0x6e: case 0x6f: res= inst_xrl_a_rn(code);break;
     case 0x70: res= inst_jnz_addr(code); break;
     case 0x72: res= inst_orl_c_bit(code); break;
-    case 0x73: res= inst_jmp_$a_dptr(code); break;
-    case 0x74: res= inst_mov_a_$data(code); break;
-    case 0x75: res= inst_mov_addr_$data(code); break;
-    case 0x76: case 0x77: res= inst_mov_$ri_$data(code); break;
+    case 0x73: res= inst_jmp_Sa_dptr(code); break;
+    case 0x74: res= inst_mov_a_Sdata(code); break;
+    case 0x75: res= inst_mov_addr_Sdata(code); break;
+    case 0x76: case 0x77: res= inst_mov_Sri_Sdata(code); break;
     case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c:
-    case 0x7d: case 0x7e: case 0x7f: res=inst_mov_rn_$data(code); break;
+    case 0x7d: case 0x7e: case 0x7f: res=inst_mov_rn_Sdata(code); break;
     case 0x80: res= inst_sjmp(code); break;
     case 0x82: res= inst_anl_c_bit(code); break;
-    case 0x83: res= inst_movc_a_$a_pc(code); break;
+    case 0x83: res= inst_movc_a_Sa_pc(code); break;
     case 0x84: res= inst_div_ab(code); break;
     case 0x85: res= inst_mov_addr_addr(code); break;
-    case 0x86: case 0x87: res= inst_mov_addr_$ri(code); break;
+    case 0x86: case 0x87: res= inst_mov_addr_Sri(code); break;
     case 0x88: case 0x89: case 0x8a: case 0x8b:
     case 0x8c: case 0x8d: case 0x8e: case 0x8f:res=inst_mov_addr_rn(code);break;
-    case 0x90: res= inst_mov_dptr_$data(code); break;
+    case 0x90: res= inst_mov_dptr_Sdata(code); break;
     case 0x92: res= inst_mov_bit_c(code); break;
-    case 0x93: res= inst_movc_a_$a_dptr(code); break;
-    case 0x94: res= inst_subb_a_$data(code); break;
+    case 0x93: res= inst_movc_a_Sa_dptr(code); break;
+    case 0x94: res= inst_subb_a_Sdata(code); break;
     case 0x95: res= inst_subb_a_addr(code); break;
-    case 0x96: case 0x97: res= inst_subb_a_$ri(code); break;
+    case 0x96: case 0x97: res= inst_subb_a_Sri(code); break;
     case 0x98: case 0x99: case 0x9a: case 0x9b:
     case 0x9c: case 0x9d: case 0x9e: case 0x9f:res= inst_subb_a_rn(code);break;
     case 0xa2: res= inst_mov_c_bit(code); break;
     case 0xa3: res= inst_inc_dptr(code); break;
     case 0xa4: res= inst_mul_ab(code); break;
     case 0xa5: res= inst_unknown(code); break;
-    case 0xa6: case 0xa7: res= inst_mov_$ri_addr(code); break;
+    case 0xa6: case 0xa7: res= inst_mov_Sri_addr(code); break;
     case 0xa8: case 0xa9: case 0xaa: case 0xab:
     case 0xac: case 0xad: case 0xae: case 0xaf:res=inst_mov_rn_addr(code);break;
-    case 0xb0: res= inst_anl_c_$bit(code); break;
+    case 0xb0: res= inst_anl_c_Sbit(code); break;
     case 0xb2: res= inst_cpl_bit(code); break;
     case 0xb3: res= inst_cpl_c(code); break;
-    case 0xb4: res= inst_cjne_a_$data_addr(code); break;
+    case 0xb4: res= inst_cjne_a_Sdata_addr(code); break;
     case 0xb5: res= inst_cjne_a_addr_addr(code); break;
-    case 0xb6: case 0xb7: res= inst_cjne_$ri_$data_addr(code); break;
+    case 0xb6: case 0xb7: res= inst_cjne_Sri_Sdata_addr(code); break;
     case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc:
-    case 0xbd: case 0xbe: case 0xbf: res=inst_cjne_rn_$data_addr(code); break;
+    case 0xbd: case 0xbe: case 0xbf: res=inst_cjne_rn_Sdata_addr(code); break;
     case 0xc0: res= inst_push(code); break;
     case 0xc2: res= inst_clr_bit(code); break;
     case 0xc3: res= inst_clr_c(code); break;
     case 0xc4: res= inst_swap(code); break;
     case 0xc5: res= inst_xch_a_addr(code); break;
-    case 0xc6: case 0xc7: res= inst_xch_a_$ri(code); break;
+    case 0xc6: case 0xc7: res= inst_xch_a_Sri(code); break;
     case 0xc8: case 0xc9: case 0xca: case 0xcb:
     case 0xcc: case 0xcd: case 0xce: case 0xcf: res= inst_xch_a_rn(code);break;
     case 0xd0: res= inst_pop(code); break;
@@ -733,21 +733,21 @@ t_uc51::exec_inst(void)
     case 0xd3: res= inst_setb_c(code); break;
     case 0xd4: res= inst_da_a(code); break;
     case 0xd5: res= inst_djnz_addr_addr(code); break;
-    case 0xd6: case 0xd7: res= inst_xchd_a_$ri(code); break;
+    case 0xd6: case 0xd7: res= inst_xchd_a_Sri(code); break;
     case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc:
     case 0xdd: case 0xde: case 0xdf: res=inst_djnz_rn_addr(code); break;
-    case 0xe0: res= inst_movx_a_$dptr(code); break;
-    case 0xe2: case 0xe3: res= inst_movx_a_$ri(code); break;
+    case 0xe0: res= inst_movx_a_Sdptr(code); break;
+    case 0xe2: case 0xe3: res= inst_movx_a_Sri(code); break;
     case 0xe4: res= inst_clr_a(code); break;
     case 0xe5: res= inst_mov_a_addr(code); break;
-    case 0xe6: case 0xe7: res= inst_mov_a_$ri(code); break;
+    case 0xe6: case 0xe7: res= inst_mov_a_Sri(code); break;
     case 0xe8: case 0xe9: case 0xea: case 0xeb:
     case 0xec: case 0xed: case 0xee: case 0xef: res= inst_mov_a_rn(code);break;
-    case 0xf0: res= inst_movx_$dptr_a(code); break;
-    case 0xf2: case 0xf3: res= inst_movx_$ri_a(code); break;
+    case 0xf0: res= inst_movx_Sdptr_a(code); break;
+    case 0xf2: case 0xf3: res= inst_movx_Sri_a(code); break;
     case 0xf4: res= inst_cpl_a(code); break;
     case 0xf5: res= inst_mov_addr_a(code); break;
-    case 0xf6: case 0xf7: res= inst_mov_$ri_a(code); break;
+    case 0xf6: case 0xf7: res= inst_mov_Sri_a(code); break;
     case 0xf8: case 0xf9: case 0xfa: case 0xfb:
     case 0xfc: case 0xfd: case 0xfe: case 0xff: res= inst_mov_rn_a(code);break;
     default:

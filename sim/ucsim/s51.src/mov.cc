@@ -49,7 +49,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  */
 
 int
-t_uc51::inst_mov_a_$data(uchar code)
+t_uc51::inst_mov_a_Sdata(uchar code)
 {
   acc->write(fetch());
   return(resGO);
@@ -63,7 +63,7 @@ t_uc51::inst_mov_a_$data(uchar code)
  */
 
 int
-t_uc51::inst_mov_addr_$data(uchar code)
+t_uc51::inst_mov_addr_Sdata(uchar code)
 {
   class cl_cell *cell;
 
@@ -81,7 +81,7 @@ t_uc51::inst_mov_addr_$data(uchar code)
  */
 
 int
-t_uc51::inst_mov_$ri_$data(uchar code)
+t_uc51::inst_mov_Sri_Sdata(uchar code)
 {
   class cl_cell *cell;
   
@@ -99,7 +99,7 @@ t_uc51::inst_mov_$ri_$data(uchar code)
  */
 
 int
-t_uc51::inst_mov_rn_$data(uchar code)
+t_uc51::inst_mov_rn_Sdata(uchar code)
 {
   class cl_cell *reg;
 
@@ -116,7 +116,7 @@ t_uc51::inst_mov_rn_$data(uchar code)
  */
 
 int
-t_uc51::inst_movc_a_$a_pc(uchar code)
+t_uc51::inst_movc_a_Sa_pc(uchar code)
 {
   acc->write(mem(MEM_ROM)->read(PC + acc->read()));
   tick(1);
@@ -151,7 +151,7 @@ t_uc51::inst_mov_addr_addr(uchar code)
  */
 
 int
-t_uc51::inst_mov_addr_$ri(uchar code)
+t_uc51::inst_mov_addr_Sri(uchar code)
 {
   class cl_cell *d, *s;
 
@@ -188,7 +188,7 @@ t_uc51::inst_mov_addr_rn(uchar code)
  */
 
 int
-t_uc51::inst_mov_dptr_$data(uchar code)
+t_uc51::inst_mov_dptr_Sdata(uchar code)
 {
   sfr->write(DPH, fetch());
   sfr->write(DPL, fetch());
@@ -204,7 +204,7 @@ t_uc51::inst_mov_dptr_$data(uchar code)
  */
 
 int
-t_uc51::inst_movc_a_$a_dptr(uchar code)
+t_uc51::inst_movc_a_Sa_dptr(uchar code)
 {
   acc->write(get_mem(MEM_ROM,
 		     sfr->read(DPH)*256+sfr->read(DPL) +
@@ -221,7 +221,7 @@ t_uc51::inst_movc_a_$a_dptr(uchar code)
  */
 
 int
-t_uc51::inst_mov_$ri_addr(uchar code)
+t_uc51::inst_mov_Sri_addr(uchar code)
 {
   class cl_cell *d, *s;
 
@@ -300,7 +300,7 @@ t_uc51::inst_xch_a_addr(uchar code)
  */
 
 int
-t_uc51::inst_xch_a_$ri(uchar code)
+t_uc51::inst_xch_a_Sri(uchar code)
 {
   t_mem temp;
   class cl_cell *cell;
@@ -361,7 +361,7 @@ t_uc51::inst_pop(uchar code)
  */
 
 int
-t_uc51::inst_xchd_a_$ri(uchar code)
+t_uc51::inst_xchd_a_Sri(uchar code)
 {
   t_mem temp, d;
   class cl_cell *cell;
@@ -381,7 +381,7 @@ t_uc51::inst_xchd_a_$ri(uchar code)
  */
 
 int
-t_uc51::inst_movx_a_$dptr(uchar code)
+t_uc51::inst_movx_a_Sdptr(uchar code)
 {
   acc->write(read_mem(MEM_XRAM,
 		      sfr->read(DPH)*256 + sfr->read(DPL)));
@@ -397,7 +397,7 @@ t_uc51::inst_movx_a_$dptr(uchar code)
  */
 
 int
-t_uc51::inst_movx_a_$ri(uchar code)
+t_uc51::inst_movx_a_Sri(uchar code)
 {
   t_mem d;
 
@@ -432,7 +432,7 @@ t_uc51::inst_mov_a_addr(uchar code)
  */
 
 int
-t_uc51::inst_mov_a_$ri(uchar code)
+t_uc51::inst_mov_a_Sri(uchar code)
 {
   class cl_cell *cell;
 
@@ -463,7 +463,7 @@ t_uc51::inst_mov_a_rn(uchar code)
  */
 
 int
-t_uc51::inst_movx_$dptr_a(uchar code)
+t_uc51::inst_movx_Sdptr_a(uchar code)
 {
   write_mem(MEM_XRAM, sfr->read(DPH)*256 + sfr->read(DPL), acc->read());
   tick(1);
@@ -478,7 +478,7 @@ t_uc51::inst_movx_$dptr_a(uchar code)
  */
 
 int
-t_uc51::inst_movx_$ri_a(uchar code)
+t_uc51::inst_movx_Sri_a(uchar code)
 {
   t_mem d;
 
@@ -513,7 +513,7 @@ t_uc51::inst_mov_addr_a(uchar code)
  */
 
 int
-t_uc51::inst_mov_$ri_a(uchar code)
+t_uc51::inst_mov_Sri_a(uchar code)
 {
   class cl_cell *cell;
 

@@ -126,7 +126,7 @@ t_uc51::inst_mov_c_bit(uchar code)
  */
 
 int
-t_uc51::inst_anl_c_$bit(uchar code)
+t_uc51::inst_anl_c_Sbit(uchar code)
 {
   t_mem m;
   t_addr a;

@@ -59,7 +59,7 @@ t_uc51::inst_orl_addr_a(uchar code)
  */
 
 int
-t_uc51::inst_orl_addr_$data(uchar code)
+t_uc51::inst_orl_addr_Sdata(uchar code)
 {
   class cl_cell *cell;
   int res= resGO;
@@ -79,7 +79,7 @@ t_uc51::inst_orl_addr_$data(uchar code)
  */
 
 int
-t_uc51::inst_orl_a_$data(uchar code)
+t_uc51::inst_orl_a_Sdata(uchar code)
 {
   uchar d;
 
@@ -115,7 +115,7 @@ t_uc51::inst_orl_a_addr(uchar code)
  */
 
 int
-t_uc51::inst_orl_a_$ri(uchar code)
+t_uc51::inst_orl_a_Sri(uchar code)
 {
   t_mem d;
   class cl_cell *cell;
@@ -168,7 +168,7 @@ t_uc51::inst_anl_addr_a(uchar code)
  */
 
 int
-t_uc51::inst_anl_addr_$data(uchar code)
+t_uc51::inst_anl_addr_Sdata(uchar code)
 {
   class cl_cell *cell;
   t_mem d;
@@ -188,7 +188,7 @@ t_uc51::inst_anl_addr_$data(uchar code)
  */
 
 int
-t_uc51::inst_anl_a_$data(uchar code)
+t_uc51::inst_anl_a_Sdata(uchar code)
 {
   uchar d;
 
@@ -224,7 +224,7 @@ t_uc51::inst_anl_a_addr(uchar code)
  */
 
 int
-t_uc51::inst_anl_a_$ri(uchar code)
+t_uc51::inst_anl_a_Sri(uchar code)
 {
   t_mem d;
   class cl_cell *cell;
@@ -277,7 +277,7 @@ t_uc51::inst_xrl_addr_a(uchar code)
  */
 
 int
-t_uc51::inst_xrl_addr_$data(uchar code)
+t_uc51::inst_xrl_addr_Sdata(uchar code)
 {
   class cl_cell *cell;
 
@@ -295,7 +295,7 @@ t_uc51::inst_xrl_addr_$data(uchar code)
  */
 
 int
-t_uc51::inst_xrl_a_$data(uchar code)
+t_uc51::inst_xrl_a_Sdata(uchar code)
 {
   uchar d;
 
@@ -331,7 +331,7 @@ t_uc51::inst_xrl_a_addr(uchar code)
  */
 
 int
-t_uc51::inst_xrl_a_$ri(uchar code)
+t_uc51::inst_xrl_a_Sri(uchar code)
 {
   t_mem d;
   class cl_cell *cell;

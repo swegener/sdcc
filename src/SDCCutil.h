@@ -28,9 +28,6 @@
 #include "SDCChasht.h"
 #include <stdarg.h>
 
-/* PENDING: Hacks as I can't work autoconf */
-#define BINDIR	PREFIX "/bin"
-
 /** Given an array of name, value string pairs creates a new hash
     containing all of the pairs.
 */

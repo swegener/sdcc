@@ -16,29 +16,20 @@
  * Define host port dependant constants etc.
  */
 
-#define DOS_DIR_SEPARATOR_CHAR	    '\\'
-#define DOS_DIR_SEPARATOR_STRING   "\\"
 #define UNIX_DIR_SEPARATOR_CHAR    '/'
-#define UNIX_DIR_SEPARATOR_STRING  "/"
 
 #ifdef _WIN32       /* WIN32 native */
 
-#define NATIVE_WIN32 		1
-#ifdef __MINGW32__  /* GCC MINGW32 depends on configure */
-#include "sdccconf.h"
-#else
-#include "sdcc_vc.h"
-#define PATH_MAX                _MAX_PATH
-#endif
-#define DIR_SEPARATOR_CHAR	DOS_DIR_SEPARATOR_CHAR
-#define DIR_SEPARATOR_STRING	DOS_DIR_SEPARATOR_STRING
+#  define NATIVE_WIN32 		1
+#  ifdef __MINGW32__  /* GCC MINGW32 depends on configure */
+#    include "sdccconf.h"
+#  else
+#    include "sdcc_vc.h"
+#    define PATH_MAX  _MAX_PATH
+#  endif
 
 #else               /* Assume Un*x style system */
-
-#include "sdccconf.h"
-#define DIR_SEPARATOR_CHAR	    UNIX_DIR_SEPARATOR_CHAR
-#define DIR_SEPARATOR_STRING	    UNIX_DIR_SEPARATOR_STRING
-
+#  include "sdccconf.h"
 #endif
 
 #include "SDCCerr.h"
@@ -48,18 +39,18 @@
 
 #include <limits.h>		/* PATH_MAX		     */
 #ifndef PATH_MAX		/* POSIX, but not required   */
-#define PATH_MAX 255		/* define a reasonable value */
+#  define PATH_MAX 255		/* define a reasonable value */
 #endif
 
 #define  MAX_REG_PARMS  1
 typedef int bool;
 
 #ifndef max
-#define max(a,b) (a > b ? a : b)
+#  define max(a,b) (a > b ? a : b)
 #endif
 
 #ifndef min
-#define min(a,b) (a < b ? a : b)
+#  define min(a,b) (a < b ? a : b)
 #endif
 
 #ifndef THROWS

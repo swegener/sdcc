@@ -11,17 +11,20 @@
 #define __FUNCTION__  __FILE__
 #endif
 
-#undef PREFIX
-#undef DATADIR
-#undef SRCDIR
+#define DIR_SEPARATOR_STRING "\\"
+#define DIR_SEPARATOR_CHAR   '\\'
 
 #define PREFIX                "\\sdcc"
+#define EXEC_PREFIX           "\\sdcc"
+#define BIN_PREFIX            "\\sdcc\\bin"
 #define DATADIR               "\\sdcc"
 
-#define BIN_DIR_SUFFIX        "bin"
-#define SEARCH_SUFFIX         ""
-#define INCLUDE_DIR_SUFFIX    "include"
-#define LIB_DIR_SUFFIX        "lib"
+#define INCLUDE_DIR_SUFFIX    "\\include"
+#define LIB_DIR_SUFFIX        "\\lib"
+
+#define BIN2DATA_DIR          "\\.."
+#define PREFIX2BIN_DIR        "\\bin"
+#define PREFIX2DATA_DIR       ""
 
 // Obsolete:
 #define SDCC_INCLUDE_DIR      "\\sdcc\\include"

@@ -57,7 +57,7 @@ AC_CHECK_PROG(LATEX2HTML, latex2html, latex2html, :)
 AC_CHECK_PROG(PDFLATEX,   pdflatex,   pdflatex, :)
 AC_CHECK_PROG(DVIPDF,     dvipdf,     dvipdf, :)
 
-AC_DEFUN(SDCC_REQUIRE_PROG, 
+AC_DEFUN(SDCC_REQUIRE_PROG,
 [if test "$1" = ":"; then
   AC_MSG_ERROR([Cannot find required program $2.])
  fi
@@ -102,25 +102,202 @@ fi
 rm -f _test_.* a.out)
 ])
 
-# This macro _AC_DEFINEs VARNAME to the expansion of the DIR variable,
-# taking care of fixing up ${prefix} and such.
+# This macro expands DIR and assigns it to RET.
+# If DIR is NONE, then it's replaced by DEFAULT.
 #
-# Note that the 3 argument form is only supported with autoconf 2.13
-# and later (i.e. only where _AC_DEFINE supports 3 arguments).
+# Based on AC_DEFINE_DIR
 #
 # Examples:
 #
-#  AC_DEFINE_DIR(DATADIR, datadir)
-#  AC_DEFINE_DIR(PROG_PATH, bindir, [Location of installed binaries])
+#  AC_EXPAND(prefix, "/usr/local", expanded_prefix)
 
-AC_DEFUN([AC_DEFINE_DIR], [
+AC_DEFUN([AC_EXPAND], [
   test "x$prefix" = xNONE && prefix="$ac_default_prefix"
   test "x$exec_prefix" = xNONE && exec_prefix='${prefix}'
-  ac_define_dir=`eval echo [$]$2`
-  ac_define_dir=`eval echo [$]ac_define_dir`
-  ifelse($3, ,
-    AC_DEFINE_UNQUOTED($1, "$ac_define_dir"),
-    AC_DEFINE_UNQUOTED($1, "$ac_define_dir", $3))
+  ac_expand=[$]$1
+  test "x$ac_expand" = xNONE && ac_expand="[$]$2"
+  ac_expand=`eval echo [$]ac_expand`
+  $3=`eval echo [$]ac_expand`
+])
+
+# adl_NORMALIZE_PATH
+#
+#  - empty paths are changed to '.'
+#  - trailing slashes are removed
+#  - repeated slashes are squeezed except a leading doubled slash '//'
+#    (which might indicate a networked disk on some OS).
+#
+#
+# REFERENCE_STRING is used to turn '/' into '\' and vice-versa: if
+# REFERENCE_STRING contains some backslashes, all slashes and backslashes
+# are turned into backslashes, otherwise they are all turned into slashes.
+#
+# This makes processing of DOS filenames quite easier, because you can turn a
+# filename to the Unix notation, make your processing, and turn it back to
+# original notation.
+
+dnl Available from the GNU Autoconf Macro Archive at:
+dnl http://www.gnu.org/software/ac-archive/htmldoc/normpath.html
+dnl
+AC_DEFUN([adl_NORMALIZE_PATH],
+[case ":[$]$1:" in
+# change empty paths to '.'
+  ::) $1='.' ;;
+# strip trailing slashes
+  :*[[\\/]]:) $1=`echo "[$]$1" | sed 's,[[\\/]]*[$],,'` ;;
+  :*:) ;;
+esac
+# squeze repeated slashes
+case ifelse($2,,"[$]$1",$2) in
+# if the path contains any backslashes, turn slashes into backslashes
+
+# Bernhard Held 2003-04-06
+# This was the original line. It doesn't:
+# - convert the first slash
+# - replace a slash with a double-backslash
+# *\\*) $1=`echo "[$]$1" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
+ *\\*) $1=`echo "[$]$1" | sed 's,[[\\/]][[\\/]]*,\1\\\\\\\\,g'` ;;
+
+# if the path contains slashes, also turn backslashes into slashes
+ *) $1=`echo "[$]$1" | sed 's,\(.\)[[\\/]][[\\/]]*,\1/,g'` ;;
+esac])
+
+
+# adl_COMPUTE_RELATIVE_PATH
+#
+# PATH_LIST is a space-separated list of colon-separated triplets of the form
+# 'FROM:TO:RESULT'. This function iterates over these triplets and set $RESULT
+# to the relative path from $FROM to $TO. Note that $FROM and $TO needs to be
+# absolute filenames for this macro to success.
+
+AC_DEFUN([adl_COMPUTE_RELATIVE_PATHS],
+[for _lcl_i in $1; do
+  _lcl_from=\[$]`echo "[$]_lcl_i" | sed 's,:.*$,,'`
+  _lcl_to=\[$]`echo "[$]_lcl_i" | sed 's,^[[^:]]*:,,' | sed 's,:[[^:]]*$,,'`
+  _lcl_result_var=`echo "[$]_lcl_i" | sed 's,^.*:,,'`
+  adl_RECURSIVE_EVAL([[$]_lcl_from], [_lcl_from])
+  adl_RECURSIVE_EVAL([[$]_lcl_to], [_lcl_to])
+  _lcl_notation="$_lcl_from$_lcl_to"
+  adl_NORMALIZE_PATH([_lcl_from],['/'])
+  adl_NORMALIZE_PATH([_lcl_to],['/'])
+  adl_COMPUTE_RELATIVE_PATH([_lcl_from], [_lcl_to], [_lcl_result_tmp])
+  adl_NORMALIZE_PATH([_lcl_result_tmp],["[$]_lcl_notation"])
+  eval $_lcl_result_var='[$]_lcl_result_tmp'
+done])
+
+## Note:
+## *****
+## The following helper macros are too fragile to be used out
+## of adl_COMPUTE_RELATIVE_PATHS (mainly because they assume that
+## paths are normalized), that's why I'm keeping them in the same file.
+## Still, some of them maybe worth to reuse.
+
+dnl adl_COMPUTE_RELATIVE_PATH(FROM, TO, RESULT)
+dnl ===========================================
+dnl Compute the relative path to go from $FROM to $TO and set the value
+dnl of $RESULT to that value.  This function work on raw filenames
+dnl (for instead it will considerate /usr//local and /usr/local as
+dnl two distinct paths), you should really use adl_COMPUTE_REALTIVE_PATHS
+dnl instead to have the paths sanitized automatically.
+dnl
+dnl For instance:
+dnl    first_dir=/somewhere/on/my/disk/bin
+dnl    second_dir=/somewhere/on/another/disk/share
+dnl    adl_COMPUTE_RELATIVE_PATH(first_dir, second_dir, first_to_second)
+dnl will set $first_to_second to '../../../another/disk/share'.
+AC_DEFUN([adl_COMPUTE_RELATIVE_PATH],
+[adl_COMPUTE_COMMON_PATH([$1], [$2], [_lcl_common_prefix])
+adl_COMPUTE_BACK_PATH([$1], [_lcl_common_prefix], [_lcl_first_rel])
+adl_COMPUTE_SUFFIX_PATH([$2], [_lcl_common_prefix], [_lcl_second_suffix])
+$3="[$]_lcl_first_rel[$]_lcl_second_suffix"])
+
+dnl adl_COMPUTE_COMMON_PATH(LEFT, RIGHT, RESULT)
+dnl ============================================
+dnl Compute the common path to $LEFT and $RIGHT and set the result to $RESULT.
+dnl
+dnl For instance:
+dnl    first_path=/somewhere/on/my/disk/bin
+dnl    second_path=/somewhere/on/another/disk/share
+dnl    adl_COMPUTE_COMMON_PATH(first_path, second_path, common_path)
+dnl will set $common_path to '/somewhere/on'.
+AC_DEFUN([adl_COMPUTE_COMMON_PATH],
+[$3=''
+_lcl_second_prefix_match=''
+while test "[$]_lcl_second_prefix_match" != 0; do
+  _lcl_first_prefix=`expr "x[$]$1" : "x\([$]$3/*[[^/]]*\)"`
+  _lcl_second_prefix_match=`expr "x[$]$2" : "x[$]_lcl_first_prefix"`
+  if test "[$]_lcl_second_prefix_match" != 0; then
+    if test "[$]_lcl_first_prefix" != "[$]$3"; then
+      $3="[$]_lcl_first_prefix"
+    else
+      _lcl_second_prefix_match=0
+    fi
+  fi
+done])
+
+dnl adl_COMPUTE_SUFFIX_PATH(PATH, SUBPATH, RESULT)
+dnl ==============================================
+dnl Substrack $SUBPATH from $PATH, and set the resulting suffix
+dnl (or the empty string if $SUBPATH is not a subpath of $PATH)
+dnl to $RESULT.
+dnl
+dnl For instace:
+dnl    first_path=/somewhere/on/my/disk/bin
+dnl    second_path=/somewhere/on
+dnl    adl_COMPUTE_SUFFIX_PATH(first_path, second_path, common_path)
+dnl will set $common_path to '/my/disk/bin'.
+AC_DEFUN([adl_COMPUTE_SUFFIX_PATH],
+[$3=`expr "x[$]$1" : "x[$]$2/*\(.*\)"`])
+
+dnl adl_COMPUTE_BACK_PATH(PATH, SUBPATH, RESULT)
+dnl ============================================
+dnl Compute the relative path to go from $PATH to $SUBPATH, knowing that
+dnl $SUBPATH is a subpath of $PATH (any other words, only repeated '../'
+dnl should be needed to move from $PATH to $SUBPATH) and set the value
+dnl of $RESULT to that value.  If $SUBPATH is not a subpath of PATH,
+dnl set $RESULT to the empty string.
+dnl
+dnl For instance:
+dnl    first_path=/somewhere/on/my/disk/bin
+dnl    second_path=/somewhere/on
+dnl    adl_COMPUTE_BACK_PATH(first_path, second_path, back_path)
+dnl will set $back_path to '../../../'.
+AC_DEFUN([adl_COMPUTE_BACK_PATH],
+[adl_COMPUTE_SUFFIX_PATH([$1], [$2], [_lcl_first_suffix])
+$3=''
+_lcl_tmp='xxx'
+while test "[$]_lcl_tmp" != ''; do
+  _lcl_tmp=`expr "x[$]_lcl_first_suffix" : "x[[^/]]*/*\(.*\)"`
+  if test "[$]_lcl_first_suffix" != ''; then
+     _lcl_first_suffix="[$]_lcl_tmp"
+     $3="../[$]$3"
+  fi
+done])
+
+
+dnl adl_RECURSIVE_EVAL(VALUE, RESULT)
+dnl =================================
+dnl Interpolate the VALUE in loop until it doesn't change,
+dnl and set the result to $RESULT.
+dnl WARNING: It's easy to get an infinite loop with some unsane input.
+AC_DEFUN([adl_RECURSIVE_EVAL],
+[_lcl_receval="$1"
+$2=`(test "x$prefix" = xNONE && prefix="$ac_default_prefix"
+     test "x$exec_prefix" = xNONE && exec_prefix="${prefix}"
+     _lcl_receval_old=''
+     while test "[$]_lcl_receval_old" != "[$]_lcl_receval"; do
+       _lcl_receval_old="[$]_lcl_receval"
+       eval _lcl_receval="\"[$]_lcl_receval\""
+     done
+     echo "[$]_lcl_receval")`])
+
+
+# AC_NORMALIZE_DEFINE_UNQUOTED(var, DEFINE, REFERENCE_STRING)
+
+AC_DEFUN([AC_NORMALIZE_DEFINE_UNQUOTED], [
+  ac_ndu=[$]$1
+  adl_NORMALIZE_PATH([ac_ndu], [$]$3)
+  AC_DEFINE_UNQUOTED($2, "${ac_ndu}")
 ])
 
 
@@ -142,13 +319,14 @@ AC_SUBST(M_OR_MM)
 # This is the first time when CFLAGS are set/modified!!
 DD_COPT(CC, ggdb)
 if test "$sdcc_cv_CCggdb" = "yes"; then
-  CFLAGS="-ggdb -O2"
+  CFLAGS="-ggdb ${CFLAGS}"
 fi
 
 DD_COPT(CC, pipe)
 if test "$sdcc_cv_CCpipe" = "yes"; then
-  CFLAGS="$CFLAGS -pipe"
+  CFLAGS="-pipe $CFLAGS"
 fi
+
 
 # Checks for typedefs, structures, and compiler characteristics.
 # ===========================================================================
@@ -197,38 +375,133 @@ AC_C_BIGENDIAN
 
 # Set standard installation paths
 # ===========================================================================
-case $host in
-    *mingw32*)
-	MINGW32_HOST="yes"
-	;;
-    *)
-	MINGW32_HOST="no"
-	;;
-esac
 
-AC_MSG_CHECKING(host mingw32)
+# In the Makefiles we need paths with '/' as directory separator, even if
+# crosscompiling for Win32.
+# And we want to preserve the macros (e.g. ${prefix}) in the Makefiles.
+# The variables in the Makefiles are replaced by AC_SUBST()
+#
+# In sdccconf.h the '/' in paths are replaced by "\\" (normalized).
+# The macros are expanded for the header.
+# The variables in the header are replaced by AC_*DEFINE*()
+
+AC_MSG_CHECKING(-mno-cygwin)
+  case ${CFLAGS} in
+      *-mno-cygwin*)
+	  MINGW32_HOST="yes"
+	  ;;
+      *)
+	  MINGW32_HOST="no"
+	  ;;
+  esac
 AC_MSG_RESULT($MINGW32_HOST)
 
-# prefix: *nix default is "NONE"
-# prefix: mingw32 default is "/sdcc"
-if test "$prefix" = NONE; then
-    if test "$MINGW32_HOST" = "no"; then
-	prefix="/usr/local"
-    else
-	prefix="/sdcc"
-    fi
+AC_MSG_CHECKING(host mingw32)
+  case ${host} in
+      *mingw32*)
+	  MINGW32_HOST="yes"
+	  ;;
+  esac
+AC_MSG_RESULT($MINGW32_HOST)
+
+if test "${MINGW32_HOST}" = "no"; then
+    dir_separator="/"
+else
+    dir_separator="\\\\"
 fi
 
-# datadir: *nix default is "${prefix}/share"
-if test "$datadir" = "\${prefix}/share"; then
-    if test "$MINGW32_HOST" = "no"; then
-	datadir="\${prefix}/share/sdcc"
-    fi
-# mingw32 default is "/sdcc"
-elif test "$datadir" = "/sdcc"; then
-    if test "$MINGW32_HOST" = "yes"; then
-	datadir="\${prefix}"
-    fi
+
+# Makefiles
+###########
+
+# include_dir_suffix:
+# *nix    default: "sdcc/include"
+# mingw32 default: "include"
+  if test "${MINGW32_HOST}" = "no"; then
+	include_dir_suffix="sdcc/include"
+  else
+	include_dir_suffix="include"
+  fi
+AC_SUBST(include_dir_suffix)
+
+# lib_dir_suffix:
+# *nix    default: "sdcc/lib"
+# mingw32 default: "lib"
+  if test "${MINGW32_HOST}" = "no"; then
+	lib_dir_suffix="sdcc/lib"
+  else
+	lib_dir_suffix="lib"
+  fi
+AC_SUBST(lib_dir_suffix)
+
+# docdir:
+# *nix    default: "${datadir}/sdcc/doc"
+# mingw32 default: "${datadir}/doc"
+  if test "${MINGW32_HOST}" = "no"; then
+	doc_suffix="/sdcc/doc"
+  else
+	doc_suffix="/doc"
+  fi
+  docdir="\${datadir}"${doc_suffix}
+AC_SUBST(docdir)
+
+# sdccconf.h
+############
+
+AC_DEFINE_UNQUOTED(DIR_SEPARATOR_STRING, "${dir_separator}")
+AC_DEFINE_UNQUOTED(DIR_SEPARATOR_CHAR  , '${dir_separator}')
+
+# prefix:
+# *nix    default: "NONE", ${ac_default_prefix}: "/usr/local"
+# mingw32 default: "/sdcc"
+AC_EXPAND(prefix, ac_default_prefix, expanded_prefix)
+AC_NORMALIZE_DEFINE_UNQUOTED(expanded_prefix, PREFIX, dir_separator)
+
+# exec_prefix:
+# default: "${prefix}"
+AC_EXPAND(exec_prefix, expanded_prefix, expanded_exec_prefix)
+AC_NORMALIZE_DEFINE_UNQUOTED(expanded_exec_prefix, EXEC_PREFIX, dir_separator)
+
+# bindir:
+# default: "${exec_prefix}/bin"
+AC_EXPAND(bindir, "NONE", expanded_bindir)
+AC_NORMALIZE_DEFINE_UNQUOTED(expanded_bindir, BINDIR, dir_separator)
+
+# datadir:
+# *nix    default: "${prefix}/share"
+# mingw32 default: "/sdcc"
+AC_EXPAND(datadir, "NONE", expanded_datadir)
+AC_NORMALIZE_DEFINE_UNQUOTED(expanded_datadir, DATADIR, dir_separator)
+
+# include/lib suffix
+norm_inc_dir_suffix=${include_dir_suffix}
+adl_NORMALIZE_PATH([norm_inc_dir_suffix], [$dir_separator])
+AC_DEFINE_UNQUOTED(INCLUDE_DIR_SUFFIX,
+                   DIR_SEPARATOR_STRING "${norm_inc_dir_suffix}")
+norm_lib_dir_suffix=${lib_dir_suffix}
+adl_NORMALIZE_PATH([norm_lib_dir_suffix], [$dir_separator])
+AC_DEFINE_UNQUOTED(LIB_DIR_SUFFIX,
+                   DIR_SEPARATOR_STRING "${norm_lib_dir_suffix}")
+
+# relative paths
+adl_COMPUTE_RELATIVE_PATHS([expanded_bindir:expanded_datadir:bin2data_dir])
+adl_NORMALIZE_PATH(bin2data_dir, [$dir_separator])
+AC_DEFINE_UNQUOTED(BIN2DATA_DIR,
+                   DIR_SEPARATOR_STRING "${bin2data_dir}")
+
+adl_COMPUTE_RELATIVE_PATHS([expanded_prefix:expanded_bindir:prefix2bin_dir])
+adl_NORMALIZE_PATH(prefix2bin_dir, [$dir_separator])
+AC_DEFINE_UNQUOTED(PREFIX2BIN_DIR,
+                   DIR_SEPARATOR_STRING "${prefix2bin_dir}")
+
+adl_COMPUTE_RELATIVE_PATHS([expanded_prefix:expanded_datadir:prefix2data_dir])
+adl_NORMALIZE_PATH(prefix2data_dir, [$dir_separator])
+if test "${prefix2data_dir}" = "."; then
+    # small optimization for Mingw32; otherwise Borut will complain ;-)
+    AC_DEFINE_UNQUOTED(PREFIX2DATA_DIR, "")
+else
+    AC_DEFINE_UNQUOTED(PREFIX2DATA_DIR,
+                       DIR_SEPARATOR_STRING "${prefix2data_dir}")
 fi
 
 # standard libs
@@ -239,47 +512,33 @@ AC_DEFINE_UNQUOTED(STD_FP_LIB,    "libfloat")
 AC_DEFINE_UNQUOTED(STD_DS390_LIB, "libds390")
 AC_DEFINE_UNQUOTED(STD_xa51_LIB,  "xa51")
 
-AC_DEFINE_DIR(PREFIX,  "${prefix}")
-AC_DEFINE_DIR(DATADIR, "$datadir")
-AC_SUBST(datadir)
-
-# search paths
-bin_dir_suffix="bin"
-AC_DEFINE_DIR(BIN_DIR_SUFFIX, "${bin_dir_suffix}")
-
-    if test "$MINGW32_HOST" = "no"; then
-	search_suffix="share/sdcc"
-    else
-	search_suffix=""
-    fi
-AC_DEFINE_DIR(SEARCH_SUFFIX, "${search_suffix}")
-
-include_dir_suffix="include"
-AC_DEFINE_DIR(INCLUDE_DIR_SUFFIX, "${include_dir_suffix}")
-
-lib_dir_suffix="lib"
-AC_DEFINE_UNQUOTED(LIB_DIR_SUFFIX, "${lib_dir_suffix}")
-
 ### <Obsolete>
-# sdcc_datadir is still used in [device,lib]/Makefile
-sdcc_datadir=${datadir}
+sdcc_include_dir="\${datadir}/${include_dir_suffix}"
+AC_SUBST(sdcc_include_dir)
+AC_EXPAND(sdcc_include_dir,
+          "NONE", expanded_sdcc_include_dir)
+AC_DEFINE_UNQUOTED(SDCC_INCLUDE_DIR, "${expanded_sdcc_include_dir}")
+
+sdcc_lib_dir="\${datadir}/\${lib_dir_suffix}"
+# AC_SUBST(sdcc_lib_dir)
+AC_EXPAND(sdcc_lib_dir,
+          "NONE", expanded_sdcc_lib_dir)
+AC_DEFINE_UNQUOTED(SDCC_LIB_DIR, "${expanded_sdcc_lib_dir}")
+
+sdcc_datadir=${datadir}/sdcc
 AC_SUBST(sdcc_datadir)
 
-# SDCC_[INCLUDE,LIB]_DIR is still used in SDCCmain.c
-if test "${includedir}" = "\${prefix}/include"; then
-    includedir="${datadir}/include"
-fi
-AC_DEFINE_DIR(SDCC_INCLUDE_DIR, "${includedir}")
-AC_DEFINE_DIR(SDCC_LIB_DIR,     "${datadir}/lib")
 ### </Obsolete>
 
 # environment variables
 sdcc_dir_name="SDCC_HOME"
-AC_DEFINE_DIR(SDCC_DIR_NAME, "${sdcc_dir_name}")
+AC_DEFINE_UNQUOTED(SDCC_DIR_NAME, "${sdcc_dir_name}")
+
 sdcc_include_name="SDCC_INCLUDE"
-AC_DEFINE_DIR(SDCC_INCLUDE_NAME, "${sdcc_include_name}")
+AC_DEFINE_UNQUOTED(SDCC_INCLUDE_NAME, "${sdcc_include_name}")
+
 sdcc_lib_name="SDCC_LIB"
-AC_DEFINE_DIR(SDCC_LIB_NAME, "${sdcc_lib_name}")
+AC_DEFINE_UNQUOTED(SDCC_LIB_NAME, "${sdcc_lib_name}")
 
 # Now handle the port selection
 # ===========================================================================

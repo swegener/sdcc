@@ -1,5 +1,5 @@
-#LyX 1.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 220
+#LyX 1.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 221
 \textclass article
 \language english
 \inputencoding default
@@ -330,7 +330,7 @@ If you can think of some more, please send them to the list.
 Installation
 \layout Subsection
 
-Install paths
+Configure variables
 \layout Standard
 
 The install paths and default search paths are defined when running 'configure'.
@@ -338,7 +338,7 @@ The install paths and default search paths are defined when running 'configure'.
 \layout Standard
 
 ...
- TBA
+ TBD
 \newline 
 
 \newline 
@@ -348,21 +348,41 @@ These configure variables are compiled into the binaries, and can only be
 \emph on 
 italics
 \emph default 
- to distinguish them from run time variables (see next section).
+ to distinguish them from run time environment variables (see section search
+ paths).
 \newline 
 
 \newline 
-The defaults are:
+Cygwin is handled like a *nix, Mingw32 however belongs to the Win32 builds.
+ The SDCC team uses Mingw32 to build the official Windows binaries, because
+ it's
+\layout Enumerate
+
+open source, 
+\layout Enumerate
+
+a gcc compiler and last but not least
+\layout Enumerate
+
+the binaries can be built by cross compiling on Sourceforge's compile farm.
+\layout Standard
+
+The other Win32 builds using Borland, VC or whatever don't use 'configure',
+ but they (hopefully) use the default Win32 paths.
+\newline 
+
+\newline 
+These defaults are:
 \newline 
 
 \newline 
 
 \begin_inset  Tabular
-<lyxtabular version="3" rows="7" columns="3">
+<lyxtabular version="3" rows="8" columns="3">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="0pt">
-<column alignment="left" valignment="top" leftline="true" width="0pt">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" width="0in">
+<column alignment="left" valignment="top" leftline="true" width="0in">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0in">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -427,6 +447,76 @@ sdcc
 
 
 \emph on 
+EXEC_PREFIX
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+$PREFIX
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+$PREFIX
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+BINDIR
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+$EXECPREFIX
+\emph default 
+/bin
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+$EXECPREFIX
+\emph default 
+
+\backslash 
+bin
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
 DATADIR
 \end_inset 
 </cell>
@@ -439,7 +529,7 @@ DATADIR
 \emph on 
 $PREFIX
 \emph default 
-/share/sdcc
+/share
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -461,27 +551,9 @@ $PREFIX
 
 
 \emph on 
-BIN_DIR_SUFFIX
+DOCDIR
 \end_inset 
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-bin
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-bin
-\end_inset 
-</cell>
-</row>
-<row topline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -489,15 +561,9 @@ bin
 
 
 \emph on 
-SEARCH_SUFFIX
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-share/sdcc
+$DATADIR
+\emph default 
+/sdcc/doc
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -505,6 +571,13 @@ share/sdcc
 
 \layout Standard
 
+
+\emph on 
+$DATADIR
+\emph default 
+
+\backslash 
+doc
 \end_inset 
 </cell>
 </row>
@@ -524,7 +597,7 @@ INCLUDE_DIR_SUFFIX
 
 \layout Standard
 
-include
+sdcc/include
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -552,7 +625,7 @@ LIB_DIR_SUFFIX
 
 \layout Standard
 
-lib
+sdcc/lib
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -572,25 +645,142 @@ lib
 \newline 
 
 \newline 
-Cygwin is handled like a *nix, Mingw32 however belongs to the Win32 builds.
- The SDCC team uses Mingw32 to build the official Windows binaries, because
- it's
-\layout Enumerate
 
-open source, 
-\layout Enumerate
+\newline 
+'configure' also computes relative paths.
+ This is needed for full relocatability of a binary package and to complete
+ search paths (see section search paths below):
+\newline 
+ 
+\newline 
 
-a gcc compiler and last but not least
-\layout Enumerate
+\begin_inset  Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features>
+<column alignment="left" valignment="top" leftline="true" width="0in">
+<column alignment="left" valignment="top" leftline="true" width="0in">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0in">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
 
-the binaries can be built by cross compiling on Sourceforge's compile farm.
 \layout Standard
 
-The other Win32 builds using Borland, VC or whatever don't use 'configure',
- but they (hopefully) use the default Win32 paths.
-\newline 
+Variable (computed)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
 
-\newline 
+\layout Standard
+
+*nix default
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Win32 default
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+BIN2DATA_DIR
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+../share
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+..
+\backslash 
+
+\end_inset 
+</cell>
+</row>
+<row bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+PREFIX2BIN_DIR
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+bin
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+bin
+\end_inset 
+</cell>
+</row>
+<row bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+PREFIX2DATA_DIR
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+share/sdcc
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Subsection
+
+Install paths
+\layout Standard
+
 1.
  Binary files (preprocessor, assembler and linker)
 \layout Standard
@@ -599,9 +789,9 @@ The other Win32 builds using Borland, VC or whatever don't use 'configure',
 \begin_inset  Tabular
 <lyxtabular version="3" rows="2" columns="3">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="0pt">
-<column alignment="left" valignment="top" leftline="true" width="0pt">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" width="0in">
+<column alignment="left" valignment="top" leftline="true" width="0in">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0in">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -636,7 +826,7 @@ Win32 default
 
 
 \emph on 
-$PREFIX/$BIN_DIR_SUFFIX
+$EXEC_PREFIX
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -676,9 +866,9 @@ bin
 \begin_inset  Tabular
 <lyxtabular version="3" rows="2" columns="3">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="1.6in">
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0pt">
+<column alignment="block" valignment="top" leftline="true" width="1.6in">
+<column alignment="center" valignment="top" leftline="true" width="0in">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0in">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -760,9 +950,9 @@ model
 \begin_inset  Tabular
 <lyxtabular version="3" rows="2" columns="3">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="0pt">
-<column alignment="left" valignment="top" leftline="true" width="0pt">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" width="0in">
+<column alignment="left" valignment="top" leftline="true" width="0in">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0in">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -837,9 +1027,9 @@ lib
 \begin_inset  Tabular
 <lyxtabular version="3" rows="2" columns="3">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="0pt">
-<column alignment="left" valignment="top" leftline="true" width="0pt">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" width="0in">
+<column alignment="left" valignment="top" leftline="true" width="0in">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0in">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -874,9 +1064,7 @@ Win32 default
 
 
 \emph on 
-$DATADIR/
-\emph default 
-doc
+$DOCDIR
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -916,7 +1104,7 @@ Some search paths or parts of them are determined by configure variables
 italics
 \emph default 
 , see section above).
- Other search paths are determined by environment variables during runtime.
+ Further search paths are determined by environment variables during runtime.
  
 \newline 
 The paths searched when running the compiler are as follows (the first catch
@@ -931,9 +1119,9 @@ The paths searched when running the compiler are as follows (the first catch
 \begin_inset  Tabular
 <lyxtabular version="3" rows="4" columns="3">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="0pt">
-<column alignment="left" valignment="top" leftline="true" width="0pt">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" width="0in">
+<column alignment="left" valignment="top" leftline="true" width="0in">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0in">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -968,7 +1156,7 @@ Win32 default
 
 $SDCC_HOME/
 \emph on 
-$BIN_DIR_SUFFIX
+$PPREFIX2BIN_DIR
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -1057,9 +1245,9 @@ $PATH
 \begin_inset  Tabular
 <lyxtabular version="3" rows="6" columns="3">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="1.5in">
-<column alignment="left" valignment="top" leftline="true" width="1.5in">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
+<column alignment="block" valignment="top" leftline="true" width="1.5in">
+<column alignment="block" valignment="top" leftline="true" width="1.5in">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0in">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -1118,7 +1306,7 @@ Win32 default
 
 \layout Standard
 
-$SDCC_INCLUDE_PATH
+$SDCC_INCLUDE
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -1126,7 +1314,7 @@ $SDCC_INCLUDE_PATH
 
 \layout Standard
 
-$SDCC_INCLUDE_PATH
+$SDCC_INCLUDE
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -1134,7 +1322,7 @@ $SDCC_INCLUDE_PATH
 
 \layout Standard
 
-$SDCC_INCLUDE_PATH
+$SDCC_INCLUDE
 \end_inset 
 </cell>
 </row>
@@ -1148,7 +1336,7 @@ $SDCC_HOME/
 \newline 
 
 \emph on 
-$SEARCH_SUFFIX/
+$PREFIX2DATA_DIR/
 \newline 
 $INCLUDE_DIR_SUFFIX
 \end_inset 
@@ -1158,7 +1346,7 @@ $INCLUDE_DIR_SUFFIX
 
 \layout Standard
 
-$SDCC_HOME/
+$SDCC_ HOME/
 \newline 
 share/sdcc/
 \newline 
@@ -1182,11 +1370,11 @@ include
 
 \layout Standard
 
-path(argv[0])/../
+path(argv[0])/
 \newline 
 
 \emph on 
-$SEARCH_SUFFIX/
+$BIN2DATADIR/
 \emph default 
 
 \newline 
@@ -1200,7 +1388,9 @@ $INCLUDE_DIR_SUFFIX
 
 \layout Standard
 
-(not on *nix)
+path(argv[0])/
+\newline 
+../sdcc/include
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -1287,9 +1477,9 @@ model
 \begin_inset  Tabular
 <lyxtabular version="3" rows="6" columns="3">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="1.7in">
-<column alignment="left" valignment="top" leftline="true" width="1.2in">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="1.2in">
+<column alignment="block" valignment="top" leftline="true" width="1.7in">
+<column alignment="block" valignment="top" leftline="true" width="1.2in">
+<column alignment="block" valignment="top" leftline="true" rightline="true" width="1.2in">
 <row topline="true" bottomline="true">
 <cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -1348,7 +1538,7 @@ Win32 default
 
 \layout Standard
 
-$SDCC_LIB_PATH/
+$SDCC_LIB/
 \newline 
 
 \emph on 
@@ -1360,7 +1550,7 @@ $SDCC_LIB_PATH/
 
 \layout Standard
 
-$SDCC_LIB_PATH/
+$SDCC_LIB/
 \newline 
 
 \emph on 
@@ -1372,7 +1562,7 @@ $SDCC_LIB_PATH/
 
 \layout Standard
 
-$SDCC_LIB_PATH
+$SDCC_LIB
 \backslash 
 
 \newline 
@@ -1392,7 +1582,7 @@ $SDCC_HOME/
 \newline 
 
 \emph on 
-$SEARCH_SUFFIX/
+$PREFIX2DATA_DIR/
 \newline 
 $LIB_DIR_SUFFIX/<model>
 \end_inset 
@@ -1434,12 +1624,16 @@ lib
 
 \layout Standard
 
-path(argv[0]/../
+path(argv[0]/
 \newline 
 
 \emph on 
-$SEARCH_SUFFIX/
+$BIN2DATADIR/
+\emph default 
+
 \newline 
+
+\emph on 
 $LIB_DIR_SUFFIX/<model>
 \end_inset 
 </cell>
@@ -1448,47 +1642,11 @@ $LIB_DIR_SUFFIX/<model>
 
 \layout Standard
 
-(not on *nix)
+path(argv[0])/
 \newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-
+../sdcc/lib/
+\emph on 
+<model>
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -1498,56 +1656,15 @@ $LIB_DIR_SUFFIX/<model>
 
 path(argv[0]
 \backslash 
+
+\newline 
 ..
 \backslash 
 lib
 \backslash 
 
 \emph on 
-
-\newline 
 <model>
-\newline 
-
-\emph default 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-
 \end_inset 
 </cell>
 </row>
@@ -1592,7 +1709,7 @@ lib/
 
 \layout Comment
 
-Don't delete any of the stray spaces in the table line 5 without checking
+Don't delete any of the stray spaces in the table above without checking
  the HTML output (last line)!
 \layout Standard
 
@@ -1696,6 +1813,15 @@ Type
 \series default 
  This copies the binary executables, the include files, the libraries and
  the documentation to the install directories.
+\layout Standard
+
+On OSX 2.x it was reported, that the default gcc (version 3.1 20020420 (prerelease
+)) fails to compile SDCC.
+ Fortunately there's also gcc 2.9.x installed, which works fine.
+ This compiler can be selected by running 'configure' with:
+\layout LyX-Code
+
+./configure CC=gcc2 CXX=g++2
 \layout Subsection
 
 Windows 
@@ -3614,15 +3740,13 @@ TMPDIR
 
 
 \series bold 
-(coming\SpecialChar ~
-soon:\SpecialChar ~
-SDCC_BIN_PATH)
+SDCC_HOME
 \series default 
  Path, see 
 \begin_inset Quotes sld
 \end_inset 
 
-2.1 Install and search paths
+2.3 Install and search paths
 \begin_inset Quotes srd
 \end_inset 
 
@@ -3632,15 +3756,13 @@ SDCC_BIN_PATH)
 
 
 \series bold 
-(coming\SpecialChar ~
-soon:\SpecialChar ~
-SDCC_INCLUDE_PATH)
+SDCC_INCLUDE
 \series default 
  Path, see 
 \begin_inset Quotes sld
 \end_inset 
 
-2.1 Install and search paths
+2.3 Install and search paths
 \begin_inset Quotes srd
 \end_inset 
 
@@ -3650,35 +3772,13 @@ SDCC_INCLUDE_PATH)
 
 
 \series bold 
-(coming\SpecialChar ~
-soon:\SpecialChar ~
-SDCC_LIB_PATH)
+SDCC_LIB
 \series default 
  Path, see 
 \begin_inset Quotes sld
 \end_inset 
 
-2.1 Install and search paths
-\begin_inset Quotes srd
-\end_inset 
-
-.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
-SDCCDIR\SpecialChar ~
-(soon\SpecialChar ~
-replaced\SpecialChar ~
-by:\SpecialChar ~
-SDCCPATH)
-\series default 
- Path, see 
-\begin_inset Quotes sld
-\end_inset 
-
-2.1 Install and search paths
+2.3 Install and search paths
 \begin_inset Quotes srd
 \end_inset 
 
@@ -4174,9 +4274,9 @@ Interrupt Numbers and the corresponding address & descriptions for the Standard
 \begin_inset  Tabular
 <lyxtabular version="3" rows="6" columns="3">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0pt">
+<column alignment="center" valignment="top" leftline="true" width="0in">
+<column alignment="center" valignment="top" leftline="true" width="0in">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0in">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text

@@ -14,7 +14,7 @@ CC		= @CC@
 CPP		= @CPP@
 RANLIB		= @RANLIB@
 INSTALL		= @INSTALL@
-YACC            = @YACC@ 
+YACC            = @YACC@
 LEX             = @LEX@ 
 AWK             = @AWK@
 STRIP           = @STRIP@
@@ -29,7 +29,10 @@ man1dir         = $(mandir)/man1
 man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
-docdir          = @datadir@/doc
+docdir          = @docdir@
+
+include_dir_suffix = @include_dir_suffix@
+lib_dir_suffix     = @lib_dir_suffix@
 
 # Modules to enable/disable
 OPT_ENABLE_UCSIM = @OPT_ENABLE_UCSIM@
@@ -44,7 +47,7 @@ transform       = @program_transform_name@
 
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 CPPFLAGS        = $(INCLUDEFLAGS) -I. -I$(PRJDIR) -I$(SLIB)
-CFLAGS          = @CFLAGS@ -Wall
+CFLAGS          = -Wall @CFLAGS@
 M_OR_MM         = @M_OR_MM@
 
 EXTRALIBS	= @LIBS@

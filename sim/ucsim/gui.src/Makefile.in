@@ -35,7 +35,8 @@ man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
 
-PKGS		= serio.src portmon.src
+PKGS		=
+# serio.src portmon.src
 
 LOBJECTS	= event.o \
 		  view.o frame.o bg.o label.o \

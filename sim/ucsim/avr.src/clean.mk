@@ -13,6 +13,7 @@ clean:
 distclean: clean
 	rm -f config.cache config.log config.status
 	rm -f Makefile *.dep
+	rm -f *.obj *.list *.lst *.hex
 
 
 # Like clean but some files may still exist

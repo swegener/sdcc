@@ -9,7 +9,8 @@ STARTYEAR	= 1997
 SHELL		= /bin/sh
 
 PRJDIR		= .
-PKGS		= cmd.src sim.src s51.src avr.src z80.src gui.src doc
+PKGS		= cmd.src sim.src s51.src avr.src z80.src doc
+#gui.src
 
 srcdir          = .
 
@@ -136,6 +137,10 @@ print-newer:
 	  echo ".start file not found.\n" ;\
 	  exit 1 ;\
 	fi
+
+new_files:
+	diff -rNu $$HOME/clean-source/sdcc/sim/ucsim .|\
+	grep '^diff' | grep -v CVS | awk '{print $$4}'
 
 lines:
 	@find . \( -name '*.[ch]' -o -name '*.cc' -o -name '*.hh' \) \

@@ -3018,7 +3018,8 @@ ds390_assignRegisters (eBBlock ** ebbs, int count)
   createRegMask (ebbs, count);
 
   /* redo that offsets for stacked automatic variables */
-  redoStackOffsets ();
+  if (currFunc)
+    redoStackOffsets ();
 
   if (options.dump_rassgn) {
     dumpEbbsToFileExt (DUMP_RASSGN, ebbs, count);

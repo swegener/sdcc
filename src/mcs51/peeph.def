@@ -1082,15 +1082,20 @@ replace {
 
 // applies to f.e. bug-408972.c
 // not before peephole 177.c
-replace restart {
-	mov	%1,%2
-	mov	%3,%4
-	mov	%2,%1
-} by {
-	;	Peephole 177.d	removed redundant move
-	mov	%1,%2
-	mov	%3,%4
-} if notVolatile %1 %2
+// Bug #1076940, this rule erroneously applies to:
+//	mov	a,r2
+//	mov	acc.0,c
+//	mov	r2,a
+//
+//replace restart {
+//	mov	%1,%2
+//	mov	%3,%4
+//	mov	%2,%1
+//} by {
+//	;	Peephole 177.d	removed redundant move
+//	mov	%1,%2
+//	mov	%3,%4
+//} if notVolatile %1 %2
 
 // applies to f.e. bug-607243.c
 // also check notVolatile %3, as it will return FALSE if it's @r%1

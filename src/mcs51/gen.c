@@ -3420,14 +3420,20 @@ genMult (iCode * ic)
     }
 
   /* if both are of size == 1 */
-  if (AOP_SIZE (left) == 1 &&
-      AOP_SIZE (right) == 1)
+#if 0 // one of them can be a sloc shared with the result
+    if (AOP_SIZE (left) == 1 && AOP_SIZE (right) == 1)
+#else
+  if (getSize(operandType(left)) == 1 && 
+      getSize(operandType(right)) == 1)
+#endif
     {
       genMultOneByte (left, right, result);
       goto release;
     }
 
   /* should have been converted to function call */
+    fprintf (stderr, "left: %d right: %d\n", getSize(OP_SYMBOL(left)->type),
+	     getSize(OP_SYMBOL(right)->type));
   assert (0);
 
 release:

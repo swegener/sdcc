@@ -1182,10 +1182,15 @@ serialRegAssign (eBBlock ** ebbs, int count)
 		    else
 			sym->regs[j] = getRegGpr (ic, ebbs[i], sym);
 
-		    /* if the allocation falied which means
+		    /* if the allocation failed which means
 		       this was spilt then break */
-		    if (!sym->regs[j])
-			break;
+		    if (!sym->regs[j]) {
+		      if (j) {
+			fprintf (stderr, "%d reg(s) lost in %s:%d\n",
+				 j, __FILE__,__LINE__);
+		      }
+		      break;
+		    }
 		}
 
 		/* if it shares registers with operands make sure

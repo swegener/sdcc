@@ -515,8 +515,7 @@ relr()
 
 	/* JLH: output only if data (beyond two byte address) */
 	if ((oflag == 1) && (rtcnt > 2)) {
-#if 0
-		int extendedAddress = (a[aindex]->a_addr >> 16) & 0xffff;
+		// int extendedAddress = (a[aindex]->a_addr >> 16) & 0xffff;
 		
 		/* Boy, is this a hack: for ABS sections, the
 		 * base address is stored as zero, and the T records
@@ -542,7 +541,7 @@ relr()
 			lastAreaIndex = aindex;
 			newArea();
 		}
-		
+#if 0		
 		if (extendedAddress != lastExtendedAddress)
 		{
 		

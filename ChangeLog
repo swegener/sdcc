@@ -1,3 +1,7 @@
+2003-10-31 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+	
+	* as/hc08/lkrloc.c (relr): Fixed ihx output, fixed lastAreaIndex warning
+
 2003-10-31 Klaus Flittner <klaus_flittner@gmx.de>
 
 	* src/SDCCcse.c (updateSpillLocation): fixed bug #808027

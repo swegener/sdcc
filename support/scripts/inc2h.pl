@@ -275,7 +275,7 @@ $header .= <<EOT;
 #define P${processor}_H
 
 #ifndef BIT_AT
-#define BIT_AT(base,bitno) bit at ((base<<3)+bitno)
+#define BIT_AT(base,bitno) sbit at ((base<<3)+bitno)
 #endif
 
 //

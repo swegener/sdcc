@@ -50,7 +50,7 @@ void pic16_genMult8X8_8 (operand *, operand *,operand *);
 pCode *pic16_AssembleLine(char *line);
 extern void pic16_printpBlock(FILE *of, pBlock *pb);
 static asmop *newAsmop (short type);
-static pCodeOp *popRegFromString(char *str, int size, int offset);
+static pCodeOp *pic16_popRegFromString(char *str, int size, int offset);
 static void mov2w (asmop *aop, int offset);
 static int aopIdx (asmop *aop, int offset);
 
@@ -873,7 +873,7 @@ void pic16_aopOp (operand *op, iCode *ic, bool result)
 
 	sym->aop = op->aop = aop = newAsmop(AOP_PCODE);
 	//aop->aopu.pcop = pic16_popGetImmd(sym->usl.spillLoc->rname,0,sym->usl.spillLoc->offset);
-	aop->aopu.pcop = popRegFromString(sym->usl.spillLoc->rname, 
+	aop->aopu.pcop = pic16_popRegFromString(sym->usl.spillLoc->rname, 
 					  getSize(sym->type), 
 					  sym->usl.spillLoc->offset);
         aop->size = getSize(sym->type);
@@ -1264,9 +1264,9 @@ pCodeOp *pic16_popGetWithString(char *str)
 }
 
 /*-----------------------------------------------------------------*/
-/* popRegFromString -                                              */
+/* pic16_popRegFromString -                                        */
 /*-----------------------------------------------------------------*/
-static pCodeOp *popRegFromString(char *str, int size, int offset)
+static pCodeOp *pic16_popRegFromString(char *str, int size, int offset)
 {
 
   pCodeOp *pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
@@ -1370,7 +1370,7 @@ pCodeOp *pic16_popGet (asmop *aop, int offset) //, bool bit16, bool dname)
       return pic16_popGetImmd(aop->aopu.aop_immd,offset,0);
 
     case AOP_DIR:
-      return popRegFromString(aop->aopu.aop_dir, aop->size, offset);
+      return pic16_popRegFromString(aop->aopu.aop_dir, aop->size, offset);
 
 #if 0
 	pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
@@ -8684,12 +8684,12 @@ static void genDataPointerSet(operand *right,
 	    pic16_emitcode("movwf","%s",buffer);
 
 	    pic16_emitpcode(POC_MOVLW, pic16_popGetLit(lit&0xff));
-	    //pic16_emitpcode(POC_MOVWF, popRegFromString(buffer));
+	    //pic16_emitpcode(POC_MOVWF, pic16_popRegFromString(buffer));
 	    pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),0));
 
 	  } else {
 	    pic16_emitcode("clrf","%s",buffer);
-	    //pic16_emitpcode(POC_CLRF, popRegFromString(buffer));
+	    //pic16_emitpcode(POC_CLRF, pic16_popRegFromString(buffer));
 	    pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(result),0));
 	  }
 	}else {
@@ -8697,7 +8697,7 @@ static void genDataPointerSet(operand *right,
 	  pic16_emitcode("movwf","%s",buffer);
 
 	  pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(right),offset));
-	  //pic16_emitpcode(POC_MOVWF, popRegFromString(buffer));
+	  //pic16_emitpcode(POC_MOVWF, pic16_popRegFromString(buffer));
 	  pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),0));
 
 	}

@@ -53,13 +53,13 @@ static peepCommand peepCommands[] = {
 
 // Eventually this will go into device dependent files:
 pCodeOpReg pic16_pc_status    = {{PO_STATUS,  "_STATUS"}, -1, NULL,0,NULL};
-pCodeOpReg pic16_pc_indf0     = {{PO_INDF0,   "INDF0"}, -1, NULL,0,NULL};
-pCodeOpReg pic16_pc_fsr0      = {{PO_FSR0,    "FSR0"}, -1, NULL,0,NULL};
+pCodeOpReg pic16_pc_indf0     = {{PO_INDF0,   "_INDF0"}, -1, NULL,0,NULL};
+pCodeOpReg pic16_pc_fsr0      = {{PO_FSR0,    "_FSR0"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_intcon    = {{PO_INTCON,  ""}, -1, NULL,0,NULL};
-pCodeOpReg pic16_pc_pcl       = {{PO_PCL,     "PCL"}, -1, NULL,0,NULL};
+pCodeOpReg pic16_pc_pcl       = {{PO_PCL,     "_PCL"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_pclath    = {{PO_PCLATH,  "_PCLATH"}, -1, NULL,0,NULL};
-pCodeOpReg pic16_pc_wreg      = {{PO_WREG,    "WREG"}, -1, NULL,0,NULL};
-pCodeOpReg pic16_pc_bsr       = {{PO_BSR,     "BSR"}, -1, NULL,0,NULL};
+pCodeOpReg pic16_pc_wreg      = {{PO_WREG,    "_WREG"}, -1, NULL,0,NULL};
+pCodeOpReg pic16_pc_bsr       = {{PO_BSR,     "_BSR"}, -1, NULL,0,NULL};
 
 pCodeOpReg pic16_pc_kzero     = {{PO_GPR_REGISTER,  "KZ"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_wsave     = {{PO_GPR_REGISTER,  "WSAVE"}, -1, NULL,0,NULL};
@@ -5899,7 +5899,7 @@ pCodeOp *pic16_popCopyGPR2Bit(pCodeOp *pc, int bitval)
 	 (pcop->type == PO_LITERAL) ||
 	 (pcop->type == PO_STR) ))
     PCOR(pcop)->r = PCOR(pc)->r;  /* This is dangerous... */
-
+    PCOR(pcop)->r->wasUsed = 1;		// mark register as used
   return pcop;
 }
 
@@ -6291,8 +6291,8 @@ void pic16_AnalyzeBanking(void)
 
   for(pb = the_pFile->pbHead; pb; pb = pb->next)
     pic16_FixRegisterBanking(pb);
-
 }
+
 
 /*-----------------------------------------------------------------*/
 /* buildCallTree - Look at the flow and extract all of the calls.  */

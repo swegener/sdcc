@@ -456,14 +456,16 @@ static regs* newReg(short type, short pc_type, int rIdx, char *name, int size, i
   //fprintf(stderr,"newReg: %s, rIdx = 0x%02x\n",dReg->name,rIdx);
   dReg->isFree = 0;
   dReg->wasUsed = 1;
-  if(type == REG_SFR)
+  if(type == REG_SFR) {
     dReg->isFixed = 1;
-  else
+    dReg->address = rIdx;
+  } else {
     dReg->isFixed = 0;
+    dReg->address = 0;
+  }
 
   dReg->isMapped = 0;
   dReg->isEmitted = 0;
-  dReg->address = 0;
   dReg->size = size;
   dReg->alias = alias;
   dReg->reg_alias = NULL;
@@ -531,9 +533,12 @@ void pic16_initStack(int base_address, int size)
 regs *
 pic16_allocProcessorRegister(int rIdx, char * name, short po_type, int alias)
 {
+  regs * reg = newReg(REG_SFR, po_type, rIdx, name, 1, alias);
 
+	if(reg)reg->wasUsed = 0;
+	
   //fprintf(stderr,"pic16_allocProcessorRegister %s addr =0x%x\n",name,rIdx);
-  return addSet(&pic16_dynProcessorRegs,newReg(REG_SFR, po_type, rIdx, name,1,alias));
+  return addSet(&pic16_dynProcessorRegs, reg);
 }
 
 /*-----------------------------------------------------------------*
@@ -1086,6 +1091,7 @@ void pic16_writeUsedRegs(FILE *of)
   pic16_assignFixedRegisters(pic16_dynAllocRegs);
   pic16_assignFixedRegisters(pic16_dynStackRegs);
   pic16_assignFixedRegisters(pic16_dynDirectRegs);
+  pic16_assignFixedRegisters(pic16_dynProcessorRegs);
 
   pic16_assignRelocatableRegisters(pic16_dynInternalRegs,0);
   pic16_assignRelocatableRegisters(pic16_dynAllocRegs,0);

@@ -1,3 +1,20 @@
+2004-01-05 Vangelis Rokas <vrokas@otenet.gr>
+
+	* support/scripts/inc2h.pl: changed definition of BIT_AT
+	to emit 'sbit at' instead of 'bit at'. This was a request.
+
+	PIC16 port related preliminary changes:
+	* gen.c: prefixed function popRegFromString with
+	pic16_ and all references to it corrected
+	* pcode.c: all pic16_pc_* hardware registers prefixed
+	with underscore (_),
+	pic16_popCopyGPR2Bit(): function sets register wasUsed=1
+	* ralloc.c: newReg(): when register is REG_SFR then
+	set address to rIdx,
+	pic16_allocProcessorRegister(): marks register wasUsed=0
+	pic16_writeUsedRegs(): added a call to assign processor
+	registers via pic16_assignFixedRegisters
+
 2004-01-04  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	* as/mcs51/aslink.h, as/mcs51/lkarea.c, as/mcs51/lkdata.c,

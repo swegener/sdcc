@@ -392,7 +392,8 @@ void pic16_dump_cblock(FILE *of)
 
   do {
 
-    if(pic16_finalMapping[addr].reg && !pic16_finalMapping[addr].reg->isEmitted) {
+    if(pic16_finalMapping[addr].reg && !pic16_finalMapping[addr].reg->isEmitted
+    	&& pic16_finalMapping[addr].reg->wasUsed) {
 
       if(start<0)
 	start = addr;

@@ -496,7 +496,6 @@ createStackSpil (symbol * sym)
       sym->usl.spillLoc = sloc;      
       sym->stackSpil = 1;
       sloc->isFree = 0;
-      sloc->allocreq++;
       addSetHead (&sloc->usl.itmpStack, sym);
       return sym;
     }
@@ -523,6 +522,7 @@ createStackSpil (symbol * sym)
     SPEC_SCLS (sloc->etype) = S_XDATA;
   }
   SPEC_EXTR (sloc->etype) = 0;
+  SPEC_STAT (sloc->etype) = 0;
 
   /* we don't allow it to be allocated`
      onto the external stack since : so we
@@ -1082,7 +1082,7 @@ willCauseSpill (int nr, int rt)
 /* position as the operand otherwise chaos results                 */
 /*-----------------------------------------------------------------*/
 static int
-positionRegs (symbol * result, symbol * opsym, int lineno)
+positionRegs (symbol * result, symbol * opsym)
 {
   int count = min (result->nRegs, opsym->nRegs);
   int i, j = 0, shared = 0;
@@ -1255,12 +1255,12 @@ serialRegAssign (eBBlock ** ebbs, int count)
 	      if (IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)) &&
 		  OP_SYMBOL (IC_LEFT (ic))->nRegs && ic->op != '=')
 		positionRegs (OP_SYMBOL (IC_RESULT (ic)),
-			      OP_SYMBOL (IC_LEFT (ic)), ic->lineno);
+			      OP_SYMBOL (IC_LEFT (ic)));
 	      /* do the same for the right operand */
 	      if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic)) &&
 		  OP_SYMBOL (IC_RIGHT (ic))->nRegs)
 		positionRegs (OP_SYMBOL (IC_RESULT (ic)),
-			      OP_SYMBOL (IC_RIGHT (ic)), ic->lineno);
+			      OP_SYMBOL (IC_RIGHT (ic)));
 
 	      if (ptrRegSet)
 		{
@@ -1281,12 +1281,13 @@ static void fillGaps()
     symbol *sym =NULL;
     int key =0;    
     
-    return ; /* NOT YET .. MORE TESTING IN PROGRESS */
+    if (getenv("DISABLE_FILL_GAPS")) return;
     /* look for livernages that was spilt by the allocator */
     for (sym = hTabFirstItem(liveRanges,&key) ; sym ; 
 	 sym = hTabNextItem(liveRanges,&key)) {
 
 	int i;
+	int pdone = 0;
 
 	if (!sym->spillA || !sym->clashes || sym->remat) continue ;
 	
@@ -1319,6 +1320,41 @@ static void fillGaps()
 		sym->regs[i] = getRegPtrNoSpil ();
 	    else
 		sym->regs[i] = getRegGprNoSpil ();		  
+	}
+
+	/* for all its definitions check if the registers
+	   allocated needs positioning NOTE: we can position
+	   only ONCE if more than One positioning required 
+	   then give up */
+	sym->isspilt = 0;
+	for (i = 0 ; i < sym->defs->size ; i++ ) {
+	    if (bitVectBitValue(sym->defs,i)) {
+		iCode *ic;
+		if (!(ic = hTabItemWithKey(iCodehTab,i))) continue ;
+		if (SKIP_IC(ic)) continue;
+		assert(isSymbolEqual(sym,OP_SYMBOL(IC_RESULT(ic)))); /* just making sure */
+		/* if left is assigned to registers */
+		if (IS_SYMOP(IC_LEFT(ic)) && 
+		    bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_LEFT(ic))->key)) {
+		    pdone += positionRegs(sym,OP_SYMBOL(IC_LEFT(ic)));
+		}
+		if (IS_SYMOP(IC_RIGHT(ic)) && 
+		    bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_RIGHT(ic))->key)) {
+		    pdone += positionRegs(sym,OP_SYMBOL(IC_RIGHT(ic)));
+		}
+		if (pdone > 1) break;
+	    }
+	}
+	/* had to position more than once GIVE UP */
+	if (pdone > 1) {
+	    /* UNDO all the changes we made to try this */
+	    sym->isspilt = 0;
+	    for (i=0; i < sym->nRegs ; i++ ) {
+		sym->regs[i] = NULL;
+	    }
+	    freeAllRegs();
+	    printf("Fill Gap gave up due to positioning for %s in function %s\n",sym->name, currFunc ? currFunc->name : "UNKNOWN");
+	    continue ;	    
 	}
 	printf("FILLED GAP for %s in function %s\n",sym->name, currFunc ? currFunc->name : "UNKNOWN");
 	_G.totRegAssigned = bitVectSetBit(_G.totRegAssigned,sym->key);
@@ -1459,7 +1495,7 @@ createRegMask (eBBlock ** ebbs, int count)
 		}
 	      
 	      /* special case for ruonly */
-	      if (sym->ruonly) {
+	      if (sym->ruonly && sym->liveFrom != sym->liveTo) {
 		  int size = getSize(sym->type);
 		  int j = DPL_IDX;
 		  for (k = 0 ; k < size; k++ )

@@ -323,6 +323,37 @@ newStruct (char *tag)
   strncpyz (s->tag, tag, sizeof(s->tag));		/* copy the tag */
   return s;
 }
+  
+/*------------------------------------------------------------------*/
+/* sclsFromPtr - Return the storage class a pointer points into.    */
+/*               S_FIXED is returned for generic pointers or other  */
+/*               unexpected cases                                   */
+/*------------------------------------------------------------------*/
+STORAGE_CLASS
+sclsFromPtr(sym_link *ptr)
+{
+  switch (DCL_TYPE (ptr))
+    {
+    case POINTER:
+      return S_DATA;
+    case GPOINTER:
+      return S_FIXED;
+    case FPOINTER:
+      return S_XDATA;
+    case CPOINTER:
+      return S_CODE;
+    case IPOINTER:
+      return S_IDATA;
+    case PPOINTER:
+      return S_PDATA;
+    case EEPPOINTER:
+      return S_EEPROM;
+    case FUNCTION:
+      return S_CODE;
+    default:
+      return S_FIXED;
+    }
+}
 
 /*------------------------------------------------------------------*/
 /* pointerTypes - do the computation for the pointer types          */

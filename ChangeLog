@@ -1,3 +1,14 @@
+2003-09-14  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCsymt.c (sclsFromPtr),
+	* src/SDCCsymt.h,
+	* src/SDCCast.c (decorateType): fixed bug #462971. Also, better
+	support for standard C idiom of memory mapped variables; for
+	example, *((xdata int*)0x1234) = 1 is now internally equivalent
+	to xdata int at 0x1234 tempvar = 1.
+	* sim/ucsim/z80.src/inst_xd.cc: fixed bug #805483 with patch
+	provided by Akiya ISHIDA
+
 2003-09-13  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCval.c (cheapestVal): reenabled to reduce int to char

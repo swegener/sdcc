@@ -556,6 +556,7 @@ void *findSymWithBlock (bucket **, struct symbol *, int);
 void changePointer (symbol * sym);
 void checkTypeSanity(sym_link *etype, char *name);
 sym_link *typeFromStr (char *) ;
+STORAGE_CLASS sclsFromPtr(sym_link *ptr);
 
 
 extern char *nounName(sym_link *); /* noun strings */

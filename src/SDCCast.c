@@ -1220,6 +1220,7 @@ processBlockVars (ast * tree, int *stack, int action)
   return tree;
 }
 
+
 /*-------------------------------------------------------------*/
 /* constExprTree - returns TRUE if this tree is a constant     */
 /*                 expression                                  */
@@ -1231,7 +1232,7 @@ bool constExprTree (ast *cexpr) {
   }
 
   cexpr = decorateType (resolveSymbols (cexpr));
-  
+
   switch (cexpr->type) 
     {
     case EX_VALUE:
@@ -1251,6 +1252,7 @@ bool constExprTree (ast *cexpr) {
 	  IN_CODESPACE(SPEC_OCLS(AST_SYMBOL(cexpr)->etype))) {
 	// a symbol in code space will never change
 	// This is only for the 'char *s="hallo"' case and will have to leave
+        //printf(" code space symbol");
 	return TRUE;
       }
       return FALSE;
@@ -1317,11 +1319,15 @@ constExprValue (ast * cexpr, int check)
       if (IS_AST_OP (cexpr) &&
 	  cexpr->opval.op == CAST &&
 	  IS_LITERAL (cexpr->right->ftype))
+        {
 	return valCastLiteral (cexpr->ftype,
 			       floatFromVal (cexpr->right->opval.val));
+        }
 
       if (IS_AST_VALUE (cexpr))
+        {
 	return cexpr->opval.val;
+        }
 
       if (check)
 	werror (E_CONST_EXPECTED, "found expression");
@@ -1993,6 +1999,8 @@ decorateType (ast * tree)
       tree->left = dtl;
     if (dtr != tree->right)
       tree->right = dtr;
+    if ((dtl && dtl->isError) || (dtr && dtr->isError))
+      return tree;
 
     if (IS_AST_OP(tree) &&
 	(tree->opval.op == CAST || tree->opval.op == '=') &&
@@ -2124,6 +2132,39 @@ decorateType (ast * tree)
       case FUNCTION:
       	break;
       }
+      
+      if (IS_ADDRESS_OF_OP (tree->left) && IS_AST_SYM_VALUE(tree->left->left)
+          && SPEC_ABSA (AST_SYMBOL (tree->left->left)->etype))
+        {
+            /* If defined    struct type at addr var
+               then rewrite  (&struct var)->member
+               as            temp
+               and define    membertype at (addr+offsetof(struct var,member)) temp
+            */
+            symbol *sym;
+            symbol *element = getStructElement (SPEC_STRUCT (LETYPE(tree)),
+					        AST_SYMBOL(tree->right));
+
+            sym = newSymbol(genSymName (0), 0);
+            sym->type = TTYPE (tree);
+            sym->etype = getSpec(sym->type);
+            sym->lineDef = tree->lineno;
+            sym->cdef = 1;
+            sym->isref = 1;
+            SPEC_STAT (sym->etype) = 1;
+            SPEC_ADDR (sym->etype) = SPEC_ADDR (AST_SYMBOL (tree->left->left)->etype)
+                                     + element->offset;
+            SPEC_ABSA(sym->etype) = 1;
+            addSym (SymbolTab, sym, sym->name, 0, 0, 0);
+            allocGlobal (sym);
+            
+            AST_VALUE (tree) = symbolVal(sym);
+            TLVAL (tree) = 1;
+            TRVAL (tree) = 0;
+            tree->type = EX_VALUE;
+            tree->left = NULL;
+            tree->right = NULL;          
+        }
 
       return tree;
 
@@ -2257,6 +2298,22 @@ decorateType (ast * tree)
       TETYPE (tree) = getSpec (TTYPE (tree));
       LLVAL (tree) = 1;
       TLVAL (tree) = 1;
+
+      #if 0      
+      if (IS_AST_OP (tree->left) && tree->left->opval.op == PTR_OP
+          && IS_AST_VALUE (tree->left->left) && !IS_AST_SYM_VALUE (tree->left->left))
+        {  
+          symbol *element = getStructElement (SPEC_STRUCT (LETYPE(tree->left)),
+				      AST_SYMBOL(tree->left->right));
+	  AST_VALUE(tree) = valPlus(AST_VALUE(tree->left->left),
+                                    valueFromLit(element->offset));
+	  tree->left = NULL;
+	  tree->right = NULL;
+	  tree->type = EX_VALUE;
+	  tree->values.literalFromCast = 1;
+        }
+      #endif
+      
       return tree;
 
       /*------------------------------------------------------------------*/
@@ -2384,7 +2441,12 @@ decorateType (ast * tree)
 	      werror (E_LVALUE_REQUIRED, "pointer deref");
 	      goto errorTreeReturn;
 	    }
-	  TTYPE (tree) = copyLinkChain (LTYPE (tree)->next);
+	  if (IS_ADDRESS_OF_OP(tree->left))
+            {
+              /* replace *&obj with obj */
+              return tree->left->left;
+            }
+          TTYPE (tree) = copyLinkChain (LTYPE (tree)->next);
 	  TETYPE (tree) = getSpec (TTYPE (tree));
 	  return tree;
 	}
@@ -2800,20 +2862,108 @@ decorateType (ast * tree)
 		 SPEC_STRUCT(LETYPE(tree))->tag);
 	}
 #endif
-      /* if the right is a literal replace the tree */
-      if (IS_LITERAL (RETYPE (tree)) && !IS_PTR (LTYPE (tree))) {
-	tree->type = EX_VALUE;
+      if (IS_ADDRESS_OF_OP(tree->right)
+          && IS_AST_SYM_VALUE (tree->right->left)
+          && SPEC_ABSA (AST_SYMBOL (tree->right->left)->etype)) {
+	    
+        tree->type = EX_VALUE;
 	tree->opval.val =
 	  valCastLiteral (LTYPE (tree),
-			  floatFromVal (valFromType (RETYPE (tree))));
+			  SPEC_ADDR (AST_SYMBOL (tree->right->left)->etype));
+	TTYPE (tree) = tree->opval.val->type;
+        TETYPE (tree) = getSpec (TTYPE (tree));
 	tree->left = NULL;
 	tree->right = NULL;
-	TTYPE (tree) = tree->opval.val->type;
 	tree->values.literalFromCast = 1;
-      } else {
-	TTYPE (tree) = LTYPE (tree);
-	LRVAL (tree) = 1;
+        return tree;
       }
+      
+      /* handle offsetof macro:            */
+      /* #define offsetof(TYPE, MEMBER) \  */
+      /* ((unsigned) &((TYPE *)0)->MEMBER) */      
+      if (IS_ADDRESS_OF_OP(tree->right)
+          && IS_AST_OP (tree->right->left)
+          && tree->right->left->opval.op == PTR_OP
+          && IS_AST_OP (tree->right->left->left)
+          && tree->right->left->left->opval.op == CAST
+          && IS_AST_LIT_VALUE(tree->right->left->left->right)) {
+            
+        symbol *element = getStructElement (
+          SPEC_STRUCT (LETYPE(tree->right->left)),
+	  AST_SYMBOL(tree->right->left->right)
+        );
+	
+        if (element) {
+          tree->type = EX_VALUE;
+	  tree->opval.val = valCastLiteral (
+	    LTYPE (tree),
+	    element->offset
+            + floatFromVal (valFromType (RETYPE (tree->right->left->left)))
+          );
+        
+	  TTYPE (tree) = tree->opval.val->type;
+          TETYPE (tree) = getSpec (TTYPE (tree));
+	  tree->left = NULL;
+	  tree->right = NULL;
+          return tree;
+        }
+      }
+      
+      /* if the right is a literal replace the tree */
+      if (IS_LITERAL (RETYPE (tree))) {
+        if (IS_PTR (LTYPE (tree)) && !IS_GENPTR (LTYPE (tree)) ) {
+          /* rewrite      (type *)litaddr
+             as           &temp
+             and define   type at litaddr temp
+             (but only if type's storage class is not generic)
+          */
+          ast *newTree = newNode ('&', NULL, NULL);
+          symbol *sym;
+
+          TTYPE (newTree) = LTYPE (tree);
+          TETYPE (newTree) = getSpec(LTYPE (tree));
+
+          /* define a global symbol at the casted address*/
+          sym = newSymbol(genSymName (0), 0);
+          sym->type = LTYPE (tree)->next;
+          if (!sym->type)
+            sym->type = newLink (V_VOID);
+          sym->etype = getSpec(sym->type);
+          SPEC_SCLS (sym->etype) = sclsFromPtr (LTYPE (tree));
+          sym->lineDef = tree->lineno;
+          sym->cdef = 1;
+          sym->isref = 1;
+          SPEC_STAT (sym->etype) = 1;
+          SPEC_ADDR(sym->etype) = floatFromVal (valFromType (RETYPE (tree)));
+          SPEC_ABSA(sym->etype) = 1;
+          addSym (SymbolTab, sym, sym->name, 0, 0, 0);
+          allocGlobal (sym);
+
+          newTree->left = newAst_VALUE(symbolVal(sym));
+          newTree->left->lineno = tree->lineno;
+          LTYPE (newTree) = sym->type;
+          LETYPE (newTree) = sym->etype;
+	  LLVAL (newTree) = 1;
+          LRVAL (newTree) = 0;
+          TLVAL (newTree) = 1;
+          return newTree;
+        }
+        if (!IS_PTR (LTYPE (tree))) {
+	  tree->type = EX_VALUE;
+	  tree->opval.val =
+	  valCastLiteral (LTYPE (tree),
+			  floatFromVal (valFromType (RETYPE (tree))));
+	  TTYPE (tree) = tree->opval.val->type;
+	  tree->left = NULL;
+	  tree->right = NULL;
+	  tree->values.literalFromCast = 1;
+	  TETYPE (tree) = getSpec (TTYPE (tree));
+          return tree;
+        }
+      }
+      TTYPE (tree) = LTYPE (tree);
+      LRVAL (tree) = 1;
+      
 #endif      
       TETYPE (tree) = getSpec (TTYPE (tree));
 

@@ -522,7 +522,7 @@ cl_z80::inst_Xd(void)
       return(resGO);
 
       case 0xE9: // JP (IX)
-        PC = get2(regs_IX_OR_IY);
+        PC = regs_IX_OR_IY;
       return(resGO);
 
       default:

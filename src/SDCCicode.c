@@ -149,12 +149,6 @@ int printOperand (operand *op, FILE *file)
 		 OP_LIVEFROM(op),OP_LIVETO(op),
 		 OP_SYMBOL(op)->stack,
 		 op->isaddr, OP_SYMBOL(op)->isreqv,OP_SYMBOL(op)->remat
-/* 		 , */
-/* 		 OP_SYMBOL(op)->allocreq,OP_SYMBOL(op)->remat, */
-/* 		 OP_SYMBOL(op)->ruonly, */
-/* 		 OP_SYMBOL(op)->isptr,op->isaddr,OP_SYMBOL(op)->used, */
-/* 		 OP_SYMBOL(op)->isind, */
-/* 		 OP_SYMBOL(op)->accuse, op->key, OP_SYMBOL(op)->key */
 		 );
 	{
 	    fprintf(file,"{"); printTypeChain(operandType(op),file); 
@@ -1735,12 +1729,7 @@ operand *geniCodeArray (operand *left,operand *right)
     link *ltype = operandType(left);
     
     if (IS_PTR(ltype)) {
-	operand *r ;
-	int olval = lvaluereq ;
-	lvaluereq = IS_PTR(ltype->next);
-	r= geniCodeDerefPtr(geniCodeAdd(left,right));
-	lvaluereq = olval;
-	return r;
+	return geniCodeDerefPtr(geniCodeAdd(left,right));
     }
 
    /* array access */
@@ -1762,7 +1751,7 @@ operand *geniCodeArray (operand *left,operand *right)
 				      !IS_AGGREGATE(ltype->next) &&
 				      !IS_PTR(ltype->next))
 				     ? ltype : ltype->next),0);
-/*     IC_RESULT(ic) = newiTempOperand(ltype->next,0); */
+
     IC_RESULT(ic)->isaddr = (!IS_AGGREGATE(ltype->next));
     ADDTOCHAIN(ic);
     return IC_RESULT(ic) ;
@@ -1815,7 +1804,6 @@ operand *geniCodePostInc (operand *op)
 		   geniCodeRValue(op,(IS_PTR(optype) ? TRUE : FALSE)) :
 		   op);		   
     link *rvtype = operandType(rv);    
-    int diff = (IS_PTR(rvtype) && DCL_TYPE(optype) != DCL_TYPE(rvtype));
     int size = 0;
     
     /* if this is not an address we have trouble */
@@ -1824,7 +1812,7 @@ operand *geniCodePostInc (operand *op)
 	return op ;
     }
     
-    rOp = newiTempOperand((diff ? rvtype : optype),0);
+    rOp = newiTempOperand(rvtype,0);
     rOp->noSpilLoc = 1;
 
     if (IS_ITEMP(rv))
@@ -1834,7 +1822,7 @@ operand *geniCodePostInc (operand *op)
    
     size = (IS_PTR(rvtype) ? getSize(rvtype->next) : 1);
     ic = newiCode('+',rv,operandFromLit(size));          
-    IC_RESULT(ic) = result =newiTempOperand((diff ? rvtype : optype),0);
+    IC_RESULT(ic) = result =newiTempOperand(rvtype,0);
     ADDTOCHAIN(ic);
 
     geniCodeAssign(op,result,0);
@@ -1854,7 +1842,6 @@ operand *geniCodePreInc (operand *op)
 		    geniCodeRValue (op,(IS_PTR(optype) ? TRUE : FALSE)) :
 		    op);
     link *roptype = operandType(rop);
-    int diff = (IS_PTR(roptype) && (DCL_TYPE(roptype) != DCL_TYPE(optype)));
     operand *result;
     int size = 0;
     
@@ -1866,7 +1853,7 @@ operand *geniCodePreInc (operand *op)
 
     size = (IS_PTR(roptype) ? getSize(roptype->next) : 1);
     ic = newiCode('+',rop,operandFromLit(size));
-    IC_RESULT(ic) = result = newiTempOperand((diff ? roptype : optype),0) ;
+    IC_RESULT(ic) = result = newiTempOperand(roptype,0) ;
     ADDTOCHAIN(ic);
 
     
@@ -1886,7 +1873,6 @@ operand *geniCodePostDec (operand *op)
 		   geniCodeRValue(op,(IS_PTR(optype) ? TRUE : FALSE)) :
 		   op);		   
     link *rvtype = operandType(rv);    
-    int diff = (IS_PTR(rvtype) && DCL_TYPE(optype) != DCL_TYPE(rvtype));
     int size = 0;
     
     /* if this is not an address we have trouble */
@@ -1895,7 +1881,7 @@ operand *geniCodePostDec (operand *op)
 	return op ;
     }
     
-    rOp = newiTempOperand((diff ? rvtype : optype),0);
+    rOp = newiTempOperand(rvtype,0);
     rOp->noSpilLoc = 1;
 
     if (IS_ITEMP(rv))
@@ -1905,7 +1891,7 @@ operand *geniCodePostDec (operand *op)
    
     size = (IS_PTR(rvtype) ? getSize(rvtype->next) : 1);
     ic = newiCode('-',rv,operandFromLit(size));          
-    IC_RESULT(ic) = result =newiTempOperand((diff ? rvtype : optype),0);
+    IC_RESULT(ic) = result =newiTempOperand(rvtype,0);
     ADDTOCHAIN(ic);
 
     geniCodeAssign(op,result,0);
@@ -1925,7 +1911,6 @@ operand *geniCodePreDec (operand *op)
 		    geniCodeRValue (op,(IS_PTR(optype) ? TRUE : FALSE)) :
 		    op);
     link *roptype = operandType(rop);
-    int diff = (IS_PTR(roptype) && (DCL_TYPE(roptype) != DCL_TYPE(optype)));
     operand *result;
     int size = 0;
     
@@ -1937,7 +1922,7 @@ operand *geniCodePreDec (operand *op)
 
     size = (IS_PTR(roptype) ? getSize(roptype->next) : 1);
     ic = newiCode('-',rop,operandFromLit(size));
-    IC_RESULT(ic) = result = newiTempOperand((diff ? roptype : optype),0) ;
+    IC_RESULT(ic) = result = newiTempOperand(roptype,0) ;
     ADDTOCHAIN(ic);
 
     
@@ -2058,7 +2043,6 @@ void setOClass (link *ptr, link *spec)
     case PPOINTER:
 	SPEC_OCLS(spec) = xstack;
 	break;
-	
     }
 }
 
@@ -2090,7 +2074,7 @@ operand *geniCodeDerefPtr (operand *op)
     if (IS_PTR(optype)) 
 	setOClass(optype,retype);    
         
-    op = geniCodeRValue(op,TRUE);
+
     op->isGptr = IS_GENPTR(optype);
 
     /* if the pointer was declared as a constant */
@@ -2098,13 +2082,15 @@ operand *geniCodeDerefPtr (operand *op)
     if (IS_PTR_CONST(optype))
 	SPEC_CONST(retype) = 1;
     
-
-    setOperandType(op,rtype);
     op->isaddr = (IS_PTR(rtype)    ||
 		  IS_STRUCT(rtype) || 
 		  IS_INT(rtype)    ||
 		  IS_CHAR(rtype)   ||
 		  IS_FLOAT(rtype) );
+
+    if (!lvaluereq)
+	op = geniCodeRValue(op,TRUE);
+    setOperandType(op,rtype);
     
     return op;    
 }
@@ -2551,7 +2537,6 @@ void geniCodeIfx (ast *tree)
 {
     iCode *ic;
     operand *condition = ast2iCode(tree->left);
-/*     link *ctype = operandType(condition);     */
     link *cetype; 
     
     /* if condition is null then exit */
@@ -2795,7 +2780,13 @@ operand *ast2iCode (ast *tree)
 	} else {
 	    left =  operandFromAst(tree->left);
 	}
-	right= operandFromAst(tree->right);
+	if (tree->opval.op == INC_OP || tree->opval.op == DEC_OP) {
+	    lvaluereq++;
+	    right= operandFromAst(tree->right);
+	    lvaluereq--;
+	} else {
+	    right= operandFromAst(tree->right);
+	}
     }
     
     /* now depending on the type of operand */

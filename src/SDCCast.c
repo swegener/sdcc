@@ -207,7 +207,7 @@ void copyAstValues (ast *dest,ast *src)
 	break ;
 	
     case INLINEASM:
-	dest->values.inlineasm = Safe_calloc(strlen(src->values.inlineasm));
+	dest->values.inlineasm = Safe_calloc(strlen(src->values.inlineasm)+1);
 	strcpy(dest->values.inlineasm,src->values.inlineasm);
 
     case FOR:

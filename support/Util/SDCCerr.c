@@ -382,6 +382,8 @@ struct
     "illegal combination of options (--c1mode, -E, -S -c)" },
 { E_DUPLICATE_MEMBER, ERROR_LEVEL_ERROR,
     "duplicate %s member '%s'" },
+{ E_STACK_VIOLATION, ERROR_LEVEL_ERROR,
+    "'%s' internal stack %s" },
 };
 
 /*

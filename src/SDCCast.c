@@ -1644,6 +1644,9 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
       /*       function call        */
 /*----------------------------*/
     case CALL:
+	/* if local & not passed as paramater then ok */
+	if (sym->level && !astHasSymbol(pbody->right,sym)) 
+	    return TRUE;
       return FALSE;
 
 /*------------------------------------------------------------------*/

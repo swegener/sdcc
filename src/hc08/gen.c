@@ -4263,6 +4263,10 @@ genPointerGetSetOfs (iCode *ic)
   if (!pset && !pget)
     return FALSE;
 
+  /* Make sure this is the only use of the pointer */
+  if (bitVectnBitsOn (OP_USES (IC_RESULT (ic))) > 1)
+    return FALSE;
+    
   D(emitcode("", "; checking pset operandsEqu"));
   if (pset & !operandsEqu (IC_RESULT (ic), IC_RESULT (lic)))
     return FALSE;
@@ -6749,6 +6753,7 @@ genPackBits (sym_link * etype,
   int bstr;		/* bitfield starting bit within byte */
   int litval;		/* source literal value (if AOP_LIT) */
   unsigned char mask;	/* bitmask within current byte */
+  int xoffset = 0;
 
   D(emitcode (";     genPackBits",""));
 
@@ -6807,6 +6812,7 @@ genPackBits (sym_link * etype,
       if (AOP (right)->type == AOP_DIR)
         {
           emitcode ("mov", "%s,x+", aopAdrStr(AOP (right), offset, FALSE));
+	  xoffset++;
         }
       else
         {
@@ -6828,13 +6834,13 @@ genPackBits (sym_link * etype,
           litval = (int) floatFromVal (AOP (right)->aopu.aop_lit);
           litval >>= (blen-rlen);
           litval &= (~mask) & 0xff;
-          emitcode ("lda", "%d,x", offset);
+          emitcode ("lda", "%d,x", offset - xoffset);
           hc08_dirtyReg (hc08_reg_a, FALSE);
           if ((mask|litval)!=0xff)
             emitcode ("and","#0x%02x", mask);
           if (litval)
             emitcode ("ora","#0x%02x", litval);
-          emitcode ("sta", "%d,x", offset);
+          emitcode ("sta", "%d,x", offset - xoffset);
           hc08_dirtyReg (hc08_reg_a, FALSE);
           hc08_freeReg (hc08_reg_a);
           return;
@@ -6842,15 +6848,15 @@ genPackBits (sym_link * etype,
       
       /* Case with partial byte and arbitrary source
       */
-      loadRegFromAop (hc08_reg_a, AOP (right), offset++);
+      loadRegFromAop (hc08_reg_a, AOP (right), offset);
       emitcode ("and", "#0x%02x", (~mask) & 0xff);
       hc08_dirtyReg (hc08_reg_a, FALSE);
       pushReg (hc08_reg_a, TRUE);
 
-      emitcode ("lda", ",x");
+      emitcode ("lda", "%d,x", offset - xoffset);
       emitcode ("and", "#0x%02x", mask);
       emitcode ("ora", "1,s");
-      emitcode ("sta", ",x");
+      emitcode ("sta", "%d,x", offset - xoffset);
       pullReg (hc08_reg_a);
     }
 

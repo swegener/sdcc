@@ -38,10 +38,15 @@ struct y {
   char  b[];
 };
 
+/* I think section 6.7.2.1 paragraph 2 of ISO/IEC 9899:1999 prohibits */
+/* nesting a structure ending in a flexible array inside another      */
+/* struct/union. In any case, my gcc (3.2.2) chokes on this. -- EEP   */
+#ifdef NESTED_FLEX_ARRAY
 struct z {
   char     c;
   struct y s;
 };
+#endif
 
 struct x STORAGE teststruct[5] = {
   { 10, {  1, 2, 3, 4, 5} },
@@ -53,10 +58,12 @@ struct y STORAGE incompletestruct = {
   10, {1, 2, 3, 4, 5}
 };
 
+#ifdef NESTED_FLEX_ARRAY
 struct z STORAGE nestedstruct = {
   16,
   {20, {6, 7, 8} }
 };
+#endif
 
 void
 testZeropad(void)
@@ -87,7 +94,9 @@ testZeropad(void)
   ASSERT(sizeof(incompletestruct) == offsetof(struct y, b));
   ASSERT(sizeof(incompletestruct) == offsetof(struct x, b));
 
+#ifdef NESTED_FLEX_ARRAY
   ASSERT(nestedstruct.c      == 16);
   ASSERT(nestedstruct.s.a    == 20);
   ASSERT(nestedstruct.s.b[2] ==  8);
+#endif
 }

@@ -1733,9 +1733,9 @@ findAssignToSym (operand * op, iCode * ic)
 	  /* or in stack space in case of + & - */
 
 	  /* if assigned to a non-symbol then return
-	     true */
+	     FALSE */
 	  if (!IS_SYMOP (IC_RIGHT (dic)))
-	    break;
+	    return NULL;
 
 	  /* if the symbol is in far space then
 	     we should not */
@@ -1794,6 +1794,8 @@ static int
 packRegsForSupport (iCode * ic, eBBlock * ebp)
 {
   int change = 0;
+  iCode *dic, *sic;
+
   /* for the left & right operand :- look to see if the
      left was assigned a true symbol in far space in that
      case replace them */
@@ -1801,8 +1803,7 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
   if (IS_ITEMP (IC_LEFT (ic)) &&
       OP_SYMBOL (IC_LEFT (ic))->liveTo <= ic->seq)
     {
-      iCode *dic = findAssignToSym (IC_LEFT (ic), ic);
-      iCode *sic;
+      dic = findAssignToSym (IC_LEFT (ic), ic);
 
       if (!dic)
 	goto right;
@@ -1812,9 +1813,8 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
       for (sic = dic; sic != ic; sic = sic->next)
 	bitVectUnSetBit (sic->rlive, IC_LEFT (ic)->key);
 
-      IC_LEFT (ic)->operand.symOperand =
-	IC_RIGHT (dic)->operand.symOperand;
-      IC_LEFT (ic)->key = IC_RIGHT (dic)->operand.symOperand->key;
+      OP_SYMBOL(IC_LEFT (ic))=OP_SYMBOL(IC_RIGHT (dic));
+      IC_LEFT (ic)->key = OP_SYMBOL(IC_RIGHT (dic))->key;
       remiCodeFromeBBlock (ebp, dic);
       hTabDeleteItem (&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
       change++;

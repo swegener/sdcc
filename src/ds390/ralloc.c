@@ -1745,9 +1745,9 @@ findAssignToSym (operand * op, iCode * ic)
 	  /* or in stack space in case of + & - */
 
 	  /* if assigned to a non-symbol then return
-	     true */
+	     FALSE */
 	  if (!IS_SYMOP (IC_RIGHT (dic)))
-	    break;
+	    return NULL;
 
 	  /* if the symbol is in far space then
 	     we should not */

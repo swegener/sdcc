@@ -44,7 +44,9 @@ $(TSS).html: $(TSS).tex
 # Deleting all files created by building the program
 # --------------------------------------------------
 clean:
-	rm -rf $(MANUAL).html $(TSS).html
+# The directories are still in CVS, so don't delete them
+#	rm -rf $(MANUAL).html $(TSS).html
+	rm -f $(MANUAL).html/* $(TSS).html/*
 	rm -f $(MANUAL).txt $(TSS).txt *.pdf *.dvi *.tex *.ind *.glo *.aux *.idx *.ilg *.log *.toc
 
 # Deleting all files created by configuring or building the program

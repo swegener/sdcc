@@ -1,3 +1,7 @@
+2003-10-31 Klaus Flittner <klaus_flittner@gmx.de>
+
+	* src/SDCCcse.c (updateSpillLocation): fixed bug #808027
+
 2003-10-31 Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCmain.c (linkEdit): "fixed" bug #833605

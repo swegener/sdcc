@@ -1165,6 +1165,7 @@ updateSpillLocation (iCode * ic, int induction)
 	if (ic->nosupdate)
 		return;
 
+#if 0
 	/* for the form true_symbol := iTempNN */
 	if (ASSIGN_ITEMP_TO_SYM (ic) && 
 	    !SPIL_LOC (IC_RIGHT (ic))) {
@@ -1183,6 +1184,7 @@ updateSpillLocation (iCode * ic, int induction)
 		}
 	    
 	}
+#endif
 
 #if 0 /* this needs furthur investigation can save a lot of code */
 	if (ASSIGN_SYM_TO_ITEMP(ic) &&

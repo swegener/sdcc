@@ -3358,6 +3358,8 @@ adjustArithmeticResult (iCode * ic)
     }
 }
 
+#if 0 // AOP_OP_3 is deprecated; nobody likes Ack errors.
+      // Please don't bring it back without a really good reason.
 // Macro to aopOp all three operands of an ic. Will fatal if this cannot be done
 // (because all three operands are in far space).
 #define AOP_OP_3(ic) \
@@ -3372,6 +3374,7 @@ adjustArithmeticResult (iCode * ic)
         fprintf(stderr,                                  \
                "Ack: three operands in far space! (%s:%d %s:%d)\n", __FILE__, __LINE__, ic->filename, ic->lineno);   \
     }
+#endif
 
 // Macro to aopOp all three operands of an ic. If this cannot be done, 
 // the IC_LEFT and IC_RIGHT operands will be aopOp'd, and the rc parameter
@@ -4264,7 +4267,8 @@ release:
 static void
 genModbits (operand * left,
 	    operand * right,
-	    operand * result)
+	    operand * result,
+	    iCode   * ic)
 {
 
   char *l;
@@ -4274,6 +4278,7 @@ genModbits (operand * left,
   emitcode ("div", "ab");
   emitcode ("mov", "a,b");
   emitcode ("rrc", "a");
+  aopOp(result, ic, TRUE, FALSE);
   aopPut (AOP (result), "c", 0);
 }
 
@@ -4283,7 +4288,8 @@ genModbits (operand * left,
 static void
 genModOneByte (operand * left,
 	       operand * right,
-	       operand * result)
+	       operand * result,
+	       iCode   * ic)
 {
   sym_link *opetype = operandType (result);
   char *l;
@@ -4295,6 +4301,7 @@ genModOneByte (operand * left,
       /* unsigned is easy */
       LOAD_AB_FOR_DIV (left, right, l);
       emitcode ("div", "ab");
+      aopOp(result, ic, TRUE, FALSE);	
       aopPut (AOP (result), "b", 0);
       return;
     }
@@ -4347,6 +4354,7 @@ genModOneByte (operand * left,
   emitcode ("", "%05d$:", (lbl->key + 100));
 
   /* now we are done */
+  aopOp(result, ic, TRUE, FALSE);    
   aopPut (AOP (result), "b", 0);
 
 }
@@ -4361,18 +4369,17 @@ genMod (iCode * ic)
   operand *right = IC_RIGHT (ic);
   operand *result = IC_RESULT (ic);
 
-  D (emitcode (";", "genMod ");
-    );
+  D (emitcode (";", "genMod "); );
 
   /* assign the amsops */
-  AOP_OP_3 (ic);
+  AOP_OP_2 (ic);
 
   /* special cases first */
   /* both are bits */
   if (AOP_TYPE (left) == AOP_CRY &&
       AOP_TYPE (right) == AOP_CRY)
     {
-      genModbits (left, right, result);
+      genModbits (left, right, result, ic);
       goto release;
     }
 
@@ -4380,7 +4387,7 @@ genMod (iCode * ic)
   if (AOP_SIZE (left) == 1 &&
       AOP_SIZE (right) == 1)
     {
-      genModOneByte (left, right, result);
+      genModOneByte (left, right, result, ic);
       goto release;
     }
 

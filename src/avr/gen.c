@@ -65,6 +65,7 @@ unsigned fAVRReturnSize = 4; /* shared with ralloc.c */
 char **fAVRReturn = fReturnAVR;
 
 static short rbank = -1;
+static char *larray[4] = {"lo8","hi8","hlo8","hhi8"};
 
 static struct {
     short xPushed;
@@ -1097,10 +1098,10 @@ static void genCpl (iCode *ic)
 	    emitcode ("com","%s",l);
 	} else {
 	    aopPut(AOP(IC_RESULT(ic)),l,offset);
-	    emitcode ("com","%s",aopGet(AOP(IC_RESULT(ic)),offset++));
+	    emitcode ("com","%s",aopGet(AOP(IC_RESULT(ic)),offset));
 	}
+	offset++;
     }
-
 
     /* release the aops */
     freeAsmop(IC_LEFT(ic),NULL,ic,(RESULTONSTACK(ic) ? 0 : 1));
@@ -1158,18 +1159,30 @@ static void genUminus (iCode *ic)
     size = AOP_SIZE(IC_LEFT(ic));
     offset = 0 ;
     samer = sameRegs(AOP(IC_LEFT(ic)),AOP(IC_RESULT(ic)));
-    CLRC;
-    while(size--) {
-        char *l = aopGet(AOP(IC_LEFT(ic)),offset);
-	if (samer) {
-	    emitcode("clr","r0");
-	    emitcode("sbc","r0,%s",l);
-	    aopPut(AOP(IC_RESULT(ic)),"r0",offset++);
-	} else {
-	    char *s;
-	    emitcode("clr","%s",s=aopGet(AOP(IC_RESULT(ic)),offset++));
-	    emitcode("sbc","%s,%s",s,l);
-	}
+    if (size == 1) {
+	    if (samer) {
+		    emitcode("neg","%s",aopGet(AOP(IC_LEFT(ic)),0));
+	    } else {
+		    aopPut(AOP(IC_RESULT(ic)),aopGet(AOP(IC_LEFT(ic)),0),0);
+		    emitcode("neg","%s",aopGet(AOP(IC_RESULT(ic)),0));
+	    }
+    } else {
+	    offset = size - 1;
+	    while(size--) {
+		    char *l = aopGet(AOP(IC_LEFT(ic)),offset);
+		    if (!samer) {
+			    aopPut(AOP(IC_RESULT(ic)),l,offset);
+			    l = aopGet(AOP(IC_RESULT(ic)),offset);
+		    }
+		    if (offset) emitcode("com","%s",l);
+		    else emitcode("neg","%s",l);
+		    offset--;
+	    }
+	    size = AOP_SIZE(IC_LEFT(ic)) -1;
+	    offset = 1 ;
+	    while (size--) {
+		    emitcode("sbci","%s,lo8(-1)",aopGet(AOP(IC_RESULT(ic)),offset++));
+	    }
     }
 
     /* if any remaining bytes in the result */
@@ -1595,10 +1608,16 @@ static void genRet (iCode *ic)
     size = AOP_SIZE(IC_LEFT(ic));
     
     while (size--) {
-	char *l ;
-	l = aopGet(AOP(IC_LEFT(ic)),offset);
-	if (strcmp(fAVRReturn[offset],l))
-	    emitcode("mov","%s,%s",fAVRReturn[offset++],l);
+	if (AOP_TYPE(IC_LEFT(ic)) == AOP_LIT) {
+		emitcode("ldi","%s,%s(%d)",fAVRReturn[offset],larray[offset],
+			 (int)floatFromVal (AOP(IC_LEFT(ic))->aopu.aop_lit),offset);
+	} else {		
+		char *l ;
+		l = aopGet(AOP(IC_LEFT(ic)),offset);
+		if (strcmp(fAVRReturn[offset],l))
+			emitcode("mov","%s,%s",fAVRReturn[offset],l);
+	}
+	offset++;
     }    
 
     freeAsmop (IC_LEFT(ic),NULL,ic,TRUE);
@@ -1675,9 +1694,7 @@ static bool genPlusIncr (iCode *ic)
     
     /* if the sizes are greater than 2 or they are not the same regs
        then we cannot */
-    if (AOP_SIZE(IC_RESULT(ic)) > 2 ||
-        AOP_SIZE(IC_LEFT(ic)) > 2   ||
-	!sameRegs(AOP(IC_LEFT(ic)),AOP(IC_RESULT(ic))))
+    if (!sameRegs(AOP(IC_LEFT(ic)),AOP(IC_RESULT(ic))))
         return FALSE ;
     
     /* so we know LEFT & RESULT in the same registers and add
@@ -1692,18 +1709,28 @@ static bool genPlusIncr (iCode *ic)
 	return TRUE;
     }
 
-    /* if register pair and starts with 26/30 then adiw */
-    if (isRegPair(AOP(IC_RESULT(ic))) && icount > 0 && icount < 64 &&
-	( IS_REGIDX(AOP(IC_RESULT(ic)),R26_IDX) ||
-	  IS_REGIDX(AOP(IC_RESULT(ic)),R30_IDX) )) {
-	emitcode("adiw","%s,%d",aopGet(AOP(IC_RESULT(ic)),0),icount);
-	return TRUE;
-    }
+    if (AOP_SIZE(IC_RESULT(ic)) <= 3) {
+	    /* if register pair and starts with 26/30 then adiw */
+	    if (isRegPair(AOP(IC_RESULT(ic))) && icount > 0 && icount < 64 &&
+		( IS_REGIDX(AOP(IC_RESULT(ic)),R26_IDX) ||
+		  IS_REGIDX(AOP(IC_RESULT(ic)),R30_IDX) )) {
+		    emitcode("adiw","%s,%d",aopGet(AOP(IC_RESULT(ic)),0),icount);
+		    return TRUE;
+	    }
     
-    /* use subi */
+	    /* use subi */
+	    emitcode("subi","%s,lo8(%d)",aopGet(AOP(IC_RESULT(ic)),0),-icount);
+	    emitcode("sbci","%s,hi8(%d)",aopGet(AOP(IC_RESULT(ic)),1),-icount);
+	    return TRUE;
+    }
+
+    /* for 32 bit longs */
     emitcode("subi","%s,lo8(%d)",aopGet(AOP(IC_RESULT(ic)),0),-icount);
     emitcode("sbci","%s,hi8(%d)",aopGet(AOP(IC_RESULT(ic)),1),-icount);
+    emitcode("sbci","%s,hlo8(%d)",aopGet(AOP(IC_RESULT(ic)),2),-icount);
+    emitcode("sbci","%s,hhi8(%d)",aopGet(AOP(IC_RESULT(ic)),3),-icount);
     return TRUE;
+   
 }
 
 /* This is the pure and virtuous version of this code.
@@ -1747,6 +1774,8 @@ static void adjustArithmeticResult  (iCode *ic)
 static void genPlus (iCode *ic)
 {
     int size, offset = 0;
+    int samer;
+    char *l;
 
     /* special cases :- */
 
@@ -1760,15 +1789,28 @@ static void genPlus (iCode *ic)
         goto release;   
 
     size = getDataSize(IC_RESULT(ic));
+    samer = sameRegs(AOP(IC_RESULT(ic)),AOP(IC_LEFT(ic)));
 
     while(size--) {
-	aopPut(AOP(IC_RESULT(ic)),aopGet(AOP(IC_RIGHT(ic)),offset),offset);
-	if(offset == 0)
-	    emitcode("add","%s,%s",aopGet(AOP(IC_RESULT(ic)),offset),
-		     aopGet(AOP(IC_LEFT(ic)),offset));
-	else
-	    emitcode("adc","%s,%s",aopGet(AOP(IC_RESULT(ic)),offset),
-		     aopGet(AOP(IC_LEFT(ic)),offset));
+	    if (!samer) 
+		    aopPut(AOP(IC_RESULT(ic)),aopGet(AOP(IC_LEFT(ic)),offset),offset);
+
+	    if (AOP_TYPE(IC_RIGHT(ic)) != AOP_LIT) {
+
+		    if(offset == 0) l = "add";
+		    else l = "adc";
+
+		    emitcode(l,"%s,%s",aopGet(AOP(IC_RESULT(ic)),offset),
+			     aopGet(AOP(IC_RIGHT(ic)),offset));
+	    } else {
+		    if (offset == 0) l = "subi";
+		    else l = "sbci";
+
+		    emitcode(l,"%s,%s(-%d)",aopGet(AOP(IC_RESULT(ic)),offset),
+			     larray[offset],
+			     (int)floatFromVal (AOP(IC_RIGHT(ic))->aopu.aop_lit));
+	    }
+	    offset++;
     }
 
     adjustArithmeticResult(ic);
@@ -1796,9 +1838,7 @@ static bool genMinusDec (iCode *ic)
     
     /* if the sizes are greater than 2 or they are not the same regs
        then we cannot */
-    if (AOP_SIZE(IC_RESULT(ic)) > 2 ||
-        AOP_SIZE(IC_LEFT(ic)) > 2   ||
-	!sameRegs(AOP(IC_LEFT(ic)),AOP(IC_RIGHT(ic))))
+    if (!sameRegs(AOP(IC_LEFT(ic)),AOP(IC_RIGHT(ic))))
         return FALSE ;
     
     /* so we know LEFT & RESULT in the same registers and add
@@ -1813,18 +1853,27 @@ static bool genMinusDec (iCode *ic)
 	return TRUE;
     }
 
-    /* if register pair and starts with 26/30 then adiw */
-    if (isRegPair(AOP(IC_RESULT(ic))) && icount > 0 && icount < 64 &&
-	( IS_REGIDX(AOP(IC_RESULT(ic)),R26_IDX) ||
-	  IS_REGIDX(AOP(IC_RESULT(ic)),R30_IDX) )) {
-	emitcode("sbiw","%s,%d",aopGet(AOP(IC_RESULT(ic)),0),icount);
-	return TRUE;
-    }
+    if (AOP_SIZE(IC_RESULT(ic)) <= 3) {
+	    /* if register pair and starts with 26/30 then adiw */
+	    if (isRegPair(AOP(IC_RESULT(ic))) && icount > 0 && icount < 64 &&
+		( IS_REGIDX(AOP(IC_RESULT(ic)),R26_IDX) ||
+		  IS_REGIDX(AOP(IC_RESULT(ic)),R30_IDX) )) {
+		    emitcode("sbiw","%s,%d",aopGet(AOP(IC_RESULT(ic)),0),icount);
+		    return TRUE;
+	    }
     
-    /* use subi */
+	    /* use subi */
+	    emitcode("subi","%s,lo8(%d)",aopGet(AOP(IC_RESULT(ic)),0),icount);
+	    emitcode("sbci","%s,hi8(%d)",aopGet(AOP(IC_RESULT(ic)),1),icount);
+	    return TRUE;
+    }
+    /* for 32 bit longs */
     emitcode("subi","%s,lo8(%d)",aopGet(AOP(IC_RESULT(ic)),0),icount);
     emitcode("sbci","%s,hi8(%d)",aopGet(AOP(IC_RESULT(ic)),1),icount);
+    emitcode("sbci","%s,hlo8(%d)",aopGet(AOP(IC_RESULT(ic)),2),icount);
+    emitcode("sbci","%s,hhi8(%d)",aopGet(AOP(IC_RESULT(ic)),3),icount);
     return TRUE;
+
 }
 
 /*-----------------------------------------------------------------*/
@@ -1850,8 +1899,9 @@ static void addSign(operand *result, int offset, int sign)
 /*-----------------------------------------------------------------*/
 static void genMinus (iCode *ic)
 {
-    int size, offset = 0;
-    
+	int size, offset = 0, samer;
+	char *l;
+
     aopOp (IC_LEFT(ic),ic,FALSE);
     aopOp (IC_RIGHT(ic),ic,FALSE);
     aopOp (IC_RESULT(ic),ic,TRUE);
@@ -1862,15 +1912,27 @@ static void genMinus (iCode *ic)
         goto release;   
     
     size = getDataSize(IC_RESULT(ic));   
-    
+    samer = sameRegs(AOP(IC_RESULT(ic)),AOP(IC_LEFT(ic)));
     while (size--) {
-	aopPut(AOP(IC_RESULT(ic)),aopGet(AOP(IC_RIGHT(ic)),offset),offset);
-	if(offset == 0)
-	    emitcode("sub","%s,%s",aopGet(AOP(IC_RESULT(ic)),offset),
-		     aopGet(AOP(IC_LEFT(ic)),offset));
-	else
-	    emitcode("sbc","%s,%s",aopGet(AOP(IC_RESULT(ic)),offset),
-		     aopGet(AOP(IC_LEFT(ic)),offset));
+	    if (!samer) 
+		    aopPut(AOP(IC_RESULT(ic)),aopGet(AOP(IC_LEFT(ic)),offset),offset);
+
+	    if (AOP_TYPE(IC_RIGHT(ic)) != AOP_LIT) {
+
+		    if(offset == 0) l = "sub";
+		    else l = "sbc";
+
+		    emitcode(l,"%s,%s",aopGet(AOP(IC_RESULT(ic)),offset),
+			     aopGet(AOP(IC_RIGHT(ic)),offset));
+	    } else {
+		    if (offset == 0) l = "subi";
+		    else l = "sbci";
+
+		    emitcode(l,"%s,%s(%d)",aopGet(AOP(IC_RESULT(ic)),offset),
+			     larray[offset],
+			     (int)floatFromVal (AOP(IC_RIGHT(ic))->aopu.aop_lit));
+	    }
+	    offset++;
     }
 
     adjustArithmeticResult(ic);
@@ -1918,12 +1980,14 @@ static void genMultOneByte (operand *left,
 		aopPut(AOP(result),zero,offset++);
 	    }
 	} else {
-	    lbl = newiTempLabel(NULL);
-	    emitcode("ldi","r24,0");
-	    emitcode("brcc","L%05d",lbl->key);
-	    emitcode("ldi","r24,lo8(-1)");
-	    emitcode("","L%05d:",lbl->key);
-	    while (size--) aopPut(AOP(result),"r24",offset++);
+		if (size) {
+			lbl = newiTempLabel(NULL);
+			emitcode("ldi","r24,0");
+			emitcode("brcc","L%05d",lbl->key);
+			emitcode("ldi","r24,lo8(-1)");
+			emitcode("","L%05d:",lbl->key);
+			while (size--) aopPut(AOP(result),"r24",offset++);
+		}
 	}
     }
     return;
@@ -2277,10 +2341,10 @@ static void genAnd (iCode *ic, iCode *ifx)
 	    if (p2) { /* right side is a power of 2 */
 		l = aopGet(AOP(left),p2 / 8);
 		if (IC_TRUE(ifx)) {
-			emitcode("sbrc","%s,%d",l,p2 % 8);
+			emitcode("sbrc","%s,%d",l,(p2 % 8));
 			emitcode("rjmp","L%05d",IC_TRUE(ifx)->key);
 		} else {
-			emitcode("sbrs","%s,%d",l,p2 % 8);
+			emitcode("sbrs","%s,%d",l,(p2 % 8));
 			emitcode("rjmp","L%05d",IC_FALSE(ifx)->key);
 		}
 	    } else { /* right not power of two */
@@ -5116,38 +5180,25 @@ static int genDjnz (iCode *ic, iCode *ifx)
     return 1;
 }
 
+static char *recvregs[8] = 
+{
+	"r16","r17","r18","r19","r20","r21","r22","r23"
+};
+static recvCnt = 0;
+
 /*-----------------------------------------------------------------*/
 /* genReceive - generate code for a receive iCode                  */
 /*-----------------------------------------------------------------*/
 static void genReceive (iCode *ic)
 {    
-    if (isOperandInFarSpace(IC_RESULT(ic)) && 
-	( OP_SYMBOL(IC_RESULT(ic))->isspilt ||
-	  IS_TRUE_SYMOP(IC_RESULT(ic))) ) {
-
-	int size = getSize(operandType(IC_RESULT(ic)));
-	int offset =  fAVRReturnSize - size;
-	while (size--) {
-	    emitcode ("push","%s", (strcmp(fAVRReturn[fAVRReturnSize - offset - 1],"a") ?
-				    fAVRReturn[fAVRReturnSize - offset - 1] : "acc"));
-	    offset++;
-	}
+	int size , offset =0;
 	aopOp(IC_RESULT(ic),ic,FALSE);  
 	size = AOP_SIZE(IC_RESULT(ic));
-	offset = 0;
 	while (size--) {
-	    emitcode ("pop","acc");
-	    aopPut (AOP(IC_RESULT(ic)),"a",offset++);
+		aopPut(AOP(IC_RESULT(ic)),recvregs[recvCnt++],offset);
+		offset++;
 	}
-	
-    } else {
-	_G.accInUse++;
-	aopOp(IC_RESULT(ic),ic,FALSE);  
-	_G.accInUse--;
-	assignResultValue(IC_RESULT(ic));	
-    }
-
-    freeAsmop(IC_RESULT(ic),NULL,ic,TRUE);
+	freeAsmop(IC_RESULT(ic),NULL,ic,TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -5159,7 +5210,7 @@ void genAVRCode (iCode *lic)
     int cln = 0;
 
     lineHead = lineCurr = NULL;
-
+    recvCnt =0;
     /* print the allocation information */
     if (allocInfo)
 	printAllocInfo( currFunc, codeOutFile);

@@ -881,8 +881,10 @@ static void deassignLRs (iCode *ic, eBBlock *ebp)
 		for (i = 0 ; i < result->nRegs ; i++)
 		    if (i < sym->nRegs )
 			result->regs[i] = sym->regs[i] ;
+		    else if  (result->regType == REG_SCR)
+			    result->regs[i] = getRegScr(ic,ebp,result);
 		    else
-			result->regs[i] = getRegGpr (ic,ebp,result);
+			    result->regs[i] = getRegGpr (ic,ebp,result);
 
 		_G.regAssigned = bitVectSetBit(_G.regAssigned,result->key);
 		
@@ -1748,9 +1750,7 @@ static iCode *packRegsForOneuse (iCode *ic, operand *op , eBBlock *ebp)
     
     /* otherwise check that the definition does
        not contain any symbols in far space */
-    if (isOperandInFarSpace(IC_LEFT(dic))  ||
-	isOperandInFarSpace(IC_RIGHT(dic)) ||
-	IS_OP_RUONLY(IC_LEFT(ic))          ||
+    if (IS_OP_RUONLY(IC_LEFT(ic))          ||
 	IS_OP_RUONLY(IC_RIGHT(ic)) )        {
 	return NULL;
     }
@@ -2217,7 +2217,7 @@ static void preAssignParms (iCode *ic)
 	if (ic->op == RECEIVE) {
 	    symbol *r = OP_SYMBOL(IC_RESULT(ic));
 	    int size = getSize(r->type);
-	    if (r->regType == REG_GPR) {
+	    if (r->regType == REG_GPR || r->regType == REG_SCR) {
 		int j = 0;
 		while (size--) {
 		    r->regs[j++] = &regsAVR[i++];

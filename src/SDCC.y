@@ -1138,11 +1138,12 @@ statement
 			    ex->values.inlineasm = malloc(strlen($1)+1);
 			    strcpy(ex->values.inlineasm,$1);			    
 			    $$ = ex;
-                         }   
+                         } 
    ;
 
 labeled_statement
-   : identifier ':' statement          {  $$ = createLabel($1,$3);  }   
+//   : identifier ':' statement          {  $$ = createLabel($1,$3);  }   
+   : identifier ':'                    {  $$ = createLabel($1,NULL);  }   
    | CASE constant_expr ':' statement  {  $$ = createCase(STACK_PEEK(swStk),$2,$4); }
    | DEFAULT ':' statement             {  $$ = createDefault(STACK_PEEK(swStk),$3); }
    ;

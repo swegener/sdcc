@@ -1,0 +1,7 @@
+SDCC known bugs
+---------------
+$Id$
+
+z80 port:
+* Longs and floats are minimally supported.
+

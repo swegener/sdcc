@@ -2895,10 +2895,17 @@ decorateType (ast * tree)
       /* if they are pointers they must be castable */
       if (IS_PTR (LTYPE (tree)) && IS_PTR (RTYPE (tree)))
 	{
+	  if (tree->opval.op==EQ_OP && 
+	      !IS_GENPTR(LTYPE(tree)) && IS_GENPTR(RTYPE(tree))) {
+	    // we cannot cast a gptr to a !gptr: switch the leaves
+	    struct ast *s=tree->left;
+	    tree->left=tree->right;
+	    tree->right=s;
+	  }
 	  if (compareType (LTYPE (tree), RTYPE (tree)) == 0)
 	    {
 	      werror (E_COMPARE_OP);
-	      fprintf (stderr, "comparing type ");
+	      fprintf (stderr, "comparring type ");
 	      printTypeChain (LTYPE (tree), stderr);
 	      fprintf (stderr, "to type ");
 	      printTypeChain (RTYPE (tree), stderr);

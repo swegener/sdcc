@@ -857,8 +857,15 @@ static void aopPut (asmop *aop, char *s, int offset)
 	break;
 	
     case AOP_CRY:
-	/* if bit variable */
-	assert("bit variable cannot be AOP_CRY\n");
+	/* if used only for a condition code check */
+	assert(toupper(*s) == 'R');
+	if (offset == 0) {
+	    emitcode("xrl","r0,r0");
+	    emitcode("cpi","%s,0",s);
+	}
+	else {
+	    emitcode("cpc","r0,%s",s);
+	}
 	break;
 	
     case AOP_STR:
@@ -878,28 +885,6 @@ static void aopPut (asmop *aop, char *s, int offset)
     }    
 
 }
-
-
-#if 0
-/*-----------------------------------------------------------------*/
-/* pointToEnd :- points to the last byte of the operand            */
-/*-----------------------------------------------------------------*/
-static void pointToEnd (asmop *aop)
-{
-    int count ;
-    if (!aop)
-        return ;
-
-    aop->coff = count = (aop->size - 1);
-    switch (aop->type) {
-        case AOP_X :
-        case AOP_Z :
-	    emitcode("adiw","%s,%d",aop->aopu.aop_ptr->name,count);
-            break;
-    }
-
-}
-#endif
 
 /*-----------------------------------------------------------------*/
 /* reAdjustPreg - points a register back to where it should        */
@@ -1034,13 +1019,13 @@ static void outBitC(operand *result)
 /*-----------------------------------------------------------------*/
 /* toBoolean - emit code for orl a,operator(sizeop)                */
 /*-----------------------------------------------------------------*/
-static void toBoolean(operand *oper)
+static void toBoolean(operand *oper, char *r, bool clr)
 {
     int size = AOP_SIZE(oper) ;
     int offset = 0;
-    emitcode ("clr","r0");
+    if (clr) emitcode ("clr","%s",r);
     while (size--) 
-        emitcode("or","r0,%s",aopGet(AOP(oper),offset++));
+        emitcode("or","%s,%s",r,aopGet(AOP(oper),offset++));
 }
 
 
@@ -1064,7 +1049,7 @@ static void genNot (iCode *ic)
     }
     emitcode("clr","r24");
     tlbl = newiTempLabel(NULL);
-    toBoolean(IC_LEFT(ic));
+    toBoolean(IC_LEFT(ic),"r0",TRUE);
     emitcode("bne","L%05d",tlbl->key);
     emitcode("ldi","r24,1");
     emitcode("","L%05d:",tlbl->key);
@@ -1984,15 +1969,6 @@ static void genMod (iCode *ic)
 
 }
 
-/*-----------------------------------------------------------------*/
-/* genCmpGt :- greater than comparison                             */
-/*-----------------------------------------------------------------*/
-static void genCmpGt (iCode *ic, iCode *ifx)
-{
-    /* should have transformed by the parser */
-    assert(1);
-}
-
 enum {
     AVR_EQ = 0,
     AVR_NE,
@@ -2039,9 +2015,9 @@ static void genBranch (iCode *ifx, int br_type, int sign)
 }
 
 /*-----------------------------------------------------------------*/
-/* genCmpLt - less than comparisons                                */
+/* genCmp - compare & jump                                         */
 /*-----------------------------------------------------------------*/
-static void genCmpLt (iCode *ic, iCode *ifx)
+static void genCmp (iCode *ic, iCode *ifx, int br_type)
 {
     operand *left, *right, *result;
     link *letype , *retype;
@@ -2067,10 +2043,10 @@ static void genCmpLt (iCode *ic, iCode *ifx)
 	    if (AOP_TYPE(AOP(right)) == AOP_LIT) {
 		emitcode("cpi","%s,lo8(%d)",aopGet(AOP(left),0),
 			 (int) floatFromVal (AOP(IC_RIGHT(ic))->aopu.aop_lit));
-		genBranch(ifx,AVR_LT);
+		genBranch(ifx,br_type);
 	    } else { /* right != literal */
 		emitcode("cp","%s,%s",aopGet(AOP(left),0),aopGet(AOP(right),0));
-		genBranch(ifx,AVR_LT);
+		genBranch(ifx,br_type);
 	} else { /* size != 1 */
 	    while (size--) {
 		if (offset = 0) 
@@ -2079,7 +2055,7 @@ static void genCmpLt (iCode *ic, iCode *ifx)
 		    emitcode("cpc","%s,%s",aopGet(AOP(left),offset),aopGet(AOP(right),offset));
 		offset++;
 	    }
-	    genBranch(ifx,AVR_LT);
+	    genBranch(ifx,br_type);
 	}
     } else { /* no ifx */
 	emitCode("clr","r0");
@@ -2091,8 +2067,9 @@ static void genCmpLt (iCode *ic, iCode *ifx)
 	    offset++;
 	}
 	lbl = newiTempLabel(NULL);
-	if (sign) emitcode(br_uname[AVR_GE],"L%05d",lbl->key);
-	else emitcode(br_name[AVR_GE],"L%05d",lbl->key);
+	br_type = revavrcnd(br_type);
+	if (sign) emitcode(br_uname[br_type],"L%05d",lbl->key);
+	else emitcode(br_name[br_type],"L%05d",lbl->key);
 	emitcode("inc","r0");
 	emitcode("","L%05d:",lbl->key);
 	aopPut(AOP(result),"r0",0);
@@ -2107,31 +2084,57 @@ static void genCmpLt (iCode *ic, iCode *ifx)
 }
 
 /*-----------------------------------------------------------------*/
+/* genCmpGt :- greater than comparison                             */
+/*-----------------------------------------------------------------*/
+static void genCmpGt (iCode *ic, iCode *ifx)
+{
+    /* should have transformed by the parser */
+    assert(1);
+}
+
+/*-----------------------------------------------------------------*/
+/* genCmpLt - less than comparisons                                */
+/*-----------------------------------------------------------------*/
+static void genCmpLt (iCode *ic, iCode *ifx)
+{
+    genCmp(ic,ifx,AVR_LT);
+}
+
+/*-----------------------------------------------------------------*/
 /* genCmpEq - generates code for equal to                          */
 /*-----------------------------------------------------------------*/
 static void genCmpEq (iCode *ic, iCode *ifx)
 {
-    operand *left, *right, *result;
+    genCmp(ic,ifx,AVR_EQ);
+}
 
-    aopOp((left=IC_LEFT(ic)),ic,FALSE);
-    aopOp((right=IC_RIGHT(ic)),ic,FALSE);
-    aopOp((result=IC_RESULT(ic)),ic,TRUE);
+/*-----------------------------------------------------------------*/
+/* genCmpNe - generates code for not equal to                      */
+/*-----------------------------------------------------------------*/
+static void genCmpNe (iCode *ic, iCode *ifx)
+{
+    genCmp(ic,ifx,AVR_NE);
+}
 
-    /* if literal, literal on the right or 
-    if the right is in a pointer register and left 
-    is not */
-    if ((AOP_TYPE(IC_LEFT(ic)) == AOP_LIT) || 
-        (IS_AOP_PREG(right) && !IS_AOP_PREG(left))) {
-        operand *t = IC_RIGHT(ic);
-        IC_RIGHT(ic) = IC_LEFT(ic);
-        IC_LEFT(ic) = t;
-    }
+/*-----------------------------------------------------------------*/
+/* genCmpGe - generates code for greater than equal to             */
+/*-----------------------------------------------------------------*/
+static void genCmpGe (iCode *ic, iCode *ifx)
+{
+    genCmp(ic,ifx,AVR_GE);
+}
 
-
-release:
-    freeAsmop(left,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
-    freeAsmop(right,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
-    freeAsmop(result,NULL,ic,TRUE);
+/*-----------------------------------------------------------------*/
+/* genCmpLe - generates code for less than equal to                */
+/*-----------------------------------------------------------------*/
+static void genCmpLe (iCode *ic, iCode *ifx)
+{
+    operand *left = IC_LEFT(ic);
+    operand *right= IC_RIGHT(ic);
+    
+    IC_RIGHT(ic) = left;
+    IC_LEFT(ic)  = right;
+    gemCmp(ic,ifx,AVR_GE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2161,6 +2164,7 @@ static void genAndOp (iCode *ic)
 {
     operand *left,*right, *result;
     symbol *tlbl;
+    int size , offset;
 
     /* note here that && operations that are in an
     if statement are taken away by backPatchLabels
@@ -2169,21 +2173,19 @@ static void genAndOp (iCode *ic)
     aopOp((right=IC_RIGHT(ic)),ic,FALSE);
     aopOp((result=IC_RESULT(ic)),ic,FALSE);
 
-    /* if both are bit variables */
-    if (AOP_TYPE(left) == AOP_CRY &&
-        AOP_TYPE(right) == AOP_CRY ) {
-        emitcode("mov","c,%s",AOP(left)->aopu.aop_dir);
-        emitcode("anl","c,%s",AOP(right)->aopu.aop_dir);
-        outBitC(result);
-    } else {
-        tlbl = newiTempLabel(NULL);
-        toBoolean(left);    
-        emitcode("jz","%05d$",tlbl->key+100);
-        toBoolean(right);
-        emitcode("","%05d$:",tlbl->key+100);
-        outBitAcc(result);
-    }
-
+    tlbl = newitempLabel(NULL);
+    toBoolean(left,"r0",TRUE);    
+    toBoolean(right,"r1",TRUE);
+    emitcode("and","r0,r1");
+    emitcode("ldi","r24,1");
+    emitcode("breq","L%05d",tlbl->key);
+    emitcode("dec","r24");
+    emicode("","L%05d:",tlbl->key);
+    aopPut(AOP(result),"r24",0);
+    size = AOP_SIZE(AOP(result)) -1;
+    offset = 1;
+    while (size--) aopPut(AOP(result),zero,offset++);
+    
     freeAsmop(left,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
     freeAsmop(right,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
     freeAsmop(result,NULL,ic,TRUE);
@@ -2197,6 +2199,7 @@ static void genOrOp (iCode *ic)
 {
     operand *left,*right, *result;
     symbol *tlbl;
+    int size , offset;
 
     /* note here that || operations that are in an
     if statement are taken away by backPatchLabels
@@ -2205,20 +2208,17 @@ static void genOrOp (iCode *ic)
     aopOp((right=IC_RIGHT(ic)),ic,FALSE);
     aopOp((result=IC_RESULT(ic)),ic,FALSE);
 
-    /* if both are bit variables */
-    if (AOP_TYPE(left) == AOP_CRY &&
-        AOP_TYPE(right) == AOP_CRY ) {
-        emitcode("mov","c,%s",AOP(left)->aopu.aop_dir);
-        emitcode("orl","c,%s",AOP(right)->aopu.aop_dir);
-        outBitC(result);
-    } else {
-        tlbl = newiTempLabel(NULL);
-        toBoolean(left);
-        emitcode("jnz","%05d$",tlbl->key+100);
-        toBoolean(right);
-        emitcode("","%05d$:",tlbl->key+100);
-        outBitAcc(result);
-    }
+    tlbl = newitempLabel(NULL);
+    toBoolean(left,"r0",TRUE);    
+    toBoolean(right,"r0",FALSE);
+    emitcode("ldi","r24,1");
+    emitcode("breq","L%05d",tlbl->key);
+    emitcode("dec","r24");
+    emicode("","L%05d:",tlbl->key);
+    aopPut(AOP(result),"r24",0);
+    size = AOP_SIZE(AOP(result)) -1;
+    offset = 1;
+    while (size--) aopPut(AOP(result),zero,offset++);
 
     freeAsmop(left,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
     freeAsmop(right,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
@@ -2245,45 +2245,6 @@ static int isLiteralBit(unsigned long lit)
     return 0;
 }
 
-/*-----------------------------------------------------------------*/
-/* continueIfTrue -                                                */
-/*-----------------------------------------------------------------*/
-static void continueIfTrue (iCode *ic)
-{
-    if(IC_TRUE(ic))
-        emitcode("ljmp","%05d$",IC_TRUE(ic)->key+100);
-    ic->generated = 1;
-}
-
-/*-----------------------------------------------------------------*/
-/* jmpIfTrue -                                                     */
-/*-----------------------------------------------------------------*/
-static void jumpIfTrue (iCode *ic)
-{
-    if(!IC_TRUE(ic))
-        emitcode("ljmp","%05d$",IC_FALSE(ic)->key+100);
-    ic->generated = 1;
-}
-
-/*-----------------------------------------------------------------*/
-/* jmpTrueOrFalse -                                                */
-/*-----------------------------------------------------------------*/
-static void jmpTrueOrFalse (iCode *ic, symbol *tlbl)
-{
-    // ugly but optimized by peephole
-    if(IC_TRUE(ic)){
-        symbol *nlbl = newiTempLabel(NULL);
-        emitcode("sjmp","%05d$",nlbl->key+100);                 
-        emitcode("","%05d$:",tlbl->key+100);
-        emitcode("ljmp","%05d$",IC_TRUE(ic)->key+100);
-        emitcode("","%05d$:",nlbl->key+100);
-    }
-    else{
-        emitcode("ljmp","%05d$",IC_FALSE(ic)->key+100);
-        emitcode("","%05d$:",tlbl->key+100);
-    }
-    ic->generated = 1;
-}
 
 /*-----------------------------------------------------------------*/
 /* genAnd  - code for and                                          */
@@ -2291,236 +2252,32 @@ static void jmpTrueOrFalse (iCode *ic, symbol *tlbl)
 static void genAnd (iCode *ic, iCode *ifx)
 {
     operand *left, *right, *result;
-    int size, offset=0;  
+    int size, offset=0;
+    char *l;
     unsigned long lit = 0L;
-    int bytelit = 0;
-    char buffer[10];
 
     aopOp((left = IC_LEFT(ic)),ic,FALSE);
     aopOp((right= IC_RIGHT(ic)),ic,FALSE);
     aopOp((result=IC_RESULT(ic)),ic,TRUE);
 
-#ifdef DEBUG_TYPE
-    emitcode("","; Type res[%d] = l[%d]&r[%d]",
-             AOP_TYPE(result),
-             AOP_TYPE(left), AOP_TYPE(right));
-    emitcode("","; Size res[%d] = l[%d]&r[%d]",
-             AOP_SIZE(result),
-             AOP_SIZE(left), AOP_SIZE(right));
-#endif
-
-    /* if left is a literal & right is not then exchange them */
-    if ((AOP_TYPE(left) == AOP_LIT && AOP_TYPE(right) != AOP_LIT) ||
-	AOP_NEEDSACC(left)) {
-        operand *tmp = right ;
-        right = left;
-        left = tmp;
-    }
-
-    /* if result = right then exchange them */
-    if(sameRegs(AOP(result),AOP(right))){
-        operand *tmp = right ;
-        right = left;
-        left = tmp;
-    }
-
-    /* if right is bit then exchange them */
-    if (AOP_TYPE(right) == AOP_CRY &&
-        AOP_TYPE(left) != AOP_CRY){
-        operand *tmp = right ;
-        right = left;
-        left = tmp;
-    }
-    if(AOP_TYPE(right) == AOP_LIT)
-        lit = (unsigned long)floatFromVal (AOP(right)->aopu.aop_lit);
-
-    size = AOP_SIZE(result);
-
-    // if(bit & yy)
-    // result = bit & yy;
-    if (AOP_TYPE(left) == AOP_CRY){
-        // c = bit & literal;
-        if(AOP_TYPE(right) == AOP_LIT){
-            if(lit & 1) {
-                if(size && sameRegs(AOP(result),AOP(left)))
-                    // no change
-                    goto release;
-                emitcode("mov","c,%s",AOP(left)->aopu.aop_dir);
-            } else {
-                // bit(result) = 0;
-                if(size && (AOP_TYPE(result) == AOP_CRY)){
-                    emitcode("clr","%s",AOP(result)->aopu.aop_dir);
-                    goto release;
-                }
-                if((AOP_TYPE(result) == AOP_CRY) && ifx){
-                    jumpIfTrue(ifx);
-                    goto release;
-                }
-                emitcode("clr","c");
-            }
-        } else {
-            if (AOP_TYPE(right) == AOP_CRY){
-                // c = bit & bit;
-                emitcode("mov","c,%s",AOP(right)->aopu.aop_dir);
-                emitcode("anl","c,%s",AOP(left)->aopu.aop_dir);
-            } else {
-                // c = bit & val;
-                MOVA(aopGet(AOP(right),0,FALSE,FALSE));
-                // c = lsb
-                emitcode("rrc","a");
-                emitcode("anl","c,%s",AOP(left)->aopu.aop_dir);
-            }
-        }
-        // bit = c
-        // val = c
-        if(size)
-            outBitC(result);
-        // if(bit & ...)
-        else if((AOP_TYPE(result) == AOP_CRY) && ifx)
-            genIfxJump(ifx, "c");           
-        goto release ;
-    }
-
-    // if(val & 0xZZ)       - size = 0, ifx != FALSE  -
-    // bit = val & 0xZZ     - size = 1, ifx = FALSE -
-    if((AOP_TYPE(right) == AOP_LIT) &&
-       (AOP_TYPE(result) == AOP_CRY) &&
-       (AOP_TYPE(left) != AOP_CRY)){
-        int posbit = isLiteralBit(lit);
-        /* left &  2^n */
-        if(posbit){
-            posbit--;
-            MOVA(aopGet(AOP(left),posbit>>3,FALSE,FALSE));
-            // bit = left & 2^n
-            if(size)
-                emitcode("mov","c,acc.%d",posbit&0x07);
-            // if(left &  2^n)
-            else{
-                if(ifx){
-                    sprintf(buffer,"acc.%d",posbit&0x07);
-                    genIfxJump(ifx, buffer);
-                }
-                goto release;
-            }
-        } else {
-            symbol *tlbl = newiTempLabel(NULL);
-            int sizel = AOP_SIZE(left);
-            if(size)
-                emitcode("setb","c");
-            while(sizel--){
-                if((bytelit = ((lit >> (offset*8)) & 0x0FFL)) != 0x0L){
-                    MOVA( aopGet(AOP(left),offset,FALSE,FALSE));
-                    // byte ==  2^n ?
-                    if((posbit = isLiteralBit(bytelit)) != 0)
-                        emitcode("jb","acc.%d,%05d$",(posbit-1)&0x07,tlbl->key+100);
-                    else{
-                        if(bytelit != 0x0FFL)
-                            emitcode("anl","a,%s",
-                                     aopGet(AOP(right),offset,FALSE,TRUE));
-                        emitcode("jnz","%05d$",tlbl->key+100);
-                    }
-                }
-                offset++;
-            }
-            // bit = left & literal
-            if(size){
-                emitcode("clr","c");
-                emitcode("","%05d$:",tlbl->key+100);
-            }
-            // if(left & literal)
-            else{
-                if(ifx)
-                    jmpTrueOrFalse(ifx, tlbl);
-                goto release ;
-            }
-        }
-        outBitC(result);
-        goto release ;
-    }
-
-    /* if left is same as result */
-    if(sameRegs(AOP(result),AOP(left))){
-        for(;size--; offset++) {
-            if(AOP_TYPE(right) == AOP_LIT){
-                if((bytelit = (int)((lit >> (offset*8)) & 0x0FFL)) == 0x0FF)
-                    continue;
-                else 
-		    if (bytelit == 0)
-			aopPut(AOP(result),zero,offset);
-		    else 
-			if (IS_AOP_PREG(result)) {
-			    MOVA(aopGet(AOP(right),offset,FALSE,FALSE));
-			    emitcode("anl","a,%s",aopGet(AOP(left),offset,FALSE,TRUE));
-			    aopPut(AOP(result),"a",offset);
-			} else
-			    emitcode("anl","%s,%s",
-				     aopGet(AOP(left),offset,FALSE,TRUE),
-				     aopGet(AOP(right),offset,FALSE,FALSE));
-            } else {
-		if (AOP_TYPE(left) == AOP_ACC)
-		    emitcode("anl","a,%s",aopGet(AOP(right),offset,FALSE,FALSE));
-		else {
-		    MOVA(aopGet(AOP(right),offset,FALSE,FALSE));
-		    if (IS_AOP_PREG(result)) {
-			emitcode("anl","a,%s",aopGet(AOP(left),offset,FALSE,TRUE));
-			aopPut(AOP(result),"a",offset);
-
-		    } else
-			emitcode("anl","%s,a",
-				 aopGet(AOP(left),offset,FALSE,TRUE));
+    if (ifx) { /* used only for jumps */
+	if (AOP_TYPE(AOP(right)) == AOP_LIT) {
+	    int p2 = powof2((int) floatFromVal (AOP(right)->aopu.aop_lit));
+	    if (p2) { /* right side is a power of 2 */
+		l = aopGet(AOP(left),p2 / 8);
+		if (IC_TRUE(ifx)) {
+			emitcode("sbrc","%s,%d",l,p2 % 8);
+			emitcode("rjmp","L%05d",IC_TRUE(ifx)->key);
+		} else {
+			emitcode("sbrs","%s,%d",l,p2 % 8);
+			emitcode("rjmp","L%05d",IC_FALSE(ifx)->key);
 		}
-            }
-        }
-    } else {
-        // left & result in different registers
-        if(AOP_TYPE(result) == AOP_CRY){
-            // result = bit
-            // if(size), result in bit
-            // if(!size && ifx), conditional oper: if(left & right)
-            symbol *tlbl = newiTempLabel(NULL);
-            int sizer = min(AOP_SIZE(left),AOP_SIZE(right));
-            if(size)
-                emitcode("setb","c");
-            while(sizer--){
-                MOVA(aopGet(AOP(right),offset,FALSE,FALSE));
-                emitcode("anl","a,%s",
-                         aopGet(AOP(left),offset,FALSE,FALSE));
-                emitcode("jnz","%05d$",tlbl->key+100);
-                offset++;
-            }
-            if(size){
-                CLRC;
-                emitcode("","%05d$:",tlbl->key+100);
-                outBitC(result);
-            } else if(ifx)
-                jmpTrueOrFalse(ifx, tlbl);
-        } else {
-	    for(;(size--);offset++) {
-		// normal case
-		// result = left & right
-		if(AOP_TYPE(right) == AOP_LIT){
-		    if((bytelit = (int)((lit >> (offset*8)) & 0x0FFL)) == 0x0FF){
-			aopPut(AOP(result),
-			       aopGet(AOP(left),offset,FALSE,FALSE),
-			       offset);
-			continue;
-		    } else if(bytelit == 0){
-			aopPut(AOP(result),zero,offset);
-			continue;
-		    }
-		}
-		// faster than result <- left, anl result,right
-		// and better if result is SFR
-		if (AOP_TYPE(left) == AOP_ACC) 
-		    emitcode("anl","a,%s",aopGet(AOP(right),offset,FALSE,FALSE));
-		else {
-		    MOVA(aopGet(AOP(right),offset,FALSE,FALSE));
-		    emitcode("anl","a,%s",
-			     aopGet(AOP(left),offset,FALSE,FALSE));
-		}
-		aopPut(AOP(result),"a",offset);
+	    } else { /* right not power of two */
+		    emitcode
 	    }
+	} else { /* right is not a literal */
 	}
+    } else { /* other jump -> result goes to register*/
     }
 
 release :

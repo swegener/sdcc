@@ -199,8 +199,7 @@ static bool allDefsOutOfRange (bitVect *defs,int fseq, int toseq)
 	    (ic = hTabItemWithKey(iCodehTab,i)) &&
 	    ( ic->seq >= fseq  && ic->seq <= toseq))
 	    
-	    return FALSE;
-	
+	    return FALSE;	
     }
     
     return TRUE;
@@ -1705,7 +1704,7 @@ static iCode *packRegsForOneuse (iCode *ic, operand *op , eBBlock *ebp)
     
     /* only upto 2 bytes since we cannot predict
        the usage of b, & acc */
-    if (getSize(operandType(op)) >  (fReturnSize - 2) &&
+    if (getSize(operandType(op)) > fReturnSize  &&
 	ic->op != RETURN             &&
 	ic->op != SEND)
 	return NULL;
@@ -1740,7 +1739,7 @@ static iCode *packRegsForOneuse (iCode *ic, operand *op , eBBlock *ebp)
        a function call */
     if (dic->op == CALL || dic->op == PCALL ) {
 	if (ic->op != SEND && ic->op != RETURN) {
-/* 	    OP_SYMBOL(op)->ruonly = 1; */
+	    OP_SYMBOL(op)->ruonly = 1;
 	    return dic;
 	}
 	dic = dic->next ;
@@ -1798,17 +1797,14 @@ static iCode *packRegsForOneuse (iCode *ic, operand *op , eBBlock *ebp)
 		return NULL;
 
 	/* if left or right or result is in far space */
-	if (isOperandInFarSpace(IC_LEFT(dic))   ||
-	    isOperandInFarSpace(IC_RIGHT(dic))  ||
-	    isOperandInFarSpace(IC_RESULT(dic)) ||
-	    IS_OP_RUONLY(IC_LEFT(dic))          ||
+	if (IS_OP_RUONLY(IC_LEFT(dic))          ||
 	    IS_OP_RUONLY(IC_RIGHT(dic))         ||
 	    IS_OP_RUONLY(IC_RESULT(dic))            ) {
 	    return NULL;
 	}
     }
 	        
-/*     OP_SYMBOL(op)->ruonly = 1; */
+    OP_SYMBOL(op)->ruonly = 1;
     return sic;
 	
 }
@@ -2112,10 +2108,8 @@ static void packRegisters (eBBlock *ebp)
 	
 	/* some cases the redundant moves can
 	   can be eliminated for return statements */
-/* 	if ((ic->op == RETURN || ic->op == SEND) && */
-/* 	    !isOperandInFarSpace(IC_LEFT(ic))    && */
-/* 	    !options.model) */
-/* 	    packRegsForOneuse (ic,IC_LEFT(ic),ebp);	 */
+	if ((ic->op == RETURN || ic->op == SEND))
+	    packRegsForOneuse (ic,IC_LEFT(ic),ebp);	
 
 	/* if pointer set & left has a size more than
 	   one and right is not in far space */

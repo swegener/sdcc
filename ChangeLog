@@ -1,3 +1,7 @@
+2003-08-28  Frieder Ferlemann <Frieder.Ferlemann@web.de>
+
+	* doc/sdccman.lyx: reverted tables to those in cvs 1.64
+
 2003-08-28  Bernhard Held <bernhard@bernhardheld.de>
 
 	* device/lib/_startup.c: quick & dirty fix for ds390/ds400;

@@ -4588,6 +4588,10 @@ genPointerSet (iCode * ic, iCode *pi)
 	case GPOINTER:
 		genGenPointerSet (right, result, ic, pi);
 		break;
+
+	default:
+	  werror (E_INTERNAL_ERROR, __FILE__, __LINE__, 
+		  "genPointerSet: illegal pointer type");
 	}
 
 }

@@ -2454,7 +2454,8 @@ sym_link *typeFromStr (char *s)
 	    s++;
 	    break;
 	default:
-	    werror(E_INTERNAL_ERROR,"typeFromStr");
+	    werror(E_INTERNAL_ERROR, __FILE__, __LINE__, 
+		   "typeFromStr: unknown type");
 	    break;
 	}
 	if (IS_SPEC(r) && usign) {

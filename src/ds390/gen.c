@@ -9232,10 +9232,10 @@ genFarPointerGet (operand * left,
 }
 
 /*-----------------------------------------------------------------*/
-/* emitcodePointerGet - gget value from code space                  */
+/* genCodePointerGet - get value from code space                  */
 /*-----------------------------------------------------------------*/
 static void
-emitcodePointerGet (operand * left,
+genCodePointerGet (operand * left,
 		    operand * result, iCode * ic, iCode *pi)
 {
   int size, offset, dopi=1;
@@ -9506,7 +9506,7 @@ genPointerGet (iCode * ic, iCode *pi)
       break;
 
     case CPOINTER:
-      emitcodePointerGet (left, result, ic, pi);
+      genCodePointerGet (left, result, ic, pi);
       break;
 
     case GPOINTER:
@@ -10178,6 +10178,10 @@ genPointerSet (iCode * ic, iCode *pi)
     case GPOINTER:
       genGenPointerSet (right, result, ic, pi);
       break;
+
+    default:
+      werror (E_INTERNAL_ERROR, __FILE__, __LINE__, 
+	      "genPointerSet: illegal pointer type");
     }
 
 }

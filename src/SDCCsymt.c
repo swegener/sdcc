@@ -1553,8 +1553,6 @@ inCalleeSaveList (char *s)
 value *
 aggregateToPointer (value * val)
 {
-  int wasArray=IS_ARRAY(val->type);
-
   if (IS_AGGREGATE (val->type))
     {
       /* if this is a structure */
@@ -1608,12 +1606,6 @@ aggregateToPointer (value * val)
 	  DCL_TYPE (val->type) = GPOINTER;
 	}
       
-      if (wasArray) {
-	/* there is NO way to specify the storage of the pointer
-	   associated with an array, so we make it the default */
-	SPEC_SCLS(val->etype) = S_FIXED;
-      }
-
       /* is there is a symbol associated then */
       /* change the type of the symbol as well */
       if (val->sym)

@@ -451,8 +451,6 @@ addDecl (symbol * sym, int type, sym_link * p)
       DCL_TYPE (p) == UPOINTER &&
       DCL_TSPEC (p))
     {
-      fprintf (stderr, "This has to go!\n");
-      exit (43);
       if (!IS_SPEC (sym->etype))
 	{
 	  sym->etype = sym->etype->next = newLink ();

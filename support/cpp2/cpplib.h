@@ -140,7 +140,7 @@ struct ht;
   TK(CPP_MACRO_ARG,	SPELL_NONE)	/* Macro argument.  */		\
   OP(CPP_EOF,		"EOL")		/* End of line or file.  */	\
 \
-  /* SDCC _asm specific */
+  /* SDCC _asm specific */						\
   TK(CPP_ASM,		SPELL_STRING)   /* _asm ... _endasm ; */
 
 #define OP(e, s) e,

@@ -172,27 +172,36 @@ struct	area
  *	+-----+-----+-----+-----+-----+-----+-----+-----+
  */
 
-#define	R_WORD	0000		/* 16 bit */
-#define	R_BYTE	0001		/*  8 bit */
+#define	R_WORD	0x00		/* 16 bit */
+#define	R_BYTE	0x01		/*  8 bit */
 
-#define	R_AREA	0000		/* Base type */
-#define	R_SYM	0002
+#define	R_AREA	0x00		/* Base type */
+#define	R_SYM	0x02
 
-#define	R_NORM	0000		/* PC adjust */
-#define	R_PCR	0004
+#define	R_NORM	0x00		/* PC adjust */
+#define	R_PCR	0x04
 
-#define	R_BYT1	0000		/* Byte count for R_BYTE = 1 */
-#define	R_BYT2	0010		/* Byte count for R_BYTE = 2 */
+#define	R_BYT1	0x00		/* Byte count for R_BYTE = 1 */
+#define	R_BYT2	0x08		/* Byte count for R_BYTE = 2 */
 
-#define	R_SGND	0000		/* Signed Byte */
-#define	R_USGN	0020		/* Unsigned Byte */
+#define	R_SGND	0x00		/* Signed Byte */
+#define	R_USGN	0x10		/* Unsigned Byte */
 
-#define	R_NOPAG	0000		/* Page Mode */
-#define	R_PAG0	0040		/* Page '0' */
-#define	R_PAG	0100		/* Page 'nnn' */
+#define	R_NOPAG	0x00		/* Page Mode */
+#define	R_PAG0	0x20		/* Page '0' */
+#define	R_PAG	0x40		/* Page 'nnn' */
 
-#define	R_LSB	0000		/* low byte */
-#define	R_MSB	0200		/* high byte */
+#define	R_LSB	0x00		/* low byte */
+#define	R_MSB	0x80		/* high byte */
+
+#define R_BYT3	0x100		/* if R_BYTE is set, this is a 
+				 * 3 byte address, of which
+				 * the linker must select one byte.
+				 */
+#define R_HIB	0x200		/* If R_BYTE & R_BYT3 are set, linker
+				 * will select byte 3 of the relocated
+				 * 24 bit address.
+				 */
 
 #define R_J11   (R_WORD|R_BYT2)	/* JLH: 11 bit JMP and CALL (8051) */
 #define R_J19   (R_WORD|R_BYT2|R_MSB) /* 19 bit JMP/CALL (DS80C390) */
@@ -202,6 +211,11 @@ struct	area
 #define IS_R_J19(x) (((x) & R_J19_MASK) == R_J19)
 #define IS_R_J11(x) (((x) & R_J19_MASK) == R_J11)
 #define IS_C24(x) (((x) & R_J19_MASK) == R_C24)
+
+#define R_ESCAPE_MASK	0xf0	/* Used to escape relocation modes
+				 * greater than 0xff in the .rel
+				 * file.
+				 */
 
 /*
  * Listing Control Flags
@@ -518,7 +532,7 @@ struct	expr
 		struct area *e_ap;
 		struct sym  *e_sp;
 	} e_base;		/* Rel. base */
-	char	e_rlcf;		/* Rel. flags */
+	int	e_rlcf;		/* Rel. flags */
 };
 
 /* C Library functions */
@@ -613,7 +627,7 @@ extern	VOID		outbuf();
 extern	VOID		outchk();
 extern	VOID		outgsd();
 extern	VOID		outrb();
-extern	VOID		outrw();
+extern	VOID		outrw(struct expr *, int);
 extern	VOID		outr24(struct expr *, int);
 extern	VOID		outsym();
 extern	VOID		out_lb();

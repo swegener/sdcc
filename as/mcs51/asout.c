@@ -279,6 +279,51 @@ outaw(w)
 	dot.s_addr += 2;
 }
 
+/*)Function	VOID	write_rmode(r)
+ *
+ *		int	r		relocation mode
+ *
+ *	write_rmode puts the passed relocation mode into the 
+ *	output relp buffer, escaping it if necessary.
+ *
+ *	global variables:
+ *		int *	relp		pointer to rel array
+ *
+ *	functions called:
+ *		VOID	rerr()		assubr.c
+ *
+ *	side effects:
+ *		relp is incremented appropriately.
+ */
+VOID
+write_rmode(int r)
+{
+    /* We need to escape the relocation mode if it is greater
+     * than a byte, or if it happens to look like an escape.
+     * (I don't think that the latter case is legal, but
+     * better safe than sorry).
+     */
+    if ((r > 0xff) || ((r & R_ESCAPE_MASK) == R_ESCAPE_MASK))
+    {
+    	/* Hack in up to an extra 4 bits of flags with escape. */
+    	if (r > 0xfff)
+    	{
+    	     /* uh-oh.. we have more than 4 extra bits. */
+    	     fprintf(stderr, 
+    	     	     "Internal error: relocation mode 0x%X too big.\n", 
+    	     	     r);
+    	     rerr();
+    	}
+    	/* printf("escaping relocation mode\n"); */
+    	*relp++ = R_ESCAPE_MASK | (r >> 8);
+    	*relp++ = r & 0xff;
+    }
+    else
+    {
+    	*relp++ = r;
+    }
+}
+
 /*)Function	VOID	outrb(esp, r)
  *
  *		expr *	esp		pointer to expr structure
@@ -312,28 +357,43 @@ outaw(w)
  */
 
 VOID
-outrb(esp, r)
-register struct expr *esp;
-int r;
+outrb(struct expr *esp, int r)
 {
 	register int n;
 
 	if (pass == 2) {
 		if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
+			/* This is a constant; simply write the
+			 * const byte to the T line and don't
+			 * generate any relocation info.
+			 */
 			out_lb(lobyte(esp->e_addr),0);
 			if (oflag) {
 				outchk(1, 0);
 				*txtp++ = lobyte(esp->e_addr);
 			}
 		} else {
-			r |= R_BYTE | R_BYT2 | esp->e_rlcf;
-			if (r & R_MSB) {
+		        /* We are generating a single byte of relocatable
+		         * info.
+		         *
+		         * In 8051 mode, we generate a 16 bit address. The 
+		         * linker will later select a single byte based on
+		         * whether R_MSB is set.
+		         *
+		         * In flat24 mode, we generate a 24 bit address. The
+		         * linker will select a single byte based on 
+		         * whether R_MSB or R_HIB is set.
+		         */
+		        if (!flat24Mode)
+		        { 
+			    r |= R_BYTE | R_BYT2 | esp->e_rlcf;
+			    if (r & R_MSB) {
 				out_lb(hibyte(esp->e_addr),r|R_RELOC|R_HIGH);
-			} else {
+			    } else {
 				out_lb(lobyte(esp->e_addr),r|R_RELOC);
-			}
-			if (oflag) {
-				outchk(2, 4);
+			    }
+			    if (oflag) {
+				outchk(2, 5);
 				out_tw(esp->e_addr);
 				if (esp->e_flag) {
 					n = esp->e_base.e_sp->s_ref;
@@ -341,9 +401,40 @@ int r;
 				} else {
 					n = esp->e_base.e_ap->a_ref;
 				}
-				*relp++ = r;
+				write_rmode(r);
 				*relp++ = txtp - txt - 2;
 				out_rw(n);
+			    }
+			}
+			else
+			{
+			    /* 24 bit mode. */
+			    r |= R_BYTE | R_BYT3 | esp->e_rlcf;
+			    if (r & R_HIB)
+			    {
+			        /* Probably should mark this differently in the
+			         * listing file.
+			         */
+			        out_lb(byte3(esp->e_addr),r|R_RELOC|R_HIGH);
+			    }
+			    else if (r & R_MSB) {
+				out_lb(hibyte(esp->e_addr),r|R_RELOC|R_HIGH);
+			    } else {
+				out_lb(lobyte(esp->e_addr),r|R_RELOC);
+			    }
+			    if (oflag) {
+				outchk(3, 5);
+				out_t24(esp->e_addr);
+				if (esp->e_flag) {
+					n = esp->e_base.e_sp->s_ref;
+					r |= R_SYM;
+				} else {
+					n = esp->e_base.e_ap->a_ref;
+				}
+				write_rmode(r);
+				*relp++ = txtp - txt - 3;
+				out_rw(n);			    
+			    }
 			}
 		}
 	}
@@ -383,9 +474,7 @@ int r;
  */
 
 VOID
-outrw(esp, r)
-register struct expr *esp;
-int r;
+outrw(struct expr *esp, int r)
 {
 	register int n;
 
@@ -417,7 +506,7 @@ int r;
 				out_lw(esp->e_addr,r|R_RELOC);
 			}
 			if (oflag) {
-				outchk(2, 4);
+				outchk(2, 5);
 				out_tw(esp->e_addr);
 				if (esp->e_flag) {
 					n = esp->e_base.e_sp->s_ref;
@@ -437,7 +526,7 @@ int r;
 				    	    "outrw()\n");
 				    rerr();
 				}
-				*relp++ = r;
+				write_rmode(r);
 				*relp++ = txtp - txt - 2;
 				out_rw(n);
 			}
@@ -506,7 +595,7 @@ outr24(struct expr *esp, int r)
 				out_l24(esp->e_addr,r|R_RELOC);
 			}
 			if (oflag) {
-				outchk(3, 4);
+				outchk(3, 5);
 				out_t24(esp->e_addr);
 				if (esp->e_flag) {
 					n = esp->e_base.e_sp->s_ref;
@@ -529,7 +618,7 @@ outr24(struct expr *esp, int r)
 				    rerr();
 				}
 				
-				*relp++ = r | R_C24;
+				write_rmode(r | R_C24);
 				*relp++ = txtp - txt - 3;
 				out_rw(n);
 			}
@@ -586,7 +675,7 @@ register struct expr *esp;
 			} else {
 				n = esp->e_base.e_ap->a_ref;
 			}
-			*relp++ = r;
+			write_rmode(r);
 			*relp++ = txtp - txt - 2;
 			out_rw(n);
 		}
@@ -693,7 +782,7 @@ outchk(nt, nr)
 	if (txtp == txt) {
 		out_tw(dot.s_addr);
 		if ((ap = dot.s_area) != NULL) {
-			*relp++ = R_WORD|R_AREA;
+			write_rmode(R_WORD|R_AREA);
 			*relp++ = 0;
 			out_rw(ap->a_ref);
 		}
@@ -989,19 +1078,17 @@ register struct sym *sp;
  */
 
 VOID
-out(p, n)
-register char *p;
-register int n;
+out(char *p, int n)
 {
 	while (n--) {
 		if (xflag == 0) {
-			fprintf(ofp, " %02X", (*p++)&0377);
+			fprintf(ofp, " %02X", (*p++)&0xff);
 		} else
 		if (xflag == 1) {
-			fprintf(ofp, " %03o", (*p++)&0377);
+			fprintf(ofp, " %03o", (*p++)&0xff);
 		} else
 		if (xflag == 2) {
-			fprintf(ofp, " %03u", (*p++)&0377);
+			fprintf(ofp, " %03u", (*p++)&0xff);
 		}
 	}
 }
@@ -1321,7 +1408,7 @@ int r;
 		r |= R_WORD | esp->e_rlcf;
                 out_lw(esp->e_addr,r|R_RELOC);
                 if (oflag) {
-                        outchk(3, 4);
+                        outchk(3, 5);
                         out_tw(esp->e_addr);
                         *txtp++ = op;
 
@@ -1331,7 +1418,7 @@ int r;
                         } else {
                                 n = esp->e_base.e_ap->a_ref;
                         }
-                        *relp++ = r;
+                        write_rmode(r);
                         *relp++ = txtp - txt - 3;
                         out_rw(n);
                 }
@@ -1366,7 +1453,7 @@ outr19(struct expr * esp, int op, int r)
 		r |= R_WORD | esp->e_rlcf;
                 out_l24(esp->e_addr,r|R_RELOC);
                 if (oflag) {
-                        outchk(4, 4);
+                        outchk(4, 5);
                         out_t24(esp->e_addr);
                         *txtp++ = op;
                         
@@ -1376,7 +1463,7 @@ outr19(struct expr * esp, int op, int r)
                         } else {
                                 n = esp->e_base.e_ap->a_ref;
                         }
-                        *relp++ = r;
+                        write_rmode(r);
                         *relp++ = txtp - txt - 4;
                         out_rw(n);
                 }

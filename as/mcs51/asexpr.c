@@ -199,6 +199,23 @@ int n;
 				esp->e_rlcf |= R_MSB ;
 				break;
 			    }
+			    else if (esp->e_base.e_ap && re.e_addr == 16)
+			    {
+			    	if (flat24Mode)
+			       	{
+			       	    esp->e_rlcf |= R_HIB;
+			       	}
+			       	else
+			       	{
+			       	    warnBanner();
+			       	    fprintf(stderr, 
+			       	    	    "(expr >> 16) is only meaningful in "
+			       	    	    ".flat24 mode.\n");
+			       	    qerr();
+			       	}
+			            
+			       break;
+			    }
 			    /* else continue with the normal processing */
 			    abscheck(esp);
 			    esp->e_addr >>= re.e_addr;

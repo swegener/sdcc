@@ -67,24 +67,43 @@
 
         2.5.7  R Line 
 
-                R 0 0 nn nn n1 n2 xx xx ...  
+                R 0 0 nn nn n1 [n1x]  n2 xx xx ...  
 
            The R line provides the relocation information to the linker.
         The nn nn value is the current area index, i.e.  which area  the
         current  values  were  assembled.  Relocation information is en-
-        coded in groups of 4 bytes:  
+        coded in groups of 4 (possibly 5) bytes:  
 
-             1.  n1 is the relocation mode and object format 
+             1.  n1 (and optionally n1x) is the relocation mode and object
+		 format:
                  1.  bit 0 word(0x00)/byte(0x01) 
                  2.  bit 1 relocatable area(0x00)/symbol(0x02) 
                  3.  bit 2 normal(0x00)/PC relative(0x04) relocation 
-                 4.  bit  3  1-byte(0x00)/2-byte(0x08) object format for
+                 4.  bit 3  1-byte(0x00)/2-byte(0x08) object format for
                      byte data 
                  5.  bit 4 signed(0x00)/unsigned(0x10) byte data 
                  6.  bit 5 normal(0x00)/page '0'(0x20) reference 
                  7.  bit 6 normal(0x00)/page 'nnn'(0x40) reference 
-                 8.  bit  7  LSB  byte(0x00)/MSB  byte(0x80) with 2-byte
-                     mode 
+                 8.  bit 7  LSB  byte(0x00)/MSB  byte(0x80) with 2-byte
+                     mode
+		 9.  bit 8  1 or 2  (0x00)/3-byte (0x100) object format
+		     for byte data.
+		 10. bit 9  LSB or MSB (middle byte) (0x00) or byte 3 
+		     (real MSB) (0x200) for 3-byte mode.
+
+		If the upper four bits of n1 are set (i.e. 
+		(n1 & 0xf0) == 0xf0), it is taken as an escape character, 
+		and the relocation mode will consist of the lower four bits
+		of n1 left shifted 8 bits or'ed with the value of n1x. If
+		the upper four bits of n1 are not all set, then it is not an 
+		escape character, and the n1x byte is not present.
+
+		This escape mechanism allows a 12-bit relocation mode value.
+
+		Note that in byte mode, when 3-byte mode is used (bits 0
+		and 8 are both set), the MSB bit (bit 7) really refers to 
+		the 16 bit MSB (the middle byte of the 24-bit value) while
+	        the "byte 3" bit (bit 9) refers to the 24-bit MSB.
 
              2.  n2  is  a byte index into the corresponding (i.e.  pre-
                  ceeding) T line data (i.e.  a pointer to the data to be

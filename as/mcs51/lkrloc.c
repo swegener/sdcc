@@ -306,6 +306,13 @@ relr()
 	while (more()) {
 		error = 0;
 		mode = eval();
+		
+		if ((mode & R_ESCAPE_MASK) == R_ESCAPE_MASK)
+		{
+		    mode = ((mode & ~R_ESCAPE_MASK) << 8) | eval();
+		    /* printf("unescaping rmode\n"); */
+		}
+		
 		rtp = eval();
 		rindex = evword();
 
@@ -342,7 +349,7 @@ relr()
 		/*
 		 * R_PAG0 or R_PAG addressing
 		 */
-		if (mode & (R_PAG0|R_PAG)) {
+		if (mode & (R_PAG0 | R_PAG)) {
 			paga  = sdp.s_area->a_addr;
 			pags  = sdp.s_addr;
 			reli -= paga + pags;
@@ -352,7 +359,38 @@ relr()
 		 * R_BYTE or R_WORD operation
 		 */
 		if (mode & R_BYTE) {
-			if (mode & R_BYT2) {
+			if (mode & R_BYT3)
+			{
+				/* This is a three byte address, of which 
+				 * we will select one byte.
+				 */
+				if (mode & R_HIB)
+				{
+					/* printf("24 bit address selecting hi byte.\n"); */
+					relv = adb_24_hi(reli, rtp);
+				}		
+				else if (mode & R_MSB)
+				{
+					/* Note that in 24 bit mode, R_MSB
+					 * is really the middle byte, not
+					 * the most significant byte.
+					 *
+					 * This is ugly and I can only apologize
+					 * for any confusion.
+					 */
+					/* printf("24 bit address selecting middle byte.\n"); */
+					relv = adb_24_mid(reli, rtp);				
+				}
+				else
+				{
+					/* printf("24 bit address selecting lo byte.\n"); */
+					relv = adb_24_lo(reli, rtp);				
+				}
+			}
+			else if (mode & R_BYT2) {
+				/* This is a two byte address, of
+				 * which we will select one byte.
+				 */
 				if (mode & R_MSB) {
 					relv = adb_hi(reli, rtp);
 				} else {
@@ -854,6 +892,143 @@ int	i;
 	} else {
 		rtflg[i] = 0;
 	}
+	return (j);
+}
+
+/*)Function	addr_t		adb_24_hi(v, i)
+ *
+ *		int	v		value to add to byte
+ *		int	i		rtval[] index
+ *
+ *	The function adb_24_hi() adds the value of v to the
+ *	24 bit value contained in rtval[i] - rtval[i+2].
+ *	The new value of rtval[i] / rtval[i+1] is returned.
+ *	The LSB & middle byte rtflg[] is cleared.
+ *
+ *	local variable:
+ *		addr_t	j		temporary evaluation variable
+ *
+ *	global variables:
+ *		hilo			byte ordering parameter
+ *
+ *	called functions:
+ *		none
+ *
+ *	side effects:
+ *		The value of rtval[] is changed.
+ *		The rtflg[] value corresponding to the
+ *		LSB & middle byte of the word value is cleared to
+ *		reflect the fact that the MSB is the selected byte.
+ *
+ */
+
+addr_t
+adb_24_hi(addr_t v, int i)
+{
+	register addr_t j;
+
+	j = adw_24(v, i);
+
+	/* Remove the lower two bytes. */
+	if (hilo)
+	{
+	    rtflg[i+2] = 0;
+	}
+	else
+	{
+	    rtflg[i] = 0;
+	}
+	rtflg[i+1] = 0;
+
+	return (j);
+}
+
+/*)Function	addr_t		adb_24_mid(v, i)
+ *
+ *		int	v		value to add to byte
+ *		int	i		rtval[] index
+ *
+ *	The function adb_24_mid() adds the value of v to the
+ *	24 bit value contained in rtval[i] - rtval[i+2].
+ *	The new value of rtval[i] / rtval[i+1] is returned.
+ *	The LSB & MSB byte rtflg[] is cleared.
+ *
+ *	local variable:
+ *		addr_t	j		temporary evaluation variable
+ *
+ *	global variables:
+ *		hilo			byte ordering parameter
+ *
+ *	called functions:
+ *		none
+ *
+ *	side effects:
+ *		The value of rtval[] is changed.
+ *		The rtflg[] value corresponding to the
+ *		LSB & MSB of the 24 bit value is cleared to reflect
+ *		the fact that the middle byte is the selected byte.
+ *
+ */
+
+addr_t
+adb_24_mid(addr_t v, int i)
+{
+	register addr_t j;
+
+	j = adw_24(v, i);
+
+	/* remove the MSB & LSB. */
+	rtflg[i+2] = 0;
+	rtflg[i] = 0;
+
+	return (j);
+}
+
+/*)Function	addr_t		adb_24_lo(v, i)
+ *
+ *		int	v		value to add to byte
+ *		int	i		rtval[] index
+ *
+ *	The function adb_24_lo() adds the value of v to the
+ *	24 bit value contained in rtval[i] - rtval[i+2].
+ *	The new value of rtval[i] / rtval[i+1] is returned.
+ *	The MSB & middle byte rtflg[] is cleared.
+ *
+ *	local variable:
+ *		addr_t	j		temporary evaluation variable
+ *
+ *	global variables:
+ *		hilo			byte ordering parameter
+ *
+ *	called functions:
+ *		none
+ *
+ *	side effects:
+ *		The value of rtval[] is changed.
+ *		The rtflg[] value corresponding to the
+ *		MSB & middle byte  of the word value is cleared to
+ *		reflect the fact that the LSB is the selected byte.
+ *
+ */
+
+addr_t
+adb_24_lo(addr_t v, int i)
+{
+	register addr_t j;
+
+	j = adw_24(v, i);
+
+	/* Remove the upper two bytes. */
+	if (hilo)
+	{
+	    rtflg[i] = 0;
+	}
+	else
+	{
+	    rtflg[i+2] = 0;
+	}
+	rtflg[i+1] = 0;
+
 	return (j);
 }
 

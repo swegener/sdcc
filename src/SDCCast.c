@@ -3834,7 +3834,7 @@ decorateType (ast * tree)
 
       if (compareType (currFunc->type->next, RTYPE (tree)) == 0)
 	{
-	  werror (W_RETURN_MISMATCH);
+	  werrorfl (tree->filename, tree->lineno, W_RETURN_MISMATCH);
 	  printFromToType (RTYPE(tree), currFunc->type->next);
 	  goto errorTreeReturn;
 	}
@@ -3843,7 +3843,7 @@ decorateType (ast * tree)
 	  && tree->right &&
 	  !IS_VOID (RTYPE (tree)))
 	{
-	  werror (E_FUNC_VOID);
+	  werrorfl (tree->filename, tree->lineno, E_FUNC_VOID);
 	  goto errorTreeReturn;
 	}
 
@@ -3878,7 +3878,7 @@ decorateType (ast * tree)
       /* the switch value must be an integer */
       if (!IS_INTEGRAL (LTYPE (tree)))
 	{
-	  werror (E_SWITCH_NON_INTEGER);
+	  werrorfl (tree->filename, tree->lineno, E_SWITCH_NON_INTEGER);
 	  goto errorTreeReturn;
 	}
       LRVAL (tree) = 1;
@@ -4135,7 +4135,7 @@ createCase (ast * swStat, ast * caseVal, ast * stmnt)
   /* then case is out of context            */
   if (!swStat)
     {
-      werror (E_CASE_CONTEXT);
+      werrorfl (caseVal->filename, caseVal->lineno, E_CASE_CONTEXT);
       return NULL;
     }
 
@@ -4143,14 +4143,14 @@ createCase (ast * swStat, ast * caseVal, ast * stmnt)
   /* if not a constant then error  */
   if (!IS_LITERAL (caseVal->ftype))
     {
-      werror (E_CASE_CONSTANT);
+      werrorfl (caseVal->filename, caseVal->lineno, E_CASE_CONSTANT);
       return NULL;
     }
 
   /* if not a integer than error */
   if (!IS_INTEGRAL (caseVal->ftype))
     {
-      werror (E_CASE_NON_INTEGER);
+      werrorfl (caseVal->filename, caseVal->lineno, E_CASE_NON_INTEGER);
       return NULL;
     }
 
@@ -4172,6 +4172,12 @@ createCase (ast * swStat, ast * caseVal, ast * stmnt)
       if (!val)
 	{
 	  pval->next = caseVal->opval.val;
+	}
+      else if ((int) floatFromVal (val) == cVal)
+	{
+	  werrorfl (caseVal->filename, caseVal->lineno, E_DUPLICATE_LABEL,
+		    "case");
+	  return NULL;
 	}
       else
 	{
@@ -4205,7 +4211,7 @@ createCase (ast * swStat, ast * caseVal, ast * stmnt)
 /* createDefault - creates the parse tree for the default statement */
 /*-----------------------------------------------------------------*/
 ast *
-createDefault (ast * swStat, ast * stmnt)
+createDefault (ast * swStat, ast * defaultVal, ast * stmnt)
 {
   char defLbl[SDCC_NAME_MAX + 1];
 
@@ -4213,7 +4219,14 @@ createDefault (ast * swStat, ast * stmnt)
   /* then case is out of context            */
   if (!swStat)
     {
-      werror (E_CASE_CONTEXT);
+      werrorfl (defaultVal->filename, defaultVal->lineno, E_CASE_CONTEXT);
+      return NULL;
+    }
+
+  if (swStat->values.switchVals.swDefault)
+    {
+      werrorfl (defaultVal->filename, defaultVal->lineno, E_DUPLICATE_LABEL,
+		"default");
       return NULL;
     }
 

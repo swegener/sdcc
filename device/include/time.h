@@ -1,7 +1,11 @@
 #ifndef TIME_H
 #define TIME_H
 
-#if 1
+#ifndef __TIME_UNSIGNED
+#define __TIME_UNSIGNED 1
+#endif
+
+#if __TIME_UNSIGNED
 struct tm
 {
   unsigned char tm_sec;                   /* Seconds.     [0-60]      */

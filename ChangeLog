@@ -1,3 +1,16 @@
+2003-12-19 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* support/Util/SDCCerr.c,
+	* src/SDCCast.h,
+	* src/SDCCast.c (createCase, createDefault, decorateType),
+	* src/SDCClabel.c (labelUnreach),
+	* src/SDCC.y (labeled_statement, jump_statement): More improvements
+	to error messages.
+	* support/Util/SDCCerr.c (werrorfl): fixed a non-standard declaration
+	(with thanks to Stas Sergeev)
+	* device/include/time.h,
+	* device/lib/time.c (CheckTime): suppress unreachable code warning
+
 2003-12-18 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (createIvalCharPtr),

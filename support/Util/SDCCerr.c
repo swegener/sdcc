@@ -133,7 +133,7 @@ struct
 { E_ARG_COUNT, ERROR_LEVEL_ERROR,
    "Function was expecting more arguments" },
 { E_FUNC_EXPECTED, ERROR_LEVEL_ERROR,
-   "Function name expected '%s'.ANSI style declaration REQUIRED" },
+   "Function name expected '%s'. ANSI style declaration REQUIRED" },
 { E_PLUS_INVALID, ERROR_LEVEL_ERROR,
    "invalid operand '%s'" },
 { E_PTR_PLUS_PTR, ERROR_LEVEL_ERROR,
@@ -155,7 +155,7 @@ struct
 { E_BIT_ARRAY, ERROR_LEVEL_ERROR,
    "Array or Pointer to bit|sbit|sfr not allowed.'%s'" },
 { E_DUPLICATE_TYPEDEF, ERROR_LEVEL_ERROR,
-   "typedef/enum '%s' duplicate.Previous definiton Ignored" },
+   "typedef/enum '%s' duplicate. Previous definiton Ignored" },
 { E_ARG_TYPE, ERROR_LEVEL_ERROR,
    "Actual Argument type different from declaration %d" },
 { E_RET_VALUE, ERROR_LEVEL_ERROR,
@@ -165,7 +165,7 @@ struct
 { E_FUNC_DEF, ERROR_LEVEL_ERROR,
    "ANSI Style declaration needed" },
 { E_DUPLICATE_LABEL, ERROR_LEVEL_ERROR,
-   "Label name redefined '%s'" },
+   "Duplicate label '%s'" },
 { E_LABEL_UNDEF, ERROR_LEVEL_ERROR,
    "Label undefined '%s'" },
 { E_FUNC_VOID, ERROR_LEVEL_ERROR,
@@ -175,9 +175,9 @@ struct
 { W_RETURN_MISMATCH, ERROR_LEVEL_WARNING,
    "function return value mismatch" },
 { E_CASE_CONTEXT, ERROR_LEVEL_ERROR,
-   "'case/default' found without 'switch'.statement ignored" },
+   "'case/default' found without 'switch'. Statement ignored" },
 { E_CASE_CONSTANT, ERROR_LEVEL_ERROR,
-   "'case' expression not constant. statement ignored" },
+   "'case' expression not constant. Statement ignored" },
 { E_BREAK_CONTEXT, ERROR_LEVEL_ERROR,
    "'break/continue' statement out of context" },
 { E_SWITCH_AGGR, ERROR_LEVEL_ERROR,
@@ -211,9 +211,9 @@ struct
 { E_INCOMPAT_TYPES, ERROR_LEVEL_ERROR,
    "incompatible types" },
 { W_LOOP_ELIMINATE, ERROR_LEVEL_WARNING,
-   "'while' loop with 'zero' constant.loop eliminated" },
+   "'while' loop with 'zero' constant. Loop eliminated" },
 { W_NO_SIDE_EFFECTS, ERROR_LEVEL_WARNING,
-   "%s expression has NO side effects.expr eliminated" },
+   "%s expression has NO side effects. Expr eliminated" },
 { W_CONST_TOO_LARGE, ERROR_LEVEL_PEDANTIC,
    "constant value '%s', out of range." },
 { W_BAD_COMPARE, ERROR_LEVEL_WARNING,
@@ -509,11 +509,11 @@ void werrorfl (char *newFilename, int newLineno, int errNum, ...)
 {
     char *oldFilename = filename;
     int oldLineno = lineno;
+    va_list marker;
 
     filename = newFilename;
     lineno = newLineno;
 
-    va_list marker;
     va_start(marker,errNum);
     vwerror(errNum, marker);
     va_end(marker);

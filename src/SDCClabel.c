@@ -384,6 +384,7 @@ labelUnreach (iCode * ic)
       /* statement is not a label           */
       if (loop->op == GOTO || loop->op == RETURN)
 	{
+	  int warn = 0;
 
 	  if (loop->next &&
 	      (loop->next->op == LABEL ||
@@ -405,14 +406,21 @@ labelUnreach (iCode * ic)
 		  hTabDeleteItem (&labelRef, IC_LABEL (tic)->key, tic, DELETE_ITEM, NULL);
 		  break;
 		case IFX:
+		  warn = 1;
 		  if (IC_TRUE (tic))
 		    hTabDeleteItem (&labelRef, IC_TRUE (tic)->key, tic, DELETE_ITEM, NULL);
 		  else
 		    hTabDeleteItem (&labelRef, IC_FALSE (tic)->key, tic, DELETE_ITEM, NULL);
 		  break;
+		default:
+		  warn = 1;
 
 		}
 	    }
+
+	  if (warn)
+	    werrorfl (loop->next->filename, loop->next->lineno,
+	              W_CODE_UNREACH);
 
 	  /* now set up the pointers */
 	  loop->next = loop2;

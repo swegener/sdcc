@@ -69,18 +69,21 @@ static char ascTimeBuffer[32];
 static void CheckTime(struct tm *timeptr) {
     // we could do some normalization here, e.g.
     // change 40 october to 9 november
+    #if !__TIME_UNSIGNED
     if (timeptr->tm_sec<0) timeptr->tm_sec=0;
-    else if (timeptr->tm_sec>59) timeptr->tm_sec=59;
     if (timeptr->tm_min<0) timeptr->tm_min=0;
-    else if (timeptr->tm_min>59) timeptr->tm_min=59;
     if (timeptr->tm_hour<0) timeptr->tm_hour=0;
-    else if (timeptr->tm_hour>23) timeptr->tm_hour=23;
     if (timeptr->tm_wday<0) timeptr->tm_wday=0;
-    else if (timeptr->tm_wday>6) timeptr->tm_wday=6;
+    if (timeptr->tm_mon<0) timeptr->tm_mon=0;
+    #endif
+    
+    if (timeptr->tm_sec>59) timeptr->tm_sec=59;
+    if (timeptr->tm_min>59) timeptr->tm_min=59;
+    if (timeptr->tm_hour>23) timeptr->tm_hour=23;
+    if (timeptr->tm_wday>6) timeptr->tm_wday=6;
     if (timeptr->tm_mday<1) timeptr->tm_mday=1;
     else if (timeptr->tm_mday>31) timeptr->tm_mday=31;
-    if (timeptr->tm_mon<0) timeptr->tm_mon=0;
-    else if (timeptr->tm_mon>11) timeptr->tm_mon=11;
+    if (timeptr->tm_mon>11) timeptr->tm_mon=11;
     if (timeptr->tm_year<0) timeptr->tm_year=0;
 }
 

@@ -1324,8 +1324,20 @@ critical_statement
 labeled_statement
 //   : identifier ':' statement          {  $$ = createLabel($1,$3);  }   
    : identifier ':'                    {  $$ = createLabel($1,NULL);  }   
-   | CASE constant_expr ':' statement  {  $$ = createCase(STACK_PEEK(swStk),$2,$4); }
-   | DEFAULT ':' statement             {  $$ = createDefault(STACK_PEEK(swStk),$3); }
+   | CASE constant_expr ':' statement
+     {
+       if (STACK_EMPTY(swStk))
+         $$ = createCase(NULL,$2,$4);
+       else
+         $$ = createCase(STACK_PEEK(swStk),$2,$4);
+     }
+   | DEFAULT { $<asts>$ = newNode(DEFAULT,NULL,NULL); } ':' statement
+     {
+       if (STACK_EMPTY(swStk))
+         $$ = createDefault(NULL,$<asts>2,$4);
+       else
+         $$ = createDefault(STACK_PEEK(swStk),$<asts>2,$4);
+     }
    ;
 
 start_block : '{' { STACK_PUSH(blockNum,currBlockno); currBlockno = ++blockNo ;  }
@@ -1528,7 +1540,7 @@ jump_statement
                            }
    | CONTINUE ';'          {  
        /* make sure continue is in context */
-       if (STACK_PEEK(continueStack) == NULL) {
+       if (STACK_EMPTY(continueStack) || STACK_PEEK(continueStack) == NULL) {
 	   werror(E_BREAK_CONTEXT);
 	   $$ = NULL;
        }
@@ -1540,7 +1552,7 @@ jump_statement
        }
    }
    | BREAK ';'             { 
-       if (STACK_PEEK(breakStack) == NULL) {
+       if (STACK_EMPTY(breakStack) || STACK_PEEK(breakStack) == NULL) {
 	   werror(E_BREAK_CONTEXT);
 	   $$ = NULL;
        } else {

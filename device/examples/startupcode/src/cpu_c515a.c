@@ -231,7 +231,7 @@ void putchar(  char Byte )
 /* History     : 00/03    V1.0 Initial Version                      */
 /*                                                                  */
 /********************************************************************/
-unsigned char getchar( void )
+char getchar( void )
 {
     unsigned char c;
     while (!SERIAL_VIA_INTERRUPT_RCNT)
@@ -266,7 +266,7 @@ unsigned char getchar( void )
 /* History     : 00/03    V1.0 Initial Version                      */
 /*                                                                  */
 /********************************************************************/
-unsigned char keypressed( void )
+char keypressed( void )
 {
     unsigned char c;
 
@@ -325,7 +325,7 @@ void putchar(  char Byte )
 /* History     : 00/03    V1.0 Initial Version                      */
 /*                                                                  */
 /********************************************************************/
-unsigned char getchar( void )
+char getchar( void )
 {
     while( !RI ) /* wait for RI==1 */
     {
@@ -350,7 +350,7 @@ unsigned char getchar( void )
 /* History     : 00/03    V1.0 Initial Version                      */
 /*                                                                  */
 /********************************************************************/
-unsigned char keypressed( void )
+char keypressed( void )
 {
     unsigned char c;
 

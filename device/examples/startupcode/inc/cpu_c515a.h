@@ -37,7 +37,7 @@ extern void SERIALVIAINTERRUPT (void) interrupt SI0_VECTOR;
 #endif
 
 extern void putchar(  char Byte );
-extern unsigned char getchar( void );
+extern char getchar( void );
 extern unsigned char keypressed( void );
 
 #ifdef USE_SYSTEM_TIMER

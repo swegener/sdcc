@@ -1977,7 +1977,8 @@ decorateType (ast * tree)
 	(getSize(LTYPE(tree)) > getSize(RTYPE(tree))) &&
 	(getSize(RTYPE(tree)) < INTSIZE)) {
       // this is a cast/assign to a bigger type
-      if (IS_AST_OP(tree->right) && 
+      if (IS_AST_OP(tree->right) &&
+	  IS_INTEGRAL(tree->right->ftype) &&
 	  (tree->right->opval.op == LEFT_OP ||
 	   tree->right->opval.op == '*' ||
 	   tree->right->opval.op == '+' ||
@@ -2501,7 +2502,7 @@ decorateType (ast * tree)
 
       LRVAL (tree) = RRVAL (tree) = 1;
       /* if the left is a pointer */
-      if (IS_PTR (LTYPE (tree)) || IS_ARRAY (LTYPE (tree)))
+      if (IS_PTR (LTYPE (tree)) || IS_AGGREGATE (LTYPE (tree)) )
 	TETYPE (tree) = getSpec (TTYPE (tree) =
 				 LTYPE (tree));
       else

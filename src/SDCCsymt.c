@@ -2030,7 +2030,11 @@ printTypeChain (sym_link * start, FILE * of)
 	      fprintf (of, "unkown * ");
 	      break;
 	    case ARRAY:
-	      fprintf (of, "[] ");
+	      if (DCL_ELEM(type)) {
+		fprintf (of, "[%d] ", DCL_ELEM(type));
+	      } else {
+		fprintf (of, "[] ");
+	      }
 	      break;
 	    }
 	}

@@ -1,3 +1,8 @@
+2004-09-24 Martin Helmling <mh AT octo-soft.de>
+
+	* debugger/mcs51/cmd.c: set PC if a symbol at pc reg is set
+	* debugger/mcs51/simi.c: addapt new syntax of s51
+	
 2004-09-23 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/genutils.c (pic16_genNot): fixed bug #1032265,

@@ -26,9 +26,9 @@
 \use_numerical_citations 0
 \paperorientation portrait
 \leftmargin 30mm
-\topmargin 10mm
+\topmargin 20mm
 \rightmargin 25mm
-\bottommargin 15mm
+\bottommargin 20mm
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
@@ -3361,8 +3361,8 @@ Adjust your environment variable PATH to include the location of the bin
 Building the Documentation
 \layout Standard
 
-If the necessary tools are installed it is as easy as changing into the
- doc directory and typing 
+If the necessary tools (LyX, LaTeX, latex2html) are installed it is as easy
+ as changing into the doc directory and typing 
 \family sans 
 \series bold 
 
@@ -3412,7 +3412,7 @@ It tries to document SDCC for several processor architectures in one document
 
  currently matches SDCC for mcs51 and DS390 best and does give too few informati
 on about f.e.
- Z80 and PIC.
+ Z80, PIC and HC08.
 \layout Itemize
 
 There are many references pointing away from this documentation.
@@ -3444,7 +3444,7 @@ ate
 a
 \emph default 
 rray
-\begin_inset LatexCommand \index{fpga (field programmable array)}
+\begin_inset LatexCommand \index{fpga (field programmable gate array)}
 
 \end_inset 
 
@@ -8234,19 +8234,15 @@ NOOVERLAY
  if they are not reentrant.
 \layout Standard
 
-Also note that the compiler does not do any processing of inline
-\begin_inset LatexCommand \index{inline}
-
-\end_inset 
-
- assembler code, so the compiler might incorrectly assign local variables
- and parameters of a function into the overlay segment if the inline assembler
- code calls other c-functions that might use the overlay.
+Also note that the compiler does not do any processing of inline assembler
+ code, so the compiler might incorrectly assign local variables and parameters
+ of a function into the overlay segment if the inline assembler code calls
+ other c-functions that might use the overlay.
  In that case the #pragma\SpecialChar ~
 NOOVERLAY should be used.
 \layout Standard
 
-Parameters and Local variables of functions that contain 16 or 32 bit multiplica
+Parameters and local variables of functions that contain 16 or 32 bit multiplica
 tion
 \begin_inset LatexCommand \index{Multiplication}
 
@@ -8916,6 +8912,48 @@ EA = 0;
 EA = 1;
 \layout Standard
 
+On other architectures which have seperate opcodes for enabling and disabling
+ interrupts you might want to make use of defines with inline assembly
+\begin_inset LatexCommand \index{Assembler routines}
+
+\end_inset 
+
+ (HC08):
+\layout Verse
+
+
+\family typewriter 
+#define CLI _asm
+\begin_inset LatexCommand \index{\_asm}
+
+\end_inset 
+
+\SpecialChar ~
+\SpecialChar ~
+cli\SpecialChar ~
+\SpecialChar ~
+_endasm
+\begin_inset LatexCommand \index{\_endasm}
+
+\end_inset 
+
+; 
+\layout Verse
+
+
+\family typewriter 
+#define SEI _asm\SpecialChar ~
+\SpecialChar ~
+sei\SpecialChar ~
+\SpecialChar ~
+_endasm; 
+\layout Verse
+
+
+\family typewriter 
+...
+\layout Standard
+
 Note: it is sometimes sufficient to disable only a specific interrupt source
  like f.e.
  a timer or serial interrupt by manipulating an 
@@ -9126,6 +9164,8 @@ _sdcc_external_startup()
  routine to your program to override the default if you need to setup hardware
  or perform some other critical operation prior to static & global variable
  initialization.
+ On some mcs51 variants xdata has to be explicitly enabled before it can
+ be accessed, this is the place to do it.
  See also the compiler option 
 \emph on 
 -
@@ -9452,7 +9492,7 @@ unsigned char xdata at 0x7f00 buf[0x100];
 \newline 
 unsigned char head,tail;
 \newline 
-#define USE_ASSEMBLY (1)
+#define USE_ASSEMBLY
 \newline 
 
 \newline 
@@ -16039,44 +16079,6 @@ a
 mov\SpecialChar ~
 \SpecialChar ~
 _i,a
-\layout Standard
-
-Note that SDCC stores numbers in little-endian
-\begin_inset Foot
-collapsed false
-
-\layout Standard
-
-Usually 8-bit processors don't care much about endianness.
- This is not the case for the standard 8051 which only has an instruction
- to increment its 
-\emph on 
-dptr
-\emph default 
-
-\begin_inset LatexCommand \index{DPTR}
-
-\end_inset 
-
--datapointer
-\emph on 
- 
-\emph default 
-so little-endian is the more efficient byte order.
-\end_inset 
-
-
-\begin_inset LatexCommand \index{little-endian}
-
-\end_inset 
-
-
-\begin_inset LatexCommand \index{Endianness}
-
-\end_inset 
-
- format (i.e.
- lowest order first).
 \layout Subsubsection
 
 Bit-rotation
@@ -16087,13 +16089,33 @@ Bit-rotation
 
 \layout Standard
 
-A special case of the bit-shift operation is bit rotation, SDCC recognizes
- the following expression to be a left bit-rotation:
+A special case of the bit-shift operation is bit rotation
+\begin_inset LatexCommand \index{rotating bits}
+
+\end_inset 
+
+, SDCC recognizes the following expression to be a left bit-rotation:
 \layout Verse
 
 
 \family typewriter 
-unsigned char i; 
+\series bold 
+unsigned
+\series default 
+\SpecialChar ~
+\SpecialChar ~
+char i;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/* unsigned is needed for rotation */ 
 \newline 
 ...
  
@@ -16133,6 +16155,115 @@ ns of this case will also be recognized as bit-rotation, i.e.:
 
 \family typewriter 
 i = ((i >> 7) | (i << 1)); /* left-bit rotation */
+\layout Subsubsection
+
+Nibble and Byte Swapping
+\layout Standard
+
+Other special cases of the bit-shift operations are nibble or byte swapping
+\begin_inset LatexCommand \index{swapping nibbles/bytes}
+
+\end_inset 
+
+, SDCC recognizes the following expressions:
+\layout Verse
+
+
+\family typewriter 
+\series bold 
+unsigned
+\series default 
+\SpecialChar ~
+\SpecialChar ~
+char i; 
+\newline 
+
+\series bold 
+unsigned
+\series default 
+\SpecialChar ~
+\SpecialChar ~
+int j; 
+\newline 
+...
+ 
+\newline 
+i = ((i << 4) | (i >> 4)); 
+\family default 
+
+\newline 
+
+\family typewriter 
+j = ((j << 8) | (j >> 8)); 
+\layout Standard
+
+and generates a swap instruction for the nibble swapping
+\begin_inset LatexCommand \index{Nibble swapping}
+
+\end_inset 
+
+ or move instructions for the byte swapping
+\begin_inset LatexCommand \index{Byte swapping}
+
+\end_inset 
+
+.
+ The 
+\begin_inset Quotes sld
+\end_inset 
+
+j
+\begin_inset Quotes srd
+\end_inset 
+
+ example can be used to convert from little to big-endian or vice versa.
+ If you want to change the endianness of a 
+\emph on 
+signed
+\emph default 
+ integer you have to cast to 
+\family typewriter 
+(unsigned int)
+\family default 
+ first.
+\layout Standard
+
+Note that SDCC stores numbers in little-endian
+\begin_inset Foot
+collapsed false
+
+\layout Standard
+
+Usually 8-bit processors don't care much about endianness.
+ This is not the case for the standard 8051 which only has an instruction
+ to increment its 
+\emph on 
+dptr
+\emph default 
+
+\begin_inset LatexCommand \index{DPTR}
+
+\end_inset 
+
+-datapointer
+\emph on 
+ 
+\emph default 
+so little-endian is the more efficient byte order.
+\end_inset 
+
+
+\begin_inset LatexCommand \index{little-endian}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{Endianness}
+
+\end_inset 
+
+ format (i.e.
+ lowest order first).
 \layout Subsubsection
 
 Highest Order Bit

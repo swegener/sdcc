@@ -1,6 +1,7 @@
 2003-10-31 Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCmain.c (linkEdit): "fixed" bug #833605
+	* src/SDCCast.c (decorateType): fixed bug #832664
 
 2003-10-31  Borut Razem <borut.razem@siol.net>
 

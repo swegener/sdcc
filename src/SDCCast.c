@@ -3062,14 +3062,9 @@ decorateType (ast * tree)
 	  }
 	}
       LRVAL (tree) = RRVAL (tree) = 1;
-      if (IS_LITERAL (LTYPE (tree)) && !IS_LITERAL (RTYPE (tree)))
-	{
-	  COPYTYPE (TTYPE (tree), TETYPE (tree), RTYPE (tree));
-	}
-      else
-	{
-	  COPYTYPE (TTYPE (tree), TETYPE (tree), LTYPE (tree));
-	}
+      TTYPE (tree) = TETYPE (tree) = copyLinkChain (LTYPE (tree));
+      if (IS_LITERAL (TTYPE (tree)))
+        SPEC_SCLS (TTYPE (tree)) &= ~S_LITERAL;
       return tree;
 
       /*------------------------------------------------------------------*/

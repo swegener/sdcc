@@ -6,11 +6,13 @@ SHELL		= /bin/sh
 AUTOCONF	= autoconf
 
 PRJDIR		= .
-PKGS		= debugger/mcs51 sim/ucsim
+SDCC_MISC	= debugger/mcs51 sim/ucsim
 SDCC_LIBS	= support/cpp
 SDCC_ASLINK	= as/mcs51 as link
 
-PRJS		= sim/ucsim
+PKGS		= $(SDCC_MISC) $(SDCC_LIBS) $(SDCC_ASLINK) \
+		  src device/include device/lib
+
 PORTS		= mcs51 z80
 
 srcdir          = .
@@ -34,14 +36,13 @@ sdcc-aslink:
 	for as in $(SDCC_ASLINK); do $(MAKE) -C $$as; done
 
 sdcc-misc:
-	for pkg in $(PKGS); do $(MAKE) -C $$pkg; done
-	$(MAKE) -C sim/ucsim
+	for misc in $(SDCC_MISC); do $(MAKE) -C $$misc; done
 
 sdcc-device:
 	$(MAKE) -C device/include
 	$(MAKE) -C device/lib
 
-sdcc: sdcc-cc sdcc-aslink sdcc-misc sdcc
+sdcc: sdcc-cc sdcc-aslink sdcc-misc sdcc-device
 	$(MAKE) -f main.mk all
 
 # Some interesting sub rules
@@ -74,10 +75,6 @@ clean:
 	for pkg in $(PKGS); do\
 	  $(MAKE) PORTS="$(PORTS)" -C $$pkg clean ;\
 	done
-	@echo "+ Cleaning sub-projects using Makefile..."
-	for prj in $(PRJS); do\
-	  $(MAKE) -C $$prj clean ;\
-	done
 
 
 # Deleting all files created by configuring or building the program
@@ -89,10 +86,6 @@ distclean:
 	for pkg in $(PKGS); do\
 	  $(MAKE) -C $$pkg -f clean.mk PORTS="$(PORTS)" distclean ;\
 	done
-	@echo "+ DistCleaning sub-projects using Makefile..."
-	for prj in $(PRJS); do\
-	  $(MAKE) -C $$prj distclean ;\
-	done
 
 
 # Like clean but some files may still exist
@@ -101,9 +94,6 @@ mostlyclean: clean
 	$(MAKE) -f clean.mk mostlyclean
 	for pkg in $(PKGS); do\
 	  $(MAKE) -C $$pkg -f clean.mk PORTS="$(PORTS)" mostlyclean ;\
-	done
-	for prj in $(PRJS); do\
-	  $(MAKE) -C $$prj mostlyclean ;\
 	done
 
 
@@ -114,9 +104,6 @@ realclean: distclean
 	$(MAKE) -f clean.mk realclean
 	for pkg in $(PKGS); do\
 	  $(MAKE) -C $$pkg -f clean.mk PORTS="$(PORTS)" realclean ;\
-	done
-	for prj in $(PRJS); do\
-	  $(MAKE) -C $$prj realclean ;\
 	done
 
 

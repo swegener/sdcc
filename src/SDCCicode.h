@@ -68,6 +68,7 @@ OPTYPE;
 #define OP_SYMBOL(op)      op->operand.symOperand
 #define OP_SYM_TYPE(op)    op->operand.symOperand->type
 #define OP_SYM_ETYPE(op)   op->operand.symOperand->etype
+#define OP_VALUE(op)       op->operand.valOperand
 #define SPIL_LOC(op)       op->operand.symOperand->usl.spillLoc
 #define OP_LIVEFROM(op)    op->operand.symOperand->liveFrom
 #define OP_LIVETO(op)      op->operand.symOperand->liveTo

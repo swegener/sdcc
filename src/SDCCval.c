@@ -373,8 +373,10 @@ constVal (char *s)
   SPEC_NOUN (val->type) = V_INT;
   SPEC_SCLS (val->type) = S_LITERAL;
 
-  /* set the _unsigned flag if 'uU' found */
-  if (strchr (s, 'u') || strchr (s, 'U'))
+  /* set the _unsigned flag if 'uUoOxX' found */
+  if (strchr (s, 'u') || strchr (s, 'U') ||
+      strchr (s, 'o') || strchr (s, 'O') ||
+      strchr (s, 'x') || strchr (s, 'x'))
     SPEC_USIGN (val->type) = 1;
 
   /* set the _long flag if 'lL' is found */
@@ -711,6 +713,7 @@ charVal (char *s)
   val->type = val->etype = newLink ();
   val->type->class = SPECIFIER;
   SPEC_NOUN (val->type) = V_CHAR;
+  SPEC_USIGN(val->type) = 1;
   SPEC_SCLS (val->type) = S_LITERAL;
 
   s++;				/* get rid of quotation */

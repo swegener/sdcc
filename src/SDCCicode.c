@@ -131,11 +131,12 @@ iCodeTable codeTable[] =
      pedantic>1: "char c=200" is not allowed (evaluates to -56)
 */
 
-void checkConstantRange(sym_link *ltype, double v, char *msg, int pedantic) {
+void checkConstantRange(sym_link *ltype, value *val, char *msg, int pedantic) {
   LONG_LONG max = (LONG_LONG) 1 << bitsForType(ltype);
   char message[132]="";
   int warnings=0;
   int negative=0;
+  long v=SPEC_CVAL(val->type).v_long;
 
 #if 0
   // this could be a good idea
@@ -148,10 +149,9 @@ void checkConstantRange(sym_link *ltype, double v, char *msg, int pedantic) {
     return;
   }
 
-  if (v<0) {
+  if (!SPEC_USIGN(val->type) && v<0) {
     negative=1;
-    // if not pedantic: -1 equals to 0xf..f
-    if (SPEC_USIGN(ltype) && (!pedantic ? v!=-1 : 1)) {
+    if (SPEC_USIGN(ltype) && (pedantic>1)) {
       warnings++;
     }
     v=-v;
@@ -2507,7 +2507,7 @@ geniCodeLogic (operand * left, operand * right, int op)
   if (IS_INTEGRAL (ltype) && IS_VALOP (right) && IS_LITERAL (rtype))
     {
       checkConstantRange(ltype, 
-			 operandLitValue(right), "compare operation", 1);
+			 OP_VALUE(right), "compare operation", 1);
     }
 
   ctype = usualBinaryConversions (&left, &right);
@@ -2600,7 +2600,7 @@ geniCodeAssign (operand * left, operand * right, int nosupdate)
   if (IS_INTEGRAL (ltype) && right->type == VALUE && IS_LITERAL (rtype))
     {
       checkConstantRange(ltype, 
-			 operandLitValue(right), "= operation", 0);
+			 OP_VALUE(right), "= operation", 0);
     }
 
   /* if the left & right type don't exactly match */

@@ -1,3 +1,8 @@
+2003-09-22  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+	*link/z80/lklibr.c, as/mcs51/lklibr.c: Improved memory allocation and
+	freeing.
+
 2003-09-21  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/z80/gen.c (setupToPreserveCarry): Fixed bug #796955

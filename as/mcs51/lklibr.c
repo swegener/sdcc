@@ -383,9 +383,6 @@ search()
 			}
 		}
 	}
-#ifdef INDEXLIB
-    freelibraryindex();
-#endif
 }
 
 /*Load a .rel file embedded in a sdcclib file*/
@@ -1261,6 +1258,9 @@ library()
 			loadfile_SdccLib(lbfh->libspc, lbfh->relfil, lbfh->offset);
 		}
 	}
+#ifdef INDEXLIB
+    freelibraryindex();
+#endif
 }
 
 /*)Function	VOID	loadfile(filspc)

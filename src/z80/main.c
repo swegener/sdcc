@@ -24,7 +24,7 @@ static void _z80_setDefaultOptions(void)
     /* first the options part */
     options.intlong_rent = 1;
 
-    optimize.global_cse = 0;    
+    optimize.global_cse = 1;    
     optimize.label1 = 1;
     optimize.label2 = 1;
     optimize.label3 = 1;

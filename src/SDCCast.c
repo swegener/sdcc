@@ -1002,6 +1002,11 @@ gatherAutoInit (symbol * autoChain)
 	  SPEC_SCLS (sym->etype) != S_CODE)
 	{
 	  symbol *newSym;
+	  
+	  // this can only be a constant
+	  if (!IS_LITERAL(sym->ival->init.node->etype)) {
+	    werror (E_CONST_EXPECTED);
+	  }
 
 	  /* insert the symbol into the symbol table */
 	  /* with level = 0 & name = rname       */

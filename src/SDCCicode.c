@@ -1202,8 +1202,9 @@ operandOperation (operand * left, operand * right,
     case LEFT_OP:
       /* The number of left shifts is always unsigned. Signed doesn't make
 	 sense here. Shifting by a negative number is impossible. */
-      retval = operandFromLit ((TYPE_UDWORD) operandLitValue (left) <<
-			       (TYPE_UDWORD) operandLitValue (right));
+      retval = operandFromValue (valCastLiteral (type,
+				 ((TYPE_UDWORD) operandLitValue (left) <<
+				  (TYPE_UDWORD) operandLitValue (right))));
       break;
     case RIGHT_OP:
       /* The number of right shifts is always unsigned. Signed doesn't make

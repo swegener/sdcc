@@ -1,17 +1,21 @@
+2004-01-11 Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCicode.c (operandOperation): fixed bug #874819
+
 2004-01-11 Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
-	* doc/sdccman.lyx: Moved and added some sections, small changes 
-	all over. Telling LaTeX to be less strict with word spacing 
-	to better keep the right margin. Changed some notes about 
+	* doc/sdccman.lyx: Moved and added some sections, small changes
+	all over. Telling LaTeX to be less strict with word spacing
+	to better keep the right margin. Changed some notes about
 	maintainance of the ports in section 3.2.1 - is it OK like this?
 
 2004-01-11 Vangelis Rokas <vrokas@otenet.gr>
-	
+
 	SDCC source changes:
 	* src/SDCCopt.c (cntToFcall, cnvToFloatCast, cnvFromFloatCast,
 	convilong): modified to inform the pic16 port that builtin functions
 	are external
-	
+
 	PIC16 PORT specific changes:
 	* src/pic16/device.c pic16_dump_equates() added,
 	processor registers declared internally by the port are emitted in
@@ -77,7 +81,7 @@
 	* src/SDCCglue.c (createInterruptVect): don't append 7(5) padding
 	bytes for last interrupt vector (mcs51)
 	* sdcc.spec: fixed typo
-	
+
 2004-01-09 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/mcs51/gen.c (genFunction, genEndFunction, genReceive, getTempRegs,
@@ -123,7 +127,7 @@
 	* src/pic16/main.c: added $l in _asmCmd, changed extension for
 	object file from '.rel' to '.o' in port->linker structure,
 	changed size of fptr from 2 to 3 in port structure
-	
+
 2004-01-07  Borut Razem <borut.razem@siol.net>
 
 	* support/scripts/sdcc.nsi: update PATH

@@ -1307,6 +1307,17 @@ static void toBoolean(operand *oper)
     int size = AOP_SIZE(oper) - 1;
     int offset = 1;
 
+    /* The generic part of a generic pointer should
+     * not participate in it's truth value.
+     *
+     * i.e. 0x10000000 is zero.
+     */
+    if (opIsGptr(oper))
+    {
+    	D(emitcode(";", "toBoolean: generic ptr special case."););
+       	size--;
+    }
+
     if (AOP_NEEDSACC(oper))
     {
         emitcode("push", "b");
@@ -3919,8 +3930,19 @@ static void gencjneshort(operand *left, operand *right, symbol *lbl)
         right = left;
         left = t;
     }
+    
     if(AOP_TYPE(right) == AOP_LIT)
         lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
+        
+    if (opIsGptr(left) || opIsGptr(right))
+    {
+        /* We are comparing a generic pointer to something.
+         * Exclude the generic type byte from the comparison.
+         */
+        size--;
+        D(emitcode(";", "cjneshort: generic ptr special case.");) 
+    }
+         
 
     /* if the right side is a literal then anything goes */
     if (AOP_TYPE(right) == AOP_LIT &&

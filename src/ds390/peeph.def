@@ -1062,11 +1062,11 @@ replace {
 // saves 2 bytes, ?? cycles.
 replace {
         mov  dpl,#%1
-        mov  dph,#(%1 >> 8)
-	mov  dpx,#(%1 >> 16)
+        mov  dph,#%2
+	mov  dpx,#%3
 } by {
         ; Peephole 182a   used 24 bit load of dptr
-        mov  dptr,#%1
+        mov  dptr,#((%3 << 16) + (%2 << 8) + %1)
 } if 24bitMode
 
 // saving 3 byte, 2 cycles, return(float_constant) profits here

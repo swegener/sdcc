@@ -26,7 +26,7 @@
 
 #define EQ(A,B) !strcmp((A),(B))
 #define MEMSIZE 0x10000
-//#define DODUMP 1
+#define DODUMP 1
 
 typedef struct
 {
@@ -222,7 +222,7 @@ void DumpForDebug (void)
 {
 	char DumpFileName[PATH_MAX];
 	FILE * DumpFile;
-	int j;
+	int j, k;
 
 	strcpy(DumpFileName, infn[0].PathName);
 	strcat(DumpFileName, ".d51");
@@ -238,14 +238,15 @@ void DumpForDebug (void)
 
 	for(j=0; j<numsym; j++)
 	{
+		k=symbol[j].UsageType&0xf;
 		fprintf(DumpFile, "%s, %s, %s, 0x%04x, %s\n",
 			symbol[j].name,
 			infn[symbol[j].FileNameNumber].PathName,
 			(symbol[j].Procedure>=0)?procedure[symbol[j].Procedure].name:"GLOBAL",
 			symbol[j].Address,
-			UsageTypeName[symbol[j].UsageType&0xf]);
+			k<6?UsageTypeName[k]:"???");
 	}
-
+	
 	fprintf(DumpFile,"\nPROCEDURES:\n");
 	for(j=0; j<numproc; j++)
 	{
@@ -574,6 +575,8 @@ void CollectInfoFromCDB(void)
 			/* Example:
 			"S:G$actual$0$0({7}ST__00010000:S),E,0,0"
 			"S:Lmain$j$1$1({2}SI:S),E,0,0"
+			"S:G$DS1306_Reset_SPI$0$0({2}DF,SV:S),C,0,0"
+			"S:G$main$0$0({2}DF,SV:S),C,0,0"
 			*/
 
 			case 'S':
@@ -589,7 +592,7 @@ void CollectInfoFromCDB(void)
 					   &AddressSpace, &c,
 					   &OnStack, &c, 
 					   &StackOffset);
-				
+
 				i=-1; k=-1;
 				switch(scope[2])
 				{
@@ -641,6 +644,7 @@ void CollectInfoFromCDB(void)
 
 						case 'E': /*Internal ram (lower 128) bytes*/ 
 						case 'I': /*SFR space*/ 
+						case 'R': /*Register Space*/ 
 							symbol[numsym].UsageType=0x42;
 						break;
 
@@ -652,6 +656,10 @@ void CollectInfoFromCDB(void)
 						case 'H': /*Bit addressable*/ 
 						case 'J': /*SBIT space*/ 
 							symbol[numsym].UsageType=0x44;
+						break;
+						
+						default:
+							printf("Name: %s, AddressSpace:%c\n", symbol[numsym].name, AddressSpace);
 						break;
 					}
 					numsym++;
@@ -678,7 +686,7 @@ void CollectInfoFromCDB(void)
 					procedure[numproc].EndAdd=-1;/*To be collected latter*/
 					numproc++;
 				}
-
+				
 				/*This function name is also a global symbol*/
 				for(j=0; j<numsym; j++)/*A global symbol may have been already defined*/
 				{
@@ -694,7 +702,6 @@ void CollectInfoFromCDB(void)
 					symbol[numsym].Address=-1;/*Collected later*/
 					numsym++;
 				}
-
 			break;
 
 			case 'L':
@@ -703,7 +710,7 @@ void CollectInfoFromCDB(void)
 					case 'G': /*Example L:G$P0$0$0:80*/
 						sscanf(buff, "%[^$] %c %[^$] %c %[^:] %c %x",
 							scope, &c, name, &c, level, &c,	&Address);
-						
+
 						for(j=0; j<numsym; j++)
 						{
 							if(EQ(symbol[j].name, name))
@@ -711,21 +718,23 @@ void CollectInfoFromCDB(void)
 								if( (symbol[j].Address==-1) && (symbol[j].Procedure==-1) )
 								{
 									symbol[j].Address=Address;
-									/*If the symbol is the name of a procedure, the address is also
-									the begining of such procedure*/
-									if(symbol[j].UsageType==0x00)
+								}
+								
+								/*If the symbol is the name of a procedure, the address is also
+								the begining of such procedure*/
+								if((symbol[j].UsageType&0x0f)==0x00)
+								{
+									for(k=0; k<numproc; k++)
 									{
-										for(k=0; k<numproc; k++)
+										if(EQ(symbol[j].name, procedure[k].name))
 										{
-											if(EQ(symbol[j].name, procedure[k].name))
-											{
-												if(procedure[k].BeginAdd==-1)
-													procedure[k].BeginAdd=Address;
-												break;
-											}
+											if(procedure[k].BeginAdd==-1)
+												procedure[k].BeginAdd=Address;
+											break;
 										}
 									}
 								}
+								
 								break;
 							}
 						}

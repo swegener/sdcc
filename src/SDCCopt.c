@@ -176,7 +176,10 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
   IC_RESULT (newic) = IC_RESULT (ic);
   newic->lineno = lineno;
   newic->parmBytes+=bytesPushed;
-
+  ebp->hasFcall = 1;
+  if (currFunc)
+    FUNC_HASFCALL (currFunc->type) = 1;
+    
   if(TARGET_IS_PIC16) {
 	/* normally these functions aren't marked external, so we can use their
 	 * _extern field to marked as already added to symbol table */
@@ -264,6 +267,9 @@ found:
   newic = newiCode (CALL, operandFromSymbol (func), NULL);
   IC_RESULT (newic) = IC_RESULT (ic);
   newic->parmBytes+=bytesPushed;
+  ebp->hasFcall = 1;
+  if (currFunc)
+    FUNC_HASFCALL (currFunc->type) = 1;
 
   if(TARGET_IS_PIC16) {
 	/* normally these functions aren't marked external, so we can use their
@@ -354,6 +360,9 @@ found:
   newic = newiCode (CALL, operandFromSymbol (func), NULL);
   IC_RESULT (newic) = IC_RESULT (ic);
   newic->parmBytes+=bytesPushed;
+  ebp->hasFcall = 1;
+  if (currFunc)
+    FUNC_HASFCALL (currFunc->type) = 1;
 
   if(TARGET_IS_PIC16) {
 	/* normally these functions aren't marked external, so we can use their
@@ -517,6 +526,9 @@ found:
   IC_RESULT (newic) = IC_RESULT (ic);
   newic->lineno = lineno;
   newic->parmBytes+=bytesPushed; // to clear the stack after the call
+  ebp->hasFcall = 1;
+  if (currFunc)
+    FUNC_HASFCALL (currFunc->type) = 1;
 
   if(TARGET_IS_PIC16) {
 	/* normally these functions aren't marked external, so we can use their

@@ -1,3 +1,9 @@
+2004-05-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (isConformingBody): fixed bug #949967
+	* src/SDCCopt.c (cnvToFcall, cnvToFloatCast, cnvFromFloatCast,
+	convilong): fixed bug #952086
+
 2004-05-18 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCmem.c (allocVariables): fixed bug #955321

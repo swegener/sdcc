@@ -1655,10 +1655,12 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
 /*------------------------------------------------------------------*/
     case '[':
       // if the loopvar is used as an index
-      if (astHasSymbol(pbody->right, sym)) {
+      /* array op is commutative -- must check both left & right */
+      if (astHasSymbol(pbody->right, sym) || astHasSymbol(pbody->left, sym)) {
 	return FALSE;
       }
-      return isConformingBody (pbody->right, sym, body);
+      return isConformingBody (pbody->right, sym, body)
+              && isConformingBody (pbody->left, sym, body);
 
 /*------------------------------------------------------------------*/
     case PTR_OP:

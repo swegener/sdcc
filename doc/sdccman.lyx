@@ -324,7 +324,12 @@ This version has numerous bug fixes compared with the previous version.
 
 \end_inset 
 
-.
+ (see section 
+\begin_inset LatexCommand \ref{sub:ANSI-Compliance}
+
+\end_inset 
+
+ for ANSI-Compliance).
  
 \newline 
 
@@ -1499,8 +1504,8 @@ cross
 \begin_inset Quotes srd
 \end_inset 
 
-compile on Cygwin for Mingw32 (see also sdcc/support/scripts/sdcc_cygwin_mingw32)
-:
+compile on Cygwin for Mingw32 (see also sdcc/support/scripts/sdcc_cygwin_mingw32
+):
 \layout LyX-Code
 
 ./configure -C 
@@ -1661,6 +1666,11 @@ status Collapsed
 \layout Subsection
 
 Install paths
+\begin_inset LatexCommand \label{sub:Install-paths}
+
+\end_inset 
+
+
 \begin_inset LatexCommand \index{Install paths}
 
 \end_inset 
@@ -1672,10 +1682,10 @@ Install paths
 \begin_inset  Tabular
 <lyxtabular version="3" rows="5" columns="4">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -1907,6 +1917,11 @@ Of course this doesn't change the search paths compiled into the binaries.
 \layout Subsection
 
 Search Paths
+\begin_inset LatexCommand \label{sub:Search-Paths}
+
+\end_inset 
+
+
 \begin_inset LatexCommand \index{Search path}
 
 \end_inset 
@@ -2807,7 +2822,7 @@ Bring up a command line terminal, such as xterm.
 Unpack the file using a command like: 
 \family sans 
 \series bold 
-"tar -xzf sdcc.src.tar.gz
+"tar -xvzf sdcc.src.tar.gz
 \family default 
 \series default 
 "
@@ -3244,7 +3259,7 @@ That is it.
 \backslash 
 bin_vc to sdcc
 \backslash 
-bin, and you can compile using sdcc.
+bin, and you can compile using SDCC.
 \layout Subsubsection
 
 Building SDCC Using Borland
@@ -3354,6 +3369,67 @@ make
 \end_inset 
 
 .
+ Prebuilt documentation in html and pdf format is available from 
+\begin_inset LatexCommand \url{http://sdcc.sourceforge.net/snap.php}
+
+\end_inset 
+
+.
+\layout Subsection
+
+Reading the Documentation
+\layout Standard
+
+Currently reading the document in pdf format is recommended, as for unknown
+ reason the hyperlinks are working there whereas in the html version they
+ are not.
+\newline 
+This documentation is in some aspects different from a commercial documentation:
+ 
+\layout Itemize
+
+It tries to document SDCC for several processor architectures in one document
+ (commercially these probably would be separate documents/products).
+ This document currently matches SDCC for mcs51 and DS390 best and does
+ give too few information about f.e.
+ Z80 and PIC.
+\layout Itemize
+
+There are many references pointing away from this documentation.
+ Don't let this distract you.
+ If there f.e.
+ was a reference like 
+\begin_inset LatexCommand \url{www.opencores.org}
+
+\end_inset 
+
+ together with a statement 
+\begin_inset Quotes sld
+\end_inset 
+
+some processors which are targetted by SDCC can be implemented in a field
+ programmable array
+\begin_inset LatexCommand \index{fpga (field programmable array)}
+
+\end_inset 
+
+
+\begin_inset Quotes srd
+\end_inset 
+
+ we expect you to have a quick look there and come back.
+ If you read this you are on the right track.
+\layout Itemize
+
+Some sections attribute more space to problems, restrictions and warnings
+ than to the solution.
+\layout Itemize
+
+The installation section and the section about the debugger is intimidating.
+\layout Itemize
+
+There are still lots of typos and there are more different writing styles
+ than pictures.
 \layout Subsection
 
 Testing the SDCC Compiler
@@ -3386,8 +3462,21 @@ status Collapsed
  If it doesn't run, or gives a message about not finding sdcc program, then
  you need to check over your installation.
  Make sure that the sdcc bin directory is in your executable search path
- defined by the PATH environment setting (see the Trouble-shooting section
- for suggestions).
+ defined by the PATH environment setting (
+\series medium 
+see 
+\series default 
+section 
+\begin_inset LatexCommand \ref{sub:Install-Trouble-shooting}
+
+\end_inset 
+
+\SpecialChar ~
+
+\series medium 
+Install trouble-shooting for suggestions
+\series default 
+).
  Make sure that the sdcc program is in the bin folder, if not perhaps something
  did not install correctly.
 \newline 
@@ -3475,7 +3564,11 @@ The next step is to try it with the linker.
  
 \series medium 
 (no test.ihx, and the linker generates warnings), then the problem is most
- likely that sdcc cannot find the 
+ likely that 
+\series default 
+SDCC
+\series medium 
+ cannot find the 
 \series default 
 /
 \series medium 
@@ -3483,7 +3576,17 @@ usr/local/share/sdcc/lib directory
 \series default 
  
 \series medium 
-(see the Install trouble-shooting section for suggestions).
+(see 
+\series default 
+section 
+\begin_inset LatexCommand \ref{sub:Install-Trouble-shooting}
+
+\end_inset 
+
+\SpecialChar ~
+
+\series medium 
+Install trouble-shooting for suggestions).
 \series default 
 
 \newline 
@@ -3491,7 +3594,11 @@ usr/local/share/sdcc/lib directory
 \newline 
 
 \series medium 
-The final test is to ensure sdcc can use the 
+The final test is to ensure 
+\series default 
+SDCC
+\series medium 
+ can use the 
 \series default 
 standard
 \series medium 
@@ -3529,12 +3636,25 @@ Compile this by typing
 .
  This should generate a test.ihx output file, and it should give no warnings
  such as not finding the string.h file.
- If it cannot find the string.h file, then the problem is that sdcc cannot
- find the /usr/local/share/sdcc/include directory
+ If it cannot find the string.h file, then the problem is that 
+\series default 
+SDCC
+\series medium 
+ cannot find the /usr/local/share/sdcc/include directory
 \series default 
  
 \series medium 
-(see the Install trouble-shooting section for suggestions).
+(see the 
+\series default 
+section 
+\begin_inset LatexCommand \ref{sub:Install-Trouble-shooting}
+
+\end_inset 
+
+\SpecialChar ~
+
+\series medium 
+Install trouble-shooting section for suggestions).
 
 \series default 
  Use option 
@@ -3560,6 +3680,11 @@ status Collapsed
 \layout Subsection
 
 Install Trouble-shooting
+\begin_inset LatexCommand \label{sub:Install-Trouble-shooting}
+
+\end_inset 
+
+
 \begin_inset LatexCommand \index{Install trouble-shooting}
 
 \end_inset 
@@ -3658,15 +3783,19 @@ make install
 
 This will install the compiler, other executables libraries and include
  files into the appropriate directories.
- See section 
-\begin_inset Quotes sld
+ See sections 
+\begin_inset LatexCommand \ref{sub:Install-paths}
+
 \end_inset 
 
-Install and Search PATHS
-\begin_inset Quotes srd
+,\SpecialChar ~
+
+\begin_inset LatexCommand \ref{sub:Search-Paths}
+
 \end_inset 
 
-.
+\SpecialChar ~
+about install and search paths.
 \newline 
 On most systems you will need super-user privileges to do this.
 \layout Subsection
@@ -4073,6 +4202,18 @@ status Collapsed
 \end_inset 
 
 -dumpall) (see section 
+\begin_inset LatexCommand \ref{sub:Intermediate-Dump-Options}
+
+\end_inset 
+
+\SpecialChar ~
+ and section 
+\begin_inset LatexCommand \ref{sub:The-anatomy-of}
+
+\end_inset 
+
+\SpecialChar ~
+
 \begin_inset Quotes sld
 \end_inset 
 
@@ -4206,7 +4347,7 @@ first
 \noun default 
  file specified in the command line, since the linkage editor processes
  file in the order they are presented to it.
- The linker is invoked from sdcc using a script file with extension .lnk
+ The linker is invoked from SDCC using a script file with extension .lnk
 \begin_inset LatexCommand \index{.lnk}
 
 \end_inset 
@@ -5149,7 +5290,7 @@ status Collapsed
 \series default 
  Generate code for Large model programs see section Memory Models for more
  details.
- If this option is used all source files in the project should be compiled
+ If this option is used all source files in the project have to be compiled
  with this option.
 \layout List
 \labelwidthstring 00.00.0000
@@ -5175,7 +5316,13 @@ status Collapsed
 \series default 
  Uses a pseudo stack in the first 256 bytes in the external ram for allocating
  variables and passing parameters.
- See section on external stack for more details.
+ See section 
+\begin_inset LatexCommand \ref{sub:External-Stack}
+
+\end_inset 
+
+\SpecialChar ~
+ External Stack for more details.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -5609,7 +5756,13 @@ status Collapsed
 \end_inset 
 
  are implemented using jump-tables.
- See section Switch Statements for more details.
+ See section 
+\begin_inset LatexCommand \ref{sub:'switch'-Statements}
+
+\end_inset 
+
+\SpecialChar ~
+Switch Statements for more details.
  It is recommended that this option is NOT used, #pragma\SpecialChar ~
 NOJTBOUND
 \begin_inset LatexCommand \index{\#pragma NOJTBOUND}
@@ -6145,7 +6298,7 @@ status Collapsed
 \end_inset 
 
  function.
- The default option is to lock up i.e.
+ The default setting is to lock up i.e.
  generate a '
 \family typewriter 
 ljmp .
@@ -6175,7 +6328,13 @@ status Collapsed
 
 <filename> This option can be used to use additional rules to be used by
  the peep hole optimizer.
- See section Peep Hole optimizations for details on how to write these rules.
+ See section 
+\begin_inset LatexCommand \ref{sub:Peephole-Optimizer}
+
+\end_inset 
+
+\SpecialChar ~
+Peep Hole optimizations for details on how to write these rules.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -6388,8 +6547,19 @@ status Collapsed
 
 
 \series default 
- Disable some of the more pedantic warnings (jwk burps: please be more specific
- here, please!)
+ Disable some of the more pedantic warnings
+\begin_inset LatexCommand \index{Warnings}
+
+\end_inset 
+
+ (jwk burps: please be more specific here, please!).
+ If you want rather more than less warnings you should consider using a
+ separate tool dedicated to syntax checking like 
+\begin_inset LatexCommand \url{www.splint.org}
+
+\end_inset 
+
+.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -6463,6 +6633,11 @@ status Collapsed
 \layout Subsubsection
 
 Intermediate Dump Options
+\begin_inset LatexCommand \label{sub:Intermediate-Dump-Options}
+
+\end_inset 
+
+
 \begin_inset LatexCommand \index{Options intermediate dump}
 
 \end_inset 
@@ -6936,11 +7111,17 @@ SDCC_HOME
 
 
 \series default 
- Path, see 
+ Path, see section 
+\begin_inset LatexCommand \ref{sub:Install-paths}
+
+\end_inset 
+
+\SpecialChar ~
+
 \begin_inset Quotes sld
 \end_inset 
 
-2.3 Install and search paths
+ Install Paths
 \begin_inset Quotes srd
 \end_inset 
 
@@ -6957,11 +7138,17 @@ SDCC_INCLUDE
 
 
 \series default 
- Path, see 
+ Path, see section 
+\begin_inset LatexCommand \ref{sub:Search-Paths}
+
+\end_inset 
+
+\SpecialChar ~
+
 \begin_inset Quotes sld
 \end_inset 
 
-2.3 Install and search paths
+Search Paths
 \begin_inset Quotes srd
 \end_inset 
 
@@ -6978,15 +7165,21 @@ SDCC_LIB
 
 
 \series default 
- Path, see 
+ Path, see section 
+\begin_inset LatexCommand \ref{sub:Search-Paths}
+
+\end_inset 
+
+\SpecialChar ~
+
 \begin_inset Quotes sld
 \end_inset 
 
-2.3 Install and search paths
+Search Paths
 \begin_inset Quotes srd
 \end_inset 
 
-.
+..
 \layout Standard
 
 There are some more environment variables recognized by SDCC, but these
@@ -7018,7 +7211,7 @@ This is the
 \series bold 
 default
 \series default 
- storage class for Small Memory model.
+ storage class for the Small Memory model.
  Variables declared with this storage class will be allocated in the directly
  addressable portion of the internal RAM of a 8051, e.g.:
 \layout Verse
@@ -7055,7 +7248,7 @@ Variables declared with this storage class will be placed in the external
 \series bold 
 default
 \series default 
- storage class for Large Memory model, e.g.:
+ storage class for the Large Memory model, e.g.:
 \layout Verse
 
 
@@ -7751,7 +7944,7 @@ Automatic (local) variables and parameters to functions can either be placed
  on the stack or in data-space.
  The default action of the compiler is to place these variables in the internal
  RAM (for small model) or external RAM (for large model).
- This in fact makes them 
+ This in fact makes them similar to 
 \emph on 
 static
 \begin_inset LatexCommand \index{static}
@@ -7766,6 +7959,7 @@ static
 \end_inset 
 
 .
+ 
 \newline 
 
 \newline 
@@ -8085,6 +8279,11 @@ NOOVERLAY ensures that the parameters and local variables for
 \layout Subsection
 
 Interrupt Service Routines
+\begin_inset LatexCommand \label{sub:Interrupt-Service-Routines}
+
+\end_inset 
+
+
 \layout Standard
 
 SDCC allows interrupt service routines to be coded in C, with some extended
@@ -8125,87 +8324,9 @@ using
 \emph default 
  keyword can be used to tell the compiler to use the specified register
  bank (8051 specific) when generating code for this function.
- Note that when some function is called from an interrupt service routine
- it should be preceded by a #pragma\SpecialChar ~
-NOOVERLAY
-\begin_inset LatexCommand \index{\#pragma NOOVERLAY}
-
-\end_inset 
-
- if it is not reentrant.
- Furthermore nonreentrant functions should not be called from the main program
- while the interrupt service routine might be active.
- If the interrupt service routines changes variables which are accessed
- by other functions these variables should be declared 
-\emph on 
-volatile
-\emph default 
-
-\begin_inset LatexCommand \index{volatile}
-
-\end_inset 
-
-.
  
-\layout Standard
+\newline 
 
-A special note here, int (16 bit) and long (32 bit) integer division
-\begin_inset LatexCommand \index{Division}
-
-\end_inset 
-
-, multiplication
-\begin_inset LatexCommand \index{Multiplication}
-
-\end_inset 
-
- & modulus
-\begin_inset LatexCommand \index{Modulus}
-
-\end_inset 
-
- operations are implemented using external support routines developed in
- ANSI-C, if an interrupt service routine needs to do any of these operations
- then the support routines (as mentioned in a following section) will have
- to be recompiled using the
-\emph on 
- -
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--stack-auto
-\begin_inset LatexCommand \index{-\/-stack-auto}
-
-\end_inset 
-
-
-\emph default 
- option and the source file will need to be compiled using the 
-\emph on 
--
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--int-long-ren
-\emph default 
-t
-\begin_inset LatexCommand \index{-\/-int-long-rent}
-
-\end_inset 
-
- compiler option.
 \layout Standard
 
 If you have multiple source files in your project, interrupt service routines
@@ -8451,19 +8572,188 @@ a, b & dptr
  This scheme is recommended for larger interrupt service routines.
 \layout Standard
 
+Using interrupts opens the door for some very interesting bugs: 
+\layout Standard
+
+If the interrupt service routines changes variables which are accessed by
+ other functions these variables should be declared 
+\emph on 
+volatile
+\emph default 
+
+\begin_inset LatexCommand \index{volatile}
+
+\end_inset 
+
+.
+ If the access to these variables is not 
+\emph on 
+atomic
+\begin_inset LatexCommand \index{atomic access}
+
+\end_inset 
+
+
+\emph default 
+ (i.e.
+ the processor needs more than one instruction for the access and could
+ be interrupted while accessing the variable) the interrupt must disabled
+ during the access to avoid inconsistent data.
+ Access to 16 or 32 bit variables is obviously not atomic on 8 bit CPUs
+ and should be protected by disabling interrupts.
+ You're not automatically on the safe side if you use 8 bit variables though.
+ We need an example here: f.e.
+ on the 8051 the harmless looking 
+\begin_inset Quotes srd
+\end_inset 
+
+
+\family typewriter 
+flags\SpecialChar ~
+|=\SpecialChar ~
+0x80;
+\family default 
+
+\begin_inset Quotes sld
+\end_inset 
+
+ is not atomic if 
+\family typewriter 
+flags
+\family default 
+ resides in xdata.
+ Setting 
+\begin_inset Quotes srd
+\end_inset 
+
+
+\family typewriter 
+flags\SpecialChar ~
+|=\SpecialChar ~
+0x40;
+\family default 
+
+\begin_inset Quotes sld
+\end_inset 
+
+ from within an interrupt routine might get lost if the interrupt occurs
+ at the wrong time.
+ 
+\begin_inset Quotes sld
+\end_inset 
+
+
+\family typewriter 
+counter\SpecialChar ~
++=\SpecialChar ~
+8;
+\family default 
+
+\begin_inset Quotes srd
+\end_inset 
+
+ is not atomic on the 8051 even if 
+\family typewriter 
+counter
+\family default 
+ is located in data memory.
+ Bugs like these are hard to reproduce and can cause a lot of trouble.
+ 
+\layout Standard
+
+A special note here, int (16 bit) and long (32 bit) integer division
+\begin_inset LatexCommand \index{Division}
+
+\end_inset 
+
+, multiplication
+\begin_inset LatexCommand \index{Multiplication}
+
+\end_inset 
+
+ & modulus
+\begin_inset LatexCommand \index{Modulus}
+
+\end_inset 
+
+ and floating-point
+\begin_inset LatexCommand \index{Floating point support}
+
+\end_inset 
+
+ operations are implemented using external support routines developed in
+ ANSI-C.
+ If an interrupt service routine needs to do any of these operations then
+ the support routines (as mentioned in a following section) will have to
+ be recompiled using the
+\emph on 
+ -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-auto
+\begin_inset LatexCommand \index{-\/-stack-auto}
+
+\end_inset 
+
+
+\emph default 
+ option and the source file will need to be compiled using the 
+\emph on 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-int-long-ren
+\emph default 
+t
+\begin_inset LatexCommand \index{-\/-int-long-rent}
+
+\end_inset 
+
+ compiler option.
+\layout Standard
+
 Calling other functions from an interrupt service routine is not recommended,
  avoid it if possible.
+ Note that when some function is called from an interrupt service routine
+ it should be preceded by a #pragma\SpecialChar ~
+NOOVERLAY
+\begin_inset LatexCommand \index{\#pragma NOOVERLAY}
+
+\end_inset 
+
+ if it is not reentrant.
+ Furthermore nonreentrant functions should not be called from the main program
+ while the interrupt service routine might be active.
+ 
 \newline 
-For some pitfalls see section 
+
+\newline 
+Also see section 
 \begin_inset LatexCommand \ref{sub:Overlaying}
 
 \end_inset 
 
+\SpecialChar ~
 about Overlaying and section 
 \begin_inset LatexCommand \ref{sub:Functions-using-private-banks}
 
 \end_inset 
 
+\SpecialChar ~
 about Functions using private banks.
 \newline 
 
@@ -8472,27 +8762,35 @@ about Functions using private banks.
 Critical Functions
 \layout Standard
 
-
-\shape italic 
-<TODO: this isn't implemented at all!>
-\shape default 
-
-\newline 
-
-\newline 
 A special keyword may be associated with a function declaring it as 
 \emph on 
 critical
 \emph default 
 .
- SDCC will generate code to disable all interrupts upon entry to a critical
- function and enable them back before returning.
- Note that nesting critical functions may cause unpredictable results.
+ SDCC will generate code to disable all interrupts
+\begin_inset LatexCommand \index{interrupt}
+
+\end_inset 
+
+ upon entry to a critical function and restore the interrupt enable to the
+ previous state before returning.
+ Note that nesting critical functions will need one additional byte on the
+ stack
+\begin_inset LatexCommand \index{stack}
+
+\end_inset 
+
+ for each call.
 \layout Verse
 
 
 \family typewriter 
-int foo () critical 
+int foo () critical
+\begin_inset LatexCommand \index{critical}
+
+\end_inset 
+
+ 
 \newline 
 { 
 \newline 
@@ -8517,6 +8815,800 @@ The critical attribute maybe used with other attributes like
 \emph on 
 reentrant.
 \layout Subsection
+
+Functions using private banks
+\begin_inset LatexCommand \label{sub:Functions-using-private-banks}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{bank}
+
+\end_inset 
+
+
+\layout Standard
+
+The 
+\emph on 
+using
+\begin_inset LatexCommand \index{using}
+
+\end_inset 
+
+
+\emph default 
+ attribute (which tells the compiler to use a register bank other than the
+ default bank zero) should only be applied to 
+\emph on 
+interrupt
+\begin_inset LatexCommand \index{interrupt}
+
+\end_inset 
+
+
+\emph default 
+ functions (see note 1 below).
+ This will in most circumstances make the generated ISR code more efficient
+ since it will not have to save registers on the stack.
+\layout Standard
+
+The 
+\emph on 
+using
+\emph default 
+ attribute will have no effect on the generated code for a 
+\emph on 
+non-interrupt
+\emph default 
+ function (but may occasionally be useful anyway
+\begin_inset Foot
+collapsed false
+
+\layout Standard
+
+possible exception: if a function is called ONLY from 'interrupt' functions
+ using a particular bank, it can be declared with the same 'using' attribute
+ as the calling 'interrupt' functions.
+ For instance, if you have several ISRs using bank one, and all of them
+ call memcpy(), it might make sense to create a specialized version of memcpy()
+ 'using 1', since this would prevent the ISR from having to save bank zero
+ to the stack on entry and switch to bank zero before calling the function
+\end_inset 
+
+).
+\newline 
+
+\emph on 
+(pending: I don't think this has been done yet)
+\layout Standard
+
+An 
+\emph on 
+interrupt
+\emph default 
+ function using a non-zero bank will assume that it can trash that register
+ bank, and will not save it.
+ Since high-priority interrupts
+\begin_inset LatexCommand \index{interrupt priority}
+
+\end_inset 
+
+ can interrupt low-priority ones on the 8051 and friends, this means that
+ if a high-priority ISR 
+\emph on 
+using
+\emph default 
+ a particular bank occurs while processing a low-priority ISR 
+\emph on 
+using
+\emph default 
+ the same bank, terrible and bad things can happen.
+ To prevent this, no single register bank should be 
+\emph on 
+used
+\emph default 
+ by both a high priority and a low priority ISR.
+ This is probably most easily done by having all high priority ISRs use
+ one bank and all low priority ISRs use another.
+ If you have an ISR which can change priority at runtime, you're on your
+ own: I suggest using the default bank zero and taking the small performance
+ hit.
+\layout Standard
+
+It is most efficient if your ISR calls no other functions.
+ If your ISR must call other functions, it is most efficient if those functions
+ use the same bank as the ISR (see note 1 below); the next best is if the
+ called functions use bank zero.
+ It is very inefficient to call a function using a different, non-zero bank
+ from an ISR.
+ 
+\layout Subsection
+
+Startup Code
+\begin_inset LatexCommand \label{sub:Startup-Code}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{Startup code}
+
+\end_inset 
+
+
+\layout Subsubsection
+
+MCS51/DS390 Startup Code
+\layout Standard
+
+The compiler inserts a call to the C routine 
+\emph on 
+_sdcc_external_startup()
+\begin_inset LatexCommand \index{\_sdcc\_external\_startup()}
+
+\end_inset 
+
+
+\series bold 
+\emph default 
+ 
+\series default 
+at the start of the CODE area.
+ This routine is in the runtime library
+\begin_inset LatexCommand \index{Runtime library}
+
+\end_inset 
+
+.
+ By default this routine returns 0, if this routine returns a non-zero value,
+ the static & global variable initialization will be skipped and the function
+ main will be invoked.
+ Otherwise static & global variables will be initialized before the function
+ main is invoked.
+ You could add a 
+\emph on 
+_sdcc_external_startup()
+\emph default 
+ routine to your program to override the default if you need to setup hardware
+ or perform some other critical operation prior to static & global variable
+ initialization.
+ See also the compiler option 
+\emph on 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-no-xinit
+\emph default 
+-
+\emph on 
+opt
+\emph default 
+
+\begin_inset LatexCommand \index{-\/-no-xinit-opt}
+
+\end_inset 
+
+ and section 
+\begin_inset LatexCommand \ref{sub:MCS51-variants}
+
+\end_inset 
+
+\SpecialChar ~
+about MCS51-variants.
+\layout Subsubsection
+
+Z80 Startup Code
+\layout Standard
+
+On the Z80 the startup code is inserted by linking with crt0.o which is generated
+ from sdcc/device/lib/z80/crt0.s.
+ If you need a different startup code you can use the compiler option 
+\emph on 
+-
+\series bold 
+\emph default 
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+
+\series default 
+\emph on 
+-no-std-crt0
+\emph default 
+
+\begin_inset LatexCommand \index{-\/-no-std-crt0}
+
+\end_inset 
+
+ and provide your own crt0.o.
+ 
+\layout Subsection
+
+Inline Assembler Code
+\begin_inset LatexCommand \index{Assembler routines}
+
+\end_inset 
+
+
+\layout Subsubsection
+
+A Step by Step Introduction
+\layout Standard
+
+Starting from a small snippet of c-code this example shows for the MCS51
+ how to use inline assembly, access variables, a function parameter and
+ an array in xdata memory.
+ This is a buffer routine which should be optimized:
+\layout Verse
+
+
+\family typewriter 
+\size footnotesize 
+unsigned char xdata at 0x7f00 buf[0x100];
+\newline 
+unsigned char head,tail;
+\newline 
+
+\newline 
+void to_buffer( unsigned char c ) 
+\newline 
+{
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+if( head != tail-1 ) 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+buf[ head++ ] = c; 
+\newline 
+} 
+\layout Standard
+
+If the code snippet (assume it is saved in buffer.c) is compiled with SDCC
+ then a corresponding buffer.asm file is generated.
+ We define a new function 
+\family typewriter 
+to_buffer_asm()
+\family default 
+ in file buffer.c in which we cut and paste the generated code, removing
+ unwanted comments and some ':'.
+ Then add 
+\begin_inset Quotes sld
+\end_inset 
+
+_asm
+\begin_inset Quotes srd
+\end_inset 
+
+ and 
+\begin_inset Quotes sld
+\end_inset 
+
+_endasm;
+\begin_inset Quotes srd
+\end_inset 
+
+ to the beginning and the end of the function body:
+\layout Verse
+
+
+\family typewriter 
+\size footnotesize 
+/* With a cut and paste from the .asm file, we have something to start with.
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+The function is not yet OK! (registers aren't saved) */ 
+\newline 
+void to_buffer_asm( unsigned char c ) 
+\newline 
+{ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+_asm
+\begin_inset LatexCommand \index{\_asm}
+
+\end_inset 
+
+
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov\SpecialChar ~
+\SpecialChar ~
+r2,dpl 
+\newline 
+;buffer.c if( head != tail-1 ) 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov\SpecialChar ~
+\SpecialChar ~
+a,_tail 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+dec\SpecialChar ~
+\SpecialChar ~
+a 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov\SpecialChar ~
+\SpecialChar ~
+r3,a 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov\SpecialChar ~
+\SpecialChar ~
+a,_head 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+cjne a,ar3,00106$ 
+\newline 
+ret 00106$: 
+\newline 
+;buffer.c buf[ head++ ] = c; 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov\SpecialChar ~
+\SpecialChar ~
+r3,_head 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+inc\SpecialChar ~
+\SpecialChar ~
+_head 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov\SpecialChar ~
+\SpecialChar ~
+a,r3 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+add\SpecialChar ~
+\SpecialChar ~
+a,#_buf 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov\SpecialChar ~
+\SpecialChar ~
+dpl,a 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+clr\SpecialChar ~
+\SpecialChar ~
+a 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+addc\SpecialChar ~
+a,#(_buf >> 8) 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov\SpecialChar ~
+\SpecialChar ~
+dph,a 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov\SpecialChar ~
+\SpecialChar ~
+a,r2 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+movx @dptr,a 
+\newline 
+00103$: 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ret
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+_endasm;
+\newline 
+} 
+\layout Standard
+
+The new file buffer.c should compile with only one warning about the unreferenced
+ function argument 'c'.
+ Now we hand-optimize the assembly code and insert an #define USE_ASSEMBLY
+ and finally have:
+\layout Verse
+
+
+\family typewriter 
+\size footnotesize 
+unsigned char xdata at 0x7f00 buf[0x100];
+\newline 
+unsigned char head,tail;
+\newline 
+#define USE_ASSEMBLY (1)
+\newline 
+
+\newline 
+#ifndef USE_ASSEMBLY
+\newline 
+void to_buffer( unsigned char c )
+\newline 
+{
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+if( head != tail-1 )
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+buf[ head++ ] = c;
+\newline 
+}
+\newline 
+
+\newline 
+#else
+\newline 
+
+\newline 
+void to_buffer( unsigned char c )
+\newline 
+{
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+c; // to avoid warning: unreferenced function argument
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+_asm
+\begin_inset LatexCommand \index{\_asm}
+
+\end_inset 
+
+
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+; save used registers here.
+ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+; If we were still using r2,r3 we would have to push them here.
+ 
+\newline 
+; if( head != tail-1 )
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov\SpecialChar ~
+ a,_tail
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+dec\SpecialChar ~
+ a
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+xrl\SpecialChar ~
+ a,_head
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+; we could do an ANL a,#0x0f here to use a smaller buffer
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+jz\SpecialChar ~
+\SpecialChar ~
+ t_b_end$
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+;
+\newline 
+; buf[ head++ ] = c;
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov\SpecialChar ~
+ a,dpl \SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+; dpl holds lower byte of function argument
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov\SpecialChar ~
+ dpl,_head \SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+; buf is 0x100 byte aligned so head can be used directly
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov\SpecialChar ~
+ dph,#(_buf>>8)
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+movx @dptr,a
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+inc \SpecialChar ~
+_head
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+;
+\newline 
+t_b_end$:
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+; restore used registers here 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+_endasm;
+\newline 
+}
+\newline 
+#endif
+\layout Standard
+
+The inline assembler code can contain any valid code understood by the assembler
+, this includes any assembler directives and comment lines
+\begin_inset Foot
+collapsed false
+
+\layout Standard
+
+The assembler does not like some characters like ':' or ''' in comments.
+\end_inset 
+
+.
+ The compiler does not do any validation of the code within the 
+\family typewriter 
+_asm
+\begin_inset LatexCommand \index{\_asm}
+
+\end_inset 
+
+ ...
+ _endasm;
+\family default 
+ keyword pair.
+ Specifically it will not know which registers are used and thus register
+ pushing/popping
+\begin_inset LatexCommand \index{push/pop}
+
+\end_inset 
+
+ has to be done manually.
+ 
+\layout Standard
+
+It is strongly recommended that each assembly instruction (including labels)
+ be placed in a separate line (as the example shows).
+ When the -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-
+\emph on 
+peep-asm
+\begin_inset LatexCommand \index{-\/-peep-asm}
+
+\end_inset 
+
+
+\emph default 
+ command line option is used, the inline assembler code will be passed through
+ the peephole optimizer
+\begin_inset LatexCommand \index{Peephole optimizer}
+
+\end_inset 
+
+.
+ There are only a few (if any) cases where this option makes sense, it might
+ cause some unexpected changes in the inline assembler code.
+ Please go through the peephole optimizer rules defined in file 
+\emph on 
+SDCCpeeph.def
+\emph default 
+ carefully before using this option.
+\layout Subsubsection
 
 Naked Functions
 \begin_inset LatexCommand \label{sub:Naked-Functions}
@@ -8827,206 +9919,28 @@ The #pragma directive EXCLUDE
 
 \end_inset 
 
- also allows to reduce pushing & popping the registers.
+ allows a more fine grained control over pushing & popping
+\begin_inset LatexCommand \index{push/pop}
+
+\end_inset 
+
+ the registers.
 \layout Standard
 
 While there is nothing preventing you from writing C code inside a _naked
  function, there are many ways to shoot yourself in the foot doing this,
  and it is recommended that you stick to inline assembler.
-\layout Subsection
+\layout Subsubsection
 
-Functions using private banks
-\begin_inset LatexCommand \label{sub:Functions-using-private-banks}
-
-\end_inset 
-
-
-\begin_inset LatexCommand \index{bank}
-
-\end_inset 
-
-
-\layout Standard
-
-The 
-\emph on 
-using
-\begin_inset LatexCommand \index{using}
-
-\end_inset 
-
-
-\emph default 
- attribute (which tells the compiler to use a register bank other than the
- default bank zero) should only be applied to 
-\emph on 
-interrupt
-\begin_inset LatexCommand \index{interrupt}
-
-\end_inset 
-
-
-\emph default 
- functions (see note 1 below).
- This will in most circumstances make the generated ISR code more efficient
- since it will not have to save registers on the stack.
-\layout Standard
-
-The 
-\emph on 
-using
-\emph default 
- attribute will have no effect on the generated code for a 
-\emph on 
-non-interrupt
-\emph default 
- function (but may occasionally be useful anyway
-\begin_inset Foot
-collapsed false
-
-\layout Standard
-
-possible exception: if a function is called ONLY from 'interrupt' functions
- using a particular bank, it can be declared with the same 'using' attribute
- as the calling 'interrupt' functions.
- For instance, if you have several ISRs using bank one, and all of them
- call memcpy(), it might make sense to create a specialized version of memcpy()
- 'using 1', since this would prevent the ISR from having to save bank zero
- to the stack on entry and switch to bank zero before calling the function
-\end_inset 
-
-).
-\newline 
-
-\emph on 
-(pending: I don't think this has been done yet)
-\layout Standard
-
-An 
-\emph on 
-interrupt
-\emph default 
- function using a non-zero bank will assume that it can trash that register
- bank, and will not save it.
- Since high-priority interrupts
-\begin_inset LatexCommand \index{interrupt priority}
-
-\end_inset 
-
- can interrupt low-priority ones on the 8051 and friends, this means that
- if a high-priority ISR 
-\emph on 
-using
-\emph default 
- a particular bank occurs while processing a low-priority ISR 
-\emph on 
-using
-\emph default 
- the same bank, terrible and bad things can happen.
- To prevent this, no single register bank should be 
-\emph on 
-used
-\emph default 
- by both a high priority and a low priority ISR.
- This is probably most easily done by having all high priority ISRs use
- one bank and all low priority ISRs use another.
- If you have an ISR which can change priority at runtime, you're on your
- own: I suggest using the default bank zero and taking the small performance
- hit.
-\layout Standard
-
-It is most efficient if your ISR calls no other functions.
- If your ISR must call other functions, it is most efficient if those functions
- use the same bank as the ISR (see note 1 below); the next best is if the
- called functions use bank zero.
- It is very inefficient to call a function using a different, non-zero bank
- from an ISR.
- 
-\layout Subsection
-
-Startup Code
-\begin_inset LatexCommand \label{sub:Startup-Code}
-
-\end_inset 
-
-
-\begin_inset LatexCommand \index{Startup code}
-
-\end_inset 
-
-
-\layout Standard
-
-The compiler inserts a call to the C routine 
-\emph on 
-_sdcc_external_startup()
-\begin_inset LatexCommand \index{\_sdcc\_external\_startup()}
-
-\end_inset 
-
-
-\series bold 
-\emph default 
- 
-\series default 
-at the start of the CODE area.
- This routine is in the runtime library
-\begin_inset LatexCommand \index{Runtime library}
-
-\end_inset 
-
-.
- By default this routine returns 0, if this routine returns a non-zero value,
- the static & global variable initialization will be skipped and the function
- main will be invoked.
- Otherwise static & global variables will be initialized before the function
- main is invoked.
- You could add a 
-\emph on 
-_sdcc_external_startup()
-\emph default 
- routine to your program to override the default if you need to setup hardware
- or perform some other critical operation prior to static & global variable
- initialization.
- See also the compiler option 
-\emph on 
--
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--no-xinit
-\emph default 
--
-\emph on 
-opt
-\emph default 
-
-\begin_inset LatexCommand \index{-\/-no-xinit-opt}
-
-\end_inset 
-
-.
-\layout Subsection
-
-Inline Assembler Code
-\begin_inset LatexCommand \index{Assembler routines}
-
-\end_inset 
-
-
+Use of Labels within Inline Assembler
 \layout Standard
 
 SDCC allows the use of in-line assembler with a few restriction as regards
  labels.
- All labels defined within inline assembler code 
+ In older versions of the compiler all labels defined within inline assembler
+ code 
 \emph on 
-has to be
+had to be
 \emph default 
  of the form 
 \emph on 
@@ -9041,40 +9955,7 @@ per function
 )
 \noun default 
 .
- It is strongly recommended that each assembly instruction (including labels)
- be placed in a separate line (as the example shows).
- When the -
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--
-\emph on 
-peep-asm
-\begin_inset LatexCommand \index{-\/-peep-asm}
-
-\end_inset 
-
-
-\emph default 
- command line option is used, the inline assembler code will be passed through
- the peephole optimizer
-\begin_inset LatexCommand \index{Peephole optimizer}
-
-\end_inset 
-
-.
- This might cause some unexpected changes in the inline assembler code.
- Please go through the peephole optimizer rules defined in file 
-\emph on 
-SDCCpeeph.def
-\emph default 
- carefully before using this option.
+ 
 \layout Verse
 
 
@@ -9117,18 +9998,6 @@ _endasm
  ;
 \layout Standard
 
-The inline assembler code can contain any valid code understood by the assembler
-, this includes any assembler directives and comment lines.
- The compiler does not do any validation of the code within the 
-\family typewriter 
-_asm ...
- _endasm;
-\family default 
- keyword pair.
- 
-\newline 
-
-\newline 
 Inline assembler code cannot reference any C-Labels, however it can reference
  labels
 \begin_inset LatexCommand \index{Labels}
@@ -9216,15 +10085,7 @@ _endasm ;
 In other words inline assembly code can access labels defined in inline
  assembly within the scope of the function.
  The same goes the other way, ie.
- labels defines in inline assembly CANNOT be accessed by C statements.
-\layout Standard
-
-An example acessing a C variable is in section 
-\begin_inset LatexCommand \ref{sub:Naked-Functions}
-
-\end_inset 
-
-.
+ labels defines in inline assembly can not be accessed by C statements.
 \layout Subsection
 
 Interfacing with Assembler Code
@@ -9426,7 +10287,7 @@ mov\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-dpl
+dph
 \begin_inset LatexCommand \index{DPTR, DPH, DPL}
 
 \end_inset 
@@ -9706,8 +10567,8 @@ For signed & unsigned int (16 bit) and long (32 bit) variables, division,
 \begin_inset  Tabular
 <lyxtabular version="3" rows="11" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -9975,7 +10836,7 @@ status Collapsed
 \emph default 
  option.
  Notice that you don't have to call this routines directly.
- The compiler will use them automatically every time a integer operation
+ The compiler will use them automatically every time an integer operation
  is required.
 \layout Subsection
 
@@ -9988,7 +10849,7 @@ Floating Point Support
 \layout Standard
 
 SDCC supports IEEE (single precision 4 bytes) floating point numbers.The
- floating point support routines are derived from gcc's floatlib.c and consists
+ floating point support routines are derived from gcc's floatlib.c and consist
  of the following routines:
 \newline 
 
@@ -10000,8 +10861,8 @@ SDCC supports IEEE (single precision 4 bytes) floating point numbers.The
 \begin_inset  Tabular
 <lyxtabular version="3" rows="17" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -10775,7 +11636,7 @@ status Collapsed
 \emph on 
 -Wl-r
 \emph default 
- on the sdcc command line.
+ on the SDCC command line.
  However, currently the linker can not handle code segments > 64k.
 \layout Subsection
 
@@ -10834,7 +11695,12 @@ NOJTBOUND
 
  - will not generate code for boundary value checking, when switch statements
  are turned into jump-tables (dangerous).
- 
+ For more details see section 
+\begin_inset LatexCommand \ref{sub:'switch'-Statements}
+
+\end_inset 
+
+.
 \layout Itemize
 
 NOOVERLAY
@@ -10903,6 +11769,14 @@ NOIV
  manually, or when there is a secondary, manually defined interrupt vector
  table (e.g.
  for the autovector feature of the Cypress EZ-USB FX2).
+ More elegantly this can be achieved by obmitting the optional interrupt
+ number after the interrupt keyword, see section 
+\begin_inset LatexCommand \ref{sub:Interrupt-Service-Routines}
+
+\end_inset 
+
+\SpecialChar ~
+about interrupts.
 \layout Itemize
 
 CALLEE-SAVES
@@ -10947,9 +11821,9 @@ CALLEE-SAVES
  is appended to the list of functions specified in the command line.
 \layout Standard
 
-The pragma's are intended to be used to turn-off certain optimizations which
- might cause the compiler to generate extra stack / data space to store
- compiler generated temporary variables.
+The pragma's are intended to be used to turn-on or off certain optimizations
+ which might cause the compiler to generate extra stack / data space to
+ store compiler generated temporary variables.
  This usually happens in large functions.
  Pragma directives should be used as shown in the following example, they
  are used to control options & optimizations for a given function; pragmas
@@ -11047,8 +11921,8 @@ The compiler creates the following #defines
 \begin_inset  Tabular
 <lyxtabular version="3" rows="10" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -11427,8 +12301,8 @@ status Collapsed
 \end_inset 
 
 -debug option is specified the compiler generates extra symbol information
- some of which are put into the the assembler source and some are put into
- the .adb file.
+ some of which are put into the assembler source and some are put into the
+ .adb file.
   Then the linker creates the .cdb file from the individual .adb files with
  the address information for the symbols.
  The debugger reads the symbolic information generated by the compiler &
@@ -13768,7 +14642,7 @@ SDCC has grown to be a large project.
  
 \layout Standard
 
-The SDCC project is hosted on the sdcc sourceforge site at 
+The SDCC project is hosted on the SDCC sourceforge site at 
 \begin_inset LatexCommand \htmlurl{http://sourceforge.net/projects/sdcc}
 
 \end_inset 
@@ -13992,7 +14866,33 @@ Examples
 
 \layout Standard
 
-You'll find some small examples in the directory sdcc/device/examples/
+You'll find some small examples in the directory 
+\emph on 
+sdcc/device/examples/.
+ 
+\emph default 
+More examples and libraries are available at
+\emph on 
+ The SDCC Open Knowledge Resource 
+\begin_inset LatexCommand \url{http://www.qsl.net/dl9sec/SDCC_OKR.html}
+
+\end_inset 
+
+ 
+\emph default 
+web site or at 
+\begin_inset LatexCommand \url{http://www.pjrc.com/tech/8051/}
+
+\end_inset 
+
+.
+\layout Comment
+
+I did insert a reference to Paul's web site here although it seems rather
+ dedicated to a specific 8032 board (I think it's okay because it f.e.
+ shows LCD/Harddisc interface and has a free 8051 monitor.
+ Independent 8032 board vendors face hard competition of heavily subsidized
+ development boards anyway).
 \layout Comment
 
 Maybe we should include some links to real world applications.
@@ -14520,6 +15420,11 @@ Note the subexpressions
 \layout Subsubsection
 
 'switch' Statements
+\begin_inset LatexCommand \label{sub:'switch'-Statements}
+
+\end_inset 
+
+
 \begin_inset LatexCommand \index{switch statement}
 
 \end_inset 
@@ -14872,7 +15777,9 @@ case 12:\SpecialChar ~
 then both the switch statements will be implemented using jump-tables whereas
  the unmodified switch statement will not be.
  You might also consider dummy cases 0 and 5 to 8 in this example.
- The pragma NOJTBOUND
+ 
+\newline 
+The pragma NOJTBOUND
 \begin_inset LatexCommand \index{\#pragma NOJTBOUND}
 
 \end_inset 
@@ -14890,6 +15797,9 @@ able
 bound
 \emph default 
 aries.
+ It has no effect if a default label is supplied.
+ Use of this pragma is dangerous: if the switch argument is not matched
+ by a case statement the processor will happily jump into Nirvana.
 \layout Subsubsection
 
 Bit-shifting Operations
@@ -14978,6 +15888,30 @@ _i,a
 \layout Standard
 
 Note that SDCC stores numbers in little-endian
+\begin_inset Foot
+collapsed false
+
+\layout Standard
+
+Usually 8-bit processors don't care much about endianness.
+ This is not the case for the standard 8051 which only has an instruction
+ to increment its 
+\emph on 
+dptr
+\emph default 
+
+\begin_inset LatexCommand \index{DPTR}
+
+\end_inset 
+
+-datapointer
+\emph on 
+ 
+\emph default 
+so little-endian is the more efficient byte order.
+\end_inset 
+
+
 \begin_inset LatexCommand \index{little-endian}
 
 \end_inset 
@@ -15256,6 +16190,11 @@ will still be recognized.
 \layout Subsubsection
 
 Peephole Optimizer
+\begin_inset LatexCommand \label{sub:Peephole-Optimizer}
+
+\end_inset 
+
+
 \begin_inset LatexCommand \index{Peephole optimizer}
 
 \end_inset 
@@ -15690,6 +16629,26 @@ license statements for the libraries are missing.
 or _decdptr f.e.
  come with a GPL (as opposed to LGPL) License - this will not be liberal
  enough for many embedded programmers.
+\layout Standard
+
+If you have ported some library or want to share experience about some code
+ which f.e.
+ falls into any of these categories Busses (I
+\begin_inset Formula $^{\textrm{2}}$
+\end_inset 
+
+C, CAN, Ethernet, Profibus, Modbus, USB, SPI, JTAG ...), Media (IDE, Memory
+ cards, eeprom, flash...), En-/Decryption, remote debugging, Keyboard, LCD,
+ RTC, FPGA, PID then the sdcc-user mailing list 
+\begin_inset LatexCommand \url{http://sourceforge.net/mail/?group_id=599}
+
+\end_inset 
+
+\SpecialChar ~
+would certainly like to hear about it.
+ Programmers coding for embedded systems are not especially famous for being
+ enthusiastic, so don't expect a big hurray but as the mailing list is searchabl
+e these references are very valuable.
 \layout Subsection
 
 External Stack
@@ -15767,6 +16726,11 @@ The compiler outputs the higher order address byte of the external ram segment
 
 ANSI-Compliance
 \begin_inset LatexCommand \index{ANSI-compliance}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \label{sub:ANSI-Compliance}
 
 \end_inset 
 
@@ -15903,7 +16867,17 @@ int i,j; /* are valid in ANSI but not valid in SDCC */
 \end_deeper 
 \layout Itemize
 
-functions declared as pointers must be dereferenced during the call.
+functions declared as pointers
+\begin_inset LatexCommand \index{Pointers}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{function pointers}
+
+\end_inset 
+
+ must be dereferenced during the call.
 \begin_deeper 
 \layout Verse
 
@@ -15967,6 +16941,11 @@ Other Processors
 \layout Subsubsection
 
 MCS51 variants
+\begin_inset LatexCommand \label{sub:MCS51-variants}
+
+\end_inset 
+
+
 \begin_inset LatexCommand \index{MCS51 variants}
 
 \end_inset 
@@ -16163,6 +17142,11 @@ Compiler internals
 \layout Subsection
 
 The anatomy of the compiler
+\begin_inset LatexCommand \label{sub:The-anatomy-of}
+
+\end_inset 
+
+
 \layout Standard
 
 
@@ -17588,7 +18572,7 @@ All product names mentioned herein may be trademarks
 Alphabetical index
 \layout Standard
 
-To avoid confusion, the installation and building options for sdcc itself
+To avoid confusion, the installation and building options for SDCC itself
  (chapter 2) are not part of the index.
 \layout Standard
 

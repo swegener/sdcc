@@ -1541,9 +1541,9 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 			  aggrToPtr (operandType (IC_RESULT (ic)), FALSE));
 	}
 
-      /* if this is a condition statment then */
+      /* if this is a condition statement then */
       /* check if the condition can be replaced */
-      if (!computeOnly && ic->op == IFX)
+      if (ic->op == IFX)
 	{
 	  ifxOptimize (ic, cseSet, computeOnly,
 		       ebb, &change,
@@ -1631,7 +1631,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	}
 	
       /* if left or right changed then do algebraic */
-      if (change)
+      if (!computeOnly && change)
 	{
 	  algebraicOpts (ic);
 	  while (constFold (ic, cseSet));

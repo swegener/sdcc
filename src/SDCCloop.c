@@ -307,7 +307,7 @@ DEFSETFUNC (addDefInExprs)
   V_ARG (int, count);
 
   addSetHead (&ebp->inExprs, cdp);
-  cseBBlock (ebp, 0, ebbs, count);
+  cseBBlock (ebp, optimize.global_cse, ebbs, count);
   return 0;
 }
 

@@ -1156,6 +1156,12 @@ abstract_declarator2
        // $1 must be a pointer to a function
        sym_link *p=newLink();
        DCL_TYPE(p) = FUNCTION;
+       if (!$1) {
+	 // ((void (code *) (void)) 0) ()
+	 $1=newLink();
+	 DCL_TYPE($1)=CPOINTER;
+	 $$ = $1;
+       }
        $1->next=p;
      }
    }

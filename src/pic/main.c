@@ -327,12 +327,12 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 */
 static const char *_linkCmd[] =
 {
-  "gplink", "-nf", "$1", NULL
+  "gplink", "-nf", "\"$1\"", NULL
 };
 
 static const char *_asmCmd[] =
 {
-  "gpasm", "-c", "$1.asm", NULL
+  "gpasm", "-c", "\"$1.asm\"", NULL
 
 };
 

@@ -28,7 +28,7 @@
 #define SDCC_SYMNAME_MAX 64
 #define SDCC_NAME_MAX  3*SDCC_SYMNAME_MAX // big enough for _<func>_<var>_etc
 #include "SDCChasht.h"
-#include "../sdccconf.h"
+#include "SDCCglobl.h"
 
 enum {
     TYPEOF_INT=1,

@@ -1,3 +1,25 @@
+2003-03-07    <johan@balder>
+
+	Just a big NOOP:
+		some minor cleanups before the big shot
+		OP_DEFS and OP_USES now use Kevin's protection
+		new option --nolabelopt
+
+	* src/SDCCBBlock.c:
+	* src/SDCCast.c,:
+	* src/SDCCcflow.c:
+	* src/SDCCcse.c:
+	* src/SDCCicode.c:
+	* src/SDCCicode.h:
+	* src/SDCClabel.c:
+	* src/SDCCloop.c:
+	* src/SDCCmain.c:
+	* src/ds390/ralloc.c:
+	* src/mcs51/ralloc.c:
+	* src/pic/ralloc.c:
+	* src/xa51/ralloc.c:
+	* src/z80/ralloc.c:
+
 2003-03-06  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/pic/pcode.c (get_op): fix 64 bit warnings

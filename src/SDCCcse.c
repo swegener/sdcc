@@ -1515,7 +1515,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	    pdic = NULL;
 	}
 
-#if 0 
+#if 0
       /* if found then eliminate this and add to */
       /* to cseSet an element containing result */
       /* of this with previous opcode           */
@@ -1577,6 +1577,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
       if (pdic && IS_ITEMP(IC_RESULT(ic))) {
 	  /* if previous definition found change this to an assignment */
 	  ic->op = '=';
+	  IC_LEFT(ic) = NULL;
 	  IC_RIGHT(ic) = operandFromOperand(IC_RESULT(pdic));
 	  SET_ISADDR(IC_RESULT(ic),0);
 	  SET_ISADDR(IC_RIGHT (ic),0);	  

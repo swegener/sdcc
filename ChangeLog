@@ -1,3 +1,46 @@
+2001-12-29  Sandeep Dutta  <sandeep@ddi.com>
+
+	* /sdcc/src/ds390/gen.c:
+	a) improved computing address of stack variable
+	b) took out some #if 0 code
+	c) improved parmBytes adjustment
+	d) improved genPlusIncr & genMinusIncr
+	e) genCmp could generate bad code (when left assigned to DPTR)
+	f) Fixed bug in hasInc
+
+	* /sdcc/src/ds390/ralloc.c:
+	a) packRegsForSupport could mess up live information (Fixed)
+	b) packRegsDPTRuse could be incorrect for left & right shift
+
+	* /sdcc/src/mcs51/ralloc.c:
+	packRegsForSupport could mess up the live information (Fixed)
+
+	* /sdcc/src/mcs51/gen.c: Fixed a bug in hasInc
+
+	* /sdcc/src/SDCCast.c:
+	can reverse a loop even if function call is present as long
+	as the loop control variable is local & is not passed as parameter
+
+2001-12-24  Sandeep Dutta  <sandeep@ddi.com>
+
+	* /sdcc/ChangeLog: *** empty log message ***
+
+	* /sdcc/src/ds390/gen.c, /sdcc/src/ds390/main.c:
+	More builtin function additions for TININative
+
+	* /sdcc/src/ds390/ralloc.c:
+	Had broken the regression testsuite
+
+	* /sdcc/src/SDCCast.c: Fixed a bug in dumptree
+
+	* /sdcc/src/SDCCsymt.c, /sdcc/src/SDCCsymt.h:
+	Added funcattr hasStackParms will be set for reentrant functions when there
+	are paramteres on the stack, this helps in minimizing frame pointer generation
+	typeFromStr can handle function pointers now
+
+	* /sdcc/doc/builtins.txt, /sdcc/doc/TININative.txt:
+	*** empty log message ***
+
 2001-12-24  Sandeep Dutta  <sandeep@ddi.com>
 
 	* /src/ds390/gen.c, /src/ds390/main.c:

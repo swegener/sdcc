@@ -100,7 +100,7 @@ AC_CHECK_LIB(nsl,xdr_short)
 AC_CHECK_LIB(panel,panel_above,
 panel_ok="yes"
 curses_ok="yes"
-LIBS=$"$LIBS -lpanel -lcurses"
+LIBS="$LIBS -lpanel -lcurses"
 ,
 panel_ok="no"
 AC_CHECK_LIB(curses,nl,

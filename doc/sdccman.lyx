@@ -58,20 +58,40 @@ status Collapsed
 Two resp.
  three consecutive dashes simply result in a long resp.
  extra long dash.
+\layout Comment
+
+This document would need some rework: The Installation section is much to
+ 
+\layout Comment
+
+intimidating (as is the section about sdcdb).
+\layout Comment
+
+Architecture specific stuff (like memory models, code examples) should maybe
+ go
+\layout Comment
+
+into seperate sections/chapters/appendices (it is hard to document PIC or
+ Z80 in 
+\layout Comment
+
+a 8051 centered document)
 \layout Title
 
 SDCC Compiler User Guide
-\layout Standard
-\align center 
-2003-06-02
 \layout Comment
 
 The strings enclosed in $ are automatically updated by cvs:
 \layout Standard
 \align center 
 
-\size scriptsize 
-cvs: $Revision$ $Date$
+\size footnotesize 
+$Date$
+\layout Standard
+\align center 
+
+\size footnotesize 
+$Revision$
 \layout Standard
 
 
@@ -104,8 +124,8 @@ Sandeep Dutta
 \end_inset 
 
 , etc), Zilog Z80 based MCUs, and the Dallas DS80C390 variant.
- It can be retargetted for other microprocessors, support for PIC, AVR and
- 186 is under development.
+ It can be retargetted for other microprocessors, support for PIC, AVR is
+ under development.
  The entire source code for the compiler is distributed under GPL.
  SDCC uses ASXXXX & ASLINK, a Freeware, retargettable assembler & linker.
  SDCC has extensive language extensions suitable for utilizing various microcont
@@ -202,7 +222,7 @@ SDCC also comes with a companion source level debugger SDCDB, the debugger
 
 \newline 
 The latest version can be downloaded from 
-\begin_inset LatexCommand \url{http://sdcc.sourceforge.net/}
+\begin_inset LatexCommand \url{http://sdcc.sourceforge.net/snap.php}
 
 \end_inset 
 
@@ -419,10 +439,6 @@ The SDCC home page at
  their own documentation and can be found in the source distribution.
  If you want the latest unreleased software, the complete source package
  is available directly by anonymous CVS on cvs.sdcc.sourceforge.net.
-\layout Comment
-
-ANSI C reference / related tools / recommended reading / compiler building:
- Muchnik?
 \layout Subsection
 
 Wishes for the future
@@ -1645,10 +1661,10 @@ Install paths
 \begin_inset  Tabular
 <lyxtabular version="3" rows="5" columns="4">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -3750,8 +3766,12 @@ sdcdb
 \layout Standard
 
 Sdcdb is the companion source level debugger.
- The current version of the debugger uses Daniel's Simulator S51, but can
- be easily changed to use other simulators.
+ The current version of the debugger uses Daniel's Simulator S51
+\begin_inset LatexCommand \index{s51}
+
+\end_inset 
+
+, but can be easily changed to use other simulators.
 \layout Section
 \pagebreak_top 
 Using SDCC
@@ -4326,7 +4346,7 @@ Processor Selection Options
 
  processor (In development, not complete).
  AVR users should probably have a look at avr-gcc 
-\begin_inset LatexCommand \url[FIXME: official URL?]{ http://savannah.nongnu.org/download/avr-libc/snapshots/}
+\begin_inset LatexCommand \url{ http://savannah.nongnu.org/download/avr-libc/snapshots/}
 
 \end_inset 
 
@@ -4353,10 +4373,28 @@ I think it is fair to direct users there for now.
 
 \end_inset 
 
--bit processors (In development, not complete).
+-bit processors (Microchip p16f84 and variants).
 \layout Comment
 
 p16f627 p16f628 p16f84 p16f873 p16f877?
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-mpic16
+\begin_inset LatexCommand \index{-mpic16}
+
+\end_inset 
+
+
+\series default 
+ Generate code for the PIC 16
+\begin_inset LatexCommand \index{PIC16}
+
+\end_inset 
+
+-bit processors (Microchip p18f452 and variants).
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -6790,7 +6828,7 @@ xdata
 
 \layout Standard
 
-Variables declared with this storage class will be placed in the extern
+Variables declared with this storage class will be placed in the external
  RAM.
  This is the 
 \series bold 
@@ -6817,8 +6855,8 @@ This is the
 default
 \series default 
  storage class for Small Memory model.
- Variables declared with this storage class will be allocated in the internal
- RAM, e.g.:
+ Variables declared with this storage class will be allocated in the directly
+ addressable portion of the internal RAM of a 8051, e.g.:
 \layout Verse
 
 
@@ -6884,7 +6922,12 @@ signifies both a data-type and storage class, they are used to describe
 
 
 \family typewriter 
-sfr at 0x80 P0; /* special function register P0 at location 0x80 */
+sfr at
+\begin_inset LatexCommand \index{at}
+
+\end_inset 
+
+ 0x80 P0; /* special function register P0 at location 0x80 */
 \newline 
 sbit at 0xd7 CY; /* CY (Carry Flag
 \begin_inset LatexCommand \index{Flags}
@@ -7341,7 +7384,7 @@ SDCC allows interrupt service routines to be coded in C, with some extended
 
 
 \family typewriter 
-void timer_isr (void) interrupt 2 using 1 
+void timer_isr (void) interrupt 1 using 1 
 \newline 
 { 
 \newline 
@@ -7367,8 +7410,8 @@ interrupt
 \emph on 
 using
 \emph default 
- keyword is used to tell the compiler to use the specified register bank
- (8051 specific) when generating code for this function.
+ keyword can be used to tell the compiler to use the specified register
+ bank (8051 specific) when generating code for this function.
  Note that when some function is called from an interrupt service routine
  it should be preceded by a #pragma\SpecialChar ~
 NOOVERLAY
@@ -7377,7 +7420,23 @@ NOOVERLAY
 \end_inset 
 
  if it is not reentrant.
- A special note here, int (16 bit) and long (32 bit) integer division
+ Furthermore nonreentrant functions should not be called from the main program
+ while the interrupt service routine might be active.
+ If the interrupt service routines changes variables which are accessed
+ by other functions these variables should be declared 
+\emph on 
+volatile
+\emph default 
+
+\begin_inset LatexCommand \index{volatile}
+
+\end_inset 
+
+.
+ 
+\layout Standard
+
+A special note here, int (16 bit) and long (32 bit) integer division
 \begin_inset LatexCommand \index{Division}
 
 \end_inset 
@@ -7445,8 +7504,8 @@ main
 .
 \layout Standard
 
-Interrupt Numbers and the corresponding address & descriptions for the Standard
- 8051 are listed below.
+Interrupt numbers and the corresponding address & descriptions for the Standard
+ 8051/8052 are listed below.
  SDCC will automatically adjust the interrupt vector table to the maximum
  interrupt number specified.
 \newline 
@@ -7455,7 +7514,7 @@ Interrupt Numbers and the corresponding address & descriptions for the Standard
 \align center 
 
 \begin_inset  Tabular
-<lyxtabular version="3" rows="6" columns="3">
+<lyxtabular version="3" rows="7" columns="3">
 <features>
 <column alignment="center" valignment="top" leftline="true" width="0in">
 <column alignment="center" valignment="top" leftline="true" width="0in">
@@ -7590,7 +7649,7 @@ Timer 1
 \end_inset 
 </cell>
 </row>
-<row topline="true" bottomline="true">
+<row topline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -7613,6 +7672,32 @@ Serial
 \layout Standard
 
 0x0023
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+5
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Timer 2 (8052)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0x002B
 \end_inset 
 </cell>
 </row>
@@ -7751,7 +7836,12 @@ return
 
 
 \family typewriter 
-data unsigned char counter;
+volatile
+\begin_inset LatexCommand \index{volatile}
+
+\end_inset 
+
+ data unsigned char counter;
 \newline 
 void simpleInterrupt(void) interrupt
 \begin_inset LatexCommand \index{interrupt}
@@ -7810,7 +7900,7 @@ reti\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-; MUST explicitly include ret in _naked function.
+; MUST explicitly include ret or reti in _naked function.
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -8135,16 +8225,11 @@ xdata
 
 \end_inset 
 
- 0x8000 unsigned char PORTA_8255 ;
+ 0x7ffe unsigned int chksum;
 \layout Standard
 
-In the above example the PORTA_8255 will be allocated to the location 0x8000
+In the above example the variable chksum will located at 0x7ffe and 0x7fff
  of the external ram.
- Note that this feature is provided to give the programmer access to 
-\emph on 
-memory mapped
-\emph default 
- devices attached to the controller.
  The compiler does not actually reserve any space for variables declared
  in this way (they are implemented with an equate in the assembler).
  Thus it is left to the programmer to make sure there are no overlaps with
@@ -8164,10 +8249,37 @@ memory mapped
 
 \end_inset 
 
-) are a good places to look for such overlaps.
-\newline 
+) are good places to look for such overlaps.
+\layout Standard
 
-\newline 
+In case of memory mapped I/O devices the keyword 
+\emph on 
+volatile
+\emph default 
+ should be used to tell the compiler that accesses might not be optimized
+ away:
+\layout Verse
+
+
+\family typewriter 
+volatile
+\begin_inset LatexCommand \index{volatile}
+
+\end_inset 
+
+ xdata
+\begin_inset LatexCommand \index{xdata}
+
+\end_inset 
+
+ at
+\begin_inset LatexCommand \index{at}
+
+\end_inset 
+
+ 0x8000 unsigned char PORTA_8255;
+\layout Standard
+
 Absolute address can be specified for variables in all storage classes,
  e.g.:
 \layout Verse
@@ -8619,8 +8731,8 @@ For signed & unsigned int (16 bit) and long (32 bit) variables, division,
 \begin_inset  Tabular
 <lyxtabular version="3" rows="11" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -8913,8 +9025,8 @@ SDCC supports IEEE (single precision 4 bytes) floating point numbers.The
 \begin_inset  Tabular
 <lyxtabular version="3" rows="17" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -9721,8 +9833,8 @@ The compiler creates the following #defines
 \begin_inset  Tabular
 <lyxtabular version="3" rows="10" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -10822,7 +10934,6 @@ The number of case labels is at least three, since it takes two conditional
 
 The number of case labels is less than 84, since each label takes 3 bytes
  and a jump-table can be utmost 256 bytes long.
- 
 \layout Standard
 
 Switch statements which have gaps in the numeric sequence or those that
@@ -10941,6 +11052,24 @@ case 12:\SpecialChar ~
 
 then both the switch statements will be implemented using jump-tables whereas
  the unmodified switch statement will not be.
+ The pragma NOJTBOUND
+\begin_inset LatexCommand \index{\#pragma NOJTBOUND}
+
+\end_inset 
+
+ can be used to turn off checking the 
+\emph on 
+j
+\emph default 
+ump 
+\emph on 
+t
+\emph default 
+able 
+\emph on 
+bound
+\emph default 
+aries.
 \layout Subsubsection
 
 Bit-shifting Operations
@@ -12073,7 +12202,7 @@ _asm_func_PARM_2:
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-.ds      1 
+.ds     1 
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -13368,10 +13497,10 @@ Related open source tools
 \align center 
 
 \begin_inset  Tabular
-<lyxtabular version="3" rows="7" columns="3">
+<lyxtabular version="3" rows="8" columns="3">
 <features>
 <column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="center" valignment="top" leftline="true" width="0pt">
+<column alignment="block" valignment="top" leftline="true" width="30line%">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="0pt">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -13428,6 +13557,37 @@ PIC simulator
 
 
 \begin_inset LatexCommand \url{http://www.dattalo.com/gnupic/gpsim.html}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+flP5
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+PIC programmer
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset LatexCommand \url{http://digilander.libero.it/fbradasc/FLP5.html}
 
 \end_inset 
 
@@ -13599,6 +13759,15 @@ Debugger, serves nicely as GUI to sdcdb
 \end_inset 
 
 
+\begin_inset Foot
+collapsed false
+
+\layout Standard
+
+(sdcdb and ddd are available for Unix only)
+\end_inset 
+
+
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -13634,7 +13803,7 @@ Related documentation / recommended reading
 <lyxtabular version="3" rows="5" columns="3">
 <features>
 <column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="center" valignment="top" leftline="true" width="0pt">
+<column alignment="block" valignment="top" leftline="true" width="30line%">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="0pt">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -13939,6 +14108,7 @@ on, which also builds and installs the debugger in the target directory
  specified during configuration.
  The debugger allows you debug BOTH at the C source and at the ASM source
  level.
+ Sdcdb is available on Unix platforms only.
 \layout Subsection
 
 Compiling for Debugging

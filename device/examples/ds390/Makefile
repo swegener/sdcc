@@ -1,4 +1,4 @@
-TARGETS = clock390 hello390 i2c390 readmac rtc390
+TARGETS = clock390 hello390 i2c390 readmac rtc390 ow390
 
 all: $(TARGETS)
 	for target in $(TARGETS); do \

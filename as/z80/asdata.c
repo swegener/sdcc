@@ -235,7 +235,7 @@ FILE	*ifp[MAXINC];	/*	array of include-file file handles
  *	array of character types, one per
  *	ASCII character
  */
-char	ctype[128] = {
+unsigned char	ctype[128] = {
 /*NUL*/	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,
 /*BS*/	ILL,	SPACE,	ILL,	ILL,	SPACE,	ILL,	ILL,	ILL,
 /*DLE*/	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,

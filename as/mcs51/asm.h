@@ -500,7 +500,7 @@ extern	FILE	*sfp[MAXFIL];	/*	array of assembler-source file handles
 				 */
 extern	FILE	*ifp[MAXINC];	/*	array of include-file file handles
 				 */
-extern	char	ctype[128];	/*	array of character types, one per
+extern	unsigned char	ctype[128];	/*	array of character types, one per
 				 *	ASCII character
 				 */
 

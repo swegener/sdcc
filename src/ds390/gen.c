@@ -312,7 +312,11 @@ _startLazyDPSEvaluation (void)
 {
   _currentDPS = 0;
   _desiredDPS = 0;
+#ifdef BETTER_LITERAL_SHIFT  
+  _lazyDPS++;
+#else
   _lazyDPS = 1;
+#endif  
 }
 
 /*-----------------------------------------------------------------*/
@@ -351,14 +355,21 @@ _flushLazyDPS (void)
 static void
 _endLazyDPSEvaluation (void)
 {
-  if (_currentDPS)
+#ifdef BETTER_LITERAL_SHIFT  
+  _lazyDPS--;
+#else
+  _lazyDPS = 0;
+#endif    
+  if (!_lazyDPS)
+  {
+    if (_currentDPS)
     {
       genSetDPTR (0);
       _flushLazyDPS ();
     }
-  _lazyDPS = 0;
-  _currentDPS = 0;
-  _desiredDPS = 0;
+    _currentDPS = 0;
+    _desiredDPS = 0;
+  }
 }
 
 
@@ -3500,16 +3511,24 @@ addSign (operand * result, int offset, int sign)
   int size = (getDataSize (result) - offset);
   if (size > 0)
     {
+      _startLazyDPSEvaluation();
       if (sign)
 	{
 	  emitcode ("rlc", "a");
 	  emitcode ("subb", "a,acc");
 	  while (size--)
+	  {
 	    aopPut (AOP (result), "a", offset++);
+	  }
 	}
       else
+      {
 	while (size--)
+	{
 	  aopPut (AOP (result), zero, offset++);
+	}
+      }
+      _endLazyDPSEvaluation();
     }
 }
 
@@ -3521,8 +3540,7 @@ genMinusBits (iCode * ic)
 {
   symbol *lbl = newiTempLabel (NULL);
 
-  D (emitcode (";", "genMinusBits ");
-    );
+  D (emitcode (";", "genMinusBits "););
 
   if (AOP_TYPE (IC_RESULT (ic)) == AOP_CRY)
     {
@@ -6023,8 +6041,7 @@ AccRsh (int shCount)
     }
 }
 
-#if 0
-//REMOVE ME!!!
+#ifdef BETTER_LITERAL_SHIFT
 /*-----------------------------------------------------------------*/
 /* AccSRsh - signed right shift accumulator by known count                 */
 /*-----------------------------------------------------------------*/
@@ -6062,8 +6079,7 @@ AccSRsh (int shCount)
 }
 #endif
 
-#if 0
-//REMOVE ME!!!
+#ifdef BETTER_LITERAL_SHIFT
 /*-----------------------------------------------------------------*/
 /* shiftR1Left2Result - shift right one byte from left to result   */
 /*-----------------------------------------------------------------*/
@@ -6149,7 +6165,7 @@ AccAXRrl1 (char *x)
 }
 #endif
 
-#if 0
+#ifdef BETTER_LITERAL_SHIFT
 //REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* AccAXLrl1 - left rotate c<-a:x<-c by 1                          */
@@ -6262,7 +6278,7 @@ AccAXLsh (char *x, int shCount)
 }
 #endif
 
-#if 0
+#ifdef BETTER_LITERAL_SHIFT
 //REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* AccAXRsh - right shift a:x known count (0..7)                   */
@@ -6345,7 +6361,7 @@ AccAXRsh (char *x, int shCount)
 }
 #endif
 
-#if 0
+#ifdef BETTER_LITERAL_SHIFT
 //REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* AccAXRshS - right shift signed a:x known count (0..7)           */
@@ -6449,15 +6465,13 @@ AccAXRshS (char *x, int shCount)
 #endif
 
 #ifdef BETTER_LITERAL_SHIFT
-/*-----------------------------------------------------------------*/
-/* shiftL2Left2Result - shift left two bytes from left to result   */
-/*-----------------------------------------------------------------*/
 static void
-shiftL2Left2Result (operand * left, int offl,
-		    operand * result, int offr, int shCount)
+_loadLeftIntoAx(char 	**lsb, 
+		operand *left, 
+		operand *result,
+		int	offl,
+		int 	offr)
 {
-  char *lsb;
-  
   // Get the initial value from left into a pair of registers.
   // MSB must be in A, LSB can be any register.
   //
@@ -6495,7 +6509,7 @@ shiftL2Left2Result (operand * left, int offl,
        	   MOVA(leftByte);
        }
        _endLazyDPSEvaluation();
-       lsb = DP2_RESULT_REG;
+       *lsb = DP2_RESULT_REG;
   }
   else
   {
@@ -6512,11 +6526,16 @@ shiftL2Left2Result (operand * left, int offl,
       	  movLeft2Result (left, offl, result, offr, 0);
       	  MOVA (aopGet (AOP (left), offl + MSB16, FALSE, FALSE, TRUE));
       }
-      lsb = aopGet(AOP (result), offr, FALSE, FALSE, FALSE);
-      assert(strcmp(lsb,"a"));      
+      *lsb = aopGet(AOP (result), offr, FALSE, FALSE, FALSE);
+      assert(strcmp(*lsb,"a"));      
   }
-  AccAXLsh (lsb, shCount);
-  
+}
+
+static void
+_storeAxResults(char 	*lsb,
+		operand *result,
+		int	offr)
+{
   _startLazyDPSEvaluation();
   if (AOP_NEEDSACC(result))
   {
@@ -6526,13 +6545,31 @@ shiftL2Left2Result (operand * left, int offl,
       aopPut(AOP(result), "a", offr);
       emitcode("mov","a,%s", lsb);
   }
-  aopPut (AOP (result), "a", offr + MSB16);
+  if (getDataSize (result) > 1)
+  {
+      aopPut (AOP (result), "a", offr + MSB16);
+  }
   _endLazyDPSEvaluation();
+}
+
+/*-----------------------------------------------------------------*/
+/* shiftL2Left2Result - shift left two bytes from left to result   */
+/*-----------------------------------------------------------------*/
+static void
+shiftL2Left2Result (operand * left, int offl,
+		    operand * result, int offr, int shCount)
+{
+  char *lsb;
+
+  _loadLeftIntoAx(&lsb, left, result, offl, offr);
+  
+  AccAXLsh (lsb, shCount);
+  
+  _storeAxResults(lsb, result, offr);
 }
 #endif
 
-#if 0
-//REMOVE ME!!!
+#ifdef BETTER_LITERAL_SHIFT
 /*-----------------------------------------------------------------*/
 /* shiftR2Left2Result - shift right two bytes from left to result  */
 /*-----------------------------------------------------------------*/
@@ -6541,25 +6578,21 @@ shiftR2Left2Result (operand * left, int offl,
 		    operand * result, int offr,
 		    int shCount, int sign)
 {
-  if (sameRegs (AOP (result), AOP (left)) &&
-      ((offl + MSB16) == offr))
-    {
-      /* don't crash result[offr] */
-      MOVA (aopGet (AOP (left), offl, FALSE, FALSE, TRUE));
-      emitcode ("xch", "a,%s", aopGet (AOP (left), offl + MSB16, FALSE, FALSE, FALSE));
-    }
-  else
-    {
-      movLeft2Result (left, offl, result, offr, 0);
-      MOVA (aopGet (AOP (left), offl + MSB16, FALSE, FALSE, TRUE));
-    }
+  char *lsb;
+  
+  _loadLeftIntoAx(&lsb, left, result, offl, offr);
+  
   /* a:x >> shCount (x = lsb(result)) */
   if (sign)
-    AccAXRshS (aopGet (AOP (result), offr, FALSE, FALSE, FALSE), shCount);
+  {
+    AccAXRshS(aopGet(AOP(result), offr, FALSE, FALSE, FALSE), shCount);
+  }
   else
-    AccAXRsh (aopGet (AOP (result), offr, FALSE, FALSE, FALSE), shCount);
-  if (getDataSize (result) > 1)
-    aopPut (AOP (result), "a", offr + MSB16);
+  {
+    AccAXRsh(aopGet(AOP(result), offr, FALSE, FALSE, FALSE), shCount);
+  }
+  
+  _storeAxResults(lsb, result, offr);
 }
 #endif
 
@@ -7068,8 +7101,7 @@ release:
   freeAsmop (result, NULL, ic, TRUE);
 }
 
-#if 0
-//REMOVE ME!!!
+#ifdef BETTER_LITERAL_SHIFT
 /*-----------------------------------------------------------------*/
 /* genrshOne - right shift a one byte quantity by known count      */
 /*-----------------------------------------------------------------*/
@@ -7077,14 +7109,12 @@ static void
 genrshOne (operand * result, operand * left,
 	   int shCount, int sign)
 {
-  D (emitcode (";", "genrshOne");
-    );
+  D (emitcode (";", "genrshOne"););
   shiftR1Left2Result (left, LSB, result, LSB, shCount, sign);
 }
 #endif
 
-#if 0
-//REMOVE ME!!!
+#ifdef BETTER_LITERAL_SHIFT
 /*-----------------------------------------------------------------*/
 /* genrshTwo - right shift two bytes by known amount != 0          */
 /*-----------------------------------------------------------------*/
@@ -7092,24 +7122,31 @@ static void
 genrshTwo (operand * result, operand * left,
 	   int shCount, int sign)
 {
-  D (emitcode (";", "genrshTwo");
-    );
+  D (emitcode (";", "genrshTwo"););
 
   /* if shCount >= 8 */
   if (shCount >= 8)
     {
       shCount -= 8;
+      _startLazyDPSEvaluation();
       if (shCount)
+      {
 	shiftR1Left2Result (left, MSB16, result, LSB,
 			    shCount, sign);
+      }			    
       else
+      {
 	movLeft2Result (left, MSB16, result, LSB, sign);
+      }
       addSign (result, MSB16, sign);
+      _endLazyDPSEvaluation();
     }
 
   /*  1 <= shCount <= 7 */
   else
+  {
     shiftR2Left2Result (left, LSB, result, LSB, shCount, sign);
+  }
 }
 #endif
 
@@ -7224,12 +7261,11 @@ genrshFour (operand * result, operand * left,
 }
 #endif
 
-#if 0
-//REMOVE ME!!!
+#ifdef BETTER_LITERAL_SHIFT
 /*-----------------------------------------------------------------*/
 /* genRightShiftLiteral - right shifting by known count            */
 /*-----------------------------------------------------------------*/
-static void
+static bool
 genRightShiftLiteral (operand * left,
 		      operand * right,
 		      operand * result,
@@ -7239,8 +7275,19 @@ genRightShiftLiteral (operand * left,
   int shCount = (int) floatFromVal (AOP (right)->aopu.aop_lit);
   int size;
 
-  D (emitcode (";", "genRightShiftLiteral");
-    );
+  size = getSize (operandType (result));
+
+  D(emitcode (";", "genRightShiftLiteral (%d), size %d", shCount, size););
+
+  /* We only handle certain easy cases so far. */
+  if ((shCount != 0)
+   && (shCount < (size * 8))
+   && (size != 1)
+   && (size != 2))
+  {
+      D(emitcode (";", "genRightShiftLiteral wimping out"););	
+      return FALSE;
+  }
 
   freeAsmop (right, NULL, ic, TRUE);
 
@@ -7252,22 +7299,26 @@ genRightShiftLiteral (operand * left,
 	    AOP_SIZE (left));
 #endif
 
-  size = getDataSize (left);
   /* test the LEFT size !!! */
 
   /* I suppose that the left size >= result size */
   if (shCount == 0)
-    {
+  {
       size = getDataSize (result);
+      _startLazyDPSEvaluation();
       while (size--)
+      {
 	movLeft2Result (left, size, result, size, 0);
-    }
-
+      }
+      _endLazyDPSEvaluation();
+  }
   else if (shCount >= (size * 8))
     {
       if (sign)
+      {
 	/* get sign in acc.7 */
 	MOVA (aopGet (AOP (left), size - 1, FALSE, FALSE, TRUE));
+      }
       addSign (result, LSB, sign);
     }
   else
@@ -7281,10 +7332,11 @@ genRightShiftLiteral (operand * left,
 	case 2:
 	  genrshTwo (result, left, shCount, sign);
 	  break;
-
+#if 0
 	case 4:
 	  genrshFour (result, left, shCount, sign);
 	  break;
+#endif	  
 	default:
 	  break;
 	}
@@ -7292,6 +7344,7 @@ genRightShiftLiteral (operand * left,
       freeAsmop (left, NULL, ic, TRUE);
       freeAsmop (result, NULL, ic, TRUE);
     }
+    return TRUE;
 }
 #endif
 
@@ -7317,11 +7370,13 @@ genSignedRightShift (iCode * ic)
 
   aopOp (right, ic, FALSE, FALSE);
 
-#if 0
+#ifdef BETTER_LITERAL_SHIFT
   if (AOP_TYPE (right) == AOP_LIT)
     {
-      genRightShiftLiteral (left, right, result, ic, 1);
-      return;
+      if (genRightShiftLiteral (left, right, result, ic, 1))
+      {
+      	return;
+      }
     }
 #endif
   /* shift count is unknown then we have to form
@@ -7456,13 +7511,15 @@ genRightShift (iCode * ic)
 
   aopOp (right, ic, FALSE, FALSE);
 
-#if 0
+#ifdef BETTER_LITERAL_SHIFT
   /* if the shift count is known then do it
      as efficiently as possible */
   if (AOP_TYPE (right) == AOP_LIT)
     {
-      genRightShiftLiteral (left, right, result, ic, 0);
-      return;
+      if (genRightShiftLiteral (left, right, result, ic, 0))
+      {
+      	return;
+      }
     }
 #endif
 

@@ -1,3 +1,19 @@
+2004-11-11 Maarten Brock <sourceforge.brock AT dse.nl>
+	* src/SDCCmain.c (linkEdit): don't suppress crt0 if --nostdlib is used
+	  and search crt0.o in all library paths,
+	  (setIncludePath): proper handling of --nostdinc,
+	  (setLibPath): proper handling of --nostdlib
+	* support/regression/Makefile,
+	* support/regression/ports/ds390/spec.mk,
+	* support/regression/ports/gbz80/spec.mk,
+	* support/regression/ports/hc08/spec.mk,
+	* support/regression/ports/mcs51/spec.mk,
+	* support/regression/ports/mcs51-large/spec.mk,
+	* support/regression/ports/mcs51-stack-auto/spec.mk,
+	* support/regression/ports/z80/spec.mk: use include and lib files from
+	  built version of sdcc instead of installed version
+	* doc/sdccman.lyx: fixed typo in --nostdinc
+
 2004-11-10 Slade Rich <slade_rich AT users.sourceforge.net>
 
 	* src/pic/pcode.c,
@@ -29,6 +45,7 @@
 	* support/regression/ports/mcs51/support.c: reload T1 asap
 	* doc/sdccman.lyx: updated for options --pack-iram and --no-pack-iram,
 	  pdata use and clear idata startup behaviour
+	* support/regression/tests/bug1057979.c: added
 
 2004-11-04 Maarten Brock <sourceforge.brock AT dse.nl>
 

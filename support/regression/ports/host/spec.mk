@@ -4,6 +4,7 @@ SDCCFLAGS = -DPORT_HOST=1 -Wall -fsigned-char -fpack-struct -DREENTRANT=
 
 EXEEXT = .bin
 OBJEXT = .o
+INC_DIR = .
 
 # otherwise `make` deletes it and `make -j`will fail
 .PRECIOUS: ports/$(PORT)/testfwk$(OBJEXT)
@@ -14,7 +15,7 @@ EXTRAS = ports/$(PORT)/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
 %.out: %$(EXEEXT)
 	mkdir -p `dirname $@`
 	-$< > $@
-	-grep -n FAIL $@ /dev/null || true	
+	-grep -n FAIL $@ /dev/null || true
 
 %$(EXEEXT): %$(OBJEXT) $(EXTRAS)
 	$(SDCC) $(SDCCFLAGS) -o $@ $< $(EXTRAS) -lm

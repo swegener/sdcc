@@ -3,7 +3,10 @@
 
 RRZ80 = $(SDCC_EXTRA_DIR)/emu/rrz80/rrz80
 
-SDCCFLAGS +=-mz80 --less-pedantic --profile -DREENTRANT=
+SDCCFLAGS +=-mz80 --nostdinc --less-pedantic --profile -DREENTRANT=
+LINKFLAGS = --nostdlib
+LINKFLAGS += z80.lib
+LIBDIR = $(SDCC_DIR)/device/lib/build/z80
 
 EXEEXT = .bin
 
@@ -16,7 +19,7 @@ EXTRAS = ports/$(PORT)/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
 
 # Rule to link into .ihx
 %.ihx: %.c $(EXTRAS)
-	$(SDCC) $(SDCCFLAGS) $< $(EXTRAS) -o $@
+	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) -L $(LIBDIR) $(EXTRAS) $< -o $@
 
 %$(OBJEXT): %.asm
 	$(SDCC_DIR)/bin/as-z80 -plosgff $@ $<

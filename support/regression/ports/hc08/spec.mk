@@ -4,8 +4,10 @@ UCHC08B = $(SDCC_DIR)/bin/shc08
 
 UCHC08 = $(shell if [ -f $(UCHC08A) ]; then echo $(UCHC08A); else echo $(UCHC08B); fi)
 
-SDCCFLAGS +=-mhc08 --less-pedantic --out-fmt-ihx -DREENTRANT=reentrant
-#SDCCFLAGS +=--less-pedantic -DREENTRANT=reentrant
+SDCCFLAGS +=-mhc08 --nostdinc --less-pedantic --out-fmt-ihx -DREENTRANT=reentrant
+LINKFLAGS = --nostdlib
+LINKFLAGS += hc08.lib
+LIBDIR = $(SDCC_DIR)/device/lib/build/hc08
 
 OBJEXT = .rel
 EXEEXT = .ihx
@@ -16,7 +18,7 @@ EXTRAS = $(PORTS_DIR)/$(PORT)/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJ
 #%$(EXEEXT): %$(OBJEXT) $(EXTRAS)
 
 %$(EXEEXT): %.c $(EXTRAS)
-	$(SDCC) $(SDCCFLAGS) $< $(EXTRAS) -o $@
+	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) -L $(LIBDIR) $(EXTRAS) $< -o $@
 
 %$(OBJEXT): %.asm
 	$(SDCC_DIR)/bin/as-hc08 -plosgff $<

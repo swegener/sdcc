@@ -9,3 +9,5 @@ $(PORTS_DIR)/$(PORT)/%.c: $(PORTS_DIR)/mcs51/%.c
 	cp $< $@
 
 include $(PORTS_DIR)/mcs51/spec.mk
+
+LIBDIR = $(SDCC_DIR)/device/lib/build/large

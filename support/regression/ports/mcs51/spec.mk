@@ -8,7 +8,10 @@ S51B = $(SDCC_DIR)/bin/s51
 
 S51 = $(shell if [ -f $(S51A) ]; then echo $(S51A); else echo $(S51B); fi)
 
-SDCCFLAGS +=--less-pedantic -DREENTRANT=reentrant
+SDCCFLAGS +=--nostdinc --less-pedantic -DREENTRANT=reentrant
+LINKFLAGS = --nostdlib
+LINKFLAGS += mcs51.lib libsdcc.lib liblong.lib libint.lib libfloat.lib
+LIBDIR = $(SDCC_DIR)/device/lib/build/small
 
 OBJEXT = .rel
 EXEEXT = .ihx
@@ -17,7 +20,7 @@ EXTRAS = $(PORTS_DIR)/$(PORT)/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJ
 
 # Rule to link into .ihx
 %$(EXEEXT): %$(OBJEXT) $(EXTRAS)
-	$(SDCC) $(SDCCFLAGS) $(EXTRAS) $< -o $@
+	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) -L $(LIBDIR) $(EXTRAS) $< -o $@
 
 %$(OBJEXT): %.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@

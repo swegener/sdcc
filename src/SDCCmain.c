@@ -1617,14 +1617,20 @@ linkEdit (char **envp)
       It is very important for this file to be first on the linking proccess
       so the areas are set in the correct order, expecially _GSINIT*/
       if ((TARGET_IS_Z80 || TARGET_IS_GBZ80) &&
-        !options.no_std_crt0 && !options.nostdlib) /*For the z80, gbz80*/
+        !options.no_std_crt0) /*For the z80, gbz80*/
         {
           char crt0path[PATH_MAX];
           FILE * crt0fp;
-          for (s = setFirstItem(libDirsSet); s != NULL; s = setNextItem(libDirsSet))
+          set *tempSet=NULL;
+
+          tempSet = appendStrSet(libDirsSet, NULL, DIR_SEPARATOR_STRING);
+          tempSet = appendStrSet(libDirsSet, NULL, c);
+          mergeSets(&tempSet, libPathsSet);
+
+          for (s = setFirstItem(tempSet); s != NULL; s = setNextItem(tempSet))
             {
-              sprintf (crt0path, "%s%s%s%scrt0.o",
-                s, DIR_SEPARATOR_STRING, c, DIR_SEPARATOR_STRING);
+              sprintf (crt0path, "%s%scrt0.o",
+                s, DIR_SEPARATOR_STRING);
 
               crt0fp=fopen(crt0path, "r");
               if(crt0fp!=NULL)/*Found it!*/
@@ -2014,6 +2020,9 @@ setIncludePath(void)
    * 4. - DATADIR/INCLUDE_DIR_SUFFIX (only on *nix)
    */
 
+  if (options.nostdinc)
+      return;
+
   includeDirsSet = appendStrSet(dataDirsSet, NULL, INCLUDE_DIR_SUFFIX);
 
   if ((p = getenv(SDCC_INCLUDE_NAME)) != NULL)
@@ -2041,6 +2050,9 @@ setLibPath(void)
    * 3. - path(argv[0])/BIN2DATA_DIR/LIB_DIR_SUFFIX/<model>
    * 4. - DATADIR/LIB_DIR_SUFFIX/<model> (only on *nix)
    */
+
+  if (options.nostdlib)
+      return;
 
   libDirsSet = appendStrSet(dataDirsSet, NULL, LIB_DIR_SUFFIX);
 

@@ -7211,8 +7211,8 @@ status Collapsed
 /
 \end_inset 
 
--nostdincl
-\begin_inset LatexCommand \index{-\/-nostdincl}
+-nostdinc
+\begin_inset LatexCommand \index{-\/-nostdinc}
 
 \end_inset 
 

@@ -6,7 +6,10 @@ S51B = $(SDCC_DIR)/bin/s51
 
 S51 = $(shell if [ -f $(S51A) ]; then echo $(S51A); else echo $(S51B); fi)
 
-SDCCFLAGS +=-mds390 --less-pedantic -DREENTRANT=reentrant -Wl-r
+SDCCFLAGS +=-mds390 --nostdinc --less-pedantic -DREENTRANT=reentrant -Wl-r
+LINKFLAGS = --nostdlib
+LINKFLAGS += libds390.lib libsdcc.lib liblong.lib libint.lib libfloat.lib
+LIBDIR = $(SDCC_DIR)/device/lib/build/ds390
 
 OBJEXT = .rel
 EXEEXT = .ihx
@@ -15,7 +18,7 @@ EXTRAS = $(PORTS_DIR)/$(PORT)/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJ
 
 # Rule to link into .ihx
 %$(EXEEXT): %$(OBJEXT) $(EXTRAS)
-	$(SDCC) $(SDCCFLAGS) $(EXTRAS) $< -o $@
+	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) -L $(LIBDIR) $(EXTRAS) $< -o $@
 
 %$(OBJEXT): %.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@

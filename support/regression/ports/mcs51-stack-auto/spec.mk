@@ -2,18 +2,17 @@
 #
 # model small stack-auto
 
+include $(PORTS_DIR)/mcs51/spec.mk
+
 LIBSRCDIR = ../../device/lib
 LIBDIR    = gen/$(PORT)/lib
 
-LIBSDCCFLAGS+=--stack-auto --int-long-reent --float-reent
-SDCCFLAGS   +=$(LIBSDCCFLAGS) --nostdlib -L$(LIBDIR) -llibsdcc -llibint \
-              -lliblong -llibfloat -lmcs51
+LIBSDCCFLAGS+=--stack-auto
+SDCCFLAGS   +=$(LIBSDCCFLAGS)
 
 # copy support.c
 $(PORTS_DIR)/$(PORT)/%.c: $(PORTS_DIR)/mcs51/%.c
 	cp $< $@
-
-include $(PORTS_DIR)/mcs51/spec.mk
 
 SOURCES = _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
           _decdptr.c _divsint.c _divslong.c _divuint.c \

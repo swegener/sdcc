@@ -2,7 +2,10 @@
 
 EMU = $(SDCC_EXTRA_DIR)/emu/rrgb/rrgb
 
-SDCCFLAGS +=-mgbz80 --less-pedantic -DREENTRANT=
+SDCCFLAGS +=-mgbz80 --nostdinc --less-pedantic -DREENTRANT=
+LINKFLAGS = --nostdlib
+LINKFLAGS += gbz80.lib
+LIBDIR = $(SDCC_DIR)/device/lib/build/gbz80
 
 EXEEXT = .gb
 
@@ -11,7 +14,7 @@ EXTRAS = ports/$(PORT)/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
 
 # Rule to link into .ihx
 %.gb: %.c $(EXTRAS)
-	$(SDCC) $(SDCCFLAGS) $< $(EXTRAS) -o $@
+	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) -L $(LIBDIR) $(EXTRAS) $< -o $@
 
 %$(OBJEXT): %.asm
 	../../bin/as-gbz80 -plosgff $@ $<

@@ -82,8 +82,10 @@ test-gbz80:
 # Helper rule for testing the mcs51 port only
 test-mcs51:
 	$(MAKE) test-port PORT=mcs51
+
 test-mcs51-large:
 	$(MAKE) test-port PORT=mcs51-large
+
 test-mcs51-stack-auto:
 	$(MAKE) make-library test-port PORT=mcs51-stack-auto
 
@@ -122,7 +124,7 @@ PORT_RESULTS = $(ALL_TESTS:$(TESTS_DIR)/%.c=$(PORT_RESULTS_DIR)/%.out)
 
 SDCC_DIR = ../..
 SDCC_EXTRA_DIR = ../../../sdcc-extra
-
+INC_DIR = $(SDCC_DIR)/device/include
 
 # Defaults.  Override in spec.mk if required.
 # Path to SDCC
@@ -141,7 +143,7 @@ ifdef PORT
 include $(PORTS_DIR)/$(PORT)/spec.mk
 endif
 
-SDCCFLAGS += -Ifwk/include -Itests
+SDCCFLAGS += -Ifwk/include -Itests -I$(INC_DIR)
 
 # List of intermediate files to keep.  Pretty much keep everything as
 # disk space is free.

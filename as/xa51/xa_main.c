@@ -17,6 +17,7 @@
 /* adapted from the osu8asm project, 1995 */
 /* http://www.pjrc.com/tech/osu8/index.html */
 
+#define printf(x...) fprintf(stderr,x)
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,6 +47,21 @@ struct area_struct area[NUM_AREAS];
 int current_area=AREA_CSEG;
 
 
+char *areaToString (int area) {
+  switch (area) 
+    {
+    case AREA_CSEG: return "CSEG";
+    case AREA_DSEG: return "DSEG";
+    case AREA_OSEG: return "OSEG";
+    case AREA_ISEG: return "ISEG";
+    case AREA_BSEG: return "BSEG";
+    case AREA_XSEG: return "XSEG";
+    case AREA_XISEG: return "XISEG";
+    case AREA_XINIT: return "XINIT";
+    }
+  return ("UNKNOW");
+}
+
 /* "mem" is replaced by area[current_area].alloc_position */
 /* int mem=0; */   /* mem is location in memory */
 
@@ -68,6 +84,7 @@ struct symbol * build_sym_list(char *thename)
 	new->isbit = 0;
 	new->isreg = 0;
 	new->line_def = lineno - 1;
+	new->area = current_area;
 	new->next = NULL;
 	if (sym_list == NULL) return (sym_list = new);
 	p = sym_list;
@@ -180,19 +197,17 @@ void flag_targets()
 
 void print_symbol_table()
 {
-	struct symbol *p;
-	p = sym_list;
-	while (p != NULL) {
-		printf("Sym:%12s = %5d (%04X)  Def:", \
-		  p->name, p->value, p->value);
-		if (p->isdef) printf("Yes"); else printf("No ");
-		printf("  Bit:");
-		if (p->isbit) printf("Yes"); else printf("No ");
-		printf("  Target:");
-		if (p->istarget) printf("Yes"); else printf("No ");
-		printf(" Line %d\n", p->line_def);
-		p = p->next;
-	}
+  struct symbol *p;
+  p = sym_list;
+  while (p != NULL) {
+    printf("Sym in %-5s: %s\n", areaToString(p->area), p->name);
+    printf("  at: 0x%04X (%5d)", p->value, p->value);
+    printf(" Def:%s", p->isdef ? "Yes" : "No ");
+    printf(" Bit:%s", p->isbit ? "Yes" : "No ");
+    printf(" Target:%s", p->istarget ? "Yes" : "No ");
+    printf(" Line %d\n", p->line_def);
+    p = p->next;
+  }
 }
 
 /* check that every symbol is in the table only once */

@@ -33,6 +33,7 @@ struct symbol {
         int line_def;   /* line in which is was defined */
         int isbit;      /* 1 if a bit address, 0 otherwise */
 	int isreg;	/* 1 if a register, 0 otehrwise */
+  int area;       /* the area that this symbol is in */
         struct symbol *next; };
 
 /* a list of all the symbols that are branch targets */

@@ -150,10 +150,10 @@ directive:     '.' ORG expr {
                         $$ = 0;
                 }
 
-             | db_directive bytes {
+             | '.' db_directive bytes {
 			$$ = db_count;
 		}
-	     | dw_directive words {
+	     | '.' dw_directive words {
 			$$ = dw_count;
 		}
 	     | '.' AREA AREA_NAME AREA_DESC {

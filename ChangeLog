@@ -8,7 +8,8 @@
 	Large cumulative patch for pic16 port and libraries.
 	* device/include/pic16/sdcc-lib.h,
 	* device/include/pic16/stdarg.h,
-	* device/include/asm/pic16/features.h: NEW,
+	* device/include/asm/pic16/features.h,
+	* device/include/lib/pic16/libsdcc/gptr/{*.c, Makefile}: NEW,
 	* device/include/pic16/float.h: changes reentrant keyword with
 	_FS_REENTRANT, added prototype for __fsneq, included sdcc-lib.h
 	* device/lib/pic16/libsdcc/Makefile: added target directory gptr,

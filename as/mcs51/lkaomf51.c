@@ -25,7 +25,7 @@
 
 #define EQ(A,B) !strcmp((A),(B))
 #define MEMSIZE 0x10000
-#define DODUMP 1
+//#define DODUMP 1
 
 typedef struct
 {
@@ -124,7 +124,7 @@ void SaveLinkedFilePath(char * filepath)
 {
 	int j;
 
-	if(dflag)
+	if((dflag) && (!rflag))
 	{
 		infn=realloc(infn, sizeof(_infn)*(numin+1));
 
@@ -947,7 +947,7 @@ int ReadHexFile(int * Begin)
 
 void CreateAOMF51(void)
 {
-	if(dflag)
+	if((dflag) && (!rflag))
 	{
 		CollectInfoFromCDB();
 		#ifdef DODUMP

@@ -13,7 +13,7 @@ CFLAGS	+= -funsigned-char -DUNIX
 all:	$(BINS)
 
 $(BINS): $(OBJS)
-	$(CC) $(LDFLAGS) -o $@ $(OBJS)
+	$(CC) $(LDFLAGS) -o $(BINS) $(OBJS)
 
 %.o:	%.c
 	$(CC) -c $(CFLAGS) -I$(TOPDIR)/as/$(PORT) -o $@ $<

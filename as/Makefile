@@ -1,16 +1,16 @@
 TOPDIR = ..
 include $(TOPDIR)/Makefile.common
 
-PORTS = z80 gbz80
+PORTS = _z80 _gbz80
 
 all: 
 	for i in $(PORTS); do make $$i; done
 
-z80: clean
+_z80: clean
 	make -C z80
 	cp z80/as $(TOPDIR)/bin/as-z80
 
-gbz80: clean
+_gbz80: clean
 	make -C z80 "OPTS=-DGAMEBOY"
 	cp z80/as $(TOPDIR)/bin/as-gb
 

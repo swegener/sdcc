@@ -2224,16 +2224,22 @@ void pCodeReadCodeTable(void)
 /*-----------------------------------------------------------------*/
 void addpCode2pBlock(pBlock *pb, pCode *pc)
 {
+
+  if(!pc)
+    return;
+
   if(!pb->pcHead) {
     /* If this is the first pcode to be added to a block that
      * was initialized with a NULL pcode, then go ahead and
      * make this pcode the head and tail */
     pb->pcHead  = pb->pcTail = pc;
   } else {
+    //    if(pb->pcTail)
     pb->pcTail->next = pc;
+
     pc->prev = pb->pcTail;
-    //pc->next = NULL;
     pc->pb = pb;
+
     pb->pcTail = pc;
   }
 }
@@ -4315,15 +4321,17 @@ void pBlockMergeLabels(pBlock *pb)
 
   /* Now loop through the pBlock and merge the labels with the opcodes */
 
-  for(pc = pb->pcHead; pc; pc = pc->next) {
+  pc = pb->pcHead;
+  //  for(pc = pb->pcHead; pc; pc = pc->next) {
+
+  while(pc) {
+    pCode *pcn = pc->next;
 
     if(pc->type == PC_LABEL) {
 
       //fprintf(stderr," checking merging label %s\n",PCL(pc)->label);
       //fprintf(stderr,"Checking label key = %d\n",PCL(pc)->key);
       if((pcnext = findNextInstruction(pc) )) {
-
-	pCode *pcn = pc->next;
 
 	// Unlink the pCode label from it's pCode chain
 	unlinkpCode(pc);
@@ -4340,10 +4348,7 @@ void pBlockMergeLabels(pBlock *pb)
 	pbr->pc = pc;
 	pbr->next = NULL;
 
-
 	PCI(pcnext)->label = pBranchAppend(PCI(pcnext)->label,pbr);
-      
-	pc = pcn;
 
       } else {
 	fprintf(stderr, "WARNING: couldn't associate label %s with an instruction\n",PCL(pc)->label);
@@ -4353,18 +4358,15 @@ void pBlockMergeLabels(pBlock *pb)
       /* merge the source line symbolic info into the next instruction */
       if((pcnext = findNextInstruction(pc) )) {
 
-	pCode *pcn = pc->next;
-
 	// Unlink the pCode label from it's pCode chain
 	unlinkpCode(pc);
 	PCI(pcnext)->cline = PCCS(pc);
 	//fprintf(stderr, "merging CSRC\n");
 	//genericPrint(stderr,pcnext);
-	pc = pcn;
       }
 
     }
-
+    pc = pcn;
   }
   pBlockRemoveUnusedLabels(pb);
 

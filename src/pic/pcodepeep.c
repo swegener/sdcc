@@ -603,6 +603,11 @@ static void * cvt_altpat_mnem2a(void *pp,pCodeWildBlock *pcwb)
   pCodeInstruction *pci=NULL;
   pCodeOp *pcosubtype;
 
+  if(!pcwb) {
+    fprintf(stderr,"ERROR %s:%d - can't assemble line\n",__FILE__,__LINE__);
+    return NULL;
+  }
+
   dest = cvt_extract_destination(&p[3]);
 
   DFPRINTF((stderr,"altpat_mnem2a %s var %d destination %s(%d)\n",
@@ -893,13 +898,14 @@ int advTokIdx(int *v, int amt)
 /* pcode.                                                          */
 /*-----------------------------------------------------------------*/
 
-void parseTokens(pCodeWildBlock *pcwb)
+int parseTokens(pCodeWildBlock *pcwb, pCode **pcret)
 {
   unsigned i;
   pCode *pc;
+  int error = 0;
 
   if(!tokIdx)
-    return;
+    return error;
 
   for(i=0; i<=tokIdx; i++)
     dump1Token(tokArr[i].tt);
@@ -1074,7 +1080,14 @@ void parseTokens(pCodeWildBlock *pcwb)
 
 	  //if(curBlock && pc)
 	  //addpCode2pBlock(curBlock, pc);
-	  addpCode2pBlock(pcwb->pb, pc);
+	  if(pc) {
+	    if (pcret) {
+	      *pcret = pc;
+	      return 0;       // Only accept one line for now.
+	    } else
+	      addpCode2pBlock(pcwb->pb, pc);
+	  } else
+	    error++;
 	}
 	j += c;
       }
@@ -1098,7 +1111,7 @@ void parseTokens(pCodeWildBlock *pcwb)
 
   }
 
-
+  return error;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1115,9 +1128,33 @@ void  peepRuleBlock2pCodeBlock(  lineNode *ln, pCodeWildBlock *pcwb)
     //DFPRINTF((stderr,"%s\n",ln->line));
 
     tokenizeLineNode(ln->line);
-    parseTokens(pcwb);
-
+    
+    if(parseTokens(pcwb,NULL)) {
+      fprintf(stderr,"ERROR assembling line:\n%s\n",ln->line);
+      exit (1);
+    }
   }
+}
+
+/*-----------------------------------------------------------------*/
+/*                                                                 */
+/*-----------------------------------------------------------------*/
+pCode *AssembleLine(char *line)
+{
+  pCode *pc=NULL;
+
+  if(!line || !*line) {
+    fprintf(stderr,"WARNING returning NULL in AssembleLine\n");
+    return NULL;
+  }
+
+  tokenizeLineNode(line);
+    
+  if(parseTokens(NULL,&pc))
+    fprintf(stderr, "WARNING: unable to assemble line:\n%s\n",line);
+
+  return pc;
+
 }
 
 /*-----------------------------------------------------------------*/

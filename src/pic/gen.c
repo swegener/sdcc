@@ -63,6 +63,8 @@
 extern void genUMult8X8_16 (operand *, operand *,operand *,pCodeOpReg *);
 extern void genSMult8X8_16 (operand *, operand *,operand *,pCodeOpReg *);
 void genMult8X8_8 (operand *, operand *,operand *);
+pCode *AssembleLine(char *line);
+extern void printpBlock(FILE *of, pBlock *pb);
 
 static int labelOffset=0;
 extern int debug_verbose;
@@ -6023,8 +6025,9 @@ static void genInline (iCode *ic)
     while (*bp) {
         if (*bp == '\n') {
             *bp++ = '\0';
-            pic14_emitcode(bp1,"");
-	    addpCode2pBlock(pb,newpCodeInlineP(bp1));
+
+	    if(*bp1)
+	      addpCode2pBlock(pb,AssembleLine(bp1));
             bp1 = bp;
         } else {
             if (*bp == ':') {
@@ -6037,11 +6040,11 @@ static void genInline (iCode *ic)
                 bp++;
         }
     }
-    if (bp1 != bp) {
-        pic14_emitcode(bp1,"");
-	addpCode2pBlock(pb,newpCodeInlineP(bp1));
-    }
-    /*     pic14_emitcode("",buffer); */
+    if ((bp1 != bp) && *bp1)
+      addpCode2pBlock(pb,AssembleLine(bp1));
+
+    Safe_free(buffer);
+
     _G.inLine -= (!options.asmpeep);
 }
 

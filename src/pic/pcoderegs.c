@@ -346,7 +346,6 @@ void RemoveUnusedRegisters(void)
 {
   /* First, get rid of registers that are used only one time */
 
-
   RemoveRegsFromSet(dynInternalRegs);
   RemoveRegsFromSet(dynAllocRegs);
   RemoveRegsFromSet(dynStackRegs);
@@ -420,10 +419,12 @@ int regUsedinRange(pCode *pc1, pCode *pc2, regs *reg)
  * 
  *
  *-----------------------------------------------------------------*/
-void pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int can_free)
+int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int can_free)
 {
   pCode *pct1, *pct2;
   regs  *reg1, *reg2;
+
+  int t = total_registers_saved;
 
   if(pc2->seq < pc1->seq) {
     pct1 = pc2;
@@ -480,13 +481,13 @@ void pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int
 
       if(PCI(pct2)->op == POC_MOVWF) {
 	reg2 = getRegFromInstruction(pct2);
-	if(reg2 && !regUsedinRange(pc1,pc2,reg2)) {
+	if(reg2 && !regUsedinRange(pc1,pc2,reg2) && (reg2->type != REG_SFR)) {
 	  pct2->seq = pc1->seq;
 	  unlinkpCode(pct2);
 	  pCodeInsertAfter(pc1,pct2);
 	  Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
 	  total_registers_saved++;  // debugging stats.
-	  return;
+	  return 1;
 	}
 /*
 	fprintf(stderr, " couldn't optimize\n");
@@ -528,15 +529,17 @@ void pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int
 
   }
 
+  return (total_registers_saved != t);
 }
 
 /*-----------------------------------------------------------------*
  * void pCodeRegOptimeRegUsage(pBlock *pb) 
  *-----------------------------------------------------------------*/
-void OptimizeRegUsage(set *fregs)
+void OptimizeRegUsage(set *fregs, int optimize_multi_uses)
 {
   regs *reg;
   int used;
+  pCode *pc1=NULL, *pc2=NULL;
 
 
   while(fregs) {
@@ -566,7 +569,6 @@ void OptimizeRegUsage(set *fregs)
        * instructions are examined. If possible, they're optimized out.
        */
 
-      pCode *pc1, *pc2;
 /*
       fprintf (stderr, "OptimizeRegUsage: %s  addr=0x%03x rIdx=0x%03x type=%d used=%d\n",
 	       reg->name,
@@ -634,10 +636,46 @@ void OptimizeRegUsage(set *fregs)
 	reg->wasUsed = 0;
 
 	total_registers_saved++;  // debugging stats.
-      } else if(used > 2) {
+      } else if( (used > 2) && optimize_multi_uses) {
+
+	set *rset1=NULL;
+	set *rset2=NULL;
+	int searching=1;
+
+	pCodeFlow *pcfl1=NULL, *pcfl2=NULL;
 
 	/* examine the number of times this register is used */
 
+
+	rset1 = reg->reglives.usedpCodes;
+	while(rset1 && searching) {
+
+	  pc1 = rset1->item;
+	  rset2 = rset1->next;
+
+	  if(pc1 && isPCI(pc1) &&  ( (pcfl1 = PCI(pc1)->pcflow) != NULL) ) {
+
+	    while(rset2 && searching) {
+
+	      pc2 = rset2->item;
+	      if(pc2 && isPCI(pc2)  &&  ( (pcfl2 = PCI(pc2)->pcflow) != NULL) )  {
+		if(pcfl2 == pcfl1) {
+/*
+		  fprintf(stderr, " two instruction in same flow\n");
+		  pc1->print(stderr, pc1);
+		  pc2->print(stderr, pc2);
+*/
+		  //if(pCodeOptime2pCodes(pc1, pc2, pcfl_used, reg, 1))
+		  //  searching = 0;
+		}
+	      }
+
+	      rset2 = rset2->next;
+	      
+	    }
+	  }
+	  rset1 = rset1->next;
+	}
       }
     }
 
@@ -650,23 +688,32 @@ void OptimizeRegUsage(set *fregs)
 void pCodeRegOptimizeRegUsage(void)
 {
 
-  int passes = 4;
+  int passes;
   int saved = 0;
   int t = total_registers_saved;
+  int optimize_multi = 0;
 
   do {
-    saved = total_registers_saved;
+    passes = 4;
 
-    /* Identify registers used in one flow sequence */
-    OptimizeRegUsage(dynAllocRegs);
-    OptimizeRegUsage(dynStackRegs);
-    OptimizeRegUsage(dynDirectRegs);
+    //fprintf(stderr, " multi opti %d\n",optimize_multi);
 
-    if(total_registers_saved != saved)
-      fprintf(stderr, " *** Saved %d registers, total saved %d ***\n", total_registers_saved-saved,total_registers_saved);
+    do {
+      saved = total_registers_saved;
 
+      /* Identify registers used in one flow sequence */
+      OptimizeRegUsage(dynAllocRegs,optimize_multi);
+      OptimizeRegUsage(dynStackRegs,0);
+      OptimizeRegUsage(dynDirectRegs,0);
 
-  } while( passes-- && (total_registers_saved != saved));
+      if(total_registers_saved != saved)
+	fprintf(stderr, " *** Saved %d registers, total saved %d ***\n", total_registers_saved-saved,total_registers_saved);
+      
+
+    } while( passes-- && (total_registers_saved != saved));
+
+    optimize_multi++;  
+  } while (optimize_multi < 2);
 
   if(total_registers_saved == t) 
     fprintf(stderr, "No registers saved on this pass\n");

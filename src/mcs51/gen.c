@@ -1859,30 +1859,19 @@ genCall (iCode * ic)
 	   sic = setNextItem (_G.sendSet))
 	{
 	  int size, offset = 0;
-	  if (IS_VALOP(IC_LEFT(sic)) && IS_OP_LITERAL(IC_LEFT(sic)) 
-	      // PENDING: checkConstant2Type()
-	      // do some range checking here, just bitvars for now
-	      && IS_BITVAR(IC_LEFT(sic)->operand.valOperand->type)) {
-	    if (floatFromVal(IC_LEFT(sic)->operand.valOperand)) {
-	      emitcode ("mov", "%s,#0x01", fReturn[0]);
-	    } else {
-	      emitcode ("mov", "%s,#0x00", fReturn[0]);
+	  aopOp (IC_LEFT (sic), sic, FALSE);
+	  size = AOP_SIZE (IC_LEFT (sic));
+	  while (size--)
+	    {
+	      char *l = aopGet (AOP (IC_LEFT (sic)), offset,
+				FALSE, FALSE);
+	      if (strcmp (l, fReturn[offset]))
+		emitcode ("mov", "%s,%s",
+			  fReturn[offset],
+			  l);
+	      offset++;
 	    }
-	  } else {
-	    aopOp (IC_LEFT (sic), sic, FALSE);
-	    size = AOP_SIZE (IC_LEFT (sic));
-	    while (size--)
-	      {
-		char *l = aopGet (AOP (IC_LEFT (sic)), offset,
-				  FALSE, FALSE);
-		if (strcmp (l, fReturn[offset]))
-		  emitcode ("mov", "%s,%s",
-			    fReturn[offset],
-			    l);
-		offset++;
-	      }
-	    freeAsmop (IC_LEFT (sic), NULL, sic, TRUE);
-	  }
+	  freeAsmop (IC_LEFT (sic), NULL, sic, TRUE);
 	}
       _G.sendSet = NULL;
     }

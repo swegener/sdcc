@@ -1614,7 +1614,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
      we cannot */
   for (dic = ic->prev; dic; dic = dic->prev)
     {
-
+#if 0 // jwk 20010410, the JanVanBelle case
       /* if there is a function call and this is
          a parameter & not my parameter then don't pack it */
       if ((dic->op == CALL || dic->op == PCALL) &&
@@ -1624,6 +1624,14 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 	  dic = NULL;
 	  break;
 	}
+#else
+      /* if there is a function call then don't pack it */
+      if ((dic->op == CALL || dic->op == PCALL))
+	{
+	  dic = NULL;
+	  break;
+	}
+#endif
 
       if (SKIP_IC2 (dic))
 	continue;

@@ -1697,7 +1697,7 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
 	  return FALSE;
 	// if the loopvar is used in another (maybe conditional) block
 	if (astHasSymbol (pbody->right, sym) &&
-	    (pbody->level > body->level)) {
+	    (pbody->level >= body->level)) {
 	  return FALSE;
 	}
       }

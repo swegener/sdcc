@@ -1,3 +1,7 @@
+2003-09-05  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+	* src/SDCCast.c (isConformingBody): fixed loop reversal bug
+	reported in bug #800609
+
 2003-09-04  Vangelis Rokas <vrokas@otenet.gr>
 	* Top header beautifications in src/pic16 directory:
 	  device.c, device.h, gen.c, gen.h, genarith.c, glue.c, pcode.c,

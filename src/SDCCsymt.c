@@ -217,13 +217,12 @@ findSymWithLevel (bucket ** stab, symbol * sym)
    **/
   while (bp)
     {
-
       if (strcmp (bp->name, sym->name) == 0 && bp->level <= sym->level)
 	{
 	  /* if this is parameter then nothing else need to be checked */
 	  if (((symbol *) (bp->sym))->_isparm)
 	    return (bp->sym);
-	  /* if levels match then block numbers hsould also match */
+	  /* if levels match then block numbers should also match */
 	  if (bp->level && bp->level == sym->level && bp->block == sym->block)
 	    return (bp->sym);
 	  /* if levels don't match then we are okay */
@@ -957,7 +956,7 @@ addSymChain (symbol * symHead)
          then check if the type match, if the types match then
          delete the current entry and add the new entry      */
       if ((csym = findSymWithLevel (SymbolTab, sym)) &&
-	  csym->level == sym->level) {
+	  csym->level == sym->level && csym->localof == sym->localof) {
 	
 	/* one definition extern ? */
 	if (IS_EXTERN (csym->etype) || IS_EXTERN (sym->etype)) {
@@ -2277,6 +2276,11 @@ initCSupport ()
   };
 
   int bwd, su, muldivmod, tofrom, rlrr;
+
+  if (getenv("SDCC_NO_C_SUPPORT")) {
+    /* for debugging only */
+    return;
+  }
 
   floatType = newFloatLink ();
 

@@ -1107,7 +1107,7 @@ gatherAutoInit (symbol * autoChain)
 	  /* insert the symbol into the symbol table */
 	  /* with level = 0 & name = rname       */
 	  newSym = copySymbol (sym);
-	  addSym (SymbolTab, newSym, newSym->name, 0, 0, 1);
+	  addSym (SymbolTab, newSym, newSym->rname, 0, 0, 1);
 
 	  /* now lift the code to main */
 	  if (IS_AGGREGATE (sym->type))

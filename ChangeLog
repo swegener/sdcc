@@ -1,6 +1,7 @@
 2004-02-23 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCast.c (decorateType): fixed bug #902362
+	* doc/INSTALL.txt: fixed install instructions for win32
 
 2004-02-21 Bernhard Held <bernhard AT bernhardheld.de>
 

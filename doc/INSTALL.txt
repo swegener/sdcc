@@ -9,7 +9,7 @@ library files. See sdccman.[txt|pdf|html] for more detailed information.
 
 To install:
 
-* Extract the binary kit to a temporary directory.  This will create a
+* Extract the binary kit to a temporary directory. This will create a
 new directory called 'sdcc' in the temporary directory.
     cd ~
     mkdir tmp
@@ -28,14 +28,14 @@ You can test the install by entering:
     /usr/local/bin/sdcc -v
 
 This should return sdcc's version number.
- 
+
 
 For Windows 9X/NT/2000/XP users:
-Even if the default search paths look into c:\sdcc, sdcc is fully relocatable.
+sdcc for win32 is fully relocatable.
 To install:
 
-* Open sdcc-2.4.0-i586-mingw32-msvc.zip in WinZip
-* Extract all files to c:\, making sure to check 'Use folder names'
+* Open sdcc-2.4.0-i586-mingw32msvc.zip in WinZip
+* Extract all files to c:\ (or any other path you like), making sure to check 'Use folder names'
 
 You can test the install by opening a DOS box and entering:
     c:\sdcc\bin\sdcc -v

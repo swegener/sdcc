@@ -1,3 +1,8 @@
+2004-01-06 Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCval.c (valShift): changed from 16 to 32 bit shift count
+	* support/valdiag/tests/overflow.c: added
+
 2004-01-06  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	* as/mcs51/lkmain.c: stack must be after data when option -Y is not used
@@ -28,7 +33,7 @@
 	* src/common.h: added ifndef/define/endif macros
 	around the header file.
 	Bug reported from Jesus Calvino-Fraga
-	
+
 2004-01-06 Bernhard Held <bernhard@bernhardheld.de>
 
 	* sdcc.spec: updated

@@ -1,3 +1,11 @@
+2002-03-01    <johan@FRIJA>
+
+	* src/SDCCglue.c (printIvalPtr): fixed bug #524211
+
+	* src/SDCCast.c (decorateType): fixed bug #524209
+
+	* src/SDCCval.c (valNot): fixed bug #524195
+
 2002-02-26    <johan@balder>
 
 	* src/xa51/gen.c: fixed a warning

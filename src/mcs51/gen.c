@@ -7618,7 +7618,6 @@ genGenPointerGet (operand * left,
   if (pi && AOP_TYPE (left) != AOP_IMMD && AOP_TYPE (left) != AOP_STR) {
     aopPut ( AOP (left), "dpl", 0);
     aopPut ( AOP (left), "dph", 1);
-    aopPut ( AOP (left), "b", 2);
     pi->generated = 1;
   }
   freeAsmop (left, NULL, ic, TRUE);
@@ -8227,7 +8226,6 @@ genGenPointerSet (operand * right,
   if (pi && AOP_TYPE (result) != AOP_STR && AOP_TYPE (result) != AOP_IMMD) {
     aopPut (AOP(result),"dpl",0);
     aopPut (AOP(result),"dph",1);
-    aopPut (AOP(result),"b",2);
     pi->generated=1;
   }
   freeAsmop (result, NULL, ic, TRUE);

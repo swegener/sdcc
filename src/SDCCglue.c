@@ -232,27 +232,18 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
       /* if it has an initial value then do it only if
          it is a global variable */
       if (sym->ival && sym->level == 0) {
-	// can we copy xidata from xinit?
-	if (port->genXINIT &&
-	    SPEC_OCLS(sym->etype)==xdata &&
-	    !SPEC_ABSA(sym->etype)) {
-
-	  // create a new "XINIT (CODE)" symbol
+	if (SPEC_OCLS(sym->etype)==xidata) {
+	  // create a new "XINIT (CODE)" symbol, that will be emitted later
 	  newSym=copySymbol (sym);
 	  SPEC_OCLS(newSym->etype)=xinit;
 	  sprintf (newSym->name, "_xinit_%s", sym->name);
 	  sprintf (newSym->rname,"_xinit_%s", sym->rname);
 	  SPEC_CONST(newSym->etype)=1;
-	  //SPEC_STAT(newSym->etype)=1;
+	  SPEC_STAT(newSym->etype)=1;
 	  addSym (SymbolTab, newSym, newSym->name, 0, 0, 1);
 	  
 	  // add it to the "XINIT (CODE)" segment
 	  addSet(&xinit->syms, newSym);
-
-	  // move sym from "XSEG (XDATA)" to "XISEG (XDATA)" segment
-	  //deleteSetItem(&xdata->syms, sym);
-	  addSet(&xidata->syms, sym);
-	  SPEC_OCLS(sym->etype)=xidata;
 
 	  //fprintf (stderr, "moved %s from xdata to xidata\n", sym->rname);
 	  

@@ -5112,234 +5112,237 @@ release :
 /*-----------------------------------------------------------------*/
 static void genXor (iCode *ic, iCode *ifx)
 {
-    operand *left, *right, *result;
-    int size, offset=0;
-    unsigned long lit = 0L;
+  operand *left, *right, *result;
+  int size, offset=0;
+  unsigned long lit = 0L;
 
-    DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+  DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
-    aopOp((left = IC_LEFT(ic)),ic,FALSE);
-    aopOp((right= IC_RIGHT(ic)),ic,FALSE);
-    aopOp((result=IC_RESULT(ic)),ic,TRUE);
+  aopOp((left = IC_LEFT(ic)),ic,FALSE);
+  aopOp((right= IC_RIGHT(ic)),ic,FALSE);
+  aopOp((result=IC_RESULT(ic)),ic,TRUE);
 
-    /* if left is a literal & right is not ||
-       if left needs acc & right does not */
-    if ((AOP_TYPE(left) == AOP_LIT && AOP_TYPE(right) != AOP_LIT) ||
-	(AOP_NEEDSACC(left) && !AOP_NEEDSACC(right))) {
-        operand *tmp = right ;
-        right = left;
-        left = tmp;
-    }
+  /* if left is a literal & right is not ||
+     if left needs acc & right does not */
+  if ((AOP_TYPE(left) == AOP_LIT && AOP_TYPE(right) != AOP_LIT) ||
+      (AOP_NEEDSACC(left) && !AOP_NEEDSACC(right))) {
+    operand *tmp = right ;
+    right = left;
+    left = tmp;
+  }
 
-    /* if result = right then exchange them */
-    if(pic14_sameRegs(AOP(result),AOP(right))){
-        operand *tmp = right ;
-        right = left;
-        left = tmp;
-    }
+  /* if result = right then exchange them */
+  if(pic14_sameRegs(AOP(result),AOP(right))){
+    operand *tmp = right ;
+    right = left;
+    left = tmp;
+  }
 
-    /* if right is bit then exchange them */
-    if (AOP_TYPE(right) == AOP_CRY &&
-        AOP_TYPE(left) != AOP_CRY){
-        operand *tmp = right ;
-        right = left;
-        left = tmp;
-    }
-    if(AOP_TYPE(right) == AOP_LIT)
-        lit = (unsigned long)floatFromVal (AOP(right)->aopu.aop_lit);
+  /* if right is bit then exchange them */
+  if (AOP_TYPE(right) == AOP_CRY &&
+      AOP_TYPE(left) != AOP_CRY){
+    operand *tmp = right ;
+    right = left;
+    left = tmp;
+  }
+  if(AOP_TYPE(right) == AOP_LIT)
+    lit = (unsigned long)floatFromVal (AOP(right)->aopu.aop_lit);
 
-    size = AOP_SIZE(result);
+  size = AOP_SIZE(result);
 
-    // if(bit ^ yy)
-    // xx = bit ^ yy;
-    if (AOP_TYPE(left) == AOP_CRY){
-        if(AOP_TYPE(right) == AOP_LIT){
-            // c = bit & literal;
-            if(lit>>1){
-                // lit>>1  != 0 => result = 1
-                if(AOP_TYPE(result) == AOP_CRY){
-                    if(size)
-                        pic14_emitcode("setb","%s",AOP(result)->aopu.aop_dir);
-                    else if(ifx)
-                        continueIfTrue(ifx);
-                    goto release;
-                }
-                pic14_emitcode("setb","c");
-            } else{
-                // lit == (0 or 1)
-                if(lit == 0){
-                    // lit == 0, result = left
-                    if(size && pic14_sameRegs(AOP(result),AOP(left)))
-                        goto release;
-                    pic14_emitcode("mov","c,%s",AOP(left)->aopu.aop_dir);
-                } else{
-                    // lit == 1, result = not(left)
-                    if(size && pic14_sameRegs(AOP(result),AOP(left))){
-                        pic14_emitcode("cpl","%s",AOP(result)->aopu.aop_dir);
-                        goto release;
-                    } else {
-                        pic14_emitcode("mov","c,%s",AOP(left)->aopu.aop_dir);
-                        pic14_emitcode("cpl","c");
-                    }
-                }
-            }
+  // if(bit ^ yy)
+  // xx = bit ^ yy;
+  if (AOP_TYPE(left) == AOP_CRY){
+    if(AOP_TYPE(right) == AOP_LIT){
+      // c = bit & literal;
+      if(lit>>1){
+	// lit>>1  != 0 => result = 1
+	if(AOP_TYPE(result) == AOP_CRY){
+	  if(size)
+	    pic14_emitcode("setb","%s",AOP(result)->aopu.aop_dir);
+	  else if(ifx)
+	    continueIfTrue(ifx);
+	  goto release;
+	}
+	pic14_emitcode("setb","c");
+      } else{
+	// lit == (0 or 1)
+	if(lit == 0){
+	  // lit == 0, result = left
+	  if(size && pic14_sameRegs(AOP(result),AOP(left)))
+	    goto release;
+	  pic14_emitcode("mov","c,%s",AOP(left)->aopu.aop_dir);
+	} else{
+	  // lit == 1, result = not(left)
+	  if(size && pic14_sameRegs(AOP(result),AOP(left))){
+	    pic14_emitcode("cpl","%s",AOP(result)->aopu.aop_dir);
+	    goto release;
+	  } else {
+	    pic14_emitcode("mov","c,%s",AOP(left)->aopu.aop_dir);
+	    pic14_emitcode("cpl","c");
+	  }
+	}
+      }
 
-        } else {
-            // right != literal
-            symbol *tlbl = newiTempLabel(NULL);
-            if (AOP_TYPE(right) == AOP_CRY){
-                // c = bit ^ bit;
-                pic14_emitcode("mov","c,%s",AOP(right)->aopu.aop_dir);
-            }
-            else{
-                int sizer = AOP_SIZE(right);
-                // c = bit ^ val
-                // if val>>1 != 0, result = 1
-                pic14_emitcode("setb","c");
-                while(sizer){
-                    MOVA(aopGet(AOP(right),sizer-1,FALSE,FALSE));
-                    if(sizer == 1)
-                        // test the msb of the lsb
-                        pic14_emitcode("anl","a,#0xfe");
-                    pic14_emitcode("jnz","%05d_DS_",tlbl->key+100);
-		    sizer--;
-                }
-                // val = (0,1)
-                pic14_emitcode("rrc","a");
-            }
-            pic14_emitcode("jnb","%s,%05d_DS_",AOP(left)->aopu.aop_dir,(tlbl->key+100));
-            pic14_emitcode("cpl","c");
-            pic14_emitcode("","%05d_DS_:",(tlbl->key+100));
-        }
-        // bit = c
-        // val = c
-        if(size)
-            pic14_outBitC(result);
-        // if(bit | ...)
-        else if((AOP_TYPE(result) == AOP_CRY) && ifx)
-            genIfxJump(ifx, "c");           
-        goto release ;
-    }
-
-    if(pic14_sameRegs(AOP(result),AOP(left))){
-        /* if left is same as result */
-        for(;size--; offset++) {
-            if(AOP_TYPE(right) == AOP_LIT){
-	      int t  = (lit >> (offset*8)) & 0x0FFL;
-                if(t == 0x00L)
-                    continue;
-                else
-		    if (IS_AOP_PREG(left)) {
-			MOVA(aopGet(AOP(right),offset,FALSE,FALSE));
-			pic14_emitcode("xrl","a,%s",aopGet(AOP(left),offset,FALSE,TRUE));
-		        aopPut(AOP(result),"a",offset);
-		    } else {
-		      emitpcode(POC_MOVLW, popGetLit(t));
-		      emitpcode(POC_XORWF,popGet(AOP(left),offset,FALSE,FALSE));
-		      pic14_emitcode("xrl","%s,%s",
-				     aopGet(AOP(left),offset,FALSE,TRUE),
-				     aopGet(AOP(right),offset,FALSE,FALSE));
-		    }
-            } else {
-		if (AOP_TYPE(left) == AOP_ACC)
-		    pic14_emitcode("xrl","a,%s",aopGet(AOP(right),offset,FALSE,FALSE));
-		else {
-		    MOVA(aopGet(AOP(right),offset,FALSE,FALSE));
-		    if (IS_AOP_PREG(left)) {
-			pic14_emitcode("xrl","a,%s",aopGet(AOP(left),offset,FALSE,TRUE));
-			aopPut(AOP(result),"a",offset);
-		    } else
-			pic14_emitcode("xrl","%s,a",
-				 aopGet(AOP(left),offset,FALSE,TRUE));
-		}
-            }
-        }
     } else {
-        // left & result in different registers
-        if(AOP_TYPE(result) == AOP_CRY){
-            // result = bit
-            // if(size), result in bit
-            // if(!size && ifx), conditional oper: if(left ^ right)
-            symbol *tlbl = newiTempLabel(NULL);
-            int sizer = max(AOP_SIZE(left),AOP_SIZE(right));
-            if(size)
-                pic14_emitcode("setb","c");
-            while(sizer--){
-                if((AOP_TYPE(right) == AOP_LIT) &&
-                   (((lit >> (offset*8)) & 0x0FFL) == 0x00L)){
-                    MOVA(aopGet(AOP(left),offset,FALSE,FALSE));
-                } else {
-                    MOVA(aopGet(AOP(right),offset,FALSE,FALSE));
-                    pic14_emitcode("xrl","a,%s",
-                             aopGet(AOP(left),offset,FALSE,FALSE));
-                }
-                pic14_emitcode("jnz","%05d_DS_",tlbl->key+100);
-                offset++;
-            }
-            if(size){
-                CLRC;
-                pic14_emitcode("","%05d_DS_:",tlbl->key+100);
-                pic14_outBitC(result);
-            } else if(ifx)
-                jmpTrueOrFalse(ifx, tlbl);
-        } else for(;(size--);offset++){
-            // normal case
-            // result = left & right
-            if(AOP_TYPE(right) == AOP_LIT){
-	      int t = (lit >> (offset*8)) & 0x0FFL;
-	      switch(t) { 
-	      case 0x00:
-		emitpcode(POC_MOVFW,popGet(AOP(left),offset,FALSE,FALSE));
-		emitpcode(POC_MOVWF,popGet(AOP(result),offset,FALSE,FALSE));
-		pic14_emitcode("movf","%s,w",
-			 aopGet(AOP(left),offset,FALSE,FALSE));
-		pic14_emitcode("movwf","%s",
-			 aopGet(AOP(result),offset,FALSE,FALSE));
-		break;
-	      case 0xff:
-		emitpcode(POC_COMFW,popGet(AOP(left),offset,FALSE,FALSE));
-		emitpcode(POC_MOVWF,popGet(AOP(result),offset,FALSE,FALSE));
-		pic14_emitcode("comf","%s,w",
-			 aopGet(AOP(left),offset,FALSE,FALSE));
-		pic14_emitcode("movwf","%s",
-			 aopGet(AOP(result),offset,FALSE,FALSE));
-		break;
-	      default:
-		emitpcode(POC_MOVLW, popGetLit(t));
-		emitpcode(POC_XORFW,popGet(AOP(left),offset,FALSE,FALSE));
-		emitpcode(POC_MOVWF,popGet(AOP(result),offset,FALSE,FALSE));
-		pic14_emitcode("movlw","0x%x",t);
-		pic14_emitcode("xorwf","%s,w",
-			 aopGet(AOP(left),offset,FALSE,FALSE));
-		pic14_emitcode("movwf","%s",
-			 aopGet(AOP(result),offset,FALSE,FALSE));
-
-	      }
-	      continue;
-            }
-
-            // faster than result <- left, anl result,right
-            // and better if result is SFR
-	    if (AOP_TYPE(left) == AOP_ACC) {
-		emitpcode(POC_XORFW,popGet(AOP(right),offset,FALSE,FALSE));
-		pic14_emitcode("xorwf","%s,w",aopGet(AOP(right),offset,FALSE,FALSE));
-	    } else {
-		emitpcode(POC_MOVFW,popGet(AOP(right),offset,FALSE,FALSE));
-		emitpcode(POC_XORFW,popGet(AOP(left),offset,FALSE,FALSE));
-		pic14_emitcode("movf","%s,w",aopGet(AOP(right),offset,FALSE,FALSE));
-		pic14_emitcode("xorwf","%s,w",aopGet(AOP(left),offset,FALSE,FALSE));
-	    }
-	    if ( AOP_TYPE(result) != AOP_ACC){
-		emitpcode(POC_MOVWF,popGet(AOP(result),offset,FALSE,FALSE));
-	      pic14_emitcode("movwf","%s",aopGet(AOP(result),offset,FALSE,FALSE));
-	    }
-        }
+      // right != literal
+      symbol *tlbl = newiTempLabel(NULL);
+      if (AOP_TYPE(right) == AOP_CRY){
+	// c = bit ^ bit;
+	pic14_emitcode("mov","c,%s",AOP(right)->aopu.aop_dir);
+      }
+      else{
+	int sizer = AOP_SIZE(right);
+	// c = bit ^ val
+	// if val>>1 != 0, result = 1
+	pic14_emitcode("setb","c");
+	while(sizer){
+	  MOVA(aopGet(AOP(right),sizer-1,FALSE,FALSE));
+	  if(sizer == 1)
+	    // test the msb of the lsb
+	    pic14_emitcode("anl","a,#0xfe");
+	  pic14_emitcode("jnz","%05d_DS_",tlbl->key+100);
+	  sizer--;
+	}
+	// val = (0,1)
+	pic14_emitcode("rrc","a");
+      }
+      pic14_emitcode("jnb","%s,%05d_DS_",AOP(left)->aopu.aop_dir,(tlbl->key+100));
+      pic14_emitcode("cpl","c");
+      pic14_emitcode("","%05d_DS_:",(tlbl->key+100));
     }
+    // bit = c
+    // val = c
+    if(size)
+      pic14_outBitC(result);
+    // if(bit | ...)
+    else if((AOP_TYPE(result) == AOP_CRY) && ifx)
+      genIfxJump(ifx, "c");           
+    goto release ;
+  }
 
-release :
+  if(pic14_sameRegs(AOP(result),AOP(left))){
+    /* if left is same as result */
+    for(;size--; offset++) {
+      if(AOP_TYPE(right) == AOP_LIT){
+	int t  = (lit >> (offset*8)) & 0x0FFL;
+	if(t == 0x00L)
+	  continue;
+	else
+	  if (IS_AOP_PREG(left)) {
+	    MOVA(aopGet(AOP(right),offset,FALSE,FALSE));
+	    pic14_emitcode("xrl","a,%s",aopGet(AOP(left),offset,FALSE,TRUE));
+	    aopPut(AOP(result),"a",offset);
+	  } else {
+	    emitpcode(POC_MOVLW, popGetLit(t));
+	    emitpcode(POC_XORWF,popGet(AOP(left),offset,FALSE,FALSE));
+	    pic14_emitcode("xrl","%s,%s",
+			   aopGet(AOP(left),offset,FALSE,TRUE),
+			   aopGet(AOP(right),offset,FALSE,FALSE));
+	  }
+      } else {
+	if (AOP_TYPE(left) == AOP_ACC)
+	  pic14_emitcode("xrl","a,%s",aopGet(AOP(right),offset,FALSE,FALSE));
+	else {
+	  emitpcode(POC_MOVFW,popGet(AOP(right),offset,FALSE,FALSE));
+	  emitpcode(POC_XORWF,popGet(AOP(left),offset,FALSE,FALSE));
+/*
+	  if (IS_AOP_PREG(left)) {
+	    pic14_emitcode("xrl","a,%s",aopGet(AOP(left),offset,FALSE,TRUE));
+	    aopPut(AOP(result),"a",offset);
+	  } else
+	    pic14_emitcode("xrl","%s,a",
+			   aopGet(AOP(left),offset,FALSE,TRUE));
+*/
+	}
+      }
+    }
+  } else {
+    // left & result in different registers
+    if(AOP_TYPE(result) == AOP_CRY){
+      // result = bit
+      // if(size), result in bit
+      // if(!size && ifx), conditional oper: if(left ^ right)
+      symbol *tlbl = newiTempLabel(NULL);
+      int sizer = max(AOP_SIZE(left),AOP_SIZE(right));
+      if(size)
+	pic14_emitcode("setb","c");
+      while(sizer--){
+	if((AOP_TYPE(right) == AOP_LIT) &&
+	   (((lit >> (offset*8)) & 0x0FFL) == 0x00L)){
+	  MOVA(aopGet(AOP(left),offset,FALSE,FALSE));
+	} else {
+	  MOVA(aopGet(AOP(right),offset,FALSE,FALSE));
+	  pic14_emitcode("xrl","a,%s",
+			 aopGet(AOP(left),offset,FALSE,FALSE));
+	}
+	pic14_emitcode("jnz","%05d_DS_",tlbl->key+100);
+	offset++;
+      }
+      if(size){
+	CLRC;
+	pic14_emitcode("","%05d_DS_:",tlbl->key+100);
+	pic14_outBitC(result);
+      } else if(ifx)
+	jmpTrueOrFalse(ifx, tlbl);
+    } else for(;(size--);offset++){
+      // normal case
+      // result = left & right
+      if(AOP_TYPE(right) == AOP_LIT){
+	int t = (lit >> (offset*8)) & 0x0FFL;
+	switch(t) { 
+	case 0x00:
+	  emitpcode(POC_MOVFW,popGet(AOP(left),offset,FALSE,FALSE));
+	  emitpcode(POC_MOVWF,popGet(AOP(result),offset,FALSE,FALSE));
+	  pic14_emitcode("movf","%s,w",
+			 aopGet(AOP(left),offset,FALSE,FALSE));
+	  pic14_emitcode("movwf","%s",
+			 aopGet(AOP(result),offset,FALSE,FALSE));
+	  break;
+	case 0xff:
+	  emitpcode(POC_COMFW,popGet(AOP(left),offset,FALSE,FALSE));
+	  emitpcode(POC_MOVWF,popGet(AOP(result),offset,FALSE,FALSE));
+	  pic14_emitcode("comf","%s,w",
+			 aopGet(AOP(left),offset,FALSE,FALSE));
+	  pic14_emitcode("movwf","%s",
+			 aopGet(AOP(result),offset,FALSE,FALSE));
+	  break;
+	default:
+	  emitpcode(POC_MOVLW, popGetLit(t));
+	  emitpcode(POC_XORFW,popGet(AOP(left),offset,FALSE,FALSE));
+	  emitpcode(POC_MOVWF,popGet(AOP(result),offset,FALSE,FALSE));
+	  pic14_emitcode("movlw","0x%x",t);
+	  pic14_emitcode("xorwf","%s,w",
+			 aopGet(AOP(left),offset,FALSE,FALSE));
+	  pic14_emitcode("movwf","%s",
+			 aopGet(AOP(result),offset,FALSE,FALSE));
+
+	}
+	continue;
+      }
+
+      // faster than result <- left, anl result,right
+      // and better if result is SFR
+      if (AOP_TYPE(left) == AOP_ACC) {
+	emitpcode(POC_XORFW,popGet(AOP(right),offset,FALSE,FALSE));
+	pic14_emitcode("xorwf","%s,w",aopGet(AOP(right),offset,FALSE,FALSE));
+      } else {
+	emitpcode(POC_MOVFW,popGet(AOP(right),offset,FALSE,FALSE));
+	emitpcode(POC_XORFW,popGet(AOP(left),offset,FALSE,FALSE));
+	pic14_emitcode("movf","%s,w",aopGet(AOP(right),offset,FALSE,FALSE));
+	pic14_emitcode("xorwf","%s,w",aopGet(AOP(left),offset,FALSE,FALSE));
+      }
+      if ( AOP_TYPE(result) != AOP_ACC){
+	emitpcode(POC_MOVWF,popGet(AOP(result),offset,FALSE,FALSE));
+	pic14_emitcode("movwf","%s",aopGet(AOP(result),offset,FALSE,FALSE));
+      }
+    }
+  }
+
+  release :
     freeAsmop(left,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
-    freeAsmop(right,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
-    freeAsmop(result,NULL,ic,TRUE);     
+  freeAsmop(right,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
+  freeAsmop(result,NULL,ic,TRUE);     
 }
 
 /*-----------------------------------------------------------------*/

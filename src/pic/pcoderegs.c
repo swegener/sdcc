@@ -36,8 +36,6 @@
 #include "pcoderegs.h"
 #include "pcodeflow.h"
 
-extern void pCodeInsertAfter(pCode *pc1, pCode *pc2);
-extern void pCodeInsertBefore(pCode *pc1, pCode *pc2);
 extern void dbg_dumpregusage(void);
 extern pCode * findPrevInstruction(pCode *pci);
 extern pBranch * pBranchAppend(pBranch *h, pBranch *n);
@@ -317,7 +315,7 @@ void  RemoveRegsFromSet(set *regset)
 
 	pc = setFirstItem(reg->reglives.usedpCodes);
 
-	if(reg->type == REG_SFR || reg->type == REG_STK) {
+    if(reg->type == REG_SFR || reg->type == REG_STK || reg->isPublic || reg->isExtern) {
 	  //fprintf(stderr, "not removing SFR reg %s even though used only once\n",reg->name);
 	  continue;
 	}
@@ -376,7 +374,7 @@ void RemoveUnusedRegisters(void)
   */
   RemoveRegsFromSet(dynDirectBitRegs);
 
-  if(total_registers_saved) fprintf(stderr, " *** Saved %d registers ***\n", total_registers_saved);
+  if(total_registers_saved) DFPRINTF((stderr, " *** Saved %d registers ***\n", total_registers_saved));
 }
 
 
@@ -454,44 +452,83 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
     pc2 = pc1;
     pc1 = pct1;
   }
-/*
-  fprintf(stderr,"pCodeOptime2pCodes\n");
-  pc1->print(stderr,pc1);
-  pc2->print(stderr,pc2);
-*/
+
+  //fprintf(stderr,"pCodeOptime2pCodes\n");
+  //pc1->print(stderr,pc1);
+  //pc2->print(stderr,pc2);
+
   if((PCI(pc1)->op == POC_CLRF) && (PCI(pc2)->op == POC_MOVFW) ){
+    pCode *pc;
+    int regUsed = 0;
+    int wUsed   = 0;
+    int wSaved  = 0;
+    int wChgd   = 0;
 
     /*
       clrf  reg
       stuff...
       movf  reg,w
 
-      can be replaced with
+      can be replaced with (only if next instructions are not going to use W and reg is not used again later)
 
       stuff...
-      movlw 0
+      movlw 0 or clrf  reg
     */
 
     pCode *newpc;
-    fprintf(stderr, "   CLRF/MOVFW. instruction after MOVFW is:\n");
-    pct1 = findNextInstruction(pc2->next);
+    DFPRINTF((stderr, "   optimising CLRF reg ... MOVF reg,W to ... MOVLW 0\n"));
+    pct1 = pc = findNextInstruction(pc2->next);
 
     if(PCI(pct1)->op == POC_MOVWF) {
-      newpc = newpCode(POC_CLRF, PCI(pct1)->pcop);
-      pct1->destruct(pct1);
-    } else {
-      newpc = newpCode(POC_MOVLW, newpCodeOpLit(0));
+      wSaved = wUsed = 1; /* Maybe able to replace with clrf pc2->next->reg. */
+      pc = findNextInstruction(pc->next);
     }
+    for (; pc; pc = findNextInstruction(pc->next)) {
+      if (isPCI(pc)) {
+        regs *r;
+        if (!wChgd) {
+          if (PCI(pc)->inCond & PCC_W)
+            wUsed = 1;
+          if (PCI(pc)->outCond & PCC_W) {
+            pCode *pcp = findPrevInstruction(pc);
+            if (pcp && !isPCI_SKIP(pcp)) {
+              wChgd = 1; /* W has changed so we no longer care if it is used, however if there is a preceding skip instruction then maybe current W is still going to be used */
+            if (regUsed)
+              break;
+            }
+          }
+        }
+        r = getRegFromInstruction(pc); /* Check if reg is used later. */
+        if (r && (r->rIdx==reg->rIdx)) {
+          if (!(PCI(pc)->outCond & PCC_REGISTER))
+            regUsed = 1;
+          if (wChgd)
+            break;
+        }
+      }
+    }
+    if(regUsed&&wUsed) {
+      /* Do not optimise as exisiting code is required. */
+    } else {
+      /* Can optimise. */
+      if(regUsed) {
+        newpc = newpCode(POC_CLRF, PCI(pc1)->pcop);
+      } else if(wSaved && !wUsed) {
+        newpc = newpCode(POC_CLRF, PCI(pct1)->pcop);
+        pct1->destruct(pct1);
+      } else {
+        newpc = newpCode(POC_MOVLW, newpCodeOpLit(0));
+      }
 
-    pCodeInsertAfter(pc2, newpc);
-    PCI(newpc)->pcflow = PCFL(pcfl_used);
-    newpc->seq = pc2->seq;
+      pCodeInsertAfter(pc2, newpc);
+      PCI(newpc)->pcflow = PCFL(pcfl_used);
+      newpc->seq = pc2->seq;
 
-    Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
-    total_registers_saved++;  // debugging stats.
-
+      Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
+      total_registers_saved++;  // debugging stats.
+    }
   } else if((PCI(pc1)->op == POC_CLRF) && (PCI(pc2)->op == POC_IORFW) ){
-    fprintf(stderr, "   CLRF/IORFW.\n");
+    DFPRINTF((stderr, "   optimising CLRF/IORFW\n"));
 
     pct2 = findNextInstruction(pc2->next);
 
@@ -505,60 +542,57 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
     total_registers_saved++;  // debugging stats.
 
   }  else if(PCI(pc1)->op == POC_MOVWF) {
+    // Optimising MOVWF reg ...
 
     pct2 = findNextInstruction(pc2->next);
 
     if(PCI(pc2)->op == POC_MOVFW) {
-      /*
-	fprintf(stderr, "   MOVWF/MOVFW. instruction after MOVFW is:\n");
-	pct2->print(stderr,pct2);
-      */
+      // Optimising MOVWF reg ... MOVF reg,W
 
       if(PCI(pct2)->op == POC_MOVWF) {
-	/*
-	  Change:
+        /*
+        Change:
 
-	    movwf   reg
+        movwf   reg
 
-	    stuff...
+        stuff...
 
-	    movf    reg,w
-            movwf   reg2
+        movf    reg,w
+        movwf   reg2
 
-	  To:
+        To:
 
-	    
-	*/
-	reg2 = getRegFromInstruction(pct2);
-	//if(reg2 && !regUsedinRange(pc1,pc2,reg2) && (reg2->type != REG_SFR)) {
-	if(reg2 && !regUsedinRange(pc1,pc2,reg2)) {
 
-	  if(pCodeSearchCondition(pct2, PCC_Z) < 1) {
-	    pCode *pct3 = findNextInstruction(pct2->next);
-	    fprintf(stderr,"ABCD\n");
-	    pct2->seq = pc1->seq;
-	    unlinkpCode(pct2);
-	    pCodeInsertAfter(findPrevInstruction(pc1->prev),pct2);
+        */
+        reg2 = getRegFromInstruction(pct2);
+        if(reg2 && !regUsedinRange(pc1,pc2,reg2)) {
+
+          if(pCodeSearchCondition(pct2, PCC_Z) < 1) {
+            pCode *pct3 = findNextInstruction(pct2->next);
+            DFPRINTF((stderr, "   optimising MOVF reg ... MOVF reg,W MOVWF reg2\n"));
+            pct2->seq = pc1->seq;
+            unlinkpCode(pct2);
+            pCodeInsertAfter(findPrevInstruction(pc1->prev),pct2);
 
 #define usesW(x)       ((x) && (isPCI(x)) && ( (PCI(x)->inCond & PCC_W) != 0))
 
-	    if(usesW(pct3))
-	      ; // Remove2pcodes(pcfl_used, pc1, NULL, reg, can_free);
-	    else
-	      Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
+            if(usesW(pct3))
+              ; // Remove2pcodes(pcfl_used, pc1, NULL, reg, can_free);
+            else
+              Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
 
-	    total_registers_saved++;  // debugging stats.
-	    return 1;
-	    } else {
-	      //fprintf(stderr,"didn't optimize because Z bit is used\n");
-	    }
-	}
+            total_registers_saved++;  // debugging stats.
+            return 1;
+            } else {
+              //fprintf(stderr,"didn't optimize because Z bit is used\n");
+            }
+        }
 /*
-	fprintf(stderr, " couldn't optimize\n");
-	if(reg2)
-	  fprintf(stderr, " %s is used in range\n",reg2->name);
-	else
-	  fprintf(stderr, " reg2 is NULL\n");
+        fprintf(stderr, " couldn't optimize\n");
+        if(reg2)
+          fprintf(stderr, " %s is used in range\n",reg2->name);
+        else
+          fprintf(stderr, " reg2 is NULL\n");
 */
       }
     }
@@ -567,73 +601,66 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
     if(pct1 && (PCI(pct1)->pcflow == PCI(pc1)->pcflow)) {
 
       if ( (PCI(pct1)->op == POC_MOVFW) &&
-	   (PCI(pc2)->op == POC_MOVFW)) {
+           (PCI(pc2)->op == POC_MOVFW)) {
 
-	reg1 = getRegFromInstruction(pct1);
-	if(reg1 && !regUsedinRange(pc1,pc2,reg1)) {
-	  /*
-	    fprintf(stderr, "   MOVF/MOVFW. \n");
-	    fprintf(stderr, "     ...optimizing\n");
-	  */
+        reg1 = getRegFromInstruction(pct1);
+        if(reg1 && !regUsedinRange(pc1,pc2,reg1)) {
+          DFPRINTF((stderr, "   optimising MOVF reg1,W MOVWF reg ... MOVF reg,W\n"));
+          /*
+            Change:
 
-	  /*
-	    Change:
+            movf   reg1,w
+            movwf  reg
 
-	    movf   reg1,w
-	    movwf  reg
+            stuff...
+            movf   reg,w
 
-	    stuff...
-	    movf   reg,w
+            To:
 
-	    To:
+            stuff...
 
-	    stuff...
+            movf   reg1,w
 
-	    movf   reg1,w
+            Or, if we're not deleting the register then the "To" is:
 
-	    Or, if we're not deleting the register then the "To" is:
+            stuff...
 
-	    stuff...
+            movf   reg1,w
+            movwf  reg
+          */
+          pct2 = newpCode(PCI(pc2)->op, PCI(pct1)->pcop);
+          pCodeInsertAfter(pc2, pct2);
+          PCI(pct2)->pcflow = PCFL(pcfl_used);
+          pct2->seq = pc2->seq;
 
-	    movf   reg1,w
-	    movwf  reg
+          if(can_free) {
+            Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
+          } else {
+            /* If we're not freeing the register then that means (probably)
+             * the register is needed somewhere else.*/
+            unlinkpCode(pc1);
+            pCodeInsertAfter(pct2, pc1);
 
+            Remove2pcodes(pcfl_used, pc2, NULL, reg, can_free);
+          }
 
-	  */
-	  pct2 = newpCode(PCI(pc2)->op, PCI(pct1)->pcop);
-	  pCodeInsertAfter(pc2, pct2);
-	  PCI(pct2)->pcflow = PCFL(pcfl_used);
-	  pct2->seq = pc2->seq;
+          Remove2pcodes(pcfl_used, pct1, NULL, reg1, 0);
+          total_registers_saved++;  // debugging stats.
 
-	  if(can_free) {
-	    Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
-	  } else {
-	    /* If we're not freeing the register then that means (probably)
-	     * the register is needed somewhere else.*/
-	    unlinkpCode(pc1);
-	    pCodeInsertAfter(pct2, pc1);
-
-	    Remove2pcodes(pcfl_used, pc2, NULL, reg, can_free);
-	  }
-
-	  Remove2pcodes(pcfl_used, pct1, NULL, reg1, 0);
-	  total_registers_saved++;  // debugging stats.
-
-	}
+        }
+/* Note this else if is same conditional as the if - DELETE ME 
       } else if ( (PCI(pct1)->op == POC_MOVWF) &&
-	   (PCI(pc2)->op == POC_MOVFW)) {
-	//fprintf(stderr,"movwf MOVWF/MOVFW\n");
-	if(optimize_level > 1 && can_free) {
-	  pct2 = newpCode(POC_MOVFW, PCI(pc1)->pcop);
-	  pCodeInsertAfter(pc2, pct2);
-	  Remove2pcodes(pcfl_used, pc1, pc2, reg, 1);
-	  total_registers_saved++;  // debugging stats.
-	}
+           (PCI(pc2)->op == POC_MOVFW)) {
+        DFPRINTF(stderr, "   optimising MOVF reg1,W MOVWF reg ... MOVF reg,W\n");
+        if(optimize_level > 1 && can_free) {
+          pct2 = newpCode(POC_MOVFW, PCI(pc1)->pcop);
+          pCodeInsertAfter(pc2, pct2);
+          Remove2pcodes(pcfl_used, pc1, pc2, reg, 1);
+          total_registers_saved++;  // debugging stats.
+        }
+*/
       }
-
-
     }
-
   }
 
   return (total_registers_saved != t);
@@ -659,8 +686,12 @@ void OptimizeRegUsage(set *fregs, int optimize_multi_uses, int optimize_level)
 
     reg = fregs->item;
     fregs = fregs->next;
+/*
+if (strcmp(reg->name,"_SubState")==0)
+     fprintf(stderr,"Reg: %s\n",reg->name);
+*/
 
-    if(reg->type == REG_SFR || reg->type == REG_STK) {
+    if(reg->type == REG_SFR || reg->type == REG_STK || reg->isPublic || reg->isExtern|| reg->isFixed) {
       //fprintf(stderr,"skipping SFR: %s\n",reg->name);
       continue;
     }
@@ -810,15 +841,15 @@ void pCodeRegOptimizeRegUsage(int level)
     OptimizeRegUsage(dynDirectRegs,0, (OPT_PASSES-passes));
 
     if(total_registers_saved != saved)
-      fprintf(stderr, " *** pass %d, Saved %d registers, total saved %d ***\n", 
-	      (1+OPT_PASSES-passes),total_registers_saved-saved,total_registers_saved);
+      DFPRINTF((stderr, " *** pass %d, Saved %d registers, total saved %d ***\n", 
+	      (1+OPT_PASSES-passes),total_registers_saved-saved,total_registers_saved));
       
     passes--;
 
   } while( passes && ((total_registers_saved != saved) || (passes==OPT_PASSES-1)) );
 
   if(total_registers_saved == t) 
-    fprintf(stderr, "No registers saved on this pass\n");
+    DFPRINTF((stderr, "No registers saved on this pass\n"));
 
 
 /*

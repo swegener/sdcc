@@ -392,7 +392,7 @@ decodeOp (unsigned int op)
     case SEND:
       return "SEND";
     }
-  sprintf (buffer, "unkown op %d %c", op, op & 0xff);
+  sprintf (buffer, "unknown op %d %c", op, op & 0xff);
   return buffer;
 }
 /*-----------------------------------------------------------------*/
@@ -446,24 +446,24 @@ static regs* newReg(short type, short pc_type, int rIdx, char *name, int size, i
   dReg->type = type;
   dReg->pc_type = pc_type;
   dReg->rIdx = rIdx;
-  if(name) 
+  if(name) {
     dReg->name = Safe_strdup(name);
-  else {
+  } else {
     sprintf(buffer,"r0x%02X", dReg->rIdx);
-    if(type == REG_STK)
-      *buffer = 's';
     dReg->name = Safe_strdup(buffer);
   }
   //fprintf(stderr,"newReg: %s, rIdx = 0x%02x\n",dReg->name,rIdx);
   dReg->isFree = 0;
   dReg->wasUsed = 1;
-  if(type == REG_SFR)
+  if (type == REG_SFR)
     dReg->isFixed = 1;
   else
     dReg->isFixed = 0;
 
   dReg->isMapped = 0;
   dReg->isEmitted = 0;
+  dReg->isPublic = 0;
+  dReg->isExtern = 0;
   dReg->address = 0;
   dReg->size = size;
   dReg->alias = alias;
@@ -496,6 +496,64 @@ regWithIdx (set *dRegs, int idx, int fixed)
 }
 
 /*-----------------------------------------------------------------*/
+/* regWithName - Search through a set of registers that matches name */
+/*-----------------------------------------------------------------*/
+static regs *
+regWithName (set *dRegs, const char *name)
+{
+  regs *dReg;
+
+  for (dReg = setFirstItem(dRegs) ; dReg ; 
+       dReg = setNextItem(dRegs)) {
+
+    if((strcmp(name,dReg->name)==0)) {
+      return dReg;
+    }
+  }
+
+  return NULL;
+}
+
+/*-----------------------------------------------------------------*/
+/* regWithName - Search for a registers that matches name          */
+/*-----------------------------------------------------------------*/
+regs *
+regFindWithName (const char *name)
+{
+  regs *dReg;
+
+    if( (dReg = regWithName ( dynDirectRegs, name)) != NULL ) {
+      debugLog ("Found a Direct Register!\n");
+      return dReg;
+    }
+    if( (dReg = regWithName ( dynDirectBitRegs, name)) != NULL) {
+      debugLog ("Found a Direct Bit Register!\n");
+      return dReg;
+    }
+
+	if (*name=='_') name++; // Step passed '_'
+
+    if( (dReg = regWithName ( dynAllocRegs, name)) != NULL) {
+      debugLog ("Found a Dynamic Register!\n");
+      return dReg;
+    }
+    if( (dReg = regWithName ( dynProcessorRegs, name)) != NULL) {
+      debugLog ("Found a Processor Register!\n");
+      return dReg;
+    }
+    if( (dReg = regWithName ( dynInternalRegs, name)) != NULL) {
+      debugLog ("Found an Internal Register!\n");
+      return dReg;
+    }
+    if( (dReg = regWithName ( dynStackRegs, name)) != NULL) {
+      debugLog ("Found an Stack Register!\n");
+      return dReg;
+    }
+
+  return NULL;
+}
+
+/*-----------------------------------------------------------------*/
 /* regFindFree - Search for a free register in a set of registers  */
 /*-----------------------------------------------------------------*/
 static regs *
@@ -523,8 +581,15 @@ void initStack(int base_address, int size)
   Gstack_base_addr = base_address;
   //fprintf(stderr,"initStack");
 
-  for(i = 0; i<size; i++)
-    addSet(&dynStackRegs,newReg(REG_STK, PO_GPR_TEMP,base_address++,NULL,1,0));
+  for(i = 0; i<size; i++) {
+	regs *r = newReg(REG_STK, PO_GPR_TEMP,base_address,NULL,1,0);
+    r->address = base_address; // Pseudo stack needs a fixed location that can be known by all modules
+    r->isFixed = 1;
+    r->name[0] = 's';
+	r->alias = 0x180; // Using shared memory for pseudo stack
+    addSet(&dynStackRegs,r);
+	base_address--;
+  }
 }
 
 /*-----------------------------------------------------------------*
@@ -607,6 +672,68 @@ int IS_CONFIG_ADDRESS(int address)
 }
 
 /*-----------------------------------------------------------------*/
+/* allocNewDirReg - allocates a new register of given type         */
+/*-----------------------------------------------------------------*/
+regs *
+allocNewDirReg (sym_link *symlnk,const char *name)
+{
+  regs *reg;
+  int address = 0;
+
+  /* if this is at an absolute address, then get the address. */
+  if (SPEC_ABSA (symlnk) ) {
+    address = SPEC_ADDR (symlnk);
+    //fprintf(stderr,"reg %s is at an absolute address: 0x%03x\n",name,address);
+  }
+
+  /* Register wasn't found in hash, so let's create
+   * a new one and put it in the hash table AND in the 
+   * dynDirectRegNames set */
+  if (IS_CONFIG_ADDRESS(address)) {
+    debugLog ("  -- %s is declared at address 0x2007\n",name);
+	reg = 0;
+  } else {
+    int idx;
+    if (address) {
+      if (IS_BITVAR (symlnk))
+        idx = address >> 3;
+      else
+       idx = address;
+    } else {
+      idx = rDirectIdx++;
+    }
+    reg = newReg(REG_GPR, PO_DIR, idx, (char*)name,getSize (symlnk),0 );
+    debugLog ("  -- added %s to hash, size = %d\n", (char*)name,reg->size);
+
+    if (SPEC_ABSA (symlnk) ) {
+      reg->type = REG_SFR;
+    }
+
+    if (IS_BITVAR (symlnk)) {
+      addSet(&dynDirectBitRegs, reg);
+      reg->isBitField = 1;
+    } else
+      addSet(&dynDirectRegs, reg);
+
+    if (!IS_STATIC (symlnk)) {
+      reg->isPublic = 1;
+    }
+    if (IS_EXTERN (symlnk)) {
+      reg->isExtern = 1;
+    }
+
+  }
+
+  if (address && reg) {
+    reg->isFixed = 1;
+    reg->address = address;
+    debugLog ("  -- and it is at a fixed address 0x%02x\n",reg->address);
+  }
+
+  return reg;
+}
+
+/*-----------------------------------------------------------------*/
 /* allocDirReg - allocates register of given type                  */
 /*-----------------------------------------------------------------*/
 regs *
@@ -670,6 +797,7 @@ allocDirReg (operand *op )
     reg = dirregWithName(name);
   }
 
+#if 0
   if(!reg) {
     int address = 0;
 
@@ -702,6 +830,14 @@ allocDirReg (operand *op )
       } else
 	addSet(&dynDirectRegs, reg);
 
+      if (!IS_STATIC (OP_SYM_ETYPE(op))) {
+        reg->isPublic = 1;
+      }
+      if (IS_EXTERN (OP_SYM_ETYPE(op))) {
+        reg->isExtern = 1;
+      }
+	  
+
     } else {
       debugLog ("  -- %s is declared at address 0x2007\n",name);
 
@@ -713,12 +849,24 @@ allocDirReg (operand *op )
     reg->address = SPEC_ADDR ( OP_SYM_ETYPE(op));
     debugLog ("  -- and it is at a fixed address 0x%02x\n",reg->address);
   }
+#endif
+
+  if(reg) {
+    if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
+      reg->isFixed = 1;
+      reg->address = SPEC_ADDR ( OP_SYM_ETYPE(op));
+      debugLog ("  -- and it is at a fixed address 0x%02x\n",reg->address);
+    }
+  } else {
+    allocNewDirReg (OP_SYM_ETYPE(op),name);
+  }
 
   return reg;
 }
 
+
 /*-----------------------------------------------------------------*/
-/* allocDirReg - allocates register of given type                  */
+/* allocRegByName - allocates register with given name             */
 /*-----------------------------------------------------------------*/
 regs *
 allocRegByName (char *name, int size)
@@ -734,17 +882,58 @@ allocRegByName (char *name, int size)
   /* First, search the hash table to see if there is a register with this name */
   reg = dirregWithName(name);
 
-  if(!reg) {
 
+  if(!reg) {
+    int found = 0;
+    symbol *sym;
     /* Register wasn't found in hash, so let's create
      * a new one and put it in the hash table AND in the 
      * dynDirectRegNames set */
     //fprintf (stderr,"%s symbol name %s\n", __FUNCTION__,name);
     reg = newReg(REG_GPR, PO_DIR, rDirectIdx++, name,size,0 );
+    for (sym = setFirstItem(sfr->syms); sym; sym = setNextItem(sfr->syms)) {
+		if (strcmp(reg->name+1,sym->name)==0) {
+			   unsigned a = SPEC_ADDR(sym->etype);
+				  reg->address = a;
+				  reg->isFixed = 1;
+				reg->type = REG_SFR;
+			  if (!IS_STATIC (sym->etype)) {
+				reg->isPublic = 1;
+			  }
+			  if (IS_EXTERN (sym->etype)) {
+				reg->isExtern = 1;
+			  }
+		      if (IS_BITVAR (sym->etype)) 
+				reg->isBitField = 1;
+			found = 1;
+			break;
+		}
+	}
+	if (!found) {
+		for (sym = setFirstItem(data->syms); sym; sym = setNextItem(data->syms)) {
+			if (strcmp(reg->name+1,sym->name)==0) {
+				unsigned a = SPEC_ADDR(sym->etype);
+				reg->address = a;
+				if (!IS_STATIC (sym->etype)) {
+					reg->isPublic = 1;
+				}
+				if (IS_EXTERN (sym->etype)) {
+					reg->isExtern = 1;
+			}
+				if (IS_BITVAR (sym->etype)) 
+					reg->isBitField = 1;
+				found = 1;
+			break;
+		}
+	}
+	}
 
     debugLog ("  -- added %s to hash, size = %d\n", name,reg->size);
 
     //hTabAddItem(&dynDirectRegNames, regname2key(name), reg);
+      if (reg->isBitField) {
+		addSet(&dynDirectBitRegs, reg);
+      } else
     addSet(&dynDirectRegs, reg);
   }
 
@@ -810,9 +999,6 @@ pic14_regWithIdx (int idx)
     return dReg;
 
   if( (dReg = typeRegWithIdx(idx,REG_SFR,0)) != NULL)
-    return dReg;
-
-  if( (dReg = typeRegWithIdx(idx,REG_STK,0)) != NULL)
     return dReg;
 
   return NULL;
@@ -2504,11 +2690,7 @@ regTypeNum ()
 		    getSize (sym->type));
 
 
-#if 0
     if(IS_PTR_CONST (sym->type)) {
-#else
-    if(IS_CODEPTR (sym->type)) {
-#endif
       debugLog ("  %d const pointer type requires %d registers, changing to 2\n",__LINE__,sym->nRegs);
       sym->nRegs = 2;
     }
@@ -3505,11 +3687,7 @@ packRegisters (eBBlock * ebp)
       sym_link *etype = getSpec (operandType (IC_LEFT (ic)));
 
       debugAopGet ("  left:", IC_LEFT (ic));
-#if 0
       if(IS_PTR_CONST(OP_SYMBOL(IC_LEFT(ic))->type))
-#else
-      if(IS_CODEPTR(OP_SYMBOL(IC_LEFT(ic))->type))
-#endif
 	debugLog ("    is a pointer\n");
 
       if(IS_OP_VOLATILE(IC_LEFT(ic)))
@@ -3848,10 +4026,6 @@ pic14_assignRegisters (eBBlock ** ebbs, int count)
 
   }
 
-  /* liveranges probably changed by register packing
-     so we compute them again */
-  recomputeLiveRanges (ebbs, count);
-  
   if (options.dump_pack)
     dumpEbbsToFileExt (DUMP_PACK, ebbs, count);
 

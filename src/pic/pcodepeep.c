@@ -1663,7 +1663,7 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 
       /* If the opcodes don't match then the line doesn't match */
       if(PCI(pcs)->op != PCI(pcd)->op)
-	return 0;
+        return 0;
 
 #ifdef PCODE_DEBUG
       DFPRINTF((stderr,"%s comparing\n",__FUNCTION__));
@@ -1672,39 +1672,78 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 #endif
 
       if(!pCodePeepMatchLabels(peepBlock, pcs, pcd))
-	return 0;
+        return 0;
 
       /* Compare the operands */
       if(PCI(pcd)->pcop) {
-	if (PCI(pcd)->pcop->type == PO_WILD) {
-	  index = PCOW(PCI(pcd)->pcop)->id;
-	  //DFPRINTF((stderr,"destination is wild\n"));
+        // Volatile types should not be deleted or modified, these include SFR, externs and publics
+        // They can be used as a matched, however if a match is found then the optimiser intends
+        // to change some aspect of a block of code, which is most likely a critcal one. As this
+        // method of optimisation does not allow a means to distiguishing what may change, it is
+        // best to just negate any match.
+        if (PCI(pcs)->pcop) {
+          struct regs *r;
+          pCodeOp *pcop = PCI(pcs)->pcop;
+          switch(pcop->type) {
+          case PO_W:
+          case PO_STATUS:
+          case PO_FSR:
+          case PO_INDF:
+          case PO_INTCON:
+          case PO_PCL:
+          case PO_PCLATH:
+          case PO_SFR_REGISTER:
+            return 0; // SFR - do not modify
+          case PO_DIR:
+          case PO_GPR_REGISTER:
+          case PO_GPR_BIT:
+          case PO_GPR_TEMP:
+          case PO_GPR_POINTER:
+            r = PCOR(pcop)->r;
+            if (r->isPublic||r->isExtern||r->isFixed) // Changes to these types of registers should not be changed as they may be used else where
+              return 0;
+          default:
+            break;
+          }
+        }
+        if (PCI(pcd)->pcop->type == PO_WILD) {
+           char *n;
+          index = PCOW(PCI(pcd)->pcop)->id;
+          //DFPRINTF((stderr,"destination is wild\n"));
 #ifdef DEBUG_PCODEPEEP
-	  if (index > peepBlock->nops) {
-	    DFPRINTF((stderr,"%s - variables exceeded\n",__FUNCTION__));
-	    exit(1);
-	  }
+          if (index > peepBlock->nops) {
+            DFPRINTF((stderr,"%s - variables exceeded\n",__FUNCTION__));
+            exit(1);
+          }
 #endif
+          n = PCI(pcs)->pcop->name;
+          if(peepBlock->target.vars[index]) {
+            if ((!n)||(strcmp(peepBlock->target.vars[index],n) != 0))
+              return 0; // variable is different
+          } else {
+            DFPRINTF((stderr,"first time for a variable: %d, %s\n",index,n));
+            peepBlock->target.vars[index] = n;
+          }
 
-	  PCOW(PCI(pcd)->pcop)->matched = PCI(pcs)->pcop;
-	  if(!peepBlock->target.wildpCodeOps[index]) {
-	    peepBlock->target.wildpCodeOps[index] = PCI(pcs)->pcop;
+          PCOW(PCI(pcd)->pcop)->matched = PCI(pcs)->pcop;
+          if(!peepBlock->target.wildpCodeOps[index]) {
+            peepBlock->target.wildpCodeOps[index] = PCI(pcs)->pcop;
 
-	    //fprintf(stderr, "first time for wild opcode #%d\n",index);
-	    return 1;
+            //fprintf(stderr, "first time for wild opcode #%d\n",index);
+            return 1;
 
-	  } else {
-	    /*
-	      pcs->print(stderr,pcs);
-	      pcd->print(stderr,pcd);
-	      fprintf(stderr, "comparing operands of these instructions, result %d\n",
-	      pCodeOpCompare(PCI(pcs)->pcop, peepBlock->target.wildpCodeOps[index])
-	      );
-	    */
+          } else {
+            /*
+            pcs->print(stderr,pcs);
+            pcd->print(stderr,pcd);
+            fprintf(stderr, "comparing operands of these instructions, result %d\n",
+            pCodeOpCompare(PCI(pcs)->pcop, peepBlock->target.wildpCodeOps[index])
+            );
+            */
 
-	    return pCodeOpCompare(PCI(pcs)->pcop, peepBlock->target.wildpCodeOps[index]);
-	  }
-
+            return pCodeOpCompare(PCI(pcs)->pcop, peepBlock->target.wildpCodeOps[index]);
+          }
+/*
 	  {
 	    char *n;
 
@@ -1728,30 +1767,30 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 	      return 1;
 	    }
 	  }
+*/
+        } else if (PCI(pcd)->pcop->type == PO_LITERAL) {
+          /*
+          pcs->print(stderr,pcs);
+          pcd->print(stderr,pcd);
 
-	} else if (PCI(pcd)->pcop->type == PO_LITERAL) {
-	  /*
-	    pcs->print(stderr,pcs);
-	    pcd->print(stderr,pcd);
+          fprintf(stderr, "comparing literal operands of these instructions, result %d\n",
+          pCodeOpCompare(PCI(pcs)->pcop, PCI(pcd)->pcop));
+          */
+          return pCodeOpCompare(PCI(pcs)->pcop, PCI(pcd)->pcop);
 
-	    fprintf(stderr, "comparing literal operands of these instructions, result %d\n",
-	    pCodeOpCompare(PCI(pcs)->pcop, PCI(pcd)->pcop));
-	  */
-	  return pCodeOpCompare(PCI(pcs)->pcop, PCI(pcd)->pcop);
+        } else {
+          /* FIXME - need an else to check the case when the destination 
+          * isn't a wild card */
+          /*
+          fprintf(stderr, "Destination is not wild: operand compare =%d\n",
+          pCodeOpCompare(PCI(pcs)->pcop, PCI(pcd)->pcop));
+          */
+          return  pCodeOpCompare(PCI(pcs)->pcop, PCI(pcd)->pcop);
 
-	} else {
-	  /* FIXME - need an else to check the case when the destination 
-	   * isn't a wild card */
-	  /*
-	  fprintf(stderr, "Destination is not wild: operand compare =%d\n",
-		  pCodeOpCompare(PCI(pcs)->pcop, PCI(pcd)->pcop));
-	  */
-	  return  pCodeOpCompare(PCI(pcs)->pcop, PCI(pcd)->pcop);
-
-	}
+        }
       } else
-	/* The pcd has no operand. Lines match if pcs has no operand either*/
-	return (PCI(pcs)->pcop == NULL);
+        /* The pcd has no operand. Lines match if pcs has no operand either*/
+        return (PCI(pcs)->pcop == NULL);
     }
   }
 
@@ -1791,23 +1830,23 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
     if(PCW(pcd)->operand) {
       PCOW(PCI(pcd)->pcop)->matched = PCI(pcs)->pcop;
       if(peepBlock->target.vars[index]) {
-	int i = (strcmp(peepBlock->target.vars[index],PCI(pcs)->pcop->name) == 0);
+        int i = (strcmp(peepBlock->target.vars[index],PCI(pcs)->pcop->name) == 0);
 #ifdef PCODE_DEBUG
 
-	if(i)
-	  DFPRINTF((stderr," (matched)\n"));
-	else {
-	  DFPRINTF((stderr," (no match: wild card operand mismatch\n"));
-	  DFPRINTF((stderr,"  peepblock= %s,  pcodeop= %s\n",
-		  peepBlock->target.vars[index],
-		  PCI(pcs)->pcop->name));
-	}
+        if(i)
+          DFPRINTF((stderr," (matched)\n"));
+        else {
+          DFPRINTF((stderr," (no match: wild card operand mismatch\n"));
+          DFPRINTF((stderr,"  peepblock= %s,  pcodeop= %s\n",
+          peepBlock->target.vars[index],
+          PCI(pcs)->pcop->name));
+        }
 #endif
-	return i;
+        return i;
       } else {
-	DFPRINTF((stderr," (matched %s\n",PCI(pcs)->pcop->name));
-	peepBlock->target.vars[index] = PCI(pcs)->pcop->name;
-	return 1;
+        DFPRINTF((stderr," (matched %s\n",PCI(pcs)->pcop->name));
+        peepBlock->target.vars[index] = PCI(pcs)->pcop->name;
+        return 1;
       }
     }
 
@@ -1858,195 +1897,6 @@ void pCodePeepClrVars(pCodePeep *pcp)
 
 }
 
-/*-----------------------------------------------------------------*/
-/*  pCodeInsertAfter - splice in the pCode chain starting with pc2 */
-/*                     into the pCode chain containing pc1         */
-/*-----------------------------------------------------------------*/
-void pCodeInsertAfter(pCode *pc1, pCode *pc2)
-{
-
-  if(!pc1 || !pc2)
-    return;
-
-  pc2->next = pc1->next;
-  if(pc1->next)
-    pc1->next->prev = pc2;
-
-  pc2->pb = pc1->pb;
-  pc2->prev = pc1;
-  pc1->next = pc2;
-
-}
-
-/*------------------------------------------------------------------*/
-/*  pCodeInsertBefore - splice in the pCode chain starting with pc2 */
-/*                      into the pCode chain containing pc1         */
-/*------------------------------------------------------------------*/
-void pCodeInsertBefore(pCode *pc1, pCode *pc2)
-{
-
-  if(!pc1 || !pc2)
-    return;
-
-  pc2->prev = pc1->prev;
-  if(pc1->prev)
-    pc1->prev->next = pc2;
-
-  pc2->pb = pc1->pb;
-  pc2->next = pc1;
-  pc1->prev = pc2;
-
-}
-
-/*-----------------------------------------------------------------*/
-/* pCodeOpCopy - copy a pcode operator                             */
-/*-----------------------------------------------------------------*/
-pCodeOp *pCodeOpCopy(pCodeOp *pcop)
-{
-  pCodeOp *pcopnew=NULL;
-
-  if(!pcop)
-    return NULL;
-
-  switch(pcop->type) { 
-  case PO_CRY:
-  case PO_BIT:
-    //DFPRINTF((stderr,"pCodeOpCopy bit\n"));
-    pcopnew = Safe_calloc(1,sizeof(pCodeOpRegBit) );
-    PCORB(pcopnew)->bit = PCORB(pcop)->bit;
-    PCORB(pcopnew)->inBitSpace = PCORB(pcop)->inBitSpace;
-
-    break;
-
-  case PO_WILD:
-    /* Here we expand the wild card into the appropriate type: */
-    /* By recursively calling pCodeOpCopy */
-    //DFPRINTF((stderr,"pCodeOpCopy wild\n"));
-    if(PCOW(pcop)->matched)
-      pcopnew = pCodeOpCopy(PCOW(pcop)->matched);
-    else {
-      // Probably a label
-      pcopnew = pCodeOpCopy(PCOW(pcop)->subtype);
-      pcopnew->name = Safe_strdup(PCOW(pcop)->pcwb->vars[PCOW(pcop)->id]);
-      //DFPRINTF((stderr,"copied a wild op named %s\n",pcopnew->name));
-    }
-
-    return pcopnew;
-    break;
-
-  case PO_LABEL:
-    //DFPRINTF((stderr,"pCodeOpCopy label\n"));
-    pcopnew = Safe_calloc(1,sizeof(pCodeOpLabel) );
-    PCOLAB(pcopnew)->key =  PCOLAB(pcop)->key;
-    break;
-
-  case PO_IMMEDIATE:
-    pcopnew = Safe_calloc(1,sizeof(pCodeOpImmd) );
-    PCOI(pcopnew)->index = PCOI(pcop)->index;
-    PCOI(pcopnew)->offset = PCOI(pcop)->offset;
-    PCOI(pcopnew)->_const = PCOI(pcop)->_const;
-    PCOI(pcopnew)->_function = PCOI(pcop)->_function;
-    break;
-
-  case PO_LITERAL:
-    //DFPRINTF((stderr,"pCodeOpCopy lit\n"));
-    pcopnew = Safe_calloc(1,sizeof(pCodeOpLit) );
-    PCOL(pcopnew)->lit = PCOL(pcop)->lit;
-    break;
-
-  case PO_GPR_BIT:
-
-    pcopnew = newpCodeOpBit(pcop->name, PCORB(pcop)->bit,PCORB(pcop)->inBitSpace);
-    PCOR(pcopnew)->r = PCOR(pcop)->r;
-    PCOR(pcopnew)->rIdx = PCOR(pcop)->rIdx;
-    DFPRINTF((stderr," pCodeOpCopy Bit -register index\n"));
-    return pcopnew;
-    break;
-
-  case PO_GPR_POINTER:
-  case PO_GPR_REGISTER:
-  case PO_GPR_TEMP:
-  case PO_FSR:
-  case PO_INDF:
-    //DFPRINTF((stderr,"pCodeOpCopy GPR register\n"));
-    pcopnew = Safe_calloc(1,sizeof(pCodeOpReg) );
-    PCOR(pcopnew)->r = PCOR(pcop)->r;
-    PCOR(pcopnew)->rIdx = PCOR(pcop)->rIdx;
-    PCOR(pcopnew)->instance = PCOR(pcop)->instance;
-    DFPRINTF((stderr," register index %d\n", PCOR(pcop)->r->rIdx));
-    break;
-
-  case PO_DIR:
-    //fprintf(stderr,"pCodeOpCopy PO_DIR\n");
-    pcopnew = Safe_calloc(1,sizeof(pCodeOpReg) );
-    PCOR(pcopnew)->r = PCOR(pcop)->r;
-    PCOR(pcopnew)->rIdx = PCOR(pcop)->rIdx;
-    PCOR(pcopnew)->instance = PCOR(pcop)->instance;
-    break;
-  case PO_STATUS:
-    DFPRINTF((stderr,"pCodeOpCopy PO_STATUS\n"));
-  case PO_SFR_REGISTER:
-  case PO_STR:
-  case PO_NONE:
-  case PO_W:
-  case PO_INTCON:
-  case PO_PCL:
-  case PO_PCLATH:
-
-    //DFPRINTF((stderr,"pCodeOpCopy register type %d\n", pcop->type));
-    pcopnew = Safe_calloc(1,sizeof(pCodeOp) );
-
-  }
-
-  pcopnew->type = pcop->type;
-  if(pcop->name)
-    pcopnew->name = Safe_strdup(pcop->name);
-  else
-    pcopnew->name = NULL;
-
-  return pcopnew;
-}
-
-
-/*-----------------------------------------------------------------*/
-/* pCodeCopy - copy a pcode                                        */
-/*-----------------------------------------------------------------*/
-static pCode *pCodeInstructionCopy(pCodeInstruction *pci,int invert)
-{
-  pCodeInstruction *new_pci;
-
-  if(invert)
-    new_pci = PCI(newpCode(pci->inverted_op,pci->pcop));
-  else
-    new_pci = PCI(newpCode(pci->op,pci->pcop));
-
-  new_pci->pc.pb = pci->pc.pb;
-  new_pci->from = pci->from;
-  new_pci->to   = pci->to;
-  new_pci->label = pci->label;
-  new_pci->pcflow = pci->pcflow;
-
-  return PCODE(new_pci);
-}
-
-/*-----------------------------------------------------------------*/
-/*-----------------------------------------------------------------*/
-void pCodeDeleteChain(pCode *f,pCode *t)
-{
-  pCode *pc;
-
-
-  while(f && f!=t) {
-    DFPRINTF((stderr,"delete pCode:\n"));
-    pc = f->next;
-    //f->print(stderr,f);
-    //f->delete(f);  this dumps core...
-
-    f = pc;
-
-  }
-
-}
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 int pCodePeepMatchRule(pCode *pc)

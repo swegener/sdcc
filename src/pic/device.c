@@ -563,9 +563,6 @@ void assignRelocatableRegisters(set *regset, int used)
 
     if((!reg->isFixed) && ( used || reg->wasUsed)) {
       /* If register have been reused then shall not print it a second time. */
-// Undefine REUSE_GPR in files pcode.c & device.c to prevent local function registers being reused.
-#define REUSE_GPR
-#ifdef REUSE_GPR
       set *s;
       int done = 0;
       for (s = regset; s; s = s->next) {
@@ -582,7 +579,6 @@ void assignRelocatableRegisters(set *regset, int used)
         }
       }
       if (!done)
-#endif // REUSE_GPR
         address = assignRegister(reg,address);
     }
   }

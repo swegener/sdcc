@@ -72,6 +72,8 @@ typedef struct regs
     unsigned isMapped:1;        /* The Register's address has been mapped to physical RAM */
     unsigned isBitField:1;      /* True if reg is type bit OR is holder for several bits */
     unsigned isEmitted:1;       /* True if the reg has been written to a .asm file */
+    unsigned isPublic:1;        /* True if the reg is not static and can be modified in another module (ie a another c or asm file) */
+    unsigned isExtern:1;        /* True if the reg is in another module */
     unsigned address;           /* reg's address if isFixed | isMapped is true */
     unsigned size;              /* 0 for byte, 1 for int, 4 for long */
     unsigned alias;             /* Alias mask if register appears in multiple banks */
@@ -104,9 +106,11 @@ void  pic14_deallocateAllRegs ();
 regs *pic14_findFreeReg(short type);
 regs *pic14_allocWithIdx (int idx);
 regs *typeRegWithIdx (int idx, int type, int fixed);
+regs *regFindWithName (const char *name);
 
 regs *allocDirReg (operand *op );
 regs *allocRegByName (char *name, int size );
+regs *allocNewDirReg (sym_link *symlnk,const char *name);
 
 /* Define register address that are constant across PIC family */
 #define IDX_INDF    0

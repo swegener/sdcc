@@ -16,6 +16,7 @@
 static char _defaultRules[] =
 {
 #include "peeph.rul"
+	""
 };
 
 /* list of key words used by msc51 */
@@ -260,8 +261,8 @@ _pic14_genAssemblerPreamble (FILE * of)
   }
 
   fprintf (of, "\tlist\tp=%s\n",&name[1]);
-  fprintf (of, "\tradix dec");
-  fprintf (of, "\ninclude \"%s.inc\"\n",name);
+  fprintf (of, "\tradix dec\n");
+  fprintf (of, "\tinclude \"%s.inc\"\n",name);
 }
 
 /* Generate interrupt vector table. */
@@ -473,7 +474,8 @@ PORT pic_port =
   hasExtBitOp,			/* hasExtBitOp */
   oclsExpense,			/* oclsExpense */
   FALSE,
-  TRUE,				/* little endian */
+//  TRUE,				/* little endian */
+  FALSE,				/* little endian - PIC code enumlates big endian */
   0,				/* leave lt */
   0,				/* leave gt */
   1,				/* transform <= to ! > */

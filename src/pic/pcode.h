@@ -219,7 +219,11 @@ typedef enum
   POC_TRIS,
   POC_XORLW,
   POC_XORWF,
-  POC_XORFW
+  POC_XORFW,
+  POC_BANKSEL,
+  POC_PAGESEL,
+
+  MAX_PIC14MNEMONICS
 } PIC_OPCODE;
 
 
@@ -357,6 +361,12 @@ typedef struct pCodeOpRegPtr
 
 } pCodeOpRegPtr;
 
+typedef struct pCodeOpStr /* Only used here for the name of fn being called or jumped to */
+{
+  pCodeOp  pcop;
+  unsigned isPublic: 1; /* True if not static ie extern */
+} pCodeOpStr;
+
 typedef struct pCodeOpWild
 {
   pCodeOp pcop;
@@ -389,6 +399,7 @@ typedef struct pCode
   struct pCode *prev;  // The pCode objects are linked together
   struct pCode *next;  // in doubly linked lists.
 
+  unsigned id;         // unique ID number for all pCodes to assist in debugging
   int seq;             // sequence number
 
   struct pBlock *pb;   // The pBlock that contains this pCode.
@@ -572,7 +583,8 @@ typedef struct pCodeFunction
   pBranch *to;         // pCodes that execute after
   pBranch *label;      // pCode instructions that have labels
 
-  int  ncalled;    /* Number of times function is called */
+  int  ncalled;        /* Number of times function is called */
+  unsigned isPublic:1; /* True if the fn is not static and can be called from another module (ie a another c or asm file) */
 
 } pCodeFunction;
 
@@ -758,31 +770,38 @@ typedef struct peepCommand {
 #define PCOLAB(x) ((pCodeOpLabel *)(x))
 #define PCOR(x)   ((pCodeOpReg *)(x))
 #define PCORB(x)  ((pCodeOpRegBit *)(x))
+#define PCOS(x)   ((pCodeOpStr *)(x))
 #define PCOW(x)   ((pCodeOpWild *)(x))
 
 #define PBR(x)    ((pBranch *)(x))
 
 #define PCWB(x)   ((pCodeWildBlock *)(x))
 
+#define isPCOLAB(x)     ((PCOP(x)->type) == PO_LABEL)
+#define isPCOS(x)       ((PCOP(x)->type) == PO_STR)
+
 
 /*
   macros for checking pCode types
 */
 #define isPCI(x)        ((PCODE(x)->type == PC_OPCODE))
-#define isPCI_BRANCH(x) ((PCODE(x)->type == PC_OPCODE) &&  PCI(x)->isBranch)
-#define isPCI_SKIP(x)   ((PCODE(x)->type == PC_OPCODE) &&  PCI(x)->isSkip)
-#define isPCI_LIT(x)    ((PCODE(x)->type == PC_OPCODE) &&  PCI(x)->isLit)
-#define isPCI_BITSKIP(x)((PCODE(x)->type == PC_OPCODE) &&  PCI(x)->isSkip && PCI(x)->isBitInst)
 #define isPCFL(x)       ((PCODE(x)->type == PC_FLOW))
 #define isPCF(x)        ((PCODE(x)->type == PC_FUNCTION))
 #define isPCL(x)        ((PCODE(x)->type == PC_LABEL))
 #define isPCW(x)        ((PCODE(x)->type == PC_WILD))
 #define isPCCS(x)       ((PCODE(x)->type == PC_CSOURCE))
 
-#define isCALL(x)       ((isPCI(x)) && (PCI(x)->op == POC_CALL))
-#define isSTATUS_REG(r) ((r)->pc_type == PO_STATUS)
+/*
+  macros for checking pCodeInstruction types
+*/
+#define isCALL(x)       (isPCI(x) && (PCI(x)->op == POC_CALL))
+#define isPCI_BRANCH(x) (isPCI(x) &&  PCI(x)->isBranch)
+#define isPCI_SKIP(x)   (isPCI(x) &&  PCI(x)->isSkip)
+#define isPCI_LIT(x)    (isPCI(x) &&  PCI(x)->isLit)
+#define isPCI_BITSKIP(x)(isPCI_SKIP(x) && PCI(x)->isBitInst)
 
-#define isPCOLAB(x)     ((PCOP(x)->type) == PO_LABEL)
+
+#define isSTATUS_REG(r) ((r)->pc_type == PO_STATUS)
 
 /*-----------------------------------------------------------------*
  * pCode functions.
@@ -791,9 +810,13 @@ typedef struct peepCommand {
 pCode *newpCode (PIC_OPCODE op, pCodeOp *pcop); // Create a new pCode given an operand
 pCode *newpCodeCharP(char *cP);              // Create a new pCode given a char *
 pCode *newpCodeInlineP(char *cP);            // Create a new pCode given a char *
-pCode *newpCodeFunction(char *g, char *f);   // Create a new function
+pCode *newpCodeFunction(char *g, char *f,int); // Create a new function
 pCode *newpCodeLabel(char *name,int key);    // Create a new label given a key
 pCode *newpCodeCSource(int ln, char *f, char *l); // Create a new symbol line 
+pCode *findNextInstruction(pCode *pci);
+pCode *findNextpCode(pCode *pc, PC_TYPE pct);
+pCode *pCodeInstructionCopy(pCodeInstruction *pci,int invert);
+
 pBlock *newpCodeChain(memmap *cm,char c, pCode *pc); // Create a new pBlock
 void printpBlock(FILE *of, pBlock *pb);      // Write a pBlock to a file
 void printpCode(FILE *of, pCode *pc);        // Write a pCode to a file
@@ -806,6 +829,9 @@ int OptimizepCode(char dbName);
 void printCallTree(FILE *of);
 void pCodePeepInit(void);
 void pBlockConvert2ISR(pBlock *pb);
+void pCodeInsertAfter(pCode *pc1, pCode *pc2);
+void pCodeInsertBefore(pCode *pc1, pCode *pc2);
+void pCodeDeleteChain(pCode *f,pCode *t);
 
 pCodeOp *newpCodeOpLabel(char *name, int key);
 pCodeOp *newpCodeOpImmd(char *name, int offset, int index, int code_space,int is_func);
@@ -814,9 +840,8 @@ pCodeOp *newpCodeOpBit(char *name, int bit,int inBitSpace);
 pCodeOp *newpCodeOpRegFromStr(char *name);
 pCodeOp *newpCodeOp(char *name, PIC_OPTYPE p);
 pCodeOp *pCodeOpCopy(pCodeOp *pcop);
+pCodeOp *popCopyReg(pCodeOpReg *pc);
 
-pCode * findNextInstruction(pCode *pci);
-pCode * findNextpCode(pCode *pc, PC_TYPE pct);
 int isPCinFlow(pCode *pc, pCode *pcflow);
 struct regs * getRegFromInstruction(pCode *pc);
 
@@ -832,7 +857,6 @@ extern pCodeOpReg pc_indf;
 extern pCodeOpReg pc_fsr;
 extern pCodeOpReg pc_pcl;
 extern pCodeOpReg pc_pclath;
-extern pCodeOpReg pc_kzero;
 extern pCodeOpReg pc_wsave;     /* wsave, ssave and psave are used to save W, the Status and PCLATH*/
 extern pCodeOpReg pc_ssave;     /* registers during an interrupt */
 extern pCodeOpReg pc_psave;     /* registers during an interrupt */

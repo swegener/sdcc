@@ -98,7 +98,7 @@
 #define NCPS	80		/* Chars. per symbol (JLH: change from 8) */
 #define	HUGE	1000		/* A huge number */
 #define NERR	3		/* Errors per line */
-#define	NINPUT	PATH_MAX	/* Input buffer size (BH: change from 128) */
+#define	NINPUT	1024		/* Input buffer size (icodes need space) */
 #define NCODE	128		/* Listing code buffer size */
 #define NTITL	64		/* Title buffer size */
 #define	NSBTL	64		/* SubTitle buffer size */

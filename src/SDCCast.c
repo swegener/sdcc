@@ -2150,8 +2150,10 @@ decorateType (ast * tree)
 	DCL_TYPE (p) = IPOINTER;
       else if (SPEC_SCLS (tree->left->etype) == S_EEPROM)
 	DCL_TYPE (p) = EEPPOINTER;
+      else if (SPEC_OCLS(tree->left->etype))
+ 	  DCL_TYPE (p) = PTR_TYPE(SPEC_OCLS(tree->left->etype));
       else
-	DCL_TYPE (p) = POINTER;
+	  DCL_TYPE (p) = POINTER;
 
       if (IS_AST_SYM_VALUE (tree->left))
 	{

@@ -377,7 +377,7 @@ aopForRemat (symbol * sym)
 {
   iCode *ic = sym->rematiCode;
   asmop *aop = newAsmop (AOP_IMMD);
-  int ptr_type=0 ;
+  int ptr_type ;
   int val = 0;
 
   for (;;)
@@ -2735,6 +2735,8 @@ genPlusIncr (iCode * ic)
   unsigned int icount;
   unsigned int size = getDataSize (IC_RESULT (ic));
 
+  D(emitcode (";", "genPlusIncr"));
+
   /* will try to generate an increment */
   /* if the right side is not a literal
      we cannot */
@@ -2745,8 +2747,6 @@ genPlusIncr (iCode * ic)
      is greater than 4 then it is not worth it */
   if ((icount = (unsigned int) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit)) > 4)
     return FALSE;
-
-  D(emitcode (";", "genPlusIncr"));
 
   /* if increment 16 bits in register */
   if (sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) &&
@@ -2883,8 +2883,6 @@ outBitAcc (operand * result)
 static void
 genPlusBits (iCode * ic)
 {
-  D(emitcode (";", "genPlusBits"));
-
   if (AOP_TYPE (IC_RESULT (ic)) == AOP_CRY)
     {
       symbol *lbl = newiTempLabel (NULL);
@@ -3089,6 +3087,8 @@ genMinusDec (iCode * ic)
   unsigned int icount;
   unsigned int size = getDataSize (IC_RESULT (ic));
 
+  D(emitcode (";", "genMinusDec"));
+
   /* will try to generate an increment */
   /* if the right side is not a literal
      we cannot */
@@ -3099,8 +3099,6 @@ genMinusDec (iCode * ic)
      is greater than 4 then it is not worth it */
   if ((icount = (unsigned int) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit)) > 4)
     return FALSE;
-
-  D(emitcode (";", "genMinusDec"));
 
   /* if decrement 16 bits in register */
   if (sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) &&
@@ -3229,9 +3227,6 @@ static void
 genMinusBits (iCode * ic)
 {
   symbol *lbl = newiTempLabel (NULL);
-
-  D(emitcode (";", "genMinusBits"));
-
   if (AOP_TYPE (IC_RESULT (ic)) == AOP_CRY)
     {
       emitcode ("mov", "c,%s", AOP (IC_LEFT (ic))->aopu.aop_dir);
@@ -3260,8 +3255,6 @@ genMinus (iCode * ic)
 {
   int size, offset = 0;
   unsigned long lit = 0L;
-
-  D(emitcode (";", "genMinus"));
 
   aopOp (IC_LEFT (ic), ic, FALSE);
   aopOp (IC_RIGHT (ic), ic, FALSE);
@@ -3335,8 +3328,6 @@ genMultbits (operand * left,
 	     operand * right,
 	     operand * result)
 {
-  D(emitcode (";", "genMultbits"));
-
   emitcode ("mov", "c,%s", AOP (left)->aopu.aop_dir);
   emitcode ("anl", "c,%s", AOP (right)->aopu.aop_dir);
   outBitC (result);
@@ -3354,8 +3345,6 @@ genMultOneByte (operand * left,
   sym_link *opetype = operandType (result);
   symbol *lbl;
   int size=AOP_SIZE(result);
-
-  D(emitcode (";", "genMultOneByte"));
 
   if (size<1 || size>2) {
     // this should never happen
@@ -3459,8 +3448,6 @@ genMult (iCode * ic)
   operand *right = IC_RIGHT (ic);
   operand *result = IC_RESULT (ic);
 
-  D(emitcode (";", "genMult"));
-
   /* assign the amsops */
   aopOp (left, ic, FALSE);
   aopOp (right, ic, FALSE);
@@ -3509,8 +3496,6 @@ genDivbits (operand * left,
 
   char *l;
 
-  D(emitcode (";", "genDivbits"));
-
   /* the result must be bit */
   emitcode ("mov", "b,%s", aopGet (AOP (right), 0, FALSE, FALSE));
   l = aopGet (AOP (left), 0, FALSE, FALSE);
@@ -3534,8 +3519,6 @@ genDivOneByte (operand * left,
   char *l;
   symbol *lbl;
   int size, offset;
-
-  D(emitcode (";", "genDivOneByte"));
 
   size = AOP_SIZE (result) - 1;
   offset = 1;
@@ -3620,8 +3603,6 @@ genDiv (iCode * ic)
   operand *right = IC_RIGHT (ic);
   operand *result = IC_RESULT (ic);
 
-  D(emitcode (";", "genDiv"));
-
   /* assign the amsops */
   aopOp (left, ic, FALSE);
   aopOp (right, ic, FALSE);
@@ -3663,8 +3644,6 @@ genModbits (operand * left,
 
   char *l;
 
-  D(emitcode (";", "genModbits"));
-
   /* the result must be bit */
   emitcode ("mov", "b,%s", aopGet (AOP (right), 0, FALSE, FALSE));
   l = aopGet (AOP (left), 0, FALSE, FALSE);
@@ -3688,8 +3667,6 @@ genModOneByte (operand * left,
   sym_link *opetype = operandType (result);
   char *l;
   symbol *lbl;
-
-  D(emitcode (";", "genModOneByte"));
 
   /* signed or unsigned */
   if (SPEC_USIGN (opetype))
@@ -3764,8 +3741,6 @@ genMod (iCode * ic)
   operand *right = IC_RIGHT (ic);
   operand *result = IC_RESULT (ic);
 
-  D(emitcode (";", "genMod"));
-
   /* assign the amsops */
   aopOp (left, ic, FALSE);
   aopOp (right, ic, FALSE);
@@ -3807,8 +3782,6 @@ genIfxJump (iCode * ic, char *jval)
   symbol *tlbl = newiTempLabel (NULL);
   char *inst;
 
-  D(emitcode (";", "genIfxJump"));
-
   /* if true label then we jump if condition
      supplied is true */
   if (IC_TRUE (ic))
@@ -3844,8 +3817,6 @@ genCmp (operand * left, operand * right,
 {
   int size, offset = 0;
   unsigned long lit = 0L;
-
-  D(emitcode (";", "genCmp"));
 
   /* if left & right are bit variables */
   if (AOP_TYPE (left) == AOP_CRY &&
@@ -3955,8 +3926,6 @@ genCmpGt (iCode * ic, iCode * ifx)
   sym_link *letype, *retype;
   int sign;
 
-  D(emitcode (";", "genCmpGt"));
-
   left = IC_LEFT (ic);
   right = IC_RIGHT (ic);
   result = IC_RESULT (ic);
@@ -3983,8 +3952,6 @@ genCmpLt (iCode * ic, iCode * ifx)
   operand *left, *right, *result;
   sym_link *letype, *retype;
   int sign;
-
-  D(emitcode (";", "genCmpLt"));
 
   left = IC_LEFT (ic);
   right = IC_RIGHT (ic);
@@ -4100,8 +4067,6 @@ static void
 genCmpEq (iCode * ic, iCode * ifx)
 {
   operand *left, *right, *result;
-
-  D(emitcode (";", "genCmpEq"));
 
   aopOp ((left = IC_LEFT (ic)), ic, FALSE);
   aopOp ((right = IC_RIGHT (ic)), ic, FALSE);
@@ -4324,8 +4289,6 @@ genAndOp (iCode * ic)
   operand *left, *right, *result;
   symbol *tlbl;
 
-  D(emitcode (";", "genAndOp"));
-
   /* note here that && operations that are in an
      if statement are taken away by backPatchLabels
      only those used in arthmetic operations remain */
@@ -4365,8 +4328,6 @@ genOrOp (iCode * ic)
 {
   operand *left, *right, *result;
   symbol *tlbl;
-
-  D(emitcode (";", "genOrOp"));
 
   /* note here that || operations that are in an
      if statement are taken away by backPatchLabels
@@ -4476,8 +4437,6 @@ genAnd (iCode * ic, iCode * ifx)
   unsigned long lit = 0L;
   int bytelit = 0;
   char buffer[10];
-
-  D(emitcode (";", "genAnd"));
 
   aopOp ((left = IC_LEFT (ic)), ic, FALSE);
   aopOp ((right = IC_RIGHT (ic)), ic, FALSE);
@@ -4780,8 +4739,6 @@ genOr (iCode * ic, iCode * ifx)
   operand *left, *right, *result;
   int size, offset = 0;
   unsigned long lit = 0L;
-
-  D(emitcode (";", "genOr"));
 
   aopOp ((left = IC_LEFT (ic)), ic, FALSE);
   aopOp ((right = IC_RIGHT (ic)), ic, FALSE);
@@ -7398,7 +7355,10 @@ genGenPointerGet (operand * left,
       if (AOP_TYPE (left) == AOP_IMMD)
 	{
 	  emitcode ("mov", "dptr,%s", aopGet (AOP (left), 0, TRUE, FALSE));
-	  emitcode ("mov", "b,#%d", pointerCode (retype));
+	  if (AOP(left)->aopu.aop_immd.from_cast_remat) 
+		  emitcode ("mov", "b,%s",aopGet(AOP (left), AOP_SIZE(left)-1, FALSE, FALSE));
+	  else
+		  emitcode ("mov", "b,#%d", pointerCode (retype));
 	}
       else
 	{			/* we need to get it byte by byte */
@@ -7430,6 +7390,7 @@ genGenPointerGet (operand * left,
   if (pi && AOP_TYPE (left) != AOP_IMMD && AOP_TYPE (left) != AOP_STR) {
     aopPut ( AOP (left), "dpl", 0);
     aopPut ( AOP (left), "dph", 1);
+    aopPut ( AOP (left), "b", 2);
     pi->generated = 1;
   }
   freeAsmop (left, NULL, ic, TRUE);
@@ -7464,6 +7425,13 @@ genPointerGet (iCode * ic, iCode *pi)
       p_type = PTR_TYPE (SPEC_OCLS (etype));
     }
 
+  /* special case when cast remat */
+  if (p_type == GPOINTER && OP_SYMBOL(left)->remat &&
+      IS_CAST_ICODE(OP_SYMBOL(left)->rematiCode)) {
+	  left = IC_RIGHT(OP_SYMBOL(left)->rematiCode);
+	  type =   type = operandType (left);
+	  p_type = DCL_TYPE (type);
+  }
   /* now that we have the pointer type we assign
      the pointer values */
   switch (p_type)
@@ -7995,7 +7963,10 @@ genGenPointerSet (operand * right,
       if (AOP_TYPE (result) == AOP_IMMD)
 	{
 	  emitcode ("mov", "dptr,%s", aopGet (AOP (result), 0, TRUE, FALSE));
-	  emitcode ("mov", "b,%s + 1", aopGet (AOP (result), 0, TRUE, FALSE));
+	  if (AOP(result)->aopu.aop_immd.from_cast_remat) 
+		  emitcode ("mov", "b,%s",aopGet(AOP (result), AOP_SIZE(result)-1, FALSE, FALSE));
+	  else 
+		  emitcode ("mov", "b,%s + 1", aopGet (AOP (result), 0, TRUE, FALSE));
 	}
       else
 	{			/* we need to get it byte by byte */
@@ -8064,6 +8035,13 @@ genPointerSet (iCode * ic, iCode *pi)
       p_type = PTR_TYPE (SPEC_OCLS (etype));
     }
 
+  /* special case when cast remat */
+  if (p_type == GPOINTER && OP_SYMBOL(result)->remat &&
+      IS_CAST_ICODE(OP_SYMBOL(result)->rematiCode)) {
+	  result = IC_RIGHT(OP_SYMBOL(result)->rematiCode);
+	  type =   type = operandType (result);
+	  p_type = DCL_TYPE (type);
+  }
   /* now that we have the pointer type we assign
      the pointer values */
   switch (p_type)

@@ -5374,6 +5374,39 @@ ifxForOp (operand * op, iCode * ic)
   return NULL;
 }
 /*-----------------------------------------------------------------*/
+/* hasInc - operand is incremented before any other use            */
+/*-----------------------------------------------------------------*/
+static iCode *
+hasInc (operand *op, iCode *ic)
+{
+  sym_link *type = operandType(op);
+  sym_link *retype = getSpec (type);
+  iCode *lic = ic->next;
+  int isize ;
+  
+  /* this could from a cast, e.g.: "(char xdata *) 0x7654;" */
+  if (!IS_SYMOP(op)) return NULL;
+
+  if (IS_BITVAR(retype)||!IS_PTR(type)) return NULL;
+  isize = getSize(type->next);
+  while (lic) {
+    /* if operand of the form op = op + <sizeof *op> */
+    if (lic->op == '+' && isOperandEqual(IC_LEFT(lic),op) &&
+	isOperandEqual(IC_RESULT(lic),op) && 
+	isOperandLiteral(IC_RIGHT(lic)) &&
+	operandLitValue(IC_RIGHT(lic)) == isize) {
+      return lic;
+    }
+    /* if the operand used or deffed */
+    if (bitVectBitValue(OP_USES(op),lic->key) || (unsigned) lic->defKey == op->key) {
+      return NULL;
+    }
+    lic = lic->next;
+  }
+  return NULL;
+}
+
+/*-----------------------------------------------------------------*/
 /* genAndOp - for && operation                                     */
 /*-----------------------------------------------------------------*/
 static void
@@ -8537,7 +8570,8 @@ genDataPointerGet (operand * left,
 static void
 genNearPointerGet (operand * left,
 		   operand * result,
-		   iCode * ic)
+		   iCode * ic,
+		   iCode *pi)
 {
   asmop *aop = NULL;
   regs *preg = NULL;
@@ -8606,7 +8640,7 @@ genNearPointerGet (operand * left,
 	      aopPut (AOP (result), buffer, offset);
 	    }
 	  offset++;
-	  if (size)
+	  if (size || pi)
 	    emitcode ("inc", "%s", rname);
 	}
     }
@@ -8615,6 +8649,9 @@ genNearPointerGet (operand * left,
   if (aop)
     {
       /* we had to allocate for this iCode */
+      if (pi) { /* post increment present */
+	aopPut(AOP ( left ),rname,0);
+      }
       freeAsmop (NULL, aop, ic, TRUE);
     }
   else
@@ -8627,7 +8664,8 @@ genNearPointerGet (operand * left,
       if (AOP_SIZE (result) > 1 &&
 	  !OP_SYMBOL (left)->remat &&
 	  (OP_SYMBOL (left)->liveTo > ic->seq ||
-	   ic->depth))
+	   ic->depth) &&
+	  !pi)
 	{
 	  int size = AOP_SIZE (result) - 1;
 	  while (size--)
@@ -8637,7 +8675,7 @@ genNearPointerGet (operand * left,
 
   /* done */
   freeAsmop (result, NULL, ic, TRUE);
-
+  if (pi) pi->generated = 1;
 }
 
 /*-----------------------------------------------------------------*/
@@ -8646,7 +8684,8 @@ genNearPointerGet (operand * left,
 static void
 genPagedPointerGet (operand * left,
 		    operand * result,
-		    iCode * ic)
+		    iCode * ic,
+		    iCode * pi)
 {
   asmop *aop = NULL;
   regs *preg = NULL;
@@ -8693,7 +8732,7 @@ genPagedPointerGet (operand * left,
 
 	  offset++;
 
-	  if (size)
+	  if (size || pi)
 	    emitcode ("inc", "%s", rname);
 	}
     }
@@ -8702,6 +8741,7 @@ genPagedPointerGet (operand * left,
   if (aop)
     {
       /* we had to allocate for this iCode */
+      if (pi) aopPut ( AOP (left), rname, 0);
       freeAsmop (NULL, aop, ic, TRUE);
     }
   else
@@ -8714,7 +8754,8 @@ genPagedPointerGet (operand * left,
       if (AOP_SIZE (result) > 1 &&
 	  !OP_SYMBOL (left)->remat &&
 	  (OP_SYMBOL (left)->liveTo > ic->seq ||
-	   ic->depth))
+	   ic->depth) &&
+	  !pi)
 	{
 	  int size = AOP_SIZE (result) - 1;
 	  while (size--)
@@ -8724,8 +8765,7 @@ genPagedPointerGet (operand * left,
 
   /* done */
   freeAsmop (result, NULL, ic, TRUE);
-
-
+  if (pi) pi->generated = 1;
 }
 
 /*-----------------------------------------------------------------*/
@@ -8733,7 +8773,7 @@ genPagedPointerGet (operand * left,
 /*-----------------------------------------------------------------*/
 static void
 genFarPointerGet (operand * left,
-		  operand * result, iCode * ic)
+		  operand * result, iCode * ic, iCode *pi)
 {
   int size, offset;
   sym_link *retype = getSpec (operandType (result));
@@ -8798,13 +8838,20 @@ genFarPointerGet (operand * left,
 	  _flushLazyDPS ();
 
 	  emitcode ("movx", "a,@dptr");
-	  if (size)
+	  if (size || pi)
 	    emitcode ("inc", "dptr");
 
 	  aopPut (AOP (result), "a", offset++);
 	}
       _endLazyDPSEvaluation ();
     }
+  if (pi && AOP_TYPE (left) != AOP_IMMD && AOP_TYPE (left) != AOP_STR) {
+    aopPut ( AOP (left), "dpl", 0);
+    aopPut ( AOP (left), "dph", 1);
+    if (options.model == MODEL_FLAT24)
+	    aopPut ( AOP (left), "dpx", 2);
+    pi->generated = 1;
+  }
 
   freeAsmop (result, NULL, ic, TRUE);
 }
@@ -8814,7 +8861,7 @@ genFarPointerGet (operand * left,
 /*-----------------------------------------------------------------*/
 static void
 emitcodePointerGet (operand * left,
-		    operand * result, iCode * ic)
+		    operand * result, iCode * ic, iCode *pi)
 {
   int size, offset;
   sym_link *retype = getSpec (operandType (result));
@@ -8856,7 +8903,6 @@ emitcodePointerGet (operand * left,
 	}
     }
   /* so dptr know contains the address */
-  freeAsmop (left, NULL, ic, TRUE);
   aopOp (result, ic, FALSE, TRUE);
 
   /* if bit then unpack */
@@ -8875,13 +8921,21 @@ emitcodePointerGet (operand * left,
 
 	  emitcode ("clr", "a");
 	  emitcode ("movc", "a,@a+dptr");
-	  if (size)
+	  if (size || pi)
 	    emitcode ("inc", "dptr");
 	  aopPut (AOP (result), "a", offset++);
 	}
       _endLazyDPSEvaluation ();
     }
+  if (pi && AOP_TYPE (left) != AOP_IMMD && AOP_TYPE (left) != AOP_STR) {
+    aopPut ( AOP (left), "dpl", 0);
+    aopPut ( AOP (left), "dph", 1);
+    if (options.model == MODEL_FLAT24)
+	    aopPut ( AOP (left), "dpx", 2);
+    pi->generated = 1;
+  }
 
+  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
 }
 
@@ -8890,7 +8944,7 @@ emitcodePointerGet (operand * left,
 /*-----------------------------------------------------------------*/
 static void
 genGenPointerGet (operand * left,
-		  operand * result, iCode * ic)
+		  operand * result, iCode * ic, iCode * pi)
 {
   int size, offset;
   sym_link *retype = getSpec (operandType (result));
@@ -8949,7 +9003,6 @@ genGenPointerGet (operand * left,
 	}
     }
   /* so dptr know contains the address */
-  freeAsmop (left, NULL, ic, TRUE);
   aopOp (result, ic, FALSE, TRUE);
 
   /* if bit then unpack */
@@ -8964,11 +9017,21 @@ genGenPointerGet (operand * left,
 	{
 	  emitcode ("lcall", "__gptrget");
 	  aopPut (AOP (result), "a", offset++);
-	  if (size)
+	  if (size || pi)
 	    emitcode ("inc", "dptr");
 	}
     }
 
+  if (pi && AOP_TYPE (left) != AOP_IMMD && AOP_TYPE (left) != AOP_STR) {
+    aopPut ( AOP (left), "dpl", 0);
+    aopPut ( AOP (left), "dph", 1);
+    if (options.model == MODEL_FLAT24) {
+	    aopPut ( AOP (left), "dpx", 2);
+	    aopPut ( AOP (left), "b", 3);	
+    } else  aopPut ( AOP (left), "b", 2);	
+    pi->generated = 1;
+  }
+  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
 }
 
@@ -8976,7 +9039,7 @@ genGenPointerGet (operand * left,
 /* genPointerGet - generate code for pointer get                   */
 /*-----------------------------------------------------------------*/
 static void
-genPointerGet (iCode * ic)
+genPointerGet (iCode * ic, iCode *pi)
 {
   operand *left, *result;
   sym_link *type, *etype;
@@ -9014,23 +9077,23 @@ genPointerGet (iCode * ic)
 
     case POINTER:
     case IPOINTER:
-      genNearPointerGet (left, result, ic);
+      genNearPointerGet (left, result, ic, pi);
       break;
 
     case PPOINTER:
-      genPagedPointerGet (left, result, ic);
+      genPagedPointerGet (left, result, ic, pi);
       break;
 
     case FPOINTER:
-      genFarPointerGet (left, result, ic);
+      genFarPointerGet (left, result, ic, pi);
       break;
 
     case CPOINTER:
-      emitcodePointerGet (left, result, ic);
+      emitcodePointerGet (left, result, ic, pi);
       break;
 
     case GPOINTER:
-      genGenPointerGet (left, result, ic);
+      genGenPointerGet (left, result, ic, pi);
       break;
     }
 
@@ -9577,7 +9640,7 @@ genGenPointerSet (operand * right,
 /* genPointerSet - stores the value into a pointer location        */
 /*-----------------------------------------------------------------*/
 static void
-genPointerSet (iCode * ic)
+genPointerSet (iCode * ic, iCode *pi)
 {
   operand *right, *result;
   sym_link *type, *etype;
@@ -10691,12 +10754,12 @@ gen390Code (iCode * lic)
 	  break;
 
 	case GET_VALUE_AT_ADDRESS:
-	  genPointerGet (ic);
+	  genPointerGet (ic,hasInc(IC_LEFT(ic),ic));
 	  break;
 
 	case '=':
 	  if (POINTER_SET (ic))
-	    genPointerSet (ic);
+	    genPointerSet (ic,hasInc(IC_RESULT(ic),ic));
 	  else
 	    genAssign (ic);
 	  break;

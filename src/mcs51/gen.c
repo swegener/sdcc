@@ -8123,7 +8123,30 @@ genDjnz (iCode * ic, iCode * ifx)
 
   aopOp (IC_RESULT (ic), ic, FALSE);
 
-  if (IS_AOP_PREG (IC_RESULT (ic)))
+  if (AOP_NEEDSACC(IC_RESULT(ic)))
+  {
+      /* If the result is accessed indirectly via
+       * the accumulator, we must explicitly write
+       * it back after the decrement.
+       */
+      char *rByte = aopGet(AOP(IC_RESULT(ic)), 0, FALSE, FALSE);
+      
+      if (strcmp(rByte, "a"))
+      {
+           /* Something is hopelessly wrong */
+           fprintf(stderr, "*** warning: internal error at %s:%d\n",
+           	   __FILE__, __LINE__);
+           /* We can just give up; the generated code will be inefficient,
+            * but what the hey.
+            */
+           freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
+           return 0;
+      }
+      emitcode ("dec", "%s", rByte);
+      aopPut(AOP(IC_RESULT(ic)), rByte, 0);
+      emitcode ("jnz", "%05d$", lbl->key + 100);
+  }
+  else if (IS_AOP_PREG (IC_RESULT (ic)))
     {
       emitcode ("dec", "%s",
 		aopGet (AOP (IC_RESULT (ic)), 0, FALSE, FALSE));

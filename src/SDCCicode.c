@@ -37,7 +37,6 @@ char *filename;
 int lineno;
 int block;
 int scopeLevel;
-int lvaluereq;
 
 symbol *returnLabel;		/* function return label */
 symbol *entryLabel;		/* function entry  label */
@@ -45,10 +44,10 @@ symbol *entryLabel;		/* function entry  label */
 /* forward definition of some functions */
 operand *geniCodeDivision (operand *, operand *);
 operand *geniCodeAssign (operand *, operand *, int);
-operand *geniCodeArray (operand *, operand *);
+operand *geniCodeArray (operand *, operand *,int);
 operand *geniCodeArray2Ptr (operand *);
 operand *geniCodeRValue (operand *, bool);
-operand *geniCodeDerefPtr (operand *);
+operand *geniCodeDerefPtr (operand *,int);
 
 #define PRINTFUNC(x) void x (FILE *of, iCode *ic, char *s)
 /* forward definition of ic print functions */
@@ -1287,7 +1286,7 @@ operandFromLit (float i)
 /* operandFromAst - creates an operand from an ast                 */
 /*-----------------------------------------------------------------*/
 operand *
-operandFromAst (ast * tree)
+operandFromAst (ast * tree,int lvl)
 {
 
   if (!tree)
@@ -1297,7 +1296,7 @@ operandFromAst (ast * tree)
   switch (tree->type)
     {
     case EX_OP:
-      return ast2iCode (tree);
+      return ast2iCode (tree,lvl+1);
       break;
 
     case EX_VALUE:
@@ -1785,7 +1784,7 @@ geniCodeSubtract (operand * left, operand * right)
 /* geniCodeAdd - generates iCode for addition                      */
 /*-----------------------------------------------------------------*/
 operand *
-geniCodeAdd (operand * left, operand * right)
+geniCodeAdd (operand * left, operand * right,int lvl)
 {
   iCode *ic;
   sym_link *resType;
@@ -1795,7 +1794,7 @@ geniCodeAdd (operand * left, operand * right)
 
   /* if left is an array then array access */
   if (IS_ARRAY (ltype))
-    return geniCodeArray (left, right);
+    return geniCodeArray (left, right,lvl);
 
   /* if the right side is LITERAL zero */
   /* return the left side              */
@@ -1907,7 +1906,7 @@ geniCodeArray2Ptr (operand * op)
 /* geniCodeArray - array access                                    */
 /*-----------------------------------------------------------------*/
 operand *
-geniCodeArray (operand * left, operand * right)
+geniCodeArray (operand * left, operand * right,int lvl)
 {
   iCode *ic;
   sym_link *ltype = operandType (left);
@@ -1918,7 +1917,7 @@ geniCodeArray (operand * left, operand * right)
 	{
 	  left = geniCodeRValue (left, FALSE);
 	}
-      return geniCodeDerefPtr (geniCodeAdd (left, right));
+      return geniCodeDerefPtr (geniCodeAdd (left, right,lvl),lvl);
     }
 
   right = geniCodeMultiply (right,
@@ -2256,7 +2255,7 @@ setOClass (sym_link * ptr, sym_link * spec)
 /* geniCodeDerefPtr - dereference pointer with '*'                 */
 /*-----------------------------------------------------------------*/
 operand *
-geniCodeDerefPtr (operand * op)
+geniCodeDerefPtr (operand * op,int lvl)
 {
   sym_link *rtype, *retype;
   sym_link *optype = operandType (op);
@@ -2274,7 +2273,7 @@ geniCodeDerefPtr (operand * op)
     }
 
   /* now get rid of the pointer part */
-  if (lvaluereq && IS_ITEMP (op))
+  if (isLvaluereq(lvl) && IS_ITEMP (op))
     {
       retype = getSpec (rtype = copyLinkChain (optype));
     }
@@ -2300,7 +2299,7 @@ geniCodeDerefPtr (operand * op)
 		IS_CHAR (rtype) ||
 		IS_FLOAT (rtype));
 
-  if (!lvaluereq)
+  if (!isLvaluereq(lvl))
     op = geniCodeRValue (op, TRUE);
 
   setOperandType (op, rtype);
@@ -2418,19 +2417,19 @@ geniCodeUnary (operand * op, int oper)
 /* geniCodeConditional - geniCode for '?' ':' operation            */
 /*-----------------------------------------------------------------*/
 operand *
-geniCodeConditional (ast * tree)
+geniCodeConditional (ast * tree,int lvl)
 {
   iCode *ic;
   symbol *falseLabel = newiTempLabel (NULL);
   symbol *exitLabel = newiTempLabel (NULL);
-  operand *cond = ast2iCode (tree->left);
+  operand *cond = ast2iCode (tree->left,lvl+1);
   operand *true, *false, *result;
 
   ic = newiCodeCondition (geniCodeRValue (cond, FALSE),
 			  NULL, falseLabel);
   ADDTOCHAIN (ic);
 
-  true = ast2iCode (tree->right->left);
+  true = ast2iCode (tree->right->left,lvl+1);
 
   /* move the value to a new Operand */
   result = newiTempOperand (operandType (true), 0);
@@ -2442,7 +2441,7 @@ geniCodeConditional (ast * tree)
   /* now for the right side */
   geniCodeLabel (falseLabel);
 
-  false = ast2iCode (tree->right->right);
+  false = ast2iCode (tree->right->right,lvl+1);
   geniCodeAssign (result, geniCodeRValue (false, FALSE), 0);
 
   /* create the exit label */
@@ -2529,15 +2528,15 @@ geniCodeAssign (operand * left, operand * right, int nosupdate)
 /* geniCodeSEParms - generate code for side effecting fcalls       */
 /*-----------------------------------------------------------------*/
 static void 
-geniCodeSEParms (ast * parms)
+geniCodeSEParms (ast * parms,int lvl)
 {
   if (!parms)
     return;
 
   if (parms->type == EX_OP && parms->opval.op == PARAM)
     {
-      geniCodeSEParms (parms->left);
-      geniCodeSEParms (parms->right);
+      geniCodeSEParms (parms->left,lvl);
+      geniCodeSEParms (parms->right,lvl);
       return;
     }
 
@@ -2552,7 +2551,7 @@ geniCodeSEParms (ast * parms)
     parms->right->left->lvalue = 1;
 
   parms->opval.oprnd =
-    geniCodeRValue (ast2iCode (parms), FALSE);
+    geniCodeRValue (ast2iCode (parms,lvl+1), FALSE);
 
   parms->type = EX_OPERAND;
 }
@@ -2561,7 +2560,7 @@ geniCodeSEParms (ast * parms)
 /* geniCodeParms - generates parameters                            */
 /*-----------------------------------------------------------------*/
 static void 
-geniCodeParms (ast * parms, int *stack, sym_link * fetype, symbol * func)
+geniCodeParms (ast * parms, int *stack, sym_link * fetype, symbol * func,int lvl)
 {
   iCode *ic;
   operand *pval;
@@ -2572,8 +2571,8 @@ geniCodeParms (ast * parms, int *stack, sym_link * fetype, symbol * func)
   /* if this is a param node then do the left & right */
   if (parms->type == EX_OP && parms->opval.op == PARAM)
     {
-      geniCodeParms (parms->left, stack, fetype, func);
-      geniCodeParms (parms->right, stack, fetype, func);
+      geniCodeParms (parms->left, stack, fetype, func,lvl);
+      geniCodeParms (parms->right, stack, fetype, func,lvl);
       return;
     }
 
@@ -2593,7 +2592,7 @@ geniCodeParms (ast * parms, int *stack, sym_link * fetype, symbol * func)
 	  IS_ADDRESS_OF_OP (parms->right))
 	parms->right->left->lvalue = 1;
 
-      pval = geniCodeRValue (ast2iCode (parms), FALSE);
+      pval = geniCodeRValue (ast2iCode (parms,lvl+1), FALSE);
     }
 
   /* if register parm then make it a send */
@@ -2631,7 +2630,7 @@ geniCodeParms (ast * parms, int *stack, sym_link * fetype, symbol * func)
 /* geniCodeCall - generates temp code for calling                  */
 /*-----------------------------------------------------------------*/
 operand *
-geniCodeCall (operand * left, ast * parms)
+geniCodeCall (operand * left, ast * parms,int lvl)
 {
   iCode *ic;
   operand *result;
@@ -2641,10 +2640,10 @@ geniCodeCall (operand * left, ast * parms)
   /* take care of parameters with side-effecting
      function calls in them, this is required to take care
      of overlaying function parameters */
-  geniCodeSEParms (parms);
+  geniCodeSEParms (parms,lvl);
 
   /* first the parameters */
-  geniCodeParms (parms, &stack, getSpec (operandType (left)), OP_SYMBOL (left));
+  geniCodeParms (parms, &stack, getSpec (operandType (left)), OP_SYMBOL (left),lvl);
 
   /* now call : if symbol then pcall */
   if (IS_OP_POINTER (left) || IS_ITEMP(left))
@@ -2719,7 +2718,7 @@ geniCodeReceive (value * args)
 /* geniCodeFunctionBody - create the function body                 */
 /*-----------------------------------------------------------------*/
 void 
-geniCodeFunctionBody (ast * tree)
+geniCodeFunctionBody (ast * tree,int lvl)
 {
   iCode *ic;
   operand *func;
@@ -2732,7 +2731,7 @@ geniCodeFunctionBody (ast * tree)
   iTempLblNum = 0;
   operandKey = 0;
   iCodeKey = 0;
-  func = ast2iCode (tree->left);
+  func = ast2iCode (tree->left,lvl+1);
   fetype = getSpec (operandType (func));
 
   savelineno = lineno;
@@ -2755,7 +2754,7 @@ geniCodeFunctionBody (ast * tree)
   geniCodeReceive (tree->values.args);
 
   /* generate code for the body */
-  ast2iCode (tree->right);
+  ast2iCode (tree->right,lvl+1);
 
   /* create a label for return */
   geniCodeLabel (returnLabel);
@@ -2786,10 +2785,10 @@ geniCodeReturn (operand * op)
 /* geniCodeIfx - generates code for extended if statement          */
 /*-----------------------------------------------------------------*/
 void 
-geniCodeIfx (ast * tree)
+geniCodeIfx (ast * tree,int lvl)
 {
   iCode *ic;
-  operand *condition = ast2iCode (tree->left);
+  operand *condition = ast2iCode (tree->left,lvl+1);
   sym_link *cetype;
 
   /* if condition is null then exit */
@@ -2838,7 +2837,7 @@ geniCodeIfx (ast * tree)
     }
 
 exit:
-  ast2iCode (tree->right);
+  ast2iCode (tree->right,lvl+1);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2936,10 +2935,10 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
 /* geniCodeSwitch - changes a switch to a if statement             */
 /*-----------------------------------------------------------------*/
 void 
-geniCodeSwitch (ast * tree)
+geniCodeSwitch (ast * tree,int lvl)
 {
   iCode *ic;
-  operand *cond = geniCodeRValue (ast2iCode (tree->left), FALSE);
+  operand *cond = geniCodeRValue (ast2iCode (tree->left,lvl+1), FALSE);
   value *caseVals = tree->values.switchVals.swVals;
   symbol *trueLabel, *falseLabel;
 
@@ -2977,7 +2976,7 @@ geniCodeSwitch (ast * tree)
   geniCodeGoto (falseLabel);
 
 jumpTable:
-  ast2iCode (tree->right);
+  ast2iCode (tree->right,lvl+1);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2994,17 +2993,77 @@ geniCodeInline (ast * tree)
 }
 
 /*-----------------------------------------------------------------*/
+/* Stuff used in ast2iCode to modify geniCodeDerefPtr in some      */
+/* particular case. Ie : assigning or dereferencing array or ptr   */
+/*-----------------------------------------------------------------*/
+set * lvaluereqSet = NULL;
+typedef struct lvalItem
+  {
+    int req;
+    int lvl;
+  }
+lvalItem;
+
+/*-----------------------------------------------------------------*/
+/* addLvaluereq - add a flag for lvalreq for current ast level     */
+/*-----------------------------------------------------------------*/
+void addLvaluereq(int lvl)
+{
+  lvalItem * lpItem = (lvalItem *)Safe_calloc (1, sizeof (lvalItem));
+  lpItem->req=1;
+  lpItem->lvl=lvl;
+  addSetHead(&lvaluereqSet,lpItem);
+
+}
+/*-----------------------------------------------------------------*/
+/* delLvaluereq - del a flag for lvalreq for current ast level     */
+/*-----------------------------------------------------------------*/
+void delLvaluereq()
+{
+  lvalItem * lpItem;
+  lpItem = getSet(&lvaluereqSet);
+  if(lpItem) free(lpItem);
+}
+/*-----------------------------------------------------------------*/
+/* clearLvaluereq - clear lvalreq flag			           */
+/*-----------------------------------------------------------------*/
+void clearLvaluereq()
+{
+  lvalItem * lpItem;
+  lpItem = peekSet(lvaluereqSet);
+  if(lpItem) lpItem->req = 0;
+}
+/*-----------------------------------------------------------------*/
+/* getLvaluereq - get the last lvalreq level		           */
+/*-----------------------------------------------------------------*/
+int getLvaluereqLvl()
+{
+  lvalItem * lpItem;
+  lpItem = peekSet(lvaluereqSet);
+  if(lpItem) return lpItem->lvl;
+  return 0;
+}
+/*-----------------------------------------------------------------*/
+/* isLvaluereq - is lvalreq valid for this level ?	           */
+/*-----------------------------------------------------------------*/
+int isLvaluereq(int lvl)
+{
+  lvalItem * lpItem;
+  lpItem = peekSet(lvaluereqSet);
+  if(lpItem) return ((lpItem->req)&&(lvl <= (lpItem->lvl+1)));
+  return 0;
+}
+
+/*-----------------------------------------------------------------*/
 /* ast2iCode - creates an icodeList from an ast                    */
 /*-----------------------------------------------------------------*/
 operand *
-ast2iCode (ast * tree)
+ast2iCode (ast * tree,int lvl)
 {
   operand *left = NULL;
   operand *right = NULL;
-
   if (!tree)
     return NULL;
-
   /* set the global variables for filename & line number */
   if (tree->filename)
     filename = tree->filename;
@@ -3023,11 +3082,11 @@ ast2iCode (ast * tree)
 
   /* if we find a nullop */
   if (tree->type == EX_OP &&
-      (tree->opval.op == NULLOP ||
-       tree->opval.op == BLOCK))
+     (tree->opval.op == NULLOP ||
+     tree->opval.op == BLOCK))
     {
-      ast2iCode (tree->left);
-      ast2iCode (tree->right);
+      ast2iCode (tree->left,lvl+1);
+      ast2iCode (tree->right,lvl+1);
       return NULL;
     }
 
@@ -3043,44 +3102,37 @@ ast2iCode (ast * tree)
       tree->opval.op != INLINEASM)
     {
 
-      if (IS_ASSIGN_OP (tree->opval.op) ||
-	  IS_DEREF_OP (tree) ||
-	  (tree->opval.op == '&' && !tree->right) ||
-	  tree->opval.op == PTR_OP)
-	{
-	  lvaluereq++;
-	  if ((IS_ARRAY_OP (tree->left) && IS_ARRAY_OP (tree->left->left)) ||
-	      (IS_DEREF_OP (tree) && IS_ARRAY_OP (tree->left)))
-	    {
-	      int olvr = lvaluereq;
-	      lvaluereq = 0;
-	      left = operandFromAst (tree->left);
-	      lvaluereq = olvr - 1;
-	    }
-	  else
-	    {
-	      left = operandFromAst (tree->left);
-	      lvaluereq--;
-	    }
-	  if (IS_DEREF_OP (tree) && IS_DEREF_OP (tree->left))
-	    left = geniCodeRValue (left, TRUE);
-	}
-      else
-	{
-	  left = operandFromAst (tree->left);
-	}
-      if (tree->opval.op == INC_OP ||
-	  tree->opval.op == DEC_OP)
-	{
-	  lvaluereq++;
-	  right = operandFromAst (tree->right);
-	  lvaluereq--;
-	}
-      else
-	{
-	  right = operandFromAst (tree->right);
-	}
-    }
+        if (IS_ASSIGN_OP (tree->opval.op) ||
+           IS_DEREF_OP (tree) ||
+           (tree->opval.op == '&' && !tree->right) ||
+           tree->opval.op == PTR_OP)
+          {
+            addLvaluereq(lvl);
+            if ((IS_ARRAY_OP (tree->left) && IS_ARRAY_OP (tree->left->left)) ||
+               (IS_DEREF_OP (tree) && IS_ARRAY_OP (tree->left)))
+              clearLvaluereq();
+
+            left = operandFromAst (tree->left,lvl);
+            delLvaluereq();
+            if (IS_DEREF_OP (tree) && IS_DEREF_OP (tree->left))
+	      left = geniCodeRValue (left, TRUE);
+          }
+        else
+          {
+	    left = operandFromAst (tree->left,lvl);
+          }
+        if (tree->opval.op == INC_OP ||
+	    tree->opval.op == DEC_OP)
+          {
+	    addLvaluereq(lvl);
+	    right = operandFromAst (tree->right,lvl);
+	    delLvaluereq();
+          }
+        else
+          {
+	    right = operandFromAst (tree->right,lvl);
+          }
+      }
 
   /* now depending on the type of operand */
   /* this will be a biggy                 */
@@ -3094,7 +3146,7 @@ ast2iCode (ast * tree)
 	right = geniCodeRValue (right, TRUE);
       }
 
-      return geniCodeArray (left, right);
+      return geniCodeArray (left, right,lvl);
 
     case '.':			/* structure dereference */
       if (IS_PTR (operandType (left)))
@@ -3156,7 +3208,7 @@ ast2iCode (ast * tree)
 	return geniCodeMultiply (geniCodeRValue (left, FALSE),
 				 geniCodeRValue (right, FALSE),IS_INT(tree->ftype));
       else
-	return geniCodeDerefPtr (geniCodeRValue (left, FALSE));
+	return geniCodeDerefPtr (geniCodeRValue (left, FALSE),lvl);
 
     case '-':
       if (right)
@@ -3168,7 +3220,7 @@ ast2iCode (ast * tree)
     case '+':
       if (right)
 	return geniCodeAdd (geniCodeRValue (left, FALSE),
-			    geniCodeRValue (right, FALSE));
+			    geniCodeRValue (right, FALSE),lvl);
       else
 	return geniCodeRValue (left, FALSE);	/* unary '+' has no meaning */
 
@@ -3207,7 +3259,7 @@ ast2iCode (ast * tree)
 			    geniCodeRValue (right, FALSE),
 			    tree->opval.op);
     case '?':
-      return geniCodeConditional (tree);
+      return geniCodeConditional (tree,lvl);
 
     case SIZEOF:
       return operandFromLit (getSize (tree->right->ftype));
@@ -3258,7 +3310,7 @@ ast2iCode (ast * tree)
 	return geniCodeAssign (left,
 		     geniCodeAdd (geniCodeRValue (operandFromOperand (left),
 						  FALSE),
-				  right), 0);
+				  right,lvl), 0);
       }
     case SUB_ASSIGN:
       {
@@ -3319,18 +3371,18 @@ ast2iCode (ast * tree)
       return geniCodeRValue (right, FALSE);
 
     case CALL:
-      return geniCodeCall (ast2iCode (tree->left),
-			   tree->right);
+      return geniCodeCall (ast2iCode (tree->left,lvl+1),
+			   tree->right,lvl);
     case LABEL:
-      geniCodeLabel (ast2iCode (tree->left)->operand.symOperand);
-      return ast2iCode (tree->right);
+      geniCodeLabel (ast2iCode (tree->left,lvl+1)->operand.symOperand);
+      return ast2iCode (tree->right,lvl+1);
 
     case GOTO:
-      geniCodeGoto (ast2iCode (tree->left)->operand.symOperand);
-      return ast2iCode (tree->right);
+      geniCodeGoto (ast2iCode (tree->left,lvl+1)->operand.symOperand);
+      return ast2iCode (tree->right,lvl+1);
 
     case FUNCTION:
-      geniCodeFunctionBody (tree);
+      geniCodeFunctionBody (tree,lvl);
       return NULL;
 
     case RETURN:
@@ -3338,11 +3390,11 @@ ast2iCode (ast * tree)
       return NULL;
 
     case IFX:
-      geniCodeIfx (tree);
+      geniCodeIfx (tree,lvl);
       return NULL;
 
     case SWITCH:
-      geniCodeSwitch (tree);
+      geniCodeSwitch (tree,lvl);
       return NULL;
 
     case INLINEASM:
@@ -3382,6 +3434,6 @@ iCodeFromAst (ast * tree)
 {
   returnLabel = newiTempLabel ("_return");
   entryLabel = newiTempLabel ("_entry");
-  ast2iCode (tree);
+  ast2iCode (tree,0);
   return reverseiCChain ();
 }

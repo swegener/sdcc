@@ -271,7 +271,7 @@ bool isOperandOnStack (operand *);
 int isOperandVolatile (operand *, bool);
 int isOperandGlobal (operand *);
 void printiCChain (iCode *, FILE *);
-operand *ast2iCode (ast *);
+operand *ast2iCode (ast *,int);
 operand *geniCodeCast (sym_link *, operand *, bool);
 operand *geniCodePtrPtrSubtract (operand *, operand *);
 void initiCode ();

@@ -293,7 +293,7 @@ if test "$CC" = "i586-mingw32msvc-gcc"; then
   ac_cv_sizeof_long_long=4
 fi
 
-if test "$cross_compiling" == "no"
+if test "$cross_compiling" = "no"
 then
     AC_C_BIGENDIAN
 else

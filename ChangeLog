@@ -1,6 +1,11 @@
+2005-01-08 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/device.c (pic16_dump_usection) changed naming scheme for
+	  udata sections to fix bug #1097823
+
 2005-01-05 Raphael Neider <rneider AT web.de>
 
-        * src/pic16/gen.c (genGenericShift) added handling of differently
+	* src/pic16/gen.c (genGenericShift) added handling of differently
 	  sized left operand and result
 
 2005-01-04 Raphael Neider <rneider AT web.de>

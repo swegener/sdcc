@@ -564,6 +564,7 @@ int symCompare(const void *a, const void *b)
 void pic16_dump_usection(FILE *of, set *section, int fix)
 {
   static int abs_usection_no=0;
+  static unsigned int usection_no=0;
   regs *r, *rprev;
   unsigned int init_addr, i;
   regs **rlist;
@@ -595,7 +596,8 @@ void pic16_dump_usection(FILE *of, set *section, int fix)
 		}
 #else
 		for(r = setFirstItem(section); r; r = setNextItem(section)) {
-			fprintf(of, "\nudata_%s_%s\tudata\n", moduleName, r->name);
+			//fprintf(of, "\nudata_%s_%s\tudata\n", moduleName, r->name);
+			fprintf(of, "\nudata_%s_%u\tudata\n", moduleName, usection_no++);
 			fprintf(of, "%s\tres\t%d\n", r->name, r->size);
 			statistics.udsize += r->size;
 		}

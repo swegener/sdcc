@@ -1435,15 +1435,15 @@ valCastLiteral (sym_link * dtype, double fval)
 	{
 	  if (SPEC_USIGN (val->etype))
 	    if (SPEC_NOUN (val->etype)==V_CHAR) {
-	      SPEC_CVAL (val->etype).v_uint = (unsigned char) fval;
+	      SPEC_CVAL (val->etype).v_uint = (unsigned char)fval;
 	    } else {
-	      SPEC_CVAL (val->etype).v_uint = (unsigned int) fval;
+	      SPEC_CVAL (val->etype).v_uint = (unsigned short)fval;
 	    }
 	  else
 	    if (SPEC_NOUN (val->etype)==V_CHAR) {
-	      SPEC_CVAL (val->etype).v_int = (char) fval;
+	      SPEC_CVAL (val->etype).v_int = (char)fval;
 	    } else {
-	      SPEC_CVAL (val->etype).v_int = (int) fval;
+	      SPEC_CVAL (val->etype).v_int = (short)fval;
 	    }
 	}
     }

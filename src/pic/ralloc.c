@@ -2734,11 +2734,13 @@ regTypeNum ()
 
 				if (ptrPseudoSymSafe (sym, ic)) {
 
+					symbol *psym;
+					
 					debugLog ("  %d - \n", __LINE__);
 				
 					/* create a psuedo symbol & force a spil */
 					//X symbol *psym = newSymbol (rematStr (OP_SYMBOL (IC_LEFT (ic))), 1);
-					symbol *psym = rematStr (OP_SYMBOL (IC_LEFT (ic)));
+					psym = rematStr (OP_SYMBOL (IC_LEFT (ic)));
 					psym->type = sym->type;
 					psym->etype = sym->etype;
 					psym->psbase = ptrBaseRematSym (OP_SYMBOL (IC_LEFT (ic)));

@@ -1,5 +1,11 @@
 2004-04-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
+	* src/SDCCsymt.h: a missing part of my last change
+	* src/pic/ralloc.c (regTypeNum),
+	* src/pic16/ralloc.c (regTypeNum): fixed statement/declaration order
+
+2004-04-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
 	* src/SDCCicode.h,
 	* src/SDCCicode.c (aggrToPtrDclType),
 	* src/SDCCptropt.h,
@@ -10,7 +16,7 @@
 	* src/hc08/ralloc.c (regTypeNum),
 	* src/ds390/ralloc.c (regTypeNum),
 	* src/mcs51/ralloc.c (regTypeNum): check for dependancy hazards before
-	creating pseudo symbols (fixed bugs #777768 and #933966)
+	creating pseudo symbols (fixed bugs #777768, #930484, and #933966)
 
 2004-04-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

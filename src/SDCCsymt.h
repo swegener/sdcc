@@ -298,6 +298,7 @@ typedef struct symbol
     struct iCode *rematiCode;	/* rematerialse with which instruction */
     struct operand *reqv;	/* register equivalent of a local variable */
     struct symbol *prereqv;	/* symbol before register equiv. substituion */
+    struct symbol *psbase;	/* if pseudo symbol, the symbol it is based on */
     union
       {
 	struct symbol *spillLoc;	/* register spil location */

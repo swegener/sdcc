@@ -819,7 +819,7 @@ void aopOp (operand *op, iCode *ic, bool result)
             aop->size = getSize(sym->type);
             for ( i = 0 ; i < 2 ; i++ )
                 aop->aopu.aop_str[i] = accUse[i];
-	    DEBUGpic14_emitcode(";","%d",__LINE__);
+	    DEBUGpic14_emitcode(";","%d size=%d",__LINE__,aop->size);
             return;  
 	}
 
@@ -1312,9 +1312,10 @@ pCodeOp *popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 	if(PCOR(pcop)->r == NULL) {
 	  //fprintf(stderr,"%d - couldn't find %s in allocated registers, size =%d\n",__LINE__,aop->aopu.aop_dir,aop->size);
 	  PCOR(pcop)->r = allocRegByName (aop->aopu.aop_dir,aop->size);
-	} 
-
-      DEBUGpic14_emitcode(";","%d  %s   offset=%d",__LINE__,pcop->name,offset);
+	  DEBUGpic14_emitcode(";","%d  %s   offset=%d - had to alloc by reg name",__LINE__,pcop->name,offset);
+	} else {
+	  DEBUGpic14_emitcode(";","%d  %s   offset=%d",__LINE__,pcop->name,offset);
+	}
 	PCOR(pcop)->instance = offset;
 
 	return pcop;
@@ -1326,6 +1327,9 @@ pCodeOp *popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 	pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
 	PCOR(pcop)->rIdx = rIdx;
 	PCOR(pcop)->r = pic14_regWithIdx(rIdx);
+	PCOR(pcop)->r->wasUsed=1;
+	PCOR(pcop)->r->isFree=0;
+
 	PCOR(pcop)->instance = offset;
 	pcop->type = PCOR(pcop)->r->pc_type;
 	//rs = aop->aopu.aop_reg[offset]->name;
@@ -1357,7 +1361,8 @@ pCodeOp *popGet (asmop *aop, int offset) //, bool bit16, bool dname)
       */
 
     case AOP_PCODE:
-      DEBUGpic14_emitcode(";","popGet AOP_PCODE%d",__LINE__);
+      DEBUGpic14_emitcode(";","popGet AOP_PCODE %d %s",__LINE__, 
+			  ((aop->aopu.pcop->name)? (aop->aopu.pcop->name) : "no name"));
       pcop = pCodeOpCopy(aop->aopu.pcop);
       PCOI(pcop)->offset = offset;
       return pcop;

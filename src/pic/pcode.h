@@ -445,7 +445,34 @@ typedef struct pCodeFlow
   int inCond;   /* Input conditions - stuff assumed defined at entry */
   int outCond;  /* Output conditions - stuff modified by flow block */
 
+  int firstBank; /* The first and last bank flags are the first and last */
+  int lastBank;  /* register banks used within one flow object */
+
+  int FromConflicts;
+  int ToConflicts;
+
 } pCodeFlow;
+
+/*************************************************
+  pCodeFlowLink
+
+  The Flow Link object is used to record information
+ about how consecutive excutive Flow objects are related.
+ The pCodeFlow objects demarcate the pCodeInstructions
+ into contiguous chunks. The FlowLink records conflicts
+ in the discontinuities. For example, if one Flow object
+ references a register in bank 0 and the next Flow object
+ references a register in bank 1, then there is a discontinuity
+ in the banking registers.
+
+*/
+typedef struct pCodeFlowLink
+{
+  pCodeFlow  *pcflow;   /* pointer to linked pCodeFlow object */
+
+  int bank_conflict;    /* records bank conflicts */
+
+} pCodeFlowLink;
 
 /*************************************************
     pCodeInstruction

@@ -120,6 +120,7 @@ static PIC_device Pics[] = {
     p16f627_mem,                     /* ram mem map */
     p16f627_sfr,                     /* sfr mem map */
     0,                               /* max ram address (calculated) */
+    0x80,                            /* Bank Mask */
   },
 
   {
@@ -127,6 +128,7 @@ static PIC_device Pics[] = {
     p16f627_mem,
     p16f627_sfr,
     0,
+    0x80,
   },
 
   {
@@ -134,6 +136,7 @@ static PIC_device Pics[] = {
     p16f84_mem,
     p16f84_sfr,
     0,
+    0x80,
   },
 
   {
@@ -141,6 +144,7 @@ static PIC_device Pics[] = {
     p16f877_mem,
     p16f877_sfr,
     0,
+    0x180,
   },
 
 };
@@ -203,6 +207,36 @@ static void addMem(memRange *ranges,int type)
 
 
 }
+
+/*-----------------------------------------------------------------*
+ *-----------------------------------------------------------------*/
+
+int isREGinBank(regs *reg, int bank)
+{
+
+  if(!reg || !pic)
+    return 0;
+
+  if(((reg->address | reg->alias) & pic->bankMask & bank) == bank)
+    return 1;
+
+  return 0;
+}
+
+/*-----------------------------------------------------------------*
+ *-----------------------------------------------------------------*/
+int REGallBanks(regs *reg)
+{
+
+  if(!reg || !pic)
+    return 0;
+
+  return ((reg->address | reg->alias) & pic->bankMask);
+
+}
+
+/*-----------------------------------------------------------------*
+ *-----------------------------------------------------------------*/
 
 static void addMaps(PIC_device *pPic)
 {

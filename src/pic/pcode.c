@@ -87,6 +87,8 @@ static int GpcFlowSeq = 1;
 #define isCALL(x)       ((isPCI(x)) && (PCI(x)->op == POC_CALL))
 #define isSTATUS_REG(r) ((r)->pc_type == PO_STATUS)
 
+#define isPCOLAB(x)     ((PCOP(x)->type) == PO_LABEL)
+
 /****************************************************************/
 /*                      Forward declarations                    */
 /****************************************************************/
@@ -111,6 +113,8 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd);
 int pCodePeepMatchRule(pCode *pc);
 void pBlockStats(FILE *of, pBlock *pb);
 extern void pCodeInsertAfter(pCode *pc1, pCode *pc2);
+extern pCodeOp *popCopyReg(pCodeOpReg *pc);
+pCodeOp *popCopyGPR2Bit(pCodeOp *pc, int bitval);
 
 pCodeInstruction pciADDWF = {
   {PC_OPCODE, NULL, NULL, 0, NULL, 
@@ -1788,9 +1792,29 @@ pCode *newpCodeFlow(void )
   pcflow->inCond = PCC_NONE;
   pcflow->outCond = PCC_NONE;
 
+  pcflow->firstBank = -1;
+  pcflow->lastBank = -1;
+
+  pcflow->FromConflicts = 0;
+  pcflow->ToConflicts = 0;
+
   pcflow->end = NULL;
   return ( (pCode *)pcflow);
 
+}
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+pCodeFlowLink *newpCodeFlowLink(pCodeFlow *pcflow)
+{
+  pCodeFlowLink *pcflowLink;
+
+  pcflowLink = Safe_calloc(1,sizeof(pCodeFlowLink));
+
+  pcflowLink->pcflow = pcflow;
+  pcflowLink->bank_conflict = 0;
+
+  return pcflowLink;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2889,6 +2913,23 @@ int checkLabel(pCode *pc)
 }
 
 /*-----------------------------------------------------------------*/
+/* findLabelinpBlock - Search the pCode for a particular label     */
+/*-----------------------------------------------------------------*/
+pCode * findLabelinpBlock(pBlock *pb,pCodeOpLabel *pcop_label)
+{
+  pCode  *pc;
+
+  if(!pb)
+    return NULL;
+
+  for(pc = pb->pcHead; pc; pc = pc->next) 
+    if(compareLabel(pc,pcop_label))
+      return pc;
+    
+  return NULL;
+}
+
+/*-----------------------------------------------------------------*/
 /* findLabel - Search the pCode for a particular label             */
 /*-----------------------------------------------------------------*/
 pCode * findLabel(pCodeOpLabel *pcop_label)
@@ -2900,10 +2941,8 @@ pCode * findLabel(pCodeOpLabel *pcop_label)
     return NULL;
 
   for(pb = the_pFile->pbHead; pb; pb = pb->next) {
-    for(pc = pb->pcHead; pc; pc = pc->next) 
-      if(compareLabel(pc,pcop_label))
-	return pc;
-    
+    if( (pc = findLabelinpBlock(pb,pcop_label)) != NULL)
+      return pc;
   }
 
   fprintf(stderr,"Couldn't find label %s", pcop_label->pcop.name);
@@ -3180,11 +3219,15 @@ void BuildFlow(pBlock *pb)
   pb->pcHead = pflow;        /* Make the Flow object the head */
   pflow->pb = pb;
 
-  for( pc = findNextInstruction(pb->pcHead); 
-      (pc=findNextInstruction(pc)) != NULL; ) { 
+  for( pc = findNextInstruction(pb->pcHead);
+       pc != NULL;
+       pc=findNextInstruction(pc)) { 
 
     pc->seq = seq++;
     PCI(pc)->pcflow = PCFL(pflow);
+
+    //fprintf(stderr," build: ");
+    //pflow->print(stderr,pflow);
 
     if( PCI(pc)->isSkip) {
 
@@ -3324,6 +3367,74 @@ void FlowStats(pCodeFlow *pcflow)
 
 }
 
+/*-----------------------------------------------------------------*
+ * int isBankInstruction(pCode *pc) - examine the pCode *pc to determine
+ *    if it affects the banking bits. 
+ * 
+ * return: -1 == Banking bits are unaffected by this pCode.
+ *
+ * return: > 0 == Banking bits are affected.
+ *
+ *  If the banking bits are affected, then the returned value describes
+ * which bits are affected and how they're affected. The lower half
+ * of the integer maps to the bits that are affected, the upper half
+ * to whether they're set or cleared.
+ *
+ *-----------------------------------------------------------------*/
+#define SET_BANK_BIT (1 << 16)
+#define CLR_BANK_BIT 0
+
+int isBankInstruction(pCode *pc)
+{
+  regs *reg;
+  int bank = -1;
+
+  if(!isPCI(pc))
+    return -1;
+
+  if( ( (reg = getRegFromInstruction(pc)) != NULL) && isSTATUS_REG(reg)) {
+
+    /* Check to see if the register banks are changing */
+    if(PCI(pc)->isModReg) {
+
+      pCodeOp *pcop = PCI(pc)->pcop;
+      switch(PCI(pc)->op) {
+
+      case POC_BSF:
+	if(PCORB(pcop)->bit == PIC_RP0_BIT) {
+	  //fprintf(stderr, "  isBankInstruction - Set RP0\n");
+	  return  SET_BANK_BIT | PIC_RP0_BIT;
+	}
+
+	if(PCORB(pcop)->bit == PIC_RP1_BIT) {
+	  //fprintf(stderr, "  isBankInstruction - Set RP1\n");
+	  return  CLR_BANK_BIT | PIC_RP0_BIT;
+	}
+	break;
+
+      case POC_BCF:
+	if(PCORB(pcop)->bit == PIC_RP0_BIT) {
+	  //fprintf(stderr, "  isBankInstruction - Clr RP0\n");
+	  return  CLR_BANK_BIT | PIC_RP1_BIT;
+	}
+	if(PCORB(pcop)->bit == PIC_RP1_BIT) {
+	  //fprintf(stderr, "  isBankInstruction - Clr RP1\n");
+	  return  CLR_BANK_BIT | PIC_RP1_BIT;
+	}
+	break;
+      default:
+	//fprintf(stderr, "  isBankInstruction - Status register is getting Modified by:\n");
+	//genericPrint(stderr, pc);
+	;
+      }
+    }
+
+  }
+
+  return bank;
+}
+
+
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 void FillFlow(pCodeFlow *pcflow)
@@ -3347,56 +3458,7 @@ void FillFlow(pCodeFlow *pcflow)
   cur_bank = -1;
 
   do {
-    regs *reg;
-
-    if(isPCI(pc)) {
-
-      int inCond = PCI(pc)->inCond;
-      int outCond = PCI(pc)->outCond;
-
-      if( (reg = getRegFromInstruction(pc)) != NULL) {
-	if(isSTATUS_REG(reg)) {
-
-	  //fprintf(stderr, "  FillFlow - Status register\n");
-	  //pc->print(stderr,pc);
-	  /* Check to see if the register banks are changing */
-	  if(PCI(pc)->isModReg) {
-
-	    pCodeOp *pcop = PCI(pc)->pcop;
-	    switch(PCI(pc)->op) {
-	      /*
-	    case POC_BSF:
-	      if(PCORB(pcop)->bit == PIC_RP0_BIT)
-		fprintf(stderr, "  FillFlow - Set RP0\n");
-	      //outCond |= PCC_REG_BANK1;
-	      if(PCORB(pcop)->bit == PIC_RP1_BIT) 
-		//fprintf(stderr, "  FillFlow - Set RP1\n");
-	      //outCond |= PCC_REG_BANK3;
-	      break;
-
-	    case POC_BCF:
-	      if(PCORB(pcop)->bit == PIC_RP0_BIT)
-		fprintf(stderr, "  FillFlow - Clr RP0\n");
-	      //outCond |= PCC_REG_BANK1;
-	      if(PCORB(pcop)->bit == PIC_RP1_BIT) 
-		fprintf(stderr, "  FillFlow - Clr RP1\n");
-	      //outCond |= PCC_REG_BANK3;
-	      break;
-	      */
-	    default:
-	      fprintf(stderr, "  FillFlow - Status register is getting Modified by:\n");
-	      genericPrint(stderr, pc);
-	    }
-	  }
-
-	} else
-	  inCond |= PCC_REG_BANK0 << (REG_BANK(reg) & 3);
-      }
-
-      pcflow->inCond |= (inCond &  ~pcflow->outCond);
-      pcflow->outCond |= outCond;
-    } 
-
+    isBankInstruction(pc);
     pc = pc->next;
   } while (pc && (pc != pcflow->end) && !isPCFL(pc));
 
@@ -3419,12 +3481,16 @@ void FillFlow(pCodeFlow *pcflow)
 /*-----------------------------------------------------------------*/
 void LinkFlow_pCode(pCodeInstruction *from, pCodeInstruction *to)
 {
+  pCodeFlowLink *fromLink, *toLink;
 
   if(!from || !to || !to->pcflow || !from->pcflow)
     return;
 
-  addSet(&(from->pcflow->to), to->pcflow);
-  addSet(&(to->pcflow->from), from->pcflow);
+  fromLink = newpCodeFlowLink(from->pcflow);
+  toLink   = newpCodeFlowLink(to->pcflow);
+
+  addSetIfnotP(&(from->pcflow->to), toLink);   //to->pcflow);
+  addSetIfnotP(&(to->pcflow->from), fromLink); //from->pcflow);
 
 }
 
@@ -3437,11 +3503,16 @@ void LinkFlow(pBlock *pb)
   pCode *pct;
 
   //fprintf(stderr,"linkflow \n");
+
   for( pcflow = findNextpCode(pb->pcHead, PC_FLOW); 
-       (pcflow = findNextpCode(pcflow->next, PC_FLOW)) != NULL;) {
+       pcflow != NULL;
+       pcflow = findNextpCode(pcflow->next, PC_FLOW) ) {
 
     if(!isPCFL(pcflow))
       fprintf(stderr, "LinkFlow - pcflow is not a flow object ");
+
+    //fprintf(stderr," link: ");
+    //pcflow->print(stderr,pcflow);
 
     //FillFlow(PCFL(pcflow));
 
@@ -3450,6 +3521,7 @@ void LinkFlow(pBlock *pb)
     //fprintf(stderr, "LinkFlow - flow block (seq=%d) ", pcflow->seq);
     if(isPCI_SKIP(pc)) {
       //fprintf(stderr, "ends with skip\n");
+      //pc->print(stderr,pc);
       pct=findNextInstruction(pc->next);
       LinkFlow_pCode(PCI(pc),PCI(pct));
       pct=findNextInstruction(pct->next);
@@ -3457,22 +3529,526 @@ void LinkFlow(pBlock *pb)
       continue;
     }
 
-    //if(isPCI_BRANCH(pc)) {
-    //fprintf(stderr, "ends with branch\n");
+    if(isPCI_BRANCH(pc)) {
+      pCodeOpLabel *pcol = PCOLAB(PCI(pc)->pcop);
 
-    // continue;
-    //}
-    #if 0
-    if(isPCI(pc)) {
-      fprintf(stderr, "ends with non-branching instruction:\n");
+      //fprintf(stderr, "ends with branch\n  ");
       //pc->print(stderr,pc);
+
+      if(!(pcol && isPCOLAB(pcol))) {
+	if((PCI(pc)->op != POC_RETURN) && (PCI(pc)->op != POC_CALL)) {
+	  pc->print(stderr,pc);
+	  fprintf(stderr, "ERROR: %s, branch instruction doesn't have label\n",__FUNCTION__);
+	}
+	continue;
+      }
+
+      if( (pct = findLabelinpBlock(pb,pcol)) != NULL)
+	LinkFlow_pCode(PCI(pc),PCI(pct));
+      else
+	fprintf(stderr, "ERROR: %s, couldn't find label\n",__FUNCTION__);
+
+      continue;
     }
-    else 
-      fprintf(stderr, "has no end pcode\n");
-    #endif 
+
+    if(isPCI(pc)) {
+      //fprintf(stderr, "ends with non-branching instruction:\n");
+      //pc->print(stderr,pc);
+
+      LinkFlow_pCode(PCI(pc),PCI(findNextInstruction(pc->next)));
+
+      continue;
+    }
+
+    if(pc) {
+      //fprintf(stderr, "ends with unknown\n");
+      //pc->print(stderr,pc);
+      continue;
+    }
+
+    //fprintf(stderr, "ends with nothing: ERROR\n");
     
   }
 }
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+int isPCinFlow(pCode *pc, pCode *pcflow)
+{
+
+  if(!pc || !pcflow)
+    return 0;
+
+  if(!isPCI(pc) || !PCI(pc)->pcflow || !isPCFL(pcflow) )
+    return 0;
+
+  if( PCI(pc)->pcflow->pc.seq == pcflow->seq)
+    return 1;
+
+  return 0;
+}
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+void BanksUsedFlow2(pCode *pcflow)
+{
+  pCode *pc=NULL;
+
+  int bank = -1;
+  bool RegUsed = 0;
+
+  regs *reg;
+
+  if(!isPCFL(pcflow)) {
+    fprintf(stderr, "BanksUsed - pcflow is not a flow object ");
+    return;
+  }
+
+  pc = findNextInstruction(pcflow->next);
+
+  PCFL(pcflow)->lastBank = -1;
+
+  while(isPCinFlow(pc,pcflow)) {
+
+    int bank_selected = isBankInstruction(pc);
+
+    //if(PCI(pc)->pcflow) 
+    //fprintf(stderr,"BanksUsedFlow2, looking at seq %d\n",PCI(pc)->pcflow->pc.seq);
+
+    if(bank_selected > 0) {
+      //fprintf(stderr,"BanksUsed - mucking with bank %d\n",bank_selected);
+
+      /* This instruction is modifying banking bits before accessing registers */
+      if(!RegUsed)
+	PCFL(pcflow)->firstBank = -1;
+
+      if(PCFL(pcflow)->lastBank == -1)
+	PCFL(pcflow)->lastBank = 0;
+
+      bank = (1 << (bank_selected & (PIC_RP0_BIT | PIC_RP1_BIT)));
+      if(bank_selected & SET_BANK_BIT)
+	PCFL(pcflow)->lastBank |= bank;
+				 
+
+    } else { 
+      reg = getRegFromInstruction(pc);
+
+      if(reg && !isREGinBank(reg, bank)) {
+	int allbanks = REGallBanks(reg);
+	if(bank == -1)
+	  PCFL(pcflow)->firstBank = allbanks;
+
+	PCFL(pcflow)->lastBank = allbanks;
+
+	bank = allbanks;
+      }
+      RegUsed = 1;
+    }
+
+    pc = findNextInstruction(pc->next);
+  }
+
+//  fprintf(stderr,"BanksUsedFlow2 flow seq=%3d, first bank = 0x%03x, Last bank 0x%03x\n",
+//	  pcflow->seq,PCFL(pcflow)->firstBank,PCFL(pcflow)->lastBank);
+
+
+
+}
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+void BanksUsedFlow(pBlock *pb)
+{
+  pCode *pcflow;
+
+
+  //pb->pcHead->print(stderr, pb->pcHead);
+
+  pcflow = findNextpCode(pb->pcHead, PC_FLOW);
+  //pcflow->print(stderr,pcflow);
+
+  for( pcflow = findNextpCode(pb->pcHead, PC_FLOW); 
+       pcflow != NULL;
+       pcflow = findNextpCode(pcflow->next, PC_FLOW) ) {
+
+    BanksUsedFlow2(pcflow);
+  }
+
+}
+
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+void insertBankSwitch(pCode *pc, int Set_Clear, int RP_BankBit)
+{
+  pCode *new_pc;
+
+  if(!pc)
+    return;
+
+  if(RP_BankBit < 0) 
+    new_pc = newpCode(POC_CLRF, popCopyReg(&pc_status));
+  else
+    new_pc = newpCode((Set_Clear ? POC_BSF : POC_BCF),
+		      popCopyGPR2Bit(PCOP(&pc_status),RP_BankBit));
+
+  pCodeInsertAfter(pc->prev, new_pc);
+
+  /* Move the label, if there is one */
+
+  if(PCI(pc)->label) {
+    PCI(new_pc)->label = PCI(pc)->label;
+    PCI(pc)->label = NULL;
+  }
+
+  /* The new instruction has the same pcflow block */
+  PCI(new_pc)->pcflow = PCI(pc)->pcflow;
+
+}
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+void FixRegisterBankingInFlow(pCodeFlow *pcfl, int cur_bank)
+{
+  pCode *pc=NULL;
+  pCode *pcprev=NULL;
+  pCode *new_pc;
+
+  regs *reg;
+
+  if(!pcfl)
+    return;
+
+  pc = findNextInstruction(pcfl->pc.next);
+
+  while(isPCinFlow(pc,PCODE(pcfl))) {
+
+
+    reg = getRegFromInstruction(pc);
+#if 0
+    if(reg) {
+      fprintf(stderr, "  %s  ",reg->name);
+      fprintf(stderr, "addr = 0x%03x, bank = %d\n",reg->address,REG_BANK(reg));
+
+    }
+#endif
+
+    if(reg && REG_BANK(reg)!=cur_bank) {
+      /* Examine the instruction before this one to make sure it is
+       * not a skip type instruction */
+      pcprev = findPrevpCode(pc->prev, PC_OPCODE);
+      if(!pcprev || (pcprev && !isPCI_SKIP(pcprev))) {
+	int b = cur_bank ^ REG_BANK(reg);
+
+	//fprintf(stderr, "Cool! can switch banks\n");
+	cur_bank = REG_BANK(reg);
+	switch(b & 3) {
+	case 0:
+	  break;
+	case 1:
+	  insertBankSwitch(pc, cur_bank&1, PIC_RP0_BIT);
+	  break;
+	case 2:
+	  insertBankSwitch(pc, cur_bank&2, PIC_RP1_BIT);
+	  insertBankSwitch(pc, cur_bank&2, PIC_RP1_BIT);
+	  break;
+	case 3:
+	  if(cur_bank & 3) {
+	    insertBankSwitch(pc, cur_bank&1, PIC_RP0_BIT);
+	    insertBankSwitch(pc, cur_bank&2, PIC_RP1_BIT);
+	  } else
+	    insertBankSwitch(pc, -1, -1);
+	  break;
+	  /*
+	    new_pc = newpCode(((cur_bank&1) ? POC_BSF : POC_BCF),
+	    popCopyGPR2Bit(PCOP(&pc_status),PIC_RP0_BIT));
+	    pCodeInsertAfter(pc->prev, new_pc);
+	    if(PCI(pc)->label) { 
+	    PCI(new_pc)->label = PCI(pc)->label;
+	    PCI(pc)->label = NULL;
+	    }
+	  */
+	  /*
+	    new_pc = newpCode(((cur_bank&1) ? POC_BCF : POC_BSF),
+	    popCopyGPR2Bit(PCOP(&pc_status),PIC_RP0_BIT));
+	    pCodeInsertAfter(pc, new_pc);
+	  */
+
+	}
+
+      } else {
+	//fprintf(stderr, "Bummer can't switch banks\n");
+	;
+      }
+    }
+
+    pcprev = pc;
+    pc = findNextInstruction(pc->next);
+
+  }
+
+  if(pcprev && cur_bank) {
+    /* Brute force - make sure that we point to bank 0 at the
+     * end of each flow block */
+    new_pc = newpCode(POC_BCF,
+		      popCopyGPR2Bit(PCOP(&pc_status),PIC_RP0_BIT));
+    pCodeInsertAfter(pcprev, new_pc);
+      cur_bank = 0;
+  }
+
+}
+
+/*-----------------------------------------------------------------*/
+/*int compareBankFlow - compare the banking requirements between   */
+/*  flow objects. */
+/*-----------------------------------------------------------------*/
+int compareBankFlow(pCodeFlow *pcflow, pCodeFlowLink *pcflowLink, int toORfrom)
+{
+
+  if(!pcflow || !pcflowLink || !pcflowLink->pcflow)
+    return 0;
+
+  if(!isPCFL(pcflow) || !isPCFL(pcflowLink->pcflow))
+    return 0;
+
+  if(pcflow->firstBank == -1)
+    return 0;
+
+
+  if(pcflowLink->pcflow->firstBank == -1) {
+    pCodeFlowLink *pctl = setFirstItem( toORfrom ? 
+					pcflowLink->pcflow->to : 
+					pcflowLink->pcflow->from);
+    return compareBankFlow(pcflow, pctl, toORfrom);
+  }
+
+  if(toORfrom) {
+    if(pcflow->lastBank == pcflowLink->pcflow->firstBank)
+      return 0;
+
+    pcflowLink->bank_conflict++;
+    pcflowLink->pcflow->FromConflicts++;
+    pcflow->ToConflicts++;
+  } else {
+    
+    if(pcflow->firstBank == pcflowLink->pcflow->lastBank)
+      return 0;
+
+    pcflowLink->bank_conflict++;
+    pcflowLink->pcflow->ToConflicts++;
+    pcflow->FromConflicts++;
+
+  }
+  /*
+  fprintf(stderr,"compare flow found conflict: seq %d from conflicts %d, to conflicts %d\n",
+	  pcflowLink->pcflow->pc.seq,
+	  pcflowLink->pcflow->FromConflicts,
+	  pcflowLink->pcflow->ToConflicts);
+  */
+  return 1;
+
+}
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+void FixBankFlow(pBlock *pb)
+{
+  pCode *pc=NULL;
+  pCode *pcflow;
+  pCodeFlowLink *pcfl;
+
+  pCode *pcflow_max_To=NULL;
+  pCode *pcflow_max_From=NULL;
+  int max_ToConflicts=0;
+  int max_FromConflicts=0;
+
+  //fprintf(stderr,"Fix Bank flow \n");
+  pcflow = findNextpCode(pb->pcHead, PC_FLOW);
+
+
+  /*
+    First loop through all of the flow objects in this pcode block
+    and fix the ones that have banking conflicts between the 
+    entry and exit.
+  */
+
+  //fprintf(stderr, "FixBankFlow - Phase 1\n");
+
+  for( pcflow = findNextpCode(pb->pcHead, PC_FLOW); 
+       pcflow != NULL;
+       pcflow = findNextpCode(pcflow->next, PC_FLOW) ) {
+
+    if(!isPCFL(pcflow)) {
+      fprintf(stderr, "FixBankFlow - pcflow is not a flow object ");
+      continue;
+    }
+
+    if(PCFL(pcflow)->firstBank != PCFL(pcflow)->lastBank  &&
+       PCFL(pcflow)->firstBank >= 0 &&
+       PCFL(pcflow)->lastBank >= 0 ) {
+
+      int cur_bank = (PCFL(pcflow)->firstBank < PCFL(pcflow)->lastBank) ?
+	PCFL(pcflow)->firstBank : PCFL(pcflow)->lastBank;
+
+      FixRegisterBankingInFlow(PCFL(pcflow),cur_bank);
+      BanksUsedFlow2(pcflow);
+
+    }
+  }
+
+  //fprintf(stderr, "FixBankFlow - Phase 2\n");
+
+  for( pcflow = findNextpCode(pb->pcHead, PC_FLOW); 
+       pcflow != NULL;
+       pcflow = findNextpCode(pcflow->next, PC_FLOW) ) {
+
+    int nFlows;
+    int nConflicts;
+
+    if(!isPCFL(pcflow)) {
+      fprintf(stderr, "FixBankFlow - pcflow is not a flow object ");
+      continue;
+    }
+
+    PCFL(pcflow)->FromConflicts = 0;
+    PCFL(pcflow)->ToConflicts = 0;
+
+    nFlows = 0;
+    nConflicts = 0;
+
+    //fprintf(stderr, " FixBankFlow flow seq %d\n",pcflow->seq);
+    pcfl = setFirstItem(PCFL(pcflow)->from);
+    while (pcfl) {
+
+      pc = PCODE(pcfl->pcflow);
+
+      if(!isPCFL(pc)) {
+	fprintf(stderr,"oops dumpflow - to is not a pcflow\n");
+	pc->print(stderr,pc);
+      }
+
+      nConflicts += compareBankFlow(PCFL(pcflow), pcfl, 0);
+      nFlows++;
+
+      pcfl=setNextItem(PCFL(pcflow)->from);
+    }
+
+    if((nFlows >= 2) && nConflicts && (PCFL(pcflow)->firstBank>0)) {
+      //fprintf(stderr, " From conflicts flow seq %d, nflows %d ,nconflicts %d\n",pcflow->seq,nFlows, nConflicts);
+
+      FixRegisterBankingInFlow(PCFL(pcflow),0);
+      BanksUsedFlow2(pcflow);
+
+      continue;  /* Don't need to check the flow from here - it's already been fixed */
+
+    }
+
+    nFlows = 0;
+    nConflicts = 0;
+
+    pcfl = setFirstItem(PCFL(pcflow)->to);
+    while (pcfl) {
+
+      pc = PCODE(pcfl->pcflow);
+      if(!isPCFL(pc)) {
+	fprintf(stderr,"oops dumpflow - to is not a pcflow\n");
+	pc->print(stderr,pc);
+      }
+
+      nConflicts += compareBankFlow(PCFL(pcflow), pcfl, 1);
+      nFlows++;
+
+      pcfl=setNextItem(PCFL(pcflow)->to);
+    }
+
+    if((nFlows >= 2) && nConflicts &&(nConflicts != nFlows) && (PCFL(pcflow)->lastBank>0)) {
+      //fprintf(stderr, " To conflicts flow seq %d, nflows %d ,nconflicts %d\n",pcflow->seq,nFlows, nConflicts);
+
+      FixRegisterBankingInFlow(PCFL(pcflow),0);
+      BanksUsedFlow2(pcflow);
+    }
+  }
+
+  /*
+    Loop through the flow objects again and find the ones with the 
+    maximum conflicts
+  */
+
+  for( pcflow = findNextpCode(pb->pcHead, PC_FLOW); 
+       pcflow != NULL;
+       pcflow = findNextpCode(pcflow->next, PC_FLOW) ) {
+
+    if(PCFL(pcflow)->ToConflicts > max_ToConflicts)
+      pcflow_max_To = pcflow;
+
+    if(PCFL(pcflow)->FromConflicts > max_FromConflicts)
+      pcflow_max_From = pcflow;
+  }
+/*
+  if(pcflow_max_To)
+    fprintf(stderr,"compare flow Max To conflicts: seq %d conflicts %d\n",
+	    PCFL(pcflow_max_To)->pc.seq,
+	    PCFL(pcflow_max_To)->ToConflicts);
+
+  if(pcflow_max_From)
+    fprintf(stderr,"compare flow Max From conflicts: seq %d conflicts %d\n",
+	    PCFL(pcflow_max_From)->pc.seq,
+	    PCFL(pcflow_max_From)->FromConflicts);
+*/
+}
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+void DumpFlow(pBlock *pb)
+{
+  pCode *pc=NULL;
+  pCode *pcflow;
+  pCodeFlowLink *pcfl;
+
+
+  fprintf(stderr,"Dump flow \n");
+  pb->pcHead->print(stderr, pb->pcHead);
+
+  pcflow = findNextpCode(pb->pcHead, PC_FLOW);
+  pcflow->print(stderr,pcflow);
+
+  for( pcflow = findNextpCode(pb->pcHead, PC_FLOW); 
+       pcflow != NULL;
+       pcflow = findNextpCode(pcflow->next, PC_FLOW) ) {
+
+    if(!isPCFL(pcflow)) {
+      fprintf(stderr, "DumpFlow - pcflow is not a flow object ");
+      continue;
+    }
+    fprintf(stderr,"dumping: ");
+    pcflow->print(stderr,pcflow);
+    FlowStats(PCFL(pcflow));
+
+    for(pcfl = setFirstItem(PCFL(pcflow)->to); pcfl; pcfl=setNextItem(PCFL(pcflow)->to)) {
+
+      pc = PCODE(pcfl->pcflow);
+
+      fprintf(stderr, "    from seq %d:\n",pc->seq);
+      if(!isPCFL(pc)) {
+	fprintf(stderr,"oops dumpflow - from is not a pcflow\n");
+	pc->print(stderr,pc);
+      }
+
+    }
+
+    for(pcfl = setFirstItem(PCFL(pcflow)->to); pcfl; pcfl=setNextItem(PCFL(pcflow)->to)) {
+
+      pc = PCODE(pcfl->pcflow);
+
+      fprintf(stderr, "    to seq %d:\n",pc->seq);
+      if(!isPCFL(pc)) {
+	fprintf(stderr,"oops dumpflow - to is not a pcflow\n");
+	pc->print(stderr,pc);
+      }
+
+    }
+
+  }
+
+}
+
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 int OptimizepBlock(pBlock *pb)
@@ -3781,7 +4357,8 @@ void FixRegisterBanking(pBlock *pb)
   if(!pb)
     return;
 
-  pc = findNextpCode(pb->pcHead, PC_FLOW);
+  //pc = findNextpCode(pb->pcHead, PC_FLOW);
+  pc = findNextpCode(pb->pcHead, PC_OPCODE);
   if(!pc)
     return;
   /* loop through all of the flow blocks with in one pblock */
@@ -3795,7 +4372,7 @@ void FixRegisterBanking(pBlock *pb)
     /* for each flow block, determine the register banking 
        requirements */
 
-    do {
+    //    do {
       if(isPCI(pc)) {
 	//genericPrint(stderr, pc);
 
@@ -3841,7 +4418,10 @@ void FixRegisterBanking(pBlock *pb)
 
       pcprev = pc;
       pc = pc->next;
-    } while(pc && !(isPCFL(pc))); 
+      // } while(pc && !(isPCFL(pc))); 
+
+
+  }while (pc);
 
     if(pcprev && cur_bank) {
       /* Brute force - make sure that we point to bank 0 at the
@@ -3851,8 +4431,6 @@ void FixRegisterBanking(pBlock *pb)
       pCodeInsertAfter(pcprev, new_pc);
       cur_bank = 0;
     }
-
-  }while (pc);
 
 }
 
@@ -3923,6 +4501,15 @@ void AnalyzeBanking(void)
     return;
 
 
+  /* Phase 2 - Flow Analysis - Register Banking
+   *
+   * In this phase, the individual flow blocks are examined
+   * and register banking is fixed.
+   */
+
+  //for(pb = the_pFile->pbHead; pb; pb = pb->next)
+  //FixRegisterBanking(pb);
+
   /* Phase 2 - Flow Analysis
    *
    * In this phase, the pCode is partition into pCodeFlow 
@@ -3934,6 +4521,7 @@ void AnalyzeBanking(void)
   for(pb = the_pFile->pbHead; pb; pb = pb->next)
     BuildFlow(pb);
 
+
   /* Phase 2 - Flow Analysis - linking flow blocks
    *
    * In this phase, the individual flow blocks are examined
@@ -3943,9 +4531,29 @@ void AnalyzeBanking(void)
   for(pb = the_pFile->pbHead; pb; pb = pb->next)
     LinkFlow(pb);
 
-  for(pb = the_pFile->pbHead; pb; pb = pb->next)
-    FixRegisterBanking(pb);
 
+  /* Phase x - Flow Analysis - Used Banks
+   *
+   * In this phase, the individual flow blocks are examined
+   * to determine the Register Banks they use
+   */
+
+  for(pb = the_pFile->pbHead; pb; pb = pb->next)
+    BanksUsedFlow(pb);
+
+  /* Phase x - Flow Analysis - Used Banks
+   *
+   * In this phase, the individual flow blocks are examined
+   * to determine the Register Banks they use
+   */
+
+  for(pb = the_pFile->pbHead; pb; pb = pb->next)
+    FixBankFlow(pb);
+
+/*
+  for(pb = the_pFile->pbHead; pb; pb = pb->next)
+    DumpFlow(pb);
+*/
   /* debug stuff */ 
   for(pb = the_pFile->pbHead; pb; pb = pb->next) {
     pCode *pcflow;
@@ -4218,6 +4826,7 @@ void pBlockStats(FILE *of, pBlock *pb)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
+#if 0
 static void sequencepCode(void)
 {
   pBlock *pb;
@@ -4233,6 +4842,7 @@ static void sequencepCode(void)
   }
 
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/

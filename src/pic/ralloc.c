@@ -645,13 +645,13 @@ allocDirReg (operand *op )
     if(!IS_CONFIG_ADDRESS(address)) {
       reg = newReg(REG_GPR, PO_DIR, rDirectIdx++, name,getSize (OP_SYMBOL (op)->type),0 );
       debugLog ("  -- added %s to hash, size = %d\n", name,reg->size);
-
+/*
       if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
 	reg->isFixed = 1;
 	reg->address = SPEC_ADDR ( OP_SYM_ETYPE(op));
 	debugLog ("  -- and it is at a fixed address 0x%02x\n",reg->address);
       }
-
+*/
       hTabAddItem(&dynDirectRegNames, regname2key(name), reg);
       if (IS_BITVAR (OP_SYM_ETYPE(op)))
 	addSet(&dynDirectBitRegs, reg);
@@ -661,6 +661,12 @@ allocDirReg (operand *op )
       debugLog ("  -- %s is declared at address 0x2007\n",name);
 
     }
+  }
+
+  if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
+    reg->isFixed = 1;
+    reg->address = SPEC_ADDR ( OP_SYM_ETYPE(op));
+    debugLog ("  -- and it is at a fixed address 0x%02x\n",reg->address);
   }
 
   return reg;
@@ -3113,12 +3119,14 @@ packRegsForAccUse (iCode * ic)
   if (IS_AGGREGATE(operandType(IC_RESULT(ic)))) {
     return;
   }
+  debugLog ("  %s:%d\n", __FUNCTION__,__LINE__);
 
   /* if + or - then it has to be one byte result */
   if ((ic->op == '+' || ic->op == '-')
       && getSize (operandType (IC_RESULT (ic))) > 1)
     return;
 
+  debugLog ("  %s:%d\n", __FUNCTION__,__LINE__);
   /* if shift operation make sure right side is not a literal */
   if (ic->op == RIGHT_OP &&
       (isOperandLiteral (IC_RIGHT (ic)) ||
@@ -3148,6 +3156,7 @@ packRegsForAccUse (iCode * ic)
 			       bitVectFirstBit (OP_USES (IC_RESULT (ic))))))
     return;
 
+  debugLog ("  %s:%d\n", __FUNCTION__,__LINE__);
   if (ic->next != uic)
     return;
 
@@ -3164,6 +3173,7 @@ packRegsForAccUse (iCode * ic)
       getSize (aggrToPtr (operandType (IC_RESULT (uic)), FALSE)) > 1)
     return;
 
+  debugLog ("  %s:%d\n", __FUNCTION__,__LINE__);
   if (uic->op != '=' &&
       !IS_ARITHMETIC_OP (uic) &&
       !IS_BITWISE_OP (uic) &&
@@ -3171,6 +3181,7 @@ packRegsForAccUse (iCode * ic)
       uic->op != RIGHT_OP)
     return;
 
+  debugLog ("  %s:%d\n", __FUNCTION__,__LINE__);
   /* if used in ^ operation then make sure right is not a 
      literl */
   if (uic->op == '^' && isOperandLiteral (IC_RIGHT (uic)))
@@ -3211,14 +3222,17 @@ packRegsForAccUse (iCode * ic)
       IC_LEFT (uic)->key != IC_RESULT (ic)->key)
     return;
 
+  debugLog ("  %s:%d\n", __FUNCTION__,__LINE__);
   /* if one of them is a literal then we can */
-  if ((IC_LEFT (uic) && IS_OP_LITERAL (IC_LEFT (uic))) ||
-      (IC_RIGHT (uic) && IS_OP_LITERAL (IC_RIGHT (uic))))
+  if ( ((IC_LEFT (uic) && IS_OP_LITERAL (IC_LEFT (uic))) ||
+	(IC_RIGHT (uic) && IS_OP_LITERAL (IC_RIGHT (uic))))  &&
+       (getSize (operandType (IC_RESULT (uic))) <= 1))
     {
       OP_SYMBOL (IC_RESULT (ic))->accuse = 1;
       return;
     }
 
+  debugLog ("  %s:%d\n", __FUNCTION__,__LINE__);
   /* if the other one is not on stack then we can */
   if (IC_LEFT (uic)->key == IC_RESULT (ic)->key &&
       (IS_ITEMP (IC_RIGHT (uic)) ||

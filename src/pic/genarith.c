@@ -1500,6 +1500,7 @@ void genUMult8XLit_16 (operand *left,
 
   unsigned int lit;
   unsigned int i,have_first_bit;
+  int same;
 
   if (AOP_TYPE(right) != AOP_LIT){
     fprintf(stderr,"%s %d - right operand is not a literal\n",__FILE__,__LINE__);
@@ -1515,11 +1516,55 @@ void genUMult8XLit_16 (operand *left,
   lit &= 0xff;
   pic14_emitcode(";","Unrolled 8 X 8 multiplication");
 
+  same = pic14_sameRegs(AOP(left), AOP(result));
 
-  if(!lit) {
-    emitpcode(POC_CLRF,  popGet(AOP(result),0));
-    emitpcode(POC_CLRF,  popCopyReg(result_hi));
-    return;
+  if(same) {
+    switch(lit) {
+    case 0:
+      emitpcode(POC_CLRF,  popGet(AOP(left),0));
+      return;
+    case 2:
+      emitpcode(POC_MOVFW, popGet(AOP(left),0));
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));
+      return;
+    case 3:
+      emitpcode(POC_MOVFW, popGet(AOP(left),0));
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));
+      return;
+    case 4:
+      emitpcode(POC_MOVFW, popGet(AOP(left),0));
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));
+      return;
+    case 16:
+      emitpcode(POC_SWAPFW, popGet(AOP(left),0));
+      emitpcode(POC_ANDLW,  popGetLit(0xf0));
+      emitpcode(POC_MOVWF,  popGet(AOP(left),0));
+      return;
+    case 17:
+      emitpcode(POC_SWAPFW, popGet(AOP(left),0));
+      emitpcode(POC_ANDLW,  popGetLit(0xf0));
+      emitpcode(POC_ADDWF,  popGet(AOP(left),0));
+      return;
+
+    }
+  } else {
+
+    switch(lit) {
+    case 0:
+      emitpcode(POC_CLRF,  popGet(AOP(result),0));
+      emitpcode(POC_CLRF,  popCopyReg(result_hi));
+      return;
+    case 2:
+      emitpcode(POC_MOVFW, popGet(AOP(left),0));
+      emitpcode(POC_MOVWF, popGet(AOP(result),0));
+      emitpcode(POC_ADDWF, popGet(AOP(result),0));
+      emitpcode(POC_CLRF,  popCopyReg(result_hi));
+      emitpcode(POC_RLF,   popCopyReg(result_hi));
+      return;
+    }
+
   }
 
   emitpcode(POC_MOVFW, popGet(AOP(left),0));
@@ -1563,6 +1608,11 @@ void genUMult8X8_16 (operand *left,
     result_hi = PCOR(popGet(AOP(result),1));
   }
 
+  if (AOP_TYPE(right) == AOP_LIT) {
+    genUMult8XLit_16(left,right,result,result_hi);
+    return;
+  }
+
   if(!looped) {
     pic14_emitcode(";","Unrolled 8 X 8 multiplication");
 
@@ -1601,16 +1651,19 @@ void genUMult8X8_16 (operand *left,
 
   } else {
     symbol  *tlbl = newiTempLabel(NULL);
-    pCodeOp *temp = popGetTempReg();
+    pCodeOp *temp;
 
 
     pic14_emitcode(";","Looped 8 X 8 multiplication");
 
     emitpcode(POC_CLRF,  popGet(AOP(result),0));
     emitpcode(POC_CLRF,  popCopyReg(result_hi));
+
     emitpcode(POC_BSF,   newpCodeOpBit(aopGet(AOP(result),0,FALSE,FALSE),7,0));
 
     emitpcode(POC_MOVFW, popGet(AOP(right),0));
+
+    temp = popGetTempReg();
     emitpcode(POC_MOVWF, popCopyReg(PCOR(temp)));
 
     emitpcode(POC_MOVFW, popGet(AOP(left),0));

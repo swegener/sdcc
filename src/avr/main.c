@@ -22,7 +22,6 @@ static char *_avr_keywords[] =     {
     "eeprom",
     "interrupt",
     "sfr",
-    "sbit",
     "xdata",
     "_code",
     "_eeprom",

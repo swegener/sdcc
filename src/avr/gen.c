@@ -2499,7 +2499,7 @@ static void genBitWise(iCode *ic, iCode *ifx, int bitop)
 			emitcode(bopnames[bitop],"%s,%s",aopGet(AOP(IC_RIGHT(ic)),offset),
 				 aopGet(AOP(IC_LEFT(ic)),offset));
 		} else {
-			aopPut(AOP(IC_RESULT(ic)),aopGet(IC_LEFT(ic),offset),offset);
+			aopPut(AOP(IC_RESULT(ic)),aopGet(AOP(IC_LEFT(ic)),offset),offset);
 			emitcode(bopnames[bitop],aopGet(AOP(IC_RESULT(ic)),offset),
 				 aopGet(AOP(IC_RIGHT(ic)),offset));
 		}
@@ -2571,9 +2571,9 @@ static void genInline (iCode *ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* genRRC - rotate right with carry                                */
+/* genRotC - rotate right/left with carry , lr = 1 rotate right    */
 /*-----------------------------------------------------------------*/
-static void genRRC (iCode *ic)
+static void genRotC (iCode *ic, int lr)
 {
 	operand *left , *result ;
 	int size, offset = 0;
@@ -2587,11 +2587,39 @@ static void genRRC (iCode *ic)
 
 	/* move it to the result */
 	size = AOP_SIZE(result);    
-	offset = size - 1 ;
-
-
+	if (!sameRegs(AOP(left),AOP(result))) {
+		offset = 0;
+		while (size--) {
+			aopPut(AOP(result),
+			       aopGet(AOP(left),offset),
+			       offset);
+			offset++;
+		}
+		size = AOP_SIZE(result);
+	}
+	if (lr) offset = size - 1;
+	else offset = 0;
+	
+	CLRC;
+	emitcode ("sbrc","%s,%d",aopGet(AOP(result),offset),
+		  (lr ? 0 : 7));
+	emitcode("sec","");
+		  
+	while (size--) {
+		emitcode((lr ? "ror" : "rol"),"%s",aopGet(AOP(result),offset));
+		if (lr) offset--;
+		else offset++;
+	}
 	freeAsmop(left,NULL,ic,TRUE);
 	freeAsmop(result,NULL,ic,TRUE);
+}
+
+/*-----------------------------------------------------------------*/
+/* genRRC - rotate right with carry                                */
+/*-----------------------------------------------------------------*/
+static void genRRC (iCode *ic)
+{
+	genRotC(ic,1);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2599,19 +2627,7 @@ static void genRRC (iCode *ic)
 /*-----------------------------------------------------------------*/
 static void genRLC (iCode *ic)
 {    
-	operand *left , *result ;
-	int size, offset = 0;
-	char *l;    
-
-	/* rotate right with carry */
-	left = IC_LEFT(ic);
-	result=IC_RESULT(ic);
-	aopOp (left,ic,FALSE);
-	aopOp (result,ic,FALSE);
-
-
-	freeAsmop(left,NULL,ic,TRUE);
-	freeAsmop(result,NULL,ic,TRUE);
+	genRotC(ic,0);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2620,694 +2636,219 @@ static void genRLC (iCode *ic)
 static void genGetHbit (iCode *ic)
 {
 	operand *left, *result;
+	int size, offset ;
+
 	left = IC_LEFT(ic);
 	result=IC_RESULT(ic);
 	aopOp (left,ic,FALSE);
 	aopOp (result,ic,FALSE);
 
-
+	size = AOP_SIZE(result);
+	if (!sameRegs(AOP(left),AOP(result))) {
+		emitcode("clr","%s",aopGet(AOP(result),size -1));
+		emitcode("sbrc","%s,7",aopGet(AOP(left),size -1));
+		emitcode("subi","%s,lo8(-1)",aopGet(AOP(result),size-1));
+	} else {
+		emitcode("clr","r0");
+		emitcode("sbrc","%s,7",aopGet(AOP(left),size-1));
+		emitcode("subi","r0,lo8(-1)");
+		aopPut(AOP(result),"r0",0);
+	}
+	offset = 1;
+	size --;	
+	while (size--) {
+		emitcode("clr",aopGet(AOP(result),offset++));
+	}
 	freeAsmop(left,NULL,ic,TRUE);
 	freeAsmop(result,NULL,ic,TRUE);
 }
 
 /*-----------------------------------------------------------------*/
-/* AccRol - rotate left accumulator by known count                 */
+/* genShiftLeftLit - shift left by a known amount                  */
 /*-----------------------------------------------------------------*/
-static void AccRol (int shCount)
+static void genShiftLeftLit (iCode *ic)
 {
-	shCount &= 0x0007;              // shCount : 0..7
-	switch(shCount){
-	case 0 :
-		break;
-	case 1 :
-		emitcode("rl","a");
-		break;
-	case 2 :
-		emitcode("rl","a");
-		emitcode("rl","a");
-		break;
-	case 3 :
-		emitcode("swap","a");
-		emitcode("rr","a");
-		break;
-	case 4 :
-		emitcode("swap","a");
-		break;
-	case 5 :
-		emitcode("swap","a");
-		emitcode("rl","a");
-		break;
-	case 6 :
-		emitcode("rr","a");
-		emitcode("rr","a");
-		break;
-	case 7 :
-		emitcode("rr","a");
-		break;
-	}
-}
+	operand *left,*right, *result;
+	int size , shCount, offset =0;
+	int lByteZ=0;
 
-/*-----------------------------------------------------------------*/
-/* AccLsh - left shift accumulator by known count                  */
-/*-----------------------------------------------------------------*/
-static void AccLsh (int shCount)
-{
-	if(shCount != 0){
-		if(shCount == 1)
-			emitcode("add","a,acc");
-		else 
-			if(shCount == 2) {
-				emitcode("add","a,acc");
-				emitcode("add","a,acc");
-			} else {
-				/* rotate left accumulator */
-				AccRol(shCount);
-				/* and kill the lower order bits */
-				emitcode("anl","a,#0x%02x", SLMask[shCount]);
-			}
-	}
-}
-
-/*-----------------------------------------------------------------*/
-/* AccRsh - right shift accumulator by known count                 */
-/*-----------------------------------------------------------------*/
-static void AccRsh (int shCount)
-{
-	if(shCount != 0){
-		if(shCount == 1){
-			CLRC;
-			emitcode("rrc","a");
-		} else {
-			/* rotate right accumulator */
-			AccRol(8 - shCount);
-			/* and kill the higher order bits */
-			emitcode("anl","a,#0x%02x", SRMask[shCount]);
-		}
-	}
-}
-
-/*-----------------------------------------------------------------*/
-/* AccSRsh - signed right shift accumulator by known count                 */
-/*-----------------------------------------------------------------*/
-static void AccSRsh (int shCount)
-{
-	symbol *tlbl ;
-	if(shCount != 0){
-		if(shCount == 1){
-			emitcode("mov","c,acc.7");
-			emitcode("rrc","a");
-		} else if(shCount == 2){
-			emitcode("mov","c,acc.7");
-			emitcode("rrc","a");
-			emitcode("mov","c,acc.7");
-			emitcode("rrc","a");
-		} else {
-			tlbl = newiTempLabel(NULL);
-			/* rotate right accumulator */
-			AccRol(8 - shCount);
-			/* and kill the higher order bits */
-			emitcode("anl","a,#0x%02x", SRMask[shCount]);
-			emitcode("jnb","acc.%d,%05d$",7-shCount,tlbl->key+100);
-			emitcode("orl","a,#0x%02x",
-				 (unsigned char)~SRMask[shCount]);
-			emitcode("","%05d$:",tlbl->key+100);
-		}
-	}
-}
-
-/*-----------------------------------------------------------------*/
-/* shiftR1Left2Result - shift right one byte from left to result   */
-/*-----------------------------------------------------------------*/
-static void shiftR1Left2Result (operand *left, int offl,
-				operand *result, int offr,
-				int shCount, int sign)
-{
-	MOVA(aopGet(AOP(left),offl,FALSE,FALSE));
-	/* shift right accumulator */
-	if(sign)
-		AccSRsh(shCount);
-	else
-		AccRsh(shCount);
-	aopPut(AOP(result),"a",offr);
-}
-
-/*-----------------------------------------------------------------*/
-/* shiftL1Left2Result - shift left one byte from left to result    */
-/*-----------------------------------------------------------------*/
-static void shiftL1Left2Result (operand *left, int offl,
-				operand *result, int offr, int shCount)
-{
-	char *l;
-	l = aopGet(AOP(left),offl);
-	MOVA(l);
-	/* shift left accumulator */
-	AccLsh(shCount);
-	aopPut(AOP(result),"a",offr);
-}
-
-/*-----------------------------------------------------------------*/
-/* movLeft2Result - move byte from left to result                  */
-/*-----------------------------------------------------------------*/
-static void movLeft2Result (operand *left, int offl,
-			    operand *result, int offr, int sign)
-{
-	char *l;
-	if(!sameRegs(AOP(left),AOP(result)) || (offl != offr)){
-		l = aopGet(AOP(left),offl);
-
-		if (*l == '@' && (IS_AOP_PREG(result))) {
-			emitcode("mov","a,%s",l);
-			aopPut(AOP(result),"a",offr);
-		} else {
-			if(!sign)
-				aopPut(AOP(result),l,offr);
-			else{
-				/* MSB sign in acc.7 ! */
-				if(getDataSize(left) == offl+1){
-					emitcode("mov","a,%s",l);
-					aopPut(AOP(result),"a",offr);
-				}
-			}
-		}
-	}
-}
-
-/*-----------------------------------------------------------------*/
-/* AccAXRrl1 - right rotate c->a:x->c by 1                         */
-/*-----------------------------------------------------------------*/
-static void AccAXRrl1 (char *x)
-{
-	emitcode("rrc","a");
-	emitcode("xch","a,%s", x);
-	emitcode("rrc","a");
-	emitcode("xch","a,%s", x);
-}
-
-/*-----------------------------------------------------------------*/
-/* AccAXLrl1 - left rotate c<-a:x<-c by 1                          */
-/*-----------------------------------------------------------------*/
-static void AccAXLrl1 (char *x)
-{
-	emitcode("xch","a,%s",x);
-	emitcode("rlc","a");
-	emitcode("xch","a,%s",x);
-	emitcode("rlc","a");
-}
-
-/*-----------------------------------------------------------------*/
-/* AccAXLsh1 - left shift a:x<-0 by 1                              */
-/*-----------------------------------------------------------------*/
-static void AccAXLsh1 (char *x)
-{
-	emitcode("xch","a,%s",x);
-	emitcode("add","a,acc");
-	emitcode("xch","a,%s",x);
-	emitcode("rlc","a");
-}
-
-/*-----------------------------------------------------------------*/
-/* AccAXLsh - left shift a:x by known count (0..7)                 */
-/*-----------------------------------------------------------------*/
-static void AccAXLsh (char *x, int shCount)
-{
-	switch(shCount){
-	case 0 :
-		break;
-	case 1 :
-		AccAXLsh1(x);
-		break;
-	case 2 :
-		AccAXLsh1(x);
-		AccAXLsh1(x);
-		break;
-	case 3 :
-	case 4 :
-	case 5 :                        // AAAAABBB:CCCCCDDD
-		AccRol(shCount);            // BBBAAAAA:CCCCCDDD
-		emitcode("anl","a,#0x%02x",
-			 SLMask[shCount]);  // BBB00000:CCCCCDDD
-		emitcode("xch","a,%s",x);   // CCCCCDDD:BBB00000
-		AccRol(shCount);            // DDDCCCCC:BBB00000
-		emitcode("xch","a,%s",x);   // BBB00000:DDDCCCCC
-		emitcode("xrl","a,%s",x);   // (BBB^DDD)CCCCC:DDDCCCCC
-		emitcode("xch","a,%s",x);   // DDDCCCCC:(BBB^DDD)CCCCC
-		emitcode("anl","a,#0x%02x",
-			 SLMask[shCount]);  // DDD00000:(BBB^DDD)CCCCC
-		emitcode("xch","a,%s",x);   // (BBB^DDD)CCCCC:DDD00000
-		emitcode("xrl","a,%s",x);   // BBBCCCCC:DDD00000            
-		break;
-	case 6 :                        // AAAAAABB:CCCCCCDD
-		emitcode("anl","a,#0x%02x",
-			 SRMask[shCount]);  // 000000BB:CCCCCCDD
-		emitcode("mov","c,acc.0");  // c = B
-		emitcode("xch","a,%s",x);   // CCCCCCDD:000000BB
-		AccAXRrl1(x);               // BCCCCCCD:D000000B
-		AccAXRrl1(x);               // BBCCCCCC:DD000000
-		break;
-	case 7 :                        // a:x <<= 7
-		emitcode("anl","a,#0x%02x",
-			 SRMask[shCount]);  // 0000000B:CCCCCCCD
-		emitcode("mov","c,acc.0");  // c = B
-		emitcode("xch","a,%s",x);   // CCCCCCCD:0000000B
-		AccAXRrl1(x);               // BCCCCCCC:D0000000
-		break;
-	default :
-		break;
-	}
-}
-
-/*-----------------------------------------------------------------*/
-/* AccAXRsh - right shift a:x known count (0..7)                   */
-/*-----------------------------------------------------------------*/
-static void AccAXRsh (char *x, int shCount)
-{   
-	switch(shCount){
-	case 0 :
-		break;
-	case 1 :
-		CLRC;
-		AccAXRrl1(x);               // 0->a:x
-		break;
-	case 2 :
-		CLRC;
-		AccAXRrl1(x);               // 0->a:x
-		CLRC;
-		AccAXRrl1(x);               // 0->a:x
-		break;
-	case 3 :
-	case 4 :
-	case 5 :                        // AAAAABBB:CCCCCDDD = a:x
-		AccRol(8 - shCount);        // BBBAAAAA:DDDCCCCC
-		emitcode("xch","a,%s",x);   // CCCCCDDD:BBBAAAAA
-		AccRol(8 - shCount);        // DDDCCCCC:BBBAAAAA
-		emitcode("anl","a,#0x%02x",
-			 SRMask[shCount]);  // 000CCCCC:BBBAAAAA
-		emitcode("xrl","a,%s",x);   // BBB(CCCCC^AAAAA):BBBAAAAA
-		emitcode("xch","a,%s",x);   // BBBAAAAA:BBB(CCCCC^AAAAA)
-		emitcode("anl","a,#0x%02x",
-			 SRMask[shCount]);  // 000AAAAA:BBB(CCCCC^AAAAA)
-		emitcode("xch","a,%s",x);   // BBB(CCCCC^AAAAA):000AAAAA
-		emitcode("xrl","a,%s",x);   // BBBCCCCC:000AAAAA
-		emitcode("xch","a,%s",x);   // 000AAAAA:BBBCCCCC
-		break;
-	case 6 :                        // AABBBBBB:CCDDDDDD
-		emitcode("mov","c,acc.7");
-		AccAXLrl1(x);               // ABBBBBBC:CDDDDDDA
-		AccAXLrl1(x);               // BBBBBBCC:DDDDDDAA
-		emitcode("xch","a,%s",x);   // DDDDDDAA:BBBBBBCC
-		emitcode("anl","a,#0x%02x",
-			 SRMask[shCount]);  // 000000AA:BBBBBBCC
-		break;
-	case 7 :                        // ABBBBBBB:CDDDDDDD
-		emitcode("mov","c,acc.7");  // c = A
-		AccAXLrl1(x);               // BBBBBBBC:DDDDDDDA
-		emitcode("xch","a,%s",x);   // DDDDDDDA:BBBBBBCC
-		emitcode("anl","a,#0x%02x",
-			 SRMask[shCount]);  // 0000000A:BBBBBBBC
-		break;
-	default :
-		break;
-	}
-}
-
-/*-----------------------------------------------------------------*/
-/* AccAXRshS - right shift signed a:x known count (0..7)           */
-/*-----------------------------------------------------------------*/
-static void AccAXRshS (char *x, int shCount)
-{   
-	symbol *tlbl ;
-	switch(shCount){
-	case 0 :
-		break;
-	case 1 :
-		emitcode("mov","c,acc.7");
-		AccAXRrl1(x);               // s->a:x
-		break;
-	case 2 :
-		emitcode("mov","c,acc.7");
-		AccAXRrl1(x);               // s->a:x
-		emitcode("mov","c,acc.7");
-		AccAXRrl1(x);               // s->a:x
-		break;
-	case 3 :
-	case 4 :
-	case 5 :                        // AAAAABBB:CCCCCDDD = a:x
-		tlbl = newiTempLabel(NULL);
-		AccRol(8 - shCount);        // BBBAAAAA:CCCCCDDD
-		emitcode("xch","a,%s",x);   // CCCCCDDD:BBBAAAAA
-		AccRol(8 - shCount);        // DDDCCCCC:BBBAAAAA
-		emitcode("anl","a,#0x%02x",
-			 SRMask[shCount]);  // 000CCCCC:BBBAAAAA
-		emitcode("xrl","a,%s",x);   // BBB(CCCCC^AAAAA):BBBAAAAA
-		emitcode("xch","a,%s",x);   // BBBAAAAA:BBB(CCCCC^AAAAA)
-		emitcode("anl","a,#0x%02x",
-			 SRMask[shCount]);  // 000AAAAA:BBB(CCCCC^AAAAA)
-		emitcode("xch","a,%s",x);   // BBB(CCCCC^AAAAA):000AAAAA
-		emitcode("xrl","a,%s",x);   // BBBCCCCC:000AAAAA
-		emitcode("xch","a,%s",x);   // 000SAAAA:BBBCCCCC
-		emitcode("jnb","acc.%d,%05d$",7-shCount,tlbl->key+100); 
-		emitcode("orl","a,#0x%02x",
-			 (unsigned char)~SRMask[shCount]);  // 111AAAAA:BBBCCCCC
-		emitcode("","%05d$:",tlbl->key+100);
-		break;                      // SSSSAAAA:BBBCCCCC
-	case 6 :                        // AABBBBBB:CCDDDDDD
-		tlbl = newiTempLabel(NULL);
-		emitcode("mov","c,acc.7");
-		AccAXLrl1(x);               // ABBBBBBC:CDDDDDDA
-		AccAXLrl1(x);               // BBBBBBCC:DDDDDDAA
-		emitcode("xch","a,%s",x);   // DDDDDDAA:BBBBBBCC
-		emitcode("anl","a,#0x%02x",
-			 SRMask[shCount]);  // 000000AA:BBBBBBCC
-		emitcode("jnb","acc.%d,%05d$",7-shCount,tlbl->key+100); 
-		emitcode("orl","a,#0x%02x",
-			 (unsigned char)~SRMask[shCount]);  // 111111AA:BBBBBBCC
-		emitcode("","%05d$:",tlbl->key+100);
-		break;
-	case 7 :                        // ABBBBBBB:CDDDDDDD
-		tlbl = newiTempLabel(NULL);
-		emitcode("mov","c,acc.7");  // c = A
-		AccAXLrl1(x);               // BBBBBBBC:DDDDDDDA
-		emitcode("xch","a,%s",x);   // DDDDDDDA:BBBBBBCC
-		emitcode("anl","a,#0x%02x",
-			 SRMask[shCount]);  // 0000000A:BBBBBBBC
-		emitcode("jnb","acc.%d,%05d$",7-shCount,tlbl->key+100); 
-		emitcode("orl","a,#0x%02x",
-			 (unsigned char)~SRMask[shCount]);  // 1111111A:BBBBBBBC
-		emitcode("","%05d$:",tlbl->key+100);
-		break;
-	default :
-		break;
-	}
-}
-
-/*-----------------------------------------------------------------*/
-/* shiftL2Left2Result - shift left two bytes from left to result   */
-/*-----------------------------------------------------------------*/
-static void shiftL2Left2Result (operand *left, int offl,
-				operand *result, int offr, int shCount)
-{
-	if(sameRegs(AOP(result), AOP(left)) &&
-	   ((offl + MSB16) == offr)){
-				/* don't crash result[offr] */
-				//	MOVA(aopGet(AOP(left),offl,FALSE,FALSE));
-		emitcode("xch","a,%s", aopGet(AOP(left),offl+MSB16));
-	} else {
-		movLeft2Result(left,offl, result, offr, 0);
-		MOVA(aopGet(AOP(left),offl+MSB16));
-	}
-	/* ax << shCount (x = lsb(result))*/
-	AccAXLsh( aopGet(AOP(result),offr) , shCount);
-	aopPut(AOP(result),"a",offr+MSB16);
-}
-
-
-/*-----------------------------------------------------------------*/
-/* shiftR2Left2Result - shift right two bytes from left to result  */
-/*-----------------------------------------------------------------*/
-static void shiftR2Left2Result (operand *left, int offl,
-				operand *result, int offr,
-				int shCount, int sign)
-{
-	if(sameRegs(AOP(result), AOP(left)) &&
-	   ((offl + MSB16) == offr)){
-				/* don't crash result[offr] */
-				//	MOVA(aopGet(AOP(left),offl,FALSE,FALSE));
-		emitcode("xch","a,%s", aopGet(AOP(left),offl+MSB16));
-	} else {
-		movLeft2Result(left,offl, result, offr, 0);
-				//	MOVA(aopGet(AOP(left),offl+MSB16,FALSE,FALSE));
-	}
-	/* a:x >> shCount (x = lsb(result))*/
-	if(sign)
-		AccAXRshS( aopGet(AOP(result),offr) , shCount);
-	else
-		AccAXRsh( aopGet(AOP(result),offr) , shCount);
-	if(getDataSize(result) > 1)
-		aopPut(AOP(result),"a",offr+MSB16);
-}
-
-/*-----------------------------------------------------------------*/
-/* shiftLLeftOrResult - shift left one byte from left, or to result*/
-/*-----------------------------------------------------------------*/
-static void shiftLLeftOrResult (operand *left, int offl,
-				operand *result, int offr, int shCount)
-{
-	//    MOVA(aopGet(AOP(left),offl,FALSE,FALSE));
-	/* shift left accumulator */
-	AccLsh(shCount);
-	/* or with result */
-	emitcode("orl","a,%s", aopGet(AOP(result),offr));
-	/* back to result */
-	aopPut(AOP(result),"a",offr);
-}
-
-/*-----------------------------------------------------------------*/
-/* shiftRLeftOrResult - shift right one byte from left,or to result*/
-/*-----------------------------------------------------------------*/
-static void shiftRLeftOrResult (operand *left, int offl,
-				operand *result, int offr, int shCount)
-{
-	//   MOVA(aopGet(AOP(left),offl,FALSE,FALSE));
-	/* shift right accumulator */
-	AccRsh(shCount);
-	/* or with result */
-	emitcode("orl","a,%s", aopGet(AOP(result),offr));
-	/* back to result */
-	aopPut(AOP(result),"a",offr);
-}
-
-/*-----------------------------------------------------------------*/
-/* genlshOne - left shift a one byte quantity by known count       */
-/*-----------------------------------------------------------------*/
-static void genlshOne (operand *result, operand *left, int shCount)
-{       
-	shiftL1Left2Result(left, LSB, result, LSB, shCount);
-}
-
-/*-----------------------------------------------------------------*/
-/* genlshTwo - left shift two bytes by known amount != 0           */
-/*-----------------------------------------------------------------*/
-static void genlshTwo (operand *result,operand *left, int shCount)
-{
-	int size;
-    
-	size = getDataSize(result);
-
-	/* if shCount >= 8 */
-	if (shCount >= 8) {
-		shCount -= 8 ;
-
-		if (size > 1){
-			if (shCount)
-				shiftL1Left2Result(left, LSB, result, MSB16, shCount);
-			else 
-				movLeft2Result(left, LSB, result, MSB16, 0);
-		}
-		aopPut(AOP(result),zero,LSB);   
-	}
-
-	/*  1 <= shCount <= 7 */
-	else {  
-		if(size == 1)
-			shiftL1Left2Result(left, LSB, result, LSB, shCount); 
-		else 
-			shiftL2Left2Result(left, LSB, result, LSB, shCount);
-	}
-}
-
-/*-----------------------------------------------------------------*/
-/* shiftLLong - shift left one long from left to result            */
-/* offl = LSB or MSB16                                             */
-/*-----------------------------------------------------------------*/
-static void shiftLLong (operand *left, operand *result, int offr )
-{
-	char *l;
-	int size = AOP_SIZE(result);
-
-	if(size >= LSB+offr){
-		l = aopGet(AOP(left),LSB);
-		MOVA(l);
-		emitcode("add","a,acc");
-		if (sameRegs(AOP(left),AOP(result)) && 
-		    size >= MSB16+offr && offr != LSB )
-			emitcode("xch","a,%s",
-				 aopGet(AOP(left),LSB+offr));
-		else	    
-			aopPut(AOP(result),"a",LSB+offr);
-	}
-
-	if(size >= MSB16+offr){
-		if (!(sameRegs(AOP(result),AOP(left)) && size >= MSB16+offr && offr != LSB) ) {
-			l = aopGet(AOP(left),MSB16);
-			MOVA(l);
-		}
-		emitcode("rlc","a");
-		if (sameRegs(AOP(left),AOP(result)) && 
-		    size >= MSB24+offr && offr != LSB)
-			emitcode("xch","a,%s",
-				 aopGet(AOP(left),MSB16+offr));
-		else	    
-			aopPut(AOP(result),"a",MSB16+offr);
-	}
-
-	if(size >= MSB24+offr){
-		if (!(sameRegs(AOP(left),AOP(left)) && size >= MSB24+offr && offr != LSB)) {
-			l = aopGet(AOP(left),MSB24);
-			//	    MOVA(l);
-		}
-		emitcode("rlc","a");
-		if (sameRegs(AOP(left),AOP(result)) && 
-		    size >= MSB32+offr && offr != LSB )
-			emitcode("xch","a,%s",
-				 aopGet(AOP(left),MSB24+offr));
-		else	    
-			aopPut(AOP(result),"a",MSB24+offr);
-	}
-
-	if(size > MSB32+offr){
-		if (!(sameRegs(AOP(result),AOP(left)) && size >= MSB32+offr && offr != LSB)) {
-			l = aopGet(AOP(left),MSB32);
-			MOVA(l);	
-		}
-		emitcode("rlc","a");
-		aopPut(AOP(result),"a",MSB32+offr);
-	}
-	if(offr != LSB)
-		aopPut(AOP(result),zero,LSB);       
-}
-
-/*-----------------------------------------------------------------*/
-/* genlshFour - shift four byte by a known amount != 0             */
-/*-----------------------------------------------------------------*/
-static void genlshFour (operand *result, operand *left, int shCount)
-{
-	int size;
-
-	size = AOP_SIZE(result);
-
-	/* if shifting more that 3 bytes */
-	if (shCount >= 24 ) {
-		shCount -= 24;
-		if (shCount)
-			/* lowest order of left goes to the highest
-			   order of the destination */
-			shiftL1Left2Result(left, LSB, result, MSB32, shCount);
-		else
-			movLeft2Result(left, LSB, result, MSB32, 0);
-		aopPut(AOP(result),zero,LSB);
-		aopPut(AOP(result),zero,MSB16);
-		aopPut(AOP(result),zero,MSB32);
-		return;
-	}
-
-	/* more than two bytes */
-	else if ( shCount >= 16 ) {
-				/* lower order two bytes goes to higher order two bytes */
-		shCount -= 16;
-				/* if some more remaining */
-		if (shCount)
-			shiftL2Left2Result(left, LSB, result, MSB24, shCount);
-		else {
-			movLeft2Result(left, MSB16, result, MSB32, 0);
-			movLeft2Result(left, LSB, result, MSB24, 0);
-		}
-		aopPut(AOP(result),zero,MSB16);
-		aopPut(AOP(result),zero,LSB);
-		return;
-	}    
-
-	/* if more than 1 byte */
-	else if ( shCount >= 8 ) {
-				/* lower order three bytes goes to higher order  three bytes */
-		shCount -= 8;
-		if(size == 2){
-			if(shCount)
-				shiftL1Left2Result(left, LSB, result, MSB16, shCount);
-			else
-				movLeft2Result(left, LSB, result, MSB16, 0);
-		}
-		else{   /* size = 4 */
-			if(shCount == 0){
-				movLeft2Result(left, MSB24, result, MSB32, 0);
-				movLeft2Result(left, MSB16, result, MSB24, 0);
-				movLeft2Result(left, LSB, result, MSB16, 0);
-				aopPut(AOP(result),zero,LSB);
-			}
-			else if(shCount == 1)
-				shiftLLong(left, result, MSB16);
-			else{
-				shiftL2Left2Result(left, MSB16, result, MSB24, shCount);
-				shiftL1Left2Result(left, LSB, result, MSB16, shCount);
-				shiftRLeftOrResult(left, LSB, result, MSB24, 8 - shCount);
-				aopPut(AOP(result),zero,LSB);
-			}
-		}
-	}
-
-	/* 1 <= shCount <= 7 */
-	else if(shCount <= 2){
-		shiftLLong(left, result, LSB);
-		if(shCount == 2)
-			shiftLLong(result, result, LSB);
-	}
-	/* 3 <= shCount <= 7, optimize */
-	else{
-		shiftL2Left2Result(left, MSB24, result, MSB24, shCount);
-		shiftRLeftOrResult(left, MSB16, result, MSB24, 8 - shCount);
-		shiftL2Left2Result(left, LSB, result, LSB, shCount);
-	}
-}
-
-/*-----------------------------------------------------------------*/
-/* genLeftShiftLiteral - left shifting by known count              */
-/*-----------------------------------------------------------------*/
-static void genLeftShiftLiteral (operand *left,
-				 operand *right,
-				 operand *result,
-				 iCode *ic)
-{    
-	int shCount = (int) floatFromVal (AOP(right)->aopu.aop_lit);
-	int size;
-
-	freeAsmop(right,NULL,ic,TRUE);
+	right = IC_RIGHT(ic);
+	left  = IC_LEFT(ic);
+	result = IC_RESULT(ic);
 
 	aopOp(left,ic,FALSE);
 	aopOp(result,ic,FALSE);
+	size = AOP_SIZE(result);
+	shCount = (int)floatFromVal (AOP(right)->aopu.aop_lit);
 
-	size = getSize(operandType(result));
-
-#if VIEW_SIZE
-	emitcode("; shift left ","result %d, left %d",size,
-		 AOP_SIZE(left));
-#endif
-
-	/* I suppose that the left size >= result size */
-	if(shCount == 0){
-		while(size--){
-			movLeft2Result(left, size, result, size, 0);
+	if (shCount > (size*8 -1)) {
+		while (size--) aopPut(AOP(result),zero,offset++);
+		goto release;
+	}
+	switch(size) {
+	case 1:
+		if (!sameRegs(AOP(left),AOP(result)))
+			aopPut(AOP(result),aopGet(AOP(left),0),0);
+		if (shCount >= 4) {
+			emitcode("swap","%s",aopGet(AOP(result),0));
+			emitcode("andi","%s,0xf0");
+			shCount -= 4;
 		}
+		if (shCount == 1) {
+			emitcode("add","%s,%s",aopGet(AOP(result),0),aopGet(AOP(result),0));
+			shCount--;
+		}
+		while (shCount--)
+			emitcode("lsl","%s",aopGet(AOP(result),0));
+		break;
+	case 2:
+		if (shCount >= 12) {
+			aopPut(AOP(result),aopGet(AOP(left),0),1);
+			aopPut(AOP(result),zero,0);
+			emitcode("swap","%s",aopGet(AOP(result),1));
+			emitcode("andi","%s,0xf0",aopGet(AOP(result),1));
+			shCount -= 12;
+			lByteZ = 1;
+		}
+		if (shCount >= 8) {
+			aopPut(AOP(result),aopGet(AOP(left),0),1);
+			aopPut(AOP(result),zero,0);
+			shCount -= 8;
+			lByteZ = 1;
+		}
+		if (shCount >= 4) {
+			if (lByteZ) {
+				emitcode("swap","%s",aopGet(AOP(result),1));
+				emitcode("andi","%s,0xf0",aopGet(AOP(result),1));
+				shCount -= 4;				
+			} else {
+				int ssh;
+				shCount -= 4;
+				ssh = shCount;
+				if (sameRegs(AOP(left),AOP(result))) {
+					emitcode("mov","r1,%s",aopGet(AOP(left),0));
+					emitcode("swap","%s",aopGet(AOP(left),0));
+					emitcode("andi","%s,0xf0",aopGet(AOP(left),0));
+					emitcode("andi","r1,0x0f");
+					while(shCount--) {
+						emitcode("lsl","%s",aopGet(AOP(left),0));
+						emitcode("lsl","r1");
+					}
+					emitcode("swap","%s",aopGet(AOP(result),1));
+					emitcode("andi","%s,0xf0",aopGet(AOP(result),1));
+					while (ssh--) emitcode("lsl","%s",aopGet(AOP(result),1));
+					emitcode("or","%s,r1",aopGet(AOP(result),1));
+					shCount =0;
+				} else {
+					MOVR0(aopGet(AOP(left),0));
+					emitcode("mov","r1,r0");
+					emitcode("swap","r0");
+					emitcode("andi","r0,0xf0");
+					emitcode("andi","r1,0x0f");
+					while(shCount--) {
+						emitcode("lsl","r0");
+						emitcode("lsl","r1");
+					}
+					aopPut(AOP(result),"r0",0);
+					aopPut(AOP(result),aopGet(AOP(left),1),1);
+					emitcode("swap","%s",aopGet(AOP(result),1));
+					emitcode("andi","%s,0xf0",aopGet(AOP(result),1));
+					while (ssh--) emitcode("lsl","%s",aopGet(AOP(result),1));
+					emitcode("or","%s,r1",aopGet(AOP(result),1));
+					shCount =0;
+				}
+			}
+		}
+		if (!lByteZ && !sameRegs(AOP(result),AOP(left)) && shCount) {
+			offset = 0;
+			while(size--) {
+				aopPut(AOP(result),aopGet(AOP(left),offset),offset);
+				offset++;
+			}
+		}
+		while (shCount--) {
+			if (lByteZ) {
+				emitcode("lsl","%s",aopGet(AOP(result),1));
+			} else {
+				emitcode("lsl","%s",aopGet(AOP(result),0));
+				emitcode("rol","%s",aopGet(AOP(result),1));
+			}
+		}
+		break;
+	case 3:
+		assert("shifting generic pointer ?\n");
+		break;
+	case 4:
+		/* 32 bits we do only byte boundaries */
+		if (shCount >= 24) {
+			aopPut(AOP(result),aopGet(AOP(left),0),3);
+			aopPut(AOP(result),zero,2);
+			aopPut(AOP(result),zero,1);
+			aopPut(AOP(result),zero,0);
+			lByteZ = 3;
+			shCount -= 24;
+		}
+		if (shCount >= 16) {
+			aopPut(AOP(result),aopGet(AOP(left),0),3);
+			aopPut(AOP(result),aopGet(AOP(left),1),2);
+			aopPut(AOP(result),zero,1);
+			aopPut(AOP(result),zero,0);
+			lByteZ = 2;
+			shCount -= 16;
+		}
+		if (shCount >= 8) {
+			aopPut(AOP(result),aopGet(AOP(left),0),3);
+			aopPut(AOP(result),aopGet(AOP(left),1),2);
+			aopPut(AOP(result),aopGet(AOP(left),2),1);
+			aopPut(AOP(result),zero,0);
+			shCount -= 8;
+			lByteZ = 1;
+		}
+		if (!lByteZ && !sameRegs(AOP(left),AOP(right))) {
+			offset = 0;
+			while (size--) {
+				aopPut(AOP(result),aopGet(AOP(left),offset),offset);
+				offset++;
+			}
+			offset = 0;
+			size = AOP_SIZE(result);
+		}
+		if (shCount) {
+			switch (lByteZ) {
+			case 0:
+				while (shCount--) {
+					emitcode("lsl","%s",aopGet(AOP(result),0));
+					emitcode("rol","%s",aopGet(AOP(result),1));
+					emitcode("rol","%s",aopGet(AOP(result),2));
+					emitcode("rol","%s",aopGet(AOP(result),3));
+				}
+				break;
+			case 1:
+				while (shCount--) {
+					emitcode("lsl","%s",aopGet(AOP(result),1));
+					emitcode("rol","%s",aopGet(AOP(result),2));
+					emitcode("rol","%s",aopGet(AOP(result),3));
+				}
+				break;
+			case 2:
+				while (shCount--) {
+					emitcode("lsl","%s",aopGet(AOP(result),2));
+					emitcode("rol","%s",aopGet(AOP(result),3));
+				}
+				break;
+			case 3:
+				while (shCount--) {
+					emitcode("lsl","%s",aopGet(AOP(result),3));
+				}
+				break;
+			}
+		}
+
 	}
 
-	else if(shCount >= (size * 8))
-		while(size--)
-			aopPut(AOP(result),zero,size);
-	else{
-		switch (size) {
-		case 1:
-			genlshOne (result,left,shCount);
-			break;
-
-		case 2:
-		case 3:
-			genlshTwo (result,left,shCount);
-			break;
-
-		case 4:
-			genlshFour (result,left,shCount);
-			break;
-		}
-	}
+ release:	
 	freeAsmop(left,NULL,ic,TRUE);
+	freeAsmop(right,NULL,ic,TRUE);
 	freeAsmop(result,NULL,ic,TRUE);
 }
 
@@ -3327,361 +2868,48 @@ static void genLeftShift (iCode *ic)
 
 	aopOp(right,ic,FALSE);
 
-	/* if the shift count is known then do it 
-	   as efficiently as possible */
 	if (AOP_TYPE(right) == AOP_LIT) {
-		genLeftShiftLiteral (left,right,result,ic);
+		genShiftLeftLit(ic);
 		return ;
 	}
 
-	/* shift count is unknown then we have to form 
-	   a loop get the loop count in B : Note: we take
-	   only the lower order byte since shifting
-	   more that 32 bits make no sense anyway, ( the
-	   largest size of an object can be only 32 bits ) */  
-
-	emitcode("mov","b,%s",aopGet(AOP(right),0));
-	emitcode("inc","b");
-	freeAsmop (right,NULL,ic,TRUE);
+	/* unknown count */
 	aopOp(left,ic,FALSE);
 	aopOp(result,ic,FALSE);
-
-	/* now move the left to the result if they are not the
-	   same */
-	if (!sameRegs(AOP(left),AOP(result)) && 
-	    AOP_SIZE(result) > 1) {
-
-		size = AOP_SIZE(result);
-		offset=0;
+	size = AOP_SIZE(result);
+	offset = 0;
+	if (AOP_SIZE(right) > 1) {
+		if (isRegPair(AOP(right))) {
+			emitcode("movw","r24,%s",aopGet(AOP(right),0));
+		} else {
+			emitcode("mov","r24,%s",aopGet(AOP(right),0));
+			emitcode("mov","r25,%s",aopGet(AOP(right),1));
+		}
+	} else {
+		emitcode("mov","r24,%s",aopGet(AOP(right),0));
+	}
+	if (!sameRegs(AOP(left),AOP(result))) {
 		while (size--) {
-			l = aopGet(AOP(left),offset);
-			if (*l == '@' && (IS_AOP_PREG(result))) {
-
-				emitcode("mov","a,%s",l);
-				aopPut(AOP(result),"a",offset);
-			} else
-				aopPut(AOP(result),l,offset);
+			aopPut(AOP(result),aopGet(AOP(left),offset),offset);
 			offset++;
 		}
+		size = AOP_SIZE(result);
 	}
-
 	tlbl = newiTempLabel(NULL);
-	size = AOP_SIZE(result);
-	offset = 0 ;   
-	tlbl1 = newiTempLabel(NULL);
-
-	/* if it is only one byte then */
-	if (size == 1) {
-		symbol *tlbl1 = newiTempLabel(NULL);
-
-		l = aopGet(AOP(left),0);
-		MOVA(l);
-		emitcode("sjmp","%05d$",tlbl1->key+100); 
-		emitcode("","%05d$:",tlbl->key+100);
-		emitcode("add","a,acc");
-		emitcode("","%05d$:",tlbl1->key+100);
-		emitcode("djnz","b,%05d$",tlbl->key+100);      
-		aopPut(AOP(result),"a",0);
-		goto release ;
+	emitcode("","L%05d:",tlbl->key);
+	offset = 0;
+        while (size--) {
+		if (offset) emitcode("rol","%s",aopGet(AOP(result),offset));
+		else emitcode("lsl","%s",aopGet(AOP(result),0));
+		offset++;
 	}
-    
-	reAdjustPreg(AOP(result));    
-    
-	emitcode("sjmp","%05d$",tlbl1->key+100); 
-	emitcode("","%05d$:",tlbl->key+100);    
-	l = aopGet(AOP(result),offset);
-	MOVA(l);
-	emitcode("add","a,acc");         
-	aopPut(AOP(result),"a",offset++);
-	while (--size) {
-		l = aopGet(AOP(result),offset);
-		MOVA(l);
-		emitcode("rlc","a");         
-		aopPut(AOP(result),"a",offset++);
-	}
-	reAdjustPreg(AOP(result));
-
-	emitcode("","%05d$:",tlbl1->key+100);
-	emitcode("djnz","b,%05d$",tlbl->key+100);
+	if (AOP_SIZE(right) > 1) emitcode("sbiw","r24,1");
+	else emitcode("dec","r24");
+	emitcode("brne","L%05d",tlbl->key);
+	
  release:
 	freeAsmop(left,NULL,ic,TRUE);
-	freeAsmop(result,NULL,ic,TRUE);
-}
-
-/*-----------------------------------------------------------------*/
-/* genrshOne - right shift a one byte quantity by known count      */
-/*-----------------------------------------------------------------*/
-static void genrshOne (operand *result, operand *left,
-		       int shCount, int sign)
-{
-	shiftR1Left2Result(left, LSB, result, LSB, shCount, sign);
-}
-
-/*-----------------------------------------------------------------*/
-/* genrshTwo - right shift two bytes by known amount != 0          */
-/*-----------------------------------------------------------------*/
-static void genrshTwo (operand *result,operand *left,
-		       int shCount, int sign)
-{
-	/* if shCount >= 8 */
-	if (shCount >= 8) {
-		shCount -= 8 ;
-		if (shCount)
-			shiftR1Left2Result(left, MSB16, result, LSB,
-					   shCount, sign);
-		else 
-			movLeft2Result(left, MSB16, result, LSB, sign);
-		addSign(result, MSB16, sign);
-	}
-
-	/*  1 <= shCount <= 7 */
-	else
-		shiftR2Left2Result(left, LSB, result, LSB, shCount, sign); 
-}
-
-/*-----------------------------------------------------------------*/
-/* shiftRLong - shift right one long from left to result           */
-/* offl = LSB or MSB16                                             */
-/*-----------------------------------------------------------------*/
-static void shiftRLong (operand *left, int offl,
-			operand *result, int sign)
-{
-	if(!sign)
-		emitcode("clr","c");
-	MOVA(aopGet(AOP(left),MSB32));
-	if(sign)
-		emitcode("mov","c,acc.7");
-	emitcode("rrc","a");
-	aopPut(AOP(result),"a",MSB32-offl);
-	if(offl == MSB16)
-				/* add sign of "a" */
-		addSign(result, MSB32, sign);
-
-	MOVA(aopGet(AOP(left),MSB24));
-	emitcode("rrc","a");
-	aopPut(AOP(result),"a",MSB24-offl);
-
-	MOVA(aopGet(AOP(left),MSB16));
-	emitcode("rrc","a");
-	aopPut(AOP(result),"a",MSB16-offl);
-
-	if(offl == LSB){
-		MOVA(aopGet(AOP(left),LSB));
-		emitcode("rrc","a");
-		aopPut(AOP(result),"a",LSB);
-	}
-}
-
-/*-----------------------------------------------------------------*/
-/* genrshFour - shift four byte by a known amount != 0             */
-/*-----------------------------------------------------------------*/
-static void genrshFour (operand *result, operand *left,
-			int shCount, int sign)
-{
-	/* if shifting more that 3 bytes */
-	if(shCount >= 24 ) {
-		shCount -= 24;
-		if(shCount)
-			shiftR1Left2Result(left, MSB32, result, LSB, shCount, sign);
-		else
-			movLeft2Result(left, MSB32, result, LSB, sign);
-		addSign(result, MSB16, sign);
-	}
-	else if(shCount >= 16){
-		shCount -= 16;
-		if(shCount)
-			shiftR2Left2Result(left, MSB24, result, LSB, shCount, sign);
-		else{
-			movLeft2Result(left, MSB24, result, LSB, 0);
-			movLeft2Result(left, MSB32, result, MSB16, sign);
-		}
-		addSign(result, MSB24, sign);
-	}
-	else if(shCount >= 8){
-		shCount -= 8;
-		if(shCount == 1)
-			shiftRLong(left, MSB16, result, sign);
-		else if(shCount == 0){
-			movLeft2Result(left, MSB16, result, LSB, 0);
-			movLeft2Result(left, MSB24, result, MSB16, 0);
-			movLeft2Result(left, MSB32, result, MSB24, sign);
-			addSign(result, MSB32, sign);
-		}
-		else{
-			shiftR2Left2Result(left, MSB16, result, LSB, shCount, 0);
-			shiftLLeftOrResult(left, MSB32, result, MSB16, 8 - shCount);
-			/* the last shift is signed */
-			shiftR1Left2Result(left, MSB32, result, MSB24, shCount, sign);
-			addSign(result, MSB32, sign);
-		}
-	}
-	else{   /* 1 <= shCount <= 7 */
-		if(shCount <= 2){
-			shiftRLong(left, LSB, result, sign);
-			if(shCount == 2)
-				shiftRLong(result, LSB, result, sign);
-		}
-		else{
-			shiftR2Left2Result(left, LSB, result, LSB, shCount, 0);
-			shiftLLeftOrResult(left, MSB24, result, MSB16, 8 - shCount);
-			shiftR2Left2Result(left, MSB24, result, MSB24, shCount, sign);
-		}
-	}
-}
-
-/*-----------------------------------------------------------------*/
-/* genRightShiftLiteral - right shifting by known count            */
-/*-----------------------------------------------------------------*/
-static void genRightShiftLiteral (operand *left,
-				  operand *right,
-				  operand *result,
-				  iCode *ic,
-				  int sign)
-{    
-	int shCount = (int) floatFromVal (AOP(right)->aopu.aop_lit);
-	int size;
-
 	freeAsmop(right,NULL,ic,TRUE);
-
-	aopOp(left,ic,FALSE);
-	aopOp(result,ic,FALSE);
-
-#if VIEW_SIZE
-	emitcode("; shift right ","result %d, left %d",AOP_SIZE(result),
-		 AOP_SIZE(left));
-#endif
-
-	size = getDataSize(left);
-	/* test the LEFT size !!! */
-
-	/* I suppose that the left size >= result size */
-	if(shCount == 0){
-		size = getDataSize(result);
-		while(size--)
-			movLeft2Result(left, size, result, size, 0);
-	}
-
-	else if(shCount >= (size * 8)){
-		if(sign)
-			/* get sign in acc.7 */
-			MOVA(aopGet(AOP(left),size-1));
-		addSign(result, LSB, sign);
-	} else{
-		switch (size) {
-		case 1:
-			genrshOne (result,left,shCount,sign);
-			break;
-
-		case 2:
-			genrshTwo (result,left,shCount,sign);
-			break;
-
-		case 4:
-			genrshFour (result,left,shCount,sign);
-			break;
-		default :
-			break;
-		}
-
-		freeAsmop(left,NULL,ic,TRUE);
-		freeAsmop(result,NULL,ic,TRUE);
-	}
-}
-
-/*-----------------------------------------------------------------*/
-/* genSignedRightShift - right shift of signed number              */
-/*-----------------------------------------------------------------*/
-static void genSignedRightShift (iCode *ic)
-{
-	operand *right, *left, *result;
-	int size, offset;
-	char *l;
-	symbol *tlbl, *tlbl1 ;
-
-	/* we do it the hard way put the shift count in b
-	   and loop thru preserving the sign */
-
-	right = IC_RIGHT(ic);
-	left  = IC_LEFT(ic);
-	result = IC_RESULT(ic);
-
-	aopOp(right,ic,FALSE);  
-
-
-	if ( AOP_TYPE(right) == AOP_LIT) {
-		genRightShiftLiteral (left,right,result,ic,1);
-		return ;
-	}
-	/* shift count is unknown then we have to form 
-	   a loop get the loop count in B : Note: we take
-	   only the lower order byte since shifting
-	   more that 32 bits make no sense anyway, ( the
-	   largest size of an object can be only 32 bits ) */  
-
-	emitcode("mov","b,%s",aopGet(AOP(right),0));
-	emitcode("inc","b");
-	freeAsmop (right,NULL,ic,TRUE);
-	aopOp(left,ic,FALSE);
-	aopOp(result,ic,FALSE);
-
-	/* now move the left to the result if they are not the
-	   same */
-	if (!sameRegs(AOP(left),AOP(result)) && 
-	    AOP_SIZE(result) > 1) {
-
-		size = AOP_SIZE(result);
-		offset=0;
-		while (size--) {
-			l = aopGet(AOP(left),offset);
-			if (*l == '@' && IS_AOP_PREG(result)) {
-
-				emitcode("mov","a,%s",l);
-				aopPut(AOP(result),"a",offset);
-			} else
-				aopPut(AOP(result),l,offset);
-			offset++;
-		}
-	}
-
-	/* mov the highest order bit to OVR */    
-	tlbl = newiTempLabel(NULL);
-	tlbl1= newiTempLabel(NULL);
-
-	size = AOP_SIZE(result);
-	offset = size - 1;
-	emitcode("mov","a,%s",aopGet(AOP(left),offset));
-	emitcode("rlc","a");
-	emitcode("mov","ov,c");
-	/* if it is only one byte then */
-	if (size == 1) {
-		l = aopGet(AOP(left),0);
-		MOVA(l);
-		emitcode("sjmp","%05d$",tlbl1->key+100);
-		emitcode("","%05d$:",tlbl->key+100);
-		emitcode("mov","c,ov");
-		emitcode("rrc","a");
-		emitcode("","%05d$:",tlbl1->key+100);
-		emitcode("djnz","b,%05d$",tlbl->key+100);
-		aopPut(AOP(result),"a",0);
-		goto release ;
-	}
-
-	reAdjustPreg(AOP(result));
-	emitcode("sjmp","%05d$",tlbl1->key+100);
-	emitcode("","%05d$:",tlbl->key+100);    
-	emitcode("mov","c,ov");
-	while (size--) {
-		l = aopGet(AOP(result),offset);
-		MOVA(l);
-		emitcode("rrc","a");         
-		aopPut(AOP(result),"a",offset--);
-	}
-	reAdjustPreg(AOP(result));
-	emitcode("","%05d$:",tlbl1->key+100);
-	emitcode("djnz","b,%05d$",tlbl->key+100);
-
- release:
-	freeAsmop(left,NULL,ic,TRUE);
 	freeAsmop(result,NULL,ic,TRUE);
 }
 
@@ -3696,99 +2924,6 @@ static void genRightShift (iCode *ic)
 	char *l;
 	symbol *tlbl, *tlbl1 ;
 
-	/* if signed then we do it the hard way preserve the
-	   sign bit moving it inwards */
-	retype = getSpec(operandType(IC_RESULT(ic)));
-
-	if (!SPEC_USIGN(retype)) {
-		genSignedRightShift (ic);
-		return ;
-	}
-
-	/* signed & unsigned types are treated the same : i.e. the
-	   signed is NOT propagated inwards : quoting from the
-	   ANSI - standard : "for E1 >> E2, is equivalent to division
-	   by 2**E2 if unsigned or if it has a non-negative value,
-	   otherwise the result is implementation defined ", MY definition
-	   is that the sign does not get propagated */
-
-	right = IC_RIGHT(ic);
-	left  = IC_LEFT(ic);
-	result = IC_RESULT(ic);
-
-	aopOp(right,ic,FALSE);
-
-	/* if the shift count is known then do it 
-	   as efficiently as possible */
-	if (AOP_TYPE(right) == AOP_LIT) {
-		genRightShiftLiteral (left,right,result,ic, 0);
-		return ;
-	}
-
-	/* shift count is unknown then we have to form 
-	   a loop get the loop count in B : Note: we take
-	   only the lower order byte since shifting
-	   more that 32 bits make no sense anyway, ( the
-	   largest size of an object can be only 32 bits ) */  
-
-	emitcode("mov","b,%s",aopGet(AOP(right),0));
-	emitcode("inc","b");
-	freeAsmop (right,NULL,ic,TRUE);
-	aopOp(left,ic,FALSE);
-	aopOp(result,ic,FALSE);
-
-	/* now move the left to the result if they are not the
-	   same */
-	if (!sameRegs(AOP(left),AOP(result)) && 
-	    AOP_SIZE(result) > 1) {
-
-		size = AOP_SIZE(result);
-		offset=0;
-		while (size--) {
-			l = aopGet(AOP(left),offset);
-			if (*l == '@' && IS_AOP_PREG(result)) {
-
-				emitcode("mov","a,%s",l);
-				aopPut(AOP(result),"a",offset);
-			} else
-				aopPut(AOP(result),l,offset);
-			offset++;
-		}
-	}
-
-	tlbl = newiTempLabel(NULL);
-	tlbl1= newiTempLabel(NULL);
-	size = AOP_SIZE(result);
-	offset = size - 1;
-
-	/* if it is only one byte then */
-	if (size == 1) {
-		l = aopGet(AOP(left),0);
-		MOVA(l);
-		emitcode("sjmp","%05d$",tlbl1->key+100);
-		emitcode("","%05d$:",tlbl->key+100);
-		CLRC;
-		emitcode("rrc","a");
-		emitcode("","%05d$:",tlbl1->key+100);
-		emitcode("djnz","b,%05d$",tlbl->key+100);
-		aopPut(AOP(result),"a",0);
-		goto release ;
-	}
-
-	reAdjustPreg(AOP(result));
-	emitcode("sjmp","%05d$",tlbl1->key+100);
-	emitcode("","%05d$:",tlbl->key+100);    
-	CLRC;
-	while (size--) {
-		l = aopGet(AOP(result),offset);
-		MOVA(l);
-		emitcode("rrc","a");         
-		aopPut(AOP(result),"a",offset--);
-	}
-	reAdjustPreg(AOP(result));
-
-	emitcode("","%05d$:",tlbl1->key+100);
-	emitcode("djnz","b,%05d$",tlbl->key+100);
 
  release:
 	freeAsmop(left,NULL,ic,TRUE);
@@ -3840,7 +2975,7 @@ static void genUnpackBits (operand *result, char *rname, int ptype)
 	    (SPEC_BLEN(etype) <= 8))  {
 
 				/* shift right acc */
-		AccRsh(shCnt);
+		//		AccRsh(shCnt);
 
 		emitcode("anl","a,#0x%02x",
 			 ((unsigned char) -1)>>(8 - SPEC_BLEN(etype)));
@@ -4345,7 +3480,7 @@ static void genPackBits (link    *etype ,
 		shCount = SPEC_BSTR(etype) ;
 
 				/* shift left acc */
-		AccLsh(shCount);
+		//		AccLsh(shCount);
 
 		if (SPEC_BLEN(etype) < 8 ) { /* if smaller than a byte */
 

@@ -8489,13 +8489,26 @@ void gen51AggregateAssign(iCode *ic) {
   int toSize=getSize(OP_SYMBOL(left)->type);
   int count=toSize;
 
+  if (SPEC_OCLS(OP_SYMBOL(left)->etype)!=xdata ||
+      SPEC_OCLS(OP_SYMBOL(right)->etype)!=code) {
+    // well, this code isn't used yet from anywhere else as for initialising
+    fprintf (stderr, "*** error: %s:%d can only assign aggregates from cseg to xseg for now\n", ic->filename, ic->lineno);
+    exit (457);
+  }
+
   if (fromSize!=toSize) {
-    fprintf (stderr, "*** error aggregates have different size");
-    if (fromSize<toSize)
-      count=fromSize;
+    fprintf (stderr, "*** error: %s:%d aggregates have different size\n",
+	     ic->filename, ic->lineno);
+    exit (821);
   }
   
   // memcpy from cseg to xseg
+  // this could be greatly improved here for multiple instances
+  // e.g.:
+  //  mov dptr,#fromName
+  //  mov r0:r1,#toName
+  //  mov r2:r3,#count
+  //  lcall _native_memcpy_cseg_to_xseg
   emitcode (";", "initialize %s", OP_SYMBOL(IC_LEFT(ic))->name);
   emitcode ("mov", "dptr,#_memcpy_PARM_2");
   emitcode ("mov", "a,#%s", fromName);
@@ -8504,7 +8517,7 @@ void gen51AggregateAssign(iCode *ic) {
   emitcode ("mov", "a,#(%s>>8)", fromName);
   emitcode ("movx", "@dptr,a");
   emitcode ("inc", "dptr");
-  emitcode ("mov", "a,#%02x;	from cseg", 2);
+  emitcode ("mov", "a,#%02x;	only from cseg for now", 2);
   emitcode ("movx", "@dptr,a");
   emitcode ("mov", "dptr,#_memcpy_PARM_3");
   emitcode ("mov", "a,#(%d>>0);	number of bytes", count);

@@ -1052,7 +1052,7 @@ ast * initAggregates (symbol * sym, initList * ival, ast * wid) {
 
       // copy this symbol
       newSym=copySymbol (sym);
-      SPEC_OCLS(newSym->type->next)=code;
+      SPEC_OCLS(newSym->etype)=code;
       sprintf (newSym->name, "%s_init__", sym->name);
       sprintf (newSym->rname,"%s_init__", sym->rname);
       addSym (SymbolTab, newSym, newSym->name, 0, 0, 1);
@@ -1203,8 +1203,8 @@ processBlockVars (ast * tree, int *stack, int action)
 
       if (action == ALLOCATE)
 	{
-	  autoInit = gatherAutoInit (tree->values.sym);
 	  *stack += allocVariables (tree->values.sym);
+	  autoInit = gatherAutoInit (tree->values.sym);
 
 	  /* if there are auto inits then do them */
 	  if (autoInit)

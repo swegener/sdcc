@@ -23,7 +23,9 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
-#ifdef SDCC_MODEL_FLAT24
+#if defined(__ds390) || defined (__mcs51)
+
+// we can do this faster and more efficient in assembler
 
 unsigned int _muluint (unsigned int a, unsigned int b) 
 {
@@ -40,8 +42,12 @@ unsigned int _muluint (unsigned int a, unsigned int b)
     mov r3,dpl ; lsb_a
 
     mov b,r3 ; lsb_a
+#if defined(SDCC_ds390) || defined(SDCC_MODEL_LARGE)
     mov dptr,#__muluint_PARM_2
     movx a,@dptr ; lsb_b
+#else // must be SDCC_MODEL_SMALL
+    mov a,__muluint_PARM_2 ; lsb_b
+#endif
     mul ab ; lsb_a*lsb_b
     mov r0,a
     mov r1,b
@@ -53,8 +59,12 @@ unsigned int _muluint (unsigned int a, unsigned int b)
     mov r1,a
 
     mov b,r3 ; lsb_a
+#if defined(SDCC_ds390) || defined(SDCC_MODEL_LARGE)
     inc dptr
     movx a,@dptr ; msb_b
+#else // must be SDCC_MODEL_SMALL
+    mov a,1+__muluint_PARM_2 ; msb_b
+#endif
     mul ab ; lsb_a*msb_b
     add a,r1
 
@@ -66,31 +76,25 @@ unsigned int _muluint (unsigned int a, unsigned int b)
 
 #else
 
+// we have to do it the hard way
+
 union uu {
-	struct { unsigned short lo,hi ;} s;
-        unsigned int t;
-} ;
+  struct { unsigned short lo,hi ;} s;
+  unsigned int t;
+};
 
 unsigned int _muluint (unsigned int a, unsigned int b) 
 {
-#ifdef SDCC_MODEL_LARGE
-	union uu _xdata *x;
-	union uu _xdata *y; 
-	union uu t;
-        x = (union uu _xdata *)&a;
-        y = (union uu _xdata *)&b;
-#else
-	register union uu _near *x;
-	register union uu _near *y; 
-	union uu t;
-        x = (union uu _near *)&a;
-        y = (union uu _near *)&b;
-#endif
+  union uu *x;
+  union uu *y; 
+  union uu t;
+  x = (union uu *)&a;
+  y = (union uu *)&b;
 
-        t.t = x->s.lo * y->s.lo;
-        t.s.hi += (x->s.lo * y->s.hi) + (x->s.hi * y->s.lo);
-
-       return t.t;
+  t.t = x->s.lo * y->s.lo;
+  t.s.hi += (x->s.lo * y->s.hi) + (x->s.hi * y->s.lo);
+  
+  return t.t;
 } 
 
 #endif

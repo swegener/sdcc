@@ -1,4 +1,4 @@
-all: as cpp gc ports sdcc packihx
+all: as cpp ports sdcc packihx
 
 as:
 	cd as\mcs51
@@ -8,11 +8,6 @@ as:
 cpp:
 	cd support\cpp
 	make -f Makefile.bcc
-	cd ..\..
-
-gc:
-	cd support\gc
-	make -f BCC_MAKEFILE gc.lib
 	cd ..\..
 
 ports: z80 mcs51 avr ds390 pic izt

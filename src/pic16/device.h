@@ -84,6 +84,8 @@ typedef struct {
 	int omit_ivt;
 	int leave_reset;
 	int stack_model;
+	int ivt_loc;
+	int nodefaultlibs;
 } pic16_options_t;
 
 #define STACK_MODEL_SMALL	(pic16_options.stack_model == 0)

@@ -1,3 +1,19 @@
+2004-06-28 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* device/include/pic16/pic18fregs.h: added case for pic18f2220.h
+	* device/include/pic16/pic18f2220.h: NEW,
+	* device/lib/pic16/libdev/pic18f2220.c: NEW,
+	* device/lib/pic16/libdev/Makefile: added 18f2220 in DEVS,
+	* src/pic16/device.c (struct Pics16): added info for 18f2220,
+	* src/pic16/device.h (struct pic16_options): added ivt_loc and
+	nodefaultlibs, ivt_loc is the location of the interrupt vector
+	table, and nodefaultlibs signs that default libraries should not be
+	linked in link stage,
+	* src/pic16/gen.c (genFunction): relocate interrupt vector functions
+	according to --ivt-loc argument,
+	* src/pic16/main.c (_process_pragma): emit '_stack' as public symbol
+	when pragma stack is found,
+
 2004-06-25 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/peeph.def: added peepholes 182.d (return 0.0), 

@@ -3289,6 +3289,10 @@ static void genFunction (iCode *ic)
 				case 2: abSym->address = 0x000018; break;
 			}
 
+
+			/* relocate interrupt vectors if needed */
+			abSym->address += pic16_options.ivt_loc;
+
 			addSet(&absSymSet, abSym);
 		}
 	}

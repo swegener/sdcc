@@ -110,6 +110,8 @@ _pic16_init (void)
 	pic16_options.omit_ivt = 0;
 	pic16_options.leave_reset = 0;
 	pic16_options.stack_model = 0;			/* 0 for 'small', 1 for 'large' */
+	pic16_options.ivt_loc = 0x000000;		/* default location of interrupt vectors */
+	pic16_options.nodefaultlibs = 0;		/* link default libraries */
 }
 
 static void
@@ -159,13 +161,18 @@ _process_pragma(const char *sz)
 	  char *stackPosS = strtok((char *)NULL, WHITE);
 	  value *stackPosVal;
 	  regs *reg;
+	  symbol *sym;
 
 //	  	fprintf(stderr, "Initializing stack pointer to 0x%x\n", (int)floatFromVal(constVal(stackPos)));
 		stackPosVal = constVal( stackPosS );
 		stackPos = (unsigned int)floatFromVal( stackPosVal );
 
-		reg=newReg(REG_SFR, PO_SFR_REGISTER, stackPos, "stack", 1, 0, NULL);
+		reg=newReg(REG_SFR, PO_SFR_REGISTER, stackPos, "_stack", 1, 0, NULL);
 		addSet(&pic16_fix_udata, reg);
+
+		sym = newSymbol("stack", 0);
+		sprintf(sym->rname, "_%s", sym->name);
+		addSet(&publics, sym);
 		
 		initsfpnt = 1;		// force glue() to initialize stack/frame pointers */
 
@@ -201,6 +208,10 @@ _process_pragma(const char *sz)
 #define ALT_ASM		"--asm="
 #define ALT_LINK	"--link="
 
+#define IVT_LOC		"--ivt-loc"
+#define NO_DEFLIBS	"--nodefaultlibs"
+
+
 char *alt_asm=NULL;
 char *alt_link=NULL;
 
@@ -211,6 +222,7 @@ extern int pic16_pcode_verbose;
 int pic16_enable_peeps=0;
 
 OPTION pic16_optionsTable[]= {
+	{ 0,	NO_DEFLIBS,		&pic16_options.nodefaultlibs,	"do not link default libraries when linking"},
 	{ 0,	"--pno-banksel",	&pic16_options.no_banksel,	"do not generate BANKSEL assembler directives"},
 	{ 0,	OPT_BANKSEL,		NULL,				"set banksel optimization level (default=0 no)"},
 	{ 0,	"--pomit-config-words",	&pic16_options.omit_configw,	"omit the generation of configuration words"},
@@ -228,7 +240,7 @@ OPTION pic16_optionsTable[]= {
 	{ 0,	ALT_LINK,	NULL,	"Use alternative linker"},
 
 	{ 0,	"--denable-peeps",	&pic16_enable_peeps,	"explicit enable of peepholes"},
-
+	{ 0,	IVT_LOC,	NULL,	"<nnnn> interrupt vector table location"},
 	{ 0,	NULL,		NULL,	NULL}
 	};
 
@@ -288,6 +300,10 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
 		return TRUE;
 	}
 
+	if(ISOPT(IVT_LOC)) {
+		pic16_options.ivt_loc = getIntArg(IVT_LOC, argv, i, *pargc);
+		return TRUE;
+	}
 
   return FALSE;
 }
@@ -316,10 +332,12 @@ static void _pic16_initPaths(void)
 		/* setup pic16 library directory */
 		pic16libDirsSet = appendStrSet(dataDirsSet, NULL, pic16libDir);
 		mergeSets(&libDirsSet, pic16libDirsSet);
-	
-		/* now add the library for the device */
-		sprintf(devlib, "%s.lib", pic16->name[2]);
-		addSet(&libFilesSet, Safe_strdup(devlib));
+
+		if(!pic16_options.nodefaultlibs) {
+			/* now add the library for the device */
+			sprintf(devlib, "%s.lib", pic16->name[2]);
+			addSet(&libFilesSet, Safe_strdup(devlib));
+		}
 	}
 }
 
@@ -425,6 +443,8 @@ _pic16_setDefaultOptions (void)
 	pic16_options.omit_ivt = 0;
 	pic16_options.leave_reset = 0;
 	pic16_options.stack_model = 0;			/* 0 for 'small', 1 for 'large' */
+	pic16_options.ivt_loc = 0x000000;
+	pic16_options.nodefaultlibs = 0;
 }
 
 static const char *

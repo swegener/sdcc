@@ -1,3 +1,8 @@
+2004-02-21 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* device/include/Makefile.in (install): fixed by replacing spaces
+	by tabs
+
 2004-02-20 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/pic16/ralloc.c (packRegsForAccUse):  disabled functions with #if

@@ -41,10 +41,10 @@ all:
 # ----------------------------------------------------
 install: all installdirs
 	$(CP) -r asm *.h $(sdcc_includedir)
-        if [ "`grep pic16 ../../ports.build`" = pic16 ]; then \
-                $(CP) pic16/*.h $(sdcc_includedir)/pic16 ; \
-        fi \
- 	rm -rf `find $(sdcc_includedir) -type d -name 'CVS'`
+	if [ "`grep pic16 ../../ports.build`" = pic16 ]; then \
+		$(CP) pic16/*.h $(sdcc_includedir)/pic16 ; \
+	fi
+	rm -rf `find $(sdcc_includedir) -type d -name 'CVS'`
 
 
 # Deleting all the installed files

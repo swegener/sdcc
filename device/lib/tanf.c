@@ -22,7 +22,7 @@
 
 float tancotf(const float x, const int iscot);
 
-float tanf(const float x) reentrant
+float tanf(const float x) _FLOAT_FUNC_REENTRANT
 {
     return tancotf(x, 0);
 }

@@ -23,7 +23,7 @@
 
 float tancotf(const float x, const int iscot);
 
-float cotf(const float x) reentrant
+float cotf(const float x) _FLOAT_FUNC_REENTRANT
 {
     float y;
 

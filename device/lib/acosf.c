@@ -22,7 +22,7 @@
 
 float asincosf(const float x, const int isacos);
 
-float acosf(const float x) reentrant
+float acosf(const float x) _FLOAT_FUNC_REENTRANT
 {
          if(x== 1.0) return 0.0;
     else if(x==-1.0) return PI;

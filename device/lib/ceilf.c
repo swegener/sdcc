@@ -20,7 +20,7 @@
 
 #include <math.h>
 
-float ceilf(float x) reentrant
+float ceilf(float x) _FLOAT_FUNC_REENTRANT
 {
     long r;
     r=x;

@@ -34,7 +34,7 @@
 #define C1  0.693359375 /*355.0/512.0*/
 #define C2 -2.121944400546905827679E-4
 
-float logf(const float x) reentrant
+float logf(const float x) _FLOAT_FUNC_REENTRANT
 {
 #if     defined(SDCC_mcs51) && defined(SDCC_MODEL_SMALL) \
     && !defined(SDCC_NOOVERLAY)

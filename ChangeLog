@@ -1,3 +1,26 @@
+2004-08-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* device/lib/acosf.c (acosf),
+	* device/lib/asinf.c (asinf),
+	* device/lib/atanf.c (atanf),
+	* device/lib/ceilf.c (ceilf),
+	* device/lib/cosf.c (cosf),
+	* device/lib/coshf.c (coshf),
+	* device/lib/cotf.c (cotf),
+	* device/lib/fabsf.c (fabsf),
+	* device/lib/floorf.c (floorf),
+	* device/lib/log10f.c (log10f),
+	* device/lib/logf.c (logf),
+	* device/lib/sinf.c (sinf),
+	* device/lib/sinhf.c (sinhf),
+	* device/lib/sqrtf.c (sqrtf),
+	* device/lib/tanf.c (tanf),
+	* device/lib/tanhf.c (tanhf),
+	* device/include/math.h: defined _FLOAT_FUNC_REENTRANT macro and
+	replaced all instances of "reentrant" in the library functions
+	defined in math.h with this macro.
+	* support/regression/tests/float_trans.c: reenabled test for hc08
+
 2004-08-30 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* device/lib/pic16/Makefile.common.in: added MODELFLAGS again, it was

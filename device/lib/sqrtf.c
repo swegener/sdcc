@@ -24,7 +24,7 @@
 #include <math.h>
 #include <errno.h>
 
-float sqrtf(const float x) reentrant
+float sqrtf(const float x) _FLOAT_FUNC_REENTRANT
 {
     float f, y;
     int n;

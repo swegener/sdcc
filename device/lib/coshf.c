@@ -22,7 +22,7 @@
 
 float sincoshf(const float x, const int iscosh);
 
-float coshf(const float x) reentrant
+float coshf(const float x) _FLOAT_FUNC_REENTRANT
 {
     return sincoshf(x, 1);
 }

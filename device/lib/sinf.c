@@ -22,7 +22,7 @@
 
 float sincosf(const float x, const int iscos);
 
-float sinf(const float x) reentrant
+float sinf(const float x) _FLOAT_FUNC_REENTRANT
 {
     if (x==0.0) return 0.0;
     return sincosf(x, 0);

@@ -20,7 +20,7 @@
 
 #include <math.h>
 
-float floorf (float x) reentrant
+float floorf (float x) _FLOAT_FUNC_REENTRANT
 {
     long r;
     r=x;

@@ -37,7 +37,7 @@
 #define P(g) ((P1*g+P0)*g)
 #define Q(g) (Q1*g+Q0)
 
-float tanhf(const float x) reentrant
+float tanhf(const float x) _FLOAT_FUNC_REENTRANT
 {
     float f, g, r;
 

@@ -21,7 +21,7 @@
 #include <math.h>
 #include <errno.h>
 
-float fabsf(const float x) reentrant
+float fabsf(const float x) _FLOAT_FUNC_REENTRANT
 {
     union float_long fl;
 

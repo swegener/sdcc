@@ -42,7 +42,7 @@
    #define myconst const
 #endif
 
-float atanf(const float x) reentrant
+float atanf(const float x) _FLOAT_FUNC_REENTRANT
 {
     float f, r, g;
     int n=0;

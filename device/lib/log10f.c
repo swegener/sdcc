@@ -21,7 +21,7 @@
 #include <math.h>
 #include <errno.h>
 
-float log10f(const float x) reentrant
+float log10f(const float x) _FLOAT_FUNC_REENTRANT
 {
     return logf(x)*0.4342944819;
 }

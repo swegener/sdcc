@@ -3330,8 +3330,10 @@ genMultOneByte (operand * left,
   emitcode ("jnb", "F0,%05d$", lbl->key+100);
   // only ONE op was negative, we have to do a 8/16-bit two's complement
   emitcode ("cpl", "a"); // lsb
-  emitcode ("inc", "a");
-  if (size==2) {
+  if (size==1) {
+    emitcode ("inc", "a");
+  } else {
+    emitcode ("add", "a,#1");
     emitcode ("xch", "a,b");
     emitcode ("cpl", "a"); // msb
     emitcode ("addc", "a,#0");

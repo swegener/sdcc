@@ -1028,7 +1028,7 @@ emitStaticSeg (memmap * map, FILE * out)
 {
   symbol *sym;
 
-  fprintf(out, "\t.area\t%s\n", map->sname);
+  /* fprintf(out, "\t.area\t%s\n", map->sname); */
 
   /* for all variables in this segment do */
   for (sym = setFirstItem (map->syms); sym;
@@ -1125,6 +1125,7 @@ emitMaps ()
 
   emitStaticSeg (statsg, code->oFile);
   if (port->genXINIT) {
+    fprintf (code->oFile, "\t.area\t%s\n", xinit->sname);
     emitStaticSeg (xinit, code->oFile);
   }
   inInitMode--;

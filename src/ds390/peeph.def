@@ -57,7 +57,12 @@ replace restart {
         mov  a,%3
 }
 
-
+replace restart {
+	mov	a,#0
+} by {
+        ; Peephole 3.d   changed mov to clr
+	clr	a
+}
 
 replace {
         mov  %1,a
@@ -1071,13 +1076,32 @@ replace {
 
 // saves 2 bytes, ?? cycles.
 replace {
+        mov  dpl,#0x%1
+        mov  dph,#0x%2
+	mov  dpx,#0x%3
+} by {
+        ; Peephole 182a   used 24 bit load of dptr
+        mov	dptr,#0x%3%2%1
+} if 24bitModeAndPortDS390
+
+// saves 2 bytes, ?? cycles.
+replace {
         mov  dpl,#%1
         mov  dph,#%2
 	mov  dpx,#%3
 } by {
-        ; Peephole 182a   used 24 bit load of dptr
+        ; Peephole 182b   used 24 bit load of dptr
         mov  dptr,#((%3 << 16) + (%2 << 8) + %1)
 } if 24bitModeAndPortDS390
+
+// saving 3 byte, 2 cycles, return(float_constant) profits here
+replace {
+        mov  dpl,#0x%1
+        mov  dph,#0x%2
+} by {
+        ; Peephole 182c   used 16 bit load of dptr
+        mov  dptr,#0x%2%1
+}
 
 // saving 3 byte, 2 cycles, return(float_constant) profits here
 replace {
@@ -1779,19 +1803,36 @@ replace {
 }
 
 replace {
-        mov     dps, #0x00
-        mov     dps, #0x01
+        mov     dps, #0
+        mov     dps, #1
 } by {
         ; Peephole 220a removed bogus DPS set
-        mov     dps, #0x01
+        mov     dps, #1
 }
 
 replace {
-        mov     dps, #0x01
-        mov     dps, #0x00
+        mov     dps, #1
+        mov     dps, #0
 } by {
         ; Peephole 220b removed bogus DPS set
-        mov     dps, #0x00
+        mov     dps, #0
+}
+
+replace {
+        mov     dps, #0
+        mov     dps, #0x01
+} by {
+        ; Peephole 220c removed bogus DPS set
+}
+
+replace {
+        mov     dps,#1
+	inc	dptr
+        mov     dps,#1
+} by {
+        ; Peephole 220d removed bogus DPS set
+        mov     dps,#1
+	inc	dptr
 }
 
 replace {
@@ -1814,35 +1855,35 @@ replace {
 }
 
 replace {
-	mov     dps, #0x00
+	mov     dps, #0
 	mov     %1,a
-	mov     dps, #0x01
+	mov     dps, #1
 } by {
 	; Peephole 222 removed DPS abuse.
 	mov     %1,a
-        mov     dps, #0x01
+        mov     dps, #1
 }
 
 replace {
-	mov	dps, #0x00
+	mov	dps, #0
 	xch	a, ap
 	mov 	%1, ap
-	mov	dps, #0x01
+	mov	dps, #1
 } by {
 	; Peephole 222a removed DPS abuse.
 	xch     a, ap
         mov     %1, ap
-        mov     dps, #0x01
+        mov     dps, #1
 }
 
 replace {
-	mov 	dps, #0x%1
+	mov 	dps, #%1
 	inc	dptr
 	movx	a,@dptr
 	mov	%2,a
-	mov	dps, #0x%1
+	mov	dps, #%1
 } by {
-	mov     dps, #0x%1
+	mov     dps, #%1
         inc     dptr
         movx    a,@dptr
         mov     %2,a
@@ -1850,29 +1891,29 @@ replace {
 }
 
 replace {
-	mov	dps, #0x00
+	mov	dps, #0
 	inc	dps
 } by {
-	mov	dps, #0x01
+	mov	dps, #1
 }
 
 replace {
-	mov	dps, #0x0%1
+	mov	dps, #%1
 	mov	dptr, %2
-	mov	dps, #0x0%1
+	mov	dps, #%1
 } by {
-	mov     dps, #0x0%1
+	mov     dps, #%1
         mov     dptr, %2
 }
 
 replace {
-	mov	dps, #0x01
+	mov	dps, #1
 	mov	dptr, %1
-	mov	dps, #0x00
+	mov	dps, #0
 	mov	dptr, %2
 	inc	dps
 } by {
-	mov	dps, #0x00
+	mov	dps, #0
 	mov	dptr, %2
 	inc	dps
 	mov	dptr, %1
@@ -1880,25 +1921,25 @@ replace {
 }
 
 replace {
-	mov	dps, #0x0%1
+	mov	dps, #%1
 	mov	dptr, %2
-	mov	dps, #0x0%3
+	mov	dps, #%3
 	mov	dptr, %4
-	mov	dps, #0x0%1
+	mov	dps, #%1
 } by {
-	mov	dps, #0x0%3
+	mov	dps, #%3
 	mov	dptr, %4
-	mov	dps, #0x0%1
+	mov	dps, #%1
 	mov	dptr, %2
 ; Peephole 224: DPS usage re-arranged.
 }
 
 replace {
-	mov	dps, #0x01
+	mov	dps, #1
 	mov	dptr, %1
-	mov	dps, #0x00
+	mov	dps, #0
 } by {
-	mov	dps, #0x01
+	mov	dps, #1
 	mov	dptr, %1
 	dec	dps
 }
@@ -1919,16 +1960,16 @@ replace {
 
 replace {
 	inc 	dps
-	mov	dps, #0x%1
+	mov	dps, #%1
 } by {
-	mov     dps, #0x%1
+	mov     dps, #%1
 }
 
 replace {
 	dec 	dps
-	mov	dps, #0x%1
+	mov	dps, #%1
 } by {
-	mov     dps, #0x%1
+	mov     dps, #%1
 }
 
 
@@ -1947,4 +1988,199 @@ replace {
 	; Peephole 227.a movc optimize
 	mov	dptr,#%2
 	movc	a,@a+dptr
+}
+
+replace {
+	mov	r%1,%2
+	mov	ar%1,%3
+} by {
+	; Peephole 228 redundant move
+	mov	ar%1,%3
+}
+
+replace {
+	mov	r%1,a
+	dec	r%1
+	mov	a,r%1
+} by {
+	; Peephole 229.a redundant move
+	dec	a
+	mov	r%1,a
+}
+
+replace {
+	mov	r%1,a
+	mov	r%2,b
+	mov	a,r%1
+} by {
+	; Peephole 229.b redundant move
+	mov	r%1,a
+	mov	r%2,b
+}
+
+replace {
+	mov	r%1,a
+	mov	r%2,b
+	add	a,#%3
+	mov	r%1,a
+	mov	a,r%2
+	addc	a,#(%3 >> 8)
+	mov	r%2,a
+} by {
+	; Peephole 229.c redundant move
+	add	a,#%3
+	mov	r%1,a
+	mov	a,b
+	addc	a,#(%3 >> 8)
+	mov	r%2,a
+}
+
+replace {
+	mov	a,%1
+	mov	b,a
+	movx	a,%2
+} by {
+	; Peephole 229.d redundant move
+	mov	b,%1
+	movx	a,%2
+}
+
+replace {
+	mov	dpl,r%1
+	mov	dph,r%2
+	mov	dpx,r%3
+	movx	a,@dptr
+	mov  	r%4,a
+	add  	a,#0x01	
+	mov  	r%5,a
+	mov  	dpl,r%1
+	mov  	dph,r%2
+	mov  	dpx,r%3
+	movx	@dptr,a
+} by {
+	; Peephole 230.a save reload dptr
+	mov	dpl,r%1
+	mov	dph,r%2
+	mov	dpx,r%3
+	movx	a,@dptr
+	mov  	r%4,a
+	add  	a,#0x01	
+	mov  	r%5,a
+	movx	@dptr,a
+}
+
+replace {
+	mov	dpl,r%1
+	mov	dph,r%2
+	mov	dpx,r%3
+	movx	a,@dptr
+	mov	r%4,a
+	dec	r%4
+	mov	dpl,r%1
+	mov	dph,r%2
+	mov	dpx,r%3
+	mov	a,r%4
+	movx	@dptr,a
+} by {
+	; Peephole 230.b save reload dptr
+	mov	dpl,r%1
+	mov	dph,r%2
+	mov	dpx,r%3
+	movx	a,@dptr
+	dec	a
+	mov	r%4,a
+	movx	@dptr,a
+}
+
+replace {
+	mov	dpl,r%1
+	mov	dph,r%2
+	mov	dpx,r%3
+	movx	a,@dptr
+	inc  	a
+	mov  	r%4,a
+	mov	dpl,r%1
+	mov	dph,r%2
+	mov	dpx,r%3
+	mov	a,r%4
+	movx	@dptr,a
+} by {
+	; Peephole 230.c save reload dptr
+	mov	dpl,r%1
+	mov	dph,r%2
+	mov	dpx,r%3
+	movx	a,@dptr
+	inc  	a
+	mov  	r%4,a
+	movx	@dptr,a
+}
+
+replace {
+	mov	r%1,dpl
+	mov	r%2,dph
+	mov	r%3,dpx
+	mov	dpl,r%1
+	mov	dph,r%2
+	mov	dpx,r%3
+} by {
+	; Peephole 230.d save reload dptr
+	mov	r%1,dpl
+	mov	r%2,dph
+	mov	r%3,dpx
+}
+
+replace {
+	mov	ar%1,r%2
+	mov	ar%3,r%1
+	mov	r%1,#0x00
+	mov	ar%2,r%4
+	mov	r3,#0x00
+} by {
+	; Peephole 231.a simplified moves
+	mov	ar%3,r%2
+	mov	ar%2,r%4
+	mov	r%4,#0
+	mov	r%1,#0
+}
+
+replace {
+	mov	r%1,#0
+	mov	r%2,#0
+	mov	a,r%2
+	orl	a,r%3
+	mov	%4,a
+	mov	a,r%5
+	orl	a,r%1
+	mov	%6,a
+} by {
+	; Peephole 231.b simplified or
+	mov	r%1,#0
+	mov	r%2,#0
+	mov	a,r%3
+	mov	%4,a
+	mov	a,r%5
+	mov	%6,a
+}
+
+replace {
+	mov	a,r%1
+	mov	b,r%2
+	mov	r%1,b
+	mov	r%2,a
+} by {
+	; Peehole 232.a simplified xch
+	mov	a,r%1
+	xch	a,r%2
+	mov	r%1,a
+}
+
+replace {
+	mov	a,#%1
+	mov	b,#%2
+	mov	r%3,b
+	mov	r%4,a
+} by {
+	; Peehole 232.b simplified xch
+	mov	r%3,#%1
+	mov	r%4,#%2
 }

@@ -20582,33 +20582,6 @@ int i,j; /* are valid in ANSI but not valid in SDCC */
 \newline 
 }
 \end_deeper 
-\layout Itemize
-
-functions declared as pointers
-\begin_inset LatexCommand \index{Pointer (to function)}
-
-\end_inset 
-
-
-\begin_inset LatexCommand \index{function pointers}
-
-\end_inset 
-
- must be dereferenced during the call.
-\begin_deeper 
-\layout Verse
-
-
-\family typewriter 
-int (*foo)();
-\newline 
-...
- 
-\newline 
-/* has to be called like this */ 
-\newline 
-(*foo)(); /* ANSI standard allows calls to be made like 'foo()' */
-\end_deeper 
 \layout Section
 
 Cyclomatic Complexity

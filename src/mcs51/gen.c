@@ -68,6 +68,8 @@ static struct
   {
     short r0Pushed;
     short r1Pushed;
+    short r0InB;
+    short r1InB;
     short accInUse;
     short inLine;
     short debugLine;
@@ -207,7 +209,13 @@ getFreePtr (iCode * ic, asmop ** aopp, bool result)
   if (!r0iu)
     {
       /* push it if not already pushed */
-      if (!_G.r0Pushed)
+      if (ic->op == IPUSH)
+	{
+	  emitcode ("mov", "b,%s",
+		    mcs51_regWithIdx (R0_IDX)->dname);
+	  _G.r0InB++;
+	}
+      else if (!_G.r0Pushed)
 	{
 	  emitcode ("push", "%s",
 		    mcs51_regWithIdx (R0_IDX)->dname);
@@ -225,7 +233,13 @@ getFreePtr (iCode * ic, asmop ** aopp, bool result)
   if (!r1iu)
     {
       /* push it if not already pushed */
-      if (!_G.r1Pushed)
+      if (ic->op == IPUSH)
+	{
+	  emitcode ("mov", "b,%s",
+		    mcs51_regWithIdx (R1_IDX)->dname);
+	  _G.r1InB++;
+	}
+      else if (!_G.r1Pushed)
 	{
 	  emitcode ("push", "%s",
 		    mcs51_regWithIdx (R1_IDX)->dname);
@@ -817,7 +831,12 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
   switch (aop->type)
     {
     case AOP_R0:
-      if (_G.r0Pushed)
+      if (_G.r0InB)
+        {
+	  emitcode ("mov", "r0,b");
+	  _G.r0InB--;
+	}
+      else if (_G.r0Pushed)
 	{
 	  if (pop)
 	    {
@@ -829,6 +848,11 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
       break;
 
     case AOP_R1:
+      if (_G.r1InB)
+        {
+	  emitcode ("mov", "r1,b");
+	  _G.r1InB--;
+	}
       if (_G.r1Pushed)
 	{
 	  if (pop)
@@ -897,6 +921,81 @@ dealloc:
 	    SPIL_LOC (op)->aop = NULL;
 	}
     }
+}
+
+/*------------------------------------------------------------------*/
+/* freeForBranchAsmop - partial free up of Asmop for a branch; just */
+/*                      pop r0 or r1 off stack if pushed            */
+/*------------------------------------------------------------------*/
+static void
+freeForBranchAsmop (operand * op)
+{
+  asmop *aop;
+
+  if (!op)
+    return;
+    
+  aop = op->aop;
+
+  if (!aop)
+    return;
+
+  if (aop->freed)
+    return;
+
+  switch (aop->type)
+    {
+    case AOP_R0:
+      if (_G.r0InB)
+	{
+	  emitcode ("mov", "r0,b");
+	}
+      else if (_G.r0Pushed)
+	{
+	  emitcode ("pop", "ar0");
+	}
+      break;
+
+    case AOP_R1:
+      if (_G.r1InB)
+	{
+	  emitcode ("mov", "r1,b");
+	}
+      else if (_G.r1Pushed)
+	{
+	  emitcode ("pop", "ar1");
+	}
+      break;
+
+    case AOP_STK:
+      {
+	int sz = aop->size;
+	int stk = aop->aopu.aop_stk + aop->size - 1;
+
+	emitcode ("mov", "b,r0");
+	if (stk)
+	  {
+	    emitcode ("mov", "a,_bp");
+	    emitcode ("add", "a,#0x%02x", ((char) stk) & 0xff);
+	    emitcode ("mov", "r0,a");
+	  }
+	else
+	  {
+	    emitcode ("mov", "r0,_bp");
+	  }
+
+	while (sz--)
+	  {
+	    emitcode ("pop", "acc");
+	    emitcode ("mov", "@r0,a");
+	    if (!sz)
+	      break;
+	    emitcode ("dec", "r0");
+	  }
+	emitcode ("mov", "r0,b");
+      }
+    }
+
 }
 
 /*-----------------------------------------------------------------*/
@@ -4587,7 +4686,7 @@ release:
 /* genIfxJump :- will create a jump depending on the ifx           */
 /*-----------------------------------------------------------------*/
 static void
-genIfxJump (iCode * ic, char *jval)
+genIfxJump (iCode * ic, char *jval, operand *left, operand *right, operand *result)
 {
   symbol *jlbl;
   symbol *tlbl = newiTempLabel (NULL);
@@ -4614,6 +4713,9 @@ genIfxJump (iCode * ic, char *jval)
     emitcode (inst, "%s,%05d$", jval, (tlbl->key + 100));
   else
     emitcode (inst, "%05d$", tlbl->key + 100);
+  freeForBranchAsmop (result);
+  freeForBranchAsmop (right);
+  freeForBranchAsmop (left);
   emitcode ("ljmp", "%05d$", jlbl->key + 100);
   emitcode ("", "%05d$:", tlbl->key + 100);
 
@@ -4676,7 +4778,7 @@ genCmp (operand * left, operand * right,
 		      MOVA (aopGet (AOP (left), AOP_SIZE (left) - 1, FALSE, FALSE));
 		      if (!(AOP_TYPE (result) == AOP_CRY && AOP_SIZE (result)) && ifx)
 			{
-			  genIfxJump (ifx, "acc.7");
+			  genIfxJump (ifx, "acc.7", left, right, result);
 			  return;
 			}
 		      else
@@ -4735,7 +4837,7 @@ release:
          ifx conditional branch then generate
          code a little differently */
       if (ifx)
-	genIfxJump (ifx, "c");
+	genIfxJump (ifx, "c", NULL, NULL, result);
       else
 	outBitC (result);
       /* leave the result in acc */
@@ -4960,11 +5062,17 @@ genCmpEq (iCode * ic, iCode * ifx)
 	  if (IC_TRUE (ifx))
 	    {
 	      emitcode ("jnc", "%05d$", tlbl->key + 100);
+	      freeForBranchAsmop (result);
+	      freeForBranchAsmop (right);
+	      freeForBranchAsmop (left);
 	      emitcode ("ljmp", "%05d$", IC_TRUE (ifx)->key + 100);
 	    }
 	  else
 	    {
 	      emitcode ("jc", "%05d$", tlbl->key + 100);
+	      freeForBranchAsmop (result);
+	      freeForBranchAsmop (right);
+	      freeForBranchAsmop (left);
 	      emitcode ("ljmp", "%05d$", IC_FALSE (ifx)->key + 100);
 	    }
 	  emitcode ("", "%05d$:", tlbl->key + 100);
@@ -4975,6 +5083,9 @@ genCmpEq (iCode * ic, iCode * ifx)
 	  gencjneshort (left, right, tlbl);
 	  if (IC_TRUE (ifx))
 	    {
+	      freeForBranchAsmop (result);
+	      freeForBranchAsmop (right);
+	      freeForBranchAsmop (left);
 	      emitcode ("ljmp", "%05d$", IC_TRUE (ifx)->key + 100);
 	      emitcode ("", "%05d$:", tlbl->key + 100);
 	    }
@@ -4983,6 +5094,9 @@ genCmpEq (iCode * ic, iCode * ifx)
 	      symbol *lbl = newiTempLabel (NULL);
 	      emitcode ("sjmp", "%05d$", lbl->key + 100);
 	      emitcode ("", "%05d$:", tlbl->key + 100);
+	      freeForBranchAsmop (result);
+	      freeForBranchAsmop (right);
+	      freeForBranchAsmop (left);
 	      emitcode ("ljmp", "%05d$", IC_FALSE (ifx)->key + 100);
 	      emitcode ("", "%05d$:", lbl->key + 100);
 	    }
@@ -5030,7 +5144,7 @@ genCmpEq (iCode * ic, iCode * ifx)
 	}
       if (ifx)
 	{
-	  genIfxJump (ifx, "c");
+	  genIfxJump (ifx, "c", left, right, result);
 	  goto release;
 	}
       /* if the result is used in an arithmetic operation
@@ -5047,7 +5161,7 @@ genCmpEq (iCode * ic, iCode * ifx)
 	}
       if (ifx)
 	{
-	  genIfxJump (ifx, "a");
+	  genIfxJump (ifx, "a", left, right, result);
 	  goto release;
 	}
       /* if the result is used in an arithmetic operation
@@ -5253,7 +5367,7 @@ jumpIfTrue (iCode * ic)
 /* jmpTrueOrFalse -                                                */
 /*-----------------------------------------------------------------*/
 static void
-jmpTrueOrFalse (iCode * ic, symbol * tlbl)
+jmpTrueOrFalse (iCode * ic, symbol * tlbl, operand *left, operand *right, operand *result)
 {
   // ugly but optimized by peephole
   if (IC_TRUE (ic))
@@ -5261,11 +5375,17 @@ jmpTrueOrFalse (iCode * ic, symbol * tlbl)
       symbol *nlbl = newiTempLabel (NULL);
       emitcode ("sjmp", "%05d$", nlbl->key + 100);
       emitcode ("", "%05d$:", tlbl->key + 100);
+      freeForBranchAsmop (result);
+      freeForBranchAsmop (right);
+      freeForBranchAsmop (left);
       emitcode ("ljmp", "%05d$", IC_TRUE (ic)->key + 100);
       emitcode ("", "%05d$:", nlbl->key + 100);
     }
   else
     {
+      freeForBranchAsmop (result);
+      freeForBranchAsmop (right);
+      freeForBranchAsmop (left);
       emitcode ("ljmp", "%05d$", IC_FALSE (ic)->key + 100);
       emitcode ("", "%05d$:", tlbl->key + 100);
     }
@@ -5382,7 +5502,7 @@ genAnd (iCode * ic, iCode * ifx)
 	outBitC (result);
       // if(bit & ...)
       else if ((AOP_TYPE (result) == AOP_CRY) && ifx)
-	genIfxJump (ifx, "c");
+	genIfxJump (ifx, "c", left, right, result);
       goto release;
     }
 
@@ -5407,7 +5527,7 @@ genAnd (iCode * ic, iCode * ifx)
 	      if (ifx)
 		{
 		  sprintf (buffer, "acc.%d", posbit & 0x07);
-		  genIfxJump (ifx, buffer);
+		  genIfxJump (ifx, buffer, left, right, result);
 		}
 	      goto release;
 	    }
@@ -5446,7 +5566,7 @@ genAnd (iCode * ic, iCode * ifx)
 	  else
 	    {
 	      if (ifx)
-		jmpTrueOrFalse (ifx, tlbl);
+		jmpTrueOrFalse (ifx, tlbl, left, right, result);
               else
 	        emitcode ("", "%05d$:", tlbl->key + 100);
 	      goto release;
@@ -5538,7 +5658,7 @@ genAnd (iCode * ic, iCode * ifx)
 	      outBitC (result);
 	    }
 	  else if (ifx)
-	    jmpTrueOrFalse (ifx, tlbl);
+	    jmpTrueOrFalse (ifx, tlbl, left, right, result);
           else
 	    emitcode ("", "%05d$:", tlbl->key + 100);
 	}
@@ -5691,7 +5811,7 @@ genOr (iCode * ic, iCode * ifx)
 	      emitcode ("jnz", "%05d$", tlbl->key + 100);
 	      if ((AOP_TYPE (result) == AOP_CRY) && ifx)
 		{
-		  jmpTrueOrFalse (ifx, tlbl);
+		  jmpTrueOrFalse (ifx, tlbl, left, right, result);
 		  goto release;
 		}
 	      else
@@ -5707,7 +5827,7 @@ genOr (iCode * ic, iCode * ifx)
 	outBitC (result);
       // if(bit | ...)
       else if ((AOP_TYPE (result) == AOP_CRY) && ifx)
-	genIfxJump (ifx, "c");
+	genIfxJump (ifx, "c", left, right, result);
       goto release;
     }
 
@@ -5741,7 +5861,7 @@ genOr (iCode * ic, iCode * ifx)
 	    }
 	  else
 	    {
-	      genIfxJump (ifx, "a");
+	      genIfxJump (ifx, "a", left, right, result);
 	      goto release;
 	    }
 	}
@@ -5826,7 +5946,7 @@ genOr (iCode * ic, iCode * ifx)
 	      outBitC (result);
 	    }
 	  else if (ifx)
-	    jmpTrueOrFalse (ifx, tlbl);
+	    jmpTrueOrFalse (ifx, tlbl, left, right, result);
 	  else
 	    emitcode ("", "%05d$:", tlbl->key + 100);
 	}
@@ -6006,7 +6126,7 @@ genXor (iCode * ic, iCode * ifx)
 	outBitC (result);
       // if(bit | ...)
       else if ((AOP_TYPE (result) == AOP_CRY) && ifx)
-	genIfxJump (ifx, "c");
+	genIfxJump (ifx, "c", left, right, result);
       goto release;
     }
 
@@ -6089,7 +6209,7 @@ genXor (iCode * ic, iCode * ifx)
 	      outBitC (result);
 	    }
 	  else if (ifx)
-	    jmpTrueOrFalse (ifx, tlbl);
+	    jmpTrueOrFalse (ifx, tlbl, left, right, result);
 	}
       else
 	for (; (size--); offset++)
@@ -9031,11 +9151,11 @@ genIfx (iCode * ic, iCode * popIc)
   /* if the condition is  a bit variable */
   if (isbit && IS_ITEMP (cond) &&
       SPIL_LOC (cond))
-    genIfxJump (ic, SPIL_LOC (cond)->rname);
+    genIfxJump (ic, SPIL_LOC (cond)->rname, NULL, NULL, NULL);
   else if (isbit && !IS_ITEMP (cond))
-    genIfxJump (ic, OP_SYMBOL (cond)->rname);
+    genIfxJump (ic, OP_SYMBOL (cond)->rname, NULL, NULL, NULL);
   else
-    genIfxJump (ic, "a");
+    genIfxJump (ic, "a", NULL, NULL, NULL);
 
   ic->generated = 1;
 }

@@ -1287,7 +1287,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 		    if (sym->regType == REG_PTR)
 			sym->regs[j] = getRegPtr (ic, ebbs[i], sym);
 		    else
-		      { /*
+		      {
 		        if (ic->op == CAST && IS_SYMOP (IC_RIGHT (ic)))
 			  {
 			    symbol * right = OP_SYMBOL (IC_RIGHT (ic));
@@ -1295,7 +1295,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 			    if (right->regs[j])
 			      sym->regs[j] = allocThisReg (right->regs[j]);
 			  }
-			if (!sym->regs[j]) */
+			if (!sym->regs[j])
 			  sym->regs[j] = getRegGpr (ic, ebbs[i], sym);
 		      }
 

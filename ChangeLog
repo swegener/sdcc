@@ -1,3 +1,9 @@
+2003-09-28  Borut Razem <borut.razem@siol.net>
+
+	* src/asm.c: rewrite of printILine() to use temporary file instead
+	  a pipe
+	* src/xa51/main.c: commented out declaration of int rewinds
+
 2003-09-27  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCCicode.c (geniCodeJumpTable): Fixed bug #813206

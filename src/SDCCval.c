@@ -392,7 +392,7 @@ char octalEscape (char **str) {
 }
 
 /*! 
-  /fn void copyStr (char *dest, char *src)
+  /fn int copyStr (char *dest, char *src)
   
   Copies a source string to a dest buffer interpreting escape sequences
   and special characters

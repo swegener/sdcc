@@ -10,6 +10,11 @@
    The simulator can be used to run this program:
    s51 -Sout=serial.txt hi.ihx (run, stop, quit)
 
+   Notice that unless we use the --stack-after-data option,
+   the SSEG listed in the map is not accurate, look at the
+   .asm file and search for "sp," to see where it is really
+   initialized to.
+
  6-28-01  Written by Karl Bongers(karl@turbobit.com)
 |------------------------------------------------------------------------*/
 #include <8052.h>
@@ -36,7 +41,7 @@ bit my_bit;  // mcs51 bit variable, stored in single bit of register space
 sfr at 0xd8 WDCON;  // special function register declaration
 sbit LED_SYS = 0xb5;  // P3.5 is led, example use of sbit keyword
 
-code char my_message[] = {"GNU rocks"};  // placed in code space
+code char my_message[] = {"GNU rocks\n"};  // placed in code space
 
 void timer0_irq_proc(void) interrupt 1 using 2;
 
@@ -57,8 +62,8 @@ void timer0_irq_proc(void) interrupt 1 using 2
   }
 
   TR0 = 0; /* Stop Timer 0 counting */
-  TH0 = (~(5000)) << 8;
-  TL0 = (~(5000)) & 8;
+  TH0 = (~(5000)) >> 8;
+  TL0 = (~(5000)) & 0xff;
   TR0 = 1; /* Start counting again */
 }
 
@@ -82,10 +87,10 @@ void uart0_int(void) interrupt 4 using 1
 |------------------------------------------------------------------------*/
 void tx_char(char c)
 {
+  SBUF = c;
   while (!TI)
     ;
   TI = 0;
-  SBUF = c;
 }
 
 /*------------------------------------------------------------------------
@@ -122,9 +127,6 @@ void main(void)
   TMOD = 0x21;  /* timer control mode, byte operation */
   TCON = 0;     /* timer control register, byte operation */
 
-  TH0 = (~(5000)) << 8;  /* the initial time is not important */
-  TL0 = (~(5000)) & 8;
-
   TH1 = 0xFA;   /* serial reload value, 9,600 baud at 11.0952Mhz */
   TR1 = 1;      /* start serial timer */
 
@@ -143,8 +145,7 @@ void main(void)
   {
     if (hi_flag)
     {
-      tx_str("Hi\n");
-      tx_str("There\n");
+      tx_str("Hi There\n");
       hi_flag = 0;
     }
 

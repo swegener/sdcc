@@ -30,10 +30,10 @@ data byte lbuf[12];  // this is our line buffer, chars gather here till CR seen
 |------------------------------------------------------------------------*/
 void tx_char(char c)
 {
+  SBUF = c;
   while (!TI)
     ;
   TI = 0;
-  SBUF = c;
 }
 
 /*------------------------------------------------------------------------

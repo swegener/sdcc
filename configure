@@ -12,21 +12,21 @@ ac_help=
 ac_default_prefix=/usr/local
 # Any additions from configure.in:
 ac_help="$ac_help
---disable-mcs51-port: Excludes the Intel mcs51 port"
+  --disable-mcs51-port    Excludes the Intel mcs51 port"
 ac_help="$ac_help
---disable-gbz80-port: Excludes the Gameboy gbz80 port"
+  --disable-gbz80-port    Excludes the Gameboy gbz80 port"
 ac_help="$ac_help
---disable-z80-port: Excludes the z80 port"
+  --disable-z80-port      Excludes the z80 port"
 ac_help="$ac_help
---disable-avr-port: Excludes the AVR port"
+  --disable-avr-port      Excludes the AVR port"
 ac_help="$ac_help
---disable-ds390-port: Excludes the DS390 port"
+  --disable-ds390-port    Excludes the DS390 port"
 ac_help="$ac_help
---disable-pic-port: Excludes the PIC port"
+  --disable-pic-port      Excludes the PIC port"
 ac_help="$ac_help
---disable-i186-port: Excludes the I186 port"
+  --disable-i186-port     Excludes the I186 port"
 ac_help="$ac_help
---disable-tlcs900h-port: Excludes the TLCS900H port"
+  --disable-tlcs900h-port Excludes the TLCS900H port"
 
 # Initialize some variables set by options.
 # The variables have the same names as the options, with
@@ -539,7 +539,7 @@ fi
 
 
 
-for ac_prog in gawk mawk nawk awk
+for ac_prog in mawk gawk nawk awk
 do
 # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2

@@ -59,7 +59,11 @@ ADDS,
 NEG,
 SEXT,
 MUL,
-DIV,
+DIV_w,
+DIV_d,
+DIVU_b,
+DIVU_w,
+DIVU_d,
 DA,
 ASL,
 ASR,
@@ -97,6 +101,8 @@ NOP,
 BKPT,
 TRAP,
 RESET,
+FCALL,
+FJMP,
 };
 
 extern char *op_mnemonic_str[];
@@ -136,7 +142,12 @@ enum op_operands {
   IREGINC_DATA4,
   IREGOFF8_DATA4,
   IREGOFF16_DATA4,
-  DIRECT_DATA4
+  DIRECT_DATA4,
+
+  REG_ALONE,
+  ADDR24,
+  REG_REL8,
+  DIRECT_REL8
 };
 
 // table of dissassembled instructions

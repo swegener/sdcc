@@ -441,6 +441,19 @@ cl_xa::disass(t_addr addr, char *sep)
       strcpy(parm_str, "DIRECT_DATA4");
     break;
 
+    case REG_ALONE :
+      sprintf(parm_str, "%s",
+              reg_strs[((code >> 4) & 0xf)] );
+    break;
+    case ADDR24 :
+      strcpy(parm_str, "ADDR24");
+    break;
+    case REG_REL8 :
+      strcpy(parm_str, "REG_REL8");
+    break;
+    case DIRECT_REL8 :
+      strcpy(parm_str, "DIRECT_REL8");
+    break;
     default:
       strcpy(parm_str, "???");
     break;
@@ -556,7 +569,11 @@ cl_xa::exec_inst(void)
     return inst_SEXT(code);
     case MUL:
     return inst_MUL(code);
-    case DIV:
+    case DIV_w :
+    case DIV_d :
+    case DIVU_b:
+    case DIVU_w:
+    case DIVU_d:
     return inst_DIV(code);
     case DA:
     return inst_DA(code);

@@ -46,7 +46,11 @@ char *op_mnemonic_str[] = {
 "NEG",
 "SEXT",
 "MUL",
-"DIV",
+"DIV.w",
+"DIV.d",
+"DIVU.b",
+"DIVU.w",
+"DIVU.d",
 "DA",
 "ASL",
 "ASR",
@@ -84,6 +88,8 @@ char *op_mnemonic_str[] = {
 "BKPT",
 "TRAP",
 "RESET"
+"FCALL",
+"FJMP",
 };
 
 struct dis_entry glob_disass_xa[]= {
@@ -98,6 +104,20 @@ struct xa_dis_entry disass_xa[]= {
  {0x0840,0xfffc,' ',3,ANL, C_BIT           }, //  ANL C, bit                 0 0 0 0 1 0 0 0  0 1 0 0 0 0 b b
  {0x0850,0xfffc,' ',3,ANL, NOTC_BIT        }, //  ANL C, /bit                0 0 0 0 1 0 0 0  0 1 0 1 0 0 b b
  {0x0850,0xfffc,' ',3,ASL, REG_REG         }, //  ASL Rd, Rs                 1 1 0 0 S S 0 1  d d d d s s s s
+ {0x900c,0xf70f,' ',2,CPL, REG_ALONE       }, //  CPL Rd                     1 0 0 1 S 0 0 0  d d d d 1 0 1 0
+ {0xe708,0xff00,' ',2,DIV_w, REG_REG       }, //  DIV.w Rd, Rs               1 1 1 0 0 1 1 1  d d d d s s s s
+ {0xe80b,0xff0f,' ',3,DIV_w, REG_DATA8     }, //  DIV.w Rd, #data8           1 1 1 0 1 0 0 0  d d d d 1 0 1 1
+ {0xef00,0xff10,' ',2,DIV_d, REG_REG       }, //  DIV.d Rd, Rs               1 1 1 0 1 1 1 1  d d d 0 s s s s
+ {0xe909,0xff1f,' ',4,DIV_d, REG_DATA16    }, //  DIV.d Rd, #data16          1 1 1 0 1 0 0 1  d d d 0 1 0 0 1
+ {0xe801,0xff0f,' ',3,DIVU_b, REG_DATA8    }, //  DIVU.b Rd, #data8          1 1 1 0 1 0 0 0  d d d d 0 0 0 1
+ {0xe500,0xff00,' ',2,DIVU_w, REG_REG      }, //  DIVU.w Rd, Rs              1 1 1 0 0 1 0 1  d d d d s s s s
+ {0xe803,0xff0f,' ',3,DIVU_w, REG_DATA8    }, //  DIVU.w Rd, #data8          1 1 1 0 1 0 0 0  d d d d 0 0 1 1
+ {0xed00,0xff10,' ',2,DIVU_d, REG_REG      }, //  DIVU.d Rd, Rs              1 1 1 0 1 1 0 1  d d d 0 s s s s
+ {0xe901,0xff1f,' ',4,DIVU_d, REG_DATA16   }, //  DIVU.d Rd, #data16         1 1 1 0 1 0 0 1  d d d 0 0 0 0 1
+ {0x8708,0xf70f,' ',3,DJNZ,   REG_REL8     }, //  DJNZ Rd, rel8              1 0 0 0 S 1 1 1  d d d d 1 0 0 0
+ {0xe208,0xf7f8,' ',4,DJNZ,   DIRECT_REL8  }, //  DJNZ direct, rel8          1 1 1 0 S 0 1 0  0 0 0 0 1 x x x
+ {0xc400,0xff00,' ',4,FCALL,  ADDR24       }, //  FCALL addr24               1 1 0 0 0 1 0 0  
+ {0xd400,0xff00,' ',4,FJMP,   ADDR24       }, //  FJMP addr24                1 1 0 1 0 1 0 0
 
  {0x1408,0xf780,' ',2,ADDS, REG_DATA4      }, // ADDS Rd, #data4             1 0 1 0 S 0 0 1  d d d d #data4
  {0x1408,0xf780,' ',2,ADDS, IREG_DATA4     }, // ADDS [Rd], #data4           1 0 1 0 S 0 1 0  0 d d d #data4

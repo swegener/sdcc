@@ -1,3 +1,8 @@
+2005-01-05 Raphael Neider <rneider AT web.de>
+
+        * src/pic16/gen.c (genGenericShift) added handling of differently
+	  sized left operand and result
+
 2005-01-04 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/gen.c (genIfxJump) fixed inverted skips on CARRY

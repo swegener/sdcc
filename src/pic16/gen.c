@@ -10604,9 +10604,7 @@ static void genGenericShift (iCode *ic, int isShiftLeft) {
    * Note: we perform arithmetic shifts if the left operand is
    * signed and we do an (effective) right shift, i. e. we
    * shift in the sign bit from the left. */
-  
-  assert (AOP_SIZE(result) == AOP_SIZE(left));
-
+   
   label_complete = newiTempLabel ( NULL );
   label_loop_pos = newiTempLabel ( NULL );
   label_loop_neg = NULL;
@@ -10620,10 +10618,30 @@ static void genGenericShift (iCode *ic, int isShiftLeft) {
     label_negative = newiTempLabel ( NULL );
   } // if
 
-  // copy source to result
-  for (offset=0; offset < AOP_SIZE(result); offset++) {
+  // copy source to result -- this will effectively truncate the left operand to the size of result!
+  // (e.g. char c = 0x100 << -3 will become c = 0x00 >> 3 == 0x00 instad of 0x20)
+  // This is fine, as it only occurs for left shifting with negative count which is not standardized!
+  for (offset=0; offset < min(AOP_SIZE(left), AOP_SIZE(result)); offset++) {
     mov2f (AOP(result),AOP(left), offset);
   } // for
+
+  // if result is longer than left, fill with zeros (or sign)
+  if (AOP_SIZE(left) < AOP_SIZE(result)) {
+    if (sign && AOP_SIZE(left) > 0) {
+      // shift signed operand -- fill with sign
+      pic16_emitpcode (POC_CLRF, pic16_popCopyReg (&pic16_pc_wreg));
+      pic16_emitpcode (POC_BTFSC, pic16_popCopyGPR2Bit(pic16_popGet(AOP(result), AOP_SIZE(left)-1), 7));
+      pic16_emitpcode (POC_MOVLW, pic16_popGetLit (0xFF));
+      for (offset=AOP_SIZE(left); offset < AOP_SIZE(result); offset++) {
+        pic16_emitpcode (POC_MOVWF, pic16_popGet (AOP(result), offset));
+      } // for
+    } else {
+      // shift unsigned operand -- fill result with zeros
+      for (offset=AOP_SIZE(left); offset < AOP_SIZE(result); offset++) {
+        pic16_emitpcode (POC_CLRF, pic16_popGet (AOP(result), offset));
+      } // for
+    }
+  } // if (size mismatch)
 
   pic16_mov2w (AOP(right), 0);
   pic16_emitpcode (POC_BZ, pic16_popGetLabel (label_complete->key));

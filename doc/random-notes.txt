@@ -2,6 +2,93 @@ Random notes
 ------------
 A random set of notes about sdcc and how it works.
 
+Michael on the register allocation stage:
+-----------------------------------------
+Lets trace how the register allocator in the mcs51 port works.
+
+Some concepts:
+eBBlock
+	A basic block.  I cant remeber the conditions, but a basic block
+is one that is easy to optimise and analyse.  I guess this means that it has
+a nice set of assignments and a reasonably straight flow.
+iCode
+	Intermediate code.  Provides the interface between the parser + optimiser
+and the code generator by providing an abstract machine with infinite registers
+which the parser can generate for and the back end can turn into real code.
+iTemps
+	An iTemp is a temporary register used in iCode.  These will eventually
+be either replaced, allocated into a register, or placed onto the stack by the
+backend.
+Live range
+     The live range of an iTemp is the part of the code that the iTemp is used
+over.  Generally the live range of an iTemp is from its first assignment to its
+last use.
+
+Input to mcs51_assignRegisters is an array of basic blocks.  Assign
+registers is normally called at the end of a function.
+
+In pseudo code,
+1.  For each basic block, pack the registers in the block.
+    In this case register packing consists of:
+       Remove any unneded iTemps that are just used in assignments.
+       Mark anything that can be rematerialised as rematerialisable.
+	   There is no way I spelt that correctly.  Something is rematerialisable
+	   if it can be generated easily and is constant, and hence dosnt need
+	   to be cached away in an iTemp.  An example is the address of something.
+       Packs iTemps that are only used once into normally unavailble registers.
+    Register packing removes unneeded iTemps.
+2.  Determine what number and type of regsiters are needed for each
+    live range.
+    It does
+       If the iTemp lives for zero time, dont bother assigning
+       If its not an iTemp, skip for now.
+       If its a conditional (determined in the register packing), skip as it will
+       be stored in carry.
+       If the iTemp is already packed from 1.c, skip
+       If the iTemp is remat and some other magic, skip.
+       Else set the number and type of registers based on the size of the iTemp.
+3.  Assign registers for each segment.
+    For each iCode, do
+	If it is a IPOP (pop of an iTemp at the end of a block), reset the LR.
+	De-assign the live ranges of the iTemps that expire here.
+	    For each iTemp, do
+	        If this iTemp is still alive, skip
+		If this iTemp is spilt on the stack, free the location and continue.
+		If there are no registers assigned (?), continue.
+		Some magic using IFX and IPOP
+		If the iTemp has no registers, continue.
+		If the result of this iCode doesnt yet have registers, allocate them now.  Weird.
+		Deallocate the registers used.
+	Skip instructions that dont need registers (IFX, JUMPTABLE, POINTER_SET)
+	Only assign registers to the result of this iCode.
+	If the iCode has registers, or has been spilt, continue.
+	If this will cause a spill as it needs more registers than are free, then
+	    Find those that can be spilt.
+	    Spill this if its easy.
+	    Spill this if its the least used.
+	Allocate registers to the result iTemp	   
+	If any registers in the result are shared with the operand, make them line up.
+4.  Create the register mask for each segment.
+    For each iCode, do
+	Set the used register bit vector from the used registers.
+	Mark these registers as used in the higher function.  This lets the generator
+	decide which registers need to be saved when calling or being called by a function.
+	Hmm.  It seems to re-setup the used register bit vector.
+5.  Redo the stack offsets.
+6.  Turn the basic blocks into an intermediate code chain.
+        Takes the array of basic blocks and pulls them out into one iCode chain.
+7.  Optimise the labels in the iCode chain.
+	Skipped if the label optimisations are turned off.
+	Remove any gotos that go to the next line.
+	Simplify any chained gotos
+	Remove unreferenced labels
+	Remove unreferenced code.
+7.  Generate the mcs51 code from the iCode chain.
+8.  Deallocate everything (registers and stack locations).
+
+Sandeep:
+--------
+=======
 Sandeep:
 --------
 The Register Allocation story.

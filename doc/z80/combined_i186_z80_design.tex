@@ -156,6 +156,37 @@ Optimisations include assigning into the accumulator or the scratch
 register where possible.  This requires knowledge of what the code
 generator touches for a given instruction.
 
-\subsection{Problems}
+The first generation register allocator will only pack assignments and mark
+remat. variables.  Only the register management is processor specific.  The
+allocator may ask for a given size register or if a given size register is
+available.  Note that only whole registers may be returned.  For example, 
+allocation will fail if a sixteen bit register is requested and no pair
+is available, even two eight bit registers are available.  Note that on
+the Z80, GBZ80, and i186 a request for a 32 bit register will always fail.
+
+\subsection{Code generator}
+The possible operations are:
+\begin{itemize}
+	\item NOT - Logical not.  0 -> 1, others -> 0.
+	\item CPL - Bitwise complement.
+	\item UMINUS - Unary minus.  result = 0 - left.
+	\item IPUSH - Push immediate onto the stack.
+	\item CALL - Call a function.
+	\item PCALL - Call via pointer.
+	\item FUNCTION - Emit the function prelude.
+	\item ENDFUNCTION - Emit the function prologue.
+	\item RET - Load the return value and jump to end of function.
+	\item LABEL - Generate a local label.
+	\item GOTO - Jump to a local label.
+	\item Arithmitic - +, -, *, /, \%.
+	\item Comparison - LT, GT, LEQ, GEQ, !=, =.
+	\item Logical - \&\&, ||
+	\item Binary - AND, OR, XOR.
+	\item Shift - RRC, RLC, LSR, LSL.
+	\item Pointer - Set and Get.
+	\item Assign.
+	\item IF jump.
+	\item Misc - Jump table, cast, address of.
+\end{itemize}
 
 \end{document}

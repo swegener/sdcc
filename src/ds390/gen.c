@@ -1574,7 +1574,6 @@ static void genUminus (iCode *ic)
     /* otherwise subtract from zero */
     size = AOP_SIZE(IC_LEFT(ic));
     offset = 0 ;
-    //CLRC ;
     _startLazyDPSEvaluation();
     while(size--) {
         char *l = aopGet(AOP(IC_LEFT(ic)),offset,FALSE,FALSE,TRUE);
@@ -1832,8 +1831,7 @@ static void genIpush (iCode *ic)
     /* then do the push */
     aopOp(IC_LEFT(ic),ic,FALSE, FALSE);
 
-
-	// pushSide(IC_LEFT(ic), AOP_SIZE(IC_LEFT(ic)));
+    // pushSide(IC_LEFT(ic), AOP_SIZE(IC_LEFT(ic)));
     size = AOP_SIZE(IC_LEFT(ic));
 
     _startLazyDPSEvaluation();
@@ -4748,11 +4746,11 @@ static void genOr (iCode *ic, iCode *ifx)
 
     AOP_OP_3(ic);
     AOP_SET_LOCALS(ic);
-    #if 0
+#if 0
     aopOp((left = IC_LEFT(ic)),ic,FALSE, FALSE);
     aopOp((right= IC_RIGHT(ic)),ic,FALSE, TRUE);
     aopOp((result=IC_RESULT(ic)),ic,TRUE, FALSE);
-    #endif
+#endif
 
 #ifdef DEBUG_TYPE
     emitcode("","; Type res[%d] = l[%d]&r[%d]",
@@ -5410,6 +5408,8 @@ static void AccRsh (int shCount)
     }
 }
 
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* AccSRsh - signed right shift accumulator by known count                 */
 /*-----------------------------------------------------------------*/
@@ -5438,7 +5438,10 @@ static void AccSRsh (int shCount)
         }
     }
 }
+#endif
 
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* shiftR1Left2Result - shift right one byte from left to result   */
 /*-----------------------------------------------------------------*/
@@ -5454,7 +5457,10 @@ static void shiftR1Left2Result (operand *left, int offl,
         AccRsh(shCount);
     aopPut(AOP(result),"a",offr);
 }
+#endif
 
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* shiftL1Left2Result - shift left one byte from left to result    */
 /*-----------------------------------------------------------------*/
@@ -5468,7 +5474,10 @@ static void shiftL1Left2Result (operand *left, int offl,
     AccLsh(shCount);
     aopPut(AOP(result),"a",offr);
 }
+#endif
 
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* movLeft2Result - move byte from left to result                  */
 /*-----------------------------------------------------------------*/
@@ -5495,7 +5504,10 @@ static void movLeft2Result (operand *left, int offl,
         }
     }
 }
+#endif
 
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* AccAXRrl1 - right rotate c->a:x->c by 1                         */
 /*-----------------------------------------------------------------*/
@@ -5506,7 +5518,10 @@ static void AccAXRrl1 (char *x)
     emitcode("rrc","a");
     emitcode("xch","a,%s", x);
 }
+#endif
 
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* AccAXLrl1 - left rotate c<-a:x<-c by 1                          */
 /*-----------------------------------------------------------------*/
@@ -5517,7 +5532,10 @@ static void AccAXLrl1 (char *x)
     emitcode("xch","a,%s",x);
     emitcode("rlc","a");
 }
+#endif
 
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* AccAXLsh1 - left shift a:x<-0 by 1                              */
 /*-----------------------------------------------------------------*/
@@ -5528,7 +5546,10 @@ static void AccAXLsh1 (char *x)
     emitcode("xch","a,%s",x);
     emitcode("rlc","a");
 }
+#endif
 
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* AccAXLsh - left shift a:x by known count (0..7)                 */
 /*-----------------------------------------------------------------*/
@@ -5579,7 +5600,10 @@ static void AccAXLsh (char *x, int shCount)
             break;
     }
 }
+#endif
 
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* AccAXRsh - right shift a:x known count (0..7)                   */
 /*-----------------------------------------------------------------*/
@@ -5633,7 +5657,10 @@ static void AccAXRsh (char *x, int shCount)
             break;
     }
 }
+#endif
 
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* AccAXRshS - right shift signed a:x known count (0..7)           */
 /*-----------------------------------------------------------------*/
@@ -5703,7 +5730,10 @@ static void AccAXRshS (char *x, int shCount)
             break;
     }
 }
+#endif
 
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* shiftL2Left2Result - shift left two bytes from left to result   */
 /*-----------------------------------------------------------------*/
@@ -5723,8 +5753,10 @@ static void shiftL2Left2Result (operand *left, int offl,
     AccAXLsh( aopGet(AOP(result),offr,FALSE,FALSE,FALSE), shCount);
     aopPut(AOP(result),"a",offr+MSB16);
 }
+#endif
 
-
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* shiftR2Left2Result - shift right two bytes from left to result  */
 /*-----------------------------------------------------------------*/
@@ -5749,7 +5781,10 @@ static void shiftR2Left2Result (operand *left, int offl,
     if(getDataSize(result) > 1)
         aopPut(AOP(result),"a",offr+MSB16);
 }
+#endif
 
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* shiftLLeftOrResult - shift left one byte from left, or to result*/
 /*-----------------------------------------------------------------*/
@@ -5764,7 +5799,10 @@ static void shiftLLeftOrResult (operand *left, int offl,
     /* back to result */
     aopPut(AOP(result),"a",offr);
 }
+#endif
 
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* shiftRLeftOrResult - shift right one byte from left,or to result*/
 /*-----------------------------------------------------------------*/
@@ -5779,7 +5817,10 @@ static void shiftRLeftOrResult (operand *left, int offl,
     /* back to result */
     aopPut(AOP(result),"a",offr);
 }
+#endif
 
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* genlshOne - left shift a one byte quantity by known count       */
 /*-----------------------------------------------------------------*/
@@ -5788,7 +5829,10 @@ static void genlshOne (operand *result, operand *left, int shCount)
     D(emitcode(";", "genlshOne "););
     shiftL1Left2Result(left, LSB, result, LSB, shCount);
 }
+#endif
 
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* genlshTwo - left shift two bytes by known amount != 0           */
 /*-----------------------------------------------------------------*/
@@ -5821,7 +5865,10 @@ static void genlshTwo (operand *result,operand *left, int shCount)
             shiftL2Left2Result(left, LSB, result, LSB, shCount);
     }
 }
+#endif
 
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* shiftLLong - shift left one long from left to result            */
 /* offl = LSB or MSB16                                             */
@@ -5882,7 +5929,10 @@ static void shiftLLong (operand *left, operand *result, int offr )
     if(offr != LSB)
         aopPut(AOP(result),zero,LSB);       
 }
+#endif
 
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* genlshFour - shift four byte by a known amount != 0             */
 /*-----------------------------------------------------------------*/
@@ -5966,7 +6016,10 @@ static void genlshFour (operand *result, operand *left, int shCount)
         shiftL2Left2Result(left, LSB, result, LSB, shCount);
     }
 }
+#endif
 
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* genLeftShiftLiteral - left shifting by known count              */
 /*-----------------------------------------------------------------*/
@@ -6021,6 +6074,7 @@ static void genLeftShiftLiteral (operand *left,
     freeAsmop(left,NULL,ic,TRUE);
     freeAsmop(result,NULL,ic,TRUE);
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* genLeftShift - generates code for left shifting                 */
@@ -6040,14 +6094,14 @@ static void genLeftShift (iCode *ic)
 
     aopOp(right,ic,FALSE, FALSE);
 
-    #if 0
+#if 0
     /* if the shift count is known then do it 
     as efficiently as possible */
     if (AOP_TYPE(right) == AOP_LIT) {
         genLeftShiftLiteral (left,right,result,ic);
         return ;
     }
-    #endif
+#endif
 
     /* shift count is unknown then we have to form 
     a loop get the loop count in B : Note: we take
@@ -6127,6 +6181,8 @@ release:
     freeAsmop(result,NULL,ic,TRUE);
 }
 
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* genrshOne - right shift a one byte quantity by known count      */
 /*-----------------------------------------------------------------*/
@@ -6136,7 +6192,10 @@ static void genrshOne (operand *result, operand *left,
     D(emitcode(";", "genrshOne"););
     shiftR1Left2Result(left, LSB, result, LSB, shCount, sign);
 }
+#endif
 
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* genrshTwo - right shift two bytes by known amount != 0          */
 /*-----------------------------------------------------------------*/
@@ -6160,7 +6219,10 @@ static void genrshTwo (operand *result,operand *left,
     else
         shiftR2Left2Result(left, LSB, result, LSB, shCount, sign); 
 }
+#endif
 
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* shiftRLong - shift right one long from left to result           */
 /* offl = LSB or MSB16                                             */
@@ -6193,7 +6255,10 @@ static void shiftRLong (operand *left, int offl,
         aopPut(AOP(result),"a",LSB);
     }
 }
+#endif
 
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* genrshFour - shift four byte by a known amount != 0             */
 /*-----------------------------------------------------------------*/
@@ -6252,7 +6317,10 @@ static void genrshFour (operand *result, operand *left,
         }
     }
 }
+#endif
 
+#if 0
+//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* genRightShiftLiteral - right shifting by known count            */
 /*-----------------------------------------------------------------*/
@@ -6313,6 +6381,7 @@ static void genRightShiftLiteral (operand *left,
         freeAsmop(result,NULL,ic,TRUE);
     }
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* genSignedRightShift - right shift of signed number              */
@@ -6335,13 +6404,13 @@ static void genSignedRightShift (iCode *ic)
 
     aopOp(right,ic,FALSE, FALSE);
 
-    #if 0
+#if 0
     if ( AOP_TYPE(right) == AOP_LIT) {
 	genRightShiftLiteral (left,right,result,ic,1);
 	return ;
     }
-    #endif
-        /* shift count is unknown then we have to form 
+#endif
+    /* shift count is unknown then we have to form 
        a loop get the loop count in B : Note: we take
        only the lower order byte since shifting
        more that 32 bits make no sense anyway, ( the
@@ -6453,14 +6522,14 @@ static void genRightShift (iCode *ic)
 
     aopOp(right,ic,FALSE, FALSE);
 
-    #if 0
+#if 0
     /* if the shift count is known then do it 
     as efficiently as possible */
     if (AOP_TYPE(right) == AOP_LIT) {
         genRightShiftLiteral (left,right,result,ic, 0);
         return ;
     }
-    #endif
+#endif
 
     /* shift count is unknown then we have to form 
     a loop get the loop count in B : Note: we take

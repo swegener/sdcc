@@ -1,3 +1,7 @@
+2004-05-15 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* as/mcs51/lkmem.c: better fix for bug #954173
+
 2004-05-15 Maarten Brock <sourceforge.brock AT dse.nl>
 	committed by Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 

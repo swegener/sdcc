@@ -145,20 +145,14 @@ int summary(struct area * areap)
 		{
 			Ram[4].Size=xp->a_size;
 		}
-		else if ( EQ(xp->a_id, "DSEG") || EQ(xp->a_id, "OSEG") )
-		{
-			Ram[6].Size+=xp->a_size;
-			if(xp->a_addr<Ram[6].Start) Ram[6].Start=xp->a_addr;
-		}
 
-		else if( EQ(xp->a_id, "CSEG") || EQ(xp->a_id, "GSINIT") ||
-				 EQ(xp->a_id, "GSINIT0") || EQ(xp->a_id, "GSINIT1") ||
-				 EQ(xp->a_id, "GSINIT2") || EQ(xp->a_id, "GSINIT3") ||
-				 EQ(xp->a_id, "GSINIT4") || EQ(xp->a_id, "GSINIT5") ||
-				 EQ(xp->a_id, "GSFINAL") || EQ(xp->a_id, "HOME") )
+        else if(xp->a_flag & A_CODE)
 		{
-			Rom.Size+=xp->a_size;
-			if(xp->a_addr<Rom.Start) Rom.Start=xp->a_addr;
+            if(xp->a_size>0)
+            {
+			    Rom.Size+=xp->a_size;
+			    if(xp->a_addr<Rom.Start) Rom.Start=xp->a_addr;
+            }
 		}
 		
 		else if (EQ(xp->a_id, "SSEG"))
@@ -167,10 +161,13 @@ int summary(struct area * areap)
 			if(xp->a_addr<Stack.Start) Stack.Start=xp->a_addr;
 		}
 
-		else if (EQ(xp->a_id, "XSEG") || EQ(xp->a_id, "XISEG")) 
+        else if(xp->a_flag & A_XDATA)
 		{
-			XRam.Size+=xp->a_size;
-			if(xp->a_addr<XRam.Start) XRam.Start=xp->a_addr;
+            if(xp->a_size>0)
+            {
+			    XRam.Size+=xp->a_size;
+			    if(xp->a_addr<XRam.Start) XRam.Start=xp->a_addr;
+            }
 		}
 
 		else if (EQ(xp->a_id, "ISEG"))
@@ -178,7 +175,18 @@ int summary(struct area * areap)
 			IRam.Size+=xp->a_size;
 			if(xp->a_addr<IRam.Start) IRam.Start=xp->a_addr;
 		}
-		xp=xp->a_ap;
+
+        /*If is not a register bank, bit, stack, or idata, then it should be data*/
+        else if((xp->a_flag & (A_CODE|A_BIT|A_XDATA))==0)
+		{
+            if(xp->a_size)
+            {
+			    Ram[6].Size+=xp->a_size;
+			    if(xp->a_addr<Ram[6].Start) Ram[6].Start=xp->a_addr;
+            }
+		}
+
+        xp=xp->a_ap;
 	}
 
 	for(j=0; j<7; j++)
@@ -303,31 +311,46 @@ int summary(struct area * areap)
 	fprintf(of, format, line, line, line, line, line);
 
 	/*Report IRam totals:*/
-	sprintf(start, "0x%02lx", IRam.Start);
 	if(IRam.Size==0)
+    {
+		start[0]=0;/*Empty string*/
 		end[0]=0;/*Empty string*/
+    }
 	else
+    {
+	    sprintf(start, "0x%02lx", IRam.Start);
 		sprintf(end,  "0x%02lx", IRam.Size+IRam.Start-1);
+    }
 	sprintf(size, "%5lu", IRam.Size);
 	sprintf(max, "%5lu", IRam.Max);
 	fprintf(of, format, IRam.Name, start, end, size, max);
 
 	/*Report XRam totals:*/
-	sprintf(start, "0x%04lx", XRam.Start);
 	if(XRam.Size==0)
+    {
+		start[0]=0;/*Empty string*/
 		end[0]=0;/*Empty string*/
+    }
 	else
+    {
+	    sprintf(start, "0x%04lx", XRam.Start);
 		sprintf(end,  "0x%04lx", XRam.Size+XRam.Start-1);
+    }
 	sprintf(size, "%5lu", XRam.Size);
 	sprintf(max, "%5lu", xram_size<0?XRam.Max:xram_size);
 	fprintf(of, format, XRam.Name, start, end, size, max);
 
 	/*Report Rom/Flash totals:*/
-	sprintf(start, "0x%04lx", Rom.Start);
 	if(Rom.Size==0)
+    {
+		start[0]=0;/*Empty string*/
 		end[0]=0;/*Empty string*/
+    }
 	else
+    {
+	    sprintf(start, "0x%04lx", Rom.Start);
 		sprintf(end,  "0x%04lx", Rom.Size+Rom.Start-1);
+    }
 	sprintf(size, "%5lu", Rom.Size);
 	sprintf(max, "%5lu", code_size<0?Rom.Max:code_size);
 	fprintf(of, format, Rom.Name, start, end, size, max);
@@ -405,14 +428,13 @@ int summary2(struct area * areap)
 	xp=areap;
 	while (xp)
 	{
-		if( EQ(xp->a_id, "CSEG") || EQ(xp->a_id, "GSINIT") ||
-			EQ(xp->a_id, "GSINIT0") || EQ(xp->a_id, "GSINIT1") ||
-			EQ(xp->a_id, "GSINIT2") || EQ(xp->a_id, "GSINIT3") ||
-			EQ(xp->a_id, "GSINIT4") || EQ(xp->a_id, "GSINIT5") ||
-			EQ(xp->a_id, "GSFINAL") || EQ(xp->a_id, "HOME") )
+        if(xp->a_flag & A_CODE)
 		{
-			Rom.Size+=xp->a_size;
-			if(xp->a_addr<Rom.Start) Rom.Start=xp->a_addr;
+            if(xp->a_size)
+            {
+			    Rom.Size+=xp->a_size;
+			    if(xp->a_addr<Rom.Start) Rom.Start=xp->a_addr;
+            }
 		}
 		
 		else if (EQ(xp->a_id, "SSEG"))
@@ -421,10 +443,13 @@ int summary2(struct area * areap)
 			if(xp->a_addr<Stack.Start) Stack.Start=xp->a_addr;
 		}
 
-		else if (EQ(xp->a_id, "XSEG") || EQ(xp->a_id, "XISEG")) 
+        else if(xp->a_flag & A_XDATA)
 		{
-			XRam.Size+=xp->a_size;
-			if(xp->a_addr<XRam.Start) XRam.Start=xp->a_addr;
+            if(xp->a_size)
+            {
+			    XRam.Size+=xp->a_size;
+			    if(xp->a_addr<XRam.Start) XRam.Start=xp->a_addr;
+            }
 		}
 
 		xp=xp->a_ap;
@@ -480,21 +505,31 @@ int summary2(struct area * areap)
 	fprintf(of, format, line, line, line, line, line);
 
 	/*Report XRam totals:*/
-	sprintf(start, "0x%04lx", XRam.Start);
 	if(XRam.Size==0)
+    {
+        start[0]=0;/*Empty string*/
 		end[0]=0;/*Empty string*/
+    }
 	else
+    {
+	    sprintf(start, "0x%04lx", XRam.Start);
 		sprintf(end,  "0x%04lx", XRam.Size+XRam.Start-1);
+    }
 	sprintf(size, "%5lu", XRam.Size);
 	sprintf(max, "%5lu", xram_size<0?XRam.Max:xram_size);
 	fprintf(of, format, XRam.Name, start, end, size, max);
 
 	/*Report Rom/Flash totals:*/
-	sprintf(start, "0x%04lx", Rom.Start);
 	if(Rom.Size==0)
+    {
+        start[0]=0;/*Empty string*/
 		end[0]=0;/*Empty string*/
+    }
 	else
+    {
+	    sprintf(start, "0x%04lx", Rom.Start);
 		sprintf(end,  "0x%04lx", Rom.Size+Rom.Start-1);
+    }
 	sprintf(size, "%5lu", Rom.Size);
 	sprintf(max, "%5lu", code_size<0?Rom.Max:code_size);
 	fprintf(of, format, Rom.Name, start, end, size, max);

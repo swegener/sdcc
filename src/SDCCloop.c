@@ -259,11 +259,8 @@ DEFSETFUNC (createLoop)
 {
   edge *ep = item;
   V_ARG (set **, allRegion);
-  V_ARG (eBBlock **,ebbs);
-  V_ARG (int,count);
   region *aloop = newRegion ();
   eBBlock *block;
-  int dfMin = count ,dfMax =0, i;
 
   /* make sure regionStack is empty */
   while (!STACK_EMPTY (regionStack))
@@ -282,32 +279,6 @@ DEFSETFUNC (createLoop)
     }
 
   aloop->entry = ep->to;
-
-  /* set max & min dfNum for loopRegion */
-  for ( block = setFirstItem(aloop->regBlocks); block; 
-	block = setNextItem(aloop->regBlocks)) {
-      if (block->dfnum > dfMax) dfMax = block->dfnum;
-      if (block->dfnum < dfMin) dfMin = block->dfnum;
-  }
-
-  /* all blocks that have dfnumbers between dfMin & dfMax are also
-     part of loop */
-  for (i = 0 ; i < count ; i++) {
-    if (ebbs[i]->dfnum > dfMin && 
-	   ebbs[i]->dfnum < dfMax &&
-	  !isinSet(aloop->regBlocks,ebbs[i])) {
-	  if (!ebbs[i]->partOfLoop) {
-	    ebbs[i]->partOfLoop = aloop;
-	  }
-      }
-  }
-
-  /* and if this is a conditional block, the other side of the IFX 
-     (if any, that could have a greater dfnum) is too */
-  {
-    // just a burp, but I'm getting close :)
-  }
-  
 
   /* now add it to the set */
   addSetHead (allRegion, aloop);
@@ -1183,7 +1154,7 @@ createLoopRegions (eBBlock ** ebbs, int count)
 
   /* for each of these back edges get the blocks that */
   /* constitute the loops                             */
-  applyToSet (bEdges, createLoop, &allRegion, ebbs,count);
+  applyToSet (bEdges, createLoop, &allRegion);
 
   /* now we will create regions from these loops               */
   /* loops with the same entry points are considered to be the */

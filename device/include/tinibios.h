@@ -65,8 +65,8 @@ extern void LcdGoto(unsigned int collumnRow);
 extern void LcdPutChar(char c);
 extern void LcdPutString(char *string);
 extern void LcdLPutString(unsigned int collumnRow, char *string);
-extern void LcdPrintf(xdata const char *format, ...) reentrant;
-extern void LcdLPrintf(unsigned int collumnRow, xdata const char *format, ...) reentrant;
+extern void LcdPrintf(const char *format, ...) reentrant;
+extern void LcdLPrintf(unsigned int collumnRow, const char *format, ...) reentrant;
 
 // from i2c390.c
 #define I2C_BUFSIZE 128

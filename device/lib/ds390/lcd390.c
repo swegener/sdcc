@@ -147,7 +147,7 @@ void LcdLPutString (unsigned int collumnRow, char *string) {
 // however they will :), so to be sure
 static char lcdPrintfBuffer[LCD_COLLUMNS*4];
 
-void LcdPrintf (xdata const char *format, ...) reentrant {
+void LcdPrintf (const char *format, ...) reentrant {
   va_list arg;
 
   va_start (arg, format);
@@ -158,7 +158,7 @@ void LcdPrintf (xdata const char *format, ...) reentrant {
   va_end (arg);
 }
 
-void LcdLPrintf (unsigned int collumnRow, xdata const char *format, ...) reentrant {
+void LcdLPrintf (unsigned int collumnRow, const char *format, ...) reentrant {
   va_list arg;
 
   LcdGoto(collumnRow);

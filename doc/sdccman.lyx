@@ -6698,7 +6698,7 @@ status Collapsed
 
 
 \series default 
-  Pass the inline assembler code through the peep hole optimizer.
+ Pass the inline assembler code through the peep hole optimizer.
  This can cause unexpected changes to inline assembler code, please go through
  the peephole optimizer
 \begin_inset LatexCommand \index{Peephole optimizer}
@@ -6707,6 +6707,54 @@ status Collapsed
 
  rules defined in the source file tree '<target>/peeph.def' before using
  this option.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-opt-code-speed
+\begin_inset LatexCommand \index{-\/-opt-code-speed}
+
+\end_inset 
+
+
+\series default 
+ The compiler will optimize code generation towards fast code, possibly
+ at the expense of code size.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-opt-code-size
+\begin_inset LatexCommand \index{-\/-opt-code-size}
+
+\end_inset 
+
+
+\series default 
+ The compiler will optimize code generation towards compact code, possibly
+ at the expense of code speed.
 \layout Subsection
 
 Other Options
@@ -6938,7 +6986,7 @@ callee_saves
 \series bold 
 -
 \begin_inset ERT
-status Open
+status Collapsed
 
 \layout Standard
 
@@ -14216,6 +14264,34 @@ status Collapsed
 \end_inset 
 
  Parameters and Local Variables.
+\layout Itemize
+
+opt_code_speed 
+\begin_inset LatexCommand \index{\#pragma opt_code_speed}
+
+\end_inset 
+
+- The compiler will optimize code generation towards fast code, possibly
+ at the expense of code size.
+\layout Itemize
+
+opt_code_size 
+\begin_inset LatexCommand \index{\#pragma opt_code_size}
+
+\end_inset 
+
+- The compiler will optimize code generation towards compact code, possibly
+ at the expense of code speed.
+\layout Itemize
+
+opt_code_balanced 
+\begin_inset LatexCommand \index{\#pragma opt_code_balanced}
+
+\end_inset 
+
+- The compiler will attempt to generate code that is both compact and fast,
+ as long as meeting one goal is not a detriment to the other.
+ 
 \layout Standard
 
 SDCPP supports the following #pragma directives:

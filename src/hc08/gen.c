@@ -5640,11 +5640,15 @@ AccLsh (int shCount)
   switch (shCount)
     {
     case 4:
+      if (optimize.codeSpeed)
+        break;
       accopWithMisc ("nsa", "");
       accopWithMisc ("and", "#0xf0");
       /* total: 5 cycles, 3 bytes */
       return;
     case 5:
+      if (optimize.codeSpeed)
+        break;
       accopWithMisc ("nsa", "");
       accopWithMisc ("and", "#0xf0");
       accopWithMisc ("lsla", "");
@@ -5717,11 +5721,15 @@ AccRsh (int shCount, bool sign)
   switch (shCount)
     {
     case 4:
+      if (optimize.codeSpeed)
+        break;
       accopWithMisc ("nsa", "");
       accopWithMisc ("and", "#0x0f");
       /* total: 5 cycles, 3 bytes */
       return;
     case 5:
+      if (optimize.codeSpeed)
+        break;
       accopWithMisc ("nsa", "");
       accopWithMisc ("and", "#0x0f");
       accopWithMisc ("lsra", "");

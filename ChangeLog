@@ -1,3 +1,16 @@
+2004-09-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCC.lex (doPragma, process_pragma),
+	* src/SDCCglobl.h (struct optimize): added pragmas "opt_code_speed",
+	"opt_code_size", and "opt_code_balanced"
+	* src/SDCCmain.c (optionsTable[], printOptions, scanOptionsTable):
+	regrouped options by category, added support for category headers
+	* src/SDCCmain.c (parseCmdLine): added options "--opt-code-speed"
+	and "--opt-code-size"
+	* doc/sdccman.lyx: documented these new options and pragmas
+	* src/hc08/gen.c (AccLsh, AccRsh): take speed/size optimization
+	preference into account
+
 2004-09-08 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCicode.c (geniCodePostInc, geniCodePreInc, geniCodePostDec,

@@ -416,7 +416,10 @@ enum pragma_id {
      P_LOOPREV,
      P_OVERLAY_,     /* I had a strange conflict with P_OVERLAY while */
                      /* cross-compiling for MINGW32 with gcc 3.2 */
-     P_DISABLEWARN
+     P_DISABLEWARN,
+     P_OPTCODESPEED,
+     P_OPTCODESIZE,
+     P_OPTCODEBALANCED
 };
 
 
@@ -570,6 +573,22 @@ static void doPragma(int op, char *cp)
         setWarningDisabled(i);
       }
     break;
+  
+  case P_OPTCODESPEED:
+    optimize.codeSpeed = 1;
+    optimize.codeSize = 0;
+    break;
+
+  case P_OPTCODESIZE:
+    optimize.codeSpeed = 0;
+    optimize.codeSize = 1;
+    break;
+
+  case P_OPTCODEBALANCED:
+    optimize.codeSpeed = 0;
+    optimize.codeSize = 0;
+    break;
+
   }
 }
 
@@ -601,6 +620,9 @@ static int process_pragma(char *s)
     { "overlay",        P_OVERLAY_,     0 },
     { "less_pedantic",  P_LESSPEDANTIC, 0 },
     { "disable_warning",P_DISABLEWARN,  0 },
+    { "opt_code_speed", P_OPTCODESPEED, 0 },
+    { "opt_code_size",  P_OPTCODESIZE,  0 },
+    { "opt_code_balanced",  P_OPTCODEBALANCED,  0 },
 
     /*
      * The following lines are deprecated pragmas,

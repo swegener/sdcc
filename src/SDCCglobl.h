@@ -155,6 +155,8 @@ struct optimize
     unsigned loopInduction;
     unsigned noJTabBoundary;
     unsigned noLoopReverse;
+    unsigned codeSpeed;
+    unsigned codeSize;
   };
 
 /** Build model.

@@ -1,3 +1,54 @@
+2004-05-25 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/port.h (PORT structure): added hook initPaths, now each
+	port can declare its own default search paths,
+	which can been seen with the --print-search-dirs option,
+	see pic16 port for example,
+	* src/SDCCmain.c (setBinPaths, setIncludePaths, setLibPath,
+	setDataPaths): test to options.printSearchDirs is ifdef'ed out,
+	* (doPrintSearchDirs): NEW, replaces in a central manner the
+	printing of search dirs which was split in set*Paths functions,
+	* (main): added call to port->initPaths and doPrintSearchDirs,
+	* src/avr/main.c,
+	* src/ds390/main.c,
+	* src/hc08/main.c,
+	* src/izt/i186.c,
+	* src/izt/tlcs900h.c,
+	* src/mcs51/main.c,
+	* src/pic/main.c,
+	* src/pic16/main.c: modified port structures to reflect addition of
+	initPaths hook,
+		
+	* src/pic16/device.c (regCompare): registers are finally sorted by name,
+	* (pic16_dump_section): for registers in same address reserve memory once,
+	* src/pic16/device.h (struct PIC16_device): changed variable gen_banksel
+	to no_banksel,
+	* src/pic16/genarith.c (pic16_genPlus): added code to handle cases where
+	result is greater in size than right or left,
+	* (pic16_genUMult8X8_8): there are some cases where the result can
+	be 16 bits size, so handle these,
+	* src/pic16/gen.c: changed some pic16_emitpcomment to DEBUGpic16_emitcode,
+	* (pic16_outBitC): modified to emit pcodes,
+	* (pic16_storeForReturn): using is_LitOp to see if operand is literal
+	or not,
+	* (genDivOneByte): implemented algorithm to divide 8-bits,
+	* (genCmp): uncommented goto, but issues still exist,
+	* (genAnd): fixed a bug with variables >8bits,
+	* (genPackBits): optimization added that uses BCF/BSF to change a
+	single bit,
+	* (genAssign): fixed bug when assigning floating point literals,
+	* src/pic16/glue.c (pic16glue): added assembler directive 'code' before
+	__sdcc_gsinit_startup label,
+	* src/pic16/main.c (_pic16_init): removed search directory
+	initialisations,
+	* (_pic16_initPaths): NEW, used to initialise search directories,
+	* (_hasNativeMulFor): support functions for all except char/int
+	multiplication, and char division,
+	* (PIC16_port struct): modified entry for native mul support,
+	* src/pic16/pcode.c (insertBankSwitch): modified to support the renamed
+	no_banksel option,
+	* (buildCallTree): call to register_usage is ifdef'ed out,
+
 2004-05-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* device/include/string.h: applied Stas Sergeev's patch to make this

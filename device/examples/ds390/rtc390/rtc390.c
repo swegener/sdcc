@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-  rtc390.c - rtc demo for the DS1315 (tested on TINI)
+  rtc390.c - time demo using the DS1315 (tested on TINI)
   
    Written By - Johan Knol, johan.knol@iduna.nl
     
@@ -25,8 +25,7 @@
 #include <stdio.h>
 #include <ctype.h>
 
-//#define USE_LCD
-
+// until we have a decent scanf:
 int ScanInt(int current) {
   char reply[32], *r;
 
@@ -41,60 +40,62 @@ int ScanInt(int current) {
   return current;
 }
 
-char GetTime(struct RTCDate *rtcDate) {
-  printf ("Enter year [%d]: ", rtcDate->year);
-  rtcDate->year=ScanInt(rtcDate->year);
-  printf ("Enter month [%d]: ", rtcDate->month);
-  rtcDate->month=ScanInt(rtcDate->month);
-  printf ("Enter day [%d]: ", rtcDate->day);
-  rtcDate->day=ScanInt(rtcDate->day);
-  printf ("Enter hour [%d]: ", rtcDate->hour);
-  rtcDate->hour=ScanInt(rtcDate->hour);
-  printf ("Enter minute [%d]: ", rtcDate->minute);
-  rtcDate->minute=ScanInt(rtcDate->minute);
-  printf ("Enter second [%d]: ", rtcDate->second);
-  rtcDate->second=ScanInt(rtcDate->second);
-  rtcDate->hundredth=0;
+char GetTime(struct tm *rtcTime) {
+  printf ("Enter year [%d]: ", rtcTime->tm_year+1900);
+  rtcTime->tm_year=ScanInt(rtcTime->tm_year+1900);
+  printf ("Enter month [%d]: ", rtcTime->tm_mon+1);
+  rtcTime->tm_mon=ScanInt(rtcTime->tm_mon)-1;
+  printf ("Enter day [%d]: ", rtcTime->tm_mday);
+  rtcTime->tm_mday=ScanInt(rtcTime->tm_mday);
+  printf ("Enter hour [%d]: ", rtcTime->tm_hour);
+  rtcTime->tm_hour=ScanInt(rtcTime->tm_hour);
+  printf ("Enter minute [%d]: ", rtcTime->tm_min);
+  rtcTime->tm_min=ScanInt(rtcTime->tm_min);
+  printf ("Enter second [%d]: ", rtcTime->tm_sec);
+  rtcTime->tm_sec=ScanInt(rtcTime->tm_sec);
+  return 1;
 }
 
-void PrintTime(struct RTCDate *rtcDate) {
-  printf ("%04d-%02d-%02d %02d:%02d:%02d.%02d\n", 
-	  rtcDate->year, rtcDate->month, rtcDate->day,
-	  rtcDate->hour, rtcDate->minute, rtcDate->second,
-	  rtcDate->hundredth);
+void PrintTime(struct tm *rtcTime, char verbose) {
+
+#ifdef ShowMeAnotherBug
+  printf ("%s%04d-%02d-%02d %02d:%02d:%02d.%02d\n", 
+	  verbose ? "RTC time: " : "",
+	  rtcTime->tm_year+1900, rtcTime->tm_mon+1, rtcTime->tm_mday,
+	  rtcTime->tm_hour, rtcTime->tm_min, rtcTime->tm_sec,
+	  rtcTime->tm_hundredth);
+#else
+  printf ("RTC time: %04d-%02d-%02d %02d:%02d:%02d.%02d\n", 
+	  rtcTime->tm_year+1900, rtcTime->tm_mon+1, rtcTime->tm_mday,
+	  rtcTime->tm_hour, rtcTime->tm_min, rtcTime->tm_sec,
+	  rtcTime->tm_hundredth);
+#endif
+
+  if (verbose) {
+    time_t calendarTime=mktime(rtcTime);
+    printf ("Seconds since 00:00:00 Jan 01 1970: %ld\n", calendarTime);
+  }
 }
 
 void main (void) {
-  struct RTCDate rtcDate;
-  unsigned char seconds=0xff;
+  struct tm rtcTime, *now;
+  time_t calendarTime;
+  char seconds=-1;
 
   printf ("\nStarting RTC demo.\n");
 
-#ifdef USE_LCD
-  LcdInit();
-  LcdLPrintf (0, "Starting RTC demo.");
-#endif
-  
+  RtcRead(&rtcTime);
+  PrintTime(&rtcTime,1);
+
   while(1) {
-    RtcRead(&rtcDate);
+    calendarTime=time(0);
+    now=localtime(&calendarTime);
 
-#ifdef USE_LCD
-    // if lcd is enabled it only syncs the second time
-    RtcRead(&rtcDate);
-#endif    
-
-#ifdef USE_LCD
-    LcdLPrintf (2,"%04d-%02d-%02d",
-		rtcDate.year, rtcDate.month, rtcDate.day);
-    LcdLPrintf (3, "%02d:%02d:%02d.%02d", 
-		rtcDate.hour, rtcDate.minute, rtcDate.second,
-		rtcDate.hundredth);
-#endif
-    if (rtcDate.second!=seconds) {
-      PrintTime(&rtcDate);
-      seconds=rtcDate.second;
+    if (now->tm_sec!=seconds) {
+      printf(ctime(&calendarTime));
+      seconds=now->tm_sec;
     }
-    
+
     if (Serial0CharArrived()) {
       switch (getchar()) 
 	{
@@ -104,15 +105,12 @@ void main (void) {
 	  printf ("Ok.\n");
 	  return;
 	default:
-	  if (GetTime(&rtcDate)) {
-#ifndef USE_LCD
-	    PrintTime(&rtcDate);
-	    RtcWrite(&rtcDate);
+	  RtcRead(&rtcTime);
+	  if (GetTime(&rtcTime)) {
+	    RtcWrite(&rtcTime);
 	    printf ("Time written.\n");
-#endif
 	  }
 	}
     }
   }
-
 }

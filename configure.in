@@ -200,8 +200,9 @@ AC_OUTPUT(main.mk:main_in.mk
 support/gc/Makefile
 src/Makefile
 as/mcs51/Makefile
-as/z80/Makefile
-link/z80/Makefile
+# MLH: removed as the rules are already in Makefile.common
+#as/z80/Makefile
+#link/z80/Makefile
 support/cpp/Makefile
 device/include/Makefile
 device/lib/Makefile

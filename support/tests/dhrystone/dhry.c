@@ -71,6 +71,7 @@ Boolean Func_3 (Enumeration Enum_Par_Val);
 
 void printf(const char *format, ...);
 void exit(int val);
+unsigned clock(void);
 
 /*#define DPRINTF(_a)  printf _a*/
 #define DPRINTF(_a)
@@ -92,6 +93,7 @@ int main(void)
     Str_30          Str_2_Loc;
     REG   int             Run_Index;
     REG   int             Number_Of_Runs;
+    unsigned endTime;
 
     printf("[dhry]\n");
 
@@ -113,7 +115,8 @@ int main(void)
     /* Warning: With 16-Bit processors and Number_Of_Runs > 32000,  */
     /* overflow may occur for this array element.                   */
 
-    Number_Of_Runs = 5000;
+    Number_Of_Runs = 32000;
+    clock();
 
     /* Main test loop */
     for (Run_Index = 1; Run_Index <= Number_Of_Runs; ++Run_Index) {
@@ -185,6 +188,8 @@ int main(void)
 
     printf("Run_Index = %d\n", Run_Index);
 
+    endTime = clock();
+
     printf ("Execution ends\n");
     printf ("\n");
     printf ("Final values of the variables used in the benchmark:\n");
@@ -237,6 +242,9 @@ int main(void)
     printf ("Str_2_Loc:           %s\n", Str_2_Loc);
     printf ("        should be:   DHRYSTONE PROGRAM, 2'ND STRING\n");
     printf ("\n");
+
+    printf("Time: %u secs\n", endTime);
+    printf("Dhrystones/tick = %u\n", Number_Of_Runs / endTime);
 }
 
 void Proc_1 (REG Rec_Pointer Ptr_Val_Par)

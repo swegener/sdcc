@@ -8552,8 +8552,6 @@ genCast (iCode * ic)
       /* pointer to generic pointer */
       if (IS_GENPTR (ctype))
 	{
-	  char *l = zero;
-
 	  if (IS_PTR (type))
 	    p_type = DCL_TYPE (type);
 	  else
@@ -8578,32 +8576,19 @@ genCast (iCode * ic)
 	      offset++;
 	    }
 	  /* the last byte depending on type */
-	  switch (p_type)
 	    {
-	    case IPOINTER:
-	    case POINTER:
-	      l = zero;
-	      break;
-	    case FPOINTER:
-	      l = one;
-	      break;
-	    case CPOINTER:
-	      l = "#0x02";
-	      break;
-	    case GPOINTER:
-	      l = "0x03";
-	      break;
-	    case PPOINTER: // what the fck is this?
-	      l = "#0x03";
-	      break;
-
-	    default:
-	      /* this should never happen */
-	      werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-		      "got unknown pointer type");
-	      exit (1);
-	    }
-	  aopPut (AOP (result), l, GPTRSIZE - 1);
+		int gpVal = pointerTypeToGPByte(p_type, NULL, NULL);
+		char gpValStr[10];
+	    
+		if (gpVal == -1)
+		{
+		    // pointerTypeToGPByte will have bitched.
+		    exit(1);
+		}
+	    
+		sprintf(gpValStr, "#0x%d", gpVal);
+		aopPut (AOP (result), gpValStr, GPTRSIZE - 1);
+	    }	    
 	  goto release;
 	}
 

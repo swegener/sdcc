@@ -502,16 +502,18 @@ pointerTypeToGPByte (const int p_type, const char *iname, const char *oname)
     {
     case IPOINTER:
     case POINTER:
-      return 0;
+      return GPTYPE_NEAR;
     case GPOINTER:
-      werror (E_CANNOT_USE_GENERIC_POINTER, iname, oname);
+	werror (E_CANNOT_USE_GENERIC_POINTER, 
+		iname ? iname : "<null>", 
+		oname ? oname : "<null>");
       exit (1);
     case FPOINTER:
-      return 1;
+      return GPTYPE_FAR;
     case CPOINTER:
-      return 2;
+      return GPTYPE_CODE;
     case PPOINTER:
-      return 3;
+      return GPTYPE_XSTACK;
     default:
       fprintf (stderr, "*** internal error: unknown pointer type %d in GPByte.\n",
 	       p_type);
@@ -996,9 +998,9 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
 	  else
 	    tfprintf (oFile, "\t.byte %s,%s\n", aopLiteral (val, 0), aopLiteral (val, 1));
 	  break;
-	case 3:
-	  fprintf (oFile, "\t.byte %s,%s,#0x02\n",
-		   aopLiteral (val, 0), aopLiteral (val, 1));
+	case 3: // how about '390??
+	  fprintf (oFile, "\t.byte %s,%s,#0x%d\n",
+		   aopLiteral (val, 0), aopLiteral (val, 1), GPTYPE_CODE);
 	}
       return;
     }

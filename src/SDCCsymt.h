@@ -51,6 +51,14 @@ enum {
     TYPEOF_EEPPOINTER
 };
 
+// values for first byte of generic pointer.
+#define GPTYPE_NEAR	0
+#define GPTYPE_FAR	1
+#define GPTYPE_CODE	2
+#define GPTYPE_XSTACK	3
+#define GPTYPE_GPTR	4 	// Never used?
+#define GPTYPE_IDATA	5
+
 #define HASHTAB_SIZE 256
 
 /* hash table bucket */

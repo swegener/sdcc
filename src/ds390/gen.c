@@ -9381,6 +9381,7 @@ genGenPointerGet (operand * left,
       else
 	{			/* we need to get it byte by byte */
 	  _startLazyDPSEvaluation ();
+#if 1	// I see no point at all to this code and will likely yank it soon.
 	  if (AOP(left)->type==AOP_DPTR2) {
 	    char *l;
 	    l=aopGet(AOP(left),0,FALSE,FALSE,TRUE);
@@ -9400,7 +9401,10 @@ genGenPointerGet (operand * left,
 	    } else {
 	      emitcode ("mov", "b,%s", aopGet (AOP(left),2,FALSE,FALSE,TRUE));
 	    }
-	  } else {
+	  } 
+	  else 
+#endif		
+	  {
 	    emitcode ("mov", "dpl,%s", aopGet (AOP(left),0,FALSE,FALSE,TRUE));
 	    emitcode ("mov", "dph,%s", aopGet (AOP(left),1,FALSE,FALSE,TRUE));
 	    if (options.model == MODEL_FLAT24) {
@@ -10781,8 +10785,6 @@ genCast (iCode * ic)
       /* pointer to generic pointer */
       if (IS_GENPTR (ctype))
 	{
-	  char *l = zero;
-
 	  if (IS_PTR (type))
 	    {
 	      p_type = DCL_TYPE (type);
@@ -10842,29 +10844,19 @@ genCast (iCode * ic)
 	  _endLazyDPSEvaluation ();
 
 	  /* the last byte depending on type */
-	  switch (p_type)
 	    {
-	    case IPOINTER:
-	    case POINTER:
-	      l = zero;
-	      break;
-	    case FPOINTER:
-	      l = one;
-	      break;
-	    case CPOINTER:
-	      l = "#0x02";
-	      break;
-	    case PPOINTER:
-	      l = "#0x03";
-	      break;
-
-	    default:
-	      /* this should never happen */
-	      werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-		      "got unknown pointer type");
-	      exit (1);
+		int gpVal = pointerTypeToGPByte(p_type, NULL, NULL);
+		char gpValStr[10];
+	    
+		if (gpVal == -1)
+		{
+		    // pointerTypeToGPByte will have bitched.
+		    exit(1);
+		}
+	    
+		sprintf(gpValStr, "#0x%d", gpVal);
+		aopPut (AOP (result), gpValStr, GPTRSIZE - 1);
 	    }
-	  aopPut (AOP (result), l, GPTRSIZE - 1);
 	  goto release;
 	}
 

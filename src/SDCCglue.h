@@ -41,4 +41,8 @@ extern set *tmpfileSet;
 #if defined (__MINGW32__) || defined (__CYGWIN__) || defined (_MSC_VER)
 void rm_tmpfiles (void);
 #endif
+
+int 
+pointerTypeToGPByte (const int p_type, const char *iname, const char *oname);
+
 #endif

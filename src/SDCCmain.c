@@ -113,6 +113,7 @@ char DefaultExePath[128];
 #define OPTION_LESS_PEDANTIC	"--lesspedantic"
 #define OPTION_NO_GCSE		"--nogcse"
 #define OPTION_SHORT_IS_8BITS 	"--short-is-8bits"
+#define OPTION_TINI_LIBID 	"--tini-libid"
 
 /** Table of all options supported by all ports.
     This table provides:
@@ -208,7 +209,8 @@ optionsTable[] = {
     { 0,    "--fommit-frame-pointer", &options.ommitFramePtr, "Leave out the frame pointer." },
     { 0,    "--all-callee-saves",   &options.all_callee_saves, "callee will always save registers used" },
     { 0,    "--use-accelerator",    &options.useAccelerator,"generate code for  DS390 Arithmetic Accelerator"},
-    { 0,    "--stack-probe",   	    &options.stack_probe,"insert call to function __stack_probe at each function prologue"}
+    { 0,    "--stack-probe",   	    &options.stack_probe,"insert call to function __stack_probe at each function prologue"},
+    { 0,    "--tini-libid",   	    NULL,"<nnnn> LibraryID used in -mTININative"}
 };
 
 /** Table of all unsupported options and help text to display when one
@@ -898,6 +900,12 @@ parseCmdLine (int argc, char **argv)
               options.shortis8bits=1;
               continue;
             }
+
+	  if (strcmp (argv[i], OPTION_TINI_LIBID) == 0)
+	    {
+                options.tini_libid = getIntArg(OPTION_TINI_LIBID, argv, &i, argc);
+                continue;
+	    }
           
 	  if (!port->parseOption (&argc, argv, &i))
 	    {
@@ -1203,23 +1211,22 @@ linkEdit (char **envp)
 static void
 assemble (char **envp)
 {
-  if (port->assembler.cmd)
-    {
-      buildCmdLine (buffer, port->assembler.cmd, srcFileName, NULL,
-                    options.debug ? port->assembler.debug_opts : port->assembler.plain_opts,
-                    asmOptions);
-    }
-  else
-    {
-      buildCmdLine2 (buffer, port->assembler.mcmd);
+    if (port->assembler.do_assemble) {
+	port->assembler.do_assemble(asmOptions);
+	return ;
+    } else if (port->assembler.cmd) {
+	buildCmdLine (buffer, port->assembler.cmd, srcFileName, NULL,
+		      options.debug ? port->assembler.debug_opts : port->assembler.plain_opts,
+		      asmOptions);
+    } else {
+	buildCmdLine2 (buffer, port->assembler.mcmd);
     }
 
-  if (my_system (buffer))
-    {
-      /* either system() or the assembler itself has reported an error
-         perror ("Cannot exec assembler");
-       */
-      exit (1);
+    if (my_system (buffer)) {
+	/* either system() or the assembler itself has reported an error
+	   perror ("Cannot exec assembler");
+	*/
+	exit (1);
     }
 }
 

@@ -634,6 +634,7 @@ void CollectInfoFromCDB(void)
 					{
 						case 'C': /*Code*/ 
 						case 'D': /*Code/static segment*/ 
+						case 'Z': /*Functions and undefined code space*/ 
 							symbol[numsym].UsageType=0x40;
 						break;
 
@@ -659,7 +660,7 @@ void CollectInfoFromCDB(void)
 						break;
 						
 						default:
-							printf("Name: %s, AddressSpace:%c\n", symbol[numsym].name, AddressSpace);
+							printf("Unknown scope information for: %s, AddressSpace:%c\n", symbol[numsym].name, AddressSpace);
 						break;
 					}
 					numsym++;

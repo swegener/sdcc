@@ -1,3 +1,7 @@
+2003-05-24  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+	* as/mcs51/lkaomf51.c: Address space 'z' was missing.
+
 2003-05-25  Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
 	* src/mcs51/peeph.def: added rules 244.x, 245.x. Although they pass

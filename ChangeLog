@@ -1,3 +1,10 @@
+2004-01-11 Frieder Ferlemann <Frieder.Ferlemann@web.de>
+
+	* doc/sdccman.lyx: Moved and added some sections, small changes 
+	all over. Telling LaTeX to be less strict with word spacing 
+	to better keep the right margin. Changed some notes about 
+	maintainance of the ports in section 3.2.1 - is it OK like this?
+
 2004-01-11 Vangelis Rokas <vrokas@otenet.gr>
 	
 	SDCC source changes:

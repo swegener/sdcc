@@ -2428,10 +2428,11 @@ accuse:
 /* packForPush - hueristics to reduce iCode for pushing            */
 /*-----------------------------------------------------------------*/
 static void
-packForPush (iCode * ic, eBBlock * ebp)
+packForPush (iCode * ic, eBBlock ** ebpp, int blockno)
 {
   iCode *dic, *lic;
   bitVect *dbv;
+  struct eBBlock * ebp=ebpp[blockno];
 
   if (ic->op != IPUSH || !IS_ITEMP (IC_LEFT (ic)))
     return;
@@ -2449,32 +2450,47 @@ packForPush (iCode * ic, eBBlock * ebp)
   if (dic->op != '=' || POINTER_SET (dic))
     return;
 
-  /* make sure the right side does not have any definitions
-     inbetween */
-  dbv = OP_DEFS(IC_RIGHT(dic));
-  for (lic = ic; lic && lic != dic ; lic = lic->prev) {
-    if (bitVectBitValue(dbv,lic->key)) 
-      return ;
+  if (dic->seq < ebp->fSeq) { // Evelyn did this
+    int i;
+    printf ("packForPush: dic in previous block\n");
+    ebp=ebpp[0];
+    for (i=0; i<blockno; i++) {
+      if (dic->seq >= ebp->fSeq && dic->seq <= ebp->lSeq) {
+	ebp=ebpp[i];
+	break;
+      }
+    }
+    wassert (i!=blockno); // no way to recover from here
   }
-  /* make sure they have the same type */
-  {
-    sym_link *itype=operandType(IC_LEFT(ic));
-    sym_link *ditype=operandType(IC_RIGHT(dic));
 
-    if (SPEC_USIGN(itype)!=SPEC_USIGN(ditype) ||
-	SPEC_LONG(itype)!=SPEC_LONG(ditype))
-      return;
-  }
-  /* extend the live range of replaced operand if needed */
-  if (OP_SYMBOL(IC_RIGHT(dic))->liveTo < ic->seq) {
-	  OP_SYMBOL(IC_RIGHT(dic))->liveTo = ic->seq;
-  }
+  if (IS_SYMOP(IC_RIGHT(dic))) {
+    /* make sure the right side does not have any definitions
+       inbetween */
+    dbv = OP_DEFS(IC_RIGHT(dic));
+    for (lic = ic; lic && lic != dic ; lic = lic->prev) {
+      if (bitVectBitValue(dbv,lic->key)) 
+	return ;
+    }
+    /* make sure they have the same type */
+    {
+      sym_link *itype=operandType(IC_LEFT(ic));
+      sym_link *ditype=operandType(IC_RIGHT(dic));
+      
+      if (SPEC_USIGN(itype)!=SPEC_USIGN(ditype) ||
+	  SPEC_LONG(itype)!=SPEC_LONG(ditype))
+	return;
+    }
+    /* extend the live range of replaced operand if needed */
+    if (OP_SYMBOL(IC_RIGHT(dic))->liveTo < ic->seq) {
+      OP_SYMBOL(IC_RIGHT(dic))->liveTo = ic->seq;
+    }
+    bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
+  } 
+
   /* we now we know that it has one & only one def & use
      and the that the definition is an assignment */
   IC_LEFT (ic) = IC_RIGHT (dic);
-   
   remiCodeFromeBBlock (ebp, dic);
-  bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
   hTabDeleteItem (&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
 }
 
@@ -2483,10 +2499,11 @@ packForPush (iCode * ic, eBBlock * ebp)
 /*                   pressure                                      */
 /*-----------------------------------------------------------------*/
 static void
-packRegisters (eBBlock * ebp)
+packRegisters (eBBlock ** ebpp, int blockno)
 {
   iCode *ic;
   int change = 0;
+  eBBlock *ebp=ebpp[blockno];
 
   while (1)
     {
@@ -2716,7 +2733,7 @@ packRegisters (eBBlock * ebp)
        */
       if (ic->op == IPUSH)
 	{
-	  packForPush (ic, ebp);
+	  packForPush (ic, ebpp, blockno);
 	}
 
 
@@ -2758,7 +2775,7 @@ mcs51_assignRegisters (eBBlock ** ebbs, int count)
   /* change assignments this will remove some
      live ranges reducing some register pressure */
   for (i = 0; i < count; i++)
-    packRegisters (ebbs[i]);
+    packRegisters (ebbs, i);
 
   if (options.dump_pack)
     dumpEbbsToFileExt (DUMP_PACK, ebbs, count);

@@ -1287,7 +1287,7 @@ constExprValue (ast * cexpr, int check)
       if (check)
 	werror (E_CONST_EXPECTED, "found expression");
 
-      return NULL;
+      return constVal("0");
     }
 
   /* return the value */

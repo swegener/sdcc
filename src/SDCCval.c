@@ -419,7 +419,7 @@ value *constVal (char *s)
   short hex = 0, octal = 0;
   char scanFmt[10];
   int scI = 0;
-  long sval;
+  double dval;
 
   val = newValue ();		/* alloc space for value   */
 
@@ -446,11 +446,17 @@ value *constVal (char *s)
   else if (hex)
     scanFmt[scI++] = 'x';
   else
-    scanFmt[scI++] = 'd';
+    scanFmt[scI++] = 'f';
 
   scanFmt[scI++] = '\0';
 
-  sscanf (s, scanFmt, &sval);
+  if (octal || hex) {
+    unsigned long sval;
+    sscanf (s, scanFmt, &sval);
+    dval=sval;
+  } else {
+    sscanf (s, scanFmt, &dval);
+  }
 
   /* Setup the flags first */
   /* set the _long flag if 'lL' is found */
@@ -459,19 +465,19 @@ value *constVal (char *s)
     SPEC_LONG (val->type) = 1;
   }
 
-  if (sval<0) { // "-28u" will still be signed and negative
+  if (dval<0) { // "-28u" will still be signed and negative
     SPEC_USIGN (val->type) = 0;
-    if (sval<-128) { // check if we have to promote to int
+    if (dval<-128) { // check if we have to promote to int
       SPEC_NOUN (val->type) = V_INT;
     }
-    if (sval<-32768) { // check if we have to promote to long int
+    if (dval<-32768) { // check if we have to promote to long int
       SPEC_LONG (val->type) = 1;
     }
   } else { // >=0
-    if (sval>0xff) { // check if we have to promote to int
+    if (dval>0xff) { // check if we have to promote to int
       SPEC_NOUN (val->type) = V_INT;
     }
-    if (sval>0xffff) { // check if we have to promote to long int
+    if (dval>0xffff) { // check if we have to promote to long int
       SPEC_LONG (val->type) = 1;
     }
   }
@@ -480,22 +486,22 @@ value *constVal (char *s)
     {
       if (SPEC_USIGN (val->type))
         {
-          SPEC_CVAL (val->type).v_ulong = sval;
+          SPEC_CVAL (val->type).v_ulong = dval;
         }
       else
         {
-          SPEC_CVAL (val->type).v_long = sval;
+          SPEC_CVAL (val->type).v_long = dval;
         }
     }
   else
     {
       if (SPEC_USIGN (val->type))
         {
-          SPEC_CVAL (val->type).v_uint = sval;
+          SPEC_CVAL (val->type).v_uint = dval;
         }
       else
         {
-          SPEC_CVAL (val->type).v_int = sval;
+          SPEC_CVAL (val->type).v_int = dval;
         }
     }
 

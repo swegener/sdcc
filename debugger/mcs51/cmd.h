@@ -46,7 +46,7 @@ extern int cmdFile      (char *, context *);
 extern int cmdInfo      (char *, context *);
 extern int cmdShow      (char *, context *);
 extern int cmdFinish    (char *, context *);
-
+extern int cmdCommands  (char *, context *);
 extern int cmdStepi     (char *, context *);
 extern int cmdNexti     (char *, context *);
 extern int cmdUp        (char *, context *);

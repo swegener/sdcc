@@ -52,11 +52,12 @@ char *ssdirl = DATADIR LIB_DIR_SUFFIX ":" DATADIR LIB_DIR_SUFFIX "/small" ;
 char *simArgs[40];
 int nsimArgs = 0;
 char model_str[20];
-
 /* fake filename & lineno to make linker */
 char *filename=NULL;
 int lineno = 0;
 int fatalError = 0;
+
+static void commandLoop(FILE *cmdfile);
 
 /* command table */
 struct cmdtab
@@ -87,6 +88,9 @@ struct cmdtab
 
     { "continue" ,  cmdContinue   ,
       "{c}ontinue\t\t Continue program being debugged, after breakpoint.\n"
+    },
+    { "commands" ,  cmdCommands  ,
+      "commands [brkpoint number]\t\tSetting commands for breakpoint.\n"
     },
     { "c"        ,  cmdContinue   , NULL },
 
@@ -678,7 +682,22 @@ int cmdFile (char *s,context *cctxt)
 /*-----------------------------------------------------------------*/
 int cmdSource (char *s, context *cctxt)
 {
-    fprintf(stderr,"'source <file>' command not yet implemented\n",s);
+    FILE *cmdfile;
+    char *bp = s+strlen(s) -1;
+
+    while (isspace(*s))
+      ++s;
+
+    while (isspace(*bp)) bp--;
+    *++bp = '\0';
+
+    if (!( cmdfile = searchDirsFopen(s)))
+    {
+        fprintf(stderr,"commandfile '%s' not found\n",s);
+        return 0;
+    }
+    commandLoop( cmdfile );
+    fclose( cmdfile );
     return 0;
 }
 
@@ -815,37 +834,75 @@ int interpretCmd (char *s)
     return rv;
 }
 
+static FILE *actualcmdfile=NULL ;
+static char *actualcmds=NULL;
+
 /*-----------------------------------------------------------------*/
-/* commandLoop - the main command loop                             */
+/* getNextCmdLine get additional lines used by special commands    */
 /*-----------------------------------------------------------------*/
-void commandLoop()
+char *getNextCmdLine()
 {
- char *prompt = "(sdcdb) ";
- char *sim_prompt = "(sim) ";
+    if (!actualcmdfile)
+        return NULL;
+    if (fgets(cmdbuff,sizeof(cmdbuff),actualcmdfile) == NULL)
+        return NULL;
+    return cmdbuff;
+}
 
-  while (1) {
-    if (sim_cmd_mode)
-      printf("%s",sim_prompt);
-    else
-      fprintf(stdout,"%s",prompt);
+void setCmdLine( char *cmds )
+{
+    actualcmds = cmds;
+}
 
-    fflush(stdout);
+/*-----------------------------------------------------------------*/
+/* commandLoop - the main command loop or loop over command file   */
+/*-----------------------------------------------------------------*/
+static void commandLoop(FILE *cmdfile)
+{
+    char *line, save_ch, *s;
+    actualcmdfile = cmdfile;
+    while (1) 
+    {
+        if ( cmdfile == stdin )
+        {
+            if (sim_cmd_mode)
+                printf("(sim) ");
+            else
+                fprintf(stdout,"(sdcdb) ");        
+            fflush(stdout);
+        }
 
-    if (fgets(cmdbuff,sizeof(cmdbuff),stdin) == NULL)
-      break;
+        if (fgets(cmdbuff,sizeof(cmdbuff),cmdfile) == NULL)
+            break;
 
-#if 0
-    /* make a way to go into "ucSim" mode */
-    if (cmdbuff[0] == '$') {
-      if (sim_cmd_mode) sim_cmd_mode = 0;
-      else sim_cmd_mode = 1;
-      continue;
+        if (interpretCmd(cmdbuff))
+            break;
+
+        while ( actualcmds )
+        {
+            strcpy(cmdbuff,actualcmds);
+            actualcmds = NULL;
+            for ( line = cmdbuff; *line ; line = s )
+            {
+                if ( (s=strchr(line ,'\n')))
+                {
+                    save_ch = *++s;
+                    *s = '\0';
+                }
+                else
+                {
+                    s += strlen( line );
+                    save_ch = '\0';
+                }
+                if (interpretCmd( line ))
+                {
+                    *s = save_ch;
+                    break;
+                }
+                *s = save_ch;
+            }
+        }
     }
-#endif
-
-    if (interpretCmd(cmdbuff))
-      break;
-  }
 }
 
 /*-----------------------------------------------------------------*/
@@ -1057,7 +1114,7 @@ int main ( int argc, char **argv)
     setsignals();
     parseCmdLine(argc,argv);
 
-    commandLoop();
+    commandLoop(stdin);
 
     return 0;
 }

@@ -1302,6 +1302,40 @@ int cmdContinue (char *s, context *cctxt)
 }
 
 /*-----------------------------------------------------------------*/
+/* cmdCommands - set commands for breakpoint                       */
+/*-----------------------------------------------------------------*/
+int cmdCommands (char *s, context *cctxt)
+{   
+    int bpnum ;
+    char *cmds,*line;
+    while (isspace(*s)) s++;
+    
+    if (!*s ) 
+        bpnum = getLastBreakptNumber();
+    else
+        bpnum = strtol(s,0,10);
+
+    cmds = NULL;
+    while ((line = getNextCmdLine()))
+    {
+        while (isspace(*line)) line++;
+        if (!strncmp(line,"end",3))
+            break;
+        if (! cmds )
+        {
+            cmds = Safe_strdup(line);
+        }
+        else
+        {
+            cmds = Safe_realloc( cmds, strlen(cmds) + 1 + strlen(line));
+            strcat(cmds,line);
+        }
+    }
+    setUserbpCommand(bpnum,cmds);
+    return 0;
+}
+
+/*-----------------------------------------------------------------*/
 /* cmdDelUserBp - delete user break point                          */
 /*-----------------------------------------------------------------*/
 int cmdDelUserBp (char *s, context *cctxt)
@@ -3015,7 +3049,6 @@ int cmdClrUserBp (char *s, context *cctxt)
  ret:    
     return 0;        
 }
-
 
 /*-----------------------------------------------------------------*/
 /* cmdSimulator - send command to simulator                        */

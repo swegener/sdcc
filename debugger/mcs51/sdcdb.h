@@ -267,5 +267,6 @@ extern short fullname;
 extern int srcMode;
 extern char contsim;
 char *searchDirsFname (char *);
-
+char *getNextCmdLine(void );
+void setCmdLine( char * );
 #endif

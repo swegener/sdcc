@@ -47,7 +47,9 @@ typedef struct breakp
     char     *filename;      /* file name */
     int      lineno  ;       /* lineno */
     int (*callBack)
-	 (unsigned,char,char,int,context *);/* address of call back function */
+          (unsigned,char,char,int,context *);/* address of call back
+                                         * function */
+    char *commands;
 } breakp;
 
 
@@ -68,8 +70,11 @@ typedef struct breakp
 extern char userBpPresent;
 extern char doingSteps;
 
+
 int setBreakPoint (unsigned , char , char, 
 		    int (*callBack)(unsigned,char,char,int,context *),char *, int);
+
+extern long getLastBreakptNumber(void);
 
 void  clearUSERbp ( unsigned int  );
 void  deleteSTEPbp();

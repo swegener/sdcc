@@ -46,6 +46,13 @@ char *debug_bp_type_strings[] =
     "FEXIT", "TMPUSER", ""};
 #endif
 
+static long bpnum = 0;
+
+long getLastBreakptNumber()
+{
+    return bpnum;
+}
+
 /*-----------------------------------------------------------------*/
 /* setBreakPoint - creates an entry in the break point table       */
 /*-----------------------------------------------------------------*/
@@ -54,7 +61,6 @@ int setBreakPoint (unsigned addr, char addrType, char bpType,
         char *fileName, int lineno)
 {
     breakp *bp, *bpl;
-    static long bpnum = 0;
     char simbuf[50];
 
     Dprintf(D_break, ("setBreakPoint: addr:%x atype:%s bpType:%s [%s:%d]\n",
@@ -200,6 +206,31 @@ void deleteUSERbp (int bpnum)
 }
 
 /*-----------------------------------------------------------------*/
+/* setUserbpCommand - set commandstring for breakpoint             */
+/*-----------------------------------------------------------------*/
+void setUserbpCommand (int bpnum, char *cmds)
+{
+    breakp *bp;
+    int k;
+    Dprintf(D_break, ("break: setUserbpCommand %d: commands:\n%send\n",
+                      bpnum, cmds));
+
+    for ( bp = hTabFirstItem(bptable,&k); bp ;
+          bp = hTabNextItem(bptable,&k)) 
+    {
+        if ((bp->bpType == USER || bp->bpType == TMPUSER )
+            && ( bp->bpnum == bpnum )) 
+        {
+            if ( bp->commands )
+                Safe_free(bp->commands);
+            bp->commands = cmds;
+            return;
+        }
+    }
+    fprintf(stderr,"No breakpoint number %d.\n",bpnum);
+}
+
+/*-----------------------------------------------------------------*/
 /* listUSERbp - list all user break points                         */
 /*-----------------------------------------------------------------*/
 void listUSERbp ()
@@ -294,11 +325,17 @@ int dispatchCB (unsigned addr, context *ctxt)
     }
 
     /* dispatch the call back functions */
-    for (; bp; bp = hTabNextItemWK(bptable)) {
-
-      rv += (*bp->callBack)(addr,bp->addrType,
-          bp->bpType,bp->bpnum,ctxt);
-
+    for (; bp; bp = hTabNextItemWK(bptable)) 
+    {
+        if ( bp->commands )
+        {
+            char save_ch;
+            Dprintf(D_break, ("break: dispatchCB: commands:\n%send\n", bp->commands));
+            setCmdLine(bp->commands);
+        }
+    
+        rv += (*bp->callBack)(addr,bp->addrType,
+                              bp->bpType,bp->bpnum,ctxt);
     }
 
     if (rv == 0) {
@@ -381,6 +418,7 @@ BP_CALLBACK(userBpCB)
       fprintf(stdout,"%d\t%s",ctxt->asmline+1,
         ctxt->func->mod->asmLines[ctxt->asmline]->src);
     }
+
     if ( bpType == TMPUSER && bpnum > 0 )
         deleteUSERbp (bpnum);
     return 1;

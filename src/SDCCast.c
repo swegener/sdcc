@@ -1963,7 +1963,8 @@ decorateType (ast * tree)
        has greater size than right */
     if (tree->left && tree->right && IS_AST_OP(tree->right) &&
 	(tree->right->opval.op == LEFT_OP ||
-	 tree->right->opval.op == '*' || // for int -> long only
+	 (tree->right->opval.op == '*' /* for int -> long only */ &&
+	  tree->right->right /* but not for deref */ ) ||
 	 tree->right->opval.op == '+' ||
 	 tree->right->opval.op == '-')) {
 	int lsize = getSize(LTYPE(tree));

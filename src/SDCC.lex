@@ -79,8 +79,6 @@ char *asmp ;
 static int check_type(void);
 static int isTargetKeyword(char *s);
 static int checkCurrFile (char *s);
-//extern int processPragma	(char *);
-//extern int printListing		(int   );
 struct optimize save_optimize;
 struct options  save_options;
 %}
@@ -102,7 +100,7 @@ struct options  save_options;
 }
 <asm>.         { 
   if (asmp-asmbuff >= asmbuffSize-2) {
-    // increase the buffersize with 50%
+    /* increase the buffersize with 50% */
     int size=asmp-asmbuff;
     asmbuffSize=asmbuffSize*3/2;
     asmbuff = realloc (asmbuff, asmbuffSize); 
@@ -113,7 +111,7 @@ struct options  save_options;
 <asm>\n        { 
   count(); 
   if (asmp-asmbuff >= asmbuffSize-3) {
-    // increase the buffersize with 50%
+    /* increase the buffersize with 50% */
     int size=asmp-asmbuff;
     asmbuffSize=asmbuffSize*3/2;
     asmbuff = realloc (asmbuff, asmbuffSize); 
@@ -243,7 +241,7 @@ struct options  save_options;
 \\ {
   char ch=input();
   if (ch!='\n') {
-    // that could have been removed by the preprocessor anyway
+    /* that could have been removed by the preprocessor anyway */
     werror (W_STRAY_BACKSLASH, column);
     my_unput(ch);
   }

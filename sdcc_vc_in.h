@@ -37,6 +37,7 @@
 #undef HAVE_SPRINTF
 #undef HAVE_VSPRINTF
 #undef HAVE_MKSTEMP
+#define pclose  _pclose
 
 #define TYPE_BYTE char
 #define TYPE_WORD short

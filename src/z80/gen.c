@@ -93,10 +93,6 @@
 #define STRCASECMP strcasecmp
 #endif
 
-#ifdef HAVE_SYS_ISA_DEFS_H
-#include <sys/isa_defs.h>
-#endif
-
 #include "z80.h"
 #include "SDCCglobl.h"
 #include "SDCCpeeph.h"
@@ -1144,7 +1140,7 @@ aopGetLitWordLong (asmop * aop, int offset, bool with_hash)
             /* it is type float */
             fl.f = (float) floatFromVal (val);
 
-#ifdef _BIG_ENDIAN
+#ifdef WORDS_BIGENDIAN
             i = fl.c[3-offset] | (fl.c[3-offset-1]<<8);
 #else
             i = fl.c[offset] | (fl.c[offset+1]<<8);

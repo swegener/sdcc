@@ -1,11 +1,28 @@
 2003-03-08  Bernhard Held <bernhard@bernhardheld.de>
 
+	* src/configure.in:   check for endianess (even while cross-compiling)
+	* src/configure:      check for endianess (even while cross-compiling)
+	* src/configure_in.h: check for endianess (even while cross-compiling)
+	* src/avr/gen.c:        remove old endianess stuff
+	* src/mcs51/gen.c:      remove old endianess stuff
+	* src/ds390/gen.c:      remove old endianess stuff
+	* src/pic/gen.c:        remove old endianess stuff
+	* src/pic/genarith.c:   remove old endianess stuff
+	* src/pic/glue.c:       fix endianess check
+	* src/pic16/gen.c:      remove old endianess stuff
+	* src/pic16/genarith.c: remove old endianess stuff
+	* src/pic16/glue.c:     fix endianess check
+	* src/xa51/gen.c:       remove old endianess stuff
+	* src/z80/gen.c:        fix endianess check
+	* src/SDCCglue.c:       fix endianess check
+
+2003-03-08  Bernhard Held <bernhard@bernhardheld.de>
+
 	* src/SDCCsymt.h: use appropriate data-types on host for SDCC's int and long
-	* configure: find appropriate data-types on host for SDCC's int and long
-	* configure.in: find appropriate data-types on host for SDCC's int and long
-	* sdccconf_in.h: find appropriate data-types on host for SDCC's int and long
+	* src/configure: find appropriate data-types on host for SDCC's int and long
+	* src/configure.in: find appropriate data-types on host for SDCC's int and long
+	* src/sdccconf_in.h: find appropriate data-types on host for SDCC's int and long
 	* src/xa51/gen.c: use %d, not %ld for 4 byte variables
-	* sdcc_vc_in.h: use appropriate data-types on host for SDCC's int and long
 
 2003-03-07    <johan@balder>
 

@@ -24,9 +24,6 @@
 #undef STD_DS390_LIB
 #undef STD_XA51_LIB
 #undef HAVE_SYS_SOCKET_H
-#undef HAVE_SYS_ISA_DEFS_H
-#undef HAVE_ENDIAN_H
-#undef HAVE_MACHINE_ENDIAN_H
 
 #undef HAVE_STRERROR
 #undef HAVE_VSNPRINTF
@@ -40,6 +37,8 @@
 #define TYPE_UBYTE unsigned TYPE_BYTE
 #define TYPE_UWORD unsigned TYPE_WORD
 #define TYPE_UDWORD unsigned TYPE_DWORD
+
+#undef WORDS_BIGENDIAN
 
 #undef OPT_DISABLE_MCS51
 #undef OPT_DISABLE_GBZ80

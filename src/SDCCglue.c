@@ -145,7 +145,7 @@ aopLiteralLong (value * val, int offset, int size)
 
 	/* it is type float */
 	fl.f = (float) floatFromVal (val);
-#ifdef _BIG_ENDIAN
+#ifdef WORDS_BIGENDIAN
 	tsprintf (buffer, sizeof(buffer), 
 		  "!immedbyte", fl.c[3 - offset]);
 #else

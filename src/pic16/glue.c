@@ -29,7 +29,7 @@
 #include "newalloc.h"
 
 
-#ifdef _BIG_ENDIAN
+#ifdef WORDS_BIGENDIAN
   #define _ENDIAN(x)  (3-x)
 #else
   #define _ENDIAN(x)  (x)
@@ -86,7 +86,7 @@ int pic16aopLiteral (value *val, int offset)
 
   /* it is type float */
   fl.f = (float) floatFromVal(val);
-#ifdef _BIG_ENDIAN    
+#ifdef WORDS_BIGENDIAN
   return fl.c[3-offset];
 #else
   return fl.c[offset];

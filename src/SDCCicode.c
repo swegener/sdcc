@@ -121,6 +121,7 @@ iCodeTable codeTable[] =
 /* checkConstantRange: check a constant against the type           */
 /*-----------------------------------------------------------------*/
 
+
 /*   pedantic=0: allmost anything is allowed as long as the absolute
        value is within the bit range of the type, and -1 is treated as
        0xf..f for unsigned types (e.g. in assign)
@@ -996,7 +997,7 @@ isOperandOnStack (operand * op)
 /*-----------------------------------------------------------------*/
 /* operandLitValue - literal value of an operand                   */
 /*-----------------------------------------------------------------*/
-double 
+double
 operandLitValue (operand * op)
 {
   assert (isOperandLiteral (op));
@@ -1030,7 +1031,7 @@ iCode *getBuiltinParms (iCode *ic, int *pcount, operand **parms)
 }
 
 /*-----------------------------------------------------------------*/
-/* operandOperation - perforoms operations on operands             */
+/* operandOperation - performs operations on operands             */
 /*-----------------------------------------------------------------*/
 operand *
 operandOperation (operand * left, operand * right,
@@ -1059,13 +1060,60 @@ operandOperation (operand * left, operand * right,
 						 operandLitValue (right)));
       break;
     case '*':
+      /*
       retval = operandFromValue (valCastLiteral (type,
 						 operandLitValue (left) *
 						 operandLitValue (right)));
-      if (!options.lessPedantic &&
-	  !IS_FLOAT (OP_VALUE(retval)->type) &&
-	  !SPEC_LONG (OP_VALUE(retval)->type))
-        ; /* TODO: werror (W_INT_OVL) */
+      This could be all we've to do, but with gcc we've to take care about
+      overflows. Two examples:
+      ULONG_MAX * ULONG_MAX doesn't fit into a double, some of the least
+      significant bits are lost (52 in fraction, 63 bits would be
+      necessary to keep full precision).
+      If the resulting double value is greater than ULONG_MAX (resp.
+      USHRT_MAX, ...), then 0 will be assigned to v_ulong (resp. u_uint, ...)!
+      */
+
+      /* if it is not a specifier then we can assume that */
+      /* it will be an unsigned long                      */
+      if (IS_INT (type) ||
+          !IS_SPEC (type))
+        {
+	  /* long is handled here, because it can overflow with double */
+	  if (SPEC_LONG (type) ||
+	      !IS_SPEC (type))
+	  /* signed and unsigned mul are the same, as long as the precision
+	     of the result isn't bigger than the precision of the operands. */
+	    retval = operandFromValue (valCastLiteral (type,
+		     (TYPE_UDWORD) operandLitValue (left) *
+		     (TYPE_UDWORD) operandLitValue (right)));
+	  else if (SPEC_USIGN (type)) /* unsigned int */
+	    {
+	      /* unsigned int is handled here in order to detect overflow */
+	      TYPE_UDWORD ul = (TYPE_UWORD) operandLitValue (left) *
+			       (TYPE_UWORD) operandLitValue (right);
+
+	      retval = operandFromValue (valCastLiteral (type, (TYPE_UWORD) ul));
+	      if (!options.lessPedantic &&
+		  ul != (TYPE_UWORD) ul)
+		werror (W_INT_OVL);
+	    }
+	  else /* int */
+	    {
+	      /* int is handled here in order to detect overflow */
+	      TYPE_DWORD l = (TYPE_WORD) operandLitValue (left) *
+			     (TYPE_WORD) operandLitValue (right);
+
+	      retval = operandFromValue (valCastLiteral (type, (TYPE_WORD) l));
+	      if (!options.lessPedantic &&
+		  l != (TYPE_WORD) l)
+		werror (W_INT_OVL);
+	    }
+	}
+      else
+	/* all others go here: */
+	retval = operandFromValue (valCastLiteral (type,
+						   operandLitValue (left) *
+						   operandLitValue (right)));
       break;
     case '/':
       if ((TYPE_UDWORD) operandLitValue (right) == 0)
@@ -1102,7 +1150,7 @@ operandOperation (operand * left, operand * right,
       retval = operandFromLit ((TYPE_UDWORD) operandLitValue (left) <<
 			       (TYPE_UDWORD) operandLitValue (right));
       break;
-    case RIGHT_OP: {
+    case RIGHT_OP:
       /* The number of right shifts is always unsigned. Signed doesn't make
 	 sense here. Shifting by a negative number is impossible. */
       if (SPEC_USIGN(let))
@@ -1114,10 +1162,23 @@ operandOperation (operand * left, operand * right,
         retval = operandFromLit ((TYPE_DWORD ) operandLitValue (left) >>
 				 (TYPE_UDWORD) operandLitValue (right));
       break;
-    }
     case EQ_OP:
-      retval = operandFromLit (operandLitValue (left) ==
-			       operandLitValue (right));
+      /* this op doesn't care about signedness */
+      {
+	TYPE_UDWORD l, r;
+
+	l = (TYPE_UDWORD) operandLitValue (left);
+	if (SPEC_NOUN(OP_VALUE(left)->type) == V_CHAR)
+	  l &= 0xff;
+	else if (!SPEC_LONG (OP_VALUE(left)->type))
+	  l &= 0xffff;
+	r = (TYPE_UDWORD) operandLitValue (right);
+	if (SPEC_NOUN(OP_VALUE(right)->type) == V_CHAR)
+	  r &= 0xff;
+	else if (!SPEC_LONG (OP_VALUE(right)->type))
+	  r &= 0xffff;
+	retval = operandFromLit (l == r);
+      }
       break;
     case '<':
       retval = operandFromLit (operandLitValue (left) <
@@ -1180,7 +1241,8 @@ operandOperation (operand * left, operand * right,
       break;
 
     case UNARYMINUS:
-      retval = operandFromLit (-1 * operandLitValue (left));
+      retval = operandFromValue (valCastLiteral (type,
+                                                 -1 * operandLitValue (left)));
       break;
 
     case '~':
@@ -1204,7 +1266,7 @@ operandOperation (operand * left, operand * right,
 /*-----------------------------------------------------------------*/
 /* isOperandEqual - compares two operand & return 1 if they r =    */
 /*-----------------------------------------------------------------*/
-int 
+int
 isOperandEqual (operand * left, operand * right)
 {
   /* if the pointers are equal then they are equal */
@@ -1882,11 +1944,11 @@ geniCodeMultiply (operand * left, operand * right,int resultIsInt)
 
   /* if the right is a literal & power of 2 */
   /* then make it a left shift              */
-  /* code generated for 1 byte * 1 byte literal = 2 bytes result is more 
-     efficient in most cases than 2 bytes result = 2 bytes << literal 
+  /* code generated for 1 byte * 1 byte literal = 2 bytes result is more
+     efficient in most cases than 2 bytes result = 2 bytes << literal
      if port has 1 byte muldiv */
   if (p2 && !IS_FLOAT (letype) &&
-      !((resultIsInt) && (getSize (resType) != getSize (ltype)) && 
+      !((resultIsInt) && (getSize (resType) != getSize (ltype)) &&
 	(port->support.muldiv == 1)))
     {
       if ((resultIsInt) && (getSize (resType) != getSize (ltype)))
@@ -2648,7 +2710,7 @@ geniCodeLogic (operand * left, operand * right, int op)
      check if the literal value is within bounds */
   if (IS_INTEGRAL (ltype) && IS_VALOP (right) && IS_LITERAL (rtype))
     {
-      checkConstantRange(ltype, 
+      checkConstantRange(ltype,
 			 OP_VALUE(right), "compare operation", 1);
     }
 
@@ -3230,7 +3292,7 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
 /*-----------------------------------------------------------------*/
 /* geniCodeSwitch - changes a switch to a if statement             */
 /*-----------------------------------------------------------------*/
-void 
+void
 geniCodeSwitch (ast * tree,int lvl)
 {
   iCode *ic;

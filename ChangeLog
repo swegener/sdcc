@@ -1,3 +1,19 @@
+2003-08-13  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCcse.c (algebraicOpts): fix bug converting op from value to type
+	* src/SDCCicode.c (operandOperation): rewritten some ops
+	(*, ==, unary_minus) to fix possible overflows and to accord with ANSI
+	* src/SDCCsymt.c (computeType): literals are handled the same way as any
+	other type
+	* src/SDCCval.c (cheapestVal): removed, it doesn't accord with ANSI (can
+	be re-activated by defining REDUCE_LITERALS)
+	* src/SDCCval.c (constVal): fixed; hex and octal constants can be
+	unsigned, but are signed by default
+	* src/SDCCval.c (constVal): rearranged
+	* src/SDCCval.c (valMod): preliminary fix
+	* src/SDCCval.c (valCastLiteral): use TYPE_* types
+	* support/regression/literalop.c: added, work in progress
+
 2003-08-12  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	Generate warnings for useless declarations like "char data;"
@@ -9,7 +25,7 @@
 
 2003-08-09  Bernhard Held <bernhard@bernhardheld.de>
 
-	* src/SDCCval.c (valMult): fixex overflow detection of negativ int
+	* src/SDCCval.c (valMult): fix overflow detection of negative int
 
 2003-08-07  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 

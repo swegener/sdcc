@@ -83,8 +83,8 @@ pcseDef (void *item, va_list ap)
 
 void ReplaceOpWithCheaperOp(operand **op, operand *cop) {
 #ifdef RANGEHUNT
-  printf ("ReplaceOpWithCheaperOp %s with %s: ", 
-	  IS_SYMOP((*op)) ? OP_SYMBOL((*op))->name : "!SYM", 
+  printf ("ReplaceOpWithCheaperOp %s with %s: ",
+	  IS_SYMOP((*op)) ? OP_SYMBOL((*op))->name : "!SYM",
 	  IS_SYMOP(cop) ? OP_SYMBOL(cop)->name : "!SYM");
   // if op is a register equivalent
   if (IS_ITEMP(cop) && OP_SYMBOL((*op))->isreqv) {
@@ -107,7 +107,7 @@ void ReplaceOpWithCheaperOp(operand **op, operand *cop) {
 /* replaceAllSymBySym - replaces all operands by operand in an     */
 /*                      instruction chain                          */
 /*-----------------------------------------------------------------*/
-void 
+void
 replaceAllSymBySym (iCode * ic, operand * from, operand * to, bitVect ** ndpset)
 {
   iCode *lic;
@@ -325,8 +325,8 @@ DEFSETFUNC (findCheaperOp)
       IS_ITEMP (IC_RESULT (cdp->diCode)))
     *opp = IC_RESULT (cdp->diCode);
 
-  if ((*opp) && 
-      (isOperandLiteral(*opp) || !checkSign || 
+  if ((*opp) &&
+      (isOperandLiteral(*opp) || !checkSign ||
        (checkSign &&
 	IS_SPEC(operandType (cop)) && IS_SPEC(operandType (*opp)) &&
 	(SPEC_USIGN(operandType (cop))==SPEC_USIGN(operandType (*opp)) &&
@@ -353,11 +353,11 @@ DEFSETFUNC (findCheaperOp)
 	  *opp = operandFromOperand (*opp);
 	  (*opp)->isaddr = cop->isaddr;
 	}
-	  
+
       if (IS_SPEC(operandType (cop)) && IS_SPEC(operandType (*opp)) &&
 	  SPEC_NOUN(operandType(cop)) != SPEC_NOUN(operandType(*opp)))
 	{
-	    // special case: we can make an unsigned char literal 
+	    // special case: we can make an unsigned char literal
 	    // into an int literal with no cost.
 	    if (isOperandLiteral(*opp)
 	     && SPEC_NOUN(operandType(*opp)) == V_CHAR
@@ -372,9 +372,9 @@ DEFSETFUNC (findCheaperOp)
 		*opp = NULL;
 		return 0;
 	    }
-	    
+
         }
-	  
+
       return 1;
 
     }
@@ -517,7 +517,7 @@ DEFSETFUNC (ifOperandsHave)
 /*-----------------------------------------------------------------*/
 /* ifDefSymIs - if a definition is found in the set                */
 /*-----------------------------------------------------------------*/
-int 
+int
 ifDefSymIs (set * cseSet, operand * sym)
 {
   cseDef *loop;
@@ -554,7 +554,7 @@ DEFSETFUNC (ifDefSymIsX)
 /*-----------------------------------------------------------------*/
 /* ifDiCodeIs - returns truw if diCode is same                     */
 /*-----------------------------------------------------------------*/
-int 
+int
 ifDiCodeIs (set * cseSet, iCode * ic)
 {
   cseDef *loop;
@@ -825,6 +825,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
 		{
 	          ic->op = CAST;
 		  IC_LEFT (ic)->type = TYPE;
+		  IC_LEFT (ic)->isLiteral = 0;
 		  setOperandType (IC_LEFT (ic), operandType (IC_RESULT (ic)));
 		}
 	      return;
@@ -863,6 +864,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
 		  IC_RIGHT (ic) = IC_LEFT (ic);
 		  IC_LEFT (ic) = op;
 		  IC_LEFT (ic)->type = TYPE;
+		  IC_LEFT (ic)->isLiteral = 0;
 		  setOperandType (IC_LEFT (ic), operandType (IC_RESULT (ic)));
 	        }
 	      return;
@@ -1783,7 +1785,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	  /* update the spill location for this */
 	  updateSpillLocation (ic,0);
 
-	  if (POINTER_SET (ic) && 
+	  if (POINTER_SET (ic) &&
 	      !(IS_BITFIELD (OP_SYMBOL (IC_RESULT (ic))->etype)))
 	    {
 	      pdop = NULL;
@@ -1854,7 +1856,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	    change = 1;
 	  }
 	}
-	
+
       /* if left or right changed then do algebraic */
       if (!computeOnly && change)
 	{
@@ -1889,15 +1891,15 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	  if (pdic && compareType (operandType (IC_RESULT (pdic)),
 				 operandType (IC_RESULT (ic))) != 1)
 	    pdic = NULL;
-	  if (pdic && port->cseOk && (*port->cseOk)(ic,pdic) == 0) 
+	  if (pdic && port->cseOk && (*port->cseOk)(ic,pdic) == 0)
 	      pdic = NULL;
 	}
 
       /* Alternate code */
       if (pdic && IS_ITEMP(IC_RESULT(ic))) {
 	if (POINTER_GET(ic) && bitVectBitValue(ebb->ptrsSet,IC_LEFT(ic)->key)) {
-	  /* Mmm, found an equivalent pointer get at a lower level. 
-	     This could be a loop however with the same pointer set 
+	  /* Mmm, found an equivalent pointer get at a lower level.
+	     This could be a loop however with the same pointer set
 	     later on */
 	} else {
 	  /* if previous definition found change this to an assignment */
@@ -1905,7 +1907,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	  IC_LEFT(ic) = NULL;
 	  IC_RIGHT(ic) = operandFromOperand(IC_RESULT(pdic));
 	  SET_ISADDR(IC_RESULT(ic),0);
-	  SET_ISADDR(IC_RIGHT (ic),0);	  
+	  SET_ISADDR(IC_RIGHT (ic),0);
 	}
       }
 

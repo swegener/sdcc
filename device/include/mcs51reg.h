@@ -34,9 +34,9 @@
 
    Version 1.0.2 (Nov 6, 2000)
    T2CON bug corrected 8052 and SABX microcontrollers have different T2CONs
-   Support for for the Atmel AT89C52, AT80LV52, AT89C55, AT80LV55
-   Support for the Dallas DS80C320 and DS80C323 microcontrollers
-   microcontrollers - B. Torok / bela.torok@kssg.ch
+   Support for the Atmel AT89C52, AT80LV52, AT89C55, AT80LV55
+   Support for the Dallas DS80C320 and DS80C323
+   B. Torok / bela.torok@kssg.ch
 
    Version 1.0.3 (Nov 7, 2000)
    SAB80517 definitions added by Michael Schmitt / michael.schmitt@t-online.de
@@ -54,9 +54,11 @@
                       #ifdef MCS51REG_EXTERNAL_RAM
                       #ifdef MCS51REG_DISABLE_WARNINGS
 
-   Version 1.0.6 (Dec 15, 2000)
-   Correction, if External Memory (RAM or ROM) ist used P2 is used for the
-   upper 8 Adressbits instead of P3
+
+   Version 1.0.6 (March 10, 2001)
+   Support for the Dallas DS5000 & DS2250 
+   Support for the Dallas DS5001 & DS2251 
+   microcontrollers - B. Torok / bela.torok@kssg.ch
 
    Adding support for additional microcontrollers:
    -----------------------------------------------
@@ -104,6 +106,8 @@
    MICROCONTROLLER_AT89S53      Atmel AT89S53 microcontroller
    MICROCONTROLLER_AT89X52      Atmel AT89C52 and AT80LV52 microcontrollers
    MICROCONTROLLER_AT89X55      Atmel AT89C55 and AT80LV55 microcontrollers
+   MICROCONTROLLER_DS5000       Dallas DS5000 & DS2250 microcontroller
+   MICROCONTROLLER_DS5001       Dallas DS5001 & DS2251 microcontroller
    MICROCONTROLLER_DS80C32X     Dallas DS80C320 and DS80C323 microcontrollers
    MICROCONTROLLER_DS89C420     Dallas DS89C420 microcontroller
    MICROCONTROLLER_DS8XC520     Dallas DS87C520 and DS83C520 microcontrollers
@@ -168,7 +172,7 @@
 #define P2
 #define IE__EA__x__x__ES__ET1__EX1__ET0__EX0
 #define P3
-#define IP___x__x__x__PS__PT1__PX1__PT0__PX0
+#define IP__x__x__x__PS__PT1__PX1__PT0__PX0
 #define PSW
 #define ACC
 #define B
@@ -205,7 +209,7 @@
 #define P2
 #define IE__EA__x__ET2__ES__ET1__EX1__ET0__EX0
 #define P3
-#define IP___x__x__PT2__PS__PT1__PX1__PT0__PX0
+#define IP__x__x__PT2__PS__PT1__PX1__PT0__PX0
 #define PSW
 #define ACC
 #define B
@@ -247,7 +251,7 @@
 #define SBUF
 #define IE__EA__x__x__ES__ET1__EX1__ET0__EX0
 #define P3
-#define IP___x__x__x__PS__PT1__PX1__PT0__PX0
+#define IP__x__x__x__PS__PT1__PX1__PT0__PX0
 #define PSW
 #define ACC
 #define B
@@ -285,7 +289,7 @@
 #define P2
 #define IE__EA__x__ET2__ES__ET1__EX1__ET0__EX0
 #define P3
-#define IP___x__x__PT2__PS__PT1__PX1__PT0__PX0
+#define IP__x__x__PT2__PS__PT1__PX1__PT0__PX0
 #define PSW
 #define ACC
 #define B
@@ -337,7 +341,7 @@
 #define P2
 #define IE__EA__x__ET2__ES__ET1__EX1__ET0__EX0
 #define P3
-#define IP___x__x__PT2__PS__PT1__PX1__PT0__PX0
+#define IP__x__x__PT2__PS__PT1__PX1__PT0__PX0
 #define PSW
 #define ACC
 #define B
@@ -383,7 +387,7 @@
 #define P2
 #define IE__EA__x__ET2__ES__ET1__EX1__ET0__EX0
 #define P3
-#define IP___x__x__PT2__PS__PT1__PX1__PT0__PX0
+#define IP__x__x__PT2__PS__PT1__PX1__PT0__PX0
 #define PSW
 #define ACC
 #define B
@@ -398,6 +402,88 @@
 #define P1_EXT__x__x__x__x__x__x__T2EX__T2
 #endif
 // end of definitions for the Atmel AT89C55 and AT89LV55 microcontrollers
+
+
+// definitions for the Dallas DS5000
+#ifdef MICROCONTROLLER_DS5000
+#ifdef MICROCONTROLLER_DEFINED
+#define MCS51REG_ERROR
+#endif
+#ifndef MICROCONTROLLER_DEFINED
+#define MICROCONTROLLER_DEFINED
+#endif
+#ifndef MCS51REG_DISABLE_WARNINGS
+#warning Selected HW: 8051
+#endif
+#define P0
+#define SP
+#define DPL
+#define DPH
+#define PCON__SMOD__POR__PFW__WTR__EPFW__EWT__STOP__IDL
+#define TCON
+#define TMOD
+#define TL0
+#define TL1
+#define TH0
+#define TH1
+#define P1
+#define SCON
+#define SBUF
+#define P2
+#define IE__EA__x__x__ES__ET1__EX1__ET0__EX0
+#define P3
+#define IP__RWT__x__x__PS__PT1__PX1__PT0__PX0
+#define MCON__SL__PAA__ECE2__RA32_8__PA0__PA1__PA2__PA3
+#define TA
+#define PSW
+#define ACC
+#define B
+#endif
+// end of definitions for the Dallas DS5000
+
+
+// definitions for the Dallas DS5001
+#ifdef MICROCONTROLLER_DS5001
+#ifdef MICROCONTROLLER_DEFINED
+#define MCS51REG_ERROR
+#endif
+#ifndef MICROCONTROLLER_DEFINED
+#define MICROCONTROLLER_DEFINED
+#endif
+#ifndef MCS51REG_DISABLE_WARNINGS
+#warning Selected HW: 8051
+#endif
+#define P0
+#define SP
+#define DPL
+#define DPH
+#define PCON__SMOD__POR__PFW__WTR__EPFW__EWT__STOP__IDL
+#define TCON
+#define TMOD
+#define TL0
+#define TL1
+#define TH0
+#define TH1
+#define P1
+#define SCON
+#define SBUF
+#define P2
+#define IE__EA__x__x__ES__ET1__EX1__ET0__EX0
+#define P3
+#define IP__RWT__x__x__PS__PT1__PX1__PT0__PX0
+#define CRC
+#define CRCLOW
+#define CRCHIGH
+#define MCON__PA3__PA2__PA1__PA0__RG1__PES__PM__SL
+#define TA
+#define RNR
+#define PSW
+#define RPCTL
+#define STATUS__ST7__ST6__ST5__ST4__IA0__F0__IBF__OBF
+#define ACC
+#define B
+#endif
+// end of definitions for the Dallas DS5001
 
 
 // definitions for the Dallas DS80C320 and DS80C323 microcontrollers
@@ -868,7 +954,7 @@
 #define P2
 #define IE__EA__x__x__ES__ET1__EX1__ET0__EX0
 #define P3
-#define IP___x__x__x__PS__PT1__PX1__PT0__PX0
+#define IP__x__x__x__PS__PT1__PX1__PT0__PX0
 #define PSW
 #define ACC
 #define B
@@ -1181,14 +1267,35 @@ sfr at 0xF4 CML7    ; // compare register 7 low byte SAB80517 specific
 sfr at 0xF7 CMSEL   ; // compare input select SAB80517
 #endif
 
+#ifdef CRC
+#undef CRC
+sfr at 0xC1 CRC     ; // Dallas DS5001 specific
+#define CRC_        0x01
+#define MDM         0x02
+#define RNGE0       0x10
+#define RNGE1       0x20
+#define RNGE2       0x40
+#define RNGE3       0x80
+#endif
+
 #ifdef CRCH
 #undef CRCH
 sfr at 0xCB CRCH    ; // compare/reload/capture register, high byte SAB80515 specific
 #endif
 
+#ifdef CRCHIGH
+#undef CRCHIGH
+sfr at 0xC3 CRCHIGH ; // DS5001 specific
+#endif
+
 #ifdef CRCL
 #undef CRCL
 sfr at 0xCA CRCL    ; // compare/reload/capture register, low byte SAB80515 specific
+#endif
+
+#ifdef CRCLOW
+#undef CRCLOW
+sfr at 0xC2 CRCLOW  ; // DS5001 specific
 #endif
 
 #ifdef CTCON
@@ -1402,8 +1509,8 @@ sbit at 0xBF EXEN2      ; // timer2 external reload interrupt enable
 sfr at 0x9A IEN2        ; // interrupt enable register 2 SAB80517
 #endif
 
-#ifdef IP___x__x__x__PS__PT1__PX1__PT0__PX0
-#undef IP___x__x__x__PS__PT1__PX1__PT0__PX0
+#ifdef IP__x__x__x__PS__PT1__PX1__PT0__PX0
+#undef IP__x__x__x__PS__PT1__PX1__PT0__PX0
 sfr at 0xB8 IP   ;
 // Bit registers
 sbit at 0xB8 PX0  ;
@@ -1413,8 +1520,8 @@ sbit at 0xBB PT1  ;
 sbit at 0xBC PS   ;
 #endif
 
-#ifdef IP___x__x__PT2__PS__PT1__PX1__PT0__PX0
-#undef IP___x__x__PT2__PS__PT1__PX1__PT0__PX0
+#ifdef IP__x__x__PT2__PS__PT1__PX1__PT0__PX0
+#undef IP__x__x__PT2__PS__PT1__PX1__PT0__PX0
 sfr at 0xB8 IP    ;
 // Bit registers
 sbit at 0xB8 PX0  ;
@@ -1436,6 +1543,18 @@ sbit at 0xBB PT1  ;
 sbit at 0xBC PS   ;
 sbit at 0xBD PT2  ;
 sbit at 0xBE PS1  ;
+#endif
+
+#ifdef IP__RWT__x__x__PS__PT1__PX1__PT0__PX0
+#undef IP__RWT__x__x__PS__PT1__PX1__PT0__PX0
+sfr at 0xB8 IP   ;
+// Bit registers
+sbit at 0xB8 PX0  ;
+sbit at 0xB9 PT0  ;
+sbit at 0xBA PX1  ;
+sbit at 0xBB PT1  ;
+sbit at 0xBC PS   ;
+sbit at 0xBF RWT  ;
 #endif
 
 #ifdef IP0__x__WDTS__IP0_5__IP0_4__IP0_3__IP0_2__IP0_1__IP0_0
@@ -1520,6 +1639,32 @@ sbit at 0xC7 EXF2       ; // timer2 reload flag
 #ifdef IRCON1
 #undef IRCON1
 sfr at 0xD1 IRCON1      ; // interrupt control register - SAB80515 specific
+#endif
+
+#ifdef MCON__PA3__PA2__PA1__PA0__RA32_8__ECE2__PAA__SL
+#undef MCON__PA3__PA2__PA1__PA0__RA32_8__ECE2__PAA__SL
+sfr at 0xC6 MCON        ; // DS5000
+#define SL       0x01
+#define PAA      0x02
+#define ECE2     0x04
+#define RA32_8   0x08
+#define PA0      0x10
+#define PA1      0x20
+#define PA2      0x40
+#define PA3      0x80
+#endif
+
+#ifdef MCON__PA3__PA2__PA1__PA0__RG1__PES__PM__SL
+#undef MCON__PA3__PA2__PA1__PA0__RG1__PES__PM__SL
+sfr at 0xC6 MCON        ; // DS5001
+#define SL       0x01
+#define PM       0x02
+#define PES      0x04
+#define RG1      0x08
+#define PA0      0x10
+#define PA1      0x20
+#define PA2      0x40
+#define PA3      0x80
 #endif
 
 #ifdef MD0
@@ -1739,6 +1884,21 @@ sfr at 0x87 PCON ;
 #define PCON_SMOD       0x80
 #endif
 
+#ifdef PCON__SMOD__POR__PFW__WTR__EPFW__EWT__STOP__IDL
+#undef PCON__SMOD__POR__PFW__WTR__EPFW__EWT__STOP__IDL
+sfr at 0x87 PCON ;
+// Not directly accessible PCON bits
+#define IDL             0x01
+#define IDLE            0x01  ; same as IDL
+#define STOP            0x02  ;
+#define EWT             0x04
+#define EPFW            0x08
+#define WTR             0x10
+#define PFW             0x20
+#define POR             0x40
+#define SMOD            0x80
+#endif
+
 #ifdef PCON__SMOD__SMOD0__x__x__GF1__GF0__STOP__IDLE
 #undef PCON__SMOD__SMOD0__x__x__GF1__GF0__STOP__IDLE
 sfr at 0x87 PCON ;
@@ -1804,6 +1964,11 @@ sfr at 0xCB RCAP2H  ;
 sfr at 0xCA RCAP2L  ;
 #endif
 
+#ifdef RNR
+#undef RNR
+sfr at 0xCF RNR  ;
+#endif
+
 #ifdef ROMSIZE__x__x__x__x__x__RMS2__RMS1__RMS0
 #undef ROMSIZE__x__x__x__x__x__RMS2__RMS1__RMS0
 sfr at 0xC2 ROMSIZE  ;   // DS87C520, DS83C520
@@ -1825,6 +1990,18 @@ sfr at 0xC2 ROMSIZE  ;   // DS87C520, DS83C520
 #define TE      0x20
 #define BPF     0x40
 #define HBPF    0x80
+#endif
+
+#ifdef RPCTL
+#undef RPCTL
+sfr at 0xD8 RPCTL     ;  // Dallas DS5001 specific
+sbit at 0xD8 RG0      ;
+sbit at 0xD9 RPCON    ;
+sbit at 0xDA DMA      ;
+sbit at 0xDB IBI      ;
+sbit at 0xDC AE       ;
+sbit at 0xDD EXBS     ;
+sbit at 0xDF RNR_FLAG ;
 #endif
 
 #ifdef S0BUF
@@ -2017,6 +2194,20 @@ sfr at 0xC5 STATUS ; // DS87C520 & DS83520specific
 #define PIP    0x80
 #endif
 
+#ifdef STATUS__ST7__ST6__ST5__ST4__IA0__F0__IBF__OBF
+#undef STATUS__ST7__ST6__ST5__ST4__IA0__F0__IBF__OBF
+sfr at 0xDA STATUS ; // DS5001specific
+// Not directly accessible Bits.
+#define OBF    0x01
+#define IBF    0x02
+#define F0     0x04
+#define IA0    0x08
+#define ST4    0x10
+#define ST5    0x20
+#define ST6    0x40
+#define ST7    0x80
+#endif
+
 #ifdef SYSCON
 #undef SYSCON
 sfr at 0xB1 SYSCON      ; // XRAM Controller Access Control
@@ -2089,7 +2280,7 @@ sfr at 0xC9 T2MOD  ;
 
 #ifdef TA
 #undef TA
-// DS80C320 specific
+// DS500 & DS80C320 specific
 sfr at 0xC7 TA ;
 #endif
 
@@ -2216,6 +2407,14 @@ sfr at 0x91 XPAGE     ; // Page Address Register for Extended On-Chip Ram - Infi
 #ifdef MICROCONTROLLER_AT89X55
 #define TF2_VECTOR      5       /* 0x2B timer 2 */
 #define EX2_VECTOR      5       /* 0x2B external interrupt 2 */
+#endif
+
+#ifdef MICROCONTROLLER_DS5000
+#define PFW_VECTOR      5       /* 0x2B */
+#endif
+
+#ifdef MICROCONTROLLER_DS5001
+#define PFW_VECTOR      5       /* 0x2B */
 #endif
 
 #ifdef MICROCONTROLLER_DS80C32X

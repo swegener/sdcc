@@ -572,6 +572,20 @@ DEFSETFUNC (ifDiCodeIsX)
 }
 
 /*-----------------------------------------------------------------*/
+/* findBackwardDef - scan backwards to find deinition of operand   */
+/*-----------------------------------------------------------------*/
+iCode *findBackwardDef(operand *op,iCode *ic)
+{
+    iCode *lic;
+
+    for (lic = ic; lic ; lic = lic->prev) {
+	if (IC_RESULT(lic) && isOperandEqual(op,IC_RESULT(lic))) 
+	    return lic;
+    }
+    return NULL;
+}
+
+/*-----------------------------------------------------------------*/
 /* algebraicOpts - does some algebraic optimizations               */
 /*-----------------------------------------------------------------*/
 void 
@@ -896,6 +910,14 @@ updateSpillLocation (iCode * ic, int induction)
 				IC_RESULT (ic)->operand.symOperand;
 	}
 
+#if 0 /* this needs furthur investigation can save a lot of code */
+	if (ASSIGN_SYM_TO_ITEMP(ic) &&
+	    !SPIL_LOC(IC_RESULT(ic))) {
+	    if (!OTHERS_PARM (OP_SYMBOL (IC_RIGHT (ic))))
+		SPIL_LOC (IC_RESULT (ic)) =
+		    IC_RIGHT (ic)->operand.symOperand;
+	}
+#endif
 	if (ASSIGN_ITEMP_TO_ITEMP (ic)) {
 	  
 		if (!SPIL_LOC (IC_RIGHT (ic)) &&
@@ -1109,7 +1131,7 @@ constFold (iCode * ic, set * cseSet)
   /* this check is a hueristic to prevent live ranges
      from becoming too long */
   if (IS_PTR (operandType (IC_RESULT (ic))))
-    return 0;
+      return 0;
 
   /* check if operation with a literal */
   if (!IS_OP_LITERAL (IC_RIGHT (ic)))

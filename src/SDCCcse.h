@@ -57,4 +57,5 @@ void unsetDefsAndUses (iCode *);
 void updateSpillLocation (iCode * ic,int);
 void setUsesDefs (operand *, bitVect *, bitVect *, bitVect **);
 void replaceAllSymBySym (iCode *, operand *, operand *, bitVect **);
+iCode *findBackwardDef(operand *,iCode *);
 #endif

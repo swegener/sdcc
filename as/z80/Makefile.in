@@ -42,7 +42,7 @@ ASXZ80		= $(PRJDIR)/bin/as-z80
 all: checkconf $(ASXZ80)
 
 $(ASXZ80): $(ASOBJECTS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(ASOBJECTS) 
+	$(CC) $(CFLAGS) -o $@ $(ASOBJECTS) $(LDFLAGS)
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------

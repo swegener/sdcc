@@ -989,15 +989,19 @@ addSymChain (symbol * symHead)
 	/* one definition extern ? */
 	if (IS_EXTERN (csym->etype) || IS_EXTERN (sym->etype)) {
 	  /* do types match ? */
-	  if (compareType (csym->type, sym->type) != 1) {
+	  //checkDecl (sym, IS_EXTERN (sym->etype));
+	  if (compareTypeExact (csym->type, sym->type, sym->level) != 1) {
 	    /* no then error */
 	    werror (E_EXTERN_MISMATCH, csym->name);
+	    printFromToType (csym->type, sym->type);
 	    continue;
 	  }
 	} else {
 	  /* not extern */
-	  if (compareType (csym->type, sym->type) != 1) {
+	  //checkDecl (sym, 0);
+	  if (compareTypeExact (csym->type, sym->type, sym->level) != 1) {
 	    werror (E_DUPLICATE, sym->name);
+	    printFromToType (csym->type, sym->type);
 	    continue;
 	  }
 	}
@@ -1616,6 +1620,134 @@ compareType (sym_link * dest, sym_link * src)
   if (SPEC_USIGN (dest) != SPEC_USIGN (src))
     return -1;
 
+  return 1;
+}
+
+/*--------------------------------------------------------------------*/
+/* compareTypeExact - will do type check return 1 if match exactly    */
+/*--------------------------------------------------------------------*/
+int
+compareTypeExact (sym_link * dest, sym_link * src, int level)
+{
+  STORAGE_CLASS srcScls, destScls;
+  
+  if (!dest && !src)
+    return 1;
+
+  if (dest && !src)
+    return 0;
+
+  if (src && !dest)
+    return 0;
+
+  /* if dest is a declarator then */
+  if (IS_DECL (dest))
+    {
+      if (IS_DECL (src))
+	{
+	  if (DCL_TYPE (src) == DCL_TYPE (dest)) {
+	    if ((DCL_TYPE (src) == ARRAY) && (DCL_ELEM (src) != DCL_ELEM (dest)))
+	      return 0;
+	    if (DCL_PTR_CONST (src) != DCL_PTR_CONST (dest))
+	      return 0;
+	    if (DCL_PTR_VOLATILE (src) != DCL_PTR_VOLATILE (dest))
+	      return 0;
+	    if (IS_FUNC(src))
+	      return compareTypeExact (dest->next, src->next, -1);
+	    return compareTypeExact (dest->next, src->next, level);
+	  }
+          return 0;
+	}
+      return 0;
+    }
+
+  /* if one is a specifier and the other is not */
+  if ((IS_SPEC (src) && !IS_SPEC (dest)) ||
+      (IS_SPEC (dest) && !IS_SPEC (src)))
+    return 0;
+
+  /* if one of them is a void then ok */
+  if (SPEC_NOUN (dest) != SPEC_NOUN (src))
+    return 0;
+
+  /* if they are both bitfields then if the lengths
+     and starts don't match */
+  if (IS_BITFIELD (dest) && IS_BITFIELD (src) &&
+      (SPEC_BLEN (dest) != SPEC_BLEN (src) ||
+       SPEC_BSTR (dest) != SPEC_BSTR (src)))
+    return 0;
+
+  if (IS_INTEGRAL (dest))
+    {
+      /* signedness must match */
+      if (SPEC_USIGN (dest) != SPEC_USIGN (src))
+	return 0;
+      /* size must match */
+      if (SPEC_LONG (dest) != SPEC_LONG (src))
+	return 0;
+      if (SPEC_SHORT (dest) != SPEC_SHORT (src))
+	return 0;
+    }
+  
+  if (IS_STRUCT (dest))
+    {
+      if (SPEC_STRUCT (dest) != SPEC_STRUCT (src))
+	return 0;
+    }
+
+  if (SPEC_CONST (dest) != SPEC_CONST (src))
+    return 0;
+  if (SPEC_VOLATILE (dest) != SPEC_VOLATILE (src))
+    return 0;
+  if (SPEC_STAT (dest) != SPEC_STAT (src))
+    return 0;
+  
+  destScls = SPEC_SCLS (dest);
+  srcScls = SPEC_SCLS (src);
+  
+  /* Compensate for const to const code change in checkSClass() */
+  if (!level & port->mem.code_ro && SPEC_CONST (dest))
+    {
+      if (srcScls == S_CODE && destScls == S_FIXED)
+	destScls = S_CODE;
+      if (destScls == S_CODE && srcScls == S_FIXED)
+	srcScls = S_CODE;
+    }
+
+  /* compensate for allocGlobal() */  
+  if ((srcScls == S_FIXED || srcScls == S_AUTO)
+      && port->mem.default_globl_map == xdata
+      && !level)
+    srcScls = S_XDATA;
+  
+  if (level>0 && !SPEC_STAT (dest))
+    {
+      /* Compensate for hack-o-matic in checkSClass() */
+      if (options.stackAuto || (currFunc && IFFUNC_ISREENT (currFunc->type)))
+	{
+	  if (destScls == S_FIXED)
+	    destScls = (options.useXstack ? S_XSTACK : S_STACK);
+	  if (srcScls == S_FIXED)
+	    srcScls = (options.useXstack ? S_XSTACK : S_STACK);
+	}
+      else if (TARGET_IS_DS390 || TARGET_IS_DS400 || options.useXstack)
+	{
+	  if (destScls == S_FIXED)
+	    destScls = S_XDATA;
+	  if (srcScls == S_FIXED)
+	    srcScls = S_XDATA;
+	}
+    }
+
+  if (srcScls != destScls)
+    {
+      printf ("level = %d\n", level);
+      printf ("SPEC_SCLS (src) = %d, SPEC_SCLS (dest) = %d\n",
+		SPEC_SCLS (src), SPEC_SCLS (dest));
+      printf ("srcScls = %d, destScls = %d\n",srcScls, destScls);
+      return 0;
+    }
+  
   return 1;
 }
 

@@ -266,6 +266,14 @@ iCode2eBBlock (iCode * ic)
       ebb->ech = ebb->sch;
       return ebb;
     }
+  
+  /* if this is a function call */
+  if (ic->op == CALL || ic->op == PCALL)
+    {
+      ebb->hasFcall = 1;
+      if (currFunc)
+	FUNC_HASFCALL(currFunc->type) = 1;
+    }
 
   if ((ic->next && ic->next->op == LABEL) ||
       !ic->next)
@@ -685,13 +693,32 @@ iCodeFromeBBlock (eBBlock ** ebbs, int count)
 	  (ebbs[i]->entryLabel != entryLabel &&
 	   ebbs[i]->entryLabel != returnLabel))
 	{
-	  werror (W_CODE_UNREACH, ebbs[i]->sch->filename, ebbs[i]->sch->lineno);
-	  continue;
+          iCode *ic = NULL;
+          bool foundNonlabel = 0;
+          ic=ebbs[i]->sch;
+          do
+            {
+              if (ic->op != LABEL)
+                {
+                  foundNonlabel = 1;
+                  break;
+                }
+              if (ic==ebbs[i]->ech)
+                break;
+              ic = ic->next;
+            }
+          while (ic);
+          if (foundNonlabel && ic)
+            {
+	      werror (W_CODE_UNREACH, ic->filename, ic->lineno);
+              continue;
+            }
 	}
 
       lic->next = ebbs[i]->sch;
       lic->next->prev = lic;
       lic = ebbs[i]->ech;
+
     }
 
   return ric;

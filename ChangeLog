@@ -1,3 +1,11 @@
+2003-11-12 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCsymt.h,
+	* src/SDCCsymt.c (addSymTypeChain, compareTypesExact): fixed bugs
+	#838241 & 780691 (basicly the same bug)
+	* src/SDCCBBlock.c (iCode2eBBlock): fixed bug #840148
+	* src/SDCCBBlock.c (iCodeFromeBBlock): fixed bug #840162
+
 2003-11-11 Bernhard Held <bernhard@bernhardheld.de>
 
         * src/SDCCmain.c (linkEdit): "fix" #834252

@@ -35,9 +35,19 @@ questions on the user mailing list.  See:
 
 
 Notes:
-* The gbz80, avr, and pic ports are currently experimental.  The gbz80
-  port is known to have some large bugs due to falling out of sync
-  with the z80 port.
+* The avr, and pic ports are currently experimental.
+
+
+Roadmap:
+COPYING		- GPL v2
+as/		- Assembler, derrived from asxxxx
+debugger/
+device/		- Device libraries and examples
+doc/		- sdcc and port specific documentation
+link/		- Linker, also derrived from asxxxx
+sim/		- Simulator (mcs51 only)
+src/		- Source to the C compiler and ports
+support/	- Libraries and apps that may not be provided by your system.
 
 
 Authors and interested persons:
@@ -59,5 +69,7 @@ SDCC includes code from:
    Porting ASXXX and ASLINK for 8051.
 * Dmitry S. Obukhov <dso@usa.net>
    malloc and serial I/O routines.
-
+* Pascal Felber
+   Some of the Z80 related files are borrowed from the Gameboy
+   Development Kit (GBDK).
 

@@ -2963,8 +2963,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
          this is the only usage then
          mark the itemp as a conditional */
       if ((IS_CONDITIONAL (ic) ||
-           (IS_BITWISE_OP(ic) && isBitwiseOptimizable (ic)) ||
-           (POINTER_GET (ic) && getSize (operandType (IC_RESULT (ic))) <=1)) &&
+           (IS_BITWISE_OP(ic) && isBitwiseOptimizable (ic))) &&
           ic->next && ic->next->op == IFX &&
           bitVectnBitsOn (OP_USES(IC_RESULT(ic)))==1 &&
           isOperandEqual (IC_RESULT (ic), IC_COND (ic->next)) &&

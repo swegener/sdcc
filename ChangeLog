@@ -1,3 +1,7 @@
+2004-10-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/mcs51/ralloc.c (packRegisters): fixed bug #1044601
+
 2004-10-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/mcs51/lkarea.c: removed old K&R style,

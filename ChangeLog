@@ -1,3 +1,12 @@
+2003-08-31  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCpeeph.c (notVolatile, notVolatileVariable): handle IFX
+        and JUMPTABLE iCodes properly now (worked by accident before)
+	* src/mcs51/gen.c (leftRightUseAcc),
+	* src/ds390/gen.c (leftRightUseAcc): handle IFX and JUMPTABLE
+	iCode properly now. Use getSize instead of nRegs since a & b
+	aren't part of the nRegs tally. 
+
 2003-08-31  Vangelis Rokas <vrokas@otenet.gr>
 	* src/pic16/main.c: corrected offsets of interrupt vectors in _pic16_genIVT()
 	* src/pic16/pcode.c: fix to disable inserting BANKSEL directive

@@ -704,15 +704,27 @@ notVolatileVariable(char *var, lineNode *currPl, lineNode *endPl)
     if (cl->ic && (cl->ic!=last_ic))
       {
         last_ic = cl->ic;
-        op = IC_LEFT (cl->ic);
-        if (IS_SYMOP (op) && !strcmp(OP_SYMBOL (op)->rname,symname) )
-          return !op->isvolatile;
-        op = IC_RIGHT (cl->ic);
-        if (IS_SYMOP (op) && !strcmp(OP_SYMBOL (op)->rname,symname) )
-          return !op->isvolatile;
-        op = IC_RESULT (cl->ic);
-        if (IS_SYMOP (op) && !strcmp(OP_SYMBOL (op)->rname,symname) )
-          return !op->isvolatile;
+        switch (cl->ic->op)
+          {
+          case IFX:
+            op = IC_COND (cl->ic);
+            if (IS_SYMOP (op) && !strcmp(OP_SYMBOL (op)->rname,symname) )
+              return !op->isvolatile;
+          case JUMPTABLE:
+            op = IC_JTCOND (cl->ic);
+            if (IS_SYMOP (op) && !strcmp(OP_SYMBOL (op)->rname,symname) )
+              return !op->isvolatile;
+          default:
+            op = IC_LEFT (cl->ic);
+            if (IS_SYMOP (op) && !strcmp(OP_SYMBOL (op)->rname,symname) )
+              return !op->isvolatile;
+            op = IC_RIGHT (cl->ic);
+            if (IS_SYMOP (op) && !strcmp(OP_SYMBOL (op)->rname,symname) )
+              return !op->isvolatile;
+            op = IC_RESULT (cl->ic);
+            if (IS_SYMOP (op) && !strcmp(OP_SYMBOL (op)->rname,symname) )
+              return !op->isvolatile;
+          }
       }
   }
   
@@ -750,15 +762,27 @@ FBYNAME (notVolatile)
       {
         if (cl->ic)
           {
-            op = IC_LEFT (cl->ic);
-            if (IS_SYMOP (op) && op->isvolatile)
-              return FALSE;
-            op = IC_RIGHT (cl->ic);
-            if (IS_SYMOP (op) && op->isvolatile)
-              return FALSE;
-            op = IC_RESULT (cl->ic);
-            if (IS_SYMOP (op) && op->isvolatile)
-              return FALSE;
+            switch (cl->ic->op)
+              {
+              case IFX:
+                op = IC_COND (cl->ic);
+                if (IS_SYMOP (op) && op->isvolatile)
+                  return FALSE;
+              case JUMPTABLE:
+                op = IC_JTCOND (cl->ic);
+                if (IS_SYMOP (op) && op->isvolatile)
+                  return FALSE;
+              default:
+                op = IC_LEFT (cl->ic);
+                if (IS_SYMOP (op) && op->isvolatile)
+                  return FALSE;
+                op = IC_RIGHT (cl->ic);
+                if (IS_SYMOP (op) && op->isvolatile)
+                  return FALSE;
+                op = IC_RESULT (cl->ic);
+                if (IS_SYMOP (op) && op->isvolatile)
+                  return FALSE;
+              }
           }
       }
       return TRUE;

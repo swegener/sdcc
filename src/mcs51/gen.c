@@ -289,19 +289,64 @@ pointerCode (sym_link * etype)
 static int
 leftRightUseAcc(iCode *ic)
 {
+  operand *op;
+  int size;
+  int accuseSize = 0;
   int accuse = 0;
+  
+  if (!ic)
+    {
+      werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+	      "null iCode pointer");
+      return 0;
+    }
 
-  if (ic && IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic))
-      && OP_SYMBOL (IC_LEFT (ic)) && OP_SYMBOL (IC_LEFT (ic))->accuse)
-    accuse = (accuse < OP_SYMBOL (IC_LEFT (ic))->nRegs)
-             ? OP_SYMBOL (IC_LEFT (ic))->nRegs : accuse;
-
-  if (ic && IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic))
-      && OP_SYMBOL (IC_RIGHT (ic)) && OP_SYMBOL (IC_RIGHT (ic))->accuse)
-    accuse = (accuse < OP_SYMBOL (IC_RIGHT (ic))->nRegs)
-             ? OP_SYMBOL (IC_RIGHT (ic))->nRegs : accuse;
-
-  return accuse;
+  if (ic->op == IFX)
+    {
+      op = IC_COND (ic);
+      if (IS_SYMOP (op) && OP_SYMBOL (op) && OP_SYMBOL (op)->accuse)
+        {
+          accuse = 1;
+          size = getSize (OP_SYMBOL (op)->type);
+          if (size>accuseSize)
+            accuseSize = size;
+        }
+    }
+  else if (ic->op == JUMPTABLE)
+    {
+      op = IC_JTCOND (ic);
+      if (IS_SYMOP (op) && OP_SYMBOL (op) && OP_SYMBOL (op)->accuse)
+        {
+          accuse = 1;
+          size = getSize (OP_SYMBOL (op)->type);
+          if (size>accuseSize)
+            accuseSize = size;
+        }
+    }
+  else
+    {
+      op = IC_LEFT (ic);
+      if (IS_SYMOP (op) && OP_SYMBOL (op) && OP_SYMBOL (op)->accuse)
+        {
+          accuse = 1;
+          size = getSize (OP_SYMBOL (op)->type);
+          if (size>accuseSize)
+            accuseSize = size;
+        }
+      op = IC_RIGHT (ic);
+      if (IS_SYMOP (op) && OP_SYMBOL (op) && OP_SYMBOL (op)->accuse)
+        {
+          accuse = 1;
+          size = getSize (OP_SYMBOL (op)->type);
+          if (size>accuseSize)
+            accuseSize = size;
+        }
+    }
+  
+  if (accuseSize)
+    return accuseSize;
+  else
+    return accuse;
 }
 
 

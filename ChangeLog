@@ -1,3 +1,9 @@
+2004-10-26 Slade Rich <slade_rich AT users.sourceforge.net>
+
+	* src/pic/ralloc.c : fixed inefficient code produced when compiling a complimented bit operation.
+	* src/pic16/ralloc.c : applied same fix for pic16.
+	* src/pic/gen.c : tidied it up a little.
+
 2004-10-25 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/peeph.def: disabled 259.a,b for removing redundant ret,

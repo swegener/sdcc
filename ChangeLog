@@ -1,3 +1,7 @@
+2004-08-22 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/mcs51/peeph.def: peepholes 248.i-m for xdata bitfields
+
 2004-08-21 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/mcs51/ralloc.c (packRegsForOneuse): fixed bug #1012650 and some

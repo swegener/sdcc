@@ -798,7 +798,7 @@ replace {
 	xrl	%1,#0x80
 } by {
 	;	Peephole 159	avoided xrl during execution
-	mov  %1,#(%2 ^ 0x80)
+	mov	%1,#(%2 ^ 0x80)
 }
 
 replace {
@@ -3119,6 +3119,131 @@ replace {
 	xrl	a,%4
 	movx	@dptr,a
 }
+
+// Peeepholes 248.i to 248.m are like 248.d to 248.h except they apply to bitfields:
+// xdata struct { unsigned b0:1; unsigned b1:1; unsigned b2:1; } xport;
+// xport.b0=1; xport.b0=0; xport.b0=1;
+replace {
+	mov	dptr,%1
+	movx	a,@dptr
+	orl	a,%3
+	movx	@dptr,a
+
+	mov	dptr,%1
+	movx	a,@dptr
+	anl	a,%4
+	movx	@dptr,a
+
+	mov	dptr,%1
+	movx	a,@dptr
+	orl	a,%5
+	movx	@dptr,a
+} by {
+	;	Peephole 248.i	optimized or/and/or to xdata bitfield
+	mov	dptr,%1
+	movx	a,@dptr
+	orl	a,%3
+	movx	@dptr,a
+	movx	a,@dptr
+	anl	a,%4
+	movx	@dptr,a
+	movx	a,@dptr
+	orl	a,%5
+	movx	@dptr,a
+}
+
+replace {
+	mov	dptr,%1
+	movx	a,@dptr
+	anl	a,%3
+	movx	@dptr,a
+
+	mov	dptr,%1
+	movx	a,@dptr
+	orl	a,%4
+	movx	@dptr,a
+
+	mov	dptr,%1
+	movx	a,@dptr
+	anl	a,%5
+	movx	@dptr,a
+} by {
+	;	Peephole 248.j	optimized and/or/and to xdata bitfield
+	mov	dptr,%1
+	movx	a,@dptr
+	anl	a,%3
+	movx	@dptr,a
+	movx	a,@dptr
+	orl	a,%4
+	movx	@dptr,a
+	movx	a,@dptr
+	anl	a,%5
+	movx	@dptr,a
+}
+
+replace {
+	mov	dptr,%1
+	movx	a,@dptr
+	orl	a,%3
+	movx	@dptr,a
+
+	mov	dptr,%1
+	movx	a,@dptr
+	anl	a,%4
+	movx	@dptr,a
+} by {
+	;	Peephole 248.k	optimized or/and to xdata bitfield
+	mov	dptr,%1
+	movx	a,@dptr
+	orl	a,%3
+	movx	@dptr,a
+	movx	a,@dptr
+	anl	a,%4
+	movx	@dptr,a
+}
+
+replace {
+	mov	dptr,%1
+	movx	a,@dptr
+	anl	a,%3
+	movx	@dptr,a
+
+	mov	dptr,%1
+	movx	a,@dptr
+	orl	a,%4
+	movx	@dptr,a
+} by {
+	;	Peephole 248.l	optimized and/or to xdata bitfield
+	mov	dptr,%1
+	movx	a,@dptr
+	anl	a,%3
+	movx	@dptr,a
+	movx	a,@dptr
+	orl	a,%4
+	movx	@dptr,a
+}
+
+replace {
+	mov	dptr,%1
+	movx	a,@dptr
+	xrl	a,%3
+	movx	@dptr,a
+
+	mov	dptr,%1
+	movx	a,@dptr
+	xrl	a,%4
+	movx	@dptr,a
+} by {
+	;	Peephole 248.m	optimized xor/xor to xdata bitfield
+	mov	dptr,%1
+	movx	a,@dptr
+	xrl	a,%3
+	movx	@dptr,a
+	movx	a,@dptr
+	xrl	a,%4
+	movx	@dptr,a
+}
+
 
 replace {
 	jnz	%1

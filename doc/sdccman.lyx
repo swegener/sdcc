@@ -13102,6 +13102,9 @@ status Collapsed
 \layout Itemize
 
 -S <serial in,out> passed to simulator see the simulator docs for details.
+\layout Itemize
+
+-k <port number> passed to simulator see the simulator docs for details.
 \layout Section
 
 Debugger Commands.

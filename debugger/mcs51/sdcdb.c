@@ -1052,6 +1052,13 @@ static void parseCmdLine (int argc, char **argv)
         continue ;
       }
 
+      /* network serial port */
+      if ( (strcmp(argv[i],"-k") == 0)) {
+        simArgs[nsimArgs++] = strdup(argv[i]);
+        simArgs[nsimArgs++] = strdup(argv[++i]);
+        continue ;
+      }
+
       fprintf(stderr,"unknown option %s --- ignored\n",
         argv[i]);
 

@@ -2,6 +2,7 @@
 
 	* src/SDCCicode.c (geniCodeJumpTable, geniCodeSwitch): fixed
 	the other part of bug #814548
+	* src/SDCCpeeph.c (labelInRange): fixed bug #814558
 
 2003-09-30  Bernhard Held <bernhard@bernhardheld.de>
 

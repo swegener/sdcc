@@ -279,6 +279,10 @@ FBYNAME (labelInRange)
   if (!lbl)
     return FALSE;
 
+  /* Don't optimize jumps in a jump table; a more generic test */
+  if (currPl->ic && currPl->ic->op == JUMPTABLE)
+    return FALSE;
+    
   /* if the previous two instructions are "ljmp"s then don't
      do it since it can be part of a jump table */
   if (currPl->prev && currPl->prev->prev &&

@@ -134,7 +134,7 @@ xdata at CAN_CTRL struct
     unsigned	char	bt_0;
     unsigned	char	bt_1;
     unsigned	char	gms_0;
-    unsigned	char	gme_1;
+    unsigned	char	gms_1;
     unsigned	char	gme_0;
     unsigned	char	gme_1;
     unsigned	char	gme_2;

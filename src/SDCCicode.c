@@ -3699,23 +3699,6 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
         }
     }
 
-  /* If cond is volatile, it might change after the boundary  */
-  /* conditions are tested to an out of bounds value, causing */
-  /* a jump to a location outside of the jump table. To avoid */
-  /* this possibility, use a non-volatile copy of it instead. */
-  if (IS_OP_VOLATILE (cond))
-    {
-      operand * newcond;
-      iCode * ic;
-      
-      newcond = newiTempOperand (operandType (cond), TRUE);
-      newcond->isvolatile = 0;
-      ic = newiCode ('=', NULL, cond);
-      IC_RESULT (ic) = newcond;
-      ADDTOCHAIN (ic);
-      cond = newcond;
-    }
-
   /* first we rule out the boundary conditions */
   /* if only optimization says so */
   if (needRangeCheck)
@@ -3784,6 +3767,22 @@ geniCodeSwitch (ast * tree,int lvl)
           caseVals = caseVals->next;
         }
       goto defaultOrBreak;
+    }
+  
+  /* If cond is volatile, it might change while we are trying to */
+  /* find the matching case. To avoid this possibility, make a   */
+  /* non-volatile copy to use instead. */
+  if (IS_OP_VOLATILE (cond))
+    {
+      operand * newcond;
+      iCode * ic;
+      
+      newcond = newiTempOperand (operandType (cond), TRUE);
+      newcond->isvolatile = 0;
+      ic = newiCode ('=', NULL, cond);
+      IC_RESULT (ic) = newcond;
+      ADDTOCHAIN (ic);
+      cond = newcond;
     }
 
   /* if we can make this a jump table */

@@ -1,5 +1,10 @@
 2005-03-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
+	* src/SDCCicode.c (geniCodeSwitch, geniCodeJumpTable): fixed
+	bug #1164313
+
+2005-03-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
 	* src/SDCCcse.c (cseBBlock): retain assignment to self when volatile
 	* src/SDCCast.c (isLoopCountable): fixed bug #1161985
 

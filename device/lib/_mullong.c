@@ -480,7 +480,7 @@ union bil {
 #elif defined(__z80) || defined(__gbz80)
 #define bcast(x) ((union bil *)&(x))
 #else
-#define bcast(x) ((union bil near *)&(x))
+#define bcast(x) ((union bil near  *)&(x))
 #endif
 
 /*

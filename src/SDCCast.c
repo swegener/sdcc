@@ -2794,8 +2794,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	{
 	  tree->type = EX_VALUE;
 	  tree->opval.val = valDiv (valFromType (LETYPE (tree)),
-				    valFromType (RETYPE (tree)),
-		               resultType == RESULT_TYPE_CHAR ? FALSE : TRUE);
+				    valFromType (RETYPE (tree)));
 	  tree->right = tree->left = NULL;
 	  TETYPE (tree) = getSpec (TTYPE (tree) =
 				   tree->opval.val->type);
@@ -2950,8 +2949,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	{
 	  tree->type = EX_VALUE;
 	  tree->opval.val = valMult (valFromType (LETYPE (tree)),
-				     valFromType (RETYPE (tree)),
-		               resultType == RESULT_TYPE_CHAR ? FALSE : TRUE);
+				     valFromType (RETYPE (tree)));
 	  tree->right = tree->left = NULL;
 	  TETYPE (tree) = getSpec (TTYPE (tree) =
 				   tree->opval.val->type);

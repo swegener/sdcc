@@ -972,11 +972,20 @@ int   parseCmdLine ( int argc, char **argv )
 		break;
 
 		/* preprocessor options */		
+	    case 'M':
+	      {
+		preProcOnly=1;
+		_addToList(preArgv, "-M");
+		break;
+	      }
+	    case 'C':
+	      {
+		_addToList(preArgv, "-C");
+		break;
+	      }
 	    case 'd':
 	    case 'D':
 	    case 'I':
-	    case 'M':
-	    case 'C':
 	    case 'A':
 	    case 'U':
 		{
@@ -992,8 +1001,6 @@ int   parseCmdLine ( int argc, char **argv )
 		    
 		    if ( argv[i][1] == 'Y' )
 			argv[i][1] = 'I';
-		    if (argv[i][1] == 'M')
-			preProcOnly = 1;
 
 		    sprintf(buffer, "-%c%s", sOpt, rest);
 		    _addToList(preArgv, buffer);

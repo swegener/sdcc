@@ -208,5 +208,6 @@ void addSymToBlock (symbol *, ast *);
 // exported variables 
 extern set *operKeyReset;
 extern int noAlloc;
+extern int inInitMode;
 
 #endif

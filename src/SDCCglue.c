@@ -1034,6 +1034,7 @@ emitStaticSeg (memmap * map, FILE * out)
 void 
 emitMaps ()
 {
+  inInitMode++;
   /* no special considerations for the following
      data, idata & bit & xdata */
   emitRegularMap (data, TRUE, TRUE);
@@ -1046,6 +1047,7 @@ emitMaps ()
   emitRegularMap (code, TRUE, FALSE);
 
   emitStaticSeg (statsg, code->oFile);
+  inInitMode--;
 }
 
 /*-----------------------------------------------------------------*/

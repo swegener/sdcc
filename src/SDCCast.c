@@ -1035,7 +1035,7 @@ gatherAutoInit (symbol * autoChain)
 	  symbol *newSym;
 	  
 	  // this can only be a constant
-	  if (!IS_LITERAL(sym->ival->init.node->etype)) {
+	  if (!inInitMode && !IS_LITERAL(sym->ival->init.node->etype)) {
 	    werror (E_CONST_EXPECTED);
 	  }
 

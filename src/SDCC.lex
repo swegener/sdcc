@@ -100,8 +100,10 @@ struct options  save_options  ;
 <asm>.         { 
   if (asmp-asmbuff >= asmbuffSize-2) {
     // increase the buffersize with 50%
+    int size=asmp-asmbuff;
     asmbuffSize=asmbuffSize*3/2;
     asmbuff = Safe_realloc (asmbuff, asmbuffSize); 
+    asmp=asmbuff+size;
   }
   *asmp++ = yytext[0];
 }
@@ -109,8 +111,10 @@ struct options  save_options  ;
   count(); 
   if (asmp-asmbuff >= asmbuffSize-3) {
     // increase the buffersize with 50%
+    int size=asmp-asmbuff;
     asmbuffSize=asmbuffSize*3/2;
     asmbuff = Safe_realloc (asmbuff, asmbuffSize); 
+    asmp=asmbuff+size;
   }
   *asmp++ = '\n' ;
 }

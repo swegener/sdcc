@@ -566,6 +566,10 @@ printIvalType (symbol *sym, sym_link * type, initList * ilist, FILE * oFile)
 	}
 
 	val = list2val (ilist);
+	if (val->type != type) {
+	  val = valCastLiteral(type, floatFromVal(val));
+	}
+	
 	switch (getSize (type)) {
 	case 1:
 		if (!val)
@@ -865,7 +869,7 @@ printIvalCharPtr (symbol * sym, sym_link * type, value * val, FILE * oFile)
     }
   else
     {
-      /* What is this case? Are these pointers? */
+      // these are literals assigned to pointers
       switch (size)
 	{
 	case 1:
@@ -879,14 +883,20 @@ printIvalCharPtr (symbol * sym, sym_link * type, value * val, FILE * oFile)
 		      aopLiteral (val, 0), aopLiteral (val, 1));
 	  break;
 	case 3:
-	  werror (E_LITERAL_GENERIC);
+	  // mcs51 generic pointer
+	  if (floatFromVal(val)!=0) {
+	    werror (E_LITERAL_GENERIC);
+	  }
 	  fprintf (oFile, "\t.byte %s,%s,%s\n",
 		   aopLiteral (val, 0), 
 		   aopLiteral (val, 1),
 		   aopLiteral (val, 2));
 	  break;
 	case 4:
-	  werror (E_LITERAL_GENERIC);
+	  // ds390 generic pointer
+	  if (floatFromVal(val)!=0) {
+	    werror (E_LITERAL_GENERIC);
+	  }
 	  fprintf (oFile, "\t.byte %s,%s,%s,%s\n",
 		   aopLiteral (val, 0), 
 		   aopLiteral (val, 1), 

@@ -67,20 +67,36 @@ char *op_mnemonic_str[] = {
 "MOVC",
 "MOVX",
 "PUSH",
+"PUSHU",
 "POP",
+"POPU",
 "XCH",
 "SETB",
 "CLR",
 "MOV",
 "ANL",
 "ORL",
-"BR",
 "JMP",
 "CALL",
 "RET",
-"Bcc",
+"RETI",
+"BCC",
+"BCS",
 "BEQ",
+"BG",
+"BGE",
+"BGT",
+"BL",
+"BLE",
+"BLT",
+"BMI",
+"BNE",
+"BNV",
+"BOV",
+"BPL",
+"BR",
 "JB",
+"JBC",
 "JNB",
 "CJNE",
 "DJNZ",
@@ -89,7 +105,7 @@ char *op_mnemonic_str[] = {
 "NOP",
 "BKPT",
 "TRAP",
-"RESET"
+"RESET",
 "FCALL",
 "FJMP",
 "IREG",
@@ -188,15 +204,30 @@ struct xa_dis_entry disass_xa[]= {
  {0x0840,0xfffc,' ',3,ANL, C_BIT           }, //  ANL C, bit                 0 0 0 0 1 0 0 0  0 1 0 0 0 0 b b
  {0x0850,0xfffc,' ',3,ANL, C_NOTBIT        }, //  ANL C, /bit                0 0 0 0 1 0 0 0  0 1 0 1 0 0 b b
  {0x0850,0xfffc,' ',3,ASL, REG_REG         }, //  ASL Rd, Rs                 1 1 0 0 S S 0 1  d d d d s s s s
-/* ASR(3), BCC, BCS */
+ /* ASR(3) */
+ {0xf000,0xff00,' ',2,BCC, REL8            }, //  BCC rel8                   1 1 1 1 0 0 0 0  rel8
+ {0xf100,0xff00,' ',2,BCS, REL8            }, //  BCS rel8                   1 1 1 1 0 0 0 1  rel8
  {0xf300,0xff00,' ',2,BEQ, REL8            }, //  BEQ rel8                   1 1 1 1 0 0 1 1  rel8
-/* BG, BGE, BGT */
+ {0xf800,0xff00,' ',2,BG, REL8             }, //  BG rel8                    1 1 1 1 1 0 0 0  rel8
+ {0xfa00,0xff00,' ',2,BGE, REL8            }, //  BGE rel8                   1 1 1 1 1 0 1 0  rel8
+ {0xfc00,0xff00,' ',2,BGT, REL8            }, //  BGT rel8                   1 1 1 1 1 1 0 0  rel8
+
  {0xff00,0xff00,' ',1,BKPT, NO_OPERANDS    }, //  BKPT                       1 1 1 1 1 1 1 1
-/* BL, BLE, BLT, BMI, BNE, BNV, BOV, BPL, BR */
+
+ {0xf900,0xff00,' ',2,BL, REL8             }, //  BL rel8                    1 1 1 1 1 0 0 1  rel8
+ {0xfd00,0xff00,' ',2,BLE, REL8            }, //  BLE rel8                   1 1 1 1 1 1 0 1  rel8
+ {0xfb00,0xff00,' ',2,BLT, REL8            }, //  BLT rel8                   1 1 1 1 1 0 1 1  rel8
+ {0xf700,0xff00,' ',2,BMI, REL8            }, //  BMI rel8                   1 1 1 1 0 1 1 1  rel8
+ {0xf200,0xff00,' ',2,BNE, REL8            }, //  BNE rel8                   1 1 1 1 0 0 1 0  rel8
+ {0xf400,0xff00,' ',2,BNV, REL8            }, //  BNV rel8                   1 1 1 1 0 1 0 0  rel8
+ {0xf500,0xff00,' ',2,BOV, REL8            }, //  BOV rel8                   1 1 1 1 0 1 0 1  rel8
+ {0xf600,0xff00,' ',2,BPL, REL8            }, //  BPL rel8                   1 1 1 1 0 1 1 0  rel8
+ {0xfe00,0xff00,' ',2,BR, REL8             }, //  BR rel8                    1 1 1 1 1 1 1 0  rel8
+
  {0xc500,0xff00,' ',3,CALL, REL16          }, //  CALL rel16                 1 1 0 0 0 1 0 1  rel16
  {0xc600,0xfff8,' ',2,CALL, IREG_ALONE     }, //  CALL [Rs]                  1 1 0 0 0 1 1 0  0 0 0 0 0 s s s
-/* CJNE(5), JNE, CLR */
-
+/* CJNE(5), JNE */
+ {0x0800,0xfffc,' ',3,CLR, BIT_ALONE      },   // CLR bit                    0 0 0 0 1 0 0 0  0 0 0 0 0 0 b b 
  {0x4100,0xf700,' ',2,CMP, REG_REG         },  // CMP Rd, Rs                 0 1 0 0 S 0 0 1  d d d d s s s s
  {0x4200,0xf708,' ',2,CMP, REG_IREG        },  // CMP Rd, [Rs]               0 1 0 0 S 0 1 0  d d d d 0 s s s
  {0x4208,0xf708,' ',2,CMP, IREG_REG        },  // CMP [Rd], Rs               0 1 0 0 S 0 1 0  s s s s 1 d d d
@@ -222,7 +253,9 @@ struct xa_dis_entry disass_xa[]= {
  {0x9e04,0xff8f,' ',5,CMP, DIRECT_DATA16   },  // CMP direct, #data16        1 0 0 1 0 1 1 0  0 b b b 0 1 0 0
 
  {0x900c,0xf70f,' ',2,CPL, REG_ALONE       }, //  CPL Rd                     1 0 0 1 S 0 0 0  d d d d 1 0 1 0
-   /* DA */
+
+ {0x9008,0xff0f,' ',2,DA, REG_ALONE        }, //  DA Rd                      1 0 0 1 0 0 0 0  d d d d 1 0 0 0
+
  {0xe708,0xff00,' ',2,DIV_w, REG_REG       }, //  DIV.w Rd, Rs               1 1 1 0 0 1 1 1  d d d d s s s s
  {0xe80b,0xff0f,' ',3,DIV_w, REG_DATA8     }, //  DIV.w Rd, #data8           1 1 1 0 1 0 0 0  d d d d 1 0 1 1
  {0xef00,0xff10,' ',2,DIV_d, REG_REG       }, //  DIV.d Rd, Rs               1 1 1 0 1 1 1 1  d d d 0 s s s s
@@ -239,10 +272,14 @@ struct xa_dis_entry disass_xa[]= {
 
  {0xc400,0xff00,' ',4,FCALL,  ADDR24       }, //  FCALL addr24               1 1 0 0 0 1 0 0  
  {0xd400,0xff00,' ',4,FJMP,   ADDR24       }, //  FJMP addr24                1 1 0 1 0 1 0 0
- /* JB, JBC */
+
+ {0x9780,0xfffc,' ',4, JB,    BIT_REL8     }, //  JB bit,rel8                1 0 0 1 0 1 1 1  1 0 0 0 0 0 b b
+ {0x97c0,0xfffc,' ',4, JBC,   BIT_REL8     }, //  JBC bit,rel8               1 0 0 1 0 1 1 1  1 1 0 0 0 0 b b
  {0xd670,0xfff8,' ',2, JMP,   IREG         }, //  JMP [Rs]                   1 1 0 1 0 1 1 0  0 1 1 1 0 s s s
- {0xd500,0xff00,' ',3, JMP,   REL16        }, //  JMP rel16                  1 1 0 1 0 1 0 1  rel16
- /* JMP(2), JNB, JNZ, JZ, LEA(2), LSR(3?)  */
+ {0xd500,0xff00,' ',3, JMP,   REL16        }, //  JMP rel16                  1 1 0 1 0 1 0 1
+ /* JMP(2) */
+ {0x97a0,0xfffc,' ',4, JNB,   BIT_REL8     }, //  JNB bit,rel8               1 0 0 1 0 1 1 1  1 0 1 0 0 0 b b
+ /* JNZ, JZ, LEA(2), LSR(3?)  */
 
  {0x8100,0xf700,' ',2,MOV, REG_REG         },  // MOV Rd, Rs                 1 0 0 0 S 0 0 1  d d d d s s s s
  {0x8200,0xf708,' ',2,MOV, REG_IREG        },  // MOV Rd, [Rs]               1 0 0 0 S 0 1 0  d d d d 0 s s s
@@ -267,7 +304,10 @@ struct xa_dis_entry disass_xa[]= {
  {0x9d08,0xff8f,' ',6,MOV, IREGOFF16_DATA16},  // MOV [Rd+offset16], #data16 1 0 0 1 1 1 0 1  0 d d d 1 0 0 0
  {0x9608,0xff8f,' ',4,MOV, DIRECT_DATA8    },  // MOV direct, #data8         1 0 0 1 0 1 1 0  0 b b b 1 0 0 0
  {0x9e08,0xff8f,' ',5,MOV, DIRECT_DATA16   },  // MOV direct, #data16        1 0 0 1 0 1 1 0  0 b b b 1 0 0 0
-   /* MOV(5), MOVC(3), MOVS(6), MOVX(2), MUL.x(6), NEG */
+   /* MOV(5) */ 
+ {0x8000,0xf308,' ',2,MOVC, REG_IREGINC    },  // MOVC Rd,[Rs+]              1 0 0 0 S 0 0 0  d d d d 0 s s s
+   /* MOVC(2) */ 
+   /* MOVS(6), MOVX(2), MUL.x(6), NEG */
 
  {0x0000,0xff00,' ',1,NOP, NO_OPERANDS     }, //  NOP                        0 0 0 0 0 0 0 0
    /* NORM */
@@ -294,9 +334,22 @@ struct xa_dis_entry disass_xa[]= {
  {0x9d06,0xff8f,' ',6, OR, IREGOFF16_DATA16},  //  OR [Rd+offset16], #data16 1 0 0 1 1 1 0 1  0 d d d 0 1 1 0
  {0x9606,0xff8f,' ',4, OR, DIRECT_DATA8    },  //  OR direct, #data8         1 0 0 1 0 1 1 0  0 b b b 0 1 1 0
  {0x9e06,0xff8f,' ',5, OR, DIRECT_DATA16   },  //  OR direct, #data16        1 0 0 1 0 1 1 0  0 b b b 0 1 1 0
-   /* ORL(2), POP(2), POPU(2), PUSH(2), PUSHU(2), RESET, RET, RETI,
-      RL, RLC, RR, RRC, SETB, SEXT */
+ /* ORL(2) */
+ {0x8710,0xf7f8,' ',3, POP, DIRECT_ALONE   },  //  POP direct                1 0 0 0 S 1 1 1  0 0 0 1 0 d d d
+ {0x2700,0xb700,' ',2, POP, RLIST          },  //  POP Rlist                 0 H 1 0 S 1 1 1  rlist
+ {0x8700,0xf7f8,' ',3, POPU, DIRECT_ALONE  },  //  POPU direct               1 0 0 0 S 1 1 1  0 0 0 0 0 d d d
+ {0x3700,0xb700,' ',2, POPU, RLIST         },  //  POPU Rlist                0 H 1 1 S 1 1 1  rlist
+ {0x8730,0xf7f8,' ',3, PUSH, DIRECT_ALONE  },  //  PUSH direct               1 0 0 0 S 1 1 1  0 0 1 1 0 d d d
+ {0x0700,0xb700,' ',2, PUSH, RLIST         },  //  PUSH Rlist                0 H 0 0 S 1 1 1  rlist
+ {0x8720,0xf7f8,' ',3, PUSHU, DIRECT_ALONE },  //  PUSHU direct              1 0 0 0 S 1 1 1  0 0 1 0 0 d d d
+ {0x1700,0xb700,' ',2, PUSHU, RLIST        },  //  PUSHU Rlist               0 H 0 1 S 1 1 1  rlist
 
+ {0xd610,0xffff,' ',2, RESET, NO_OPERANDS  },  //  RESET                     1 1 0 1 0 1 1 0  0 0 0 1 0 0 0 0
+ {0xd680,0xffff,' ',2, RET, NO_OPERANDS    },  //  RET                       1 1 0 1 0 1 1 0  1 0 0 0 0 0 0 0
+ {0xd690,0xffff,' ',2, RETI, NO_OPERANDS   },  //  RETI                      1 1 0 1 0 1 1 0  1 0 0 1 0 0 0 0 
+   /* RL, RLC, RR, RRC */
+ {0x0810,0xfffc,' ',3, SETB, BIT_ALONE     },  //  SETB bit                  0 0 0 0 1 0 0 0  0 0 0 1 0 0 b b 
+   /* SEXT */
  {0x2100,0xf700,' ',2,SUB, REG_REG         },  // SUB Rd, Rs                 0 0 1 0 S 0 0 1  d d d d s s s s
  {0x2200,0xf708,' ',2,SUB, REG_IREG        },  // SUB Rd, [Rs]               0 0 1 0 S 0 1 0  d d d d 0 s s s
  {0x2208,0xf708,' ',2,SUB, IREG_REG        },  // SUB [Rd], Rs               0 0 1 0 S 0 1 0  s s s s 1 d d d

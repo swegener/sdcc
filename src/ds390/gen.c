@@ -562,6 +562,10 @@ aopForRemat (symbol * sym)
 	      aop->aopu.aop_immd.from_cast_remat = 1;
 	      ic = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
 	      ptr_type = DCL_TYPE(from_type);
+	      if (ptr_type == IPOINTER) {
+		// bug #481053
+		ptr_type = POINTER;
+	      }
 	      continue ;
       } else break;
       

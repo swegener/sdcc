@@ -25,7 +25,7 @@
 #define BIN2DATA_DIR          "\\.."
 #define PREFIX2BIN_DIR        "\\bin"
 #define PREFIX2DATA_DIR       ""
-#define BINDIR PREFIX		  "\\bin"
+#define BINDIR PREFIX         "\\bin"
 
 /* environment variables */
 #define SDCC_DIR_NAME "SDCC_HOME"
@@ -42,7 +42,6 @@
 /* #undef STD_XA51_LIB */
 
 /* #undef HAVE_SYS_SOCKET_H */
-#define HAVE_MALLOC_H
 
 #undef HAVE_STRERROR
 #define HAVE_VSNPRINTF

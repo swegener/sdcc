@@ -40,7 +40,6 @@
 #undef STD_XA51_LIB
 
 #undef HAVE_SYS_SOCKET_H
-#undef HAVE_MALLOC_H
 
 #undef HAVE_STRERROR
 #undef HAVE_VSNPRINTF

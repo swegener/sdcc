@@ -1471,8 +1471,9 @@ outBitC (operand * result)
 static void
 toBoolean (operand * oper)
 {
-  int size = AOP_SIZE (oper) - 1;
-  int offset = 1;
+  int 	size = AOP_SIZE (oper) - 1;
+  int 	offset = 1;
+  bool usedB = FALSE;
 
   /* The generic part of a generic pointer should
    * not participate in it's truth value.
@@ -1487,8 +1488,9 @@ toBoolean (operand * oper)
     }
 
   _startLazyDPSEvaluation ();
-  if (AOP_NEEDSACC (oper))
+  if (AOP_NEEDSACC (oper) && size)
     {
+      usedB = TRUE;
       emitcode ("push", "b");
       emitcode ("mov", "b, %s", aopGet (AOP (oper), 0, FALSE, FALSE, FALSE));
     }
@@ -1498,7 +1500,7 @@ toBoolean (operand * oper)
     }
   while (size--)
     {
-      if (AOP_NEEDSACC (oper))
+      if (usedB)
 	{
 	  emitcode ("orl", "b,%s", aopGet (AOP (oper), offset++, FALSE, FALSE, FALSE));
 	}
@@ -1509,7 +1511,7 @@ toBoolean (operand * oper)
     }
   _endLazyDPSEvaluation ();
 
-  if (AOP_NEEDSACC (oper))
+  if (usedB)
     {
       emitcode ("mov", "a,b");
       emitcode ("pop", "b");
@@ -8640,8 +8642,7 @@ genIfx (iCode * ic, iCode * popIc)
   operand *cond = IC_COND (ic);
   int isbit = 0;
 
-  D (emitcode (";", "genIfx ");
-    );
+  D (emitcode (";", "genIfx "););
 
   aopOp (cond, ic, FALSE, FALSE);
 

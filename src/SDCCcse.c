@@ -1520,9 +1520,13 @@ cseBBlock (eBBlock * ebb, int computeOnly,
       /* of this with previous opcode           */
       if (pdic)
 	{
-
 	  if (IS_ITEMP (IC_RESULT (ic)))
 	    {
+	      
+	      if (pdic->level > ic->level) {
+		// pdic was inside an inner loop
+		continue;
+	      }
 
 	      /* replace in the remaining of this block */
 	      replaceAllSymBySym (ic->next, IC_RESULT (ic), IC_RESULT (pdic), &ebb->ndompset);

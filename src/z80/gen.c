@@ -31,6 +31,7 @@
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
+
   
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
@@ -149,6 +150,14 @@ static struct {
 
 static char *aopGet(asmop *aop, int offset, bool bit16);
 
+static char *_strdup(const char *s)
+{
+    char *ret;
+    ALLOC_ATOMIC(ret, strlen(s)+1);
+    strcpy(ret, s);
+    return ret;
+}
+
 /*-----------------------------------------------------------------*/
 /* emitcode - writes the code into a file : for now it is simple    */
 /*-----------------------------------------------------------------*/
@@ -175,6 +184,178 @@ void emitcode (const char *inst, const char *fmt, ...)
     lineCurr->isInline = inLine;
     lineCurr->isDebug  = debugLine;
     va_end(ap);
+}
+
+typedef struct {
+    const char *szName;
+    const char *szFormat;
+} TOKEN;
+
+static TOKEN _tokens[] = {
+    { "area", ".area %s" },
+    { "global", ".globl %s" },
+    { "labeldef", "%s::" },
+    { "tlabeldef", "%05d$:" },
+    { "fileprelude", "; Generated using the default tokens." },
+    { "functionheader", 
+      "; ---------------------------------\n"
+      "; Function %s\n"
+      "; ---------------------------------"
+    },
+    { "functionlabeldef", "%s:" },
+    { "pusha", 
+      "\tpush af\n"
+      "\tpush bc\n"
+      "\tpush de\n"
+      "\tpush hl"
+    },
+    { "di", "\tdi" },
+    { "adjustsp", "\tlda sp,-%d(sp)" },
+    { "prelude", "\tpush bc" },
+    { "leave", 
+      "\tpop bc\n"
+      "\tret"
+    },
+    { "leavex", 
+      "\tlda sp,%d(sp)\n"
+      "\tpop bc\n"
+      "\tret"
+    },
+    { "hli", "(hl+) ; 2" },
+    { "*hl", "(hl) ; 1" },
+    { "ldahlsp", "lda hl,%d(sp)" },
+    { "ldaspsp", "lda sp,%d(sp)" },
+};
+
+/* Z80:
+    { "adjustsp", 
+      "\tld hl,#-%d\n"
+      "\tadd hl,sp\n"
+      "\tld sp,hl"
+    }
+    { "prelude",
+	"push bc"
+	"push de"
+	"push ix"
+	"ld ix,#0"
+	"add ix,sp"
+    { "leave" 
+    emitcode("ld", "sp,ix");
+    emitcode("pop", "ix");
+    emitcode("pop", "de");
+    }
+}
+*/
+
+#define NUM_TOKENS (sizeof(_tokens)/sizeof(_tokens[0]))
+
+static const TOKEN *_findToken(const char *szName)
+{
+    int i;
+    for (i=0; i < NUM_TOKENS; i++) {
+	if (!strcmp(_tokens[i].szName, szName))
+	    return _tokens + i;
+    }
+    return NULL;
+}
+
+static va_list _iprintf(char *pInto, const char *szFormat, va_list ap)
+{
+    char *pStart = pInto;
+    char *sz = _strdup(szFormat);
+
+    while (*sz) {
+	if (*sz == '%') {
+	    switch (*++sz) {
+		/* See if it's a special emitter */
+	    case 'r':
+		wassert(0);
+		break;
+	    default:
+		{
+		    /* Scan out the arg and pass it on to sprintf */
+		    char *p = sz-1, tmp;
+		    while (isdigit(*sz))
+			sz++;
+		    /* Skip the format */
+		    tmp = *++sz;
+		    *sz = '\0';
+		    vsprintf(pInto, p, ap);
+		    /* PENDING: Assume that the arg length was an int */
+		    va_arg(ap, int);
+		    *sz = tmp;
+		}
+	    }
+	    pInto = pStart + strlen(pStart);
+	}
+	else {
+	    *pInto++ = *sz++;
+	}
+    }
+    *pInto = '\0';
+
+    return ap;
+}
+
+static void vtprintf(char *buffer, const char *szFormat, va_list ap)
+{
+    char *sz = _strdup(szFormat);
+    char *pInto = buffer, *p;
+
+    buffer[0] = '\0';
+    
+    while (*sz) {
+	if (*sz == '!') {
+	    /* Start of a token.  Search until the first
+	       [non alplha, *] and call it a token. */
+	    char old;
+	    const TOKEN *t;
+	    p = ++sz;
+	    while (isalpha(*sz) || *sz == '*') {
+		sz++;
+	    }
+	    old = *sz;
+	    *sz = '\0';
+	    /* Now find the token in the token list */
+	    if ((t = _findToken(p))) {
+		ap = _iprintf(pInto, t->szFormat, ap);
+		pInto = buffer + strlen(buffer);
+	    }
+	    else {
+		printf("Cant find token \"%s\"\n", p);
+		wassert(0);
+	    }
+	}
+	else {
+	    *pInto++ = *sz++;
+	}
+    }
+    *pInto = '\0';
+}
+
+static void tprintf(char *buffer, const char *szFormat, ...)
+{
+    va_list ap;
+
+    va_start(ap, szFormat);
+    vtprintf(buffer, szFormat, ap);
+}
+
+static void emit2(const char *szFormat, ...)
+{
+    char buffer[256];
+    va_list ap;
+
+    va_start(ap, szFormat);
+
+    vtprintf(buffer, szFormat, ap);
+
+    lineCurr = (lineCurr ?
+		connectLine(lineCurr,newLineNode(buffer)) :
+		(lineHead = newLineNode(buffer)));
+
+    lineCurr->isInline = inLine;
+    lineCurr->isDebug  = debugLine;
 }
 
 const char *getPairName(asmop *aop)
@@ -260,14 +441,6 @@ bool isPtrPair(asmop *aop)
 void genPairPush(asmop *aop)
 {
     emitcode("push", "%s", getPairName(aop));
-}
-
-static char *_strdup(const char *s)
-{
-    char *ret;
-    ALLOC_ATOMIC(ret, strlen(s)+1);
-    strcpy(ret, s);
-    return ret;
 }
 
 
@@ -750,9 +923,9 @@ static void fetchPairLong(PAIR_ID pairId, asmop *aop, int offset)
     else { /* we need to get it byte by byte */
 	if (pairId == PAIR_HL && IS_GB && requiresHL(aop)) {
 	    aopGet(aop, offset, FALSE);
-	    emitcode("ld", "a,(hl+)");
-	    emitcode("ld", "h,(hl)");
-	    emitcode("ld", "l,a");
+	    emit2("ld a,!hli");
+	    emit2("ld h,!*hl");
+	    emit2("ld l,a");
 	}
 	else {
 	    emitcode("ld", "%s,%s", _pairs[pairId].l, aopGet(aop, offset, FALSE));
@@ -793,7 +966,7 @@ static void setupPair(PAIR_ID pairId, asmop *aop, int offset)
 	    adjustPair(_pairs[pairId].name, &_G.pairs[pairId].offset, abso);
 	}
 	else {
-	    emitcode("lda", "hl,%d+%d+%d(sp)", aop->aopu.aop_stk+offset, _G.stack.pushed, _G.stack.offset);
+	    emit2("!ldahlsp", aop->aopu.aop_stk+offset + _G.stack.pushed + _G.stack.offset);
 	}
 	_G.pairs[pairId].offset = abso;
 	break;
@@ -806,7 +979,7 @@ static void setupPair(PAIR_ID pairId, asmop *aop, int offset)
 
 static void emitLabel(int key)
 {
-    emitcode("", LABEL_STR ":", key);
+    emit2("!tlabeldef yeah?", key);
     spillCached();
 }
 
@@ -857,13 +1030,13 @@ static char *aopGet(asmop *aop, int offset, bool bit16)
 	wassert(IS_GB);
 	emitcode("", ";3");
 	setupPair(PAIR_HL, aop, offset);
-	sprintf(s, "(hl)");
-	return _strdup("(hl)");
+	tprintf(s, "!*hl");
+	return _strdup(s);
 
     case AOP_IY:
 	wassert(IS_Z80);
 	setupPair(PAIR_IY, aop, offset);
-	sprintf(s,"%d(iy)", offset);
+	tprintf(s,"!*iyx", offset);
 	ALLOC_ATOMIC(rs,strlen(s)+1);
 	strcpy(rs,s);   
 	return rs;
@@ -871,10 +1044,10 @@ static char *aopGet(asmop *aop, int offset, bool bit16)
     case AOP_STK:
 	if (IS_GB) {
 	    setupPair(PAIR_HL, aop, offset);
-	    sprintf(s, "(hl)");
+	    tprintf(s, "!*hl");
 	}
 	else {
-	    sprintf(s,"%d(ix)", aop->aopu.aop_stk+offset);
+	    tprintf(s,"!*ixx", aop->aopu.aop_stk+offset);
 	}
 	ALLOC_ATOMIC(rs,strlen(s)+1);
 	strcpy(rs,s);   
@@ -1471,7 +1644,7 @@ static void emitCall (iCode *ic, bool ispcall)
 	int i = IC_LEFT(ic)->parmBytes;
 	_G.stack.pushed -= i;
 	if (IS_GB) {
-	    emitcode("lda", "sp,%d(sp)", i);
+	    emit2("!ldaspsp", i);
 	}
 	else {
 	    spillCached();
@@ -1537,49 +1710,29 @@ static void genFunction (iCode *ic)
 
     nregssaved = 0;
     /* create the function header */
-    emitcode(";","-----------------------------------------");
-    emitcode(";"," function %s", sym->name);
-    emitcode(";","-----------------------------------------");
-
-    emitcode("", "__%s_start:", sym->rname);
-    emitcode("","%s:",sym->rname);
+    emit2("!functionheader", sym->name);
+    emit2("!functionlabeldef", sym->rname);
 
     fetype = getSpec(operandType(IC_LEFT(ic)));
 
     /* if critical function then turn interrupts off */
     if (SPEC_CRTCL(fetype))
-        emitcode("di","");
+	emit2("!di");
 
     /* if this is an interrupt service routine then
     save acc, b, dpl, dph  */
     if (IS_ISR(sym->etype)) {
-	emitcode("push", "af");
-	emitcode("push", "bc");
-	emitcode("push", "de");
-	emitcode("push", "hl");
+	emit2("!pusha");
     }
     /* PENDING: callee-save etc */
 
     /* adjust the stack for the function */
-    emitcode("push", "bc");
-    if (!IS_GB) {
-	emitcode("push", "de");
-	emitcode("push", "ix");
-	emitcode("ld", "ix,#0");
-	emitcode("add", "ix,sp");
-    }
+    emit2("!prelude");
 
     _G.stack.last = sym->stack;
 
     if (sym->stack) {
-	if (IS_GB) {
-	    emitcode("lda", "sp,-%d(sp)", sym->stack);
-	}
-	else {
-	    emitcode("ld", "hl,#-%d", sym->stack);
-	    emitcode("add", "hl,sp");
-	    emitcode("ld", "sp,hl");
-	}
+	emit2("!adjustsp", sym->stack);
     }
     _G.stack.offset = sym->stack;
 }
@@ -1596,7 +1749,7 @@ static void genEndFunction (iCode *ic)
     }
     else {
         if (SPEC_CRTCL(sym->etype))
-            emitcode("ei", "");
+	    emit2("!ei");
 	
 	/* PENDING: calleeSave */
 
@@ -1612,18 +1765,10 @@ static void genEndFunction (iCode *ic)
 		emitcode("","XG$%s$0$0 ==.",currFunc->name);
 	    debugLine = 0;
 	}
-	if (!IS_GB) {
-	    emitcode("ld", "sp,ix");
-	    emitcode("pop", "ix");
-	    emitcode("pop", "de");
-	}
-	else {
-	    if (_G.stack.offset) {
-		emitcode("lda", "sp,%d(sp)", _G.stack.offset);
-	    }
-	}
-	emitcode("pop", "bc");
-	emitcode("ret", "");
+	if (_G.stack.offset)
+	    emit2("!leavex");
+	else
+	    emit2("!leave");
     }
     _G.stack.pushed = 0;
     _G.stack.offset = 0;
@@ -3867,7 +4012,7 @@ static void genAddrOf (iCode *ic)
     if (IS_GB) {
 	if (sym->onStack) {
 	    spillCached();
-	    emitcode("lda", "hl,%d+%d+%d(sp)", sym->stack, _G.stack.pushed, _G.stack.offset);
+	    emit2("!ldahlsp", sym->stack + _G.stack.pushed + _G.stack.offset);
 	    emitcode("ld", "d,h");
 	    emitcode("ld", "e,l");
 	}

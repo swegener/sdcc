@@ -502,7 +502,7 @@ pmlibraryfile buildlibraryindex_SdccLib(char * PathLib, FILE * libfp, char * Dir
 	char FLine[MAXLINE+1];
 	int state=0;
 	long IndexOffset=0, FileOffset;
-    pmlibrarysymbol ThisSym;
+    pmlibrarysymbol ThisSym = NULL;
 
 	while(!feof(libfp))
     {

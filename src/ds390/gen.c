@@ -548,7 +548,7 @@ aopForRemat (symbol * sym)
 {
   iCode *ic = sym->rematiCode;
   asmop *aop = newAsmop (AOP_IMMD);
-  int ptr_type ;
+  int ptr_type =0;
   int val = 0;
 
   for (;;)
@@ -8870,7 +8870,10 @@ genGenPointerGet (operand * left,
       if (AOP_TYPE (left) == AOP_IMMD)
 	{
 	  emitcode ("mov", "dptr,%s", aopGet (AOP (left), 0, TRUE, FALSE, FALSE));
-	  emitcode ("mov", "b,#%d", pointerCode (retype));
+	  if (AOP(left)->aopu.aop_immd.from_cast_remat) 
+		  emitcode ("mov", "b,%s",aopGet(AOP (left), AOP_SIZE(left)-1, FALSE, FALSE, FALSE));
+	  else
+		  emitcode ("mov", "b,#%d", pointerCode (retype));
 	}
       else
 	{			/* we need to get it byte by byte */
@@ -9477,7 +9480,10 @@ genGenPointerSet (operand * right,
       if (AOP_TYPE (result) == AOP_IMMD)
 	{
 	  emitcode ("mov", "dptr,%s", aopGet (AOP (result), 0, TRUE, FALSE, FALSE));
-	  emitcode ("mov", "b,%s + 1", aopGet (AOP (result), 0, TRUE, FALSE, FALSE));
+	  if (AOP(result)->aopu.aop_immd.from_cast_remat) 
+		  emitcode ("mov", "b,%s",aopGet(AOP (result), AOP_SIZE(result)-1, FALSE, FALSE, FALSE));
+	  else
+		  emitcode ("mov", "b,%s + 1", aopGet (AOP (result), 0, TRUE, FALSE, FALSE));
 	}
       else
 	{			/* we need to get it byte by byte */

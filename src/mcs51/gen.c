@@ -233,7 +233,6 @@ endOfWorld:
       return NULL;
     }
 
-  piCode (ic, stdout);
   /* other wise this is true end of the world */
   werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
 	  "getFreePtr should never reach here");
@@ -3151,98 +3150,6 @@ genMultbits (operand * left,
 /*-----------------------------------------------------------------*/
 /* genMultOneByte : 8*8=8/16 bit multiplication                    */
 /*-----------------------------------------------------------------*/
-#if 0 // REMOVE ME
-static void
-genMultOneByte (operand * left,
-		operand * right,
-		operand * result)
-{
-  sym_link *opetype = operandType (result);
-  char *l;
-  symbol *lbl;
-  int size, offset;
-
-  /* (if two literals, the value is computed before) */
-  /* if one literal, literal on the right */
-  if (AOP_TYPE (left) == AOP_LIT)
-    {
-      operand *t = right;
-      right = left;
-      left = t;
-    }
-
-  size = AOP_SIZE (result);
-  /* signed or unsigned */
-  emitcode ("mov", "b,%s", aopGet (AOP (right), 0, FALSE, FALSE));
-  l = aopGet (AOP (left), 0, FALSE, FALSE);
-  MOVA (l);
-  emitcode ("mul", "ab");
-  /* if result size = 1, mul signed = mul unsigned */
-  aopPut (AOP (result), "a", 0);
-  if (size > 1)
-    {
-      if (SPEC_USIGN (opetype))
-	{
-	  aopPut (AOP (result), "b", 1);
-	  if (size > 2)
-	    /* for filling the MSBs */
-	    emitcode ("clr", "a");
-	}
-      else
-	{
-	  emitcode ("mov", "a,b");
-
-	  /* adjust the MSB if left or right neg */
-
-	  /* if one literal */
-	  if (AOP_TYPE (right) == AOP_LIT)
-	    {
-	      /* AND literal negative */
-	      if ((int) floatFromVal (AOP (right)->aopu.aop_lit) < 0)
-		{
-		  /* adjust MSB (c==0 after mul) */
-		  emitcode ("subb", "a,%s", aopGet (AOP (left), 0, FALSE, FALSE));
-		}
-	    }
-	  else
-	    {
-	      lbl = newiTempLabel (NULL);
-	      emitcode ("xch", "a,%s", aopGet (AOP (right), 0, FALSE, FALSE));
-	      emitcode ("cjne", "a,#0x80,%05d$", (lbl->key + 100));
-	      emitcode ("", "%05d$:", (lbl->key + 100));
-	      emitcode ("xch", "a,%s", aopGet (AOP (right), 0, FALSE, FALSE));
-	      lbl = newiTempLabel (NULL);
-	      emitcode ("jc", "%05d$", (lbl->key + 100));
-	      emitcode ("subb", "a,%s", aopGet (AOP (left), 0, FALSE, FALSE));
-	      emitcode ("", "%05d$:", (lbl->key + 100));
-	    }
-
-	  lbl = newiTempLabel (NULL);
-	  emitcode ("xch", "a,%s", aopGet (AOP (left), 0, FALSE, FALSE));
-	  emitcode ("cjne", "a,#0x80,%05d$", (lbl->key + 100));
-	  emitcode ("", "%05d$:", (lbl->key + 100));
-	  emitcode ("xch", "a,%s", aopGet (AOP (left), 0, FALSE, FALSE));
-	  lbl = newiTempLabel (NULL);
-	  emitcode ("jc", "%05d$", (lbl->key + 100));
-	  emitcode ("subb", "a,%s", aopGet (AOP (right), 0, FALSE, FALSE));
-	  emitcode ("", "%05d$:", (lbl->key + 100));
-
-	  aopPut (AOP (result), "a", 1);
-	  if (size > 2)
-	    {
-	      /* get the sign */
-	      emitcode ("rlc", "a");
-	      emitcode ("subb", "a,acc");
-	    }
-	}
-      size -= 2;
-      offset = 2;
-      if (size > 0)
-	while (size--)
-	  aopPut (AOP (result), "a", offset++);
-    }
-}
-#else
 static void
 genMultOneByte (operand * left,
 		operand * right,
@@ -3343,7 +3250,6 @@ genMultOneByte (operand * left,
     aopPut (AOP (result), "b", 1);
   }
 }
-#endif
 
 /*-----------------------------------------------------------------*/
 /* genMult - generates code for multiplication                     */
@@ -8577,8 +8483,6 @@ gen51Code (iCode * lic)
 
 	default:
 	  ic = ic;
-	  /*      piCode(ic,stdout); */
-
 	}
     }
 

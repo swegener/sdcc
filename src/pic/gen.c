@@ -292,7 +292,6 @@ endOfWorld :
         return NULL;
     }
 
-    piCode(ic,stdout);
     /* other wise this is true end of the world */
     werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
            "getFreePtr should never reach here");
@@ -8450,8 +8449,6 @@ void genpic14Code (iCode *lic)
 
 	default :
 	    ic = ic;
-	    /*      piCode(ic,stdout); */
-	    
         }
     }
     

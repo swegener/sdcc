@@ -30,6 +30,7 @@
 	* debugger/mcs51/sdcdb.c (parseCmdLine): added -k for ucsim, patch
 	provided by Scott Bronson
 	* doc/sdccman.lyx: updated documentation for sdcdb
+	updated and added chapter tips
 
 2004-01-01 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 

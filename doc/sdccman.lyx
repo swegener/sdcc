@@ -14077,6 +14077,92 @@ Here are a few guidelines that will help the compiler generate more efficient
 Use the smallest data type to represent your data-value.
  If it is known in advance that the value is going to be less than 256 then
  use an 'unsigned char' instead of a 'short' or 'int'.
+ Please note, that ANSI C requires both signed and unsigned chars to be
+ promoted to 'signed int' before doing any operation.
+ This promotion can be omitted, if the result is the same.
+ The effect of the promotion rules together with the sign-extension is often
+ supprising:
+\begin_deeper 
+\layout Verse
+
+
+\family typewriter 
+unsigned char uc = 0xfe;
+\newline 
+if (uc * uc < 0) /* this is true! */
+\newline 
+{
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+....
+\newline 
+}
+\layout Standard
+
+
+\family typewriter 
+uc * uc
+\family default 
+ is evaluated as 
+\family typewriter 
+(int) uc * (int) uc = (int) 0xfe * (int) 0xfe = (int) 0xfc04 = -1024
+\family default 
+.
+ 
+\newline 
+Another one:
+\layout Verse
+
+
+\family typewriter 
+(unsigned char) -12 / (signed char) -3 = ...
+\layout Standard
+
+No, the result is not 4:
+\layout Verse
+
+
+\family typewriter 
+(int) (unsigned char) -12 / (int) (signed char) -3 =
+\newline 
+(int) (unsigned char) 0xf4 / (int) (signed char) 0xfd =
+\newline 
+(int) 0x00f4 / (int) 0xfffd =
+\newline 
+(int) 0x00f4 / (int) 0xfffd =
+\newline 
+(int) 244 / (int) -3 =
+\newline 
+(int) -81 = (int) 0xffaf;
+\layout Standard
+
+Don't complain, that gcc gives you a different result.
+ gcc uses 32 bit ints, while SDCC uses 16 bit ints.
+ Therefore the results are different.
+\newline 
+From 
+\begin_inset Quotes sld
+\end_inset 
+
+comp.lang.c FAQ
+\begin_inset Quotes srd
+\end_inset 
+
+:
+\layout Quote
+
+If well-defined overflow characteristics are important and negative values
+ are not, or if you want to steer clear of sign-extension problems when
+ manipulating bits or bytes, use one of the corresponding unsigned types.
+ (Beware when mixing signed and unsigned values in expressions, though.)
+\newline 
+Although character types (especially unsigned char) can be used as "tiny"
+ integers, doing so is sometimes more trouble than it's worth, due to unpredicta
+ble sign extension and increased code size.
+\end_deeper 
 \layout Itemize
 
 Use unsigned when it is known in advance that the value is not going to
@@ -14111,7 +14197,7 @@ foobar(unsigned int p1, unsigned char ch)
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-unsigned char ch1 = p1 % ch ;
+unsigned char ch1 = p1 * ch ;
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -14122,10 +14208,9 @@ unsigned char ch1 = p1 % ch ;
 }
 \layout Standard
 
-For the modulus operation the variable ch will be promoted to unsigned int
- first then the modulus operation will be performed (this will lead to a
- call to support routine _moduint()), and the result will be casted to a
- char.
+For the multiplication the variable ch will be promoted to int first then
+ the modulus operation will be performed (this will lead to a call to support
+ routine _mulint()), and the result will be casted to a char.
  If the code is changed to 
 \layout Verse
 
@@ -14139,7 +14224,7 @@ foobar(unsigned int p1, unsigned char ch)
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-unsigned char ch1 = (unsigned char)p1 % ch ;
+unsigned char ch1 = (unsigned char)p1 * ch ;
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -14150,7 +14235,7 @@ unsigned char ch1 = (unsigned char)p1 % ch ;
 }
 \layout Standard
 
-It would substantially reduce the code generated (future versions of the
+it would substantially reduce the code generated (future versions of the
  compiler will be smart enough to detect such optimization opportunities).
 \end_deeper 
 \layout Itemize

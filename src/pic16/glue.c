@@ -614,23 +614,29 @@ pic16emitStaticSeg (memmap * map)
 #if 0
 	fprintf(stderr, "\t%s: sym: %s\tused: %d\n", map->sname, sym->name, sym->used);
 	printTypeChain( sym->type, stderr );
-	printf("\n");
+	fprintf(stderr, "\n");
 #endif
 
 
-      /* if it is "extern" then do nothing */
-      if (IS_EXTERN (sym->etype)) {
-	checkAddSym(&externs, sym);
-//	addSetHead(&externs, sym);
-	continue;
-      }
+	/* if it is "extern" then do nothing */
+	if (IS_EXTERN (sym->etype)) {
 
-      /* if it is not static add it to the public
-         table */
-      if (!IS_STATIC (sym->etype)) {
-        checkAddSym(&publics, sym);
-//	addSetHead (&publics, sym);
-      }
+		/* do not emit if it is a config word declaration */
+		if(!SPEC_ABSA(sym->etype)
+			|| (SPEC_ABSA(sym->etype) && !IS_CONFIG_ADDRESS(SPEC_ADDR(sym->etype))))
+			checkAddSym(&externs, sym);
+	  continue;
+	}
+
+	/* if it is not static add it to the public
+	   table */
+	if (!IS_STATIC (sym->etype)) {
+
+		/* do not emit if it is a config word declaration */
+		if(!SPEC_ABSA(sym->etype)
+			|| (SPEC_ABSA(sym->etype) && !IS_CONFIG_ADDRESS(SPEC_ADDR(sym->etype))))
+				checkAddSym(&publics, sym);
+	}
 
 #if 0
       /* print extra debug info if required */
@@ -660,6 +666,9 @@ pic16emitStaticSeg (memmap * map)
       /* if it has an absolute address */
       if (SPEC_ABSA (sym->etype))
 	{
+		fprintf(stderr, "%s:%d spec_absa is true for symbol: %s\n",
+			__FILE__, __LINE__, sym->name);
+			
 	  if (options.debug || sym->level == 0)
 	    fprintf (code->oFile, " == 0x%04x\n", SPEC_ADDR (sym->etype));
 
@@ -669,6 +678,9 @@ pic16emitStaticSeg (memmap * map)
 	}
       else
 	{
+		fprintf(stderr, "%s:%d spec_absa is false for symbol: %s\n",
+			__FILE__, __LINE__, sym->name);
+
 	  if (options.debug || sym->level == 0)
 	    fprintf (code->oFile, " == .\n");
 

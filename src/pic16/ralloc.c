@@ -557,7 +557,7 @@ pic16_dirregWithName (char *name)
   return NULL; // name wasn't found in the hash table
 }
 
-static int IS_CONFIG_ADDRESS(int address)
+int IS_CONFIG_ADDRESS(int address)
 {
 
   return address >= 0x300000 && address <= 0x300000d;
@@ -589,7 +589,7 @@ pic16_allocDirReg (operand *op )
 		return NULL;											//
 	}													// patch 13
 
-	debugLog ("%s symbol name %s\n", __FUNCTION__,name);
+	debugLog ("%s:%d symbol name %s\n", __FUNCTION__, __LINE__, name);
 //	fprintf(stderr, "%s symbol name %s\n", __FUNCTION__,name);
 
 	{
@@ -654,8 +654,8 @@ pic16_allocDirReg (operand *op )
 		 * dynDirectRegNames set */
 		if(IN_CODESPACE( SPEC_OCLS( OP_SYM_ETYPE(op)))) {
 			if(pic16_debug_verbose)
-//			    	fprintf(stderr, "%s:%d symbol %s in codespace\n", __FILE__, __LINE__,
-//			    		OP_SYMBOL(op)->name);
+			    	fprintf(stderr, "%s:%d symbol %s in codespace\n", __FILE__, __LINE__,
+			    		OP_SYMBOL(op)->name);
 			debugLog("%s:%d sym: %s in codespace\n", __FUNCTION__, __LINE__, OP_SYMBOL(op)->name);
 	    	  return NULL;
 		}
@@ -711,7 +711,7 @@ pic16_allocDirReg (operand *op )
 	
 		} else {
 			debugLog ("  -- %s is declared at address 0x30000x\n",name);
-			fprintf(stderr, "  -- %s is declared at address 0x30000x\n",name);
+//			fprintf(stderr, "  -- %s is declared at address 0x30000x\n",name);
 	
 		  return NULL;
 		}
@@ -2784,6 +2784,8 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
   debugAopGet ("  left:", IC_LEFT (ic));
   debugAopGet ("  right:", IC_RIGHT (ic));
 
+//	fprintf(stderr, "%s:%d symbol = %s\n", __FILE__, __LINE__, OP_SYMBOL( IC_RESULT(ic))->name);
+
   /* if this is at an absolute address, then get the address. */
   if (SPEC_ABSA ( OP_SYM_ETYPE(IC_RESULT(ic))) ) {
     if(IS_CONFIG_ADDRESS( SPEC_ADDR ( OP_SYM_ETYPE(IC_RESULT(ic))))) {
@@ -2791,8 +2793,8 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
       if(IS_VALOP(IC_RIGHT(ic))) {
 	debugLog ("  setting config word to %x\n", 
 		  (int) floatFromVal (IC_RIGHT(ic)->operand.valOperand));
-	fprintf(stderr, "  setting config word to %x\n", 
-		  (int) floatFromVal (IC_RIGHT(ic)->operand.valOperand));
+//	fprintf(stderr, "  setting config word to %x\n", 
+//		  (int) floatFromVal (IC_RIGHT(ic)->operand.valOperand));
 	pic16_assignConfigWordValue(  SPEC_ADDR ( OP_SYM_ETYPE(IC_RESULT(ic))),
 				(int) floatFromVal (IC_RIGHT(ic)->operand.valOperand));
       }

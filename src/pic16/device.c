@@ -763,7 +763,7 @@ void pic16_assignConfigWordValue(int address, int value)
     break;
   }
 
-	fprintf(stderr,"setting config word to 0x%x\n",value);
+//	fprintf(stderr,"setting config word to 0x%x\n",value);
 
 }
 /*-----------------------------------------------------------------*

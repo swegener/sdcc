@@ -288,5 +288,26 @@ char *gc_strdup (const char *sz);
 
 #define wassert(a)    wassertl(a,"code generator internal error")
 
+#define DUMP_RAW0 1
+#define DUMP_RAW1 DUMP_RAW0+1
+#define DUMP_CSE DUMP_RAW1+1
+#define DUMP_DFLOW DUMP_CSE+1
+#define DUMP_GCSE DUMP_DFLOW+1
+#define DUMP_DEADCODE DUMP_GCSE+1
+#define DUMP_LOOP DUMP_DEADCODE+1
+#define DUMP_LOOPG DUMP_LOOP+1
+#define DUMP_LOOPD DUMP_LOOPG+1
+#define DUMP_RANGE DUMP_LOOPD+1
+#define DUMP_PACK DUMP_RANGE+1
+#define DUMP_RASSGN DUMP_PACK+1
+#define DUMP_LRANGE DUMP_RASSGN+1
+
+struct _dumpFiles {
+  int id;
+  char *ext;
+  FILE *filePtr;
+};
+
+extern struct _dumpFiles dumpFiles[];
 
 #endif

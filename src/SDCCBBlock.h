@@ -94,16 +94,8 @@ void replaceSymBySym (set *, operand *, operand *);
 iCode *iCodeFromeBBlock (eBBlock **, int);
 int otherPathsPresent (eBBlock **, eBBlock *);
 void replaceLabel (eBBlock *, symbol *, symbol *);
-void dumpEbbsToFileExt (char *, eBBlock **, int);
-
-//#if defined(_MSC_VER)
-
-/*-----------------------------------------------------------------*/
-/* dumpLiveRanges - dump liverange information into a file         */
-/*-----------------------------------------------------------------*/
-
-void dumpLiveRanges (char *ext, hTab * liveRanges);
-
-//#endif // _MSC_VER
+void dumpEbbsToFileExt (int, eBBlock **, int);
+void dumpLiveRanges (int, hTab * liveRanges);
+void closeDumpFiles();
 
 #endif

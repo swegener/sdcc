@@ -1383,7 +1383,8 @@ main (int argc, char **argv, char **envp)
   port->finaliseOptions ();
 
   /* if no input then printUsage & exit */
-  if ((!options.c1mode && !srcFileName && !nrelFiles) || (options.c1mode && !srcFileName && !options.out_name))
+  if ((!options.c1mode && !srcFileName && !nrelFiles) || 
+      (options.c1mode && !srcFileName && !options.out_name))
     {
       printUsage ();
       exit (0);
@@ -1453,6 +1454,8 @@ main (int argc, char **argv, char **envp)
 	}
 
     }
+
+  closeDumpFiles();
 
   if (cdbFile)
     fclose (cdbFile);

@@ -29,6 +29,23 @@
 int eBBNum = 0;
 set *graphEdges = NULL;		/* list of edges in this flow graph */
 
+struct _dumpFiles dumpFiles[] = {
+  {DUMP_RAW0, ".dumpraw0", NULL},
+  {DUMP_RAW1, ".dumpraw1", NULL},
+  {DUMP_CSE, ".dumpcse", NULL},
+  {DUMP_DFLOW, ".dumpdflow", NULL},
+  {DUMP_GCSE, ".dumpgcse", NULL},
+  {DUMP_DEADCODE, ".dumpdeadcode", NULL},
+  {DUMP_LOOP, ".dumploop", NULL},
+  {DUMP_LOOPG, ".dumploopg", NULL},
+  {DUMP_LOOPD, ".dumploopd", NULL},
+  {DUMP_RANGE, ".dumprange", NULL},
+  {DUMP_PACK, ".dumppack", NULL},
+  {DUMP_RASSGN, ".dumprassgn", NULL},
+  {DUMP_LRANGE, ".dumplrange", NULL},
+  {0, NULL, NULL}
+};
+
 /*-----------------------------------------------------------------*/
 /* printEntryLabel - prints entry label of a ebblock               */
 /*-----------------------------------------------------------------*/
@@ -68,29 +85,66 @@ newEdge (eBBlock * from, eBBlock * to)
 }
 
 /*-----------------------------------------------------------------*/
+/* appendDumpFile - if not already created, create the dump file   */
+/*-----------------------------------------------------------------*/
+FILE *appendDumpFile (int id) {
+  struct _dumpFiles *dumpFilesPtr=dumpFiles;
+
+  while (dumpFilesPtr->id) {
+    if (dumpFilesPtr->id==id)
+      break;
+    dumpFilesPtr++;
+  }
+
+  if (!dumpFilesPtr->id) {
+    fprintf (stdout, "internal error: appendDumpFile: unknown dump file.\n");
+    exit (1);
+  }
+
+  if (!dumpFilesPtr->filePtr) {
+    // not used before, create it
+    strcpy (buffer, srcFileName);
+    strcat (buffer, dumpFilesPtr->ext);
+    if (!(dumpFilesPtr->filePtr = fopen (buffer, "w"))) {
+      werror (E_FILE_OPEN_ERR, buffer);
+      exit (1);
+    }
+    //dprintf ("created: %s\n", buffer);
+  } else {
+    //dprintf ("appended: %s%s\n", srcFileName, dumpFilesPtr->ext);
+  }
+  return dumpFilesPtr->filePtr;
+}
+
+/*-----------------------------------------------------------------*/
+/* closeDumpFiles - close possible opened dumpfiles                */
+/*-----------------------------------------------------------------*/
+void closeDumpFiles() {
+  struct _dumpFiles *dumpFilesPtr;
+
+  for (dumpFilesPtr=dumpFiles; dumpFilesPtr->id; dumpFilesPtr++) {
+    if (dumpFilesPtr->filePtr) {
+      fclose (dumpFilesPtr->filePtr);
+      //dprintf ("closed %s\n", dumpFilesPtr->ext);
+    }
+  }
+}
+
+/*-----------------------------------------------------------------*/
 /* dumpLiveRanges - dump liverange information into a file         */
 /*-----------------------------------------------------------------*/
 void 
-dumpLiveRanges (char *ext, hTab * liveRanges)
+dumpLiveRanges (int id, hTab * liveRanges)
 {
   FILE *file;
   symbol *sym;
   int k;
 
-  if (ext)
-    {
-      /* create the file name */
-      strcpy (buffer, srcFileName);
-      strcat (buffer, ext);
-
-      if (!(file = fopen (buffer, "a+")))
-	{
-	  werror (E_FILE_OPEN_ERR, buffer);
-	  exit (1);
-	}
-    }
-  else
+  if (id) {
+    file=appendDumpFile(id);
+  } else {
     file = stdout;
+  }
 
   for (sym = hTabFirstItem (liveRanges, &k); sym;
        sym = hTabNextItem (liveRanges, &k))
@@ -139,31 +193,23 @@ dumpLiveRanges (char *ext, hTab * liveRanges)
       fprintf (file, "\n");
     }
 
-  fclose (file);
+  fflush(file);
 }
+
 /*-----------------------------------------------------------------*/
 /* dumpEbbsToFileExt - writeall the basic blocks to a file         */
 /*-----------------------------------------------------------------*/
 void 
-dumpEbbsToFileExt (char *ext, eBBlock ** ebbs, int count)
+dumpEbbsToFileExt (int id, eBBlock ** ebbs, int count)
 {
   FILE *of;
   int i;
 
-  if (ext)
-    {
-      /* create the file name */
-      strcpy (buffer, srcFileName);
-      strcat (buffer, ext);
-
-      if (!(of = fopen (buffer, "w")))
-	{
-	  werror (E_FILE_OPEN_ERR, buffer);
-	  exit (1);
-	}
-    }
-  else
+  if (id) {
+    of=appendDumpFile(id);
+  } else {
     of = stdout;
+  }
 
   for (i = 0; i < count; i++)
     {
@@ -182,7 +228,7 @@ dumpEbbsToFileExt (char *ext, eBBlock ** ebbs, int count)
       fprintf (of, "\n----------------------------------------------------------------\n");
       printiCChain (ebbs[i]->sch, of);
     }
-  fclose (of);
+  fflush(of);
 }
 
 /*-----------------------------------------------------------------*/

@@ -753,7 +753,7 @@ eBBlockFromiCode (iCode * ic)
 
   /* dumpraw if asked for */
   if (options.dump_raw)
-    dumpEbbsToFileExt (".dumpraw0", ebbs, count);
+    dumpEbbsToFileExt (DUMP_RAW0, ebbs, count);
 
   /* replace the local variables with their
      register equivalents : the liveRange computation
@@ -766,39 +766,39 @@ eBBlockFromiCode (iCode * ic)
 
   /* dumpraw if asked for */
   if (options.dump_raw)
-    dumpEbbsToFileExt (".dumpraw1", ebbs, count);
+    dumpEbbsToFileExt (DUMP_RAW1, ebbs, count);
 
   /* do common subexpression elimination for each block */
   change = cseAllBlocks (ebbs, saveCount);
 
   /* dumpraw if asked for */
   if (options.dump_raw)
-    dumpEbbsToFileExt (".dumpcse", ebbs, count);
+    dumpEbbsToFileExt (DUMP_CSE, ebbs, count);
 
   /* compute the data flow */
   computeDataFlow (ebbs, saveCount);
 
   /* dumpraw if asked for */
   if (options.dump_raw)
-    dumpEbbsToFileExt (".dumpdflow", ebbs, count);
+    dumpEbbsToFileExt (DUMP_DFLOW, ebbs, count);
 
   /* global common subexpression elimination  */
   if (optimize.global_cse)
     {
       change += cseAllBlocks (ebbs, saveCount);
       if (options.dump_gcse)
-	dumpEbbsToFileExt (".dumpgcse", ebbs, saveCount);
+	dumpEbbsToFileExt (DUMP_GCSE, ebbs, saveCount);
     }
   /* kill dead code */
   kchange = killDeadCode (ebbs, saveCount);
 
   if (options.dump_kill)
-    dumpEbbsToFileExt (".dumpdeadcode", ebbs, count);
+    dumpEbbsToFileExt (DUMP_DEADCODE, ebbs, count);
 
   /* do loop optimizations */
   change += (lchange = loopOptimizations (loops, ebbs, count));
   if (options.dump_loop)
-    dumpEbbsToFileExt (".dumploop", ebbs, count);
+    dumpEbbsToFileExt (DUMP_LOOP, ebbs, count);
 
   /* recompute the data flow and apply global cse again 
      if loops optimizations or dead code caused a change:
@@ -813,7 +813,7 @@ eBBlockFromiCode (iCode * ic)
       computeDataFlow (ebbs, saveCount);
       change += cseAllBlocks (ebbs, saveCount);
       if (options.dump_loop)
-	dumpEbbsToFileExt (".dumploopg", ebbs, count);
+	dumpEbbsToFileExt (DUMP_LOOPG, ebbs, count);
 
       /* if loop optimizations caused a change then do
          dead code elimination once more : this will
@@ -822,7 +822,7 @@ eBBlockFromiCode (iCode * ic)
       killDeadCode (ebbs, saveCount);
 
       if (options.dump_loop)
-	dumpEbbsToFileExt (".dumploopd", ebbs, count);
+	dumpEbbsToFileExt (DUMP_LOOPD, ebbs, count);
 
     }
 
@@ -846,7 +846,7 @@ eBBlockFromiCode (iCode * ic)
   computeLiveRanges (ebbs, count);
 
   if (options.dump_range)
-    dumpEbbsToFileExt (".dumprange", ebbs, count);
+    dumpEbbsToFileExt (DUMP_RANGE, ebbs, count);
 
   /* Now that we have the live ranges, discard parameter
    * receives for unused parameters.

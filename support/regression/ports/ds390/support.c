@@ -33,6 +33,8 @@ _putchar (char c)
 void
 _exitEmu (void)
 {
+  Serial0PutChar (' '); /* wait for the last character to be transmitted */
+                       /* before hitting the breakpoint */
   * (char idata *) 0 = * (char xdata *) 0x7654;
 }
 

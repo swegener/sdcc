@@ -189,7 +189,7 @@ $(RESULTS): $(SUB_RESULTS)
 
 clean: inter-port-clean
 	rm -rf $(CASES_DIR) $(RESULTS_DIR) *.pyc fwk/lib/timeout fwk/lib/timeout.exe
-	for i in $(CLEAN_PORTS); do $(MAKE) -f $(PORTS_DIR)/$$i/spec.mk _clean PORT=$$i; done
+	for i in $(CLEAN_PORTS); do $(MAKE) -f $(PORTS_DIR)/$$i/spec.mk _clean PORTS_DIR=$(PORTS_DIR) PORT=$$i; done
 
 inter-port-clean:
 	rm -f  fwk/lib/*.o fwk/lib/*.asm fwk/lib/*.rst fwk/lib/*.lst fwk/lib/*.rel \

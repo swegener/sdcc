@@ -44,12 +44,10 @@
 #define NULL_STRING_LENGTH 6
 #endif
 
-/* XSPEC is defined in stdio.h and used here to place
-   auto variables in XSEG */
-
 /****************************************************************************/
 
-typedef char * ptr_t;
+//typedef char * ptr_t;
+#define ptr_t char *
 
 #ifdef toupper
 #undef toupper
@@ -256,7 +254,7 @@ static void output_float (float f, unsigned char reqWidth,
 
 /*--------------------------------------------------------------------------*/
 
-int vsprintf (const char *buf, const char *format, va_list ap)
+int vsprintf (const char *buf, char *format, va_list ap)
 {
   static bit            left_justify;
   static bit            zero_padding;

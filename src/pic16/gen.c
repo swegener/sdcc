@@ -10927,7 +10927,7 @@ static void genGenPointerSet (operand *right,
      * by the support function this restoring the stack. The important
      * thing is that there is no need to manually restore stack pointer
      * here */
-    mov2fp(pic16_popCopyReg(&pic16_pc_gptrreg), AOP(right), 0);
+    mov2fp(pic16_popCopyReg(&pic16_pc_postdec1), AOP(right), 0);
     if(size>1)mov2fp(pic16_popCopyReg(&pic16_pc_prodh), AOP(right), 1);
     if(size>2)mov2fp(pic16_popCopyReg(&pic16_pc_tblptrl), AOP(right), 2);
     if(size>3)mov2fp(pic16_popCopyReg(&pic16_pc_tblptrh), AOP(right), 3);

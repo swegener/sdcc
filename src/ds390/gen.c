@@ -6510,6 +6510,7 @@ genXor (iCode * ic, iCode * ifx)
 	  // if(!size && ifx), conditional oper: if(left ^ right)
 	  symbol *tlbl = newiTempLabel (NULL);
 	  int sizer = max (AOP_SIZE (left), AOP_SIZE (right));
+	          
 	  if (size)
 	    emitcode ("setb", "c");
 	  while (sizer--)
@@ -6525,9 +6526,15 @@ genXor (iCode * ic, iCode * ifx)
 		    emitcode ("xrl", "a,%s",
 			      aopGet (AOP (right), offset, FALSE, FALSE, FALSE));
 		  } else {
-		    MOVA (aopGet (AOP (right), offset, FALSE, FALSE, TRUE));
-		    emitcode ("xrl", "a,%s",
-			      aopGet (AOP (left), offset, FALSE, FALSE, FALSE));
+		      char *rOp = aopGet (AOP (right), offset, FALSE, FALSE, TRUE);
+		      if (!strcmp(rOp, "a") || !strcmp(rOp, "acc"))
+		      {
+			  emitcode("mov", "b,a");
+			  rOp = "b";
+		      }
+			
+		      MOVA (aopGet (AOP (left), offset, FALSE, FALSE, TRUE));
+		      emitcode ("xrl", "a,%s", rOp);		      
 		  }
 		}
 	      emitcode ("jnz", "%05d$", tlbl->key + 100);
@@ -6543,6 +6550,7 @@ genXor (iCode * ic, iCode * ifx)
 	    jmpTrueOrFalse (ifx, tlbl);
 	}
       else
+	{
 	for (; (size--); offset++)
 	  {
 	    // normal case
@@ -6556,8 +6564,7 @@ genXor (iCode * ic, iCode * ifx)
 			    offset);
 		    continue;
 		  }
-		D (emitcode (";", "better literal XOR.");
-		  );
+		D (emitcode (";", "better literal XOR."););
 		MOVA (aopGet (AOP (left), offset, FALSE, FALSE, TRUE));
 		emitcode ("xrl", "a, %s", aopGet (AOP (right), offset,
 						  FALSE, FALSE, FALSE));
@@ -6586,6 +6593,8 @@ genXor (iCode * ic, iCode * ifx)
 	      }
 	    aopPut (AOP (result), "a", offset);
 	  }
+	}
+	
     }
 
 release:

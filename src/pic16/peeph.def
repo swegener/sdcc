@@ -285,3 +285,11 @@ replace restart {
         movf    %1,w
 }
 
+replace restart {
+        movf    %1,w
+        movf    %2,w
+} by {
+        ;     peep 12 - Removed redundant move
+        movf    %2,w
+}
+

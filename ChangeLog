@@ -1,3 +1,30 @@
+2005-01-19 Raphael Neider <rneider AT web.de>
+
+	* src/SDCCglobl.h: ensure that PATH_MAX >= 2048 to guarantee
+	  cmdLine buffers (used when calling sdcpp...) are large enough
+	  (MAX_PATH=256 truncates arguments leading to system halts when
+	  used in MinGW...)
+	* src/pic16/gen.c (pic16_sameRegs): relaxed size criterion
+	* (genUminus): rewritten to for efficiency
+	* (genNearPointer[GS]et): enforce reloading of FSR0 (was still
+	  used uninitialized in some cases)
+	* (genCast): upcasting a 16bit int to a 24bit GPOINTER may not
+	  copy the third byte from the int -- now assumes 0x80 (data memory)
+	* src/pic16/genarith.c (pic16_genPlus): fixed bug when swapping
+	  operands (genAddLit expects the iCode's operands to swapped as
+	  well), fixed leftover bytes (crashed for short left operands)
+	* (pic16_genMinusDec): performance improvements, removed false
+	  PIC14 emitSKPNCs
+	* (pic16_genMinus): fixed to cope with differently sized operands
+	* src/pic16/glue.c (pic16_glue): added new banksel optimization
+	  for --obanksel > 1
+	* src/pic16/pcode.c: implemented (first phase of) banksel optimization
+	* src/pic16/graph.[ch]: implementation of directed graphs, used by
+	  new banksel optimization
+	* src/pic16/pcoderegs.c (pCodeRegMapLiveRangesInFlow): prevented
+	  analysis for temporary registers (segfaults...)
+	* src/pic16/peeph.def: added rule
+
 2005-01-18 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* device/lib/pic16/libc/stdlib/x_ftoa.c: it defines x_ftoa function
@@ -46,28 +73,28 @@
 
 2005-01-08 Raphael Neider <rneider AT web.de>
 
-	* src/pic16/device.c (pic16_dump_usection) changed naming scheme for
+	* src/pic16/device.c (pic16_dump_usection): changed naming scheme for
 	  udata sections to fix bug #1097823
 
 2005-01-05 Raphael Neider <rneider AT web.de>
 
-	* src/pic16/gen.c (genGenericShift) added handling of differently
+	* src/pic16/gen.c (genGenericShift): added handling of differently
 	  sized left operand and result
 
 2005-01-04 Raphael Neider <rneider AT web.de>
 
-	* src/pic16/gen.c (genIfxJump) fixed inverted skips on CARRY
-	* (genIfx) fixed (?) read from uninitialized SPIL_LOC (now assumes CARRY
+	* src/pic16/gen.c (genIfxJump): fixed inverted skips on CARRY
+	* (genIfx): fixed (?) read from uninitialized SPIL_LOC (now assumes CARRY
 	  to hold the condition bit)
 	* added new version of genCmp (old code available via #define)
 	* added new version of genShiftLeft/genShiftRight in a generic
 	  way, now supports shifting by negative values
-	* (genLeftShiftLiteral, genRightShiftLiteral) use absolute value of
+	* (genLeftShiftLiteral, genRightShiftLiteral): use absolute value of
 	  shiftCount (expected by genGenericShift)
-	* src/pic16/genarith.c (genPlus) added code for adding CARRY+literal
-	* src/pic16/pcode.c (pic16_OptimizeJumps) removed annoying statistics
+	* src/pic16/genarith.c (genPlus): added code for adding CARRY+literal
+	* src/pic16/pcode.c (pic16_OptimizeJumps): removed annoying statistics
 	  dump
-	* (pic16_newpCodeOpLit) changed to cast to unsigned char (as e.g. -32766
+	* (pic16_newpCodeOpLit): changed to cast to unsigned char (as e.g. -32766
 	  is an invalid literal too...)
 
 2005-01-04 Vangelis Rokas <vrokas AT otenet.gr>

@@ -70,6 +70,7 @@ extern DEFSETFUNC (rmTmpFiles);
 
 extern void pic16_AnalyzeBanking (void);
 extern void pic16_OptimizeJumps ();
+extern void pic16_OptimizeBanksel ();
 extern void copyFile (FILE * dest, FILE * src);
 extern void pic16_InlinepCode(void);
 extern void pic16_writeUsedRegs(FILE *);
@@ -1703,6 +1704,11 @@ pic16glue ()
       pic16_OptimizeLocalRegs();
     }
 
+    /* remove redundant BANKSELs -- added by RN 2005-01-17 */
+    if(pic16_options.opt_banksel > 1) {
+      pic16_OptimizeBanksel();
+    }
+	    
     /* turn GOTOs into BRAs -- added by RN 2004-11-16 */
     if(pic16_options.opt_flags & OF_OPTIMIZE_GOTO) {
       pic16_OptimizeJumps();

@@ -38,8 +38,9 @@
 #define ZERO  0
 
 #include <limits.h>             /* PATH_MAX                  */
-#ifndef PATH_MAX                /* POSIX, but not required   */
-#  define PATH_MAX 255          /* define a reasonable value */
+#if !defined(PATH_MAX) || (PATH_MAX < 2048)
+#  undef  PATH_MAX
+#  define PATH_MAX 2048         /* define a reasonable value */
 #endif
 
 #define  MAX_REG_PARMS  1

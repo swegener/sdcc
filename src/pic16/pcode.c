@@ -8532,3 +8532,663 @@ char *dumpPicOptype(PIC_OPTYPE type)
 {
 	return (pic_optype_names[ type ]);
 }
+
+
+/*** BEGIN of stuff belonging to the BANKSEL optimization ***/
+#include "graph.h"
+
+#define MAX_COMMON_BANK_SIZE    32
+#define FIRST_PSEUDO_BANK_NR  1000
+
+hTab *sym2bank = NULL; // <OPERAND NAME> --> <PSEUDO BANK NR>
+hTab *bank2sym = NULL; // <PSEUDO BANK NR> --> <OPERAND NAME>
+hTab *coerce = NULL;   // <PSEUDO BANK NR> --> <&PSEUDOBANK>
+Graph *adj = NULL;
+
+typedef enum { INVALID_BANK = -1, UNKNOWN_BANK = -2, FIXED_BANK = -3 } pseudoBankNr;
+
+typedef struct {
+  pseudoBankNr bank;  // number assigned to this pseudoBank
+  unsigned int size;  // number of operands assigned to this bank
+  unsigned int ref;   // number of symbols referring to this pseudoBank (for garbage collection)
+} pseudoBank;
+
+/*----------------------------------------------------------------------*/
+/* hashSymbol - hash function used to map SYMBOLs (or operands) to ints */
+/*----------------------------------------------------------------------*/
+unsigned int hashSymbol (const char *str)
+{
+  unsigned int res = 0;
+  if (!str) return 0;
+
+  while (*str) {
+    res ^= (*str);
+    res = (res << 4) | (res >> (8 * sizeof(unsigned int) - 4));
+    str++;
+  } // while
+
+  return res;
+}
+
+/*-----------------------------------------------------------------------*/
+/* compareSymbol - return 1 iff sym1 equals sym2                         */
+/*-----------------------------------------------------------------------*/
+int compareSymbol (const void *sym1, const void *sym2)
+{
+  char *s1 = (char*) sym1;
+  char *s2 = (char*) sym2;
+  
+  return (strcmp (s1,s2) == 0);
+}
+
+/*-----------------------------------------------------------------------*/
+/* comparePre - return 1 iff p1 == p2                                    */
+/*-----------------------------------------------------------------------*/
+int comparePtr (const void *p1, const void *p2)
+{
+  return (p1 == p2);
+}
+
+/*----------------------------------------------------------*/
+/* getSymbolFromOperand - return a pointer to the symbol in */
+/*                        the given operand and its length  */
+/*----------------------------------------------------------*/
+char *getSymbolFromOperand (char *op, unsigned int *len)
+{
+  char *sym, *curr;
+  *len = 0;
+
+  if (!op) return NULL;
+
+  // we recognize two forms of operands: SYMBOL and (SYMBOL + offset)
+  sym = op;
+  if (*sym == '(') sym++;
+
+  curr = sym;
+  while (((*curr >= 'A') && (*curr <= 'Z'))
+	 || ((*curr >= 'a') && (*curr <= 'z'))
+	 || ((curr != sym) && (*curr >= '0') && (*curr <= '9'))
+	 || (*curr == '_')) {
+    // find end of symbol [A-Za-z_]?[A-Za-z0-9]*
+    curr++;
+    (*len)++;
+  } // while
+
+  return sym;
+}
+
+/*--------------------------------------------------------------------------*/
+/* getSymFromBank - get (one) name of a symbol assigned to the given bank   */
+/*--------------------------------------------------------------------------*/
+char *getSymFromBank (pseudoBankNr bank)
+{
+  assert (bank2sym);
+
+  if (bank < 0) return "<INVALID BANK NR>";
+  return hTabFindByKey (bank2sym, bank % bank2sym->size, (void *) bank, &comparePtr);
+}
+
+/*-----------------------------------------------------------------------*/
+/* getPseudoBsrFromOperand - maps a string to its corresponding pseudo   */
+/*                           bank number (uses hTab sym2bank), if the    */
+/*                           symbol is not yet assigned a pseudo bank it */
+/*                           is assigned one here                        */
+/*-----------------------------------------------------------------------*/
+pseudoBankNr getPseudoBankNrFromOperand (const char *op)
+{
+  static pseudoBankNr next_bank = FIRST_PSEUDO_BANK_NR;
+  pseudoBankNr bank;
+  unsigned int hash;
+
+  assert (sym2bank);
+
+  hash = hashSymbol (op) % sym2bank->size;
+  bank = (pseudoBankNr) hTabFindByKey (sym2bank, hash, op, &compareSymbol);
+  if (bank == (pseudoBankNr)NULL) bank = UNKNOWN_BANK;
+
+  if (bank == UNKNOWN_BANK) {
+    // create a pseudo bank for the operand
+    bank = next_bank++;
+    hTabAddItemLong (&sym2bank, hash, (char *)op, (void *)bank);
+    hTabAddItemLong (&bank2sym, bank, (void *) bank, (void *)op);
+    getOrAddGNode (adj, NULL, bank); // adds the node if it does not exist yet
+    //fprintf (stderr, "%s:%d: adding %s with hash %u in bank %u\n", __FUNCTION__, __LINE__, op, hash, bank);
+  } else {
+    //fprintf (stderr, "%s:%d: found %s with hash %u in bank %u\n", __FUNCTION__, __LINE__, op, hash, bank);
+  } // if
+
+  assert (bank >= 0);
+
+  return bank;
+}
+
+/*--------------------------------------------------------------------*/
+/* isBanksel - check whether the given pCode is a BANKSEL instruction */
+/*--------------------------------------------------------------------*/
+int isBanksel (pCode *pc)
+{
+  if (!pc) return 0;
+
+  if (isPCI(pc) && (PCI(pc)->op == POC_BANKSEL || PCI(pc)->op == POC_MOVLB)) {
+    // BANKSEL <variablename>  or  MOVLB <banknr>
+    //fprintf (stderr, "%s:%d: BANKSEL found: %s %s\n", __FUNCTION__, __LINE__, PCAD(pc)->directive, PCAD(pc)->arg);
+    return 1;
+  }
+
+  // check for inline assembler BANKSELs
+  if (isPCAD(pc) && PCAD(pc)->directive && (STRCASECMP(PCAD(pc)->directive,"BANKSEL") == 0 ||
+					    STRCASECMP(PCAD(pc)->directive,"MOVLB") == 0)) {
+    //fprintf (stderr, "%s:%d: BANKSEL found: %s %s\n", __FUNCTION__, __LINE__, PCAD(pc)->directive, PCAD(pc)->arg);
+    return 1;
+  }
+
+  // assume pc is no BANKSEL instruction
+  return 0;
+}
+
+/*---------------------------------------------------------------------------------*/
+/* invalidatesBSR - check whether the pCodeInstruction passed in modifies the BSR  */
+/*                  This method can not guarantee to find all modifications of the */
+/*                  BSR (e.g. via INDirection registers) but covers all compiler   */
+/*                  generated plus some cases.                                     */
+/*---------------------------------------------------------------------------------*/
+int invalidatesBSR(pCode *pc)
+{
+  // assembler directives invalidate BSR (well, they might, we don't know)
+  if (isPCAD(pc)) return 1;
+
+  // only ASMDIRs and pCodeInstructions can invalidate BSR
+  if (!isPCI(pc)) return 0;
+
+  // we have a pCodeInstruction
+
+  // check for BSR modifying instructions
+  switch (PCI(pc)->op) {
+  case POC_CALL:
+  case POC_RCALL:
+  case POC_MOVLB:
+  case POC_RETFIE:  // might be used as CALL replacement
+  case POC_RETLW:   // might be used as CALL replacement
+  case POC_RETURN:  // might be used as CALL replacement
+  case POC_BANKSEL:
+    return 1;
+    break;
+
+  default:          // other instruction do not change BSR unless BSR is an explicit operand!
+    // TODO: check for BSR as an explicit operand (e.g. INCF BSR,F), which should be rather unlikely...!
+    break;
+  } // switch
+
+  // no change of BSR possible/probable
+  return 0;
+}
+
+/*------------------------------------------------------------*/
+/* getBankFromBanksel - return the pseudo bank nr assigned to */
+/*                      the symbol referenced in this BANKSEL */
+/*------------------------------------------------------------*/
+pseudoBankNr getBankFromBanksel (pCode *pc)
+{
+  char *sym;
+  int data = (int)NULL;
+
+  if (!pc) return INVALID_BANK;
+  
+  if (isPCAD(pc) && PCAD(pc)->directive) {
+    if (STRCASECMP(PCAD(pc)->directive,"BANKSEL") == 0) {
+      // get symbolname from PCAD(pc)->arg
+      //fprintf (stderr, "%s:%d: BANKSEL found: %s %s\n", __FUNCTION__, __LINE__, PCAD(pc)->directive, PCAD(pc)->arg);
+      sym = PCAD(pc)->arg;
+      data = getPseudoBankNrFromOperand (sym);
+      //fprintf (stderr, "symbol: %s, data=%i\n", sym, data);
+    } else if (STRCASECMP(PCAD(pc)->directive,"MOVLB")) {
+      // get (literal) bank number from PCAD(pc)->arg
+      fprintf (stderr, "%s:%d: MOVLB found: %s %s\n", __FUNCTION__, __LINE__, PCAD(pc)->directive, PCAD(pc)->arg);
+      assert (0 && "not yet implemented - turn off banksel optimization for now");
+    }
+  } else if (isPCI(pc)) {
+    if (PCI(pc)->op == POC_BANKSEL) {
+      // get symbolname from PCI(pc)->pcop->name (?)
+      //fprintf (stderr, "%s:%d: BANKSEL found: %s %s\n", __FUNCTION__, __LINE__, PCI(pc)->mnemonic, PCI(pc)->pcop->name);
+      sym = PCI(pc)->pcop->name;
+      data = getPseudoBankNrFromOperand (sym);
+      //fprintf (stderr, "symbol: %s, data=%i\n", sym, data);
+    } else if (PCI(pc)->op == POC_MOVLB) {
+      // get (literal) bank number from PCI(pc)->pcop->name
+      fprintf (stderr, "%s:%d: MOVLB found: %s %s\n", __FUNCTION__, __LINE__, PCI(pc)->mnemonic, PCI(pc)->pcop->name);
+      assert (0 && "not yet implemented - turn off banksel optimization for now");
+    }
+  }
+  
+  if (data == 0)
+    // no assigned bank could be found
+    return UNKNOWN_BANK;
+  else
+    return data;
+}
+
+/*------------------------------------------------------------------------------*/
+/* getEffectiveBank - resolves the currently assigned effective pseudo bank nr  */
+/*------------------------------------------------------------------------------*/
+pseudoBankNr getEffectiveBank (pseudoBankNr bank)
+{
+  pseudoBank *data;
+
+  if (bank < FIRST_PSEUDO_BANK_NR) return bank;
+
+  do {
+    //fprintf (stderr, "%s:%d: bank=%d\n", __FUNCTION__, __LINE__, bank);
+    data = (pseudoBank *) hTabFindByKey (coerce, bank % coerce->size, (void *) bank, &comparePtr);
+    if (data) {
+      if (data->bank != bank)
+	bank = data->bank;
+      else
+	data = NULL;
+    }
+  } while (data);
+  
+  //fprintf (stderr, "%s:%d: effective bank=%d\n", __FUNCTION__, __LINE__, bank);
+  return bank;
+}
+
+/*------------------------------------------------------------------*/
+/* attachBsrInfo2pBlock - create a look-up table as to which pseudo */
+/*                        bank is selected at a given pCode         */
+/*------------------------------------------------------------------*/
+
+/* Create a graph with pseudo banks as its nodes and switches between
+ * these as edges (with the edge weight representing the absolute
+ * number of BANKSELs from one to the other).
+ * Removes redundand BANKSELs instead iff mod == 1.
+ * BANKSELs update the pseudo BSR, labels invalidate the current BSR
+ * value (setting it to 0=UNNKOWN), (R)CALLs also invalidate the
+ * pseudo BSR.
+ * TODO: check ALL instructions operands if they modify BSR directly...
+ *
+ * pb - the pBlock to annotate
+ * mod  - select either graph creation (0) or BANKSEL removal (1)
+ */
+unsigned int attachBsrInfo2pBlock (pBlock *pb, int mod)
+{
+  pCode *pc, *pc_next;
+  unsigned int prevBSR = UNKNOWN_BANK, pseudoBSR = UNKNOWN_BANK;
+  int isBankselect = 0;
+  unsigned int banksels=0;
+  
+  if (!pb) return 0;
+
+  pc = pic16_findNextInstruction(pb->pcHead);
+  while (pc) {
+    isBankselect = isBanksel (pc);
+    pc_next = pic16_findNextInstruction (pc->next);
+
+    if (!hasNoLabel (pc)) {
+      // we don't know our predecessors -- assume different BSRs
+      prevBSR = UNKNOWN_BANK;
+      pseudoBSR = UNKNOWN_BANK;
+      //fprintf (stderr, "invalidated by label at "); pc->print (stderr, pc);
+    } // if
+
+    // check if this is a BANKSEL instruction
+    if (isBankselect) {
+      pseudoBSR = getEffectiveBank (getBankFromBanksel(pc));
+      //fprintf (stderr, "BANKSEL via "); pc->print (stderr, pc);
+      if (mod) {
+	if (prevBSR == pseudoBSR && pseudoBSR >= 0) {
+	  //fprintf (stderr, "removing redundant "); pc->print (stderr, pc);
+	  if (1 || pic16_pcode_verbose) pic16_pCodeInsertAfter (pc->prev, pic16_newpCodeCharP("removed redundant BANKSEL"));
+	  pic16_unlinkpCode (pc);
+	  banksels++;
+	}
+      } else {
+	addGEdge2 (getOrAddGNode (adj, NULL, prevBSR), getOrAddGNode (adj, NULL, pseudoBSR), 1, 0);
+	banksels++;
+      }
+    } // if
+
+    if (!isBankselect && invalidatesBSR(pc)) {
+      // check if this instruction invalidates the pseudoBSR
+      pseudoBSR = UNKNOWN_BANK;
+      //fprintf (stderr, "invalidated via "); pc->print (stderr, pc);
+    } // if
+
+    prevBSR = pseudoBSR;
+    pc = pc_next;
+  } // while
+
+  return banksels;
+}
+
+/*------------------------------------------------------------------------------------*/
+/* assignToSameBank - returns 0 on success or an error code                           */
+/*  1 - common bank would be too large                                                */
+/*  2 - assignment to fixed (absolute) bank not performed                             */
+/*                                                                                    */
+/* This functions assumes that unsplittable operands are already assigned to the same */
+/* bank (e.g. all objects being referenced as (SYMBOL + offset) must be in the same   */
+/* bank so that we can make sure the bytes are laid out sequentially in memory)       */
+/* TODO: Symbols with an abslute address must be handled specially!                   */
+/*------------------------------------------------------------------------------------*/
+int assignToSameBank (int bank0, int bank1, int doAbs)
+{
+  int eff0, eff1, dummy;
+  pseudoBank *pbank0, *pbank1;
+  hashtItem *hitem;
+
+  eff0 = getEffectiveBank (bank0);
+  eff1 = getEffectiveBank (bank1);
+
+  //fprintf (stderr, "%s:%d: bank0=%d/%d, bank1=%d/%d, doAbs=%d\n", __FUNCTION__, __LINE__, bank0, eff0, bank1, eff1, doAbs);
+
+  // nothing to do if already same bank
+  if (eff0 == eff1) return 0;
+
+  if (!doAbs && (eff0 < FIRST_PSEUDO_BANK_NR || eff1 < FIRST_PSEUDO_BANK_NR))
+    return 2;
+
+  // ensure eff0 < eff1
+  if (eff0 > eff1) {
+    // swap eff0 and eff1
+    dummy = eff0;
+    eff0 = eff1;
+    eff1 = dummy;
+    dummy = bank0;
+    bank0 = bank1;
+    bank1 = dummy;
+  } // if
+
+  // now assign bank eff1 to bank eff0
+  pbank0 = (pseudoBank *) hTabFindByKey (coerce, eff0 % coerce->size, (void *) eff0, &comparePtr);
+  if (!pbank0) {
+    pbank0 = Safe_calloc (1, sizeof (pseudoBank));
+    pbank0->bank = eff0;
+    pbank0->size = 1;
+    pbank0->ref = 1;
+    hTabAddItemLong (&coerce, eff0 % coerce->size, (void *) eff0, (void *) pbank0);
+  } // if
+
+  pbank1 = NULL;
+  hitem = hTabSearch (coerce, eff1 % coerce->size);
+  while (hitem && hitem->pkey != (void *)eff1)
+    hitem = hitem->next;
+
+  if (hitem) pbank1 = (pseudoBank *) hitem->item;
+
+#if 0
+  fprintf (stderr, "bank #%d/%d & bank #%d/%d --> bank #%d: %u (%s & %s)\n", bank0, eff0, bank1, eff1,
+	   pbank0->bank, pbank0->size,
+	   getSymFromBank (eff0), getSymFromBank (eff1));
+#endif
+
+  if (pbank1) {
+    if (pbank0->size + pbank1->size > MAX_COMMON_BANK_SIZE) {
+#if 0
+      fprintf (stderr, "bank #%d: %u, bank #%d: %u --> bank #%d': %u > %u (%s,%s)\n",
+	       pbank0->bank, pbank0->size, pbank1->bank, pbank1->size,
+	       pbank0->bank, pbank0->size + pbank1->size, MAX_COMMON_BANK_SIZE,
+	       getSymFromBank (pbank0->bank), getSymFromBank (pbank1->bank));
+#endif
+      return 1;
+    } // if
+    pbank0->size += pbank1->size;
+    pbank1->ref--;
+    if (pbank1->ref == 0) Safe_free (pbank1);
+  } else {
+    pbank0->size++;
+  } // if
+
+  if (hitem)
+    hitem->item = pbank0;
+  else  
+    hTabAddItemLong (&coerce, eff1 % coerce->size, (void *) eff1, (void *) pbank0);
+  pbank0->ref++;
+
+  //fprintf (stderr, "%s:%d: leaving.\n", __FUNCTION__, __LINE__);
+
+  return 0;
+}
+
+/*----------------------------------------------------------------*/
+/* mergeGraphNodes - combines two nodes into one and modifies all */
+/*                   edges to and from the nodes accordingly      */
+/* This method needs complete backedges, i.e. if (A,B) is an edge */
+/* then also (B,A) must be an edge (possibly with weight 0).      */
+/*----------------------------------------------------------------*/
+void mergeGraphNodes (GraphNode *node1, GraphNode *node2)
+{
+  GraphEdge *edge, *backedge, *nextedge;
+  GraphNode *node;
+  int backweight;
+
+  assert (node1 && node2);
+  assert (node1 != node2);
+  
+  // add all edges starting at node2 to node1
+  edge = node2->edge;
+  while (edge) {
+    nextedge = edge->next;
+    node = edge->node;
+    backedge = getGEdge (node, node2);
+    if (backedge)
+      backweight = backedge->weight;
+    else
+      backweight = 0;
+    // insert edges (node1,node) and (node,node1)
+    addGEdge2 (node1, node, edge->weight, backweight);
+    // remove edges (node, node2) and (node2, node)
+    remGEdge (node2, node);
+    remGEdge (node, node2);
+    edge = nextedge;
+  } // while
+  
+  // now node2 should not be referenced by any other GraphNode...
+  //remGNode (adj, node2->data, node2->hash);
+}
+
+/*----------------------------------------------------------------*/
+/* showGraph - dump the current BANKSEL graph as a node/edge list */
+/*----------------------------------------------------------------*/
+void showGraph (Graph *g)
+{
+  GraphNode *node;
+  GraphEdge *edge;
+  pseudoBankNr bankNr;
+  pseudoBank *pbank;
+  unsigned int size;
+
+  node = g->node;
+  while (node) {
+    edge = node->edge;
+    bankNr = getEffectiveBank (node->hash);
+    assert (bankNr >= 0);
+    pbank = (pseudoBank *) hTabFindByKey (coerce, bankNr % coerce->size, (void *) bankNr, &comparePtr);
+    if (pbank) {
+      bankNr = pbank->bank;
+      size = pbank->size;
+    } else {
+      size = 1;
+    }
+    
+    fprintf (stderr, "edges from %s (bank %u, size %u) to:\n", getSymFromBank (node->hash), bankNr, size);
+
+    while (edge) {
+      if (edge->weight > 0)
+	fprintf (stderr, "  %4u x %s\n", edge->weight, getSymFromBank (edge->node->hash));
+      edge = edge->next;
+    } // while (edge)
+    node = node->next;
+  } // while (node)
+}
+
+/*---------------------------------------------------------------*/
+/* pic16_OptimizeBanksel - remove redundant BANKSEL instructions */
+/*---------------------------------------------------------------*/
+void pic16_OptimizeBanksel ()
+{
+  GraphNode *node, *node1, *node1next;
+
+#if 0
+  // needed for more effective bank assignment (needs adjusted pic16_emit_usection())
+  GraphEdge *edge, *backedge;
+  GraphEdge *max;
+  int maxWeight, weight, mergeMore, absMaxWeight;
+  pseudoBankNr curr0, curr1;
+#endif
+  pseudoBank *pbank;
+  pseudoBankNr bankNr;
+  char *base_symbol0, *base_symbol1;
+  int len0, len1;
+  pBlock *pb;
+  set *set;
+  regs *reg;
+  unsigned int bankselsTotal = 0, bankselsRemoved = 0; 
+
+  //fprintf (stderr, "%s:%s:%d: entered.\n", __FILE__, __FUNCTION__, __LINE__);
+
+  if (!the_pFile || !the_pFile->pbHead) return;
+
+  adj = newGraph (NULL);
+  sym2bank = newHashTable ( 255 );
+  bank2sym = newHashTable ( 255 );
+  coerce = newHashTable ( 255 );
+
+  // create graph of BANKSEL relationships (node = operands, edge (A,B) iff BANKSEL B follows BANKSEL A)
+  for (pb = the_pFile->pbHead; pb; pb = pb->next) {
+    bankselsTotal += attachBsrInfo2pBlock (pb, 0);
+  } // for pb
+
+#if 1
+  // assign symbols with absolute addresses to their respective bank nrs
+  set = pic16_fix_udata;
+  for (reg = setFirstItem (set); reg; reg = setNextItem (set)) {
+    bankNr = reg->address >> 8;
+    node = getOrAddGNode (adj, NULL, bankNr);
+    bankNr = (pseudoBankNr) getEffectiveBank (getPseudoBankNrFromOperand(reg->name));
+    assignToSameBank (node->hash, bankNr, 1);
+    
+    assert (bankNr >= 0);
+    pbank = (pseudoBank *) hTabFindByKey (coerce, bankNr % coerce->size, (void *) bankNr, &comparePtr);
+    if (!pbank) {
+      pbank = Safe_calloc (1, sizeof (pseudoBank));
+      pbank->bank = reg->address >> 8; //FIXED_BANK;
+      pbank->size = 1;
+      pbank->ref = 1;
+      hTabAddItemLong (&coerce, bankNr % coerce->size, (void *) bankNr, pbank);
+    } else {
+      assert (pbank->bank == (reg->address >> 8));
+      pbank->bank = reg->address >> 8; //FIXED_BANK;
+    }
+    //fprintf (stderr, "ABS: %s (%d bytes) at %x in bank %u\n", reg->name, reg->size, reg->address, bankNr);
+  } // for reg
+#endif
+
+#if 1
+  // assign operands referring to the same symbol (which is not given an absolute address) to the same bank
+  //fprintf (stderr, "assign operands with the same symbol to the same bank\n");
+  node = adj->node;
+  while (node) {
+    if (node->hash < 0) { node = node->next; continue; }
+    base_symbol0 = getSymbolFromOperand (getSymFromBank (getEffectiveBank(node->hash)), &len0);
+    node1 = node->next;
+    while (node1) {
+      if (node1->hash < 0) { node1 = node1->next; continue; }
+      node1next = node1->next;
+      base_symbol1 = getSymbolFromOperand (getSymFromBank (getEffectiveBank (node1->hash)), &len1);
+      if (len0 == len1 && len0 > 0 && strncmp (base_symbol0, base_symbol1, len0) == 0) {
+	// TODO: check for symbols with absolute addresses -- these might be placed across bank boundaries!
+	//fprintf (stderr, "merging %s and %s\n", getSymFromBank (getEffectiveBank(node->hash)), getSymFromBank (getEffectiveBank(node1->hash)));
+	if (assignToSameBank (node->hash, node1->hash, 0)) {
+	  fprintf (stderr, "%s(%d) == %s(%d)\n", base_symbol0, len0, base_symbol1, len1);
+	  assert (0 && "Could not assign a symbol to a bank!");
+	}
+	mergeGraphNodes (node, node1);
+	/*
+	if (node->hash < node1->hash)
+	  mergeGraphNodes (node, node1);
+	else
+	  mergeGraphNodes (node1, node); // this removes node so node->next will fail...
+	*/
+      } // if
+      node1 = node1next;
+    } // while (node1)
+    node = node->next;
+  } // while (node)
+#endif
+
+#if 0
+  // >>> THIS ALSO NEEDS AN UPDATED pic16_emit_usection() TO REFLECT THE BANK ASSIGNMENTS <<<
+  // assign tightly coupled operands to the same (pseudo) bank
+  //fprintf (stderr, "assign tightly coupled operands to the same bank\n");
+  mergeMore = 1;
+  absMaxWeight = 0;
+  while (mergeMore) {
+    node = adj->node;
+    max = NULL;
+    maxWeight = 0;
+    while (node) {
+      curr0 = getEffectiveBank (node->hash);
+      if (curr0 < 0) { node = node->next; continue; }
+      edge = node->edge;
+      while (edge) {
+	assert (edge->src == node);
+	backedge = getGEdge (edge->node, edge->src);
+	weight = edge->weight + (backedge ? backedge->weight : 0);
+	curr1 = getEffectiveBank (edge->node->hash);
+	if (curr1 < 0) { edge = edge->next; continue; }
+
+	// merging is only useful if the items are not assigned to the same bank already...
+	if (curr0 != curr1 && weight > maxWeight) {
+	  if (maxWeight > absMaxWeight) absMaxWeight = maxWeight;
+	  maxWeight = weight;
+	  max = edge;
+	} // if
+	edge = edge->next;
+      } // while
+      node = node->next;
+    } // while
+    
+    if (maxWeight > 0) {
+#if 1
+      fprintf (stderr, "%s:%d: merging (%4u) %d(%s) and %d(%s)\n", __FUNCTION__, __LINE__, maxWeight,
+	       max->src->hash, getSymFromBank (max->src->hash),
+	       max->node->hash, getSymFromBank (max->node->hash));
+#endif
+
+      node = getGNode (adj, max->src->data, max->src->hash);
+      node1 = getGNode (adj, max->node->data, max->node->hash);
+
+      if (0 == assignToSameBank (max->src->hash, max->node->hash, 0)) {
+	if (max->src->hash < max->node->hash)
+	  mergeGraphNodes (node, node1);
+	else
+	  mergeGraphNodes (node1, node);
+      } else {
+	remGEdge (node, node1);
+	remGEdge (node1, node);
+	//mergeMore = 0;
+      }
+
+    } else {
+      mergeMore = 0;
+    }
+  } // while
+#endif
+
+#if 1  
+  // remove redundant BANKSELs
+  //fprintf (stderr, "removing redundant BANKSELs\n");
+  for (pb = the_pFile->pbHead; pb; pb = pb->next) {
+    bankselsRemoved += attachBsrInfo2pBlock (pb, 1);
+  } // for pb
+#endif
+
+#if 0
+  fprintf (stderr, "display graph\n");
+  showGraph ();
+#endif
+
+  deleteGraph (adj);
+  fprintf (stderr, "%s:%s:%d: leaving, %u/%u BANKSELs removed...\n", __FILE__, __FUNCTION__, __LINE__, bankselsRemoved, bankselsTotal);
+}
+
+/*** END of stuff belonging to the BANKSEL optimization ***/

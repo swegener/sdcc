@@ -167,7 +167,7 @@ static void pCodeRegMapLiveRangesInFlow(pCodeFlow *pcfl)
 
     reg = pic16_getRegFromInstruction(pc);
 
-    if(reg) {
+    if(reg && (reg->type != REG_TMP)) {
 #if 0
       fprintf(stderr, "reg= %p\n", reg);
       fprintf(stderr, "flow seq %d, inst seq %d  %s  ",PCODE(pcfl)->seq,pc->seq,reg->name);

@@ -1069,10 +1069,12 @@ bool pic16_sameRegs (asmop *aop1, asmop *aop2 )
         aop2->type != AOP_REG )
         return FALSE ;
 
+    /* This is a bit too restrictive if one is a subset of the other...
     if (aop1->size != aop2->size )
         return FALSE ;
+    */
 
-    for (i = 0 ; i < aop1->size ; i++ ) {
+    for (i = 0 ; i < min(aop1->size, aop2->size) ; i++ ) {
 //        if(aop1->aopu.aop_reg[i]->type != aop2->aopu.aop_reg[i]->type)return FALSE;
 
 //        if(aop1->aopu.aop_reg[i]->type == AOP_REG)
@@ -2680,6 +2682,8 @@ static void genUminus (iCode *ic)
 {
   int size, i;
   sym_link *optype, *rtype;
+  symbol *label;
+  int needLabel=0;
 
     FENTRY;	
     
@@ -2708,21 +2712,33 @@ static void genUminus (iCode *ic)
 
     /* otherwise subtract from zero by taking the 2's complement */
     size = AOP_SIZE(IC_LEFT(ic));
-
-    for(i=0; i<size; i++) {
-      if (pic16_sameRegs(AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic))) )
-        pic16_emitpcode(POC_COMF,  pic16_popGet(AOP(IC_LEFT(ic)),i));
-      else {
-        pic16_emitpcode(POC_COMFW, pic16_popGet(AOP(IC_LEFT(ic)),i));
-        pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(IC_RESULT(ic)),i));
-      }
+    label = newiTempLabel ( NULL );
+    
+    if (pic16_sameRegs (AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic)))) {
+      for (i=size-1; i > 0; i--) {
+        pic16_emitpcode (POC_COMF, pic16_popGet (AOP(IC_LEFT(ic)), i));
+      } // for
+      pic16_emitpcode (POC_NEGF, pic16_popGet (AOP(IC_LEFT(ic)), 0));
+      for (i=1; i < size; i++) {
+        if (i == size - 1) { emitSKPNZ; } else { pic16_emitpcode (POC_BNZ, pic16_popGetLabel (label->key)); needLabel++; }
+        pic16_emitpcode (POC_INCF, pic16_popGet (AOP(IC_LEFT(ic)), i));
+      } // for
+    } else {
+      for (i=size-1; i >= 0; i--) {
+        pic16_emitpcode (POC_COMFW, pic16_popGet (AOP(IC_LEFT(ic)), i));
+	pic16_emitpcode (POC_MOVWF, pic16_popGet (AOP(IC_RESULT(ic)), i));
+      } // for
+      if (size > 1) {
+        for (i=0; i < size-2; i++) {
+          pic16_emitpcode (POC_INCF, pic16_popGet (AOP(IC_RESULT(ic)),i));
+          pic16_emitpcode (POC_BNZ, pic16_popGetLabel (label->key)); needLabel++;
+	} // for
+        pic16_emitpcode (POC_INFSNZ, pic16_popGet (AOP(IC_RESULT(ic)), size-2));
+      } // if
+      pic16_emitpcode (POC_INCF, pic16_popGet(AOP(IC_RESULT(ic)), size-1));
     }
-
-    pic16_emitpcode(POC_INCF,  pic16_popGet(AOP(IC_RESULT(ic)),0));
-    for(i=1; i<size; i++) {
-      emitSKPNZ;
-      pic16_emitpcode(POC_INCF,  pic16_popGet(AOP(IC_RESULT(ic)),i));
-    }
+    if (needLabel)
+      pic16_emitpLabel (label->key);
 
 release:
     /* release the aops */
@@ -11059,7 +11075,7 @@ static void genNearPointerGet (operand *left,
 
     /* if the value is already in a pointer register
      * then don't need anything more */
-    if (!AOP_INPREG(AOP(left))) {
+    if (1 || !AOP_INPREG(AOP(left))) {  // AOP_INPREG(AOP(left)) is not always correct...
       /* otherwise get a free pointer register */
       DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 		
@@ -11946,7 +11962,7 @@ static void genNearPointerSet (operand *right,
 
 	/* if the value is already in a pointer register
 	 * then don't need anything more */
-	if (!AOP_INPREG(AOP(result))) {
+	if (1 || !AOP_INPREG(AOP(result))) {  // AOP_INPREG(AOP(result)) is not always correct...
 		/* otherwise get a free pointer register */
 		DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
@@ -13274,7 +13290,13 @@ static void genCast (iCode *ic)
 		break;
 
             case GPOINTER:
-              pic16_emitpcode(POC_MOVFF, pic16_popGet2(AOP(right), AOP(result), GPTRSIZE-1));
+		if (GPTRSIZE > AOP_SIZE(right)) {
+		  // assume data pointer... THIS MIGHT BE WRONG!
+	          pic16_emitpcode(POC_MOVLW, pic16_popGetLit(0x80));
+	          pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result), GPTRSIZE - 1));
+		} else {
+		  pic16_emitpcode(POC_MOVFF, pic16_popGet2(AOP(right), AOP(result), GPTRSIZE-1));
+		}
               break;
               
 	    default:

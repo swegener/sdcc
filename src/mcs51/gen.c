@@ -8919,7 +8919,15 @@ gen51Code (iCode * lic)
 	  cln = ic->lineno;
 	}
       if (options.iCodeInAsm) {
-	emitcode("", ";ic:%d: %s", ic->key, printILine(ic));
+	char regsInUse[80];
+	int i;
+
+	for (i=0; i<8; i++) {
+	  sprintf (&regsInUse[i],
+		   "%c", ic->riu & (1<<i) ? i+'0' : '-'); 
+	}
+	regsInUse[i]=0;
+	emitcode("", "; [%s] ic:%d: %s", regsInUse, ic->seq, printILine(ic));
       }
       /* if the result is marked as
          spilt and rematerializable or code for

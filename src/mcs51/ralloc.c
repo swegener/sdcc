@@ -1107,6 +1107,16 @@ serialRegAssign (eBBlock ** ebbs, int count)
 
 	/* of all instructions do */
 	for (ic = ebbs[i]->sch; ic; ic = ic->next) {
+	    int i;
+
+	    // update the registers in use at the start of this icode
+	    for (i=0; i<8; i++) {
+	      if (regs8051[i].isFree) {
+		ic->riu &= ~(1<<regs8051[i].offset);
+	      } else {
+		ic->riu |= (1<<regs8051[i].offset);
+	      }
+	    }
 
 	    /* if this is an ipop that means some live
 	       range will have to be assigned again */
@@ -2790,6 +2800,7 @@ mcs51_assignRegisters (eBBlock ** ebbs, int count)
   int i;
 
   setToNull ((void *) &_G.funcrUsed);
+  setToNull ((void *) &_G.regAssigned);
   setToNull ((void *) &_G.totRegAssigned);
   mcs51_ptrRegReq = _G.stackExtend = _G.dataExtend = 0;
   mcs51_nRegs = 8;
@@ -2810,6 +2821,8 @@ mcs51_assignRegisters (eBBlock ** ebbs, int count)
   serialRegAssign (ebbs, count);
 
   freeAllRegs ();
+  setToNull ((void *) &_G.regAssigned);
+  setToNull ((void *) &_G.totRegAssigned);
   fillGaps();
 
   /* if stack was extended then tell the user */

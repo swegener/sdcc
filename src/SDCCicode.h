@@ -189,6 +189,7 @@ typedef struct iCode
     				   on stack */
     int argreg;			/* argument regno for SEND/RECEIVE */
     int eBBlockNum;             /* belongs to which eBBlock */
+    char riu;			/* after ralloc, the registers in use */
   }
 iCode;
 

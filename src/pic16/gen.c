@@ -273,6 +273,11 @@ void pic16_emitpLabel(int key)
   pic16_addpCode2pBlock(pb,pic16_newpCodeLabel(NULL,key+100+labelOffset));
 }
 
+void pic16_emitpLabelFORCE(int key)
+{
+  pic16_addpCode2pBlock(pb,pic16_newpCodeLabelFORCE(NULL,key+100+labelOffset));
+}
+
 void pic16_emitpcode(PIC_OPCODE poc, pCodeOp *pcop)
 {
 
@@ -2963,9 +2968,7 @@ static void genPcall (iCode *ic)
 	// push return address
 	// push $ on return stack, then replace with retlbl
 
-	// Note: retlbl is supplied as dummy operand to PUSH
-	// This has the nice side effect of keeping the label from being optimized out :o)
-	pic16_emitpcode(POC_PUSH, pic16_popGetLabel(retlbl->key));	
+	pic16_emitpcodeNULLop(POC_PUSH);
 
 	pic16_emitpcode(POC_MOVLW, pic16_popGetImmd(pcop_lbl->name, 0, 0));
 	pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_tosl));
@@ -2975,22 +2978,22 @@ static void genPcall (iCode *ic)
 	pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_tosu));
 
 	/* make the call by writing the pointer into pc */
-	// FIXME Disabled writes to PCLATU because of gpsim problems
-#if 1
 	pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(IC_LEFT(ic)),2), pic16_popCopyReg(&pic16_pc_pclatu)));
-#else
-	fprintf(stderr,
-"WARNING: (%s:%d) PCLATU is not written because of gpsim problems\n\
-Correct this as soon as gpsim bug is fixed\n", __FILE__, __LINE__);
-#endif
- 
 	pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(IC_LEFT(ic)),1), pic16_popCopyReg(&pic16_pc_pclath)));
+
 	// note: MOVFF to PCL not allowed
 	pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(IC_LEFT(ic)),0));
 	pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_pcl));
 
+
+//	pic16_emitpcode(POC_GOTO, pic16_popGetLabel(retlbl->key));
+//	pic16_emitpcodeNULLop(POC_NOP);
+//	pic16_emitpcodeNULLop(POC_NOP);
+
 	/* return address is here: (X) */
-	pic16_emitpLabel(retlbl->key);
+	pic16_emitpLabelFORCE(retlbl->key);
+
+//	pic16_emitpcodeNULLop(POC_NOP);
 
 	pic16_freeAsmop (IC_LEFT(ic),NULL,ic,TRUE);
 

@@ -439,9 +439,8 @@ typedef struct pCodeOpWild
 			   * card will be expanded */
   pCodeOp *matched;       /* When a wild matches, we'll store a pointer to the
 			   * opcode we matched */
-  int id2;		  /* same as id but for second wild operand */
-  pCodeOp *subtype2;	  /* Poiter to the second Operand type */
-  pCodeOp *matched2;	  /* same as matched but for second wil operand */
+
+  pCodeOp *pcop2;	  /* second operand if exists */
 
 } pCodeOpWild;
 
@@ -648,6 +647,7 @@ typedef struct pCodeLabel
 
   char *label;
   int key;
+  int force;		/* label cannot be optimized out */
 
 } pCodeLabel;
 
@@ -861,7 +861,7 @@ typedef struct peepCommand {
 #define PCOR2(x)  ((pCodeOpReg2 *)(x))
 #define PCORB(x)  ((pCodeOpRegBit *)(x))
 #define PCOW(x)   ((pCodeOpWild *)(x))
-
+#define PCOW2(x)  (PCOW(PCOW(x)->pcop2))
 #define PBR(x)    ((pBranch *)(x))
 
 #define PCWB(x)   ((pCodeWildBlock *)(x))
@@ -900,6 +900,7 @@ pCode *pic16_newpCodeCharP(char *cP);              // Create a new pCode given a
 pCode *pic16_newpCodeInlineP(char *cP);            // Create a new pCode given a char *
 pCode *pic16_newpCodeFunction(char *g, char *f);   // Create a new function
 pCode *pic16_newpCodeLabel(char *name,int key);    // Create a new label given a key
+pCode *pic16_newpCodeLabelFORCE(char *name, int key); // Same as newpCodeLabel but label cannot be optimized out
 pCode *pic16_newpCodeCSource(int ln, char *f, char *l); // Create a new symbol line 
 pBlock *pic16_newpCodeChain(memmap *cm,char c, pCode *pc); // Create a new pBlock
 void pic16_printpBlock(FILE *of, pBlock *pb);      // Write a pBlock to a file

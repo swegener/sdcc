@@ -39,17 +39,22 @@
 #define CONFIGURATION_WORDS	20
 
 typedef struct {
+	int sfrLoAddr;
+	int sfrHiAddr;
+} sfrRangeInfo_t;
+	
+
+typedef struct {
 	int mask;
 	int emit;
 	int value;
-} configRegInfo;
+} configRegInfo_t;
 
 typedef struct {
 	int confAddrStart;	/* starting address */
 	int confAddrEnd;	/* ending address */
-	configRegInfo crInfo[ CONFIGURATION_WORDS ];
-} configWordsInfo;
-
+	configRegInfo_t crInfo[ CONFIGURATION_WORDS ];
+} configWordsInfo_t;
 
 
 #define PROCESSOR_NAMES    4
@@ -57,11 +62,12 @@ typedef struct {
 typedef struct PIC16_device {
   char *name[PROCESSOR_NAMES];/* aliases for the processor name */
 
-  int maxRAMaddress;          /* maximum value for a data address */
-  int bankMask;               /* Bitmask that is ANDed with address to extract banking bits */
-  int RAMsize;		      /* size of Data RAM - VR 031120 */
-  int extMIface;               /* device has external memory interface */
-  configWordsInfo cwInfo;	/* configuration words info */
+  int maxRAMaddress;		/* maximum value for a data address */
+  int RAMsize;			/* size of Data RAM - VR 031120 */
+  int acsSplitOfs;		/* access bank split offset */
+  int extMIface;		/* device has external memory interface */
+  sfrRangeInfo_t sfrRange;	/* SFR range */
+  configWordsInfo_t cwInfo;	/* configuration words info */
 } PIC16_device;
 
 /* Given a pointer to a register, this macro returns the bank that it is in */

@@ -208,6 +208,8 @@ extern int pic16_debug_verbose;
 extern int pic16_ralloc_debug;
 extern int pic16_pcode_verbose;
 
+int pic16_enable_peeps=0;
+
 OPTION pic16_optionsTable[]= {
 	{ 0,	"--pno-banksel",	&pic16_options.no_banksel,	"do not generate BANKSEL assembler directives"},
 	{ 0,	OPT_BANKSEL,		NULL,				"set banksel optimization level (default=0 no)"},
@@ -224,6 +226,8 @@ OPTION pic16_optionsTable[]= {
 
 	{ 0,	ALT_ASM,	NULL,	"Use alternative assembler"},
 	{ 0,	ALT_LINK,	NULL,	"Use alternative linker"},
+
+	{ 0,	"--denable-peeps",	&pic16_enable_peeps,	"explicit enable of peepholes"},
 
 	{ 0,	NULL,		NULL,	NULL}
 	};
@@ -332,6 +336,10 @@ _pic16_finaliseOptions (void)
 
 	/* peepholes are disabled for the time being */
 	options.nopeep = 1;
+
+	/* explicit enable peepholes for testing */
+	if(pic16_enable_peeps)
+		options.nopeep = 0;
 
 	options.all_callee_saves = 1;		// always callee saves
 //	options.float_rent = 1;

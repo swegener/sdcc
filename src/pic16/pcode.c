@@ -3646,7 +3646,8 @@ pCode *pic16_newpCodeLabel(char *name, int key)
   pcl->pc.print = pCodePrintLabel;
 
   pcl->key = key;
-
+  pcl->force = 0;
+  
   pcl->label = NULL;
   if(key>0) {
     sprintf(s,"_%05d_DS_",key);
@@ -3662,6 +3663,15 @@ pCode *pic16_newpCodeLabel(char *name, int key)
 
   return ( (pCode *)pcl);
 
+}
+
+pCode *pic16_newpCodeLabelFORCE(char *name, int key)
+{
+  pCodeLabel *pcl = (pCodeLabel *)pic16_newpCodeLabel(name, key);
+  
+	pcl->force = 1;
+  
+  return ( (pCode *)pcl );
 }
 
 
@@ -3843,6 +3853,8 @@ pCodeOp *pic16_newpCodeOpWild(int id, pCodeWildBlock *pcwb, pCodeOp *subtype)
   PCOW(pcop)->subtype = subtype;
   PCOW(pcop)->matched = NULL;
 
+  PCOW(pcop)->pcop2 = NULL;
+  
   return pcop;
 }
 
@@ -3854,23 +3866,41 @@ pCodeOp *pic16_newpCodeOpWild2(int id, int id2, pCodeWildBlock *pcwb, pCodeOp *s
   pCodeOp *pcop;
 
 
-  if(!pcwb || !subtype || !subtype2) {
-    fprintf(stderr, "Wild opcode declaration error: %s-%d\n",__FILE__,__LINE__);
-    exit(1);
-  }
+	if(!pcwb || !subtype || !subtype2) {
+		fprintf(stderr, "Wild opcode declaration error: %s-%d\n",__FILE__,__LINE__);
+		exit(1);
+	}
 
-  pcop = Safe_calloc(1,sizeof(pCodeOpWild));
-  pcop->type = PO_WILD;
-  sprintf(s,"%%%d",id);
-  pcop->name = Safe_strdup(s);
+	pcop = Safe_calloc(1,sizeof(pCodeOpWild));
+	pcop->type = PO_WILD;
+	sprintf(s,"%%%d",id);
+	pcop->name = Safe_strdup(s);
 
-  PCOW(pcop)->id = id;
-  PCOW(pcop)->pcwb = pcwb;
-  PCOW(pcop)->subtype = subtype;
-  PCOW(pcop)->matched = NULL;
+	PCOW(pcop)->id = id;
+	PCOW(pcop)->pcwb = pcwb;
+	PCOW(pcop)->subtype = subtype;
+	PCOW(pcop)->matched = NULL;
 
-  PCOW(pcop)->id2 = id2;
-  PCOW(pcop)->subtype2 = subtype2;
+	PCOW(pcop)->pcop2 = Safe_calloc(1, sizeof(pCodeOpWild));
+
+	if(!subtype2->name) {
+		PCOW(pcop)->pcop2 = Safe_calloc(1, sizeof(pCodeOpWild));
+		PCOW2(pcop)->pcop.type = PO_WILD;
+		sprintf(s, "%%%d", id2);
+		PCOW2(pcop)->pcop.name = Safe_strdup(s);
+		PCOW2(pcop)->id = id2;
+		PCOW2(pcop)->subtype = subtype2;
+
+//		fprintf(stderr, "%s:%d %s [wild,wild] for name: %s (%d)\tname2: %s (%d)\n", __FILE__, __LINE__, __FUNCTION__,
+//				pcop->name, id, PCOW2(pcop)->pcop.name, id2);
+	} else {
+		PCOW2(pcop)->pcop2 = pic16_pCodeOpCopy( subtype2 );
+
+//		fprintf(stderr, "%s:%d %s [wild,str] for name: %s (%d)\tname2: %s (%d)\n", __FILE__, __LINE__, __FUNCTION__,
+//				pcop->name, id, PCOW2(pcop)->pcop.name, id2);
+	}
+  
+
 
   return pcop;
 }
@@ -6175,7 +6205,8 @@ static void pBlockRemoveUnusedLabels(pBlock *pb)
     /* This pCode is a label, so search the pBlock to see if anyone
      * refers to it */
 
-    if( (pcl->key>0) && (!findInstructionUsingLabel(pcl, pb->pcHead))) {
+    if( (pcl->key>0) && (!findInstructionUsingLabel(pcl, pb->pcHead))
+    	&& (!pcl->force)) {
     //if( !findInstructionUsingLabel(pcl, pb->pcHead)) {
       /* Couldn't find an instruction that refers to this label
        * So, unlink the pCode label from it's pCode chain

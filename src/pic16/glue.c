@@ -132,8 +132,9 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms)) {
 
 #if 0
-		fprintf(stderr, "\t%s: sym: %s\tused: %d\textern: %d\tstatic: %d\n",
-			map->sname, sym->name, sym->used, IS_EXTERN(sym->etype), IS_STATIC(sym->etype));
+		fprintf(stderr, "\t%s: sym: %s\tused: %d\textern: %d\tstatic: %d\taggregate: %d\n",
+			map->sname, sym->name, sym->used, IS_EXTERN(sym->etype), IS_STATIC(sym->etype),
+			IS_AGGREGATE(sym->type));
 		printTypeChain( sym->type, stderr );
 		fprintf(stderr, "\n");
 #endif
@@ -168,7 +169,6 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 			!IS_STATIC (sym->etype) && !IS_FUNC(sym->type)) {
 		  
 			checkAddSym(&publics, sym);
-//			addSetHead(&publics, sym);
 		} else
 			if(IS_STATIC(sym->etype)
 				&& !(sym->ival && !sym->level)
@@ -272,7 +272,11 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 					sym->implicit = 1;		// mark as implicit
 #endif
 				if(!sym->ival) {
-					reg = pic16_allocDirReg( operandFromSymbol( sym ) );
+					if(IS_AGGREGATE(sym->type)) {
+						reg=pic16_allocRegByName(sym->rname, getSize( sym->type ), NULL);
+					} else {
+						reg = pic16_allocDirReg( operandFromSymbol( sym ) );
+					}
 					if(checkAddReg(&pic16_rel_udata, reg)) {
 						addSetHead(&publics, sym);
 					}
@@ -619,11 +623,10 @@ pic16emitStaticSeg (memmap * map)
 	fprintf(stderr, "\n");
 #endif
 
-        if(SPEC_ABSA(sym->etype)
-             && (SPEC_ABSA(sym->etype) && PIC16_IS_CONFIG_ADDRESS(SPEC_ADDR(sym->etype)))) {
+        if(SPEC_ABSA(sym->etype) && PIC16_IS_CONFIG_ADDRESS(SPEC_ADDR(sym->etype))) {
              
-		pic16_assignConfigWordValue(SPEC_ADDR (sym->etype),
-			(int) floatFromVal(list2val( sym->ival )));
+		pic16_assignConfigWordValue(SPEC_ADDR(sym->etype),
+			(int) floatFromVal(list2val(sym->ival)));
 
 		continue;
         }

@@ -1,3 +1,23 @@
+2004-06-07 Vangelis Rokas <vrokas AT otenet.gr>
+
+	Cumulative patch for pic16 port:
+	* src/pic16/device.h (typedef PIC16_device) modified fields for
+	defining microcontrollers,
+	* src/pic16/device.c: added new info for all devices in Pics16 array,
+	* src/pic16/gen.c (genPcall): fixed bug that caused the return label
+	to be optimised out by the pCode optimiser,
+	* src/pic16/glue.c (pic16emitRegularMap): treat implicit aggragates
+	specially, bug reported by G.M. Gallant,
+	* src/pic16/pcode.c (pic16_newpCodeLabelFORCE): NEW, marks a label
+	as force'd so that cannot be optimised out by pCode optimiser,
+	* src/pic16/pcode.c,
+	* src/pic16/pcodepeeph.c,
+	* src/pic16/pcoderegs.c: many modifications to re-enable peepholes,
+	they are disabled by default, but can be enabled explicit with
+	command argument --denable-peeps, for testing,
+        * device/lib/pic16/startup/Makefile: added --no-peep,--pomit-config-words,
+        --pomit-ivt in COMPILE_FLAGS
+ 
 2004-06-06 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/pic16/pcode.c (pic16_emitDB): removed double semicolon which fails

@@ -1143,16 +1143,19 @@ operandOperation (operand * left, operand * right,
 			       operandLitValue (right));
       break;
     case BITWISEAND:
-      retval = operandFromLit ((unsigned long)operandLitValue(left) & 
-			       (unsigned long)operandLitValue(right));
+      retval = operandFromValue (valCastLiteral (type,
+                                                 (unsigned long)operandLitValue(left) &
+			                         (unsigned long)operandLitValue(right)));
       break;
     case '|':
-      retval = operandFromLit ((unsigned long)operandLitValue (left) |
-			       (unsigned long)operandLitValue (right));
+      retval = operandFromValue (valCastLiteral (type,
+                                                 (unsigned long)operandLitValue(left) |
+			                         (unsigned long)operandLitValue(right)));
       break;
     case '^':
-      retval = operandFromLit ((unsigned long)operandLitValue (left) ^
-			       (unsigned long)operandLitValue (right));
+      retval = operandFromValue (valCastLiteral (type,
+                                                 (unsigned long)operandLitValue(left) ^
+			                         (unsigned long)operandLitValue(right)));
       break;
     case AND_OP:
       retval = operandFromLit (operandLitValue (left) &&

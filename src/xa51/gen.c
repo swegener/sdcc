@@ -1896,6 +1896,8 @@ static void
 genDummyRead (iCode * ic)
 {
   emitcode (";     genDummyRead","");
+
+  ic = ic;
 }
 
 /*-----------------------------------------------------------------*/

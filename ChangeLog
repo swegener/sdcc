@@ -1,3 +1,14 @@
+2003-07-24  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCicode.c (operandOperation): really fixed problem with bitops
+	* support/regression/tests/bitopcse.c: added
+	fixed warning:
+	* src/avr/gen.c:
+	* src/pic/gen.c:
+	* src/pic16/gen.c:
+	* src/z80/gen.c:
+	* src/xa51/gen.c:
+
 2003-07-24  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
     added support for new library format to z80, gbz80 linkers:
@@ -38,7 +49,7 @@
 
 2003-07-20  Bernhard Held <bernhard@bernhardheld.de>
 
-        * src/pic16/glue.c: minor cleanup by Vangelis
+	* src/pic16/glue.c: minor cleanup by Vangelis
 
 2003-07-19  Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
@@ -49,7 +60,7 @@
         * device/lib/_ser.c: process RX bytes earlier than TX bytes
         * device/lib/serial.c: process RX bytes earlier than TX bytes
         * src/mcs51/gen.c(genGenPointerGet/Set): removed writing of type after postincrement
-        
+
 2003-07-18  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/z80/gen.c: fixed some right shift bugs (#772726 among them)
@@ -60,15 +71,15 @@
 
 2003-07-17  Bernhard Held <bernhard@bernhardheld.de>
 
-        * device/lib/Makefile.in: bad fix, reverted to 1.43
-	
+	* device/lib/Makefile.in: bad fix, reverted to 1.43
+
 2003-07-16  Bernhard Held <bernhard@bernhardheld.de>
 
 	* device/lib/Makefile.in: added missing z80 object files
 
 2003-07-14  Bernhard Held <bernhard@bernhardheld.de>
 
-        * src/SDCCcse.c (algebraicOpts): CSE fun with &|^ and 0x00/0xff literals
+	* src/SDCCcse.c (algebraicOpts): CSE fun with &|^ and 0x00/0xff literals
 	pic16 progress by Vangelis:
 	* src/SDCCglobl.h:
 	* src/SDCCmain.c:
@@ -201,7 +212,7 @@
 2003-06-08  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	* support/Util/SDCCerr.c, src/SDCCglobl.h, src/SDCCmain.c, doc/sdccman.lyx:
-	added option --vc, so sdcc errors and warnings are compatible with 
+	added option --vc, so sdcc errors and warnings are compatible with
 	Microsoft Visual Studio.
 
 2003-06-07  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
@@ -232,7 +243,7 @@
 2003-05-29  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/pic/device.c: added 16F819, patch by "David I. Lehn" <dlehn@vt.edu>
-	* src/SDCCcse.c (algebraicOpts): fixed "c * 1" 
+	* src/SDCCcse.c (algebraicOpts): fixed "c * 1"
 
 2003-05-28  Bernhard Held <bernhard@bernhardheld.de>
 

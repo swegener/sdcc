@@ -5095,7 +5095,7 @@ genDummyRead (iCode * ic)
   emitcode (";     genDummyRead","");
   emitcode (";     not implemented","");
 
-  ic;
+  ic = ic;
 }
 
 /*-----------------------------------------------------------------*/

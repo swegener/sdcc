@@ -9972,7 +9972,7 @@ genDummyRead (iCode * ic)
   pic16_emitcode ("; genDummyRead","");
   pic16_emitcode ("; not implemented","");
 
-  ic;
+  ic = ic;
 }
 
 /*-----------------------------------------------------------------*/

@@ -9912,7 +9912,7 @@ genDummyRead (iCode * ic)
   pic14_emitcode ("; genDummyRead","");
   pic14_emitcode ("; not implemented","");
 
-  ic;
+  ic = ic;
 }
 
 /*-----------------------------------------------------------------*/

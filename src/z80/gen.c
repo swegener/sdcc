@@ -6714,7 +6714,7 @@ genDummyRead (iCode * ic)
 {
   emit2 ("; genDummyRead not implemented");
 
-  ic;
+  ic = ic;
 }
 
 enum

@@ -1,3 +1,5 @@
+#define __16F873
+#include "p16f873.h"
 // Compound comparisons
 
 unsigned char success = 0;

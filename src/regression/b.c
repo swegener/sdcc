@@ -1,3 +1,5 @@
+#define __16F873
+#include "p16f873.h"
 
 unsigned char failures = 0;
 unsigned char dummy = 0;

@@ -1,3 +1,5 @@
+#define __16F873
+#include "p16f873.h"
 // Signed comparisons of the form:  (variable>LIT)
 //
 // This regression test exercises all of the boundary

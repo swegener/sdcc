@@ -1,3 +1,5 @@
+#define __16F873
+#include "p16f873.h"
 // Shift ints left and right
 
 unsigned char success=0;

@@ -34,151 +34,43 @@
 #define STRCASECMP strcasecmp
 #endif
 
-/* 16F627 */
-memRange p16f627_mem[] = {
-  {0x20,  0x6f,  0x00,  0},
-  {0xa0,  0xef,  0x00,  1},
-  {0x120, 0x14f, 0x00,  2},
-  {0x70,  0x7f,  0x180, 0},
-  {-1,    -1,    -1,   -1}     /* end indicator */
-};
-memRange p16f627_sfr[] = {
-  {0x00,  0x00,  0x180, 0},
-  {0x01,  0x01,  0x100, 0},
-  {0x02,  0x04,  0x180, 0},
-  {0x05,  0x05,  0x000, 0},
-  {0x06,  0x06,  0x100, 0},
-  {0x81,  0x81,  0x100, 1},
-  {0x85,  0x85,  0x000, 1},
-  {0x86,  0x86,  0x100, 1},
-  {0x0a,  0x0b,  0x180, 0},
-  {0x0c,  0x0c,  0x000, 0},
-  {0x0e,  0x12,  0x000, 0},
-  {0x15,  0x1a,  0x000, 0},
-  {0x1f,  0x1f,  0x000, 0},
-  {0x8e,  0x8e,  0x000, 1},
-  {0x92,  0x92,  0x000, 1},
-  {0x98,  0x9d,  0x000, 1},
-  {0x9f,  0x9f,  0x000, 1},
-
-  {-1,    -1,    -1,   -1}     /* end indicator */
-};
-
-/* 16F84 */
-memRange p16f84_mem[] = {
-  {0x0c,  0x4f,  0x80,  0},
-  {-1,    -1,    -1,   -1}     /* end indicator */
-};
-memRange p16f84_sfr[] = {
-  {0x01,  0x01,  0x00, 0},
-  {0x02,  0x04,  0x80, 0},
-  {0x05,  0x06,  0x00, 0},
-  {0x81,  0x81,  0x00, 1},
-  {0x85,  0x86,  0x00, 1},
-  {0x08,  0x09,  0x00, 0},
-  {0x88,  0x89,  0x00, 1},
-  {0x0a,  0x0b,  0x80, 0},
-  {-1,    -1,    -1,   -1}     /* end indicator */
-};
-
-/* 16F877 */
-memRange p16f877_mem[] = {
-  {0x20,  0x6f,  0x00,  0},
-  {0xa0,  0xef,  0x00,  1},
-  {0x110, 0x16f, 0x00,  2},
-  {0x190, 0x1ef, 0x00,  3},
-  {0x70,  0x7f,  0x180, 0},
-  {-1,    -1,    -1,   -1}     /* end indicator */
-};
-memRange p16f877_sfr[] = {
-  {0x00,  0x00,  0x180, 0},
-  {0x01,  0x01,  0x100, 0},
-  {0x02,  0x04,  0x180, 0},
-  {0x05,  0x05,  0x000, 0},
-  {0x85,  0x85,  0x000, 1},
-  {0x81,  0x81,  0x100, 1},
-  {0x06,  0x06,  0x100, 0},
-  {0x86,  0x86,  0x100, 1},
-  {0x07,  0x09,  0x000, 0},
-  {0x87,  0x89,  0x000, 1},
-  {0x0a,  0x0b,  0x180, 0},
-  {0x0c,  0x1f,  0x000, 0},
-  {0x8c,  0x8e,  0x000, 1},
-  {0x91,  0x94,  0x000, 1},
-  {0x98,  0x99,  0x000, 1},
-  {0x9e,  0x9f,  0x000, 1},
-  {0x10c, 0x10f, 0x000, 2},
-  {0x18c, 0x18f, 0x000, 3},
-
-  {-1,    -1,    -1,   -1}     /* end indicator */
-};
-
-/* 16F873 */
-memRange p16f873_mem[] = {
-  {0x20,  0x7f,  0x100, 0},
-  {0xa0,  0xff,  0x100, 1},
-  {-1,    -1,    -1,   -1}     /* end indicator */
-};
-memRange p16f873_sfr[] = {
-  {0x00,  0x00,  0x180, 0},
-  {0x01,  0x01,  0x100, 0},
-  {0x02,  0x04,  0x180, 0},
-  {0x05,  0x05,  0x000, 0},
-  {0x85,  0x85,  0x000, 1},
-  {0x81,  0x81,  0x100, 1},
-  {0x06,  0x06,  0x100, 0},
-  {0x86,  0x86,  0x100, 1},
-  {0x07,  0x09,  0x000, 0},
-  {0x87,  0x89,  0x000, 1},
-  {0x0a,  0x0b,  0x180, 0},
-  {0x0c,  0x1f,  0x000, 0},
-  {0x8c,  0x8e,  0x000, 1},
-  {0x91,  0x94,  0x000, 1},
-  {0x98,  0x99,  0x000, 1},
-  {0x9e,  0x9f,  0x000, 1},
-  {0x10c, 0x10f, 0x000, 2},
-  {0x18c, 0x18f, 0x000, 3},
-
-  {-1,    -1,    -1,   -1}     /* end indicator */
-};
-
 static PIC_device Pics[] = {
   {
     {"p16f627", "16f627", "pic16f627", "f627"}, /* processor name */
-    p16f627_mem,                     /* ram mem map */
-    p16f627_sfr,                     /* sfr mem map */
+    (memRange *)NULL,
+    (memRange *)NULL,
     0,                               /* max ram address (calculated) */
     0x80,                            /* Bank Mask */
   },
 
   {
     {"p16f628", "16f628", "pic16f628", "f628"},
-    p16f627_mem,
-    p16f627_sfr,
+    (memRange *)NULL,
+    (memRange *)NULL,
     0,
     0x80,
   },
 
   {
     {"p16f84", "16f84", "pic16f84", "f84"},
-    p16f84_mem,
-    p16f84_sfr,
+    (memRange *)NULL,
+    (memRange *)NULL,
     0,
     0x80,
   },
 
   {
     {"p16f873", "16f873", "pic16f873", "f873"},
-    p16f873_mem,
-    p16f873_sfr,
+    (memRange *)NULL,
+    (memRange *)NULL,
     0,
     0x180,
   },
 
   {
     {"p16f877", "16f877", "pic16f877", "f877"},
-    p16f877_mem,
-    p16f877_sfr,
+    (memRange *)NULL,
+    (memRange *)NULL,
     0,
     0x180,
   },
@@ -198,50 +90,61 @@ AssignedMemory *finalMapping=NULL;
 
 static unsigned int config_word = DEFAULT_CONFIG_WORD;
 
-/*-----------------------------------------------------------------*
- *
- * void addMem(memRange *ranges,int type)
- *
- *
- *-----------------------------------------------------------------*/
-
-static void addMem(memRange *ranges,int type)
+void addMemRange(memRange *r, int type)
 {
-  memRange *r = ranges;
   int i;
+  int alias = r->alias;
+
+  if (pic->maxRAMaddress < 0) {
+    fprintf(stderr, "missing \"#pragma maxram\" setting\n");
+    return;
+  }
 
   do {
-
-    int alias = r->alias;
-
-    do {
-
-      for(i=r->start_address; i<= r->end_address; i++) {
-	if(i <= pic->maxRAMaddress) {
-	  finalMapping[i | alias].isValid = 1;
-	  finalMapping[i | alias].alias = r->alias;
-	  finalMapping[i | alias].bank  = r->bank;
-	  if(type) {
-	    /* hack for now */
-	    finalMapping[i | alias].isSFR  = 1;
-	  } else
-	    finalMapping[i | alias].isSFR  = 0;
+    for (i=r->start_address; i<= r->end_address; i++) {
+      if (i <= pic->maxRAMaddress) {
+	finalMapping[i | alias].isValid = 1;
+	finalMapping[i | alias].alias = r->alias;
+	finalMapping[i | alias].bank  = r->bank;
+	if(type) {
+	  /* hack for now */
+	  finalMapping[i | alias].isSFR  = 1;
+	} else {
+	  finalMapping[i | alias].isSFR  = 0;
 	}
       }
+    }
 
-      /* Decrement alias */
-      if(alias)
-	alias -= ((alias & (alias - 1)) ^ alias);
-	else
-	  alias--;
-	
-    } while(alias >= 0);
+    /* Decrement alias */
+    if (alias) {
+      alias -= ((alias & (alias - 1)) ^ alias);
+    } else {
+      alias--;
+    }
 
-    r++;
+  } while (alias >= 0);
+}
 
-  } while (r->start_address >= 0);
+void setMaxRAM(int size)
+{
+  int i;
+  pic->maxRAMaddress = size;
 
+  if (pic->maxRAMaddress < 0) {
+    fprintf(stderr, "invalid \"#pragma maxram 0x%x\" setting\n",
+	    pic->maxRAMaddress);
+    return;
+  }
 
+  finalMapping = Safe_calloc(1+pic->maxRAMaddress,
+			     sizeof(AssignedMemory));
+
+  /* Now initialize the finalMapping array */
+
+  for(i=0; i<=pic->maxRAMaddress; i++) {
+    finalMapping[i].reg = NULL;
+    finalMapping[i].isValid = 0;
+  }
 }
 
 /*-----------------------------------------------------------------*
@@ -274,45 +177,6 @@ int REGallBanks(regs *reg)
 /*-----------------------------------------------------------------*
  *-----------------------------------------------------------------*/
 
-static void addMaps(PIC_device *pPic)
-{
-  int i;
-  memRange *r;
-
-  if(!pPic)
-    return;
-
-
-  /* First, find the maximum address */
-
-  r = pPic->ram;
-  pPic->maxRAMaddress = 0;
-
-  do {
-
-    if((r->end_address | r->alias) > pPic->maxRAMaddress)
-      pPic->maxRAMaddress = r->end_address | r->alias;
-
-    r++;
-
-  } while (r->start_address >= 0);
-
-
-
-  finalMapping = Safe_calloc(1+pPic->maxRAMaddress, sizeof(AssignedMemory));
-
-  /* Now initialize the finalMapping array */
-
-  for(i=0; i<=pPic->maxRAMaddress; i++) {
-    finalMapping[i].reg = NULL;
-    finalMapping[i].isValid = 0;
-  }
-
-  addMem(pPic->ram,0); /* add general purpose regs to the map */
-  addMem(pPic->sfr,1); /* Add SFR's to the memmap */
-
-}
-
 /*
  *  dump_map -- debug stuff
  */
@@ -343,6 +207,11 @@ void dump_cblock(FILE *of)
   int bank_base;
 
   //dump_map();   /* display the register map */
+
+  if (pic->maxRAMaddress < 0) {
+    fprintf(stderr, "missing \"#pragma maxram\" setting\n");
+    return;
+  }
 
   do {
 
@@ -497,10 +366,7 @@ void init_pic(char *pic_type)
     exit(1);
   }
 
-  
-  addMaps(pic);
-
-
+  pic->maxRAMaddress = -1;
 }
 
 /*-----------------------------------------------------------------*
@@ -529,6 +395,11 @@ int validAddress(int address, int reg_size)
 {
   int i;
 
+  if (pic->maxRAMaddress < 0) {
+    fprintf(stderr, "missing \"#pragma maxram\" setting\n");
+    return 0;
+  }
+
   if(address > pic->maxRAMaddress)
     return 0;
 
@@ -549,6 +420,11 @@ void mapRegister(regs *reg)
 
   if(!reg || !reg->size) {
     fprintf(stderr,"WARNING: %s:%s:%d Bad register\n",__FILE__,__FUNCTION__,__LINE__);
+    return;
+  }
+
+  if (pic->maxRAMaddress < 0) {
+    fprintf(stderr, "missing \"#pragma maxram\" setting\n");
     return;
   }
 

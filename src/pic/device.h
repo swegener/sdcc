@@ -96,5 +96,7 @@ void assignConfigWordValue(int address, int value);
 int getConfigWord(int address);
 int isREGinBank(regs *reg, int bank);
 int REGallBanks(regs *reg);
+void addMemRange(memRange *r, int type);
+void setMaxRAM(int size);
 
 #endif  /* __DEVICE_H__ */

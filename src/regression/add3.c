@@ -1,3 +1,5 @@
+#define __16F873
+#include "p16f873.h"
 
 // Addition tests - mostly int's
 

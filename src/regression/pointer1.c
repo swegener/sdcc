@@ -1,4 +1,6 @@
-//#include "p16c84.h"
+#define __16F873
+#include "p16f873.h"
+
 // Pointer tests
 
 unsigned char success = 0;

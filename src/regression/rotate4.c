@@ -1,3 +1,5 @@
+#define __16F873
+#include "p16f873.h"
 // rotate bytes left and right by a constant.
 
 unsigned char success=0;

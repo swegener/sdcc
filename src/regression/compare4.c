@@ -1,3 +1,5 @@
+#define __16F873
+#include "p16f873.h"
 //
 // compare4.c
 // regression testing program for comparing signed chars and ints

@@ -8,6 +8,7 @@
 #include "main.h"
 #include "ralloc.h"
 #include "device.h"
+#include "SDCCutil.h"
 //#include "gen.h"
 
 
@@ -72,6 +73,70 @@ _pic14_regparm (sym_link * l)
   //  return 0;
 
   regParmFlg++;// = 1;
+  return 1;
+}
+
+static int
+_process_pragma(const char *sz)
+{
+  static const char *WHITE = " \t";
+  char	*ptr = strtok((char *)sz, WHITE);
+
+  if (startsWith (ptr, "memmap"))
+    {
+      char	*start;
+      char	*end;
+      char	*type;
+      char	*alias;
+
+      start = strtok((char *)NULL, WHITE);
+      end = strtok((char *)NULL, WHITE);
+      type = strtok((char *)NULL, WHITE);
+      alias = strtok((char *)NULL, WHITE);
+
+      if (start != (char *)NULL
+	  && end != (char *)NULL
+	  && type != (char *)NULL) {
+	value		*startVal = constVal(start);
+	value		*endVal = constVal(end);
+	value		*aliasVal;
+	memRange	r;
+
+	if (alias == (char *)NULL) {
+	  aliasVal = constVal(0);
+	} else {
+	  aliasVal = constVal(alias);
+	}
+
+	r.start_address = (int)floatFromVal(startVal);
+	r.end_address = (int)floatFromVal(endVal);
+	r.alias = (int)floatFromVal(aliasVal);
+	r.bank = (r.start_address >> 7) & 3;
+
+	if (strcmp(type, "RAM") == 0) {
+	  addMemRange(&r, 0);
+	} else if (strcmp(type, "SFR") == 0) {
+	  addMemRange(&r, 1);
+	} else {
+	  return 1;
+	}
+      }
+
+      return 0;
+    } else if (startsWith (ptr, "maxram")) {
+      char *maxRAM = strtok((char *)NULL, WHITE);
+
+      if (maxRAM != (char *)NULL) {
+	int	maxRAMaddress;
+	value 	*maxRAMVal;
+
+	maxRAMVal = constVal(maxRAM);
+	maxRAMaddress = (int)floatFromVal(maxRAMVal);
+	setMaxRAM(maxRAMaddress);
+      }
+	
+      return 0;
+    }
   return 1;
 }
 
@@ -354,7 +419,7 @@ PORT pic_port =
   NULL, // _pic14_genXINIT
   _pic14_reset_regparm,
   _pic14_regparm,
-  NULL,
+  _process_pragma,				/* process a pragma */
   NULL,
   _hasNativeMulFor,
   FALSE,

@@ -1,3 +1,5 @@
+#define __16F873
+#include "p16f873.h"
 //
 // compare3.c
 // regression testing program for comparing literals to variables

@@ -3192,7 +3192,7 @@ genPlus (iCode * ic)
     {
       if (aopGetUsesAcc (leftOp, offset) && aopGetUsesAcc (rightOp, offset))
 	{
-	  emitcode("mov", "b,acc");
+	  emitcode("mov", "b,a");
 	  MOVA (aopGet (leftOp,  offset, FALSE, TRUE));
 	  emitcode("xch", "a,b");
 	  MOVA (aopGet (rightOp, offset, FALSE, TRUE));

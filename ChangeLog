@@ -1,9 +1,9 @@
 2003-08-17  Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
-	The first rules relate to bitfields, the last speed up
+	Rules 246.x, 247.x relate to bitfields, the others speed up
 	access to xdata mapped I/O devices.
 
-	* src/mcs51/peeph.def: added 24 peepholes 246.x - 248.x
+	* src/mcs51/peeph.def: added 26 peepholes 246.x - 248.x, 180.x 
 
 2003-08-16  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 

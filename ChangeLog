@@ -1,3 +1,8 @@
+2003-03-22  Frieder Ferlemann <Frieder.Ferlemann@web.de>
+
+	* src/mcs51/gen.c (genCodePointerGet): quicker code for bug #700797
+	* src/mcs51/peeph.def: added rules 177, 241.x to 243, touched 181, 182.x, 193.x
+
 2003-03-22    <johan@balder>
 
 	* src/SDCCicode.c (geniCodeDerefPtr): fixed bug #698231

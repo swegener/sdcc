@@ -70,6 +70,8 @@
    Dallas DS89C420 definitions corrected by B. Torok / bela.torok@kssg.ch
    Revised by lanius@ewetel.net
 
+   Version 1.0.9 (Sept 9, 2002)
+   Register declarations for the Atmel T89C51RD2 added by Johannes Hoelzl / johannes.hoelzl@gmx.de
 
    Adding support for additional microcontrollers:
    -----------------------------------------------
@@ -84,7 +86,7 @@
           a. An entry with the inventory of the register set of the
              microcontroller in the  "Describe microcontrollers" section.
 
-          b. If necessary add entry(s) in for registers not defined in this file
+          b. If necessary add entry(s) for registers not defined in this file
 
           c. Define interrupt vectors
 
@@ -127,6 +129,7 @@
    MICROCONTROLLER_SAB80515     Infineon / Siemens SAB80515 & SAB80535
    MICROCONTROLLER_SAB80515A    Infineon / Siemens SAB80515A
    MICROCONTROLLER_SAB80517     Infineon / Siemens SAB80517
+   MICROCONTROLLER_T89C51RD2    Atmel T89C51RD2
 
    Additional definitions (use them prior the #include mcs51reg.h statement):
 
@@ -543,7 +546,7 @@
 #define DPL1
 #define DPH1
 #define DPS__x__x__x__x__x__x__x__SEL
-#define CKCON
+#define CKCON__WD1__WD0__T2M__T1M__TOM__MD2__MD1__MD0
 #define EXIF__IE5__IE4__IE3__IE2__x__RGMD__RGSL__BGS
 #define SADDR0
 #define SADDR1
@@ -607,7 +610,7 @@
 #define DPL1
 #define DPH1
 #define DPS__ID1__ID0__TSL__x__x__x__x__SEL
-#define CKCON
+#define CKCON__WD1__WD0__T2M__T1M__TOM__MD2__MD1__MD0
 #define EXIF__IE5__IE4__IE3__IE2__CKRY__RGMD__RGSL__BGS
 #define P4CNT
 #define DPX
@@ -735,7 +738,7 @@
 #define DPL1
 #define DPH1
 #define DPS__ID1__ID0__TSL__AID__x__x__x__SEL
-#define CKCON
+#define CKCON__WD1__WD0__T2M__T1M__TOM__MD2__MD1__MD0
 #define CKMOD
 #define IP0__x__LPS1__LPT2__LPS0__LPT1__LPX1__LPT0__LPX0
 #define IP1__x__MPS1__MPT2__MPS0__MPT1__MPX1__MPT0__MPX0
@@ -804,7 +807,7 @@
 #define DPL1
 #define DPH1
 #define DPS__x__x__x__x__x__x__x__SEL
-#define CKCON
+#define CKCON__WD1__WD0__T2M__T1M__TOM__MD2__MD1__MD0
 #define EXIF__IE5__IE4__IE3__IE2__XT_RG__RGMD__RGSL__BGS
 #define PMR__CD1__CD0__SWB__x__XTOFF__ALEOFF__DME1__DME0
 #define SADDR0
@@ -887,7 +890,7 @@
 #define PWM1_AT_0XFD
 #define PWMP_AT_0XFE
 #define P1_EXT__SDA__SCL__RT2__T2__CT3I__CT2I__CT1I__CT0I
-#define P4_AT_0XC0
+#define P4_AT_0XC0__CMT0__CMT1__CMSR5__CMSR4__CMSR3__CMSR2__CMSR1__CMSR0
 #define P5_AT_0XC4
 #define RTE__TP47__TP46__RP45__RP44__RP43__RP42__RP41__RP40
 #define S1ADR__x__x__x__x__x__x__x__GC
@@ -1134,6 +1137,86 @@
 // end of definitions for the Infineon / Siemens SAB80517
 
 
+// definitions for the Atmel T89C51RD2
+#ifdef MICROCONTROLLER_T89C51RD2
+#ifdef MICROCONTROLLER_DEFINED
+#define MCS51REG_ERROR
+#endif
+#ifndef MICROCONTROLLER_DEFINED
+#define MICROCONTROLLER_DEFINED
+#endif
+#ifdef MCS51REG_ENABLE_WARNINGS
+#warning Selected HW: T89C51RD2
+#endif
+
+// 8051 register set
+#define P0
+#define SP
+#define DPL
+#define DPH
+#define PCON__SMOD1__SMOD0__x__POF__GF1__GF0__PD__IDL
+#define TCON
+#define TMOD
+#define TL0
+#define TL1
+#define TH0
+#define TH1
+#define P1
+#define SCON
+#define SBUF
+#define P2
+#define IE__EA__EC__ET2__ES__ET1__EX1__ET0__EX0
+#define SADDR
+#define P3
+#define IP__x__PPC__PT2__PS__PT1__PX1__PT0__PX0
+#define PSW
+#define ACC
+#define B
+
+// 8052 register set
+#define T2CON__TF2__EXF2__RCLK__TCLK__EXEN2__TR2__C_T2__CP_RL2
+#define RCAP2L
+#define RCAP2H
+#define TL2
+#define TH2
+
+// T89C51RD2 register set
+#define P4_AT_0XC0__P4_7__P4_6__P4_5__P4_3__P4_2__P4_1__P4_0
+#define P5_AT_0XE8
+#define SADEN0
+
+#define AUXR1
+#define WDTRST
+#define WDTPRG
+#define AUXR
+#define IPH
+#define FCON
+#define EECON
+#define EETIM
+#define CKCON__X2__T0X2__T1X2__T2X2__SiX2__PcaX2__WdX2__x
+#define CCON
+#define CMOD
+#define CCAPM0
+#define CCAPM1
+#define CCAPM2
+#define CCAPM3
+#define CCAPM4
+#define CL
+#define CCAP0L
+#define CCAP1L
+#define CCAP2L
+#define CCAP3L
+#define CCAP4L
+#define CH
+#define CCAP0H
+#define CCAP1H
+#define CCAP2H
+#define CCAP3H
+#define CCAP4H
+#endif /* MICROCONTROLLER_T89C51RD2 */
+/* end of definition for the Atmel T89C51RD2 */
+
+
 /////////////////////////////////////////////////////////
 ///  don't specify microcontrollers below this line!  ///
 /////////////////////////////////////////////////////////
@@ -1322,6 +1405,15 @@ sfr at 0xEF ARCON       ; // arithmetic control register SAB80517
 sfr at 0x9C AP          ; // DS80C390
 #endif
 
+#ifdef AUXR
+#undef AUXR
+sfr at 0x8E AUXR;
+#define AO     0x01
+#define EXTRAM 0x02
+#define XRS0   0x04
+#define XRS1   0x08
+#define M0     0x20
+#endif
 #ifdef B
 #undef B
 sfr at 0xF0 B    ;
@@ -1334,6 +1426,13 @@ sbit at 0xF4 BREG_F4        ;
 sbit at 0xF5 BREG_F5        ;
 sbit at 0xF6 BREG_F6        ;
 sbit at 0xF7 BREG_F7        ;
+#endif
+
+#ifdef AUXR1
+#undef AUXR1
+sfr at 0xA2 AUXR1;
+#define DPS       0x01
+#define GF3       0x08
 #endif
 
 #ifdef BP2
@@ -1656,6 +1755,88 @@ sfr at 0xDF C1TMA1      ; // DS80C390 specific
 sfr at 0xC9 CC4EN       ; // compare/capture 4 enable register SAB80517 specific
 #endif
 
+#ifdef CCAP0H 
+#undef CCAP0H 
+sfr at 0xFA CCAP0H;
+#endif
+
+#ifdef CCAP1H 
+#undef CCAP1H 
+sfr at 0xFB CCAP1H;
+#endif
+
+#ifdef CCAP2H 
+#undef CCAP2H 
+sfr at 0xFC CCAP2H;
+#endif
+
+#ifdef CCAP3H 
+#undef CCAP3H 
+sfr at 0xFD CCAP3H;
+#endif
+
+#ifdef CCAP4H 
+#undef CCAP4H 
+sfr at 0xFE CCAP4H;
+#endif
+
+#ifdef CCAP0L 
+#undef CCAP0L 
+sfr at 0xEA CCAP0L;
+#endif
+
+#ifdef CCAP1L 
+#undef CCAP1L 
+sfr at 0xEB CCAP1L;
+#endif
+
+#ifdef CCAP2L 
+#undef CCAP2L 
+sfr at 0xEC CCAP2L;
+#endif
+
+#ifdef CCAP3L 
+#undef CCAP3L 
+sfr at 0xED CCAP3L;
+#endif
+
+#ifdef CCAP4L 
+#undef CCAP4L 
+sfr at 0xEE CCAP4L;
+#endif
+
+#ifdef CCAPM0
+#undef CCAPM0
+sfr at 0x0DA CCAPM0;
+#define ECCF       0x01
+#define PWM        0x02
+#define TOG        0x04
+#define MAT        0x08
+#define CAPN       0x10
+#define CAPP       0x20
+#define ECOM       0x40
+#endif
+
+#ifdef CCAPM1
+#undef CCAPM1
+sfr at 0x0DB CCAPM1;
+#endif
+
+#ifdef CCAPM2
+#undef CCAPM2
+sfr at 0x0DC CCAPM2;
+#endif
+
+#ifdef CCAPM3 
+#undef CCAPM3 
+sfr at 0x0DD CCAPM3;
+#endif
+
+#ifdef CCAPM4
+#undef CCAPM4 
+sfr at 0x0DE CCAPM4;
+#endif
+
 #ifdef CCEN
 #undef CCEN
 sfr at 0xC1 CCEN        ; // compare/capture enable register SAB80515 specific
@@ -1701,8 +1882,26 @@ sfr at 0xC6 CCL3        ; // compare/capture register 3, low byte SAB80515 speci
 sfr at 0xCE CCL4        ; // compare/capture register 4, low byte SAB80515 specific
 #endif
 
-#ifdef CKCON
-#undef CKCON
+#ifdef CCON
+#undef CCON
+sfr at 0xD8 CCON;         // T89C51RD2 specific register
+// Bit registers
+sbit at 0xD8 CCF0;
+sbit at 0xD9 CCF1;
+sbit at 0xDA CCF2;
+sbit at 0xDB CCF3;
+sbit at 0xDC CCF4;
+sbit at 0xDD CR;
+sbit at 0xDE CF;
+#endif
+
+#ifdef CH
+#undef CH
+sfr at 0xF9 CH;
+#endif
+
+#ifdef CKCON__WD1__WD0__T2M__T1M__TOM__MD2__MD1__MD0
+#undef CKCON__WD1__WD0__T2M__T1M__TOM__MD2__MD1__MD0
 sfr at 0x8E CKCON       ; // DS80C320 & DS80C390 specific
 // Not directly accessible Bits.
 #define MD0    0x01
@@ -1715,6 +1914,18 @@ sfr at 0x8E CKCON       ; // DS80C320 & DS80C390 specific
 #define WD1    0x80
 #endif
 
+#ifdef CKCON__X2__T0X2__T1X2__T2X2__SiX2__PcaX2__WdX2__x
+#undef CKCON__X2__T0X2__T1X2__T2X2__SiX2__PcaX2__WdX2__x
+sfr at 0x8F CKCON;
+#define X2        0x01
+#define T0X2      0x02
+#define T1X2      0x04
+#define T2X2      0x08
+#define SiX2      0x10
+#define PcaX2     0x20
+#define WdX2      0x40
+#endif
+
 #ifdef CKMOD
 #undef CKMOD
 sfr at 0x96 CKMOD       ; // DS89C420 specific
@@ -1722,6 +1933,11 @@ sfr at 0x96 CKMOD       ; // DS89C420 specific
 #define T0MH   0x08
 #define T1MH   0x10
 #define T2MH   0x20
+#endif
+
+#ifdef CL 
+#undef CL 
+sfr at 0xE9 CL;
 #endif
 
 #ifdef CMEN
@@ -1837,6 +2053,16 @@ sfr at 0xAA CML1	; // Compare low 1, P80C552 specific
 #ifdef CML2_AT_0XAB
 #undef CML2_AT_0XAB
 sfr at 0xAB CML2	; // Compare low 2, P80C552 specific
+#endif
+
+#ifdef CMOD
+#undef CMOD
+sfr at 0xD9 CMOD;
+#define ECF        0x01
+#define CPS0       0x02
+#define CPS1       0x04
+#define WDTE       0x40
+#define CIDL       0x80
 #endif
 
 #ifdef CMSEL
@@ -2034,6 +2260,23 @@ sfr at 0x93 DPX1  ; // DS80C390 specific
 sfr at 0x95 DPX1  ; // DS80C390 specific
 #endif
 
+#ifdef EECON
+#undef EECON
+sfr at 0xD2 EECON;
+#define EEBUSY    0x01
+#define EEE       0x02
+#define EEPL0     0x10
+#define EEPL1     0x20
+#define EEPL2     0x40
+#define EEPL3     0x80
+#define EEPL      0xF0
+#endif
+
+#ifdef EETIM
+#undef EETIM
+sfr at 0xD3 EETIM;
+#endif
+
 #ifdef EIE__x__x__x__EWDI__EX5__EX4__EX3__EX2
 #undef EIE__x__x__x__EWDI__EX5__EX4__EX3__EX2
 sfr at 0xE8 EIE  ;
@@ -2167,6 +2410,20 @@ sfr at 0xD5 FCNTL  ;
 #define FBUSY  0x80
 #endif
 
+#ifdef FCON
+#undef FCON
+sfr at 0xD1 FCON;
+#define FBUSY     0x01
+#define FMOD0     0x02
+#define FMOD1     0x04
+#define FPS       0x08
+#define FPL0      0x10
+#define FPL1      0x20
+#define FPL2      0x40
+#define FPL3      0x80
+#define FPL       0xF0
+#endif
+
 #ifdef FDATA
 #undef FDATA
 sfr at 0xD6 FDATA  ;
@@ -2200,7 +2457,7 @@ sbit at 0xAF EA   ;
 #ifdef IE__EA__EAD__ES1__ES0__ET1__EX1__ET0__EX0
 #undef IE__EA__EAD__ES1__ES0__ET1__EX1__ET0__EX0
 sfr at 0xA8 IE		; // same as IEN0 - Interrupt enable 0, P80C552 specific
-sfr at 0xA8 IEN0    ; // alternate name
+sfr at 0xA8 IEN0        ; // alternate name
 // Bit registers
 sbit at 0xA8 EX0	;
 sbit at 0xA9 ET0	;
@@ -2210,6 +2467,18 @@ sbit at 0xAC ES0	;
 sbit at 0xAD ES1	;
 sbit at 0xAE EAD	;
 sbit at 0xAF EEA	;
+#endif
+
+#ifdef IE__EA__EC__ET2__ES__ET1__EX1__ET0__EX0
+#undef IE__EA__EC__ET2__ES__ET1__EX1__ET0__EX0
+sfr at 0xA8 IE;
+sbit at 0xA8 EX0;
+sbit at 0xA9 ET0;
+sbit at 0xAA ET1;
+sbit at 0xAB ES;
+sbit at 0xAC ET2;
+sbit at 0xAD EC;
+sbit at 0xAE EA;
 #endif
 
 #ifdef IE__EA__ES1__ET2__ES__ET1__EX1__ET0__EX0
@@ -2315,6 +2584,19 @@ sbit at 0xBD PS1	;
 sbit at 0xBE PAD	;
 #endif
 
+#ifdef IP__x__PPC__PT2__PS__PT1__PX1__PT0__PX0
+#undef IP__x__PPC__PT2__PS__PT1__PX1__PT0__PX0
+sfr at 0xB8 IP;
+// Bit registers
+sbit at 0xB8 PX0  ;
+sbit at 0xB9 PT0  ;
+sbit at 0xBA PX1  ;
+sbit at 0xBB PT1  ;
+sbit at 0xBC PS   ;
+sbit at 0xBD PT2  ;
+sbit at 0xBE PPC  ;
+#endif
+
 #ifdef IP__x__PS1__PT2__PS__PT1_PX1__PT0__PX0
 #undef IP__x__PS1__PT2__PS__PT1_PX1__PT0__PX0
 sfr at 0xB8 IP   ;
@@ -2403,6 +2685,18 @@ sbit at 0xFC PCM0	;
 sbit at 0xFD PCM1	;
 sbit at 0xFE PCM2	;
 sbit at 0xFF PT2	;
+#endif
+
+#ifdef IPH
+#undef IPH
+sfr at 0xB7 IPH;
+#define PX0H      0x01
+#define PT0H      0x02
+#define PX1H      0x04
+#define PT1H      0x08
+#define PSH       0x10
+#define PT2H      0x20
+#define PPCH      0x40
 #endif
 
 #ifdef IRCON
@@ -2676,8 +2970,8 @@ sbit at 0x86 P4_6       ;
 sbit at 0x87 P4_7       ;
 #endif
 
-#ifdef P4_AT_0XC0
-#undef P4_AT_0XC0
+#ifdef P4_AT_0XC0__CMT0__CMT1__CMSR5__CMSR4__CMSR3__CMSR2__CMSR1__CMSR0
+#undef P4_AT_0XC0__CMT0__CMT1__CMSR5__CMSR4__CMSR3__CMSR2__CMSR1__CMSR0
 sfr at 0xC0 P4		; // Port 4, P80C552 specific
 // Bit registers
 sbit at 0xC0 CMSR0	;
@@ -2688,6 +2982,20 @@ sbit at 0xC4 CMSR4	;
 sbit at 0xC5 CMSR5	;
 sbit at 0xC6 CMT0	;
 sbit at 0xC7 CMT1	;
+#endif
+
+#ifdef P4_AT_0XC0__P4_7__P4_6__P4_5__P4_3__P4_2__P4_1__P4_0
+#undef P4_AT_0XC0__P4_7__P4_6__P4_5__P4_3__P4_2__P4_1__P4_0
+sfr at 0xC0 P4          ; // Port 4, T89C51 specific
+// Bit registers
+sbit at 0xC0 P4_0       ;
+sbit at 0xC1 P4_1       ;
+sbit at 0xC2 P4_2       ;
+sbit at 0xC3 P4_3       ;
+sbit at 0xC4 P4_4       ;
+sbit at 0xC5 P4_5       ;
+sbit at 0xC6 P4_6       ;
+sbit at 0xC7 P4_7       ;
 #endif
 
 #ifdef P4_AT_0XE8
@@ -2720,6 +3028,20 @@ sfr at 0x92 P4CNT       ; // DS80C390
 #ifdef P5_AT_0XA1
 #undef P5_AT_0XA1
 sfr at 0xA1 P5          ; // Port 5 - DS80C390
+#endif
+
+#ifdef P5_AT_0XE8
+#undef P5_AT_0XE8
+sfr at 0xE8 P5;           // Port 5 - T89C51RD2
+// Bit registers
+sbit at 0xE8 P5_0;
+sbit at 0xE9 P5_1;
+sbit at 0xEA P5_2;
+sbit at 0xEB P5_3;
+sbit at 0xEC P5_4;
+sbit at 0xED P5_5;
+sbit at 0xEE P5_6;
+sbit at 0xEF P5_7;
 #endif
 
 #ifdef P5CNT
@@ -2878,6 +3200,18 @@ sfr at 0x87 PCON ;
 #define SMOD0           0x40
 #define SMOD            0x80
 #define SMOD_0          0x80  ; same as SMOD
+#endif
+
+#ifdef PCON__SMOD1__SMOD0__x__POF__GF1__GF0__PD__IDL
+#undef PCON__SMOD1__SMOD0__x__POF__GF1__GF0__PD__IDL
+sfr at 0x87 PCON;
+#define IDL    0x01
+#define PD     0x02
+#define GF0    0x04
+#define GF1    0x08
+#define POF    0x10
+#define SMOD0  0x40
+#define SMOD1  0x80
 #endif
 
 #ifdef PMR__CD1__CD0__SWB__x__XTOFF__ALEOFF__DME1__DME0
@@ -3568,9 +3902,22 @@ sbit at 0xDE POR    ;
 sbit at 0xDF SMOD_1 ;
 #endif
 
+#ifdef WDTPRG
+#undef WDTPRG
+sfr at 0xA7 WDRPRG;
+#define WDRPRG_S0 0x01
+#define WDRPRG_S1 0x02
+#define WDRPRG_S2 0x04
+#endif
+
 #ifdef WDTREL
 #undef WDTREL
 sfr at 0x86 WDTREL    ; // Watchdof Timer reload register
+#endif
+
+#ifdef WDTRST
+#undef WDTRST
+sfr at 0xA6 WDRRST;
 #endif
 
 #ifdef XPAGE
@@ -3686,5 +4033,11 @@ sfr at 0x91 XPAGE     ; // Page Address Register for Extended On-Chip Ram - Infi
 #define COMPARE_VECTOR 19       // 0x9B compare
 #endif
 
+#ifdef MICROCONTORLLER_T89C51RD2
+#define TF2_VECTOR     5     /* 0x2B timer 2 */
+#define PCA_VECTOR     6     /* 0x33 Programmable Counetr Array interrupt */
+#endif /* MICROCONTORLLER_T89C51RD2 */
+
 #endif	// End of the header -> #ifndef MCS51REG_H
+
 

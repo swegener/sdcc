@@ -192,7 +192,6 @@ int main() //short argc, char **argv)
    // clear the buffer
    for (i = 0; i < 2000; i++)
       tran_buffer[i] = 0x55;
-   _asm ;johan _endasm;
    printf("Read file DEMO.000 %d\n",owReadFile(portnum,filename,tran_buffer));
    // print the data result
    for (i = 0; i < 2000; i++)
@@ -206,14 +205,12 @@ int main() //short argc, char **argv)
    //----------------------------------------
    // Turn off overdrive
    printf("\n/---------------------------------------------\n");
-   _asm ;johan 7 _endasm;
    printf("TEST%d: Turn off overdrive\n",testcnt++);
    printf("Set 1-Wire Net speed to normal %d\n",owSpeed(portnum,MODE_NORMAL));
 
    //----------------------------------------
    // Verify a device
    printf("\n/---------------------------------------------\n");
-   _asm ;johan 8 _endasm;
    printf("TEST%d: Verify the current device\n",testcnt++);
 
    printf("owVerify (normal) %d\n",owVerify(portnum,FALSE));
@@ -222,7 +219,6 @@ int main() //short argc, char **argv)
    //----------------------------------------
    // Skip the first family code found
    printf("\n/---------------------------------------------\n");
-   _asm ;johan 9 _endasm;
    printf("TEST%d: Skip the first family code found\n",testcnt++);
    
    // find the next device
@@ -244,7 +240,6 @@ int main() //short argc, char **argv)
    //----------------------------------------
    // Find first family code (DS1920) and read temperature
    printf("\n/---------------------------------------------\n");
-   _asm ;johan 10 _endasm;
    printf("TEST%d: Find first family code (DS1920) and read temperature\n",testcnt++);
 
    // find the next device
@@ -278,7 +273,6 @@ int main() //short argc, char **argv)
    //----------------------------------------
    //  Verify the current device, could also be alarming
    printf("\n/---------------------------------------------\n");
-   _asm ;johan 11 _endasm;
    printf("TEST%d: Verify the current device, could also be alarming\n",testcnt++);
 
    printf("owVerify (normal) %d\n",owVerify(portnum,FALSE));
@@ -287,7 +281,6 @@ int main() //short argc, char **argv)
    //----------------------------------------
    // Test setting the Serial Number with owSerialNum
    printf("\n/---------------------------------------------\n");
-   _asm ;johan 12 _endasm;
    printf("TEST%d: Test setting the Serial Number with owSerialNum\n",testcnt++);
 
    // set the Serial Num to 0 to 7
@@ -301,7 +294,6 @@ int main() //short argc, char **argv)
    //----------------------------------------
    //  Verify the current device (should fail, no such device)
    printf("\n/---------------------------------------------\n");
-   _asm ;johan 13 _endasm;
    printf("TEST%d: Verify the current device (should fail, no such device)\n",testcnt++);
 
    printf("owVerify (normal) %d\n",owVerify(portnum,FALSE));

@@ -128,7 +128,6 @@ int owReadFile(int portnum, uchar *filename, uchar *buf)
          buf[bufcnt++] = pgbuf[i];
 
       // get the next file page (from page pointer) 
-      _asm ;johan _endasm;
       filepg = pgbuf[pglen-1];
    }
    while (filepg);

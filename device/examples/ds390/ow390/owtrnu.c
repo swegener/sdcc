@@ -467,7 +467,6 @@ int Write_Scratchpad(int portnum, uchar *write_buf, int start_page, int write_le
    sendpacket[sendlen++] = 0x0F;     
    // write the target address
    sendpacket[sendlen++] = ((start_page << 5) & 0xFF);    
-   _asm ;johan 1 _endasm;
    sendpacket[sendlen++] = (start_page >> 3);
 
    // write packet bytes 
@@ -553,7 +552,6 @@ int Copy_Scratchpad(int portnum, int start_page, int write_len)
    sendpacket[sendlen++] = 0x55;     
    // write the target address
    sendpacket[sendlen++] = ((start_page << 5) & 0xFF);    
-   _asm ;johan 2 _endasm;
    sendpacket[sendlen++] = (start_page >> 3);
    sendpacket[sendlen++] = write_len - 1;
    // read copy result

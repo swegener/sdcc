@@ -1,3 +1,9 @@
+2004-07-25 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/glue.c (pic16_printIvalFuncPtr): when an extern
+	function isn't used in the source but referenced as a
+	variable initializer then declare it as extern in .asm file
+
 2004-07-24 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* .version: increased version number to 2.4.3

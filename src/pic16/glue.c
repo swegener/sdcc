@@ -131,7 +131,7 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 
 	for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms)) {
 
-#if 0
+#if 1
 		fprintf(stderr, "%s\t%s: sym: %s\tused: %d\textern: %d\tstatic: %d\taggregate: %d\tregister: 0x%x\tfunction: %d\n",
 			__FUNCTION__,
 			map->sname, sym->name, sym->used, IS_EXTERN(sym->etype), IS_STATIC(sym->etype),
@@ -153,7 +153,7 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 		}
 		
 		/* if allocation required check is needed
-		 *  then check if the symbol really requires
+		 * then check if the symbol really requires
 		 * allocation only for local variables */
 		 if (arFlag && !IS_AGGREGATE (sym->type) &&
 			!(sym->_isparm && !IS_REGPARM (sym->etype)) &&
@@ -944,6 +944,11 @@ void pic16_printIvalFuncPtr (sym_link * type, initList * ilist, char ptype, void
   value *val;
   int dLvl = 0;
 
+
+#if DEBUG_PRINTIVAL
+  fprintf(stderr, "%s\n",__FUNCTION__);
+#endif
+
   if (ilist)
     val = list2val (ilist);
   else
@@ -975,6 +980,22 @@ void pic16_printIvalFuncPtr (sym_link * type, initList * ilist, char ptype, void
       pic16_printPointerType (val->name, ptype, p);
   } else {
       pic16_printPointerType (val->sym->rname, ptype, p);
+
+      if(IS_FUNC(val->sym->type) && !val->sym->used) {
+ 
+      	/* this has not been declared as extern
+      	 * so declare it as a late extern just after the symbol */
+      	 if(ptype == 'p') {
+	      	pic16_addpCode2pBlock((pBlock *)p, pic16_newpCodeCharP("declare symbol as extern"));
+	      	pic16_addpCode2pBlock((pBlock *)p, pic16_newpCodeAsmDir("extern", "%s", val->sym->rname));
+	      	pic16_addpCode2pBlock((pBlock *)p, pic16_newpCodeCharP("continue variable declaration"));
+	 } else
+	 if(ptype == 'f') {
+	 	fprintf((FILE *)p, "declare symbol as extern");
+	 	fprintf((FILE *)p, "\textern\t%s\n", val->sym->rname);
+	 	fprintf((FILE *)p, "continue variable declaration");
+	}
+      }
   }
 
   return;
@@ -1171,6 +1192,7 @@ static void
 pic16emitStaticSeg (memmap * map)
 {
   symbol *sym;
+  static int didcode=0;
 
   //fprintf(stderr, "%s\n",__FUNCTION__);
 
@@ -1181,7 +1203,7 @@ pic16emitStaticSeg (memmap * map)
        sym = setNextItem (map->syms))
     {
 
-#if 0
+#if 1
 	fprintf(stderr, "%s\t%s: sym: %s\tused: %d\tSPEC_ABSA: %d\tSPEC_AGGREGATE: %d\tCODE: %d\n\
 CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
 		map->sname, sym->name, sym->used, SPEC_ABSA(sym->etype), IS_AGGREGATE(sym->type),
@@ -1299,8 +1321,12 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
 	      pb = pic16_newpCodeChain(NULL, 'P',pic16_newpCodeCharP("; Starting pCode block for Ival"));
 	      pic16_addpBlock(pb);
 
-              /* make sure that 'code' directive is emitted before */
-              pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir("code", NULL));
+	      if(!didcode) {
+	      	/* make sure that 'code' directive is emitted before, once */
+	      	pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir("code", NULL));
+	      	
+	      	didcode++;
+	      }
                             
 //	      fprintf(stderr, "%s:%d [2] generating init for label: %s\n", __FILE__, __LINE__, sym->rname);
 
@@ -1738,14 +1764,14 @@ pic16glue ()
 
 	/* copy the interrupt vector table */
 	if(mainf && IFFUNC_HASBODY(mainf->type)) {
-		fprintf (asmFile, "%s", iComments2);
+		fprintf (asmFile, "\n%s", iComments2);
 		fprintf (asmFile, "; interrupt vector \n");
 		fprintf (asmFile, "%s", iComments2);
 		copyFile (asmFile, vFile);
 	}
     
 	/* copy global & static initialisations */
-	fprintf (asmFile, "%s", iComments2);
+	fprintf (asmFile, "\n%s", iComments2);
 	fprintf (asmFile, "; global & static initialisations\n");
 	fprintf (asmFile, "%s", iComments2);
     

@@ -1355,7 +1355,8 @@ static void outAcc(operand *result)
 {
     int size, offset;
     size = getDataSize(result);
-    if(size){
+    if(size)
+    {
         aopPut(AOP(result),"a",0);
         size--;
         offset = 1;
@@ -1372,9 +1373,12 @@ static void outAcc(operand *result)
 static void outBitC(operand *result)
 {
     /* if the result is bit */
-    if (AOP_TYPE(result) == AOP_CRY) 
+    if (AOP_TYPE(result) == AOP_CRY)
+    {
         aopPut(AOP(result),"c",0);
-    else {
+    }
+    else 
+    {
         emitcode("clr","a");
         emitcode("rlc","a");
         outAcc(result);
@@ -2936,6 +2940,7 @@ static void adjustArithmeticResult(iCode *ic)
      }
 }
 
+#if 0
 #define AOP_OP_3(ic) \
     aopOp (IC_LEFT(ic),ic,FALSE, FALSE); \
     aopOp (IC_RIGHT(ic),ic,FALSE, TRUE); \
@@ -2947,6 +2952,42 @@ static void adjustArithmeticResult(iCode *ic)
         fprintf(stderr,                                  \
                "Ack: three operands in far space! (%s:%d %s:%d)\n", __FILE__, __LINE__, ic->filename, ic->lineno);   \
     }
+#else
+#define AOP_OP_3(ic) \
+    aopOp (IC_RIGHT(ic),ic,FALSE, FALSE); \
+    aopOp (IC_LEFT(ic),ic,FALSE, (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR)); \
+    aopOp (IC_RESULT(ic),ic,TRUE, (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR) || \
+    				  (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR)); \
+    if (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR2 && \
+        AOP_TYPE(IC_RESULT(ic)) == AOP_DPTR2) \
+    { \
+        /* werror(E_INTERNAL_ERROR,__FILE__,__LINE__, */ \
+        fprintf(stderr,                                  \
+               "Ack: three operands in far space! (%s:%d %s:%d)\n", __FILE__, __LINE__, ic->filename, ic->lineno);   \
+    }
+    
+#define AOP_OP_3_NOFATAL(ic, rc) \
+    aopOp (IC_RIGHT(ic),ic,FALSE, FALSE); \
+    aopOp (IC_LEFT(ic),ic,FALSE, (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR)); \
+    aopOp (IC_RESULT(ic),ic,TRUE, (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR) || \
+    				  (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR)); \
+    if (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR2 && \
+        AOP_TYPE(IC_RESULT(ic)) == AOP_DPTR2) \
+    { \
+       rc = TRUE; \
+       freeAsmop(IC_RESULT(ic), NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE)); \
+    }  \
+    else \
+    { \
+       rc = FALSE; \
+    }
+
+#define AOP_OP_2(ic) \
+    aopOp (IC_RIGHT(ic),ic,FALSE, FALSE); \
+    aopOp (IC_LEFT(ic),ic,FALSE, (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR));
+    
+#endif
+
 
 #define AOP_SET_LOCALS(ic) \
     left = IC_LEFT(ic); \
@@ -2966,14 +3007,10 @@ static void genPlus (iCode *ic)
 
     /* special cases :- */
 
-#ifdef LAZY_DPS_OPT
+#if 0
     aopOp (IC_RIGHT(ic),ic,FALSE, FALSE);
     aopOp (IC_LEFT(ic),ic,FALSE, 
     	   (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR));
-#else    
-    aopOp (IC_LEFT(ic),ic,FALSE, TRUE);
-    aopOp (IC_RIGHT(ic),ic,FALSE, FALSE);
-#endif    
     if ((AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR2) &&
         (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR))
     {
@@ -2984,16 +3021,24 @@ static void genPlus (iCode *ic)
         aopOp (IC_RESULT(ic),ic,TRUE, 
                ((AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR)
              || (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR)));
+    }
+#else
+    AOP_OP_3_NOFATAL(ic, pushResult);
+#endif    
 
+    if (!pushResult)
+    {
     /* if literal, literal on the right or
        if left requires ACC or right is already
        in ACC */
-    if ((AOP_TYPE(IC_LEFT(ic)) == AOP_LIT) ||
-	(AOP_NEEDSACC(IC_LEFT(ic))) ||
-	AOP_TYPE(IC_RIGHT(ic)) == AOP_ACC ){
+    if ((AOP_TYPE(IC_LEFT(ic)) == AOP_LIT)
+	|| ((AOP_NEEDSACC(IC_LEFT(ic))) && !(AOP_NEEDSACC(IC_RIGHT(ic)))) 
+	|| AOP_TYPE(IC_RIGHT(ic)) == AOP_ACC )
+    {
         operand *t = IC_RIGHT(ic);
         IC_RIGHT(ic) = IC_LEFT(ic);
         IC_LEFT(ic) = t;
+        emitcode(";", "Swapped plus args.");
     }
 
     /* if both left & right are in bit
@@ -3029,7 +3074,10 @@ static void genPlus (iCode *ic)
     /* if I can do an increment instead
     of add then GOOD for ME */
     if (genPlusIncr (ic) == TRUE)
+    {
+        emitcode(";", "did genPlusIncr");
         goto release;   
+    }
 
     }
     size = getDataSize(pushResult ? IC_LEFT(ic) : IC_RESULT(ic));
@@ -3867,44 +3915,15 @@ static void genIfxJump (iCode *ic, char *jval)
 /* genCmp :- greater or less than comparison                       */
 /*-----------------------------------------------------------------*/
 static void genCmp (operand *left,operand *right,
-                    operand *result, iCode *ifx, int sign)
+		    iCode *ic, iCode *ifx, int sign)
 {
-    int size, offset = 0 ;
-    unsigned long lit = 0L;
-    bool swappedOps = FALSE;
+    int 	  	size, offset = 0 ;
+    unsigned long 	lit = 0L;
+    operand   	        *result;
 
     D(emitcode(";", "genCmp"););
 
-#if 0
-    /* If left if lit and right isn't, swap 'em. */
-    if (AOP_TYPE(left) == AOP_LIT &&
-        AOP_TYPE(right) != AOP_LIT)
-    {
-        operand *tmp = left;
-        left = right;
-        right = tmp;
-        D(emitcode(";", "kevin literal hack"););
-        swappedOps = !swappedOps;
-    }
-
-    if (AOP_NEEDSACC(right))
-    {
-        if (AOP_NEEDSACC(left))
-        {
-            werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
-                   "both CMP operands need ACC!");
-            exit(1);
-        }
-        else
-        {
-            operand *tmp = left;
-            left = right;
-            right = tmp;
-            D(emitcode(";", "kevin ACC hack"););
-            swappedOps = !swappedOps;
-        }
-    }
-#endif
+    result = IC_RESULT(ic);
 
     /* if left & right are bit variables */
     if (AOP_TYPE(left) == AOP_CRY &&
@@ -3927,21 +3946,36 @@ static void genCmp (operand *left,operand *right,
                      lbl->key+100);
             emitcode("","%05d$:",lbl->key+100);
         } else {
-            if(AOP_TYPE(right) == AOP_LIT){
+            if (AOP_TYPE(right) == AOP_LIT)
+            {
                 lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
                 /* optimize if(x < 0) or if(x >= 0) */
-                if(lit == 0L){
-                    if(!sign){
+                if(lit == 0L)
+                {
+                    if(!sign)
+                    {
                         CLRC;
                     }
-                    else{
+                    else
+                    {
                         MOVA(aopGet(AOP(left),AOP_SIZE(left)-1,FALSE,FALSE,TRUE));
-                        if(!(AOP_TYPE(result) == AOP_CRY && AOP_SIZE(result)) && ifx){
+                        
+    			freeAsmop(left,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
+        		freeAsmop(right,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
+                        
+                        aopOp(result,ic,FALSE, FALSE);
+                        
+                        if(!(AOP_TYPE(result) == AOP_CRY && AOP_SIZE(result)) && ifx)
+                        {
+                            freeAsmop(result,NULL,ic,TRUE);
                             genIfxJump (ifx,"acc.7");
                             return;
                         }
-                        else    
+                        else
+                        {
                             emitcode("rlc","a");
+                        }
+                        goto release_freedLR;
                     }
                     goto release;
                 }
@@ -4008,24 +4042,34 @@ static void genCmp (operand *left,operand *right,
     }
 
 release:
-    if (swappedOps)
-    {
-        D(emitcode(";","kevHack: flip carry."););
-        emitcode("cpl", "c");
-    }
+/* Don't need the left & right operands any more; do need the result. */
+    freeAsmop(left,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
+    freeAsmop(right,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
+                        
+    aopOp(result,ic,FALSE, FALSE);
 
-    if (AOP_TYPE(result) == AOP_CRY && AOP_SIZE(result)) {
+release_freedLR:
+
+    if (AOP_TYPE(result) == AOP_CRY && AOP_SIZE(result)) 
+    {
         outBitC(result);
-    } else {
+    } 
+    else 
+    {
         /* if the result is used in the next
         ifx conditional branch then generate
         code a little differently */
         if (ifx )
+        {
             genIfxJump (ifx,"c");
+        }
         else
+        {
             outBitC(result);
+        }
         /* leave the result in acc */
     }
+    freeAsmop(result,NULL,ic,TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -4033,7 +4077,7 @@ release:
 /*-----------------------------------------------------------------*/
 static void genCmpGt (iCode *ic, iCode *ifx)
 {
-    operand *left, *right, *result;
+    operand *left, *right;
     sym_link *letype , *retype;
     int sign ;
 
@@ -4041,24 +4085,15 @@ static void genCmpGt (iCode *ic, iCode *ifx)
 
     left = IC_LEFT(ic);
     right= IC_RIGHT(ic);
-    result = IC_RESULT(ic);
 
     letype = getSpec(operandType(left));
     retype =getSpec(operandType(right));
     sign =  !(SPEC_USIGN(letype) | SPEC_USIGN(retype));
-    /* assign the amsops */
-    AOP_OP_3(ic);
-#if 0
-    aopOp (left,ic,FALSE, TRUE);
-    aopOp (right,ic,FALSE, FALSE);
-    aopOp (result,ic,TRUE, FALSE);
-#endif
 
-    genCmp(right, left, result, ifx, sign);
+    /* assign the left & right amsops */
+    AOP_OP_2(ic);
 
-    freeAsmop(left,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
-    freeAsmop(right,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
-    freeAsmop(result,NULL,ic,TRUE); 
+    genCmp(right, left, ic, ifx, sign);
 }
 
 /*-----------------------------------------------------------------*/
@@ -4066,7 +4101,7 @@ static void genCmpGt (iCode *ic, iCode *ifx)
 /*-----------------------------------------------------------------*/
 static void genCmpLt (iCode *ic, iCode *ifx)
 {
-    operand *left, *right, *result;
+    operand *left, *right;
     sym_link *letype , *retype;
     int sign ;
 
@@ -4074,25 +4109,15 @@ static void genCmpLt (iCode *ic, iCode *ifx)
 
     left = IC_LEFT(ic);
     right= IC_RIGHT(ic);
-    result = IC_RESULT(ic);
 
     letype = getSpec(operandType(left));
     retype =getSpec(operandType(right));
     sign =  !(SPEC_USIGN(letype) | SPEC_USIGN(retype));
 
-    /* assign the amsops */
-    AOP_OP_3(ic);
-#if 0
-    aopOp (left,ic,FALSE, FALSE);
-    aopOp (right,ic,FALSE, TRUE);
-    aopOp (result,ic,TRUE, FALSE);
-#endif
+    /* assign the left & right amsops */
+    AOP_OP_2(ic);
 
-    genCmp(left, right, result, ifx, sign);
-
-    freeAsmop(left,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
-    freeAsmop(right,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
-    freeAsmop(result,NULL,ic,TRUE); 
+    genCmp(left, right, ic, ifx, sign);
 }
 
 /*-----------------------------------------------------------------*/

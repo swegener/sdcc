@@ -1432,7 +1432,7 @@ operand *geniCodeRValue (operand *op, bool force)
     
     /* if this is not a temp symbol then */
     if (!IS_ITEMP(op) && 
-	!force        && 
+	!force && 
 	!IN_FARSPACE(SPEC_OCLS(etype))) {
 	op = operandFromOperand(op);
 	op->isaddr = 0;
@@ -1441,7 +1441,7 @@ operand *geniCodeRValue (operand *op, bool force)
     
     if (IS_SPEC(type) && 
 	IS_TRUE_SYMOP(op) &&
-	!IN_FARSPACE(SPEC_OCLS(etype))) {
+	(!IN_FARSPACE(SPEC_OCLS(etype)) || IS_DS390_PORT)) {
 	op = operandFromOperand(op);
 	op->isaddr = 0;
 	return op;

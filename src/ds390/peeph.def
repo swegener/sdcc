@@ -1901,3 +1901,17 @@ replace {
 	mov	dptr, %1
 	dec	dps
 }
+
+replace {
+	xch	a, ap
+	add	a, ap
+} by {
+	add 	a, ap
+}
+
+replace {
+	xch	a, ap
+	addc	a, ap
+} by {
+	addc 	a, ap
+}

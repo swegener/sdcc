@@ -118,7 +118,7 @@ struct options  save_options  ;
 "interrupt"    { count(); return(INTERRUPT);}
 "long"	       { count(); return(LONG); }
 "near"	       { count(); TKEYWORD(DATA);}
-"pdata"        { count(); return(PDATA); }
+"pdata"        { count(); TKEYWORD(PDATA); }
 "reentrant"    { count(); TKEYWORD(REENTRANT);}
 "register"     { count(); return(REGISTER); }
 "return"       { count(); return(RETURN); }

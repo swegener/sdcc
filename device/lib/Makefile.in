@@ -74,7 +74,8 @@ Z80SOURCES      = _atoi.c \
 		  assert.c _strcat.c \
 		  _modslong.c _modulong.c \
 		  _mullong.c \
-		  _divslong.c _divulong.c
+		  _divslong.c _divulong.c \
+		  malloc.c
 
 Z80OBJECTS      = $(Z80SOURCES:%.c=$(PORTDIR)/%.o)
 

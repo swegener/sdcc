@@ -3418,6 +3418,30 @@ replace {
 %2:
 } if labelRefCount %2 0
 
+// applies to f.e. malloc.c
+replace {
+	jnz	%1
+%2:
+	mov	%3,#0x00
+	mov	%4,#0x00
+} by {
+	;	Peephole 256.c	loading %3,%4 with zero from a
+	jnz	%1
+	mov	%3,a
+	mov	%4,a
+} if labelRefCount %2 0
+
+// applies to f.e. bug-905492.c
+replace {
+	jnz	%1
+%2:
+	mov	%3,#0x00
+} by {
+	;	Peephole 256.d	loading %3 with zero from a
+	jnz	%1
+	mov	%3,a
+} if labelRefCount %2 0
+
 
 // unsigned char i=8; do{ } while(--i != 0);
 // this currently only applies if i is kept in a register

@@ -1793,7 +1793,7 @@ static iCode *packRegsForOneuse (iCode *ic, operand *op , eBBlock *ebp)
 
     /* also make sure the intervenening instructions
        don't have any thing in far space */
-    for (dic = dic->next ; dic && dic != ic ; dic = dic->next) {
+    for (dic = dic->next ; dic && dic != ic && sic != ic; dic = dic->next) {
 		
 	/* if there is an intervening function call then no */
 	if (dic->op == CALL || dic->op == PCALL)
@@ -2155,7 +2155,7 @@ static void packRegisters (eBBlock *ebp)
 	   can be eliminated for return statements */
 	if ((ic->op == RETURN || ic->op == SEND) &&
 	    !isOperandInFarSpace(IC_LEFT(ic))    &&
-	    !options.model)
+	    options.model == MODEL_SMALL)
 	    packRegsForOneuse (ic,IC_LEFT(ic),ebp);	
 
 	/* if pointer set & left has a size more than

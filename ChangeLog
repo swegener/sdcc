@@ -1,3 +1,7 @@
+2005-04-03 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (decorateType): fixed bug #1105626
+
 2005-04-02 Vangelis Rokas <vrokas AT users.sourceforge.net>
 
         * device/include/asm/pic16/features.h,

@@ -3565,11 +3565,39 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       if (IS_ADDRESS_OF_OP(tree->right)
           && IS_AST_SYM_VALUE (tree->right->left)
           && SPEC_ABSA (AST_SYMBOL (tree->right->left)->etype)) {
+        
+        symbol * sym = AST_SYMBOL (tree->right->left);
+        unsigned int gptype = 0;
+        unsigned int addr = SPEC_ADDR (sym->etype);
 
+        if (IS_GENPTR (LTYPE (tree)) && GPTRSIZE > FPTRSIZE)
+          {
+            switch (SPEC_SCLS (sym->etype))
+              {
+              case S_CODE:
+                gptype = GPTYPE_CODE;
+                break;
+              case S_XDATA:
+                gptype = GPTYPE_FAR;
+                break;
+              case S_DATA:
+                gptype = GPTYPE_NEAR;
+                break;
+              case S_IDATA:
+                gptype = GPTYPE_IDATA;
+                break;
+              case S_PDATA:
+                gptype = GPTYPE_XSTACK;
+                break;
+              default:
+                gptype = 0;
+              }
+            addr |= gptype << (8*(GPTRSIZE - 1));
+          }
+        
         tree->type = EX_VALUE;
         tree->opval.val =
-          valCastLiteral (LTYPE (tree),
-                          SPEC_ADDR (AST_SYMBOL (tree->right->left)->etype));
+          valCastLiteral (LTYPE (tree), addr);
         TTYPE (tree) = tree->opval.val->type;
         TETYPE (tree) = getSpec (TTYPE (tree));
         tree->left = NULL;

@@ -60,7 +60,7 @@ void PrintTime(struct tm *rtcTime, char verbose) {
 
 #ifdef ShowMeAnotherBug
   printf ("%s%04d-%02d-%02d %02d:%02d:%02d.%02d\n", 
-	  verbose ? "RTC time: " : "",
+	  verbose ? "RTC time: " : "", // this one still needs a cast
 	  rtcTime->tm_year+1900, rtcTime->tm_mon+1, rtcTime->tm_mday,
 	  rtcTime->tm_hour, rtcTime->tm_min, rtcTime->tm_sec,
 	  rtcTime->tm_hundredth);
@@ -114,3 +114,4 @@ void main (void) {
     }
   }
 }
+

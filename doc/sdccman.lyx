@@ -1155,8 +1155,6 @@ BIN2DATA_DIR
 \layout Standard
 
 ..
-\backslash 
-
 \end_inset 
 </cell>
 </row>
@@ -1501,7 +1499,7 @@ cross
 \begin_inset Quotes srd
 \end_inset 
 
-compile on Cygwin for Mingw32(see also sdcc/support/scripts/sdcc_cygwin_mingw32)
+compile on Cygwin for Mingw32 (see also sdcc/support/scripts/sdcc_cygwin_mingw32)
 :
 \layout LyX-Code
 
@@ -2919,7 +2917,7 @@ native
 
  Win32-binary can be built, which will not need the Cygwin-DLL.
  For the necessary 'configure' options see section 'configure options' or
- the script 'sdcc/support/scripts/sdcc_cygwinmingw32'.
+ the script 'sdcc/support/scripts/sdcc_cygwin_mingw32'.
 \newline 
 
 \newline 

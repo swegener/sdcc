@@ -57,12 +57,11 @@ char *joinn(char **pplist, int n);
 */
 char *getPathDifference (char *pinto, const char *p1, const char *p2);
 
-/** Given a file with path information in the binary files directory,
-    returns what PREFIX must be to get this path.  Used for discovery
-    of where SDCC is installed.  Returns NULL if the path is
-    impossible.
+/** Given an array of string pointers, returns a string containing all
+    of the strings seperated by spaces.  The returned string is on the
+    heap.  n is the number of strings in the list.
 */
-char *getPrefixFromBinPath (const char *prel);
+char *getBinPath (const char *prel);
 
 /** Returns true if the given path exists.
  */

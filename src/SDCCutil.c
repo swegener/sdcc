@@ -218,38 +218,33 @@ getPathDifference (char *pinto, const char *p1, const char *p2)
   return fixupPath(pinto);
 }
 
+
 /** Given a file with path information in the binary files directory,
-    returns what PREFIX must be to get this path.  Used for discovery
-    of where SDCC is installed.  Returns NULL if the path is
+    returns the directory component. Used for discovery of bin
+    directory of SDCC installation. Returns NULL if the path is
     impossible.
 */
 char *
-getPrefixFromBinPath (const char *prel)
+getBinPath(const char *prel)
 {
-  strncpyz(scratchFileName, prel, PATH_MAX);
-  /* Strip off the /sdcc at the end */
-  *strrchr(scratchFileName, DIR_SEPARATOR_CHAR) = '\0';
-  /* Compute what the difference between the prefix and the bin dir
-     should be. */
-  getPathDifference (buffer, PREFIX, BINDIR);
-
-  /* Verify that the path in has the expected suffix */
-  if (strlen(buffer) > strlen(scratchFileName))
-    {
-      /* Not long enough */
+  char *p;
+  size_t len;
+  static char path[PATH_MAX];
+    
+  if ((p = strrchr(prel, DIR_SEPARATOR_CHAR)) == NULL)
+#ifdef _WIN32
+    /* try *nix dir separator on WIN32 */
+    if ((p = strrchr(prel, UNIX_DIR_SEPARATOR_CHAR)) == NULL)
+#endif
       return NULL;
-    }
 
-  if (pathEquivalent (buffer, scratchFileName + strlen(scratchFileName) - strlen(buffer)) == FALSE)
-    {
-      /* Doesn't match */
-      return NULL;
-    }
+  len = min((sizeof path) - 1, p - prel);
+  strncpy(path, prel, len);
+  path[len] = '\0';
 
-  scratchFileName[strlen(scratchFileName) - strlen(buffer)] = '\0';
-
-  return Safe_strdup (scratchFileName);
+  return path;
 }
+
 
 /** Returns true if the given path exists.
  */

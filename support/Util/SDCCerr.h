@@ -171,6 +171,7 @@ SDCCERR - SDCC Standard error handler
 #define E_VOID_VALUE_USED 153
 #define W_INTEGRAL2PTR_NOCAST 154
 #define W_PTR2INTEGRAL_NOCAST 155
+#define W_SYMBOL_NAME_TOO_LONG 156
 
 /** Describes the maximum error level that will be logged.  Any level
  *  includes all of the levels listed after it.

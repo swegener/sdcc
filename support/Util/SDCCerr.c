@@ -366,6 +366,8 @@ struct
     "converting integral to pointer without a cast" },
 { W_PTR2INTEGRAL_NOCAST, ERROR_LEVEL_WARNING,
     "converting pointer to integral without a cast" },
+{ W_SYMBOL_NAME_TOO_LONG, ERROR_LEVEL_WARNING,
+    "symbol name too long, truncated to %d chars" },
 };
 
 /*

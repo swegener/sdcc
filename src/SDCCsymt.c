@@ -112,6 +112,12 @@ addSym (bucket ** stab,
     checkTypeSanity(((symbol *)sym)->etype, ((symbol *)sym)->name);
   }
 
+  /* prevent overflow of the (r)name buffers */
+  if (strlen(sname)>SDCC_SYMNAME_MAX) {
+    werror (W_SYMBOL_NAME_TOO_LONG, SDCC_SYMNAME_MAX);
+    sname[SDCC_SYMNAME_MAX]='\0';
+  }
+
   /* the symbols are always added at the head of the list  */
   i = hashKey (sname);
   /* get a free entry */

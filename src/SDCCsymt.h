@@ -25,7 +25,8 @@
 #define  SDCCSYMT_H
 
 #define MAX_NEST_LEVEL  256
-#define SDCC_NAME_MAX    64
+#define SDCC_SYMNAME_MAX 64
+#define SDCC_NAME_MAX  3*SDCC_SYMNAME_MAX // big enough for _<func>_<var>_etc
 #include "SDCChasht.h"
 
 
@@ -182,7 +183,7 @@ sym_link;
 
 typedef struct symbol
   {
-    char name[SDCC_NAME_MAX + 1];	/* Input Variable Name     */
+    char name[SDCC_SYMNAME_MAX + 1];	/* Input Variable Name     */
     char rname[SDCC_NAME_MAX + 1];	/* internal name           */
 
     short level;		/* declration lev,fld offset */

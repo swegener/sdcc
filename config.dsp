@@ -94,6 +94,7 @@ SOURCE=.\src\version.awk
 !IF  "$(CFG)" == "config - Win32 Release"
 
 # PROP Ignore_Default_Tool 1
+USERDEP__VERSI="ChangeLog"	
 # Begin Custom Build
 InputPath=.\src\version.awk
 
@@ -105,6 +106,7 @@ InputPath=.\src\version.awk
 !ELSEIF  "$(CFG)" == "config - Win32 Debug"
 
 # PROP Ignore_Default_Tool 1
+USERDEP__VERSI="ChangeLog"	
 # Begin Custom Build
 InputPath=.\src\version.awk
 

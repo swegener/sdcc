@@ -107,7 +107,7 @@ addSym (bucket ** stab,
     fprintf (stderr, "addSym: %s ", sname);
   }
   /* Make sure sym is a symbol and not a structdef */
-  if (1 || StructTab!=stab) {
+  if (StructTab!=stab) {
     /* make sure the type is complete and sane */
     checkTypeSanity(((symbol *)sym)->etype, ((symbol *)sym)->name);
   }

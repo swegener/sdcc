@@ -3565,8 +3565,12 @@ createIf (ast * condAst, ast * ifBody, ast * elseBody)
   symbol *ifTrue, *ifFalse, *ifEnd;
 
   /* if neither exists */
-  if (!elseBody && !ifBody)
-    return condAst;
+  if (!elseBody && !ifBody) {
+    // if there are no side effects (i++, j() etc)
+    if (!hasSEFcalls(condAst)) {
+      return condAst;
+    }
+  }
 
   /* create the labels */
   sprintf (buffer, "_iffalse_%d", Lblnum);

@@ -1787,3 +1787,10 @@ replace {
 } by {
 	; Peephole 221b remove redundant move
 }
+
+replace {
+	dec	r%1
+	inc	r%1
+} by {
+	; removed dec/inc pair
+}

@@ -1512,6 +1512,15 @@ glue ()
   applyToSet (tmpfileNameSet, rmTmpFiles);
 }
 
+#if defined (__MINGW32__) || defined (__CYGWIN__) || defined (_MSC_VER)
+void
+rm_tmpfiles (void)
+{
+  applyToSet (tmpfileSet, closeTmpFiles);
+  applyToSet (tmpfileNameSet, rmTmpFiles);
+}
+#endif
+
 /** Creates a temporary file a'la tmpfile which avoids the bugs
     in cygwin wrt c:\tmp.
     Scans, in order: TMP, TEMP, TMPDIR, else uses tmpfile().

@@ -131,7 +131,7 @@ optionsTable[] = {
     { 'C',  NULL,                   NULL, "Preprocessor option" },
     { 'M',  NULL,                   NULL, "Preprocessor option" },
     { 'V',  NULL,                   &verboseExec, "Execute verbosely.  Show sub commands as they are run" },
-    { 'S',  NULL,                   &noAssemble, "Assemble only" },
+    { 'S',  NULL,                   &noAssemble, "Compile only; do not assemble or link" },
     { 'W',  NULL,                   NULL, "Pass through options to the assembler (a) or linker (l)" },
     { 'L',  NULL,                   NULL, "Add the next field to the library search path" },
     { 'l',  NULL,                   NULL, "Include the given library in the link" },
@@ -149,7 +149,7 @@ optionsTable[] = {
     { 0,    OPTION_NO_LOOP_IND,     NULL, NULL },
     { 0,    "--nojtbound",          &optimize.noJTabBoundary, "Don't generate boundary check for jump tables" },
     { 0,    "--noloopreverse",      &optimize.noLoopReverse, "Disable the loop reverse optimisation" },
-    { 'c',  "--compile-only",       &options.cc_only, "Compile only, do not assemble or link" },
+    { 'c',  "--compile-only",       &options.cc_only, "Compile and assemble, but do not link" },
     { 0,    "--dumpraw",            &options.dump_raw, "Dump the internal structure after the initial parse" },
     { 0,    "--dumpgcse",           &options.dump_gcse, NULL },
     { 0,    "--dumploop",           &options.dump_loop, NULL },
@@ -312,8 +312,8 @@ printVersionInfo ()
 #ifdef SDCC_SUB_VERSION_STR
 	   "/" SDCC_SUB_VERSION_STR
 #endif
-#ifdef __CYGWIN32__
-	   " (CYGWIN32)\n"
+#ifdef __CYGWIN__
+	   " (CYGWIN)\n"
 #else
 #ifdef __DJGPP__
 	   " (DJGPP) \n"
@@ -1327,6 +1327,9 @@ main (int argc, char **argv, char **envp)
   if ((!options.c1mode && !srcFileName && !nrelFiles) || 
       (options.c1mode && !srcFileName && !options.out_name))
     {
+      #if defined (__MINGW32__) || defined (__CYGWIN__) || defined (_MSC_VER)
+      rm_tmpfiles();
+      #endif
       printUsage ();
       exit (0);
     }
@@ -1391,6 +1394,9 @@ main (int argc, char **argv, char **envp)
               free (preOutName);
             }
           // EndFix
+          #if defined (__MINGW32__) || defined (__CYGWIN__) || defined (_MSC_VER)
+          rm_tmpfiles();
+          #endif
 	  return 1;
 	}
 
@@ -1400,6 +1406,12 @@ main (int argc, char **argv, char **envp)
 
   if (cdbFile)
     fclose (cdbFile);
+
+  if (preOutName && !options.c1mode)
+    {
+      unlink (preOutName);
+      free (preOutName);
+    }
 
   if (!options.cc_only &&
       !fatalError &&
@@ -1415,12 +1427,6 @@ main (int argc, char **argv, char **envp)
 
   if (yyin && yyin != stdin)
     fclose (yyin);
-
-  if (preOutName && !options.c1mode)
-    {
-      unlink (preOutName);
-      free (preOutName);
-    }
 
   return 0;
 

@@ -36,4 +36,8 @@ void flushStatics (void);
 extern symbol *interrupts[];
 extern set *publics;
 extern set *tmpfileSet;
+
+#if defined (__MINGW32__) || defined (__CYGWIN__) || defined (_MSC_VER)
+void rm_tmpfiles (void);
+#endif
 #endif

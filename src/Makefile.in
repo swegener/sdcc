@@ -45,7 +45,7 @@ TARGET		= $(PRJDIR)/bin/sdcc$(EXEEXT)
 # ------------------------------------------
 all: checkconf $(TARGET)
 
-*/port.a: FORCE 
+$(PORT_LIBS): FORCE 
 	$(MAKE) -C `dirname $@`
  
 FORCE:

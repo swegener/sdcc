@@ -26,6 +26,7 @@
 #include "simi.h"
 #include "break.h"
 #include "cmd.h"
+#include "newalloc.h"
 
 char *currModName = NULL;
 cdbrecs *recsRoot = NULL ;
@@ -153,7 +154,7 @@ struct cmdtab
 char *gc_strdup(const char *s)
 {
     char *ret;
-    Safe_calloc(1,ret, strlen(s)+1);
+    ret = Safe_malloc(strlen(s)+1);
     strcpy(ret, s);
     return ret;
 }
@@ -168,7 +169,7 @@ char *alloccpy ( char *s, int size)
     if (!size)
   return NULL;
 
-    Safe_calloc(1,d,size+1);
+    d = Safe_malloc(size+1);
     memcpy(d,s,size);
     d[size] = '\0';
 
@@ -209,7 +210,7 @@ static int readCdb (FILE *file)
     if (!(bp = fgets(buffer,sizeof(buffer),file)))
       return 0;
 
-    Safe_calloc(1,currl,sizeof(cdbrecs));
+    currl = Safe_calloc(1,sizeof(cdbrecs));
     recsRoot = currl ;
 
     while (1) {
@@ -237,7 +238,7 @@ static int readCdb (FILE *file)
       }
 
       bp += 2;
-      Safe_calloc(1,currl->line,strlen(bp));
+      currl->line = Safe_calloc(1,strlen(bp));
       strncpy(currl->line,bp,strlen(bp)-1);
       currl->line[strlen(bp)-1] = '\0';
   }
@@ -248,7 +249,7 @@ static int readCdb (FILE *file)
   if (feof(file))
       break;
 
-  Safe_calloc(1,currl->next,sizeof(cdbrecs));
+  currl->next = Safe_calloc(1,sizeof(cdbrecs));
   currl = currl->next;
     }
 
@@ -351,7 +352,7 @@ srcLine **loadFile (char *name, int *nlines)
 
   slines = (srcLine **)resize((void **)slines,*nlines);
 
-  Safe_calloc(1,slines[(*nlines)-1],sizeof(srcLine));
+  slines[(*nlines)-1] = Safe_calloc(1,sizeof(srcLine));
   slines[(*nlines)-1]->src = alloccpy(bp,strlen(bp));
     }
 
@@ -464,7 +465,7 @@ static void functionPoints ()
     if (func->exitline < j)
         func->exitline = j;
 
-    Safe_calloc(1,ep,sizeof(exePoint));
+    ep = Safe_calloc(1,sizeof(exePoint));
     ep->addr =  mod->cLines[j]->addr ;
     ep->line = j;
     ep->block= mod->cLines[j]->block;
@@ -487,7 +488,7 @@ static void functionPoints ()
         func->aexitline = j;
 
     /* add it to the execution point */
-    Safe_calloc(1,ep,sizeof(exePoint));
+    ep = Safe_calloc(1,sizeof(exePoint));
     ep->addr =  mod->asmLines[j]->addr ;
     ep->line = j;
     addSet(&func->afpoints,ep);
@@ -559,7 +560,7 @@ int cmdFile (char *s,context *cctxt)
     }
 
     /* allocate for context */
-    Safe_calloc(1,currCtxt ,sizeof(context));
+    currCtxt = Safe_calloc(1,sizeof(context));
 
     /* readin the debug information */
     if (!readCdb (cdbFile)) {

@@ -9489,7 +9489,7 @@ genPointerGet (iCode * ic, iCode *pi)
   if (p_type == GPOINTER && OP_SYMBOL(left)->remat &&
       IS_CAST_ICODE(OP_SYMBOL(left)->rematiCode)) {
 	  left = IC_RIGHT(OP_SYMBOL(left)->rematiCode);
-	  type =   type = operandType (left);
+	  type = operandType (left);
 	  p_type = DCL_TYPE (type);
   }
   /* now that we have the pointer type we assign
@@ -10158,7 +10158,7 @@ genPointerSet (iCode * ic, iCode *pi)
   if (p_type == GPOINTER && OP_SYMBOL(result)->remat &&
       IS_CAST_ICODE(OP_SYMBOL(result)->rematiCode)) {
 	  result = IC_RIGHT(OP_SYMBOL(result)->rematiCode);
-	  type =   type = operandType (result);
+	  type = operandType (result);
 	  p_type = DCL_TYPE (type);
   }
 

@@ -289,7 +289,8 @@ extern int nlibFiles;
 extern char *libPaths[128];
 extern int nlibPaths;
 
-extern bool verboseExec ;
+extern bool verboseExec;
+extern bool noXinitOpt;
 
 void parseWithComma (char **, char *);
 

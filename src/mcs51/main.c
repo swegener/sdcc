@@ -105,6 +105,10 @@ _mcs51_parseOptions (int *pargc, char **argv, int *i)
 static void
 _mcs51_finaliseOptions (void)
 {
+  if (noXinitOpt /* || options.model==MODEL_SMALL */) {
+    port->genXINIT=0;
+  }
+
   if (options.model == MODEL_LARGE) {
       port->mem.default_local_map = xdata;
       port->mem.default_globl_map = xdata;

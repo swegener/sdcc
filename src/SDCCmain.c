@@ -72,6 +72,7 @@ char *relFiles[128];
 int nrelFiles = 0;
 bool verboseExec = FALSE;
 char *preOutName;
+bool noXinitOpt = FALSE;
 
 /* uncomment JAMIN_DS390 to always override and use ds390 port
   for mcs51 work.  This is temporary, for compatibility testing. */
@@ -116,6 +117,7 @@ char DefaultExePath[128];
 #define OPTION_NO_GCSE		"--nogcse"
 #define OPTION_SHORT_IS_8BITS 	"--short-is-8bits"
 #define OPTION_TINI_LIBID 	"--tini-libid"
+#define OPTION_NO_XINIT_OPT     "--no-xinit-opt"
 
 static const OPTION 
 optionsTable[] = {
@@ -197,6 +199,7 @@ optionsTable[] = {
     { 0,    "--tini-libid",   	    NULL,"<nnnn> LibraryID used in -mTININative"},
     { 0,    "--protect-sp-update",  &options.protect_sp_update,"DS390 - will disable interrupts during ESP:SP updates"},
     { 0,    "--parms-in-bank1",	    &options.parms_in_bank1,"MCS51/DS390 - use Bank1 for parameter passing"},
+    { 0,    OPTION_NO_XINIT_OPT,    &noXinitOpt, "don't memcpy initialized xram from code"},
     /* End of options */
     { 0,    NULL }
 };

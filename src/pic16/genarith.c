@@ -1020,17 +1020,13 @@ void pic16_genPlus (iCode *ic)
 			// add leftover bytes
 			// either left or right is too short
 			for (i=size; i < AOP_SIZE(result); i++) {
-			  fprintf (stderr, "%s:%d: new code...\n", __FUNCTION__, __LINE__);
-			  pic16_emitcode ("; ", "new arithmetics... test me...");
 			  // get right operand into WREG
 			  if (i < AOP_SIZE(right)) {
 			    pic16_mov2w (AOP(right), i);
 			  } else {
-			    pic16_emitcode ("; =##", "right too short");
 			    // right is too short
 			    pic16_emitpcode (POC_CLRF, pic16_popCopyReg (&pic16_pc_wreg));
 			    if (!SPEC_USIGN(getSpec(operandType(right)))) {
-			      pic16_emitcode ("; =##", "right signed");
 			      // right operand is signed
 			      pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(right),AOP_SIZE(right)-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
 			      pic16_emitpcode(POC_COMF, pic16_popCopyReg (&pic16_pc_wreg));
@@ -1046,11 +1042,9 @@ void pic16_genPlus (iCode *ic)
 			      pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),i));
 			    }
 			  } else {
-			    pic16_emitcode ("; =##", "left too short");
 			    // left is too short
 			    pic16_emitpcode (POC_CLRF, pic16_popGet (AOP(result), i));
 			    if (!SPEC_USIGN(getSpec(operandType(left)))) {
-			      pic16_emitcode ("; =##", "left signed");
 			      // left operand is signed
 			      pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(left),AOP_SIZE(left)-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
 			      pic16_emitpcode(POC_COMF, pic16_popGet (AOP(result), i));

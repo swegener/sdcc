@@ -25,6 +25,9 @@
 	* support/Util/SDCCerr.h:
 	* support/Util/SDCCerr.c: replaced W_ARRAY_BOUND by W_IDX_OUT_OF_BOUNDS
 	* .version: bumped version number to 2.3.8
+	* device/include/Makefile.in (install),
+	* doc/Makefile (install): changed to 'rm `find ...`' construct to
+	avoid warnings
 
 2004-01-30 Bernhard Held <bernhard AT bernhardheld.de>
 

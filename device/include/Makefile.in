@@ -44,7 +44,7 @@ install: all installdirs
         if [ "`grep pic16 ../../ports.build`" = pic16 ]; then \
                 $(CP) pic16/*.h $(sdcc_includedir)/pic16 ; \
         fi \
- 	find $(sdcc_includedir) -type d -name 'CVS' -exec rm {} \;
+ 	rm -rf `find $(sdcc_includedir) -type d -name 'CVS'`
 
 
 # Deleting all the installed files

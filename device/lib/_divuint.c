@@ -27,6 +27,8 @@
      mcs51 small stack-auto
 */
 
+#include <stdbool.h>
+
 #if !defined(SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
 #  if defined(SDCC_mcs51)
 #    if defined(SDCC_MODEL_SMALL)
@@ -150,11 +152,7 @@ _divuint (unsigned int a, unsigned int b)
 {
   unsigned int reste = 0;
   unsigned char count = 16;
-  #if defined(SDCC_STACK_AUTO) || defined(SDCC_z80)
-    char c;
-  #else
-    bit c;
-  #endif
+  BOOL c;
 
   do
   {

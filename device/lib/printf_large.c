@@ -42,6 +42,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #define PTR value.ptr
 
@@ -62,13 +63,6 @@
 //#define toupper(c) ((c)&=~0x20)
 #define toupper(c) ((c)&=0xDF)
 
-#if defined (SDCC_STACK_AUTO) || defined (SDCC_hc08)
- //as long as bit/bool cannot be used reentrant
- #define BOOL char
-#else
- #define BOOL bit
-#endif
-
 typedef union
 {
   unsigned char  byte[5];
@@ -86,7 +80,7 @@ static const char memory_id[] = "IXCP-";
   static void* p;
 
   #ifdef ASM_ALLOWED
-    static bit   lsd;
+    static bool   lsd;
 
     /* this one NEEDS to be in data */
     static data value_t value;

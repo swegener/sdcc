@@ -173,6 +173,13 @@ models:
 	  done \
 	fi
 
+model-mcs51-reentrant:
+	if [ "`grep mcs51 ../../ports.build`" = mcs51 ]; then \
+	  for model in $(MODELS); do \
+	    $(MAKE) MODELFLAGS="--model-$$model --stack-auto --int-long-reent --float-reent" PORT=reent-$$model objects; \
+	  done \
+	fi
+
 model-ds390:
 	if [ "`grep ds390 ../../ports.build`" = ds390 ]; then \
 	  $(MAKE) MODELFLAGS="-mds390" PORT=ds390 objects; \

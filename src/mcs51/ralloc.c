@@ -620,8 +620,6 @@ spillThis (symbol * sym)
   return;
 }
 
-
-
 /*-----------------------------------------------------------------*/
 /* selectSpil - select a iTemp to spil : rather a simple procedure */
 /*-----------------------------------------------------------------*/
@@ -2812,6 +2810,47 @@ packRegisters (eBBlock ** ebpp, int blockno)
 
   for (ic = ebp->sch; ic; ic = ic->next)
     {
+      /* Fix for bug #979599:   */
+      /* P0 &= ~1;              */
+
+      /* Look for two subsequent iCodes with */
+      /*   iTemp := _c;         */
+      /*   _c = iTemp & op;     */
+      /* and replace them by    */
+      /*   iTemp := _c;         */
+      /*   _c = _c & op;        */
+      if ((ic->op == BITWISEAND || ic->op == '|' || ic->op == '^') &&
+          ic->prev &&
+          ic->prev->op == '=' &&
+          IS_ITEMP (IC_LEFT (ic)) &&
+          IC_LEFT (ic) == IC_RESULT (ic->prev) &&
+          isOperandEqual (IC_RESULT(ic), IC_RIGHT(ic->prev)))
+        {
+          iCode* ic_prev = ic->prev;
+          symbol* prev_result_sym = OP_SYMBOL (IC_RESULT (ic_prev));
+
+          ReplaceOpWithCheaperOp (&IC_LEFT (ic), IC_RESULT (ic));
+          if (IC_RESULT (ic_prev) != IC_RIGHT (ic))
+            {
+              bitVectUnSetBit (OP_USES (IC_RESULT (ic_prev)), ic->key);
+              if (/*IS_ITEMP (IC_RESULT (ic_prev)) && */
+                  prev_result_sym->liveTo == ic->seq)
+                {
+                  prev_result_sym->liveTo = ic_prev->seq;
+                }
+            }
+          bitVectSetBit (OP_USES (IC_RESULT (ic)), ic->key);
+
+          bitVectSetBit (ic->rlive, IC_RESULT (ic)->key);
+
+          if (bitVectIsZero (OP_USES (IC_RESULT (ic_prev))))
+            {
+              bitVectUnSetBit (ic->rlive, IC_RESULT (ic)->key);
+              bitVectUnSetBit (OP_DEFS (IC_RESULT (ic_prev)), ic_prev->key);
+              remiCodeFromeBBlock (ebp, ic_prev);
+              hTabDeleteItem (&iCodehTab, ic_prev->key, ic_prev, DELETE_ITEM, NULL);
+            }
+        }
 
       /* if this is an itemp & result of an address of a true sym
          then mark this as rematerialisable   */
@@ -2980,8 +3019,8 @@ packRegisters (eBBlock ** ebpp, int blockno)
         packRegsForOneuse (ic, IC_LEFT (ic), ebp);
 
 
-      /* if this is cast for intergral promotion then
-         check if only use of  the definition of the
+      /* if this is a cast for intergral promotion then
+         check if it's the only use of the definition of the
          operand being casted/ if yes then replace
          the result of that arithmetic operation with
          this result and get rid of the cast */

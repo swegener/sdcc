@@ -3,6 +3,7 @@
 \textclass book
 \begin_preamble
 
+
 \usepackage[
   pdftitle={SDCC Compiler User Guide},
   pdfauthor={SDCC development team},
@@ -7377,6 +7378,30 @@ status Collapsed
 /
 \end_inset 
 
+-disable-warning\SpecialChar ~
+<nnnn>
+\begin_inset LatexCommand \index{-\/-disable-warning}
+
+\end_inset 
+
+
+\series default 
+ Disable specific warning with number <nnnn>.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
 -print-search-dirs
 \begin_inset LatexCommand \index{-\/-print-search-dirs}
 
@@ -13671,6 +13696,62 @@ putchar()
  in sdcc/device/lib.
 \layout Standard
 
+The default
+\family typewriter 
+ printf()
+\begin_inset LatexCommand \index{printf()}
+
+\end_inset 
+
+
+\family default 
+implementation in
+\family typewriter 
+ printf_large.c
+\family default 
+ does not support float (except on ds390).
+ To enable this recompile it with the option 
+\emph on 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+DUSE_FLOATS=1
+\begin_inset LatexCommand \index{USE\_FLOATS}
+
+\end_inset 
+
+
+\emph default 
+ on the command line.
+ Use
+\emph on 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-model-large
+\begin_inset LatexCommand \index{-\/-model-large}
+
+\end_inset 
+
+
+\emph default 
+ for the mcs51 port, since this uses a lot of memory.
+\layout Standard
+
 If you're short on memory you might want to use 
 \family typewriter 
 printf_small()
@@ -13681,12 +13762,7 @@ instead
 \emph default 
  of
 \family typewriter 
- printf()
-\begin_inset LatexCommand \index{printf()}
-
-\end_inset 
-
-.
+ printf().
 
 \family default 
  For the mcs51 there is an assembly version 
@@ -14149,6 +14225,14 @@ less_pedantic
 
  - the compiler will not warn you anymore for obvious mistakes, you'r on
  your own now ;-(
+\layout Itemize
+
+disable_warning <nnnn>
+\begin_inset LatexCommand \index{\#pragma disable\_warning}
+
+\end_inset 
+
+ - the compiler will not warn you anymore about warning number <nnnn>.
 \layout Itemize
 
 nogcse

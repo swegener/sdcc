@@ -1,6 +1,6 @@
 /*  sincosf.c: Computes sin or cos of a 32-bit float as outlined in [1]
 
-    Copyright (C) 2001, 2002  Jesus Calvino-Fraga, jesusc@ieee.org 
+    Copyright (C) 2001, 2002  Jesus Calvino-Fraga, jesusc@ieee.org
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,7 @@
 
 #include <math.h>
 #include <errno.h>
+#include <stdbool.h>
 
 #define r1      -0.1666665668E+0
 #define r2       0.8333025139E-2
@@ -40,11 +41,7 @@ float sincosf(const float x, const int iscos)
 {
     float y, f, r, g, XN;
     int N;
-#ifdef SDCC_mcs51
-	bit sign;
-#else
-	char sign;
-#endif
+	BOOL sign;
 
     if(iscos)
     {

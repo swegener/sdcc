@@ -1,3 +1,21 @@
+2004-10-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/port.h: made reset_regparms prototype void parameter explicit.
+	* src/SDCCsymt.c (processFuncArgs): removed argument "func".
+	* src/mcs51/ralloc.c (packRegisters): new fix for bugs 898889 & 979599.
+	* doc/sdccman.lyx: documented warning disabling and how to use
+	  printf_large to make it print floats.
+	* device/include/stdbool.h: NEW
+	* device/lib/_atof.c,
+	* device/lib/_divuint.c,
+	* device/lib/_divulong.c,
+	* device/lib/expf.c,
+	* device/lib/printf_large.c,
+	* device/lib/sincosf.c,
+	* device/lib/sincoshf.c: used stdbool.h, all compile with stack-auto now
+	* device/lib/Makefile.in: added target for model-mcs51-reentrant to build
+	  a completely reentrant lib.
+
 2004-10-05 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* device/lib/pic16/libsdcc/gptr/gptr*.c: added return statements
@@ -23,7 +41,7 @@
 	* support/Util/SDCCerr.h: added warning W_POSSBUG2.
 	* support/Util/SDCCerr.c (messages structure): added entry for
 	W_POSSBUG2
-	
+
 	Large cumulative patch for pic16 port and libraries.
 	* device/include/pic16/sdcc-lib.h,
 	* device/include/pic16/stdarg.h,
@@ -94,7 +112,7 @@
 
 	* debugger/mcs51/cmd.c: set PC if a symbol at pc reg is set
 	* debugger/mcs51/simi.c: addapt new syntax of s51
-	
+
 2004-09-23 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/genutils.c (pic16_genNot): fixed bug #1032265,

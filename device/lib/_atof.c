@@ -1,6 +1,6 @@
 /*  atof.c: converts an ASCII string to float
 
-    Copyright (C) 2003  Jesus Calvino-Fraga, jesusc@ieee.org 
+    Copyright (C) 2003  Jesus Calvino-Fraga, jesusc@ieee.org
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -18,16 +18,13 @@
 
 #include <ctype.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 float atof(char * s)
 {
 	float value, fraction;
 	char iexp;
-#ifdef SDCC_mcs51
-	bit sign;
-#else
-	char sign;
-#endif
+	BOOL sign;
 
 	//Skip leading blanks
 	while (isspace(*s)) s++;

@@ -272,7 +272,7 @@ typedef struct
     void (*genInitStartup) (FILE * of);
 
     /* parameter passing in register related functions */
-    void (*reset_regparms) ();	/* reset the register count */
+    void (*reset_regparms) (void);	/* reset the register count */
     int (*reg_parm) (struct sym_link *);	/* will return 1 if can be passed in register */
 
     /** Process the pragma string 'sz'.  Returns 0 if recognised and

@@ -1496,7 +1496,7 @@ checkSClass (symbol * sym, int isProto)
       else
         {
           /* hack-o-matic! I see no reason why the useXstack option should ever
-           * control this allcoation, but the code was originally that way, and
+           * control this allocation, but the code was originally that way, and
            * changing it for non-390 ports breaks the compiler badly.
            */
           bool useXdata = (TARGET_IS_DS390 || TARGET_IS_DS400) ? 
@@ -1565,7 +1565,6 @@ copyLinkChain (sym_link * p)
 
   return head;
 }
-
 
 /*------------------------------------------------------------------*/
 /* cleanUpBlock - cleansup the symbol table specified for all the   */
@@ -2470,7 +2469,8 @@ processFuncArgs (symbol * func)
     }
 
   /* reset regparm for the port */
-  (*port->reset_regparms) ( func );
+  (*port->reset_regparms) ();
+
   /* if any of the arguments is an aggregate */
   /* change it to pointer to the same type */
   while (val)

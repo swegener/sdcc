@@ -1,6 +1,6 @@
 /*  sincoshf.c: Computes sinh or cosh of a 32-bit float as outlined in [1]
 
-    Copyright (C) 2001, 2002  Jesus Calvino-Fraga, jesusc@ieee.org 
+    Copyright (C) 2001, 2002  Jesus Calvino-Fraga, jesusc@ieee.org
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,7 @@
 
 #include <math.h>
 #include <errno.h>
+#include <stdbool.h>
 
 #define P0 -0.713793159E+1
 #define P1 -0.190333999E+0
@@ -45,12 +46,8 @@
 float sincoshf(const float x, const int iscosh)
 {
     float y, w, z;
-#ifdef SDCC_mcs51
-	bit sign;
-#else
-	char sign;
-#endif
-    
+	BOOL sign;
+
     if (x<0.0) { y=-x; sign=1; }
           else { y=x;  sign=0; }
 

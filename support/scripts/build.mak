@@ -74,13 +74,6 @@ tidy:
 	-$(TNP)strip $(BUILD)/bin/*
 
 sdcc-bin: sdcc/sdccconf.h
-<<<<<<< build.mak
-	make -C sdcc sdcc-bin
-	mkdir -p $(BUILD)/bin
-	for i in \
-	sdcc sdcpp link-z80 as-z80 aslink asx8051 sdcdb; \
-	do cp sdcc/bin/$$i$(SE) $(BUILD)/bin/$$i$(E); done
-=======
 	make -C sdcc sdcc-bin CROSS_LIBGC=$(CROSS_LIBGC)
 	mkdir -p $(BUILD)/bin
 	for i in \
@@ -93,7 +86,6 @@ sdcc-misc: sdcc/sdccconf.h
 	for i in \
 	sdcdb; \
 	do cp sdcc/bin/$$i$(SE) $(BUILD)/bin/$$i$(E); done
->>>>>>> 1.1.2.5
 	cp sdcc/sim/ucsim/s51.src/s51$(E) $(BUILD)/bin
 	cp sdcc/sim/ucsim/z80.src/sz80$(E) $(BUILD)/bin
 	cp sdcc/sim/ucsim/avr.src/savr$(E) $(BUILD)/bin
@@ -121,17 +113,10 @@ sdcc-lib-z80:
 sdcc-lib-gen:
 	make -C sdcc sdcc-device
 
-<<<<<<< build.mak
-lcc:
-	make -C gbdk-support/lcc SDCCLIB=$(SDCC_ROOT)/
-	cp gbdk-support/lcc/lcc$(E) $(BUILD)/bin
-
-=======
 lcc:
 	make -C gbdk-support/lcc SDCCLIB=$(SDCC_ROOT)/ TNP=$(TNP)
 	cp gbdk-support/lcc/lcc$(SE) $(BUILD)/bin/lcc$(E)
 
->>>>>>> 1.1.2.5
 sdcc/sdccconf.h: sdcc/configure
 ifdef TNP
 	cd sdcc; \
@@ -153,7 +138,4 @@ logged_in:
 	cvs -d$(ROOT_GBDK) login
 	cvs -d$(ROOT_SDCC) login
 	touch logged_in
-<<<<<<< build.mak
-	make update=======
 	make -f build.mak update
->>>>>>> 1.1.2.5

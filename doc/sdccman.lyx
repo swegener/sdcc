@@ -1986,12 +1986,20 @@ Will not do loop reversal optimization.
 \layout List
 \labelwidthstring 00.00.0000
 
+---
+\series bold 
+nolabelopt
+\series default 
+ Will not optimize labels (makes the dumpfiles more readable).
+\layout List
+\labelwidthstring 00.00.0000
+
 
 \series bold 
 ---no-xinit-opt
 \series default 
- This will disable the memcpy of initialized data in far space from code
- space
+ Will not memcpy initialized data in far space from code space.
+ This saves a few bytes in code space if you don't have initialized data.
 \layout Subsubsection
 
 Other Options

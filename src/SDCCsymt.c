@@ -800,7 +800,8 @@ link *structElemType (link *stype, value *id ,value **argsp)
 	    }
 	    type = copyLinkChain (fields->type) ;
 	    etype=getSpec(type);
-	    SPEC_SCLS(etype) = SPEC_SCLS(petype);
+	    SPEC_SCLS(etype) = (SPEC_SCLS(petype) == S_REGISTER ? 
+				SPEC_SCLS(etype) : SPEC_SCLS(petype));
 	    return type;
 	}
 	fields = fields->next ;

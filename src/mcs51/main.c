@@ -124,7 +124,7 @@ _mcs51_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 static void _mcs51_genXINIT (FILE * of) {
   fprintf (of, ";	_mcs51_genXINIT() start\n");
   fprintf (of, "	mov	a,#l_XINIT\n");
-  fprintf (of, "	add	a,#l_XINIT>>8\n");
+  fprintf (of, "	orl	a,#l_XINIT>>8\n");
   fprintf (of, "	jz	00003$\n");
   fprintf (of, "	mov	a,#s_XINIT\n");
   fprintf (of, "	add	a,#l_XINIT\n");

@@ -213,7 +213,7 @@ _ds390_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 static void _ds390_genXINIT (FILE * of) {
   fprintf (of, ";	_ds390_genXINIT() start\n");
   fprintf (of, "	mov	a,#l_XINIT\n");
-  fprintf (of, "	add	a,#l_XINIT>>8\n");
+  fprintf (of, "	orl	a,#l_XINIT>>8\n");
   fprintf (of, "	jz	00003$\n");
   fprintf (of, "	mov	a,#s_XINIT\n");
   fprintf (of, "	add	a,#l_XINIT\n");

@@ -3782,7 +3782,7 @@ genUnpackBits (operand * result, char *rname, int ptype)
 	if ((shCnt = SPEC_BSTR (etype)) || (SPEC_BLEN (etype) <= 8)) {
 
 		/* shift right acc */
-		AccRsh (shCnt);
+	  //		AccRsh (shCnt);
 
 		emitcode ("anl", "a,#0x%02x",
 			  ((unsigned char) -1) >> (8 - SPEC_BLEN (etype)));
@@ -3836,7 +3836,7 @@ genUnpackBits (operand * result, char *rname, int ptype)
 
 	if (rlen) {
 		//  emitcode("anl","a,#0x%02x",((unsigned char)-1)>>(rlen));
-		AccLsh (8 - rlen);
+	  //		AccLsh (8 - rlen);
 		aopPut (AOP (result), "a", offset++);
 	}
 

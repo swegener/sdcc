@@ -2,6 +2,8 @@
 
 	* src/SDCCast.c (decorateType): fixed bug #898889,
 	cast result of a literal complement too
+	* src/mcs51/ralloc.c (packRegsForAssign): fixed bug #930931,
+	fixed check for bitfields
 
 2004-04-11 Bernhard Held <bernhard AT bernhardheld.de>
 

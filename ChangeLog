@@ -1,3 +1,7 @@
+2004-02-08  Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* doc/sdccman.lyx: added section 3.14: sdcclib.
+
 2004-02-08 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* device/include/c8051f120.h,

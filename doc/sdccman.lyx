@@ -1718,10 +1718,10 @@ Install paths
 \begin_inset  Tabular
 <lyxtabular version="3" rows="5" columns="4">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -4566,6 +4566,243 @@ The most efficient way to use libraries is to keep separate modules in separate
 libsdcc.lib
 \emph default 
  in the directory <installdir>/share/lib/small.
+\layout Subsection
+
+Using sdcclib to Create and Manage Libraries
+\begin_inset LatexCommand \index{sdcclib}
+
+\end_inset 
+
+
+\layout Standard
+
+Alternatively, instead of having a .rel file for each entry on the library
+ file as described in the preceding section, sdcclib can be used to embed
+ all the modules belonging to such library in the library file itself.
+ This results in a larger library file, but it greatly reduces the number
+ of disk files accessed by the linker.
+  Additionally, the packed library file contains an index of all include
+ modules and symbols that significantly speeds up the linking process.
+ To display a list of options supported by sdcclib type:
+\newline 
+
+\layout Standard
+
+
+\family sans 
+\series bold 
+sdcclib -?
+\begin_inset LatexCommand \index{sdcclib}
+
+\end_inset 
+
+
+\newline 
+
+\newline 
+
+\family default 
+\series default 
+To create a new library file, start by compiling all the required modules.
+ For example:
+\newline 
+
+\layout Standard
+
+
+\series bold 
+sdcc -c _divsint.c
+\layout Standard
+
+
+\series bold 
+sdcc -c _divuint.c
+\layout Standard
+
+
+\series bold 
+sdcc -c _modsint.c
+\layout Standard
+
+
+\series bold 
+sdcc -c _moduint.c
+\layout Standard
+
+
+\series bold 
+sdcc -c _mulint.c
+\newline 
+
+\layout Standard
+
+This will create files _divsint.rel, _divuint.rel, _modsint.rel, _moduint.rel,
+ and _mulint.rel.
+ The next step is to add the .rel files to the library file:
+\newline 
+
+\layout Standard
+
+
+\series bold 
+sdcclib libint.lib _divsint.rel
+\begin_inset LatexCommand \index{sdcclib}
+
+\end_inset 
+
+
+\layout Standard
+
+
+\series bold 
+sdcclib libint.lib _divuint.rel
+\layout Standard
+
+
+\series bold 
+sdcclib libint.lib _modsint.rel
+\layout Standard
+
+
+\series bold 
+sdcclib libint.lib _moduint.rel
+\layout Standard
+
+
+\series bold 
+sdcclib libint.lib _mulint.rel
+\series default 
+
+\newline 
+
+\layout Standard
+
+If the file already exists in the library, it will be replaced.
+ To see what modules and symbols are included in the library, options -s
+ and -m are available.
+ For example:
+\newline 
+
+\newline 
+
+\series bold 
+sdcclib -s libint.lib
+\begin_inset LatexCommand \index{sdcclib}
+
+\end_inset 
+
+
+\newline 
+_divsint.rel:
+\layout Standard
+
+
+\series bold 
+__divsint_a_1_1
+\layout Standard
+
+
+\series bold 
+__divsint_PARM_2
+\layout Standard
+
+
+\series bold 
+__divsint
+\newline 
+_divuint.rel:
+\layout Standard
+
+
+\series bold 
+__divuint_a_1_1
+\layout Standard
+
+
+\series bold 
+__divuint_PARM_2
+\layout Standard
+
+
+\series bold 
+__divuint_reste_1_1
+\layout Standard
+
+
+\series bold 
+__divuint_count_1_1
+\layout Standard
+
+
+\series bold 
+__divuint
+\newline 
+_modsint.rel:
+\layout Standard
+
+
+\series bold 
+__modsint_a_1_1
+\layout Standard
+
+
+\series bold 
+__modsint_PARM_2
+\layout Standard
+
+
+\series bold 
+__modsint
+\newline 
+_moduint.rel:
+\layout Standard
+
+
+\series bold 
+__moduint_a_1_1
+\layout Standard
+
+
+\series bold 
+__moduint_PARM_2
+\layout Standard
+
+
+\series bold 
+__moduint_count_1_1
+\layout Standard
+
+
+\series bold 
+__moduint
+\newline 
+_mulint.rel:
+\layout Standard
+
+
+\series bold 
+__mulint_PARM_2
+\layout Standard
+
+
+\series bold 
+__mulint
+\newline 
+
+\layout Standard
+
+If the source files are compiled using --debug, the corresponding debug
+ information file .adb will be include in the library file as well.
+ The library files created with sdcclib are plain text files, so they can
+ be viewed with a text editor.
+ It is not recomended to modify a library file created with sdcclib using
+ a text editor, as there are file indexes numbers located accross the file
+ used by the linker to quickly locate the required module to link.
+ Once a .rel file (as well as a .adb file) is added to a library using sdcclib,
+ it can be safely deleted, since all the information required for linking
+ is embedded in the library file itself.
+ Library files created using sdcclib are used as described in the preceding
+ sections.
 \layout Section
 
 Command Line Options
@@ -11957,8 +12194,8 @@ For signed & unsigned int (16 bit) and long (32 bit) variables, division,
 \begin_inset  Tabular
 <lyxtabular version="3" rows="11" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -12251,8 +12488,8 @@ SDCC supports IEEE (single precision 4 bytes) floating point numbers.The
 \begin_inset  Tabular
 <lyxtabular version="3" rows="17" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -13574,8 +13811,8 @@ The compiler creates the following #defines
 \begin_inset  Tabular
 <lyxtabular version="3" rows="10" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -15649,7 +15886,7 @@ Documentation
 \begin_inset  Tabular
 <lyxtabular version="3" rows="10" columns="2">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="0">
+<column alignment="left" valignment="top" leftline="true" width="0(null)">
 <column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">

@@ -8180,7 +8180,9 @@ genAddrOf (iCode * ic)
       if (sym->stack)
 	{
 	  emitcode ("mov", "a,_bp");
-	  emitcode ("add", "a,#0x%02x", ((char) sym->stack & 0xff));
+	  emitcode ("add", "a,#0x%02x", ((sym->stack < 0) ?
+					 ((char) (sym->stack - _G.nRegsSaved)) :
+					 ((char) sym->stack)) & 0xff);
 	  aopPut (AOP (IC_RESULT (ic)), "a", 0);
 	}
       else

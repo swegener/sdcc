@@ -3076,7 +3076,7 @@ ast *createFor ( symbol *trueLabel, symbol *continueLabel ,
     /* vanilla for statement */
     condExpr = backPatchLabels(condExpr,trueLabel,falseLabel);
     
-    if (!IS_IFX(condExpr)) 
+    if (condExpr && !IS_IFX(condExpr)) 
 	condExpr = newIfxNode(condExpr,trueLabel,falseLabel);
     
     

@@ -430,9 +430,10 @@ DEFSETFUNC(ifPointerGet)
 {
     cseDef *cdp = item;
     V_ARG(operand *,op);
+    iCode *dic = cdp->diCode;
+    operand *left = IC_LEFT(cdp->diCode);
 
-    if (POINTER_GET(cdp->diCode) &&
-	IC_LEFT(cdp->diCode)->key == op->key)
+    if (POINTER_GET(dic) && left->key == op->key)
 	return 1;
 
     return 0;
@@ -984,14 +985,14 @@ int constFold (iCode *ic, set *cseSet)
 /* will delete from cseSet all get pointers computed from this     */
 /* pointer. A simple ifOperandsHave is not good enough here        */
 /*-----------------------------------------------------------------*/
-static void deleteGetPointers (set **cseSet,operand *op,eBBlock *ebb)
+static void deleteGetPointers (set **cseSet, set **pss, operand *op,eBBlock *ebb)
 {
     set *compItems = NULL;
     cseDef *cdp ;
     operand *cop;
     
     /* easy return */
-    if (!*cseSet)
+    if (!*cseSet && !*pss)
 	return ;
     
     /* first find all items computed from this operand .
@@ -1018,12 +1019,15 @@ static void deleteGetPointers (set **cseSet,operand *op,eBBlock *ebb)
     
     /* now delete all pointer gets with this op */
     deleteItemIf(cseSet,ifPointerGet,op);
+    deleteItemIf(pss,ifPointerSet,op);
+
     /* set the bit vector used by dataFlow computation later */
     ebb->ptrsSet = bitVectSetBit(ebb->ptrsSet,op->key);
     /* now for the computed items */
     for (cop = setFirstItem(compItems); cop ; cop = setNextItem(compItems)) {
 	ebb->ptrsSet = bitVectSetBit(ebb->ptrsSet,cop->key);	
 	deleteItemIf(cseSet,ifPointerGet,cop);
+	deleteItemIf(pss,ifPointerSet,cop);
     }
 }
 
@@ -1132,11 +1136,17 @@ int cseBBlock ( eBBlock *ebb, int computeOnly,
 		setUsesDefs(IC_LEFT(ic),ebb->defSet,
 			    ebb->outDefs,&ebb->usesDefs);
 	    }
+
+	    
 	    /* if we a sending a pointer as a parameter
 	       then kill all cse since the pointed to item
 	       might be changed in the function being called */
-	    if (IS_PTR(operandType(IC_LEFT(ic)))) {
-		    deleteGetPointers(&cseSet,IC_LEFT(ic),ebb);
+	    if ((ic->op == IPUSH || ic->op == SEND) &&
+		IS_PTR(operandType(IC_LEFT(ic)))) {
+		deleteGetPointers(&cseSet,&ptrSetSet,IC_LEFT(ic),ebb);
+		ebb->ptrsSet = bitVectSetBit(ebb->ptrsSet,IC_LEFT(ic)->key);
+		for (i = 0 ; i < count ;ebbs[i++]->visited = 0);
+		applyToSet(ebb->succList,delGetPointerSucc,IC_LEFT(ic),ebb->dfnum);
 	    }
 	    continue;
 	}
@@ -1316,7 +1326,10 @@ int cseBBlock ( eBBlock *ebb, int computeOnly,
 	if (ASSIGNMENT(ic)                        && 
 	    OTHERS_PARM(OP_SYMBOL(IC_RESULT(ic))) &&
 	    IS_PTR(operandType(IC_RESULT(ic)))) {
-	    deleteGetPointers(&cseSet,IC_RIGHT(ic),ebb);
+	    deleteGetPointers(&cseSet,&ptrSetSet,IC_RIGHT(ic),ebb);
+	    for (i = 0 ; i < count ;ebbs[i++]->visited = 0);
+	    applyToSet(ebb->succList,delGetPointerSucc,IC_RIGHT(ic),ebb->dfnum);
+	    ebb->ptrsSet = bitVectSetBit(ebb->ptrsSet,IC_RIGHT(ic)->key);
 	}
 
 	/* if this is a pointerget then see if we can replace

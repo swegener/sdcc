@@ -1,4 +1,9 @@
-2005-03-12 Vangelis Rokas <vrokas AT users.sourceforge.net>
+2005-03-15 Vangelis Rokas <vrokas AT users.sourceforge.net>
+
+	* src/pic16/genutils.c (pic16_genCmp_special): initialized offs to
+	prevent compiler warning
+
+2005-03-14 Vangelis Rokas <vrokas AT users.sourceforge.net>
 
 	* device/lib/pic16/startup/crt0i.c (_cinit): local variables where
 	moved to level 0 and declared as static. Also they are explicit

@@ -497,7 +497,7 @@ int pic16_genCmp_special(operand *left, operand *right, operand *result,
                     iCode *ifx, resolvedIfx *rIfx, int sign)
 {
   int size;
-  int offs;
+  int offs=0;
   symbol *tmplbl;
   unsigned long lit;
   int op, cmp_op=0;

@@ -82,6 +82,11 @@ static void _mcs51_finaliseOptions(void)
      */
     if (options.model == MODEL_FLAT24)
     {
+	
+	fprintf(stderr, "*** WARNING: you should use the '-mds390' option "
+			"for DS80C390 support. This code generator is "
+			"badly out of date and probably broken.\n");
+	
         port->s.fptr_size = 3;
         port->s.gptr_size = 4;
         port->stack.isr_overhead++;   /* Will save dpx on ISR entry. */

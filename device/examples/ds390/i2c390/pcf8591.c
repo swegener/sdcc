@@ -1,21 +1,16 @@
 #include "i2clole.h"
 #include "pcf8591.h"
 
-#if 0 || FIND_OPERATOR_PRECEDING_INCONSISTANCY
-#undef PCF8591_ID
-#define PCF8591_ID 0x90;
-#endif
-
 unsigned char ReadPCF8591(char address, char channel) {
   
-  unsigned char id=PCF8591_ID+address<<1;
+  unsigned char id=PCF8591_ID+(address<<1);
   
   while (!I2CReset()) {
     //fprintf (stderr, "I2C bus busy, retrying.\n");
   }
   
   // set output enable, no autoincrement
-  i2cTransmitBuffer[0]=channel&0x03+0x40;
+  i2cTransmitBuffer[0]=(channel&0x03)+0x40;
 
   // read 2 bytes, since the first one is the old value
   if (I2CSendReceive(id, 1, 2))

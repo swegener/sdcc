@@ -1,3 +1,3 @@
 
-unsigned char _ret2;
-unsigned char _ret3;
+data unsigned char _ret2;
+data unsigned char _ret3;

@@ -1,3 +1,11 @@
+2004-08-28 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCsymt.c (processFuncArgs): make sure parameter types
+	are sane and complete before asking the port its prefered parameter
+	passing method (fixes bug #1017633)
+	* device/lib/hc08/_ret.c: added "data" storage class to _ret2
+	and _ret3
+
 2004-08-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (genPackBitsImmed, genUnpackBitsImmed): fix offset

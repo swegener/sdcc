@@ -2475,7 +2475,12 @@ processFuncArgs (symbol * func)
   /* change it to pointer to the same type */
   while (val)
     {
-        int argreg = 0;
+      int argreg = 0;
+      char buffer[SDCC_NAME_MAX+1];
+      
+      SNPRINTF (buffer, sizeof(buffer), "%s parameter %d", func->name, pNum);
+      checkTypeSanity (val->etype, buffer);
+      
       /* mark it as a register parameter if
          the function does not have VA_ARG
          and as port dictates */

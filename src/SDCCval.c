@@ -340,28 +340,28 @@ value *cheapestVal (value *val) {
     if (uval<=0xffff) {
       SPEC_LONG(val->type)=0;
       SPEC_CVAL(val->type).v_uint = uval;
-    }
-    if (uval<=0xff) {
-      SPEC_NOUN(val->type)=V_CHAR;
+      if (uval<=0xff) {
+	SPEC_NOUN(val->type)=V_CHAR;
+      }
     }
   } else { // not unsigned
     if (sval<0) {
       if (sval>=-32768) {
 	SPEC_LONG(val->type)=0;
 	SPEC_CVAL(val->type).v_int = sval & 0xffff;
-      }
-      if (sval>=-128) {
-	SPEC_NOUN(val->type)=V_CHAR;
-	SPEC_CVAL(val->type).v_int &= 0xff;
+	if (sval>=-128) {
+	  SPEC_NOUN(val->type)=V_CHAR;
+	  SPEC_CVAL(val->type).v_int &= 0xff;
+	}
       }
     } else { // sval>=0
       SPEC_USIGN(val->type)=1;
       if (sval<=65535) {
 	SPEC_LONG(val->type)=0;
 	SPEC_CVAL(val->type).v_int = sval;
-      }
-      if (sval<=255) {
-	SPEC_NOUN(val->type)=V_CHAR;
+	if (sval<=255) {
+	  SPEC_NOUN(val->type)=V_CHAR;
+	}
       }
     }
   }
@@ -860,7 +860,7 @@ valFromType (sym_link * type)
 }
 
 /*------------------------------------------------------------------*/
-/* floatFromVal - value to unsinged integer conversion        */
+/* floatFromVal - value to double float conversion                  */
 /*------------------------------------------------------------------*/
 double 
 floatFromVal (value * val)

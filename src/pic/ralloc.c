@@ -861,7 +861,6 @@ pic14_findFreeReg(short type)
   case REG_GPR:
     if((dReg = regFindFree(dynAllocRegs)) != NULL)
       return dReg;
-    //fprintf(stderr,"findfreereg\n");
     return addSet(&dynAllocRegs,newReg(REG_GPR, PO_GPR_TEMP,dynrIdx++,NULL,1,0));
 
   case REG_STK:

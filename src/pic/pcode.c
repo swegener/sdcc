@@ -2181,7 +2181,10 @@ pCodeOp *newpCodeOp(char *name, PIC_OPTYPE type)
     break;
 
   case PO_GPR_REGISTER:
-    pcop = newpCodeOpReg(-1);
+    if(name)
+      pcop = newpCodeOpRegFromStr(name);
+    else
+      pcop = newpCodeOpReg(-1);
     break;
 
   default:

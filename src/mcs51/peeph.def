@@ -1036,6 +1036,16 @@ replace {
         mov  dptr,#0x0000
 }
 
+// saving 3 bytes, 2 cycles
+// provided by Bernhard Held <bernhard.held@de.westinghouse.com>
+replace {
+	mov dpl,#%1
+	mov dph,#(%1 >> 8)
+} by {
+	; Peephole 182a use 16 bit load of DPTR
+	mov dptr,#%1
+}
+
 // saving 3 byte, 2 cycles, return(float_constant) profits here
 replace {
         mov  dpl,#%1

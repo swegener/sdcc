@@ -26,8 +26,12 @@
 #include "asm.h"
 #include <time.h>
 #include "newalloc.h"
+#include <fcntl.h>
+#include <sys/stat.h>
 
-#if !defined(__BORLANDC__) && !defined(_MSC_VER)
+#ifdef _WIN32
+#include <io.h>
+#else
 #include <unistd.h>
 #endif
 
@@ -1703,58 +1707,148 @@ glue (void)
   rm_tmpfiles ();
 }
 
-/** Creates a temporary file name a'la tmpnam which avoids the bugs
-    in cygwin wrt c:\tmp.
-    Scans, in order: TMP, TEMP, TMPDIR, else uses tmpfile().
+
+/** Creates a temporary file with unoque file name
+    Scans, in order:
+    - TMP, TEMP, TMPDIR env. varibles
+    - if Un*x system: /usr/tmp and /tmp
+    - root directory using mkstemp() if avaliable
+    - default location using tempnam()
 */
-char *
-tempfilename (void)
+static int
+tempfileandname(char *fname, size_t len)
 {
+#define TEMPLATE      "sdccXXXXXX"
+#define TEMPLATE_LEN  ((sizeof TEMPLATE) - 1)
+
   const char *tmpdir = NULL;
-  if (getenv ("TMP"))
-    tmpdir = getenv ("TMP");
-  else if (getenv ("TEMP"))
-    tmpdir = getenv ("TEMP");
-  else if (getenv ("TMPDIR"))
-    tmpdir = getenv ("TMPDIR");
-  if (tmpdir)
-    {
-      char *name = tempnam (tmpdir, "sdcc");
-      if (name)
-	{
-          return name;
-        }
+  int fd;
+
+  if ((tmpdir = getenv ("TMP")) == NULL)
+    if ((tmpdir = getenv ("TEMP")) == NULL)
+      tmpdir = getenv ("TMPDIR");
+
+#ifndef _WIN32
+  {
+    /* try with /usr/tmp and /tmp on Un*x systems */
+    struct stat statbuf;
+
+    if (tmpdir == NULL) {
+      if (stat("/usr/tmp", &statbuf) != -1)
+        tmpdir = "/usr/tmp";
+      else if (stat("/tmp", &statbuf) != -1)
+        tmpdir = "/tmp";
     }
-  return tmpnam (NULL);
+  }
+#endif
+
+#ifdef HAVE_MKSTEMP
+  {
+    char fnamebuf[PATH_MAX];
+    size_t name_len;
+
+    if (fname == NULL || len == 0) {
+      fname = fnamebuf;
+      len = sizeof fnamebuf;
+    }
+
+    if (tmpdir) {
+      name_len = strlen(tmpdir) + 1 + TEMPLATE_LEN;
+
+      assert(name_len < len);
+      if (!(name_len < len))  /* in NDEBUG is defined */
+        return -1;            /* buffer too small, temporary file can not be created */
+
+      sprintf(fname, "%s" DIR_SEPARATOR_STRING TEMPLATE, tmpdir);
+    }
+    else {
+      name_len = TEMPLATE_LEN;
+
+      assert(name_len < len);
+      if (!(name_len < len))  /* in NDEBUG is defined */
+        return -1;            /* buffer too small, temporary file can not be created */
+
+      strcpy(fname, TEMPLATE);
+    }
+
+    fd = mkstemp(fname);
+  }
+#else
+  {
+    char *name = tempnam(tmpdir, "sdcc");
+
+    if (name == NULL) {
+      perror("Can't create temporary file name");
+      exit(1);
+    }
+
+    assert(strlen(name) < len);
+    if (!(strlen(name) < len))  /* in NDEBUG is defined */
+      return -1;                /* buffer too small, temporary file can not be created */
+
+    strcpy(fname, name);
+#ifdef _WIN32
+    fd = open(name, O_CREAT | O_EXCL | O_RDWR, S_IREAD | S_IWRITE);
+#else
+    fd = open(name, O_CREAT | O_EXCL | O_RDWR, S_IRUSR | S_IWUSR);
+#endif
+  }
+#endif
+
+  if (fd == -1) {
+    perror("Can't create temporary file");
+    exit(1);
+  }
+
+  return fd;
 }
 
-/** Creates a temporary file a'la tmpfile which avoids the bugs
-    in cygwin wrt c:\tmp.
-    Scans, in order: TMP, TEMP, TMPDIR, else uses tmpfile().
+
+/** Create a temporary file name
+*/
+char *
+tempfilename(void)
+{
+  int fd;
+  static char fnamebuf[PATH_MAX];
+
+  if ((fd = tempfileandname(fnamebuf, sizeof fnamebuf)) == -1) {
+    fprintf(stderr, "Can't create temporary file name!");
+    exit(1);
+  }
+
+  fd = close(fd);
+  assert(fd != -1);
+
+  return fnamebuf;
+}
+
+
+/** Create a temporary file and add it to tmpfileNameSet,
+    so that it is removed explicitly by rm_tmpfiles()
+    or implicitly at program extit.
 */
 FILE *
-tempfile (void)
+tempfile(void)
 {
-  const char *tmpdir = NULL;
-  if (getenv ("TMP"))
-    tmpdir = getenv ("TMP");
-  else if (getenv ("TEMP"))
-    tmpdir = getenv ("TEMP");
-  else if (getenv ("TMPDIR"))
-    tmpdir = getenv ("TMPDIR");
-  if (tmpdir)
-    {
-      char *name = Safe_strdup( tempnam (tmpdir, "sdcc"));
-      if (name)
-	{
-	  FILE *fp = fopen (name, "w+b");
-	  if (fp)
-	    {
-	      addSetHead (&tmpfileNameSet, name);
-	    }
-	  return fp;
-	}
-      return NULL;
-    }
-  return tmpfile ();
+  int fd;
+  char *tmp;
+  FILE *fp;
+  char fnamebuf[PATH_MAX];
+
+  if ((fd = tempfileandname(fnamebuf, sizeof fnamebuf)) == -1) {
+    fprintf(stderr, "Can't create temporary file name!");
+    exit(1);
+  }
+
+  tmp = Safe_strdup(fnamebuf);
+  if (tmp)
+    addSetHead(&tmpfileNameSet, tmp);
+
+  if ((fp = fdopen(fd, "w+b")) == NULL) {
+      perror("Can't create temporary file name!");
+      exit(1);
+  }
+
+  return fp;
 }

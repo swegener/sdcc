@@ -1,3 +1,11 @@
+2003-03-09  Borut Razem <borut.razem@siol.net>
+
+	* src/SDCCglue.c: re-implemented tempfilename() and tempfile(): using mkstemp() if available
+	* src/SDCCsymt.h: fixed MSVC and BORLANDC compilation (included SDCCglobl.h instead srccconf.h)
+	* sdcc_vc_in.h: explicitly undefined HAVE_MKSTEMP which is not available on BORLANDC and MSVC
+	* src/SDCCset.h: removed inclusion of sdccconf.h or sdcc_vc.h
+	* src/SDCCglobl.h: unification of WIN32 native definitions
+
 2003-03-09  Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
 	* src/mcs51/gen.c: applied in-/dec patch mentioned on sdcc-devel 2003-03-01

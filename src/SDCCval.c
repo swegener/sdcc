@@ -419,9 +419,8 @@ copyStr (char *dest, char *src)
 	      } else {
 		if (value>255) {
 		  werror(W_ESC_SEQ_OOR_FOR_CHAR);
-		} else {
-		  *dest++ = value;
 		}
+		*dest++ = value;
 		src--;
 	      }
 	      break;

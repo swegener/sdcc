@@ -464,12 +464,12 @@ PORT hc08_port =
     },
   },
   {
-    255/3,      /* maxCount */
-    3,          /* sizeofElement */
+    256,        /* maxCount */
+    2,          /* sizeofElement */
     {8,16,32},  /* sizeofMatchJump[] */
     {8,16,32},  /* sizeofRangeCompare[] */
     5,          /* sizeofSubtract */
-    11,         /* sizeofDispatch */
+    10,         /* sizeofDispatch */
   },
   "_",
   _hc08_init,

@@ -411,18 +411,18 @@ pullReg (regs *reg)
 	updateCFA();
         break;
       case HX_IDX:
-        emitcode ("pulx", "");
+        emitcode ("pulh", "");
         _G.stackPushes--;
 	updateCFA();
-        emitcode ("pulh", "");
+        emitcode ("pulx", "");
         _G.stackPushes--;
 	updateCFA();
         break;
       case XA_IDX:
-        emitcode ("pula", "");
+        emitcode ("pulx", "");
         _G.stackPushes--;
 	updateCFA();
-        emitcode ("pulx", "");
+        emitcode ("pula", "");
         _G.stackPushes--;
 	updateCFA();
         break;
@@ -7665,32 +7665,59 @@ static void
 genJumpTab (iCode * ic)
 {
   symbol *jtab;
-//  char *l;
-
+  symbol *jtablo = newiTempLabel (NULL);
+  symbol *jtabhi = newiTempLabel (NULL);
+  
   D(emitcode (";     genJumpTab",""));
 
   aopOp (IC_JTCOND (ic), ic, FALSE);
-  /* get the condition into accumulator */
-  loadRegFromAop (hc08_reg_a, AOP (IC_JTCOND (ic)), 0);
-  freeAsmop (IC_JTCOND (ic), NULL, ic, TRUE);
-  /* multiply by three */
-  pushReg (hc08_reg_a, FALSE);
-  emitcode ("lsla", "");
-  emitcode ("add","1,s");
-  transferRegReg (hc08_reg_a, hc08_reg_x, TRUE);
-  loadRegFromConst (hc08_reg_h, zero);
-  pullReg (hc08_reg_a);
+  
+  if (hc08_reg_x->isFree && hc08_reg_x->isFree)
+    {
+      /* get the condition into x */
+      loadRegFromAop (hc08_reg_x, AOP (IC_JTCOND (ic)), 0);
+      freeAsmop (IC_JTCOND (ic), NULL, ic, TRUE);
+      loadRegFromConst (hc08_reg_h, zero);
 
-  jtab = newiTempLabel (NULL);
-  emitcode ("jmp", "%05d$,x", jtab->key + 100);
-  emitcode ("", "%05d$:", jtab->key + 100);
+      emitcode ("lda", "%05d$,x", jtabhi->key + 100);
+      emitcode ("ldx", "%05d$,x", jtablo->key + 100);
+      transferRegReg (hc08_reg_a, hc08_reg_h, TRUE);
+      emitcode ("jmp", ",x");
+
+      hc08_dirtyReg (hc08_reg_a, TRUE);
+      hc08_dirtyReg (hc08_reg_hx, TRUE);
+    }
+  else
+    {
+      adjustStack(-2);
+      pushReg(hc08_reg_hx, TRUE);
+      
+      /* get the condition into x */
+      loadRegFromAop (hc08_reg_x, AOP (IC_JTCOND (ic)), 0);
+      freeAsmop (IC_JTCOND (ic), NULL, ic, TRUE);
+      loadRegFromConst (hc08_reg_h, zero);
+
+      emitcode ("lda", "%05d$,x", jtabhi->key + 100);
+      emitcode ("sta", "3,s");
+      emitcode ("lda", "%05d$,x", jtablo->key + 100);
+      emitcode ("sta", "4,s");
+      
+      pullReg(hc08_reg_hx);
+      emitcode ("rts", "");
+      _G.stackPushes += 2;
+      updateCFA();
+    }
+
   /* now generate the jump labels */
+  emitLabel (jtablo);
   for (jtab = setFirstItem (IC_JTLABELS (ic)); jtab;
        jtab = setNextItem (IC_JTLABELS (ic)))
-    emitcode ("jmp", "%05d$", jtab->key + 100);
+    emitcode (".db", "%05d$", jtab->key + 100);
+  emitLabel (jtabhi);
+  for (jtab = setFirstItem (IC_JTLABELS (ic)); jtab;
+       jtab = setNextItem (IC_JTLABELS (ic)))
+    emitcode (".db", ">%05d$", jtab->key + 100);
 
-  hc08_dirtyReg (hc08_reg_a, TRUE);
-  hc08_dirtyReg (hc08_reg_hx, TRUE);
 }
 
 /*-----------------------------------------------------------------*/

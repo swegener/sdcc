@@ -1,3 +1,12 @@
+2004-09-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/main.c,
+	* src/hc08/gen.c (genJumpTable): more efficient jump table, supports
+	preservation of HX
+	* src/hc08/gen.c (pullRegs): fixed order of HX & XA pairs
+	* src/mcs51/ralloc.c (packRegisters): removed the patch applied
+	on 2004-09-12; it was buggy
+
 2004-09-15 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCsymt.h: removed RESULT_CHECK

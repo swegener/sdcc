@@ -2808,46 +2808,6 @@ packRegisters (eBBlock ** ebpp, int blockno)
 
   for (ic = ebp->sch; ic; ic = ic->next)
     {
-      /* Fix for bug #979599:   */
-      /* P0 &= ~1;              */
-
-      /* Look for two subsequent iCodes with */
-      /*   iTemp := _c;         */
-      /*   _c = iTemp & op;     */
-      /* and replace them by    */
-      /*   _c = _c & op;        */
-      if ((ic->op == BITWISEAND || ic->op == '|' || ic->op == '^') &&
-          /* avoid trouble with unary '&' */
-          IC_RIGHT (ic) &&
-          ic->prev &&
-          ic->prev->op == '=' &&
-          IS_ITEMP (IC_LEFT (ic)) &&
-          IC_LEFT (ic) == IC_RESULT (ic->prev) &&
-          isOperandEqual (IC_RESULT(ic), IC_RIGHT(ic->prev)))
-        {
-          int key = ic->prev->key;
-
-          bitVectUnSetBit (OP_SYMBOL (IC_RESULT (ic->prev))->defs, key);
-          ReplaceOpWithCheaperOp (&IC_LEFT (ic), IC_RESULT (ic));
-          if (/*IS_ITEMP (IC_RESULT (ic->prev)) && */
-              OP_SYMBOL (IC_RESULT (ic->prev))->liveFrom > ic->seq)
-            {
-              OP_SYMBOL (IC_RESULT (ic->prev))->liveFrom = ic->seq;
-            }
-          // TODO: and the other way round?
-
-          /* delete from liverange table also
-             delete from all the points in between and the new one */
-          bitVectUnSetBit (ic->prev->rlive, IC_RESULT (ic->prev)->key);
-          bitVectSetBit   (ic->prev->rlive, IC_RESULT (ic)->key);
-          bitVectUnSetBit (ic->rlive, IC_RESULT (ic->prev)->key);
-          bitVectSetBit   (ic->rlive, IC_RESULT (ic)->key);
-
-          remiCodeFromeBBlock (ebp, ic->prev);
-          // bitVectUnSetBit (OP_SYMBOL (IC_RESULT (ic))->defs, ic->key);
-          hTabDeleteItem (&iCodehTab, key, ic->prev, DELETE_ITEM, NULL);
-          // OP_DEFS (IC_RESULT (ic->prev)) = bitVectSetBit (OP_DEFS (IC_RESULT (ic->prev)), ic->prev->key);
-        }
 
       /* if this is an itemp & result of an address of a true sym
          then mark this as rematerialisable   */

@@ -540,14 +540,15 @@ int printIvalCharPtr (symbol * sym, link * type, value * val, FILE * oFile)
 		    "\t!dbs\n", val->name) ;
 	    break;
 	case 2:
-	    tfprintf(oFile, "\t!dws\n", val->name);
+	    tfprintf(oFile, "\t.byte %s,(%s >> 8)\n", val->name, val->name);
 	    break;
 	    /* PENDING: probably just 3 */
 	default:
 	    /* PENDING: 0x02 or 0x%02x, CDATA? */
 	    fprintf (oFile,
-		     "\t.byte %s,(%s >> 8),#0x02\n",
-		     val->name, val->name);
+		     "\t.byte %s,(%s >> 8),#0x%02x\n",
+		     val->name, val->name, (IS_PTR(val->type) ? DCL_TYPE(val->type) :
+					    PTR_TYPE(SPEC_OCLS(val->etype))));
 	}
     }
     else {
@@ -631,8 +632,9 @@ void printIvalPtr (symbol * sym, link * type, initList * ilist, FILE * oFile)
 	break;
 	
     case 3:
-	fprintf (oFile, "\t.byte %s,(%s >> 8),#0x02\n",
-		 val->name, val->name);
+	fprintf (oFile, "\t.byte %s,(%s >> 8),#0x%02x\n",
+		 val->name, val->name,(IS_PTR(val->type) ? DCL_TYPE(val->type) :
+					    PTR_TYPE(SPEC_OCLS(val->etype))));
     }
     return;
 }

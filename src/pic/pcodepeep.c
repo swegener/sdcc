@@ -45,6 +45,7 @@ int getpCode(char *mnem,int dest);
 int getpCodePeepCommand(char *cmd);
 void pBlockMergeLabels(pBlock *pb);
 char *pCode2str(char *str, int size, pCode *pc);
+char *get_op( pCodeOp *pcop);
 
 extern pCodeInstruction *pic14Mnemonics[];
 
@@ -1403,6 +1404,49 @@ int pCodeSearchCondition(pCode *pc, unsigned int cond)
   return 0;
 }
 
+/*-----------------------------------------------------------------
+ * int pCodeOpCompare(pCodeOp *pcops, pCodeOp *pcopd)
+ *
+ * Compare two pCodeOp's and return 1 if they're the same
+ *-----------------------------------------------------------------*/
+int pCodeOpCompare(pCodeOp *pcops, pCodeOp *pcopd)
+{
+
+  if(!pcops || !pcopd)
+    return 0;
+
+  fprintf(stderr," Comparing operands %s",
+	  get_op( pcops));
+
+  fprintf(stderr," to %s\n",
+	  get_op( pcopd));
+
+  if(pcops->type != pcopd->type) {
+    fprintf(stderr,"  - fail - diff types\n");
+    return 0;  // different types
+  }
+
+  if(!pcops->name ||  !pcopd->name || strcmp(pcops->name,pcopd->name)) {
+    fprintf(stderr,"  - fail - diff names\n");
+    return 0;  // different names
+  }
+
+  switch(pcops->type) {
+  case PO_DIR:
+    if( PCOR(pcops)->instance != PCOR(pcopd)->instance) {
+      fprintf(stderr, "  - fail different instances\n");
+      return 0;
+    }
+    break;
+  default:
+    break;
+  }
+
+  fprintf(stderr,"  - pass\n");
+
+  return 1;
+}
+
 int pCodePeepMatchLabels(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 {
   int labindex;
@@ -1504,13 +1548,24 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 	    exit(1);
 	  }
 #endif
+
 	  PCOW(PCI(pcd)->pcop)->matched = PCI(pcs)->pcop;
 	  if(!peepBlock->target.wildpCodeOps[index]) {
 	    peepBlock->target.wildpCodeOps[index] = PCI(pcs)->pcop;
 
 	    //if(PCI(pcs)->pcop->type == PO_GPR_TEMP) 
 
+	  } else {
+	    pcs->print(stderr,pcs);
+	    pcd->print(stderr,pcd);
+
+	    fprintf(stderr, "comparing operands of these instructions, result %d\n",
+		    pCodeOpCompare(PCI(pcs)->pcop, peepBlock->target.wildpCodeOps[index])
+		    );
+
+	    return pCodeOpCompare(PCI(pcs)->pcop, peepBlock->target.wildpCodeOps[index]);
 	  }
+
 	  {
 	    char *n;
 
@@ -1533,6 +1588,7 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 	      return 1;
 	    }
 	  }
+
 	}
 	/* FIXME - need an else to check the case when the destination 
 	 * isn't a wild card */
@@ -1717,12 +1773,16 @@ pCodeOp *pCodeOpCopy(pCodeOp *pcop)
     pcopnew = Safe_calloc(1,sizeof(pCodeOpReg) );
     PCOR(pcopnew)->r = PCOR(pcop)->r;
     PCOR(pcopnew)->rIdx = PCOR(pcop)->rIdx;
+    PCOR(pcopnew)->instance = PCOR(pcop)->instance;
     DFPRINTF((stderr," register index %d\n", PCOR(pcop)->r->rIdx));
     break;
 
   case PO_DIR:
     fprintf(stderr,"pCodeOpCopy PO_DIR\n");
     pcopnew = Safe_calloc(1,sizeof(pCodeOpReg) );
+    PCOR(pcopnew)->r = PCOR(pcop)->r;
+    PCOR(pcopnew)->rIdx = PCOR(pcop)->rIdx;
+    PCOR(pcopnew)->instance = PCOR(pcop)->instance;
     break;
   case PO_STATUS:
     DFPRINTF((stderr,"pCodeOpCopy PO_STATUS\n"));

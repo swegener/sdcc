@@ -1308,7 +1308,7 @@ pCodeOp *popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 	strcpy(pcop->name,aop->aopu.aop_dir);   
 	PCOR(pcop)->r = dirregWithName(aop->aopu.aop_dir);
 	if(PCOR(pcop)->r == NULL) {
-	  fprintf(stderr,"%d - couldn't find %s in allocated registers, size =%d\n",__LINE__,aop->aopu.aop_dir,aop->size);
+	  //fprintf(stderr,"%d - couldn't find %s in allocated registers, size =%d\n",__LINE__,aop->aopu.aop_dir,aop->size);
 	  PCOR(pcop)->r = allocRegByName (aop->aopu.aop_dir,aop->size);
 	} 
 
@@ -1334,8 +1334,8 @@ pCodeOp *popGet (asmop *aop, int offset) //, bool bit16, bool dname)
     case AOP_CRY:
       pcop = newpCodeOpBit(aop->aopu.aop_dir,-1,1);
       PCOR(pcop)->r = dirregWithName(aop->aopu.aop_dir);
-      if(PCOR(pcop)->r == NULL)
-	fprintf(stderr,"%d - couldn't find %s in allocated registers\n",__LINE__,aop->aopu.aop_dir);
+      //if(PCOR(pcop)->r == NULL)
+      //fprintf(stderr,"%d - couldn't find %s in allocated registers\n",__LINE__,aop->aopu.aop_dir);
       return pcop;
 	
     case AOP_LIT:
@@ -3674,7 +3674,7 @@ static int genChkZeroes(operand *op, int lit,  int size)
 static void genCmp (operand *left,operand *right,
                     operand *result, iCode *ifx, int sign)
 {
-  int size, offset = 0 ;
+  int size; //, offset = 0 ;
   unsigned long lit = 0L,i = 0;
   resolvedIfx rFalseIfx;
   //  resolvedIfx rTrueIfx;
@@ -3702,15 +3702,16 @@ static void genCmp (operand *left,operand *right,
     size = max(AOP_SIZE(left),AOP_SIZE(right));
 
     /* if unsigned char cmp with lit, do cjne left,#right,zz */
-    if((size == 1) && !sign &&
-       (AOP_TYPE(right) == AOP_LIT && AOP_TYPE(left) != AOP_DIR )){
-      symbol *lbl  = newiTempLabel(NULL);
-      pic14_emitcode("cjne","%s,%s,%05d_DS_",
-	       aopGet(AOP(left),offset,FALSE,FALSE),
-	       aopGet(AOP(right),offset,FALSE,FALSE),
-	       lbl->key+100);
-      pic14_emitcode("","%05d_DS_:",lbl->key+100);
-    } else {
+    //if((size == 1) && !sign &&
+    //   (AOP_TYPE(right) == AOP_LIT && AOP_TYPE(left) != AOP_DIR )){
+    //  symbol *lbl  = newiTempLabel(NULL);
+    //  pic14_emitcode("cjne","%s,%s,%05d_DS_",
+    //       aopGet(AOP(left),offset,FALSE,FALSE),
+    //       aopGet(AOP(right),offset,FALSE,FALSE),
+    //       lbl->key+100);
+    //pic14_emitcode("","%05d_DS_:",lbl->key+100);
+    //} else 
+      {
 
       symbol *lbl  = newiTempLabel(NULL);
 
@@ -5867,6 +5868,7 @@ static void genInline (iCode *ic)
         if (*bp == '\n') {
             *bp++ = '\0';
             pic14_emitcode(bp1,"");
+	    addpCode2pBlock(pb,newpCodeInlineP(bp1));
             bp1 = bp;
         } else {
             if (*bp == ':') {
@@ -5879,8 +5881,10 @@ static void genInline (iCode *ic)
                 bp++;
         }
     }
-    if (bp1 != bp)
+    if (bp1 != bp) {
         pic14_emitcode(bp1,"");
+	addpCode2pBlock(pb,newpCodeInlineP(bp1));
+    }
     /*     pic14_emitcode("",buffer); */
     _G.inLine -= (!options.asmpeep);
 }
@@ -6121,7 +6125,7 @@ static void shiftR1Left2ResultSigned (operand *left, int offl,
 
   DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
-  same = (left == result) || (AOP(left) == AOP(result));
+  same = ((left == result) || (AOP(left) == AOP(result))) && (offl == offr);
 
   switch(shCount) {
   case 1:
@@ -6134,6 +6138,90 @@ static void shiftR1Left2ResultSigned (operand *left, int offl,
     }
 
     break;
+  case 2:
+
+    emitpcode(POC_RLFW, popGet(AOP(left),offl));
+    if(same) 
+      emitpcode(POC_RRF, popGet(AOP(result),offr));
+    else {
+      emitpcode(POC_RRFW, popGet(AOP(left),offl));
+      emitpcode(POC_MOVWF, popGet(AOP(result),offr));
+    }
+    emitpcode(POC_RLFW, popGet(AOP(result),offl));
+    emitpcode(POC_RRF,  popGet(AOP(result),offl));
+
+    break;
+
+  case 3:
+    if(same)
+      emitpcode(POC_SWAPF, popGet(AOP(result),offr));
+    else {
+      emitpcode(POC_SWAPFW, popGet(AOP(left),offl));
+      emitpcode(POC_MOVWF, popGet(AOP(result),offr));
+    }
+
+    emitpcode(POC_RLFW,  popGet(AOP(result),offr));
+    emitpcode(POC_RLFW,  popGet(AOP(result),offr));
+    emitpcode(POC_ANDLW, popGetLit(0x1f));
+
+    emitpcode(POC_BTFSC, newpCodeOpBit(aopGet(AOP(result),offr,FALSE,FALSE),3,0));
+    emitpcode(POC_IORLW, popGetLit(0xe0));
+
+    emitpcode(POC_MOVWF, popGet(AOP(result),offr));
+    break;
+
+  case 4:
+    emitpcode(POC_SWAPFW, popGet(AOP(left),offl));
+    emitpcode(POC_ANDLW,  popGetLit(0x0f));
+    emitpcode(POC_BTFSC,  newpCodeOpBit(aopGet(AOP(left),offl,FALSE,FALSE),7,0));
+    emitpcode(POC_IORLW,  popGetLit(0xf0));
+    emitpcode(POC_MOVWF,  popGet(AOP(result),offr));
+    break;
+  case 5:
+    if(same) {
+      emitpcode(POC_SWAPF,  popGet(AOP(result),offr));
+    } else {
+      emitpcode(POC_SWAPFW,  popGet(AOP(result),offr));
+      emitpcode(POC_MOVWF,  popGet(AOP(result),offr));
+    }
+    emitpcode(POC_RRFW,   popGet(AOP(result),offr));
+    emitpcode(POC_ANDLW,  popGetLit(0x07));
+    emitpcode(POC_BTFSC,  newpCodeOpBit(aopGet(AOP(result),offr,FALSE,FALSE),3,0));
+    emitpcode(POC_IORLW,  popGetLit(0xf8));
+    emitpcode(POC_MOVWF,  popGet(AOP(result),offr));
+
+
+
+    break;
+
+  case 6:
+    if(same) {
+      emitpcode(POC_MOVLW, popGetLit(0x00));
+      emitpcode(POC_BTFSC, newpCodeOpBit(aopGet(AOP(left),LSB,FALSE,FALSE),7,0));
+      emitpcode(POC_MOVLW, popGetLit(0xfe));
+      emitpcode(POC_BTFSC, newpCodeOpBit(aopGet(AOP(left),LSB,FALSE,FALSE),6,0));
+      emitpcode(POC_IORLW, popGetLit(0x01));
+      emitpcode(POC_MOVWF, popGet(AOP(result),offr));
+    } else {
+      emitpcode(POC_CLRF,  popGet(AOP(result),offr));
+      emitpcode(POC_BTFSC, newpCodeOpBit(aopGet(AOP(left),offl,FALSE,FALSE),7,0));
+      emitpcode(POC_DECF,  popGet(AOP(result),offr));
+      emitpcode(POC_BTFSS, newpCodeOpBit(aopGet(AOP(left),offl,FALSE,FALSE),6,0));
+      emitpcode(POC_BCF,   newpCodeOpBit(aopGet(AOP(result),offr,FALSE,FALSE),0,0));
+    }
+    break;
+
+  case 7:
+    if(same) {
+      emitpcode(POC_MOVLW, popGetLit(0x00));
+      emitpcode(POC_BTFSC, newpCodeOpBit(aopGet(AOP(left),LSB,FALSE,FALSE),7,0));
+      emitpcode(POC_MOVLW, popGetLit(0xff));
+      emitpcode(POC_MOVWF, popGet(AOP(result),offr));
+    } else {
+      emitpcode(POC_CLRF,  popGet(AOP(result),offr));
+      emitpcode(POC_BTFSC, newpCodeOpBit(aopGet(AOP(left),offl,FALSE,FALSE),7,0));
+      emitpcode(POC_DECF,  popGet(AOP(result),offr));
+    }
 
   default:
     break;
@@ -6184,7 +6272,7 @@ static void shiftR1Left2Result (operand *left, int offl,
 
     break;
   case 3:
-    if(same) 
+    if(same)
       emitpcode(POC_SWAPF, popGet(AOP(result),offr));
     else {
       emitpcode(POC_SWAPFW, popGet(AOP(left),offl));
@@ -6231,19 +6319,6 @@ static void shiftR1Left2Result (operand *left, int offl,
   default:
     break;
   }
-
-
-#if 0
-    
-  MOVA(aopGet(AOP(left),offl,FALSE,FALSE));
-
-  /* shift right accumulator */
-  if(sign)
-    AccSRsh(shCount);
-  else
-    AccRsh(shCount);
-  aopPut(AOP(result),"a",offr);
-#endif
 }
 
 /*-----------------------------------------------------------------*/
@@ -6325,29 +6400,29 @@ static void shiftL1Left2Result (operand *left, int offl,
 static void movLeft2Result (operand *left, int offl,
                             operand *result, int offr, int sign)
 {
-    char *l;
-    DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    if(!pic14_sameRegs(AOP(left),AOP(result)) || (offl != offr)){
-        l = aopGet(AOP(left),offl,FALSE,FALSE);
+  char *l;
+  DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+  if(!pic14_sameRegs(AOP(left),AOP(result)) || (offl != offr)){
+    l = aopGet(AOP(left),offl,FALSE,FALSE);
 
-        if (*l == '@' && (IS_AOP_PREG(result))) {
-            pic14_emitcode("mov","a,%s",l);
-            aopPut(AOP(result),"a",offr);
-        } else {
-	  if(!sign) {
-	    emitpcode(POC_MOVFW, popGet(AOP(left),offl));
-	    emitpcode(POC_MOVWF, popGet(AOP(result),offr));
+    if (*l == '@' && (IS_AOP_PREG(result))) {
+      pic14_emitcode("mov","a,%s",l);
+      aopPut(AOP(result),"a",offr);
+    } else {
+      //if(!sign) {
+      emitpcode(POC_MOVFW, popGet(AOP(left),offl));
+      emitpcode(POC_MOVWF, popGet(AOP(result),offr));
 
-	    //aopPut(AOP(result),l,offr);
-	  }else{
-                /* MSB sign in acc.7 ! */
-                if(pic14_getDataSize(left) == offl+1){
-                    pic14_emitcode("mov","a,%s",l);
-                    aopPut(AOP(result),"a",offr);
-                }
-            }
-        }
+      //aopPut(AOP(result),l,offr);
+      //}else{
+      /* MSB sign in acc.7 ! */
+      //if(pic14_getDataSize(left) == offl+1){
+      //  pic14_emitcode("mov","a,%s",l);
+      //  aopPut(AOP(result),"a",offr);
+      //}
+      //}
     }
+  }
 }
 
 /*-----------------------------------------------------------------*/
@@ -6542,11 +6617,11 @@ static void shiftR2Left2Result (operand *left, int offl,
       emitpcode(POC_XORWF, popGet(AOP(result),offr+MSB16));
       emitpcode(POC_ADDWF, popGet(AOP(result),offr));
     } else {
-      emitpcode(POC_SWAPF, popGet(AOP(left),offl));
+      emitpcode(POC_SWAPFW,popGet(AOP(left),offl));
       emitpcode(POC_ANDLW, popGetLit(0x0f));
       emitpcode(POC_MOVWF, popGet(AOP(result),offr));
 
-      emitpcode(POC_SWAPF, popGet(AOP(left),offl+MSB16));
+      emitpcode(POC_SWAPFW,popGet(AOP(left),offl+MSB16));
       emitpcode(POC_MOVWF, popGet(AOP(result),offr+MSB16));
       emitpcode(POC_ANDLW, popGetLit(0xf0));
       emitpcode(POC_XORWF, popGet(AOP(result),offr+MSB16));
@@ -7044,25 +7119,27 @@ static void genrshOne (operand *result, operand *left,
 static void genrshTwo (operand *result,operand *left,
                        int shCount, int sign)
 {
-    DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    /* if shCount >= 8 */
-    if (shCount >= 8) {
-        shCount -= 8 ;
-        if (shCount)
-            shiftR1Left2Result(left, MSB16, result, LSB,
-                               shCount, sign);
-        else 
-            movLeft2Result(left, MSB16, result, LSB, sign);
-	if(sign)
-	  addSign(result, MSB16, sign);
-	else
-	  emitpcode(POC_CLRF,popGet(AOP(result),MSB16));
-
-    }
-
-    /*  1 <= shCount <= 7 */
+  DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+  /* if shCount >= 8 */
+  if (shCount >= 8) {
+    shCount -= 8 ;
+    if (shCount)
+      shiftR1Left2Result(left, MSB16, result, LSB,
+			 shCount, sign);
     else
-        shiftR2Left2Result(left, LSB, result, LSB, shCount, sign); 
+      movLeft2Result(left, MSB16, result, LSB, sign);
+
+    emitpcode(POC_CLRF,popGet(AOP(result),MSB16));
+
+    if(sign) {
+      emitpcode(POC_BTFSC,newpCodeOpBit(aopGet(AOP(left),LSB,FALSE,FALSE),7,0));
+      emitpcode(POC_DECF, popGet(AOP(result),MSB16));
+    }
+  }
+
+  /*  1 <= shCount <= 7 */
+  else
+    shiftR2Left2Result(left, LSB, result, LSB, shCount, sign); 
 }
 
 /*-----------------------------------------------------------------*/
@@ -8217,11 +8294,13 @@ static void genDataPointerSet(operand *right,
     
     l = aopGet(AOP(result),0,FALSE,TRUE);
     size = AOP_SIZE(right);
+/*
     if ( AOP_TYPE(result) == AOP_PCODE) {
       fprintf(stderr,"genDataPointerSet   %s, %d\n",
 	      AOP(result)->aopu.pcop->name,
 	      PCOI(AOP(result)->aopu.pcop)->offset);
     }
+*/
 
     // tsd, was l+1 - the underline `_' prefix was being stripped
     while (size--) {

@@ -228,6 +228,7 @@ typedef enum
 typedef enum
 {
   PC_COMMENT=0,   /* pCode is a comment     */
+  PC_INLINE,      /* user's inline code     */
   PC_OPCODE,      /* PORT dependent opcode  */
   PC_LABEL,       /* assembly label         */
   PC_FLOW,        /* flow analysis          */
@@ -694,6 +695,7 @@ typedef struct peepCommand {
 
 pCode *newpCode (PIC_OPCODE op, pCodeOp *pcop); // Create a new pCode given an operand
 pCode *newpCodeCharP(char *cP);              // Create a new pCode given a char *
+pCode *newpCodeInlineP(char *cP);            // Create a new pCode given a char *
 pCode *newpCodeFunction(char *g, char *f);   // Create a new function
 pCode *newpCodeLabel(char *name,int key);    // Create a new label given a key
 pBlock *newpCodeChain(memmap *cm,char c, pCode *pc); // Create a new pBlock

@@ -2260,7 +2260,7 @@ rematStr (symbol * sym)
 
   debugLog ("%s\n", __FUNCTION__);
 
-  printf ("%s\n", s);
+  //printf ("%s\n", s);
 
   /* if plus or minus print the right hand side */
 
@@ -2274,7 +2274,7 @@ rematStr (symbol * sym)
 	     (int) operandLitValue (IC_RIGHT (ic)));
 
 
-    fprintf(stderr, "ralloc.c:%d OOPS %s\n",__LINE__,s);
+    //fprintf(stderr, "ralloc.c:%d OOPS %s\n",__LINE__,s);
 
     psym = newSymbol (OP_SYMBOL (IC_LEFT (ric))->rname, 1);
     psym->offset = (int) operandLitValue (IC_RIGHT (ic));
@@ -2285,7 +2285,7 @@ rematStr (symbol * sym)
   sprintf (s, "%s", OP_SYMBOL (IC_LEFT (ic))->rname);
   psym = newSymbol (OP_SYMBOL (IC_LEFT (ic))->rname, 1);
 
-  printf ("%s\n", buffer);
+  //printf ("ralloc.c:%d %s\n", __LINE__,buffer);
   return psym;
 }
 

@@ -70,7 +70,7 @@ static hTab *pic14pCodePeepCommandsHash = NULL;
 
 
 static pFile *the_pFile = NULL;
-static int peepOptimizing = 0;
+static int peepOptimizing = 1;
 static int GpCodeSequenceNumber = 1;
 static int GpcFlowSeq = 1;
 
@@ -101,7 +101,8 @@ static void genericPrint(FILE *of,pCode *pc);
 static void pCodePrintLabel(FILE *of, pCode *pc);
 static void pCodePrintFunction(FILE *of, pCode *pc);
 static void pCodeOpPrint(FILE *of, pCodeOp *pcop);
-static char *get_op( pCodeInstruction *pcc);
+static char *get_op_from_instruction( pCodeInstruction *pcc);
+char *get_op( pCodeOp *pcop);
 int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd);
 int pCodePeepMatchRule(pCode *pc);
 void pBlockStats(FILE *of, pBlock *pb);
@@ -1591,6 +1592,36 @@ pCode *newpCodeWild(int pCodeID, pCodeOp *optional_operand, pCodeOp *optional_la
   
 }
 
+ /*-----------------------------------------------------------------*/
+/* newPcodeInlineP - create a new pCode from a char string           */
+/*-----------------------------------------------------------------*/
+
+
+pCode *newpCodeInlineP(char *cP)
+{
+
+  pCodeComment *pcc ;
+    
+  pcc = Safe_calloc(1,sizeof(pCodeComment));
+
+  pcc->pc.type = PC_INLINE;
+  pcc->pc.prev = pcc->pc.next = NULL;
+  //pcc->pc.from = pcc->pc.to = pcc->pc.label = NULL;
+  pcc->pc.pb = NULL;
+
+  //  pcc->pc.analyze = genericAnalyze;
+  pcc->pc.destruct = genericDestruct;
+  pcc->pc.print = genericPrint;
+
+  if(cP)
+    pcc->comment = Safe_strdup(cP);
+  else
+    pcc->comment = NULL;
+
+  return ( (pCode *)pcc);
+
+}
+
 /*-----------------------------------------------------------------*/
 /* newPcodeCharP - create a new pCode from a char string           */
 /*-----------------------------------------------------------------*/
@@ -1850,7 +1881,7 @@ pCodeOp *newpCodeOpImmd(char *name, int offset, int index, int code_space)
   pcop->type = PO_IMMEDIATE;
   if(name) {
     pcop->name = Safe_strdup(name);
-    fprintf(stderr,"%s %s %d\n",__FUNCTION__,name,offset);
+    //fprintf(stderr,"%s %s %d\n",__FUNCTION__,name,offset);
   } else {
     pcop->name = NULL;
   }
@@ -2163,28 +2194,28 @@ void pBlockRegs(FILE *of, pBlock *pb)
 }
 
 
-static char *get_op( pCodeInstruction *pcc)
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+char *get_op(pCodeOp *pcop)
 {
   regs *r;
   static char buffer[50];
   char *s;
   int size;
 
-  if(pcc && pcc->pcop) {
 
-
-    switch(pcc->pcop->type) {
+  if(pcop) {
+    switch(pcop->type) {
     case PO_INDF:
     case PO_FSR:
       //fprintf(stderr,"get_op getting register name rIdx=%d\n",PCOR(pcc->pcop)->rIdx);
       //r = pic14_regWithIdx(PCOR(pcc->pcop)->rIdx);
       //return r->name;
-      return PCOR(pcc->pcop)->r->name;
+      return PCOR(pcop)->r->name;
       break;
     case PO_GPR_TEMP:
-      r = pic14_regWithIdx(PCOR(pcc->pcop)->r->rIdx);
+      r = pic14_regWithIdx(PCOR(pcop)->r->rIdx);
       //fprintf(stderr,"getop: getting %s\nfrom:\n",r->name); //pcc->pcop->name);
-      pBlockRegs(stderr,pcc->pc.pb);
       return r->name;
 
       //    case PO_GPR_BIT:
@@ -2192,25 +2223,24 @@ static char *get_op( pCodeInstruction *pcc)
     case PO_IMMEDIATE:
       s = buffer;
       size = sizeof(buffer);
-      fprintf(stderr,"PO_IMMEDIATE name = %s  offset = %d\n",pcc->pcop->name,
-	      PCOI(pcc->pcop)->offset);
-      if(PCOI(pcc->pcop)->_const) {
+      //fprintf(stderr,"PO_IMMEDIATE name = %s  offset = %d\n",pcc->pcop->name,PCOI(pcc->pcop)->offset);
+      if(PCOI(pcop)->_const) {
 
-	if( PCOI(pcc->pcop)->offset && PCOI(pcc->pcop)->offset<4) {
+	if( PCOI(pcop)->offset && PCOI(pcop)->offset<4) {
 	  SAFE_snprintf(&s,&size,"(((%s+%d) >> %d)&0xff)",
-			pcc->pcop->name,
-			PCOI(pcc->pcop)->index,
-			8 * PCOI(pcc->pcop)->offset );
+			pcop->name,
+			PCOI(pcop)->index,
+			8 * PCOI(pcop)->offset );
 	} else
-	  SAFE_snprintf(&s,&size,"LOW(%s+%d)",pcc->pcop->name,PCOI(pcc->pcop)->index);
+	  SAFE_snprintf(&s,&size,"LOW(%s+%d)",pcop->name,PCOI(pcop)->index);
       } else {
       
-	if( PCOI(pcc->pcop)->index) { // && PCOI(pcc->pcop)->offset<4) {
+	if( PCOI(pcop)->index) { // && PCOI(pcc->pcop)->offset<4) {
 	  SAFE_snprintf(&s,&size,"(%s + %d)",
-			pcc->pcop->name,
-			PCOI(pcc->pcop)->index );
+			pcop->name,
+			PCOI(pcop)->index );
 	} else
-	  SAFE_snprintf(&s,&size,"%s",pcc->pcop->name);
+	  SAFE_snprintf(&s,&size,"%s",pcop->name);
       }
 
       return buffer;
@@ -2218,23 +2248,36 @@ static char *get_op( pCodeInstruction *pcc)
     case PO_DIR:
       s = buffer;
       size = sizeof(buffer);
-      if( PCOR(pcc->pcop)->instance) {
+      if( PCOR(pcop)->instance) {
 	SAFE_snprintf(&s,&size,"(%s + %d)",
-		      pcc->pcop->name,
-		      PCOR(pcc->pcop)->instance );
-	fprintf(stderr,"PO_DIR %s\n",buffer);
+		      pcop->name,
+		      PCOR(pcop)->instance );
+	//fprintf(stderr,"PO_DIR %s\n",buffer);
       } else
-	SAFE_snprintf(&s,&size,"%s",pcc->pcop->name);
+	SAFE_snprintf(&s,&size,"%s",pcop->name);
       return buffer;
 
     default:
-      if  (pcc->pcop->name)
-	return pcc->pcop->name;
+      if  (pcop->name)
+	return pcop->name;
 
     }
   }
 
   return "NO operand";
+
+}
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+static char *get_op_from_instruction( pCodeInstruction *pcc)
+{
+
+  if(pcc )
+    return get_op(pcc->pcop);
+  
+  return ("ERROR Null: "__FUNCTION__);
+
 }
 
 /*-----------------------------------------------------------------*/
@@ -2264,23 +2307,23 @@ char *pCode2str(char *str, int size, pCode *pc)
 			  PCI(pc)->pcop->name ,
 			  PCI(pc)->pcop->name );
 	  else
-	    SAFE_snprintf(&s,&size,"%s,%d", get_op(PCI(pc)), 
+	    SAFE_snprintf(&s,&size,"%s,%d", get_op_from_instruction(PCI(pc)), 
 			  (((pCodeOpRegBit *)(PCI(pc)->pcop))->bit ));
 	} else if(PCI(pc)->pcop->type == PO_GPR_BIT) {
-	  SAFE_snprintf(&s,&size,"%s,%d", get_op(PCI(pc)),PCORB(PCI(pc)->pcop)->bit);
+	  SAFE_snprintf(&s,&size,"%s,%d", get_op_from_instruction(PCI(pc)),PCORB(PCI(pc)->pcop)->bit);
 	}else
-	  SAFE_snprintf(&s,&size,"%s,0 ; ?bug", get_op(PCI(pc)));
+	  SAFE_snprintf(&s,&size,"%s,0 ; ?bug", get_op_from_instruction(PCI(pc)));
 	//PCI(pc)->pcop->t.bit );
       } else {
 
 	if(PCI(pc)->pcop->type == PO_GPR_BIT) {
 	  if( PCI(pc)->num_ops == 2)
-	    SAFE_snprintf(&s,&size,"(%s >> 3),%c",get_op(PCI(pc)),((PCI(pc)->isModReg) ? 'F':'W'));
+	    SAFE_snprintf(&s,&size,"(%s >> 3),%c",get_op_from_instruction(PCI(pc)),((PCI(pc)->isModReg) ? 'F':'W'));
 	  else
-	    SAFE_snprintf(&s,&size,"(1 << (%s & 7))",get_op(PCI(pc)));
+	    SAFE_snprintf(&s,&size,"(1 << (%s & 7))",get_op_from_instruction(PCI(pc)));
 
 	}else {
-	  SAFE_snprintf(&s,&size,"%s",get_op(PCI(pc)));
+	  SAFE_snprintf(&s,&size,"%s",get_op_from_instruction(PCI(pc)));
 
 	  if( PCI(pc)->num_ops == 2)
 	    SAFE_snprintf(&s,&size,",%c", ( (PCI(pc)->isModReg) ? 'F':'W'));
@@ -2293,6 +2336,11 @@ char *pCode2str(char *str, int size, pCode *pc)
   case PC_COMMENT:
     /* assuming that comment ends with a \n */
     SAFE_snprintf(&s,&size,";%s", ((pCodeComment *)pc)->comment);
+    break;
+
+  case PC_INLINE:
+    /* assuming that inline code ends with a \n */
+    SAFE_snprintf(&s,&size,"%s", ((pCodeComment *)pc)->comment);
     break;
 
   case PC_LABEL:
@@ -2326,6 +2374,10 @@ static void genericPrint(FILE *of, pCode *pc)
   case PC_COMMENT:
     fprintf(of,";%s\n", ((pCodeComment *)pc)->comment);
     break;
+
+  case PC_INLINE:
+    fprintf(of,"%s\n", ((pCodeComment *)pc)->comment);
+     break;
 
   case PC_OPCODE:
     // If the opcode has a label, print that first
@@ -2831,27 +2883,26 @@ regs * getRegFromInstruction(pCode *pc)
 
   case PO_BIT:
   case PO_GPR_TEMP:
-    fprintf(stderr, "getRegFromInstruction - bit or temp\n");
+    //fprintf(stderr, "getRegFromInstruction - bit or temp\n");
     return PCOR(PCI(pc)->pcop)->r;
 
   case PO_IMMEDIATE:
-    fprintf(stderr, "getRegFromInstruction - immediate\n");
+    //fprintf(stderr, "getRegFromInstruction - immediate\n");
     return NULL; // PCOR(PCI(pc)->pcop)->r;
 
   case PO_GPR_BIT:
     return PCOR(PCI(pc)->pcop)->r;
 
   case PO_DIR:
-    fprintf(stderr, "getRegFromInstruction - dir\n");
-    //return NULL; PCOR(PCI(pc)->pcop)->r;
+    //fprintf(stderr, "getRegFromInstruction - dir\n");
     return PCOR(PCI(pc)->pcop)->r;
   case PO_LITERAL:
-    fprintf(stderr, "getRegFromInstruction - literal\n");
+    //fprintf(stderr, "getRegFromInstruction - literal\n");
     break;
 
   default:
-    fprintf(stderr, "getRegFromInstruction - unknown reg type %d\n",PCI(pc)->pcop->type);
-    genericPrint(stderr, pc);
+    //fprintf(stderr, "getRegFromInstruction - unknown reg type %d\n",PCI(pc)->pcop->type);
+    //genericPrint(stderr, pc);
     break;
   }
 
@@ -3380,7 +3431,7 @@ void FixRegisterBanking(pBlock *pb)
 
   int cur_bank;
   regs *reg;
-  return;
+  //  return;
   if(!pb)
     return;
 
@@ -3389,7 +3440,7 @@ void FixRegisterBanking(pBlock *pb)
     return;
   /* loop through all of the flow blocks with in one pblock */
 
-  //  fprintf(stderr,"Register banking\n");
+  //fprintf(stderr,"Register banking\n");
   cur_bank = 0;
   do {
     /* at this point, pc should point to a PC_FLOW object */
@@ -3400,21 +3451,21 @@ void FixRegisterBanking(pBlock *pb)
 
     do {
       if(isPCI(pc)) {
-    genericPrint(stderr, pc);
+	//genericPrint(stderr, pc);
 
 	reg = getRegFromInstruction(pc);
-	//#if 0
+	#if 0
 	if(reg) {
 	  fprintf(stderr, "  %s  ",reg->name);
 	  fprintf(stderr, "addr = 0x%03x, bank = %d\n",reg->address,REG_BANK(reg));
 
 	}
-	//#endif
+	#endif
 	if(reg && REG_BANK(reg)!=cur_bank) {
 	  /* Examine the instruction before this one to make sure it is
 	   * not a skip type instruction */
 	  pcprev = findPrevpCode(pc->prev, PC_OPCODE);
-	  if(pcprev && !isPCI_SKIP(pcprev)) {
+	  if(!pcprev || (pcprev && !isPCI_SKIP(pcprev))) {
 	    int b = cur_bank ^ REG_BANK(reg);
 
 	    //fprintf(stderr, "Cool! can switch banks\n");
@@ -3435,8 +3486,10 @@ void FixRegisterBanking(pBlock *pb)
 
 	    }
 
-	  } else
-	    fprintf(stderr, "Bummer can't switch banks\n");
+	  } else {
+	    //fprintf(stderr, "Bummer can't switch banks\n");
+	    ;
+	  }
 	}
       }
 
@@ -3792,7 +3845,7 @@ void pBlockStats(FILE *of, pBlock *pb)
 
     while(pc) {
       if(pc->type == PC_OPCODE && PCI(pc)->op == POC_CALL) {
-	fprintf(of,";   %s\n",get_op(PCI(pc)));
+	fprintf(of,";   %s\n",get_op_from_instruction(PCI(pc)));
       }
       pc = setNextItem(pb->function_calls);
     }
@@ -3853,7 +3906,7 @@ set *register_usage(pBlock *pb)
   for( ; pc; pc = setNextItem(pb->function_calls)) {
 
     if(pc->type == PC_OPCODE && PCI(pc)->op == POC_CALL) {
-      char *dest = get_op(PCI(pc));
+      char *dest = get_op_from_instruction(PCI(pc));
 
       pcn = findFunction(dest);
       if(pcn) 
@@ -3975,7 +4028,7 @@ void pct2(FILE *of,pBlock *pb,int indent)
   for( ; pc; pc = setNextItem(pb->function_calls)) {
 
     if(pc->type == PC_OPCODE && PCI(pc)->op == POC_CALL) {
-      char *dest = get_op(PCI(pc));
+      char *dest = get_op_from_instruction(PCI(pc));
 
       pcn = findFunction(dest);
       if(pcn) 
@@ -4097,7 +4150,7 @@ void printCallTree(FILE *of)
       while(pc->next && !ispCodeFunction(pc->next)) {
 	pc = pc->next;
 	if(pc->type == PC_OPCODE && PCI(pc)->op == POC_CALL)
-	  fprintf(of,"\t%s\n",get_op(PCI(pc)));
+	  fprintf(of,"\t%s\n",get_op_from_instruction(PCI(pc)));
       }
     }
 

@@ -80,6 +80,7 @@ SRC = b.c \
 	rotate2.c \
 	rotate3.c \
 	rotate4.c \
+	rotate5.c \
 	struct1.c \
 	sub.c \
 	sub2.c \

@@ -425,3 +425,35 @@ computeControlFlow (eBBlock ** ebbs, int count, int reSort)
   qsort (ebbs, saveCount, sizeof (eBBlock *), dfNumCompare);
 
 }
+
+/*-----------------------------------------------------------------*/
+/* returnAtEnd - returns 1 if Basic Block has a return at the end  */
+/*               of it                                             */
+/*-----------------------------------------------------------------*/
+int returnAtEnd (eBBlock *ebp)
+{
+    /* case 1.
+       This basic block ends in a return statment 
+    */
+    if (ebp->ech && ebp->ech->op == RETURN) return 1;
+
+    /* case 2.
+       This basic block has only one successor and that
+       successor has only one return statement
+    */
+    if (elementsInSet(ebp->succList) == 1) {
+	eBBlock *succ = setFirstItem(ebp->succList);
+	/* could happen for dummy blocks */
+	if (!succ->sch || !succ->ech) return 0;
+
+	/* first iCode is a return */
+	if (succ->sch->op == RETURN) return 2;
+
+	/* or first iCode is a label & the next &
+	   last icode is a return */
+	if (succ->sch->op == LABEL && succ->sch->next == succ->ech &&
+	    succ->ech->op == RETURN ) return 2;
+    }
+
+    return 0;
+}

@@ -40,5 +40,5 @@ void computeControlFlow (eBBlock **, int, int);
 int dfNumCompare (const void *, const void *);
 int bbNumCompare (const void *, const void *);
 void disconBBlock (eBBlock *, eBBlock **, int);
-
+int returnAtEnd (eBBlock *) ;
 #endif

@@ -5,6 +5,7 @@
 	* src/SDCCmain.c (printVersionInfo): report MINGW32 instead of UNIX
 	* src/spawn.c: removed
 	* src/spawn.h: removed
+	* support/regression/ports/ds390/spec.mk: link with -r
 
 2003-01-24    <johan@CP255758-A>
 

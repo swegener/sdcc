@@ -33,8 +33,6 @@ _gptrget (char *gptr)
 	
     _asm
     ;   save values passed
-	xch    a,r0
-	push   acc
     ;
     ;   depending on the pointer type acc. to SDCCsymt.h
     ;
@@ -58,8 +56,13 @@ _gptrget (char *gptr)
     ;   Pointer to data space
     ;
  00001$:
+	push    ar0
+        ;
 	mov     r0,dpl     ; use only low order address
 	mov     a,@r0
+        ;
+        pop     ar0
+        ;
         sjmp    00005$
     ;
     ;   pointer to xternal data
@@ -78,15 +81,12 @@ _gptrget (char *gptr)
 ;   pointer to xternal stack
 ;
  00004$:
-	mov     r0,dpl
-        movx    a,@r0
+        mov     dph,p2          ; p2 holds high byte for pdata access
+        movx    a,@dptr
 ;
-;   restore and return
+;   return
 ;
  00005$:
-        mov     r0,a
-        pop     acc
-	xch     a,r0
      _endasm ;
 }
 

@@ -44,7 +44,6 @@ extern TBLPTRU;
 extern TABLAT;
 extern PRODL;
 extern PRODH;
-extern _GPTRREG;
 
 void _gptrput4(void) _naked
 {

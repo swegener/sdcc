@@ -1,6 +1,13 @@
+2004-10-12 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* device/lib/pic16/libsdcc/gptr/gptrput[234].c: an external
+	reference to a deprecated symbol _GPTRREG was causing failure to
+	link. Thanks G. M. Gallant for the info.
+
 2004-10-12 Slade Rich <slade_rich AT users.sourceforge.net>
 
-	* src/pic/pcode.c : Applied a code patch supplied by Paul Ashmore in comments for Bugs item #954788.
+	* src/pic/pcode.c : Applied a code patch supplied by Paul Ashmore in
+	comments for Bugs item #954788.
 
 2004-10-10 Vangelis Rokas <vrokas AT otenet.gr>
 

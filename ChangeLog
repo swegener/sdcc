@@ -1,3 +1,15 @@
+2004-03-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/mcs51/gen.c (genFunction): optimize RECEIVE in reentrant
+	functions
+	* src/ds390/gen.c (genFunction, genEndFunction),
+	* src/ds390/ralloc.c (ds390_assignRegisters),
+	* src/mcs51/gen.c (genFunction, genEndFunction, mcs51_assignRegisters):
+	* src/mcs51/ralloc.c (mcs51_assignRegisters): Skip optimizing registers
+	pushed if there are parameters passed on the stack. Also, a cleaner
+	way to decide if r0/r1 should be pushed/popped. (Together they fix
+	bug #918693)
+
 2004-03-18 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* doc/sdccman.lyx,
@@ -5,7 +17,6 @@
 	* device/lib/mcs51/crtxinit.asm,
 	* device/lib/mcs51/crtxstack.asm: Changed name of _PAGESFR to _XPAGE
 	to avoid confusion with Si Lab's SFRPAGE register.
-
 
 2004-03-17 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

@@ -135,7 +135,7 @@ emitcode (char *inst, const char *fmt,...)
   while (isspace (*lbp))
     lbp++;
 
-  // printf ("%s\n", lb);
+  //printf ("%s\n", lb);
   
   if (lbp && *lbp)
     lineCurr = (lineCurr ?
@@ -2361,15 +2361,18 @@ inExcludeList (char *s)
 static void
 genFunction (iCode * ic)
 {
-  symbol *sym;
+  symbol *sym = OP_SYMBOL (IC_LEFT (ic));
   sym_link *ftype;
   bool   switchedPSW = FALSE;
   int calleesaves_saved_register = -1;
+  int stackAdjust = sym->stack;
+  int accIsFree = sym->recvSize < 4;
+  iCode * ric = (ic->next && ic->next->op == RECEIVE) ? ic->next : NULL;
 
   _G.nRegsSaved = 0;
   /* create the function header */
   emitcode (";", "-----------------------------------------");
-  emitcode (";", " function %s", (sym = OP_SYMBOL (IC_LEFT (ic)))->name);
+  emitcode (";", " function %s", sym->name);
   emitcode (";", "-----------------------------------------");
 
   emitcode ("", "%s:", sym->rname);
@@ -2381,7 +2384,7 @@ genFunction (iCode * ic)
       emitcode(";", "naked function: no prologue.");
       return;
   }
-
+  
   /* here we need to generate the equates for the
      register bank if required */
   if (FUNC_REGBANK (ftype) != rbank)
@@ -2435,22 +2438,15 @@ genFunction (iCode * ic)
 		  /* save the registers used */
 		  for (i = 0; i < sym->regsUsed->size; i++)
 		    {
-		      if (bitVectBitValue (sym->regsUsed, i) ||
-			  (mcs51_ptrRegReq && (i == R0_IDX || i == R1_IDX)))
+		      if (bitVectBitValue (sym->regsUsed, i))
 			emitcode ("push", "%s", mcs51_regWithIdx (i)->dname);
 		    }
 		}
-	      else if (mcs51_ptrRegReq)
-	        {
-		  emitcode ("push", "%s", mcs51_regWithIdx (R0_IDX)->dname);
-		  emitcode ("push", "%s", mcs51_regWithIdx (R1_IDX)->dname);
-		}
-
 	    }
 	  else
 	    {
 
-	      /* this function has  a function call cannot
+	      /* this function has a function call. We cannot
 	         determines register usage so we will have to push the
 	         entire bank */
 		saveRBank (0, ic, FALSE);
@@ -2552,9 +2548,20 @@ genFunction (iCode * ic)
 	    // TODO: this needs a closer look
 	    SPEC_ISR_SAVED_BANKS(currFunc->etype) = banksToSave;
 	}
+      
+      /* Set the register bank to the desired value if nothing else */
+      /* has done so yet. */
+      if (!switchedPSW)
+        {
+          emitcode ("push", "psw");
+          emitcode ("mov", "psw,#0x%02x", (FUNC_REGBANK (sym->type) << 3) & 0x00ff);
+        }
     }
   else
     {
+      /* This is a non-ISR function. The caller has already switched register */
+      /* banks, if necessary, so just handle the callee-saves option. */
+      
       /* if callee-save to be used for this function
          then save the registers being used in this function */
       if (IFFUNC_CALLEESAVES(sym->type))
@@ -2567,8 +2574,7 @@ genFunction (iCode * ic)
 	      /* save the registers used */
 	      for (i = 0; i < sym->regsUsed->size; i++)
 		{
-		  if (bitVectBitValue (sym->regsUsed, i) ||
-		      (mcs51_ptrRegReq && (i == R0_IDX || i == R1_IDX)))
+		  if (bitVectBitValue (sym->regsUsed, i))
 		    {
 		      /* remember one saved register for later usage */
 		      if (calleesaves_saved_register < 0)
@@ -2578,31 +2584,23 @@ genFunction (iCode * ic)
 		    }
 		}
 	    }
-	  else if (mcs51_ptrRegReq)
-	    {
-	      emitcode ("push", "%s", mcs51_regWithIdx (R0_IDX)->dname);
-	      emitcode ("push", "%s", mcs51_regWithIdx (R1_IDX)->dname);
-	    }
 	}
     }
 
-  /* set the register bank to the desired value */
-  if (( /* FUNC_REGBANK (sym->type) || */ IFFUNC_ISISR (sym->type))
-   && !switchedPSW)
-    {
-      emitcode ("push", "psw");
-      emitcode ("mov", "psw,#0x%02x", (FUNC_REGBANK (sym->type) << 3) & 0x00ff);
-    }
 
   if (IFFUNC_ISREENT (sym->type) || options.stackAuto)
     {
 
       if (options.useXstack)
 	{
+	  if (!accIsFree)
+	    emitcode ("push", "acc");
 	  emitcode ("mov", "r0,%s", spname);
 	  emitcode ("mov", "a,_bp");
 	  emitcode ("movx", "@r0,a");
 	  emitcode ("inc", "%s", spname);
+	  if (!accIsFree)
+	    emitcode ("pop", "acc");
 	}
       else
 	{
@@ -2611,16 +2609,76 @@ genFunction (iCode * ic)
 	}
       emitcode ("mov", "_bp,%s", spname);
     }
-
+  
+  /* For some cases it is worthwhile to perform a RECEIVE iCode */
+  /* before setting up the stack frame completely. */
+  if (ric && ric->argreg == 1 && IC_RESULT (ric))
+    {
+      symbol * rsym = OP_SYMBOL (IC_RESULT (ric));
+      
+      if (rsym->isitmp)
+        {
+	  if (rsym && rsym->regType == REG_CND)
+	    rsym = NULL;
+	  if (rsym && (rsym->accuse || rsym->ruonly))
+	    rsym = NULL;
+          if (rsym && (rsym->isspilt || rsym->nRegs == 0) && rsym->usl.spillLoc)
+            rsym = rsym->usl.spillLoc;
+	}
+      
+      /* If the RECEIVE operand immediately spills to the first entry on the */
+      /* stack, we can push it directly (since sp = _bp + 1 at this point) */
+      /* rather than the usual @r0/r1 machinations. */
+      if (!options.useXstack && rsym && rsym->onStack && rsym->stack == 1)
+        {
+	  int ofs;
+	  
+	  _G.current_iCode = ric;
+	  D(emitcode (";     genReceive",""));
+	  for (ofs=0; ofs < sym->recvSize; ofs++)
+	    {
+	      if (!strcmp (fReturn[ofs], "a"))
+	        emitcode ("push", "acc");
+	      else
+	        emitcode ("push", fReturn[ofs]);
+	    }
+	  stackAdjust -= sym->recvSize;
+	  if (stackAdjust<0)
+	    {
+	      assert (stackAdjust>=0);
+	      stackAdjust = 0;
+	    }
+	  _G.current_iCode = ic;
+	  ric->generated = 1;
+	  accIsFree = 1;
+	}
+      /* If the RECEIVE operand is 4 registers, we can do the moves now */
+      /* to free up the accumulator. */
+      else if (rsym && rsym->nRegs && sym->recvSize == 4)
+        {
+	  int ofs;
+	  
+	  _G.current_iCode = ric;
+	  D(emitcode (";     genReceive",""));
+	  for (ofs=0; ofs < sym->recvSize; ofs++)
+	    {
+	      emitcode ("mov", "%s,%s", rsym->regs[ofs]->name, fReturn[ofs]);
+	    }
+	  _G.current_iCode = ic;
+	  ric->generated = 1;
+	  accIsFree = 1;
+	}
+    }
+  
   /* adjust the stack for the function */
-  if (sym->stack)
+  if (stackAdjust)
     {
 
-      int i = sym->stack;
+      int i = stackAdjust;
       if (i > 256)
 	werror (W_STACK_OVERFLOW, sym->name);
 
-      if (i > 3 && sym->recvSize < 4)
+      if (i > 3 && accIsFree)
 	{
 
 	  emitcode ("mov", "a,sp");
@@ -2630,6 +2688,11 @@ genFunction (iCode * ic)
 	}
       else if (i > 5)
         {
+	  /* The accumulator is not free, so we will need another register */
+	  /* to clobber. No need to worry about a possible conflict with */
+	  /* the above early RECEIVE optimizations since they would have */
+	  /* freed the accumulator if they were generated. */
+	  
 	  if (IFFUNC_CALLEESAVES(sym->type))
 	    {
 	      /* if it's a callee-saves function we need a saved register */
@@ -2664,9 +2727,13 @@ genFunction (iCode * ic)
   if (sym->xstack)
     {
 
+      if (!accIsFree)
+        emitcode ("push", "acc");
       emitcode ("mov", "a,_spx");
       emitcode ("add", "a,#0x%02x", ((char) sym->xstack & 0xff));
       emitcode ("mov", "_spx,a");
+      if (!accIsFree)
+        emitcode ("pop", "acc");
     }
 
   /* if critical function then turn interrupts off */
@@ -2773,17 +2840,10 @@ genEndFunction (iCode * ic)
 		  /* save the registers used */
 		  for (i = sym->regsUsed->size; i >= 0; i--)
 		    {
-		      if (bitVectBitValue (sym->regsUsed, i) ||
-			  (mcs51_ptrRegReq && (i == R0_IDX || i == R1_IDX)))
+		      if (bitVectBitValue (sym->regsUsed, i))
 			emitcode ("pop", "%s", mcs51_regWithIdx (i)->dname);
 		    }
 		}
-	      else if (mcs51_ptrRegReq)
-	        {
-		  emitcode ("pop", "%s", mcs51_regWithIdx (R1_IDX)->dname);
-		  emitcode ("pop", "%s", mcs51_regWithIdx (R0_IDX)->dname);
-		}
-
 	    }
 	  else
 	    {
@@ -2901,6 +2961,15 @@ genEndFunction (iCode * ic)
   if (IFFUNC_ISISR (sym->type) && IFFUNC_HASFCALL(sym->type)
       && !FUNC_REGBANK(sym->type))
     return;
+
+  /* There are no push/pops to optimize if not callee-saves or ISR */
+  if (!(FUNC_CALLEESAVES (sym->type) || FUNC_ISISR (sym->type)))
+    return;
+  
+  /* If there were stack parameters, we cannot optimize without also    */
+  /* fixing all of the stack offsets; this is too dificult to consider. */
+  if (FUNC_HASSTACKPARM(sym->type))
+    return;
     
   /* Compute the registers actually used */
   regsUsed = newBitVect (mcs51_nRegs);
@@ -2913,7 +2982,7 @@ genEndFunction (iCode * ic)
         regsUsed = bitVectUnion (regsUsed, port->peep.getRegsWritten(lnp));
       
       if (lnp->ic && lnp->ic->op == FUNCTION && lnp->prev
-          && lnp->prev->ic && lnp->prev->ic->op != FUNCTION)
+          && lnp->prev->ic && lnp->prev->ic->op == ENDFUNCTION)
 	break;
       if (!lnp->prev)
         break;
@@ -9683,7 +9752,6 @@ genEndCritical (iCode *ic)
       emitcode ("mov", "ea,c");
     }
 }
-
 
 /*-----------------------------------------------------------------*/
 /* gen51Code - generate code for 8051 based controllers            */

@@ -3017,17 +3017,10 @@ genFunction (iCode * ic)
 		  /* save the registers used */
 		  for (i = 0; i < sym->regsUsed->size; i++)
 		    {
-		      if (bitVectBitValue (sym->regsUsed, i) ||
-			  (ds390_ptrRegReq && (i == R0_IDX || i == R1_IDX)))
+		      if (bitVectBitValue (sym->regsUsed, i))
 			emitcode ("push", "%s", ds390_regWithIdx (i)->dname);
 		    }
 		}
-	      else if (ds390_ptrRegReq)
-	        {
-		  emitcode ("push", "%s", ds390_regWithIdx (R0_IDX)->dname);
-		  emitcode ("push", "%s", ds390_regWithIdx (R1_IDX)->dname);
-		}
-
 	    }
 	  else
 	    {
@@ -3147,19 +3140,12 @@ genFunction (iCode * ic)
 	      /* save the registers used */
 	      for (i = 0; i < sym->regsUsed->size; i++)
 		{
-		  if (bitVectBitValue (sym->regsUsed, i) ||
-		      (ds390_ptrRegReq && (i == R0_IDX || i == R1_IDX)))
+		  if (bitVectBitValue (sym->regsUsed, i))
 		    {
 		      emitcode ("push", "%s", ds390_regWithIdx (i)->dname);
 		      _G.nRegsSaved++;
 		    }
 		}
-	    }
-	  else if (ds390_ptrRegReq)
-	    {
-	      emitcode ("push", "%s", ds390_regWithIdx (R0_IDX)->dname);
-	      emitcode ("push", "%s", ds390_regWithIdx (R1_IDX)->dname);
-	      _G.nRegsSaved += 2;
 	    }
 	}
     }
@@ -3353,17 +3339,10 @@ genEndFunction (iCode * ic)
 		  /* save the registers used */
 		  for (i = sym->regsUsed->size; i >= 0; i--)
 		    {
-		      if (bitVectBitValue (sym->regsUsed, i) ||
-			  (ds390_ptrRegReq && (i == R0_IDX || i == R1_IDX)))
+		      if (bitVectBitValue (sym->regsUsed, i))
 			emitcode ("pop", "%s", ds390_regWithIdx (i)->dname);
 		    }
 		}
-	      else if (ds390_ptrRegReq)
-	        {
-		  emitcode ("pop", "%s", ds390_regWithIdx (R1_IDX)->dname);
-		  emitcode ("pop", "%s", ds390_regWithIdx (R0_IDX)->dname);
-		}
-
 	    }
 	  else
 	    {
@@ -3453,17 +3432,10 @@ genEndFunction (iCode * ic)
 	      /* save the registers used */
 	      for (i = sym->regsUsed->size; i >= 0; i--)
 		{
-		  if (bitVectBitValue (sym->regsUsed, i) ||
-		      (ds390_ptrRegReq && (i == R0_IDX || i == R1_IDX)))
+		  if (bitVectBitValue (sym->regsUsed, i))
 		    emitcode ("pop", "%s", ds390_regWithIdx (i)->dname);
 		}
 	    }
-	  else if (ds390_ptrRegReq)
-	    {
-	       emitcode ("pop", "%s", ds390_regWithIdx (R1_IDX)->dname);
-	       emitcode ("pop", "%s", ds390_regWithIdx (R0_IDX)->dname);
-	    }
-
 	}
 
       /* if debug then send end of function */
@@ -3492,6 +3464,15 @@ genEndFunction (iCode * ic)
       && !FUNC_REGBANK(sym->type))
     return;
     
+  /* There are no push/pops to optimize if not callee-saves or ISR */
+  if (!(FUNC_CALLEESAVES (sym->type) || FUNC_ISISR (sym->type)))
+    return;
+  
+  /* If there were stack parameters, we cannot optimize without also    */
+  /* fixing all of the stack offsets; this is too dificult to consider. */
+  if (FUNC_HASSTACKPARM(sym->type))
+    return;
+  
   /* Compute the registers actually used */
   regsUsed = newBitVect (ds390_nRegs);
   regsUsedPrologue = newBitVect (ds390_nRegs);
@@ -3503,7 +3484,7 @@ genEndFunction (iCode * ic)
         regsUsed = bitVectUnion (regsUsed, port->peep.getRegsWritten(lnp));
       
       if (lnp->ic && lnp->ic->op == FUNCTION && lnp->prev
-          && lnp->prev->ic && lnp->prev->ic->op != FUNCTION)
+          && lnp->prev->ic && lnp->prev->ic->op == ENDFUNCTION)
 	break;
       if (!lnp->prev)
         break;

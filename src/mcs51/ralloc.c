@@ -3033,6 +3033,14 @@ mcs51_assignRegisters (eBBlock ** ebbs, int count)
     redoStackOffsets ();
   }
 
+  /* make sure r0 & r1 are flagged as used if they might be used */
+  /* as pointers */
+  if (currFunc && mcs51_ptrRegReq)
+    {
+      currFunc->regsUsed = bitVectSetBit (currFunc->regsUsed, R0_IDX);
+      currFunc->regsUsed = bitVectSetBit (currFunc->regsUsed, R1_IDX);
+    }
+
   if (options.dump_rassgn)
     {
       dumpEbbsToFileExt (DUMP_RASSGN, ebbs, count);

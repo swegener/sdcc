@@ -1264,7 +1264,8 @@ int summary(struct area * areap)
 	if(Ram[7].Size>0x80)
 	{
 		sprintf(buff, "*** ERROR: Insuficient DRAM memory.  "
-					"%d byte%s short.", Ram[7].Size-0x80);
+					"%d byte%s short.\n", Ram[7].Size-0x80,
+					((Ram[7].Size-0x80)==1)?"":"s");
 		REPORT_ERROR(buff);
 	}
 

@@ -1150,11 +1150,11 @@ aopGet (asmop *aop,
       if (saveAcc)
 	{
 	    TR_AP("#1");
-	    if (aop->type != AOP_DPTR2)
-	    {
-		if (saveAccWarn) { fprintf(stderr, "saveAcc for DPTR...\n"); }
-		emitcode(";", "spanky: saveAcc for DPTR");
-	    }
+//	    if (aop->type != AOP_DPTR2)
+//	    {
+//		if (saveAccWarn) { fprintf(stderr, "saveAcc for DPTR...\n"); }
+//		emitcode(";", "spanky: saveAcc for DPTR");
+//	    }
 	    
 	    emitcode ("xch", "a, %s", saveAcc);
 	}
@@ -1193,10 +1193,10 @@ aopGet (asmop *aop,
 	{
        TR_AP("#2");
 	      emitcode ("xch", "a, %s", saveAcc);
-	      if (strcmp(saveAcc, "_ap"))
-	      {
-		  emitcode(";", "spiffy: non _ap return from aopGet.");
-	      }
+//	      if (strcmp(saveAcc, "_ap"))
+//	      {
+//		  emitcode(";", "spiffy: non _ap return from aopGet.");
+//	      }
 		  
 	      return saveAcc;
 	}
@@ -1609,7 +1609,6 @@ static void
 genNotFloat (operand * op, operand * res)
 {
   int size, offset;
-  char *l;
   symbol *tlbl;
 
   D (emitcode (";", "genNotFloat "););
@@ -1621,8 +1620,7 @@ genNotFloat (operand * op, operand * res)
   offset = 1;
 
   _startLazyDPSEvaluation ();
-  l = aopGet (op->aop, offset++, FALSE, FALSE, NULL);
-  MOVA (l);
+  MOVA(aopGet(op->aop, offset++, FALSE, FALSE, NULL));
 
   while (size--)
     {
@@ -1770,7 +1768,7 @@ toBoolean (operand * oper)
       else
 	{
 	  emitcode ("orl", "a,%s",
-		    aopGet (AOP (oper), offset++, FALSE, FALSE, DP2_RESULT_REG));
+		    aopGet (AOP (oper), offset++, FALSE, FALSE, NULL));
 	}
     }
   _endLazyDPSEvaluation ();
@@ -2151,7 +2149,24 @@ assignResultValue (operand * oper)
 {
   int offset = 0;
   int size = AOP_SIZE (oper);
+  bool pushedAcc = FALSE;
 
+  if (size == fReturnSizeDS390)
+  {
+      /* I don't think this case can ever happen... */
+      /* ACC is the last part of this. If writing the result
+       * uses AC, we must preserve it.
+       */
+      if (AOP_NEEDSACC(oper))
+      {
+	  emitcode(";", "assignResultValue special case for ACC.");
+	  emitcode("push", "acc");
+	  pushedAcc = TRUE;
+	  size--;
+      }
+  }
+    
+    
   _startLazyDPSEvaluation ();
   while (size--)
     {
@@ -2159,6 +2174,12 @@ assignResultValue (operand * oper)
       offset++;
     }
   _endLazyDPSEvaluation ();
+    
+  if (pushedAcc)
+    {
+	emitcode("pop", "acc");
+	aopPut(AOP(oper), "a", offset);
+    }
 }
 
 
@@ -4052,10 +4073,10 @@ genPlus (iCode * ic)
 	  MOVA (aopGet (AOP (IC_LEFT (ic)), offset, FALSE, FALSE, NULL));
 	  if (offset == 0)
 	    emitcode ("add", "a,%s",
-		 aopGet (AOP (IC_RIGHT (ic)), offset, FALSE, FALSE, DP2_RESULT_REG));
+		 aopGet (AOP (IC_RIGHT (ic)), offset, FALSE, FALSE, NULL));
 	  else
 	    emitcode ("addc", "a,%s",
-		 aopGet (AOP (IC_RIGHT (ic)), offset, FALSE, FALSE, DP2_RESULT_REG));
+		 aopGet (AOP (IC_RIGHT (ic)), offset, FALSE, FALSE, NULL));
 	}
       else
 	{
@@ -4200,7 +4221,7 @@ genMinusDec (iCode * ic)
 	  emitcode ("mov", "a,#!constbyte",0xff);
 	  emitcode ("cjne", "a,%s,!tlabel", l, tlbl->key + 100);
       }
-      l = aopGet (AOP (IC_RESULT (ic)), MSB16, FALSE, NULL, NULL);
+      l = aopGet (AOP (IC_RESULT (ic)), MSB16, FALSE, FALSE, NULL);
       emitcode ("dec", "%s", l);
       if (size > 2)
 	{
@@ -4219,7 +4240,7 @@ genMinusDec (iCode * ic)
 		emitcode ("mov", "a,#!constbyte",0xff);
 		emitcode ("cjne", "a,%s,!tlabel", l, tlbl->key + 100);
 	    }
-	    l = aopGet (AOP (IC_RESULT (ic)), MSB24, FALSE, NULL, NULL);
+	    l = aopGet (AOP (IC_RESULT (ic)), MSB24, FALSE, FALSE, NULL);
 	    emitcode ("dec", "%s", l);
 	}
       if (size > 3)
@@ -4239,7 +4260,7 @@ genMinusDec (iCode * ic)
 		emitcode ("mov", "a,#!constbyte",0xff);
 		emitcode ("cjne", "a,%s,!tlabel", l, tlbl->key + 100);
 	    }	    
-	    l = aopGet (AOP (IC_RESULT (ic)), MSB32, FALSE, NULL, NULL);
+	    l = aopGet (AOP (IC_RESULT (ic)), MSB32, FALSE, FALSE, NULL);
 	    emitcode ("dec", "%s", l);
 	}
       if (emitTlbl)
@@ -5597,7 +5618,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
 	{
 	  MOVA (aopGet (AOP (left), offset, FALSE, FALSE, NULL));
 	  emitcode ("cjne", "a,%s,!tlabel",
-		    aopGet (AOP (right), offset, FALSE, FALSE, DP2_RESULT_REG),
+		    aopGet (AOP (right), offset, FALSE, FALSE, NULL),
 		    lbl->key + 100);
 	  offset++;
 	}
@@ -6321,7 +6342,7 @@ genAnd (iCode * ic, iCode * ifx)
 	      else
 		emitcode ("anl", "%s,%s",
 			  aopGet (AOP (left), offset, FALSE, TRUE, NULL),
-			  aopGet (AOP (right), offset, FALSE, FALSE, DP2_RESULT_REG));
+			  aopGet (AOP (right), offset, FALSE, FALSE, NULL));
 	    }
 	  else
 	    {
@@ -9315,8 +9336,7 @@ genFarPointerGet (operand * left,
 	  else
 	    {
 	      /* We need to generate a load to DPTR indirect through DPTR. */
-	      D (emitcode (";", "genFarPointerGet -- indirection special case.");
-		);
+	      D (emitcode (";", "genFarPointerGet -- indirection special case."););
 	      emitcode ("push", "%s", aopGet (AOP (left), 0, FALSE, TRUE, NULL));
 	      emitcode ("push", "%s", aopGet (AOP (left), 1, FALSE, TRUE, NULL));
 	      if (options.model == MODEL_FLAT24)
@@ -9375,10 +9395,12 @@ genFarPointerGet (operand * left,
     }
   if (dopi && pi && AOP_TYPE (left) != AOP_IMMD) {
       if (!AOP_INDPTRn(left)) {
+	  _startLazyDPSEvaluation ();
 	  aopPut ( AOP (left), "dpl", 0);
 	  aopPut ( AOP (left), "dph", 1);
 	  if (options.model == MODEL_FLAT24)
 	      aopPut ( AOP (left), "dpx", 2);
+	  _endLazyDPSEvaluation ();
       }
     pi->generated = 1;
   } else if ((OP_SYMBOL(left)->ruonly || AOP_INDPTRn(left)) && 
@@ -9433,8 +9455,7 @@ genCodePointerGet (operand * left,
 	  else
 	    {
 	      /* We need to generate a load to DPTR indirect through DPTR. */
-	      D (emitcode (";", "gencodePointerGet -- indirection special case.");
-		);
+	      D (emitcode (";", "gencodePointerGet -- indirection special case."););
 	      emitcode ("push", "%s", aopGet (AOP (left), 0, FALSE, TRUE, NULL));
 	      emitcode ("push", "%s", aopGet (AOP (left), 1, FALSE, TRUE, NULL));
 	      if (options.model == MODEL_FLAT24)
@@ -9494,10 +9515,14 @@ genCodePointerGet (operand * left,
     }
   if (dopi && pi && AOP_TYPE (left) != AOP_IMMD) {
       if (!AOP_INDPTRn(left)) {
+	  _startLazyDPSEvaluation ();
+	  
 	  aopPut ( AOP (left), "dpl", 0);
 	  aopPut ( AOP (left), "dph", 1);
 	  if (options.model == MODEL_FLAT24)
 	      aopPut ( AOP (left), "dpx", 2);
+
+	  _endLazyDPSEvaluation ();
       }
       pi->generated = 1;
   } else if ((OP_SYMBOL(left)->ruonly || AOP_INDPTRn(left)) && 
@@ -9610,12 +9635,17 @@ genGenPointerGet (operand * left,
     }
 
   if (pi && AOP_TYPE (left) != AOP_IMMD) {
+    _startLazyDPSEvaluation ();
+      
     aopPut ( AOP (left), "dpl", 0);
     aopPut ( AOP (left), "dph", 1);
     if (options.model == MODEL_FLAT24) {
 	aopPut ( AOP (left), "dpx", 2);
 	aopPut ( AOP (left), "b", 3);	
     } else  aopPut ( AOP (left), "b", 2);	
+    
+    _endLazyDPSEvaluation ();
+      
     pi->generated = 1;
   } else if (OP_SYMBOL(left)->ruonly && AOP_SIZE(result) > 1 &&
 	     (OP_SYMBOL (left)->liveTo > ic->seq || ic->depth)) {
@@ -10186,10 +10216,14 @@ genFarPointerSet (operand * right,
   
   if (dopi && pi && AOP_TYPE (result) != AOP_IMMD) {
       if (!AOP_INDPTRn(result)) {
+	  _startLazyDPSEvaluation ();
+	  
 	  aopPut (AOP(result),"dpl",0);
 	  aopPut (AOP(result),"dph",1);
 	  if (options.model == MODEL_FLAT24)
 	      aopPut (AOP(result),"dpx",2);
+
+	  _endLazyDPSEvaluation ();
       }
       pi->generated=1;
   } else if ((OP_SYMBOL(result)->ruonly || AOP_INDPTRn(result)) && 
@@ -10254,33 +10288,63 @@ genGenPointerSet (operand * right,
 	}
       _endLazyDPSEvaluation ();
     }
-  /* so dptr know contains the address */
+  /* so dptr + b now contains the address */
+  _G.bInUse++;
   aopOp (right, ic, FALSE, TRUE);
+  _G.bInUse--;
+    
 
   /* if bit then unpack */
   if (IS_BITVAR (retype) || IS_BITVAR (letype))
-    genPackBits ((IS_BITVAR (retype) ? retype : letype), right, "dptr", GPOINTER);
+    {
+	genPackBits ((IS_BITVAR (retype) ? retype : letype), right, "dptr", GPOINTER);
+    }
   else
     {
-      size = AOP_SIZE (right);
-      offset = 0;
+	size = AOP_SIZE (right);
+	offset = 0;
 
-      _startLazyDPSEvaluation ();
-      while (size--)
+	_startLazyDPSEvaluation ();
+	while (size--)
 	{
-	  MOVA (aopGet (AOP (right), offset++, FALSE, FALSE, NULL));
+	    if (size)
+	    {
+		// Set two bytes at a time, passed in _AP & A.
+		// dptr will be incremented ONCE by __gptrputWord.
+		//
+		// Note: any change here must be coordinated
+		// with the implementation of __gptrputWord
+		// in device/lib/_gptrput.c
+		emitcode("mov", "_ap, %s", 
+			 aopGet (AOP (right), offset++, FALSE, FALSE, NULL));
+		MOVA (aopGet (AOP (right), offset++, FALSE, FALSE, NULL));
+		
+		genSetDPTR (0);
+		_flushLazyDPS ();
+		emitcode ("lcall", "__gptrputWord");
+		size--;
+	    }
+	    else
+	    {
+		// Only one byte to put.
+		MOVA (aopGet (AOP (right), offset++, FALSE, FALSE, NULL));
 
-	  genSetDPTR (0);
-	  _flushLazyDPS ();
-
-	  emitcode ("lcall", "__gptrput");
-	  if (size || (pi && AOP_TYPE (result) != AOP_IMMD))
-	    emitcode ("inc", "dptr");
+		genSetDPTR (0);
+		_flushLazyDPS ();		
+		emitcode ("lcall", "__gptrput");
+	    }
+	    
+	    if (size || (pi && AOP_TYPE (result) != AOP_IMMD))
+	    {
+		emitcode ("inc", "dptr");
+	    }
 	}
-      _endLazyDPSEvaluation ();
+	_endLazyDPSEvaluation ();
     }
 
   if (pi && AOP_TYPE (result) != AOP_IMMD) {
+      _startLazyDPSEvaluation ();
+      
       aopPut (AOP(result),"dpl",0);
       aopPut (AOP(result),"dph",1);
       if (options.model == MODEL_FLAT24) {
@@ -10289,6 +10353,8 @@ genGenPointerSet (operand * right,
       } else {
 	  aopPut (AOP(result),"b",2);
       }
+      _endLazyDPSEvaluation ();
+      
       pi->generated=1;
   } else if (OP_SYMBOL(result)->ruonly && AOP_SIZE(right) > 1 &&
 	     (OP_SYMBOL (result)->liveTo > ic->seq || ic->depth)) {
@@ -11201,53 +11267,55 @@ genDjnz (iCode * ic, iCode * ifx)
 static void
 genReceive (iCode * ic)
 {
-
     int size = getSize (operandType (IC_RESULT (ic)));
     int offset = 0;
     int rb1off ;
     
-    D (emitcode (";", "genReceive ");
-       );
+    D (emitcode (";", "genReceive "););
 
-  if (ic->argreg == 1) { /* first parameter */
-      if (isOperandInFarSpace (IC_RESULT (ic)) &&
-	  (OP_SYMBOL (IC_RESULT (ic))->isspilt ||
-	   IS_TRUE_SYMOP (IC_RESULT (ic))))
-	  {
-	      offset = fReturnSizeDS390 - size;
-	      while (size--)
-		  {
-		      emitcode ("push", "%s", (strcmp (fReturn[fReturnSizeDS390 - offset - 1], "a") ?
-					       fReturn[fReturnSizeDS390 - offset - 1] : "acc"));
-		      offset++;
-		  }
-	      aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
-	      size = AOP_SIZE (IC_RESULT (ic));
-	      offset = 0;
-	      while (size--)
-		  {
-		      emitcode ("pop", "acc");
-		      aopPut (AOP (IC_RESULT (ic)), "a", offset++);
-		  }
-	      
-	  } else {
-	      _G.accInUse++;
-	      aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
-	      _G.accInUse--;
-	      assignResultValue (IC_RESULT (ic));
-	  }
-  } else { /* second receive onwards */
-      /* this gets a little tricky since unused recevies will be
+    if (ic->argreg == 1) 
+    {
+	/* first parameter */
+	if (AOP_IS_STR(IC_RESULT(ic)))
+	{
+	    /* Nothing to do: it's already in the proper place. */
+	    return;
+	}
+	else
+	{
+	    bool useDp2;
+	    
+	    useDp2 = isOperandInFarSpace (IC_RESULT (ic)) &&
+		(OP_SYMBOL (IC_RESULT (ic))->isspilt ||
+		 IS_TRUE_SYMOP (IC_RESULT (ic)));
+	    
+	    _G.accInUse++;
+	    aopOp (IC_RESULT (ic), ic, FALSE, useDp2);
+	    _G.accInUse--; 
+	    
+	    /* Sanity checking... */
+	    if (AOP_USESDPTR(IC_RESULT(ic)))
+	    {
+		werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+			"genReceive got unexpected DPTR.");
+	    }
+	    assignResultValue (IC_RESULT (ic));
+	}
+    } 
+    else 
+    { 
+	/* second receive onwards */
+	/* this gets a little tricky since unused recevies will be
 	 eliminated, we have saved the reg in the type field . and
 	 we use that to figure out which register to use */
-      aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
-      rb1off = ic->argreg;
-      while (size--) {
-	  aopPut (AOP (IC_RESULT (ic)), rb1regs[rb1off++ -5], offset++);
-      }
-      
-  }
-  freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
+	aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
+	rb1off = ic->argreg;
+	while (size--) 
+	{
+	    aopPut (AOP (IC_RESULT (ic)), rb1regs[rb1off++ -5], offset++);
+	}
+    }
+    freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -12145,9 +12213,14 @@ static void genMMDeref (iCode *ic,int nparms, operand **parms)
 		if (rsym->liveFrom != rsym->liveTo) {			
 			aopOp (IC_RESULT(ic),ic,FALSE,FALSE);
 			if (AOP_TYPE(IC_RESULT(ic)) != AOP_STR) {
+			    _startLazyDPSEvaluation ();
+			    
 				aopPut(AOP(IC_RESULT(ic)),"dpl",0);
 				aopPut(AOP(IC_RESULT(ic)),"dph",1);
 				aopPut(AOP(IC_RESULT(ic)),"dpx",2);
+
+			    _endLazyDPSEvaluation ();
+			    
 			}
 		}
 	}

@@ -26,9 +26,6 @@
 unsigned char _gptrput ()
 {
     _asm
-        xch      a,r0
-	push     acc
-	xch      a,r0
 	push     acc
     ;
     ;   depending on the pointer type acc. to SDCCsymt.h
@@ -45,12 +42,13 @@ unsigned char _gptrput ()
 	dec	a
 	jz	00001$	; 5 idata
 	pop     acc
-	sjmp    00005$
+	sjmp    00006$
 ;
 ;       store into near space
 ;
  00001$:
 	pop     acc
+	push	ar0
 	mov     r0,dpl
 	mov     @r0,a
 	sjmp    00005$
@@ -58,19 +56,82 @@ unsigned char _gptrput ()
  00002$:
 	pop     acc
 	movx    @dptr,a
-	sjmp    00005$
+	sjmp    00006$
 
  00003$:
 	pop     acc    ; do nothing
-	sjmp    00005$
+	sjmp    00006$
 
  00004$:
 	pop     acc
+	push	ar0
 	mov     r0,dpl
 	movx    @r0,a
  00005$:
-	xch     a,r0
-	pop     acc
-	xch     a,r0
+	pop     ar0
+ 00006$:
 _endasm;
 }
+
+#ifdef SDCC_ds390
+unsigned char _gptrputWord ()
+{
+    _asm
+	push     acc
+    ;
+    ;   depending on the pointer type acc. to SDCCsymt.h
+    ;
+        mov     a,b
+	jz      00011$	; 0 near
+        dec     a
+        jz      00012$	; 1 far
+        dec     a
+        jz      00013$	; 2 code
+        dec     a
+        jz      00014$
+	dec	a	; 4 skip generic pointer
+	dec	a
+	jz	00011$	; 5 idata
+	pop     acc
+	sjmp    00016$
+;
+;       store into near space
+;
+ 00011$:
+	pop     acc
+	push	ar0
+	mov     r0,dpl
+	mov     @r0,_ap
+	inc	r0
+	mov	@r0,a
+	sjmp    00015$
+
+ 00012$:
+	mov	a, _ap
+	movx    @dptr,a
+	inc	dptr
+	pop	acc
+        movx    @dptr,a
+	sjmp    00016$
+
+ 00013$:
+	pop     acc    ; do nothing
+	sjmp    00016$
+
+ 00014$:
+	pop     acc
+	push	ar0
+	mov     r0,dpl
+	xch	a,_ap
+	movx    @r0,a
+	inc	r0
+	xch	a,_ap
+	movx	@r0, a
+ 00015$:	
+        inc	dptr
+	pop     ar0
+ 00016$:	
+    _endasm;
+}
+
+#endif

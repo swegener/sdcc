@@ -1,4 +1,4 @@
-2003-10-04 Frieder Ferlemann <Frieder.Ferlemann@web.de>
+2003-11-01 Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
 	* src/mcs51/main.c: xdata initialization is 13 bytes shorter now
 

@@ -363,5 +363,220 @@ PORT ds390_port =
   TRUE,                         /* we support array initializers. */
   cseCostEstimation,
   __ds390_builtins,             /* table of builtin functions */
+  GPOINTER,			/* treat unqualified pointers as "generic" pointers */
+  1,				/* reset labelKey to 1 */
+  1,				/* globals & local static allowed */
+  PORT_MAGIC
+};
+
+/*---------------------------------------------------------------------------------*/
+/*  				 TININative specific 			   	   */
+/*---------------------------------------------------------------------------------*/
+/* Globals */
+static void _tininative_init (void)
+{
+    asm_addTree (&asm_a390_mapping);
+}
+
+static void _tininative_setDefaultOptions (void)
+{
+    options.model=MODEL_FLAT24;
+    options.stack10bit=1;
+    options.stackAuto = 1;
+}
+
+static void _tininative_finaliseOptions (void)
+{
+    /* Hack-o-matic: if we are using the flat24 model,
+     * adjust pointer sizes.
+     */
+    if (options.model != MODEL_FLAT24)  {
+	options.model = MODEL_FLAT24 ;
+	fprintf(stderr,"TININative supports only MODEL FLAT24\n");
+    }
+    port->s.fptr_size = 3;
+    port->s.gptr_size = 4;
+    
+    port->stack.isr_overhead += 2;	/* Will save dpx on ISR entry. */
+    
+    port->stack.call_overhead += 2;	/* This acounts for the extra byte 
+					 * of return addres on the stack.
+					 * but is ugly. There must be a 
+					 * better way.
+					 */
+    
+    port->mem.default_local_map = xdata;
+    port->mem.default_globl_map = xdata;
+    
+    if (!options.stack10bit) {
+	options.stack10bit = 1;
+	fprintf(stderr,"TININative supports only stack10bit \n");
+    }
+    
+    if (!options.stack_loc) options.stack_loc = 0x400007;
+    
+    /* generate native code 16*16 mul/div */
+    if (options.useAccelerator) 
+	port->support.muldiv=2;
+    else 
+	port->support.muldiv=1;
+    
+    /* Fixup the memory map for the stack; it is now in
+     * far space and requires a FPOINTER to access it.
+     */
+    istack->fmap = 1;
+    istack->ptrType = FPOINTER;
+    options.cc_only =1;
+}  /* MODEL_FLAT24 */
+
+static int _tininative_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts) 
+{
+    return 1;
+}
+static void _tininative_genAssemblerPreamble (FILE * of)
+{
+    fputs ("_bpx EQU 080h \t\t; _bpx register unknown to assembler\n", of);
+    fputs ("dpx EQU 093h\t\t; dpx register unknown to assembler\n", of);
+    fputs ("dps EQU 086h\t\t; dps register unknown to assembler\n", of);
+    fputs ("dpl1 EQU 084h\t\t; dpl1 register unknown to assembler\n", of);
+    fputs ("dph1 EQU 085h\t\t; dph1 register unknown to assembler\n", of);
+    fputs ("dpx1 EQU 095h\t\t; dpx1 register unknown to assembler\n", of);
+    fputs ("ap EQU 09Ch\t\t; ap register unknown to assembler\n", of);
+    fputs ("mcnt0 EQU 0D1h\t\t; mcnt0 register unknown to assembler\n", of);
+    fputs ("mcnt1 EQU 0D2h\t\t; mcnt1 register unknown to assembler\n", of);
+    fputs ("ma EQU 0D3h\t\t; ma register unknown to assembler\n", of);
+    fputs ("mb EQU 0D4h\t\t; mb register unknown to assembler\n", of);
+    fputs ("mc EQU 0D5h\t\t; mc register unknown to assembler\n", of);
+    fputs ("F1 EQU 0D1h\t\t; F1 user flag unknown to assembler\n", of);
+    fputs ("esp EQU 09Bh\t\t; ESP user flag unknown to assembler\n", of);
+}
+
+/* list of key words used by TININative */
+static char *_tininative_keywords[] =
+{
+  "at",
+  "bit",
+  "code",
+  "critical",
+  "data",
+  "far",
+  "idata",
+  "interrupt",
+  "near",
+  "pdata",
+  "reentrant",
+  "sfr",
+  "sbit",
+  "using",
+  "xdata",
+  "_data",
+  "_code",
+  "_generic",
+  "_near",
+  "_xdata",
+  "_pdata",
+  "_idata",
+  "_naked",
+  "_JavaNative",
+  NULL
+};
+
+static builtins __tininative_builtins[] = {
+    { "__builtin_memcpy_x2x","v",3,{"cx*","cx*","i"}}, /* void __builtin_memcpy_x2x (xdata char *,xdata char *,int) */
+    { "__builtin_memcpy_c2x","v",3,{"cx*","cp*","i"}}, /* void __builtin_memcpy_c2x (xdata char *,code  char *,int) */
+    { "__builtin_memset_x","v",3,{"cx*","c","i"}},     /* void __builtin_memset     (xdata char *,char,int) 	    */
+    { NULL , NULL,0, {NULL}} 			   /* mark end of table */
+};    
+
+static const char *_a390Cmd[] =
+{
+  "a390", "$l", "$3", "$1.a51", NULL
+};
+PORT tininative_port =
+{
+  TARGET_ID_DS390,
+  "TININative",
+  "DS80C390",			/* Target name */
+  {
+    FALSE,			/* Emit glue around main */
+    MODEL_FLAT24,
+    MODEL_FLAT24
+  },
+  {
+    _a390Cmd,
+    NULL,
+    "-l",		/* Options with debug */
+    "-l",		/* Options without debug */
+    0,
+    ".a51"
+  },
+  {
+    NULL,
+    NULL,
+    NULL,
+    ".tlib",
+  },
+  {
+    _defaultRules
+  },
+  {
+	/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
+    1, 2, 2, 4, 1, 3, 3, 1, 4, 4
+  },
+  {
+    "XSEG    (XDATA)",
+    "STACK   (DATA)",
+    "CSEG    (CODE)",
+    "DSEG    (DATA)",
+    "ISEG    (DATA)",
+    "XSEG    (XDATA)",
+    "BSEG    (BIT)",
+    "RSEG    (DATA)",
+    "GSINIT  (CODE)",
+    "OSEG    (OVR,DATA)",
+    "GSFINAL (CODE)",
+    "HOME	 (CODE)",
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    1
+  },
+  {
+    +1, 1, 4, 1, 1, 0
+  },
+    /* ds390 has an 16 bit mul & div */
+  {
+    2, -1
+  },
+  "",
+  _tininative_init,
+  _ds390_parseOptions,
+  _tininative_finaliseOptions,
+  _tininative_setDefaultOptions,
+  ds390_assignRegisters,
+  _ds390_getRegName,
+  _tininative_keywords,
+  _tininative_genAssemblerPreamble,
+  _tininative_genIVT,
+  NULL,
+  _ds390_reset_regparm,
+  _ds390_regparm,
+  NULL,
+  NULL,
+  NULL,
+  FALSE,
+  0,				/* leave lt */
+  0,				/* leave gt */
+  1,				/* transform <= to ! > */
+  1,				/* transform >= to ! < */
+  1,				/* transform != to !(a == b) */
+  0,				/* leave == */
+  TRUE,                         /* we support array initializers. */
+  cseCostEstimation,
+  __tininative_builtins,        /* table of builtin functions */
+  FPOINTER,			/* treat unqualified pointers as far pointers */
+  0,				/* DONOT reset labelKey */
+  0,				/* globals & local static NOT allowed */
   PORT_MAGIC
 };

@@ -1,3 +1,12 @@
+2003-11-25 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	Fixed several common-sub-expression bugs (#772861, #768380, & #755323)
+	* src/SDCCdflow.c
+	* src/SDCCcse.c
+	* src/SDCCcse.h
+	* src/SDCCBBlock.h
+	* src/SDCCBBlock.c
+
 2003-11-23 Klaus Flittner <klaus_flittner@gmx.de>
 
 	fixed bug #845089

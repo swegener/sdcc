@@ -40,10 +40,65 @@ newCseDef (operand * sym, iCode * ic)
   cdp->sym = sym;
   cdp->diCode = ic;
   cdp->key = sym->key;
+  cdp->ancestors = newBitVect(iCodeKey);
+  cdp->fromGlobal = 0;
 
+  if (ic->op!=IF && ic->op!=JUMPTABLE)
+    {
+      if (IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)))
+        {
+          bitVectSetBit (cdp->ancestors, IC_LEFT (ic)->key);
+          cdp->fromGlobal |= isOperandGlobal (IC_LEFT (ic));
+        }
+      if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic)))
+        {
+          bitVectSetBit (cdp->ancestors, IC_RIGHT (ic)->key);
+          cdp->fromGlobal |= isOperandGlobal (IC_RIGHT (ic));
+        }
+    }
+  
   return cdp;
 }
 
+void
+updateCseDefAncestors(cseDef *cdp, set * cseSet)
+{
+  cseDef *loop;
+  set *sl;
+  iCode *ic = cdp->diCode;
+  
+  if (ic->op!=IF && ic->op!=JUMPTABLE)
+    {
+      if (IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)))
+        {
+          bitVectSetBit (cdp->ancestors, IC_LEFT (ic)->key);
+          for (sl = cseSet; sl; sl = sl->next)
+            {
+              loop = sl->item;
+              if (loop->sym->key == IC_LEFT (ic)->key)
+                {
+                  cdp->ancestors = bitVectUnion (cdp->ancestors, loop->ancestors);
+                  cdp->fromGlobal |= loop->fromGlobal;
+                  break;
+                }
+            }
+        }
+      if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic)))
+        {
+          bitVectSetBit (cdp->ancestors, IC_RIGHT (ic)->key);
+          for (sl = cseSet; sl; sl = sl->next)
+            {
+              loop = sl->item;
+              if (loop->sym->key == IC_RIGHT (ic)->key)
+                {
+                  cdp->ancestors = bitVectUnion (cdp->ancestors, loop->ancestors);
+                  cdp->fromGlobal |= loop->fromGlobal;
+                  break;
+                }
+            }
+        }
+    }
+}
 
 
 /*-----------------------------------------------------------------*/
@@ -457,6 +512,16 @@ DEFSETFUNC (ifAssignedFromGlobal)
   return 0;
 }
 
+/*-------------------------------------------------------------------*/
+/* ifFromGlobal - if definition is derived from global               */
+/*-------------------------------------------------------------------*/
+DEFSETFUNC (ifFromGlobal)
+{
+  cseDef *cdp = item;
+  
+  return cdp->fromGlobal;
+}
+
 /*-----------------------------------------------------------------*/
 /* ifDefGlobal - if definition is global                           */
 /*-----------------------------------------------------------------*/
@@ -487,7 +552,9 @@ DEFSETFUNC (ifOperandsHave)
   cseDef *cdp = item;
   V_ARG (operand *, op);
 
-
+  if (bitVectBitValue(cdp->ancestors, op->key))
+    return 1;
+  
   if (IC_LEFT (cdp->diCode) &&
       IS_SYMOP (IC_LEFT (cdp->diCode)) &&
       IC_LEFT (cdp->diCode)->key == op->key)
@@ -543,12 +610,17 @@ DEFSETFUNC (ifDefSymIsX)
 {
   cseDef *cdp = item;
   V_ARG (operand *, op);
-
+  int match;
+  
   if (op && cdp->sym)
-    return cdp->sym->key == op->key;
+    match = cdp->sym->key == op->key;
   else
-    return (isOperandEqual (cdp->sym, op));
-
+    match = (isOperandEqual (cdp->sym, op));
+  #if 0
+  if (match)
+    printf("%s ",OP_SYMBOL(cdp->sym)->name);
+  #endif
+  return match;
 }
 
 
@@ -1548,6 +1620,7 @@ deleteGetPointers (set ** cseSet, set ** pss, operand * op, eBBlock * ebb)
     {
       ebb->ptrsSet = bitVectSetBit (ebb->ptrsSet, cop->key);
       deleteItemIf (cseSet, ifPointerGet, cop);
+      deleteItemIf (cseSet, ifDefSymIsX, cop);
       deleteItemIf (pss, ifPointerSet, cop);
     }
 }
@@ -1679,6 +1752,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
   int change = 0;
   int i;
   set *ptrSetSet = NULL;
+  cseDef *expr;
 
   /* if this block is not reachable */
   if (ebb->noPath)
@@ -1719,7 +1793,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	  IS_PTR (operandType (IC_RESULT (ic))))
 	{
 	  ptrPostIncDecOpt (ic);
-	}
+	}        
 
       /* clear the def & use chains for the operands involved */
       /* in this operation . since it can change due to opts  */
@@ -1739,8 +1813,8 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	     since they can be modified by the function call */
 	  deleteItemIf (&cseSet, ifDefGlobal);
 
-	  /* and also itemps assigned from globals */
-	  deleteItemIf (&cseSet, ifAssignedFromGlobal);
+	  /* and also itemps derived from globals */
+	  deleteItemIf (&cseSet, ifFromGlobal);
 
 	  /* delete all getpointer iCodes from cseSet, this should
 	     be done only for global arrays & pointers but at this
@@ -1973,8 +2047,11 @@ cseBBlock (eBBlock * ebb, int computeOnly,
       }
 
       if (!(POINTER_SET (ic)) && IC_RESULT (ic)) {
+          cseDef *csed;
 	  deleteItemIf (&cseSet, ifDefSymIsX, IC_RESULT (ic));
-	  addSetHead (&cseSet, newCseDef (IC_RESULT (ic), ic));
+          csed = newCseDef (IC_RESULT (ic), ic);
+          updateCseDefAncestors (csed, cseSet);
+	  addSetHead (&cseSet, csed);
       }
       defic = ic;
 
@@ -2076,6 +2153,11 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	}
     }
 
+  for (expr=setFirstItem (ebb->inExprs); expr; expr=setNextItem (ebb->inExprs))
+    if (!isinSetWith (cseSet, expr, isCseDefEqual) &&
+        !isinSetWith (ebb->killedExprs, expr, isCseDefEqual)) {
+    addSetHead (&ebb->killedExprs, expr);
+  }
   setToNull ((void *) &ebb->outExprs);
   ebb->outExprs = cseSet;
   ebb->outDefs = bitVectUnion (ebb->outDefs, ebb->defSet);

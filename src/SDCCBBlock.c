@@ -178,6 +178,7 @@ dumpEbbsToFileExt (int id, eBBlock ** ebbs, int count)
   FILE *of;
   int i;
   eBBlock *bb;
+  set *cseSet;
 
   if (id) {
     of=createDumpFile(id);
@@ -230,6 +231,29 @@ dumpEbbsToFileExt (int id, eBBlock ** ebbs, int count)
 	      fprintf (of, "\nInductions Set bitvector :");
 	      bitVectDebugOn (ebbs[i]->linds, of);
       }
+      
+      fprintf (of, "\ninExprs:");
+      for (cseSet = ebbs[i]->inExprs; cseSet; cseSet=cseSet->next) {
+        cseDef *item=cseSet->item;
+        fprintf (of, " %s(%d)",OP_SYMBOL(item->sym)->name,item->diCode->key);
+        if (item->fromGlobal)
+          fprintf (of, "g");
+      }
+      fprintf (of, "\noutExprs:");
+      for (cseSet = ebbs[i]->outExprs; cseSet; cseSet=cseSet->next) {
+        cseDef *item=cseSet->item;
+        fprintf (of, " %s(%d)",OP_SYMBOL(item->sym)->name,item->diCode->key);
+        if (item->fromGlobal)
+          fprintf (of, "g");
+      }
+      fprintf (of, "\nkilledExprs:");
+      for (cseSet = ebbs[i]->killedExprs; cseSet; cseSet=cseSet->next) {
+        cseDef *item=cseSet->item;
+        fprintf (of, " %s(%d)",OP_SYMBOL(item->sym)->name,item->diCode->key);
+        if (item->fromGlobal)
+          fprintf (of, "g");
+      }
+      
       fprintf (of, "\n----------------------------------------------------------------\n");
       printiCChain (ebbs[i]->sch, of);
     }

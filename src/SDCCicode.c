@@ -1219,22 +1219,32 @@ operandOperation (operand * left, operand * right,
 				 (TYPE_UDWORD) operandLitValue (right));
       break;
     case EQ_OP:
-      /* this op doesn't care about signedness */
-      {
-	TYPE_UDWORD l, r;
+      if (IS_FLOAT (let) ||
+          IS_FLOAT (ret))
+	{
+	  retval = operandFromLit (operandLitValue (left) ==
+				   operandLitValue (right));
+	}
+      else
+	{
+	  /* this op doesn't care about signedness */
+	  TYPE_UDWORD l, r;
 
-	l = (TYPE_UDWORD) operandLitValue (left);
-	if (IS_CHAR(OP_VALUE(left)->type))
-	  l &= 0xff;
-	else if (!IS_LONG (OP_VALUE(left)->type))
-	  l &= 0xffff;
-	r = (TYPE_UDWORD) operandLitValue (right);
-	if (IS_CHAR(OP_VALUE(right)->type))
-	  r &= 0xff;
-	else if (!IS_LONG (OP_VALUE(right)->type))
-	  r &= 0xffff;
-	retval = operandFromLit (l == r);
-      }
+	  l = (TYPE_UDWORD) operandLitValue (left);
+	  r = (TYPE_UDWORD) operandLitValue (right);
+	  /* In order to correctly compare 'signed int' and 'unsigned int' it's
+	     neccessary to strip them to 16 bit.
+	     Literals are reduced to their cheapest type, therefore left and
+	     right might have different types. It's neccessary to find a
+	     common type: int (used for char too) or long */
+	  if (!IS_LONG (let) &&
+	      !IS_LONG (ret))
+	    {
+	      r = (TYPE_UWORD) r;
+	      l = (TYPE_UWORD) l;
+	    }
+	  retval = operandFromLit (l == r);
+	}
       break;
     case '<':
       retval = operandFromLit (operandLitValue (left) <

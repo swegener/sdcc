@@ -8,6 +8,10 @@
 	modified to finally use computeType() all over SDCC,
 	see Feature Request #877103
 	* src/SDCCval.h: cosmetic
+	* src/SDCCicode.c (operandOperation): fixed EQ_OP bug, now same as in
+	valCompare(); regression tested in muldiv.c
+	* support/regression/tests/muldiv.c (testMod): mod sign follows
+	dividend only
 
 2004-02-23 Bernhard Held <bernhard AT bernhardheld.de>
 

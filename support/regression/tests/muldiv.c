@@ -98,7 +98,6 @@ testMod(void)
     //    LOG(("i%%17 == 15 = %u\n", (int)(i%9)));
     ASSERT(i%17 == 15);
 
-#if MOD_SIGN_FOLLOWS_DIVIDEND
     //    LOG(("i%%-7 == 2 = %u\n", (int)i%-7));
     ASSERT(i%-7 == 2);
 
@@ -107,5 +106,4 @@ testMod(void)
     ASSERT(i%3 == -1);
     //    LOG(("i%%-5 == -4 = %u\n", (int)i%-5));
     ASSERT(i%-5 == -4);
-#endif
 }

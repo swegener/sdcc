@@ -1,9 +1,10 @@
 #ifndef CMDLEXCL_HEADER
 #define CMDLEXCL_HEADER
 
-#ifndef __FLEX_LEXER_H
-#include <FlexLexer.h>
-#endif
+//#ifndef __FLEX_LEXER_H
+//#include <FlexLexer.h>
+//#endif
+#include "flex_lexer.h"
 
 #include "pobjcl.h"
 

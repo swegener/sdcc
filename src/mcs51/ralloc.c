@@ -2265,7 +2265,7 @@ packRegisters (eBBlock * ebp)
 
   for (ic = ebp->sch; ic; ic = ic->next)
     {
-      /* if this is an itemp & result of a address of a true sym 
+      /* if this is an itemp & result of an address of a true sym 
          then mark this as rematerialisable   */
       if (ic->op == ADDRESS_OF &&
 	  IS_ITEMP (IC_RESULT (ic)) &&
@@ -2297,6 +2297,8 @@ packRegisters (eBBlock * ebp)
 
       /* if this is a +/- operation with a rematerizable 
          then mark this as rematerializable as well */
+#if 0
+      // jwk 20010716: temporary disabled because of bug #441448
       if ((ic->op == '+' || ic->op == '-') &&
 	  (IS_SYMOP (IC_LEFT (ic)) &&
 	   IS_ITEMP (IC_RESULT (ic)) &&
@@ -2308,6 +2310,7 @@ packRegisters (eBBlock * ebp)
 	  OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
 	  OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
 	}
+#endif
 
       /* mark the pointer usages */
       if (POINTER_SET (ic))
@@ -2551,7 +2554,6 @@ mcs51_assignRegisters (eBBlock ** ebbs, int count)
 
   /* now get back the chain */
   ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbs, count));
-
 
   gen51Code (ic);
 

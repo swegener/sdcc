@@ -1,7 +1,6 @@
 2004-11-18 Maarten Brock <sourceforge.brock AT dse.nl>
 
-	* device/lib/printf_large.c (_print_format): fixed bug 1073386,
-	  (calculate_digit): added optimization for octal and hex
+	* device/lib/printf_large.c (_print_format): fixed bug 1073386
 	* support/regression/tests/bug1057979.c: added test for bug 1073386
 
 2004-11-25 Vangelis Rokas <vrokas AT otenet.gr>

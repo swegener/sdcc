@@ -1,6 +1,7 @@
 2003-02-08  Bernhard Held <bernhard@bernhardheld.de>
 
 	* device/lib/_mulint.c: small fix for large/ds390 --int-long-reent resp. --stack-auto
+	* device/lib/printfl.c: fix a ds390 bug by making it portable
 
 2003-02-05  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 

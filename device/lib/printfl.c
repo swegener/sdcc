@@ -20,7 +20,7 @@
     In other words, you are welcome to use, share and improve this program.
     You are forbidden to forbid anyone else to use, share and improve
     what you give them.   Help stamp out software-hoarding!
-    
+
     2001060401: Improved by was@icb.snz.chel.su
 -------------------------------------------------------------------------*/
 
@@ -42,23 +42,37 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #ifndef __ds390
 /* just for the SP */
 #include <8051.h>
 #endif
 
-static data volatile char ch;
 static data char radix ;
 static bit  long_flag = 0;
 static bit  string_flag =0;
 static bit  char_flag = 0;
-static bit sign;
 static char * data str ;
 static data long val;
 
+/* This great loop fails with the ds390 port (2003-01-13).
+
+   At the beginning resp. end of the loop the compiler inserts a "push ar2"
+   resp. "pop ar2", which badly interfers with the push/pop in the source.
+
+   Library functions should be rock solid and portable. There's an _ltoa in
+   the library, so let's use it and don't reinvent the wheel.
+
+   Bernhard
+*/
+
+#if NICE_LIFO_IMPLEMENTATION_BUT_NOT_PORTABLE
+static data volatile char ch;
+static bit sign;
+
 static void pval(void)
 {
-        char sp;
+        volatile char sp;
         unsigned long lval;
         sp = SP;
 
@@ -78,18 +92,19 @@ static void pval(void)
 
         do
         {
-#if 1
+
+#  if 1
                 if(radix != 16)  ch = (lval % radix) + '0';
                 else ch = "0123456789ABCDEF"[(unsigned char)lval & 0x0f];
                 _asm push _ch _endasm;
                 lval /= radix;
-#else
+#  else
 		// This only looks more efficient, but isn't. see the .map
-                ch = (lval % radix) + '0'; 
-                if (ch>'9') ch+=7; 
-                _asm push _ch _endasm; 
+                ch = (lval % radix) + '0';
+                if (ch>'9') ch+=7;
+                _asm push _ch _endasm;
                 lval /= radix;
-#endif
+#  endif
         }
         while (lval);
 
@@ -103,6 +118,7 @@ static void pval(void)
                 putchar(ch);
         }
 }
+#endif
 
 void printf_small (char * fmt, ... ) reentrant
 {
@@ -156,8 +172,21 @@ void printf_small (char * fmt, ... ) reentrant
                 else
                     val = va_arg(ap,int);
 
+#if NICE_LIFO_IMPLEMENTATION_BUT_NOT_PORTABLE
             if (radix) pval();
-            else putchar((char)val);
+#else
+            if (radix)
+            {
+              static char data buffer[12], c;
+
+              _ltoa (val, buffer, radix);
+              str = buffer;
+              while ((c = *str++) != '\0')
+                putchar (c);
+            }
+#endif
+            else
+              putchar((char)val);
 
         } else
             putchar(*fmt);

@@ -1585,16 +1585,19 @@ main (int argc, char **argv, char **envp)
 
       if (!fatalError)
 	{
- 	  if (TARGET_IS_PIC) {
+	  if (TARGET_IS_PIC) {
 	    /* TSD PIC port hack - if the PIC port option is enabled
 	       and SDCC is used to generate PIC code, then we will
 	       generate .asm files in gpasm's format instead of SDCC's
 	       assembler's format
 	    */
+#if !OPT_DISABLE_PIC
 	    picglue ();
-	  }
-	  else
+#endif
+	  } else {
 	    glue ();
+	  }
+
 	  if (fatalError)
 	    {
 	      return 1;

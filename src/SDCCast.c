@@ -970,9 +970,7 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr)
       {
 	symbol *sym=AST_SYMBOL(iexpr);
 	memmap *segment=SPEC_OCLS(sym->etype);
-	if (segment) {
-	  deleteSetItem(&segment->syms, sym);
-	}
+	deleteSetItem(&segment->syms, sym);
       }
       
       return decorateType(resolveSymbols (rast));
@@ -1061,9 +1059,7 @@ gatherAutoInit (symbol * autoChain)
 
       /* resolve the symbols in the ival */
       if (sym->ival) {
-	noAlloc++;
 	resolveIvalSym (sym->ival);
-	noAlloc--;
       }
 
       /* if this is a static variable & has an */

@@ -1478,11 +1478,11 @@ linkEdit (char **envp)
 	/* VR 030517 - gplink needs linker options to set the linker script,*/
 	buildCmdLine (buffer2, port->linker.cmd, dstFileName, scratchFileName, NULL, linkOptionsSet);
 
-	buildCmdLine2 (buffer, buffer2, sizeof(buffer));
+	buildCmdLine2 (buffer, sizeof(buffer), buffer2);
     }
   else
     {
-      buildCmdLine2 (buffer, port->linker.mcmd, sizeof(buffer));
+      buildCmdLine2 (buffer, sizeof(buffer), port->linker.mcmd);
     }
 
 /*  if (options.verbose)fprintf(stderr, "linker command line: %s\n", buffer); */
@@ -1569,7 +1569,7 @@ assemble (char **envp)
 		      options.debug ? port->assembler.debug_opts : port->assembler.plain_opts,
 		      asmOptionsSet);
     } else {
-	buildCmdLine2 (buffer, port->assembler.mcmd, sizeof(buffer));
+	buildCmdLine2 (buffer, sizeof(buffer), port->assembler.mcmd);
     }
 
     if (my_system (buffer)) {
@@ -1675,7 +1675,7 @@ preProcess (char **envp)
       if (options.verbose)
 	printf ("sdcc: Calling preprocessor...\n");
 
-      buildCmdLine2 (buffer, _preCmd, sizeof(buffer));
+      buildCmdLine2 (buffer, sizeof(buffer), _preCmd);
 
       if (preProcOnly) {
         if (my_system (buffer)) {

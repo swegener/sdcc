@@ -287,6 +287,7 @@ extern set *preArgvSet;
 extern set *relFilesSet;
 extern set *libFilesSet;
 extern set *libPathsSet;
+extern set *libDirsSet;         /* list of lib search directories */
 
 void setParseWithComma (set **, char *);
 

@@ -22,6 +22,7 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
+#include <sys/stat.h>
 #include "z80.h"
 #include "MySystem.h"
 #include "BuildCmd.h"
@@ -285,8 +286,32 @@ _setValues(void)
 
   if (options.nostdlib == FALSE)
     {
+      const char *s;
+      char path[PATH_MAX];
+
       setMainValue ("z80libspec", "-l\"{port}.lib\"");
-      setMainValue ("z80crt0", "\"crt0{objext}\"");
+
+      for (s = setFirstItem(libDirsSet); s != NULL; s = setNextItem(libDirsSet))
+        {
+          struct stat stat_buf;
+
+          buildCmdLine2(path, sizeof path, "%s" DIR_SEPARATOR_STRING "{port}" DIR_SEPARATOR_STRING "crt0{objext}", s);
+          if (stat(path, &stat_buf) == 0)
+            break;
+        }
+
+      if (s == NULL)
+        setMainValue ("z80crt0", "\"crt0{objext}\"");
+      else
+        {
+          char *buf;
+          size_t len = strlen(path) + 3;
+
+          buf = Safe_alloc(len);
+          SNPRINTF(buf, len, "\"%s\"", path);
+          setMainValue("z80crt0", buf);
+          Safe_free(buf);
+        } 
     }
   else
     {

@@ -62,7 +62,7 @@ void setMainValue (const char *pname, const char *pvalue);
 
 void populateMainValues (const char **ppin);
 
-void buildCmdLine2 (char *pbuffer, const char *pcmd, size_t len);
+void buildCmdLine2 (char *pbuffer, size_t len, const char *pcmd, ...);
 
 /** Returns true if sz starts with the string given in key.
  */

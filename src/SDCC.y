@@ -57,6 +57,7 @@ STACK_DCL(swStk   ,ast   *,MAX_NEST_LEVEL)
 STACK_DCL(blockNum,int,MAX_NEST_LEVEL*3)
 
 value *cenum = NULL  ;  /* current enumeration  type chain*/
+bool uselessDecl = TRUE;
 
 %}
 %expect 6
@@ -459,7 +460,13 @@ constant_expr
    ;
 
 declaration
-   : declaration_specifiers ';'  { $$ = NULL ; }
+   : declaration_specifiers ';'
+      {
+         if (uselessDecl)
+           werror(W_USELESS_DECL);
+         uselessDecl = TRUE;
+         $$ = NULL ;
+      }
    | declaration_specifiers init_declarator_list ';'
       {
          /* add the specifier list to the id */
@@ -472,6 +479,7 @@ declaration
 	     addDecl (sym,0,lnk) ;
 	 }
         
+         uselessDecl = TRUE;
 	 $$ = sym1 ;
       }
    ;
@@ -629,9 +637,13 @@ type_specifier2
 	       SPEC_BSTR($$) = 0;
             }
 
-   | struct_or_union_specifier
+   | struct_or_union_specifier  {
+                                   uselessDecl = FALSE;
+                                   $$ = $1 ;
+                                }
    | enum_specifier     {                           
                            cenum = NULL ;
+                           uselessDecl = FALSE;
                            $$ = $1 ;                              
                         }
    | TYPE_NAME    

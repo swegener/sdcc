@@ -1,3 +1,12 @@
+2003-08-12  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	Generate warnings for useless declarations like "char data;"
+	that don't do what new users expect.
+
+	* src/SDCC.y
+	* support/Util/SDCCerr.h
+	* support/Util/SDCCerr.c
+
 2003-08-09  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCval.c (valMult): fixex overflow detection of negativ int

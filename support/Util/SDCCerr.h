@@ -181,6 +181,7 @@ SDCCERR - SDCC Standard error handler
 #define E_DUPLICATE_MEMBER 163
 #define E_STACK_VIOLATION 164       /* internal stack violation */
 #define W_INT_OVL 165               /* integer overflow in expression */
+#define W_USELESS_DECL 166	    /* useless declaration */
 
 /** Describes the maximum error level that will be logged.  Any level
  *  includes all of the levels listed after it.

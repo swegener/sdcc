@@ -387,6 +387,8 @@ struct
     "'%s' internal stack %s" },
 { W_INT_OVL, ERROR_LEVEL_WARNING,
     "integer overflow in expression" },
+{ W_USELESS_DECL, ERROR_LEVEL_WARNING,
+    "useless declaration (possible use of keyword as variable name)" },
 };
 
 /*

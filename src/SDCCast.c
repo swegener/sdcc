@@ -3232,7 +3232,6 @@ decorateType (ast * tree)
 	{
 	  werror (E_TYPE_MISMATCH, "assignment", " ");
 	  printFromToType(RTYPE(tree),LTYPE(tree));
-	  //goto errorTreeReturn;
 	}
 
       /* if the left side of the tree is of type void
@@ -3283,12 +3282,15 @@ decorateType (ast * tree)
       if ((options.stackAuto || IFFUNC_ISREENT (LTYPE (tree))) && 
 	  !IFFUNC_ISBUILTIN(LTYPE(tree)))
 	{
-	  //FUNC_ARGS(tree->left->ftype) = 
-	  //reverseVal (FUNC_ARGS(tree->left->ftype));
 	  reverseParms (tree->right);
 	}
 
-      TETYPE (tree) = getSpec (TTYPE (tree) = LTYPE (tree)->next);
+      if (IS_CODEPTR(LTYPE(tree))) {
+	TTYPE(tree) = LTYPE(tree)->next->next;
+      } else {
+	TTYPE(tree) = LTYPE(tree)->next;
+      }
+      TETYPE (tree) = getSpec (TTYPE (tree));
       return tree;
 
       /*------------------------------------------------------------------*/

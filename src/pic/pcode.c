@@ -1317,6 +1317,7 @@ void pic14initMnemonics(void)
   pic14Mnemonics[POC_COMFW] = &pciCOMFW;
   pic14Mnemonics[POC_CLRF] = &pciCLRF;
   pic14Mnemonics[POC_CLRW] = &pciCLRW;
+  pic14Mnemonics[POC_CLRWDT] = &pciCLRWDT;
   pic14Mnemonics[POC_DECF] = &pciDECF;
   pic14Mnemonics[POC_DECFW] = &pciDECFW;
   pic14Mnemonics[POC_DECFSZ] = &pciDECFSZ;
@@ -4679,6 +4680,7 @@ void AnalyzeFlow(int level)
   /*
   for(pb = the_pFile->pbHead; pb; pb = pb->next)
     BuildFlowTree(pb);
+
   */
 
   /* Phase x - Flow Analysis - Used Banks

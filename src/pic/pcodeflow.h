@@ -19,8 +19,8 @@
    
 -------------------------------------------------------------------------*/
 
-#ifndef __PCODE_FLOW_H__
-#define __PCODE_FLOW_H__
+#ifndef __PCODEFLOW_H__
+#define __PCODEFLOW_H__
 
 /*************************************************
  * pCode conditions:
@@ -60,4 +60,6 @@
 
 /*------------------------------------------------------------*/
 
-#endif // __PCODE_H__
+void BuildFlowAncestry(pBlock *pb);
+
+#endif // __PCODEFLOW_H__

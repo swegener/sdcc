@@ -156,7 +156,7 @@ void BuildFlowTree(pBlock *pb)
 }
 #endif
 
-void BuildFlowAncestry(pBlock *pb)
+void BuildFlowTree(pBlock *pb)
 {
   pCode *pc=NULL;
   pCode *pcflow;

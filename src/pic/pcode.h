@@ -450,6 +450,9 @@ typedef struct pCodeFlow
 
   set *from;    /* flow blocks that can send control to this flow block */
   set *to;      /* flow blocks to which this one can send control */
+  struct pCodeFlow *ancestor; /* The most immediate "single" pCodeFlow object that
+			       * executes prior to this one. In many cases, this 
+			       * will be just the previous */
 
   int inCond;   /* Input conditions - stuff assumed defined at entry */
   int outCond;  /* Output conditions - stuff modified by flow block */

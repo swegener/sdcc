@@ -1,0 +1,76 @@
+replace restart {
+	ld %1,%1
+} by {
+	; Removed redundent load
+}
+replace restart {
+	xor a,a
+	or a,%1
+	or a,a
+	jp %2,%3
+} by {
+	; Removed redundent or a,a
+	xor	a,a
+	or	a,%1
+	jp	%2,%3
+}
+replace restart {
+	cp a,#0x00
+	jp nz,%1
+} by {
+	; Rule 3
+	or	a,a
+	jp	nz,%1
+}
+replace restart {
+	jp nz,%1
+	jp	%2
+%1:
+	jp	%3
+%2:
+} by {
+	; Rule 4
+	jp	z,%2
+%1:
+	jp	%3
+%2:
+}
+replace restart {
+	jp	nz,%1
+	jp	%2
+%1:
+} by {
+	; Rule 5
+	jp	z,%2
+%1:
+}
+replace restart {
+	jp	z,%1
+	jp	%2
+%1:
+} by {
+	; Rule 6
+	jp	nz,%2
+%1:
+}
+replace restart {
+%1:
+	jp	%2
+	jp	%3
+} by {
+	; Weird Rule 7
+%1:
+	jp	%2
+}
+replace restart {
+	ld	(hl),a
+	inc	hl
+} by {
+	ld	(hl+),a
+}
+replace restart {
+	ld	a,(hl)
+	inc	hl
+} by {
+	ld	a,(hl+)
+}

@@ -572,6 +572,84 @@ FBYNAME (labelRefCount)
   return rc;
 }
 
+
+/* labelRefCountChange:
+ * takes two parameters: a variable (bound to a label name)
+ * and a signed int for changing the reference count.
+ *
+ * Please note, this function is not a conditional. It unconditionally
+ * changes the label. It should be passed as the 'last' function
+ * so it only is applied if all other conditions have been met.
+ *
+ * should always return TRUE
+ */
+FBYNAME (labelRefCountChange)
+{
+  int varNumber, RefCountDelta;
+  bool rc = FALSE;
+
+  /* If we don't have the label hash table yet, build it. */
+  if (!labelHash)
+    {
+      buildLabelRefCountHash (head);
+    }
+
+  if (sscanf (cmdLine, "%*[ \t%]%d %i", &varNumber, &RefCountDelta) == 2)
+    {
+      char *label = hTabItemWithKey (vars, varNumber);
+
+      if (label)
+        {
+          labelHashEntry *entry;
+
+          entry = hTabFirstItemWK (labelHash, hashSymbolName (label));
+
+          while (entry)
+            {
+              if (!strcmp (label, entry->name))
+                {
+                  break;
+                }
+              entry = hTabNextItemWK (labelHash);
+            }
+          if (entry)
+            {
+              if (0 <= entry->refCount + RefCountDelta)
+                {
+                  entry->refCount += RefCountDelta;
+                  rc = TRUE;
+                }
+              else
+                {
+                  fprintf (stderr, "*** internal error: label %s may not get"
+                          " negative refCount in %s peephole.\n",
+                           label, __FUNCTION__);
+                }
+            }
+            else
+            {
+              fprintf (stderr, "*** internal error: no label has entry for"
+                       " %s in %s peephole.\n",
+                       label, __FUNCTION__);
+            }
+        }
+      else
+        {
+          fprintf (stderr, "*** internal error: var %d not bound"
+                   " in peephole %s rule.\n", 
+                   varNumber, __FUNCTION__);
+        }
+    }
+  else
+    {
+      fprintf (stderr,
+               "*** internal error: labelRefCount peephole restriction"
+               " malformed: %s\n", cmdLine);
+    }
+  return rc;
+}
+
+
 /* Within the context of the lines currPl through endPl, determine
 ** if the variable var contains a symbol that is volatile. Returns
 ** TRUE only if it is certain that this was not volatile (the symbol
@@ -963,6 +1041,9 @@ callFuncByName (char *fname,
     },
     {
       "operandsNotRelated", operandsNotRelated
+    },
+    {
+      "labelRefCountChange", labelRefCountChange
     }
   };
   int 	i;

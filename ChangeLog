@@ -1,3 +1,19 @@
+2003-06-15  Borut Razem <borut.razem@siol.net>
+
+	* support/cpp2/sdcc.h: HAVE_DOS_BASED_FILE_SYSTEM defined for _WIN23
+	* src/SDCC.lex: cloneXxx and copyAndFreeXxx functions for options and optimize stack handling
+	* src/SDCCglobl.h, src/SDCCmain.c, src/ds390/main.c, src/mcs51/main.c, src/z80/main.c:
+	fixed width array of pointers replaced with sets;
+	multiple include and lib paths ared transferred to preprocessor and linker
+	* src/SDCCset.c, src/SDCCset.h: added function setFromSetNonRev() and mergeSets()
+	* src/SDCCsymt.c: reimplemented function inCalleeSaveList() by using sets instead
+	fixed width array of pointers
+	* src/SDCCutil.c, src/SDCCutil.h: added functions fputStrSet(), appendStrSet(), joinStrSet();
+	removed functions addToList(), join(), joinn(), pathCharsEquivalent(), pathCharTransform(),
+	fixupPath(), getPathDifference()
+	* src/ds390/gen.c, src/mcs51/gen.c: reimplemented function  inExcludeList() by using sets instead
+	fixed width array of pointers
+
 2003-06-11  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/pic16/ralloc.c: fix warnings

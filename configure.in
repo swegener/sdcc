@@ -634,9 +634,9 @@ fi
 AC_DEFINE_UNQUOTED(OPT_ENABLE_LIBGC, $OPT_ENABLE_LIBGC)
 
 #remove duplicates
-cat ports.all | uniq >ports
+uniq ports.all ports
 mv ports ports.all
-cat ports.build | uniq >ports
+uniq ports.build ports
 mv ports ports.build
 
 # Generating output files

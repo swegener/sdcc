@@ -7114,9 +7114,9 @@ _ACEOF
 
 
 #remove duplicates
-cat ports.all | uniq >ports
+uniq ports.all ports
 mv ports ports.all
-cat ports.build | uniq >ports
+uniq ports.build ports
 mv ports ports.build
 
 # Generating output files

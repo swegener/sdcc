@@ -3468,9 +3468,7 @@ genMinus (iCode * ic)
 	  if (aopGetUsesAcc(rightOp, offset)) {
 	    wassertl(!aopGetUsesAcc(leftOp, offset), "accumulator clash");
 	    MOVA (aopGet(rightOp, offset, FALSE, TRUE));
-	    if (offset > 0) {
-	      emitcode( "cpl", "c");
-	    } else {
+	    if (offset == 0) {
 	      emitcode( "setb", "c");
 	    }
 	    emitcode("subb", "a,%s", aopGet(leftOp, offset, FALSE, TRUE));

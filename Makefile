@@ -20,7 +20,7 @@ SDCC_PACKIHX	= packihx
 
 TARGETS         = sdcc-libs sdcc-cc sdcc-aslink
 
-PKGS		= $(SDCC_LIBS) src $(SDCC_ASLINK) $(SDCC_PACKIHX)
+PKGS		= $(SDCC_LIBS) src $(SDCC_ASLINK)
 
 ifneq ($(OPT_ENABLE_UCSIM), no)
 TARGETS         += sdcc-misc 

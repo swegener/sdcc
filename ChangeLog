@@ -1,3 +1,7 @@
+2002-01-05  Bernhard Held <bernhard@bernhardheld.de>
+	* src/SDCCmacro.c: MAX_STRING_LENGTH increased to 2048; was too small for regression tests
+	* support/regression/ports/host/support.c: #include <stdarg.h> for gcc 3.2
+
 2003-01-04    <johan@balder>
 
 	* src/SDCCval.c (getNelements): fixed the initialized array of structures

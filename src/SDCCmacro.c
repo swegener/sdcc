@@ -26,7 +26,7 @@
 
 enum 
   {
-    MAX_STRING_LENGTH	= PATH_MAX,
+    MAX_STRING_LENGTH	  = 2048,
     MAX_MACRO_NAME_LENGTH = 128
   };
 

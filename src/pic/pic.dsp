@@ -110,35 +110,6 @@ SOURCE=.\pcodepeep.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\peeph.def
-
-!IF  "$(CFG)" == "pic - Win32 Release"
-
-# Begin Custom Build
-InputPath=.\peeph.def
-
-"peeph.rul" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	echo on 
-	gawk -f ../SDCCpeeph.awk $(InputPath) >peeph.rul 
-	
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "pic - Win32 Debug"
-
-# Begin Custom Build
-InputPath=.\peeph.def
-
-"peeph.rul" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	echo on 
-	gawk -f ../SDCCpeeph.awk $(InputPath) >peeph.rul 
-	
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=.\ralloc.c
 # End Source File
 # End Group

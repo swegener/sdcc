@@ -47,6 +47,21 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name avra
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "avra"=.\src\avr\avra.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
 }}}
 
 ###############################################################################
@@ -59,11 +74,41 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name ds390a
+    End Project Dependency
 }}}
 
 ###############################################################################
 
-Project: "mcs51"=.\SRC\mcs51\mcs51.dsp - Package Owner=<4>
+Project: "ds390a"=.\src\ds390\ds390a.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "mcs51"=.\src\mcs51\mcs51.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name msc51a
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "msc51a"=.\src\mcs51\mcs51a.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -88,6 +133,21 @@ Package=<4>
 ###############################################################################
 
 Project: "pic"=.\src\pic\pic.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name pica
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "pica"=.\src\pic\pica.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -126,19 +186,34 @@ Package=<4>
     Project_Dep_Name ds390
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name mcs51
-    End Project Dependency
-    Begin Project Dependency
     Project_Dep_Name z80
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name pic
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name mcs51
     End Project Dependency
 }}}
 
 ###############################################################################
 
 Project: "z80"=.\SRC\z80\z80.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name z80a
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "z80a"=.\src\z80\z80a.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

@@ -77,7 +77,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 mcs51/port.lib z80/port.lib avr/port.lib ds390/port.lib pic/port.lib /nologo /subsystem:console /pdb:none /debug /machine:I386 /nodefaultlib:"libcd" /out:"..\bin\sdcc.exe"
-# SUBTRACT LINK32 /nodefaultlib
+# SUBTRACT LINK32 /verbose /nodefaultlib
 
 !ENDIF 
 

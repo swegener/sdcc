@@ -91,45 +91,6 @@ SOURCE=.\gen.c
 # Begin Source File
 
 SOURCE=.\main.c
-
-!IF  "$(CFG)" == "mcs51 - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "mcs51 - Win32 Debug"
-
-# PROP Ignore_Default_Tool 1
-USERDEP__MAIN_="peeph.rul"	
-# Begin Custom Build
-TargetName=port
-InputPath=.\main.c
-
-"$(TargetName)" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	cl /nologo /G3 /ML /W3 /Gm /GX /ZI /Od /I ".." /I "." /I "..\.." /I "..\..\support\util" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /FR /J /FD /Zm500 /GZ /c $(InputPath)
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\peeph.def
-
-!IF  "$(CFG)" == "mcs51 - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "mcs51 - Win32 Debug"
-
-# PROP Ignore_Default_Tool 1
-# Begin Custom Build
-InputPath=.\peeph.def
-
-"peeph.rul" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	echo on 
-	gawk -f ../SDCCpeeph.awk $(InputPath) >peeph.rul 
-	
-# End Custom Build
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -146,17 +107,6 @@ SOURCE=.\gen.h
 # Begin Source File
 
 SOURCE=.\main.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\peeph.rul
-
-!IF  "$(CFG)" == "mcs51 - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "mcs51 - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 

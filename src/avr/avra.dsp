@@ -1,24 +1,24 @@
-# Microsoft Developer Studio Project File - Name="z80" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="avra" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Static Library" 0x0104
 
-CFG=z80 - Win32 Debug
+CFG=avra - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "z80.mak".
+!MESSAGE NMAKE /f "avra.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "z80.mak" CFG="z80 - Win32 Debug"
+!MESSAGE NMAKE /f "avra.mak" CFG="avra - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "z80 - Win32 Release" (based on "Win32 (x86) Static Library")
-!MESSAGE "z80 - Win32 Debug" (based on "Win32 (x86) Static Library")
+!MESSAGE "avra - Win32 Release" (based on "Win32 (x86) Static Library")
+!MESSAGE "avra - Win32 Debug" (based on "Win32 (x86) Static Library")
 !MESSAGE 
 
 # Begin Project
@@ -28,7 +28,7 @@ CFG=z80 - Win32 Debug
 CPP=cl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "z80 - Win32 Release"
+!IF  "$(CFG)" == "avra - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -42,6 +42,7 @@ RSC=rc.exe
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
 # ADD CPP /nologo /G3 /Zp1 /W3 /GX /O2 /I ".." /I "." /I "..\.." /I "..\..\support" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /FR /YX /FD /Zm500 /c
+# SUBTRACT CPP /WX
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -51,7 +52,7 @@ LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo /out:"port.lib"
 
-!ELSEIF  "$(CFG)" == "z80 - Win32 Debug"
+!ELSEIF  "$(CFG)" == "avra - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -78,47 +79,36 @@ LIB32=link.exe -lib
 
 # Begin Target
 
-# Name "z80 - Win32 Release"
-# Name "z80 - Win32 Debug"
+# Name "avra - Win32 Release"
+# Name "avra - Win32 Debug"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=.\gen.c
-# End Source File
-# Begin Source File
+SOURCE=.\peeph.def
 
-SOURCE=.\main.c
-# End Source File
-# Begin Source File
+!IF  "$(CFG)" == "avra - Win32 Release"
 
-SOURCE=.\ralloc.c
-# End Source File
-# Begin Source File
+!ELSEIF  "$(CFG)" == "avra - Win32 Debug"
 
-SOURCE=.\support.c
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build
+InputPath=.\peeph.def
+
+"peeph.rul" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	echo on 
+	gawk -f ../SDCCpeeph.awk $(InputPath) >peeph.rul 
+	
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
-# Begin Source File
-
-SOURCE=.\gen.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\ralloc.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\support.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\z80.h
-# End Source File
 # End Group
 # End Target
 # End Project

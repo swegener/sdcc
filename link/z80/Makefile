@@ -2,21 +2,32 @@ PRJDIR = ../..
 
 include $(PRJDIR)/Makefile.common
 
-OBJS	= lkarea.o lkdata.o lkeval.o lkhead.o lkihx.o lklex.o \
-	  lklibr.o lklist.o lkmain.o lkrloc.o lks19.o lksym.o \
-	  lkgb.o lkgg.o
-BINS	= $(BUILDDIR)/link$(EXT)
+OBJDIR	= obj/$(EXT)
+SRC	= lkarea.c lkdata.c lkeval.c lkhead.c lkihx.c lklex.c \
+	  lklibr.c lklist.c lkmain.c lkrloc.c lks19.c lksym.c \
+	  lkgb.c lkgg.c
+OBJS	= $(SRC:%.c=$(OBJDIR)/%.o)
+BINS	= $(BUILDDIR)link$(EXT)
 
 CFLAGS	+= $(OPTS) -DINDEXLIB -DMLH_MAP -DUNIX -DSDK
 CFLAGS	+= -funsigned-char -DUNIX
 
 all:	$(BINS)
 
-$(BINS): $(OBJS)
+$(BINS): $(OBJDIR) $(OBJS)
 	$(CC) $(LDFLAGS) -o $(BINS) $(OBJS)
 
-%.o:	%.c
+$(OBJDIR):
+	mkdir -p $(OBJDIR)
+
+$(OBJDIR)/%.o:	%.c
 	$(CC) -c $(CFLAGS) -I$(PRJDIR)/as/$(PORT) -o $@ $<
 
 clean:
-	rm -f $(OBJS) $(BINS)
+	rm -rf $(OBJS) $(BINS) $(OBJDIR)
+
+_link-z80:
+	$(MAKE) EXT=-z80$(E)
+
+_link-gbz80:
+	$(MAKE) EXT=-gbz80$(E)

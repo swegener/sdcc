@@ -2,17 +2,18 @@ PRJDIR = ../..
 
 include $(PRJDIR)/Makefile.common
 
+OBJDIR	= obj/$(EXT)
 SDC	= .
 SRC	= asdata.c asexpr.c aslex.c aslist.c asmain.c asout.c \
 	  assubr.c assym.c z80adr.c z80ext.c z80mch.c z80pst.c
-OBJS	= $(SRC:%.c=%.o)
-BINS	= $(BUILDDIR)/as$(EXT)
+OBJS	= $(SRC:%.c=$(OBJDIR)/%.o)
+BINS	= $(BUILDDIR)as$(EXT)
 
 CFLAGS	+= $(OPTS) -I. -DINDEXLIB -DMLH_MAP -DUNIX -DSDK
 CFLAGS	+= -funsigned-char
 LDFLAGS += -lm
 
-all:	dep $(BINS)
+all:	$(OBJDIR) dep $(BINS)
 
 dep: Makefile.dep
 
@@ -21,18 +22,21 @@ Makefile.dep: $(SRC) *.h
 
 include Makefile.dep
 
+$(OBJDIR):
+	mkdir -p $(OBJDIR)
+
 $(BINS): $(OBJS)
 	$(CC) $(LDFLAGS) -o $(BINS) $(OBJS)
 
-# Hmm.  Should only rebuild if any of the source files are changed,
-# but must do a clean build to make sure that there isnt a mix of
-# z80 and gb stuff.
-wary: $(OBJS)
-	make clean
-	make $(BINS)
 
-%.o:	%.c
+$(OBJDIR)/%.o:	%.c
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 clean:
-	rm -f $(OBJS) $(BINS)
+	rm -rf $(OBJS) $(BINS) $(OBJDIR)
+
+_as-z80:
+	$(MAKE) EXT=-z80$(E)
+
+_as-gbz80:
+	$(MAKE) EXT=-gbz80$(E) OPTS=-DGAMEBOY

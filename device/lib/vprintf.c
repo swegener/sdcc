@@ -22,7 +22,9 @@
    You are forbidden to forbid anyone else to use, share and improve
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
+#ifdef __ds390
 #define USE_FLOATS 1
+#endif
 
 #include <stdarg.h>
 #include <string.h>
@@ -157,12 +159,12 @@ static void output_float (float f, unsigned char reqWidth,
 			  signed char reqDecimals,
 			  bit left, bit zero, bit sign, bit space)
 {
-  XSPEC char negative=0;
-  XSPEC long integerPart;
-  XSPEC float decimalPart;
-  XSPEC char fpBuffer[128];
-  XSPEC char fpBI=0, fpBD;
-  XSPEC unsigned char minWidth, i;
+  char negative=0;
+  long integerPart;
+  float decimalPart;
+  char fpBuffer[128];
+  char fpBI=0, fpBD;
+  unsigned char minWidth, i;
 
   // save the sign
   if (f<0) {
@@ -259,10 +261,10 @@ int vsprintf (const char *buf, const char *format, va_list ap)
   bit            long_argument;
   bit            float_argument;
 
-  XSPEC unsigned char  width;
-  XSPEC signed char decimals;
-  XSPEC unsigned char  length;
-  XSPEC char           c;
+  unsigned char  width;
+  signed char decimals;
+  unsigned char  length;
+  char           c;
 
   // reset output chars
   charsOutputted=0;

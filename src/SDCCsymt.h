@@ -302,6 +302,13 @@ symbol;
 #define SPEC_CVAL(x) x->select.s.const_val
 #define SPEC_BSTR(x) x->select.s._bitStart
 #define SPEC_BLEN(x) x->select.s._bitLength
+
+/* Sleaze: SPEC_ISR_SAVED_BANKS is only used on 
+ * function type symbols, which obviously cannot
+ * be of BIT type. Therefore, we recycle the 
+ * _bitStart field instead of defining a new field.
+ */
+#define SPEC_ISR_SAVED_BANKS(x) x->select.s._bitStart
 #define SPEC_BNKF(x) x->select.s._rbank
 #define SPEC_INTRTN(x) x->select.s._intrtn
 #define SPEC_CRTCL(x) x->select.s._critical

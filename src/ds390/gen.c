@@ -2053,6 +2053,13 @@ unsaveRBank (int bank, iCode * ic, bool popPsw)
     {
       if (options.useXstack)
 	{
+          if (!ic)
+          {
+              werror(E_INTERNAL_ERROR, __FILE__, __LINE__,
+                     "unexpected null IC in saveRBank");
+              return;
+          }	
+	
 	  aop = newAsmop (0);
 	  r = getFreePtr (ic, &aop, FALSE);
 
@@ -2103,11 +2110,16 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
 
   if (options.useXstack)
     {
-
+      if (!ic)
+      {
+          werror(E_INTERNAL_ERROR, __FILE__, __LINE__,
+                 "unexpected null IC in saveRBank");
+          return;
+      }
       aop = newAsmop (0);
       r = getFreePtr (ic, &aop, FALSE);
       emitcode ("mov", "%s,_spx", r->name);
-
+ 
     }
 
   for (i = 0; i < ds390_nRegs; i++)
@@ -2136,12 +2148,17 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
 
 	}
       else
+      {
 	emitcode ("push", "psw");
+      }
 
       emitcode ("mov", "psw,#0x%02x", (bank << 3) & 0x00ff);
     }
-  ic->bankSaved = 1;
-
+    
+  if (ic)
+  {  
+      ic->bankSaved = 1;
+  }
 }
 
 /*-----------------------------------------------------------------*/
@@ -2151,6 +2168,8 @@ static void
 genCall (iCode * ic)
 {
   sym_link *detype;
+  bool restoreBank = FALSE;
+  bool swapBanks = FALSE;
 
   D (emitcode (";", "genCall "););
 
@@ -2160,14 +2179,22 @@ genCall (iCode * ic)
   detype = getSpec (operandType (IC_LEFT (ic)));
   if (detype &&
       (SPEC_BANK (currFunc->etype) != SPEC_BANK (detype)) &&
-      IS_ISR (currFunc->etype) &&
-      !ic->bankSaved) {
-    saveRBank (SPEC_BANK (detype), ic, TRUE);
-  } else /* no need to save if we just saved the whole bank */ {
+      IS_ISR (currFunc->etype))
+  {
+      if (!ic->bankSaved) 
+      {
+           /* This is unexpected; the bank should have been saved in
+            * genFunction.
+            */
+    	   saveRBank (SPEC_BANK (detype), ic, FALSE);
+    	   restoreBank = TRUE;
+      }
+      swapBanks = TRUE;
+  }
+  
     /* if caller saves & we have not saved then */
     if (!ic->regsSaved)
       saveRegisters (ic);
-  }
   
   /* if send set is not empty the assign */
   /* We've saved all the registers we care about;
@@ -2223,11 +2250,23 @@ genCall (iCode * ic)
 	}
       _G.sendSet = NULL;
     }  
+    
+  if (swapBanks)
+  {
+        emitcode ("mov", "psw,#0x%02x", 
+           ((SPEC_BANK(detype)) << 3) & 0xff);
+  }
 
   /* make the call */
   emitcode ("lcall", "%s", (OP_SYMBOL (IC_LEFT (ic))->rname[0] ?
 			    OP_SYMBOL (IC_LEFT (ic))->rname :
 			    OP_SYMBOL (IC_LEFT (ic))->name));
+
+  if (swapBanks)
+  {
+       emitcode ("mov", "psw,#0x%02x", 
+          ((SPEC_BANK(currFunc->etype)) << 3) & 0xff);
+  }
 
   /* if we need assign a result value */
   if ((IS_ITEMP (IC_RESULT (ic)) &&
@@ -2282,18 +2321,15 @@ genCall (iCode * ic)
       else
 	for (i = 0; i < ic->parmBytes; i++)
 	  emitcode ("dec", "%s", spname);
-
     }
-
-  /* if register bank was saved then pop them */
-  if (ic->bankSaved)
-    unsaveRBank (SPEC_BANK (detype), ic, TRUE);
 
   /* if we hade saved some registers then unsave them */
   if (ic->regsSaved && !(OP_SYMBOL (IC_LEFT (ic))->calleeSave))
     unsaveRegisters (ic);
 
-
+  /* if register bank was saved then pop them */
+  if (restoreBank)
+    unsaveRBank (SPEC_BANK (detype), ic, FALSE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2478,8 +2514,7 @@ genFunction (iCode * ic)
   symbol *sym;
   sym_link *fetype;
 
-  D (emitcode (";", "genFunction ");
-    );
+  D (emitcode (";", "genFunction "););
 
   _G.nRegsSaved = 0;
   /* create the function header */
@@ -2577,6 +2612,85 @@ genFunction (iCode * ic)
 	      saveRBank (0, ic, FALSE);
 	    }
 	}
+	else
+	{
+	    /* This ISR uses a non-zero bank.
+	     *
+	     * We assume that the bank is available for our
+	     * exclusive use.
+	     *
+	     * However, if this ISR calls a function which uses some
+	     * other bank, we must save that bank entirely.
+	     */
+	    unsigned long banksToSave = 0;
+	    
+	    if (sym->hasFcall)
+	    {
+
+#define MAX_REGISTER_BANKS 4
+
+	        iCode *i;
+	        int ix;
+
+		D(emitcode(";", "seeking function calls..."););
+	        
+	        for (i = ic; i; i = i->next)
+	        {
+	            if (i->op == ENDFUNCTION)
+	            {
+	                /* we got to the end OK. */
+	                break;
+	            }
+	            
+	            if (i->op == CALL)
+	            {
+	                sym_link *detype;
+	                
+	                detype = getSpec(operandType (IC_LEFT(i)));
+	                if (detype 
+	                 && SPEC_BANK(detype) != SPEC_BANK(sym->etype))
+	                {
+	                     /* Mark this bank for saving. */
+	                     if (SPEC_BANK(detype) >= MAX_REGISTER_BANKS)
+	                     {
+	                         werror(E_NO_SUCH_BANK, SPEC_BANK(detype));
+	                     }
+	                     else
+	                     {
+	                         D(emitcode(";", "should save bank %d",
+	                     	             SPEC_BANK(detype));); 
+	                         banksToSave |= (1 << SPEC_BANK(detype));
+	                     }
+	                     
+	                     /* And note that we don't need to do it in 
+	                      * genCall.
+	                      */
+	                     i->bankSaved = 1;
+	                }
+	            }
+	            if (i->op == PCALL)
+	            {
+	             	/* This is a mess; we have no idea what
+	             	 * register bank the called function might
+	             	 * use.
+	             	 *
+	             	 * The only thing I can think of to do is
+	             	 * throw a warning and hope.
+	             	 */
+	             	werror(W_FUNCPTR_IN_USING_ISR);   
+	            }
+	        }
+	        
+	        for (ix = 0; ix < MAX_REGISTER_BANKS; ix++)
+	        {
+	             if (banksToSave & (1 << ix))
+	             {
+	                 saveRBank(ix, NULL, FALSE);
+	             }
+	        }
+	    }
+	    SPEC_ISR_SAVED_BANKS(currFunc->etype) = banksToSave;
+	}
     }
   else
     {
@@ -2667,8 +2781,7 @@ genEndFunction (iCode * ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
 
-  D (emitcode (";", "genEndFunction ");
-    );
+  D (emitcode (";", "genEndFunction "););
 
   if (IS_RENT (sym->etype) || options.stackAuto)
     {
@@ -2741,6 +2854,24 @@ genEndFunction (iCode * ic)
 	         determines register usage so we will have to pop the
 	         entire bank */
 	      unsaveRBank (0, ic, FALSE);
+	    }
+	}
+	else
+	{
+	    /* This ISR uses a non-zero bank.
+	     *
+	     * Restore any register banks saved by genFunction
+	     * in reverse order/
+	     */
+	    unsigned savedBanks = SPEC_ISR_SAVED_BANKS(currFunc->etype);
+	    int ix;
+	    
+	    for (ix = MAX_REGISTER_BANKS - 1; ix >= 0; ix--)
+	    {
+	        if (savedBanks & (1 << ix))
+	        {
+	            unsaveRBank(ix, NULL, FALSE);
+	        }
 	    }
 	}
 

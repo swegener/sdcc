@@ -146,6 +146,9 @@ struct  {
 { WARNING,"warning *** unknown memory model at %s : %d\n" },
 { ERROR  ,"error   *** cannot generate code for target '%s'\n"},
 { WARNING,"warning *** Indirect call to a banked function not implemented.\n"},
+{ WARNING,"warning *** Model '%s' not supported for %s, ignored.\n"},
+{ WARNING,"warning *** Both banked and nonbanked attributes used.  nonbanked wins.\n"},
+{ WARNING,"warning *** Both banked and static used.  static wins.\n"},
 };
 
 /****************************************************************************/

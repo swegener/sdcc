@@ -30,7 +30,7 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	register op, t1, t2;
+	register int op, t1, t2;
 	struct expr e1, e2;
 	int rf, v1, v2;
 

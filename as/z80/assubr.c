@@ -59,7 +59,7 @@
 
 VOID
 err(c)
-register c;
+register int c;
 {
 	register char *p;
 

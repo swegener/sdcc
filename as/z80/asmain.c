@@ -152,11 +152,11 @@
  *		REL, LST, and/or SYM files may be generated.
  */
 
-VOID
+int
 main(int argc, char **argv)
 {
 	register char *p;
-	register c, i;
+	register int c, i;
 	struct area *ap;
 
 #ifdef SDK
@@ -320,6 +320,8 @@ main(int argc, char **argv)
 		lstsym(lfp);
 	}
 	asexit(aserr);
+	/* Never reached */
+	return 0;
 }
 
 /*)Function	VOID	asexit(i)
@@ -463,7 +465,7 @@ asmbl()
 	register struct mne *mp;
 	register struct sym *sp;
 	register struct tsym *tp;
-	register c;
+	register int c;
 	struct area  *ap;
 	struct expr e1;
 	char id[NCPS];
@@ -1021,7 +1023,7 @@ char *ft;
 int wf;
 {
 	register char *p1, *p2, *p3;
-	register c;
+	register int c;
 	FILE *fp;
 
 	p1 = fn;

@@ -48,6 +48,8 @@ sdcc: sdcc-cc sdcc-aslink sdcc-misc sdcc-device
 # Some interesting sub rules
 sdcc-bin: sdcc-cc sdcc-aslink sdcc-misc
 
+sdcc-base: sdcc-cc sdcc-aslink
+
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install:

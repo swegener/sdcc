@@ -178,8 +178,10 @@ static void emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	if ((sym->level == 0 || 
 	     (sym->_isparm && !IS_REGPARM(sym->etype))) &&
 	    addPublics &&
-	    !IS_STATIC (sym->etype))
+	    !IS_STATIC (sym->etype) &&
+	    (sym->used || sym->fbody)) {
 	    addSetHead (&publics, sym);
+	}
 	
 	/* if extern then do nothing or is a function 
 	   then do nothing */

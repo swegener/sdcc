@@ -28,6 +28,7 @@ static struct {
 static char *_keywords[] = {
     "sfr",
     "nonbanked",
+    "banked",
     NULL 
 };
 
@@ -282,6 +283,8 @@ PORT z80_port = {
     "Zilog Z80",		/* Target name */
     {
 	FALSE,
+	MODEL_MEDIUM | MODEL_SMALL,
+	MODEL_SMALL
     },
     {	
 	_z80_asmCmd,
@@ -346,6 +349,8 @@ PORT gbz80_port = {
     "Gameboy Z80-like",		/* Target name */
     {
 	FALSE,
+	MODEL_MEDIUM | MODEL_SMALL,
+	MODEL_SMALL
     },
     {	
 	_gbz80_asmCmd,

@@ -1372,8 +1372,9 @@ int   checkFunction (symbol   *sym)
     deleteSym (SymbolTab,csym,csym->name);
     addSym    (SymbolTab,sym,sym->name,sym->level,sym->block);
     if (IS_EXTERN(csym->etype) && !
-	IS_EXTERN(sym->etype))
+	IS_EXTERN(sym->etype)) {
 	addSet(&publics,sym);
+    }
     return 1 ;      
 }
 

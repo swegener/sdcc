@@ -80,7 +80,7 @@ syminit()
 	struct mne **mpp;
 	register struct sym  *sp;
 	struct sym **spp;
-	register h;
+	register int h;
 
 	mpp = &mnehash[0];
 	while (mpp < &mnehash[NHASH])
@@ -176,7 +176,7 @@ mlookup(id)
 char *id;
 {
 	register struct mne *mp;
-	register h;
+	register int h;
 
 	h = hash(id);
 	mp = mnehash[h];
@@ -221,7 +221,7 @@ lookup(id)
 char *id;
 {
 	register struct sym *sp;
-	register h;
+	register int h;
 
 	h = hash(id);
 	sp = symhash[h];
@@ -268,7 +268,7 @@ VOID
 symglob()
 {
 	register struct sym *sp;
-	register i;
+	register int i;
 
 	for (i=0; i<NHASH; ++i) {
 		sp = symhash[i];
@@ -305,7 +305,7 @@ VOID
 allglob()
 {
 	register struct sym *sp;
-	register i;
+	register int i;
 
 	for (i=0; i<NHASH; ++i) {
 		sp = symhash[i];
@@ -344,7 +344,7 @@ int
 symeq(p1, p2)
 register char *p1, *p2;
 {
-	register n;
+	register int n;
 
 	n = NCPS;
 	do {
@@ -387,7 +387,7 @@ int
 hash(p)
 register char *p;
 {
-	register h, n;
+	register int h, n;
 
 	h = 0;
 	n = NCPS;

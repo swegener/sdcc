@@ -1680,9 +1680,6 @@ static void emitCall(iCode *ic, bool ispcall)
     int pushed_de = 0;
     link *detype = getSpec(operandType(IC_LEFT(ic)));
 
-    if (IS_BANKED(detype)) 
-	emit2("; call to a banked function");
-
     /* if caller saves & we have not saved then */
     if (!ic->regsSaved) {
 	/* PENDING */
@@ -1753,7 +1750,7 @@ static void emitCall(iCode *ic, bool ispcall)
     }
 
     if (ispcall) {
-	if (IS_BANKED(detype)) {
+	if (IS_BANKEDCALL(detype)) {
 	    werror(W_INDIR_BANKED);
 	}
 	aopOp(IC_LEFT(ic),ic,FALSE, FALSE);
@@ -1780,7 +1777,7 @@ static void emitCall(iCode *ic, bool ispcall)
 	char *name = OP_SYMBOL(IC_LEFT(ic))->rname[0] ?
 	    OP_SYMBOL(IC_LEFT(ic))->rname :
 	    OP_SYMBOL(IC_LEFT(ic))->name;
-	if (IS_BANKED(detype)) {
+	if (IS_BANKEDCALL(detype)) {
 	    emit2("call banked_call");
 	    emit2("!dws", name);
 	    emit2("!dw !bankimmeds", name);
@@ -1870,6 +1867,8 @@ static int resultRemat (iCode *ic)
     return 0;
 }
 
+extern set *publics;
+
 /*-----------------------------------------------------------------*/
 /* genFunction - generated code for function entry                 */
 /*-----------------------------------------------------------------*/
@@ -1880,6 +1879,11 @@ static void genFunction (iCode *ic)
 
     nregssaved = 0;
     setArea(IS_NONBANKED(sym->etype));
+
+    /* PENDING: hack */
+    if (!IS_STATIC(sym->etype)) {
+	addSetIfnotP(&publics, sym);
+    }
 
     /* create the function header */
     emit2("!functionheader", sym->name);

@@ -133,5 +133,8 @@
 #define  W_UNKNOWN_MODEL    130		/* Unknown memory model */
 #define  E_UNKNOWN_TARGET   131         /* target not defined   */
 #define	 W_INDIR_BANKED	    132		/* Indirect call to a banked fun */
+#define	 W_UNSUPPORTED_MODEL 133	/* Unsupported model, ignored */
+#define	 W_BANKED_WITH_NONBANKED 134	/* banked and nonbanked attributes mixed */
+#define	 W_BANKED_WITH_STATIC 135	/* banked and static mixed */
 
 void werror(int, ...);

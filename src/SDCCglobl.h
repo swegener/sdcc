@@ -170,14 +170,21 @@ struct optimize {
     unsigned    noLoopReverse :1;
 } ;
 
-/* Values for options.model. */
-#define MODEL_SMALL	0
-#define MODEL_LARGE	1
-#define MODEL_FLAT24	2
+/** Build model.
+    Used in options.model.A bit each as port.supported_models is an OR
+    of these. 
+*/
+enum {
+    MODEL_SMALL	      = 1,
+    MODEL_COMPACT     = 2,
+    MODEL_MEDIUM      = 4,
+    MODEL_LARGE	      = 8,
+    MODEL_FLAT24      = 16
+};
 
 /* other command line options */
 struct options {
-    int model  : 3     ; /* see MODEL_* defines above */
+    int model;	       ; /* see MODEL_* defines above */
     int stackAuto : 3  ; /* Stack Automatic  */
     int useXstack : 3  ; /* use Xternal Stack */
     int stack10bit : 3;  /* use 10 bit stack (flat24 model only) */

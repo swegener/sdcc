@@ -62,7 +62,7 @@
 addr_t
 eval()
 {
-	register c, v;
+	register int c, v;
 	register addr_t n;
 
 	c = getnb();
@@ -114,7 +114,7 @@ eval()
 addr_t
 expr (n)
 {
-	register c, p;
+	register int c, p;
 	register addr_t v, ve;
 
 	v = term();
@@ -211,7 +211,7 @@ expr (n)
 addr_t
 term()
 {
-	register c, r, n;
+	register int c, r, n;
 	register addr_t v;
 	struct sym *sp;
 	char id[NCPS];
@@ -330,7 +330,7 @@ term()
 
 int
 digit(c, r)
-register c, r;
+register int c, r;
 {
 	if (r == 16) {
 		if (ctype[c] & RAD16) {
@@ -378,7 +378,7 @@ register c, r;
  
 int
 oprio(c)
-register c;
+register int c;
 {
 	if (c == '*' || c == '/' || c == '%')
 		return (10);

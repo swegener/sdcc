@@ -84,7 +84,7 @@ expr(esp, n)
 register struct expr *esp;
 int n;
 {
-        register c, d, p;
+        register int c, d, p;
         struct area *ap;
         struct expr re;
 
@@ -268,7 +268,7 @@ VOID
 term(esp)
 register struct expr *esp;
 {
-        register c, n;
+        register int c, n;
         register char *jp;
         char id[NCPS];
         struct sym  *sp;
@@ -347,7 +347,7 @@ register struct expr *esp;
         if (ctype[c] & DIGIT) {
                 esp->e_mode = S_USER;
                 jp = ip;
-                while (ctype[*jp] & RAD10) {
+                 while (ctype[*jp] & RAD10) {
                         jp++;
                 }
                 if (*jp == '$') {
@@ -498,7 +498,7 @@ register struct expr *esp;
 
 int
 digit(c, r)
-register c, r;
+register int c, r;
 {
         if (r == 16) {
                 if (ctype[c] & RAD16) {
@@ -619,7 +619,7 @@ register struct expr *esp;
  
 int
 oprio(c)
-register c;
+register int c;
 {
         if (c == '*' || c == '/' || c == '%')
                 return (10);

@@ -78,7 +78,7 @@ list()
 {
 	register char *wp;
 	register int *wpt;
-	register nb;
+	register int nb;
 
 	if (lfp == NULL || lmode == NLIST)
 		return;
@@ -354,7 +354,7 @@ list1(wp, wpt, nb, f)
 register char *wp;
 register int *wpt, nb, f;
 {
-	register i;
+	register int i;
 
 	/*
 	 * HEX output Option.

@@ -56,7 +56,7 @@
 VOID
 syminit()
 {
-	register h;
+	register int h;
 	struct sym **spp;
 
 	spp = &symhash[0];
@@ -124,7 +124,7 @@ syminit()
 struct sym *
 newsym()
 {
-	register c, i, nglob;
+	register int c, i, nglob;
 	struct sym *tsp;
 	struct sym **s;
 	char id[NCPS];
@@ -176,6 +176,7 @@ newsym()
 	}
 	fprintf(stderr, "Header symbol list overflow\n");
 	lkexit(1);
+	/* Never reached */
 }
 
 /*)Function	sym *	lkpsym(id,f)
@@ -214,7 +215,7 @@ lkpsym(id, f)
 char *id;
 {
 	register struct sym *sp;
-	register h;
+	register int h;
 
 	h = hash(id);
 	sp = symhash[h];
@@ -298,7 +299,7 @@ symdef(fp)
 FILE *fp;
 {
 	register struct sym *sp;
-	register i;
+	register int i;
 
 	for (i=0; i<NHASH; ++i) {
 		sp = symhash[i];
@@ -347,7 +348,7 @@ symmod(fp, tsp)
 FILE *fp;
 struct sym *tsp;
 {
-	register i, j;
+	register int i, j;
 	struct sym **p;
 
 	if ((hp = headp) != NULL) {
@@ -392,7 +393,7 @@ int
 symeq(p1, p2)
 register char *p1, *p2;
 {
-	register n;
+	register int n;
 
 	n = NCPS;
 	do {
@@ -436,7 +437,7 @@ int
 hash(p)
 register char *p;
 {
-	register h, n;
+	register int h, n;
 
 	h = 0;
 	n = NCPS;

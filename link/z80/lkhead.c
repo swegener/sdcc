@@ -75,7 +75,7 @@
 VOID
 newhead()
 {
-	register i;
+	register int i;
 	struct head *thp;
 
 	hp = (struct head *) new (sizeof(struct head));

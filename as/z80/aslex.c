@@ -84,7 +84,7 @@
 
 VOID
 getid(id, c)
-register c;
+register int c;
 char *id;
 {
 	register char *p;
@@ -150,7 +150,7 @@ char *id;
 
 VOID
 getst(id, c)
-register c;
+register int c;
 char *id;
 {
 	register char *p;
@@ -193,7 +193,7 @@ char *id;
 char
 getnb()
 {
-	register c;
+	register int c;
 
 	while ((c=get()) == ' ' || c == '\t')
 		;
@@ -226,7 +226,7 @@ getnb()
 char
 get()
 {
-	register c;
+	register int c;
 
 	if ((c = *ip) != 0)
 		++ip;
@@ -302,7 +302,7 @@ unget(c)
 int
 getmap(d)
 {
-	register c, n, v;
+	register int c, n, v;
 
 	if ((c=get()) == '\0')
 		qerr();
@@ -403,7 +403,7 @@ getmap(d)
 int
 getline()
 {
-register i;
+register int i;
 
 loop:	if (incfil >= 0) {
 		if (fgets(ib, sizeof ib, ifp[incfil]) == NULL) {
@@ -461,7 +461,7 @@ loop:	if (incfil >= 0) {
 int
 more()
 {
-	register c;
+	register int c;
 
 	c = getnb();
 	unget(c);
@@ -493,7 +493,7 @@ more()
 char
 endline()
 {
-	register c;
+	register int c;
 
 	c = getnb();
 	return( (c == '\0' || c == ';') ? 0 : c );

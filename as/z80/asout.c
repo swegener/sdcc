@@ -312,7 +312,7 @@ outrb(esp, r)
 register struct expr *esp;
 int r;
 {
-	register n;
+	register int n;
 
 	if (pass == 2) {
 		if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
@@ -383,7 +383,7 @@ outrw(esp, r)
 register struct expr *esp;
 int r;
 {
-	register n;
+	register int n;
 
 	if (pass == 2) {
 		if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
@@ -456,7 +456,7 @@ outdp(carea, esp)
 register struct area *carea;
 register struct expr *esp;
 {
-	register n, r;
+	register int n, r;
 
 	if (oflag && pass==2) {
 		outchk(HUGE,HUGE);
@@ -670,7 +670,7 @@ outgsd()
 {
 	register struct area *ap;
 	register struct sym  *sp;
-	register i, j;
+	register int i, j;
 	char *ptr;
 	int c, narea, nglob, rn;
 
@@ -786,7 +786,7 @@ outarea(ap)
 register struct area *ap;
 {
 	register char *ptr;
-	register c;
+	register int c;
 
 	fprintf(ofp, "A ");
 	ptr = &ap->a_id[0];
@@ -834,7 +834,7 @@ outsym(sp)
 register struct sym *sp;
 {
 	register char *ptr;
-	register c;
+	register int c;
 
 	fprintf(ofp, "S ");
 	ptr = &sp->s_id[0];
@@ -879,7 +879,7 @@ register struct sym *sp;
 VOID
 out(p, n)
 register char *p;
-register n;
+register int n;
 {
 	while (n--) {
 		if (xflag == 0) {
@@ -919,7 +919,7 @@ register n;
 
 VOID
 out_lb(b,t)
-register b,t;
+register int b,t;
 {
 	if (cp < &cb[NCODE]) {
 		*cp++ = b;
@@ -952,7 +952,7 @@ register b,t;
 
 VOID
 out_lw(n,t)
-register n,t;
+register int n,t;
 {
 	if (hilo) {
 		out_lb(hibyte(n),t ? t|R_HIGH : 0);
@@ -986,7 +986,7 @@ register n,t;
 
 VOID
 out_rw(n)
-register n;
+register int n;
 {
 	if (hilo) {
 		*relp++ = hibyte(n);
@@ -1020,7 +1020,7 @@ register n;
 
 VOID
 out_tw(n)
-register n;
+register int n;
 {
 	if (hilo) {
 		*txtp++ = hibyte(n);

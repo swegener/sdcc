@@ -7,7 +7,9 @@
 #  * Takes the libs from native and hooks them into win32
 #  * tars it all up and calls it done
 
-BUILD_DIR = /home/michaelh/tmp/sdcc-build
+DIST = gbdk
+
+BUILD_DIR = /home/michaelh/tmp/$(DIST)-build
 NATIVE = linux-linux
 CROSS = linux-mingw32
 NATIVE_DIST = linux-glibc2
@@ -25,12 +27,12 @@ spawn:
 build: orig native cross dist
 
 dist:
-	cd $(NATIVE)/build; tar czf ../../sdcc-$(VER)-$(NATIVE_DIST).tar.gz sdcc
+	cd $(NATIVE)/build; tar czf ../../$(DIST)-$(VER)-$(NATIVE_DIST).tar.gz $(DIST)
 ifeq ($(CROSS_DIST), win32)
-	rm -f sdcc-$(VER)-$(CROSS_DIST).zip
-	cd $(CROSS)/build; zip -rlq9 ../../sdcc-$(VER)-$(CROSS_DIST).zip sdcc
+	rm -f $(DIST)-$(VER)-$(CROSS_DIST).zip
+	cd $(CROSS)/build; zip -rlq9 ../../$(DIST)-$(VER)-$(CROSS_DIST).zip $(DIST)
 else
-	cd $(CROSS)/build; tar czf ../../sdcc-$(VER)-$(CROSS_DIST).tar.gz sdcc
+	cd $(CROSS)/build; tar czf ../../$(DIST)-$(VER)-$(CROSS_DIST).tar.gz $(DIST)
 endif
 
 clean:
@@ -41,7 +43,6 @@ orig:
 	cp build.mak orig
 	touch orig/logged_in			# Assume already logged in
 	make -C orig -f build.mak update
-
 
 linux-linux: orig
 	mkdir -p linux-linux
@@ -67,9 +68,9 @@ cross-bin: $(CROSS) dummy
 # Binary files are compiled; now copy the built libs from the native
 # version across
 cross-mix:
-	mv $(CROSS)/build/sdcc/bin $(CROSS)/build/sdcc/bin.1
-	(cd $(NATIVE); tar cf - build/sdcc) | (cd $(CROSS); tar xf - )
-	rm -rf $(CROSS)/build/sdcc/bin
-	mv $(CROSS)/build/sdcc/bin.1 $(CROSS)/build/sdcc/bin
+	mv $(CROSS)/build/$(DIST)/bin $(CROSS)/build/$(DIST)/bin.1
+	(cd $(NATIVE); tar cf - build/$(DIST)) | (cd $(CROSS); tar xf - )
+	rm -rf $(CROSS)/build/$(DIST)/bin
+	mv $(CROSS)/build/$(DIST)/bin.1 $(CROSS)/build/$(DIST)/bin
 
 cross: cross-bin cross-mix

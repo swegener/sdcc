@@ -197,6 +197,8 @@ PORT mcs51_port = {
     "MCU 8051",			/* Target name */
     {
 	TRUE,			/* Emit glue around main */
+	MODEL_SMALL | MODEL_LARGE | MODEL_FLAT24,
+	MODEL_SMALL
     },
     {	
 	_asmCmd,

@@ -20,6 +20,9 @@ typedef struct {
 	    code is provided by a seperate module.
 	*/
 	bool glue_up_main;
+	/* OR of MODEL_* */
+	int supported_models;
+	int default_model;
     } general;
 
     /* assembler related information */

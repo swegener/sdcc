@@ -37,7 +37,7 @@ int
 addr(esp)
 register struct expr *esp;
 {
-	register c, mode, indx;
+	register int c, mode, indx;
 
 	if ((c = getnb()) == '#') {
 		expr(esp, 0);
@@ -196,45 +196,45 @@ char    c, *str;
  */
 
 struct	adsym	R8[] = {
-	"b",	B|0400,
-	"c",	C|0400,
-	"d",	D|0400,
-	"e",	E|0400,
-	"h",	H|0400,
-	"l",	L|0400,
-	"a",	A|0400,
-	"",	0000
+    { "b",	B|0400 },
+    { "c",	C|0400 },
+    { "d",	D|0400 },
+    { "e",	E|0400 },
+    { "h",	H|0400 },
+    { "l",	L|0400 },
+    { "a",	A|0400 },
+    { "",	000 }
 };
 
 struct	adsym	R8X[] = {
-	"i",	I|0400,
-	"r",	R|0400,
-	"",	0000
+    { "i",	I|0400 },
+    { "r",	R|0400 },
+    { "",	000 }
 };
 
 struct	adsym	R16[] = {
-	"bc",	BC|0400,
-	"de",	DE|0400,
-	"hl",	HL|0400,
-	"sp",	SP|0400,
+    { "bc",	BC|0400 },
+    { "de",	DE|0400 },
+    { "hl",	HL|0400 },
+    { "sp",	SP|0400 },
 #ifndef GAMEBOY
-	"ix",	IX|0400,
-	"iy",	IY|0400,
+    { "ix",	IX|0400 },
+    { "iy",	IY|0400 },
 #else /* GAMEBOY */
-	"hl-",	HLD|0400,
-	"hl+",	HLI|0400,
-	"hld",	HLD|0400,
-	"hli",	HLI|0400,
+    { "hl-",	HLD|0400 },
+    { "hl+",	HLI|0400 },
+    { "hld",	HLD|0400 },
+    { "hli",	HLI|0400 },
 #endif /* GAMEBOY */
-	"",	0000
+    { "",	000 }
 };
 
 struct	adsym	R16X[] = {
-	"af",	AF|0400,
+    { "af",	AF|0400 },
 #ifndef GAMEBOY
-	"af'",	AF|0400,
+    { "af'",	AF|0400 },
 #endif /* GAMEBOY */
-	"",	0000
+    { "",	000 }
 };
 
 /*
@@ -242,15 +242,15 @@ struct	adsym	R16X[] = {
  */
 
 struct	adsym	CND[] = {
-	"NZ",	NZ|0400,
-	"Z",	Z |0400,
-	"NC",	NC|0400,
-	"C",	CS|0400,
+    { "NZ",	NZ|0400 },
+    { "Z",	Z |0400 },
+    { "NC",	NC|0400 },
+    { "C",	CS|0400 },
 #ifndef GAMEBOY
-	"PO",	PO|0400,
-	"PE",	PE|0400,
-	"P",	P |0400,
-	"M",	M |0400,
+    { "PO",	PO|0400 },
+    { "PE",	PE|0400 },
+    { "P",	P |0400 },
+    { "M",	M |0400 },
 #endif /* GAMEBOY */
-	"",	0000
+    { "",	000 }
 };

@@ -178,7 +178,7 @@ struct	mne	*mnehash[NHASH];
  *	};
  */
 struct	sym	sym[] = {
-	NULL,	NULL,	".",	S_USER,	S_END,	NULL,	0,	0
+    { NULL,	NULL,	".",	S_USER,	S_END,	NULL,	0, }
 };
 
 struct	sym	*symp;		/*	pointer to a symbol structure
@@ -212,7 +212,7 @@ struct	sym *symhash[NHASH];	/*	array of pointers to NHASH
  *	};
  */
 struct	area	area[] = {
-	NULL,	"_CODE",	0,	0,	0,	A_CON|A_REL
+    { NULL,	"_CODE",	0,	0,	0,	A_CON|A_REL }
 };
 
 struct	area	*areap;	/*	pointer to an area structure

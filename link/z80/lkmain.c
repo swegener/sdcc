@@ -157,12 +157,12 @@ char *default_globlp[] = {
 };
 #endif /* GAMEBOY */
 
-VOID
+int
 main(argc, argv)
 char *argv[];
 {
 	register char *p;
-	register c, i;
+	register int c, i;
 
 #ifdef GAMEBOY
 	nb_rom_banks = 2;
@@ -449,7 +449,7 @@ int i;
 VOID
 link()
 {
-	register c;
+	register int c;
 
 	if ((c=endline()) == 0) { return; }
 	switch (c) {
@@ -681,7 +681,6 @@ map()
 #else
 VOID map()
 {
-	register i;
 	register struct head *hdp;
 	register struct lbfile *lbfh;
 
@@ -774,10 +773,6 @@ VOID map()
 #ifdef SDK
 VOID sym()
 {
-	register i;
-	register struct head *hdp;
-	register struct lbfile *lbfh;
-
 	/*
 	 * Open sym File
 	 */
@@ -849,7 +844,7 @@ VOID sym()
 int
 parse()
 {
-	register c;
+	register int c;
 	char fid[NINPUT];
 
 	while ((c = getnb()) != 0) {
@@ -1088,7 +1083,7 @@ bassav()
 VOID
 setbas()
 {
-	register v;
+	register int v;
 	char id[NCPS];
 
 	bsp = basep;
@@ -1198,7 +1193,7 @@ gblsav()
 VOID
 setgbl()
 {
-	register v;
+	register int v;
 	register struct sym *sp;
 	char id[NCPS];
 
@@ -1280,7 +1275,7 @@ char *fn;
 char *ft;
 {
 	register char *p1, *p2, *p3;
-	register c;
+	register int c;
 	FILE *fp;
 	char fb[FILSPC];
 

@@ -618,7 +618,7 @@ extern	VOID		bassav();
 extern	VOID		gblsav();
 extern	VOID		link();
 extern	VOID		lkexit();
-extern	VOID		main();
+extern	int		main();
 extern	VOID		map();
 #ifdef SDK
 extern	VOID		sym();

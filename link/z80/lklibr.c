@@ -289,7 +289,7 @@ VOID
 search()
 {
 	register struct sym *sp;
-	register i,symfnd;
+	register int i, symfnd;
 
 	/*
 	 * Look for undefined symbols.  Keep

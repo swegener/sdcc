@@ -3543,8 +3543,9 @@ ast  *createFunction   (symbol  *name,   ast  *body )
 	   we need to add the name to the publics list : this
 	   actually means we are now compiling the compiler
 	   support routine */
-	if (name->cdef)
+	if (name->cdef) {
 	    addSet(&publics,name);
+	}
     }
     else {
 	addSymChain(name);

@@ -444,7 +444,7 @@ void allocParms ( value  *val )
 		    /* PENDING: isr, bank overhead, ... */
 		    SPEC_STAK(lval->etype) = SPEC_STAK(lval->sym->etype) = lval->sym->stack = 
 			stackPtr +
-			(IS_BANKED(currFunc->etype) ? port->stack.banked_overhead : 0) +
+			(IS_BANKEDCALL(currFunc->etype) ? port->stack.banked_overhead : 0) +
 			(IS_ISR(currFunc->etype) ? port->stack.isr_overhead : 0) +
 			0;
 		    stackPtr += getSize (lval->type);

@@ -74,7 +74,10 @@ bool verboseExec = FALSE;
 //extern int wait (int *);
 char    *preOutName;
 
+/* Far functions, far data */
 #define OPTION_LARGE_MODEL "-model-large"
+/* Far functions, near data */
+#define OPTION_MEDIUM_MODEL "-model-medium"
 #define OPTION_SMALL_MODEL "-model-small"
 #define OPTION_FLAT24_MODEL "-model-flat24"
 #define OPTION_STACK_AUTO  "-stack-auto"
@@ -248,8 +251,11 @@ void	printVersionInfo ()
 	     "SDCC : ");
     for (i=0; i<NUM_PORTS; i++)
 	fprintf(stderr, "%s%s", i==0 ? "" : "/", _ports[i]->target);
-
-    fprintf(stderr, " %s `"
+    fprintf(stderr, " %s"
+#ifdef SDCC_SUB_VERSION_STR
+	    "/" SDCC_SUB_VERSION_STR
+#endif
+	    " ` "
 #ifdef __CYGWIN32__
 		" (CYGWIN32)\n"
 #else
@@ -259,6 +265,7 @@ void	printVersionInfo ()
 		" (UNIX) \n"
 # endif
 #endif
+
 	    , VersionString
 	    );
 }
@@ -340,6 +347,7 @@ static void setDefaultOptions()
     options.idata_loc = 0x80;
     options.genericPtr = 1;   /* default on */
     options.nopeep    = 0;
+    options.model = port->general.default_model;
 
     /* now for the optimizations */
     /* turn on the everything */
@@ -458,6 +466,14 @@ static void _addToList(const char **list, const char *str)
     *(++list) = NULL;
 }
 
+static void _setModel(int model, const char *sz)
+{
+    if (port->general.supported_models & model)
+	options.model = model;
+    else
+	werror(W_UNSUPPORTED_MODEL, sz, port->target);
+}
+
 /*-----------------------------------------------------------------*/
 /* parseCmdLine - parses the command line and sets the options     */
 /*-----------------------------------------------------------------*/
@@ -485,17 +501,22 @@ int   parseCmdLine ( int argc, char **argv )
 	    }
 
 	    if (strcmp(&argv[i][1],OPTION_LARGE_MODEL) == 0) {
-		options.model = MODEL_LARGE;
+		_setModel(MODEL_LARGE, argv[i]);
+                continue;
+	    }
+
+	    if (strcmp(&argv[i][1],OPTION_MEDIUM_MODEL) == 0) {
+		_setModel(MODEL_MEDIUM, argv[i]);
                 continue;
 	    }
 	    
 	    if (strcmp(&argv[i][1],OPTION_SMALL_MODEL) == 0) {
-		options.model = MODEL_SMALL;
+		_setModel(MODEL_SMALL, argv[i]);
                 continue;
 	    }
 	    
 	    if (strcmp(&argv[i][1],OPTION_FLAT24_MODEL) == 0) {
-		options.model = MODEL_FLAT24;
+		_setModel(MODEL_FLAT24, argv[i]);
                 continue;
 	    }
 	    
@@ -1231,6 +1252,12 @@ static int preProcess (char **envp)
 		break;
 	    case MODEL_SMALL:
 		_addToList(preArgv, "-DSDCC_MODEL_SMALL");
+		break;
+	    case MODEL_COMPACT:
+		_addToList(preArgv, "-DSDCC_MODEL_COMPACT");
+		break;
+	    case MODEL_MEDIUM:
+		_addToList(preArgv, "-DSDCC_MODEL_MEDIUM");
 		break;
 	    case MODEL_FLAT24:
 		_addToList(preArgv, "-DSDCC_MODEL_FLAT24");

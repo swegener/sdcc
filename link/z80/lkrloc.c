@@ -248,7 +248,7 @@ relt()
 VOID
 relr()
 {
-	register mode;
+	register int mode;
 	register addr_t reli, relv;
 	int aindex, rindex, rtp, error;
 	addr_t r, rtbase, rtofst, paga, pags, pc;
@@ -507,7 +507,7 @@ char *errmsg[] = {
 VOID
 relp()
 {
-	register aindex, rindex;
+	register int aindex, rindex;
 	int mode, rtp;
 	addr_t relv;
 	struct areax **a;

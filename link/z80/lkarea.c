@@ -100,7 +100,7 @@
 VOID
 newarea()
 {
-	register i, narea;
+	register int i, narea;
 	struct areax *taxp;
 	struct areax **halp;
 	char id[NCPS];
@@ -312,7 +312,7 @@ char *id;
 VOID
 lnkarea()
 {
-	register rloc;
+	register int rloc;
 	char temp[NCPS];
 	struct sym *sp;
 

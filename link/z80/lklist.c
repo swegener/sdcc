@@ -60,7 +60,7 @@ VOID
 slew(fp)
 FILE *fp;
 {
-	register i;
+	register int i;
 
 	if (lop++ >= NLPP) {
 		newpag(fp);
@@ -334,10 +334,8 @@ struct area *xp;
 #else
 VOID lstarea(struct area *xp)
 {
-	register struct area *op;
 	register struct areax *oxp;
-	register c, i, j;
-	register char *ptr;
+	register int i, j;
 	int nmsym;
 	addr_t a0, ai, aj;
 	struct sym *sp;
@@ -678,7 +676,7 @@ VOID lstareatosym(struct area *xp)
 {
 	/* Output the current area symbols to a NO$GMB .sym file */
 	register struct areax *oxp;
-	register i, j;
+	register int i, j;
 	int nmsym;
 	addr_t a0, ai;
 	struct sym *sp;

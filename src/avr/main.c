@@ -140,6 +140,8 @@ PORT avr_port = {
     "ATMEL AVR",		/* Target name */
     {
 	TRUE,			/* Emit glue around main */
+	MODEL_LARGE | MODEL_SMALL,
+	MODEL_SMALL
     },
     {	
 	_asmCmd,

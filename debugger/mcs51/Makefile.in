@@ -53,8 +53,8 @@ $(PRJDIR)/support/gc/libgc.a:
 # ---------------------------------------------------
 install: all installdirs
 	$(INSTALL) -s $(TARGET) $(bindir)/sdcdb
-	cp $(PRJDIR)/sdcdb/sdcdb.el $(bindir)/sdcdb.el
-	cp $(PRJDIR)/sdcdb/sdcdbsrc.el $(bindir)/sdcdbsrc.el
+	cp $(PRJDIR)/debugger/mcs51/sdcdb.el $(bindir)/sdcdb.el
+	cp $(PRJDIR)/debugger/mcs51/sdcdbsrc.el $(bindir)/sdcdbsrc.el
 
 
 # Deleting all the installed files

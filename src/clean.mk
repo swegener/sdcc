@@ -4,7 +4,7 @@ clean:
 	rm -f *core *[%~] *.[oa] *.output
 	rm -f .[a-z]*~
 	rm -f $(PRJDIR)/bin/sdcc sdcc
-
+	for port in $(PORTS) ; do $(MAKE) -C $$port clean; done;
 
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------

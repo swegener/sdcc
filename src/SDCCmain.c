@@ -1375,19 +1375,28 @@ int main ( int argc, char **argv , char **envp)
     if (srcFileName)
 	preProcess(envp) ;
 
-    if (srcFileName) {
-
+    if (srcFileName) 
+    {
 	initSymt();
 	initiCode();
 	initCSupport ();
 	initPeepHole();
 	yyparse();
 
-	if (!fatalError) {
+	if (!fatalError) 
+	{
 	    glue();
+	    if (fatalError)
+	    {
+	        return 1;
+	    }
 	    if (!options.c1mode)
+	    {
 		assemble(envp);
-	} else {
+	    }
+	}
+	else 
+	{
 	    return 1;
         }
 	

@@ -102,7 +102,7 @@
 #define  E_CODE_NO_INIT     99          /* vars in code space must have initializer */
 #define  E_OPS_INTEGRAL    100          /* operans must be integral for certian assignments */
 #define  E_TOO_MANY_PARMS  101          /* too many parameters */
-#define  E_TO_FEW_PARMS    102          /* to few parameters   */
+#define  E_TOO_FEW_PARMS    102          /* to few parameters   */
 #define  E_FUNC_NO_CODE    103          /* fatalError          */
 #define  E_TYPE_MISMATCH_PARM 104       /* type mismatch for parameter */
 #define  E_INVALID_FLOAT_CONST 105      /* invalid floating point literal string */

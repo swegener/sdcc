@@ -51,13 +51,13 @@ float atof(char * s)
 	}
 
 	//Get the fraction
-	if (*s=='.')
+	if (*s == '.')
 	{
 		s++;
-		for (fraction=10.0; isdigit(*s); s++)
+		for (fraction=0.1; isdigit(*s); s++)
 		{
-			value+=(*s-'0')/fraction;
-			fraction*=10.0;
+			value+=(*s-'0')*fraction;
+			fraction*=0.1;
 		}
 	}
 
@@ -65,14 +65,13 @@ float atof(char * s)
 	if (toupper(*s)=='E')
 	{
 		s++;
-		while(*s=='0') s++;//So atoi doesn't return an octal number
 		iexp=(char)atoi(s);
 		{
 			while(iexp!=0)
 			{
 				if(iexp<0)
 				{
-					value/=10.0;
+					value*=0.1;
 					iexp++;
 				}
 				else

@@ -2249,6 +2249,33 @@ static void genGoto (iCode *ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* findLabelBackwards: walks back through the iCode chain looking  */
+/* for the given label. Returns number of iCode instructions	   */
+/* between that label and given ic.				   */
+/* Returns zero if label not found.				   */
+/*-----------------------------------------------------------------*/
+static int findLabelBackwards(iCode *ic, int key)
+{
+    int count = 0;
+    
+    while (ic->prev)
+    {
+        ic = ic->prev;
+        count++;
+        
+        if (ic->op == LABEL && IC_LABEL(ic)->key == key)
+        {
+            printf("findLabelBackwards = %d\n", count);
+            return count;
+        }
+    }
+    
+    printf("findLabelBackwards: not found.\n");
+    
+    return 0;
+}
+
+/*-----------------------------------------------------------------*/
 /* genPlusIncr :- does addition with increment if possible         */
 /*-----------------------------------------------------------------*/
 static bool genPlusIncr (iCode *ic)
@@ -2271,7 +2298,27 @@ static bool genPlusIncr (iCode *ic)
     if (sameRegs(AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic))) &&
         (size > 1) &&
         (icount == 1)) {
-        symbol *tlbl = newiTempLabel(NULL);
+        symbol *tlbl;
+        int emitTlbl;
+        int labelRange;
+
+	/* If the next instruction is a goto and the goto target
+	 * is < 10 instructions previous to this, we can generate
+	 * jumps straight to that target.
+	 */
+        if (ic->next && ic->next->op == GOTO
+            && (labelRange = findLabelBackwards(ic, IC_LABEL(ic->next)->key)) != 0
+            && labelRange <= 10 )
+        {
+           emitcode(";", "tail increment optimized");
+           tlbl = IC_LABEL(ic->next);
+           emitTlbl = 0;
+        }
+        else
+        {
+            tlbl = newiTempLabel(NULL);
+            emitTlbl = 1;
+        }
 	emitcode("inc","%s",aopGet(AOP(IC_RESULT(ic)),LSB,FALSE,FALSE));
 	if(AOP_TYPE(IC_RESULT(ic)) == AOP_REG ||
 	   IS_AOP_PREG(IC_RESULT(ic)))
@@ -2314,7 +2361,11 @@ static bool genPlusIncr (iCode *ic)
 	    }
 	    emitcode("inc","%s",aopGet(AOP(IC_RESULT(ic)),MSB32,FALSE,FALSE));
 	}
-	emitcode("","%05d$:",tlbl->key+100);
+	
+	if (emitTlbl)
+	{
+	    emitcode("","%05d$:",tlbl->key+100);
+	}
         return TRUE;
     }
     
@@ -2548,7 +2599,7 @@ release:
 static bool genMinusDec (iCode *ic)
 {
     unsigned int icount ;
-	unsigned int size = getDataSize(IC_RESULT(ic));
+    unsigned int size = getDataSize(IC_RESULT(ic));
 
     /* will try to generate an increment */
     /* if the right side is not a literal 
@@ -2561,12 +2612,32 @@ static bool genMinusDec (iCode *ic)
     if ((icount = (unsigned int) floatFromVal (AOP(IC_RIGHT(ic))->aopu.aop_lit)) > 4)
         return FALSE ;
 
-	size = getDataSize(IC_RESULT(ic));
     /* if decrement 16 bits in register */
     if (sameRegs(AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic))) &&
         (size > 1) &&
         (icount == 1)) {
-        symbol *tlbl = newiTempLabel(NULL);
+            symbol *tlbl;
+            int emitTlbl;
+            int labelRange;
+
+	    /* If the next instruction is a goto and the goto target
+	     * is <= 10 instructions previous to this, we can generate
+	     * jumps straight to that target.
+	     */
+            if (ic->next && ic->next->op == GOTO
+                && (labelRange = findLabelBackwards(ic, IC_LABEL(ic->next)->key)) != 0
+                && labelRange <= 10 )
+            {        
+               emitcode(";", "tail decrement optimized");
+               tlbl = IC_LABEL(ic->next);
+               emitTlbl = 0;
+            }
+            else
+            {
+                tlbl = newiTempLabel(NULL);
+                emitTlbl = 1;
+            }
+        
 		emitcode("dec","%s",aopGet(AOP(IC_RESULT(ic)),LSB,FALSE,FALSE));
 		if(AOP_TYPE(IC_RESULT(ic)) == AOP_REG ||
 		   IS_AOP_PREG(IC_RESULT(ic)))
@@ -2608,7 +2679,10 @@ static bool genMinusDec (iCode *ic)
 			}
 			emitcode("dec","%s",aopGet(AOP(IC_RESULT(ic)),MSB32,FALSE,FALSE));
 		}
-		emitcode("","%05d$:",tlbl->key+100);
+		if (emitTlbl)
+		{
+		    emitcode("","%05d$:",tlbl->key+100);
+		}
         return TRUE;
     }
 

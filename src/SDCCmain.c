@@ -135,13 +135,13 @@ optionsTable[] = {
     { 'W',  NULL,                   NULL, "Pass through options to the assembler (a) or linker (l)" },
     { 'L',  NULL,                   NULL, "Add the next field to the library search path" },
     { 'l',  NULL,                   NULL, "Include the given library in the link" },
-    { 0,    OPTION_LARGE_MODEL,     NULL, "Far functions, far data" },
-    { 0,    OPTION_MEDIUM_MODEL,    NULL, "Far functions, near data" },
-    { 0,    OPTION_SMALL_MODEL,     NULL, "Small model (default)" },
-    { 0,    OPTION_FLAT24_MODEL,    NULL, NULL },
+    { 0,    OPTION_LARGE_MODEL,     NULL, "external data space is used" },
+    { 0,    OPTION_MEDIUM_MODEL,    NULL, "not supported" },
+    { 0,    OPTION_SMALL_MODEL,     NULL, "internal data space is used (default)" },
+    { 0,    OPTION_FLAT24_MODEL,    NULL, "use the flat24 model for the ds390 (default)" },
     { 0,    "--stack-auto",         &options.stackAuto, "Stack automatic variables" },
-    { 0,    OPTION_STACK_8BIT,      NULL, NULL },
-    { 0,    "--stack-10bit",        &options.stack10bit, NULL },
+    { 0,    OPTION_STACK_8BIT,      NULL, "use the 8bit stack for the ds390 (not supported yet)" },
+    { 0,    "--stack-10bit",        &options.stack10bit, "use the 10bit stack for ds390 (default)" },
     { 0,    "--xstack",             &options.useXstack, "Use external stack" },
     { 0,    "--generic",            &options.genericPtr, "All unqualified ptrs converted to '_generic'" },
     { 0,    OPTION_NO_GCSE,         NULL, "Disable the GCSE optimisation" },
@@ -158,15 +158,15 @@ optionsTable[] = {
     { 0,    "--dumpregpack",        &options.dump_pack, NULL },
     { 0,    "--dumpregassign",      &options.dump_rassgn, NULL },
     { 0,    OPTION_DUMP_ALL,        NULL, "Dump the internal structure at all stages" },
-    { 0,    OPTION_XRAM_LOC,        NULL, NULL },
+    { 0,    OPTION_XRAM_LOC,        NULL, "<nnnn> External Ram start location" },
     { 0,    OPTION_IRAM_SIZE,       NULL, "<nnnn> Internal Ram size" },
     { 0,    OPTION_XSTACK_LOC,      NULL, "<nnnn> External Ram start location" },
     { 0,    OPTION_CODE_LOC,        NULL, "<nnnn> Code Segment Location" },
     { 0,    OPTION_STACK_LOC,       NULL, "<nnnn> Stack pointer initial value" },
     { 0,    OPTION_DATA_LOC,        NULL, "<nnnn> Direct data start location" },
     { 0,    OPTION_IDATA_LOC,       NULL, NULL },
-    { 0,    OPTION_PEEP_FILE,       NULL, NULL },
-    { 0,    OPTION_LIB_PATH,        NULL, NULL },
+    { 0,    OPTION_PEEP_FILE,       NULL, "<file> use this extra peep-hole file" },
+    { 0,    OPTION_LIB_PATH,        NULL, "<path> use this path to search for libraries" },
     { 0,    "--int-long-reent",     &options.intlong_rent, "Use reenterant calls on the int and long support functions" },
     { 0,    "--float-reent",        &options.float_rent, "Use reenterant calls on the floar support functions" },
     { 0,    OPTION_OUT_FMT_IHX,     NULL, NULL },
@@ -179,13 +179,13 @@ optionsTable[] = {
     { 0,    "--peep-asm",           &options.asmpeep, NULL },
     { 0,    "--debug",              &options.debug, "Enable debugging symbol output" },
     { 'v',  OPTION_VERSION,         NULL, "Display sdcc's version" },
-    { 0,    "--stack-after-data",   &options.stackOnData, NULL },
+    { 0,    "--stack-after-data",   &options.stackOnData, "initialize the stackpointer with the last byte use in DSEG" },
     { 'E',  "--preprocessonly",     &preProcOnly, "Preprocess only, do not compile" },
     { 0,    "--c1mode",             &options.c1mode, "Act in c1 mode.  The input is preprocessed code, the output is assembly code." },
     { 0,    "--help",               NULL, "Display this help" },
-    { 0,    OPTION_CALLEE_SAVES,    NULL, "Cause the called function to save registers insted of the caller" },
+    { 0,    OPTION_CALLEE_SAVES,    NULL, "<func[,func,...]> Cause the called function to save registers insted of the caller" },
     { 0,    "--nostdlib",           &options.nostdlib, "Do not include the standard library directory in the search path" },
-    { 0,    "--nostdinc",           &options.nostdinc, NULL },
+    { 0,    "--nostdinc",           &options.nostdinc, "Do not include the standard include directory in the search path" },
     { 0,    "--verbose",            &options.verbose, "Trace calls to the preprocessor, assembler, and linker" },
     { 0,    OPTION_LESS_PEDANTIC,   NULL, "Disable some of the more pedantic warnings" },
     { 0,    OPTION_SHORT_IS_8BITS,   NULL, "Make short 8bits (for old times sake)" }
@@ -571,7 +571,7 @@ getStringArg(const char *szStart, char **argv, int *pi, int argc)
         }
       else 
         {
-          return argv[++(*pi)];
+          return argv[*pi];
         }
     }
 }

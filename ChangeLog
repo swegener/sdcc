@@ -1,5 +1,12 @@
 2005-01-18 Vangelis Rokas <vrokas AT otenet.gr>
 
+	* device/lib/pic16/libc/stdlib/x_ftoa.c: it defines x_ftoa function
+	which converts a float number to its ASCII representation
+	* device/lib/pic16/libc/utils/cnvfrac.S,cnvint.S: support
+	functions to convert the fractional and integer part of a float to ASCII,
+	* device/lib/pic16/libc/stdlib/(calloc.c,free.c, malloc.c,
+	realloc.c): added _MALLOC_SPEC to explicit place variables in data
+	ram
 	* device/include/asm/pic16/features.h: added _CODE, _DATA, _AUTOMEM,
 	_STATMEM macros,
 	* device/include/pic16/adc.h: added GPL info,

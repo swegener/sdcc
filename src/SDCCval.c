@@ -355,10 +355,9 @@ constFloatVal (char *s)
 }
 
 /*-----------------------------------------------------------------*/
-/* constVal - converts a INTEGER constant into a value       */
+/* constVal - converts an INTEGER constant into a cheapest value   */
 /*-----------------------------------------------------------------*/
-value *
-constVal (char *s)
+value *constVal (char *s)
 {
   value *val;
   short hex = 0, octal = 0;
@@ -370,14 +369,10 @@ constVal (char *s)
 
   val->type = val->etype = newLink ();	/* create the spcifier */
   val->type->class = SPECIFIER;
-  SPEC_NOUN (val->type) = V_INT;
   SPEC_SCLS (val->type) = S_LITERAL;
-
-  /* set the _unsigned flag if 'uUoOxX' found */
-  if (strchr (s, 'u') || strchr (s, 'U') ||
-      strchr (s, 'o') || strchr (s, 'O') ||
-      strchr (s, 'x') || strchr (s, 'x'))
-    SPEC_USIGN (val->type) = 1;
+  // let's start with an unsigned char
+  SPEC_NOUN (val->type) = V_CHAR;
+  SPEC_USIGN (val->type) = 1;
 
   /* set the _long flag if 'lL' is found */
   if (strchr (s, 'l') || strchr (s, 'L'))
@@ -396,45 +391,39 @@ constVal (char *s)
     scanFmt[scI++] = 'o';
   else if (hex)
     scanFmt[scI++] = 'x';
-  else if (SPEC_USIGN (val->type))
-    scanFmt[scI++] = 'u';
   else
     scanFmt[scI++] = 'd';
 
+  scanFmt[scI++] = 'L';
   scanFmt[scI++] = '\0';
 
-  /* if hex or octal then set the unsigned flag   */
-  if (hex || octal)
-    {
-      SPEC_USIGN (val->type) = 1;
-      sscanf (s, scanFmt, &sval);
-    }
-  else
-    sval = atol (s);
+  sscanf (s, scanFmt, &sval);
 
-  // check if we have to promote to long
-  if (SPEC_LONG (val->type) || 
-      (SPEC_USIGN(val->type) && sval>0xffff) ||
-      (!SPEC_USIGN(val->type) && ((long)sval>32767 || (long)sval<-32768))) {
-      if (SPEC_USIGN (val->type))
-	SPEC_CVAL (val->type).v_ulong = sval;
-      else
-	SPEC_CVAL (val->type).v_long = sval;
+  if (sval<0) { // "-28u" will still be signed and negative
+    SPEC_USIGN (val->type) = 0;
+    if (sval<-32768) { // check if have to promote to long
+      SPEC_NOUN (val->type) = V_INT;
       SPEC_LONG (val->type) = 1;
-      return val;
+      SPEC_CVAL (val->type).v_long=sval;
+    } else {
+      SPEC_CVAL (val->type).v_int=sval;
+      if (sval<-128) { // check if we have to promote to int
+	SPEC_NOUN (val->type) = V_INT;
+      }
     }
-  
-  if (SPEC_USIGN (val->type))
-    SPEC_CVAL (val->type).v_uint = sval;
-  else
-    SPEC_CVAL (val->type).v_int = sval;
-  
-  
-  // check if we can make it a char
-  if ((SPEC_USIGN(val->type) && sval < 256) ||
-      (!SPEC_USIGN(val->type) && ((long)sval<127 && (long)sval>-128))) {
-    SPEC_NOUN (val->etype) = V_CHAR;
+  } else {
+    if (sval>0xffff) { // check if we have to promote to long
+      SPEC_NOUN (val->type) = V_INT;
+      SPEC_LONG (val->type) = 1;
+      SPEC_CVAL (val->type).v_ulong=sval;
+    } else {
+      SPEC_CVAL (val->type).v_uint=sval;
+      if (sval>0xff) { // check if we have to promote to int
+	SPEC_NOUN (val->type) = V_INT;
+      }
+    }
   }
+
   return val;
 }
 

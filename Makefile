@@ -12,7 +12,8 @@ SDCC_ASLINK	= as/mcs51 as link
 
 PKGS		= $(SDCC_MISC) $(SDCC_LIBS) $(SDCC_ASLINK) \
 		  src device/include device/lib
-
+PKGS_TINI	= $(SDCC_LIBS) $(SDCC_ASLINK) \
+		  src device/include
 PORTS		= mcs51 z80
 
 srcdir          = .
@@ -20,6 +21,8 @@ srcdir          = .
 # Compiling entire program or any subproject
 # ------------------------------------------
 all: checkconf sdcc
+
+tini: checkconf sdcc-tini
 
 sdcc-libs:
 ifeq ($(CROSS_LIBGC),1)
@@ -42,7 +45,14 @@ sdcc-device:
 	$(MAKE) -C device/include
 	$(MAKE) -C device/lib
 
+sdcc-device-tini:
+	$(MAKE) -C device/include
+	$(MAKE) -C device/lib modelDS390
+
 sdcc: sdcc-cc sdcc-aslink sdcc-misc sdcc-device
+	$(MAKE) -f main.mk all
+
+sdcc-tini: sdcc-cc sdcc-aslink sdcc-device-tini
 	$(MAKE) -f main.mk all
 
 # Some interesting sub rules
@@ -57,6 +67,14 @@ install:
 	@for pkg in $(PKGS); do\
 	  $(MAKE) -C $$pkg install ;\
 	done
+
+install-tini:
+	$(MAKE) -f main.mk install
+	@for pkg in $(PKGS_TINI); do\
+	  $(MAKE) -C $$pkg install ;\
+	done
+	$(MAKE) -C device/lib installDS390
+
 
 
 # Deleting all the installed files

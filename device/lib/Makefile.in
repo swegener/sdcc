@@ -81,7 +81,7 @@ modelDS390:
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
-install: installdirs
+install: installDS390
 	$(CP) *.c $(datadir)/lib/
 	for model in $(MODELS); do \
 	 [ -d $$model ] || $(MAKE) all; \
@@ -89,8 +89,9 @@ install: installdirs
 	 $(CP) $$model/*.asm $(datadir)/lib/$$model/; \
 	 $(CP) $$model/*.cdb $(datadir)/lib/$$model/; \
 	done
-	$(CP) ds390/*.lib ds390/*.rel ds390/*.asm ds390/*.cdb $(datadir)/lib/ds390
 
+installDS390: installdirs
+	$(CP) ds390/*.lib ds390/*.rel ds390/*.asm ds390/*.cdb $(datadir)/lib/ds390
 
 # Deleting all the installed files
 # --------------------------------

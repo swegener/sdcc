@@ -211,6 +211,7 @@ AC_DEFINE_UNQUOTED(STD_INT_LIB, "libint")
 AC_DEFINE_UNQUOTED(STD_LONG_LIB, "liblong")
 AC_DEFINE_UNQUOTED(STD_FP_LIB, "libfloat")
 AC_DEFINE_UNQUOTED(STD_DS390_LIB, "libds390")
+AC_DEFINE_UNQUOTED(STD_xa51_LIB, "xa51")
 
 AC_DEFINE_UNQUOTED(PREFIX, "${prefix}")
 AC_DEFINE_UNQUOTED(DATADIR, "${sdcc_datadir_tmp}")
@@ -290,6 +291,15 @@ if test "$enable_tlcs900h_port" = "no"; then
 else
     echo izt >>ports.build
     AC_DEFINE_UNQUOTED(OPT_DISABLE_TLCS900H, 0)
+fi
+
+AC_ARG_ENABLE(xa51-port,[  --disable-xa51-port Excludes the XA51 port])
+echo xa51 >>ports.all
+if test "$enable_xa51_port" = "no"; then
+    AC_DEFINE_UNQUOTED(OPT_DISABLE_XA51, 1)
+else
+    echo xa51 >>ports.build
+    AC_DEFINE_UNQUOTED(OPT_DISABLE_XA51, 0)
 fi
 
 AC_ARG_ENABLE(ucsim,[  --disable-ucsim         Disables configuring and building of ucsim])

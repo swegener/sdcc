@@ -28,6 +28,8 @@ ac_help="$ac_help
 ac_help="$ac_help
   --disable-tlcs900h-port Excludes the TLCS900H port"
 ac_help="$ac_help
+--disable-xa51-port       Excludes the XA51 port"
+ac_help="$ac_help
   --disable-ucsim         Disables configuring and building of ucsim"
 ac_help="$ac_help
   --disable-device-lib-build Disables automatically building device libraries"
@@ -2609,6 +2611,9 @@ cat >> confdefs.h <<EOF
 #define STD_DS390_LIB "libds390"
 EOF
 
+cat >> confdefs.h <<EOF
+#define STD_XA51_LIB "libxa51"
+EOF
 
 cat >> confdefs.h <<EOF
 #define PREFIX "${prefix}"
@@ -2783,6 +2788,20 @@ else
     echo izt >>ports.build
     cat >> confdefs.h <<EOF
 #define OPT_DISABLE_TLCS900H 0
+EOF
+
+fi
+
+echo xa51 >>ports.all
+if test "$enable_xa51_port" = "no"; then
+    cat >> confdefs.h <<EOF
+#define OPT_DISABLE_XA51 1
+EOF
+
+else
+    echo xa51 >>ports.build
+    cat >> confdefs.h <<EOF
+#define OPT_DISABLE_XA51 0
 EOF
 
 fi

@@ -22,6 +22,7 @@
 #undef STD_LONG_LIB
 #undef STD_FP_LIB
 #undef STD_DS390_LIB
+//#undef STD_XA51_LIB
 #undef HAVE_SYS_SOCKET_H
 #undef HAVE_SYS_ISA_DEFS_H
 #undef HAVE_ENDIAN_H
@@ -37,6 +38,7 @@
 #undef OPT_DISABLE_PIC
 #undef OPT_DISABLE_I186
 #undef OPT_DISABLE_TLCS900H
+//#undef OPT_DISABLE_XA51
 
 #undef OPT_ENABLE_LIBGC
 

@@ -15,7 +15,7 @@ cpp2:
 	make -f Makefile.bcc
 	cd ..\..
 
-ports: z80 mcs51 avr ds390 pic izt
+ports: z80 mcs51 avr ds390 pic izt xa51
 
 z80:
 	cd src\z80
@@ -46,6 +46,11 @@ izt:
         cd src\izt
 	make -f Makefile.bcc
         cd ..\..
+
+xa51:
+	cd src\xa51
+	make -f Makefile.bcc
+	cd ..\..
 
 sdcc:
 	cd src

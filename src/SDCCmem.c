@@ -476,11 +476,11 @@ allocParms (value * val)
 	  allocIntoSeg (lval->sym);
 	}
       else
-	{			/* allocate them in the automatic space */
+	{ /* allocate them in the automatic space */
 	  /* generate a unique name  */
 	  sprintf (lval->sym->rname, "%s%s_PARM_%d", port->fun_prefix, currFunc->name, pNum);
 	  strcpy (lval->name, lval->sym->rname);
-
+	  
 	  /* if declared in external storage */
 	  if (SPEC_SCLS (lval->etype) == S_XDATA)
 	    SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) = xdata;
@@ -489,18 +489,17 @@ allocParms (value * val)
 	       note here that we put it into the overlay segment
 	       first, we will remove it from the overlay segment
 	       after the overlay determination has been done */
-	  if (options.model == MODEL_SMALL)
-	    {
-	      SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) =
-		(options.model == MODEL_SMALL ? port->mem.default_local_map :
-		 (options.noOverlay ? port->mem.default_local_map
-		  : overlay));
-	    }
-	  else
-	    {
-	      SPEC_SCLS (lval->etype) = S_XDATA;
-	      SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) = xdata;
-	    }
+	    if (options.model == MODEL_SMALL)
+	      {
+		SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) =
+		  (options.noOverlay ? port->mem.default_local_map
+		   : overlay);
+	      }
+	    else
+	      {
+		SPEC_SCLS (lval->etype) = S_XDATA;
+		SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) = xdata;
+	      }
 	  allocIntoSeg (lval->sym);
 	}
     }
@@ -687,9 +686,13 @@ allocLocal (symbol * sym)
   /* again note that we have put it into the overlay segment
      will remove and put into the 'data' segment if required after 
      overlay  analysis has been done */
-  SPEC_OCLS (sym->etype) = (options.model == MODEL_SMALL ? port->mem.default_local_map :
-			    (options.noOverlay ? port->mem.default_local_map
-			     : overlay));
+  if (options.model == MODEL_SMALL) {
+    SPEC_OCLS (sym->etype) = 
+      (options.noOverlay ? port->mem.default_local_map
+       : overlay);
+  } else {
+    SPEC_OCLS (sym->etype) = port->mem.default_local_map;
+  }
   allocIntoSeg (sym);
 }
 

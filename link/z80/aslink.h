@@ -426,6 +426,7 @@ struct lbfile {
 	char		*libspc;
 	char		*relfil;
 	char		*filspc;
+    long		offset; /*>=0 if rel file is embedded in a lib file at this offset*/
 };
 
 /*
@@ -650,6 +651,7 @@ extern	char		getnb();
 extern	int		more();
 extern	VOID		skip();
 extern	VOID		unget();
+extern	VOID		chop_crlf();
 
 /* lkarea.c */
 extern	VOID		lkparea();

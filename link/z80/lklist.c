@@ -161,7 +161,7 @@ VOID
 lstarea(xp)
 struct area *xp;
 {
-	register struct area *op;
+//	register struct area *op;
 	register struct areax *oxp;
 	register c, i, j;
 	register char *ptr;

@@ -1,3 +1,11 @@
+2003-07-24  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+    added support for new library format to z80, gbz80 linkers:
+    *link/z80/aslink.h
+    *link/z80/lklex.c
+    *link/z80/lklib.c
+    *link/z80/lklist.c
+
 2003-07-24  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCicode.c (operandOperation): fixed problem with bitops and 0xffffffff;

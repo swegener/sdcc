@@ -19,6 +19,9 @@
  * Extensions: P. Felber
  */
 
+#define EQ(A,B) !strcmp((A),(B))
+#define MAXLINE 254 /*when using fgets*/
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -48,7 +51,7 @@ typedef struct slibrarysymbol mlibrarysymbol;
 typedef struct slibrarysymbol *pmlibrarysymbol;
 
 struct slibrarysymbol {
-	char name[40];
+	char name[NCPS];
 	pmlibrarysymbol next;
 };
 
@@ -61,6 +64,7 @@ struct slibraryfile {
 	char *str;
 	char relfil[FILSPC];
 	char filename[FILSPC];
+    long offset; //if > 0, the embedded file offset in the library file libspc
 	pmlibrarysymbol symbols;
 	pmlibraryfile next;
 };
@@ -323,6 +327,43 @@ search()
 	}
 }
 
+/*Load a .rel file embedded in a sdcclib file*/
+void LoadRel(FILE * libfp, char * ModName)
+{
+	char str[NINPUT+2];
+	int state=0;
+
+	while (fgets(str, NINPUT, libfp) != NULL)
+	{
+		str[NINPUT+1] = '\0';
+		chop_crlf(str);
+		switch(state)
+		{
+			case 0:
+				if(EQ(str, "<FILE>"))
+				{
+					fgets(str, NINPUT, libfp);
+					str[NINPUT+1] = '\0';
+					chop_crlf(str);
+					if(EQ(str, ModName)) state=1;
+					else
+					{
+						printf("Bad offset in library file str=%s, Modname=%s\n", str, ModName);
+						lkexit(1);
+					}
+				}
+			break;
+			case 1:
+				if(EQ(str, "<REL>")) state=2;
+			break;
+			case 2:
+				if(EQ(str, "</REL>")) return;
+				ip = str;
+				link();
+			break;
+		}
+	}
+}
 
 /*)Function	VOID	fndsym(name)
  *
@@ -434,7 +475,16 @@ int fndsym( char *name )
 					lbfh->filspc = ThisLibr->str;
 					lbfh->relfil = (char *) new (strlen(ThisLibr->relfil) + 1);
 					strcpy(lbfh->relfil,ThisLibr->relfil);
-					loadfile(lbfh->filspc);
+                    lbfh->offset = ThisLibr->offset;
+                    if(lbfh->offset>0)
+                    { /*For an embedded object file in a library*/
+                        void loadfile_SdccLib(char * libspc, char * module, long offset);
+                        loadfile_SdccLib(lbfh->libspc, lbfh->relfil, lbfh->offset);
+                    }
+                    else
+                    { /*For a stand alone object file*/
+					    loadfile(lbfh->filspc);
+                    }
 					ThisLibr->loaded=1;
 				}
 				return (1);	/* Found the symbol, return */
@@ -444,13 +494,113 @@ int fndsym( char *name )
 		ThisLibr=ThisLibr->next; /* Next library in list */
 	}
 	return 0;	/* Failure - symbol not found in any library */
-};
+}
+
+pmlibraryfile buildlibraryindex_SdccLib(char * PathLib, FILE * libfp, char * DirLib, pmlibraryfile This)
+{
+	char ModName[NCPS]="";
+	char FLine[MAXLINE+1];
+	int state=0;
+	long IndexOffset=0, FileOffset;
+    pmlibrarysymbol ThisSym;
+
+	while(!feof(libfp))
+    {
+        FLine[0]=0;
+        fgets(FLine, MAXLINE, libfp);
+        chop_crlf(FLine);
+
+        switch(state)
+        {
+            case 0:
+                if(EQ(FLine, "<INDEX>"))
+                {
+					/*The next line has the size of the index*/
+                    FLine[0]=0;
+                    fgets(FLine, MAXLINE, libfp);
+                    chop_crlf(FLine);
+					IndexOffset=atol(FLine);
+					state=1;
+                }
+            break;
+            case 1:
+                if(EQ(FLine, "<MODULE>"))
+				{
+					/*The next line has the name of the module and the offset
+					of the corresponding embedded file in the library*/
+                    FLine[0]=0;
+                    fgets(FLine, MAXLINE, libfp);
+                    chop_crlf(FLine);
+					sscanf(FLine, "%s %ld", ModName, &FileOffset);
+					state=2;
+
+                    /*create a new libraryfile object for this module*/
+					This->next = (pmlibraryfile)new( sizeof( mlibraryfile ));
+					if (This->next == NULL)
+                    {
+						printf("panic: can't allocate memory.\n");
+						exit(-1);
+					}
+
+					This=This->next;
+					This->next = NULL;
+					This->loaded=-1; /*Kind of useless, but...*/
+                    This->offset=FileOffset+IndexOffset;
+					This->libspc=PathLib;
+					strcpy(This->relfil, ModName);
+
+                    #ifdef SDK
+                    sprintf(This->filename, "%s%s%co", DirLib, ModName, FSEPX);
+                    #else /* SDK */
+                    sprintf(This->filename, "%s%s%crel", DirLib, ModName, FSEPX);
+                    #endif /* SDK */
+
+                    This->str=This->filename;
+
+					ThisSym = This->symbols = (pmlibrarysymbol)malloc( sizeof(mlibrarysymbol));
+					ThisSym->next = NULL;
+				}
+                else if(EQ(FLine, "</INDEX>"))
+				{
+					return This; /*Finish, get out of here*/
+				}
+            break;
+            case 2:
+                if(EQ(FLine, "</MODULE>"))
+				{
+					This->loaded=0;
+					/*Create the index for the next module*/
+                    state=1;
+				}
+                else
+				{
+					/*Add the symbols*/
+					ThisSym->next = (pmlibrarysymbol)malloc(sizeof(mlibrarysymbol));
+					ThisSym=ThisSym->next;
+					if (ThisSym == NULL)
+                    {
+						printf("panic: can't allocate memory.\n");
+						exit(-2);
+					}
+					ThisSym->next=NULL;
+					strcpy(ThisSym->name, FLine);
+                }
+            break;
+			
+			default:
+				return This; /*State machine should never reach this point, but just in case...*/
+			break;
+        }
+    }
+
+	return This; /*State machine should never reach this point, but just in case...*/
+}
+
 
 /* buildlibraryindex - build an in-memory cache of the symbols contained in
  *			the libraries
  */
-
-int buildlibraryindex()
+int buildlibraryindex(void)
 {
 	FILE *libfp, *fp;
 	struct lbname *lbnh;
@@ -476,7 +626,7 @@ int buildlibraryindex()
 
 /*2*/			while (fgets(relfil, NINPUT, libfp) != NULL) {
 				relfil[NINPUT+1] = '\0';
-				relfil[strlen(relfil) - 1] = '\0';
+				chop_crlf(relfil);
 				if (path != NULL) {
 					str = (char *)new(strlen(path)+strlen(relfil)+6);
 					strcpy(str,path);
@@ -498,6 +648,18 @@ int buildlibraryindex()
 				} else {
 					str = (char *)new(strlen(relfil) + 5);
 				}
+
+                if(strcmp(relfil, "<SDCCLIB>")==0)
+			    {
+                    /*Get the built in index of a library*/
+				    This=buildlibraryindex_SdccLib(lbnh->libspc, libfp, str, This);
+				    free(str);
+				    fclose(libfp);
+				    break; /*get the index for next library*/
+			    }
+                
+                /*From here down, build the index for the original library
+                format*/
 #ifdef SDK
 #ifdef UNIX
 				if (relfil[0] == '/') {
@@ -523,13 +685,14 @@ int buildlibraryindex()
 					/* Opened OK - create a new libraryfile object for it */
 					This->next = (pmlibraryfile)new( sizeof( mlibraryfile ));
 					if (This->next == NULL) {
-						printf("panic: cant allocate memory.\n");
+						printf("panic: can't allocate memory.\n");
 						exit(-1);
 					}
 
 					This=This->next;
 					This->next = NULL;
 					This->loaded=-1;
+                    This->offset=-1; /*There should be a rel file*/
 
 					strcpy( This->filename, str );
 
@@ -569,7 +732,7 @@ int buildlibraryindex()
 						ThisSym->next = (pmlibrarysymbol)malloc(sizeof(mlibrarysymbol));
 						ThisSym=ThisSym->next;
 						if (ThisSym == NULL) {
-							printf("panic: cant allocate memory.\n");
+							printf("panic: can't allocate memory.\n");
 							exit(-2);
 						}
 						This->loaded=0;
@@ -590,6 +753,127 @@ int buildlibraryindex()
 }
 #else /* INDEXLIB */
 
+
+/*Check for a symbol in a SDCC library.  If found, add the embedded .rel.
+The library must be created with the SDCC librarian 'sdcclib' since the
+linking process depends on the correct file offsets embedded in the library
+file.*/
+
+int SdccLib(char * PathLib, FILE * libfp, char * DirLib, char * SymName)
+{
+	struct lbfile *lbfh, *lbf;
+	char ModName[NCPS]="";
+	char FLine[MAXLINE+1];
+	int state=0;
+	long IndexOffset=0, FileOffset;
+
+	while(!feof(libfp))
+    {
+        FLine[0]=0;
+        fgets(FLine, MAXLINE, libfp);
+        chop_crlf(FLine);
+
+        switch(state)
+        {
+            case 0:
+                if(EQ(FLine, "<INDEX>"))
+                {
+					/*The next line has the size of the index*/
+                    FLine[0]=0;
+                    fgets(FLine, MAXLINE, libfp);
+                    chop_crlf(FLine);
+					IndexOffset=atol(FLine);
+					state=1;
+                }
+            break;
+            case 1:
+                if(EQ(FLine, "<MODULE>"))
+				{
+					/*The next line has the name of the module and the offset
+					of the corresponding embedded file in the library*/
+                    FLine[0]=0;
+                    fgets(FLine, MAXLINE, libfp);
+                    chop_crlf(FLine);
+					sscanf(FLine, "%s %ld", ModName, &FileOffset);
+					state=2;
+				}
+                else if(EQ(FLine, "</INDEX>"))
+				{
+					/*Reached the end of the index.  The symbol is not in this library.*/
+					return 0;
+				}
+            break;
+            case 2:
+                if(EQ(FLine, "</MODULE>"))
+				{
+					/*The symbol is not in this module, try the next one*/
+                    state=1;
+				}
+                else
+				{
+					/*Check if this is the symbol we are looking for.*/
+					if (strncmp(SymName, FLine, NCPS)==0)
+					{
+						/*The symbol is in this module.*/
+
+						/*As in the original library format, it is assumed that the .rel
+						files reside in the same directory as the lib files.*/
+						strcat(DirLib, ModName);
+                        #ifdef SDK
+			            sprintf(&DirLib[strlen(DirLib)], "%co", FSEPX);
+                        #else /* SDK */
+			            sprintf(&DirLib[strlen(DirLib)], "%crel", FSEPX);
+                        #endif /* SDK */
+
+						/*If this module has been loaded already don't load it again.*/
+						lbf = lbfhead;
+						while (lbf)
+						{
+							if(EQ(DirLib, lbf->filspc)) return 1;/*Already loaded*/
+							lbf=lbf->next;
+						}
+						
+						/*Add the embedded file to the list of files to be loaded in
+						the second pass.  That is performed latter by the function
+						library() below.*/
+						lbfh = (struct lbfile *) new (sizeof(struct lbfile));
+						if (lbfhead == NULL)
+						{
+							lbfhead = lbfh;
+						}
+						else
+						{
+							lbf = lbfhead;
+							while (lbf->next)
+							lbf = lbf->next;
+							lbf->next = lbfh;
+						}
+
+						lbfh->libspc = PathLib;
+						lbfh->filspc = DirLib;
+						lbfh->relfil = (char *) new (strlen(ModName) + 1);
+						strcpy(lbfh->relfil, ModName);
+						/*Library embedded file, so lbfh->offset must be >=0*/
+						lbfh->offset = IndexOffset+FileOffset;
+						
+						/*Jump to where the .rel begins and load it.*/
+						fseek(libfp, lbfh->offset, SEEK_SET);
+						LoadRel(libfp, ModName);
+
+						return 1; /*Found the symbol, so success!*/
+					}
+				}
+            break;
+			
+			default:
+				return 0; /*It should never reach this point, but just in case...*/
+			break;
+        }
+    }
+
+	return 0; /*The symbol is not in this library*/
+}
+
 int
 fndsym(name)
 char *name;
@@ -602,6 +886,7 @@ char *name;
 	char symname[NINPUT];
 	char *path,*str;
 	char c;
+	int result;
 
 	/*
 	 * Search through every library in the linked list "lbnhead".
@@ -623,7 +908,7 @@ char *name;
 
 /*2*/		while (fgets(relfil, NINPUT, libfp) != NULL) {
 		    relfil[NINPUT+1] = '\0';
-		    relfil[strlen(relfil) - 1] = '\0';
+		    chop_crlf(relfil);
 		    if (path != NULL) {
 			str = (char *) new (strlen(path)+strlen(relfil)+6);
 			strcpy(str,path);
@@ -645,6 +930,20 @@ char *name;
 		    } else {
 			str = (char *) new (strlen(relfil) + 5);
 		    }
+
+            /*See if this is a library with embedded files*/
+			if(strcmp(relfil, "<SDCCLIB>")==0)
+			{
+				result=SdccLib(lbnh->libspc, libfp, str, name);
+				fclose(libfp);
+				if(result) return(1); /*Found the symbol*/
+				free(str);
+				/*The symbol is not in the current library,
+				check the next library in the list*/
+				break; 
+			}
+
+			/*From here down is the support for libraries in the original format*/
 #ifdef SDK
 #ifdef UNIX
 		    if (relfil[0] == '/') {
@@ -715,6 +1014,7 @@ char *name;
 			lbfh->libspc = lbnh->libspc;
 			lbfh->filspc = str;
 			lbfh->relfil = (char *) new (strlen(relfil) + 1);
+			lbfh->offset = -1; /*Stand alone rel file*/
 			strcpy(lbfh->relfil,relfil);
 			fclose(fp);
 			fclose(libfp);
@@ -734,6 +1034,18 @@ char *name;
 	return(0);
 }
 #endif /* INDEXLIB */
+
+void loadfile_SdccLib(char * libspc, char * module, long offset)
+{
+	FILE *fp;
+
+	if ((fp = fopen(libspc,"r")) != NULL)
+	{
+		fseek(fp, offset, SEEK_SET);
+		LoadRel(fp, module);
+		fclose(fp);
+	}
+}
 
 /*)Function	VOID	library()
  *
@@ -758,8 +1070,18 @@ library()
 {
 	struct lbfile *lbfh;
 
-	for (lbfh=lbfhead; lbfh; lbfh=lbfh->next) {
-		loadfile(lbfh->filspc);
+	for (lbfh=lbfhead; lbfh; lbfh=lbfh->next)
+	{
+		if(lbfh->offset<0)
+		{
+			/*Stand alone rel file (original lib format)*/
+			loadfile(lbfh->filspc);
+		}
+		else
+		{
+			/*rel file embedded in lib (new lib format)*/
+			loadfile_SdccLib(lbfh->libspc, lbfh->relfil, lbfh->offset);
+		}
 	}
 }
 

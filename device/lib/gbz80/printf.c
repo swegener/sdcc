@@ -7,10 +7,7 @@
 
 #define STATIC
 
-/* PENDING */
-#define NULL	0
-
-STATIC void _printn(unsigned u, unsigned base, char issigned, void (*emitter)(char, void *), void *pData)
+static void _printn(unsigned u, unsigned base, char issigned, void (*emitter)(char, void *), void *pData)
 {
     const char *_hex = "0123456789ABCDEF";
     if (issigned && ((int)u < 0)) {
@@ -50,7 +47,7 @@ STATIC void _printf(const char *format, void (*emitter)(char, void *), void *pDa
 		    _printn(u, 16, 0, emitter, pData);
 		    break;
 		}
-	    case 's': 
+	    case 's':
 		{
 		    char *s = va_arg(va, char *);
 		    while (*s) {

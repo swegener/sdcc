@@ -1,5 +1,10 @@
 2004-09-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* device/lib/gbz80/printf.c,
+	* device/lib/z80/printf.c: removed define for NULL
+
+2004-09-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* as/xa51/xa_link.c,
 	* device/examples/ds390/ow390/ad26.c,
 	* device/examples/ds390/ow390/cnt1d.c,

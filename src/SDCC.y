@@ -1163,7 +1163,7 @@ abstract_declarator2
      $1->next=p;
    }
    | abstract_declarator2 '(' parameter_type_list ')' {
-     if (!IS_VOID($3->type)) {
+     if (!IS_VOID($3->etype)) {
        // this is nonsense, so let's just burp something
        werror(E_TOO_FEW_PARMS);
      } else {

@@ -1,5 +1,5 @@
-#LyX 1.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 218
+#LyX 1.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 220
 \textclass article
 \language english
 \inputencoding default
@@ -11,6 +11,8 @@
 \paperpackage a4
 \use_geometry 0
 \use_amsmath 0
+\use_natbib 0
+\use_numerical_citations 0
 \paperorientation portrait
 \secnumdepth 3
 \tocdepth 3
@@ -161,12 +163,10 @@ opensource
 \emph on 
 freeware
 \emph default 
-; source code for all the sub-packages (asxxxx assembler/linker, pre-processor)
- is distributed with the package.
+; source code for all the sub-packages (pre-processor, assemblers, linkers
+ etc) is distributed with the package.
  This documentation is maintained using a freeware word processor (LyX).
- 
-\layout Standard
-
+\newline 
 This program is free software; you can redistribute it and/or modify it
  under the terms of the GNU General Public License as published by the Free
  Software Foundation; either version 2, or (at your option) any later version.
@@ -202,7 +202,7 @@ typewriter font.
 \family default 
  Interesting items and new terms are printed in 
 \emph on 
-italicised type.
+italic.
 \layout Subsection
 
 Compatibility with previous versions
@@ -218,11 +218,11 @@ This version has numerous bug fixes compared with the previous version.
 \layout Itemize
 
 short is now equivalent to int (16 bits), it used to be equivalent to char
- (8 bits)
+ (8 bits) which is not ANSI compliant
 \layout Itemize
 
 the default directory where include, library and documention files are stored
- is no in /usr/local/share
+ is now in /usr/local/share
 \layout Itemize
 
 char type parameters to vararg functions are casted to int unless explicitly
@@ -248,7 +248,10 @@ n", a, (char)a);
 option --regextend has been removed
 \layout Itemize
 
-option --noreparms has been removed
+option --noregparms has been removed
+\layout Itemize
+
+option --stack-after-data has been removed
 \layout Standard
 
 
@@ -298,17 +301,6 @@ There are (and always will be) some things that could be done.
 \layout Standard
 
 
-\family sans 
-\series bold 
-sdcc -c --model-large -o large _atoi.c
-\family default 
-\series default 
- (where large could be a different basename or a directory)
-\newline 
-
-\layout Standard
-
-
 \family typewriter 
 char KernelFunction3(char p) at 0x340;
 \newline 
@@ -338,7 +330,11 @@ Linux/Unix Installation
 
 
 \series medium 
-Download the source package, it will be named something like sdcc-2.x.x.tgz.
+Download the source package, it will be named something like sdcc-
+\series default 
+x
+\series medium 
+.x.x.tgz.
 \layout Enumerate
 
 
@@ -351,7 +347,7 @@ Bring up a command line terminal, such as xterm.
 Unpack the file using a command like: 
 \family sans 
 \series bold 
-"tar -xzf sdcc-2.x.x.tgz
+"tar -xzf sdcc-x.x.x.tgz
 \family default 
 \series default 
 "
@@ -420,18 +416,6 @@ Windows Installation
 <pending: is this complete? where is borland, mingw>
 \newline 
 
-\newline 
-
-\emph default 
-For installation under Windows you first need to pick between a pre-compiled
- binary package, or installing the source package along with the Cygwin
- package.
- The binary package is the quickest to install, while the Cygwin package
- includes all of the open source power tools used to compile the complete
- SDCC source package in the Windows environment.
- If you are not familiar with the Unix command line environment, you may
- want to read the section on additional information for Windows users prior
- to your initial installation.
 \layout Subsubsection
 
 Windows Install Using a Binary Package
@@ -481,7 +465,7 @@ bin;%PATH%
 
 When you compile with sdcc, you may need to specify the location of the
  lib and include folders.
- For example, sdcc -I c:
+ For example, sdcc test.c -I c:
 \backslash 
 usr
 \backslash 
@@ -503,7 +487,7 @@ sdcc
 \backslash 
 lib
 \backslash 
-small test.c
+small
 \layout Subsubsection
 
 Windows Install Using Cygwin
@@ -547,7 +531,168 @@ command line terminal from the Cygwin menu.
 
 
 \series medium 
-Follow the instructions in the preceding Linux/Unix installation section.
+Follow the instructions in the preceding Linux/Unix installation section
+\layout Subsubsection
+
+Windows Install Using Microsoft Visual C++ 6.0/NET
+\layout Standard
+
+(By Jesus Calvino-Fraga (jesus@ieee.org) Jan/31/2003, many thanks to "Borut
+ Razem" <borut.razem@siol.net> for fixing all the sources, projects, and workspace
+ so to build SDCC with Visual C++).
+\newline 
+
+\newline 
+SDCC is distributed with all the projects, workspaces, and files you need
+ to build it using Visual C++ 6.0/NET.
+ The workspace name is 'sdcc.dsw'.
+ Please note that as it is now, all the executables are created in a folder
+ called sdcc
+\backslash 
+bin_vc.
+ Once built you need to copy the executables from sdcc
+\backslash 
+bin_vc to sdcc
+\backslash 
+bin before runnng SDCC.
+ 
+\newline 
+
+\newline 
+In order to build SDCC with Visual C++ 6.0/NET you need win32 executables
+ of bison.exe, flex.exe, and gawk.exe.
+ One good place to get them is 
+\begin_inset LatexCommand \url[here]{http://unxutils.sourceforge.net}
+
+\end_inset 
+
+
+\newline 
+
+\newline 
+Download the file UnxUtils.zip.
+ Now you have to install the utilities and setup Visual C++ so it can locate
+ the required programs.
+ Here there are two alternatives (choose one!):
+\layout Enumerate
+
+The easy way:
+\newline 
+
+\newline 
+a) Extract UnxUtils.zip to your C:
+\backslash 
+ hard disk PRESERVING the original paths, otherwise bison won't work.
+ (If you are using WinZip make certain that 'Use folder names' is selected)
+\newline 
+
+\newline 
+b) In the Visual C++ IDE click Tools, Options, select the Directory tab,
+ in 'Show directories for:' select 'Executable files', and in the directories
+ window add a new path: 'C:
+\backslash 
+user
+\backslash 
+local
+\backslash 
+wbin', click ok.
+\newline 
+
+\newline 
+(As a side effect, you get a bunch of Unix utilities that could be useful,
+ such as diff and patch.)
+\layout Enumerate
+
+A more compact way:
+\newline 
+
+\newline 
+This one avoids extracting a bunch of files you may not use, but requires
+ some extra work:
+\newline 
+
+\newline 
+a) Create a directory were to put the tools needed, or use a directory already
+ present.
+ Say for example 'C:
+\backslash 
+util'.
+\newline 
+
+\newline 
+b) Extract 'bison.exe', 'bison.hairy', 'bison.simple', 'flex.exe', and gawk.exe
+ to such directory WITHOUT preserving the original paths.
+ (If you are using WinZip make certain that 'Use folder names' is not selected)
+\newline 
+
+\newline 
+c) Rename bison.exe to '_bison.exe'.
+\newline 
+
+\newline 
+d) Create a batch file 'bison.bat' in 'C:
+\backslash 
+util
+\backslash 
+' and add these lines: 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+set BISON_SIMPLE=C:
+\backslash 
+util
+\backslash 
+bison.simple 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+set BISON_HAIRY=C:
+\backslash 
+util
+\backslash 
+bison.hairy
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+_bison %1 %2 %3 %4 %5 %6 %7 %8 %9
+\newline 
+
+\newline 
+Steps 'c' and 'd' are needed because bison requires by default that the
+ files 'bison.simple' and 'bison.hairy' reside in some weird Unix directory,
+ '/usr/local/share/' I think.
+ So it is necessary to tell bison where those files are located if they
+ are not in such directory.
+ That is the function of the environment variables BISON_SIMPLE and BISON_HAIRY.
+\newline 
+
+\newline 
+e) In the Visual C++ IDE click Tools, Options, select the Directory tab,
+ in 'Show directories for:' select 'Executable files', and in the directories
+ window add a new path: 'c:
+\backslash 
+util', click ok.
+ Note that you can use any other path instead of 'c:
+\backslash 
+util', even the path where the Visual C++ tools are, probably: 'C:
+\backslash 
+Program Files
+\backslash 
+Microsoft Visual Studio
+\backslash 
+Common
+\backslash 
+Tools'.
+ So you don't have to execute step 'e' :)
+\layout Standard
+
+That is it.
+ Open 'sdcc.dsw' in Visual Studio, click 'build all', when it finishes copy
+ the executables from sdcc
+\backslash 
+bin_vc to sdcc
+\backslash 
+bin, and you can compile using sdcc.
 \layout Subsection
 
 Testing out the SDCC Compiler
@@ -582,12 +727,12 @@ SDCC binaries are commonly installed in a directory arrangement like this:
 \newline 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="3" columns="2">
-<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="left" valignment="top" leftline="true" rightline="false" width="" special="">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="" special="">
-<row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<lyxtabular version="3" rows="3" columns="2">
+<features>
+<column alignment="left" valignment="top" leftline="true" width="0(null)">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0(null)">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -597,7 +742,7 @@ SDCC binaries are commonly installed in a directory arrangement like this:
 usr/local/bin
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -612,8 +757,8 @@ Holds executables(sdcc, s51, aslink,
 \end_inset 
 </cell>
 </row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -623,7 +768,7 @@ Holds executables(sdcc, s51, aslink,
 usr/local/share/sdcc/lib 
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -636,8 +781,8 @@ libraries
 \end_inset 
 </cell>
 </row>
-<row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -647,7 +792,7 @@ libraries
 usr/local/share/sdcc/include
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -674,19 +819,20 @@ Make sure the compiler works on a very simple example.
 
 \newline 
 
-\emph on 
-
-\newline 
-
 \family typewriter 
-\emph default 
-int test(int t) {
+
+\newline 
+char test;
+\newline 
+
+\newline 
+void main(void) {
 \newline 
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-return t+3;
+test=0;
 \newline 
 }
 \family default 
@@ -763,16 +909,18 @@ standard
 \newline 
 
 \newline 
-#include <string.h>
-\newline 
-main() {
-\newline 
 
 \family typewriter 
+#include <string.h>
+\newline 
+
+\newline 
 char str1[10];
 \newline 
-\SpecialChar ~
-\SpecialChar ~
+
+\newline 
+void main(void) {
+\newline 
 \SpecialChar ~
 \SpecialChar ~
 strcpy(str1, "testing");
@@ -845,22 +993,32 @@ SDCC does not compile correctly.
 
 A thing to try is starting from scratch by unpacking the .tgz source package
  again in an empty directory.
- Confure it again and build like:
+ Confure it like:
 \newline 
 
 \newline 
 
-\family sans 
-\series bold 
+\family typewriter 
+./configure 2&>1 | tee configure.log
+\family default 
+
+\newline 
+
+\newline 
+and build it like:
+\newline 
+
+\newline 
+
+\family typewriter 
 make 2&>1 | tee make.log
 \family default 
-\series default 
 
 \newline 
 
 \newline 
-After this you can review the make.log file to locate the problem.
- Or a relevant part of this be attached to an email that could be helpful
+If anything goes wrong, you can review the log files to locate the problem.
+ Or a relevant part of this can be attached to an email that could be helpful
  when requesting help from the mailing list.
 \layout Subsubsection
 
@@ -919,191 +1077,7 @@ This will install the compiler, other executables and libraries in to the
  appropriate system directories.
  The default is to copy the executables to /usr/local/bin and the libraries
  and header files to /usr/local/share/sdcc/lib and /usr/local/share/sdcc/include.
-\layout Subsection
-
-Additional Information for Windows Users
-\layout Standard
-
-
-\emph on 
-<pending: is this up to date?>
-\newline 
-
-\newline 
-
-\emph default 
-The standard method of installing on a Unix system involves compiling the
- source package.
- This is easily done under Unix, but under Windows it can be a more difficult
- process.
- The Cygwin is a large package to download, and the compilation runs considerabl
-y slower under Windows due to the overhead of the Cygwin tool set.
- An alternative is to install a pre-compiled Windows binary package.
- There are various trade-offs between each of these methods.
- 
-\layout Standard
-
-The Cygwin package allows a Windows user to run a Unix command line interface
- (bash shell) and also implements a Unix like file system on top of Windows.
- Included are many of the famous GNU software development tools which can
- augment the SDCC compiler.This is great if you have some experience with
- Unix command line tools and file system conventions, if not you may find
- it easier to start by installing a binary Windows package.
- The binary packages work with the Windows file system conventions.
-\layout Subsubsection
-
-Getting started with Cygwin
-\layout Standard
-
-SDCC is typically distributed as a tarred/gzipped file (.tgz).
- This is a packed file similar to a .zip file.
- Cygwin includes the tools you will need to unpack the SDCC distribution
- (tar and gzip).
- To unpack it, simply follow the instructions under the Linux/Unix install
- section.
- Before you do this you need to learn how to start a cygwin shell and some
- of the basic commands used to move files, change directory, run commands
- and so on.
- The change directory command is 
-\family sans 
-\series bold 
-
-\begin_inset Quotes eld
-\end_inset 
-
-cd
-\begin_inset Quotes erd
-\end_inset 
-
-
-\family default 
-\series default 
-, the move command is 
-\family sans 
-\series bold 
-
-\begin_inset Quotes eld
-\end_inset 
-
-mv
-\begin_inset Quotes erd
-\end_inset 
-
-
-\family default 
-\series default 
-.
- To print the current working directory, type 
-\family sans 
-\series bold 
-
-\begin_inset Quotes eld
-\end_inset 
-
-pwd
-\begin_inset Quotes erd
-\end_inset 
-
-
-\family default 
-\series default 
-.
- To make a directory, use 
-\family sans 
-\series bold 
-
-\begin_inset Quotes eld
-\end_inset 
-
-mkdir
-\begin_inset Quotes erd
-\end_inset 
-
-
-\family default 
-\series default 
-.
-\layout Standard
-
-There are some basic differences between Unix and Windows file systems you
- should understand.
- When you type in directory paths, Unix and the Cygwin bash prompt uses
- forward slashes '/' between directories while Windows traditionally uses
- '
-\backslash 
-' backward slashes.
- So when you work at the Cygwin bash prompt, you will need to use the forward
- '/' slashes.
- Unix does not have a concept of drive letters, such as 
-\begin_inset Quotes eld
-\end_inset 
-
-c:
-\begin_inset Quotes eld
-\end_inset 
-
-, instead all files systems attach and appear as directories.
-\layout Subsubsection
-
-Running SDCC as Native Compiled Executables
-\layout Standard
-
-If you use the pre-compiled binaries, the install directories for the libraries
- and header files may need to be specified on the sdcc command line like
- this: 
-\family sans 
-\series bold 
-"sdcc -L c:
-\backslash 
-usr
-\backslash 
-local
-\backslash 
-sdcc
-\backslash 
-lib
-\backslash 
-small -I c:
-\backslash 
-usr
-\backslash 
-local
-\backslash 
-sdcc
-\backslash 
-include test.c"
-\family default 
-\series default 
- if you are running outside of a Unix bash shell.
-\layout Standard
-
-If you have successfully installed and compiled SDCC with the Cygwin package,
- it is possible to compile into native .exe files by using the additional
- makefiles included for this purpose.
- For example, with the Borland 32-bit compiler you would run 
-\family sans 
-\series bold 
-"make -f Makefile.bcc"
-\family default 
-\series default 
-.
- A command line version of the Borland 32-bit compiler can be downloaded
- from the Inprise web site.
-\layout Subsection
-
-SDCC on Other Platforms
-\layout Itemize
-
-
-\series bold 
-FreeBSD and other non-GNU Unixes 
-\series default 
-- Make sure the GNU make is installed as the default make tool.
-\layout Itemize
-
-SDCC has been ported to run under a variety of operating systems and processors.
- If you can run GNU GCC/make then chances are good SDCC can be compiled
- and run on your system.
+ On most systems you will need super-user privilages to do this.
 \layout Subsection
 
 Advanced Install Options
@@ -1213,7 +1187,7 @@ s51 - The ucSim 8051 simulator.
 sdcdb - The source debugger.
 \layout Itemize
 
-packihx - A tool to pack Intel hex files.
+packihx - A tool to pack (compress) Intel hex files.
 \layout Standard
 
 In <installdir>/share/sdcc/include
@@ -1246,7 +1220,7 @@ This is the actual compiler, it in turn uses the c-preprocessor and invokes
  the assembler and linkage editor.
 \layout Subsubsection
 
-sdcpp (C-Preprocessor)
+sdcpp - The C-Preprocessor)
 \layout Standard
 
 The preprocessor is a modified version of the GNU preprocessor.
@@ -1254,8 +1228,8 @@ The preprocessor is a modified version of the GNU preprocessor.
  statements, #defines and so on.
 \layout Subsubsection
 
-asx8051, as-z80, as-gbz80, aslink, link-z80, link-gbz80 (The Assemblers
- and Linkage Editors)
+asx8051, as-z80, as-gbz80, aslink, link-z80, link-gbz80 - The Assemblers
+ and Linkage Editors
 \layout Standard
 
 This is retargettable assembler & linkage editor, it was developed by Alan
@@ -1264,7 +1238,7 @@ This is retargettable assembler & linkage editor, it was developed by Alan
  enhancements and bug fixes for it to work properly with the SDCC.
 \layout Subsubsection
 
-s51 - Simulator
+s51 - The Simulator
 \layout Standard
 
 S51 is a freeware, opensource simulator developed by Daniel Drotos (
@@ -1279,12 +1253,24 @@ S51 is a freeware, opensource simulator developed by Daniel Drotos (
 
 \end_inset 
 
- .
+.
+ It currently support the core mcs51, the Dallas DS80C390 and the Philips
+ XA51 family.
 \layout Subsubsection
 
 sdcdb - Source Level Debugger
 \layout Standard
 
+
+\family typewriter 
+\shape italic 
+<todo: is this thing alive?>
+\newline 
+
+\newline 
+
+\family default 
+\shape default 
 Sdcdb is the companion source level debugger.
  The current version of the debugger uses Daniel's Simulator S51, but can
  be easily changed to use other simulators.
@@ -1549,7 +1535,7 @@ Processor Selection Options
 \series bold 
 -mavr
 \series default 
- Generate code for the Atmel AVR processor(In development, not complete).
+ Generate code for the Atmel AVR processor (In development, not complete).
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -1557,7 +1543,7 @@ Processor Selection Options
 \series bold 
 -mpic14
 \series default 
- Generate code for the PIC 14-bit processors(In development, not complete).
+ Generate code for the PIC 14-bit processors (In development, not complete).
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -1565,7 +1551,16 @@ Processor Selection Options
 \series bold 
 -mtlcs900h
 \series default 
- Generate code for the Toshiba TLCS-900H processor(In development, not complete).
+ Generate code for the Toshiba TLCS-900H processor (In development, not
+ complete).
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-mxa51
+\series default 
+ Generate code for the Philips XA51 processor (In development, not complete).
 \layout Subsubsection
 
 Preprocessor Options
@@ -1764,15 +1759,6 @@ Linker Options
  --stack-loc 0x20 or --stack-loc 32.
  If all four register banks are used the stack will be placed after the
  data segment (equivalent to --stack-after-data)
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---stack-after-data
-\series default 
- This option will cause the stack to be located in the internal ram after
- the data segment.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -1987,6 +1973,15 @@ NOJTBOUND can be
  
 \size default 
 Will not do loop reversal optimization.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--no-xinit-opt
+\series default 
+ This will disable the memcpy of initialized data in far space from code
+ space
 \layout Subsubsection
 
 Other Options
@@ -2491,11 +2486,8 @@ Pointers
 
 SDCC allows (via language extensions) pointers to explicitly point to any
  of the memory spaces of the 8051.
- In addition to the explicit pointers, the compiler also allows a 
-\emph on 
-_generic
-\emph default 
- class of pointers which can be used to point to any of the memory spaces.
+ In addition to the explicit pointers, the compiler uses (by default) generic
+ pointers which can be used to point to any of the memory spaces.
 \newline 
 
 \newline 
@@ -2543,49 +2535,12 @@ Well you get the idea.
 \newline 
 
 \newline 
-
-\emph on 
-For compatibility with the previous version of the compiler, the following
- syntax for pointer declaration is still supported but will disappear int
- the near future.
- 
-\newline 
-
-\newline 
-
-\family typewriter 
-unsigned char _xdata *ucxdp; /* pointer to data in external ram */ 
-\newline 
-unsigned char _data \SpecialChar ~
-*ucdp ; /* pointer to data in internal ram */ 
-\newline 
-unsigned char _code \SpecialChar ~
-*uccp ; /* pointer to data in R/O code space */
-\newline 
-unsigned char _idata *uccp; \SpecialChar ~
-/* pointer to upper 128 bytes of ram */
-\family default 
-\size small 
-\emph default 
-
-\newline 
-
-\newline 
-
-\size default 
 All unqualified pointers are treated as 3-byte (4-byte for the ds390) 
 \emph on 
 generic
 \emph default 
  pointers.
- These type of pointers can also to be explicitly declared.
-\newline 
-
-\newline 
-
-\family typewriter 
-unsigned char _generic *ucgp;
-\family default 
+ 
 \size small 
 
 \newline 
@@ -2607,8 +2562,6 @@ generic
  These are useful for developing reusable library routines.
  Explicitly specifying the pointer type will generate the most efficient
  code.
- Pointers declared using a mixture of OLD and NEW style could have unpredictable
- results.
 \layout Subsection
 
 Parameters & Local Variables
@@ -2617,19 +2570,20 @@ Parameters & Local Variables
 Automatic (local) variables and parameters to functions can either be placed
  on the stack or in data-space.
  The default action of the compiler is to place these variables in the internal
- RAM (for small model) or external RAM (for Large model).
+ RAM (for small model) or external RAM (for large model).
  This in fact makes them 
 \emph on 
 static
 \emph default 
  so by default functions are non-reentrant.
-\layout Standard
+\newline 
 
+\newline 
 They can be placed on the stack either by using the
 \emph on 
  --stack-auto
 \emph default 
- compiler option or by using the 
+ option or by using the 
 \emph on 
 reentrant
 \emph default 
@@ -2734,7 +2688,7 @@ bvar
 \emph on 
 reentrant
 \emph default 
- this can only be done for static variables.
+ this should only be done for static variables.
 \layout Standard
 
 Parameters however are not allowed any storage class, (storage classes for
@@ -2920,13 +2874,13 @@ Interrupt Numbers and the corresponding address & descriptions for the Standard
 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="6" columns="3">
-<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
-<row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<lyxtabular version="3" rows="6" columns="3">
+<features>
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -2934,7 +2888,7 @@ Interrupt Numbers and the corresponding address & descriptions for the Standard
 Interrupt #
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -2942,7 +2896,7 @@ Interrupt #
 Description
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -2951,8 +2905,8 @@ Vector Address
 \end_inset 
 </cell>
 </row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -2960,7 +2914,7 @@ Vector Address
 0
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -2968,7 +2922,7 @@ Vector Address
 External 0
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -2977,8 +2931,8 @@ External 0
 \end_inset 
 </cell>
 </row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -2986,7 +2940,7 @@ External 0
 1
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -2994,7 +2948,7 @@ External 0
 Timer 0
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -3003,8 +2957,8 @@ Timer 0
 \end_inset 
 </cell>
 </row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -3012,7 +2966,7 @@ Timer 0
 2
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -3020,7 +2974,7 @@ Timer 0
 External 1
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -3029,8 +2983,8 @@ External 1
 \end_inset 
 </cell>
 </row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -3038,7 +2992,7 @@ External 1
 3
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -3046,7 +3000,7 @@ External 1
 Timer 1
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -3055,8 +3009,8 @@ Timer 1
 \end_inset 
 </cell>
 </row>
-<row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -3064,7 +3018,7 @@ Timer 1
 4
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -3072,7 +3026,7 @@ Timer 1
 Serial
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -3123,6 +3077,14 @@ Also see the _naked modifier.
 Critical Functions
 \layout Standard
 
+
+\shape italic 
+<TODO: this isn't implemented at all!>
+\shape default 
+
+\newline 
+
+\newline 
 A special keyword may be associated with a function declaring it as 
 \emph on 
 critical
@@ -3461,7 +3423,9 @@ using
 non-interrupt
 \emph default 
  function (but may occasionally be useful anyway
-\begin_float footnote 
+\begin_inset Foot
+collapsed true
+
 \layout Standard
 
 possible exception: if a function is called ONLY from 'interrupt' functions
@@ -3471,7 +3435,8 @@ possible exception: if a function is called ONLY from 'interrupt' functions
  call memcpy(), it might make sense to create a specialized version of memcpy()
  'using 1', since this would prevent the ISR from having to save bank zero
  to the stack on entry and switch to bank zero before calling the function
-\end_float 
+\end_inset 
+
 ).
 \newline 
 
@@ -5601,1032 +5566,15 @@ The compiler will generate a warning message when extra space is allocated.
 <pending: this is messy and incomplete>
 \emph default 
  Library Routines
-\layout Standard
+\layout Enumerate
 
-The following library routines are provided for your convenience.
-\layout Standard
+Compiler support routines (_gptrget, _mulint etc)
+\layout Enumerate
 
-stdio.h - Contains the following functions printf & sprintf these routines
- are developed by Martijn van Balen <balen@natlab.research.philips.com>.
- 
-\layout Standard
+Stdclib functions (puts, printf, strcat etc)
+\layout Enumerate
 
-%[flags][width][b|B|l|L]type
-\layout Standard
-
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- flags: -\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- left justify output in specified field width 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- +\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- prefix output with +/- sign if output is signed type 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- space\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- prefix output with a blank if it's a signed positive value 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- width:\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- specifies minimum number of characters outputted for numbers 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- or strings.
- 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- - For numbers, spaces are added on the left when needed.
- 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- If width starts with a zero character, zeroes and used 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- instead of spaces.
- 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- - For strings, spaces are are added on the left or right (when 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- flag '-' is used) when needed.
- 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- b/B:\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- byte argument (used by d, u, o, x, X) 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- l/L:\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- long argument (used by d, u, o, x, X)
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- type:\SpecialChar ~
- d\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- decimal number 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- u\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- unsigned decimal number 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- o\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- unsigned octal number 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- x\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- unsigned hexadecimal number (0-9, a-f) 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- X\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- unsigned hexadecimal number (0-9, A-F) 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- c\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- character 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- s\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- string (generic pointer) 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- p\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- generic pointer (I:data/idata, C:code, X:xdata, P:paged) 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- f\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- float (still to be implemented)
-\layout Standard
-
-Also contains a very simple version of printf (printf_small).
- This simplified version of printf supports only the following formats.
-\layout Standard
-
-format\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-output\SpecialChar ~
-type\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-argument-type 
-\newline 
-%d \SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-decimal \SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- short/int 
-\newline 
-%ld\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-decimal\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-long 
-\newline 
-%hd\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-decimal\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-char 
-\newline 
-%x\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-hexadecimal\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-short/int 
-\newline 
-%lx\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-hexadecimal\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-long 
-\newline 
-%hx\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-hexadecimal\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-char 
-\newline 
-%o\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-octal\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-short/int 
-\newline 
-%lo\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-octal\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-long 
-\newline 
-%ho\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-octal\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-char 
-\newline 
-%c\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-character\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-char 
-\newline 
-%s\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-character\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-_generic pointer
-\layout Standard
-
-The routine is very stack intesive, --stack-after-data parameter should
- be used when using this routine, the routine also takes about 1K of code
- space.
- It also expects an external function named putchar(char) to be present
- (this can be changed).
- When using the %s format the string / pointer should be cast to a generic
- pointer.
- eg.
-\layout Standard
-
-printf_small(
-\begin_inset Quotes eld
-\end_inset 
-
-my str %s, my int %d
-\backslash 
-n
-\begin_inset Quotes erd
-\end_inset 
-
-,(char _generic *)mystr,myint);
-\layout Itemize
-
-stdarg.h - contains definition for the following macros to be used for variable
- parameter list, note that a function can have a variable parameter list
- if and only if it is 'reentrant'
-\begin_deeper 
-\layout Standard
-
-va_list, va_start, va_arg, va_end.
-\end_deeper 
-\layout Itemize
-
-setjmp.h - contains defintion for ANSI setjmp & longjmp routines.
- Note in this case setjmp & longjmp can be used between functions executing
- within the same register bank, if long jmp is executed from a function
- that is using a different register bank from the function issuing the setjmp
- function, the results may be unpredictable.
- The jump buffer requires 3 bytes of data (the stack pointer & a 16 byte
- return address), and can be placed in any address space.
-\layout Itemize
-
-stdlib.h - contains the following functions.
-\begin_deeper 
-\layout Standard
-
-atoi, atol.
-\end_deeper 
-\layout Itemize
-
-string.h - contains the following functions.
-\begin_deeper 
-\layout Standard
-
-strcpy, strncpy, strcat, strncat, strcmp, strncmp, strchr, strrchr, strspn,
- strcspn, strpbrk, strstr, strlen, strtok, memcpy, memcmp, memset.
-\end_deeper 
-\layout Itemize
-
-ctype.h - contains the following routines.
-\begin_deeper 
-\layout Standard
-
-iscntrl, isdigit, isgraph, islower, isupper, isprint, ispunct, isspace,
- isxdigit, isalnum, isalpha.
-\end_deeper 
-\layout Itemize
-
-malloc.h - The malloc routines are developed by Dmitry S.
- Obukhov (dso@usa.net).
- These routines will allocate memory from the external ram.
- Here is a description on how to use them (as described by the author).
-\begin_deeper 
-\layout Standard
-
-//Example: 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- //\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- #define DYNAMIC_MEMORY_SIZE 0x2000 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- //\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- .....
- 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- //\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- unsigned char xdata dynamic_memory_pool[DYNAMIC_MEMORY_SIZE]; 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- //\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- unsigned char xdata * current_buffer; 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- //\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- .....
- 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- //\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- void main(void) 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- //\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- { 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- //\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- ...
- 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-//\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- init_dynamic_memory(dynamic_memory_pool,DYNAMIC_MEMORY_SIZE); 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- //\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- //Now it's possible to use malloc.
- 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- //\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- ...
- 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- //\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- current_buffer = malloc(0x100); 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- //
-\end_deeper 
-\layout Itemize
-
-serial.h - Serial IO routines are also developed by Dmitry S.
- Obukhov (dso@usa.net).
- These routines are interrupt driven with a 256 byte circular buffer, they
- also expect external ram to be present.
- Please see documentation in file SDCCDIR/sdcc51lib/serial.c.
- Note the header file 
-\begin_inset Quotes eld
-\end_inset 
-
-serial.h
-\begin_inset Quotes erd
-\end_inset 
-
- MUST be included in the file containing the 'main' function.
-\layout Itemize
-
-ser.h - Alternate serial routine provided by Wolfgang Esslinger <wolfgang@WiredMi
-nds.com> these routines are more compact and faster.
- Please see documentation in file SDCCDIR/sdcc51lib/ser.c
-\layout Itemize
-
-ser_ir.h - Another alternate set of serial routines provided by Josef Wolf
- <jw@raven.inka.de>, these routines do not use the external ram.
-\layout Itemize
-
-reg51.h - contains register definitions for a standard 8051
-\layout Itemize
-
-float.h - contains min, max and other floating point related stuff.
-\layout Standard
-
-All library routines are compiled as --model-small, they are all non-reentrant,
- if you plan to use the large model or want to make these routines reentrant,
- then they will have to be recompiled with the appropriate compiler option.
-\layout Standard
-
-Have not had time to do the more involved routines like printf, will get
- to them shortly.
+Math functions (sin, pow, sqrt etc)
 \layout Subsection
 
 Interfacing with Assembly Routines
@@ -7264,8 +6212,8 @@ foobar(unsigned int p1, unsigned char ch)
 \newline 
 For the modulus operation the variable ch will be promoted to unsigned int
  first then the modulus operation will be performed (this will lead to a
- call to support routine _muduint()), and the result will be casted to an
- int.
+ call to support routine _moduint()), and the result will be casted to a
+ char.
  If the code is changed to 
 \newline 
 

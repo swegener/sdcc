@@ -8236,10 +8236,18 @@ static void genCast (iCode *ic)
     /* now depending on the sign of the source && destination */
     size = AOP_SIZE(result) - AOP_SIZE(right);
     /* if unsigned or not an integral type */
-    if (SPEC_USIGN(rtype) || !IS_SPEC(rtype)) {
+    /* also, if the source is a bit, we don't need to sign extend, because
+     * it can't possibly have set the sign bit.
+     */
+    if (SPEC_USIGN(rtype) || !IS_SPEC(rtype) || AOP_TYPE(right) == AOP_CRY) 
+    {
         while (size--)
+        {
             aopPut(AOP(result),zero,offset++);
-    } else {
+        }
+    } 
+    else 
+    {
         /* we need to extend the sign :{ */
         char *l = aopGet(AOP(right),AOP_SIZE(right) - 1,
                          FALSE,FALSE,TRUE);

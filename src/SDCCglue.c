@@ -848,12 +848,11 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
     }
 
     for (iloop=ilist->init.deep; iloop; iloop=iloop->next) {
-      printIval (sym, type->next, iloop, oFile);
-      
       if ((++size > DCL_ELEM(type)) && DCL_ELEM(type)) {
         werrorfl (sym->fileDef, sym->lineDef, W_EXCESS_INITIALIZERS, "array", sym->name);
         break;
       }
+      printIval (sym, type->next, iloop, oFile);
     }
   }
   

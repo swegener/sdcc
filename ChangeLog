@@ -1,3 +1,13 @@
+2004-07-11 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCglue.c (printIvalArray): fixed bug #984229, thanks to Phuah
+          Yee Keat for the patch
+        * src/SDCCast.c (decorateType): fixed bug #979599
+        * src/ds390/gen.h: removed local fReturnSizeDS390
+        * src/ds390/gen.c: made fReturnSizeDS390 signed short to remove a warning
+        * src/ds390/gen.c (genAnd, genOr, genXor),
+        * src/mcs51/gen.c (genAnd, genOr, genXor): generate better optimized code
+
 2004-07-04 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/SDCCmain.c (linkEdit): modifications only for pic16 port,

@@ -2566,12 +2566,6 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               return decorateType (otree, RESULT_CHECK);
           }
 
-          TTYPE (tree) = computeType (LTYPE (tree),
-                                      RTYPE (tree),
-                                      resultType,
-                                      tree->opval.op);
-          TETYPE (tree) = getSpec (TTYPE (tree));
-
           /* if left is a literal exchange left & right */
           if (IS_LITERAL (LTYPE (tree)))
             {
@@ -2581,7 +2575,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
             }
 
           /* if right is a literal and */
-          /* we can find a 2nd literal in a and-tree then */
+          /* we can find a 2nd literal in an and-tree then */
           /* rearrange the tree */
           if (IS_LITERAL (RTYPE (tree)))
             {
@@ -2593,13 +2587,28 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                   ast *tTree = litTree->left;
                   litTree->left = tree->right;
                   tree->right = tTree;
-                  /* both operands in tTree are literal now */
+                  /* both operands in litTree are literal now */
                   decorateType (parent, resultType);
                 }
             }
 
           LRVAL (tree) = RRVAL (tree) = 1;
           
+          /* AND is signless so make signedness of literal equal */
+          /* to signedness of left for better optimized code */
+          if (IS_LITERAL (RTYPE (tree)) &&
+              (getSize(LTYPE(tree)) == getSize(RTYPE(tree))) &&
+              (SPEC_USIGN(LTYPE(tree)) != SPEC_USIGN(RTYPE(tree))) )
+            {
+              SPEC_USIGN(RTYPE(tree)) = SPEC_USIGN(LTYPE(tree));
+            }
+
+          TTYPE (tree) = computeType (LTYPE (tree),
+                                      RTYPE (tree),
+                                      resultType,
+                                      tree->opval.op);
+          TETYPE (tree) = getSpec (TTYPE (tree));
+
           return tree;
         }
 
@@ -2709,7 +2718,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         }
 
       /* if right is a literal and */
-      /* we can find a 2nd literal in a or-tree then */
+      /* we can find a 2nd literal in an or-tree then */
       /* rearrange the tree */
       if (IS_LITERAL (RTYPE (tree)))
         {
@@ -2743,8 +2752,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           goto errorTreeReturn;
         }
 
-      /* if they are both literal then */
-      /* rewrite the tree */
+      /* if they are both literal then rewrite the tree */
       if (IS_LITERAL (RTYPE (tree)) && IS_LITERAL (LTYPE (tree)))
         {
           tree->type = EX_VALUE;
@@ -2784,12 +2792,22 @@ decorateType (ast * tree, RESULT_TYPE resultType)
             }
         }
 
+      /* OR/XOR are signless so make signedness of literal equal */
+      /* to signedness of left for better optimized code */
+      if (IS_LITERAL (RTYPE (tree)) &&
+          (getSize(LTYPE(tree)) == getSize(RTYPE(tree))) &&
+          (SPEC_USIGN(LTYPE(tree)) != SPEC_USIGN(RTYPE(tree))) )
+        {
+          SPEC_USIGN(RTYPE(tree)) = SPEC_USIGN(LTYPE(tree));
+        }
+
       LRVAL (tree) = RRVAL (tree) = 1;
-      TETYPE (tree) = getSpec (TTYPE (tree) =
-                               computeType (LTYPE (tree),
-                                            RTYPE (tree),
-                                            resultType,
-                                            tree->opval.op));
+
+      TTYPE (tree) = computeType (LTYPE (tree),
+                                  RTYPE (tree),
+                                  resultType,
+                                  tree->opval.op);
+      TETYPE (tree) = getSpec (TTYPE (tree));
 
       return tree;
 

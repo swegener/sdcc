@@ -2052,6 +2052,9 @@ decorateType (ast * tree)
 	      return decorateType (otree);
 	  }
 
+#if 0 
+	  // we can't do this because of "(int & 0xff) << 3"
+
 	  /* if right or left is literal then result of that type */
 	  if (IS_LITERAL (RTYPE (tree)))
 	    {
@@ -2076,6 +2079,11 @@ decorateType (ast * tree)
 		  TETYPE (tree) = getSpec (TTYPE (tree));
 		}
 	    }
+#else
+	  TTYPE (tree) =
+	    computeType (LTYPE (tree), RTYPE (tree));
+	  TETYPE (tree) = getSpec (TTYPE (tree));
+#endif
 	  LRVAL (tree) = RRVAL (tree) = 1;
 	  return tree;
 	}

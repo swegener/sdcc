@@ -778,13 +778,14 @@ aopGetUsesAcc (asmop *aop, int offset)
   if (offset > (aop->size - 1))
     return FALSE;
 
-  switch (aop->type) 
+  switch (aop->type)
     {
 
     case AOP_R0:
     case AOP_R1:
       if (aop->paged)
 	return TRUE;
+      return FALSE;
     case AOP_DPTR:
       return TRUE;
     case AOP_IMMD:

@@ -1,3 +1,6 @@
+2002-12-28  Bernhard Held <bernhard@bernhardheld.de>
+	* src/mcs51/gen.c (aopGetUsesAcc): inserted missing "return FALSE"
+
 2002-12-27  Bernhard Held <bernhard@bernhardheld.de>
         * as/mcs51/Makefile.in: fixed typo lkomf51.o -> lkaomf51.o
 

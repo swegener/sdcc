@@ -1,3 +1,7 @@
+2001-09-04  Paul Stoffregen  <paul@pjrc.com>
+
+	* pragma noinduction broke memcpy on mcs51 large model.  Moved it inside z80 optimization
+
 2001-09-03  Michael Hope  <michaelh@juju.net.nz>
 
 	* link/z80/aslink.h: Fixed path for PATH_MAX

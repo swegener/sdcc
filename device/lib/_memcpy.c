@@ -28,8 +28,6 @@
 
 #define NULL (void *)0
 
-#pragma NOINDUCTION
-
 void _generic * memcpy (
 	void _generic * dst,
 	void _generic * src,
@@ -37,6 +35,9 @@ void _generic * memcpy (
 	) 
 {
 #if _SDCC_Z80_STYLE_LIB_OPT
+
+#pragma NOINDUCTION
+
 	char _generic * d = dst;
 	char _generic * s = src;
 	int count = -acount;

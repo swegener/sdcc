@@ -1,3 +1,12 @@
+2004-02-08 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* device/include/c8051f120.h,
+	* device/include/c8051f300.h,
+	* device/include/c8051f310.h: added/updated header files for Silicon
+	Laboratories (formerly Cygnal) CPUs. Contributed by Maarten Brock.
+	* doc/sdccman.lyx: minor changes, recommended diff -Naur and diff -u
+	in new section Submitting patches
+
 2004-02-08 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/mcs51/gen.c (genNearPointerGet, genPagedPointerGet,

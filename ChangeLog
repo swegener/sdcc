@@ -1,3 +1,10 @@
+2004-03-22 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCast.c (processParms): fixed bug #920866; decorateType() can
+	return an optimized tree; actually replace actParm with the new tree
+	* src/SDCCast.h: added some parantheses to remove side effects
+	* support/regression/tests/bug-920866.c
+
 2004-03-21  Scott Dattalo  <scott AT dattalo.com>
 	* src/pic/gen.c, src/pic/gen.h, src/pic/genarith.c, src/pic/pcode.c:
 	Bit operands were not being handled properly in the pic14 port.
@@ -96,7 +103,7 @@
 	reported by Adam Wozniak in Sdcc-user list
 
 2004-03-10 Bernhard Held <bernhard AT bernhardheld.de>
-	
+
 	* src/SDCCast.c (decorateType): fixed with bug and promotion in
 	arithmetic optimizations, added debug output
 

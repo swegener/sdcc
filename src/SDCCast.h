@@ -111,7 +111,7 @@ ast;
 
 
 /* easy access macros   */
-#define  IS_AST_OP(x)			(x && x->type == EX_OP)
+#define  IS_AST_OP(x)			((x) && (x)->type == EX_OP)
 #define IS_CALLOP(x)   (IS_AST_OP(x) && x->opval.op == CALL)
 #define IS_BITOR(x) (IS_AST_OP(x) && x->opval.op == '|')
 #define IS_BITAND(x) (IS_AST_OP(x) && x->opval.op == '&' && \
@@ -119,7 +119,7 @@ ast;
 #define IS_FOR_STMT(x) (IS_AST_OP(x) && x->opval.op == FOR)
 #define IS_LEFT_OP(x) (IS_AST_OP(x) && x->opval.op == LEFT_OP)
 #define IS_RIGHT_OP(x) (IS_AST_OP(x) && x->opval.op == RIGHT_OP)
-#define  IS_AST_VALUE(x)	(x && x->type == EX_VALUE && x->opval.val)
+#define  IS_AST_VALUE(x)	((x) && (x)->type == EX_VALUE && (x)->opval.val)
 #define  IS_AST_LINK(x)		(x->type == EX_LINK)
 #define  IS_AST_NOT_OPER(x)	(x && IS_AST_OP(x) && x->opval.op == '!')
 #define  IS_ARRAY_OP(x) (IS_AST_OP(x) && x->opval.op == '[')
@@ -130,14 +130,14 @@ ast;
 				   x->opval.op == GE_OP	||		\
 				   x->opval.op == EQ_OP	||		\
 				   x->opval.op == NE_OP	))
-#define IS_CAST_OP(x) (IS_AST_OP(x) && x->opval.op == CAST)
+#define IS_CAST_OP(x) (IS_AST_OP(x) && (x)->opval.op == CAST)
 #define IS_TERNARY_OP(x) (IS_AST_OP(x) && x->opval.op == '?')
 #define IS_COLON_OP(x) (IS_AST_OP(x) && x->opval.op == ':')
 #define IS_ADDRESS_OF_OP(x)    (IS_AST_OP(x)            &&              \
 				x->opval.op == '&'      &&              \
 				x->right == NULL )
 #define IS_AST_LIT_VALUE(x) (IS_AST_VALUE(x) && \
-                             IS_LITERAL(x->opval.val->etype))
+                             IS_LITERAL((x)->opval.val->etype))
 #define IS_AST_SYM_VALUE(x)     (IS_AST_VALUE(x) && x->opval.val->sym)
 #define AST_LIT_VALUE(x)        (floatFromVal(x->opval.val))
 #define AST_SYMBOL(x)           (x->opval.val->sym)

@@ -649,7 +649,7 @@ reverseParms (ast * ptree)
 static int
 processParms (ast *func,
 	      value *defParm,
-	      ast *actParm,
+	      ast **actParm,
 	      int *parmNumber, /* unused, although updated */
 	      bool rightmost)
 {
@@ -657,7 +657,7 @@ processParms (ast *func,
   sym_link *functype;
   
   /* if none of them exist */
-  if (!defParm && !actParm)
+  if (!defParm && !*actParm)
     return 0;
 
   if (defParm)
@@ -687,27 +687,27 @@ processParms (ast *func,
 
   /* if defined parameters ended but actual parameters */
   /* exist and this is not defined as a variable arg   */
-  if (!defParm && actParm && !IFFUNC_HASVARARGS(functype))
+  if (!defParm && *actParm && !IFFUNC_HASVARARGS(functype))
     {
       werror (E_TOO_MANY_PARMS);
       return 1;
     }
 
   /* if defined parameters present but no actual parameters */
-  if (defParm && !actParm)
+  if (defParm && !*actParm)
     {
       werror (E_TOO_FEW_PARMS);
       return 1;
     }
 
   /* if this is a PARAM node then match left & right */
-  if (actParm->type == EX_OP && actParm->opval.op == PARAM)
+  if ((*actParm)->type == EX_OP && (*actParm)->opval.op == PARAM)
     {
-      actParm->decorated = 1;
+      (*actParm)->decorated = 1;
       return (processParms (func, defParm,
-			    actParm->left,  parmNumber, FALSE) ||
+			    &(*actParm)->left,  parmNumber, FALSE) ||
 	      processParms (func, defParm ? defParm->next : NULL,
-			    actParm->right, parmNumber, rightmost));
+			    &(*actParm)->right, parmNumber, rightmost));
     }
   else if (defParm) /* not vararg */
     {
@@ -727,28 +727,28 @@ processParms (ast *func,
   /* decorate parameter */
   resultType = defParm ? getResultTypeFromType (defParm->etype) :
                          RESULT_TYPE_NONE;
-  actParm = decorateType (actParm, resultType);
+  *actParm = decorateType (*actParm, resultType);
 
-  if (IS_VOID(actParm->ftype))
+  if (IS_VOID((*actParm)->ftype))
     {
       werror (E_VOID_VALUE_USED);
       return 1;
     }
 
   /* If this is a varargs function... */
-  if (!defParm && actParm && IFFUNC_HASVARARGS(functype))
+  if (!defParm && *actParm && IFFUNC_HASVARARGS(functype))
     {
       ast *newType = NULL;
       sym_link *ftype;
 
-      if (IS_CAST_OP (actParm)
-	  || (IS_AST_LIT_VALUE (actParm) && actParm->values.literalFromCast))
+      if (IS_CAST_OP (*actParm)
+	  || (IS_AST_LIT_VALUE (*actParm) && (*actParm)->values.literalFromCast))
 	{
 	  /* Parameter was explicitly typecast; don't touch it. */
 	  return 0;
 	}
 
-      ftype = actParm->ftype;
+      ftype = (*actParm)->ftype;
 
       /* If it's a char, upcast to int. */
       if (IS_INTEGRAL (ftype)
@@ -772,55 +772,55 @@ processParms (ast *func,
       if (newType)
 	{
 	  /* cast required; change this op to a cast. */
-	  ast *parmCopy = resolveSymbols (copyAst (actParm));
+	  ast *parmCopy = resolveSymbols (copyAst (*actParm));
 
-	  actParm->type = EX_OP;
-	  actParm->opval.op = CAST;
-	  actParm->left = newType;
-	  actParm->right = parmCopy;
-	  actParm->decorated = 0; /* force typechecking */
-	  decorateType (actParm, RESULT_TYPE_NONE);
+	  (*actParm)->type = EX_OP;
+	  (*actParm)->opval.op = CAST;
+	  (*actParm)->left = newType;
+	  (*actParm)->right = parmCopy;
+	  (*actParm)->decorated = 0; /* force typechecking */
+	  decorateType (*actParm, RESULT_TYPE_NONE);
 	}
       return 0;
     } /* vararg */
 
   /* if defined parameters ended but actual has not & */
   /* reentrant */
-  if (!defParm && actParm &&
+  if (!defParm && *actParm &&
       (options.stackAuto || IFFUNC_ISREENT (functype)))
     return 0;
 
-  resolveSymbols (actParm);
+  resolveSymbols (*actParm);
   
   /* the parameter type must be at least castable */
-  if (compareType (defParm->type, actParm->ftype) == 0)
+  if (compareType (defParm->type, (*actParm)->ftype) == 0)
     {
       werror (E_INCOMPAT_TYPES);
-      printFromToType (actParm->ftype, defParm->type);
+      printFromToType ((*actParm)->ftype, defParm->type);
       return 1;
     }
 
   /* if the parameter is castable then add the cast */
-  if (compareType (defParm->type, actParm->ftype) < 0)
+  if (compareType (defParm->type, (*actParm)->ftype) < 0)
     {
       ast *pTree;
 
       resultType = getResultTypeFromType (defParm->etype);
-      pTree = resolveSymbols (copyAst (actParm));
+      pTree = resolveSymbols (copyAst (*actParm));
       
       /* now change the current one to a cast */
-      actParm->type = EX_OP;
-      actParm->opval.op = CAST;
-      actParm->left = newAst_LINK (defParm->type);
-      actParm->right = pTree;
-      actParm->decorated = 0; /* force typechecking */
-      decorateType (actParm, resultType);
+      (*actParm)->type = EX_OP;
+      (*actParm)->opval.op = CAST;
+      (*actParm)->left = newAst_LINK (defParm->type);
+      (*actParm)->right = pTree;
+      (*actParm)->decorated = 0; /* force typechecking */
+      decorateType (*actParm, resultType);
     }
 
   /* make a copy and change the regparm type to the defined parm */
-  actParm->etype = getSpec (actParm->ftype = copyLinkChain (actParm->ftype));
-  SPEC_REGPARM (actParm->etype) = SPEC_REGPARM (defParm->etype);
-  SPEC_ARGREG  (actParm->etype) = SPEC_ARGREG (defParm->etype);
+  (*actParm)->etype = getSpec ((*actParm)->ftype = copyLinkChain ((*actParm)->ftype));
+  SPEC_REGPARM ((*actParm)->etype) = SPEC_REGPARM (defParm->etype);
+  SPEC_ARGREG  ((*actParm)->etype) = SPEC_ARGREG (defParm->etype);
   (*parmNumber)++;
   return 0;
 }
@@ -4128,7 +4128,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	  functype = LTYPE (tree);
 
 	if (processParms (tree->left, FUNC_ARGS(functype),
-			  tree->right, &parmNumber, TRUE)) {
+			  &tree->right, &parmNumber, TRUE)) {
 	  goto errorTreeReturn;
         }
 

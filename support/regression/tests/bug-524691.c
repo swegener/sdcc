@@ -19,6 +19,7 @@ static HeapEntryState *_getHeapEntryState(void *p, HeapEntryState *pStates, UINT
       int iDiff;
 
       uMiddle = (uLeft + uRight)/2;
+      /* A divide by zero is added just before iDiff is assigned */
       iDiff = pStates[uMiddle].pBase - p;
 
       if (iDiff > 0)
@@ -36,4 +37,18 @@ static HeapEntryState *_getHeapEntryState(void *p, HeapEntryState *pStates, UINT
     }
 
   return NULL;
+}
+
+void
+testDivByZero(void)
+{
+  HeapEntryState aStates[] = {
+    { (void *)1, 0 }
+  };
+  void *p = (void *)0x1234;
+
+  ASSERT(_getHeapEntryState(p, aStates, 1) == NULL);
+
+  aStates[0].pBase = p;
+  ASSERT(_getHeapEntryState(p, aStates, 1) == aStates + 0);
 }

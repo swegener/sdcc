@@ -2,6 +2,9 @@
  */
 #include <testfwk.h>
 
+#if 0
+/* Disabled as this only shows a warning */
+
 typedef unsigned short UINT16;
 typedef unsigned char UINT8;
 
@@ -24,3 +27,4 @@ const Class Bar = {
 void foo(void)
 {
 }
+#endif

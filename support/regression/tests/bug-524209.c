@@ -22,7 +22,7 @@ typedef struct _StringBuffer
 
 void _scan(StringBuffer *pSB)
 {
-  UNUSED(*pSB);
+  UNUSED(pSB);
 }
 
 void checkCast(void *pIn)

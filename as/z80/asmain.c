@@ -160,6 +160,21 @@ main(int argc, char **argv)
 	register int c, i;
 	struct area *ap;
 
+	/* Check to make sure there are the right number of filenames */
+	/* before openning any of them */
+#ifdef SDK
+	inpfil = -2;
+#else /* SDK */
+	inpfil = -1;
+#endif /* SDK */
+	for (i=1; i<argc; ++i) {
+		p = argv[i];
+		if (*p != '-')
+			inpfil++;
+	}
+	if (inpfil < 0)
+		usage();
+
 #ifdef SDK
 	inpfil = -2;
 #else /* SDK */

@@ -1,6 +1,7 @@
 2003-09-06  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 	* src/z80/gen.c (aopPut, spillPairReg): fixed bug #800998
 	* src/z80/gen.c (genFunction, genEndFunction): fixed "bug" #774700
+	* as/z80/asmain.c (main): fixed bug #801766
 
 2003-09-06  Bernhard Held <bernhard@bernhardheld.de>
 

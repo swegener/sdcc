@@ -946,6 +946,12 @@ valUnaryPM (value * val)
     }
   // -(unsigned 3) now really is signed
   SPEC_USIGN(val->etype)=0;
+  // -(unsigned char)135 now really is an int
+  if (SPEC_NOUN(val->etype) == V_CHAR) {
+    if (SPEC_CVAL(val->etype).v_int < -128) {
+      SPEC_NOUN(val->etype) = V_INT;
+    }
+  }
   return val;
 }
 

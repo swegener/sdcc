@@ -1,0 +1,143 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:30 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module _memset
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl _memset_PARM_3
+                             11 	.globl _memset_PARM_2
+                             12 	.globl _memset
+                             13 ;--------------------------------------------------------
+                             14 ; special function registers
+                             15 ;--------------------------------------------------------
+                             16 ;--------------------------------------------------------
+                             17 ; special function bits 
+                             18 ;--------------------------------------------------------
+                             19 ;--------------------------------------------------------
+                             20 ; internal ram data
+                             21 ;--------------------------------------------------------
+                             22 	.area	DSEG    (DATA)
+                             23 ;--------------------------------------------------------
+                             24 ; overlayable items in internal ram 
+                             25 ;--------------------------------------------------------
+                             26 	.area	OSEG	(OVR,DATA)
+                             27 ;--------------------------------------------------------
+                             28 ; indirectly addressable internal ram data
+                             29 ;--------------------------------------------------------
+                             30 	.area	ISEG    (DATA)
+                             31 ;--------------------------------------------------------
+                             32 ; bit data
+                             33 ;--------------------------------------------------------
+                             34 	.area	BSEG    (BIT)
+                             35 ;--------------------------------------------------------
+                             36 ; external ram data
+                             37 ;--------------------------------------------------------
+                             38 	.area	XSEG    (XDATA)
+   0000                      39 _memset_PARM_2:
+   0000                      40 	.ds	0x0001
+   0001                      41 _memset_PARM_3:
+   0001                      42 	.ds	0x0002
+   0003                      43 _memset_buf_1_1:
+   0003                      44 	.ds	0x0003
+                             45 ;--------------------------------------------------------
+                             46 ; global & static initialisations
+                             47 ;--------------------------------------------------------
+                             48 	.area GSINIT (CODE)
+                             49 ;--------------------------------------------------------
+                             50 ; code
+                             51 ;--------------------------------------------------------
+                             52 	.area CSEG (CODE)
+                    0000     53 	G$memset$0$0 ==.
+                             54 ;	_memset.c 27
+                             55 ;	-----------------------------------------
+                             56 ;	 function memset
+                             57 ;	-----------------------------------------
+   0000                      58 _memset:
+                    0002     59 	ar2 = 0x02
+                    0003     60 	ar3 = 0x03
+                    0004     61 	ar4 = 0x04
+                    0005     62 	ar5 = 0x05
+                    0006     63 	ar6 = 0x06
+                    0007     64 	ar7 = 0x07
+                    0000     65 	ar0 = 0x00
+                    0001     66 	ar1 = 0x01
+                             67 ;	_memset.c 40
+   0000 C0 F0                68 	push	b
+   0002 C0 83                69 	push	dph
+   0004 C0 82                70 	push	dpl
+   0006 90s00r03             71 	mov	dptr,#_memset_buf_1_1
+   0009 D0 E0                72 	pop	acc
+   000B F0                   73 	movx	@dptr,a
+   000C D0 E0                74 	pop	acc
+   000E A3                   75 	inc	dptr
+   000F F0                   76 	movx	@dptr,a
+   0010 D0 E0                77 	pop	acc
+   0012 A3                   78 	inc	dptr
+   0013 F0                   79 	movx	@dptr,a
+                             80 ;	_memset.c 33
+   0014 90s00r03             81 	mov	dptr,#_memset_buf_1_1
+   0017 E0                   82 	movx	a,@dptr
+   0018 FA                   83 	mov	r2,a
+   0019 A3                   84 	inc	dptr
+   001A E0                   85 	movx	a,@dptr
+   001B FB                   86 	mov	r3,a
+   001C A3                   87 	inc	dptr
+   001D E0                   88 	movx	a,@dptr
+   001E FC                   89 	mov	r4,a
+                             90 ;	_memset.c 35
+   001F 90s00r00             91 	mov	dptr,#_memset_PARM_2
+   0022 E0                   92 	movx	a,@dptr
+   0023 FD                   93 	mov	r5,a
+   0024 90s00r01             94 	mov	dptr,#_memset_PARM_3
+   0027 E0                   95 	movx	a,@dptr
+   0028 FE                   96 	mov	r6,a
+   0029 A3                   97 	inc	dptr
+   002A E0                   98 	movx	a,@dptr
+   002B FF                   99 	mov	r7,a
+   002C                     100 00101$:
+   002C 8E 00               101 	mov	ar0,r6
+   002E 8F 01               102 	mov	ar1,r7
+   0030 1E                  103 	dec	r6
+   0031 BE FF 01            104 	cjne	r6,#0xff,00108$
+   0034 1F                  105 	dec	r7
+   0035                     106 00108$:
+   0035 E8                  107 	mov	a,r0
+   0036 49                  108 	orl	a,r1
+                            109 ; Peephole 110   removed ljmp by inverse jump logic
+   0037 60 11               110 	jz  00103$
+   0039                     111 00109$:
+                            112 ;	_memset.c 36
+   0039 8A 82               113 	mov	dpl,r2
+   003B 8B 83               114 	mov	dph,r3
+   003D 8C F0               115 	mov	b,r4
+   003F ED                  116 	mov	a,r5
+   0040 12s00r00            117 	lcall	__gptrput
+                            118 ;	_memset.c 37
+   0043 0A                  119 	inc	r2
+   0044 BA 00 01            120 	cjne	r2,#0x00,00110$
+   0047 0B                  121 	inc	r3
+   0048                     122 00110$:
+                            123 ; Peephole 132   changed ljmp to sjmp
+   0048 80 E2               124 	sjmp 00101$
+   004A                     125 00103$:
+                            126 ;	_memset.c 40
+   004A 90s00r03            127 	mov	dptr,#_memset_buf_1_1
+   004D E0                  128 	movx	a,@dptr
+   004E FA                  129 	mov	r2,a
+   004F A3                  130 	inc	dptr
+   0050 E0                  131 	movx	a,@dptr
+   0051 FB                  132 	mov	r3,a
+   0052 A3                  133 	inc	dptr
+   0053 E0                  134 	movx	a,@dptr
+   0054 FC                  135 	mov	r4,a
+   0055 8A 82               136 	mov	dpl,r2
+   0057 8B 83               137 	mov	dph,r3
+   0059 8C F0               138 	mov	b,r4
+   005B                     139 00104$:
+                    005B    140 	C$_memset.c$41$1$1 ==.
+                    005B    141 	XG$memset$0$0 ==.
+   005B 22                  142 	ret
+                            143 	.area	CSEG    (CODE)

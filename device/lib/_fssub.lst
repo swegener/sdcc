@@ -1,0 +1,289 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:28 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module _fssub
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl ___fssub_PARM_2
+                             11 	.globl ___fssub
+                             12 ;--------------------------------------------------------
+                             13 ; special function registers
+                             14 ;--------------------------------------------------------
+                             15 ;--------------------------------------------------------
+                             16 ; special function bits 
+                             17 ;--------------------------------------------------------
+                             18 ;--------------------------------------------------------
+                             19 ; internal ram data
+                             20 ;--------------------------------------------------------
+                             21 	.area	DSEG    (DATA)
+                             22 ;--------------------------------------------------------
+                             23 ; overlayable items in internal ram 
+                             24 ;--------------------------------------------------------
+                             25 	.area	OSEG	(OVR,DATA)
+                             26 ;--------------------------------------------------------
+                             27 ; indirectly addressable internal ram data
+                             28 ;--------------------------------------------------------
+                             29 	.area	ISEG    (DATA)
+                             30 ;--------------------------------------------------------
+                             31 ; bit data
+                             32 ;--------------------------------------------------------
+                             33 	.area	BSEG    (BIT)
+                             34 ;--------------------------------------------------------
+                             35 ; external ram data
+                             36 ;--------------------------------------------------------
+                             37 	.area	XSEG    (XDATA)
+   0000                      38 ___fssub_PARM_2:
+   0000                      39 	.ds	0x0004
+   0004                      40 ___fssub_a1_1_1:
+   0004                      41 	.ds	0x0004
+   0008                      42 ___fssub_fl1_1_1:
+   0008                      43 	.ds	0x0004
+   000C                      44 ___fssub_fl2_1_1:
+   000C                      45 	.ds	0x0004
+                             46 ;--------------------------------------------------------
+                             47 ; global & static initialisations
+                             48 ;--------------------------------------------------------
+                             49 	.area GSINIT (CODE)
+                             50 ;--------------------------------------------------------
+                             51 ; code
+                             52 ;--------------------------------------------------------
+                             53 	.area CSEG (CODE)
+                    0000     54 	G$__fssub$0$0 ==.
+                             55 ;	_fssub.c 81
+                             56 ;	-----------------------------------------
+                             57 ;	 function __fssub
+                             58 ;	-----------------------------------------
+   0000                      59 ___fssub:
+                    0002     60 	ar2 = 0x02
+                    0003     61 	ar3 = 0x03
+                    0004     62 	ar4 = 0x04
+                    0005     63 	ar5 = 0x05
+                    0006     64 	ar6 = 0x06
+                    0007     65 	ar7 = 0x07
+                    0000     66 	ar0 = 0x00
+                    0001     67 	ar1 = 0x01
+                             68 ;	_fssub.c 96
+   0000 C0 E0                69 	push	acc
+   0002 C0 F0                70 	push	b
+   0004 C0 83                71 	push	dph
+   0006 C0 82                72 	push	dpl
+   0008 90s00r04             73 	mov	dptr,#___fssub_a1_1_1
+   000B D0 E0                74 	pop	acc
+   000D F0                   75 	movx	@dptr,a
+   000E D0 E0                76 	pop	acc
+   0010 A3                   77 	inc	dptr
+   0011 F0                   78 	movx	@dptr,a
+   0012 D0 E0                79 	pop	acc
+   0014 A3                   80 	inc	dptr
+   0015 F0                   81 	movx	@dptr,a
+   0016 D0 E0                82 	pop	acc
+   0018 A3                   83 	inc	dptr
+   0019 F0                   84 	movx	@dptr,a
+                             85 ;	_fssub.c 85
+   001A 90s00r04             86 	mov	dptr,#___fssub_a1_1_1
+   001D E0                   87 	movx	a,@dptr
+   001E FA                   88 	mov	r2,a
+   001F A3                   89 	inc	dptr
+   0020 E0                   90 	movx	a,@dptr
+   0021 FB                   91 	mov	r3,a
+   0022 A3                   92 	inc	dptr
+   0023 E0                   93 	movx	a,@dptr
+   0024 FC                   94 	mov	r4,a
+   0025 A3                   95 	inc	dptr
+   0026 E0                   96 	movx	a,@dptr
+   0027 FD                   97 	mov	r5,a
+   0028 90s00r08             98 	mov	dptr,#(___fssub_fl1_1_1)
+   002B EA                   99 	mov	a,r2
+   002C F0                  100 	movx	@dptr,a
+   002D A3                  101 	inc	dptr
+   002E EB                  102 	mov	a,r3
+   002F F0                  103 	movx	@dptr,a
+   0030 A3                  104 	inc	dptr
+   0031 EC                  105 	mov	a,r4
+   0032 F0                  106 	movx	@dptr,a
+   0033 A3                  107 	inc	dptr
+   0034 ED                  108 	mov	a,r5
+   0035 F0                  109 	movx	@dptr,a
+                            110 ;	_fssub.c 86
+   0036 90s00r00            111 	mov	dptr,#___fssub_PARM_2
+   0039 E0                  112 	movx	a,@dptr
+   003A FA                  113 	mov	r2,a
+   003B A3                  114 	inc	dptr
+   003C E0                  115 	movx	a,@dptr
+   003D FB                  116 	mov	r3,a
+   003E A3                  117 	inc	dptr
+   003F E0                  118 	movx	a,@dptr
+   0040 FC                  119 	mov	r4,a
+   0041 A3                  120 	inc	dptr
+   0042 E0                  121 	movx	a,@dptr
+   0043 FD                  122 	mov	r5,a
+   0044 90s00r0C            123 	mov	dptr,#(___fssub_fl2_1_1)
+   0047 EA                  124 	mov	a,r2
+   0048 F0                  125 	movx	@dptr,a
+   0049 A3                  126 	inc	dptr
+   004A EB                  127 	mov	a,r3
+   004B F0                  128 	movx	@dptr,a
+   004C A3                  129 	inc	dptr
+   004D EC                  130 	mov	a,r4
+   004E F0                  131 	movx	@dptr,a
+   004F A3                  132 	inc	dptr
+   0050 ED                  133 	mov	a,r5
+   0051 F0                  134 	movx	@dptr,a
+                            135 ;	_fssub.c 89
+   0052 90s00r0C            136 	mov	dptr,#(___fssub_fl2_1_1)
+   0055 E0                  137 	movx	a,@dptr
+   0056 FA                  138 	mov	r2,a
+   0057 A3                  139 	inc	dptr
+   0058 E0                  140 	movx	a,@dptr
+   0059 FB                  141 	mov	r3,a
+   005A A3                  142 	inc	dptr
+   005B E0                  143 	movx	a,@dptr
+   005C FC                  144 	mov	r4,a
+   005D A3                  145 	inc	dptr
+   005E E0                  146 	movx	a,@dptr
+   005F FD                  147 	mov	r5,a
+   0060 EA                  148 	mov	a,r2
+   0061 4B                  149 	orl	a,r3
+   0062 4C                  150 	orl	a,r4
+   0063 4D                  151 	orl	a,r5
+                            152 ; Peephole 109   removed ljmp by inverse jump logic
+   0064 70 17               153 	jnz  00102$
+   0066                     154 00109$:
+                            155 ;	_fssub.c 90
+   0066 90s00r08            156 	mov	dptr,#(___fssub_fl1_1_1)
+   0069 E0                  157 	movx	a,@dptr
+   006A FA                  158 	mov	r2,a
+   006B A3                  159 	inc	dptr
+   006C E0                  160 	movx	a,@dptr
+   006D FB                  161 	mov	r3,a
+   006E A3                  162 	inc	dptr
+   006F E0                  163 	movx	a,@dptr
+   0070 FC                  164 	mov	r4,a
+   0071 A3                  165 	inc	dptr
+   0072 E0                  166 	movx	a,@dptr
+                            167 ; Peephole 191   removed redundant mov
+   0073 FD                  168 	mov  r5,a
+   0074 8A 82               169 	mov  dpl,r2
+   0076 8B 83               170 	mov  dph,r3
+   0078 8C F0               171 	mov  b,r4
+   007A 02s00rFE            172 	ljmp	00105$
+   007D                     173 00102$:
+                            174 ;	_fssub.c 91
+   007D 90s00r08            175 	mov	dptr,#(___fssub_fl1_1_1)
+   0080 E0                  176 	movx	a,@dptr
+   0081 FA                  177 	mov	r2,a
+   0082 A3                  178 	inc	dptr
+   0083 E0                  179 	movx	a,@dptr
+   0084 FB                  180 	mov	r3,a
+   0085 A3                  181 	inc	dptr
+   0086 E0                  182 	movx	a,@dptr
+   0087 FC                  183 	mov	r4,a
+   0088 A3                  184 	inc	dptr
+   0089 E0                  185 	movx	a,@dptr
+   008A FD                  186 	mov	r5,a
+   008B EA                  187 	mov	a,r2
+   008C 4B                  188 	orl	a,r3
+   008D 4C                  189 	orl	a,r4
+   008E 4D                  190 	orl	a,r5
+                            191 ; Peephole 109   removed ljmp by inverse jump logic
+   008F 70 1A               192 	jnz  00104$
+   0091                     193 00110$:
+                            194 ;	_fssub.c 92
+   0091 90s00r0C            195 	mov	dptr,#(___fssub_fl2_1_1)
+   0094 E0                  196 	movx	a,@dptr
+   0095 FA                  197 	mov	r2,a
+   0096 A3                  198 	inc	dptr
+   0097 E0                  199 	movx	a,@dptr
+   0098 FB                  200 	mov	r3,a
+   0099 A3                  201 	inc	dptr
+   009A E0                  202 	movx	a,@dptr
+   009B FC                  203 	mov	r4,a
+   009C A3                  204 	inc	dptr
+   009D E0                  205 	movx	a,@dptr
+                            206 ; Peephole 105   removed redundant mov
+   009E FD                  207 	mov  r5,a
+   009F B2 E7               208 	cpl	acc.7
+                            209 ; Peephole 191   removed redundant mov
+   00A1 FD                  210 	mov  r5,a
+   00A2 8A 82               211 	mov  dpl,r2
+   00A4 8B 83               212 	mov  dph,r3
+   00A6 8C F0               213 	mov  b,r4
+   00A8 02s00rFE            214 	ljmp	00105$
+   00AB                     215 00104$:
+                            216 ;	_fssub.c 95
+   00AB 90s00r0C            217 	mov	dptr,#(___fssub_fl2_1_1)
+   00AE E0                  218 	movx	a,@dptr
+   00AF FA                  219 	mov	r2,a
+   00B0 A3                  220 	inc	dptr
+   00B1 E0                  221 	movx	a,@dptr
+   00B2 FB                  222 	mov	r3,a
+   00B3 A3                  223 	inc	dptr
+   00B4 E0                  224 	movx	a,@dptr
+   00B5 FC                  225 	mov	r4,a
+   00B6 A3                  226 	inc	dptr
+   00B7 E0                  227 	movx	a,@dptr
+   00B8 FD                  228 	mov	r5,a
+   00B9 63 05 80            229 	xrl	ar5,#0x80
+   00BC 90s00r0C            230 	mov	dptr,#(___fssub_fl2_1_1)
+   00BF EA                  231 	mov	a,r2
+   00C0 F0                  232 	movx	@dptr,a
+   00C1 A3                  233 	inc	dptr
+   00C2 EB                  234 	mov	a,r3
+   00C3 F0                  235 	movx	@dptr,a
+   00C4 A3                  236 	inc	dptr
+   00C5 EC                  237 	mov	a,r4
+   00C6 F0                  238 	movx	@dptr,a
+   00C7 A3                  239 	inc	dptr
+   00C8 ED                  240 	mov	a,r5
+   00C9 F0                  241 	movx	@dptr,a
+                            242 ;	_fssub.c 96
+   00CA 90s00r08            243 	mov	dptr,#(___fssub_fl1_1_1)
+   00CD E0                  244 	movx	a,@dptr
+   00CE FA                  245 	mov	r2,a
+   00CF A3                  246 	inc	dptr
+   00D0 E0                  247 	movx	a,@dptr
+   00D1 FB                  248 	mov	r3,a
+   00D2 A3                  249 	inc	dptr
+   00D3 E0                  250 	movx	a,@dptr
+   00D4 FC                  251 	mov	r4,a
+   00D5 A3                  252 	inc	dptr
+   00D6 E0                  253 	movx	a,@dptr
+   00D7 FD                  254 	mov	r5,a
+   00D8 90s00r0C            255 	mov	dptr,#(___fssub_fl2_1_1)
+   00DB E0                  256 	movx	a,@dptr
+   00DC FE                  257 	mov	r6,a
+   00DD A3                  258 	inc	dptr
+   00DE E0                  259 	movx	a,@dptr
+   00DF FF                  260 	mov	r7,a
+   00E0 A3                  261 	inc	dptr
+   00E1 E0                  262 	movx	a,@dptr
+   00E2 F8                  263 	mov	r0,a
+   00E3 A3                  264 	inc	dptr
+   00E4 E0                  265 	movx	a,@dptr
+   00E5 F9                  266 	mov	r1,a
+   00E6 90s00r00            267 	mov	dptr,#___fsadd_PARM_2
+   00E9 EE                  268 	mov	a,r6
+   00EA F0                  269 	movx	@dptr,a
+   00EB A3                  270 	inc	dptr
+   00EC EF                  271 	mov	a,r7
+   00ED F0                  272 	movx	@dptr,a
+   00EE A3                  273 	inc	dptr
+   00EF E8                  274 	mov	a,r0
+   00F0 F0                  275 	movx	@dptr,a
+   00F1 A3                  276 	inc	dptr
+   00F2 E9                  277 	mov	a,r1
+   00F3 F0                  278 	movx	@dptr,a
+   00F4 8A 82               279 	mov	dpl,r2
+   00F6 8B 83               280 	mov	dph,r3
+   00F8 8C F0               281 	mov	b,r4
+   00FA ED                  282 	mov	a,r5
+   00FB 12s00r00            283 	lcall	___fsadd
+                    00FE    284 	C$_fssub.c$97$1$1 ==.
+                    00FE    285 	XG$__fssub$0$0 ==.
+                            286 ; Peephole 156   removed misc moves via dph, dpl, b, a before return
+   00FE                     287 00105$:
+   00FE 22                  288 	ret
+                            289 	.area	CSEG    (CODE)

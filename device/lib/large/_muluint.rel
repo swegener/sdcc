@@ -1,0 +1,105 @@
+;!FILE _muluint.asm
+XH
+H 8 areas 3D global symbols
+M _muluint
+A _CODE size 0 flags 0
+A DSEG size 0 flags 0
+A OSEG size 0 flags 4
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 6 flags 40
+S __muluint_PARM_2 Def0000
+A GSINIT size 0 flags 20
+A CSEG size 54 flags 20
+S A$_muluint$91 Def0023
+S A$_muluint$82 Def0016
+S A$_muluint$73 Def000C
+S A$_muluint$92 Def0024
+S A$_muluint$83 Def0017
+S A$_muluint$74 Def000D
+S A$_muluint$93 Def0025
+S A$_muluint$84 Def0018
+S A$_muluint$94 Def0026
+S A$_muluint$85 Def001A
+S A$_muluint$67 Def0000
+S A$_muluint$86 Def001B
+S A$_muluint$68 Def0002
+S A$_muluint$96 Def0027
+S A$_muluint$87 Def001C
+S A$_muluint$78 Def000E
+S A$_muluint$69 Def0004
+S A$_muluint$97 Def002A
+S A$_muluint$88 Def001D
+S A$_muluint$79 Def0011
+S A$_muluint$98 Def002B
+S A$_muluint$89 Def001F
+S A$_muluint$99 Def002C
+S __muluint Def0000
+S XG$_muluint$0$0 Def0053
+S G$_muluint$0$0 Def0000
+S A$_muluint$100 Def002F
+S A$_muluint$110 Def003D
+S A$_muluint$101 Def0030
+S A$_muluint$111 Def003E
+S A$_muluint$102 Def0031
+S A$_muluint$121 Def0047
+S A$_muluint$103 Def0033
+S A$_muluint$122 Def004A
+S A$_muluint$113 Def003F
+S A$_muluint$104 Def0034
+S A$_muluint$132 Def0053
+S A$_muluint$123 Def004B
+S A$_muluint$114 Def0040
+S A$_muluint$105 Def0035
+S A$_muluint$124 Def004C
+S A$_muluint$115 Def0041
+S A$_muluint$106 Def0036
+S A$_muluint$125 Def004D
+S A$_muluint$107 Def0039
+S A$_muluint$126 Def004E
+S A$_muluint$117 Def0042
+S A$_muluint$108 Def003A
+S A$_muluint$127 Def004F
+S A$_muluint$118 Def0043
+S A$_muluint$109 Def003B
+S A$_muluint$128 Def0051
+S A$_muluint$119 Def0046
+S C$_muluint.c$52$1$1 Def0053
+S A$_muluint$70 Def0007
+S A$_muluint$80 Def0012
+S A$_muluint$71 Def0009
+S A$_muluint$90 Def0022
+S A$_muluint$81 Def0013
+S A$_muluint$72 Def000A
+T 00 00
+R 00 00 00 05
+T 00 00
+R 00 00 00 05
+T 00 02
+R 00 00 00 05
+T 00 02
+R 00 00 00 05
+T 00 04
+R 00 00 00 05
+T 00 04
+R 00 00 00 05
+T 00 00
+R 00 00 00 07
+T 00 00 C0 83 C0 82 90 00 02 D0 E0 F0 D0 E0 A3 F0
+R 00 00 00 07 00 07 00 05
+T 00 0E 90 00 02 E0 FA 90 00 00 E0 FB 8B F0 EA A4
+R 00 00 00 07 00 03 00 05 00 08 00 05
+T 00 1C FC AD F0 90 00 04 EC F0 A3 ED F0 90 00 05
+R 00 00 00 07 00 06 00 05 00 0E 00 05
+T 00 2A E0 FC 90 00 01 E0 FD 8D F0 EA A4 FA 90
+R 00 00 00 07 00 05 00 05
+T 00 37 00 03 E0 FD 8B F0 ED A4 FB 2A 2C FC 90
+R 00 00 00 07 00 02 00 05
+T 00 44 00 05 F0 90 00 04 E0 FA A3 E0 FB 8A 82 8B
+R 00 00 00 07 00 02 00 05 00 06 00 05
+T 00 52 83
+R 00 00 00 07
+T 00 53
+R 00 00 00 07
+T 00 53 22
+R 00 00 00 07

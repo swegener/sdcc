@@ -1,0 +1,114 @@
+CC=gcc
+LEX=flex
+YACC=bison
+STD_LIB_PATH='"$(SDCCDIR)/sdcc51lib"'
+SDCC_INCLUDE_DIR='"$(SDCCDIR)/sdcc51inc"'
+GC_DIR=$(SDCCDIR)/gc
+LIBSDIRS=-DSTD_LIB_PATH=$(STD_LIB_PATH) -DSTD_LIB='"$(STD_LIB)"' 
+LIBSDIRS += -DSTD_INT_LIB='"$(STD_INT_LIB)"' -DSTD_LONG_LIB='"$(STD_LONG_LIB)"' 
+LIBSDIRS += -DSTD_FP_LIB='"$(STD_FP_LIB)"' -DSDCC_INCLUDE_DIR=$(SDCC_INCLUDE_DIR)
+CFLAGS=-Wall -ggdb -O2 
+#if compiling under linux then uncomment the following line	
+#LDFLAGS += -Wl,-defsym,_DYNAMIC=0
+TARGETS=$(SDCCDIR)/bin/sdcc
+ALLOBJECTS= SDCCy.o SDCClex.o SDCCerr.o SDCChasht.o SDCCmain.o SDCCsymt.o SDCCopt.o 
+ALLOBJECTS += SDCCast.o SDCCmem.o SDCCval.o SDCCralloc.o SDCCicode.o SDCCbitv.o SDCCset.o 
+ALLOBJECTS += SDCClabel.o SDCCBBlock.o SDCCloop.o SDCCcse.o SDCCcflow.o SDCCdflow.o 
+ALLOBJECTS += SDCClrange.o SDCCptropt.o SDCCgen51.o SDCCpeeph.o SDCCglue.o
+
+ALLHEADERS=SDCCopt.h SDCCast.h SDCChasht.h SDCCval.h  Makefile SDCCerr.h 
+ALLHEADERS += SDCCglobl.h SDCCmem.h SDCCsymt.h SDCCicode.h SDCCbitv.h SDCCset.h 
+ALLHEADERS += SDCClabel.h SDCCBBlock.h SDCCloop.h SDCCcse.h SDCCcflow.h SDCCdflow.h 
+ALLHEADERS += SDCClrange.h SDCCralloc.h SDCCptropt.h 
+
+all:: $(TARGETS)
+
+clean::
+	rm *.o SDCCy.c SDCCy.h SDCClex.c SDCCy.output SDCCpeeph.rul
+
+SDCCy.c   : SDCC.y
+	$(YACC) -d -v -o SDCCy.c SDCC.y
+
+SDCClex.o : SDCClex.c $(ALLHEADERS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCClex.o SDCClex.c
+
+SDCClex.c : SDCC.lex SDCCy.h
+	$(LEX) -f -oSDCClex.c SDCC.lex
+
+SDCCast.o : SDCCast.c $(ALLHEADERS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCCast.o SDCCast.c
+
+SDCCmem.o : SDCCmem.c $(ALLHEADERS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCCmem.o SDCCmem.c
+
+SDCCval.o : SDCCval.c $(ALLHEADERS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCCval.o SDCCval.c
+
+SDCCralloc.o : SDCCralloc.c $(ALLHEADERS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCCralloc.o SDCCralloc.c
+
+SDCCicode.o : SDCCicode.c $(ALLHEADERS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCCicode.o SDCCicode.c
+
+SDCCerr.o : SDCCerr.c $(ALLHEADERS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCCerr.o SDCCerr.c
+
+SDCChasht.o : SDCChasht.c $(ALLHEADERS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCChasht.o SDCChasht.c
+
+SDCCmain.o : SDCCmain.c $(ALLHEADERS) 
+	$(CC) $(CFLAGS) $(LDFLAGS) $(LIBSDIRS) -c -o SDCCmain.o SDCCmain.c
+
+SDCCsymt.o : SDCCsymt.c $(ALLHEADERS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCCsymt.o SDCCsymt.c
+
+SDCCy.o : SDCCy.c $(ALLHEADERS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCCy.o SDCCy.c
+
+SDCCopt.o : SDCCopt.c $(ALLHEADERS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCCopt.o SDCCopt.c
+
+SDCCbitv.o : SDCCbitv.c $(ALLHEADERS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCCbitv.o SDCCbitv.c
+
+SDCCset.o : SDCCset.c $(ALLHEADERS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCCset.o SDCCset.c
+
+SDCClabel.o : SDCClabel.c $(ALLHEADERS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCClabel.o SDCClabel.c
+
+SDCCBBlock.o : SDCCBBlock.c $(ALLHEADERS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCCBBlock.o SDCCBBlock.c
+
+SDCCloop.o : SDCCloop.c $(ALLHEADERS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCCloop.o SDCCloop.c
+
+SDCCcse.o : SDCCcse.c $(ALLHEADERS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCCcse.o SDCCcse.c
+
+SDCCcflow.o : SDCCcflow.c $(ALLHEADERS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCCcflow.o SDCCcflow.c
+
+SDCCdflow.o : SDCCdflow.c $(ALLHEADERS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCCdflow.o SDCCdflow.c
+
+SDCClrange.o : SDCClrange.c $(ALLHEADERS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCClrange.o SDCClrange.c
+
+SDCCptropt.o : SDCCptropt.c $(ALLHEADERS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCCptropt.o SDCCptropt.c
+
+SDCCgen51.o : SDCCgen51.c $(ALLHEADERS) SDCCgen51.h SDCCpeeph.h
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCCgen51.o SDCCgen51.c
+
+SDCCpeeph.rul : SDCCpeeph.def
+	awk -f SDCCpeeph.awk SDCCpeeph.def > SDCCpeeph.rul
+
+SDCCpeeph.o : SDCCpeeph.c SDCCpeeph.h SDCChasht.h SDCCglobl.h Makefile SDCCpeeph.rul
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCCpeeph.o SDCCpeeph.c
+
+SDCCglue.o : SDCCglue.c $(ALLHEADERS) SDCCglue.h Makefile
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o SDCCglue.o SDCCglue.c
+
+$(TARGETS): $(ALLOBJECTS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(LDXFLAGS) -o $@ $(ALLOBJECTS) $(GC_DIR)/gc.a 

@@ -1,0 +1,487 @@
+;!FILE malloc.asm
+XH
+H 9 areas 13E global symbols
+M malloc
+A _CODE size 0 flags 0
+A DSEG size 2 flags 0
+S Fmalloc$FIRST_MEMORY_HEADER_PTR$0$0 Def0000
+A _DUMMY size 0 flags 0
+A OSEG size 0 flags 4
+S _init_dynamic_memory_PARM_2 Def0000
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 0 flags 40
+A GSINIT size 0 flags 20
+A CSEG size 1B3 flags 20
+S A$malloc$483 Def01AF
+S A$malloc$474 Def01A7
+S A$malloc$465 Def019F
+S A$malloc$447 Def018D
+S A$malloc$438 Def0181
+S A$malloc$384 Def0151
+S A$malloc$375 Def0148
+S A$malloc$357 Def0134
+S A$malloc$348 Def012A
+S A$malloc$339 Def011F
+S A$malloc$294 Def00EC
+S A$malloc$285 Def00DF
+S A$malloc$276 Def00D8
+S A$malloc$267 Def00CD
+S A$malloc$249 Def00B8
+S A$malloc$186 Def006F
+S A$malloc$177 Def0066
+S A$malloc$484 Def01B0
+S A$malloc$475 Def01A8
+S A$malloc$466 Def01A0
+S A$malloc$457 Def0195
+S A$malloc$448 Def018E
+S A$malloc$439 Def0183
+S A$malloc$385 Def0152
+S A$malloc$376 Def0149
+S A$malloc$367 Def013D
+S A$malloc$358 Def0135
+S A$malloc$349 Def012B
+S A$malloc$295 Def00ED
+S A$malloc$286 Def00E1
+S A$malloc$259 Def00C2
+S A$malloc$196 Def0079
+S A$malloc$187 Def0070
+S A$malloc$178 Def0067
+S _free Def0159
+S A$malloc$485 Def01B1
+S A$malloc$467 Def01A1
+S A$malloc$458 Def0197
+S A$malloc$449 Def018F
+S A$malloc$386 Def0153
+S A$malloc$377 Def014A
+S A$malloc$368 Def013F
+S A$malloc$359 Def0136
+S A$malloc$287 Def00E3
+S A$malloc$269 Def00CE
+S A$malloc$197 Def007B
+S A$malloc$179 Def0069
+S A$malloc$477 Def01AA
+S A$malloc$468 Def01A2
+S A$malloc$459 Def0198
+S A$malloc$387 Def0154
+S A$malloc$378 Def014C
+S A$malloc$369 Def0140
+S A$malloc$297 Def00EE
+S A$malloc$288 Def00E5
+S A$malloc$279 Def00DB
+S A$malloc$198 Def007D
+S A$malloc$189 Def0071
+S A$malloc$478 Def01AB
+S A$malloc$388 Def0156
+S A$malloc$298 Def00EF
+S A$malloc$289 Def00E6
+S A$malloc$479 Def01AC
+S A$malloc$299 Def00F0
+S A$malloc$489 Def01B2
+S C$malloc.c$64$1$1 Def0057
+S A$malloc$80 Def0004
+S A$malloc$81 Def0005
+S A$malloc$91 Def000D
+S A$malloc$92 Def000F
+S A$malloc$83 Def0006
+S A$malloc$93 Def0011
+S XG$free$0$0 Def01B2
+S A$malloc$94 Def0014
+S A$malloc$86 Def0008
+S A$malloc$77 Def0000
+S _init_dynamic_memory Def0000
+S A$malloc$87 Def0009
+S A$malloc$78 Def0002
+S A$malloc$88 Def000C
+S A$malloc$98 Def0016
+S A$malloc$99 Def0018
+S G$free$0$0 Def0159
+S _malloc Def0058
+S XG$init_dynamic_memory$0$0 Def0057
+S XG$malloc$0$0 Def0158
+S G$init_dynamic_memory$0$0 Def0000
+S G$malloc$0$0 Def0058
+S C$malloc.c$102$1$1 Def0158
+S A$malloc$200 Def007F
+S A$malloc$110 Def0025
+S A$malloc$101 Def001A
+S A$malloc$300 Def00F1
+S A$malloc$210 Def008A
+S A$malloc$201 Def0080
+S A$malloc$120 Def0033
+S A$malloc$111 Def0027
+S A$malloc$102 Def001C
+S A$malloc$400 Def0159
+S A$malloc$310 Def00FD
+S A$malloc$301 Def00F3
+S A$malloc$220 Def0099
+S A$malloc$211 Def008C
+S A$malloc$202 Def0082
+S A$malloc$130 Def003C
+S A$malloc$121 Def0034
+S A$malloc$112 Def0028
+S A$malloc$103 Def001E
+S A$malloc$410 Def0165
+S A$malloc$401 Def015B
+S A$malloc$320 Def0109
+S A$malloc$302 Def00F5
+S A$malloc$230 Def00A4
+S A$malloc$221 Def009B
+S A$malloc$212 Def008D
+S A$malloc$113 Def0029
+S A$malloc$104 Def001F
+S A$malloc$420 Def0170
+S A$malloc$411 Def0167
+S A$malloc$330 Def0115
+S A$malloc$321 Def010B
+S A$malloc$312 Def00FE
+S A$malloc$240 Def00AF
+S A$malloc$231 Def00A5
+S A$malloc$222 Def009C
+S A$malloc$213 Def008F
+S A$malloc$204 Def0084
+S A$malloc$150 Def004F
+S A$malloc$141 Def0046
+S A$malloc$132 Def003D
+S A$malloc$123 Def0035
+S A$malloc$114 Def002B
+S A$malloc$105 Def0020
+S A$malloc$430 Def017B
+S A$malloc$421 Def0171
+S A$malloc$412 Def0168
+S A$malloc$403 Def015D
+S A$malloc$331 Def0116
+S A$malloc$322 Def010C
+S A$malloc$313 Def0100
+S A$malloc$250 Def00B9
+S A$malloc$241 Def00B0
+S A$malloc$223 Def009D
+S A$malloc$214 Def0090
+S A$malloc$205 Def0086
+S A$malloc$151 Def0050
+S A$malloc$142 Def0047
+S A$malloc$133 Def003F
+S A$malloc$124 Def0037
+S A$malloc$115 Def002C
+S A$malloc$106 Def0021
+S A$malloc$440 Def0184
+S A$malloc$431 Def017C
+S A$malloc$422 Def0172
+S A$malloc$413 Def0169
+S A$malloc$404 Def015E
+S A$malloc$350 Def012C
+S A$malloc$341 Def0120
+S A$malloc$314 Def0102
+S A$malloc$305 Def00F8
+S A$malloc$260 Def00C4
+S A$malloc$251 Def00BA
+S A$malloc$242 Def00B1
+S A$malloc$233 Def00A6
+S A$malloc$224 Def009E
+S A$malloc$215 Def0091
+S A$malloc$170 Def0058
+S A$malloc$152 Def0051
+S A$malloc$143 Def0048
+S A$malloc$134 Def0040
+S A$malloc$116 Def002E
+S A$malloc$107 Def0022
+S C$malloc.c$118$2$1 Def01B2
+S A$malloc$450 Def0190
+S A$malloc$441 Def0185
+S A$malloc$423 Def0173
+S A$malloc$414 Def016B
+S A$malloc$405 Def015F
+S A$malloc$360 Def0138
+S A$malloc$351 Def012D
+S A$malloc$342 Def0122
+S A$malloc$333 Def0117
+S A$malloc$324 Def010E
+S A$malloc$315 Def0104
+S A$malloc$306 Def00F9
+S A$malloc$270 Def00CF
+S A$malloc$252 Def00BB
+S A$malloc$243 Def00B2
+S A$malloc$234 Def00A7
+S A$malloc$225 Def009F
+S A$malloc$216 Def0093
+S A$malloc$180 Def006A
+S A$malloc$171 Def005B
+S A$malloc$162 Def0057
+S A$malloc$144 Def0049
+S A$malloc$117 Def0030
+S A$malloc$108 Def0023
+S A$malloc$442 Def0186
+S A$malloc$433 Def017D
+S A$malloc$424 Def0175
+S A$malloc$406 Def0161
+S A$malloc$361 Def0139
+S A$malloc$352 Def012E
+S A$malloc$334 Def0119
+S A$malloc$325 Def010F
+S A$malloc$316 Def0105
+S A$malloc$307 Def00FA
+S A$malloc$280 Def00DC
+S A$malloc$271 Def00D0
+S A$malloc$262 Def00C6
+S A$malloc$253 Def00BD
+S A$malloc$244 Def00B3
+S A$malloc$235 Def00A8
+S A$malloc$226 Def00A0
+S A$malloc$217 Def0095
+S A$malloc$181 Def006C
+S A$malloc$136 Def0042
+S A$malloc$127 Def0039
+S A$malloc$118 Def0031
+S A$malloc$109 Def0024
+S A$malloc$470 Def01A3
+S A$malloc$461 Def019A
+S A$malloc$452 Def0191
+S A$malloc$443 Def0187
+S A$malloc$425 Def0177
+S A$malloc$416 Def016C
+S A$malloc$380 Def014D
+S A$malloc$371 Def0142
+S A$malloc$362 Def013A
+S A$malloc$353 Def012F
+S A$malloc$344 Def0124
+S A$malloc$335 Def011B
+S A$malloc$326 Def0110
+S A$malloc$317 Def0106
+S A$malloc$308 Def00FB
+S A$malloc$290 Def00E7
+S A$malloc$272 Def00D2
+S A$malloc$263 Def00C8
+S A$malloc$254 Def00BE
+S A$malloc$245 Def00B4
+S A$malloc$236 Def00A9
+S A$malloc$227 Def00A1
+S A$malloc$209 Def0088
+S A$malloc$173 Def005E
+S A$malloc$155 Def0053
+S A$malloc$146 Def004A
+S A$malloc$137 Def0043
+S A$malloc$128 Def003A
+S A$malloc$119 Def0032
+S A$malloc$462 Def019B
+S A$malloc$453 Def0192
+S A$malloc$444 Def0188
+S A$malloc$426 Def0178
+S A$malloc$417 Def016E
+S A$malloc$381 Def014F
+S A$malloc$372 Def0143
+S A$malloc$363 Def013B
+S A$malloc$354 Def0131
+S A$malloc$336 Def011C
+S A$malloc$327 Def0112
+S A$malloc$318 Def0108
+S A$malloc$309 Def00FC
+S A$malloc$291 Def00E9
+S A$malloc$282 Def00DD
+S A$malloc$264 Def00CA
+S A$malloc$246 Def00B5
+S A$malloc$237 Def00AB
+S A$malloc$219 Def0097
+S A$malloc$192 Def0073
+S A$malloc$183 Def006D
+S A$malloc$174 Def0060
+S A$malloc$156 Def0054
+S A$malloc$147 Def004C
+S A$malloc$138 Def0044
+S A$malloc$129 Def003B
+S A$malloc$463 Def019C
+S A$malloc$445 Def018A
+S A$malloc$427 Def0179
+S A$malloc$418 Def016F
+S A$malloc$409 Def0164
+S A$malloc$382 Def0150
+S A$malloc$373 Def0144
+S A$malloc$364 Def013C
+S A$malloc$355 Def0132
+S A$malloc$346 Def0126
+S A$malloc$337 Def011D
+S A$malloc$328 Def0113
+S A$malloc$265 Def00CB
+S A$malloc$256 Def00C0
+S A$malloc$247 Def00B6
+S A$malloc$238 Def00AD
+S A$malloc$229 Def00A2
+S A$malloc$193 Def0076
+S A$malloc$184 Def006E
+S A$malloc$175 Def0062
+S A$malloc$157 Def0055
+S A$malloc$148 Def004D
+S A$malloc$482 Def01AE
+S A$malloc$473 Def01A5
+S A$malloc$464 Def019E
+S A$malloc$455 Def0193
+S A$malloc$446 Def018C
+S A$malloc$437 Def017F
+S A$malloc$428 Def017A
+S A$malloc$392 Def0158
+S A$malloc$374 Def0146
+S A$malloc$347 Def0128
+S A$malloc$338 Def011E
+S A$malloc$329 Def0114
+S A$malloc$293 Def00EA
+S A$malloc$275 Def00D5
+S A$malloc$266 Def00CC
+S A$malloc$248 Def00B7
+S A$malloc$239 Def00AE
+S A$malloc$176 Def0064
+S A$malloc$158 Def0056
+T 00 00
+R 00 00 00 01
+T 00 00
+R 00 00 00 01
+T 00 00
+R 00 00 00 03
+T 00 00
+R 00 00 00 03
+T 00 00
+R 00 00 00 03
+T 00 00
+R 00 00 00 03
+T 00 02
+R 00 00 00 03
+T 00 02
+R 00 00 00 03
+T 00 00
+R 00 00 00 08
+T 00 00 AA 82 AB 83 EA 4B 70 0E
+R 00 00 00 08
+T 00 08
+R 00 00 00 08
+T 00 08 0A BA 00 01 0B
+R 00 00 00 08
+T 00 0D
+R 00 00 00 08
+T 00 0D 15 00 00 74 FF B5 00 00 02 15 00 01
+R 00 00 00 08 29 03 00 03 29 08 00 03 29 0C 00 03
+T 00 16
+R 00 00 00 08
+T 00 16
+R 00 00 00 08
+T 00 16 8A 00 00 8B 00 01 AC 00 00 AD
+R 00 00 00 08 29 03 00 01 29 06 00 01 29 09 00 03
+T 00 1D 00 01 EC 2A FC ED 3B FD EC 24 FA FC ED 34
+R 00 00 00 08 29 02 00 03
+T 00 2A FF FD 8A 82 8B 83 EC F0 A3 ED F0 8C 82 8D
+R 00 00 00 08
+T 00 38 83 E4 F0 A3 F0 74 02 2A F5 82 E4 3B F5 83
+R 00 00 00 08
+T 00 46 E4 F0 A3 F0 74 04 2A F5 82 E4 3B F5 83 E4
+R 00 00 00 08
+T 00 54 F0 A3 F0
+R 00 00 00 08
+T 00 57
+R 00 00 00 08
+T 00 57 22
+R 00 00 00 08
+T 00 58
+R 00 00 00 08
+T 00 58 85 82 00 00 85 83 00 01 AC 00 00 AD
+R 00 00 00 08 29 04 00 03 29 08 00 03 29 0B 00 03
+T 00 61 00 01 7E 00 7F 00 C3 74 F9 9C 74 FF 9D E4
+R 00 00 00 08 29 02 00 03
+T 00 6E 9E E4 9F 50 06
+R 00 00 00 08
+T 00 73
+R 00 00 00 08
+T 00 73 90 00 00 02 01 58
+R 00 00 00 08 00 06 00 08
+T 00 79
+R 00 00 00 08
+T 00 79 74 06 25 00 00 F5 00 00 E4 35 00 01 F5
+R 00 00 00 08 29 05 00 03 29 08 00 03 29 0C 00 03
+T 00 83 00 01 AC 00 00 AD 00 01
+R 00 00 00 08 29 02 00 03 29 05 00 01 29 08 00 01
+T 00 88
+R 00 00 00 08
+T 00 88 8C 82 8D 83 E0 F5 00 02 A3 E0 F5 00 03 A8
+R 00 00 00 08 29 08 00 03 29 0D 00 03
+T 00 94 00 02 A9 00 03 8C 02 8D 03 C3 E8 9A F8 E9
+R 00 00 00 08 29 02 00 03 29 05 00 03
+T 00 A0 9B F9 74 04 2C FA E4 3D FB 8A 82 8B 83 E0
+R 00 00 00 08
+T 00 AE FE A3 E0 FF C3 E8 9E F8 E9 9F F9 C3 E8 95
+R 00 00 00 08
+T 00 BC 00 00 E9 95 00 01 50 19
+R 00 00 00 08 29 02 00 03 29 06 00 03
+T 00 C2
+R 00 00 00 08
+T 00 C2 AC 00 02 AD 00 03 8C 82 8D 83 E0 F8 A3 E0
+R 00 00 00 08 29 03 00 03 29 06 00 03
+T 00 CE F9 48 60 03 02 00 88
+R 00 00 00 08 00 07 00 08
+T 00 D5
+R 00 00 00 08
+T 00 D5 90 00 00 02 01 58
+R 00 00 00 08 00 06 00 08
+T 00 DB
+R 00 00 00 08
+T 00 DB EE 4F 70 19
+R 00 00 00 08
+T 00 DF
+R 00 00 00 08
+T 00 DF 8A 82 8B 83 E5 00 00 F0 A3 E5 00 01 F0 74
+R 00 00 00 08 29 07 00 03 29 0C 00 03
+T 00 EB 06 2C FA E4 3D FB 8A 82 8B 83 02 01 58
+R 00 00 00 08 00 0D 00 08
+T 00 F8
+R 00 00 00 08
+T 00 F8 EE 2C FA EF 3D FB 8A 82 8B 83 E5 00 02 F0
+R 00 00 00 08 29 0D 00 03
+T 01 05 A3 E5 00 03 F0 74 02 2A F5 82 E4 3B F5 83
+R 00 00 00 08 29 04 00 03
+T 01 12 EC F0 A3 ED F0 8C 82 8D 83 EA F0 A3 EB F0
+R 00 00 00 08
+T 01 20 E5 00 02 45 00 03 60 17
+R 00 00 00 08 29 03 00 03 29 06 00 03
+T 01 26
+R 00 00 00 08
+T 01 26 8A 82 8B 83 E0 FC A3 E0 FD 74 02 2C F5 82
+R 00 00 00 08
+T 01 34 E4 3D F5 83 EA F0 A3 EB F0
+R 00 00 00 08
+T 01 3D
+R 00 00 00 08
+T 01 3D 74 04 2A F5 82 E4 3B F5 83 E5 00 00 F0 A3
+R 00 00 00 08 29 0C 00 03
+T 01 4A E5 00 01 F0 74 06 2A FA E4 3B FB 8A 82 8B
+R 00 00 00 08 29 03 00 03
+T 01 57 83
+R 00 00 00 08
+T 01 58
+R 00 00 00 08
+T 01 58 22
+R 00 00 00 08
+T 01 59
+R 00 00 00 08
+T 01 59 AA 82 AB 83 EA 4B 70 03 02 01 B2
+R 00 00 00 08 00 0B 00 08
+T 01 64
+R 00 00 00 08
+T 01 64 EA 24 FA FA EB 34 FF FB 74 02 2A FC E4 3B
+R 00 00 00 08
+T 01 72 FD 8C 82 8D 83 E0 FC A3 E0 FD 4C 60 26
+R 00 00 00 08
+T 01 7F
+R 00 00 00 08
+T 01 7F 8A 82 8B 83 E0 FE A3 E0 FF 8C 82 8D 83 EE
+R 00 00 00 08
+T 01 8D F0 A3 EF F0 EE 4F 60 1D
+R 00 00 00 08
+T 01 95
+R 00 00 00 08
+T 01 95 74 02 2E F5 82 E4 3F F5 83 EC F0 A3 ED F0
+R 00 00 00 08
+T 01 A3 80 0D
+R 00 00 00 08
+T 01 A5
+R 00 00 00 08
+T 01 A5 74 04 2A F5 82 E4 3B F5 83 E4 F0 A3 F0
+R 00 00 00 08
+T 01 B2
+R 00 00 00 08
+T 01 B2 22
+R 00 00 00 08

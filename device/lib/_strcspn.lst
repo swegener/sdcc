@@ -1,0 +1,152 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:33 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module _strcspn
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl _strcspn_PARM_2
+                             11 	.globl _strcspn
+                             12 ;--------------------------------------------------------
+                             13 ; special function registers
+                             14 ;--------------------------------------------------------
+                             15 ;--------------------------------------------------------
+                             16 ; special function bits 
+                             17 ;--------------------------------------------------------
+                             18 ;--------------------------------------------------------
+                             19 ; internal ram data
+                             20 ;--------------------------------------------------------
+                             21 	.area	DSEG    (DATA)
+   0000                      22 _strcspn_sloc0_1_0:
+   0000                      23 	.ds	0x0003
+                             24 ;--------------------------------------------------------
+                             25 ; overlayable items in internal ram 
+                             26 ;--------------------------------------------------------
+                             27 	.area	OSEG	(OVR,DATA)
+                             28 ;--------------------------------------------------------
+                             29 ; indirectly addressable internal ram data
+                             30 ;--------------------------------------------------------
+                             31 	.area	ISEG    (DATA)
+                             32 ;--------------------------------------------------------
+                             33 ; bit data
+                             34 ;--------------------------------------------------------
+                             35 	.area	BSEG    (BIT)
+                             36 ;--------------------------------------------------------
+                             37 ; external ram data
+                             38 ;--------------------------------------------------------
+                             39 	.area	XSEG    (XDATA)
+   0000                      40 _strcspn_PARM_2:
+   0000                      41 	.ds	0x0003
+   0003                      42 _strcspn_string_1_1:
+   0003                      43 	.ds	0x0003
+                             44 ;--------------------------------------------------------
+                             45 ; global & static initialisations
+                             46 ;--------------------------------------------------------
+                             47 	.area GSINIT (CODE)
+                             48 ;--------------------------------------------------------
+                             49 ; code
+                             50 ;--------------------------------------------------------
+                             51 	.area CSEG (CODE)
+                    0000     52 	G$strcspn$0$0 ==.
+                             53 ;	_strcspn.c 27
+                             54 ;	-----------------------------------------
+                             55 ;	 function strcspn
+                             56 ;	-----------------------------------------
+   0000                      57 _strcspn:
+                    0002     58 	ar2 = 0x02
+                    0003     59 	ar3 = 0x03
+                    0004     60 	ar4 = 0x04
+                    0005     61 	ar5 = 0x05
+                    0006     62 	ar6 = 0x06
+                    0007     63 	ar7 = 0x07
+                    0000     64 	ar0 = 0x00
+                    0001     65 	ar1 = 0x01
+                             66 ;	_strcspn.c 42
+   0000 C0 F0                67 	push	b
+   0002 C0 83                68 	push	dph
+   0004 C0 82                69 	push	dpl
+   0006 90s00r03             70 	mov	dptr,#_strcspn_string_1_1
+   0009 D0 E0                71 	pop	acc
+   000B F0                   72 	movx	@dptr,a
+   000C D0 E0                73 	pop	acc
+   000E A3                   74 	inc	dptr
+   000F F0                   75 	movx	@dptr,a
+   0010 D0 E0                76 	pop	acc
+   0012 A3                   77 	inc	dptr
+   0013 F0                   78 	movx	@dptr,a
+                             79 ;	_strcspn.c 35
+   0014 90s00r00             80 	mov	dptr,#_strcspn_PARM_2
+   0017 E0                   81 	movx	a,@dptr
+   0018 F5*00                82 	mov	_strcspn_sloc0_1_0,a
+   001A A3                   83 	inc	dptr
+   001B E0                   84 	movx	a,@dptr
+   001C F5*01                85 	mov	(_strcspn_sloc0_1_0 + 1),a
+   001E A3                   86 	inc	dptr
+   001F E0                   87 	movx	a,@dptr
+   0020 F5*02                88 	mov	(_strcspn_sloc0_1_0 + 2),a
+   0022 90s00r03             89 	mov	dptr,#_strcspn_string_1_1
+   0025 E0                   90 	movx	a,@dptr
+   0026 FD                   91 	mov	r5,a
+   0027 A3                   92 	inc	dptr
+   0028 E0                   93 	movx	a,@dptr
+   0029 FE                   94 	mov	r6,a
+   002A A3                   95 	inc	dptr
+   002B E0                   96 	movx	a,@dptr
+   002C FF                   97 	mov	r7,a
+   002D 78 00                98 	mov	r0,#0x00
+   002F 79 00                99 	mov	r1,#0x00
+   0031                     100 00104$:
+   0031 8D 82               101 	mov	dpl,r5
+   0033 8E 83               102 	mov	dph,r6
+   0035 8F F0               103 	mov	b,r7
+   0037 12s00r00            104 	lcall	__gptrget
+                            105 ; Peephole 105   removed redundant mov
+   003A FA                  106 	mov  r2,a
+                            107 ; Peephole 110   removed ljmp by inverse jump logic
+   003B 60 37               108 	jz  00106$
+   003D                     109 00112$:
+                            110 ;	_strcspn.c 36
+   003D 90s00r00            111 	mov	dptr,#_strchr_PARM_2
+   0040 EA                  112 	mov	a,r2
+   0041 F0                  113 	movx	@dptr,a
+   0042 C0 05               114 	push	ar5
+   0044 C0 06               115 	push	ar6
+   0046 C0 07               116 	push	ar7
+   0048 C0 00               117 	push	ar0
+   004A C0 01               118 	push	ar1
+   004C 85*00 82            119 	mov	dpl,_strcspn_sloc0_1_0
+   004F 85*01 83            120 	mov	dph,(_strcspn_sloc0_1_0 + 1)
+   0052 85*02 F0            121 	mov	b,(_strcspn_sloc0_1_0 + 2)
+   0055 12s00r00            122 	lcall	_strchr
+   0058 AA 82               123 	mov	r2,dpl
+   005A AB 83               124 	mov	r3,dph
+   005C AC F0               125 	mov	r4,b
+   005E D0 01               126 	pop	ar1
+   0060 D0 00               127 	pop	ar0
+   0062 D0 07               128 	pop	ar7
+   0064 D0 06               129 	pop	ar6
+   0066 D0 05               130 	pop	ar5
+   0068 EA                  131 	mov	a,r2
+   0069 4B                  132 	orl	a,r3
+   006A 4C                  133 	orl	a,r4
+                            134 ; Peephole 109   removed ljmp by inverse jump logic
+   006B 70 07               135 	jnz  00106$
+   006D                     136 00113$:
+                            137 ;	_strcspn.c 39
+   006D 08                  138 	inc	r0
+   006E B8 00 01            139 	cjne	r0,#0x00,00114$
+   0071 09                  140 	inc	r1
+   0072                     141 00114$:
+                            142 ; Peephole 132   changed ljmp to sjmp
+   0072 80 BD               143 	sjmp 00104$
+   0074                     144 00106$:
+                            145 ;	_strcspn.c 42
+   0074 88 82               146 	mov	dpl,r0
+   0076 89 83               147 	mov	dph,r1
+   0078                     148 00107$:
+                    0078    149 	C$_strcspn.c$43$1$1 ==.
+                    0078    150 	XG$strcspn$0$0 ==.
+   0078 22                  151 	ret
+                            152 	.area	CSEG    (CODE)

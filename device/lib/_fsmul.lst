@@ -1,0 +1,936 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:28 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module _fsmul
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl ___fsmul_PARM_2
+                             11 	.globl ___fsmul
+                             12 ;--------------------------------------------------------
+                             13 ; special function registers
+                             14 ;--------------------------------------------------------
+                             15 ;--------------------------------------------------------
+                             16 ; special function bits 
+                             17 ;--------------------------------------------------------
+                             18 ;--------------------------------------------------------
+                             19 ; internal ram data
+                             20 ;--------------------------------------------------------
+                             21 	.area	DSEG    (DATA)
+   0000                      22 ___fsmul_sloc0_1_0:
+   0000                      23 	.ds	0x0004
+   0004                      24 ___fsmul_sloc1_1_0:
+   0004                      25 	.ds	0x0004
+                             26 ;--------------------------------------------------------
+                             27 ; overlayable items in internal ram 
+                             28 ;--------------------------------------------------------
+                             29 	.area	OSEG	(OVR,DATA)
+                             30 ;--------------------------------------------------------
+                             31 ; indirectly addressable internal ram data
+                             32 ;--------------------------------------------------------
+                             33 	.area	ISEG    (DATA)
+                             34 ;--------------------------------------------------------
+                             35 ; bit data
+                             36 ;--------------------------------------------------------
+                             37 	.area	BSEG    (BIT)
+                             38 ;--------------------------------------------------------
+                             39 ; external ram data
+                             40 ;--------------------------------------------------------
+                             41 	.area	XSEG    (XDATA)
+   0000                      42 ___fsmul_PARM_2:
+   0000                      43 	.ds	0x0004
+   0004                      44 ___fsmul_a1_1_1:
+   0004                      45 	.ds	0x0004
+   0008                      46 ___fsmul_fl1_1_1:
+   0008                      47 	.ds	0x0004
+   000C                      48 ___fsmul_fl2_1_1:
+   000C                      49 	.ds	0x0004
+   0010                      50 ___fsmul_result_1_1:
+   0010                      51 	.ds	0x0004
+   0014                      52 ___fsmul_exp_1_1:
+   0014                      53 	.ds	0x0002
+   0016                      54 ___fsmul_sign_1_1:
+   0016                      55 	.ds	0x0001
+                             56 ;--------------------------------------------------------
+                             57 ; global & static initialisations
+                             58 ;--------------------------------------------------------
+                             59 	.area GSINIT (CODE)
+                             60 ;--------------------------------------------------------
+                             61 ; code
+                             62 ;--------------------------------------------------------
+                             63 	.area CSEG (CODE)
+                    0000     64 	G$__fsmul$0$0 ==.
+                             65 ;	_fsmul.c 81
+                             66 ;	-----------------------------------------
+                             67 ;	 function __fsmul
+                             68 ;	-----------------------------------------
+   0000                      69 ___fsmul:
+                    0002     70 	ar2 = 0x02
+                    0003     71 	ar3 = 0x03
+                    0004     72 	ar4 = 0x04
+                    0005     73 	ar5 = 0x05
+                    0006     74 	ar6 = 0x06
+                    0007     75 	ar7 = 0x07
+                    0000     76 	ar0 = 0x00
+                    0001     77 	ar1 = 0x01
+                             78 ;	_fsmul.c 125
+   0000 C0 E0                79 	push	acc
+   0002 C0 F0                80 	push	b
+   0004 C0 83                81 	push	dph
+   0006 C0 82                82 	push	dpl
+   0008 90s00r04             83 	mov	dptr,#___fsmul_a1_1_1
+   000B D0 E0                84 	pop	acc
+   000D F0                   85 	movx	@dptr,a
+   000E D0 E0                86 	pop	acc
+   0010 A3                   87 	inc	dptr
+   0011 F0                   88 	movx	@dptr,a
+   0012 D0 E0                89 	pop	acc
+   0014 A3                   90 	inc	dptr
+   0015 F0                   91 	movx	@dptr,a
+   0016 D0 E0                92 	pop	acc
+   0018 A3                   93 	inc	dptr
+   0019 F0                   94 	movx	@dptr,a
+                             95 ;	_fsmul.c 88
+   001A 90s00r04             96 	mov	dptr,#___fsmul_a1_1_1
+   001D E0                   97 	movx	a,@dptr
+   001E FA                   98 	mov	r2,a
+   001F A3                   99 	inc	dptr
+   0020 E0                  100 	movx	a,@dptr
+   0021 FB                  101 	mov	r3,a
+   0022 A3                  102 	inc	dptr
+   0023 E0                  103 	movx	a,@dptr
+   0024 FC                  104 	mov	r4,a
+   0025 A3                  105 	inc	dptr
+   0026 E0                  106 	movx	a,@dptr
+   0027 FD                  107 	mov	r5,a
+   0028 90s00r08            108 	mov	dptr,#(___fsmul_fl1_1_1)
+   002B EA                  109 	mov	a,r2
+   002C F0                  110 	movx	@dptr,a
+   002D A3                  111 	inc	dptr
+   002E EB                  112 	mov	a,r3
+   002F F0                  113 	movx	@dptr,a
+   0030 A3                  114 	inc	dptr
+   0031 EC                  115 	mov	a,r4
+   0032 F0                  116 	movx	@dptr,a
+   0033 A3                  117 	inc	dptr
+   0034 ED                  118 	mov	a,r5
+   0035 F0                  119 	movx	@dptr,a
+                            120 ;	_fsmul.c 89
+   0036 90s00r00            121 	mov	dptr,#___fsmul_PARM_2
+   0039 E0                  122 	movx	a,@dptr
+   003A FA                  123 	mov	r2,a
+   003B A3                  124 	inc	dptr
+   003C E0                  125 	movx	a,@dptr
+   003D FB                  126 	mov	r3,a
+   003E A3                  127 	inc	dptr
+   003F E0                  128 	movx	a,@dptr
+   0040 FC                  129 	mov	r4,a
+   0041 A3                  130 	inc	dptr
+   0042 E0                  131 	movx	a,@dptr
+   0043 FD                  132 	mov	r5,a
+   0044 90s00r0C            133 	mov	dptr,#(___fsmul_fl2_1_1)
+   0047 EA                  134 	mov	a,r2
+   0048 F0                  135 	movx	@dptr,a
+   0049 A3                  136 	inc	dptr
+   004A EB                  137 	mov	a,r3
+   004B F0                  138 	movx	@dptr,a
+   004C A3                  139 	inc	dptr
+   004D EC                  140 	mov	a,r4
+   004E F0                  141 	movx	@dptr,a
+   004F A3                  142 	inc	dptr
+   0050 ED                  143 	mov	a,r5
+   0051 F0                  144 	movx	@dptr,a
+                            145 ;	_fsmul.c 91
+   0052 90s00r08            146 	mov	dptr,#(___fsmul_fl1_1_1)
+   0055 E0                  147 	movx	a,@dptr
+   0056 FA                  148 	mov	r2,a
+   0057 A3                  149 	inc	dptr
+   0058 E0                  150 	movx	a,@dptr
+   0059 FB                  151 	mov	r3,a
+   005A A3                  152 	inc	dptr
+   005B E0                  153 	movx	a,@dptr
+   005C FC                  154 	mov	r4,a
+   005D A3                  155 	inc	dptr
+   005E E0                  156 	movx	a,@dptr
+   005F FD                  157 	mov	r5,a
+   0060 EA                  158 	mov	a,r2
+   0061 4B                  159 	orl	a,r3
+   0062 4C                  160 	orl	a,r4
+   0063 4D                  161 	orl	a,r5
+                            162 ; Peephole 110   removed ljmp by inverse jump logic
+   0064 60 14               163 	jz  00101$
+   0066                     164 00114$:
+   0066 90s00r0C            165 	mov	dptr,#(___fsmul_fl2_1_1)
+   0069 E0                  166 	movx	a,@dptr
+   006A FA                  167 	mov	r2,a
+   006B A3                  168 	inc	dptr
+   006C E0                  169 	movx	a,@dptr
+   006D FB                  170 	mov	r3,a
+   006E A3                  171 	inc	dptr
+   006F E0                  172 	movx	a,@dptr
+   0070 FC                  173 	mov	r4,a
+   0071 A3                  174 	inc	dptr
+   0072 E0                  175 	movx	a,@dptr
+   0073 FD                  176 	mov	r5,a
+   0074 EA                  177 	mov	a,r2
+   0075 4B                  178 	orl	a,r3
+   0076 4C                  179 	orl	a,r4
+   0077 4D                  180 	orl	a,r5
+                            181 ; Peephole 109   removed ljmp by inverse jump logic
+   0078 70 0A               182 	jnz  00102$
+   007A                     183 00115$:
+   007A                     184 00101$:
+                            185 ;	_fsmul.c 92
+                            186 ; Peephole 3.a   changed mov to clr
+                            187 ; Peephole 3.b   changed mov to clr
+                            188 ; Peephole 3.b   changed mov to clr
+   007A E4                  189 	clr  a
+   007B F5 82               190 	mov  dpl,a
+   007D F5 83               191 	mov  dph,a
+   007F F5 F0               192 	mov  b,a
+   0081 02s05r25            193 	ljmp	00107$
+   0084                     194 00102$:
+                            195 ;	_fsmul.c 95
+   0084 90s00r08            196 	mov	dptr,#(___fsmul_fl1_1_1)
+   0087 E0                  197 	movx	a,@dptr
+   0088 FA                  198 	mov	r2,a
+   0089 A3                  199 	inc	dptr
+   008A E0                  200 	movx	a,@dptr
+   008B FB                  201 	mov	r3,a
+   008C A3                  202 	inc	dptr
+   008D E0                  203 	movx	a,@dptr
+   008E FC                  204 	mov	r4,a
+   008F A3                  205 	inc	dptr
+   0090 E0                  206 	movx	a,@dptr
+                            207 ; Peephole 105   removed redundant mov
+   0091 FD                  208 	mov  r5,a
+   0092 23                  209 	rl	a
+   0093 54 01               210 	anl	a,#0x01
+   0095 FA                  211 	mov	r2,a
+   0096 90s00r0C            212 	mov	dptr,#(___fsmul_fl2_1_1)
+   0099 E0                  213 	movx	a,@dptr
+   009A FE                  214 	mov	r6,a
+   009B A3                  215 	inc	dptr
+   009C E0                  216 	movx	a,@dptr
+   009D FF                  217 	mov	r7,a
+   009E A3                  218 	inc	dptr
+   009F E0                  219 	movx	a,@dptr
+   00A0 F8                  220 	mov	r0,a
+   00A1 A3                  221 	inc	dptr
+   00A2 E0                  222 	movx	a,@dptr
+                            223 ; Peephole 105   removed redundant mov
+   00A3 F9                  224 	mov  r1,a
+   00A4 23                  225 	rl	a
+   00A5 54 01               226 	anl	a,#0x01
+   00A7 FE                  227 	mov	r6,a
+   00A8 90s00r16            228 	mov	dptr,#___fsmul_sign_1_1
+   00AB EE                  229 	mov	a,r6
+   00AC 65 02               230 	xrl	a,ar2
+   00AE F0                  231 	movx	@dptr,a
+                            232 ;	_fsmul.c 96
+   00AF 90s00r08            233 	mov	dptr,#(___fsmul_fl1_1_1)
+   00B2 E0                  234 	movx	a,@dptr
+   00B3 F5*00               235 	mov	___fsmul_sloc0_1_0,a
+   00B5 A3                  236 	inc	dptr
+   00B6 E0                  237 	movx	a,@dptr
+   00B7 F5*01               238 	mov	(___fsmul_sloc0_1_0 + 1),a
+   00B9 A3                  239 	inc	dptr
+   00BA E0                  240 	movx	a,@dptr
+   00BB F5*02               241 	mov	(___fsmul_sloc0_1_0 + 2),a
+   00BD A3                  242 	inc	dptr
+   00BE E0                  243 	movx	a,@dptr
+   00BF F5*03               244 	mov	(___fsmul_sloc0_1_0 + 3),a
+   00C1 85*02*00            245 	mov	___fsmul_sloc0_1_0,(___fsmul_sloc0_1_0 + 2)
+   00C4 E5*03               246 	mov	a,(___fsmul_sloc0_1_0 + 3)
+   00C6 A2 E7               247 	mov	c,acc.7
+   00C8 C5*00               248 	xch	a,___fsmul_sloc0_1_0
+   00CA 33                  249 	rlc	a
+   00CB C5*00               250 	xch	a,___fsmul_sloc0_1_0
+   00CD 33                  251 	rlc	a
+   00CE C5*00               252 	xch	a,___fsmul_sloc0_1_0
+   00D0 54 01               253 	anl	a,#0x01
+   00D2 30 E0 02            254 	jnb	acc.0,00116$
+   00D5 44 FE               255 	orl	a,#0xfe
+   00D7                     256 00116$:
+   00D7 F5*01               257 	mov	(___fsmul_sloc0_1_0 + 1),a
+   00D9 33                  258 	rlc	a
+   00DA 95 E0               259 	subb	a,acc
+   00DC F5*02               260 	mov	(___fsmul_sloc0_1_0 + 2),a
+   00DE F5*03               261 	mov	(___fsmul_sloc0_1_0 + 3),a
+   00E0 AA*00               262 	mov	r2,___fsmul_sloc0_1_0
+   00E2 AE*01               263 	mov	r6,(___fsmul_sloc0_1_0 + 1)
+   00E4 EA                  264 	mov	a,r2
+   00E5 75 F0 00            265 	mov	b,#0x00
+   00E8 24 82               266 	add	a,#0x82
+   00EA FA                  267 	mov	r2,a
+   00EB E5 F0               268 	mov	a,b
+   00ED 34 FF               269 	addc	a,#0xff
+   00EF FE                  270 	mov	r6,a
+   00F0 90s00r14            271 	mov	dptr,#___fsmul_exp_1_1
+   00F3 EA                  272 	mov	a,r2
+   00F4 F0                  273 	movx	@dptr,a
+   00F5 A3                  274 	inc	dptr
+   00F6 EE                  275 	mov	a,r6
+   00F7 F0                  276 	movx	@dptr,a
+                            277 ;	_fsmul.c 97
+   00F8 90s00r0C            278 	mov	dptr,#(___fsmul_fl2_1_1)
+   00FB E0                  279 	movx	a,@dptr
+   00FC F5*00               280 	mov	___fsmul_sloc0_1_0,a
+   00FE A3                  281 	inc	dptr
+   00FF E0                  282 	movx	a,@dptr
+   0100 F5*01               283 	mov	(___fsmul_sloc0_1_0 + 1),a
+   0102 A3                  284 	inc	dptr
+   0103 E0                  285 	movx	a,@dptr
+   0104 F5*02               286 	mov	(___fsmul_sloc0_1_0 + 2),a
+   0106 A3                  287 	inc	dptr
+   0107 E0                  288 	movx	a,@dptr
+   0108 F5*03               289 	mov	(___fsmul_sloc0_1_0 + 3),a
+   010A 85*02*00            290 	mov	___fsmul_sloc0_1_0,(___fsmul_sloc0_1_0 + 2)
+   010D E5*03               291 	mov	a,(___fsmul_sloc0_1_0 + 3)
+   010F A2 E7               292 	mov	c,acc.7
+   0111 C5*00               293 	xch	a,___fsmul_sloc0_1_0
+   0113 33                  294 	rlc	a
+   0114 C5*00               295 	xch	a,___fsmul_sloc0_1_0
+   0116 33                  296 	rlc	a
+   0117 C5*00               297 	xch	a,___fsmul_sloc0_1_0
+   0119 54 01               298 	anl	a,#0x01
+   011B 30 E0 02            299 	jnb	acc.0,00117$
+   011E 44 FE               300 	orl	a,#0xfe
+   0120                     301 00117$:
+   0120 F5*01               302 	mov	(___fsmul_sloc0_1_0 + 1),a
+   0122 33                  303 	rlc	a
+   0123 95 E0               304 	subb	a,acc
+   0125 F5*02               305 	mov	(___fsmul_sloc0_1_0 + 2),a
+   0127 F5*03               306 	mov	(___fsmul_sloc0_1_0 + 3),a
+   0129 AA*00               307 	mov	r2,___fsmul_sloc0_1_0
+   012B AE*01               308 	mov	r6,(___fsmul_sloc0_1_0 + 1)
+   012D 8A*00               309 	mov	___fsmul_sloc0_1_0,r2
+   012F 75*01 00            310 	mov	(___fsmul_sloc0_1_0 + 1),#0x00
+   0132 90s00r14            311 	mov	dptr,#___fsmul_exp_1_1
+   0135 E0                  312 	movx	a,@dptr
+   0136 FA                  313 	mov	r2,a
+   0137 A3                  314 	inc	dptr
+   0138 E0                  315 	movx	a,@dptr
+   0139 FE                  316 	mov	r6,a
+   013A 90s00r14            317 	mov	dptr,#___fsmul_exp_1_1
+   013D E5*00               318 	mov	a,___fsmul_sloc0_1_0
+   013F 2A                  319 	add	a,r2
+   0140 F0                  320 	movx	@dptr,a
+   0141 E5*01               321 	mov	a,(___fsmul_sloc0_1_0 + 1)
+   0143 3E                  322 	addc	a,r6
+   0144 A3                  323 	inc	dptr
+   0145 F0                  324 	movx	@dptr,a
+                            325 ;	_fsmul.c 99
+   0146 90s00r08            326 	mov	dptr,#(___fsmul_fl1_1_1)
+   0149 E0                  327 	movx	a,@dptr
+   014A F5*00               328 	mov	___fsmul_sloc0_1_0,a
+   014C A3                  329 	inc	dptr
+   014D E0                  330 	movx	a,@dptr
+   014E F5*01               331 	mov	(___fsmul_sloc0_1_0 + 1),a
+   0150 A3                  332 	inc	dptr
+   0151 E0                  333 	movx	a,@dptr
+   0152 F5*02               334 	mov	(___fsmul_sloc0_1_0 + 2),a
+   0154 A3                  335 	inc	dptr
+   0155 E0                  336 	movx	a,@dptr
+   0156 F5*03               337 	mov	(___fsmul_sloc0_1_0 + 3),a
+   0158 53r02 7F            338 	anl	(___fsmul_sloc0_1_0 + 2),#0x7f
+   015B 75*03 00            339 	mov	(___fsmul_sloc0_1_0 + 3),#0x00
+   015E 43r02 80            340 	orl	(___fsmul_sloc0_1_0 + 2),#0x80
+   0161 90s00r08            341 	mov	dptr,#(___fsmul_fl1_1_1)
+   0164 E5*00               342 	mov	a,___fsmul_sloc0_1_0
+   0166 F0                  343 	movx	@dptr,a
+   0167 A3                  344 	inc	dptr
+   0168 E5*01               345 	mov	a,(___fsmul_sloc0_1_0 + 1)
+   016A F0                  346 	movx	@dptr,a
+   016B A3                  347 	inc	dptr
+   016C E5*02               348 	mov	a,(___fsmul_sloc0_1_0 + 2)
+   016E F0                  349 	movx	@dptr,a
+   016F A3                  350 	inc	dptr
+   0170 E5*03               351 	mov	a,(___fsmul_sloc0_1_0 + 3)
+   0172 F0                  352 	movx	@dptr,a
+                            353 ;	_fsmul.c 100
+   0173 90s00r0C            354 	mov	dptr,#(___fsmul_fl2_1_1)
+   0176 E0                  355 	movx	a,@dptr
+   0177 F5*00               356 	mov	___fsmul_sloc0_1_0,a
+   0179 A3                  357 	inc	dptr
+   017A E0                  358 	movx	a,@dptr
+   017B F5*01               359 	mov	(___fsmul_sloc0_1_0 + 1),a
+   017D A3                  360 	inc	dptr
+   017E E0                  361 	movx	a,@dptr
+   017F F5*02               362 	mov	(___fsmul_sloc0_1_0 + 2),a
+   0181 A3                  363 	inc	dptr
+   0182 E0                  364 	movx	a,@dptr
+   0183 F5*03               365 	mov	(___fsmul_sloc0_1_0 + 3),a
+   0185 53r02 7F            366 	anl	(___fsmul_sloc0_1_0 + 2),#0x7f
+   0188 75*03 00            367 	mov	(___fsmul_sloc0_1_0 + 3),#0x00
+   018B 43r02 80            368 	orl	(___fsmul_sloc0_1_0 + 2),#0x80
+   018E 90s00r0C            369 	mov	dptr,#(___fsmul_fl2_1_1)
+   0191 E5*00               370 	mov	a,___fsmul_sloc0_1_0
+   0193 F0                  371 	movx	@dptr,a
+   0194 A3                  372 	inc	dptr
+   0195 E5*01               373 	mov	a,(___fsmul_sloc0_1_0 + 1)
+   0197 F0                  374 	movx	@dptr,a
+   0198 A3                  375 	inc	dptr
+   0199 E5*02               376 	mov	a,(___fsmul_sloc0_1_0 + 2)
+   019B F0                  377 	movx	@dptr,a
+   019C A3                  378 	inc	dptr
+   019D E5*03               379 	mov	a,(___fsmul_sloc0_1_0 + 3)
+   019F F0                  380 	movx	@dptr,a
+                            381 ;	_fsmul.c 103
+   01A0 90s00r08            382 	mov	dptr,#(___fsmul_fl1_1_1)
+   01A3 E0                  383 	movx	a,@dptr
+   01A4 F5*00               384 	mov	___fsmul_sloc0_1_0,a
+   01A6 A3                  385 	inc	dptr
+   01A7 E0                  386 	movx	a,@dptr
+   01A8 F5*01               387 	mov	(___fsmul_sloc0_1_0 + 1),a
+   01AA A3                  388 	inc	dptr
+   01AB E0                  389 	movx	a,@dptr
+   01AC F5*02               390 	mov	(___fsmul_sloc0_1_0 + 2),a
+   01AE A3                  391 	inc	dptr
+   01AF E0                  392 	movx	a,@dptr
+   01B0 F5*03               393 	mov	(___fsmul_sloc0_1_0 + 3),a
+   01B2 85*01*00            394 	mov	___fsmul_sloc0_1_0,(___fsmul_sloc0_1_0 + 1)
+   01B5 85*02*01            395 	mov	(___fsmul_sloc0_1_0 + 1),(___fsmul_sloc0_1_0 + 2)
+   01B8 E5*03               396 	mov	a,(___fsmul_sloc0_1_0 + 3)
+   01BA F5*02               397 	mov	(___fsmul_sloc0_1_0 + 2),a
+   01BC 33                  398 	rlc	a
+   01BD 95 E0               399 	subb	a,acc
+   01BF F5*03               400 	mov	(___fsmul_sloc0_1_0 + 3),a
+   01C1 90s00r0C            401 	mov	dptr,#(___fsmul_fl2_1_1)
+   01C4 E0                  402 	movx	a,@dptr
+   01C5 F5*04               403 	mov	___fsmul_sloc1_1_0,a
+   01C7 A3                  404 	inc	dptr
+   01C8 E0                  405 	movx	a,@dptr
+   01C9 F5*05               406 	mov	(___fsmul_sloc1_1_0 + 1),a
+   01CB A3                  407 	inc	dptr
+   01CC E0                  408 	movx	a,@dptr
+   01CD F5*06               409 	mov	(___fsmul_sloc1_1_0 + 2),a
+   01CF A3                  410 	inc	dptr
+   01D0 E0                  411 	movx	a,@dptr
+   01D1 F5*07               412 	mov	(___fsmul_sloc1_1_0 + 3),a
+   01D3 85*05*04            413 	mov	___fsmul_sloc1_1_0,(___fsmul_sloc1_1_0 + 1)
+   01D6 85*06*05            414 	mov	(___fsmul_sloc1_1_0 + 1),(___fsmul_sloc1_1_0 + 2)
+   01D9 E5*07               415 	mov	a,(___fsmul_sloc1_1_0 + 3)
+   01DB F5*06               416 	mov	(___fsmul_sloc1_1_0 + 2),a
+   01DD 33                  417 	rlc	a
+   01DE 95 E0               418 	subb	a,acc
+   01E0 F5*07               419 	mov	(___fsmul_sloc1_1_0 + 3),a
+   01E2 90s00r00            420 	mov	dptr,#__mulslong_PARM_2
+   01E5 E5*04               421 	mov	a,___fsmul_sloc1_1_0
+   01E7 F0                  422 	movx	@dptr,a
+   01E8 A3                  423 	inc	dptr
+   01E9 E5*05               424 	mov	a,(___fsmul_sloc1_1_0 + 1)
+   01EB F0                  425 	movx	@dptr,a
+   01EC A3                  426 	inc	dptr
+   01ED E5*06               427 	mov	a,(___fsmul_sloc1_1_0 + 2)
+   01EF F0                  428 	movx	@dptr,a
+   01F0 A3                  429 	inc	dptr
+   01F1 E5*07               430 	mov	a,(___fsmul_sloc1_1_0 + 3)
+   01F3 F0                  431 	movx	@dptr,a
+   01F4 85*00 82            432 	mov	dpl,___fsmul_sloc0_1_0
+   01F7 85*01 83            433 	mov	dph,(___fsmul_sloc0_1_0 + 1)
+   01FA 85*02 F0            434 	mov	b,(___fsmul_sloc0_1_0 + 2)
+   01FD E5*03               435 	mov	a,(___fsmul_sloc0_1_0 + 3)
+   01FF 12s00r00            436 	lcall	__mulslong
+   0202 85 82*04            437 	mov	___fsmul_sloc1_1_0,dpl
+   0205 85 83*05            438 	mov	(___fsmul_sloc1_1_0 + 1),dph
+   0208 85 F0*06            439 	mov	(___fsmul_sloc1_1_0 + 2),b
+   020B F5*07               440 	mov	(___fsmul_sloc1_1_0 + 3),a
+   020D 90s00r10            441 	mov	dptr,#___fsmul_result_1_1
+   0210 E5*04               442 	mov	a,___fsmul_sloc1_1_0
+   0212 F0                  443 	movx	@dptr,a
+   0213 A3                  444 	inc	dptr
+   0214 E5*05               445 	mov	a,(___fsmul_sloc1_1_0 + 1)
+   0216 F0                  446 	movx	@dptr,a
+   0217 A3                  447 	inc	dptr
+   0218 E5*06               448 	mov	a,(___fsmul_sloc1_1_0 + 2)
+   021A F0                  449 	movx	@dptr,a
+   021B A3                  450 	inc	dptr
+   021C E5*07               451 	mov	a,(___fsmul_sloc1_1_0 + 3)
+   021E F0                  452 	movx	@dptr,a
+                            453 ;	_fsmul.c 104
+   021F 90s00r08            454 	mov	dptr,#(___fsmul_fl1_1_1)
+   0222 E0                  455 	movx	a,@dptr
+   0223 F5*04               456 	mov	___fsmul_sloc1_1_0,a
+   0225 A3                  457 	inc	dptr
+   0226 E0                  458 	movx	a,@dptr
+   0227 F5*05               459 	mov	(___fsmul_sloc1_1_0 + 1),a
+   0229 A3                  460 	inc	dptr
+   022A E0                  461 	movx	a,@dptr
+   022B F5*06               462 	mov	(___fsmul_sloc1_1_0 + 2),a
+   022D A3                  463 	inc	dptr
+   022E E0                  464 	movx	a,@dptr
+   022F F5*07               465 	mov	(___fsmul_sloc1_1_0 + 3),a
+   0231 75*05 00            466 	mov	(___fsmul_sloc1_1_0 + 1),#0x00
+   0234 75*06 00            467 	mov	(___fsmul_sloc1_1_0 + 2),#0x00
+   0237 75*07 00            468 	mov	(___fsmul_sloc1_1_0 + 3),#0x00
+   023A 90s00r0C            469 	mov	dptr,#(___fsmul_fl2_1_1)
+   023D E0                  470 	movx	a,@dptr
+   023E F5*00               471 	mov	___fsmul_sloc0_1_0,a
+   0240 A3                  472 	inc	dptr
+   0241 E0                  473 	movx	a,@dptr
+   0242 F5*01               474 	mov	(___fsmul_sloc0_1_0 + 1),a
+   0244 A3                  475 	inc	dptr
+   0245 E0                  476 	movx	a,@dptr
+   0246 F5*02               477 	mov	(___fsmul_sloc0_1_0 + 2),a
+   0248 A3                  478 	inc	dptr
+   0249 E0                  479 	movx	a,@dptr
+   024A F5*03               480 	mov	(___fsmul_sloc0_1_0 + 3),a
+   024C 85*01*00            481 	mov	___fsmul_sloc0_1_0,(___fsmul_sloc0_1_0 + 1)
+   024F 85*02*01            482 	mov	(___fsmul_sloc0_1_0 + 1),(___fsmul_sloc0_1_0 + 2)
+   0252 E5*03               483 	mov	a,(___fsmul_sloc0_1_0 + 3)
+   0254 F5*02               484 	mov	(___fsmul_sloc0_1_0 + 2),a
+   0256 33                  485 	rlc	a
+   0257 95 E0               486 	subb	a,acc
+   0259 F5*03               487 	mov	(___fsmul_sloc0_1_0 + 3),a
+   025B 90s00r00            488 	mov	dptr,#__mululong_PARM_2
+   025E E5*00               489 	mov	a,___fsmul_sloc0_1_0
+   0260 F0                  490 	movx	@dptr,a
+   0261 A3                  491 	inc	dptr
+   0262 E5*01               492 	mov	a,(___fsmul_sloc0_1_0 + 1)
+   0264 F0                  493 	movx	@dptr,a
+   0265 A3                  494 	inc	dptr
+   0266 E5*02               495 	mov	a,(___fsmul_sloc0_1_0 + 2)
+   0268 F0                  496 	movx	@dptr,a
+   0269 A3                  497 	inc	dptr
+   026A E5*03               498 	mov	a,(___fsmul_sloc0_1_0 + 3)
+   026C F0                  499 	movx	@dptr,a
+   026D 85*04 82            500 	mov	dpl,___fsmul_sloc1_1_0
+   0270 85*05 83            501 	mov	dph,(___fsmul_sloc1_1_0 + 1)
+   0273 85*06 F0            502 	mov	b,(___fsmul_sloc1_1_0 + 2)
+   0276 E5*07               503 	mov	a,(___fsmul_sloc1_1_0 + 3)
+   0278 12s00r00            504 	lcall	__mululong
+   027B 85 82*04            505 	mov	___fsmul_sloc1_1_0,dpl
+   027E 85 83*05            506 	mov	(___fsmul_sloc1_1_0 + 1),dph
+   0281 85 F0*06            507 	mov	(___fsmul_sloc1_1_0 + 2),b
+   0284 F5*07               508 	mov	(___fsmul_sloc1_1_0 + 3),a
+   0286 85*05*04            509 	mov	___fsmul_sloc1_1_0,(___fsmul_sloc1_1_0 + 1)
+   0289 85*06*05            510 	mov	(___fsmul_sloc1_1_0 + 1),(___fsmul_sloc1_1_0 + 2)
+   028C 85*07*06            511 	mov	(___fsmul_sloc1_1_0 + 2),(___fsmul_sloc1_1_0 + 3)
+   028F 75*07 00            512 	mov	(___fsmul_sloc1_1_0 + 3),#0x00
+   0292 90s00r10            513 	mov	dptr,#___fsmul_result_1_1
+   0295 E0                  514 	movx	a,@dptr
+   0296 F5*00               515 	mov	___fsmul_sloc0_1_0,a
+   0298 A3                  516 	inc	dptr
+   0299 E0                  517 	movx	a,@dptr
+   029A F5*01               518 	mov	(___fsmul_sloc0_1_0 + 1),a
+   029C A3                  519 	inc	dptr
+   029D E0                  520 	movx	a,@dptr
+   029E F5*02               521 	mov	(___fsmul_sloc0_1_0 + 2),a
+   02A0 A3                  522 	inc	dptr
+   02A1 E0                  523 	movx	a,@dptr
+   02A2 F5*03               524 	mov	(___fsmul_sloc0_1_0 + 3),a
+   02A4 90s00r10            525 	mov	dptr,#___fsmul_result_1_1
+   02A7 E5*04               526 	mov	a,___fsmul_sloc1_1_0
+   02A9 25*00               527 	add	a,___fsmul_sloc0_1_0
+   02AB F0                  528 	movx	@dptr,a
+   02AC E5*05               529 	mov	a,(___fsmul_sloc1_1_0 + 1)
+   02AE 35*01               530 	addc	a,(___fsmul_sloc0_1_0 + 1)
+   02B0 A3                  531 	inc	dptr
+   02B1 F0                  532 	movx	@dptr,a
+   02B2 E5*06               533 	mov	a,(___fsmul_sloc1_1_0 + 2)
+   02B4 35*02               534 	addc	a,(___fsmul_sloc0_1_0 + 2)
+   02B6 A3                  535 	inc	dptr
+   02B7 F0                  536 	movx	@dptr,a
+   02B8 E5*07               537 	mov	a,(___fsmul_sloc1_1_0 + 3)
+   02BA 35*03               538 	addc	a,(___fsmul_sloc0_1_0 + 3)
+   02BC A3                  539 	inc	dptr
+   02BD F0                  540 	movx	@dptr,a
+                            541 ;	_fsmul.c 105
+   02BE 90s00r0C            542 	mov	dptr,#(___fsmul_fl2_1_1)
+   02C1 E0                  543 	movx	a,@dptr
+   02C2 F5*04               544 	mov	___fsmul_sloc1_1_0,a
+   02C4 A3                  545 	inc	dptr
+   02C5 E0                  546 	movx	a,@dptr
+   02C6 F5*05               547 	mov	(___fsmul_sloc1_1_0 + 1),a
+   02C8 A3                  548 	inc	dptr
+   02C9 E0                  549 	movx	a,@dptr
+   02CA F5*06               550 	mov	(___fsmul_sloc1_1_0 + 2),a
+   02CC A3                  551 	inc	dptr
+   02CD E0                  552 	movx	a,@dptr
+   02CE F5*07               553 	mov	(___fsmul_sloc1_1_0 + 3),a
+   02D0 75*05 00            554 	mov	(___fsmul_sloc1_1_0 + 1),#0x00
+   02D3 75*06 00            555 	mov	(___fsmul_sloc1_1_0 + 2),#0x00
+   02D6 75*07 00            556 	mov	(___fsmul_sloc1_1_0 + 3),#0x00
+   02D9 90s00r08            557 	mov	dptr,#(___fsmul_fl1_1_1)
+   02DC E0                  558 	movx	a,@dptr
+   02DD F5*00               559 	mov	___fsmul_sloc0_1_0,a
+   02DF A3                  560 	inc	dptr
+   02E0 E0                  561 	movx	a,@dptr
+   02E1 F5*01               562 	mov	(___fsmul_sloc0_1_0 + 1),a
+   02E3 A3                  563 	inc	dptr
+   02E4 E0                  564 	movx	a,@dptr
+   02E5 F5*02               565 	mov	(___fsmul_sloc0_1_0 + 2),a
+   02E7 A3                  566 	inc	dptr
+   02E8 E0                  567 	movx	a,@dptr
+   02E9 F5*03               568 	mov	(___fsmul_sloc0_1_0 + 3),a
+   02EB 85*01*00            569 	mov	___fsmul_sloc0_1_0,(___fsmul_sloc0_1_0 + 1)
+   02EE 85*02*01            570 	mov	(___fsmul_sloc0_1_0 + 1),(___fsmul_sloc0_1_0 + 2)
+   02F1 E5*03               571 	mov	a,(___fsmul_sloc0_1_0 + 3)
+   02F3 F5*02               572 	mov	(___fsmul_sloc0_1_0 + 2),a
+   02F5 33                  573 	rlc	a
+   02F6 95 E0               574 	subb	a,acc
+   02F8 F5*03               575 	mov	(___fsmul_sloc0_1_0 + 3),a
+   02FA 90s00r00            576 	mov	dptr,#__mululong_PARM_2
+   02FD E5*00               577 	mov	a,___fsmul_sloc0_1_0
+   02FF F0                  578 	movx	@dptr,a
+   0300 A3                  579 	inc	dptr
+   0301 E5*01               580 	mov	a,(___fsmul_sloc0_1_0 + 1)
+   0303 F0                  581 	movx	@dptr,a
+   0304 A3                  582 	inc	dptr
+   0305 E5*02               583 	mov	a,(___fsmul_sloc0_1_0 + 2)
+   0307 F0                  584 	movx	@dptr,a
+   0308 A3                  585 	inc	dptr
+   0309 E5*03               586 	mov	a,(___fsmul_sloc0_1_0 + 3)
+   030B F0                  587 	movx	@dptr,a
+   030C 85*04 82            588 	mov	dpl,___fsmul_sloc1_1_0
+   030F 85*05 83            589 	mov	dph,(___fsmul_sloc1_1_0 + 1)
+   0312 85*06 F0            590 	mov	b,(___fsmul_sloc1_1_0 + 2)
+   0315 E5*07               591 	mov	a,(___fsmul_sloc1_1_0 + 3)
+   0317 12s00r00            592 	lcall	__mululong
+   031A 85 82*04            593 	mov	___fsmul_sloc1_1_0,dpl
+   031D 85 83*05            594 	mov	(___fsmul_sloc1_1_0 + 1),dph
+   0320 85 F0*06            595 	mov	(___fsmul_sloc1_1_0 + 2),b
+   0323 F5*07               596 	mov	(___fsmul_sloc1_1_0 + 3),a
+   0325 85*05*04            597 	mov	___fsmul_sloc1_1_0,(___fsmul_sloc1_1_0 + 1)
+   0328 85*06*05            598 	mov	(___fsmul_sloc1_1_0 + 1),(___fsmul_sloc1_1_0 + 2)
+   032B 85*07*06            599 	mov	(___fsmul_sloc1_1_0 + 2),(___fsmul_sloc1_1_0 + 3)
+   032E 75*07 00            600 	mov	(___fsmul_sloc1_1_0 + 3),#0x00
+   0331 90s00r10            601 	mov	dptr,#___fsmul_result_1_1
+   0334 E0                  602 	movx	a,@dptr
+   0335 F5*00               603 	mov	___fsmul_sloc0_1_0,a
+   0337 A3                  604 	inc	dptr
+   0338 E0                  605 	movx	a,@dptr
+   0339 F5*01               606 	mov	(___fsmul_sloc0_1_0 + 1),a
+   033B A3                  607 	inc	dptr
+   033C E0                  608 	movx	a,@dptr
+   033D F5*02               609 	mov	(___fsmul_sloc0_1_0 + 2),a
+   033F A3                  610 	inc	dptr
+   0340 E0                  611 	movx	a,@dptr
+   0341 F5*03               612 	mov	(___fsmul_sloc0_1_0 + 3),a
+   0343 90s00r10            613 	mov	dptr,#___fsmul_result_1_1
+   0346 E5*04               614 	mov	a,___fsmul_sloc1_1_0
+   0348 25*00               615 	add	a,___fsmul_sloc0_1_0
+   034A F0                  616 	movx	@dptr,a
+   034B E5*05               617 	mov	a,(___fsmul_sloc1_1_0 + 1)
+   034D 35*01               618 	addc	a,(___fsmul_sloc0_1_0 + 1)
+   034F A3                  619 	inc	dptr
+   0350 F0                  620 	movx	@dptr,a
+   0351 E5*06               621 	mov	a,(___fsmul_sloc1_1_0 + 2)
+   0353 35*02               622 	addc	a,(___fsmul_sloc0_1_0 + 2)
+   0355 A3                  623 	inc	dptr
+   0356 F0                  624 	movx	@dptr,a
+   0357 E5*07               625 	mov	a,(___fsmul_sloc1_1_0 + 3)
+   0359 35*03               626 	addc	a,(___fsmul_sloc0_1_0 + 3)
+   035B A3                  627 	inc	dptr
+   035C F0                  628 	movx	@dptr,a
+                            629 ;	_fsmul.c 107
+   035D 90s00r10            630 	mov	dptr,#___fsmul_result_1_1
+   0360 E0                  631 	movx	a,@dptr
+   0361 F5*04               632 	mov	___fsmul_sloc1_1_0,a
+   0363 A3                  633 	inc	dptr
+   0364 E0                  634 	movx	a,@dptr
+   0365 F5*05               635 	mov	(___fsmul_sloc1_1_0 + 1),a
+   0367 A3                  636 	inc	dptr
+   0368 E0                  637 	movx	a,@dptr
+   0369 F5*06               638 	mov	(___fsmul_sloc1_1_0 + 2),a
+   036B A3                  639 	inc	dptr
+   036C E0                  640 	movx	a,@dptr
+                            641 ; Peephole 105   removed redundant mov
+   036D F5*07               642 	mov  (___fsmul_sloc1_1_0 + 3),a
+   036F 20 E7 03            643 	jb	acc.7,00118$
+   0372 02s03rD1            644 	ljmp	00105$
+   0375                     645 00118$:
+                            646 ;	_fsmul.c 110
+   0375 90s00r10            647 	mov	dptr,#___fsmul_result_1_1
+   0378 E0                  648 	movx	a,@dptr
+   0379 F5*04               649 	mov	___fsmul_sloc1_1_0,a
+   037B A3                  650 	inc	dptr
+   037C E0                  651 	movx	a,@dptr
+   037D F5*05               652 	mov	(___fsmul_sloc1_1_0 + 1),a
+   037F A3                  653 	inc	dptr
+   0380 E0                  654 	movx	a,@dptr
+   0381 F5*06               655 	mov	(___fsmul_sloc1_1_0 + 2),a
+   0383 A3                  656 	inc	dptr
+   0384 E0                  657 	movx	a,@dptr
+   0385 F5*07               658 	mov	(___fsmul_sloc1_1_0 + 3),a
+   0387 90s00r10            659 	mov	dptr,#___fsmul_result_1_1
+   038A 74 80               660 	mov	a,#0x80
+   038C 25*04               661 	add	a,___fsmul_sloc1_1_0
+   038E F0                  662 	movx	@dptr,a
+                            663 ; Peephole 180   changed mov to clr
+   038F E4                  664 	clr  a
+   0390 35*05               665 	addc	a,(___fsmul_sloc1_1_0 + 1)
+   0392 A3                  666 	inc	dptr
+   0393 F0                  667 	movx	@dptr,a
+                            668 ; Peephole 180   changed mov to clr
+   0394 E4                  669 	clr  a
+   0395 35*06               670 	addc	a,(___fsmul_sloc1_1_0 + 2)
+   0397 A3                  671 	inc	dptr
+   0398 F0                  672 	movx	@dptr,a
+                            673 ; Peephole 180   changed mov to clr
+   0399 E4                  674 	clr  a
+   039A 35*07               675 	addc	a,(___fsmul_sloc1_1_0 + 3)
+   039C A3                  676 	inc	dptr
+   039D F0                  677 	movx	@dptr,a
+                            678 ;	_fsmul.c 111
+   039E 90s00r10            679 	mov	dptr,#___fsmul_result_1_1
+   03A1 E0                  680 	movx	a,@dptr
+   03A2 F5*04               681 	mov	___fsmul_sloc1_1_0,a
+   03A4 A3                  682 	inc	dptr
+   03A5 E0                  683 	movx	a,@dptr
+   03A6 F5*05               684 	mov	(___fsmul_sloc1_1_0 + 1),a
+   03A8 A3                  685 	inc	dptr
+   03A9 E0                  686 	movx	a,@dptr
+   03AA F5*06               687 	mov	(___fsmul_sloc1_1_0 + 2),a
+   03AC A3                  688 	inc	dptr
+   03AD E0                  689 	movx	a,@dptr
+   03AE F5*07               690 	mov	(___fsmul_sloc1_1_0 + 3),a
+   03B0 85*05*04            691 	mov	___fsmul_sloc1_1_0,(___fsmul_sloc1_1_0 + 1)
+   03B3 85*06*05            692 	mov	(___fsmul_sloc1_1_0 + 1),(___fsmul_sloc1_1_0 + 2)
+   03B6 85*07*06            693 	mov	(___fsmul_sloc1_1_0 + 2),(___fsmul_sloc1_1_0 + 3)
+   03B9 75*07 00            694 	mov	(___fsmul_sloc1_1_0 + 3),#0x00
+   03BC 90s00r10            695 	mov	dptr,#___fsmul_result_1_1
+   03BF E5*04               696 	mov	a,___fsmul_sloc1_1_0
+   03C1 F0                  697 	movx	@dptr,a
+   03C2 A3                  698 	inc	dptr
+   03C3 E5*05               699 	mov	a,(___fsmul_sloc1_1_0 + 1)
+   03C5 F0                  700 	movx	@dptr,a
+   03C6 A3                  701 	inc	dptr
+   03C7 E5*06               702 	mov	a,(___fsmul_sloc1_1_0 + 2)
+   03C9 F0                  703 	movx	@dptr,a
+   03CA A3                  704 	inc	dptr
+   03CB E5*07               705 	mov	a,(___fsmul_sloc1_1_0 + 3)
+   03CD F0                  706 	movx	@dptr,a
+   03CE 02s04r5A            707 	ljmp	00106$
+   03D1                     708 00105$:
+                            709 ;	_fsmul.c 116
+   03D1 90s00r10            710 	mov	dptr,#___fsmul_result_1_1
+   03D4 E0                  711 	movx	a,@dptr
+   03D5 F5*04               712 	mov	___fsmul_sloc1_1_0,a
+   03D7 A3                  713 	inc	dptr
+   03D8 E0                  714 	movx	a,@dptr
+   03D9 F5*05               715 	mov	(___fsmul_sloc1_1_0 + 1),a
+   03DB A3                  716 	inc	dptr
+   03DC E0                  717 	movx	a,@dptr
+   03DD F5*06               718 	mov	(___fsmul_sloc1_1_0 + 2),a
+   03DF A3                  719 	inc	dptr
+   03E0 E0                  720 	movx	a,@dptr
+   03E1 F5*07               721 	mov	(___fsmul_sloc1_1_0 + 3),a
+   03E3 90s00r10            722 	mov	dptr,#___fsmul_result_1_1
+   03E6 74 40               723 	mov	a,#0x40
+   03E8 25*04               724 	add	a,___fsmul_sloc1_1_0
+   03EA F0                  725 	movx	@dptr,a
+                            726 ; Peephole 180   changed mov to clr
+   03EB E4                  727 	clr  a
+   03EC 35*05               728 	addc	a,(___fsmul_sloc1_1_0 + 1)
+   03EE A3                  729 	inc	dptr
+   03EF F0                  730 	movx	@dptr,a
+                            731 ; Peephole 180   changed mov to clr
+   03F0 E4                  732 	clr  a
+   03F1 35*06               733 	addc	a,(___fsmul_sloc1_1_0 + 2)
+   03F3 A3                  734 	inc	dptr
+   03F4 F0                  735 	movx	@dptr,a
+                            736 ; Peephole 180   changed mov to clr
+   03F5 E4                  737 	clr  a
+   03F6 35*07               738 	addc	a,(___fsmul_sloc1_1_0 + 3)
+   03F8 A3                  739 	inc	dptr
+   03F9 F0                  740 	movx	@dptr,a
+                            741 ;	_fsmul.c 117
+   03FA 90s00r10            742 	mov	dptr,#___fsmul_result_1_1
+   03FD E0                  743 	movx	a,@dptr
+   03FE F5*04               744 	mov	___fsmul_sloc1_1_0,a
+   0400 A3                  745 	inc	dptr
+   0401 E0                  746 	movx	a,@dptr
+   0402 F5*05               747 	mov	(___fsmul_sloc1_1_0 + 1),a
+   0404 A3                  748 	inc	dptr
+   0405 E0                  749 	movx	a,@dptr
+   0406 F5*06               750 	mov	(___fsmul_sloc1_1_0 + 2),a
+   0408 A3                  751 	inc	dptr
+   0409 E0                  752 	movx	a,@dptr
+   040A F5*07               753 	mov	(___fsmul_sloc1_1_0 + 3),a
+   040C E5*05               754 	mov	a,(___fsmul_sloc1_1_0 + 1)
+   040E A2 E7               755 	mov	c,acc.7
+   0410 C5*04               756 	xch	a,___fsmul_sloc1_1_0
+   0412 33                  757 	rlc	a
+   0413 C5*04               758 	xch	a,___fsmul_sloc1_1_0
+   0415 33                  759 	rlc	a
+   0416 C5*04               760 	xch	a,___fsmul_sloc1_1_0
+   0418 54 01               761 	anl	a,#0x01
+   041A F5*05               762 	mov	(___fsmul_sloc1_1_0 + 1),a
+   041C E5*06               763 	mov	a,(___fsmul_sloc1_1_0 + 2)
+   041E 25 E0               764 	add	a,acc
+   0420 45*05               765 	orl	a,(___fsmul_sloc1_1_0 + 1)
+   0422 F5*05               766 	mov	(___fsmul_sloc1_1_0 + 1),a
+   0424 E5*07               767 	mov	a,(___fsmul_sloc1_1_0 + 3)
+   0426 A2 E7               768 	mov	c,acc.7
+   0428 C5*06               769 	xch	a,(___fsmul_sloc1_1_0 + 2)
+   042A 33                  770 	rlc	a
+   042B C5*06               771 	xch	a,(___fsmul_sloc1_1_0 + 2)
+   042D 33                  772 	rlc	a
+   042E C5*06               773 	xch	a,(___fsmul_sloc1_1_0 + 2)
+   0430 54 01               774 	anl	a,#0x01
+   0432 F5*07               775 	mov	(___fsmul_sloc1_1_0 + 3),a
+   0434 90s00r10            776 	mov	dptr,#___fsmul_result_1_1
+   0437 E5*04               777 	mov	a,___fsmul_sloc1_1_0
+   0439 F0                  778 	movx	@dptr,a
+   043A A3                  779 	inc	dptr
+   043B E5*05               780 	mov	a,(___fsmul_sloc1_1_0 + 1)
+   043D F0                  781 	movx	@dptr,a
+   043E A3                  782 	inc	dptr
+   043F E5*06               783 	mov	a,(___fsmul_sloc1_1_0 + 2)
+   0441 F0                  784 	movx	@dptr,a
+   0442 A3                  785 	inc	dptr
+   0443 E5*07               786 	mov	a,(___fsmul_sloc1_1_0 + 3)
+   0445 F0                  787 	movx	@dptr,a
+                            788 ;	_fsmul.c 118
+   0446 90s00r14            789 	mov	dptr,#___fsmul_exp_1_1
+   0449 E0                  790 	movx	a,@dptr
+   044A 24 FF               791 	add	a,#0xff
+   044C FA                  792 	mov	r2,a
+   044D A3                  793 	inc	dptr
+   044E E0                  794 	movx	a,@dptr
+   044F 34 FF               795 	addc	a,#0xff
+   0451 FE                  796 	mov	r6,a
+   0452 90s00r14            797 	mov	dptr,#___fsmul_exp_1_1
+   0455 EA                  798 	mov	a,r2
+   0456 F0                  799 	movx	@dptr,a
+   0457 A3                  800 	inc	dptr
+   0458 EE                  801 	mov	a,r6
+   0459 F0                  802 	movx	@dptr,a
+   045A                     803 00106$:
+                            804 ;	_fsmul.c 121
+   045A 90s00r10            805 	mov	dptr,#___fsmul_result_1_1
+   045D E0                  806 	movx	a,@dptr
+   045E F5*04               807 	mov	___fsmul_sloc1_1_0,a
+   0460 A3                  808 	inc	dptr
+   0461 E0                  809 	movx	a,@dptr
+   0462 F5*05               810 	mov	(___fsmul_sloc1_1_0 + 1),a
+   0464 A3                  811 	inc	dptr
+   0465 E0                  812 	movx	a,@dptr
+   0466 F5*06               813 	mov	(___fsmul_sloc1_1_0 + 2),a
+   0468 A3                  814 	inc	dptr
+   0469 E0                  815 	movx	a,@dptr
+   046A F5*07               816 	mov	(___fsmul_sloc1_1_0 + 3),a
+   046C 90s00r10            817 	mov	dptr,#___fsmul_result_1_1
+   046F E5*04               818 	mov	a,___fsmul_sloc1_1_0
+   0471 F0                  819 	movx	@dptr,a
+   0472 A3                  820 	inc	dptr
+   0473 E5*05               821 	mov	a,(___fsmul_sloc1_1_0 + 1)
+   0475 F0                  822 	movx	@dptr,a
+   0476 74 7F               823 	mov	a,#0x7f
+   0478 55*06               824 	anl	a,(___fsmul_sloc1_1_0 + 2)
+   047A A3                  825 	inc	dptr
+   047B F0                  826 	movx	@dptr,a
+   047C A3                  827 	inc	dptr
+   047D E5*07               828 	mov	a,(___fsmul_sloc1_1_0 + 3)
+   047F F0                  829 	movx	@dptr,a
+                            830 ;	_fsmul.c 124
+   0480 90s00r16            831 	mov	dptr,#___fsmul_sign_1_1
+   0483 E0                  832 	movx	a,@dptr
+                            833 ; Peephole 105   removed redundant mov
+   0484 FA                  834 	mov  r2,a
+                            835 ; Peephole 110   removed ljmp by inverse jump logic
+   0485 60 0E               836 	jz  00109$
+   0487                     837 00119$:
+   0487 75*04 00            838 	mov	___fsmul_sloc1_1_0,#0x00
+   048A 75*05 00            839 	mov	(___fsmul_sloc1_1_0 + 1),#0x00
+   048D 75*06 00            840 	mov	(___fsmul_sloc1_1_0 + 2),#0x00
+   0490 75*07 80            841 	mov	(___fsmul_sloc1_1_0 + 3),#0x80
+                            842 ; Peephole 132   changed ljmp to sjmp
+   0493 80 09               843 	sjmp 00110$
+   0495                     844 00109$:
+   0495 E4                  845 	clr	a
+   0496 F5*07               846 	mov	(___fsmul_sloc1_1_0 + 3),a
+   0498 F5*06               847 	mov	(___fsmul_sloc1_1_0 + 2),a
+   049A F5*05               848 	mov	(___fsmul_sloc1_1_0 + 1),a
+   049C F5*04               849 	mov	___fsmul_sloc1_1_0,a
+   049E                     850 00110$:
+   049E 90s00r14            851 	mov	dptr,#___fsmul_exp_1_1
+   04A1 E0                  852 	movx	a,@dptr
+   04A2 FA                  853 	mov	r2,a
+   04A3 A3                  854 	inc	dptr
+   04A4 E0                  855 	movx	a,@dptr
+   04A5 FE                  856 	mov	r6,a
+   04A6 8A*00               857 	mov	___fsmul_sloc0_1_0,r2
+   04A8 8E*01               858 	mov	(___fsmul_sloc0_1_0 + 1),r6
+   04AA 75*02 00            859 	mov	(___fsmul_sloc0_1_0 + 2),#0x00
+   04AD 75*03 00            860 	mov	(___fsmul_sloc0_1_0 + 3),#0x00
+   04B0 85*00*02            861 	mov	(___fsmul_sloc0_1_0 + 2),___fsmul_sloc0_1_0
+   04B3 E5*01               862 	mov	a,(___fsmul_sloc0_1_0 + 1)
+   04B5 54 01               863 	anl	a,#0x01
+   04B7 A2 E0               864 	mov	c,acc.0
+   04B9 C5*02               865 	xch	a,(___fsmul_sloc0_1_0 + 2)
+   04BB 13                  866 	rrc	a
+   04BC C5*02               867 	xch	a,(___fsmul_sloc0_1_0 + 2)
+   04BE 13                  868 	rrc	a
+   04BF C5*02               869 	xch	a,(___fsmul_sloc0_1_0 + 2)
+   04C1 F5*03               870 	mov	(___fsmul_sloc0_1_0 + 3),a
+                            871 ; Peephole 3.c   changed mov to clr
+   04C3 E4                  872 	clr  a
+   04C4 F5*01               873 	mov  (___fsmul_sloc0_1_0 + 1),a
+                            874 ; Peephole 105   removed redundant mov
+   04C6 F5*00               875 	mov  ___fsmul_sloc0_1_0,a
+   04C8 42*04               876 	orl	___fsmul_sloc1_1_0,a
+   04CA E5*01               877 	mov	a,(___fsmul_sloc0_1_0 + 1)
+   04CC 42*05               878 	orl	(___fsmul_sloc1_1_0 + 1),a
+   04CE E5*02               879 	mov	a,(___fsmul_sloc0_1_0 + 2)
+   04D0 42*06               880 	orl	(___fsmul_sloc1_1_0 + 2),a
+   04D2 E5*03               881 	mov	a,(___fsmul_sloc0_1_0 + 3)
+   04D4 42*07               882 	orl	(___fsmul_sloc1_1_0 + 3),a
+   04D6 90s00r10            883 	mov	dptr,#___fsmul_result_1_1
+   04D9 E0                  884 	movx	a,@dptr
+   04DA F5*00               885 	mov	___fsmul_sloc0_1_0,a
+   04DC A3                  886 	inc	dptr
+   04DD E0                  887 	movx	a,@dptr
+   04DE F5*01               888 	mov	(___fsmul_sloc0_1_0 + 1),a
+   04E0 A3                  889 	inc	dptr
+   04E1 E0                  890 	movx	a,@dptr
+   04E2 F5*02               891 	mov	(___fsmul_sloc0_1_0 + 2),a
+   04E4 A3                  892 	inc	dptr
+   04E5 E0                  893 	movx	a,@dptr
+   04E6 F5*03               894 	mov	(___fsmul_sloc0_1_0 + 3),a
+   04E8 E5*00               895 	mov	a,___fsmul_sloc0_1_0
+   04EA 42*04               896 	orl	___fsmul_sloc1_1_0,a
+   04EC E5*01               897 	mov	a,(___fsmul_sloc0_1_0 + 1)
+   04EE 42*05               898 	orl	(___fsmul_sloc1_1_0 + 1),a
+   04F0 E5*02               899 	mov	a,(___fsmul_sloc0_1_0 + 2)
+   04F2 42*06               900 	orl	(___fsmul_sloc1_1_0 + 2),a
+   04F4 E5*03               901 	mov	a,(___fsmul_sloc0_1_0 + 3)
+   04F6 42*07               902 	orl	(___fsmul_sloc1_1_0 + 3),a
+   04F8 90s00r08            903 	mov	dptr,#(___fsmul_fl1_1_1)
+   04FB E5*04               904 	mov	a,___fsmul_sloc1_1_0
+   04FD F0                  905 	movx	@dptr,a
+   04FE A3                  906 	inc	dptr
+   04FF E5*05               907 	mov	a,(___fsmul_sloc1_1_0 + 1)
+   0501 F0                  908 	movx	@dptr,a
+   0502 A3                  909 	inc	dptr
+   0503 E5*06               910 	mov	a,(___fsmul_sloc1_1_0 + 2)
+   0505 F0                  911 	movx	@dptr,a
+   0506 A3                  912 	inc	dptr
+   0507 E5*07               913 	mov	a,(___fsmul_sloc1_1_0 + 3)
+   0509 F0                  914 	movx	@dptr,a
+                            915 ;	_fsmul.c 125
+   050A 90s00r08            916 	mov	dptr,#(___fsmul_fl1_1_1)
+   050D E0                  917 	movx	a,@dptr
+   050E F5*04               918 	mov	___fsmul_sloc1_1_0,a
+   0510 A3                  919 	inc	dptr
+   0511 E0                  920 	movx	a,@dptr
+   0512 F5*05               921 	mov	(___fsmul_sloc1_1_0 + 1),a
+   0514 A3                  922 	inc	dptr
+   0515 E0                  923 	movx	a,@dptr
+   0516 F5*06               924 	mov	(___fsmul_sloc1_1_0 + 2),a
+   0518 A3                  925 	inc	dptr
+   0519 E0                  926 	movx	a,@dptr
+                            927 ; Peephole 191   removed redundant mov
+   051A F5*07               928 	mov  (___fsmul_sloc1_1_0 + 3),a
+   051C 85*04 82            929 	mov  dpl,___fsmul_sloc1_1_0
+   051F 85*05 83            930 	mov  dph,(___fsmul_sloc1_1_0 + 1)
+   0522 85*06 F0            931 	mov  b,(___fsmul_sloc1_1_0 + 2)
+   0525                     932 00107$:
+                    0525    933 	C$_fsmul.c$126$1$1 ==.
+                    0525    934 	XG$__fsmul$0$0 ==.
+   0525 22                  935 	ret
+                            936 	.area	CSEG    (CODE)

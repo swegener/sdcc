@@ -1,0 +1,228 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:31 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module _moduint
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl __moduint_PARM_2
+                             11 	.globl __moduint
+                             12 ;--------------------------------------------------------
+                             13 ; special function registers
+                             14 ;--------------------------------------------------------
+                             15 ;--------------------------------------------------------
+                             16 ; special function bits 
+                             17 ;--------------------------------------------------------
+                             18 ;--------------------------------------------------------
+                             19 ; internal ram data
+                             20 ;--------------------------------------------------------
+                             21 	.area	DSEG    (DATA)
+                             22 ;--------------------------------------------------------
+                             23 ; overlayable items in internal ram 
+                             24 ;--------------------------------------------------------
+                             25 	.area	OSEG	(OVR,DATA)
+                             26 ;--------------------------------------------------------
+                             27 ; indirectly addressable internal ram data
+                             28 ;--------------------------------------------------------
+                             29 	.area	ISEG    (DATA)
+                             30 ;--------------------------------------------------------
+                             31 ; bit data
+                             32 ;--------------------------------------------------------
+                             33 	.area	BSEG    (BIT)
+                             34 ;--------------------------------------------------------
+                             35 ; external ram data
+                             36 ;--------------------------------------------------------
+                             37 	.area	XSEG    (XDATA)
+   0000                      38 __moduint_PARM_2:
+   0000                      39 	.ds	0x0002
+   0002                      40 __moduint_a_1_1:
+   0002                      41 	.ds	0x0002
+   0004                      42 __moduint_count_1_1:
+   0004                      43 	.ds	0x0001
+                             44 ;--------------------------------------------------------
+                             45 ; global & static initialisations
+                             46 ;--------------------------------------------------------
+                             47 	.area GSINIT (CODE)
+                             48 ;--------------------------------------------------------
+                             49 ; code
+                             50 ;--------------------------------------------------------
+                             51 	.area CSEG (CODE)
+                    0000     52 	G$_moduint$0$0 ==.
+                             53 ;	_moduint.c 30
+                             54 ;	-----------------------------------------
+                             55 ;	 function _moduint
+                             56 ;	-----------------------------------------
+   0000                      57 __moduint:
+                    0002     58 	ar2 = 0x02
+                    0003     59 	ar3 = 0x03
+                    0004     60 	ar4 = 0x04
+                    0005     61 	ar5 = 0x05
+                    0006     62 	ar6 = 0x06
+                    0007     63 	ar7 = 0x07
+                    0000     64 	ar0 = 0x00
+                    0001     65 	ar1 = 0x01
+                             66 ;	_moduint.c 52
+   0000 C0 83                67 	push	dph
+   0002 C0 82                68 	push	dpl
+   0004 90s00r02             69 	mov	dptr,#__moduint_a_1_1
+   0007 D0 E0                70 	pop	acc
+   0009 F0                   71 	movx	@dptr,a
+   000A D0 E0                72 	pop	acc
+   000C A3                   73 	inc	dptr
+   000D F0                   74 	movx	@dptr,a
+                             75 ;	_moduint.c 32
+   000E 90s00r04             76 	mov	dptr,#__moduint_count_1_1
+                             77 ; Peephole 180   changed mov to clr
+   0011 E4                   78 	clr  a
+   0012 F0                   79 	movx	@dptr,a
+                             80 ;	_moduint.c 35
+   0013 90s00r02             81 	mov	dptr,#__moduint_a_1_1
+   0016 E0                   82 	movx	a,@dptr
+   0017 FA                   83 	mov	r2,a
+   0018 A3                   84 	inc	dptr
+   0019 E0                   85 	movx	a,@dptr
+   001A FB                   86 	mov	r3,a
+   001B 7C 00                87 	mov	r4,#0x00
+   001D                      88 00103$:
+   001D 90s00r00             89 	mov	dptr,#__moduint_PARM_2
+   0020 E0                   90 	movx	a,@dptr
+   0021 FD                   91 	mov	r5,a
+   0022 A3                   92 	inc	dptr
+   0023 E0                   93 	movx	a,@dptr
+                             94 ; Peephole 105   removed redundant mov
+   0024 FE                   95 	mov  r6,a
+   0025 23                   96 	rl	a
+   0026 54 01                97 	anl	a,#0x01
+                             98 ; Peephole 105   removed redundant mov
+   0028 FF                   99 	mov  r7,a
+                            100 ; Peephole 109   removed ljmp by inverse jump logic
+   0029 70 30               101 	jnz  00117$
+   002B                     102 00119$:
+                            103 ;	_moduint.c 36
+   002B EE                  104 	mov	a,r6
+   002C CD                  105 	xch	a,r5
+   002D 25 E0               106 	add	a,acc
+   002F CD                  107 	xch	a,r5
+   0030 33                  108 	rlc	a
+   0031 FE                  109 	mov	r6,a
+   0032 90s00r00            110 	mov	dptr,#__moduint_PARM_2
+   0035 ED                  111 	mov	a,r5
+   0036 F0                  112 	movx	@dptr,a
+   0037 A3                  113 	inc	dptr
+   0038 EE                  114 	mov	a,r6
+   0039 F0                  115 	movx	@dptr,a
+                            116 ;	_moduint.c 37
+   003A C3                  117 	clr	c
+   003B EA                  118 	mov	a,r2
+   003C 9D                  119 	subb	a,r5
+   003D EB                  120 	mov	a,r3
+   003E 9E                  121 	subb	a,r6
+                            122 ; Peephole 108   removed ljmp by inverse jump logic
+   003F 50 11               123 	jnc  00102$
+   0041                     124 00120$:
+                            125 ;	_moduint.c 39
+   0041 EE                  126 	mov	a,r6
+   0042 C3                  127 	clr	c
+   0043 13                  128 	rrc	a
+   0044 CD                  129 	xch	a,r5
+   0045 13                  130 	rrc	a
+   0046 CD                  131 	xch	a,r5
+   0047 FE                  132 	mov	r6,a
+   0048 90s00r00            133 	mov	dptr,#__moduint_PARM_2
+   004B ED                  134 	mov	a,r5
+   004C F0                  135 	movx	@dptr,a
+   004D A3                  136 	inc	dptr
+   004E EE                  137 	mov	a,r6
+   004F F0                  138 	movx	@dptr,a
+                            139 ;	_moduint.c 40
+                            140 ; Peephole 132   changed ljmp to sjmp
+   0050 80 09               141 	sjmp 00117$
+   0052                     142 00102$:
+                            143 ;	_moduint.c 42
+   0052 0C                  144 	inc	r4
+   0053 90s00r04            145 	mov	dptr,#__moduint_count_1_1
+   0056 EC                  146 	mov	a,r4
+   0057 F0                  147 	movx	@dptr,a
+   0058 02s00r1D            148 	ljmp	00103$
+                            149 ;	_moduint.c 45
+   005B                     150 00117$:
+   005B 90s00r04            151 	mov	dptr,#__moduint_count_1_1
+   005E E0                  152 	movx	a,@dptr
+   005F FA                  153 	mov	r2,a
+   0060                     154 00108$:
+                            155 ;	_moduint.c 46
+   0060 90s00r02            156 	mov	dptr,#__moduint_a_1_1
+   0063 E0                  157 	movx	a,@dptr
+   0064 FB                  158 	mov	r3,a
+   0065 A3                  159 	inc	dptr
+   0066 E0                  160 	movx	a,@dptr
+   0067 FC                  161 	mov	r4,a
+   0068 90s00r00            162 	mov	dptr,#__moduint_PARM_2
+   006B E0                  163 	movx	a,@dptr
+   006C FD                  164 	mov	r5,a
+   006D A3                  165 	inc	dptr
+   006E E0                  166 	movx	a,@dptr
+   006F FE                  167 	mov	r6,a
+   0070 C3                  168 	clr	c
+   0071 EB                  169 	mov	a,r3
+   0072 9D                  170 	subb	a,r5
+   0073 EC                  171 	mov	a,r4
+   0074 9E                  172 	subb	a,r6
+                            173 ; Peephole 132   changed ljmp to sjmp
+                            174 ; Peephole 160   removed sjmp by inverse jump logic
+   0075 40 0B               175 	jc   00107$
+   0077                     176 00121$:
+                            177 ;	_moduint.c 47
+   0077 90s00r02            178 	mov	dptr,#__moduint_a_1_1
+   007A C3                  179 	clr	c
+   007B EB                  180 	mov	a,r3
+   007C 9D                  181 	subb	a,r5
+   007D F0                  182 	movx	@dptr,a
+   007E EC                  183 	mov	a,r4
+   007F 9E                  184 	subb	a,r6
+   0080 A3                  185 	inc	dptr
+   0081 F0                  186 	movx	@dptr,a
+   0082                     187 00107$:
+                            188 ;	_moduint.c 49
+   0082 90s00r00            189 	mov	dptr,#__moduint_PARM_2
+   0085 E0                  190 	movx	a,@dptr
+   0086 FB                  191 	mov	r3,a
+   0087 A3                  192 	inc	dptr
+   0088 E0                  193 	movx	a,@dptr
+                            194 ; Peephole 105   removed redundant mov
+   0089 FC                  195 	mov  r4,a
+   008A C3                  196 	clr	c
+   008B 13                  197 	rrc	a
+   008C CB                  198 	xch	a,r3
+   008D 13                  199 	rrc	a
+   008E CB                  200 	xch	a,r3
+   008F FC                  201 	mov	r4,a
+   0090 90s00r00            202 	mov	dptr,#__moduint_PARM_2
+   0093 EB                  203 	mov	a,r3
+   0094 F0                  204 	movx	@dptr,a
+   0095 A3                  205 	inc	dptr
+   0096 EC                  206 	mov	a,r4
+   0097 F0                  207 	movx	@dptr,a
+                            208 ;	_moduint.c 50
+   0098 8A 03               209 	mov	ar3,r2
+   009A 1A                  210 	dec	r2
+   009B EB                  211 	mov	a,r3
+   009C 60 03               212 	jz	00122$
+   009E 02s00r60            213 	ljmp	00108$
+   00A1                     214 00122$:
+                            215 ;	_moduint.c 52
+   00A1 90s00r02            216 	mov	dptr,#__moduint_a_1_1
+   00A4 E0                  217 	movx	a,@dptr
+   00A5 FA                  218 	mov	r2,a
+   00A6 A3                  219 	inc	dptr
+   00A7 E0                  220 	movx	a,@dptr
+   00A8 FB                  221 	mov	r3,a
+   00A9 8A 82               222 	mov	dpl,r2
+   00AB 8B 83               223 	mov	dph,r3
+   00AD                     224 00111$:
+                    00AD    225 	C$_moduint.c$53$1$1 ==.
+                    00AD    226 	XG$_moduint$0$0 ==.
+   00AD 22                  227 	ret
+                            228 	.area	CSEG    (CODE)

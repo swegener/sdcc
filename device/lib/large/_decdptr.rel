@@ -1,0 +1,34 @@
+;!FILE _decdptr.asm
+XH
+H 8 areas A global symbols
+M _decdptr
+A _CODE size 0 flags 0
+A DSEG size 0 flags 0
+A OSEG size 0 flags 4
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 0 flags 40
+A GSINIT size 0 flags 20
+A CSEG size A flags 20
+S A$_decdptr$60 Def0000
+S C$_decdptr.c$36$1$1 Def0009
+S A$_decdptr$61 Def0002
+S A$_decdptr$62 Def0004
+S A$_decdptr$64 Def0006
+S A$_decdptr$65 Def0007
+S A$_decdptr$69 Def0009
+S __decdptr Def0000
+S XG$_decdptr$0$0 Def0009
+S G$_decdptr$0$0 Def0000
+T 00 00
+R 00 00 00 07
+T 00 00 C5 82 70 02 15 83
+R 00 00 00 07
+T 00 06
+R 00 00 00 07
+T 00 06 14 C5 82
+R 00 00 00 07
+T 00 09
+R 00 00 00 07
+T 00 09 22
+R 00 00 00 07

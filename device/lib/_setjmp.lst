@@ -1,0 +1,403 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:32 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module _setjmp
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl _setjmp
+                             11 	.globl _longjmp
+                             12 	.globl _longjmp_PARM_2
+                             13 ;--------------------------------------------------------
+                             14 ; special function registers
+                             15 ;--------------------------------------------------------
+                    0080     16 G$P0$0$0 == 0x0080
+                    0080     17 _P0	=	0x0080
+                    0090     18 G$P1$0$0 == 0x0090
+                    0090     19 _P1	=	0x0090
+                    00A0     20 G$P2$0$0 == 0x00a0
+                    00A0     21 _P2	=	0x00a0
+                    00B0     22 G$P3$0$0 == 0x00b0
+                    00B0     23 _P3	=	0x00b0
+                    00D0     24 G$PSW$0$0 == 0x00d0
+                    00D0     25 _PSW	=	0x00d0
+                    00E0     26 G$ACC$0$0 == 0x00e0
+                    00E0     27 _ACC	=	0x00e0
+                    00F0     28 G$B$0$0 == 0x00f0
+                    00F0     29 _B	=	0x00f0
+                    0081     30 G$SP$0$0 == 0x0081
+                    0081     31 _SP	=	0x0081
+                    0082     32 G$DPL$0$0 == 0x0082
+                    0082     33 _DPL	=	0x0082
+                    0083     34 G$DPH$0$0 == 0x0083
+                    0083     35 _DPH	=	0x0083
+                    0087     36 G$PCON$0$0 == 0x0087
+                    0087     37 _PCON	=	0x0087
+                    0088     38 G$TCON$0$0 == 0x0088
+                    0088     39 _TCON	=	0x0088
+                    0089     40 G$TMOD$0$0 == 0x0089
+                    0089     41 _TMOD	=	0x0089
+                    008A     42 G$TL0$0$0 == 0x008a
+                    008A     43 _TL0	=	0x008a
+                    008B     44 G$TL1$0$0 == 0x008b
+                    008B     45 _TL1	=	0x008b
+                    008C     46 G$TH0$0$0 == 0x008c
+                    008C     47 _TH0	=	0x008c
+                    008D     48 G$TH1$0$0 == 0x008d
+                    008D     49 _TH1	=	0x008d
+                    008E     50 G$AUXR$0$0 == 0x008e
+                    008E     51 _AUXR	=	0x008e
+                    00A8     52 G$IE$0$0 == 0x00a8
+                    00A8     53 _IE	=	0x00a8
+                    00B8     54 G$IP$0$0 == 0x00b8
+                    00B8     55 _IP	=	0x00b8
+                    0098     56 G$SCON$0$0 == 0x0098
+                    0098     57 _SCON	=	0x0098
+                    0099     58 G$SBUF$0$0 == 0x0099
+                    0099     59 _SBUF	=	0x0099
+                    00C8     60 G$T2CON$0$0 == 0x00c8
+                    00C8     61 _T2CON	=	0x00c8
+                    00CB     62 G$RCAP2H$0$0 == 0x00cb
+                    00CB     63 _RCAP2H	=	0x00cb
+                    00CA     64 G$RCAP2L$0$0 == 0x00ca
+                    00CA     65 _RCAP2L	=	0x00ca
+                             66 ;--------------------------------------------------------
+                             67 ; special function bits 
+                             68 ;--------------------------------------------------------
+                    00D7     69 G$CY$0$0 == 0x00d7
+                    00D7     70 _CY	=	0x00d7
+                    00D6     71 G$AC$0$0 == 0x00d6
+                    00D6     72 _AC	=	0x00d6
+                    00D5     73 G$F0$0$0 == 0x00d5
+                    00D5     74 _F0	=	0x00d5
+                    00D4     75 G$RS1$0$0 == 0x00d4
+                    00D4     76 _RS1	=	0x00d4
+                    00D3     77 G$RS0$0$0 == 0x00d3
+                    00D3     78 _RS0	=	0x00d3
+                    00D2     79 G$OV$0$0 == 0x00d2
+                    00D2     80 _OV	=	0x00d2
+                    00D0     81 G$P$0$0 == 0x00d0
+                    00D0     82 _P	=	0x00d0
+                    008F     83 G$TF1$0$0 == 0x008f
+                    008F     84 _TF1	=	0x008f
+                    008E     85 G$TR1$0$0 == 0x008e
+                    008E     86 _TR1	=	0x008e
+                    008D     87 G$TF0$0$0 == 0x008d
+                    008D     88 _TF0	=	0x008d
+                    008C     89 G$TR0$0$0 == 0x008c
+                    008C     90 _TR0	=	0x008c
+                    008B     91 G$IE1$0$0 == 0x008b
+                    008B     92 _IE1	=	0x008b
+                    008A     93 G$IT1$0$0 == 0x008a
+                    008A     94 _IT1	=	0x008a
+                    0089     95 G$IE0$0$0 == 0x0089
+                    0089     96 _IE0	=	0x0089
+                    0088     97 G$IT0$0$0 == 0x0088
+                    0088     98 _IT0	=	0x0088
+                    00AF     99 G$EA$0$0 == 0x00af
+                    00AF    100 _EA	=	0x00af
+                    00AC    101 G$ES$0$0 == 0x00ac
+                    00AC    102 _ES	=	0x00ac
+                    00AB    103 G$ET1$0$0 == 0x00ab
+                    00AB    104 _ET1	=	0x00ab
+                    00AA    105 G$EX1$0$0 == 0x00aa
+                    00AA    106 _EX1	=	0x00aa
+                    00A9    107 G$ET0$0$0 == 0x00a9
+                    00A9    108 _ET0	=	0x00a9
+                    00A8    109 G$EX0$0$0 == 0x00a8
+                    00A8    110 _EX0	=	0x00a8
+                    00BC    111 G$PS$0$0 == 0x00bc
+                    00BC    112 _PS	=	0x00bc
+                    00BB    113 G$PT1$0$0 == 0x00bb
+                    00BB    114 _PT1	=	0x00bb
+                    00BA    115 G$PX1$0$0 == 0x00ba
+                    00BA    116 _PX1	=	0x00ba
+                    00B9    117 G$PT0$0$0 == 0x00b9
+                    00B9    118 _PT0	=	0x00b9
+                    00B8    119 G$PX0$0$0 == 0x00b8
+                    00B8    120 _PX0	=	0x00b8
+                    00B7    121 G$RD$0$0 == 0x00b7
+                    00B7    122 _RD	=	0x00b7
+                    00B6    123 G$WR$0$0 == 0x00b6
+                    00B6    124 _WR	=	0x00b6
+                    00B5    125 G$T1$0$0 == 0x00b5
+                    00B5    126 _T1	=	0x00b5
+                    00B4    127 G$T0$0$0 == 0x00b4
+                    00B4    128 _T0	=	0x00b4
+                    00B3    129 G$INT1$0$0 == 0x00b3
+                    00B3    130 _INT1	=	0x00b3
+                    00B2    131 G$INT0$0$0 == 0x00b2
+                    00B2    132 _INT0	=	0x00b2
+                    00B1    133 G$TXD$0$0 == 0x00b1
+                    00B1    134 _TXD	=	0x00b1
+                    00B0    135 G$RXD$0$0 == 0x00b0
+                    00B0    136 _RXD	=	0x00b0
+                    0090    137 G$P1_0$0$0 == 0x0090
+                    0090    138 _P1_0	=	0x0090
+                    0091    139 G$P1_1$0$0 == 0x0091
+                    0091    140 _P1_1	=	0x0091
+                    0092    141 G$P1_2$0$0 == 0x0092
+                    0092    142 _P1_2	=	0x0092
+                    0093    143 G$P1_3$0$0 == 0x0093
+                    0093    144 _P1_3	=	0x0093
+                    0094    145 G$P1_4$0$0 == 0x0094
+                    0094    146 _P1_4	=	0x0094
+                    0095    147 G$P1_5$0$0 == 0x0095
+                    0095    148 _P1_5	=	0x0095
+                    0096    149 G$P1_6$0$0 == 0x0096
+                    0096    150 _P1_6	=	0x0096
+                    0097    151 G$P1_7$0$0 == 0x0097
+                    0097    152 _P1_7	=	0x0097
+                    009F    153 G$SM0$0$0 == 0x009f
+                    009F    154 _SM0	=	0x009f
+                    009E    155 G$SM1$0$0 == 0x009e
+                    009E    156 _SM1	=	0x009e
+                    009D    157 G$SM2$0$0 == 0x009d
+                    009D    158 _SM2	=	0x009d
+                    009C    159 G$REN$0$0 == 0x009c
+                    009C    160 _REN	=	0x009c
+                    009B    161 G$TB8$0$0 == 0x009b
+                    009B    162 _TB8	=	0x009b
+                    009A    163 G$RB8$0$0 == 0x009a
+                    009A    164 _RB8	=	0x009a
+                    0099    165 G$TI$0$0 == 0x0099
+                    0099    166 _TI	=	0x0099
+                    0098    167 G$RI$0$0 == 0x0098
+                    0098    168 _RI	=	0x0098
+                    00C8    169 G$T2CON_0$0$0 == 0x00c8
+                    00C8    170 _T2CON_0	=	0x00c8
+                    00C9    171 G$T2CON_1$0$0 == 0x00c9
+                    00C9    172 _T2CON_1	=	0x00c9
+                    00CA    173 G$T2CON_2$0$0 == 0x00ca
+                    00CA    174 _T2CON_2	=	0x00ca
+                    00CB    175 G$T2CON_3$0$0 == 0x00cb
+                    00CB    176 _T2CON_3	=	0x00cb
+                    00CC    177 G$T2CON_4$0$0 == 0x00cc
+                    00CC    178 _T2CON_4	=	0x00cc
+                    00CD    179 G$T2CON_5$0$0 == 0x00cd
+                    00CD    180 _T2CON_5	=	0x00cd
+                    00CE    181 G$T2CON_6$0$0 == 0x00ce
+                    00CE    182 _T2CON_6	=	0x00ce
+                    00CF    183 G$T2CON_7$0$0 == 0x00cf
+                    00CF    184 _T2CON_7	=	0x00cf
+                            185 ;--------------------------------------------------------
+                            186 ; internal ram data
+                            187 ;--------------------------------------------------------
+                            188 	.area	DSEG    (DATA)
+   0000                     189 _setjmp_sloc0_1_0:
+   0000                     190 	.ds	0x0003
+                            191 ;--------------------------------------------------------
+                            192 ; overlayable items in internal ram 
+                            193 ;--------------------------------------------------------
+                            194 	.area	OSEG	(OVR,DATA)
+                            195 ;--------------------------------------------------------
+                            196 ; indirectly addressable internal ram data
+                            197 ;--------------------------------------------------------
+                            198 	.area	ISEG    (DATA)
+                            199 ;--------------------------------------------------------
+                            200 ; bit data
+                            201 ;--------------------------------------------------------
+                            202 	.area	BSEG    (BIT)
+                            203 ;--------------------------------------------------------
+                            204 ; external ram data
+                            205 ;--------------------------------------------------------
+                            206 	.area	XSEG    (XDATA)
+   0000                     207 _longjmp_PARM_2:
+   0000                     208 	.ds	0x0002
+   0002                     209 _longjmp_bp_1_1:
+   0002                     210 	.ds	0x0003
+   0005                     211 _setjmp_bp_1_1:
+   0005                     212 	.ds	0x0003
+                            213 ;--------------------------------------------------------
+                            214 ; global & static initialisations
+                            215 ;--------------------------------------------------------
+                            216 	.area GSINIT (CODE)
+                            217 ;--------------------------------------------------------
+                            218 ; code
+                            219 ;--------------------------------------------------------
+                            220 	.area CSEG (CODE)
+                    0000    221 	G$longjmp$0$0 ==.
+                            222 ;	_setjmp.c 28
+                            223 ;	-----------------------------------------
+                            224 ;	 function longjmp
+                            225 ;	-----------------------------------------
+   0000                     226 _longjmp:
+                    0002    227 	ar2 = 0x02
+                    0003    228 	ar3 = 0x03
+                    0004    229 	ar4 = 0x04
+                    0005    230 	ar5 = 0x05
+                    0006    231 	ar6 = 0x06
+                    0007    232 	ar7 = 0x07
+                    0000    233 	ar0 = 0x00
+                    0001    234 	ar1 = 0x01
+                            235 ;	_setjmp.c 35
+   0000 C0 F0               236 	push	b
+   0002 C0 83               237 	push	dph
+   0004 C0 82               238 	push	dpl
+   0006 90s00r02            239 	mov	dptr,#_longjmp_bp_1_1
+   0009 D0 E0               240 	pop	acc
+   000B F0                  241 	movx	@dptr,a
+   000C D0 E0               242 	pop	acc
+   000E A3                  243 	inc	dptr
+   000F F0                  244 	movx	@dptr,a
+   0010 D0 E0               245 	pop	acc
+   0012 A3                  246 	inc	dptr
+   0013 F0                  247 	movx	@dptr,a
+                            248 ;	_setjmp.c 31
+   0014 90s00r02            249 	mov	dptr,#_longjmp_bp_1_1
+   0017 E0                  250 	movx	a,@dptr
+   0018 FA                  251 	mov	r2,a
+   0019 A3                  252 	inc	dptr
+   001A E0                  253 	movx	a,@dptr
+   001B FB                  254 	mov	r3,a
+   001C A3                  255 	inc	dptr
+   001D E0                  256 	movx	a,@dptr
+   001E FC                  257 	mov	r4,a
+   001F 74 02               258 	mov	a,#0x02
+   0021 2A                  259 	add	a,r2
+   0022 F5 82               260 	mov	dpl,a
+                            261 ; Peephole 180   changed mov to clr
+   0024 E4                  262 	clr  a
+   0025 3B                  263 	addc	a,r3
+   0026 F5 83               264 	mov	dph,a
+   0028 8C F0               265 	mov	b,r4
+   002A 12s00r00            266 	lcall	__gptrget
+   002D FD                  267 	mov	r5,a
+                            268 ;	_setjmp.c 32
+   002E 8D 00               269 	mov	ar0,r5
+   0030 74 01               270 	mov	a,#0x01
+   0032 2A                  271 	add	a,r2
+   0033 FE                  272 	mov	r6,a
+                            273 ; Peephole 180   changed mov to clr
+   0034 E4                  274 	clr  a
+   0035 3B                  275 	addc	a,r3
+   0036 FF                  276 	mov	r7,a
+   0037 8C 01               277 	mov	ar1,r4
+   0039 90s00r02            278 	mov	dptr,#_longjmp_bp_1_1
+   003C EE                  279 	mov	a,r6
+   003D F0                  280 	movx	@dptr,a
+   003E A3                  281 	inc	dptr
+   003F EF                  282 	mov	a,r7
+   0040 F0                  283 	movx	@dptr,a
+   0041 A3                  284 	inc	dptr
+   0042 E9                  285 	mov	a,r1
+   0043 F0                  286 	movx	@dptr,a
+   0044 8A 82               287 	mov	dpl,r2
+   0046 8B 83               288 	mov	dph,r3
+   0048 8C F0               289 	mov	b,r4
+   004A 12s00r00            290 	lcall	__gptrget
+                            291 ; Peephole 192   used a instead of ar2 as source
+   004D FA                  292 	mov  r2,a
+   004E F6                  293 	mov  @r0,a
+                            294 ;	_setjmp.c 33
+   004F 18                  295 	dec	r0
+   0050 8E 82               296 	mov	dpl,r6
+   0052 8F 83               297 	mov	dph,r7
+   0054 89 F0               298 	mov	b,r1
+   0056 12s00r00            299 	lcall	__gptrget
+                            300 ; Peephole 192   used a instead of ar6 as source
+   0059 FE                  301 	mov  r6,a
+   005A F6                  302 	mov  @r0,a
+                            303 ;	_setjmp.c 34
+   005B 8D 81               304 	mov	_SP,r5
+                            305 ;	_setjmp.c 35
+   005D 90s00r00            306 	mov	dptr,#_longjmp_PARM_2
+   0060 E0                  307 	movx	a,@dptr
+   0061 FA                  308 	mov	r2,a
+   0062 A3                  309 	inc	dptr
+   0063 E0                  310 	movx	a,@dptr
+   0064 FD                  311 	mov	r5,a
+   0065 8A 82               312 	mov	dpl,r2
+   0067 8D 83               313 	mov	dph,r5
+   0069                     314 00101$:
+                    0069    315 	C$_setjmp.c$36$1$1 ==.
+                    0069    316 	XG$longjmp$0$0 ==.
+   0069 22                  317 	ret
+                    006A    318 	G$setjmp$0$0 ==.
+                            319 ;	_setjmp.c 38
+                            320 ;	-----------------------------------------
+                            321 ;	 function setjmp
+                            322 ;	-----------------------------------------
+   006A                     323 _setjmp:
+                            324 ;	_setjmp.c 0
+   006A C0 F0               325 	push	b
+   006C C0 83               326 	push	dph
+   006E C0 82               327 	push	dpl
+   0070 90s00r05            328 	mov	dptr,#_setjmp_bp_1_1
+   0073 D0 E0               329 	pop	acc
+   0075 F0                  330 	movx	@dptr,a
+   0076 D0 E0               331 	pop	acc
+   0078 A3                  332 	inc	dptr
+   0079 F0                  333 	movx	@dptr,a
+   007A D0 E0               334 	pop	acc
+   007C A3                  335 	inc	dptr
+   007D F0                  336 	movx	@dptr,a
+                            337 ;	_setjmp.c 43
+   007E 90s00r05            338 	mov	dptr,#_setjmp_bp_1_1
+   0081 E0                  339 	movx	a,@dptr
+   0082 FA                  340 	mov	r2,a
+   0083 A3                  341 	inc	dptr
+   0084 E0                  342 	movx	a,@dptr
+   0085 FB                  343 	mov	r3,a
+   0086 A3                  344 	inc	dptr
+   0087 E0                  345 	movx	a,@dptr
+   0088 FC                  346 	mov	r4,a
+   0089 74 01               347 	mov	a,#0x01
+   008B 2A                  348 	add	a,r2
+   008C F5*00               349 	mov	_setjmp_sloc0_1_0,a
+                            350 ; Peephole 180   changed mov to clr
+   008E E4                  351 	clr  a
+   008F 3B                  352 	addc	a,r3
+   0090 F5*01               353 	mov	(_setjmp_sloc0_1_0 + 1),a
+   0092 8C*02               354 	mov	(_setjmp_sloc0_1_0 + 2),r4
+   0094 A8 81               355 	mov	r0,_SP
+   0096 86 05               356 	mov	ar5,@r0
+   0098 8A 82               357 	mov	dpl,r2
+   009A 8B 83               358 	mov	dph,r3
+   009C 8C F0               359 	mov	b,r4
+   009E ED                  360 	mov	a,r5
+   009F 12s00r00            361 	lcall	__gptrput
+                            362 ;	_setjmp.c 44
+   00A2 74 01               363 	mov	a,#0x01
+   00A4 25*00               364 	add	a,_setjmp_sloc0_1_0
+   00A6 FA                  365 	mov	r2,a
+                            366 ; Peephole 180   changed mov to clr
+   00A7 E4                  367 	clr  a
+   00A8 35*01               368 	addc	a,(_setjmp_sloc0_1_0 + 1)
+   00AA FB                  369 	mov	r3,a
+   00AB AC*02               370 	mov	r4,(_setjmp_sloc0_1_0 + 2)
+   00AD 90s00r05            371 	mov	dptr,#_setjmp_bp_1_1
+   00B0 EA                  372 	mov	a,r2
+   00B1 F0                  373 	movx	@dptr,a
+   00B2 A3                  374 	inc	dptr
+   00B3 EB                  375 	mov	a,r3
+   00B4 F0                  376 	movx	@dptr,a
+   00B5 A3                  377 	inc	dptr
+   00B6 EC                  378 	mov	a,r4
+   00B7 F0                  379 	movx	@dptr,a
+   00B8 AD 81               380 	mov	r5,_SP
+   00BA ED                  381 	mov	a,r5
+   00BB 24 FF               382 	add	a,#0xff
+   00BD F8                  383 	mov	r0,a
+   00BE 86 05               384 	mov	ar5,@r0
+   00C0 85*00 82            385 	mov	dpl,_setjmp_sloc0_1_0
+   00C3 85*01 83            386 	mov	dph,(_setjmp_sloc0_1_0 + 1)
+   00C6 85*02 F0            387 	mov	b,(_setjmp_sloc0_1_0 + 2)
+   00C9 ED                  388 	mov	a,r5
+   00CA 12s00r00            389 	lcall	__gptrput
+                            390 ;	_setjmp.c 45
+   00CD 8A 82               391 	mov	dpl,r2
+   00CF 8B 83               392 	mov	dph,r3
+   00D1 8C F0               393 	mov	b,r4
+   00D3 E5 81               394 	mov	a,_SP
+   00D5 12s00r00            395 	lcall	__gptrput
+                            396 ;	_setjmp.c 46
+                            397 ; Peephole 181   used 16 bit load of dptr
+   00D8 90 00 00            398 	mov  dptr,#0x0000
+   00DB                     399 00101$:
+                    00DB    400 	C$_setjmp.c$48$1$1 ==.
+                    00DB    401 	XG$setjmp$0$0 ==.
+   00DB 22                  402 	ret
+                            403 	.area	CSEG    (CODE)

@@ -1,0 +1,208 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:30 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module _memcmp
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl _memcmp_PARM_3
+                             11 	.globl _memcmp_PARM_2
+                             12 	.globl _memcmp
+                             13 ;--------------------------------------------------------
+                             14 ; special function registers
+                             15 ;--------------------------------------------------------
+                             16 ;--------------------------------------------------------
+                             17 ; special function bits 
+                             18 ;--------------------------------------------------------
+                             19 ;--------------------------------------------------------
+                             20 ; internal ram data
+                             21 ;--------------------------------------------------------
+                             22 	.area	DSEG    (DATA)
+                             23 ;--------------------------------------------------------
+                             24 ; overlayable items in internal ram 
+                             25 ;--------------------------------------------------------
+                             26 	.area	OSEG	(OVR,DATA)
+                             27 ;--------------------------------------------------------
+                             28 ; indirectly addressable internal ram data
+                             29 ;--------------------------------------------------------
+                             30 	.area	ISEG    (DATA)
+                             31 ;--------------------------------------------------------
+                             32 ; bit data
+                             33 ;--------------------------------------------------------
+                             34 	.area	BSEG    (BIT)
+                             35 ;--------------------------------------------------------
+                             36 ; external ram data
+                             37 ;--------------------------------------------------------
+                             38 	.area	XSEG    (XDATA)
+   0000                      39 _memcmp_PARM_2:
+   0000                      40 	.ds	0x0003
+   0003                      41 _memcmp_PARM_3:
+   0003                      42 	.ds	0x0002
+   0005                      43 _memcmp_buf1_1_1:
+   0005                      44 	.ds	0x0003
+                             45 ;--------------------------------------------------------
+                             46 ; global & static initialisations
+                             47 ;--------------------------------------------------------
+                             48 	.area GSINIT (CODE)
+                             49 ;--------------------------------------------------------
+                             50 ; code
+                             51 ;--------------------------------------------------------
+                             52 	.area CSEG (CODE)
+                    0000     53 	G$memcmp$0$0 ==.
+                             54 ;	_memcmp.c 27
+                             55 ;	-----------------------------------------
+                             56 ;	 function memcmp
+                             57 ;	-----------------------------------------
+   0000                      58 _memcmp:
+                    0002     59 	ar2 = 0x02
+                    0003     60 	ar3 = 0x03
+                    0004     61 	ar4 = 0x04
+                    0005     62 	ar5 = 0x05
+                    0006     63 	ar6 = 0x06
+                    0007     64 	ar7 = 0x07
+                    0000     65 	ar0 = 0x00
+                    0001     66 	ar1 = 0x01
+                             67 ;	_memcmp.c 0
+   0000 C0 F0                68 	push	b
+   0002 C0 83                69 	push	dph
+   0004 C0 82                70 	push	dpl
+   0006 90s00r05             71 	mov	dptr,#_memcmp_buf1_1_1
+   0009 D0 E0                72 	pop	acc
+   000B F0                   73 	movx	@dptr,a
+   000C D0 E0                74 	pop	acc
+   000E A3                   75 	inc	dptr
+   000F F0                   76 	movx	@dptr,a
+   0010 D0 E0                77 	pop	acc
+   0012 A3                   78 	inc	dptr
+   0013 F0                   79 	movx	@dptr,a
+                             80 ;	_memcmp.c 33
+   0014 90s00r03             81 	mov	dptr,#_memcmp_PARM_3
+   0017 E0                   82 	movx	a,@dptr
+   0018 FA                   83 	mov	r2,a
+   0019 A3                   84 	inc	dptr
+   001A E0                   85 	movx	a,@dptr
+                             86 ; Peephole 135   removed redundant mov
+   001B FB                   87 	mov  r3,a
+   001C 4A                   88 	orl  a,r2
+                             89 ; Peephole 109   removed ljmp by inverse jump logic
+   001D 70 06                90 	jnz  00112$
+   001F                      91 00113$:
+                             92 ;	_memcmp.c 34
+                             93 ; Peephole 181   used 16 bit load of dptr
+   001F 90 00 00             94 	mov  dptr,#0x0000
+   0022 02s00rAC             95 	ljmp	00107$
+                             96 ;	_memcmp.c 36
+   0025                      97 00112$:
+   0025 90s00r05             98 	mov	dptr,#_memcmp_buf1_1_1
+   0028 E0                   99 	movx	a,@dptr
+   0029 FA                  100 	mov	r2,a
+   002A A3                  101 	inc	dptr
+   002B E0                  102 	movx	a,@dptr
+   002C FB                  103 	mov	r3,a
+   002D A3                  104 	inc	dptr
+   002E E0                  105 	movx	a,@dptr
+   002F FC                  106 	mov	r4,a
+   0030 90s00r00            107 	mov	dptr,#_memcmp_PARM_2
+   0033 E0                  108 	movx	a,@dptr
+   0034 FD                  109 	mov	r5,a
+   0035 A3                  110 	inc	dptr
+   0036 E0                  111 	movx	a,@dptr
+   0037 FE                  112 	mov	r6,a
+   0038 A3                  113 	inc	dptr
+   0039 E0                  114 	movx	a,@dptr
+   003A FF                  115 	mov	r7,a
+   003B                     116 00104$:
+   003B 90s00r03            117 	mov	dptr,#_memcmp_PARM_3
+   003E E0                  118 	movx	a,@dptr
+   003F 24 FF               119 	add	a,#0xff
+   0041 F8                  120 	mov	r0,a
+   0042 A3                  121 	inc	dptr
+   0043 E0                  122 	movx	a,@dptr
+   0044 34 FF               123 	addc	a,#0xff
+   0046 F9                  124 	mov	r1,a
+   0047 90s00r03            125 	mov	dptr,#_memcmp_PARM_3
+   004A E8                  126 	mov	a,r0
+   004B F0                  127 	movx	@dptr,a
+   004C A3                  128 	inc	dptr
+   004D E9                  129 	mov	a,r1
+   004E F0                  130 	movx	@dptr,a
+   004F E8                  131 	mov	a,r0
+   0050 49                  132 	orl	a,r1
+                            133 ; Peephole 110   removed ljmp by inverse jump logic
+   0051 60 2F               134 	jz  00106$
+   0053                     135 00114$:
+   0053 8D 82               136 	mov	dpl,r5
+   0055 8E 83               137 	mov	dph,r6
+   0057 8F F0               138 	mov	b,r7
+   0059 12s00r00            139 	lcall	__gptrget
+   005C F8                  140 	mov	r0,a
+   005D 8A 82               141 	mov	dpl,r2
+   005F 8B 83               142 	mov	dph,r3
+   0061 8C F0               143 	mov	b,r4
+   0063 12s00r00            144 	lcall	__gptrget
+                            145 ; Peephole 105   removed redundant mov
+   0066 F9                  146 	mov  r1,a
+                            147 ; Peephole 132   changed ljmp to sjmp
+                            148 ; Peephole 199   optimized misc jump sequence
+   0067 B5 00 18            149 	cjne a,ar0,00106$
+                            150 ; Peephole 201   removed redundant sjmp
+   006A                     151 00115$:
+   006A                     152 00116$:
+                            153 ;	_memcmp.c 37
+   006A 0A                  154 	inc	r2
+   006B BA 00 01            155 	cjne	r2,#0x00,00117$
+   006E 0B                  156 	inc	r3
+   006F                     157 00117$:
+   006F 90s00r05            158 	mov	dptr,#_memcmp_buf1_1_1
+   0072 EA                  159 	mov	a,r2
+   0073 F0                  160 	movx	@dptr,a
+   0074 A3                  161 	inc	dptr
+   0075 EB                  162 	mov	a,r3
+   0076 F0                  163 	movx	@dptr,a
+   0077 A3                  164 	inc	dptr
+   0078 EC                  165 	mov	a,r4
+   0079 F0                  166 	movx	@dptr,a
+                            167 ;	_memcmp.c 38
+   007A 0D                  168 	inc	r5
+   007B BD 00 01            169 	cjne	r5,#0x00,00118$
+   007E 0E                  170 	inc	r6
+   007F                     171 00118$:
+   007F 02s00r3B            172 	ljmp	00104$
+   0082                     173 00106$:
+                            174 ;	_memcmp.c 41
+   0082 90s00r05            175 	mov	dptr,#_memcmp_buf1_1_1
+   0085 EA                  176 	mov	a,r2
+   0086 F0                  177 	movx	@dptr,a
+   0087 A3                  178 	inc	dptr
+   0088 EB                  179 	mov	a,r3
+   0089 F0                  180 	movx	@dptr,a
+   008A A3                  181 	inc	dptr
+   008B EC                  182 	mov	a,r4
+   008C F0                  183 	movx	@dptr,a
+   008D 8D 82               184 	mov	dpl,r5
+   008F 8E 83               185 	mov	dph,r6
+   0091 8F F0               186 	mov	b,r7
+   0093 12s00r00            187 	lcall	__gptrget
+   0096 FD                  188 	mov	r5,a
+   0097 8A 82               189 	mov	dpl,r2
+   0099 8B 83               190 	mov	dph,r3
+   009B 8C F0               191 	mov	b,r4
+   009D 12s00r00            192 	lcall	__gptrget
+                            193 ; Peephole 106   removed redundant mov 
+   00A0 FA                  194 	mov  r2,a
+   00A1 C3                  195 	clr  c
+   00A2 9D                  196 	subb	a,r5
+   00A3 FA                  197 	mov	r2,a
+                            198 ; Peephole 180   changed mov to clr
+   00A4 E4                  199 	clr  a
+   00A5 94 00               200 	subb	a,#0x00
+   00A7 FD                  201 	mov	r5,a
+   00A8 8A 82               202 	mov	dpl,r2
+   00AA 8D 83               203 	mov	dph,r5
+   00AC                     204 00107$:
+                    00AC    205 	C$_memcmp.c$42$1$1 ==.
+                    00AC    206 	XG$memcmp$0$0 ==.
+   00AC 22                  207 	ret
+                            208 	.area	CSEG    (CODE)

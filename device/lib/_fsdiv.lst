@@ -1,0 +1,936 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:26 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module _fsdiv
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl ___fsdiv_PARM_2
+                             11 	.globl ___fsdiv
+                             12 ;--------------------------------------------------------
+                             13 ; special function registers
+                             14 ;--------------------------------------------------------
+                             15 ;--------------------------------------------------------
+                             16 ; special function bits 
+                             17 ;--------------------------------------------------------
+                             18 ;--------------------------------------------------------
+                             19 ; internal ram data
+                             20 ;--------------------------------------------------------
+                             21 	.area	DSEG    (DATA)
+   0000                      22 ___fsdiv_sloc0_1_0:
+   0000                      23 	.ds	0x0001
+   0001                      24 ___fsdiv_sloc1_1_0:
+   0001                      25 	.ds	0x0004
+   0005                      26 ___fsdiv_sloc2_1_0:
+   0005                      27 	.ds	0x0004
+   0009                      28 ___fsdiv_sloc3_1_0:
+   0009                      29 	.ds	0x0004
+                             30 ;--------------------------------------------------------
+                             31 ; overlayable items in internal ram 
+                             32 ;--------------------------------------------------------
+                             33 	.area	OSEG	(OVR,DATA)
+                             34 ;--------------------------------------------------------
+                             35 ; indirectly addressable internal ram data
+                             36 ;--------------------------------------------------------
+                             37 	.area	ISEG    (DATA)
+                             38 ;--------------------------------------------------------
+                             39 ; bit data
+                             40 ;--------------------------------------------------------
+                             41 	.area	BSEG    (BIT)
+                             42 ;--------------------------------------------------------
+                             43 ; external ram data
+                             44 ;--------------------------------------------------------
+                             45 	.area	XSEG    (XDATA)
+   0000                      46 ___fsdiv_PARM_2:
+   0000                      47 	.ds	0x0004
+   0004                      48 ___fsdiv_a1_1_1:
+   0004                      49 	.ds	0x0004
+   0008                      50 ___fsdiv_fl1_1_1:
+   0008                      51 	.ds	0x0004
+   000C                      52 ___fsdiv_fl2_1_1:
+   000C                      53 	.ds	0x0004
+   0010                      54 ___fsdiv_result_1_1:
+   0010                      55 	.ds	0x0004
+   0014                      56 ___fsdiv_mask_1_1:
+   0014                      57 	.ds	0x0004
+   0018                      58 ___fsdiv_mant1_1_1:
+   0018                      59 	.ds	0x0004
+   001C                      60 ___fsdiv_mant2_1_1:
+   001C                      61 	.ds	0x0004
+   0020                      62 ___fsdiv_exp_1_1:
+   0020                      63 	.ds	0x0002
+                             64 ;--------------------------------------------------------
+                             65 ; global & static initialisations
+                             66 ;--------------------------------------------------------
+                             67 	.area GSINIT (CODE)
+                             68 ;--------------------------------------------------------
+                             69 ; code
+                             70 ;--------------------------------------------------------
+                             71 	.area CSEG (CODE)
+                    0000     72 	G$__fsdiv$0$0 ==.
+                             73 ;	_fsdiv.c 73
+                             74 ;	-----------------------------------------
+                             75 ;	 function __fsdiv
+                             76 ;	-----------------------------------------
+   0000                      77 ___fsdiv:
+                    0002     78 	ar2 = 0x02
+                    0003     79 	ar3 = 0x03
+                    0004     80 	ar4 = 0x04
+                    0005     81 	ar5 = 0x05
+                    0006     82 	ar6 = 0x06
+                    0007     83 	ar7 = 0x07
+                    0000     84 	ar0 = 0x00
+                    0001     85 	ar1 = 0x01
+                             86 ;	_fsdiv.c 138
+   0000 C0 E0                87 	push	acc
+   0002 C0 F0                88 	push	b
+   0004 C0 83                89 	push	dph
+   0006 C0 82                90 	push	dpl
+   0008 90s00r04             91 	mov	dptr,#___fsdiv_a1_1_1
+   000B D0 E0                92 	pop	acc
+   000D F0                   93 	movx	@dptr,a
+   000E D0 E0                94 	pop	acc
+   0010 A3                   95 	inc	dptr
+   0011 F0                   96 	movx	@dptr,a
+   0012 D0 E0                97 	pop	acc
+   0014 A3                   98 	inc	dptr
+   0015 F0                   99 	movx	@dptr,a
+   0016 D0 E0               100 	pop	acc
+   0018 A3                  101 	inc	dptr
+   0019 F0                  102 	movx	@dptr,a
+                            103 ;	_fsdiv.c 82
+   001A 90s00r04            104 	mov	dptr,#___fsdiv_a1_1_1
+   001D E0                  105 	movx	a,@dptr
+   001E FA                  106 	mov	r2,a
+   001F A3                  107 	inc	dptr
+   0020 E0                  108 	movx	a,@dptr
+   0021 FB                  109 	mov	r3,a
+   0022 A3                  110 	inc	dptr
+   0023 E0                  111 	movx	a,@dptr
+   0024 FC                  112 	mov	r4,a
+   0025 A3                  113 	inc	dptr
+   0026 E0                  114 	movx	a,@dptr
+   0027 FD                  115 	mov	r5,a
+   0028 90s00r08            116 	mov	dptr,#(___fsdiv_fl1_1_1)
+   002B EA                  117 	mov	a,r2
+   002C F0                  118 	movx	@dptr,a
+   002D A3                  119 	inc	dptr
+   002E EB                  120 	mov	a,r3
+   002F F0                  121 	movx	@dptr,a
+   0030 A3                  122 	inc	dptr
+   0031 EC                  123 	mov	a,r4
+   0032 F0                  124 	movx	@dptr,a
+   0033 A3                  125 	inc	dptr
+   0034 ED                  126 	mov	a,r5
+   0035 F0                  127 	movx	@dptr,a
+                            128 ;	_fsdiv.c 83
+   0036 90s00r00            129 	mov	dptr,#___fsdiv_PARM_2
+   0039 E0                  130 	movx	a,@dptr
+   003A FA                  131 	mov	r2,a
+   003B A3                  132 	inc	dptr
+   003C E0                  133 	movx	a,@dptr
+   003D FB                  134 	mov	r3,a
+   003E A3                  135 	inc	dptr
+   003F E0                  136 	movx	a,@dptr
+   0040 FC                  137 	mov	r4,a
+   0041 A3                  138 	inc	dptr
+   0042 E0                  139 	movx	a,@dptr
+   0043 FD                  140 	mov	r5,a
+   0044 90s00r0C            141 	mov	dptr,#(___fsdiv_fl2_1_1)
+   0047 EA                  142 	mov	a,r2
+   0048 F0                  143 	movx	@dptr,a
+   0049 A3                  144 	inc	dptr
+   004A EB                  145 	mov	a,r3
+   004B F0                  146 	movx	@dptr,a
+   004C A3                  147 	inc	dptr
+   004D EC                  148 	mov	a,r4
+   004E F0                  149 	movx	@dptr,a
+   004F A3                  150 	inc	dptr
+   0050 ED                  151 	mov	a,r5
+   0051 F0                  152 	movx	@dptr,a
+                            153 ;	_fsdiv.c 86
+   0052 90s00r08            154 	mov	dptr,#(___fsdiv_fl1_1_1)
+   0055 E0                  155 	movx	a,@dptr
+   0056 FA                  156 	mov	r2,a
+   0057 A3                  157 	inc	dptr
+   0058 E0                  158 	movx	a,@dptr
+   0059 FB                  159 	mov	r3,a
+   005A A3                  160 	inc	dptr
+   005B E0                  161 	movx	a,@dptr
+   005C FC                  162 	mov	r4,a
+   005D A3                  163 	inc	dptr
+   005E E0                  164 	movx	a,@dptr
+   005F FD                  165 	mov	r5,a
+   0060 8C 02               166 	mov	ar2,r4
+   0062 ED                  167 	mov	a,r5
+   0063 A2 E7               168 	mov	c,acc.7
+   0065 CA                  169 	xch	a,r2
+   0066 33                  170 	rlc	a
+   0067 CA                  171 	xch	a,r2
+   0068 33                  172 	rlc	a
+   0069 CA                  173 	xch	a,r2
+   006A 54 01               174 	anl	a,#0x01
+   006C 30 E0 02            175 	jnb	acc.0,00120$
+   006F 44 FE               176 	orl	a,#0xfe
+   0071                     177 00120$:
+   0071 FB                  178 	mov	r3,a
+   0072 33                  179 	rlc	a
+   0073 95 E0               180 	subb	a,acc
+   0075 FC                  181 	mov	r4,a
+   0076 FD                  182 	mov	r5,a
+   0077 90s00r20            183 	mov	dptr,#___fsdiv_exp_1_1
+   007A EA                  184 	mov	a,r2
+   007B F0                  185 	movx	@dptr,a
+   007C A3                  186 	inc	dptr
+                            187 ; Peephole 180   changed mov to clr
+   007D E4                  188 	clr  a
+   007E F0                  189 	movx	@dptr,a
+                            190 ;	_fsdiv.c 87
+   007F 90s00r0C            191 	mov	dptr,#(___fsdiv_fl2_1_1)
+   0082 E0                  192 	movx	a,@dptr
+   0083 FA                  193 	mov	r2,a
+   0084 A3                  194 	inc	dptr
+   0085 E0                  195 	movx	a,@dptr
+   0086 FB                  196 	mov	r3,a
+   0087 A3                  197 	inc	dptr
+   0088 E0                  198 	movx	a,@dptr
+   0089 FE                  199 	mov	r6,a
+   008A A3                  200 	inc	dptr
+   008B E0                  201 	movx	a,@dptr
+   008C FF                  202 	mov	r7,a
+   008D 8E 02               203 	mov	ar2,r6
+   008F EF                  204 	mov	a,r7
+   0090 A2 E7               205 	mov	c,acc.7
+   0092 CA                  206 	xch	a,r2
+   0093 33                  207 	rlc	a
+   0094 CA                  208 	xch	a,r2
+   0095 33                  209 	rlc	a
+   0096 CA                  210 	xch	a,r2
+   0097 54 01               211 	anl	a,#0x01
+   0099 30 E0 02            212 	jnb	acc.0,00121$
+   009C 44 FE               213 	orl	a,#0xfe
+   009E                     214 00121$:
+   009E FB                  215 	mov	r3,a
+   009F 33                  216 	rlc	a
+   00A0 95 E0               217 	subb	a,acc
+   00A2 FE                  218 	mov	r6,a
+   00A3 FF                  219 	mov	r7,a
+   00A4 7B 00               220 	mov	r3,#0x00
+   00A6 90s00r20            221 	mov	dptr,#___fsdiv_exp_1_1
+   00A9 E0                  222 	movx	a,@dptr
+   00AA F8                  223 	mov	r0,a
+   00AB A3                  224 	inc	dptr
+   00AC E0                  225 	movx	a,@dptr
+   00AD F9                  226 	mov	r1,a
+   00AE 90s00r20            227 	mov	dptr,#___fsdiv_exp_1_1
+   00B1 C3                  228 	clr	c
+   00B2 E8                  229 	mov	a,r0
+   00B3 9A                  230 	subb	a,r2
+   00B4 F0                  231 	movx	@dptr,a
+   00B5 E9                  232 	mov	a,r1
+   00B6 9B                  233 	subb	a,r3
+   00B7 A3                  234 	inc	dptr
+   00B8 F0                  235 	movx	@dptr,a
+                            236 ;	_fsdiv.c 88
+   00B9 90s00r20            237 	mov	dptr,#___fsdiv_exp_1_1
+   00BC E0                  238 	movx	a,@dptr
+   00BD FA                  239 	mov	r2,a
+   00BE A3                  240 	inc	dptr
+   00BF E0                  241 	movx	a,@dptr
+   00C0 FB                  242 	mov	r3,a
+   00C1 90s00r20            243 	mov	dptr,#___fsdiv_exp_1_1
+   00C4 74 7E               244 	mov	a,#0x7e
+   00C6 2A                  245 	add	a,r2
+   00C7 F0                  246 	movx	@dptr,a
+                            247 ; Peephole 180   changed mov to clr
+   00C8 E4                  248 	clr  a
+   00C9 3B                  249 	addc	a,r3
+   00CA A3                  250 	inc	dptr
+   00CB F0                  251 	movx	@dptr,a
+                            252 ;	_fsdiv.c 91
+   00CC 90s00r08            253 	mov	dptr,#(___fsdiv_fl1_1_1)
+   00CF E0                  254 	movx	a,@dptr
+   00D0 FA                  255 	mov	r2,a
+   00D1 A3                  256 	inc	dptr
+   00D2 E0                  257 	movx	a,@dptr
+   00D3 FB                  258 	mov	r3,a
+   00D4 A3                  259 	inc	dptr
+   00D5 E0                  260 	movx	a,@dptr
+   00D6 F8                  261 	mov	r0,a
+   00D7 A3                  262 	inc	dptr
+   00D8 E0                  263 	movx	a,@dptr
+                            264 ; Peephole 105   removed redundant mov
+   00D9 F9                  265 	mov  r1,a
+   00DA 23                  266 	rl	a
+   00DB 54 01               267 	anl	a,#0x01
+   00DD F5*00               268 	mov	___fsdiv_sloc0_1_0,a
+   00DF 90s00r0C            269 	mov	dptr,#(___fsdiv_fl2_1_1)
+   00E2 E0                  270 	movx	a,@dptr
+   00E3 F5*01               271 	mov	___fsdiv_sloc1_1_0,a
+   00E5 A3                  272 	inc	dptr
+   00E6 E0                  273 	movx	a,@dptr
+   00E7 F5*02               274 	mov	(___fsdiv_sloc1_1_0 + 1),a
+   00E9 A3                  275 	inc	dptr
+   00EA E0                  276 	movx	a,@dptr
+   00EB F5*03               277 	mov	(___fsdiv_sloc1_1_0 + 2),a
+   00ED A3                  278 	inc	dptr
+   00EE E0                  279 	movx	a,@dptr
+                            280 ; Peephole 105   removed redundant mov
+   00EF F5*04               281 	mov  (___fsdiv_sloc1_1_0 + 3),a
+   00F1 23                  282 	rl	a
+   00F2 54 01               283 	anl	a,#0x01
+                            284 ; Peephole 105   removed redundant mov
+   00F4 FA                  285 	mov  r2,a
+   00F5 65*00               286 	xrl	a,___fsdiv_sloc0_1_0
+   00F7 F5*01               287 	mov	___fsdiv_sloc1_1_0,a
+                            288 ;	_fsdiv.c 94
+   00F9 90s00r0C            289 	mov	dptr,#(___fsdiv_fl2_1_1)
+   00FC E0                  290 	movx	a,@dptr
+   00FD F5*05               291 	mov	___fsdiv_sloc2_1_0,a
+   00FF A3                  292 	inc	dptr
+   0100 E0                  293 	movx	a,@dptr
+   0101 F5*06               294 	mov	(___fsdiv_sloc2_1_0 + 1),a
+   0103 A3                  295 	inc	dptr
+   0104 E0                  296 	movx	a,@dptr
+   0105 F5*07               297 	mov	(___fsdiv_sloc2_1_0 + 2),a
+   0107 A3                  298 	inc	dptr
+   0108 E0                  299 	movx	a,@dptr
+   0109 F5*08               300 	mov	(___fsdiv_sloc2_1_0 + 3),a
+   010B E5*05               301 	mov	a,___fsdiv_sloc2_1_0
+   010D 45*06               302 	orl	a,(___fsdiv_sloc2_1_0 + 1)
+   010F 45*07               303 	orl	a,(___fsdiv_sloc2_1_0 + 2)
+   0111 45*08               304 	orl	a,(___fsdiv_sloc2_1_0 + 3)
+                            305 ; Peephole 109   removed ljmp by inverse jump logic
+   0113 70 0B               306 	jnz  00102$
+   0115                     307 00122$:
+                            308 ;	_fsdiv.c 96
+                            309 ; Peephole 181   used 16 bit load of dptr
+   0115 90 00 00            310 	mov  dptr,#0x0000
+   0118 75 F0 80            311 	mov	b,#0x80
+   011B 74 BF               312 	mov	a,#0xbf
+   011D 02s04rBF            313 	ljmp	00112$
+   0120                     314 00102$:
+                            315 ;	_fsdiv.c 99
+   0120 90s00r08            316 	mov	dptr,#(___fsdiv_fl1_1_1)
+   0123 E0                  317 	movx	a,@dptr
+   0124 F5*05               318 	mov	___fsdiv_sloc2_1_0,a
+   0126 A3                  319 	inc	dptr
+   0127 E0                  320 	movx	a,@dptr
+   0128 F5*06               321 	mov	(___fsdiv_sloc2_1_0 + 1),a
+   012A A3                  322 	inc	dptr
+   012B E0                  323 	movx	a,@dptr
+   012C F5*07               324 	mov	(___fsdiv_sloc2_1_0 + 2),a
+   012E A3                  325 	inc	dptr
+   012F E0                  326 	movx	a,@dptr
+   0130 F5*08               327 	mov	(___fsdiv_sloc2_1_0 + 3),a
+   0132 E5*05               328 	mov	a,___fsdiv_sloc2_1_0
+   0134 45*06               329 	orl	a,(___fsdiv_sloc2_1_0 + 1)
+   0136 45*07               330 	orl	a,(___fsdiv_sloc2_1_0 + 2)
+   0138 45*08               331 	orl	a,(___fsdiv_sloc2_1_0 + 3)
+                            332 ; Peephole 109   removed ljmp by inverse jump logic
+   013A 70 0A               333 	jnz  00104$
+   013C                     334 00123$:
+                            335 ;	_fsdiv.c 100
+                            336 ; Peephole 3.a   changed mov to clr
+                            337 ; Peephole 3.b   changed mov to clr
+                            338 ; Peephole 3.b   changed mov to clr
+   013C E4                  339 	clr  a
+   013D F5 82               340 	mov  dpl,a
+   013F F5 83               341 	mov  dph,a
+   0141 F5 F0               342 	mov  b,a
+   0143 02s04rBF            343 	ljmp	00112$
+   0146                     344 00104$:
+                            345 ;	_fsdiv.c 103
+   0146 90s00r08            346 	mov	dptr,#(___fsdiv_fl1_1_1)
+   0149 E0                  347 	movx	a,@dptr
+   014A F5*05               348 	mov	___fsdiv_sloc2_1_0,a
+   014C A3                  349 	inc	dptr
+   014D E0                  350 	movx	a,@dptr
+   014E F5*06               351 	mov	(___fsdiv_sloc2_1_0 + 1),a
+   0150 A3                  352 	inc	dptr
+   0151 E0                  353 	movx	a,@dptr
+   0152 F5*07               354 	mov	(___fsdiv_sloc2_1_0 + 2),a
+   0154 A3                  355 	inc	dptr
+   0155 E0                  356 	movx	a,@dptr
+   0156 F5*08               357 	mov	(___fsdiv_sloc2_1_0 + 3),a
+   0158 53r07 7F            358 	anl	(___fsdiv_sloc2_1_0 + 2),#0x7f
+   015B 75*08 00            359 	mov	(___fsdiv_sloc2_1_0 + 3),#0x00
+   015E 90s00r18            360 	mov	dptr,#___fsdiv_mant1_1_1
+   0161 E5*05               361 	mov	a,___fsdiv_sloc2_1_0
+   0163 F0                  362 	movx	@dptr,a
+   0164 A3                  363 	inc	dptr
+   0165 E5*06               364 	mov	a,(___fsdiv_sloc2_1_0 + 1)
+   0167 F0                  365 	movx	@dptr,a
+   0168 74 80               366 	mov	a,#0x80
+   016A 45*07               367 	orl	a,(___fsdiv_sloc2_1_0 + 2)
+   016C A3                  368 	inc	dptr
+   016D F0                  369 	movx	@dptr,a
+   016E A3                  370 	inc	dptr
+   016F E5*08               371 	mov	a,(___fsdiv_sloc2_1_0 + 3)
+   0171 F0                  372 	movx	@dptr,a
+                            373 ;	_fsdiv.c 104
+   0172 90s00r0C            374 	mov	dptr,#(___fsdiv_fl2_1_1)
+   0175 E0                  375 	movx	a,@dptr
+   0176 F5*05               376 	mov	___fsdiv_sloc2_1_0,a
+   0178 A3                  377 	inc	dptr
+   0179 E0                  378 	movx	a,@dptr
+   017A F5*06               379 	mov	(___fsdiv_sloc2_1_0 + 1),a
+   017C A3                  380 	inc	dptr
+   017D E0                  381 	movx	a,@dptr
+   017E F5*07               382 	mov	(___fsdiv_sloc2_1_0 + 2),a
+   0180 A3                  383 	inc	dptr
+   0181 E0                  384 	movx	a,@dptr
+   0182 F5*08               385 	mov	(___fsdiv_sloc2_1_0 + 3),a
+   0184 53r07 7F            386 	anl	(___fsdiv_sloc2_1_0 + 2),#0x7f
+   0187 75*08 00            387 	mov	(___fsdiv_sloc2_1_0 + 3),#0x00
+   018A 90s00r1C            388 	mov	dptr,#___fsdiv_mant2_1_1
+   018D E5*05               389 	mov	a,___fsdiv_sloc2_1_0
+   018F F0                  390 	movx	@dptr,a
+   0190 A3                  391 	inc	dptr
+   0191 E5*06               392 	mov	a,(___fsdiv_sloc2_1_0 + 1)
+   0193 F0                  393 	movx	@dptr,a
+   0194 74 80               394 	mov	a,#0x80
+   0196 45*07               395 	orl	a,(___fsdiv_sloc2_1_0 + 2)
+   0198 A3                  396 	inc	dptr
+   0199 F0                  397 	movx	@dptr,a
+   019A A3                  398 	inc	dptr
+   019B E5*08               399 	mov	a,(___fsdiv_sloc2_1_0 + 3)
+   019D F0                  400 	movx	@dptr,a
+                            401 ;	_fsdiv.c 107
+   019E 90s00r1C            402 	mov	dptr,#___fsdiv_mant2_1_1
+   01A1 E0                  403 	movx	a,@dptr
+   01A2 F5*05               404 	mov	___fsdiv_sloc2_1_0,a
+   01A4 A3                  405 	inc	dptr
+   01A5 E0                  406 	movx	a,@dptr
+   01A6 F5*06               407 	mov	(___fsdiv_sloc2_1_0 + 1),a
+   01A8 A3                  408 	inc	dptr
+   01A9 E0                  409 	movx	a,@dptr
+   01AA F5*07               410 	mov	(___fsdiv_sloc2_1_0 + 2),a
+   01AC A3                  411 	inc	dptr
+   01AD E0                  412 	movx	a,@dptr
+   01AE F5*08               413 	mov	(___fsdiv_sloc2_1_0 + 3),a
+   01B0 90s00r18            414 	mov	dptr,#___fsdiv_mant1_1_1
+   01B3 E0                  415 	movx	a,@dptr
+   01B4 F5*09               416 	mov	___fsdiv_sloc3_1_0,a
+   01B6 A3                  417 	inc	dptr
+   01B7 E0                  418 	movx	a,@dptr
+   01B8 F5*0A               419 	mov	(___fsdiv_sloc3_1_0 + 1),a
+   01BA A3                  420 	inc	dptr
+   01BB E0                  421 	movx	a,@dptr
+   01BC F5*0B               422 	mov	(___fsdiv_sloc3_1_0 + 2),a
+   01BE A3                  423 	inc	dptr
+   01BF E0                  424 	movx	a,@dptr
+   01C0 F5*0C               425 	mov	(___fsdiv_sloc3_1_0 + 3),a
+   01C2 C3                  426 	clr	c
+   01C3 E5*09               427 	mov	a,___fsdiv_sloc3_1_0
+   01C5 95*05               428 	subb	a,___fsdiv_sloc2_1_0
+   01C7 E5*0A               429 	mov	a,(___fsdiv_sloc3_1_0 + 1)
+   01C9 95*06               430 	subb	a,(___fsdiv_sloc2_1_0 + 1)
+   01CB E5*0B               431 	mov	a,(___fsdiv_sloc3_1_0 + 2)
+   01CD 95*07               432 	subb	a,(___fsdiv_sloc2_1_0 + 2)
+   01CF E5*0C               433 	mov	a,(___fsdiv_sloc3_1_0 + 3)
+   01D1 64 80               434 	xrl	a,#0x80
+   01D3 85*08 F0            435 	mov	b,(___fsdiv_sloc2_1_0 + 3)
+   01D6 63 F0 80            436 	xrl	b,#0x80
+   01D9 95 F0               437 	subb	a,b
+   01DB 40 03               438 	jc	00124$
+   01DD 02s02r31            439 	ljmp	00106$
+   01E0                     440 00124$:
+                            441 ;	_fsdiv.c 109
+   01E0 90s00r18            442 	mov	dptr,#___fsdiv_mant1_1_1
+   01E3 E0                  443 	movx	a,@dptr
+   01E4 F5*09               444 	mov	___fsdiv_sloc3_1_0,a
+   01E6 A3                  445 	inc	dptr
+   01E7 E0                  446 	movx	a,@dptr
+   01E8 F5*0A               447 	mov	(___fsdiv_sloc3_1_0 + 1),a
+   01EA A3                  448 	inc	dptr
+   01EB E0                  449 	movx	a,@dptr
+   01EC F5*0B               450 	mov	(___fsdiv_sloc3_1_0 + 2),a
+   01EE A3                  451 	inc	dptr
+   01EF E0                  452 	movx	a,@dptr
+   01F0 F5*0C               453 	mov	(___fsdiv_sloc3_1_0 + 3),a
+   01F2 E5*09               454 	mov	a,___fsdiv_sloc3_1_0
+   01F4 25 E0               455 	add	a,acc
+   01F6 F5*09               456 	mov	___fsdiv_sloc3_1_0,a
+   01F8 E5*0A               457 	mov	a,(___fsdiv_sloc3_1_0 + 1)
+   01FA 33                  458 	rlc	a
+   01FB F5*0A               459 	mov	(___fsdiv_sloc3_1_0 + 1),a
+   01FD E5*0B               460 	mov	a,(___fsdiv_sloc3_1_0 + 2)
+   01FF 33                  461 	rlc	a
+   0200 F5*0B               462 	mov	(___fsdiv_sloc3_1_0 + 2),a
+   0202 E5*0C               463 	mov	a,(___fsdiv_sloc3_1_0 + 3)
+   0204 33                  464 	rlc	a
+   0205 F5*0C               465 	mov	(___fsdiv_sloc3_1_0 + 3),a
+   0207 90s00r18            466 	mov	dptr,#___fsdiv_mant1_1_1
+   020A E5*09               467 	mov	a,___fsdiv_sloc3_1_0
+   020C F0                  468 	movx	@dptr,a
+   020D A3                  469 	inc	dptr
+   020E E5*0A               470 	mov	a,(___fsdiv_sloc3_1_0 + 1)
+   0210 F0                  471 	movx	@dptr,a
+   0211 A3                  472 	inc	dptr
+   0212 E5*0B               473 	mov	a,(___fsdiv_sloc3_1_0 + 2)
+   0214 F0                  474 	movx	@dptr,a
+   0215 A3                  475 	inc	dptr
+   0216 E5*0C               476 	mov	a,(___fsdiv_sloc3_1_0 + 3)
+   0218 F0                  477 	movx	@dptr,a
+                            478 ;	_fsdiv.c 110
+   0219 90s00r20            479 	mov	dptr,#___fsdiv_exp_1_1
+   021C E0                  480 	movx	a,@dptr
+   021D 24 FF               481 	add	a,#0xff
+   021F F5*09               482 	mov	___fsdiv_sloc3_1_0,a
+   0221 A3                  483 	inc	dptr
+   0222 E0                  484 	movx	a,@dptr
+   0223 34 FF               485 	addc	a,#0xff
+   0225 F5*0A               486 	mov	(___fsdiv_sloc3_1_0 + 1),a
+   0227 90s00r20            487 	mov	dptr,#___fsdiv_exp_1_1
+   022A E5*09               488 	mov	a,___fsdiv_sloc3_1_0
+   022C F0                  489 	movx	@dptr,a
+   022D A3                  490 	inc	dptr
+   022E E5*0A               491 	mov	a,(___fsdiv_sloc3_1_0 + 1)
+   0230 F0                  492 	movx	@dptr,a
+   0231                     493 00106$:
+                            494 ;	_fsdiv.c 114
+   0231 90s00r14            495 	mov	dptr,#___fsdiv_mask_1_1
+                            496 ; Peephole 101   removed redundant mov
+                            497 ; Peephole 180   changed mov to clr
+   0234 E4                  498 	clr  a
+   0235 F0                  499 	movx @dptr,a
+   0236 A3                  500 	inc  dptr
+   0237 F0                  501 	movx @dptr,a
+   0238 A3                  502 	inc	dptr
+                            503 ; Peephole 180   changed mov to clr
+   0239 E4                  504 	clr  a
+   023A F0                  505 	movx	@dptr,a
+   023B A3                  506 	inc	dptr
+   023C 74 01               507 	mov	a,#0x01
+   023E F0                  508 	movx	@dptr,a
+                            509 ;	_fsdiv.c 115
+   023F 90s00r10            510 	mov	dptr,#___fsdiv_result_1_1
+   0242 E4                  511 	clr	a
+   0243 A3                  512 	inc	dptr
+   0244 A3                  513 	inc	dptr
+   0245 A3                  514 	inc	dptr
+   0246 F0                  515 	movx	@dptr,a
+   0247 12s00r00            516 	lcall	__decdptr
+   024A F0                  517 	movx	@dptr,a
+   024B 12s00r00            518 	lcall	__decdptr
+   024E F0                  519 	movx	@dptr,a
+   024F 12s00r00            520 	lcall	__decdptr
+   0252 F0                  521 	movx	@dptr,a
+                            522 ;	_fsdiv.c 116
+   0253                     523 00109$:
+   0253 90s00r14            524 	mov	dptr,#___fsdiv_mask_1_1
+   0256 E0                  525 	movx	a,@dptr
+   0257 F5*09               526 	mov	___fsdiv_sloc3_1_0,a
+   0259 A3                  527 	inc	dptr
+   025A E0                  528 	movx	a,@dptr
+   025B F5*0A               529 	mov	(___fsdiv_sloc3_1_0 + 1),a
+   025D A3                  530 	inc	dptr
+   025E E0                  531 	movx	a,@dptr
+   025F F5*0B               532 	mov	(___fsdiv_sloc3_1_0 + 2),a
+   0261 A3                  533 	inc	dptr
+   0262 E0                  534 	movx	a,@dptr
+   0263 F5*0C               535 	mov	(___fsdiv_sloc3_1_0 + 3),a
+   0265 E5*09               536 	mov	a,___fsdiv_sloc3_1_0
+   0267 45*0A               537 	orl	a,(___fsdiv_sloc3_1_0 + 1)
+   0269 45*0B               538 	orl	a,(___fsdiv_sloc3_1_0 + 2)
+   026B 45*0C               539 	orl	a,(___fsdiv_sloc3_1_0 + 3)
+   026D 70 03               540 	jnz	00125$
+   026F 02s03rA2            541 	ljmp	00111$
+   0272                     542 00125$:
+                            543 ;	_fsdiv.c 118
+   0272 90s00r1C            544 	mov	dptr,#___fsdiv_mant2_1_1
+   0275 E0                  545 	movx	a,@dptr
+   0276 F5*09               546 	mov	___fsdiv_sloc3_1_0,a
+   0278 A3                  547 	inc	dptr
+   0279 E0                  548 	movx	a,@dptr
+   027A F5*0A               549 	mov	(___fsdiv_sloc3_1_0 + 1),a
+   027C A3                  550 	inc	dptr
+   027D E0                  551 	movx	a,@dptr
+   027E F5*0B               552 	mov	(___fsdiv_sloc3_1_0 + 2),a
+   0280 A3                  553 	inc	dptr
+   0281 E0                  554 	movx	a,@dptr
+   0282 F5*0C               555 	mov	(___fsdiv_sloc3_1_0 + 3),a
+   0284 90s00r18            556 	mov	dptr,#___fsdiv_mant1_1_1
+   0287 E0                  557 	movx	a,@dptr
+   0288 F5*05               558 	mov	___fsdiv_sloc2_1_0,a
+   028A A3                  559 	inc	dptr
+   028B E0                  560 	movx	a,@dptr
+   028C F5*06               561 	mov	(___fsdiv_sloc2_1_0 + 1),a
+   028E A3                  562 	inc	dptr
+   028F E0                  563 	movx	a,@dptr
+   0290 F5*07               564 	mov	(___fsdiv_sloc2_1_0 + 2),a
+   0292 A3                  565 	inc	dptr
+   0293 E0                  566 	movx	a,@dptr
+   0294 F5*08               567 	mov	(___fsdiv_sloc2_1_0 + 3),a
+   0296 C3                  568 	clr	c
+   0297 E5*05               569 	mov	a,___fsdiv_sloc2_1_0
+   0299 95*09               570 	subb	a,___fsdiv_sloc3_1_0
+   029B E5*06               571 	mov	a,(___fsdiv_sloc2_1_0 + 1)
+   029D 95*0A               572 	subb	a,(___fsdiv_sloc3_1_0 + 1)
+   029F E5*07               573 	mov	a,(___fsdiv_sloc2_1_0 + 2)
+   02A1 95*0B               574 	subb	a,(___fsdiv_sloc3_1_0 + 2)
+   02A3 E5*08               575 	mov	a,(___fsdiv_sloc2_1_0 + 3)
+   02A5 64 80               576 	xrl	a,#0x80
+   02A7 85*0C F0            577 	mov	b,(___fsdiv_sloc3_1_0 + 3)
+   02AA 63 F0 80            578 	xrl	b,#0x80
+   02AD 95 F0               579 	subb	a,b
+   02AF 50 03               580 	jnc	00126$
+   02B1 02s03r31            581 	ljmp	00108$
+   02B4                     582 00126$:
+                            583 ;	_fsdiv.c 120
+   02B4 90s00r14            584 	mov	dptr,#___fsdiv_mask_1_1
+   02B7 E0                  585 	movx	a,@dptr
+   02B8 F5*09               586 	mov	___fsdiv_sloc3_1_0,a
+   02BA A3                  587 	inc	dptr
+   02BB E0                  588 	movx	a,@dptr
+   02BC F5*0A               589 	mov	(___fsdiv_sloc3_1_0 + 1),a
+   02BE A3                  590 	inc	dptr
+   02BF E0                  591 	movx	a,@dptr
+   02C0 F5*0B               592 	mov	(___fsdiv_sloc3_1_0 + 2),a
+   02C2 A3                  593 	inc	dptr
+   02C3 E0                  594 	movx	a,@dptr
+   02C4 F5*0C               595 	mov	(___fsdiv_sloc3_1_0 + 3),a
+   02C6 90s00r10            596 	mov	dptr,#___fsdiv_result_1_1
+   02C9 E0                  597 	movx	a,@dptr
+   02CA F5*05               598 	mov	___fsdiv_sloc2_1_0,a
+   02CC A3                  599 	inc	dptr
+   02CD E0                  600 	movx	a,@dptr
+   02CE F5*06               601 	mov	(___fsdiv_sloc2_1_0 + 1),a
+   02D0 A3                  602 	inc	dptr
+   02D1 E0                  603 	movx	a,@dptr
+   02D2 F5*07               604 	mov	(___fsdiv_sloc2_1_0 + 2),a
+   02D4 A3                  605 	inc	dptr
+   02D5 E0                  606 	movx	a,@dptr
+   02D6 F5*08               607 	mov	(___fsdiv_sloc2_1_0 + 3),a
+   02D8 90s00r10            608 	mov	dptr,#___fsdiv_result_1_1
+   02DB E5*09               609 	mov	a,___fsdiv_sloc3_1_0
+   02DD 45*05               610 	orl	a,___fsdiv_sloc2_1_0
+   02DF F0                  611 	movx	@dptr,a
+   02E0 E5*0A               612 	mov	a,(___fsdiv_sloc3_1_0 + 1)
+   02E2 45*06               613 	orl	a,(___fsdiv_sloc2_1_0 + 1)
+   02E4 A3                  614 	inc	dptr
+   02E5 F0                  615 	movx	@dptr,a
+   02E6 E5*0B               616 	mov	a,(___fsdiv_sloc3_1_0 + 2)
+   02E8 45*07               617 	orl	a,(___fsdiv_sloc2_1_0 + 2)
+   02EA A3                  618 	inc	dptr
+   02EB F0                  619 	movx	@dptr,a
+   02EC E5*0C               620 	mov	a,(___fsdiv_sloc3_1_0 + 3)
+   02EE 45*08               621 	orl	a,(___fsdiv_sloc2_1_0 + 3)
+   02F0 A3                  622 	inc	dptr
+   02F1 F0                  623 	movx	@dptr,a
+                            624 ;	_fsdiv.c 121
+   02F2 90s00r1C            625 	mov	dptr,#___fsdiv_mant2_1_1
+   02F5 E0                  626 	movx	a,@dptr
+   02F6 F5*09               627 	mov	___fsdiv_sloc3_1_0,a
+   02F8 A3                  628 	inc	dptr
+   02F9 E0                  629 	movx	a,@dptr
+   02FA F5*0A               630 	mov	(___fsdiv_sloc3_1_0 + 1),a
+   02FC A3                  631 	inc	dptr
+   02FD E0                  632 	movx	a,@dptr
+   02FE F5*0B               633 	mov	(___fsdiv_sloc3_1_0 + 2),a
+   0300 A3                  634 	inc	dptr
+   0301 E0                  635 	movx	a,@dptr
+   0302 F5*0C               636 	mov	(___fsdiv_sloc3_1_0 + 3),a
+   0304 90s00r18            637 	mov	dptr,#___fsdiv_mant1_1_1
+   0307 E0                  638 	movx	a,@dptr
+   0308 F5*05               639 	mov	___fsdiv_sloc2_1_0,a
+   030A A3                  640 	inc	dptr
+   030B E0                  641 	movx	a,@dptr
+   030C F5*06               642 	mov	(___fsdiv_sloc2_1_0 + 1),a
+   030E A3                  643 	inc	dptr
+   030F E0                  644 	movx	a,@dptr
+   0310 F5*07               645 	mov	(___fsdiv_sloc2_1_0 + 2),a
+   0312 A3                  646 	inc	dptr
+   0313 E0                  647 	movx	a,@dptr
+   0314 F5*08               648 	mov	(___fsdiv_sloc2_1_0 + 3),a
+   0316 90s00r18            649 	mov	dptr,#___fsdiv_mant1_1_1
+   0319 C3                  650 	clr	c
+   031A E5*05               651 	mov	a,___fsdiv_sloc2_1_0
+   031C 95*09               652 	subb	a,___fsdiv_sloc3_1_0
+   031E F0                  653 	movx	@dptr,a
+   031F E5*06               654 	mov	a,(___fsdiv_sloc2_1_0 + 1)
+   0321 95*0A               655 	subb	a,(___fsdiv_sloc3_1_0 + 1)
+   0323 A3                  656 	inc	dptr
+   0324 F0                  657 	movx	@dptr,a
+   0325 E5*07               658 	mov	a,(___fsdiv_sloc2_1_0 + 2)
+   0327 95*0B               659 	subb	a,(___fsdiv_sloc3_1_0 + 2)
+   0329 A3                  660 	inc	dptr
+   032A F0                  661 	movx	@dptr,a
+   032B E5*08               662 	mov	a,(___fsdiv_sloc2_1_0 + 3)
+   032D 95*0C               663 	subb	a,(___fsdiv_sloc3_1_0 + 3)
+   032F A3                  664 	inc	dptr
+   0330 F0                  665 	movx	@dptr,a
+   0331                     666 00108$:
+                            667 ;	_fsdiv.c 123
+   0331 90s00r18            668 	mov	dptr,#___fsdiv_mant1_1_1
+   0334 E0                  669 	movx	a,@dptr
+   0335 F5*09               670 	mov	___fsdiv_sloc3_1_0,a
+   0337 A3                  671 	inc	dptr
+   0338 E0                  672 	movx	a,@dptr
+   0339 F5*0A               673 	mov	(___fsdiv_sloc3_1_0 + 1),a
+   033B A3                  674 	inc	dptr
+   033C E0                  675 	movx	a,@dptr
+   033D F5*0B               676 	mov	(___fsdiv_sloc3_1_0 + 2),a
+   033F A3                  677 	inc	dptr
+   0340 E0                  678 	movx	a,@dptr
+   0341 F5*0C               679 	mov	(___fsdiv_sloc3_1_0 + 3),a
+   0343 E5*09               680 	mov	a,___fsdiv_sloc3_1_0
+   0345 25 E0               681 	add	a,acc
+   0347 F5*09               682 	mov	___fsdiv_sloc3_1_0,a
+   0349 E5*0A               683 	mov	a,(___fsdiv_sloc3_1_0 + 1)
+   034B 33                  684 	rlc	a
+   034C F5*0A               685 	mov	(___fsdiv_sloc3_1_0 + 1),a
+   034E E5*0B               686 	mov	a,(___fsdiv_sloc3_1_0 + 2)
+   0350 33                  687 	rlc	a
+   0351 F5*0B               688 	mov	(___fsdiv_sloc3_1_0 + 2),a
+   0353 E5*0C               689 	mov	a,(___fsdiv_sloc3_1_0 + 3)
+   0355 33                  690 	rlc	a
+   0356 F5*0C               691 	mov	(___fsdiv_sloc3_1_0 + 3),a
+   0358 90s00r18            692 	mov	dptr,#___fsdiv_mant1_1_1
+   035B E5*09               693 	mov	a,___fsdiv_sloc3_1_0
+   035D F0                  694 	movx	@dptr,a
+   035E A3                  695 	inc	dptr
+   035F E5*0A               696 	mov	a,(___fsdiv_sloc3_1_0 + 1)
+   0361 F0                  697 	movx	@dptr,a
+   0362 A3                  698 	inc	dptr
+   0363 E5*0B               699 	mov	a,(___fsdiv_sloc3_1_0 + 2)
+   0365 F0                  700 	movx	@dptr,a
+   0366 A3                  701 	inc	dptr
+   0367 E5*0C               702 	mov	a,(___fsdiv_sloc3_1_0 + 3)
+   0369 F0                  703 	movx	@dptr,a
+                            704 ;	_fsdiv.c 124
+   036A 90s00r14            705 	mov	dptr,#___fsdiv_mask_1_1
+   036D E0                  706 	movx	a,@dptr
+   036E F5*09               707 	mov	___fsdiv_sloc3_1_0,a
+   0370 A3                  708 	inc	dptr
+   0371 E0                  709 	movx	a,@dptr
+   0372 F5*0A               710 	mov	(___fsdiv_sloc3_1_0 + 1),a
+   0374 A3                  711 	inc	dptr
+   0375 E0                  712 	movx	a,@dptr
+   0376 F5*0B               713 	mov	(___fsdiv_sloc3_1_0 + 2),a
+   0378 A3                  714 	inc	dptr
+   0379 E0                  715 	movx	a,@dptr
+                            716 ; Peephole 106   removed redundant mov 
+   037A F5*0C               717 	mov  (___fsdiv_sloc3_1_0 + 3),a
+   037C C3                  718 	clr  c
+   037D 13                  719 	rrc	a
+   037E F5*0C               720 	mov	(___fsdiv_sloc3_1_0 + 3),a
+   0380 E5*0B               721 	mov	a,(___fsdiv_sloc3_1_0 + 2)
+   0382 13                  722 	rrc	a
+   0383 F5*0B               723 	mov	(___fsdiv_sloc3_1_0 + 2),a
+   0385 E5*0A               724 	mov	a,(___fsdiv_sloc3_1_0 + 1)
+   0387 13                  725 	rrc	a
+   0388 F5*0A               726 	mov	(___fsdiv_sloc3_1_0 + 1),a
+   038A E5*09               727 	mov	a,___fsdiv_sloc3_1_0
+   038C 13                  728 	rrc	a
+                            729 ; Peephole 100   removed redundant mov
+   038D F5*09               730 	mov  ___fsdiv_sloc3_1_0,a
+   038F 90s00r14            731 	mov  dptr,#___fsdiv_mask_1_1
+   0392 F0                  732 	movx @dptr,a
+   0393 A3                  733 	inc	dptr
+   0394 E5*0A               734 	mov	a,(___fsdiv_sloc3_1_0 + 1)
+   0396 F0                  735 	movx	@dptr,a
+   0397 A3                  736 	inc	dptr
+   0398 E5*0B               737 	mov	a,(___fsdiv_sloc3_1_0 + 2)
+   039A F0                  738 	movx	@dptr,a
+   039B A3                  739 	inc	dptr
+   039C E5*0C               740 	mov	a,(___fsdiv_sloc3_1_0 + 3)
+   039E F0                  741 	movx	@dptr,a
+   039F 02s02r53            742 	ljmp	00109$
+   03A2                     743 00111$:
+                            744 ;	_fsdiv.c 128
+   03A2 90s00r10            745 	mov	dptr,#___fsdiv_result_1_1
+   03A5 E0                  746 	movx	a,@dptr
+   03A6 F5*09               747 	mov	___fsdiv_sloc3_1_0,a
+   03A8 A3                  748 	inc	dptr
+   03A9 E0                  749 	movx	a,@dptr
+   03AA F5*0A               750 	mov	(___fsdiv_sloc3_1_0 + 1),a
+   03AC A3                  751 	inc	dptr
+   03AD E0                  752 	movx	a,@dptr
+   03AE F5*0B               753 	mov	(___fsdiv_sloc3_1_0 + 2),a
+   03B0 A3                  754 	inc	dptr
+   03B1 E0                  755 	movx	a,@dptr
+   03B2 F5*0C               756 	mov	(___fsdiv_sloc3_1_0 + 3),a
+   03B4 90s00r10            757 	mov	dptr,#___fsdiv_result_1_1
+   03B7 74 01               758 	mov	a,#0x01
+   03B9 25*09               759 	add	a,___fsdiv_sloc3_1_0
+   03BB F0                  760 	movx	@dptr,a
+                            761 ; Peephole 180   changed mov to clr
+   03BC E4                  762 	clr  a
+   03BD 35*0A               763 	addc	a,(___fsdiv_sloc3_1_0 + 1)
+   03BF A3                  764 	inc	dptr
+   03C0 F0                  765 	movx	@dptr,a
+                            766 ; Peephole 180   changed mov to clr
+   03C1 E4                  767 	clr  a
+   03C2 35*0B               768 	addc	a,(___fsdiv_sloc3_1_0 + 2)
+   03C4 A3                  769 	inc	dptr
+   03C5 F0                  770 	movx	@dptr,a
+                            771 ; Peephole 180   changed mov to clr
+   03C6 E4                  772 	clr  a
+   03C7 35*0C               773 	addc	a,(___fsdiv_sloc3_1_0 + 3)
+   03C9 A3                  774 	inc	dptr
+   03CA F0                  775 	movx	@dptr,a
+                            776 ;	_fsdiv.c 131
+   03CB 90s00r20            777 	mov	dptr,#___fsdiv_exp_1_1
+   03CE E0                  778 	movx	a,@dptr
+   03CF 24 01               779 	add	a,#0x01
+   03D1 F0                  780 	movx	@dptr,a
+   03D2 A3                  781 	inc	dptr
+   03D3 E0                  782 	movx	a,@dptr
+   03D4 34 00               783 	addc	a,#0x00
+   03D6 F0                  784 	movx	@dptr,a
+                            785 ;	_fsdiv.c 132
+   03D7 90s00r10            786 	mov	dptr,#___fsdiv_result_1_1
+   03DA E0                  787 	movx	a,@dptr
+   03DB F5*09               788 	mov	___fsdiv_sloc3_1_0,a
+   03DD A3                  789 	inc	dptr
+   03DE E0                  790 	movx	a,@dptr
+   03DF F5*0A               791 	mov	(___fsdiv_sloc3_1_0 + 1),a
+   03E1 A3                  792 	inc	dptr
+   03E2 E0                  793 	movx	a,@dptr
+   03E3 F5*0B               794 	mov	(___fsdiv_sloc3_1_0 + 2),a
+   03E5 A3                  795 	inc	dptr
+   03E6 E0                  796 	movx	a,@dptr
+                            797 ; Peephole 105   removed redundant mov
+   03E7 F5*0C               798 	mov  (___fsdiv_sloc3_1_0 + 3),a
+   03E9 A2 E7               799 	mov	c,acc.7
+   03EB 13                  800 	rrc	a
+   03EC F5*0C               801 	mov	(___fsdiv_sloc3_1_0 + 3),a
+   03EE E5*0B               802 	mov	a,(___fsdiv_sloc3_1_0 + 2)
+   03F0 13                  803 	rrc	a
+   03F1 F5*0B               804 	mov	(___fsdiv_sloc3_1_0 + 2),a
+   03F3 E5*0A               805 	mov	a,(___fsdiv_sloc3_1_0 + 1)
+   03F5 13                  806 	rrc	a
+   03F6 F5*0A               807 	mov	(___fsdiv_sloc3_1_0 + 1),a
+   03F8 E5*09               808 	mov	a,___fsdiv_sloc3_1_0
+   03FA 13                  809 	rrc	a
+                            810 ; Peephole 100   removed redundant mov
+   03FB F5*09               811 	mov  ___fsdiv_sloc3_1_0,a
+   03FD 90s00r10            812 	mov  dptr,#___fsdiv_result_1_1
+   0400 F0                  813 	movx @dptr,a
+   0401 A3                  814 	inc	dptr
+   0402 E5*0A               815 	mov	a,(___fsdiv_sloc3_1_0 + 1)
+   0404 F0                  816 	movx	@dptr,a
+   0405 A3                  817 	inc	dptr
+   0406 E5*0B               818 	mov	a,(___fsdiv_sloc3_1_0 + 2)
+   0408 F0                  819 	movx	@dptr,a
+   0409 A3                  820 	inc	dptr
+   040A E5*0C               821 	mov	a,(___fsdiv_sloc3_1_0 + 3)
+   040C F0                  822 	movx	@dptr,a
+                            823 ;	_fsdiv.c 134
+   040D 90s00r10            824 	mov	dptr,#___fsdiv_result_1_1
+   0410 E0                  825 	movx	a,@dptr
+   0411 F5*09               826 	mov	___fsdiv_sloc3_1_0,a
+   0413 A3                  827 	inc	dptr
+   0414 E0                  828 	movx	a,@dptr
+   0415 F5*0A               829 	mov	(___fsdiv_sloc3_1_0 + 1),a
+   0417 A3                  830 	inc	dptr
+   0418 E0                  831 	movx	a,@dptr
+   0419 F5*0B               832 	mov	(___fsdiv_sloc3_1_0 + 2),a
+   041B A3                  833 	inc	dptr
+   041C E0                  834 	movx	a,@dptr
+   041D F5*0C               835 	mov	(___fsdiv_sloc3_1_0 + 3),a
+   041F 90s00r10            836 	mov	dptr,#___fsdiv_result_1_1
+   0422 E5*09               837 	mov	a,___fsdiv_sloc3_1_0
+   0424 F0                  838 	movx	@dptr,a
+   0425 A3                  839 	inc	dptr
+   0426 E5*0A               840 	mov	a,(___fsdiv_sloc3_1_0 + 1)
+   0428 F0                  841 	movx	@dptr,a
+   0429 74 7F               842 	mov	a,#0x7f
+   042B 55*0B               843 	anl	a,(___fsdiv_sloc3_1_0 + 2)
+   042D A3                  844 	inc	dptr
+   042E F0                  845 	movx	@dptr,a
+   042F A3                  846 	inc	dptr
+   0430 E5*0C               847 	mov	a,(___fsdiv_sloc3_1_0 + 3)
+   0432 F0                  848 	movx	@dptr,a
+                            849 ;	_fsdiv.c 137
+   0433 90s00r20            850 	mov	dptr,#___fsdiv_exp_1_1
+   0436 E0                  851 	movx	a,@dptr
+   0437 F5*09               852 	mov	___fsdiv_sloc3_1_0,a
+   0439 A3                  853 	inc	dptr
+   043A E0                  854 	movx	a,@dptr
+   043B F5*0A               855 	mov	(___fsdiv_sloc3_1_0 + 1),a
+   043D 85*09*0B            856 	mov	(___fsdiv_sloc3_1_0 + 2),___fsdiv_sloc3_1_0
+   0440 E5*0A               857 	mov	a,(___fsdiv_sloc3_1_0 + 1)
+   0442 54 01               858 	anl	a,#0x01
+   0444 A2 E0               859 	mov	c,acc.0
+   0446 C5*0B               860 	xch	a,(___fsdiv_sloc3_1_0 + 2)
+   0448 13                  861 	rrc	a
+   0449 C5*0B               862 	xch	a,(___fsdiv_sloc3_1_0 + 2)
+   044B 13                  863 	rrc	a
+   044C C5*0B               864 	xch	a,(___fsdiv_sloc3_1_0 + 2)
+   044E F5*0C               865 	mov	(___fsdiv_sloc3_1_0 + 3),a
+   0450 75*0A 00            866 	mov	(___fsdiv_sloc3_1_0 + 1),#0x00
+   0453 75*09 00            867 	mov	___fsdiv_sloc3_1_0,#0x00
+   0456 85*01*05            868 	mov	___fsdiv_sloc2_1_0,___fsdiv_sloc1_1_0
+                            869 ; Peephole 3.c   changed mov to clr
+                            870 ; Peephole 3.b   changed mov to clr
+   0459 E4                  871 	clr  a
+   045A F5*06               872 	mov  (___fsdiv_sloc2_1_0 + 1),a
+   045C F5*07               873 	mov  (___fsdiv_sloc2_1_0 + 2),a
+   045E F5*08               874 	mov  (___fsdiv_sloc2_1_0 + 3),a
+   0460 E5*05               875 	mov  a,___fsdiv_sloc2_1_0
+   0462 42*09               876 	orl	___fsdiv_sloc3_1_0,a
+   0464 E5*06               877 	mov	a,(___fsdiv_sloc2_1_0 + 1)
+   0466 42*0A               878 	orl	(___fsdiv_sloc3_1_0 + 1),a
+   0468 E5*07               879 	mov	a,(___fsdiv_sloc2_1_0 + 2)
+   046A 42*0B               880 	orl	(___fsdiv_sloc3_1_0 + 2),a
+   046C E5*08               881 	mov	a,(___fsdiv_sloc2_1_0 + 3)
+   046E 42*0C               882 	orl	(___fsdiv_sloc3_1_0 + 3),a
+   0470 90s00r10            883 	mov	dptr,#___fsdiv_result_1_1
+   0473 E0                  884 	movx	a,@dptr
+   0474 F5*05               885 	mov	___fsdiv_sloc2_1_0,a
+   0476 A3                  886 	inc	dptr
+   0477 E0                  887 	movx	a,@dptr
+   0478 F5*06               888 	mov	(___fsdiv_sloc2_1_0 + 1),a
+   047A A3                  889 	inc	dptr
+   047B E0                  890 	movx	a,@dptr
+   047C F5*07               891 	mov	(___fsdiv_sloc2_1_0 + 2),a
+   047E A3                  892 	inc	dptr
+   047F E0                  893 	movx	a,@dptr
+   0480 F5*08               894 	mov	(___fsdiv_sloc2_1_0 + 3),a
+   0482 E5*05               895 	mov	a,___fsdiv_sloc2_1_0
+   0484 42*09               896 	orl	___fsdiv_sloc3_1_0,a
+   0486 E5*06               897 	mov	a,(___fsdiv_sloc2_1_0 + 1)
+   0488 42*0A               898 	orl	(___fsdiv_sloc3_1_0 + 1),a
+   048A E5*07               899 	mov	a,(___fsdiv_sloc2_1_0 + 2)
+   048C 42*0B               900 	orl	(___fsdiv_sloc3_1_0 + 2),a
+   048E E5*08               901 	mov	a,(___fsdiv_sloc2_1_0 + 3)
+   0490 42*0C               902 	orl	(___fsdiv_sloc3_1_0 + 3),a
+   0492 90s00r08            903 	mov	dptr,#(___fsdiv_fl1_1_1)
+   0495 E5*09               904 	mov	a,___fsdiv_sloc3_1_0
+   0497 F0                  905 	movx	@dptr,a
+   0498 A3                  906 	inc	dptr
+   0499 E5*0A               907 	mov	a,(___fsdiv_sloc3_1_0 + 1)
+   049B F0                  908 	movx	@dptr,a
+   049C A3                  909 	inc	dptr
+   049D E5*0B               910 	mov	a,(___fsdiv_sloc3_1_0 + 2)
+   049F F0                  911 	movx	@dptr,a
+   04A0 A3                  912 	inc	dptr
+   04A1 E5*0C               913 	mov	a,(___fsdiv_sloc3_1_0 + 3)
+   04A3 F0                  914 	movx	@dptr,a
+                            915 ;	_fsdiv.c 138
+   04A4 90s00r08            916 	mov	dptr,#(___fsdiv_fl1_1_1)
+   04A7 E0                  917 	movx	a,@dptr
+   04A8 F5*09               918 	mov	___fsdiv_sloc3_1_0,a
+   04AA A3                  919 	inc	dptr
+   04AB E0                  920 	movx	a,@dptr
+   04AC F5*0A               921 	mov	(___fsdiv_sloc3_1_0 + 1),a
+   04AE A3                  922 	inc	dptr
+   04AF E0                  923 	movx	a,@dptr
+   04B0 F5*0B               924 	mov	(___fsdiv_sloc3_1_0 + 2),a
+   04B2 A3                  925 	inc	dptr
+   04B3 E0                  926 	movx	a,@dptr
+                            927 ; Peephole 191   removed redundant mov
+   04B4 F5*0C               928 	mov  (___fsdiv_sloc3_1_0 + 3),a
+   04B6 85*09 82            929 	mov  dpl,___fsdiv_sloc3_1_0
+   04B9 85*0A 83            930 	mov  dph,(___fsdiv_sloc3_1_0 + 1)
+   04BC 85*0B F0            931 	mov  b,(___fsdiv_sloc3_1_0 + 2)
+   04BF                     932 00112$:
+                    04BF    933 	C$_fsdiv.c$139$1$1 ==.
+                    04BF    934 	XG$__fsdiv$0$0 ==.
+   04BF 22                  935 	ret
+                            936 	.area	CSEG    (CODE)

@@ -1,0 +1,325 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:22 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module _autobaud
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl _autobaud
+                             11 ;--------------------------------------------------------
+                             12 ; special function registers
+                             13 ;--------------------------------------------------------
+                    0080     14 G$P0$0$0 == 0x0080
+                    0080     15 _P0	=	0x0080
+                    0090     16 G$P1$0$0 == 0x0090
+                    0090     17 _P1	=	0x0090
+                    00A0     18 G$P2$0$0 == 0x00a0
+                    00A0     19 _P2	=	0x00a0
+                    00B0     20 G$P3$0$0 == 0x00b0
+                    00B0     21 _P3	=	0x00b0
+                    00D0     22 G$PSW$0$0 == 0x00d0
+                    00D0     23 _PSW	=	0x00d0
+                    00E0     24 G$ACC$0$0 == 0x00e0
+                    00E0     25 _ACC	=	0x00e0
+                    00F0     26 G$B$0$0 == 0x00f0
+                    00F0     27 _B	=	0x00f0
+                    0081     28 G$SP$0$0 == 0x0081
+                    0081     29 _SP	=	0x0081
+                    0082     30 G$DPL$0$0 == 0x0082
+                    0082     31 _DPL	=	0x0082
+                    0083     32 G$DPH$0$0 == 0x0083
+                    0083     33 _DPH	=	0x0083
+                    0087     34 G$PCON$0$0 == 0x0087
+                    0087     35 _PCON	=	0x0087
+                    0088     36 G$TCON$0$0 == 0x0088
+                    0088     37 _TCON	=	0x0088
+                    0089     38 G$TMOD$0$0 == 0x0089
+                    0089     39 _TMOD	=	0x0089
+                    008A     40 G$TL0$0$0 == 0x008a
+                    008A     41 _TL0	=	0x008a
+                    008B     42 G$TL1$0$0 == 0x008b
+                    008B     43 _TL1	=	0x008b
+                    008C     44 G$TH0$0$0 == 0x008c
+                    008C     45 _TH0	=	0x008c
+                    008D     46 G$TH1$0$0 == 0x008d
+                    008D     47 _TH1	=	0x008d
+                    008E     48 G$AUXR$0$0 == 0x008e
+                    008E     49 _AUXR	=	0x008e
+                    00A8     50 G$IE$0$0 == 0x00a8
+                    00A8     51 _IE	=	0x00a8
+                    00B8     52 G$IP$0$0 == 0x00b8
+                    00B8     53 _IP	=	0x00b8
+                    0098     54 G$SCON$0$0 == 0x0098
+                    0098     55 _SCON	=	0x0098
+                    0099     56 G$SBUF$0$0 == 0x0099
+                    0099     57 _SBUF	=	0x0099
+                    00C8     58 G$T2CON$0$0 == 0x00c8
+                    00C8     59 _T2CON	=	0x00c8
+                    00CB     60 G$RCAP2H$0$0 == 0x00cb
+                    00CB     61 _RCAP2H	=	0x00cb
+                    00CA     62 G$RCAP2L$0$0 == 0x00ca
+                    00CA     63 _RCAP2L	=	0x00ca
+                             64 ;--------------------------------------------------------
+                             65 ; special function bits 
+                             66 ;--------------------------------------------------------
+                    00D7     67 G$CY$0$0 == 0x00d7
+                    00D7     68 _CY	=	0x00d7
+                    00D6     69 G$AC$0$0 == 0x00d6
+                    00D6     70 _AC	=	0x00d6
+                    00D5     71 G$F0$0$0 == 0x00d5
+                    00D5     72 _F0	=	0x00d5
+                    00D4     73 G$RS1$0$0 == 0x00d4
+                    00D4     74 _RS1	=	0x00d4
+                    00D3     75 G$RS0$0$0 == 0x00d3
+                    00D3     76 _RS0	=	0x00d3
+                    00D2     77 G$OV$0$0 == 0x00d2
+                    00D2     78 _OV	=	0x00d2
+                    00D0     79 G$P$0$0 == 0x00d0
+                    00D0     80 _P	=	0x00d0
+                    008F     81 G$TF1$0$0 == 0x008f
+                    008F     82 _TF1	=	0x008f
+                    008E     83 G$TR1$0$0 == 0x008e
+                    008E     84 _TR1	=	0x008e
+                    008D     85 G$TF0$0$0 == 0x008d
+                    008D     86 _TF0	=	0x008d
+                    008C     87 G$TR0$0$0 == 0x008c
+                    008C     88 _TR0	=	0x008c
+                    008B     89 G$IE1$0$0 == 0x008b
+                    008B     90 _IE1	=	0x008b
+                    008A     91 G$IT1$0$0 == 0x008a
+                    008A     92 _IT1	=	0x008a
+                    0089     93 G$IE0$0$0 == 0x0089
+                    0089     94 _IE0	=	0x0089
+                    0088     95 G$IT0$0$0 == 0x0088
+                    0088     96 _IT0	=	0x0088
+                    00AF     97 G$EA$0$0 == 0x00af
+                    00AF     98 _EA	=	0x00af
+                    00AC     99 G$ES$0$0 == 0x00ac
+                    00AC    100 _ES	=	0x00ac
+                    00AB    101 G$ET1$0$0 == 0x00ab
+                    00AB    102 _ET1	=	0x00ab
+                    00AA    103 G$EX1$0$0 == 0x00aa
+                    00AA    104 _EX1	=	0x00aa
+                    00A9    105 G$ET0$0$0 == 0x00a9
+                    00A9    106 _ET0	=	0x00a9
+                    00A8    107 G$EX0$0$0 == 0x00a8
+                    00A8    108 _EX0	=	0x00a8
+                    00BC    109 G$PS$0$0 == 0x00bc
+                    00BC    110 _PS	=	0x00bc
+                    00BB    111 G$PT1$0$0 == 0x00bb
+                    00BB    112 _PT1	=	0x00bb
+                    00BA    113 G$PX1$0$0 == 0x00ba
+                    00BA    114 _PX1	=	0x00ba
+                    00B9    115 G$PT0$0$0 == 0x00b9
+                    00B9    116 _PT0	=	0x00b9
+                    00B8    117 G$PX0$0$0 == 0x00b8
+                    00B8    118 _PX0	=	0x00b8
+                    00B7    119 G$RD$0$0 == 0x00b7
+                    00B7    120 _RD	=	0x00b7
+                    00B6    121 G$WR$0$0 == 0x00b6
+                    00B6    122 _WR	=	0x00b6
+                    00B5    123 G$T1$0$0 == 0x00b5
+                    00B5    124 _T1	=	0x00b5
+                    00B4    125 G$T0$0$0 == 0x00b4
+                    00B4    126 _T0	=	0x00b4
+                    00B3    127 G$INT1$0$0 == 0x00b3
+                    00B3    128 _INT1	=	0x00b3
+                    00B2    129 G$INT0$0$0 == 0x00b2
+                    00B2    130 _INT0	=	0x00b2
+                    00B1    131 G$TXD$0$0 == 0x00b1
+                    00B1    132 _TXD	=	0x00b1
+                    00B0    133 G$RXD$0$0 == 0x00b0
+                    00B0    134 _RXD	=	0x00b0
+                    0090    135 G$P1_0$0$0 == 0x0090
+                    0090    136 _P1_0	=	0x0090
+                    0091    137 G$P1_1$0$0 == 0x0091
+                    0091    138 _P1_1	=	0x0091
+                    0092    139 G$P1_2$0$0 == 0x0092
+                    0092    140 _P1_2	=	0x0092
+                    0093    141 G$P1_3$0$0 == 0x0093
+                    0093    142 _P1_3	=	0x0093
+                    0094    143 G$P1_4$0$0 == 0x0094
+                    0094    144 _P1_4	=	0x0094
+                    0095    145 G$P1_5$0$0 == 0x0095
+                    0095    146 _P1_5	=	0x0095
+                    0096    147 G$P1_6$0$0 == 0x0096
+                    0096    148 _P1_6	=	0x0096
+                    0097    149 G$P1_7$0$0 == 0x0097
+                    0097    150 _P1_7	=	0x0097
+                    009F    151 G$SM0$0$0 == 0x009f
+                    009F    152 _SM0	=	0x009f
+                    009E    153 G$SM1$0$0 == 0x009e
+                    009E    154 _SM1	=	0x009e
+                    009D    155 G$SM2$0$0 == 0x009d
+                    009D    156 _SM2	=	0x009d
+                    009C    157 G$REN$0$0 == 0x009c
+                    009C    158 _REN	=	0x009c
+                    009B    159 G$TB8$0$0 == 0x009b
+                    009B    160 _TB8	=	0x009b
+                    009A    161 G$RB8$0$0 == 0x009a
+                    009A    162 _RB8	=	0x009a
+                    0099    163 G$TI$0$0 == 0x0099
+                    0099    164 _TI	=	0x0099
+                    0098    165 G$RI$0$0 == 0x0098
+                    0098    166 _RI	=	0x0098
+                    00C8    167 G$T2CON_0$0$0 == 0x00c8
+                    00C8    168 _T2CON_0	=	0x00c8
+                    00C9    169 G$T2CON_1$0$0 == 0x00c9
+                    00C9    170 _T2CON_1	=	0x00c9
+                    00CA    171 G$T2CON_2$0$0 == 0x00ca
+                    00CA    172 _T2CON_2	=	0x00ca
+                    00CB    173 G$T2CON_3$0$0 == 0x00cb
+                    00CB    174 _T2CON_3	=	0x00cb
+                    00CC    175 G$T2CON_4$0$0 == 0x00cc
+                    00CC    176 _T2CON_4	=	0x00cc
+                    00CD    177 G$T2CON_5$0$0 == 0x00cd
+                    00CD    178 _T2CON_5	=	0x00cd
+                    00CE    179 G$T2CON_6$0$0 == 0x00ce
+                    00CE    180 _T2CON_6	=	0x00ce
+                    00CF    181 G$T2CON_7$0$0 == 0x00cf
+                    00CF    182 _T2CON_7	=	0x00cf
+                            183 ;--------------------------------------------------------
+                            184 ; internal ram data
+                            185 ;--------------------------------------------------------
+                            186 	.area	DSEG    (DATA)
+                            187 ;--------------------------------------------------------
+                            188 ; overlayable items in internal ram 
+                            189 ;--------------------------------------------------------
+                            190 	.area	OSEG	(OVR,DATA)
+                            191 ;--------------------------------------------------------
+                            192 ; indirectly addressable internal ram data
+                            193 ;--------------------------------------------------------
+                            194 	.area	ISEG    (DATA)
+                            195 ;--------------------------------------------------------
+                            196 ; bit data
+                            197 ;--------------------------------------------------------
+                            198 	.area	BSEG    (BIT)
+                            199 ;--------------------------------------------------------
+                            200 ; external ram data
+                            201 ;--------------------------------------------------------
+                            202 	.area	XSEG    (XDATA)
+                            203 ;--------------------------------------------------------
+                            204 ; global & static initialisations
+                            205 ;--------------------------------------------------------
+                            206 	.area GSINIT (CODE)
+                            207 ;--------------------------------------------------------
+                            208 ; code
+                            209 ;--------------------------------------------------------
+                            210 	.area CSEG (CODE)
+                    0000    211 	G$autobaud$0$0 ==.
+                            212 ;	_autobaud.c 52
+                            213 ;	-----------------------------------------
+                            214 ;	 function autobaud
+                            215 ;	-----------------------------------------
+   0000                     216 _autobaud:
+                    0002    217 	ar2 = 0x02
+                    0003    218 	ar3 = 0x03
+                    0004    219 	ar4 = 0x04
+                    0005    220 	ar5 = 0x05
+                    0006    221 	ar6 = 0x06
+                    0007    222 	ar7 = 0x07
+                    0000    223 	ar0 = 0x00
+                    0001    224 	ar1 = 0x01
+                            225 ;	_autobaud.c 56
+   0000 75 89 11            226 	mov	_TMOD,#0x11
+                            227 ;	_autobaud.c 57
+   0003 75 88 00            228 	mov	_TCON,#0x00
+                            229 ;	_autobaud.c 58
+   0006 75 8B 00            230 	mov	_TL1,#0x00
+   0009 75 8D 00            231 	mov	_TH1,#0x00
+                            232 ;	_autobaud.c 62
+   000C                     233 00101$:
+                            234 ; Peephole 112   removed ljmp by inverse jump logic
+   000C 20 B0 FD            235 	jb   _RXD,00101$
+   000F                     236 00142$:
+                            237 ;	_autobaud.c 66
+                            238 ; Peephole 112   removed ljmp by inverse jump logic
+   000F 20 B0 FA            239 	jb   _RXD,00101$
+   0012                     240 00143$:
+                            241 ;	_autobaud.c 67
+                            242 ; Peephole 112   removed ljmp by inverse jump logic
+   0012 20 B0 F7            243 	jb   _RXD,00101$
+   0015                     244 00144$:
+                            245 ;	_autobaud.c 68
+                            246 ; Peephole 112   removed ljmp by inverse jump logic
+   0015 20 B0 F4            247 	jb   _RXD,00101$
+   0018                     248 00145$:
+                            249 ;	_autobaud.c 69
+                            250 ; Peephole 112   removed ljmp by inverse jump logic
+   0018 20 B0 F1            251 	jb   _RXD,00101$
+   001B                     252 00146$:
+                            253 ;	_autobaud.c 72
+   001B                     254 00113$:
+                            255 ; Peephole 111   removed ljmp by inverse jump logic
+   001B 30 B0 FD            256 	jnb  _RXD,00113$
+   001E                     257 00147$:
+                            258 ;	_autobaud.c 73
+   001E D2 8E               259 	setb	_TR1
+                            260 ;	_autobaud.c 74
+   0020                     261 00116$:
+                            262 ; Peephole 112   removed ljmp by inverse jump logic
+   0020 20 B0 FD            263 	jb   _RXD,00116$
+   0023                     264 00148$:
+                            265 ;	_autobaud.c 75
+   0023                     266 00119$:
+                            267 ; Peephole 111   removed ljmp by inverse jump logic
+   0023 30 B0 FD            268 	jnb  _RXD,00119$
+   0026                     269 00149$:
+                            270 ;	_autobaud.c 76
+   0026                     271 00122$:
+                            272 ; Peephole 112   removed ljmp by inverse jump logic
+   0026 20 B0 FD            273 	jb   _RXD,00122$
+   0029                     274 00150$:
+                            275 ;	_autobaud.c 77
+   0029                     276 00125$:
+                            277 ; Peephole 111   removed ljmp by inverse jump logic
+   0029 30 B0 FD            278 	jnb  _RXD,00125$
+   002C                     279 00151$:
+                            280 ;	_autobaud.c 78
+   002C C2 8E               281 	clr	_TR1
+                            282 ;	_autobaud.c 81
+   002E E5 8D               283 	mov	a,_TH1
+   0030 25 E0               284 	add	a,acc
+   0032 FA                  285 	mov	r2,a
+   0033 E5 8B               286 	mov	a,_TL1
+   0035 23                  287 	rl	a
+   0036 54 01               288 	anl	a,#0x01
+                            289 ; Peephole 105   removed redundant mov
+   0038 FB                  290 	mov  r3,a
+   0039 4A                  291 	orl	a,r2
+                            292 ;	_autobaud.c 84
+                            293 ; Peephole 105   removed redundant mov
+   003A F5 8D               294 	mov  _TH1,a
+   003C 25 E0               295 	add	a,acc
+   003E FA                  296 	mov	r2,a
+   003F E5 8B               297 	mov	a,_TL1
+   0041 23                  298 	rl	a
+   0042 23                  299 	rl	a
+                            300 ; Peephole 139   removed redundant mov
+                            301 ; Peephole 183   avoided anl during execution
+   0043 54 01               302 	anl  a,#(0x03 & 0x01)
+   0045 FB                  303 	mov  r3,a
+   0046 4A                  304 	orl	a,r2
+                            305 ;	_autobaud.c 87
+                            306 ; Peephole 105   removed redundant mov
+                            307 ; Peephole 184   removed redundant mov
+   0047 F4                  308 	cpl  a
+                            309 ;	_autobaud.c 90
+                            310 ; Peephole 185   changed order of increment (acc incremented also!)
+   0048 04                  311 	inc  a
+   0049 F5 8D               312 	mov  _TH1,a
+                            313 ;	_autobaud.c 92
+   004B 85 8D 8B            314 	mov	_TL1,_TH1
+                            315 ;	_autobaud.c 93
+   004E 75 89 21            316 	mov	_TMOD,#0x21
+                            317 ;	_autobaud.c 94
+   0051 75 87 80            318 	mov	_PCON,#0x80
+                            319 ;	_autobaud.c 95
+   0054 75 98 52            320 	mov	_SCON,#0x52
+   0057                     321 00128$:
+                    0057    322 	C$_autobaud.c$96$1$1 ==.
+                    0057    323 	XG$autobaud$0$0 ==.
+   0057 22                  324 	ret
+                            325 	.area	CSEG    (CODE)

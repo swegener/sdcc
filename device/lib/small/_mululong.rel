@@ -1,0 +1,180 @@
+;!FILE _mululong.asm
+XH
+H 9 areas 69 global symbols
+M _mululong
+A _CODE size 0 flags 0
+A DSEG size 0 flags 0
+A _DUMMY size 0 flags 0
+A OSEG size C flags 4
+S __mululong_PARM_2 Def0000
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 0 flags 40
+A GSINIT size 0 flags 20
+A CSEG size B9 flags 20
+S G$_mululong$0$0 Def0000
+S A$_mululong$100 Def0033
+S A$_mululong$110 Def0043
+S A$_mululong$101 Def0035
+S A$_mululong$120 Def0052
+S A$_mululong$111 Def0044
+S A$_mululong$121 Def0053
+S A$_mululong$112 Def0045
+S A$_mululong$103 Def0037
+S A$_mululong$140 Def006E
+S A$_mululong$122 Def0055
+S A$_mululong$113 Def0047
+S A$_mululong$104 Def003A
+S A$_mululong$150 Def007C
+S A$_mululong$141 Def006F
+S A$_mululong$132 Def0061
+S A$_mululong$123 Def0056
+S A$_mululong$114 Def0048
+S A$_mululong$105 Def003C
+S A$_mululong$160 Def0088
+S A$_mululong$151 Def007F
+S A$_mululong$142 Def0071
+S A$_mululong$133 Def0064
+S A$_mululong$124 Def0058
+S A$_mululong$115 Def004A
+S A$_mululong$106 Def003D
+S A$_mululong$170 Def0098
+S A$_mululong$152 Def0081
+S A$_mululong$134 Def0066
+S A$_mululong$125 Def0059
+S A$_mululong$107 Def003E
+S A$_mululong$180 Def00A8
+S A$_mululong$171 Def0099
+S A$_mululong$162 Def008A
+S A$_mululong$153 Def0082
+S A$_mululong$135 Def0067
+S A$_mululong$126 Def005A
+S A$_mululong$117 Def004C
+S A$_mululong$108 Def0040
+S A$_mululong$181 Def00A9
+S A$_mululong$172 Def009B
+S A$_mululong$163 Def008C
+S A$_mululong$154 Def0084
+S A$_mululong$145 Def0074
+S A$_mululong$127 Def005C
+S A$_mululong$118 Def004F
+S A$_mululong$109 Def0041
+S A$_mululong$182 Def00AB
+S A$_mululong$173 Def009D
+S A$_mululong$164 Def008E
+S A$_mululong$146 Def0077
+S A$_mululong$128 Def005D
+S A$_mululong$119 Def0051
+S A$_mululong$183 Def00AD
+S A$_mululong$174 Def009E
+S A$_mululong$165 Def008F
+S A$_mululong$147 Def0079
+S A$_mululong$138 Def0069
+S A$_mululong$129 Def005F
+S A$_mululong$193 Def00B8
+S A$_mululong$184 Def00AE
+S A$_mululong$175 Def00A0
+S A$_mululong$166 Def0091
+S A$_mululong$148 Def007A
+S A$_mululong$139 Def006C
+S A$_mululong$185 Def00B0
+S A$_mululong$176 Def00A2
+S A$_mululong$167 Def0093
+S A$_mululong$186 Def00B2
+S A$_mululong$177 Def00A4
+S A$_mululong$168 Def0094
+S A$_mululong$159 Def0087
+S A$_mululong$187 Def00B3
+S A$_mululong$169 Def0096
+S A$_mululong$188 Def00B5
+S A$_mululong$179 Def00A6
+S A$_mululong$189 Def00B7
+S A$_mululong$70 Def0006
+S A$_mululong$80 Def0019
+S A$_mululong$71 Def0009
+S A$_mululong$90 Def0027
+S A$_mululong$81 Def001B
+S A$_mululong$91 Def0028
+S A$_mululong$82 Def001C
+S A$_mululong$73 Def000B
+S A$_mululong$92 Def002A
+S A$_mululong$83 Def001E
+S A$_mululong$74 Def000E
+S A$_mululong$75 Def0010
+S C$_mululong.c$87$1$1 Def00B8
+S A$_mululong$76 Def0011
+S A$_mululong$95 Def002C
+S A$_mululong$86 Def0021
+S A$_mululong$77 Def0013
+S A$_mululong$68 Def0000
+S A$_mululong$96 Def002F
+S A$_mululong$87 Def0024
+S A$_mululong$69 Def0003
+S A$_mululong$97 Def0031
+S A$_mululong$88 Def0026
+S A$_mululong$79 Def0016
+S A$_mululong$99 Def0032
+S __mululong Def0000
+S XG$_mululong$0$0 Def00B8
+T 00 00
+R 00 00 00 03
+T 00 00
+R 00 00 00 03
+T 00 04
+R 00 00 00 03
+T 00 04
+R 00 00 00 03
+T 00 08
+R 00 00 00 03
+T 00 08
+R 00 00 00 03
+T 00 00
+R 00 00 00 08
+T 00 00 85 82 00 04 85 83 00 05 85 F0 00 06 F5
+R 00 00 00 08 29 04 00 03 29 08 00 03 29 0C 00 03
+T 00 0A 00 07 85 00 02 F0 E5 00 04 A4 F5
+R 00 00 00 08 29 02 00 03 29 05 00 03 29 09 00 03
+T 00 12 00 0A 85 F0 00 0B 85 00 00 F0 E5
+R 00 00 00 08 29 02 00 03 29 06 00 03 29 09 00 03
+T 00 1A 00 04 A4 F5 00 08 85 F0 00 09 85
+R 00 00 00 08 29 02 00 03 29 06 00 03 29 0A 00 03
+T 00 22 00 00 F0 E5 00 07 A4 FA 25 00 0B F5
+R 00 00 00 08 29 02 00 03 29 06 00 03 29 0B 00 03
+T 00 2B 00 0B 85 00 01 F0 E5 00 06 A4 FA 25
+R 00 00 00 08 29 02 00 03 29 05 00 03 29 09 00 03
+T 00 34 00 0B F5 00 0B 85 00 00 F0 E5
+R 00 00 00 08 29 02 00 03 29 05 00 03 29 08 00 03
+T 00 3B 00 06 A4 FA AB F0 EA 25 00 0A FA EB 35
+R 00 00 00 08 29 02 00 03 29 0A 00 03
+T 00 46 00 0B FB 8A 00 0A 8B 00 0B 85
+R 00 00 00 08 29 02 00 03 29 06 00 03 29 09 00 03
+T 00 4D 00 01 F0 E5 00 05 A4 FA AB F0 EA 25 00 0A
+R 00 00 00 08 29 02 00 03 29 06 00 03 29 0E 00 03
+T 00 58 FA EB 35 00 0B FB 8A 00 0A 8B 00 0B 85
+R 00 00 00 08 29 05 00 03 29 09 00 03 29 0C 00 03
+T 00 62 00 02 F0 E5 00 05 A4 F5 00 07 85
+R 00 00 00 08 29 02 00 03 29 06 00 03 29 0A 00 03
+T 00 6A 00 00 F0 E5 00 05 A4 F5 00 05 85 F0
+R 00 00 00 08 29 02 00 03 29 06 00 03 29 0A 00 03
+T 00 73 00 06 85 00 03 F0 E5 00 04 A4 F5
+R 00 00 00 08 29 02 00 03 29 05 00 03 29 09 00 03
+T 00 7B 00 03 85 00 01 F0 E5 00 04 A4 F5
+R 00 00 00 08 29 02 00 03 29 05 00 03 29 09 00 03
+T 00 83 00 01 85 F0 00 02 E4 F5 00 00 F5
+R 00 00 00 08 29 02 00 03 29 06 00 03 29 0A 00 03
+T 00 8B 00 04 25 00 08 FA E5 00 05 35
+R 00 00 00 08 29 02 00 03 29 05 00 03 29 09 00 03
+T 00 92 00 09 FB E5 00 06 35 00 0A FC E5
+R 00 00 00 08 29 02 00 03 29 06 00 03 29 09 00 03
+T 00 9A 00 07 35 00 0B FD 8A 00 08 8B
+R 00 00 00 08 29 02 00 03 29 05 00 03 29 09 00 03
+T 00 A1 00 09 8C 00 0A 8D 00 0B E5
+R 00 00 00 08 29 02 00 03 29 05 00 03 29 08 00 03
+T 00 A7 00 00 2A F5 82 E5 00 01 3B F5 83 E5 00 02
+R 00 00 00 08 29 02 00 03 29 08 00 03 29 0E 00 03
+T 00 B2 3C F5 F0 E5 00 03 3D
+R 00 00 00 08 29 06 00 03
+T 00 B8
+R 00 00 00 08
+T 00 B8 22
+R 00 00 00 08

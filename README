@@ -1,0 +1,49 @@
+Small Device C Compiler (sdcc)
+------------------------------
+A C compiler for the Intel mcs51 series and soon the Z80.
+
+http://sdcc.sourceforge.net/
+
+This file is just a stub.  It will get better.
+
+Almost all of this is by Sandeep Dutta <sandeep.dutta@usa.net>
+The Z80 port was started by Michael Hope <michaelh@earthling.net>
+
+Some of the Z80 related files are borrowed from the Gameboy
+Development Kit (GBDK) originally by Pascal Felber.
+
+Roadmap:
+--------
+README		- This file
+COPYING		- GPL v2
+as/		- Assembler, derrived from asxxxx
+debugger/
+device/		- Device libraries and examples
+doc/		- sdcc and port specific documentation
+link/		- Linker, also derrived from asxxxx
+sim/		- Simulator (mcs51 only)
+src/		- Source to the C compiler and ports
+support/	- Libraries and apps that may not be provided by your system.
+
+Most of the port related files are in a subdirectory below the
+appropriate module.  For example, all compiler z80 related files
+are in src/z80, all 8051 (mcs51) specific library files are in
+device/lib/mcs51.
+
+Links:
+------
+
+* SDCC homepage
+  http://sdcc.sourceforge.net/
+
+* GBDK homepage
+  http://gbdk.sourceforge.net/
+
+* SDCC at Geocities (old)
+  http://www.geocities.com/ResearchTriangle/Forum/1353/
+
+* SDCC mailing list
+  http://sdcc.listbot.com/
+
+* Yahoo! Random link
+  http://random.yahoo.com/bin/ryl

@@ -1,0 +1,4 @@
+SDCCset.o: ../../src/SDCCset.c ../../src/SDCCset.h \
+ ../../support/gc/gc.h
+SDCChasht.o: ../../src/SDCChasht.c ../../src/SDCChasht.h \
+ ../../support/gc/gc.h

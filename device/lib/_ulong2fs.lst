@@ -1,0 +1,349 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:35 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module _ulong2fs
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl ___ulong2fs
+                             11 ;--------------------------------------------------------
+                             12 ; special function registers
+                             13 ;--------------------------------------------------------
+                             14 ;--------------------------------------------------------
+                             15 ; special function bits 
+                             16 ;--------------------------------------------------------
+                             17 ;--------------------------------------------------------
+                             18 ; internal ram data
+                             19 ;--------------------------------------------------------
+                             20 	.area	DSEG    (DATA)
+   0000                      21 ___ulong2fs_sloc0_1_0:
+   0000                      22 	.ds	0x0002
+   0002                      23 ___ulong2fs_sloc1_1_0:
+   0002                      24 	.ds	0x0004
+                             25 ;--------------------------------------------------------
+                             26 ; overlayable items in internal ram 
+                             27 ;--------------------------------------------------------
+                             28 	.area	OSEG	(OVR,DATA)
+                             29 ;--------------------------------------------------------
+                             30 ; indirectly addressable internal ram data
+                             31 ;--------------------------------------------------------
+                             32 	.area	ISEG    (DATA)
+                             33 ;--------------------------------------------------------
+                             34 ; bit data
+                             35 ;--------------------------------------------------------
+                             36 	.area	BSEG    (BIT)
+                             37 ;--------------------------------------------------------
+                             38 ; external ram data
+                             39 ;--------------------------------------------------------
+                             40 	.area	XSEG    (XDATA)
+   0000                      41 ___ulong2fs_a_1_1:
+   0000                      42 	.ds	0x0004
+   0004                      43 ___ulong2fs_sign_1_1:
+   0004                      44 	.ds	0x0004
+   0008                      45 ___ulong2fs_fl_1_1:
+   0008                      46 	.ds	0x0004
+   000C                      47 ___ulong2fs_a1_1_1:
+   000C                      48 	.ds	0x0004
+                             49 ;--------------------------------------------------------
+                             50 ; global & static initialisations
+                             51 ;--------------------------------------------------------
+                             52 	.area GSINIT (CODE)
+                             53 ;--------------------------------------------------------
+                             54 ; code
+                             55 ;--------------------------------------------------------
+                             56 	.area CSEG (CODE)
+                    0000     57 	G$__ulong2fs$0$0 ==.
+                             58 ;	_ulong2fs.c 80
+                             59 ;	-----------------------------------------
+                             60 ;	 function __ulong2fs
+                             61 ;	-----------------------------------------
+   0000                      62 ___ulong2fs:
+                    0002     63 	ar2 = 0x02
+                    0003     64 	ar3 = 0x03
+                    0004     65 	ar4 = 0x04
+                    0005     66 	ar5 = 0x05
+                    0006     67 	ar6 = 0x06
+                    0007     68 	ar7 = 0x07
+                    0000     69 	ar0 = 0x00
+                    0001     70 	ar1 = 0x01
+                             71 ;	_ulong2fs.c 109
+   0000 C0 E0                72 	push	acc
+   0002 C0 F0                73 	push	b
+   0004 C0 83                74 	push	dph
+   0006 C0 82                75 	push	dpl
+   0008 90s00r00             76 	mov	dptr,#___ulong2fs_a_1_1
+   000B D0 E0                77 	pop	acc
+   000D F0                   78 	movx	@dptr,a
+   000E D0 E0                79 	pop	acc
+   0010 A3                   80 	inc	dptr
+   0011 F0                   81 	movx	@dptr,a
+   0012 D0 E0                82 	pop	acc
+   0014 A3                   83 	inc	dptr
+   0015 F0                   84 	movx	@dptr,a
+   0016 D0 E0                85 	pop	acc
+   0018 A3                   86 	inc	dptr
+   0019 F0                   87 	movx	@dptr,a
+                             88 ;	_ulong2fs.c 82
+   001A 90s00r04             89 	mov	dptr,#___ulong2fs_sign_1_1
+   001D E4                   90 	clr	a
+   001E A3                   91 	inc	dptr
+   001F A3                   92 	inc	dptr
+   0020 A3                   93 	inc	dptr
+   0021 F0                   94 	movx	@dptr,a
+   0022 12s00r00             95 	lcall	__decdptr
+   0025 F0                   96 	movx	@dptr,a
+   0026 12s00r00             97 	lcall	__decdptr
+   0029 F0                   98 	movx	@dptr,a
+   002A 12s00r00             99 	lcall	__decdptr
+   002D F0                  100 	movx	@dptr,a
+                            101 ;	_ulong2fs.c 85
+   002E 90s00r00            102 	mov	dptr,#___ulong2fs_a_1_1
+   0031 E0                  103 	movx	a,@dptr
+   0032 FA                  104 	mov	r2,a
+   0033 A3                  105 	inc	dptr
+   0034 E0                  106 	movx	a,@dptr
+   0035 FB                  107 	mov	r3,a
+   0036 A3                  108 	inc	dptr
+   0037 E0                  109 	movx	a,@dptr
+   0038 FC                  110 	mov	r4,a
+   0039 A3                  111 	inc	dptr
+   003A E0                  112 	movx	a,@dptr
+   003B FD                  113 	mov	r5,a
+   003C 90s00r0C            114 	mov	dptr,#___ulong2fs_a1_1_1
+   003F EA                  115 	mov	a,r2
+   0040 F0                  116 	movx	@dptr,a
+   0041 A3                  117 	inc	dptr
+   0042 EB                  118 	mov	a,r3
+   0043 F0                  119 	movx	@dptr,a
+   0044 A3                  120 	inc	dptr
+   0045 EC                  121 	mov	a,r4
+   0046 F0                  122 	movx	@dptr,a
+   0047 A3                  123 	inc	dptr
+   0048 ED                  124 	mov	a,r5
+   0049 F0                  125 	movx	@dptr,a
+                            126 ;	_ulong2fs.c 87
+   004A EA                  127 	mov	a,r2
+   004B 4B                  128 	orl	a,r3
+   004C 4C                  129 	orl	a,r4
+   004D 4D                  130 	orl	a,r5
+                            131 ; Peephole 109   removed ljmp by inverse jump logic
+   004E 70 23               132 	jnz  00102$
+   0050                     133 00114$:
+                            134 ;	_ulong2fs.c 89
+   0050 90s00r08            135 	mov	dptr,#(___ulong2fs_fl_1_1)
+                            136 ; Peephole 101   removed redundant mov
+                            137 ; Peephole 180   changed mov to clr
+   0053 E4                  138 	clr  a
+   0054 F0                  139 	movx @dptr,a
+   0055 A3                  140 	inc  dptr
+   0056 F0                  141 	movx @dptr,a
+   0057 A3                  142 	inc	dptr
+                            143 ; Peephole 101   removed redundant mov
+                            144 ; Peephole 180   changed mov to clr
+   0058 E4                  145 	clr  a
+   0059 F0                  146 	movx @dptr,a
+   005A A3                  147 	inc  dptr
+   005B F0                  148 	movx @dptr,a
+                            149 ;	_ulong2fs.c 90
+   005C 90s00r08            150 	mov	dptr,#(___ulong2fs_fl_1_1)
+   005F E0                  151 	movx	a,@dptr
+   0060 FE                  152 	mov	r6,a
+   0061 A3                  153 	inc	dptr
+   0062 E0                  154 	movx	a,@dptr
+   0063 FF                  155 	mov	r7,a
+   0064 A3                  156 	inc	dptr
+   0065 E0                  157 	movx	a,@dptr
+   0066 F8                  158 	mov	r0,a
+   0067 A3                  159 	inc	dptr
+   0068 E0                  160 	movx	a,@dptr
+                            161 ; Peephole 191   removed redundant mov
+   0069 F9                  162 	mov  r1,a
+   006A 8E 82               163 	mov  dpl,r6
+   006C 8F 83               164 	mov  dph,r7
+   006E 88 F0               165 	mov  b,r0
+   0070 02s01r4F            166 	ljmp	00108$
+   0073                     167 00102$:
+                            168 ;	_ulong2fs.c 93
+   0073 C3                  169 	clr	c
+                            170 ; Peephole 108   removed ljmp by inverse jump logic
+   0074 50 21               171 	jnc  00113$
+   0076                     172 00115$:
+                            173 ;	_ulong2fs.c 95
+   0076 90s00r04            174 	mov	dptr,#___ulong2fs_sign_1_1
+                            175 ; Peephole 101   removed redundant mov
+                            176 ; Peephole 180   changed mov to clr
+   0079 E4                  177 	clr  a
+   007A F0                  178 	movx @dptr,a
+   007B A3                  179 	inc  dptr
+   007C F0                  180 	movx @dptr,a
+   007D A3                  181 	inc	dptr
+                            182 ; Peephole 180   changed mov to clr
+   007E E4                  183 	clr  a
+   007F F0                  184 	movx	@dptr,a
+   0080 A3                  185 	inc	dptr
+   0081 74 80               186 	mov	a,#0x80
+   0083 F0                  187 	movx	@dptr,a
+                            188 ;	_ulong2fs.c 96
+   0084 90s00r0C            189 	mov	dptr,#___ulong2fs_a1_1_1
+   0087 C3                  190 	clr	c
+   0088 E4                  191 	clr	a
+   0089 9A                  192 	subb	a,r2
+   008A F0                  193 	movx	@dptr,a
+   008B E4                  194 	clr	a
+   008C 9B                  195 	subb	a,r3
+   008D A3                  196 	inc	dptr
+   008E F0                  197 	movx	@dptr,a
+   008F E4                  198 	clr	a
+   0090 9C                  199 	subb	a,r4
+   0091 A3                  200 	inc	dptr
+   0092 F0                  201 	movx	@dptr,a
+   0093 E4                  202 	clr	a
+   0094 9D                  203 	subb	a,r5
+   0095 A3                  204 	inc	dptr
+   0096 F0                  205 	movx	@dptr,a
+                            206 ;	_ulong2fs.c 99
+   0097                     207 00113$:
+   0097 E4                  208 	clr	a
+   0098 F5*01               209 	mov	(___ulong2fs_sloc0_1_0 + 1),a
+   009A 75*00 96            210 	mov	___ulong2fs_sloc0_1_0,#0x96
+   009D                     211 00105$:
+   009D 90s00r0C            212 	mov	dptr,#___ulong2fs_a1_1_1
+   00A0 E0                  213 	movx	a,@dptr
+   00A1 FC                  214 	mov	r4,a
+   00A2 A3                  215 	inc	dptr
+   00A3 E0                  216 	movx	a,@dptr
+   00A4 FD                  217 	mov	r5,a
+   00A5 A3                  218 	inc	dptr
+   00A6 E0                  219 	movx	a,@dptr
+   00A7 FE                  220 	mov	r6,a
+   00A8 A3                  221 	inc	dptr
+   00A9 E0                  222 	movx	a,@dptr
+   00AA FF                  223 	mov	r7,a
+   00AB C3                  224 	clr	c
+   00AC EC                  225 	mov	a,r4
+   00AD 94 00               226 	subb	a,#0x00
+   00AF ED                  227 	mov	a,r5
+   00B0 94 00               228 	subb	a,#0x00
+   00B2 EE                  229 	mov	a,r6
+   00B3 94 80               230 	subb	a,#0x80
+   00B5 EF                  231 	mov	a,r7
+   00B6 94 00               232 	subb	a,#0x00
+                            233 ; Peephole 108   removed ljmp by inverse jump logic
+   00B8 50 27               234 	jnc  00107$
+   00BA                     235 00116$:
+                            236 ;	_ulong2fs.c 101
+   00BA EC                  237 	mov	a,r4
+   00BB 25 E0               238 	add	a,acc
+   00BD F8                  239 	mov	r0,a
+   00BE ED                  240 	mov	a,r5
+   00BF 33                  241 	rlc	a
+   00C0 F9                  242 	mov	r1,a
+   00C1 EE                  243 	mov	a,r6
+   00C2 33                  244 	rlc	a
+   00C3 FA                  245 	mov	r2,a
+   00C4 EF                  246 	mov	a,r7
+   00C5 33                  247 	rlc	a
+   00C6 FB                  248 	mov	r3,a
+   00C7 90s00r0C            249 	mov	dptr,#___ulong2fs_a1_1_1
+   00CA E8                  250 	mov	a,r0
+   00CB F0                  251 	movx	@dptr,a
+   00CC A3                  252 	inc	dptr
+   00CD E9                  253 	mov	a,r1
+   00CE F0                  254 	movx	@dptr,a
+   00CF A3                  255 	inc	dptr
+   00D0 EA                  256 	mov	a,r2
+   00D1 F0                  257 	movx	@dptr,a
+   00D2 A3                  258 	inc	dptr
+   00D3 EB                  259 	mov	a,r3
+   00D4 F0                  260 	movx	@dptr,a
+                            261 ;	_ulong2fs.c 102
+   00D5 15*00               262 	dec	___ulong2fs_sloc0_1_0
+   00D7 74 FF               263 	mov	a,#0xff
+   00D9 B5*00 02            264 	cjne	a,___ulong2fs_sloc0_1_0,00117$
+   00DC 15*01               265 	dec	(___ulong2fs_sloc0_1_0 + 1)
+   00DE                     266 00117$:
+   00DE 02s00r9D            267 	ljmp	00105$
+   00E1                     268 00107$:
+                            269 ;	_ulong2fs.c 105
+   00E1 53 06 7F            270 	anl	ar6,#0x7f
+                            271 ;	_ulong2fs.c 107
+   00E4 AA*00               272 	mov	r2,___ulong2fs_sloc0_1_0
+   00E6 AB*01               273 	mov	r3,(___ulong2fs_sloc0_1_0 + 1)
+   00E8 78 00               274 	mov	r0,#0x00
+   00EA 79 00               275 	mov	r1,#0x00
+   00EC 8A*04               276 	mov	(___ulong2fs_sloc1_1_0 + 2),r2
+   00EE EB                  277 	mov	a,r3
+   00EF 54 01               278 	anl	a,#0x01
+   00F1 A2 E0               279 	mov	c,acc.0
+   00F3 C5*04               280 	xch	a,(___ulong2fs_sloc1_1_0 + 2)
+   00F5 13                  281 	rrc	a
+   00F6 C5*04               282 	xch	a,(___ulong2fs_sloc1_1_0 + 2)
+   00F8 13                  283 	rrc	a
+   00F9 C5*04               284 	xch	a,(___ulong2fs_sloc1_1_0 + 2)
+   00FB F5*05               285 	mov	(___ulong2fs_sloc1_1_0 + 3),a
+   00FD 75*03 00            286 	mov	(___ulong2fs_sloc1_1_0 + 1),#0x00
+   0100 75*02 00            287 	mov	___ulong2fs_sloc1_1_0,#0x00
+   0103 90s00r04            288 	mov	dptr,#___ulong2fs_sign_1_1
+   0106 E0                  289 	movx	a,@dptr
+   0107 FA                  290 	mov	r2,a
+   0108 A3                  291 	inc	dptr
+   0109 E0                  292 	movx	a,@dptr
+   010A FB                  293 	mov	r3,a
+   010B A3                  294 	inc	dptr
+   010C E0                  295 	movx	a,@dptr
+   010D F8                  296 	mov	r0,a
+   010E A3                  297 	inc	dptr
+   010F E0                  298 	movx	a,@dptr
+   0110 F9                  299 	mov	r1,a
+   0111 E5*02               300 	mov	a,___ulong2fs_sloc1_1_0
+   0113 42 02               301 	orl	ar2,a
+   0115 E5*03               302 	mov	a,(___ulong2fs_sloc1_1_0 + 1)
+   0117 42 03               303 	orl	ar3,a
+   0119 E5*04               304 	mov	a,(___ulong2fs_sloc1_1_0 + 2)
+   011B 42 00               305 	orl	ar0,a
+   011D E5*05               306 	mov	a,(___ulong2fs_sloc1_1_0 + 3)
+   011F 42 01               307 	orl	ar1,a
+   0121 EA                  308 	mov	a,r2
+   0122 42 04               309 	orl	ar4,a
+   0124 EB                  310 	mov	a,r3
+   0125 42 05               311 	orl	ar5,a
+   0127 E8                  312 	mov	a,r0
+   0128 42 06               313 	orl	ar6,a
+   012A E9                  314 	mov	a,r1
+   012B 42 07               315 	orl	ar7,a
+   012D 90s00r08            316 	mov	dptr,#(___ulong2fs_fl_1_1)
+   0130 EC                  317 	mov	a,r4
+   0131 F0                  318 	movx	@dptr,a
+   0132 A3                  319 	inc	dptr
+   0133 ED                  320 	mov	a,r5
+   0134 F0                  321 	movx	@dptr,a
+   0135 A3                  322 	inc	dptr
+   0136 EE                  323 	mov	a,r6
+   0137 F0                  324 	movx	@dptr,a
+   0138 A3                  325 	inc	dptr
+   0139 EF                  326 	mov	a,r7
+   013A F0                  327 	movx	@dptr,a
+                            328 ;	_ulong2fs.c 109
+   013B 90s00r08            329 	mov	dptr,#(___ulong2fs_fl_1_1)
+   013E E0                  330 	movx	a,@dptr
+   013F FA                  331 	mov	r2,a
+   0140 A3                  332 	inc	dptr
+   0141 E0                  333 	movx	a,@dptr
+   0142 FB                  334 	mov	r3,a
+   0143 A3                  335 	inc	dptr
+   0144 E0                  336 	movx	a,@dptr
+   0145 FC                  337 	mov	r4,a
+   0146 A3                  338 	inc	dptr
+   0147 E0                  339 	movx	a,@dptr
+                            340 ; Peephole 191   removed redundant mov
+   0148 FD                  341 	mov  r5,a
+   0149 8A 82               342 	mov  dpl,r2
+   014B 8B 83               343 	mov  dph,r3
+   014D 8C F0               344 	mov  b,r4
+   014F                     345 00108$:
+                    014F    346 	C$_ulong2fs.c$110$1$1 ==.
+                    014F    347 	XG$__ulong2fs$0$0 ==.
+   014F 22                  348 	ret
+                            349 	.area	CSEG    (CODE)

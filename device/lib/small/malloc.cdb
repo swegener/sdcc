@@ -1,0 +1,5 @@
+M:malloc
+F:G$init_dynamic_memory$0$0({2}DF,SV:S),C,0,0,0,0,0
+F:G$malloc$0$0({2}DF,DX,SV:S),C,0,0,0,0,0
+F:G$free$0$0({2}DF,SV:S),C,0,0,0,0,0
+S:Fmalloc$FIRST_MEMORY_HEADER_PTR$0$0({2}DX,STMAH:S),E,0,0

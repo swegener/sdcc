@@ -1,0 +1,515 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:35 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module serial
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl _serial_getc
+                             11 	.globl _serial_putc
+                             12 	.globl _serial_interrupt_handler
+                             13 	.globl _serial_init
+                             14 ;--------------------------------------------------------
+                             15 ; special function registers
+                             16 ;--------------------------------------------------------
+                    0080     17 G$P0$0$0 == 0x0080
+                    0080     18 _P0	=	0x0080
+                    0090     19 G$P1$0$0 == 0x0090
+                    0090     20 _P1	=	0x0090
+                    00A0     21 G$P2$0$0 == 0x00a0
+                    00A0     22 _P2	=	0x00a0
+                    00B0     23 G$P3$0$0 == 0x00b0
+                    00B0     24 _P3	=	0x00b0
+                    00D0     25 G$PSW$0$0 == 0x00d0
+                    00D0     26 _PSW	=	0x00d0
+                    00E0     27 G$ACC$0$0 == 0x00e0
+                    00E0     28 _ACC	=	0x00e0
+                    00F0     29 G$B$0$0 == 0x00f0
+                    00F0     30 _B	=	0x00f0
+                    0081     31 G$SP$0$0 == 0x0081
+                    0081     32 _SP	=	0x0081
+                    0082     33 G$DPL$0$0 == 0x0082
+                    0082     34 _DPL	=	0x0082
+                    0083     35 G$DPH$0$0 == 0x0083
+                    0083     36 _DPH	=	0x0083
+                    0087     37 G$PCON$0$0 == 0x0087
+                    0087     38 _PCON	=	0x0087
+                    0088     39 G$TCON$0$0 == 0x0088
+                    0088     40 _TCON	=	0x0088
+                    0089     41 G$TMOD$0$0 == 0x0089
+                    0089     42 _TMOD	=	0x0089
+                    008A     43 G$TL0$0$0 == 0x008a
+                    008A     44 _TL0	=	0x008a
+                    008B     45 G$TL1$0$0 == 0x008b
+                    008B     46 _TL1	=	0x008b
+                    008C     47 G$TH0$0$0 == 0x008c
+                    008C     48 _TH0	=	0x008c
+                    008D     49 G$TH1$0$0 == 0x008d
+                    008D     50 _TH1	=	0x008d
+                    008E     51 G$AUXR$0$0 == 0x008e
+                    008E     52 _AUXR	=	0x008e
+                    00A8     53 G$IE$0$0 == 0x00a8
+                    00A8     54 _IE	=	0x00a8
+                    00B8     55 G$IP$0$0 == 0x00b8
+                    00B8     56 _IP	=	0x00b8
+                    0098     57 G$SCON$0$0 == 0x0098
+                    0098     58 _SCON	=	0x0098
+                    0099     59 G$SBUF$0$0 == 0x0099
+                    0099     60 _SBUF	=	0x0099
+                    00C8     61 G$T2CON$0$0 == 0x00c8
+                    00C8     62 _T2CON	=	0x00c8
+                    00CB     63 G$RCAP2H$0$0 == 0x00cb
+                    00CB     64 _RCAP2H	=	0x00cb
+                    00CA     65 G$RCAP2L$0$0 == 0x00ca
+                    00CA     66 _RCAP2L	=	0x00ca
+                             67 ;--------------------------------------------------------
+                             68 ; special function bits 
+                             69 ;--------------------------------------------------------
+                    00D7     70 G$CY$0$0 == 0x00d7
+                    00D7     71 _CY	=	0x00d7
+                    00D6     72 G$AC$0$0 == 0x00d6
+                    00D6     73 _AC	=	0x00d6
+                    00D5     74 G$F0$0$0 == 0x00d5
+                    00D5     75 _F0	=	0x00d5
+                    00D4     76 G$RS1$0$0 == 0x00d4
+                    00D4     77 _RS1	=	0x00d4
+                    00D3     78 G$RS0$0$0 == 0x00d3
+                    00D3     79 _RS0	=	0x00d3
+                    00D2     80 G$OV$0$0 == 0x00d2
+                    00D2     81 _OV	=	0x00d2
+                    00D0     82 G$P$0$0 == 0x00d0
+                    00D0     83 _P	=	0x00d0
+                    008F     84 G$TF1$0$0 == 0x008f
+                    008F     85 _TF1	=	0x008f
+                    008E     86 G$TR1$0$0 == 0x008e
+                    008E     87 _TR1	=	0x008e
+                    008D     88 G$TF0$0$0 == 0x008d
+                    008D     89 _TF0	=	0x008d
+                    008C     90 G$TR0$0$0 == 0x008c
+                    008C     91 _TR0	=	0x008c
+                    008B     92 G$IE1$0$0 == 0x008b
+                    008B     93 _IE1	=	0x008b
+                    008A     94 G$IT1$0$0 == 0x008a
+                    008A     95 _IT1	=	0x008a
+                    0089     96 G$IE0$0$0 == 0x0089
+                    0089     97 _IE0	=	0x0089
+                    0088     98 G$IT0$0$0 == 0x0088
+                    0088     99 _IT0	=	0x0088
+                    00AF    100 G$EA$0$0 == 0x00af
+                    00AF    101 _EA	=	0x00af
+                    00AC    102 G$ES$0$0 == 0x00ac
+                    00AC    103 _ES	=	0x00ac
+                    00AB    104 G$ET1$0$0 == 0x00ab
+                    00AB    105 _ET1	=	0x00ab
+                    00AA    106 G$EX1$0$0 == 0x00aa
+                    00AA    107 _EX1	=	0x00aa
+                    00A9    108 G$ET0$0$0 == 0x00a9
+                    00A9    109 _ET0	=	0x00a9
+                    00A8    110 G$EX0$0$0 == 0x00a8
+                    00A8    111 _EX0	=	0x00a8
+                    00BC    112 G$PS$0$0 == 0x00bc
+                    00BC    113 _PS	=	0x00bc
+                    00BB    114 G$PT1$0$0 == 0x00bb
+                    00BB    115 _PT1	=	0x00bb
+                    00BA    116 G$PX1$0$0 == 0x00ba
+                    00BA    117 _PX1	=	0x00ba
+                    00B9    118 G$PT0$0$0 == 0x00b9
+                    00B9    119 _PT0	=	0x00b9
+                    00B8    120 G$PX0$0$0 == 0x00b8
+                    00B8    121 _PX0	=	0x00b8
+                    00B7    122 G$RD$0$0 == 0x00b7
+                    00B7    123 _RD	=	0x00b7
+                    00B6    124 G$WR$0$0 == 0x00b6
+                    00B6    125 _WR	=	0x00b6
+                    00B5    126 G$T1$0$0 == 0x00b5
+                    00B5    127 _T1	=	0x00b5
+                    00B4    128 G$T0$0$0 == 0x00b4
+                    00B4    129 _T0	=	0x00b4
+                    00B3    130 G$INT1$0$0 == 0x00b3
+                    00B3    131 _INT1	=	0x00b3
+                    00B2    132 G$INT0$0$0 == 0x00b2
+                    00B2    133 _INT0	=	0x00b2
+                    00B1    134 G$TXD$0$0 == 0x00b1
+                    00B1    135 _TXD	=	0x00b1
+                    00B0    136 G$RXD$0$0 == 0x00b0
+                    00B0    137 _RXD	=	0x00b0
+                    0090    138 G$P1_0$0$0 == 0x0090
+                    0090    139 _P1_0	=	0x0090
+                    0091    140 G$P1_1$0$0 == 0x0091
+                    0091    141 _P1_1	=	0x0091
+                    0092    142 G$P1_2$0$0 == 0x0092
+                    0092    143 _P1_2	=	0x0092
+                    0093    144 G$P1_3$0$0 == 0x0093
+                    0093    145 _P1_3	=	0x0093
+                    0094    146 G$P1_4$0$0 == 0x0094
+                    0094    147 _P1_4	=	0x0094
+                    0095    148 G$P1_5$0$0 == 0x0095
+                    0095    149 _P1_5	=	0x0095
+                    0096    150 G$P1_6$0$0 == 0x0096
+                    0096    151 _P1_6	=	0x0096
+                    0097    152 G$P1_7$0$0 == 0x0097
+                    0097    153 _P1_7	=	0x0097
+                    009F    154 G$SM0$0$0 == 0x009f
+                    009F    155 _SM0	=	0x009f
+                    009E    156 G$SM1$0$0 == 0x009e
+                    009E    157 _SM1	=	0x009e
+                    009D    158 G$SM2$0$0 == 0x009d
+                    009D    159 _SM2	=	0x009d
+                    009C    160 G$REN$0$0 == 0x009c
+                    009C    161 _REN	=	0x009c
+                    009B    162 G$TB8$0$0 == 0x009b
+                    009B    163 _TB8	=	0x009b
+                    009A    164 G$RB8$0$0 == 0x009a
+                    009A    165 _RB8	=	0x009a
+                    0099    166 G$TI$0$0 == 0x0099
+                    0099    167 _TI	=	0x0099
+                    0098    168 G$RI$0$0 == 0x0098
+                    0098    169 _RI	=	0x0098
+                    00C8    170 G$T2CON_0$0$0 == 0x00c8
+                    00C8    171 _T2CON_0	=	0x00c8
+                    00C9    172 G$T2CON_1$0$0 == 0x00c9
+                    00C9    173 _T2CON_1	=	0x00c9
+                    00CA    174 G$T2CON_2$0$0 == 0x00ca
+                    00CA    175 _T2CON_2	=	0x00ca
+                    00CB    176 G$T2CON_3$0$0 == 0x00cb
+                    00CB    177 _T2CON_3	=	0x00cb
+                    00CC    178 G$T2CON_4$0$0 == 0x00cc
+                    00CC    179 _T2CON_4	=	0x00cc
+                    00CD    180 G$T2CON_5$0$0 == 0x00cd
+                    00CD    181 _T2CON_5	=	0x00cd
+                    00CE    182 G$T2CON_6$0$0 == 0x00ce
+                    00CE    183 _T2CON_6	=	0x00ce
+                    00CF    184 G$T2CON_7$0$0 == 0x00cf
+                    00CF    185 _T2CON_7	=	0x00cf
+                            186 ;--------------------------------------------------------
+                            187 ; internal ram data
+                            188 ;--------------------------------------------------------
+                            189 	.area	DSEG    (DATA)
+                            190 ;--------------------------------------------------------
+                            191 ; overlayable items in internal ram 
+                            192 ;--------------------------------------------------------
+                            193 	.area	OSEG	(OVR,DATA)
+                            194 ;--------------------------------------------------------
+                            195 ; indirectly addressable internal ram data
+                            196 ;--------------------------------------------------------
+                            197 	.area	ISEG    (DATA)
+                            198 ;--------------------------------------------------------
+                            199 ; bit data
+                            200 ;--------------------------------------------------------
+                            201 	.area	BSEG    (BIT)
+                    0000    202 Fserial$work_flag_byte_arrived$0$0==.
+   0000                     203 _work_flag_byte_arrived:
+   0000                     204 	.ds	0x0001
+                    0001    205 Fserial$work_flag_buffer_transfered$0$0==.
+   0001                     206 _work_flag_buffer_transfered:
+   0001                     207 	.ds	0x0001
+                    0002    208 Fserial$tx_serial_buffer_empty$0$0==.
+   0002                     209 _tx_serial_buffer_empty:
+   0002                     210 	.ds	0x0001
+                    0003    211 Fserial$rx_serial_buffer_empty$0$0==.
+   0003                     212 _rx_serial_buffer_empty:
+   0003                     213 	.ds	0x0001
+                            214 ;--------------------------------------------------------
+                            215 ; external ram data
+                            216 ;--------------------------------------------------------
+                            217 	.area	XSEG    (XDATA)
+                    0000    218 Fserial$stx_index_in$0$0==.
+   0000                     219 _stx_index_in:
+   0000                     220 	.ds	0x0001
+                    0001    221 Fserial$srx_index_in$0$0==.
+   0001                     222 _srx_index_in:
+   0001                     223 	.ds	0x0001
+                    0002    224 Fserial$stx_index_out$0$0==.
+   0002                     225 _stx_index_out:
+   0002                     226 	.ds	0x0001
+                    0003    227 Fserial$srx_index_out$0$0==.
+   0003                     228 _srx_index_out:
+   0003                     229 	.ds	0x0001
+                    0004    230 Fserial$stx_buffer$0$0==.
+   0004                     231 _stx_buffer:
+   0004                     232 	.ds	0x0100
+                    0104    233 Fserial$srx_buffer$0$0==.
+   0104                     234 _srx_buffer:
+   0104                     235 	.ds	0x0100
+   0204                     236 _serial_putc_c_1_1:
+   0204                     237 	.ds	0x0001
+                            238 ;--------------------------------------------------------
+                            239 ; global & static initialisations
+                            240 ;--------------------------------------------------------
+                            241 	.area GSINIT (CODE)
+                            242 ;--------------------------------------------------------
+                            243 ; code
+                            244 ;--------------------------------------------------------
+                            245 	.area CSEG (CODE)
+                    0000    246 	G$serial_init$0$0 ==.
+                            247 ;	serial.c 24
+                            248 ;	-----------------------------------------
+                            249 ;	 function serial_init
+                            250 ;	-----------------------------------------
+   0000                     251 _serial_init:
+                    0002    252 	ar2 = 0x02
+                    0003    253 	ar3 = 0x03
+                    0004    254 	ar4 = 0x04
+                    0005    255 	ar5 = 0x05
+                    0006    256 	ar6 = 0x06
+                    0007    257 	ar7 = 0x07
+                    0000    258 	ar0 = 0x00
+                    0001    259 	ar1 = 0x01
+                            260 ;	serial.c 26
+   0000 75 98 50            261 	mov	_SCON,#0x50
+                            262 ;	serial.c 27
+   0003 75 C8 34            263 	mov	_T2CON,#0x34
+                            264 ;	serial.c 28
+   0006 D2 BC               265 	setb	_PS
+                            266 ;	serial.c 29
+   0008 75 C8 34            267 	mov	_T2CON,#0x34
+                            268 ;	serial.c 30
+   000B 75 CB FF            269 	mov	_RCAP2H,#0xff
+                            270 ;	serial.c 31
+   000E 75 CA DA            271 	mov	_RCAP2L,#0xda
+                            272 ;	serial.c 33
+   0011 C2 98               273 	clr	_RI
+                            274 ;	serial.c 34
+   0013 C2 99               275 	clr	_TI
+                            276 ;	serial.c 36
+   0015 90s00r03            277 	mov	dptr,#_srx_index_out
+                            278 ; Peephole 180   changed mov to clr
+   0018 E4                  279 	clr  a
+   0019 F0                  280 	movx	@dptr,a
+   001A 90s00r02            281 	mov	dptr,#_stx_index_out
+                            282 ; Peephole 180   changed mov to clr
+   001D E4                  283 	clr  a
+   001E F0                  284 	movx	@dptr,a
+   001F 90s00r01            285 	mov	dptr,#_srx_index_in
+                            286 ; Peephole 180   changed mov to clr
+   0022 E4                  287 	clr  a
+   0023 F0                  288 	movx	@dptr,a
+   0024 90s00r00            289 	mov	dptr,#_stx_index_in
+                            290 ; Peephole 180   changed mov to clr
+   0027 E4                  291 	clr  a
+   0028 F0                  292 	movx	@dptr,a
+                            293 ;	serial.c 37
+   0029 D2*02               294 	setb	_tx_serial_buffer_empty
+   002B D2*03               295 	setb	_rx_serial_buffer_empty
+                            296 ;	serial.c 38
+   002D C2*01               297 	clr	_work_flag_buffer_transfered
+                            298 ;	serial.c 39
+   002F C2*00               299 	clr	_work_flag_byte_arrived
+                            300 ;	serial.c 40
+   0031 D2 AC               301 	setb	_ES
+   0033                     302 00101$:
+                    0033    303 	C$serial.c$41$1$1 ==.
+                    0033    304 	XG$serial_init$0$0 ==.
+   0033 22                  305 	ret
+                    0034    306 	G$serial_interrupt_handler$0$0 ==.
+                            307 ;	serial.c 43
+                            308 ;	-----------------------------------------
+                            309 ;	 function serial_interrupt_handler
+                            310 ;	-----------------------------------------
+   0034                     311 _serial_interrupt_handler:
+                    000A    312 	ar2 = 0x0a
+                    000B    313 	ar3 = 0x0b
+                    000C    314 	ar4 = 0x0c
+                    000D    315 	ar5 = 0x0d
+                    000E    316 	ar6 = 0x0e
+                    000F    317 	ar7 = 0x0f
+                    0008    318 	ar0 = 0x08
+                    0009    319 	ar1 = 0x09
+   0034 C0 E0               320 	push	acc
+   0036 C0 F0               321 	push	b
+   0038 C0 82               322 	push	dpl
+   003A C0 83               323 	push	dph
+   003C C0 D0               324 	push	psw
+   003E 75 D0 08            325 	mov	psw,#0x08
+                            326 ;	serial.c 45
+   0041 C2 AC               327 	clr	_ES
+                            328 ;	serial.c 46
+                            329 ; Peephole 111   removed ljmp by inverse jump logic
+   0043 30 99 29            330 	jnb  _TI,00105$
+   0046                     331 00113$:
+                            332 ;	serial.c 48
+   0046 C2 99               333 	clr	_TI
+                            334 ;	serial.c 49
+   0048 90s00r00            335 	mov	dptr,#_stx_index_in
+   004B E0                  336 	movx	a,@dptr
+   004C FA                  337 	mov	r2,a
+   004D 90s00r02            338 	mov	dptr,#_stx_index_out
+   0050 E0                  339 	movx	a,@dptr
+                            340 ; Peephole 105   removed redundant mov
+   0051 FB                  341 	mov  r3,a
+                            342 ; Peephole 132   changed ljmp to sjmp
+                            343 ; Peephole 199   optimized misc jump sequence
+   0052 B5 0A 06            344 	cjne a,ar2,00102$
+                            345 ; Peephole 201   removed redundant sjmp
+   0055                     346 00114$:
+   0055                     347 00115$:
+                            348 ;	serial.c 51
+   0055 D2*02               349 	setb	_tx_serial_buffer_empty
+                            350 ;	serial.c 52
+   0057 D2*01               351 	setb	_work_flag_buffer_transfered
+                            352 ; Peephole 132   changed ljmp to sjmp
+   0059 80 14               353 	sjmp 00105$
+   005B                     354 00102$:
+                            355 ;	serial.c 54
+   005B 90s00r02            356 	mov	dptr,#_stx_index_out
+   005E 74 01               357 	mov	a,#0x01
+   0060 2B                  358 	add	a,r3
+   0061 F0                  359 	movx	@dptr,a
+   0062 EB                  360 	mov	a,r3
+   0063 24r04               361 	add	a,#_stx_buffer
+   0065 F5 82               362 	mov	dpl,a
+                            363 ; Peephole 180   changed mov to clr
+   0067 E4                  364 	clr  a
+   0068 34s00               365 	addc	a,#(_stx_buffer >> 8)
+   006A F5 83               366 	mov	dph,a
+   006C E0                  367 	movx	a,@dptr
+   006D F5 99               368 	mov	_SBUF,a
+   006F                     369 00105$:
+                            370 ;	serial.c 56
+                            371 ; Peephole 111   removed ljmp by inverse jump logic
+   006F 30 98 1F            372 	jnb  _RI,00107$
+   0072                     373 00116$:
+                            374 ;	serial.c 58
+   0072 C2 98               375 	clr	_RI
+                            376 ;	serial.c 59
+   0074 90s00r01            377 	mov	dptr,#_srx_index_in
+   0077 E0                  378 	movx	a,@dptr
+   0078 FA                  379 	mov	r2,a
+   0079 90s00r01            380 	mov	dptr,#_srx_index_in
+   007C 74 01               381 	mov	a,#0x01
+   007E 2A                  382 	add	a,r2
+   007F F0                  383 	movx	@dptr,a
+   0080 EA                  384 	mov	a,r2
+   0081 24r04               385 	add	a,#_srx_buffer
+   0083 F5 82               386 	mov	dpl,a
+                            387 ; Peephole 180   changed mov to clr
+   0085 E4                  388 	clr  a
+   0086 34s01               389 	addc	a,#(_srx_buffer >> 8)
+   0088 F5 83               390 	mov	dph,a
+   008A E5 99               391 	mov	a,_SBUF
+   008C F0                  392 	movx	@dptr,a
+                            393 ;	serial.c 60
+   008D D2*00               394 	setb	_work_flag_byte_arrived
+                            395 ;	serial.c 61
+   008F C2*03               396 	clr	_rx_serial_buffer_empty
+   0091                     397 00107$:
+                            398 ;	serial.c 63
+   0091 D2 AC               399 	setb	_ES
+   0093                     400 00108$:
+   0093 D0 D0               401 	pop	psw
+   0095 D0 83               402 	pop	dph
+   0097 D0 82               403 	pop	dpl
+   0099 D0 F0               404 	pop	b
+   009B D0 E0               405 	pop	acc
+                    009D    406 	C$serial.c$64$1$1 ==.
+                    009D    407 	XG$serial_interrupt_handler$0$0 ==.
+   009D 32                  408 	reti
+                    009E    409 	G$serial_putc$0$0 ==.
+                            410 ;	serial.c 68
+                            411 ;	-----------------------------------------
+                            412 ;	 function serial_putc
+                            413 ;	-----------------------------------------
+   009E                     414 _serial_putc:
+                    0002    415 	ar2 = 0x02
+                    0003    416 	ar3 = 0x03
+                    0004    417 	ar4 = 0x04
+                    0005    418 	ar5 = 0x05
+                    0006    419 	ar6 = 0x06
+                    0007    420 	ar7 = 0x07
+                    0000    421 	ar0 = 0x00
+                    0001    422 	ar1 = 0x01
+                            423 ;	serial.c 77
+   009E C0 82               424 	push	dpl
+   00A0 90s02r04            425 	mov	dptr,#_serial_putc_c_1_1
+   00A3 D0 E0               426 	pop	acc
+   00A5 F0                  427 	movx	@dptr,a
+                            428 ;	serial.c 70
+   00A6 90s00r00            429 	mov	dptr,#_stx_index_in
+   00A9 E0                  430 	movx	a,@dptr
+   00AA FA                  431 	mov	r2,a
+   00AB 90s00r00            432 	mov	dptr,#_stx_index_in
+   00AE 74 01               433 	mov	a,#0x01
+   00B0 2A                  434 	add	a,r2
+   00B1 F0                  435 	movx	@dptr,a
+   00B2 EA                  436 	mov	a,r2
+   00B3 24r04               437 	add	a,#_stx_buffer
+   00B5 FA                  438 	mov	r2,a
+                            439 ; Peephole 180   changed mov to clr
+   00B6 E4                  440 	clr  a
+   00B7 34s00               441 	addc	a,#(_stx_buffer >> 8)
+   00B9 FB                  442 	mov	r3,a
+   00BA 90s02r04            443 	mov	dptr,#_serial_putc_c_1_1
+   00BD E0                  444 	movx	a,@dptr
+                            445 ; Peephole 136   removed redundant moves
+   00BE FC                  446 	mov  r4,a
+   00BF 8A 82               447 	mov  dpl,r2
+   00C1 8B 83               448 	mov  dph,r3
+   00C3 F0                  449 	movx	@dptr,a
+                            450 ;	serial.c 71
+   00C4 C2 AC               451 	clr	_ES
+                            452 ;	serial.c 72
+                            453 ; Peephole 111   removed ljmp by inverse jump logic
+   00C6 30*02 04            454 	jnb  _tx_serial_buffer_empty,00102$
+   00C9                     455 00106$:
+                            456 ;	serial.c 74
+   00C9 C2*02               457 	clr	_tx_serial_buffer_empty
+                            458 ;	serial.c 75
+   00CB D2 99               459 	setb	_TI
+   00CD                     460 00102$:
+                            461 ;	serial.c 77
+   00CD D2 AC               462 	setb	_ES
+   00CF                     463 00103$:
+                    00CF    464 	C$serial.c$78$1$1 ==.
+                    00CF    465 	XG$serial_putc$0$0 ==.
+   00CF 22                  466 	ret
+                    00D0    467 	G$serial_getc$0$0 ==.
+                            468 ;	serial.c 80
+                            469 ;	-----------------------------------------
+                            470 ;	 function serial_getc
+                            471 ;	-----------------------------------------
+   00D0                     472 _serial_getc:
+                            473 ;	serial.c 82
+   00D0 90s00r03            474 	mov	dptr,#_srx_index_out
+   00D3 E0                  475 	movx	a,@dptr
+                            476 ; Peephole 214 reduced some extra movs
+   00D4 FA                  477 	mov  r2,a
+   00D5 24 01               478 	add  a,#0x01	
+                            479 ; Peephole 100   removed redundant mov
+   00D7 FB                  480 	mov  r3,a
+   00D8 90s00r03            481 	mov  dptr,#_srx_index_out
+   00DB F0                  482 	movx @dptr,a
+   00DC EA                  483 	mov	a,r2
+   00DD 24r04               484 	add	a,#_srx_buffer
+   00DF F5 82               485 	mov	dpl,a
+                            486 ; Peephole 180   changed mov to clr
+   00E1 E4                  487 	clr  a
+   00E2 34s01               488 	addc	a,#(_srx_buffer >> 8)
+   00E4 F5 83               489 	mov	dph,a
+   00E6 E0                  490 	movx	a,@dptr
+   00E7 FA                  491 	mov	r2,a
+                            492 ;	serial.c 83
+   00E8 C2 AC               493 	clr	_ES
+                            494 ;	serial.c 84
+   00EA 90s00r01            495 	mov	dptr,#_srx_index_in
+   00ED E0                  496 	movx	a,@dptr
+   00EE FC                  497 	mov	r4,a
+   00EF EB                  498 	mov	a,r3
+                            499 ; Peephole 132   changed ljmp to sjmp
+                            500 ; Peephole 199   optimized misc jump sequence
+   00F0 B5 04 02            501 	cjne a,ar4,00102$
+                            502 ; Peephole 201   removed redundant sjmp
+   00F3                     503 00106$:
+   00F3                     504 00107$:
+   00F3 D2*03               505 	setb	_rx_serial_buffer_empty
+   00F5                     506 00102$:
+                            507 ;	serial.c 85
+   00F5 D2 AC               508 	setb	_ES
+                            509 ;	serial.c 86
+   00F7 8A 82               510 	mov	dpl,r2
+   00F9                     511 00103$:
+                    00F9    512 	C$serial.c$87$1$1 ==.
+                    00F9    513 	XG$serial_getc$0$0 ==.
+   00F9 22                  514 	ret
+                            515 	.area	CSEG    (CODE)

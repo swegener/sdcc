@@ -1,0 +1,159 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:33 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module _strchr
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl _strchr_PARM_2
+                             11 	.globl _strchr
+                             12 ;--------------------------------------------------------
+                             13 ; special function registers
+                             14 ;--------------------------------------------------------
+                             15 ;--------------------------------------------------------
+                             16 ; special function bits 
+                             17 ;--------------------------------------------------------
+                             18 ;--------------------------------------------------------
+                             19 ; internal ram data
+                             20 ;--------------------------------------------------------
+                             21 	.area	DSEG    (DATA)
+                             22 ;--------------------------------------------------------
+                             23 ; overlayable items in internal ram 
+                             24 ;--------------------------------------------------------
+                             25 	.area	OSEG	(OVR,DATA)
+                             26 ;--------------------------------------------------------
+                             27 ; indirectly addressable internal ram data
+                             28 ;--------------------------------------------------------
+                             29 	.area	ISEG    (DATA)
+                             30 ;--------------------------------------------------------
+                             31 ; bit data
+                             32 ;--------------------------------------------------------
+                             33 	.area	BSEG    (BIT)
+                             34 ;--------------------------------------------------------
+                             35 ; external ram data
+                             36 ;--------------------------------------------------------
+                             37 	.area	XSEG    (XDATA)
+   0000                      38 _strchr_PARM_2:
+   0000                      39 	.ds	0x0001
+   0001                      40 _strchr_string_1_1:
+   0001                      41 	.ds	0x0003
+                             42 ;--------------------------------------------------------
+                             43 ; global & static initialisations
+                             44 ;--------------------------------------------------------
+                             45 	.area GSINIT (CODE)
+                             46 ;--------------------------------------------------------
+                             47 ; code
+                             48 ;--------------------------------------------------------
+                             49 	.area CSEG (CODE)
+                    0000     50 	G$strchr$0$0 ==.
+                             51 ;	_strchr.c 27
+                             52 ;	-----------------------------------------
+                             53 ;	 function strchr
+                             54 ;	-----------------------------------------
+   0000                      55 _strchr:
+                    0002     56 	ar2 = 0x02
+                    0003     57 	ar3 = 0x03
+                    0004     58 	ar4 = 0x04
+                    0005     59 	ar5 = 0x05
+                    0006     60 	ar6 = 0x06
+                    0007     61 	ar7 = 0x07
+                    0000     62 	ar0 = 0x00
+                    0001     63 	ar1 = 0x01
+                             64 ;	_strchr.c 0
+   0000 C0 F0                65 	push	b
+   0002 C0 83                66 	push	dph
+   0004 C0 82                67 	push	dpl
+   0006 90s00r01             68 	mov	dptr,#_strchr_string_1_1
+   0009 D0 E0                69 	pop	acc
+   000B F0                   70 	movx	@dptr,a
+   000C D0 E0                71 	pop	acc
+   000E A3                   72 	inc	dptr
+   000F F0                   73 	movx	@dptr,a
+   0010 D0 E0                74 	pop	acc
+   0012 A3                   75 	inc	dptr
+   0013 F0                   76 	movx	@dptr,a
+                             77 ;	_strchr.c 32
+   0014 90s00r00             78 	mov	dptr,#_strchr_PARM_2
+   0017 E0                   79 	movx	a,@dptr
+   0018 FA                   80 	mov	r2,a
+   0019 90s00r01             81 	mov	dptr,#_strchr_string_1_1
+   001C E0                   82 	movx	a,@dptr
+   001D FB                   83 	mov	r3,a
+   001E A3                   84 	inc	dptr
+   001F E0                   85 	movx	a,@dptr
+   0020 FC                   86 	mov	r4,a
+   0021 A3                   87 	inc	dptr
+   0022 E0                   88 	movx	a,@dptr
+   0023 FD                   89 	mov	r5,a
+   0024                      90 00102$:
+   0024 8B 82                91 	mov	dpl,r3
+   0026 8C 83                92 	mov	dph,r4
+   0028 8D F0                93 	mov	b,r5
+   002A 12s00r00             94 	lcall	__gptrget
+                             95 ; Peephole 105   removed redundant mov
+   002D FE                   96 	mov  r6,a
+                             97 ; Peephole 110   removed ljmp by inverse jump logic
+   002E 60 18                98 	jz  00104$
+   0030                      99 00113$:
+   0030 EE                  100 	mov	a,r6
+   0031 B5 02 02            101 	cjne	a,ar2,00114$
+                            102 ; Peephole 132   changed ljmp to sjmp
+   0034 80 12               103 	sjmp 00104$
+   0036                     104 00114$:
+                            105 ;	_strchr.c 33
+   0036 0B                  106 	inc	r3
+   0037 BB 00 01            107 	cjne	r3,#0x00,00115$
+   003A 0C                  108 	inc	r4
+   003B                     109 00115$:
+   003B 90s00r01            110 	mov	dptr,#_strchr_string_1_1
+   003E EB                  111 	mov	a,r3
+   003F F0                  112 	movx	@dptr,a
+   0040 A3                  113 	inc	dptr
+   0041 EC                  114 	mov	a,r4
+   0042 F0                  115 	movx	@dptr,a
+   0043 A3                  116 	inc	dptr
+   0044 ED                  117 	mov	a,r5
+   0045 F0                  118 	movx	@dptr,a
+                            119 ; Peephole 132   changed ljmp to sjmp
+   0046 80 DC               120 	sjmp 00102$
+   0048                     121 00104$:
+                            122 ;	_strchr.c 35
+   0048 90s00r01            123 	mov	dptr,#_strchr_string_1_1
+   004B EB                  124 	mov	a,r3
+   004C F0                  125 	movx	@dptr,a
+   004D A3                  126 	inc	dptr
+   004E EC                  127 	mov	a,r4
+   004F F0                  128 	movx	@dptr,a
+   0050 A3                  129 	inc	dptr
+   0051 ED                  130 	mov	a,r5
+   0052 F0                  131 	movx	@dptr,a
+   0053 8B 82               132 	mov	dpl,r3
+   0055 8C 83               133 	mov	dph,r4
+   0057 8D F0               134 	mov	b,r5
+   0059 12s00r00            135 	lcall	__gptrget
+                            136 ; Peephole 105   removed redundant mov
+   005C FE                  137 	mov  r6,a
+                            138 ; Peephole 132   changed ljmp to sjmp
+                            139 ; Peephole 199   optimized misc jump sequence
+   005D B5 02 08            140 	cjne a,ar2,00106$
+                            141 ; Peephole 201   removed redundant sjmp
+   0060                     142 00116$:
+   0060                     143 00117$:
+                            144 ;	_strchr.c 36
+   0060 8B 82               145 	mov	dpl,r3
+   0062 8C 83               146 	mov	dph,r4
+   0064 8D F0               147 	mov	b,r5
+                            148 ; Peephole 132   changed ljmp to sjmp
+   0066 80 06               149 	sjmp 00107$
+   0068                     150 00106$:
+                            151 ;	_strchr.c 37
+                            152 ; Peephole 181   used 16 bit load of dptr
+   0068 90 00 00            153 	mov  dptr,#0x0000
+   006B 75 F0 00            154 	mov	b,#0x00
+   006E                     155 00107$:
+                    006E    156 	C$_strchr.c$38$1$1 ==.
+                    006E    157 	XG$strchr$0$0 ==.
+   006E 22                  158 	ret
+                            159 	.area	CSEG    (CODE)

@@ -1,0 +1,129 @@
+;!FILE _memset.asm
+XH
+H 8 areas 43 global symbols
+M _memset
+S __gptrput Ref0000
+A _CODE size 0 flags 0
+A DSEG size 0 flags 0
+A OSEG size 0 flags 4
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 6 flags 40
+S _memset_PARM_2 Def0000
+S _memset_PARM_3 Def0001
+A GSINIT size 0 flags 20
+A CSEG size 5C flags 20
+S A$_memset$94 Def0024
+S A$_memset$85 Def001A
+S A$_memset$76 Def000F
+S A$_memset$95 Def0027
+S A$_memset$86 Def001B
+S A$_memset$77 Def0010
+S A$_memset$68 Def0000
+S A$_memset$96 Def0028
+S A$_memset$87 Def001C
+S A$_memset$78 Def0012
+S A$_memset$69 Def0002
+S A$_memset$97 Def0029
+S A$_memset$88 Def001D
+S A$_memset$79 Def0013
+S A$_memset$98 Def002A
+S A$_memset$89 Def001E
+S A$_memset$99 Def002B
+S A$_memset$110 Def0037
+S A$_memset$101 Def002C
+S A$_memset$120 Def0044
+S A$_memset$102 Def002E
+S A$_memset$130 Def004F
+S A$_memset$121 Def0047
+S A$_memset$103 Def0030
+S A$_memset$131 Def0050
+S A$_memset$113 Def0039
+S A$_memset$104 Def0031
+S A$_memset$132 Def0051
+S A$_memset$114 Def003B
+S A$_memset$105 Def0034
+S A$_memset$142 Def005B
+S A$_memset$133 Def0052
+S A$_memset$124 Def0048
+S A$_memset$115 Def003D
+S _memset Def0000
+S A$_memset$134 Def0053
+S A$_memset$116 Def003F
+S A$_memset$107 Def0035
+S A$_memset$135 Def0054
+S A$_memset$117 Def0040
+S A$_memset$108 Def0036
+S A$_memset$136 Def0055
+S A$_memset$127 Def004A
+S A$_memset$137 Def0057
+S A$_memset$128 Def004D
+S A$_memset$119 Def0043
+S A$_memset$138 Def0059
+S A$_memset$129 Def004E
+S C$_memset.c$41$1$1 Def005B
+S XG$memset$0$0 Def005B
+S A$_memset$70 Def0004
+S A$_memset$71 Def0006
+S A$_memset$81 Def0014
+S A$_memset$72 Def0009
+S A$_memset$91 Def001F
+S A$_memset$82 Def0017
+S A$_memset$73 Def000B
+S A$_memset$92 Def0022
+S A$_memset$83 Def0018
+S A$_memset$74 Def000C
+S G$memset$0$0 Def0000
+S A$_memset$93 Def0023
+S A$_memset$84 Def0019
+S A$_memset$75 Def000E
+T 00 00
+R 00 00 00 05
+T 00 00
+R 00 00 00 05
+T 00 01
+R 00 00 00 05
+T 00 01
+R 00 00 00 05
+T 00 03
+R 00 00 00 05
+T 00 03
+R 00 00 00 05
+T 00 00
+R 00 00 00 07
+T 00 00 C0 F0 C0 83 C0 82 90 00 03 D0 E0 F0 D0 E0
+R 00 00 00 07 00 09 00 05
+T 00 0E A3 F0 D0 E0 A3 F0 90 00 03 E0 FA A3 E0 FB
+R 00 00 00 07 00 09 00 05
+T 00 1C A3 E0 FC 90 00 00 E0 FD 90 00 01 E0 FE A3
+R 00 00 00 07 00 06 00 05 00 0B 00 05
+T 00 2A E0 FF
+R 00 00 00 07
+T 00 2C
+R 00 00 00 07
+T 00 2C 8E 00 8F 01 1E BE FF 01 1F
+R 00 00 00 07
+T 00 35
+R 00 00 00 07
+T 00 35 E8 49 60 11
+R 00 00 00 07
+T 00 39
+R 00 00 00 07
+T 00 39 8A 82 8B 83 8C F0 ED 12 00 00 0A BA 00 01
+R 00 00 00 07 02 0A 00 00
+T 00 47 0B
+R 00 00 00 07
+T 00 48
+R 00 00 00 07
+T 00 48 80 E2
+R 00 00 00 07
+T 00 4A
+R 00 00 00 07
+T 00 4A 90 00 03 E0 FA A3 E0 FB A3 E0 FC 8A 82 8B
+R 00 00 00 07 00 03 00 05
+T 00 58 83 8C F0
+R 00 00 00 07
+T 00 5B
+R 00 00 00 07
+T 00 5B 22
+R 00 00 00 07

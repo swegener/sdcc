@@ -1,0 +1,636 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:32 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module _ser
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl _ser_charAvail
+                             11 	.globl _ser_printString
+                             12 	.globl _ser_getc
+                             13 	.globl _ser_putc
+                             14 	.globl _ser_interrupt_handler
+                             15 	.globl _ser_init
+                             16 	.globl _ser_rxBuffer
+                             17 	.globl _ser_txBuffer
+                             18 	.globl _ser_rxIndexOut
+                             19 	.globl _ser_rxIndexIn
+                             20 	.globl _ser_txIndexOut
+                             21 	.globl _ser_txIndexIn
+                             22 ;--------------------------------------------------------
+                             23 ; special function registers
+                             24 ;--------------------------------------------------------
+                    0080     25 G$P0$0$0 == 0x0080
+                    0080     26 _P0	=	0x0080
+                    0090     27 G$P1$0$0 == 0x0090
+                    0090     28 _P1	=	0x0090
+                    00A0     29 G$P2$0$0 == 0x00a0
+                    00A0     30 _P2	=	0x00a0
+                    00B0     31 G$P3$0$0 == 0x00b0
+                    00B0     32 _P3	=	0x00b0
+                    00D0     33 G$PSW$0$0 == 0x00d0
+                    00D0     34 _PSW	=	0x00d0
+                    00E0     35 G$ACC$0$0 == 0x00e0
+                    00E0     36 _ACC	=	0x00e0
+                    00F0     37 G$B$0$0 == 0x00f0
+                    00F0     38 _B	=	0x00f0
+                    0081     39 G$SP$0$0 == 0x0081
+                    0081     40 _SP	=	0x0081
+                    0082     41 G$DPL$0$0 == 0x0082
+                    0082     42 _DPL	=	0x0082
+                    0083     43 G$DPH$0$0 == 0x0083
+                    0083     44 _DPH	=	0x0083
+                    0087     45 G$PCON$0$0 == 0x0087
+                    0087     46 _PCON	=	0x0087
+                    0088     47 G$TCON$0$0 == 0x0088
+                    0088     48 _TCON	=	0x0088
+                    0089     49 G$TMOD$0$0 == 0x0089
+                    0089     50 _TMOD	=	0x0089
+                    008A     51 G$TL0$0$0 == 0x008a
+                    008A     52 _TL0	=	0x008a
+                    008B     53 G$TL1$0$0 == 0x008b
+                    008B     54 _TL1	=	0x008b
+                    008C     55 G$TH0$0$0 == 0x008c
+                    008C     56 _TH0	=	0x008c
+                    008D     57 G$TH1$0$0 == 0x008d
+                    008D     58 _TH1	=	0x008d
+                    008E     59 G$AUXR$0$0 == 0x008e
+                    008E     60 _AUXR	=	0x008e
+                    00A8     61 G$IE$0$0 == 0x00a8
+                    00A8     62 _IE	=	0x00a8
+                    00B8     63 G$IP$0$0 == 0x00b8
+                    00B8     64 _IP	=	0x00b8
+                    0098     65 G$SCON$0$0 == 0x0098
+                    0098     66 _SCON	=	0x0098
+                    0099     67 G$SBUF$0$0 == 0x0099
+                    0099     68 _SBUF	=	0x0099
+                    00C8     69 G$T2CON$0$0 == 0x00c8
+                    00C8     70 _T2CON	=	0x00c8
+                    00CB     71 G$RCAP2H$0$0 == 0x00cb
+                    00CB     72 _RCAP2H	=	0x00cb
+                    00CA     73 G$RCAP2L$0$0 == 0x00ca
+                    00CA     74 _RCAP2L	=	0x00ca
+                             75 ;--------------------------------------------------------
+                             76 ; special function bits 
+                             77 ;--------------------------------------------------------
+                    00D7     78 G$CY$0$0 == 0x00d7
+                    00D7     79 _CY	=	0x00d7
+                    00D6     80 G$AC$0$0 == 0x00d6
+                    00D6     81 _AC	=	0x00d6
+                    00D5     82 G$F0$0$0 == 0x00d5
+                    00D5     83 _F0	=	0x00d5
+                    00D4     84 G$RS1$0$0 == 0x00d4
+                    00D4     85 _RS1	=	0x00d4
+                    00D3     86 G$RS0$0$0 == 0x00d3
+                    00D3     87 _RS0	=	0x00d3
+                    00D2     88 G$OV$0$0 == 0x00d2
+                    00D2     89 _OV	=	0x00d2
+                    00D0     90 G$P$0$0 == 0x00d0
+                    00D0     91 _P	=	0x00d0
+                    008F     92 G$TF1$0$0 == 0x008f
+                    008F     93 _TF1	=	0x008f
+                    008E     94 G$TR1$0$0 == 0x008e
+                    008E     95 _TR1	=	0x008e
+                    008D     96 G$TF0$0$0 == 0x008d
+                    008D     97 _TF0	=	0x008d
+                    008C     98 G$TR0$0$0 == 0x008c
+                    008C     99 _TR0	=	0x008c
+                    008B    100 G$IE1$0$0 == 0x008b
+                    008B    101 _IE1	=	0x008b
+                    008A    102 G$IT1$0$0 == 0x008a
+                    008A    103 _IT1	=	0x008a
+                    0089    104 G$IE0$0$0 == 0x0089
+                    0089    105 _IE0	=	0x0089
+                    0088    106 G$IT0$0$0 == 0x0088
+                    0088    107 _IT0	=	0x0088
+                    00AF    108 G$EA$0$0 == 0x00af
+                    00AF    109 _EA	=	0x00af
+                    00AC    110 G$ES$0$0 == 0x00ac
+                    00AC    111 _ES	=	0x00ac
+                    00AB    112 G$ET1$0$0 == 0x00ab
+                    00AB    113 _ET1	=	0x00ab
+                    00AA    114 G$EX1$0$0 == 0x00aa
+                    00AA    115 _EX1	=	0x00aa
+                    00A9    116 G$ET0$0$0 == 0x00a9
+                    00A9    117 _ET0	=	0x00a9
+                    00A8    118 G$EX0$0$0 == 0x00a8
+                    00A8    119 _EX0	=	0x00a8
+                    00BC    120 G$PS$0$0 == 0x00bc
+                    00BC    121 _PS	=	0x00bc
+                    00BB    122 G$PT1$0$0 == 0x00bb
+                    00BB    123 _PT1	=	0x00bb
+                    00BA    124 G$PX1$0$0 == 0x00ba
+                    00BA    125 _PX1	=	0x00ba
+                    00B9    126 G$PT0$0$0 == 0x00b9
+                    00B9    127 _PT0	=	0x00b9
+                    00B8    128 G$PX0$0$0 == 0x00b8
+                    00B8    129 _PX0	=	0x00b8
+                    00B7    130 G$RD$0$0 == 0x00b7
+                    00B7    131 _RD	=	0x00b7
+                    00B6    132 G$WR$0$0 == 0x00b6
+                    00B6    133 _WR	=	0x00b6
+                    00B5    134 G$T1$0$0 == 0x00b5
+                    00B5    135 _T1	=	0x00b5
+                    00B4    136 G$T0$0$0 == 0x00b4
+                    00B4    137 _T0	=	0x00b4
+                    00B3    138 G$INT1$0$0 == 0x00b3
+                    00B3    139 _INT1	=	0x00b3
+                    00B2    140 G$INT0$0$0 == 0x00b2
+                    00B2    141 _INT0	=	0x00b2
+                    00B1    142 G$TXD$0$0 == 0x00b1
+                    00B1    143 _TXD	=	0x00b1
+                    00B0    144 G$RXD$0$0 == 0x00b0
+                    00B0    145 _RXD	=	0x00b0
+                    0090    146 G$P1_0$0$0 == 0x0090
+                    0090    147 _P1_0	=	0x0090
+                    0091    148 G$P1_1$0$0 == 0x0091
+                    0091    149 _P1_1	=	0x0091
+                    0092    150 G$P1_2$0$0 == 0x0092
+                    0092    151 _P1_2	=	0x0092
+                    0093    152 G$P1_3$0$0 == 0x0093
+                    0093    153 _P1_3	=	0x0093
+                    0094    154 G$P1_4$0$0 == 0x0094
+                    0094    155 _P1_4	=	0x0094
+                    0095    156 G$P1_5$0$0 == 0x0095
+                    0095    157 _P1_5	=	0x0095
+                    0096    158 G$P1_6$0$0 == 0x0096
+                    0096    159 _P1_6	=	0x0096
+                    0097    160 G$P1_7$0$0 == 0x0097
+                    0097    161 _P1_7	=	0x0097
+                    009F    162 G$SM0$0$0 == 0x009f
+                    009F    163 _SM0	=	0x009f
+                    009E    164 G$SM1$0$0 == 0x009e
+                    009E    165 _SM1	=	0x009e
+                    009D    166 G$SM2$0$0 == 0x009d
+                    009D    167 _SM2	=	0x009d
+                    009C    168 G$REN$0$0 == 0x009c
+                    009C    169 _REN	=	0x009c
+                    009B    170 G$TB8$0$0 == 0x009b
+                    009B    171 _TB8	=	0x009b
+                    009A    172 G$RB8$0$0 == 0x009a
+                    009A    173 _RB8	=	0x009a
+                    0099    174 G$TI$0$0 == 0x0099
+                    0099    175 _TI	=	0x0099
+                    0098    176 G$RI$0$0 == 0x0098
+                    0098    177 _RI	=	0x0098
+                    00C8    178 G$T2CON_0$0$0 == 0x00c8
+                    00C8    179 _T2CON_0	=	0x00c8
+                    00C9    180 G$T2CON_1$0$0 == 0x00c9
+                    00C9    181 _T2CON_1	=	0x00c9
+                    00CA    182 G$T2CON_2$0$0 == 0x00ca
+                    00CA    183 _T2CON_2	=	0x00ca
+                    00CB    184 G$T2CON_3$0$0 == 0x00cb
+                    00CB    185 _T2CON_3	=	0x00cb
+                    00CC    186 G$T2CON_4$0$0 == 0x00cc
+                    00CC    187 _T2CON_4	=	0x00cc
+                    00CD    188 G$T2CON_5$0$0 == 0x00cd
+                    00CD    189 _T2CON_5	=	0x00cd
+                    00CE    190 G$T2CON_6$0$0 == 0x00ce
+                    00CE    191 _T2CON_6	=	0x00ce
+                    00CF    192 G$T2CON_7$0$0 == 0x00cf
+                    00CF    193 _T2CON_7	=	0x00cf
+                            194 ;--------------------------------------------------------
+                            195 ; internal ram data
+                            196 ;--------------------------------------------------------
+                            197 	.area	DSEG    (DATA)
+                            198 ;--------------------------------------------------------
+                            199 ; overlayable items in internal ram 
+                            200 ;--------------------------------------------------------
+                            201 	.area	OSEG	(OVR,DATA)
+                            202 ;--------------------------------------------------------
+                            203 ; indirectly addressable internal ram data
+                            204 ;--------------------------------------------------------
+                            205 	.area	ISEG    (DATA)
+                            206 ;--------------------------------------------------------
+                            207 ; bit data
+                            208 ;--------------------------------------------------------
+                            209 	.area	BSEG    (BIT)
+                    0000    210 F_ser$ser_txBusy$0$0==.
+   0000                     211 _ser_txBusy:
+   0000                     212 	.ds	0x0001
+                            213 ;--------------------------------------------------------
+                            214 ; external ram data
+                            215 ;--------------------------------------------------------
+                            216 	.area	XSEG    (XDATA)
+                    0000    217 G$ser_txIndexIn$0$0==.
+   0000                     218 _ser_txIndexIn:
+   0000                     219 	.ds	0x0001
+                    0001    220 G$ser_txIndexOut$0$0==.
+   0001                     221 _ser_txIndexOut:
+   0001                     222 	.ds	0x0001
+                    0002    223 G$ser_rxIndexIn$0$0==.
+   0002                     224 _ser_rxIndexIn:
+   0002                     225 	.ds	0x0001
+                    0003    226 G$ser_rxIndexOut$0$0==.
+   0003                     227 _ser_rxIndexOut:
+   0003                     228 	.ds	0x0001
+                    0004    229 G$ser_txBuffer$0$0==.
+   0004                     230 _ser_txBuffer:
+   0004                     231 	.ds	0x0100
+                    0104    232 G$ser_rxBuffer$0$0==.
+   0104                     233 _ser_rxBuffer:
+   0104                     234 	.ds	0x0100
+   0204                     235 _ser_putc_c_1_1:
+   0204                     236 	.ds	0x0001
+   0205                     237 _ser_getc_tmp_1_1:
+   0205                     238 	.ds	0x0001
+   0206                     239 _ser_printString_String_1_1:
+   0206                     240 	.ds	0x0003
+   0209                     241 _ser_charAvail_ret_1_1:
+   0209                     242 	.ds	0x0001
+                            243 ;--------------------------------------------------------
+                            244 ; global & static initialisations
+                            245 ;--------------------------------------------------------
+                            246 	.area GSINIT (CODE)
+                            247 ;--------------------------------------------------------
+                            248 ; code
+                            249 ;--------------------------------------------------------
+                            250 	.area CSEG (CODE)
+                    0000    251 	G$ser_init$0$0 ==.
+                            252 ;	_ser.c 49
+                            253 ;	-----------------------------------------
+                            254 ;	 function ser_init
+                            255 ;	-----------------------------------------
+   0000                     256 _ser_init:
+                    0002    257 	ar2 = 0x02
+                    0003    258 	ar3 = 0x03
+                    0004    259 	ar4 = 0x04
+                    0005    260 	ar5 = 0x05
+                    0006    261 	ar6 = 0x06
+                    0007    262 	ar7 = 0x07
+                    0000    263 	ar0 = 0x00
+                    0001    264 	ar1 = 0x01
+                            265 ;	_ser.c 51
+   0000 C2 AC               266 	clr	_ES
+                            267 ;	_ser.c 53
+   0002 C2*00               268 	clr	_ser_txBusy
+                            269 ;	_ser.c 55
+   0004 90s00r00            270 	mov	dptr,#_ser_txIndexIn
+                            271 ; Peephole 180   changed mov to clr
+   0007 E4                  272 	clr  a
+   0008 F0                  273 	movx	@dptr,a
+                            274 ;	_ser.c 56
+   0009 90s00r01            275 	mov	dptr,#_ser_txIndexOut
+                            276 ; Peephole 180   changed mov to clr
+   000C E4                  277 	clr  a
+   000D F0                  278 	movx	@dptr,a
+                            279 ;	_ser.c 57
+   000E 90s00r02            280 	mov	dptr,#_ser_rxIndexIn
+                            281 ; Peephole 180   changed mov to clr
+   0011 E4                  282 	clr  a
+   0012 F0                  283 	movx	@dptr,a
+                            284 ;	_ser.c 58
+   0013 90s00r03            285 	mov	dptr,#_ser_rxIndexOut
+                            286 ; Peephole 180   changed mov to clr
+   0016 E4                  287 	clr  a
+   0017 F0                  288 	movx	@dptr,a
+                            289 ;	_ser.c 60
+   0018 75 C8 30            290 	mov	_T2CON,#0x30
+                            291 ;	_ser.c 63
+   001B 75 CB FF            292 	mov	_RCAP2H,#0xff
+                            293 ;	_ser.c 64
+   001E 75 CA DD            294 	mov	_RCAP2L,#0xdd
+                            295 ;	_ser.c 67
+   0021 75 C8 34            296 	mov	_T2CON,#0x34
+                            297 ;	_ser.c 69
+   0024 75 98 50            298 	mov	_SCON,#0x50
+                            299 ;	_ser.c 71
+                            300 ; Peephole 111   removed ljmp by inverse jump logic
+   0027 30 99 02            301 	jnb  _TI,00102$
+   002A                     302 00109$:
+                            303 ;	_ser.c 72
+   002A C2 99               304 	clr	_TI
+   002C                     305 00102$:
+                            306 ;	_ser.c 74
+                            307 ; Peephole 111   removed ljmp by inverse jump logic
+   002C 30 98 02            308 	jnb  _RI,00104$
+   002F                     309 00110$:
+                            310 ;	_ser.c 75
+   002F C2 98               311 	clr	_RI
+   0031                     312 00104$:
+                            313 ;	_ser.c 78
+   0031 D2 AC               314 	setb	_ES
+   0033                     315 00105$:
+                    0033    316 	C$_ser.c$79$1$1 ==.
+                    0033    317 	XG$ser_init$0$0 ==.
+   0033 22                  318 	ret
+                    0034    319 	G$ser_interrupt_handler$0$0 ==.
+                            320 ;	_ser.c 82
+                            321 ;	-----------------------------------------
+                            322 ;	 function ser_interrupt_handler
+                            323 ;	-----------------------------------------
+   0034                     324 _ser_interrupt_handler:
+                    000A    325 	ar2 = 0x0a
+                    000B    326 	ar3 = 0x0b
+                    000C    327 	ar4 = 0x0c
+                    000D    328 	ar5 = 0x0d
+                    000E    329 	ar6 = 0x0e
+                    000F    330 	ar7 = 0x0f
+                    0008    331 	ar0 = 0x08
+                    0009    332 	ar1 = 0x09
+   0034 C0 E0               333 	push	acc
+   0036 C0 F0               334 	push	b
+   0038 C0 82               335 	push	dpl
+   003A C0 83               336 	push	dph
+   003C C0 D0               337 	push	psw
+   003E 75 D0 08            338 	mov	psw,#0x08
+                            339 ;	_ser.c 84
+   0041 C2 AC               340 	clr	_ES
+                            341 ;	_ser.c 86
+                            342 ; Peephole 111   removed ljmp by inverse jump logic
+   0043 30 99 27            343 	jnb  _TI,00105$
+   0046                     344 00113$:
+                            345 ;	_ser.c 87
+   0046 C2 99               346 	clr	_TI
+                            347 ;	_ser.c 88
+   0048 90s00r01            348 	mov	dptr,#_ser_txIndexOut
+   004B E0                  349 	movx	a,@dptr
+   004C FA                  350 	mov	r2,a
+   004D 90s00r00            351 	mov	dptr,#_ser_txIndexIn
+   0050 E0                  352 	movx	a,@dptr
+                            353 ; Peephole 105   removed redundant mov
+   0051 FB                  354 	mov  r3,a
+                            355 ; Peephole 132   changed ljmp to sjmp
+                            356 ; Peephole 199   optimized misc jump sequence
+   0052 B5 0A 04            357 	cjne a,ar2,00102$
+                            358 ; Peephole 201   removed redundant sjmp
+   0055                     359 00114$:
+   0055                     360 00115$:
+                            361 ;	_ser.c 89
+   0055 C2*00               362 	clr	_ser_txBusy
+                            363 ; Peephole 132   changed ljmp to sjmp
+   0057 80 14               364 	sjmp 00105$
+   0059                     365 00102$:
+                            366 ;	_ser.c 92
+   0059 90s00r01            367 	mov	dptr,#_ser_txIndexOut
+   005C 74 01               368 	mov	a,#0x01
+   005E 2A                  369 	add	a,r2
+   005F F0                  370 	movx	@dptr,a
+   0060 EA                  371 	mov	a,r2
+   0061 24r04               372 	add	a,#_ser_txBuffer
+   0063 F5 82               373 	mov	dpl,a
+                            374 ; Peephole 180   changed mov to clr
+   0065 E4                  375 	clr  a
+   0066 34s00               376 	addc	a,#(_ser_txBuffer >> 8)
+   0068 F5 83               377 	mov	dph,a
+   006A E0                  378 	movx	a,@dptr
+   006B F5 99               379 	mov	_SBUF,a
+   006D                     380 00105$:
+                            381 ;	_ser.c 96
+                            382 ; Peephole 111   removed ljmp by inverse jump logic
+   006D 30 98 1B            383 	jnb  _RI,00107$
+   0070                     384 00116$:
+                            385 ;	_ser.c 97
+   0070 C2 98               386 	clr	_RI
+                            387 ;	_ser.c 98
+   0072 90s00r02            388 	mov	dptr,#_ser_rxIndexIn
+   0075 E0                  389 	movx	a,@dptr
+   0076 FA                  390 	mov	r2,a
+   0077 90s00r02            391 	mov	dptr,#_ser_rxIndexIn
+   007A 74 01               392 	mov	a,#0x01
+   007C 2A                  393 	add	a,r2
+   007D F0                  394 	movx	@dptr,a
+   007E EA                  395 	mov	a,r2
+   007F 24r04               396 	add	a,#_ser_rxBuffer
+   0081 F5 82               397 	mov	dpl,a
+                            398 ; Peephole 180   changed mov to clr
+   0083 E4                  399 	clr  a
+   0084 34s01               400 	addc	a,#(_ser_rxBuffer >> 8)
+   0086 F5 83               401 	mov	dph,a
+   0088 E5 99               402 	mov	a,_SBUF
+   008A F0                  403 	movx	@dptr,a
+   008B                     404 00107$:
+                            405 ;	_ser.c 101
+   008B D2 AC               406 	setb	_ES
+   008D                     407 00108$:
+   008D D0 D0               408 	pop	psw
+   008F D0 83               409 	pop	dph
+   0091 D0 82               410 	pop	dpl
+   0093 D0 F0               411 	pop	b
+   0095 D0 E0               412 	pop	acc
+                    0097    413 	C$_ser.c$102$1$1 ==.
+                    0097    414 	XG$ser_interrupt_handler$0$0 ==.
+   0097 32                  415 	reti
+                    0098    416 	G$ser_putc$0$0 ==.
+                            417 ;	_ser.c 105
+                            418 ;	-----------------------------------------
+                            419 ;	 function ser_putc
+                            420 ;	-----------------------------------------
+   0098                     421 _ser_putc:
+                    0002    422 	ar2 = 0x02
+                    0003    423 	ar3 = 0x03
+                    0004    424 	ar4 = 0x04
+                    0005    425 	ar5 = 0x05
+                    0006    426 	ar6 = 0x06
+                    0007    427 	ar7 = 0x07
+                    0000    428 	ar0 = 0x00
+                    0001    429 	ar1 = 0x01
+                            430 ;	_ser.c 117
+   0098 C0 82               431 	push	dpl
+   009A 90s02r04            432 	mov	dptr,#_ser_putc_c_1_1
+   009D D0 E0               433 	pop	acc
+   009F F0                  434 	movx	@dptr,a
+                            435 ;	_ser.c 107
+   00A0 C2 AC               436 	clr	_ES
+                            437 ;	_ser.c 109
+                            438 ; Peephole 111   removed ljmp by inverse jump logic
+   00A2 30*00 20            439 	jnb  _ser_txBusy,00102$
+   00A5                     440 00107$:
+                            441 ;	_ser.c 110
+   00A5 90s00r00            442 	mov	dptr,#_ser_txIndexIn
+   00A8 E0                  443 	movx	a,@dptr
+   00A9 FA                  444 	mov	r2,a
+   00AA 90s00r00            445 	mov	dptr,#_ser_txIndexIn
+   00AD 74 01               446 	mov	a,#0x01
+   00AF 2A                  447 	add	a,r2
+   00B0 F0                  448 	movx	@dptr,a
+   00B1 EA                  449 	mov	a,r2
+   00B2 24r04               450 	add	a,#_ser_txBuffer
+   00B4 FA                  451 	mov	r2,a
+                            452 ; Peephole 180   changed mov to clr
+   00B5 E4                  453 	clr  a
+   00B6 34s00               454 	addc	a,#(_ser_txBuffer >> 8)
+   00B8 FB                  455 	mov	r3,a
+   00B9 90s02r04            456 	mov	dptr,#_ser_putc_c_1_1
+   00BC E0                  457 	movx	a,@dptr
+                            458 ; Peephole 136   removed redundant moves
+   00BD FC                  459 	mov  r4,a
+   00BE 8A 82               460 	mov  dpl,r2
+   00C0 8B 83               461 	mov  dph,r3
+   00C2 F0                  462 	movx	@dptr,a
+                            463 ; Peephole 132   changed ljmp to sjmp
+   00C3 80 08               464 	sjmp 00103$
+   00C5                     465 00102$:
+                            466 ;	_ser.c 113
+   00C5 D2*00               467 	setb	_ser_txBusy
+                            468 ;	_ser.c 114
+   00C7 90s02r04            469 	mov	dptr,#_ser_putc_c_1_1
+   00CA E0                  470 	movx	a,@dptr
+   00CB F5 99               471 	mov	_SBUF,a
+   00CD                     472 00103$:
+                            473 ;	_ser.c 117
+   00CD D2 AC               474 	setb	_ES
+   00CF                     475 00104$:
+                    00CF    476 	C$_ser.c$118$1$1 ==.
+                    00CF    477 	XG$ser_putc$0$0 ==.
+   00CF 22                  478 	ret
+                    00D0    479 	G$ser_getc$0$0 ==.
+                            480 ;	_ser.c 121
+                            481 ;	-----------------------------------------
+                            482 ;	 function ser_getc
+                            483 ;	-----------------------------------------
+   00D0                     484 _ser_getc:
+                            485 ;	_ser.c 126
+   00D0 90s00r03            486 	mov	dptr,#_ser_rxIndexOut
+   00D3 E0                  487 	movx	a,@dptr
+   00D4 FA                  488 	mov	r2,a
+   00D5 90s00r02            489 	mov	dptr,#_ser_rxIndexIn
+   00D8 E0                  490 	movx	a,@dptr
+                            491 ; Peephole 105   removed redundant mov
+   00D9 FB                  492 	mov  r3,a
+   00DA B5 02 02            493 	cjne	a,ar2,00107$
+                            494 ; Peephole 132   changed ljmp to sjmp
+   00DD 80 19               495 	sjmp 00102$
+   00DF                     496 00107$:
+                            497 ;	_ser.c 127
+   00DF 90s00r03            498 	mov	dptr,#_ser_rxIndexOut
+   00E2 74 01               499 	mov	a,#0x01
+   00E4 2A                  500 	add	a,r2
+   00E5 F0                  501 	movx	@dptr,a
+   00E6 EA                  502 	mov	a,r2
+   00E7 24r04               503 	add	a,#_ser_rxBuffer
+   00E9 F5 82               504 	mov	dpl,a
+                            505 ; Peephole 180   changed mov to clr
+   00EB E4                  506 	clr  a
+   00EC 34s01               507 	addc	a,#(_ser_rxBuffer >> 8)
+   00EE F5 83               508 	mov	dph,a
+   00F0 E0                  509 	movx	a,@dptr
+                            510 ; Peephole 100   removed redundant mov
+   00F1 FA                  511 	mov  r2,a
+   00F2 90s02r05            512 	mov  dptr,#_ser_getc_tmp_1_1
+   00F5 F0                  513 	movx @dptr,a
+                            514 ; Peephole 132   changed ljmp to sjmp
+   00F6 80 05               515 	sjmp 00103$
+   00F8                     516 00102$:
+                            517 ;	_ser.c 130
+   00F8 90s02r05            518 	mov	dptr,#_ser_getc_tmp_1_1
+                            519 ; Peephole 180   changed mov to clr
+   00FB E4                  520 	clr  a
+   00FC F0                  521 	movx	@dptr,a
+   00FD                     522 00103$:
+                            523 ;	_ser.c 134
+   00FD 90s02r05            524 	mov	dptr,#_ser_getc_tmp_1_1
+   0100 E0                  525 	movx	a,@dptr
+   0101 FA                  526 	mov	r2,a
+   0102 8A 82               527 	mov	dpl,r2
+   0104                     528 00104$:
+                    0104    529 	C$_ser.c$135$1$1 ==.
+                    0104    530 	XG$ser_getc$0$0 ==.
+   0104 22                  531 	ret
+                    0105    532 	G$ser_printString$0$0 ==.
+                            533 ;	_ser.c 138
+                            534 ;	-----------------------------------------
+                            535 ;	 function ser_printString
+                            536 ;	-----------------------------------------
+   0105                     537 _ser_printString:
+                            538 ;	_ser.c 0
+   0105 C0 F0               539 	push	b
+   0107 C0 83               540 	push	dph
+   0109 C0 82               541 	push	dpl
+   010B 90s02r06            542 	mov	dptr,#_ser_printString_String_1_1
+   010E D0 E0               543 	pop	acc
+   0110 F0                  544 	movx	@dptr,a
+   0111 D0 E0               545 	pop	acc
+   0113 A3                  546 	inc	dptr
+   0114 F0                  547 	movx	@dptr,a
+   0115 D0 E0               548 	pop	acc
+   0117 A3                  549 	inc	dptr
+   0118 F0                  550 	movx	@dptr,a
+                            551 ;	_ser.c 140
+   0119 90s02r06            552 	mov	dptr,#_ser_printString_String_1_1
+   011C E0                  553 	movx	a,@dptr
+   011D FA                  554 	mov	r2,a
+   011E A3                  555 	inc	dptr
+   011F E0                  556 	movx	a,@dptr
+   0120 FB                  557 	mov	r3,a
+   0121 A3                  558 	inc	dptr
+   0122 E0                  559 	movx	a,@dptr
+   0123 FC                  560 	mov	r4,a
+   0124                     561 00101$:
+   0124 8A 82               562 	mov	dpl,r2
+   0126 8B 83               563 	mov	dph,r3
+   0128 8C F0               564 	mov	b,r4
+   012A 12s00r00            565 	lcall	__gptrget
+   012D FD                  566 	mov	r5,a
+   012E 90s02r06            567 	mov	dptr,#_ser_printString_String_1_1
+   0131 EA                  568 	mov	a,r2
+   0132 F0                  569 	movx	@dptr,a
+   0133 A3                  570 	inc	dptr
+   0134 EB                  571 	mov	a,r3
+   0135 F0                  572 	movx	@dptr,a
+   0136 A3                  573 	inc	dptr
+   0137 EC                  574 	mov	a,r4
+   0138 F0                  575 	movx	@dptr,a
+   0139 ED                  576 	mov	a,r5
+                            577 ; Peephole 110   removed ljmp by inverse jump logic
+   013A 60 18               578 	jz  00104$
+   013C                     579 00108$:
+                            580 ;	_ser.c 141
+   013C 0A                  581 	inc	r2
+   013D BA 00 01            582 	cjne	r2,#0x00,00109$
+   0140 0B                  583 	inc	r3
+   0141                     584 00109$:
+   0141 C0 02               585 	push	ar2
+   0143 C0 03               586 	push	ar3
+   0145 C0 04               587 	push	ar4
+   0147 8D 82               588 	mov	dpl,r5
+   0149 12s00r98            589 	lcall	_ser_putc
+   014C D0 04               590 	pop	ar4
+   014E D0 03               591 	pop	ar3
+   0150 D0 02               592 	pop	ar2
+                            593 ; Peephole 132   changed ljmp to sjmp
+   0152 80 D0               594 	sjmp 00101$
+   0154                     595 00104$:
+                    0154    596 	C$_ser.c$143$1$1 ==.
+                    0154    597 	XG$ser_printString$0$0 ==.
+   0154 22                  598 	ret
+                    0155    599 	G$ser_charAvail$0$0 ==.
+                            600 ;	_ser.c 146
+                            601 ;	-----------------------------------------
+                            602 ;	 function ser_charAvail
+                            603 ;	-----------------------------------------
+   0155                     604 _ser_charAvail:
+                            605 ;	_ser.c 148
+   0155 90s02r09            606 	mov	dptr,#_ser_charAvail_ret_1_1
+                            607 ; Peephole 180   changed mov to clr
+   0158 E4                  608 	clr  a
+   0159 F0                  609 	movx	@dptr,a
+                            610 ;	_ser.c 150
+   015A 90s00r03            611 	mov	dptr,#_ser_rxIndexOut
+   015D E0                  612 	movx	a,@dptr
+   015E FA                  613 	mov	r2,a
+   015F 90s00r02            614 	mov	dptr,#_ser_rxIndexIn
+   0162 E0                  615 	movx	a,@dptr
+                            616 ; Peephole 105   removed redundant mov
+   0163 FB                  617 	mov  r3,a
+   0164 B5 02 02            618 	cjne	a,ar2,00106$
+                            619 ; Peephole 132   changed ljmp to sjmp
+   0167 80 06               620 	sjmp 00102$
+   0169                     621 00106$:
+                            622 ;	_ser.c 151
+   0169 90s02r09            623 	mov	dptr,#_ser_charAvail_ret_1_1
+   016C 74 01               624 	mov	a,#0x01
+   016E F0                  625 	movx	@dptr,a
+   016F                     626 00102$:
+                            627 ;	_ser.c 154
+   016F 90s02r09            628 	mov	dptr,#_ser_charAvail_ret_1_1
+   0172 E0                  629 	movx	a,@dptr
+   0173 FA                  630 	mov	r2,a
+   0174 8A 82               631 	mov	dpl,r2
+   0176                     632 00103$:
+                    0176    633 	C$_ser.c$155$1$1 ==.
+                    0176    634 	XG$ser_charAvail$0$0 ==.
+   0176 22                  635 	ret
+                            636 	.area	CSEG    (CODE)

@@ -1,0 +1,63 @@
+;!FILE _isgraph.asm
+XH
+H 8 areas 15 global symbols
+M _isgraph
+A _CODE size 0 flags 0
+A DSEG size 0 flags 0
+A OSEG size 0 flags 4
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 1 flags 40
+A GSINIT size 0 flags 20
+A CSEG size 21 flags 20
+S _isgraph Def0000
+S C$_isgraph.c$31$1$1 Def0020
+S XG$isgraph$0$0 Def0020
+S A$_isgraph$70 Def000D
+S A$_isgraph$62 Def0000
+S A$_isgraph$81 Def0016
+S A$_isgraph$63 Def0002
+S A$_isgraph$64 Def0005
+S A$_isgraph$74 Def0010
+S A$_isgraph$65 Def0007
+S G$isgraph$0$0 Def0000
+S A$_isgraph$93 Def0020
+S A$_isgraph$84 Def0018
+S A$_isgraph$76 Def0012
+S A$_isgraph$67 Def0008
+S A$_isgraph$86 Def001B
+S A$_isgraph$77 Def0013
+S A$_isgraph$68 Def000B
+S A$_isgraph$78 Def0015
+S A$_isgraph$69 Def000C
+S A$_isgraph$89 Def001D
+T 00 00
+R 00 00 00 05
+T 00 00
+R 00 00 00 05
+T 00 00
+R 00 00 00 07
+T 00 00 C0 82 90 00 00 D0 E0 F0 90 00 00 E0 FA BA
+R 00 00 00 07 00 05 00 05 00 0B 00 05
+T 00 0E 21 00
+R 00 00 00 07
+T 00 10
+R 00 00 00 07
+T 00 10 40 0B
+R 00 00 00 07
+T 00 12
+R 00 00 00 07
+T 00 12 C3 74 7E 9A 40 05
+R 00 00 00 07
+T 00 18
+R 00 00 00 07
+T 00 18 75 82 01 80 03
+R 00 00 00 07
+T 00 1D
+R 00 00 00 07
+T 00 1D 75 82 00
+R 00 00 00 07
+T 00 20
+R 00 00 00 07
+T 00 20 22
+R 00 00 00 07

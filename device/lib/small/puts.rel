@@ -1,0 +1,100 @@
+;!FILE puts.asm
+XH
+H 8 areas 36 global symbols
+M puts
+S _putchar Ref0000
+S __gptrget Ref0000
+A _CODE size 0 flags 0
+A DSEG size 0 flags 0
+A OSEG size 0 flags 4
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 0 flags 40
+A GSINIT size 0 flags 20
+A CSEG size 5D flags 20
+S A$puts$100 Def003F
+S A$puts$110 Def004C
+S A$puts$101 Def0042
+S A$puts$120 Def005A
+S A$puts$111 Def004F
+S A$puts$112 Def0051
+S A$puts$104 Def0043
+S A$puts$114 Def0053
+S A$puts$124 Def005C
+S A$puts$115 Def0055
+S A$puts$116 Def0056
+S A$puts$107 Def0045
+S A$puts$108 Def0047
+S A$puts$118 Def0058
+S A$puts$109 Def0049
+S A$puts$119 Def0059
+S A$puts$60 Def0000
+S C$puts.c$36$1$1 Def005C
+S A$puts$70 Def0010
+S A$puts$61 Def0002
+S A$puts$80 Def001C
+S A$puts$62 Def0004
+S A$puts$90 Def002D
+S A$puts$81 Def001D
+S A$puts$72 Def0013
+S A$puts$91 Def002F
+S A$puts$82 Def0020
+S A$puts$64 Def0006
+S A$puts$92 Def0031
+S A$puts$74 Def0014
+S A$puts$65 Def0008
+S A$puts$93 Def0034
+S A$puts$84 Def0021
+S A$puts$94 Def0036
+S A$puts$85 Def0024
+S A$puts$67 Def000A
+S A$puts$95 Def0038
+S A$puts$86 Def0025
+S A$puts$77 Def0016
+S A$puts$68 Def000C
+S A$puts$96 Def003A
+S A$puts$87 Def0027
+S A$puts$78 Def0018
+S A$puts$69 Def000E
+S A$puts$97 Def003C
+S A$puts$88 Def0029
+S A$puts$79 Def001A
+S A$puts$89 Def002B
+S A$puts$99 Def003E
+S _puts Def0000
+S XG$puts$0$0 Def005C
+S G$puts$0$0 Def0000
+T 00 00
+R 00 00 00 07
+T 00 00 AA 82 AB 83 AC F0 7D 00 7E 00
+R 00 00 00 07
+T 00 0A
+R 00 00 00 07
+T 00 0A 8A 82 8B 83 8C F0 12 00 00 FF 60 2F
+R 00 00 00 07 02 09 00 01
+T 00 16
+R 00 00 00 07
+T 00 16 8A 82 8B 83 8C F0 0A BA 00 01 0B
+R 00 00 00 07
+T 00 21
+R 00 00 00 07
+T 00 21 12 00 00 FF C0 02 C0 03 C0 04 C0 05 C0 06
+R 00 00 00 07 02 03 00 01
+T 00 2F 8F 82 12 00 00 D0 06 D0 05 D0 04 D0 03 D0
+R 00 00 00 07 02 05 00 00
+T 00 3D 02 0D BD 00 01 0E
+R 00 00 00 07
+T 00 43
+R 00 00 00 07
+T 00 43 80 C5
+R 00 00 00 07
+T 00 45
+R 00 00 00 07
+T 00 45 C0 05 C0 06 75 82 0A 12 00 00 D0 06 D0 05
+R 00 00 00 07 02 0A 00 00
+T 00 53 74 01 2D F5 82 E4 3E F5 83
+R 00 00 00 07
+T 00 5C
+R 00 00 00 07
+T 00 5C 22
+R 00 00 00 07

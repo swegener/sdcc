@@ -1,0 +1,7 @@
+cppalloc.o: cppalloc.c config.h i386/i386.h i386/xm-linux.h
+cpperror.o: cpperror.c cpplib.h
+cppexp.o: cppexp.c config.h i386/i386.h i386/xm-linux.h cpplib.h
+cpphash.o: cpphash.c cpplib.h cpphash.h
+cpplib.o: cpplib.c ../../sdccconf.h config.h i386/i386.h \
+ i386/xm-linux.h cpplib.h cpphash.h
+cppmain.o: cppmain.c cpplib.h

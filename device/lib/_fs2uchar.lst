@@ -1,0 +1,422 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:24 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module _fs2uchar
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl ___fs2uchar
+                             11 ;--------------------------------------------------------
+                             12 ; special function registers
+                             13 ;--------------------------------------------------------
+                             14 ;--------------------------------------------------------
+                             15 ; special function bits 
+                             16 ;--------------------------------------------------------
+                             17 ;--------------------------------------------------------
+                             18 ; internal ram data
+                             19 ;--------------------------------------------------------
+                             20 	.area	DSEG    (DATA)
+   0000                      21 ___fs2uchar_sloc0_1_0:
+   0000                      22 	.ds	0x0004
+   0004                      23 ___fs2uchar_sloc1_1_0:
+   0004                      24 	.ds	0x0004
+                             25 ;--------------------------------------------------------
+                             26 ; overlayable items in internal ram 
+                             27 ;--------------------------------------------------------
+                             28 	.area	OSEG	(OVR,DATA)
+                             29 ;--------------------------------------------------------
+                             30 ; indirectly addressable internal ram data
+                             31 ;--------------------------------------------------------
+                             32 	.area	ISEG    (DATA)
+                             33 ;--------------------------------------------------------
+                             34 ; bit data
+                             35 ;--------------------------------------------------------
+                             36 	.area	BSEG    (BIT)
+                             37 ;--------------------------------------------------------
+                             38 ; external ram data
+                             39 ;--------------------------------------------------------
+                             40 	.area	XSEG    (XDATA)
+   0000                      41 ___fs2uchar_a1_1_1:
+   0000                      42 	.ds	0x0004
+   0004                      43 ___fs2uchar_fl1_1_1:
+   0004                      44 	.ds	0x0004
+   0008                      45 ___fs2uchar_exp_1_1:
+   0008                      46 	.ds	0x0002
+   000A                      47 ___fs2uchar_l_1_1:
+   000A                      48 	.ds	0x0004
+                             49 ;--------------------------------------------------------
+                             50 ; global & static initialisations
+                             51 ;--------------------------------------------------------
+                             52 	.area GSINIT (CODE)
+                             53 ;--------------------------------------------------------
+                             54 ; code
+                             55 ;--------------------------------------------------------
+                             56 	.area CSEG (CODE)
+                    0000     57 	G$__fs2uchar$0$0 ==.
+                             58 ;	_fs2uchar.c 73
+                             59 ;	-----------------------------------------
+                             60 ;	 function __fs2uchar
+                             61 ;	-----------------------------------------
+   0000                      62 ___fs2uchar:
+                    0002     63 	ar2 = 0x02
+                    0003     64 	ar3 = 0x03
+                    0004     65 	ar4 = 0x04
+                    0005     66 	ar5 = 0x05
+                    0006     67 	ar6 = 0x06
+                    0007     68 	ar7 = 0x07
+                    0000     69 	ar0 = 0x00
+                    0001     70 	ar1 = 0x01
+                             71 ;	_fs2uchar.c 0
+   0000 C0 E0                72 	push	acc
+   0002 C0 F0                73 	push	b
+   0004 C0 83                74 	push	dph
+   0006 C0 82                75 	push	dpl
+   0008 90s00r00             76 	mov	dptr,#___fs2uchar_a1_1_1
+   000B D0 E0                77 	pop	acc
+   000D F0                   78 	movx	@dptr,a
+   000E D0 E0                79 	pop	acc
+   0010 A3                   80 	inc	dptr
+   0011 F0                   81 	movx	@dptr,a
+   0012 D0 E0                82 	pop	acc
+   0014 A3                   83 	inc	dptr
+   0015 F0                   84 	movx	@dptr,a
+   0016 D0 E0                85 	pop	acc
+   0018 A3                   86 	inc	dptr
+   0019 F0                   87 	movx	@dptr,a
+                             88 ;	_fs2uchar.c 79
+   001A 90s00r00             89 	mov	dptr,#___fs2uchar_a1_1_1
+   001D E0                   90 	movx	a,@dptr
+   001E FA                   91 	mov	r2,a
+   001F A3                   92 	inc	dptr
+   0020 E0                   93 	movx	a,@dptr
+   0021 FB                   94 	mov	r3,a
+   0022 A3                   95 	inc	dptr
+   0023 E0                   96 	movx	a,@dptr
+   0024 FC                   97 	mov	r4,a
+   0025 A3                   98 	inc	dptr
+   0026 E0                   99 	movx	a,@dptr
+   0027 FD                  100 	mov	r5,a
+   0028 90s00r04            101 	mov	dptr,#(___fs2uchar_fl1_1_1)
+   002B EA                  102 	mov	a,r2
+   002C F0                  103 	movx	@dptr,a
+   002D A3                  104 	inc	dptr
+   002E EB                  105 	mov	a,r3
+   002F F0                  106 	movx	@dptr,a
+   0030 A3                  107 	inc	dptr
+   0031 EC                  108 	mov	a,r4
+   0032 F0                  109 	movx	@dptr,a
+   0033 A3                  110 	inc	dptr
+   0034 ED                  111 	mov	a,r5
+   0035 F0                  112 	movx	@dptr,a
+                            113 ;	_fs2uchar.c 81
+   0036 90s00r04            114 	mov	dptr,#(___fs2uchar_fl1_1_1)
+   0039 E0                  115 	movx	a,@dptr
+   003A FA                  116 	mov	r2,a
+   003B A3                  117 	inc	dptr
+   003C E0                  118 	movx	a,@dptr
+   003D FB                  119 	mov	r3,a
+   003E A3                  120 	inc	dptr
+   003F E0                  121 	movx	a,@dptr
+   0040 FC                  122 	mov	r4,a
+   0041 A3                  123 	inc	dptr
+   0042 E0                  124 	movx	a,@dptr
+   0043 FD                  125 	mov	r5,a
+   0044 EA                  126 	mov	a,r2
+   0045 4B                  127 	orl	a,r3
+   0046 4C                  128 	orl	a,r4
+   0047 4D                  129 	orl	a,r5
+                            130 ; Peephole 109   removed ljmp by inverse jump logic
+   0048 70 06               131 	jnz  00102$
+   004A                     132 00120$:
+                            133 ;	_fs2uchar.c 82
+   004A 75 82 00            134 	mov	dpl,#0x00
+   004D 02s01rD0            135 	ljmp	00110$
+   0050                     136 00102$:
+                            137 ;	_fs2uchar.c 84
+   0050 90s00r04            138 	mov	dptr,#(___fs2uchar_fl1_1_1)
+   0053 E0                  139 	movx	a,@dptr
+   0054 FA                  140 	mov	r2,a
+   0055 A3                  141 	inc	dptr
+   0056 E0                  142 	movx	a,@dptr
+   0057 FB                  143 	mov	r3,a
+   0058 A3                  144 	inc	dptr
+   0059 E0                  145 	movx	a,@dptr
+   005A FC                  146 	mov	r4,a
+   005B A3                  147 	inc	dptr
+   005C E0                  148 	movx	a,@dptr
+   005D FD                  149 	mov	r5,a
+   005E 8C 02               150 	mov	ar2,r4
+   0060 ED                  151 	mov	a,r5
+   0061 A2 E7               152 	mov	c,acc.7
+   0063 CA                  153 	xch	a,r2
+   0064 33                  154 	rlc	a
+   0065 CA                  155 	xch	a,r2
+   0066 33                  156 	rlc	a
+   0067 CA                  157 	xch	a,r2
+   0068 54 01               158 	anl	a,#0x01
+   006A 30 E0 02            159 	jnb	acc.0,00121$
+   006D 44 FE               160 	orl	a,#0xfe
+   006F                     161 00121$:
+   006F FB                  162 	mov	r3,a
+   0070 33                  163 	rlc	a
+   0071 95 E0               164 	subb	a,acc
+   0073 FC                  165 	mov	r4,a
+   0074 FD                  166 	mov	r5,a
+   0075 EA                  167 	mov	a,r2
+   0076 75 F0 00            168 	mov	b,#0x00
+   0079 24 6A               169 	add	a,#0x6a
+   007B FA                  170 	mov	r2,a
+   007C E5 F0               171 	mov	a,b
+   007E 34 FF               172 	addc	a,#0xff
+   0080 FB                  173 	mov	r3,a
+   0081 90s00r08            174 	mov	dptr,#___fs2uchar_exp_1_1
+   0084 EA                  175 	mov	a,r2
+   0085 F0                  176 	movx	@dptr,a
+   0086 A3                  177 	inc	dptr
+   0087 EB                  178 	mov	a,r3
+   0088 F0                  179 	movx	@dptr,a
+                            180 ;	_fs2uchar.c 85
+   0089 90s00r04            181 	mov	dptr,#(___fs2uchar_fl1_1_1)
+   008C E0                  182 	movx	a,@dptr
+   008D FA                  183 	mov	r2,a
+   008E A3                  184 	inc	dptr
+   008F E0                  185 	movx	a,@dptr
+   0090 FB                  186 	mov	r3,a
+   0091 A3                  187 	inc	dptr
+   0092 E0                  188 	movx	a,@dptr
+   0093 FE                  189 	mov	r6,a
+   0094 A3                  190 	inc	dptr
+   0095 E0                  191 	movx	a,@dptr
+   0096 FF                  192 	mov	r7,a
+   0097 53 06 7F            193 	anl	ar6,#0x7f
+   009A 7F 00               194 	mov	r7,#0x00
+   009C 90s00r0A            195 	mov	dptr,#___fs2uchar_l_1_1
+   009F EA                  196 	mov	a,r2
+   00A0 F0                  197 	movx	@dptr,a
+   00A1 A3                  198 	inc	dptr
+   00A2 EB                  199 	mov	a,r3
+   00A3 F0                  200 	movx	@dptr,a
+   00A4 74 80               201 	mov	a,#0x80
+   00A6 4E                  202 	orl	a,r6
+   00A7 A3                  203 	inc	dptr
+   00A8 F0                  204 	movx	@dptr,a
+   00A9 A3                  205 	inc	dptr
+   00AA EF                  206 	mov	a,r7
+   00AB F0                  207 	movx	@dptr,a
+                            208 ;	_fs2uchar.c 87
+   00AC 90s00r08            209 	mov	dptr,#___fs2uchar_exp_1_1
+   00AF E0                  210 	movx	a,@dptr
+   00B0 FA                  211 	mov	r2,a
+   00B1 A3                  212 	inc	dptr
+   00B2 E0                  213 	movx	a,@dptr
+   00B3 FB                  214 	mov	r3,a
+   00B4 C3                  215 	clr	c
+                            216 ; Peephole 180   changed mov to clr
+   00B5 E4                  217 	clr  a
+   00B6 9A                  218 	subb	a,r2
+                            219 ; Peephole 159   avoided xrl during execution
+   00B7 74 80               220 	mov  a,#(0x00 ^ 0x80)
+   00B9 8B F0               221 	mov	b,r3
+   00BB 63 F0 80            222 	xrl	b,#0x80
+   00BE 95 F0               223 	subb	a,b
+                            224 ; Peephole 108   removed ljmp by inverse jump logic
+   00C0 50 1A               225 	jnc  00104$
+   00C2                     226 00122$:
+                            227 ;	_fs2uchar.c 88
+   00C2 90s00r04            228 	mov	dptr,#(___fs2uchar_fl1_1_1)
+   00C5 E0                  229 	movx	a,@dptr
+   00C6 FA                  230 	mov	r2,a
+   00C7 A3                  231 	inc	dptr
+   00C8 E0                  232 	movx	a,@dptr
+   00C9 FB                  233 	mov	r3,a
+   00CA A3                  234 	inc	dptr
+   00CB E0                  235 	movx	a,@dptr
+   00CC FE                  236 	mov	r6,a
+   00CD A3                  237 	inc	dptr
+   00CE E0                  238 	movx	a,@dptr
+                            239 ; Peephole 105   removed redundant mov
+   00CF FF                  240 	mov  r7,a
+   00D0 23                  241 	rl	a
+   00D1 54 01               242 	anl	a,#0x01
+   00D3 FA                  243 	mov	r2,a
+   00D4 43 02 7F            244 	orl	ar2,#0x7f
+   00D7 8A 82               245 	mov	dpl,r2
+   00D9 02s01rD0            246 	ljmp	00110$
+   00DC                     247 00104$:
+                            248 ;	_fs2uchar.c 91
+   00DC 90s00r08            249 	mov	dptr,#___fs2uchar_exp_1_1
+   00DF E0                  250 	movx	a,@dptr
+   00E0 FA                  251 	mov	r2,a
+   00E1 A3                  252 	inc	dptr
+   00E2 E0                  253 	movx	a,@dptr
+                            254 ; Peephole 105   removed redundant mov
+   00E3 F8                  255 	mov  r0,a
+   00E4 20 E7 03            256 	jb	acc.7,00123$
+   00E7 02s01r7F            257 	ljmp	00106$
+   00EA                     258 00123$:
+   00EA 90s00r08            259 	mov	dptr,#___fs2uchar_exp_1_1
+   00ED E0                  260 	movx	a,@dptr
+   00EE FA                  261 	mov	r2,a
+   00EF A3                  262 	inc	dptr
+   00F0 E0                  263 	movx	a,@dptr
+   00F1 F8                  264 	mov	r0,a
+   00F2 C3                  265 	clr	c
+   00F3 74 E7               266 	mov	a,#0xe7
+   00F5 9A                  267 	subb	a,r2
+                            268 ; Peephole 159   avoided xrl during execution
+   00F6 74 7F               269 	mov  a,#(0xff ^ 0x80)
+   00F8 88 F0               270 	mov	b,r0
+   00FA 63 F0 80            271 	xrl	b,#0x80
+   00FD 95 F0               272 	subb	a,b
+   00FF 40 03               273 	jc	00124$
+   0101 02s01r7F            274 	ljmp	00106$
+   0104                     275 00124$:
+   0104 90s00r0A            276 	mov	dptr,#___fs2uchar_l_1_1
+   0107 E0                  277 	movx	a,@dptr
+   0108 F5*00               278 	mov	___fs2uchar_sloc0_1_0,a
+   010A A3                  279 	inc	dptr
+   010B E0                  280 	movx	a,@dptr
+   010C F5*01               281 	mov	(___fs2uchar_sloc0_1_0 + 1),a
+   010E A3                  282 	inc	dptr
+   010F E0                  283 	movx	a,@dptr
+   0110 F5*02               284 	mov	(___fs2uchar_sloc0_1_0 + 2),a
+   0112 A3                  285 	inc	dptr
+   0113 E0                  286 	movx	a,@dptr
+   0114 F5*03               287 	mov	(___fs2uchar_sloc0_1_0 + 3),a
+   0116 E5*00               288 	mov	a,___fs2uchar_sloc0_1_0
+   0118 45*01               289 	orl	a,(___fs2uchar_sloc0_1_0 + 1)
+   011A 45*02               290 	orl	a,(___fs2uchar_sloc0_1_0 + 2)
+   011C 45*03               291 	orl	a,(___fs2uchar_sloc0_1_0 + 3)
+   011E 70 03               292 	jnz	00125$
+   0120 02s01r7F            293 	ljmp	00106$
+   0123                     294 00125$:
+                            295 ;	_fs2uchar.c 92
+   0123 90s00r08            296 	mov	dptr,#___fs2uchar_exp_1_1
+   0126 E0                  297 	movx	a,@dptr
+   0127 FA                  298 	mov	r2,a
+   0128 A3                  299 	inc	dptr
+   0129 E0                  300 	movx	a,@dptr
+   012A F8                  301 	mov	r0,a
+   012B C3                  302 	clr	c
+   012C E4                  303 	clr	a
+   012D 9A                  304 	subb	a,r2
+   012E F5*00               305 	mov	___fs2uchar_sloc0_1_0,a
+   0130 E4                  306 	clr	a
+   0131 98                  307 	subb	a,r0
+   0132 F5*01               308 	mov	(___fs2uchar_sloc0_1_0 + 1),a
+   0134 90s00r0A            309 	mov	dptr,#___fs2uchar_l_1_1
+   0137 E0                  310 	movx	a,@dptr
+   0138 F5*04               311 	mov	___fs2uchar_sloc1_1_0,a
+   013A A3                  312 	inc	dptr
+   013B E0                  313 	movx	a,@dptr
+   013C F5*05               314 	mov	(___fs2uchar_sloc1_1_0 + 1),a
+   013E A3                  315 	inc	dptr
+   013F E0                  316 	movx	a,@dptr
+   0140 F5*06               317 	mov	(___fs2uchar_sloc1_1_0 + 2),a
+   0142 A3                  318 	inc	dptr
+   0143 E0                  319 	movx	a,@dptr
+   0144 F5*07               320 	mov	(___fs2uchar_sloc1_1_0 + 3),a
+   0146 85*00 F0            321 	mov	b,___fs2uchar_sloc0_1_0
+   0149 05 F0               322 	inc	b
+   014B E5*07               323 	mov	a,(___fs2uchar_sloc1_1_0 + 3)
+   014D 33                  324 	rlc	a
+   014E 92 D2               325 	mov	ov,c
+   0150 80 16               326 	sjmp	00127$
+   0152                     327 00126$:
+   0152 A2 D2               328 	mov	c,ov
+   0154 E5*07               329 	mov	a,(___fs2uchar_sloc1_1_0 + 3)
+   0156 13                  330 	rrc	a
+   0157 F5*07               331 	mov	(___fs2uchar_sloc1_1_0 + 3),a
+   0159 E5*06               332 	mov	a,(___fs2uchar_sloc1_1_0 + 2)
+   015B 13                  333 	rrc	a
+   015C F5*06               334 	mov	(___fs2uchar_sloc1_1_0 + 2),a
+   015E E5*05               335 	mov	a,(___fs2uchar_sloc1_1_0 + 1)
+   0160 13                  336 	rrc	a
+   0161 F5*05               337 	mov	(___fs2uchar_sloc1_1_0 + 1),a
+   0163 E5*04               338 	mov	a,___fs2uchar_sloc1_1_0
+   0165 13                  339 	rrc	a
+   0166 F5*04               340 	mov	___fs2uchar_sloc1_1_0,a
+   0168                     341 00127$:
+   0168 D5 F0 E7            342 	djnz	b,00126$
+   016B 90s00r0A            343 	mov	dptr,#___fs2uchar_l_1_1
+   016E E5*04               344 	mov	a,___fs2uchar_sloc1_1_0
+   0170 F0                  345 	movx	@dptr,a
+   0171 A3                  346 	inc	dptr
+   0172 E5*05               347 	mov	a,(___fs2uchar_sloc1_1_0 + 1)
+   0174 F0                  348 	movx	@dptr,a
+   0175 A3                  349 	inc	dptr
+   0176 E5*06               350 	mov	a,(___fs2uchar_sloc1_1_0 + 2)
+   0178 F0                  351 	movx	@dptr,a
+   0179 A3                  352 	inc	dptr
+   017A E5*07               353 	mov	a,(___fs2uchar_sloc1_1_0 + 3)
+   017C F0                  354 	movx	@dptr,a
+                            355 ; Peephole 132   changed ljmp to sjmp
+   017D 80 06               356 	sjmp 00107$
+   017F                     357 00106$:
+                            358 ;	_fs2uchar.c 94
+   017F 75 82 00            359 	mov	dpl,#0x00
+   0182 02s01rD0            360 	ljmp	00110$
+   0185                     361 00107$:
+                            362 ;	_fs2uchar.c 96
+   0185 90s00r04            363 	mov	dptr,#(___fs2uchar_fl1_1_1)
+   0188 E0                  364 	movx	a,@dptr
+   0189 F5*04               365 	mov	___fs2uchar_sloc1_1_0,a
+   018B A3                  366 	inc	dptr
+   018C E0                  367 	movx	a,@dptr
+   018D F5*05               368 	mov	(___fs2uchar_sloc1_1_0 + 1),a
+   018F A3                  369 	inc	dptr
+   0190 E0                  370 	movx	a,@dptr
+   0191 F5*06               371 	mov	(___fs2uchar_sloc1_1_0 + 2),a
+   0193 A3                  372 	inc	dptr
+   0194 E0                  373 	movx	a,@dptr
+                            374 ; Peephole 105   removed redundant mov
+   0195 F5*07               375 	mov  (___fs2uchar_sloc1_1_0 + 3),a
+   0197 23                  376 	rl	a
+   0198 54 01               377 	anl	a,#0x01
+                            378 ; Peephole 105   removed redundant mov
+   019A FA                  379 	mov  r2,a
+                            380 ; Peephole 110   removed ljmp by inverse jump logic
+   019B 60 1B               381 	jz  00112$
+   019D                     382 00128$:
+   019D 90s00r0A            383 	mov	dptr,#___fs2uchar_l_1_1
+   01A0 E0                  384 	movx	a,@dptr
+   01A1 F5*04               385 	mov	___fs2uchar_sloc1_1_0,a
+   01A3 A3                  386 	inc	dptr
+   01A4 E0                  387 	movx	a,@dptr
+   01A5 F5*05               388 	mov	(___fs2uchar_sloc1_1_0 + 1),a
+   01A7 A3                  389 	inc	dptr
+   01A8 E0                  390 	movx	a,@dptr
+   01A9 F5*06               391 	mov	(___fs2uchar_sloc1_1_0 + 2),a
+   01AB A3                  392 	inc	dptr
+   01AC E0                  393 	movx	a,@dptr
+   01AD F5*07               394 	mov	(___fs2uchar_sloc1_1_0 + 3),a
+   01AF AA*04               395 	mov	r2,___fs2uchar_sloc1_1_0
+   01B1 C3                  396 	clr	c
+   01B2 E4                  397 	clr	a
+   01B3 9A                  398 	subb	a,r2
+   01B4 F5*04               399 	mov	___fs2uchar_sloc1_1_0,a
+                            400 ; Peephole 132   changed ljmp to sjmp
+   01B6 80 15               401 	sjmp 00113$
+   01B8                     402 00112$:
+   01B8 90s00r0A            403 	mov	dptr,#___fs2uchar_l_1_1
+   01BB E0                  404 	movx	a,@dptr
+   01BC F5*00               405 	mov	___fs2uchar_sloc0_1_0,a
+   01BE A3                  406 	inc	dptr
+   01BF E0                  407 	movx	a,@dptr
+   01C0 F5*01               408 	mov	(___fs2uchar_sloc0_1_0 + 1),a
+   01C2 A3                  409 	inc	dptr
+   01C3 E0                  410 	movx	a,@dptr
+   01C4 F5*02               411 	mov	(___fs2uchar_sloc0_1_0 + 2),a
+   01C6 A3                  412 	inc	dptr
+   01C7 E0                  413 	movx	a,@dptr
+   01C8 F5*03               414 	mov	(___fs2uchar_sloc0_1_0 + 3),a
+   01CA 85*00*04            415 	mov	___fs2uchar_sloc1_1_0,___fs2uchar_sloc0_1_0
+   01CD                     416 00113$:
+   01CD 85*04 82            417 	mov	dpl,___fs2uchar_sloc1_1_0
+   01D0                     418 00110$:
+                    01D0    419 	C$_fs2uchar.c$97$1$1 ==.
+                    01D0    420 	XG$__fs2uchar$0$0 ==.
+   01D0 22                  421 	ret
+                            422 	.area	CSEG    (CODE)

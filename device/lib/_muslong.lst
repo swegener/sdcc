@@ -1,0 +1,254 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:32 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module _muslong
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl __mulslong_PARM_2
+                             11 	.globl __mulslong
+                             12 ;--------------------------------------------------------
+                             13 ; special function registers
+                             14 ;--------------------------------------------------------
+                             15 ;--------------------------------------------------------
+                             16 ; special function bits 
+                             17 ;--------------------------------------------------------
+                             18 ;--------------------------------------------------------
+                             19 ; internal ram data
+                             20 ;--------------------------------------------------------
+                             21 	.area	DSEG    (DATA)
+   0000                      22 __mulslong_sloc0_1_0:
+   0000                      23 	.ds	0x0004
+   0004                      24 __mulslong_sloc1_1_0:
+   0004                      25 	.ds	0x0004
+                             26 ;--------------------------------------------------------
+                             27 ; overlayable items in internal ram 
+                             28 ;--------------------------------------------------------
+                             29 	.area	OSEG	(OVR,DATA)
+                             30 ;--------------------------------------------------------
+                             31 ; indirectly addressable internal ram data
+                             32 ;--------------------------------------------------------
+                             33 	.area	ISEG    (DATA)
+                             34 ;--------------------------------------------------------
+                             35 ; bit data
+                             36 ;--------------------------------------------------------
+                             37 	.area	BSEG    (BIT)
+                             38 ;--------------------------------------------------------
+                             39 ; external ram data
+                             40 ;--------------------------------------------------------
+                             41 	.area	XSEG    (XDATA)
+   0000                      42 __mulslong_PARM_2:
+   0000                      43 	.ds	0x0004
+   0004                      44 __mulslong_a_1_1:
+   0004                      45 	.ds	0x0004
+                             46 ;--------------------------------------------------------
+                             47 ; global & static initialisations
+                             48 ;--------------------------------------------------------
+                             49 	.area GSINIT (CODE)
+                             50 ;--------------------------------------------------------
+                             51 ; code
+                             52 ;--------------------------------------------------------
+                             53 	.area CSEG (CODE)
+                    0000     54 	G$_mulslong$0$0 ==.
+                             55 ;	_muslong.c 24
+                             56 ;	-----------------------------------------
+                             57 ;	 function _mulslong
+                             58 ;	-----------------------------------------
+   0000                      59 __mulslong:
+                    0002     60 	ar2 = 0x02
+                    0003     61 	ar3 = 0x03
+                    0004     62 	ar4 = 0x04
+                    0005     63 	ar5 = 0x05
+                    0006     64 	ar6 = 0x06
+                    0007     65 	ar7 = 0x07
+                    0000     66 	ar0 = 0x00
+                    0001     67 	ar1 = 0x01
+                             68 ;	_muslong.c 0
+   0000 C0 E0                69 	push	acc
+   0002 C0 F0                70 	push	b
+   0004 C0 83                71 	push	dph
+   0006 C0 82                72 	push	dpl
+   0008 90s00r04             73 	mov	dptr,#__mulslong_a_1_1
+   000B D0 E0                74 	pop	acc
+   000D F0                   75 	movx	@dptr,a
+   000E D0 E0                76 	pop	acc
+   0010 A3                   77 	inc	dptr
+   0011 F0                   78 	movx	@dptr,a
+   0012 D0 E0                79 	pop	acc
+   0014 A3                   80 	inc	dptr
+   0015 F0                   81 	movx	@dptr,a
+   0016 D0 E0                82 	pop	acc
+   0018 A3                   83 	inc	dptr
+   0019 F0                   84 	movx	@dptr,a
+                             85 ;	_muslong.c 28
+   001A 90s00r04             86 	mov	dptr,#__mulslong_a_1_1
+   001D E0                   87 	movx	a,@dptr
+   001E FA                   88 	mov	r2,a
+   001F A3                   89 	inc	dptr
+   0020 E0                   90 	movx	a,@dptr
+   0021 FB                   91 	mov	r3,a
+   0022 A3                   92 	inc	dptr
+   0023 E0                   93 	movx	a,@dptr
+   0024 FC                   94 	mov	r4,a
+   0025 A3                   95 	inc	dptr
+   0026 E0                   96 	movx	a,@dptr
+                             97 ; Peephole 105   removed redundant mov
+   0027 FD                   98 	mov  r5,a
+                             99 ; Peephole 111   removed ljmp by inverse jump logic
+   0028 30 E7 0F            100 	jnb  acc.7,00106$
+   002B                     101 00113$:
+   002B C3                  102 	clr	c
+   002C E4                  103 	clr	a
+   002D 9A                  104 	subb	a,r2
+   002E FE                  105 	mov	r6,a
+   002F E4                  106 	clr	a
+   0030 9B                  107 	subb	a,r3
+   0031 FF                  108 	mov	r7,a
+   0032 E4                  109 	clr	a
+   0033 9C                  110 	subb	a,r4
+   0034 F8                  111 	mov	r0,a
+   0035 E4                  112 	clr	a
+   0036 9D                  113 	subb	a,r5
+   0037 F9                  114 	mov	r1,a
+                            115 ; Peephole 132   changed ljmp to sjmp
+   0038 80 08               116 	sjmp 00107$
+   003A                     117 00106$:
+   003A 8A 06               118 	mov	ar6,r2
+   003C 8B 07               119 	mov	ar7,r3
+   003E 8C 00               120 	mov	ar0,r4
+   0040 8D 01               121 	mov	ar1,r5
+   0042                     122 00107$:
+   0042 8E*00               123 	mov	__mulslong_sloc0_1_0,r6
+   0044 8F*01               124 	mov	(__mulslong_sloc0_1_0 + 1),r7
+   0046 88*02               125 	mov	(__mulslong_sloc0_1_0 + 2),r0
+   0048 89*03               126 	mov	(__mulslong_sloc0_1_0 + 3),r1
+                            127 ;	_muslong.c 29
+   004A 90s00r00            128 	mov	dptr,#__mulslong_PARM_2
+   004D E0                  129 	movx	a,@dptr
+   004E FE                  130 	mov	r6,a
+   004F A3                  131 	inc	dptr
+   0050 E0                  132 	movx	a,@dptr
+   0051 FF                  133 	mov	r7,a
+   0052 A3                  134 	inc	dptr
+   0053 E0                  135 	movx	a,@dptr
+   0054 F8                  136 	mov	r0,a
+   0055 A3                  137 	inc	dptr
+   0056 E0                  138 	movx	a,@dptr
+                            139 ; Peephole 105   removed redundant mov
+   0057 F9                  140 	mov  r1,a
+   0058 33                  141 	rlc	a
+   0059 E4                  142 	clr	a
+   005A 33                  143 	rlc	a
+                            144 ; Peephole 105   removed redundant mov
+   005B FA                  145 	mov  r2,a
+                            146 ; Peephole 110   removed ljmp by inverse jump logic
+   005C 60 13               147 	jz  00108$
+   005E                     148 00114$:
+   005E C3                  149 	clr	c
+   005F E4                  150 	clr	a
+   0060 9E                  151 	subb	a,r6
+   0061 F5*04               152 	mov	__mulslong_sloc1_1_0,a
+   0063 E4                  153 	clr	a
+   0064 9F                  154 	subb	a,r7
+   0065 F5*05               155 	mov	(__mulslong_sloc1_1_0 + 1),a
+   0067 E4                  156 	clr	a
+   0068 98                  157 	subb	a,r0
+   0069 F5*06               158 	mov	(__mulslong_sloc1_1_0 + 2),a
+   006B E4                  159 	clr	a
+   006C 99                  160 	subb	a,r1
+   006D F5*07               161 	mov	(__mulslong_sloc1_1_0 + 3),a
+                            162 ; Peephole 132   changed ljmp to sjmp
+   006F 80 08               163 	sjmp 00109$
+   0071                     164 00108$:
+   0071 8E*04               165 	mov	__mulslong_sloc1_1_0,r6
+   0073 8F*05               166 	mov	(__mulslong_sloc1_1_0 + 1),r7
+   0075 88*06               167 	mov	(__mulslong_sloc1_1_0 + 2),r0
+   0077 89*07               168 	mov	(__mulslong_sloc1_1_0 + 3),r1
+   0079                     169 00109$:
+   0079 90s00r00            170 	mov	dptr,#__mululong_PARM_2
+   007C E5*04               171 	mov	a,__mulslong_sloc1_1_0
+   007E F0                  172 	movx	@dptr,a
+   007F A3                  173 	inc	dptr
+   0080 E5*05               174 	mov	a,(__mulslong_sloc1_1_0 + 1)
+   0082 F0                  175 	movx	@dptr,a
+   0083 A3                  176 	inc	dptr
+   0084 E5*06               177 	mov	a,(__mulslong_sloc1_1_0 + 2)
+   0086 F0                  178 	movx	@dptr,a
+   0087 A3                  179 	inc	dptr
+   0088 E5*07               180 	mov	a,(__mulslong_sloc1_1_0 + 3)
+   008A F0                  181 	movx	@dptr,a
+   008B C0 02               182 	push	ar2
+   008D 85*00 82            183 	mov	dpl,__mulslong_sloc0_1_0
+   0090 85*01 83            184 	mov	dph,(__mulslong_sloc0_1_0 + 1)
+   0093 85*02 F0            185 	mov	b,(__mulslong_sloc0_1_0 + 2)
+   0096 E5*03               186 	mov	a,(__mulslong_sloc0_1_0 + 3)
+   0098 12s00r00            187 	lcall	__mululong
+   009B AB 82               188 	mov	r3,dpl
+   009D AC 83               189 	mov	r4,dph
+   009F AD F0               190 	mov	r5,b
+   00A1 FE                  191 	mov	r6,a
+   00A2 D0 02               192 	pop	ar2
+                            193 ;	_muslong.c 31
+   00A4 C0 03               194 	push	ar3
+   00A6 C0 04               195 	push	ar4
+   00A8 C0 05               196 	push	ar5
+   00AA C0 06               197 	push	ar6
+   00AC 90s00r04            198 	mov	dptr,#__mulslong_a_1_1
+   00AF E0                  199 	movx	a,@dptr
+   00B0 FF                  200 	mov	r7,a
+   00B1 A3                  201 	inc	dptr
+   00B2 E0                  202 	movx	a,@dptr
+   00B3 F8                  203 	mov	r0,a
+   00B4 A3                  204 	inc	dptr
+   00B5 E0                  205 	movx	a,@dptr
+   00B6 F9                  206 	mov	r1,a
+   00B7 A3                  207 	inc	dptr
+   00B8 E0                  208 	movx	a,@dptr
+                            209 ; Peephole 105   removed redundant mov
+   00B9 FB                  210 	mov  r3,a
+   00BA 33                  211 	rlc	a
+   00BB E4                  212 	clr	a
+   00BC 33                  213 	rlc	a
+   00BD FF                  214 	mov	r7,a
+   00BE EA                  215 	mov	a,r2
+   00BF 65 07               216 	xrl	a,ar7
+   00C1 D0 06               217 	pop	ar6
+   00C3 D0 05               218 	pop	ar5
+   00C5 D0 04               219 	pop	ar4
+   00C7 D0 03               220 	pop	ar3
+                            221 ; Peephole 110   removed ljmp by inverse jump logic
+   00C9 60 1C               222 	jz  00102$
+   00CB                     223 00115$:
+                            224 ;	_muslong.c 32
+   00CB C3                  225 	clr	c
+   00CC E4                  226 	clr	a
+   00CD 9B                  227 	subb	a,r3
+   00CE F5*04               228 	mov	__mulslong_sloc1_1_0,a
+   00D0 E4                  229 	clr	a
+   00D1 9C                  230 	subb	a,r4
+   00D2 F5*05               231 	mov	(__mulslong_sloc1_1_0 + 1),a
+   00D4 E4                  232 	clr	a
+   00D5 9D                  233 	subb	a,r5
+   00D6 F5*06               234 	mov	(__mulslong_sloc1_1_0 + 2),a
+   00D8 E4                  235 	clr	a
+   00D9 9E                  236 	subb	a,r6
+                            237 ; Peephole 191   removed redundant mov
+   00DA F5*07               238 	mov  (__mulslong_sloc1_1_0 + 3),a
+   00DC 85*04 82            239 	mov  dpl,__mulslong_sloc1_1_0
+   00DF 85*05 83            240 	mov  dph,(__mulslong_sloc1_1_0 + 1)
+   00E2 85*06 F0            241 	mov  b,(__mulslong_sloc1_1_0 + 2)
+                            242 ; Peephole 132   changed ljmp to sjmp
+   00E5 80 07               243 	sjmp 00104$
+   00E7                     244 00102$:
+                            245 ;	_muslong.c 34
+   00E7 8B 82               246 	mov	dpl,r3
+   00E9 8C 83               247 	mov	dph,r4
+   00EB 8D F0               248 	mov	b,r5
+   00ED EE                  249 	mov	a,r6
+   00EE                     250 00104$:
+                    00EE    251 	C$_muslong.c$35$1$1 ==.
+                    00EE    252 	XG$_mulslong$0$0 ==.
+   00EE 22                  253 	ret
+                            254 	.area	CSEG    (CODE)

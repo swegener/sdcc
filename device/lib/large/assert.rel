@@ -1,0 +1,113 @@
+;!FILE assert.asm
+XH
+H 8 areas 3B global symbols
+M assert
+S _printf Ref0000
+A _CODE size 0 flags 0
+A DSEG size 0 flags 0
+A OSEG size 0 flags 4
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 8 flags 40
+S __assert_PARM_2 Def0000
+S __assert_PARM_3 Def0003
+A GSINIT size 0 flags 20
+A CSEG size 7F flags 20
+S Fassert$_str_0$0$0 Def0055
+S A$assert$110 Def0039
+S A$assert$101 Def002D
+S A$assert$120 Def0049
+S A$assert$111 Def003A
+S A$assert$102 Def002F
+S A$assert$121 Def004C
+S A$assert$103 Def0030
+S A$assert$131 Def0054
+S A$assert$122 Def004E
+S A$assert$113 Def003B
+S __assert Def0000
+S A$assert$123 Def0050
+S A$assert$114 Def003D
+S A$assert$105 Def0031
+S A$assert$115 Def003F
+S A$assert$106 Def0033
+S A$assert$116 Def0041
+S A$assert$107 Def0036
+S A$assert$117 Def0043
+S A$assert$127 Def0052
+S A$assert$118 Def0045
+S A$assert$109 Def0037
+S A$assert$119 Def0047
+S XG$_assert$0$0 Def0054
+S A$assert$70 Def0004
+S A$assert$71 Def0006
+S A$assert$81 Def0014
+S A$assert$72 Def0009
+S G$_assert$0$0 Def0000
+S A$assert$91 Def001F
+S A$assert$82 Def0017
+S A$assert$73 Def000B
+S A$assert$92 Def0021
+S A$assert$83 Def0018
+S A$assert$74 Def000C
+S A$assert$93 Def0023
+S A$assert$84 Def0019
+S A$assert$75 Def000E
+S A$assert$94 Def0025
+S A$assert$85 Def001A
+S A$assert$76 Def000F
+S A$assert$95 Def0028
+S A$assert$86 Def001B
+S A$assert$77 Def0010
+S A$assert$68 Def0000
+S A$assert$87 Def001C
+S A$assert$78 Def0012
+S A$assert$69 Def0002
+S A$assert$97 Def0029
+S A$assert$88 Def001D
+S A$assert$79 Def0013
+S A$assert$98 Def002B
+S A$assert$89 Def001E
+S A$assert$99 Def002C
+S C$assert.c$9$1$1 Def0054
+T 00 00
+R 00 00 00 05
+T 00 00
+R 00 00 00 05
+T 00 03
+R 00 00 00 05
+T 00 03
+R 00 00 00 05
+T 00 05
+R 00 00 00 05
+T 00 05
+R 00 00 00 05
+T 00 00
+R 00 00 00 07
+T 00 00 C0 F0 C0 83 C0 82 90 00 05 D0 E0 F0 D0 E0
+R 00 00 00 07 00 09 00 05
+T 00 0E A3 F0 D0 E0 A3 F0 90 00 05 E0 FA A3 E0 FB
+R 00 00 00 07 00 09 00 05
+T 00 1C A3 E0 FC 7D 00 55 7E 00 55 7F 02 90 00 00
+R 00 00 00 07 09 06 00 07 89 09 00 07 00 0E 00 05
+T 00 28 E0 C0 E0 A3 E0 C0 E0 A3 E0 C0 E0 90 00 03
+R 00 00 00 07 00 0E 00 05
+T 00 36 E0 C0 E0 A3 E0 C0 E0 C0 05 C0 06 C0 07 8A
+R 00 00 00 07
+T 00 44 82 8B 83 8C F0 12 00 00 E5 81 24 FA F5 81
+R 00 00 00 07 02 08 00 00
+T 00 52
+R 00 00 00 07
+T 00 52 80 FE
+R 00 00 00 07
+T 00 54
+R 00 00 00 07
+T 00 54 22
+R 00 00 00 07
+T 00 55
+R 00 00 00 07
+T 00 55 41 73 73 65 72 74 28 25 73 29 20 66 61 69
+R 00 00 00 07
+T 00 63 6C 65 64 20 61 74 20 6C 69 6E 65 20 25 75
+R 00 00 00 07
+T 00 71 20 69 6E 20 66 69 6C 65 20 25 73 2E 0A 00
+R 00 00 00 07

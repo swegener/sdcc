@@ -1,0 +1,215 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:23 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module _divuint
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl __divuint_PARM_2
+                             11 	.globl __divuint
+                             12 ;--------------------------------------------------------
+                             13 ; special function registers
+                             14 ;--------------------------------------------------------
+                             15 ;--------------------------------------------------------
+                             16 ; special function bits 
+                             17 ;--------------------------------------------------------
+                             18 ;--------------------------------------------------------
+                             19 ; internal ram data
+                             20 ;--------------------------------------------------------
+                             21 	.area	DSEG    (DATA)
+                             22 ;--------------------------------------------------------
+                             23 ; overlayable items in internal ram 
+                             24 ;--------------------------------------------------------
+                             25 	.area	OSEG	(OVR,DATA)
+                             26 ;--------------------------------------------------------
+                             27 ; indirectly addressable internal ram data
+                             28 ;--------------------------------------------------------
+                             29 	.area	ISEG    (DATA)
+                             30 ;--------------------------------------------------------
+                             31 ; bit data
+                             32 ;--------------------------------------------------------
+                             33 	.area	BSEG    (BIT)
+   0000                      34 __divuint_c_1_1:
+   0000                      35 	.ds	0x0001
+                             36 ;--------------------------------------------------------
+                             37 ; external ram data
+                             38 ;--------------------------------------------------------
+                             39 	.area	XSEG    (XDATA)
+   0000                      40 __divuint_PARM_2:
+   0000                      41 	.ds	0x0002
+   0002                      42 __divuint_a_1_1:
+   0002                      43 	.ds	0x0002
+   0004                      44 __divuint_reste_1_1:
+   0004                      45 	.ds	0x0002
+   0006                      46 __divuint_count_1_1:
+   0006                      47 	.ds	0x0001
+                             48 ;--------------------------------------------------------
+                             49 ; global & static initialisations
+                             50 ;--------------------------------------------------------
+                             51 	.area GSINIT (CODE)
+                             52 ;--------------------------------------------------------
+                             53 ; code
+                             54 ;--------------------------------------------------------
+                             55 	.area CSEG (CODE)
+                    0000     56 	G$_divuint$0$0 ==.
+                             57 ;	_divuint.c 28
+                             58 ;	-----------------------------------------
+                             59 ;	 function _divuint
+                             60 ;	-----------------------------------------
+   0000                      61 __divuint:
+                    0002     62 	ar2 = 0x02
+                    0003     63 	ar3 = 0x03
+                    0004     64 	ar4 = 0x04
+                    0005     65 	ar5 = 0x05
+                    0006     66 	ar6 = 0x06
+                    0007     67 	ar7 = 0x07
+                    0000     68 	ar0 = 0x00
+                    0001     69 	ar1 = 0x01
+                             70 ;	_divuint.c 49
+   0000 C0 83                71 	push	dph
+   0002 C0 82                72 	push	dpl
+   0004 90s00r02             73 	mov	dptr,#__divuint_a_1_1
+   0007 D0 E0                74 	pop	acc
+   0009 F0                   75 	movx	@dptr,a
+   000A D0 E0                76 	pop	acc
+   000C A3                   77 	inc	dptr
+   000D F0                   78 	movx	@dptr,a
+                             79 ;	_divuint.c 30
+   000E 90s00r04             80 	mov	dptr,#__divuint_reste_1_1
+   0011 E4                   81 	clr	a
+   0012 A3                   82 	inc	dptr
+   0013 F0                   83 	movx	@dptr,a
+   0014 12s00r00             84 	lcall	__decdptr
+   0017 F0                   85 	movx	@dptr,a
+                             86 ;	_divuint.c 31
+   0018 90s00r06             87 	mov	dptr,#__divuint_count_1_1
+   001B 74 10                88 	mov	a,#0x10
+   001D F0                   89 	movx	@dptr,a
+                             90 ;	_divuint.c 34
+   001E 90s00r00             91 	mov	dptr,#__divuint_PARM_2
+   0021 E0                   92 	movx	a,@dptr
+   0022 FA                   93 	mov	r2,a
+   0023 A3                   94 	inc	dptr
+   0024 E0                   95 	movx	a,@dptr
+   0025 FB                   96 	mov	r3,a
+   0026                      97 00105$:
+                             98 ;	_divuint.c 36
+   0026 90s00r02             99 	mov	dptr,#__divuint_a_1_1
+   0029 E0                  100 	movx	a,@dptr
+   002A FC                  101 	mov	r4,a
+   002B A3                  102 	inc	dptr
+   002C E0                  103 	movx	a,@dptr
+                            104 ; Peephole 105   removed redundant mov
+   002D FD                  105 	mov  r5,a
+   002E 23                  106 	rl	a
+   002F 54 01               107 	anl	a,#0x01
+   0031 FE                  108 	mov	r6,a
+                            109 ;	_divuint.c 37
+   0032 ED                  110 	mov	a,r5
+   0033 CC                  111 	xch	a,r4
+   0034 25 E0               112 	add	a,acc
+   0036 CC                  113 	xch	a,r4
+   0037 33                  114 	rlc	a
+   0038 FD                  115 	mov	r5,a
+   0039 90s00r02            116 	mov	dptr,#__divuint_a_1_1
+   003C EC                  117 	mov	a,r4
+   003D F0                  118 	movx	@dptr,a
+   003E A3                  119 	inc	dptr
+   003F ED                  120 	mov	a,r5
+   0040 F0                  121 	movx	@dptr,a
+                            122 ;	_divuint.c 38
+   0041 90s00r04            123 	mov	dptr,#__divuint_reste_1_1
+   0044 E0                  124 	movx	a,@dptr
+   0045 FF                  125 	mov	r7,a
+   0046 A3                  126 	inc	dptr
+   0047 E0                  127 	movx	a,@dptr
+                            128 ; Peephole 105   removed redundant mov
+   0048 F8                  129 	mov  r0,a
+   0049 CF                  130 	xch	a,r7
+   004A 25 E0               131 	add	a,acc
+   004C CF                  132 	xch	a,r7
+   004D 33                  133 	rlc	a
+   004E F8                  134 	mov	r0,a
+   004F 90s00r04            135 	mov	dptr,#__divuint_reste_1_1
+   0052 EF                  136 	mov	a,r7
+   0053 F0                  137 	movx	@dptr,a
+   0054 A3                  138 	inc	dptr
+   0055 E8                  139 	mov	a,r0
+   0056 F0                  140 	movx	@dptr,a
+                            141 ;	_divuint.c 39
+   0057 EE                  142 	mov	a,r6
+                            143 ; Peephole 110   removed ljmp by inverse jump logic
+   0058 60 0A               144 	jz  00102$
+   005A                     145 00114$:
+                            146 ;	_divuint.c 40
+   005A 90s00r04            147 	mov	dptr,#__divuint_reste_1_1
+   005D 74 01               148 	mov	a,#0x01
+   005F 4F                  149 	orl	a,r7
+   0060 F0                  150 	movx	@dptr,a
+   0061 A3                  151 	inc	dptr
+   0062 E8                  152 	mov	a,r0
+   0063 F0                  153 	movx	@dptr,a
+   0064                     154 00102$:
+                            155 ;	_divuint.c 42
+   0064 90s00r04            156 	mov	dptr,#__divuint_reste_1_1
+   0067 E0                  157 	movx	a,@dptr
+   0068 FE                  158 	mov	r6,a
+   0069 A3                  159 	inc	dptr
+   006A E0                  160 	movx	a,@dptr
+   006B FF                  161 	mov	r7,a
+   006C C3                  162 	clr	c
+   006D EE                  163 	mov	a,r6
+   006E 9A                  164 	subb	a,r2
+   006F EF                  165 	mov	a,r7
+   0070 9B                  166 	subb	a,r3
+                            167 ; Peephole 132   changed ljmp to sjmp
+                            168 ; Peephole 160   removed sjmp by inverse jump logic
+   0071 40 15               169 	jc   00106$
+   0073                     170 00115$:
+                            171 ;	_divuint.c 43
+   0073 90s00r04            172 	mov	dptr,#__divuint_reste_1_1
+   0076 C3                  173 	clr	c
+   0077 EE                  174 	mov	a,r6
+   0078 9A                  175 	subb	a,r2
+   0079 F0                  176 	movx	@dptr,a
+   007A EF                  177 	mov	a,r7
+   007B 9B                  178 	subb	a,r3
+   007C A3                  179 	inc	dptr
+   007D F0                  180 	movx	@dptr,a
+                            181 ;	_divuint.c 45
+   007E 90s00r02            182 	mov	dptr,#__divuint_a_1_1
+   0081 74 01               183 	mov	a,#0x01
+   0083 4C                  184 	orl	a,r4
+   0084 F0                  185 	movx	@dptr,a
+   0085 A3                  186 	inc	dptr
+   0086 ED                  187 	mov	a,r5
+   0087 F0                  188 	movx	@dptr,a
+   0088                     189 00106$:
+                            190 ;	_divuint.c 47
+   0088 90s00r06            191 	mov	dptr,#__divuint_count_1_1
+   008B E0                  192 	movx	a,@dptr
+   008C 24 FF               193 	add	a,#0xff
+                            194 ; Peephole 100   removed redundant mov
+   008E FC                  195 	mov  r4,a
+   008F 90s00r06            196 	mov  dptr,#__divuint_count_1_1
+   0092 F0                  197 	movx @dptr,a
+   0093 EC                  198 	mov	a,r4
+   0094 60 03               199 	jz	00116$
+   0096 02s00r26            200 	ljmp	00105$
+   0099                     201 00116$:
+                            202 ;	_divuint.c 49
+   0099 90s00r02            203 	mov	dptr,#__divuint_a_1_1
+   009C E0                  204 	movx	a,@dptr
+   009D FA                  205 	mov	r2,a
+   009E A3                  206 	inc	dptr
+   009F E0                  207 	movx	a,@dptr
+   00A0 FB                  208 	mov	r3,a
+   00A1 8A 82               209 	mov	dpl,r2
+   00A3 8B 83               210 	mov	dph,r3
+   00A5                     211 00108$:
+                    00A5    212 	C$_divuint.c$50$1$1 ==.
+                    00A5    213 	XG$_divuint$0$0 ==.
+   00A5 22                  214 	ret
+                            215 	.area	CSEG    (CODE)

@@ -1,0 +1,129 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:29 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module _isxdigit
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl _isxdigit
+                             11 ;--------------------------------------------------------
+                             12 ; special function registers
+                             13 ;--------------------------------------------------------
+                             14 ;--------------------------------------------------------
+                             15 ; special function bits 
+                             16 ;--------------------------------------------------------
+                             17 ;--------------------------------------------------------
+                             18 ; internal ram data
+                             19 ;--------------------------------------------------------
+                             20 	.area	DSEG    (DATA)
+                             21 ;--------------------------------------------------------
+                             22 ; overlayable items in internal ram 
+                             23 ;--------------------------------------------------------
+                             24 	.area	OSEG	(OVR,DATA)
+                             25 ;--------------------------------------------------------
+                             26 ; indirectly addressable internal ram data
+                             27 ;--------------------------------------------------------
+                             28 	.area	ISEG    (DATA)
+                             29 ;--------------------------------------------------------
+                             30 ; bit data
+                             31 ;--------------------------------------------------------
+                             32 	.area	BSEG    (BIT)
+                             33 ;--------------------------------------------------------
+                             34 ; external ram data
+                             35 ;--------------------------------------------------------
+                             36 	.area	XSEG    (XDATA)
+   0000                      37 _isxdigit_c_1_1:
+   0000                      38 	.ds	0x0001
+                             39 ;--------------------------------------------------------
+                             40 ; global & static initialisations
+                             41 ;--------------------------------------------------------
+                             42 	.area GSINIT (CODE)
+                             43 ;--------------------------------------------------------
+                             44 ; code
+                             45 ;--------------------------------------------------------
+                             46 	.area CSEG (CODE)
+                    0000     47 	G$isxdigit$0$0 ==.
+                             48 ;	_isxdigit.c 24
+                             49 ;	-----------------------------------------
+                             50 ;	 function isxdigit
+                             51 ;	-----------------------------------------
+   0000                      52 _isxdigit:
+                    0002     53 	ar2 = 0x02
+                    0003     54 	ar3 = 0x03
+                    0004     55 	ar4 = 0x04
+                    0005     56 	ar5 = 0x05
+                    0006     57 	ar6 = 0x06
+                    0007     58 	ar7 = 0x07
+                    0000     59 	ar0 = 0x00
+                    0001     60 	ar1 = 0x01
+                             61 ;	_isxdigit.c 31
+   0000 C0 82                62 	push	dpl
+   0002 90s00r00             63 	mov	dptr,#_isxdigit_c_1_1
+   0005 D0 E0                64 	pop	acc
+   0007 F0                   65 	movx	@dptr,a
+                             66 ;	_isxdigit.c 27
+   0008 90s00r00             67 	mov	dptr,#_isxdigit_c_1_1
+   000B E0                   68 	movx	a,@dptr
+   000C FA                   69 	mov	r2,a
+   000D BA 30 00             70 	cjne	r2,#0x30,00113$
+   0010                      71 00113$:
+                             72 ; Peephole 132   changed ljmp to sjmp
+                             73 ; Peephole 160   removed sjmp by inverse jump logic
+   0010 40 06                74 	jc   00105$
+   0012                      75 00114$:
+   0012 C3                   76 	clr	c
+   0013 74 39                77 	mov	a,#0x39
+   0015 9A                   78 	subb	a,r2
+                             79 ; Peephole 108   removed ljmp by inverse jump logic
+   0016 50 20                80 	jnc  00101$
+   0018                      81 00115$:
+   0018                      82 00105$:
+                             83 ;	_isxdigit.c 28
+   0018 90s00r00             84 	mov	dptr,#_isxdigit_c_1_1
+   001B E0                   85 	movx	a,@dptr
+   001C FA                   86 	mov	r2,a
+   001D BA 61 00             87 	cjne	r2,#0x61,00116$
+   0020                      88 00116$:
+                             89 ; Peephole 132   changed ljmp to sjmp
+                             90 ; Peephole 160   removed sjmp by inverse jump logic
+   0020 40 06                91 	jc   00107$
+   0022                      92 00117$:
+   0022 C3                   93 	clr	c
+   0023 74 66                94 	mov	a,#0x66
+   0025 9A                   95 	subb	a,r2
+                             96 ; Peephole 108   removed ljmp by inverse jump logic
+   0026 50 10                97 	jnc  00101$
+   0028                      98 00118$:
+   0028                      99 00107$:
+                            100 ;	_isxdigit.c 29
+   0028 90s00r00            101 	mov	dptr,#_isxdigit_c_1_1
+   002B E0                  102 	movx	a,@dptr
+   002C FA                  103 	mov	r2,a
+   002D BA 41 00            104 	cjne	r2,#0x41,00119$
+   0030                     105 00119$:
+                            106 ; Peephole 132   changed ljmp to sjmp
+                            107 ; Peephole 160   removed sjmp by inverse jump logic
+   0030 40 0B               108 	jc   00102$
+   0032                     109 00120$:
+   0032 C3                  110 	clr	c
+   0033 74 46               111 	mov	a,#0x46
+   0035 9A                  112 	subb	a,r2
+                            113 ; Peephole 132   changed ljmp to sjmp
+                            114 ; Peephole 160   removed sjmp by inverse jump logic
+   0036 40 05               115 	jc   00102$
+   0038                     116 00121$:
+   0038                     117 00101$:
+                            118 ;	_isxdigit.c 30
+   0038 75 82 01            119 	mov	dpl,#0x01
+                            120 ; Peephole 132   changed ljmp to sjmp
+   003B 80 03               121 	sjmp 00108$
+   003D                     122 00102$:
+                            123 ;	_isxdigit.c 31
+   003D 75 82 00            124 	mov	dpl,#0x00
+   0040                     125 00108$:
+                    0040    126 	C$_isxdigit.c$33$1$1 ==.
+                    0040    127 	XG$isxdigit$0$0 ==.
+   0040 22                  128 	ret
+                            129 	.area	CSEG    (CODE)

@@ -1,0 +1,334 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:34 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module _uchar2fs
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl ___uchar2fs
+                             11 ;--------------------------------------------------------
+                             12 ; special function registers
+                             13 ;--------------------------------------------------------
+                             14 ;--------------------------------------------------------
+                             15 ; special function bits 
+                             16 ;--------------------------------------------------------
+                             17 ;--------------------------------------------------------
+                             18 ; internal ram data
+                             19 ;--------------------------------------------------------
+                             20 	.area	DSEG    (DATA)
+   0000                      21 ___uchar2fs_sloc0_1_0:
+   0000                      22 	.ds	0x0002
+   0002                      23 ___uchar2fs_sloc1_1_0:
+   0002                      24 	.ds	0x0004
+                             25 ;--------------------------------------------------------
+                             26 ; overlayable items in internal ram 
+                             27 ;--------------------------------------------------------
+                             28 	.area	OSEG	(OVR,DATA)
+                             29 ;--------------------------------------------------------
+                             30 ; indirectly addressable internal ram data
+                             31 ;--------------------------------------------------------
+                             32 	.area	ISEG    (DATA)
+                             33 ;--------------------------------------------------------
+                             34 ; bit data
+                             35 ;--------------------------------------------------------
+                             36 	.area	BSEG    (BIT)
+                             37 ;--------------------------------------------------------
+                             38 ; external ram data
+                             39 ;--------------------------------------------------------
+                             40 	.area	XSEG    (XDATA)
+   0000                      41 ___uchar2fs_a_1_1:
+   0000                      42 	.ds	0x0001
+   0001                      43 ___uchar2fs_sign_1_1:
+   0001                      44 	.ds	0x0004
+   0005                      45 ___uchar2fs_fl_1_1:
+   0005                      46 	.ds	0x0004
+   0009                      47 ___uchar2fs_a1_1_1:
+   0009                      48 	.ds	0x0004
+                             49 ;--------------------------------------------------------
+                             50 ; global & static initialisations
+                             51 ;--------------------------------------------------------
+                             52 	.area GSINIT (CODE)
+                             53 ;--------------------------------------------------------
+                             54 ; code
+                             55 ;--------------------------------------------------------
+                             56 	.area CSEG (CODE)
+                    0000     57 	G$__uchar2fs$0$0 ==.
+                             58 ;	_uchar2fs.c 80
+                             59 ;	-----------------------------------------
+                             60 ;	 function __uchar2fs
+                             61 ;	-----------------------------------------
+   0000                      62 ___uchar2fs:
+                    0002     63 	ar2 = 0x02
+                    0003     64 	ar3 = 0x03
+                    0004     65 	ar4 = 0x04
+                    0005     66 	ar5 = 0x05
+                    0006     67 	ar6 = 0x06
+                    0007     68 	ar7 = 0x07
+                    0000     69 	ar0 = 0x00
+                    0001     70 	ar1 = 0x01
+                             71 ;	_uchar2fs.c 109
+   0000 C0 82                72 	push	dpl
+   0002 90s00r00             73 	mov	dptr,#___uchar2fs_a_1_1
+   0005 D0 E0                74 	pop	acc
+   0007 F0                   75 	movx	@dptr,a
+                             76 ;	_uchar2fs.c 82
+   0008 90s00r01             77 	mov	dptr,#___uchar2fs_sign_1_1
+   000B E4                   78 	clr	a
+   000C A3                   79 	inc	dptr
+   000D A3                   80 	inc	dptr
+   000E A3                   81 	inc	dptr
+   000F F0                   82 	movx	@dptr,a
+   0010 12s00r00             83 	lcall	__decdptr
+   0013 F0                   84 	movx	@dptr,a
+   0014 12s00r00             85 	lcall	__decdptr
+   0017 F0                   86 	movx	@dptr,a
+   0018 12s00r00             87 	lcall	__decdptr
+   001B F0                   88 	movx	@dptr,a
+                             89 ;	_uchar2fs.c 85
+   001C 90s00r00             90 	mov	dptr,#___uchar2fs_a_1_1
+   001F E0                   91 	movx	a,@dptr
+                             92 ; Peephole 105   removed redundant mov
+   0020 FA                   93 	mov  r2,a
+   0021 33                   94 	rlc	a
+   0022 95 E0                95 	subb	a,acc
+   0024 FB                   96 	mov	r3,a
+   0025 FC                   97 	mov	r4,a
+   0026 FD                   98 	mov	r5,a
+   0027 90s00r09             99 	mov	dptr,#___uchar2fs_a1_1_1
+   002A EA                  100 	mov	a,r2
+   002B F0                  101 	movx	@dptr,a
+   002C A3                  102 	inc	dptr
+   002D EB                  103 	mov	a,r3
+   002E F0                  104 	movx	@dptr,a
+   002F A3                  105 	inc	dptr
+   0030 EC                  106 	mov	a,r4
+   0031 F0                  107 	movx	@dptr,a
+   0032 A3                  108 	inc	dptr
+   0033 ED                  109 	mov	a,r5
+   0034 F0                  110 	movx	@dptr,a
+                            111 ;	_uchar2fs.c 87
+   0035 EA                  112 	mov	a,r2
+   0036 4B                  113 	orl	a,r3
+   0037 4C                  114 	orl	a,r4
+   0038 4D                  115 	orl	a,r5
+                            116 ; Peephole 109   removed ljmp by inverse jump logic
+   0039 70 23               117 	jnz  00102$
+   003B                     118 00114$:
+                            119 ;	_uchar2fs.c 89
+   003B 90s00r05            120 	mov	dptr,#(___uchar2fs_fl_1_1)
+                            121 ; Peephole 101   removed redundant mov
+                            122 ; Peephole 180   changed mov to clr
+   003E E4                  123 	clr  a
+   003F F0                  124 	movx @dptr,a
+   0040 A3                  125 	inc  dptr
+   0041 F0                  126 	movx @dptr,a
+   0042 A3                  127 	inc	dptr
+                            128 ; Peephole 101   removed redundant mov
+                            129 ; Peephole 180   changed mov to clr
+   0043 E4                  130 	clr  a
+   0044 F0                  131 	movx @dptr,a
+   0045 A3                  132 	inc  dptr
+   0046 F0                  133 	movx @dptr,a
+                            134 ;	_uchar2fs.c 90
+   0047 90s00r05            135 	mov	dptr,#(___uchar2fs_fl_1_1)
+   004A E0                  136 	movx	a,@dptr
+   004B FE                  137 	mov	r6,a
+   004C A3                  138 	inc	dptr
+   004D E0                  139 	movx	a,@dptr
+   004E FF                  140 	mov	r7,a
+   004F A3                  141 	inc	dptr
+   0050 E0                  142 	movx	a,@dptr
+   0051 F8                  143 	mov	r0,a
+   0052 A3                  144 	inc	dptr
+   0053 E0                  145 	movx	a,@dptr
+                            146 ; Peephole 191   removed redundant mov
+   0054 F9                  147 	mov  r1,a
+   0055 8E 82               148 	mov  dpl,r6
+   0057 8F 83               149 	mov  dph,r7
+   0059 88 F0               150 	mov  b,r0
+   005B 02s01r3B            151 	ljmp	00108$
+   005E                     152 00102$:
+                            153 ;	_uchar2fs.c 93
+   005E ED                  154 	mov	a,r5
+                            155 ; Peephole 111   removed ljmp by inverse jump logic
+   005F 30 E7 21            156 	jnb  acc.7,00113$
+   0062                     157 00115$:
+                            158 ;	_uchar2fs.c 95
+   0062 90s00r01            159 	mov	dptr,#___uchar2fs_sign_1_1
+                            160 ; Peephole 101   removed redundant mov
+                            161 ; Peephole 180   changed mov to clr
+   0065 E4                  162 	clr  a
+   0066 F0                  163 	movx @dptr,a
+   0067 A3                  164 	inc  dptr
+   0068 F0                  165 	movx @dptr,a
+   0069 A3                  166 	inc	dptr
+                            167 ; Peephole 180   changed mov to clr
+   006A E4                  168 	clr  a
+   006B F0                  169 	movx	@dptr,a
+   006C A3                  170 	inc	dptr
+   006D 74 80               171 	mov	a,#0x80
+   006F F0                  172 	movx	@dptr,a
+                            173 ;	_uchar2fs.c 96
+   0070 90s00r09            174 	mov	dptr,#___uchar2fs_a1_1_1
+   0073 C3                  175 	clr	c
+   0074 E4                  176 	clr	a
+   0075 9A                  177 	subb	a,r2
+   0076 F0                  178 	movx	@dptr,a
+   0077 E4                  179 	clr	a
+   0078 9B                  180 	subb	a,r3
+   0079 A3                  181 	inc	dptr
+   007A F0                  182 	movx	@dptr,a
+   007B E4                  183 	clr	a
+   007C 9C                  184 	subb	a,r4
+   007D A3                  185 	inc	dptr
+   007E F0                  186 	movx	@dptr,a
+   007F E4                  187 	clr	a
+   0080 9D                  188 	subb	a,r5
+   0081 A3                  189 	inc	dptr
+   0082 F0                  190 	movx	@dptr,a
+                            191 ;	_uchar2fs.c 99
+   0083                     192 00113$:
+   0083 E4                  193 	clr	a
+   0084 F5*01               194 	mov	(___uchar2fs_sloc0_1_0 + 1),a
+   0086 75*00 96            195 	mov	___uchar2fs_sloc0_1_0,#0x96
+   0089                     196 00105$:
+   0089 90s00r09            197 	mov	dptr,#___uchar2fs_a1_1_1
+   008C E0                  198 	movx	a,@dptr
+   008D FC                  199 	mov	r4,a
+   008E A3                  200 	inc	dptr
+   008F E0                  201 	movx	a,@dptr
+   0090 FD                  202 	mov	r5,a
+   0091 A3                  203 	inc	dptr
+   0092 E0                  204 	movx	a,@dptr
+   0093 FE                  205 	mov	r6,a
+   0094 A3                  206 	inc	dptr
+   0095 E0                  207 	movx	a,@dptr
+   0096 FF                  208 	mov	r7,a
+   0097 C3                  209 	clr	c
+   0098 EC                  210 	mov	a,r4
+   0099 94 00               211 	subb	a,#0x00
+   009B ED                  212 	mov	a,r5
+   009C 94 00               213 	subb	a,#0x00
+   009E EE                  214 	mov	a,r6
+   009F 94 80               215 	subb	a,#0x80
+   00A1 EF                  216 	mov	a,r7
+   00A2 94 00               217 	subb	a,#0x00
+                            218 ; Peephole 108   removed ljmp by inverse jump logic
+   00A4 50 27               219 	jnc  00107$
+   00A6                     220 00116$:
+                            221 ;	_uchar2fs.c 101
+   00A6 EC                  222 	mov	a,r4
+   00A7 25 E0               223 	add	a,acc
+   00A9 F8                  224 	mov	r0,a
+   00AA ED                  225 	mov	a,r5
+   00AB 33                  226 	rlc	a
+   00AC F9                  227 	mov	r1,a
+   00AD EE                  228 	mov	a,r6
+   00AE 33                  229 	rlc	a
+   00AF FA                  230 	mov	r2,a
+   00B0 EF                  231 	mov	a,r7
+   00B1 33                  232 	rlc	a
+   00B2 FB                  233 	mov	r3,a
+   00B3 90s00r09            234 	mov	dptr,#___uchar2fs_a1_1_1
+   00B6 E8                  235 	mov	a,r0
+   00B7 F0                  236 	movx	@dptr,a
+   00B8 A3                  237 	inc	dptr
+   00B9 E9                  238 	mov	a,r1
+   00BA F0                  239 	movx	@dptr,a
+   00BB A3                  240 	inc	dptr
+   00BC EA                  241 	mov	a,r2
+   00BD F0                  242 	movx	@dptr,a
+   00BE A3                  243 	inc	dptr
+   00BF EB                  244 	mov	a,r3
+   00C0 F0                  245 	movx	@dptr,a
+                            246 ;	_uchar2fs.c 102
+   00C1 15*00               247 	dec	___uchar2fs_sloc0_1_0
+   00C3 74 FF               248 	mov	a,#0xff
+   00C5 B5*00 02            249 	cjne	a,___uchar2fs_sloc0_1_0,00117$
+   00C8 15*01               250 	dec	(___uchar2fs_sloc0_1_0 + 1)
+   00CA                     251 00117$:
+   00CA 02s00r89            252 	ljmp	00105$
+   00CD                     253 00107$:
+                            254 ;	_uchar2fs.c 105
+   00CD 53 06 7F            255 	anl	ar6,#0x7f
+                            256 ;	_uchar2fs.c 107
+   00D0 AA*00               257 	mov	r2,___uchar2fs_sloc0_1_0
+   00D2 AB*01               258 	mov	r3,(___uchar2fs_sloc0_1_0 + 1)
+   00D4 78 00               259 	mov	r0,#0x00
+   00D6 79 00               260 	mov	r1,#0x00
+   00D8 8A*04               261 	mov	(___uchar2fs_sloc1_1_0 + 2),r2
+   00DA EB                  262 	mov	a,r3
+   00DB 54 01               263 	anl	a,#0x01
+   00DD A2 E0               264 	mov	c,acc.0
+   00DF C5*04               265 	xch	a,(___uchar2fs_sloc1_1_0 + 2)
+   00E1 13                  266 	rrc	a
+   00E2 C5*04               267 	xch	a,(___uchar2fs_sloc1_1_0 + 2)
+   00E4 13                  268 	rrc	a
+   00E5 C5*04               269 	xch	a,(___uchar2fs_sloc1_1_0 + 2)
+   00E7 F5*05               270 	mov	(___uchar2fs_sloc1_1_0 + 3),a
+   00E9 75*03 00            271 	mov	(___uchar2fs_sloc1_1_0 + 1),#0x00
+   00EC 75*02 00            272 	mov	___uchar2fs_sloc1_1_0,#0x00
+   00EF 90s00r01            273 	mov	dptr,#___uchar2fs_sign_1_1
+   00F2 E0                  274 	movx	a,@dptr
+   00F3 FA                  275 	mov	r2,a
+   00F4 A3                  276 	inc	dptr
+   00F5 E0                  277 	movx	a,@dptr
+   00F6 FB                  278 	mov	r3,a
+   00F7 A3                  279 	inc	dptr
+   00F8 E0                  280 	movx	a,@dptr
+   00F9 F8                  281 	mov	r0,a
+   00FA A3                  282 	inc	dptr
+   00FB E0                  283 	movx	a,@dptr
+   00FC F9                  284 	mov	r1,a
+   00FD E5*02               285 	mov	a,___uchar2fs_sloc1_1_0
+   00FF 42 02               286 	orl	ar2,a
+   0101 E5*03               287 	mov	a,(___uchar2fs_sloc1_1_0 + 1)
+   0103 42 03               288 	orl	ar3,a
+   0105 E5*04               289 	mov	a,(___uchar2fs_sloc1_1_0 + 2)
+   0107 42 00               290 	orl	ar0,a
+   0109 E5*05               291 	mov	a,(___uchar2fs_sloc1_1_0 + 3)
+   010B 42 01               292 	orl	ar1,a
+   010D EA                  293 	mov	a,r2
+   010E 42 04               294 	orl	ar4,a
+   0110 EB                  295 	mov	a,r3
+   0111 42 05               296 	orl	ar5,a
+   0113 E8                  297 	mov	a,r0
+   0114 42 06               298 	orl	ar6,a
+   0116 E9                  299 	mov	a,r1
+   0117 42 07               300 	orl	ar7,a
+   0119 90s00r05            301 	mov	dptr,#(___uchar2fs_fl_1_1)
+   011C EC                  302 	mov	a,r4
+   011D F0                  303 	movx	@dptr,a
+   011E A3                  304 	inc	dptr
+   011F ED                  305 	mov	a,r5
+   0120 F0                  306 	movx	@dptr,a
+   0121 A3                  307 	inc	dptr
+   0122 EE                  308 	mov	a,r6
+   0123 F0                  309 	movx	@dptr,a
+   0124 A3                  310 	inc	dptr
+   0125 EF                  311 	mov	a,r7
+   0126 F0                  312 	movx	@dptr,a
+                            313 ;	_uchar2fs.c 109
+   0127 90s00r05            314 	mov	dptr,#(___uchar2fs_fl_1_1)
+   012A E0                  315 	movx	a,@dptr
+   012B FA                  316 	mov	r2,a
+   012C A3                  317 	inc	dptr
+   012D E0                  318 	movx	a,@dptr
+   012E FB                  319 	mov	r3,a
+   012F A3                  320 	inc	dptr
+   0130 E0                  321 	movx	a,@dptr
+   0131 FC                  322 	mov	r4,a
+   0132 A3                  323 	inc	dptr
+   0133 E0                  324 	movx	a,@dptr
+                            325 ; Peephole 191   removed redundant mov
+   0134 FD                  326 	mov  r5,a
+   0135 8A 82               327 	mov  dpl,r2
+   0137 8B 83               328 	mov  dph,r3
+   0139 8C F0               329 	mov  b,r4
+   013B                     330 00108$:
+                    013B    331 	C$_uchar2fs.c$110$1$1 ==.
+                    013B    332 	XG$__uchar2fs$0$0 ==.
+   013B 22                  333 	ret
+                            334 	.area	CSEG    (CODE)

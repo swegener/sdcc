@@ -1,0 +1,268 @@
+;!FILE _fs2char.asm
+XH
+H 9 areas 8F global symbols
+M _fs2char
+A _CODE size 0 flags 0
+A DSEG size 0 flags 0
+A _DUMMY size 0 flags 0
+A OSEG size A flags 4
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 0 flags 40
+A GSINIT size 0 flags 20
+A CSEG size F8 flags 20
+S A$_fs2char$110 Def003F
+S A$_fs2char$101 Def0031
+S A$_fs2char$201 Def00C3
+S A$_fs2char$120 Def0050
+S A$_fs2char$111 Def0041
+S A$_fs2char$102 Def0032
+S A$_fs2char$220 Def00D6
+S A$_fs2char$211 Def00CD
+S A$_fs2char$130 Def005D
+S A$_fs2char$121 Def0052
+S A$_fs2char$112 Def0043
+S A$_fs2char$103 Def0033
+S A$_fs2char$230 Def00E3
+S A$_fs2char$221 Def00D7
+S A$_fs2char$212 Def00CF
+S A$_fs2char$203 Def00C6
+S A$_fs2char$140 Def006B
+S A$_fs2char$122 Def0054
+S A$_fs2char$104 Def0035
+S ___fs2char Def0000
+S A$_fs2char$240 Def00F0
+S A$_fs2char$231 Def00E5
+S A$_fs2char$222 Def00D9
+S A$_fs2char$213 Def00D0
+S A$_fs2char$150 Def0079
+S A$_fs2char$141 Def006D
+S A$_fs2char$132 Def005F
+S A$_fs2char$123 Def0056
+S A$_fs2char$114 Def0045
+S A$_fs2char$105 Def0036
+S A$_fs2char$241 Def00F2
+S A$_fs2char$223 Def00DA
+S A$_fs2char$160 Def0088
+S A$_fs2char$142 Def006E
+S A$_fs2char$133 Def0061
+S A$_fs2char$124 Def0057
+S A$_fs2char$115 Def0047
+S A$_fs2char$106 Def0037
+S A$_fs2char$242 Def00F4
+S A$_fs2char$233 Def00E6
+S A$_fs2char$224 Def00DB
+S A$_fs2char$215 Def00D2
+S A$_fs2char$206 Def00C8
+S A$_fs2char$170 Def0097
+S A$_fs2char$161 Def008B
+S A$_fs2char$152 Def007B
+S A$_fs2char$143 Def0070
+S A$_fs2char$134 Def0064
+S A$_fs2char$125 Def0059
+S A$_fs2char$116 Def0049
+S A$_fs2char$107 Def0038
+S A$_fs2char$243 Def00F6
+S A$_fs2char$225 Def00DD
+S A$_fs2char$180 Def00A2
+S A$_fs2char$144 Def0071
+S A$_fs2char$135 Def0067
+S A$_fs2char$117 Def004B
+S A$_fs2char$108 Def003B
+S A$_fs2char$235 Def00E8
+S A$_fs2char$226 Def00DE
+S A$_fs2char$217 Def00D3
+S A$_fs2char$208 Def00CB
+S A$_fs2char$190 Def00B2
+S A$_fs2char$181 Def00A4
+S A$_fs2char$163 Def008D
+S A$_fs2char$154 Def007E
+S A$_fs2char$145 Def0073
+S A$_fs2char$127 Def005B
+S A$_fs2char$118 Def004D
+S A$_fs2char$109 Def003D
+S A$_fs2char$236 Def00EA
+S A$_fs2char$227 Def00DF
+S A$_fs2char$191 Def00B4
+S A$_fs2char$182 Def00A6
+S A$_fs2char$173 Def0099
+S A$_fs2char$155 Def007F
+S A$_fs2char$146 Def0074
+S A$_fs2char$137 Def0069
+S A$_fs2char$119 Def004E
+S A$_fs2char$237 Def00EC
+S A$_fs2char$228 Def00E1
+S A$_fs2char$219 Def00D5
+S A$_fs2char$192 Def00B6
+S A$_fs2char$183 Def00A8
+S A$_fs2char$174 Def009A
+S A$_fs2char$165 Def008F
+S A$_fs2char$156 Def0081
+S A$_fs2char$147 Def0076
+S A$_fs2char$129 Def005C
+S A$_fs2char$247 Def00F7
+S A$_fs2char$238 Def00EE
+S A$_fs2char$229 Def00E2
+S A$_fs2char$193 Def00B7
+S A$_fs2char$184 Def00A9
+S A$_fs2char$175 Def009B
+S A$_fs2char$166 Def0091
+S A$_fs2char$194 Def00B9
+S A$_fs2char$185 Def00AB
+S A$_fs2char$176 Def009D
+S A$_fs2char$167 Def0093
+S A$_fs2char$158 Def0083
+S A$_fs2char$195 Def00BB
+S A$_fs2char$177 Def009E
+S A$_fs2char$168 Def0095
+S A$_fs2char$159 Def0085
+S A$_fs2char$196 Def00BC
+S A$_fs2char$187 Def00AD
+S A$_fs2char$178 Def009F
+S A$_fs2char$197 Def00BE
+S A$_fs2char$188 Def00AF
+S A$_fs2char$179 Def00A1
+S XG$__fs2char$0$0 Def00F7
+S A$_fs2char$198 Def00C0
+S A$_fs2char$189 Def00B1
+S A$_fs2char$199 Def00C1
+S A$_fs2char$70 Def0006
+S A$_fs2char$80 Def0015
+S A$_fs2char$90 Def0021
+S A$_fs2char$72 Def0007
+S G$__fs2char$0$0 Def0000
+S A$_fs2char$91 Def0023
+S A$_fs2char$82 Def0017
+S A$_fs2char$73 Def0009
+S A$_fs2char$92 Def0025
+S A$_fs2char$74 Def000B
+S A$_fs2char$93 Def0026
+S A$_fs2char$75 Def000D
+S A$_fs2char$94 Def0027
+S A$_fs2char$85 Def0019
+S A$_fs2char$67 Def0000
+S C$_fs2char.c$97$1$1 Def00F7
+S A$_fs2char$95 Def0028
+S A$_fs2char$86 Def001C
+S A$_fs2char$77 Def000F
+S A$_fs2char$68 Def0002
+S A$_fs2char$96 Def0029
+S A$_fs2char$78 Def0011
+S A$_fs2char$69 Def0004
+S A$_fs2char$97 Def002A
+S A$_fs2char$79 Def0013
+S A$_fs2char$98 Def002C
+S A$_fs2char$89 Def001F
+S A$_fs2char$99 Def002F
+T 00 00
+R 00 00 00 03
+T 00 00
+R 00 00 00 03
+T 00 04
+R 00 00 00 03
+T 00 04
+R 00 00 00 03
+T 00 06
+R 00 00 00 03
+T 00 06
+R 00 00 00 03
+T 00 00
+R 00 00 00 08
+T 00 00 AA 82 AB 83 AC F0 FD 8A 00 00 8B 00 01 8C
+R 00 00 00 08 29 0A 00 03 29 0D 00 03
+T 00 0C 00 02 8D 00 03 E5 00 00 45
+R 00 00 00 08 29 02 00 03 29 05 00 03 29 08 00 03
+T 00 12 00 01 45 00 02 45 00 03 70 06
+R 00 00 00 08 29 02 00 03 29 05 00 03 29 08 00 03
+T 00 19
+R 00 00 00 08
+T 00 19 75 82 00 02 00 F7
+R 00 00 00 08 00 06 00 08
+T 00 1F
+R 00 00 00 08
+T 00 1F AA 00 02 E5 00 03 A2 E7 CA 33 CA 33 CA 54
+R 00 00 00 08 29 03 00 03 29 06 00 03
+T 00 2B 01 30 E0 02 44 FE
+R 00 00 00 08
+T 00 31
+R 00 00 00 08
+T 00 31 FB 33 95 E0 FC FD EA 75 F0 00 24 6A F5
+R 00 00 00 08
+T 00 3E 00 04 E5 F0 34 FF F5 00 05 AA 00 00 AB
+R 00 00 00 08 29 02 00 03 29 09 00 03 29 0C 00 03
+T 00 48 00 01 74 7F 55 00 02 FE 7F 00 8A 00 06 8B
+R 00 00 00 08 29 02 00 03 29 07 00 03 29 0D 00 03
+T 00 53 00 07 74 80 4E F5 00 08 8F 00 09 C3 E4 95
+R 00 00 00 08 29 02 00 03 29 08 00 03 29 0B 00 03
+T 00 5E 00 04 74 80 85 00 05 F0 63 F0 80 95 F0 50
+R 00 00 00 08 29 02 00 03 29 07 00 03
+T 00 6A 0E
+R 00 00 00 08
+T 00 6B
+R 00 00 00 08
+T 00 6B E5 00 03 23 54 01 FA 74 7F 4A F5 82 02
+R 00 00 00 08 29 03 00 03
+T 00 77 00 F7
+R 00 00 00 08 00 02 00 08
+T 00 79
+R 00 00 00 08
+T 00 79 E5 00 05 30 E7 4A
+R 00 00 00 08 29 03 00 03
+T 00 7E
+R 00 00 00 08
+T 00 7E C3 74 E7 95 00 04 74 7F 85 00 05 F0 63 F0
+R 00 00 00 08 29 06 00 03 29 0B 00 03
+T 00 8A 80 95 F0 50 39
+R 00 00 00 08
+T 00 8F
+R 00 00 00 08
+T 00 8F E5 00 06 45 00 07 45 00 08 45
+R 00 00 00 08 29 03 00 03 29 06 00 03 29 09 00 03
+T 00 96 00 09 60 2F
+R 00 00 00 08 29 02 00 03
+T 00 99
+R 00 00 00 08
+T 00 99 C3 E4 95 00 04 FA E4 95 00 05 FB 8A F0 05
+R 00 00 00 08 29 05 00 03 29 0A 00 03
+T 00 A5 F0 E5 00 09 33 92 D2 80 16
+R 00 00 00 08 29 04 00 03
+T 00 AD
+R 00 00 00 08
+T 00 AD A2 D2 E5 00 09 13 F5 00 09 E5 00 08 13 F5
+R 00 00 00 08 29 05 00 03 29 09 00 03 29 0C 00 03
+T 00 B8 00 08 E5 00 07 13 F5 00 07 E5
+R 00 00 00 08 29 02 00 03 29 05 00 03 29 09 00 03
+T 00 BF 00 06 13 F5 00 06
+R 00 00 00 08 29 02 00 03 29 06 00 03
+T 00 C3
+R 00 00 00 08
+T 00 C3 D5 F0 E7 80 05
+R 00 00 00 08
+T 00 C8
+R 00 00 00 08
+T 00 C8 75 82 00 80 2A
+R 00 00 00 08
+T 00 CD
+R 00 00 00 08
+T 00 CD E5 00 03 23 54 01 FA 60 13
+R 00 00 00 08 29 03 00 03
+T 00 D5
+R 00 00 00 08
+T 00 D5 C3 E4 95 00 06 FA E4 95 00 07 FB E4 95
+R 00 00 00 08 29 05 00 03 29 0A 00 03
+T 00 E0 00 08 FE E4 95 00 09 FF 80 08
+R 00 00 00 08 29 02 00 03 29 07 00 03
+T 00 E8
+R 00 00 00 08
+T 00 E8 AA 00 06 AB 00 07 AE 00 08 AF
+R 00 00 00 08 29 03 00 03 29 06 00 03 29 09 00 03
+T 00 EF 00 09
+R 00 00 00 08 29 02 00 03
+T 00 F0
+R 00 00 00 08
+T 00 F0 8A 82 8B 83 8E F0 EF
+R 00 00 00 08
+T 00 F7
+R 00 00 00 08
+T 00 F7 22
+R 00 00 00 08

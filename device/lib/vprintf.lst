@@ -1,0 +1,1471 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:39 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module vprintf
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl _vprintf_PARM_2
+                             11 	.globl _vsprintf_PARM_3
+                             12 	.globl _vsprintf_PARM_2
+                             13 	.globl _radix
+                             14 	.globl _output_ptr
+                             15 	.globl _lsd
+                             16 	.globl _lower_case
+                             17 	.globl _output_to_string
+                             18 	.globl _value
+                             19 	.globl _vsprintf
+                             20 	.globl _vprintf
+                             21 ;--------------------------------------------------------
+                             22 ; special function registers
+                             23 ;--------------------------------------------------------
+                             24 ;--------------------------------------------------------
+                             25 ; special function bits 
+                             26 ;--------------------------------------------------------
+                             27 ;--------------------------------------------------------
+                             28 ; internal ram data
+                             29 ;--------------------------------------------------------
+                             30 	.area	DSEG    (DATA)
+                    0000     31 G$value$0$0==.
+   0000                      32 _value:
+   0000                      33 	.ds	0x0005
+   0005                      34 _vsprintf_sloc0_1_0:
+   0005                      35 	.ds	0x0001
+   0006                      36 _vsprintf_sloc1_1_0:
+   0006                      37 	.ds	0x0001
+   0007                      38 _vsprintf_sloc2_1_0:
+   0007                      39 	.ds	0x0003
+   000A                      40 _vsprintf_sloc3_1_0:
+   000A                      41 	.ds	0x0001
+   000B                      42 _vsprintf_sloc4_1_0:
+   000B                      43 	.ds	0x0001
+   000C                      44 _vsprintf_sloc5_1_0:
+   000C                      45 	.ds	0x0001
+   000D                      46 _vsprintf_sloc6_1_0:
+   000D                      47 	.ds	0x0001
+   000E                      48 _vsprintf_sloc7_1_0:
+   000E                      49 	.ds	0x0001
+   000F                      50 _vsprintf_sloc8_1_0:
+   000F                      51 	.ds	0x0001
+   0010                      52 _vsprintf_sloc9_1_0:
+   0010                      53 	.ds	0x0001
+   0011                      54 _vsprintf_sloc10_1_0:
+   0011                      55 	.ds	0x0001
+   0012                      56 _vsprintf_sloc11_1_0:
+   0012                      57 	.ds	0x0001
+   0013                      58 _vsprintf_sloc12_1_0:
+   0013                      59 	.ds	0x0001
+   0014                      60 _vsprintf_sloc13_1_0:
+   0014                      61 	.ds	0x0001
+                             62 ;--------------------------------------------------------
+                             63 ; overlayable items in internal ram 
+                             64 ;--------------------------------------------------------
+                             65 	.area	OSEG	(OVR,DATA)
+                             66 ;--------------------------------------------------------
+                             67 ; indirectly addressable internal ram data
+                             68 ;--------------------------------------------------------
+                             69 	.area	ISEG    (DATA)
+                             70 ;--------------------------------------------------------
+                             71 ; bit data
+                             72 ;--------------------------------------------------------
+                             73 	.area	BSEG    (BIT)
+                    0000     74 G$output_to_string$0$0==.
+   0000                      75 _output_to_string:
+   0000                      76 	.ds	0x0001
+                    0001     77 G$lower_case$0$0==.
+   0001                      78 _lower_case:
+   0001                      79 	.ds	0x0001
+                    0002     80 G$lsd$0$0==.
+   0002                      81 _lsd:
+   0002                      82 	.ds	0x0001
+   0003                      83 _vsprintf_left_justify_1_1:
+   0003                      84 	.ds	0x0001
+   0004                      85 _vsprintf_zero_padding_1_1:
+   0004                      86 	.ds	0x0001
+   0005                      87 _vsprintf_prefix_sign_1_1:
+   0005                      88 	.ds	0x0001
+   0006                      89 _vsprintf_prefix_space_1_1:
+   0006                      90 	.ds	0x0001
+   0007                      91 _vsprintf_signed_argument_1_1:
+   0007                      92 	.ds	0x0001
+   0008                      93 _vsprintf_char_argument_1_1:
+   0008                      94 	.ds	0x0001
+   0009                      95 _vsprintf_long_argument_1_1:
+   0009                      96 	.ds	0x0001
+                             97 ;--------------------------------------------------------
+                             98 ; external ram data
+                             99 ;--------------------------------------------------------
+                            100 	.area	XSEG    (XDATA)
+                    0000    101 G$output_ptr$0$0==.
+   0000                     102 _output_ptr:
+   0000                     103 	.ds	0x0003
+                    0003    104 G$radix$0$0==.
+   0003                     105 _radix:
+   0003                     106 	.ds	0x0001
+   0004                     107 _vsprintf_PARM_2:
+   0004                     108 	.ds	0x0003
+   0007                     109 _vsprintf_PARM_3:
+   0007                     110 	.ds	0x0001
+   0008                     111 _vsprintf_buf_1_1:
+   0008                     112 	.ds	0x0003
+   000B                     113 _vsprintf_width_1_1:
+   000B                     114 	.ds	0x0001
+   000C                     115 _vsprintf_length_1_1:
+   000C                     116 	.ds	0x0001
+   000D                     117 _vsprintf_c_1_1:
+   000D                     118 	.ds	0x0001
+   000E                     119 _vprintf_PARM_2:
+   000E                     120 	.ds	0x0001
+   000F                     121 _vprintf_format_1_1:
+   000F                     122 	.ds	0x0003
+                            123 ;--------------------------------------------------------
+                            124 ; global & static initialisations
+                            125 ;--------------------------------------------------------
+                            126 	.area GSINIT (CODE)
+                            127 ;--------------------------------------------------------
+                            128 ; code
+                            129 ;--------------------------------------------------------
+                            130 	.area CSEG (CODE)
+                    0000    131 	Fvprintf$output_char$0$0 ==.
+                            132 ;	vprintf.c 63
+                            133 ;	-----------------------------------------
+                            134 ;	 function output_char
+                            135 ;	-----------------------------------------
+   0000                     136 _output_char:
+                    0002    137 	ar2 = 0x02
+                    0003    138 	ar3 = 0x03
+                    0004    139 	ar4 = 0x04
+                    0005    140 	ar5 = 0x05
+                    0006    141 	ar6 = 0x06
+                    0007    142 	ar7 = 0x07
+                    0000    143 	ar0 = 0x00
+                    0001    144 	ar1 = 0x01
+   0000 C0*00               145 	push	_bp
+   0002 85 81*00            146 	mov	_bp,sp
+                            147 ;	vprintf.c 0
+   0005 AA 82               148 	mov	r2,dpl
+                            149 ;	vprintf.c 65
+                            150 ; Peephole 111   removed ljmp by inverse jump logic
+   0007 30*00 25            151 	jnb  _output_to_string,00102$
+   000A                     152 00107$:
+                            153 ;	vprintf.c 67
+   000A 90s00r00            154 	mov	dptr,#_output_ptr
+   000D E0                  155 	movx	a,@dptr
+   000E FB                  156 	mov	r3,a
+   000F A3                  157 	inc	dptr
+   0010 E0                  158 	movx	a,@dptr
+   0011 FC                  159 	mov	r4,a
+   0012 A3                  160 	inc	dptr
+   0013 E0                  161 	movx	a,@dptr
+   0014 FD                  162 	mov	r5,a
+   0015 90s00r00            163 	mov	dptr,#_output_ptr
+   0018 74 01               164 	mov	a,#0x01
+   001A 2B                  165 	add	a,r3
+   001B F0                  166 	movx	@dptr,a
+                            167 ; Peephole 180   changed mov to clr
+   001C E4                  168 	clr  a
+   001D 3C                  169 	addc	a,r4
+   001E A3                  170 	inc	dptr
+   001F F0                  171 	movx	@dptr,a
+   0020 A3                  172 	inc	dptr
+   0021 ED                  173 	mov	a,r5
+   0022 F0                  174 	movx	@dptr,a
+   0023 8B 82               175 	mov	dpl,r3
+   0025 8C 83               176 	mov	dph,r4
+   0027 8D F0               177 	mov	b,r5
+   0029 EA                  178 	mov	a,r2
+   002A 12s00r00            179 	lcall	__gptrput
+                            180 ; Peephole 132   changed ljmp to sjmp
+   002D 80 05               181 	sjmp 00104$
+   002F                     182 00102$:
+                            183 ;	vprintf.c 71
+   002F 8A 82               184 	mov	dpl,r2
+   0031 12s00r00            185 	lcall	_putchar
+   0034                     186 00104$:
+   0034 85*00 81            187 	mov	sp,_bp
+   0037 D0*00               188 	pop	_bp
+                    0039    189 	C$vprintf.c$73$1$1 ==.
+                    0039    190 	XFvprintf$output_char$0$0 ==.
+   0039 22                  191 	ret
+                    003A    192 	Fvprintf$output_digit$0$0 ==.
+                            193 ;	vprintf.c 77
+                            194 ;	-----------------------------------------
+                            195 ;	 function output_digit
+                            196 ;	-----------------------------------------
+   003A                     197 _output_digit:
+   003A C0*00               198 	push	_bp
+   003C 85 81*00            199 	mov	_bp,sp
+                            200 ;	vprintf.c 79
+   003F AA 82               201 	mov	r2,dpl
+   0041 C3                  202 	clr	c
+   0042 74 09               203 	mov	a,#0x09
+   0044 9A                  204 	subb	a,r2
+   0045 E4                  205 	clr	a
+   0046 33                  206 	rlc	a
+                            207 ; Peephole 105   removed redundant mov
+   0047 FB                  208 	mov  r3,a
+   0048 B4 01 00            209 	cjne	a,#0x01,00109$
+   004B                     210 00109$:
+   004B E4                  211 	clr	a
+   004C 33                  212 	rlc	a
+                            213 ; Peephole 105   removed redundant mov
+   004D FB                  214 	mov  r3,a
+                            215 ; Peephole 110   removed ljmp by inverse jump logic
+   004E 60 06               216 	jz  00103$
+   0050                     217 00110$:
+   0050 74 30               218 	mov	a,#0x30
+   0052 2A                  219 	add	a,r2
+   0053 FB                  220 	mov	r3,a
+                            221 ; Peephole 132   changed ljmp to sjmp
+   0054 80 0F               222 	sjmp 00104$
+   0056                     223 00103$:
+                            224 ; Peephole 111   removed ljmp by inverse jump logic
+   0056 30*01 06            225 	jnb  _lower_case,00105$
+   0059                     226 00111$:
+   0059 74 57               227 	mov	a,#0x57
+   005B 2A                  228 	add	a,r2
+   005C FC                  229 	mov	r4,a
+                            230 ; Peephole 132   changed ljmp to sjmp
+   005D 80 04               231 	sjmp 00106$
+   005F                     232 00105$:
+   005F 74 37               233 	mov	a,#0x37
+   0061 2A                  234 	add	a,r2
+   0062 FC                  235 	mov	r4,a
+   0063                     236 00106$:
+   0063 8C 03               237 	mov	ar3,r4
+   0065                     238 00104$:
+   0065 8B 82               239 	mov	dpl,r3
+   0067 12s00r00            240 	lcall	_output_char
+   006A                     241 00101$:
+   006A 85*00 81            242 	mov	sp,_bp
+   006D D0*00               243 	pop	_bp
+                    006F    244 	C$vprintf.c$80$1$1 ==.
+                    006F    245 	XFvprintf$output_digit$0$0 ==.
+   006F 22                  246 	ret
+                    0070    247 	Fvprintf$output_2digits$0$0 ==.
+                            248 ;	vprintf.c 84
+                            249 ;	-----------------------------------------
+                            250 ;	 function output_2digits
+                            251 ;	-----------------------------------------
+   0070                     252 _output_2digits:
+   0070 C0*00               253 	push	_bp
+   0072 85 81*00            254 	mov	_bp,sp
+                            255 ;	vprintf.c 87
+   0075 AA 82               256 	mov	r2,dpl
+                            257 ;	vprintf.c 86
+   0077 EA                  258 	mov	a,r2
+   0078 C4                  259 	swap	a
+   0079 54 0F               260 	anl	a,#0x0f
+   007B FB                  261 	mov	r3,a
+   007C C0 02               262 	push	ar2
+   007E 8B 82               263 	mov	dpl,r3
+   0080 12s00r3A            264 	lcall	_output_digit
+   0083 D0 02               265 	pop	ar2
+                            266 ;	vprintf.c 87
+   0085 53 02 0F            267 	anl	ar2,#0x0f
+   0088 8A 82               268 	mov	dpl,r2
+   008A 12s00r3A            269 	lcall	_output_digit
+   008D                     270 00101$:
+   008D 85*00 81            271 	mov	sp,_bp
+   0090 D0*00               272 	pop	_bp
+                    0092    273 	C$vprintf.c$88$1$1 ==.
+                    0092    274 	XFvprintf$output_2digits$0$0 ==.
+   0092 22                  275 	ret
+                    0093    276 	Fvprintf$calculate_digit$0$0 ==.
+                            277 ;	vprintf.c 92
+                            278 ;	-----------------------------------------
+                            279 ;	 function calculate_digit
+                            280 ;	-----------------------------------------
+   0093                     281 _calculate_digit:
+                            282 ;	vprintf.c 96
+   0093 7A 20               283 	mov	r2,#0x20
+   0095                     284 00103$:
+   0095 BA 00 02            285 	cjne	r2,#0x00,00112$
+                            286 ; Peephole 132   changed ljmp to sjmp
+   0098 80 34               287 	sjmp 00107$
+   009A                     288 00112$:
+                            289 ;	vprintf.c 115
+   009A C3                  290 	  clr  c
+   009B E5*00               291 	  mov  a,_value+0
+   009D 33                  292 	  rlc  a
+   009E F5*00               293 	  mov  _value+0,a
+   00A0 E5*01               294 	  mov  a,_value+1
+   00A2 33                  295 	  rlc  a
+   00A3 F5*01               296 	  mov  _value+1,a
+   00A5 E5*02               297 	  mov  a,_value+2
+   00A7 33                  298 	  rlc  a
+   00A8 F5*02               299 	  mov  _value+2,a
+   00AA E5*03               300 	  mov  a,_value+3
+   00AC 33                  301 	  rlc  a
+   00AD F5*03               302 	  mov  _value+3,a
+   00AF E5*04               303 	  mov  a,_value+4
+   00B1 33                  304 	  rlc  a
+   00B2 F5*04               305 	  mov  _value+4,a
+                            306 ;	vprintf.c 117
+   00B4 90s00r03            307 	mov	dptr,#_radix
+   00B7 E0                  308 	movx	a,@dptr
+   00B8 FB                  309 	mov	r3,a
+   00B9 C3                  310 	clr	c
+   00BA E5*04               311 	mov	a,0x0004 + _value
+   00BC 9B                  312 	subb	a,r3
+                            313 ; Peephole 132   changed ljmp to sjmp
+                            314 ; Peephole 160   removed sjmp by inverse jump logic
+   00BD 40 0C               315 	jc   00105$
+   00BF                     316 00113$:
+                            317 ;	vprintf.c 119
+   00BF C3                  318 	clr	c
+   00C0 E5*04               319 	mov	a,0x0004 + _value
+   00C2 9B                  320 	subb	a,r3
+   00C3 F5*04               321 	mov	0x0004 + _value,a
+                            322 ;	vprintf.c 120
+   00C5 74 01               323 	mov	a,#0x01
+   00C7 25*00               324 	add	a,_value
+   00C9 F5*00               325 	mov	_value,a
+   00CB                     326 00105$:
+                            327 ;	vprintf.c 96
+   00CB 1A                  328 	dec	r2
+                            329 ; Peephole 132   changed ljmp to sjmp
+   00CC 80 C7               330 	sjmp 00103$
+   00CE                     331 00107$:
+                    00CE    332 	C$vprintf.c$123$1$1 ==.
+                    00CE    333 	XFvprintf$calculate_digit$0$0 ==.
+   00CE 22                  334 	ret
+                    00CF    335 	G$vsprintf$0$0 ==.
+                            336 ;	vprintf.c 127
+                            337 ;	-----------------------------------------
+                            338 ;	 function vsprintf
+                            339 ;	-----------------------------------------
+   00CF                     340 _vsprintf:
+                            341 ;	vprintf.c 0
+   00CF C0 F0               342 	push	b
+   00D1 C0 83               343 	push	dph
+   00D3 C0 82               344 	push	dpl
+   00D5 90s00r08            345 	mov	dptr,#_vsprintf_buf_1_1
+   00D8 D0 E0               346 	pop	acc
+   00DA F0                  347 	movx	@dptr,a
+   00DB D0 E0               348 	pop	acc
+   00DD A3                  349 	inc	dptr
+   00DE F0                  350 	movx	@dptr,a
+   00DF D0 E0               351 	pop	acc
+   00E1 A3                  352 	inc	dptr
+   00E2 F0                  353 	movx	@dptr,a
+                            354 ;	vprintf.c 141
+   00E3 90s00r08            355 	mov	dptr,#_vsprintf_buf_1_1
+   00E6 E0                  356 	movx	a,@dptr
+   00E7 FA                  357 	mov	r2,a
+   00E8 A3                  358 	inc	dptr
+   00E9 E0                  359 	movx	a,@dptr
+   00EA FB                  360 	mov	r3,a
+   00EB A3                  361 	inc	dptr
+   00EC E0                  362 	movx	a,@dptr
+   00ED FC                  363 	mov	r4,a
+   00EE 90s00r00            364 	mov	dptr,#_output_ptr
+   00F1 EA                  365 	mov	a,r2
+   00F2 F0                  366 	movx	@dptr,a
+   00F3 A3                  367 	inc	dptr
+   00F4 EB                  368 	mov	a,r3
+   00F5 F0                  369 	movx	@dptr,a
+   00F6 A3                  370 	inc	dptr
+   00F7 EC                  371 	mov	a,r4
+   00F8 F0                  372 	movx	@dptr,a
+                            373 ;	vprintf.c 142
+   00F9 EA                  374 	mov	a,r2
+   00FA 4B                  375 	orl	a,r3
+   00FB 4C                  376 	orl	a,r4
+                            377 ; Peephole 109   removed ljmp by inverse jump logic
+   00FC 70 04               378 	jnz  00102$
+   00FE                     379 00262$:
+                            380 ;	vprintf.c 144
+   00FE C2*00               381 	clr	_output_to_string
+                            382 ; Peephole 132   changed ljmp to sjmp
+   0100 80 02               383 	sjmp 00237$
+   0102                     384 00102$:
+                            385 ;	vprintf.c 148
+   0102 D2*00               386 	setb	_output_to_string
+                            387 ;	vprintf.c 151
+   0104                     388 00237$:
+   0104                     389 00193$:
+   0104 90s00r04            390 	mov	dptr,#_vsprintf_PARM_2
+   0107 E0                  391 	movx	a,@dptr
+   0108 FA                  392 	mov	r2,a
+   0109 A3                  393 	inc	dptr
+   010A E0                  394 	movx	a,@dptr
+   010B FB                  395 	mov	r3,a
+   010C A3                  396 	inc	dptr
+   010D E0                  397 	movx	a,@dptr
+   010E FC                  398 	mov	r4,a
+   010F 74 01               399 	mov	a,#0x01
+   0111 2A                  400 	add	a,r2
+   0112 FD                  401 	mov	r5,a
+                            402 ; Peephole 180   changed mov to clr
+   0113 E4                  403 	clr  a
+   0114 3B                  404 	addc	a,r3
+   0115 FE                  405 	mov	r6,a
+   0116 8C 07               406 	mov	ar7,r4
+   0118 90s00r04            407 	mov	dptr,#_vsprintf_PARM_2
+   011B ED                  408 	mov	a,r5
+   011C F0                  409 	movx	@dptr,a
+   011D A3                  410 	inc	dptr
+   011E EE                  411 	mov	a,r6
+   011F F0                  412 	movx	@dptr,a
+   0120 A3                  413 	inc	dptr
+   0121 EF                  414 	mov	a,r7
+   0122 F0                  415 	movx	@dptr,a
+   0123 8A 82               416 	mov	dpl,r2
+   0125 8B 83               417 	mov	dph,r3
+   0127 8C F0               418 	mov	b,r4
+   0129 12s00r00            419 	lcall	__gptrget
+                            420 ; Peephole 105   removed redundant mov
+   012C F5*05               421 	mov  _vsprintf_sloc0_1_0,a
+   012E 70 03               422 	jnz	00263$
+   0130 02s06r23            423 	ljmp	00195$
+   0133                     424 00263$:
+                            425 ;	vprintf.c 153
+   0133 E5*05               426 	mov	a,_vsprintf_sloc0_1_0
+   0135 B4 25 02            427 	cjne	a,#0x25,00264$
+   0138 80 03               428 	sjmp	00265$
+   013A                     429 00264$:
+   013A 02s06r1A            430 	ljmp	00191$
+   013D                     431 00265$:
+                            432 ;	vprintf.c 155
+   013D C2*03               433 	clr	_vsprintf_left_justify_1_1
+                            434 ;	vprintf.c 156
+   013F C2*04               435 	clr	_vsprintf_zero_padding_1_1
+                            436 ;	vprintf.c 157
+   0141 C2*05               437 	clr	_vsprintf_prefix_sign_1_1
+                            438 ;	vprintf.c 158
+   0143 C2*06               439 	clr	_vsprintf_prefix_space_1_1
+                            440 ;	vprintf.c 159
+   0145 C2*07               441 	clr	_vsprintf_signed_argument_1_1
+                            442 ;	vprintf.c 160
+   0147 90s00r03            443 	mov	dptr,#_radix
+                            444 ; Peephole 180   changed mov to clr
+   014A E4                  445 	clr  a
+   014B F0                  446 	movx	@dptr,a
+                            447 ;	vprintf.c 161
+   014C C2*08               448 	clr	_vsprintf_char_argument_1_1
+                            449 ;	vprintf.c 162
+   014E C2*09               450 	clr	_vsprintf_long_argument_1_1
+                            451 ;	vprintf.c 163
+   0150 90s00r0B            452 	mov	dptr,#_vsprintf_width_1_1
+                            453 ; Peephole 180   changed mov to clr
+   0153 E4                  454 	clr  a
+   0154 F0                  455 	movx	@dptr,a
+                            456 ;	vprintf.c 167
+   0155                     457 00104$:
+   0155 8D*07               458 	mov	_vsprintf_sloc2_1_0,r5
+   0157 8E*08               459 	mov	(_vsprintf_sloc2_1_0 + 1),r6
+   0159 8F*09               460 	mov	(_vsprintf_sloc2_1_0 + 2),r7
+   015B 0D                  461 	inc	r5
+   015C BD 00 01            462 	cjne	r5,#0x00,00266$
+   015F 0E                  463 	inc	r6
+   0160                     464 00266$:
+   0160 90s00r04            465 	mov	dptr,#_vsprintf_PARM_2
+   0163 ED                  466 	mov	a,r5
+   0164 F0                  467 	movx	@dptr,a
+   0165 A3                  468 	inc	dptr
+   0166 EE                  469 	mov	a,r6
+   0167 F0                  470 	movx	@dptr,a
+   0168 A3                  471 	inc	dptr
+   0169 EF                  472 	mov	a,r7
+   016A F0                  473 	movx	@dptr,a
+   016B 85*07 82            474 	mov	dpl,_vsprintf_sloc2_1_0
+   016E 85*08 83            475 	mov	dph,(_vsprintf_sloc2_1_0 + 1)
+   0171 85*09 F0            476 	mov	b,(_vsprintf_sloc2_1_0 + 2)
+   0174 12s00r00            477 	lcall	__gptrget
+                            478 ; Peephole 100   removed redundant mov
+   0177 F9                  479 	mov  r1,a
+   0178 90s00r0D            480 	mov  dptr,#_vsprintf_c_1_1
+   017B F0                  481 	movx @dptr,a
+                            482 ;	vprintf.c 169
+   017C C0 05               483 	push	ar5
+   017E C0 06               484 	push	ar6
+   0180 C0 07               485 	push	ar7
+   0182 C0 01               486 	push	ar1
+   0184 89 82               487 	mov	dpl,r1
+   0186 12s00r00            488 	lcall	_isdigit
+   0189 85 82*06            489 	mov	_vsprintf_sloc1_1_0,dpl
+   018C D0 01               490 	pop	ar1
+   018E D0 07               491 	pop	ar7
+   0190 D0 06               492 	pop	ar6
+   0192 D0 05               493 	pop	ar5
+   0194 E5*06               494 	mov	a,_vsprintf_sloc1_1_0
+                            495 ; Peephole 110   removed ljmp by inverse jump logic
+   0196 60 2C               496 	jz  00108$
+   0198                     497 00267$:
+                            498 ;	vprintf.c 171
+   0198 90s00r0B            499 	mov	dptr,#_vsprintf_width_1_1
+   019B E0                  500 	movx	a,@dptr
+   019C FA                  501 	mov	r2,a
+   019D 75 F0 0A            502 	mov	b,#0x0a
+   01A0 EA                  503 	mov	a,r2
+   01A1 A4                  504 	mul	ab
+   01A2 F5*0C               505 	mov	_vsprintf_sloc5_1_0,a
+   01A4 E9                  506 	mov	a,r1
+   01A5 24 D0               507 	add	a,#0xd0
+                            508 ; Peephole 105   removed redundant mov
+   01A7 F5*0A               509 	mov  _vsprintf_sloc3_1_0,a
+   01A9 25*0C               510 	add	a,_vsprintf_sloc5_1_0
+                            511 ; Peephole 100   removed redundant mov
+   01AB F8                  512 	mov  r0,a
+   01AC 90s00r0B            513 	mov  dptr,#_vsprintf_width_1_1
+   01AF F0                  514 	movx @dptr,a
+                            515 ;	vprintf.c 173
+   01B0 B8 00 04            516 	cjne	r0,#0x00,00268$
+   01B3 74 01               517 	mov	a,#0x01
+   01B5 80 01               518 	sjmp	00269$
+   01B7                     519 00268$:
+   01B7 E4                  520 	clr	a
+   01B8                     521 00269$:
+                            522 ; Peephole 105   removed redundant mov
+   01B8 F5*0B               523 	mov  _vsprintf_sloc4_1_0,a
+   01BA 70 03               524 	jnz	00270$
+   01BC 02s01r55            525 	ljmp	00104$
+   01BF                     526 00270$:
+                            527 ;	vprintf.c 176
+   01BF D2*04               528 	setb	_vsprintf_zero_padding_1_1
+                            529 ;	vprintf.c 178
+   01C1 02s01r55            530 	ljmp	00104$
+   01C4                     531 00108$:
+                            532 ;	vprintf.c 181
+   01C4 C0 02               533 	push	ar2
+   01C6 C0 05               534 	push	ar5
+   01C8 C0 06               535 	push	ar6
+   01CA C0 07               536 	push	ar7
+   01CC C0 00               537 	push	ar0
+   01CE C0 01               538 	push	ar1
+   01D0 89 82               539 	mov	dpl,r1
+   01D2 12s00r00            540 	lcall	_islower
+   01D5 85 82*0D            541 	mov	_vsprintf_sloc6_1_0,dpl
+   01D8 D0 01               542 	pop	ar1
+   01DA D0 00               543 	pop	ar0
+   01DC D0 07               544 	pop	ar7
+   01DE D0 06               545 	pop	ar6
+   01E0 D0 05               546 	pop	ar5
+   01E2 D0 02               547 	pop	ar2
+   01E4 E5*0D               548 	mov	a,_vsprintf_sloc6_1_0
+   01E6 B4 01 00            549 	cjne	a,#0x01,00271$
+   01E9                     550 00271$:
+   01E9 B3                  551 	cpl	c
+   01EA 92*01               552 	mov	_lower_case,c
+                            553 ;	vprintf.c 182
+                            554 ; Peephole 111   removed ljmp by inverse jump logic
+   01EC 30*01 07            555 	jnb  _lower_case,00110$
+   01EF                     556 00272$:
+                            557 ;	vprintf.c 184
+   01EF 74 DF               558 	mov	a,#0xdf
+   01F1 59                  559 	anl	a,r1
+   01F2 90s00r0D            560 	mov	dptr,#_vsprintf_c_1_1
+   01F5 F0                  561 	movx	@dptr,a
+   01F6                     562 00110$:
+                            563 ;	vprintf.c 187
+   01F6 90s00r0D            564 	mov	dptr,#_vsprintf_c_1_1
+   01F9 E0                  565 	movx	a,@dptr
+   01FA FB                  566 	mov	r3,a
+   01FB BB 20 04            567 	cjne	r3,#0x20,00273$
+   01FE 74 01               568 	mov	a,#0x01
+   0200 80 01               569 	sjmp	00274$
+   0202                     570 00273$:
+   0202 E4                  571 	clr	a
+   0203                     572 00274$:
+                            573 ; Peephole 105   removed redundant mov
+   0203 F5*0E               574 	mov  _vsprintf_sloc7_1_0,a
+   0205 60 03               575 	jz	00275$
+   0207 02s02r90            576 	ljmp	00113$
+   020A                     577 00275$:
+   020A BB 2B 04            578 	cjne	r3,#0x2b,00276$
+   020D 74 01               579 	mov	a,#0x01
+   020F 80 01               580 	sjmp	00277$
+   0211                     581 00276$:
+   0211 E4                  582 	clr	a
+   0212                     583 00277$:
+                            584 ; Peephole 105   removed redundant mov
+   0212 F5*0F               585 	mov  _vsprintf_sloc8_1_0,a
+   0214 60 03               586 	jz	00278$
+   0216 02s02r8B            587 	ljmp	00112$
+   0219                     588 00278$:
+   0219 BB 2D 04            589 	cjne	r3,#0x2d,00279$
+   021C 74 01               590 	mov	a,#0x01
+   021E 80 01               591 	sjmp	00280$
+   0220                     592 00279$:
+   0220 E4                  593 	clr	a
+   0221                     594 00280$:
+                            595 ; Peephole 105   removed redundant mov
+   0221 F5*10               596 	mov  _vsprintf_sloc9_1_0,a
+                            597 ; Peephole 132   changed ljmp to sjmp
+                            598 ; Peephole 163   removed sjmp by inverse jump logic
+   0223 70 61               599 	jnz  00111$
+   0225                     600 00281$:
+   0225 BB 42 04            601 	cjne	r3,#0x42,00282$
+   0228 74 01               602 	mov	a,#0x01
+   022A 80 01               603 	sjmp	00283$
+   022C                     604 00282$:
+   022C E4                  605 	clr	a
+   022D                     606 00283$:
+                            607 ; Peephole 105   removed redundant mov
+   022D F5*11               608 	mov  _vsprintf_sloc10_1_0,a
+                            609 ; Peephole 132   changed ljmp to sjmp
+                            610 ; Peephole 163   removed sjmp by inverse jump logic
+   022F 70 64               611 	jnz  00114$
+   0231                     612 00284$:
+   0231 BB 43 04            613 	cjne	r3,#0x43,00285$
+   0234 74 01               614 	mov	a,#0x01
+   0236 80 01               615 	sjmp	00286$
+   0238                     616 00285$:
+   0238 E4                  617 	clr	a
+   0239                     618 00286$:
+                            619 ; Peephole 105   removed redundant mov
+   0239 F5*12               620 	mov  _vsprintf_sloc11_1_0,a
+                            621 ; Peephole 109   removed ljmp by inverse jump logic
+   023B 70 62               622 	jnz  00116$
+   023D                     623 00287$:
+   023D BB 44 04            624 	cjne	r3,#0x44,00288$
+   0240 74 01               625 	mov	a,#0x01
+   0242 80 01               626 	sjmp	00289$
+   0244                     627 00288$:
+   0244 E4                  628 	clr	a
+   0245                     629 00289$:
+                            630 ; Peephole 105   removed redundant mov
+   0245 F5*13               631 	mov  _vsprintf_sloc12_1_0,a
+   0247 60 03               632 	jz	00290$
+   0249 02s04r23            633 	ljmp	00137$
+   024C                     634 00290$:
+   024C BB 49 04            635 	cjne	r3,#0x49,00291$
+   024F 74 01               636 	mov	a,#0x01
+   0251 80 01               637 	sjmp	00292$
+   0253                     638 00291$:
+   0253 E4                  639 	clr	a
+   0254                     640 00292$:
+                            641 ; Peephole 105   removed redundant mov
+   0254 F5*14               642 	mov  _vsprintf_sloc13_1_0,a
+   0256 60 03               643 	jz	00293$
+   0258 02s04r23            644 	ljmp	00137$
+   025B                     645 00293$:
+   025B BB 4C 04            646 	cjne	r3,#0x4c,00294$
+   025E 74 01               647 	mov	a,#0x01
+   0260 80 01               648 	sjmp	00295$
+   0262                     649 00294$:
+   0262 E4                  650 	clr	a
+   0263                     651 00295$:
+                            652 ; Peephole 105   removed redundant mov
+   0263 FC                  653 	mov  r4,a
+                            654 ; Peephole 109   removed ljmp by inverse jump logic
+   0264 70 34               655 	jnz  00115$
+   0266                     656 00296$:
+   0266 BB 4F 03            657 	cjne	r3,#0x4f,00297$
+   0269 02s04r2D            658 	ljmp	00139$
+   026C                     659 00297$:
+   026C BB 50 03            660 	cjne	r3,#0x50,00298$
+   026F 02s03rC0            661 	ljmp	00133$
+   0272                     662 00298$:
+   0272 BB 53 02            663 	cjne	r3,#0x53,00299$
+                            664 ; Peephole 132   changed ljmp to sjmp
+   0275 80 42               665 	sjmp 00117$
+   0277                     666 00299$:
+   0277 BB 55 03            667 	cjne	r3,#0x55,00300$
+   027A 02s04r35            668 	ljmp	00140$
+   027D                     669 00300$:
+   027D BB 58 03            670 	cjne	r3,#0x58,00301$
+   0280 02s04r3D            671 	ljmp	00141$
+   0283                     672 00301$:
+   0283 02s04r45            673 	ljmp	00142$
+                            674 ;	vprintf.c 190
+   0286                     675 00111$:
+   0286 D2*03               676 	setb	_vsprintf_left_justify_1_1
+                            677 ;	vprintf.c 191
+   0288 02s01r55            678 	ljmp	00104$
+                            679 ;	vprintf.c 193
+   028B                     680 00112$:
+   028B D2*05               681 	setb	_vsprintf_prefix_sign_1_1
+                            682 ;	vprintf.c 194
+   028D 02s01r55            683 	ljmp	00104$
+                            684 ;	vprintf.c 196
+   0290                     685 00113$:
+   0290 D2*06               686 	setb	_vsprintf_prefix_space_1_1
+                            687 ;	vprintf.c 197
+   0292 02s01r55            688 	ljmp	00104$
+                            689 ;	vprintf.c 199
+   0295                     690 00114$:
+   0295 D2*08               691 	setb	_vsprintf_char_argument_1_1
+                            692 ;	vprintf.c 200
+   0297 02s01r55            693 	ljmp	00104$
+                            694 ;	vprintf.c 202
+   029A                     695 00115$:
+   029A D2*09               696 	setb	_vsprintf_long_argument_1_1
+                            697 ;	vprintf.c 203
+   029C 02s01r55            698 	ljmp	00104$
+                            699 ;	vprintf.c 206
+   029F                     700 00116$:
+   029F 90s00r07            701 	mov	dptr,#_vsprintf_PARM_3
+   02A2 E0                  702 	movx	a,@dptr
+                            703 ; Peephole 105   removed redundant mov
+   02A3 FA                  704 	mov  r2,a
+   02A4 24 FF               705 	add	a,#0xff
+                            706 ; Peephole 100   removed redundant mov
+   02A6 F8                  707 	mov  r0,a
+   02A7 90s00r07            708 	mov  dptr,#_vsprintf_PARM_3
+   02AA F0                  709 	movx @dptr,a
+   02AB 86 02               710 	mov	ar2,@r0
+   02AD C0 03               711 	push	ar3
+   02AF 8A 82               712 	mov	dpl,r2
+   02B1 12s00r00            713 	lcall	_output_char
+   02B4 D0 03               714 	pop	ar3
+                            715 ;	vprintf.c 207
+   02B6 02s04r4A            716 	ljmp	00143$
+                            717 ;	vprintf.c 210
+   02B9                     718 00117$:
+   02B9 90s00r07            719 	mov	dptr,#_vsprintf_PARM_3
+   02BC E0                  720 	movx	a,@dptr
+                            721 ; Peephole 105   removed redundant mov
+   02BD FA                  722 	mov  r2,a
+   02BE 24 FD               723 	add	a,#0xfd
+                            724 ; Peephole 100   removed redundant mov
+   02C0 F8                  725 	mov  r0,a
+   02C1 90s00r07            726 	mov  dptr,#_vsprintf_PARM_3
+   02C4 F0                  727 	movx @dptr,a
+   02C5 86 02               728 	mov	ar2,@r0
+   02C7 08                  729 	inc	r0
+   02C8 86 04               730 	mov	ar4,@r0
+   02CA 08                  731 	inc	r0
+   02CB 86 05               732 	mov	ar5,@r0
+   02CD 18                  733 	dec	r0
+   02CE 18                  734 	dec	r0
+   02CF 8A*00               735 	mov	_value,r2
+   02D1 8C*01               736 	mov	(_value + 1),r4
+   02D3 8D*02               737 	mov	(_value + 2),r5
+                            738 ;	vprintf.c 212
+   02D5 C0 03               739 	push	ar3
+   02D7 8A 82               740 	mov	dpl,r2
+   02D9 8C 83               741 	mov	dph,r4
+   02DB 8D F0               742 	mov	b,r5
+   02DD 12s00r00            743 	lcall	_strlen
+   02E0 AA 82               744 	mov	r2,dpl
+   02E2 AC 83               745 	mov	r4,dph
+   02E4 D0 03               746 	pop	ar3
+   02E6 8A*14               747 	mov	_vsprintf_sloc13_1_0,r2
+                            748 ;	vprintf.c 213
+                            749 ; Peephole 112   removed ljmp by inverse jump logic
+   02E8 20*03 3B            750 	jb   _vsprintf_left_justify_1_1,00124$
+   02EB                     751 00302$:
+   02EB 90s00r0B            752 	mov	dptr,#_vsprintf_width_1_1
+   02EE E0                  753 	movx	a,@dptr
+   02EF FC                  754 	mov	r4,a
+   02F0 C3                  755 	clr	c
+   02F1 E5*14               756 	mov	a,_vsprintf_sloc13_1_0
+   02F3 9C                  757 	subb	a,r4
+                            758 ; Peephole 108   removed ljmp by inverse jump logic
+   02F4 50 30               759 	jnc  00124$
+   02F6                     760 00303$:
+                            761 ;	vprintf.c 215
+   02F6 C3                  762 	clr	c
+   02F7 EC                  763 	mov	a,r4
+   02F8 95*14               764 	subb	a,_vsprintf_sloc13_1_0
+   02FA FC                  765 	mov	r4,a
+                            766 ;	vprintf.c 216
+   02FB                     767 00118$:
+   02FB 8C 05               768 	mov	ar5,r4
+   02FD 1C                  769 	dec	r4
+   02FE 90s00r0B            770 	mov	dptr,#_vsprintf_width_1_1
+   0301 EC                  771 	mov	a,r4
+   0302 F0                  772 	movx	@dptr,a
+   0303 BD 00 04            773 	cjne	r5,#0x00,00304$
+   0306 74 01               774 	mov	a,#0x01
+   0308 80 01               775 	sjmp	00305$
+   030A                     776 00304$:
+   030A E4                  777 	clr	a
+   030B                     778 00305$:
+                            779 ; Peephole 105   removed redundant mov
+   030B FE                  780 	mov  r6,a
+                            781 ; Peephole 109   removed ljmp by inverse jump logic
+   030C 70 18               782 	jnz  00124$
+   030E                     783 00306$:
+                            784 ;	vprintf.c 218
+   030E C0 03               785 	push	ar3
+   0310 C0 04               786 	push	ar4
+   0312 C0 05               787 	push	ar5
+   0314 C0 06               788 	push	ar6
+   0316 75 82 20            789 	mov	dpl,#0x20
+   0319 12s00r00            790 	lcall	_output_char
+   031C D0 06               791 	pop	ar6
+   031E D0 05               792 	pop	ar5
+   0320 D0 04               793 	pop	ar4
+   0322 D0 03               794 	pop	ar3
+                            795 ;	vprintf.c 222
+                            796 ; Peephole 132   changed ljmp to sjmp
+   0324 80 D5               797 	sjmp 00118$
+   0326                     798 00124$:
+   0326 AC*00               799 	mov	r4,_value
+   0328 AD*01               800 	mov	r5,(_value + 1)
+   032A AE*02               801 	mov	r6,(_value + 2)
+   032C 8C 82               802 	mov	dpl,r4
+   032E 8D 83               803 	mov	dph,r5
+   0330 8E F0               804 	mov	b,r6
+   0332 12s00r00            805 	lcall	__gptrget
+                            806 ; Peephole 105   removed redundant mov
+   0335 F5*13               807 	mov  _vsprintf_sloc12_1_0,a
+                            808 ; Peephole 110   removed ljmp by inverse jump logic
+   0337 60 40               809 	jz  00126$
+   0339                     810 00307$:
+                            811 ;	vprintf.c 223
+   0339 74 01               812 	mov	a,#0x01
+   033B 2C                  813 	add	a,r4
+   033C F8                  814 	mov	r0,a
+                            815 ; Peephole 180   changed mov to clr
+   033D E4                  816 	clr  a
+   033E 3D                  817 	addc	a,r5
+   033F F9                  818 	mov	r1,a
+   0340 8E 02               819 	mov	ar2,r6
+   0342 88*00               820 	mov	_value,r0
+   0344 89*01               821 	mov	(_value + 1),r1
+   0346 8A*02               822 	mov	(_value + 2),r2
+   0348 8C 82               823 	mov	dpl,r4
+   034A 8D 83               824 	mov	dph,r5
+   034C 8E F0               825 	mov	b,r6
+   034E 12s00r00            826 	lcall	__gptrget
+   0351 FF                  827 	mov	r7,a
+   0352 C0 02               828 	push	ar2
+   0354 C0 03               829 	push	ar3
+   0356 C0 04               830 	push	ar4
+   0358 C0 05               831 	push	ar5
+   035A C0 06               832 	push	ar6
+   035C C0 07               833 	push	ar7
+   035E C0 00               834 	push	ar0
+   0360 C0 01               835 	push	ar1
+   0362 8F 82               836 	mov	dpl,r7
+   0364 12s00r00            837 	lcall	_output_char
+   0367 D0 01               838 	pop	ar1
+   0369 D0 00               839 	pop	ar0
+   036B D0 07               840 	pop	ar7
+   036D D0 06               841 	pop	ar6
+   036F D0 05               842 	pop	ar5
+   0371 D0 04               843 	pop	ar4
+   0373 D0 03               844 	pop	ar3
+   0375 D0 02               845 	pop	ar2
+                            846 ; Peephole 132   changed ljmp to sjmp
+   0377 80 AD               847 	sjmp 00124$
+   0379                     848 00126$:
+                            849 ;	vprintf.c 225
+   0379 20*03 03            850 	jb	_vsprintf_left_justify_1_1,00308$
+   037C 02s04r4A            851 	ljmp	00143$
+   037F                     852 00308$:
+   037F 90s00r0B            853 	mov	dptr,#_vsprintf_width_1_1
+   0382 E0                  854 	movx	a,@dptr
+   0383 FA                  855 	mov	r2,a
+   0384 C3                  856 	clr	c
+   0385 E5*14               857 	mov	a,_vsprintf_sloc13_1_0
+   0387 9A                  858 	subb	a,r2
+   0388 40 03               859 	jc	00309$
+   038A 02s04r4A            860 	ljmp	00143$
+   038D                     861 00309$:
+                            862 ;	vprintf.c 227
+   038D C3                  863 	clr	c
+   038E EA                  864 	mov	a,r2
+   038F 95*14               865 	subb	a,_vsprintf_sloc13_1_0
+   0391 FA                  866 	mov	r2,a
+                            867 ;	vprintf.c 228
+   0392                     868 00127$:
+   0392 8A 04               869 	mov	ar4,r2
+   0394 1A                  870 	dec	r2
+   0395 90s00r0B            871 	mov	dptr,#_vsprintf_width_1_1
+   0398 EA                  872 	mov	a,r2
+   0399 F0                  873 	movx	@dptr,a
+   039A BC 00 04            874 	cjne	r4,#0x00,00310$
+   039D 74 01               875 	mov	a,#0x01
+   039F 80 01               876 	sjmp	00311$
+   03A1                     877 00310$:
+   03A1 E4                  878 	clr	a
+   03A2                     879 00311$:
+                            880 ; Peephole 105   removed redundant mov
+   03A2 FD                  881 	mov  r5,a
+   03A3 60 03               882 	jz	00312$
+   03A5 02s04r4A            883 	ljmp	00143$
+   03A8                     884 00312$:
+                            885 ;	vprintf.c 230
+   03A8 C0 02               886 	push	ar2
+   03AA C0 03               887 	push	ar3
+   03AC C0 04               888 	push	ar4
+   03AE C0 05               889 	push	ar5
+   03B0 75 82 20            890 	mov	dpl,#0x20
+   03B3 12s00r00            891 	lcall	_output_char
+   03B6 D0 05               892 	pop	ar5
+   03B8 D0 04               893 	pop	ar4
+   03BA D0 03               894 	pop	ar3
+   03BC D0 02               895 	pop	ar2
+                            896 ;	vprintf.c 236
+                            897 ; Peephole 132   changed ljmp to sjmp
+   03BE 80 D2               898 	sjmp 00127$
+   03C0                     899 00133$:
+   03C0 90s00r07            900 	mov	dptr,#_vsprintf_PARM_3
+   03C3 E0                  901 	movx	a,@dptr
+                            902 ; Peephole 105   removed redundant mov
+   03C4 FA                  903 	mov  r2,a
+   03C5 24 FD               904 	add	a,#0xfd
+                            905 ; Peephole 100   removed redundant mov
+   03C7 F8                  906 	mov  r0,a
+   03C8 90s00r07            907 	mov  dptr,#_vsprintf_PARM_3
+   03CB F0                  908 	movx @dptr,a
+   03CC 86 02               909 	mov	ar2,@r0
+   03CE 08                  910 	inc	r0
+   03CF 86 04               911 	mov	ar4,@r0
+   03D1 08                  912 	inc	r0
+   03D2 86 05               913 	mov	ar5,@r0
+   03D4 18                  914 	dec	r0
+   03D5 18                  915 	dec	r0
+   03D6 8A*00               916 	mov	_value,r2
+   03D8 8C*01               917 	mov	(_value + 1),r4
+   03DA 8D*02               918 	mov	(_value + 2),r5
+                            919 ;	vprintf.c 238
+   03DC C3                  920 	clr	c
+   03DD 74 03               921 	mov	a,#0x03
+   03DF 95*02               922 	subb	a,0x0002 + _value
+                            923 ; Peephole 108   removed ljmp by inverse jump logic
+   03E1 50 04               924 	jnc  00200$
+   03E3                     925 00313$:
+   03E3 7A 04               926 	mov	r2,#0x04
+                            927 ; Peephole 132   changed ljmp to sjmp
+   03E5 80 02               928 	sjmp 00201$
+   03E7                     929 00200$:
+   03E7 AA*02               930 	mov	r2,0x0002 + _value
+   03E9                     931 00201$:
+   03E9 EA                  932 	mov	a,r2
+                            933 ; Peephole 180   changed mov to clr
+                            934 ; Peephole 186   optimized movc sequence
+   03EA 90s06r6B            935 	mov  dptr,#_memory_id
+   03ED 93                  936 	movc a,@a+dptr
+   03EE FA                  937 	mov	r2,a
+   03EF C0 03               938 	push	ar3
+   03F1 8A 82               939 	mov	dpl,r2
+   03F3 12s00r00            940 	lcall	_output_char
+   03F6 D0 03               941 	pop	ar3
+                            942 ;	vprintf.c 239
+   03F8 C0 03               943 	push	ar3
+   03FA 75 82 3A            944 	mov	dpl,#0x3a
+   03FD 12s00r00            945 	lcall	_output_char
+   0400 D0 03               946 	pop	ar3
+                            947 ;	vprintf.c 240
+   0402 E5*02               948 	mov	a,0x0002 + _value
+                            949 ; Peephole 110   removed ljmp by inverse jump logic
+   0404 60 11               950 	jz  00135$
+   0406                     951 00314$:
+   0406 E5*02               952 	mov	a,0x0002 + _value
+   0408 B4 03 02            953 	cjne	a,#0x03,00315$
+                            954 ; Peephole 132   changed ljmp to sjmp
+   040B 80 0A               955 	sjmp 00135$
+   040D                     956 00315$:
+                            957 ;	vprintf.c 241
+   040D C0 03               958 	push	ar3
+   040F 85*01 82            959 	mov	dpl,0x0001 + _value
+   0412 12s00r70            960 	lcall	_output_2digits
+   0415 D0 03               961 	pop	ar3
+   0417                     962 00135$:
+                            963 ;	vprintf.c 242
+   0417 C0 03               964 	push	ar3
+   0419 85*00 82            965 	mov	dpl,_value
+   041C 12s00r70            966 	lcall	_output_2digits
+   041F D0 03               967 	pop	ar3
+                            968 ;	vprintf.c 243
+                            969 ;	vprintf.c 247
+                            970 ; Peephole 132   changed ljmp to sjmp
+   0421 80 27               971 	sjmp 00143$
+   0423                     972 00137$:
+   0423 D2*07               973 	setb	_vsprintf_signed_argument_1_1
+                            974 ;	vprintf.c 248
+   0425 90s00r03            975 	mov	dptr,#_radix
+   0428 74 0A               976 	mov	a,#0x0a
+   042A F0                  977 	movx	@dptr,a
+                            978 ;	vprintf.c 249
+                            979 ;	vprintf.c 252
+                            980 ; Peephole 132   changed ljmp to sjmp
+   042B 80 1D               981 	sjmp 00143$
+   042D                     982 00139$:
+   042D 90s00r03            983 	mov	dptr,#_radix
+   0430 74 08               984 	mov	a,#0x08
+   0432 F0                  985 	movx	@dptr,a
+                            986 ;	vprintf.c 253
+                            987 ;	vprintf.c 256
+                            988 ; Peephole 132   changed ljmp to sjmp
+   0433 80 15               989 	sjmp 00143$
+   0435                     990 00140$:
+   0435 90s00r03            991 	mov	dptr,#_radix
+   0438 74 0A               992 	mov	a,#0x0a
+   043A F0                  993 	movx	@dptr,a
+                            994 ;	vprintf.c 257
+                            995 ;	vprintf.c 260
+                            996 ; Peephole 132   changed ljmp to sjmp
+   043B 80 0D               997 	sjmp 00143$
+   043D                     998 00141$:
+   043D 90s00r03            999 	mov	dptr,#_radix
+   0440 74 10              1000 	mov	a,#0x10
+   0442 F0                 1001 	movx	@dptr,a
+                           1002 ;	vprintf.c 261
+                           1003 ;	vprintf.c 265
+                           1004 ; Peephole 132   changed ljmp to sjmp
+   0443 80 05              1005 	sjmp 00143$
+   0445                    1006 00142$:
+   0445 8B 82              1007 	mov	dpl,r3
+   0447 12s00r00           1008 	lcall	_output_char
+                           1009 ;	vprintf.c 267
+   044A                    1010 00143$:
+                           1011 ;	vprintf.c 269
+   044A 90s00r03           1012 	mov	dptr,#_radix
+   044D E0                 1013 	movx	a,@dptr
+   044E FA                 1014 	mov	r2,a
+   044F BA 00 03           1015 	cjne	r2,#0x00,00316$
+   0452 02s01r04           1016 	ljmp	00193$
+   0455                    1017 00316$:
+                           1018 ;	vprintf.c 275
+                           1019 ; Peephole 111   removed ljmp by inverse jump logic
+   0455 30*08 2F           1020 	jnb  _vsprintf_char_argument_1_1,00152$
+   0458                    1021 00317$:
+                           1022 ;	vprintf.c 277
+   0458 90s00r07           1023 	mov	dptr,#_vsprintf_PARM_3
+   045B E0                 1024 	movx	a,@dptr
+                           1025 ; Peephole 105   removed redundant mov
+   045C FA                 1026 	mov  r2,a
+   045D 24 FF              1027 	add	a,#0xff
+                           1028 ; Peephole 100   removed redundant mov
+   045F F8                 1029 	mov  r0,a
+   0460 90s00r07           1030 	mov  dptr,#_vsprintf_PARM_3
+   0463 F0                 1031 	movx @dptr,a
+   0464 86 02              1032 	mov	ar2,@r0
+   0466 EA                 1033 	mov	a,r2
+   0467 33                 1034 	rlc	a
+   0468 95 E0              1035 	subb	a,acc
+   046A FB                 1036 	mov	r3,a
+   046B FC                 1037 	mov	r4,a
+   046C FD                 1038 	mov	r5,a
+   046D 8A*00              1039 	mov	_value,r2
+   046F 8B*01              1040 	mov	(_value + 1),r3
+   0471 8C*02              1041 	mov	(_value + 2),r4
+   0473 8D*03              1042 	mov	(_value + 3),r5
+                           1043 ;	vprintf.c 278
+   0475 30*07 03           1044 	jnb	_vsprintf_signed_argument_1_1,00318$
+   0478 02s04rD7           1045 	ljmp	00153$
+   047B                    1046 00318$:
+                           1047 ;	vprintf.c 280
+   047B 75*01 00           1048 	mov	0x0001 + _value,#0x00
+                           1049 ;	vprintf.c 281
+   047E 75*02 00           1050 	mov	0x0002 + _value,#0x00
+                           1051 ;	vprintf.c 282
+   0481 75*03 00           1052 	mov	0x0003 + _value,#0x00
+   0484 02s04rD7           1053 	ljmp	00153$
+   0487                    1054 00152$:
+                           1055 ;	vprintf.c 285
+                           1056 ; Peephole 111   removed ljmp by inverse jump logic
+   0487 30*09 24           1057 	jnb  _vsprintf_long_argument_1_1,00149$
+   048A                    1058 00319$:
+                           1059 ;	vprintf.c 287
+   048A 90s00r07           1060 	mov	dptr,#_vsprintf_PARM_3
+   048D E0                 1061 	movx	a,@dptr
+                           1062 ; Peephole 105   removed redundant mov
+   048E FA                 1063 	mov  r2,a
+   048F 24 FC              1064 	add	a,#0xfc
+                           1065 ; Peephole 100   removed redundant mov
+   0491 F8                 1066 	mov  r0,a
+   0492 90s00r07           1067 	mov  dptr,#_vsprintf_PARM_3
+   0495 F0                 1068 	movx @dptr,a
+   0496 86 02              1069 	mov	ar2,@r0
+   0498 08                 1070 	inc	r0
+   0499 86 03              1071 	mov	ar3,@r0
+   049B 08                 1072 	inc	r0
+   049C 86 04              1073 	mov	ar4,@r0
+   049E 08                 1074 	inc	r0
+   049F 86 05              1075 	mov	ar5,@r0
+   04A1 18                 1076 	dec	r0
+   04A2 18                 1077 	dec	r0
+   04A3 18                 1078 	dec	r0
+   04A4 8A*00              1079 	mov	_value,r2
+   04A6 8B*01              1080 	mov	(_value + 1),r3
+   04A8 8C*02              1081 	mov	(_value + 2),r4
+   04AA 8D*03              1082 	mov	(_value + 3),r5
+                           1083 ; Peephole 132   changed ljmp to sjmp
+   04AC 80 29              1084 	sjmp 00153$
+   04AE                    1085 00149$:
+                           1086 ;	vprintf.c 291
+   04AE 90s00r07           1087 	mov	dptr,#_vsprintf_PARM_3
+   04B1 E0                 1088 	movx	a,@dptr
+                           1089 ; Peephole 105   removed redundant mov
+   04B2 FA                 1090 	mov  r2,a
+   04B3 24 FE              1091 	add	a,#0xfe
+                           1092 ; Peephole 100   removed redundant mov
+   04B5 F8                 1093 	mov  r0,a
+   04B6 90s00r07           1094 	mov  dptr,#_vsprintf_PARM_3
+   04B9 F0                 1095 	movx @dptr,a
+   04BA 86 02              1096 	mov	ar2,@r0
+   04BC 08                 1097 	inc	r0
+   04BD 86 03              1098 	mov	ar3,@r0
+   04BF 18                 1099 	dec	r0
+   04C0 EB                 1100 	mov	a,r3
+   04C1 33                 1101 	rlc	a
+   04C2 95 E0              1102 	subb	a,acc
+   04C4 FC                 1103 	mov	r4,a
+   04C5 FD                 1104 	mov	r5,a
+   04C6 8A*00              1105 	mov	_value,r2
+   04C8 8B*01              1106 	mov	(_value + 1),r3
+   04CA 8C*02              1107 	mov	(_value + 2),r4
+   04CC 8D*03              1108 	mov	(_value + 3),r5
+                           1109 ;	vprintf.c 292
+                           1110 ; Peephole 112   removed ljmp by inverse jump logic
+   04CE 20*07 06           1111 	jb   _vsprintf_signed_argument_1_1,00153$
+   04D1                    1112 00320$:
+                           1113 ;	vprintf.c 294
+   04D1 75*02 00           1114 	mov	0x0002 + _value,#0x00
+                           1115 ;	vprintf.c 295
+   04D4 75*03 00           1116 	mov	0x0003 + _value,#0x00
+   04D7                    1117 00153$:
+                           1118 ;	vprintf.c 299
+                           1119 ; Peephole 111   removed ljmp by inverse jump logic
+   04D7 30*07 22           1120 	jnb  _vsprintf_signed_argument_1_1,00158$
+   04DA                    1121 00321$:
+                           1122 ;	vprintf.c 301
+   04DA E5*03              1123 	mov	a,(_value + 3)
+                           1124 ; Peephole 111   removed ljmp by inverse jump logic
+   04DC 30 E7 1B           1125 	jnb  acc.7,00155$
+   04DF                    1126 00322$:
+                           1127 ;	vprintf.c 302
+   04DF C3                 1128 	clr	c
+   04E0 E4                 1129 	clr	a
+   04E1 95*00              1130 	subb	a,_value
+   04E3 FA                 1131 	mov	r2,a
+   04E4 E4                 1132 	clr	a
+   04E5 95*01              1133 	subb	a,(_value + 1)
+   04E7 FB                 1134 	mov	r3,a
+   04E8 E4                 1135 	clr	a
+   04E9 95*02              1136 	subb	a,(_value + 2)
+   04EB FC                 1137 	mov	r4,a
+   04EC E4                 1138 	clr	a
+   04ED 95*03              1139 	subb	a,(_value + 3)
+   04EF FD                 1140 	mov	r5,a
+   04F0 8A*00              1141 	mov	_value,r2
+   04F2 8B*01              1142 	mov	(_value + 1),r3
+   04F4 8C*02              1143 	mov	(_value + 2),r4
+   04F6 8D*03              1144 	mov	(_value + 3),r5
+                           1145 ; Peephole 132   changed ljmp to sjmp
+   04F8 80 02              1146 	sjmp 00158$
+   04FA                    1147 00155$:
+                           1148 ;	vprintf.c 304
+   04FA C2*07              1149 	clr	_vsprintf_signed_argument_1_1
+   04FC                    1150 00158$:
+                           1151 ;	vprintf.c 307
+   04FC 90s00r0C           1152 	mov	dptr,#_vsprintf_length_1_1
+                           1153 ; Peephole 180   changed mov to clr
+   04FF E4                 1154 	clr  a
+   0500 F0                 1155 	movx	@dptr,a
+                           1156 ;	vprintf.c 308
+   0501 D2*02              1157 	setb	_lsd
+                           1158 ;	vprintf.c 309
+   0503 7A 00              1159 	mov	r2,#0x00
+   0505                    1160 00162$:
+   0505 E5*00              1161 	mov	a,_value
+                           1162 ; Peephole 162   removed sjmp by inverse jump logic
+   0507 60 02              1163 	jz   00324$
+   0509                    1164 00323$:
+                           1165 ; Peephole 132   changed ljmp to sjmp
+   0509 80 1E              1166 	sjmp 00163$
+   050B                    1167 00324$:
+   050B E5*01              1168 	mov	a,0x0001 + _value
+                           1169 ; Peephole 162   removed sjmp by inverse jump logic
+   050D 60 02              1170 	jz   00326$
+   050F                    1171 00325$:
+                           1172 ; Peephole 132   changed ljmp to sjmp
+   050F 80 18              1173 	sjmp 00163$
+   0511                    1174 00326$:
+                           1175 ;	vprintf.c 310
+   0511 E5*02              1176 	mov	a,0x0002 + _value
+                           1177 ; Peephole 162   removed sjmp by inverse jump logic
+   0513 60 02              1178 	jz   00328$
+   0515                    1179 00327$:
+                           1180 ; Peephole 132   changed ljmp to sjmp
+   0515 80 12              1181 	sjmp 00163$
+   0517                    1182 00328$:
+   0517 E5*03              1183 	mov	a,0x0003 + _value
+   0519 70 04              1184 	jnz	00329$
+   051B 74 01              1185 	mov	a,#0x01
+   051D 80 01              1186 	sjmp	00330$
+   051F                    1187 00329$:
+   051F E4                 1188 	clr	a
+   0520                    1189 00330$:
+   0520 FB                 1190 	mov	r3,a
+   0521 90s00r0C           1191 	mov	dptr,#_vsprintf_length_1_1
+   0524 EA                 1192 	mov	a,r2
+   0525 F0                 1193 	movx	@dptr,a
+   0526 EB                 1194 	mov	a,r3
+                           1195 ; Peephole 109   removed ljmp by inverse jump logic
+   0527 70 21              1196 	jnz  00164$
+   0529                    1197 00331$:
+   0529                    1198 00163$:
+                           1199 ;	vprintf.c 312
+   0529 75*04 00           1200 	mov	0x0004 + _value,#0x00
+                           1201 ;	vprintf.c 313
+   052C C0 02              1202 	push	ar2
+   052E 12s00r93           1203 	lcall	_calculate_digit
+   0531 D0 02              1204 	pop	ar2
+                           1205 ;	vprintf.c 327
+   0533 20*02 0B           1206 	  jb   _lsd,1$
+   0536 D0 F0              1207 	  pop  b                ; b = <lsd>
+   0538 E5*04              1208 	  mov  a,_value+4       ; a = <msd>
+   053A C4                 1209 	  swap a
+   053B 42 F0              1210 	  orl  b,a              ; b = <msd><lsd>
+   053D C0 F0              1211 	  push b
+   053F 80 04              1212 	  sjmp 2$
+   0541                    1213 1$:
+   0541 E5*04              1214 	  mov  a,_value+4       ; a = <lsd>
+   0543 C0 E0              1215 	  push acc
+   0545                    1216 2$:
+                           1217 ;	vprintf.c 329
+   0545 0A                 1218 	inc	r2
+                           1219 ;	vprintf.c 330
+                           1220 ; Peephole 167   removed redundant bit moves (c not set to _lsd)
+   0546 B2*02              1221 	cpl  _lsd 
+                           1222 ; Peephole 132   changed ljmp to sjmp
+   0548 80 BB              1223 	sjmp 00162$
+   054A                    1224 00164$:
+                           1225 ;	vprintf.c 333
+   054A 90s00r0B           1226 	mov	dptr,#_vsprintf_width_1_1
+   054D E0                 1227 	movx	a,@dptr
+   054E FB                 1228 	mov	r3,a
+                           1229 ; Peephole 132   changed ljmp to sjmp
+                           1230 ; Peephole 199   optimized misc jump sequence
+   054F BB 00 06           1231 	cjne r3,#0x00,00166$
+                           1232 ; Peephole 201   removed redundant sjmp
+   0552                    1233 00332$:
+   0552                    1234 00333$:
+                           1235 ;	vprintf.c 338
+   0552 90s00r0B           1236 	mov	dptr,#_vsprintf_width_1_1
+   0555 74 01              1237 	mov	a,#0x01
+   0557 F0                 1238 	movx	@dptr,a
+   0558                    1239 00166$:
+                           1240 ;	vprintf.c 342
+                           1241 ; Peephole 112   removed ljmp by inverse jump logic
+   0558 20*04 21           1242 	jb   _vsprintf_zero_padding_1_1,00171$
+   055B                    1243 00334$:
+                           1244 ;	vprintf.c 344
+   055B 0A                 1245 	inc	r2
+   055C 90s00r0B           1246 	mov	dptr,#_vsprintf_width_1_1
+   055F E0                 1247 	movx	a,@dptr
+   0560 FB                 1248 	mov	r3,a
+   0561                    1249 00167$:
+   0561 C3                 1250 	clr	c
+   0562 EA                 1251 	mov	a,r2
+   0563 9B                 1252 	subb	a,r3
+   0564 E4                 1253 	clr	a
+   0565 33                 1254 	rlc	a
+   0566 FA                 1255 	mov	r2,a
+   0567 90s00r0B           1256 	mov	dptr,#_vsprintf_width_1_1
+   056A EB                 1257 	mov	a,r3
+   056B F0                 1258 	movx	@dptr,a
+   056C EA                 1259 	mov	a,r2
+                           1260 ; Peephole 110   removed ljmp by inverse jump logic
+   056D 60 0D              1261 	jz  00171$
+   056F                    1262 00335$:
+                           1263 ;	vprintf.c 346
+   056F C0 03              1264 	push	ar3
+   0571 75 82 20           1265 	mov	dpl,#0x20
+   0574 12s00r00           1266 	lcall	_output_char
+   0577 D0 03              1267 	pop	ar3
+                           1268 ;	vprintf.c 347
+   0579 1B                 1269 	dec	r3
+                           1270 ; Peephole 132   changed ljmp to sjmp
+   057A 80 E5              1271 	sjmp 00167$
+   057C                    1272 00171$:
+                           1273 ;	vprintf.c 351
+                           1274 ; Peephole 111   removed ljmp by inverse jump logic
+   057C 30*07 13           1275 	jnb  _vsprintf_signed_argument_1_1,00180$
+   057F                    1276 00336$:
+                           1277 ;	vprintf.c 353
+   057F 75 82 2D           1278 	mov	dpl,#0x2d
+   0582 12s00r00           1279 	lcall	_output_char
+                           1280 ;	vprintf.c 355
+   0585 90s00r0B           1281 	mov	dptr,#_vsprintf_width_1_1
+   0588 E0                 1282 	movx	a,@dptr
+                           1283 ; Peephole 105   removed redundant mov
+   0589 FA                 1284 	mov  r2,a
+   058A 24 FF              1285 	add	a,#0xff
+   058C 90s00r0B           1286 	mov	dptr,#_vsprintf_width_1_1
+   058F F0                 1287 	movx	@dptr,a
+                           1288 ; Peephole 132   changed ljmp to sjmp
+   0590 80 34              1289 	sjmp 00258$
+   0592                    1290 00180$:
+                           1291 ;	vprintf.c 357
+   0592 90s00r0C           1292 	mov	dptr,#_vsprintf_length_1_1
+   0595 E0                 1293 	movx	a,@dptr
+   0596 FA                 1294 	mov	r2,a
+   0597 BA 00 02           1295 	cjne	r2,#0x00,00337$
+                           1296 ; Peephole 132   changed ljmp to sjmp
+   059A 80 2A              1297 	sjmp 00258$
+   059C                    1298 00337$:
+                           1299 ;	vprintf.c 360
+                           1300 ; Peephole 111   removed ljmp by inverse jump logic
+   059C 30*05 13           1301 	jnb  _vsprintf_prefix_sign_1_1,00175$
+   059F                    1302 00338$:
+                           1303 ;	vprintf.c 362
+   059F 75 82 2B           1304 	mov	dpl,#0x2b
+   05A2 12s00r00           1305 	lcall	_output_char
+                           1306 ;	vprintf.c 364
+   05A5 90s00r0B           1307 	mov	dptr,#_vsprintf_width_1_1
+   05A8 E0                 1308 	movx	a,@dptr
+                           1309 ; Peephole 105   removed redundant mov
+   05A9 FA                 1310 	mov  r2,a
+   05AA 24 FF              1311 	add	a,#0xff
+   05AC 90s00r0B           1312 	mov	dptr,#_vsprintf_width_1_1
+   05AF F0                 1313 	movx	@dptr,a
+                           1314 ; Peephole 132   changed ljmp to sjmp
+   05B0 80 14              1315 	sjmp 00258$
+   05B2                    1316 00175$:
+                           1317 ;	vprintf.c 366
+                           1318 ; Peephole 111   removed ljmp by inverse jump logic
+   05B2 30*06 11           1319 	jnb  _vsprintf_prefix_space_1_1,00258$
+   05B5                    1320 00339$:
+                           1321 ;	vprintf.c 368
+   05B5 75 82 20           1322 	mov	dpl,#0x20
+   05B8 12s00r00           1323 	lcall	_output_char
+                           1324 ;	vprintf.c 370
+   05BB 90s00r0B           1325 	mov	dptr,#_vsprintf_width_1_1
+   05BE E0                 1326 	movx	a,@dptr
+                           1327 ; Peephole 105   removed redundant mov
+   05BF FA                 1328 	mov  r2,a
+   05C0 24 FF              1329 	add	a,#0xff
+   05C2 90s00r0B           1330 	mov	dptr,#_vsprintf_width_1_1
+   05C5 F0                 1331 	movx	@dptr,a
+                           1332 ;	vprintf.c 375
+   05C6                    1333 00258$:
+   05C6 90s00r0C           1334 	mov	dptr,#_vsprintf_length_1_1
+   05C9 E0                 1335 	movx	a,@dptr
+   05CA FA                 1336 	mov	r2,a
+   05CB 90s00r0B           1337 	mov	dptr,#_vsprintf_width_1_1
+   05CE E0                 1338 	movx	a,@dptr
+   05CF FB                 1339 	mov	r3,a
+   05D0                    1340 00182$:
+   05D0 8B 04              1341 	mov	ar4,r3
+   05D2 1B                 1342 	dec	r3
+   05D3 C3                 1343 	clr	c
+   05D4 EA                 1344 	mov	a,r2
+   05D5 9C                 1345 	subb	a,r4
+                           1346 ; Peephole 108   removed ljmp by inverse jump logic
+   05D6 50 18              1347 	jnc  00260$
+   05D8                    1348 00340$:
+                           1349 ;	vprintf.c 377
+                           1350 ; Peephole 111   removed ljmp by inverse jump logic
+   05D8 30*04 04           1351 	jnb  _vsprintf_zero_padding_1_1,00202$
+   05DB                    1352 00341$:
+   05DB 7C 30              1353 	mov	r4,#0x30
+                           1354 ; Peephole 132   changed ljmp to sjmp
+   05DD 80 02              1355 	sjmp 00203$
+   05DF                    1356 00202$:
+   05DF 7C 20              1357 	mov	r4,#0x20
+   05E1                    1358 00203$:
+   05E1 C0 02              1359 	push	ar2
+   05E3 C0 03              1360 	push	ar3
+   05E5 8C 82              1361 	mov	dpl,r4
+   05E7 12s00r00           1362 	lcall	_output_char
+   05EA D0 03              1363 	pop	ar3
+   05EC D0 02              1364 	pop	ar2
+                           1365 ;	vprintf.c 381
+                           1366 ; Peephole 132   changed ljmp to sjmp
+   05EE 80 E0              1367 	sjmp 00182$
+   05F0                    1368 00260$:
+   05F0                    1369 00185$:
+   05F0 8A 03              1370 	mov	ar3,r2
+   05F2 1A                 1371 	dec	r2
+   05F3 EB                 1372 	mov	a,r3
+   05F4 70 03              1373 	jnz	00342$
+   05F6 02s01r04           1374 	ljmp	00193$
+   05F9                    1375 00342$:
+                           1376 ;	vprintf.c 383
+                           1377 ; Peephole 167   removed redundant bit moves (c not set to _lsd)
+   05F9 B2*02              1378 	cpl  _lsd 
+                           1379 ;	vprintf.c 398
+   05FB 20*02 0A           1380 	  jb   _lsd,3$
+   05FE D0 E0              1381 	  pop  acc              ; a = <msd><lsd>
+   0600 00                 1382 	  nop                   ; to disable the "optimizer"
+   0601 C0 E0              1383 	  push acc
+   0603 C4                 1384 	  swap a
+   0604 54 0F              1385 	  anl  a,#0x0F          ; a = <msd>
+   0606 80 04              1386 	  sjmp 4$
+   0608                    1387 3$:
+   0608 D0 E0              1388 	  pop  acc
+   060A 54 0F              1389 	  anl  a,#0x0F          ; a = <lsd>
+   060C                    1390 4$:
+   060C F5*04              1391 	  mov  _value+4,a
+                           1392 ;	vprintf.c 400
+   060E C0 02              1393 	push	ar2
+   0610 85*04 82           1394 	mov	dpl,0x0004 + _value
+   0613 12s00r3A           1395 	lcall	_output_digit
+   0616 D0 02              1396 	pop	ar2
+                           1397 ; Peephole 132   changed ljmp to sjmp
+   0618 80 D6              1398 	sjmp 00185$
+   061A                    1399 00191$:
+                           1400 ;	vprintf.c 407
+   061A 85*05 82           1401 	mov	dpl,_vsprintf_sloc0_1_0
+   061D 12s00r00           1402 	lcall	_output_char
+   0620 02s01r04           1403 	ljmp	00193$
+   0623                    1404 00195$:
+                           1405 ;	vprintf.c 413
+                           1406 ; Peephole 111   removed ljmp by inverse jump logic
+   0623 30*00 06           1407 	jnb  _output_to_string,00198$
+   0626                    1408 00343$:
+   0626 75 82 00           1409 	mov	dpl,#0x00
+   0629 12s00r00           1410 	lcall	_output_char
+   062C                    1411 00198$:
+                    062C   1412 	C$vprintf.c$414$1$1 ==.
+                    062C   1413 	XG$vsprintf$0$0 ==.
+   062C 22                 1414 	ret
+                    062D   1415 	G$vprintf$0$0 ==.
+                           1416 ;	vprintf.c 418
+                           1417 ;	-----------------------------------------
+                           1418 ;	 function vprintf
+                           1419 ;	-----------------------------------------
+   062D                    1420 _vprintf:
+                           1421 ;	vprintf.c 420
+   062D C0 F0              1422 	push	b
+   062F C0 83              1423 	push	dph
+   0631 C0 82              1424 	push	dpl
+   0633 90s00r0F           1425 	mov	dptr,#_vprintf_format_1_1
+   0636 D0 E0              1426 	pop	acc
+   0638 F0                 1427 	movx	@dptr,a
+   0639 D0 E0              1428 	pop	acc
+   063B A3                 1429 	inc	dptr
+   063C F0                 1430 	movx	@dptr,a
+   063D D0 E0              1431 	pop	acc
+   063F A3                 1432 	inc	dptr
+   0640 F0                 1433 	movx	@dptr,a
+   0641 90s00r0F           1434 	mov	dptr,#_vprintf_format_1_1
+   0644 E0                 1435 	movx	a,@dptr
+   0645 FA                 1436 	mov	r2,a
+   0646 A3                 1437 	inc	dptr
+   0647 E0                 1438 	movx	a,@dptr
+   0648 FB                 1439 	mov	r3,a
+   0649 A3                 1440 	inc	dptr
+   064A E0                 1441 	movx	a,@dptr
+   064B FC                 1442 	mov	r4,a
+   064C 90s00r0E           1443 	mov	dptr,#_vprintf_PARM_2
+   064F E0                 1444 	movx	a,@dptr
+   0650 FD                 1445 	mov	r5,a
+   0651 90s00r04           1446 	mov	dptr,#_vsprintf_PARM_2
+   0654 EA                 1447 	mov	a,r2
+   0655 F0                 1448 	movx	@dptr,a
+   0656 A3                 1449 	inc	dptr
+   0657 EB                 1450 	mov	a,r3
+   0658 F0                 1451 	movx	@dptr,a
+   0659 A3                 1452 	inc	dptr
+   065A EC                 1453 	mov	a,r4
+   065B F0                 1454 	movx	@dptr,a
+   065C 90s00r07           1455 	mov	dptr,#_vsprintf_PARM_3
+   065F ED                 1456 	mov	a,r5
+   0660 F0                 1457 	movx	@dptr,a
+                           1458 ; Peephole 181   used 16 bit load of dptr
+   0661 90 00 00           1459 	mov  dptr,#0x0000
+   0664 75 F0 00           1460 	mov	b,#0x00
+   0667 12s00rCF           1461 	lcall	_vsprintf
+                    066A   1462 	C$vprintf.c$421$1$1 ==.
+                    066A   1463 	XG$vprintf$0$0 ==.
+                           1464 ; Peephole 151   removed misc moves via dph, dpl before return
+   066A                    1465 00101$:
+   066A 22                 1466 	ret
+                           1467 	.area	CSEG    (CODE)
+                    066B   1468 Fvprintf$memory_id$0$0 == .
+   066B                    1469 _memory_id:
+   066B 49 58 43 50 2D     1470 	.ascii /IXCP-/
+   0670 00                 1471 	.byte	0

@@ -1,0 +1,206 @@
+#!/bin/sh
+
+AC_INIT(Makefile)
+AC_CONFIG_HEADER(sdccconf.h:sdccconf_in.h)
+
+AC_PROG_AWK
+
+AC_MSG_CHECKING(version of the package)
+if test -f .version; then
+  VERSION=`cat .version`
+elif test -f ../.version; then
+  VERSION=`cat ../.version`
+else
+  VERSION="0.0.0"
+fi
+VERSIONHI=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $1}'`
+VERSIONLO=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $2}'`
+VERSIONP=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $3}'`
+AC_MSG_RESULT(${VERSION})
+AC_SUBST(VERSION)
+AC_SUBST(VERSIONHI)
+AC_SUBST(VERSIONLO)
+AC_SUBST(VERSIONP)
+AC_DEFINE_UNQUOTED(SDCC_VERSION_LO, ${VERSIONLO})
+AC_DEFINE_UNQUOTED(SDCC_VERSION_HI, ${VERSIONHI})
+AC_DEFINE_UNQUOTED(SDCC_VERSION_P, ${VERSIONP})
+AC_DEFINE_UNQUOTED(SDCC_VERSION_STR, "${VERSION}")
+sdcc_cv_version=$VERSION
+sdcc_cv_versionhi=$VERSIONHI
+sdcc_cv_versionlo=$VERSIONLO
+sdcc_cv_versionp=$VERSIONP
+
+# Required programs
+#-------------------
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_CPP
+AC_PROG_INSTALL
+AC_PROG_RANLIB
+AC_PROG_YACC(bison, :)
+AC_PROG_LEX(flex, :)
+AC_CHECK_PROG(AUTOCONF, autoconf, autoconf, :)
+AC_CHECK_PROG(AS, as, as, :)
+AC_CHECK_PROG(CP, cp, cp, :)
+
+AC_LANG_C
+
+# Checking for header files.
+# ===========================================================================
+AC_HEADER_STDC
+AC_CHECK_HEADERS(getopt.h)
+AC_CHECK_HEADERS(unistd.h)
+AC_CHECK_HEADERS(endian.h)
+AC_CHECK_HEADERS(sys/isa_defs.h)
+AC_CHECK_HEADERS(sys/socket.h)
+AC_HEADER_DIRENT
+
+# This must be after CPP
+
+AC_CACHE_CHECK(which header file defines FD_ macros, s51_cv_fd,
+[sdcc_cv_fd="unknown"
+AC_EGREP_CPP(yes, [
+#include <sys/time.h>
+#ifdef FD_ZERO
+yes
+#endif], sdcc_cv_fd="<sys/time.h>")
+AC_EGREP_CPP(yes, [
+#include <sys/types.h>
+#ifdef FD_ZERO
+yes
+#endif], sdcc_cv_fd="<sys/types.h>")
+AC_EGREP_CPP(yes, [
+#include <sys/select.h>
+#ifdef FD_ZERO
+yes
+#endif], sdcc_cv_fd="<sys/types.h>")])
+
+AC_DEFINE(FD_HEADER_OK, 0)
+if echo $sdcc_cv_fd|grep time >/dev/null 2>&1; then
+AC_DEFINE(FD_NEED_TIME_H, 1)
+AC_DEFINE(FD_HEADER_OK, 1)
+else
+AC_DEFINE(FD_NEED_TIME_H, 0)
+fi
+if echo $sdcc_cv_fd|grep types >/dev/null 2>&1; then
+AC_DEFINE(FD_NEED_TYPES_H, 1)
+AC_DEFINE(FD_HEADER_OK, 1)
+else
+AC_DEFINE(FD_NEED_TYPES_H, 0)
+fi
+if echo $sdcc_cv_fd|grep select >/dev/null 2>&1; then
+AC_DEFINE(FD_NEED_SELECT_H, 1)
+AC_DEFINE(FD_HEADER_OK, 1)
+else
+AC_DEFINE(FD_NEED_SELECT_H, 0)
+fi
+
+AC_DEFINE_UNQUOTED(HEADER_FD, ${sdcc_cv_fd})
+
+
+# Checking for functions
+# ===========================================================================
+AC_CHECK_FUNCS(strlen strcpy strcat strstr strcmp strerror strtok strdup)
+AC_CHECK_FUNCS(strchr memcpy)
+dnl AC_CHECK_FUNCS(getline)
+dnl AC_CHECK_FUNCS(getdelim)
+AC_CHECK_FUNCS(fgets)
+AC_CHECK_FUNCS(yylex)
+
+# check if -lsocket && -lxnet is required to compile socket stuff
+AC_SEARCH_LIBS(socket,socket)
+AC_SEARCH_LIBS(inet_addr,nsl xnet)
+
+# Macro definitions
+###################
+
+# DD_COPT macro checks if the compiler specified as the 1st parameter
+# supports option specified as the 2nd parameter
+# For example: DD_CPORT(CXX, fPIC)
+
+AC_DEFUN(DD_COPT, [
+AC_CACHE_CHECK(whether $$1 accepts -$2,sdcc_cv_$1$2,
+cat >_test_.c <<EOF
+#include <stdio.h>
+void main(void) {}
+EOF
+$$1 -v -$2 -c _test_.c 1>&5 2>&5
+if test "$?" = "0"; then
+  sdcc_cv_$1$2="yes"
+else
+  sdcc_cv_$1$2="no"
+fi
+rm -f _test_.* a.out)
+])
+
+
+# Checking characteristics of compilers and other programs
+# --------------------------------------------------------
+AC_CACHE_CHECK(whether preprocessor accepts -MM or -M,sdcc_cv_MM,
+echo "#include <stdio.h>" >_test_.c
+echo "" >>_test_.c
+$CPP -v -MM _test_.c 1>&5 2>&5
+if test "$?" = "0"; then
+  sdcc_cv_MM="-MM"
+else
+  sdcc_cv_MM="-M"
+fi
+rm -f _test_.*)
+M_OR_MM=$sdcc_cv_MM
+AC_SUBST(M_OR_MM)
+
+# This is the first time when CFLAGS are set/modified!!
+DD_COPT(CC, ggdb)
+if test "$sdcc_cv_CCggdb" = "yes"; then
+  CFLAGS="-ggdb -O2"
+fi
+
+DD_COPT(CC, pipe)
+if test "$sdcc_cv_CCpipe" = "yes"; then
+  CFLAGS="$CFLAGS -pipe"
+fi
+
+
+# Checks for typedefs, structures, and compiler characteristics.
+# ===========================================================================
+AC_TYPE_SIGNAL
+
+#
+#
+if test "${prefix}" = "NONE"; then
+    prefix="/usr/local"
+fi
+
+config_in=`pwd`
+if test "${datadir}" = "\${prefix}/share"; then
+  sdcc_datadir=${prefix}/share
+else
+  sdcc_datadir=${datadir}
+fi
+AC_DEFINE_UNQUOTED(STANDARD_INCLUDE_DIR, "${sdcc_datadir}/sdcc51inc")
+AC_DEFINE_UNQUOTED(SDCC_INCLUDE_DIR, "${sdcc_datadir}/sdcc51inc")
+AC_DEFINE_UNQUOTED(SDCC_LIB_DIR, "${sdcc_datadir}/sdcc51lib")
+AC_DEFINE_UNQUOTED(STD_LIB, "libsdcc")
+AC_DEFINE_UNQUOTED(STD_INT_LIB, "libint")
+AC_DEFINE_UNQUOTED(STD_LONG_LIB, "liblong")
+AC_DEFINE_UNQUOTED(STD_FP_LIB, "libfloat")
+
+AC_DEFINE_UNQUOTED(PREFIX, "${prefix}")
+AC_DEFINE_UNQUOTED(DATADIR, "${sdcc_datadir}")
+AC_DEFINE_UNQUOTED(SRCDIR, "${config_in}")
+
+
+# Generating output files
+# ===========================================================================
+AC_CONFIG_SUBDIRS(s51.src)
+AC_OUTPUT(main.mk:main_in.mk
+support/gc/Makefile
+src/Makefile
+as/mcs51/Makefile
+support/cpp/Makefile
+device/include/Makefile
+device/lib/Makefile
+debugger/mcs51/Makefile
+)
+
+# End of configure/configure.in

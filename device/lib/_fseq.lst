@@ -1,0 +1,282 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:27 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module _fseq
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl ___fseq_PARM_2
+                             11 	.globl ___fseq
+                             12 ;--------------------------------------------------------
+                             13 ; special function registers
+                             14 ;--------------------------------------------------------
+                             15 ;--------------------------------------------------------
+                             16 ; special function bits 
+                             17 ;--------------------------------------------------------
+                             18 ;--------------------------------------------------------
+                             19 ; internal ram data
+                             20 ;--------------------------------------------------------
+                             21 	.area	DSEG    (DATA)
+   0000                      22 ___fseq_sloc0_1_0:
+   0000                      23 	.ds	0x0004
+   0004                      24 ___fseq_sloc1_1_0:
+   0004                      25 	.ds	0x0004
+                             26 ;--------------------------------------------------------
+                             27 ; overlayable items in internal ram 
+                             28 ;--------------------------------------------------------
+                             29 	.area	OSEG	(OVR,DATA)
+                             30 ;--------------------------------------------------------
+                             31 ; indirectly addressable internal ram data
+                             32 ;--------------------------------------------------------
+                             33 	.area	ISEG    (DATA)
+                             34 ;--------------------------------------------------------
+                             35 ; bit data
+                             36 ;--------------------------------------------------------
+                             37 	.area	BSEG    (BIT)
+                             38 ;--------------------------------------------------------
+                             39 ; external ram data
+                             40 ;--------------------------------------------------------
+                             41 	.area	XSEG    (XDATA)
+   0000                      42 ___fseq_PARM_2:
+   0000                      43 	.ds	0x0004
+   0004                      44 ___fseq_a1_1_1:
+   0004                      45 	.ds	0x0004
+   0008                      46 ___fseq_fl1_1_1:
+   0008                      47 	.ds	0x0004
+   000C                      48 ___fseq_fl2_1_1:
+   000C                      49 	.ds	0x0004
+                             50 ;--------------------------------------------------------
+                             51 ; global & static initialisations
+                             52 ;--------------------------------------------------------
+                             53 	.area GSINIT (CODE)
+                             54 ;--------------------------------------------------------
+                             55 ; code
+                             56 ;--------------------------------------------------------
+                             57 	.area CSEG (CODE)
+                    0000     58 	G$__fseq$0$0 ==.
+                             59 ;	_fseq.c 73
+                             60 ;	-----------------------------------------
+                             61 ;	 function __fseq
+                             62 ;	-----------------------------------------
+   0000                      63 ___fseq:
+                    0002     64 	ar2 = 0x02
+                    0003     65 	ar3 = 0x03
+                    0004     66 	ar4 = 0x04
+                    0005     67 	ar5 = 0x05
+                    0006     68 	ar6 = 0x06
+                    0007     69 	ar7 = 0x07
+                    0000     70 	ar0 = 0x00
+                    0001     71 	ar1 = 0x01
+                             72 ;	_fseq.c 87
+   0000 C0 E0                73 	push	acc
+   0002 C0 F0                74 	push	b
+   0004 C0 83                75 	push	dph
+   0006 C0 82                76 	push	dpl
+   0008 90s00r04             77 	mov	dptr,#___fseq_a1_1_1
+   000B D0 E0                78 	pop	acc
+   000D F0                   79 	movx	@dptr,a
+   000E D0 E0                80 	pop	acc
+   0010 A3                   81 	inc	dptr
+   0011 F0                   82 	movx	@dptr,a
+   0012 D0 E0                83 	pop	acc
+   0014 A3                   84 	inc	dptr
+   0015 F0                   85 	movx	@dptr,a
+   0016 D0 E0                86 	pop	acc
+   0018 A3                   87 	inc	dptr
+   0019 F0                   88 	movx	@dptr,a
+                             89 ;	_fseq.c 77
+   001A 90s00r04             90 	mov	dptr,#___fseq_a1_1_1
+   001D E0                   91 	movx	a,@dptr
+   001E FA                   92 	mov	r2,a
+   001F A3                   93 	inc	dptr
+   0020 E0                   94 	movx	a,@dptr
+   0021 FB                   95 	mov	r3,a
+   0022 A3                   96 	inc	dptr
+   0023 E0                   97 	movx	a,@dptr
+   0024 FC                   98 	mov	r4,a
+   0025 A3                   99 	inc	dptr
+   0026 E0                  100 	movx	a,@dptr
+   0027 FD                  101 	mov	r5,a
+   0028 90s00r08            102 	mov	dptr,#(___fseq_fl1_1_1)
+   002B EA                  103 	mov	a,r2
+   002C F0                  104 	movx	@dptr,a
+   002D A3                  105 	inc	dptr
+   002E EB                  106 	mov	a,r3
+   002F F0                  107 	movx	@dptr,a
+   0030 A3                  108 	inc	dptr
+   0031 EC                  109 	mov	a,r4
+   0032 F0                  110 	movx	@dptr,a
+   0033 A3                  111 	inc	dptr
+   0034 ED                  112 	mov	a,r5
+   0035 F0                  113 	movx	@dptr,a
+                            114 ;	_fseq.c 78
+   0036 90s00r00            115 	mov	dptr,#___fseq_PARM_2
+   0039 E0                  116 	movx	a,@dptr
+   003A FA                  117 	mov	r2,a
+   003B A3                  118 	inc	dptr
+   003C E0                  119 	movx	a,@dptr
+   003D FB                  120 	mov	r3,a
+   003E A3                  121 	inc	dptr
+   003F E0                  122 	movx	a,@dptr
+   0040 FC                  123 	mov	r4,a
+   0041 A3                  124 	inc	dptr
+   0042 E0                  125 	movx	a,@dptr
+   0043 FD                  126 	mov	r5,a
+   0044 90s00r0C            127 	mov	dptr,#(___fseq_fl2_1_1)
+   0047 EA                  128 	mov	a,r2
+   0048 F0                  129 	movx	@dptr,a
+   0049 A3                  130 	inc	dptr
+   004A EB                  131 	mov	a,r3
+   004B F0                  132 	movx	@dptr,a
+   004C A3                  133 	inc	dptr
+   004D EC                  134 	mov	a,r4
+   004E F0                  135 	movx	@dptr,a
+   004F A3                  136 	inc	dptr
+   0050 ED                  137 	mov	a,r5
+   0051 F0                  138 	movx	@dptr,a
+                            139 ;	_fseq.c 80
+   0052 90s00r08            140 	mov	dptr,#(___fseq_fl1_1_1)
+   0055 E0                  141 	movx	a,@dptr
+   0056 FA                  142 	mov	r2,a
+   0057 A3                  143 	inc	dptr
+   0058 E0                  144 	movx	a,@dptr
+   0059 FB                  145 	mov	r3,a
+   005A A3                  146 	inc	dptr
+   005B E0                  147 	movx	a,@dptr
+   005C FC                  148 	mov	r4,a
+   005D A3                  149 	inc	dptr
+   005E E0                  150 	movx	a,@dptr
+                            151 ; Peephole 105   removed redundant mov
+   005F FD                  152 	mov  r5,a
+   0060 23                  153 	rl	a
+   0061 54 01               154 	anl	a,#0x01
+                            155 ; Peephole 105   removed redundant mov
+   0063 FA                  156 	mov  r2,a
+   0064 70 03               157 	jnz	00111$
+   0066 02s00rCE            158 	ljmp	00102$
+   0069                     159 00111$:
+   0069 90s00r0C            160 	mov	dptr,#(___fseq_fl2_1_1)
+   006C E0                  161 	movx	a,@dptr
+   006D FA                  162 	mov	r2,a
+   006E A3                  163 	inc	dptr
+   006F E0                  164 	movx	a,@dptr
+   0070 FE                  165 	mov	r6,a
+   0071 A3                  166 	inc	dptr
+   0072 E0                  167 	movx	a,@dptr
+   0073 FF                  168 	mov	r7,a
+   0074 A3                  169 	inc	dptr
+   0075 E0                  170 	movx	a,@dptr
+                            171 ; Peephole 105   removed redundant mov
+   0076 F8                  172 	mov  r0,a
+   0077 23                  173 	rl	a
+   0078 54 01               174 	anl	a,#0x01
+                            175 ; Peephole 105   removed redundant mov
+   007A FA                  176 	mov  r2,a
+   007B 70 03               177 	jnz	00112$
+   007D 02s00rCE            178 	ljmp	00102$
+   0080                     179 00112$:
+                            180 ;	_fseq.c 82
+   0080 90s00r08            181 	mov	dptr,#(___fseq_fl1_1_1)
+   0083 E0                  182 	movx	a,@dptr
+   0084 F5*00               183 	mov	___fseq_sloc0_1_0,a
+   0086 A3                  184 	inc	dptr
+   0087 E0                  185 	movx	a,@dptr
+   0088 F5*01               186 	mov	(___fseq_sloc0_1_0 + 1),a
+   008A A3                  187 	inc	dptr
+   008B E0                  188 	movx	a,@dptr
+   008C F5*02               189 	mov	(___fseq_sloc0_1_0 + 2),a
+   008E A3                  190 	inc	dptr
+   008F E0                  191 	movx	a,@dptr
+   0090 F5*03               192 	mov	(___fseq_sloc0_1_0 + 3),a
+   0092 63r03 80            193 	xrl	(___fseq_sloc0_1_0 + 3),#0x80
+   0095 90s00r08            194 	mov	dptr,#(___fseq_fl1_1_1)
+   0098 E5*00               195 	mov	a,___fseq_sloc0_1_0
+   009A F0                  196 	movx	@dptr,a
+   009B A3                  197 	inc	dptr
+   009C E5*01               198 	mov	a,(___fseq_sloc0_1_0 + 1)
+   009E F0                  199 	movx	@dptr,a
+   009F A3                  200 	inc	dptr
+   00A0 E5*02               201 	mov	a,(___fseq_sloc0_1_0 + 2)
+   00A2 F0                  202 	movx	@dptr,a
+   00A3 A3                  203 	inc	dptr
+   00A4 E5*03               204 	mov	a,(___fseq_sloc0_1_0 + 3)
+   00A6 F0                  205 	movx	@dptr,a
+                            206 ;	_fseq.c 83
+   00A7 90s00r0C            207 	mov	dptr,#(___fseq_fl2_1_1)
+   00AA E0                  208 	movx	a,@dptr
+   00AB F5*00               209 	mov	___fseq_sloc0_1_0,a
+   00AD A3                  210 	inc	dptr
+   00AE E0                  211 	movx	a,@dptr
+   00AF F5*01               212 	mov	(___fseq_sloc0_1_0 + 1),a
+   00B1 A3                  213 	inc	dptr
+   00B2 E0                  214 	movx	a,@dptr
+   00B3 F5*02               215 	mov	(___fseq_sloc0_1_0 + 2),a
+   00B5 A3                  216 	inc	dptr
+   00B6 E0                  217 	movx	a,@dptr
+   00B7 F5*03               218 	mov	(___fseq_sloc0_1_0 + 3),a
+   00B9 63r03 80            219 	xrl	(___fseq_sloc0_1_0 + 3),#0x80
+   00BC 90s00r0C            220 	mov	dptr,#(___fseq_fl2_1_1)
+   00BF E5*00               221 	mov	a,___fseq_sloc0_1_0
+   00C1 F0                  222 	movx	@dptr,a
+   00C2 A3                  223 	inc	dptr
+   00C3 E5*01               224 	mov	a,(___fseq_sloc0_1_0 + 1)
+   00C5 F0                  225 	movx	@dptr,a
+   00C6 A3                  226 	inc	dptr
+   00C7 E5*02               227 	mov	a,(___fseq_sloc0_1_0 + 2)
+   00C9 F0                  228 	movx	@dptr,a
+   00CA A3                  229 	inc	dptr
+   00CB E5*03               230 	mov	a,(___fseq_sloc0_1_0 + 3)
+   00CD F0                  231 	movx	@dptr,a
+   00CE                     232 00102$:
+                            233 ;	_fseq.c 85
+   00CE 90s00r08            234 	mov	dptr,#(___fseq_fl1_1_1)
+   00D1 E0                  235 	movx	a,@dptr
+   00D2 F5*00               236 	mov	___fseq_sloc0_1_0,a
+   00D4 A3                  237 	inc	dptr
+   00D5 E0                  238 	movx	a,@dptr
+   00D6 F5*01               239 	mov	(___fseq_sloc0_1_0 + 1),a
+   00D8 A3                  240 	inc	dptr
+   00D9 E0                  241 	movx	a,@dptr
+   00DA F5*02               242 	mov	(___fseq_sloc0_1_0 + 2),a
+   00DC A3                  243 	inc	dptr
+   00DD E0                  244 	movx	a,@dptr
+   00DE F5*03               245 	mov	(___fseq_sloc0_1_0 + 3),a
+   00E0 90s00r0C            246 	mov	dptr,#(___fseq_fl2_1_1)
+   00E3 E0                  247 	movx	a,@dptr
+   00E4 F5*04               248 	mov	___fseq_sloc1_1_0,a
+   00E6 A3                  249 	inc	dptr
+   00E7 E0                  250 	movx	a,@dptr
+   00E8 F5*05               251 	mov	(___fseq_sloc1_1_0 + 1),a
+   00EA A3                  252 	inc	dptr
+   00EB E0                  253 	movx	a,@dptr
+   00EC F5*06               254 	mov	(___fseq_sloc1_1_0 + 2),a
+   00EE A3                  255 	inc	dptr
+   00EF E0                  256 	movx	a,@dptr
+   00F0 F5*07               257 	mov	(___fseq_sloc1_1_0 + 3),a
+   00F2 E5*00               258 	mov	a,___fseq_sloc0_1_0
+                            259 ; Peephole 132   changed ljmp to sjmp
+                            260 ; Peephole 193   optimized misc jump sequence
+   00F4 B5*04 14            261 	cjne a,___fseq_sloc1_1_0,00105$
+   00F7 E5*01               262 	mov  a,(___fseq_sloc0_1_0 + 1)
+   00F9 B5*05 0F            263 	cjne a,(___fseq_sloc1_1_0 + 1),00105$
+   00FC E5*02               264 	mov  a,(___fseq_sloc0_1_0 + 2)
+   00FE B5*06 0A            265 	cjne a,(___fseq_sloc1_1_0 + 2),00105$
+   0101 E5*03               266 	mov  a,(___fseq_sloc0_1_0 + 3)
+   0103 B5*07 05            267 	cjne a,(___fseq_sloc1_1_0 + 3),00105$
+                            268 ; Peephole 201   removed redundant sjmp
+   0106                     269 00113$:
+   0106                     270 00114$:
+                            271 ;	_fseq.c 86
+   0106 75 82 01            272 	mov	dpl,#0x01
+                            273 ; Peephole 132   changed ljmp to sjmp
+   0109 80 03               274 	sjmp 00106$
+   010B                     275 00105$:
+                            276 ;	_fseq.c 87
+   010B 75 82 00            277 	mov	dpl,#0x00
+   010E                     278 00106$:
+                    010E    279 	C$_fseq.c$88$1$1 ==.
+                    010E    280 	XG$__fseq$0$0 ==.
+   010E 22                  281 	ret
+                            282 	.area	CSEG    (CODE)

@@ -1,0 +1,112 @@
+;!FILE _strncpy.asm
+XH
+H 9 areas 2F global symbols
+M _strncpy
+S __gptrput Ref0000
+S __gptrget Ref0000
+A _CODE size 0 flags 0
+A DSEG size 0 flags 0
+A _DUMMY size 0 flags 0
+A OSEG size 8 flags 4
+S _strncpy_PARM_2 Def0000
+S _strncpy_PARM_3 Def0003
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 0 flags 40
+A GSINIT size 0 flags 20
+A CSEG size 52 flags 20
+S A$_strncpy$70 Def0002
+S C$_strncpy.c$37$1$1 Def0051
+S A$_strncpy$80 Def0010
+S A$_strncpy$71 Def0004
+S A$_strncpy$81 Def0012
+S A$_strncpy$91 Def001D
+S A$_strncpy$82 Def0014
+S A$_strncpy$73 Def0006
+S A$_strncpy$92 Def001F
+S A$_strncpy$83 Def0017
+S A$_strncpy$74 Def0008
+S G$strncpy$0$0 Def0000
+S A$_strncpy$93 Def0021
+S A$_strncpy$75 Def000A
+S A$_strncpy$94 Def0023
+S A$_strncpy$85 Def0019
+S A$_strncpy$95 Def0024
+S A$_strncpy$86 Def001A
+S A$_strncpy$96 Def0027
+S A$_strncpy$78 Def000C
+S A$_strncpy$69 Def0000
+S A$_strncpy$88 Def001B
+S A$_strncpy$79 Def000E
+S A$_strncpy$98 Def0028
+S A$_strncpy$99 Def002B
+S A$_strncpy$100 Def002E
+S A$_strncpy$110 Def003F
+S A$_strncpy$101 Def0031
+S A$_strncpy$111 Def0041
+S A$_strncpy$102 Def0033
+S A$_strncpy$112 Def0043
+S A$_strncpy$103 Def0034
+S A$_strncpy$104 Def0037
+S A$_strncpy$123 Def0051
+S A$_strncpy$114 Def0046
+S A$_strncpy$106 Def0039
+S _strncpy Def0000
+S A$_strncpy$117 Def0048
+S A$_strncpy$108 Def003C
+S A$_strncpy$118 Def004B
+S A$_strncpy$109 Def003D
+S A$_strncpy$119 Def004E
+S XG$strncpy$0$0 Def0051
+T 00 00
+R 00 00 00 03
+T 00 00
+R 00 00 00 03
+T 00 03
+R 00 00 00 03
+T 00 03
+R 00 00 00 03
+T 00 05
+R 00 00 00 03
+T 00 05
+R 00 00 00 03
+T 00 00
+R 00 00 00 08
+T 00 00 AA 82 AB 83 AC F0 8A 00 05 8B 00 06 8C
+R 00 00 00 08 29 09 00 03 29 0C 00 03
+T 00 0B 00 07
+R 00 00 00 08 29 02 00 03
+T 00 0C
+R 00 00 00 08
+T 00 0C AD 00 03 A8 00 04 15 00 03 74 FF B5
+R 00 00 00 08 29 03 00 03 29 06 00 03 29 09 00 03
+T 00 15 00 03 02 15 00 04
+R 00 00 00 08 29 02 00 03 29 06 00 03
+T 00 19
+R 00 00 00 08
+T 00 19 ED 48 60 2B
+R 00 00 00 08
+T 00 1D
+R 00 00 00 08
+T 00 1D 8A 05 8B 00 8C 01 0A BA 00 01 0B
+R 00 00 00 08
+T 00 28
+R 00 00 00 08
+T 00 28 85 00 00 82 85 00 01 83 85 00 02 F0 05
+R 00 00 00 08 29 03 00 03 29 07 00 03 29 0B 00 03
+T 00 32 00 00 E4 B5 00 00 02 05 00 01
+R 00 00 00 08 29 02 00 03 29 06 00 03 29 0A 00 03
+T 00 39
+R 00 00 00 08
+T 00 39 12 00 00 FE 8D 82 88 83 89 F0 12 00 00 80
+R 00 00 00 08 02 03 00 01 02 0D 00 00
+T 00 47 C4
+R 00 00 00 08
+T 00 48
+R 00 00 00 08
+T 00 48 85 00 05 82 85 00 06 83 85 00 07 F0
+R 00 00 00 08 29 03 00 03 29 07 00 03 29 0B 00 03
+T 00 51
+R 00 00 00 08
+T 00 51 22
+R 00 00 00 08

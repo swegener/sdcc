@@ -1,0 +1,288 @@
+;!FILE _fssub.asm
+XH
+H 8 areas CE global symbols
+M _fssub
+S ___fsadd Ref0000
+S ___fsadd_PARM_2 Ref0000
+A _CODE size 0 flags 0
+A DSEG size 0 flags 0
+A OSEG size 0 flags 4
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 10 flags 40
+S ___fssub_PARM_2 Def0000
+A GSINIT size 0 flags 20
+A CSEG size FF flags 20
+S A$_fssub$230 Def00BC
+S A$_fssub$221 Def00B1
+S A$_fssub$212 Def00A4
+S A$_fssub$203 Def009B
+S A$_fssub$140 Def0058
+S A$_fssub$131 Def004E
+S A$_fssub$122 Def0043
+S A$_fssub$113 Def003A
+S A$_fssub$104 Def0030
+S ___fssub Def0000
+S A$_fssub$240 Def00C8
+S A$_fssub$231 Def00BF
+S A$_fssub$222 Def00B2
+S A$_fssub$213 Def00A6
+S A$_fssub$204 Def009C
+S A$_fssub$150 Def0062
+S A$_fssub$141 Def0059
+S A$_fssub$132 Def004F
+S A$_fssub$123 Def0044
+S A$_fssub$114 Def003B
+S A$_fssub$105 Def0031
+S A$_fssub$250 Def00D3
+S A$_fssub$241 Def00C9
+S A$_fssub$232 Def00C0
+S A$_fssub$223 Def00B3
+S A$_fssub$214 Def00A8
+S A$_fssub$205 Def009D
+S A$_fssub$160 Def006C
+S A$_fssub$151 Def0063
+S A$_fssub$142 Def005A
+S A$_fssub$133 Def0050
+S A$_fssub$124 Def0047
+S A$_fssub$115 Def003C
+S A$_fssub$106 Def0032
+S A$_fssub$260 Def00DF
+S A$_fssub$251 Def00D4
+S A$_fssub$233 Def00C1
+S A$_fssub$224 Def00B4
+S A$_fssub$170 Def0076
+S A$_fssub$161 Def006D
+S A$_fssub$143 Def005B
+S A$_fssub$134 Def0051
+S A$_fssub$125 Def0048
+S A$_fssub$116 Def003D
+S A$_fssub$107 Def0033
+S A$_fssub$270 Def00EB
+S A$_fssub$261 Def00E0
+S A$_fssub$252 Def00D5
+S A$_fssub$243 Def00CA
+S A$_fssub$234 Def00C2
+S A$_fssub$225 Def00B5
+S A$_fssub$207 Def009E
+S A$_fssub$180 Def0084
+S A$_fssub$171 Def0078
+S A$_fssub$162 Def006E
+S A$_fssub$153 Def0064
+S A$_fssub$144 Def005C
+S A$_fssub$126 Def0049
+S A$_fssub$117 Def003E
+S A$_fssub$108 Def0034
+S A$_fssub$280 Def00F6
+S A$_fssub$271 Def00EC
+S A$_fssub$262 Def00E1
+S A$_fssub$253 Def00D6
+S A$_fssub$244 Def00CD
+S A$_fssub$235 Def00C3
+S A$_fssub$226 Def00B6
+S A$_fssub$217 Def00AB
+S A$_fssub$208 Def009F
+S A$_fssub$190 Def008E
+S A$_fssub$181 Def0085
+S A$_fssub$172 Def007A
+S A$_fssub$163 Def006F
+S A$_fssub$145 Def005D
+S A$_fssub$136 Def0052
+S A$_fssub$127 Def004A
+S A$_fssub$118 Def003F
+S A$_fssub$109 Def0035
+S A$_fssub$281 Def00F8
+S A$_fssub$272 Def00ED
+S A$_fssub$263 Def00E2
+S A$_fssub$254 Def00D7
+S A$_fssub$245 Def00CE
+S A$_fssub$236 Def00C4
+S A$_fssub$227 Def00B7
+S A$_fssub$218 Def00AE
+S A$_fssub$182 Def0086
+S A$_fssub$164 Def0070
+S A$_fssub$146 Def005E
+S A$_fssub$137 Def0055
+S A$_fssub$128 Def004B
+S A$_fssub$119 Def0040
+S A$_fssub$282 Def00FA
+S A$_fssub$273 Def00EE
+S A$_fssub$264 Def00E3
+S A$_fssub$255 Def00D8
+S A$_fssub$246 Def00CF
+S A$_fssub$237 Def00C5
+S A$_fssub$228 Def00B8
+S A$_fssub$219 Def00AF
+S A$_fssub$192 Def008F
+S A$_fssub$183 Def0087
+S A$_fssub$165 Def0071
+S A$_fssub$156 Def0066
+S A$_fssub$147 Def005F
+S A$_fssub$138 Def0056
+S A$_fssub$129 Def004C
+S A$_fssub$283 Def00FB
+S A$_fssub$274 Def00EF
+S A$_fssub$265 Def00E4
+S A$_fssub$256 Def00DB
+S A$_fssub$247 Def00D0
+S A$_fssub$238 Def00C6
+S A$_fssub$229 Def00B9
+S A$_fssub$184 Def0088
+S A$_fssub$175 Def007D
+S A$_fssub$166 Def0072
+S A$_fssub$157 Def0069
+S A$_fssub$148 Def0060
+S A$_fssub$139 Def0057
+S A$_fssub$275 Def00F0
+S A$_fssub$266 Def00E5
+S A$_fssub$257 Def00DC
+S A$_fssub$248 Def00D1
+S A$_fssub$239 Def00C7
+S A$_fssub$185 Def0089
+S A$_fssub$176 Def0080
+S A$_fssub$158 Def006A
+S A$_fssub$149 Def0061
+S A$_fssub$276 Def00F1
+S A$_fssub$267 Def00E6
+S A$_fssub$258 Def00DD
+S A$_fssub$249 Def00D2
+S A$_fssub$195 Def0091
+S A$_fssub$186 Def008A
+S A$_fssub$177 Def0081
+S A$_fssub$168 Def0073
+S A$_fssub$159 Def006B
+S A$_fssub$277 Def00F2
+S A$_fssub$268 Def00E9
+S A$_fssub$259 Def00DE
+S A$_fssub$196 Def0094
+S A$_fssub$187 Def008B
+S A$_fssub$178 Def0082
+S A$_fssub$169 Def0074
+S A$_fssub$278 Def00F3
+S A$_fssub$269 Def00EA
+S A$_fssub$197 Def0095
+S A$_fssub$188 Def008C
+S A$_fssub$179 Def0083
+S XG$__fssub$0$0 Def00FE
+S A$_fssub$288 Def00FE
+S A$_fssub$279 Def00F4
+S A$_fssub$198 Def0096
+S A$_fssub$189 Def008D
+S A$_fssub$199 Def0097
+S A$_fssub$70 Def0002
+S A$_fssub$80 Def0014
+S A$_fssub$71 Def0004
+S A$_fssub$90 Def0020
+S A$_fssub$81 Def0015
+S A$_fssub$72 Def0006
+S G$__fssub$0$0 Def0000
+S A$_fssub$91 Def0021
+S A$_fssub$82 Def0016
+S A$_fssub$73 Def0008
+S A$_fssub$92 Def0022
+S A$_fssub$83 Def0018
+S A$_fssub$74 Def000B
+S A$_fssub$93 Def0023
+S A$_fssub$84 Def0019
+S A$_fssub$75 Def000D
+S A$_fssub$94 Def0024
+S A$_fssub$76 Def000E
+S C$_fssub.c$97$1$1 Def00FE
+S A$_fssub$95 Def0025
+S A$_fssub$86 Def001A
+S A$_fssub$77 Def0010
+S A$_fssub$96 Def0026
+S A$_fssub$87 Def001D
+S A$_fssub$78 Def0011
+S A$_fssub$69 Def0000
+S A$_fssub$97 Def0027
+S A$_fssub$88 Def001E
+S A$_fssub$79 Def0012
+S A$_fssub$98 Def0028
+S A$_fssub$89 Def001F
+S A$_fssub$99 Def002B
+S A$_fssub$100 Def002C
+S A$_fssub$200 Def0098
+S A$_fssub$101 Def002D
+S A$_fssub$210 Def00A1
+S A$_fssub$201 Def0099
+S A$_fssub$120 Def0041
+S A$_fssub$111 Def0036
+S A$_fssub$102 Def002E
+S A$_fssub$220 Def00B0
+S A$_fssub$211 Def00A2
+S A$_fssub$202 Def009A
+S A$_fssub$130 Def004D
+S A$_fssub$121 Def0042
+S A$_fssub$112 Def0039
+S A$_fssub$103 Def002F
+T 00 00
+R 00 00 00 05
+T 00 00
+R 00 00 00 05
+T 00 04
+R 00 00 00 05
+T 00 04
+R 00 00 00 05
+T 00 08
+R 00 00 00 05
+T 00 08
+R 00 00 00 05
+T 00 0C
+R 00 00 00 05
+T 00 0C
+R 00 00 00 05
+T 00 00
+R 00 00 00 07
+T 00 00 C0 E0 C0 F0 C0 83 C0 82 90 00 04 D0 E0 F0
+R 00 00 00 07 00 0B 00 05
+T 00 0E D0 E0 A3 F0 D0 E0 A3 F0 D0 E0 A3 F0 90
+R 00 00 00 07
+T 00 1B 00 04 E0 FA A3 E0 FB A3 E0 FC A3 E0 FD 90
+R 00 00 00 07 00 02 00 05
+T 00 29 00 08 EA F0 A3 EB F0 A3 EC F0 A3 ED F0 90
+R 00 00 00 07 00 02 00 05
+T 00 37 00 00 E0 FA A3 E0 FB A3 E0 FC A3 E0 FD 90
+R 00 00 00 07 00 02 00 05
+T 00 45 00 0C EA F0 A3 EB F0 A3 EC F0 A3 ED F0 90
+R 00 00 00 07 00 02 00 05
+T 00 53 00 0C E0 FA A3 E0 FB A3 E0 FC A3 E0 FD EA
+R 00 00 00 07 00 02 00 05
+T 00 61 4B 4C 4D 70 17
+R 00 00 00 07
+T 00 66
+R 00 00 00 07
+T 00 66 90 00 08 E0 FA A3 E0 FB A3 E0 FC A3 E0 FD
+R 00 00 00 07 00 03 00 05
+T 00 74 8A 82 8B 83 8C F0 02 00 FE
+R 00 00 00 07 00 09 00 07
+T 00 7D
+R 00 00 00 07
+T 00 7D 90 00 08 E0 FA A3 E0 FB A3 E0 FC A3 E0 FD
+R 00 00 00 07 00 03 00 05
+T 00 8B EA 4B 4C 4D 70 1A
+R 00 00 00 07
+T 00 91
+R 00 00 00 07
+T 00 91 90 00 0C E0 FA A3 E0 FB A3 E0 FC A3 E0 FD
+R 00 00 00 07 00 03 00 05
+T 00 9F B2 E7 FD 8A 82 8B 83 8C F0 02 00 FE
+R 00 00 00 07 00 0C 00 07
+T 00 AB
+R 00 00 00 07
+T 00 AB 90 00 0C E0 FA A3 E0 FB A3 E0 FC A3 E0 FD
+R 00 00 00 07 00 03 00 05
+T 00 B9 63 05 80 90 00 0C EA F0 A3 EB F0 A3 EC F0
+R 00 00 00 07 00 06 00 05
+T 00 C7 A3 ED F0 90 00 08 E0 FA A3 E0 FB A3 E0 FC
+R 00 00 00 07 00 06 00 05
+T 00 D5 A3 E0 FD 90 00 0C E0 FE A3 E0 FF A3 E0 F8
+R 00 00 00 07 00 06 00 05
+T 00 E3 A3 E0 F9 90 00 00 EE F0 A3 EF F0 A3 E8 F0
+R 00 00 00 07 02 06 00 01
+T 00 F1 A3 E9 F0 8A 82 8B 83 8C F0 ED 12 00 00
+R 00 00 00 07 02 0D 00 00
+T 00 FE
+R 00 00 00 07
+T 00 FE 22
+R 00 00 00 07

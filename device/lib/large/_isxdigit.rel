@@ -1,0 +1,111 @@
+;!FILE _isxdigit.asm
+XH
+H 8 areas 27 global symbols
+M _isxdigit
+A _CODE size 0 flags 0
+A DSEG size 0 flags 0
+A OSEG size 0 flags 4
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 1 flags 40
+A GSINIT size 0 flags 20
+A CSEG size 41 flags 20
+S A$_isxdigit$111 Def0033
+S A$_isxdigit$102 Def002B
+S A$_isxdigit$121 Def003B
+S A$_isxdigit$112 Def0035
+S A$_isxdigit$103 Def002C
+S A$_isxdigit$104 Def002D
+S A$_isxdigit$124 Def003D
+S A$_isxdigit$115 Def0036
+S _isxdigit Def0000
+S A$_isxdigit$108 Def0030
+S A$_isxdigit$128 Def0040
+S A$_isxdigit$119 Def0038
+S XG$isxdigit$0$0 Def0040
+S C$_isxdigit.c$33$1$1 Def0040
+S A$_isxdigit$70 Def000D
+S A$_isxdigit$80 Def0016
+S A$_isxdigit$62 Def0000
+S A$_isxdigit$63 Def0002
+S A$_isxdigit$91 Def0020
+S A$_isxdigit$64 Def0005
+S A$_isxdigit$74 Def0010
+S A$_isxdigit$65 Def0007
+S G$isxdigit$0$0 Def0000
+S A$_isxdigit$93 Def0022
+S A$_isxdigit$84 Def0018
+S A$_isxdigit$94 Def0023
+S A$_isxdigit$85 Def001B
+S A$_isxdigit$76 Def0012
+S A$_isxdigit$67 Def0008
+S A$_isxdigit$95 Def0025
+S A$_isxdigit$86 Def001C
+S A$_isxdigit$77 Def0013
+S A$_isxdigit$68 Def000B
+S A$_isxdigit$87 Def001D
+S A$_isxdigit$78 Def0015
+S A$_isxdigit$69 Def000C
+S A$_isxdigit$97 Def0026
+S A$_isxdigit$110 Def0032
+S A$_isxdigit$101 Def0028
+T 00 00
+R 00 00 00 05
+T 00 00
+R 00 00 00 05
+T 00 00
+R 00 00 00 07
+T 00 00 C0 82 90 00 00 D0 E0 F0 90 00 00 E0 FA BA
+R 00 00 00 07 00 05 00 05 00 0B 00 05
+T 00 0E 30 00
+R 00 00 00 07
+T 00 10
+R 00 00 00 07
+T 00 10 40 06
+R 00 00 00 07
+T 00 12
+R 00 00 00 07
+T 00 12 C3 74 39 9A 50 20
+R 00 00 00 07
+T 00 18
+R 00 00 00 07
+T 00 18
+R 00 00 00 07
+T 00 18 90 00 00 E0 FA BA 61 00
+R 00 00 00 07 00 03 00 05
+T 00 20
+R 00 00 00 07
+T 00 20 40 06
+R 00 00 00 07
+T 00 22
+R 00 00 00 07
+T 00 22 C3 74 66 9A 50 10
+R 00 00 00 07
+T 00 28
+R 00 00 00 07
+T 00 28
+R 00 00 00 07
+T 00 28 90 00 00 E0 FA BA 41 00
+R 00 00 00 07 00 03 00 05
+T 00 30
+R 00 00 00 07
+T 00 30 40 0B
+R 00 00 00 07
+T 00 32
+R 00 00 00 07
+T 00 32 C3 74 46 9A 40 05
+R 00 00 00 07
+T 00 38
+R 00 00 00 07
+T 00 38
+R 00 00 00 07
+T 00 38 75 82 01 80 03
+R 00 00 00 07
+T 00 3D
+R 00 00 00 07
+T 00 3D 75 82 00
+R 00 00 00 07
+T 00 40
+R 00 00 00 07
+T 00 40 22
+R 00 00 00 07

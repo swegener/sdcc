@@ -1,0 +1,17 @@
+XH
+H 8 areas 2 global symbols
+M _bp
+A _CODE size 0 flags 0
+A DSEG size 1 flags 0
+S G$bp$0$0 Def0000
+S _bp Def0000
+A OSEG size 0 flags 4
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 0 flags 40
+A GSINIT size 0 flags 20
+A CSEG size 0 flags 20
+T 00 00
+R 00 00 00 01
+T 00 00
+R 00 00 00 01

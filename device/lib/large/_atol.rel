@@ -1,0 +1,439 @@
+;!FILE _atol.asm
+XH
+H 8 areas 115 global symbols
+M _atol
+S __mulslong_PARM_2 Ref0000
+S __decdptr Ref0000
+S __mulslong Ref0000
+S __gptrget Ref0000
+A _CODE size 0 flags 0
+A DSEG size 4 flags 0
+A OSEG size 0 flags 4
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 7 flags 40
+A GSINIT size 0 flags 20
+A CSEG size 19F flags 20
+S A$_atol$100 Def0032
+S A$_atol$200 Def009D
+S A$_atol$300 Def0132
+S A$_atol$210 Def00A7
+S A$_atol$201 Def009E
+S A$_atol$120 Def0049
+S A$_atol$102 Def0033
+S A$_atol$310 Def0140
+S A$_atol$301 Def0133
+S A$_atol$220 Def00B4
+S A$_atol$211 Def00A8
+S A$_atol$202 Def009F
+S A$_atol$112 Def003F
+S A$_atol$103 Def0035
+S A$_atol$320 Def014D
+S A$_atol$311 Def0142
+S A$_atol$302 Def0136
+S A$_atol$221 Def00B5
+S A$_atol$212 Def00A9
+S A$_atol$122 Def004B
+S A$_atol$104 Def0037
+S A$_atol$330 Def0158
+S A$_atol$312 Def0143
+S A$_atol$303 Def0137
+S A$_atol$231 Def00C5
+S A$_atol$222 Def00B7
+S A$_atol$213 Def00AA
+S A$_atol$150 Def0069
+S A$_atol$141 Def005D
+S A$_atol$132 Def0053
+S A$_atol$123 Def004C
+S A$_atol$114 Def0040
+S A$_atol$105 Def0039
+S A$_atol$340 Def0165
+S A$_atol$331 Def0159
+S A$_atol$322 Def014E
+S A$_atol$313 Def0144
+S A$_atol$304 Def0139
+S A$_atol$250 Def00E0
+S A$_atol$241 Def00D4
+S A$_atol$205 Def00A0
+S A$_atol$160 Def0073
+S A$_atol$151 Def006A
+S A$_atol$142 Def005E
+S A$_atol$124 Def004D
+S A$_atol$115 Def0042
+S _atol Def0000
+S A$_atol$350 Def0170
+S A$_atol$341 Def0166
+S A$_atol$332 Def015B
+S A$_atol$323 Def0151
+S A$_atol$314 Def0145
+S A$_atol$305 Def013A
+S A$_atol$260 Def00EC
+S A$_atol$251 Def00E1
+S A$_atol$242 Def00D6
+S A$_atol$233 Def00C6
+S A$_atol$224 Def00BA
+S A$_atol$215 Def00AB
+S A$_atol$206 Def00A3
+S A$_atol$170 Def0080
+S A$_atol$161 Def0074
+S A$_atol$152 Def006B
+S A$_atol$143 Def0061
+S A$_atol$134 Def0056
+S A$_atol$125 Def004F
+S A$_atol$116 Def0044
+S A$_atol$107 Def003C
+S A$_atol$360 Def017A
+S A$_atol$351 Def0171
+S A$_atol$342 Def0167
+S A$_atol$324 Def0152
+S A$_atol$315 Def0147
+S A$_atol$306 Def013B
+S A$_atol$270 Def0100
+S A$_atol$261 Def00EF
+S A$_atol$252 Def00E2
+S A$_atol$243 Def00D9
+S A$_atol$234 Def00C8
+S A$_atol$225 Def00BB
+S A$_atol$216 Def00AD
+S A$_atol$207 Def00A4
+S A$_atol$180 Def008C
+S A$_atol$171 Def0083
+S A$_atol$162 Def0075
+S A$_atol$153 Def006C
+S A$_atol$117 Def0047
+S A$_atol$370 Def0184
+S A$_atol$361 Def017B
+S A$_atol$352 Def0172
+S A$_atol$343 Def0168
+S A$_atol$325 Def0153
+S A$_atol$316 Def0148
+S A$_atol$307 Def013D
+S A$_atol$280 Def0117
+S A$_atol$271 Def0102
+S A$_atol$262 Def00F0
+S A$_atol$253 Def00E3
+S A$_atol$244 Def00DA
+S A$_atol$235 Def00CA
+S A$_atol$226 Def00BC
+S A$_atol$217 Def00AF
+S A$_atol$208 Def00A5
+S A$_atol$172 Def0084
+S A$_atol$163 Def0076
+S A$_atol$145 Def0062
+S A$_atol$136 Def0058
+S A$_atol$127 Def0051
+S A$_atol$109 Def003D
+S A$_atol$380 Def018F
+S A$_atol$371 Def0185
+S A$_atol$362 Def017C
+S A$_atol$353 Def0173
+S A$_atol$344 Def0169
+S A$_atol$335 Def015E
+S A$_atol$326 Def0154
+S A$_atol$308 Def013E
+S A$_atol$290 Def0127
+S A$_atol$281 Def0119
+S A$_atol$272 Def0104
+S A$_atol$263 Def00F3
+S A$_atol$254 Def00E4
+S A$_atol$245 Def00DB
+S A$_atol$236 Def00CD
+S A$_atol$227 Def00BE
+S A$_atol$218 Def00B1
+S A$_atol$209 Def00A6
+S A$_atol$191 Def0092
+S A$_atol$182 Def008D
+S A$_atol$173 Def0087
+S A$_atol$164 Def0077
+S A$_atol$155 Def006D
+S A$_atol$146 Def0065
+S A$_atol$390 Def0199
+S A$_atol$381 Def0190
+S A$_atol$372 Def0186
+S A$_atol$363 Def017D
+S A$_atol$354 Def0174
+S A$_atol$336 Def0161
+S A$_atol$327 Def0155
+S A$_atol$318 Def0149
+S A$_atol$309 Def013F
+S A$_atol$291 Def0128
+S A$_atol$282 Def011B
+S A$_atol$273 Def0106
+S A$_atol$264 Def00F4
+S A$_atol$255 Def00E7
+S A$_atol$246 Def00DC
+S A$_atol$237 Def00CF
+S A$_atol$228 Def00C0
+S A$_atol$192 Def0095
+S A$_atol$174 Def0089
+S A$_atol$165 Def0078
+S A$_atol$147 Def0066
+S A$_atol$138 Def005B
+S A$_atol$391 Def019B
+S A$_atol$382 Def0191
+S A$_atol$364 Def017E
+S A$_atol$355 Def0175
+S A$_atol$346 Def016A
+S A$_atol$337 Def0162
+S A$_atol$328 Def0156
+S A$_atol$319 Def014A
+S A$_atol$292 Def012A
+S A$_atol$283 Def011D
+S A$_atol$274 Def0108
+S A$_atol$265 Def00F7
+S A$_atol$256 Def00E8
+S A$_atol$247 Def00DD
+S A$_atol$238 Def00D1
+S A$_atol$229 Def00C2
+S A$_atol$193 Def0097
+S A$_atol$166 Def0079
+S A$_atol$148 Def0067
+S A$_atol$392 Def019D
+S A$_atol$383 Def0192
+S A$_atol$374 Def0187
+S A$_atol$365 Def017F
+S A$_atol$356 Def0176
+S A$_atol$338 Def0163
+S A$_atol$329 Def0157
+S A$_atol$284 Def011F
+S A$_atol$275 Def010A
+S A$_atol$266 Def00F9
+S A$_atol$257 Def00E9
+S A$_atol$248 Def00DE
+S A$_atol$194 Def0098
+S A$_atol$176 Def008B
+S A$_atol$167 Def007A
+S A$_atol$158 Def006F
+S A$_atol$149 Def0068
+S A$_atol$384 Def0193
+S A$_atol$366 Def0180
+S A$_atol$357 Def0177
+S A$_atol$348 Def016C
+S A$_atol$339 Def0164
+S A$_atol$294 Def012B
+S A$_atol$285 Def0121
+S A$_atol$276 Def010B
+S A$_atol$267 Def00FA
+S A$_atol$258 Def00EA
+S A$_atol$249 Def00DF
+S A$_atol$186 Def008F
+S A$_atol$168 Def007C
+S A$_atol$159 Def0072
+S A$_atol$385 Def0194
+S A$_atol$376 Def0189
+S A$_atol$367 Def0181
+S A$_atol$358 Def0178
+S A$_atol$349 Def016F
+S A$_atol$295 Def012C
+S A$_atol$286 Def0123
+S A$_atol$277 Def010E
+S A$_atol$268 Def00FC
+S A$_atol$259 Def00EB
+S A$_atol$196 Def0099
+S A$_atol$169 Def007E
+S A$_atol$386 Def0195
+S A$_atol$377 Def018C
+S A$_atol$368 Def0182
+S A$_atol$359 Def0179
+S A$_atol$296 Def012E
+S A$_atol$287 Def0124
+S A$_atol$278 Def0111
+S A$_atol$269 Def00FE
+S A$_atol$197 Def009A
+S A$_atol$396 Def019E
+S A$_atol$387 Def0196
+S A$_atol$378 Def018D
+S A$_atol$369 Def0183
+S A$_atol$288 Def0126
+S A$_atol$279 Def0114
+S A$_atol$198 Def009B
+S A$_atol$379 Def018E
+S A$_atol$298 Def012F
+S A$_atol$199 Def009C
+S XG$atol$0$0 Def019E
+S A$_atol$389 Def0197
+S A$_atol$299 Def0130
+S A$_atol$70 Def0009
+S A$_atol$80 Def0017
+S A$_atol$71 Def000B
+S A$_atol$90 Def0027
+S A$_atol$81 Def0018
+S A$_atol$72 Def000C
+S C$_atol.c$48$1$1 Def019E
+S A$_atol$82 Def0019
+S A$_atol$73 Def000E
+S A$_atol$92 Def0028
+S A$_atol$83 Def001A
+S A$_atol$74 Def000F
+S G$atol$0$0 Def0000
+S A$_atol$93 Def002B
+S A$_atol$84 Def001B
+S A$_atol$75 Def0010
+S A$_atol$66 Def0000
+S A$_atol$94 Def002C
+S A$_atol$85 Def001C
+S A$_atol$76 Def0012
+S A$_atol$67 Def0002
+S A$_atol$95 Def002D
+S A$_atol$86 Def001F
+S A$_atol$77 Def0013
+S A$_atol$68 Def0004
+S A$_atol$96 Def002E
+S A$_atol$87 Def0020
+S A$_atol$69 Def0006
+S A$_atol$97 Def002F
+S A$_atol$88 Def0023
+S A$_atol$79 Def0014
+S A$_atol$98 Def0030
+S A$_atol$89 Def0024
+S A$_atol$99 Def0031
+T 00 00
+R 00 00 00 01
+T 00 00
+R 00 00 00 01
+T 00 00
+R 00 00 00 05
+T 00 00
+R 00 00 00 05
+T 00 03
+R 00 00 00 05
+T 00 03
+R 00 00 00 05
+T 00 00
+R 00 00 00 07
+T 00 00 C0 F0 C0 83 C0 82 90 00 00 D0 E0 F0 D0 E0
+R 00 00 00 07 00 09 00 05
+T 00 0E A3 F0 D0 E0 A3 F0 90 00 03 E4 A3 A3 A3 F0
+R 00 00 00 07 00 09 00 05
+T 00 1C 12 00 00 F0 12 00 00 F0 12 00 00 F0 90
+R 00 00 00 07 02 03 00 01 02 07 00 01 02 0B 00 01
+T 00 29 00 00 E0 FA A3 E0 FB A3 E0 FC
+R 00 00 00 07 00 02 00 05
+T 00 33
+R 00 00 00 07
+T 00 33 8A 82 8B 83 8C F0 12 00 00 FD 60 30
+R 00 00 00 07 02 09 00 03
+T 00 3F
+R 00 00 00 07
+T 00 3F C3 74 B9 8D F0 63 F0 80 95 F0 40 08
+R 00 00 00 07
+T 00 4B
+R 00 00 00 07
+T 00 4B C3 ED 64 80 94 B0 50 1C
+R 00 00 00 07
+T 00 53
+R 00 00 00 07
+T 00 53
+R 00 00 00 07
+T 00 53 BD 2D 02 80 17
+R 00 00 00 07
+T 00 58
+R 00 00 00 07
+T 00 58 BD 2B 02 80 12
+R 00 00 00 07
+T 00 5D
+R 00 00 00 07
+T 00 5D 0A BA 00 01 0B
+R 00 00 00 07
+T 00 62
+R 00 00 00 07
+T 00 62 90 00 00 EA F0 A3 EB F0 A3 EC F0 80 C4
+R 00 00 00 07 00 03 00 05
+T 00 6F
+R 00 00 00 07
+T 00 6F 90 00 00 EA F0 A3 EB F0 A3 EC F0 8A 82 8B
+R 00 00 00 07 00 03 00 05
+T 00 7D 83 8C F0 12 00 00 FD BD 2D 04 74 01 80 01
+R 00 00 00 07 02 06 00 03
+T 00 8B
+R 00 00 00 07
+T 00 8B E4
+R 00 00 00 07
+T 00 8C
+R 00 00 00 07
+T 00 8C FE 70 03
+R 00 00 00 07
+T 00 8F
+R 00 00 00 07
+T 00 8F BD 2B 0E
+R 00 00 00 07
+T 00 92
+R 00 00 00 07
+T 00 92
+R 00 00 00 07
+T 00 92
+R 00 00 00 07
+T 00 92 90 00 00 74 01 2A F0 E4 3B A3 F0 A3 EC F0
+R 00 00 00 07 00 03 00 05
+T 00 A0
+R 00 00 00 07
+T 00 A0 90 00 00 E0 FA A3 E0 FB A3 E0 FC
+R 00 00 00 07 00 03 00 05
+T 00 AB
+R 00 00 00 07
+T 00 AB 8A 82 8B 83 8C F0 12 00 00 FD 70 03 02
+R 00 00 00 07 02 09 00 03
+T 00 B8 01 5E
+R 00 00 00 07 00 02 00 07
+T 00 BA
+R 00 00 00 07
+T 00 BA C3 ED 64 80 94 B0 50 03 02 01 5E
+R 00 00 00 07 00 0B 00 07
+T 00 C5
+R 00 00 00 07
+T 00 C5 C3 74 B9 8D F0 63 F0 80 95 F0 50 03 02
+R 00 00 00 07
+T 00 D2 01 5E
+R 00 00 00 07 00 02 00 07
+T 00 D4
+R 00 00 00 07
+T 00 D4 C0 06 90 00 03 E0 FF A3 E0 F8 A3 E0 F9 A3
+R 00 00 00 07 00 05 00 05
+T 00 E2 E0 FE 90 00 00 E4 A3 A3 A3 F0 12 00 00 F0
+R 00 00 00 07 02 05 00 00 02 0D 00 01
+T 00 F0 12 00 00 F0 12 00 00 74 0A F0 C0 02 C0 03
+R 00 00 00 07 02 03 00 01 02 07 00 01
+T 00 FE C0 04 C0 05 C0 06 8F 82 88 83 89 F0 EE 12
+R 00 00 00 07
+T 01 0C 00 00 85 82 00 00 85 83 00 01 85 F0
+R 00 00 00 07 02 02 00 02 29 06 00 01 29 0A 00 01
+T 01 16 00 02 F5 00 03 D0 06 D0 05 D0 04 D0 03 D0
+R 00 00 00 07 29 02 00 01 29 05 00 01
+T 01 22 02 ED 24 D0 FD E4 34 FF FE E4 34 FF FF E4
+R 00 00 00 07
+T 01 30 34 FF F8 90 00 03 ED 25 00 00 F0 EE 35
+R 00 00 00 07 00 06 00 05 29 0A 00 01
+T 01 3C 00 01 A3 F0 EF 35 00 02 A3 F0 E8 35 00 03
+R 00 00 00 07 29 02 00 01 29 08 00 01 29 0E 00 01
+T 01 47 A3 F0 0A BA 00 01 0B
+R 00 00 00 07
+T 01 4E
+R 00 00 00 07
+T 01 4E 90 00 00 EA F0 A3 EB F0 A3 EC F0 D0 06 02
+R 00 00 00 07 00 03 00 05
+T 01 5C 00 AB
+R 00 00 00 07 00 02 00 07
+T 01 5E
+R 00 00 00 07
+T 01 5E 90 00 00 EA F0 A3 EB F0 A3 EC F0 EE 60 1D
+R 00 00 00 07 00 03 00 05
+T 01 6C
+R 00 00 00 07
+T 01 6C 90 00 03 E0 FA A3 E0 FB A3 E0 FC A3 E0 FD
+R 00 00 00 07 00 03 00 05
+T 01 7A C3 E4 9A FA E4 9B FB E4 9C FC E4 9D FD 80
+R 00 00 00 07
+T 01 88 0E
+R 00 00 00 07
+T 01 89
+R 00 00 00 07
+T 01 89 90 00 03 E0 FA A3 E0 FB A3 E0 FC A3 E0 FD
+R 00 00 00 07 00 03 00 05
+T 01 97
+R 00 00 00 07
+T 01 97 8A 82 8B 83 8C F0 ED
+R 00 00 00 07
+T 01 9E
+R 00 00 00 07
+T 01 9E 22
+R 00 00 00 07

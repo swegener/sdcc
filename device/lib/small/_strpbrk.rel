@@ -1,0 +1,98 @@
+;!FILE _strpbrk.asm
+XH
+H 8 areas 2E global symbols
+M _strpbrk
+S _strchr_PARM_2 Ref0000
+S _strchr Ref0000
+S __gptrget Ref0000
+A _CODE size 0 flags 0
+A DSEG size 6 flags 0
+S _strpbrk_PARM_2 Def0000
+A OSEG size 0 flags 4
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 0 flags 40
+A GSINIT size 0 flags 20
+A CSEG size 54 flags 20
+S A$_strpbrk$97 Def003B
+S A$_strpbrk$88 Def0028
+S A$_strpbrk$79 Def001C
+S A$_strpbrk$98 Def003D
+S A$_strpbrk$89 Def002A
+S A$_strpbrk$99 Def003E
+S A$_strpbrk$100 Def003F
+S A$_strpbrk$102 Def0040
+S A$_strpbrk$113 Def004D
+S A$_strpbrk$114 Def0050
+S A$_strpbrk$105 Def0042
+S A$_strpbrk$106 Def0045
+S _strpbrk Def0000
+S A$_strpbrk$107 Def0048
+S A$_strpbrk$118 Def0053
+S A$_strpbrk$109 Def004B
+S C$_strpbrk.c$40$1$1 Def0053
+S XG$strpbrk$0$0 Def0053
+S A$_strpbrk$70 Def000B
+S A$_strpbrk$71 Def000D
+S A$_strpbrk$90 Def002C
+S A$_strpbrk$81 Def001E
+S A$_strpbrk$91 Def002E
+S A$_strpbrk$73 Def000F
+S A$_strpbrk$92 Def0031
+S A$_strpbrk$74 Def0012
+S A$_strpbrk$65 Def0000
+S G$strpbrk$0$0 Def0000
+S A$_strpbrk$93 Def0033
+S A$_strpbrk$84 Def0020
+S A$_strpbrk$75 Def0015
+S A$_strpbrk$66 Def0003
+S A$_strpbrk$94 Def0035
+S A$_strpbrk$85 Def0022
+S A$_strpbrk$76 Def0018
+S A$_strpbrk$67 Def0006
+S A$_strpbrk$95 Def0037
+S A$_strpbrk$86 Def0024
+S A$_strpbrk$96 Def0039
+S A$_strpbrk$87 Def0026
+S A$_strpbrk$78 Def001B
+S A$_strpbrk$69 Def0009
+T 00 00
+R 00 00 00 01
+T 00 00
+R 00 00 00 01
+T 00 03
+R 00 00 00 01
+T 00 03
+R 00 00 00 01
+T 00 00
+R 00 00 00 07
+T 00 00 85 82 00 03 85 83 00 04 85 F0 00 05 AD
+R 00 00 00 07 29 04 00 01 29 08 00 01 29 0C 00 01
+T 00 0A 00 00 AE 00 01 AF 00 02
+R 00 00 00 07 29 02 00 01 29 05 00 01 29 08 00 01
+T 00 0F
+R 00 00 00 07
+T 00 0F 85 00 03 82 85 00 04 83 85 00 05 F0 12
+R 00 00 00 07 29 03 00 01 29 07 00 01 29 0B 00 01
+T 00 19 00 00 F8 88 01 60 2D
+R 00 00 00 07 02 02 00 02
+T 00 20
+R 00 00 00 07
+T 00 20 89 00 00 C0 05 C0 06 C0 07 8D 82 8E 83 8F
+R 00 00 00 07 2B 03 00 00
+T 00 2D F0 12 00 00 A8 82 A9 83 AA F0 D0 07 D0 06
+R 00 00 00 07 02 04 00 01
+T 00 3B D0 05 E8 49 4A 60 CD
+R 00 00 00 07
+T 00 42
+R 00 00 00 07
+T 00 42 85 00 03 82 85 00 04 83 85 00 05 F0 80 06
+R 00 00 00 07 29 03 00 01 29 07 00 01 29 0B 00 01
+T 00 4D
+R 00 00 00 07
+T 00 4D 90 00 00 75 F0 00
+R 00 00 00 07
+T 00 53
+R 00 00 00 07
+T 00 53 22
+R 00 00 00 07

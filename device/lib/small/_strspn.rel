@@ -1,0 +1,123 @@
+;!FILE _strspn.asm
+XH
+H 8 areas 39 global symbols
+M _strspn
+S _strchr_PARM_2 Ref0000
+S _strchr Ref0000
+S __gptrget Ref0000
+A _CODE size 0 flags 0
+A DSEG size 8 flags 0
+S _strspn_PARM_2 Def0000
+A OSEG size 0 flags 4
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 0 flags 40
+A GSINIT size 0 flags 20
+A CSEG size 63 flags 20
+S A$_strspn$100 Def0039
+S A$_strspn$110 Def0048
+S A$_strspn$101 Def003B
+S A$_strspn$120 Def0054
+S A$_strspn$102 Def003D
+S A$_strspn$121 Def0055
+S A$_strspn$103 Def003F
+S A$_strspn$122 Def0058
+S A$_strspn$113 Def004A
+S A$_strspn$104 Def0041
+S A$_strspn$114 Def004C
+S A$_strspn$105 Def0043
+S A$_strspn$133 Def0062
+S A$_strspn$115 Def004D
+S A$_strspn$106 Def0045
+S _strspn Def0000
+S A$_strspn$125 Def005A
+S A$_strspn$116 Def0050
+S A$_strspn$107 Def0046
+S A$_strspn$108 Def0047
+S A$_strspn$128 Def005C
+S A$_strspn$119 Def0052
+S A$_strspn$129 Def005F
+S XG$strspn$0$0 Def0062
+S C$_strspn.c$44$1$1 Def0062
+S A$_strspn$71 Def0006
+S A$_strspn$81 Def0017
+S A$_strspn$72 Def0008
+S A$_strspn$82 Def001A
+S A$_strspn$73 Def000A
+S A$_strspn$92 Def0028
+S A$_strspn$83 Def001D
+S A$_strspn$74 Def000C
+S G$strspn$0$0 Def0000
+S A$_strspn$93 Def002A
+S A$_strspn$84 Def0020
+S A$_strspn$75 Def000D
+S A$_strspn$94 Def002C
+S A$_strspn$76 Def000F
+S A$_strspn$67 Def0000
+S A$_strspn$95 Def002E
+S A$_strspn$86 Def0023
+S A$_strspn$77 Def0011
+S A$_strspn$68 Def0002
+S A$_strspn$96 Def0030
+S A$_strspn$87 Def0024
+S A$_strspn$78 Def0013
+S A$_strspn$69 Def0004
+S A$_strspn$97 Def0032
+S A$_strspn$79 Def0015
+S A$_strspn$98 Def0034
+S A$_strspn$89 Def0026
+S A$_strspn$99 Def0036
+T 00 00
+R 00 00 00 01
+T 00 00
+R 00 00 00 01
+T 00 03
+R 00 00 00 01
+T 00 03
+R 00 00 00 01
+T 00 06
+R 00 00 00 01
+T 00 06
+R 00 00 00 01
+T 00 00
+R 00 00 00 07
+T 00 00 AA 82 AB 83 AC F0 AD 00 00 AE 00 01 AF
+R 00 00 00 07 29 09 00 01 29 0C 00 01
+T 00 0B 00 02 E4 F5 00 07 F5 00 06 8A
+R 00 00 00 07 29 02 00 01 29 06 00 01 29 09 00 01
+T 00 12 00 03 8B 00 04 8C 00 05
+R 00 00 00 07 29 02 00 01 29 05 00 01 29 08 00 01
+T 00 17
+R 00 00 00 07
+T 00 17 85 00 03 82 85 00 04 83 85 00 05 F0 12
+R 00 00 00 07 29 03 00 01 29 07 00 01 29 0B 00 01
+T 00 21 00 00 F8 88 01 60 34
+R 00 00 00 07 02 02 00 02
+T 00 28
+R 00 00 00 07
+T 00 28 89 00 00 C0 05 C0 06 C0 07 8D 82 8E 83 8F
+R 00 00 00 07 2B 03 00 00
+T 00 35 F0 12 00 00 A8 82 A9 83 AA F0 D0 07 D0 06
+R 00 00 00 07 02 04 00 01
+T 00 43 D0 05 E8 49 4A 60 12
+R 00 00 00 07
+T 00 4A
+R 00 00 00 07
+T 00 4A 05 00 06 E4 B5 00 06 02 05 00 07
+R 00 00 00 07 29 03 00 01 29 07 00 01 29 0B 00 01
+T 00 52
+R 00 00 00 07
+T 00 52 05 00 03 E4 B5 00 03 02 05 00 04
+R 00 00 00 07 29 03 00 01 29 07 00 01 29 0B 00 01
+T 00 5A
+R 00 00 00 07
+T 00 5A 80 BB
+R 00 00 00 07
+T 00 5C
+R 00 00 00 07
+T 00 5C 85 00 06 82 85 00 07 83
+R 00 00 00 07 29 03 00 01 29 07 00 01
+T 00 62
+R 00 00 00 07
+T 00 62 22
+R 00 00 00 07

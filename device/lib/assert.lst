@@ -1,0 +1,144 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:40 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module assert
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl __assert
+                             11 	.globl __assert_PARM_3
+                             12 	.globl __assert_PARM_2
+                             13 ;--------------------------------------------------------
+                             14 ; special function registers
+                             15 ;--------------------------------------------------------
+                             16 ;--------------------------------------------------------
+                             17 ; special function bits 
+                             18 ;--------------------------------------------------------
+                             19 ;--------------------------------------------------------
+                             20 ; internal ram data
+                             21 ;--------------------------------------------------------
+                             22 	.area	DSEG    (DATA)
+                             23 ;--------------------------------------------------------
+                             24 ; overlayable items in internal ram 
+                             25 ;--------------------------------------------------------
+                             26 	.area	OSEG	(OVR,DATA)
+                             27 ;--------------------------------------------------------
+                             28 ; indirectly addressable internal ram data
+                             29 ;--------------------------------------------------------
+                             30 	.area	ISEG    (DATA)
+                             31 ;--------------------------------------------------------
+                             32 ; bit data
+                             33 ;--------------------------------------------------------
+                             34 	.area	BSEG    (BIT)
+                             35 ;--------------------------------------------------------
+                             36 ; external ram data
+                             37 ;--------------------------------------------------------
+                             38 	.area	XSEG    (XDATA)
+   0000                      39 __assert_PARM_2:
+   0000                      40 	.ds	0x0003
+   0003                      41 __assert_PARM_3:
+   0003                      42 	.ds	0x0002
+   0005                      43 __assert_expr_1_1:
+   0005                      44 	.ds	0x0003
+                             45 ;--------------------------------------------------------
+                             46 ; global & static initialisations
+                             47 ;--------------------------------------------------------
+                             48 	.area GSINIT (CODE)
+                             49 ;--------------------------------------------------------
+                             50 ; code
+                             51 ;--------------------------------------------------------
+                             52 	.area CSEG (CODE)
+                    0000     53 	G$_assert$0$0 ==.
+                             54 ;	assert.c 4
+                             55 ;	-----------------------------------------
+                             56 ;	 function _assert
+                             57 ;	-----------------------------------------
+   0000                      58 __assert:
+                    0002     59 	ar2 = 0x02
+                    0003     60 	ar3 = 0x03
+                    0004     61 	ar4 = 0x04
+                    0005     62 	ar5 = 0x05
+                    0006     63 	ar6 = 0x06
+                    0007     64 	ar7 = 0x07
+                    0000     65 	ar0 = 0x00
+                    0001     66 	ar1 = 0x01
+                             67 ;	assert.c 0
+   0000 C0 F0                68 	push	b
+   0002 C0 83                69 	push	dph
+   0004 C0 82                70 	push	dpl
+   0006 90s00r05             71 	mov	dptr,#__assert_expr_1_1
+   0009 D0 E0                72 	pop	acc
+   000B F0                   73 	movx	@dptr,a
+   000C D0 E0                74 	pop	acc
+   000E A3                   75 	inc	dptr
+   000F F0                   76 	movx	@dptr,a
+   0010 D0 E0                77 	pop	acc
+   0012 A3                   78 	inc	dptr
+   0013 F0                   79 	movx	@dptr,a
+                             80 ;	assert.c 7
+   0014 90s00r05             81 	mov	dptr,#__assert_expr_1_1
+   0017 E0                   82 	movx	a,@dptr
+   0018 FA                   83 	mov	r2,a
+   0019 A3                   84 	inc	dptr
+   001A E0                   85 	movx	a,@dptr
+   001B FB                   86 	mov	r3,a
+   001C A3                   87 	inc	dptr
+   001D E0                   88 	movx	a,@dptr
+   001E FC                   89 	mov	r4,a
+                             90 ;	assert.c 6
+   001F 7Dr55                91 	mov	r5,#__str_0
+   0021 7Es00                92 	mov	r6,#(__str_0 >> 8)
+   0023 7F 02                93 	mov	r7,#0x02
+   0025 90s00r00             94 	mov	dptr,#__assert_PARM_2
+   0028 E0                   95 	movx	a,@dptr
+                             96 ;  Peephole 100.a   removed redundant mov
+   0029 C0 E0                97 	push	acc
+   002B A3                   98 	inc	dptr
+   002C E0                   99 	movx	a,@dptr
+                            100 ;  Peephole 100.a   removed redundant mov
+   002D C0 E0               101 	push	acc
+   002F A3                  102 	inc	dptr
+   0030 E0                  103 	movx	a,@dptr
+                            104 ;  Peephole 100.a   removed redundant mov
+   0031 C0 E0               105 	push	acc
+   0033 90s00r03            106 	mov	dptr,#__assert_PARM_3
+   0036 E0                  107 	movx	a,@dptr
+                            108 ;  Peephole 100.a   removed redundant mov
+   0037 C0 E0               109 	push	acc
+   0039 A3                  110 	inc	dptr
+   003A E0                  111 	movx	a,@dptr
+                            112 ;  Peephole 100.a   removed redundant mov
+   003B C0 E0               113 	push	acc
+   003D C0 05               114 	push	ar5
+   003F C0 06               115 	push	ar6
+   0041 C0 07               116 	push	ar7
+   0043 8A 82               117 	mov	dpl,r2
+   0045 8B 83               118 	mov	dph,r3
+   0047 8C F0               119 	mov	b,r4
+   0049 12s00r00            120 	lcall	_printf
+   004C E5 81               121 	mov	a,sp
+   004E 24 FA               122 	add	a,#0xfa
+   0050 F5 81               123 	mov	sp,a
+                            124 ;	assert.c 8
+   0052                     125 00102$:
+                            126 ; Peephole 132   changed ljmp to sjmp
+   0052 80 FE               127 	sjmp 00102$
+   0054                     128 00104$:
+                    0054    129 	C$assert.c$9$1$1 ==.
+                    0054    130 	XG$_assert$0$0 ==.
+   0054 22                  131 	ret
+                            132 	.area	CSEG    (CODE)
+                    0055    133 Fassert$_str_0$0$0 == .
+   0055                     134 __str_0:
+   0055 41 73 73 65 72 74   135 	.ascii /Assert(%s) failed at line %u in file %s./
+        28 25 73 29 20 66
+        61 69 6C 65 64 20
+        61 74 20 6C 69 6E
+        65 20 25 75 20 69
+        6E 20 66 69 6C 65
+        20 25 73 2E
+   007D 0A                  136 	.byte 0x0a
+   007E                     137 	.ascii //
+   007E 00                  138 	.byte	0

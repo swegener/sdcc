@@ -1,0 +1,705 @@
+ASxxxx Assembler V01.70 + NoICE + SDCC mods Feb-1999  (Intel 8051), page 1.
+
+Symbol Table
+
+    A                                                              00D6 
+  7 A$_fs2long$100                                                 0027 GR
+  7 A$_fs2long$101                                                 0028 GR
+  7 A$_fs2long$102                                                 002B GR
+  7 A$_fs2long$103                                                 002C GR
+  7 A$_fs2long$104                                                 002D GR
+  7 A$_fs2long$105                                                 002E GR
+  7 A$_fs2long$106                                                 002F GR
+  7 A$_fs2long$107                                                 0030 GR
+  7 A$_fs2long$108                                                 0031 GR
+  7 A$_fs2long$109                                                 0032 GR
+  7 A$_fs2long$110                                                 0033 GR
+  7 A$_fs2long$111                                                 0034 GR
+  7 A$_fs2long$112                                                 0035 GR
+  7 A$_fs2long$114                                                 0036 GR
+  7 A$_fs2long$115                                                 0039 GR
+  7 A$_fs2long$116                                                 003A GR
+  7 A$_fs2long$117                                                 003B GR
+  7 A$_fs2long$118                                                 003C GR
+  7 A$_fs2long$119                                                 003D GR
+  7 A$_fs2long$120                                                 003E GR
+  7 A$_fs2long$121                                                 003F GR
+  7 A$_fs2long$122                                                 0040 GR
+  7 A$_fs2long$123                                                 0041 GR
+  7 A$_fs2long$124                                                 0042 GR
+  7 A$_fs2long$125                                                 0043 GR
+  7 A$_fs2long$126                                                 0044 GR
+  7 A$_fs2long$127                                                 0045 GR
+  7 A$_fs2long$128                                                 0046 GR
+  7 A$_fs2long$129                                                 0047 GR
+  7 A$_fs2long$131                                                 0048 GR
+  7 A$_fs2long$137                                                 004A GR
+  7 A$_fs2long$138                                                 004B GR
+  7 A$_fs2long$139                                                 004D GR
+  7 A$_fs2long$140                                                 004F GR
+  7 A$_fs2long$141                                                 0051 GR
+  7 A$_fs2long$144                                                 0054 GR
+  7 A$_fs2long$145                                                 0057 GR
+  7 A$_fs2long$146                                                 0058 GR
+  7 A$_fs2long$147                                                 0059 GR
+  7 A$_fs2long$148                                                 005A GR
+  7 A$_fs2long$149                                                 005B GR
+  7 A$_fs2long$150                                                 005C GR
+  7 A$_fs2long$151                                                 005D GR
+  7 A$_fs2long$152                                                 005E GR
+  7 A$_fs2long$153                                                 005F GR
+  7 A$_fs2long$154                                                 0060 GR
+  7 A$_fs2long$155                                                 0061 GR
+  7 A$_fs2long$156                                                 0062 GR
+  7 A$_fs2long$157                                                 0064 GR
+  7 A$_fs2long$158                                                 0065 GR
+  7 A$_fs2long$159                                                 0067 GR
+  7 A$_fs2long$160                                                 0068 GR
+  7 A$_fs2long$161                                                 0069 GR
+  7 A$_fs2long$162                                                 006A GR
+  7 A$_fs2long$163                                                 006B GR
+  7 A$_fs2long$164                                                 006C GR
+  7 A$_fs2long$165                                                 006E GR
+  7 A$_fs2long$166                                                 0071 GR
+  7 A$_fs2long$168                                                 0073 GR
+  7 A$_fs2long$169                                                 0074 GR
+  7 A$_fs2long$170                                                 0075 GR
+  7 A$_fs2long$171                                                 0077 GR
+  7 A$_fs2long$172                                                 0078 GR
+  7 A$_fs2long$173                                                 0079 GR
+  7 A$_fs2long$174                                                 007A GR
+  7 A$_fs2long$175                                                 007D GR
+  7 A$_fs2long$176                                                 007F GR
+  7 A$_fs2long$177                                                 0080 GR
+  7 A$_fs2long$178                                                 0082 GR
+  7 A$_fs2long$179                                                 0084 GR
+  7 A$_fs2long$180                                                 0085 GR
+  7 A$_fs2long$181                                                 0088 GR
+  7 A$_fs2long$182                                                 0089 GR
+  7 A$_fs2long$183                                                 008A GR
+  7 A$_fs2long$184                                                 008B GR
+  7 A$_fs2long$185                                                 008C GR
+  7 A$_fs2long$187                                                 008D GR
+  7 A$_fs2long$188                                                 0090 GR
+  7 A$_fs2long$189                                                 0091 GR
+  7 A$_fs2long$190                                                 0092 GR
+  7 A$_fs2long$191                                                 0093 GR
+  7 A$_fs2long$192                                                 0094 GR
+  7 A$_fs2long$193                                                 0095 GR
+  7 A$_fs2long$194                                                 0096 GR
+  7 A$_fs2long$195                                                 0097 GR
+  7 A$_fs2long$196                                                 0098 GR
+  7 A$_fs2long$197                                                 0099 GR
+  7 A$_fs2long$198                                                 009A GR
+  7 A$_fs2long$199                                                 009B GR
+  7 A$_fs2long$200                                                 009E GR
+  7 A$_fs2long$201                                                 00A0 GR
+  7 A$_fs2long$202                                                 00A3 GR
+  7 A$_fs2long$203                                                 00A4 GR
+  7 A$_fs2long$204                                                 00A5 GR
+  7 A$_fs2long$205                                                 00A6 GR
+  7 A$_fs2long$206                                                 00A7 GR
+  7 A$_fs2long$207                                                 00A8 GR
+  7 A$_fs2long$208                                                 00AA GR
+  7 A$_fs2long$209                                                 00AB GR
+  7 A$_fs2long$210                                                 00AC GR
+  7 A$_fs2long$211                                                 00AD GR
+  7 A$_fs2long$212                                                 00AE GR
+  7 A$_fs2long$213                                                 00AF GR
+  7 A$_fs2long$215                                                 00B0 GR
+  7 A$_fs2long$216                                                 00B3 GR
+  7 A$_fs2long$217                                                 00B4 GR
+  7 A$_fs2long$218                                                 00B5 GR
+  7 A$_fs2long$219                                                 00B6 GR
+  7 A$_fs2long$220                                                 00B7 GR
+  7 A$_fs2long$221                                                 00B8 GR
+  7 A$_fs2long$223                                                 00B9 GR
+  7 A$_fs2long$224                                                 00BA GR
+  7 A$_fs2long$226                                                 00BB GR
+  7 A$_fs2long$227                                                 00BD GR
+  7 A$_fs2long$228                                                 00BF GR
+  7 A$_fs2long$229                                                 00C2 GR
+  7 A$_fs2long$231                                                 00C4 GR
+  7 A$_fs2long$234                                                 00C6 GR
+  7 A$_fs2long$235                                                 00C9 GR
+  7 A$_fs2long$236                                                 00CA GR
+  7 A$_fs2long$237                                                 00CB GR
+  7 A$_fs2long$238                                                 00CC GR
+  7 A$_fs2long$239                                                 00CD GR
+  7 A$_fs2long$240                                                 00CE GR
+  7 A$_fs2long$241                                                 00CF GR
+  7 A$_fs2long$242                                                 00D0 GR
+  7 A$_fs2long$243                                                 00D1 GR
+  7 A$_fs2long$244                                                 00D2 GR
+  7 A$_fs2long$246                                                 00D3 GR
+  7 A$_fs2long$247                                                 00D4 GR
+  7 A$_fs2long$248                                                 00D5 GR
+  7 A$_fs2long$249                                                 00D7 GR
+  7 A$_fs2long$250                                                 00D8 GR
+  7 A$_fs2long$251                                                 00DB GR
+  7 A$_fs2long$252                                                 00DD GR
+  7 A$_fs2long$253                                                 00DE GR
+  7 A$_fs2long$254                                                 00DF GR
+  7 A$_fs2long$255                                                 00E1 GR
+  7 A$_fs2long$256                                                 00E3 GR
+  7 A$_fs2long$258                                                 00E5 GR
+  7 A$_fs2long$259                                                 00E7 GR
+  7 A$_fs2long$260                                                 00EA GR
+  7 A$_fs2long$261                                                 00ED GR
+  7 A$_fs2long$262                                                 00F0 GR
+  7 A$_fs2long$265                                                 00F3 GR
+  7 A$_fs2long$266                                                 00F6 GR
+  7 A$_fs2long$267                                                 00F7 GR
+  7 A$_fs2long$268                                                 00F8 GR
+  7 A$_fs2long$269                                                 00F9 GR
+  7 A$_fs2long$271                                                 00FA GR
+  7 A$_fs2long$272                                                 00FB GR
+  7 A$_fs2long$273                                                 00FE GR
+  7 A$_fs2long$275                                                 0101 GR
+  7 A$_fs2long$276                                                 0104 GR
+  7 A$_fs2long$277                                                 0105 GR
+  7 A$_fs2long$278                                                 0106 GR
+  7 A$_fs2long$279                                                 0107 GR
+  7 A$_fs2long$280                                                 0108 GR
+  7 A$_fs2long$281                                                 0109 GR
+  7 A$_fs2long$282                                                 010A GR
+  7 A$_fs2long$283                                                 010C GR
+  7 A$_fs2long$285                                                 010D GR
+  7 A$_fs2long$286                                                 010F GR
+  7 A$_fs2long$287                                                 0111 GR
+  7 A$_fs2long$288                                                 0114 GR
+  7 A$_fs2long$289                                                 0116 GR
+  7 A$_fs2long$290                                                 0118 GR
+  7 A$_fs2long$292                                                 011B GR
+  7 A$_fs2long$293                                                 011E GR
+  7 A$_fs2long$294                                                 011F GR
+  7 A$_fs2long$295                                                 0121 GR
+  7 A$_fs2long$296                                                 0122 GR
+  7 A$_fs2long$297                                                 0123 GR
+  7 A$_fs2long$298                                                 0125 GR
+  7 A$_fs2long$299                                                 0126 GR
+  7 A$_fs2long$300                                                 0127 GR
+  7 A$_fs2long$301                                                 0129 GR
+  7 A$_fs2long$302                                                 012A GR
+  7 A$_fs2long$303                                                 012B GR
+  7 A$_fs2long$304                                                 012D GR
+  7 A$_fs2long$305                                                 012F GR
+  7 A$_fs2long$306                                                 0131 GR
+  7 A$_fs2long$307                                                 0133 GR
+  7 A$_fs2long$308                                                 0135 GR
+  7 A$_fs2long$309                                                 0137 GR
+  7 A$_fs2long$312                                                 013A GR
+  7 A$_fs2long$313                                                 013D GR
+  7 A$_fs2long$314                                                 013E GR
+  7 A$_fs2long$315                                                 013F GR
+  7 A$_fs2long$316                                                 0140 GR
+  7 A$_fs2long$317                                                 0141 GR
+  7 A$_fs2long$318                                                 0142 GR
+  7 A$_fs2long$319                                                 0143 GR
+  7 A$_fs2long$320                                                 0144 GR
+  7 A$_fs2long$321                                                 0145 GR
+  7 A$_fs2long$322                                                 0147 GR
+  7 A$_fs2long$323                                                 0148 GR
+  7 A$_fs2long$324                                                 0149 GR
+  7 A$_fs2long$325                                                 014B GR
+  7 A$_fs2long$326                                                 014E GR
+  7 A$_fs2long$327                                                 014F GR
+  7 A$_fs2long$328                                                 0151 GR
+  7 A$_fs2long$329                                                 0152 GR
+  7 A$_fs2long$330                                                 0153 GR
+  7 A$_fs2long$331                                                 0155 GR
+  7 A$_fs2long$332                                                 0156 GR
+  7 A$_fs2long$333                                                 0157 GR
+  7 A$_fs2long$334                                                 0159 GR
+  7 A$_fs2long$335                                                 015A GR
+  7 A$_fs2long$336                                                 015B GR
+  7 A$_fs2long$337                                                 015D GR
+  7 A$_fs2long$338                                                 0160 GR
+  7 A$_fs2long$339                                                 0162 GR
+  7 A$_fs2long$340                                                 0164 GR
+  7 A$_fs2long$341                                                 0165 GR
+  7 A$_fs2long$342                                                 0167 GR
+  7 A$_fs2long$344                                                 0169 GR
+  7 A$_fs2long$345                                                 016B GR
+  7 A$_fs2long$346                                                 016D GR
+  7 A$_fs2long$347                                                 016E GR
+  7 A$_fs2long$348                                                 0170 GR
+  7 A$_fs2long$349                                                 0172 GR
+  7 A$_fs2long$350                                                 0173 GR
+  7 A$_fs2long$351                                                 0175 GR
+  7 A$_fs2long$352                                                 0177 GR
+  7 A$_fs2long$353                                                 0178 GR
+  7 A$_fs2long$354                                                 017A GR
+  7 A$_fs2long$355                                                 017C GR
+  7 A$_fs2long$356                                                 017D GR
+  7 A$_fs2long$358                                                 017F GR
+  7 A$_fs2long$359                                                 0182 GR
+  7 A$_fs2long$360                                                 0185 GR
+  7 A$_fs2long$361                                                 0187 GR
+  7 A$_fs2long$362                                                 0188 GR
+  7 A$_fs2long$363                                                 0189 GR
+  7 A$_fs2long$364                                                 018B GR
+  7 A$_fs2long$365                                                 018C GR
+  7 A$_fs2long$366                                                 018D GR
+  7 A$_fs2long$367                                                 018F GR
+  7 A$_fs2long$368                                                 0190 GR
+  7 A$_fs2long$369                                                 0191 GR
+  7 A$_fs2long$370                                                 0193 GR
+  7 A$_fs2long$372                                                 0194 GR
+  7 A$_fs2long$378                                                 0196 GR
+  7 A$_fs2long$379                                                 0197 GR
+  7 A$_fs2long$380                                                 0199 GR
+  7 A$_fs2long$381                                                 019B GR
+  7 A$_fs2long$382                                                 019D GR
+  7 A$_fs2long$385                                                 01A0 GR
+  7 A$_fs2long$386                                                 01A3 GR
+  7 A$_fs2long$387                                                 01A4 GR
+  7 A$_fs2long$388                                                 01A6 GR
+  7 A$_fs2long$389                                                 01A7 GR
+  7 A$_fs2long$390                                                 01A8 GR
+  7 A$_fs2long$391                                                 01AA GR
+  7 A$_fs2long$392                                                 01AB GR
+  7 A$_fs2long$393                                                 01AC GR
+  7 A$_fs2long$394                                                 01AE GR
+  7 A$_fs2long$395                                                 01AF GR
+  7 A$_fs2long$397                                                 01B0 GR
+  7 A$_fs2long$398                                                 01B2 GR
+  7 A$_fs2long$399                                                 01B3 GR
+  7 A$_fs2long$401                                                 01B5 GR
+  7 A$_fs2long$403                                                 01B6 GR
+  7 A$_fs2long$405                                                 01B8 GR
+  7 A$_fs2long$406                                                 01BB GR
+  7 A$_fs2long$407                                                 01BC GR
+  7 A$_fs2long$408                                                 01BE GR
+  7 A$_fs2long$409                                                 01BF GR
+  7 A$_fs2long$410                                                 01C0 GR
+  7 A$_fs2long$411                                                 01C2 GR
+  7 A$_fs2long$412                                                 01C3 GR
+  7 A$_fs2long$413                                                 01C4 GR
+  7 A$_fs2long$414                                                 01C6 GR
+  7 A$_fs2long$415                                                 01C7 GR
+  7 A$_fs2long$416                                                 01C8 GR
+  7 A$_fs2long$417                                                 01CA GR
+  7 A$_fs2long$418                                                 01CB GR
+  7 A$_fs2long$419                                                 01CC GR
+  7 A$_fs2long$420                                                 01CE GR
+  7 A$_fs2long$421                                                 01D0 GR
+  7 A$_fs2long$422                                                 01D1 GR
+  7 A$_fs2long$423                                                 01D3 GR
+  7 A$_fs2long$424                                                 01D5 GR
+  7 A$_fs2long$425                                                 01D6 GR
+  7 A$_fs2long$426                                                 01D8 GR
+  7 A$_fs2long$427                                                 01DA GR
+  7 A$_fs2long$428                                                 01DB GR
+  7 A$_fs2long$429                                                 01DD GR
+  7 A$_fs2long$431                                                 01DF GR
+  7 A$_fs2long$433                                                 01E1 GR
+  7 A$_fs2long$434                                                 01E4 GR
+  7 A$_fs2long$435                                                 01E5 GR
+  7 A$_fs2long$436                                                 01E7 GR
+  7 A$_fs2long$437                                                 01E8 GR
+  7 A$_fs2long$438                                                 01E9 GR
+  7 A$_fs2long$439                                                 01EB GR
+  7 A$_fs2long$440                                                 01EC GR
+  7 A$_fs2long$441                                                 01ED GR
+  7 A$_fs2long$442                                                 01EF GR
+  7 A$_fs2long$443                                                 01F0 GR
+  7 A$_fs2long$444                                                 01F1 GR
+  7 A$_fs2long$446                                                 01F3 GR
+  7 A$_fs2long$447                                                 01F6 GR
+  7 A$_fs2long$448                                                 01F9 GR
+  7 A$_fs2long$449                                                 01FC GR
+  7 A$_fs2long$453                                                 01FE GR
+  7 A$_fs2long$72                                                  0000 GR
+  7 A$_fs2long$73                                                  0002 GR
+  7 A$_fs2long$74                                                  0004 GR
+  7 A$_fs2long$75                                                  0006 GR
+  7 A$_fs2long$76                                                  0008 GR
+  7 A$_fs2long$77                                                  000B GR
+  7 A$_fs2long$78                                                  000D GR
+  7 A$_fs2long$79                                                  000E GR
+  7 A$_fs2long$80                                                  0010 GR
+  7 A$_fs2long$81                                                  0011 GR
+  7 A$_fs2long$82                                                  0012 GR
+  7 A$_fs2long$83                                                  0014 GR
+  7 A$_fs2long$84                                                  0015 GR
+  7 A$_fs2long$85                                                  0016 GR
+  7 A$_fs2long$86                                                  0018 GR
+  7 A$_fs2long$87                                                  0019 GR
+  7 A$_fs2long$89                                                  001A GR
+  7 A$_fs2long$90                                                  001D GR
+  7 A$_fs2long$91                                                  001E GR
+  7 A$_fs2long$92                                                  001F GR
+  7 A$_fs2long$93                                                  0020 GR
+  7 A$_fs2long$94                                                  0021 GR
+  7 A$_fs2long$95                                                  0022 GR
+  7 A$_fs2long$96                                                  0023 GR
+  7 A$_fs2long$97                                                  0024 GR
+  7 A$_fs2long$98                                                  0025 GR
+  7 A$_fs2long$99                                                  0026 GR
+    AC                                                             00D6 
+    ACC                                                            00E0 
+    ACC.0                                                          00E0 
+    ACC.1                                                          00E1 
+    ACC.2                                                          00E2 
+    ACC.3                                                          00E3 
+    ACC.4                                                          00E4 
+    ACC.5                                                          00E5 
+    ACC.6                                                          00E6 
+    ACC.7                                                          00E7 
+    B                                                              00F0 
+    B.0                                                            00F0 
+    B.1                                                            00F1 
+    B.2                                                            00F2 
+    B.3                                                            00F3 
+    B.4                                                            00F4 
+    B.5                                                            00F5 
+    B.6                                                            00F6 
+    B.7                                                            00F7 
+  7 C$_fs2long.c$97$1$1                                         =  01FE GR
+    CPRL2                                                          00C8 
+    CT2                                                            00C9 
+    CY                                                             00D7 
+    DPH                                                            0083 
+    DPL                                                            0082 
+    EA                                                             00AF 
+    ES                                                             00AC 
+    ET0                                                            00A9 
+    ET1                                                            00AB 
+    ET2                                                            00AD 
+    EX0                                                            00A8 
+    EX1                                                            00AA 
+    EXEN2                                                          00CB 
+    EXF2                                                           00CE 
+    F0                                                             00D5 
+  7 G$__fs2long$0$0                                             =  0000 GR
+    IE                                                             00A8 
+    IE.0                                                           00A8 
+    IE.1                                                           00A9 
+    IE.2                                                           00AA 
+    IE.3                                                           00AB 
+    IE.4                                                           00AC 
+    IE.5                                                           00AD 
+    IE.7                                                           00AF 
+    IE0                                                            0089 
+    IE1                                                            008B 
+    INT0                                                           00B2 
+    INT1                                                           00B3 
+    IP                                                             00B8 
+    IP.0                                                           00B8 
+    IP.1                                                           00B9 
+    IP.2                                                           00BA 
+    IP.3                                                           00BB 
+    IP.4                                                           00BC 
+    IP.5                                                           00BD 
+    IT0                                                            0088 
+    IT1                                                            008A 
+    OV                                                             00D2 
+    P                                                              00D0 
+    P0                                                             0080 
+    P0.0                                                           0080 
+    P0.1                                                           0081 
+    P0.2                                                           0082 
+    P0.3                                                           0083 
+    P0.4                                                           0084 
+    P0.5                                                           0085 
+    P0.6                                                           0086 
+    P0.7                                                           0087 
+    P1                                                             0090 
+    P1.0                                                           0090 
+    P1.1                                                           0091 
+    P1.2                                                           0092 
+    P1.3                                                           0093 
+    P1.4                                                           0094 
+    P1.5                                                           0095 
+    P1.6                                                           0096 
+    P1.7                                                           0097 
+    P2                                                             00A0 
+    P2.0                                                           00A0 
+    P2.1                                                           00A1 
+    P2.2                                                           00A2 
+    P2.3                                                           00A3 
+    P2.4                                                           00A4 
+    P2.5                                                           00A5 
+    P2.6                                                           00A6 
+    P2.7                                                           00A7 
+    P3                                                             00B0 
+    P3.0                                                           00B0 
+    P3.1                                                           00B1 
+    P3.2                                                           00B2 
+    P3.3                                                           00B3 
+    P3.4                                                           00B4 
+    P3.5                                                           00B5 
+    P3.6                                                           00B6 
+    P3.7                                                           00B7 
+    PCON                                                           0087 
+    PS                                                             00BC 
+    PSW                                                            00D0 
+    PSW.0                                                          00D0 
+    PSW.1                                                          00D1 
+    PSW.2                                                          00D2 
+    PSW.3                                                          00D3 
+    PSW.4                                                          00D4 
+    PSW.5                                                          00D5 
+    PSW.6                                                          00D6 
+    PSW.7                                                          00D7 
+    PT0                                                            00B9 
+    PT1                                                            00BB 
+    PT2                                                            00BD 
+    PX0                                                            00B8 
+    PX1                                                            00BA 
+    RB8                                                            009A 
+    RCAP2H                                                         00CB 
+    RCAP2L                                                         00CA 
+    RCLK                                                           00CD 
+    REN                                                            009C 
+    RI                                                             0098 
+    RS0                                                            00D3 
+    RS1                                                            00D4 
+    RXD                                                            00B0 
+    SBUF                                                           0099 
+    SCON                                                           0098 
+    SCON.0                                                         0098 
+    SCON.1                                                         0099 
+    SCON.2                                                         009A 
+    SCON.3                                                         009B 
+    SCON.4                                                         009C 
+    SCON.5                                                         009D 
+    SCON.6                                                         009E 
+    SCON.7                                                         009F 
+    SM0                                                            009F 
+    SM1                                                            009E 
+    SM2                                                            009D 
+    SP                                                             0081 
+    T2CON                                                          00C8 
+    T2CON.0                                                        00C8 
+    T2CON.1                                                        00C9 
+    T2CON.2                                                        00CA 
+    T2CON.3                                                        00CB 
+    T2CON.4                                                        00CC 
+    T2CON.5                                                        00CD 
+    T2CON.6                                                        00CE 
+    T2CON.7                                                        00CF 
+    TB8                                                            009B 
+    TCLK                                                           00CC 
+    TCON                                                           0088 
+    TCON.0                                                         0088 
+    TCON.1                                                         0089 
+    TCON.2                                                         008A 
+    TCON.3                                                         008B 
+    TCON.4                                                         008C 
+    TCON.5                                                         008D 
+    TCON.6                                                         008E 
+    TCON.7                                                         008F 
+    TF0                                                            008D 
+    TF1                                                            008F 
+    TF2                                                            00CF 
+    TH0                                                            008C 
+    TH1                                                            008D 
+    TH2                                                            00CD 
+    TI                                                             0099 
+    TL0                                                            008A 
+    TL1                                                            008B 
+    TL2                                                            00CC 
+    TMOD                                                           0089 
+    TR0                                                            008C 
+    TR1                                                            008E 
+    TR2                                                            00CA 
+    TXD                                                            00B1 
+  7 XG$__fs2long$0$0                                            =  01FE GR
+  7 ___fs2long                                                     0000 GR
+  5 ___fs2long_a1_1_1                                              0000 R
+  5 ___fs2long_exp_1_1                                             0008 R
+  5 ___fs2long_fl1_1_1                                             0004 R
+  5 ___fs2long_l_1_1                                               000A R
+  1 ___fs2long_sloc0_1_0                                           0000 R
+  1 ___fs2long_sloc1_1_0                                           0004 R
+    a                                                              00D6 
+    ac                                                             00D6 
+    acc                                                            00E0 
+    acc.0                                                          00E0 
+    acc.1                                                          00E1 
+    acc.2                                                          00E2 
+    acc.3                                                          00E3 
+    acc.4                                                          00E4 
+    acc.5                                                          00E5 
+    acc.6                                                          00E6 
+    acc.7                                                          00E7 
+    ar0                                                         =  0000 
+    ar1                                                         =  0001 
+    ar2                                                         =  0002 
+    ar3                                                         =  0003 
+    ar4                                                         =  0004 
+    ar5                                                         =  0005 
+    ar6                                                         =  0006 
+    ar7                                                         =  0007 
+    b                                                              00F0 
+    b.0                                                            00F0 
+    b.1                                                            00F1 
+    b.2                                                            00F2 
+    b.3                                                            00F3 
+    b.4                                                            00F4 
+    b.5                                                            00F5 
+    b.6                                                            00F6 
+    b.7                                                            00F7 
+    cprl2                                                          00C8 
+    ct2                                                            00C9 
+    cy                                                             00D7 
+    dph                                                            0083 
+    dpl                                                            0082 
+    ea                                                             00AF 
+    es                                                             00AC 
+    et0                                                            00A9 
+    et1                                                            00AB 
+    et2                                                            00AD 
+    ex0                                                            00A8 
+    ex1                                                            00AA 
+    exen2                                                          00CB 
+    exf2                                                           00CE 
+    f0                                                             00D5 
+    ie                                                             00A8 
+    ie.0                                                           00A8 
+    ie.1                                                           00A9 
+    ie.2                                                           00AA 
+    ie.3                                                           00AB 
+    ie.4                                                           00AC 
+    ie.5                                                           00AD 
+    ie.7                                                           00AF 
+    ie0                                                            0089 
+    ie1                                                            008B 
+    int0                                                           00B2 
+    int1                                                           00B3 
+    ip                                                             00B8 
+    ip.0                                                           00B8 
+    ip.1                                                           00B9 
+    ip.2                                                           00BA 
+    ip.3                                                           00BB 
+    ip.4                                                           00BC 
+    ip.5                                                           00BD 
+    it0                                                            0088 
+    it1                                                            008A 
+    ov                                                             00D2 
+    p                                                              00D0 
+    p0                                                             0080 
+    p0.0                                                           0080 
+    p0.1                                                           0081 
+    p0.2                                                           0082 
+    p0.3                                                           0083 
+    p0.4                                                           0084 
+    p0.5                                                           0085 
+    p0.6                                                           0086 
+    p0.7                                                           0087 
+    p1                                                             0090 
+    p1.0                                                           0090 
+    p1.1                                                           0091 
+    p1.2                                                           0092 
+    p1.3                                                           0093 
+    p1.4                                                           0094 
+    p1.5                                                           0095 
+    p1.6                                                           0096 
+    p1.7                                                           0097 
+    p2                                                             00A0 
+    p2.0                                                           00A0 
+    p2.1                                                           00A1 
+    p2.2                                                           00A2 
+    p2.3                                                           00A3 
+    p2.4                                                           00A4 
+    p2.5                                                           00A5 
+    p2.6                                                           00A6 
+    p2.7                                                           00A7 
+    p3                                                             00B0 
+    p3.0                                                           00B0 
+    p3.1                                                           00B1 
+    p3.2                                                           00B2 
+    p3.3                                                           00B3 
+    p3.4                                                           00B4 
+    p3.5                                                           00B5 
+    p3.6                                                           00B6 
+    p3.7                                                           00B7 
+    pcon                                                           0087 
+    ps                                                             00BC 
+    psw                                                            00D0 
+    psw.0                                                          00D0 
+    psw.1                                                          00D1 
+    psw.2                                                          00D2 
+    psw.3                                                          00D3 
+    psw.4                                                          00D4 
+    psw.5                                                          00D5 
+    psw.6                                                          00D6 
+    psw.7                                                          00D7 
+    pt0                                                            00B9 
+    pt1                                                            00BB 
+    pt2                                                            00BD 
+    px0                                                            00B8 
+    px1                                                            00BA 
+    rb8                                                            009A 
+    rcap2h                                                         00CB 
+    rcap2l                                                         00CA 
+    rclk                                                           00CD 
+    ren                                                            009C 
+    ri                                                             0098 
+    rs0                                                            00D3 
+    rs1                                                            00D4 
+    rxd                                                            00B0 
+    sbuf                                                           0099 
+    scon                                                           0098 
+    scon.0                                                         0098 
+    scon.1                                                         0099 
+    scon.2                                                         009A 
+    scon.3                                                         009B 
+    scon.4                                                         009C 
+    scon.5                                                         009D 
+    scon.6                                                         009E 
+    scon.7                                                         009F 
+    sm0                                                            009F 
+    sm1                                                            009E 
+    sm2                                                            009D 
+    sp                                                             0081 
+    t2con                                                          00C8 
+    t2con.0                                                        00C8 
+    t2con.1                                                        00C9 
+    t2con.2                                                        00CA 
+    t2con.3                                                        00CB 
+    t2con.4                                                        00CC 
+    t2con.5                                                        00CD 
+    t2con.6                                                        00CE 
+    t2con.7                                                        00CF 
+    tb8                                                            009B 
+    tclk                                                           00CC 
+    tcon                                                           0088 
+    tcon.0                                                         0088 
+    tcon.1                                                         0089 
+    tcon.2                                                         008A 
+    tcon.3                                                         008B 
+    tcon.4                                                         008C 
+    tcon.5                                                         008D 
+    tcon.6                                                         008E 
+    tcon.7                                                         008F 
+    tf0                                                            008D 
+    tf1                                                            008F 
+    tf2                                                            00CF 
+    th0                                                            008C 
+    th1                                                            008D 
+    th2                                                            00CD 
+    ti                                                             0099 
+    tl0                                                            008A 
+    tl1                                                            008B 
+    tl2                                                            00CC 
+    tmod                                                           0089 
+    tr0                                                            008C 
+    tr1                                                            008E 
+    tr2                                                            00CA 
+    txd                                                            00B1 
+
+ASxxxx Assembler V01.70 + NoICE + SDCC mods Feb-1999  (Intel 8051), page 2.
+
+Area Table
+
+   0 _CODE                                                                              size    0   flags 0
+   1 DSEG                                                                               size    8   flags 0
+   2 OSEG                                                                               size    0   flags 4
+   3 ISEG                                                                               size    0   flags 0
+   4 BSEG                                                                               size    0   flags 80
+   5 XSEG                                                                               size    E   flags 40
+   6 GSINIT                                                                             size    0   flags 20
+   7 CSEG                                                                               size  1FF   flags 20

@@ -1,0 +1,186 @@
+In file included from i386/att.h:22,
+                 from i386/linux.h:29,
+                 from config.h:1,
+                 from cppalloc.c:25:
+i386/unix.h:77: parse error before `do'
+i386/unix.h:77: stray '\' in program
+i386/unix.h:78: parse error before `('
+i386/unix.h:78: stray '\' in program
+i386/unix.h:90: stray '\' in program
+i386/unix.h:91: stray '\' in program
+i386/unix.h:92: stray '\' in program
+i386/unix.h:93: stray '\' in program
+i386/unix.h:93: stray '\' in program
+i386/unix.h:94: stray '\' in program
+i386/unix.h:94: stray '\' in program
+i386/unix.h:95: parse error before character constant
+i386/unix.h:130: parse error before string constant
+i386/unix.h:141: stray '\' in program
+In file included from i386/linux.h:29,
+                 from config.h:1,
+                 from cppalloc.c:25:
+i386/att.h:41: stray '\' in program
+i386/att.h:42: stray '\' in program
+i386/att.h:43: stray '\' in program
+i386/att.h:44: stray '\' in program
+i386/att.h:45: parse error before `('
+i386/att.h:45: stray '\' in program
+i386/att.h:46: stray '\' in program
+i386/att.h:47: parse error before `('
+i386/att.h:47: stray '\' in program
+i386/att.h:48: parse error before `('
+i386/att.h:48: stray '\' in program
+i386/att.h:74: stray '\' in program
+i386/att.h:75: stray '\' in program
+i386/att.h:76: stray '\' in program
+i386/att.h:77: stray '\' in program
+i386/att.h:78: stray '\' in program
+i386/att.h:79: stray '\' in program
+i386/att.h:80: `in_bss' undeclared here (not in a function)
+i386/att.h:80: warning: data definition has no type or storage class
+i386/att.h:80: stray '\' in program
+i386/att.h:81: parse error before `}'
+i386/att.h:81: stray '\' in program
+i386/att.h:93: parse error before `('
+In file included from config.h:1,
+                 from cppalloc.c:25:
+i386/linux.h:108: stray '\' in program
+i386/linux.h:109: stray '\' in program
+i386/linux.h:110: stray '\' in program
+i386/linux.h:111: stray '\' in program
+i386/linux.h:112: stray '\' in program
+i386/linux.h:113: stray '\' in program
+i386/linux.h:114: stray '\' in program
+i386/linux.h:115: stray '\' in program
+i386/linux.h:116: stray '\' in program
+i386/linux.h:124: stray '\' in program
+i386/linux.h:125: stray '\' in program
+i386/linux.h:126: stray '\' in program
+i386/linux.h:127: stray '\' in program
+i386/linux.h:128: stray '\' in program
+i386/linux.h:129: parse error before string constant
+i386/linux.h:129: warning: data definition has no type or storage class
+i386/linux.h:129: stray '\' in program
+i386/linux.h:130: stray '\' in program
+i386/linux.h:131: stray '\' in program
+i386/linux.h:132: stray '\' in program
+i386/linux.h:133: stray '\' in program
+i386/linux.h:134: parse error before string constant
+i386/linux.h:134: warning: data definition has no type or storage class
+i386/linux.h:134: stray '\' in program
+i386/linux.h:135: stray '\' in program
+i386/linux.h:185: warning: unknown escape sequence: `\' followed by char code 0xd
+In file included from i386/linux.h:235,
+                 from config.h:1,
+                 from cppalloc.c:25:
+i386/perform.h:31: stray '\' in program
+i386/perform.h:32: stray '\' in program
+i386/perform.h:33: warning: call-clobbered register used for global register variable
+i386/perform.h:33: stray '\' in program
+i386/perform.h:34: stray '\' in program
+i386/perform.h:35: warning: data definition has no type or storage class
+i386/perform.h:35: stray '\' in program
+i386/perform.h:36: conflicting declarations of `ax'
+i386/perform.h:33: `ax' previously declared here
+i386/perform.h:36: `arg0' undeclared here (not in a function)
+i386/perform.h:36: warning: data definition has no type or storage class
+i386/perform.h:36: stray '\' in program
+i386/perform.h:37: parse error before `:'
+i386/perform.h:37: stray '\' in program
+i386/perform.h:38: stray '\' in program
+i386/perform.h:42: stray '\' in program
+i386/perform.h:43: stray '\' in program
+i386/perform.h:44: conflicting declarations of `ax'
+i386/perform.h:36: `ax' previously defined here
+i386/perform.h:44: stray '\' in program
+i386/perform.h:45: warning: call-clobbered register used for global register variable
+i386/perform.h:45: stray '\' in program
+i386/perform.h:46: stray '\' in program
+i386/perform.h:47: redefinition of `ax'
+i386/perform.h:36: `ax' previously defined here
+i386/perform.h:47: `arg0' undeclared here (not in a function)
+i386/perform.h:47: warning: data definition has no type or storage class
+i386/perform.h:47: stray '\' in program
+i386/perform.h:48: conflicting declarations of `cx'
+i386/perform.h:45: `cx' previously declared here
+i386/perform.h:48: `arg1' undeclared here (not in a function)
+i386/perform.h:48: warning: data definition has no type or storage class
+i386/perform.h:48: stray '\' in program
+i386/perform.h:49: parse error before `:'
+i386/perform.h:49: stray '\' in program
+i386/perform.h:50: stray '\' in program
+i386/perform.h:54: stray '\' in program
+i386/perform.h:55: stray '\' in program
+i386/perform.h:56: conflicting declarations of `ax'
+i386/perform.h:47: `ax' previously defined here
+i386/perform.h:56: stray '\' in program
+i386/perform.h:57: stray '\' in program
+i386/perform.h:58: redefinition of `dx'
+i386/perform.h:35: `dx' previously defined here
+i386/perform.h:58: warning: data definition has no type or storage class
+i386/perform.h:58: stray '\' in program
+i386/perform.h:59: redefinition of `ax'
+i386/perform.h:47: `ax' previously defined here
+i386/perform.h:59: `arg0' undeclared here (not in a function)
+i386/perform.h:59: warning: data definition has no type or storage class
+i386/perform.h:59: stray '\' in program
+i386/perform.h:60: parse error before `:'
+i386/perform.h:60: stray '\' in program
+i386/perform.h:61: stray '\' in program
+i386/perform.h:65: stray '\' in program
+i386/perform.h:66: stray '\' in program
+i386/perform.h:67: conflicting declarations of `ax'
+i386/perform.h:59: `ax' previously defined here
+i386/perform.h:67: stray '\' in program
+i386/perform.h:68: conflicting declarations of `cx'
+i386/perform.h:48: `cx' previously defined here
+i386/perform.h:68: stray '\' in program
+i386/perform.h:69: stray '\' in program
+i386/perform.h:70: redefinition of `ax'
+i386/perform.h:59: `ax' previously defined here
+i386/perform.h:70: `arg0' undeclared here (not in a function)
+i386/perform.h:70: warning: data definition has no type or storage class
+i386/perform.h:70: stray '\' in program
+i386/perform.h:71: redefinition of `cx'
+i386/perform.h:48: `cx' previously defined here
+i386/perform.h:71: `arg1' undeclared here (not in a function)
+i386/perform.h:71: warning: data definition has no type or storage class
+i386/perform.h:71: stray '\' in program
+i386/perform.h:72: parse error before `:'
+i386/perform.h:72: stray '\' in program
+i386/perform.h:73: stray '\' in program
+i386/perform.h:77: stray '\' in program
+i386/perform.h:78: stray '\' in program
+i386/perform.h:79: top-level declaration of `nstatus' specifies `auto'
+i386/perform.h:79: stray '\' in program
+i386/perform.h:80: top-level declaration of `ret' specifies `auto'
+i386/perform.h:80: stray '\' in program
+i386/perform.h:81: top-level declaration of `tmp' specifies `auto'
+i386/perform.h:81: stray '\' in program
+i386/perform.h:82: stray '\' in program
+i386/perform.h:83: parse error before `&'
+i386/perform.h:83: stray '\' in program
+i386/perform.h:84: stray '\' in program
+i386/perform.h:85: stray '\' in program
+i386/perform.h:86: stray '\' in program
+i386/perform.h:87: stray '\' in program
+i386/perform.h:88: stray '\' in program
+i386/perform.h:89: conflicting types for `nstatus'
+i386/perform.h:79: previous declaration of `nstatus'
+i386/perform.h:89: `ostatus' undeclared here (not in a function)
+i386/perform.h:89: initializer element is not constant
+i386/perform.h:89: warning: data definition has no type or storage class
+i386/perform.h:89: stray '\' in program
+i386/perform.h:90: parse error before `volatile'
+i386/perform.h:90: stray '\' in program
+i386/perform.h:91: conflicting types for `tmp'
+i386/perform.h:81: previous declaration of `tmp'
+i386/perform.h:91: `arg0' undeclared here (not in a function)
+i386/perform.h:91: warning: data definition has no type or storage class
+i386/perform.h:91: stray '\' in program
+i386/perform.h:92: parse error before `volatile'
+i386/perform.h:92: stray '\' in program
+i386/perform.h:93: stray '\' in program
+i386/perform.h:94: stray '\' in program
+i386/perform.h:95: stray '\' in program
+i386/perform.h:96: stray '\' in program

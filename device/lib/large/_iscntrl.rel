@@ -1,0 +1,62 @@
+;!FILE _iscntrl.asm
+XH
+H 8 areas 14 global symbols
+M _iscntrl
+A _CODE size 0 flags 0
+A DSEG size 0 flags 0
+A OSEG size 0 flags 4
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 1 flags 40
+A GSINIT size 0 flags 20
+A CSEG size 1F flags 20
+S _iscntrl Def0000
+S XG$iscntrl$0$0 Def001E
+S C$_iscntrl.c$33$1$1 Def001E
+S A$_iscntrl$70 Def000D
+S A$_iscntrl$71 Def000E
+S A$_iscntrl$62 Def0000
+S A$_iscntrl$72 Def0010
+S A$_iscntrl$63 Def0002
+S A$_iscntrl$64 Def0005
+S A$_iscntrl$74 Def0011
+S A$_iscntrl$65 Def0007
+S G$iscntrl$0$0 Def0000
+S A$_iscntrl$93 Def001E
+S A$_iscntrl$84 Def0016
+S A$_iscntrl$67 Def0008
+S A$_iscntrl$86 Def0019
+S A$_iscntrl$68 Def000B
+S A$_iscntrl$78 Def0013
+S A$_iscntrl$69 Def000C
+S A$_iscntrl$89 Def001B
+T 00 00
+R 00 00 00 05
+T 00 00
+R 00 00 00 05
+T 00 00
+R 00 00 00 07
+T 00 00 C0 82 90 00 00 D0 E0 F0 90 00 00 E0 FA C3
+R 00 00 00 07 00 05 00 05 00 0B 00 05
+T 00 0E 74 1F 9A 50 03
+R 00 00 00 07
+T 00 13
+R 00 00 00 07
+T 00 13 BA 7F 05
+R 00 00 00 07
+T 00 16
+R 00 00 00 07
+T 00 16
+R 00 00 00 07
+T 00 16
+R 00 00 00 07
+T 00 16 75 82 01 80 03
+R 00 00 00 07
+T 00 1B
+R 00 00 00 07
+T 00 1B 75 82 00
+R 00 00 00 07
+T 00 1E
+R 00 00 00 07
+T 00 1E 22
+R 00 00 00 07

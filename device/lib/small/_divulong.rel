@@ -1,0 +1,184 @@
+;!FILE _divulong.asm
+XH
+H 9 areas 5F global symbols
+M _divulong
+A _CODE size 0 flags 0
+A DSEG size 0 flags 0
+A _DUMMY size 0 flags 0
+A OSEG size E flags 4
+S __divulong_PARM_2 Def0000
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 0 flags 40
+A GSINIT size 0 flags 20
+A CSEG size 8C flags 20
+S A$_divulong$100 Def0023
+S A$_divulong$110 Def002D
+S A$_divulong$101 Def0024
+S A$_divulong$111 Def002E
+S A$_divulong$130 Def0047
+S A$_divulong$121 Def0036
+S A$_divulong$112 Def002F
+S A$_divulong$103 Def0025
+S A$_divulong$140 Def0053
+S A$_divulong$122 Def0038
+S A$_divulong$113 Def0030
+S A$_divulong$104 Def0026
+S A$_divulong$150 Def005C
+S A$_divulong$141 Def0054
+S A$_divulong$123 Def003A
+S A$_divulong$114 Def0031
+S A$_divulong$105 Def0028
+S A$_divulong$151 Def005D
+S A$_divulong$133 Def0049
+S A$_divulong$124 Def003C
+S A$_divulong$106 Def0029
+S A$_divulong$170 Def007A
+S A$_divulong$161 Def0069
+S A$_divulong$152 Def005E
+S A$_divulong$134 Def004A
+S A$_divulong$125 Def003E
+S A$_divulong$116 Def0032
+S A$_divulong$107 Def002A
+S A$_divulong$180 Def0086
+S A$_divulong$162 Def006B
+S A$_divulong$153 Def0060
+S A$_divulong$144 Def0056
+S A$_divulong$135 Def004B
+S A$_divulong$126 Def0040
+S A$_divulong$108 Def002B
+S A$_divulong$181 Def0088
+S A$_divulong$163 Def006D
+S A$_divulong$154 Def0061
+S A$_divulong$136 Def004D
+S A$_divulong$127 Def0042
+S A$_divulong$118 Def0034
+S A$_divulong$109 Def002C
+S A$_divulong$182 Def008A
+S A$_divulong$173 Def007C
+S A$_divulong$164 Def006F
+S A$_divulong$155 Def0062
+S A$_divulong$137 Def004E
+S A$_divulong$128 Def0043
+S A$_divulong$174 Def007F
+S A$_divulong$165 Def0071
+S A$_divulong$156 Def0064
+S A$_divulong$147 Def0058
+S A$_divulong$138 Def0050
+S A$_divulong$129 Def0045
+S A$_divulong$166 Def0073
+S A$_divulong$157 Def0065
+S A$_divulong$148 Def0059
+S A$_divulong$139 Def0051
+S A$_divulong$176 Def0081
+S A$_divulong$167 Def0075
+S A$_divulong$158 Def0066
+S A$_divulong$149 Def005A
+S A$_divulong$186 Def008B
+S A$_divulong$168 Def0076
+S A$_divulong$159 Def0068
+S A$_divulong$169 Def0078
+S A$_divulong$179 Def0084
+S A$_divulong$80 Def000D
+S A$_divulong$90 Def0018
+S A$_divulong$72 Def0000
+S A$_divulong$91 Def0019
+S A$_divulong$82 Def000F
+S A$_divulong$73 Def0002
+S C$_divulong.c$49$1$1 Def008B
+S A$_divulong$92 Def001B
+S A$_divulong$74 Def0004
+S A$_divulong$93 Def001C
+S A$_divulong$75 Def0006
+S A$_divulong$94 Def001D
+S A$_divulong$85 Def0012
+S A$_divulong$95 Def001E
+S A$_divulong$86 Def0013
+S A$_divulong$77 Def0007
+S A$_divulong$96 Def001F
+S A$_divulong$87 Def0014
+S A$_divulong$78 Def0009
+S A$_divulong$97 Def0020
+S A$_divulong$88 Def0016
+S A$_divulong$79 Def000B
+S A$_divulong$98 Def0021
+S A$_divulong$99 Def0022
+S __divulong Def0000
+S XG$_divulong$0$0 Def008B
+S G$_divulong$0$0 Def0000
+T 00 00
+R 00 00 00 03
+T 00 00
+R 00 00 00 03
+T 00 04
+R 00 00 00 03
+T 00 04
+R 00 00 00 03
+T 00 08
+R 00 00 00 03
+T 00 08
+R 00 00 00 03
+T 00 0C
+R 00 00 00 03
+T 00 0C
+R 00 00 00 03
+T 00 0D
+R 00 00 00 03
+T 00 0D
+R 00 00 00 03
+T 00 00
+R 00 00 00 08
+T 00 00 AA 82 AB 83 AC F0 FD 7E 00 7F 00 78 00 79
+R 00 00 00 08
+T 00 0E 00 75 00 0C 20
+R 00 00 00 08 29 04 00 03
+T 00 12
+R 00 00 00 08
+T 00 12 ED 23 54 01 F5 00 0D EA 25 E0 FA EB 33 FB
+R 00 00 00 08 29 07 00 03
+T 00 1F EC 33 FC ED 33 FD EE 25 E0 FE EF 33 FF E8
+R 00 00 00 08
+T 00 2D 33 F8 E9 33 F9 E5 00 0D 60 13
+R 00 00 00 08 29 08 00 03
+T 00 36
+R 00 00 00 08
+T 00 36 8E 00 08 8F 00 09 88 00 0A 89
+R 00 00 00 08 29 03 00 03 29 06 00 03 29 09 00 03
+T 00 3D 00 0B 74 01 45 00 08 FE AF 00 09 A8
+R 00 00 00 08 29 02 00 03 29 07 00 03 29 0B 00 03
+T 00 46 00 0A A9 00 0B
+R 00 00 00 08 29 02 00 03 29 05 00 03
+T 00 49
+R 00 00 00 08
+T 00 49 C3 EE 95 00 00 EF 95 00 01 E8 95 00 02 E9
+R 00 00 00 08 29 05 00 03 29 09 00 03 29 0D 00 03
+T 00 54 95 00 03 40 24
+R 00 00 00 08 29 03 00 03
+T 00 58
+R 00 00 00 08
+T 00 58 C3 EE 95 00 00 FE EF 95 00 01 FF E8 95
+R 00 00 00 08 29 05 00 03 29 0A 00 03
+T 00 63 00 02 F8 E9 95 00 03 F9 8A 00 04 8B
+R 00 00 00 08 29 02 00 03 29 07 00 03 29 0B 00 03
+T 00 6C 00 05 8C 00 06 8D 00 07 74 01 45
+R 00 00 00 08 29 02 00 03 29 05 00 03 29 08 00 03
+T 00 74 00 04 FA AB 00 05 AC 00 06 AD
+R 00 00 00 08 29 02 00 03 29 06 00 03 29 09 00 03
+T 00 7B 00 07
+R 00 00 00 08 29 02 00 03
+T 00 7C
+R 00 00 00 08
+T 00 7C D5 00 0C 02 80 03
+R 00 00 00 08 29 03 00 03
+T 00 81
+R 00 00 00 08
+T 00 81 02 00 12
+R 00 00 00 08 00 03 00 08
+T 00 84
+R 00 00 00 08
+T 00 84 8A 82 8B 83 8C F0 ED
+R 00 00 00 08
+T 00 8B
+R 00 00 00 08
+T 00 8B 22
+R 00 00 00 08

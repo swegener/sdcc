@@ -1,0 +1,94 @@
+;!FILE _isxdigit.asm
+XH
+H 9 areas 1B global symbols
+M _isxdigit
+A _CODE size 0 flags 0
+A DSEG size 0 flags 0
+A _DUMMY size 0 flags 0
+A OSEG size 0 flags 4
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 0 flags 40
+A GSINIT size 0 flags 20
+A CSEG size 2C flags 20
+S A$_isxdigit$111 Def0028
+S A$_isxdigit$102 Def0021
+S A$_isxdigit$115 Def002B
+S A$_isxdigit$106 Def0023
+S _isxdigit Def0000
+S A$_isxdigit$108 Def0026
+S XG$isxdigit$0$0 Def002B
+S C$_isxdigit.c$33$1$1 Def002B
+S A$_isxdigit$70 Def0008
+S A$_isxdigit$61 Def0000
+S A$_isxdigit$71 Def000A
+S A$_isxdigit$81 Def0010
+S A$_isxdigit$63 Def0002
+S A$_isxdigit$91 Def0018
+S A$_isxdigit$73 Def000B
+S A$_isxdigit$83 Def0012
+S G$isxdigit$0$0 Def0000
+S A$_isxdigit$84 Def0013
+S A$_isxdigit$85 Def0015
+S A$_isxdigit$67 Def0005
+S A$_isxdigit$95 Def001B
+S A$_isxdigit$77 Def000D
+S A$_isxdigit$87 Def0016
+S A$_isxdigit$69 Def0007
+S A$_isxdigit$97 Def001D
+S A$_isxdigit$98 Def001E
+S A$_isxdigit$99 Def0020
+T 00 00
+R 00 00 00 08
+T 00 00 AA 82 BA 30 00
+R 00 00 00 08
+T 00 05
+R 00 00 00 08
+T 00 05 40 06
+R 00 00 00 08
+T 00 07
+R 00 00 00 08
+T 00 07 C3 74 39 9A 50 16
+R 00 00 00 08
+T 00 0D
+R 00 00 00 08
+T 00 0D
+R 00 00 00 08
+T 00 0D BA 61 00
+R 00 00 00 08
+T 00 10
+R 00 00 00 08
+T 00 10 40 06
+R 00 00 00 08
+T 00 12
+R 00 00 00 08
+T 00 12 C3 74 66 9A 50 0B
+R 00 00 00 08
+T 00 18
+R 00 00 00 08
+T 00 18
+R 00 00 00 08
+T 00 18 BA 41 00
+R 00 00 00 08
+T 00 1B
+R 00 00 00 08
+T 00 1B 40 0B
+R 00 00 00 08
+T 00 1D
+R 00 00 00 08
+T 00 1D C3 74 46 9A 40 05
+R 00 00 00 08
+T 00 23
+R 00 00 00 08
+T 00 23
+R 00 00 00 08
+T 00 23 75 82 01 80 03
+R 00 00 00 08
+T 00 28
+R 00 00 00 08
+T 00 28 75 82 00
+R 00 00 00 08
+T 00 2B
+R 00 00 00 08
+T 00 2B 22
+R 00 00 00 08

@@ -1,0 +1,133 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:31 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module _muluint
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl __muluint_PARM_2
+                             11 	.globl __muluint
+                             12 ;--------------------------------------------------------
+                             13 ; special function registers
+                             14 ;--------------------------------------------------------
+                             15 ;--------------------------------------------------------
+                             16 ; special function bits 
+                             17 ;--------------------------------------------------------
+                             18 ;--------------------------------------------------------
+                             19 ; internal ram data
+                             20 ;--------------------------------------------------------
+                             21 	.area	DSEG    (DATA)
+                             22 ;--------------------------------------------------------
+                             23 ; overlayable items in internal ram 
+                             24 ;--------------------------------------------------------
+                             25 	.area	OSEG	(OVR,DATA)
+                             26 ;--------------------------------------------------------
+                             27 ; indirectly addressable internal ram data
+                             28 ;--------------------------------------------------------
+                             29 	.area	ISEG    (DATA)
+                             30 ;--------------------------------------------------------
+                             31 ; bit data
+                             32 ;--------------------------------------------------------
+                             33 	.area	BSEG    (BIT)
+                             34 ;--------------------------------------------------------
+                             35 ; external ram data
+                             36 ;--------------------------------------------------------
+                             37 	.area	XSEG    (XDATA)
+   0000                      38 __muluint_PARM_2:
+   0000                      39 	.ds	0x0002
+   0002                      40 __muluint_a_1_1:
+   0002                      41 	.ds	0x0002
+   0004                      42 __muluint_t_1_1:
+   0004                      43 	.ds	0x0002
+                             44 ;--------------------------------------------------------
+                             45 ; global & static initialisations
+                             46 ;--------------------------------------------------------
+                             47 	.area GSINIT (CODE)
+                             48 ;--------------------------------------------------------
+                             49 ; code
+                             50 ;--------------------------------------------------------
+                             51 	.area CSEG (CODE)
+                    0000     52 	G$_muluint$0$0 ==.
+                             53 ;	_muluint.c 32
+                             54 ;	-----------------------------------------
+                             55 ;	 function _muluint
+                             56 ;	-----------------------------------------
+   0000                      57 __muluint:
+                    0002     58 	ar2 = 0x02
+                    0003     59 	ar3 = 0x03
+                    0004     60 	ar4 = 0x04
+                    0005     61 	ar5 = 0x05
+                    0006     62 	ar6 = 0x06
+                    0007     63 	ar7 = 0x07
+                    0000     64 	ar0 = 0x00
+                    0001     65 	ar1 = 0x01
+                             66 ;	_muluint.c 51
+   0000 C0 83                67 	push	dph
+   0002 C0 82                68 	push	dpl
+   0004 90s00r02             69 	mov	dptr,#__muluint_a_1_1
+   0007 D0 E0                70 	pop	acc
+   0009 F0                   71 	movx	@dptr,a
+   000A D0 E0                72 	pop	acc
+   000C A3                   73 	inc	dptr
+   000D F0                   74 	movx	@dptr,a
+                             75 ;	_muluint.c 38
+                             76 ;	_muluint.c 39
+                             77 ;	_muluint.c 48
+   000E 90s00r02             78 	mov	dptr,#(__muluint_a_1_1)
+   0011 E0                   79 	movx	a,@dptr
+   0012 FA                   80 	mov	r2,a
+   0013 90s00r00             81 	mov	dptr,#(__muluint_PARM_2)
+   0016 E0                   82 	movx	a,@dptr
+   0017 FB                   83 	mov	r3,a
+   0018 8B F0                84 	mov	b,r3
+   001A EA                   85 	mov	a,r2
+   001B A4                   86 	mul	ab
+   001C FC                   87 	mov	r4,a
+   001D AD F0                88 	mov	r5,b
+   001F 90s00r04             89 	mov	dptr,#(__muluint_t_1_1)
+   0022 EC                   90 	mov	a,r4
+   0023 F0                   91 	movx	@dptr,a
+   0024 A3                   92 	inc	dptr
+   0025 ED                   93 	mov	a,r5
+   0026 F0                   94 	movx	@dptr,a
+                             95 ;	_muluint.c 49
+   0027 90s00r05             96 	mov	dptr,#(0x0001 + __muluint_t_1_1)
+   002A E0                   97 	movx	a,@dptr
+   002B FC                   98 	mov	r4,a
+   002C 90s00r01             99 	mov	dptr,#(0x0001 + __muluint_PARM_2)
+   002F E0                  100 	movx	a,@dptr
+   0030 FD                  101 	mov	r5,a
+   0031 8D F0               102 	mov	b,r5
+   0033 EA                  103 	mov	a,r2
+   0034 A4                  104 	mul	ab
+   0035 FA                  105 	mov	r2,a
+   0036 90s00r03            106 	mov	dptr,#(0x0001 + __muluint_a_1_1)
+   0039 E0                  107 	movx	a,@dptr
+   003A FD                  108 	mov	r5,a
+   003B 8B F0               109 	mov	b,r3
+   003D ED                  110 	mov	a,r5
+   003E A4                  111 	mul	ab
+                            112 ; Peephole 105   removed redundant mov
+   003F FB                  113 	mov  r3,a
+   0040 2A                  114 	add	a,r2
+   0041 2C                  115 	add	a,r4
+                            116 ; Peephole 100   removed redundant mov
+   0042 FC                  117 	mov  r4,a
+   0043 90s00r05            118 	mov  dptr,#(0x0001 + __muluint_t_1_1)
+   0046 F0                  119 	movx @dptr,a
+                            120 ;	_muluint.c 51
+   0047 90s00r04            121 	mov	dptr,#(__muluint_t_1_1)
+   004A E0                  122 	movx	a,@dptr
+   004B FA                  123 	mov	r2,a
+   004C A3                  124 	inc	dptr
+   004D E0                  125 	movx	a,@dptr
+   004E FB                  126 	mov	r3,a
+   004F 8A 82               127 	mov	dpl,r2
+   0051 8B 83               128 	mov	dph,r3
+   0053                     129 00101$:
+                    0053    130 	C$_muluint.c$52$1$1 ==.
+                    0053    131 	XG$_muluint$0$0 ==.
+   0053 22                  132 	ret
+                            133 	.area	CSEG    (CODE)

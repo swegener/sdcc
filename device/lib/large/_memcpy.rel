@@ -1,0 +1,163 @@
+;!FILE _memcpy.asm
+XH
+H 8 areas 53 global symbols
+M _memcpy
+S __gptrput Ref0000
+S __gptrget Ref0000
+A _CODE size 0 flags 0
+A DSEG size 6 flags 0
+A OSEG size 0 flags 4
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 8 flags 40
+S _memcpy_PARM_2 Def0000
+S _memcpy_PARM_3 Def0003
+A GSINIT size 0 flags 20
+A CSEG size 88 flags 20
+S A$_memcpy$85 Def0014
+S A$_memcpy$76 Def0009
+S A$_memcpy$95 Def0022
+S A$_memcpy$86 Def0017
+S A$_memcpy$77 Def000B
+S A$_memcpy$96 Def0025
+S A$_memcpy$87 Def0018
+S A$_memcpy$78 Def000C
+S A$_memcpy$97 Def0026
+S A$_memcpy$88 Def001A
+S A$_memcpy$79 Def000E
+S A$_memcpy$98 Def0028
+S A$_memcpy$89 Def001B
+S A$_memcpy$99 Def0029
+S A$_memcpy$100 Def002A
+S A$_memcpy$110 Def003A
+S A$_memcpy$101 Def002C
+S A$_memcpy$111 Def003B
+S A$_memcpy$102 Def002D
+S A$_memcpy$130 Def0051
+S A$_memcpy$121 Def0047
+S A$_memcpy$112 Def003C
+S A$_memcpy$103 Def002E
+S A$_memcpy$140 Def0065
+S A$_memcpy$131 Def0053
+S A$_memcpy$122 Def0048
+S A$_memcpy$113 Def003D
+S A$_memcpy$150 Def0075
+S A$_memcpy$141 Def0066
+S A$_memcpy$132 Def0055
+S A$_memcpy$105 Def0030
+S A$_memcpy$151 Def0078
+S A$_memcpy$142 Def0069
+S A$_memcpy$133 Def0056
+S A$_memcpy$124 Def0049
+S A$_memcpy$115 Def003E
+S A$_memcpy$106 Def0032
+S _memcpy Def0000
+S A$_memcpy$152 Def007A
+S A$_memcpy$134 Def0059
+S A$_memcpy$116 Def0040
+S A$_memcpy$107 Def0034
+S A$_memcpy$144 Def006B
+S A$_memcpy$117 Def0042
+S A$_memcpy$108 Def0036
+S A$_memcpy$163 Def0087
+S A$_memcpy$154 Def007C
+S A$_memcpy$136 Def005A
+S A$_memcpy$127 Def004B
+S A$_memcpy$118 Def0043
+S A$_memcpy$109 Def0039
+S A$_memcpy$146 Def006E
+S A$_memcpy$137 Def005D
+S A$_memcpy$128 Def004D
+S A$_memcpy$119 Def0046
+S A$_memcpy$147 Def006F
+S A$_memcpy$138 Def0060
+S A$_memcpy$129 Def004F
+S A$_memcpy$157 Def007E
+S A$_memcpy$148 Def0071
+S A$_memcpy$139 Def0063
+S A$_memcpy$158 Def0081
+S A$_memcpy$149 Def0073
+S A$_memcpy$159 Def0084
+S XG$memcpy$0$0 Def0087
+S C$_memcpy.c$45$1$1 Def0087
+S A$_memcpy$80 Def000F
+S A$_memcpy$90 Def001C
+S A$_memcpy$81 Def0010
+S A$_memcpy$72 Def0000
+S A$_memcpy$91 Def001E
+S A$_memcpy$82 Def0012
+S A$_memcpy$73 Def0002
+S A$_memcpy$92 Def001F
+S A$_memcpy$83 Def0013
+S A$_memcpy$74 Def0004
+S G$memcpy$0$0 Def0000
+S A$_memcpy$93 Def0020
+S A$_memcpy$75 Def0006
+T 00 00
+R 00 00 00 01
+T 00 00
+R 00 00 00 01
+T 00 03
+R 00 00 00 01
+T 00 03
+R 00 00 00 01
+T 00 00
+R 00 00 00 05
+T 00 00
+R 00 00 00 05
+T 00 03
+R 00 00 00 05
+T 00 03
+R 00 00 00 05
+T 00 05
+R 00 00 00 05
+T 00 05
+R 00 00 00 05
+T 00 00
+R 00 00 00 07
+T 00 00 C0 F0 C0 83 C0 82 90 00 05 D0 E0 F0 D0 E0
+R 00 00 00 07 00 09 00 05
+T 00 0E A3 F0 D0 E0 A3 F0 90 00 05 E0 F5 00 03 A3
+R 00 00 00 07 00 09 00 05 29 0D 00 01
+T 00 1B E0 F5 00 04 A3 E0 F5 00 05 90 00 00 E0 F5
+R 00 00 00 07 29 04 00 01 29 09 00 01 00 0C 00 05
+T 00 27 00 00 A3 E0 F5 00 01 A3 E0 F5 00 02 A8
+R 00 00 00 07 29 02 00 01 29 07 00 01 29 0C 00 01
+T 00 31 00 03 A9 00 04 AD 00 05 90
+R 00 00 00 07 29 02 00 01 29 05 00 01 29 08 00 01
+T 00 37 00 03 E0 FB A3 E0 FC
+R 00 00 00 07 00 02 00 05
+T 00 3E
+R 00 00 00 07
+T 00 3E 8B 02 8C 06 1B BB FF 01 1C
+R 00 00 00 07
+T 00 47
+R 00 00 00 07
+T 00 47 EA 4E 60 33
+R 00 00 00 07
+T 00 4B
+R 00 00 00 07
+T 00 4B C0 03 C0 04 88 02 89 06 8D 07 08 B8 00 01
+R 00 00 00 07
+T 00 59 09
+R 00 00 00 07
+T 00 5A
+R 00 00 00 07
+T 00 5A 85 00 00 82 85 00 01 83 85 00 02 F0 05
+R 00 00 00 07 29 03 00 01 29 07 00 01 29 0B 00 01
+T 00 64 00 00 E4 B5 00 00 02 05 00 01
+R 00 00 00 07 29 02 00 01 29 06 00 01 29 0A 00 01
+T 00 6B
+R 00 00 00 07
+T 00 6B 12 00 00 FB 8A 82 8E 83 8F F0 12 00 00 D0
+R 00 00 00 07 02 03 00 01 02 0D 00 00
+T 00 79 04 D0 03 80 C0
+R 00 00 00 07
+T 00 7E
+R 00 00 00 07
+T 00 7E 85 00 03 82 85 00 04 83 85 00 05 F0
+R 00 00 00 07 29 03 00 01 29 07 00 01 29 0B 00 01
+T 00 87
+R 00 00 00 07
+T 00 87 22
+R 00 00 00 07

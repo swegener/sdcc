@@ -1,0 +1,88 @@
+;!FILE _strcpy.asm
+XH
+H 9 areas 25 global symbols
+M _strcpy
+S __gptrput Ref0000
+S __gptrget Ref0000
+A _CODE size 0 flags 0
+A DSEG size 0 flags 0
+A _DUMMY size 0 flags 0
+A OSEG size 6 flags 4
+S _strcpy_PARM_2 Def0000
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 0 flags 40
+A GSINIT size 0 flags 20
+A CSEG size 44 flags 20
+S A$_strcpy$102 Def003D
+S A$_strcpy$103 Def0040
+S _strcpy Def0000
+S A$_strcpy$107 Def0043
+S XG$strcpy$0$0 Def0043
+S C$_strcpy.c$36$1$1 Def0043
+S A$_strcpy$70 Def0009
+S A$_strcpy$71 Def000B
+S A$_strcpy$81 Def001A
+S A$_strcpy$72 Def000D
+S A$_strcpy$82 Def001D
+S A$_strcpy$92 Def002E
+S A$_strcpy$83 Def0020
+S A$_strcpy$74 Def000F
+S G$strcpy$0$0 Def0000
+S A$_strcpy$93 Def002F
+S A$_strcpy$84 Def0023
+S A$_strcpy$75 Def0011
+S A$_strcpy$66 Def0000
+S A$_strcpy$94 Def0031
+S A$_strcpy$85 Def0025
+S A$_strcpy$76 Def0013
+S A$_strcpy$67 Def0003
+S A$_strcpy$95 Def0033
+S A$_strcpy$86 Def0026
+S A$_strcpy$77 Def0015
+S A$_strcpy$68 Def0006
+S A$_strcpy$96 Def0035
+S A$_strcpy$87 Def0029
+S A$_strcpy$78 Def0016
+S A$_strcpy$79 Def0019
+S A$_strcpy$98 Def0038
+S A$_strcpy$89 Def002B
+S A$_strcpy$101 Def003A
+T 00 00
+R 00 00 00 03
+T 00 00
+R 00 00 00 03
+T 00 03
+R 00 00 00 03
+T 00 03
+R 00 00 00 03
+T 00 00
+R 00 00 00 08
+T 00 00 85 82 00 03 85 83 00 04 85 F0 00 05 AD
+R 00 00 00 08 29 04 00 03 29 08 00 03 29 0C 00 03
+T 00 0A 00 03 AE 00 04 AF 00 05
+R 00 00 00 08 29 02 00 03 29 05 00 03 29 08 00 03
+T 00 0F
+R 00 00 00 08
+T 00 0F 8D 03 8E 04 8F 02 0D BD 00 01 0E
+R 00 00 00 08
+T 00 1A
+R 00 00 00 08
+T 00 1A 85 00 00 82 85 00 01 83 85 00 02 F0 05
+R 00 00 00 08 29 03 00 03 29 07 00 03 29 0B 00 03
+T 00 24 00 00 E4 B5 00 00 02 05 00 01
+R 00 00 00 08 29 02 00 03 29 06 00 03 29 0A 00 03
+T 00 2B
+R 00 00 00 08
+T 00 2B 12 00 00 F8 8B 82 8C 83 8A F0 12 00 00 70
+R 00 00 00 08 02 03 00 01 02 0D 00 00
+T 00 39 D5
+R 00 00 00 08
+T 00 3A
+R 00 00 00 08
+T 00 3A 85 00 03 82 85 00 04 83 85 00 05 F0
+R 00 00 00 08 29 03 00 03 29 07 00 03 29 0B 00 03
+T 00 43
+R 00 00 00 08
+T 00 43 22
+R 00 00 00 08

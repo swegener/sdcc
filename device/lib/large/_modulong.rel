@@ -1,0 +1,330 @@
+;!FILE _modulong.asm
+XH
+H 8 areas E4 global symbols
+M _modulong
+A _CODE size 0 flags 0
+A DSEG size 4 flags 0
+A OSEG size 0 flags 4
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 9 flags 40
+S __modulong_PARM_2 Def0000
+A GSINIT size 0 flags 20
+A CSEG size 11F flags 20
+S A$_modulong$210 Def00A5
+S A$_modulong$201 Def0099
+S A$_modulong$111 Def003B
+S A$_modulong$102 Def002F
+S A$_modulong$310 Def010E
+S A$_modulong$301 Def0100
+S A$_modulong$220 Def00B1
+S A$_modulong$211 Def00A6
+S A$_modulong$202 Def009C
+S A$_modulong$130 Def004F
+S A$_modulong$121 Def0044
+S A$_modulong$112 Def003C
+S A$_modulong$103 Def0031
+S A$_modulong$320 Def0117
+S A$_modulong$311 Def010F
+S A$_modulong$302 Def0102
+S A$_modulong$230 Def00BB
+S A$_modulong$221 Def00B2
+S A$_modulong$212 Def00A7
+S A$_modulong$203 Def009D
+S A$_modulong$140 Def005B
+S A$_modulong$131 Def0050
+S A$_modulong$122 Def0045
+S A$_modulong$113 Def003D
+S A$_modulong$321 Def0118
+S A$_modulong$312 Def0110
+S A$_modulong$303 Def0104
+S A$_modulong$231 Def00BC
+S A$_modulong$222 Def00B3
+S A$_modulong$213 Def00A8
+S A$_modulong$141 Def005C
+S A$_modulong$132 Def0051
+S A$_modulong$123 Def0047
+S A$_modulong$114 Def003E
+S A$_modulong$105 Def0033
+S A$_modulong$322 Def011A
+S A$_modulong$313 Def0111
+S A$_modulong$304 Def0105
+S A$_modulong$250 Def00CE
+S A$_modulong$241 Def00C4
+S A$_modulong$232 Def00BD
+S A$_modulong$223 Def00B4
+S A$_modulong$214 Def00A9
+S A$_modulong$151 Def0065
+S A$_modulong$142 Def005D
+S A$_modulong$133 Def0052
+S A$_modulong$115 Def003F
+S A$_modulong$106 Def0036
+S A$_modulong$323 Def011C
+S A$_modulong$314 Def0112
+S A$_modulong$305 Def0107
+S A$_modulong$260 Def00D8
+S A$_modulong$251 Def00CF
+S A$_modulong$233 Def00BE
+S A$_modulong$224 Def00B5
+S A$_modulong$215 Def00AA
+S A$_modulong$206 Def009F
+S A$_modulong$170 Def007A
+S A$_modulong$161 Def0072
+S A$_modulong$152 Def0066
+S A$_modulong$143 Def005E
+S A$_modulong$134 Def0053
+S A$_modulong$107 Def0037
+S A$_modulong$315 Def0113
+S A$_modulong$270 Def00E2
+S A$_modulong$252 Def00D0
+S A$_modulong$234 Def00BF
+S A$_modulong$225 Def00B6
+S A$_modulong$216 Def00AB
+S A$_modulong$207 Def00A2
+S A$_modulong$180 Def0085
+S A$_modulong$171 Def007B
+S A$_modulong$153 Def0068
+S A$_modulong$144 Def005F
+S A$_modulong$135 Def0054
+S A$_modulong$126 Def004A
+S A$_modulong$117 Def0040
+S A$_modulong$108 Def0038
+S A$_modulong$316 Def0114
+S A$_modulong$280 Def00EB
+S A$_modulong$271 Def00E3
+S A$_modulong$253 Def00D1
+S A$_modulong$244 Def00C6
+S A$_modulong$235 Def00C0
+S A$_modulong$226 Def00B7
+S A$_modulong$217 Def00AC
+S A$_modulong$208 Def00A3
+S A$_modulong$181 Def0086
+S A$_modulong$172 Def007C
+S A$_modulong$154 Def0069
+S A$_modulong$145 Def0060
+S A$_modulong$136 Def0055
+S A$_modulong$127 Def004B
+S A$_modulong$118 Def0041
+S A$_modulong$109 Def0039
+S A$_modulong$317 Def0115
+S A$_modulong$308 Def010A
+S A$_modulong$290 Def00F6
+S A$_modulong$281 Def00EC
+S A$_modulong$272 Def00E4
+S A$_modulong$263 Def00D9
+S A$_modulong$254 Def00D2
+S A$_modulong$245 Def00C9
+S A$_modulong$236 Def00C1
+S A$_modulong$227 Def00B8
+S A$_modulong$218 Def00AD
+S A$_modulong$209 Def00A4
+S A$_modulong$191 Def008E
+S A$_modulong$182 Def0087
+S A$_modulong$173 Def007D
+S A$_modulong$164 Def0074
+S A$_modulong$155 Def006B
+S A$_modulong$146 Def0061
+S A$_modulong$137 Def0056
+S A$_modulong$128 Def004D
+S A$_modulong$119 Def0042
+S A$_modulong$327 Def011E
+S A$_modulong$318 Def0116
+S A$_modulong$309 Def010D
+S A$_modulong$291 Def00F7
+S A$_modulong$282 Def00ED
+S A$_modulong$273 Def00E5
+S A$_modulong$264 Def00DC
+S A$_modulong$255 Def00D3
+S A$_modulong$246 Def00CA
+S A$_modulong$237 Def00C2
+S A$_modulong$228 Def00B9
+S A$_modulong$219 Def00B0
+S A$_modulong$183 Def0088
+S A$_modulong$174 Def007E
+S A$_modulong$165 Def0075
+S A$_modulong$156 Def006C
+S A$_modulong$147 Def0062
+S A$_modulong$138 Def0057
+S A$_modulong$129 Def004E
+S A$_modulong$292 Def00F8
+S A$_modulong$283 Def00EE
+S A$_modulong$265 Def00DD
+S A$_modulong$256 Def00D4
+S A$_modulong$247 Def00CB
+S A$_modulong$238 Def00C3
+S A$_modulong$229 Def00BA
+S A$_modulong$184 Def0089
+S A$_modulong$175 Def007F
+S A$_modulong$166 Def0076
+S A$_modulong$157 Def006E
+S A$_modulong$148 Def0063
+S A$_modulong$139 Def005A
+S A$_modulong$293 Def00F9
+S A$_modulong$284 Def00EF
+S A$_modulong$275 Def00E6
+S A$_modulong$266 Def00DE
+S A$_modulong$257 Def00D5
+S A$_modulong$248 Def00CC
+S A$_modulong$194 Def0090
+S A$_modulong$185 Def008A
+S A$_modulong$167 Def0077
+S A$_modulong$158 Def006F
+S A$_modulong$149 Def0064
+S A$_modulong$294 Def00FA
+S A$_modulong$285 Def00F0
+S A$_modulong$276 Def00E7
+S A$_modulong$267 Def00DF
+S A$_modulong$258 Def00D6
+S A$_modulong$249 Def00CD
+S A$_modulong$195 Def0091
+S A$_modulong$186 Def008B
+S A$_modulong$177 Def0080
+S A$_modulong$168 Def0078
+S A$_modulong$159 Def0071
+S A$_modulong$295 Def00FB
+S A$_modulong$286 Def00F1
+S A$_modulong$277 Def00E8
+S A$_modulong$268 Def00E0
+S A$_modulong$259 Def00D7
+S A$_modulong$196 Def0094
+S A$_modulong$187 Def008C
+S A$_modulong$178 Def0081
+S A$_modulong$169 Def0079
+S A$_modulong$296 Def00FC
+S A$_modulong$278 Def00E9
+S A$_modulong$269 Def00E1
+S A$_modulong$197 Def0095
+S A$_modulong$188 Def008D
+S A$_modulong$179 Def0084
+S A$_modulong$297 Def00FD
+S A$_modulong$288 Def00F2
+S A$_modulong$279 Def00EA
+S A$_modulong$198 Def0096
+S A$_modulong$298 Def00FE
+S A$_modulong$289 Def00F3
+S A$_modulong$299 Def00FF
+S C$_modulong.c$52$1$1 Def011E
+S A$_modulong$70 Def0002
+S A$_modulong$80 Def0014
+S A$_modulong$71 Def0004
+S A$_modulong$81 Def0015
+S A$_modulong$72 Def0006
+S A$_modulong$91 Def001F
+S A$_modulong$82 Def0016
+S A$_modulong$73 Def0008
+S A$_modulong$92 Def0022
+S A$_modulong$83 Def0018
+S A$_modulong$74 Def000B
+S A$_modulong$93 Def0023
+S A$_modulong$84 Def0019
+S A$_modulong$75 Def000D
+S A$_modulong$94 Def0025
+S A$_modulong$76 Def000E
+S A$_modulong$95 Def0026
+S A$_modulong$86 Def001A
+S A$_modulong$77 Def0010
+S A$_modulong$96 Def0027
+S A$_modulong$78 Def0011
+S A$_modulong$69 Def0000
+S A$_modulong$97 Def0029
+S A$_modulong$88 Def001D
+S A$_modulong$79 Def0012
+S A$_modulong$98 Def002A
+S A$_modulong$89 Def001E
+S A$_modulong$99 Def002B
+S __modulong Def0000
+S XG$_modulong$0$0 Def011E
+S G$_modulong$0$0 Def0000
+S A$_modulong$100 Def002D
+S A$_modulong$110 Def003A
+S A$_modulong$101 Def002E
+T 00 00
+R 00 00 00 01
+T 00 00
+R 00 00 00 01
+T 00 00
+R 00 00 00 05
+T 00 00
+R 00 00 00 05
+T 00 04
+R 00 00 00 05
+T 00 04
+R 00 00 00 05
+T 00 08
+R 00 00 00 05
+T 00 08
+R 00 00 00 05
+T 00 00
+R 00 00 00 07
+T 00 00 C0 E0 C0 F0 C0 83 C0 82 90 00 04 D0 E0 F0
+R 00 00 00 07 00 0B 00 05
+T 00 0E D0 E0 A3 F0 D0 E0 A3 F0 D0 E0 A3 F0 90
+R 00 00 00 07
+T 00 1B 00 08 E4 F0 90 00 04 E0 F5 00 00 A3 E0 F5
+R 00 00 00 07 00 02 00 05 00 07 00 05 29 0B 00 01
+T 00 28 00 01 A3 E0 F5 00 02 A3 E0 F5 00 03 7E 00
+R 00 00 00 07 29 02 00 01 29 07 00 01 29 0C 00 01
+T 00 33
+R 00 00 00 07
+T 00 33 90 00 00 E0 FF A3 E0 F8 A3 E0 F9 A3 E0 FA
+R 00 00 00 07 00 03 00 05
+T 00 41 23 54 01 FB 60 03 02 00 99
+R 00 00 00 07 00 09 00 07
+T 00 4A
+R 00 00 00 07
+T 00 4A EF 25 E0 FD E8 33 FB E9 33 FC EA 33 FA 90
+R 00 00 00 07
+T 00 58 00 00 ED F0 A3 EB F0 A3 EC F0 A3 EA F0 C3
+R 00 00 00 07 00 02 00 05
+T 00 66 E5 00 00 9D E5 00 01 9B E5 00 02 9C E5
+R 00 00 00 07 29 03 00 01 29 07 00 01 29 0B 00 01
+T 00 70 00 03 9A 50 1C
+R 00 00 00 07 29 02 00 01
+T 00 74
+R 00 00 00 07
+T 00 74 C3 EA 13 FA EC 13 FC EB 13 FB ED 13 FD 90
+R 00 00 00 07
+T 00 82 00 00 F0 A3 EB F0 A3 EC F0 A3 EA F0 80 09
+R 00 00 00 07 00 02 00 05
+T 00 90
+R 00 00 00 07
+T 00 90 0E 90 00 08 EE F0 02 00 33
+R 00 00 00 07 00 04 00 05 00 09 00 07
+T 00 99
+R 00 00 00 07
+T 00 99 90 00 08 E0 F5 00 00
+R 00 00 00 07 00 03 00 05 29 07 00 01
+T 00 9F
+R 00 00 00 07
+T 00 9F 90 00 04 E0 FB A3 E0 FC A3 E0 FD A3 E0 FE
+R 00 00 00 07 00 03 00 05
+T 00 AD 90 00 00 E0 FF A3 E0 F8 A3 E0 F9 A3 E0 FA
+R 00 00 00 07 00 03 00 05
+T 00 BB C3 EB 9F EC 98 ED 99 EE 9A 40 13
+R 00 00 00 07
+T 00 C6
+R 00 00 00 07
+T 00 C6 90 00 04 C3 EB 9F F0 EC 98 A3 F0 ED 99 A3
+R 00 00 00 07 00 03 00 05
+T 00 D4 F0 EE 9A A3 F0
+R 00 00 00 07
+T 00 D9
+R 00 00 00 07
+T 00 D9 90 00 00 E0 FA A3 E0 FB A3 E0 FC A3 E0 FD
+R 00 00 00 07 00 03 00 05
+T 00 E7 C3 13 FD EC 13 FC EB 13 FB EA 13 FA 90
+R 00 00 00 07
+T 00 F4 00 00 F0 A3 EB F0 A3 EC F0 A3 ED F0 AA
+R 00 00 00 07 00 02 00 05
+T 01 01 00 00 15 00 00 EA 60 03 02 00 9F
+R 00 00 00 07 29 02 00 01 29 05 00 01 00 0B 00 07
+T 01 0A
+R 00 00 00 07
+T 01 0A 90 00 04 E0 FA A3 E0 FB A3 E0 FC A3 E0 FD
+R 00 00 00 07 00 03 00 05
+T 01 18 8A 82 8B 83 8C F0
+R 00 00 00 07
+T 01 1E
+R 00 00 00 07
+T 01 1E 22
+R 00 00 00 07

@@ -1,0 +1,162 @@
+;!FILE _mulsint.asm
+XH
+H 8 areas 5E global symbols
+M _mulsint
+S __muluint Ref0000
+S __muluint_PARM_2 Ref0000
+A _CODE size 0 flags 0
+A DSEG size 0 flags 0
+A OSEG size 0 flags 4
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 4 flags 40
+S __mulsint_PARM_2 Def0000
+A GSINIT size 0 flags 20
+A CSEG size 7F flags 20
+S A$_mulsint$84 Def0019
+S A$_mulsint$75 Def0011
+S A$_mulsint$66 Def0002
+S A$_mulsint$94 Def0022
+S A$_mulsint$85 Def001A
+S A$_mulsint$76 Def0012
+S A$_mulsint$67 Def0004
+S A$_mulsint$95 Def0024
+S A$_mulsint$86 Def001B
+S A$_mulsint$77 Def0013
+S A$_mulsint$68 Def0007
+S A$_mulsint$87 Def001C
+S A$_mulsint$78 Def0014
+S A$_mulsint$69 Def0009
+S A$_mulsint$97 Def0026
+S A$_mulsint$88 Def001D
+S A$_mulsint$98 Def0028
+S A$_mulsint$89 Def001E
+S __mulsint Def0000
+S XG$_mulsint$0$0 Def007E
+S G$_mulsint$0$0 Def0000
+S A$_mulsint$100 Def002A
+S A$_mulsint$101 Def002D
+S A$_mulsint$120 Def003D
+S A$_mulsint$111 Def0035
+S A$_mulsint$102 Def002E
+S A$_mulsint$130 Def0049
+S A$_mulsint$121 Def003E
+S A$_mulsint$103 Def002F
+S A$_mulsint$140 Def005A
+S A$_mulsint$131 Def004A
+S A$_mulsint$113 Def0036
+S A$_mulsint$104 Def0030
+S A$_mulsint$150 Def0065
+S A$_mulsint$132 Def004B
+S A$_mulsint$123 Def003F
+S A$_mulsint$160 Def006E
+S A$_mulsint$151 Def0066
+S A$_mulsint$142 Def005C
+S A$_mulsint$133 Def004C
+S A$_mulsint$115 Def0038
+S A$_mulsint$106 Def0031
+S A$_mulsint$161 Def006F
+S A$_mulsint$152 Def0067
+S A$_mulsint$143 Def005F
+S A$_mulsint$134 Def004D
+S A$_mulsint$125 Def0041
+S A$_mulsint$116 Def0039
+S A$_mulsint$107 Def0032
+S A$_mulsint$162 Def0070
+S A$_mulsint$153 Def0068
+S A$_mulsint$144 Def0060
+S A$_mulsint$135 Def004F
+S A$_mulsint$126 Def0043
+S A$_mulsint$117 Def003A
+S A$_mulsint$108 Def0033
+S A$_mulsint$172 Def007A
+S A$_mulsint$163 Def0071
+S A$_mulsint$154 Def0069
+S A$_mulsint$145 Def0061
+S A$_mulsint$136 Def0051
+S A$_mulsint$118 Def003B
+S A$_mulsint$109 Def0034
+S A$_mulsint$173 Def007C
+S A$_mulsint$164 Def0072
+S A$_mulsint$146 Def0062
+S A$_mulsint$137 Def0053
+S A$_mulsint$128 Def0045
+S A$_mulsint$119 Def003C
+S A$_mulsint$165 Def0073
+S A$_mulsint$156 Def006B
+S A$_mulsint$138 Def0056
+S A$_mulsint$129 Def0048
+S A$_mulsint$166 Def0074
+S A$_mulsint$148 Def0063
+S A$_mulsint$139 Def0058
+S A$_mulsint$167 Def0076
+S A$_mulsint$149 Def0064
+S A$_mulsint$177 Def007E
+S A$_mulsint$159 Def006D
+S A$_mulsint$169 Def0078
+S A$_mulsint$70 Def000A
+S C$_mulsint.c$37$1$1 Def007E
+S A$_mulsint$80 Def0015
+S A$_mulsint$71 Def000C
+S A$_mulsint$90 Def001F
+S A$_mulsint$72 Def000D
+S A$_mulsint$82 Def0016
+S A$_mulsint$92 Def0020
+S A$_mulsint$74 Def000E
+S A$_mulsint$65 Def0000
+T 00 00
+R 00 00 00 05
+T 00 00
+R 00 00 00 05
+T 00 02
+R 00 00 00 05
+T 00 02
+R 00 00 00 05
+T 00 00
+R 00 00 00 07
+T 00 00 C0 83 C0 82 90 00 02 D0 E0 F0 D0 E0 A3 F0
+R 00 00 00 07 00 07 00 05
+T 00 0E 90 00 02 E0 FA A3 E0 FB 30 E7 09
+R 00 00 00 07 00 03 00 05
+T 00 19
+R 00 00 00 07
+T 00 19 C3 E4 9A FC E4 9B FD 80 04
+R 00 00 00 07
+T 00 22
+R 00 00 00 07
+T 00 22 8A 04 8B 05
+R 00 00 00 07
+T 00 26
+R 00 00 00 07
+T 00 26 8C 02 8D 03 90 00 00 E0 FC A3 E0 FD 33 E4
+R 00 00 00 07 00 07 00 05
+T 00 34 33 FE 60 09
+R 00 00 00 07
+T 00 38
+R 00 00 00 07
+T 00 38 C3 E4 9C FF E4 9D F8 80 04
+R 00 00 00 07
+T 00 41
+R 00 00 00 07
+T 00 41 8C 07 8D 00
+R 00 00 00 07
+T 00 45
+R 00 00 00 07
+T 00 45 90 00 00 EF F0 A3 E8 F0 C0 06 8A 82 8B 83
+R 00 00 00 07 02 03 00 01
+T 00 53 12 00 00 AA 82 AB 83 D0 06 90 00 02 E0 FC
+R 00 00 00 07 02 03 00 00 00 0C 00 05
+T 00 61 A3 E0 FD 33 E4 33 FC EE 65 04 60 0D
+R 00 00 00 07
+T 00 6D
+R 00 00 00 07
+T 00 6D C3 E4 9A FC E4 9B FE 8C 82 8E 83 80 04
+R 00 00 00 07
+T 00 7A
+R 00 00 00 07
+T 00 7A 8A 82 8B 83
+R 00 00 00 07
+T 00 7E
+R 00 00 00 07
+T 00 7E 22
+R 00 00 00 07

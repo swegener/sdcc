@@ -1,0 +1,346 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:30 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module _long2fs
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl ___long2fs
+                             11 ;--------------------------------------------------------
+                             12 ; special function registers
+                             13 ;--------------------------------------------------------
+                             14 ;--------------------------------------------------------
+                             15 ; special function bits 
+                             16 ;--------------------------------------------------------
+                             17 ;--------------------------------------------------------
+                             18 ; internal ram data
+                             19 ;--------------------------------------------------------
+                             20 	.area	DSEG    (DATA)
+   0000                      21 ___long2fs_sloc0_1_0:
+   0000                      22 	.ds	0x0002
+   0002                      23 ___long2fs_sloc1_1_0:
+   0002                      24 	.ds	0x0004
+                             25 ;--------------------------------------------------------
+                             26 ; overlayable items in internal ram 
+                             27 ;--------------------------------------------------------
+                             28 	.area	OSEG	(OVR,DATA)
+                             29 ;--------------------------------------------------------
+                             30 ; indirectly addressable internal ram data
+                             31 ;--------------------------------------------------------
+                             32 	.area	ISEG    (DATA)
+                             33 ;--------------------------------------------------------
+                             34 ; bit data
+                             35 ;--------------------------------------------------------
+                             36 	.area	BSEG    (BIT)
+                             37 ;--------------------------------------------------------
+                             38 ; external ram data
+                             39 ;--------------------------------------------------------
+                             40 	.area	XSEG    (XDATA)
+   0000                      41 ___long2fs_a1_1_1:
+   0000                      42 	.ds	0x0004
+   0004                      43 ___long2fs_sign_1_1:
+   0004                      44 	.ds	0x0004
+   0008                      45 ___long2fs_fl_1_1:
+   0008                      46 	.ds	0x0004
+                             47 ;--------------------------------------------------------
+                             48 ; global & static initialisations
+                             49 ;--------------------------------------------------------
+                             50 	.area GSINIT (CODE)
+                             51 ;--------------------------------------------------------
+                             52 ; code
+                             53 ;--------------------------------------------------------
+                             54 	.area CSEG (CODE)
+                    0000     55 	G$__long2fs$0$0 ==.
+                             56 ;	_long2fs.c 80
+                             57 ;	-----------------------------------------
+                             58 ;	 function __long2fs
+                             59 ;	-----------------------------------------
+   0000                      60 ___long2fs:
+                    0002     61 	ar2 = 0x02
+                    0003     62 	ar3 = 0x03
+                    0004     63 	ar4 = 0x04
+                    0005     64 	ar5 = 0x05
+                    0006     65 	ar6 = 0x06
+                    0007     66 	ar7 = 0x07
+                    0000     67 	ar0 = 0x00
+                    0001     68 	ar1 = 0x01
+                             69 ;	_long2fs.c 108
+   0000 C0 E0                70 	push	acc
+   0002 C0 F0                71 	push	b
+   0004 C0 83                72 	push	dph
+   0006 C0 82                73 	push	dpl
+   0008 90s00r00             74 	mov	dptr,#___long2fs_a1_1_1
+   000B D0 E0                75 	pop	acc
+   000D F0                   76 	movx	@dptr,a
+   000E D0 E0                77 	pop	acc
+   0010 A3                   78 	inc	dptr
+   0011 F0                   79 	movx	@dptr,a
+   0012 D0 E0                80 	pop	acc
+   0014 A3                   81 	inc	dptr
+   0015 F0                   82 	movx	@dptr,a
+   0016 D0 E0                83 	pop	acc
+   0018 A3                   84 	inc	dptr
+   0019 F0                   85 	movx	@dptr,a
+                             86 ;	_long2fs.c 82
+   001A 90s00r04             87 	mov	dptr,#___long2fs_sign_1_1
+   001D E4                   88 	clr	a
+   001E A3                   89 	inc	dptr
+   001F A3                   90 	inc	dptr
+   0020 A3                   91 	inc	dptr
+   0021 F0                   92 	movx	@dptr,a
+   0022 12s00r00             93 	lcall	__decdptr
+   0025 F0                   94 	movx	@dptr,a
+   0026 12s00r00             95 	lcall	__decdptr
+   0029 F0                   96 	movx	@dptr,a
+   002A 12s00r00             97 	lcall	__decdptr
+   002D F0                   98 	movx	@dptr,a
+                             99 ;	_long2fs.c 86
+   002E 90s00r00            100 	mov	dptr,#___long2fs_a1_1_1
+   0031 E0                  101 	movx	a,@dptr
+   0032 FA                  102 	mov	r2,a
+   0033 A3                  103 	inc	dptr
+   0034 E0                  104 	movx	a,@dptr
+   0035 FB                  105 	mov	r3,a
+   0036 A3                  106 	inc	dptr
+   0037 E0                  107 	movx	a,@dptr
+   0038 FC                  108 	mov	r4,a
+   0039 A3                  109 	inc	dptr
+   003A E0                  110 	movx	a,@dptr
+   003B FD                  111 	mov	r5,a
+   003C EA                  112 	mov	a,r2
+   003D 4B                  113 	orl	a,r3
+   003E 4C                  114 	orl	a,r4
+   003F 4D                  115 	orl	a,r5
+                            116 ; Peephole 109   removed ljmp by inverse jump logic
+   0040 70 23               117 	jnz  00102$
+   0042                     118 00114$:
+                            119 ;	_long2fs.c 88
+   0042 90s00r08            120 	mov	dptr,#(___long2fs_fl_1_1)
+                            121 ; Peephole 101   removed redundant mov
+                            122 ; Peephole 180   changed mov to clr
+   0045 E4                  123 	clr  a
+   0046 F0                  124 	movx @dptr,a
+   0047 A3                  125 	inc  dptr
+   0048 F0                  126 	movx @dptr,a
+   0049 A3                  127 	inc	dptr
+                            128 ; Peephole 101   removed redundant mov
+                            129 ; Peephole 180   changed mov to clr
+   004A E4                  130 	clr  a
+   004B F0                  131 	movx @dptr,a
+   004C A3                  132 	inc  dptr
+   004D F0                  133 	movx @dptr,a
+                            134 ;	_long2fs.c 89
+   004E 90s00r08            135 	mov	dptr,#(___long2fs_fl_1_1)
+   0051 E0                  136 	movx	a,@dptr
+   0052 FE                  137 	mov	r6,a
+   0053 A3                  138 	inc	dptr
+   0054 E0                  139 	movx	a,@dptr
+   0055 FF                  140 	mov	r7,a
+   0056 A3                  141 	inc	dptr
+   0057 E0                  142 	movx	a,@dptr
+   0058 F8                  143 	mov	r0,a
+   0059 A3                  144 	inc	dptr
+   005A E0                  145 	movx	a,@dptr
+                            146 ; Peephole 191   removed redundant mov
+   005B F9                  147 	mov  r1,a
+   005C 8E 82               148 	mov  dpl,r6
+   005E 8F 83               149 	mov  dph,r7
+   0060 88 F0               150 	mov  b,r0
+   0062 02s01r50            151 	ljmp	00108$
+   0065                     152 00102$:
+                            153 ;	_long2fs.c 92
+   0065 ED                  154 	mov	a,r5
+                            155 ; Peephole 111   removed ljmp by inverse jump logic
+   0066 30 E7 21            156 	jnb  acc.7,00113$
+   0069                     157 00115$:
+                            158 ;	_long2fs.c 94
+   0069 90s00r04            159 	mov	dptr,#___long2fs_sign_1_1
+                            160 ; Peephole 101   removed redundant mov
+                            161 ; Peephole 180   changed mov to clr
+   006C E4                  162 	clr  a
+   006D F0                  163 	movx @dptr,a
+   006E A3                  164 	inc  dptr
+   006F F0                  165 	movx @dptr,a
+   0070 A3                  166 	inc	dptr
+                            167 ; Peephole 180   changed mov to clr
+   0071 E4                  168 	clr  a
+   0072 F0                  169 	movx	@dptr,a
+   0073 A3                  170 	inc	dptr
+   0074 74 80               171 	mov	a,#0x80
+   0076 F0                  172 	movx	@dptr,a
+                            173 ;	_long2fs.c 95
+   0077 90s00r00            174 	mov	dptr,#___long2fs_a1_1_1
+   007A C3                  175 	clr	c
+   007B E4                  176 	clr	a
+   007C 9A                  177 	subb	a,r2
+   007D F0                  178 	movx	@dptr,a
+   007E E4                  179 	clr	a
+   007F 9B                  180 	subb	a,r3
+   0080 A3                  181 	inc	dptr
+   0081 F0                  182 	movx	@dptr,a
+   0082 E4                  183 	clr	a
+   0083 9C                  184 	subb	a,r4
+   0084 A3                  185 	inc	dptr
+   0085 F0                  186 	movx	@dptr,a
+   0086 E4                  187 	clr	a
+   0087 9D                  188 	subb	a,r5
+   0088 A3                  189 	inc	dptr
+   0089 F0                  190 	movx	@dptr,a
+                            191 ;	_long2fs.c 98
+   008A                     192 00113$:
+   008A E4                  193 	clr	a
+   008B F5*01               194 	mov	(___long2fs_sloc0_1_0 + 1),a
+   008D 75*00 96            195 	mov	___long2fs_sloc0_1_0,#0x96
+   0090                     196 00105$:
+   0090 90s00r00            197 	mov	dptr,#___long2fs_a1_1_1
+   0093 E0                  198 	movx	a,@dptr
+   0094 FC                  199 	mov	r4,a
+   0095 A3                  200 	inc	dptr
+   0096 E0                  201 	movx	a,@dptr
+   0097 FD                  202 	mov	r5,a
+   0098 A3                  203 	inc	dptr
+   0099 E0                  204 	movx	a,@dptr
+   009A FE                  205 	mov	r6,a
+   009B A3                  206 	inc	dptr
+   009C E0                  207 	movx	a,@dptr
+   009D FF                  208 	mov	r7,a
+   009E C3                  209 	clr	c
+   009F EC                  210 	mov	a,r4
+   00A0 94 00               211 	subb	a,#0x00
+   00A2 ED                  212 	mov	a,r5
+   00A3 94 00               213 	subb	a,#0x00
+   00A5 EE                  214 	mov	a,r6
+   00A6 94 80               215 	subb	a,#0x80
+   00A8 EF                  216 	mov	a,r7
+   00A9 94 00               217 	subb	a,#0x00
+                            218 ; Peephole 108   removed ljmp by inverse jump logic
+   00AB 50 27               219 	jnc  00107$
+   00AD                     220 00116$:
+                            221 ;	_long2fs.c 100
+   00AD EC                  222 	mov	a,r4
+   00AE 25 E0               223 	add	a,acc
+   00B0 F8                  224 	mov	r0,a
+   00B1 ED                  225 	mov	a,r5
+   00B2 33                  226 	rlc	a
+   00B3 F9                  227 	mov	r1,a
+   00B4 EE                  228 	mov	a,r6
+   00B5 33                  229 	rlc	a
+   00B6 FA                  230 	mov	r2,a
+   00B7 EF                  231 	mov	a,r7
+   00B8 33                  232 	rlc	a
+   00B9 FB                  233 	mov	r3,a
+   00BA 90s00r00            234 	mov	dptr,#___long2fs_a1_1_1
+   00BD E8                  235 	mov	a,r0
+   00BE F0                  236 	movx	@dptr,a
+   00BF A3                  237 	inc	dptr
+   00C0 E9                  238 	mov	a,r1
+   00C1 F0                  239 	movx	@dptr,a
+   00C2 A3                  240 	inc	dptr
+   00C3 EA                  241 	mov	a,r2
+   00C4 F0                  242 	movx	@dptr,a
+   00C5 A3                  243 	inc	dptr
+   00C6 EB                  244 	mov	a,r3
+   00C7 F0                  245 	movx	@dptr,a
+                            246 ;	_long2fs.c 101
+   00C8 15*00               247 	dec	___long2fs_sloc0_1_0
+   00CA 74 FF               248 	mov	a,#0xff
+   00CC B5*00 02            249 	cjne	a,___long2fs_sloc0_1_0,00117$
+   00CF 15*01               250 	dec	(___long2fs_sloc0_1_0 + 1)
+   00D1                     251 00117$:
+   00D1 02s00r90            252 	ljmp	00105$
+   00D4                     253 00107$:
+                            254 ;	_long2fs.c 104
+   00D4 53 06 7F            255 	anl	ar6,#0x7f
+   00D7 90s00r00            256 	mov	dptr,#___long2fs_a1_1_1
+   00DA EC                  257 	mov	a,r4
+   00DB F0                  258 	movx	@dptr,a
+   00DC A3                  259 	inc	dptr
+   00DD ED                  260 	mov	a,r5
+   00DE F0                  261 	movx	@dptr,a
+   00DF A3                  262 	inc	dptr
+   00E0 EE                  263 	mov	a,r6
+   00E1 F0                  264 	movx	@dptr,a
+   00E2 A3                  265 	inc	dptr
+   00E3 EF                  266 	mov	a,r7
+   00E4 F0                  267 	movx	@dptr,a
+                            268 ;	_long2fs.c 106
+   00E5 AA*00               269 	mov	r2,___long2fs_sloc0_1_0
+   00E7 AB*01               270 	mov	r3,(___long2fs_sloc0_1_0 + 1)
+   00E9 78 00               271 	mov	r0,#0x00
+   00EB 79 00               272 	mov	r1,#0x00
+   00ED 8A*04               273 	mov	(___long2fs_sloc1_1_0 + 2),r2
+   00EF EB                  274 	mov	a,r3
+   00F0 54 01               275 	anl	a,#0x01
+   00F2 A2 E0               276 	mov	c,acc.0
+   00F4 C5*04               277 	xch	a,(___long2fs_sloc1_1_0 + 2)
+   00F6 13                  278 	rrc	a
+   00F7 C5*04               279 	xch	a,(___long2fs_sloc1_1_0 + 2)
+   00F9 13                  280 	rrc	a
+   00FA C5*04               281 	xch	a,(___long2fs_sloc1_1_0 + 2)
+   00FC F5*05               282 	mov	(___long2fs_sloc1_1_0 + 3),a
+   00FE 75*03 00            283 	mov	(___long2fs_sloc1_1_0 + 1),#0x00
+   0101 75*02 00            284 	mov	___long2fs_sloc1_1_0,#0x00
+   0104 90s00r04            285 	mov	dptr,#___long2fs_sign_1_1
+   0107 E0                  286 	movx	a,@dptr
+   0108 FA                  287 	mov	r2,a
+   0109 A3                  288 	inc	dptr
+   010A E0                  289 	movx	a,@dptr
+   010B FB                  290 	mov	r3,a
+   010C A3                  291 	inc	dptr
+   010D E0                  292 	movx	a,@dptr
+   010E F8                  293 	mov	r0,a
+   010F A3                  294 	inc	dptr
+   0110 E0                  295 	movx	a,@dptr
+   0111 F9                  296 	mov	r1,a
+   0112 E5*02               297 	mov	a,___long2fs_sloc1_1_0
+   0114 42 02               298 	orl	ar2,a
+   0116 E5*03               299 	mov	a,(___long2fs_sloc1_1_0 + 1)
+   0118 42 03               300 	orl	ar3,a
+   011A E5*04               301 	mov	a,(___long2fs_sloc1_1_0 + 2)
+   011C 42 00               302 	orl	ar0,a
+   011E E5*05               303 	mov	a,(___long2fs_sloc1_1_0 + 3)
+   0120 42 01               304 	orl	ar1,a
+   0122 EA                  305 	mov	a,r2
+   0123 42 04               306 	orl	ar4,a
+   0125 EB                  307 	mov	a,r3
+   0126 42 05               308 	orl	ar5,a
+   0128 E8                  309 	mov	a,r0
+   0129 42 06               310 	orl	ar6,a
+   012B E9                  311 	mov	a,r1
+   012C 42 07               312 	orl	ar7,a
+   012E 90s00r08            313 	mov	dptr,#(___long2fs_fl_1_1)
+   0131 EC                  314 	mov	a,r4
+   0132 F0                  315 	movx	@dptr,a
+   0133 A3                  316 	inc	dptr
+   0134 ED                  317 	mov	a,r5
+   0135 F0                  318 	movx	@dptr,a
+   0136 A3                  319 	inc	dptr
+   0137 EE                  320 	mov	a,r6
+   0138 F0                  321 	movx	@dptr,a
+   0139 A3                  322 	inc	dptr
+   013A EF                  323 	mov	a,r7
+   013B F0                  324 	movx	@dptr,a
+                            325 ;	_long2fs.c 108
+   013C 90s00r08            326 	mov	dptr,#(___long2fs_fl_1_1)
+   013F E0                  327 	movx	a,@dptr
+   0140 FA                  328 	mov	r2,a
+   0141 A3                  329 	inc	dptr
+   0142 E0                  330 	movx	a,@dptr
+   0143 FB                  331 	mov	r3,a
+   0144 A3                  332 	inc	dptr
+   0145 E0                  333 	movx	a,@dptr
+   0146 FC                  334 	mov	r4,a
+   0147 A3                  335 	inc	dptr
+   0148 E0                  336 	movx	a,@dptr
+                            337 ; Peephole 191   removed redundant mov
+   0149 FD                  338 	mov  r5,a
+   014A 8A 82               339 	mov  dpl,r2
+   014C 8B 83               340 	mov  dph,r3
+   014E 8C F0               341 	mov  b,r4
+   0150                     342 00108$:
+                    0150    343 	C$_long2fs.c$109$1$1 ==.
+                    0150    344 	XG$__long2fs$0$0 ==.
+   0150 22                  345 	ret
+                            346 	.area	CSEG    (CODE)

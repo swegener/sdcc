@@ -1,0 +1,233 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.1.9Ga Sun Jan 16 17:31:34 2000
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module _strstr
+                              7 ;--------------------------------------------------------
+                              8 ; publics variables in this module
+                              9 ;--------------------------------------------------------
+                             10 	.globl _strstr_PARM_2
+                             11 	.globl _strstr
+                             12 ;--------------------------------------------------------
+                             13 ; special function registers
+                             14 ;--------------------------------------------------------
+                             15 ;--------------------------------------------------------
+                             16 ; special function bits 
+                             17 ;--------------------------------------------------------
+                             18 ;--------------------------------------------------------
+                             19 ; internal ram data
+                             20 ;--------------------------------------------------------
+                             21 	.area	DSEG    (DATA)
+   0000                      22 _strstr_sloc0_1_0:
+   0000                      23 	.ds	0x0003
+   0003                      24 _strstr_sloc1_1_0:
+   0003                      25 	.ds	0x0003
+                             26 ;--------------------------------------------------------
+                             27 ; overlayable items in internal ram 
+                             28 ;--------------------------------------------------------
+                             29 	.area	OSEG	(OVR,DATA)
+                             30 ;--------------------------------------------------------
+                             31 ; indirectly addressable internal ram data
+                             32 ;--------------------------------------------------------
+                             33 	.area	ISEG    (DATA)
+                             34 ;--------------------------------------------------------
+                             35 ; bit data
+                             36 ;--------------------------------------------------------
+                             37 	.area	BSEG    (BIT)
+                             38 ;--------------------------------------------------------
+                             39 ; external ram data
+                             40 ;--------------------------------------------------------
+                             41 	.area	XSEG    (XDATA)
+   0000                      42 _strstr_PARM_2:
+   0000                      43 	.ds	0x0003
+   0003                      44 _strstr_str1_1_1:
+   0003                      45 	.ds	0x0003
+   0006                      46 _strstr_cp_1_1:
+   0006                      47 	.ds	0x0003
+                             48 ;--------------------------------------------------------
+                             49 ; global & static initialisations
+                             50 ;--------------------------------------------------------
+                             51 	.area GSINIT (CODE)
+                             52 ;--------------------------------------------------------
+                             53 ; code
+                             54 ;--------------------------------------------------------
+                             55 	.area CSEG (CODE)
+                    0000     56 	G$strstr$0$0 ==.
+                             57 ;	_strstr.c 27
+                             58 ;	-----------------------------------------
+                             59 ;	 function strstr
+                             60 ;	-----------------------------------------
+   0000                      61 _strstr:
+                    0002     62 	ar2 = 0x02
+                    0003     63 	ar3 = 0x03
+                    0004     64 	ar4 = 0x04
+                    0005     65 	ar5 = 0x05
+                    0006     66 	ar6 = 0x06
+                    0007     67 	ar7 = 0x07
+                    0000     68 	ar0 = 0x00
+                    0001     69 	ar1 = 0x01
+                             70 ;	_strstr.c 0
+   0000 C0 F0                71 	push	b
+   0002 C0 83                72 	push	dph
+   0004 C0 82                73 	push	dpl
+   0006 90s00r03             74 	mov	dptr,#_strstr_str1_1_1
+   0009 D0 E0                75 	pop	acc
+   000B F0                   76 	movx	@dptr,a
+   000C D0 E0                77 	pop	acc
+   000E A3                   78 	inc	dptr
+   000F F0                   79 	movx	@dptr,a
+   0010 D0 E0                80 	pop	acc
+   0012 A3                   81 	inc	dptr
+   0013 F0                   82 	movx	@dptr,a
+                             83 ;	_strstr.c 32
+   0014 90s00r03             84 	mov	dptr,#_strstr_str1_1_1
+   0017 E0                   85 	movx	a,@dptr
+   0018 FA                   86 	mov	r2,a
+   0019 A3                   87 	inc	dptr
+   001A E0                   88 	movx	a,@dptr
+   001B FB                   89 	mov	r3,a
+   001C A3                   90 	inc	dptr
+   001D E0                   91 	movx	a,@dptr
+   001E FC                   92 	mov	r4,a
+   001F 90s00r06             93 	mov	dptr,#_strstr_cp_1_1
+   0022 EA                   94 	mov	a,r2
+   0023 F0                   95 	movx	@dptr,a
+   0024 A3                   96 	inc	dptr
+   0025 EB                   97 	mov	a,r3
+   0026 F0                   98 	movx	@dptr,a
+   0027 A3                   99 	inc	dptr
+   0028 EC                  100 	mov	a,r4
+   0029 F0                  101 	movx	@dptr,a
+                            102 ;	_strstr.c 36
+   002A 90s00r00            103 	mov	dptr,#_strstr_PARM_2
+   002D E0                  104 	movx	a,@dptr
+   002E F5*00               105 	mov	_strstr_sloc0_1_0,a
+   0030 A3                  106 	inc	dptr
+   0031 E0                  107 	movx	a,@dptr
+   0032 F5*01               108 	mov	(_strstr_sloc0_1_0 + 1),a
+   0034 A3                  109 	inc	dptr
+   0035 E0                  110 	movx	a,@dptr
+   0036 F5*02               111 	mov	(_strstr_sloc0_1_0 + 2),a
+   0038 85*00 82            112 	mov	dpl,_strstr_sloc0_1_0
+   003B 85*01 83            113 	mov	dph,(_strstr_sloc0_1_0 + 1)
+   003E 85*02 F0            114 	mov	b,(_strstr_sloc0_1_0 + 2)
+   0041 12s00r00            115 	lcall	__gptrget
+                            116 ; Peephole 105   removed redundant mov
+   0044 F8                  117 	mov  r0,a
+                            118 ; Peephole 109   removed ljmp by inverse jump logic
+   0045 70 09               119 	jnz  00122$
+   0047                     120 00123$:
+                            121 ;	_strstr.c 37
+   0047 8A 82               122 	mov	dpl,r2
+   0049 8B 83               123 	mov	dph,r3
+   004B 8C F0               124 	mov	b,r4
+   004D 02s00rD2            125 	ljmp	00113$
+                            126 ;	_strstr.c 39
+   0050                     127 00122$:
+   0050                     128 00110$:
+   0050 8A 82               129 	mov	dpl,r2
+   0052 8B 83               130 	mov	dph,r3
+   0054 8C F0               131 	mov	b,r4
+   0056 12s00r00            132 	lcall	__gptrget
+                            133 ; Peephole 105   removed redundant mov
+   0059 F8                  134 	mov  r0,a
+   005A 70 03               135 	jnz	00124$
+   005C 02s00rCC            136 	ljmp	00112$
+   005F                     137 00124$:
+                            138 ;	_strstr.c 44
+   005F 8A*03               139 	mov	_strstr_sloc1_1_0,r2
+   0061 8B*04               140 	mov	(_strstr_sloc1_1_0 + 1),r3
+   0063 8C*05               141 	mov	(_strstr_sloc1_1_0 + 2),r4
+   0065 AE*00               142 	mov	r6,_strstr_sloc0_1_0
+   0067 AF*01               143 	mov	r7,(_strstr_sloc0_1_0 + 1)
+   0069 AD*02               144 	mov	r5,(_strstr_sloc0_1_0 + 2)
+   006B                     145 00105$:
+   006B 85*03 82            146 	mov	dpl,_strstr_sloc1_1_0
+   006E 85*04 83            147 	mov	dph,(_strstr_sloc1_1_0 + 1)
+   0071 85*05 F0            148 	mov	b,(_strstr_sloc1_1_0 + 2)
+   0074 12s00r00            149 	lcall	__gptrget
+                            150 ; Peephole 105   removed redundant mov
+   0077 F8                  151 	mov  r0,a
+                            152 ; Peephole 110   removed ljmp by inverse jump logic
+   0078 60 20               153 	jz  00107$
+   007A                     154 00125$:
+   007A 8E 82               155 	mov	dpl,r6
+   007C 8F 83               156 	mov	dph,r7
+   007E 8D F0               157 	mov	b,r5
+   0080 12s00r00            158 	lcall	__gptrget
+                            159 ; Peephole 105   removed redundant mov
+   0083 F9                  160 	mov  r1,a
+                            161 ; Peephole 110   removed ljmp by inverse jump logic
+   0084 60 14               162 	jz  00107$
+   0086                     163 00126$:
+   0086 C3                  164 	clr	c
+   0087 E8                  165 	mov	a,r0
+   0088 99                  166 	subb	a,r1
+                            167 ; Peephole 109   removed ljmp by inverse jump logic
+   0089 70 0F               168 	jnz  00107$
+   008B                     169 00127$:
+                            170 ;	_strstr.c 45
+   008B 05*03               171 	inc	_strstr_sloc1_1_0
+   008D E4                  172 	clr	a
+   008E B5*03 02            173 	cjne	a,_strstr_sloc1_1_0,00128$
+   0091 05*04               174 	inc	(_strstr_sloc1_1_0 + 1)
+   0093                     175 00128$:
+   0093 0E                  176 	inc	r6
+   0094 BE 00 01            177 	cjne	r6,#0x00,00129$
+   0097 0F                  178 	inc	r7
+   0098                     179 00129$:
+                            180 ; Peephole 132   changed ljmp to sjmp
+   0098 80 D1               181 	sjmp 00105$
+   009A                     182 00107$:
+                            183 ;	_strstr.c 47
+   009A 8E 82               184 	mov	dpl,r6
+   009C 8F 83               185 	mov	dph,r7
+   009E 8D F0               186 	mov	b,r5
+   00A0 12s00r00            187 	lcall	__gptrget
+                            188 ; Peephole 105   removed redundant mov
+   00A3 FE                  189 	mov  r6,a
+                            190 ; Peephole 109   removed ljmp by inverse jump logic
+   00A4 70 13               191 	jnz  00109$
+   00A6                     192 00130$:
+                            193 ;	_strstr.c 48
+   00A6 90s00r06            194 	mov	dptr,#_strstr_cp_1_1
+   00A9 E0                  195 	movx	a,@dptr
+   00AA FE                  196 	mov	r6,a
+   00AB A3                  197 	inc	dptr
+   00AC E0                  198 	movx	a,@dptr
+   00AD F8                  199 	mov	r0,a
+   00AE A3                  200 	inc	dptr
+   00AF E0                  201 	movx	a,@dptr
+   00B0 F9                  202 	mov	r1,a
+   00B1 8E 82               203 	mov	dpl,r6
+   00B3 88 83               204 	mov	dph,r0
+   00B5 89 F0               205 	mov	b,r1
+                            206 ; Peephole 132   changed ljmp to sjmp
+   00B7 80 19               207 	sjmp 00113$
+   00B9                     208 00109$:
+                            209 ;	_strstr.c 50
+   00B9 0A                  210 	inc	r2
+   00BA BA 00 01            211 	cjne	r2,#0x00,00131$
+   00BD 0B                  212 	inc	r3
+   00BE                     213 00131$:
+   00BE 90s00r06            214 	mov	dptr,#_strstr_cp_1_1
+   00C1 EA                  215 	mov	a,r2
+   00C2 F0                  216 	movx	@dptr,a
+   00C3 A3                  217 	inc	dptr
+   00C4 EB                  218 	mov	a,r3
+   00C5 F0                  219 	movx	@dptr,a
+   00C6 A3                  220 	inc	dptr
+   00C7 EC                  221 	mov	a,r4
+   00C8 F0                  222 	movx	@dptr,a
+   00C9 02s00r50            223 	ljmp	00110$
+   00CC                     224 00112$:
+                            225 ;	_strstr.c 53
+                            226 ; Peephole 181   used 16 bit load of dptr
+   00CC 90 00 00            227 	mov  dptr,#0x0000
+   00CF 75 F0 00            228 	mov	b,#0x00
+   00D2                     229 00113$:
+                    00D2    230 	C$_strstr.c$54$1$1 ==.
+                    00D2    231 	XG$strstr$0$0 ==.
+   00D2 22                  232 	ret
+                            233 	.area	CSEG    (CODE)

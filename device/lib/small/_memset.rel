@@ -1,0 +1,95 @@
+;!FILE _memset.asm
+XH
+H 9 areas 24 global symbols
+M _memset
+S __gptrput Ref0000
+A _CODE size 0 flags 0
+A DSEG size 0 flags 0
+A _DUMMY size 0 flags 0
+A OSEG size 6 flags 4
+S _memset_PARM_2 Def0000
+S _memset_PARM_3 Def0001
+A ISEG size 0 flags 0
+A BSEG size 0 flags 80
+A XSEG size 0 flags 40
+A GSINIT size 0 flags 20
+A CSEG size 3C flags 20
+S A$_memset$94 Def0024
+S A$_memset$95 Def0026
+S A$_memset$86 Def001C
+S A$_memset$77 Def000F
+S A$_memset$96 Def0028
+S A$_memset$87 Def001D
+S A$_memset$78 Def0011
+S A$_memset$69 Def0000
+S A$_memset$98 Def002B
+S A$_memset$89 Def001E
+S A$_memset$99 Def002C
+S A$_memset$100 Def002F
+S A$_memset$112 Def003B
+S A$_memset$103 Def0030
+S A$_memset$106 Def0032
+S _memset Def0000
+S A$_memset$107 Def0035
+S A$_memset$108 Def0038
+S C$_memset.c$41$1$1 Def003B
+S XG$memset$0$0 Def003B
+S A$_memset$70 Def0003
+S A$_memset$80 Def0013
+S A$_memset$71 Def0006
+S A$_memset$81 Def0015
+S A$_memset$82 Def0017
+S A$_memset$73 Def0009
+S A$_memset$92 Def0020
+S A$_memset$83 Def0018
+S A$_memset$74 Def000B
+S G$memset$0$0 Def0000
+S A$_memset$93 Def0022
+S A$_memset$84 Def001B
+S A$_memset$75 Def000D
+T 00 00
+R 00 00 00 03
+T 00 00
+R 00 00 00 03
+T 00 01
+R 00 00 00 03
+T 00 01
+R 00 00 00 03
+T 00 03
+R 00 00 00 03
+T 00 03
+R 00 00 00 03
+T 00 00
+R 00 00 00 08
+T 00 00 85 82 00 03 85 83 00 04 85 F0 00 05 AD
+R 00 00 00 08 29 04 00 03 29 08 00 03 29 0C 00 03
+T 00 0A 00 03 AE 00 04 AF 00 05 A8
+R 00 00 00 08 29 02 00 03 29 05 00 03 29 08 00 03
+T 00 10 00 01 A9 00 02
+R 00 00 00 08 29 02 00 03 29 05 00 03
+T 00 13
+R 00 00 00 08
+T 00 13 88 02 89 03 18 B8 FF 01 19
+R 00 00 00 08
+T 00 1C
+R 00 00 00 08
+T 00 1C EA 4B 60 12
+R 00 00 00 08
+T 00 20
+R 00 00 00 08
+T 00 20 8D 82 8E 83 8F F0 E5 00 00 12 00 00 0D BD
+R 00 00 00 08 29 09 00 03 02 0C 00 00
+T 00 2D 00 01 0E
+R 00 00 00 08
+T 00 30
+R 00 00 00 08
+T 00 30 80 E1
+R 00 00 00 08
+T 00 32
+R 00 00 00 08
+T 00 32 85 00 03 82 85 00 04 83 85 00 05 F0
+R 00 00 00 08 29 03 00 03 29 07 00 03 29 0B 00 03
+T 00 3B
+R 00 00 00 08
+T 00 3B 22
+R 00 00 00 08

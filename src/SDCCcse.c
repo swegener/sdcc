@@ -281,7 +281,7 @@ DEFSETFUNC (findCheaperOp)
 	/* if the result is volatile then return result */
 	if (IS_OP_VOLATILE (IC_RESULT (cdp->diCode)))
 	  *opp = IC_RESULT (cdp->diCode);
-	else 
+	else
 	  /* if this is a straight assignment and
 	     left is a temp then prefer the temporary to the
 	     true symbol */
@@ -624,7 +624,7 @@ iCode *findBackwardDef(operand *op,iCode *ic)
     iCode *lic;
 
     for (lic = ic; lic ; lic = lic->prev) {
-	if (IC_RESULT(lic) && isOperandEqual(op,IC_RESULT(lic))) 
+	if (IC_RESULT(lic) && isOperandEqual(op,IC_RESULT(lic)))
 	    return lic;
     }
     return NULL;
@@ -812,10 +812,21 @@ algebraicOpts (iCode * ic)
 	    }
 	  if (operandLitValue (IC_LEFT (ic)) == 1.0)
 	    {
-	      ic->op = '=';
-	      IC_LEFT (ic) = NULL;
-	      SET_RESULT_RIGHT (ic);
-	      return;
+	      /* '*' can have two unsigned chars as operands */
+	      /* and an unsigned int as result.              */
+	      if (compareType (operandType (IC_RESULT (ic)),
+			       operandType (IC_RIGHT (ic))) == 1)
+		{
+		  ic->op = '=';
+		  IC_LEFT (ic) = NULL;
+		  SET_RESULT_RIGHT (ic);
+		}
+	      else
+		{
+	          ic->op = CAST;
+		  IC_LEFT (ic)->type = TYPE;
+		  setOperandType (IC_LEFT (ic), operandType (IC_RESULT (ic)));
+		}
 	    }
 	}
 
@@ -832,10 +843,27 @@ algebraicOpts (iCode * ic)
 
 	  if (operandLitValue (IC_RIGHT (ic)) == 1.0)
 	    {
-	      ic->op = '=';
-	      IC_RIGHT (ic) = IC_LEFT (ic);
-	      IC_LEFT (ic) = NULL;
-	      SET_RESULT_RIGHT (ic);
+	      /* '*' can have two unsigned chars as operands */
+	      /* and an unsigned int as result.              */
+	      if (compareType (operandType (IC_RESULT (ic)),
+			       operandType (IC_LEFT (ic))) == 1)
+		{
+		  ic->op = '=';
+		  IC_RIGHT (ic) = IC_LEFT (ic);
+		  IC_LEFT (ic) = NULL;
+		  SET_RESULT_RIGHT (ic);
+	        }
+	      else
+	        {
+                  operand *op;
+
+	          ic->op = CAST;
+		  op = IC_RIGHT (ic);
+		  IC_RIGHT (ic) = IC_LEFT (ic);
+		  IC_LEFT (ic) = op;
+		  IC_LEFT (ic)->type = TYPE;
+		  setOperandType (IC_LEFT (ic), operandType (IC_RESULT (ic)));
+	        }
 	      return;
 	    }
 	}

@@ -1,3 +1,8 @@
+2003-05-29  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/pic/device.c: added 16F819, patch by "David I. Lehn" <dlehn@vt.edu>
+	* src/SDCCcse.c (algebraicOpts): fixed "c * 1" 
+
 2003-05-28  Bernhard Held <bernhard@bernhardheld.de>
 
 	* doc/sdccman.lyx: fix double dash and other minor things

@@ -75,6 +75,14 @@ static PIC_device Pics[] = {
     0x180,
   },
 
+  {
+    {"p16f819", "16f819", "pic16f819", "f819"},
+    (memRange *)NULL,
+    (memRange *)NULL,
+    0,
+    0x80,
+  },
+
 };
 
 static int num_of_supported_PICS = sizeof(Pics)/sizeof(PIC_device);

@@ -519,13 +519,17 @@ printGPointerType (FILE * oFile, const char *iname, const char *oname,
 /* printIvalType - generates ival for int/char                     */
 /*-----------------------------------------------------------------*/
 void 
-printIvalType (sym_link * type, initList * ilist, FILE * oFile)
+printIvalType (symbol *sym, sym_link * type, initList * ilist, FILE * oFile)
 {
 	value *val;
 
 	/* if initList is deep */
 	if (ilist->type == INIT_DEEP)
 		ilist = ilist->init.deep;
+
+	if (sym && ilist->next) {
+	  werror (W_EXCESS_INITIALIZERS, "scalar", sym->name, sym->lineDef);
+	}
 
 	val = list2val (ilist);
 	switch (getSize (type)) {
@@ -629,8 +633,11 @@ printIvalStruct (symbol * sym, sym_link * type,
 		if (IS_BITFIELD(sflds->type)) {
 			printIvalBitFields(&sflds,&iloop,oFile);
 		} else {
-			printIval (sflds, sflds->type, iloop, oFile);
+			printIval (NULL, sflds->type, iloop, oFile);
 		}
+	}
+	if (iloop) {
+	  werror (W_EXCESS_INITIALIZERS, "struct", sym->name, sym->lineDef);
 	}
 	return;
 }
@@ -702,7 +709,7 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
   for (;;)
     {
       size++;
-      printIval (sym, type->next, iloop, oFile);
+      printIval (NULL, type->next, iloop, oFile);
       iloop = (iloop ? iloop->next : NULL);
 
 
@@ -716,7 +723,7 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
       if (!--lcnt) {
 	/* if initializers left */
 	if (iloop) {
-	  werror (W_EXESS_ARRAY_INITIALIZERS, sym->name, sym->lineDef);
+	  werror (W_EXCESS_INITIALIZERS, "array", sym->name, sym->lineDef);
 	}
 	break;
       }
@@ -964,7 +971,7 @@ printIval (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
   /* if type is SPECIFIER */
   if (IS_SPEC (type))
     {
-      printIvalType (type, ilist, oFile);
+      printIvalType (sym, type, ilist, oFile);
       return;
     }
 }

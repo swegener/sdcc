@@ -861,7 +861,7 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist)
 	    char *name=sym->opval.val->sym->name;
 	    int lineno=sym->opval.val->sym->lineDef;
 	    
-	    werror (W_EXESS_ARRAY_INITIALIZERS, name, lineno);
+	    werror (W_EXCESS_INITIALIZERS, "array", name, lineno);
 	}
     }
     else
@@ -886,7 +886,7 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist)
 		// there has to be a better way
 		char *name=sym->opval.val->sym->name;
 		int lineno=sym->opval.val->sym->lineDef;
-		werror (W_EXESS_ARRAY_INITIALIZERS, name, lineno);
+		werror (W_EXCESS_INITIALIZERS, "array", name, lineno);
 		
 		break;
 	    }

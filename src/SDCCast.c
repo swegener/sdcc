@@ -48,8 +48,8 @@ int labelKey = 1;
 int noLineno = 0;
 int noAlloc = 0;
 symbol *currFunc;
-ast *createIval (ast *, sym_link *, initList *, ast *);
-ast *createIvalCharPtr (ast *, sym_link *, ast *);
+static ast *createIval (ast *, sym_link *, initList *, ast *);
+static ast *createIvalCharPtr (ast *, sym_link *, ast *);
 ast *optimizeRRCRLC (ast *);
 ast *optimizeGetHbit (ast *);
 ast *backPatchLabels (ast *, symbol *, symbol *);
@@ -66,44 +66,8 @@ ptt (ast * tree)
 
 
 /*-----------------------------------------------------------------*/
-/* newAst - creates a fresh node for an expression tree           */
+/* newAst - creates a fresh node for an expression tree            */
 /*-----------------------------------------------------------------*/
-#if 0
-ast *
-newAst (int type, void *op)
-{
-  ast *ex;
-  static int oldLineno = 0;
-
-  ex = Safe_alloc ( sizeof (ast));
-
-  ex->type = type;
-  ex->lineno = (noLineno ? oldLineno : yylineno);
-  ex->filename = currFname;
-  ex->level = NestLevel;
-  ex->block = currBlockno;
-  ex->initMode = inInitMode;
-
-  /* depending on the type */
-  switch (type)
-    {
-    case EX_VALUE:
-      ex->opval.val = (value *) op;
-      break;
-    case EX_OP:
-      ex->opval.op = (long) op;
-      break;
-    case EX_LINK:
-      ex->opval.lnk = (sym_link *) op;
-      break;
-    case EX_STMNT:
-      ex->opval.stmnt = (unsigned) op;
-    }
-
-  return ex;
-}
-#endif
-
 static ast *
 newAst_ (unsigned type)
 {
@@ -499,38 +463,6 @@ setAstLineno (ast * tree, int lineno)
   return 0;
 }
 
-#if 0
-/* this functions seems to be superfluous?! kmh */
-
-/*-----------------------------------------------------------------*/
-/* resolveFromTable - will return the symbal table value           */
-/*-----------------------------------------------------------------*/
-value *
-resolveFromTable (value * val)
-{
-  symbol *csym;
-
-  if (!val->sym)
-    return val;
-
-  csym = findSymWithLevel (SymbolTab, val->sym);
-
-  /* if found in the symbol table & they r not the same */
-  if (csym && val->sym != csym &&
-      csym->level == val->sym->level &&
-      csym->_isparm &&
-      !csym->ismyparm)
-    {
-
-      val->sym = csym;
-      val->type = csym->type;
-      val->etype = csym->etype;
-    }
-
-  return val;
-}
-#endif
-
 /*-----------------------------------------------------------------*/
 /* funcOfType :- function of type with name                        */
 /*-----------------------------------------------------------------*/
@@ -801,7 +733,7 @@ processParms (ast * func,
 /*-----------------------------------------------------------------*/
 /* createIvalType - generates ival for basic types                 */
 /*-----------------------------------------------------------------*/
-ast *
+static ast *
 createIvalType (ast * sym, sym_link * type, initList * ilist)
 {
   ast *iExpr;
@@ -817,7 +749,7 @@ createIvalType (ast * sym, sym_link * type, initList * ilist)
 /*-----------------------------------------------------------------*/
 /* createIvalStruct - generates initial value for structures       */
 /*-----------------------------------------------------------------*/
-ast *
+static ast *
 createIvalStruct (ast * sym, sym_link * type, initList * ilist)
 {
   ast *rast = NULL;
@@ -857,7 +789,7 @@ createIvalStruct (ast * sym, sym_link * type, initList * ilist)
 /*-----------------------------------------------------------------*/
 /* createIvalArray - generates code for array initialization       */
 /*-----------------------------------------------------------------*/
-ast *
+static ast *
 createIvalArray (ast * sym, sym_link * type, initList * ilist)
 {
   ast *rast = NULL;
@@ -952,7 +884,7 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist)
 /*-----------------------------------------------------------------*/
 /* createIvalCharPtr - generates initial values for char pointers  */
 /*-----------------------------------------------------------------*/
-ast *
+static ast *
 createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr)
 {
   ast *rast = NULL;
@@ -1001,7 +933,7 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr)
 /*-----------------------------------------------------------------*/
 /* createIvalPtr - generates initial value for pointers            */
 /*-----------------------------------------------------------------*/
-ast *
+static ast *
 createIvalPtr (ast * sym, sym_link * type, initList * ilist)
 {
   ast *rast;
@@ -1024,7 +956,7 @@ createIvalPtr (ast * sym, sym_link * type, initList * ilist)
 /*-----------------------------------------------------------------*/
 /* createIval - generates code for initial value                   */
 /*-----------------------------------------------------------------*/
-ast *
+static ast *
 createIval (ast * sym, sym_link * type, initList * ilist, ast * wid)
 {
   ast *rast = NULL;
@@ -1065,7 +997,7 @@ ast * initAggregates (symbol * sym, initList * ival, ast * wid) {
 /* gatherAutoInit - creates assignment expressions for initial     */
 /*    values                 */
 /*-----------------------------------------------------------------*/
-ast *
+static ast *
 gatherAutoInit (symbol * autoChain)
 {
   ast *init = NULL;

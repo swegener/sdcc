@@ -351,14 +351,6 @@ allocGlobal (symbol * sym)
       SPEC_SCLS (sym->etype) == S_SBIT)
     {
 
-      /* if both absolute address & initial  */
-      /* value specified then error        */
-      if (IS_ABSOLUTE (sym->etype) && sym->ival)
-	{
-	  werror (E_SFR_INIT, sym->name);
-	  sym->ival = NULL;
-	}
-
       SPEC_OCLS (sym->etype) =
 	(SPEC_SCLS (sym->etype) == S_SFR ? sfr : sfrbit);
 
@@ -683,15 +675,6 @@ allocLocal (symbol * sym)
   if (SPEC_SCLS (sym->etype) == S_SFR ||
       SPEC_SCLS (sym->etype) == S_SBIT)
     {
-
-      /* if both absolute address & initial  */
-      /* value specified then error        */
-      if (IS_ABSOLUTE (sym->etype) && sym->ival)
-	{
-	  werror (E_SFR_INIT, sym->name);
-	  sym->ival = NULL;
-	}
-
       SPEC_OCLS (sym->etype) =
 	(SPEC_SCLS (sym->etype) == S_SFR ? sfr : sfrbit);
 

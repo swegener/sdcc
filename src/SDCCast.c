@@ -3540,7 +3540,7 @@ createBlock (symbol * decl, ast * body)
   ast *ex;
 
   /* if the block has nothing */
-  if (!body)
+  if (!body && !decl)
     return NULL;
 
   ex = newNode (BLOCK, NULL, body);

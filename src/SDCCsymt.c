@@ -1134,21 +1134,11 @@ checkSClass (symbol * sym, int isProto)
   if (SPEC_SCLS (sym->etype) == S_LITERAL && !SPEC_ENUM (sym->etype))
     SPEC_SCLS (sym->etype) = S_AUTO;
   
-  /* if sfr or sbit then must also be */
-  /* volatile the initial value will be xlated */
-  /* to an absolute address */
+  /* if sfr or sbit then must also be volatile */
   if (SPEC_SCLS (sym->etype) == S_SBIT ||
       SPEC_SCLS (sym->etype) == S_SFR)
     {
       SPEC_VOLATILE (sym->etype) = 1;
-      /* if initial value given */
-      if (sym->ival)
-	{
-	  SPEC_ABSA (sym->etype) = 1;
-	  SPEC_ADDR (sym->etype) =
-	    (int) list2int (sym->ival);
-	  sym->ival = NULL;
-	}
     }
   
   /* if absolute address given then it mark it as

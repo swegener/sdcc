@@ -5212,8 +5212,11 @@ genAnd (iCode * ic, iCode * ifx)
 #endif
 
   /* if left is a literal & right is not then exchange them */
-  if ((AOP_TYPE (left) == AOP_LIT && AOP_TYPE (right) != AOP_LIT) ||
-      AOP_NEEDSACC (left))
+  if ((AOP_TYPE (left) == AOP_LIT && AOP_TYPE (right) != AOP_LIT)
+#ifdef LOGIC_OPS_BROKEN      
+    ||  AOP_NEEDSACC (left)
+#endif
+    )
     {
       operand *tmp = right;
       right = left;
@@ -5468,8 +5471,7 @@ genAnd (iCode * ic, iCode * ifx)
 		      aopPut (AOP (result), zero, offset);
 		      continue;
 		    }
-		  D (emitcode (";", "better literal AND.");
-		    );
+		  D (emitcode (";", "better literal AND."););
 		  MOVA (aopGet (AOP (left), offset, FALSE, FALSE, TRUE));
 		  emitcode ("anl", "a, %s", aopGet (AOP (right), offset,
 						    FALSE, FALSE, FALSE));
@@ -5486,10 +5488,16 @@ genAnd (iCode * ic, iCode * ifx)
 		    }
 		  else
 		    {
-		      MOVA (aopGet (AOP (right), offset, FALSE, FALSE, TRUE));
-		      emitcode ("anl", "a,%s",
-			  aopGet (AOP (left), offset, FALSE, FALSE, FALSE));
-		    }
+		      char *rOp = aopGet (AOP (right), offset, FALSE, FALSE, TRUE);
+		      if (!strcmp(rOp, "a") || !strcmp(rOp, "acc"))
+		      {
+			  emitcode("mov", "b,a");
+			  rOp = "b";
+		      }
+			
+		      MOVA (aopGet (AOP (left), offset, FALSE, FALSE, TRUE));
+		      emitcode ("anl", "a,%s", rOp);
+		    }			
 		}
 	      aopPut (AOP (result), "a", offset);
 	    }
@@ -5536,8 +5544,11 @@ genOr (iCode * ic, iCode * ifx)
 #endif
 
   /* if left is a literal & right is not then exchange them */
-  if ((AOP_TYPE (left) == AOP_LIT && AOP_TYPE (right) != AOP_LIT) ||
-      AOP_NEEDSACC (left))
+  if ((AOP_TYPE (left) == AOP_LIT && AOP_TYPE (right) != AOP_LIT)
+#ifdef LOGIC_OPS_BROKEN
+   || AOP_NEEDSACC (left) // I think this is a net loss now.
+#endif      
+      )
     {
       operand *tmp = right;
       right = left;
@@ -5789,6 +5800,7 @@ genOr (iCode * ic, iCode * ifx)
 		  else
 		    {
 		      char *rOp = aopGet (AOP (right), offset, FALSE, FALSE, TRUE);
+			
 		      if (!strcmp(rOp, "a") || !strcmp(rOp, "acc"))
 		      {
 			  emitcode("mov", "b,a");
@@ -5844,8 +5856,11 @@ genXor (iCode * ic, iCode * ifx)
 
   /* if left is a literal & right is not ||
      if left needs acc & right does not */
-  if ((AOP_TYPE (left) == AOP_LIT && AOP_TYPE (right) != AOP_LIT) ||
-      (AOP_NEEDSACC (left) && !AOP_NEEDSACC (right)))
+  if ((AOP_TYPE (left) == AOP_LIT && AOP_TYPE (right) != AOP_LIT) 
+#ifdef LOGIC_OPS_BROKEN      
+      || (AOP_NEEDSACC (left) && !AOP_NEEDSACC (right))
+#endif
+     )
     {
       operand *tmp = right;
       right = left;
@@ -6073,9 +6088,15 @@ genXor (iCode * ic, iCode * ifx)
 		  }
 		else
 		  {
-		    MOVA (aopGet (AOP (right), offset, FALSE, FALSE, TRUE));
-		    emitcode ("xrl", "a,%s",
-			   aopGet (AOP (left), offset, FALSE, TRUE, FALSE));
+		      char *rOp = aopGet (AOP (right), offset, FALSE, FALSE, TRUE);
+		      if (!strcmp(rOp, "a") || !strcmp(rOp, "acc"))
+		      {
+			  emitcode("mov", "b,a");
+			  rOp = "b";
+		      }
+			
+		      MOVA (aopGet (AOP (left), offset, FALSE, FALSE, TRUE));
+		      emitcode ("xrl", "a,%s", rOp);
 		  }
 	      }
 	    aopPut (AOP (result), "a", offset);

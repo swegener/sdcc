@@ -648,14 +648,19 @@ int processParms (ast *func, value *defParm,
     resolveSymbols(actParm);
     /* if this is a PARAM node then match left & right */
     if ( actParm->type == EX_OP && actParm->opval.op == PARAM) {
-      return (processParms (func,defParm->next, actParm->right,parmNumber) );
-    } else {
+      return (processParms (func,defParm,actParm->left,parmNumber) ||
+      	      processParms (func,defParm->next, actParm->right,parmNumber) );
+    } 
+#if 0
+    /* Pending discussion with Johan. */
+    else {
       /* if more defined parameters present but no more actual parameters */
       if (defParm->next) {
 	werror(E_TOO_FEW_PARMS);
 	return 1;
       }
     }
+#endif
        
     /* the parameter type must be atleast castable */
     if (checkType(defParm->type,actParm->ftype) == 0) {

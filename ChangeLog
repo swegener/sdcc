@@ -1,3 +1,9 @@
+2005-04-06 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/pcode.c (pic16_pCodeReplace): also update pcflow->end
+	* (createDefmap): fixed CALLs to depend on FSR1 and RETLW to restore
+	  callers stack/frame pointers
+
 2005-04-06 Vangelis Rokas <vrokas AT users.sourceforge.net>
 
         * device/include/pic16/usart.h: added, missing in previous commit,

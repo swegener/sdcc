@@ -7240,6 +7240,9 @@ void pic16_pCodeReplace (pCode *oldPC, pCode *newPC) {
   /* keep flow information intact */
   newPC->seq = oldPC->seq;
   PCI(newPC)->pcflow = PCI(oldPC)->pcflow;
+  if (PCI(newPC)->pcflow && PCI(newPC)->pcflow->end == oldPC) {
+    PCI(newPC)->pcflow->end = newPC;
+  }
 
   /* insert a comment stating which pCode has been replaced */
 #if 1
@@ -10530,7 +10533,7 @@ static int pic16_regIsLocal (regs *r) {
     case SPO_WREG:
     case SPO_FSR0L: // used in ptrget/ptrput
     case SPO_FSR0H: // ... as well
-    case SPO_FSR1L: // used as stack pointer...
+    case SPO_FSR1L: // used as stack pointer... (so not really local but shared among function calls)
     case SPO_FSR1H: // ... as well
     case SPO_FSR2L: // used as frame pointer
     case SPO_FSR2H: // ... as well
@@ -10865,6 +10868,10 @@ static defmap_t *createDefmap (pCode *pc, defmap_t *list) {
     list = newDefmap (SPO_PRODL, 0xff, 0xff, 1, 1, pc, newValnum (), list);
     list = newDefmap (SPO_PRODH, 0xff, 0xff, 1, 1, pc, newValnum (), list);
     list = newDefmap (SPO_FSR0L, 0xff, 0xff, 1, 1, pc, newValnum (), list);
+
+    /* needs correctly set-up stack pointer */
+    list = newDefmap (SPO_FSR1L, 0xff, 0x00, 1, 0, pc, 0, list);
+    list = newDefmap (SPO_FSR1H, 0xff, 0x00, 1, 0, pc, 0, list);
     break;
 
   case POC_RETLW: // return values: WREG, PRODx, FSR0L
@@ -10873,6 +10880,12 @@ static defmap_t *createDefmap (pCode *pc, defmap_t *list) {
     list = newDefmap (SPO_PRODL, 0xff, 0x00, 1, 0, pc, 0, list);
     list = newDefmap (SPO_PRODH, 0xff, 0x00, 1, 0, pc, 0, list);
     list = newDefmap (SPO_FSR0L, 0xff, 0x00, 1, 0, pc, 0, list);
+
+    /* caller's stack pointers must be restored */
+    list = newDefmap (SPO_FSR1L, 0xff, 0x00, 1, 0, pc, 0, list);
+    list = newDefmap (SPO_FSR1H, 0xff, 0x00, 1, 0, pc, 0, list);
+    list = newDefmap (SPO_FSR2L, 0xff, 0x00, 1, 0, pc, 0, list);
+    list = newDefmap (SPO_FSR2H, 0xff, 0x00, 1, 0, pc, 0, list);
     break;
 
   case POC_RETURN: // return values; WREG, PRODx, FSR0L

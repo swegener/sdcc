@@ -26,6 +26,20 @@
 
 \layout Title
 
+
+\begin_inset ERT
+status Open
+
+\layout Standard
+
+\backslash 
+NotSpecial{
+\backslash 
+do
+\backslash 
+-}
+\end_inset 
+
 SDCC Compiler User Guide
 \layout Standard
 
@@ -128,7 +142,7 @@ inline assembler code
 \newline 
 
 \newline 
-SDCC also provides an option (\-\-cyclomatic) to report the relative complexity
+SDCC also provides an option (---cyclomatic) to report the relative complexity
  of a function.
  These functions can then be further optimized, or hand coded in assembly
  if needed.
@@ -1845,11 +1859,11 @@ the output path resp.
 <Value> The start location of the internal ram data segment.
  The value entered can be in Hexadecimal or Decimal format, eg.
  --data-loc 0x20 or --data-loc 32.
- (By default, the start location of the internal ram data segment 
- is set as low as possible in memory, taking into account the used
- register banks and the bit segment at address 0x20.
- For example if register banks 0 and 1 are used without bit variables,
- the data segment will be set, if --data-loc is not used, to location 0x10.)
+ (By default, the start location of the internal ram data segment  is set
+ as low as possible in memory, taking into account the used register banks
+ and the bit segment at address 0x20.
+ For example if register banks 0 and 1 are used without bit variables, the
+ data segment will be set, if --data-loc is not used, to location 0x10.)
 \layout List
 \labelwidthstring 00.00.0000
 

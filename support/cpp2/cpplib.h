@@ -392,6 +392,10 @@ struct cpp_options
    * (see _cpp_create_definition in cppmacro.c)
    */
   unsigned char allow_naked_hash;
+
+  /* SDCC _asm specific
+     switch _asm block preprocessing on / off */
+  unsigned char preproc_asm;
 };
 
 /* This structure is passed to the call back when changing file.  */

@@ -93,16 +93,17 @@ static unsigned int read_flag	PARAMS ((cpp_reader *, unsigned int));
 static int  strtoul_for_line	PARAMS ((const U_CHAR *, unsigned int,
 					 unsigned long *));
 static void do_diagnostic	PARAMS ((cpp_reader *, enum error_type, int));
-static cpp_hashnode *lex_macro_node	PARAMS ((cpp_reader *));
+static cpp_hashnode *lex_macro_node PARAMS ((cpp_reader *));
 static void do_include_common	PARAMS ((cpp_reader *, enum include_type));
 static void do_pragma_once	PARAMS ((cpp_reader *));
 static void do_pragma_poison	PARAMS ((cpp_reader *));
 static void do_pragma_sdcc_hash PARAMS ((cpp_reader *));
-static void do_pragma_system_header	PARAMS ((cpp_reader *));
-static void do_pragma_dependency	PARAMS ((cpp_reader *));
+static void do_pragma_preproc_asm   PARAMS ((cpp_reader *));
+static void do_pragma_system_header PARAMS ((cpp_reader *));
+static void do_pragma_dependency    PARAMS ((cpp_reader *));
 static int get__Pragma_string	PARAMS ((cpp_reader *, cpp_token *));
-static unsigned char *destringize	PARAMS ((const cpp_string *,
-						 unsigned int *));
+static unsigned char *destringize   PARAMS ((const cpp_string *,
+					     unsigned int *));
 static int parse_answer PARAMS ((cpp_reader *, struct answer **, int));
 static cpp_hashnode *parse_assertion PARAMS ((cpp_reader *, struct answer **,
 					      int));
@@ -1029,6 +1030,8 @@ _cpp_init_internal_pragmas (pfile)
     
   /* Kevin abuse for SDCC. */
   cpp_register_pragma(pfile, 0, "sdcc_hash", do_pragma_sdcc_hash);
+  /* SDCC _asm specific */ 
+  cpp_register_pragma(pfile, 0, "preproc_asm", do_pragma_preproc_asm);
 }
 
 static void
@@ -1149,6 +1152,29 @@ do_pragma_sdcc_hash (pfile)
     else
     {
 	cpp_error (pfile, "invalid #pragma sdcc_hash directive, need '+' or '-'");
+    }
+}
+
+/* SDCC _asm specific
+   switch _asm block preprocessing on / off */
+static void
+do_pragma_preproc_asm (pfile)
+     cpp_reader *pfile;
+{
+  cpp_token tok;
+
+  _cpp_lex_token (pfile, &tok);
+  if (tok.type == CPP_PLUS)
+    {
+      CPP_OPTION(pfile, preproc_asm) = 1;
+    }
+  else if (tok.type == CPP_MINUS)
+    {
+      CPP_OPTION(pfile, preproc_asm)= 0;	
+    }
+  else
+    {
+      cpp_error (pfile, "invalid #pragma preproc_asm directive, need '+' or '-'");
     }
 }
 

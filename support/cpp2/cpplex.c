@@ -794,6 +794,10 @@ parse_string (pfile, token, terminator)
   POOL_COMMIT (pool, token->val.str.len + 1);
 }
 
+/* Fixed _WIN32 problem with CR-CR-LF sequences when outputting
+   comment blocks (when executed with -C option) and
+   _asm (SDCPP specific) blocks */
+
 /* Count and copy characters from src to dest, excluding CRs:
    CRs are automatically generated, because the output is
    opened in TEXT mode. If dest == NULL, only count chars */
@@ -1113,7 +1117,7 @@ _cpp_lex_token (pfile, result)
 	}
       /* SDCC _asm specific */
       /* handle _asm ... _endasm ;  */
-      else if (result->val.node == pfile->spec_nodes.n__asm)
+      else if (CPP_OPTION(pfile, preproc_asm) == 0 && result->val.node == pfile->spec_nodes.n__asm)
         {
           int read_ahead = buffer->read_ahead;
 

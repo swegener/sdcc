@@ -376,7 +376,7 @@ DEFSETFUNC (findPrevIc)
   if (isiCodeEqual (ic, cdp->diCode) &&
       isOperandEqual (cdp->sym, IC_RESULT (cdp->diCode)))
     {
-      *icp = cdp->diCode;
+	*icp = cdp->diCode;
       return 1;
     }
 
@@ -1302,6 +1302,8 @@ cseBBlock (eBBlock * ebb, int computeOnly,
       iCode *pdic;
       operand *pdop;
       iCode *defic;
+      
+      ic->eBBlockNum = ebb->bbnum;
 
       if (SKIP_IC2 (ic))
 	continue;
@@ -1527,70 +1529,14 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	  IS_ITEMP (IC_RESULT (ic)) &&
 	  !computeOnly)
 	{
-	  applyToSet (cseSet, findPrevIc, ic, &pdic);
+	    applyToSet (cseSet, findPrevIc, ic, &pdic);
 	  if (pdic && compareType (operandType (IC_RESULT (pdic)),
 				 operandType (IC_RESULT (ic))) != 1)
 	    pdic = NULL;
+	  if (pdic && port->cseOk && (*port->cseOk)(ic,pdic) == 0) 
+	      pdic = NULL;
 	}
 
-#if 0
-      /* if found then eliminate this and add to */
-      /* to cseSet an element containing result */
-      /* of this with previous opcode           */
-      if (pdic)
-	{
-	  if (IS_ITEMP (IC_RESULT (ic)))
-	    {
-	      
-	      /* replace in the remaining of this block */
-	      replaceAllSymBySym (ic->next, IC_RESULT (ic), IC_RESULT (pdic), &ebb->ndompset);
-	      /* remove this iCode from inexpressions of all
-	         its successors, it cannot be in the in expressions
-	         of any of the predecessors */
-	      for (i = 0; i < count; ebbs[i++]->visited = 0);
-	      applyToSet (ebb->succList, removeFromInExprs, ic, IC_RESULT (ic),
-			  IC_RESULT (pdic), ebb);
-
-	      /* if this was moved from another block */
-	      /* then replace in those blocks too     */
-	      if (ic->movedFrom)
-		{
-		  eBBlock *owner;
-		  for (owner = setFirstItem (ic->movedFrom); owner;
-		       owner = setNextItem (ic->movedFrom))
-		    replaceAllSymBySym (owner->sch, IC_RESULT (ic), IC_RESULT (pdic), &owner->ndompset);
-		}
-	      pdic->movedFrom = unionSets (pdic->movedFrom, ic->movedFrom, THROW_NONE);
-	    }
-	  else
-	    addSetHead (&cseSet, newCseDef (IC_RESULT (ic), pdic));
-
-	  if (!computeOnly)
-	    /* eliminate this */
-	    remiCodeFromeBBlock (ebb, ic);
-
-	  defic = pdic;
-	  change++;
-
-	  if (IS_ITEMP (IC_RESULT (ic)))
-	    continue;
-
-	}
-      else
-	{
-
-	  /* just add this as a previous expression except in */
-	  /* case of a pointer access in which case this is a */
-	  /* usage not a definition                           */
-	  if (!(POINTER_SET (ic)) && IC_RESULT (ic))
-	    {
-	      deleteItemIf (&cseSet, ifDefSymIsX, IC_RESULT (ic));
-	      addSetHead (&cseSet, newCseDef (IC_RESULT (ic), ic));
-	    }
-	  defic = ic;
-
-	}
-#else
       /* Alternate code */
       if (pdic && IS_ITEMP(IC_RESULT(ic))) {
 	  /* if previous definition found change this to an assignment */
@@ -1606,7 +1552,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	  addSetHead (&cseSet, newCseDef (IC_RESULT (ic), ic));
       }
       defic = ic;
-#endif
+
       /* if assignment to a parameter which is not
          mine and type is a pointer then delete
          pointerGets to take care of aliasing */

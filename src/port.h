@@ -226,7 +226,8 @@ typedef struct
     bool eq_nne;		/* transform a == b --> ! (a != b)  */
 
     bool arrayInitializerSuppported;  
-      
+    
+    bool (*cseOk) (iCode *ic, iCode *pdic);
 #define PORT_MAGIC 0xAC32
 /** Used at runtime to detect if this structure has been completly filled in. */
     int magic;

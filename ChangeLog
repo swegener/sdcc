@@ -1,3 +1,7 @@
+2004-02-07 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/pic16/gen.c (genCmpEq, shiftRLong): fixed declarations
+
 2004-02-06 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (decorateType),

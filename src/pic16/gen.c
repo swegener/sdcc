@@ -4996,8 +4996,8 @@ static void genCmpEq (iCode *ic, iCode *ifx)
 
 
     if(ifx && !AOP_SIZE(result)){
-    	DEBUGpic16_emitcode ("; ***","%s  %d CASE 1",__FUNCTION__,__LINE__);
         symbol *tlbl;
+    	DEBUGpic16_emitcode ("; ***","%s  %d CASE 1",__FUNCTION__,__LINE__);
         /* if they are both bit variables */
         if (AOP_TYPE(left) == AOP_CRY &&
             ((AOP_TYPE(right) == AOP_CRY) || (AOP_TYPE(right) == AOP_LIT))) {
@@ -7716,10 +7716,10 @@ static void genrshTwo (operand *result,operand *left,
 static void shiftRLong (operand *left, int offl,
                         operand *result, int sign)
 {
-    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
     int size = AOP_SIZE(result);
     int same = pic16_sameRegs(AOP(left),AOP(result));
-	int i;
+    int i;
+    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
     DEBUGpic16_emitcode ("; ***","%s  %d  offl:%d size:%d",__FUNCTION__,__LINE__,offl,size);
 

@@ -46,6 +46,7 @@ static char *_ds390_keywords[] =
 static builtins __ds390_builtins[] = {
     { "__builtin_memcpy_x2x","v",3,{"cx*","cx*","i"}}, /* void __builtin_memcpy_x2x (xdata char *,xdata char *,int) */
     { "__builtin_memcpy_c2x","v",3,{"cx*","cp*","i"}}, /* void __builtin_memcpy_c2x (xdata char *,code  char *,int) */
+    { "__builtin_memset_x","v",3,{"cx*","c","i"}},     /* void __builtin_memset     (xdata char *,char,int) 	    */
     { NULL , NULL,0, {NULL}} 			   /* mark end of table */
 };    
 void ds390_assignRegisters (eBBlock ** ebbs, int count);

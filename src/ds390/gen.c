@@ -2630,7 +2630,9 @@ genFunction (iCode * ic)
       emitcode(";", "naked function: no prologue.");
       return;
   }
-
+  
+  if (options.stack_probe) 
+      emitcode ("lcall","__stack_probe");
   /* if critical function then turn interrupts off */
   if (IFFUNC_ISCRITICAL (ftype))
     emitcode ("clr", "ea");
@@ -3556,7 +3558,7 @@ genPlus (iCode * ic)
   D (emitcode (";", "genPlus "););
 
   /* special cases :- */
-  if (isOperandEqual(IC_LEFT(ic),IC_RESULT(ic)) &&
+  if ( IS_SYMOP(IC_LEFT(ic)) && OP_SYMBOL(IC_LEFT(ic))->ruonly &&
       isOperandLiteral(IC_RIGHT(ic)) && OP_SYMBOL(IC_RESULT(ic))->ruonly) {
       aopOp (IC_RIGHT (ic), ic, TRUE, FALSE);
       size = floatFromVal (AOP (IC_RIGHT(ic))->aopu.aop_lit);
@@ -10836,6 +10838,89 @@ static void genMemcpyX2X( iCode *ic, int nparms, operand **parms, int fromc)
 }
 
 /*-----------------------------------------------------------------*/
+/* genMemsetX - gencode for memSetX data                           */
+/*-----------------------------------------------------------------*/
+static void genMemsetX(iCode *ic, int nparms, operand **parms)
+{
+    operand *to , *val , *count;
+    symbol *lbl;
+    char *l;
+    /* we know it has to be 3 parameters */
+    assert (nparms == 3);
+    
+    to = parms[0];
+    val = parms[1];
+    count = parms[2];
+
+    aopOp (to, ic, FALSE, FALSE);
+    /* get "to" into DPTR */
+    /* if the operand is already in dptr
+       then we do nothing else we move the value to dptr */
+    if (AOP_TYPE (to) != AOP_STR) {
+	/* if already in DPTR then we need to push */
+	if (AOP_TYPE(to) == AOP_DPTR) {
+	    emitcode ("push", "%s", aopGet (AOP (to), 0, FALSE, TRUE, TRUE));
+	    emitcode ("push", "%s", aopGet (AOP (to), 1, FALSE, TRUE, TRUE));
+	    if (options.model == MODEL_FLAT24)
+		emitcode ("mov", "dpx,%s", aopGet (AOP (to), 2, FALSE, FALSE, TRUE));
+	    emitcode ("pop", "dph");
+	    emitcode ("pop", "dpl");	    
+	} else {
+	    _startLazyDPSEvaluation ();
+	    /* if this is remateriazable */
+	    if (AOP_TYPE (to) == AOP_IMMD) {
+		emitcode ("mov", "dptr,%s", aopGet (AOP (to), 0, TRUE, FALSE, FALSE));
+	    } else {			/* we need to get it byte by byte */
+		emitcode ("mov", "dpl,%s", aopGet (AOP (to), 0, FALSE, FALSE, TRUE));
+		emitcode ("mov", "dph,%s", aopGet (AOP (to), 1, FALSE, FALSE, TRUE));
+		if (options.model == MODEL_FLAT24) {
+		    emitcode ("mov", "dpx,%s", aopGet (AOP (to), 2, FALSE, FALSE, TRUE));
+		}
+	    }
+	    _endLazyDPSEvaluation ();
+	}
+    }
+    freeAsmop (to, NULL, ic, FALSE);
+
+    aopOp (val, ic->next->next, FALSE,FALSE);
+    aopOp (count, ic->next->next, FALSE,FALSE);    
+    lbl =newiTempLabel(NULL);
+    /* now for the actual copy */
+    if (AOP_TYPE(count) == AOP_LIT && 
+	(int)floatFromVal (AOP(count)->aopu.aop_lit) <= 256) {
+	l = aopGet(AOP (val), 0, FALSE, FALSE, TRUE);
+	emitcode ("mov", "b,%s",aopGet(AOP(count),0,FALSE,FALSE,FALSE));
+	MOVA(l);
+	emitcode ("","%05d$:",lbl->key+100);
+	emitcode ("movx", "@dptr,a");
+	emitcode ("inc", "dptr");
+	emitcode ("djnz","b,%05d$",lbl->key+100);
+    } else {
+	symbol *lbl1 = newiTempLabel(NULL);
+	
+	emitcode ("mov","ap,%s",aopGet (AOP (count), 0, FALSE, TRUE, TRUE));
+	emitcode ("mov","b,%s",aopGet (AOP (count), 1, FALSE, TRUE, TRUE));
+	emitcode ("","%05d$:",lbl->key+100);
+	l = aopGet(AOP (val), 0, FALSE, FALSE, TRUE);
+	MOVA(l);
+	emitcode ("movx", "a,@dptr");
+	emitcode ("inc", "dptr");
+	emitcode ("mov","a,b");
+	emitcode ("orl","a,ap");
+	emitcode ("jz","%05d$",lbl1->key+100);
+	emitcode ("mov","a,ap");
+	emitcode ("add","a,#0xFF");
+	emitcode ("mov","ap,a");
+	emitcode ("mov","a,b");
+	emitcode ("addc","a,#0xFF");
+	emitcode ("mov","b,a");
+	emitcode ("sjmp","%05d$",lbl->key+100);
+	emitcode ("","%05d$:",lbl1->key+100);
+    }
+    freeAsmop (count, NULL, ic, FALSE);
+}
+
+/*-----------------------------------------------------------------*/
 /* genBuiltIn - calls the appropriate function to  generating code */
 /* for a built in function 					   */
 /*-----------------------------------------------------------------*/
@@ -10855,6 +10940,8 @@ static void genBuiltIn (iCode *ic)
 	genMemcpyX2X(bi_iCode,nbi_parms,bi_parms,0);
     } else if (strcmp(bif->name,"__builtin_memcpy_c2x")==0) {
 	genMemcpyX2X(bi_iCode,nbi_parms,bi_parms,1);
+    } else if (strcmp(bif->name,"__builtin_memset_x")==0) {
+	genMemsetX(bi_iCode,nbi_parms,bi_parms);
     } else {
 	werror(E_INTERNAL_ERROR,"unknown builtin function encountered\n");
 	return ;

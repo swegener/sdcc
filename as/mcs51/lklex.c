@@ -142,7 +142,7 @@ char *str;
 		if (p < &str[FILSPC-1])
 			*p++ = c;
 		c = get();
-	} while (c && (ctype[c] != SPACE));
+	} while (c && ((ctype[c] != SPACE)||(c == ':')||(c == '\\')));
 	while (p < &str[FILSPC])
 		*p++ = 0;
 }

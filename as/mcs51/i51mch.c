@@ -498,7 +498,7 @@ struct mne *mp;
 			v1 = -3;
 		    else   
 			v1 = e1.e_addr - dot.s_addr - 1;
-			if ((v1 < -128) || (v1 > 127))
+			if (pass == 2 && ((v1 < -128) || (v1 > 127)))
 				aerr();
 			outab(v1);
 		} else {
@@ -535,7 +535,7 @@ struct mne *mp;
 			v1 = -2;
 		    else   
 			v1 = e1.e_addr - dot.s_addr - 1;
-			if ((v1 < -128) || (v1 > 127))
+			if (pass == 2 && ((v1 < -128) || (v1 > 127)))
 				aerr();
 			outab(v1);
 		} else {

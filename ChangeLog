@@ -1,3 +1,11 @@
+2002-02-21  Sandeep Dutta  <sandeep@ddi.com>
+
+	* sdcc/src/SDCCloop.c:
+	Previous fix was not good. basic blocks that have "break" or "return" are
+	not really partof a loop , but live ranges used in these blocks should
+	be live thru the entire loop, so set partOfLoop but don't add them to
+	loop region
+
 2002-02-21    <johan@FRIJA>
 
 	* src/SDCCcse.c: fixed bug #514308

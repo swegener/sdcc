@@ -124,3 +124,19 @@ char *msprintf(hTab *pvals, const char *pformat, ...)
 
   return pret;
 }
+
+void
+mfprintf(FILE *fp, hTab *pvals, const char *pformat, ...)
+{
+  va_list ap;
+  char *p;
+
+  va_start(ap, pformat);
+
+  p = mvsprintf(pvals, pformat, ap);
+
+  va_end(ap);
+
+  fputs(p, fp);
+  Safe_free(p);
+}

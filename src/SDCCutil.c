@@ -313,3 +313,8 @@ chomp (char *sz)
     *nl = '\0';
 }
 
+hTab *
+getRuntimeVariables(void)
+{
+  return _mainValues;
+}

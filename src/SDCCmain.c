@@ -1132,7 +1132,7 @@ linkEdit (char **envp)
 	      break;
 	    }
 	}
-      fprintf (lnkfile, "-k %s/%s\n", SDCC_LIB_DIR /*STD_LIB_PATH */ , c);
+      mfprintf (lnkfile, getRuntimeVariables(), "-k {libdir}{sep}%s\n", c);
 
       /* standard library files */
       /* if (strcmp (port->target, "ds390") == 0) */

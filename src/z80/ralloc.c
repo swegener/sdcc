@@ -2046,6 +2046,11 @@ packRegsForHLUse (iCode * ic)
       return;
     }
 
+  if (getSize (operandType (IC_RESULT (ic))) != 2)
+    {
+      D (D_HLUSE, ("  + Dropping as the result size is not 2\n"));
+    }
+
   if (IS_Z80)
     {
       if (ic->op == CAST && uic->op == IPUSH)
@@ -2064,7 +2069,7 @@ packRegsForHLUse (iCode * ic)
             {
               goto hluse;
             }
-          else if (uic->op == IPUSH)
+          else if (uic->op == IPUSH && getSize (operandType (IC_LEFT (uic))) == 2)
             {
               goto hluse;
             }

@@ -85,5 +85,8 @@ bool startsWith (const char *sz, const char *key);
 */
 void chomp (char *sz);
 
+hTab *
+getRuntimeVariables(void);
+
 #endif
 

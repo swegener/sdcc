@@ -104,7 +104,7 @@ sfr at 0xb8 IP; // interupt priority
   sbit at 0xbb PT1; // timer 1
   sbit at 0xbc PS0; // serial port 0
   sbit at 0xbd PT2; // timer 2
-  sbit at 0xde PS1; // serial port 1
+  sbit at 0xbe PS1; // serial port 1
 sfr at 0xc0 SCON1; // serial 1 control
   sbit at 0xc0 RI_1;
   sbit at 0xc1 TI_1;
@@ -156,7 +156,7 @@ sfr at 0xd8 WDCON; // watch dog
   sbit at 0xdb PF1;
   sbit at 0xdc EPF1;
   sbit at 0xde POR;
-  sbit at 0xde SMOD_1;
+  sbit at 0xdf SMOD_1;
 sfr at 0xe0 ACC; // accumulator
 sfr at 0xe8 EIE; // extended interrupt enable
   sbit at 0xe8 EX2;

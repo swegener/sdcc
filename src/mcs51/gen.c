@@ -6826,10 +6826,13 @@ genRightShiftLiteral (operand * left,
 
   else if (shCount >= (size * 8))
     {
-      if (sign)
+      if (sign) {
 	/* get sign in acc.7 */
 	MOVA (aopGet (AOP (left), size - 1, FALSE, FALSE));
+      }
       addSign (result, LSB, sign);
+      freeAsmop (left, NULL, ic, TRUE);
+      freeAsmop (result, NULL, ic, TRUE);
     }
   else
     {
@@ -8449,8 +8452,9 @@ genAssign (iCode * ic)
   right = IC_RIGHT (ic);
 
   /* if they are the same */
-  if (operandsEqu (IC_RESULT (ic), IC_RIGHT (ic)))
+  if (operandsEqu (result, right)) {
     return;
+  }
 
   aopOp (right, ic, FALSE);
 

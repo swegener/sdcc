@@ -8548,6 +8548,8 @@ genRightShiftLiteral (operand * left,
 	MOVA (aopGet (AOP (left), size - 1, FALSE, FALSE, TRUE));
       }
       addSign (result, LSB, sign);
+      freeAsmop (left, NULL, ic, TRUE);
+      freeAsmop (result, NULL, ic, TRUE);
     }
   else
     {

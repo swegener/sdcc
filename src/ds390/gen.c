@@ -439,6 +439,27 @@ pointerCode (sym_link * etype)
 }
 
 /*-----------------------------------------------------------------*/
+/* leftRightUseAcc - returns size of accumulator use by operands   */
+/*-----------------------------------------------------------------*/
+static int
+leftRightUseAcc(iCode *ic)
+{
+  int accuse = 0;
+  
+  if (ic && IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic))
+      && OP_SYMBOL (IC_LEFT (ic)) && OP_SYMBOL (IC_LEFT (ic))->accuse)
+    accuse = (accuse < OP_SYMBOL (IC_LEFT (ic))->nRegs)
+             ? OP_SYMBOL (IC_LEFT (ic))->nRegs : accuse;
+    
+  if (ic && IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic))
+      && OP_SYMBOL (IC_RIGHT (ic)) && OP_SYMBOL (IC_RIGHT (ic))->accuse)
+    accuse = (accuse < OP_SYMBOL (IC_RIGHT (ic))->nRegs)
+             ? OP_SYMBOL (IC_RIGHT (ic))->nRegs : accuse;
+
+  return accuse;
+}
+
+/*-----------------------------------------------------------------*/
 /* aopForSym - for a true symbol                                   */
 /*-----------------------------------------------------------------*/
 static asmop *
@@ -446,6 +467,7 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool useDP2)
 {
   asmop *aop;
   memmap *space = SPEC_OCLS (sym->etype);
+  int accuse = leftRightUseAcc (ic);
 
   /* if already has one */
   if (sym->aop)
@@ -467,10 +489,10 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool useDP2)
 
 	  if (sym->onStack)
 	    {
-	      if (_G.accInUse)
+	      if (_G.accInUse || accuse)
 		emitcode ("push", "acc");
 
-	      if (_G.bInUse)
+	      if (_G.bInUse || (accuse>1))
 		emitcode ("push", "b");
 
 	      emitcode ("mov", "a,_bp");
@@ -481,10 +503,10 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool useDP2)
 	      emitcode ("mov", "%s,a",
 			aop->aopu.aop_ptr->name);
 
-	      if (_G.bInUse)
+	      if (_G.bInUse || (accuse>1))
 		emitcode ("pop", "b");
 
-	      if (_G.accInUse)
+	      if (_G.accInUse || accuse)
 		emitcode ("pop", "acc");
 	    }
 	  else
@@ -543,10 +565,10 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool useDP2)
 		emitcode("mov","dps,#0");
 	    }
 	}  else {
-	    if (_G.accInUse)
+	    if (_G.accInUse || accuse)
 		emitcode ("push", "acc");
 	    
-	    if (_G.bInUse)
+	    if (_G.bInUse || (accuse>1))
 		emitcode ("push", "b");
 	
 	    emitcode ("mov", "a,_bpx");
@@ -573,10 +595,10 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool useDP2)
 		emitcode ("mov", "dpl,b");
 	    }
 	    
-	    if (_G.bInUse)
+	    if (_G.bInUse || (accuse>1))
 		emitcode ("pop", "b");
 	    
-	    if (_G.accInUse)
+	    if (_G.accInUse || accuse)
 		emitcode ("pop", "acc");
 	}
 	sym->aop = aop = newAsmop ((short) (useDP2 ? AOP_DPTR2 : AOP_DPTR));

@@ -280,6 +280,29 @@ pointerCode (sym_link * etype)
 
 }
 
+
+/*-----------------------------------------------------------------*/
+/* leftRightUseAcc - returns size of accumulator use by operands   */
+/*-----------------------------------------------------------------*/
+static int
+leftRightUseAcc(iCode *ic)
+{
+  int accuse = 0;
+  
+  if (ic && IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic))
+      && OP_SYMBOL (IC_LEFT (ic)) && OP_SYMBOL (IC_LEFT (ic))->accuse)
+    accuse = (accuse < OP_SYMBOL (IC_LEFT (ic))->nRegs)
+             ? OP_SYMBOL (IC_LEFT (ic))->nRegs : accuse;
+    
+  if (ic && IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic))
+      && OP_SYMBOL (IC_RIGHT (ic)) && OP_SYMBOL (IC_RIGHT (ic))->accuse)
+    accuse = (accuse < OP_SYMBOL (IC_RIGHT (ic))->nRegs)
+             ? OP_SYMBOL (IC_RIGHT (ic))->nRegs : accuse;
+
+  return accuse;
+}
+
+
 /*-----------------------------------------------------------------*/
 /* aopForSym - for a true symbol                                   */
 /*-----------------------------------------------------------------*/
@@ -314,7 +337,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
 
 	  if (sym->onStack)
 	    {
-	      if (_G.accInUse)
+	      if (_G.accInUse || leftRightUseAcc (ic))
 		emitcode ("push", "acc");
 
 	      emitcode ("mov", "a,_bp");
@@ -325,7 +348,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
 	      emitcode ("mov", "%s,a",
 			aop->aopu.aop_ptr->name);
 
-	      if (_G.accInUse)
+	      if (_G.accInUse || leftRightUseAcc (ic))
 		emitcode ("pop", "acc");
 	    }
 	  else

@@ -1,5 +1,13 @@
 2003-08-20  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
+	Fixed bug #741761
+
+	* src/mcs51/gen.c (aopForSym, leftRightUseAcc),
+	* src/ds390/gen.c (aopForSym, leftRightUseAcc): preserve A and B
+	if the left or right operand symbols have the accuse flag set.
+
+2003-08-20  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
 	Changed the type of the result of the ! (NOT) operator to char;
 	previously it returned the same type as the source. This allows
 	us to eliminate all the genFloatNot functions (all of its target

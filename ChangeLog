@@ -1,3 +1,15 @@
+2003-03-10  Borut Razem <borut.razem@siol.net>
+
+	* src/SDCCmain.c: pipe preprocessor's output
+	* support/Util/MySystem.c, support/Util/MySystem.h: added my_popen()
+	* sdcc_vc_in.h: define pclose as _pclose for WIN32
+	* src/SDCCglue.c, src/SDCCglue.h: added set pipeSet, added function closePipes,
+	which closes all pipes in pipeSet set
+	* src/SDCCset.c: free deleted item in function deleteSetItem()
+	* src/src.dsp, src/z80/z80.dsp: files support/Util/BuildCmd.c and support/Util/MySystem.c
+	moved from z80 to src subproject
+	* .version: increased version number to 2.3.4
+
 2003-03-10  Bernhard Held <bernhard@bernhardheld.de>
 
 	* support/regression/ports/mcs51/spec.mk: increase timeout for CF's sparc to 30s
@@ -7,6 +19,17 @@
 2003-03-09  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCglobl.h: PATH_MAX is already defined in mingw32 headers
+
+2003-03-09  Borut Razem <borut.razem@siol.net>
+
+	* src/SDCCmain.c: pipe preprocessor's output
+	* support/Util/MySystem.c, support/Util/MySystem.h: added my_popen()
+	* sdcc_vc_in.h: define pclose as _pclose for WIN32
+	* src/SDCCglue.c, src/SDCCglue.h: added set pipeSet, added function closePipes,
+	which closes all pipes in pipeSet set
+	* src/SDCCset.c: free deleted item in function deleteSetItem()
+	* src/src.dsp, src/z80/z80.dsp: files support/Util/BuildCmd.c and support/Util/MySystem.c
+	moved from z80 to src subproject
 
 2003-03-09  Borut Razem <borut.razem@siol.net>
 

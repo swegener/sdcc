@@ -1602,7 +1602,7 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
       if (IS_INTEGRAL(optype)) { 
 	// maybe this is NULL, than it's ok.
 	if (!(IS_LITERAL(optype) && (SPEC_CVAL(optype).v_ulong ==0))) {
-	  if (IS_GENPTR(type)) {
+	  if (!TARGET_IS_Z80 && !TARGET_IS_GBZ80 && IS_GENPTR(type)) {
 	    // no way to set the storage
 	    if (IS_LITERAL(optype)) {
 	      werror(E_LITERAL_GENERIC);
@@ -1625,10 +1625,12 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
 	}
       }
     } else { // from a pointer to a pointer
-      if (implicit) { // if not to generic, they have to match 
-	if ((!IS_GENPTR(type) && (DCL_TYPE(optype) != DCL_TYPE(type)))) {
-	  werror(E_INCOMPAT_PTYPES);
-	  errors++;
+      if (!TARGET_IS_Z80 && !TARGET_IS_GBZ80) {
+	if (implicit) { // if not to generic, they have to match 
+	  if ((!IS_GENPTR(type) && (DCL_TYPE(optype) != DCL_TYPE(type)))) {
+	    werror(E_INCOMPAT_PTYPES);
+	    errors++;
+	  }
 	}
       }
     }

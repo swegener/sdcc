@@ -1434,13 +1434,16 @@ void aopPut (asmop *aop, char *s, int offset)
 	    else
 	  */
 
-	  if(strcmp(s,"W"))
+	  if(strcmp(s,"W")==0 )
 	    pic14_emitcode("movf","%s,w  ; %d",s,__LINE__);
 
 	  pic14_emitcode("movwf","%s",
 		   aop->aopu.aop_reg[offset]->name);
 
-	  if(strcmp(s,"W")) {
+	  if(strcmp(s,zero)==0) {
+	    emitpcode(POC_CLRF,popGet(aop,offset));
+
+	  } else if(strcmp(s,"W")==0) {
 	    pCodeOp *pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
 	    pcop->type = PO_GPR_REGISTER;
 
@@ -1450,9 +1453,13 @@ void aopPut (asmop *aop, char *s, int offset)
 	    DEBUGpic14_emitcode(";","%d",__LINE__);
 	    pcop->name = Safe_strdup(s);
 	    emitpcode(POC_MOVFW,pcop);
+	    emitpcode(POC_MOVWF,popGet(aop,offset));
+	  } else if(strcmp(s,one)==0) {
+	    emitpcode(POC_CLRF,popGet(aop,offset));
+	    emitpcode(POC_INCF,popGet(aop,offset));
+	  } else {
+	    emitpcode(POC_MOVWF,popGet(aop,offset));
 	  }
-	  emitpcode(POC_MOVWF,popGet(aop,offset));
-
 	}
 	break;
 	

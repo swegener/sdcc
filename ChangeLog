@@ -1,3 +1,11 @@
+2002-03-02    <johan@FRIJA>
+
+	* src/SDCCast.c (decorateType): fixed bug #524708
+
+	* src/SDCCval.c (floatFromVal): fixed the literal void (whatever that may be)
+
+	* src/SDCCicode.c (geniCodePtrPtrSubtract): fixed bug #524691
+
 2002-03-01  Michael Hope  <michaelh@vroom>
 
 	* src/SDCCsymt.c (initCSupport): Removed managling of support function names.

@@ -260,22 +260,28 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	  }
 	  codeOutFile = statsg->oFile;
 
+#if 1
 	  if (ival) {
 	    // set ival's lineno to where the symbol was defined
 	    lineno=ival->lineno=sym->lineDef;
-#if 0	    
+	    allocInfo = 0;
+	    eBBlockFromiCode (iCodeFromAst (ival));
+	    allocInfo = 1;
+	  }
+#else
+	  if (ival) {
+	    // set ival's lineno to where the symbol was defined
+	    lineno=ival->lineno=sym->lineDef;
 	    // check if this is a constant expression
 	    if (constExprTree(ival->right)) {
 	      allocInfo = 0;
-#endif
 	      eBBlockFromiCode (iCodeFromAst (ival));
 	      allocInfo = 1;
-#if 0
 	    } else {
 	      werror (E_CONST_EXPECTED, "found expression");
 	    }
-#endif
 	  }
+#endif
 	}	  
 
 	/* if the ival is a symbol assigned to an aggregate,

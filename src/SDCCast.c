@@ -1183,7 +1183,6 @@ bool constExprTree (ast *cexpr) {
       return FALSE;
     case EX_OP:
       if (cexpr->opval.op==ARRAYINIT) {
-	fprintf (stderr, "skipping arrayinit\n");
 	// this is a list of literals
 	return TRUE;
       }

@@ -34,11 +34,9 @@
 #include "SDCCdebug.h"
 #include "SDCCargs.h"
 
-#if NATIVE_WIN32
+#ifdef _WIN32
 #include <process.h>
-#endif
-
-#if !defined(__BORLANDC__) && !defined(_MSC_VER)
+#else
 #include <sys/stat.h>
 #include <unistd.h>
 #endif
@@ -60,16 +58,19 @@ char *dstPath = "";		/* path for the output files; */
 				/* "" is equivalent with cwd */
 char *moduleName;		/* module name is source file without path and extension */
 				/* can be NULL while linking without compiling */
+/*
+ * in following definitions fixed length arrays are very dangerous!
+ * Sets should be used instead. See definition of asmOptions.
+ */
 const char *preArgv[128];	/* pre-processor arguments  */
 int currRegBank = 0;
-int RegBankUsed[4]={1, 0, 0, 0};	/*JCF: Reg Bank 0 used by default*/
+int RegBankUsed[4]={1, 0, 0, 0}; /*JCF: Reg Bank 0 used by default*/
 struct optimize optimize;
 struct options options;
-char *VersionString = SDCC_VERSION_STR;
 int preProcOnly = 0;
 int noAssemble = 0;
+set *asmOptions = NULL;         /* set of assembler options */
 char *linkOptions[128];
-const char *asmOptions[128];
 char *libFiles[128];
 int nlibFiles = 0;
 char *libPaths[128];
@@ -242,7 +243,7 @@ unsupportedOptTable[] = {
 /** List of all default constant macros.
  */
 static const char *_baseValues[] = {
-  "cpp", "{bindir}{sep}sdcpp",
+  "cpp", "sdcpp",
   "cppextraopts", "",
   /* Path seperator character */
   "sep", DIR_SEPARATOR_STRING,
@@ -383,7 +384,7 @@ printVersionInfo ()
   for (i = 0; i < NUM_PORTS; i++)
     fprintf (stderr, "%s%s", i == 0 ? "" : "/", _ports[i]->target);
 
-  fprintf (stderr, " %s"
+  fprintf (stderr, " " SDCC_VERSION_STR
 #ifdef SDCC_SUB_VERSION_STR
 	   "/" SDCC_SUB_VERSION_STR
 #endif
@@ -401,8 +402,6 @@ printVersionInfo ()
 #else
 	   " (UNIX) \n"
 #endif
-
-	   ,VersionString
     );
 }
 
@@ -476,6 +475,28 @@ parseWithComma (char **dest, char *src)
 }
 
 /*-----------------------------------------------------------------*/
+/* setParseWithComma - separates string with comma to a set        */
+/*                                                                 */
+/* CAUTION: set items are no strdup-ed!                            */
+/*-----------------------------------------------------------------*/
+void
+setParseWithComma (set **dest, char *src)
+{
+  char *p;
+
+  /* skip the initial white spaces */
+  while (isspace (*src))
+    src++;
+
+  if ((p = strtok(src, ",")) != NULL) {
+    do
+    {
+      addSet(dest, p);
+    } while ((p = strtok(NULL, ",")) != NULL);
+  }
+}
+
+/*-----------------------------------------------------------------*/
 /* setDefaultOptions - sets the default options                    */
 /*-----------------------------------------------------------------*/
 static void
@@ -484,9 +505,7 @@ setDefaultOptions ()
   int i;
 
   for (i = 0; i < 128; i++)
-    preArgv[i] = asmOptions[i] =
-      linkOptions[i] = relFiles[i] = libFiles[i] =
-      libPaths[i] = NULL;
+    preArgv[i] = linkOptions[i] = relFiles[i] = libFiles[i] = libPaths[i] = NULL;
 
   /* first the options part */
   options.stack_loc = 0;	/* stack pointer initialised to 0 */
@@ -1088,7 +1107,7 @@ parseCmdLine (int argc, char **argv)
               /* assembler options */
 	      else if (argv[i][2] == 'a')
                 {
-                  parseWithComma ((char **) asmOptions, getStringArg("-Wa", argv, &i, argc));
+                  setParseWithComma (&asmOptions, getStringArg("-Wa", argv, &i, argc));
                 }
               else
                 {

@@ -2171,6 +2171,7 @@ genFunction (iCode * ic)
   symbol *sym;
   sym_link *ftype;
   bool   switchedPSW = FALSE;
+  int calleesaves_saved_register = -1;
 
   _G.nRegsSaved = 0;
   /* create the function header */
@@ -2367,6 +2368,9 @@ genFunction (iCode * ic)
 		  if (bitVectBitValue (sym->regsUsed, i) ||
 		      (mcs51_ptrRegReq && (i == R0_IDX || i == R1_IDX)))
 		    {
+		      /* remember one saved register for later usage */
+		      if (calleesaves_saved_register < 0)
+		        calleesaves_saved_register = i;
 		      emitcode ("push", "%s", mcs51_regWithIdx (i)->dname);
 		      _G.nRegsSaved++;
 		    }
@@ -2418,16 +2422,32 @@ genFunction (iCode * ic)
 
 	}
       else if (i > 5)
-	{
-
-	  /* ISRs will be handled by the code above, because they
-	     can't have parameters. Therefore it's save to use r0 */
-	  emitcode ("mov", "r0,a");
-	  emitcode ("mov", "a,sp");
-	  emitcode ("add", "a,#0x%02x", ((char) sym->stack & 0xff));
-	  emitcode ("mov", "sp,a");
-	  emitcode ("mov", "a,r0");
-
+        {
+	  if (IFFUNC_CALLEESAVES(sym->type))
+	    {
+	      /* if it's a callee-saves function we need a saved register */
+	      if (calleesaves_saved_register >= 0)
+		{
+		  emitcode ("mov", "%s,a", mcs51_regWithIdx (calleesaves_saved_register)->dname);
+		  emitcode ("mov", "a,sp");
+		  emitcode ("add", "a,#0x%02x", ((char) sym->stack & 0xff));
+		  emitcode ("mov", "sp,a");
+		  emitcode ("mov", "a,%s", mcs51_regWithIdx (calleesaves_saved_register)->dname);
+		}
+	      else
+		/* do it the hard way */
+		while (i--)
+		  emitcode ("inc", "sp");
+	    }
+	  else
+	    {
+	      /* not callee-saves, we can clobber ar0 */
+	      emitcode ("mov", "ar0,a");
+	      emitcode ("mov", "a,sp");
+	      emitcode ("add", "a,#0x%02x", ((char) sym->stack & 0xff));
+	      emitcode ("mov", "sp,a");
+	      emitcode ("mov", "a,ar0");
+	    }
 	}
       else
 	while (i--)

@@ -86,9 +86,10 @@ typedef struct PIC_device {
 } PIC_device;
 
 /* Given a pointer to a register, this macro returns the bank that it is in */
-#define REG_BANK(r)        (finalMapping[(r)->address].bank)
-#define REG_isALIASED(r)   (finalMapping[(r)->address].alias != 0)
-#define REG_isVALID(r)     (finalMapping[(r)->address].isValid)
+#define REG_ADDR(r)        ((r)->isBitField ? (((r)->address)>>3) : (r)->address)
+#define REG_BANK(r)        (finalMapping[REG_ADDR(r)].bank)
+#define REG_isALIASED(r)   (finalMapping[REG_ADDR(r)].alias != 0)
+#define REG_isVALID(r)     (finalMapping[REG_ADDR(r)].isValid)
 
 
 /****************************************/

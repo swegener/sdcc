@@ -416,7 +416,7 @@ int validAddress(int address, int reg_size)
     fprintf(stderr, "missing \"#pragma maxram\" setting\n");
     return 0;
   }
-
+  //  fprintf(stderr, "validAddress: Checking 0x%04x\n",address);
   if(address > pic->maxRAMaddress)
     return 0;
 

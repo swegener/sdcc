@@ -691,9 +691,10 @@ allocDirReg (operand *op )
 	reg->type = REG_SFR;
       }
 
-      if (IS_BITVAR (OP_SYM_ETYPE(op)))
+      if (IS_BITVAR (OP_SYM_ETYPE(op))) {
 	addSet(&dynDirectBitRegs, reg);
-      else
+	reg->isBitField = 1;
+      } else
 	addSet(&dynDirectRegs, reg);
 
     } else {

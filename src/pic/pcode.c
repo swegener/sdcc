@@ -3824,7 +3824,7 @@ void BanksUsedFlow(pBlock *pb)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-void insertBankSwitch(pCode *pc, int Set_Clear, int RP_BankBit)
+void insertBankSwitch(int position, pCode *pc, int Set_Clear, int RP_BankBit)
 {
   pCode *new_pc;
 
@@ -3837,7 +3837,15 @@ void insertBankSwitch(pCode *pc, int Set_Clear, int RP_BankBit)
     new_pc = newpCode((Set_Clear ? POC_BSF : POC_BCF),
 		      popCopyGPR2Bit(PCOP(&pc_status),RP_BankBit));
 
-  pCodeInsertAfter(pc->prev, new_pc);
+  if(position) {
+    /* insert the bank switch after this pc instruction */
+    pCode *pcnext = findNextInstruction(pc);
+    pCodeInsertAfter(pc, new_pc);
+    if(pcnext)
+      pc = pcnext;
+
+  } else
+    pCodeInsertAfter(pc->prev, new_pc);
 
   /* Move the label, if there is one */
 
@@ -3890,18 +3898,18 @@ void FixRegisterBankingInFlow(pCodeFlow *pcfl, int cur_bank)
 	case 0:
 	  break;
 	case 1:
-	  insertBankSwitch(pc, cur_bank&1, PIC_RP0_BIT);
+	  insertBankSwitch(0, pc, cur_bank&1, PIC_RP0_BIT);
 	  break;
 	case 2:
-	  insertBankSwitch(pc, cur_bank&2, PIC_RP1_BIT);
-	  insertBankSwitch(pc, cur_bank&2, PIC_RP1_BIT);
+	  insertBankSwitch(0, pc, cur_bank&2, PIC_RP1_BIT);
+	  insertBankSwitch(0, pc, cur_bank&2, PIC_RP1_BIT);
 	  break;
 	case 3:
 	  if(cur_bank & 3) {
-	    insertBankSwitch(pc, cur_bank&1, PIC_RP0_BIT);
-	    insertBankSwitch(pc, cur_bank&2, PIC_RP1_BIT);
+	    insertBankSwitch(0, pc, cur_bank&1, PIC_RP0_BIT);
+	    insertBankSwitch(0, pc, cur_bank&2, PIC_RP1_BIT);
 	  } else
-	    insertBankSwitch(pc, -1, -1);
+	    insertBankSwitch(0, pc, -1, -1);
 	  break;
 	  /*
 	    new_pc = newpCode(((cur_bank&1) ? POC_BSF : POC_BCF),
@@ -4494,11 +4502,10 @@ void FixRegisterBanking(pBlock *pb)
 {
   pCode *pc=NULL;
   pCode *pcprev=NULL;
-  pCode *new_pc;
 
   int cur_bank;
   regs *reg;
-  //  return;
+
   if(!pb)
     return;
 
@@ -4522,60 +4529,102 @@ void FixRegisterBanking(pBlock *pb)
 	//genericPrint(stderr, pc);
 
 	reg = getRegFromInstruction(pc);
-	#if 0
+#if 0
 	if(reg) {
 	  fprintf(stderr, "  %s  ",reg->name);
-	  fprintf(stderr, "addr = 0x%03x, bank = %d\n",reg->address,REG_BANK(reg));
+	  fprintf(stderr, "addr = 0x%03x, bank = %d, bit=%d\n",
+		  reg->address,REG_BANK(reg),reg->isBitField);
 
 	}
-	#endif
+#endif
 	if(reg && REG_BANK(reg)!=cur_bank) {
+	  //fprintf(stderr,"need to switch banks\n");
 	  /* Examine the instruction before this one to make sure it is
 	   * not a skip type instruction */
 	  pcprev = findPrevpCode(pc->prev, PC_OPCODE);
 	  if(!pcprev || (pcprev && !isPCI_SKIP(pcprev))) {
 	    int b = cur_bank ^ REG_BANK(reg);
 
-	    //fprintf(stderr, "Cool! can switch banks\n");
 	    cur_bank = REG_BANK(reg);
-	    if(b & 1) {
-	      new_pc = newpCode(((cur_bank&1) ? POC_BSF : POC_BCF),
-				popCopyGPR2Bit(PCOP(&pc_status),PIC_RP0_BIT));
-	      pCodeInsertAfter(pc->prev, new_pc);
-	      if(PCI(pc)->label) { 
-		PCI(new_pc)->label = PCI(pc)->label;
-		PCI(pc)->label = NULL;
-	      }
-	      /*
-		new_pc = newpCode(((cur_bank&1) ? POC_BCF : POC_BSF),
-		popCopyGPR2Bit(PCOP(&pc_status),PIC_RP0_BIT));
-		pCodeInsertAfter(pc, new_pc);
-	      */
+
+	    switch(b & 3) {
+	    case 0:
+	      break;
+	    case 1:
+	      insertBankSwitch(0, pc, cur_bank&1, PIC_RP0_BIT);
+	      break;
+	    case 2:
+	      insertBankSwitch(0, pc, cur_bank&2, PIC_RP1_BIT);
+	      insertBankSwitch(0, pc, cur_bank&2, PIC_RP1_BIT);
+	      break;
+	    case 3:
+	      if(cur_bank & 3) {
+		insertBankSwitch(0, pc, cur_bank&1, PIC_RP0_BIT);
+		insertBankSwitch(0, pc, cur_bank&2, PIC_RP1_BIT);
+	      } else
+		insertBankSwitch(0, pc, -1, -1);
+	      break;
 
 	    }
 
-	  } else {
+
+	  }else {
 	    //fprintf(stderr, "Bummer can't switch banks\n");
 	    ;
 	  }
 	}
+
+	pcprev = pc;
+
       }
 
-      pcprev = pc;
       pc = pc->next;
       // } while(pc && !(isPCFL(pc))); 
 
 
   }while (pc);
 
-    if(pcprev && cur_bank) {
-      /* Brute force - make sure that we point to bank 0 at the
-       * end of each flow block */
-      new_pc = newpCode(POC_BCF,
-			popCopyGPR2Bit(PCOP(&pc_status),PIC_RP0_BIT));
-      pCodeInsertAfter(pcprev, new_pc);
-      cur_bank = 0;
+  if(pcprev && cur_bank) {
+
+    int pos = 1;  /* Assume that the bank swithc instruction(s)
+		   * are inserted after this instruction */
+
+    if((PCI(pcprev)->op == POC_RETLW) || 
+       (PCI(pcprev)->op == POC_RETURN) || 
+       (PCI(pcprev)->op == POC_RETFIE)) {
+
+      /* oops, a RETURN - we need to switch banks *before* the RETURN */
+
+      pos = 0;
+
+    } 
+	    
+    /* Brute force - make sure that we point to bank 0 at the
+     * end of each flow block */
+
+    switch(cur_bank & 3) {
+    case 0:
+      break;
+    case 1:
+      insertBankSwitch(pos, pcprev, 0, PIC_RP0_BIT);
+      break;
+    case 2:
+      insertBankSwitch(pos, pcprev, 0, PIC_RP1_BIT);
+      insertBankSwitch(pos, pcprev, 0, PIC_RP1_BIT);
+      break;
+    case 3:
+      insertBankSwitch(pos, pcprev, -1, -1);
+      break;
+
     }
+/*
+    new_pc = newpCode(POC_BCF,
+		      popCopyGPR2Bit(PCOP(&pc_status),PIC_RP0_BIT));
+    pCodeInsertAfter(pcprev, new_pc);
+*/
+    cur_bank = 0;
+    //fprintf(stderr, "Brute force switch\n");
+  }
 
 }
 

@@ -267,7 +267,6 @@ void
 setMainValue (const char *pname, const char *pvalue)
 {
   assert(pname);
-  assert(pvalue);
 
   shash_add (&_mainValues, pname, pvalue);
 }
@@ -319,15 +318,16 @@ getRuntimeVariables(void)
 char *strncpyz(char *dest, const char *src, size_t n)
 {
     assert(n > 0);
-    
+
+    --n;
     // paranoia...
-    if (strlen(src) >= n)
+    if (strlen(src) > n)
     {
 	fprintf(stderr, "strncpyz prevented buffer overrun!\n");
     }
     
     strncpy(dest, src, n);
-    dest[n - 1] = 0;
+    dest[n] = 0;
     return dest;
 }
 
@@ -360,30 +360,29 @@ char *strncatz(char *dest, const char *src, size_t n)
 #if defined(HAVE_VSNPRINTF) || defined(HAVE_VSPRINTF)
 size_t SDCCsnprintf(char *dst, size_t n, const char *fmt, ...)
 {
-    va_list args;
-    int  len;
-    
-    va_start(args, fmt);
-    
-# if defined(HAVE_VSNPRINTF)    
-    len = vsnprintf(dst, n, fmt, args);
+  va_list args;
+  int len;
+
+  va_start(args, fmt);
+
+# if defined(HAVE_VSNPRINTF)
+  len = vsnprintf(dst, n, fmt, args);
 # else
-    vsprintf(dst, fmt, args);
-    len = strlen(dst) + 1;
-# endif    
-    
-    va_end(args);
-    
-    /* on some gnu systems, vsnprintf returns -1 if output is truncated.
-     * In the C99 spec, vsnprintf returns the number of characters that 
-     * would have been written, were space available.
-     */
-    if ((len < 0) || len >= n)
-    {
-	fprintf(stderr, "internal error: sprintf truncated.\n");
-    }
-    
-    return len;
+  vsprintf(dst, fmt, args);
+  len = strlen(dst) + 1;
+# endif
+
+  va_end(args);
+
+  /* on some gnu systems, vsnprintf returns -1 if output is truncated.
+   * In the C99 spec, vsnprintf returns the number of characters that 
+   * would have been written, were space available.
+   */
+  if ((len < 0) || (size_t) len >= n) {
+    fprintf(stderr, "internal error: sprintf truncated.\n");
+  }
+
+  return len;
 }
 
 #endif

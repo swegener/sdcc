@@ -24,3 +24,6 @@ extern char *lbasename(const char *path);
 
 #define TARGET_OBJECT_SUFFIX ".rel"
 
+#ifdef _WIN32
+#define HAVE_DOS_BASED_FILE_SYSTEM
+#endif

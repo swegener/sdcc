@@ -25,20 +25,25 @@ int getbyte(char **p)
 int main(int argc, char **argv)
 {
     int opt;
-    int size = 32768;
+    int size = 32768, pack = 0, real_size = 0;
     BYTE *rom;
     char line[256];
     char *p;
 
-    while ((opt = getopt(argc, argv, "s:h"))!=-1) {
+    while ((opt = getopt(argc, argv, "ps:h"))!=-1) {
 	switch (opt) {
 	case 's':
 	    size = atoi(optarg);
 	    break;
 	case 'h':
 	    printf("makebin: convert a Intel IHX file to binary.\n"
-		   "Usage: %s [-s romsize] [-h]\n", argv[0]);
+		   "Usage: %s [-p] [-s romsize] [-h]\n", argv[0]);
 	    return 0;
+	case 'p':
+	    pack = 1;
+	    break;
+	default:
+	    return 1;
 	}
     }
     rom = malloc(size);
@@ -64,7 +69,15 @@ int main(int argc, char **argv)
 	    if (addr < size)
 		rom[addr++] = getbyte(&p);
 	}
+
+	if (addr > real_size)
+	    real_size = addr;
     }
-    fwrite(rom, 1, size, stdout);
+
+    if (pack)
+        fwrite(rom, 1, real_size, stdout);
+    else
+        fwrite(rom, 1, size, stdout);
+    
     return 0;
 }

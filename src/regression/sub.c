@@ -179,6 +179,50 @@ void sub_bit2uint(void)
     failures++;
 
 }
+
+void sub_ucharFromLit(void)
+{
+
+  achar0 = 2 - achar0;
+
+  if(achar0 != 2)
+    failures++;
+
+
+  aint0 = 2 - aint0;
+
+  if(aint0 != 2)
+    failures++;
+
+  aint0--;
+
+  if(aint0 != 1)
+    failures++;
+
+  aint0 = 0x100 - aint0;
+
+  if(aint0 != 0xff)
+    failures++;
+
+  aint0 = 0xff00 - aint0;
+
+  if(aint0 != 0xfe01)
+    failures++;
+
+  aint0 = 0x0e01 - aint0;
+
+  if(aint0 != 0x1000)
+    failures++;
+
+  aint0 = 0x10ff - aint0;
+
+  if(aint0 != 0xff)
+    failures++;
+
+
+
+}
+
 void main(void)
 {
 
@@ -202,6 +246,9 @@ void main(void)
   sub_bit2uint();
 #endif
 
+  aint0 = 0;
+  achar0 = 0;
+  sub_ucharFromLit();
 
   success = failures;
   done();

@@ -63,6 +63,49 @@
 #include "pcode.h"
 #include "gen.h"
 
+const char *AopType(short type)
+{
+  switch(type) {
+  case AOP_LIT:
+    return "AOP_LIT";
+    break;
+  case AOP_REG:
+    return "AOP_REG";
+    break;
+  case AOP_DIR:
+    return "AOP_DIR";
+    break;
+  case AOP_DPTR:
+    return "AOP_DPTR";
+    break;
+  case AOP_DPTR2:
+    return "AOP_DPTR2";
+    break;
+  case AOP_R0:
+    return "AOP_R0";
+    break;
+  case AOP_R1:
+    return "AOP_R1";
+    break;
+  case AOP_STK:
+    return "AOP_STK";
+    break;
+  case AOP_IMMD:
+    return "AOP_IMMD";
+    break;
+  case AOP_STR:
+    return "AOP_STR";
+    break;
+  case AOP_CRY:
+    return "AOP_CRY";
+    break;
+  case AOP_ACC:
+    return "AOP_ACC";
+    break;
+  }
+
+  return "BAD TYPE";
+}
 /*-----------------------------------------------------------------*/
 /* genPlusIncr :- does addition with increment if possible         */
 /*-----------------------------------------------------------------*/
@@ -335,7 +378,6 @@ static void genAddLit (operand *result,operand *left, int lit)
 {
 
   int size,same;
-  int knowW=0,W=0,needC=0;
 
   DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
   size = pic14_getDataSize(result);
@@ -957,7 +999,7 @@ void genMinusBits (iCode *ic)
 /*-----------------------------------------------------------------*/
 void genMinus (iCode *ic)
 {
-  int size, offset = 0;
+  int size, offset = 0,same;
   unsigned long lit = 0L;
 
   DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
@@ -971,6 +1013,11 @@ void genMinus (iCode *ic)
     IC_RIGHT(ic) = IC_LEFT(ic);
     IC_LEFT(ic) = t;
   }
+
+  DEBUGpic14_emitcode ("; ","result %s, left %s, right %s",
+		   AopType(AOP_TYPE(IC_RESULT(ic))),
+		   AopType(AOP_TYPE(IC_LEFT(ic))),
+		   AopType(AOP_TYPE(IC_RIGHT(ic))));
 
   /* special cases :- */
   /* if both left & right are in bit space */
@@ -986,6 +1033,7 @@ void genMinus (iCode *ic)
   //    goto release;   
 
   size = pic14_getDataSize(IC_RESULT(ic));   
+  same = pic14_sameRegs(AOP(IC_RIGHT(ic)), AOP(IC_RESULT(ic)));
 
   if(AOP(IC_RIGHT(ic))->type == AOP_LIT) {
     /* Add a literal to something else */
@@ -1105,7 +1153,98 @@ void genMinus (iCode *ic)
       }
 
     }
+  } else   if(// (AOP_TYPE(IC_LEFT(ic)) == AOP_IMMD) || 
+	      (AOP(IC_LEFT(ic))->type == AOP_LIT) &&
+	      (AOP_TYPE(IC_RIGHT(ic)) != AOP_ACC)) {
+
+    lit = (unsigned long)floatFromVal(AOP(IC_LEFT(ic))->aopu.aop_lit);
+    DEBUGpic14_emitcode ("; left is lit","line %d result %s, left %s, right %s",__LINE__,
+		   AopType(AOP_TYPE(IC_RESULT(ic))),
+		   AopType(AOP_TYPE(IC_LEFT(ic))),
+		   AopType(AOP_TYPE(IC_RIGHT(ic))));
+
+
+    if( (size == 1) && ((lit & 0xff) == 0) ) {
+      /* res = 0 - right */
+      if (pic14_sameRegs(AOP(IC_RIGHT(ic)), AOP(IC_RESULT(ic))) ) {
+	emitpcode(POC_COMF,  popGet(AOP(IC_RIGHT(ic)),0,FALSE,FALSE));
+      } else { 
+	emitpcode(POC_MOVFW,  popGet(AOP(IC_RIGHT(ic)),0,FALSE,FALSE));
+	emitpcode(POC_MOVWF,  popGet(AOP(IC_RESULT(ic)),0,FALSE,FALSE));
+      }
+      goto release;
+    }
+
+    emitpcode(POC_MOVFW,  popGet(AOP(IC_RIGHT(ic)),0,FALSE,FALSE));
+    emitpcode(POC_SUBLW, popGetLit(lit & 0xff));    
+    emitpcode(POC_MOVWF,popGet(AOP(IC_RESULT(ic)),0,FALSE,FALSE));
+
+
+    offset = 1;
+    while(--size) {
+      lit >>= 8;
+
+      if(size == 1) {
+	/* This is the last byte in a multibyte subtraction 
+	 * There are a couple of tricks we can do by not worrying about 
+	 * propogating the carry */
+	if(lit == 0xff) {
+	  /* 0xff - x == ~x */
+	  if(same) {
+	    emitpcode(POC_COMF,  popGet(AOP(IC_RESULT(ic)),offset,FALSE,FALSE));
+	    emitSKPC;
+	    emitpcode(POC_DECF,  popGet(AOP(IC_RESULT(ic)),offset,FALSE,FALSE));
+	  } else {
+	    emitpcode(POC_COMFW, popGet(AOP(IC_RIGHT(ic)),offset,FALSE,FALSE));
+	    emitpcode(POC_MOVWF, popGet(AOP(IC_RESULT(ic)),offset,FALSE,FALSE));
+	    emitSKPC;
+	    emitpcode(POC_DECF,  popGet(AOP(IC_RESULT(ic)),offset,FALSE,FALSE));
+	  }
+	} else {
+	    emitpcode(POC_MOVFW, popGet(AOP(IC_RIGHT(ic)),offset,FALSE,FALSE));
+	    emitSKPC;
+	    emitpcode(POC_INCFW, popGet(AOP(IC_RIGHT(ic)),offset,FALSE,FALSE));
+	    emitpcode(POC_SUBLW, popGetLit(lit & 0xff));
+	    emitpcode(POC_MOVWF, popGet(AOP(IC_RESULT(ic)),offset,FALSE,FALSE));
+	}
+
+	goto release;
+      }
+
+      if(same) {
+
+	if(lit & 0xff) {
+	  emitpcode(POC_MOVLW, popGetLit(lit & 0xff));
+	  emitSKPC;
+	  emitpcode(POC_MOVLW, popGetLit((lit & 0xff)-1));
+	  emitpcode(POC_SUBWF,  popGet(AOP(IC_RESULT(ic)),offset,FALSE,FALSE));
+	} else {
+	  emitSKPNC;
+	  emitpcode(POC_SUBWF,  popGet(AOP(IC_RESULT(ic)),offset,FALSE,FALSE));
+
+	}
+      } else {
+
+	if(lit & 0xff) {
+	  emitpcode(POC_MOVLW, popGetLit(lit & 0xff));
+	  emitpcode(POC_MOVWF, popGet(AOP(IC_RESULT(ic)),offset,FALSE,FALSE));
+	} else
+	  emitpcode(POC_CLRF, popGet(AOP(IC_RESULT(ic)),offset,FALSE,FALSE));
+
+	emitpcode(POC_MOVFW,  popGet(AOP(IC_RIGHT(ic)),offset,FALSE,FALSE));
+	emitSKPC;
+	emitpcode(POC_INCFSZW,popGet(AOP(IC_RIGHT(ic)),offset,FALSE,FALSE));
+	emitpcode(POC_SUBWF,  popGet(AOP(IC_RESULT(ic)),offset,FALSE,FALSE));
+      }
+    }
+  
+
   } else {
+
+    DEBUGpic14_emitcode ("; ","line %d result %s, left %s, right %s",__LINE__,
+		   AopType(AOP_TYPE(IC_RESULT(ic))),
+		   AopType(AOP_TYPE(IC_LEFT(ic))),
+		   AopType(AOP_TYPE(IC_RIGHT(ic))));
 
     if(strcmp(aopGet(AOP(IC_LEFT(ic)),0,FALSE,FALSE),"a") == 0 ) {
       DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
@@ -1165,7 +1304,7 @@ void genMinus (iCode *ic)
 	emitpcode(POC_MOVWF,  popGet(AOP(IC_RESULT(ic)),0,FALSE,FALSE));
       }
       emitpcode(POC_MOVFW,  popGet(AOP(IC_RIGHT(ic)),offset,FALSE,FALSE));
-      emitSKPNC;
+      emitSKPC;
       emitpcode(POC_INCFSZW,popGet(AOP(IC_RIGHT(ic)),offset,FALSE,FALSE));
       emitpcode(POC_SUBWF,  popGet(AOP(IC_RESULT(ic)),offset,FALSE,FALSE));
 

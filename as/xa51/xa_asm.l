@@ -206,6 +206,7 @@ ISEG		{LIST; yylval = AREA_ISEG; return AREA_NAME;}
 BSEG		{LIST; yylval = AREA_BSEG; return AREA_NAME;}
 XSEG		{LIST; yylval = AREA_XSEG; return AREA_NAME;}
 XISEG		{LIST; yylval = AREA_XISEG; return AREA_NAME;}
+XINIT		{LIST; yylval = AREA_XINIT; return AREA_NAME;}
 GSINIT		{LIST; yylval = AREA_GSINIT; return AREA_NAME;}
 GSFINAL		{LIST; yylval = AREA_GSFINAL; return AREA_NAME;}
 HOME		{LIST; yylval = AREA_HOME; return AREA_NAME;}

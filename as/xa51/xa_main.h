@@ -57,10 +57,11 @@ extern int current_area;
 #define AREA_BSEG	4
 #define AREA_XSEG	5
 #define AREA_XISEG	6
-#define AREA_GSINIT	7
-#define AREA_GSFINAL	8
-#define AREA_HOME	9
-#define NUM_AREAS	10
+#define AREA_XINIT	7
+#define AREA_GSINIT	8
+#define AREA_GSFINAL	9
+#define AREA_HOME	10
+#define NUM_AREAS	11
 
 extern struct area_struct area[NUM_AREAS];
 

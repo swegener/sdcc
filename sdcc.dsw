@@ -159,18 +159,6 @@ Package=<4>
 
 ###############################################################################
 
-Project: "sdcpp"=.\support\cpp\sdcpp.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
 Project: "src"=.\src\src.dsp - Package Owner=<4>
 
 Package=<5>
@@ -194,6 +182,36 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name mcs51
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name xa51
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "xa51"=.\src\xa51\xa51.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name xa51a
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "xa51a"=.\src\xa51\xa51a.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
 }}}
 
 ###############################################################################
@@ -236,4 +254,3 @@ Package=<3>
 }}}
 
 ###############################################################################
-

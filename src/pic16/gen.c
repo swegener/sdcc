@@ -5149,15 +5149,18 @@ static void gencjne(operand *left, operand *right, operand *result, iCode *ifx)
   int res_offset = 0;  /* the result may be a different size then left or right */
   int res_size = AOP_SIZE(result);
   resolvedIfx rIfx;
-  symbol *lbl;
+  symbol *lbl, *lbl_done;
 
   unsigned long lit = 0L;
+  int preserve_result = 0; /* don't touch result before we are done, if left/right == result */
+
   DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
   DEBUGpic16_pic16_AopType(__LINE__,left,right,result);
   if(result)
     DEBUGpic16_emitcode ("; ***","%s  %d result is not null",__FUNCTION__,__LINE__);
   resolveIfx(&rIfx,ifx);
   lbl =  newiTempLabel(NULL);
+  lbl_done =  newiTempLabel(NULL);
 
 
   /* if the left side is a literal or 
@@ -5172,13 +5175,24 @@ static void gencjne(operand *left, operand *right, operand *result, iCode *ifx)
   if(AOP_TYPE(right) == AOP_LIT)
     lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
 
+  if ( regsInCommon(left, result) || regsInCommon(right, result) )
+    preserve_result = 1;
+
+  if(result && !preserve_result)
+    {
+      int i;
+      for(i = 0; i < AOP_SIZE(result); i++)
+        pic16_emitpcode(POC_CLRF,pic16_popGet(AOP(result),i));
+    }
+
+
   /* if the right side is a literal then anything goes */
   if (AOP_TYPE(right) == AOP_LIT &&
       AOP_TYPE(left) != AOP_DIR ) {
     switch(size) {
     case 2:
       genc16bit2lit(left, lit, 0);
-      emitSKPNZ;
+      emitSKPZ;
       pic16_emitpcode(POC_GOTO,pic16_popGetLabel(lbl->key));
       break;
     default:
@@ -5191,7 +5205,7 @@ static void gencjne(operand *left, operand *right, operand *result, iCode *ifx)
 	  pic16_emitpcode(POC_MOVF,pic16_popGet(AOP(left),offset));
 	}
 
-	emitSKPNZ;
+	emitSKPZ;
 	pic16_emitpcode(POC_GOTO,pic16_popGetLabel(lbl->key));
 	offset++;
 	if(res_offset < res_size-1)
@@ -5212,7 +5226,7 @@ static void gencjne(operand *left, operand *right, operand *result, iCode *ifx)
     int lbl_key = lbl->key;
 
     if(result) {
-      pic16_emitpcode(POC_CLRF,pic16_popGet(AOP(result),res_offset));
+      // pic16_emitpcode(POC_CLRF,pic16_popGet(AOP(result),res_offset));
       //pic16_emitpcode(POC_INCF,pic16_popGet(AOP(result),res_offset));
     }else {
       DEBUGpic16_emitcode ("; ***","%s  %d -- ERROR",__FUNCTION__,__LINE__);
@@ -5220,7 +5234,7 @@ static void gencjne(operand *left, operand *right, operand *result, iCode *ifx)
 	      __FUNCTION__,__LINE__);
       return;
     }
-
+   
 /*     switch(size) { */
 /*     case 2: */
 /*       genc16bit2lit(left, lit, 0); */
@@ -5244,8 +5258,8 @@ static void gencjne(operand *left, operand *right, operand *result, iCode *ifx)
 	  break;
 	case 1:
 	  pic16_emitpcode(POC_DECFSZW,pic16_popGet(AOP(left),offset));
-	  pic16_emitpcode(POC_INCF,pic16_popGet(AOP(result),res_offset));
-	  //pic16_emitpcode(POC_GOTO,pic16_popGetLabel(lbl->key));
+	  //pic16_emitpcode(POC_INCF,pic16_popGet(AOP(result),res_offset));
+	  pic16_emitpcode(POC_GOTO,pic16_popGetLabel(lbl->key));
 	  emit_skip=0;
 	  break;
 	case 0xff:
@@ -5321,11 +5335,31 @@ static void gencjne(operand *left, operand *right, operand *result, iCode *ifx)
     }
   }
 
-  pic16_emitpcode(POC_INCF,pic16_popGet(AOP(result),res_offset));
+  if(result && preserve_result)
+    {
+      int i;
+      for(i = 0; i < AOP_SIZE(result); i++)
+        pic16_emitpcode(POC_CLRF,pic16_popGet(AOP(result),i));
+    }
+
+  pic16_emitpcode(POC_INCF, pic16_popGet(AOP(result), 0));
+
+  if(result && preserve_result)
+    pic16_emitpcode(POC_GOTO,pic16_popGetLabel(lbl_done->key));
+
   if(!rIfx.condition)
     pic16_emitpcode(POC_GOTO,pic16_popGetLabel(rIfx.lbl->key));
 
   pic16_emitpLabel(lbl->key);
+
+  if(result && preserve_result)
+    {
+      int i;
+      for(i = 0; i < AOP_SIZE(result); i++)
+        pic16_emitpcode(POC_CLRF,pic16_popGet(AOP(result),i));
+
+      pic16_emitpLabel(lbl_done->key);
+   }
 
   DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 

@@ -596,6 +596,7 @@ mergeSpec (sym_link * dest, sym_link * src, char *name)
   dest->select.s._signed|=src->select.s._signed;
   SPEC_STAT (dest) |= SPEC_STAT (src);
   SPEC_EXTR (dest) |= SPEC_EXTR (src);
+  SPEC_CONST(dest) |= SPEC_CONST (src);
   SPEC_ABSA (dest) |= SPEC_ABSA (src);
   SPEC_VOLATILE (dest) |= SPEC_VOLATILE (src);
   SPEC_ADDR (dest) |= SPEC_ADDR (src);

@@ -25,6 +25,29 @@
 #define TARGET_STRING		"gbz80"
 #endif
 
+#ifdef WIN32T
+#include <time.h>
+
+void Timer(int action, char * message)
+{
+	static double start, end, total=0.0;
+    static const double secs_per_tick = 1.0 / CLOCKS_PER_SEC;
+
+    if(action==0) start=clock()*secs_per_tick;
+    else if(action==1)
+    {
+    	end=clock() * secs_per_tick;
+		printf("%s \t%f seconds.\n", message, (end-start));
+		total+=end-start;
+    }
+    else
+    {
+		printf("Total time: \t%f seconds.\n", total);
+		total=0.0;
+    }
+}
+#endif
+
 /*)Module	lkmain.c
  *
  *	The module lkmain.c contains the functions which
@@ -164,6 +187,10 @@ char *argv[];
 {
 	register char *p;
 	register int c, i;
+
+#ifdef WIN32T
+    Timer(0, "");
+#endif
 
 #ifdef GAMEBOY
 	nb_rom_banks = 2;
@@ -376,6 +403,9 @@ char *argv[];
 			reloc('E');
 		}
 	}
+#ifdef WIN32T
+    Timer(1, "Linker time");
+#endif
 	lkexit(lkerr);
 
         /* Never get here. */

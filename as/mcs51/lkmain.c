@@ -19,6 +19,29 @@
 #include <string.h>
 #include "aslink.h"
 
+#ifdef WIN32T
+#include <time.h>
+
+void Timer(int action, char * message)
+{
+	static double start, end, total=0.0;
+    static const double secs_per_tick = 1.0 / CLOCKS_PER_SEC;
+
+    if(action==0) start=clock()*secs_per_tick;
+    else if(action==1)
+    {
+    	end=clock() * secs_per_tick;
+		printf("%s \t%f seconds.\n", message, (end-start));
+		total+=end-start;
+    }
+    else
+    {
+		printf("Total time: \t%f seconds.\n", total);
+		total=0.0;
+    }
+}
+#endif
+
 /* yuck - but including unistd.h causes problems on Cygwin by redefining
  * Addr_T.
  */
@@ -175,6 +198,10 @@ char *argv[];
 {
 	register char *p;
 	register int c, i;
+
+#ifdef WIN32T
+    Timer(0, "");
+#endif
 
 	startp = (struct lfile *) new (sizeof (struct lfile));
 
@@ -343,6 +370,10 @@ char *argv[];
 	}
 	//JCF:
 	CreateAOMF51();
+
+#ifdef WIN32T
+    Timer(1, "Linker execution time");
+#endif
 
 	lkexit(lkerr);
 	return 0;

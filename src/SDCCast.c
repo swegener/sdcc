@@ -4876,7 +4876,9 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		/*----------------------------*/
 	case RETURN:
 		fprintf(outfile,"RETURN (%p) type (",tree);
-		printTypeChain(tree->right->ftype,outfile);
+		if (tree->right) {
+		    printTypeChain(tree->right->ftype,outfile);
+		}
 		fprintf(outfile,")\n");
 		ast_print(tree->right,outfile,indent+2);
 		return ;

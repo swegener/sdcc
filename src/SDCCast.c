@@ -1959,14 +1959,26 @@ decorateType (ast * tree)
     if (dtr != tree->right)
       tree->right = dtr;
 
-    /* special case for some operations: cast up right->left if type of left
-       has greater size than right */
-    if (tree->left && tree->right && IS_AST_OP(tree->right) &&
-	(tree->right->opval.op == LEFT_OP ||
-	 (tree->right->opval.op == '*' /* for int -> long only */ &&
-	  tree->right->right /* but not for deref */ ) ||
-	 tree->right->opval.op == '+' ||
-	 tree->right->opval.op == '-')) {
+#if 0 // not sure yet if this covers all the cases
+    if (IS_AST_OP(tree) &&
+	(tree->opval.op == CAST || tree->opval.op == '=') &&
+	getSize(LTYPE(tree)) > getSize(RTYPE(tree))) {
+      // this is a cast/assign to a bigger type
+      if (IS_AST_OP(tree->right) && tree->right->right &&
+	  (tree->right->opval.op == LEFT_OP ||
+	   tree->right->opval.op == '*' ||
+	   tree->right->opval.op == '+' ||
+	   tree->right->opval.op == '-')) {
+	// we should cast the operands instead of the result
+	fprintf (stderr, "*** we should promote operands instead of result\n");
+	fprintf (stderr, "(%d = %d op %d)\n", getSize(LTYPE(tree)),
+		 getSize(LTYPE(tree->right)), getSize(RTYPE(tree->right)));
+      }
+    }
+#else
+    /* special case for left shift operation : cast up right->left if type 
+       of left has greater size than right */
+    if (tree->left && tree->right && tree->right->opval.op == LEFT_OP) {
 	int lsize = getSize(LTYPE(tree));
 	int rsize = getSize(RTYPE(tree));
 
@@ -1978,7 +1990,8 @@ decorateType (ast * tree)
 					tree->right->left);
 	    tree->right = decorateType(tree->right);
 	}
-    }
+      }
+#endif
   }
 
   /* depending on type of operator do */
@@ -2397,13 +2410,17 @@ decorateType (ast * tree)
 	}
 
       LRVAL (tree) = RRVAL (tree) = 1;
-      TETYPE (tree) = getSpec (TTYPE (tree) =
-			       computeType (LTYPE (tree),
-					    RTYPE (tree)));
       /* promote result to int if left & right are char
 	 this will facilitate hardware multiplies 8bit x 8bit = 16bit */
       if (IS_CHAR(LETYPE(tree)) && IS_CHAR(RETYPE(tree))) {
+	TETYPE (tree) = getSpec (TTYPE (tree) =
+				 computeType (LTYPE (tree),
+					      RTYPE (tree)));
 	SPEC_NOUN(TETYPE(tree)) = V_INT;
+      } else {
+	TETYPE (tree) = getSpec (TTYPE (tree) =
+				 computeType (LTYPE (tree),
+					      RTYPE (tree)));
       }
       return tree;
 

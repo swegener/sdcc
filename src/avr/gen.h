@@ -71,7 +71,7 @@ void gen51Code (iCode *);
 
 extern char *fReturn8051[];
 extern char *fReturn390[];
-extern unsigned fReturnSize;
-extern char **fReturn;
+extern unsigned fAVRReturnSize;
+extern char **fAVRReturn;
 
 #endif

@@ -1704,7 +1704,7 @@ static iCode *packRegsForOneuse (iCode *ic, operand *op , eBBlock *ebp)
     
     /* only upto 2 bytes since we cannot predict
        the usage of b, & acc */
-    if (getSize(operandType(op)) > fReturnSize  &&
+    if (getSize(operandType(op)) > fAVRReturnSize  &&
 	ic->op != RETURN             &&
 	ic->op != SEND)
 	return NULL;
@@ -2352,9 +2352,9 @@ void avr_assignRegisters (eBBlock **ebbs, int count)
     ic = iCodeLabelOptimize(iCodeFromeBBlock (ebbs,count));
 
 
-    /*    genAVRCode(ic); */
-    for (; ic ; ic = ic->next)
-	    piCode(ic,stdout);
+    genAVRCode(ic);
+/*     for (; ic ; ic = ic->next) */
+/* 	    piCode(ic,stdout); */
     /* free up any _G.stackSpil locations allocated */   
     applyToSet(_G.stackSpil,deallocStackSpil);
     _G.slocNum = 0;

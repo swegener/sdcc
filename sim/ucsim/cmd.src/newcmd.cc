@@ -652,6 +652,8 @@ cl_console::print_prompt(void)
   if (flags & (CONS_PROMPT|CONS_FROZEN))
     return;
   flags|= CONS_PROMPT;
+  if (!out)
+    return;
   if (sim->arg_avail('P'))
     putc('\0', out);
   else

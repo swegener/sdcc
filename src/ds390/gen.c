@@ -2969,17 +2969,24 @@ static void adjustArithmeticResult(iCode *ic)
 #define AOP_OP_3_NOFATAL(ic, rc) \
     aopOp (IC_RIGHT(ic),ic,FALSE, FALSE); \
     aopOp (IC_LEFT(ic),ic,FALSE, (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR)); \
-    aopOp (IC_RESULT(ic),ic,TRUE, (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR) || \
-    				  (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR)); \
     if (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR2 && \
-        AOP_TYPE(IC_RESULT(ic)) == AOP_DPTR2) \
+        isOperandInFarSpace(IC_RESULT(ic))) \
     { \
+       /* No can do; DPTR & DPTR2 in use, and we need another. */ \
        rc = TRUE; \
-       freeAsmop(IC_RESULT(ic), NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE)); \
     }  \
     else \
     { \
+       aopOp (IC_RESULT(ic),ic,TRUE, (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR) || \
+                                     (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR)); \
        rc = FALSE; \
+       if (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR2 && \
+           AOP_TYPE(IC_RESULT(ic)) == AOP_DPTR2) \
+       { \
+            /* werror(E_INTERNAL_ERROR,__FILE__,__LINE__, */ \
+            fprintf(stderr,                                  \
+                    "Ack: got unexpected DP2! (%s:%d %s:%d)\n", __FILE__, __LINE__, ic->filename, ic->lineno);   \
+       } \
     }
 
 #define AOP_OP_2(ic) \
@@ -3024,6 +3031,10 @@ static void genPlus (iCode *ic)
     }
 #else
     AOP_OP_3_NOFATAL(ic, pushResult);
+    if (pushResult)
+    {
+        D(emitcode(";", "genPlus: must push result: 3 ops in far space"););
+    }
 #endif    
 
     if (!pushResult)

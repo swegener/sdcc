@@ -165,6 +165,7 @@ _hc08_genAssemblerPreamble (FILE * of)
   mainExists->block=0;
 
   fprintf (of, "\t.area %s\n",port->mem.code_name);
+  fprintf (of, "\t.area GSINIT0 (CODE)\n");
   fprintf (of, "\t.area %s\n",port->mem.static_name);
   fprintf (of, "\t.area %s\n",port->mem.post_static_name);
   fprintf (of, "\t.area %s\n",port->mem.xinit_name);
@@ -197,7 +198,7 @@ _hc08_genAssemblerPreamble (FILE * of)
 	fprintf (of, "\t.org\t0xfffe\n");
       fprintf (of, "\t.dw\t%s", "__sdcc_gs_init_startup\n\n");
         
-      fprintf (of, "\t.area GSINIT\n");
+      fprintf (of, "\t.area GSINIT0\n");
       fprintf (of, "__sdcc_gs_init_startup:\n");
       if (options.stack_loc)
         {

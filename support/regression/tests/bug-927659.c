@@ -44,7 +44,7 @@ void putchar (char c)
 void
 testAddFunc(void)
 {
-#ifndef SDCC_z80
+#if !defined(SDCC_z80) && !defined(SDCC_hc08)
   char buf[5];
   unsigned char count = 0;
 

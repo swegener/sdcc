@@ -25,6 +25,9 @@ typedef unsigned int size_t;
 # define xdata
 # define code
 #endif
+#if defined(SDCC_hc08)
+# define idata
+#endif
 
 const char *string1 = "\x00\x01";
 const char string2[] = "\x00\x01";

@@ -650,7 +650,7 @@ loadRegFromAop (regs *reg, asmop *aop, int loffset)
     }
 
 forceload:
-
+  
   switch (regidx)
     {
       case A_IDX:
@@ -662,7 +662,13 @@ forceload:
               emitcode ("clra", ""); /* TODO: handle sign extension */
           }
         else
-          emitcode ("lda","%s", aopAdrStr (aop, loffset, FALSE));
+          {
+            char * l = aopAdrStr (aop, loffset, FALSE);
+            if (!strcmp (l, zero))
+              emitcode ("clra", "");
+            else
+              emitcode ("lda", "%s", l);
+          }
         break;
       case X_IDX:
         if (aop->type == AOP_REG)
@@ -673,7 +679,13 @@ forceload:
               emitcode ("clrx", ""); /* TODO: handle sign extension */
           }
         else
-          emitcode ("ldx","%s", aopAdrStr (aop, loffset, FALSE));
+          {
+            char * l = aopAdrStr (aop, loffset, FALSE);
+            if (!strcmp (l, zero))
+              emitcode ("clrx", "");
+            else
+              emitcode ("ldx", "%s", l);
+          }
         break;
       case H_IDX:
         if (hc08_reg_a->isFree)
@@ -4847,12 +4859,37 @@ genAnd (iCode * ic, iCode * ifx)
   if (AOP_TYPE (right) == AOP_LIT)
     lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
       
+  size = (AOP_SIZE (left) >= AOP_SIZE (right)) ? AOP_SIZE (left) : AOP_SIZE (right);
+  
+  if (AOP_TYPE (result) == AOP_CRY
+      && size > 1
+      && (isOperandVolatile (left, FALSE) || isOperandVolatile (right, FALSE)))
+    {
+      /* this generates ugly code, but meets volatility requirements */
+      loadRegFromConst (hc08_reg_a, zero);
+      pushReg (hc08_reg_a, TRUE);
+      
+      offset = 0;
+      while (size--)
+        {
+          loadRegFromAop (hc08_reg_a, AOP (left), offset);
+          accopWithAop ("and", AOP (right), offset);
+          emitcode ("ora", "1,s");
+          emitcode ("sta", "1,s");
+          offset++;
+        }
+      
+      pullReg (hc08_reg_a);
+      emitcode ("tsta", "");
+      genIfxJump (ifx, "a");
+      goto release;
+    }
+  
   if (AOP_TYPE (result) == AOP_CRY)
     {
       symbol *tlbl = NULL;
       wassertl (ifx, "AOP_CRY result without ifx");
       
-      size = (AOP_SIZE (left) >= AOP_SIZE (right)) ? AOP_SIZE (left) : AOP_SIZE (right);
       offset = 0;
       while (size--)
         {
@@ -4860,11 +4897,7 @@ genAnd (iCode * ic, iCode * ifx)
           
           if (AOP_TYPE (right) == AOP_LIT && bytemask == 0)
             {
-              if (isOperandVolatile (left, FALSE))
-                {
-                  loadRegFromAop (hc08_reg_a, AOP (left), offset);
-                  hc08_freeReg( hc08_reg_a);      
-                }
+              /* do nothing */
             }
           else if (AOP_TYPE (right) == AOP_LIT && bytemask == 0xff)
             {
@@ -4893,6 +4926,7 @@ genAnd (iCode * ic, iCode * ifx)
         if (tlbl)
           emitLabel (tlbl);
         genIfxJump (ifx, "a");
+        goto release;
     }
   
   size = AOP_SIZE (result);
@@ -4989,12 +5023,37 @@ genOr (iCode * ic, iCode * ifx)
   if (AOP_TYPE (right) == AOP_LIT)
     lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
       
+  size = (AOP_SIZE (left) >= AOP_SIZE (right)) ? AOP_SIZE (left) : AOP_SIZE (right);
+  
+  if (AOP_TYPE (result) == AOP_CRY
+      && size > 1
+      && (isOperandVolatile (left, FALSE) || isOperandVolatile (right, FALSE)))
+    {
+      /* this generates ugly code, but meets volatility requirements */
+      loadRegFromConst (hc08_reg_a, zero);
+      pushReg (hc08_reg_a, TRUE);
+      
+      offset = 0;
+      while (size--)
+        {
+          loadRegFromAop (hc08_reg_a, AOP (left), offset);
+          accopWithAop ("ora", AOP (right), offset);
+          emitcode ("ora", "1,s");
+          emitcode ("sta", "1,s");
+          offset++;
+        }
+      
+      pullReg (hc08_reg_a);
+      emitcode ("tsta", "");
+      genIfxJump (ifx, "a");
+      goto release;
+    }
+  
   if (AOP_TYPE (result) == AOP_CRY)
     {
       symbol *tlbl = NULL;
       wassertl (ifx, "AOP_CRY result without ifx");
       
-      size = (AOP_SIZE (left) >= AOP_SIZE (right)) ? AOP_SIZE (left) : AOP_SIZE (right);
       offset = 0;
       while (size--)
         {
@@ -5801,7 +5860,7 @@ XAccSRsh (int shCount)
       ;
     }
 
-  /* asrx/rola is only 2 cycles and bytes, so an unrolled loop is often  */
+  /* asrx/rora is only 2 cycles and bytes, so an unrolled loop is often  */
   /* the fastest and shortest.                                           */
   for (i=0;i<shCount;i++)
     {
@@ -6472,7 +6531,7 @@ shiftRLong (operand * left, int offl,
         rmwWithReg ("asr", hc08_reg_x);
       else
         rmwWithReg ("lsr", hc08_reg_x);
-      rmwWithReg ("rol", hc08_reg_a);
+      rmwWithReg ("ror", hc08_reg_a);
       storeRegToAop (hc08_reg_xa, AOP (result), MSB24);
     }
   else if (offl==MSB16)

@@ -1,3 +1,20 @@
+2004-08-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c (loadRegFromAop): better use of clra & clrx
+	* src/hc08/gen.c (genAnd, genOr): fixed bug with conditional when
+	multi-byte volatile operands are used
+	* src/hc08/gen.c (shiftRLong): fixed bug with wrong rotate direction
+	* src/hc08/main.c (_hc08_genAssemblerPreamble): moved the built-in
+	initialization to area GSINIT0 so that it would always precede
+	any static initializers in GSINIT
+	* support/regression/tests/zeropad.c: fixed idata define for hc08
+	* support/regression/tests/bug-927659.c,
+	* support/regression/tests/float_trans.c: disabled tests for hc08
+	pending missing library routines
+	* .version: increased version number to 2.4.4 - hc08 port now passes
+	regression tests
+
+
 2004-08-29 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* device/lib/pic16/Makefile.common.in: added $(MM) to fix `make clean`

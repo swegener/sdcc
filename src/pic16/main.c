@@ -312,6 +312,8 @@ _process_pragma(const char *sz)
 
 #define	OFMSG_LRSUPPORT	"--flr-support"
 
+#define OPTIMIZE_GOTO   "--optimize-goto"
+
 char *alt_asm=NULL;
 char *alt_link=NULL;
 
@@ -352,6 +354,7 @@ OPTION pic16_optionsTable[]= {
 	{ 0,	"--no-crt",	&pic16_options.no_crt,	"do not link any default run-time initialization module"},
 	{ 0,	"--gstack",	&pic16_options.gstack,	"trace stack pointer push/pop to overflow"},
 //	{ 0,	OFMSG_LRSUPPORT,	NULL,		"use support functions for local register store/restore"},
+	{ 0,    OPTIMIZE_GOTO,  NULL,			"try to use (conditional) BRA instead of GOTO"},
 	{ 0,	NULL,		NULL,	NULL}
 	};
 
@@ -442,7 +445,14 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
       return TRUE;
     }
 #endif
-        
+
+#if 1
+    if (ISOPT(OPTIMIZE_GOTO)) {
+      pic16_options.opt_flags |= OF_OPTIMIZE_GOTO;
+      return TRUE;
+    }
+#endif
+
   return FALSE;
 }
 

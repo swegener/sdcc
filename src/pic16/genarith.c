@@ -1604,11 +1604,12 @@ void pic16_genUMult8XLit_8 (operand *left,
 {
   unsigned int lit;
   int same;
-
+  int size = AOP_SIZE(result);
+  int i;
 
 	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	DEBUGpic16_pic16_AopType(__LINE__,left,right,result);
-  
+
 	if (AOP_TYPE(right) != AOP_LIT){
 		fprintf(stderr,"%s %d - right operand is not a literal\n",__FILE__,__LINE__);
 		exit(1);
@@ -1623,12 +1624,19 @@ void pic16_genUMult8XLit_8 (operand *left,
 	if(same) {
 		switch(lit) {
 			case 0:
-				pic16_emitpcode(POC_CLRF,  pic16_popGet(AOP(result),0));
+			        while (size--) {
+				  pic16_emitpcode(POC_CLRF,  pic16_popGet(AOP(result),size));
+			        } // while
 				return;
 			case 2:
 				// its faster to left shift
+			        for (i=1; i < size; i++) {
+			          pic16_emitpcode(POC_CLRF,  pic16_popGet(AOP(result),i));
+			        } // for
 				emitCLRC;
 				pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(left),0));
+				if (size > 1)
+				  pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(result),1));
 				return;
 
 			default:
@@ -1637,18 +1645,32 @@ void pic16_genUMult8XLit_8 (operand *left,
 				pic16_emitpcode(POC_MULLW, pic16_popGetLit(lit));
 				pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_prodl),
 					pic16_popGet(AOP(result), 0)));
+				if (size > 1) {
+				  pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_prodh),
+									    pic16_popGet(AOP(result), 1)));
+				  for (i=2; i < size; i++) {
+				    pic16_emitpcode(POC_CLRF,  pic16_popGet(AOP(result),i));
+				  } // for
+				} // if
 				return;
 		}
 	} else {
 		// operands different
 		switch(lit) {
 			case 0:
-				pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(result), 0));
+			        while (size--) {
+				  pic16_emitpcode(POC_CLRF,  pic16_popGet(AOP(result),size));
+			        } // while
 				return;
 			case 2:
+			        for (i=1; i < size; i++) {
+			          pic16_emitpcode(POC_CLRF,  pic16_popGet(AOP(result),i));
+			        } // for
 				emitCLRC;
 				pic16_emitpcode(POC_RLCFW, pic16_popGet(AOP(left), 0));
 				pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result), 0));
+				if (size > 1)
+				  pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(result),1));
 				return;
 			default:
 				if(AOP_TYPE(left) != AOP_ACC)
@@ -1656,6 +1678,14 @@ void pic16_genUMult8XLit_8 (operand *left,
 				pic16_emitpcode(POC_MULLW, pic16_popGetLit(lit));
 				pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_prodl),
 					pic16_popGet(AOP(result), 0)));
+
+				if (size > 1) {
+				  pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_prodh),
+									    pic16_popGet(AOP(result), 1)));
+				  for (i=2; i < size; i++) {
+				    pic16_emitpcode(POC_CLRF,  pic16_popGet(AOP(result),i));
+				  } // for
+				} // if
 				return;
 		}
 	}

@@ -69,6 +69,7 @@ extern DEFSETFUNC (closeTmpFiles);
 extern DEFSETFUNC (rmTmpFiles);
 
 extern void pic16_AnalyzeBanking (void);
+extern void pic16_OptimizeJumps ();
 extern void copyFile (FILE * dest, FILE * src);
 extern void pic16_InlinepCode(void);
 extern void pic16_writeUsedRegs(FILE *);
@@ -1732,6 +1733,11 @@ pic16glue ()
 
     if(pic16_options.opt_flags & OF_LR_SUPPORT) {
       pic16_OptimizeLocalRegs();
+    }
+
+    /* turn GOTOs into BRAs -- added by RN 2004-11-16 */
+    if(pic16_options.opt_flags & OF_OPTIMIZE_GOTO) {
+      pic16_OptimizeJumps();
     }
 
     /* print the extern variables to this module */

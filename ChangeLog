@@ -1,3 +1,11 @@
+2004-11-25 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/device.h,
+	* src/pic16/genarith.c,
+	* src/pic16/glue.c,
+	* src/pic16/main.c,
+	* src/pic16/pcode.c: applied patches #1068154 and #1070213
+
 2004-11-24 Vangelis Rokas <vrokas AT otenet.gr>
 
 	Large cummulative patch for pic16 port.

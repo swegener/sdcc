@@ -86,7 +86,8 @@ typedef struct PIC16_device {
 /* Given a pointer to a register, this macro returns the bank that it is in */
 #define REG_ADDR(r)        ((r)->isBitField ? (((r)->address)>>3) : (r)->address)
 
-#define OF_LR_SUPPORT	0x00000001
+#define OF_LR_SUPPORT		0x00000001
+#define OF_OPTIMIZE_GOTO	0x00000002
 
 
 typedef struct {

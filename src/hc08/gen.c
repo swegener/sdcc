@@ -3325,6 +3325,8 @@ genMinus (iCode * ic)
 {
   char *sub;
   int size, offset = 0;
+  
+  asmop *leftOp, *rightOp;
 
   D(emitcode (";     genMinus",""));
 
@@ -3340,7 +3342,6 @@ genMinus (iCode * ic)
 
   size = getDataSize (IC_RESULT (ic));
 
-  asmop *leftOp, *rightOp;
 
   leftOp = AOP(IC_LEFT(ic));
   rightOp = AOP(IC_RIGHT(ic));

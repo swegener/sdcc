@@ -403,6 +403,8 @@ struct
     "%s not allowed here" },
 { E_BAD_TAG, ERROR_LEVEL_ERROR,
     "'%s' is not a %s tag" },
+{ E_ENUM_NON_INTEGER, ERROR_LEVEL_ERROR,
+   "enumeration constant not an integer" },
 };
 
 /*

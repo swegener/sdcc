@@ -26,6 +26,11 @@ enum _IndexedEnum {
 
 };
 
+volatile enum _IntEnum {
+  INT_256 = 256,
+  INT_ZERO = 0
+} ie;
+
 void
 testSimpleEnum(void)
 {
@@ -52,4 +57,16 @@ testIndexedEnum(void)
   ASSERT(INDEXED_ONE_ALIAS == 1);
   ASSERT(INDEXED_TWO == 2);
   ASSERT(INDEXED_MATH == 7);
+}
+
+void
+testIntEnum(void)
+{
+  ASSERT(INT_ZERO == 0);
+  ASSERT(INT_256 == 256);
+
+  ie = INT_ZERO;
+  ASSERT(ie == INT_ZERO);
+  ie = INT_256;
+  ASSERT(ie == INT_256);
 }

@@ -560,6 +560,7 @@ void changePointer (symbol * sym);
 void checkTypeSanity(sym_link *etype, char *name);
 sym_link *typeFromStr (char *) ;
 STORAGE_CLASS sclsFromPtr(sym_link *ptr);
+sym_link *newEnumType (symbol *);
 
 
 extern char *nounName(sym_link *); /* noun strings */

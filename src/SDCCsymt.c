@@ -3000,3 +3000,63 @@ sym_link *validateLink(sym_link 	*l,
     exit(-1);
     return l; // never reached, makes compiler happy.
 }
+
+/*--------------------------------------------------------------------*/
+/* newEnumType - create an integer type compatible with enumerations  */
+/*--------------------------------------------------------------------*/
+sym_link *
+newEnumType (symbol *enumlist)
+{
+  int min, max, v;
+  symbol *sym;
+  sym_link *type;
+
+  if (!enumlist)
+    {
+      type = newLink (SPECIFIER);
+      SPEC_NOUN (type) = V_INT;
+      return type;
+    }
+      
+  /* Determine the range of the enumerated values */
+  sym = enumlist;
+  min = max = (int) floatFromVal (valFromType (sym->type));
+  for (sym = sym->next; sym; sym = sym->next)
+    {
+      v = (int) floatFromVal (valFromType (sym->type));
+      if (v<min)
+        min = v;
+      if (v>max)
+        max = v;
+    }
+
+  /* Determine the smallest integer type that is compatible with this range */
+  type = newLink (SPECIFIER);
+  if (min>=0 && max<=255)
+    {
+      SPEC_NOUN (type) = V_CHAR;
+      SPEC_USIGN (type) = 1;
+    }
+  else if (min>=-128 && max<=127)
+    {
+      SPEC_NOUN (type) = V_CHAR;
+    }
+  else if (min>=0 && max<=65535)
+    {
+      SPEC_NOUN (type) = V_INT;
+      SPEC_USIGN (type) = 1;
+    }
+  else if (min>=-32768 && max<=32767)
+    {
+      SPEC_NOUN (type) = V_INT;
+    }
+  else
+    {
+      SPEC_NOUN (type) = V_INT;
+      SPEC_LONG (type) = 1;
+      if (min>=0)
+        SPEC_USIGN (type) = 1;
+    }
+  
+  return type;    
+}

@@ -1,3 +1,14 @@
+2004-01-06 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCC.y (enum_specifier, enumerator_list, opt_assign_expr),
+	* src/SDCCsymt.c (newEnumType),
+	* src/SDCCsymt.h
+	* support/Util/SDCCerr.c,
+	* support/Util/SDCCerr.h: fixed bug #871258 and some other unreported
+	enum related bugs.
+	* support/regression/tests/enum.c: added test for enum values that
+	require at least 2 bytes of storage.
+
 2004-01-06 Vangelis Rokas <vrokas@otenet.gr>
 
 	* src/common.h: added ifndef/define/endif macros

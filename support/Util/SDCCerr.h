@@ -189,6 +189,7 @@ SDCCERR - SDCC Standard error handler
 #define E_INVALID_CRITICAL 171	    /* operation invalid in critical sequence */
 #define E_NOT_ALLOWED 172	    /* %s not allowed here */
 #define E_BAD_TAG 173               /* '%s' is not a %s tag */
+#define E_ENUM_NON_INTEGER 174      /* enumeration constant not an integer */
 
 /** Describes the maximum error level that will be logged.  Any level
  *  includes all of the levels listed after it.

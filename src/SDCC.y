@@ -753,6 +753,7 @@ struct_or_union_specifier
 	     }
 	     if (IS_SPEC(sym->etype) && SPEC_SCLS(sym->etype)) {
 	       werrorfl(filename, sym->lineDef, E_NOT_ALLOWED, "storage class");
+	       printTypeChainRaw (sym->type,NULL);
 	       SPEC_SCLS(sym->etype) = 0;
 	     }
 	     for (dsym=sym->next; dsym; dsym=dsym->next) {
@@ -898,41 +899,26 @@ struct_declarator
 
 enum_specifier
    : ENUM            '{' enumerator_list '}' {
-           symbol *sym, *dsym;
-	   char _error=0;
-
-	   // check for duplicate enums
-	   for (sym=$3; sym; sym=sym->next) {
-	     for (dsym=sym->next; dsym; dsym=dsym->next) {
-	       if (strcmp(sym->name, dsym->name)==0) {
-		 werrorfl(filename, sym->lineDef, E_DUPLICATE_MEMBER, "enum", sym->name);
-		 _error++;
-	       }
-	     }
-	   }
-	   if (_error==0) {
-	     $$ = copyLinkChain(cenum->type);
-	   } else {
-	     $$ = newIntLink();
-	     SPEC_NOUN($$)=0;
-	   }
+	   $$ = newEnumType ($3);	//copyLinkChain(cenum->type);
+	   SPEC_SCLS(getSpec($$)) = 0;
          }
 
    | ENUM identifier '{' enumerator_list '}' {
      symbol *csym ;
+     sym_link *enumtype;
+
+     csym=findSym(enumTab,$2,$2->name);
+     if ((csym && csym->level == $2->level))
+       werrorfl(filename, $2->lineDef, E_DUPLICATE_TYPEDEF,csym->name);
      
-     $2->type = copyLinkChain(cenum->type);
-     $2->etype = getSpec($2->type);
+     enumtype = newEnumType ($4);	//copyLinkChain(cenum->type);
+     SPEC_SCLS(getSpec(enumtype)) = 0;
+     $2->type = enumtype;
+     
      /* add this to the enumerator table */
-     if (!(csym=findSym(enumTab,$2,$2->name)) && 
-	 (csym && csym->level == $2->level))
-       werror(E_DUPLICATE_TYPEDEF,csym->name);
-     
-     addSym ( enumTab,$2,$2->name,$2->level,$2->block, 0);
-     //addSymChain ($4);
-     //allocVariables (reverseSyms($4));
-     $$ = copyLinkChain(cenum->type);
-     SPEC_SCLS(getSpec($$)) = 0 ;
+     if (!csym)
+       addSym ( enumTab,$2,$2->name,$2->level,$2->block, 0);
+     $$ = copyLinkChain(enumtype);
    }
    | ENUM identifier                         {
      symbol *csym ;
@@ -944,8 +930,6 @@ enum_specifier
        $$ = newLink(SPECIFIER) ;
        SPEC_NOUN($$) = V_INT   ;
      }
-     
-     SPEC_SCLS(getSpec($$)) = 0 ;
    }
    ;
 
@@ -953,10 +937,19 @@ enumerator_list
    : enumerator
    | enumerator_list ',' {
                          }
-   | enumerator_list ',' enumerator {
-                                       $3->next = $1 ;
-                                       $$ = $3  ;
-                                    }
+   | enumerator_list ',' enumerator
+     {
+       symbol *dsym;
+       
+       for (dsym=$1; dsym; dsym=dsym->next)
+         {
+	   if (strcmp($3->name, dsym->name)==0)
+	     werrorfl(filename, $3->lineDef, E_DUPLICATE_MEMBER, "enum", $3->name);
+	 }
+       
+       $3->next = $1 ;
+       $$ = $3  ;
+     }
    ;
 
 enumerator
@@ -976,8 +969,15 @@ enumerator
 opt_assign_expr
    :  '='   constant_expr  {
                               value *val ;
-							
-                              val = constExprValue($2,TRUE);                         
+
+                              val = constExprValue($2,TRUE);
+			      if (!IS_INT(val->type) && !IS_CHAR(val->type))
+			        {
+				  werror(E_ENUM_NON_INTEGER);
+				  SNPRINTF(lbuff, sizeof(lbuff), 
+				 	  "%d",(int) floatFromVal(val));
+				  val = constVal(lbuff);
+				}
                               $$ = cenum = val ;
                            }                           
    |                       {                              

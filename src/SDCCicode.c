@@ -1786,7 +1786,7 @@ getArraySizePtr (operand * op)
   if(IS_PTR(ltype))
     {
       int size = getSize(ltype);
-      return(IS_GENPTR(ltype)?(size-1):size);
+      return((IS_GENPTR(ltype) && GPTRSIZE > FPTRSIZE) ? (size-1) : size);
     }
 
   if(IS_ARRAY(ltype))
@@ -1804,7 +1804,10 @@ getArraySizePtr (operand * op)
 	case FUNCTION:
 	  return (FPTRSIZE);
 	case GPOINTER:
-	  return (GPTRSIZE-1);
+          if (GPTRSIZE > FPTRSIZE)
+	    return (GPTRSIZE-1);
+          else
+	    return (FPTRSIZE);
 
 	default:
 	  return (FPTRSIZE);

@@ -1,3 +1,7 @@
+2005-04-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCicode.c (getArraySizePtr): fixed bug #1122171
+
 2005-04-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* device/include/Makefile.in: add support for hc08 subdirectory

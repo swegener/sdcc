@@ -112,8 +112,6 @@ pCodeOpReg pic16_pc_kzero     = {{PO_GPR_REGISTER,  "KZ"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_wsave     = {{PO_GPR_REGISTER,  "WSAVE"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_ssave     = {{PO_GPR_REGISTER,  "SSAVE"}, -1, NULL,0,NULL};
 
-pCodeOpReg pic16_pc_gptrreg     = {{PO_GPR_REGISTER,  "__GPTRREG"}, -1, NULL,0,NULL};
-
 pCodeOpReg pic16_pc_gpsimio   = {{PO_GPR_REGISTER, "GPSIMIO"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_gpsimio2  = {{PO_GPR_REGISTER, "GPSIMIO2"}, -1, NULL, 0, NULL};
 
@@ -2953,9 +2951,6 @@ void  pic16_pCodeInitRegisters(void)
 
 	pic16_pc_gpsimio.rIdx = IDX_GPSIMIO;
 	pic16_pc_gpsimio2.rIdx = IDX_GPSIMIO2;
-
-	pic16_pc_gptrreg.r = newReg(REG_SFR, PO_GPR_REGISTER, 0, "__GPTRREG", 1, 0x40, NULL);	//PO_GPR_REGISTER, 0x00);
-	pic16_pc_gptrreg.rIdx = 0;
 
 	/* probably should put this in a separate initialization routine */
 	pb_dead_pcodes = newpBlock();

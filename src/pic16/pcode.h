@@ -1051,6 +1051,5 @@ extern pCodeOpReg pic16_pc_ssave;     /* registers during an interrupt */
 
 extern pCodeOpReg pic16_pc_gpsimio;
 extern pCodeOpReg pic16_pc_gpsimio2;
-extern pCodeOpReg pic16_pc_gptrreg;
 
 #endif // __PCODE_H__

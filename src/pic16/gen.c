@@ -10920,7 +10920,13 @@ static void genGenPointerSet (operand *right,
     DEBUGpic16_emitcode ("; ***","%s  %d size=%d",__FUNCTION__,__LINE__,size);
 
 
-    /* load value to write in TBLPTRH:TBLPTRL:PRODH:PRODL */
+
+    /* load value to write in TBLPTRH:TBLPTRL:PRODH:[stack] */
+
+    /* value of right+0 is placed on stack, which will be retrieved
+     * by the support function this restoring the stack. The important
+     * thing is that there is no need to manually restore stack pointer
+     * here */
     mov2fp(pic16_popCopyReg(&pic16_pc_gptrreg), AOP(right), 0);
     if(size>1)mov2fp(pic16_popCopyReg(&pic16_pc_prodh), AOP(right), 1);
     if(size>2)mov2fp(pic16_popCopyReg(&pic16_pc_tblptrl), AOP(right), 2);
@@ -10954,9 +10960,11 @@ static void genGenPointerSet (operand *right,
         strcpy(sym->rname, fgptrput);
         checkAddSym(&externs, sym);
 
+#if 0
 	sym = newSymbol("__GPTRREG", 0);
         strcpy(sym->rname, "__GPTRREG");
         checkAddSym(&externs, sym);
+#endif
 
 //          fprintf(stderr, "%s:%d adding extern symbol %s in externs\n", __FILE__, __LINE__, fgptrget);
     }

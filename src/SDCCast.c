@@ -2930,7 +2930,8 @@ decorateType (ast * tree)
 	}
       /* if unsigned value < 0  then always false */
       /* if (unsigned value) > 0 then (unsigned value) */
-      if (SPEC_USIGN(LETYPE(tree)) && IS_LITERAL(RTYPE(tree)) && 
+      if (LETYPE(tree) && SPEC_USIGN(LETYPE(tree)) &&
+	  RTYPE(tree)  && IS_LITERAL(RTYPE(tree))  && 
 	  ((int) floatFromVal (valFromType (RETYPE (tree)))) == 0) {
 
 	  if (tree->opval.op == '<') {

@@ -20,6 +20,7 @@
 	* src/pic/gen.c (genpic14Code)
 	* src/pic/glue.c (pic14emitRegularMap, pic14emitStaticSeg, pic14emitOverlay, picglue)
 	* src/xa51/gen.c (genXA51Code)
+	* src/SDCCast.c: fixed "void foo(void){char c; -c < 0;}"
 
 2003-03-22  Frieder Ferlemann <Frieder.Ferlemann@web.de>
 

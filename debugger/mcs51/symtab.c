@@ -23,6 +23,7 @@
 
 #include "sdcdb.h"
 #include "symtab.h"
+#include "newalloc.h"
 
 extern char *currModName ;
 structdef *structWithName (char *);
@@ -90,7 +91,7 @@ void parseFunc (char *line)
     function *func ;
     char *rs;
     int i;
-    Safe_calloc(1,func,sizeof(function));
+    func = Safe_calloc(1,sizeof(function));
     func->sym = parseSymbol(line,&rs);
     func->sym->isfunc = 1;
     func->modName = currModName ;
@@ -119,7 +120,7 @@ static char  *parseTypeInfo (symbol *sym, char *s)
     s = ++bp;
     while (*s != ')') { /* till we reach the end */
   link *type;
-  Safe_calloc(1,type,sizeof(link));
+  type = Safe_calloc(1,sizeof(link));
   if (*s == ',') s++;
 
   /* is a declarator */
@@ -240,7 +241,7 @@ symbol *parseSymbol (char *s, char **rs)
     symbol *nsym ;
     char *bp = s;
 
-    Safe_calloc(1,nsym,sizeof(symbol));
+    nsym = Safe_calloc(1,sizeof(symbol));
 
     /* copy over the mangled name */
     while (*bp != '(') bp++;
@@ -335,7 +336,7 @@ module *parseModule (char *s, bool createName )
     module *nmod ;
     char buffer[512];
 
-    Safe_calloc(1,nmod,sizeof(module));
+    nmod = Safe_calloc(1,sizeof(module));
 
     addSet (&modules,nmod);
 
@@ -346,11 +347,11 @@ module *parseModule (char *s, bool createName )
     if (createName) {
   sprintf(buffer,"%s.c",s);
 
-  Safe_calloc(1,nmod->c_name,strlen(buffer)+1);
+  nmod->c_name = Safe_malloc(strlen(buffer)+1);
   strcpy(nmod->c_name,buffer);
 
   sprintf(buffer,"%s.asm",s);
-  Safe_calloc(1,nmod->asm_name,strlen(buffer)+1);
+  nmod->asm_name = Safe_malloc(strlen(buffer)+1);
   strcpy(nmod->asm_name,buffer);
     }
 
@@ -432,7 +433,7 @@ structdef *structWithName (char *s)
       return structs[i];
     }
 
-    Safe_calloc(1,nsdef,sizeof(structdef));
+    nsdef = Safe_calloc(1,sizeof(structdef));
     nsdef->tag = alloccpy(s,strlen(s));
     nsdef->sname = currModName ;
 

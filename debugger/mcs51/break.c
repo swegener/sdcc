@@ -24,6 +24,7 @@
 #include "sdcdb.h"
 #include "symtab.h"
 #include "break.h"
+#include "newalloc.h"
 
 static hTab *bptable = NULL;
 char userBpPresent = 0;
@@ -42,7 +43,7 @@ int setBreakPoint (unsigned addr, char addrType, char bpType,
     char simbuf[50];
 
     /* allocate & init a new bp */
-    Safe_calloc(1,bp,sizeof(breakp));
+    bp = Safe_calloc(1,sizeof(breakp));
     bp->addr = addr;
     bp->addrType = addrType;
     bp->bpType = bpType;

@@ -951,12 +951,27 @@ static void genPointerGet (iCode * ic, iCode *pi) {
       }
       return;
     case AOP_DIR:
+      if (AOP_SIZE(result)==1) {
+	instr=MOVB;
+      } else {
+	instr=MOVW;
+      }
       emitcode (instr, "%s,%s", AOP_NAME(result)[0], AOP_NAME(left)[0]);
       if (AOP_SIZE(result) > 2) {
+	if (AOP_SIZE(result)==3) {
+	  instr=MOVB;
+	} else {
+	  instr=MOVW;
+	}
 	emitcode (instr, "%s,%s+2", AOP_NAME(result)[1], AOP_NAME(left)[0]);
       }
       return;
     case AOP_REG:
+      if (AOP_SIZE(result)==1) {
+	instr=MOVB;
+      } else {
+	instr=MOVW;
+      }
       emitcode (instr, "%s,[%s]", AOP_NAME(result)[0], AOP_NAME(left)[0]);
       if (AOP_SIZE(result) > 2) {
 	// result is generic pointer
@@ -966,7 +981,7 @@ static void genPointerGet (iCode * ic, iCode *pi) {
 	  emitcode ("mov.b", "%s,#0x%02x", AOP_NAME(result)[1], 
 		    PTR_TYPE(SPEC_OCLS(opetype)));
 	} else {
-	  emitcode (instr, "%s,[%s]", AOP_NAME(result)[1], AOP_NAME(left)[1]);
+	  emitcode ("mov.b", "%s,[%s]", AOP_NAME(result)[1], AOP_NAME(left)[1]);
 	}
       }
       return;
@@ -981,7 +996,11 @@ static void genPointerGet (iCode * ic, iCode *pi) {
 	  emitcode ("mov", "%s,r0", AOP_NAME(result)[0]);
 	}
       } else {
-	emitcode (instr, "%s,%s", AOP_NAME(result)[0], AOP_NAME(left)[0]);
+	if (AOP_SIZE(result)==3) {
+	  emitcode ("mov.b", "%s,%s", AOP_NAME(result)[0], AOP_NAME(left)[0]);
+	} else {
+	  emitcode ("mov.w", "%s,%s", AOP_NAME(result)[0], AOP_NAME(left)[0]);
+	}
       }
       if (AOP_SIZE(result) > 2) {
 	if (AOP_TYPE(result)==AOP_STK) {
@@ -993,7 +1012,7 @@ static void genPointerGet (iCode * ic, iCode *pi) {
 	    emitcode ("mov", "%s,r0", AOP_NAME(result)[1]);
 	  }
 	} else {
-	  emitcode (instr, "%s,%s", AOP_NAME(result)[1], AOP_NAME(left)[1]);
+	  emitcode ("mov", "%s,%s", AOP_NAME(result)[1], AOP_NAME(left)[1]);
 	}
       }
       return;

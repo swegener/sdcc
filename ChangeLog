@@ -1,5 +1,9 @@
 2001-01-04  Bernhard Held  <bernhard@bernhardheld.de>
 
+	* src/SDCCglue.h: printIvalCharPtr(), not printIvalChar()
+
+2001-01-04  Bernhard Held  <bernhard@bernhardheld.de>
+
 	* support/regression/ports/mcs51/support.c: correct setup of timer / UART
 
 2001-01-03  Bernhard Held  <bernhard@bernhardheld.de>

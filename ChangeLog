@@ -1,3 +1,36 @@
+2004-07-04 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/SDCCmain.c (linkEdit): modifications only for pic16 port,
+	add relFilesSet to $3, manipulate $2 to handle linking of object
+	files without source files in command line,
+	* device/include/pic16 (all headers): added ID location macros,
+	* src/pic16/device.c (struct PIC16_device Pics16[]): added field
+	entries for ID location bytes,
+	* (pic16_assignIdByteValue): NEW,
+	* src/pic16/device.h: new structures idRegInfo_t and idBytesInfo_t,
+	added field dumpcalltree to pic16_options_t,
+	* src/pic16/gen.c (genCmp): fixed bug case so a temporary register
+	is used instead of pic16_Gstack_base_addr, check if (ifx) before
+	emitting rFalseIfx label after check_carry label,
+	* src/pic16/glue.c (PIC16_IS_IDLOC_ADDRESS, PIC16_IS_HWREG_ADDRESS,
+	pic16_emitDIRegs), NEW
+	* (pic16glue): dump .calltree file when option --calltree found,
+	* src/pic16/main.c (OPTION _pic16_optionsTable): new option --calltree
+	* (_pic16_genAssemblerPreamble): emit ID locations after
+	configuration registers,
+	* (pic16_linkCmd): modifications of the link command,
+	* src/pic16/pcode.c (pic16_pciMOVFF): PCC_REGISTER replaces PCC_REGISTER2
+	* (pic16_pCodeInitRegisters): don't init stack registers,
+	* (pic16_findPrevInstruction): fixed bug,
+	* (pic16_getRegFromInstruction, pic16_getRegFromInstruction2): fixed
+	bug with immediate registers,
+	* (buildCallTree): traces stack push and pop,
+	* (pct2): dump also stack usage for each function,
+	* src/pic16/ralloc.c (dynrIdx): registers names start from 0x00
+	* (pic16_allocDirReg): various modifications,
+	* (pic16_typeRegWithIdx): when searching pic16_dynProcessorRegs set
+	fixed to 1,
+
 2004-07-02 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/pcode.c: removed buggy double colon

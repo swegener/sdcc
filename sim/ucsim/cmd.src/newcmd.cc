@@ -196,6 +196,7 @@ cl_console::cl_console(FILE *fin, FILE *fout, class cl_app *the_app):
   app= the_app;
   in = fin;
   out= fout;
+  rout=(FILE *)0;
   prompt= 0;
   flags= CONS_NONE;
   if (in &&

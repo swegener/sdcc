@@ -1005,28 +1005,16 @@ operandOperation (operand * left, operand * right,
 			       operandLitValue (right));
       break;
     case BITWISEAND:
-      retval = operandFromLit ((SPEC_USIGN(let) ?
-				(unsigned long) operandLitValue (left) :
-				(long) operandLitValue (left)) &
-			       (SPEC_USIGN(ret) ?
-				(unsigned long) operandLitValue (right) :
-				(long) operandLitValue (right)));
+      retval = operandFromLit ((long)operandLitValue(left) & 
+			       (long)operandLitValue(right));
       break;
     case '|':
-      retval = operandFromLit ((SPEC_USIGN(let) ?
-				(unsigned long) operandLitValue (left) :
-				(long) operandLitValue (left)) |
-			       (SPEC_USIGN(ret) ?
-				(unsigned long) operandLitValue (right) :
-				(long) operandLitValue (right)));
+      retval = operandFromLit ((long)operandLitValue (left) |
+			       (long)operandLitValue (right));
       break;
     case '^':
-      retval = operandFromLit ((SPEC_USIGN(let) ?
-				(unsigned long) operandLitValue (left) :
-				(long) operandLitValue (left)) ^
-			       (SPEC_USIGN(ret) ?
-				(unsigned long) operandLitValue (right) :
-				(long) operandLitValue (right)));
+      retval = operandFromLit ((long)operandLitValue (left) ^
+			       (long)operandLitValue (right));
       break;
     case AND_OP:
       retval = operandFromLit (operandLitValue (left) &&

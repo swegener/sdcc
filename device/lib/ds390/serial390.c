@@ -93,9 +93,6 @@ void putchar (char c)
     ;
   transmitIsBusy=1;
   SBUF0=c;
-    _asm
-      cpl P3.5 ; toggle the TINI led
-    _endasm;
 }
 
 char getchar (void)

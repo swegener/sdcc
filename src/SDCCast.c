@@ -605,7 +605,7 @@ int processParms (ast 	*func,
 
         /* If it's a small integer, upcast to int. */
       if (IS_INTEGRAL(actParm->ftype)
-         && getSize(actParm->ftype) < INTSIZE)
+         && getSize(actParm->ftype) < (unsigned) INTSIZE)
         {
       newType = newAst_LINK(INTTYPE);
         }
@@ -779,7 +779,7 @@ ast *createIvalArray (ast  *sym, sym_link *type, initList *ilist)
   ast *aSym ;
   size++ ;
 
-  aSym = newNode('[',sym,newAst_VALUE(valueFromLit(size-1)));
+  aSym = newNode('[',sym,newAst_VALUE(valueFromLit((float) (size-1))));
   aSym = decorateType(resolveSymbols(aSym));
   rast = createIval (aSym,type->next,iloop,rast)   ;
   iloop = (iloop ? iloop->next : NULL) ;
@@ -834,7 +834,7 @@ ast *createIvalCharPtr (ast *sym, sym_link *type, ast *iexpr)
          rast,
          newNode('=',
            newNode('[', sym,
-             newAst_VALUE(valueFromLit(i))),
+             newAst_VALUE(valueFromLit((float) i))),
            newAst_VALUE(valueFromLit(*s))));
       i++;
       s++;
@@ -843,7 +843,7 @@ ast *createIvalCharPtr (ast *sym, sym_link *type, ast *iexpr)
          rast,
          newNode('=',
            newNode('[', sym,
-             newAst_VALUE(valueFromLit(i))),
+             newAst_VALUE(valueFromLit((float) i))),
            newAst_VALUE(valueFromLit(*s))));
   return decorateType(resolveSymbols(rast));
     }
@@ -2390,7 +2390,7 @@ ast *decorateType (ast *tree)
   /* if only the right side is a literal & we are
      shifting more than size of the left operand then zero */
   if (IS_LITERAL(RTYPE(tree)) &&
-      ((int)floatFromVal( valFromType(RETYPE(tree)))) >=
+      ((unsigned)floatFromVal( valFromType(RETYPE(tree)))) >=
       (getSize(LTYPE(tree))*8)) {
       werror(W_SHIFT_CHANGED,
        (tree->opval.op == LEFT_OP ? "left" : "right"));
@@ -3401,7 +3401,7 @@ ast *optimizeGetHbit (ast *tree)
     if (!IS_AST_LIT_VALUE(tree->left->right))
   return tree;
 
-    if ((i = AST_LIT_VALUE(tree->left->right)) !=
+    if ((i = (int) AST_LIT_VALUE(tree->left->right)) !=
   ( j = (getSize(TTYPE(tree->left->left))*8 - 1)))
   return tree;
 

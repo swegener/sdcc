@@ -1016,8 +1016,13 @@ canOverlayLocals (eBBlock ** ebbs, int count)
       iCode *ic;
 
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
-	if (ic && (ic->op == CALL || ic->op == PCALL))
-	  return FALSE;
+	  if (ic) {
+	      if (ic->op == CALL) {
+		  sym_link *ftype = operandType(IC_LEFT(ic));
+		  /* builtins only can use overlays */
+		  if (!IFFUNC_ISBUILTIN(ftype)) return FALSE; 
+	      } else if (ic->op == PCALL) return FALSE;
+	  }
     }
 
   /* no function calls found return TRUE */

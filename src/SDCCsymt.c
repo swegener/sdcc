@@ -1174,7 +1174,8 @@ checkSClass (symbol * sym, int isProto)
   /* if no other storage class specified */
   if (sym->level == 0 &&
       SPEC_CONST (sym->etype) &&
-      SPEC_SCLS(sym->etype) == S_FIXED) {
+      SPEC_SCLS(sym->etype) == S_FIXED &&
+      !IS_FUNC(sym->type)) {
     SPEC_SCLS (sym->etype) = S_CODE;
   }
   
@@ -1589,23 +1590,8 @@ aggregateToPointer (value * val)
 	  if (SPEC_OCLS(val->etype)) {
 	    DCL_TYPE(val->type)=PTR_TYPE(SPEC_OCLS(val->etype));
 	  } else {
-#if 1
 	    // this happens for (external) function parameters
 	    DCL_TYPE (val->type) = port->unqualified_pointer;
-#else
-	    if (TARGET_IS_DS390) {
-	      /* The AUTO and REGISTER classes should probably
-	       * also become generic pointers, but I haven't yet
-	       * devised a test case for that.
-	       */
-	      DCL_TYPE (val->type) = port->unqualified_pointer;
-	      break;
-	    }
-	    if (options.model==MODEL_LARGE) {
-	      DCL_TYPE (val->type) = FPOINTER;
-	      break;
-	    }
-#endif
 	  }
 	  break;
 	case S_AUTO:

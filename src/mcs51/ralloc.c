@@ -1819,6 +1819,7 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
   /* for the left & right operand :- look to see if the
      left was assigned a true symbol in far space in that
      case replace them */
+
   if (IS_ITEMP (IC_LEFT (ic)) &&
       OP_SYMBOL (IC_LEFT (ic))->liveTo <= ic->seq)
     {
@@ -1842,7 +1843,7 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
     }
 
   /* do the same for the right operand */
-right:
+ right:
   if (!change &&
       IS_ITEMP (IC_RIGHT (ic)) &&
       OP_SYMBOL (IC_RIGHT (ic))->liveTo <= ic->seq)
@@ -2024,23 +2025,18 @@ static bool
 isBitwiseOptimizable (iCode * ic)
 {
   sym_link *ltype = getSpec (operandType (IC_LEFT (ic)));
-  // jwk sym_link *rtype = getSpec (operandType (IC_RIGHT (ic)));
 
   /* bitwise operations are considered optimizable
      under the following conditions (Jean-Louis VERN) 
 
-     x & lit   <== jwk: should be x && lit
      bit & bit
      bit & x
      bit ^ bit
      bit ^ x
-     x   ^ lit <== jwk: should be x ^^ lit
-     x   | lit <== jwk: should be x || lit
      bit | bit
      bit | x
    */
-  if ( /* jwk IS_LITERAL (rtype) || */
-      (IS_BITVAR (ltype) && IN_BITSPACE (SPEC_OCLS (ltype))))
+  if ((IS_BITVAR (ltype) && IN_BITSPACE (SPEC_OCLS (ltype))))
     return TRUE;
   else
     return FALSE;
@@ -2252,7 +2248,6 @@ packRegisters (eBBlock * ebp)
 
   for (ic = ebp->sch; ic; ic = ic->next)
     {
-
       /* if this is an itemp & result of a address of a true sym 
          then mark this as rematerialisable   */
       if (ic->op == ADDRESS_OF &&
@@ -2292,8 +2287,6 @@ packRegisters (eBBlock * ebp)
 	   bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 &&
 	   IS_OP_LITERAL (IC_RIGHT (ic))))
 	{
-
-	  //int i = operandLitValue (IC_RIGHT (ic));
 	  OP_SYMBOL (IC_RESULT (ic))->remat = 1;
 	  OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
 	  OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
@@ -2344,8 +2337,10 @@ packRegisters (eBBlock * ebp)
 	}
 
       /* reduce for support function calls */
+#if geniCodeLogicHasBeenFixed
       if (ic->supportRtn || ic->op == '+' || ic->op == '-')
 	packRegsForSupport (ic, ebp);
+#endif
 
       /* some cases the redundant moves can
          can be eliminated for return statements */
@@ -2460,7 +2455,6 @@ packRegisters (eBBlock * ebp)
 	  getSize (operandType (IC_RESULT (ic))) <= 2)
 
 	packRegsForAccUse (ic);
-
     }
 }
 

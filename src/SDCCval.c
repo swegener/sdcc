@@ -215,7 +215,7 @@ symbolVal (symbol * sym)
 /* valueFromLit - creates a value from a literal                   */
 /*-----------------------------------------------------------------*/
 value *
-valueFromLit (float lit)
+valueFromLit (double lit)
 {
   char buffer[50];
 
@@ -225,7 +225,7 @@ valueFromLit (float lit)
       return constVal (buffer);
     }
 
-  sprintf (buffer, "%f", lit);
+  sprintf (buffer, "%lf", lit);
   return constFloatVal (buffer);
 }
 
@@ -333,7 +333,38 @@ constVal (char *s)
   return val;
 
 }
+/*! /fn char hexEscape(char **src)
 
+    /param src Pointer to 'x' from start of hex character value
+*/
+
+char hexEscape(char **src)
+
+{
+char *s ;
+unsigned long value ;
+
+(*src)++ ;	/* Skip over the 'x' */
+s = *src ;	/* Save for error detection */
+
+value = strtol (*src, src, 16);
+
+if (s == *src) 
+  {
+  // no valid hex found
+  werror(E_INVALID_HEX);
+  } 
+
+else 
+  {
+  if (value > 255) 
+    {
+    werror(W_ESC_SEQ_OOR_FOR_CHAR);
+    }
+  }
+
+return (char) value;
+}
 /*------------------------------------------------------------------*/
 /* octalEscape - process an octal constant of max three digits      */
 /* return the octal value, throw a warning for illegal octal        */
@@ -356,17 +387,28 @@ char octalEscape (char **str) {
     if (value > 255 /* || (**str>='0' && **str<='7') */ ) {
       werror (W_ESC_SEQ_OOR_FOR_CHAR);
     }
-    (*str)--;
   }
   return value;
 }
 
-/*------------------------------------------------------------------*/
-/* copyStr - copies src to dest ignoring leading & trailing \"s     */
-/*------------------------------------------------------------------*/
-void 
+/*! 
+  /fn void copyStr (char *dest, char *src)
+  
+  Copies a source string to a dest buffer interpreting escape sequences
+  and special characters
+
+  /param dest Buffer to receive the resultant string
+  /param src  Buffer containing the source string with escape sequecnes
+  /return Number of characters in output string
+
+*/
+
+int 
 copyStr (char *dest, char *src)
+
 {
+  char *OriginalDest = dest ;
+
   while (*src)
     {
       if (*src == '\"')
@@ -407,24 +449,13 @@ copyStr (char *dest, char *src)
 	    case '6':
 	    case '7':
 	      *dest++ = octalEscape(&src);
+	      src-- ;
 	      break;
 
-	    case 'x': {
-	      char *s=++src;
-	      unsigned long value=strtol (src, &src, 16);
-
-	      if (s==src) {
-		// no valid hex found
-		werror(E_INVALID_HEX);
-	      } else {
-		if (value>255) {
-		  werror(W_ESC_SEQ_OOR_FOR_CHAR);
-		}
-		*dest++ = value;
-		src--;
-	      }
-	      break;
-	    }
+	    case 'x': 
+	      *dest++ = hexEscape(&src) ;
+	      src-- ;
+	      break ;
 
 	    case '\\':
 	      *dest++ = '\\';
@@ -447,7 +478,9 @@ copyStr (char *dest, char *src)
 	*dest++ = *src++;
     }
 
-  *dest = '\0';
+  *dest++ = '\0';
+
+  return dest - OriginalDest ;
 }
 
 /*------------------------------------------------------------------*/
@@ -463,14 +496,14 @@ strVal (char *s)
   /* get a declarator */
   val->type = newLink ();
   DCL_TYPE (val->type) = ARRAY;
-  DCL_ELEM (val->type) = strlen (s) - 1;
   val->type->next = val->etype = newLink ();
   val->etype->class = SPECIFIER;
   SPEC_NOUN (val->etype) = V_CHAR;
   SPEC_SCLS (val->etype) = S_LITERAL;
 
   SPEC_CVAL (val->etype).v_char = Safe_calloc (1, strlen (s) + 1);
-  copyStr (SPEC_CVAL (val->etype).v_char, s);
+  DCL_ELEM (val->type) = copyStr (SPEC_CVAL (val->etype).v_char, s);
+
   return val;
 }
 
@@ -568,6 +601,7 @@ value *
 charVal (char *s)
 {
   value *val;
+//  unsigned uValue ;
 
   val = newValue ();
 
@@ -616,13 +650,22 @@ charVal (char *s)
 	case '\"':
 	  SPEC_CVAL (val->type).v_int = '\"';
 	  break;
-	case '0':
-	  sscanf (s, "%o", &SPEC_CVAL (val->type).v_int);
+
+	case '0' :
+	case '1' :
+	case '2' :
+	case '3' :
+	case '4' :
+	case '5' :
+	case '6' :
+	case '7' :
+	  SPEC_CVAL (val->type).v_int = octalEscape(&s);
 	  break;
+
 	case 'x':
-	  s++;			/* go behond the 'x' */
-	  sscanf (s, "%x", &SPEC_CVAL (val->type).v_int);
+	  SPEC_CVAL (val->type).v_int = hexEscape(&s) ;
 	  break;
+
 	default:
 	  SPEC_CVAL (val->type).v_int = *s;
 	  break;

@@ -7,6 +7,8 @@
 	* src/SDCCval.c (valDiv, valMod): fixed signdness
 	* src/SDCCicode.c (operandOperation): fixed critical typo; fixed
 	signedness of modulo, left and right shift
+	* support/Util/SDCCerr.c: added warning "integer overflow in expression"
+	* support/Util/SDCCerr.h: added warning W_INT_OVL
 
 2003-08-04  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 

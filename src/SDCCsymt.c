@@ -1418,10 +1418,12 @@ computeType (sym_link * type1, sym_link * type2)
 
   reType = getSpec (rType);
 
-  /* if either of them unsigned then make this unsigned */
-  if ((SPEC_USIGN (etype1) || SPEC_USIGN (etype2)) && !IS_FLOAT (reType))
+  /* if either of them unsigned but not val then make this unsigned */
+  if (((!IS_LITERAL(type1) && SPEC_USIGN (etype1)) || 
+       (!IS_LITERAL(type2) && SPEC_USIGN (etype2))) && 
+      !IS_FLOAT (reType))
     SPEC_USIGN (reType) = 1;
-
+  
   /* if result is a literal then make not so */
   if (IS_LITERAL (reType))
     SPEC_SCLS (reType) = S_REGISTER;

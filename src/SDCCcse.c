@@ -848,55 +848,56 @@ algebraicOpts (iCode * ic)
 /* updateSpillLocation - keeps track of register spill location    */
 /*-----------------------------------------------------------------*/
 void 
-updateSpillLocation (iCode * ic)
+updateSpillLocation (iCode * ic, int induction)
 {
 
-  sym_link *setype;
+	sym_link *setype;
 
-  if (POINTER_SET (ic))
-    return;
+	if (POINTER_SET (ic))
+		return;
 
-  if (ic->nosupdate)
-    return;
+	if (ic->nosupdate)
+		return;
 
-  /* for the form true_symbol := iTempNN */
-  if (ASSIGN_ITEMP_TO_SYM (ic)
-      && !SPIL_LOC (IC_RIGHT (ic)))
-    {
+	/* for the form true_symbol := iTempNN */
+	if (ASSIGN_ITEMP_TO_SYM (ic) && 
+	    !SPIL_LOC (IC_RIGHT (ic))) {
 
-      setype = getSpec (operandType (IC_RESULT (ic)));
+		setype = getSpec (operandType (IC_RESULT (ic)));
 
-      if (!OP_SYMBOL(IC_RIGHT (ic))->noSpilLoc &&
-	  !IS_VOLATILE (setype) &&
-	  !IN_FARSPACE (SPEC_OCLS (setype)) &&
-          /* PENDING */
-          !TARGET_IS_Z80 &&
-	  !OTHERS_PARM (OP_SYMBOL (IC_RESULT (ic))))
+		if (!OP_SYMBOL(IC_RIGHT (ic))->noSpilLoc &&
+		    !IS_VOLATILE (setype) &&
+		    !IN_FARSPACE (SPEC_OCLS (setype)) &&
+		    !OTHERS_PARM (OP_SYMBOL (IC_RESULT (ic))))
 
-	SPIL_LOC (IC_RIGHT (ic)) =
-	  IC_RESULT (ic)->operand.symOperand;
-    }
+			SPIL_LOC (IC_RIGHT (ic)) =
+				IC_RESULT (ic)->operand.symOperand;
+	}
 
-  if (ASSIGN_ITEMP_TO_ITEMP (ic) &&
-      !SPIL_LOC (IC_RIGHT (ic)) &&
-  !bitVectBitsInCommon (OP_DEFS (IC_RIGHT (ic)), OP_USES (IC_RESULT (ic))) &&
-      OP_SYMBOL (IC_RESULT (ic))->isreqv)
-    {
+	if (ASSIGN_ITEMP_TO_ITEMP (ic)) {
+	  
+		if (!SPIL_LOC (IC_RIGHT (ic)) &&
+		    !bitVectBitsInCommon (OP_DEFS (IC_RIGHT (ic)), OP_USES (IC_RESULT (ic))) &&
+		    OP_SYMBOL (IC_RESULT (ic))->isreqv) {
 
-      setype = getSpec (operandType (IC_RESULT (ic)));
+			setype = getSpec (operandType (IC_RESULT (ic)));
+	      
+			if (!OP_SYMBOL(IC_RIGHT (ic))->noSpilLoc &&
+			    !IS_VOLATILE (setype) &&
+			    !IN_FARSPACE (SPEC_OCLS (setype)) &&
+			    !OTHERS_PARM (OP_SYMBOL (IC_RESULT (ic))))
 
-      if (!OP_SYMBOL(IC_RIGHT (ic))->noSpilLoc &&
-	  !IS_VOLATILE (setype) &&
-	  !IN_FARSPACE (SPEC_OCLS (setype)) &&
-          /* PENDING */
-          !TARGET_IS_Z80 &&
-	  !OTHERS_PARM (OP_SYMBOL (IC_RESULT (ic))))
-
-	SPIL_LOC (IC_RIGHT (ic)) =
-	  SPIL_LOC (IC_RESULT (ic));
-    }
+				SPIL_LOC (IC_RIGHT (ic)) =
+					SPIL_LOC (IC_RESULT (ic));
+		}
+		/* special case for inductions */
+		if (induction && 
+		    OP_SYMBOL(IC_RIGHT(ic))->isreqv && 
+		    !SPIL_LOC(IC_RESULT(ic))) {
+			SPIL_LOC (IC_RESULT (ic)) = SPIL_LOC (IC_RIGHT (ic));
+		}
+	}
 }
-
 /*-----------------------------------------------------------------*/
 /* setUsesDef - sets the uses def bitvector for a given operand    */
 /*-----------------------------------------------------------------*/
@@ -1400,7 +1401,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	{
 
 	  /* update the spill location for this */
-	  updateSpillLocation (ic);
+	  updateSpillLocation (ic,1);
 
 	  if (POINTER_SET (ic) &&
 	      !(IS_BITFIELD (OP_SYMBOL (IC_RESULT (ic))->etype)))

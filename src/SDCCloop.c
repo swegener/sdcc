@@ -46,7 +46,7 @@ newInduction (operand * sym, unsigned int op,
   ip->op = op;
   ip->cval = constVal;
   ip->ic = ic;
-
+  updateSpillLocation(ic,1);
   return ip;
 }
 

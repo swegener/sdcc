@@ -54,7 +54,7 @@ int cseBBlock (eBBlock *, int, eBBlock **, int);
 int cseAllBlocks (eBBlock **, int);
 void ifxOptimize (iCode *, set *, int, eBBlock *, int *, eBBlock **, int);
 void unsetDefsAndUses (iCode *);
-void updateSpillLocation (iCode * ic);
+void updateSpillLocation (iCode * ic,int);
 void setUsesDefs (operand *, bitVect *, bitVect *, bitVect **);
 void replaceAllSymBySym (iCode *, operand *, operand *, bitVect **);
 #endif

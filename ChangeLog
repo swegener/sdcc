@@ -1,3 +1,9 @@
+2003-01-26    <johan@balder>
+
+	* src/SDCCglue.c: reverted back to 1.124
+	* src/SDCCast.c: reverted back to 1.156
+	* src/mcs51/gen.c (aopGet): applied Frieder's efficiency patch
+
 2003-01-25    <johan@balder>
 
 	* src/SDCCglue.c: A better fix for bug #661910

@@ -1154,8 +1154,6 @@ emitStaticSeg (memmap * map, FILE * out)
 	      resolveIvalSym (sym->ival);
 	      printIval (sym, sym->type, sym->ival, out);
 	      noAlloc--;
-	      // now we don't need sym->ival anymore
-	      deleteSetItem(&map->syms, list2val(sym->ival)->sym);
 	    }
 	  else {
 	      /* allocate space */

@@ -859,6 +859,12 @@ aopGet (asmop * aop, int offset, bool bit16, bool dname)
       return rs;
 
     case AOP_DPTR:
+      if (aop->code && aop->coff==0 && offset>=1) {
+	emitcode ("mov", "a,#0x%02x", offset);
+	emitcode ("movc", "a,@a+dptr");
+	return (dname ? "acc" : "a");
+      }
+
       while (offset > aop->coff)
 	{
 	  emitcode ("inc", "dptr");

@@ -972,8 +972,7 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr)
 	memmap *segment=SPEC_OCLS(sym->etype);
 	deleteSetItem(&segment->syms, sym);
       }
-      
-      return decorateType(resolveSymbols (rast));
+      return decorateType (resolveSymbols (rast));
     }
 
   return NULL;
@@ -1058,9 +1057,8 @@ gatherAutoInit (symbol * autoChain)
     {
 
       /* resolve the symbols in the ival */
-      if (sym->ival) {
+      if (sym->ival)
 	resolveIvalSym (sym->ival);
-      }
 
       /* if this is a static variable & has an */
       /* initial value the code needs to be lifted */
@@ -1229,10 +1227,6 @@ bool constExprTree (ast *cexpr) {
       }
       if (IS_AST_SYM_VALUE(cexpr) && IS_FUNC(AST_SYMBOL(cexpr)->type)) {
 	// a function's address will never change
-	return TRUE;
-      }
-      if (IS_AST_SYM_VALUE(cexpr) && IS_ARRAY(AST_SYMBOL(cexpr)->type)) {
-	// an array's address will never change
 	return TRUE;
       }
       if (IS_AST_SYM_VALUE(cexpr) && 

@@ -42,10 +42,8 @@ ports:
 $(TARGET): $(OBJECTS) $(PORT_LIBS)
         bcc32 -e$(TARGET) $(OBJECTS) $(PORT_LIBS) $(LIBGC)
 
-CFLAGS  = -6 -O -g0 -I. -I.. -I..\support
-
-.c.obj:
-        BCC32 -c $(CFLAGS) $(CPPFLAGS) $<
+!include ..\Bcc.inc
+CFLAGS  = -I. -I.. -I..\support
 
 SDCCy.h: SDCCy.c
 

@@ -59,7 +59,7 @@ while (<>)
 	    &flush_pending_data;
 	    $pendingDataStart = 0;
 	    $nextOffset = 0;
-	    print;
+            print;
 	}
 	else
 	{

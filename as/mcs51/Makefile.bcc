@@ -10,13 +10,11 @@ VERSIONP        = 0
 
 PRJDIR		= ../..
 
-CPPFLAGS	=  -I. -I$(PRJDIR)
-CFLAGS          = -6 -O -g0
+!include ..\..\Bcc.inc
+
+CFLAGS        =  -I. -I$(PRJDIR)
 M_OR_MM		= -MM
 LDFLAGS		= 
-
-.c.obj:
-        BCC32 -c $(CFLAGS) $(CPPFLAGS) $<
 
 ASOBJECTS       = asmain.obj aslex.obj assym.obj assubr.obj asnoice.obj \
                   asexpr.obj asdata.obj aslist.obj asout.obj asstore.obj \

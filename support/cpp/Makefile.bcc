@@ -23,9 +23,8 @@ man2dir         = $(mandir)/man2
 infodir         = ${prefix}/info
 
 STD_INC         = @sdcc_include_dir@
-#CPPFLAGS        =  -I. -I$(PRJDIR) -D_FORASXXXX_
-#CFLAGS          = -ggdb -O2 -pipe
-CFLAGS  = -6 -O -g0 -I. -I$(PRJDIR) -D_FORASXXXX_
+!include ..\..\bcc.inc
+CFLAGS  = -I. -I$(PRJDIR) -D_FORASXXXX_
 M_OR_MM         = -MM
 LDFLAGS		= 
 
@@ -42,11 +41,6 @@ $(TARGET): $(OBJECTS)
         bcc32 -e$(TARGET) $(OBJECTS)
 
 !include Makefile.dep
-
-# My rules
-# --------
-.c.obj:
-        BCC32 -c $(CFLAGS) $(CPPFLAGS) $<
 
 
 # End of cpp/Makefile

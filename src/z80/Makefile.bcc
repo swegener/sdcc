@@ -5,10 +5,8 @@ PRJDIR = ../..
 OBJ = gen.obj ralloc.obj main.obj gbz80.obj
 LIB = port.lib
 
-CFLAGS  = -6 -O -g0 -I.. -I. -I..\.. -I..\..\support
-
-.c.obj:
-        BCC32 -c $(CFLAGS) $(CPPFLAGS) $<
+!include ..\..\Bcc.inc
+CFLAGS  = -I.. -I. -I..\.. -I..\..\support
 
 all: $(LIB)
 

@@ -322,7 +322,7 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
 	/* special case for a function */
 	if (IS_FUNC(sym->type)) {   
 		sym->aop = aop = newAsmop(AOP_IMMD);    
-		ALLOC_ATOMIC(aop->aopu.aop_immd,strlen(sym->rname)+1);
+		ALLOC(aop->aopu.aop_immd,strlen(sym->rname)+1);
 		strcpy(aop->aopu.aop_immd,sym->rname);
 		aop->size = FPTRSIZE; 
 		return aop;
@@ -372,7 +372,7 @@ static asmop *aopForRemat (symbol *sym)
 	else
 		strcpy(buffer,OP_SYMBOL(IC_LEFT(ic))->rname);
 
-	ALLOC_ATOMIC(aop->aopu.aop_immd,strlen(buffer)+1);
+	ALLOC(aop->aopu.aop_immd,strlen(buffer)+1);
 	strcpy(aop->aopu.aop_immd,buffer);    
 	return aop;        
 }

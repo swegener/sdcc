@@ -88,7 +88,7 @@ char *pic14aopLiteral (value *val, int offset)
 
         v >>= (offset * 8);
         sprintf(buffer,"0x%02x",((char) v) & 0xff);
-        ALLOC_ATOMIC(rs,strlen(buffer)+1);
+        ALLOC(rs,strlen(buffer)+1);
         return strcpy (rs,buffer);
     }
 
@@ -99,7 +99,7 @@ char *pic14aopLiteral (value *val, int offset)
 #else
     sprintf(buffer,"0x%02x",fl.c[offset]);
 #endif
-    ALLOC_ATOMIC(rs,strlen(buffer)+1);
+    ALLOC(rs,strlen(buffer)+1);
     return strcpy (rs,buffer);
 }
 

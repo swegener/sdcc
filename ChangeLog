@@ -1,3 +1,9 @@
+2003-05-18  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/port.h: removed DEFAULT_PORT, it's not yet pic16 ;-)
+	it can be defined with CFLAGS when running configure
+	* src/SDCCmain.c: fixed compiling + linking with object files
+
 2003-05-18  Vangelis Rokas (vrokas@otenet.gr)
 
 	* configure.in: configure for pic16 port,
@@ -40,7 +46,7 @@
 2003-05-18    <johan@balder>
 
 	* src/ds390/gen.c (genArrayInit): removed obsolete and buggy ARRAYINIT
-	* src/ds390/main.c (genArrayInit): removed obsolete and buggy ARRAYINIT	
+	* src/ds390/main.c (genArrayInit): removed obsolete and buggy ARRAYINIT
 2003-05-17  Karl Bongers(apply patches from Martin Helmling)
 
 	* debugger/mcs51/sdcdb.c,cmd.c,break.c and .h files.

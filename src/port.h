@@ -295,6 +295,4 @@ extern PORT xa51_port;
 extern PORT ds400_port;
 #endif
 
-#define DEFAULT_PORT	pic16_port
-
 #endif /* PORT_INCLUDE*/

@@ -1453,7 +1453,7 @@ linkEdit (char **envp)
 
   /* put in the object files */
   if (fullSrcFileName)
-    fprintf (lnkfile, "%s ", dstFileName);
+    fprintf (lnkfile, "%s%s\n", dstFileName, port->linker.rel_ext);
 
   for (i = 0; i < nrelFiles; i++)
     fprintf (lnkfile, "%s\n", relFiles[i]);

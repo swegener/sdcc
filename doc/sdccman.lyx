@@ -5324,7 +5324,8 @@ The optimizer will apply to the rules one by one from the top in the sequence
  the rules again from the top, this option for a rule is expensive (performance)
 , it is intended to be used in situations where a transformation will trigger
  the same rule again.
- A good example of this the following rule:
+ An example of this (not a good one, it has side effects) is the following
+ rule:
 \newline 
 
 \newline 

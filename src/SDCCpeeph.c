@@ -193,7 +193,7 @@ FBYNAME (labelIsReturnOnly)
   len = strlen(label);
 
   for(pl = currPl; pl; pl = pl->next) {
-	if (pl->line && !pl->isDebug &&
+	if (pl->line && !pl->isDebug && !pl->isComment &&
 	  pl->line[strlen(pl->line)-1] == ':') {
 		if (strncmp(pl->line, label, len) == 0) break; /* Found Label */
 		if (strlen(pl->line) != 7 || !isdigit(*(pl->line)) ||
@@ -206,6 +206,8 @@ FBYNAME (labelIsReturnOnly)
   }
   if (!pl) return FALSE; /* did not find the label */
   pl = pl->next;
+  while (pl && (pl->isDebug || pl->isComment))
+    pl = pl->next;
   if (!pl || !pl->line || pl->isDebug) return FALSE; /* next line not valid */
   p = pl->line;
   for (p = pl->line; *p && isspace(*p); p++)

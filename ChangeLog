@@ -1,3 +1,8 @@
+2004-06-08 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCicode.c (geniCodeJumpTable): fixed bug #967601
+	* src/SDCCpeeph.c (labelIsReturnOnly): fixed bug #966505
+
 2004-06-07 Vangelis Rokas <vrokas AT otenet.gr>
 
 	Cumulative patch for pic16 port:

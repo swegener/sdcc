@@ -163,6 +163,7 @@ SDCCERR - SDCC Standard error handler
 #define E_SIGNED_AND_UNSIGNED_INVALID 145 /* signed and unsigned invalid for .. */
 #define E_TWO_OR_MORE_STORAGE_CLASSES 146
 #define W_EXESS_ARRAY_INITIALIZERS 147 /* too much initializers for array */
+#define	 E_ARGUMENT_MISSING	148	/* Option requires an argument. */
 
 /** Describes the maximum error level that will be logged.  Any level
  *  includes all of the levels listed after it.

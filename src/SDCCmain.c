@@ -62,8 +62,8 @@ int currRegBank = 0;
 struct optimize optimize;
 struct options options;
 char *VersionString = SDCC_VERSION_STR /*"Version 2.1.8a" */ ;
-short preProcOnly = 0;
-short noAssemble = 0;
+int preProcOnly = 0;
+int noAssemble = 0;
 char *linkOptions[128];
 const char *asmOptions[128];
 char *libFiles[128];
@@ -79,64 +79,152 @@ char *preOutName;
 
 char DefaultExePath[128];
 
-/* Far functions, far data */
-#define OPTION_LARGE_MODEL "-model-large"
-/* Far functions, near data */
-#define OPTION_MEDIUM_MODEL "-model-medium"
-#define OPTION_SMALL_MODEL "-model-small"
-#define OPTION_FLAT24_MODEL "-model-flat24"
-#define OPTION_STACK_AUTO  "-stack-auto"
-#define OPTION_STACK_8BIT "-stack-8bit"
-#define OPTION_STACK_10BIT "-stack-10bit"
-#define OPTION_XSTACK      "-xstack"
-#define OPTION_GENERIC     "-generic"
-#define OPTION_NO_GCSE     "-nogcse"
-#define OPTION_NO_LOOP_INV "-noinvariant"
-#define OPTION_NO_LOOP_IND "-noinduction"
-#define OPTION_NO_JTBOUND  "-nojtbound"
-#define OPTION_NO_LOOPREV  "-noloopreverse"
-#define OPTION_XREGS       "-regextend"
-#define OPTION_COMP_ONLY   "-compile-only"
-#define OPTION_DUMP_RAW    "-dumpraw"
-#define OPTION_DUMP_GCSE   "-dumpgcse"
-#define OPTION_DUMP_LOOP   "-dumploop"
-#define OPTION_DUMP_KILL   "-dumpdeadcode"
-#define OPTION_DUMP_RANGE  "-dumpliverange"
-#define OPTION_DUMP_PACK   "-dumpregpack"
-#define OPTION_DUMP_RASSGN "-dumpregassign"
-#define OPTION_DUMP_ALL    "-dumpall"
-#define OPTION_XRAM_LOC    "-xram-loc"
-#define OPTION_IRAM_SIZE   "-iram-size"
-#define OPTION_XSTACK_LOC  "-xstack-loc"
-#define OPTION_CODE_LOC    "-code-loc"
-#define OPTION_STACK_LOC   "-stack-loc"
-#define OPTION_DATA_LOC    "-data-loc"
-#define OPTION_IDATA_LOC   "-idata-loc"
-#define OPTION_PEEP_FILE   "-peep-file"
-#define OPTION_LIB_PATH    "-lib-path"
-#define OPTION_INTLONG_RENT "-int-long-reent"
-#define OPTION_FLOAT_RENT  "-float-reent"
-#define OPTION_OUT_FMT_IHX "-out-fmt-ihx"
-#define OPTION_OUT_FMT_S19 "-out-fmt-s19"
-#define OPTION_CYCLOMATIC  "-cyclomatic"
-#define OPTION_NOOVERLAY   "-nooverlay"
-#define OPTION_MAINRETURN  "-main-return"
-#define OPTION_NOPEEP      "-no-peep"
-#define OPTION_ASMPEEP     "-peep-asm"
-#define OPTION_DEBUG       "-debug"
-#define OPTION_NODEBUG     "-nodebug"
-#define OPTION_VERSION     "-version"
-#define OPTION_STKAFTRDATA "-stack-after-data"
-#define OPTION_PREPROC_ONLY "-preprocessonly"
-#define OPTION_C1_MODE   "-c1mode"
-#define OPTION_HELP         "-help"
-#define OPTION_CALLEE_SAVES "-callee-saves"
-#define OPTION_NOSTDLIB     "-nostdlib"
-#define OPTION_NOSTDINC     "-nostdinc"
-#define OPTION_VERBOSE      "-verbose"
-#define OPTION_LESS_PEDANTIC "-lesspedantic"
-#define OPTION_SHORT_IS_CHAR "-short-is-char"
-#define OPTION_SHORT_IS_INT "-short-is-int"
+#define OPTION_HELP	"-help"
+
+#define LENGTH(_a)	(sizeof(_a)/sizeof(*(_a)))
+
+#define OPTION_STACK_8BIT 	"--stack-8bit"
+#define OPTION_OUT_FMT_IHX	"--out-fmt-ihx"
+#define OPTION_LARGE_MODEL	"--model-large"
+#define OPTION_MEDIUM_MODEL	"--model-medium"
+#define OPTION_SMALL_MODEL	"--model-small"
+#define OPTION_FLAT24_MODEL	"--model-flat24"
+#define OPTION_DUMP_ALL		"--dumpall"
+#define OPTION_PEEP_FILE	"--peep-file"
+#define OPTION_LIB_PATH		"--lib-path"
+#define OPTION_XSTACK_LOC	"--xstack-loc"
+#define OPTION_CALLEE_SAVES	"--callee-saves"
+#define OPTION_STACK_LOC	"--stack-loc"
+#define OPTION_XRAM_LOC		"--xram-loc"
+#define OPTION_IRAM_SIZE	"--iram-size"
+#define OPTION_VERSION		"--version"
+#define OPTION_DATA_LOC		"--data-loc"
+#define OPTION_CODE_LOC		"--code-loc"
+#define OPTION_IDATA_LOC	"--idata-loc"
+#define OPTION_NO_LOOP_INV 	"--noinvariant"
+#define OPTION_NO_LOOP_IND	"--noinduction"
+#define OPTION_LESS_PEDANTIC	"--lesspedantic"
+#define OPTION_NO_GCSE		"--nogcse"
+#define OPTION_SHORT_IS_CHAR 	"--short-is-char"
+
+/** Table of all options supported by all ports.
+    This table provides:
+      * A reference for all options.
+      * An easy way to maintain help for the options.
+      * Automatic support for setting flags on simple options.
+*/
+typedef struct {
+    /** The short option character e.g. 'h' for -h.  0 for none. */
+    char shortOpt;
+    /** Long option e.g. "--help".  Includes the -- prefix.  NULL for
+        none. */
+    const char *longOpt;
+    /** Pointer to an int that will be incremented every time the
+        option is encountered.  May be NULL.
+    */
+    int *pparameter;
+    /** Help text to go with this option.  May be NULL. */
+    const char *help;
+} OPTION;
+
+static const OPTION 
+optionsTable[] = {
+    { 'm',  NULL,                   NULL, "Set the port to use e.g. -mz80." },
+    { 'd',  NULL,                   NULL, NULL },
+    { 'D',  NULL,                   NULL, "Define macro as in -Dmacro" },
+    { 'I',  NULL,                   NULL, "Add to the include (*.h) path, as in -Ipath" },
+    { 'A',  NULL,                   NULL, NULL },
+    { 'U',  NULL,                   NULL, NULL },
+    { 'C',  NULL,                   NULL, "Preprocessor option" },
+    { 'M',  NULL,                   NULL, "Preprocessor option" },
+    { 'V',  NULL,                   &verboseExec, "Execute verbosely.  Show sub commands as they are run" },
+    { 'S',  NULL,                   &noAssemble, "Assemble only" },
+    { 'W',  NULL,                   NULL, "Pass through options to the assembler (a) or linker (l)" },
+    { 'L',  NULL,                   NULL, "Add the next field to the library search path" },
+    { 0,    OPTION_LARGE_MODEL,     NULL, "Far functions, far data" },
+    { 0,    OPTION_MEDIUM_MODEL,    NULL, "Far functions, near data" },
+    { 0,    OPTION_SMALL_MODEL,     NULL, "Small model (default)" },
+    { 0,    OPTION_FLAT24_MODEL,    NULL, NULL },
+    { 0,    "--stack-auto",         &options.stackAuto, "Stack automatic variables" },
+    { 0,    OPTION_STACK_8BIT,      NULL, NULL },
+    { 0,    "--stack-10bit",        &options.stack10bit, NULL },
+    { 0,    "--xstack",             &options.useXstack, "Use external stack" },
+    { 0,    "--generic",            &options.genericPtr, "All unqualified ptrs converted to '_generic'" },
+    { 0,    OPTION_NO_GCSE,         NULL, "Disable the GCSE optimisation" },
+    { 0,    OPTION_NO_LOOP_INV,     NULL, "Disable optimisation of invariants" },
+    { 0,    OPTION_NO_LOOP_IND,     NULL, NULL },
+    { 0,    "--nojtbound",          &optimize.noJTabBoundary, "Don't generate boundary check for jump tables" },
+    { 0,    "--noloopreverse",      &optimize.noLoopReverse, "Disable the loop reverse optimisation" },
+    { 0,    "--regextend",          &options.regExtend, NULL },
+    { 'c',  "--compile-only",       &options.cc_only, "Compile only, do not assemble or link" },
+    { 0,    "--dumpraw",            &options.dump_raw, "Dump the internal structure after the initial parse" },
+    { 0,    "--dumpgcse",           &options.dump_gcse, NULL },
+    { 0,    "--dumploop",           &options.dump_loop, NULL },
+    { 0,    "--dumpdeadcode",       &options.dump_kill, NULL },
+    { 0,    "--dumpliverange",      &options.dump_range, NULL },
+    { 0,    "--dumpregpack",        &options.dump_pack, NULL },
+    { 0,    "--dumpregassign",      &options.dump_rassgn, NULL },
+    { 0,    OPTION_DUMP_ALL,        NULL, "Dump the internal structure at all stages" },
+    { 0,    OPTION_XRAM_LOC,        NULL, NULL },
+    { 0,    OPTION_IRAM_SIZE,       NULL, "<nnnn> Internal Ram size" },
+    { 0,    OPTION_XSTACK_LOC,      NULL, "<nnnn> External Ram start location" },
+    { 0,    OPTION_CODE_LOC,        NULL, "<nnnn> Code Segment Location" },
+    { 0,    OPTION_STACK_LOC,       NULL, "<nnnn> Stack pointer initial value" },
+    { 0,    OPTION_DATA_LOC,        NULL, "<nnnn> Direct data start location" },
+    { 0,    OPTION_IDATA_LOC,       NULL, NULL },
+    { 0,    OPTION_PEEP_FILE,       NULL, NULL },
+    { 0,    OPTION_LIB_PATH,        NULL, NULL },
+    { 0,    "--int-long-reent",     &options.intlong_rent, "Use reenterant calls on the int and long support functions" },
+    { 0,    "--float-reent",        &options.float_rent, "Use reenterant calls on the floar support functions" },
+    { 0,    OPTION_OUT_FMT_IHX,     NULL, NULL },
+    { 0,    "--out-fmt-s19",        &options.out_fmt, NULL },
+    { 0,    "--cyclomatic",         &options.cyclomatic, NULL },
+    { 0,    "--nooverlay",          &options.noOverlay, NULL },
+    { 0,    "--main-return",        &options.mainreturn, "Issue a return after main()" },
+    { 0,    "--no-peep",            &options.nopeep, "Disable the peephole assembly file optimisation" },
+    { 0,    "--peep-asm",           &options.asmpeep, NULL },
+    { 0,    "--debug",              &options.debug, "Enable debugging symbol output" },
+    { 0,    "--nodebug",            &options.nodebug, "Disable debugging symbol output" },
+    { 'v',  OPTION_VERSION,         NULL, "Display sdcc's version" },
+    { 0,    "--stack-after-data",   &options.stackOnData, NULL },
+    { 'E',  "--preprocessonly",     &preProcOnly, "Preprocess only, do not compile" },
+    { 0,    "--c1mode",             &options.c1mode, "Act in c1 mode.  The input is preprocessed code, the output is assembly code." },
+    { 0,    "--help",               NULL, "Display this help" },
+    { 0,    OPTION_CALLEE_SAVES,    NULL, "Cause the called function to save registers insted of the caller" },
+    { 0,    "--nostdlib",           &options.nostdlib, "Do not include the standard library directory in the search path" },
+    { 0,    "--nostdinc",           &options.nostdinc, NULL },
+    { 0,    "--verbose",            &options.verbose, "Trace calls to the preprocessor, assembler, and linker" },
+    { 0,    OPTION_LESS_PEDANTIC,   NULL, "Disable some of the more pedantic warnings" },
+    { 0,    "--short-is-int",	    &options.shortisint, "Make short the same size as int" },
+    { 0,    OPTION_SHORT_IS_CHAR,   NULL, "Make short the same size as char (default)" }
+};
+
+/** Table of all unsupported options and help text to display when one
+    is used.
+*/
+typedef struct {
+    /** shortOpt as in OPTIONS. */
+    char shortOpt;
+    /** longOpt as in OPTIONS. */
+    const char *longOpt;
+    /** Message to display inside W_UNSUPPORTED_OPT when this option
+        is used. */
+    const char *message;
+} UNSUPPORTEDOPT;
+
+static const UNSUPPORTEDOPT 
+unsupportedOptTable[] = {
+    { 'a',  NULL,	"use --stack-auto instead." },
+    { 'g',  NULL,	"use --generic instead" },
+    { 'X',  NULL,	"use --xstack-loc instead" },
+    { 'x',  NULL,	"use --xstack instead" },
+    { 'p',  NULL,	"use --stack-loc instead" },
+    { 'P',  NULL,	"use --stack-loc instead" },
+    { 'i',  NULL,	"use --idata-loc instead" },
+    { 'r',  NULL,	"use --xdata-loc instead" },
+    { 's',  NULL,	"use --code-loc instead" },
+    { 'Y',  NULL,	"use -I instead" }
+};
 
 static const char *_preCmd[] =
 {
@@ -250,16 +338,7 @@ printVersionInfo ()
     );
 }
 
-/*-----------------------------------------------------------------*/
-/* printUsage - prints command line syntax         */
-/*-----------------------------------------------------------------*/
-void
-printUsage ()
-{
-  printVersionInfo ();
-  fprintf (stderr,
-	   "Usage : [options] filename\n"
-	   "Options :-\n"
+/*
        "\t-m<proc>             -     Target processor <proc>.  Default %s\n"
 	   "\t                           Try --version for supported values of <proc>\n"
 	   "\t--model-large        -     Large Model\n"
@@ -279,9 +358,29 @@ printUsage ()
 	   "\t-Dmacro   - Define Macro\n"
 	   "\t-Ipath    - Include \"*.h\" path\n"
       "Note: this is NOT a complete list of options see docs for details\n",
-	   _ports[0]->target
-    );
-  exit (0);
+*/
+/*-----------------------------------------------------------------*/
+/* printUsage - prints command line syntax         */
+/*-----------------------------------------------------------------*/
+void
+printUsage ()
+{
+    int i;
+    printVersionInfo();
+    fprintf (stderr,
+             "Usage : sdcc [options] filename\n"
+             "Options :-\n"
+             );
+    
+    for (i = 0; i < LENGTH(optionsTable); i++) {
+        fprintf(stderr, "  %c%c  %-20s  %s\n", 
+                optionsTable[i].shortOpt !=0 ? '-' : ' ',
+                optionsTable[i].shortOpt !=0 ? optionsTable[i].shortOpt : ' ',
+                optionsTable[i].longOpt != NULL ? optionsTable[i].longOpt : "",
+                optionsTable[i].help != NULL ? optionsTable[i].help : ""
+                );
+    }
+    exit (0);
 }
 
 /*-----------------------------------------------------------------*/
@@ -481,6 +580,114 @@ _setModel (int model, const char *sz)
     werror (W_UNSUPPORTED_MODEL, sz, port->target);
 }
 
+/** Gets the string argument to this option.  If the option is '--opt'
+    then for input of '--optxyz' or '--opt xyz' returns xyz.
+*/
+static char *
+getStringArg(const char *szStart, char **argv, int *pi)
+{
+    if (argv[*pi][strlen(szStart)]) {
+        return &argv[*pi][strlen(szStart)];
+    }
+    else {
+        return argv[++(*pi)];
+    }
+}
+
+/** Gets the integer argument to this option using the same rules as
+    getStringArg. 
+*/
+static int
+getIntArg(const char *szStart, char **argv, int *pi)
+{
+    return (int)floatFromVal(constVal(getStringArg(szStart, argv, pi)));
+}
+
+static bool
+tryHandleUnsupportedOpt(char **argv, int *pi)
+{
+    if (argv[*pi][0] == '-') 
+        {
+            const char *longOpt = "";
+            char shortOpt = -1;
+            int i;
+
+            if (argv[*pi][1] == '-') 
+                {
+                    // Long option.
+                    longOpt = argv[*pi];
+                }
+            else 
+                {
+                    shortOpt = argv[*pi][1];
+                }
+            for (i = 0; i < LENGTH(unsupportedOptTable); i++) 
+                {
+                    if (unsupportedOptTable[i].shortOpt == shortOpt || 
+                        (longOpt && unsupportedOptTable[i].longOpt && !strcmp(unsupportedOptTable[i].longOpt, longOpt))) {
+                        // Found an unsupported opt.
+                        char buffer[100];
+                        sprintf(buffer, "%s%c%c", longOpt ? longOpt : "", shortOpt ? '-' : ' ', shortOpt ? shortOpt : ' ');
+                        werror (W_UNSUPP_OPTION, buffer, unsupportedOptTable[i].message);
+                        return 1;
+                    }
+                }
+            // Didn't find in the table
+            return 0;
+        }
+    else 
+        {
+            // Not an option, so can't be unsupported :)
+            return 0;
+    }
+}
+
+static bool
+tryHandleSimpleOpt(char **argv, int *pi)
+{
+    if (argv[*pi][0] == '-') 
+        {
+            const char *longOpt = "";
+            char shortOpt = -1;
+            int i;
+
+            if (argv[*pi][1] == '-') 
+                {
+                    // Long option.
+                    longOpt = argv[*pi];
+                }
+            else 
+                {
+                    shortOpt = argv[*pi][1];
+                }
+
+            for (i = 0; i < LENGTH(optionsTable); i++) 
+                {
+                    if (optionsTable[i].shortOpt == shortOpt || 
+                        (longOpt && optionsTable[i].longOpt && strcmp(optionsTable[i].longOpt, longOpt) == 0))
+                        {
+                            // If it is a flag then we can handle it here
+                            if (optionsTable[i].pparameter != NULL) 
+                                {
+                                    (*optionsTable[i].pparameter)++;
+                                    return 1;
+                                }
+                            else {
+                                // Not a flag.  Handled manually later.
+                                return 0;
+                            }
+                        }
+                }
+            // Didn't find in the table
+            return 0;
+        }
+    else 
+        {
+            // Not an option, so can't be handled.
+            return 0;
+        }
+}
+
 /*-----------------------------------------------------------------*/
 /* parseCmdLine - parses the command line and sets the options     */
 /*-----------------------------------------------------------------*/
@@ -496,162 +703,62 @@ parseCmdLine (int argc, char **argv)
       if (i >= argc)
 	break;
 
+      if (tryHandleUnsupportedOpt(argv, &i) == TRUE) 
+          {
+              continue;
+          }
+
+      if (tryHandleSimpleOpt(argv, &i) == TRUE)
+          {
+              continue;
+          }
+
       /* options */
       if (argv[i][0] == '-' && argv[i][1] == '-')
 	{
-
-	  if (strcmp (&argv[i][1], OPTION_HELP) == 0)
+	  if (strcmp (argv[i], OPTION_HELP) == 0)
 	    {
 	      printUsage ();
 	      exit (0);
 	    }
 
-	  if (strcmp (&argv[i][1], OPTION_XREGS) == 0)
-	    {
-	      options.regExtend = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_LARGE_MODEL) == 0)
-	    {
-	      _setModel (MODEL_LARGE, argv[i]);
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_MEDIUM_MODEL) == 0)
-	    {
-	      _setModel (MODEL_MEDIUM, argv[i]);
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_SMALL_MODEL) == 0)
-	    {
-	      _setModel (MODEL_SMALL, argv[i]);
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_FLAT24_MODEL) == 0)
-	    {
-	      _setModel (MODEL_FLAT24, argv[i]);
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_STACK_10BIT) == 0)
-	    {
-	      options.stack10bit = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_STACK_8BIT) == 0)
+	  if (strcmp (argv[i], OPTION_STACK_8BIT) == 0)
 	    {
 	      options.stack10bit = 0;
 	      continue;
 	    }
 
-	  if (strcmp (&argv[i][1], OPTION_STACK_AUTO) == 0)
-	    {
-	      options.stackAuto = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_DUMP_RAW) == 0)
-	    {
-	      options.dump_raw = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_CYCLOMATIC) == 0)
-	    {
-	      options.cyclomatic = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_DUMP_GCSE) == 0)
-	    {
-	      options.dump_gcse = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_DUMP_LOOP) == 0)
-	    {
-	      options.dump_loop = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_DUMP_KILL) == 0)
-	    {
-	      options.dump_kill = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_INTLONG_RENT) == 0)
-	    {
-	      options.intlong_rent = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_FLOAT_RENT) == 0)
-	    {
-	      options.float_rent = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_DUMP_RANGE) == 0)
-	    {
-	      options.dump_range = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_DUMP_PACK) == 0)
-	    {
-	      options.dump_pack = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_DUMP_RASSGN) == 0)
-	    {
-	      options.dump_rassgn = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_OUT_FMT_IHX) == 0)
+	  if (strcmp (argv[i], OPTION_OUT_FMT_IHX) == 0)
 	    {
 	      options.out_fmt = 0;
 	      continue;
 	    }
 
-	  if (strcmp (&argv[i][1], OPTION_OUT_FMT_S19) == 0)
+	  if (strcmp (argv[i], OPTION_LARGE_MODEL) == 0)
 	    {
-	      options.out_fmt = 1;
+	      _setModel (MODEL_LARGE, argv[i]);
 	      continue;
 	    }
 
-	  if (strcmp (&argv[i][1], OPTION_NOOVERLAY) == 0)
+	  if (strcmp (argv[i], OPTION_MEDIUM_MODEL) == 0)
 	    {
-	      options.noOverlay = 1;
+	      _setModel (MODEL_MEDIUM, argv[i]);
 	      continue;
 	    }
 
-	  if (strcmp (&argv[i][1], OPTION_STKAFTRDATA) == 0)
+	  if (strcmp (argv[i], OPTION_SMALL_MODEL) == 0)
 	    {
-	      options.stackOnData = 1;
+	      _setModel (MODEL_SMALL, argv[i]);
 	      continue;
 	    }
 
-	  if (strcmp (&argv[i][1], OPTION_PREPROC_ONLY) == 0)
+	  if (strcmp (argv[i], OPTION_FLAT24_MODEL) == 0)
 	    {
-	      preProcOnly = 1;
+	      _setModel (MODEL_FLAT24, argv[i]);
 	      continue;
 	    }
 
-	  if (strcmp (&argv[i][1], OPTION_C1_MODE) == 0)
-	    {
-	      options.c1mode = 1;
-	      continue;
-	    }
-
-
-	  if (strcmp (&argv[i][1], OPTION_DUMP_ALL) == 0)
+	  if (strcmp (argv[i], OPTION_DUMP_ALL) == 0)
 	    {
 	      options.dump_rassgn =
 		options.dump_pack =
@@ -663,240 +770,102 @@ parseCmdLine (int argc, char **argv)
 	      continue;
 	    }
 
-	  if (strcmp (&argv[i][1], OPTION_COMP_ONLY) == 0)
+	  if (strcmp (argv[i], OPTION_PEEP_FILE) == 0)
 	    {
-	      options.cc_only = 1;
-	      continue;
+                options.peep_file = getStringArg(OPTION_PEEP_FILE, argv, &i);
+                continue;
 	    }
 
-	  if (strcmp (&argv[i][1], OPTION_GENERIC) == 0)
-	    {
-	      options.genericPtr = 1;
-	      continue;
+	  if (strcmp (argv[i], OPTION_LIB_PATH) == 0)
+            {
+		libPaths[nlibPaths++] = getStringArg(OPTION_LIB_PATH, argv, &i);
+                continue;
 	    }
 
-	  if (strcmp (&argv[i][1], OPTION_NOPEEP) == 0)
-	    {
-	      options.nopeep = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_ASMPEEP) == 0)
-	    {
-	      options.asmpeep = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_DEBUG) == 0)
-	    {
-	      options.debug = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_NODEBUG) == 0)
-	    {
-	      options.nodebug = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_PEEP_FILE) == 0)
-	    {
-	      if (argv[i][1 + strlen (OPTION_PEEP_FILE)])
-		options.peep_file =
-		  &argv[i][1 + strlen (OPTION_PEEP_FILE)];
-	      else
-		options.peep_file = argv[++i];
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_LIB_PATH) == 0)
-	    {
-	      if (argv[i][1 + strlen (OPTION_LIB_PATH)])
-		libPaths[nlibPaths++] =
-		  &argv[i][1 + strlen (OPTION_PEEP_FILE)];
-	      else
-		libPaths[nlibPaths++] = argv[++i];
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_XSTACK_LOC) == 0)
-	    {
-
-	      if (argv[i][1 + strlen (OPTION_XSTACK_LOC)])
-		options.xstack_loc =
-		  (int) floatFromVal (constVal (&argv[i][1 + strlen (OPTION_XSTACK_LOC)]));
-	      else
-		options.xstack_loc =
-		  (int) floatFromVal (constVal (argv[++i]));
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_XSTACK) == 0)
-	    {
-	      options.useXstack = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_MAINRETURN) == 0)
-	    {
-	      options.mainreturn = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_CALLEE_SAVES) == 0)
-	    {
-	      if (argv[i][1 + strlen (OPTION_CALLEE_SAVES)])
-		parseWithComma (options.calleeSaves
-				,&argv[i][1 + strlen (OPTION_CALLEE_SAVES)]);
-	      else
-		parseWithComma (options.calleeSaves, argv[++i]);
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_STACK_LOC) == 0)
-	    {
-
-	      if (argv[i][1 + strlen (OPTION_STACK_LOC)])
-		options.stack_loc =
-		  (int) floatFromVal (constVal (&argv[i][1 + strlen (OPTION_STACK_LOC)]));
-	      else
-		options.stack_loc =
-		  (int) floatFromVal (constVal (argv[++i]));
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_XRAM_LOC) == 0)
-	    {
-
-	      if (argv[i][1 + strlen (OPTION_XRAM_LOC)])
-		options.xdata_loc =
-		  (unsigned int) floatFromVal (constVal (&argv[i][1 + strlen (OPTION_XRAM_LOC)]));
-	      else
-		options.xdata_loc =
-		  (unsigned int) floatFromVal (constVal (argv[++i]));
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_IRAM_SIZE) == 0)
-	    {
-
-	      if (argv[i][1 + strlen (OPTION_IRAM_SIZE)])
-		options.iram_size =
-		  (int) floatFromVal (constVal (&argv[i][1 + strlen (OPTION_IRAM_SIZE)]));
-	      else
-		options.iram_size =
-		  (int) floatFromVal (constVal (argv[++i]));
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_VERSION) == 0)
+	  if (strcmp (argv[i], OPTION_VERSION) == 0)
 	    {
 	      printVersionInfo ();
-	      exit (0);
+              exit (0);
 	      continue;
 	    }
 
-	  if (strcmp (&argv[i][1], OPTION_DATA_LOC) == 0)
+	  if (strcmp (argv[i], OPTION_CALLEE_SAVES) == 0)
 	    {
-
-	      if (argv[i][1 + strlen (OPTION_DATA_LOC)])
-		options.data_loc =
-		  (int) floatFromVal (constVal (&argv[i][1 + strlen (OPTION_DATA_LOC)]));
-	      else
-		options.data_loc =
-		  (int) floatFromVal (constVal (argv[++i]));
-	      continue;
+                parseWithComma (options.calleeSaves, getStringArg(OPTION_CALLEE_SAVES, argv, &i));
+                continue;
 	    }
 
-	  if (strcmp (&argv[i][1], OPTION_IDATA_LOC) == 0)
+	  if (strcmp (argv[i], OPTION_XSTACK_LOC) == 0)
 	    {
-
-	      if (argv[i][1 + strlen (OPTION_IDATA_LOC)])
-		options.idata_loc =
-		  (int) floatFromVal (constVal (&argv[i][1 + strlen (OPTION_IDATA_LOC)]));
-	      else
-		options.idata_loc =
-		  (int) floatFromVal (constVal (argv[++i]));
-	      continue;
+                options.xstack_loc = getIntArg(OPTION_XSTACK_LOC, argv, &i);
+                continue;
 	    }
 
-	  if (strcmp (&argv[i][1], OPTION_CODE_LOC) == 0)
+	  if (strcmp (argv[i], OPTION_STACK_LOC) == 0)
 	    {
-
-	      if (argv[i][1 + strlen (OPTION_CODE_LOC)])
-		options.code_loc =
-		  (int) floatFromVal (constVal (&argv[i][1 + strlen (OPTION_CODE_LOC)]));
-	      else
-		options.code_loc =
-		  (int) floatFromVal (constVal (argv[++i]));
-	      continue;
+                options.stack_loc = getIntArg(OPTION_STACK_LOC, argv, &i);
+                continue;
 	    }
 
-
-	  if (strcmp (&argv[i][1], OPTION_NO_JTBOUND) == 0)
+	  if (strcmp (argv[i], OPTION_XRAM_LOC) == 0)
 	    {
-	      optimize.noJTabBoundary = 1;
-	      continue;
+                options.xdata_loc = getIntArg(OPTION_XRAM_LOC, argv, &i);
+                continue;
 	    }
 
-	  if (strcmp (&argv[i][1], OPTION_NO_GCSE) == 0)
+	  if (strcmp (argv[i], OPTION_IRAM_SIZE) == 0)
+	    {
+                options.iram_size = getIntArg(OPTION_IRAM_SIZE, argv, &i);
+                continue;
+	    }
+
+	  if (strcmp (argv[i], OPTION_DATA_LOC) == 0)
+	    {
+                options.data_loc = getIntArg(OPTION_DATA_LOC, argv, &i);
+                continue;
+	    }
+
+	  if (strcmp (argv[i], OPTION_IDATA_LOC) == 0)
+	    {
+                options.idata_loc = getIntArg(OPTION_IDATA_LOC, argv, &i);
+                continue;
+	    }
+
+	  if (strcmp (argv[i], OPTION_CODE_LOC) == 0)
+	    {
+                options.code_loc = getIntArg(OPTION_CODE_LOC, argv, &i);
+                continue;
+	    }
+
+	  if (strcmp (argv[i], OPTION_NO_GCSE) == 0)
 	    {
 	      optimize.global_cse = 0;
 	      continue;
 	    }
 
-	  if (strcmp (&argv[i][1], OPTION_NO_LOOP_INV) == 0)
+	  if (strcmp (argv[i], OPTION_NO_LOOP_INV) == 0)
 	    {
 	      optimize.loopInvariant = 0;
 	      continue;
 	    }
 
-	  if (strcmp (&argv[i][1], OPTION_NO_LOOP_IND) == 0)
+	  if (strcmp (argv[i], OPTION_NO_LOOP_IND) == 0)
 	    {
 	      optimize.loopInduction = 0;
 	      continue;
 	    }
 
-	  if (strcmp (&argv[i][1], OPTION_NO_LOOPREV) == 0)
-	    {
-	      optimize.noLoopReverse = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_NOSTDLIB) == 0)
-	    {
-	      options.nostdlib = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_NOSTDINC) == 0)
-	    {
-	      options.nostdinc = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_VERBOSE) == 0)
-	    {
-	      options.verbose = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_SHORT_IS_INT) == 0) {
-	    options.shortisint=1;
-	    continue;
-	  }
+          if (strcmp (argv[i], OPTION_LESS_PEDANTIC) == 0) 
+              {
+                  setErrorLogLevel(ERROR_LEVEL_WARNING);
+                  continue;
+              }
 
 	  if (strcmp (&argv[i][1], OPTION_SHORT_IS_CHAR) == 0) {
 	    options.shortisint=0;
 	    continue;
 	  }
           
-          if (strcmp (argv[i] +1, OPTION_LESS_PEDANTIC) == 0) 
-              {
-                  setErrorLogLevel(ERROR_LEVEL_WARNING);
-                  continue;
-              }
-
 	  if (!port->parseOption (&argc, argv, &i))
 	    {
 	      werror (W_UNKNOWN_OPTION, argv[i]);
@@ -906,7 +875,6 @@ parseCmdLine (int argc, char **argv)
 	      continue;
 	    }
 	}
-
 
       /* if preceded by  '-' then option */
       if (*argv[i] == '-')
@@ -918,95 +886,37 @@ parseCmdLine (int argc, char **argv)
 	      exit (0);
 	      break;
 
-	    case 'E':
-	      preProcOnly = 1;
-	      break;
-
 	    case 'm':
 	      /* Used to select the port */
 	      _setPort (argv[i] + 2);
-	      break;
-
-	    case 'a':
-	      werror (W_UNSUPP_OPTION, "-a", "use --stack-auto instead");
-	      break;
-
-	    case 'g':
-	      werror (W_UNSUPP_OPTION, "-g", "use --generic instead");
-	      break;
-
-	    case 'X':		/* use external stack   */
-	      werror (W_UNSUPP_OPTION, "-X", "use --xstack-loc instead");
-	      break;
-
-	    case 'x':
-	      werror (W_UNSUPP_OPTION, "-x", "use --xstack instead");
-	      break;
-
-	    case 'p':		/* stack pointer intial value */
-	    case 'P':
-	      werror (W_UNSUPP_OPTION, "-p", "use --stack-loc instead");
-	      break;
-
-	    case 'i':
-	      werror (W_UNSUPP_OPTION, "-i", "use --idata-loc instead");
-	      break;
-
-	    case 'r':
-	      werror (W_UNSUPP_OPTION, "-r", "use --xdata-loc instead");
-	      break;
-
-	    case 's':
-	      werror (W_UNSUPP_OPTION, "-s", "use --code-loc instead");
 	      break;
 
 	    case 'c':
 	      options.cc_only = 1;
 	      break;
 
-	    case 'Y':
-	      werror (W_UNSUPP_OPTION, "-Y", "use -I instead");
-	      break;
-
 	    case 'L':
-	      if (argv[i][2])
-		libPaths[nlibPaths++] = &argv[i][2];
-	      else
-		libPaths[nlibPaths++] = argv[++i];
-	      break;
+                libPaths[nlibPaths++] = getStringArg("-L", argv, &i);
+                break;
 
 	    case 'W':
 	      /* linker options */
 	      if (argv[i][2] == 'l')
 		{
-		  if (argv[i][3])
-		    parseWithComma (linkOptions, &argv[i][3]);
-		  else
-		    parseWithComma (linkOptions, argv[++i]);
+                    parseWithComma(linkOptions, getStringArg("-Wl", argv, &i));
 		}
 	      else
 		{
 		  /* assembler options */
 		  if (argv[i][2] == 'a')
 		    {
-		      if (argv[i][3])
-			parseWithComma ((char **) asmOptions, &argv[i][3]);
-		      else
-			parseWithComma ((char **) asmOptions, argv[++i]);
-
+			parseWithComma ((char **) asmOptions, getStringArg("-Wa", argv, &i));
 		    }
 		  else
 		    {
 		      werror (W_UNKNOWN_OPTION, argv[i]);
 		    }
 		}
-	      break;
-	    case 'S':
-	      noAssemble = 1;
-	      break;
-
-	    case 'V':
-	      verboseExec = TRUE;
 	      break;
 
 	    case 'v':
@@ -1038,13 +948,22 @@ parseCmdLine (int argc, char **argv)
 		if (argv[i][2] == ' ' || argv[i][2] == '\0')
 		  {
 		    i++;
-		    rest = argv[i];
+                    if (i >= argc) 
+                      {
+                          /* No argument. */
+                          werror(E_ARGUMENT_MISSING, argv[i-1]);
+                          break;
+                      }
+                    else 
+                      {
+                          rest = argv[i];
+                      }
 		  }
 		else
 		  rest = &argv[i][2];
 
-		if (argv[i][1] == 'Y')
-		  argv[i][1] = 'I';
+		if (sOpt == 'Y')
+		  sOpt = 'I';
 
 		sprintf (buffer, "-%c%s", sOpt, rest);
 		_addToList (preArgv, buffer);

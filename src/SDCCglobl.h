@@ -158,16 +158,16 @@ typedef int bool;
 /* optimization options */
 struct optimize
   {
-    unsigned global_cse:1;
-    unsigned ptrArithmetic:1;
-    unsigned label1:1;
-    unsigned label2:1;
-    unsigned label3:1;
-    unsigned label4:1;
-    unsigned loopInvariant:1;
-    unsigned loopInduction:1;
-    unsigned noJTabBoundary:1;
-    unsigned noLoopReverse:1;
+    unsigned global_cse;
+    unsigned ptrArithmetic;
+    unsigned label1;
+    unsigned label2;
+    unsigned label3;
+    unsigned label4;
+    unsigned loopInvariant;
+    unsigned loopInduction;
+    unsigned noJTabBoundary;
+    unsigned noLoopReverse;
   };
 
 /** Build model.
@@ -187,37 +187,37 @@ enum
 struct options
   {
     int model;			/* see MODEL_* defines above */
-    int stackAuto:3;		/* Stack Automatic  */
-    int useXstack:3;		/* use Xternal Stack */
-    int stack10bit:3;		/* use 10 bit stack (flat24 model only) */
-    int genericPtr:1;		/* use generic pointers */
-    int regExtend:1;		/* don't use extended registers */
-    int dump_raw:1;		/* dump after intermediate code generation */
-    int dump_gcse:1;		/* dump after gcse */
-    int dump_loop:1;		/* dump after loop optimizations */
-    int dump_kill:1;		/* dump after dead code elimination */
-    int dump_range:1;		/* dump after live range analysis */
-    int dump_pack:1;		/* dump after register packing */
-    int dump_rassgn:1;		/* dump after register assignment */
-    int cc_only:1;		/* compile only flag              */
-    int intlong_rent:1;		/* integer & long support routines reentrant */
-    int float_rent:1;		/* floating point routines are reentrant */
-    int out_fmt:1;		/* 1 = motorola S19 format 0 = intel Hex format */
-    int cyclomatic:1;		/* print cyclomatic information */
-    int noOverlay:1;		/* don't overlay local variables & parameters */
-    int mainreturn:1;		/* issue a return after main */
-    int nopeep:1;		/* no peep hole optimization */
-    int asmpeep:1;		/* pass inline assembler thru peep hole */
-    int debug:1;		/* generate extra debug info */
-    int nodebug:1;		/* Generate no debug info. */
-    int stackOnData:1;		/* stack after data segment  */
-    int c1mode:1;		/* Act like c1 - no pre-proc, asm or link */
+    int stackAuto;		/* Stack Automatic  */
+    int useXstack;		/* use Xternal Stack */
+    int stack10bit;		/* use 10 bit stack (flat24 model only) */
+    int genericPtr;		/* use generic pointers */
+    int regExtend;		/* don't use extended registers */
+    int dump_raw;		/* dump after intermediate code generation */
+    int dump_gcse;		/* dump after gcse */
+    int dump_loop;		/* dump after loop optimizations */
+    int dump_kill;		/* dump after dead code elimination */
+    int dump_range;		/* dump after live range analysis */
+    int dump_pack;		/* dump after register packing */
+    int dump_rassgn;		/* dump after register assignment */
+    int cc_only;		/* compile only flag              */
+    int intlong_rent;		/* integer & long support routines reentrant */
+    int float_rent;		/* floating point routines are reentrant */
+    int out_fmt;		/* 1 = motorola S19 format 0 = intel Hex format */
+    int cyclomatic;		/* print cyclomatic information */
+    int noOverlay;		/* don't overlay local variables & parameters */
+    int mainreturn;		/* issue a return after main */
+    int nopeep;			/* no peep hole optimization */
+    int asmpeep;		/* pass inline assembler thru peep hole */
+    int debug;			/* generate extra debug info */
+    int nodebug;		/* Generate no debug info. */
+    int stackOnData;		/* stack after data segment  */
+    int c1mode;			/* Act like c1 - no pre-proc, asm or link */
     char *peep_file;		/* additional rules for peep hole */
     char *out_name;		/* Asm output name for c1 mode */
-    int nostdlib:1;		/* Don't use standard lib files */
-    int nostdinc:1;		/* Don't use standard include files */
-    int verbose:1;		/* Show what the compiler is doing */
-    int shortisint:1;           /* treat short like int or char */
+    int nostdlib;		/* Don't use standard lib files */
+    int nostdinc;		/* Don't use standard include files */
+    int verbose;		/* Show what the compiler is doing */
+    int shortisint;             /* treat short like int or char */
 
     char *calleeSaves[128];	/* list of functions using callee save */
     char *excludeRegs[32];	/* registers excluded from saving */

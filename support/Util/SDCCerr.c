@@ -349,6 +349,8 @@ struct
     "two or more storage classes in declaration for '%s'" },
 { W_EXESS_ARRAY_INITIALIZERS, ERROR_LEVEL_WARNING,
     "excess elements in array initializer after `%s' at line %d" },
+{ E_ARGUMENT_MISSING, ERROR_LEVEL_ERROR,
+   "Option %s requires an argument." }
 };
 
 /*

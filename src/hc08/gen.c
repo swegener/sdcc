@@ -2331,20 +2331,16 @@ genUminusFloat (operand * op, operand * result)
 
   while (size--)
     {
-      if (!size)
-        {
-          needpula = pushRegIfUsed (hc08_reg_a);
-          loadRegFromAop (hc08_reg_a, AOP (op), offset);
-          emitcode ("eor", "#0x80");
-          hc08_useReg (hc08_reg_a);
-          storeRegToAop (hc08_reg_a, AOP (result), offset);
-          pullOrFreeReg (hc08_reg_a, needpula);
-        }
-      else
-        transferAopAop (AOP (op), offset, AOP (result), offset);
+      transferAopAop (AOP (op), offset, AOP (result), offset);
       offset++;
     }
 
+  needpula = pushRegIfUsed (hc08_reg_a);
+  loadRegFromAop (hc08_reg_a, AOP (op), offset);
+  emitcode ("eor", "#0x80");
+  hc08_useReg (hc08_reg_a);
+  storeRegToAop (hc08_reg_a, AOP (result), offset);
+  pullOrFreeReg (hc08_reg_a, needpula);
 }
 
 /*-----------------------------------------------------------------*/

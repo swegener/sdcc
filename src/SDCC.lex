@@ -568,7 +568,7 @@ int yyerror(char *s)
    fflush(stdout);
 
    if (yylineno && filename)
-	fprintf(stdout,"\n%s(%d) %s: token -> '%s' ; column %d\n",
+	fprintf(stdout,"\n%s:%d: %s: token -> '%s' ; column %d\n",
 		filename,yylineno,
 		s,yytext,column);
    fatalError++;

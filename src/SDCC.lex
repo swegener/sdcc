@@ -22,8 +22,6 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
-%option noyywrap
-
 D        [0-9]
 L        [a-zA-Z_]
 H        [a-fA-F0-9]
@@ -47,32 +45,10 @@ extern char *filename;
 int  mylineno = 1;
 static void count(void);
 static int process_pragma(char *);
-#undef yywrap
-
-#ifndef YYPROTO
-
-#ifdef YY_USE_PROTOS
-#define YY_PROTO(proto) proto
-#else
-#define YY_PROTO(proto) ()
-#endif
-
-#endif
-
-int yywrap YY_PROTO((void))
-{
-   return(1);
-}
-
-static void yyunput (int, char *);
-
-static void my_unput(char c)
-{
-  yyunput(c, (yytext_ptr));
-}
+static void my_unput(char c);
 
 #define TKEYWORD(token) return (isTargetKeyword(yytext) ? token :\
-			        check_type())
+                                check_type())
 char *asmbuff=NULL;
 int asmbuffSize=0;
 char *asmp ;
@@ -663,6 +639,19 @@ static int isTargetKeyword(char *s)
     }
     
     return 0;
+}
+
+static void my_unput(char c)
+{
+  yyunput(c, (yytext_ptr));
+}
+
+int yywrap(void)
+{
+  if (!STACK_EMPTY(options_stack) || !STACK_EMPTY(optimize_stack))
+    werror(W_SAVE_RESTORE);
+
+  return 1;
 }
 
 int yyerror(char *s)

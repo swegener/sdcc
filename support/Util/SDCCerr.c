@@ -395,6 +395,8 @@ struct
     "ignoring declarator of 0 length bitfield" },
 { E_FUNC_ATTR, ERROR_LEVEL_ERROR,
     "function attribute following non-function declaration"},
+{ W_SAVE_RESTORE, ERROR_LEVEL_PEDANTIC,
+    "unmatched #pragma SAVE and #pragma RESTORE" },
 };
 
 /*

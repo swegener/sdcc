@@ -69,6 +69,8 @@ PRINTFUNC (picJumpTable);
 PRINTFUNC (picInline);
 PRINTFUNC (picReceive);
 PRINTFUNC (picDummyRead);
+PRINTFUNC (picCritical);
+PRINTFUNC (picEndCritical);
 
 iCodeTable codeTable[] =
 {
@@ -115,7 +117,9 @@ iCodeTable codeTable[] =
   {RECEIVE, "recv", picReceive, NULL},
   {SEND, "send", picGenericOne, NULL},
   {ARRAYINIT, "arrayInit", picGenericOne, NULL},
-  {DUMMY_READ_VOLATILE, "dummy = (volatile)", picDummyRead, NULL}
+  {DUMMY_READ_VOLATILE, "dummy = (volatile)", picDummyRead, NULL},
+  {CRITICAL, "critical_start", picCritical, NULL},
+  {ENDCRITICAL, "critical_end", picEndCritical, NULL}
 };
 
 /*-----------------------------------------------------------------*/
@@ -470,6 +474,28 @@ PRINTFUNC (picDummyRead)
   fprintf (of, "\t");
   fprintf (of, "%s ", s);
   printOperand (IC_RIGHT (ic), of);
+  fprintf (of, "\n");
+}
+
+PRINTFUNC (picCritical)
+{
+  fprintf (of, "\t");
+  if (IC_RESULT (ic))
+    printOperand (IC_RESULT (ic), of);
+  else
+    fprintf (of, "(stack)");
+  fprintf (of, " = %s ", s);
+  fprintf (of, "\n");
+}
+
+PRINTFUNC (picEndCritical)
+{
+  fprintf (of, "\t");
+  fprintf (of, "%s = ", s);
+  if (IC_RIGHT (ic))
+    printOperand (IC_RIGHT (ic), of);
+  else
+    fprintf (of, "(stack)");
   fprintf (of, "\n");
 }
 
@@ -3431,6 +3457,34 @@ geniCodeArrayInit (ast * tree, operand *array)
   }
   ADDTOCHAIN (ic);
 }
+	
+/*-----------------------------------------------------------------*/
+/* geniCodeCritical - intermediate code for a critical statement   */
+/*-----------------------------------------------------------------*/
+static void 
+geniCodeCritical (ast *tree, int lvl)
+{
+  iCode *ic;
+  operand *op = NULL;
+
+  /* If op is NULL, the original interrupt state will saved on */
+  /* the stack. Otherwise, it will be saved in op. */
+  
+  /* Generate a save of the current interrupt state & disabled */
+  ic = newiCode (CRITICAL, NULL, NULL);
+  IC_RESULT (ic) = op;
+  ADDTOCHAIN (ic);
+  
+  /* Generate the critical code sequence */
+  if (tree->left && tree->left->type == EX_VALUE)
+    geniCodeDummyRead (ast2iCode (tree->left,lvl+1));
+  else
+    ast2iCode (tree->left,lvl+1);
+  
+  /* Generate a restore of the original interrupt state */
+  ic = newiCode (ENDCRITICAL, NULL, op);
+  ADDTOCHAIN (ic);
+}
 
 /*-----------------------------------------------------------------*/
 /* Stuff used in ast2iCode to modify geniCodeDerefPtr in some      */
@@ -3546,7 +3600,8 @@ ast2iCode (ast * tree,int lvl)
       tree->opval.op != GOTO &&
       tree->opval.op != SWITCH &&
       tree->opval.op != FUNCTION &&
-      tree->opval.op != INLINEASM)
+      tree->opval.op != INLINEASM &&
+      tree->opval.op != CRITICAL)
     {
 
         if (IS_ASSIGN_OP (tree->opval.op) ||
@@ -3880,6 +3935,9 @@ ast2iCode (ast * tree,int lvl)
     case ARRAYINIT:
 	geniCodeArrayInit(tree, ast2iCode (tree->left,lvl+1));
 	return NULL;
+    
+    case CRITICAL:
+	geniCodeCritical (tree, lvl);    
     }
 
   return NULL;

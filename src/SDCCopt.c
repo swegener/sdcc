@@ -680,7 +680,9 @@ killDeadCode (eBBlock ** ebbs, int count)
 	      if (SKIP_IC (ic) ||
 		  ic->op == IFX ||
 		  ic->op == RETURN ||
-                  ic->op == DUMMY_READ_VOLATILE)
+                  ic->op == DUMMY_READ_VOLATILE ||
+                  ic->op == CRITICAL ||
+                  ic->op == ENDCRITICAL)
 		continue;
 
 	      /* if the result is volatile then continue */

@@ -7307,6 +7307,85 @@ genReceive (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* genDummyRead - generate code for dummy read of volatiles        */
+/*-----------------------------------------------------------------*/
+static void
+genDummyRead (iCode * ic)
+{
+  operand *right;
+  int size, offset;
+
+  D(emitcode(";     genDummyRead",""));
+
+  right = IC_RIGHT (ic);
+
+  aopOp (right, ic, FALSE);
+
+  /* bit variables done */
+  /* general case */
+  size = AOP_SIZE (right);
+  offset = 0;
+
+  while (size--)
+    {
+      loadRegFromAop (hc08_reg_a, AOP (right), offset);
+      hc08_freeReg (hc08_reg_a);
+      offset++;
+    }
+
+  freeAsmop (right, NULL, ic, TRUE);
+}
+
+/*-----------------------------------------------------------------*/
+/* genCritical - generate code for start of a critical sequence    */
+/*-----------------------------------------------------------------*/
+static void
+genCritical (iCode *ic)
+{
+  D(emitcode(";     genCritical",""));
+  
+  if (IC_RESULT (ic))
+    aopOp (IC_RESULT (ic), ic, TRUE);
+
+  emitcode ("tpa", "");
+  hc08_dirtyReg (hc08_reg_a, FALSE);
+  emitcode ("sei", "");
+
+  if (IC_RESULT (ic))
+    storeRegToAop (hc08_reg_a, AOP (IC_RESULT (ic)), 0);
+  else
+    pushReg (hc08_reg_a, FALSE);
+
+  hc08_freeReg (hc08_reg_a);
+  if (IC_RESULT (ic))
+    freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
+}
+
+/*-----------------------------------------------------------------*/
+/* genEndCritical - generate code for end of a critical sequence   */
+/*-----------------------------------------------------------------*/
+static void
+genEndCritical (iCode *ic)
+{
+  D(emitcode(";     genEndCritical",""));
+  
+  if (IC_RIGHT (ic))
+    {
+      aopOp (IC_RIGHT (ic), ic, FALSE);
+      loadRegFromAop (hc08_reg_a, AOP (IC_RIGHT (ic)), 0);
+      emitcode ("tap", "");
+      hc08_freeReg (hc08_reg_a);
+      freeAsmop (IC_RIGHT (ic), NULL, ic, TRUE);
+    }
+  else
+    {
+      pullReg (hc08_reg_a);
+      emitcode ("tap", "");
+    }
+}
+
+
+/*-----------------------------------------------------------------*/
 /* genhc08Code - generate code for HC08 based controllers          */
 /*-----------------------------------------------------------------*/
 void
@@ -7615,6 +7694,18 @@ genhc08Code (iCode * lic)
 
 	case SEND:
 	  addSet (&_G.sendSet, ic);
+	  break;
+
+	case DUMMY_READ_VOLATILE:
+	  genDummyRead (ic);
+	  break;
+
+	case CRITICAL:
+	  genCritical (ic);
+	  break;
+
+	case ENDCRITICAL:
+	  genEndCritical (ic);
 	  break;
 
 	default:

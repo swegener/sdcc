@@ -5505,6 +5505,9 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"FOR LOOP BODY \n");
 		ast_print(tree->left,outfile,indent+2);
 		return ;
+	case CRITICAL:
+		fprintf(outfile,"CRITICAL (%p) \n",tree);
+		ast_print(tree->left,outfile,indent+2);
 	default:
 	    return ;
 	}

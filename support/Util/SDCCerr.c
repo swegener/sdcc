@@ -397,6 +397,8 @@ struct
     "function attribute following non-function declaration"},
 { W_SAVE_RESTORE, ERROR_LEVEL_PEDANTIC,
     "unmatched #pragma SAVE and #pragma RESTORE" },
+{ E_INVALID_CRITICAL, ERROR_LEVEL_ERROR,
+    "not allowed in a critical section" },
 };
 
 /*

@@ -186,6 +186,7 @@ SDCCERR - SDCC Standard error handler
 #define W_BITFLD_NAMED 168          /* declarator used with 0 length bitfield */
 #define E_FUNC_ATTR 169             /* function attribute without function */
 #define W_SAVE_RESTORE 170          /* unmatched #pragma SAVE and #pragma RESTORE */
+#define E_INVALID_CRITICAL 171	    /* operation invalid in critical sequence */
 
 /** Describes the maximum error level that will be logged.  Any level
  *  includes all of the levels listed after it.

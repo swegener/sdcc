@@ -2604,9 +2604,12 @@ genFunction (iCode * ic)
   /* if critical function then turn interrupts off */
   if (IFFUNC_ISCRITICAL (ftype))
     {
-      emitcode ("mov", "c,ea");
+      symbol *tlbl = newiTempLabel (NULL);
+      emitcode ("setb", "c");
+      emitcode ("jbc", "ea,%05d$", (tlbl->key + 100)); /* atomic test & clear */
+      emitcode ("clr", "c");
+      emitcode ("", "%05d$:", (tlbl->key + 100));
       emitcode ("push", "psw"); /* save old ea via c in psw */
-      emitcode ("clr", "ea");
     }
 }
 
@@ -9005,6 +9008,65 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
+/* genCritical - generate code for start of a critical sequence    */
+/*-----------------------------------------------------------------*/
+static void
+genCritical (iCode *ic)
+{
+  symbol *tlbl = newiTempLabel (NULL);
+
+  D(emitcode(";     genCritical",""));
+  
+  if (IC_RESULT (ic))
+    aopOp (IC_RESULT (ic), ic, TRUE);
+
+  emitcode ("setb", "c");
+  emitcode ("jbc", "ea,%05d$", (tlbl->key + 100)); /* atomic test & clear */
+  emitcode ("clr", "c");
+  emitcode ("", "%05d$:", (tlbl->key + 100));
+
+  if (IC_RESULT (ic))
+    outBitC (IC_RESULT (ic)); /* save old ea in an operand */
+  else
+    emitcode ("push", "psw"); /* save old ea via c in psw on top of stack*/
+
+  if (IC_RESULT (ic))
+    freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
+}
+
+/*-----------------------------------------------------------------*/
+/* genEndCritical - generate code for end of a critical sequence   */
+/*-----------------------------------------------------------------*/
+static void
+genEndCritical (iCode *ic)
+{
+  D(emitcode(";     genEndCritical",""));
+  
+  if (IC_RIGHT (ic))
+    {
+      aopOp (IC_RIGHT (ic), ic, FALSE);
+      if (AOP_TYPE (IC_RIGHT (ic)) == AOP_CRY)
+        {
+	  emitcode ("mov", "c,%s", IC_RIGHT (ic)->aop->aopu.aop_dir);
+          emitcode ("mov", "ea,c");
+        }
+      else
+        {
+          MOVA (aopGet (AOP (IC_RIGHT (ic)), 0, FALSE, FALSE));
+          emitcode ("rrc", "a");
+          emitcode ("mov", "ea,c");
+        }
+      freeAsmop (IC_RIGHT (ic), NULL, ic, TRUE);
+    }
+  else
+    {
+      emitcode ("pop", "psw"); /* restore ea via c in psw on top of stack */
+      emitcode ("mov", "ea,c");
+    }
+}
+
+
+/*-----------------------------------------------------------------*/
 /* gen51Code - generate code for 8051 based controllers            */
 /*-----------------------------------------------------------------*/
 void
@@ -9260,6 +9322,14 @@ gen51Code (iCode * lic)
 
 	case DUMMY_READ_VOLATILE:
 	  genDummyRead (ic);
+	  break;
+
+	case CRITICAL:
+	  genCritical (ic);
+	  break;
+
+	case ENDCRITICAL:
+	  genEndCritical (ic);
 	  break;
 
 	default:

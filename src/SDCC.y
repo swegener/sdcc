@@ -44,6 +44,7 @@ int xstackPtr = 0 ;     /* xstack pointer          */
 int reentrant = 0 ; 
 int blockNo   = 0 ;     /* sequential block number  */
 int currBlockno=0 ;
+int inCritical= 0 ;
 extern int yylex();
 int yyparse(void);
 extern int noLineno ;
@@ -93,7 +94,7 @@ bool uselessDecl = TRUE;
 %token BITWISEAND UNARYMINUS IPUSH IPOP PCALL  ENDFUNCTION JUMPTABLE
 %token RRC RLC 
 %token CAST CALL PARAM NULLOP BLOCK LABEL RECEIVE SEND ARRAYINIT
-%token DUMMY_READ_VOLATILE
+%token DUMMY_READ_VOLATILE ENDCRITICAL
 
 %type <yyint>  Interrupt_storage
 %type <sym> identifier  declarator  declarator2 enumerator_list enumerator
@@ -101,7 +102,7 @@ bool uselessDecl = TRUE;
 %type <sym> struct_declarator_list  struct_declaration   struct_declaration_list
 %type <sym> declaration init_declarator_list init_declarator
 %type <sym> declaration_list identifier_list parameter_identifier_list
-%type <sym> declarator2_function_attributes while do for
+%type <sym> declarator2_function_attributes while do for critical
 %type <lnk> pointer type_specifier_list type_specifier type_name
 %type <lnk> storage_class_specifier struct_or_union_specifier
 %type <lnk> declaration_specifiers  sfr_reg_bit type_specifier2
@@ -118,6 +119,7 @@ bool uselessDecl = TRUE;
 %type <asts> statement_list statement labeled_statement compound_statement
 %type <asts> expression_statement selection_statement iteration_statement
 %type <asts> jump_statement function_body else_statement string_literal
+%type <asts> critical_statement
 %type <ilist> initializer initializer_list
 %type <yyint> unary_operator  assignment_operator struct_or_union
 
@@ -1247,6 +1249,7 @@ statement
    | selection_statement
    | iteration_statement
    | jump_statement
+   | critical_statement
    | INLINEASM  ';'      {
                             ast *ex = newNode(INLINEASM,NULL,NULL);
 			    ex->values.inlineasm = strdup($1);
@@ -1254,6 +1257,24 @@ statement
                          } 
    ;
 
+critical
+   : CRITICAL   {
+		   inCritical++;
+		   STACK_PUSH(continueStack,NULL);
+		   STACK_PUSH(breakStack,NULL);
+                   $$ = NULL;
+                }
+   ;
+   
+critical_statement
+   : critical statement  {
+		   STACK_POP(breakStack);
+		   STACK_POP(continueStack);
+		   inCritical--;
+		   $$ = newNode(CRITICAL,$2,NULL);
+                }
+   ;
+      
 labeled_statement
 //   : identifier ':' statement          {  $$ = createLabel($1,$3);  }   
    : identifier ':'                    {  $$ = createLabel($1,NULL);  }   
@@ -1482,8 +1503,22 @@ jump_statement
 	   STACK_PEEK(breakStack)->isref = 1;
        }
    }
-   | RETURN ';'            { $$ = newNode(RETURN,NULL,NULL)    ; }
-   | RETURN expr ';'       { $$ = newNode(RETURN,NULL,$2) ; } 
+   | RETURN ';'            {
+       if (inCritical) {
+	   werror(E_INVALID_CRITICAL);
+	   $$ = NULL;
+       } else {
+	   $$ = newNode(RETURN,NULL,NULL);
+       }
+   }
+   | RETURN expr ';'       {
+       if (inCritical) {
+	   werror(E_INVALID_CRITICAL);
+	   $$ = NULL;
+       } else {
+	   $$ = newNode(RETURN,NULL,$2);
+       }
+   }
    ;
 
 identifier

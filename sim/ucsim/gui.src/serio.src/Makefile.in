@@ -89,7 +89,7 @@ include clean.mk
 # My rules
 # --------
 serialview: $(OBJECTS)
-	$(CXX) -o $@ $(OBJECTS) $(LIBS)
+	$(CXX) -o $@ $(LDFLAGS) $(OBJECTS) $(LIBS)
 
 .cc.o:
 	$(CXX) $(CXXFLAGS)  $(CPPFLAGS) -c $< -o $@

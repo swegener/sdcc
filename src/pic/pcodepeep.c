@@ -1862,7 +1862,7 @@ void pCodeDeleteChain(pCode *f,pCode *t)
   while(f && f!=t) {
     DFPRINTF((stderr,"delete pCode:\n"));
     pc = f->next;
-    f->print(stderr,f);
+    //f->print(stderr,f);
     //f->delete(f);  this dumps core...
 
     f = pc;
@@ -1967,7 +1967,7 @@ int pCodePeepMatchRule(pCode *pc)
 	pcin->prev = pc->prev;
 
 
-
+#if 0
       {
 	/*     DEBUG    */
 	/* Converted the deleted pCodes into comments */
@@ -1999,6 +1999,7 @@ int pCodePeepMatchRule(pCode *pc)
 	if(pc_cline2)
 	  pc_cline2->pc.next = NULL;
       }
+#endif
 
       if(pcin)
 	pCodeDeleteChain(pc,pcin);

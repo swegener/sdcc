@@ -818,11 +818,11 @@ picglue ()
   //#ifdef PCODE_DEBUG
   //printCallTree(stderr);
   //#endif
-/*
+
   InlinepCode();
 
   AnalyzepCode('*');
-*/
+
   pcode_test();
 
 

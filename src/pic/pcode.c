@@ -80,6 +80,10 @@ static int GpcFlowSeq = 1;
 #define isPCI_BITSKIP(x)((PCODE(x)->type == PC_OPCODE) &&  PCI(x)->isSkip && PCI(x)->isBitInst)
 #define isPCFL(x)       ((PCODE(x)->type == PC_FLOW))
 #define isPCF(x)        ((PCODE(x)->type == PC_FUNCTION))
+#define isPCL(x)        ((PCODE(x)->type == PC_LABEL))
+#define isPCW(x)        ((PCODE(x)->type == PC_WILD))
+#define isPCCS(x)       ((PCODE(x)->type == PC_CSOURCE))
+
 #define isCALL(x)       ((isPCI(x)) && (PCI(x)->op == POC_CALL))
 #define isSTATUS_REG(r) ((r)->pc_type == PO_STATUS)
 
@@ -1744,6 +1748,19 @@ pCode *newpCodeFunction(char *mod,char *f)
 /* newpCodeFlow                                                    */
 /*-----------------------------------------------------------------*/
 
+void destructpCodeFlow(pCode *pc)
+{
+  if(!pc || !isPCFL(pc))
+    return;
+
+  if(PCFL(pc)->uses)
+    free(PCFL(pc)->uses);
+/*
+  if(PCFL(pc)->from)
+  if(PCFL(pc)->to)
+*/
+  free(pc);
+}
 
 pCode *newpCodeFlow(void )
 {
@@ -1758,7 +1775,7 @@ pCode *newpCodeFlow(void )
   pcflow->pc.pb = NULL;
 
   //  pcflow->pc.analyze = genericAnalyze;
-  pcflow->pc.destruct = genericDestruct;
+  pcflow->pc.destruct = destructpCodeFlow;
   pcflow->pc.print = genericPrint;
 
   pcflow->pc.seq = GpcFlowSeq++;
@@ -2294,7 +2311,7 @@ static void unlinkPC(pCode *pc)
 }
 static void genericDestruct(pCode *pc)
 {
-  fprintf(stderr,"warning, calling default pCode destructor\n");
+  //fprintf(stderr,"warning, calling default pCode destructor\n");
 
   unlinkPC(pc);
 
@@ -2574,7 +2591,7 @@ static void genericPrint(FILE *of, pCode *pc)
     break;
 
   case PC_FLOW:
-    fprintf(of,";Start of new flow, seq=%d\n",pc->seq);
+    fprintf(of,";<>Start of new flow, seq=%d\n",pc->seq);
     break;
 
   case PC_CSOURCE:
@@ -2657,8 +2674,12 @@ static void unlinkpCodeFromBranch(pCode *pcl , pCode *pc)
 
   }
 
+  //fprintf (stderr, "%s \n",__FUNCTION__);
+  //pcl->print(stderr,pcl);
+  //pc->print(stderr,pc);
   while(b) {
     if(b->pc == pc) {
+      //fprintf (stderr, "found label\n");
 
       /* Found a label */
       if(bprev) {
@@ -2675,30 +2696,6 @@ static void unlinkpCodeFromBranch(pCode *pcl , pCode *pc)
     b = b->next;
   }
 
-#if 0
-
-  original stuff:
-
-  bprev = NULL;
-  b = pcl->label;
-  while(b) {
-    if(b->pc == pc) {
-
-      /* Found a label */
-      if(bprev) {
-	bprev->next = b->next;  /* Not first pCode in chain */
-	free(b);
-      } else {
-	pc->destruct(pc);
-	pcl->label = b->next;   /* First pCode in chain */
-	free(b);
-      }
-      return;  /* A label can't occur more than once */
-    }
-    bprev = b;
-    b = b->next;
-  }
-#endif
 }
 
 /*-----------------------------------------------------------------*/
@@ -2849,6 +2846,7 @@ static void genericAnalyze(pCode *pc)
 #endif
 
 /*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
 int compareLabel(pCode *pc, pCodeOpLabel *pcop_label)
 {
   pBranch *pbr;
@@ -2864,6 +2862,25 @@ int compareLabel(pCode *pc, pCodeOpLabel *pcop_label)
 	if( ((pCodeLabel *)(pbr->pc))->key ==  pcop_label->key)
 	  return TRUE;
       }
+      pbr = pbr->next;
+    }
+  }
+
+  return FALSE;
+}
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+int checkLabel(pCode *pc)
+{
+  pBranch *pbr;
+
+  if(pc && isPCI(pc)) {
+    pbr = PCI(pc)->label;
+    while(pbr) {
+      if(isPCL(pbr->pc) && (PCL(pbr->pc)->key >= 0))
+	return TRUE;
+
       pbr = pbr->next;
     }
   }
@@ -3169,22 +3186,43 @@ void BuildFlow(pBlock *pb)
     pc->seq = seq++;
     PCI(pc)->pcflow = PCFL(pflow);
 
-    if(PCI(pc)->isSkip || PCI(pc)->isBranch)  {
+    if( PCI(pc)->isSkip) {
 
-      /* The instruction immediately following this one 
-       * marks the beginning of a new flow segment */
+      /* The two instructions immediately following this one 
+       * mark the beginning of a new flow segment */
+
+      while(pc && PCI(pc)->isSkip) {
+
+	PCI(pc)->pcflow = PCFL(pflow);
+	pc->seq = seq-1;
+	seq = 1;
+
+	InsertpFlow(pc, &pflow);
+	pc=findNextInstruction(pc->next);
+      }
+
+      seq = 0;
+
+      if(!pc)
+	break;
+
+      PCI(pc)->pcflow = PCFL(pflow);
+      pc->seq = 0;
+      InsertpFlow(pc, &pflow);
+
+    } else if ( PCI(pc)->isBranch && !checkLabel(findNextInstruction(pc->next)))  {
 
       InsertpFlow(pc, &pflow);
       seq = 0;
-	  
-    } else if (PCI_HAS_LABEL(pc)) {
+
+    } else if (checkLabel(pc)) { //(PCI_HAS_LABEL(pc)) {
 
       /* This instruction marks the beginning of a
        * new flow segment */
 
       pc->seq = 0;
       seq = 1; 
-      InsertpFlow(pc->prev, &pflow);
+      InsertpFlow(findPrevInstruction(pc->prev), &pflow);
 
       PCI(pc)->pcflow = PCFL(pflow);
       
@@ -3195,6 +3233,38 @@ void BuildFlow(pBlock *pb)
 
   //fprintf (stderr,",end seq %d",GpcFlowSeq);
   PCFL(pflow)->end = pb->pcTail;
+}
+
+/*-------------------------------------------------------------------*/
+/* unBuildFlow(pBlock *pb) - examine the code in a pBlock and build  */
+/*                           the flow blocks.                        */
+/*
+ * unBuildFlow removes pCodeFlow objects from a pCode chain
+ */
+/*-----------------------------------------------------------------*/
+void unBuildFlow(pBlock *pb)
+{
+  pCode *pc;
+
+  if(!pb)
+    return;
+
+  pc = pb->pcHead;
+  while(pc) {
+    pCode *pcn = pc->next;
+
+    if(isPCI(pc)) {
+      pc->seq = 0;
+      PCI(pc)->pcflow = NULL;
+      pc = pcn;
+    } else if(isPCFL(pc)) {
+      unlinkPC(pc);
+      pc->destruct(pc);
+    } else 
+      pc = pcn;
+
+  }
+
 }
 
 /*-----------------------------------------------------------------*/
@@ -3229,6 +3299,33 @@ void dumpCond(int cond)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
+void FlowStats(pCodeFlow *pcflow)
+{
+
+  pCode *pc;
+
+  if(!isPCFL(pcflow))
+    return;
+
+  fprintf(stderr, " FlowStats - flow block (seq=%d)\n", pcflow->pc.seq);
+
+  pc = findNextpCode(PCODE(pcflow), PC_OPCODE); 
+
+  if(!pc) {
+    fprintf(stderr, " FlowStats - empty flow (seq=%d)\n", pcflow->pc.seq);
+    return;
+  }
+
+
+  fprintf(stderr, "  FlowStats inCond: ");
+  dumpCond(pcflow->inCond);
+  fprintf(stderr, "  FlowStats outCond: ");
+  dumpCond(pcflow->outCond);
+
+}
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
 void FillFlow(pCodeFlow *pcflow)
 {
 
@@ -3241,35 +3338,39 @@ void FillFlow(pCodeFlow *pcflow)
   //  fprintf(stderr, " FillFlow - flow block (seq=%d)\n", pcflow->pc.seq);
 
   pc = findNextpCode(PCODE(pcflow), PC_OPCODE); 
+
   if(!pc) {
-    //    fprintf(stderr, " FillFlow - empty flow (seq=%d)\n", pcflow->pc.seq);
+    //fprintf(stderr, " FillFlow - empty flow (seq=%d)\n", pcflow->pc.seq);
     return;
   }
 
   cur_bank = -1;
 
   do {
-    //regs *reg;
+    regs *reg;
 
-    int inCond = PCI(pc)->inCond;
-    int outCond = PCI(pc)->outCond;
-#if 0
-    if( (reg = getRegFromInstruction(pc)) != NULL) {
-      if(isSTATUS_REG(reg)) {
+    if(isPCI(pc)) {
 
-	//fprintf(stderr, "  FillFlow - Status register\n");
+      int inCond = PCI(pc)->inCond;
+      int outCond = PCI(pc)->outCond;
 
-	/* Check to see if the register banks are changing */
-	if(PCI(pc)->isModReg) {
+      if( (reg = getRegFromInstruction(pc)) != NULL) {
+	if(isSTATUS_REG(reg)) {
 
-	  pCodeOp *pcop = PCI(pc)->pcop;
-	  switch(PCI(pc)->op) {
+	  //fprintf(stderr, "  FillFlow - Status register\n");
+	  //pc->print(stderr,pc);
+	  /* Check to see if the register banks are changing */
+	  if(PCI(pc)->isModReg) {
+
+	    pCodeOp *pcop = PCI(pc)->pcop;
+	    switch(PCI(pc)->op) {
+	      /*
 	    case POC_BSF:
 	      if(PCORB(pcop)->bit == PIC_RP0_BIT)
 		fprintf(stderr, "  FillFlow - Set RP0\n");
 	      //outCond |= PCC_REG_BANK1;
 	      if(PCORB(pcop)->bit == PIC_RP1_BIT) 
-		fprintf(stderr, "  FillFlow - Set RP1\n");
+		//fprintf(stderr, "  FillFlow - Set RP1\n");
 	      //outCond |= PCC_REG_BANK3;
 	      break;
 
@@ -3281,38 +3382,39 @@ void FillFlow(pCodeFlow *pcflow)
 		fprintf(stderr, "  FillFlow - Clr RP1\n");
 	      //outCond |= PCC_REG_BANK3;
 	      break;
-
-	  default:
-	    fprintf(stderr, "  FillFlow - Status register is getting Modified by:\n");
-	    genericPrint(stderr, pc);
+	      */
+	    default:
+	      fprintf(stderr, "  FillFlow - Status register is getting Modified by:\n");
+	      genericPrint(stderr, pc);
+	    }
 	  }
-	}
 
-      } else
-	inCond |= PCC_REG_BANK0 << (REG_BANK(reg) & 3);
-    }
-#endif
+	} else
+	  inCond |= PCC_REG_BANK0 << (REG_BANK(reg) & 3);
+      }
 
-    pcflow->inCond |= (inCond &  ~pcflow->outCond);
-    pcflow->outCond |= outCond;
+      pcflow->inCond |= (inCond &  ~pcflow->outCond);
+      pcflow->outCond |= outCond;
+    } 
 
-    
+    pc = pc->next;
+  } while (pc && (pc != pcflow->end) && !isPCFL(pc));
 
-
-    pc = findNextpCode(pc->next, PC_OPCODE);
-  } while (pc && (pc != pcflow->end));
-
-#if 0
-  if(!pc)
+/*
+  if(!pc ) {
     fprintf(stderr, "  FillFlow - Bad end of flow\n");
-
+  } else {
+    fprintf(stderr, "  FillFlow - Ending flow with\n  ");
+    pc->print(stderr,pc);
+  }
 
   fprintf(stderr, "  FillFlow inCond: ");
   dumpCond(pcflow->inCond);
   fprintf(stderr, "  FillFlow outCond: ");
   dumpCond(pcflow->outCond);
-#endif
+*/
 }
+
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 void LinkFlow_pCode(pCodeInstruction *from, pCodeInstruction *to)
@@ -3334,10 +3436,9 @@ void LinkFlow(pBlock *pb)
   pCode *pcflow;
   pCode *pct;
 
-  
+  //fprintf(stderr,"linkflow \n");
   for( pcflow = findNextpCode(pb->pcHead, PC_FLOW); 
-      (pcflow = findNextpCode(pcflow, PC_FLOW)) != NULL;
-      pcflow = pcflow->next) {
+       (pcflow = findNextpCode(pcflow->next, PC_FLOW)) != NULL;) {
 
     if(!isPCFL(pcflow))
       fprintf(stderr, "LinkFlow - pcflow is not a flow object ");
@@ -3356,19 +3457,19 @@ void LinkFlow(pBlock *pb)
       continue;
     }
 
-    if(isPCI_BRANCH(pc)) {
-      //fprintf(stderr, "ends with branch\n");
+    //if(isPCI_BRANCH(pc)) {
+    //fprintf(stderr, "ends with branch\n");
 
-      continue;
-    }
-#if 0
-    if(pc) {
-      fprintf(stderr, "has an unrecognized ending:\n");
-      pc->print(stderr,pc);
+    // continue;
+    //}
+    #if 0
+    if(isPCI(pc)) {
+      fprintf(stderr, "ends with non-branching instruction:\n");
+      //pc->print(stderr,pc);
     }
     else 
       fprintf(stderr, "has no end pcode\n");
-#endif 
+    #endif 
     
   }
 }
@@ -3432,6 +3533,32 @@ pCode * findInstructionUsingLabel(pCodeLabel *pcl, pCode *pcs)
 }
 
 /*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+void exchangeLabels(pCodeLabel *pcl, pCode *pc)
+{
+
+  if(isPCI(pc) && 
+     (PCI(pc)->pcop) && 
+     (PCI(pc)->pcop->type == PO_LABEL)) {
+
+    pCodeOpLabel *pcol = PCOLAB(PCI(pc)->pcop);
+
+    //fprintf(stderr,"changing label key from %d to %d\n",pcol->key, pcl->key);
+    if(pcol->pcop.name)
+      free(pcol->pcop.name);
+
+    sprintf(buffer,"_%05d_DS_",pcl->key);
+
+    pcol->pcop.name = Safe_strdup(buffer);
+    pcol->key = pcl->key;
+    //pc->print(stderr,pc);
+
+  }
+
+
+}
+
+/*-----------------------------------------------------------------*/
 /* pBlockRemoveUnusedLabels - remove the pCode labels from the     */
 /*                            pCode chain if they're not used.     */
 /*-----------------------------------------------------------------*/
@@ -3442,21 +3569,50 @@ void pBlockRemoveUnusedLabels(pBlock *pb)
   if(!pb)
     return;
 
+  for(pc = pb->pcHead; (pc=findNextInstruction(pc->next)) != NULL; ) {
+
+    pBranch *pbr = PCI(pc)->label;
+    if(pbr && pbr->next) {
+      pCode *pcd = pb->pcHead;
+
+      //fprintf(stderr, "multiple labels\n");
+      //pc->print(stderr,pc);
+
+      pbr = pbr->next;
+      while(pbr) {
+
+	while ( (pcd = findInstructionUsingLabel(PCL(PCI(pc)->label->pc), pcd)) != NULL) {
+	  //fprintf(stderr,"Used by:\n");
+	  //pcd->print(stderr,pcd);
+
+	  exchangeLabels(PCL(pbr->pc),pcd);
+
+	  pcd = pcd->next;
+	}
+	pbr = pbr->next;
+      }
+    }
+  }
+
   for(pc = pb->pcHead; pc; pc = pc->next) {
 
-    if(pc->type == PC_LABEL)
+    if(isPCL(pc)) // pc->type == PC_LABEL)
       pcl = PCL(pc);
-    else if ((pc->type == PC_OPCODE) && PCI(pc)->label)
+    else if (isPCI(pc) && PCI(pc)->label) //((pc->type == PC_OPCODE) && PCI(pc)->label)
       pcl = PCL(PCI(pc)->label->pc);
     else continue;
 
-      /* This pCode is a label, so search the pBlock to see if anyone
-       * refers to it */
+    //fprintf(stderr," found  A LABEL !!! key = %d, %s\n", pcl->key,pcl->label);
+
+    /* This pCode is a label, so search the pBlock to see if anyone
+     * refers to it */
 
     if( (pcl->key>0) && (!findInstructionUsingLabel(pcl, pb->pcHead))) {
+    //if( !findInstructionUsingLabel(pcl, pb->pcHead)) {
       /* Couldn't find an instruction that refers to this label
        * So, unlink the pCode label from it's pCode chain
        * and destroy the label */
+      //fprintf(stderr," removed  A LABEL !!! key = %d, %s\n", pcl->key,pcl->label);
 
       DFPRINTF((stderr," !!! REMOVED A LABEL !!! key = %d, %s\n", pcl->key,pcl->label));
       if(pc->type == PC_LABEL) {
@@ -3800,8 +3956,17 @@ void AnalyzeBanking(void)
       FillFlow(PCFL(pcflow));
     }
   }
+/*
+  for(pb = the_pFile->pbHead; pb; pb = pb->next) {
+    pCode *pcflow;
+    for( pcflow = findNextpCode(pb->pcHead, PC_FLOW); 
+	 (pcflow = findNextpCode(pcflow, PC_FLOW)) != NULL;
+	 pcflow = pcflow->next) {
 
-
+      FlowStats(PCFL(pcflow));
+    }
+  }
+*/
 }
 
 /*-----------------------------------------------------------------*/
@@ -3928,12 +4093,14 @@ void AnalyzepCode(char dbName)
   do {
 
     DFPRINTF((stderr," Analyzing pCode: PASS #%d\n",i+1));
+    //fprintf(stderr," Analyzing pCode: PASS #%d\n",i+1);
 
     /* First, merge the labels with the instructions */
     for(pb = the_pFile->pbHead; pb; pb = pb->next) {
       if('*' == dbName || getpBlock_dbName(pb) == dbName) {
 
 	DFPRINTF((stderr," analyze and merging block %c\n",dbName));
+	//fprintf(stderr," analyze and merging block %c\n",dbName);
 	pBlockMergeLabels(pb);
 	AnalyzepBlock(pb);
       } else {
@@ -4402,6 +4569,7 @@ void InlinepCode(void)
 
   /* Loop through all of the function definitions and count the
    * number of times each one is called */
+  //fprintf(stderr,"inlining %d\n",__LINE__);
 
   for(pb = the_pFile->pbHead; pb; pb = pb->next) {
 
@@ -4420,10 +4588,15 @@ void InlinepCode(void)
     }
   }
 
+  //fprintf(stderr,"inlining %d\n",__LINE__);
 
   /* Now, Loop through the function definitions again, but this
    * time inline those functions that have only been called once. */
 
   InlineFunction(the_pFile->pbHead);
+  //fprintf(stderr,"inlining %d\n",__LINE__);
+
+  for(pb = the_pFile->pbHead; pb; pb = pb->next)
+    unBuildFlow(pb);
 
 }

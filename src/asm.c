@@ -20,6 +20,10 @@ FileBaseName (char *fileFullName)
 {
   char *p = fileFullName;
 
+  if (!fileFullName) {
+    return "unknown";
+  }
+
   while (*fileFullName)
     {
       if ((*fileFullName == '/') || (*fileFullName == '\\') || (*fileFullName == ':'))
@@ -179,7 +183,7 @@ tvsprintf (char *buffer, const char *format, va_list ap)
   // This is acheived by expanding the tokens and zero arg formats into
   // one big format string, which is passed to the native printf.
   static int count;
-  char newformat[MAX_INLINEASM];
+  char newformat[INITIAL_INLINEASM];
   char *pInto = newformat;
   char *p;
   char token[MAX_TOKEN_LEN];
@@ -261,7 +265,7 @@ void
 tfprintf (FILE * fp, const char *szFormat,...)
 {
   va_list ap;
-  char buffer[MAX_INLINEASM];
+  char buffer[INITIAL_INLINEASM];
 
   va_start (ap, szFormat);
   tvsprintf (buffer, szFormat, ap);

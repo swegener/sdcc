@@ -1,4 +1,3 @@
-void CatchMe() {}
 /*----------------------------------------------------------------------
     SDCCval.c :- has routine to do all kinds of fun stuff with the
                 value wrapper & with initialiser lists.

@@ -99,7 +99,7 @@ typedef int bool;
 #define  FALSE 0
 
 #define MAX_TVAR 6
-#define MAX_INLINEASM 4*1024
+#define INITIAL_INLINEASM 4*1024
 #define DEFPOOLSTACK(type,size)     \
     type       *type##Pool        ; \
     type *type##FreeStack [size]  ; \

@@ -54,7 +54,8 @@ int yywrap YY_PROTO((void))
 }
 #define TKEYWORD(token) return (isTargetKeyword(yytext) ? token :\
 			        check_type(yytext))
-char asmbuff[MAX_INLINEASM]			;
+char *asmbuff=NULL;
+int asmbuffSize=0;
 char *asmp ;
 extern int check_type		();
  extern int isTargetKeyword     ();
@@ -82,14 +83,37 @@ struct options  save_options  ;
 %}
 %x asm
 %%
-"_asm"        {  count(); asmp = asmbuff ;BEGIN(asm) ;}
-<asm>"_endasm" { count()	  	; 
-                  *asmp = '\0'				; 
-                  strcpy(yylval.yyinline,asmbuff)		; 
-                  BEGIN(INITIAL)	;
-                  return (INLINEASM)			; }
-<asm>.         { *asmp++ = yytext[0]	; }
-<asm>\n        { count(); *asmp++ = '\n' ;}
+"_asm"         {  
+  count(); 
+  asmp = asmbuff = Safe_realloc (asmbuff, INITIAL_INLINEASM);
+  asmbuffSize=INITIAL_INLINEASM;
+  BEGIN(asm) ;
+}
+<asm>"_endasm" { 
+  count();
+  *asmp = '\0';
+  yylval.yyinline = Safe_calloc (1, strlen(asmbuff)+1);
+  strcpy(yylval.yyinline,asmbuff);
+  BEGIN(INITIAL);
+  return (INLINEASM);
+}
+<asm>.         { 
+  if (asmp-asmbuff >= asmbuffSize-2) {
+    // increase the buffersize with 50%
+    asmbuffSize=asmbuffSize*3/2;
+    asmbuff = Safe_realloc (asmbuff, asmbuffSize); 
+  }
+  *asmp++ = yytext[0];
+}
+<asm>\n        { 
+  count(); 
+  if (asmp-asmbuff >= asmbuffSize-3) {
+    // increase the buffersize with 50%
+    asmbuffSize=asmbuffSize*3/2;
+    asmbuff = Safe_realloc (asmbuff, asmbuffSize); 
+  }
+  *asmp++ = '\n' ;
+}
 "/*"	       { comment(); }
 "at"	       { count(); TKEYWORD(AT)  ; }
 "auto"	       { count(); return(AUTO); }

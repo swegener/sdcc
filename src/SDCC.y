@@ -66,7 +66,7 @@ value *cenum = NULL  ;  /* current enumeration  type chain*/
     int        yyint;      /* integer value returned     */
     value      *val ;      /* for integer constant       */
     initList   *ilist;     /* initial list               */
-    char       yyinline[MAX_INLINEASM]; /* inlined assembler code */
+    char       *yyinline; /* inlined assembler code */
     ast       *asts;     /* expression tree            */
 }
 

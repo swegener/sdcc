@@ -789,7 +789,8 @@ See the examples, how to pass the Win32 settings to 'configure'.
 These defaults are:
 \newline 
 
-\newline 
+\layout Standard
+\align center 
 
 \begin_inset  Tabular
 <lyxtabular version="3" rows="8" columns="3">
@@ -1058,15 +1059,15 @@ lib
 
 \newline 
 
-\newline 
-
-\newline 
+\layout Standard
+\noindent 
 'configure' also computes relative paths.
  This is needed for full relocatability of a binary package and to complete
  search paths (see section search paths below):
 \newline 
  
-\newline 
+\layout Standard
+\align center 
 
 \begin_inset  Tabular
 <lyxtabular version="3" rows="4" columns="3">
@@ -1192,7 +1193,8 @@ share/sdcc
 
 \newline 
 
-\newline 
+\layout Standard
+\noindent 
 Examples:
 \layout LyX-Code
 
@@ -1638,24 +1640,33 @@ Install paths
 
 
 \layout Standard
-
-1.
- Binary files (preprocessor, assembler and linker)
-\layout Standard
-
+\line_top \align center 
 
 \begin_inset  Tabular
-<lyxtabular version="3" rows="2" columns="3">
+<lyxtabular version="3" rows="5" columns="4">
 <features>
-<column alignment="block" valignment="top" leftline="true" width="0in">
-<column alignment="block" valignment="top" leftline="true" width="0in">
-<column alignment="block" valignment="top" leftline="true" rightline="true" width="0in">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
 
+
+\series bold 
+Description
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\series bold 
 Path
 \end_inset 
 </cell>
@@ -1664,7 +1675,9 @@ Path
 
 \layout Standard
 
-default
+
+\series bold 
+Default
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -1672,11 +1685,30 @@ default
 
 \layout Standard
 
+
+\series bold 
 Win32 builds
 \end_inset 
 </cell>
 </row>
-<row topline="true" bottomline="true">
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Binary files
+\begin_inset Foot
+collapsed true
+
+\layout Standard
+
+preprocessor, assembler, and linker
+\end_inset 
+
+
+\end_inset 
+</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -1708,62 +1740,23 @@ bin
 \end_inset 
 </cell>
 </row>
-</lyxtabular>
-
-\end_inset 
-
- 
-\newline 
-
-\newline 
-2.
- Include files
-\layout Standard
-
-
-\begin_inset  Tabular
-<lyxtabular version="3" rows="2" columns="3">
-<features>
-<column alignment="block" valignment="top" leftline="true" width="1.6in">
-<column alignment="block" valignment="top" leftline="true" width="0in">
-<column alignment="block" valignment="top" leftline="true" rightline="true" width="0in">
-<row topline="true" bottomline="true">
+<row topline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
 
-Path
+Include files
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-default
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Win32 builds
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="true">
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
 
 
 \emph on 
-$DATADIR/
-\newline 
-$INCLUDE_DIR_SUFFIX
+$DATADIR/ $INCLUDE_DIR_SUFFIX
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -1787,57 +1780,29 @@ include
 \end_inset 
 </cell>
 </row>
-</lyxtabular>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
 
-\end_inset 
+\layout Standard
 
+Library files
+\begin_inset Foot
+collapsed true
 
-\newline 
+\layout Standard
 
-\newline 
-3.
- Library files (the 
+the 
 \shape italic 
 model
 \shape default 
  is auto-appended by the compiler, e.g.
- small, large, z80, ds390 etc.)
-\layout Standard
+ small, large, z80, ds390 etc.
+\end_inset 
 
 
-\begin_inset  Tabular
-<lyxtabular version="3" rows="2" columns="3">
-<features>
-<column alignment="block" valignment="top" leftline="true" width="0in">
-<column alignment="block" valignment="top" leftline="true" width="0in">
-<column alignment="block" valignment="top" leftline="true" rightline="true" width="0in">
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Path
 \end_inset 
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-default
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Win32 builds
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -1869,52 +1834,15 @@ lib
 \end_inset 
 </cell>
 </row>
-</lyxtabular>
-
-\end_inset 
-
-
-\newline 
-
-\newline 
-4.
- Documentation
-\layout Standard
-
-
-\begin_inset  Tabular
-<lyxtabular version="3" rows="2" columns="3">
-<features>
-<column alignment="block" valignment="top" leftline="true" width="0in">
-<column alignment="block" valignment="top" leftline="true" width="0in">
-<column alignment="block" valignment="top" leftline="true" rightline="true" width="0in">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
 
-Path
+Documentation
 \end_inset 
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-default
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Win32 builds
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -1953,7 +1881,8 @@ doc
 
 \newline 
 
-\newline 
+\layout Standard
+\noindent 
 The install paths can still be changed during `make install` with e.g.:
 \layout LyX-Code
 
@@ -1988,7 +1917,10 @@ The paths searched when running the compiler are as follows (the first catch
 1.
  Binary files (preprocessor, assembler and linker)
 \newline 
- 
+
+\layout Standard
+\align center 
+
 \begin_inset  Tabular
 <lyxtabular version="3" rows="4" columns="3">
 <features>
@@ -2110,11 +2042,15 @@ $PATH
  
 \newline 
 
-\newline 
+\layout Standard
+\noindent 
 2.
  Include files
 \newline 
- 
+
+\layout Standard
+\align center 
+
 \begin_inset  Tabular
 <lyxtabular version="3" rows="6" columns="3">
 <features>
@@ -2392,8 +2328,9 @@ include
  
 \newline 
 
-\newline 
- The option -
+\layout Standard
+\noindent 
+The option -
 \begin_inset ERT
 status Collapsed
 
@@ -2410,6 +2347,9 @@ status Collapsed
 3.
  Library files 
 \newline 
+
+\layout Standard
+
 With the exception of 
 \begin_inset Quotes sld
 \end_inset 
@@ -2436,6 +2376,9 @@ model
  small, large, z80, ds390 etc.).
  
 \newline 
+
+\layout Standard
+\align center 
 
 \begin_inset  Tabular
 <lyxtabular version="3" rows="6" columns="3">
@@ -2777,6 +2720,8 @@ lib/
 
 \end_inset 
 
+
+\newline 
 
 \layout Comment
 
@@ -3541,19 +3486,26 @@ Compile this by typing
 (see the Install trouble-shooting section for suggestions).
 
 \series default 
- To find exactly where SDCC is looking for the include files try compiling
- using 
-\family sans 
+ Use option 
 \series bold 
 -
-\family default 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-print-search-dirs
 \series default 
-V
-\begin_inset LatexCommand \index{-V}
+
+\begin_inset LatexCommand \index{-\/-print-search-dirs}
 
 \end_inset 
 
-.
+ to find exactly where SDCC is looking for the include and lib files.
 \layout Subsection
 
 Install Trouble-shooting
@@ -7423,14 +7375,14 @@ Interrupt Numbers and the corresponding address & descriptions for the Standard
 \newline 
 
 \layout Standard
-
+\align center 
 
 \begin_inset  Tabular
 <lyxtabular version="3" rows="6" columns="3">
 <features>
-<column alignment="block" valignment="top" leftline="true" width="0in">
-<column alignment="block" valignment="top" leftline="true" width="0in">
-<column alignment="block" valignment="top" leftline="true" rightline="true" width="0in">
+<column alignment="center" valignment="top" leftline="true" width="0in">
+<column alignment="center" valignment="top" leftline="true" width="0in">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0in">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -7594,7 +7546,8 @@ Serial
 
 \newline 
 
-\newline 
+\layout Standard
+
 If the interrupt service routine is defined without 
 \emph on 
 using
@@ -8583,8 +8536,9 @@ For signed & unsigned int (16 bit) and long (32 bit) variables, division,
  in <installdir>/share/sdcc/lib.
 \newline 
 
-\newline 
- 
+\layout Standard
+\align center 
+
 \begin_inset  Tabular
 <lyxtabular version="3" rows="11" columns="2">
 <features>
@@ -8799,11 +8753,8 @@ unsigned 32 bit modulus
 
 \newline 
 
-\size footnotesize 
- 
-\newline 
+\layout Standard
 
-\size default 
 Since they are compiled as 
 \emph on 
 non-reentrant
@@ -8877,10 +8828,11 @@ SDCC supports IEEE (single precision 4 bytes) floating point numbers.The
  of the following routines:
 \newline 
 
-\newline 
+\layout Standard
+\align center 
 
 \size footnotesize 
- 
+
 \begin_inset  Tabular
 <lyxtabular version="3" rows="17" columns="2">
 <features>
@@ -9505,9 +9457,8 @@ convert long to floating point number
 
 \newline 
 
-\size default 
+\layout Standard
 
-\newline 
 Note if all these routines are used simultaneously the data space might
  overflow.
  For serious floating point usage it is strongly recommended that the large
@@ -9684,16 +9635,67 @@ The compiler creates the following #defines
 
 \end_inset 
 
-.
-\layout Itemize
+:
+\newline 
+
+\layout Standard
+
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="10" columns="2">
+<features>
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\series bold 
+#define
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\series bold 
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
 
 SDCC
 \begin_inset LatexCommand \index{SDCC}
 
 \end_inset 
 
- - this Symbol is always defined.
-\layout Itemize
+ 
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+this Symbol is always defined
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
 
 SDCC_mcs51
 \begin_inset LatexCommand \index{SDCC\_mcs51}
@@ -9710,8 +9712,23 @@ SDCC_mcs51
 
 \end_inset 
 
-, etc - depending on the model used (e.g.: -mds390)
-\layout Itemize
+, etc
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+depending on the model used (e.g.: -mds390
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
 
 __mcs51
 \begin_inset LatexCommand \index{\_\_mcs51}
@@ -9728,16 +9745,39 @@ __mcs51
 
 \end_inset 
 
-, etc - depending on the model used (e.g.
+, etc
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+depending on the model used (e.g.
  -mz80)
-\layout Itemize
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
 
 SDCC_STACK_AUTO
 \begin_inset LatexCommand \index{SDCC\_STACK\_AUTO}
 
 \end_inset 
 
- - this symbol is defined when 
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+when 
 \emph on 
 -
 \begin_inset ERT
@@ -9751,15 +9791,30 @@ status Collapsed
 
 -stack-auto
 \emph default 
- option is used.
-\layout Itemize
+ option is used
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
 
 SDCC_MODEL_SMALL
 \begin_inset LatexCommand \index{SDCC\_MODEL\_SMALL}
 
 \end_inset 
 
- - when 
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+when 
 \emph on 
 -
 \begin_inset ERT
@@ -9773,15 +9828,30 @@ status Collapsed
 
 -model-small
 \emph default 
- is used.
-\layout Itemize
+ is used
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
 
 SDCC_MODEL_LARGE
 \begin_inset LatexCommand \index{SDCC\_MODEL\_LARGE}
 
 \end_inset 
 
- - when 
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+when 
 \emph on 
 -
 \begin_inset ERT
@@ -9795,15 +9865,30 @@ status Collapsed
 
 -model-large
 \emph default 
- is used.
-\layout Itemize
+ is used
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
 
 SDCC_USE_XSTACK
 \begin_inset LatexCommand \index{SDCC\_USE\_XSTACK}
 
 \end_inset 
 
- - when 
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+when 
 \emph on 
 -
 \begin_inset ERT
@@ -9817,31 +9902,71 @@ status Collapsed
 
 -xstack
 \emph default 
- option is used.
-\layout Itemize
+ option is used
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
 
 SDCC_STACK_TENBIT
 \begin_inset LatexCommand \index{SDCC\_STACK\_TENBIT}
 
 \end_inset 
 
- - when 
+ 
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+when 
 \emph on 
 -mds390
 \emph default 
  is used
-\layout Itemize
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
 
 SDCC_MODEL_FLAT24
 \begin_inset LatexCommand \index{SDCC\_MODEL\_FLAT24}
 
 \end_inset 
 
- - when 
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+when 
 \emph on 
 -mds390
 \emph default 
  is used
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\newline 
+
 \layout Subsection
 
 Redirecting output on Windows Shells
@@ -12688,8 +12813,10 @@ Tools
 \end_inset 
 
  included in the distribution
-\layout Standard
+\newline 
 
+\layout Standard
+\align center 
 
 \begin_inset  Tabular
 <lyxtabular version="3" rows="12" columns="3">
@@ -13086,6 +13213,8 @@ sdcc/bin
 \end_inset 
 
 
+\newline 
+
 \layout Subsection
 
 Related open source tools
@@ -13094,8 +13223,10 @@ Related open source tools
 \end_inset 
 
 
-\layout Standard
+\newline 
 
+\layout Standard
+\align center 
 
 \begin_inset  Tabular
 <lyxtabular version="3" rows="7" columns="3">
@@ -13350,11 +13481,15 @@ Debugger, serves nicely as GUI to sdcdb
 \end_inset 
 
 
+\newline 
+
 \layout Subsection
 
 Related documentation / recommended reading
-\layout Standard
+\newline 
 
+\layout Standard
+\align center 
 
 \begin_inset  Tabular
 <lyxtabular version="3" rows="5" columns="3">
@@ -13540,6 +13675,8 @@ sdcc/doc
 
 \end_inset 
 
+
+\newline 
 
 \layout Section
 \pagebreak_top 
@@ -14894,9 +15031,12 @@ Specify the SDCC version (type "sdcc -v"), your platform, and operating
 
 Provide an exact copy of any error message or incorrect output.
  
+\layout Enumerate
+
+Put something meaningful in the subject of your message.
 \layout Standard
 
-Please attempt to include these 4 important parts, as applicable, in all
+Please attempt to include these 5 important parts, as applicable, in all
  requests for support or when reporting any problems or bugs with SDCC.
  Though this will make your message lengthy, it will greatly improve your
  chance that SDCC users and developers will be able to help you.
@@ -14948,7 +15088,7 @@ These links should take you directly to the
 
 
 \begin_inset Foot
-collapsed true
+collapsed false
 
 \layout Standard
 

@@ -49,7 +49,7 @@ static char *_mcs51_keywords[] =
 
 void mcs51_assignRegisters (eBBlock ** ebbs, int count);
 
-static int regParmFlg = 0;	/* determine if we can register a parameter */
+static int regParmFlg = 0;      /* determine if we can register a parameter */
 
 static void
 _mcs51_init (void)
@@ -66,30 +66,32 @@ _mcs51_reset_regparm (void)
 static int
 _mcs51_regparm (sym_link * l)
 {
+    if (IS_SPEC(l) && (SPEC_NOUN(l) == V_BIT))
+        return 0;
     if (options.parms_in_bank1 == 0) {
-	/* simple can pass only the first parameter in a register */
-	if (regParmFlg)
-	    return 0;
+        /* simple can pass only the first parameter in a register */
+        if (regParmFlg)
+            return 0;
 
-	regParmFlg = 1;
-	return 1;
+        regParmFlg = 1;
+        return 1;
     } else {
-	int size = getSize(l);
-	int remain ;
+        int size = getSize(l);
+        int remain ;
 
-	/* first one goes the usual way to DPTR */
-	if (regParmFlg == 0) {
-	    regParmFlg += 4 ;
-	    return 1;
-	}
-	/* second one onwards goes to RB1_0 thru RB1_7 */
+        /* first one goes the usual way to DPTR */
+        if (regParmFlg == 0) {
+            regParmFlg += 4 ;
+            return 1;
+        }
+        /* second one onwards goes to RB1_0 thru RB1_7 */
         remain = regParmFlg - 4;
-	if (size > (8 - remain)) {
-	    regParmFlg = 12 ;
-	    return 0;
-	}
-	regParmFlg += size ;
-	return regParmFlg - size + 1;	
+        if (size > (8 - remain)) {
+            regParmFlg = 12 ;
+            return 0;
+        }
+        regParmFlg += size ;
+        return regParmFlg - size + 1;
     }
 }
 
@@ -141,11 +143,10 @@ static void
 _mcs51_genAssemblerPreamble (FILE * of)
 {
     if (options.parms_in_bank1) {
-	int i ;
-	for (i=0; i < 8 ; i++ )
-	    fprintf (of,"b1_%d = 0x%x \n",i,8+i);
+        int i ;
+        for (i=0; i < 8 ; i++ )
+            fprintf (of,"b1_%d = 0x%x \n",i,8+i);
     }
-  
 }
 
 /* Generate interrupt vector table. */
@@ -175,7 +176,7 @@ _mcs51_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
   return TRUE;
 }
 
-static void	  
+static void
 _mcs51_genExtraAreas(FILE *of, bool hasMain)
 {
   tfprintf (of, "\t!area\n", port->mem.code_name);
@@ -193,7 +194,7 @@ _mcs51_genInitStartup (FILE *of)
   tfprintf (of, "\t!global\n", "__sdcc_gsinit_startup");
   tfprintf (of, "\t!global\n", "__sdcc_program_startup");
   tfprintf (of, "\t!global\n", "__start__stack");
-  
+
   if (options.useXstack)
     {
       tfprintf (of, "\t!global\n", "__sdcc_init_xstack");
@@ -205,7 +206,7 @@ _mcs51_genInitStartup (FILE *of)
     {
       port->genXINIT(of);
     }
-  
+
   if (!getenv("SDCC_NOGENRAMCLEAR"))
     tfprintf (of, "\t!global\n", "__mcs51_genRAMCLEAR");
 }
@@ -214,7 +215,7 @@ _mcs51_genInitStartup (FILE *of)
 /* Generate code to copy XINIT to XISEG */
 static void _mcs51_genXINIT (FILE * of) {
   tfprintf (of, "\t!global\n", "__mcs51_genXINIT");
-  
+
   if (!getenv("SDCC_NOGENRAMCLEAR"))
     tfprintf (of, "\t!global\n", "__mcs51_genXRAMCLEAR");
 }
@@ -228,16 +229,16 @@ static bool cseCostEstimation (iCode *ic, iCode *pdic)
 
     /* if it is a pointer then return ok for now */
     if (IC_RESULT(ic) && IS_PTR(result_type)) return 1;
-    
-    /* if bitwise | add & subtract then no since mcs51 is pretty good at it 
+
+    /* if bitwise | add & subtract then no since mcs51 is pretty good at it
        so we will cse only if they are local (i.e. both ic & pdic belong to
        the same basic block */
     if (IS_BITWISE_OP(ic) || ic->op == '+' || ic->op == '-') {
-	/* then if they are the same Basic block then ok */
-	if (ic->eBBlockNum == pdic->eBBlockNum) return 1;
-	else return 0;
+        /* then if they are the same Basic block then ok */
+        if (ic->eBBlockNum == pdic->eBBlockNum) return 1;
+        else return 0;
     }
-	
+
     /* for others it is cheaper to do the cse */
     return 1;
 }
@@ -262,7 +263,7 @@ oclsExpense (struct memmap *oclass)
 {
   if (IN_FARSPACE(oclass))
     return 1;
-    
+
   return 0;
 }
 
@@ -279,7 +280,7 @@ instructionSize(char *inst, char *op1, char *op2)
 
   /* Based on the current (2003-08-22) code generation for the
      small library, the top instruction probability is:
-   
+
        57% mov/movx/movc
         6% push
         6% pop
@@ -296,20 +297,20 @@ instructionSize(char *inst, char *op1, char *op2)
       if (*(inst+3)=='c') return 1; /* movc */
       if (IS_C (op1) || IS_C (op2)) return 2;
       if (IS_A (op1))
-	{
-	  if (IS_Rn (op2) || IS_atRi (op2)) return 1;
-	  return 2;
-	}
+        {
+          if (IS_Rn (op2) || IS_atRi (op2)) return 1;
+          return 2;
+        }
       if (IS_Rn(op1) || IS_atRi(op1))
-	{
-	  if (IS_A(op2)) return 1;
-	  return 2;
-	}
+        {
+          if (IS_A(op2)) return 1;
+          return 2;
+        }
       if (strcmp (op1, "dptr") == 0) return 3;
       if (IS_A (op2) || IS_Rn (op2) || IS_atRi (op2)) return 2;
       return 3;
     }
-  
+
   if (ISINST ("push")) return 2;
   if (ISINST ("pop")) return 2;
 
@@ -327,7 +328,7 @@ instructionSize(char *inst, char *op1, char *op2)
   if (ISINST ("jb")) return 3;
   if (ISINST ("jnb")) return 3;
   if (ISINST ("jbc")) return 3;
-  if (ISINST ("jmp")) return 1;	// always jmp @a+dptr
+  if (ISINST ("jmp")) return 1; // always jmp @a+dptr
   if (ISINST ("jz")) return 2;
   if (ISINST ("jnz")) return 2;
   if (ISINST ("cjne")) return 3;
@@ -340,7 +341,7 @@ instructionSize(char *inst, char *op1, char *op2)
   if (ISINST ("acall")) return 2;
   if (ISINST ("ajmp")) return 2;
 
-    
+
   if (ISINST ("add") || ISINST ("addc") || ISINST ("subb") || ISINST ("xch"))
     {
       if (IS_Rn(op2) || IS_atRi(op2)) return 1;
@@ -356,15 +357,15 @@ instructionSize(char *inst, char *op1, char *op2)
     {
       if (IS_C(op1)) return 2;
       if (IS_A(op1))
-	{
-	  if (IS_Rn(op2) || IS_atRi(op2)) return 1;
-	  return 2;
-	}
+        {
+          if (IS_Rn(op2) || IS_atRi(op2)) return 1;
+          return 2;
+        }
       else
-	{
-	  if (IS_A(op2)) return 2;
-	  return 3;
-	}
+        {
+          if (IS_A(op2)) return 2;
+          return 3;
+        }
     }
   if (ISINST ("clr") || ISINST ("setb") || ISINST ("cpl"))
     {
@@ -391,7 +392,7 @@ newAsmLineNode (void)
   aln->size = 0;
   aln->regsRead = NULL;
   aln->regsWritten = NULL;
-  
+
   return aln;
 }
 
@@ -445,20 +446,20 @@ mcs51operandCompare (const void *key, const void *member)
   return strcmp((const char *)key, ((mcs51operanddata *)member)->name);
 }
 
-static void      
+static void
 updateOpRW (asmLineNode *aln, char *op, char *optype)
 {
   mcs51operanddata *opdat;
   char *dot;
-  
+
   dot = strchr(op, '.');
   if (dot)
     *dot = '\0';
 
   opdat = bsearch (op, mcs51operandDataTable,
-		   sizeof(mcs51operandDataTable)/sizeof(mcs51operanddata),
-		   sizeof(mcs51operanddata), mcs51operandCompare);
-  
+                   sizeof(mcs51operandDataTable)/sizeof(mcs51operanddata),
+                   sizeof(mcs51operanddata), mcs51operandCompare);
+
   if (opdat && strchr(optype,'r'))
     {
       if (opdat->regIdx1 >= 0)
@@ -480,12 +481,12 @@ updateOpRW (asmLineNode *aln, char *op, char *optype)
       if (!strcmp(op, "@r1"))
         aln->regsRead = bitVectSetBit (aln->regsRead, R1_IDX);
       if (strstr(op, "dptr"))
-	{
-	  aln->regsRead = bitVectSetBit (aln->regsRead, DPL_IDX);
-	  aln->regsRead = bitVectSetBit (aln->regsRead, DPH_IDX);
-	}
+        {
+          aln->regsRead = bitVectSetBit (aln->regsRead, DPL_IDX);
+          aln->regsRead = bitVectSetBit (aln->regsRead, DPH_IDX);
+        }
       if (strstr(op, "a+"))
-	aln->regsRead = bitVectSetBit (aln->regsRead, A_IDX);
+        aln->regsRead = bitVectSetBit (aln->regsRead, A_IDX);
     }
 }
 
@@ -546,7 +547,7 @@ static mcs51opcodedata mcs51opcodeDataTable[] =
     {"xchd", "",  "",   "rw", "rw"},
     {"xrl",  "",  "",   "rw", "r"},
   };
-  
+
 static int
 mcs51opcodeCompare (const void *key, const void *member)
 {
@@ -564,7 +565,7 @@ asmLineNodeFromLineNode (lineNode *ln)
   mcs51opcodedata *opdat;
 
   p = ln->line;
-  
+
   while (*p && isspace(*p)) p++;
   for (op = inst, opsize=1; *p; p++)
     {
@@ -572,13 +573,13 @@ asmLineNodeFromLineNode (lineNode *ln)
         break;
       else
         if (opsize < sizeof(inst))
-	  *op++ = tolower(*p), opsize++;
+          *op++ = tolower(*p), opsize++;
     }
   *op = '\0';
 
   if (*p == ';' || *p == ':' || *p == '=')
     return aln;
-    
+
   while (*p && isspace(*p)) p++;
   if (*p == '=')
     return aln;
@@ -589,7 +590,7 @@ asmLineNodeFromLineNode (lineNode *ln)
         *op++ = tolower(*p), opsize++;
     }
   *op = '\0';
-  
+
   if (*p == ',') p++;
   for (op = op2, opsize=1; *p && *p != ','; p++)
     {
@@ -604,8 +605,8 @@ asmLineNodeFromLineNode (lineNode *ln)
   aln->regsWritten = newBitVect (END_IDX);
 
   opdat = bsearch (inst, mcs51opcodeDataTable,
-		   sizeof(mcs51opcodeDataTable)/sizeof(mcs51opcodedata),
-		   sizeof(mcs51opcodedata), mcs51opcodeCompare);
+                   sizeof(mcs51opcodeDataTable)/sizeof(mcs51opcodedata),
+                   sizeof(mcs51opcodedata), mcs51opcodeCompare);
 
   if (opdat)
     {
@@ -625,7 +626,7 @@ getInstructionSize (lineNode *line)
 {
   if (!line->aln)
     line->aln = asmLineNodeFromLineNode (line);
-  
+
   return line->aln->size;
 }
 
@@ -634,7 +635,7 @@ getRegsRead (lineNode *line)
 {
   if (!line->aln)
     line->aln = asmLineNodeFromLineNode (line);
-  
+
   return line->aln->regsRead;
 }
 
@@ -643,7 +644,7 @@ getRegsWritten (lineNode *line)
 {
   if (!line->aln)
     line->aln = asmLineNodeFromLineNode (line);
-  
+
   return line->aln->regsWritten;
 }
 
@@ -670,22 +671,22 @@ PORT mcs51_port =
 {
   TARGET_ID_MCS51,
   "mcs51",
-  "MCU 8051",			/* Target name */
-  NULL,				/* Processor name */
+  "MCU 8051",                   /* Target name */
+  NULL,                         /* Processor name */
   {
     glue,
-    TRUE,			/* Emit glue around main */
+    TRUE,                       /* Emit glue around main */
     MODEL_SMALL | MODEL_LARGE,
     MODEL_SMALL
   },
   {
     _asmCmd,
     NULL,
-    "-plosgffc",		/* Options with debug */
-    "-plosgff",			/* Options without debug */
+    "-plosgffc",                /* Options with debug */
+    "-plosgff",                 /* Options without debug */
     0,
     ".asm",
-    NULL			/* no do_assemble function */
+    NULL                        /* no do_assemble function */
   },
   {
     _linkCmd,
@@ -701,7 +702,7 @@ PORT mcs51_port =
     getRegsWritten
   },
   {
-	/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
+    /* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
     1, 2, 2, 4, 1, 2, 3, 1, 4, 4
   },
   {
@@ -754,7 +755,7 @@ PORT mcs51_port =
   _mcs51_getRegName,
   _mcs51_keywords,
   _mcs51_genAssemblerPreamble,
-  NULL,				/* no genAssemblerEnd */
+  NULL,                         /* no genAssemblerEnd */
   _mcs51_genIVT,
   _mcs51_genXINIT,
   _mcs51_genInitStartup,
@@ -763,21 +764,21 @@ PORT mcs51_port =
   NULL,
   NULL,
   NULL,
-  hasExtBitOp,			/* hasExtBitOp */
-  oclsExpense,			/* oclsExpense */
+  hasExtBitOp,                  /* hasExtBitOp */
+  oclsExpense,                  /* oclsExpense */
   FALSE,
-  TRUE,				/* little endian */
-  0,				/* leave lt */
-  0,				/* leave gt */
-  1,				/* transform <= to ! > */
-  1,				/* transform >= to ! < */
-  1,				/* transform != to !(a == b) */
-  0,				/* leave == */
+  TRUE,                         /* little endian */
+  0,                            /* leave lt */
+  0,                            /* leave gt */
+  1,                            /* transform <= to ! > */
+  1,                            /* transform >= to ! < */
+  1,                            /* transform != to !(a == b) */
+  0,                            /* leave == */
   FALSE,                        /* No array initializer support. */
   cseCostEstimation,
-  NULL, 			/* no builtin functions */
-  GPOINTER,			/* treat unqualified pointers as "generic" pointers */
-  1,				/* reset labelKey to 1 */
-  1,				/* globals & local static allowed */
+  NULL,                         /* no builtin functions */
+  GPOINTER,                     /* treat unqualified pointers as "generic" pointers */
+  1,                            /* reset labelKey to 1 */
+  1,                            /* globals & local static allowed */
   PORT_MAGIC
 };

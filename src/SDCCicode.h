@@ -207,25 +207,27 @@ typedef struct icodeFuncTable
 iCodeTable;
 
 /* useful macros */
-#define SKIP_IC2(x)  (x->op == GOTO     ||     \
-                      x->op == LABEL    ||     \
-                      x->op == FUNCTION ||     \
-                      x->op == INLINEASM ||    \
-                      x->op == ENDFUNCTION   )
+#define SKIP_IC2(x)  (x->op == GOTO         ||    \
+                      x->op == LABEL        ||    \
+                      x->op == FUNCTION     ||    \
+                      x->op == INLINEASM    ||    \
+                      x->op == ENDFUNCTION  ||    \
+                      x->op == CRITICAL     ||    \
+                      x->op == ENDCRITICAL  )
 
-#define SKIP_IC1(x)  (x->op == CALL     ||     \
+#define SKIP_IC1(x)  (x->op == CALL         ||    \
                       SKIP_IC2(x) )
 
-#define SKIP_IC(x)   (x->op == PCALL    ||     \
-                      x->op == IPUSH    ||     \
-                      x->op == IPOP     ||     \
-                      x->op == JUMPTABLE ||    \
-                      x->op == RECEIVE  ||     \
-                      x->op == ARRAYINIT ||    \
-                      SKIP_IC1(x)||  \
+#define SKIP_IC(x)   (x->op == PCALL        ||    \
+                      x->op == IPUSH        ||    \
+                      x->op == IPOP         ||    \
+                      x->op == JUMPTABLE    ||    \
+                      x->op == RECEIVE      ||    \
+                      x->op == ARRAYINIT    ||    \
+                      SKIP_IC1(x)           ||    \
                       x->op == SEND         )
 
-#define SKIP_IC3(x) (SKIP_IC2(x) ||     \
+#define SKIP_IC3(x) (SKIP_IC2(x)            ||    \
                      x->op == JUMPTABLE )
 
 #define IS_CONDITIONAL(x) (x->op == EQ_OP || \

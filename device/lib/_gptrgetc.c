@@ -27,7 +27,7 @@
 /* the  return value is expected to be in acc, and not in the standard
  * location dpl. Therefore we choose return type void here: */
 void
-_gptrgetc (char *gptr)
+_gptrgetc (char *gptr) _naked
 {
     gptr; /* hush the compiler */
 
@@ -45,7 +45,7 @@ _gptrgetc (char *gptr)
         dec     a
         jz      00003$	; 2 code
 	dec     a
-	jz      00004$
+	jz      00004$  ; 3 pdata
 	dec     a	; 4 skip generic pointer
 	dec     a
 	jz      00001$	; 5 idata
@@ -81,7 +81,8 @@ _gptrgetc (char *gptr)
  00005$:
         mov     r0,a
         pop     acc
-	xch     a,r0
+        xch     a,r0
+        ret
      _endasm ;
 
 }

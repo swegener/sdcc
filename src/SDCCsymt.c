@@ -2333,7 +2333,10 @@ checkFunction (symbol * sym, symbol *csym)
       werror (E_PREV_DEF_CONFLICT, csym->name, "interrupt");
     }
 
-  if (FUNC_REGBANK (csym->type) != FUNC_REGBANK (sym->type))
+  /* I don't think this is necessary for interrupts. An isr is a  */
+  /* root in the calling tree.                                    */
+  if ((FUNC_REGBANK (csym->type) != FUNC_REGBANK (sym->type)) &&
+      (!FUNC_ISISR (sym->type)))
     {
       werror (E_PREV_DEF_CONFLICT, csym->name, "using");
     }
@@ -2342,7 +2345,7 @@ checkFunction (symbol * sym, symbol *csym)
     {
       werror (E_PREV_DEF_CONFLICT, csym->name, "_naked");
     }
-  
+
   /* Really, reentrant should match regardless of argCnt, but     */
   /* this breaks some existing code (the fp lib functions). If    */
   /* the first argument is always passed the same way, this       */
@@ -2528,7 +2531,10 @@ processFuncArgs (symbol * func)
           SNPRINTF (val->name, sizeof(val->name), 
                     "_%s_PARM_%d", func->name, pNum++);
           val->sym = newSymbol (val->name, 1);
-          SPEC_OCLS (val->etype) = port->mem.default_local_map;
+          if (SPEC_SCLS(val->etype) == S_BIT)
+            SPEC_OCLS (val->etype) = bit;
+          else
+            SPEC_OCLS (val->etype) = port->mem.default_local_map;
           val->sym->type = copyLinkChain (val->type);
           val->sym->etype = getSpec (val->sym->type);
           val->sym->_isparm = 1;
@@ -2549,8 +2555,11 @@ processFuncArgs (symbol * func)
           SNPRINTF (val->name, sizeof(val->name), "_%s_PARM_%d", func->name, pNum++);
           strncpyz (val->sym->rname, val->name, sizeof(val->sym->rname));
           val->sym->_isparm = 1;
-          SPEC_OCLS (val->etype) = SPEC_OCLS (val->sym->etype) =
-            (options.model != MODEL_SMALL ? xdata : data);
+          if (SPEC_SCLS(val->etype) == S_BIT)
+            SPEC_OCLS (val->etype) = SPEC_OCLS (val->sym->etype) = bit;
+          else
+            SPEC_OCLS (val->etype) = SPEC_OCLS (val->sym->etype) =
+              (options.model != MODEL_SMALL ? xdata : data);
           
           #if 0
           /* ?? static functions shouldn't imply static parameters - EEP */

@@ -31,11 +31,12 @@
 #define USE_PDATA_PAGING_REGISTER 0
 
 void
-_gptrput (char *gptr, char c)
+_gptrput (char *gptr, char c) _naked
 {
     gptr; c; /* hush the compiler */
 
     _asm
+	ar0 = 0x00
         push     acc
     ;
     ;   depending on the pointer type acc. to SDCCsymt.h
@@ -85,6 +86,7 @@ _gptrput (char *gptr, char c)
 #endif
 
  00005$:
+        ret
 _endasm;
 }
 

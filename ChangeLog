@@ -1,3 +1,42 @@
+2004-11-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* .version: bumped version to 2.4.7
+	* device/lib/_gptrget.c (_gptrget): is now _naked
+	* device/lib/_gptrgetc.c (_gptrgetc): is now _naked
+	* device/lib/_gptrput.c (_gptrput): is now _naked
+	* src/SDCCast.c (createBlock): removed ridiculous self-assignment,
+	  (createFunction): fixed xstack
+	* src/SDCCglue.c (emitMaps): set allocation required for bit area
+	* src/SDCCicode.c (geniCodeCast): don't change SPEC_OCLS for literal
+	  or bit either,
+	  (geniCodeCritical): store original interrupt state in an iTemp bit
+	  var unless stack-auto
+	* src/SDCCicode.h: added CRITICAL and ENDCRITICAL to SKIP_IC2
+	* src/SDCCmain.c (setIncludePath): added include/target to search path
+	* src/SDCCmem.c (allocParms): store bit vars in bit space, not overlay
+	* src/SDCCsymt.c (checkFunction): don't check regbank for isr's against
+	  prototype,
+	  (processFuncArgs): put bit vars in bit area
+	* src/mcs51/gen.c (saveRegisters, unsaveRegisters, genXpush, saveRBank,
+	  unsaveRBank): fixed xstack,
+	  (genFunction): bugfix: replaced (global!) reentrant with fReentrant,
+	  (genFunction, genEndFunction): fixed xstack,
+	  (genAssign): optimization don't walk backwards through mem
+	* src/mcs51/main.c (_mcs51_regparm): don't pass bit params in registers
+	* src/mcs51/ralloc.c (createStackSpil): spill bits to bit area
+	* support/regression/Makefile: also make library (for stack-auto) when
+	  making "all" and added "test-mcs51-xstack-auto"
+	* support/regression/fwk/lib/testfwk.c: added T2_isr prototype for mcs51
+	* support/regression/ports/mcs51/T2_isr.c: added this file as a stub
+	* support/regression/ports/mcs51/fwk.lib: added to link T2_isr stub
+	* support/regression/ports/mcs51/spec.mk: added rules for fwk.lib
+	* support/regression/ports/mcs51-stack-auto/spec.mk: replaced
+	  make-library by MAKE_LIBRARY
+	* support/regression/ports/mcs51-xstack-auto/spec.mk: file added to run
+	  regression tests for xstack
+	* support/regression/tests/bitvars.c: test for bit vars (bug 938782)
+	* support/regression/tests/critical.c: test for critical on mcs51
+
 2004-11-18 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regression/ports/ucz80/spec.mk: use include and lib files from

@@ -43,9 +43,7 @@ SOURCES = _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
 OBJECTS = $(patsubst %.c,$(LIBDIR)/%.rel,$(SOURCES))
 MODULES = $(patsubst %.c,%,$(SOURCES))
 
-.PHONY: make-library
-make-library: $(LIBDIR) $(OBJECTS) lib-files
-
+MAKE_LIBRARY = $(LIBDIR) $(OBJECTS) lib-files
 
 $(LIBDIR):
 	mkdir -p $(LIBDIR)

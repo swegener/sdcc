@@ -660,7 +660,7 @@ newiTempLabel (char *s)
 {
   symbol *itmplbl;
 
-  /* check if this alredy exists */
+  /* check if this already exists */
   if (s && (itmplbl = findSym (LabelTab, NULL, s)))
     return itmplbl;
 
@@ -2027,9 +2027,10 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
   restype = getSpec (operandType (IC_RESULT (ic)));
   if (!IS_LITERAL(opetype) &&
       !IS_BIT(opetype))
+    {
       SPEC_SCLS (restype) = SPEC_SCLS (opetype);
-  SPEC_OCLS (restype) = SPEC_OCLS (opetype);
-
+      SPEC_OCLS (restype) = SPEC_OCLS (opetype);
+    }
   ADDTOCHAIN (ic);
   return IC_RESULT (ic);
 }
@@ -3237,12 +3238,12 @@ geniCodeParms (ast * parms, value *argVals, int *stack,
       /* hack don't like this but too lazy to think of
          something better */
       if (IS_ADDRESS_OF_OP (parms))
-	parms->left->lvalue = 1;
+        parms->left->lvalue = 1;
 
       if (IS_CAST_OP (parms) &&
-	  IS_PTR (parms->ftype) &&
-	  IS_ADDRESS_OF_OP (parms->right))
-	parms->right->left->lvalue = 1;
+          IS_PTR (parms->ftype) &&
+          IS_ADDRESS_OF_OP (parms->right))
+        parms->right->left->lvalue = 1;
 
       pval = geniCodeRValue (ast2iCode (parms,lvl+1), FALSE);
     }
@@ -3260,24 +3261,24 @@ geniCodeParms (ast * parms, value *argVals, int *stack,
     {
       /* now decide whether to push or assign */
       if (!(options.stackAuto || IFFUNC_ISREENT (ftype)))
-	{
+        {
 
-	  /* assign */
-	  operand *top = operandFromSymbol (argVals->sym);
-	  /* clear useDef and other bitVectors */
-	  OP_USES(top)=OP_DEFS(top)=OP_SYMBOL(top)->clashes = NULL;
-	  geniCodeAssign (top, pval, 1, 0);
-	}
+          /* assign */
+          operand *top = operandFromSymbol (argVals->sym);
+          /* clear useDef and other bitVectors */
+          OP_USES(top)=OP_DEFS(top)=OP_SYMBOL(top)->clashes = NULL;
+          geniCodeAssign (top, pval, 1, 0);
+        }
       else
-	{
-	  sym_link *p = operandType (pval);
-	  /* push */
-	  ic = newiCode (IPUSH, pval, NULL);
-	  ic->parmPush = 1;
-	  /* update the stack adjustment */
-	  *stack += getSize (IS_AGGREGATE (p) ? aggrToPtr (p, FALSE) : p);
-	  ADDTOCHAIN (ic);
-	}
+        {
+          sym_link *p = operandType (pval);
+          /* push */
+          ic = newiCode (IPUSH, pval, NULL);
+          ic->parmPush = 1;
+          /* update the stack adjustment */
+          *stack += getSize (IS_AGGREGATE (p) ? aggrToPtr (p, FALSE) : p);
+          ADDTOCHAIN (ic);
+        }
     }
 
   argVals=argVals->next;
@@ -3817,11 +3818,23 @@ geniCodeCritical (ast *tree, int lvl)
 {
   iCode *ic;
   operand *op = NULL;
+  sym_link *type;
+
+  if (!options.stackAuto)
+    {
+      type = newLink(SPECIFIER);
+      SPEC_VOLATILE(type) = 1;
+      SPEC_NOUN(type) = V_BIT;
+      SPEC_SCLS(type) = S_BIT;
+      SPEC_BLEN(type) = 1;
+      SPEC_BSTR(type) = 0;
+      op = newiTempOperand(type, 1);
+    }
 
   /* If op is NULL, the original interrupt state will saved on */
   /* the stack. Otherwise, it will be saved in op. */
   
-  /* Generate a save of the current interrupt state & disabled */
+  /* Generate a save of the current interrupt state & disable */
   ic = newiCode (CRITICAL, NULL, NULL);
   IC_RESULT (ic) = op;
   ADDTOCHAIN (ic);

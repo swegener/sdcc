@@ -13,6 +13,11 @@
 #define _REENTRANT reentrant
 #endif
 
+#if defined(SDCC_mcs51)
+/* until changed, isr's must have a prototype in the module containing main */
+void T2_isr (void) interrupt 5;
+#endif
+
 /** Define this if the port's div or mod functions are broken.
     A slow loop based method will be substituded.
 */
@@ -105,14 +110,14 @@ void __printf(const char *szFormat, ...) REENTRANT
 int __numTests;
 int __numFailures;
 
-void 
+void
 __fail(const char *szMsg, const char *szCond, const char *szFile, int line)
 {
     __printf("--- FAIL: \"%s\" on %s at %s:%u\n", szMsg, szCond, szFile, line);
     __numFailures++;
 }
 
-int 
+int
 main(void)
 {
     TESTFUNP *cases;
@@ -128,8 +133,8 @@ main(void)
         cases++;
         numCases++;
     }
-    
-    __printf("--- Summary: %u/%u/%u: %u failed of %u tests in %u cases.\n", 
+
+    __printf("--- Summary: %u/%u/%u: %u failed of %u tests in %u cases.\n",
            __numFailures, __numTests, numCases,
            __numFailures, __numTests, numCases
            );

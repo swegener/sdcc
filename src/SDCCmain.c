@@ -2010,20 +2010,28 @@ static void
 setIncludePath(void)
 {
   char *p;
+  set *tempSet=NULL;
 
   /*
    * Search logic:
    *
-   * 1. - $SDCC_INCLUDE
-   * 2. - $SDCC_HOME/PREFIX2DATA_DIR/INCLUDE_DIR_SUFFIX
-   * 3. - path(argv[0])/BIN2DATA_DIR/INCLUDE_DIR_SUFFIX
-   * 4. - DATADIR/INCLUDE_DIR_SUFFIX (only on *nix)
+   * 1. - $SDCC_INCLUDE/target
+   * 2. - $SDCC_HOME/PREFIX2DATA_DIR/INCLUDE_DIR_SUFFIX/target
+   * 3. - path(argv[0])/BIN2DATA_DIR/INCLUDE_DIR_SUFFIX/target
+   * 4. - DATADIR/INCLUDE_DIR_SUFFIX/target (only on *nix)
+   * 5. - $SDCC_INCLUDE
+   * 6. - $SDCC_HOME/PREFIX2DATA_DIR/INCLUDE_DIR_SUFFIX
+   * 7. - path(argv[0])/BIN2DATA_DIR/INCLUDE_DIR_SUFFIX
+   * 8. - DATADIR/INCLUDE_DIR_SUFFIX (only on *nix)
    */
 
   if (options.nostdinc)
       return;
 
-  includeDirsSet = appendStrSet(dataDirsSet, NULL, INCLUDE_DIR_SUFFIX);
+  tempSet = appendStrSet(dataDirsSet, NULL, INCLUDE_DIR_SUFFIX);
+  includeDirsSet = appendStrSet(tempSet, NULL, DIR_SEPARATOR_STRING);
+  includeDirsSet = appendStrSet(includeDirsSet, NULL, port->target);
+  mergeSets(&includeDirsSet, tempSet);
 
   if ((p = getenv(SDCC_INCLUDE_NAME)) != NULL)
     addSetHead(&includeDirsSet, p);

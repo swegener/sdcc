@@ -4431,7 +4431,6 @@ createBlock (symbol * decl, ast * body)
   ex = newNode (BLOCK, NULL, body);
   ex->values.sym = decl;
   
-  ex->right = ex->right;///?????
   ex->level++;
   ex->lineno = 0;
   return ex;
@@ -5301,14 +5300,19 @@ createFunction (symbol * name, ast * body)
   currFunc = name;
 
   /* set the stack pointer */
-  /* PENDING: check this for the mcs51 */
-  stackPtr = -port->stack.direction * port->stack.call_overhead;
+  stackPtr  = -port->stack.direction * port->stack.call_overhead;
+  xstackPtr = -port->stack.direction * port->stack.call_overhead;
+
   if (IFFUNC_ISISR (name->type))
     stackPtr -= port->stack.direction * port->stack.isr_overhead;
-  if (IFFUNC_ISREENT (name->type) || options.stackAuto)
-    stackPtr -= port->stack.direction * port->stack.reent_overhead;
 
-  xstackPtr = -port->stack.direction * port->stack.call_overhead;
+  if (IFFUNC_ISREENT (name->type) || options.stackAuto)
+    {
+      if (options.useXstack)
+        xstackPtr -= port->stack.direction * port->stack.reent_overhead;
+      else
+        stackPtr  -= port->stack.direction * port->stack.reent_overhead;
+    }
 
   fetype = getSpec (name->type);        /* get the specifier for the function */
   /* if this is a reentrant function then */

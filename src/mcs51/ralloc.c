@@ -61,24 +61,24 @@ int mcs51_ptrRegReq;            /* one byte pointer register required */
 regs regs8051[] =
 {
 
-  {REG_GPR, R2_IDX, REG_GPR, "r2", "ar2", "0", 2, 1},
-  {REG_GPR, R3_IDX, REG_GPR, "r3", "ar3", "0", 3, 1},
-  {REG_GPR, R4_IDX, REG_GPR, "r4", "ar4", "0", 4, 1},
-  {REG_GPR, R5_IDX, REG_GPR, "r5", "ar5", "0", 5, 1},
-  {REG_GPR, R6_IDX, REG_GPR, "r6", "ar6", "0", 6, 1},
-  {REG_GPR, R7_IDX, REG_GPR, "r7", "ar7", "0", 7, 1},
-  {REG_PTR, R0_IDX, REG_PTR, "r0", "ar0", "0", 0, 1},
-  {REG_PTR, R1_IDX, REG_PTR, "r1", "ar1", "0", 1, 1},
-  {REG_GPR, X8_IDX, REG_GPR, "x8", "x8", "xreg", 0, 1},
-  {REG_GPR, X9_IDX, REG_GPR, "x9", "x9", "xreg", 1, 1},
+  {REG_GPR, R2_IDX,  REG_GPR, "r2",  "ar2", "0",    2, 1},
+  {REG_GPR, R3_IDX,  REG_GPR, "r3",  "ar3", "0",    3, 1},
+  {REG_GPR, R4_IDX,  REG_GPR, "r4",  "ar4", "0",    4, 1},
+  {REG_GPR, R5_IDX,  REG_GPR, "r5",  "ar5", "0",    5, 1},
+  {REG_GPR, R6_IDX,  REG_GPR, "r6",  "ar6", "0",    6, 1},
+  {REG_GPR, R7_IDX,  REG_GPR, "r7",  "ar7", "0",    7, 1},
+  {REG_PTR, R0_IDX,  REG_PTR, "r0",  "ar0", "0",    0, 1},
+  {REG_PTR, R1_IDX,  REG_PTR, "r1",  "ar1", "0",    1, 1},
+  {REG_GPR, X8_IDX,  REG_GPR, "x8",  "x8",  "xreg", 0, 1},
+  {REG_GPR, X9_IDX,  REG_GPR, "x9",  "x9",  "xreg", 1, 1},
   {REG_GPR, X10_IDX, REG_GPR, "x10", "x10", "xreg", 2, 1},
   {REG_GPR, X11_IDX, REG_GPR, "x11", "x11", "xreg", 3, 1},
   {REG_GPR, X12_IDX, REG_GPR, "x12", "x12", "xreg", 4, 1},
-  {REG_CND, CND_IDX, REG_CND, "C", "psw", "0xd0", 0, 1},
-  {0, DPL_IDX, 0, "dpl", "dpl", "0x82", 0, 0},
-  {0, DPH_IDX, 0, "dph", "dph", "0x83", 0, 0},
-  {0, B_IDX, 0, "b", "b", "0xf0", 0, 0},
-  {0, A_IDX, 0, "a", "acc", "0xe0", 0, 0},
+  {REG_CND, CND_IDX, REG_CND, "C",   "psw", "0xd0", 0, 1},
+  {0,       DPL_IDX, 0,       "dpl", "dpl", "0x82", 0, 0},
+  {0,       DPH_IDX, 0,       "dph", "dph", "0x83", 0, 0},
+  {0,       B_IDX,   0,       "b",   "b",   "0xf0", 0, 0},
+  {0,       A_IDX,   0,       "a",   "acc", "0xe0", 0, 0},
 };
 int mcs51_nRegs = 17;
 static void spillThis (symbol *);
@@ -505,7 +505,10 @@ createStackSpil (symbol * sym)
   /* set the type to the spilling symbol */
   sloc->type = copyLinkChain (sym->type);
   sloc->etype = getSpec (sloc->type);
-  SPEC_SCLS (sloc->etype) = S_DATA;
+  if (SPEC_SCLS (sloc->etype) != S_BIT)
+    {
+      SPEC_SCLS (sloc->etype) = S_DATA;
+    }
   SPEC_EXTR (sloc->etype) = 0;
   SPEC_STAT (sloc->etype) = 0;
   SPEC_VOLATILE(sloc->etype) = 0;
@@ -1167,7 +1170,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
            ebbs[i]->entryLabel != returnLabel))
         continue;
 
-      /* of all instructions do */
+      /* for all instructions do */
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
 #if 1
@@ -1230,6 +1233,15 @@ serialRegAssign (eBBlock ** ebbs, int count)
                     spillThis (sym);
                     continue;
                 }
+
+                /* if this is a bit variable then don't use precious registers
+                   along with expensive bit-to-char conversions but just spill
+                   it */
+                if (SPEC_NOUN(sym->etype) == V_BIT) {
+                    spillThis (sym);
+                    continue;
+                }
+
                 /* if trying to allocate this will cause
                    a spill and there is nothing to spill
                    or this one is rematerializable then
@@ -1577,8 +1589,7 @@ mcs51_rUmaskForOp (operand * op)
   for (j = 0; j < sym->nRegs; j++)
     {
       if (sym->regs[j]) /* EEP - debug */
-      rumask = bitVectSetBit (rumask,
-                              sym->regs[j]->rIdx);
+        rumask = bitVectSetBit (rumask, sym->regs[j]->rIdx);
     }
 
   return rumask;
@@ -2710,7 +2721,7 @@ accuse:
 }
 
 /*-----------------------------------------------------------------*/
-/* packForPush - hueristics to reduce iCode for pushing            */
+/* packForPush - heuristics to reduce iCode for pushing            */
 /*-----------------------------------------------------------------*/
 static void
 packForPush (iCode * ic, eBBlock ** ebpp, int blockno)

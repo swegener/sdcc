@@ -65,11 +65,13 @@ ALL_PORTS = $(filter-out CVS xa51 ucz80 gbz80,$(notdir $(wildcard $(PORTS_DIR)/*
 # These  ports will be cleaned with 'make clean'
 CLEAN_PORTS = $(filter-out CVS,$(notdir $(wildcard $(PORTS_DIR)/*)))
 
+MAKE_LIBRARY =
+
 all: test-ports
 
 # Test all of the ports
 test-ports:
-	for i in $(ALL_PORTS); do $(MAKE) test-port PORT=$$i; done
+	for i in $(ALL_PORTS); do $(MAKE) make_library test-port PORT=$$i; done
 
 # Helper rule for testing the z80 port only
 test-z80:
@@ -87,7 +89,10 @@ test-mcs51-large:
 	$(MAKE) test-port PORT=mcs51-large
 
 test-mcs51-stack-auto:
-	$(MAKE) make-library test-port PORT=mcs51-stack-auto
+	$(MAKE) make_library test-port PORT=mcs51-stack-auto
+
+test-mcs51-xstack-auto:
+	$(MAKE) make_library test-port PORT=mcs51-xstack-auto
 
 # Helper rule for testing the ds390 port only
 test-ds390:
@@ -142,6 +147,8 @@ DIREXT =
 ifdef PORT
 include $(PORTS_DIR)/$(PORT)/spec.mk
 endif
+
+make_library: $(MAKE_LIBRARY)
 
 SDCCFLAGS += -Ifwk/include -Itests -I$(INC_DIR)
 

@@ -1869,26 +1869,52 @@ saveRegisters (iCode * lic)
   ic->regsSaved = 1;
   if (options.useXstack)
     {
-      if (bitVectBitValue (rsave, R0_IDX))
+      int count = bitVectnBitsOn (rsave);
+
+      if (count == 1)
         {
-          emitcode ("mov", "a,r0");
-          emitcode ("push", "%s", mcs51_regWithIdx (R0_IDX)->dname);
+          i = bitVectFirstBit (rsave);
+          emitcode ("mov", "a,%s", mcs51_regWithIdx (i)->name);
+          emitcode ("mov", "r0,%s", spname);
+          emitcode ("inc", "%s", spname);// allocate before use
+          emitcode ("movx", "@r0,a");
+          if (bitVectBitValue (rsave, R0_IDX))
+            emitcode ("mov", "r0,a");
         }
-      emitcode ("mov", "r0,%s", spname);
-      for (i = 0; i < mcs51_nRegs; i++)
+      else if (count != 0)
         {
-          if (bitVectBitValue (rsave, i))
+          if (bitVectBitValue (rsave, R0_IDX))
             {
-              if (i != R0_IDX)
-                emitcode ("mov", "a,%s", mcs51_regWithIdx (i)->name);
-              emitcode ("movx", "@r0,a");
-              emitcode ("inc", "r0");
+              emitcode ("push", "%s", mcs51_regWithIdx (R0_IDX)->dname);
             }
-        }
-      emitcode ("mov", "%s,r0", spname);
-      if (bitVectBitValue (rsave, R0_IDX))
-        {
-          emitcode ("pop", "%s", mcs51_regWithIdx (R0_IDX)->dname);
+          emitcode ("mov", "r0,%s", spname);
+          MOVA ("r0");
+          emitcode ("add", "a,#%d", count);
+          emitcode ("mov", "%s,a", spname);
+          for (i = 0; i < mcs51_nRegs; i++)
+            {
+              if (bitVectBitValue (rsave, i))
+                {
+                  if (i == R0_IDX)
+                    {
+                      emitcode ("pop", "acc");
+                      emitcode ("push", "acc");
+                    }
+                  else
+                    {
+                      emitcode ("mov", "a,%s", mcs51_regWithIdx (i)->name);
+                    }
+                  emitcode ("movx", "@r0,a");
+                  if (--count)
+                    {
+                      emitcode ("inc", "r0");
+                    }
+                }
+            }
+          if (bitVectBitValue (rsave, R0_IDX))
+            {
+              emitcode ("pop", "%s", mcs51_regWithIdx (R0_IDX)->dname);
+            }
         }
     }
   else
@@ -1915,22 +1941,35 @@ unsaveRegisters (iCode * ic)
 
   if (options.useXstack)
     {
-      emitcode ("mov", "r0,%s", spname);
-      for (i = mcs51_nRegs; i >= 0; i--)
-        {
-          if (bitVectBitValue (rsave, i))
-            {
-              emitcode ("dec", "r0");
-              emitcode ("movx", "a,@r0");
-              if (i != R0_IDX)
-                emitcode ("mov", "%s,a", mcs51_regWithIdx (i)->name);
-            }
+      int count = bitVectnBitsOn (rsave);
 
-        }
-      emitcode ("mov", "%s,r0", spname);
-      if (bitVectBitValue (rsave, R0_IDX))
+      if (count == 1)
         {
-          emitcode ("mov", "r0,a");
+          emitcode ("mov", "r0,%s", spname);
+          emitcode ("dec", "r0");
+          emitcode ("movx", "a,@r0");
+          i = bitVectFirstBit (rsave);
+          emitcode ("mov", "%s,a", mcs51_regWithIdx (i)->name);
+          emitcode ("dec", "%s", spname);
+        }
+      else
+        {
+          emitcode ("mov", "r0,%s", spname);
+          for (i = mcs51_nRegs; i >= 0; i--)
+            {
+              if (bitVectBitValue (rsave, i))
+                {
+                  emitcode ("dec", "r0");
+                  emitcode ("movx", "a,@r0");
+                  if (i != R0_IDX)
+                    emitcode ("mov", "%s,a", mcs51_regWithIdx (i)->name);
+                }
+            }
+          emitcode ("mov", "%s,r0", spname);
+          if (bitVectBitValue (rsave, R0_IDX))
+            {
+              emitcode ("mov", "r0,a");
+            }
         }
     }
   else
@@ -1939,7 +1978,6 @@ unsaveRegisters (iCode * ic)
         if (bitVectBitValue (rsave, i))
           emitcode ("pop", "%s", mcs51_regWithIdx (i)->dname);
       }
-
 }
 
 
@@ -1996,23 +2034,30 @@ genXpush (iCode * ic)
   aopOp (IC_LEFT (ic), ic, FALSE);
   r = getFreePtr (ic, &aop, FALSE);
 
-
-  emitcode ("mov", "%s,_spx", r->name);
-
   size = AOP_SIZE (IC_LEFT (ic));
-  while (size--)
+
+  if (size == 1)
     {
-
-      char *l = aopGet (AOP (IC_LEFT (ic)),
-                        offset++, FALSE, FALSE);
-      MOVA (l);
+      MOVA (aopGet (AOP (IC_LEFT (ic)), 0, FALSE, FALSE));
+      emitcode ("mov", "%s,%s", r->name, spname);
+      emitcode ("inc", "%s", spname); // allocate space first
       emitcode ("movx", "@%s,a", r->name);
-      emitcode ("inc", "%s", r->name);
-
     }
+  else
+    {
+      // allocate space first
+      emitcode ("mov", "%s,%s", r->name, spname);
+      MOVA (r->name);
+      emitcode ("add", "a,#%d", size);
+      emitcode ("mov", "%s,a", spname);
 
-
-  emitcode ("mov", "_spx,%s", r->name);
+      while (size--)
+        {
+          MOVA (aopGet (AOP (IC_LEFT (ic)), offset++, FALSE, FALSE));
+          emitcode ("movx", "@%s,a", r->name);
+          emitcode ("inc", "%s", r->name);
+        }
+    }
 
   freeAsmop (NULL, aop, ic, TRUE);
   freeAsmop (IC_LEFT (ic), NULL, ic, TRUE);
@@ -2070,7 +2115,6 @@ genIpush (iCode * ic)
   /* then do the push */
   aopOp (IC_LEFT (ic), ic, FALSE);
 
-
   // pushSide(IC_LEFT(ic), AOP_SIZE(IC_LEFT(ic)));
   size = AOP_SIZE (IC_LEFT (ic));
 
@@ -2086,7 +2130,7 @@ genIpush (iCode * ic)
         }
       else
           emitcode ("push", "%s", l);
-        }
+    }
 
   freeAsmop (IC_LEFT (ic), NULL, ic, TRUE);
 }
@@ -2116,77 +2160,13 @@ genIpop (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* unsaveRBank - restores the resgister bank from stack            */
-/*-----------------------------------------------------------------*/
-static void
-unsaveRBank (int bank, iCode * ic, bool popPsw)
-{
-  int i;
-  asmop *aop = NULL;
-  regs *r = NULL;
-
-  if (options.useXstack)
-  {
-      if (!ic)
-      {
-          /* Assume r0 is available for use. */
-          r = mcs51_regWithIdx (R0_IDX);;
-      }
-      else
-      {
-          aop = newAsmop (0);
-          r = getFreePtr (ic, &aop, FALSE);
-      }
-      emitcode ("mov", "%s,_spx", r->name);
-  }
-
-  if (popPsw)
-    {
-      if (options.useXstack)
-      {
-          emitcode ("movx", "a,@%s", r->name);
-          emitcode ("mov", "psw,a");
-          emitcode ("dec", "%s", r->name);
-        }
-      else
-      {
-        emitcode ("pop", "psw");
-      }
-    }
-
-  for (i = (mcs51_nRegs - 1); i >= 0; i--)
-    {
-      if (options.useXstack)
-        {
-          emitcode ("movx", "a,@%s", r->name);
-          emitcode ("mov", "(%s+%d),a",
-                    regs8051[i].base, 8 * bank + regs8051[i].offset);
-          emitcode ("dec", "%s", r->name);
-
-        }
-      else
-        emitcode ("pop", "(%s+%d)",
-                  regs8051[i].base, 8 * bank + regs8051[i].offset);
-    }
-
-  if (options.useXstack)
-    {
-      emitcode ("mov", "_spx,%s", r->name);
-    }
-
-  if (aop)
-  {
-      freeAsmop (NULL, aop, ic, TRUE);
-  }
-}
-
-/*-----------------------------------------------------------------*/
 /* saveRBank - saves an entire register bank on the stack          */
 /*-----------------------------------------------------------------*/
 static void
 saveRBank (int bank, iCode * ic, bool pushPsw)
 {
   int i;
+  int count = mcs51_nRegs + (pushPsw ? 1 : 0);
   asmop *aop = NULL;
   regs *r = NULL;
 
@@ -2202,17 +2182,22 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
           aop = newAsmop (0);
           r = getFreePtr (ic, &aop, FALSE);
       }
-      emitcode ("mov", "%s,_spx", r->name);
+      // allocate space first
+      emitcode ("mov", "%s,%s", r->name, spname);
+      MOVA (r->name);
+      emitcode ("add", "a,#%d", count);
+      emitcode ("mov", "%s,a", spname);
     }
 
   for (i = 0; i < mcs51_nRegs; i++)
     {
       if (options.useXstack)
         {
-          emitcode ("inc", "%s", r->name);
           emitcode ("mov", "a,(%s+%d)",
                     regs8051[i].base, 8 * bank + regs8051[i].offset);
           emitcode ("movx", "@%s,a", r->name);
+          if (--count)
+            emitcode ("inc", "%s", r->name);
         }
       else
         emitcode ("push", "(%s+%d)",
@@ -2225,14 +2210,12 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
         {
           emitcode ("mov", "a,psw");
           emitcode ("movx", "@%s,a", r->name);
-          emitcode ("inc", "%s", r->name);
-          emitcode ("mov", "_spx,%s", r->name);
 
         }
       else
-      {
-        emitcode ("push", "psw");
-      }
+        {
+          emitcode ("push", "psw");
+        }
 
       emitcode ("mov", "psw,#0x%02x", (bank << 3) & 0x00ff);
     }
@@ -2246,6 +2229,72 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
   {
     ic->bankSaved = 1;
   }
+}
+
+/*-----------------------------------------------------------------*/
+/* unsaveRBank - restores the register bank from stack             */
+/*-----------------------------------------------------------------*/
+static void
+unsaveRBank (int bank, iCode * ic, bool popPsw)
+{
+  int i;
+  asmop *aop = NULL;
+  regs *r = NULL;
+
+  if (options.useXstack)
+    {
+      if (!ic)
+        {
+          /* Assume r0 is available for use. */
+          r = mcs51_regWithIdx (R0_IDX);;
+        }
+      else
+        {
+          aop = newAsmop (0);
+          r = getFreePtr (ic, &aop, FALSE);
+        }
+      emitcode ("mov", "%s,%s", r->name, spname);
+    }
+
+  if (popPsw)
+    {
+      if (options.useXstack)
+        {
+          emitcode ("dec", "%s", r->name);
+          emitcode ("movx", "a,@%s", r->name);
+          emitcode ("mov", "psw,a");
+        }
+      else
+        {
+          emitcode ("pop", "psw");
+        }
+    }
+
+  for (i = (mcs51_nRegs - 1); i >= 0; i--)
+    {
+      if (options.useXstack)
+        {
+          emitcode ("dec", "%s", r->name);
+          emitcode ("movx", "a,@%s", r->name);
+          emitcode ("mov", "(%s+%d),a",
+                    regs8051[i].base, 8 * bank + regs8051[i].offset);
+        }
+      else
+        {
+          emitcode ("pop", "(%s+%d)",
+                  regs8051[i].base, 8 * bank + regs8051[i].offset);
+        }
+    }
+
+  if (options.useXstack)
+    {
+      emitcode ("mov", "%s,%s", spname, r->name);
+    }
+
+  if (aop)
+    {
+      freeAsmop (NULL, aop, ic, TRUE);
+    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -2543,13 +2592,14 @@ inExcludeList (char *s)
 static void
 genFunction (iCode * ic)
 {
-  symbol *sym = OP_SYMBOL (IC_LEFT (ic));
+  symbol   *sym = OP_SYMBOL (IC_LEFT (ic));
   sym_link *ftype;
-  bool   switchedPSW = FALSE;
-  int calleesaves_saved_register = -1;
-  int stackAdjust = sym->stack;
-  int accIsFree = sym->recvSize < 4;
-  iCode * ric = (ic->next && ic->next->op == RECEIVE) ? ic->next : NULL;
+  bool     switchedPSW = FALSE;
+  int      calleesaves_saved_register = -1;
+  int      stackAdjust = sym->stack;
+  int      accIsFree = sym->recvSize < 4;
+  iCode    *ric = (ic->next && ic->next->op == RECEIVE) ? ic->next : NULL;
+  bool     fReentrant = (IFFUNC_ISREENT (sym->type) || options.stackAuto);
 
   _G.nRegsSaved = 0;
   /* create the function header */
@@ -2770,16 +2820,17 @@ genFunction (iCode * ic)
     }
 
 
-  if (reentrant)
+  if (fReentrant)
     {
       if (options.useXstack)
         {
-              emitcode ("inc", "%s", spname);
-              emitcode ("mov", "r0,%s", spname);
-              emitcode ("xch", "a,_bp");
-              emitcode ("movx", "@r0,a");
-              emitcode ("mov", "a,r0");
-              emitcode ("xch", "a,_bp");
+          emitcode ("mov", "r0,%s", spname);
+          emitcode ("inc", "%s", spname);
+          emitcode ("xch", "a,_bp");
+          emitcode ("movx", "@r0,a");
+          emitcode ("inc", "r0");
+          emitcode ("mov", "a,r0");
+          emitcode ("xch", "a,_bp");
         }
       else
         {
@@ -2858,11 +2909,9 @@ genFunction (iCode * ic)
 
       if (i > 3 && accIsFree)
         {
-
           emitcode ("mov", "a,sp");
           emitcode ("add", "a,#0x%02x", ((char) sym->stack & 0xff));
           emitcode ("mov", "sp,a");
-
         }
       else if (i > 5)
         {
@@ -2904,14 +2953,27 @@ genFunction (iCode * ic)
 
   if (sym->xstack)
     {
+      char i = ((char) sym->xstack & 0xff);
 
-      if (!accIsFree)
-        emitcode ("push", "acc");
-      emitcode ("mov", "a,_spx");
-      emitcode ("add", "a,#0x%02x", ((char) sym->xstack & 0xff));
-      emitcode ("mov", "_spx,a");
-      if (!accIsFree)
-        emitcode ("pop", "acc");
+      if (i > 3 && accIsFree)
+        {
+          emitcode ("mov", "a,_spx");
+          emitcode ("add", "a,#0x%02x", i);
+          emitcode ("mov", "_spx,a");
+        }
+      else if (i > 5)
+        {
+          emitcode ("push", "acc");
+          emitcode ("mov", "a,_spx");
+          emitcode ("add", "a,#0x%02x", i);
+          emitcode ("mov", "_spx,a");
+          emitcode ("pop", "acc");
+        }
+      else
+        {
+          while (i--)
+            emitcode ("inc", "_spx");
+        }
     }
 
   /* if critical function then turn interrupts off */
@@ -2955,7 +3017,7 @@ genEndFunction (iCode * ic)
       emitcode ("mov", "ea,c");
     }
 
-  if (IFFUNC_ISREENT (sym->type) || options.stackAuto)
+  if ((IFFUNC_ISREENT (sym->type) || options.stackAuto) && !options.useXstack)
     {
       emitcode ("mov", "%s,_bp", spname);
     }
@@ -2965,13 +3027,19 @@ genEndFunction (iCode * ic)
      local stack */
   if (options.useXstack && sym->stack)
     {
-      if (!accIsFree)
-        emitcode ("push", "acc");
-      emitcode ("mov", "a,sp");
-      emitcode ("add", "a,#0x%02x", ((char) -sym->stack) & 0xff);
-      emitcode ("mov", "sp,a");
-      if (!accIsFree)
-        emitcode ("pop", "acc");
+      char count = sym->stack;
+
+      if ((count>3) && accIsFree)
+        {
+          emitcode ("mov", "a,sp");
+          emitcode ("add", "a,#0x%02x", ((char) -count) & 0xff);
+          emitcode ("mov", "sp,a");
+        }
+      else
+        {
+          while (count--)
+            emitcode ("dec", "sp");
+        }
     }
 
   if ((IFFUNC_ISREENT (sym->type) || options.stackAuto))
@@ -2979,10 +3047,11 @@ genEndFunction (iCode * ic)
       if (options.useXstack)
         {
           emitcode ("xch", "a,_bp");
-          emitcode ("mov", "r0,%s", spname);
+          emitcode ("mov", "r0,a");
+          emitcode ("dec", "r0");
           emitcode ("movx", "a,@r0");
           emitcode ("xch", "a,_bp");
-          emitcode ("dec", "%s", spname); //read before freeing stack space (interrupts)
+          emitcode ("mov", "%s,r0", spname); //read before freeing stack space (interrupts)
         }
       else
         {
@@ -9609,16 +9678,21 @@ genAssign (iCode * ic)
       !IS_FLOAT (operandType (right)) &&
       (lit < 256L))
     {
+      while ((size) && (lit))
+        {
+          aopPut (AOP (result),
+                  aopGet (AOP (right), offset, FALSE, FALSE),
+                  offset,
+                  isOperandVolatile (result, FALSE));
+          lit >>= 8;
+          offset++;
+          size--;
+        }
       emitcode ("clr", "a");
       while (size--)
         {
-          if ((unsigned int) ((lit >> (size * 8)) & 0x0FFL) == 0)
-            aopPut (AOP (result), "a", size, isOperandVolatile (result, FALSE));
-          else
-            aopPut (AOP (result),
-                    aopGet (AOP (right), size, FALSE, FALSE),
-                    size,
-                    isOperandVolatile (result, FALSE));
+          aopPut (AOP (result), "a", offset, isOperandVolatile (result, FALSE));
+          offset++;
         }
     }
   else

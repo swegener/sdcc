@@ -1319,7 +1319,7 @@ emitMaps (void)
      data, idata & bit & xdata */
   emitRegularMap (data, TRUE, TRUE);
   emitRegularMap (idata, TRUE, TRUE);
-  emitRegularMap (bit, TRUE, FALSE);
+  emitRegularMap (bit, TRUE, TRUE);
   emitRegularMap (pdata, TRUE, TRUE);
   emitRegularMap (xdata, TRUE, TRUE);
   if (port->genXINIT) {
@@ -1595,7 +1595,7 @@ glue (void)
     cdbStructBlock (0);
 
   vFile = tempfile ();
-  /* PENDING: this isnt the best place but it will do */
+  /* PENDING: this isn't the best place but it will do */
   if (port->general.glue_up_main)
     {
       /* create the interrupt vector table */

@@ -33,11 +33,12 @@
 /* the  return value is expected to be in acc, and not in the standard
  * location dpl. Therefore we choose return type void here: */
 void
-_gptrget (char *gptr)
+_gptrget (char *gptr) _naked
 {
     gptr; /* hush the compiler */
 
     _asm
+	ar0 = 0x00
     ;   save values passed
     ;
     ;   depending on the pointer type acc. to SDCCsymt.h
@@ -101,6 +102,7 @@ _gptrget (char *gptr)
 ;   return
 ;
  00005$:
+        ret
      _endasm ;
 }
 

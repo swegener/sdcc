@@ -5,46 +5,46 @@
 #include "common.h"
 
 /* memory segments */
-memmap *xstack = NULL;		/* xternal stack data          */
-memmap *istack = NULL;		/* internal stack              */
-memmap *code = NULL;		/* code segment                */
-memmap *data = NULL;		/* internal data upto 128      */
-memmap *pdata = NULL;		/* paged external data         */
-memmap *xdata = NULL;		/* external data               */
+memmap *xstack = NULL;          /* xternal stack data          */
+memmap *istack = NULL;          /* internal stack              */
+memmap *code = NULL;            /* code segment                */
+memmap *data = NULL;            /* internal data upto 128      */
+memmap *pdata = NULL;           /* paged external data         */
+memmap *xdata = NULL;           /* external data               */
 memmap *xidata = NULL;          /* the initialized xdata       */
 memmap *xinit = NULL;           /* the initializers for xidata */
-memmap *idata = NULL;		/* internal data upto 256      */
-memmap *bit = NULL;		/* bit addressable space       */
-memmap *statsg = NULL;		/* the constant data segment   */
-memmap *sfr = NULL;		/* register space              */
-memmap *reg = NULL;		/* register space              */
-memmap *sfrbit = NULL;		/* sfr bit space               */
-memmap *generic = NULL;		/* is a generic pointer        */
-memmap *overlay = NULL;		/* overlay segment             */
-memmap *eeprom = NULL;		/* eeprom location             */
-memmap *home = NULL;		/* Unswitchable code bank      */
+memmap *idata = NULL;           /* internal data upto 256      */
+memmap *bit = NULL;             /* bit addressable space       */
+memmap *statsg = NULL;          /* the constant data segment   */
+memmap *sfr = NULL;             /* register space              */
+memmap *reg = NULL;             /* register space              */
+memmap *sfrbit = NULL;          /* sfr bit space               */
+memmap *generic = NULL;         /* is a generic pointer        */
+memmap *overlay = NULL;         /* overlay segment             */
+memmap *eeprom = NULL;          /* eeprom location             */
+memmap *home = NULL;            /* Unswitchable code bank      */
 
 /* this is a set of sets each set containing
    symbols in a single overlay */
 set *ovrSetSets = NULL;
 
 int maxRegBank = 0;
-int fatalError = 0;		/* fatal error flag                   */
+int fatalError = 0;             /* fatal error flag                   */
 
 /*-----------------------------------------------------------------*/
 /* allocMap - allocates a memory map                               */
 /*-----------------------------------------------------------------*/
 memmap *
-allocMap (char rspace,		/* sfr space            */
-	  char farmap,		/* far or near segment  */
-	  char paged,		/* can this segment be paged  */
-	  char direct,		/* directly addressable */
-	  char bitaddr,		/* bit addressable space */
-	  char codemap,		/* this is code space   */
-	  unsigned sloc,	/* starting location    */
-	  const char *name,	/* 2 character name     */
-	  char dbName,		/* debug name                 */
-	  int ptrType		/* pointer type for this space */
+allocMap (char rspace,          /* sfr space            */
+          char farmap,          /* far or near segment  */
+          char paged,           /* can this segment be paged  */
+          char direct,          /* directly addressable */
+          char bitaddr,         /* bit addressable space */
+          char codemap,         /* this is code space   */
+          unsigned sloc,        /* starting location    */
+          const char *name,     /* 2 character name     */
+          char dbName,          /* debug name                 */
+          int ptrType           /* pointer type for this space */
 )
 {
   memmap *map;
@@ -79,58 +79,58 @@ allocMap (char rspace,		/* sfr space            */
 /*-----------------------------------------------------------------*/
 /* initMem - allocates and initializes all the segments            */
 /*-----------------------------------------------------------------*/
-void 
+void
 initMem ()
 {
   /* allocate all the segments */
-  /* xternal stack segment ;   
+  /* xternal stack segment ;
      SFRSPACE       -   NO
      FAR-SPACE      -   YES
      PAGED          -   YES
      DIRECT-ACCESS  -   NO
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   NO 
+     CODE-ACESS     -   NO
      DEBUG-NAME     -   'A'
      POINTER-TYPE   -   FPOINTER
    */
   xstack = allocMap (0, 1, 1, 0, 0, 0, options.xstack_loc, XSTACK_NAME, 'A', PPOINTER);
 
-  /* internal stack segment ;   
+  /* internal stack segment ;
      SFRSPACE       -   NO
      FAR-SPACE      -   NO
      PAGED          -   NO
      DIRECT-ACCESS  -   NO
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   NO 
+     CODE-ACESS     -   NO
      DEBUG-NAME     -   'B'
      POINTER-TYPE   -   POINTER
    */
   if (ISTACK_NAME) {
-    istack = allocMap (0, 0, 0, 0, 0, 0, options.stack_loc, 
-		       ISTACK_NAME, 'B', POINTER);
+    istack = allocMap (0, 0, 0, 0, 0, 0, options.stack_loc,
+                       ISTACK_NAME, 'B', POINTER);
   } else {
     istack=NULL;
   }
 
-  /* code  segment ;   
+  /* code  segment ;
      SFRSPACE       -   NO
      FAR-SPACE      -   YES
      PAGED          -   NO
      DIRECT-ACCESS  -   NO
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   YES 
+     CODE-ACESS     -   YES
      DEBUG-NAME     -   'C'
      POINTER-TYPE   -   CPOINTER
    */
   code = allocMap (0, 1, 0, 0, 0, 1, options.code_loc, CODE_NAME, 'C', CPOINTER);
 
-  /* home  segment ;   
+  /* home  segment ;
      SFRSPACE       -   NO
      FAR-SPACE      -   YES
      PAGED          -   NO
      DIRECT-ACCESS  -   NO
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   YES 
+     CODE-ACESS     -   YES
      DEBUG-NAME     -   'C'
      POINTER-TYPE   -   CPOINTER
    */
@@ -142,7 +142,7 @@ initMem ()
      PAGED          -   NO
      DIRECT-ACCESS  -   NO
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   YES 
+     CODE-ACESS     -   YES
      DEBUG-NAME     -   'D'
      POINTER-TYPE   -   CPOINTER
    */
@@ -154,7 +154,7 @@ initMem ()
      PAGED          -   NO
      DIRECT-ACCESS  -   YES
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   NO 
+     CODE-ACESS     -   NO
      DEBUG-NAME     -   'E'
      POINTER-TYPE   -   POINTER
    */
@@ -166,7 +166,7 @@ initMem ()
      PAGED          -   NO
      DIRECT-ACCESS  -   YES
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   NO 
+     CODE-ACESS     -   NO
      DEBUG-NAME     -   'E'
      POINTER-TYPE   -   POINTER
    */
@@ -192,13 +192,13 @@ initMem ()
     pdata = NULL;
   }
 
-  /* Xternal Data segment - 
+  /* Xternal Data segment -
      SFRSPACE       -   NO
      FAR-SPACE      -   YES
      PAGED          -   NO
      DIRECT-ACCESS  -   NO
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   NO 
+     CODE-ACESS     -   NO
      DEBUG-NAME     -   'F'
      POINTER-TYPE   -   FPOINTER
    */
@@ -212,15 +212,15 @@ initMem ()
      PAGED          -   NO
      DIRECT-ACCESS  -   NO
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   NO 
+     CODE-ACESS     -   NO
      DEBUG-NAME     -   'G'
      POINTER-TYPE   -   IPOINTER
    */
   if (IDATA_NAME) {
-    idata = allocMap (0, 0, 0, 0, 0, 0, options.idata_loc, 
-		      IDATA_NAME, 'G', IPOINTER);
+    idata = allocMap (0, 0, 0, 0, 0, 0, options.idata_loc,
+                      IDATA_NAME, 'G', IPOINTER);
   } else {
-    idata = NULL;
+    idata=NULL;
   }
 
   /* Static segment (code for variables );
@@ -229,7 +229,7 @@ initMem ()
      PAGED          -   NO
      DIRECT-ACCESS  -   YES
      BIT-ACCESS     -   YES
-     CODE-ACESS     -   NO 
+     CODE-ACESS     -   NO
      DEBUG-NAME     -   'H'
      POINTER-TYPE   -  _NONE_
    */
@@ -241,7 +241,7 @@ initMem ()
      PAGED          -   NO
      DIRECT-ACCESS  -   YES
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   NO 
+     CODE-ACESS     -   NO
      DEBUG-NAME     -   'I'
      POINTER-TYPE   -   _NONE_
    */
@@ -253,31 +253,31 @@ initMem ()
      PAGED          -   NO
      DIRECT-ACCESS  -   NO
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   NO 
+     CODE-ACESS     -   NO
      DEBUG-NAME     -   ' '
      POINTER-TYPE   -   _NONE_
    */
   reg = allocMap (1, 0, 0, 0, 0, 0, 0, REG_NAME, ' ', 0);
 
-  /* SFR bit space 
+  /* SFR bit space
      SFRSPACE       -   YES
      FAR-SPACE      -   NO
      PAGED          -   NO
      DIRECT-ACCESS  -   YES
      BIT-ACCESS     -   YES
-     CODE-ACESS     -   NO 
+     CODE-ACESS     -   NO
      DEBUG-NAME     -   'J'
      POINTER-TYPE   -   _NONE_
    */
   sfrbit = allocMap (1, 0, 0, 1, 1, 0, 0, REG_NAME, 'J', 0);
 
-  /* EEPROM bit space 
+  /* EEPROM bit space
      SFRSPACE       -   NO
      FAR-SPACE      -   YES
      PAGED          -   NO
      DIRECT-ACCESS  -   NO
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   NO 
+     CODE-ACESS     -   NO
      DEBUG-NAME     -   'K'
      POINTER-TYPE   -   EEPPOINTER
    */
@@ -291,7 +291,7 @@ initMem ()
 /*-----------------------------------------------------------------*/
 /* allocIntoSeg - puts a symbol into a memory segment              */
 /*-----------------------------------------------------------------*/
-void 
+void
 allocIntoSeg (symbol * sym)
 {
   memmap *segment = SPEC_OCLS (sym->etype);
@@ -300,13 +300,13 @@ allocIntoSeg (symbol * sym)
 
 /*-----------------------------------------------------------------*/
 /* deleteFromSeg - deletes a symbol from segment used when a var   */
-/* 		   firest declared as "extern" then no extern      */
+/*                 first declared as "extern" then no extern       */
 /*-----------------------------------------------------------------*/
 void deleteFromSeg(symbol *sym)
 {
     if (SPEC_OCLS(sym->etype)) {
-	memmap *segment = SPEC_OCLS (sym->etype);	
-	deleteSetItem(&segment->syms,sym);
+        memmap *segment = SPEC_OCLS (sym->etype);
+        deleteSetItem(&segment->syms,sym);
     }
 }
 
@@ -314,14 +314,14 @@ void deleteFromSeg(symbol *sym)
 /*-----------------------------------------------------------------*/
 /* allocGlobal - assigns the output segment to a global var       */
 /*-----------------------------------------------------------------*/
-void 
+void
 allocGlobal (symbol * sym)
 {
 
   /* symbol name is internal name  */
-  if (!sym->level)		/* local statics can come here */
-    SNPRINTF (sym->rname, sizeof(sym->rname), 
-	      "%s%s", port->fun_prefix, sym->name);
+  if (!sym->level)              /* local statics can come here */
+    SNPRINTF (sym->rname, sizeof(sym->rname),
+              "%s%s", port->fun_prefix, sym->name);
 
   /* add it to the operandKey reset */
   if (!isinSet (operKeyReset, sym)) {
@@ -344,7 +344,7 @@ allocGlobal (symbol * sym)
          then put it in the interrupt service array */
       if (FUNC_ISISR (sym->type) && !options.noiv
           && (FUNC_INTNO (sym->type) != INTNO_UNSPEC))
-        {
+            {
           if (interrupts[FUNC_INTNO (sym->type)])
             werror (E_INT_DEFINED,
                     FUNC_INTNO (sym->type),
@@ -355,7 +355,7 @@ allocGlobal (symbol * sym)
           /* automagically extend the maximum interrupts */
           if (FUNC_INTNO (sym->type) >= maxInterrupts)
             maxInterrupts = FUNC_INTNO (sym->type) + 1;
-	    }
+            }
       /* if it is not compiler defined */
       if (!sym->cdef)
         allocIntoSeg (sym);
@@ -369,7 +369,7 @@ allocGlobal (symbol * sym)
     {
 
       SPEC_OCLS (sym->etype) =
-	(SPEC_SCLS (sym->etype) == S_SFR ? sfr : sfrbit);
+        (SPEC_SCLS (sym->etype) == S_SFR ? sfr : sfrbit);
 
       allocIntoSeg (sym);
       return;
@@ -394,8 +394,8 @@ allocGlobal (symbol * sym)
 
   if(!TARGET_IS_PIC16 || (TARGET_IS_PIC16 && sym->level))
   /* register storage class ignored changed to FIXED */
-    if (SPEC_SCLS (sym->etype) == S_REGISTER)
-      SPEC_SCLS (sym->etype) = S_FIXED;
+  if (SPEC_SCLS (sym->etype) == S_REGISTER)
+    SPEC_SCLS (sym->etype) = S_FIXED;
 
   /* if data specified then  */
   if (SPEC_SCLS (sym->etype) == S_DATA)
@@ -434,7 +434,7 @@ allocGlobal (symbol * sym)
     {
       // should we move this to the initialized data segment?
       if (port->genXINIT &&
-	  sym->ival && (sym->level==0) && !SPEC_ABSA(sym->etype)) {
+          sym->ival && (sym->level==0) && !SPEC_ABSA(sym->etype)) {
         SPEC_OCLS(sym->etype)=xidata;
       } else {
         SPEC_OCLS (sym->etype) = xdata;
@@ -472,7 +472,7 @@ allocGlobal (symbol * sym)
 /*-----------------------------------------------------------------*/
 /* allocParms - parameters are always passed on stack              */
 /*-----------------------------------------------------------------*/
-void 
+void
 allocParms (value * val)
 {
   value *lval;
@@ -502,69 +502,71 @@ allocParms (value * val)
           if (lval->sym)
             lval->sym->onStack = 1;
 
-	  /* choose which stack 2 use   */
-	  /*  use xternal stack */
-	  if (options.useXstack)
-	    {
-          /* PENDING: stack direction support */
-          SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) = xstack;
-          SPEC_STAK (lval->etype) = SPEC_STAK (lval->sym->etype) = lval->sym->stack =
-            xstackPtr - getSize (lval->type);
-          xstackPtr -= getSize (lval->type);
-	    }
-	  else
-	    {			/* use internal stack   */
-	      SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) = istack;
-	      if (port->stack.direction > 0)
-		{
-		  SPEC_STAK (lval->etype) = SPEC_STAK (lval->sym->etype) = lval->sym->stack =
-		    stackPtr - (FUNC_REGBANK (currFunc->type) ? port->stack.bank_overhead : 0) -
-		    getSize (lval->type) -
-		    (FUNC_ISISR (currFunc->type) ? port->stack.isr_overhead : 0);
-		  stackPtr -= getSize (lval->type);
-		}
-	      else
-		{
-		  /* This looks like the wrong order but it turns out OK... */
-		  /* PENDING: isr, bank overhead, ... */
-		  SPEC_STAK (lval->etype) = SPEC_STAK (lval->sym->etype) = lval->sym->stack =
-		    stackPtr +
-		    ((IFFUNC_ISBANKEDCALL (currFunc->type) && !SPEC_STAT(getSpec(currFunc->etype)))? port->stack.banked_overhead : 0) +
-		    (FUNC_ISISR (currFunc->type) ? port->stack.isr_overhead : 0) +
-		    0;
-		  stackPtr += getSize (lval->type);
-		}
-	    }
-	  allocIntoSeg (lval->sym);
-	}
+          /* choose which stack 2 use   */
+          /*  use xternal stack */
+          if (options.useXstack)
+            {
+              /* PENDING: stack direction support */
+              SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) = xstack;
+              SPEC_STAK (lval->etype) = SPEC_STAK (lval->sym->etype) = lval->sym->stack =
+                xstackPtr - getSize (lval->type);
+              xstackPtr -= getSize (lval->type);
+            }
+          else
+            {                   /* use internal stack   */
+              SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) = istack;
+              if (port->stack.direction > 0)
+                {
+                  SPEC_STAK (lval->etype) = SPEC_STAK (lval->sym->etype) = lval->sym->stack =
+                    stackPtr - (FUNC_REGBANK (currFunc->type) ? port->stack.bank_overhead : 0) -
+                    getSize (lval->type) -
+                    (FUNC_ISISR (currFunc->type) ? port->stack.isr_overhead : 0);
+                  stackPtr -= getSize (lval->type);
+                }
+              else
+                {
+                  /* This looks like the wrong order but it turns out OK... */
+                  /* PENDING: isr, bank overhead, ... */
+                  SPEC_STAK (lval->etype) = SPEC_STAK (lval->sym->etype) = lval->sym->stack =
+                    stackPtr +
+                    ((IFFUNC_ISBANKEDCALL (currFunc->type) && !SPEC_STAT(getSpec(currFunc->etype)))? port->stack.banked_overhead : 0) +
+                    (FUNC_ISISR (currFunc->type) ? port->stack.isr_overhead : 0) +
+                    0;
+                  stackPtr += getSize (lval->type);
+                }
+            }
+          allocIntoSeg (lval->sym);
+        }
       else
-	{ /* allocate them in the automatic space */
-	  /* generate a unique name  */
-	  SNPRINTF (lval->sym->rname, sizeof(lval->sym->rname),
-		    "%s%s_PARM_%d", port->fun_prefix, currFunc->name, pNum);
-	  strncpyz (lval->name, lval->sym->rname, sizeof(lval->name));
-	  
-	  /* if declared in external storage */
-	  if (SPEC_SCLS (lval->etype) == S_XDATA)
-	    SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) = xdata;
-	  else
-	    /* other wise depending on the memory model 
-	       note here that we put it into the overlay segment
-	       first, we will remove it from the overlay segment
-	       after the overlay determination has been done */
-	    if (options.model == MODEL_SMALL)
-	      {
-		SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) =
-		  (options.noOverlay ? port->mem.default_local_map
-		   : overlay);
-	      }
-	    else
-	      {
-		SPEC_SCLS (lval->etype) = S_XDATA;
-		SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) = xdata;
-	      }
-	  allocIntoSeg (lval->sym);
-	}
+        { /* allocate them in the automatic space */
+          /* generate a unique name  */
+          SNPRINTF (lval->sym->rname, sizeof(lval->sym->rname),
+                    "%s%s_PARM_%d", port->fun_prefix, currFunc->name, pNum);
+          strncpyz (lval->name, lval->sym->rname, sizeof(lval->name));
+
+          /* if declared in external storage */
+          if (SPEC_SCLS (lval->etype) == S_XDATA)
+            SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) = xdata;
+          else if (SPEC_SCLS (lval->etype) == S_BIT)
+            SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) = bit;
+          else
+            /* otherwise depending on the memory model
+               note here that we put it into the overlay segment
+               first, we will remove it from the overlay segment
+               after the overlay determination has been done */
+            if (options.model == MODEL_SMALL)
+              {
+                SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) =
+                  (options.noOverlay ? port->mem.default_local_map
+                   : overlay);
+              }
+            else
+              {
+                SPEC_SCLS (lval->etype) = S_XDATA;
+                SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) = xdata;
+              }
+          allocIntoSeg (lval->sym);
+        }
     }
 
   return;
@@ -573,7 +575,7 @@ allocParms (value * val)
 /*-----------------------------------------------------------------*/
 /* deallocParms - parameters are always passed on stack                */
 /*-----------------------------------------------------------------*/
-void 
+void
 deallocParms (value * val)
 {
   value *lval;
@@ -588,30 +590,30 @@ deallocParms (value * val)
       deleteSym (SymbolTab, lval->sym, lval->sym->name);
 
       if (!lval->sym->isref)
-	{
-	  lval->sym->allocreq = 0;
-	    werror (W_NO_REFERENCE, 
-		    currFunc ? currFunc->name : "(unknown)",
-		    "function argument", lval->sym->name);
-	}
+        {
+          lval->sym->allocreq = 0;
+            werror (W_NO_REFERENCE,
+                    currFunc ? currFunc->name : "(unknown)",
+                    "function argument", lval->sym->name);
+        }
 
       /* move the rname if any to the name for both val & sym */
       /* and leave a copy of it in the symbol table           */
       if (lval->sym->rname[0])
-	{
-	  char buffer[SDCC_NAME_MAX];
-	  strncpyz (buffer, lval->sym->rname, sizeof(buffer));
-	  lval->sym = copySymbol (lval->sym);
-	  strncpyz (lval->sym->rname, buffer, sizeof(lval->sym->rname));
-	  strncpyz (lval->sym->name, buffer, sizeof(lval->sym->name));
-	  strncpyz (lval->name, buffer, sizeof(lval->name)); 
-	  addSym (SymbolTab, lval->sym, lval->sym->name,
-		  lval->sym->level, lval->sym->block, 1);
-	  lval->sym->_isparm = 1;
-	  if (!isinSet (operKeyReset, lval->sym)) {
-	    addSet(&operKeyReset, lval->sym);
-	  }
-	}
+        {
+          char buffer[SDCC_NAME_MAX];
+          strncpyz (buffer, lval->sym->rname, sizeof(buffer));
+          lval->sym = copySymbol (lval->sym);
+          strncpyz (lval->sym->rname, buffer, sizeof(lval->sym->rname));
+          strncpyz (lval->sym->name, buffer, sizeof(lval->sym->name));
+          strncpyz (lval->name, buffer, sizeof(lval->name));
+          addSym (SymbolTab, lval->sym, lval->sym->name,
+                  lval->sym->level, lval->sym->block, 1);
+          lval->sym->_isparm = 1;
+          if (!isinSet (operKeyReset, lval->sym)) {
+            addSet(&operKeyReset, lval->sym);
+          }
+        }
 
     }
 
@@ -621,15 +623,15 @@ deallocParms (value * val)
 /*-----------------------------------------------------------------*/
 /* allocLocal - allocate local variables                           */
 /*-----------------------------------------------------------------*/
-void 
+void
 allocLocal (symbol * sym)
 {
 
   /* generate an unique name */
-  SNPRINTF (sym->rname, sizeof(sym->rname), 
-	    "%s%s_%s_%d_%d",
-	    port->fun_prefix,
-	    currFunc->name, sym->name, sym->level, sym->block);
+  SNPRINTF (sym->rname, sizeof(sym->rname),
+            "%s%s_%s_%d_%d",
+            port->fun_prefix,
+            currFunc->name, sym->name, sym->level, sym->block);
 
   sym->islocal = 1;
   sym->localof = currFunc;
@@ -659,17 +661,17 @@ allocLocal (symbol * sym)
     } else {
       SPEC_OCLS (sym->etype) = istack;
       if (port->stack.direction > 0) {
-	SPEC_STAK (sym->etype) = sym->stack = (stackPtr + 1);
-	stackPtr += getSize (sym->type);
+        SPEC_STAK (sym->etype) = sym->stack = (stackPtr + 1);
+        stackPtr += getSize (sym->type);
       } else {
-	stackPtr -= getSize (sym->type);
-	SPEC_STAK (sym->etype) = sym->stack = stackPtr;
+        stackPtr -= getSize (sym->type);
+        SPEC_STAK (sym->etype) = sym->stack = stackPtr;
       }
     }
     allocIntoSeg (sym);
     return;
   }
-  
+
   /* else depending on the storage class specified */
   if (SPEC_SCLS (sym->etype) == S_XDATA)
     {
@@ -683,7 +685,7 @@ allocLocal (symbol * sym)
     allocIntoSeg (sym);
     return;
   }
-  
+
   if (SPEC_SCLS (sym->etype) == S_IDATA)
     {
       SPEC_OCLS (sym->etype) = idata;
@@ -704,7 +706,7 @@ allocLocal (symbol * sym)
       SPEC_SCLS (sym->etype) == S_SBIT)
     {
       SPEC_OCLS (sym->etype) =
-	(SPEC_SCLS (sym->etype) == S_SFR ? sfr : sfrbit);
+        (SPEC_SCLS (sym->etype) == S_SFR ? sfr : sfrbit);
 
       allocIntoSeg (sym);
       return;
@@ -734,12 +736,12 @@ allocLocal (symbol * sym)
     }
 
   /* again note that we have put it into the overlay segment
-     will remove and put into the 'data' segment if required after 
+     will remove and put into the 'data' segment if required after
      overlay  analysis has been done */
   if (options.model == MODEL_SMALL) {
-      SPEC_OCLS (sym->etype) = 
-	(options.noOverlay ? port->mem.default_local_map
-	 : overlay);
+      SPEC_OCLS (sym->etype) =
+        (options.noOverlay ? port->mem.default_local_map
+         : overlay);
   } else {
       SPEC_OCLS (sym->etype) = port->mem.default_local_map;
   }
@@ -749,29 +751,29 @@ allocLocal (symbol * sym)
 /*-----------------------------------------------------------------*/
 /* deallocLocal - deallocates the local variables                  */
 /*-----------------------------------------------------------------*/
-void 
+void
 deallocLocal (symbol * csym)
 {
   symbol *sym;
 
   for (sym = csym; sym; sym = sym->next)
     {
-      if (sym->_isparm) 
-	continue;
+      if (sym->_isparm)
+        continue;
 
       /* if it is on the stack */
       if (sym->onStack)
-	{
-	  if (options.useXstack)
-	    xstackPtr -= getSize (sym->type);
-	  else
-	    stackPtr -= getSize (sym->type);
-	}
+        {
+          if (options.useXstack)
+            xstackPtr -= getSize (sym->type);
+          else
+            stackPtr -= getSize (sym->type);
+        }
       /* if not used give a warning */
       if (!sym->isref && !IS_STATIC (sym->etype))
-	werror (W_NO_REFERENCE, 
-		currFunc ? currFunc->name : "(unknown)",
-		"local variable", sym->name);
+        werror (W_NO_REFERENCE,
+                currFunc ? currFunc->name : "(unknown)",
+                "local variable", sym->name);
       /* now delete it from the symbol table */
       deleteSym (SymbolTab, sym, sym->name);
     }
@@ -780,7 +782,7 @@ deallocLocal (symbol * csym)
 /*-----------------------------------------------------------------*/
 /* overlay2data - moves declarations from the overlay seg to data  */
 /*-----------------------------------------------------------------*/
-void 
+void
 overlay2data ()
 {
   symbol *sym;
@@ -801,7 +803,7 @@ overlay2data ()
 /* overlay2Set - will add all symbols from the overlay segment to  */
 /*               the set of sets containing the overlable symbols  */
 /*-----------------------------------------------------------------*/
-void 
+void
 overlay2Set ()
 {
   symbol *sym;
@@ -822,7 +824,7 @@ overlay2Set ()
 /*-----------------------------------------------------------------*/
 /* allocVariables - creates decl & assign storage class for a v    */
 /*-----------------------------------------------------------------*/
-int 
+int
 allocVariables (symbol * symChain)
 {
   symbol *sym;
@@ -837,20 +839,20 @@ allocVariables (symbol * symChain)
       /* if this is a typedef then add it */
       /* to the typedef table             */
       if (IS_TYPEDEF (sym->etype))
-	{
-	  /* check if the typedef already exists    */
-	  csym = findSym (TypedefTab, NULL, sym->name);
-	  if (csym && csym->level == sym->level)
-	    werror (E_DUPLICATE_TYPEDEF, sym->name);
+        {
+          /* check if the typedef already exists    */
+          csym = findSym (TypedefTab, NULL, sym->name);
+          if (csym && csym->level == sym->level)
+            werror (E_DUPLICATE_TYPEDEF, sym->name);
 
-	  SPEC_EXTR (sym->etype) = 0;
-	  addSym (TypedefTab, sym, sym->name, sym->level, sym->block, 0);
-	  continue;		/* go to the next one         */
-	}
+          SPEC_EXTR (sym->etype) = 0;
+          addSym (TypedefTab, sym, sym->name, sym->level, sym->block, 0);
+          continue;             /* go to the next one         */
+        }
       /* make sure it already exist */
       csym = findSymWithLevel (SymbolTab, sym);
       if (!csym || (csym && csym->level != sym->level))
-	csym = sym;
+        csym = sym;
 
       /* check the declaration */
       checkDecl (csym,0);
@@ -871,29 +873,29 @@ allocVariables (symbol * symChain)
       /* if this is a extern variable then change the */
       /* level to zero temporarily                                    */
       if (IS_EXTERN (csym->etype) || IS_FUNC (csym->type))
-	{
-	  saveLevel = csym->level;
-	  csym->level = 0;
-	}
+        {
+          saveLevel = csym->level;
+          csym->level = 0;
+        }
 
       /* if this is a literal then it is an enumerated */
       /* type so need not allocate it space for it     */
       if (IS_LITERAL (sym->etype))
-	continue;
+        continue;
 
       /* generate the actual declaration  */
       if (csym->level)
-	{
-	  allocLocal (csym);
-	  if (csym->onStack)
-	    stack += getSize (csym->type);
-	}
+        {
+          allocLocal (csym);
+          if (csym->onStack)
+            stack += getSize (csym->type);
+        }
       else
-	allocGlobal (csym);
+        allocGlobal (csym);
 
       /* restore the level */
       if (IS_EXTERN (csym->etype) || IS_FUNC (csym->type))
-	csym->level = saveLevel;
+        csym->level = saveLevel;
     }
 
   return stack;
@@ -902,7 +904,7 @@ allocVariables (symbol * symChain)
 /*-----------------------------------------------------------------*/
 /* redoStackOffsets :- will reassign the values for stack offsets  */
 /*-----------------------------------------------------------------*/
-void 
+void
 redoStackOffsets (void)
 {
   symbol *sym;
@@ -921,42 +923,42 @@ redoStackOffsets (void)
       int size = getSize (sym->type);
       /* nothing to do with parameters so continue */
       if ((sym->_isparm && !IS_REGPARM (sym->etype)))
-	continue;
+        continue;
 
       if (IS_AGGREGATE (sym->type))
-	{
-	  if (port->stack.direction > 0)
-	    {
-	      SPEC_STAK (sym->etype) = sym->stack = (sPtr + 1);
-	      sPtr += size;
-	    }
-	  else
-	    {
-	      sPtr -= size;
-	      SPEC_STAK (sym->etype) = sym->stack = sPtr;
-	    }
-	  continue;
-	}
+        {
+          if (port->stack.direction > 0)
+            {
+              SPEC_STAK (sym->etype) = sym->stack = (sPtr + 1);
+              sPtr += size;
+            }
+          else
+            {
+              sPtr -= size;
+              SPEC_STAK (sym->etype) = sym->stack = sPtr;
+            }
+          continue;
+        }
 
       /* if allocation not required then subtract
          size from overall stack size & continue */
       if (!sym->allocreq)
-	{
-	  currFunc->stack -= size;
-	  SPEC_STAK (currFunc->etype) -= size;
-	  continue;
-	}
+        {
+          currFunc->stack -= size;
+          SPEC_STAK (currFunc->etype) -= size;
+          continue;
+        }
 
       if (port->stack.direction > 0)
-	{
-	  SPEC_STAK (sym->etype) = sym->stack = (sPtr + 1);
-	  sPtr += size;
-	}
+        {
+          SPEC_STAK (sym->etype) = sym->stack = (sPtr + 1);
+          sPtr += size;
+        }
       else
-	{
-	  sPtr -= size;
-	  SPEC_STAK (sym->etype) = sym->stack = sPtr;
-	}
+        {
+          sPtr -= size;
+          SPEC_STAK (sym->etype) = sym->stack = sPtr;
+        }
     }
 
   /* do the same for the external stack */
@@ -968,23 +970,23 @@ redoStackOffsets (void)
       int size = getSize (sym->type);
       /* nothing to do with parameters so continue */
       if ((sym->_isparm && !IS_REGPARM (sym->etype)))
-	continue;
+        continue;
 
       if (IS_AGGREGATE (sym->type))
-	{
-	  SPEC_STAK (sym->etype) = sym->stack = (xsPtr + 1);
-	  xsPtr += size;
-	  continue;
-	}
+        {
+          SPEC_STAK (sym->etype) = sym->stack = (xsPtr + 1);
+          xsPtr += size;
+          continue;
+        }
 
       /* if allocation not required then subtract
          size from overall stack size & continue */
       if (!sym->allocreq)
-	{
-	  currFunc->xstack -= size;
-	  SPEC_STAK (currFunc->etype) -= size;
-	  continue;
-	}
+        {
+          currFunc->xstack -= size;
+          SPEC_STAK (currFunc->etype) -= size;
+          continue;
+        }
 
       SPEC_STAK (sym->etype) = sym->stack = (xsPtr + 1);
       xsPtr += size;
@@ -995,7 +997,7 @@ redoStackOffsets (void)
 /*-----------------------------------------------------------------*/
 /* printAllocInfoSeg- print the allocation for a given section     */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 printAllocInfoSeg (memmap * map, symbol * func, FILE * of)
 {
   symbol *sym;
@@ -1004,44 +1006,44 @@ printAllocInfoSeg (memmap * map, symbol * func, FILE * of)
     return;
   if (!map->syms)
     return;
-  
+
   for (sym = setFirstItem (map->syms); sym;
        sym = setNextItem (map->syms))
     {
 
       if (sym->level == 0)
-	continue;
+        continue;
       if (sym->localof != func)
-	continue;
-      
+        continue;
+
       fprintf (of, ";%-25s Allocated ", sym->name);
 
       /* if assigned to registers */
       if (!sym->allocreq && sym->reqv)
-	{
-	  int i;
+        {
+          int i;
 
-	  sym = OP_SYMBOL (sym->reqv);
-	  if (!sym->isspilt || sym->remat)
-	    {
-	      fprintf (of, "to registers ");
-	      for (i = 0; i < 4 && sym->regs[i]; i++)
-		fprintf (of, "%s ", port->getRegName (sym->regs[i]));
-	      fprintf (of, "\n");
-	      continue;
-	    }
-	  else
-	    {
-	      sym = sym->usl.spillLoc;
-	    }
-	}
+          sym = OP_SYMBOL (sym->reqv);
+          if (!sym->isspilt || sym->remat)
+            {
+              fprintf (of, "to registers ");
+              for (i = 0; i < 4 && sym->regs[i]; i++)
+                fprintf (of, "%s ", port->getRegName (sym->regs[i]));
+              fprintf (of, "\n");
+              continue;
+            }
+          else
+            {
+              sym = sym->usl.spillLoc;
+            }
+        }
 
       /* if on stack */
       if (sym->onStack)
-	{
-	  fprintf (of, "to stack - offset %d\n", sym->stack);
-	  continue;
-	}
+        {
+          fprintf (of, "to stack - offset %d\n", sym->stack);
+          continue;
+        }
 
       /* otherwise give rname */
       fprintf (of, "with name '%s'\n", sym->rname);
@@ -1051,7 +1053,7 @@ printAllocInfoSeg (memmap * map, symbol * func, FILE * of)
 /*-----------------------------------------------------------------*/
 /* canOverlayLocals - returns true if the local variables can overlayed */
 /*-----------------------------------------------------------------*/
-static bool 
+static bool
 canOverlayLocals (eBBlock ** ebbs, int count)
 {
   int i;
@@ -1062,7 +1064,7 @@ canOverlayLocals (eBBlock ** ebbs, int count)
       options.stackAuto ||
       (currFunc &&
        (IFFUNC_ISREENT (currFunc->type) ||
-	FUNC_ISISR (currFunc->type))) ||
+        FUNC_ISISR (currFunc->type))) ||
       elementsInSet (overlay->syms) == 0)
 
     return FALSE;
@@ -1077,13 +1079,13 @@ canOverlayLocals (eBBlock ** ebbs, int count)
       iCode *ic;
 
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
-	  if (ic) {
-	      if (ic->op == CALL) {
-		  sym_link *ftype = operandType(IC_LEFT(ic));
-		  /* builtins only can use overlays */
-		  if (!IFFUNC_ISBUILTIN(ftype)) return FALSE; 
-	      } else if (ic->op == PCALL) return FALSE;
-	  }
+          if (ic) {
+              if (ic->op == CALL) {
+                  sym_link *ftype = operandType(IC_LEFT(ic));
+                  /* builtins only can use overlays */
+                  if (!IFFUNC_ISBUILTIN(ftype)) return FALSE;
+              } else if (ic->op == PCALL) return FALSE;
+          }
     }
 
   /* no function calls found return TRUE */
@@ -1093,7 +1095,7 @@ canOverlayLocals (eBBlock ** ebbs, int count)
 /*-----------------------------------------------------------------*/
 /* doOverlays - move the overlay segment to appropriate location   */
 /*-----------------------------------------------------------------*/
-void 
+void
 doOverlays (eBBlock ** ebbs, int count)
 {
   if (!overlay) {
@@ -1118,12 +1120,12 @@ doOverlays (eBBlock ** ebbs, int count)
 /*-----------------------------------------------------------------*/
 /* printAllocInfo - prints allocation information for a function   */
 /*-----------------------------------------------------------------*/
-void 
+void
 printAllocInfo (symbol * func, FILE * of)
 {
   if (!func)
-	return;
-    
+        return;
+
   if (!of)
     of = stdout;
 
@@ -1140,11 +1142,11 @@ printAllocInfo (symbol * func, FILE * of)
   printAllocInfoSeg (idata, func, of);
   printAllocInfoSeg (sfr, func, of);
   printAllocInfoSeg (sfrbit, func, of);
-  
+
   {
     set *ovrset;
     set *tempOverlaySyms = overlay->syms;
-    
+
     /* search the set of overlay sets for local variables/parameters */
     for (ovrset = setFirstItem (ovrSetSets); ovrset;
          ovrset = setNextItem (ovrSetSets))
@@ -1154,6 +1156,6 @@ printAllocInfo (symbol * func, FILE * of)
       }
     overlay->syms = tempOverlaySyms;
   }
-  
+
   fprintf (of, ";------------------------------------------------------------\n");
 }

@@ -1,3 +1,7 @@
+2004-06-08 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCcse.c (cseBBlock): fixed bug #966963
+
 2004-06-12 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/gen.c (genPointerGet): added E_INTERNAL_ERROR for

@@ -1931,9 +1931,15 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	    {
 	      pdop = NULL;
 	      applyToSetFTrue (cseSet, findCheaperOp, IC_RESULT (ic), &pdop, 0);
-	      if (pdop && !computeOnly &&
-		  IS_ITEMP (pdop) && IS_PTR(operandType(pdop)))
-		ReplaceOpWithCheaperOp (&IC_RESULT(ic), pdop);
+	      if (pdop && !computeOnly && IS_ITEMP (pdop))
+		{
+		  ReplaceOpWithCheaperOp (&IC_RESULT(ic), pdop);
+		  if (!IS_PTR (operandType (IC_RESULT (ic))))
+		    {
+		      setOperandType (IC_RESULT (ic),
+			              aggrToPtr (operandType (IC_RESULT (ic)), FALSE));
+		    }
+		}
 	    }
 	}
 

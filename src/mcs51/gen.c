@@ -6282,7 +6282,7 @@ static void genGenPointerGet (operand *left,
     }
     /* so dptr know contains the address */
     freeAsmop(left,NULL,ic,TRUE);
-    aopOp(result,ic, /* FALSE */ TRUE); 
+    aopOp(result,ic,FALSE); 
 
     /* if bit then unpack */
     if (IS_BITVAR(retype)) 

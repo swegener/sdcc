@@ -2394,7 +2394,7 @@ geniCodeLogic (operand * left, operand * right, int op)
       int nbits = bitsForType (ltype);
       long v = (long) operandLitValue (right);
 
-      if (v > ((LONG_LONG) 1 << nbits) && v > 0)
+      if (v >= ((LONG_LONG) 1 << nbits) && v > 0)
 	werror (W_CONST_RANGE, " compare operation ");
     }
 
@@ -2490,7 +2490,7 @@ geniCodeAssign (operand * left, operand * right, int nosupdate)
       int nbits = bitsForType (ltype);
       long v = (long) operandLitValue (right);
 
-      if (v > ((LONG_LONG) 1 << nbits) && v > 0)
+      if (v >= ((LONG_LONG) 1 << nbits) && v > 0)
 	werror (W_CONST_RANGE, " = operation");
     }
 

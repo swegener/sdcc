@@ -560,7 +560,8 @@ pic14createInterruptVect (FILE * vFile)
 	/* only if the main function exists */
 	if (!(mainf = findSymWithLevel (SymbolTab, mainf)))
 	{
-		if (!options.cc_only)
+		struct options *op = &options;
+		if (!(op->cc_only || noAssemble))
 			//	werror (E_NO_MAIN);
 			fprintf(stderr,"WARNING: function 'main' undefined\n");
 		return;
@@ -570,7 +571,7 @@ pic14createInterruptVect (FILE * vFile)
 	if (!IFFUNC_HASBODY(mainf->type))
 	{
 		/* if ! compile only then main function should be present */
-		if (!options.cc_only)
+		if (!(options.cc_only || noAssemble))
 			//	werror (E_NO_MAIN);
 			fprintf(stderr,"WARNING: function 'main' undefined\n");
 		return;

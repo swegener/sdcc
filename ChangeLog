@@ -1,3 +1,8 @@
+2004-09-12 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/ralloc.c (packRegisters): applied fix by Bernhard Held
+	  for bugs 898889 & 979599. Also used some safer print instructions.
+
 2004-09-12 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/device.h (pic16_options_t): added field use_crt,

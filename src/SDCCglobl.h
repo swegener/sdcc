@@ -98,6 +98,7 @@ typedef int bool;
 #define PRAGMA_NOOVERLAY   "NOOVERLAY"
 #define PRAGMA_CALLEESAVES "CALLEE-SAVES"
 #define PRAGMA_EXCLUDE     "EXCLUDE"
+#define PRAGMA_EXCLUDE     "OVERLAY"
 #define  SMALL_MODEL 0
 #define  LARGE_MODEL 1
 #define  TRUE 1
@@ -188,6 +189,14 @@ enum
     MODEL_FLAT24 = 16
   };
 
+/* overlay segment name and the functions
+   that belong to it. used by pragma overlay */
+typedef struct {
+    char *osname;	/* overlay segment name */
+    int  nfuncs;        /* number of functions in this overlay */
+    char *funcs[128];   /* function name that belong to this */
+} olay;
+
 /* other command line options */
 struct options
   {
@@ -231,6 +240,7 @@ struct options
     char *excludeRegs[32];	/* registers excluded from saving */
     int all_callee_saves; 	/* callee saves for all functions */
     int stack_probe;            /* insert call to function __stack_probe */
+    olay olays[128];            /* overlay segments used in #pragma OVERLAY */
     /* starting address of the segments */
     int xstack_loc;		/* initial location of external stack */
     int stack_loc;		/* initial value of internal stack pointer */

@@ -90,58 +90,184 @@ LINK32=link.exe
 # Begin Source File
 
 SOURCE=.\lkarea.c
+
+!IF  "$(CFG)" == "linkz80 - Win32 Release"
+
+# ADD CPP /D "SDK"
+
+!ELSEIF  "$(CFG)" == "linkz80 - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\lkdata.c
+
+!IF  "$(CFG)" == "linkz80 - Win32 Release"
+
+# ADD CPP /D "SDK"
+
+!ELSEIF  "$(CFG)" == "linkz80 - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\lkeval.c
+
+!IF  "$(CFG)" == "linkz80 - Win32 Release"
+
+# ADD CPP /D "SDK"
+
+!ELSEIF  "$(CFG)" == "linkz80 - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\lkgb.c
+
+!IF  "$(CFG)" == "linkz80 - Win32 Release"
+
+# ADD CPP /D "SDK"
+
+!ELSEIF  "$(CFG)" == "linkz80 - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\lkgg.c
+
+!IF  "$(CFG)" == "linkz80 - Win32 Release"
+
+# ADD CPP /D "SDK"
+
+!ELSEIF  "$(CFG)" == "linkz80 - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\lkhead.c
+
+!IF  "$(CFG)" == "linkz80 - Win32 Release"
+
+# ADD CPP /D "SDK"
+
+!ELSEIF  "$(CFG)" == "linkz80 - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\lkihx.c
+
+!IF  "$(CFG)" == "linkz80 - Win32 Release"
+
+# ADD CPP /D "SDK"
+
+!ELSEIF  "$(CFG)" == "linkz80 - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\lklex.c
+
+!IF  "$(CFG)" == "linkz80 - Win32 Release"
+
+# ADD CPP /D "SDK"
+
+!ELSEIF  "$(CFG)" == "linkz80 - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\lklibr.c
+
+!IF  "$(CFG)" == "linkz80 - Win32 Release"
+
+# ADD CPP /D "SDK"
+
+!ELSEIF  "$(CFG)" == "linkz80 - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\lklist.c
+
+!IF  "$(CFG)" == "linkz80 - Win32 Release"
+
+# ADD CPP /D "SDK"
+
+!ELSEIF  "$(CFG)" == "linkz80 - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\lkmain.c
+
+!IF  "$(CFG)" == "linkz80 - Win32 Release"
+
+# ADD CPP /D "SDK"
+
+!ELSEIF  "$(CFG)" == "linkz80 - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\lkrloc.c
+
+!IF  "$(CFG)" == "linkz80 - Win32 Release"
+
+# ADD CPP /D "SDK"
+
+!ELSEIF  "$(CFG)" == "linkz80 - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\lks19.c
+
+!IF  "$(CFG)" == "linkz80 - Win32 Release"
+
+# ADD CPP /D "SDK"
+
+!ELSEIF  "$(CFG)" == "linkz80 - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\lksym.c
+
+!IF  "$(CFG)" == "linkz80 - Win32 Release"
+
+# ADD CPP /D "SDK"
+
+!ELSEIF  "$(CFG)" == "linkz80 - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "Header Files"

@@ -1129,7 +1129,7 @@ void glue ()
          * This area is guaranteed to follow the static area
          * by the ugly shucking and jiving about 20 lines ago.
          */
-    	tfprintf(asmFile, "\t!area %s\n", port->mem.post_static_name);
+    	tfprintf(asmFile, "\t!area\n", port->mem.post_static_name);
 	fprintf (asmFile,"\tljmp\t__sdcc_program_startup\n");
     }
 	

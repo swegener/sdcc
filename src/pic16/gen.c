@@ -94,6 +94,11 @@ static bool is_LitAOp(asmop *aop);
 
 #define BYTEofLONG(l,b) ( (l>> (b<<3)) & 0xff)
 
+/* set the following macro to 1 to enable passing the
+ * first byte of functions parameters via WREG */
+#define USE_WREG_IN_FUNC_PARAMS	0
+
+
 /* this is the down and dirty file with all kinds of 
    kludgy & hacky stuff. This is what it is all about
    CODE GENERATION for a specific MCU . some of the
@@ -2770,7 +2775,7 @@ void pic16_loadFromReturn(operand *op, int offset, pCodeOp *src)
 
 /*-----------------------------------------------------------------*/
 /* assignResultValue - assign results to oper, rescall==1 is       */
-/*                     called from genCall() or genPCall()         */
+/*                     called from genCall() or genPcall()         */
 /*-----------------------------------------------------------------*/
 static void assignResultValue(operand * oper, int rescall)
 {
@@ -2828,6 +2833,7 @@ static void assignResultValue(operand * oper, int rescall)
     } else {
       int areg = 0;		/* matching argument register */
       
+      debugf("_G.useWreg = %d\n", _G.useWreg);
       areg = SPEC_ARGREG( OP_SYM_ETYPE( oper ) ) - 1;
 
 
@@ -3060,8 +3066,9 @@ static void genCall (iCode *ic)
     if (_G.sendSet) {
       iCode *sic;
       int psuedoStkPtr=-1; 
+#if USE_WREG_IN_FUNC_PARAMS
       int firstTimeThruLoop = 1;
-
+#endif
 
 #if 1
         /* reverse sendSet if function is not reentrant */
@@ -3085,13 +3092,17 @@ static void genCall (iCode *ic)
         use_wreg = 0;
         
         for (sic = setFirstItem(_G.sendSet) ; sic ; sic = setNextItem(_G.sendSet)) {
-          int size, offset = 0;
-
+          int size;
+#if USE_WREG_IN_FUNC_PARAMS
+          int offset = 0;
+#endif
             pic16_aopOp(IC_LEFT(sic),sic,FALSE);
             size = AOP_SIZE(IC_LEFT(sic));
 
             stackParms += size;
 
+            /* set the following to 1 to enable passing arguments via WREG */
+#if USE_WREG_IN_FUNC_PARAMS
             while (size--) {
               DEBUGpic16_emitcode ("; ","%d left %s",__LINE__,
                     pic16_AopType(AOP_TYPE(IC_LEFT(sic))));
@@ -3105,6 +3116,7 @@ static void genCall (iCode *ic)
 
                 pushw();
 //                --psuedoStkPtr;		// sanity check
+                use_wreg = 1;
               }
                 
               firstTimeThruLoop=0;
@@ -3113,13 +3125,27 @@ static void genCall (iCode *ic)
 
               offset++;
             }
+#else
+            /* all arguments are passed via stack */
+            while (size--) {
+              DEBUGpic16_emitcode ("; ","%d left %s",__LINE__,
+                    pic16_AopType(AOP_TYPE(IC_LEFT(sic))));
+              DEBUGpic16_emitcode("; ", "push %d", psuedoStkPtr-1);
+
+              mov2w (AOP(IC_LEFT(sic)), size);
+              pushw();
+            }
+#endif
+
             pic16_freeAsmop (IC_LEFT(sic),NULL,sic,TRUE);
           }
 
+#if USE_WREG_IN_FUNC_PARAMS
           /* save last parameter to stack if functions has varargs */
           if(IFFUNC_HASVARARGS(ftype) || IFFUNC_ISREENT(ftype))pushw();
           else use_wreg = 1;		/* last parameter in WREG */
-          
+#endif
+
           _G.stackRegSet = _G.sendSet;
           _G.sendSet = NULL;
     }
@@ -3151,7 +3177,7 @@ static void genCall (iCode *ic)
     }
       
     stackParms -= use_wreg;
-      
+    
     if(stackParms>0) {
       if(stackParms == 1) {
         pic16_emitpcode(POC_INCF, pic16_popCopyReg(&pic16_pc_fsr1l));
@@ -3193,9 +3219,9 @@ static void genPcall (iCode *ic)
 {
   sym_link *ftype;
   int stackParms=0;
+  int use_wreg=0;
   symbol *retlbl = newiTempLabel(NULL);
   pCodeOp *pcop_lbl = pic16_popGetLabel(retlbl->key);
-  int use_wreg=0;
   
     DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
@@ -3205,7 +3231,9 @@ static void genPcall (iCode *ic)
     if (_G.sendSet) {
       iCode *sic;
       int psuedoStkPtr=-1; 
+#if USE_WREG_IN_FUNC_PARAMS
       int firstTimeThruLoop = 1;
+#endif
 
       /* For the Pic port, there is no data stack.
        * So parameters passed to functions are stored
@@ -3232,12 +3260,16 @@ static void genPcall (iCode *ic)
       stackParms = 0;
 
       for (sic = setFirstItem(_G.sendSet) ; sic ; sic = setNextItem(_G.sendSet)) {
-        int size, offset = 0;
+        int size;
+#if USE_WREG_IN_FUNC_PARAMS
+        int offset = 0;
+#endif
 
           pic16_aopOp(IC_LEFT(sic),sic,FALSE);
           size = AOP_SIZE(IC_LEFT(sic));
           stackParms += size;
 
+#if USE_WREG_IN_FUNC_PARAMS
           while (size--) {
             DEBUGpic16_emitcode ("; ","%d left %s",__LINE__,
             pic16_AopType(AOP_TYPE(IC_LEFT(sic))));
@@ -3256,16 +3288,28 @@ static void genPcall (iCode *ic)
             firstTimeThruLoop=0;
 
             mov2w (AOP(IC_LEFT(sic)), size);
+            use_wreg = 1;
 
             offset++;
           }
+#else
+          while (size--) {
+            DEBUGpic16_emitcode ("; ","%d left %s",__LINE__,
+            pic16_AopType(AOP_TYPE(IC_LEFT(sic))));
+            DEBUGpic16_emitcode("; ", "push %d", psuedoStkPtr-1);
 
+            mov2w (AOP(IC_LEFT(sic)), size);
+            pushw();
+          }
+#endif
 
           pic16_freeAsmop (IC_LEFT(sic),NULL,sic,TRUE);
       }
 
+#if USE_WREG_IN_FUNC_PARAMS
       if(IFFUNC_HASVARARGS(ftype) || IFFUNC_ISREENT(ftype))pushw();
       else use_wreg = 1;		/* last parameter in WREG */
+#endif
 
       _G.stackRegSet = _G.sendSet;
       _G.sendSet = NULL;
@@ -3539,9 +3583,13 @@ static void genFunction (iCode *ic)
       pic16_emitpcode(POC_DECF, pic16_popCopyReg(&pic16_pc_fsr1h));
     }
           
+#if USE_WREG_IN_FUNC_PARAMS
     if(IFFUNC_HASVARARGS(sym->type) || IFFUNC_ISREENT(sym->type))
       _G.useWreg = 0;
     else _G.useWreg = 1;
+#else
+    _G.useWreg = 0;
+#endif
 
     /* if callee-save to be used for this function
      * then save the registers being used in this function */
@@ -11741,6 +11789,7 @@ static void genAssign (iCode *ic)
     } else if (AOP_TYPE(right) == AOP_CRY) {
       pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(result),offset));
       if(offset == 0) {
+        debugf("%s: BTFSS offset == 0\n", __FUNCTION__);
 	pic16_emitpcode(POC_BTFSS, pic16_popGet(AOP(right),0));
 	pic16_emitpcode(POC_INCF, pic16_popGet(AOP(result),0));
       }

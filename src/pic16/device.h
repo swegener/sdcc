@@ -103,6 +103,7 @@ typedef struct {
   int no_crt;
   int ip_stack;
   unsigned long opt_flags;
+  int gstack;
 } pic16_options_t;
 
 #define STACK_MODEL_SMALL	(pic16_options.stack_model == 0)
@@ -110,6 +111,16 @@ typedef struct {
 
 extern set *fix_idataSymSet;
 extern set *rel_idataSymSet;
+
+typedef struct {
+  unsigned long isize;
+  unsigned long adsize;
+  unsigned long udsize;
+  unsigned long idsize;
+  unsigned long intsize;
+} stats_t;
+
+extern stats_t statistics;
 
 extern pic16_options_t pic16_options;
 extern PIC16_device *pic16;

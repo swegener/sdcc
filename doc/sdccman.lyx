@@ -83,7 +83,7 @@ SDCC Compiler User Guide
 
 
 \size normal 
-SDCC 2.4.5
+SDCC 2.4.6
 \size footnotesize 
 
 \newline 
@@ -15265,41 +15265,6 @@ status Collapsed
 /
 \end_inset 
 
--stack-auto Auto variables that are function parameters, will be saved on
- stack by default.
- 
-\emph on 
-There is no need to specify this in the command line.
-\layout List
-\labelwidthstring 00.00.0000
-
--
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--float-reent All floating point functions are reentrant by default.
- 
-\emph on 
-There is no need to specifiy this in the command line.
-\layout List
-\labelwidthstring 00.00.0000
-
--
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
 -callee-saves See -
 \begin_inset ERT
 status Collapsed
@@ -15374,8 +15339,7 @@ status Collapsed
 /
 \end_inset 
 
--pgen-bank Instructs the port to insert BANKSEL directives before instructions
- that use the Bank Select Register (BSR).
+-nodefaultlibs do not link default libraries when linking.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -15389,8 +15353,18 @@ status Collapsed
 /
 \end_inset 
 
--pomit-config-words Instructs the port to omit the generation of the configurati
-on words.
+-obanksel=# Set optimization level for inserting BANKSELs.
+\begin_deeper 
+\layout List
+\labelwidthstring 00.00.0000
+
+0 is no optimization
+\layout List
+\labelwidthstring 00.00.0000
+
+1 checkes previous used register and if it is the same then doesn't emit
+ BANKSEL, accounts only for labels.
+\end_deeper 
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -15404,7 +15378,7 @@ status Collapsed
 /
 \end_inset 
 
--pomit-ivt Instructs the port to omit the generation of the interrupt vectors
+-pomit-config-words Omit the generation of the configuration words.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -15418,8 +15392,31 @@ status Collapsed
 /
 \end_inset 
 
--pleave-reset-vector Used in conjuction with the previous command, instructs
- the port NOT to omit the reset vector.
+-pomit-ivt Omit the generation of the interrupt vectors.
+\layout List
+\labelwidthstring 00.00.0000
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-pleave-reset-vector Used in conjuction with -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-pomit-ivt, instructs the port NOT to omit the reset vector.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -15516,6 +15513,78 @@ status Collapsed
 \end_inset 
 
 -link= sets the full path and name of an external linker to call.
+\layout List
+\labelwidthstring 00.00.0000
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-call-tree dump call tree in .calltree file
+\layout List
+\labelwidthstring 00.00.0000
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-mplab-comp MPLAB compatibility option.
+ Currently only suppresses special gpasm directives.
+\layout List
+\labelwidthstring 00.00.0000
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-use-crt= Use a custom run-time module instead of the defaults.
+\layout List
+\labelwidthstring 00.00.0000
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-no-crt Don't link the default run-time modules
+\layout List
+\labelwidthstring 00.00.0000
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-flr-support When entering/leaving a function, call support functions to
+ store/restore used registers
 \layout Subsubsection
 
 Debugging Options
@@ -15581,6 +15650,35 @@ status Collapsed
 \end_inset 
 
 -pcode-verbose Enable pcode debugging information in translation.
+\layout List
+\labelwidthstring 00.00.0000
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-denable-peeps Force the usage of peepholes.
+ Use with care.
+\layout List
+\labelwidthstring 00.00.0000
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-gstack Trace push/pops for stack pointer overflow
 \layout Subsection
 
 Preprocessor Macros
@@ -15817,6 +15915,21 @@ Example:
 \layout LyX-Code
 
 #pragma stack 0x5ff
+\layout List
+\labelwidthstring 00.00.0000
+
+code place a function symbol at static FLASH address
+\layout LyX-Code
+
+Example:
+\layout LyX-Code
+
+\layout LyX-Code
+
+/* place function test_func at 0x4000 */
+\layout LyX-Code
+
+#pragma code test_func 0x4000
 \layout List
 \labelwidthstring 00.00.0000
 

@@ -461,6 +461,8 @@ static PIC16_device Pics16[] = {
 
 static int num_of_supported_PICS = sizeof(Pics16)/sizeof(PIC16_device);
 
+stats_t statistics = { 0, 0, 0, 0 };
+
 #define DEFAULT_PIC "452"
 
 PIC16_device *pic16=NULL;
@@ -514,6 +516,7 @@ void pic16_dump_access(FILE *of, set *section)
 	fprintf(of, "\tudata_acs\n");
 	for(; r; r = setNextItem(section)) {
 		fprintf(of, "%s\tres\t%d\n", r->name, r->size);
+		statistics.adsize += r->size;
 	}
 }
 
@@ -582,10 +585,21 @@ void pic16_dump_usection(FILE *of, set *section, int fix)
 	qsort(rlist, i	/*elementsInSet(section)*/, sizeof(regs *), regCompare);
 	
 	if(!fix) {
+
+#define EMIT_SINGLE_UDATA_SECTION	0
+#if EMIT_SINGLE_UDATA_SECTION
 		fprintf(of, "\n\n\tudata\n");
 		for(r = setFirstItem(section); r; r = setNextItem(section)) {
 			fprintf(of, "%s\tres\t%d\n", r->name, r->size);
+			statistics.udsize += r->size;
 		}
+#else
+		for(r = setFirstItem(section); r; r = setNextItem(section)) {
+			fprintf(of, "\nudata_%s_%s\tudata\n", moduleName, r->name);
+			fprintf(of, "%s\tres\t%d\n", r->name, r->size);
+			statistics.udsize += r->size;
+		}
+#endif
 	} else {
 	  unsigned int j=0;
 	  int deb_addr=0;
@@ -611,6 +625,7 @@ void pic16_dump_usection(FILE *of, set *section, int fix)
 			} else {
 				fprintf(of, "%s\tres\t%d\n", r->name, r->size);
 				deb_addr += r->size;
+				statistics.udsize += r->size;
 			}
 			
 			rprev = r;
@@ -634,6 +649,7 @@ void pic16_dump_gsection(FILE *of, set *sections)
   				r->name, sname->name, sname);
 #endif
 			fprintf(of, "%s\tres\t%d\n", r->name, r->size);
+			statistics.udsize += r->size;
 		}
 	}
 }
@@ -752,8 +768,10 @@ void pic16_dump_int_registers(FILE *of, set *section)
 	fprintf(of, "\n\n; Internal registers\n");
 	
 	fprintf(of, "%s\tudata_ovr\t0x0000\n", ".registers");
-	for(r = setFirstItem(section); r; r = setNextItem(section))
+	for(r = setFirstItem(section); r; r = setNextItem(section)) {
 		fprintf(of, "%s\tres\t%d\n", r->name, r->size);
+		statistics.intsize += r->size;
+	}
 
 	free(rlist);
 }

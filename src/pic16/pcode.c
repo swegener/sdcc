@@ -194,6 +194,7 @@ pCodeInstruction pic16_pciADDWF = {
    genericPrint},
   POC_ADDWF,
   "ADDWF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -221,6 +222,7 @@ pCodeInstruction pic16_pciADDFW = {
    genericPrint},
   POC_ADDFW,
   "ADDWF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -248,6 +250,7 @@ pCodeInstruction pic16_pciADDWFC = { // mdubuc - New
    genericPrint},
   POC_ADDWFC,
   "ADDWFC",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -275,6 +278,7 @@ pCodeInstruction pic16_pciADDFWC = {
    genericPrint},
   POC_ADDFWC,
   "ADDWFC",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -302,6 +306,7 @@ pCodeInstruction pic16_pciADDLW = {
    genericPrint},
   POC_ADDLW,
   "ADDLW",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -329,6 +334,7 @@ pCodeInstruction pic16_pciANDLW = {
    genericPrint},
   POC_ANDLW,
   "ANDLW",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -356,6 +362,7 @@ pCodeInstruction pic16_pciANDWF = {
    genericPrint},
   POC_ANDWF,
   "ANDWF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -383,6 +390,7 @@ pCodeInstruction pic16_pciANDFW = {
    genericPrint},
   POC_ANDFW,
   "ANDWF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -409,6 +417,7 @@ pCodeInstruction pic16_pciBC = { // mdubuc - New
    genericPrint},
   POC_BC,
   "BC",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -436,6 +445,7 @@ pCodeInstruction pic16_pciBCF = {
    genericPrint},
   POC_BCF,
   "BCF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -463,6 +473,7 @@ pCodeInstruction pic16_pciBN = { // mdubuc - New
    genericPrint},
   POC_BN,
   "BN",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -490,6 +501,7 @@ pCodeInstruction pic16_pciBNC = { // mdubuc - New
    genericPrint},
   POC_BNC,
   "BNC",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -517,6 +529,7 @@ pCodeInstruction pic16_pciBNN = { // mdubuc - New
    genericPrint},
   POC_BNN,
   "BNN",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -544,6 +557,7 @@ pCodeInstruction pic16_pciBNOV = { // mdubuc - New
    genericPrint},
   POC_BNOV,
   "BNOV",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -571,6 +585,7 @@ pCodeInstruction pic16_pciBNZ = { // mdubuc - New
    genericPrint},
   POC_BNZ,
   "BNZ",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -598,6 +613,7 @@ pCodeInstruction pic16_pciBOV = { // mdubuc - New
    genericPrint},
   POC_BOV,
   "BOV",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -625,6 +641,7 @@ pCodeInstruction pic16_pciBRA = { // mdubuc - New
    genericPrint},
   POC_BRA,
   "BRA",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -652,6 +669,7 @@ pCodeInstruction pic16_pciBSF = {
    genericPrint},
   POC_BSF,
   "BSF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -679,6 +697,7 @@ pCodeInstruction pic16_pciBTFSC = {
    genericPrint},
   POC_BTFSC,
   "BTFSC",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -706,6 +725,7 @@ pCodeInstruction pic16_pciBTFSS = {
    genericPrint},
   POC_BTFSS,
   "BTFSS",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -733,6 +753,7 @@ pCodeInstruction pic16_pciBTG = { // mdubuc - New
    genericPrint},
   POC_BTG,
   "BTG",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -760,6 +781,7 @@ pCodeInstruction pic16_pciBZ = { // mdubuc - New
    genericPrint},
   POC_BZ,
   "BZ",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -787,6 +809,7 @@ pCodeInstruction pic16_pciCALL = {
    genericPrint},
   POC_CALL,
   "CALL",
+  4,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -814,6 +837,7 @@ pCodeInstruction pic16_pciCOMF = {
    genericPrint},
   POC_COMF,
   "COMF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -841,6 +865,7 @@ pCodeInstruction pic16_pciCOMFW = {
    genericPrint},
   POC_COMFW,
   "COMF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -868,6 +893,7 @@ pCodeInstruction pic16_pciCLRF = {
    genericPrint},
   POC_CLRF,
   "CLRF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -895,6 +921,7 @@ pCodeInstruction pic16_pciCLRWDT = {
    genericPrint},
   POC_CLRWDT,
   "CLRWDT",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -922,6 +949,7 @@ pCodeInstruction pic16_pciCPFSEQ = { // mdubuc - New
    genericPrint},
   POC_CPFSEQ,
   "CPFSEQ",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -949,6 +977,7 @@ pCodeInstruction pic16_pciCPFSGT = { // mdubuc - New
    genericPrint},
   POC_CPFSGT,
   "CPFSGT",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -976,6 +1005,7 @@ pCodeInstruction pic16_pciCPFSLT = { // mdubuc - New
    genericPrint},
   POC_CPFSLT,
   "CPFSLT",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1003,6 +1033,7 @@ pCodeInstruction pic16_pciDAW = {
    genericPrint},
   POC_DAW,
   "DAW",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1030,6 +1061,7 @@ pCodeInstruction pic16_pciDCFSNZ = { // mdubuc - New
    genericPrint},
   POC_DCFSNZ,
   "DCFSNZ",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1057,6 +1089,7 @@ pCodeInstruction pic16_pciDCFSNZW = { // mdubuc - New
    genericPrint},
   POC_DCFSNZW,
   "DCFSNZ",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1084,6 +1117,7 @@ pCodeInstruction pic16_pciDECF = {
    genericPrint},
   POC_DECF,
   "DECF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1111,6 +1145,7 @@ pCodeInstruction pic16_pciDECFW = {
    genericPrint},
   POC_DECFW,
   "DECF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1138,6 +1173,7 @@ pCodeInstruction pic16_pciDECFSZ = {
    genericPrint},
   POC_DECFSZ,
   "DECFSZ",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1165,6 +1201,7 @@ pCodeInstruction pic16_pciDECFSZW = {
    genericPrint},
   POC_DECFSZW,
   "DECFSZ",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1192,6 +1229,7 @@ pCodeInstruction pic16_pciGOTO = {
    genericPrint},
   POC_GOTO,
   "GOTO",
+  4,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1219,6 +1257,7 @@ pCodeInstruction pic16_pciINCF = {
    genericPrint},
   POC_INCF,
   "INCF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1246,6 +1285,7 @@ pCodeInstruction pic16_pciINCFW = {
    genericPrint},
   POC_INCFW,
   "INCF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1273,6 +1313,7 @@ pCodeInstruction pic16_pciINCFSZ = {
    genericPrint},
   POC_INCFSZ,
   "INCFSZ",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1300,6 +1341,7 @@ pCodeInstruction pic16_pciINCFSZW = {
    genericPrint},
   POC_INCFSZW,
   "INCFSZ",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1327,6 +1369,7 @@ pCodeInstruction pic16_pciINFSNZ = { // mdubuc - New
    genericPrint},
   POC_INFSNZ,
   "INFSNZ",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1354,6 +1397,7 @@ pCodeInstruction pic16_pciINFSNZW = { // vrokas - New
    genericPrint},
   POC_INFSNZW,
   "INFSNZ",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1381,6 +1425,7 @@ pCodeInstruction pic16_pciIORWF = {
    genericPrint},
   POC_IORWF,
   "IORWF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1408,6 +1453,7 @@ pCodeInstruction pic16_pciIORFW = {
    genericPrint},
   POC_IORFW,
   "IORWF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1435,6 +1481,7 @@ pCodeInstruction pic16_pciIORLW = {
    genericPrint},
   POC_IORLW,
   "IORLW",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1462,6 +1509,7 @@ pCodeInstruction pic16_pciLFSR = { // mdubuc - New
    genericPrint},
   POC_LFSR,
   "LFSR",
+  4,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1489,6 +1537,7 @@ pCodeInstruction pic16_pciMOVF = {
    genericPrint},
   POC_MOVF,
   "MOVF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1516,6 +1565,7 @@ pCodeInstruction pic16_pciMOVFW = {
    genericPrint},
   POC_MOVFW,
   "MOVF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1543,6 +1593,7 @@ pCodeInstruction pic16_pciMOVFF = { // mdubuc - New
    genericPrint},
   POC_MOVFF,
   "MOVFF",
+  4,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1569,6 +1620,7 @@ pCodeInstruction pic16_pciMOVLB = { // mdubuc - New
    genericPrint},
   POC_MOVLB,
   "MOVLB",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1595,6 +1647,7 @@ pCodeInstruction pic16_pciMOVLW = {
    genericPrint},
   POC_MOVLW,
   "MOVLW",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1622,6 +1675,7 @@ pCodeInstruction pic16_pciMOVWF = {
    genericPrint},
   POC_MOVWF,
   "MOVWF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1648,6 +1702,7 @@ pCodeInstruction pic16_pciMULLW = { // mdubuc - New
    genericPrint},
   POC_MULLW,
   "MULLW",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1674,6 +1729,7 @@ pCodeInstruction pic16_pciMULWF = { // mdubuc - New
    genericPrint},
   POC_MULWF,
   "MULWF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1700,6 +1756,7 @@ pCodeInstruction pic16_pciNEGF = { // mdubuc - New
    genericPrint},
   POC_NEGF,
   "NEGF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1726,6 +1783,7 @@ pCodeInstruction pic16_pciNOP = {
    genericPrint},
   POC_NOP,
   "NOP",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1752,6 +1810,7 @@ pCodeInstruction pic16_pciPOP = { // mdubuc - New
    genericPrint},
   POC_POP,
   "POP",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1778,6 +1837,7 @@ pCodeInstruction pic16_pciPUSH = {
    genericPrint},
   POC_PUSH,
   "PUSH",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1804,6 +1864,7 @@ pCodeInstruction pic16_pciRCALL = { // mdubuc - New
    genericPrint},
   POC_RCALL,
   "RCALL",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1831,6 +1892,7 @@ pCodeInstruction pic16_pciRETFIE = {
    genericPrint},
   POC_RETFIE,
   "RETFIE",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1858,6 +1920,7 @@ pCodeInstruction pic16_pciRETLW = {
    genericPrint},
   POC_RETLW,
   "RETLW",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1885,6 +1948,7 @@ pCodeInstruction pic16_pciRETURN = {
    genericPrint},
   POC_RETURN,
   "RETURN",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1911,6 +1975,7 @@ pCodeInstruction pic16_pciRLCF = { // mdubuc - New
    genericPrint},
   POC_RLCF,
   "RLCF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1938,6 +2003,7 @@ pCodeInstruction pic16_pciRLCFW = { // mdubuc - New
    genericPrint},
   POC_RLCFW,
   "RLCF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1965,6 +2031,7 @@ pCodeInstruction pic16_pciRLNCF = { // mdubuc - New
    genericPrint},
   POC_RLNCF,
   "RLNCF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1991,6 +2058,7 @@ pCodeInstruction pic16_pciRLNCFW = { // mdubuc - New
    genericPrint},
   POC_RLNCFW,
   "RLNCF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2017,6 +2085,7 @@ pCodeInstruction pic16_pciRRCF = { // mdubuc - New
    genericPrint},
   POC_RRCF,
   "RRCF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2043,6 +2112,7 @@ pCodeInstruction pic16_pciRRCFW = { // mdubuc - New
    genericPrint},
   POC_RRCFW,
   "RRCF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2069,6 +2139,7 @@ pCodeInstruction pic16_pciRRNCF = { // mdubuc - New
    genericPrint},
   POC_RRNCF,
   "RRNCF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2096,6 +2167,7 @@ pCodeInstruction pic16_pciRRNCFW = { // mdubuc - New
    genericPrint},
   POC_RRNCFW,
   "RRNCF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2123,6 +2195,7 @@ pCodeInstruction pic16_pciSETF = { // mdubuc - New
    genericPrint},
   POC_SETF,
   "SETF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2150,6 +2223,7 @@ pCodeInstruction pic16_pciSUBLW = {
    genericPrint},
   POC_SUBLW,
   "SUBLW",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2177,6 +2251,7 @@ pCodeInstruction pic16_pciSUBFWB = {
    genericPrint},
   POC_SUBFWB,
   "SUBFWB",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2204,6 +2279,7 @@ pCodeInstruction pic16_pciSUBWF = {
    genericPrint},
   POC_SUBWF,
   "SUBWF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2231,6 +2307,7 @@ pCodeInstruction pic16_pciSUBFW = {
    genericPrint},
   POC_SUBFW,
   "SUBWF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2258,6 +2335,7 @@ pCodeInstruction pic16_pciSUBFWB_D1 = { // mdubuc - New
    genericPrint},
   POC_SUBFWB_D1,
   "SUBFWB",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2285,6 +2363,7 @@ pCodeInstruction pic16_pciSUBFWB_D0 = { // mdubuc - New
    genericPrint},
   POC_SUBFWB_D0,
   "SUBFWB",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2312,6 +2391,7 @@ pCodeInstruction pic16_pciSUBWFB_D1 = { // mdubuc - New
    genericPrint},
   POC_SUBWFB_D1,
   "SUBWFB",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2339,6 +2419,7 @@ pCodeInstruction pic16_pciSUBWFB_D0 = { // mdubuc - New
    genericPrint},
   POC_SUBWFB_D0,
   "SUBWFB",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2366,6 +2447,7 @@ pCodeInstruction pic16_pciSWAPF = {
    genericPrint},
   POC_SWAPF,
   "SWAPF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2393,6 +2475,7 @@ pCodeInstruction pic16_pciSWAPFW = {
    genericPrint},
   POC_SWAPFW,
   "SWAPF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2419,6 +2502,7 @@ pCodeInstruction pic16_pciTBLRD = {	// patch 15
    genericPrint},
   POC_TBLRD,
   "TBLRD*",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2445,6 +2529,7 @@ pCodeInstruction pic16_pciTBLRD_POSTINC = {	// patch 15
    genericPrint},
   POC_TBLRD_POSTINC,
   "TBLRD*+",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2471,6 +2556,7 @@ pCodeInstruction pic16_pciTBLRD_POSTDEC = {	// patch 15
    genericPrint},
   POC_TBLRD_POSTDEC,
   "TBLRD*-",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2497,6 +2583,7 @@ pCodeInstruction pic16_pciTBLRD_PREINC = {	// patch 15
    genericPrint},
   POC_TBLRD_PREINC,
   "TBLRD+*",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2523,6 +2610,7 @@ pCodeInstruction pic16_pciTBLWT = {	// patch 15
    genericPrint},
   POC_TBLWT,
   "TBLWT*",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2549,6 +2637,7 @@ pCodeInstruction pic16_pciTBLWT_POSTINC = {	// patch 15
    genericPrint},
   POC_TBLWT_POSTINC,
   "TBLWT*+",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2575,6 +2664,7 @@ pCodeInstruction pic16_pciTBLWT_POSTDEC = {	// patch 15
    genericPrint},
   POC_TBLWT_POSTDEC,
   "TBLWT*-",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2601,6 +2691,7 @@ pCodeInstruction pic16_pciTBLWT_PREINC = {	// patch 15
    genericPrint},
   POC_TBLWT_PREINC,
   "TBLWT+*",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2628,6 +2719,7 @@ pCodeInstruction pic16_pciTSTFSZ = { // mdubuc - New
    genericPrint},
   POC_TSTFSZ,
   "TSTFSZ",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2655,6 +2747,7 @@ pCodeInstruction pic16_pciXORWF = {
    genericPrint},
   POC_XORWF,
   "XORWF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2682,6 +2775,7 @@ pCodeInstruction pic16_pciXORFW = {
    genericPrint},
   POC_XORFW,
   "XORWF",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2709,6 +2803,7 @@ pCodeInstruction pic16_pciXORLW = {
    genericPrint},
   POC_XORLW,
   "XORLW",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -2736,6 +2831,7 @@ pCodeInstruction pic16_pciBANKSEL = {
    genericPrint},
   POC_BANKSEL,
   "BANKSEL",
+  2,
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -3336,6 +3432,25 @@ void pic16_pcode_test(void)
     }
   }
 }
+
+
+unsigned long pic16_countInstructions(void)
+{
+  pBlock *pb;
+  pCode *pc;
+  unsigned long isize=0;
+
+    if(!the_pFile)return -1;
+    
+    for(pb = the_pFile->pbHead; pb; pb = pb->next) {
+      for(pc = pb->pcHead; pc; pc = pc->next) {
+        if(isPCI(pc) || isASMDIR(pc))isize += PCI(pc)->isize;
+      }
+    }
+  return (isize);
+}
+
+
 /*-----------------------------------------------------------------*/
 /* int RegCond(pCodeOp *pcop) - if pcop points to the STATUS reg-  */
 /*      ister, RegCond will return the bit being referenced.       */
@@ -3689,7 +3804,7 @@ pCode *pic16_newpCodeAsmDir(char *asdir, char *argfmt, ...)
 	pcad->pci.pc.type = PC_ASMDIR;
 	pcad->pci.pc.prev = pcad->pci.pc.next = NULL;
 	pcad->pci.pc.pb = NULL;
-	
+	pcad->pci.isize = 2;
 	pcad->pci.pc.destruct = genericDestruct;
 	pcad->pci.pc.print = genericPrint;
 
@@ -6661,9 +6776,18 @@ static void pic16_FixRegisterBanking(pBlock *pb)
 		/* for each flow block, determine the register banking 
 		 * requirements */
 
+		
+		/* if label, then might come from other point, force banksel */
+		if(isPCL(pc))prevreg = NULL;
+		
 		if(!isPCI(pc))goto loop;
 
+		if(PCI(pc)->label)prevreg = NULL;
+
 		if(PCI(pc)->is2MemOp)goto loop;
+
+		/* if goto, then force banksel */
+//		if(PCI(pc)->op == POC_GOTO)prevreg = NULL;
        
 		reg = pic16_getRegFromInstruction(pc);
 
@@ -6687,6 +6811,7 @@ static void pic16_FixRegisterBanking(pBlock *pb)
 		 
 		if(isPCI_SKIP(pc)) {
 //			fprintf(stderr, "instruction is SKIP instruction\n");
+//		  prevreg = NULL;
 		}
 		if(reg && isACCESS_BANK(reg))goto loop;
 
@@ -6704,15 +6829,27 @@ static void pic16_FixRegisterBanking(pBlock *pb)
 		
 		/* if previous instruction is a skip one, then set flag
 		 * to 2 and call insertBankSwitch */
-		if(pcprev && isPCI_SKIP(pcprev))flag=2;	//goto loop;
+		if(pcprev && isPCI_SKIP(pcprev)) {
+		  flag=2;	//goto loop
+//		  prevreg = NULL;
+		}
 		 
+		if(pic16_options.opt_banksel>0) {
+		  char op1[128], op2[128];
+		  
+		    if(prevreg) {
+		      strcpy(op1, pic16_get_op_from_instruction(PCI(pc)));
+		      strcpy(op2, pic16_get_op_from_instruction(PCI(pcprev)));
+		      if(!strcmp(op1, op2))goto loop;
+		    }
+		}
 		prevreg = reg;
 		insertBankSwitch(flag, pc);
-		pcprev = pc;
 
 //		fprintf(stderr, "BANK SWITCH inserted\n");
 		
 loop:
+		pcprev = pc;
 		pc = pc->next;
 	} while (pc);
 }

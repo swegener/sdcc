@@ -1,3 +1,31 @@
+2004-10-30 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* doc/sdccman.lyx: updated SDCC version,
+	* (PIC16 port): update list of command line options,
+	* src/pic16/device.h (structure pic16_options_t): added field gstack
+	to enable stack overflow tracing on push/pops,
+	* src/pic16/device.c (statistics structure): added statistics
+	structure,
+	* (pic16_dump_access, pic16_dump_usection, pic16_dump_gsection,
+	pic16_dump_int_registers): increase statistics counters for each
+	* variable which is encountered
+	* (pic16_dump_usection): emit each .udata variable to its own udata
+	section,
+	* src/pic16/gen.c (assignResultValue, genCall, genPcall, genFunction):
+	when macro USE_WREG_IN_FUNC_PARAMS is set to 0 pass all function
+	parameters via stack, otherwise use old scheme,
+	* src/pic16/glue.c (pic16_emitStatistics): dump statistics in
+	assembler output file,
+	* src/pic16/main.c: added command line options --gstack to enable
+	push/pop tracing for stack overflow,
+	* src/pic16/pcode.c (all pCodeInstruction records for PIC18F
+	instructions): added size of each instruction,
+	* (pic16_countInstruction): estimate size of instructions in
+	the_pFile list, inline assembly blocks are not counted,
+	* (pic16_FixRegisterBanking): trace previous register usage, when
+	banksel optimizations is greater than 0, don't emit a redudant
+	banksel directive,
+
 2004-10-26 Slade Rich <slade_rich AT users.sourceforge.net>
 
 	* src/pic/ralloc.c : fixed inefficient code produced when compiling a complimented bit operation.

@@ -649,6 +649,8 @@ typedef struct pCodeInstruction
 
   char const * const mnemonic;       // Pointer to mnemonic string
 
+  char isize;          // pCode instruction size
+
   pBranch *from;       // pCodes that execute before this one
   pBranch *to;         // pCodes that execute after
   pBranch *label;      // pCode instructions that have labels

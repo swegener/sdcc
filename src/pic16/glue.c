@@ -59,7 +59,9 @@ extern char *iComments1;
 extern char *iComments2;
 
 extern int initsfpnt;
+extern unsigned long pFile_isize;
 
+extern unsigned long pic16_countInstructions();
 set *rel_idataSymSet=NULL;
 set *fix_idataSymSet=NULL;
 
@@ -1600,6 +1602,23 @@ pic16emitOverlay (FILE * afile)
     }
 }
 
+void emitStatistics(FILE *asmFile)
+{
+  statistics.isize = pic16_countInstructions();
+	
+  fprintf (asmFile, "\n\n; Statistics:\n");
+  fprintf (asmFile, "; code size:\t%ld (0x%lx) bytes\n;\t\t%ld (0x%lx) words\n",
+    statistics.isize, statistics.isize,
+    statistics.isize>>1, statistics.isize>>1);
+  fprintf (asmFile, "; udata size:\t%ld (0x%lx) bytes\n", 
+    statistics.udsize, statistics.udsize);
+  fprintf (asmFile, "; access size:\t%ld (0x%lx) bytes\n",
+    statistics.intsize, statistics.intsize);
+
+  fprintf (asmFile, "\n\n");
+}
+
+
 
 /*-----------------------------------------------------------------*/
 /* glue - the final glue that hold the whole thing together        */
@@ -1816,6 +1835,8 @@ pic16glue ()
     pic16_copypCode(asmFile, code->dbName);
     
     pic16_copypCode(asmFile, 'P');
+
+    emitStatistics(asmFile);
 
     fprintf (asmFile,"\tend\n");
     fclose (asmFile);

@@ -18,6 +18,13 @@ Scott Dattalo	<scott AT dattalo.com>
 
 ======================================================================
 ======================================================================
+2004-Oct-29 Vangelis Rokas
+1. Function parameters are passed now all via stack. This might
+lower performance, but some issues are solved this way. Later
+we can enable passing through WREG,PRODL,PRODH,FSR0L by implementing
+specific pragmas
+
+
 2004-Sep-27 Vangelis Rokas
 1. Function parameters have been extended to cover functions with
 variable arguments. Now function parameters follow the rules below:

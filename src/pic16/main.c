@@ -298,7 +298,6 @@ _process_pragma(const char *sz)
 
 #define	OFMSG_LRSUPPORT	"--flr-support"
 
-
 char *alt_asm=NULL;
 char *alt_link=NULL;
 
@@ -337,6 +336,7 @@ OPTION pic16_optionsTable[]= {
 	{ 0,	NL_OPT,		NULL,				"new line, \"lf\" or \"crlf\""},
 	{ 0,	USE_CRT,	NULL,	"use <crt-o> run-time initialization module"},
 	{ 0,	"--no-crt",	&pic16_options.no_crt,	"do not link any default run-time initialization module"},
+	{ 0,	"--gstack",	&pic16_options.gstack,	"trace stack pointer push/pop to overflow"},
 	{ 0,	OFMSG_LRSUPPORT,	NULL,		"use support functions for local register store/restore"},
 	{ 0,	NULL,		NULL,	NULL}
 	};
@@ -623,6 +623,7 @@ _pic16_setDefaultOptions (void)
   pic16_options.crt_name = "crt0i.o";		/* the default crt to link */
   pic16_options.no_crt = 0;			/* use crt by default */
   pic16_options.ip_stack = 1;		/* set to 1 to enable ipop/ipush for stack */
+  pic16_options.gstack = 0;
 }
 
 static const char *

@@ -705,7 +705,15 @@ void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...)
     return;
 
   va_start(val, format);
+#if 0
+  // Alas, vsnprintf is not ANSI standard, and does not exist
+  // on Solaris (and probably other non-Gnu flavored Unixes).
   vsnprintf(*str, *size, format, val);
+#else
+  // This, of course, is *not* safe, despite the name.
+  vsprintf(*str, format, val);
+#endif
+    
   va_end (val);
 
   len = strlen(*str);

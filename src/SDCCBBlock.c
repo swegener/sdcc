@@ -188,40 +188,36 @@ dumpEbbsToFileExt (int id, eBBlock ** ebbs, int count)
   for (i = 0; i < count; i++)
     {
       fprintf (of, "\n----------------------------------------------------------------\n");
-      fprintf (of, "Basic Block %d %s : loop Depth = %d noPath = %d lastinLoop = %d\n",
-	       ebbs[i]->dfnum,
+      fprintf (of, "Basic Block %s (df:%d bb:%d): loop Depth = %d noPath = %d lastinLoop = %d\n",
 	       ebbs[i]->entryLabel->name,
+	       ebbs[i]->dfnum, ebbs[i]->bbnum,
 	       ebbs[i]->depth,
 	       ebbs[i]->noPath,
 	       ebbs[i]->isLastInLoop);
 
-      if (!optimize.label4) { 
-	// this only makes sense with --nolabelopt
-	fprintf (of, "\nsuccessors: ");
-	for (bb=setFirstItem(ebbs[i]->succList); 
-	     bb; 
-	     bb=setNextItem(ebbs[i]->succList)) {
-	  fprintf (of, "%s ", bb->entryLabel->name);
-	}
-	fprintf (of, "\npredecessors: ");
-	for (bb=setFirstItem(ebbs[i]->predList); 
-	     bb; 
-	     bb=setNextItem(ebbs[i]->predList)) {
-	  fprintf (of, "%s ", bb->entryLabel->name);
-	}
-#if 0 // jwk: TODO: this can't be true
-	{
-	  int d;
-	  fprintf (of, "\ndominators ???: ");
-	  for (d=0; d<ebbs[i]->domVect->size; d++) {
-	    if (bitVectBitValue(ebbs[d]->domVect, d)) {
-	      fprintf (of, "%s ", ebbs[d]->entryLabel->name);
-	    }
+      // a --nolabelopt makes this more readable
+      fprintf (of, "\nsuccessors: ");
+      for (bb=setFirstItem(ebbs[i]->succList); 
+	   bb; 
+	   bb=setNextItem(ebbs[i]->succList)) {
+	fprintf (of, "%s ", bb->entryLabel->name);
+      }
+      fprintf (of, "\npredecessors: ");
+      for (bb=setFirstItem(ebbs[i]->predList); 
+	   bb; 
+	   bb=setNextItem(ebbs[i]->predList)) {
+	fprintf (of, "%s ", bb->entryLabel->name);
+      }
+      {
+	int d;
+	fprintf (of, "\ndominators: ");
+	for (d=0; d<ebbs[i]->domVect->size; d++) {
+	  if (bitVectBitValue(ebbs[i]->domVect, d)) {
+	    fprintf (of, "%s ", ebbs[d]->entryLabel->name);
 	  }
 	}
-#endif
-	fprintf (of, "\n");
       }
+      fprintf (of, "\n");
   
       fprintf (of, "\ndefines bitVector :");
       bitVectDebugOn (ebbs[i]->defSet, of);

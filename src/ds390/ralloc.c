@@ -190,31 +190,6 @@ nfreeRegsType (int type)
 }
 
 
-/*-----------------------------------------------------------------*/
-/* allDefsOutOfRange - all definitions are out of a range          */
-/*-----------------------------------------------------------------*/
-static bool
-allDefsOutOfRange (bitVect * defs, int fseq, int toseq)
-{
-  int i;
-
-  if (!defs)
-    return TRUE;
-
-  for (i = 0; i < defs->size; i++)
-    {
-      iCode *ic;
-
-      if (bitVectBitValue (defs, i) &&
-	  (ic = hTabItemWithKey (iCodehTab, i)) &&
-	  (ic->seq >= fseq && ic->seq <= toseq))
-
-	return FALSE;
-
-    }
-
-  return TRUE;
-}
 
 /*-----------------------------------------------------------------*/
 /* isOperandInReg - returns true if operand is currently in regs   */
@@ -302,18 +277,6 @@ static int
 rematable (symbol * sym, eBBlock * ebp, iCode * ic)
 {
   return sym->remat;
-}
-
-/*-----------------------------------------------------------------*/
-/* notUsedInBlock - not used in this block                         */
-/*-----------------------------------------------------------------*/
-static int
-notUsedInBlock (symbol * sym, eBBlock * ebp, iCode * ic)
-{
-  return (!bitVectBitsInCommon (sym->defs, ebp->usesDefs) &&
-	  allDefsOutOfRange (sym->defs, ebp->fSeq, ebp->lSeq) &&
-	  allDefsOutOfRange (sym->uses, ebp->fSeq, ebp->lSeq));
-/*     return (!bitVectBitsInCommon(sym->defs,ebp->usesDefs)); */
 }
 
 /*-----------------------------------------------------------------*/
@@ -1137,6 +1100,97 @@ xchgPositions:
 }
 
 /*-----------------------------------------------------------------*/
+/* unusedLRS - returns a bitVector of liveranges not used in 'ebp' */
+/*-----------------------------------------------------------------*/
+bitVect *unusedLRs (eBBlock *ebp) 
+{
+    bitVect *ret = NULL;
+    symbol *sym;
+    int key;
+    
+    if (!ebp) return NULL;
+    for (sym = hTabFirstItem(liveRanges,&key); sym ; 
+	 sym = hTabNextItem(liveRanges,&key)) {
+	
+	if (notUsedInBlock(sym,ebp,NULL)) {
+	    ret = bitVectSetBit(ret,sym->key);
+	}
+    }
+
+    return ret;
+}
+
+/*-----------------------------------------------------------------*/
+/* deassignUnsedLRs - if this baisc block ends in a return then    */
+/* 		      deassign symbols not used in this block      */
+/*-----------------------------------------------------------------*/
+bitVect *deassignUnsedLRs(eBBlock *ebp)
+{
+    bitVect *unused = NULL;
+    int i;
+
+    switch (returnAtEnd(ebp)) {
+    case 2: /* successor block ends in a return */
+	unused = unusedLRs((eBBlock *) setFirstItem(ebp->succList));
+	/* fall thru */
+    case 1: /* this block ends in a return */
+	unused = bitVectIntersect(unused,unusedLRs(ebp));
+	break;
+    }
+    
+    if (unused) {
+	for (i = 0 ; i < unused->size ; i++ ) {
+
+	    /* if unused  */
+	    if (bitVectBitValue(unused,i)) {
+
+		/* if assigned to registers */
+		if (bitVectBitValue(_G.regAssigned,i)) {
+		    symbol *sym;
+		    int j;
+		    
+		    sym = hTabItemWithKey(liveRanges,i);
+		    /* remove it from regassigned & mark the
+		       register free */
+		    bitVectUnSetBit(_G.regAssigned,i);
+		    for (j = 0 ; j < sym->nRegs; j++)
+			freeReg(sym->regs[j]);
+		} else {
+		    /* not assigned to registers : remove from set*/
+		    bitVectUnSetBit(unused,i);
+		}
+	    }
+	}
+    }
+    return unused;
+}
+
+/*-----------------------------------------------------------------*/
+/* reassignUnusedLRs - put registers to unused Live ranges         */
+/*-----------------------------------------------------------------*/
+void reassignUnusedLRs (bitVect *unused)
+{
+    int i;
+    if (!unused) return ;
+
+    for (i = 0 ; i < unused->size ; i++ ) {
+	/* if unused : means it was assigned to registers before */
+	if (bitVectBitValue(unused,i)) {
+	    symbol *sym;
+	    int j;
+	    
+	    /* put it back into reg set*/
+	    bitVectSetBit(_G.regAssigned,i) ;
+
+	    sym = hTabItemWithKey(liveRanges,i);
+	    /* makr registers busy */
+	    for (j = 0 ; j < sym->nRegs; j++)
+		sym->regs[j]->isFree = 0;
+	}
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* serialRegAssign - serially allocate registers to the variables  */
 /*-----------------------------------------------------------------*/
 static void
@@ -1146,16 +1200,17 @@ serialRegAssign (eBBlock ** ebbs, int count)
 
   /* for all blocks */
   for (i = 0; i < count; i++)
-    {
+      { /* ebbs */
 
       iCode *ic;
+      bitVect *unusedLRs = NULL;
 
       if (ebbs[i]->noPath &&
 	  (ebbs[i]->entryLabel != entryLabel &&
 	   ebbs[i]->entryLabel != returnLabel))
 	continue;
       
-/*       if (returnsAtEnd(ebbs[i])) */
+      unusedLRs = deassignUnsedLRs(ebbs[i]);
       
       /* of all instructions do */
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
@@ -1294,6 +1349,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 
 	    }
 	}
+      reassignUnusedLRs(unusedLRs);
     }
 }
 
@@ -1349,7 +1405,6 @@ static void fillGaps()
 			sym->usl.spillLoc->allocreq--;
 			sym->usl.spillLoc = NULL;
 		    }
-/* 		    printf("Allocated %s in function %s to DPTR1\n",sym->name,currFunc->name); */
 		    sym->nRegs = 0;		    
 		    sym->isspilt = sym->spillA = 0;		    
 		}
@@ -2177,7 +2232,7 @@ static int packRegsDPTRnuse( operand *op , int dptr)
 	    continue ;
 
 	if (ic->op == SEND ) {
-	    if (ic->argreg != 1) return 0;
+	    if (ic->argreg != 1 ) return 0;
 	    else continue ;
 	}
 	/* two special cases first */
@@ -2219,6 +2274,9 @@ static int packRegsDPTRnuse( operand *op , int dptr)
 	    nfs++;
 	}
 	
+	if (nfs && IC_RESULT(ic) && IS_SYMOP(IC_RESULT(ic)) &&
+	    OP_SYMBOL(IC_RESULT(ic))->ruonly) return 0;
+
 	if (nfs > 1) return 0;
     }
     OP_SYMBOL(op)->dptr = dptr;
@@ -2265,7 +2323,9 @@ packRegsDPTRuse (operand * op)
 	if (ic->op == PCALL) return NULL;
 
 	/* if SEND & not the first parameter then giveup */
-	if (ic->op == SEND && ic->argreg != 1) return NULL;
+	if (ic->op == SEND && ic->argreg != 1 &&
+	    ((isOperandInFarSpace(IC_LEFT(ic))  && !isOperandInReg(IC_LEFT(ic))) || 
+	     isOperandEqual(op,IC_LEFT(ic)))) return NULL;
 
 	/* if CALL then make sure it is VOID || return value not used 
 	   or the return value is assigned to this one */
@@ -2325,7 +2385,7 @@ packRegsDPTRuse (operand * op)
 
 	if (IC_LEFT(ic) && IS_SYMOP(IC_LEFT(ic)) && 
 	    !isOperandEqual(IC_LEFT(ic),op) &&
-	    (OP_SYMBOL(IC_LEFT(ic))->liveTo > ic->seq || 
+	    (OP_SYMBOL(IC_LEFT(ic))->liveTo >= ic->seq || 
 	     IS_TRUE_SYMOP(IC_LEFT(ic))  	      ||
 	     OP_SYMBOL(IC_LEFT(ic))->ruonly) &&
 	    ( ( isOperandInFarSpace(IC_LEFT(ic)) || OP_SYMBOL(IC_LEFT(ic))->onStack) && 
@@ -2338,6 +2398,11 @@ packRegsDPTRuse (operand * op)
 	    return NULL;
     }
     OP_SYMBOL(op)->ruonly = 1;
+    if (OP_SYMBOL(op)->usl.spillLoc) {
+	if (OP_SYMBOL(op)->spillA)
+	    OP_SYMBOL(op)->usl.spillLoc->allocreq--;
+	OP_SYMBOL(op)->usl.spillLoc = NULL;
+    }
     return dic;
 }
 
@@ -2535,6 +2600,8 @@ packForPush (iCode * ic, eBBlock * ebp)
 
   if (dic->op != '=' || POINTER_SET (dic))
     return;
+  
+  if (dic->eBBlockNum != ic->eBBlockNum) return ;
 
   /* make sure the right side does not have any definitions
      inbetween */
@@ -2552,8 +2619,11 @@ packForPush (iCode * ic, eBBlock * ebp)
       return;
   }
   /* extend the live range of replaced operand if needed */
-  if (OP_SYMBOL(IC_RIGHT(dic))->liveTo < ic->seq) {
-	  OP_SYMBOL(IC_RIGHT(dic))->liveTo = ic->seq;
+  if (OP_SYMBOL(IC_RIGHT(dic))->liveTo < OP_SYMBOL(IC_LEFT(ic))->liveTo) {
+	  OP_SYMBOL(IC_RIGHT(dic))->liveTo = OP_SYMBOL(IC_LEFT(ic))->liveTo;
+	  OP_SYMBOL(IC_RIGHT(dic))->clashes =
+	      bitVectUnion(OP_SYMBOL(IC_RIGHT(dic))->clashes,
+			   OP_SYMBOL(IC_LEFT(ic))->clashes);
   }
   for (lic = ic; lic && lic != dic; lic = lic->prev)
     {
@@ -2693,6 +2763,10 @@ packRegisters (eBBlock * ebp)
       if (ic->op == RECEIVE && ic->argreg == 1 &&
 	  getSize (operandType(IC_RESULT(ic))) <= 3)
 	  OP_SYMBOL (IC_RESULT(ic))->uptr = 1;
+
+      if (ic->op == SEND && ic->argreg == 1 &&
+	  getSize (aggrToPtr(operandType(IC_LEFT(ic)),FALSE)) <= 3)
+	  OP_SYMBOL (IC_LEFT(ic))->uptr = 1;
 
       if (!SKIP_IC2 (ic))
 	{

@@ -523,7 +523,7 @@ fi
 
 
 
-for ac_prog in mawk gawk nawk awk
+for ac_prog in gawk mawk nawk awk
 do
 # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -2599,6 +2599,8 @@ trap 'rm -fr `echo "main.mk:main_in.mk
 support/gc/Makefile
 src/Makefile
 as/mcs51/Makefile
+as/z80/Makefile
+link/z80/Makefile
 support/cpp/Makefile
 device/include/Makefile
 device/lib/Makefile
@@ -2702,6 +2704,8 @@ CONFIG_FILES=\${CONFIG_FILES-"main.mk:main_in.mk
 support/gc/Makefile
 src/Makefile
 as/mcs51/Makefile
+as/z80/Makefile
+link/z80/Makefile
 support/cpp/Makefile
 device/include/Makefile
 device/lib/Makefile

@@ -7,7 +7,7 @@ AUTOCONF	= autoconf
 
 PRJDIR		= .
 PKGS		= support/gc support/cpp \
-		  src as/mcs51 debugger/mcs51 \
+		  src as/mcs51 as/z80 link/z80 debugger/mcs51 \
 		  device/include device/lib sim/ucsim
 PRJS		= sim/ucsim
 PORTS		= mcs51 z80

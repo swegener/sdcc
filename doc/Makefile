@@ -45,7 +45,6 @@ $(CDB).html: $(CDB).tex
 
 %.tex: %.lyx
 	lyx -e latex $<
-	touch --reference=$< $@
 
 %.ind: %.dvi
 	makeindex -s l2hidx.ist $*

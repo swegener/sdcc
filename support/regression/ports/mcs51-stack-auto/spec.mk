@@ -35,7 +35,9 @@ SOURCES = _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
           assert.c _strcat.c time.c printf_fast.c bpx.c
 
 OBJECTS = $(patsubst %.c,$(LIBDIR)/%.rel,$(SOURCES))
+MODULES = $(patsubst %.c,%,$(SOURCES))
 
+.PHONY: make-library
 make-library: $(LIBDIR) $(OBJECTS) lib-files
 
 
@@ -45,5 +47,7 @@ $(LIBDIR):
 $(LIBDIR)/%.rel: $(LIBSRCDIR)/%.c
 	-$(SDCC) -I../../device/include $(LIBSDCCFLAGS) -c $< -o $@
 
+.PHONY: lib-files
 lib-files:
-	cp $(LIBSRCDIR)/*.lib $(LIBDIR)
+	echo $(MODULES) | tr ' ' '\n' > $(LIBDIR)/libsdcc.lib
+	touch $(LIBDIR)/libfloat.lib $(LIBDIR)/libint.lib $(LIBDIR)/liblong.lib

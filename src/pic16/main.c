@@ -420,29 +420,32 @@ static void _pic16_initPaths(void)
   set *pic16libDirsSet;
   char devlib[512];
 
- 	setMainValue("mcu", pic16->name[2] );
-	addSet(&preArgvSet, Safe_strdup("-D{mcu}"));
+    setMainValue("mcu", pic16->name[2] );
+    addSet(&preArgvSet, Safe_strdup("-D{mcu}"));
 
-	sprintf(pic16incDir, "%s%cpic16", INCLUDE_DIR_SUFFIX, DIR_SEPARATOR_CHAR);
-	sprintf(pic16libDir, "%s%cpic16", LIB_DIR_SUFFIX, DIR_SEPARATOR_CHAR);
+    sprintf(pic16incDir, "%s%cpic16", INCLUDE_DIR_SUFFIX, DIR_SEPARATOR_CHAR);
+    sprintf(pic16libDir, "%s%cpic16", LIB_DIR_SUFFIX, DIR_SEPARATOR_CHAR);
 
-	if(!options.nostdinc) {
-		/* setup pic16 include directory */
-		pic16incDirsSet = appendStrSet(dataDirsSet, NULL, pic16incDir);
-		mergeSets(&includeDirsSet, pic16incDirsSet);
-	}
-	
-	if(!options.nostdlib) {
-		/* setup pic16 library directory */
-		pic16libDirsSet = appendStrSet(dataDirsSet, NULL, pic16libDir);
-		mergeSets(&libDirsSet, pic16libDirsSet);
-	}
-	
-	if(!pic16_options.nodefaultlibs) {
-		/* now add the library for the device */
-		sprintf(devlib, "%s.lib", pic16->name[2]);
-		addSet(&libFilesSet, Safe_strdup(devlib));
-	}
+    if(!options.nostdinc) {
+      /* setup pic16 include directory */
+      pic16incDirsSet = appendStrSet(dataDirsSet, NULL, pic16incDir);
+      mergeSets(&includeDirsSet, pic16incDirsSet);
+    }
+
+    if(!options.nostdlib) {
+      /* setup pic16 library directory */
+      pic16libDirsSet = appendStrSet(dataDirsSet, NULL, pic16libDir);
+      mergeSets(&libDirsSet, pic16libDirsSet);
+    }
+
+    if(!pic16_options.nodefaultlibs) {
+      /* now add the library for the device */
+      sprintf(devlib, "%s.lib", pic16->name[2]);
+      addSet(&libFilesSet, Safe_strdup(devlib));
+
+      /* add the internal SDCC library */
+      addSet(&libFilesSet, Safe_strdup( "libsdcc.lib" ));
+    }
 }
 
 extern set *linkOptionsSet;
@@ -673,13 +676,13 @@ static bool _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 #if 1
 	/* multiplication is fixed */
 	/* support mul for char/int/long */
-	if((getSize(OP_SYMBOL(IC_LEFT(ic))->type ) <= 4)
-		&& (ic->op == '*'))return TRUE;
+	if((ic->op == '*')
+	  && (getSize(OP_SYMBOL(IC_LEFT(ic))->type ) < 2))return TRUE;
 #endif
 
 #if 0
 	/* support div for char/int/long */
-	if((getSize(OP_SYMBOL(IC_LEFT(ic))->type ) <= 0)
+	if((getSize(OP_SYMBOL(IC_LEFT(ic))->type ) < 0)
 		&& (ic->op == '/'))return TRUE;
 #endif
 	

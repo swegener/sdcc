@@ -1,3 +1,18 @@
+2004-09-15 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/SDCCicode.c (piCode): applied patch from Raphael Neider,
+	* src/pic16/device.c (pic16_assignConfigWordValues): wrong
+	configuration values no more rejected by compiler, they are assigned
+	to configuration registers with a warning message instead,
+	* src/pic16/glue.c (pic16_emitConfigRegs): added +1 at top-limit of
+	the for-loop so last conf register is emitted too,
+	* (_pic16_initPaths): link library libsdcc.lib by default,
+	* (_hasNativeMulFor): modified test for multiplication according to
+	Raphael Neider's remarks. Integer multiplication is also done with
+	support functions,
+	* device/include/pic16/pic18fregs.h: corrected type error in while
+	testing and including 18f6720 header file
+
 2004-09-14 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/device.h (pic16_options): removed field use_crt,

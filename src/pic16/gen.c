@@ -1122,10 +1122,13 @@ void pic16_aopOp (operand *op, iCode *ic, bool result)
 	    /* force a new aop if sizes differ */
 	    sym->usl.spillLoc->aop = NULL;
 	}
+
+#if 0
 	DEBUGpic16_emitcode(";","%s %d %s sym->rname = %s, offset %d",
 			    __FUNCTION__,__LINE__,
 			    sym->usl.spillLoc->rname,
 			    sym->rname, sym->usl.spillLoc->offset);
+#endif
 
 	sym->aop = op->aop = aop = newAsmop(AOP_PCODE);
 	//aop->aopu.pcop = pic16_popGetImmd(sym->usl.spillLoc->rname,0,sym->usl.spillLoc->offset);
@@ -6618,6 +6621,7 @@ static void genAnd (iCode *ic, iCode *ifx)
                                                 (posbit-1),0, PO_GPR_REGISTER));
 
               pic16_emitpcode(POC_BRA, pic16_popGetLabel(tlbl->key));
+//              pic16_emitpcode(POC_BRA, pic16_popGetLabel(rIfx.lbl->key));
           } else {
               if (bytelit == 0xff) {
                   /* Aaron had a MOVF instruction here, changed to MOVFW cause

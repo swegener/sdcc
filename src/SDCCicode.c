@@ -514,7 +514,7 @@ piCode (void *item, FILE * of)
     of = stdout;
 
   icTab = getTableEntry (ic->op);
-  fprintf (stdout, "%s(%d:%d:%d:%d:%d)\t",
+  fprintf (of, "%s(%d:%d:%d:%d:%d)\t",
 	   ic->filename, ic->lineno,
 	   ic->seq, ic->key, ic->depth, ic->supportRtn);
   icTab->iCodePrint (of, ic, icTab->printName);

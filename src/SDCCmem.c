@@ -581,6 +581,11 @@ allocLocal (symbol * sym)
 
   /* this is automatic           */
 
+  if (!IS_SPEC(sym->type) && SPEC_OCLS(sym->etype)) {
+    allocIntoSeg (sym);
+    return;
+  }
+
   /* if it to be placed on the stack */
   if (options.stackAuto || reentrant) {
     sym->onStack = 1;

@@ -196,13 +196,13 @@ AC_SUBST(HAVE_LIBGC)
 # Generating output files
 # ===========================================================================
 AC_CONFIG_SUBDIRS(sim/ucsim)
+# MLH: removed as the rules are already in Makefile.common
+#as/z80/Makefile
+#link/z80/Makefile
 AC_OUTPUT(main.mk:main_in.mk
 support/gc/Makefile
 src/Makefile
 as/mcs51/Makefile
-# MLH: removed as the rules are already in Makefile.common
-#as/z80/Makefile
-#link/z80/Makefile
 support/cpp/Makefile
 device/include/Makefile
 device/lib/Makefile

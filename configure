@@ -2494,6 +2494,9 @@ fi
 # ===========================================================================
 subdirs="sim/ucsim"
 
+# MLH: removed as the rules are already in Makefile.common
+#as/z80/Makefile
+#link/z80/Makefile
 trap '' 1 2 15
 cat > confcache <<\EOF
 # This file is a shell script that caches the results of configure
@@ -2599,9 +2602,6 @@ trap 'rm -fr `echo "main.mk:main_in.mk
 support/gc/Makefile
 src/Makefile
 as/mcs51/Makefile
-# MLH: removed as the rules are already in Makefile.common
-#as/z80/Makefile
-#link/z80/Makefile
 support/cpp/Makefile
 device/include/Makefile
 device/lib/Makefile
@@ -2705,9 +2705,6 @@ CONFIG_FILES=\${CONFIG_FILES-"main.mk:main_in.mk
 support/gc/Makefile
 src/Makefile
 as/mcs51/Makefile
-# MLH: removed as the rules are already in Makefile.common
-#as/z80/Makefile
-#link/z80/Makefile
 support/cpp/Makefile
 device/include/Makefile
 device/lib/Makefile

@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : FreeWare ANSI-C Compiler
-; Version 2.3.4 Sun Mar 30 09:16:00 2003
+; Version 2.3.4 Sun Mar 30 15:22:14 2003
 
 ;--------------------------------------------------------
 ; PIC port for the 14-bit core
@@ -14,6 +14,11 @@ include "p16f877.inc"
 ; publics variables in this module
 ;--------------------------------------------------------
 ;	.globl _main
+;	.globl _neg_compound1
+;	.globl _xor_compound2
+;	.globl _xor_compound1
+;	.globl _or_compound2
+;	.globl _or_compound1
 ;	.globl _and_compound2
 ;	.globl _and_compound1
 ;	.globl _done
@@ -232,21 +237,30 @@ _EEADRH	EQU	0x010f
 _EECON1	EQU	0x018c
 _EECON2	EQU	0x018d
   cblock  0X0020	; Bank 0
+	r0x56
+	r0x57
+	r0x58
 	_dummy
 	_uchar0
 	_failures
 	_uchar1
   endc
   cblock  0X0120	; Bank 0
+	r0x56_120
+	r0x57_120
+	r0x58_120
 	_dummy_120
 	_uchar0_120
 	_failures_120
 	_uchar1_120
   endc
-_dummy	EQU	0x020
-_uchar0	EQU	0x021
-_failures	EQU	0x022
-_uchar1	EQU	0x023
+r0x56	EQU	0x020
+r0x57	EQU	0x021
+r0x58	EQU	0x022
+_dummy	EQU	0x023
+_uchar0	EQU	0x024
+_failures	EQU	0x025
+_uchar1	EQU	0x026
 _STATUS	EQU	0x003
 PCL	EQU	0x002
 _PCLATH	EQU	0x00a
@@ -464,107 +478,107 @@ __sdcc_gsinit_startup:
 ;  pBlock Stats: dbName = D
 ;***
 ;; Starting pCode block
-;<>Start of new flow, seq=0x9 ancestor = 0x9
+;<>Start of new flow, seq=0x17 ancestor = 0x17
 ;;ic
-;; ***	genAssign  9238
+;; ***	genAssign  9239
 ;; ***	aopForSym 434
 ;;	520 sym->rname = _success, size = 1
-;; 	line = 9247 result AOP_DIR=_success, left -=-, right AOP_LIT=0x00, size = 1
-;; ***	genAssign  9321
+;; 	line = 9248 result AOP_DIR=_success, left -=-, right AOP_LIT=0x00, size = 1
+;; ***	genAssign  9322
 ;;	1241
 ;;	1257  _success   offset=0
 ;; Starting pCode block
 ;;ic
-;; ***	genAssign  9238
+;; ***	genAssign  9239
 ;; ***	aopForSym 434
 ;;	520 sym->rname = _failures, size = 1
-;; 	line = 9247 result AOP_DIR=_failures, left -=-, right AOP_LIT=0x00, size = 1
-;; ***	genAssign  9321
+;; 	line = 9248 result AOP_DIR=_failures, left -=-, right AOP_LIT=0x00, size = 1
+;; ***	genAssign  9322
 ;;	1241
 ;;	1257  _failures   offset=0
-;#CSRC	and2.c 54
+;#CSRC	and2.c 120
 ;  }
 
-	CLRF	_failures	;key=000,flow seq=009
+	CLRF	_failures	;key=000,flow seq=017
 ;; Starting pCode block
 ;;ic
-;; ***	genAssign  9238
+;; ***	genAssign  9239
 ;; ***	aopForSym 434
 ;;	520 sym->rname = _dummy, size = 1
-;; 	line = 9247 result AOP_DIR=_dummy, left -=-, right AOP_LIT=0x00, size = 1
-;; ***	genAssign  9321
+;; 	line = 9248 result AOP_DIR=_dummy, left -=-, right AOP_LIT=0x00, size = 1
+;; ***	genAssign  9322
 ;;	1241
 ;;	1257  _dummy   offset=0
-;#CSRC	and2.c 54
+;#CSRC	and2.c 120
 ;  }
 
-	CLRF	_dummy	;key=001,flow seq=009
+	CLRF	_dummy	;key=001,flow seq=017
 ;; Starting pCode block
 ;;ic
-;; ***	genAssign  9238
+;; ***	genAssign  9239
 ;; ***	aopForSym 434
 ;;	520 sym->rname = _uint0, size = 2
-;; 	line = 9247 result AOP_DIR=_uint0, left -=-, right AOP_LIT=0x00, size = 2
-;; ***	genAssign  9321
+;; 	line = 9248 result AOP_DIR=_uint0, left -=-, right AOP_LIT=0x00, size = 2
+;; ***	genAssign  9322
 ;;	1241
 ;;	1257  _uint0   offset=0
-;; ***	genAssign  9321
+;; ***	genAssign  9322
 ;;	1241
 ;;	1257  _uint0   offset=1
 ;; Starting pCode block
 ;;ic
-;; ***	genAssign  9238
+;; ***	genAssign  9239
 ;; ***	aopForSym 434
 ;;	520 sym->rname = _uint1, size = 2
-;; 	line = 9247 result AOP_DIR=_uint1, left -=-, right AOP_LIT=0x00, size = 2
-;; ***	genAssign  9321
+;; 	line = 9248 result AOP_DIR=_uint1, left -=-, right AOP_LIT=0x00, size = 2
+;; ***	genAssign  9322
 ;;	1241
 ;;	1257  _uint1   offset=0
-;; ***	genAssign  9321
+;; ***	genAssign  9322
 ;;	1241
 ;;	1257  _uint1   offset=1
 ;; Starting pCode block
 ;;ic
-;; ***	genAssign  9238
+;; ***	genAssign  9239
 ;; ***	aopForSym 434
 ;;	520 sym->rname = _uchar0, size = 1
-;; 	line = 9247 result AOP_DIR=_uchar0, left -=-, right AOP_LIT=0x00, size = 1
-;; ***	genAssign  9321
+;; 	line = 9248 result AOP_DIR=_uchar0, left -=-, right AOP_LIT=0x00, size = 1
+;; ***	genAssign  9322
 ;;	1241
 ;;	1257  _uchar0   offset=0
-;#CSRC	and2.c 54
+;#CSRC	and2.c 120
 ;  }
 
-	CLRF	_uchar0	;key=002,flow seq=009
+	CLRF	_uchar0	;key=002,flow seq=017
 ;; Starting pCode block
 ;;ic
-;; ***	genAssign  9238
+;; ***	genAssign  9239
 ;; ***	aopForSym 434
 ;;	520 sym->rname = _uchar1, size = 1
-;; 	line = 9247 result AOP_DIR=_uchar1, left -=-, right AOP_LIT=0x00, size = 1
-;; ***	genAssign  9321
+;; 	line = 9248 result AOP_DIR=_uchar1, left -=-, right AOP_LIT=0x00, size = 1
+;; ***	genAssign  9322
 ;;	1241
 ;;	1257  _uchar1   offset=0
-;#CSRC	and2.c 54
+;#CSRC	and2.c 120
 ;  }
 
-	CLRF	_uchar1	;key=003,flow seq=009
+	CLRF	_uchar1	;key=003,flow seq=017
 ;; Starting pCode block
 ;;ic
-;; ***	genAssign  9238
+;; ***	genAssign  9239
 ;; ***	aopForSym 434
 ;;	520 sym->rname = _ulong0, size = 4
-;; 	line = 9247 result AOP_DIR=_ulong0, left -=-, right AOP_LIT=0x00, size = 4
-;; ***	genAssign  9321
+;; 	line = 9248 result AOP_DIR=_ulong0, left -=-, right AOP_LIT=0x00, size = 4
+;; ***	genAssign  9322
 ;;	1241
 ;;	1257  _ulong0   offset=0
-;; ***	genAssign  9321
+;; ***	genAssign  9322
 ;;	1241
 ;;	1257  _ulong0   offset=1
-;; ***	genAssign  9321
+;; ***	genAssign  9322
 ;;	1241
 ;;	1257  _ulong0   offset=2
-;; ***	genAssign  9321
+;; ***	genAssign  9322
 ;;	1241
 ;;	1257  _ulong0   offset=3
 ;***
@@ -576,13 +590,22 @@ __sdcc_gsinit_startup:
 ;functions called:
 ;   _and_compound1
 ;   _and_compound2
+;   _or_compound1
+;   _or_compound2
+;   _xor_compound1
+;   _xor_compound2
+;   _neg_compound1
 ;   _done
+;3 compiler assigned registers:
+;   r0x56
+;   r0x57
+;   r0x58
 ;; Starting pCode block
 ;<>Start of new flow, seq=0x1 ancestor = 0x1
 ;;ic
-;; ***	genLabel  3059
+;; ***	genLabel  3062
 ;;ic
-;; ***	genFunction  2646 curr label offset=15previous max_key=5 
+;; ***	genFunction  2649 curr label offset=56previous max_key=3 
 ;;	-----------------------------------------
 ;;	 function main
 ;;	-----------------------------------------
@@ -590,20 +613,20 @@ __sdcc_gsinit_startup:
 _main	;Function start
 ; 2 exit points
 ;;ic
-;; ***	genAssign  9238
+;; ***	genAssign  9239
 ;; ***	aopForSym 434
 ;;	520 sym->rname = _uchar0, size = 1
-;; 	line = 9247 result AOP_DIR=_uchar0, left -=-, right AOP_LIT=0x13, size = 1
-;; ***	genAssign  9321
-;#CSRC	and2.c 45
+;; 	line = 9248 result AOP_DIR=_uchar0, left -=-, right AOP_LIT=0x13, size = 1
+;; ***	genAssign  9322
+;#CSRC	and2.c 96
 ;  uchar0 = 0x13;
 	MOVLW	0x13	;key=000,flow seq=001
 ;;	1241
 ;;	1257  _uchar0   offset=0
 	MOVWF	_uchar0	;key=001,flow seq=001
 ;;ic
-;; ***	genCall  2355
-;; ***	saveRegisters  2026
+;; ***	genCall  2358
+;; ***	saveRegisters  2029
 ;;ic
 ;; ***	genPlus  781
 ;; ***	aopForSym 434
@@ -631,14 +654,14 @@ _and_compound1
 	INCF	_uchar0,W	;key=002,flow seq=001
 ;; ***	emitMOVWF  438 ignoring mov into W
 ;;ic
-;; ***	ifxForOp  5035
-;; ***	genAnd  5242
+;; ***	ifxForOp  5038
+;; ***	genAnd  5245
 ;;	794
 ;;	811 size=1
 ;; ***	aopForSym 434
 ;;	520 sym->rname = _uchar0, size = 1
 ;;Warning -pic port ignoring get(AOP_ACC)	1088
-;; 	line = 5276 result AOP_DIR=_uchar0, left AOP_ACC=AOP_accumulator_bug, right AOP_LIT=0x0f, size = 1
+;; 	line = 5279 result AOP_DIR=_uchar0, left AOP_ACC=AOP_accumulator_bug, right AOP_LIT=0x0f, size = 1
 	ANDLW	0x0f	;key=003,flow seq=001
 ;;	1241
 ;;	1257  _uchar0   offset=0
@@ -650,22 +673,22 @@ _and_compound1
 ;<>Start of new flow, seq=0x2 ancestor = 0x1
 	INCF	_failures,F	;key=000,flow seq=002
 ;<>Start of new flow, seq=0x3 ancestor = 0x1
-;; ***	unsaveRegisters  2088
+;; ***	unsaveRegisters  2091
 ;;ic
-;; ***	genAssign  9238
+;; ***	genAssign  9239
 ;; ***	aopForSym 434
 ;;	520 sym->rname = _uchar1, size = 1
-;; 	line = 9247 result AOP_DIR=_uchar1, left -=-, right AOP_LIT=0x42, size = 1
-;; ***	genAssign  9321
-;#CSRC	and2.c 48
+;; 	line = 9248 result AOP_DIR=_uchar1, left -=-, right AOP_LIT=0x42, size = 1
+;; ***	genAssign  9322
+;#CSRC	and2.c 99
 ;  uchar1 = 0x42;
 	MOVLW	0x42	;key=000,flow seq=003
 ;;	1241
 ;;	1257  _uchar1   offset=0
 	MOVWF	_uchar1	;key=001,flow seq=003
 ;;ic
-;; ***	genCall  2355
-;; ***	saveRegisters  2026
+;; ***	genCall  2358
+;; ***	saveRegisters  2029
 ;;ic
 ;; ***	genPlus  781
 ;; ***	aopForSym 434
@@ -693,14 +716,14 @@ _and_compound2
 	INCF	_uchar1,W	;key=002,flow seq=003
 ;; ***	emitMOVWF  438 ignoring mov into W
 ;;ic
-;; ***	ifxForOp  5035
-;; ***	genAnd  5242
+;; ***	ifxForOp  5038
+;; ***	genAnd  5245
 ;;	794
 ;;	811 size=1
 ;; ***	aopForSym 434
 ;;	520 sym->rname = _uchar0, size = 1
 ;;Warning -pic port ignoring get(AOP_ACC)	1088
-;; 	line = 5276 result AOP_DIR=_uchar0, left AOP_ACC=AOP_accumulator_bug, right AOP_LIT=0x0f, size = 1
+;; 	line = 5279 result AOP_DIR=_uchar0, left AOP_ACC=AOP_accumulator_bug, right AOP_LIT=0x0f, size = 1
 	ANDLW	0x0f	;key=003,flow seq=003
 ;;	1241
 ;;	1257  _uchar0   offset=0
@@ -719,26 +742,337 @@ _and_compound2
 ;<>Start of new flow, seq=0x6 ancestor = 0x5
 	INCF	_failures,F	;key=000,flow seq=006
 ;<>Start of new flow, seq=0x7 ancestor = 0x5
-;; ***	unsaveRegisters  2088
+;; ***	unsaveRegisters  2091
 ;;ic
-;; ***	genAssign  9238
+;; ***	genAssign  9239
+;; ***	aopForSym 434
+;;	520 sym->rname = _uchar0, size = 1
+;; 	line = 9248 result AOP_DIR=_uchar0, left -=-, right AOP_LIT=0x13, size = 1
+;; ***	genAssign  9322
+;#CSRC	and2.c 102
+;  uchar0 = 0x13;
+	MOVLW	0x13	;key=000,flow seq=007
+;;	1241
+;;	1257  _uchar0   offset=0
+	MOVWF	_uchar0	;key=001,flow seq=007
+;;ic
+;; ***	genCall  2358
+;; ***	saveRegisters  2029
+;;ic
+;; ***	genPlus  781
+;; ***	aopForSym 434
+;;	520 sym->rname = _uchar0, size = 1
+;;	794
+;;	811 size=1
+;;Warning -pic port ignoring get(AOP_ACC)	1088
+;; 	line = 787 result AOP_ACC=AOP_accumulator_bug, left AOP_DIR=_uchar0, right AOP_LIT=0x0e, size = 1
+;; ***	pic14_getDataSize  1751
+;; ***	genPlusIncr  161
+;; 	result AOP_ACC, left AOP_DIR, right AOP_LIT
+;; 	genPlusIncr  173
+;; ***	pic14_getDataSize  1751
+;;	adding lit to something. size 1
+;; ***	genAddLit  455
+;; ***	pic14_getDataSize  1751
+;;  left and result aren't same	genAddLit  680
+_or_compound1
+;#CSRC	and2.c 45
+;  uchar0 = (uchar0 + 0xe) | 0x0f;
+	MOVLW	0x0e	;key=002,flow seq=007
+;;	1241
+;;	1257  _uchar0   offset=0
+	ADDWF	_uchar0,W	;key=003,flow seq=007
+;; ***	emitMOVWF  438 ignoring mov into W
+;;ic
+;; ***	ifxForOp  5038
+;; ***	genOr  5533
+;;	794
+;;	811 size=1
+;; ***	aopForSym 434
+;;	520 sym->rname = _uchar0, size = 1
+;;Warning -pic port ignoring get(AOP_ACC)	1088
+;; 	line = 5539 result AOP_DIR=_uchar0, left AOP_ACC=AOP_accumulator_bug, right AOP_LIT=0x0f, size = 1
+;;Warning -pic port ignoring get(AOP_ACC)	1088
+;; 	line = 5564 result AOP_DIR=_uchar0, left AOP_ACC=AOP_accumulator_bug, right AOP_LIT=0x0f, size = 1
+	IORLW	0x0f	;key=004,flow seq=007
+;;	1241
+;;	1257  _uchar0   offset=0
+;;     peep 2 - Removed redundant move
+	MOVWF	_uchar0	;key=005,flow seq=007
+;;     peep 1 - test/jump to test/skip
+	XORLW	0x2f	;key=006,flow seq=007
+	BTFSS	_STATUS,2	;key=007,flow seq=007
+;<>Start of new flow, seq=0x8 ancestor = 0x7
+	INCF	_failures,F	;key=000,flow seq=008
+;<>Start of new flow, seq=0x9 ancestor = 0x7
+;; ***	unsaveRegisters  2091
+;;ic
+;; ***	genAssign  9239
+;; ***	aopForSym 434
+;;	520 sym->rname = _uchar1, size = 1
+;; 	line = 9248 result AOP_DIR=_uchar1, left -=-, right AOP_LIT=0x47, size = 1
+;; ***	genAssign  9322
+;#CSRC	and2.c 105
+;  uchar1 = 0x47;
+	MOVLW	0x47	;key=000,flow seq=009
+;;	1241
+;;	1257  _uchar1   offset=0
+	MOVWF	_uchar1	;key=001,flow seq=009
+;;ic
+;; ***	genCall  2358
+;; ***	saveRegisters  2029
+;;ic
+;; ***	genPlus  781
+;; ***	aopForSym 434
+;;	520 sym->rname = _uchar1, size = 1
+;;	794
+;;	811 size=1
+;;Warning -pic port ignoring get(AOP_ACC)	1088
+;; 	line = 787 result AOP_ACC=AOP_accumulator_bug, left AOP_DIR=_uchar1, right AOP_LIT=0x0f, size = 1
+;; ***	pic14_getDataSize  1751
+;; ***	genPlusIncr  161
+;; 	result AOP_ACC, left AOP_DIR, right AOP_LIT
+;; 	genPlusIncr  173
+;; ***	pic14_getDataSize  1751
+;;	adding lit to something. size 1
+;; ***	genAddLit  455
+;; ***	pic14_getDataSize  1751
+;;  left and result aren't same	genAddLit  680
+_or_compound2
+;#CSRC	and2.c 54
+;  uchar0 = (uchar1 + 0xf) | 0x0f;
+	MOVLW	0x0f	;key=002,flow seq=009
+;;	1241
+;;	1257  _uchar1   offset=0
+	ADDWF	_uchar1,W	;key=003,flow seq=009
+;; ***	emitMOVWF  438 ignoring mov into W
+;;ic
+;; ***	ifxForOp  5038
+;; ***	genOr  5533
+;;	794
+;;	811 size=1
+;; ***	aopForSym 434
+;;	520 sym->rname = _uchar0, size = 1
+;;Warning -pic port ignoring get(AOP_ACC)	1088
+;; 	line = 5539 result AOP_DIR=_uchar0, left AOP_ACC=AOP_accumulator_bug, right AOP_LIT=0x0f, size = 1
+;;Warning -pic port ignoring get(AOP_ACC)	1088
+;; 	line = 5564 result AOP_DIR=_uchar0, left AOP_ACC=AOP_accumulator_bug, right AOP_LIT=0x0f, size = 1
+	IORLW	0x0f	;key=004,flow seq=009
+;;	1241
+;;	1257  _uchar0   offset=0
+;;     peep 2 - Removed redundant move
+	MOVWF	_uchar0	;key=005,flow seq=009
+;;     peep 1 - test/jump to test/skip
+	XORLW	0x5f	;key=006,flow seq=009
+	BTFSS	_STATUS,2	;key=007,flow seq=009
+;<>Start of new flow, seq=0xa ancestor = 0x9
+	INCF	_failures,F	;key=000,flow seq=00a
+;<>Start of new flow, seq=0xb ancestor = 0x9
+	MOVF	_uchar1,W	;key=000,flow seq=00b
+;;     peep 1 - test/jump to test/skip
+	XORLW	0x47	;key=001,flow seq=00b
+	BTFSS	_STATUS,2	;key=002,flow seq=00b
+;<>Start of new flow, seq=0xc ancestor = 0xb
+	INCF	_failures,F	;key=000,flow seq=00c
+;<>Start of new flow, seq=0xd ancestor = 0xb
+;; ***	unsaveRegisters  2091
+;;ic
+;; ***	genAssign  9239
+;; ***	aopForSym 434
+;;	520 sym->rname = _uchar0, size = 1
+;; 	line = 9248 result AOP_DIR=_uchar0, left -=-, right AOP_LIT=0x13, size = 1
+;; ***	genAssign  9322
+;#CSRC	and2.c 108
+;  uchar0 = 0x13;
+	MOVLW	0x13	;key=000,flow seq=00d
+;;	1241
+;;	1257  _uchar0   offset=0
+	MOVWF	_uchar0	;key=001,flow seq=00d
+;;ic
+;; ***	genCall  2358
+;; ***	saveRegisters  2029
+;;ic
+;; ***	genPlus  781
+;; ***	aopForSym 434
+;;	520 sym->rname = _uchar0, size = 1
+;;	861 register type nRegs=1
+;; 	line = 787 result AOP_REG=r0x56, left AOP_DIR=_uchar0, right AOP_LIT=0x01, size = 1
+;; ***	pic14_getDataSize  1751
+;; ***	genPlusIncr  161
+;; 	result AOP_REG, left AOP_DIR, right AOP_LIT
+;; 	genPlusIncr  173
+;; 	genPlusIncr  197
+;; 	couldn't increment 
+;; ***	pic14_getDataSize  1751
+;;	adding lit to something. size 1
+;; ***	genAddLit  455
+;; ***	pic14_getDataSize  1751
+;;  left and result aren't same	genAddLit  680
+;;	1241
+;;	1257  _uchar0   offset=0
+_xor_compound1
+;#CSRC	and2.c 67
+;  uchar0 = (uchar0 + 1) ^ 0x0f;
+	INCF	_uchar0,W	;key=002,flow seq=00d
+	MOVWF	r0x56	;key=003,flow seq=00d
+;;ic
+;; ***	ifxForOp  5038
+;; ***	genXor  5833
+;;	861 register type nRegs=1
+;; ***	aopForSym 434
+;;	520 sym->rname = _uchar0, size = 1
+	MOVLW	0x0f	;key=004,flow seq=00d
+	XORWF	r0x56,W	;key=005,flow seq=00d
+;;	1241
+;;	1257  _uchar0   offset=0
+;;     peep 2 - Removed redundant move
+	MOVWF	_uchar0	;key=006,flow seq=00d
+;;     peep 1 - test/jump to test/skip
+	XORLW	0x1b	;key=007,flow seq=00d
+	BTFSS	_STATUS,2	;key=008,flow seq=00d
+;<>Start of new flow, seq=0xe ancestor = 0xd
+	INCF	_failures,F	;key=000,flow seq=00e
+;<>Start of new flow, seq=0xf ancestor = 0xd
+;; ***	unsaveRegisters  2091
+;;ic
+;; ***	genAssign  9239
+;; ***	aopForSym 434
+;;	520 sym->rname = _uchar1, size = 1
+;; 	line = 9248 result AOP_DIR=_uchar1, left -=-, right AOP_LIT=0x47, size = 1
+;; ***	genAssign  9322
+;#CSRC	and2.c 111
+;  uchar1 = 0x47;
+	MOVLW	0x47	;key=000,flow seq=00f
+;;	1241
+;;	1257  _uchar1   offset=0
+	MOVWF	_uchar1	;key=001,flow seq=00f
+;;ic
+;; ***	genCall  2358
+;; ***	saveRegisters  2029
+;;ic
+;; ***	genPlus  781
+;; ***	aopForSym 434
+;;	520 sym->rname = _uchar1, size = 1
+;;	861 register type nRegs=1
+;; 	line = 787 result AOP_REG=r0x57, left AOP_DIR=_uchar1, right AOP_LIT=0x0f, size = 1
+;; ***	pic14_getDataSize  1751
+;; ***	genPlusIncr  161
+;; 	result AOP_REG, left AOP_DIR, right AOP_LIT
+;; 	genPlusIncr  173
+;; ***	pic14_getDataSize  1751
+;;	adding lit to something. size 1
+;; ***	genAddLit  455
+;; ***	pic14_getDataSize  1751
+;;  left and result aren't same	genAddLit  680
+_xor_compound2
+;#CSRC	and2.c 76
+;  uchar0 = (uchar1 + 0xf) ^ 0x0f;
+	MOVLW	0x0f	;key=002,flow seq=00f
+;;	1241
+;;	1257  _uchar1   offset=0
+	ADDWF	_uchar1,W	;key=003,flow seq=00f
+	MOVWF	r0x57	;key=004,flow seq=00f
+;;ic
+;; ***	ifxForOp  5038
+;; ***	genXor  5833
+;;	861 register type nRegs=1
+;; ***	aopForSym 434
+;;	520 sym->rname = _uchar0, size = 1
+	MOVLW	0x0f	;key=005,flow seq=00f
+	XORWF	r0x57,W	;key=006,flow seq=00f
+;;	1241
+;;	1257  _uchar0   offset=0
+;;     peep 2 - Removed redundant move
+	MOVWF	_uchar0	;key=007,flow seq=00f
+;;     peep 1 - test/jump to test/skip
+	XORLW	0x59	;key=008,flow seq=00f
+	BTFSS	_STATUS,2	;key=009,flow seq=00f
+;<>Start of new flow, seq=0x10 ancestor = 0xf
+	INCF	_failures,F	;key=000,flow seq=010
+;<>Start of new flow, seq=0x11 ancestor = 0xf
+	MOVF	_uchar1,W	;key=000,flow seq=011
+;;     peep 1 - test/jump to test/skip
+	XORLW	0x47	;key=001,flow seq=011
+	BTFSS	_STATUS,2	;key=002,flow seq=011
+;<>Start of new flow, seq=0x12 ancestor = 0x11
+	INCF	_failures,F	;key=000,flow seq=012
+;<>Start of new flow, seq=0x13 ancestor = 0x11
+;; ***	unsaveRegisters  2091
+;;ic
+;; ***	genAssign  9239
+;; ***	aopForSym 434
+;;	520 sym->rname = _uchar0, size = 1
+;; 	line = 9248 result AOP_DIR=_uchar0, left -=-, right AOP_LIT=0x13, size = 1
+;; ***	genAssign  9322
+;#CSRC	and2.c 114
+;  uchar0 = 0x13;
+	MOVLW	0x13	;key=000,flow seq=013
+;;	1241
+;;	1257  _uchar0   offset=0
+	MOVWF	_uchar0	;key=001,flow seq=013
+;;ic
+;; ***	genCall  2358
+;; ***	saveRegisters  2029
+;;ic
+;; ***	genPlus  781
+;; ***	aopForSym 434
+;;	520 sym->rname = _uchar0, size = 1
+;;	861 register type nRegs=1
+;; 	line = 787 result AOP_REG=r0x58, left AOP_DIR=_uchar0, right AOP_LIT=0x01, size = 1
+;; ***	pic14_getDataSize  1751
+;; ***	genPlusIncr  161
+;; 	result AOP_REG, left AOP_DIR, right AOP_LIT
+;; 	genPlusIncr  173
+;; 	genPlusIncr  197
+;; 	couldn't increment 
+;; ***	pic14_getDataSize  1751
+;;	adding lit to something. size 1
+;; ***	genAddLit  455
+;; ***	pic14_getDataSize  1751
+;;  left and result aren't same	genAddLit  680
+;;	1241
+;;	1257  _uchar0   offset=0
+_neg_compound1
+;#CSRC	and2.c 87
+;  uchar0 = ~(uchar0 + 1);
+	INCF	_uchar0,W	;key=002,flow seq=013
+	MOVWF	r0x58	;key=003,flow seq=013
+;;ic
+;; ***	genCpl  1899
+;;	861 register type nRegs=1
+;; ***	aopForSym 434
+;;	520 sym->rname = _uchar0, size = 1
+	COMF	r0x58,W	;key=004,flow seq=013
+;;	1241
+;;	1257  _uchar0   offset=0
+;;     peep 2 - Removed redundant move
+	MOVWF	_uchar0	;key=005,flow seq=013
+;;     peep 1 - test/jump to test/skip
+	XORLW	0xeb	;key=006,flow seq=013
+	BTFSS	_STATUS,2	;key=007,flow seq=013
+;<>Start of new flow, seq=0x14 ancestor = 0x13
+	INCF	_failures,F	;key=000,flow seq=014
+;<>Start of new flow, seq=0x15 ancestor = 0x13
+;; ***	unsaveRegisters  2091
+;;ic
+;; ***	genAssign  9239
 ;; ***	aopForSym 434
 ;;	520 sym->rname = _failures, size = 1
 ;; ***	aopForSym 434
 ;;	520 sym->rname = _success, size = 1
-;; 	line = 9247 result AOP_DIR=_success, left -=-, right AOP_DIR=_failures, size = 1
-;; ***	genAssign  9321
-;; ***	genAssign  9340
+;; 	line = 9248 result AOP_DIR=_success, left -=-, right AOP_DIR=_failures, size = 1
+;; ***	genAssign  9322
+;; ***	genAssign  9341
 ;;	1241
 ;;	1257  _failures   offset=0
-;#CSRC	and2.c 51
+;#CSRC	and2.c 117
 ;  success = failures;
-	MOVF	_failures,W	;key=000,flow seq=007
+	MOVF	_failures,W	;key=000,flow seq=015
 ;;	1241
 ;;	1257  _success   offset=0
 ;;ic
-;; ***	genCall  2355
-;; ***	saveRegisters  2026
+;; ***	genCall  2358
+;; ***	saveRegisters  2029
 ;;ic
 ;; ***	genPlus  781
 ;; ***	aopForSym 434
@@ -753,25 +1087,25 @@ _and_compound2
 _done
 ;#CSRC	and2.c 18
 ;  dummy++;
-	INCF	_dummy,F	;key=001,flow seq=007
+	INCF	_dummy,F	;key=001,flow seq=015
 ;;ic
-;; ***	genLabel  3059
+;; ***	genLabel  3062
 ;_00105_DS_:
 ;;ic
-;; ***	genEndFunction  2829
+;; ***	genEndFunction  2832
 ;;	C$and2.c$20$1$1 ==.
 ;;	XG$done$0$0 ==.
 ;return
-;; ***	unsaveRegisters  2088
+;; ***	unsaveRegisters  2091
 ;;ic
-;; ***	genLabel  3059
-;_00125_DS_:
+;; ***	genLabel  3062
+;_00164_DS_:
 ;;ic
-;; ***	genEndFunction  2829
-;;	C$and2.c$53$1$1 ==.
+;; ***	genEndFunction  2832
+;;	C$and2.c$119$1$1 ==.
 ;;	XG$main$0$0 ==.
 ;return
-	RETURN		;key=002,flow seq=007
-;<>Start of new flow, seq=0x8
+	RETURN		;key=002,flow seq=015
+;<>Start of new flow, seq=0x16
 ; exit point of _main
 	end

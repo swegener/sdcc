@@ -45,7 +45,8 @@ linkrec **linkrecs = NULL; /* all linkage editor records */
 context *currCtxt = NULL;
 short fullname = 0;
 short showfull = 0;
-short userinterrupt = 0;
+char userinterrupt = 0;
+char nointerrupt = 0;
 char contsim = 0;
 char *ssdirl = DATADIR LIB_DIR_SUFFIX ":" DATADIR LIB_DIR_SUFFIX "/small" ;
 char *simArgs[40];
@@ -71,8 +72,14 @@ struct cmdtab
     { "break"    ,  cmdSetUserBp  ,
       "{b}reak\t\t\t [LINE | FILE:LINE | FILE:FUNCTION | FUNCTION | *<address>]\n",
     },
+    { "tbreak"   ,  cmdSetTmpUserBp ,
+      "tbreak\t\t\t [LINE | FILE:LINE | FILE:FUNCTION | FUNCTION | *<address>]\n",
+    },
     { "b"        ,  cmdSetUserBp  , NULL },
 
+    { "jump"   ,  cmdJump ,
+      "jump\t\t\tContinue program being debugged at specified line or address\n [LINE | FILE:LINE | *<address>]\n",
+    },
     { "clear"    ,  cmdClrUserBp  ,
       "{cl}ear\t\t\t [LINE | FILE:LINE | FILE:FUNCTION | FUNCTION]\n"
     },
@@ -127,6 +134,9 @@ struct cmdtab
     },
     { "step"     ,  cmdStep       ,
       "{s}tep\t\t\tStep program until it reaches a different source line.\n"
+    },
+    { "source"   ,  cmdSource      ,
+      "source <FILE>\t\t\tRead commands from a file named FILE.\n"
     },
     { "s"        ,  cmdStep       , NULL },
     { "nexti"    ,  cmdNexti      ,
@@ -659,7 +669,16 @@ int cmdFile (char *s,context *cctxt)
        and function exit break points */
     applyToSet(functions,setEntryExitBP);
 
-    /* ad we are done */
+    setMainContext();
+    return 0;
+}
+
+/*-----------------------------------------------------------------*/
+/* cmdSource - read commands from file                             */
+/*-----------------------------------------------------------------*/
+int cmdSource (char *s, context *cctxt)
+{
+    fprintf(stderr,"'source <file>' command not yet implemented\n",s);
     return 0;
 }
 
@@ -904,6 +923,9 @@ static void parseCmdLine (int argc, char **argv)
           contsim=1;
           continue;
       }
+      if (strncmp(argv[i],"-q",2) == 0) {
+          continue;
+      }
 
       /* model string */
       if (strncmp(argv[i],"-m",2) == 0) {
@@ -987,7 +1009,8 @@ sigintr(int sig)
 {
     /* may be interrupt from user: stop debugger and also simulator */
     userinterrupt = 1;
-    sendSim("stop\n");
+    if ( !nointerrupt )
+        sendSim("stop\n");
 }
 
 /* the only child can be the simulator */
@@ -1010,11 +1033,11 @@ setsignals()
 
     signal(SIGABRT, bad_signal);
     signal(SIGALRM, bad_signal);
-    signal(SIGFPE,  bad_signal);
-    signal(SIGILL,  bad_signal);
+    //signal(SIGFPE,  bad_signal);
+    //signal(SIGILL,  bad_signal);
     signal(SIGPIPE, bad_signal);
     signal(SIGQUIT, bad_signal);
-    signal(SIGSEGV, bad_signal);
+    //signal(SIGSEGV, bad_signal);
 }
 
 /*-----------------------------------------------------------------*/

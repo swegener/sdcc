@@ -51,6 +51,7 @@ void waitForSim(int timeout_ms, char *expect);
 void  closeSimulator ();
 void  sendSim(char *);
 char *simResponse();
+void  simSetPC (unsigned int);
 void  simSetBP (unsigned int);
 void  simClearBP (unsigned int);
 void  simLoadFile(char *);

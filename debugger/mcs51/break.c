@@ -29,6 +29,7 @@
 static hTab *bptable = NULL;
 char doingSteps    = 0;
 char userBpPresent = 0;
+                                
 /* call stack can be 1024 deep */
 STACK_DCL(callStack,function *,1024);
 
@@ -42,7 +43,7 @@ char *debug_bp_type_strings[] =
     "STEP"    ,
     "NEXT"    ,
     "FENTRY"  ,
-    "FEXIT", "", ""};
+    "FEXIT", "TMPUSER", ""};
 #endif
 
 /*-----------------------------------------------------------------*/
@@ -68,20 +69,20 @@ int setBreakPoint (unsigned addr, char addrType, char bpType,
     bp->addrType = addrType;
     bp->bpType = bpType;
     bp->callBack = callBack;
-    bp->bpnum = (bpType == USER ? ++bpnum : 0);
+    bp->bpnum = ((bpType == USER || bpType == TMPUSER)? ++bpnum : 0);
     bp->filename = fileName;
     bp->lineno = lineno;
 
     /* if this is an user break point then
        check if there already exists one for this address */
-    if (bpType == USER)
+    if (bpType == USER || bpType == TMPUSER)
     {
         for ( bpl = hTabFirstItemWK(bptable,addr) ; bpl;
               bpl = hTabNextItemWK(bptable)) 
         {
 
             /* if also a user break point then issue Note : */
-            if (bpl->bpType == USER)
+            if (bpl->bpType == USER || bpType == TMPUSER)
                 fprintf(stderr,"Note: breakpoint %d also set at pc 0x%x\n",
                         bpl->bpnum,bpl->addr);
         }
@@ -124,12 +125,6 @@ void deleteSTEPbp ()
   if (bp->bpType == STEP) {
       hTabDeleteItem(&bptable,bp->addr,bp,DELETE_ITEM,NULL);
 
-#if 0
-      /* if this leaves no other break points then
-         send command to simulator to delete bp from this addr */
-      if (hTabSearch(bptable,bp->addr) == NULL)
-    simClearBP (bp->addr);
-#endif
       free(bp);
   }
     }
@@ -155,14 +150,6 @@ void deleteNEXTbp ()
   if (bp->bpType == NEXT) {
       hTabDeleteItem(&bptable,bp->addr,bp,DELETE_ITEM,NULL);
 
-#if 0
-      /* if this leaves no other break points then
-         send command to simulator to delete bp from this addr */
-      if (hTabSearch(bptable,bp->addr) == NULL) {
-    simClearBP(bp->addr);
-
-      }
-#endif
       free(bp);
   }
     }
@@ -187,7 +174,8 @@ void deleteUSERbp (int bpnum)
   /* if this is a user then delete if break
      point matches or bpnumber == -1 (meaning delete
      all user break points */
-  if (bp->bpType == USER && ( bp->bpnum == bpnum || bpnum == -1)) {
+  if ((bp->bpType == USER || bp->bpType == TMPUSER )
+      && ( bp->bpnum == bpnum || bpnum == -1)) {
       hTabDeleteItem(&bptable,bp->addr,bp,DELETE_ITEM,NULL);
 
       /* if this leaves no other break points then
@@ -234,6 +222,12 @@ void listUSERbp ()
         bp->filename,bp->lineno+1);
 
   }
+  else if (bp->bpType == TMPUSER ) {
+      fprintf(stdout,"%-3d breakpoint      del y   0x%08x at %s:%d\n",
+        bp->bpnum,bp->addr,
+        bp->filename,bp->lineno+1);
+
+  }
     }
 }
 
@@ -260,7 +254,7 @@ void clearUSERbp ( unsigned int addr )
     bp = hTabNextItemWK(bptable)) {
 
   /* if this is a step then delete */
-  if (bp->bpType == USER) {
+  if (bp->bpType == USER || bp->bpType == TMPUSER) {
       hTabDeleteItem(&bptable,bp->addr,bp,DELETE_ITEM,NULL);
 
       /* if this leaves no other break points then
@@ -319,14 +313,25 @@ int dispatchCB (unsigned addr, context *ctxt)
 /*-----------------------------------------------------------------*/
 BP_CALLBACK(fentryCB)
 {
-    Dprintf(D_break, ("break: fentryCB: BP_CALLBACK entry\n"));
+    function *func;
 
-    /* add the current function into the call stack */
-    STACK_PUSH(callStack,ctxt->func);
-
-    /* will have to add code here to get the value of SP
+    /* we save the value of SP
        which will be used to display the value of local variables
        and parameters on the stack */
+    ctxt->func->stkaddr = simGetValue (0x81,'I',1);
+
+    Dprintf(D_break, ("break: fentryCB: BP_CALLBACK entry %s sp=0x%02x %p\n",
+                      ctxt->func->sym->name, 
+                      ctxt->func->stkaddr, p_callStack));
+
+    /* and set laddr of calling function to return addr from stack */
+    if ((func = STACK_PEEK(callStack)))
+    { 
+        /* extern stack ?? 'A' */
+        func->laddr = simGetValue (ctxt->func->stkaddr-1,'B',2);
+    }
+    /* add the current function into the call stack */
+    STACK_PUSH(callStack,ctxt->func);
 
     return 0;
 }
@@ -336,10 +341,18 @@ BP_CALLBACK(fentryCB)
 /*-----------------------------------------------------------------*/
 BP_CALLBACK(fexitCB)
 {
-    Dprintf(D_break, ("break: fexitCB: BP_CALLBACK entry\n"));
-
+    function *func;
     /* pop the top most from the call stack */
-    STACK_POP(callStack);
+    func = STACK_POP(callStack);
+
+    Dprintf(D_break, ("break: fexitCB: BP_CALLBACK entry %s %p\n",func->sym->name, p_callStack));
+
+    /* check main function */
+    if ( STACK_EMPTY(callStack))
+    {
+        fprintf(stdout,"Program exited with code %d.\n",simGetValue (0x82,'I',2));
+        return 1;
+    }
     return 0;
 }
 /*-----------------------------------------------------------------*/
@@ -368,7 +381,8 @@ BP_CALLBACK(userBpCB)
       fprintf(stdout,"%d\t%s",ctxt->asmline+1,
         ctxt->func->mod->asmLines[ctxt->asmline]->src);
     }
-
+    if ( bpType == TMPUSER && bpnum > 0 )
+        deleteUSERbp (bpnum);
     return 1;
 }
 

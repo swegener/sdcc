@@ -207,6 +207,8 @@ typedef struct function {
     set       *afpoints     ;/* set of all ASM execution points in func */
     unsigned   int laddr    ;/* last executed address                   */
     int        lline        ;/* last executed linenumber                */
+    unsigned   int stkaddr  ;/* stackpointer at beginning of function
+                              * (not reentrant ! ) only actual */
 } function ;
 
 /*-----------------------------------------------------------------*/
@@ -251,7 +253,8 @@ extern set *symbols  ; /* set of symbols */
 extern set *sfrsymbols;/* set of symbols of sfr or sbit */
 
 extern char *currModName ;
-extern short userinterrupt ;
+extern char userinterrupt ;
+extern char nointerrupt ;
 extern short showfull ;
 extern int nStructs ;
 extern struct structdef **structs ; /* all structures */

@@ -24,9 +24,11 @@
 #ifndef SDCDB_CMD_H
 #define SDCDB_CMD_H
 /* forward definition for command functions */
+extern int cmdSetTmpUserBp (char *, context *);
 extern int cmdSetUserBp (char *, context *);
 extern int cmdClrUserBp (char *, context *);
 extern int cmdHelp      (char *, context *);
+extern int cmdJump      (char *, context *);
 extern int cmdListSrc   (char *, context *);
 extern int cmdListAsm   (char *, context *);
 extern int cmdSetOption (char *, context *);
@@ -55,10 +57,13 @@ extern int cmdDisasm1   (char *, context *);
 extern int cmdDisasmF   (char *, context *);
 extern int cmdDisplay   (char *, context *);
 extern int cmdUnDisplay (char *, context *);
+extern int cmdSource    (char *, context *);
 extern void displayAll  (context *);
 
 extern int cmdListModules (char *s, context *cctxt);
 extern int cmdListFunctions (char *s, context *cctxt);
 extern int cmdListSymbols (char *s, context *cctxt);
+
+extern void setMainContext( void);
 
 #endif

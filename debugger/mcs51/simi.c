@@ -36,7 +36,6 @@
 #endif
 FILE *simin ; /* stream for simulator input */
 FILE *simout; /* stream for simulator output */
-typedef void (*sighandler_t)(int);
 
 int sock = -1; /* socket descriptor to comm with simulator */
 pid_t simPid = -1;
@@ -288,6 +287,15 @@ static int getMemString(char *buffer, char wrflag,
     return cachenr;
 }
 
+void simSetPC( unsigned int addr )
+{
+    char buffer[40];
+    sprintf(buffer,"pc %d\n", addr);
+    sendSim(buffer);
+    waitForSim(100,NULL);
+    simResponse();   
+}
+
 int simSetValue (unsigned int addr,char mem, int size, unsigned long val)
 {
     char cachenr, i;
@@ -423,7 +431,6 @@ void simLoadFile (char *s)
 /*-----------------------------------------------------------------*/
 unsigned int simGoTillBp ( unsigned int gaddr)
 {
-    sighandler_t oldsig;
     char *sr;
     unsigned addr ; 
     char *sfmt;
@@ -481,7 +488,7 @@ unsigned int simGoTillBp ( unsigned int gaddr)
         sr++ ;
     }
 
-    oldsig = signal(SIGINT,SIG_IGN);
+    nointerrupt = 1;
     /* get answer of stop command */
     if ( userinterrupt )
         waitForSim(wait_ms, NULL);
@@ -490,7 +497,7 @@ unsigned int simGoTillBp ( unsigned int gaddr)
     sendSim ("pc\n");
     waitForSim(100, NULL);
     sr = simResponse();
-    signal(SIGINT,oldsig);
+    nointerrupt = 0;
 
     gaddr = strtol(sr+3,0,0);
     return gaddr;
@@ -519,6 +526,7 @@ void closeSimulator ()
         simactive = 0;
         return;
     }
+    simactive = 0;
     sendSim("quit\n");
     fclose (simin);
     fclose (simout);

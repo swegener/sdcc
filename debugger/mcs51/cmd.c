@@ -30,7 +30,8 @@
 #include "newalloc.h"
 
 /* default number of lines to list out */
-int listLines = 16;
+#define LISTLINES 10
+static int listlines = LISTLINES;
 
 /* mainly used to retain a reference to the active module being
    listed.  May be used as a general context for other commands if
@@ -381,7 +382,7 @@ DEFSETFUNC(symWithAddr)
 /*-----------------------------------------------------------------*/
 /* setBPatModLine - set break point at the line specified for the  */
 /*-----------------------------------------------------------------*/
-static void setBPatModLine (module *mod, int line)
+static void setBPatModLine (module *mod, int line, char bpType )
 {
   int next_line;
 
@@ -404,7 +405,7 @@ static void setBPatModLine (module *mod, int line)
 	  next_line++ ) {
 	if (srcMode == SRC_CMODE) {
 	    if (mod->cLines[next_line]->addr) {
-		setBreakPoint (mod->cLines[next_line]->addr, CODE, USER, 
+		setBreakPoint (mod->cLines[next_line]->addr, CODE, bpType, 
 			       userBpCB, mod->c_name, next_line);
 		return;
 //		break;
@@ -412,7 +413,7 @@ static void setBPatModLine (module *mod, int line)
 	}
 	else {
 	   if (mod->asmLines[next_line]->addr) {
-	       setBreakPoint (mod->asmLines[next_line]->addr, CODE, USER, 
+	       setBreakPoint (mod->asmLines[next_line]->addr, CODE, bpType, 
 			      userBpCB, mod->asm_name, next_line);
 		return;
 //	       break;
@@ -644,16 +645,13 @@ DEFSETFUNC(lineNearAddr)
 /*-----------------------------------------------------------------*/
 /* discoverContext - find out the current context of the bp        */
 /*-----------------------------------------------------------------*/
-context *discoverContext (unsigned addr)
+context *discoverContext (unsigned addr, function *func)
 {
-    function *func = NULL;
     module   *mod  = NULL;
     int line = 0;
 
-    currentFrame = 0; 
-
     /* find the function we are in */
-    if (!applyToSet(functions,funcInAddr,addr,&func)) {
+    if (!func && !applyToSet(functions,funcInAddr,addr,&func)) {
         if (!applyToSet(functions,funcWithName,"main",&func) ||
             !applyToSet(modules,moduleLineWithAddr,addr,&mod,NULL))
         {
@@ -701,7 +699,6 @@ void simGo (unsigned int gaddr)
     unsigned int addr ;
     context *ctxt;
     int rv;
-    static int initial_break_flag = 0;
 
  top:    
     if ( userinterrupt )
@@ -714,7 +711,8 @@ void simGo (unsigned int gaddr)
     /* got the pc for the break point now first
        discover the program context i.e. module, function 
        linenumber of the source etc, etc etc */
-    ctxt = discoverContext (addr);
+    currentFrame = 0; 
+    ctxt = discoverContext (addr, NULL);
     
     /* dispatch all the break point call back functions */
     rv = dispatchCB (addr,ctxt);    
@@ -724,42 +722,12 @@ void simGo (unsigned int gaddr)
        non-zero if an user break point has been hit
        if not then we continue with the execution 
        of the program */
-    if (!rv) {
-      if (!initial_break_flag) {
-        initial_break_flag = 1;  // kludge to stop only at first run
-#if 0
-        fprintf(stdout, "Stopping at entry.  You can now list and set breakpoints\n");
-#endif
-      }
-      else {
+    if (!rv) 
+    {
        	if ( gaddr == 0 )
             gaddr = -1;
        	if ( gaddr == -1 || doingSteps == 1 )
             goto top ;
-      }
-
-// notes: kpb
-// I took this out, after running "run" it would just keep re-running
-// even after a lot of break points hit.  For some reason above code
-// not triggering(dispatchCB).  This seems to be by design, startup adds
-// a bunch of breakpoints-but they are not USER breakpoints.  Perhaps the
-// debugger changed with its implementation of "go"("run").  It seems we
-// need to add a "next" or "step" followed by a "run"...
-// I added a "step" in simi.c when we want a resume function, this seems
-// to work.
-
-// still there is question of how do we stop it initially, since
-// it must be started before it can get a context.  If so, we would
-// want it to just run up to an initial entry point you'd think...
-// I don't see why we can't set breakpoints before an initial run,
-// this does not seem right to me.
-
-// line #'s are a bit off too.
-
-#if 0
-	gaddr = -1;
-	goto top ;
-#endif
     }
     
 }
@@ -975,10 +943,7 @@ int cmdDisasmF(char *s, context *cctxt)
     return cmdDisasm( s, cctxt, 2);
 }
 
-/*-----------------------------------------------------------------*/
-/* cmdSetUserBp - set break point at the user specified location   */
-/*-----------------------------------------------------------------*/
-int cmdSetUserBp (char *s, context *cctxt)
+static int commonSetUserBp(char *s, context *cctxt, char bpType)
 {
     char *bp ;
     function *func = NULL;
@@ -1014,10 +979,10 @@ int cmdSetUserBp (char *s, context *cctxt)
 	if (cctxt->func) {
 	    if (srcMode == SRC_CMODE)
 		/* set the break point */
-		setBreakPoint ( cctxt->addr , CODE , USER , userBpCB ,
+		setBreakPoint ( cctxt->addr , CODE , bpType , userBpCB ,
 				cctxt->func->mod->c_name, cctxt->cline);
 	    else
-		setBreakPoint ( cctxt->addr , CODE , USER , userBpCB ,
+		setBreakPoint ( cctxt->addr , CODE , bpType , userBpCB ,
 				cctxt->func->mod->asm_name, cctxt->asmline);
 		
 	}
@@ -1040,7 +1005,7 @@ int cmdSetUserBp (char *s, context *cctxt)
             }
             else
             {
-                setBreakPoint ( braddr , CODE , USER , userBpCB ,
+                setBreakPoint ( braddr , CODE , bpType , userBpCB ,
                             modul->c_name,line);
             }
             goto ret ;
@@ -1051,7 +1016,7 @@ int cmdSetUserBp (char *s, context *cctxt)
             if ( !applyToSet(func->cfpoints,lineAtAddr,braddr,
                                   &line,NULL,NULL))
                 applyToSet(func->cfpoints,lineNearAddr,braddr,&line,NULL,NULL);
-            setBreakPoint ( braddr , CODE , USER , userBpCB ,
+            setBreakPoint ( braddr , CODE , bpType , userBpCB ,
                             func->mod->c_name,line);
         }
 	goto ret ;
@@ -1072,12 +1037,12 @@ int cmdSetUserBp (char *s, context *cctxt)
 		if (!applyToSet(functions,funcWithName,"main"))
 		    fprintf(stderr,"Function \"main\" not defined.\n");
 		else 
-		    setBPatModLine(func->mod,line);
+		    setBPatModLine(func->mod,line, bpType);
 	    } else 
-		setBPatModLine(cctxt->func->mod,line);
+		setBPatModLine(cctxt->func->mod,line, bpType);
 	} else {
 		if (list_mod) {
-			setBPatModLine(list_mod,line);
+			setBPatModLine(list_mod,line, bpType);
 		} else {
 		  fprintf(stdout,"Sdcdb fails to have module symbol context at %d\n", __LINE__);
 		}
@@ -1106,7 +1071,7 @@ int cmdSetUserBp (char *s, context *cctxt)
 	/* case c) filename:lineno */
 	if (isdigit(*(bp +1))) {	    	    
 	 
-	    setBPatModLine (mod,atoi(bp+1)-1);	    
+	    setBPatModLine (mod,atoi(bp+1)-1,bpType);	    
 	    goto ret;
 	    
 	}
@@ -1117,7 +1082,7 @@ int cmdSetUserBp (char *s, context *cctxt)
 	    setBPatModLine (mod,
 			    (srcMode == SRC_CMODE ? 
 			     func->entryline :
-			     func->aentryline));
+			     func->aentryline),bpType);
 	
 	goto ret;
     }
@@ -1129,9 +1094,121 @@ int cmdSetUserBp (char *s, context *cctxt)
 	setBPatModLine(func->mod,
 		       (srcMode == SRC_CMODE ?
 			func->entryline :
-			func->aentryline));
+			func->aentryline),bpType);
 
  ret:    
+    return 0;
+}
+
+/*-----------------------------------------------------------------*/
+/* cmdSetTmpUserBp - settempory break point at the user specified location   */
+/*-----------------------------------------------------------------*/
+int cmdSetTmpUserBp (char *s, context *cctxt)
+{
+    return commonSetUserBp(s, cctxt, TMPUSER );
+}
+
+/*-----------------------------------------------------------------*/
+/* cmdSetUserBp - set break point at the user specified location   */
+/*-----------------------------------------------------------------*/
+int cmdSetUserBp (char *s, context *cctxt)
+{
+    return commonSetUserBp(s, cctxt, USER );
+}
+
+/*-----------------------------------------------------------------*/
+/* cmdJump - set program counter                                   */
+/*-----------------------------------------------------------------*/
+int cmdJump (char *s, context *cctxt)
+{
+    char *bp ;
+    function *func = NULL;
+    if (STACK_EMPTY(callStack)) 
+    {
+        fprintf(stdout,"The program is not running.\n");
+        return 0;
+    } 
+
+    /* white space skip */
+    while (*s && isspace(*s)) s++;
+    
+    /* null terminate it after stripping trailing blanks*/
+    bp = s + strlen(s);
+    while (bp != s && isspace(*bp)) bp--;
+    *bp = '\0';
+    if (! *s ) 
+    {
+        fprintf(stdout,"No argument: need line or *addr.\n");
+        return 0;
+    }
+    if ( *s == '*' && isdigit(*(s+1)))
+    {
+        unsigned int addr = atoi(s);
+        if (cctxt && cctxt->func &&
+            cctxt->func->sym->addr <= addr &&
+            cctxt->func->sym->eaddr >= addr)
+        {
+            simSetPC(addr);
+            return 0;
+        }
+        fprintf(stdout,"Warning addr 0x%x outside actual function.\n",addr);
+        simSetPC(addr);
+        return 0;
+    }
+    if (isdigit(*s)) 
+    {
+        /* get the lineno */
+        int line = atoi(s) -1;
+        if (!cctxt || !cctxt->func || !cctxt->func->mod) 
+        {
+		    fprintf(stderr,"Function not defined.\n");
+            return 0;
+        }
+        if (line >= cctxt->func->entryline &&
+            line <= cctxt->func->exitline )
+        {
+            simSetPC(cctxt->func->mod->cLines[line]->addr);
+            return 0;
+        }
+        if (line >= cctxt->func->mod->ncLines )
+        {
+		    fprintf(stderr,"line not in module.\n");
+            return 0;
+        }
+        fprintf(stdout,"Warning line %d outside actual function.\n",line+1);
+        simSetPC(cctxt->func->mod->cLines[line]->addr);
+        return 0;
+    }
+    if ((bp = strchr(s,':'))) 
+    {
+        int line;
+        module *mod = NULL;
+        *bp++ = '\0';
+        if (!applyToSet(modules,moduleWithCName,s,&mod)) 
+        {
+            fprintf (stderr,"No source file named %s.\n",s);
+            return 0;
+        } 
+        if (!isdigit(*bp)) 
+        {	    	    	 
+            fprintf (stderr,"No line number.\n");
+            return 0;	    
+        }
+        line = atoi(bp) -1;
+        if (line >= mod->ncLines )
+        {
+		    fprintf(stderr,"line not in module.\n");
+            return 0;
+        }
+        if ( mod != cctxt->func->mod ||
+             line < cctxt->func->entryline ||
+             line > cctxt->func->exitline )
+        {
+            fprintf(stdout,"Warning line %d outside actual function.\n",
+                    line+1);
+        }             
+        simSetPC(mod->cLines[line]->addr);
+    }
     return 0;
 }
 
@@ -1166,6 +1243,21 @@ int cmdSetOption (char *s, context *cctxt)
 	return 0;
     }
 
+    if (strncmp(s,"listsize ",9) == 0) 
+    {
+        listlines = strtol(s+9,0,0);
+        if ( listlines < LISTLINES )
+            listlines = LISTLINES;
+        return 0;
+    }
+
+#ifdef SDCDB_DEBUG
+    if (strncmp(s,"debug ",6) == 0) 
+    {
+        sdcdbDebug = strtol(s+6,0,0);
+        return 0;
+    }
+#endif
     if (strncmp(s,"variable ",9) == 0) 
     {
         symbol *sym ;
@@ -1198,7 +1290,7 @@ int cmdSetOption (char *s, context *cctxt)
 /*-----------------------------------------------------------------*/
 int cmdContinue (char *s, context *cctxt)
 {
-    if (!cctxt || !cctxt->func) {
+    if (STACK_EMPTY(callStack)) {
 	fprintf(stdout,"The program is not being run.\n");
 	return 0;
     }
@@ -1242,7 +1334,7 @@ int cmdDelUserBp (char *s, context *cctxt)
 int cmdStepi (char *s, context *cctxt)
 {
 
-    if (!cctxt || !cctxt->func || !cctxt->func->mod) 
+    if (STACK_EMPTY(callStack))
         fprintf(stdout,"The program is not being run.\n");
     else 
     {
@@ -1261,7 +1353,7 @@ int cmdStep (char *s, context *cctxt)
 {
     function *func = NULL;
 
-    if (!cctxt || !cctxt->func || !cctxt->func->mod) 
+    if (STACK_EMPTY(callStack))
         fprintf(stdout,"The program is not being run.\n");
     else {
         /* if we are @ the end of a function then set
@@ -1342,7 +1434,7 @@ int cmdStep (char *s, context *cctxt)
 /*-----------------------------------------------------------------*/
 int cmdNexti (char *s, context *cctxt)
 {
-    if (!cctxt || !cctxt->func || !cctxt->func->mod) 
+    if (STACK_EMPTY(callStack))
         fprintf(stdout,"The program is not being run.\n");
     else 
     {
@@ -1363,7 +1455,7 @@ int cmdNext (char *s, context *cctxt)
     /* next is almost the same as step except we don't
        we don't set break point for all function entry
        points */
-    if (!cctxt || !cctxt->func || !cctxt->func->mod) 
+    if (STACK_EMPTY(callStack))
         fprintf(stdout,"The program is not being run.\n");
     else {
         /* if we are @ the end of a function then set
@@ -1433,7 +1525,7 @@ int cmdNext (char *s, context *cctxt)
 int cmdRun (char *s, context *cctxt)
 {
     char buff[10];
-    if (!cctxt || !cctxt->func || !cctxt->func->mod) {
+    if (STACK_EMPTY(callStack)) {
 	fprintf(stdout,"Starting program\n");
     if ( ! simactive )
     {
@@ -1797,12 +1889,14 @@ static void infoStack(context *ctxt)
 
     STACK_STARTWALK(callStack) ;
     while ((func = STACK_WALK(callStack))) {
+    Dprintf(D_break, ("break: infoStack: %s %p (%p)\n",func->sym->name, w_callStack,p_callStack));
 
 	fprintf(stdout,"#%d  0x%08x in %s () at %s:%d\n",i++,
 		func->laddr,func->sym->name,
-		func->mod->c_name,func->lline);
+		func->mod->c_name,func->lline+1);
     }
-
+    if ( !i )
+        fprintf(stdout,"no stack.\n");
 }
 
 /*-----------------------------------------------------------------*/
@@ -1840,7 +1934,51 @@ int cmdInfo (char *s, context *cctxt)
 	cmdListSrc (s+4,cctxt);
 	return 0;
     }
-
+    if (strncmp(s,"source",6) == 0) 
+    {
+        module *m;
+        if ( s[6] == 's' )
+        {
+            int k = 0;
+            fprintf(stdout,"Source files for which symbols have been read in:\n\n");
+            for (m = setFirstItem(modules); m ; m = setNextItem(modules))
+            {
+                fprintf(stdout,"%s%s, %s",k ? ", ":"",m->cfullname, m->afullname); 
+                k = 1;
+            }
+            fprintf(stdout,"\n"); 
+        }
+        else
+        {
+            if (!cctxt || !cctxt->func || !cctxt->func->mod) 
+            {
+                fprintf(stdout,"No source file loaded\n");
+                return 0;
+            }
+            m = cctxt->func->mod;
+            fprintf(stdout,"Current source file is %s\n",m->c_name);
+            fprintf(stdout,"Located in %s\n",m->cfullname);
+            fprintf(stdout,"Contains %d lines.\nSource language is c.\n",
+                    m->ncLines);
+        }
+        return 0;
+    }
+    if (strncmp(s,"functions",7) == 0) 
+    {
+        function *f;
+        module *m = NULL;
+        fprintf(stdout,"All defined functions:\n");
+        for ( f = setFirstItem(functions); f ; f = setNextItem(functions))
+        {
+            if ( f->mod != m )
+            {
+                m = f->mod;
+                fprintf(stdout,"\nFile %s\n", m->c_name);
+            }
+            fprintf(stdout,"%s();\n",f->sym->name);
+        }
+        return 0;
+    }
     /* info stack display call stack */
     if (strcmp(s,"stack") == 0) {
 	infoStack(cctxt);
@@ -1899,7 +2037,9 @@ int cmdListSrc (char *s, context *cctxt)
     static int currline = 0;
     int i =0 ;
     int pline = 0;
-    int llines = listLines;
+    int llines = listlines;
+    function *func = NULL;
+
 
     while (*s && isspace(*s)) s++;
     
@@ -1907,13 +2047,13 @@ int cmdListSrc (char *s, context *cctxt)
        can be of the following formats
        LINE          - just line number
        FILE:LINE     - filename line number
+       FILE:LINE,LASTLINE  + last line
        FUNCTION      - list a function
        FILE:FUNCTION - function in file */
 
     if (*s) {
 	/* case a) LINE */
 	if (isdigit(*s)) {
-        pline = strtol(s,0,10) - 1;
 	    if (!cctxt || !cctxt->func || !cctxt->func->mod) {
 	      if (!list_mod) {
 	        fprintf(stdout,"Sdcdb fails to have a proper context at %d.\n", __LINE__);
@@ -1922,10 +2062,19 @@ int cmdListSrc (char *s, context *cctxt)
 	    }
 	    else
 	      list_mod = cctxt->func->mod;
+        pline = strtol(s,&s,10) - 1;
+        if (s && (s = strchr(s,','))) 
+        {
+            /* LINE,LASTLINE */
+            llines = strtol(s+1,0,10); 
+            if ( llines > 0 )
+                llines -= pline+1;
+            else
+                llines = listlines;
+        }
 	}
 	else {
 	    char *bp;
-	    function *func = NULL;
 	    
 	    /* if ':' present then FILE:LINE || FILE:FUNCTION */
 	    if ((bp = strchr(s,':'))) {
@@ -1945,7 +2094,16 @@ int cmdListSrc (char *s, context *cctxt)
 			    return 0;
 			}
 		    }
-		    pline = strtol(bp,0,10) - 1;
+		    pline = strtol(bp,&bp,10) - 1;
+            if (bp && (bp = strchr(bp,','))) 
+            {
+                /* FILE:LINE,LASTLINE */
+                llines = strtol(bp+1,0,10); 
+                if ( llines > 0 )
+                    llines -= pline+1;
+                else
+                    llines = listlines;
+            }
 		} else {
 		    /* FILE:FUCTION */
 		    if (!applyToSet(functions,funcWithNameModule,bp,s,&func)) {
@@ -2012,14 +2170,43 @@ int cmdListSrc (char *s, context *cctxt)
       fprintf(stdout,"Sdcdb fails to have a valid module context at %d.\n", __LINE__);
       return 0;
     }
-    
-    if (llines > listLines) llines = listLines;
 
+    if ( pline < 0 )
+        return 0;
     if ( infomode )
     {
-	    fprintf(stdout,"Line %d of \"%s\" starts at address 0x%08x.\n",pline+1,
-		    list_mod->c_name, list_mod->cLines[pline]->addr);
+        int firstaddr , lastaddr ;
+	    if ( pline  >= list_mod->ncLines )
+            pline = cctxt->cline;
+        firstaddr = lastaddr = list_mod->cLines[pline]->addr;
+        if (!func && cctxt && cctxt->func )
+            func = cctxt->func;
+	    fprintf(stdout,"Line %d of \"%s\" starts at address 0x%08x <%s+%d>", 
+                pline+1,
+                list_mod->c_name, lastaddr,
+                func ? func->sym->name : "?",
+                func ? lastaddr -func->sym->addr : 0);
+        llines = pline +1;
+        while ( pline < list_mod->ncLines )
+        {
+            pline++;
+            if ( list_mod->cLines[pline]->addr > lastaddr )
+            {
+                lastaddr = list_mod->cLines[pline]->addr -1;
+                break;
+            }
+        }
+        fprintf(stdout," and ends at 0x%08x <%s+%d>.\n", 
+                lastaddr,
+                func ? func->sym->name : "?",
+                func ? lastaddr -func->sym->addr : 0);
         infomode=0;
+        if ( func )
+            fprintf(stdout,"\032\032%s:%d:1:beg:0x%08x\n",
+                    func->mod->cfullname,
+                    llines,firstaddr);
+        else
+            showfull=1;
         return 0;
     }
     for ( i = 0 ; i < llines ; i++ ) {
@@ -2849,39 +3036,46 @@ int cmdSimulator (char *s, context *cctxt)
     return 0;
 }
 
-static int printFrame(int framenr, int getlast)
+void setMainContext()
+{
+    function *func = NULL;
+    currentFrame = 0; 
+    if (!applyToSet(functions,funcWithName,"main",&func) &&
+        !applyToSet(functions,funcWithName,"_main",&func))
+        return;
+
+    discoverContext (func->sym->addr, func);
+}
+    
+static void printFrame()
 {
     int i;
     function *func     = NULL;
     function *lastfunc = NULL;
 
-    STACK_STARTWALK(callStack) ;
-    if ( framenr < 0 )
-        framenr = 0;
-    for ( i = 0; i <= framenr ; i++ )
+    if ( currentFrame < 0 )
     {
-        lastfunc = func;
+        currentFrame = 0;
+        fprintf(stdout,"Bottom (i.e., innermost) frame selected; you cannot go down.\n");
+        return;
+    }
+    STACK_STARTWALK(callStack) ;
+    for ( i = 0; i <= currentFrame ; i++ )
+    {
         func = STACK_WALK(callStack);
         if ( !func )
         {
-            framenr = i-1;
-            break;
+            currentFrame = i-1;
+            fprintf(stdout,"Initial frame selected; you cannot go up.\n");
+            return;
         }
     }
-    if (! func && getlast )
-        func = lastfunc;
+    fprintf(stdout,"#%d  0x%08x in %s () at %s:%d\n",
+            currentFrame,func->laddr,func->sym->name,func->mod->c_name,func->lline+1);
+    fprintf(stdout,"\032\032%s:%d:1:beg:0x%08x\n",
+            func->mod->cfullname,func->lline+1,func->laddr);
 
-    if ( func )
-    {
-        fprintf(stdout,"#%d  0x%08x in %s () at %s:%d\n",
-                framenr,func->laddr,func->sym->name,func->mod->c_name,func->lline+1);
-        fprintf(stdout,"\032\032%s:%d:1:beg:0x%08x\n",
-                func->mod->cfullname,func->lline+1,func->laddr);
-    }
-    else
-        fprintf(stdout,"No stack.\n");
-
-    return framenr;
+    discoverContext (func->laddr, func);
 }
 
 
@@ -2896,7 +3090,7 @@ int cmdUp(char *s, context *cctxt)
     else
         currentFrame++ ;
 
-    currentFrame = printFrame(currentFrame, 1 );
+    printFrame();
 	return 0;
 }
 
@@ -2911,7 +3105,7 @@ int cmdDown(char *s, context *cctxt)
     else
         currentFrame-- ;
 
-    currentFrame = printFrame(currentFrame, 1 );
+    printFrame();
 	return 0;
 }
 /*-----------------------------------------------------------------*/
@@ -2924,10 +3118,8 @@ int cmdFrame (char *s, context *cctxt)
 
     while (isspace(*s)) s++;
     if ( *s )
-        framenr = strtol(s,0,10);
-    else
-        framenr = currentFrame;
-    printFrame( framenr, 0 );
+        currentFrame = strtol(s,0,10);
+    printFrame();
     return 0;
 }
 
@@ -2936,7 +3128,7 @@ int cmdFrame (char *s, context *cctxt)
 /*-----------------------------------------------------------------*/
 int cmdFinish (char *s, context *ctxt)
 {
-    if (!ctxt || ! ctxt->func) {
+    if (STACK_EMPTY(callStack)) {
 	fprintf(stdout,"The program is not running.\n");
 	return 0;
     }
@@ -2952,6 +3144,7 @@ int cmdFinish (char *s, context *ctxt)
     }
 
     simGo(-1);
+    showfull = 1;
     return 0;
     
 }

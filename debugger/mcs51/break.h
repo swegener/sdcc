@@ -35,7 +35,8 @@ enum {
     STEP    ,
     NEXT    ,
     FENTRY  ,
-    FEXIT};  
+    FEXIT,
+    TMPUSER };  
 
 typedef struct breakp
 {

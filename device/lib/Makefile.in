@@ -65,7 +65,7 @@ SOURCES		= _atof.c _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
 		  calloc.c malloc.c realloc.c free.c \
 		  serial.c ser_ir.c printfl.c \
 		  printf_large.c sprintf.c vprintf.c puts.c gets.c \
-		  assert.c time.c printf_fast.c bpx.c \
+		  assert.c time.c printf_fast.c printf_tiny.c bpx.c \
 		  fabsf.c frexpf.c ldexpf.c expf.c powf.c sincosf.c sinf.c \
 		  cosf.c logf.c log10f.c sqrtf.c tancotf.c tanf.c cotf.c \
 		  asincosf.c asinf.c acosf.c atanf.c atan2f.c sincoshf.c \

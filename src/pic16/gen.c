@@ -12820,7 +12820,7 @@ static void genAssign (iCode *ic)
 				pic16_popCopyReg(&pic16_pc_tblptru)));
 	}
 
-	size = min(AOP_SIZE(right), AOP_SIZE(result));
+	size = min(getSize(OP_SYM_ETYPE(right)), AOP_SIZE(result));
 	while(size--) {
 		pic16_emitpcodeNULLop(POC_TBLRD_POSTINC);
 		pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_tablat),
@@ -12828,8 +12828,9 @@ static void genAssign (iCode *ic)
 		offset++;
 	}
 
-	if(AOP_SIZE(result) > AOP_SIZE(right)) {
-		size = AOP_SIZE(result) - AOP_SIZE(right);
+	size = getSize(OP_SYM_ETYPE(right));
+	if(AOP_SIZE(result) > size) {
+		size = AOP_SIZE(result) - size;
 		while(size--) {
 			pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(result), offset));
 			offset++;
@@ -13566,10 +13567,26 @@ static void genReceive (iCode *ic)
 static void
 genDummyRead (iCode * ic)
 {
-  pic16_emitcode ("; genDummyRead","");
-  pic16_emitcode ("; not implemented","");
+  operand *op;
+  int i;
 
-  ic = ic;
+  op = IC_RIGHT(ic);
+  if (op && IS_SYMOP(op)) {
+    if (IN_CODESPACE(SPEC_OCLS(OP_SYM_ETYPE(op)))) {
+      fprintf (stderr, "%s: volatile symbols in codespace?!? -- might go wrong...\n", __FUNCTION__);
+      return;
+    }
+    pic16_aopOp (op, ic, FALSE);
+    for (i=0; i < AOP_SIZE(op); i++) {
+      // may need to protect this from the peepholer -- this is not nice but works...
+      pic16_addpCode2pBlock(pb,pic16_newpCodeAsmDir(";", "VOLATILE READ - BEGIN"));
+      pic16_mov2w (AOP(op),i);
+      pic16_addpCode2pBlock(pb,pic16_newpCodeAsmDir(";", "VOLATILE READ - END"));
+    } // for i
+    pic16_freeAsmop (op, NULL, ic, TRUE);
+  } else if (op) {
+    fprintf (stderr, "%s: not implemented for non-symbols (volatile operand might not be read)\n", __FUNCTION__);
+  } // if
 }
 
 /*-----------------------------------------------------------------*/

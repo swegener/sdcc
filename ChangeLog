@@ -1,3 +1,12 @@
+2005-01-26 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c (genAssign): fixed assignment from longs
+	  in codespace (were cut to three bytes)
+	* (genDummyRead): implemented (except for CODESPACE...),
+	  fixed bug #1108575
+	* src/pic16/glue.c (emitStatistics): beautified
+	* device/lib/pic16/libm/Makefile: added include path
+
 2004-01-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/z80/gen.c (aopPut): fixed bug #1103902

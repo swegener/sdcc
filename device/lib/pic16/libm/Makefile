@@ -63,6 +63,7 @@ SRCS	=	acosf  \
 COMPILE_FLAGS	+= $(MODELFLAGS) $(OPT_FLAGS)
 
 #CFLAGS	+= -I$(LIBC_INC_DIR)
+CFLAGS += -I $(PRJDIR)/device/include/pic16
 
 
 CFILES	= $(patsubst %,%.c,$(SRCS))

@@ -1564,15 +1564,18 @@ pic16emitOverlay (FILE * afile)
 
 void emitStatistics(FILE *asmFile)
 {
+  unsigned long isize, udsize;
   statistics.isize = pic16_countInstructions();
+  isize = (statistics.isize >= 0) ? statistics.isize : 0;
+  udsize = (statistics.udsize >= 0) ? statistics.udsize : 0;
 	
   fprintf (asmFile, "\n\n; Statistics:\n");
-  fprintf (asmFile, "; code size:\t%ld (0x%lx) bytes\n;\t\t%ld (0x%lx) words\n",
-    statistics.isize, statistics.isize,
-    statistics.isize>>1, statistics.isize>>1);
-  fprintf (asmFile, "; udata size:\t%ld (0x%lx) bytes\n", 
-    statistics.udsize, statistics.udsize);
-  fprintf (asmFile, "; access size:\t%ld (0x%lx) bytes\n",
+  fprintf (asmFile, "; code size:\t%5ld (0x%04lx) bytes (%3.2f%%)\n;           \t%5ld (0x%04lx) words\n",
+    isize, isize, (isize*100.0)/(128 << 10),
+    isize>>1, isize>>1);
+  fprintf (asmFile, "; udata size:\t%5ld (0x%04lx) bytes (%3.2f%%)\n",
+    udsize, udsize, (udsize*100.0) / ((pic16 ? pic16->RAMsize : 0x200) -256));
+  fprintf (asmFile, "; access size:\t%5ld (0x%04lx) bytes\n",
     statistics.intsize, statistics.intsize);
 
   fprintf (asmFile, "\n\n");

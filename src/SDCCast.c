@@ -605,7 +605,7 @@ processParms (ast * func,
 	      value *defParm,
 	      ast * actParm,
 	      int *parmNumber, // unused, although updated
-	      bool rightmost) // double checked?
+	      bool rightmost)
 {
   /* if none of them exist */
   if (!defParm && !actParm)
@@ -3093,13 +3093,15 @@ decorateType (ast * tree)
 
       if (processParms (tree->left,
 			FUNC_ARGS(tree->left->ftype),
-			tree->right, &parmNumber, TRUE))
+			tree->right, &parmNumber, TRUE)) {
+	//fprintf (stderr, "jwk: error in processParms()\n");
 	goto errorTreeReturn;
+      }
 
       if (options.stackAuto || IFFUNC_ISREENT (LTYPE (tree)))
 	{
-	  //IFFUNC_ARGS(tree->left->ftype) = 
-	  //reverseVal (IFFUNC_ARGS(tree->left->ftype));
+	  //FUNC_ARGS(tree->left->ftype) = 
+	  //reverseVal (FUNC_ARGS(tree->left->ftype));
 	  reverseParms (tree->right);
 	}
 
@@ -4171,7 +4173,7 @@ createFunction (symbol * name, ast * body)
   body = resolveSymbols (body);	/* resolve the symbols */
   body = decorateType (body);	/* propagateType & do semantic checks */
 
-  ex = newAst_VALUE (symbolVal (name)); /* create name */
+  ex = newAst_VALUE (symbolVal (name));	/* create name */
   ex = newNode (FUNCTION, ex, body);
   ex->values.args = FUNC_ARGS(name->type);
   ex->decorated=1;
@@ -4275,9 +4277,9 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		  if (arg) {
 		    fprintf (outfile, ", ");
 		  }
-		  printTypeChain (args->type, outfile);
+		  printTypeChain (args ? args->type : NULL, outfile);
 		  arg++;
-		  args=args->next;
+		  args= args ? args->next : NULL;
 		} while (args);
 		fprintf(outfile,")\n");
 		ast_print(tree->left,outfile,indent);
@@ -4811,10 +4813,9 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		ast_print(tree->right,outfile,indent+4);
 		return;
 	case PARAM:
-		fprintf(outfile,"PARM ");
+		fprintf(outfile,"PARMS\n");
 		ast_print(tree->left,outfile,indent+4);
 		if (tree->right && !IS_AST_PARAM(tree->right)) {
-			fprintf(outfile,"PARM ");
 			ast_print(tree->right,outfile,indent+4);
 		}
 		return ;

@@ -10,6 +10,7 @@
 #  if defined(type_c)
 #    define _SDCC_NO_ASM_LIB_FUNCS 1
 #    define near
+#    define long int
 #    include "../../../../../device/lib/_mullong.c"
 #  else
 #    define _mullong(a,b) (a*b)

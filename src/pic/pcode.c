@@ -1181,8 +1181,6 @@ static void pCodeLabelDestruct(pCode *pc)
   if(!pc)
     return;
 
-  unlinkPC(pc);
-
   if((pc->type == PC_LABEL) && PCL(pc)->label)
     free(PCL(pc)->label);
 
@@ -1648,7 +1646,7 @@ static void genericPrint(FILE *of, pCode *pc)
     // If the opcode has a label, print that first
     {
       pBranch *pbl = pc->label;
-      while(pbl) {
+      while(pbl && pbl->pc) {
 	if(pbl->pc->type == PC_LABEL)
 	  pCodePrintLabel(of, pbl->pc);
 	pbl = pbl->next;
@@ -1758,16 +1756,28 @@ static void pCodePrintLabel(FILE *of, pCode *pc)
 
 }
 /*-----------------------------------------------------------------*/
-static void  unlinkpCodeFromBranch(pBranch *pb , pCode *pc)
+/* unlinkpCodeFromBranch - Search for a label in a pBranch and     */
+/*                         remove it if it is found.               */
+/*-----------------------------------------------------------------*/
+static void unlinkpCodeFromBranch(pCode *pcl , pCode *pc)
 {
   pBranch *b, *bprev;
 
   bprev = NULL;
-  b = pb;
+  b = pcl->label;
   while(b) {
     if(b->pc == pc) {
-      if(bprev)
-	bprev->next = b->next;
+
+      /* Found a label */
+      if(bprev) {
+	bprev->next = b->next;  /* Not first pCode in chain */
+	free(b);
+      } else {
+	pc->destruct(pc);
+	pcl->label = b->next;   /* First pCode in chain */
+	free(b);
+      }
+      return;  /* A label can't occur more than once */
     }
     bprev = b;
     b = b->next;
@@ -2131,13 +2141,13 @@ void pBlockRemoveUnusedLabels(pBlock *pb)
       fprintf(stderr," !!! REMOVED A LABEL !!! key = %d\n", pcl->key);
 
       if(pc->type == PC_LABEL) {
-	//unlinkPC(pc);
+	unlinkPC(pc);
 	pCodeLabelDestruct(pc);
       } else {
-	unlinkpCodeFromBranch(pc->label, pc);
-	if(pc->label->next == NULL && pc->label->pc == NULL) {
+	unlinkpCodeFromBranch(pc, PCODE(pcl));
+	/*if(pc->label->next == NULL && pc->label->pc == NULL) {
 	  free(pc->label);
-	}
+	}*/
       }
 
     }
@@ -2237,25 +2247,32 @@ void AnalyzepCode(char dbName)
   pCode *pc;
   pBranch *pbr;
 
+  int i,changes;
+
   if(!the_pFile)
     return;
 
   fprintf(stderr," Analyzing pCode");
 
-  /* First, merge the labels with the instructions */
-  for(pb = the_pFile->pbHead; pb; pb = pb->next) {
-    if('*' == dbName || getpBlock_dbName(pb) == dbName) {
+  changes = 0;
+  i = 0;
+  do {
+    /* First, merge the labels with the instructions */
+    for(pb = the_pFile->pbHead; pb; pb = pb->next) {
+      if('*' == dbName || getpBlock_dbName(pb) == dbName) {
 
-      fprintf(stderr," analyze and merging block %c\n",dbName);
-      pBlockMergeLabels(pb);
-      AnalyzepBlock(pb);
+	fprintf(stderr," analyze and merging block %c\n",dbName);
+	pBlockMergeLabels(pb);
+	AnalyzepBlock(pb);
+      }
     }
-  }
 
-  for(pb = the_pFile->pbHead; pb; pb = pb->next) {
-    if('*' == dbName || getpBlock_dbName(pb) == dbName)
-      OptimizepBlock(pb);
-  }
+    for(pb = the_pFile->pbHead; pb; pb = pb->next) {
+      if('*' == dbName || getpBlock_dbName(pb) == dbName)
+	changes += OptimizepBlock(pb);
+    }
+      
+  } while(changes && (i++ < MAX_PASSES));
 
   /* Now build the call tree.
      First we examine all of the pCodes for functions.

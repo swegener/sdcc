@@ -1039,9 +1039,9 @@ picglue ()
   AnalyzepCode('*'); //code->dbName);
   printCallTree(stderr);
 
-  pCodePeepInit();
+  //pCodePeepInit();
 
-  OptimizepCode(code->dbName);
+  //OptimizepCode(code->dbName);
 
 
   /* print the global struct definitions */

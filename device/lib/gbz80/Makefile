@@ -23,4 +23,4 @@ $(LIB): $(OBJ) Makefile _dummy
 _dummy:
 
 clean:
-	rm -f $(OBJ) *~ $(CLEANSPEC) *.dump*
+	rm -f $(OBJ) *~ $(CLEANSPEC) *.dump* *.asm *.lib

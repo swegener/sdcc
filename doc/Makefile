@@ -39,14 +39,4 @@ $(TSS).html: $(TSS).tex
 	# the glossary, not implemented yet
 	# makeindex -s l2hglo.ist -o $@ $<
 
-
-clean:
-	# remove intermediate file, not the final pdf's and html's
-	# because these are needed for the distribution
-	rm -rf *.tex *.aux *.dvi *.idx *.ilg *.ind *.log *.toc *~ \#* \
-		*.ps */*.css */*.pl *.gif core
-
-superclean:
-	$(MAKE) clean
-	# now get rid of the generated pdf's and html's as well
-	rm -rf *.pdf $(MANUAL).html $(TSS).html
+include clean.mk

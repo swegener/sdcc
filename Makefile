@@ -2,18 +2,16 @@
 #
 #
 
-CFLAGS+=-g
-
 SHELL		= /bin/sh
-AUTOCONF	= autoconf
 
 PRJDIR		= .
-srcdir          = .
-include $(srcdir)/Makefile.common
 
 SDCC_MISC	= debugger/mcs51 sim/ucsim
 SDCC_LIBS	= support/cpp support/cpp2
 SDCC_DOC        = doc
+
+# Parts that are not normally compiled but need to be cleaned
+SDCC_EXTRA      = support/regression support/makebin
 
 SDCC_ASLINK	= as/mcs51 as link
 SDCC_PACKIHX	= packihx
@@ -117,9 +115,8 @@ clean:
 	$(MAKE) -f clean.mk clean
 	@echo "+ Cleaning packages in their directories..."
 	for pkg in $(PKGS); do\
-	  $(MAKE) PORTS="$(PORTS)" -C $$pkg clean ;\
+	  $(MAKE) PORTS="$(PORTS)" -C $$pkg -f clean.mk clean ;\
 	done
-
 
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------
@@ -128,9 +125,11 @@ distclean:
 	$(MAKE) -f clean.mk distclean
 	@echo "+ DistCleaning packages using clean.mk..."
 	for pkg in $(PKGS); do\
-	  $(MAKE) -C $$pkg -f clean.mk PORTS="$(PORTS)" distclean ;\
+	  $(MAKE) -C $$pkg PORTS="$(PORTS)" -f clean.mk distclean ;\
 	done
-
+	for pkg in $(SDCC_EXTRA); do \
+	  $(MAKE) -C $$pkg clean; \
+	done
 
 # Like clean but some files may still exist
 # -----------------------------------------

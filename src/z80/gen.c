@@ -4583,9 +4583,13 @@ genLeftShiftLiteral (operand * left,
       wassert (0);
     }
 
-  else if (shCount >= (size * 8))
-    while (size--)
-      aopPut (AOP (result), "!zero", size);
+  else if (shCount >= (size * 8)) 
+    {
+      while (size--)
+        {
+          aopPut (AOP (result), "!zero", size);
+        }
+    }
   else
     {
       switch (size)
@@ -4597,7 +4601,7 @@ genLeftShiftLiteral (operand * left,
 	  genlshTwo (result, left, shCount);
 	  break;
 	case 4:
-	  wassert (0);
+	  wassertl (0, "Shifting of longs is currently unsupported");
 	  break;
 	default:
 	  wassert (0);

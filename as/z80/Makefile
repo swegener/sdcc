@@ -44,11 +44,10 @@ $(OBJDIR)/%.o:	%.c
 $(OBJDIR)/%.o:	$(SLIB)/%.c
 	$(CC) -c $(CFLAGS) -o $@ $<
 
-clean:
-	rm -rf $(OBJS) $(BINS) $(OBJDIR)
-
 _as-z80:
 	$(MAKE) EXT=-z80$(E)
 
 _as-gbz80:
 	$(MAKE) EXT=-gbz80$(E) OPTS=-DGAMEBOY
+
+include clean.mk

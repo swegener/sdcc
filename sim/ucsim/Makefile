@@ -49,7 +49,8 @@ uninstall:
 # Deleting all files created by building the program
 # --------------------------------------------------
 clean:
-	$(MAKE) -f clean.mk clean
+	rm -f *core *[%~] *.[oa] *.so ucsim
+	rm -f .[a-z]*~
 	@for pkg in $(PKGS); do\
 	  $(MAKE) -C $$pkg -f clean.mk clean ;\
 	done
@@ -58,7 +59,8 @@ clean:
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------
 distclean: clean
-	$(MAKE) -f clean.mk distclean
+	rm -f config.cache config.log config.status
+	rm -f ddconfig.h main.mk *.dep
 	@for pkg in $(PKGS); do\
 	  $(MAKE) -C $$pkg -f clean.mk distclean ;\
 	done
@@ -68,7 +70,6 @@ distclean: clean
 # Like clean but some files may still exist
 # -----------------------------------------
 mostlyclean: clean
-	$(MAKE) -f clean.mk mostlyclean
 	@for pkg in $(PKGS); do\
 	  $(MAKE) -C $$pkg -f clean.mk mostlyclean ;\
 	done
@@ -78,7 +79,6 @@ mostlyclean: clean
 # everything deleted by distclean plus files created by bison, stc.
 # -----------------------------------------------------------------------
 realclean: distclean
-	$(MAKE) -f clean.mk realclean
 	@for pkg in $(PKGS); do\
 	  $(MAKE) -C $$pkg -f clean.mk realclean ;\
 	done

@@ -43,5 +43,4 @@ Makefile.dep: $(PREBUILD) Makefile $(SOURCES) $(SPECIAL) *.h $(PRJDIR)/*.h $(PRJ
 
 include Makefile.dep
 
-clean:
-	rm -f $(LIB) *.o *~ port.a $(CLEANSPEC)
+include ../port-clean.mk

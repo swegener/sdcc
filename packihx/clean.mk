@@ -4,4 +4,4 @@ clean:
 	rm -f packihx
 
 distclean realclean: clean
-	rm -f config.*
+	rm -f config.* Makefile

@@ -329,27 +329,6 @@ printVersionInfo ()
     );
 }
 
-/*
-       "\t-m<proc>             -     Target processor <proc>.  Default %s\n"
-	   "\t                           Try --version for supported values of <proc>\n"
-	   "\t--model-large        -     Large Model\n"
-	   "\t--model-small        -     Small Model (default)\n"
-	   "\t--stack-auto         -     Stack automatic variables\n"
-	   "\t--xstack             -     Use external stack\n"
-	   "\t--xram-loc <nnnn>    -     External Ram start location\n"
-	   "\t--xstack-loc <nnnn>  -     Xternal Stack Location\n"
-	   "\t--code-loc <nnnn>    -     Code Segment Location\n"
-	   "\t--stack-loc <nnnn>   -     Stack pointer initial value\n"
-	   "\t--data-loc <nnnn>    -     Direct data start location\n"
-	   "\t--idata-loc <nnnn>   -     Indirect data start location\n"
-	   "\t--iram-size <nnnn>   -     Internal Ram size\n"
-	   "\t--nojtbound          -     Don't generate boundary check for jump tables\n"
-	   "\t--generic            -     All unqualified ptrs converted to '_generic'\n"
-	   "PreProcessor Options :-\n"
-	   "\t-Dmacro   - Define Macro\n"
-	   "\t-Ipath    - Include \"*.h\" path\n"
-      "Note: this is NOT a complete list of options see docs for details\n",
-*/
 /*-----------------------------------------------------------------*/
 /* printUsage - prints command line syntax         */
 /*-----------------------------------------------------------------*/
@@ -575,13 +554,25 @@ _setModel (int model, const char *sz)
     then for input of '--optxyz' or '--opt xyz' returns xyz.
 */
 static char *
-getStringArg(const char *szStart, char **argv, int *pi)
+getStringArg(const char *szStart, char **argv, int *pi, int argc)
 {
-    if (argv[*pi][strlen(szStart)]) {
-        return &argv[*pi][strlen(szStart)];
+  if (argv[*pi][strlen(szStart)]) 
+    {
+      return &argv[*pi][strlen(szStart)];
     }
-    else {
-        return argv[++(*pi)];
+  else 
+    {
+      ++(*pi);
+      if (*pi >= argc) 
+        {
+          werror (E_ARGUMENT_MISSING, szStart);
+          /* Die here rather than checking for errors later. */
+          exit(-1);
+        }
+      else 
+        {
+          return argv[++(*pi)];
+        }
     }
 }
 
@@ -589,9 +580,9 @@ getStringArg(const char *szStart, char **argv, int *pi)
     getStringArg. 
 */
 static int
-getIntArg(const char *szStart, char **argv, int *pi)
+getIntArg(const char *szStart, char **argv, int *pi, int argc)
 {
-    return (int)floatFromVal(constVal(getStringArg(szStart, argv, pi)));
+    return (int)floatFromVal(constVal(getStringArg(szStart, argv, pi, argc)));
 }
 
 static bool
@@ -762,13 +753,13 @@ parseCmdLine (int argc, char **argv)
 
 	  if (strcmp (argv[i], OPTION_PEEP_FILE) == 0)
 	    {
-                options.peep_file = getStringArg(OPTION_PEEP_FILE, argv, &i);
+                options.peep_file = getStringArg(OPTION_PEEP_FILE, argv, &i, argc);
                 continue;
 	    }
 
 	  if (strcmp (argv[i], OPTION_LIB_PATH) == 0)
             {
-		libPaths[nlibPaths++] = getStringArg(OPTION_LIB_PATH, argv, &i);
+		libPaths[nlibPaths++] = getStringArg(OPTION_LIB_PATH, argv, &i, argc);
                 continue;
 	    }
 
@@ -781,49 +772,49 @@ parseCmdLine (int argc, char **argv)
 
 	  if (strcmp (argv[i], OPTION_CALLEE_SAVES) == 0)
 	    {
-                parseWithComma (options.calleeSaves, getStringArg(OPTION_CALLEE_SAVES, argv, &i));
+                parseWithComma (options.calleeSaves, getStringArg(OPTION_CALLEE_SAVES, argv, &i, argc));
                 continue;
 	    }
 
 	  if (strcmp (argv[i], OPTION_XSTACK_LOC) == 0)
 	    {
-                options.xstack_loc = getIntArg(OPTION_XSTACK_LOC, argv, &i);
+                options.xstack_loc = getIntArg(OPTION_XSTACK_LOC, argv, &i, argc);
                 continue;
 	    }
 
 	  if (strcmp (argv[i], OPTION_STACK_LOC) == 0)
 	    {
-                options.stack_loc = getIntArg(OPTION_STACK_LOC, argv, &i);
+                options.stack_loc = getIntArg(OPTION_STACK_LOC, argv, &i, argc);
                 continue;
 	    }
 
 	  if (strcmp (argv[i], OPTION_XRAM_LOC) == 0)
 	    {
-                options.xdata_loc = getIntArg(OPTION_XRAM_LOC, argv, &i);
+                options.xdata_loc = getIntArg(OPTION_XRAM_LOC, argv, &i, argc);
                 continue;
 	    }
 
 	  if (strcmp (argv[i], OPTION_IRAM_SIZE) == 0)
 	    {
-                options.iram_size = getIntArg(OPTION_IRAM_SIZE, argv, &i);
+                options.iram_size = getIntArg(OPTION_IRAM_SIZE, argv, &i, argc);
                 continue;
 	    }
 
 	  if (strcmp (argv[i], OPTION_DATA_LOC) == 0)
 	    {
-                options.data_loc = getIntArg(OPTION_DATA_LOC, argv, &i);
+                options.data_loc = getIntArg(OPTION_DATA_LOC, argv, &i, argc);
                 continue;
 	    }
 
 	  if (strcmp (argv[i], OPTION_IDATA_LOC) == 0)
 	    {
-                options.idata_loc = getIntArg(OPTION_IDATA_LOC, argv, &i);
+                options.idata_loc = getIntArg(OPTION_IDATA_LOC, argv, &i, argc);
                 continue;
 	    }
 
 	  if (strcmp (argv[i], OPTION_CODE_LOC) == 0)
 	    {
-                options.code_loc = getIntArg(OPTION_CODE_LOC, argv, &i);
+                options.code_loc = getIntArg(OPTION_CODE_LOC, argv, &i, argc);
                 continue;
 	    }
 
@@ -846,15 +837,16 @@ parseCmdLine (int argc, char **argv)
 	    }
 
           if (strcmp (argv[i], OPTION_LESS_PEDANTIC) == 0) 
-              {
-                  setErrorLogLevel(ERROR_LEVEL_WARNING);
-                  continue;
-              }
+            {
+              setErrorLogLevel(ERROR_LEVEL_WARNING);
+              continue;
+            }
 
-	  if (strcmp (&argv[i][1], OPTION_SHORT_IS_8BITS) == 0) {
-	    options.shortis8bits=1;
-	    continue;
-	  }
+	  if (strcmp (&argv[i][1], OPTION_SHORT_IS_8BITS) == 0) 
+            {
+              options.shortis8bits=1;
+              continue;
+            }
           
 	  if (!port->parseOption (&argc, argv, &i))
 	    {
@@ -886,25 +878,25 @@ parseCmdLine (int argc, char **argv)
 	      break;
 
 	    case 'L':
-                libPaths[nlibPaths++] = getStringArg("-L", argv, &i);
+                libPaths[nlibPaths++] = getStringArg("-L", argv, &i, argc);
                 break;
 
             case 'l':
-                libFiles[nlibFiles++] = getStringArg("-l", argv, &i);
+                libFiles[nlibFiles++] = getStringArg("-l", argv, &i, argc);
                 break;
 
 	    case 'W':
 	      /* linker options */
 	      if (argv[i][2] == 'l')
 		{
-                    parseWithComma(linkOptions, getStringArg("-Wl", argv, &i));
+                    parseWithComma(linkOptions, getStringArg("-Wl", argv, &i, argc));
 		}
 	      else
 		{
 		  /* assembler options */
 		  if (argv[i][2] == 'a')
 		    {
-			parseWithComma ((char **) asmOptions, getStringArg("-Wa", argv, &i));
+			parseWithComma ((char **) asmOptions, getStringArg("-Wa", argv, &i, argc));
 		    }
 		  else
 		    {

@@ -33,11 +33,10 @@ $(OBJDIR)/%.o:	%.c
 $(OBJDIR)/%.o:	$(SLIB)/%.c
 	$(CC) -c $(CFLAGS) -o $@ $<
 
-clean:
-	rm -rf $(OBJS) $(BINS) $(OBJDIR)
-
 _link-z80:
 	$(MAKE) EXT=-z80$(E) PORT=z80
 
 _link-gbz80:
 	$(MAKE) EXT=-gbz80$(E) OPTS=-DGAMEBOY PORT=z80
+
+include clean.mk

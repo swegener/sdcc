@@ -170,7 +170,7 @@ $(RESULTS): $(SUB_RESULTS)
 # BeginGeneric rules
 
 clean:
-	rm -rf $(CASES_DIR) $(RESULTS_DIR)
+	rm -rf $(CASES_DIR) $(RESULTS_DIR) *.pyc
 
 inter-port-clean:
 	rm -f  fwk/lib/*.o

@@ -12,7 +12,7 @@ clean:
 # -----------------------------------------------------------------
 distclean: clean
 	rm -f config.cache config.log config.status
-	rm -f Makefile *.dep
+	rm -f Makefile *.dep auto-host.h configargs.h cstamp-h
 
 
 # Like clean but some files may still exist

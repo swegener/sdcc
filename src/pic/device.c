@@ -484,7 +484,7 @@ int assignRegister(regs *reg, int start_address)
   if(reg->isFixed) {
 
     if (validAddress(reg->address,reg->size)) {
-      fprintf(stderr,"%s -  %s address = 0x%03x\n",__FUNCTION__,reg->name, reg->address);
+      //fprintf(stderr,"%s -  %s address = 0x%03x\n",__FUNCTION__,reg->name, reg->address);
       mapRegister(reg);
       return reg->address;
     }
@@ -493,8 +493,9 @@ int assignRegister(regs *reg, int start_address)
       mapRegister(reg);
       return reg->address;
     }
-    fprintf(stderr, "WARNING: Ignoring Out of Range register assignment at fixed address %d, %s\n",
-	    reg->address, reg->name);
+
+    //fprintf(stderr, "WARNING: Ignoring Out of Range register assignment at fixed address %d, %s\n",
+    //    reg->address, reg->name);
 
   } else {
 

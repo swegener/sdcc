@@ -738,34 +738,50 @@ static void genAddLit (iCode *ic, int lit)
       }
 
     } else {
+      int clear_carry=0;
 
       /* left is not the accumulator */
       if(lit & 0xff) {
 	emitpcode(POC_MOVLW, popGetLit(lit & 0xff));
 	emitpcode(POC_ADDFW, popGet(AOP(left),0));
-      } else
+      } else {
 	emitpcode(POC_MOVFW, popGet(AOP(left),0));
-
+	/* We don't know the state of the carry bit at this point */
+	clear_carry = 1;
+      }
       //emitpcode(POC_MOVWF, popGet(AOP(result),0,FALSE,FALSE));
       emitMOVWF(result,0);
-      lit >>= 8;
       while(--size) {
       
+	lit >>= 8;
 	if(lit & 0xff) {
-	  emitpcode(POC_MOVLW, popGetLit(lit & 0xff));
-	  //emitpcode(POC_MOVWF, popGet(AOP(result),offset,FALSE,FALSE));
-	  emitMOVWF(result,offset);
-	  emitpcode(POC_MOVFW, popGet(AOP(left),offset));
-	  emitSKPNC;
-	  emitpcode(POC_INCFSZW,popGet(AOP(left),offset));
-	  emitpcode(POC_ADDWF,  popGet(AOP(result),offset));
+	  if(clear_carry) {
+	    /* The ls byte of the lit must've been zero - that 
+	       means we don't have to deal with carry */
+
+	    emitpcode(POC_MOVLW, popGetLit(lit & 0xff));
+	    emitpcode(POC_ADDFW,  popGet(AOP(left),offset));
+	    emitpcode(POC_MOVWF, popGet(AOP(left),offset));
+
+	    clear_carry = 0;
+
+	  } else {
+	    emitpcode(POC_MOVLW, popGetLit(lit & 0xff));
+	    //emitpcode(POC_MOVWF, popGet(AOP(result),offset,FALSE,FALSE));
+	    emitMOVWF(result,offset);
+	    emitpcode(POC_MOVFW, popGet(AOP(left),offset));
+	    emitSKPNC;
+	    emitpcode(POC_INCFSZW,popGet(AOP(left),offset));
+	    emitpcode(POC_ADDWF,  popGet(AOP(result),offset));
+	  }
+
 	} else {
 	  emitpcode(POC_CLRF,  popGet(AOP(result),offset));
 	  emitpcode(POC_RLF,   popGet(AOP(result),offset));
 	  emitpcode(POC_MOVFW, popGet(AOP(left),offset));
 	  emitpcode(POC_ADDWF, popGet(AOP(result),offset));
 	}
-      offset++;
+	offset++;
       }
     }
   }

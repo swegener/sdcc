@@ -31,7 +31,7 @@ void  isr(void) interrupt 1 using 1
 
 void lcd1(const unsigned char *str)
 {
-  const char *p = "hellow world!\r\n";
+  const char *p = "hello world!\r\n";
 
   if(!str)
     failures++;

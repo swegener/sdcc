@@ -73,6 +73,7 @@ set *dynDirectBitRegs=NULL;
 set *dynInternalRegs=NULL;
 
 static hTab  *dynDirectRegNames= NULL;
+static hTab  *regHash = NULL;    /* a hash table containing ALL registers */
 
 static int dynrIdx=0x20;
 static int rDirectIdx=0;
@@ -661,7 +662,7 @@ allocDirReg (operand *op )
 	      name, SPEC_ADDR ( OP_SYM_ETYPE(op)));
 */
   } else {
-    //fprintf(stderr,"ralloc %s \n", name);
+    //fprintf(stderr,"ralloc:%d %s \n", __LINE__,name);
     
     reg = dirregWithName(name);
   }
@@ -672,6 +673,7 @@ allocDirReg (operand *op )
     /* if this is at an absolute address, then get the address. */
     if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
       address = SPEC_ADDR ( OP_SYM_ETYPE(op));
+      //fprintf(stderr,"reg %s is at an absolute address: 0x%03x\n",name,address);
     }
 
     /* Register wasn't found in hash, so let's create
@@ -3391,6 +3393,45 @@ void printSymType(char * str, sym_link *sl)
 }
 
 /*-----------------------------------------------------------------*/
+/* some debug code to print the symbol S_TYPE. Note that
+ * the function checkSClass in src/SDCCsymt.c dinks with
+ * the S_TYPE in ways the PIC port doesn't fully like...*/
+/*-----------------------------------------------------------------*/
+void isData(sym_link *sl)
+{
+  FILE *of = stderr;
+
+  if(!sl)
+    return;
+
+  if(debugF)
+    of = debugF;
+
+  for ( ; sl; sl=sl->next) {
+    if(!IS_DECL(sl) ) {
+      switch (SPEC_SCLS(sl)) {
+	
+      case S_DATA: fprintf (of, "data "); break;
+      case S_XDATA: fprintf (of, "xdata "); break;
+      case S_SFR: fprintf (of, "sfr "); break;
+      case S_SBIT: fprintf (of, "sbit "); break;
+      case S_CODE: fprintf (of, "code "); break;
+      case S_IDATA: fprintf (of, "idata "); break;
+      case S_PDATA: fprintf (of, "pdata "); break;
+      case S_LITERAL: fprintf (of, "literal "); break;
+      case S_STACK: fprintf (of, "stack "); break;
+      case S_XSTACK: fprintf (of, "xstack "); break;
+      case S_BIT: fprintf (of, "bit "); break;
+      case S_EEPROM: fprintf (of, "eeprom "); break;
+      default: break;
+      }
+
+    }
+
+  }
+    
+}
+/*-----------------------------------------------------------------*/
 /* packRegisters - does some transformations to reduce register    */
 /*                   pressure                                      */
 /*-----------------------------------------------------------------*/
@@ -3435,11 +3476,16 @@ packRegisters (eBBlock * ebp)
   for (ic = ebp->sch; ic; ic = ic->next) {
 
     if(IS_SYMOP ( IC_LEFT(ic))) {
-      //sym_link *etype = getSpec (operandType (IC_LEFT (ic)));
+      sym_link *etype = getSpec (operandType (IC_LEFT (ic)));
 
       debugAopGet ("  left:", IC_LEFT (ic));
       if(IS_PTR_CONST(OP_SYMBOL(IC_LEFT(ic))->type))
-	debugLog ("    is a pointer");
+	debugLog ("    is a pointer\n");
+
+      if(IS_OP_VOLATILE(IC_LEFT(ic)))
+	debugLog ("    is volatile\n");
+
+      isData(etype);
 
       printSymType("   ", OP_SYMBOL(IC_LEFT(ic))->type);
     }

@@ -67,6 +67,8 @@ SRC = b.c \
 	add3.c \
 	and1.c \
 	bool1.c \
+	bool2.c \
+	bool3.c \
 	call1.c \
 	compare.c \
 	compare2.c \

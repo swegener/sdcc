@@ -1173,10 +1173,17 @@ checkSClass (symbol * sym, int isProto)
     }
   
   /* if absolute address given then it mark it as
-     volatile */
-  if (IS_ABSOLUTE (sym->etype))
-    SPEC_VOLATILE (sym->etype) = 1;
+     volatile -- except in the PIC port */
+
+#if !OPT_DISABLE_PIC
+  /* The PIC port uses a different peep hole optimizer based on "pCode" */
+  if (!TARGET_IS_PIC)
+#endif
+
+    if (IS_ABSOLUTE (sym->etype))
+      SPEC_VOLATILE (sym->etype) = 1;
   
+
   /* global variables declared const put into code */
   /* if no other storage class specified */
   if (sym->level == 0 &&

@@ -35,7 +35,7 @@
 #endif
 
 pCodeOp *popCopyGPR2Bit(pCodeOpReg *pc, int bitval);
-
+pCodeOp *popRegFromString(char *str, int size, int offset);
 
 pCodeOp *newpCodeOpWild(int id, pCodeWildBlock *pcwb, pCodeOp *subtype);
 pCode *newpCodeWild(int pCodeID, pCodeOp *optional_operand, pCodeOp *optional_label);
@@ -542,6 +542,12 @@ static void * cvt_altpat_mnem1b(void *pp,pCodeWildBlock *pcwb)
 }
 
 /*-----------------------------------------------------------------*/
+/* cvt_altpat_mnem2                                                */
+/*                                                                 */
+/*  pp[0] - mnem                                                   */
+/*  pp[1] - var                                                    */
+/*  pp[2] - comma                                                  */
+/*  pp[3] - destination                                            */
 /*-----------------------------------------------------------------*/
 static void * cvt_altpat_mnem2(void *pp,pCodeWildBlock *pcwb)
 {

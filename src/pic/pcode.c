@@ -1931,7 +1931,7 @@ pCode *newpCodeLabel(char *name, int key)
   if(s)
     pcl->label = Safe_strdup(s);
 
-
+  //fprintf(stderr,"newpCodeLabel: key=%d, name=%s\n",key, ((s)?s:""));
   return ( (pCode *)pcl);
 
 }
@@ -2007,6 +2007,7 @@ pCodeOp *newpCodeOpLabel(char *name, int key)
 
   ((pCodeOpLabel *)pcop)->key = key;
 
+  //fprintf(stderr,"newpCodeOpLabel: key=%d, name=%s\n",key,((s)?s:""));
   return pcop;
 }
 
@@ -3690,7 +3691,9 @@ void LinkFlow(pBlock *pb)
       if( (pct = findLabelinpBlock(pb,pcol)) != NULL)
 	LinkFlow_pCode(PCI(pc),PCI(pct));
       else
-	fprintf(stderr, "ERROR: %s, couldn't find label\n",__FUNCTION__);
+	fprintf(stderr, "ERROR: %s, couldn't find label. key=%d,lab=%s\n",
+		__FUNCTION__,pcol->key,((PCOP(pcol)->name)?PCOP(pcol)->name:"-"));
+  //fprintf(stderr,"newpCodeOpLabel: key=%d, name=%s\n",key,((s)?s:""));
 
       continue;
     }
@@ -3875,7 +3878,6 @@ void FixRegisterBankingInFlow(pCodeFlow *pcfl, int cur_bank)
 
   while(isPCinFlow(pc,PCODE(pcfl))) {
 
-
     reg = getRegFromInstruction(pc);
 #if 0
     if(reg) {
@@ -3885,15 +3887,23 @@ void FixRegisterBankingInFlow(pCodeFlow *pcfl, int cur_bank)
     }
 #endif
 
-    if(reg && REG_BANK(reg)!=cur_bank) {
+    if((reg && REG_BANK(reg)!=cur_bank) || 
+       ((PCI(pc)->op == POC_CALL) && (cur_bank != 0) ))  {
+
       /* Examine the instruction before this one to make sure it is
        * not a skip type instruction */
       pcprev = findPrevpCode(pc->prev, PC_OPCODE);
+
       if(!pcprev || (pcprev && !isPCI_SKIP(pcprev))) {
-	int b = cur_bank ^ REG_BANK(reg);
+	int b;
+	int reg_bank;
+
+	reg_bank =  (reg) ? REG_BANK(reg) : 0;
+	  
+	b = cur_bank ^ reg_bank;
 
 	//fprintf(stderr, "Cool! can switch banks\n");
-	cur_bank = REG_BANK(reg);
+	cur_bank = reg_bank;
 	switch(b & 3) {
 	case 0:
 	  break;
@@ -3911,20 +3921,6 @@ void FixRegisterBankingInFlow(pCodeFlow *pcfl, int cur_bank)
 	  } else
 	    insertBankSwitch(0, pc, -1, -1);
 	  break;
-	  /*
-	    new_pc = newpCode(((cur_bank&1) ? POC_BSF : POC_BCF),
-	    popCopyGPR2Bit(PCOP(&pc_status),PIC_RP0_BIT));
-	    pCodeInsertAfter(pc->prev, new_pc);
-	    if(PCI(pc)->label) { 
-	    PCI(new_pc)->label = PCI(pc)->label;
-	    PCI(pc)->label = NULL;
-	    }
-	  */
-	  /*
-	    new_pc = newpCode(((cur_bank&1) ? POC_BCF : POC_BSF),
-	    popCopyGPR2Bit(PCOP(&pc_status),PIC_RP0_BIT));
-	    pCodeInsertAfter(pc, new_pc);
-	  */
 
 	}
 
@@ -4270,6 +4266,8 @@ pCode * findInstructionUsingLabel(pCodeLabel *pcl, pCode *pcs)
 void exchangeLabels(pCodeLabel *pcl, pCode *pc)
 {
 
+  char *s=NULL;
+
   if(isPCI(pc) && 
      (PCI(pc)->pcop) && 
      (PCI(pc)->pcop->type == PO_LABEL)) {
@@ -4280,9 +4278,19 @@ void exchangeLabels(pCodeLabel *pcl, pCode *pc)
     if(pcol->pcop.name)
       free(pcol->pcop.name);
 
-    sprintf(buffer,"_%05d_DS_",pcl->key);
+    /* If the key is negative, then we (probably) have a label to
+     * a function and the name is already defined */
+       
+    if(pcl->key>0)
+      sprintf(s=buffer,"_%05d_DS_",pcl->key);
+    else 
+      s = pcl->label;
 
-    pcol->pcop.name = Safe_strdup(buffer);
+    //sprintf(buffer,"_%05d_DS_",pcl->key);
+    if(!s) {
+      fprintf(stderr, "ERROR %s:%d function label is null\n",__FUNCTION__,__LINE__);
+    }
+    pcol->pcop.name = Safe_strdup(s);
     pcol->key = pcl->key;
     //pc->print(stderr,pc);
 
@@ -4537,16 +4545,23 @@ void FixRegisterBanking(pBlock *pb)
 
 	}
 #endif
-	if(reg && REG_BANK(reg)!=cur_bank) {
-	  //fprintf(stderr,"need to switch banks\n");
+
+	if((reg && REG_BANK(reg)!=cur_bank) || 
+	   ((PCI(pc)->op == POC_CALL) && (cur_bank != 0) ))  {
+
 	  /* Examine the instruction before this one to make sure it is
 	   * not a skip type instruction */
 	  pcprev = findPrevpCode(pc->prev, PC_OPCODE);
+
 	  if(!pcprev || (pcprev && !isPCI_SKIP(pcprev))) {
-	    int b = cur_bank ^ REG_BANK(reg);
+	    int b;
+	    int reg_bank;
 
-	    cur_bank = REG_BANK(reg);
+	    reg_bank =  (reg) ? REG_BANK(reg) : 0;
+	  
+	    b = cur_bank ^ reg_bank;
 
+	    cur_bank = reg_bank;
 	    switch(b & 3) {
 	    case 0:
 	      break;
@@ -4566,7 +4581,6 @@ void FixRegisterBanking(pBlock *pb)
 	      break;
 
 	    }
-
 
 	  }else {
 	    //fprintf(stderr, "Bummer can't switch banks\n");
@@ -4627,6 +4641,44 @@ void FixRegisterBanking(pBlock *pb)
   }
 
 }
+
+
+
+
+#if 0
+	if(reg && REG_BANK(reg)!=cur_bank) {
+	  //fprintf(stderr,"need to switch banks\n");
+	  /* Examine the instruction before this one to make sure it is
+	   * not a skip type instruction */
+	  pcprev = findPrevpCode(pc->prev, PC_OPCODE);
+	  if(!pcprev || (pcprev && !isPCI_SKIP(pcprev))) {
+	    int b = cur_bank ^ REG_BANK(reg);
+
+	    cur_bank = REG_BANK(reg);
+
+	    switch(b & 3) {
+	    case 0:
+	      break;
+	    case 1:
+	      insertBankSwitch(0, pc, cur_bank&1, PIC_RP0_BIT);
+	      break;
+	    case 2:
+	      insertBankSwitch(0, pc, cur_bank&2, PIC_RP1_BIT);
+	      insertBankSwitch(0, pc, cur_bank&2, PIC_RP1_BIT);
+	      break;
+	    case 3:
+	      if(cur_bank & 3) {
+		insertBankSwitch(0, pc, cur_bank&1, PIC_RP0_BIT);
+		insertBankSwitch(0, pc, cur_bank&2, PIC_RP1_BIT);
+	      } else
+		insertBankSwitch(0, pc, -1, -1);
+	      break;
+
+	    }
+#endif
+
+
+
 
 void pBlockDestruct(pBlock *pb)
 {

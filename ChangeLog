@@ -1,3 +1,7 @@
+2001-09-11    <johan@FRIJA>
+
+	* src/SDCCval.c (valDiv Mod Minus Plus Shift): keep litteral expressions as small as possible (bug #460010)
+
 2001-09-10  Michael Hope  <michaelh@juju.net.nz>
 
 	* support/regression/tests/bug-460444.c: Added test case.

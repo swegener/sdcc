@@ -46,6 +46,10 @@ _evalMacros(char *apinto, hTab *pvals, const char *pfrom, size_t alen)
     switch (*pfrom) {
     case '"':
     case '\'':
+      if (quote != '\0') {
+        /* write previous quote */
+        *pinto++ = quote;
+      }
       quote = *pfrom;
       ++pfrom;
       break;
@@ -104,6 +108,7 @@ _evalMacros(char *apinto, hTab *pvals, const char *pfrom, size_t alen)
           }
         }
 
+        quote = '\0';
         pfrom = pend + 1;
       }
       break;

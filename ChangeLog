@@ -1,3 +1,22 @@
+2004-05-15 Maarten Brock <sourceforge.brock AT dse.nl>
+	committed by Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* device/include/c8051f020.h: newly added SiLabs (Cygnal) header file
+	* device/include/c8051f000.h,
+	* device/include/c8051f120.h,
+	* device/include/c8051f300.h,
+	* device/include/c8051f310.h,
+	* device/include/c8051f320.h: updated (added _XPAGE, CAPN, CAPP,
+	PWM16) and detab'ed
+
+2004-05-15 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* doc/sdccman.lyx: mentioned sourceforge's delay between web frontend
+	and mailing lists, doc'ed --no-peep-comments, removed reference
+	to knoppix (newest version has no LyX/LaTeX), other minor changes
+	* src/SDCCglue.c (glue): save 2 bytes stack space with 
+	option --main-return. The ljmp could probably be avoided too
+
 2004-05-14 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* as/mcs51/lkmem.c, as/mcs51/lkaomf51: fixed bug 954173

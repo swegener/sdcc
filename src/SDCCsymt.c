@@ -1483,6 +1483,9 @@ compareType (sym_link * dest, sym_link * src)
 	    }
 	    return compareType (dest->next, src->next);
 	  }
+	  if (IS_PTR (dest) && IS_GENPTR (src) && IS_VOID(src->next)) {
+	    return 1;
+	  }
 	  if (IS_PTR (src) && IS_GENPTR (dest))
 	    return -1;
 	  if (IS_PTR (dest) && IS_ARRAY (src)) {
@@ -1490,7 +1493,6 @@ compareType (sym_link * dest, sym_link * src)
 	    int res=compareType (dest, val->type);
 	    Safe_free(val->type);
 	    Safe_free(val);
-	    //return res ? -1 : 0;
 	    return res;
 	  }
 	  if (IS_PTR (dest) && IS_FUNC (dest->next) && IS_FUNC (src))

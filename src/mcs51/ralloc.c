@@ -1316,6 +1316,9 @@ static void fillGaps()
 
 	/* THERE IS HOPE !!!! */
 	for (i=0; i < sym->nRegs ; i++ ) {
+	    if (sym->regType == REG_PTR)
+		sym->regs[i] = getRegPtrNoSpil ();
+	    else
 		sym->regs[i] = getRegGprNoSpil ();		  
 	}
 
@@ -1342,15 +1345,27 @@ static void fillGaps()
 		if (pdone > 1) break;
 	    }
 	}
+	for (i = 0 ; i < sym->uses->size ; i++ ) {
+	    if (bitVectBitValue(sym->uses,i)) {
+		iCode *ic;
+		if (!(ic = hTabItemWithKey(iCodehTab,i))) continue ;
+		if (SKIP_IC(ic)) continue;
+		if (!IS_ASSIGN_ICODE(ic)) continue ;
+
+		/* if result is assigned to registers */
+		if (IS_SYMOP(IC_RESULT(ic)) && 
+		    bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_RESULT(ic))->key)) {
+		    pdone += positionRegs(sym,OP_SYMBOL(IC_RESULT(ic)));
+		}
+		if (pdone > 1) break;
+	    }
+	}
 	/* had to position more than once GIVE UP */
 	if (pdone > 1) {
 	    /* UNDO all the changes we made to try this */
-	    sym->isspilt = 0;
+	    sym->isspilt = 1;
 	    for (i=0; i < sym->nRegs ; i++ ) {
-		if (sym->regType == REG_PTR)
-		    sym->regs[i] = getRegPtrNoSpil ();
-		else
-		    sym->regs[i] = getRegGprNoSpil ();
+		    sym->regs[i] = NULL;
 	    }
 	    freeAllRegs();
 	    D(printf ("Fill Gap gave up due to positioning for %s in function %s\n",sym->name, currFunc ? currFunc->name : "UNKNOWN"));

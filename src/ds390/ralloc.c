@@ -1365,7 +1365,7 @@ static void fillGaps()
 		sym->regs[i] = getRegGprNoSpil ();		  
 	}
 
-	/* for all its definitions check if the registers
+	/* for all its definitions & uses check if the registers
 	   allocated needs positioning NOTE: we can position
 	   only ONCE if more than One positioning required 
 	   then give up */
@@ -1388,10 +1388,25 @@ static void fillGaps()
 		if (pdone > 1) break;
 	    }
 	}
+       	for (i = 0 ; i < sym->uses->size ; i++ ) {
+	    if (bitVectBitValue(sym->uses,i)) {
+		iCode *ic;
+		if (!(ic = hTabItemWithKey(iCodehTab,i))) continue ;
+		if (SKIP_IC(ic)) continue;
+		if (!IS_ASSIGN_ICODE(ic)) continue ;
+
+		/* if result is assigned to registers */
+		if (IS_SYMOP(IC_RESULT(ic)) && 
+		    bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_RESULT(ic))->key)) {
+		    pdone += positionRegs(sym,OP_SYMBOL(IC_RESULT(ic)));
+		}
+		if (pdone > 1) break;
+	    }
+	}
 	/* had to position more than once GIVE UP */
 	if (pdone > 1) {
 	    /* UNDO all the changes we made to try this */
-	    sym->isspilt = 0;
+	    sym->isspilt = 1;
 	    for (i=0; i < sym->nRegs ; i++ ) {
 		sym->regs[i] = NULL;
 	    }

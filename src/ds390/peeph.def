@@ -2366,3 +2366,11 @@ replace {
         xrl  a,r%1
 }
 
+replace {
+        mov     r%1,a
+        mov     a,ar%1
+} by {
+        mov     r%1,a
+        ; Peephole 237   removed redundant move
+}
+

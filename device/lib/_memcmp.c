@@ -26,7 +26,7 @@
 int memcmp (
 	void * buf1,
 	void * buf2,
-	int count
+	size_t count
 	) 
 {
 	if (!count)

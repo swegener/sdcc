@@ -51,29 +51,21 @@ __memcpy_rrx_s::
         ;; LDIR:        do; *DE = *HL; HL++; BC--; while BC != 0
         
         ;; All registers are already saved.
-        ld      hl,#2
-        add     hl,sp
-        ld      e,(hl)
-        inc     hl
-        ld      d,(hl)
-        inc     hl
-        ld      a,(hl)
-        inc     hl
-        ld      b,(hl)
-        inc     hl
-        ld      c,(hl)
-        inc     hl
-        ld      h,(hl)
-        ld      l,a
-        ld      a,h
-        ld      h,b
-        ld      b,a
-
-        ;; Pending: could optimise this check to occur earlier.
-        or      c
-        ret     z
-
-        ldir
+	pop	iy	; iy = return address
+	pop	de	; de = destination pointer
+	pop	hl	; hl = source pointer
+	pop	bc	; bc = count
+	push	bc
+	push	hl
+	push	de
+	ld	a,b
+	or	c
+	jr	z,1$
+	ldir
+1$:
+	pop	hl	; return hl = original destination pointer
+	push	hl
+	jp	(iy)
         ret
 
 ; int strcmp(const char *s1, const char *s2) 

@@ -26,7 +26,7 @@
 int strncmp (
 	char * first,
 	char * last,
-	int count
+	size_t count
 	) 
 {
 	if (!count)

@@ -26,7 +26,7 @@
 void * memset (
 	void * buf,
 	unsigned char ch ,
-	int count) 
+	size_t count) 
 {
 	register unsigned char * ret = buf;
 

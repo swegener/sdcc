@@ -26,7 +26,7 @@
 char *strncpy (
 	char * d,
 	char * s,
-	int n ) 
+	size_t n ) 
 {
 	register char * d1 =  d;
 

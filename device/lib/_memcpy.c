@@ -29,7 +29,7 @@
 void * memcpy (
 	void * dst,
 	void * src,
-	int acount
+	size_t acount
 	) 
 {
 #if _SDCC_Z80_STYLE_LIB_OPT
@@ -39,7 +39,7 @@ void * memcpy (
 	char * d = dst;
 	char * s = src;
 	/* PENDING: Divide first to get around sign problems */
-	int count = -(acount/4);
+	int count = -(acount >> 2);
 
         while (count) {
 		*d++ = *s++;

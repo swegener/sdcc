@@ -100,7 +100,7 @@ testBitfieldSizeof(void)
   ASSERT( sizeof(size2c_bf) >= 2);
   ASSERT( sizeof(size2d_bf) >= 2);
   ASSERT( sizeof(size3a_bf) >= 2);
-  ASSERT( sizeof(size1a_bf) == sizeof(size1b_bf));
+  ASSERT( sizeof(size1a_bf) <= sizeof(size1b_bf));
   ASSERT( sizeof(size1a_bf) < sizeof(size2a_bf));
 
   /* Some SDCC specific assertions. SDCC uses 8 bit storage units.

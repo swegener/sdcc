@@ -1,4 +1,23 @@
+2003-09-07  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* device/include/string.h: added size_t typedef, changed
+	prototypes to use size_t, eliminated separate reentrant and
+	non-reentrant declarations, added _memmove declaration
+	* device/lib/_memcpy.c: changed to use size_t instead of int,
+	changed /4 to >>2 to avoid division library call
+	* device/lib/_memcmp.c,
+	* device/lib/_memset.c,
+	* device/lib/_strncat.c,
+	* device/lib/_strncpy.c,
+	* device/lib/_strncmp.c: changed to use size_t instead of int
+	* device/lib/_memmove.c: new file (fixed bug #772294)
+	* device/lib/Makefile.in: added _memmove.c
+	* device/lib/z80/asm_strings.s: fixed bug #772290
+	* support/regression/tests/bitfields.c: attempt to fix host assertion
+	failure on amd64-unknown-linux2.2
+
 2003-09-06  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
 	* src/z80/gen.c (aopPut, spillPairReg): fixed bug #800998
 	* src/z80/gen.c (genFunction, genEndFunction): fixed "bug" #774700
 	* as/z80/asmain.c (main): fixed bug #801766
@@ -9,10 +28,12 @@
 	compilers
 
 2003-09-05  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
 	* src/SDCCast.c (isConformingBody): fixed loop reversal bug
 	reported in bug #800609
 
 2003-09-04  Vangelis Rokas <vrokas@otenet.gr>
+
 	* Top header beautifications in src/pic16 directory:
 	  device.c, device.h, gen.c, gen.h, genarith.c, glue.c, pcode.c,
 	  pcodeflow.c, pcodeflow.h, pcode.h, pcodepeep.c, pcoderegs.c,
@@ -34,6 +55,7 @@
 	aren't part of the nRegs tally. 
 
 2003-08-31  Vangelis Rokas <vrokas@otenet.gr>
+
 	* src/pic16/main.c: corrected offsets of interrupt vectors in _pic16_genIVT()
 	* src/pic16/pcode.c: fix to disable inserting BANKSEL directive
 	  before instructions that use the _STATUS register

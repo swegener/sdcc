@@ -26,7 +26,7 @@
 char * strncat (
 	char * front,
 	char * back,
-	int count
+	size_t count
 	) 
 {
 	char *start = front;

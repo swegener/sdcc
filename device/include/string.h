@@ -26,44 +26,21 @@
 #ifndef __SDC51_STRING_H
 #define __SDC51_STRING_H 1
 
-#if !defined(SDCC_mcs51) && !defined(SDCC_ds390)
-#define reentrant
-#endif
-
 #ifndef NULL
 # define NULL (void *)0
 #endif
 
-#define memmove memcpy
-
-#ifdef SDCC_STACK_AUTO
-
-extern char *strcpy (char *, char *) reentrant ;
-extern char *strncpy(char *, char *,int ) reentrant ;
-extern char *strcat (char *, char *) reentrant ;
-extern char *strncat(char *, char *,int ) reentrant ;
-extern int   strcmp (char *, char *) reentrant ;
-extern int   strncmp(char *, char *,int ) reentrant ;
-extern char *strchr (char *, char  ) reentrant ;
-extern char *strrchr(char *, char  ) reentrant ;
-extern int   strspn (char *, char *) reentrant ;
-extern int   strcspn(char *, char *) reentrant ;
-extern char *strpbrk(char *, char *) reentrant ;
-extern char *strstr (char *, char *) reentrant ;
-extern int   strlen (char *        ) reentrant ;
-extern char *strtok (char *, char *) reentrant ;
-extern void *memcpy (void *, void *, int ) reentrant ;
-extern int   memcmp (void *, void *, int ) reentrant ;
-extern void *memset (void *, unsigned char  , int ) reentrant ;
- 
-#else
+#ifndef _SIZE_T_DEFINED
+# define _SIZE_T_DEFINED
+  typedef unsigned int size_t;
+#endif
 
 extern char *strcpy (char *, char *)  ;
-extern char *strncpy(char *, char *,int )  ;
+extern char *strncpy(char *, char *, size_t )  ;
 extern char *strcat (char *, char *)  ;
-extern char *strncat(char *, char *,int )  ;
+extern char *strncat(char *, char *, size_t )  ;
 extern int   strcmp (char *, char *)  ;
-extern int   strncmp(char *, char *,int )  ;
+extern int   strncmp(char *, char *, size_t )  ;
 extern char *strchr (char *, char  )  ;
 extern char *strrchr(char *, char  )  ;
 extern int   strspn (char *, char *)  ;
@@ -72,14 +49,14 @@ extern char *strpbrk(char *, char *)  ;
 extern char *strstr (char *, char *)  ;
 extern int   strlen (char *  )  ;
 extern char *strtok (char *, char *)  ;
-extern void *memcpy (void *, void *, int )  ;
-extern int   memcmp (void *, void *, int )  ;
-extern void *memset (void *, unsigned char  , int )  ;
+extern void *memcpy (void *, void *, size_t )  ;
+extern int   memcmp (void *, void *, size_t )  ;
+extern void *memset (void *, unsigned char  , size_t )  ;
+extern void *memmove (void *, void *, size_t )  ;
 
 #if SDCC_ds390
 extern void xdata * memcpyx(void xdata *, void xdata *, int) _naked;
 #endif
 
-#endif
 
 #endif

@@ -214,7 +214,7 @@ computeDataFlow (eBBlock ** ebbs, int count)
 	  /* figure out the incoming expressions */
 	  /* this is a little more complex       */
 	  setToNull ((void **) &ebbs[i]->inExprs);
-	  // ??????? jwk ?????? if (optimize.global_cse)
+	  if (optimize.global_cse)
 	    {
 	      firstTime = 1;
 	      applyToSet (pred, mergeInExprs, ebbs[i], &firstTime);

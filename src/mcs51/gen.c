@@ -2509,8 +2509,8 @@ genEndFunction (iCode * ic)
 	emitcode ("setb", "ea");
 
       /* if debug then send end of function */
-/*  if (options.debug && currFunc)  */
-      if (currFunc)
+      /*  if (options.debug && currFunc)  */
+      if (options.debug && currFunc)
 	{
 	  _G.debugLine = 1;
 	  emitcode ("", "C$%s$%d$%d$%d ==.",
@@ -2549,7 +2549,7 @@ genEndFunction (iCode * ic)
 	}
 
       /* if debug then send end of function */
-      if (currFunc)
+      if (options.debug && currFunc)
 	{
 	  _G.debugLine = 1;
 	  emitcode ("", "C$%s$%d$%d$%d ==.",
@@ -8438,8 +8438,8 @@ gen51Code (iCode * lic)
   if (allocInfo)
     printAllocInfo (currFunc, codeOutFile);
   /* if debug information required */
-/*     if (options.debug && currFunc) { */
-  if (currFunc)
+  /*     if (options.debug && currFunc) { */
+  if (options.debug && currFunc)
     {
       cdbSymbol (currFunc, cdbFile, FALSE, TRUE);
       _G.debugLine = 1;

@@ -4164,7 +4164,7 @@ skipall:
   addSet (&operKeyReset, name);
   applyToSet (operKeyReset, resetParmKey);
 
-  if (options.debug && !options.nodebug)
+  if (options.debug)
     cdbStructBlock (1, cdbFile);
 
   cleanUpLevel (LabelTab, 0);

@@ -69,7 +69,6 @@ models:
 	  $(MAKE) CFLAGS="$(CFLAGS) --model-$$model" objects; \
 	  mv *.rel $$model; \
 	  mv *.asm $$model; \
-	  mv *.cdb $$model; \
 	done
 
 modelDS390:
@@ -79,7 +78,7 @@ modelDS390:
 		$(MAKE) CFLAGS="$(CFLAGS) -mds390" objects; \
 		cd ds390; $(MAKE); cd ..; \
 		cp *.lib ds390; \
-		mv *.rel *.asm *.cdb ds390; \
+		mv *.rel *.asm ds390; \
 	fi
 
 # Compiling and installing everything and runing test

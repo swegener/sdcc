@@ -2505,12 +2505,7 @@ ds390_assignRegisters (eBBlock ** ebbs, int count)
 
   setToNull ((void *) &_G.funcrUsed);
   ds390_ptrRegReq = _G.stackExtend = _G.dataExtend = 0;
-  /* if not register extentions then reduce number
-     of registers */
-  if (options.regExtend)
-    ds390_nRegs = 13;
-  else
-    ds390_nRegs = 8;
+  ds390_nRegs = 8;
 
   /* change assignments this will remove some
      live ranges reducing some register pressure */

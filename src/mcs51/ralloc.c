@@ -2501,12 +2501,7 @@ mcs51_assignRegisters (eBBlock ** ebbs, int count)
 
   setToNull ((void *) &_G.funcrUsed);
   mcs51_ptrRegReq = _G.stackExtend = _G.dataExtend = 0;
-  /* if not register extentions then reduce number
-     of registers */
-  if (options.regExtend)
-    mcs51_nRegs = 13;
-  else
-    mcs51_nRegs = 8;
+  mcs51_nRegs = 8;
 
   /* change assignments this will remove some
      live ranges reducing some register pressure */

@@ -16,7 +16,7 @@
 \tocdepth 3
 \paragraph_separation indent
 \defskip medskip
-\quotes_language english
+\quotes_language swedish
 \quotes_times 2
 \papercolumns 1
 \papersides 1
@@ -24,7 +24,7 @@
 
 \layout Title
 
-SDCC Compiler User Guide
+lSDCC Compiler User Guide
 \layout Standard
 
 
@@ -99,7 +99,7 @@ inline assembler code
 
 \end_inset 
 
-.
+ .
 \layout Subsection
 
 Open Source
@@ -109,7 +109,7 @@ All packages used in this compiler system are
 \emph on 
 opensource
 \emph default 
-(freeware); source code for all the sub-packages (asxxxx assembler/linker,
+ (freeware); source code for all the sub-packages (asxxxx assembler/linker,
  pre-processor) are distributed with the package.
  This documentation is maintained using a freeware word processor (LyX).
  
@@ -129,6 +129,28 @@ This program is free software; you can redistribute it and/or modify it
  You are forbidden to forbid anyone else to use, share and improve what
  you give them.
  Help stamp out software-hoarding! 
+\layout Subsection
+
+Typographic conventions
+\layout Standard
+
+Throughout this manual, we will use the following convention.
+ Commands you have to type in are printed in 
+\family sans 
+\series bold 
+"sans serif"
+\series default 
+.
+
+\family default 
+ Code samples are printed in 
+\family typewriter 
+typewriter font.
+
+\family default 
+ Interesting items and new terms are printed in 
+\emph on 
+italicised type.
 \layout Subsection
 
 System Requirements
@@ -160,7 +182,7 @@ The SDCC home page at
  Some of the other tools (simulator and assembler) included with SDCC contain
  their own documentation and can be found in the source distribution.
  If you want the latest unreleased software, the complete source package
- is available directly by anonymous CVS on www.sourceforge.net.
+ is available directly by anonymous CVS on cvs.sdcc.sourceforge.net.
 \layout Section
 
 Installation
@@ -181,32 +203,30 @@ Bring up a command line terminal, such as xterm.
 
 
 \series medium 
-Unpack the file using a command like: tar -xzf sdcc-2.x.x.tgz, this will create
- a sub-directory called sdcc with all of the sources.
+Unpack the file using a command like: 
+\family sans 
+\series bold 
+"tar -xzf sdcc-2.x.x.tgz"
+\family default 
+\series medium 
+, this will create a sub-directory called sdcc with all of the sources.
 \layout Enumerate
 
 Change directory into the main SDCC directory, for example type: 
-\begin_inset Quotes eld
-\end_inset 
-
-cd sdcc
-\begin_inset Quotes erd
-\end_inset 
-
+\family sans 
+\series bold 
+"cd sdcc"
+\series default 
 .
 \layout Enumerate
 
 
 \series medium 
 Type 
-\begin_inset Quotes eld
-\end_inset 
-
-./configure
-\begin_inset Quotes erd
-\end_inset 
-
-
+\family sans 
+\series bold 
+"./configure"
+\family default 
 \series default 
 .
  This configures the package for compilation on your system.
@@ -215,13 +235,11 @@ Type
 
 \series medium 
 Type 
-\begin_inset Quotes eld
-\end_inset 
-
-make
-\begin_inset Quotes erd
-\end_inset 
-
+\family sans 
+\series bold 
+"make"
+\family default 
+\series medium 
 .
 
 \series default 
@@ -231,14 +249,10 @@ make
 
 \series medium 
 Type 
-\begin_inset Quotes eld
-\end_inset 
-
-make install
-\begin_inset Quotes erd
-\end_inset 
-
-
+\family sans 
+\series bold 
+"make install"
+\family default 
 \series default 
  as root
 \series medium 
@@ -266,7 +280,7 @@ Windows Install Using a Binary Package
 \layout Enumerate
 
 Download the binary package and unpack it using your favorite unpacking
- tool(gunzip, WinZip, etc).
+ tool (gunzip, WinZip, etc).
  This should unpack to a group of sub-directories.
  An example directory structure after unpacking is: c:
 \backslash 
@@ -358,7 +372,7 @@ selected parts of
 \series medium 
  the package
 \series default 
-(a large 80M byte sized dowload for the whole thing)
+ (a large 80M byte sized dowload for the whole thing)
 \series medium 
 .
 
@@ -386,13 +400,11 @@ Testing out the SDCC Compiler
 The first thing you should do after installing your SDCC compiler is to
  see if it runs.
  Type 
-\begin_inset Quotes eld
-\end_inset 
-
-sdcc --version
-\begin_inset Quotes erd
-\end_inset 
-
+\family sans 
+\series bold 
+"sdcc --version"
+\family default 
+\series default 
  at the prompt, and the program should run and tell you the version.
  If it doesn't run, or gives a message about not finding sdcc program, then
  you need to check over your installation.
@@ -401,8 +413,9 @@ sdcc --version
  for suggestions).
  Make sure that the sdcc program is in the bin folder, if not perhaps something
  did not install correctly.
-\layout Standard
+\newline 
 
+\newline 
 
 \series medium 
 SDCC binaries are commonly installed in a directory arrangement like this:
@@ -510,63 +523,34 @@ Make sure the compiler works on a very simple example.
 
 \newline 
 
-\family typewriter 
-\emph default 
-main()
-\newline 
-{ 
-\layout Standard
-
-
-\family typewriter 
-int i;
-\layout Standard
-
-
-\family typewriter 
-i = 0;
-\layout Standard
-
-
-\family typewriter 
-i += 10;
-\newline 
-}
-\family default 
-\emph on 
-
-\newline 
-
-\layout Standard
-
-
 \series medium 
+\emph default 
 Compile this using the following command: 
-\begin_inset Quotes eld
-\end_inset 
-
-sdcc -c test.c
-\begin_inset Quotes erd
-\end_inset 
-
-.
- If all goes well, the compiler will generate a test.asm and test.rel file.
+\family sans 
+\series bold 
+"sdcc -c test.c"
+\family default 
+\series default 
+ 
+\series medium 
+If all goes well, the compiler will generate a test.asm and test.rel file.
  Congratulations, you've just compiled your first program with SDCC.
  We used the -c option to tell SDCC not to link the generated code, just
  to keep things simple for this step.
-\layout Standard
+\series default 
 
+\newline 
+
+\newline 
 
 \series medium 
 The next step is to try it with the linker.
  Type in 
-\begin_inset Quotes eld
-\end_inset 
-
-sdcc test.c
-\begin_inset Quotes erd
-\end_inset 
-
+\family sans 
+\series bold 
+"sdcc test.c"
+\family default 
+\series medium 
 .
  If all goes well the compiler will link with the libraries and produce
  a test.ihx output file.
@@ -584,63 +568,52 @@ usr/local/share/sdcc/lib directory
  
 \series medium 
 (see the Install trouble-shooting section for suggestions).
-\layout Standard
-
-
-\series medium 
-The final test is to ensure sdcc can use the standard header files and libraries.
- Edit test.c and change it to the following:
 \series default 
 
 \newline 
 
 \newline 
 
-\family typewriter 
+\series medium 
+The final test is to ensure sdcc can use the 
+\series default 
+standard
+\series medium 
+ header files and libraries.
+ Edit test.c and change it to the following:
+\layout LyX-Code
+
 #include <string.h>
-\newline 
-main()
-\newline 
-{ 
-\layout Standard
+\layout LyX-Code
 
+main() {
+\layout LyX-Code
 
+  
 \family typewriter 
 char str1[10];
-\layout Standard
+\layout LyX-Code
+
+  
+\family typewriter 
+strcpy(str1, "testing");
+\layout LyX-Code
 
 
 \family typewriter 
-strcpy(str1, 
-\begin_inset Quotes eld
-\end_inset 
-
-testing
-\begin_inset Quotes erd
-\end_inset 
-
-);
-\newline 
-
-\newline 
 }
-\family default 
-\emph on 
-
-\newline 
+\layout LyX-Code
 
 \layout Standard
 
 
 \series medium 
-Compile this by typing: 
-\begin_inset Quotes eld
-\end_inset 
-
-sdcc test.c
-\begin_inset Quotes erd
-\end_inset 
-
+Compile this by typing 
+\family sans 
+\series bold 
+"sdcc test.c"
+\family default 
+\series medium 
 .
  This should generate a test.ihx output file, and it should give no warnings
  such as not finding the string.h file.
@@ -677,7 +650,13 @@ The default installation assumes the libraries and header files are located
 
 .
  An alternative is to specify these locations as compiler options like this:
- sdcc -L /usr/local/sdcc/lib/small -I /usr/local/sdcc/include test.c
+ 
+\family sans 
+\series bold 
+"sdcc -L /usr/local/sdcc/lib/small -I /usr/local/sdcc/include test.c"
+\family default 
+\series default 
+.
 \layout Subsubsection
 
 SDCC does not compile correctly.
@@ -686,41 +665,41 @@ SDCC does not compile correctly.
 A thing to try is starting from scratch by unpacking the .tgz source package
  again in an empty directory.
  Confure it again and build like:
-\layout Standard
+\newline 
 
+\newline 
 
-\begin_inset Quotes eld
-\end_inset 
-
+\family sans 
+\series bold 
 make 2&>1 | tee make.log
-\begin_inset Quotes erd
-\end_inset 
+\family default 
+\series default 
 
+\newline 
 
-\layout Standard
-
+\newline 
 After this you can review the make.log file to locate the problem.
  Or a relevant part of this be attached to an email that could be helpful
  when requesting help from the mailing list.
 \layout Subsubsection
 
 What the 
-\begin_inset Quotes eld
+\begin_inset Quotes sld
 \end_inset 
 
 ./configure
-\begin_inset Quotes erd
+\begin_inset Quotes srd
 \end_inset 
 
  does
 \layout Standard
 
 The 
-\begin_inset Quotes eld
+\begin_inset Quotes sld
 \end_inset 
 
 ./configure
-\begin_inset Quotes erd
+\begin_inset Quotes srd
 \end_inset 
 
  command is a script that analyzes your system and performs some configuration
@@ -730,11 +709,11 @@ The
 \layout Subsubsection
 
 What the 
-\begin_inset Quotes eld
+\begin_inset Quotes sld
 \end_inset 
 
 make
-\begin_inset Quotes erd
+\begin_inset Quotes srd
 \end_inset 
 
  does.
@@ -745,7 +724,7 @@ This runs the GNU make tool, which automatically compiles all the source
 \layout Subsubsection
 
 What the 
-\begin_inset Quotes eld
+\begin_inset Quotes sld
 \end_inset 
 
 make install
@@ -775,8 +754,8 @@ y slower under Windows due to the overhead of the Cygwin tool set.
  
 \layout Standard
 
-The Cygwin package allows a Windows user to run a Unix command line interface(ba
-sh shell) and also implements a Unix like file system on top of Windows.
+The Cygwin package allows a Windows user to run a Unix command line interface
+ (bash shell) and also implements a Unix like file system on top of Windows.
  Included are many of the famous GNU software development tools which can
  augment the SDCC compiler.This is great if you have some experience with
  Unix command line tools and file system conventions, if not you may find
@@ -787,16 +766,19 @@ sh shell) and also implements a Unix like file system on top of Windows.
 Getting started with Cygwin
 \layout Standard
 
-SDCC is typically distributed as a tarred/gzipped file(.tgz).
+SDCC is typically distributed as a tarred/gzipped file (.tgz).
  This is a packed file similar to a .zip file.
- Cygwin includes the tools you will need to unpack the SDCC distribution(tar
- and gzip).
+ Cygwin includes the tools you will need to unpack the SDCC distribution
+ (tar and gzip).
  To unpack it, simply follow the instructions under the Linux/Unix install
  section.
  Before you do this you need to learn how to start a cygwin shell and some
  of the basic commands used to move files, change directory, run commands
  and so on.
  The change directory command is 
+\family sans 
+\series bold 
+
 \begin_inset Quotes eld
 \end_inset 
 
@@ -804,7 +786,13 @@ cd
 \begin_inset Quotes erd
 \end_inset 
 
+
+\family default 
+\series default 
 , the move command is 
+\family sans 
+\series bold 
+
 \begin_inset Quotes eld
 \end_inset 
 
@@ -812,8 +800,14 @@ mv
 \begin_inset Quotes erd
 \end_inset 
 
+
+\family default 
+\series default 
 .
  To print the current working directory, type 
+\family sans 
+\series bold 
+
 \begin_inset Quotes eld
 \end_inset 
 
@@ -821,8 +815,14 @@ pwd
 \begin_inset Quotes erd
 \end_inset 
 
+
+\family default 
+\series default 
 .
  To make a directory, use 
+\family sans 
+\series bold 
+
 \begin_inset Quotes eld
 \end_inset 
 
@@ -830,6 +830,9 @@ mkdir
 \begin_inset Quotes erd
 \end_inset 
 
+
+\family default 
+\series default 
 .
 \layout Standard
 
@@ -858,7 +861,10 @@ Running SDCC as Native Compiled Executables
 
 If you use the pre-compiled binaries, the install directories for the libraries
  and header files may need to be specified on the sdcc command line like
- this: sdcc -L c:
+ this: 
+\family sans 
+\series bold 
+"sdcc -L c:
 \backslash 
 usr
 \backslash 
@@ -876,13 +882,22 @@ local
 \backslash 
 sdcc
 \backslash 
-include test.c if you are running outside of a Unix bash shell.
+include test.c"
+\family default 
+\series default 
+ if you are running outside of a Unix bash shell.
 \layout Standard
 
 If you have successfully installed and compiled SDCC with the Cygwin package,
  it is possible to compile into native .exe files by using the additional
  makefiles included for this purpose.
- For example, with the Borland 32-bit compiler you would run make -f Makefile.bcc.
+ For example, with the Borland 32-bit compiler you would run 
+\family sans 
+\series bold 
+"make -f Makefile.bcc"
+\family default 
+\series default 
+.
  A command line version of the Borland 32-bit compiler can be downloaded
  from the Inprise web site.
 \layout Subsection
@@ -918,99 +933,48 @@ configure
  name> is the final location for the sdcc executables and libraries, (default
  location is /usr/local).
  The installation process will create the following directory structure
- under the <directory name> specified.
+ under the <directory name> specified (if they do not already exist).
  
+\newline 
+
 \layout Standard
 
-bin/ - binary exectables (add to PATH environment variable) 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-share/ 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-sdcc/include/ - include header files 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-sdcc/lib/ - 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-small/ - Object & library files for small model library 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-large/ - Object & library files for large model library 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-ds390/ - Object & library files forDS80C390 library
+bin/ - binary exectables (add to PATH environment variable)
 \layout Standard
 
+bin/share/
+\layout Standard
+
+bin/share/sdcc/include/ - include header files
+\layout Standard
+
+bin/share/sdcc/lib/
+\layout Standard
+
+bin/share/sdcc/lib/small/ - Object & library files for small model library
+\layout Standard
+
+bin/share/sdcc/lib/large/ - Object & library files for large model library
+\layout Standard
+
+bin/share/sdcc/lib/ds390/ - Object & library files forDS80C390 library
+\newline 
+
+\newline 
 The command 
-\layout Standard
-
-
+\family sans 
 \series bold 
-\size large 
-\bar under 
-'./configure --prefix=/usr/local
+
+\begin_inset Quotes sld
+\end_inset 
+
+./configure --prefix=/usr/local
 \begin_inset Quotes erd
 \end_inset 
 
  
-\layout Standard
-
+\family default 
+\series default 
 will configure the compiler to be installed in directory /usr/local/bin.
 \layout Subsection
 
@@ -1029,6 +993,8 @@ SDCC is not just a compiler, but a collection of tools by various developers.
 You might want to look at the various executables which are installed in
  the bin directory.
  At the time of this writing, we find the following programs:
+\newline 
+
 \layout Standard
 
 
@@ -1061,7 +1027,7 @@ sdcpp
 
 
 \series bold 
-sdcpd
+sdcdb
 \series default 
  - The source debugger.
 \layout Standard
@@ -1075,7 +1041,7 @@ s51
 
 
 \series bold 
-linkz80, linkgbz80
+link-z80, link-gbz80
 \series default 
  - The Z80 and GameBoy Z80 linkers.
 \layout Standard
@@ -1092,8 +1058,9 @@ as-z80, as-gbz80
 packihx
 \series default 
  - A tool to pack Intel hex files.
-\layout Standard
+\newline 
 
+\newline 
 As development for other processors proceeds, this list will expand to include
  executables to support processors like AVR, PIC, etc.
 \layout Subsubsection
@@ -1101,54 +1068,49 @@ As development for other processors proceeds, this list will expand to include
 cpp ( C-Preprocessor)
 \layout Standard
 
-The preprocessor is extracted into the directory 
-\emph on 
-SDCCDIR/cpp
-\emph default 
-, it is a modified version of the GNU preprocessor.
+The preprocessor is a modified version of the GNU preprocessor.
  The C preprocessor is used to pull in #include sources, process #ifdef
  statements, #defines and so on.
 \layout Subsubsection
 
-asxxxx & aslink ( The assembler and Linkage Editor)
+asxxxx & aslink ( The Assembler and Linkage Editor)
 \layout Standard
 
 This is retargettable assembler & linkage editor, it was developed by Alan
- Baldwin, John Hartman created the version for 8051, and I (Sandeep) have
- some enhancements and bug fixes for it to work properly with the SDCC.
- This component is extracted into the directory 
-\emph on 
-SDCCDIR/asxxxx.
+ Baldwin.
+ John Hartman created the version for 8051, and I (Sandeep) have made some
+ enhancements and bug fixes for it to work properly with the SDCC.
 \layout Subsubsection
 
-SDCC - The compiler
+sdcc - The Compiler
 \layout Standard
 
 This is the actual compiler, it in turn uses the c-preprocessor and invokes
- the assembler and linkage editors.
- All files with the prefix 
-\emph on 
-SDCC 
-\emph default 
-are part of the compiler and are extracted into the the directory 
-\emph on 
-SDCCDIR.
+ the assembler and linkage editor.
 \layout Subsubsection
 
-S51 - Simulator
+s51 - Simulator
 \layout Standard
 
-s51 is a freeware, opensource simulator developed by Daniel Drotos <drdani@mazso
-la.iit.uni-miskolc.hu>.
- The executable is built as part of the build process, for more information
- visit Daniel's website at <http://mazsola.iit.uni-miskolc.hu/~drdani/embedded/s51/
->.
+S51 is a freeware, opensource simulator developed by Daniel Drotos 
+\begin_inset LatexCommand \url{mailto:drdani@mazsola.iit.uni-miskolc.hu}
+
+\end_inset 
+
+.
+ The executable is built as part of the build process.
+ For more information visit Daniel's website at 
+\begin_inset LatexCommand \url{http://mazsola.iit.uni-miskolc.hu/~drdani/embedded/s51}
+
+\end_inset 
+
+.
 \layout Subsubsection
 
-SDCDB - Source Level Debugger
+sdcdb - Source Level Debugger
 \layout Standard
 
-SDCDB is the companion source level debugger.
+Sdcdb is the companion source level debugger.
  The current version of the debugger uses Daniel's Simulator S51, but can
  be easily changed to use other simulators.
 \layout Section
@@ -1163,15 +1125,14 @@ Single Source File Projects
 \layout Standard
 
 For single source file 8051 projects the process is very simple.
- Compile your programs with the following command
-\layout Standard
+ Compile your programs with the following command 
+\family sans 
+\series bold 
+"sdcc sourcefile.c".
 
-
-\size footnotesize 
-sdcc sourcefile.c
-\layout Standard
-
-The above command will compile ,assemble and link your source file.
+\family default 
+\series default 
+ This will compile, assemble and link your source file.
  Output files are as follows.
 \layout Itemize
 
@@ -1221,6 +1182,8 @@ Projects with Multiple Source Files
 SDCC can compile only ONE file at a time.
  Let us for example assume that you have a project containing the following
  files.
+\newline 
+
 \layout Standard
 
 
@@ -1236,50 +1199,85 @@ foo2.c (contains some more functions)
 
 \size footnotesize 
 foomain.c (contains more functions and the function main)
-\layout Standard
+\newline 
 
+\newline 
+
+\size default 
 The first two files will need to be compiled separately with the commands
-\layout Standard
-
-
 \size footnotesize 
-sdcc -c foo1.c
-\layout Standard
-
-
+ 
+\family sans 
+\series bold 
+\size default 
+"sdcc\SpecialChar ~
+-c\SpecialChar ~
+foo1.c"
+\family default 
+\series default 
 \size footnotesize 
-sdcc -c foo2.c
-\layout Standard
-
-Then compile the source file containing main and link the other files together
- with the following command.
-\layout Standard
-
-
+ and 
+\family sans 
+\series bold 
+\size default 
+"sdcc\SpecialChar ~
+-c\SpecialChar ~
+foo2.c"
+\family default 
+\series default 
 \size footnotesize 
-sdcc foomain.c foo1.rel foo2.rel
-\layout Standard
-
-Alternatively 
+.
+ 
+\size default 
+Then compile the source file containing the main() function and link the
+ files together with the following command: 
+\family sans 
+\series bold 
+"sdcc\SpecialChar ~
+foomain.c\SpecialChar ~
+foo1.rel\SpecialChar ~
+foo2.rel"
+\family default 
+\series default 
+.
+ Alternatively, foomain.c
 \emph on 
-foomain.c
+ 
 \emph default 
- can be separately compiled as well
-\layout Standard
-
-
+can be separately compiled as well: 
+\family sans 
+\series bold 
+"sdcc\SpecialChar ~
+-c\SpecialChar ~
+foomain.c"
+\family default 
+\series default 
 \size footnotesize 
-sdcc -c foomain.c 
-\layout Standard
+ and 
+\family sans 
+\series bold 
+\size default 
 
+\begin_inset Quotes sld
+\end_inset 
 
-\size footnotesize 
-sdcc foomain.rel foo1.rel foo2.rel
-\layout Standard
+sdcc foomain.rel foo1.rel foo2.rel"
+\newline 
 
-The file containing the main function MUST be the FIRST file specified in
- the command line , since the linkage editor processes file in the order
- they are presented to it.
+\newline 
+
+\family default 
+\series default 
+The file containing the main function
+\emph on 
+must
+\emph default 
+ be the 
+\emph on 
+first
+\emph default 
+ file specified in the command line, since the linkage editor processes
+ file in the order they are presented to it.
 \layout Subsubsection
 
 Projects with Additional Libraries
@@ -1425,369 +1423,6 @@ Preprocessor Options
 
 
 \series bold 
---compile-only(-c)
-\series default 
-\size large 
- 
-\size default 
- will compile and assemble the source, but will not call the linkage editor.
-\layout Subsubsection
-
-Linker Options
-\layout Standard
-
-
-\series bold 
---lib-path(-L)
-\bar under 
- 
-\series default 
-\bar default 
-<absolute path to additional libraries> This option is passed to the linkage
- editor's additional libraries search path.
- The path name must be absolute.
- Additional library files may be specified in the command line.
- See section Compiling programs for more details.
-\layout Standard
-
-
-\series bold 
---xram-loc
-\series default 
-<Value> The start location of the external ram, default value is 0.
- The value entered can be in Hexadecimal or Decimal format, e.g.: --xram-loc
- 0x8000 or --xram-loc 32768.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---code-loc
-\series default 
-<Value> The start location of the code segment , default value 0.
- Note when this option is used the interrupt vector table is also relocated
- to the given address.
- The value entered can be in Hexadecimal or Decimal format, e.g.: --code-loc
- 0x8000 or --code-loc 32768.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---stack-loc
-\series default 
-<Value> The initial value of the stack pointer.
- The default value of the stack pointer is 0x07 if only register bank 0
- is used, if other register banks are used then the stack pointer is initialized
- to the location above the highest register bank used.
- eg.
- if register banks 1 & 2 are used the stack pointer will default to location
- 0x18.
- The value entered can be in Hexadecimal or Decimal format, eg.
- --stack-loc 0x20 or --stack-loc 32.
- If all four register banks are used the stack will be placed after the
- data segment (equivalent to --stack-after-data)
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---stack-after-data
-\series default 
- This option will cause the stack to be located in the internal ram after
- the data segment.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---data-loc
-\series default 
-<Value> The start location of the internal ram data segment, the default
- value is 0x30.The value entered can be in Hexadecimal or Decimal format,
- eg.
- --data-loc 0x20 or --data-loc 32.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---idata-loc
-\series default 
-<Value> The start location of the indirectly addressable internal ram, default
- value is 0x80.
- The value entered can be in Hexadecimal or Decimal format, eg.
- --idata-loc 0x88 or --idata-loc 136.
-\layout Subsubsection
-
-MCS51 Options
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---model-large
-\series default 
- Generate code for Large model programs see section Memory Models for more
- details.
- If this option is used all source files in the project should be compiled
- with this option.
- In addition the standard library routines are compiled with small model
- , they will need to be recompiled.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---model-small
-\series default 
-\size large 
-\emph on 
- 
-\size default 
-\emph default 
-Generate code for Small Model programs see section Memory Models for more
- details.
- This is the default model.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---stack-auto
-\series default 
-\size large 
-\emph on 
- 
-\size default 
-\emph default 
-All functions in the source file will be compiled as 
-\emph on 
-reentrant
-\emph default 
-, i.e.
- the parameters and local variables will be allocated on the stack.
- see section Parameters and Local Variables for more details.
- If this option is used all source files in the project should be compiled
- with this option.
- 
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---xstack
-\series default 
- Uses a pseudo stack in the first 256 bytes in the external ram for allocating
- variables and passing parameters.
- See section on external stack for more details.
-\layout Subsubsection
-
-Optimization Options
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---nogcse
-\series default 
- Will not do global subexpression elimination, this option may be used when
- the compiler creates undesirably large stack/data spaces to store compiler
- temporaries.
- A warning message will be generated when this happens and the compiler
- will indicate the number of extra bytes it allocated.
- It recommended that this option NOT be used , #pragma NOGCSE can be used
- to turn off global subexpression elimination for a given function only.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---noinvariant
-\series default 
- Will not do loop invariant optimizations, this may be turned off for reasons
- explained for the previous option.
- For more details of loop optimizations performed see section Loop Invariants.It
- recommended that this option NOT be used , #pragma NOINVARIANT can be used
- to turn off invariant optimizations for a given function only.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---noinduction
-\series default 
- Will not do loop induction optimizations, see section Strength reduction
- for more details.It recommended that this option NOT be used , #pragma NOINDUCTI
-ON can be used to turn off induction optimizations for given function only.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---nojtbound
-\size large 
-\bar under 
- 
-\series default 
-\size default 
-\bar default 
- Will not generate boundary condition check when switch statements are implement
-ed using jump-tables.
- See section Switch Statements for more details.It recommended that this
- option NOT be used , #pragma NOJTBOUND can be used to turn off boundary
- checking for jump tables for a given function only.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---noloopreverse
-\series default 
-\size large 
- 
-\size default 
-Will not do loop reversal optimization
-\layout Subsubsection
-
-DS390 Options
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---stack-auto
-\series default 
- See MCS51 section for description.
-\layout List
-\labelwidthstring 00.00.0000
-
---
-\series bold 
-model
-\series default 
--
-\series bold 
-flat24
-\series default 
-\size large 
-\emph on 
- 
-\size default 
-\emph default 
-Generate 24-bit flat mode code.
- This is the one and only that the ds390 code generator supports right now
- and is default when using -mds390.
- See section Memory Models for more details.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---stack-10bit
-\series default 
- This option generates code for the 10 bit stack mode of the Dallas DS80C390
- part.
- This is the one and only that the ds390 code generator supports right now
- and is default when using -mds390.
- In this mode, the stack is located in the lower 1K of the internal RAM,
- which is mapped to 0x400000.
- Note that the support is incomplete, since it still uses a single byte
- as the stack pointer.
- This means that only the lower 256 bytes of the potential 1K stack space
- will actually be used.
- However, this does allow you to reclaim the precious 256 bytes of low RAM
- for use for the DATA and IDATA segments.
- The compiler will not generate any code to put the processor into 10 bit
- stack mode.
- It is important to ensure that the processor is in this mode before calling
- any re-entrant functions compiled with this option.
- In principle, this should work with the --stack-auto option, but that has
- not been tested.
- It is incompatible with the --xstack option.
- It also only makes sense if the processor is in 24 bit contiguous addressing
- mode (see the --model-flat24 option).
-\layout Subsubsection
-
-Other Options
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---callee-saves function1[,function2][,function3]....
-
-\series default 
- The compiler by default uses a caller saves convention for register saving
- across function calls, however this can cause unneccessary register pushing
- & popping when calling small functions from larger functions.
- This option can be used to switch the register saving convention for the
- function names specified.
- The compiler will not save registers when calling these functions, no extra
- code will be generated at the entry & exit for these functions to save
- & restore the registers used by these functions, this can SUBSTANTIALLY
- reduce code & improve run time performance of the generated code.
- In the future the compiler (with interprocedural analysis) will be able
- to determine the appropriate scheme to use for each function call.
- DO NOT use this option for built-in functions such as _muluint..., if this
- option is used for a library function the appropriate library function
- needs to be recompiled with the same option.
- If the project consists of multiple source files then all the source file
- should be compiled with the same --callee-saves option string.
- Also see Pragma Directive CALLEE-SAVES.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---debug
-\bar under 
- 
-\series default 
-\bar default 
-When this option is used the compiler will generate debug information ,
- that can be used with the SDCDB.
- The debug information is collected in a file with .cdb extension.
- For more information see documentation for SDCDB.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---regextend
-\bar under 
- 
-\series default 
-\bar default 
- This option will cause the compiler to define pseudo registers , if this
- option is used, all source files in the project should be compiled with
- this option.
- See section Register Extension for more details.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---peep-file
-\series default 
-<filename> This option can be used to use additional rules to be used by
- the peep hole optimizer.
- See section Peep Hole optimizations for details on how to write these rules.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
--E
-\series default 
- Run only the C preprocessor.
- Preprocess all the C source files specified and output the results to standard
- output.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
 -M
 \series default 
  Tell the preprocessor to output a rule suitable for make describing the
@@ -1894,6 +1529,387 @@ file"'.
 \bar default 
 Like `-dD' except that the macro arguments and contents are omitted.
  Only `#define name' is included in the output.
+\layout Subsubsection
+
+Linker Options
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-L\SpecialChar ~
+--lib-path
+\bar under 
+ 
+\series default 
+\bar default 
+<absolute path to additional libraries> This option is passed to the linkage
+ editor's additional libraries search path.
+ The path name must be absolute.
+ Additional library files may be specified in the command line.
+ See section Compiling programs for more details.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--xram-loc
+\series default 
+<Value> The start location of the external ram, default value is 0.
+ The value entered can be in Hexadecimal or Decimal format, e.g.: --xram-loc
+ 0x8000 or --xram-loc 32768.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--code-loc
+\series default 
+<Value> The start location of the code segment , default value 0.
+ Note when this option is used the interrupt vector table is also relocated
+ to the given address.
+ The value entered can be in Hexadecimal or Decimal format, e.g.: --code-loc
+ 0x8000 or --code-loc 32768.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--stack-loc
+\series default 
+<Value> The initial value of the stack pointer.
+ The default value of the stack pointer is 0x07 if only register bank 0
+ is used, if other register banks are used then the stack pointer is initialized
+ to the location above the highest register bank used.
+ eg.
+ if register banks 1 & 2 are used the stack pointer will default to location
+ 0x18.
+ The value entered can be in Hexadecimal or Decimal format, eg.
+ --stack-loc 0x20 or --stack-loc 32.
+ If all four register banks are used the stack will be placed after the
+ data segment (equivalent to --stack-after-data)
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--stack-after-data
+\series default 
+ This option will cause the stack to be located in the internal ram after
+ the data segment.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--data-loc
+\series default 
+<Value> The start location of the internal ram data segment, the default
+ value is 0x30.The value entered can be in Hexadecimal or Decimal format,
+ eg.
+ --data-loc 0x20 or --data-loc 32.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--idata-loc
+\series default 
+<Value> The start location of the indirectly addressable internal ram, default
+ value is 0x80.
+ The value entered can be in Hexadecimal or Decimal format, eg.
+ --idata-loc 0x88 or --idata-loc 136.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--out-fmt-ihx
+\bar under 
+ 
+\series default 
+\bar default 
+The linker output (final object code) is in Intel Hex format.
+ (This is the default option).
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--out-fmt-s19
+\bar under 
+ 
+\series default 
+\bar default 
+The linker output (final object code) is in Motorola S19 format.
+\layout Subsubsection
+
+MCS51 Options
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--model-large
+\series default 
+ Generate code for Large model programs see section Memory Models for more
+ details.
+ If this option is used all source files in the project should be compiled
+ with this option.
+ In addition the standard library routines are compiled with small model
+ , they will need to be recompiled.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--model-small
+\series default 
+\size large 
+\emph on 
+ 
+\size default 
+\emph default 
+Generate code for Small Model programs see section Memory Models for more
+ details.
+ This is the default model.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--xstack
+\series default 
+ Uses a pseudo stack in the first 256 bytes in the external ram for allocating
+ variables and passing parameters.
+ See section on external stack for more details.
+\layout Subsubsection
+
+Optimization Options
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--nogcse
+\series default 
+ Will not do global subexpression elimination, this option may be used when
+ the compiler creates undesirably large stack/data spaces to store compiler
+ temporaries.
+ A warning message will be generated when this happens and the compiler
+ will indicate the number of extra bytes it allocated.
+ It recommended that this option NOT be used , #pragma NOGCSE can be used
+ to turn off global subexpression elimination for a given function only.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--noinvariant
+\series default 
+ Will not do loop invariant optimizations, this may be turned off for reasons
+ explained for the previous option.
+ For more details of loop optimizations performed see section Loop Invariants.It
+ recommended that this option NOT be used , #pragma NOINVARIANT can be used
+ to turn off invariant optimizations for a given function only.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--noinduction
+\series default 
+ Will not do loop induction optimizations, see section Strength reduction
+ for more details.It recommended that this option NOT be used , #pragma NOINDUCTI
+ON can be used to turn off induction optimizations for given function only.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--nojtbound
+\size large 
+\bar under 
+ 
+\series default 
+\size default 
+\bar default 
+ Will not generate boundary condition check when switch statements are implement
+ed using jump-tables.
+ See section Switch Statements for more details.It recommended that this
+ option NOT be used , #pragma NOJTBOUND can be used to turn off boundary
+ checking for jump tables for a given function only.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--noloopreverse
+\series default 
+\size large 
+ 
+\size default 
+Will not do loop reversal optimization
+\layout Subsubsection
+
+DS390 Options
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--model-flat24
+\series default 
+\size large 
+\emph on 
+ 
+\size default 
+\emph default 
+Generate 24-bit flat mode code.
+ This is the one and only that the ds390 code generator supports right now
+ and is default when using -mds390.
+ See section Memory Models for more details.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--stack-10bit
+\series default 
+ Generate code for the 10 bit stack mode of the Dallas DS80C390 part.
+ This is the one and only that the ds390 code generator supports right now
+ and is default when using -mds390.
+ In this mode, the stack is located in the lower 1K of the internal RAM,
+ which is mapped to 0x400000.
+ Note that the support is incomplete, since it still uses a single byte
+ as the stack pointer.
+ This means that only the lower 256 bytes of the potential 1K stack space
+ will actually be used.
+ However, this does allow you to reclaim the precious 256 bytes of low RAM
+ for use for the DATA and IDATA segments.
+ The compiler will not generate any code to put the processor into 10 bit
+ stack mode.
+ It is important to ensure that the processor is in this mode before calling
+ any re-entrant functions compiled with this option.
+ In principle, this should work with the --stack-auto option, but that has
+ not been tested.
+ It is incompatible with the --xstack option.
+ It also only makes sense if the processor is in 24 bit contiguous addressing
+ mode (see the --model-flat24 option).
+\layout Subsubsection
+
+Other Options
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-c\SpecialChar ~
+--compile-only
+\series default 
+ will compile and assemble the source, but will not call the linkage editor.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-E
+\series default 
+ Run only the C preprocessor.
+ Preprocess all the C source files specified and output the results to standard
+ output.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--stack-auto
+\series default 
+\size large 
+\emph on 
+ 
+\size default 
+\emph default 
+All functions in the source file will be compiled as 
+\emph on 
+reentrant
+\emph default 
+, i.e.
+ the parameters and local variables will be allocated on the stack.
+ see section Parameters and Local Variables for more details.
+ If this option is used all source files in the project should be compiled
+ with this option.
+ 
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--callee-saves function1[,function2][,function3]....
+
+\series default 
+ The compiler by default uses a caller saves convention for register saving
+ across function calls, however this can cause unneccessary register pushing
+ & popping when calling small functions from larger functions.
+ This option can be used to switch the register saving convention for the
+ function names specified.
+ The compiler will not save registers when calling these functions, no extra
+ code will be generated at the entry & exit for these functions to save
+ & restore the registers used by these functions, this can SUBSTANTIALLY
+ reduce code & improve run time performance of the generated code.
+ In the future the compiler (with interprocedural analysis) will be able
+ to determine the appropriate scheme to use for each function call.
+ DO NOT use this option for built-in functions such as _muluint..., if this
+ option is used for a library function the appropriate library function
+ needs to be recompiled with the same option.
+ If the project consists of multiple source files then all the source file
+ should be compiled with the same --callee-saves option string.
+ Also see Pragma Directive CALLEE-SAVES.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--debug
+\bar under 
+ 
+\series default 
+\bar default 
+When this option is used the compiler will generate debug information ,
+ that can be used with the SDCDB.
+ The debug information is collected in a file with .cdb extension.
+ For more information see documentation for SDCDB.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+\emph on 
+--regextend
+\bar under 
+ 
+\series default 
+\bar default 
+ This option is obsolete and isn't supported anymore.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+\emph on 
+--noregparms
+\series default 
+ This option is obsolete and isn't supported anymore.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--peep-file
+\series default 
+<filename> This option can be used to use additional rules to be used by
+ the peep hole optimizer.
+ See section Peep Hole optimizations for details on how to write these rules.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -1979,29 +1995,6 @@ cyclomatic complexity
 
 
 \series bold 
---out-fmt-ihx
-\bar under 
- 
-\series default 
-\bar default 
-The linker output (final object code) is in Intel Hex format.
- (This is the default option).
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
---out-fmt-s19
-\bar under 
- 
-\series default 
-\bar default 
-The linker output (final object code) is in Motorola S19 format.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
 --nooverlay
 \series default 
   The compiler will not overlay parameters and local variables of any function,
@@ -2046,6 +2039,40 @@ The linker output (final object code) is in Motorola S19 format.
 \series default 
 <Value> Causes the linker to check if the interal ram usage is within limits
  of the given value.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--nostdincl
+\series default 
+ This will prevent the compiler from passing on the default include path
+ to the preprocessor.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--nostdlib
+\series default 
+ This will prevent the compiler from passing on the default library path
+ to the linker.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--verbose
+\series default 
+ Shows the various actions the compiler is performing.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-V
+\series default 
+ Shows the actual commands the compiler is executing.
 \layout Subsubsection
 
 Intermediate Dump Options
@@ -2130,7 +2157,7 @@ Will create a dump of iCode's, after live range analysis, into a file named
 \series bold 
 --dumlrange
 \series default 
- Will dump the life ranges for all symbols
+ Will dump the life ranges for all symbols.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -2520,33 +2547,39 @@ tion or division will NOT be overlayed since these are implemented using
 void set_error( unsigned char errcd) 
 \newline 
 {
-\layout Standard
-
-
-\family typewriter 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 P3 = errcd;
 \newline 
 } 
 \newline 
 #pragma RESTORE 
 \newline 
+
+\newline 
 void some_isr () interrupt 2 using 1 
 \newline 
 {
-\layout Standard
-
-
-\family typewriter 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 ...
-\layout Standard
-
-
-\family typewriter 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 set_error(10);
-\layout Standard
-
-
-\family typewriter 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 ...
  
 \newline 
@@ -2573,10 +2606,11 @@ Interrupt Service Routines
 
 SDCC allows interrupt service routines to be coded in C, with some extended
  keywords.
-\layout Standard
+\newline 
 
+\newline 
 
-\size small 
+\family typewriter 
 void timer_isr (void) interrupt 2 using 1 
 \newline 
 { 
@@ -2585,8 +2619,11 @@ void timer_isr (void) interrupt 2 using 1
  
 \newline 
 }
-\layout Standard
+\newline 
 
+\newline 
+
+\family default 
 The number following the 'interrupt' keyword is the interrupt number this
  routine will service.
  The compiler will insert a call to this routine in the interrupt vector
@@ -2851,15 +2888,15 @@ critical
  SDCC will generate code to disable all interrupts upon entry to a critical
  function and enable them back before returning.
  Note that nesting critical functions may cause unpredictable results.
-\newline 
-
-\newline 
-eg:
+ 
 \newline 
 
 \size small 
 
 \newline 
+
+\family typewriter 
+\size default 
 int foo () critical 
 \newline 
 { 
@@ -2873,7 +2910,7 @@ int foo () critical
 }
 \newline 
 
-\size default 
+\family default 
 
 \newline 
 The critical attribute maybe used with other attributes like 
@@ -2910,13 +2947,18 @@ The
 \newline 
 
 \newline 
+
+\family typewriter 
 data unsigned char counter;
 \newline 
 void simpleIterrupt(void) interrupt 1
 \newline 
 {
-\layout Standard
-
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 counter++;
 \newline 
 }
@@ -2926,33 +2968,47 @@ counter++;
 void nakedInterrupt(void) interrupt 2 _naked
 \newline 
 {
-\layout Standard
-
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 _asm
-\layout Standard
-
-\SpecialChar ~
-\SpecialChar ~
- inc\SpecialChar ~
- _counter
-\layout Standard
-
-\SpecialChar ~
-\SpecialChar ~
- reti\SpecialChar ~
+\newline 
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
+inc\SpecialChar ~
 \SpecialChar ~
- ; MUST explicitly include ret in _naked function.
-\layout Standard
-
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+_counter
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+reti\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+; MUST explicitly include ret in _naked function.
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 _endasm;
 \newline 
 }
+\family default 
+
 \newline 
 
 \newline 
@@ -2960,89 +3016,144 @@ For an 8051 target, the generated simpleInterrupt looks like:
 \newline 
 
 \newline 
+
+\family typewriter 
 _simpleIterrupt:
-\layout Standard
-
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 push\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- acc
-\layout Standard
-
+\SpecialChar ~
+acc
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 push\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- b
-\layout Standard
-
+\SpecialChar ~
+b
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 push\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- dpl
-\layout Standard
-
+\SpecialChar ~
+dpl
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 push\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- dph
-\layout Standard
-
+\SpecialChar ~
+dph
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 push\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- psw
-\layout Standard
-
+\SpecialChar ~
+psw
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 mov\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- psw,#0x00
-\layout Standard
-
+\SpecialChar ~
+psw,#0x00
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 inc\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- _counter
-\layout Standard
-
+\SpecialChar ~
+_counter
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 pop\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- psw
-\layout Standard
-
+\SpecialChar ~
+psw
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 pop\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- dph
-\layout Standard
-
+\SpecialChar ~
+dph
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 pop\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- dpl
-\layout Standard
-
+\SpecialChar ~
+dpl
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 pop\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- b
-\layout Standard
-
+\SpecialChar ~
+b
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 pop\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- acc
-\layout Standard
-
+\SpecialChar ~
+acc
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 reti
+\family default 
+
 \newline 
 
 \newline 
@@ -3050,22 +3161,30 @@ whereas nakedInterrupt looks like:
 \newline 
 
 \newline 
+
+\family typewriter 
 _nakedInterrupt:
-\layout Standard
-
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 inc\SpecialChar ~
- _counter
-\layout Standard
-
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+_counter
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 reti\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- ; MUST explicitly include ret(i) in _naked function.
+; MUST explicitly include ret(i) in _naked function.
+\family default 
+
 \newline 
 
 \newline 
@@ -3144,27 +3263,24 @@ Data items can be assigned an absolute address with the
 \emph on 
 at <address>
 \emph default 
- keyword, in addition to a storage class.
-\layout Standard
+ keyword, in addition to a storage class, e.g.:
+\newline 
 
-eg.
- 
-\layout Standard
+\newline 
 
-
-\size small 
+\family typewriter 
 xdata at 0x8000 unsigned char PORTA_8255 ;
-\layout Standard
+\newline 
 
+\family default 
+
+\newline 
 In the above example the 
 \emph on 
 PORTA_8255
 \emph default 
  will be allocated to the location 0x8000 of the external ram.
- 
-\layout Standard
-
-Note that is this feature is provided to give the programmer access to 
+ Note that this feature is provided to give the programmer access to 
 \emph on 
 memory mapped
 \emph default 
@@ -3175,21 +3291,22 @@ memory mapped
  variables that are declared without the absolute address, the assembler
  listing file (.lst) and the linker output files (<filename>.rst) and (<filename>.m
 ap) are a good places to look for such overlaps.
-\layout Standard
+\newline 
 
-Absolute address can be specified for variables in all storage classes.
-\layout Standard
+\newline 
+Absolute address can be specified for variables in all storage classes,
+ e.g.:
+\newline 
 
+\newline 
 
-\size small 
-eg.
-\layout Standard
-
-
-\size small 
+\family typewriter 
 bit at 0x02 bvar;
-\layout Standard
+\newline 
 
+\newline 
+
+\family default 
 The above example will allocate the variable at offset 0x02 in the bit-addressab
 le space.
  There is no real advantage to assigning absolute addresses to variables
@@ -3227,9 +3344,9 @@ Inline Assembler Code
 
 SDCC allows the use of in-line assembler with a few restriction as regards
  labels.
- All labels defined within inline assembler code HAS TO BE of the 
+ All labels defined within inline assembler code HAS TO BE of the form 
 \emph on 
-form nnnnn$
+nnnnn$
 \emph default 
  where nnnn is a number less than 100 (which implies a limit of utmost 100
  inline assembler labels 
@@ -3238,107 +3355,137 @@ per function)
 \noun default 
 .
  It is strongly recommended that each assembly instruction (including labels)
- be placed in a separate line ( as the example shows).
+ be placed in a separate line (as the example shows).
  When the 
 \series bold 
-\bar under 
 --peep-asm
 \series default 
-\bar default 
  command line option is used, the inline assembler code will be passed through
  the peephole optimizer, this might cause some unexpected changes in the
- inline assembler code, please go throught the peephole optimizer rules
- defined in file 'SDCCpeeph.def' carefully before using this option.
-\layout Standard
+ inline assembler code.
+ Please go throught the peephole optimizer rules defined in file 'SDCCpeeph.def'
+ carefully before using this option.
+\newline 
 
+\newline 
 
-\size small 
-eg
-\layout Standard
-
-
-\size small 
+\family typewriter 
 _asm 
 \newline 
 \SpecialChar ~
  \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
-mov b,#10 
+ mov b,#10 
 \newline 
 00001$: 
 \newline 
 \SpecialChar ~
  \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
-djnz b,00001$ 
+ djnz b,00001$ 
 \newline 
 _endasm ;
-\layout Standard
+\family default 
+\size small 
 
+\newline 
+
+\newline 
+
+\size default 
 The inline assembler code can contain any valid code understood by the assembler
  (this includes any assembler directives and comment lines).
  The compiler does not do any validation of the code within the 
-\emph on 
+\family typewriter 
 _asm ...
  _endasm;
-\emph default 
+\family default 
  keyword pair.
  
-\layout Standard
+\newline 
 
-Inline assembler code cannot reference any C-Labels however it can reference
- labels defined by the inline assembler.
-\layout Standard
+\newline 
+Inline assembler code cannot reference any C-Labels, however it can reference
+ labels defined by the inline assembler, e.g.:
+\newline 
 
+\newline 
 
-\size small 
-eg
-\layout Standard
-
-
-\size small 
+\family typewriter 
 foo() { 
 \newline 
-...
- /* some c code */ 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/* some c code */ 
 \newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 _asm 
 \newline 
 \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 ; some assembler code 
 \newline 
 \SpecialChar ~
- \SpecialChar ~
- ljmp $0003 
-\newline 
-_endasm ; 
-\newline 
-...
- /* some more c code */ 
-\newline 
-clabel: \SpecialChar ~
- /* inline assembler cannot reference this label */ 
-\newline 
-_asm 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ljmp $0003 
 \newline 
 \SpecialChar ~
- \SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+_endasm; 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/* some more c code */ 
+\newline 
+clabel:\SpecialChar ~
+\SpecialChar ~
+/* inline assembler cannot reference this label */ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+_asm
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 $0003: ;label (can be reference by inline assembler only) 
 \newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 _endasm ; 
 \newline 
-...
- 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/* some more c code */
 \newline 
 }
-\layout Standard
+\newline 
 
+\newline 
+
+\family default 
 In other words inline assembly code can access labels defined in inline
  assembly.
  The same goes the other way, ie.
@@ -3353,7 +3500,7 @@ For signed & unsigned int (16 bit) and long (32 bit) variables, division,
  These support routines are all developed in ANSI-C to facilitate porting
  to other MCUs.
  The following files contain the described routine, all of them can be found
- in the directory SDCCDIR/sdcc51lib
+ in the directory default SDCC library path.
 \layout Itemize
 
 
@@ -3416,11 +3563,11 @@ _modslong.c - signed 32 bit modulus (calls _modulong).
 _modulong.c - unsigned 32 bit modulus.
 \layout Standard
 
-All these routines are compiled as non-reentrant and small model.
- Since they are compiled as non-reentrant, interrupt service routines should
- not do any of the above operations, if this unavoidable then the above
- routines will need to ne compiled with the --stack-auto option, after which
- the source program will have to be compiled with --int-long-rent option.
+Since they are compiled as non-reentrant, interrupt service routines should
+ not do any of the above operations.
+ If this unavoidable then the above routines will need to be compiled with
+ the --stack-auto option, after which the source program will have to be
+ compiled with --int-long-rent option.
 \layout Subsection
 
 Floating Point Support
@@ -3516,20 +3663,23 @@ Note if all these routines are used simultaneously the data space might
  overflow.
  For serious floating point usage it is strongly recommended that the Large
  model be used (in which case the floating point routines mentioned above
- will need to recompiled with the --model-Large option)
+ will need to recompiled with the --model-large option)
 \layout Subsection
 
 MCS51 Memory Models
 \layout Standard
 
 SDCC allows two memory models for MCS51 code, small and large.
- Modules compiled with different memory models should never be combined
- together or the results would be unpredictable.
+ Modules compiled with different memory models should 
+\emph on 
+never
+\emph default 
+ be combined together or the results would be unpredictable.
  The library routines supplied with the compiler are compiled as both small
  and large.
  The compiled library modules are contained in seperate directories as small
  and large so that you can link to either set.
- In general the use of the large model is discouraged.
+ 
 \layout Standard
 
 When the large model is used all variables declared without a storage class
@@ -3540,43 +3690,48 @@ When the large model is used all variables declared without a storage class
 \layout Standard
 
 Judicious usage of the processor specific storage classes and the 'reentrant'
- function type will yield much more efficient code, than using the large-model.
+ function type will yield much more efficient code, than using the large
+ model.
  Several optimizations are disabled when the program is compiled using the
  large model, it is therefore strongly recommdended that the small model
  be used unless absolutely required.
 \layout Subsection
 
-Flat 24 bit Addressing Model
+DS390 Memory Models
 \layout Standard
 
-This option generates code for the 24 bit contiguous addressing mode of
- the Dallas DS80C390 part.
+The only model supported is Flat 24.
+ This generates code for the 24 bit contiguous addressing mode of the Dallas
+ DS80C390 part.
  In this mode, up to four meg of external RAM or code space can be directly
  addressed.
  See the data sheets at www.dalsemi.com for further information on this part.
-\layout Standard
+\newline 
 
+\newline 
 In older versions of the compiler, this option was used with the MCS51 code
  generator (-mmcs51).
  Now, however, the '390 has it's own code generator, selected by the -mds390
  switch.
- This code generator currently supports only the flat24 model, but the --model-f
-lat24 switch is still required, in case later versions of the code generator
- support other models (such as the paged mode of the '390).
- The combination of -mmcs51 and --model-flat24 is now depracated.
-\layout Standard
+ 
+\newline 
 
+\newline 
 Note that the compiler does not generate any code to place the processor
- into24 bitmode (it defaults to 8051 compatible mode).
- Boot loader or similar code must ensure that the processor is in 24 bit
- contiguous addressing mode before calling the SDCC startup code.
-\layout Standard
+ into 24 bitmode (although the tinibios in the ds390 libraries will do that
+ for you).
+ If you don't use tinibios, the boot loader or similar code must ensure
+ that the processor is in 24 bit contiguous addressing mode before calling
+ the SDCC startup code.
+\newline 
 
+\newline 
 Like the --model-large option, variables will by default be placed into
  the XDATA segment.
  
-\layout Standard
+\newline 
 
+\newline 
 Segments may be placed anywhere in the 4 meg address space using the usual
  --*-loc options.
  Note that if any segments are located above 64K, the -r flag must be passed
@@ -3584,6 +3739,7 @@ Segments may be placed anywhere in the 4 meg address space using the usual
  HEX output format must be used.
  The -r flag can be passed to the linker by using the option -Wl-r on the
  sdcc command line.
+ However, currently the linker can not handle code segments > 64k.
 \layout Subsection
 
 Defines Created by the Compiler
@@ -3593,6 +3749,14 @@ The compiler creates the following #defines.
 \layout Itemize
 
 SDCC - this Symbol is always defined.
+\layout Itemize
+
+SDCC_mcs51 or SDCC_ds390 or SDCC_z80, etc - depending on the model used
+ (e.g.: -mds390)
+\layout Itemize
+
+__mcs51 or __ds390 or __z80, etc - depending on the model used (e.g.
+ -mz80)
 \layout Itemize
 
 SDCC_STACK_AUTO - this symbol is defined when --stack-auto option is used.
@@ -3605,6 +3769,12 @@ SDCC_MODEL_LARGE - when --model-large is used.
 \layout Itemize
 
 SDCC_USE_XSTACK - when --xstack option is used.
+\layout Itemize
+
+SDCC_STACK_TENBIT - when -mds390 is used
+\layout Itemize
+
+SDCC_MODEL_FLAT24 - when -mds390 is used
 \layout Section
 
 SDCC Technical Data

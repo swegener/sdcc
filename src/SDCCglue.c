@@ -212,29 +212,26 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	continue;
 
       /* print extra debug info if required */
-      if ((options.debug || sym->level == 0) && !options.nodebug)
-	{
-
-	  cdbSymbol (sym, cdbFile, FALSE, FALSE);
-
-	  if (!sym->level)	/* global */
-	    if (IS_STATIC (sym->etype))
-	      fprintf (map->oFile, "F%s$", moduleName);		/* scope is file */
-	    else
-	      fprintf (map->oFile, "G$");	/* scope is global */
+      if (options.debug) {
+	cdbSymbol (sym, cdbFile, FALSE, FALSE);
+	if (!sym->level) /* global */
+	  if (IS_STATIC (sym->etype))
+	    fprintf (map->oFile, "F%s$", moduleName); /* scope is file */
 	  else
-	    /* symbol is local */
-	    fprintf (map->oFile, "L%s$", (sym->localof ? sym->localof->name : "-null-"));
-	  fprintf (map->oFile, "%s$%d$%d", sym->name, sym->level, sym->block);
-	}
-
+	    fprintf (map->oFile, "G$");	/* scope is global */
+	else
+	  /* symbol is local */
+	  fprintf (map->oFile, "L%s$", (sym->localof ? sym->localof->name : "-null-"));
+	fprintf (map->oFile, "%s$%d$%d", sym->name, sym->level, sym->block);
+      }
+      
       /* if is has an absolute address then generate
          an equate for this no need to allocate space */
       if (SPEC_ABSA (sym->etype))
 	{
-	  if ((options.debug || sym->level == 0) && !options.nodebug)
+	  if (options.debug) {
 	    fprintf (map->oFile, " == 0x%04x\n", SPEC_ADDR (sym->etype));
-
+	  }
 	  fprintf (map->oFile, "%s\t=\t0x%04x\n",
 		   sym->rname,
 		   SPEC_ADDR (sym->etype));
@@ -242,13 +239,15 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
       else
 	{
 	  /* allocate space */
-	  if ((options.debug || sym->level == 0) && !options.nodebug)
+	  if (options.debug) {
 	    fprintf (map->oFile, "==.\n");
+	  }
 	  if (IS_STATIC (sym->etype))
 	    tfprintf (map->oFile, "!slabeldef\n", sym->rname);
 	  else
 	    tfprintf (map->oFile, "!labeldef\n", sym->rname);
-	  tfprintf (map->oFile, "\t!ds\n", (unsigned int) getSize (sym->type) & 0xffff);
+	  tfprintf (map->oFile, "\t!ds\n", 
+		    (unsigned int) getSize (sym->type) & 0xffff);
 	}
 
       /* if it has an initial value then do it only if
@@ -982,40 +981,37 @@ emitStaticSeg (memmap * map, FILE * out)
 	addSetHead (&publics, sym);
 
       /* print extra debug info if required */
-      if ((options.debug || sym->level == 0) && !options.nodebug)
-	{
-
-	  cdbSymbol (sym, cdbFile, FALSE, FALSE);
-
-	  if (!sym->level)
-	    {			/* global */
-	      if (IS_STATIC (sym->etype))
-		fprintf (out, "F%s$", moduleName);	/* scope is file */
-	      else
-		fprintf (out, "G$");	/* scope is global */
-	    }
-	  else
-	    /* symbol is local */
-	    fprintf (out, "L%s$",
-		     (sym->localof ? sym->localof->name : "-null-"));
-	  fprintf (out, "%s$%d$%d", sym->name, sym->level, sym->block);
-	}
-
+      if (options.debug) {
+	cdbSymbol (sym, cdbFile, FALSE, FALSE);
+	if (!sym->level)
+	  {			/* global */
+	    if (IS_STATIC (sym->etype))
+	      fprintf (out, "F%s$", moduleName);	/* scope is file */
+	    else
+	      fprintf (out, "G$");	/* scope is global */
+	  }
+	else
+	  /* symbol is local */
+	  fprintf (out, "L%s$",
+		   (sym->localof ? sym->localof->name : "-null-"));
+	fprintf (out, "%s$%d$%d", sym->name, sym->level, sym->block);
+      }
+      
       /* if it has an absolute address */
       if (SPEC_ABSA (sym->etype))
 	{
-	  if ((options.debug || sym->level == 0) && !options.nodebug)
+	  if (options.debug)
 	    fprintf (out, " == 0x%04x\n", SPEC_ADDR (sym->etype));
-
+	  
 	  fprintf (out, "%s\t=\t0x%04x\n",
 		   sym->rname,
 		   SPEC_ADDR (sym->etype));
 	}
       else
 	{
-	  if ((options.debug || sym->level == 0) && !options.nodebug)
+	  if (options.debug)
 	    fprintf (out, " == .\n");
-
+	  
 	  /* if it has an initial value */
 	  if (sym->ival)
 	    {
@@ -1088,7 +1084,7 @@ createInterruptVect (FILE * vFile)
   /* only if the main function exists */
   if (!(mainf = findSymWithLevel (SymbolTab, mainf)))
     {
-      if (!options.cc_only)
+      if (!options.cc_only && !noAssemble)
 	werror (E_NO_MAIN);
       return;
     }
@@ -1097,7 +1093,7 @@ createInterruptVect (FILE * vFile)
   if (!mainf->fbody)
     {
       /* if ! compile only then main function should be present */
-      if (!options.cc_only)
+      if (!options.cc_only && !noAssemble)
 	werror (E_NO_MAIN);
       return;
     }
@@ -1241,9 +1237,8 @@ emitOverlay (FILE * afile)
 	    continue;
 
 	  /* print extra debug info if required */
-	  if ((options.debug || sym->level == 0) && !options.nodebug)
+	  if (options.debug)
 	    {
-
 	      cdbSymbol (sym, cdbFile, FALSE, FALSE);
 
 	      if (!sym->level)
@@ -1265,7 +1260,7 @@ emitOverlay (FILE * afile)
 	  if (SPEC_ABSA (sym->etype))
 	    {
 
-	      if ((options.debug || sym->level == 0) && !options.nodebug)
+	      if (options.debug)
 		fprintf (afile, " == 0x%04x\n", SPEC_ADDR (sym->etype));
 
 	      fprintf (afile, "%s\t=\t0x%04x\n",
@@ -1274,9 +1269,9 @@ emitOverlay (FILE * afile)
 	    }
 	  else
 	    {
-	      if ((options.debug || sym->level == 0) && !options.nodebug)
+	      if (options.debug)
 		fprintf (afile, "==.\n");
-
+	      
 	      /* allocate space */
 	      tfprintf (afile, "!labeldef\n", sym->rname);
 	      tfprintf (afile, "\t!ds\n", (unsigned int) getSize (sym->type) & 0xffff);
@@ -1298,7 +1293,7 @@ glue ()
 
   addSetHead (&tmpfileSet, ovrFile);
   /* print the global struct definitions */
-  if (options.debug && !options.nodebug)
+  if (options.debug)
     cdbStructBlock (0, cdbFile);
 
   vFile = tempfile ();

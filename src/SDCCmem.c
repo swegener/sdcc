@@ -930,7 +930,7 @@ redoStackOffsets (void)
 
   /* if the debug option is set then output the
      symbols to the map file */
-  if (options.debug && !options.nodebug)
+  if (options.debug)
     {
       for (sym = setFirstItem (istack->syms); sym;
 	   sym = setNextItem (istack->syms))

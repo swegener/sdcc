@@ -158,7 +158,6 @@ optionsTable[] = {
     { 0,    OPTION_NO_LOOP_IND,     NULL, NULL },
     { 0,    "--nojtbound",          &optimize.noJTabBoundary, "Don't generate boundary check for jump tables" },
     { 0,    "--noloopreverse",      &optimize.noLoopReverse, "Disable the loop reverse optimisation" },
-    { 0,    "--regextend",          &options.regExtend, NULL },
     { 'c',  "--compile-only",       &options.cc_only, "Compile only, do not assemble or link" },
     { 0,    "--dumpraw",            &options.dump_raw, "Dump the internal structure after the initial parse" },
     { 0,    "--dumpgcse",           &options.dump_gcse, NULL },
@@ -187,7 +186,6 @@ optionsTable[] = {
     { 0,    "--no-peep",            &options.nopeep, "Disable the peephole assembly file optimisation" },
     { 0,    "--peep-asm",           &options.asmpeep, NULL },
     { 0,    "--debug",              &options.debug, "Enable debugging symbol output" },
-    { 0,    "--nodebug",            &options.nodebug, "Disable debugging symbol output" },
     { 'v',  OPTION_VERSION,         NULL, "Display sdcc's version" },
     { 0,    "--stack-after-data",   &options.stackOnData, NULL },
     { 'E',  "--preprocessonly",     &preProcOnly, "Preprocess only, do not compile" },
@@ -993,7 +991,7 @@ parseCmdLine (int argc, char **argv)
     options.xstack_loc = options.xdata_loc;
 
   /* if debug option is set the open the cdbFile */
-  if (!options.nodebug && srcFileName)
+  if (options.debug && srcFileName)
     {
       sprintf (scratchFileName, "%s.cdb", srcFileName);
       if ((cdbFile = fopen (scratchFileName, "w")) == NULL)
@@ -1035,8 +1033,8 @@ linkEdit (char **envp)
   if (options.iram_size)
     fprintf (lnkfile, "-a 0x%04x\n", options.iram_size);
 
-  /*if (options.debug) */
-  fprintf (lnkfile, "-z\n");
+  if (options.debug)
+    fprintf (lnkfile, "-z\n");
 
 #define WRITE_SEG_LOC(N, L) \
     segName = strdup(N); \
@@ -1365,7 +1363,7 @@ main (int argc, char **argv, char **envp)
               // EndFix
 	      return 1;
 	    }
-	  if (!options.c1mode)
+	  if (!options.c1mode && !noAssemble)
 	    {
 	      if (options.verbose)
 		printf ("sdcc: Calling assembler...\n");

@@ -22,12 +22,12 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
-#if !defined(__MYSYSTEM_H)
+#ifndef __MYSYSTEM_H
 #define __MYSYSTEM_H
 
-int my_system (const char *cmd) ;
-FILE *my_popen (const char *cmd) ;
+extern set *binPathSet; /* set of binary paths */
 
-extern char *ExePathList[] ;	  // List of paths to try to locate exeucatbles
+int my_system(const char *cmd);
+FILE *my_popen(const char *cmd);
 
 #endif

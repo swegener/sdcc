@@ -31,90 +31,197 @@
 #include <unistd.h>
 #endif
 
+#ifdef _WIN32
+#define EXE_EXT ".exe"
+#else
+#define EXE_EXT ""
+#endif
 
-//char *ExePathList[]= {SRCDIR "/bin",PREFIX "/bin", NULL};
-char *ExePathList[] = {NULL, NULL};			/* First entry may be overwritten, so use two. */
+
+set *binPathSet = NULL; /* set of binary paths */
+
 
 /*!
-Find the comamnd in one of predefined paths
+ * get command and arguments from command line
+ */
 
-NOTE: this function does't do it's job if:
-- the program name also contains the path
-  (and it seems thet this is always true :-(()
-- there are no spaces in cmd
-- the program name contains space characters
+static void
+split_command(const char *cmd_line, char **command, char **params)
+{
+  const char *p, *cmd_start;
+  char delim;
+  char *str;
+  unsigned len;
 
-It has to be rewritten.
-*/
+  /* skip leading spaces */
+  for (p = cmd_line; isspace(*p); p++)
+    ;
+
+  /* get command */
+  switch (*p) {
+  case '\'':
+  case '"':
+    delim = *p;
+    cmd_start = ++p;
+    break;
+
+  default:
+    delim = ' ';
+    cmd_start = p;
+  }
+
+  if (delim == ' ') {
+    while (*p != '\0' && !isspace(*p))
+      p++;
+  }
+  else {
+    while (*p != '\0' && *p != delim)
+      p++;
+  }
+
+  if (command != NULL) {
+    len = p - cmd_start;
+    str = Safe_alloc(len + 1);
+    strncpy(str, cmd_start, len);
+    str[len] = '\0';
+    *command = str;
+  }
+
+  p++;
+
+  /* skip spaces before parameters */
+  while (isspace(*p))
+    p++;
+
+  /* get parameters */
+  if (params != NULL)
+    *params = Safe_strdup(p);
+}
+
+
+/*!
+ * merge command and parameters to command line
+ */
 
 static char *
-get_path (const char *cmd)
+merge_command(const char *command, const char *params)
 {
-  int argsStart, i = 0;
+  char *cmd_line;
+  size_t len;
+
+  /* allocate extra space for ' ' and '\0' */
+  len = strlen(command) + strlen(params) + 2;
+  cmd_line = (char *)Safe_alloc(len);
+  SNPRINTF(cmd_line, len, "%s %s", command, params);
+
+  return cmd_line;
+}
+
+
+/*!
+ * check if the path is absolute
+ */
+
+static int
+has_path(const char *path)
+{
+  if (strrchr(path, DIR_SEPARATOR_CHAR) == NULL)
+#ifdef _WIN32
+    /* try *nix deir separator on WIN32 */
+    if (strrchr(path, UNIX_DIR_SEPARATOR_CHAR) == NULL)
+#endif
+      return 0;
+
+  return 1;
+}
+
+
+/*!
+ * find the command:
+ * 1) if the command is specified by absolute or relative path, try it
+ * 2) try to find the command in predefined path's
+ * 3) trust on $PATH
+ */
+
+static char *
+get_path(const char *cmd)
+{
   char *cmdLine = NULL;
+  char *command;
+  char *args;
+  char *path;
+  char cmdPath[PATH_MAX];
 
-  argsStart = strstr (cmd, " ") - cmd;
 
-  // try to find the command in predefined path's
-  while (ExePathList[i])
-    {
-      cmdLine = (char *) Safe_alloc (strlen (ExePathList[i]) + strlen (cmd) + 10);
-      strcpy (cmdLine, ExePathList[i]);	// the path
+  /* get the command */
+  split_command(cmd, &command, &args);
 
-      strcat (cmdLine, DIR_SEPARATOR_STRING);
-      strncat (cmdLine, cmd, argsStart);	// the command
+  if (!has_path(command)) {
+    /* try to find the command in predefined binary paths */
+    if ((path = (char *)setFirstItem(binPathSet)) != NULL) {
+      do
+      {
+        SNPRINTF(cmdPath, sizeof cmdPath,
+          "%s" DIR_SEPARATOR_STRING "%s", path, command);
 
 #ifdef _WIN32
-      strcat (cmdLine, ".exe");
-      if (access(cmdLine, 0) == 0)
+        /* Try if cmdPath or cmdPath.exe exist */
+        if (0 == access(cmdPath, 0) ||
+          0 == access(strncatz(cmdPath, EXE_EXT, sizeof cmdPath), 0)) {
 #else
-      if (access(cmdLine, X_OK) == 0)
+        /* Try if cmdPath */
+        if (0 == access(cmdPath, X_OK)) {
 #endif
-	{
-	  // the arguments
-	  strcat (cmdLine, cmd + argsStart);
-	  break;
-	}
-      Safe_free (cmdLine);
-      cmdLine = NULL;
-      i++;
+          /* compose the command line */
+          cmdLine = merge_command(cmdPath, args);
+          break;
+        }
+      } while ((path = (char *)setNextItem(binPathSet)) != NULL);
     }
+    if (cmdLine == NULL)
+      cmdLine = merge_command(command, args);
+  }
+  else {
+    /*
+     * the command is defined with absolute path:
+     * just return it
+     */
+    return Safe_strdup(cmd);
+  }
+
+  Safe_free(command);
+  Safe_free(args);
 
   return cmdLine;
 }
 
 
 /*!
-Call an external program with arguements
-*/
+ * call an external program with arguements
+ */
 
 int
-my_system (const char *cmd)
+my_system(const char *cmd)
 {
   int e;
-  char *cmdLine = get_path (cmd);
+  char *cmdLine = get_path(cmd);
+
+  assert(cmdLine != NULL);
 
   if (options.verboseExec) {
-      printf ("+ %s\n", cmdLine ? cmdLine : cmd);
+      printf("+ %s\n", cmdLine);
   }
 
-  if (cmdLine) {
-      // command found in predefined path
-      e = system (cmdLine);
-      Safe_free (cmdLine);
-  }
-  else {
-      // trust on $PATH
-      e = system (cmd);
-  }
+  e = system(cmdLine);
+  Safe_free(cmdLine);
 
   return e;
 }
 
 
 /*!
-Pipe an external program with arguements
-*/
+ * pipe an external program with arguements
+ */
 
 #ifdef _WIN32
 #define popen_read(cmd) _popen((cmd), "rt")
@@ -123,24 +230,19 @@ Pipe an external program with arguements
 #endif
 
 FILE *
-my_popen (const char *cmd)
+my_popen(const char *cmd)
 {
   FILE *fp;
-  char *cmdLine = get_path (cmd);
+  char *cmdLine = get_path(cmd);
+
+  assert(cmdLine != NULL);
 
   if (options.verboseExec) {
-      printf ("+ %s\n", cmdLine ? cmdLine : cmd);
+      printf("+ %s\n", cmdLine);
   }
 
-  if (cmdLine) {
-      // command found in predefined path
-      fp = popen_read (cmdLine);
-      Safe_free (cmdLine);
-  }
-  else {
-      // trust on $PATH
-      fp = popen_read (cmd);
-  }
+  fp = popen_read(cmdLine);
+  Safe_free(cmdLine);
 
   return fp;
 }

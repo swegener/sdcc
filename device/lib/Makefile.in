@@ -77,7 +77,7 @@ modelDS390:
 		test -d ds390 || mkdir ds390; \
 		rm -f ds390/*.lib; \
 		$(MAKE) CFLAGS="$(CFLAGS) -mds390" objects; \
-		cd ds390; $(MAKE); \
+		cd ds390; $(MAKE); cd ..; \
 		cp *.lib ds390; \
 		mv *.rel *.asm *.cdb ds390; \
 	fi

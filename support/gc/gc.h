@@ -55,8 +55,8 @@
 #define GC_API extern
 #endif
 
-# if defined(__STDC__) || defined(__cplusplus)
-#   define GC_PROTO(args) args
+# if defined(__STDC__) || defined(__cplusplus) || defined(__BORLANDC__)
+#  define GC_PROTO(args) args
     typedef void * GC_PTR;
 # else
 #   define GC_PROTO(args) ()

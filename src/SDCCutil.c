@@ -22,11 +22,14 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
-#include "common.h"
+#ifdef _WIN32
+#include <windows.h>
+#endif
+#include <sys/stat.h>
+#include "SDCCglobl.h"
 #include "SDCCmacro.h"
 #include "SDCCutil.h"
 #include "newalloc.h"
-#include <sys/stat.h>
 
 /** Given an array of name, value string pairs creates a new hash
     containing all of the pairs.
@@ -208,6 +211,32 @@ getPathDifference (char *pinto, const char *p1, const char *p2)
     directory of SDCC installation. Returns NULL if the path is
     impossible.
 */
+#ifdef _WIN32
+char *
+getBinPath(const char *prel)
+{
+  char *p;
+  size_t len;
+  static char path[PATH_MAX];
+    
+  /* try DOS and *nix dir separator on WIN32 */
+  if (NULL != (p = strrchr(prel, DIR_SEPARATOR_CHAR)) ||
+    NULL != (p = strrchr(prel, UNIX_DIR_SEPARATOR_CHAR))) {
+    len = min((sizeof path) - 1, p - prel);
+    strncpy(path, prel, len);
+    path[len] = '\0';
+    return path;
+  }
+  /* not enough info in prel; do it with module name */
+  else if (0 != GetModuleFileName(NULL, path, sizeof path) != 0 &&
+    NULL != (p = strrchr(path, DIR_SEPARATOR_CHAR))) {
+    *p = '\0';
+    return path;
+  }
+  else
+    return NULL;
+}
+#else
 char *
 getBinPath(const char *prel)
 {
@@ -216,11 +245,7 @@ getBinPath(const char *prel)
   static char path[PATH_MAX];
     
   if ((p = strrchr(prel, DIR_SEPARATOR_CHAR)) == NULL)
-#ifdef _WIN32
-    /* try *nix dir separator on WIN32 */
-    if ((p = strrchr(prel, UNIX_DIR_SEPARATOR_CHAR)) == NULL)
-#endif
-      return NULL;
+    return NULL;
 
   len = min((sizeof path) - 1, p - prel);
   strncpy(path, prel, len);
@@ -228,7 +253,7 @@ getBinPath(const char *prel)
 
   return path;
 }
-
+#endif
 
 /** Returns true if the given path exists.
  */

@@ -241,7 +241,7 @@ static asmop *newAsmop (short type)
     return aop;
 }
 
-/* #define LAZY_DPS_OPT */  /* turn this on after some more testing. */
+/* #define LAZY_DPS_OPT */ /* turn this on after some more testing. */
 
 static int _currentDPS;	  /* Current processor DPS. */
 static int _desiredDPS;	  /* DPS value compiler thinks we should be using. */
@@ -2034,14 +2034,42 @@ static void genCall (iCode *ic)
 	/* Not really related to LAZY_DPS_OPT, but don't want
 	 * another testing flag right now...
 	 */
-        _G.accInUse++;
-        aopOp(IC_RESULT(ic),ic,FALSE, TRUE);
-        _G.accInUse--;
+#define FAR_RETURN_OPT
+#ifdef FAR_RETURN_OPT	 
+	if (isOperandInFarSpace(IC_RESULT(ic))
+	 && getSize(operandType(IC_RESULT(ic))) <= 2)
+	{
+	    int size =  getSize(operandType(IC_RESULT(ic)));
+	    
+	     /* Special case for 1 or 2 byte return in far space. */
+	    emitcode(";", "Kevin function call abuse #1");
+
+	    MOVA(fReturn[0]);
+    	    if (size > 1)
+    	    {
+    	        emitcode("mov", "b,%s", fReturn[1]);
+    	    }
+    
+    	    aopOp(IC_RESULT(ic),ic,FALSE, FALSE);
+	    aopPut(AOP(IC_RESULT(ic)),"a",0);
+	    
+	    if (size > 1)
+	    {
+	        aopPut(AOP(IC_RESULT(ic)),"b",1);
+	    }
+    	    freeAsmop(IC_RESULT(ic),NULL,ic,TRUE);	     
+	}
+	else
+#endif	
+	{
+            _G.accInUse++;
+            aopOp(IC_RESULT(ic),ic,FALSE, TRUE);
+            _G.accInUse--;
                                      
-        assignResultValue(IC_RESULT(ic));
+            assignResultValue(IC_RESULT(ic));
                                                   
-        freeAsmop(IC_RESULT(ic),NULL, ic,TRUE);
-                                                                      
+            freeAsmop(IC_RESULT(ic),NULL, ic,TRUE);
+        }
 #else
 	if (!isOperandInFarSpace(IC_RESULT(ic)))
 	{
@@ -2931,8 +2959,14 @@ static void genPlus (iCode *ic)
 
     /* special cases :- */
 
+#ifdef LAZY_DPS_OPT
+    aopOp (IC_RIGHT(ic),ic,FALSE, FALSE);
+    aopOp (IC_LEFT(ic),ic,FALSE, 
+    	   (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR));
+#else    
     aopOp (IC_LEFT(ic),ic,FALSE, TRUE);
     aopOp (IC_RIGHT(ic),ic,FALSE, FALSE);
+#endif    
     if ((AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR2) &&
         (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR))
     {
@@ -2940,7 +2974,9 @@ static void genPlus (iCode *ic)
     }
     else
     {
-        aopOp (IC_RESULT(ic),ic,TRUE, AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR);
+        aopOp (IC_RESULT(ic),ic,TRUE, 
+               ((AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR)
+             || (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR)));
 
     /* if literal, literal on the right or
        if left requires ACC or right is already

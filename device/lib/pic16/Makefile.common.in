@@ -27,3 +27,5 @@ SED	= @SED@
 # Quick+dirty fix: this should be defined elsewhere,
 # but it's needed for `make clean`; Bernhard
 MM = -MM
+
+MODELFLAGS      = -mpic16

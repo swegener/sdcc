@@ -1,3 +1,8 @@
+2004-08-30 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* device/lib/pic16/Makefile.common.in: added MODELFLAGS again, it was
+	erroneously deleted
+
 2004-08-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (loadRegFromAop): better use of clra & clrx

@@ -1898,7 +1898,7 @@ static void saveRegisters(iCode *lic)
 	}
 
     dtype = operandType(IC_LEFT(ic));
-    if (dtype        && 
+    if (currFunc && dtype && 
         (FUNC_REGBANK(currFunc->type) != FUNC_REGBANK(dtype)) &&
 	IFFUNC_ISISR(currFunc->type) &&
         !ic->bankSaved) 
@@ -2189,7 +2189,7 @@ static void genCall (iCode *ic)
      the same register bank then we need to save the
      destination registers on the stack */
   dtype = operandType(IC_LEFT(ic));
-  if (dtype        && 
+  if (currFunc && dtype && 
       (FUNC_REGBANK(currFunc->type) != FUNC_REGBANK(dtype)) &&
       IFFUNC_ISISR(currFunc->type) &&
       !ic->bankSaved) 
@@ -2322,7 +2322,7 @@ static void genPcall (iCode *ic)
     the same register bank then we need to save the
     destination registers on the stack */
     dtype = operandType(IC_LEFT(ic));
-    if (dtype        && 
+    if (currFunc && dtype && 
 	IFFUNC_ISISR(currFunc->type) &&
         (FUNC_REGBANK(currFunc->type) != FUNC_REGBANK(dtype)))
         saverbank(FUNC_REGBANK(dtype),ic,TRUE);
@@ -2404,7 +2404,7 @@ static void genPcall (iCode *ic)
     }
 
     /* if register bank was saved then unsave them */
-    if (dtype        && 
+    if (currFunc && dtype && 
         (FUNC_REGBANK(currFunc->type) != FUNC_REGBANK(dtype)))
         unsaverbank(FUNC_REGBANK(dtype),ic,TRUE);
 

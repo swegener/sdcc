@@ -2269,7 +2269,7 @@ genCall (iCode * ic)
      the same register bank then we need to save the
      destination registers on the stack */
   dtype = operandType (IC_LEFT (ic));
-  if (dtype && !IFFUNC_ISNAKED(dtype) &&
+  if (currFunc && dtype && !IFFUNC_ISNAKED(dtype) &&
       (FUNC_REGBANK (currFunc->type) != FUNC_REGBANK (dtype)) &&
       IFFUNC_ISISR (currFunc->type))
   {
@@ -2479,7 +2479,7 @@ genPcall (iCode * ic)
      the same register bank then we need to save the
      destination registers on the stack */
   dtype = operandType (IC_LEFT (ic));
-  if (dtype && !IFFUNC_ISNAKED(dtype) &&
+  if (currFunc && dtype && !IFFUNC_ISNAKED(dtype) &&
       IFFUNC_ISISR (currFunc->type) &&
       (FUNC_REGBANK (currFunc->type) != FUNC_REGBANK (dtype))) {
     saveRBank (FUNC_REGBANK (dtype), ic, TRUE);

@@ -1925,7 +1925,7 @@ genCall (iCode * ic)
      the same register bank then we need to save the
      destination registers on the stack */
   dtype = operandType (IC_LEFT (ic));
-  if (dtype && !IFFUNC_ISNAKED(dtype) &&
+  if (currFunc && dtype && !IFFUNC_ISNAKED(dtype) &&
       (FUNC_REGBANK (currFunc->type) != FUNC_REGBANK (dtype)) &&
       IFFUNC_ISISR (currFunc->type))
   {
@@ -2023,7 +2023,7 @@ genPcall (iCode * ic)
      the same register bank then we need to save the
      destination registers on the stack */
   dtype = operandType (IC_LEFT (ic));
-  if (dtype && !FUNC_ISNAKED(dtype) &&
+  if (currFunc && dtype && !FUNC_ISNAKED(dtype) &&
       IFFUNC_ISISR (currFunc->type) &&
       (FUNC_REGBANK (currFunc->type) != FUNC_REGBANK (dtype))) {
     saveRBank (FUNC_REGBANK (dtype), ic, TRUE);
@@ -2568,7 +2568,6 @@ genEndFunction (iCode * ic)
 	emitcode ("setb", "ea");
 
       /* if debug then send end of function */
-      /*  if (options.debug && currFunc)  */
       if (options.debug && currFunc)
 	{
 	  _G.debugLine = 1;
@@ -8788,7 +8787,6 @@ gen51Code (iCode * lic)
   if (allocInfo)
     printAllocInfo (currFunc, codeOutFile);
   /* if debug information required */
-  /*     if (options.debug && currFunc) { */
   if (options.debug && currFunc)
     {
       cdbSymbol (currFunc, cdbFile, FALSE, TRUE);

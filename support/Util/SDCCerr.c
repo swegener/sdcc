@@ -54,7 +54,7 @@ struct
 { E_SYNTAX_ERROR, ERROR_LEVEL_ERROR,
    "Syntax error, declaration ignored at '%s'" },
 { E_CONST_EXPECTED, ERROR_LEVEL_ERROR,
-   "Constant Expected Found Variable" },
+    "Initializer element is not constant" },
 { E_OUT_OF_MEM, ERROR_LEVEL_ERROR,
    "'malloc' failed file '%s' for size %ld" },
 { E_FILE_OPEN_ERR, ERROR_LEVEL_ERROR,

@@ -1124,11 +1124,6 @@ gatherAutoInit (symbol * autoChain)
 	{
 	  symbol *newSym;
 	  
-	  // this can only be a constant
-	  if (!inInitMode && !IS_LITERAL(sym->ival->init.node->etype)) {
-	    werror (E_CONST_EXPECTED);
-	  }
-
 	  /* insert the symbol into the symbol table */
 	  /* with level = 0 & name = rname       */
 	  newSym = copySymbol (sym);
@@ -1829,48 +1824,6 @@ reverseLoop (ast * loop, symbol * sym, ast * init, ast * end)
   return decorateType (rloop);
 
 }
-
-//#define DEMAND_INTEGER_PROMOTION
-
-#ifdef DEMAND_INTEGER_PROMOTION
-
-/*-----------------------------------------------------------------*/
-/* walk a tree looking for the leaves. Add a typecast to the given */
-/* type to each value leaf node.           */
-/*-----------------------------------------------------------------*/
-void 
-pushTypeCastToLeaves (sym_link * type, ast * node, ast ** parentPtr)
-{
-  if (!node || IS_CALLOP(node))
-    {
-      /* WTF? We should never get here. */
-      return;
-    }
-
-  if (!node->left && !node->right)
-    {
-      /* We're at a leaf; if it's a value, apply the typecast */
-      if (node->type == EX_VALUE && IS_INTEGRAL (TTYPE (node)))
-	{
-	  *parentPtr = decorateType (newNode (CAST,
-					 newAst_LINK (copyLinkChain (type)),
-					      node));
-	}
-    }
-  else
-    {
-      if (node->left)
-	{
-	  pushTypeCastToLeaves (type, node->left, &(node->left));
-	}
-      if (node->right)
-	{
-	  pushTypeCastToLeaves (type, node->right, &(node->right));
-	}
-    }
-}
-
-#endif
 
 /*-----------------------------------------------------------------*/
 /* decorateType - compute type for this tree also does type cheking */
@@ -4293,10 +4246,6 @@ createFunction (symbol * name, ast * body)
     }
   name->lastLine = yylineno;
   currFunc = name;
-
-#if 0 // jwk: this is now done in addDecl()
-  processFuncArgs (currFunc);
-#endif
 
   /* set the stack pointer */
   /* PENDING: check this for the mcs51 */

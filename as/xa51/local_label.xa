@@ -1,0 +1,40 @@
+;local lable test... labels consisting of one of more numbers
+;with a dollar sign on the end are considered to be local
+;labels and are unique within a section of code following
+;a normal non-local label
+
+
+        .equ    var, 40
+        .bit    my_bit, var.5	;this is another comment
+
+begin:
+	add	r5, r1
+	add	r4l, r2h	;this is the third comment
+	add	r14, r2
+
+00001$:	add	[r5], r11
+	add	[r4], r1h
+
+	jmp	00001$
+	add	r2, [r0]
+	add	r0, r1
+	mov	[r4+4], r6
+	bkpt
+00002$:	mov	r2, r1
+	asr	r1, #3
+	mov	r1l, #9
+	bne	another_function
+	mov	[r1+4], r2
+	jmp	00002$
+	bkpt
+
+
+another_function:
+	add	r4l, [r5]
+	add.b	[r6+], #-10
+00001$: add.b	[r7+32321], #12
+	add.b	1231, #31
+	beq	00001$
+	djnz	r2, 00001$
+	jmp	begin
+

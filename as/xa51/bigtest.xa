@@ -1,0 +1,141 @@
+
+;this is a comment
+
+        .equ    var, 40
+        .bit    my_bit, var.5	;this is another comment
+
+	add	r5, r1
+	add	r4l, r2h	;this is the third comment
+	add	r14, r2
+
+	add	[r5], r11
+	add	[r4], r1h
+
+	add	r2, [r0]
+	add	r4l, [r5]
+
+	add	r3, [r1+54]
+	add	r6h, [r5+31]
+
+	add	[r7+3], r2l
+	add	[r6+2], r5
+
+	add	r4, [r2+5405]
+	add	r3h, [r5+-31321]
+
+	add	[r1+1032], r3l
+	add	[r2+-1232], r7
+
+	add	r1, [r6+]
+	add	r3h, [r2+]
+
+	add	[r5+], r2
+	add	[r1+], r7l
+
+	add	341, r3
+	add	345, r1l
+
+	add.w	r6, 31
+	add.b	r5h, 1029
+
+	add	r3l, #54
+	add	r0, #12411
+
+	add.w	[r7], #4223
+	add.w	[r1], #41122
+
+	add.b	[r1+], #45
+	add.b	[r6+], #-10
+
+	add.b	[r2+42], #41
+	add.w	[r1+89], #3112
+
+	add.b	[r7+32321], #12
+	add.w	[r3+8761], #5891
+
+	add.b	1231, #31
+	add.w	156, #9861
+
+	add	r0, r1
+	mov	[r4+4], r6
+loop:	mov	r2, r1
+	asr	r1, #3
+	mov	r1l, #9
+	mov	[r1+4], r2
+	jmp	loop
+	bov	loop
+
+	addc	r15, r4
+	addc	r11, r10
+	addc.b	[r7+4], #-30
+	addc.b	[r3+], #21
+        addc.w  [r7+4], #-30
+        addc.w  [r3+], #321
+
+	adds	r3, #4
+	adds.w	[r1], #6
+	adds.w	[r0+], #-3
+	adds.w	[r5+4], #2
+	adds.w	[r2+-500], #1
+	adds.w	var, #1
+
+        adds    r3h, #4
+        adds.b  [r1], #6
+        adds.b  [r0+], #-3
+t1:     adds.b  [r5+4], #2
+        adds.b  [r2+-500], #1
+        adds.b  var, #1
+
+t2:	and	[r5+3287], r1l
+	and.w	var, #2011
+
+	anl	c, 43.1
+	anl	c, /my_bit
+
+	asl	r3, r1l
+	asl	r11, r5h
+t65:	asl.d	r4, r1h
+	asl.w	r0, r4l
+	asl.b	r4h, r3l
+        asl     r0, r4l
+
+
+	asl.b	r1l, #6
+	asl.b	r3h, #11
+	asl.w	r1, #3
+	asl.w	r4, #7
+        asl     r1l, #6
+        asl     r3h, #11
+        asl     r1, #3
+        asl     r4, #7
+	asl.d	r2, #9
+	asl.d	r2, #21
+
+	asr	r4l, r1h
+	asr	r4, r1h
+        asr.w   r0, r4l
+        asr.w   r4, #7
+        asr.d   r1, #9
+	asr.d	r6, #14
+	asr.d	r5, #27
+
+	bcc	loop
+t7:	bcs	t65
+	beq	t7
+	bg	t65
+	bge	t1
+	bgt	t1
+	bkpt
+	bl	t7
+	ble	loop
+	blt	loop
+	bmi	t2
+	bne	t1
+	bnv	t65
+	bov	t2
+	bpl	t2
+	br	loop
+	call	t2
+	call	[r1]
+
+

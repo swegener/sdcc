@@ -1,0 +1,7 @@
+add flag to all symbol structure to remember if it was a line label...
+if a symbol which was a line label is used in immediate addressing,
+it must be considered a branch target.
+-- maybe adding an align directive would be enough...
+
+write error messages into list file
+

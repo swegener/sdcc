@@ -101,11 +101,8 @@ extern void pic16_RegsUnMapLiveRanges(void);
 extern void pic16_BuildFlowTree(pBlock *pb);
 extern void pic16_pCodeRegOptimizeRegUsage(int level);
 extern int pic16_picIsInitialized(void);
-#if !OPT_DISABLE_PIC || !OPT_DISABLE_PIC16
-// From pic/pcode.c:
 extern void SAFE_snprintf(char **str, size_t *size, const char *format, ...);
 extern int mnem2key(char const *mnem);
-#endif // OPT_DISABLE_PIC || !OPT_DISABLE_PIC16
 
 /****************************************************************/
 /*                      Forward declarations                    */
@@ -2452,9 +2449,8 @@ pCodeInstruction pic16_pciXORLW = {
 #define MAX_PIC16MNEMONICS 100
 pCodeInstruction *pic16Mnemonics[MAX_PIC16MNEMONICS];
 
+//#define USE_VSNPRINTF
 #if OPT_DISABLE_PIC
-/* This definition needs to be part of configure.in */
-// #define USE_VSNPRINTF
 
 #ifdef USE_VSNPRINTF
   // Alas, vsnprintf is not ANSI standard, and does not exist
@@ -2491,8 +2487,7 @@ void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...)
 
 }
 
-#else  //  USE_VSNPRINTF
-
+#else
 // This version is *not* safe, despite the name.
 
 void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...)
@@ -2522,9 +2517,7 @@ void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...)
 }
 
 #endif    //  USE_VSNPRINTF
-    
-#endif // OPT_DISABLE_PIC
-
+#endif
 
 extern  void pic16_initStack(int base_address, int size);
 extern regs *pic16_allocProcessorRegister(int rIdx, char * name, short po_type, int alias);
@@ -2615,7 +2608,7 @@ int mnem2key(char const *mnem)
   return (key & 0x1f);
 
 }
-#endif // OPT_DISABLE_PIC
+#endif
 
 void pic16initMnemonics(void)
 {
@@ -3504,8 +3497,8 @@ pCodeOp *pic16_newpCodeOpImmd(char *name, int offset, int index, int code_space)
 			fprintf(stderr, "%s:%d %s reg %s exists\n",__FILE__, __LINE__, __FUNCTION__, name);
 			PCOI(pcop)->rIdx = r->rIdx;
 		} else {
-			fprintf(stderr, "%s:%d %s reg %s doesn't exist\n",
-				__FILE__, __LINE__, __FUNCTION__, name);
+//			fprintf(stderr, "%s:%d %s reg %s doesn't exist\n",
+//				__FILE__, __LINE__, __FUNCTION__, name);
 			PCOI(pcop)->rIdx = -1;
 		}
 //			fprintf(stderr,"%s %s %d\n",__FUNCTION__,name,offset);

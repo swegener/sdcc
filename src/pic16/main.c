@@ -527,17 +527,17 @@ _pic16_genAssemblerPreamble (FILE * of)
 	fprintf (of, "\tlist\tp=%s\n",&name[1]);
 
 	if(!pic16_options.omit_configw) {
-		fprintf (of, "\t__config 0x%x,0x%x\n", 0x300001, pic16_getConfigWord(0x300001));
-		fprintf (of, "\t__config 0x%x,0x%x\n", 0x300002, pic16_getConfigWord(0x300002));
-		fprintf (of, "\t__config 0x%x,0x%x\n", 0x300003, pic16_getConfigWord(0x300003));
-		fprintf (of, "\t__config 0x%x,0x%x\n", 0x300005, pic16_getConfigWord(0x300005));
-		fprintf (of, "\t__config 0x%x,0x%x\n", 0x300006, pic16_getConfigWord(0x300006));
-		fprintf (of, "\t__config 0x%x,0x%x\n", 0x300008, pic16_getConfigWord(0x300008));
-		fprintf (of, "\t__config 0x%x,0x%x\n", 0x300009, pic16_getConfigWord(0x300009));
-		fprintf (of, "\t__config 0x%x,0x%x\n", 0x30000a, pic16_getConfigWord(0x30000a));
-		fprintf (of, "\t__config 0x%x,0x%x\n", 0x30000b, pic16_getConfigWord(0x30000b));
-		fprintf (of, "\t__config 0x%x,0x%x\n", 0x30000c, pic16_getConfigWord(0x30000c));
-		fprintf (of, "\t__config 0x%x,0x%x\n", 0x30000d, pic16_getConfigWord(0x30000d));
+		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x300001, pic16_getConfigWord(0x300001));
+		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x300002, pic16_getConfigWord(0x300002));
+		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x300003, pic16_getConfigWord(0x300003));
+		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x300005, pic16_getConfigWord(0x300005));
+		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x300006, pic16_getConfigWord(0x300006));
+		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x300008, pic16_getConfigWord(0x300008));
+		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x300009, pic16_getConfigWord(0x300009));
+		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x30000a, pic16_getConfigWord(0x30000a));
+		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x30000b, pic16_getConfigWord(0x30000b));
+		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x30000c, pic16_getConfigWord(0x30000c));
+		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x30000d, pic16_getConfigWord(0x30000d));
 	}
 	
   fprintf (of, "\tradix dec\n");

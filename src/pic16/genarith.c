@@ -48,6 +48,9 @@
 #include "pcode.h"
 #include "gen.h"
 
+#if 1
+#define pic16_emitcode	DEBUGpic16_emitcode
+#endif
 
 #define BYTEofLONG(l,b) ( (l>> (b<<3)) & 0xff)
 void DEBUGpic16_pic16_AopType(int line_no, operand *left, operand *right, operand *result);

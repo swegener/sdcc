@@ -866,24 +866,7 @@ typedef struct peepCommand {
 #define isCALL(x)       ((isPCI(x)) && (PCI(x)->op == POC_CALL))
 #define isSTATUS_REG(r) ((r)->pc_type == PO_STATUS)
 #define isBSR_REG(r)    ((r)->pc_type == PO_BSR)
-
-#if 0
-/* these are deprecated since when creating relocatable code, the register
-   address is not known (except of course of the SFRs and the Fixed registers)
-*/
-
-
-#define isACCESS_LOW(r) ((pic16_finalMapping[REG_ADDR(r)].bank == \
-                          PIC_BANK_FIRST) && (REG_ADDR(r) < 0x80))
-#define isACCESS_HI(r)  (pic16_finalMapping[REG_ADDR(r)].bank == PIC_BANK_LAST)
-#define isACCESS_BANK(r)	(isACCESS_LOW(r) || isACCESS_HI(r))
-
-#endif
-
-//#define isACCESS_BANK(r)	(REG_ADDR(r)!= 0)
 #define isACCESS_BANK(r)	(r->accessBank)
-// && pic16_finalMapping[REG_ADDR(r)].isSFR)
-//				|| (pic16_finalMapping[(r)->rIdx].reg && pic16_finalMapping[(r)->rIdx].reg->isFixed))
 
 
 

@@ -812,10 +812,17 @@ pic16glue ()
 		pic16_addpCode2pBlock(pb,pic16_newpCodeLabel("__sdcc_program_startup\t;VR1",-1));
 
 		if(USE_STACK) {
+#if 0
 			pic16_addpCode2pBlock(pb, pic16_newpCode(POC_LFSR,
 				pic16_popGetLit2(1, pic16_popGetLit(stackPos))));
 			pic16_addpCode2pBlock(pb, pic16_newpCode(POC_LFSR,
 				pic16_popGetLit2(2, pic16_popGetLit(stackPos))));
+#else
+			pic16_addpCode2pBlock(pb, pic16_newpCode(POC_LFSR,
+				pic16_popGetLit2(1, pic16_newpCodeOpRegFromStr("stack"))));
+			pic16_addpCode2pBlock(pb, pic16_newpCode(POC_LFSR,
+				pic16_popGetLit2(2, pic16_newpCodeOpRegFromStr("stack"))));
+#endif
 		}
 
 		/* put in the call to main */

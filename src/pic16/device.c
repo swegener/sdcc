@@ -260,10 +260,16 @@ static unsigned int config7h_word = DEFAULT_CONFIG7H_WORD;
 
 unsigned int stackPos = 0;
 
+extern regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alias, operand *refop);
+
 void pic16_setMaxRAM(int size)
 {
   pic->maxRAMaddress = size;
   stackPos = pic->RAMsize-1;
+  regs * reg;
+
+	reg=newReg(REG_SFR, PO_SFR_REGISTER, stackPos, "stack", 1, 0, NULL);
+	addSet(&pic16_fix_udata, reg);
 
   if (pic->maxRAMaddress < 0) {
     fprintf(stderr, "invalid \"#pragma maxram 0x%x\" setting\n",
@@ -358,27 +364,51 @@ void pic16_dump_equates(FILE *of, set *equs)
 }
 
 
+int regCompare(const void *a, const void *b)
+{
+  const regs *const *i = a;
+  const regs *const *j = b;
+
+	if( (*i)->address > (*j)->address)return 1;
+	if( (*i)->address < (*j)->address)return -1;
+
+  return 0;
+}
+
 void pic16_dump_section(FILE *of, set *section, int fix)
 {
   static int abs_section_no=0;
   regs *r, *rprev;
-  int init_addr;
+  int init_addr, i;
+  regs **rlist;
 
+	/* put all symbols in an array */
+	rlist = Safe_calloc(elementsInSet(section), sizeof(regs *));
+	r = rlist[0]; i = 0;
+	for(rprev = setFirstItem(section); rprev; rprev = setNextItem(section)) {
+		rlist[i] = rprev; i++;
+	}
+
+	/* sort symbols according to their address */
+	qsort(rlist, elementsInSet(section), sizeof(regs *), regCompare);
+	
+	if(!i)return;
+	
 	if(!fix) {
 		fprintf(of, "\n\n\tudata\n");
 		for(r = setFirstItem(section); r; r = setNextItem(section)) {
 			fprintf(of, "%s\tres\t%d\n", r->name, r->size);
 		}
 	} else {
-		r = setFirstItem(section);
-		if(!r)return;
-		init_addr = r->address;
-		fprintf(of, "\n\nstatic_%s_%02d\tudata\t0X%04X\n", moduleName, abs_section_no++, init_addr);
-		
+	  int j=0;
+		  
 		rprev = NULL;
-		for(; r; r = setNextItem(section)) {
+		init_addr = rlist[j]->address;
+		fprintf(of, "\n\nstatic_%s_%02d\tudata\t0X%04X\n", moduleName, abs_section_no++, init_addr);
+	
+		for(j=0;j<i;j++) {
+			r = rlist[j];
 			init_addr = r->address;
-
 			if(rprev && (init_addr != (rprev->address + rprev->size))) {
 				fprintf(of, "\nstatic_%s_%02d\tudata\t0X%04X\n", moduleName, abs_section_no++, init_addr);
 			}
@@ -387,6 +417,7 @@ void pic16_dump_section(FILE *of, set *section, int fix)
 			rprev = r;
 		}
 	}
+	free(rlist);
 }
 
 
@@ -570,6 +601,8 @@ void pic16_groupRegistersInSection(set *regset)
 	for(reg=setFirstItem(regset); reg; reg = setNextItem(regset)) {
 		if(reg->wasUsed
 			&& !(reg->regop && SPEC_EXTR(OP_SYM_ETYPE(reg->regop)))) {
+
+//			fprintf(stderr, "%s:%d register %s\n", __FILE__, __LINE__, reg->name);
 
 			if(reg->alias) {
 				checkAddReg(&pic16_equ_data, reg);

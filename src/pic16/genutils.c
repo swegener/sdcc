@@ -58,6 +58,9 @@
 
 #include "genutils.h"
 
+#if 1
+#define pic16_emitcode	DEBUGpic16_emitcode
+#endif
 
 #if defined(GEN_Not)
 /*-----------------------------------------------------------------*/

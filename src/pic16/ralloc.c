@@ -339,7 +339,7 @@ static int regname2key(char const *name)
 /*-----------------------------------------------------------------*/
 /* newReg - allocate and init memory for a new register            */
 /*-----------------------------------------------------------------*/
-static regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alias, operand *refop)
+regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alias, operand *refop)
 {
 
   regs *dReg;
@@ -357,22 +357,24 @@ static regs* newReg(short type, short pc_type, int rIdx, char *name, int size, i
 			dReg->name = Safe_strdup(buffer);
 	}
 
-//	fprintf(stderr,"newReg: %s, rIdx = 0x%02x\n",dReg->name,rIdx);
 
 	dReg->isFree = 0;
 	dReg->wasUsed = 1;
 
 //	dReg->isMapped = 0;
 	dReg->isEmitted = 0;
-	dReg->accessBank = 0;
 
 	if(type == REG_SFR) {
 		dReg->isFixed = 1;
 		dReg->address = rIdx;
+		dReg->accessBank = 1;
 	} else {
 		dReg->isFixed = 0;
 		dReg->address = 0;
+		dReg->accessBank = 0;
 	}
+
+//	fprintf(stderr,"newReg: %s, rIdx = 0x%02x\taccess= %d\n",dReg->name,rIdx, dReg->accessBank);
   	
 	dReg->size = size;
 	dReg->alias = alias;
@@ -564,122 +566,120 @@ static int IS_CONFIG_ADDRESS(int address)
 regs *
 pic16_allocDirReg (operand *op )
 {
-
   regs *reg;
   char *name;
 
-  if(!IS_SYMOP(op)) {
-    debugLog ("%s BAD, op is NULL\n", __FUNCTION__);
-    return NULL;
-  }
+	if(!IS_SYMOP(op)) {
+		debugLog ("%s BAD, op is NULL\n", __FUNCTION__);
+	  return NULL;
+	}
 
-  name = OP_SYMBOL (op)->rname[0] ? OP_SYMBOL (op)->rname : OP_SYMBOL (op)->name;
+	name = OP_SYMBOL (op)->rname[0] ? OP_SYMBOL (op)->rname : OP_SYMBOL (op)->name;
 
-  /* If the symbol is at a fixed address, then remove the leading underscore
-   * from the name. This is hack to allow the .asm include file named registers
-   * to match the .c declared register names */
+	debugLog ("%s symbol name %s\n", __FUNCTION__,name);
+//	fprintf(stderr, "%s symbol name %s\n", __FUNCTION__,name);
 
-  //if (SPEC_ABSA ( OP_SYM_ETYPE(op)) && (*name == '_'))
-  //name++;
+	{
+		if(SPEC_CONST ( OP_SYM_ETYPE(op)) && (IS_CHAR ( OP_SYM_ETYPE(op)) )) {
+			debugLog(" %d  const char\n",__LINE__);
+			debugLog(" value = %s \n",SPEC_CVAL( OP_SYM_ETYPE(op)));
+//			fprintf(stderr, " %d  const char\n",__LINE__);
+//			fprintf(stderr, " value = %s \n",SPEC_CVAL( OP_SYM_ETYPE(op)));
+		}
 
-  /* The above hack is not necessery anymore, since .asm include files are not
-   * used by current implementation of the port -- VR 03-Jan-04 */
+	
+		debugLog("  %d  storage class %d \n",__LINE__,SPEC_SCLS( OP_SYM_ETYPE(op)));
+		if (IS_CODE ( OP_SYM_ETYPE(op)) )
+			debugLog(" %d  code space\n",__LINE__);
 
-  debugLog ("%s symbol name %s\n", __FUNCTION__,name);
-//  fprintf(stderr, "%s symbol name %s\n", __FUNCTION__,name);
-  {
-    if(SPEC_CONST ( OP_SYM_ETYPE(op)) && (IS_CHAR ( OP_SYM_ETYPE(op)) )) {
-      debugLog(" %d  const char\n",__LINE__);
-      debugLog(" value = %s \n",SPEC_CVAL( OP_SYM_ETYPE(op)));
-//      fprintf(stderr, " %d  const char\n",__LINE__);
-//      fprintf(stderr, " value = %s \n",SPEC_CVAL( OP_SYM_ETYPE(op)));
-    }
+		if (IS_INTEGRAL ( OP_SYM_ETYPE(op)) )
+			debugLog(" %d  integral\n",__LINE__);
 
-    debugLog("  %d  storage class %d \n",__LINE__,SPEC_SCLS( OP_SYM_ETYPE(op)));
-    if (IS_CODE ( OP_SYM_ETYPE(op)) )
-      debugLog(" %d  code space\n",__LINE__);
+		if (IS_LITERAL ( OP_SYM_ETYPE(op)) )
+			debugLog(" %d  literal\n",__LINE__);
 
-    if (IS_INTEGRAL ( OP_SYM_ETYPE(op)) )
-      debugLog(" %d  integral\n",__LINE__);
-    if (IS_LITERAL ( OP_SYM_ETYPE(op)) )
-      debugLog(" %d  literal\n",__LINE__);
-    if (IS_SPEC ( OP_SYM_ETYPE(op)) )
-      debugLog(" %d  specifier\n",__LINE__);
-    debugAopGet(NULL, op);
-  }
+		if (IS_SPEC ( OP_SYM_ETYPE(op)) )
+			debugLog(" %d  specifier\n",__LINE__);
 
-  if (IS_CODE ( OP_SYM_ETYPE(op)) )
-    return NULL;
+		debugAopGet(NULL, op);
+	}
 
-  /* First, search the hash table to see if there is a register with this name */
-  if (SPEC_ABSA ( OP_SYM_ETYPE(op)) && !(IS_BITVAR (OP_SYM_ETYPE(op))) ) {
-    reg = regWithIdx (pic16_dynProcessorRegs, SPEC_ADDR ( OP_SYM_ETYPE(op)), 1);
+	if (IS_CODE ( OP_SYM_ETYPE(op)) )
+		return NULL;
+
+	/* First, search the hash table to see if there is a register with this name */
+	if (SPEC_ABSA ( OP_SYM_ETYPE(op)) && !(IS_BITVAR (OP_SYM_ETYPE(op))) ) {
+		reg=NULL;
+//		reg = regWithIdx (pic16_dynProcessorRegs, SPEC_ADDR ( OP_SYM_ETYPE(op)), 1);
 
 #if 0
-    if(!reg) 
-      fprintf(stderr,"%s:%d: ralloc %s is at fixed address but not a processor reg, addr=0x%x\n",
-      		__FUNCTION__, __LINE__, name, SPEC_ADDR ( OP_SYM_ETYPE(op)));
-    else
-      fprintf(stderr,"%s:%d: ralloc %s at fixed address has already been declared, addr=0x%x\n",
-		__FUNCTION__, __LINE__, name, SPEC_ADDR ( OP_SYM_ETYPE(op)));
+		if(!reg) 
+			fprintf(stderr,"%s:%d: ralloc %s is at fixed address but not a processor reg, addr=0x%x\n",
+					__FUNCTION__, __LINE__, name, SPEC_ADDR ( OP_SYM_ETYPE(op)));
+		else
+			fprintf(stderr,"%s:%d: ralloc %s at fixed address has already been declared, addr=0x%x\n",
+					__FUNCTION__, __LINE__, name, SPEC_ADDR ( OP_SYM_ETYPE(op)));
 #endif
-  } else {
-//  	fprintf(stderr,"ralloc:%d %s \n", __LINE__,name);
+	} else {
+//		fprintf(stderr,"ralloc:%d %s \n", __LINE__,name);
     
-    reg = pic16_dirregWithName(name);
-  }
+		reg = pic16_dirregWithName(name);
+	}
 
-  if(!reg) {
-    int address = 0;
+	if(!reg) {
+	  int address = 0;
+	  int regtype = REG_GPR;
+    
+		/* if this is at an absolute address, then get the address. */
+		if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
+			address = SPEC_ADDR ( OP_SYM_ETYPE(op));
+//			fprintf(stderr,"reg %s is at an absolute address: 0x%03x\n",name,address);
+		}
 
-    /* if this is at an absolute address, then get the address. */
-    if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
-      address = SPEC_ADDR ( OP_SYM_ETYPE(op));
-      //fprintf(stderr,"reg %s is at an absolute address: 0x%03x\n",name,address);
-    }
+		/* Register wasn't found in hash, so let's create
+		 * a new one and put it in the hash table AND in the 
+		 * dynDirectRegNames set */
+		if(IN_CODESPACE( SPEC_OCLS( OP_SYM_ETYPE(op)))) {
+			if(pic16_debug_verbose)
+			    	fprintf(stderr, "%s:%d symbol %s in codespace\n", __FILE__, __LINE__,
+			    		OP_SYMBOL(op)->name);
+	    	  return NULL;
+		}
 
-    /* Register wasn't found in hash, so let's create
-     * a new one and put it in the hash table AND in the 
-     * dynDirectRegNames set */
-    if(IN_CODESPACE( SPEC_OCLS( OP_SYM_ETYPE(op)))) {
-	if(pic16_debug_verbose)
-		    	fprintf(stderr, "%s:%d symbol %s in codespace\n", __FILE__, __LINE__,
-		    		OP_SYMBOL(op)->name);
-    	return NULL;
-    }
-    if(!IS_CONFIG_ADDRESS(address)) {
-      //fprintf(stderr,"%s:allocating new reg %s\n",__FUNCTION__, name);
+		if(!IS_CONFIG_ADDRESS(address)) {
+//			fprintf(stderr,"%s:allocating new reg %s\n",__FUNCTION__, name);
 
-      reg = newReg(REG_GPR, PO_DIR, rDirectIdx++, name,getSize (OP_SYMBOL (op)->type),0, op);
-      debugLog ("%d  -- added %s to hash, size = %d\n", __LINE__, name,reg->size);
+			if(SPEC_SCLS(OP_SYM_ETYPE(op)))regtype = REG_SFR;
+	
+			reg = newReg(regtype, PO_DIR, rDirectIdx++, name,getSize (OP_SYMBOL (op)->type),0, op);
+			debugLog ("%d  -- added %s to hash, size = %d\n", __LINE__, name,reg->size);
 
-      //hTabAddItem(&dynDirectRegNames, regname2key(name), reg);	/* commented out */
+//			hTabAddItem(&dynDirectRegNames, regname2key(name), reg);	/* commented out */
 
-      if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
+//			if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
+//				fprintf(stderr, " ralloc.c at fixed address: %s - changing to REG_SFR\n",name);
+//				reg->type = REG_SFR;
+//			}
 
-	//fprintf(stderr, " ralloc.c at fixed address: %s - changing to REG_SFR\n",name);
-	reg->type = REG_SFR;
-      }
+		if (IS_BITVAR (OP_SYM_ETYPE(op))) {
+			addSet(&pic16_dynDirectBitRegs, reg);
+			reg->isBitField = 1;
+		} else
+			addSet(&pic16_dynDirectRegs, reg);
+	
+		} else {
+			debugLog ("  -- %s is declared at address 0x30000x\n",name);
+			fprintf(stderr, "  -- %s is declared at address 0x30000x\n",name);
+	
+		  return NULL;
+		}
+	}
 
-      if (IS_BITVAR (OP_SYM_ETYPE(op))) {
-	addSet(&pic16_dynDirectBitRegs, reg);
-	reg->isBitField = 1;
-      } else
-	addSet(&pic16_dynDirectRegs, reg);
-
-    } else {
-      debugLog ("  -- %s is declared at address 0x30000x\n",name);
-      fprintf(stderr, "  -- %s is declared at address 0x30000x\n",name);
-
-      return NULL;
-    }
-  }
-
-  if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
-    reg->isFixed = 1;
-    reg->address = SPEC_ADDR ( OP_SYM_ETYPE(op));
-    debugLog ("  -- and it is at a fixed address 0x%02x\n",reg->address);
-  }
+	if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
+		reg->isFixed = 1;
+		reg->address = SPEC_ADDR ( OP_SYM_ETYPE(op));
+		debugLog ("  -- and it is at a fixed address 0x%02x\n",reg->address);
+	}
 
   return reg;
 }
@@ -3489,6 +3489,11 @@ static void isData(sym_link *sl)
 	}
 }
 
+#define NO_packRegsForSupport	1
+#define NO_packRegsForAccUse	1
+#define NO_packRegsForOneuse	1
+#define NO_cast_peep		1
+
 /*--------------------------------------------------------------------*/
 /* pic16_packRegisters - does some transformations to reduce          */
 /*                   register pressure                                */
@@ -3692,22 +3697,27 @@ pic16_packRegisters (eBBlock * ebp)
 
 	debugLog(" %d\n", __LINE__);
 
+#if NO_packRegsForSupport
     /* reduce for support function calls */
     if (ic->supportRtn || ic->op == '+' || ic->op == '-')
       packRegsForSupport (ic, ebp);
+#endif
 
     /* if a parameter is passed, it's in W, so we may not
        need to place a copy in a register */
     if (ic->op == RECEIVE)
       packForReceive (ic, ebp);
 
+#if NO_packRegsForOneuse
     /* some cases the redundant moves can
        can be eliminated for return statements */
     if ((ic->op == RETURN || ic->op == SEND) &&
 	!isOperandInFarSpace (IC_LEFT (ic)) &&
 	!options.model)
       packRegsForOneuse (ic, IC_LEFT (ic), ebp);
+#endif
 
+#if NO_packRegsForOneuse
     /* if pointer set & left has a size more than
        one and right is not in far space */
     if (POINTER_SET (ic) &&
@@ -3717,7 +3727,9 @@ pic16_packRegisters (eBBlock * ebp)
 	getSize (aggrToPtr (operandType (IC_RESULT (ic)), FALSE)) > 1)
 
       packRegsForOneuse (ic, IC_RESULT (ic), ebp);
+#endif
 
+#if NO_packRegsForOneuse
     /* if pointer get */
     if (POINTER_GET (ic) &&
 	!isOperandInFarSpace (IC_RESULT (ic)) &&
@@ -3727,7 +3739,9 @@ pic16_packRegisters (eBBlock * ebp)
 
       packRegsForOneuse (ic, IC_LEFT (ic), ebp);
       debugLog("%d - return from packRegsForOneuse\n", __LINE__);
+#endif
 
+#if NO_cast_peep
     /* if this is cast for intergral promotion then
        check if only use of  the definition of the 
        operand being casted/ if yes then replace
@@ -3784,7 +3798,7 @@ pic16_packRegisters (eBBlock * ebp)
 	}
       }
     }
-
+#endif
     /* pack for PUSH 
        iTempNN := (some variable in farspace) V1
        push iTempNN ;
@@ -3797,6 +3811,7 @@ pic16_packRegisters (eBBlock * ebp)
       }
 
 
+#if NO_packRegsForAccUse
     /* pack registers for accumulator use, when the
        result of an arithmetic or bit wise operation
        has only one use, that use is immediately following
@@ -3816,6 +3831,7 @@ pic16_packRegisters (eBBlock * ebp)
 	getSize (operandType (IC_RESULT (ic))) <= 2)
 
       packRegsForAccUse (ic);
+#endif
 
   }
 }

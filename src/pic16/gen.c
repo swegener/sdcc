@@ -273,6 +273,10 @@ void pic16_emitpcodeNULLop(PIC_OPCODE poc)
 
 }
 
+
+#if 1
+#define pic16_emitcode	DEBUGpic16_emitcode
+#else
 /*-----------------------------------------------------------------*/
 /* pic16_emitcode - writes the code into a file : for now it is simple    */
 /*-----------------------------------------------------------------*/
@@ -309,6 +313,7 @@ void pic16_emitcode (char *inst,char *fmt, ...)
 
     va_end(ap);
 }
+#endif
 
 
 /*-----------------------------------------------------------------*/
@@ -8558,8 +8563,8 @@ static void genGenPointerGet (operand *left,
   /* so dptr know contains the address */
 
   /* if bit then unpack */
-  //if (IS_BITVAR(retype)) 
-  //  genUnpackBits(result,"dptr",GPOINTER);
+	if (IS_BITVAR(retype)) 
+	genUnpackBits(result,"BAD",GPOINTER);
 
  release:
   pic16_freeAsmop(left,NULL,ic,TRUE);
@@ -8972,14 +8977,15 @@ static void genNearPointerSet (operand *right,
     goto release;
 
   }// else
-  //   rname = pic16_aopGet(AOP(result),0,FALSE,FALSE);
+//	rname = pic16_aopGet(AOP(result),0,FALSE,FALSE);
 
+  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
   /* if bitfield then unpack the bits */
   if (IS_BITVAR(retype)) {
     werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
 	   "The programmer is obviously confused");
-    //genPackBits (retype,right,rname,POINTER);
+//	genPackBits (retype,right,"BAD",POINTER);
     exit(1);
   }
   else {
@@ -10515,8 +10521,6 @@ void genpic16Code (iCode *lic)
 	    break;
 	    
 	case SEND:
-	      DEBUGpic16_emitcode(";ic ", "\t%c 0x%x\tSEND",ic->op, ic->op);
-
 	    addSet(&_G.sendSet,ic);
 	    break;
 

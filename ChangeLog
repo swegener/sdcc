@@ -1,5 +1,16 @@
 2004-01-13 Vangelis Rokas <vrokas@otenet.gr>
 
+	Mainly changes to support compilation of the device libraries
+	* src/pic16/device.c: stack is allocated via symbol and not
+	via literal number. The symbol is placed in the corresponding
+	position of the data ram
+	* (pic16_dump_section): relocatable and absolute uninitialized
+	data are now emitted in sorted order to reduce section naming,
+	* src/pic16/ralloc.c (newReg): fixed bug with SFR's that
+	weren't marked as being in the access bank,
+
+2004-01-13 Vangelis Rokas <vrokas@otenet.gr>
+
 	Added portion of GNU PIC Library under the directory
 	device/include/pic16 and device/lib/pic16. These files
 	contain the declarations of SFRs for the PIC18Fxx2 devices.

@@ -1,10 +1,17 @@
+2003-12-13 Frieder Ferlemann <Frieder.Ferlemann@web.de>
+
+	* src/mcs51/peephole.def,
+	* src/ds390/peephole.def: using the atomic test and clear instruction jbc
+	(allows non-interrupt and interrupt code to safely compete for a resource
+	without the non-interrupt code having to disable interrupts)
+
 2003-12-13 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCCicode.c (geniCodeAdd),
 	* src/SDCCast.c (decorateType): fixed bug #857753 (need to be careful
 	with valFromType if type might be a pointer and host is big endian).
 	* src/SDCCast.c (decorateType): unary plus compatible with all arithmetic
-	types, not just integer types. 
+	types, not just integer types.
 	* src/SDCCsymt.c (addSymChain): clarified error message when symbol is
 	multiply defined with mismatching "at" address.
 

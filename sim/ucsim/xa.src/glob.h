@@ -149,6 +149,7 @@ enum op_operands {
   NO_OPERANDS,  // for NOP
   C_BIT,
   C_NOTBIT,
+  DATA4,
   REG_DATA4,
   IREG_DATA4,
   IREGINC_DATA4,
@@ -165,6 +166,8 @@ enum op_operands {
   BIT_REL8,
   REG_REL8,
   DIRECT_REL8,
+  REG_REGOFF8,
+  REG_REGOFF16,
 
   REL8,
   REL16,
@@ -191,6 +194,8 @@ extern struct dis_entry glob_disass_xa[];
 
 extern struct xa_dis_entry disass_xa[];
 
+extern struct name_entry sfr_tabXA51[];
+extern struct name_entry bit_tabXA51[];
 #endif
 
 /* End of xa.src/glob.h */

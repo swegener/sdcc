@@ -148,6 +148,7 @@ _xa51_genAssemblerPreamble (FILE * of)
     fprintf (of, "\t.dw\t__sdcc_gsinit_startup\n");
     fprintf (of, "\n");
     fprintf (of, "__sdcc_gsinit_startup:\n");
+    fprintf (of, "\tmov.b\t_SCR,#0x01\t; page zero mode\n");
     fprintf (of, "\tmov\tr7,#0x%04x\n", options.stack_loc);
     fprintf (of, "\tcall\t_external_startup\n");
     _xa51_genXINIT(of);

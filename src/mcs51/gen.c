@@ -8632,7 +8632,7 @@ genCast (iCode * ic)
   /* now depending on the sign of the source && destination */
   size = AOP_SIZE (result) - AOP_SIZE (right);
   /* if unsigned or not an integral type */
-  if (SPEC_USIGN (rtype) || !IS_SPEC (rtype) || AOP_TYPE(right)==AOP_CRY)
+  if (!IS_SPEC (rtype) || SPEC_USIGN (rtype) || AOP_TYPE(right)==AOP_CRY)
     {
       while (size--)
 	aopPut (AOP (result), zero, offset++);

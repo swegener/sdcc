@@ -44,10 +44,34 @@ int cl_xa::get_reg(int word_flag, unsigned int index)
   //    return mem_direct[0x400+index];
   //} else { /* non-banked */
     if (word_flag)
-      return get_word_direct(0x400+index);
+      return get_word_direct(index);
     else
-      return mem_direct[0x400+index];
+      return mem_direct[index];
   //}
+}
+
+bool cl_xa::get_bit(int bit) {
+  short offset=0;
+  if (bit>=0x200) {
+    // in sfr space
+    bit-=0x200;
+    offset=0x400;
+  }
+  return mem_direct[offset + (bit/8)] & (1 << (bit%8));
+}
+
+void cl_xa::set_bit(int bit, int value) {
+  short offset=0;
+  if (bit>=0x200) {
+    // in sfr space
+    bit-=0x200;
+    offset=0x400;
+  }
+  if (value) {
+    mem_direct[offset + (bit/8)] |= (1 << (bit%8));
+  } else {
+    mem_direct[offset + (bit/8)] &= ~(1 << (bit%8));
+  }
 }
 
 #define RI_F0 ((code >> 4) & 0xf)
@@ -186,33 +210,35 @@ int cl_xa::inst_CALL(uint code, int operands)
 {
   int jmpaddr;
   unsigned int sp;
+  bool pageZero=get_scr()&1;
 
   switch(operands) {
     case REL16:
     {
       jmpaddr = (signed short)fetch2();
-      sp = get_sp() - 4;
+      sp = get_sp() - (pageZero ? 2 : 4);
       set_sp(sp);
-      store2(sp, PC);
-      store2(sp+2, 0);  /* segment(not sure about ordering...) */
+      store2(sp, PC&0xffff);
+      if (!pageZero) {
+	store2(sp+2, (PC>>16)&0xff);
+      }
       jmpaddr *= 2;
-      PC = (PC + jmpaddr) & 0xfffffffe;
+      PC = (PC + jmpaddr) & 0xfffffe;
     }
     break;
     case IREG:
     {
-      sp = get_sp() - 2;
+      sp = get_sp() - (pageZero ? 2 : 4);
       set_sp(sp);
-      store2(sp, PC);
-#if 0 // only in huge model
-      store2(sp+2, ...
-#endif
+      store2(sp, PC&0xffff);
+      if (!pageZero) {
+	store2(sp+2, (PC>>16)&0xff);
+      }
       jmpaddr = reg2(RI_07);
       jmpaddr *= 2;
-      PC = (PC + jmpaddr) & 0xfffffffe;
+      PC = (PC + jmpaddr) & 0xfffffe;
     }
     break;
-    /* fixme 2 more... */ /* johan: which ones? */
   }
   return(resGO);
 }
@@ -569,17 +595,35 @@ int cl_xa::inst_RET(uint code, int operands)
 {
   unsigned int retaddr;
   unsigned short sp;
+  bool pageZero=get_scr()&1;
+
   sp = get_sp();
   retaddr = get2(sp);
-#if 0 // only in huge model
-  retaddr |= get2(sp+2) << 16;
-#endif
-  set_sp(sp+2);
+  if (!pageZero) {
+    retaddr |= get2(sp+2) << 16;
+    set_sp(sp+4);
+  } else {
+    set_sp(sp+2);
+  }
   PC = retaddr;
   return(resGO);
 }
 int cl_xa::inst_RETI(uint code, int operands)
 {
+  unsigned int retaddr;
+  unsigned short sp;
+  bool pageZero=get_scr()&1;
+
+  sp = get_sp();
+  set_psw(get2(sp));
+  retaddr = get2(sp+2);
+  if (!pageZero) {
+    retaddr |= get2(sp+4) << 16;
+    set_sp(sp+6);
+  } else {
+    set_sp(sp+4);
+  }
+  PC = retaddr;
   return(resGO);
 }
 int cl_xa::inst_RL(uint code, int operands)

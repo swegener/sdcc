@@ -28,6 +28,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+#define REGS_OFFSET 0
+//#define REGS_OFFSET 0x400
+
 #ifndef REGSAVR_HEADER
 #define REGSAVR_HEADER
 
@@ -43,24 +46,19 @@ struct t_regs
 */
 
 /* direct is a special code space for built-in ram and SFR, 1K size */
-#ifdef WORDS_BIGENDIAN
 #define set_word_direct(_index, _value) { \
-      mem_direct[(_index)] = (_value >> 8); \
+      mem_direct[(_index)+1] = (_value >> 8); \
       mem_direct[(_index)] = (_value & 0xff); }
 
 #define get_word_direct(_index) \
-      ( (mem_direct[(_index)] << 8) | mem_direct[(_index)+1] )
-#else
-#define set_word_direct(_index, _value) { \
-      wmem_direct[(_index) >> 1] = _value; }
-#define get_word_direct(_index) (wmem_direct[(_index) >> 1] )
-#endif
+      ( (mem_direct[(_index+1)] << 8) | mem_direct[(_index)] )
 
+#define set_byte_direct(_index, _value) (mem_direct[_index] = _value)
 #define get_byte_direct(_index) (mem_direct[_index])
 
 /* store to ram */
-#define store2(addr, val) { ram->set((t_addr) (addr), val & 0xff); \
-                            ram->set((t_addr) (addr+1), (val >> 8) & 0xff); }
+#define store2(addr, val) { ram->set((t_addr) (addr), (val) & 0xff); \
+                            ram->set((t_addr) (addr+1), ((val) >> 8) & 0xff); }
 #define store1(addr, val) ram->set((t_addr) (addr), val)
 
 /* get from ram */
@@ -79,23 +77,19 @@ struct t_regs
 #define reg2(_index) get_reg(1, (_index<<1)) /* function in inst.cc */
 #define reg1(_index) (unsigned char)get_reg(0, (_index))
 
-#define set_byte_direct(_index, _value) { \
-   mem_direct[_index] = _value; \
-}
-
 #define set_reg1(_index, _value) { \
   if ((_index) < 3) { /* banked */ \
-      mem_direct[0x400+(_index)] = _value; \
+      mem_direct[REGS_OFFSET+(_index)] = _value; \
   } else { /* non-banked */ \
-      mem_direct[0x400+(_index)] = _value; \
+      mem_direct[REGS_OFFSET+(_index)] = _value; \
   } \
 }
 
 #define set_reg2(_index, _value) { \
   if ((_index) < 3) { /* banked */ \
-     set_word_direct((0x400+(_index<<1)), _value); \
+     set_word_direct((REGS_OFFSET+(_index<<1)), _value); \
   } else { /* non-banked */ \
-     set_word_direct((0x400+(_index<<1)), _value); \
+     set_word_direct((REGS_OFFSET+(_index<<1)), _value); \
   } \
 }
 
@@ -106,20 +100,22 @@ struct t_regs
     { set_reg1((_index), _value) } \
 }
 
-// fixme: implement
-#define get_bit(x) (x)
-#define set_bit(x,y)
-
 /* R7 mirrors 1 of 2 real SP's */
 #define set_sp(_value) { \
-  { set_word_direct(0x400+(7*2), _value); } \
+  { set_word_direct(REGS_OFFSET+(7*2), _value); } \
 }
 
-#define get_sp() ((TYPE_UWORD)(get_word_direct(0x400+(7*2))))
+#define get_sp() ((TYPE_UWORD)(get_word_direct(REGS_OFFSET+(7*2))))
 
-// fixme: I don't know where the psw is kept, just want to compile...
-#define get_psw() ((TYPE_UWORD)(get_word_direct(0x400+(0x80*2))))
-#define set_psw(_flags) set_word_direct(0x400+(0x80*2), _flags)
+/* the program status word */
+#define PSW 0x400
+#define get_psw() ((TYPE_UWORD)(get_word_direct(PSW)))
+#define set_psw(_flags) set_word_direct(PSW, _flags)
+
+/* the system configuration register */
+#define SCR 0x440
+#define get_scr() get_byte_direct(SCR)
+#define set_scr(scr) set_byte_direct(SCR, scr)
 
 // PSW bits...
 #define BIT_C  0x80

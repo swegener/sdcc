@@ -61,6 +61,11 @@ public:
 
   virtual struct dis_entry *dis_tbl(void);
 
+  virtual struct name_entry *sfr_tbl(void);
+  virtual struct name_entry *bit_tbl(void);
+  virtual char *get_dir_name(short);
+  virtual char *get_bit_name(short);
+
   virtual int inst_length(t_addr addr);
   virtual int inst_branch(t_addr addr);
   virtual int longest_inst(void);
@@ -77,6 +82,8 @@ public:
 
   virtual int exec_inst(void);
   virtual int get_reg(int word_flag, unsigned int index);
+  virtual bool get_bit(int bit);
+  virtual void set_bit(int bit, int value);
 
 #include "instcl.h"
 

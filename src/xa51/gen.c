@@ -560,7 +560,7 @@ char * printOp (operand *op) {
   } else if (IS_VALOP(op)) {
     opRegName(op, 0, line, 1);
   } else if (IS_TYPOP(op)) {
-    sprintf (line, "[");
+    sprintf (line, "(");
     if (isPtr) {
       if (DCL_TYPE(optype)==FPOINTER)
 	strcat (line, "far * ");
@@ -577,7 +577,7 @@ char * printOp (operand *op) {
     if (SPEC_USIGN(operandType(op))) strcat (line, "unsigned ");
     if (SPEC_LONG(operandType(op))) strcat (line, "long ");
     strcat (line, nounName(operandType(op)));
-    strcat (line, "]");
+    strcat (line, ")");
   } else {
     bailOut("printOp: unexpected operand type");
   }
@@ -1564,8 +1564,142 @@ static void genJumpTab (iCode * ic) {
 /* genCast - gen code for casting                                  */
 /*-----------------------------------------------------------------*/
 static void genCast (iCode * ic) {
+  int size;
+  operand *result=IC_RESULT(ic);
+  operand *right=IC_RIGHT(ic);
+  sym_link *ctype=operandType(IC_LEFT(ic));
+  sym_link *rtype=operandType(IC_RIGHT(ic));
+  sym_link *etype=getSpec(rtype);
+  short ptrType, signedness;
+
   printIc ("genCast", ic, 1,1,1);
+
+  aopOp(result, TRUE, TRUE);
+  aopOp(right, !aopIsPtr(result), AOP_TYPE(result)!=AOP_DIR);
+  size=AOP_SIZE(result);
+  
+  /* if result is a bit */
+  if (AOP_TYPE(result) == AOP_BIT) {
+    /* if right is literal, we know what the value is */
+    if (AOP_TYPE(right) == AOP_LIT) {
+      if (operandLitValue(right)) {
+	emitcode ("setb", AOP_NAME(result)[0]);
+      } else {
+	emitcode ("clr", AOP_NAME(result)[0]);
+      }
+      return;
+    }
+    /* if right is also a bit */
+    if (AOP_TYPE(right) == AOP_BIT) {
+      emitcode ("mov", "c,%s", AOP_NAME(right));
+      emitcode ("mov", "%s,c", AOP_NAME(result));
+      return;
+    }
+    /* we need to or */
+    emitcode ("mov", "%s,%s; toBoolean", AOP_NAME(result), toBoolean(right));
+    return;
+  }
+
+  /* if right is a bit */
+  if (AOP_TYPE(right)==AOP_BIT) {
+    emitcode ("mov", "c,%s", AOP_NAME(right));
+    emitcode ("mov", "%s,#0", AOP_NAME(result)[0]);
+    emitcode ("rlc", "%s,#1", AOP_NAME(result)[0]);
+    if (size>2) {
+      emitcode ("mov", "%s,#0", AOP_NAME(result)[1]);
+    }
+    return;
+  }
+
+  /* if the result is of type pointer */
+  if (IS_PTR (ctype)) {
+
+    if (AOP_SIZE(right)>1) {
+      emitcode ("mov", "%s,%s",  AOP_NAME(result)[0], AOP_NAME(right)[0]);
+    } else {
+      emitcode ("mov", "r1l,%s", AOP_NAME(right)[0]);
+      emitcode ("sext", "r1h");
+      emitcode ("mov", "%s,r1",  AOP_NAME(result)[0]);
+    }
+    
+    /* if pointer to generic pointer */
+    if (IS_GENPTR (ctype)) {
+            
+      if (IS_GENPTR (rtype)) {
+	bailOut("genCast: gptr -> gptr");
+      }
+
+      if (IS_PTR (rtype)) {
+	ptrType = DCL_TYPE (rtype);
+      } else {
+	/* we have to go by the storage class */
+	if (!SPEC_OCLS(etype)) {
+	  bailOut("genCast: unknown storage class");
+	} else {
+	  ptrType = PTR_TYPE (SPEC_OCLS (etype));
+	}
+      }
+      
+      /* the generic part depends on the type */
+      switch (ptrType)
+	{
+	case POINTER:
+	  emitcode ("mov", "%s,#0x00", AOP_NAME(result)[1]);
+	  break;
+	case FPOINTER:
+	  emitcode ("mov", "%s,#0x01", AOP_NAME(result)[1]);
+	  break;
+	case CPOINTER:
+	  emitcode ("mov", "%s,#0x02", AOP_NAME(result)[1]);
+	  break;
+	default:
+	  bailOut("genCast: got unknown storage class");
+	}
+    }
+    return;
+  }
+
+  /* do we have to sign extend? */
+  signedness = SPEC_USIGN(rtype);
+
+  /* now depending on the size */
+  switch ((AOP_SIZE(result)<<4) + AOP_SIZE(right))
+    {
+    case 0x44:
+    case 0x33:
+      emitcode("mov", "%s,%s", AOP_NAME(result)[1], AOP_NAME(right)[1]);
+      // fall through
+    case 0x24:
+    case 0x22:
+    case 0x11:
+      emitcode("mov", "%s,%s", AOP_NAME(result)[0], AOP_NAME(right)[0]);
+      return;
+    case 0x41:
+    case 0x21:
+      emitcode("mov", "r1l,%s", AOP_NAME(right)[0]);
+      if (signedness) {
+	emitcode("sext", "r1h");
+      } else {
+	emitcode("mov", "rlh,#0");
+      }
+      emitcode("mov", "%s,r1", AOP_NAME(result)[0]);
+      if (size==2)
+	return;
+      // fall through: case 0x41
+      emitcode("sext", AOP_NAME(result)[1]);
+      return;
+    case 14:
+    case 12:
+      emitcode("mov", "r1,%s", AOP_NAME(right)[0]);
+      emitcode("mov", "%s,r1l", AOP_NAME(result)[0]);
+      return;
+    case 24:
+      emitcode("mov", "%s,%s", AOP_NAME(result)[0], AOP_NAME(right)[0]);
+      return;
+    }
+  bailOut("genCast: unknown size");
 }
+
 
 /*-----------------------------------------------------------------*/
 /* genDjnz - generate decrement & jump if not zero instrucion      */

@@ -236,7 +236,7 @@ struct xa_dis_entry disass_xa[]= {
  {0xe308,0xff8f,' ',4,CJNE, IREG_DATA8_REL8}, //  CJNE [Rd], data8, rel8     1 1 1 0 0 0 1 1  0 d d d 1 0 0 0
  {0xeb08,0xff8f,' ',5,CJNE, IREG_DATA16_REL8},//  CJNE [Rd], data16, rel8    1 1 1 0 1 0 1 1  0 d d d 1 0 0 0
 
- {0x0800,0xfffc,' ',3,CLR, BIT_ALONE       },   // CLR bit                    0 0 0 0 1 0 0 0  0 0 0 0 0 0 b b 
+ {0x0800,0xfffc,' ',3,CLR, BIT_ALONE       },  // CLR bit                    0 0 0 0 1 0 0 0  0 0 0 0 0 0 b b 
  {0x4100,0xf700,' ',2,CMP, REG_REG         },  // CMP Rd, Rs                 0 1 0 0 S 0 0 1  d d d d s s s s
  {0x4200,0xf708,' ',2,CMP, REG_IREG        },  // CMP Rd, [Rs]               0 1 0 0 S 0 1 0  d d d d 0 s s s
  {0x4208,0xf708,' ',2,CMP, IREG_REG        },  // CMP [Rd], Rs               0 1 0 0 S 0 1 0  s s s s 1 d d d
@@ -281,11 +281,14 @@ struct xa_dis_entry disass_xa[]= {
 
  {0x9780,0xfffc,' ',4, JB,    BIT_REL8     }, //  JB bit,rel8                1 0 0 1 0 1 1 1  1 0 0 0 0 0 b b
  {0x97c0,0xfffc,' ',4, JBC,   BIT_REL8     }, //  JBC bit,rel8               1 0 0 1 0 1 1 1  1 1 0 0 0 0 b b
- {0xd670,0xfff8,' ',2, JMP,   IREG         }, //  JMP [Rs]                   1 1 0 1 0 1 1 0  0 1 1 1 0 s s s
  {0xd500,0xff00,' ',3, JMP,   REL16        }, //  JMP rel16                  1 1 0 1 0 1 0 1
+ {0xd670,0xfff8,' ',2, JMP,   IREG         }, //  JMP [Rs]                   1 1 0 1 0 1 1 0  0 1 1 1 0 s s s
  /* JMP(2) */
  {0x97a0,0xfffc,' ',4, JNB,   BIT_REL8     }, //  JNB bit,rel8               1 0 0 1 0 1 1 1  1 0 1 0 0 0 b b
- /* JNZ, JZ, LEA(2), LSR(3?)  */
+ /* JNZ, JZ */
+ {0x4000,0xff88,' ',3, LEA,   REG_REGOFF8  }, //  LEA Rd,Rs+offset8          0 1 0 0 0 0 0 0  0 d d d 0 s s s
+ {0x4800,0xff88,' ',3, LEA,   REG_REGOFF16 }, //  LEA Rd,Rs+offset16         0 1 0 0 0 0 0 0  0 d d d 0 s s s
+ /* LSR(3?)  */
 
  {0x8100,0xf700,' ',2,MOV, REG_REG         },  // MOV Rd, Rs                 1 0 0 0 S 0 0 1  d d d d s s s s
  {0x8200,0xf708,' ',2,MOV, REG_IREG        },  // MOV Rd, [Rs]               1 0 0 0 S 0 1 0  d d d d 0 s s s
@@ -356,7 +359,7 @@ struct xa_dis_entry disass_xa[]= {
  {0xd690,0xffff,' ',2, RETI, NO_OPERANDS   },  //  RETI                      1 1 0 1 0 1 1 0  1 0 0 1 0 0 0 0 
    /* RL, RLC, RR, RRC */
  {0x0810,0xfffc,' ',3, SETB, BIT_ALONE     },  //  SETB bit                  0 0 0 0 1 0 0 0  0 0 0 1 0 0 b b 
-   /* SEXT */
+ {0x9009,0xf70f,' ',2, SEXT, REG           },  //  SEXT Rd                   1 0 0 1 S 0 0 0  d d d d 1 0 0 1
  {0x2100,0xf700,' ',2,SUB, REG_REG         },  // SUB Rd, Rs                 0 0 1 0 S 0 0 1  d d d d s s s s
  {0x2200,0xf708,' ',2,SUB, REG_IREG        },  // SUB Rd, [Rs]               0 0 1 0 S 0 1 0  d d d d 0 s s s
  {0x2208,0xf708,' ',2,SUB, IREG_REG        },  // SUB [Rd], Rs               0 0 1 0 S 0 1 0  s s s s 1 d d d
@@ -404,7 +407,8 @@ struct xa_dis_entry disass_xa[]= {
  {0x9d03,0xff8f,' ',6,SUBB,IREGOFF16_DATA16},  //SUBB [Rd+offset16], #data16 1 0 0 1 1 1 0 1  0 d d d 0 0 1 1
  {0x9603,0xff8f,' ',4,SUBB,DIRECT_DATA8    },  //SUBB direct, #data8         1 0 0 1 0 1 1 0  0 b b b 0 0 1 1
  {0x9e03,0xff8f,' ',5,SUBB,DIRECT_DATA16   },  //SUBB direct, #data16        1 0 0 1 0 1 1 0  0 b b b 0 0 1 1
-   /* TRAP, XCH(3) */
+ {0xd630,0xfff0,' ',2,TRAP,DATA4           },  //TRAP #data4                 1 1 0 1 0 1 1 0  0 0 1 1 #data4
+   /* XCH(3) */
 
  {0x7100,0xf700,' ',2,XOR, REG_REG         },  // XOR Rd, Rs                 0 1 1 1 S 0 0 1  d d d d s s s s
  {0x7200,0xf708,' ',2,XOR, REG_IREG        },  // XOR Rd, [Rs]               0 1 1 1 S 0 1 0  d d d d 0 s s s
@@ -419,7 +423,7 @@ struct xa_dis_entry disass_xa[]= {
  {0x7600,0xf708,' ',3,XOR, REG_DIRECT      },  // XOR Rd, direct             0 1 1 1 S 1 1 0  d d d d 0 x x x
  {0x9107,0xff0f,' ',3,XOR, REG_DATA8       },  // XOR Rd, #data8             1 0 0 1 0 0 0 1  d d d d 0 1 1 1
  {0x9907,0xff0f,' ',4,XOR, REG_DATA16      },  // XOR Rd, #data16            1 0 0 1 1 0 0 1  d d d d 0 1 1 1
- {0x9207,0xff8f,' ',3,XOR, IREG_DATA8      },  // XOR [Rd], #data8           1 0 0 1 0 0 1 0  0 d d d 0 1 1 1
+ {0x9207,0xff8f,' ',3,XOR, IREG_DATA8      },   // XOR [Rd], #data8           1 0 0 1 0 0 1 0  0 d d d 0 1 1 1
  {0x9a07,0xff8f,' ',4,XOR, IREG_DATA16     },  // XOR [Rd], #data16          1 0 0 1 1 0 1 0  0 d d d 0 1 1 1
  {0x9307,0xff8f,' ',3,XOR, IREGINC_DATA8   },  // XOR [Rd+], #data8          1 0 0 1 0 0 1 1  0 d d d 0 1 1 1
  {0x9b07,0xff8f,' ',4,XOR, IREGINC_DATA16  },  // XOR [Rd+], #data16         1 0 0 1 1 0 1 1  0 d d d 0 1 1 1
@@ -433,24 +437,22 @@ struct xa_dis_entry disass_xa[]= {
  {0x0000,0x0000,  0,1,BAD_OPCODE, REG_REG}
 };
 
-#if 0
 /*
  * Names of SFRs
  */
 
 struct name_entry sfr_tabXA51[]=
 {
-  {CPU_XA51G3,                    0x400, "PSW"},
+#include "xa_sfr.cc"
 };
 
 /*
- * Names SBITs
+ * Names of SBITs
  */
 
 struct name_entry bit_tabXA51[]=
 {
-  {CPU_XA51G3,                    0x33b, "ETI1"},
+#include "xa_bit.cc"
 };
-#endif
 
 /* End of xa.src/glob.cc */

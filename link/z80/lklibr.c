@@ -658,7 +658,7 @@ char *name;
 		    } else {
 			strcat(str,relfil);
 		    }
-		    if(strchr(str,FSEPX) == NULL) {
+		    if(strchr(relfil,FSEPX) == NULL) {
 #ifdef SDK
 			sprintf(&str[strlen(str)], "%co", FSEPX);
 #else /* SDK */

@@ -24,19 +24,32 @@ $rcsid = q~$Id$~;
 if ($#ARGV < 0 || $#ARGV > 1 ) {
     Usage();
 }
-$processor = shift;
+$processor = uc(shift);
 $path = shift;
 
-$processor = uc $processor;
-# Nathan Hurst <njh@mail.csse.monash.edu.au>: find gputils on Debian
-if ($path eq '') {
-    if ( -x "/usr/share/gputils") {
-       $path = "/usr/share/gputils";
-    } elsif ( -x "/usr/share/gpasm") {
-       $path = "/usr/share/gpasm";
-    } else {
-       die "Could not find gpasm includes.\n";
+if ($^O eq 'MSWin32') {
+    if ($path eq '') {
+	if (defined($path = $ENV{'GPUTILS_HEADER_PATH'}) || defined($path = $ENV{'GPUTILS_LKR_PATH'})) {
+	    $path .= '\\..';
+	}
+	else {
+	    die "Could not find gpasm includes.\n";
+	}
     }
+    $path_delim = '\\';
+}
+else {
+    # Nathan Hurst <njh@mail.csse.monash.edu.au>: find gputils on Debian
+    if ($path eq '') {
+	if ( -x "/usr/share/gputils") {
+	    $path = "/usr/share/gputils";
+	} elsif ( -x "/usr/share/gpasm") {
+	    $path = "/usr/share/gpasm";
+	} else {
+	    die "Could not find gpasm includes.\n";
+	}
+    }
+    $path_delim = '/';
 }
 
 #
@@ -120,7 +133,7 @@ while (<DATA>) {
 # Convert the file.
 #
 $defaultType = 'other';
-$includeFile = "$path/header/p" . lc $processor . ".inc";
+$includeFile = $path.$path_delim.'header'.$path_delim.'p'.lc($processor).'.inc';
 open(HEADER, "<$includeFile")
     || die "$programName: Error: Cannot open include file $includeFile ($!)\n";
 

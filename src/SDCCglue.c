@@ -102,49 +102,46 @@ copyFile (FILE * dest, FILE * src)
 char *
 aopLiteralLong (value * val, int offset, int size)
 {
-  char *rs;
-  union
-    {
-      float f;
-      unsigned char c[4];
-    }
-  fl;
-
-  /* if it is a float then it gets tricky */
-  /* otherwise it is fairly simple */
-  if (!IS_FLOAT (val->type))
-    {
-      unsigned long v = floatFromVal (val);
-
-      v >>= (offset * 8);
-      switch (size)
-	{
-	case 1:
-	  tsprintf (buffer, "!immedbyte", (unsigned int) v & 0xff);
-	  break;
-	case 2:
-	  tsprintf (buffer, "!immedword", (unsigned int) v & 0xffff);
-	  break;
-	default:
-	  /* Hmm.  Too big for now. */
-	  assert (0);
+	char *rs;
+	union {
+		float f;
+		unsigned char c[4];
 	}
-      rs = Safe_calloc (1, strlen (buffer) + 1);
-      return strcpy (rs, buffer);
-    }
+	fl;
 
-  /* PENDING: For now size must be 1 */
-  assert (size == 1);
+	/* if it is a float then it gets tricky */
+	/* otherwise it is fairly simple */
+	if (!IS_FLOAT (val->type)) {
+		unsigned long v = floatFromVal (val);
 
-  /* it is type float */
-  fl.f = (float) floatFromVal (val);
+		v >>= (offset * 8);
+		switch (size) {
+		case 1:
+			tsprintf (buffer, "!immedbyte", (unsigned int) v & 0xff);
+			break;
+		case 2:
+			tsprintf (buffer, "!immedword", (unsigned int) v & 0xffff);
+			break;
+		default:
+			/* Hmm.  Too big for now. */
+			assert (0);
+		}
+		rs = Safe_calloc (1, strlen (buffer) + 1);
+		return strcpy (rs, buffer);
+	}
+
+	/* PENDING: For now size must be 1 */
+	assert (size == 1);
+
+	/* it is type float */
+	fl.f = (float) floatFromVal (val);
 #ifdef _BIG_ENDIAN
-  tsprintf (buffer, "!immedbyte", fl.c[3 - offset]);
+	tsprintf (buffer, "!immedbyte", fl.c[3 - offset]);
 #else
-  tsprintf (buffer, "!immedbyte", fl.c[offset]);
+	tsprintf (buffer, "!immedbyte", fl.c[offset]);
 #endif
-  rs = Safe_calloc (1, strlen (buffer) + 1);
-  return strcpy (rs, buffer);
+	rs = Safe_calloc (1, strlen (buffer) + 1);
+	return strcpy (rs, buffer);
 }
 
 /*-----------------------------------------------------------------*/
@@ -153,7 +150,7 @@ aopLiteralLong (value * val, int offset, int size)
 char *
 aopLiteral (value * val, int offset)
 {
-  return aopLiteralLong (val, offset, 1);
+	return aopLiteralLong (val, offset, 1);
 }
 
 /*-----------------------------------------------------------------*/
@@ -484,43 +481,90 @@ printGPointerType (FILE * oFile, const char *name,
 void 
 printIvalType (sym_link * type, initList * ilist, FILE * oFile)
 {
-  value *val;
+	value *val;
 
-  /* if initList is deep */
-  if (ilist->type == INIT_DEEP)
-    ilist = ilist->init.deep;
+	/* if initList is deep */
+	if (ilist->type == INIT_DEEP)
+		ilist = ilist->init.deep;
 
-  val = list2val (ilist);
-  switch (getSize (type))
-    {
-    case 1:
-      if (!val)
-	tfprintf (oFile, "\t!db !constbyte\n", 0);
-      else
-	tfprintf (oFile, "\t!dbs\n",
-		  aopLiteral (val, 0));
-      break;
+	val = list2val (ilist);
+	switch (getSize (type)) {
+	case 1:
+		if (!val)
+			tfprintf (oFile, "\t!db !constbyte\n", 0);
+		else
+			tfprintf (oFile, "\t!dbs\n",
+				  aopLiteral (val, 0));
+		break;
 
-    case 2:
-      if (port->use_dw_for_init)
-	tfprintf (oFile, "\t!dws\n", aopLiteralLong (val, 0, 2));
-      else
-	fprintf (oFile, "\t.byte %s,%s\n", aopLiteral (val, 0), aopLiteral (val, 1));
-      break;
-    case 4:
-      if (!val)
-	{
-	  tfprintf (oFile, "\t!dw !constword\n", 0);
-	  tfprintf (oFile, "\t!dw !constword\n", 0);
+	case 2:
+		if (port->use_dw_for_init)
+			tfprintf (oFile, "\t!dws\n", aopLiteralLong (val, 0, 2));
+		else
+			fprintf (oFile, "\t.byte %s,%s\n", aopLiteral (val, 0), aopLiteral (val, 1));
+		break;
+	case 4:
+		if (!val) {
+			tfprintf (oFile, "\t!dw !constword\n", 0);
+			tfprintf (oFile, "\t!dw !constword\n", 0);
+		}
+		else {
+			fprintf (oFile, "\t.byte %s,%s,%s,%s\n",
+				 aopLiteral (val, 0), aopLiteral (val, 1),
+				 aopLiteral (val, 2), aopLiteral (val, 3));
+		}
+		break;
 	}
-      else
-	{
-	  fprintf (oFile, "\t.byte %s,%s,%s,%s\n",
-		   aopLiteral (val, 0), aopLiteral (val, 1),
-		   aopLiteral (val, 2), aopLiteral (val, 3));
+}
+
+/*-----------------------------------------------------------------*/
+/* printIvalBitFields - generate initializer for bitfields         */
+/*-----------------------------------------------------------------*/
+void printIvalBitFields(symbol **sym, initList **ilist, FILE * oFile)
+{
+	value *val ;
+	symbol *lsym = *sym;
+	initList *lilist = *ilist ;
+	unsigned long ival = 0;
+	int size =0;
+
+	
+	do {
+		unsigned long i;
+		val = list2val(lilist);
+		if (size) {
+			if (SPEC_BLEN(lsym->etype) > 8) {
+				size += ((SPEC_BLEN (lsym->etype) / 8) + 
+					 (SPEC_BLEN (lsym->etype) % 8 ? 1 : 0));
+			}
+		} else {
+			size = ((SPEC_BLEN (lsym->etype) / 8) + 
+				 (SPEC_BLEN (lsym->etype) % 8 ? 1 : 0));
+		}
+		i = (unsigned long)floatFromVal(val);
+		i <<= SPEC_BSTR (lsym->etype);
+		ival |= i;
+		if (! ( lsym->next &&
+			(IS_BITFIELD(lsym->next->type)) &&
+			(SPEC_BSTR(lsym->next->etype)))) break;
+		lsym = lsym->next;
+		lilist = lilist->next;
+	} while (1);
+	switch (size) {
+	case 1:
+		tfprintf (oFile, "\t!db !constbyte\n",ival);
+		break;
+
+	case 2:
+		tfprintf (oFile, "\t!dw !constword\n",ival);
+		break;
+	case 4:
+		tfprintf (oFile, "\t!db  !constword,!constword\n",
+			 (ival >> 8) & 0xffff, (ival & 0xffff));
+		break;
 	}
-      break;
-    }
+	*sym = lsym;
+	*ilist = lilist;
 }
 
 /*-----------------------------------------------------------------*/
@@ -530,22 +574,25 @@ void
 printIvalStruct (symbol * sym, sym_link * type,
 		 initList * ilist, FILE * oFile)
 {
-  symbol *sflds;
-  initList *iloop;
+	symbol *sflds;
+	initList *iloop;
 
-  sflds = SPEC_STRUCT (type)->fields;
-  if (ilist->type != INIT_DEEP)
-    {
-      werror (E_INIT_STRUCT, sym->name);
-      return;
-    }
+	sflds = SPEC_STRUCT (type)->fields;
+	if (ilist->type != INIT_DEEP) {
+		werror (E_INIT_STRUCT, sym->name);
+		return;
+	}
 
-  iloop = ilist->init.deep;
+	iloop = ilist->init.deep;
 
-  for (; sflds; sflds = sflds->next, iloop = (iloop ? iloop->next : NULL))
-    printIval (sflds, sflds->type, iloop, oFile);
-
-  return;
+	for (; sflds; sflds = sflds->next, iloop = (iloop ? iloop->next : NULL)) {
+		if (IS_BITFIELD(sflds->type)) {
+			printIvalBitFields(&sflds,&iloop,oFile);
+		} else {
+			printIval (sflds, sflds->type, iloop, oFile);
+		}
+	}
+	return;
 }
 
 /*-----------------------------------------------------------------*/
@@ -566,10 +613,6 @@ printIvalChar (sym_link * type, initList * ilist, FILE * oFile, char *s)
 	{
 	  if (!DCL_ELEM (type))
 	    DCL_ELEM (type) = strlen (SPEC_CVAL (val->etype).v_char) + 1;
-
-	  /* if size mismatch  */
-/*      if (DCL_ELEM (type) < ((int) strlen (SPEC_CVAL (val->etype).v_char) + 1)) */
-/*    werror (E_ARRAY_BOUND); */
 
 	  printChar (oFile, SPEC_CVAL (val->etype).v_char, DCL_ELEM (type));
 

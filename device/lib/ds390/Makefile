@@ -2,7 +2,7 @@ CC = ../../../bin/sdcc
 
 #VERBOSE = --verbose
 
-OBJECTS = tinibios.rel memcpyx.rel  lcd390.rel i2c390.rel
+OBJECTS = tinibios.rel memcpyx.rel  lcd390.rel i2c390.rel rstc390.rel
 
 SOURCES = $(patsubst %.rel,%.c,$(OBJECTS))
 

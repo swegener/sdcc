@@ -1398,19 +1398,19 @@ critical_statement
 labeled_statement
 //   : identifier ':' statement          {  $$ = createLabel($1,$3);  }   
    : identifier ':'                    {  $$ = createLabel($1,NULL);  }   
-   | CASE constant_expr ':' statement
+   | CASE constant_expr ':'
      {
        if (STACK_EMPTY(swStk))
-         $$ = createCase(NULL,$2,$4);
+         $$ = createCase(NULL,$2,NULL);
        else
-         $$ = createCase(STACK_PEEK(swStk),$2,$4);
+         $$ = createCase(STACK_PEEK(swStk),$2,NULL);
      }
-   | DEFAULT { $<asts>$ = newNode(DEFAULT,NULL,NULL); } ':' statement
+   | DEFAULT { $<asts>$ = newNode(DEFAULT,NULL,NULL); } ':'
      {
        if (STACK_EMPTY(swStk))
-         $$ = createDefault(NULL,$<asts>2,$4);
+         $$ = createDefault(NULL,$<asts>2,NULL);
        else
-         $$ = createDefault(STACK_PEEK(swStk),$<asts>2,$4);
+         $$ = createDefault(STACK_PEEK(swStk),$<asts>2,NULL);
      }
    ;
 

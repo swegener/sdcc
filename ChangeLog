@@ -1,3 +1,8 @@
+2004-03-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCC.y (labeled_statement): case and default no longer require
+	a following statement (RFE #893037)
+
 2004-03-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/mcs51/gen.c (pushSide, genSignedRightShift, genDjnz, geniPush):

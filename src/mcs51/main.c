@@ -83,9 +83,8 @@ _mcs51_parseOptions (int *pargc, char **argv, int *i)
 static void
 _mcs51_finaliseOptions (void)
 {
-  if (options.model == MODEL_LARGE)
-    {
-      port->mem.default_local_map = xdata;
+  if (options.model == MODEL_LARGE) {
+      port->mem.default_local_map = data;
       port->mem.default_globl_map = xdata;
     }
   else

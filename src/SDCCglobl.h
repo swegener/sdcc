@@ -186,7 +186,8 @@ enum
     MODEL_COMPACT = 2,
     MODEL_MEDIUM = 4,
     MODEL_LARGE = 8,
-    MODEL_FLAT24 = 16
+    MODEL_FLAT24 = 16,
+    MODEL_PAGE0 = 32 /* for the xa51 port */
   };
 
 /* overlay segment name and the functions

@@ -17,6 +17,14 @@
 /* adapted from the osu8asm project, 1995 */
 /* http://www.pjrc.com/tech/osu8/index.html */
 
+/* 
+   made "relocatable" by johan.knol@iduna.nl for sdcc
+   
+   This isn't a standalone assembler anymore. It's only purpose is to
+   create relocatable modules (that has to be processed with xa_link) 
+   out of sdcc-generated .xa files
+*/
+
 #define D(x) x
 
 #include <stdio.h>

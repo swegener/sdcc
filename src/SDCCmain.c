@@ -57,7 +57,7 @@ const char *preArgv[128];	/* pre-processor arguments  */
 int currRegBank = 0;
 struct optimize optimize;
 struct options options;
-char *VersionString = SDCC_VERSION_STR /*"Version 2.1.8a" */ ;
+char *VersionString = SDCC_VERSION_STR;
 int preProcOnly = 0;
 int noAssemble = 0;
 char *linkOptions[128];
@@ -1119,8 +1119,9 @@ linkEdit (char **envp)
   WRITE_SEG_LOC (XDATA_NAME, options.xdata_loc);
 
   /* indirect data */
-  if (IDATA_NAME)
+  if (IDATA_NAME) {
     WRITE_SEG_LOC (IDATA_NAME, options.idata_loc);
+  }
 
   /* bit segment start */
   WRITE_SEG_LOC (BIT_NAME, 0);
@@ -1136,31 +1137,25 @@ linkEdit (char **envp)
   /* standard library path */
   if (!options.nostdlib)
     {
-/****
-      if (TARGET_IS_DS390)
+      switch (options.model)
 	{
+	case MODEL_SMALL:
+	  c = "small";
+	  break;
+	case MODEL_LARGE:
+	  c = "large";
+	  break;
+	case MODEL_FLAT24:
+	  /* c = "flat24"; */
 	  c = "ds390";
-	}
-      else
-*****/
-	{
-	  switch (options.model)
-	    {
-	    case MODEL_SMALL:
-	      c = "small";
-	      break;
-	    case MODEL_LARGE:
-	      c = "large";
-	      break;
-	    case MODEL_FLAT24:
-	      /* c = "flat24"; */
-	      c = "ds390";
-	      break;
-	    default:
-	      werror (W_UNKNOWN_MODEL, __FILE__, __LINE__);
-	      c = "unknown";
-	      break;
-	    }
+	  break;
+	case MODEL_PAGE0:
+	  c = "xa51";
+	  break;
+	default:
+	  werror (W_UNKNOWN_MODEL, __FILE__, __LINE__);
+	  c = "unknown";
+	  break;
 	}
       mfprintf (lnkfile, getRuntimeVariables(), "-k {libdir}{sep}%s\n", c);
 
@@ -1287,6 +1282,9 @@ preProcess (char **envp)
 	  break;
 	case MODEL_FLAT24:
 	  addToList (preArgv, "-DSDCC_MODEL_FLAT24");
+	  break;
+	case MODEL_PAGE0:
+	  addToList (preArgv, "-DSDCC_MODEL_PAGE0");
 	  break;
 	default:
 	  werror (W_UNKNOWN_MODEL, __FILE__, __LINE__);

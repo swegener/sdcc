@@ -1,9 +1,7 @@
-/** @file main.c
-    xa51 specific general functions.
-
-    Note that mlh prepended _xa51_ on the static functions.  Makes
-    it easier to set a breakpoint using the debugger.
+/* @file main.c
+   xa51 specific general functions.
 */
+
 #include "common.h"
 #include "main.h"
 #include "ralloc.h"
@@ -93,6 +91,10 @@ _xa51_finaliseOptions (void)
 {
   port->mem.default_local_map = istack;
   port->mem.default_globl_map = xdata;
+  if (options.model!=MODEL_PAGE0) {
+    fprintf (stderr, "-mxa51 only supports --model-page0\n");
+    exit (1);
+  }
 }
 
 static void
@@ -102,6 +104,7 @@ _xa51_setDefaultOptions (void)
   options.intlong_rent=1;
   options.float_rent=1;
   options.stack_loc=0x100;
+  options.data_loc=0;
 }
 
 static const char *
@@ -189,7 +192,7 @@ static bool cseCostEstimation (iCode *ic, iCode *pdic)
 */
 static const char *_linkCmd[] =
 {
-  "xa_link", "", NULL
+  "xa_link", "", "$1", NULL
 };
 
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
@@ -206,8 +209,8 @@ PORT xa51_port =
   "MCU 80C51XA",       		/* Target name */
   {
     FALSE,			/* Emit glue around main */
-    MODEL_LARGE,
-    MODEL_LARGE
+    MODEL_PAGE0,
+    MODEL_PAGE0
   },
   {
     _asmCmd,

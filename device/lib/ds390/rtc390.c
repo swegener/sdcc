@@ -68,7 +68,7 @@ unsigned char RtcRead(struct tm *rtcDate) {
       }
     }
   }
-  rtcDate->tm_year=BCDtoINT(rtcBytes[7]+100); // year since 1900
+  rtcDate->tm_year=BCDtoINT(rtcBytes[7])+100; // year since 1900
   rtcDate->tm_mon=BCDtoINT(rtcBytes[6])-1; // jan=0
   rtcDate->tm_mday=BCDtoINT(rtcBytes[5]);
   rtcDate->tm_wday=(rtcBytes[4]&0x07)-1; // monday=0?
@@ -87,7 +87,7 @@ void RtcWrite(struct tm *rtcDate) {
   unsigned char rtcBytes[8];
   unsigned char byte,bitMask;
 
-  rtcBytes[7]=INTtoBCD(rtcDate->tm_year-100);
+  rtcBytes[7]=INTtoBCD(rtcDate->tm_year%100);
   rtcBytes[6]=INTtoBCD(rtcDate->tm_mon)+1;
   rtcBytes[5]=INTtoBCD(rtcDate->tm_mday);
   rtcBytes[4]=(INTtoBCD(rtcDate->tm_wday)+1)&0x07; //set 24h  mode

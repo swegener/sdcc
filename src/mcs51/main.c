@@ -8,6 +8,8 @@
 #include "main.h"
 #include "ralloc.h"
 #include "gen.h"
+#include "../SDCCutil.h"
+extern const char *preArgv[128];	/* pre-processor arguments  */
 
 static char _defaultRules[] =
 {
@@ -64,13 +66,31 @@ _mcs51_reset_regparm ()
 static int
 _mcs51_regparm (sym_link * l)
 {
-  /* for this processor it is simple
-     can pass only the first parameter in a register */
-  if (regParmFlg)
-    return 0;
+    if (options.parms_in_bank1 == 0) {
+	/* simple can pass only the first parameter in a register */
+	if (regParmFlg)
+	    return 0;
 
-  regParmFlg = 1;
-  return 1;
+	regParmFlg = 1;
+	return 1;
+    } else {
+	int size = getSize(l);
+	int remain ;
+
+	/* first one goes the usual way to DPTR */
+	if (regParmFlg == 0) {
+	    regParmFlg += 4 ;
+	    return 1;
+	}
+	/* second one onwards goes to RB1_0 thru RB1_7 */
+        remain = regParmFlg - 4;
+	if (size > (8 - remain)) {
+	    regParmFlg = 12 ;
+	    return 0;
+	}
+	regParmFlg += size ;
+	return regParmFlg - size + 1;	
+    }
 }
 
 static bool
@@ -94,6 +114,10 @@ _mcs51_finaliseOptions (void)
       port->mem.default_local_map = data;
       port->mem.default_globl_map = data;
     }
+  options.parms_in_bank1=1;
+  if (options.parms_in_bank1) {
+      addToList (preArgv, "-DSDCC_PARMS_IN_BANK1");
+  }
 }
 
 static void
@@ -112,6 +136,11 @@ _mcs51_getRegName (struct regs *reg)
 static void
 _mcs51_genAssemblerPreamble (FILE * of)
 {
+    if (options.parms_in_bank1) {
+	int i ;
+	for (i=0; i < 8 ; i++ )
+	    fprintf (of,"b1_%d = 0x%x \n",i,8+i);
+    }
 }
 
 /* Generate interrupt vector table. */

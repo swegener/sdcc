@@ -2077,6 +2077,8 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
       !POINTER_GET (ic))
     return NULL;
   
+  if (ic->op == SEND && ic->argreg != 1) return NULL;
+
   /* this routine will mark the a symbol as used in one 
      instruction use only && if the defintion is local 
      (ie. within the basic block) && has only one definition &&
@@ -2589,7 +2591,7 @@ packRegisters (eBBlock * ebp)
 
       /* some cases the redundant moves can
          can be eliminated for return statements */
-      if ((ic->op == RETURN || ic->op == SEND) &&
+      if ((ic->op == RETURN || (ic->op == SEND && ic->argreg == 1)) &&
 	  !isOperandInFarSpace (IC_LEFT (ic)) &&
 	  options.model == MODEL_SMALL) {
 	if (0 && options.stackAuto) {

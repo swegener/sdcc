@@ -93,6 +93,10 @@ static struct
   }
 _G;
 
+static char *rb1regs[] = {
+    "b1_0","b1_1","b1_2","b1_3","b1_4","b1_5","b1_6","b1_7"
+};
+
 extern int mcs51_ptrRegReq;
 extern int mcs51_nRegs;
 extern FILE *codeOutFile;
@@ -1888,6 +1892,39 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
 }
 
 /*-----------------------------------------------------------------*/
+/* genSend - gen code for SEND	                                   */
+/*-----------------------------------------------------------------*/
+static void genSend(set *sendSet)
+{
+    iCode *sic;
+    int rb1_count = 0 ;
+
+    for (sic = setFirstItem (_G.sendSet); sic;
+	 sic = setNextItem (_G.sendSet)) {
+	  int size, offset = 0;
+	  aopOp (IC_LEFT (sic), sic, FALSE);
+	  size = AOP_SIZE (IC_LEFT (sic));
+
+	  if (sic->argreg == 1) {
+	      while (size--) {
+		  char *l = aopGet (AOP (IC_LEFT (sic)), offset,
+				    FALSE, FALSE);
+		  if (strcmp (l, fReturn[offset]))
+		      emitcode ("mov", "%s,%s", fReturn[offset], l);
+		  offset++;
+	      }
+	      rb1_count = 0;
+	  } else {
+	      while (size--) {
+		  emitcode ("mov","b1_%d,%s",rb1_count++,
+			    aopGet (AOP (IC_LEFT (sic)), offset++,FALSE, FALSE));
+	      }
+	  } 	  
+	  freeAsmop (IC_LEFT (sic), NULL, sic, TRUE);
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* genCall - generates a call statement                            */
 /*-----------------------------------------------------------------*/
 static void
@@ -1899,29 +1936,16 @@ genCall (iCode * ic)
 
   D(emitcode(";", "genCall"));
 
+  dtype = operandType (IC_LEFT (ic));
   /* if send set is not empty the assign */
   if (_G.sendSet)
     {
-      iCode *sic;
-
-      for (sic = setFirstItem (_G.sendSet); sic;
-	   sic = setNextItem (_G.sendSet))
-	{
-	  int size, offset = 0;
-	  aopOp (IC_LEFT (sic), sic, FALSE);
-	  size = AOP_SIZE (IC_LEFT (sic));
-	  while (size--)
-	    {
-	      char *l = aopGet (AOP (IC_LEFT (sic)), offset,
-				FALSE, FALSE);
-	      if (strcmp (l, fReturn[offset]))
-		emitcode ("mov", "%s,%s",
-			  fReturn[offset],
-			  l);
-	      offset++;
-	    }
-	  freeAsmop (IC_LEFT (sic), NULL, sic, TRUE);
+	if (IFFUNC_ISREENT(dtype)) { /* need to reverse the send set */
+	    genSend(reverseSet(_G.sendSet));
+	} else {
+	    genSend(_G.sendSet);
 	}
+
       _G.sendSet = NULL;
     }
 
@@ -1933,15 +1957,6 @@ genCall (iCode * ic)
       (FUNC_REGBANK (currFunc->type) != FUNC_REGBANK (dtype)) &&
        !IFFUNC_ISISR (dtype))
   {
-//      if (!ic->bankSaved) 
-//      {
-//           /* This is unexpected; the bank should have been saved in
-//            * genFunction.
-//            */
-//    	   saveRBank (FUNC_REGBANK (dtype), ic, FALSE);
-//    	   restoreBank = TRUE;
-//      }
-      // need caution message to user here
       swapBanks = TRUE;  
   } 
     
@@ -2055,27 +2070,8 @@ genPcall (iCode * ic)
   /* if send set is not empty the assign */
   if (_G.sendSet)
     {
-      iCode *sic;
-
-      for (sic = setFirstItem (_G.sendSet); sic;
-	   sic = setNextItem (_G.sendSet))
-	{
-	  int size, offset = 0;
-	  aopOp (IC_LEFT (sic), sic, FALSE);
-	  size = AOP_SIZE (IC_LEFT (sic));
-	  while (size--)
-	    {
-	      char *l = aopGet (AOP (IC_LEFT (sic)), offset,
-				FALSE, FALSE);
-	      if (strcmp (l, fReturn[offset]))
-		emitcode ("mov", "%s,%s",
-			  fReturn[offset],
-			  l);
-	      offset++;
-	    }
-	  freeAsmop (IC_LEFT (sic), NULL, sic, TRUE);
-	}
-      _G.sendSet = NULL;
+	genSend(reverseSet(_G.sendSet));
+	_G.sendSet = NULL;
     }
 
   if (swapBanks)
@@ -2276,10 +2272,17 @@ genFunction (iCode * ic)
 	    }
 	  else
 	    {
+		
 	      /* this function has  a function call cannot
 	         determines register usage so we will have to push the
 	         entire bank */
-	      saveRBank (0, ic, FALSE);
+		saveRBank (0, ic, FALSE);
+		if (options.parms_in_bank1) {
+		    int i;
+		    for (i=0; i < 8 ; i++ ) {
+			emitcode ("push","%s",rb1regs[i]);
+		    }
+		}
 	    }
 	}
 	else
@@ -2575,6 +2578,12 @@ genEndFunction (iCode * ic)
 	    }
 	  else
 	    {
+	      if (options.parms_in_bank1) {
+		  int i;
+		  for (i = 7 ; i >= 0 ; i-- ) {		      
+		      emitcode ("pop","%s",rb1regs[i]);
+		  }
+	      }
 	      /* this function has  a function call cannot
 	         determines register usage so we will have to pop the
 	         entire bank */
@@ -2819,7 +2828,8 @@ genPlusIncr (iCode * ic)
   D(emitcode (";", "genPlusIncr"));
 
   /* if increment 16 bits in register */
-  if (sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) &&
+  if (AOP_TYPE(IC_LEFT(ic)) == AOP_REG &&
+      sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) && 
       (size > 1) &&
       (icount == 1))
     {
@@ -3173,7 +3183,8 @@ genMinusDec (iCode * ic)
   D(emitcode (";", "genMinusDec"));
 
   /* if decrement 16 bits in register */
-  if (sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) &&
+  if (AOP_TYPE(IC_LEFT(ic)) == AOP_REG &&
+      sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) &&
       (size > 1) &&
       (icount == 1))
     {
@@ -8737,39 +8748,43 @@ genDjnz (iCode * ic, iCode * ifx)
 static void
 genReceive (iCode * ic)
 {
+    int size = getSize (operandType (IC_RESULT (ic)));
+    int offset = 0;
   D(emitcode (";", "genReceive"));
 
-  if (isOperandInFarSpace (IC_RESULT (ic)) &&
-      (OP_SYMBOL (IC_RESULT (ic))->isspilt ||
-       IS_TRUE_SYMOP (IC_RESULT (ic))))
-    {
-
-      int size = getSize (operandType (IC_RESULT (ic)));
-      int offset = fReturnSizeMCS51 - size;
-      while (size--)
-	{
-	  emitcode ("push", "%s", (strcmp (fReturn[fReturnSizeMCS51 - offset - 1], "a") ?
-				fReturn[fReturnSizeMCS51 - offset - 1] : "acc"));
-	  offset++;
-	}
+  if (ic->argreg == 1) { /* first parameter */
+      if (isOperandInFarSpace (IC_RESULT (ic)) &&
+	  (OP_SYMBOL (IC_RESULT (ic))->isspilt ||
+	   IS_TRUE_SYMOP (IC_RESULT (ic)))) {
+	  
+	  offset = fReturnSizeMCS51 - size;
+	  while (size--) {
+	      emitcode ("push", "%s", (strcmp (fReturn[fReturnSizeMCS51 - offset - 1], "a") ?
+				       fReturn[fReturnSizeMCS51 - offset - 1] : "acc"));
+	      offset++;
+	  }
+	  aopOp (IC_RESULT (ic), ic, FALSE);
+	  size = AOP_SIZE (IC_RESULT (ic));
+	  offset = 0;
+	  while (size--) {
+	      emitcode ("pop", "acc");
+	      aopPut (AOP (IC_RESULT (ic)), "a", offset++);
+	  }
+	  
+      } else {
+	  _G.accInUse++;
+	  aopOp (IC_RESULT (ic), ic, FALSE);
+	  _G.accInUse--;
+	  assignResultValue (IC_RESULT (ic));
+      }
+  } else { /* second receive onwards */
+      int rb1off ;
       aopOp (IC_RESULT (ic), ic, FALSE);
-      size = AOP_SIZE (IC_RESULT (ic));
-      offset = 0;
-      while (size--)
-	{
-	  emitcode ("pop", "acc");
-	  aopPut (AOP (IC_RESULT (ic)), "a", offset++);
-	}
-
-    }
-  else
-    {
-      _G.accInUse++;
-      aopOp (IC_RESULT (ic), ic, FALSE);
-      _G.accInUse--;
-      assignResultValue (IC_RESULT (ic));
-    }
-
+      rb1off = ic->argreg;
+      while (size--) {
+	  aopPut (AOP (IC_RESULT (ic)), rb1regs[rb1off++ -5], offset++);
+      }
+  }
   freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
 }
 

@@ -6627,10 +6627,8 @@ static void genFarPointerGet (operand *left,
                  emitcode("push", "%s", aopGet(AOP(left),0,FALSE,TRUE));
                  emitcode("push", "%s", aopGet(AOP(left),1,FALSE,TRUE));
                  emitcode("mov", "dpx,%s",aopGet(AOP(left),2,FALSE,FALSE));
-                 emitcode("pop", "acc");
-                 emitcode("mov", "dph,a");
-                 emitcode("pop", "acc");
-                 emitcode("mov", "dpl,a");
+                 emitcode("pop", "dph");
+                 emitcode("pop", "dpl");
             }
         }
     }
@@ -7216,10 +7214,8 @@ static void genFarPointerSet (operand *right,
                  emitcode("push", "%s", aopGet(AOP(result),0,FALSE,TRUE));
                  emitcode("push", "%s", aopGet(AOP(result),1,FALSE,TRUE));
                  emitcode("mov", "dpx,%s",aopGet(AOP(result),2,FALSE,FALSE));
-                 emitcode("pop", "acc");
-                 emitcode("mov", "dph,a");
-                 emitcode("pop", "acc");
-                 emitcode("mov", "dpl,a");
+                 emitcode("pop", "dph");
+                 emitcode("pop", "dpl");
             }
         }
     }

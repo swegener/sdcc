@@ -484,11 +484,11 @@ declaration_specifiers
        sym_link *lnk = $2 ;
        while (lnk && !IS_SPEC(lnk->next))
 	 lnk = lnk->next;
-       lnk->next = mergeSpec($1,lnk->next, yytext);
+       lnk->next = mergeSpec($1,lnk->next, "storage_class_specifier declaration_specifiers - skipped");
        $$ = $2 ;
      }
      else
-       $$ = mergeSpec($1,$2, yytext);
+       $$ = mergeSpec($1,$2, "storage_class_specifier declaration_specifiers");
    }
    | type_specifier				    { $$ = $1; }
    | type_specifier declaration_specifiers          { 
@@ -498,11 +498,11 @@ declaration_specifiers
        sym_link *lnk = $2 ;
        while (lnk && !IS_SPEC(lnk->next))
 	 lnk = lnk->next;
-       lnk->next = mergeSpec($1,lnk->next, yytext);
+       lnk->next = mergeSpec($1,lnk->next, "type_specifier declaration_specifiers - skipped");
        $$ = $2 ;
      }
      else
-       $$ = mergeSpec($1,$2, yytext);
+       $$ = mergeSpec($1,$2, "type_specifier declaration_specifiers");
    }
    ;
 
@@ -603,6 +603,9 @@ type_specifier2
    | CODE      {
                   $$ = newLink (SPECIFIER) ;
                   SPEC_SCLS($$) = S_CODE ;                 
+		  if (port->mem.code_ro) {
+		    SPEC_CONST($$) = 1;
+		  }
                }
    | EEPROM      {
                   $$ = newLink (SPECIFIER) ;
@@ -1008,11 +1011,11 @@ type_specifier_list
        sym_link *lnk = $2 ;
        while (lnk && !IS_SPEC(lnk->next))
 	 lnk = lnk->next;
-       lnk->next = mergeSpec($1,lnk->next, "type_specifier_list");
+       lnk->next = mergeSpec($1,lnk->next, "type_specifier_list type_specifier skipped");
        $$ = $2 ;
      }
      else
-       $$ = mergeSpec($1,$2, "type_specifier_list");
+       $$ = mergeSpec($1,$2, "type_specifier_list type_specifier");
    }
    ;
 

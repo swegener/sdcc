@@ -373,9 +373,7 @@ pointerTypes (sym_link * ptr, sym_link * type)
 	  break;
 	}
       /* the storage class of type ends here */
-      SPEC_SCLS (type) =
-	SPEC_CONST (type) =
-	SPEC_VOLATILE (type) = 0;
+      SPEC_SCLS (type) = 0;
     }
 
   /* now change all the remaining unknown pointers
@@ -558,8 +556,6 @@ void checkTypeSanity(sym_link *etype, char *name) {
 sym_link *
 mergeSpec (sym_link * dest, sym_link * src, char *name)
 {
-  sym_link *symlink=dest;
-
   if (!IS_SPEC(dest) || !IS_SPEC(src)) {
 #if 0
     werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "cannot merge declarator");
@@ -643,7 +639,7 @@ mergeSpec (sym_link * dest, sym_link * src, char *name)
   FUNC_INTNO(dest) |= FUNC_INTNO(src);
   FUNC_REGBANK(dest) |= FUNC_REGBANK(src);
 
-  return symlink;
+  return dest;
 }
 
 /*------------------------------------------------------------------*/

@@ -1,3 +1,7 @@
+2003-09-06  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+	* src/z80/gen.c (aopPut, spillPairReg): fixed bug #800998
+	* src/z80/gen.c (genFunction, genEndFunction): fixed "bug" #774700
+
 2003-09-06  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCicode.c (ast2iCode): fixed differences in iCode with different

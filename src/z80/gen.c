@@ -214,6 +214,7 @@ static struct
     int pushedDE;
   } calleeSaves;
 
+  bool omitFramePtr;
   int frameId;
   int receiveOffset;
   bool flushStatics;
@@ -623,6 +624,30 @@ spillPair (PAIR_ID pairId)
   _G.pairs[pairId].base = NULL;
 }
 
+/* Given a register name, spill the pair (if any) the register is part of */
+static void
+spillPairReg (const char *regname)
+{      
+  if (strlen(regname)==1)
+    {
+      switch (*regname)
+        {
+        case 'h':
+        case 'l':
+          spillPair(PAIR_HL);
+          break;
+        case 'd':
+        case 'e':
+          spillPair(PAIR_DE);
+          break;
+        case 'b':
+        case 'c':
+          spillPair(PAIR_BC);
+          break;
+        }
+    }
+}
+
 /** Push a register pair onto the stack */
 void
 genPairPush (asmop * aop)
@@ -686,7 +711,7 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool requires_a)
          Normally everything is AOP_STK, but for offsets of < -128 or
          > 127 on the Z80 an extended stack pointer is used.
       */
-      if (IS_Z80 && (options.ommitFramePtr || sym->stack < INT8MIN || sym->stack > (int)(INT8MAX-getSize (sym->type))))
+      if (IS_Z80 && (_G.omitFramePtr || sym->stack < INT8MIN || sym->stack > (int)(INT8MAX-getSize (sym->type))))
         {
           emitDebug ("; AOP_EXSTK for %s", sym->rname);
           sym->aop = aop = newAsmop (AOP_EXSTK);
@@ -1708,6 +1733,7 @@ aopPut (asmop * aop, const char *s, int offset)
       else
 	emit2 ("ld %s,%s",
 	       aop->aopu.aop_reg[offset]->name, s);
+      spillPairReg(aop->aopu.aop_reg[offset]->name);
       break;
 
     case AOP_IY:
@@ -1807,6 +1833,7 @@ aopPut (asmop * aop, const char *s, int offset)
 	{
 	  emit2 ("ld %s,%s", aop->aopu.aop_str[offset], s);
 	}
+      spillPairReg(aop->aopu.aop_str[offset]);
       break;
 
     case AOP_ACC:
@@ -1820,13 +1847,17 @@ aopPut (asmop * aop, const char *s, int offset)
       else
 	{
 	  if (strcmp (aop->aopu.aop_str[offset], s))
-	    emit2 ("ld %s,%s", aop->aopu.aop_str[offset], s);
+	    {
+	      emit2 ("ld %s,%s", aop->aopu.aop_str[offset], s);
+	      spillPairReg(aop->aopu.aop_str[offset]);
+	    }
 	}
       break;
 
     case AOP_HLREG:
       wassert (offset < 2);
       emit2 ("ld %s,%s", aop->aopu.aop_str[offset], s);
+      spillPairReg(aop->aopu.aop_str[offset]);
       break;
 
     case AOP_PAIRPTR:
@@ -2839,6 +2870,8 @@ extern set *publics;
 static void
 genFunction (iCode * ic)
 {
+  bool stackParm;
+  
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
   sym_link *ftype;
 
@@ -2933,8 +2966,29 @@ genFunction (iCode * ic)
 
   /* adjust the stack for the function */
   _G.stack.last = sym->stack;
-
-  if (sym->stack && IS_GB && sym->stack > -INT8MIN)
+  
+  stackParm = FALSE;
+  for (sym = setFirstItem (istack->syms); sym;
+       sym = setNextItem (istack->syms))
+    {
+      if (sym->_isparm && !IS_REGPARM (sym->etype))
+        {
+          stackParm = TRUE;
+          break;
+        }
+    }
+  sym = OP_SYMBOL (IC_LEFT (ic));
+  
+  _G.omitFramePtr = options.ommitFramePtr;
+  if (IS_Z80 && !stackParm && !sym->stack)
+    {
+      /* When the conflicts between AOP_EXSTK && AOP_HLREG are fixed, */
+      /* the above !sym->stack condition can be removed. -- EEP       */
+      if (sym->stack)
+        emit2 ("!ldaspsp", -sym->stack);
+      _G.omitFramePtr = TRUE;
+    }
+  else if (sym->stack && IS_GB && sym->stack > -INT8MIN)
     emit2 ("!enterxl", sym->stack);
   else if (sym->stack)
     emit2 ("!enterx", sym->stack);
@@ -2962,7 +3016,12 @@ genEndFunction (iCode * ic)
 
       /* PENDING: calleeSave */
 
-      if (_G.stack.offset && IS_GB && _G.stack.offset > INT8MAX)
+      if (IS_Z80 && _G.omitFramePtr)
+        {
+          if (_G.stack.offset)
+            emit2 ("!ldaspsp", _G.stack.offset);
+        }
+      else if (_G.stack.offset && IS_GB && _G.stack.offset > INT8MAX)
         {
           emit2 ("!leavexl", _G.stack.offset);
         }

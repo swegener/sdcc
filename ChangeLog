@@ -1,3 +1,8 @@
+2004-10-20 Borut Razem <borut.razem AT siol.net>
+
+	* support/scripts/sdcc.nsi: added include/pic16/*.h to the setup
+	package
+
 2004-10-20 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* device/lib/pic16/libsdcc/Makefile: added lregs directory in

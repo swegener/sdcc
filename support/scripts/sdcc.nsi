@@ -55,15 +55,7 @@ SetCompressor lzma
 
 !define SDCC_ROOT "."
 
-!define FROM_SNAPSHOT
-
-!ifdef FROM_SNAPSHOT
-!system "dir ${SDCC_ROOT}\device > NUL" <> 0
 !define DEV_ROOT "${SDCC_ROOT}"
-!else
-!system "dir ${SDCC_ROOT}\device > NUL" = 0
-!define DEV_ROOT "${SDCC_ROOT}\device"
-!endif
 
 !system "unix2dos ${SDCC_ROOT}\doc\ChangeLog_head.txt" = 0
 !system "unix2dos ${SDCC_ROOT}\doc\README.TXT" = 0
@@ -164,6 +156,8 @@ Section "SDCC include files"
   File "${DEV_ROOT}\include\asm\default\features.h"
   SetOutPath "$INSTDIR\include\asm\gbz80"
   File "${DEV_ROOT}\include\asm\gbz80\features.h"
+  SetOutPath "$INSTDIR\include\asm\pic16"
+  File "${DEV_ROOT}\include\asm\pic16\features.h"
   SetOutPath "$INSTDIR\include\asm\z80"
   File "${DEV_ROOT}\include\asm\z80\features.h"
   SetOutPath "$INSTDIR\include\pic16"
@@ -385,6 +379,7 @@ Section Uninstall
   Delete "$INSTDIR\lib\ds400\*.lib"
 
   Delete "$INSTDIR\include\asm\z80\*.h"
+  Delete "$INSTDIR\include\asm\pic16\*.h"
   Delete "$INSTDIR\include\asm\gbz80\*.h"
   Delete "$INSTDIR\include\asm\default\*.h"
   Delete "$INSTDIR\include\pic16\*.h"
@@ -418,6 +413,7 @@ Section Uninstall
   RMDir "$INSTDIR\lib"
 
   RMDir "$INSTDIR\include\asm\z80"
+  RMDir "$INSTDIR\include\asm\pic16"
   RMDir "$INSTDIR\include\asm\gbz80"
   RMDir "$INSTDIR\include\asm\default"
   RMDir "$INSTDIR\include\asm"

@@ -45,35 +45,65 @@
 #include "xa_version.h"
 
 enum {
-  CSEG=1,
+  // these are all concatenated into the code image
+  GSINIT=1,
+  CSEG,
+  XINIT,
+  //GSFINAL, // do we need this?
+
+  // these are only for storage
+  BSEG,
   DSEG,
   XSEG,
-  BSEG,
-  XINIT,
   XISEG,
-  GSINIT,
-  GSFINAL,
-  HOME,
   MAX_SEGMENTS
 };
+
+#define CODESIZE 0x10000
+
+char codeImage[CODESIZE];
+char gsinitImage[CODESIZE];
+char xinitImage[CODESIZE];
 
 struct SEGMENT {
   short id;
   char *name;
+  int hasSymbols;
+  int _size;
   int start;
   int current;
+  unsigned char *image;
 } segments[MAX_SEGMENTS]={
-  {0,       "????",    0, 0},
-  {CSEG,    "CSEG",    0, 0},
-  {DSEG,    "DSEG",    0, 0},
-  {XSEG,    "XSEG",    0, 0},
-  {BSEG,    "BSEG",    0, 0},
-  {XINIT,   "XINIT",   0, 0},
-  {XISEG,   "XISEG",   0, 0},
-  {GSINIT,  "GSINIT",  0, 0},
-  {GSFINAL, "GSFINAL", 0, 0},
-  {HOME,    "HOME",    0, 0},
+  {0,       "????",    0, 0, 0, 0, NULL},
+
+  {GSINIT,  "GSINIT",  0, 0, 0, 0, gsinitImage},
+  {CSEG,    "CSEG",    0, 0, 0, 0, codeImage},
+  {XINIT,   "XINIT",   0, 0, 0, 0, xinitImage},
+  //{GSFINAL, "GSFINAL", 0, 0, 0, 0, NULL},
+
+  {BSEG,    "BSEG",    0, 0, 0, 0, NULL},
+  {DSEG,    "DSEG",    0, 0, 0, 0, NULL},
+  {XSEG,    "XSEG",    0, 0, 0, 0, NULL},
+  {XISEG,   "XISEG",   0, 0, 0, 0, NULL},
 };
+
+struct MODULE {
+  char *name;
+  int offset[MAX_SEGMENTS];
+  int size[MAX_SEGMENTS];
+  struct MODULE *next;
+  struct MODULE *last;
+} *modules=NULL;
+
+
+struct SYMBOL {
+  char *name;
+  struct MODULE *module;
+  struct SEGMENT *segment;
+  int address;
+  struct SYMBOL *next;
+  struct SYMBOL *last;
+} *symbols=NULL;
 
 char *libPaths[128];
 int nlibPaths=0;
@@ -82,24 +112,60 @@ int nlibFiles=0;
 
 static char outFileName[PATH_MAX];
 
-int currentArea=0;
+struct SEGMENT *currentSegment;
+struct MODULE *currentModule;
 
-int getAreaID(char *area) {
+struct SEGMENT *findSegment(char *segment) {
   int i;
   for (i=1; i<MAX_SEGMENTS; i++) {
-    if (strcmp(segments[i].name, area)==0) {
-      return segments[i].id;
+    if (strcmp(segments[i].name, segment)==0) {
+      return &segments[i];
     }
   }
   return 0;
 }
 
+void addToModules (char *name) {
+  struct MODULE *module;
+  int s;
+
+  //fprintf (stderr, "addToModules: %s\n", name);
+
+  module=calloc(1, sizeof(struct MODULE));
+  module->name=strdup(name);
+  for (s=0; s<MAX_SEGMENTS; s++) {
+    module->offset[s]=segments[s].current;
+  }
+  if (!modules) {
+    modules=module;
+  } else {
+    modules->last->next=module;
+  }
+  currentModule=modules->last=module;
+}
+
 void addToRefs(char *ref) {
-  fprintf (stderr, "Ref: %s\n", ref);
+  //fprintf (stderr, "addToRefs: %s\n", ref);
 }
 
 void addToDefs(char *def, int address) {
-  fprintf (stderr, "Def: %s 0x%04x\n", def, address);
+  struct SYMBOL *symbol;
+  /* fprintf (stderr, "addToDefs: %s %s 0x%04x + 0x%04x\n", 
+     currentSegment->name, def, 
+     currentModule->offset[currentSegment->id],
+     address); */
+  symbol=calloc(1, sizeof(struct SYMBOL));
+  symbol->name=strdup(def);
+  symbol->module=currentModule;
+  symbol->segment=currentSegment;
+  symbol->address=currentModule->offset[currentSegment->id]+address;
+  if (!symbols) {
+    symbols=symbol;
+  } else {
+    symbols->last->next=symbol;
+  }
+  symbols->last=symbol;
+  currentSegment->hasSymbols++;
 }
 
 void syntaxError (char *err) {
@@ -139,14 +205,15 @@ void readModule(char *module) {
   char line[132];
   FILE *relModule;
   char moduleName[PATH_MAX];
-  int areas, globals;
+  int segments, globals;
   int currentLine=1;
 
   if ((relModule=fopen(module, "r"))==NULL) {
     perror (module);
     exit (1);
   }
-  printf ("ReadModule: %s\n", module);
+
+  //fprintf (stderr, "ReadModule: %s\n", module);
 
   // first we need to check if this is a valid file
   if (sscanf(fgets(line, 132, relModule), 
@@ -164,7 +231,7 @@ void readModule(char *module) {
   // H 7 areas 168 global symbols
   if (sscanf(fgets(line, 132, relModule),
 	     "H %d areas %d global symbols",
-	     &areas, &globals)!=2) {
+	     &segments, &globals)!=2) {
     syntaxError(line);
   }
   currentLine++;
@@ -174,8 +241,12 @@ void readModule(char *module) {
 	     "M %s", moduleName)!=1) {
     syntaxError(line);
   }
-  fprintf (stderr, "module %s has %d area%s and %d globals\n",
-	   moduleName, areas, areas==1?"":"s", globals);
+
+  // add this to the known modules with current offsets
+  addToModules(module);
+
+  fprintf (stderr, "module %s has %d segment%s and %d globals\n",
+	   moduleName, segments, segments==1?"":"s", globals);
   currentLine++;
 
   // now for the ASTR tags
@@ -183,22 +254,35 @@ void readModule(char *module) {
     switch (line[0]) 
       {
       case 'A': {
-	char area[32];
+	char segment[32];
 	int size, flags;
 	if (sscanf(line, "A %[^ ] size %d flags %d",
-		   area, &size, &flags)!=3) {
-	  fprintf (stderr, "%s:%d error in A record line\n", module, 
-		   currentLine);
+		   segment, &size, &flags)!=3) {
+	  fprintf (stderr, "%s:%d error in A record line\n", 
+		   module, currentLine);
 	  exit (1);
 	}
-	// do we know this area?
-	if (!(currentArea=getAreaID(area))) {
+	// do we know this segment?
+	if (!(currentSegment=findSegment(segment))) {
 	  fprintf (stderr, "%s:%d unknown area: %s\n", module,
-		   currentLine, area);
+		   currentLine, segment);
 	  exit (1);
 	}
-	fprintf (stderr, "Area: %s size: %d\n", area, size);
-	// never mind about the size and flags for now
+	if (currentModule->size[currentSegment->id]) {
+	  if (currentModule->size[currentSegment->id] != size) {
+	    fprintf (stderr, "%s:%d error %s %d %d\n",
+		     module, currentLine,
+		     currentSegment->name,
+		     currentModule->size[currentSegment->id], 
+		     size);
+	  }
+	} else {
+	  currentModule->size[currentSegment->id]=size;
+	  currentModule->offset[currentSegment->id]+=currentSegment->_size;
+	  currentSegment->_size += size;
+	}
+	//fprintf (stderr, "Area: %s size: %d\n", segment, size);
+	// never mind about the flags for now
 	break;
       }
       case 'S': {
@@ -226,25 +310,37 @@ void readModule(char *module) {
 	unsigned int address;
 	unsigned int byte;
 	char *tline=NULL;
+	if (currentSegment->id!=CSEG && 
+	    currentSegment->id!=GSINIT &&
+	    //currentSegment->id!=GSFINAL &&
+	    currentSegment->id!=XINIT) {
+	  fprintf (stderr, "%s:%d cannot emit bytes in %s\n",
+		   module, currentLine, currentSegment->name);
+	  exit (1);
+	}
 	if (sscanf(strtok(&line[2], " "), "%04x", &address)!=1) {
 	  fprintf (stderr, "%s:%d error in T record\n", module, currentLine);
 	  exit (1);
 	}
-	fprintf (stderr, "%04x:", address);
+	//fprintf (stderr, "%04x:", address);
+	address+=currentSegment->current;
 	for ( ;
 	      (tline=strtok(NULL, " \t\n")) && 
 		(sscanf(tline, "%02x", &byte)==1);
-	      fprintf (stderr, " %02x", byte))
-	  ; // how about that one, hey?
-	fprintf (stderr, "\n");
+	      ) {
+	  //fprintf (stderr, " %02x", byte);
+	  currentSegment->image[address++]=byte;
+	  currentSegment->current++;
+	}
+	//fprintf (stderr, "\n");
 	break;
       }
       case 'R':
-	fprintf (stderr, "%s", line);
+	//fprintf (stderr, "%s", line);
 	break;
       default:
-	fprintf (stderr, "%s:%d unknown record \"%s\"\n",
-		 module, currentLine, line);
+	/* fprintf (stderr, "%s:%d unknown record \"%s\"\n",
+	   module, currentLine, line); */
 	break;
       }
     currentLine++;
@@ -259,6 +355,27 @@ void writeModule() {
 }
 
 void relocate() {
+  struct SYMBOL *symbol;
+  int length=segments[GSINIT].current +
+    segments[CSEG].current +
+    segments[XINIT].current;
+
+  // first check if it will fit
+  if (length > 0xffff) {
+    fprintf (stderr, "error: code segment exceeds 0xffff\n");
+    exit(1);
+  }
+  fprintf (stderr, "relocate: total code size: 0x%04x\n", length);
+
+  // GSINIT gets the --code-loc
+  segments[GSINIT].start=segments[CSEG].start;
+  segments[CSEG].start=segments[GSINIT].start+segments[GSINIT]._size;
+  segments[XINIT].start=segments[CSEG].start+segments[CSEG]._size;
+  segments[XISEG].start=segments[XSEG].start+segments[XINIT]._size;  
+  // now relocate the defined symbols
+  for (symbol=symbols; symbol; symbol=symbol->next) {
+    symbol->address += symbol->segment->start;
+  }
 }
 
 void usage (char * progName, int errNo) {
@@ -272,10 +389,15 @@ int main(int argc, char **argv) {
   FILE *linkCommandsFile;
   char linkCommandsPath[PATH_MAX];
   char linkCommand[PATH_MAX];
+  struct MODULE *module;
+  struct SYMBOL *symbol;
+  int s;
 
   if (argc!=2) {
     usage(argv[0], 1);
   }
+
+  memset(codeImage, 0xff, CODESIZE);
 
   // read in the commands
   sprintf (linkCommandsPath, "%s.lnk", argv[1]);
@@ -291,7 +413,7 @@ int main(int argc, char **argv) {
       continue;
     }
 
-    puts (linkCommand);
+    //puts (linkCommand);
     if (*linkCommand=='-') {
       switch (linkCommand[1]) 
 	{
@@ -313,8 +435,8 @@ int main(int argc, char **argv) {
 			   &segments[s].start)!=1) {
 		  syntaxError(linkCommand);
 		}
-		fprintf (stderr, "%s starts at 0x%04x\n", segments[s].name,
-			 segments[s].start);
+		/* fprintf (stderr, "%s starts at 0x%04x\n", segments[s].name,
+		   segments[s].start); */
 		break;
 	      }
 	    }
@@ -339,7 +461,37 @@ int main(int argc, char **argv) {
       readModule(linkCommand);
     }
   }
+
   relocate();
+
+  // the modules
+  for (module=modules; module; module=module->next) {
+    fprintf (stderr, "%s: ", module->name);
+    for (s=0; s<MAX_SEGMENTS; s++) {
+      if (module->size[s]) {
+	fprintf (stderr, "%s:0x%04x-0x%04x ", segments[s].name,
+		 module->offset[s], module->offset[s]+module->size[s]);
+      }
+    }
+    fprintf (stderr, "\n");
+  }
+
+  // the symbols
+  for (symbol=symbols; symbol; symbol=symbol->next) {
+    fprintf (stderr, "%s %s 0x%04x %s\n", symbol->name, symbol->segment->name,
+	     symbol->address, symbol->module->name);
+  }
+
+  // the segments
+  for (s=1; s<MAX_SEGMENTS; s++) {
+    if (segments[s]._size) {
+      fprintf (stderr, "%s start 0x%04x size 0x%04x %d symbols\n",
+	       segments[s].name, segments[s].start,
+	       segments[s]._size, 
+	       segments[s].hasSymbols);
+    }
+  }
+
   writeModule();
   return 0;
 }

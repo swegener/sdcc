@@ -143,7 +143,7 @@ _xa51_genAssemblerPreamble (FILE * of)
   mainExists->block=0;
 
   if ((mainExists=findSymWithLevel(SymbolTab, mainExists))) {
-    fprintf (of, "\t.area CSEG\t(CODE)\n");
+    fprintf (of, "\t.area GSINIT\t(CODE)\n");
     fprintf (of, "__interrupt_vect:\n");
     fprintf (of, "\t.dw\t0x8f00\n");
     fprintf (of, "\t.dw\t__sdcc_gsinit_startup\n");

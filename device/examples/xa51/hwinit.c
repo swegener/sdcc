@@ -1,5 +1,10 @@
 #include "hw.h"
 
+bit b3;
+code c2=1;
+data d3, d4=4;
+xdata x3, x4=5;
+
 #define	DIVIDER	(OSC/(64L*BAUD_RATE))
 
 void external_startup(void) {

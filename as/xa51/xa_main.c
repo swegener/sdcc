@@ -401,6 +401,7 @@ void out(int *byte_list, int num) {
     last_area=current_area;
   }
   if (current_area==AREA_CSEG ||
+      current_area==AREA_GSINIT ||
       current_area==AREA_GSFINAL ||
       current_area==AREA_XINIT) {
     if (num) {
@@ -503,7 +504,7 @@ void print_usage(int);
 void init_areas(void)
 {
   area[AREA_CSEG].start=area[AREA_CSEG].alloc_position = 0;
-  area[AREA_DSEG].start=area[AREA_DSEG].alloc_position = 0x30;
+  area[AREA_DSEG].start=area[AREA_DSEG].alloc_position = 0;
   area[AREA_BSEG].start=area[AREA_BSEG].alloc_position = 0;
   area[AREA_XSEG].start=area[AREA_XSEG].alloc_position = 0;
   area[AREA_XISEG].start=area[AREA_XISEG].alloc_position = 0;

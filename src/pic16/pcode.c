@@ -70,8 +70,6 @@ static int mnemonics_initialized = 0;
 static hTab *pic16MnemonicsHash = NULL;
 static hTab *pic16pCodePeepCommandsHash = NULL;
 
-int options_gen_banksel = 1;
-
 static pFile *the_pFile = NULL;
 static pBlock *pb_dead_pcodes = NULL;
 
@@ -2166,7 +2164,7 @@ pCodeInstruction pic16_pciSWAPFW = {
 };
 
 
-#if 1
+#if 0
 // mdubuc - Remove TRIS
 
 pCodeInstruction pic16_pciTRIS = {
@@ -2538,7 +2536,7 @@ void pic16initMnemonics(void)
   pic16Mnemonics[POC_SUBFWB_D1] = &pic16_pciSUBFWB_D1;
   pic16Mnemonics[POC_SWAPF] = &pic16_pciSWAPF;
   pic16Mnemonics[POC_SWAPFW] = &pic16_pciSWAPFW;
-  pic16Mnemonics[POC_TRIS] = &pic16_pciTRIS;
+//  pic16Mnemonics[POC_TRIS] = &pic16_pciTRIS;
   pic16Mnemonics[POC_TSTFSZ] = &pic16_pciTSTFSZ;
   pic16Mnemonics[POC_XORLW] = &pic16_pciXORLW;
   pic16Mnemonics[POC_XORWF] = &pic16_pciXORWF;
@@ -3780,7 +3778,6 @@ char *pic16_get_op(pCodeOp *pcop,char *buffer, size_t size)
 
 }
 
-
 /*-----------------------------------------------------------------*/
 /* pic16_get_op2 - variant to support two memory operand commands  */
 /*-----------------------------------------------------------------*/
@@ -3923,17 +3920,12 @@ static char *pCode2str(char *str, size_t size, pCode *pc)
 
     if( (PCI(pc)->num_ops >= 1) && (PCI(pc)->pcop)) {
 
-#if 1
 	if(PCI(pc)->is2MemOp) {
-//		fprintf(stderr, "HELP !\n");
-#if 1
 		SAFE_snprintf(&s,&size, "%s,%s", 
 		pic16_get_op(PCOP(PCI(pc)->pcop), NULL, 0),
 		pic16_get_op2(PCOP(PCI(pc)->pcop), NULL, 0));
 		break;
-#endif
 	}
-#endif
 
       if(PCI(pc)->isBitInst) {
 	if(PCI(pc)->pcop->type == PO_GPR_BIT) {
@@ -5252,7 +5244,6 @@ static void insertBankSwitch(int position, pCode *pc, int bsr)
   if(!pc)
     return;
 
-
 /*
  * if bsr == -1 then do not insert a MOVLB instruction, but rather
  * insert a BANKSEL assembler directive for the symbol used by
@@ -5260,8 +5251,9 @@ static void insertBankSwitch(int position, pCode *pc, int bsr)
  * bank at linking time
  */
 
-	if(!options_gen_banksel || bsr != -1) {
-		new_pc = pic16_newpCode(POC_MOVLB, pic16_newpCodeOpLit(bsr));
+	if(!options.gen_banksel || bsr != -1) {
+//		new_pc = pic16_newpCode(POC_MOVLB, pic16_newpCodeOpLit(bsr));
+		return;
 	} else {
 		/* emit the BANKSEL [symbol] */
 
@@ -5991,7 +5983,7 @@ static void pic16_FixRegisterBanking(pBlock *pb)
 
 //		if (cur_bank != reg_bank) {
 			cur_bank = reg_bank;
-			insertBankSwitch(0, pc, (options_gen_banksel)?-1:cur_bank);	//cur_bank);
+			insertBankSwitch(0, pc, (options.gen_banksel)?-1:cur_bank);	//cur_bank);
 //		}
 
 	  }else {
@@ -6222,7 +6214,9 @@ static void AnalyzeFlow(int level)
   //  for(pb = the_pFile->pbHead; pb; pb = pb->next)
   pic16_pCodeRegOptimizeRegUsage(level);
 
-  OptimizepCode('*');
+
+	if(!options.nopeep)
+		OptimizepCode('*');
 
 
 /*
@@ -6428,7 +6422,9 @@ void pic16_AnalyzepCode(char dbName)
       }
     }
 
-    changes = OptimizepCode(dbName);
+	if(!options.nopeep)
+		changes = OptimizepCode(dbName);
+	else changes = 0;
 
   } while(changes && (i++ < MAX_PASSES));
 

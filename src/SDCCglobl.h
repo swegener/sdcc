@@ -242,6 +242,7 @@ struct options
     int noCcodeInAsm;           /* hide c-code from asm */
     int iCodeInAsm;             /* show i-code in asm */
     int printSearchDirs;        /* display the directories in the compiler's search path */
+    int gen_banksel;		/* enable the generation of the banksel assembler directive in pic16 port */
     int vc_err_style;           /* errors and warnings are compatible with Micro$oft visual studio */
     int use_stdout;             /* send errors to stdout instead of stderr */
     int no_std_crt0;            /*For the z80/gbz80 do not link default crt0.o*/

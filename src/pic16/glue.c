@@ -566,8 +566,14 @@ pic16createInterruptVect (FILE * vFile)
       return;
     }
 
-  fprintf (vFile, ";\t.area\t%s\n", CODE_NAME);
-  fprintf (vFile, ";__interrupt_vect:\n");
+/*
+ * update started by Vangelis Rokas on 19-Jun-2003
+ * all fprintf() calls are prefixed with ';' so they seem
+ * as comments to the assembler. I (VR) removed them */
+
+//  fprintf (vFile, "\t.area\t%s\n", CODE_NAME);
+	fprintf(vFile, "\tcode\t0x0000\n");
+  fprintf (vFile, "__interrupt_vect:\n");
 
 
   if (!port->genIVT || !(port->genIVT (vFile, interrupts, maxInterrupts)))
@@ -795,7 +801,7 @@ pic16glue ()
   pic16emitOverlay(ovrFile);
 
 
-  pic16_AnalyzepCode('*');
+	pic16_AnalyzepCode('*');
 
   //#ifdef PCODE_DEBUG
   //pic16_printCallTree(stderr);
@@ -803,7 +809,7 @@ pic16glue ()
 
   pic16_InlinepCode();
 
-  pic16_AnalyzepCode('*');
+	pic16_AnalyzepCode('*');
 
   pic16_pcode_test();
 
@@ -898,7 +904,10 @@ pic16glue ()
   copyFile (asmFile, bit->oFile);
 
 
-  fprintf (asmFile, "\tORG 0\n");
+/* the following is commented out. the CODE directive will be
+   used instead before code */
+   
+//  fprintf (asmFile, "\tORG 0\n");
 
   /* copy the interrupt vector table */
   if (mainf && IFFUNC_HASBODY(mainf->type)) {
@@ -922,9 +931,12 @@ pic16glue ()
   fprintf (asmFile, ";\t.area %s\n", port->mem.static_name); /* MOF */
   fprintf (asmFile, ";\t.area %s\n", port->mem.post_static_name);
   fprintf (asmFile, ";\t.area %s\n", port->mem.static_name);
-    
+
   if (mainf && IFFUNC_HASBODY(mainf->type)) {
     fprintf (asmFile,"__sdcc_gsinit_startup:\n");
+
+#if 0
+	/* 8051 legacy (?!) - VR 20-Jun-2003 */
     /* if external stack is specified then the
        higher order byte of the xdatalocation is
        going into P2 and the lower order going into
@@ -935,6 +947,7 @@ pic16glue ()
       fprintf(asmFile,";\tmov\t_spx,#0x%02x\n",
 	      (unsigned int)options.xdata_loc & 0xff);
     }
+#endif
 
   }
 
@@ -945,7 +958,7 @@ pic16glue ()
        * by the ugly shucking and jiving about 20 lines ago.
        */
       fprintf(asmFile, ";\t.area %s\n", port->mem.post_static_name);
-      fprintf (asmFile,";\tljmp\t__sdcc_program_startup\n");
+      fprintf (asmFile,"\tgoto\t__sdcc_program_startup\n");
     }
 	
   /* copy over code */
@@ -956,9 +969,15 @@ pic16glue ()
 
   //copyFile (stderr, code->oFile);
 
+	fprintf(asmFile, "; I code from now on!\n");
   pic16_copypCode(asmFile, 'I');
+
+	fprintf(asmFile, "; dbName from now on!\n");
   pic16_copypCode(asmFile, statsg->dbName);
+
+	fprintf(asmFile, "; X code from now on!\n");
   pic16_copypCode(asmFile, 'X');
+	fprintf(asmFile, "; M code from now on!\n");
   pic16_copypCode(asmFile, 'M');
   pic16_copypCode(asmFile, code->dbName);
   pic16_copypCode(asmFile, 'P');

@@ -77,6 +77,7 @@ static int num_of_supported_PICS = sizeof(Pics)/sizeof(PIC_device);
 static PIC_device *pic=NULL;
 
 AssignedMemory *pic16_finalMapping=NULL;
+int pic16_finalMappingSize=0;
 
 #define DEFAULT_CONFIG_BYTE 0xff
 
@@ -295,7 +296,8 @@ void pic16_dump_cblock(FILE *of)
 	    
 	    fputc('\n',of);
 
-	    //pic16_finalMapping[start].reg->isEmitted = 1;
+//#warning why is the following line commented out?! (VR)
+//	    pic16_finalMapping[start].reg->isEmitted = 1;
 	  }
 	}
 

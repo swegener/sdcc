@@ -71,6 +71,14 @@ typedef struct AssignedMemory {
  */
 
 extern AssignedMemory *pic16_finalMapping;
+
+/*
+ * pic16_finalMappingSize - Size of register assignments that pic16_finalMapping can hold
+ */
+
+extern int pic16_finalMappingSize;
+
+
 #define PROCESSOR_NAMES    4
 /* Processor unique attributes */
 typedef struct PIC_device {

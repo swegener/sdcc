@@ -228,11 +228,10 @@ optionsTable[] = {
 #if !OPT_DISABLE_Z80 || !OPT_DISABLE_GBZ80
     { 0,    "--no-std-crt0", &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.o"},
 #endif
-    /* End of options */
-#if 0 /* 10jun03 !OPT_DISABLE_PIC16 */
-    { 0,    "--no-movff",	    &options.no_movff, "disable generating MOVFF opcode in PIC16 port"},
+#if !OPT_DISABLE_PIC16
     { 0,    "--gen-banksel",	    &options.gen_banksel, "enable the generation of banksel assembler directives in PIC16 port"},
 #endif
+    /* End of options */
     { 0,    NULL }
 };
 

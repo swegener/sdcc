@@ -886,7 +886,7 @@ static int pcComparePattern(pCodeToken *pct, char *pat, int max_tokens)
       return (i+1);
     }
 
-    //dump1Token(*pat); DFPRINTF((stderr,"\n"));
+//	dump1Token(*pat); fputc('\n', stderr); DFPRINTF((stderr,"\n"));
 
     if(pct->tt != *pat) 
       return 0;
@@ -1198,6 +1198,7 @@ static void  peepRuleBlock2pCodeBlock(  lineNode *ln, pCodeWildBlock *pcwb)
   for( ; ln; ln = ln->next) {
 
     //DFPRINTF((stderr,"%s\n",ln->line));
+//	fprintf(stderr, "peep rule : %s\n", ln->line);
 
     tokenizeLineNode(ln->line);
     
@@ -1205,7 +1206,7 @@ static void  peepRuleBlock2pCodeBlock(  lineNode *ln, pCodeWildBlock *pcwb)
       int i;
       fprintf(stderr,"ERROR assembling line:\n%s\n",ln->line);
       fprintf(stderr,"Tokens:\n");
-      for(i=0; i<5; i++)
+      for(i=0; i<8; i++)
 	dump1Token(tokArr[i].tt);
       fputc('\n',stderr);
       exit (1);
@@ -1349,7 +1350,7 @@ void  pic16_peepRules2pCode(peepRule *rules)
     peepRuleBlock2pCodeBlock(pr->match, &currentRule->target);
 
     //DFPRINTF((stderr,"finished target, here it is in pcode form:\n"));
-    //pic16_printpBlock(stderr, currentRule->target.pb);
+//	pic16_printpBlock(stderr, currentRule->target.pb);
 
     //DFPRINTF((stderr,"target with labels merged:\n"));
     //pic16_pBlockMergeLabels(curBlock);
@@ -1514,13 +1515,14 @@ static int pCodeOpCompare(pCodeOp *pcops, pCodeOp *pcopd)
 
   if(!pcops || !pcopd)
     return 0;
-/*
+
+#if 1
   fprintf(stderr," Comparing operands %s",
 	  pic16_get_op( pcops,NULL,0));
 
   fprintf(stderr," to %s\n",
 	  pic16_get_op( pcopd,NULL,0));
-*/
+#endif
 
   if(pcops->type != pcopd->type) {
     //fprintf(stderr,"  - fail - diff types\n");
@@ -2066,7 +2068,7 @@ int pic16_pCodePeepMatchRule(pCode *pc)
 
       if(!pcin && pct) {
 	DFPRINTF((stderr," partial match... no more code\n"));
-	fprintf(stderr," partial match... no more code\n");
+//	fprintf(stderr," partial match... no more code\n");
 	matched = 0; 
       }
       if(!pct) {

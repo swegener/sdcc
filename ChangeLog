@@ -1,3 +1,23 @@
+2003-07-14  Bernhard Held <bernhard@bernhardheld.de>
+
+	pic16 progress by Vangelis:
+	* src/SDCCglobl.h:
+	* src/SDCCmain.c:
+	* src/pic/Makefile:
+	* src/pic:
+	* pic/Makefile:
+	* pic16/device.c:
+	* pic16/device.h:
+	* pic16/gen.c:
+	* pic16/gen.h:
+	* pic16/genarith.c:
+	* pic16/glue.c:
+	* pic16/main.c:
+	* pic16/pcode.c:
+	* pic16/pcode.h:
+	* pic16/pcodepeep.c:
+	* pic16/peeph.def:
+
 2003-07-13  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
     * src/SDCCmain.c, src/SDCCglobl.h: added option --no-std-crt0
@@ -97,9 +117,9 @@
 	 Scott D. for Vangelis Rokas (vrokas@otenet.gr). I (scott) don't
 	know all the details, but essentially this set of changes enable
 	the pic16 port to generate movff instructions and generate assembler
-	directives, 
-	* src/SDCCmain.c: 
-	* src/pic16/gen.c: 
+	directives,
+	* src/SDCCmain.c:
+	* src/pic16/gen.c:
 	* src/pic16/glue.c:
 	* src/pic16/pcode.c:
 	* src/pic16/device.c:

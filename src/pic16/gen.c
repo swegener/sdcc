@@ -289,8 +289,8 @@ static regs *getFreePtr (iCode *ic, asmop **aopp, bool result)
     bool r0iu = FALSE , r1iu = FALSE;
     bool r0ou = FALSE , r1ou = FALSE;
 
-
 	//fprintf(stderr, "%s:%d: getting free ptr from ic = %c\n", __FUNCTION__, __LINE__, ic->op);
+
     /* the logic: if r0 & r1 used in the instruction
     then we are in trouble otherwise */
 
@@ -754,7 +754,7 @@ void pic16_aopOp (operand *op, iCode *ic, bool result)
     if (!op)
         return ;
 
-    //    DEBUGpic16_emitcode(";","%d",__LINE__);
+	DEBUGpic16_emitcode(";","%d",__LINE__);
     /* if this a literal */
     if (IS_OP_LITERAL(op)) {
         op->aop = aop = newAsmop(AOP_LIT);
@@ -1272,7 +1272,9 @@ static pCodeOp *popRegFromString(char *str, int size, int offset)
   if(PCOR(pcop)->r == NULL) {
     //fprintf(stderr,"%d - couldn't find %s in allocated registers, size =%d\n",__LINE__,aop->aopu.aop_dir,aop->size);
     PCOR(pcop)->r = pic16_allocRegByName (pcop->name,size);
+
 	//fprintf(stderr, "allocating new register -> %s\n", str);
+
     DEBUGpic16_emitcode(";","%d  %s   offset=%d - had to alloc by reg name",__LINE__,pcop->name,offset);
   } else {
     DEBUGpic16_emitcode(";","%d  %s   offset=%d",__LINE__,pcop->name,offset);
@@ -2737,10 +2739,16 @@ static void genFunction (iCode *ic)
     /* if this is an interrupt service routine then
     save acc, b, dpl, dph  */
     if (IFFUNC_ISISR(sym->type)) {
-      pic16_addpCode2pBlock(pb,pic16_newpCode(POC_BRA,pic16_newpCodeOp("END_OF_INTERRUPT+2",PO_STR)));
-      pic16_emitpcodeNULLop(POC_NOP);
-      pic16_emitpcodeNULLop(POC_NOP);
-      pic16_emitpcodeNULLop(POC_NOP);
+
+#if 0
+	pic16_addpCode2pBlock(pb,pic16_newpCode(POC_BRA,pic16_newpCodeOp("END_OF_INTERRUPT+2",PO_STR)));
+	
+	/* what is the reason of having these 3 NOPS? VR - 030701 */
+	pic16_emitpcodeNULLop(POC_NOP);
+	pic16_emitpcodeNULLop(POC_NOP);
+	pic16_emitpcodeNULLop(POC_NOP);
+#endif
+
       pic16_emitpcode(POC_MOVWF,  pic16_popCopyReg(&pic16_pc_wsave));
       pic16_emitpcode(POC_SWAPFW, pic16_popCopyReg(&pic16_pc_status));
       pic16_emitpcode(POC_CLRF,   pic16_popCopyReg(&pic16_pc_status));
@@ -2980,14 +2988,17 @@ static void genEndFunction (iCode *ic)
 	    _G.debugLine = 0;
 	}
 	
-        pic16_emitcode ("reti","");
+//	pic16_emitcode ("reti","");
 
 	pic16_emitpcode(POC_CLRF,   pic16_popCopyReg(&pic16_pc_status));
 	pic16_emitpcode(POC_SWAPFW, pic16_popCopyReg(&pic16_pc_ssave));
 	pic16_emitpcode(POC_MOVWF,  pic16_popCopyReg(&pic16_pc_status));
 	pic16_emitpcode(POC_SWAPF,  pic16_popCopyReg(&pic16_pc_wsave));
 	pic16_emitpcode(POC_SWAPFW, pic16_popCopyReg(&pic16_pc_wsave));
+
+#if 0
 	pic16_addpCode2pBlock(pb,pic16_newpCodeLabel("END_OF_INTERRUPT",-1));
+#endif
 
 	pic16_emitpcodeNULLop(POC_RETFIE);
 
@@ -9376,8 +9387,7 @@ static void genAssign (iCode *ic)
     } else {
   DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
-	if(!options_no_movff) {
-
+#if 1
 	/* This is a hack to turn MOVFW/MOVWF pairs to MOVFF command. It
 	   normally should work, but mind that thw W register live range
 	   is not checked, so if the code generator assumes that the W
@@ -9389,13 +9399,13 @@ static void genAssign (iCode *ic)
 	   Vangelis Rokas 030603 (vrokas@otenet.gr) */
 	   
 	
-		pic16_emitpcode(POC_MOVFF, pic16_popGet2(AOP(right), AOP(result), offset));
-	} else {
+	pic16_emitpcode(POC_MOVFF, pic16_popGet2(AOP(right), AOP(result), offset));
+#else	
 	/* This is the old code, which is assumed(?!) that works fine(!?) */
 
-		pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(right),offset));
-		pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset));
-	}
+	pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(right),offset));
+	pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset));
+#endif
     }
 	    
     offset++;
@@ -9992,6 +10002,8 @@ void genpic16Code (iCode *lic)
       }
     }
 #endif
+
+//    dumpiCode(lic);
 
     for (ic = lic ; ic ; ic = ic->next ) {
 

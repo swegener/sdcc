@@ -57,6 +57,7 @@ _pic16_init (void)
 {
   asm_addTree (&asm_asxxxx_mapping);
   pic16_pCodeInitRegisters();
+  maxInterrupts = 2;
 }
 
 static void
@@ -265,26 +266,53 @@ _pic16_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 {
   int i;
 
+#if 0
   if (options.model != MODEL_FLAT24)
     {
       /* Let the default code handle it. */
       return FALSE;
     }
+#endif
 
-  fprintf (of, "\t;ajmp\t__sdcc_gsinit_startup\n");
+	/* PIC18F family has only two interrupts, the high and the low
+	 * priority interrupts, which reside in 0x0008 and 0x0018 respectively */
 
+	fprintf(of, "; RESET vector\n");
+	fprintf(of, "\tgoto\t__sdcc_gsinit_startup\n");
+	fprintf(of, "\tres 2\n");
+
+
+	fprintf(of, "; High priority interrupt vector 0x0008\n");
+	
+	if(interrupts[1]) {
+		fprintf(of, "\tgoto\t%s\n", interrupts[1]->rname);
+		fprintf(of, "\tres\t6\n");
+	} else {
+		fprintf(of, "\tretfie\n");
+		fprintf(of, "\tres\t14\n");
+	}
+
+	fprintf(of, "; Low priority interrupt vector 0x0018\n");
+	if(interrupts[2]) {
+		fprintf(of, "\tgoto\t%s\n", interrupts[2]->rname);
+	} else {
+		fprintf(of, "\tretfie\n");
+	}
+#if 0
   /* now for the other interrupts */
   for (i = 0; i < maxInterrupts; i++)
     {
+	fprintf(of, "; %s priority interrupt vector 0x%s\n", (i==0)?"high":"low", (i==0)?"0008":"0018");
       if (interrupts[i])
 	{
-	  fprintf (of, "\t;ljmp\t%s\n\t.ds\t4\n", interrupts[i]->rname);
+	  fprintf (of, "\tgoto\t%s\n\tres\t4\n", interrupts[i]->rname);
 	}
       else
 	{
-	  fprintf (of, "\t;reti\n\t.ds\t7\n");
+	  fprintf (of, "\tretfie\n\tres\t7\n");
 	}
     }
+#endif
 
   return TRUE;
 }
@@ -360,7 +388,7 @@ PORT pic16_port =
   TARGET_ID_PIC16,
   "pic16",
   "MCU PIC16",			/* Target name */
-  "p18f452",                    /* Processor */
+  "p18f442",                    /* Processor */
   {
     pic16glue,
     TRUE,			/* Emit glue around main */
@@ -396,23 +424,23 @@ PORT pic16_port =
 	 */
   },
   {
-    "XSEG    (XDATA)",
-    "STACK   (DATA)",
-    "CSEG    (CODE)",
-    "DSEG    (DATA)",
-    "ISEG    (DATA)",
-    "XSEG    (XDATA)",
-    "BSEG    (BIT)",
-    "RSEG    (DATA)",
-    "GSINIT  (CODE)",
-    "OSEG    (OVR,DATA)",
-    "GSFINAL (CODE)",
-    "HOME	 (CODE)",
-    NULL, // xidata
-    NULL, // xinit
-    NULL,
-    NULL,
-    1        // code is read only
+    "XSEG    (XDATA)",		// xstack
+    "STACK   (DATA)",		// istack
+    "CSEG    (CODE)",		// code
+    "DSEG    (DATA)",		// data
+    "ISEG    (DATA)",		// idata
+    "XSEG    (XDATA)",		// xdata
+    "BSEG    (BIT)",		// bit
+    "RSEG    (DATA)",		// reg
+    "GSINIT  (CODE)",		// static
+    "OSEG    (OVR,DATA)",	// overlay
+    "GSFINAL (CODE)",		// post static
+    "HOME	 (CODE)",	// home
+    NULL,			// xidata
+    NULL,			// xinit
+    NULL,			// default location for auto vars
+    NULL,			// default location for global vars
+    1				// code is read only
   },
   { NULL, NULL },
   {

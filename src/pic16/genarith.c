@@ -180,7 +180,7 @@ bool pic16_genPlusIncr (iCode *ic)
     DEBUGpic16_emitcode ("; ","%s  %d",__FUNCTION__,__LINE__);
     /* if the literal value of the right hand side
        is greater than 1 then it is faster to add */
-    if ((icount = (unsigned int) floatFromVal (AOP(IC_RIGHT(ic))->aopu.aop_lit)) > 2)
+    if ((icount = (unsigned int) floatFromVal (AOP(IC_RIGHT(ic))->aopu.aop_lit)) > 1)		// this was > 2 why? VR
         return FALSE ;
     
     /* if increment 16 bits in register */
@@ -202,7 +202,7 @@ bool pic16_genPlusIncr (iCode *ic)
     }
     
     DEBUGpic16_emitcode ("; ","%s  %d",__FUNCTION__,__LINE__);
-    /* if left is in accumulator  - probably a bit operation*/
+    /* if left is in accumulator  - probably a bit operation*/				// VR - why this is a bit operation?!
     if( strcmp(pic16_aopGet(AOP(IC_LEFT(ic)),0,FALSE,FALSE),"a")  &&
 	(AOP_TYPE(IC_RESULT(ic)) == AOP_CRY) ) {
       
@@ -778,20 +778,33 @@ static void genAddLit (iCode *ic, int lit)
 }
 
 /*-----------------------------------------------------------------*/
-/* pic16_genPlus - generates code for addition                           */
+/* pic16_genPlus - generates code for addition                     */
 /*-----------------------------------------------------------------*/
 void pic16_genPlus (iCode *ic)
 {
   int size, offset = 0;
-
+  operand *result, *left, *right;
+  
   /* special cases :- */
   DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
+
+#if 1
+	result = IC_RESULT(ic);
+	left = IC_LEFT(ic);
+	right = IC_RIGHT(ic);
+  pic16_aopOp (left,ic,FALSE);
+  pic16_aopOp (right,ic,FALSE);
+  pic16_aopOp (result,ic,TRUE);
+  DEBUGpic16_pic16_AopType(__LINE__,left, right, result);
+
+#else
   pic16_aopOp (IC_LEFT(ic),ic,FALSE);
   pic16_aopOp (IC_RIGHT(ic),ic,FALSE);
   pic16_aopOp (IC_RESULT(ic),ic,TRUE);
-
   DEBUGpic16_pic16_AopType(__LINE__,IC_LEFT(ic),IC_RIGHT(ic),IC_RESULT(ic));
+#endif
+
 
   /* if literal, literal on the right or
      if left requires ACC or right is already

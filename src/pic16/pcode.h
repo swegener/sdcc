@@ -264,7 +264,7 @@ typedef enum
   POC_SUBFWB_D1,
   POC_SWAPF,
   POC_SWAPFW,
-  POC_TRIS , // To be removed
+//  POC_TRIS , // To be removed
   POC_TSTFSZ,
   POC_XORLW,
   POC_XORWF,

@@ -289,9 +289,44 @@ replace restart {
 // From: Vangelis Rokas (vrokas@otenet.gr)
 
 //replace {
-//	movf	%1,W
+//	movf	%1,w
 //	movwf	%2
 //} by {
 //	;	peep 12 - Use movff to move source to dest
 //	movff	%1, %2
 //}
+
+//replace restart {
+//	banksel	%1
+//	banksel	%2
+//} by {
+//	;	peep 13 - remove redudant banksel directive
+//	banksel	%2
+//}
+
+//replace restart {
+//	movff	%1,%2
+//	movf	%1,w
+//} by {
+//	;	peep 14a - movff/movf is 6 bytes long, movfw/movwf is 4
+//	movf	%1,w
+//	movwf	%2
+//}
+
+//replace restart {
+//	movff	%1,%2
+//	movff	%1,%3
+//} by {
+//	;	peep 14b - movff/movff is 8 bytes long movf/mowf/movwf is 6
+//	movf	%1,w
+//	movwf	%2
+//	movwf	%3
+//}
+
+replace {
+	movff	%1,%2
+} by {
+	;	peep xxx - test peep to see if peep rules can handle movff
+	movf	%1,w
+	movwf	%2
+}

@@ -110,6 +110,7 @@ extern unsigned pic16_fReturnSizePic;
 #define MOVA(x) if (strcmp(x,"a") && strcmp(x,"acc")) pic16_emitcode(";XXX mov","a,%s  %s,%d",x,__FILE__,__LINE__);
 #define CLRC    pic16_emitcode(";XXX clr","c %s,%d",__FILE__,__LINE__);
 
+
 #define BIT_NUMBER(x) (x & 7)
 #define BIT_REGISTER(x) (x>>3)
 
@@ -177,5 +178,6 @@ void pic16_freeAsmop (operand *op, asmop *aaop, iCode *ic, bool pop);
 const char *pic16_pCodeOpType(  pCodeOp *pcop);
 
 
+void dumpiCode(iCode *lic);
 
 #endif

@@ -15,7 +15,7 @@ gc:
         make -f BCC_MAKEFILE gc.lib
         cd ..\..
 
-ports: z80 mcs51
+ports: z80 mcs51 avr
 
 z80:
         cd src\z80
@@ -24,6 +24,11 @@ z80:
 
 mcs51:
         cd src\mcs51
+        make -f Makefile.bcc
+        cd ..\..
+
+avr:
+        cd src\avr
         make -f Makefile.bcc
         cd ..\..
 

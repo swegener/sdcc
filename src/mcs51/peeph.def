@@ -2203,3 +2203,13 @@ replace {
         ;       Peephole 239    used a instead of acc
         mov     r%1,a
 }
+
+replace restart {
+	mov	a,%1
+	addc	a,#0x00
+} by {
+	;	Peephole 240    use clr instead of addc a,#0
+	clr	a
+	addc	a,%1
+}
+

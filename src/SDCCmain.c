@@ -119,6 +119,7 @@ char buffer[PATH_MAX * 2];
 #define OPTION_CODE_SIZE	"--code-size"
 #define OPTION_NO_CCODE_IN_ASM	"--no-c-code-in-asm"
 #define OPTION_ICODE_IN_ASM	"--i-code-in-asm"
+#define OPTION_PRINT_SEARCH_DIRS "--print-search-dirs"
 
 static const OPTION
 optionsTable[] = {
@@ -205,6 +206,7 @@ optionsTable[] = {
     { 0,    OPTION_NO_XINIT_OPT,    &options.noXinitOpt, "don't memcpy initialized xram from code"},
     { 0,    OPTION_NO_CCODE_IN_ASM, &options.noCcodeInAsm, "don't include c-code as comments in the asm file"},
     { 0,    OPTION_ICODE_IN_ASM,    &options.iCodeInAsm, "include i-code as comments in the asm file"},
+    { 0,    OPTION_PRINT_SEARCH_DIRS, &options.printSearchDirs, "display the directories in the compiler's search path"},
     /* End of options */
     { 0,    NULL }
 };
@@ -387,13 +389,13 @@ printVersionInfo ()
 #ifdef __CYGWIN__
 	   " (CYGWIN)\n"
 #elif defined __MINGW32__
-	   " (MINGW32) \n"
+	   " (MINGW32)\n"
 #elif defined __DJGPP__
-	   " (DJGPP) \n"
+	   " (DJGPP)\n"
 #elif defined(_MSC_VER)
-	   " (MSVC) \n"
+	   " (MSVC)\n"
 #elif defined(__BORLANDC__)
-	   " (BORLANDC) \n"
+	   " (BORLANDC)\n"
 #else
 	   " (UNIX) \n"
 #endif
@@ -1687,7 +1689,7 @@ setBinPaths(const char *argv0)
    */
 
   /* do it in reverse mode, so that addSetHead() can be used
-     instaed of slower addSet() */
+     instead of slower addSet() */
 
   if ((p = getBinPath(argv0)) != NULL)
     addSetHead(&binPathSet, Safe_strdup(p));
@@ -1695,6 +1697,16 @@ setBinPaths(const char *argv0)
   if ((p = getenv(SDCC_DIR_NAME)) != NULL) {
     SNPRINTF(buf, sizeof buf, "%s" PREFIX2BIN_DIR, p);
     addSetHead(&binPathSet, Safe_strdup(buf));
+  }
+
+  if (options.printSearchDirs) {
+    printf("programs: ");
+    if (NULL != (p = (char *)setFirstItem(binPathSet))) {
+      printf("%s", p);
+      while (NULL != (p = (char *)setNextItem(binPathSet)))
+        printf(":%s", p);
+    }
+    putchar('\n');
   }
 }
 
@@ -1718,6 +1730,9 @@ setIncludePath(const char *datadir)
     SNPRINTF(buf, sizeof buf, "%s" INCLUDE_DIR_SUFFIX, datadir);
     p = buf;
   }
+
+  if (options.printSearchDirs)
+    printf("includedir: %s\n", p);
 
   setMainValue ("includedir", p);
 }
@@ -1743,6 +1758,9 @@ setLibPath(const char *datadir)
     p = buf;
   }
 
+  if (options.printSearchDirs)
+    printf("libdir: %s\n", p);
+
   setMainValue ("libdir", p);
 }
 
@@ -1765,18 +1783,22 @@ setDataPaths(const char *argv0)
     SNPRINTF(buf, sizeof buf, "%s" PREFIX2DATA_DIR, p);
     p = buf;
   }
-  else {
-    if ((p = getBinPath(argv0)) == NULL)
-      p = ".";
-
+  else if ((p = getBinPath(argv0)) != NULL) {
     SNPRINTF(buf, sizeof buf, "%s" BIN2DATA_DIR, p);
     p = buf;
-
-#ifndef _WIN32  /* *nix paltform */
-    if (!pathExists(p))
-      p = DATADIR; /* last resort */
+  }
+  else {
+#ifdef _WIN32
+    /* this should never happen... */
+    wassertl(0, "Can't get binary path");
+    p = ".";
+#else /* *nix paltform */
+    p = DATADIR; /* last resort */
 #endif
   }
+
+  if (options.printSearchDirs)
+    printf("datadir: %s\n", p);
 
   setIncludePath(p);
   setLibPath(p);
@@ -1896,9 +1918,6 @@ main (int argc, char **argv, char **envp)
   if (port->init)
     port->init ();
 
-  // Create a default exe search path from the path to the sdcc command
-
-
   setDefaultOptions ();
 #ifdef JAMIN_DS390
   if (ds390_jammed) {
@@ -1908,16 +1927,20 @@ main (int argc, char **argv, char **envp)
 #endif
   parseCmdLine (argc, argv);
 
+  initValues ();
+  setBinPaths(argv[0]);
+  setDataPaths(argv[0]);
+
+  /* if print search dirs then exit */
+  if (options.printSearchDirs)
+    exit(0);
+
   /* if no input then printUsage & exit */
   if (!options.c1mode && !fullSrcFileName && !nrelFiles)
     {
       printUsage ();
       exit (0);
     }
-
-  initValues ();
-  setBinPaths(argv[0]);
-  setDataPaths(argv[0]);
 
   /* initMem() is expensive, but
      initMem() must called before port->finaliseOptions ().

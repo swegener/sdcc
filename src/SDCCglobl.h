@@ -230,12 +230,13 @@ struct options
     int code_loc;		/* code location start           */
     int iram_size;		/* internal ram size (used only for error checking) */   
     int xram_size;		/* external ram size (used only for error checking) */
-	bool xram_size_set; /* since xram_size=0 is a possibility */
+    bool xram_size_set;         /* since xram_size=0 is a possibility */
     int code_size;		/* code size (used only for error checking) */    
     int verboseExec;            /* show what we are doing */
     int noXinitOpt;             /* don't optimize initialized xdata */
     int noCcodeInAsm;           /* hide c-code from asm */
     int iCodeInAsm;             /* show i-code in asm */
+    int printSearchDirs;        /* display the directories in the compiler's search path */
   };
 
 /* forward definition for variables accessed globally */

@@ -4291,6 +4291,14 @@ cyclomatic complexity
 \series default 
  Disable some of the more pedantic warnings (jwk burps: please be more specific
  here, please!)
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+---print-search-dirs
+\series default 
+ Display the directories in the compiler's search path
 \layout Subsubsection
 
 Intermediate Dump Options

@@ -4,7 +4,9 @@
 
 /* (C) 1998-2002 Red Hat, Inc. -- Licensing details are in the COPYING
    file accompanying popt source distributions, available from 
-   ftp://ftp.rpm.org/pub/rpm/dist. */
+   ftp://ftp.rpm.org/pub/rpm/dist.
+
+   alloca replaced with malloc()/free() pair */
 
 #include "system.h"
 #include "findme.h"
@@ -22,7 +24,8 @@ const char * findProgramPath(const char * argv0) {
 
     if (path == NULL) return NULL;
 
-    start = pathbuf = alloca(strlen(path) + 1);
+    start = pathbuf = malloc(strlen(path) + 1);
+    if (pathbuf == NULL) return NULL;
     buf = malloc(strlen(path) + strlen(argv0) + sizeof("/"));
     if (buf == NULL) return NULL;	/* XXX can't happen */
     strcpy(pathbuf, path);
@@ -34,8 +37,10 @@ const char * findProgramPath(const char * argv0) {
 	    *chptr = '\0';
 	sprintf(buf, "%s/%s", start, argv0);
 
-	if (!access(buf, X_OK))
+	if (!access(buf, X_OK)) {
+            free(pathbuf);
 	    return buf;
+        }
 
 	if (chptr) 
 	    start = chptr + 1;
@@ -45,6 +50,7 @@ const char * findProgramPath(const char * argv0) {
     /*@=branchstate@*/
 
     free(buf);
+    free(pathbuf);
 
     return NULL;
 }

@@ -2095,7 +2095,8 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
      a function call */
   if (dic->op == CALL || dic->op == PCALL)
     {
-      if (ic->op != SEND && ic->op != RETURN)
+      if (ic->op != SEND && ic->op != RETURN &&
+	  !POINTER_SET(ic) && !POINTER_GET(ic))
 	{
 	  OP_SYMBOL (op)->ruonly = 1;
 	  return dic;

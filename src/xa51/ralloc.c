@@ -330,27 +330,6 @@ static void freeAllRegs (void) {
 }
 
 /*-----------------------------------------------------------------*/
-/* allDefsOutOfRange - all definitions are out of a range          */
-/*-----------------------------------------------------------------*/
-static bool allDefsOutOfRange (bitVect * defs, int fseq, int toseq) {
-  int i;
-  
-  if (!defs)
-    return TRUE;
-  
-  for (i = 0; i < defs->size; i++)
-    {
-      iCode *ic;
-      
-      if (bitVectBitValue (defs, i) &&
-	  (ic = hTabItemWithKey (iCodehTab, i)) &&
-	  (ic->seq >= fseq && ic->seq <= toseq))
-	return FALSE;
-    }
-  return TRUE;
-}
-
-/*-----------------------------------------------------------------*/
 /* computeSpillable - given a point find the spillable live ranges */
 /*-----------------------------------------------------------------*/
 static bitVect *computeSpillable (iCode * ic) {
@@ -409,17 +388,6 @@ static int
 rematable (symbol * sym, eBBlock * ebp, iCode * ic)
 {
   return sym->remat;
-}
-
-/*-----------------------------------------------------------------*/
-/* notUsedInBlock - not used in this block                         */
-/*-----------------------------------------------------------------*/
-static int
-notUsedInBlock (symbol * sym, eBBlock * ebp, iCode * ic)
-{
-  return (!bitVectBitsInCommon (sym->defs, ebp->usesDefs) &&
-	  allDefsOutOfRange (sym->defs, ebp->fSeq, ebp->lSeq));
-  /*     return (!bitVectBitsInCommon(sym->defs,ebp->usesDefs)); */
 }
 
 /*-----------------------------------------------------------------*/

@@ -181,7 +181,7 @@ int main() //short argc, char **argv)
 void PrintResults(ThermoStateType *ThermoState, FILE *fp, int ConvertToF)
 {
   // aslink only can handle 64k, so we use the second 64k bank
-   char *str=(char*)0x190000;
+   char *str=(xdata char*)0x190000;
 
    // check if need to use standard out
    if (fp == NULL)

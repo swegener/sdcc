@@ -40,7 +40,7 @@
 #include "thermo21.h"   
 
 // a hack for sdcc/TINI, just printf to stdout
-int fprintf (FILE *fp, xdata char *format, ...) reentrant {
+int fprintf (FILE *fp, char *format, ...) reentrant {
   va_list arg;
   *fp; // hush the compiler
   va_start(arg, format);

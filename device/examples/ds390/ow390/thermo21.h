@@ -41,7 +41,7 @@
 #define stdin ((void *)0)
 #define stdout ((void *)0)
 #define stderr ((void *)0)
-int fprintf (FILE *fp, xdata char *format, ...) reentrant;
+int fprintf (FILE *fp, char *format, ...) reentrant;
 FILE *fopen (char *, char *);
 int fclose (FILE *);
 

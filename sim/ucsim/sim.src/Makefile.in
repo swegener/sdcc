@@ -95,7 +95,7 @@ include clean.mk
 sim_lib: $(PRJDIR)/libsim.a
 
 $(PRJDIR)/libsim.a: $(OBJECTS)
-	ar -rcu $*.a $(OBJECTS)
+	$(AR) -rcu $*.a $(OBJECTS)
 	$(RANLIB) $*.a
 
 .cc.o:

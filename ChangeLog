@@ -1,3 +1,7 @@
+2001-09-30  Michael Hope  <michaelh@juju.net.nz>
+
+	* sim/ucsim/cmd.src/Makefile.in ($(PRJDIR)/libcmd.a): Changed all ar references to $(AR) for Solaris.
+
 2001-09-29  Michael Hope  <michaelh@juju.net.nz>
 
 	* Makefile (sdcc-libs): Added makebin to the list of standard targets.

@@ -101,7 +101,7 @@ include clean.mk
 # My rules
 # --------
 libutil.a: $(OBJECTS)
-	ar -rcu $*.a $(OBJECTS)
+	$(AR) -rcu $*.a $(OBJECTS)
 	$(RANLIB) $*.a
 
 ucsim_app: libs ucsim

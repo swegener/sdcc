@@ -135,13 +135,13 @@ include clean.mk
 ucsim_lib: $(PRJDIR)/libguiucsim.a
 
 $(PRJDIR)/libguiucsim.a: $(OBJECTS) $(UCSIM_OBJECTS)
-	ar -rcu $*.a $(OBJECTS) $(UCSIM_OBJECTS)
+	$(AR) -rcu $*.a $(OBJECTS) $(UCSIM_OBJECTS)
 	$(RANLIB) $*.a
 
 tool_lib: $(PRJDIR)/libguitool.a
 
 $(PRJDIR)/libguitool.a: $(OBJECTS) $(TOOL_OBJECTS)
-	ar -rcu $*.a $(OBJECTS) $(TOOL_OBJECTS)
+	$(AR) -rcu $*.a $(OBJECTS) $(TOOL_OBJECTS)
 	$(RANLIB) $*.a
 
 .cc.o:

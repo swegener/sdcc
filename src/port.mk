@@ -30,7 +30,7 @@ include $(PRJDIR)/Makefile.common
 
 $(LIB): $(OBJ)
 	rm -f $(LIB)
-	ar r $(LIB) $(OBJ)
+	$(AR) r $(LIB) $(OBJ)
 	$(RANLIB) $(LIB)
 
 %.rul: %.def

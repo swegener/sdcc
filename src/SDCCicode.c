@@ -2953,14 +2953,14 @@ geniCodeIfx (ast * tree,int lvl)
 	  if (tree->trueLabel)
 	    geniCodeGoto (tree->trueLabel);
 	  else
-	    assert (1);
+	    assert (0);
 	}
       else
 	{
 	  if (tree->falseLabel)
 	    geniCodeGoto (tree->falseLabel);
 	  else
-	    assert (1);
+	    assert (0);
 	}
       goto exit;
     }

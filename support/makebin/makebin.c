@@ -5,6 +5,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#if defined(__BORLANDC__) || defined(__MINGW32__) || defined(__CYGWIN__)
+  #include <fcntl.h>
+  #include <io.h>
+#endif
+
+
 typedef unsigned char BYTE;
 
 #define FILL_BYTE 0xFF
@@ -30,6 +36,14 @@ void usage(void)
           "Usage: makebin [-p] [-s romsize] [-h]\n");
 }
 
+void fixStdout(void)
+{
+  #if defined(__BORLANDC__) || defined(__MINGW32__) || defined(__CYGWIN__)
+    setmode(fileno(stdout), O_BINARY);
+  #endif
+}
+
+
 int main(int argc, char **argv)
 {
     int size = 32768, pack = 0, real_size = 0;
@@ -40,6 +54,8 @@ int main(int argc, char **argv)
     argc--;
     argv++;
 
+    fixStdout();
+    
     while (argc--) {
         if (**argv != '-') {
             usage();

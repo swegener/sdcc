@@ -132,7 +132,8 @@ emitcode (char *inst, const char *fmt,...)
 
   while (isspace (*lbp))
     lbp++;
-
+//  printf ("%s\n", lb); // EEP - debugging
+  
   if (lbp && *lbp)
     lineCurr = (lineCurr ?
 		connectLine (lineCurr, newLineNode (lb)) :
@@ -1205,46 +1206,6 @@ reAdjustPreg (asmop * aop)
                       (x->aopu.aop_reg[0] == mcs51_regWithIdx(R0_IDX) || \
                       x->aopu.aop_reg[0] == mcs51_regWithIdx(R1_IDX) )))
 
-/*-----------------------------------------------------------------*/
-/* genNotFloat - generates not for float operations              */
-/*-----------------------------------------------------------------*/
-static void
-genNotFloat (operand * op, operand * res)
-{
-  int size, offset;
-  char *l;
-  symbol *tlbl;
-
-  D(emitcode (";     genNotFloat",""));
-
-  /* we will put 127 in the first byte of
-     the result */
-  aopPut (AOP (res), "#127", 0, isOperandVolatile (op, FALSE));
-  size = AOP_SIZE (op) - 1;
-  offset = 1;
-
-  l = aopGet (op->aop, offset++, FALSE, FALSE);
-  MOVA (l);
-
-  while (size--)
-    {
-      emitcode ("orl", "a,%s",
-		aopGet (op->aop,
-			offset++, FALSE, FALSE));
-    }
-
-  tlbl = newiTempLabel (NULL);
-  aopPut (res->aop, one, 1, isOperandVolatile (op, FALSE));
-  emitcode ("jz", "%05d$", (tlbl->key + 100));
-  aopPut (res->aop, zero, 1, isOperandVolatile (op, FALSE));
-  emitcode ("", "%05d$:", (tlbl->key + 100));
-
-  size = res->aop->size - 2;
-  offset = 2;
-  /* put zeros in the rest */
-  while (size--)
-    aopPut (res->aop, zero, offset++, isOperandVolatile (op, FALSE));
-}
 
 /*-----------------------------------------------------------------*/
 /* opIsGptr: returns non-zero if the passed operand is       */
@@ -1343,7 +1304,6 @@ static void
 genNot (iCode * ic)
 {
   symbol *tlbl;
-  sym_link *optype = operandType (IC_LEFT (ic));
 
   D(emitcode (";     genNot",""));
 
@@ -1357,13 +1317,6 @@ genNot (iCode * ic)
       emitcode ("mov", "c,%s", IC_LEFT (ic)->aop->aopu.aop_dir);
       emitcode ("cpl", "c");
       outBitC (IC_RESULT (ic));
-      goto release;
-    }
-
-  /* if type float then do float */
-  if (IS_FLOAT (optype))
-    {
-      genNotFloat (IC_LEFT (ic), IC_RESULT (ic));
       goto release;
     }
 

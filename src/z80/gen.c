@@ -2033,43 +2033,6 @@ _toBoolean (operand * oper)
     }
 }
 
-/*-----------------------------------------------------------------*/
-/* genNotFloat - generates not for float operations              */
-/*-----------------------------------------------------------------*/
-static void
-genNotFloat (operand * op, operand * res)
-{
-  int size, offset;
-  symbol *tlbl;
-
-  emitDebug ("; genNotFloat");
-
-  /* we will put 127 in the first byte of
-     the result */
-  aopPut (AOP (res), "!immedbyte", 0x7F);
-  size = AOP_SIZE (op) - 1;
-  offset = 1;
-
-  _moveA (aopGet (op->aop, offset++, FALSE));
-
-  while (size--)
-    {
-      emit2 ("or a,%s", aopGet (op->aop, offset++, FALSE));
-    }
-
-  tlbl = newiTempLabel (NULL);
-  aopPut (res->aop, "!one", 1);
-  emit2 ("!shortjp z !tlabel", tlbl->key + 100);
-  aopPut (res->aop, "!zero", 1);
-
-  emitLabel(tlbl->key + 100);
-
-  size = res->aop->size - 2;
-  offset = 2;
-  /* put zeros in the rest */
-  while (size--)
-    aopPut (res->aop, "!zero", offset++);
-}
 
 /*-----------------------------------------------------------------*/
 /* genNot - generate code for ! operation                          */
@@ -2077,7 +2040,6 @@ genNotFloat (operand * op, operand * res)
 static void
 genNot (iCode * ic)
 {
-  sym_link *optype = operandType (IC_LEFT (ic));
 
   /* assign asmOps to operand & result */
   aopOp (IC_LEFT (ic), ic, FALSE, TRUE);
@@ -2089,13 +2051,6 @@ genNot (iCode * ic)
       wassertl (0, "Tried to negate a bit");
     }
 
-  /* if type float then do float */
-  if (IS_FLOAT (optype))
-    {
-      genNotFloat (IC_LEFT (ic), IC_RESULT (ic));
-      goto release;
-    }
-
   _toBoolean (IC_LEFT (ic));
 
   /* Not of A:
@@ -2105,7 +2060,6 @@ genNot (iCode * ic)
   emit2 ("sub a,!one");
   outBitC (IC_RESULT (ic));
 
- release:
   /* release the aops */
   freeAsmop (IC_LEFT (ic), NULL, ic);
   freeAsmop (IC_RESULT (ic), NULL, ic);

@@ -1,3 +1,18 @@
+2003-08-20  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	Changed the type of the result of the ! (NOT) operator to char;
+	previously it returned the same type as the source. This allows
+	us to eliminate all the genFloatNot functions (all of its target
+	implementations were very buggy) since !float can use the same
+	code as !long now.
+
+	* src/SDCCicode.c (ast2iCode): ! returns char
+	* src/mcs51/gen.c (genNot, genNotFloat),
+	* src/ds390/gen.c (genNot, genNotFloat),
+	* src/z80/gen.c (genNot, genNotFloat),
+	* src/pic/gen.c (genNot, genNotFloat),
+	* src/pic16/gen.c (genNot, genNotFloat): eliminated genNotFloat
+
 2003-08-19  Bernhard Held <bernhard@bernhardheld.de>
 
 	pic patch provided by Slade Rich <slade_rich@yahoo.com>
@@ -26,7 +41,7 @@
 
 2003-08-18  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
-	* src/z80/gen.c (isUnsplitable, fetchPairLog): fixed bug #770454
+	* src/z80/gen.c (isUnsplitable, fetchPairLong): fixed bug #770454
 
 2003-08-18  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 

@@ -1728,44 +1728,6 @@ static void reAdjustPreg (asmop *aop)
 
 }
 
-/*-----------------------------------------------------------------*/
-/* genNotFloat - generates not for float operations              */
-/*-----------------------------------------------------------------*/
-static void genNotFloat (operand *op, operand *res)
-{
-    int size, offset;
-    char *l;
-    symbol *tlbl ;
-
-    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    /* we will put 127 in the first byte of 
-    the result */
-    pic16_aopPut(AOP(res),"#127",0);
-    size = AOP_SIZE(op) - 1;
-    offset = 1;
-
-    l = pic16_aopGet(op->aop,offset++,FALSE,FALSE);
-    MOVA(l);    
-
-    while(size--) {
-        pic16_emitcode("orl","a,%s",
-                 pic16_aopGet(op->aop,
-                        offset++,FALSE,FALSE));
-    }
-    tlbl = newiTempLabel(NULL);
-
-    tlbl = newiTempLabel(NULL);
-    pic16_aopPut(res->aop,one,1);
-    pic16_emitcode("jz","%05d_DS_",(tlbl->key+100));
-    pic16_aopPut(res->aop,zero,1);
-    pic16_emitcode("","%05d_DS_:",(tlbl->key+100));
-
-    size = res->aop->size - 2;
-    offset = 2;    
-    /* put zeros in the rest */
-    while (size--) 
-        pic16_aopPut(res->aop,zero,offset++);
-}
 
 #if 0
 /*-----------------------------------------------------------------*/
@@ -1880,7 +1842,6 @@ void pic16_toBoolean(operand *oper)
 static void genNot (iCode *ic)
 {
   symbol *tlbl;
-  sym_link *optype = operandType(IC_LEFT(ic));
   int size;
 
   DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
@@ -1902,13 +1863,7 @@ static void genNot (iCode *ic)
     goto release;
   }
 
-  /* if type float then do float */
-  if (IS_FLOAT(optype)) {
-    genNotFloat(IC_LEFT(ic),IC_RESULT(ic));
-    goto release;
-  }
-
-  size = AOP_SIZE(IC_RESULT(ic));
+  size = AOP_SIZE(IC_LEFT(ic));
   if(size == 1) {
     pic16_emitpcode(POC_COMFW,pic16_popGet(AOP(IC_LEFT(ic)),0));
     pic16_emitpcode(POC_ANDLW,pic16_popGetLit(1));

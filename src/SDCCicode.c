@@ -3637,11 +3637,11 @@ ast2iCode (ast * tree,int lvl)
 #endif
 
     case '~':
-    case '!':
     case RRC:
     case RLC:
       return geniCodeUnary (geniCodeRValue (left, FALSE), tree->opval.op);
 
+    case '!':
     case GETHBIT:
       {
 	operand *op = geniCodeUnary (geniCodeRValue (left, FALSE), tree->opval.op);

@@ -1607,47 +1607,6 @@ reAdjustPreg (asmop * aop)
       emitcode("nop", "; workaround for DS80C390 div bug.");  \
     }
 
-/*-----------------------------------------------------------------*/
-/* genNotFloat - generates not for float operations              */
-/*-----------------------------------------------------------------*/
-static void
-genNotFloat (operand * op, operand * res)
-{
-  int size, offset;
-  symbol *tlbl;
-
-  D (emitcode (";", "genNotFloat "););
-
-  /* we will put 127 in the first byte of
-     the result */
-  aopPut (AOP (res), "#127", 0);
-  size = AOP_SIZE (op) - 1;
-  offset = 1;
-
-  _startLazyDPSEvaluation ();
-  MOVA(aopGet(op->aop, offset++, FALSE, FALSE, NULL));
-
-  while (size--)
-    {
-      emitcode ("orl", "a,%s",
-		aopGet (op->aop,
-			offset++, FALSE, FALSE,
-			DP2_RESULT_REG));
-    }
-  _endLazyDPSEvaluation ();
-
-  tlbl = newiTempLabel (NULL);
-  aopPut (res->aop, one, 1);
-  emitcode ("jz", "!tlabel", (tlbl->key + 100));
-  aopPut (res->aop, zero, 1);
-  emitcode ("", "!tlabeldef", (tlbl->key + 100));
-
-  size = res->aop->size - 2;
-  offset = 2;
-  /* put zeros in the rest */
-  while (size--)
-    aopPut (res->aop, zero, offset++);
-}
 
 /*-----------------------------------------------------------------*/
 /* opIsGptr: returns non-zero if the passed operand is       */
@@ -1797,7 +1756,6 @@ static void
 genNot (iCode * ic)
 {
   symbol *tlbl;
-  sym_link *optype = operandType (IC_LEFT (ic));
 
   D (emitcode (";", "genNot "););
 
@@ -1811,13 +1769,6 @@ genNot (iCode * ic)
       emitcode ("mov", "c,%s", IC_LEFT (ic)->aop->aopu.aop_dir);
       emitcode ("cpl", "c");
       outBitC (IC_RESULT (ic));
-      goto release;
-    }
-
-  /* if type float then do float */
-  if (IS_FLOAT (optype))
-    {
-      genNotFloat (IC_LEFT (ic), IC_RESULT (ic));
       goto release;
     }
 

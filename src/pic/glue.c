@@ -1238,6 +1238,9 @@ pic14glue ()
   }
 
   AnalyzepCode(code->dbName);
+  pCodePeepInit();
+
+  OptimizepCode(code->dbName);
   //copyFile (asmFile, code->oFile);
   copypCode(asmFile, code->dbName);
 

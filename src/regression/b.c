@@ -32,5 +32,6 @@ void main(void)
   inc(uchar0);
   if(uchar0 !=2)
     success++;
+
   done();
 }

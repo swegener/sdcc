@@ -71,7 +71,7 @@ static char *zero = "#0x00";
 static char *one  = "#0x01";
 static char *spname = "sp";
 
-char *fReturnpic14[] = {"fsr","dph","b","a" };
+char *fReturnpic14[] = {"FSR","dph","b","a" };
 //char *fReturn390[] = {"dpl","dph","dpx", "b","a" };
 static unsigned fReturnSize = 4; /* shared with ralloc.c */
 static char **fReturn = fReturnpic14;
@@ -1053,16 +1053,8 @@ static pCodeOp *popGetWithString(char *str)
     exit (1);
   }
 
-  pcop = newpCodeOp(str);
-  pcop->type = PO_STR;
+  pcop = newpCodeOp(str,PO_STR);
 
-/*
-  _ALLOC(pcop,sizeof(pCodeOp) );
-    _ALLOC_ATOMIC(pcop->name,strlen(str)+1);
-    strcpy(pcop->name,str);   
-  } else {
-  }
-*/
   return pcop;
 }
 /*-----------------------------------------------------------------*/

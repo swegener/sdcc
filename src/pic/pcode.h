@@ -114,6 +114,36 @@ typedef enum
 } PIC_OPTYPE;
 
 
+/*************************************************
+ * pCode conditions:
+ *
+ * The "conditions" are bit-mapped flags that describe
+ * input and/or output conditions that are affected by
+ * the instructions. For example:
+ *
+ *    MOVF   SOME_REG,W
+ *
+ * This instruction depends upon 'SOME_REG'. Consequently
+ * it has the input condition PCC_REGISTER set to true.
+ *
+ * In addition, this instruction affects the Z bit in the
+ * status register and affects W. Thus the output conditions
+ * are the logical or:
+ *  PCC_ZERO_BIT | PCC_W
+ *
+ * The conditions are intialized when the pCode for an
+ * instruction is created. They're subsequently used
+ * by the pCode optimizer determine state information
+ * in the program flow.
+ *************************************************/
+
+#define  PCC_NONE          0
+#define  PCC_REGISTER      (1<<0)
+#define  PCC_C             (1<<1)
+#define  PCC_Z             (1<<2)
+#define  PCC_DC            (1<<3)
+#define  PCC_W             (1<<4)
+
 /***********************************************************************
  *
  *  PIC_OPCODE
@@ -253,17 +283,12 @@ typedef struct pCodeOpLabel
   int key;
 } pCodeOpLabel;
 
-typedef struct pCodeOpWild
-{
-  pCodeOp pcop;
-  int id;
-} pCodeOpWild;
 
 
 /*************************************************
     pCode
 
-    Here the basic build block of a PIC instruction.
+    Here is the basic build block of a PIC instruction.
     Each pic instruction will get allocated a pCode.
     A linked list of pCodes makes a program.
 
@@ -328,6 +353,9 @@ typedef struct pCodeInstruction
   unsigned int dest:     1;       // If destination is W or F, then 1==F
   unsigned int bit_inst: 1;
 
+  unsigned int inCond;   // Input conditions for this instruction
+  unsigned int outCond;  // Output conditions for this instruction
+
 } pCodeInstruction;
 
 
@@ -340,7 +368,9 @@ typedef struct pCodeLabel
 
   pCode  pc;
 
+  char *label;
   int key;
+
 } pCodeLabel;
 
 /*************************************************
@@ -360,6 +390,25 @@ typedef struct pCodeFunction
 
 } pCodeFunction;
 
+
+/*************************************************
+    pCodeWild
+**************************************************/
+
+typedef struct pCodeWild
+{
+
+  pCode  pc;
+
+  int    id;     /* Index into the wild card array of a peepBlock 
+		  * - this wild card will get expanded into that pCode
+		  *   that is stored at this index */
+
+
+  pCodeOp *operand;  // Optional operand
+  pCodeOp *label;    // Optional label
+
+} pCodeWild;
 
 /*************************************************
     pBlock
@@ -404,6 +453,7 @@ typedef struct pFile
 } pFile;
 
 
+
 /*************************************************
   pCodePeep
 
@@ -420,15 +470,55 @@ typedef struct pCodePeep {
   pBlock *target;    // code we'd like to optimize
   pBlock *replace;   // and this is what we'll optimize it with.
 
+  int     nvars;       // Number of wildcard registers in target.
+  char  **vars;        // array of pointers to them
+  int     nwildpCodes; // Number of wildcard pCodes in target/replace
+  pCode **wildpCodes;  // array of pointers to the pCodeOp's.
+
+
+  /* (Note: a wildcard register is a place holder. Any register
+   * can be replaced by the wildcard when the pcode is being 
+   * compared to the target. */
+
+  /* Post Conditions. A post condition is a condition that
+   * must be either true or false before the peep rule is
+   * accepted. For example, a certain rule may be accepted
+   * if and only if the Z-bit is not used as an input to 
+   * the subsequent instructions in a pCode chain.
+   */
+  unsigned int postFalseCond;  
+  unsigned int postTrueCond;
+
 } pCodePeep;
+
+typedef struct pCodeOpWild
+{
+  pCodeOp pcop;
+  //PIC_OPTYPE subtype;      Wild get's expanded to this by the optimizer
+  pCodePeep *pcp;         // pointer to the parent peep block 
+  int id;                 /* index into an array of char *'s that will match
+			   * the wild card. The array is in *pcp. */
+  pCodeOp *subtype;       /* Pointer to the Operand type into which this wild
+			   * card will be expanded */
+} pCodeOpWild;
 
 /*************************************************
     pCode Macros
 
 **************************************************/
-#define PCI(x)  ((pCodeInstruction *)(x))
-#define PCL(x)  ((pCodeLabel *)(x))
-#define PCF(x)  ((pCodeFunction *)(x))
+#define PCODE(x)  ((pCode *)(x))
+#define PCI(x)    ((pCodeInstruction *)(x))
+#define PCL(x)    ((pCodeLabel *)(x))
+#define PCF(x)    ((pCodeFunction *)(x))
+#define PCW(x)    ((pCodeWild *)(x))
+
+#define PCOP(x)   ((pCodeOp *)(x))
+#define PCOB(x)   ((pCodeOpBit *)(x))
+#define PCOL(x)   ((pCodeOpLit *)(x))
+#define PCOLAB(x) ((pCodeOpLabel *)(x))
+#define PCOW(x)   ((pCodeOpWild *)(x))
+
+#define PBR(x)    ((pBranch *)(x))
 
 /*-----------------------------------------------------------------*
  * pCode functions.
@@ -445,12 +535,14 @@ void addpCode2pBlock(pBlock *pb, pCode *pc); // Add a pCode to a pBlock
 void addpBlock(pBlock *pb);                  // Add a pBlock to a pFile
 void copypCode(FILE *of, char dbName);       // Write all pBlocks with dbName to *of
 void AnalyzepCode(char dbName);
+void OptimizepCode(char dbName);
 void printCallTree(FILE *of);
+void pCodePeepInit(void);
 
 pCodeOp *newpCodeOpLabel(int key);
 pCodeOp *newpCodeOpLit(int lit);
 pCodeOp *newpCodeOpBit(char *name, int bit);
-pCodeOp *newpCodeOp(char *name);
+pCodeOp *newpCodeOp(char *name, PIC_OPTYPE p);
 extern void pcode_test(void);
 
 /*-----------------------------------------------------------------*

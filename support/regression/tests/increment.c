@@ -2,7 +2,7 @@
 
     type: signed char, int, long
     storage: static, 
-    attr: volatile,
+    attr: volatile
 */
 #include <testfwk.h>
 

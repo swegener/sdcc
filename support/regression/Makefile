@@ -65,6 +65,11 @@ ALL_PORTS = $(filter-out CVS,$(notdir $(wildcard $(PORTS_DIR)/*)))
 test-ports:
 	for i in $(ALL_PORTS); do $(MAKE) inter-port-clean test-port PORT=$$i; done
 
+# Helper rule for testing the z80 port only
+test-z80:
+	$(MAKE) inter-port-clean clean test-port PORT=z80
+
+test-z80:
 # Begin per-port rules
 # List of all of the known source test suites.
 ALL_TESTS = $(shell find $(TESTS_DIR) -name "*.c")

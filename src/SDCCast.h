@@ -130,6 +130,8 @@ ast;
 				   x->opval.op == EQ_OP	||		\
 				   x->opval.op == NE_OP	))
 #define IS_CAST_OP(x) (IS_AST_OP(x) && x->opval.op == CAST)
+#define IS_TERNARY_OP(x) (IS_AST_OP(x) && x->opval.op == '?')
+#define IS_COLON_OP(x) (IS_AST_OP(x) && x->opval.op == ':')
 #define IS_ADDRESS_OF_OP(x)    (IS_AST_OP(x)            &&              \
 				x->opval.op == '&'      &&              \
 				x->right == NULL )

@@ -641,6 +641,7 @@ processParms (ast * func,
   if (!defParm && actParm && func->hasVargs)
     {
       ast *newType = NULL;
+      sym_link *ftype;
 
       if (IS_CAST_OP (actParm)
 	  || (IS_AST_LIT_VALUE (actParm) && actParm->values.literalFromCast))
@@ -649,25 +650,39 @@ processParms (ast * func,
 	  return 0;
 	}
 
+      /* The ternary ('?') operator is weird: the ftype of the 
+       * operator is the type of the condition, but it will return a 
+       * (possibly) different type. 
+       */
+      if (IS_TERNARY_OP(actParm))
+      {
+          assert(IS_COLON_OP(actParm->right));
+          assert(actParm->right->left);
+          ftype = actParm->right->left->ftype;
+      }
+      else
+      {
+          ftype = actParm->ftype;
+      }
+          
       /* If it's a small integer, upcast to int. */
-      if (IS_INTEGRAL (actParm->ftype)
-	  && getSize (actParm->ftype) < (unsigned) INTSIZE)
+      if (IS_INTEGRAL (ftype)
+	  && (getSize (ftype) < (unsigned) INTSIZE))
 	{
-	  newType = newAst_LINK (INTTYPE);
+	  newType = newAst_LINK(INTTYPE);
 	}
 
-      if (IS_PTR (actParm->ftype) && !IS_GENPTR (actParm->ftype))
+      if (IS_PTR(ftype) && !IS_GENPTR(ftype))
 	{
-	  newType = newAst_LINK (copyLinkChain (actParm->ftype));
+	  newType = newAst_LINK (copyLinkChain(ftype));
 	  DCL_TYPE (newType->opval.lnk) = GPOINTER;
 	}
 
-      if (IS_AGGREGATE (actParm->ftype))
+      if (IS_AGGREGATE (ftype))
 	{
-	  newType = newAst_LINK (copyLinkChain (actParm->ftype));
+	  newType = newAst_LINK (copyLinkChain (ftype));
 	  DCL_TYPE (newType->opval.lnk) = GPOINTER;
 	}
-
       if (newType)
 	{
 	  /* cast required; change this op to a cast. */

@@ -1,5 +1,9 @@
 2004-11-19 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
+	* device/lib/_gptrget.c (_gptrget),
+	* device/lib/_gptrgetc.c (_gptrgetc),
+	* device/lib/_gptrput.c (_gptrput): _naked allows to use ret
+	  instead of sjmp to ret
 	* src/mcs51/peeph.def: added peepholes 3.d-g and 177.g,h provided
 	  by anonymous in RFE #1067986, thanks
 

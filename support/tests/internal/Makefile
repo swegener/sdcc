@@ -1,13 +1,14 @@
 TOPDIR = ../../..
 
 LIBSOURCE = \
+	$(TOPDIR)/src/SDCCutil.c \
 	$(TOPDIR)/src/SDCChasht.c \
 	$(TOPDIR)/support/Util/NewAlloc.c \
 	$(TOPDIR)/support/Util/SDCCerr.c \
 	$(TOPDIR)/src/SDCCmacro.c \
 	stubs.c
 
-SOURCES = testmacro.c $(LIBSOURCE)
+SOURCES = testpaths.c $(LIBSOURCE)
 
 include $(TOPDIR)/Makefile.common
 

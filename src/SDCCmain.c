@@ -1266,13 +1266,10 @@ preProcess (char **envp)
       setMainValue ("cppextraopts", join(preArgv));
       
       if (!preProcOnly)
-      {
-        preOutName = strdup (tmpnam (NULL));
+          preOutName = strdup (tempfilename ());
 
-        setMainValue ("cppoutfilename", preOutName);
-      }
-      else
-        setMainValue ("cppoutfilename", "notexistent_fixme");	// Fix me!
+      /* Have to set cppoutfilename to something, even if just pre-processing. */
+      setMainValue ("cppoutfilename", preOutName ? preOutName : "");
 	
       if (options.verbose)
 	printf ("sdcc: Calling preprocessor...\n");
@@ -1319,7 +1316,7 @@ _setPaths (const char *pprefix)
       configure time, see if the library and include directories are
       where expected.  If so, set.
   */
-  getStringDifference (buffer, PREFIX, SDCC_INCLUDE_DIR);
+  getPathDifference (buffer, PREFIX, SDCC_INCLUDE_DIR);
   strcpy (scratchFileName, pprefix);
   strcat (scratchFileName, buffer);
 
@@ -1332,7 +1329,7 @@ _setPaths (const char *pprefix)
       return FALSE;
     }
 
-  getStringDifference (buffer, PREFIX, SDCC_LIB_DIR);
+  getPathDifference (buffer, PREFIX, SDCC_LIB_DIR);
   strcpy (scratchFileName, pprefix);
   strcat (scratchFileName, buffer);
 
@@ -1385,7 +1382,7 @@ _discoverPaths (const char *argv0)
     }
   else if (getenv (SDCCDIR_NAME) != NULL)
     {
-      getStringDifference (buffer, PREFIX, BINDIR);
+      getPathDifference (buffer, PREFIX, BINDIR);
       strcpy (scratchFileName, getenv (SDCCDIR_NAME));
       strcat (scratchFileName, buffer);
       setMainValue ("bindir", scratchFileName);
@@ -1409,7 +1406,7 @@ _discoverPaths (const char *argv0)
             }
           else
             {
-              /* Include and lib wern't where expected. */
+              /* Include and lib weren't where expected. */
             }
         }
       /* Case 2 */

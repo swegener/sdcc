@@ -107,20 +107,112 @@ joinn(char **pplist, int n)
   return buffer;
 }
 
+/** Returns TRUE if for the host the two path characters are
+    equivalent.
+*/
+static bool
+pathCharsEquivalent(char c1, char c2)
+{
+#if NATIVE_WIN32
+  /* win32 is case insensitive */
+  if (tolower(c1) == tolower(c2))
+    {
+      return TRUE;
+    }
+  /* And / is equivalent to \ */
+  else if (c1 == '/' && c2 == '\\')
+    {
+      return TRUE;
+    }
+  else if (c1 == '\\' && c2 == '/')
+    {
+      return TRUE;
+    }
+  else
+    {
+      return FALSE;
+    }
+#else
+  /* Assume a Unix host where they must match exactly. */
+  return c1 == c2;
+#endif
+}
+
+static bool
+pathEquivalent(const char *p1, const char *p2)
+{
+  while (*p1 != '\0' && *p2 != '\0')
+    {
+      if (pathCharsEquivalent (*p1, *p2) == FALSE)
+        {
+          break;
+        }
+      p1++;
+      p2++;
+    }
+
+  return *p1 == *p2;
+}
+
+static char
+pathCharTransform(char c)
+{
+#if NATIVE_WIN32
+  if (c == '/')
+    {
+      return DIR_SEPARATOR_CHAR;
+    }
+  else
+    {
+      return c;
+    }
+#else
+  return c;
+#endif
+}
+
+/** Fixes up a potentially mixed path to the proper representation for
+    the host.  Fixes up in place.
+*/
+static char *
+fixupPath(char *pin)
+{
+  char *p = pin;
+
+  while (*p)
+    {
+      *p = pathCharTransform(*p);
+      p++;
+    }
+  *p = '\0';
+
+  return pin;
+}
+
 /** Returns the characters in p2 past the last matching characters in
     p1.  
 */
 char *
-getStringDifference (char *pinto, const char *p1, const char *p2)
+getPathDifference (char *pinto, const char *p1, const char *p2)
 {
   char *p = pinto;
 
+#if NATIVE_WIN32
+  /* win32 can have a path at the start. */
+  if (strchr(p2, ':'))
+    {
+      p2 = strchr(p2, ':')+1;
+    }
+#endif  
+
   while (*p1 != '\0' && *p2 != '\0')
     {
-      if (*p1++ != *p2++)
+      if (pathCharsEquivalent(*p1, *p2) == FALSE)
         {
           break;
         }
+      p1++;
+      p2++;
     }
   while (*p2)
     {
@@ -128,7 +220,7 @@ getStringDifference (char *pinto, const char *p1, const char *p2)
     }
   *p = '\0';
 
-  return pinto;
+  return fixupPath(pinto);
 }
 
 /** Given a file with path information in the binary files directory,
@@ -144,7 +236,7 @@ getPrefixFromBinPath (const char *prel)
   *strrchr(scratchFileName, DIR_SEPARATOR_CHAR) = '\0';
   /* Compute what the difference between the prefix and the bin dir
      should be. */
-  getStringDifference (buffer, PREFIX, BINDIR);
+  getPathDifference (buffer, PREFIX, BINDIR);
 
   /* Verify that the path in has the expected suffix */
   if (strlen(buffer) > strlen(scratchFileName))
@@ -152,7 +244,8 @@ getPrefixFromBinPath (const char *prel)
       /* Not long enough */
       return NULL;
     }
-  if (strcmp(buffer, scratchFileName + strlen(scratchFileName) - strlen(buffer)) != 0)
+
+  if (pathEquivalent (buffer, scratchFileName + strlen(scratchFileName) - strlen(buffer)) == FALSE)
     {
       /* Doesn't match */
       return NULL;

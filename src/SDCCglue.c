@@ -1545,6 +1545,33 @@ rm_tmpfiles (void)
 }
 #endif
 
+/** Creates a temporary file name a'la tmpnam which avoids the bugs
+    in cygwin wrt c:\tmp.
+    Scans, in order: TMP, TEMP, TMPDIR, else uses tmpfile().
+*/
+char *
+tempfilename (void)
+{
+#if !defined(_MSC_VER)
+  const char *tmpdir = NULL;
+  if (getenv ("TMP"))
+    tmpdir = getenv ("TMP");
+  else if (getenv ("TEMP"))
+    tmpdir = getenv ("TEMP");
+  else if (getenv ("TMPDIR"))
+    tmpdir = getenv ("TMPDIR");
+  if (tmpdir)
+    {
+      char *name = tempnam (tmpdir, "sdcc");
+      if (name)
+	{
+          return name;
+        }
+    }
+#endif
+  return tmpnam (NULL);
+}
+
 /** Creates a temporary file a'la tmpfile which avoids the bugs
     in cygwin wrt c:\tmp.
     Scans, in order: TMP, TEMP, TMPDIR, else uses tmpfile().

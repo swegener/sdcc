@@ -53,10 +53,11 @@ char *join(const char **pplist);
 */
 char *joinn(char **pplist, int n);
 
-/** Returns the characters in p2 past the last matching characters in
-    p1.  
+/** Returns the characters in the path p2 past the last matching characters in
+    p1.  Processes in a host dependent way.  For example, on win32 the
+    test is case insensitive and treats '/' and '\' as the same.
 */
-char *getStringDifference (char *pinto, const char *p1, const char *p2);
+char *getPathDifference (char *pinto, const char *p1, const char *p2);
 
 /** Given a file with path information in the binary files directory,
     returns what PREFIX must be to get this path.  Used for discovery

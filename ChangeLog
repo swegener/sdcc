@@ -1,3 +1,16 @@
+2001-09-25  Michael Hope  <michaelh@juju.net.nz>
+
+	* configure.in: Fixed up so that ucsim is only configured once.
+
+	* support/cpp2/configure.in: Fixed to use the program transform to append the .exe for the win32 build.
+
+	* src/SDCCutil.c (getPrefixFromBinPath): Fixed up to work with win32 in all of its glory.
+	(getPathDifference): As above.
+
+	* src/SDCCmain.c (preProcess): Changed to use a temporary file in a proper temp directory.  Fixed case where pre-processing only.
+
+	* src/SDCCglue.c (tempfilename): Added function for pre-processor.
+
 2001-09-23  Michael Hope  <michaelh@juju.net.nz>
 	* .version: Updated to 2.3.1
 

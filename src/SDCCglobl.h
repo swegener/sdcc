@@ -274,6 +274,13 @@ void parseWithComma (char **, char *);
 */
 FILE *tempfile (void);
 
+/** Creates a temporary file name a'la tmpnam which avoids the bugs
+    in cygwin wrt c:\tmp.
+    Scans, in order: TMP, TEMP, TMPDIR, else uses tmpfile().
+*/
+char *
+tempfilename (void);
+
 /** Creates a duplicate of the string 'sz' a'la strdup but using
     libgc.
 */

@@ -27,6 +27,7 @@
 #include <alloc.h>
 #endif
 #include "asm.h"
+#include "strcmpi.h"
 
 /*)Module	assym.c
  *
@@ -194,7 +195,7 @@ char *id;
 	h = hash(id);
 	mp = mnehash[h];
 	while (mp) {
-		if (strcmpi(id, mp->m_id) == 0)	/* JLH: case insensitive */
+		if (as_strcmpi(id, mp->m_id) == 0)	/* JLH: case insensitive */
 			return (mp);
 		mp = mp->m_mp;
 	}
@@ -360,7 +361,7 @@ register char *p1, *p2;
 #if	CASE_SENSITIVE
 		return (strcmp( p1, p2 ) == 0);
 #else
-		return (strcmpi( p1, p2 ) == 0);
+		return (as_strcmpi( p1, p2 ) == 0);
 #endif
 }
 

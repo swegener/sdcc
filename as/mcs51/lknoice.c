@@ -12,6 +12,7 @@
 #include <setjmp.h>
 #include <string.h>
 #include "aslink.h"
+#include "strcmpi.h"
 
 static void DefineGlobal( char *name, Addr_T value, int page );
 static void DefineScoped( char *name, Addr_T value, int page );
@@ -140,7 +141,7 @@ void DefineScoped( char *name, Addr_T value, int page )
  */
 void DefineFile( char *name, Addr_T value, int page )
 {
-	if (strcmpi( name, currentFile ) != 0)
+	if (as_strcmpi( name, currentFile ) != 0)
 	{
 		strcpy( currentFile, name );
 		if (value != 0)
@@ -161,7 +162,7 @@ void DefineFile( char *name, Addr_T value, int page )
  */
 void DefineFunction( char *name, Addr_T value, int page )
 {
-	if (strcmpi( name, currentFunction ) != 0)
+	if (as_strcmpi( name, currentFunction ) != 0)
 	{
 		strcpy( currentFunction, name );
                 if (value != 0)
@@ -184,7 +185,7 @@ void DefineFunction( char *name, Addr_T value, int page )
  */
 void DefineStaticFunction( char *name, Addr_T value, int page )
 {
-	if (strcmpi( name, currentFunction ) != 0)
+	if (as_strcmpi( name, currentFunction ) != 0)
 	{
 		strcpy( currentFunction, name );
 		if (value != 0)

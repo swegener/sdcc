@@ -34,13 +34,13 @@ LDFLAGS		= @LDFLAGS@
 
 ASOBJECTS	= asmain.o aslex.o assym.o assubr.o asnoice.o \
 		  asexpr.o asdata.o aslist.o asout.o asstore.o \
-		  i51ext.o i51pst.o i51mch.o i51adr.o    
+		  i51ext.o i51pst.o i51mch.o i51adr.o strcmpi.o
 ASSOURCES	= $(patsubst %.o,%.c,$(ASOBJECTS))
 
 LKOBJECTS	= lkmain.o lkhead.o lkarea.o lkdata.o \
 		  lkeval.o lklex.o lksym.o lkrloc.o \
 		  lklibr.o lklist.o lkihx.o lks19.o \
-		  lkstore.o lknoice.o lkmem.o lkaomf51.o
+		  lkstore.o lknoice.o lkmem.o lkaomf51.o strcmpi.o
 LKSOURCES	= $(patsubst %.o,%.c,$(LKOBJECTS))
 
 ASX8051		= $(PRJDIR)/bin/asx8051

@@ -1,3 +1,19 @@
+2003-01-26  Bernhard Held <bernhard@bernhardheld.de>
+
+	* as/mcs51/strcmpi.c: added, provides as_strcmpi(); strcmpi() is not ANSI
+	* as/mcs51/strcmpi.h: added
+	* as/mcs51/asm.h: remove ugly "#define strcmpi strcmp"
+	* as/mcs51/aslink.h: remove ugly "#define strcmpi strcmp"
+	* as/mcs51/asmain.c: strcmpi -> as_strcmpi
+	* as/mcs51/assym.c: strcmpi -> as_strcmpi
+	* as/mcs51/lkmem.c: strcmpi -> as_strcmpi
+	* as/mcs51/lknoice.c: strcmpi -> as_strcmpi
+	* as/mcs51/lksym.c: strcmpi -> as_strcmpi
+	* as/mcs51/Makefile.aslink: new module strcmpi
+	* as/mcs51/Makefile.asx8051: new module strcmpi
+	* as/mcs51/Makefil.bcc: new module strcmpi
+	* as/mcs51/Makefile.in: new module strcmpi
+
 2003-01-26    <johan@balder>
 
 	* src/SDCCglue.c: reverted back to 1.124

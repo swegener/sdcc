@@ -17,6 +17,7 @@
 #include <string.h>
 
 #include "asm.h"
+#include "strcmpi.h"
 
 /*)Module	asmain.c
  *
@@ -931,7 +932,7 @@ loop:
 		{
 		    getst(id, -1);
 		    
-		    if (!strcmpi(id, "on"))
+		    if (!as_strcmpi(id, "on"))
 		    {
 		    	/* Quick sanity check: size of 
 		    	 * Addr_T must be at least 24 bits.
@@ -949,7 +950,7 @@ loop:
 		    	    flat24Mode = 1;
 		    	}
 		    }
-		    else if (!strcmpi(id, "off"))
+		    else if (!as_strcmpi(id, "off"))
 		    {
 		        flat24Mode = 0;
 		    }

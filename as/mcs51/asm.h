@@ -674,7 +674,3 @@ extern	struct	mne	mne[];
 
 extern	VOID		minit();
 extern VOID machine(struct mne *);
-
-/* SD added THIS define to change
-   strcmpi --> strcmp (strcmpi is NOT ANSI) */
-#define strcmpi strcmp

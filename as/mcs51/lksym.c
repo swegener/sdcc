@@ -404,7 +404,7 @@ register char *p1, *p2;
 #if	CASE_SENSITIVE
 		return (strcmp( p1, p2 ) == 0);
 #else
-		return (strcmpi( p1, p2 ) == 0);
+		return (as_strcmpi( p1, p2 ) == 0);
 #endif
 }
 

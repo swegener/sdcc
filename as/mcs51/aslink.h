@@ -760,8 +760,3 @@ extern int summary(struct area * xp);
 /* JCF: lkaomf51.c */
 extern void SaveLinkedFilePath(char * filepath);
 extern void CreateAOMF51(void);
-
-/* SD added this to change
-	strcmpi --> strcmp (strcmpi NOT ANSI) */
-#define strcmpi strcmp
-

@@ -22,10 +22,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include "aslink.h"
+#include "strcmpi.h"
 
 int summary(struct area * areap) 
 {
-	#define EQ(A,B) !strcmpi((A),(B))
+	#define EQ(A,B) !as_strcmpi((A),(B))
 	#define MIN_STACK 16
 	#define REPORT_ERROR(A, H) \
 	{\

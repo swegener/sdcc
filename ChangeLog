@@ -1,3 +1,14 @@
+2004-05-31 Maarten Brock <sourceforge.brock AT dse.nl>
+	* src/SDCCast.c (createIvalArray): fixed bug 770487 SIGSEGV
+	* src/SDCCglue.c (emitRegularMap): fixed bug 770484 allocation problem
+	* src/SDCCglue.c (initPointer, printIvalType, printIvalStruct,
+	  printIvalArray, printIvalFuncPtr, printIvalPtr, printIval): fixed
+	  bugs 928906 and 954082 half-empty initializers
+	* src/SDCCsymt.h,
+	* src/SDCCsymt.c (getAllocSize): added for above fix
+	* src/z80/gen.c (genArrayInit): fixed bug 741044
+	* support/regression/tests/zeropad.c: added tests
+
 2004-05-30 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/device.c (pic16_dump_section): corrected bug which
@@ -63,7 +74,7 @@
 	* src/pic/main.c,
 	* src/pic16/main.c: modified port structures to reflect addition of
 	initPaths hook,
-		
+
 	* src/pic16/device.c (regCompare): registers are finally sorted by name,
 	* (pic16_dump_section): for registers in same address reserve memory once,
 	* src/pic16/device.h (struct PIC16_device): changed variable gen_banksel
@@ -163,7 +174,7 @@
 	* doc/sdccman.lyx: mentioned sourceforge's delay between web frontend
 	and mailing lists, doc'ed --no-peep-comments, removed reference
 	to knoppix (newest version has no LyX/LaTeX), other minor changes
-	* src/SDCCglue.c (glue): save 2 bytes stack space with 
+	* src/SDCCglue.c (glue): save 2 bytes stack space with
 	option --main-return. The ljmp could probably be avoided too
 
 2004-05-14 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
@@ -191,7 +202,7 @@
 	the module name has non-alphanumeric symbols in it
 	* src/SDCCdwarf2.c (dwWriteSymbolInternal): better detection for
 	when a variable's allocation has been optimized away
-	
+
 
 2004-05-13 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
@@ -215,26 +226,26 @@
 	* src/SDCCdebug.h,
 	* src/port.h: added a debugger struct to the port struct. Added a
 	callback for defining debugger symbols
-	
+
 	* src/SDCCast.c (createLabel),
 	* src/SDCC.y (labeled_statement): mark all compiler generated labels
 	with isitmp = 1
 	* src/SDCCicode.h,
 	* src/SDCCicode.c (geniCodeFunctionBody): added a link from the FUNCTION
 	iCode back to the ast for the function
-	
+
 	* src/hc08/ralloc.c (hc08_assignRegisters),
 	* src/hc08/ralloc.h: define a regs struct for the stack pointer. Removed
 	unneeded fields from the regs struct.
 	* src/hc08/gen.c (transferRegReg, genFunction, genEndFunction): use the
 	pushReg() & pullReg() functions instead of emitcode()
-	
+
 	* src/hc08/gen.c (genLabel, genhc08Code),
 	* src/SDCCdebug.h: Added additional debugger hooks needed for DWARF
-	
+
 	* src/cdbFile.c (cdbWriteLabel, cdbWriteScope): Added stubs for unneeded
 	debugger hooks
-	
+
 	* src/hc08/gen.c (genEndFunction, genhc08Code),
 	* src/hc08/gen.h,
 	* src/mcs51/gen.c (genEndFunction, gen51Code),
@@ -254,7 +265,7 @@
 	* src/xa51/gen.h,
 	* src/cdbFile.c (cdbWriteFunction, cdbWriteEndFunction): moved cdb
 	specific code to cdbFile.c and out of the backend code generators
-	
+
 	* as/hc08/lkmain.c (main): removed OMF51 support from link-hc08
 	* as/hc08/lkarea.c (lnkarea): areas with NOLOAD attribute default
 	starting address is now 0
@@ -264,11 +275,11 @@
 	* as/hc08/asmain.c (asmbl): implemented the .sleb128 and .uleb128
 	assembler directive for DWARF support
 	* as/hc08/lkelf.c (elf): only increment address when rtflg[] set
-	
+
 	* src/src.dsp,
 	* src/Makefile.in,
 	* src/SDCCdwarf2.c: preliminary DWARF (ver 2) debugger data generator
-	
+
 2004-05-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (genJumpTab, emitcode, genhc08code): fixed stack error
@@ -412,7 +423,7 @@
 	correct.
 	* support/regression/tests/bug-927659.c: fixed to avoid conflict with
 	putchar() in tinibios.c in ds390's library
-	
+
 2004-04-12 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCast.c (decorateType): fixed bug #898889,
@@ -585,7 +596,7 @@
 	needed for literals of LEFT_OP and '+'
 	* src/SDCCicode.c (geniCodeLogic): I must have been braindead when I
 	introduced RESULT_TYPE_NOPROM
-	(geniCodeMultiply): fixed logic for decision if mul is optimized to 
+	(geniCodeMultiply): fixed logic for decision if mul is optimized to
 	left shift
 	* src/SDCCsymt.c (computeType): op is int; added RESULT_TYPE_OTHER;
 	limited promotion to int only for '*'
@@ -899,7 +910,7 @@
 	SRCASECMP macro is moved here from device.c
 	* src/pic16/genarith.c (pic16_pCodeOpType): added cases for
 	PO_PCLATU, PO_PRODL, PO_PRODH,
-	* (pic16_pCodeOpType, genMinus, 
+	* (pic16_pCodeOpType, genMinus,
 	changed compares to "a" register, with AOP_ACC,
 	* (pic16_genPlus): fixed some bugs and indented properly,
 	* (pic16_addSign): changed size to size+offset in the MOVWF
@@ -1068,7 +1079,7 @@
 
 	* ralloc.h: missing declarations from previous patch,
 	seems that patch for ralloc.h was never applied, fixed
-	
+
 2004-02-10 Hans-Juergen Dorn <hans.dorn AT apl-landau.de>
 	   patch committed by Vangelis Rokas <vrokas AT otenet.gr>
 
@@ -1109,7 +1120,7 @@
 	* src/SDCCglue.c (emitRegularMap, printIvalStruct, printIvalArray,
 	printIvalCharPtr, printIvalPtr, printIval, emitStaticSeg, emitOverlay)
 	* src/SDCCsymt.c (newSymbol),
-	* src/SDCC.y (struct_or_union_specifier, enum_specifier, 
+	* src/SDCC.y (struct_or_union_specifier, enum_specifier,
 	enumerator_list),
 	* src/SDCCval.h,
 	* src/SDCCval.c (newiList): fixed bug #885705
@@ -1502,7 +1513,7 @@
 	device/include/pic16 and device/lib/pic16. These files
 	contain the declarations of SFRs for the PIC18Fxx2 devices.
 	The directory is initialized via configure from toplevel.
-	
+
 2004-01-12 Klaus Flittner <klaus_flittner AT gmx.de>
 
 	* src/ds390/gen.c (operandsEqu): fixed a little typo, that prevented
@@ -1743,7 +1754,7 @@
 
 	* added files genutils.c and genutils.h which contain gen*
 	debugged and optimised functions extracted from gen.c
-	
+
 	* glue.c: added variable 'externs' which holds extern symbols,
 	pic16emitRegularMap: is modified to properly handle relocatable
 	 symbols under the new scheme,
@@ -1754,11 +1765,11 @@
 	the assembly output. Temporary hack, will be corrected later,
 	because gplink yet does not support stack and SDCC does not
 	yet support a type of crt0.o object to create the final binary.
-	
+
 	* Removed many lines that contain 8051 legacy code.
 	* The code is finally placed under a 'code' directive.
 	* Added port specific options.
-	
+
 	* _process_pragma: simplified since now we do not need *special*
 	include file to define SFR registers. But a separate header
 	will be needed. This will be developed later.
@@ -1766,7 +1777,7 @@
 	--pgen-banksel,	--obanksel=, --pomit-config-words, --pomit-ivt,
 	--pleave-reset-vector, --penable-stack, --pstack-model, --debug-xtra
 	--preplace-udata-with=
-	
+
 	* _pic16_setDefaultOptions: modified to initialize section names,
 	but hack is temporarly out of order since it needs improvement.
 	* _pic16_genAssemblerPreamble: configuration words are emitted by
@@ -1775,7 +1786,7 @@
 	during assembly since they do not contain the same set of config
 	registers
 	* _pic16_genIVT: is modified,
-	
+
 	* pcode.c: added definitions for some hardware registers that are needed
 	for stack support
 	* added flag is2LitOp and variable pci_magic in pCodeInstruction.
@@ -1792,9 +1803,9 @@
 	of bank switching,
 	* InlineFunction: functions that are called once, are not any more
 	inlined. This can be a port option in the future,
-	
+
 	* pcode.h: added pCodeOpLit2 and added variable label in pCodeAsmDir
-	
+
 	* ralloc.c: added pic16_rel_udata and pic16_fix_udata variables which
 	hold the corresponding uninitialized symbols,
 	* pic16_allocProcessorRegister: registers have explicit marked the
@@ -1803,7 +1814,7 @@
 	not used,
 	* pic16_writeUsedRegs: pic16_dynDirectBitRegs was missing from the
 	processing list, so bit registers were lost,
-	* 
+	*
 
 	* ralloc.h: added field 'accessBank' and original symbol operand
 	in register definition,
@@ -1814,11 +1825,11 @@
 	pic16_addMemRange,pic16_isREGinBank,pic16_dump_map,pic16_dump_cblock
 	isSFR,validAddress,mapRegister,assignRegister,pic16_assignFixedRegisters
 	pic16_assignRelocatableRegisters
-	
+
 	** others have been introduced:
 	pic16_areRegsSame,pic16_dump_section,checkAddReg,pic16_groupRegistersInSection
 	pic16_popGetLit2,pic16_popCombine2,pushw,pushaop
-	
+
 2004-01-05 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* support/scripts/inc2h.pl: changed definition of BIT_AT
@@ -2103,7 +2114,7 @@
 	* src/SDCCglue.c (emitRegularMap): fixed bug #847813
 
 2003-11-26 Vangelis Rokas <vrokas AT otenet.gr>
-	
+
 	* src/pic16/main.c (_pic16_genIVT): fixed interrupt vector table
 	* src/pic16/main.c (_pic16_genAssemblerPreamble): re-enabled the
 	output of __config directives, since gpasm now supports them
@@ -2122,9 +2133,9 @@
 	* src/SDCC.y (pointer): fixed bug #846006
 	* support/Util/SDCCerr.c: made W_PTR_TYPE_INVALID message clearer
 	* src/SDCCast.c (decorateType): fixed bug #846009
-	* src/ds390/peeph.def,        
+	* src/ds390/peeph.def,
 	* src/ds390/gen.c (genAnd, genOr),
-	* src/mcs51/peeph.def,        
+	* src/mcs51/peeph.def,
 	* src/mcs51/gen.c (genAnd, genOr): fixed bug #846777
 
 2003-11-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
@@ -2193,7 +2204,7 @@
 	* src/SDCCdflow.c (mergeInExprs): fixed bug #587536
 
 2003-11-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
-	
+
 	* src/SDCCicode.c (geniCodeAddressOf): fixed part of bug #840381
 	* src/SDCCopt.c (replaceRegEqv, isLocalWithoutDef): fixed other part
 	(SIGSEV) of bug #840381
@@ -2203,8 +2214,8 @@
 2003-11-13 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/main.c: started fixing bug #737001 (SDCC not clearing
-	uninitialized variables) for the mcs51. Set environment variable 
-	SDCC_GENRAMCLEAR to test. 
+	uninitialized variables) for the mcs51. Set environment variable
+	SDCC_GENRAMCLEAR to test.
 	xdata initialization slightly shorter
 
 2003-11-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
@@ -2361,7 +2372,7 @@
 	  _asm (SDCPP specific) blocks
 
 2003-10-31 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
-	
+
 	* as/hc08/lkrloc.c (relr): Fixed ihx output, fixed lastAreaIndex warning
 
 2003-10-31 Klaus Flittner <klaus_flittner AT gmx.de>
@@ -2831,7 +2842,7 @@
 	  pcoderegs.h, ralloc.c, ralloc.h
 	* main.c: added top header and GPL license notice
 	* pcode.c: fixed the if-conditional warning
- 
+
 2003-09-04  Bernhard Held <bernhard AT bernhardheld.de>
 
 	* device/lib/_mullong.c: replaced int by short for gcc
@@ -3131,7 +3142,7 @@
 	* support\cpp2\cpplib.c
 	* src\ds390\gen.c
 	* src\mcs51\gen.c
-    
+
 2003-08-03  Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCast.c (constExprTree): fix bug #781827 by Carl Worth <cworth AT isi.edu>
@@ -3522,7 +3533,7 @@
 2003-05-24  Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	 * doc/sdccman.lyx: updated information about .adb files (fixed bug 742649)
-	 
+
 2003-05-22  Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/pic16/pcode.c (pic16_get_op_from_instruction): fixed a gcc 3.x warning
@@ -3539,7 +3550,7 @@
 	* src/SDCglobl.h
 	* src/SDCC.lex
 	* src/SDCCsymt.c
-	* src/SDCCval.c	
+	* src/SDCCval.c
 	* src/pic16/pcode.c: Cleaned warnings
 	* src/pic16/pcodeflow.c: Cleaned warnings
 	* src/pic16/pcoderegs.c: Cleaned warnings
@@ -3679,7 +3690,7 @@
 
 	 * src.dsw, link/z80/aslink.h, link/z80/linkz80.dsp: z80 linker
 	 support for MSVC.
-	 
+
 2003-04-29  Kevin Vigor <kevin AT vigor.nu>
 
 	Initial support for DS80C400. "Hello world" runs on TINIm400
@@ -3769,7 +3780,7 @@
 
 2003-04-22  Bernhard Held <bernhard AT bernhardheld.de>
 
-	* Makefile.common.in: added  AT EXEEXT AT 
+	* Makefile.common.in: added  AT EXEEXT AT
 	* configure.in: removed all mingw32 stuff
 	* configure: rebuilt from configure.in
 	* doc/sdccman.lyx: updated section "installation"
@@ -3879,7 +3890,7 @@
 	* src/pic/* Applied the pointer-to-function patch from Steve Tell.
 	* src/pic/* Fixed several pointer bugs. (PIC port broke when the ruonly bit was
 	 set - this bit used to not be set...).
-        * src/pic/gen.c Fixed buf 609268 ==> x = (x+1) & 0xf; generated 
+        * src/pic/gen.c Fixed buf 609268 ==> x = (x+1) & 0xf; generated
           bad code in PIC Port
         * src/regression/and2.c added to test bug 609268
         * src/regression/Makefile added and2.c to regression test
@@ -4044,7 +4055,7 @@
 	* src/common.h
 	* src/avr/gen.c (genAVRCode)
 	* src/ds390/gen.c (gen390Code)
-	* src/mcs51/gen.c (gen51Code) 
+	* src/mcs51/gen.c (gen51Code)
 	* src/pic/gen.c (genpic14Code)
 	* src/pic/glue.c (pic14emitRegularMap, pic14emitStaticSeg, pic14emitOverlay, picglue)
 	* src/xa51/gen.c (genXA51Code)
@@ -4073,10 +4084,10 @@
 2003-03-20    <johan AT balder>
 
 	An sfr/sbit can have an "at #" AND an initializer
-	* src/SDCCsymt.c (checkSClass): 
-	* src/SDCCmem.c (allocGlobal): 
+	* src/SDCCsymt.c (checkSClass):
+	* src/SDCCmem.c (allocGlobal):
 	* src/SDCCmem.c (allocLocal):
-	* src/SDCCast.c (createBlock): 
+	* src/SDCCast.c (createBlock):
 
 2003-03-17  Bernhard Held <bernhard AT bernhardheld.de>
 
@@ -4126,13 +4137,13 @@
 
 2003-03-11  Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
-	* as/mcs51/lkmain.c: Added ASlink-Warning to messages 
+	* as/mcs51/lkmain.c: Added ASlink-Warning to messages
 	* as/mcs51/lkaomf51.c: Fixed bug when linking asmblink example
 
 2003-03-11 Kevin Vigor <kevin AT vigor.nu>
 
 	* src/SDCCpeeph.c: fix so that operandsNotEqualX functions are
-	actually called (operandsNotEqual() was called for all 
+	actually called (operandsNotEqual() was called for all
 	operandsNotEqualX tests).
 
 2003-03-11 Kevin Vigor <kevin AT vigor.nu>
@@ -4461,12 +4472,12 @@
 
 2003-01-29  Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
-	* as/mcs51/aslink.h: Added options --xram-size and --code-size 
-	* as/mcs51/lkdata.c: Added options --xram-size and --code-size 
-	* as/mcs51/lkmain.c: Added options --xram-size and --code-size 
-	* as/mcs51/lkmem.c:  Added options --xram-size and --code-size 
-	* src/SDCCglobl.h:   Added options --xram-size and --code-size 
-	* src/SDCCmain.c:    Added options --xram-size and --code-size 
+	* as/mcs51/aslink.h: Added options --xram-size and --code-size
+	* as/mcs51/lkdata.c: Added options --xram-size and --code-size
+	* as/mcs51/lkmain.c: Added options --xram-size and --code-size
+	* as/mcs51/lkmem.c:  Added options --xram-size and --code-size
+	* src/SDCCglobl.h:   Added options --xram-size and --code-size
+	* src/SDCCmain.c:    Added options --xram-size and --code-size
 
 2003-01-28  Bernhard Held <bernhard AT bernhardheld.de>
 
@@ -4619,7 +4630,7 @@
 
 2003-01-09  Bernhard Held <bernhard AT bernhardheld.de>
 	* src/mcs51/gen.c (genPlus): replaced "mov b,acc" by "mov b,a" Fiorenzo D. Ramaglia <fd.ramaglia AT tin.it>
-	
+
 2003-01-07    <johan AT balder>
 
 	* src/SDCCast.c (decorateType): fixed bug #600035
@@ -4667,13 +4678,13 @@
 
     * in \sdcc\as\mcs51\ changed these files in order to create an
     aomf51 file: aslink.h, lkdta.c, lklex.c, lklibr.c, lklist.c,
-    lkmain.c.  Also added: lkmem.c and lkaomf51.c.  Changed the 
+    lkmain.c.  Also added: lkmem.c and lkaomf51.c.  Changed the
     following files to include the previous two files: aslink.dsp,
     Makefile.aslink, Makefile.bcc, and Makefile.in.
 
     * Changed \sdcc\src\SDCCmain.c so it creates files with extension
     .adb instead of .cdb
-    
+
 2002-11-09  Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* \sdcc\as\mcs51\lklist.c: Now reports memory usage using the
@@ -4693,7 +4704,7 @@
 	  multiple times and emitting the fetch operations more than once
 	  added aopGetUsesAcc() function to allow binary operators to
 	  fetch their operands in the correct order; made genMinus() emit
-	  compact code for X = LITERAL - Y 
+	  compact code for X = LITERAL - Y
 
 2002-09-00  Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 	* \sdcc\as\mcs51\lklist.c: Fixed incorrect number of parameters to
@@ -4721,7 +4732,7 @@
 	file with extension .mem.  Reports of overlaping stack and small stack
 	size.  If the space for the stack is less than 16 bytes aslink trows a
 	warning.
-	
+
 	* \sdcc\as\mcs51\lkmain.c: Creation of some of the default areas for
 	the 8051.  Option 'y' for memory summary output file.
 
@@ -4741,7 +4752,7 @@
 
 	* \sdcc\src\SDCCmem.c:  If a register bank is used, marks it so
 	glue() in SDCCglue.c creates an area for it.
-	
+
 2002-09-03  Borut Razem <borut.razem AT siol.net>
 	* sdcc/src/SDCCglue.c, sdcc/src/SDCCglue.h, sdcc/src/SDCCmain.c,
 	sdcc/src/pic/glue.c:
@@ -4782,7 +4793,7 @@
 
 	* sdcc/config.dsp, sdcc/configure_vc.awk, sdcc/sdcc_vc_in.h:
 	added - genarate sdcc_vc.h using sdcc_vc_in.h as template
-	and insert the version number definitions from .version 
+	and insert the version number definitions from .version
 
 	* sdcc/support/cpp2/sdcpp.dsp: added - VC project for sdcpp
 
@@ -4842,18 +4853,18 @@
 	* src/SDCCast.c (decorateType): fixed access to array of structures http://sourceforge.net/mailarchive/forum.php?thread_id=902690&forum_id=4107
 
 2002-06-22  Scott Dattalo <scott AT dattalo.com>
-	* src/pic/*: Numerous bug fixes. Flow analysis has been enhanced. 
-	- Rewrote the register banking algorithm. 
-	- Added pCode live-range analysis to registers (for now, only non-used and 
+	* src/pic/*: Numerous bug fixes. Flow analysis has been enhanced.
+	- Rewrote the register banking algorithm.
+	- Added pCode live-range analysis to registers (for now, only non-used and
 	singly-used registers optimized away)
 
 	* src/pic/pcoderegs.[ch]: Added new files for pCode live-range analysis
 
 	* support/scripts/inc2h.pl Kevin L. Pauba <klpauba AT cox.net> submitted this perl script for converting MicroChip include files into SDCC Pic include files.
-	
+
 2002-05-10  Scott Dattalo <scott AT dattalo.com>
 	* src/pic/*: Added support for multiplication. Fixed many,many bugs.
-	
+
 2002-04-22  Michael Hope  <michaelh AT vroom>
 
 	* device/lib/z80/printf.c: Changed emitter to volatile to work around a pcall bug.
@@ -4895,7 +4906,7 @@
 	* /src/pic/*:
 	Compiler generated registers for interrupt context saving
 	were not getting allocated.
-		
+
 2002-03-16  Sandeep Dutta  <sandeep AT ddi.com>
 
 	* /src/SDCCast.c:
@@ -4905,7 +4916,7 @@
 
 2002-03-14  Scott Dattalo <scott AT dattalo.com>
 	* src/pic/*
-	tons of changes. Register allocation has been 
+	tons of changes. Register allocation has been
 	rewritten. Added customization for the various PICs. Flow
 	analysis is restructured. ...
 
@@ -4936,7 +4947,7 @@
 
 	* support/Util/SDCCerr.c: did something, but don't no why anymore
 
-	* support/regression/tests/bug-524691.c: made it a little less shy 
+	* support/regression/tests/bug-524691.c: made it a little less shy
 
 	* src/SDCCast.c (decorateType): fixed bug #524697
 
@@ -5107,8 +5118,8 @@
 	* src/SDCCast.c, src/SDCCast.h:
 	added option parms-in-bank1
 
-	* device/lib/_divsint.c, device/lib/_divslong.c, device/lib/_divuint.c 
-	* device/lib/_divulong.c, device/lib/_modsint.c, device/lib/_modslong.c 
+	* device/lib/_divsint.c, device/lib/_divslong.c, device/lib/_divuint.c
+	* device/lib/_divulong.c, device/lib/_modsint.c, device/lib/_modslong.c
 	* device/lib/_modulong.c, device/lib/_mulint.c, device/lib/_mullong.c:
 	adjusted for --parms-in-bank1 option
 
@@ -5119,7 +5130,7 @@
 
 2002-01-28  Bernhard Held  <bernhard AT bernhardheld.de>
 
-	* sim/ucsim: Merged branch ucsim-034-pre3 to main trunk; new version 0.4 
+	* sim/ucsim: Merged branch ucsim-034-pre3 to main trunk; new version 0.4
 
 2002-01-26  Bernhard Held  <bernhard AT bernhardheld.de>
 
@@ -5708,7 +5719,7 @@
 
 	* SDCCicode.c: z80 has no generic pointers
 	* removed -s from strip in all Makefile(.in)'s. It is not needed, but Solaris chocks on it.
-	
+
 2001-09-30  Michael Hope  <michaelh AT juju.net.nz>
 
 	* sim/ucsim/cmd.src/Makefile.in ($(PRJDIR)/libcmd.a): Changed all ar references to $(AR) for Solaris.
@@ -5904,8 +5915,8 @@
 
 2001-08-30 Bernhard Held   <bernhard AT bernhardheld.de>
 
-  * sim/ucsim/configure:    little improvement of Cygwin-detection	
-  * sim/ucsim/configure.in: little improvement of Cygwin-detection	
+  * sim/ucsim/configure:    little improvement of Cygwin-detection
+  * sim/ucsim/configure.in: little improvement of Cygwin-detection
   * sim/ucsim/cmd.src/newcmdcl.h: include <sys/types.h> to define fd_set automated build
   * support/regression/tests/bug-221100.c: small changes for mcs51
   * support/regression/tests/bug-221168.c: small changes for mcs51

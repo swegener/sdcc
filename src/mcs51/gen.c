@@ -5436,18 +5436,25 @@ AccAXLsh (char *x, int shCount)
 
       break;
     case 6:			// AAAAAABB:CCCCCCDD
-
       emitcode ("anl", "a,#0x%02x",
 		SRMask[shCount]);	// 000000BB:CCCCCCDD
-
       emitcode ("mov", "c,acc.0");	// c = B
-
       emitcode ("xch", "a,%s", x);	// CCCCCCDD:000000BB
-
+#if 0
       AccAXRrl1 (x);		// BCCCCCCD:D000000B
-
       AccAXRrl1 (x);		// BBCCCCCC:DD000000
+#else
+      emitcode("rrc","a"); 
+      emitcode("xch","a,%s", x); 
+      emitcode("rrc","a"); 
+      emitcode("mov","c,acc.0"); //<< get correct bit 
+      emitcode("xch","a,%s", x); 
 
+      emitcode("rrc","a"); 
+      emitcode("xch","a,%s", x); 
+      emitcode("rrc","a"); 
+      emitcode("xch","a,%s", x); 
+#endif
       break;
     case 7:			// a:x <<= 7
 

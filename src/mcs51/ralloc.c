@@ -981,6 +981,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 	      (result = OP_SYMBOL (IC_RESULT (ic))) &&	/* has a result */
 	      result->liveTo > ic->seq &&	/* and will live beyond this */
 	      result->liveTo <= ebp->lSeq &&	/* does not go beyond this block */
+	      result->liveFrom == ic->seq &&    /* does not start before here */
 	      result->regType == sym->regType &&	/* same register types */
 	      result->nRegs &&	/* which needs registers */
 	      !result->isspilt &&	/* and does not already have them */
@@ -1409,7 +1410,7 @@ static void fillGaps()
 		bitVectBitValue(_G.totRegAssigned,i) == 0) /* and are still assigned to registers */
 		continue ;
 
-		clr = hTabItemWithKey(liveRanges,i);
+	    clr = hTabItemWithKey(liveRanges,i);
 	    assert(clr);
 
 	    /* mark these registers as used */

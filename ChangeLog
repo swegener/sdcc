@@ -1,3 +1,15 @@
+2004-08-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/mcs51/ralloc.c (deassignLR),
+	* src/ds390/ralloc.c (deassignLR),
+	* src/hc08/ralloc.c (deassignLR),
+	* src/z80/ralloc.c (deassignLR),
+	* src/pic/ralloc.c (deassignLR),
+	* src/pic16/ralloc.c (deassignLR),
+	* src/avr/ralloc.c (deassignLR),
+	* src/SDCClrange.c (findRecursiveSucc, findRecursivePred, findPrevUse,
+	rlivePoint): fixed another part of bug #971834
+
 2004-08-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/z80/main.c: enabled "critical" keyword

@@ -1032,6 +1032,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 	      (result = OP_SYMBOL (IC_RESULT (ic))) &&	/* has a result */
 	      result->liveTo > ic->seq &&	/* and will live beyond this */
 	      result->liveTo <= ebp->lSeq &&	/* does not go beyond this block */
+	      result->liveFrom == ic->seq &&    /* does not start before here */
 	      result->regType == sym->regType &&	/* same register types */
 	      result->nRegs &&	/* which needs registers */
 	      !result->isspilt &&	/* and does not already have them */

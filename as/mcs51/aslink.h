@@ -244,6 +244,7 @@ struct	area
 	struct	areax	*a_axp;	/* Area extension link */
 	Addr_T	a_addr;		/* Beginning address of area */
 	Addr_T	a_size;		/* Total size of the area */
+	Addr_T	a_unaloc;	/* Total number of unalocated bytes, for error reporting */
 	char	a_type;		/* Area subtype */
 	char	a_flag;		/* Flag byte */
 	char	a_id[NCPS];	/* Name */
@@ -577,6 +578,8 @@ extern	int	mflag;		/*	Map output flag
 				 */
 extern	int	sflag;		/*	JCF: Memory usage output flag
 				 */
+extern	int	packflag_and_stacksize;	/*	Pack data memory flag
+				 */
 extern	int	jflag;		/*	NoICE output flag
 				 */
 extern	int	xflag;		/*	Map file radix type flag
@@ -685,6 +688,7 @@ extern	VOID		chop_crlf();
 /* lkarea.c */
 extern	VOID		lkparea();
 extern	VOID		lnkarea();
+extern	VOID		lnkarea2();
 extern	VOID		lnksect();
 extern	VOID		newarea();
 
@@ -769,6 +773,7 @@ extern void             DefineNoICE( char *name, Addr_T value, int page );
 
 /* JCF: lkmem.c */
 extern int summary(struct area * xp);
+extern int summary2(struct area * xp);
 
 /* JCF: lkaomf51.c */
 extern void SaveLinkedFilePath(char * filepath);

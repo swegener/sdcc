@@ -79,7 +79,7 @@ void Areas51 (void)
 {
 	char * rel[]={
 		"XH",
-		"H 7 areas 0 global symbols",
+		"H B areas 0 global symbols",
 		"A _CODE size 0 flags 0",		/*Each .rel has one, so...*/
 		"A REG_BANK_0 size 0 flags 4",	/*Register banks are overlayable*/
 		"A REG_BANK_1 size 0 flags 4",
@@ -87,6 +87,10 @@ void Areas51 (void)
 		"A REG_BANK_3 size 0 flags 4",
 		"A BSEG size 0 flags 80",		/*BSEG must be just before BITS*/
 		"A BSEG_BYTES size 0 flags 0",	/*Size will be obtained from BSEG in lnkarea()*/
+		"A DSEG size 0 flags 0",
+		"A OSEG size 0 flags 4",
+		"A ISEG size 0 flags 0",
+		"A SSEG size 0 flags 4",
 		""
 	};
 	int j;
@@ -105,6 +109,10 @@ void Areas51 (void)
 		else if (!strcmp(ap->a_id, "REG_BANK_2")) { ap->a_addr=0x10; ap->a_type=1; }
 		else if (!strcmp(ap->a_id, "REG_BANK_3")) { ap->a_addr=0x18; ap->a_type=1; }
 		else if (!strcmp(ap->a_id, "BSEG_BYTES")) { ap->a_addr=0x20; ap->a_type=1; }
+		else if (!strcmp(ap->a_id, "SSEG"))
+        {
+            if(packflag_and_stacksize>1) ap->a_axp->a_size=packflag_and_stacksize;
+        }
 	}
 }
 
@@ -308,7 +316,10 @@ char *argv[];
 			/*
 			 * Link all area addresses.
 			 */
-			lnkarea();
+			if(!packflag_and_stacksize)
+                lnkarea();
+            else
+                lnkarea2();
 			/*
 			 * Process global definitions.
 			 */
@@ -335,9 +346,18 @@ char *argv[];
 				map();
 
 			if (sflag) /*JCF: memory usage summary output*/
-				if(summary(areap))lkexit(1);
+            {
+                if(!packflag_and_stacksize)
+                {
+				    if(summary(areap)) lkexit(1);
+                }
+                else
+                {
+				    if(summary2(areap)) lkexit(1);
+                }
+            }
 
-			if (iram_size)
+			if ((iram_size) && (!packflag_and_stacksize))
 				iramcheck();
 
 			/*
@@ -776,9 +796,14 @@ parse()
 					break;
 
 				case 'y': /*JCF: memory usage summary output*/
-				case 'Y':
 					++sflag;
 					break;
+
+                case 'Y':
+                    unget(getnb());
+                    /*The stack segment default size is 16 bytes.  Use -Yxx for xx bytes*/
+                    packflag_and_stacksize=(ip && *ip)?expr(0):16;
+                    break;
 
 				case 'j':
 				case 'J':
@@ -858,7 +883,7 @@ parse()
 					return(0);
 
 				case 'z':
-                                case 'Z':
+                case 'Z':
 				        dflag = 1;					
 					return(0);
 				default:

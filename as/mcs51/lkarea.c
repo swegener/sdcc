@@ -474,3 +474,325 @@ register struct area *tap;
 	    lkerr++;
 	}
 }
+
+void lnksect2 (struct area *tap, int rloc);
+char idatamap[256];
+
+/*Modified version of the functions for packing variables in internal data memory*/
+VOID lnkarea2 (void)
+{
+    Addr_T rloc[4]={0, 0, 0, 0};
+	int  locIndex;
+	char temp[NCPS];
+	struct sym *sp;
+	int j;
+    struct area *dseg_ap=NULL;
+	struct sym *sp_dseg_s, *sp_dseg_l;
+
+	for(j=0; j<256; j++) idatamap[j]=' ';
+
+	ap = areap;
+	while (ap)
+	{
+		/* Determine memory space */
+             if (ap->a_flag & A_CODE)  locIndex = 1;
+        else if (ap->a_flag & A_XDATA) locIndex = 2;
+        else if (ap->a_flag & A_BIT)   locIndex = 3;
+        else locIndex = 0;
+
+        if (ap->a_flag&A_ABS) /* Absolute sections */
+		{
+			lnksect2(ap, locIndex);
+		}
+		else /* Relocatable sections */
+		{
+			if (ap->a_type == 0)
+            {
+				ap->a_addr=rloc[locIndex];
+				ap->a_type=1;
+			}
+			
+			lnksect2(ap, locIndex);
+			rloc[locIndex] = ap->a_addr + ap->a_size;
+		}
+
+		/*
+		 * Create symbols called:
+		 *	s_<areaname>	the start address of the area
+		 *	l_<areaname>	the length of the area
+		 */
+
+		if (! symeq(ap->a_id, _abs_))
+		{
+			strncpy(temp+2,ap->a_id,NCPS-2);
+			*(temp+1) = '_';
+
+			*temp = 's';
+			sp = lkpsym(temp, 1);
+			sp->s_addr = ap->a_addr ;
+			sp->s_type |= S_DEF;
+            if (!strcmp(ap->a_id, "DSEG")) sp_dseg_s=sp;
+
+			*temp = 'l';
+			sp = lkpsym(temp, 1);
+			sp->s_addr = ap->a_size;
+			sp->s_axp = NULL;
+			sp->s_type |= S_DEF;
+            if (!strcmp(ap->a_id, "DSEG")) sp_dseg_l=sp;
+		}
+		
+		/*Since area BSEG is defined just before BSEG_BYTES, use the bit size of BSEG
+		to compute the byte size of BSEG_BYTES: */
+		if (!strcmp(ap->a_id, "BSEG"))
+        {
+			ap->a_ap->a_axp->a_size=(ap->a_addr/8)+((ap->a_size+7)/8); /*Bits to bytes*/
+		}
+        else if (!strcmp(ap->a_id, "DSEG"))
+        {
+            dseg_ap=ap; /*Need it later to set its correct size*/
+        }
+		ap = ap->a_ap;
+	}
+
+    /*Compute the size of DSEG*/
+    dseg_ap->a_addr=0;
+    dseg_ap->a_size=0;
+    for(j=0; j<0x80; j++) if(idatamap[j]!=' ') dseg_ap->a_size++;
+    sp_dseg_s->s_addr=0;
+    sp_dseg_l->s_addr=dseg_ap->a_size;
+
+#if 0
+    /*Print the memory map*/
+	fprintf(stderr, "Internal RAM layout:\n"
+           "      0 1 2 3 4 5 6 7 8 9 A B C D E F");
+    for(j=0; j<256; j++)
+	{
+		if(j%16==0) fprintf(stderr, "\n0x%02x:|", j);
+		fprintf(stderr, "%c|", idatamap[j]);
+	}
+	fprintf(stderr, "\n0-3:Reg Banks, a-z:Data, B:Bits, Q:Overlay, I:iData, S:Stack\n");
+#endif
+}
+
+void lnksect2 (struct area *tap, int rloc)
+{
+	register Addr_T size, addr;
+	register struct areax *taxp;
+	int j, k, ramlimit;
+    char fchar, dchar='a';
+    char ErrMsg[]="?ASlink-Error-Could not get %d consecutive byte%s" 
+                  " in internal RAM for area %s.\n";
+
+    tap->a_unaloc=0;
+    
+    /*Notice that only ISEG and SSEG can be in the indirectly addressable internal RAM*/
+    if( (!strcmp(tap->a_id, "ISEG")) || (!strcmp(tap->a_id, "SSEG")) )
+    {
+        if((iram_size<=0)||(iram_size>0x100))
+            ramlimit=0x100;
+        else
+            ramlimit=iram_size;
+    }
+    else
+    {
+        ramlimit=0x80;
+    }
+
+	size = 0;
+	addr = tap->a_addr;
+	if ((tap->a_flag&A_PAG) && (addr & 0xFF))
+    {
+	    fprintf(stderr,
+	    "\n?ASlink-Warning-Paged Area %8s Boundary Error\n", tap->a_id);
+	    lkerr++;
+	}
+	taxp = tap->a_axp;
+
+    /*Use a letter to identify each area in the internal RAM layout map*/
+    if(rloc==0)
+    {
+        /**/ if(!strcmp(tap->a_id, "DSEG"))
+            fchar='D'; /*It will be converted to letters 'a' to 'z' latter for each areax*/
+        else if(!strcmp(tap->a_id, "ISEG"))
+            fchar='I';
+        else if(!strcmp(tap->a_id, "SSEG"))
+            fchar='S';
+        else if(!strcmp(tap->a_id, "OSEG"))
+            fchar='Q';
+        else if(!strcmp(tap->a_id, "REG_BANK_0"))
+            fchar='0';
+        else if(!strcmp(tap->a_id, "REG_BANK_1"))
+            fchar='1';
+        else if(!strcmp(tap->a_id, "REG_BANK_2"))
+            fchar='2';
+        else if(!strcmp(tap->a_id, "REG_BANK_3"))
+            fchar='3';
+        else if(!strcmp(tap->a_id, "BSEG_BYTES"))
+            fchar='B';
+        else
+            fchar=' ';/*???*/
+    }
+    else
+    {
+        fchar=' ';
+    }
+
+	if (tap->a_flag&A_OVR) /* Overlayed sections */
+    {
+        while (taxp)
+        {
+            if ( (fchar=='0')||(fchar=='1')||(fchar=='2')||(fchar=='3') ) /*Reg banks*/
+            {
+                addr=(fchar-'0')*8;
+                taxp->a_addr=addr;
+                size=taxp->a_size;
+                for(j=addr; (j<(int)(addr+taxp->a_size)) && (j<ramlimit); j++)
+                    idatamap[j]=fchar;
+            }
+            else if( (fchar=='S') || (fchar=='Q') ) /*Overlay and stack in internal RAM*/
+            {
+                /*Find the size of the space currently used for this areax overlay*/
+                for(j=0, size=0; j<ramlimit; j++)
+                    if(idatamap[j]==fchar) size++;
+
+                /*If more space required, release the previously allocated areax in 
+                internal RAM and search for a bigger one*/
+                if((int)taxp->a_size>size)
+                {
+                    size=(int)taxp->a_size;
+
+                    for(j=0; j<ramlimit; j++)
+                        if(idatamap[j]==fchar) idatamap[j]=' ';
+               
+                    /*Search for a space large enough in data memory for this overlay areax*/
+                    for(j=0, k=0; j<ramlimit; j++)
+                    {
+                        if(idatamap[j]==' ')
+                            k++;
+                        else
+                            k=0;
+                        if(k==(int)taxp->a_size) break;
+                    }
+
+                    if(k==(int)taxp->a_size)
+                    {
+                        taxp->a_addr = j-k+1;
+                        if(addr<(unsigned int)ramlimit)
+                        {
+                            for(j=ramlimit-1; (j>=0)&&(idatamap[j]==' '); j--);
+                            if(j>=0) addr=j+1;
+                        }
+                    }
+                
+                    /*Mark the memory used for overlay*/
+                    if(k==(int)taxp->a_size)
+                    {
+                        for(j=taxp->a_addr; (j<(int)(taxp->a_addr+taxp->a_size)) && (j<ramlimit); j++)
+                            idatamap[j]=fchar;
+
+                        /*Set the new size of the data memory area*/
+                        size=ramlimit-addr;
+                    }
+                    else /*Couldn't find a chunk big enough: report the problem.*/
+                    {
+                        tap->a_unaloc=taxp->a_size;
+                        fprintf(stderr, ErrMsg, taxp->a_size, taxp->a_size>1?"s":"", tap->a_id);
+                        lkerr++;
+                    }
+               }
+                
+                for(j=0; j<ramlimit; j++)
+                {
+                    if (idatamap[j]==fchar)
+                    {
+                        addr=j;
+                        tap->a_addr=addr;
+               			taxp->a_addr=addr;
+                        break;
+                    }
+                }
+            }
+            else /*Overlay areas not in internal ram*/
+            {
+			    taxp->a_addr = addr;
+			    if (taxp->a_size > size) size = taxp->a_size;
+            }
+            taxp = taxp->a_axp;
+		}
+	}
+    else /* Concatenated sections */
+    {
+		while (taxp)
+        {
+			if( (fchar=='D') || (fchar=='I') )
+			{
+                if(taxp->a_size)
+                {
+                    /*Search for a space large enough in internal RAM for this areax*/
+                    for(j=0, k=0; j<ramlimit; j++)
+                    {
+                        if(idatamap[j]==' ')
+                            k++;
+                        else
+                            k=0;
+                        if(k==(int)taxp->a_size) break;
+                    }
+
+                    if(k==(int)taxp->a_size)
+                    {
+                        taxp->a_addr = j-k+1;
+                        if(addr<(unsigned int)ramlimit)
+                        {
+                            for(j=ramlimit-1; (j>=0)&&(idatamap[j]==' '); j--);
+                            if(j>=0) addr=j+1;
+                            size=ramlimit-addr;
+                        }
+                        
+                        for(j=taxp->a_addr; (j<(int)(taxp->a_addr+taxp->a_size)) && (j<ramlimit); j++)
+                            idatamap[j]=(fchar=='D')?dchar:fchar;
+                        if((taxp->a_size>0)&&(fchar=='D'))dchar++;
+                        if((dchar<'a')||(dchar>'z')) dchar='D'; /*Ran out of letters?*/
+                    }
+                    else /*We are in trouble, there is not enough memory for an areax chunk*/
+                    {
+                        taxp->a_addr = addr;
+                        addr += taxp->a_size;
+			            size += taxp->a_size;
+                        tap->a_unaloc+=taxp->a_size;
+                        fprintf(stderr, ErrMsg, taxp->a_size, taxp->a_size>1?"s":"", tap->a_id);
+                        lkerr++;
+                    }
+               }
+			   taxp = taxp->a_axp;
+			}
+            else if(fchar=='B')
+            {
+                if(taxp->a_size!=0)
+                {
+                    for(j=0x20+taxp->a_addr; j<((int)(0x20+taxp->a_addr+taxp->a_size)); j++)
+                        idatamap[j]=fchar;
+                }
+
+       			taxp->a_addr = addr;
+			    addr += taxp->a_size;
+			    size += taxp->a_size;
+			    taxp = taxp->a_axp;
+            }
+            else /*For concatenated BIT, CODE, and XRAM areax's*/
+            {
+       			taxp->a_addr = addr;
+			    addr += taxp->a_size;
+			    size += taxp->a_size;
+			    taxp = taxp->a_axp;
+            }
+		}
+	}
+	tap->a_size = size;
+
+	if ((tap->a_flag&A_PAG) && (size > 256))
+	{
+	    fprintf(stderr,
+	    "\n?ASlink-Warning-Paged Area %8s Length Error\n", tap->a_id);
+	    lkerr++;
+	}
+}

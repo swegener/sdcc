@@ -349,3 +349,157 @@ int summary(struct area * areap)
 	fclose(of);
 	return toreturn;		
 }
+
+extern char idatamap[]; //0:not used, 1:used
+
+
+int summary2(struct area * areap) 
+{
+	#define EQ(A,B) !as_strcmpi((A),(B))
+	#define MIN_STACK 16
+
+	char buff[128];
+	int j, toreturn=0;
+    long int Stack_Start=0;
+
+	struct area * xp;
+	FILE * of;
+	
+	/*Artifacts used for printing*/
+	char start[15], end[15], size[15], max[15];
+	char format[]="   %-16.16s %-8.8s %-8.8s %-8.8s %-8.8s\n";
+	char line[]="---------------------";
+
+	typedef struct
+	{
+		unsigned long Start;
+		unsigned long Size;
+		unsigned long Max;
+		char Name[NCPS];
+		unsigned long flag;
+	} _Mem;
+	
+	_Mem Stack={0xff,   0,     1, "STACK",				0x0000};
+	_Mem XRam= {0xffff, 0, 65536, "EXTERNAL RAM",		0x0100};
+	_Mem Rom=  {0xffff, 0, 65536, "ROM/EPROM/FLASH",	0x0200};
+	
+	if(rflag) /*For the DS390*/
+	{
+		XRam.Max=0x1000000; /*24 bits*/
+		XRam.Start=0xffffff;
+		Rom.Max=0x1000000;
+		Rom.Start=0xffffff;
+	}
+
+	/* Open Memory Summary File*/
+	of = afile(linkp->f_idp, "mem", 1);
+	if (of == NULL)
+	{
+		lkexit(1);
+	}
+
+	xp=areap;
+	while (xp)
+	{
+		if( EQ(xp->a_id, "CSEG") || EQ(xp->a_id, "GSINIT") ||
+				 EQ(xp->a_id, "GSFINAL") || EQ(xp->a_id, "HOME") )
+		{
+			Rom.Size+=xp->a_size;
+			if(xp->a_addr<Rom.Start) Rom.Start=xp->a_addr;
+		}
+		
+		else if (EQ(xp->a_id, "SSEG"))
+		{
+			Stack.Size+=xp->a_size;
+			if(xp->a_addr<Stack.Start) Stack.Start=xp->a_addr;
+		}
+
+		else if (EQ(xp->a_id, "XSEG") || EQ(xp->a_id, "XISEG")) 
+		{
+			XRam.Size+=xp->a_size;
+			if(xp->a_addr<XRam.Start) XRam.Start=xp->a_addr;
+		}
+
+		xp=xp->a_ap;
+	}
+
+	/*Report the Ram totals*/
+	fprintf(of, "Internal RAM layout:\n");
+	fprintf(of, "      0 1 2 3 4 5 6 7 8 9 A B C D E F");
+    for(j=0; j<256; j++)
+	{
+		if(j%16==0) fprintf(of, "\n0x%02x:|", j);
+		fprintf(of, "%c|", idatamap[j]);
+	}
+	fprintf(of, "\n0-3:Reg Banks, a-z:Data, B:Bits, Q:Overlay, I:iData, S:Stack\n");
+
+    for(j=0; j<256; j++)
+    {
+        if(idatamap[j]=='S')
+        {
+            Stack_Start=j;
+            break;
+        }
+    }
+    
+	xp=areap;
+	while (xp)
+    {
+        if(xp->a_unaloc>0)
+        {
+            fprintf(of, "\nERROR: Couldn't get %d byte%s allocated" 
+                        " in internal RAM for area %s.",
+                        xp->a_unaloc, xp->a_unaloc>1?"s":"", xp->a_id);
+            toreturn=1;
+        }
+		xp=xp->a_ap;
+    }
+
+	/*Report the position of the begining of the stack*/
+    if(Stack_Start!=256)
+	    fprintf(of, "\n%stack starts at: 0x%02lx (sp set to 0x%02lx)",
+		    rflag ? "16 bit mode initial s" : "S", Stack_Start, Stack_Start-1);
+    else
+        fprintf(of, "\nI don't have a clue where the stack ended up! Sorry...");
+
+	fprintf(of, "\n\nOther memory:\n");
+	fprintf(of, format, "Name", "Start", "End", "Size", "Max");
+	fprintf(of, format, line, line, line, line, line);
+
+	/*Report XRam totals:*/
+	sprintf(start, "0x%04lx", XRam.Start);
+	if(XRam.Size==0)
+		end[0]=0;/*Empty string*/
+	else
+		sprintf(end,  "0x%04lx", XRam.Size+XRam.Start-1);
+	sprintf(size, "%5lu", XRam.Size);
+	sprintf(max, "%5lu", xram_size<0?XRam.Max:xram_size);
+	fprintf(of, format, XRam.Name, start, end, size, max);
+
+	/*Report Rom/Flash totals:*/
+	sprintf(start, "0x%04lx", Rom.Start);
+	if(Rom.Size==0)
+		end[0]=0;/*Empty string*/
+	else
+		sprintf(end,  "0x%04lx", Rom.Size+Rom.Start-1);
+	sprintf(size, "%5lu", Rom.Size);
+	sprintf(max, "%5lu", code_size<0?Rom.Max:code_size);
+	fprintf(of, format, Rom.Name, start, end, size, max);
+
+	/*Report any excess:*/
+	if( ((XRam.Start+XRam.Size)>XRam.Max) ||
+		(((int)XRam.Size>xram_size)&&(xram_size>=0)) )
+	{
+		sprintf(buff, "Insufficient EXTERNAL RAM memory.\n");
+		REPORT_ERROR(buff, 1);
+	}
+	if( ((Rom.Start+Rom.Size)>Rom.Max) ||
+		(((int)Rom.Size>code_size)&&(code_size>=0)) )
+	{
+		sprintf(buff, "Insufficient ROM/EPROM/FLASH memory.\n");
+		REPORT_ERROR(buff, 1);
+	}
+
+	fclose(of);
+	return toreturn;		
+}

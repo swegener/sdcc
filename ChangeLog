@@ -1,3 +1,13 @@
+2004-01-04  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+	* as/mcs51/aslink.h, as/mcs51/lkarea.c, as/mcs51/lkdata.c,
+	as/mcs51/lkmain.c, as/mcs51/lkmem.c: 8051 linker can now pack
+	variables in unused register banks.  Also the SSEG is placed
+	wherever there is enough space for it, and IDATA can be anywhere
+	in internal RAM.  For now compile using	-Wl-Y[stack_size].
+	The mem file is different for this option as well, since it
+	makes no sense of talking about DSEG lenght.
+
 2004-01-02 Vangelis Rokas <vrokas@otenet.gr>
 
 	* src/SDCClrange.c: fixed bug 869095 that caused segfault

@@ -1,3 +1,7 @@
+2001-08-30  Paul Stoffregen  <paul@pjrc.com>
+
+	* added peepholes 223 to 231 to mcs51 port.  These improve code when using large model.
+
 2001-08-30  Michael Hope  <michaelh@juju.net.nz>
 
 	* device/lib/gbz80/crt0.s (init): Fixed up support for the gbz80 such that it will at least run (and fail badly) the regression tests.

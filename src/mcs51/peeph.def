@@ -1772,3 +1772,160 @@ replace {
 } by {
 	; removed dec/inc pair
 }
+
+replace {
+        mov     %1,dpl
+        mov     %2,dph
+        mov     dpl,%1
+        mov     dph,%2
+} by {
+        ; Peephole 223   removed redundant dph/dpl moves
+        mov     %1,dpl
+        mov     %2,dph
+}
+
+replace {
+        mov     %1,dpl
+        mov     (%1 + 1),dph
+        mov     dpl,%1
+        mov     dph,(%1 + 1)
+} by {
+        ; Peephole 224   removed redundant dph/dpl moves
+        mov     %1,dpl
+        mov     (%1 + 1),dph
+}
+
+replace {
+        mov     a,%1
+        movx    @dptr,a
+        mov     dpl,%2
+        mov     dph,%3
+        mov     b,%4
+        mov     a,%1
+} by {
+        ; Peephole 225   removed redundant move to acc
+        mov     a,%1
+        movx    @dptr,a
+        mov     dpl,%2
+        mov     dph,%3
+        mov     b,%4
+}
+
+replace {
+        clr  a
+        movx @dptr,a
+        inc  dptr
+        movx @dptr,a
+        inc     dptr
+        clr  a
+} by {
+        ; Peephole 226   removed unnecessary clr
+        clr     a
+        movx    @dptr,a
+        inc     dptr
+        movx    @dptr,a
+        inc     dptr
+}
+
+replace {
+        mov     dptr,#%1
+        clr     a
+        inc     dptr
+        inc     dptr
+        inc     dptr
+        movx    @dptr,a
+        lcall   __decdptr
+        movx    @dptr,a
+        lcall   __decdptr
+        movx    @dptr,a
+        lcall   __decdptr
+        movx    @dptr,a
+} by {
+        ; Peephole 227   replaced inefficient 32 bit clear
+        mov     dptr,#%1
+        clr     a
+        movx    @dptr,a
+        inc     dptr
+        movx    @dptr,a
+        inc     dptr
+        movx    @dptr,a
+        inc     dptr
+        movx    @dptr,a
+        mov     dptr,#%1
+}
+
+replace {
+        mov     dptr,#%1
+        clr     a
+        inc     dptr
+        inc     dptr
+        inc     dptr
+        movx    @dptr,a
+        lcall   __decdptr
+        movx    @dptr,a
+        lcall   __decdptr
+        movx    @dptr,a
+        lcall   __decdptr
+        mov     a,#%2
+        movx    @dptr,a
+} by {
+        ; Peephole 228   replaced inefficient 32 constant
+        mov     dptr,#%1
+        mov     a, #%2
+        movx    @dptr,a
+        inc     dptr
+        clr     a
+        movx    @dptr,a
+        inc     dptr
+        movx    @dptr,a
+        inc     dptr
+        movx    @dptr,a
+        mov     dptr,#%1
+}
+
+replace {
+        mov     dptr,#%1
+        clr     a
+        inc     dptr
+        movx    @dptr,a
+        lcall   __decdptr
+        movx    @dptr,a
+} by {
+        ; Peephole 229   replaced inefficient 16 bit clear
+        mov     dptr,#%1
+        clr     a
+        movx    @dptr,a
+        inc     dptr
+        movx    @dptr,a
+        mov     dptr,#%1
+}
+
+replace {
+        mov     dptr,#%1
+        clr     a
+        inc     dptr
+        movx    @dptr,a
+        lcall   __decdptr
+        mov     a,#%2
+        movx    @dptr,a
+} by {
+        ; Peephole 230   replaced inefficient 16 constant
+        mov     dptr,#%1
+        mov     a,#%2
+        movx    @dptr,a
+        inc     dptr
+        clr     a
+        movx    @dptr,a
+        mov     dptr,#%1
+}
+
+// this last peephole often removes the last mov from 227-230
+replace {
+        mov     dptr,#%1
+        mov     dptr,#%2
+} by {
+        ; Peephole 231   removed redundant mov to dptr
+        mov     dptr,#%2
+}
+
+

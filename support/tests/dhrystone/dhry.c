@@ -12,6 +12,11 @@
     * Removed malloc's for a couple of static arrays.
     * Into one file.
 
+    Notes:
+    * The comment at the start of Func_1 about the input being
+      H, R on the first call is wrong - Func_1 is first called
+      from Func_2 where the input is R, Y.  The test still succeeds.
+
     I couldnt find a copyright in the original - the most relevent
     part follows:
 
@@ -59,6 +64,9 @@ Enumeration Func_1 (Capital_Letter Ch_1_Par_Val, Capital_Letter Ch_2_Par_Val);
 Boolean Func_2 (char *Str_1_Par_Ref, char *Str_2_Par_Ref);
 Boolean Func_3 (Enumeration Enum_Par_Val);
 
+void printf(const char *format, ...);
+void exit(int val);
+
 int _main(void) 
 {
     One_Fifty       Int_1_Loc;
@@ -71,9 +79,7 @@ int _main(void)
     REG   int             Run_Index;
     REG   int             Number_Of_Runs;
 
-#if !SDCC
     printf("[dhry]\n");
-#endif
 
     Next_Ptr_Glob = &_r[0];
     Ptr_Glob = &_r[1];
@@ -82,6 +88,7 @@ int _main(void)
     Ptr_Glob->Discr                       = Ident_1;
     Ptr_Glob->variant.var_1.Enum_Comp     = Ident_3;
     Ptr_Glob->variant.var_1.Int_Comp      = 40;
+
     strcpy (Ptr_Glob->variant.var_1.Str_Comp, 
 	    "DHRYSTONE PROGRAM, SOME STRING");
     strcpy (Str_1_Loc, "DHRYSTONE PROGRAM, 1'ST STRING");
@@ -96,6 +103,7 @@ int _main(void)
 
     /* Main test loop */
     for (Run_Index = 1; Run_Index <= Number_Of_Runs; ++Run_Index) {
+	printf("Proc_5\n");
 	Proc_5();
 	Proc_4();
 	/* Ch_1_Glob == 'A', Ch_2_Glob == 'B', Bool_Glob == true */
@@ -103,26 +111,34 @@ int _main(void)
 	Int_2_Loc = 3;
 	strcpy (Str_2_Loc, "DHRYSTONE PROGRAM, 2'ND STRING");
 	Enum_Loc = Ident_2;
+	printf("Func_2\n");
 	Bool_Glob = ! Func_2 (Str_1_Loc, Str_2_Loc);
 	/* Bool_Glob == 1 */
 	while (Int_1_Loc < Int_2_Loc)  /* loop body executed once */
 	    {
+		printf("m.1 Executes once.\n");
 		Int_3_Loc = 5 * Int_1_Loc - Int_2_Loc;
 		/* Int_3_Loc == 7 */
+		printf("Proc_7\n");
 		Proc_7 (Int_1_Loc, Int_2_Loc, &Int_3_Loc);
 		/* Int_3_Loc == 7 */
 		Int_1_Loc += 1;
 	    } /* while */
+	printf("m.2 Check above executed once.\n");
 	/* Int_1_Loc == 3, Int_2_Loc == 3, Int_3_Loc == 7 */
+	printf("Proc_8\n");
 	Proc_8 (Arr_1_Glob, Arr_2_Glob, Int_1_Loc, Int_3_Loc);
 	/* Int_Glob == 5 */
+	printf("Proc_1\n");
 	Proc_1 (Ptr_Glob);
 	for (Ch_Index = 'A'; Ch_Index <= Ch_2_Glob; ++Ch_Index)
 	    /* loop body executed twice */
 	    {
+		printf("Func_1\n");
 		if (Enum_Loc == Func_1 (Ch_Index, 'C'))
 		    /* then, not executed */
 		    {
+			printf("Proc_6\n");
 			Proc_6 (Ident_1, &Enum_Loc);
 			strcpy (Str_2_Loc, "DHRYSTONE PROGRAM, 3'RD STRING");
 			Int_2_Loc = Run_Index;
@@ -134,11 +150,13 @@ int _main(void)
 	Int_1_Loc = Int_2_Loc / Int_3_Loc;
 	Int_2_Loc = 7 * (Int_2_Loc - Int_3_Loc) - Int_1_Loc;
 	/* Int_1_Loc == 1, Int_2_Loc == 13, Int_3_Loc == 7 */
+	printf("Proc_2\n");
 	Proc_2 (&Int_1_Loc);
 	/* Int_1_Loc == 5 */
-
+	printf("Looping.\n");
     } /* loop "for Run_Index" */
 
+    printf("Done.\n");
 #if !SDCC
     printf ("Execution ends\n");
     printf ("\n");
@@ -234,16 +252,23 @@ void Proc_2 (One_Fifty *Int_Par_Ref)
     One_Fifty  Int_Loc;  
     Enumeration   Enum_Loc;
 
+    printf("-> Proc_2\n");
+
     Int_Loc = *Int_Par_Ref + 10;
-    do /* executed once */
+    do {
+	printf("1\n");
+	/* executed once */
 	if (Ch_1_Glob == 'A')
 	    /* then, executed */
 	    {
+		printf("2\n");
 		Int_Loc -= 1;
 		*Int_Par_Ref = Int_Loc - Int_Glob;
 		Enum_Loc = Ident_1;
 	    } /* if */
-    while (Enum_Loc != Ident_1); /* true */
+	printf("3\n");
+    } while (Enum_Loc != Ident_1); /* true */
+    printf("Proc_2 done.\n");
 } /* Proc_2 */
 
 
@@ -258,16 +283,20 @@ void Proc_3 (Rec_Pointer *Ptr_Ref_Par)
     Proc_7 (10, Int_Glob, &Ptr_Glob->variant.var_1.Int_Comp);
 } /* Proc_3 */
 
-
 void Proc_4 (void) /* without parameters */
     /*******/
     /* executed once */
 {
     Boolean Bool_Loc;
 
+    printf("-> Proc_4\n");
     Bool_Loc = Ch_1_Glob == 'A';
     Bool_Glob = Bool_Loc | Bool_Glob;
     Ch_2_Glob = 'B';
+    printf("Expect Ch_1_Glob '%c' == 'A'\n", (char)Ch_1_Glob);
+    printf("       Ch_2_Glob '%c' == 'B'\n", (char)Ch_2_Glob);
+    printf("       Bool_Loc %d == 1\n", (unsigned)Bool_Loc);
+    printf("       Bool_Glob %d == 1\n", (unsigned)Bool_Glob);
 } /* Proc_4 */
 
 
@@ -321,11 +350,16 @@ Enumeration Func_1 (Capital_Letter Ch_1_Par_Val, Capital_Letter Ch_2_Par_Val)
     Capital_Letter        Ch_1_Loc;
     Capital_Letter        Ch_2_Loc;
 
+    printf("-> Func_1\n");
+    printf("  Inputs: Ch_1_Par_Val '%c' == { H, A, B }\n", (char)Ch_1_Par_Val);
+    printf("          Ch_2_Par_Val '%c' == { R, C, C }\n", (char)Ch_2_Par_Val);
+
     Ch_1_Loc = Ch_1_Par_Val;
     Ch_2_Loc = Ch_1_Loc;
-    if (Ch_2_Loc != Ch_2_Par_Val)
+    if (Ch_2_Loc != Ch_2_Par_Val) {
 	/* then, executed */
 	return (Ident_1);
+    }
     else  /* not executed */
 	{
 	    Ch_1_Glob = Ch_1_Loc;
@@ -396,15 +430,34 @@ Boolean Func_2 (char *Str_1_Par_Ref, char *Str_2_Par_Ref)
     REG One_Thirty        Int_Loc;
     Capital_Letter    Ch_Loc;
 
+    printf("-> Func_2\n");
+    printf("  Inputs Str_1_Par_Ref \"%s\" = \"DHRYSTONE PROGRAM, 1'ST STRING\"\n", Str_1_Par_Ref);
+    printf("         Str_2_Par_Ref \"%s\" = \"DHRYSTONE PROGRAM, 2'ND STRING\"\n", Str_2_Par_Ref);
+
     Int_Loc = 2;
-    while (Int_Loc <= 2) /* loop body executed once */
+
+    while (Int_Loc <= 2) {
+#if BROKEN_SDCC
+	char a, b;
+	printf("  2.1 Runs once Int_Loc %u = 2.\n", (unsigned)Int_Loc);
+	/* loop body executed once */
+	a = Str_1_Par_Ref[Int_Loc];
+	b = Str_2_Par_Ref[Int_Loc+1];
+	if (Func_1 (a, b) == Ident_1)
+#else
 	if (Func_1 (Str_1_Par_Ref[Int_Loc],
 		    Str_2_Par_Ref[Int_Loc+1]) == Ident_1)
+#endif
 	    /* then, executed */
 	    {
+		printf("  2.3 Then OK.\n");
 		Ch_Loc = 'A';
 		Int_Loc += 1;
 	    } /* if, while */
+	else {
+	    printf("  2.2 Error.\n");
+	}
+    }
     if (Ch_Loc >= 'W' && Ch_Loc < 'Z')
 	/* then, not executed */
 	Int_Loc = 7;

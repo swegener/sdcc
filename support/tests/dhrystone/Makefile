@@ -3,7 +3,7 @@
 CC = /home/michaelh/projects/sdcc/bin/sdcc
 # -DNOENUM is here to make the results more predictable
 CFLAGS = -mz80 -v
-CFLAGS += -DREG= -DNOSTRUCTASSIGN -DNOENUM
+CFLAGS += -DREG= -DNOSTRUCTASSIGN -DNOENUM -DBROKEN_SDCC=1
 LIBDIR = /home/michaelh/projects/sdcc/device/lib/z80/
 LD = link-z80
 

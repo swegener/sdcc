@@ -734,6 +734,7 @@ static void aopPut (asmop *aop, char *s, int offset)
 	if (!offset && (strcmp(s,"acc") == 0))
 	    break;
 	if (offset>0) {
+	    
 	    emitcode("", "; Error aopPut AOP_ACC");
 	}
 	else {
@@ -1715,34 +1716,13 @@ static void genCmp (operand *left,operand *right,
             while (size--) {
 		/* Do a long subtract */
                 MOVA(aopGet(AOP(left),offset,FALSE));
-                if (sign && size == 0) {
-		    /* Case where it's signed and we've hit the end */
-		    /* PENDING: This is almost certanitly wrong.
-		       On the 8051 xrl doesnt change C, but xor does.
-		    */
-                    emitcode("xor","a,#0x80");
-                    if (AOP_TYPE(right) == AOP_LIT){
-                        unsigned long lit = (unsigned long)
-			    floatFromVal(AOP(right)->aopu.aop_lit);
-                        emitcode("sbc","a,#0x%02x",
-				 0x80 ^ (unsigned int)((lit >> (offset*8)) & 0x0FFL));
-                    } else {
-			/* The bad way... */
-			emitcode("push", "af");
-                        emitcode("ld","a,%s",aopGet(AOP(right),offset++,FALSE));
-			emitcode("xor", "a,#0x80");
-			emitcode("ld", "l,a");
-			emitcode("pop", "af");
-                        emitcode("sbc","a,l");
-                    }
-                } else {
-		    /* Subtract through, propagating the carry */
-		    if (offset==0) {
-			emitcode("sub","a,%s",aopGet(AOP(right),offset++,FALSE));
-		    }
-		    else
-			emitcode("sbc","a,%s",aopGet(AOP(right),offset++,FALSE));
+		/* PENDING: CRITICAL: support signed cmp's */
+		/* Subtract through, propagating the carry */
+		if (offset==0) {
+		    emitcode("sub","a,%s",aopGet(AOP(right),offset++,FALSE));
 		}
+		else
+		    emitcode("sbc","a,%s",aopGet(AOP(right),offset++,FALSE));
             }
         }
     }
@@ -2281,7 +2261,7 @@ static void genOr (iCode *ic, iCode *ifx)
     aopOp((right= IC_RIGHT(ic)),ic,FALSE);
     aopOp((result=IC_RESULT(ic)),ic,TRUE);
 
-#ifdef DEBUG_TYPE
+#if 1
     emitcode("","; Type res[%d] = l[%d]&r[%d]",
              AOP_TYPE(result),
              AOP_TYPE(left), AOP_TYPE(right));
@@ -2336,17 +2316,17 @@ static void genOr (iCode *ic, iCode *ifx)
                 if(((lit >> (offset*8)) & 0x0FFL) == 0x00L)
                     continue;
                 else 
-		    emitcode("or","%s,%s",
+		    emitcode("or","%s,%s; 5",
 			     aopGet(AOP(left),offset,FALSE),
 			     aopGet(AOP(right),offset,FALSE));
             } else {
 		if (AOP_TYPE(left) == AOP_ACC) 
-		    emitcode("or","a,%s",aopGet(AOP(right),offset,FALSE));
+		    emitcode("or","a,%s ; 6",aopGet(AOP(right),offset,FALSE));
 		else {		    
 		    MOVA(aopGet(AOP(right),offset,FALSE));
-		    emitcode("or","a,%s",
+		    emitcode("or","a,%s ; 7",
 			     aopGet(AOP(left),offset,FALSE));
-		    aopPut(AOP(result),"a",0);
+		    aopPut(AOP(result),"a ; 8",0);
 		}
             }
         }
@@ -2373,9 +2353,11 @@ static void genOr (iCode *ic, iCode *ifx)
 		MOVA(aopGet(AOP(right),offset,FALSE));
 		emitcode("or","a,%s",
 			 aopGet(AOP(left),offset,FALSE));
-		aopPut(AOP(result),"a",0);
 	    }
 	    aopPut(AOP(result),"a",offset);			
+	    /* PENDING: something weird is going on here.  Add exception. */
+	    if (AOP_TYPE(result) == AOP_ACC)
+		break;
         }
     }
 

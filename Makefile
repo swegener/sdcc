@@ -26,7 +26,8 @@ all: checkconf
 install:
 	$(MAKE) -f main.mk install
 	@for pkg in $(PKGS); do\
-	  cd $$pkg && $(MAKE) install; cd ..;\
+	  CURDIR=`pwd`;\
+	  cd $$pkg && $(MAKE) install; cd $(CURDIR);\
 	done
 
 
@@ -35,7 +36,8 @@ install:
 uninstall:
 	$(MAKE) -f main.mk uninstall
 	@for pkg in $(PKGS); do\
-	  cd cmd && $(MAKE) uninstall; cd ..;\
+	  CURDIR=`pwd`;\
+	  cd cmd && $(MAKE) uninstall; cd $(CURDIR);\
 	done
 
 
@@ -45,31 +47,35 @@ clean:
 	$(MAKE) -f clean.mk clean
 	for pkg in $(PKGS); do $(MAKE) -C $$pkg clean; done
 	@for prj in $(PRJS); do\
-	  cd $$prj && $(MAKE) clean; cd ..;\
+	  CURDIR=`pwd`;\
+	  cd $$prj && $(MAKE) clean; cd $(CURDIR);\
 	done
- 
+
 
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------
 distclean: clean
 	$(MAKE) -f clean.mk distclean
 	@for pkg in $(PKGS); do\
-	  cd $$pkg && $(MAKE) -f clean.mk distclean; cd ..;\
+	  CURDIR=`pwd`;\
+	  cd $$pkg && $(MAKE) -f clean.mk distclean; cd $(CURDIR);\
 	done
 	@for prj in $(PRJS); do\
 	  cd $$prj && $(MAKE) distclean; cd ..;\
 	done
- 
+
 
 # Like clean but some files may still exist
 # -----------------------------------------
 mostlyclean: clean
 	$(MAKE) -f clean.mk mostlyclean
 	@for pkg in $(PKGS); do\
-	  cd $$pkg && $(MAKE) -f clean.mk mostlyclean; cd ..;\
+	  CURDIR=`pwd`;\
+	  cd $$pkg && $(MAKE) -f clean.mk mostlyclean; cd $(CURDIR);\
 	done
 	@for prj in $(PRJS); do\
-	  cd $$prj && $(MAKE) mostlyclean; cd ..;\
+	  CURDIR=`pwd`;\
+	  cd $$prj && $(MAKE) mostlyclean; cd $(CURDIR);\
 	done
 
 
@@ -79,10 +85,12 @@ mostlyclean: clean
 realclean: distclean
 	$(MAKE) -f clean.mk realclean
 	@for pkg in $(PKGS); do\
-	  cd $$pkg && $(MAKE) -f clean.mk realclean; cd ..;\
+	  CURDIR=`pwd`;\
+	  cd $$pkg && $(MAKE) -f clean.mk realclean; cd $(CURDIR);\
 	done
 	@for prj in $(PRJS); do\
-	  cd $$prj && $(MAKE) realclean; cd ..;\
+	  CURDIR=`pwd`;\
+	  cd $$prj && $(MAKE) realclean; cd $(CURDIR);\
 	done
 
 
@@ -111,7 +119,8 @@ installcheck:
 dep:
 	$(MAKE) -f main.mk dep
 	@for pkg in $(PKGS); do\
-	  cd $$pkg && $(MAKE) dep; cd ..;\
+	  CURDIR=`pwd`;\
+	  cd $$pkg && $(MAKE) dep; cd $(CURDIR);\
 	done
 
 

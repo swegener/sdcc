@@ -1,12 +1,20 @@
+2003-07-12  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+    * sdcc.dsw, all.dsp, link/z80/linkgbz80.dsp, as/z80/as-gbz80.dsp:
+    added gbz80 build to MSVC project.
+    * src/SDCCmain.c, src/SDCCglue.c, src/z80/main.c, src/z80/z80.dsp,
+    link/z80/aslink.h, linkz80.dsp: cleaned up z80 and gbz80 asm files
+    from 8051 stuff and setup so it links using a .lnk file.
+
 2003-07-06  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
     * support/librarian/sdcclib.c: sdcc librarian.
-	* as/mcs51/aslink.h, as/mcs51/lklib.c: Support for libraries created
-	with sdcclib.
+    * as/mcs51/aslink.h, as/mcs51/lklib.c: Support for libraries created
+    with sdcclib.
 
 2003-07-03  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
-	* as/mcs51/lkmain.c: properly handle extensions in function afile.
+    * as/mcs51/lkmain.c: properly handle extensions in function afile.
 
 2003-07-02  Borut Razem <borut.razem@siol.net>
 

@@ -48,6 +48,8 @@
 #endif
 #endif
 
+// #define BETTER_LITERAL_SHIFT
+
 char *aopLiteral (value * val, int offset);
 
 /* this is the down and dirty file with all kinds of
@@ -6080,8 +6082,7 @@ shiftR1Left2Result (operand * left, int offl,
 }
 #endif
 
-#if 0
-//REMOVE ME!!!
+#ifdef BETTER_LITERAL_SHIFT
 /*-----------------------------------------------------------------*/
 /* shiftL1Left2Result - shift left one byte from left to result    */
 /*-----------------------------------------------------------------*/
@@ -6089,17 +6090,14 @@ static void
 shiftL1Left2Result (operand * left, int offl,
 		    operand * result, int offr, int shCount)
 {
-  char *l;
-  l = aopGet (AOP (left), offl, FALSE, FALSE, TRUE);
-  MOVA (l);
+  MOVA(aopGet (AOP (left), offl, FALSE, FALSE, TRUE));
   /* shift left accumulator */
   AccLsh (shCount);
   aopPut (AOP (result), "a", offr);
 }
 #endif
 
-#if 0
-//REMOVE ME!!!
+#ifdef BETTER_LITERAL_SHIFT
 /*-----------------------------------------------------------------*/
 /* movLeft2Result - move byte from left to result                  */
 /*-----------------------------------------------------------------*/
@@ -6109,18 +6107,20 @@ movLeft2Result (operand * left, int offl,
 {
   char *l;
   if (!sameRegs (AOP (left), AOP (result)) || (offl != offr))
-    {
-      l = aopGet (AOP (left), offl, FALSE, FALSE, FALSE);
+  {
+      l = aopGet (AOP (left), offl, FALSE, FALSE, TRUE);
 
       if (*l == '@' && (IS_AOP_PREG (result)))
-	{
+      {
 	  emitcode ("mov", "a,%s", l);
 	  aopPut (AOP (result), "a", offr);
-	}
+      }
       else
-	{
+      {
 	  if (!sign)
+	  {
 	    aopPut (AOP (result), l, offr);
+	  }
 	  else
 	    {
 	      /* MSB sign in acc.7 ! */
@@ -6130,13 +6130,12 @@ movLeft2Result (operand * left, int offl,
 		  aopPut (AOP (result), "a", offr);
 		}
 	    }
-	}
-    }
+      }
+  }
 }
 #endif
 
-#if 0
-//REMOVE ME!!!
+#ifdef BETTER_LITERAL_SHIFT
 /*-----------------------------------------------------------------*/
 /* AccAXRrl1 - right rotate c->a:x->c by 1                         */
 /*-----------------------------------------------------------------*/
@@ -6165,8 +6164,7 @@ AccAXLrl1 (char *x)
 }
 #endif
 
-#if 0
-//REMOVE ME!!!
+#ifdef BETTER_LITERAL_SHIFT
 /*-----------------------------------------------------------------*/
 /* AccAXLsh1 - left shift a:x<-0 by 1                              */
 /*-----------------------------------------------------------------*/
@@ -6180,8 +6178,7 @@ AccAXLsh1 (char *x)
 }
 #endif
 
-#if 0
-//REMOVE ME!!!
+#ifdef BETTER_LITERAL_SHIFT
 /*-----------------------------------------------------------------*/
 /* AccAXLsh - left shift a:x by known count (0..7)                 */
 /*-----------------------------------------------------------------*/
@@ -6451,8 +6448,7 @@ AccAXRshS (char *x, int shCount)
 }
 #endif
 
-#if 0
-//REMOVE ME!!!
+#ifdef BETTER_LITERAL_SHIFT
 /*-----------------------------------------------------------------*/
 /* shiftL2Left2Result - shift left two bytes from left to result   */
 /*-----------------------------------------------------------------*/
@@ -6460,21 +6456,78 @@ static void
 shiftL2Left2Result (operand * left, int offl,
 		    operand * result, int offr, int shCount)
 {
-  if (sameRegs (AOP (result), AOP (left)) &&
-      ((offl + MSB16) == offr))
-    {
-      /* don't crash result[offr] */
-      MOVA (aopGet (AOP (left), offl, FALSE, FALSE, TRUE));
-      emitcode ("xch", "a,%s", aopGet (AOP (left), offl + MSB16, FALSE, FALSE, FALSE));
-    }
+  char *lsb;
+  
+  // Get the initial value from left into a pair of registers.
+  // MSB must be in A, LSB can be any register.
+  //
+  // If the result is held in registers, it is an optimization
+  // if the LSB can be held in the register which will hold the,
+  // result LSB since this saves us from having to copy it into
+  // the result following AccAXLsh.
+  //
+  // If the result is addressed indirectly, this is not a gain.
+  if (AOP_NEEDSACC(result))
+  {
+       char *leftByte;
+       
+       D(emitcode(";", "watch me do the hambone!"););
+       _startLazyDPSEvaluation();
+       if (AOP_TYPE(left) == AOP_DPTR2)
+       {
+           // Get MSB in A.
+       	   MOVA(aopGet(AOP(left), offl + MSB16, FALSE, FALSE, TRUE));
+       	   // get LSB in DP2_RESULT_REG.
+       	   leftByte = aopGet(AOP(left), offl, FALSE, FALSE, FALSE);
+       	   assert(!strcmp(leftByte, DP2_RESULT_REG));
+       }
+       else
+       {
+           // get LSB into DP2_RESULT_REG
+       	   leftByte = aopGet (AOP(left), offl, FALSE, FALSE, TRUE);
+           if (strcmp(leftByte, DP2_RESULT_REG))
+           {
+               emitcode("mov","%s,%s", DP2_RESULT_REG, leftByte);
+       	   }
+       	   // And MSB in A.
+       	   leftByte = aopGet(AOP(left), offl + MSB16, FALSE, FALSE, TRUE);
+       	   assert(strcmp(leftByte, DP2_RESULT_REG));
+       	   MOVA(leftByte);
+       }
+       _endLazyDPSEvaluation();
+       lsb = DP2_RESULT_REG;
+  }
   else
-    {
-      movLeft2Result (left, offl, result, offr, 0);
-      MOVA (aopGet (AOP (left), offl + MSB16, FALSE, FALSE, TRUE));
-    }
-  /* ax << shCount (x = lsb(result)) */
-  AccAXLsh (aopGet (AOP (result), offr, FALSE, FALSE, FALSE), shCount);
+  {
+      if (sameRegs (AOP (result), AOP (left)) &&
+      	((offl + MSB16) == offr))
+      {
+      	  /* don't crash result[offr] */
+      	  MOVA(aopGet(AOP(left), offl, FALSE, FALSE, TRUE));
+      	  emitcode ("xch", "a,%s", 
+      	  	    aopGet(AOP(left), offl + MSB16, FALSE, FALSE, FALSE));
+      }
+      else
+      {
+      	  movLeft2Result (left, offl, result, offr, 0);
+      	  MOVA (aopGet (AOP (left), offl + MSB16, FALSE, FALSE, TRUE));
+      }
+      lsb = aopGet(AOP (result), offr, FALSE, FALSE, FALSE);
+      assert(strcmp(lsb,"a"));      
+  }
+  AccAXLsh (lsb, shCount);
+  
+  _startLazyDPSEvaluation();
+  if (AOP_NEEDSACC(result))
+  {
+      /* We have to explicitly update the result LSB.
+       */
+      emitcode("xch","a,%s", lsb);
+      aopPut(AOP(result), "a", offr);
+      emitcode("mov","a,%s", lsb);
+  }
   aopPut (AOP (result), "a", offr + MSB16);
+  _endLazyDPSEvaluation();
 }
 #endif
 
@@ -6548,22 +6601,19 @@ shiftRLeftOrResult (operand * left, int offl,
 }
 #endif
 
-#if 0
-//REMOVE ME!!!
+#ifdef BETTER_LITERAL_SHIFT
 /*-----------------------------------------------------------------*/
 /* genlshOne - left shift a one byte quantity by known count       */
 /*-----------------------------------------------------------------*/
 static void
 genlshOne (operand * result, operand * left, int shCount)
 {
-  D (emitcode (";", "genlshOne ");
-    );
+  D (emitcode (";", "genlshOne "););
   shiftL1Left2Result (left, LSB, result, LSB, shCount);
 }
 #endif
 
-#if 0
-//REMOVE ME!!!
+#ifdef BETTER_LITERAL_SHIFT
 /*-----------------------------------------------------------------*/
 /* genlshTwo - left shift two bytes by known amount != 0           */
 /*-----------------------------------------------------------------*/
@@ -6572,33 +6622,47 @@ genlshTwo (operand * result, operand * left, int shCount)
 {
   int size;
 
-  D (emitcode (";", "genlshTwo ");
-    );
+  D (emitcode (";", "genlshTwo "););
 
   size = getDataSize (result);
 
   /* if shCount >= 8 */
   if (shCount >= 8)
-    {
+  {
       shCount -= 8;
 
+      _startLazyDPSEvaluation();
+      aopPut (AOP (result), zero, LSB);
       if (size > 1)
 	{
 	  if (shCount)
+	  {
+	    _endLazyDPSEvaluation();
 	    shiftL1Left2Result (left, LSB, result, MSB16, shCount);
+	  }
 	  else
+	  {
 	    movLeft2Result (left, LSB, result, MSB16, 0);
+	    _endLazyDPSEvaluation();
+	  }
 	}
-      aopPut (AOP (result), zero, LSB);
-    }
+	else
+	{
+	  _endLazyDPSEvaluation();
+	}
+  }
 
   /*  1 <= shCount <= 7 */
   else
     {
       if (size == 1)
+      {
 	shiftL1Left2Result (left, LSB, result, LSB, shCount);
+      }
       else
+      {
 	shiftL2Left2Result (left, LSB, result, LSB, shCount);
+      }
     }
 }
 #endif
@@ -6774,12 +6838,11 @@ genlshFour (operand * result, operand * left, int shCount)
 }
 #endif
 
-#if 0
-//REMOVE ME!!!
+#ifdef BETTER_LITERAL_SHIFT
 /*-----------------------------------------------------------------*/
 /* genLeftShiftLiteral - left shifting by known count              */
 /*-----------------------------------------------------------------*/
-static void
+static bool
 genLeftShiftLiteral (operand * left,
 		     operand * right,
 		     operand * result,
@@ -6788,16 +6851,44 @@ genLeftShiftLiteral (operand * left,
   int shCount = (int) floatFromVal (AOP (right)->aopu.aop_lit);
   int size;
 
-  D (emitcode (";", "genLeftShiftLiteral (%d)", shCount);
-    );
+  size = getSize (operandType (result));
+
+  D(emitcode (";", "genLeftShiftLiteral (%d), size %d", shCount, size););
+
+  /* We only handle certain easy cases so far. */
+  if ((shCount != 0)
+   && (shCount < (size * 8))
+   && (size != 1)
+   && (size != 2))
+  {
+      D(emitcode (";", "genLeftShiftLiteral wimping out"););	
+      return FALSE;
+  }
 
   freeAsmop (right, NULL, ic, TRUE);
 
-  aopOp (left, ic, FALSE, FALSE);
-  aopOp (result, ic, FALSE, TRUE);
+  aopOp(left, ic, FALSE, FALSE);
+  aopOp(result, ic, FALSE, (AOP_TYPE(left) == AOP_DPTR));
 
-  size = getSize (operandType (result));
-
+#if 1 // debug spew
+  if (IS_SYMOP(left) && OP_SYMBOL(left)->aop)
+  {
+  	emitcode(";", "left (%s) is %d", OP_SYMBOL(left)->rname, AOP_TYPE(left));
+  	if (!IS_TRUE_SYMOP(left) && OP_SYMBOL(left)->usl.spillLoc)
+  	{
+  	   emitcode(";", "\taka %s", OP_SYMBOL(left)->usl.spillLoc->rname);
+  	}
+  }
+  if (IS_SYMOP(result) && OP_SYMBOL(result)->aop)
+  {
+  	emitcode(";", "result (%s) is %d", OP_SYMBOL(result)->rname, AOP_TYPE(result));
+  	if (!IS_TRUE_SYMOP(result) && OP_SYMBOL(result)->usl.spillLoc)
+  	{
+  	   emitcode(";", "\taka %s", OP_SYMBOL(result)->usl.spillLoc->rname);
+  	}  	
+  }  
+#endif
+  
 #if VIEW_SIZE
   emitcode ("; shift left ", "result %d, left %d", size,
 	    AOP_SIZE (left));
@@ -6805,18 +6896,25 @@ genLeftShiftLiteral (operand * left,
 
   /* I suppose that the left size >= result size */
   if (shCount == 0)
-    {
-      while (size--)
+  {
+  	_startLazyDPSEvaluation();
+      	while (size--)
 	{
 	  movLeft2Result (left, size, result, size, 0);
 	}
-    }
-
+	_endLazyDPSEvaluation();
+  }
   else if (shCount >= (size * 8))
+  {
+    _startLazyDPSEvaluation();
     while (size--)
-      aopPut (AOP (result), zero, size);
-  else
     {
+      aopPut (AOP (result), zero, size);
+    }
+    _endLazyDPSEvaluation();
+  }
+  else
+  {
       switch (size)
 	{
 	case 1:
@@ -6824,17 +6922,21 @@ genLeftShiftLiteral (operand * left,
 	  break;
 
 	case 2:
-	case 3:		/* bug: this is for generic pointers, I bet. */
 	  genlshTwo (result, left, shCount);
 	  break;
-
+#if 0
 	case 4:
 	  genlshFour (result, left, shCount);
+	  break;
+#endif
+	default:
+	  fprintf(stderr, "*** ack! mystery literal shift!\n");	  
 	  break;
 	}
     }
   freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
+  return TRUE;
 }
 #endif
 
@@ -6857,13 +6959,16 @@ genLeftShift (iCode * ic)
 
   aopOp (right, ic, FALSE, FALSE);
 
-#if 0
+
+#ifdef BETTER_LITERAL_SHIFT
   /* if the shift count is known then do it
      as efficiently as possible */
   if (AOP_TYPE (right) == AOP_LIT)
     {
-      genLeftShiftLiteral (left, right, result, ic);
-      return;
+      if (genLeftShiftLiteral (left, right, result, ic))
+      {
+      	return;
+      }
     }
 #endif
 

@@ -23,8 +23,14 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
-unsigned char _gptrgetc ()
+
+/* the  return value is expected to be in acc, and not in the standard
+ * location dpl. Therefore we choose return type void here: */
+void
+_gptrgetc (char *gptr)
 {
+    gptr; /* hush the compiler */
+
     _asm
     ;   save values passed
 	xch    a,r0

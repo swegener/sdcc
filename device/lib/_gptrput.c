@@ -23,8 +23,13 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
-unsigned char _gptrput ()
+/* the  return value is expected to be in acc, and not in the standard
+ * location dpl. Therefore we choose return type void here: */
+void
+_gptrput (char *gptr, char c)
 {
+    gptr; c; /* hush the compiler */
+
     _asm
 	push     acc
     ;
@@ -74,7 +79,8 @@ _endasm;
 }
 
 #ifdef SDCC_ds390
-unsigned char _gptrputWord ()
+void
+_gptrputWord ()
 {
     _asm
 	push     acc

@@ -23,8 +23,14 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
-unsigned char _gptrget ()
+
+/* the  return value is expected to be in acc, and not in the standard
+ * location dpl. Therefore we choose return type void here: */
+void
+_gptrget (char *gptr)
 {
+    gptr; /* hush the compiler */
+	
     _asm
     ;   save values passed
 	xch    a,r0
@@ -82,12 +88,16 @@ unsigned char _gptrget ()
         pop     acc
 	xch     a,r0
      _endasm ;
-
 }
 
 #ifdef SDCC_ds390
-unsigned int _gptrgetWord ()
+/* the  return value is expected to be in acc/_ap, and not in the standard
+ * location dpl/dph. Therefore we choose return type void here: */
+void
+_gptrgetWord (unsigned *gptr)
 {
+    gptr; /* hush the compiler */
+
     _asm
     ;
     ;   depending on the pointer type acc. to SDCCsymt.h

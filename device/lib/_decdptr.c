@@ -23,8 +23,12 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
-unsigned char _decdptr ()
+/* the return value is already in dph/dpl */
+void
+_decdptr (char *gptr)
 {
+	gptr; /* hush the compiler */
+
 #ifdef SDCC_ds390    
     	_asm
         orl dps, #0xc0

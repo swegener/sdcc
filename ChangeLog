@@ -1,3 +1,11 @@
+2003-04-03  Bernhard Held <bernhard@bernhardheld.de>
+
+	* _decdptr.c: fix return values
+	* _gptrget.c: fix return values
+	* _gptrgetc.c: fix return values
+	* _gptrput.c: fix return values
+	* _mulint.c: fix return values
+
 2003-04-02  Bernhard Held <bernhard@bernhardheld.de>
 
 	* Makefile.common.in: unused PORT, SCC and SAS removed, fixed docdir

@@ -1813,6 +1813,7 @@ glue (void)
    * the post_static_name area will immediately follow the static_name
    * area.
    */
+  tfprintf (asmFile, "\t!area\n", port->mem.code_name);
   tfprintf (asmFile, "\t!area\n", port->mem.static_name);       /* MOF */
   tfprintf (asmFile, "\t!area\n", port->mem.post_static_name);
   tfprintf (asmFile, "\t!area\n", port->mem.static_name);

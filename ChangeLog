@@ -1,3 +1,8 @@
+2003-07-24  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCicode.c (operandOperation): fixed problem with bitops and 0xffffffff;
+	after {double d = 0xffffffff; long l = d;} l will be 0x80000000 (LONG_MIN)
+
 2003-07-23  Bernhard Held <bernhard@bernhardheld.de>
 
 	added DUMMY_READ_VOLATILE:

@@ -1143,16 +1143,16 @@ operandOperation (operand * left, operand * right,
 			       operandLitValue (right));
       break;
     case BITWISEAND:
-      retval = operandFromLit ((long)operandLitValue(left) & 
-			       (long)operandLitValue(right));
+      retval = operandFromLit ((unsigned long)operandLitValue(left) & 
+			       (unsigned long)operandLitValue(right));
       break;
     case '|':
-      retval = operandFromLit ((long)operandLitValue (left) |
-			       (long)operandLitValue (right));
+      retval = operandFromLit ((unsigned long)operandLitValue (left) |
+			       (unsigned long)operandLitValue (right));
       break;
     case '^':
-      retval = operandFromLit ((long)operandLitValue (left) ^
-			       (long)operandLitValue (right));
+      retval = operandFromLit ((unsigned long)operandLitValue (left) ^
+			       (unsigned long)operandLitValue (right));
       break;
     case AND_OP:
       retval = operandFromLit (operandLitValue (left) &&
@@ -1164,7 +1164,7 @@ operandOperation (operand * left, operand * right,
       break;
     case RRC:
       {
-	long i = (long) operandLitValue (left);
+	unsigned long i = (unsigned long) operandLitValue (left);
 
 	retval = operandFromLit ((i >> (getSize (operandType (left)) * 8 - 1)) |
 				 (i << 1));
@@ -1172,7 +1172,7 @@ operandOperation (operand * left, operand * right,
       break;
     case RLC:
       {
-	long i = (long) operandLitValue (left);
+	unsigned long i = (unsigned long) operandLitValue (left);
 
 	retval = operandFromLit ((i << (getSize (operandType (left)) * 8 - 1)) |
 				 (i >> 1));
@@ -1184,7 +1184,7 @@ operandOperation (operand * left, operand * right,
       break;
 
     case '~':
-      retval = operandFromLit (~((long) operandLitValue (left)));
+      retval = operandFromLit (~((unsigned long) operandLitValue (left)));
       break;
 
     case '!':

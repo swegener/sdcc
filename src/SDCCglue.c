@@ -31,10 +31,6 @@
 #include <unistd.h>
 #endif
 
-#if defined (__MINGW32__)
-#include <windows.h>    // let's see if it win32api is available
-#endif
-
 symbol *interrupts[256];
 
 void printIval (symbol *, sym_link *, initList *, FILE *);

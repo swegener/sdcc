@@ -5779,7 +5779,17 @@ genAnd (iCode * ic, iCode * ifx)
           MOVA (aopGet (AOP (left), posbit >> 3, FALSE, FALSE));
           // bit = left & 2^n
           if (size)
-            emitcode ("mov", "c,acc.%d", posbit & 0x07);
+            {
+              switch (posbit & 0x07)
+                {
+                  case 0: emitcode ("rrc", "a");
+                          break;
+                  case 7: emitcode ("rlc", "a");
+                          break;
+                  default: emitcode ("mov", "c,acc.%d", posbit & 0x07);
+                          break;
+                }            
+            }
           // if(left &  2^n)
           else
             {

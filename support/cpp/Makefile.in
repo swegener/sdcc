@@ -42,7 +42,7 @@ SLIBOBJS	= NewAlloc.o
 OBJECTS		= cppalloc.o cpperror.o cppexp.o cpphash.o cpplib.o cppmain.o support.o
 SOURCES		= $(patsubst %.o,%.c,$(OBJECTS))
 
-TARGET		= $(PRJDIR)/bin/sdcpp
+TARGET		= $(PRJDIR)/bin/sdcppold
 
 transform       = @program_transform_name@
 
@@ -56,13 +56,13 @@ $(TARGET): $(SLIBOBJS) $(OBJECTS)
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) $(TARGET) `echo $(bindir)/sdcpp|sed '$(transform)'`
-	$(STRIP) -s `echo $(bindir)/sdcpp|sed '$(transform)'`
+	$(INSTALL) $(TARGET) `echo $(bindir)/sdcppold|sed '$(transform)'`
+	$(STRIP) -s `echo $(bindir)/sdcppold|sed '$(transform)'`
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(bindir)/sdcpp
+	rm -f $(bindir)/sdcppold
 
 
 # Performing self-test

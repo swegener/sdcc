@@ -27,7 +27,7 @@ OBJECTS         = cppalloc.obj cpperror.obj cppexp.obj cpphash.obj cpplib.obj cp
 
 SLIBOBJS	= $(SLIB)\NewAlloc.obj
 
-TARGET          = $(PRJDIR)\bin\sdcpp.exe
+TARGET          = $(PRJDIR)\bin\sdcppold.exe
 
 
 # Compiling entire program or any subproject

@@ -1347,6 +1347,8 @@ void  pCodeInitRegisters(void)
 	stkSize = 8; // Set pseudo stack size to 8
 	initStack(shareBankAddress, stkSize); // Putting the pseudo stack in shared memory so all modules use the same register when passing fn parameters
 	init_pic(port->processor);
+	if ((unsigned)shareBankAddress > getMaxRam())
+		shareBankAddress = (int)getMaxRam();
 	
 	pc_status.r = allocProcessorRegister(IDX_STATUS,"STATUS", PO_STATUS, 0x180);
 	pc_pcl.r = allocProcessorRegister(IDX_PCL,"PCL", PO_PCL, 0x80);

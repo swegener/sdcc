@@ -58,7 +58,7 @@ static PIC_device Pics[] = {
 			(memRange *)NULL,
 			(memRange *)NULL,
 			0,
-			0xcf,
+			0x4f, /* 68 register available 0x0C to 0x4F (0x8C to 0xCF mapped to bank 0) */
 			0x80,
 	},
 	

@@ -943,6 +943,7 @@ addSymChain (symbol * symHead)
 {
   symbol *sym = symHead;
   symbol *csym = NULL;
+  int bothSymbolsExtern;
 
 
   for (; sym != NULL; sym = sym->next)
@@ -950,16 +951,18 @@ addSymChain (symbol * symHead)
       changePointer(sym);
 
       /* if already exists in the symbol table then check if
-         the previous was an extern definition if yes then
+         one of them is an extern definition if yes then
          then check if the type match, if the types match then
          delete the current entry and add the new entry      */
       if ((csym = findSymWithLevel (SymbolTab, sym)) &&
 	  csym->level == sym->level)
 	{
 
-	  /* previous definition extern ? */
-	  if (IS_EXTERN (csym->etype))
+	  /* one definition extern ? */
+	  if (IS_EXTERN (csym->etype) || IS_EXTERN (sym->etype))
 	    {
+	      bothSymbolsExtern=
+		IS_EXTERN (csym->etype) && IS_EXTERN (sym->etype);
 	      /* do types match ? */
 	      if (compareType (csym->type, sym->type) != 1)
 		/* no then error */
@@ -967,6 +970,10 @@ addSymChain (symbol * symHead)
 
 	      /* delete current entry */
 	      deleteSym (SymbolTab, csym, csym->name);
+
+	      /* this isn't really needed, but alla */
+	      sym->etype->select.s._extern=bothSymbolsExtern;
+
 	      /* add new entry */
 	      addSym (SymbolTab, sym, sym->name, sym->level, sym->block, 1);
 	    }

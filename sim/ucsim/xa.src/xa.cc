@@ -66,7 +66,7 @@ cl_xa::init(void)
   wmem_direct = (TYPE_UWORD *) &mem_direct[0];
 
   /* initialize SP to 100H */
-  set_reg2(7*2, 0x100);
+  set_reg2(7, 0x100);
 
   printf("The XA Simulator is in development, UNSTABLE, DEVELOPERS ONLY!\n");
 
@@ -157,7 +157,25 @@ cl_xa::longest_inst(void)
 }
 
 /*--------------------------------------------------------------------
-get_disasm_info -
+get_disasm_info - Given an address, return information about the opcode
+  which resides there.
+  addr - address of opcode we want information on.
+  ret_len - return length of opcode.
+  ret_branch - return a character which indicates if we are
+    a branching opcode.  Used by main app to implement "Next"
+    function which steps over functions.
+  immed_offset - return a number which represents the number of bytes
+    offset to where any immediate data is(tail end of opcode).  Used
+    for printing disassembly.
+  operands - return a key indicating the form of the operands,
+    used for printing the disassembly.
+  mnemonic - return a key indicating the mnemonic of the instruction.
+
+  Return value: Return the operand code formed by either the single
+  byte opcode or 2 bytes of the opcode for multi-byte opcodes.
+
+  Note: Any of the return pointer parameters can be set to NULL to
+    indicate the caller does not want the information.
 |--------------------------------------------------------------------*/
 int
 cl_xa::get_disasm_info(t_addr addr,
@@ -227,7 +245,9 @@ static char *b_reg_strs[] = {
  "R7l", "R7h"};
 
 /*--------------------------------------------------------------------
-disass -
+disass - Disassemble an opcode.
+    addr - address of opcode to disassemble/print.
+    sep - optionally points to string(tab) to use as separator.
 |--------------------------------------------------------------------*/
 char *
 cl_xa::disass(t_addr addr, char *sep)
@@ -440,15 +460,15 @@ cl_xa::disass(t_addr addr, char *sep)
     case DIRECT_DATA4 :
       strcpy(parm_str, "DIRECT_DATA4");
     break;
-    case DIRECT_ALONE :
+    case DIRECT :
       sprintf(parm_str, "0x%03x",
 	      ((code & 0x007) << 4) + get_mem(MEM_ROM, addr+2));
     break;
-    case REG_ALONE :
+    case REG :
       sprintf(parm_str, "%s",
               reg_strs[((code >> 4) & 0xf)] );
     break;
-    case IREG_ALONE :
+    case IREG :
       sprintf(parm_str, "[%s]",
               reg_strs[((code >> 4) & 0xf)] );
     break;
@@ -557,7 +577,8 @@ cl_xa::disass(t_addr addr, char *sep)
 }
 
 /*--------------------------------------------------------------------
- print_regs -
+ print_regs - Print the registers, flags and other useful information.
+   Used to print a status line while stepping through the code.
 |--------------------------------------------------------------------*/
 void
 cl_xa::print_regs(class cl_console *con)
@@ -567,7 +588,7 @@ cl_xa::print_regs(class cl_console *con)
   flags = get_psw();
   con->dd_printf("CA---VNZ  Flags: %02x ", flags);
   con->dd_printf("R0:%04x R1:%04x R2:%04x R3:%04x\n",
-                 get_reg(1,0), get_reg(1,2), get_reg(1,4), get_reg(1,6));
+                 reg2(0), reg2(1), reg2(2), reg2(3));
 
   con->dd_printf("%c%c---%c%c%c            ",
          (flags & BIT_C)?'1':'0',
@@ -577,18 +598,17 @@ cl_xa::print_regs(class cl_console *con)
          (flags & BIT_Z)?'1':'0');
 
   con->dd_printf("R4:%04x R5:%04x R6:%04x R7(SP):%04x ES:%04x  DS:%04x\n",
-            get_reg(1,8), get_reg(1,10), get_reg(1,12), get_reg(1,14), 0, 0);
+                 reg2(4), reg2(5), reg2(6), reg2(7), 0, 0);
 
   print_disass(PC, con);
 }
 
 
-/*
- * Execution
- */
-
-int
-cl_xa::exec_inst(void)
+/*--------------------------------------------------------------------
+ exec_inst - Called to implement simulator execution of 1 instruction
+   at the current PC(program counter) address.
+|--------------------------------------------------------------------*/
+int cl_xa::exec_inst(void)
 {
   t_mem code1;
   uint code;
@@ -632,46 +652,122 @@ cl_xa::exec_inst(void)
     return inst_ADD(code, operands);
     case ADDC:
     return inst_ADDC(code, operands);
-    case SUB:
-    return inst_SUB(code, operands);
-    case SUBB:
-    return inst_SUBB(code, operands);
-    case CMP:
-    return inst_CMP(code, operands);
-    case AND:
-    return inst_AND(code, operands);
-    case OR:
-    return inst_OR(code, operands);
-    case XOR:
-    return inst_XOR(code, operands);
     case ADDS:
     return inst_ADDS(code, operands);
-    case NEG:
-    return inst_NEG(code, operands);
-    case SEXT:
-    return inst_SEXT(code, operands);
-    case MUL:
-    return inst_MUL(code, operands);
+    case AND:
+    return inst_AND(code, operands);
+    case ANL:
+    return inst_ANL(code, operands);
+    case ASL:
+    return inst_ASL(code, operands);
+    case ASR:
+    return inst_ASR(code, operands);
+    case BCC:
+    return inst_BCC(code, operands);
+    case BCS:
+    return inst_BCS(code, operands);
+    case BEQ:
+    return inst_BEQ(code, operands);
+    case BG:
+    return inst_BG(code, operands);
+    case BGE:
+    return inst_BGE(code, operands);
+    case BGT:
+    return inst_BGT(code, operands);
+    case BKPT:
+    return inst_BKPT(code, operands);
+    case BL:
+    return inst_BL(code, operands);
+    case BLE:
+    return inst_BLE(code, operands);
+    case BLT:
+    return inst_BLT(code, operands);
+    case BMI:
+    return inst_BMI(code, operands);
+    case BNE:
+    return inst_BNE(code, operands);
+    case BNV:
+    return inst_BNV(code, operands);
+    case BOV:
+    return inst_BOV(code, operands);
+    case BPL:
+    return inst_BPL(code, operands);
+    case BR:
+    return inst_BR(code, operands);
+    case CALL:
+    return inst_CALL(code, operands);
+    case CJNE:
+    return inst_CJNE(code, operands);
+    case CLR:
+    return inst_CLR(code, operands);
+    case CMP:
+    return inst_CMP(code, operands);
+    case CPL:
+    return inst_CPL(code, operands);
+    case DA:
+    return inst_DA(code, operands);
     case DIV_w :
     case DIV_d :
     case DIVU_b:
     case DIVU_w:
     case DIVU_d:
     return inst_DIV(code, operands);
-    case DA:
-    return inst_DA(code, operands);
-    case ASL:
-    return inst_ASL(code, operands);
-    case ASR:
-    return inst_ASR(code, operands);
+    case DJNZ:
+    return inst_DJNZ(code, operands);
+    case FCALL:
+    return inst_FCALL(code, operands);
+    case FJMP:
+    return inst_FJMP(code, operands);
+    case JB:
+    return inst_JB(code, operands);
+    case JBC:
+    return inst_JBC(code, operands);
+    case JMP:
+    return inst_JMP(code, operands);
+    case JNB:
+    return inst_JNB(code, operands);
+    case JNZ:
+    return inst_JNZ(code, operands);
+    case JZ:
+    return inst_JZ(code, operands);
     case LEA:
     return inst_LEA(code, operands);
-    case CPL:
-    return inst_CPL(code, operands);
     case LSR:
     return inst_LSR(code, operands);
+    case MOV:
+    return inst_MOV(code, operands);
+    case MOVC:
+    return inst_MOVC(code, operands);
+    case MOVS:
+    return inst_MOVS(code, operands);
+    case MOVX:
+    return inst_MOVX(code, operands);
+    case MUL_w:
+    case MULU_b:
+    case MULU_w:
+    return inst_MUL(code, operands);
+    case NEG:
+    return inst_NEG(code, operands);
+    case NOP:
+    return inst_NOP(code, operands);
     case NORM:
     return inst_NORM(code, operands);
+    case OR:
+    return inst_OR(code, operands);
+    case ORL:
+    return inst_ORL(code, operands);
+    case POP:
+    case POPU:
+    return inst_POP(code, operands);
+    case PUSH:
+    case PUSHU:
+    return inst_PUSH(code, operands);
+    case RESET:
+    return inst_RESET(code, operands);
+    case RET:
+    return inst_RET(code, operands);
+    case RETI:
+    return inst_RETI(code, operands);
     case RL:
     return inst_RL(code, operands);
     case RLC:
@@ -680,60 +776,21 @@ cl_xa::exec_inst(void)
     return inst_RR(code, operands);
     case RRC:
     return inst_RRC(code, operands);
-    case MOVS:
-    return inst_MOVS(code, operands);
-    case MOVC:
-    return inst_MOVC(code, operands);
-    case MOVX:
-    return inst_MOVX(code, operands);
-    case PUSH:
-    return inst_PUSH(code, operands);
-    case POP:
-    return inst_POP(code, operands);
-    case XCH:
-    return inst_XCH(code, operands);
     case SETB:
     return inst_SETB(code, operands);
-    case CLR:
-    return inst_CLR(code, operands);
-    case MOV:
-    return inst_MOV(code, operands);
-    case ANL:
-    return inst_ANL(code, operands);
-    case ORL:
-    return inst_ORL(code, operands);
-    case BEQ:
-    return inst_BEQ(code, operands);
-    case BR:
-    return inst_BR(code, operands);
-    case JMP:
-    return inst_JMP(code, operands);
-    case CALL:
-    return inst_CALL(code, operands);
-    case RET:
-    return inst_RET(code, operands);
-    case BCC:
-    return inst_Bcc(code, operands);
-    case JB:
-    return inst_JB(code, operands);
-    case JNB:
-    return inst_JNB(code, operands);
-    case CJNE:
-    return inst_CJNE(code, operands);
-    case DJNZ:
-    return inst_DJNZ(code, operands);
-    case JZ:
-    return inst_JZ(code, operands);
-    case JNZ:
-    return inst_JNZ(code, operands);
-    case NOP:
-    return inst_NOP(code, operands);
-    case BKPT:
-    return inst_BKPT(code, operands);
+    case SEXT:
+    return inst_SEXT(code, operands);
+    case SUB:
+    return inst_SUB(code, operands);
+    case SUBB:
+    return inst_SUBB(code, operands);
     case TRAP:
     return inst_TRAP(code, operands);
-    case RESET:
-    return inst_RESET(code, operands);
+    case XCH:
+    return inst_XCH(code, operands);
+    case XOR:
+    return inst_XOR(code, operands);
+
     case BAD_OPCODE:
     default:
     break;

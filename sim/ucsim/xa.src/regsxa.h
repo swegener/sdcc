@@ -76,7 +76,7 @@ struct t_regs
 #define fetch1() fetch()
 
 /* get a 1 or 2 byte register */
-#define reg2(_index) get_reg(1, (_index))
+#define reg2(_index) get_reg(1, (_index<<1)) /* function in inst.cc */
 #define reg1(_index) (unsigned char)get_reg(0, (_index))
 
 #define set_byte_direct(_index, _value) { \
@@ -93,9 +93,9 @@ struct t_regs
 
 #define set_reg2(_index, _value) { \
   if ((_index) < 3) { /* banked */ \
-     set_word_direct((0x400+_index), _value); \
+     set_word_direct((0x400+(_index<<1)), _value); \
   } else { /* non-banked */ \
-     set_word_direct((0x400+_index), _value); \
+     set_word_direct((0x400+(_index<<1)), _value); \
   } \
 }
 
@@ -121,10 +121,23 @@ struct t_regs
 #define get_psw() ((TYPE_UWORD)(get_word_direct(0x400+(0x80*2))))
 #define set_psw(_flags) set_word_direct(0x400+(0x80*2), _flags)
 
+// PSW bits...
+#define BIT_C  0x80
+#define BIT_AC 0x40
+#define BIT_V  0x04
+#define BIT_N  0x02
+#define BIT_Z  0x01
+#define BIT_ALL (BIT_C | BIT_AC | BIT_V | BIT_N | BIT_Z)
+
+
 #if 0
 --------------------------------------------------------------------
-Notes:
- Register layout:
+Developer Notes.
+
+This user guide has got the detailed information on the XA chip. 
+
+http://www.semiconductors.philips.com/acrobat/various/XA_USER_GUIDE_1.pdf
+
 
 f: {unused slot(word accessable only) for R8-R15}
 e: R7h,R7l  Stack pointer, ptr to USP(PSW.SM=0), or SSP(PSW.SM=1)
@@ -133,7 +146,7 @@ a: R5h,R5l
 8: R4h,R4l
 below are the banked registers which mirror(B0..B3) depending on
 PSW.(RS0,RS1)
-6: R3h,R3l                  
+6: R3h,R3l
 4: R2h,R2l
 2: R1h,R1l
 0: R0h,R0l
@@ -184,17 +197,9 @@ PSW Flags: Carry(C), Aux Carry(AC), Overflow(V), Negative(N), Zero(Z).
 
 Stack ptr is pre-decremented, followed by load(word operation),
 default SPs are set to 100H.  So first PUSH would go to FEH-FFH.
-
+--------------------------------------------------------------------
 #endif
 
-
-// PSW bits...
-#define BIT_C  0x80
-#define BIT_AC 0x40
-#define BIT_V  0x04
-#define BIT_N  0x02
-#define BIT_Z  0x01
-#define BIT_ALL (BIT_C | BIT_AC | BIT_V | BIT_N | BIT_Z)
 
 #endif
 /* End of xa.src/regsxa.h */

@@ -37,55 +37,18 @@ char *op_mnemonic_str[] = {
 "BAD_OPCODE",
 "ADD",
 "ADDC",
-"SUB",
-"SUBB",
-"CMP",
-"AND",
-"OR",
-"XOR",
 "ADDS",
-"NEG",
-"SEXT",
-"MUL",
-"DIV.w",
-"DIV.d",
-"DIVU.b",
-"DIVU.w",
-"DIVU.d",
-"DA",
+"AND",
+"ANL",
 "ASL",
 "ASR",
-"LEA",
-"CPL",
-"LSR",
-"NORM",
-"RL",
-"RLC",
-"RR",
-"RRC",
-"MOVS",
-"MOVC",
-"MOVX",
-"PUSH",
-"PUSHU",
-"POP",
-"POPU",
-"XCH",
-"SETB",
-"CLR",
-"MOV",
-"ANL",
-"ORL",
-"JMP",
-"CALL",
-"RET",
-"RETI",
 "BCC",
 "BCS",
 "BEQ",
 "BG",
 "BGE",
 "BGT",
+"BKPT",
 "BL",
 "BLE",
 "BLT",
@@ -95,20 +58,58 @@ char *op_mnemonic_str[] = {
 "BOV",
 "BPL",
 "BR",
-"JB",
-"JBC",
-"JNB",
+"CALL",
 "CJNE",
+"CLR",
+"CMP",
+"CPL",
+"DA",
+"DIV_w",
+"DIV_d",
+"DIVU_b",
+"DIVU_w",
+"DIVU_d",
 "DJNZ",
-"JZ",
-"JNZ",
-"NOP",
-"BKPT",
-"TRAP",
-"RESET",
 "FCALL",
 "FJMP",
-"IREG",
+"JB",
+"JBC",
+"JMP",
+"JNB",
+"JNZ",
+"JZ",
+"LEA",
+"LSR",
+"MOV",
+"MOVC",
+"MOVS",
+"MOVX",
+"MUL_w",
+"MULU_b",
+"MULU_w",
+"NEG",
+"NOP",
+"NORM",
+"OR",
+"ORL",
+"POP",
+"POPU",
+"PUSH",
+"PUSHU",
+"RESET",
+"RET",
+"RETI",
+"RL",
+"RLC",
+"RR",
+"RRC",
+"SETB",
+"SEXT",
+"SUB",
+"SUBB",
+"TRAP",
+"XCH",
+"XOR",
 };
 
 /* this is junk, but we need to keep it until main ucSim code
@@ -203,8 +204,10 @@ struct xa_dis_entry disass_xa[]= {
 
  {0x0840,0xfffc,' ',3,ANL, C_BIT           }, //  ANL C, bit                 0 0 0 0 1 0 0 0  0 1 0 0 0 0 b b
  {0x0850,0xfffc,' ',3,ANL, C_NOTBIT        }, //  ANL C, /bit                0 0 0 0 1 0 0 0  0 1 0 1 0 0 b b
- {0x0850,0xfffc,' ',3,ASL, REG_REG         }, //  ASL Rd, Rs                 1 1 0 0 S S 0 1  d d d d s s s s
- /* ASR(3) */
+ {0xc150,0xf300,' ',3,ASL, REG_REG         }, //  ASL Rd, Rs                 1 1 0 0 S S 0 1  d d d d s s s s
+ /* 2 more ASL cases */
+ {0xc250,0xf300,' ',3,ASR, REG_REG         }, //  ASR Rd, Rs                 1 1 0 0 S S 1 0  d d d d s s s s
+ /* 2 more ASR cases */
  {0xf000,0xff00,' ',2,BCC, REL8            }, //  BCC rel8                   1 1 1 1 0 0 0 0  rel8
  {0xf100,0xff00,' ',2,BCS, REL8            }, //  BCS rel8                   1 1 1 1 0 0 0 1  rel8
  {0xf300,0xff00,' ',2,BEQ, REL8            }, //  BEQ rel8                   1 1 1 1 0 0 1 1  rel8
@@ -225,7 +228,7 @@ struct xa_dis_entry disass_xa[]= {
  {0xfe00,0xff00,' ',2,BR, REL8             }, //  BR rel8                    1 1 1 1 1 1 1 0  rel8
 
  {0xc500,0xff00,' ',3,CALL, REL16          }, //  CALL rel16                 1 1 0 0 0 1 0 1  rel16
- {0xc600,0xfff8,' ',2,CALL, IREG_ALONE     }, //  CALL [Rs]                  1 1 0 0 0 1 1 0  0 0 0 0 0 s s s
+ {0xc600,0xfff8,' ',2,CALL, IREG           }, //  CALL [Rs]                  1 1 0 0 0 1 1 0  0 0 0 0 0 s s s
 
  {0xe200,0xf708,' ',4,CJNE, REG_DIRECT_REL8}, //  CJNE Rd, direct, rel8      1 1 1 0 S 0 1 0  d d d d 0 x x x
  {0xe300,0xff0f,' ',4,CJNE, REG_DATA8_REL8},  //  CJNE Rd, data8, rel8       1 1 1 0 0 0 1 1  d d d d 0 0 0 0
@@ -233,7 +236,7 @@ struct xa_dis_entry disass_xa[]= {
  {0xe308,0xff8f,' ',4,CJNE, IREG_DATA8_REL8}, //  CJNE [Rd], data8, rel8     1 1 1 0 0 0 1 1  0 d d d 1 0 0 0
  {0xeb08,0xff8f,' ',5,CJNE, IREG_DATA16_REL8},//  CJNE [Rd], data16, rel8    1 1 1 0 1 0 1 1  0 d d d 1 0 0 0
 
- {0x0800,0xfffc,' ',3,CLR, BIT_ALONE      },   // CLR bit                    0 0 0 0 1 0 0 0  0 0 0 0 0 0 b b 
+ {0x0800,0xfffc,' ',3,CLR, BIT_ALONE       },   // CLR bit                    0 0 0 0 1 0 0 0  0 0 0 0 0 0 b b 
  {0x4100,0xf700,' ',2,CMP, REG_REG         },  // CMP Rd, Rs                 0 1 0 0 S 0 0 1  d d d d s s s s
  {0x4200,0xf708,' ',2,CMP, REG_IREG        },  // CMP Rd, [Rs]               0 1 0 0 S 0 1 0  d d d d 0 s s s
  {0x4208,0xf708,' ',2,CMP, IREG_REG        },  // CMP [Rd], Rs               0 1 0 0 S 0 1 0  s s s s 1 d d d
@@ -257,11 +260,8 @@ struct xa_dis_entry disass_xa[]= {
  {0x9d04,0xff8f,' ',6,CMP, IREGOFF16_DATA16},  // CMP [Rd+offset16], #data16 1 0 0 1 1 1 0 1  0 d d d 0 1 0 0
  {0x9604,0xff8f,' ',4,CMP, DIRECT_DATA8    },  // CMP direct, #data8         1 0 0 1 0 1 1 0  0 b b b 0 1 0 0
  {0x9e04,0xff8f,' ',5,CMP, DIRECT_DATA16   },  // CMP direct, #data16        1 0 0 1 0 1 1 0  0 b b b 0 1 0 0
-
- {0x900c,0xf70f,' ',2,CPL, REG_ALONE       }, //  CPL Rd                     1 0 0 1 S 0 0 0  d d d d 1 0 1 0
-
- {0x9008,0xff0f,' ',2,DA, REG_ALONE        }, //  DA Rd                      1 0 0 1 0 0 0 0  d d d d 1 0 0 0
-
+ {0x900c,0xf70f,' ',2,CPL, REG             }, //  CPL Rd                     1 0 0 1 S 0 0 0  d d d d 1 0 1 0
+ {0x9008,0xff0f,' ',2,DA, REG              }, //  DA Rd                      1 0 0 1 0 0 0 0  d d d d 1 0 0 0
  {0xe708,0xff00,' ',2,DIV_w, REG_REG       }, //  DIV.w Rd, Rs               1 1 1 0 0 1 1 1  d d d d s s s s
  {0xe80b,0xff0f,' ',3,DIV_w, REG_DATA8     }, //  DIV.w Rd, #data8           1 1 1 0 1 0 0 0  d d d d 1 0 1 1
  {0xef00,0xff10,' ',2,DIV_d, REG_REG       }, //  DIV.d Rd, Rs               1 1 1 0 1 1 1 1  d d d 0 s s s s
@@ -340,14 +340,15 @@ struct xa_dis_entry disass_xa[]= {
  {0x9d06,0xff8f,' ',6, OR, IREGOFF16_DATA16},  //  OR [Rd+offset16], #data16 1 0 0 1 1 1 0 1  0 d d d 0 1 1 0
  {0x9606,0xff8f,' ',4, OR, DIRECT_DATA8    },  //  OR direct, #data8         1 0 0 1 0 1 1 0  0 b b b 0 1 1 0
  {0x9e06,0xff8f,' ',5, OR, DIRECT_DATA16   },  //  OR direct, #data16        1 0 0 1 0 1 1 0  0 b b b 0 1 1 0
- /* ORL(2) */
- {0x8710,0xf7f8,' ',3, POP, DIRECT_ALONE   },  //  POP direct                1 0 0 0 S 1 1 1  0 0 0 1 0 d d d
+ {0x0860,0xfffc,' ',3, ORL, C_BIT          },  //  ORL C, bit                0 0 0 0 1 0 0 0  0 1 1 0 0 0 b b
+ {0x0870,0xfffc,' ',3, ORL, C_NOTBIT       },  //  ORL C, /bit               0 0 0 0 1 0 0 0  0 1 1 1 0 0 b b
+ {0x8710,0xf7f8,' ',3, POP, DIRECT         },  //  POP direct                1 0 0 0 S 1 1 1  0 0 0 1 0 d d d
  {0x2700,0xb700,' ',2, POP, RLIST          },  //  POP Rlist                 0 H 1 0 S 1 1 1  rlist
- {0x8700,0xf7f8,' ',3, POPU, DIRECT_ALONE  },  //  POPU direct               1 0 0 0 S 1 1 1  0 0 0 0 0 d d d
+ {0x8700,0xf7f8,' ',3, POPU, DIRECT        },  //  POPU direct               1 0 0 0 S 1 1 1  0 0 0 0 0 d d d
  {0x3700,0xb700,' ',2, POPU, RLIST         },  //  POPU Rlist                0 H 1 1 S 1 1 1  rlist
- {0x8730,0xf7f8,' ',3, PUSH, DIRECT_ALONE  },  //  PUSH direct               1 0 0 0 S 1 1 1  0 0 1 1 0 d d d
+ {0x8730,0xf7f8,' ',3, PUSH, DIRECT        },  //  PUSH direct               1 0 0 0 S 1 1 1  0 0 1 1 0 d d d
  {0x0700,0xb700,' ',2, PUSH, RLIST         },  //  PUSH Rlist                0 H 0 0 S 1 1 1  rlist
- {0x8720,0xf7f8,' ',3, PUSHU, DIRECT_ALONE },  //  PUSHU direct              1 0 0 0 S 1 1 1  0 0 1 0 0 d d d
+ {0x8720,0xf7f8,' ',3, PUSHU, DIRECT       },  //  PUSHU direct              1 0 0 0 S 1 1 1  0 0 1 0 0 d d d
  {0x1700,0xb700,' ',2, PUSHU, RLIST        },  //  PUSHU Rlist               0 H 0 1 S 1 1 1  rlist
 
  {0xd610,0xffff,' ',2, RESET, NO_OPERANDS  },  //  RESET                     1 1 0 1 0 1 1 0  0 0 0 1 0 0 0 0

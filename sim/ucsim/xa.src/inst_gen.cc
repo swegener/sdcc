@@ -177,7 +177,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
     break;
 
     case REG_DATA16 :
-      set_reg2( RI_F0, FUNC2( reg2(RI_F0), fetch2()) );
+      {
+        unsigned short dat = fetch2();
+        //unsigned short res;
+        //res = FUNC2( reg2(RI_F0), dat);
+        //set_reg2( RI_F0, res );
+//printf("reg_data16 code=%x dat=%x, res=%x\n", code, dat, res);
+        set_reg2( RI_F0, FUNC2( reg2(RI_F0), dat) );
+      }
     break;
 
     case IREGINC_DATA8 :

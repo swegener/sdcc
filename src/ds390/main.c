@@ -316,7 +316,7 @@ PORT ds390_port =
     "XSEG    (XDATA)",
     "BSEG    (BIT)",
     "RSEG    (DATA)",
-    /* "GSINIT  (CODE)", */ "CSEG    (CODE)",
+    "GSINIT  (CODE)",
     "OSEG    (OVR,DATA)",
     "GSFINAL (CODE)",
     "HOME    (CODE)",

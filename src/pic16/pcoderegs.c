@@ -431,6 +431,7 @@ static void Remove2pcodes(pCode *pcflow, pCode *pc1, pCode *pc2, regs *reg, int 
 /*-----------------------------------------------------------------*
  *
  *-----------------------------------------------------------------*/
+#if 0
 static int regUsedinRange(pCode *pc1, pCode *pc2, regs *reg)
 {
   int i=0;
@@ -465,6 +466,10 @@ static int regUsedinRange(pCode *pc1, pCode *pc2, regs *reg)
  *-----------------------------------------------------------------*/
 static int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int can_free, int optimize_level)
 {
+  // pc1 and pc2 have to given in execution order -- this not guaranteed.
+  // The check on pcX->seq does not help much as (nearly) all seq's are
+  // zero at the moment...
+
   pCode *pct1, *pct2;
   regs  *reg1, *reg2;
 
@@ -665,6 +670,14 @@ static int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *re
 
   return (total_registers_saved != t);
 }
+#else
+
+static int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int can_free, int optimize_level)
+{
+  return 0;
+}
+
+#endif
 
 /*-----------------------------------------------------------------*
  * void pCodeRegOptimeRegUsage(pBlock *pb) 

@@ -1,3 +1,8 @@
+2005-01-22 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/pcoderegs.c (pCodeOptime2pCodes): disabled optimization
+	  to fix #1106967 (pCode->seq are not set up correctly)
+
 2004-01-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCglue.c (glue): make sure code area is declared before the

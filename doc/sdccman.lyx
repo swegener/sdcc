@@ -1,13 +1,13 @@
 #LyX 1.3 created this file. For more info see http://www.lyx.org/
 \lyxformat 221
-\textclass article
+\textclass book
 \begin_preamble
 \usepackage[
   pdftitle={SDCC Compiler User Guide},
   pdfauthor={SDCC development team},
   pdfsubject={installation, user manual},
   pdfkeywords={8032, 8051, ansi, c, compiler, CPU, DS390, 
-               embedded, GPL, manual, mcs51, PIC, small, Z80},
+               embedded, GPL, HC08, manual, mcs51, PIC, Z80},
   colorlinks=true,
   linkcolor=blue] {hyperref}
 \date{}
@@ -72,19 +72,16 @@ a 8051 centered document)
 \layout Title
 
 SDCC Compiler User Guide
+\layout Date
+
+
+\size footnotesize 
+$Date$ 
+\newline 
+$Revision$
 \layout Comment
 
-The strings enclosed in $ are automatically updated by cvs:
-\layout Standard
-\align center 
-
-\size footnotesize 
-$Date$
-\layout Standard
-\align center 
-
-\size footnotesize 
-$Revision$
+The above strings enclosed in $ are automatically updated by cvs
 \layout Standard
 
 
@@ -93,10 +90,10 @@ $Revision$
 \end_inset 
 
 
-\layout Section
-\pagebreak_top 
+\layout Chapter
+
 Introduction
-\layout Subsection
+\layout Section
 
 About SDCC
 \layout Standard
@@ -112,12 +109,11 @@ Sandeep Dutta
  designed for 8 bit Microprocessors.
  The current version targets Intel MCS51 based Microprocessors (8031, 8032,
  8051, 8052
-\begin_inset LatexCommand \index{8031, 8032, 8051, 8052 CPU}
+\begin_inset LatexCommand \index{8031, 8032, 8051, 8052, mcs51 CPU}
 
 \end_inset 
 
-, etc), Dallas DS80C390 variants, Motorola HC08 and Zilog Z80 based MCUs
- .
+, etc.), Dallas DS80C390 variants, Motorola HC08 and Zilog Z80 based MCUs.
  It can be retargetted for other microprocessors, support for Microchip
  PIC, Atmel AVR is under development.
  The entire source code for the compiler is distributed under GPL.
@@ -245,7 +241,7 @@ Obviously this has pros and cons
 \end_inset 
 
 .
-\layout Subsection
+\layout Section
 
 Open Source
 \layout Standard
@@ -285,7 +281,7 @@ This program is free software; you can redistribute it and/or modify it
  You are forbidden to forbid anyone else to use, share and improve what
  you give them.
  Help stamp out software-hoarding! 
-\layout Subsection
+\layout Section
 
 Typographic conventions
 \begin_inset LatexCommand \index{Typographic conventions}
@@ -312,7 +308,7 @@ typewriter font.
  Interesting items and new terms are printed in 
 \emph on 
 italic.
-\layout Subsection
+\layout Section
 
 Compatibility with previous versions
 \layout Standard
@@ -406,7 +402,7 @@ status Collapsed
 
 \emph on 
 <pending: more incompatibilities?>
-\layout Subsection
+\layout Section
 
 System Requirements
 \layout Standard
@@ -418,7 +414,7 @@ What do you need before you start installation of SDCC? A computer, and
  For Windows some pre-compiled binary distributions are available for your
  convenience.
  You should have some experience with command line tools and compiler use.
-\layout Subsection
+\layout Section
 
 Other Resources
 \layout Standard
@@ -438,7 +434,7 @@ The SDCC home page at
  their own documentation and can be found in the source distribution.
  If you want the latest unreleased software, the complete source package
  is available directly by anonymous CVS on cvs.sdcc.sourceforge.net.
-\layout Subsection
+\layout Section
 
 Wishes for the future
 \layout Standard
@@ -487,8 +483,8 @@ If you can think of some more, please see the chapter
 .
 \newline 
 
-\layout Section
-\pagebreak_top 
+\layout Chapter
+
 Installing SDCC
 \begin_inset LatexCommand \index{Installation}
 
@@ -509,7 +505,7 @@ For most users it is sufficient to skip to either section
 
 .
  More detailled instructions follow below.
-\layout Subsection
+\layout Section
 
 Configure Options
 \begin_inset LatexCommand \index{Options SDCC configuration}
@@ -1678,7 +1674,7 @@ status Collapsed
 -C' turns on caching, which gives a little bit extra speed.
  However if options are changed, it can be necessary to delete the config.cache
  file.
-\layout Subsection
+\layout Section
 
 Install paths
 \begin_inset LatexCommand \label{sub:Install-paths}
@@ -1929,7 +1925,7 @@ make install prefix=$(HOME)/local/sdcc
 \layout Standard
 
 Of course this doesn't change the search paths compiled into the binaries.
-\layout Subsection
+\layout Section
 
 Search Paths
 \begin_inset LatexCommand \label{sub:Search-Paths}
@@ -2787,7 +2783,7 @@ status Collapsed
 \end_inset 
 
 -nostdlib disables the last two search paths.
-\layout Subsection
+\layout Section
 
 Building SDCC
 \begin_inset LatexCommand \index{Building SDCC}
@@ -2795,7 +2791,7 @@ Building SDCC
 \end_inset 
 
 
-\layout Subsubsection
+\layout Subsection
 
 Building SDCC on Linux
 \begin_inset LatexCommand \label{sub:Building-SDCC-on-Linux}
@@ -2896,7 +2892,7 @@ Type
 \series default 
  This copies the binary executables, the include files, the libraries and
  the documentation to the install directories.
-\layout Subsubsection
+\layout Subsection
 
 Building SDCC on OSX 2.x
 \layout Standard
@@ -2912,14 +2908,14 @@ On OSX 2.x it was reported, that the default gcc (version 3.1 20020420 (prerelea
 \layout LyX-Code
 
 ./configure CC=gcc2 CXX=g++2
-\layout Subsubsection
+\layout Subsection
 
 Cross compiling SDCC on Linux for Windows
 \layout Standard
 
 With the Mingw32 gcc cross compiler it's easy to compile SDCC for Win32.
  See section 'Configure Options'.
-\layout Subsubsection
+\layout Subsection
 
 Building SDCC on Windows 
 \layout Standard
@@ -2927,7 +2923,7 @@ Building SDCC on Windows
 With the exception of Cygwin the SDCC binaries uCsim and sdcdb can't be
  built on Windows.
  They use Unix-sockets, which are not available on Win32.
-\layout Subsubsection
+\layout Subsection
 
 Building SDCC using Cygwin and Mingw32
 \layout Standard
@@ -3096,7 +3092,7 @@ SDCC sources use the unix line ending LF.
  And use an editor which can handle LF-only line endings.
  Make sure not to commit files with windows line endings.
  The tabulator spacing used in the project is 8.
-\layout Subsubsection
+\layout Subsection
 
 Building SDCC Using Microsoft Visual C++ 6.0/NET (MSVC)
 \layout Standard
@@ -3275,7 +3271,7 @@ That is it.
 bin_vc to sdcc
 \backslash 
 bin, and you can compile using SDCC.
-\layout Subsubsection
+\layout Subsection
 
 Building SDCC Using Borland
 \layout Enumerate
@@ -3321,7 +3317,7 @@ del /s *.obj *.lib *.rul
 \family default 
 \series default 
  from the sdcc directory.
-\layout Subsubsection
+\layout Subsection
 
 Windows Install Using a Binary Package
 \begin_inset LatexCommand \label{sub:Windows-Install}
@@ -3356,7 +3352,7 @@ lib for the include and libraries.
 
 Adjust your environment variable PATH to include the location of the bin
  directory or start sdcc using the full path.
-\layout Subsection
+\layout Section
 
 Building the Documentation
 \layout Standard
@@ -3379,7 +3375,7 @@ make
  there.
  If you want to avoid installing the tools you will have some success with
  a bootable Knoppix CD 
-\begin_inset LatexCommand \url{http://www.knopper.net}
+\begin_inset LatexCommand \url{http://www.knoppix.net}
 
 \end_inset 
 
@@ -3390,7 +3386,7 @@ make
 \end_inset 
 
 .
-\layout Subsection
+\layout Section
 
 Reading the Documentation
 \layout Standard
@@ -3465,7 +3461,7 @@ The installation section and the section about the debugger is intimidating.
 
 There are still lots of typos and there are more different writing styles
  than pictures.
-\layout Subsection
+\layout Section
 
 Testing the SDCC Compiler
 \layout Standard
@@ -3712,7 +3708,7 @@ status Collapsed
 \end_inset 
 
  to find exactly where SDCC is looking for the include and lib files.
-\layout Subsection
+\layout Section
 
 Install Trouble-shooting
 \begin_inset LatexCommand \label{sub:Install-Trouble-shooting}
@@ -3725,7 +3721,7 @@ Install Trouble-shooting
 \end_inset 
 
 
-\layout Subsubsection
+\layout Subsection
 
 SDCC does not build correctly.
 \layout Standard
@@ -3763,7 +3759,7 @@ make 2>&1 | tee make.log
 If anything goes wrong, you can review the log files to locate the problem.
  Or a relevant part of this can be attached to an email that could be helpful
  when requesting help from the mailing list.
-\layout Subsubsection
+\layout Subsection
 
 What the 
 \begin_inset Quotes sld
@@ -3788,7 +3784,7 @@ The
  to ensure the source package compiles on your system.
  It will take a few minutes to run, and will compile a few tests to determine
  what compiler features are installed.
-\layout Subsubsection
+\layout Subsection
 
 What the 
 \begin_inset Quotes sld
@@ -3803,7 +3799,7 @@ make
 
 This runs the GNU make tool, which automatically compiles all the source
  packages into the final installed binary executables.
-\layout Subsubsection
+\layout Subsection
 
 What the 
 \begin_inset Quotes sld
@@ -3833,7 +3829,7 @@ This will install the compiler, other executables libraries and include
 about install and search paths.
 \newline 
 On most systems you will need super-user privileges to do this.
-\layout Subsection
+\layout Section
 
 Components of SDCC
 \layout Standard
@@ -3912,14 +3908,14 @@ the documentation
 
 As development for other processors proceeds, this list will expand to include
  executables to support processors like AVR, PIC, etc.
-\layout Subsubsection
+\layout Subsection
 
 sdcc - The Compiler
 \layout Standard
 
 This is the actual compiler, it in turn uses the c-preprocessor and invokes
  the assembler and linkage editor.
-\layout Subsubsection
+\layout Subsection
 
 sdcpp
 \begin_inset LatexCommand \index{sdcpp}
@@ -3932,7 +3928,7 @@ sdcpp
 The preprocessor is a modified version of the GNU preprocessor.
  The C preprocessor is used to pull in #include sources, process #ifdef
  statements, #defines and so on.
-\layout Subsubsection
+\layout Subsection
 
 asx8051, as-z80, as-gbz80, aslink, link-z80, link-gbz80 - The Assemblers
  and Linkage Editors
@@ -3942,7 +3938,7 @@ This is retargettable assembler & linkage editor, it was developed by Alan
  Baldwin.
  John Hartman created the version for 8051, and I (Sandeep) have made some
  enhancements and bug fixes for it to work properly with SDCC.
-\layout Subsubsection
+\layout Subsection
 
 s51 - The Simulator
 \begin_inset LatexCommand \index{s51}
@@ -3967,7 +3963,7 @@ S51 is a freeware, opensource simulator developed by Daniel Drotos (
 .
  It currently supports the core mcs51, the Dallas DS80C390 and the Phillips
  XA51 family.
-\layout Subsubsection
+\layout Subsection
 
 sdcdb
 \begin_inset LatexCommand \index{sdcdb}
@@ -3984,13 +3980,13 @@ Sdcdb is the companion source level debugger.
 \end_inset 
 
 , but can be easily changed to use other simulators.
-\layout Section
-\pagebreak_top 
+\layout Chapter
+
 Using SDCC
-\layout Subsection
+\layout Section
 
 Compiling
-\layout Subsubsection
+\layout Subsection
 
 Single Source File Projects
 \layout Standard
@@ -4008,7 +4004,7 @@ For single source file 8051 projects the process is very simple.
 \layout Itemize
 
 sourcefile.asm
-\begin_inset LatexCommand \index{.asm}
+\begin_inset LatexCommand \index{<file>.asm}
 
 \end_inset 
 
@@ -4021,7 +4017,7 @@ sourcefile.asm
 \layout Itemize
 
 sourcefile.lst
-\begin_inset LatexCommand \index{.lst}
+\begin_inset LatexCommand \index{<file>.lst}
 
 \end_inset 
 
@@ -4034,7 +4030,7 @@ sourcefile.lst
 \layout Itemize
 
 sourcefile.rst
-\begin_inset LatexCommand \index{.rst}
+\begin_inset LatexCommand \index{<file>.rst}
 
 \end_inset 
 
@@ -4047,7 +4043,7 @@ sourcefile.rst
 \layout Itemize
 
 sourcefile.sym
-\begin_inset LatexCommand \index{.sym}
+\begin_inset LatexCommand \index{<file>.sym}
 
 \end_inset 
 
@@ -4060,7 +4056,7 @@ sourcefile.sym
 \layout Itemize
 
 sourcefile.rel
-\begin_inset LatexCommand \index{.rel}
+\begin_inset LatexCommand \index{<file>.rel}
 
 \end_inset 
 
@@ -4073,7 +4069,7 @@ sourcefile.rel
 \layout Itemize
 
 sourcefile.map
-\begin_inset LatexCommand \index{.map}
+\begin_inset LatexCommand \index{<file>.map}
 
 \end_inset 
 
@@ -4086,7 +4082,7 @@ sourcefile.map
 \layout Itemize
 
 sourcefile.mem
-\begin_inset LatexCommand \index{.mem}
+\begin_inset LatexCommand \index{<file>.mem}
 
 \end_inset 
 
@@ -4094,7 +4090,7 @@ sourcefile.mem
 \layout Itemize
 
 sourcefile.ihx
-\begin_inset LatexCommand \index{.ihx}
+\begin_inset LatexCommand \index{<file>.ihx}
 
 \end_inset 
 
@@ -4174,7 +4170,7 @@ status Collapsed
 \layout Itemize
 
 sourcefile.cdb
-\begin_inset LatexCommand \index{.cdb}
+\begin_inset LatexCommand \index{<file>.cdb}
 
 \end_inset 
 
@@ -4193,7 +4189,7 @@ status Collapsed
 
 sourcefile.
  - (no extension)
-\begin_inset LatexCommand \index{. (no extension)}
+\begin_inset LatexCommand \index{<file> (no extension)}
 
 \end_inset 
 
@@ -4222,7 +4218,7 @@ status Collapsed
 \layout Itemize
 
 sourcefile.dump*
-\begin_inset LatexCommand \index{.dump*}
+\begin_inset LatexCommand \index{<file>.dump*}
 
 \end_inset 
 
@@ -4257,7 +4253,7 @@ Anatomy of the compiler
 \end_inset 
 
 ).
-\layout Subsubsection
+\layout Subsection
 
 Projects with Multiple Source Files
 \layout Standard
@@ -4390,7 +4386,7 @@ first
 .
  You can view this file to troubleshoot linking problems such as those arising
  from missing libraries.
-\layout Subsubsection
+\layout Subsection
 
 Projects with Additional Libraries
 \begin_inset LatexCommand \index{Libraries}
@@ -4462,7 +4458,7 @@ The most efficient way to use libraries is to keep separate modules in separate
 libsdcc.lib
 \emph default 
  in the directory <installdir>/share/lib/small.
-\layout Subsection
+\layout Section
 
 Command Line Options
 \begin_inset LatexCommand \index{Command Line Options}
@@ -4470,7 +4466,7 @@ Command Line Options
 \end_inset 
 
 
-\layout Subsubsection
+\layout Subsection
 
 Processor Selection Options
 \begin_inset LatexCommand \index{Options processor selection}
@@ -4587,7 +4583,7 @@ Processor Selection Options
 
 \series default 
  Generate code for the GameBoy Z80
-\begin_inset LatexCommand \index{GameBoy Z80}
+\begin_inset LatexCommand \index{gbz80 (GameBoy Z80)}
 
 \end_inset 
 
@@ -4691,7 +4687,7 @@ p16f627 p16f628 p16f84 p16f873 p16f877?
 \end_inset 
 
  processor (In development, not complete).
-\layout Subsubsection
+\layout Subsection
 
 Preprocessor Options
 \begin_inset LatexCommand \index{Options preprocessor}
@@ -4884,7 +4880,22 @@ file"'.
 \bar default 
 Like `-dD' except that the macro arguments and contents are omitted.
  Only `#define name' is included in the output.
-\layout Subsubsection
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-Wp\SpecialChar ~
+preprocessorOption[,preprocessorOption]
+\series default 
+
+\begin_inset LatexCommand \index{-Wp preprocessorOption[,preprocessorOption]}
+
+\end_inset 
+
+...
+ Pass the preprocessorOption to the preprocessor.
+\layout Subsection
 
 Linker Options
 \begin_inset LatexCommand \index{Options linker}
@@ -4918,7 +4929,7 @@ status Collapsed
 
 \series bold 
 -lib-path
-\begin_inset LatexCommand \index{-\/-lib-path}
+\begin_inset LatexCommand \index{-\/-lib-path <path>}
 
 \end_inset 
 
@@ -4928,10 +4939,8 @@ status Collapsed
 \end_inset 
 
 
-\bar under 
- 
 \series default 
-\bar default 
+\SpecialChar ~
 <absolute path to additional libraries> This option is passed to the linkage
  editor's additional libraries
 \begin_inset LatexCommand \index{Libraries}
@@ -4960,10 +4969,11 @@ status Collapsed
 -xram-loc
 \series default 
 
-\begin_inset LatexCommand \index{-\/-xram-loc}
+\begin_inset LatexCommand \index{-\/-xram-loc <Value>}
 
 \end_inset 
 
+\SpecialChar ~
 <Value> The start location of the external ram
 \begin_inset LatexCommand \index{xdata}
 
@@ -5009,10 +5019,11 @@ status Collapsed
 -code-loc
 \series default 
 
-\begin_inset LatexCommand \index{-\/-code-loc}
+\begin_inset LatexCommand \index{-\/-code-loc <Value>}
 
 \end_inset 
 
+\SpecialChar ~
 <Value> The start location of the code
 \begin_inset LatexCommand \index{code}
 
@@ -5060,10 +5071,11 @@ status Collapsed
 -stack-loc
 \series default 
 
-\begin_inset LatexCommand \index{-\/-stack-loc}
+\begin_inset LatexCommand \index{-\/-stack-loc <Value>}
 
 \end_inset 
 
+\SpecialChar ~
 <Value> By default the stack
 \begin_inset LatexCommand \index{stack}
 
@@ -5117,10 +5129,11 @@ status Collapsed
 -data-loc
 \series default 
 
-\begin_inset LatexCommand \index{-\/-data-loc}
+\begin_inset LatexCommand \index{-\/-data-loc <Value>}
 
 \end_inset 
 
+\SpecialChar ~
 <Value> The start location of the internal ram data
 \begin_inset LatexCommand \index{data}
 
@@ -5182,16 +5195,17 @@ status Collapsed
 -idata-loc
 \series default 
 
-\begin_inset LatexCommand \index{-\/-idata-loc}
+\begin_inset LatexCommand \index{-\/-idata-loc <Value>}
 
 \end_inset 
 
+\SpecialChar ~
 <Value> The start location of the indirectly addressable internal ram
 \begin_inset LatexCommand \index{idata}
 
 \end_inset 
 
-, default value is 0x80.
+ of the 8051, default value is 0x80.
  The value entered can be in Hexadecimal or Decimal format, eg.
  -
 \begin_inset ERT
@@ -5214,6 +5228,37 @@ status Collapsed
 \end_inset 
 
 -idata-loc 136.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-bit-loc
+\series default 
+\SpecialChar ~
+<Value> The start location of the bit
+\begin_inset LatexCommand \index{bit}
+
+\end_inset 
+
+ addressable internal ram of the 8051.
+ This is 
+\emph on 
+not
+\emph default 
+ implemented yet.
+ Instead an option can be passed directly to the linker: -Wl\SpecialChar ~
+-bBSEG=<Value>.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -5276,7 +5321,22 @@ The linker output (final object code) is in Motorola S19 format
 \end_inset 
 
 .
-\layout Subsubsection
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-Wl\SpecialChar ~
+linkOption[,linkOption]
+\series default 
+
+\begin_inset LatexCommand \index{-Wl linkOption[,linkOption]}
+
+\end_inset 
+
+...
+ Pass the linkOption to the linker.
+\layout Subsection
 
 MCS51 Options
 \begin_inset LatexCommand \index{Options MCS51}
@@ -5393,8 +5453,9 @@ status Collapsed
 
 -iram-size
 \series default 
+\SpecialChar ~
 <Value>
-\begin_inset LatexCommand \index{-\/-iram-size<Value>}
+\begin_inset LatexCommand \index{-\/-iram-size <Value>}
 
 \end_inset 
 
@@ -5417,8 +5478,9 @@ status Collapsed
 
 -xram-size
 \series default 
+\SpecialChar ~
 <Value>
-\begin_inset LatexCommand \index{-\/-xram-size<Value>}
+\begin_inset LatexCommand \index{-\/-xram-size <Value>}
 
 \end_inset 
 
@@ -5441,14 +5503,15 @@ status Collapsed
 
 -code-size
 \series default 
+\SpecialChar ~
 <Value>
-\begin_inset LatexCommand \index{-\/-data-loc}
+\begin_inset LatexCommand \index{-\/-code-size <Value>}
 
 \end_inset 
 
  Causes the linker to check if the code memory usage is within limits of
  the given value.
-\layout Subsubsection
+\layout Subsection
 
 DS390 Options
 \begin_inset LatexCommand \index{Options DS390}
@@ -5594,7 +5657,7 @@ status Collapsed
 -model-flat24 option
 \emph default 
 ).
-\layout Subsubsection
+\layout Subsection
 
 Z80 Options
 \begin_inset LatexCommand \index{Options Z80}
@@ -5661,7 +5724,7 @@ status Collapsed
  When linking, skip the standard crt0.o object file.
  You must provide your own crt0.o for your system when linking.
  
-\layout Subsubsection
+\layout Subsection
 
 Optimization Options
 \begin_inset LatexCommand \index{Options optimization}
@@ -5902,7 +5965,7 @@ status Collapsed
 \series default 
  Will not memcpy initialized data from code space into xdata space.
  This saves a few bytes in code space if you don't have initialized data.
-\layout Subsubsection
+\layout Subsection
 
 Other Options
 \begin_inset LatexCommand \index{Options other}
@@ -6174,34 +6237,6 @@ Stop after the stage of compilation proper; do not assemble.
 
 
 \series bold 
--Wa_asmOption[,asmOption]
-\series default 
-
-\begin_inset LatexCommand \index{-Wa\_asmOption[,asmOption]}
-
-\end_inset 
-
-...
- Pass the asmOption to the assembler.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
--Wl_linkOption[,linkOption]
-\series default 
-
-\begin_inset LatexCommand \index{-Wl\_linkOption[,linkOption]}
-
-\end_inset 
-
-...
- Pass the linkOption to the linker.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
 -
 \begin_inset ERT
 status Collapsed
@@ -6379,6 +6414,7 @@ status Collapsed
 
 \end_inset 
 
+\SpecialChar ~
 <filename> This option can be used to use additional rules to be used by
  the peep hole optimizer.
  See section 
@@ -6410,7 +6446,7 @@ status Collapsed
 
 
 \series default 
-  Disable peep-hole optimization.
+ Disable peep-hole optimization.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -6683,7 +6719,22 @@ status Collapsed
 
 \series default 
  Send errors and warnings to stdout instead of stderr.
-\layout Subsubsection
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-Wa\SpecialChar ~
+asmOption[,asmOption]
+\series default 
+
+\begin_inset LatexCommand \index{-Wa asmOption[,asmOption]}
+
+\end_inset 
+
+...
+ Pass the asmOption to the assembler.
+\layout Subsection
 
 Intermediate Dump Options
 \begin_inset LatexCommand \label{sub:Intermediate-Dump-Options}
@@ -6987,7 +7038,7 @@ status Collapsed
 \size default 
 \bar default 
 Will cause all the above mentioned dumps to be created.
-\layout Subsubsection
+\layout Subsection
 
 Redirecting output on Windows Shells
 \layout Standard
@@ -7102,7 +7153,7 @@ status Collapsed
 \series bold 
 \emph default 
 -model-large -c $(InputPath)
-\layout Subsection
+\layout Section
 
 Environment variables
 \begin_inset LatexCommand \index{Environment variables}
@@ -7238,7 +7289,7 @@ Search Paths
 There are some more environment variables recognized by SDCC, but these
  are solely used for debugging purposes.
  They can change or disappear very quickly, and will never be documented.
-\layout Subsection
+\layout Section
 
 MCS51/DS390 Storage Class
 \begin_inset LatexCommand \index{Storage class}
@@ -7250,7 +7301,7 @@ MCS51/DS390 Storage Class
 
 In addition to the ANSI storage classes SDCC allows the following MCS51
  specific storage classes.
-\layout Subsubsection
+\layout Subsection
 
 data
 \begin_inset LatexCommand \index{data}
@@ -7285,7 +7336,7 @@ Writing 0x01 to this variable generates the assembly code:
 mov\SpecialChar ~
 \SpecialChar ~
 _test_data,#0x01 
-\layout Subsubsection
+\layout Subsection
 
 xdata
 \begin_inset LatexCommand \index{xdata}
@@ -7343,7 +7394,7 @@ F0\SpecialChar ~
 \SpecialChar ~
 movx\SpecialChar ~
 @dptr,a 
-\layout Subsubsection
+\layout Subsection
 
 idata
 \begin_inset LatexCommand \index{idata}
@@ -7389,7 +7440,7 @@ r0,#_test_idata
 mov\SpecialChar ~
 \SpecialChar ~
 @r0,#0x01 
-\layout Subsubsection
+\layout Subsection
 
 pdata
 \begin_inset LatexCommand \index{pdata}
@@ -7494,7 +7545,7 @@ status Collapsed
 \end_inset 
 
  option.
-\layout Subsubsection
+\layout Subsection
 
 code
 \begin_inset LatexCommand \index{code}
@@ -7544,7 +7595,7 @@ clr a
 \SpecialChar ~
 \SpecialChar ~
 movc a,@a+dptr 
-\layout Subsubsection
+\layout Subsection
 
 bit
 \begin_inset LatexCommand \index{bit}
@@ -7578,7 +7629,26 @@ D2*00\SpecialChar ~
 \SpecialChar ~
 setb\SpecialChar ~
 _test_bit
-\layout Subsubsection
+\layout Standard
+
+Apart from this 8051 specific storage class most architectures support ANSI-C
+ bitfields
+\begin_inset LatexCommand \index{bitfields}
+
+\end_inset 
+
+ 
+\begin_inset Foot
+collapsed false
+
+\layout Standard
+
+Not really meant as examples, but nevertheless showing what bitfields are
+ about: device/include/mc68hc908qy.h and support/regression/tests/bitfields.c
+\end_inset 
+
+.
+\layout Subsection
 
 sfr
 \begin_inset LatexCommand \index{sfr}
@@ -7622,7 +7692,7 @@ sbit at 0xd7 CY; /* CY (Carry Flag
 \end_inset 
 
 ) */
-\layout Subsubsection
+\layout Subsection
 
 Pointers
 \begin_inset LatexCommand \index{Pointers}
@@ -7718,7 +7788,7 @@ generic
  routines.
  Explicitly specifying the pointer type will generate the most efficient
  code.
-\layout Subsection
+\layout Section
 
 Absolute Addressing
 \begin_inset LatexCommand \index{Absolute addressing}
@@ -7762,17 +7832,17 @@ In the above example the variable chksum will located at 0x7ffe and 0x7fff
  Thus it is left to the programmer to make sure there are no overlaps with
  other variables that are declared without the absolute address.
  The assembler listing file (.lst
-\begin_inset LatexCommand \index{.lst}
+\begin_inset LatexCommand \index{<file>.lst}
 
 \end_inset 
 
 ) and the linker output files (.rst
-\begin_inset LatexCommand \index{.rst}
+\begin_inset LatexCommand \index{<file>.rst}
 
 \end_inset 
 
 ) and (.map
-\begin_inset LatexCommand \index{.map}
+\begin_inset LatexCommand \index{<file>.map}
 
 \end_inset 
 
@@ -7965,7 +8035,12 @@ bit at 0x91 SCLK;\SpecialChar ~
 \SpecialChar ~
 /* I/O port 1, bit 1 */
 \newline 
-bit CPOL;\SpecialChar ~
+bit
+\begin_inset LatexCommand \index{bit}
+
+\end_inset 
+
+ CPOL;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -7983,10 +8058,15 @@ and you can use the same hardware dependent routine without changes, as
  for example in a library.
  This is somehow similar to sbit, but only one absolute address has to be
  specified in the whole project.
-\layout Subsection
+\layout Section
 
 Parameters
 \begin_inset LatexCommand \index{Parameters}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{function parameter}
 
 \end_inset 
 
@@ -8177,10 +8257,19 @@ reentrant
  this should only be done for static variables.
 \layout Standard
 
-Parameters however are not allowed any storage class, (storage classes for
- parameters will be ignored), their allocation is governed by the memory
- model in use, and the reentrancy options.
-\layout Subsection
+Parameters
+\begin_inset LatexCommand \index{function parameter}
+
+\end_inset 
+
+ however are not allowed any storage class
+\begin_inset LatexCommand \index{storage class}
+
+\end_inset 
+
+, (storage classes for parameters will be ignored), their allocation is
+ governed by the memory model in use, and the reentrancy options.
+\layout Section
 
 Overlaying
 \begin_inset LatexCommand \label{sub:Overlaying}
@@ -8330,7 +8419,7 @@ NOOVERLAY was
  The #pragma\SpecialChar ~
 NOOVERLAY ensures that the parameters and local variables for
  the function are NOT overlayed.
-\layout Subsection
+\layout Section
 
 Interrupt Service Routines
 \begin_inset LatexCommand \label{sub:Interrupt-Service-Routines}
@@ -8770,10 +8859,10 @@ status Collapsed
 /
 \end_inset 
 
--int-long-ren
+-int-long-reent
 \emph default 
-t
-\begin_inset LatexCommand \index{-\/-int-long-rent}
+
+\begin_inset LatexCommand \index{-\/-int-long-reent}
 
 \end_inset 
 
@@ -8809,10 +8898,10 @@ about Overlaying and section
 
 \SpecialChar ~
 about Functions using private banks.
-\layout Subsection
+\layout Section
 
 Enabling and Disabling Interrupts
-\layout Subsubsection
+\layout Subsection
 
 Critical Functions and Critical Statements
 \layout Standard
@@ -8884,7 +8973,7 @@ critical{ i++; }
 \layout Standard
 
 More than one statement could have been included in the block.
-\layout Subsubsection
+\layout Subsection
 
 Enabling and Disabling Interrupts directly
 \layout Standard
@@ -8988,6 +9077,12 @@ interrupt jitter
 \end_inset 
 
  (the difference between the shortest and the longest interrupt latency).
+ These really are something different, f.e.
+ a serial interrupt has to be served before its buffer overruns so it cares
+ for the maximum interrupt latency, whereas it does not care about jitter.
+ On a loudspeaker driven via a digital to analog converter which is fed
+ by an interrupt a latency of a few milliseconds might be tolerable, whereas
+ a much smaller jitter will be very audible.
 \layout Standard
 
 You can reenable interrupts within an interrupt routine and on some architecture
@@ -9006,7 +9101,7 @@ interrupt priorities
  within the interrupt routine.
  Don't add complexity unless you have to.
  
-\layout Subsection
+\layout Section
 
 Functions using private banks
 \begin_inset LatexCommand \label{sub:Functions-using-private-banks}
@@ -9115,7 +9210,7 @@ It is most efficient if your ISR calls no other functions.
  It is very inefficient to call a function using a different, non-zero bank
  from an ISR.
  
-\layout Subsection
+\layout Section
 
 Startup Code
 \begin_inset LatexCommand \label{sub:Startup-Code}
@@ -9128,7 +9223,7 @@ Startup Code
 \end_inset 
 
 
-\layout Subsubsection
+\layout Subsection
 
 MCS51/DS390 Startup Code
 \layout Standard
@@ -9196,7 +9291,13 @@ opt
 
 \SpecialChar ~
 about MCS51-variants.
-\layout Subsubsection
+\layout Subsection
+
+HC08 Startup Code
+\layout Standard
+
+The HC08 startup code follows the same scheme as the MCS51 startup code.
+\layout Subsection
 
 Z80 Startup Code
 \layout Standard
@@ -9230,7 +9331,7 @@ status Collapsed
 
  and provide your own crt0.o.
  
-\layout Subsection
+\layout Section
 
 Inline Assembler Code
 \begin_inset LatexCommand \index{Assembler routines}
@@ -9238,7 +9339,7 @@ Inline Assembler Code
 \end_inset 
 
 
-\layout Subsubsection
+\layout Subsection
 
 A Step by Step Introduction
 \layout Standard
@@ -9802,7 +9903,7 @@ peep-asm
 SDCCpeeph.def
 \emph default 
  carefully before using this option.
-\layout Subsubsection
+\layout Subsection
 
 Naked Functions
 \begin_inset LatexCommand \label{sub:Naked-Functions}
@@ -10124,7 +10225,7 @@ The #pragma directive EXCLUDE
 While there is nothing preventing you from writing C code inside a _naked
  function, there are many ways to shoot yourself in the foot doing this,
  and it is recommended that you stick to inline assembler.
-\layout Subsubsection
+\layout Subsection
 
 Use of Labels within Inline Assembler
 \layout Standard
@@ -10280,7 +10381,7 @@ In other words inline assembly code can access labels defined in inline
  assembly within the scope of the function.
  The same goes the other way, ie.
  labels defines in inline assembly can not be accessed by C statements.
-\layout Subsection
+\layout Section
 
 Interfacing with Assembler Code
 \begin_inset LatexCommand \index{Assembler routines}
@@ -10288,7 +10389,7 @@ Interfacing with Assembler Code
 \end_inset 
 
 
-\layout Subsubsection
+\layout Subsection
 
 Global Registers used for Parameter Passing
 \begin_inset LatexCommand \index{Parameter passing}
@@ -10302,6 +10403,11 @@ The compiler always uses the global registers
 \emph on 
 DPL, DPH
 \begin_inset LatexCommand \index{DPTR, DPH, DPL}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{DPTR}
 
 \end_inset 
 
@@ -10336,7 +10442,7 @@ status Collapsed
 -stack-auto is used) or in data / xdata memory (depending on the memory
  model).
  
-\layout Subsubsection
+\layout Subsection
 
 Assembler Routine(non-reentrant
 \begin_inset LatexCommand \index{reentrant}
@@ -10352,7 +10458,12 @@ Assembler Routine(non-reentrant
 \layout Standard
 
 In the following example the function c_func calls an assembler routine
- asm_func, which takes two parameters.
+ asm_func, which takes two parameters
+\begin_inset LatexCommand \index{function parameter}
+
+\end_inset 
+
+.
 \layout Verse
 
 
@@ -10499,8 +10610,13 @@ dph
 ret
 \layout Standard
 
-Note here that the return values are placed in 'dpl' - One byte return value,
- 'dpl' LSB & 'dph' MSB for two byte values.
+Note here that the return values
+\begin_inset LatexCommand \index{return value}
+
+\end_inset 
+
+ are placed in 'dpl' - One byte return value, 'dpl' LSB & 'dph' MSB for
+ two byte values.
  'dpl', 'dph' and 'b' for three byte values (generic pointers) and 'dpl','dph','
 b' & 'acc' for four byte values.
 \layout Standard
@@ -10567,7 +10683,7 @@ Then compile and link the assembler routine to the C source file with the
 \family sans 
 \series bold 
 sdcc cfunc.c asmfunc.rel
-\layout Subsubsection
+\layout Subsection
 
 Assembler Routine(reentrant
 \begin_inset LatexCommand \index{reentrant}
@@ -10582,8 +10698,13 @@ Assembler Routine(reentrant
 
 \layout Standard
 
-In this case the second parameter onwards will be passed on the stack, the
- parameters are pushed from right to left i.e.
+In this case the second parameter
+\begin_inset LatexCommand \index{function parameter}
+
+\end_inset 
+
+ onwards will be passed on the stack, the parameters are pushed from right
+ to left i.e.
  after the call the left most parameter will be on the top of the stack.
  Here is an example:
 \layout Verse
@@ -10731,7 +10852,7 @@ The compiling and linking procedure remains the same, however note the extra
  entry & exit linkage required for the assembler code, _bp is the stack
  frame pointer and is used to compute the offset into the stack for parameters
  and local variables.
-\layout Subsection
+\layout Section
 
 int (16 bit)
 \begin_inset LatexCommand \index{int (16 bit)}
@@ -11021,8 +11142,8 @@ status Collapsed
 /
 \end_inset 
 
--int-long-rent
-\begin_inset LatexCommand \index{-\/-int-long-rent}
+-int-long-reent
+\begin_inset LatexCommand \index{-\/-int-long-reent}
 
 \end_inset 
 
@@ -11032,7 +11153,7 @@ status Collapsed
  Notice that you don't have to call this routines directly.
  The compiler will use them automatically every time an integer operation
  is required.
-\layout Subsection
+\layout Section
 
 Floating Point Support
 \begin_inset LatexCommand \index{Floating point support}
@@ -11685,7 +11806,7 @@ Note if all these routines are used simultaneously the data space might
  Also notice that you don't have to call this routines directly.
  The compiler will use them automatically every time a floating point operation
  is required.
-\layout Subsection
+\layout Section
 
 MCS51 Memory Models
 \begin_inset LatexCommand \index{Memory model}
@@ -11743,7 +11864,7 @@ Judicious usage of the processor specific storage classes
  Several optimizations are disabled when the program is compiled using the
  large model, it is therefore strongly recommended that the small model
  be used unless absolutely required.
-\layout Subsection
+\layout Section
 
 DS390 Memory Models
 \begin_inset LatexCommand \index{Memory model}
@@ -11832,7 +11953,7 @@ status Collapsed
 \emph default 
  on the SDCC command line.
  However, currently the linker can not handle code segments > 64k.
-\layout Subsection
+\layout Section
 
 Pragmas
 \begin_inset LatexCommand \index{Pragmas}
@@ -12091,7 +12212,7 @@ int foo ()
 The compiler will generate a warning message when extra space is allocated.
  It is strongly recommended that the SAVE and RESTORE pragma's be used when
  changing options for a function.
-\layout Subsection
+\layout Section
 
 Defines Created by the Compiler
 \begin_inset LatexCommand \index{Defines created by the compiler}
@@ -12206,12 +12327,17 @@ __mcs51
 
 \end_inset 
 
- or __ds390
+, __ds390
 \begin_inset LatexCommand \index{\_\_ds390}
 
 \end_inset 
 
- or __z80
+, __hc08
+\begin_inset LatexCommand \index{\_\_hc08}
+
+\end_inset 
+
+, __z80
 \begin_inset LatexCommand \index{\_\_z80}
 
 \end_inset 
@@ -12438,8 +12564,8 @@ when
 
 \newline 
 
-\layout Section
-\pagebreak_top 
+\layout Chapter
+
 Debugging with SDCDB
 \begin_inset LatexCommand \index{sdcdb}
 
@@ -12467,7 +12593,7 @@ on, which also builds and installs the debugger in the target directory
  The debugger allows you debug BOTH at the C source and at the ASM source
  level.
  Sdcdb is available on Unix platforms only.
-\layout Subsection
+\layout Section
 
 Compiling for Debugging
 \layout Standard
@@ -12479,7 +12605,7 @@ debug option must be specified for all files for which debug information
  The complier generates a .adb file for each of these files.
  The linker creates the .cdb file from the .adb files and the address information.
  This .cdb is used by the debugger.
-\layout Subsection
+\layout Section
 
 How the Debugger Works
 \layout Standard
@@ -12505,7 +12631,7 @@ status Collapsed
  execution is controlled by the debugger.
  When a command is issued for the debugger, it translates it into appropriate
  commands for the simulator.
-\layout Subsection
+\layout Section
 
 Starting the Debugger
 \layout Standard
@@ -12540,7 +12666,7 @@ foo.ihx - the Intel hex format
 \end_inset 
 
  object file.
-\layout Subsection
+\layout Section
 
 Command Line Options.
 \layout Itemize
@@ -12604,7 +12730,7 @@ status Collapsed
 \layout Itemize
 
 -S <serial in,out> passed to simulator see the simulator docs for details.
-\layout Subsection
+\layout Section
 
 Debugger Commands.
 \layout Standard
@@ -12754,7 +12880,7 @@ quit.
 "Watch me now.
  Iam going Down.
  My name is Bobby Brown"
-\layout Subsection
+\layout Section
 
 Interfacing with XEmacs
 \begin_inset LatexCommand \index{XEmacs}
@@ -13563,7 +13689,7 @@ Toggle Sdcdbsrc mode
 ;; 
 \newline 
 
-\layout Section
+\layout Chapter
 \pagebreak_top 
 TIPS
 \layout Standard
@@ -13663,7 +13789,7 @@ feeling
 \end_inset 
 
  for the code generation.
-\layout Subsection
+\layout Section
 
 Notes on MCS51 memory
 \begin_inset LatexCommand \index{MCS51 memory}
@@ -13729,7 +13855,14 @@ data
 xdata
 \emph default 
  memory has to be activated before using it (you can probably find this
- information on the datasheet of the microcontroller your are using).
+ information on the datasheet of the microcontroller your are using, see
+ also section 
+\begin_inset LatexCommand \ref{sub:Startup-Code}
+
+\end_inset 
+
+\SpecialChar ~
+Startup-Code).
 \layout Standard
 
 Normally SDCC will only use the first bank
@@ -13913,7 +14046,7 @@ The 8051 linker generates two files with memory allocation information.
  allocation, take a look at either the .map or .mem files to find out what
  the problem is.
  The .mem file may even suggest a solution to the problem.
-\layout Subsection
+\layout Section
 
 Tools
 \begin_inset LatexCommand \index{Tools}
@@ -14321,7 +14454,7 @@ sdcc/bin
 
 \newline 
 
-\layout Subsection
+\layout Section
 
 Related open source tools
 \begin_inset LatexCommand \index{Related tools}
@@ -14618,7 +14751,7 @@ Debugger, serves nicely as GUI to sdcdb
 
 \newline 
 
-\layout Subsection
+\layout Section
 
 Related documentation / recommended reading
 \layout Standard
@@ -14811,7 +14944,7 @@ sdcc/doc
 
 \newline 
 
-\layout Section
+\layout Chapter
 \pagebreak_top 
 Support
 \begin_inset LatexCommand \index{Support}
@@ -14863,10 +14996,10 @@ The SDCC project is hosted on the SDCC sourceforge site at
 \end_inset 
 
  there.
-\layout Subsection
+\layout Section
 
 Reporting Bugs
-\begin_inset LatexCommand \index{Bugs}
+\begin_inset LatexCommand \index{Bug reporting}
 
 \end_inset 
 
@@ -14946,7 +15079,7 @@ Please have a short check that you are using a recent version of SDCC and
 \end_inset 
 
 .
-\layout Subsection
+\layout Section
 
 Requesting Features
 \begin_inset LatexCommand \label{sub:Requesting-Features}
@@ -14974,7 +15107,7 @@ Like bug reports feature requests are forwarded to the developer mailing
 \end_inset 
 
 .
-\layout Subsection
+\layout Section
 
 Getting Help
 \layout Standard
@@ -15001,7 +15134,7 @@ Traffic on sdcc-devel and sdcc-user is about 100 mails/month each not counting
 
 , lists and forums are archived so if you are lucky someone already had
  a similar problem.
-\layout Subsection
+\layout Section
 
 ChangeLog
 \begin_inset LatexCommand \index{Changelog}
@@ -15022,7 +15155,7 @@ You can follow the status of the cvs version
 \end_inset 
 
  in the cvs-repository.
-\layout Subsection
+\layout Section
 
 Release policy
 \begin_inset LatexCommand \index{Release policy}
@@ -15050,7 +15183,7 @@ Historically there often were long delays between official releases and
 \end_inset 
 
 .
-\layout Subsection
+\layout Section
 
 Examples
 \begin_inset LatexCommand \index{Examples}
@@ -15092,7 +15225,7 @@ I did insert a reference to Paul's web site here although it seems rather
 Maybe we should include some links to real world applications.
  Preferably pointer to pointers (one for each architecture) so this stays
  manageable here?
-\layout Subsection
+\layout Section
 
 Quality control
 \begin_inset LatexCommand \index{Quality control}
@@ -15161,10 +15294,10 @@ The pic port uses a different set of regression tests, you'll find them
 sdcc/src/regression
 \shape default 
 .
-\layout Section
+\layout Chapter
 \pagebreak_top 
 SDCC Technical Data
-\layout Subsection
+\layout Section
 
 Optimizations
 \begin_inset LatexCommand \index{Optimizations}
@@ -15177,7 +15310,7 @@ Optimizations
 SDCC performs a host of standard optimizations in addition to some MCU specific
  optimizations.
  
-\layout Subsubsection
+\layout Subsection
 
 Sub-expression Elimination
 \begin_inset LatexCommand \index{Subexpression elimination}
@@ -15234,7 +15367,7 @@ iTemp.d = 11;
 \layout Standard
 
 The compiler will try to keep these temporary variables in registers.
-\layout Subsubsection
+\layout Subsection
 
 Dead-Code Elimination
 \begin_inset LatexCommand \index{Dead-code elimination}
@@ -15306,7 +15439,7 @@ global = 2;
 return; 
 \newline 
 }
-\layout Subsubsection
+\layout Subsection
 
 Copy-Propagation
 \begin_inset LatexCommand \index{Copy propagation}
@@ -15367,7 +15500,7 @@ return 10;
 
 Note: the dead stores created by this copy propagation will be eliminated
  by dead-code elimination.
-\layout Subsubsection
+\layout Subsection
 
 Loop Optimizations
 \begin_inset LatexCommand \index{Loop optimization}
@@ -15509,7 +15642,7 @@ The more expensive multiplication
 \end_inset 
 
  is changed to a less expensive addition.
-\layout Subsubsection
+\layout Subsection
 
 Loop Reversing
 \begin_inset LatexCommand \index{Loop reversing}
@@ -15580,7 +15713,7 @@ The loop control variable does NOT participate in any arithmetic operation
 \layout Itemize
 
 There are NO switch statements in the loop.
-\layout Subsubsection
+\layout Subsection
 
 Algebraic Simplifications
 \layout Standard
@@ -15611,7 +15744,7 @@ Note the subexpressions
 
  given above are generally introduced by macro expansions or as a result
  of copy/constant propagation.
-\layout Subsubsection
+\layout Subsection
 
 'switch' Statements
 \begin_inset LatexCommand \label{sub:'switch'-Statements}
@@ -15994,7 +16127,7 @@ aries.
  It has no effect if a default label is supplied.
  Use of this pragma is dangerous: if the switch argument is not matched
  by a case statement the processor will happily jump into Nirvana.
-\layout Subsubsection
+\layout Subsection
 
 Bit-shifting Operations
 \begin_inset LatexCommand \index{Bit shifting}
@@ -16079,7 +16212,7 @@ a
 mov\SpecialChar ~
 \SpecialChar ~
 _i,a
-\layout Subsubsection
+\layout Subsection
 
 Bit-rotation
 \begin_inset LatexCommand \index{Bit rotation}
@@ -16155,7 +16288,7 @@ ns of this case will also be recognized as bit-rotation, i.e.:
 
 \family typewriter 
 i = ((i >> 7) | (i << 1)); /* left-bit rotation */
-\layout Subsubsection
+\layout Subsection
 
 Nibble and Byte Swapping
 \layout Standard
@@ -16264,7 +16397,7 @@ so little-endian is the more efficient byte order.
 
  format (i.e.
  lowest order first).
-\layout Subsubsection
+\layout Subsection
 
 Highest Order Bit
 \begin_inset LatexCommand \index{Highest Order Bit}
@@ -16472,7 +16605,7 @@ xyz = gint + ((gint >> 15) & 1);
 \layout Standard
 
 will still be recognized.
-\layout Subsubsection
+\layout Subsection
 
 Peephole Optimizer
 \begin_inset LatexCommand \label{sub:Peephole-Optimizer}
@@ -16866,7 +16999,7 @@ status Collapsed
 \end_inset 
 
 -peep-file option.
-\layout Subsection
+\layout Section
 
 Library Routines
 \emph on 
@@ -16934,7 +17067,7 @@ would certainly like to hear about it.
  Programmers coding for embedded systems are not especially famous for being
  enthusiastic, so don't expect a big hurray but as the mailing list is searchabl
 e these references are very valuable.
-\layout Subsection
+\layout Section
 
 External Stack
 \begin_inset LatexCommand \label{sub:External-Stack}
@@ -17007,7 +17140,7 @@ status Collapsed
 The compiler outputs the higher order address byte of the external ram segment
  into PORT P2, therefore when using the External Stack option, this port
  MAY NOT be used by the application program.
-\layout Subsection
+\layout Section
 
 ANSI-Compliance
 \begin_inset LatexCommand \index{ANSI-compliance}
@@ -17025,7 +17158,12 @@ ANSI-Compliance
 Deviations from the compliance:
 \layout Itemize
 
-functions are not always reentrant.
+functions are not always reentrant
+\begin_inset LatexCommand \index{reentrant}
+
+\end_inset 
+
+.
 \layout Itemize
 
 structures cannot be assigned values directly, cannot be passed as function
@@ -17121,7 +17259,17 @@ return rets;/* is invalid in SDCC although allowed in ANSI */
 not supported.
 \layout Itemize
 
-No support for setjmp and longjmp (for now).
+No support for setjmp
+\begin_inset LatexCommand \index{setjmp (not supported)}
+
+\end_inset 
+
+ and longjmp
+\begin_inset LatexCommand \index{longjmp (not supported)}
+
+\end_inset 
+
+ (for now).
 \layout Itemize
 
 Old K&R style
@@ -17177,7 +17325,7 @@ int (*foo)();
 \newline 
 (*foo)(); /* ANSI standard allows calls to be made like 'foo()' */
 \end_deeper 
-\layout Subsection
+\layout Section
 
 Cyclomatic Complexity
 \begin_inset LatexCommand \index{Cyclomatic complexity}
@@ -17220,10 +17368,10 @@ Having said that the industry standard is 10, you should be aware that in
  The complexity level is by no means an absolute measure of the algorithmic
  complexity of the function, it does however provide a good starting point
  for which functions you might look at for further optimization.
-\layout Subsection
+\layout Section
 
 Other Processors
-\layout Subsubsection
+\layout Subsection
 
 MCS51 variants
 \begin_inset LatexCommand \label{sub:MCS51-variants}
@@ -17289,7 +17437,7 @@ Some MCS51 variants offer features like Double DPTR
  These are currently not used for the MCS51 port.
  If you absolutely need them you can fall back to inline assembly or submit
  a patch to SDCC.
-\layout Subsubsection
+\layout Subsection
 
 The Z80 and gbz80 port
 \layout Standard
@@ -17300,7 +17448,7 @@ SDCC can target both the Zilog
 \end_inset 
 
  and the Nintendo Gameboy's Z80-like gbz80
-\begin_inset LatexCommand \index{GameBoy Z80}
+\begin_inset LatexCommand \index{gbz80 (GameBoy Z80)}
 
 \end_inset 
 
@@ -17322,14 +17470,24 @@ regressions tests
 
 As always, the code is the authoritative reference - see z80/ralloc.c and
  z80/gen.c.
- The stack frame is similar to that generated by the IAR Z80 compiler.
+ The stack
+\begin_inset LatexCommand \index{stack}
+
+\end_inset 
+
+ frame is similar to that generated by the IAR Z80 compiler.
  IX is used as the base pointer, HL is used as a temporary register, and
  BC and DE are available for holding variables.
  IY is currently unused.
- Return values are stored in HL.
+ Return values
+\begin_inset LatexCommand \index{return value}
+
+\end_inset 
+
+ are stored in HL.
  One bad side effect of using IX as the base pointer is that a functions
  stack frame is limited to 127 bytes - this will be fixed in a later version.
-\layout Subsubsection
+\layout Subsection
 
 The HC08 port
 \layout Standard
@@ -17340,7 +17498,7 @@ The port to the Motorola HC08
 \end_inset 
 
  family has been added in October 2003, thank you Erik!
-\layout Subsection
+\layout Section
 
 Retargetting for other MCUs.
 \layout Standard
@@ -17434,15 +17592,15 @@ The Code generation phase is (unhappily), entirely MCU dependent and very
 
 As mentioned in the optimization section the peep-hole optimizer is rule
  based system, which can reprogrammed for other MCUs.
-\layout Section
-\pagebreak_top 
+\layout Chapter
+
 Compiler internals
 \begin_inset LatexCommand \index{Compiler internals}
 
 \end_inset 
 
 
-\layout Subsection
+\layout Section
 
 The anatomy of the compiler
 \begin_inset LatexCommand \label{sub:The-anatomy-of}
@@ -18777,7 +18935,7 @@ mov dpl,a
 ret
 \newline 
 
-\layout Subsection
+\layout Section
 
 A few words about basic block successors, predecessors and dominators
 \layout Standard
@@ -18835,7 +18993,7 @@ b) predList of [BB2] = [BB1], of [BB3] = [BB1], of [BB4] = [BB2,BB3]
 c) domVect of [BB4] = BB1 ...
  here we are not sure if BB2 or BB3 was executed but we are SURE that BB1
  was executed.
-\layout Section
+\layout Chapter
 
 Acknowledgments
 \layout Standard
@@ -18870,7 +19028,7 @@ All product names mentioned herein may be trademarks
 
  of their respective companies.
  
-\layout Section
+\layout Section*
 
 Alphabetical index
 \layout Standard

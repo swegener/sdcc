@@ -24,6 +24,7 @@
 
 #include "common.h"
 #include "newalloc.h"
+#include "math.h"
 
 /*-----------------------------------------------------------------*/
 /* global variables       */
@@ -40,12 +41,6 @@ int scopeLevel;
 
 symbol *returnLabel;		/* function return label */
 symbol *entryLabel;		/* function entry  label */
-
-#if defined(__BORLANDC__) || defined(_MSC_VER)
-#define LONG_LONG __int64
-#else
-#define LONG_LONG long long
-#endif
 
 /*-----------------------------------------------------------------*/
 /* forward definition of some functions */
@@ -132,11 +127,13 @@ iCodeTable codeTable[] =
 */
 
 void checkConstantRange(sym_link *ltype, value *val, char *msg, int pedantic) {
-  LONG_LONG max = (LONG_LONG) 1 << bitsForType(ltype);
+  double max;
   char message[132]="";
   int warnings=0;
   int negative=0;
   long v;
+
+  max = pow ((double)2.0, (double)bitsForType(ltype));
 
   if (SPEC_LONG(val->type)) {
     v=SPEC_CVAL(val->type).v_long;

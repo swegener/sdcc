@@ -29,12 +29,6 @@
 #include <limits.h>
 #include "newalloc.h"
 
-#if defined(__BORLANDC__) || defined(_MSC_VER)
-#define LONG_LONG __int64
-#else
-#define LONG_LONG long long
-#endif
-
 int cNestLevel;
 
 /*-----------------------------------------------------------------*/
@@ -425,7 +419,7 @@ value *constVal (char *s)
   short hex = 0, octal = 0;
   char scanFmt[10];
   int scI = 0;
-  double sval;
+  long sval;
 
   val = newValue ();		/* alloc space for value   */
 
@@ -446,7 +440,6 @@ value *constVal (char *s)
   scanFmt[scI++] = '%';
 
   scanFmt[scI++] = 'l';
-  scanFmt[scI++] = 'f';
 
   if (octal)
     scanFmt[scI++] = 'o';

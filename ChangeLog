@@ -1,3 +1,8 @@
+2003-04-18 	Kevin Vigor <kevin@vigor.nu>
+
+	* src/SDCCopt.c: add special case optimization to replace modulo by
+	  a power of two with a bitwise AND.
+
 2003-04-18    <johan@balder>
 
 	* src/mcs51/gen.c (getFreePtr): fixed bug #635354

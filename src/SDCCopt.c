@@ -324,6 +324,8 @@ found:
 
 }
 
+extern operand *geniCodeRValue (operand *, bool);
+
 /*-----------------------------------------------------------------*/
 /* convilong - converts int or long mults or divs to fcalls        */
 /*-----------------------------------------------------------------*/
@@ -338,8 +340,34 @@ convilong (iCode * ic, eBBlock * ebp, sym_link * type, int op)
   int su;
   int bytesPushed=0;
 
-  remiCodeFromeBBlock (ebp, ic);
-
+  // Easy special case which avoids function call: modulo by a literal power 
+  // of two can be replaced by a bitwise AND.
+  if (op == '%' && isOperandLiteral(IC_RIGHT(ic)))
+  {
+      unsigned litVal = (unsigned)(operandLitValue(IC_RIGHT(ic)));
+      
+      // See if literal value is a power of 2.
+      while (litVal && !(litVal & 1))
+      {
+	  litVal >>= 1;
+      }
+      if (litVal)
+      {
+	  // discard first high bit set.
+	  litVal >>= 1;
+      }
+	  
+      if (!litVal)
+      {
+	  ic->op = BITWISEAND;
+	  IC_RIGHT(ic) = operandFromLit(operandLitValue(IC_RIGHT(ic)) - 1);
+	  return;
+      }
+  }
+    
+  remiCodeFromeBBlock (ebp, ic);    
+    
+    
   /* depending on the type */
   for (bwd = 0; bwd < 3; bwd++)
     {

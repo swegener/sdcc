@@ -48,7 +48,7 @@ int pic16_getpCode(char *mnem,int dest);
 int pic16_getpCodePeepCommand(char *cmd);
 void pic16_pBlockMergeLabels(pBlock *pb);
 char *pic16_pCode2str(char *str, int size, pCode *pc);
-char *pic16_get_op( pCodeOp *pcop,char *buf,int buf_size);
+//char *pic16_get_op(pCodeOp *pcop,char *buf, size_t buf_size);
 pCodeOp *pic16_popCombine2(pCodeOp *, pCodeOp *, int);
 
 extern pCodeInstruction *pic16Mnemonics[];

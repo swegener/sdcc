@@ -958,7 +958,7 @@ typedef struct peepCommand {
 #define isPCL(x)        ((PCODE(x)->type == PC_LABEL))
 #define isPCW(x)        ((PCODE(x)->type == PC_WILD))
 #define isPCCS(x)       ((PCODE(x)->type == PC_CSOURCE))
-#define isASMDIR(x)	((PCODE(x)->type == PC_ASMDIR))
+#define isPCAD(x)	((PCODE(x)->type == PC_ASMDIR))
 
 #define isCALL(x)       ((isPCI(x)) && (PCI(x)->op == POC_CALL))
 #define isSTATUS_REG(r) ((r)->pc_type == PO_STATUS)
@@ -1018,6 +1018,9 @@ pCode * pic16_findNextpCode(pCode *pc, PC_TYPE pct);
 int pic16_isPCinFlow(pCode *pc, pCode *pcflow);
 struct regs * pic16_getRegFromInstruction(pCode *pc);
 struct regs * pic16_getRegFromInstruction2(pCode *pc);
+char *pic16_get_op(pCodeOp *pcop,char *buffer, size_t size);
+char *pic16_get_op2(pCodeOp *pcop,char *buffer, size_t size);
+char *dumpPicOptype(PIC_OPTYPE type);
 
 extern void pic16_pcode_test(void);
 extern int pic16_debug_verbose;
@@ -1025,7 +1028,7 @@ extern int pic16_pcode_verbose;
 
 #ifndef debugf
 //#define debugf(frm, rest...)       _debugf(__FILE__, __LINE__, frm, rest)
-#define debugf(frm, rest)	_debug(__FILE__, __LINE__, frm, rest)
+#define debugf(frm, rest)	_debugf(__FILE__, __LINE__, frm, rest)
 #endif
 
 extern void _debugf(char *f, int l, char *frm, ...);

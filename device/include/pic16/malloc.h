@@ -7,7 +7,8 @@
 
 /*
 ** $Id$
-*/
+ */
+ 
 
 /*
  * Structure of memory block header:

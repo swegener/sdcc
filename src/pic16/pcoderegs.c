@@ -177,7 +177,7 @@ static void pCodeRegMapLiveRangesInFlow(pCodeFlow *pcfl)
       	      
 #endif
 
-//      fprintf(stderr, "trying to get first operand from pCode reg= %s\n", reg->name);
+//      fprintf(stderr, "%s:%d: trying to get first operand from pCode reg= %s\n", __FILE__, __LINE__, reg->name);
       addSetIfnotP(& (PCFL(pcfl)->registers), reg);
 
       if((PCC_REGISTER | PCC_LITERAL) & PCI(pc)->inCond)
@@ -194,7 +194,7 @@ static void pCodeRegMapLiveRangesInFlow(pCodeFlow *pcfl)
 	if(PCI(pc)->is2MemOp) {
 			reg = pic16_getRegFromInstruction2(pc);
 			if(reg) {
-//				fprintf(stderr, "trying to get second operand from pCode reg= %s\n", reg->name);
+//				fprintf(stderr, "%s:%d: trying to get second operand from pCode reg= %s\n", __FILE__, __LINE__, reg->name);
 				addSetIfnotP(& (PCFL(pcfl)->registers), reg);
 
 				if((PCC_REGISTER | PCC_LITERAL) & PCI(pc)->inCond)

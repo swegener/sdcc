@@ -37,6 +37,12 @@
 #define STRCASECMP strcasecmp
 #endif
 
+#ifndef debugf
+#define debugf(frm, rest)       _debugf(__FILE__, __LINE__, frm, rest)
+#endif
+void _debugf(char *f, int l, char *frm, ...);
+
+
 //#define USE_ONSTACK
 
 
@@ -103,7 +109,9 @@ int pic16_Gstack_base_addr=0; /* The starting address of registers that
 			 * are used to pass and return parameters */
 
 
-
+int _inRegAllocator=0;	/* flag that marks whther allocReg happens while
+                         * inside the register allocator function */
+                         
 
 static void spillThis (symbol *);
 int pic16_ralloc_debug = 0;
@@ -486,6 +494,8 @@ pic16_allocInternalRegister(int rIdx, char * name, short po_type, int alias)
 
   return NULL;
 }
+
+
 /*-----------------------------------------------------------------*/
 /* allocReg - allocates register of given type                     */
 /*-----------------------------------------------------------------*/
@@ -494,6 +504,9 @@ allocReg (short type)
 {
   regs * reg=NULL;
   
+#define MAX_P16_NREGS	6
+
+
 #if 0
   if(dynrIdx > pic16_nRegs)
   	return NULL;
@@ -503,11 +516,20 @@ allocReg (short type)
 	reg = regFindFree( pic16_dynAllocRegs );
 
 	if(reg) {
-//		fprintf(stderr, "%s: found FREE register %s\n", __FILE__, reg->name);
+//		fprintf(stderr, "%s: [%s] found FREE register %s, rIdx: %d\n", __FILE__, (_inRegAllocator)?"ralloc":"", reg->name, reg->rIdx);
 	}
 
 	if(!reg) {
 		reg = newReg(REG_GPR, PO_GPR_TEMP, dynrIdx++, NULL, 1, 0, NULL);
+//		fprintf(stderr, "%s: [%s] allocating NEW register %s, rIdx: %d\n", __FILE__, (_inRegAllocator)?"ralloc":"", reg->name, reg->rIdx);
+
+#if 1
+                if(_inRegAllocator && (dynrIdx > MAX_P16_NREGS)) {
+//                  debugf("allocating more registers than available\n", 0);
+//                  return (NULL);
+                }
+#endif
+
 //		addSet(&pic16_dynAllocRegs, reg);
 	}
 
@@ -2324,7 +2346,6 @@ serialRegAssign (eBBlock ** ebbs, int count)
 	      /* else we assign registers to it */
 	      _G.regAssigned = bitVectSetBit (_G.regAssigned, sym->key);
 
-	      debugLog ("  %d - nRegs: %d\n", __LINE__, sym->nRegs);
 	      if(debugF) 
 		bitVectDebugOn(_G.regAssigned, debugF);
 
@@ -2677,7 +2698,6 @@ regTypeNum ()
 	if (IS_AGGREGATE (sym->type) || sym->isptr)
 	  sym->type = aggrToPtr (sym->type, FALSE);
 	debugLog ("  %d - no reg needed - used as a return\n", __LINE__);
-
 	continue;
       }
 
@@ -2755,6 +2775,7 @@ regTypeNum ()
       /* registers for true symbols we will */
       /* see how things go                  */
       sym->nRegs = 0;
+      
   }
 
 }
@@ -4150,6 +4171,8 @@ pic16_assignRegisters (eBBlock ** ebbs, int count)
   debugLog ("\nebbs before optimizing:\n");
   dumpEbbsToDebug (ebbs, count);
 
+  _inRegAllocator = 1;
+
   setToNull ((void *) &_G.funcrUsed);
   pic16_ptrRegReq = _G.stackExtend = _G.dataExtend = 0;
 
@@ -4227,6 +4250,7 @@ pic16_assignRegisters (eBBlock ** ebbs, int count)
   debugLog ("ebbs after optimizing:\n");
   dumpEbbsToDebug (ebbs, count);
 
+  _inRegAllocator = 0;
 
   genpic16Code (ic);
 
@@ -4237,6 +4261,7 @@ pic16_assignRegisters (eBBlock ** ebbs, int count)
   setToNull ((void *) &_G.spiltSet);
   /* mark all registers as free */
   pic16_freeAllRegs ();
+
 
   debugLog ("leaving\n<><><><><><><><><><><><><><><><><>\n");
   debugLogClose ();

@@ -24,6 +24,10 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
+/*
+** $Id$
+*/
+
 #include <sdcc-lib.h>
 
 #define MSB_SET(x) ((x >> (8*sizeof(x)-1)) & 1)

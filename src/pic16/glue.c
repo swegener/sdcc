@@ -576,7 +576,7 @@ void pic16_printGPointerType (const char *iname, const unsigned int itype,
         pic16_emitDS(buf, ptype, p);
         break;
       default:
-//        debugf("itype = %d\n", itype );
+        debugf("itype = %d\n", itype );
         assert( 0 );
     }
 

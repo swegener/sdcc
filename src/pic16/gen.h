@@ -153,6 +153,8 @@ extern unsigned pic16_fReturnSizePic;
 #define emitSETC    pic16_emitpcode(POC_BSF,  pic16_popCopyGPR2Bit(PCOP(&pic16_pc_status),PIC_C_BIT))
 #define emitSETDC   pic16_emitpcode(POC_BSF,  pic16_popCopyGPR2Bit(PCOP(&pic16_pc_status),PIC_DC_BIT))
 
+#define emitTOGC    pic16_emitpcode(POC_BTG,  pic16_popCopyGPR2Bit(PCOP(&pic16_pc_status),PIC_C_BIT))
+
 int pic16_getDataSize(operand *op);
 void pic16_emitpcode(PIC_OPCODE poc, pCodeOp *pcop);
 void pic16_emitpLabel(int key);
@@ -200,5 +202,8 @@ const char *pic16_pCodeOpType(  pCodeOp *pcop);
 
 
 void dumpiCode(iCode *lic);
+
+int inWparamList(char *s);
+
 
 #endif

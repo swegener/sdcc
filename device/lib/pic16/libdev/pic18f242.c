@@ -131,6 +131,8 @@ sfr at 0xfd3 OSCCON;
 volatile __OSCCONbits_t at 0xfd3 OSCCONbits;
 
 sfr at 0xfd5 T0CON;
+volatile __T0CONbits_t at 0xfd5 T0CONbits;
+
 sfr at 0xfd6 TMR0L;
 sfr at 0xfd7 TMR0H;
 sfr at 0xfd8 STATUS;

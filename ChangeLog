@@ -1,3 +1,52 @@
+2004-11-24 Vangelis Rokas <vrokas AT otenet.gr>
+
+	Large cummulative patch for pic16 port.
+	* device/lib/pic16/gstack.h: NEW, user can specify its own handler
+	to call when a stack overflow occurs,
+	* (malloc.h): added CVS Id tag,
+	* (pic18f{242,252,442,452}.h): added T0CONbits structure and
+	variable,
+	* added libc directory. The current version of LibC contains string
+	functions, ctype functions and macros and some functions of the
+	stdlib set (like malloc/free/atof/atoi etc...). All functions are to
+	be extensively tested in the future. Standard disclaimer here.
+	Library is not automatically build yet. But one can build it by
+	invoking 'make' inside the libc directory.
+	* added ADC library under libio. Preliminary version yet.
+	
+	* src/pic16/gen.h: added emitTOGC macro, to toggle Carry flag,
+	* src/pic16/gen.c (aopForRemat): asmop size is filled by
+	aopForRemat() now and not by pic16_aopOp(),
+	* (pic16_popGetTempReg): removed warning messgae when allocating
+	temporary registers, its a buggy feature and will be removed,
+	* (pic16_popGet): set register instance field in AOP_CRY,
+	* (pic16_outBitC): fixed for results in size greater than 1,
+	* (genUminusFloat): fixed for pic16, ported code from mcs51,
+	* (pic16_storeForReturn): optimized return of 0,
+	* (genCmp): experimental code for new genCmp which uses PIC18's
+	special compare&skip instructions. Initial tests fail some times
+	with variables grater than 1 byte in size, so new code is disabled,
+	* (genUnpackBits, genPackBits): more optimizations in reading/writing,
+	a single bit,
+	* (genCast): began a fix to optimize the casting of a bit to another
+	bit, now assigning a bitfield to another bitfield will fail, sorry,
+	* src/pic16/main.c: disabled the use of lr-support feature,
+	* src/pic16/pcode.h: renamed PCASMDIR to PCAD,
+	* added some function prototypes, added function _debugf prototype,
+	* src/pic16/pcode.c: (pic16_get_op): fixed emitting operands of register
+	bits with offset (case PO_GPR_BIT),
+	* (genericPrint): don't emit INFO pcode when --pcode-verbose not in
+	command line,
+	* (isBankInstruction): modified to return 0 for no banking instruction,
+	and 1 for banking instruction,
+	* (pic16_isPCinFlow): check for PCAD (assembler directives) too,
+	caused stop processing pCodes after a inline assembly block,
+	* (pic16_popCopyGPR2Bit): updated to match bitfields with offset,
+	* src/pic16/pcoderegs.c: fixed a bug with eliminating some temporary
+	registers when it shouldn't,
+	* src/pic16/ralloc.c (allocReg): add preliminary support for
+	supporting a limited set of temporary registers,
+
 2004-11-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (genAssign, genPointerGetSetOfs, genDataPointerGet,

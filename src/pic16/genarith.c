@@ -612,7 +612,7 @@ static void genAddLit (iCode *ic, int lit)
 	if(carry_info) {
 	  switch(lo) {
 	  case 0:
-	    D_POS(">>> IMPROVED and compacted");
+	    D_POS(">>> IMPROVED and compacted 0");
 	    emitSKPNC;
 	    pic16_emitpcode(POC_INCF, pic16_popGet(AOP(result),offset));
 	    D_POS("<<< IMPROVED and compacted");
@@ -624,7 +624,7 @@ static void genAddLit (iCode *ic, int lit)
 	    pic16_emitpcode(POC_ADDWF, pic16_popGet(AOP(result),offset));
 	    break;
 	  default:
-	    D_POS(">>> IMPROVED and compacted");
+	    D_POS(">>> IMPROVED and compacted - default");
 	    pic16_emitpcode(POC_MOVLW,pic16_popGetLit(lo));
 	    pic16_emitpcode(POC_ADDWFC, pic16_popGet(AOP(result),offset));
 	    D_POS("<<< IMPROVED and compacted");

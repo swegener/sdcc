@@ -765,6 +765,21 @@ typedef union {
 extern volatile __OSCCONbits_t at 0xfd3 OSCCONbits;
 
 extern sfr at 0xfd5 T0CON;
+typedef union {
+	struct {
+		unsigned T0PS0:1;
+		unsigned T0PS1:1;
+		unsigned T0PS2:1;
+		unsigned PSA:1;
+		unsigned T0SE:1;
+		unsigned T0CS:1;
+		unsigned T08BIT:1;
+		unsigned TMR0ON:1;
+	};
+} __T0CONbits_t;
+
+extern volatile __T0CONbits_t at 0xfd5 T0CONbits;
+
 extern sfr at 0xfd6 TMR0L;
 extern sfr at 0xfd7 TMR0H;
 extern sfr at 0xfd8 STATUS;

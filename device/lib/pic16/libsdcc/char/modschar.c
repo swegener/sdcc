@@ -24,6 +24,11 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
+/*
+** $Id$
+*/
+
+
 #include <sdcc-lib.h>
 
 unsigned char _moduchar (unsigned char a, unsigned char b);
@@ -31,7 +36,7 @@ unsigned char _moduchar (unsigned char a, unsigned char b);
 char _modschar (char a, char b) _IL_REENTRANT
 {
   register char r;
-  register char ta, tb;
+  char ta, tb;
 
 	if(a<0)ta = -a; else ta = a;
 	if(b<0)tb = -b; else tb = b;

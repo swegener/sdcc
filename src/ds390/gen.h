@@ -31,7 +31,7 @@ enum
     AOP_REG, AOP_DIR,
     AOP_DPTR, AOP_DPTR2, AOP_R0, AOP_R1,
     AOP_STK, AOP_IMMD, AOP_STR,
-    AOP_CRY, AOP_ACC, AOP_DPTRn
+    AOP_CRY, AOP_ACC, AOP_DPTRn, AOP_DUMMY
   };
 
 /* type asmop : a homogenised type for 
@@ -54,6 +54,7 @@ typedef struct asmop
 				   AOP_STR    -  array of strings
 				   AOP_ACC    -  result is in the acc:b pair
 				   AOP_DPTRn  -  is in dptr(n)
+				   AOP_DUMMY  -  read as 0, discard writes
 				 */
     short coff;			/* current offset */
     short size;			/* total size */

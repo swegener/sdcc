@@ -679,7 +679,8 @@ killDeadCode (eBBlock ** ebbs, int count)
 
 	      if (SKIP_IC (ic) ||
 		  ic->op == IFX ||
-		  ic->op == RETURN)
+		  ic->op == RETURN ||
+                  ic->op == DUMMY_READ_VOLATILE)
 		continue;
 
 	      /* if the result is volatile then continue */
@@ -689,6 +690,9 @@ killDeadCode (eBBlock ** ebbs, int count)
 	      /* if the result is a temp & isaddr then skip */
 	      if (IC_RESULT (ic) && POINTER_SET (ic))
 		continue;
+              
+              if (POINTER_GET (ic) && IS_VOLATILE (operandType (IC_LEFT (ic))->next))
+                continue;
 
 	      /* if the result is used in the remainder of the */
 	      /* block then skip */
@@ -725,7 +729,7 @@ killDeadCode (eBBlock ** ebbs, int count)
 		    continue;
 
 		  kill = 1;
-		}
+                }
 
 	    kill:
 	      /* kill this one if required */

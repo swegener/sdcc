@@ -57,7 +57,9 @@ typedef enum
     /* Is in the extended stack pointer (IY on the Z80) */
     AOP_EXSTK,
     /* Is referenced by a pointer in a register pair. */
-    AOP_PAIRPTR
+    AOP_PAIRPTR,
+    /* Read as 0, discard writes */
+    AOP_DUMMY
   }
 AOP_TYPE;
 

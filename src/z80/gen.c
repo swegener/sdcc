@@ -262,7 +262,8 @@ static const char *aopNames[] = {
   "AOP_HLREG",
   "AOP_SIMPLELIT",
   "AOP_EXSTK",
-  "AOP_PAIRPT"
+  "AOP_PAIRPT",
+  "AOP_DUMMY"
 };
 
 static bool
@@ -1082,13 +1083,21 @@ aopOp (operand * op, iCode * ic, bool result, bool requires_a)
 	  return;
 	}
 
-      /* else spill location  */
-      if (sym->usl.spillLoc && getSize(sym->type) != getSize(sym->usl.spillLoc->type)) {
-	  /* force a new aop if sizes differ */
-	  sym->usl.spillLoc->aop = NULL;
-      }
-      sym->aop = op->aop = aop =
-	aopForSym (ic, sym->usl.spillLoc, result, requires_a);
+      if (sym->usl.spillLoc)
+        {
+	  if (getSize(sym->type) != getSize(sym->usl.spillLoc->type))
+            {
+	      /* force a new aop if sizes differ */
+	      sym->usl.spillLoc->aop = NULL;
+	    }
+	  sym->aop = op->aop = aop =
+		     aopForSym (ic, sym->usl.spillLoc, result, requires_a);
+	  aop->size = getSize (sym->type);
+	  return;
+        }
+      
+      /* else must be a dummy iTemp */
+      sym->aop = op->aop = aop = newAsmop (AOP_DUMMY);
       aop->size = getSize (sym->type);
       return;
     }
@@ -1584,6 +1593,10 @@ aopGet (asmop * aop, int offset, bool bit16)
   /* depending on type */
   switch (aop->type)
     {
+    case AOP_DUMMY:
+      tsprintf (buffer, sizeof(buffer), "!zero");
+      return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
+    
     case AOP_IMMD:
       /* PENDING: re-target */
       if (bit16)
@@ -1770,6 +1783,10 @@ aopPut (asmop * aop, const char *s, int offset)
   /* depending on where it is ofcourse */
   switch (aop->type)
     {
+    case AOP_DUMMY:
+      _moveA (s);  /* in case s is volatile */
+      break;
+      
     case AOP_DIR:
       /* Direct.  Hmmm. */
       wassert (IS_GB);
@@ -7099,9 +7116,24 @@ genReceive (iCode * ic)
 static void
 genDummyRead (iCode * ic)
 {
-  emit2 ("; genDummyRead not implemented");
+  operand *right;
+  int size, offset;
 
-  ic = ic;
+  right = IC_RIGHT (ic);
+  aopOp (right, ic, FALSE, FALSE);
+  
+  /* general case */
+  size = AOP_SIZE (right);
+  offset = 0;
+
+  while (size--)
+    {
+      _moveA (aopGet (AOP (right), offset, FALSE));
+      offset++;
+    }
+
+release:
+  freeAsmop (right, NULL, ic);
 }
 
 enum
@@ -7910,6 +7942,7 @@ genZ80Code (iCode * lic)
           break;
 
 	case DUMMY_READ_VOLATILE:
+	  emitDebug ("; genDummyRead");
 	  genDummyRead (ic);
 	  break;
 

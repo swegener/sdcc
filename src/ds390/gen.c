@@ -1006,13 +1006,22 @@ aopOp (operand * op, iCode * ic, bool result, bool useDP2)
 	  aop->aopu.dptr = sym->dptr;
 	  return ;
       }
-      /* else spill location  */
-      if (sym->usl.spillLoc && getSize(sym->type) != getSize(sym->usl.spillLoc->type)) {
-	  /* force a new aop if sizes differ */
-	  sym->usl.spillLoc->aop = NULL;
-      }
-      sym->aop = op->aop = aop =
-	aopForSym (ic, sym->usl.spillLoc, result, useDP2);
+      
+      if (sym->usl.spillLoc)
+        {
+          if (getSize(sym->type) != getSize(sym->usl.spillLoc->type))
+            {
+	      /* force a new aop if sizes differ */
+	      sym->usl.spillLoc->aop = NULL;
+	    }
+	  sym->aop = op->aop = aop =
+	             aopForSym (ic, sym->usl.spillLoc, result, useDP2);
+	  aop->size = getSize (sym->type);
+	  return;
+        }
+      
+      /* else must be a dummy iTemp */
+      sym->aop = op->aop = aop = newAsmop (AOP_DUMMY);
       aop->size = getSize (sym->type);
       return;
     }
@@ -1182,6 +1191,8 @@ aopGet (asmop *aop,
   /* depending on type */
   switch (aop->type)
     {
+    case AOP_DUMMY:
+      return zero;
 
     case AOP_R0:
     case AOP_R1:
@@ -1383,6 +1394,10 @@ aopPut (asmop * aop, char *s, int offset)
   /* depending on where it is ofcourse */
   switch (aop->type)
     {
+    case AOP_DUMMY:
+      MOVA (s);		/* read s in case it was volatile */
+      break;
+      
     case AOP_DIR:
         if (offset)
 	{
@@ -12650,7 +12665,7 @@ genDummyRead (iCode * ic)
   offset = 0;
   while (size--)
     {
-      emitcode ("mov", "a,%s", aopGet (AOP (right), offset, FALSE, FALSE, FALSE));
+      MOVA (aopGet (AOP (right), offset, FALSE, FALSE, FALSE));
       offset++;
     }
 

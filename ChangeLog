@@ -1,3 +1,14 @@
+2003-10-03  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/z80/gen.h,
+	* src/z80/gen.c (aopOp, aopGet, aopPut, genDummyRead),
+	* src/mcs51/gen.h
+	* src/mcs51/gen.c (aopOp, aopGet, aopPut, genDummyRead),
+	* src/ds390/gen.h
+	* src/ds390/gen.c (aopOp, aopGet, aopPut, genDummyRead),
+	* src/SDCCicode.c (ast2iCode, geniCodeDummyRead): Fixed bug #663539
+	* src/SDCCopt.c (killDeadCode): Fixed bugs #663539 & #816705
+
 2003-10-02  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/z80/gen.c (genRet): fixed bug #524753
@@ -7,7 +18,6 @@
 	fix for bug #477835 to the z80
 	* src/z80/gen.c (genZ80code, _vemit2, _emit2): added support
 	for tracking iCodes in the peephole optimizer for z80
-
 
 2003-10-01  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 

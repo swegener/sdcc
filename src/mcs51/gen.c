@@ -708,13 +708,21 @@ aopOp (operand * op, iCode * ic, bool result)
 	  return;
 	}
 
-      /* else spill location  */
-      if (sym->usl.spillLoc && getSize(sym->type) != getSize(sym->usl.spillLoc->type)) {
-	  /* force a new aop if sizes differ */
-	  sym->usl.spillLoc->aop = NULL;
-      }
-      sym->aop = op->aop = aop =
-	aopForSym (ic, sym->usl.spillLoc, result);
+      if (sym->usl.spillLoc)
+        {
+          if (getSize(sym->type) != getSize(sym->usl.spillLoc->type))
+            {
+	      /* force a new aop if sizes differ */
+	      sym->usl.spillLoc->aop = NULL;
+	    }
+	  sym->aop = op->aop = aop =
+	             aopForSym (ic, sym->usl.spillLoc, result);
+	  aop->size = getSize (sym->type);
+	  return;
+        }
+      
+      /* else must be a dummy iTemp */
+      sym->aop = op->aop = aop = newAsmop (AOP_DUMMY);
       aop->size = getSize (sym->type);
       return;
     }
@@ -871,6 +879,8 @@ aopGetUsesAcc (asmop *aop, int offset)
       if (strcmp (aop->aopu.aop_str[offset], "a") == 0)
 	return TRUE;
       return FALSE;
+    case AOP_DUMMY:
+      return FALSE;
     default:
       /* Error case --- will have been caught already */
       wassert(0);
@@ -896,7 +906,9 @@ aopGet (asmop * aop, int offset, bool bit16, bool dname)
   /* depending on type */
   switch (aop->type)
     {
-
+    case AOP_DUMMY:
+      return zero;
+      
     case AOP_R0:
     case AOP_R1:
       /* if we need to increment it */
@@ -1035,6 +1047,10 @@ aopPut (asmop * aop, const char *s, int offset, bool bvolatile)
   /* depending on where it is ofcourse */
   switch (aop->type)
     {
+    case AOP_DUMMY:
+      MOVA (s);		/* read s in case it was volatile */
+      break;
+      
     case AOP_DIR:
       if (offset)
 	sprintf (d, "(%s + %d)",
@@ -8965,7 +8981,7 @@ genDummyRead (iCode * ic)
   offset = 0;
   while (size--)
     {
-      emitcode ("mov", "a,%s", aopGet (AOP (right), offset, FALSE, FALSE));
+      MOVA (aopGet (AOP (right), offset, FALSE, FALSE));
       offset++;
     }
 

@@ -2863,6 +2863,24 @@ geniCodeAssign (operand * left, operand * right, int nosupdate)
 }
 
 /*-----------------------------------------------------------------*/
+/* geniCodeDummyRead - generate code for dummy read                */
+/*-----------------------------------------------------------------*/
+static void
+geniCodeDummyRead (operand * op)
+{
+  iCode *ic;
+  sym_link *type = operandType (op);
+
+  if (!IS_VOLATILE(type))
+    return;
+    
+  ic = newiCode (DUMMY_READ_VOLATILE, NULL, op);
+  ADDTOCHAIN (ic);
+
+  ic->nosupdate = 1;
+}
+
+/*-----------------------------------------------------------------*/
 /* geniCodeSEParms - generate code for side effecting fcalls       */
 /*-----------------------------------------------------------------*/
 static void 
@@ -3503,8 +3521,14 @@ ast2iCode (ast * tree,int lvl)
      (tree->opval.op == NULLOP ||
      tree->opval.op == BLOCK))
     {
-      ast2iCode (tree->left,lvl+1);
-      ast2iCode (tree->right,lvl+1);
+      if (tree->left && tree->left->type == EX_VALUE)
+        geniCodeDummyRead (ast2iCode (tree->left,lvl+1));
+      else
+        ast2iCode (tree->left,lvl+1);
+      if (tree->right && tree->right->type == EX_VALUE)
+        geniCodeDummyRead (ast2iCode (tree->right,lvl+1));
+      else
+        ast2iCode (tree->right,lvl+1);
       return NULL;
     }
 

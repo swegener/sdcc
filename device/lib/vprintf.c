@@ -306,9 +306,9 @@ get_conversion_spec:
 
 	length=0;
         lsd = 1;
-	while( (value.byte[0] != 0) || (value.byte[1] != 0) ||
-	       (value.byte[2] != 0) || (value.byte[3] != 0) )
-	{
+
+	//jwk20000814: do this at least once, e.g.: printf ("%d", (int)0);
+	do {
           value.byte[4] = 0;
 	  calculate_digit();
 
@@ -328,8 +328,9 @@ _endasm;
 
 	  length++;
           lsd = ~lsd;
-	}
-
+	} while( (value.byte[0] != 0) || (value.byte[1] != 0) ||
+		 (value.byte[2] != 0) || (value.byte[3] != 0) );
+	
 	if (width == 0)
 	{
 	  // default width. We set it to 1 to output

@@ -143,6 +143,36 @@ emitcode (char *inst, char *fmt, ...)
 }
 
 /*-----------------------------------------------------------------*/
+/* hasInc - operand is incremented before any other use            */
+/*-----------------------------------------------------------------*/
+static iCode *
+hasInc (operand *op, iCode *ic)
+{
+  sym_link *type = operandType(op);
+  sym_link *retype = getSpec (type);
+  iCode *lic = ic->next;
+  int isize ;
+  
+  if (IS_BITVAR(retype)||!IS_PTR(type)) return NULL;
+  isize = getSize(type->next);
+  while (lic) {
+    /* if operand of the form op = op + <sizeof *op> */
+    if (lic->op == '+' && isOperandEqual(IC_LEFT(lic),op) &&
+	isOperandEqual(IC_RESULT(lic),op) && 
+	isOperandLiteral(IC_RIGHT(lic)) &&
+	operandLitValue(IC_RIGHT(lic)) == isize) {
+      return lic;
+    }
+    /* if the operand used or deffed */
+    if (bitVectBitValue(ic->uses,op->key) || ic->defKey == op->key) {
+      return NULL;
+    }
+    lic = lic->next;
+  }
+  return NULL;
+}
+
+/*-----------------------------------------------------------------*/
 /* getFreePtr - returns X or Z whichever is free or can be pushed  */
 /*-----------------------------------------------------------------*/
 static regs *
@@ -3768,7 +3798,7 @@ genDataPointerGet (operand * left, operand * result, iCode * ic)
 /* genNearPointerGet - emitcode for near pointer fetch             */
 /*-----------------------------------------------------------------*/
 static void
-genMemPointerGet (operand * left, operand * result, iCode * ic)
+genMemPointerGet (operand * left, operand * result, iCode * ic, iCode *pi)
 {
 	asmop *aop = NULL;
 	regs *preg = NULL;
@@ -3799,7 +3829,9 @@ genMemPointerGet (operand * left, operand * result, iCode * ic)
 		aop = newAsmop (0);
 		preg = getFreePtr (ic, &aop, FALSE, 0);
 		if (isRegPair (AOP (left) )) {
-		    emitcode ("movw", "%s,%s",aop->aopu.aop_ptr->name);
+			emitcode ("movw", "%s,%s",
+				  aop->aopu.aop_ptr->name,
+				  aopGet(AOP(left),0));
 		} else {
 			emitcode ("mov", "%s,%s", aop->aopu.aop_ptr->name, 
 				  aopGet (AOP (left), 0));
@@ -3822,7 +3854,6 @@ genMemPointerGet (operand * left, operand * result, iCode * ic)
 		exit (0);
 	}
 
-	freeAsmop (left, NULL, ic, TRUE);
 	aopOp (result, ic, FALSE);
 
 	/* if bitfield then unpack the bits */
@@ -3834,7 +3865,7 @@ genMemPointerGet (operand * left, operand * result, iCode * ic)
 		int offset = 0;
 
 		while (size--) {
-			if (size) {
+			if (size || pi) {
 				emitcode ("ld","%s,%s+",aopGet(AOP(result),offset), rname);
 			} else {
 				emitcode ("ld","%s,%s",aopGet(AOP(result),offset), rname);
@@ -3845,6 +3876,20 @@ genMemPointerGet (operand * left, operand * result, iCode * ic)
 	/* now some housekeeping stuff */
 	if (gotFreePtr) {
 		/* we had to allocate for this iCode */
+		if (pi) {
+			if (isRegPair (AOP (left) )) {
+				emitcode ("movw", "%s,%s",
+					  aopGet (AOP(left),0),
+					  aop->aopu.aop_ptr->name);
+			} else {
+				emitcode ("mov", "%s,%s", 
+					  aopGet (AOP (left), 0),
+					  aop->aopu.aop_ptr->name);
+				emitcode ("mov", "%s,%s", 
+					  aopGet (AOP (left), 1),
+					  aop->aop_ptr2->name);
+			}
+		}
 		freeAsmop (NULL, aop, ic, TRUE);
 	} else {
 
@@ -3853,15 +3898,17 @@ genMemPointerGet (operand * left, operand * result, iCode * ic)
 		   if size > 0 && this could be used again
 		   we have to point it back to where it
 		   belongs */
-		if (AOP_SIZE (result) > 1 &&
-		    !OP_SYMBOL (left)->remat &&
-		    (OP_SYMBOL (left)->liveTo > ic->seq || ic->depth)) {
+		if ((AOP_SIZE (result) > 1 &&
+		     !OP_SYMBOL (left)->remat &&
+		     (OP_SYMBOL (left)->liveTo > ic->seq || ic->depth)) && !pi) {
 			int size = AOP_SIZE (result) - 1;
 			emitcode ("sbiw", "%s,%d",frname,size);
 		}
 	}
 
 	/* done */
+	if (pi) pi->generated = 1;
+	freeAsmop (left, NULL, ic, TRUE);
 	freeAsmop (result, NULL, ic, TRUE);
 
 }
@@ -3870,7 +3917,7 @@ genMemPointerGet (operand * left, operand * result, iCode * ic)
 /* genCodePointerGet - gget value from code space                  */
 /*-----------------------------------------------------------------*/
 static void
-genCodePointerGet (operand * left, operand * result, iCode * ic)
+genCodePointerGet (operand * left, operand * result, iCode * ic, iCode *pi)
 {
 	int size, offset;
 	sym_link *retype = getSpec (operandType (result));	
@@ -3905,7 +3952,7 @@ genCodePointerGet (operand * left, operand * result, iCode * ic)
 		offset = 0;
 
 		while (size--) {
-			if (size) {
+			if (size || pi) {
 				emitcode ("lpm","%s,Z+",aopGet(AOP(result),offset++));
 			} else {
 				emitcode ("lpm","%s,Z",aopGet(AOP(result),offset++));
@@ -3913,10 +3960,17 @@ genCodePointerGet (operand * left, operand * result, iCode * ic)
 		}
 	}
 
-	freeAsmop (left, NULL, ic, TRUE);
 	/* now some housekeeping stuff */
 	if (gotFreePtr) {
 		/* we had to allocate for this iCode */
+		if (pi) {
+			if (isRegPair(AOP (left))) {
+				emitcode ("movw","%s,r30",aopGet (AOP (left), 0));
+			} else {			
+				emitcode ("mov", "%s,r30", aopGet (AOP (left), 0));
+				emitcode ("mov", "%s,r31", aopGet (AOP (left), 1));
+			}
+		}
 		freeAsmop (NULL, aop, ic, TRUE);
 	} else {
 
@@ -3925,15 +3979,18 @@ genCodePointerGet (operand * left, operand * result, iCode * ic)
 		   if size > 0 && this could be used again
 		   we have to point it back to where it
 		   belongs */
-		if (AOP_SIZE (result) > 1 &&
-		    !OP_SYMBOL (left)->remat &&
-		    (OP_SYMBOL (left)->liveTo > ic->seq || ic->depth)) {
+		if ((AOP_SIZE (result) > 1 &&
+		     !OP_SYMBOL (left)->remat &&
+		     (OP_SYMBOL (left)->liveTo > ic->seq || ic->depth)) &&
+		    !pi) {
 			int size = AOP_SIZE (result) - 1;
 			emitcode ("sbiw", "r30,%d",size);
 		}
 	}
 
 	/* done */
+	if (pi) pi->generated=1;
+	freeAsmop (left, NULL, ic, TRUE);
 	freeAsmop (result, NULL, ic, TRUE);
 
 }
@@ -3942,7 +3999,7 @@ genCodePointerGet (operand * left, operand * result, iCode * ic)
 /* genGenPointerGet - gget value from generic pointer space        */
 /*-----------------------------------------------------------------*/
 static void
-genGenPointerGet (operand * left, operand * result, iCode * ic)
+genGenPointerGet (operand * left, operand * result, iCode * ic, iCode *pi)
 {
 	int size, offset;
 	int gotFreePtr = 0;
@@ -3977,7 +4034,7 @@ genGenPointerGet (operand * left, operand * result, iCode * ic)
 		offset = 0;
 
 		while (size--) {
-			if (size) 
+			if (size || pi) 
 				emitcode ("call", "__gptrget_pi");
 			else
 				emitcode ("call", "__gptrget");
@@ -3985,10 +4042,18 @@ genGenPointerGet (operand * left, operand * result, iCode * ic)
 		}
 	}
 
-	freeAsmop (left, NULL, ic, TRUE);
+
 	/* now some housekeeping stuff */
 	if (gotFreePtr) {
 		/* we had to allocate for this iCode */
+		if (pi) {
+			if (isRegPair(AOP (left))) {
+				emitcode ("movw","%s,r30",aopGet (AOP (left), 0));
+			} else {			
+				emitcode ("mov", "%s,r30", aopGet (AOP (left), 0));
+				emitcode ("mov", "%s,r31", aopGet (AOP (left), 1));
+			}
+		}
 		freeAsmop (NULL, aop, ic, TRUE);
 	} else {
 
@@ -3997,13 +4062,16 @@ genGenPointerGet (operand * left, operand * result, iCode * ic)
 		   if size > 0 && this could be used again
 		   we have to point it back to where it
 		   belongs */
-		if (AOP_SIZE (result) > 1 &&
-		    !OP_SYMBOL (left)->remat &&
-		    (OP_SYMBOL (left)->liveTo > ic->seq || ic->depth)) {
+		if ((AOP_SIZE (result) > 1 &&
+		     !OP_SYMBOL (left)->remat &&
+		     (OP_SYMBOL (left)->liveTo > ic->seq || ic->depth)) &&
+		    !pi) {
 			int size = AOP_SIZE (result) - 1;
 			emitcode ("sbiw", "r30,%d",size);
 		}
 	}
+	if (pi) pi->generated=1;
+	freeAsmop (left, NULL, ic, TRUE);
 	freeAsmop (result, NULL, ic, TRUE);
 }
 
@@ -4011,7 +4079,7 @@ genGenPointerGet (operand * left, operand * result, iCode * ic)
 /* genPointerGet - generate code for pointer get                   */
 /*-----------------------------------------------------------------*/
 static void
-genPointerGet (iCode * ic)
+genPointerGet (iCode * ic, iCode *pi)
 {
 	operand *left, *result;
 	sym_link *type, *etype;
@@ -4042,15 +4110,15 @@ genPointerGet (iCode * ic)
 	case IPOINTER:
 	case PPOINTER:
 	case FPOINTER:
-		genMemPointerGet (left, result, ic);
+		genMemPointerGet (left, result, ic, pi);
 		break;
 
 	case CPOINTER:
-		genCodePointerGet (left, result, ic);
+		genCodePointerGet (left, result, ic, pi);
 		break;
 
 	case GPOINTER:
-		genGenPointerGet (left, result, ic);
+		genGenPointerGet (left, result, ic, pi);
 		break;
 	}
 
@@ -4230,10 +4298,10 @@ genDataPointerSet (operand * right, operand * result, iCode * ic)
 /* genNearPointerSet - emitcode for near pointer put               */
 /*-----------------------------------------------------------------*/
 static void
-genMemPointerSet (operand * right, operand * result, iCode * ic)
+genMemPointerSet (operand * right, operand * result, iCode * ic, iCode *pi)
 {
 	asmop *aop = NULL;
-	char *frname, *rname, *l;
+	char *frname = NULL, *rname, *l;
 	int gotFreePtr = 0;
 	sym_link *retype;
 	sym_link *ptype = operandType (result);
@@ -4254,14 +4322,15 @@ genMemPointerSet (operand * right, operand * result, iCode * ic)
 		aop = newAsmop (0);
 		getFreePtr (ic, &aop, FALSE, 0);
 		if (isRegPair (AOP (result) )) {
-			emitcode ("movw", "%s,%s",aop->aopu.aop_ptr->name);
+			emitcode ("movw", "%s,%s",aop->aopu.aop_ptr->name,
+				  aopGet(AOP (result), 0));
 		} else {
 			emitcode ("mov", "%s,%s", aop->aopu.aop_ptr->name, 
 				  aopGet (AOP (result), 0));
 			emitcode ("mov", "%s,%s", aop->aop_ptr2->name,
 				  aopGet (AOP (result), 1));
 		}
-		gotFreePtr = 1;
+		gotFreePtr = 1;		
 	} else {
 		aop = AOP(result);
 		frname = aopGet(aop,0);
@@ -4287,18 +4356,29 @@ genMemPointerSet (operand * right, operand * result, iCode * ic)
 
 		while (size--) {
 			l = aopGet (AOP (right), offset);
-			if (size)
-				emitcode ("sts", "%s+,%s", rname,l);
+			if (size || pi)
+				emitcode ("st", "%s+,%s", rname,l);
 			else
-				emitcode ("sts", "%s,%s", rname,l);				
+				emitcode ("st", "%s,%s", rname,l);				
 			offset++;
 		}
 	}
 	
 	/* now some housekeeping stuff */
-	freeAsmop (result, NULL, ic, TRUE);
 	if (gotFreePtr) {
 		/* we had to allocate for this iCode */
+		if (pi) {
+			if (isRegPair (AOP (result) )) {
+				emitcode ("movw", "%s,%s",
+					  aopGet(AOP(result),0),
+					  aop->aopu.aop_ptr->name);
+			} else {
+				emitcode ("mov", "%s,%s", aop->aopu.aop_ptr->name, 
+					  aopGet (AOP (result), 0));
+				emitcode ("mov", "%s,%s", aop->aop_ptr2->name,
+					  aopGet (AOP (result), 1));
+			}
+		}
 		freeAsmop (NULL, aop, ic, TRUE);
 	} else {
 
@@ -4307,15 +4387,17 @@ genMemPointerSet (operand * right, operand * result, iCode * ic)
 		   if size > 0 && this could be used again
 		   we have to point it back to where it
 		   belongs */
-		if (AOP_SIZE (right) > 1 &&
-		    !OP_SYMBOL (result)->remat &&
-		    (OP_SYMBOL (right)->liveTo > ic->seq || ic->depth)) {
+		if ((AOP_SIZE (right) > 1 &&
+		     !OP_SYMBOL (result)->remat &&
+		     (OP_SYMBOL (right)->liveTo > ic->seq || ic->depth)) && !pi) {
 			int size = AOP_SIZE (right) - 1;
 			emitcode ("sbiw", "%s,%d",frname,size);
 		}
 	}
 
 	/* done */
+	if (pi) pi->generated = 1;
+	freeAsmop (result, NULL, ic, TRUE);
 	freeAsmop (right, NULL, ic, TRUE);
 }
 
@@ -4323,7 +4405,7 @@ genMemPointerSet (operand * right, operand * result, iCode * ic)
 /* genGenPointerSet - set value from generic pointer space         */
 /*-----------------------------------------------------------------*/
 static void
-genGenPointerSet (operand * right, operand * result, iCode * ic)
+genGenPointerSet (operand * right, operand * result, iCode * ic, iCode *pi)
 {
 	int size, offset;
 	int gotFreePtr = 0;
@@ -4339,10 +4421,13 @@ genGenPointerSet (operand * right, operand * result, iCode * ic)
 	} else {
 		aop = newAsmop(0);
 		getFreePtr(ic,&aop,FALSE,TRUE);
-		
-		emitcode ("mov", "r30,%s", aopGet (AOP (result), 0));
-		emitcode ("mov", "r31,%s", aopGet (AOP (result), 1));
-		emitcode ("mov", "r0,%s",  aopGet (AOP (result), 2));
+		if (isRegPair(AOP(result))) {
+			emitcode ("movw", "r30,%s", aopGet (AOP (result), 0));
+		} else {
+			emitcode ("mov", "r30,%s", aopGet (AOP (result), 0));
+			emitcode ("mov", "r31,%s", aopGet (AOP (result), 1));
+		}
+		emitcode ("mov", "r24,%s",  aopGet (AOP (result), 2));
 		gotFreePtr=1;
 	}
 	
@@ -4360,17 +4445,24 @@ genGenPointerSet (operand * right, operand * result, iCode * ic)
 			char *l = aopGet(AOP (right), offset++);
 			MOVR0(l);
 			
-			if (size) 
+			if (size || pi) 
 				emitcode ("call", "__gptrput_pi");
 			else
 				emitcode ("call", "__gptrput");
 		}
 	}
 
-	freeAsmop (right, NULL, ic, TRUE);
 	/* now some housekeeping stuff */
 	if (gotFreePtr) {
 		/* we had to allocate for this iCode */
+		if (pi) {
+			if (isRegPair(AOP(result))) {
+				emitcode ("movw", "%s,r30", aopGet (AOP (result), 0));
+			} else {
+				emitcode ("mov", "%s,r30", aopGet (AOP (result), 0));
+				emitcode ("mov", "%s,r31", aopGet (AOP (result), 1));
+			}
+		}
 		freeAsmop (NULL, aop, ic, TRUE);
 	} else {
 
@@ -4379,13 +4471,15 @@ genGenPointerSet (operand * right, operand * result, iCode * ic)
 		   if size > 0 && this could be used again
 		   we have to point it back to where it
 		   belongs */
-		if (AOP_SIZE (right) > 1 &&
-		    !OP_SYMBOL (result)->remat &&
-		    (OP_SYMBOL (result)->liveTo > ic->seq || ic->depth)) {
+		if ((AOP_SIZE (right) > 1 &&
+		     !OP_SYMBOL (result)->remat &&
+		     (OP_SYMBOL (result)->liveTo > ic->seq || ic->depth)) && !pi) {
 			int size = AOP_SIZE (right) - 1;
 			emitcode ("sbiw", "r30,%d",size);
 		}
 	}
+	if (pi) pi->generated = 1;
+	freeAsmop (right, NULL, ic, TRUE);
 	freeAsmop (result, NULL, ic, TRUE);
 }
 
@@ -4393,7 +4487,7 @@ genGenPointerSet (operand * right, operand * result, iCode * ic)
 /* genPointerSet - stores the value into a pointer location        */
 /*-----------------------------------------------------------------*/
 static void
-genPointerSet (iCode * ic)
+genPointerSet (iCode * ic, iCode *pi)
 {
 	operand *right, *result;
 	sym_link *type, *etype;
@@ -4424,11 +4518,11 @@ genPointerSet (iCode * ic)
 	case IPOINTER:
 	case PPOINTER:
 	case FPOINTER:
-		genMemPointerSet (right, result, ic);
+		genMemPointerSet (right, result, ic, pi);
 		break;
 
 	case GPOINTER:
-		genGenPointerSet (right, result, ic);
+		genGenPointerSet (right, result, ic, pi);
 		break;
 	}
 
@@ -4441,32 +4535,36 @@ static void
 genIfx (iCode * ic, iCode * popIc)
 {
 	operand *cond = IC_COND (ic);
-	int isbit = 0;
+	char *cname ;
+	symbol *lbl;
 
 	aopOp (cond, ic, FALSE);
 
-	/* get the value into acc */
-	if (AOP_TYPE (cond) != AOP_CRY)
-		toBoolean (cond, "", 0);
-	else
-		isbit = 1;
+	/* get the value into acc */	
+	if (AOP_SIZE(cond) == 1 && AOP_ISHIGHREG(AOP(cond),0)) {
+		cname = aopGet(AOP(cond),0);
+	} else {
+		toBoolean (cond, "r24", 1);
+		cname = "r24";
+	}
 	/* the result is now in the accumulator */
 	freeAsmop (cond, NULL, ic, TRUE);
 
 	/* if there was something to be popped then do it */
 	if (popIc)
 		genIpop (popIc);
-
-	/* if the condition is  a bit variable */
-	/*     if (isbit && IS_ITEMP(cond) && SPIL_LOC(cond)) { */
-	/*  //  genIfxJump(ic,SPIL_LOC(cond)->rname); */
-	/*     } */
-	/*     else */
-	/*  if (isbit && !IS_ITEMP(cond)) */
-	/*    //      genIfxJump(ic,OP_SYMBOL(cond)->rname); */
-	/*  else */
-	/*    // genIfxJump(ic,"a"); */
-
+	
+	emitcode("cpi","%s,0",cname);
+	lbl = newiTempLabel(NULL);
+	if (IC_TRUE(ic)) {
+		emitcode ("brne","L%05d",lbl->key);
+		emitcode ("jmp","L%05d",IC_TRUE(ic)->key);
+		emitcode ("","L%05d:",lbl->key);
+	} else {
+		emitcode ("breq","L%05d",lbl->key);
+		emitcode ("jmp","L%05d",IC_FALSE(ic)->key);
+		emitcode ("","L%05d:",lbl->key);
+	}
 	ic->generated = 1;
 }
 
@@ -5122,12 +5220,12 @@ genAVRCode (iCode * lic)
 			break;
 
 		case GET_VALUE_AT_ADDRESS:
-			genPointerGet (ic);
+			genPointerGet (ic, hasInc(IC_LEFT(ic),ic));
 			break;
 
 		case '=':
 			if (POINTER_SET (ic))
-				genPointerSet (ic);
+				genPointerSet (ic, hasInc(IC_RESULT(ic),ic));
 			else
 				genAssign (ic);
 			break;

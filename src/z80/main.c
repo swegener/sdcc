@@ -328,6 +328,8 @@ PORT z80_port =
     _z80_asmCmd,
     "-plosgff",			/* Options with debug */
     "-plosgff",			/* Options without debug */
+    0,
+    ".asm"
   },
   {
     _z80_linkCmd,

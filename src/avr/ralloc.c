@@ -765,7 +765,7 @@ getRegPtr (iCode * ic, eBBlock * ebp, symbol * sym)
 		return NULL;
 
 	/* this looks like an infinite loop but 
-	   in really selectSpil will abort  */
+	   in reality selectSpil will abort  */
 	goto tryAgain;
 }
 
@@ -993,6 +993,22 @@ willCauseSpill (int nr, int rt)
 }
 
 /*-----------------------------------------------------------------*/
+/* makeRegPair - if two registers then try to make a pair          */
+/*-----------------------------------------------------------------*/
+static void makeRegPair (operand *op)
+{
+	symbol *opsym = OP_SYMBOL(op);
+
+	if (opsym->isspilt || opsym->nRegs != 2)
+		return;	
+	if ((opsym->regs[0] - opsym->regs[1]) == 1) {
+		regs *tmp = opsym->regs[0];
+		opsym->regs[0] = opsym->regs[1];
+		opsym->regs[1] = tmp;
+	}
+}
+
+/*-----------------------------------------------------------------*/
 /* positionRegs - the allocator can allocate same registers to res- */
 /* ult and operand, if this happens make sure they are in the same */
 /* position as the operand otherwise chaos results                 */
@@ -1002,11 +1018,11 @@ positionRegs (symbol * result, symbol * opsym, int lineno)
 {
 	int count = min (result->nRegs, opsym->nRegs);
 	int i, j = 0, shared = 0;
-
+	
 	/* if the result has been spilt then cannot share */
 	if (opsym->isspilt)
-		return;
-      again:
+		return;	
+ again:
 	shared = 0;
 	/* first make sure that they actually share */
 	for (i = 0; i < count; i++) {
@@ -1017,13 +1033,13 @@ positionRegs (symbol * result, symbol * opsym, int lineno)
 			}
 		}
 	}
-      xchgPositions:
+ xchgPositions:
 	if (shared) {
 		regs *tmp = result->regs[i];
 		result->regs[i] = result->regs[j];
 		result->regs[j] = tmp;
 		goto again;
-	}
+	}	
 }
 
 /*-----------------------------------------------------------------*/
@@ -1143,21 +1159,22 @@ serialRegAssign (eBBlock ** ebbs, int count)
 					if (!sym->regs[j])
 						break;
 				}
+				/* make the registers a pair */
+				makeRegPair(IC_RESULT(ic));
+
 				/* if it shares registers with operands make sure
 				   that they are in the same position */
 				if (IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)) &&
 				    OP_SYMBOL (IC_LEFT (ic))->nRegs
 				    && ic->op != '=')
-					positionRegs (OP_SYMBOL
-						      (IC_RESULT (ic)),
+					positionRegs (OP_SYMBOL (IC_RESULT (ic)),
 						      OP_SYMBOL (IC_LEFT
 								 (ic)),
 						      ic->lineno);
 				/* do the same for the right operand */
 				if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic))
 				    && OP_SYMBOL (IC_RIGHT (ic))->nRegs)
-					positionRegs (OP_SYMBOL
-						      (IC_RESULT (ic)),
+					positionRegs (OP_SYMBOL (IC_RESULT (ic)),
 						      OP_SYMBOL (IC_RIGHT
 								 (ic)),
 						      ic->lineno);

@@ -210,7 +210,8 @@ PORT ds390_port =
     _asmCmd,
     "-plosgffc",		/* Options with debug */
     "-plosgff",			/* Options without debug */
-    0
+    0,
+    ".asm"
   },
   {
     _linkCmd,

@@ -91,6 +91,8 @@ PORT gbz80_port =
     _asmCmd,
     "-plosgff",			/* Options with debug */
     "-plosgff",			/* Options without debug */
+    0,
+    ".asm"
   },
   {
     _linkCmd

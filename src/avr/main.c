@@ -142,7 +142,7 @@ static const char *_linkCmd[] = {
 };
 
 static const char *_asmCmd[] = {
-	"avr-as", "", "$1.asm", NULL
+	"avr-as", "-mmcu=avr3" , "$1.s", NULL
 };
 
 /* Globals */
@@ -158,7 +158,8 @@ PORT avr_port = {
 	 _asmCmd,
 	 "-plosgffc",		/* Options with debug */
 	 "-plosgff",		/* Options without debug */
-	 0},
+	 0,
+	".s"},
 	{
 	 _linkCmd,
 	 NULL,

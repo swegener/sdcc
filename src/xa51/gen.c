@@ -374,9 +374,9 @@ static asmop *aopForVal(operand *op) {
 	sprintf (aop->name[1], "#0");
 	break;
       case 4:
-	sprintf (aop->name[0], "#0x%04lx",
+	sprintf (aop->name[0], "#0x%04x",
 		 SPEC_CVAL(operandType(op)).v_ulong & 0xffff);
-	sprintf (aop->name[1], "#0x%04lx", 
+	sprintf (aop->name[1], "#0x%04x", 
 		 SPEC_CVAL(operandType(op)).v_ulong >> 16);
 	break;
       default:
@@ -476,7 +476,7 @@ char *opRegName(operand *op, int offset, char *opName, bool decorate) {
       break;
     case V_INT:
       if (SPEC_LONG(OP_VALUE(op)->type)) {
-	sprintf (opName, "#%s0x%02lx", decorate?"(long)":"",
+	sprintf (opName, "#%s0x%02x", decorate?"(long)":"",
 		 SPEC_CVAL(OP_VALUE(op)->type).v_long);
       } else {
 	sprintf (opName, "#%s0x%02x", decorate?"(int)":"",

@@ -28,6 +28,7 @@
 #define SDCC_SYMNAME_MAX 64
 #define SDCC_NAME_MAX  3*SDCC_SYMNAME_MAX // big enough for _<func>_<var>_etc
 #include "SDCChasht.h"
+#include "../sdccconf.h"
 
 enum {
     TYPEOF_INT=1,
@@ -143,12 +144,12 @@ typedef struct specifier
     int argreg;  	        /* reg no for regparm 	      */
     union
       {				/* Values if constant or enum */
-	short int v_int;		/* int and char values        */
-	char *v_char;		/* character string           */
-	unsigned short v_uint;	/* unsigned int const value   */
-	long v_long;		/* long constant value        */
-	unsigned long v_ulong;	/* unsigned long constant val */
-	double v_float;		/* floating point constant value */
+	TYPE_WORD   v_int;	/* 2 bytes: int and char values        */
+	char       *v_char;	/*          character string           */
+	TYPE_UWORD  v_uint;	/* 2 bytes: unsigned int const value   */
+	TYPE_DWORD  v_long;	/* 4 bytes: long constant value        */
+	TYPE_UDWORD v_ulong;	/* 4 bytes: unsigned long constant val */
+	double      v_float;	/*          floating point constant value */
 	struct symbol *v_enum;	/* ptr 2 enum_list if enum==1 */
       }
     const_val;

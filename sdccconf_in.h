@@ -34,6 +34,13 @@
 #undef HAVE_VSPRINTF
 #undef HAVE_MKSTEMP
 
+#undef TYPE_BYTE
+#undef TYPE_WORD
+#undef TYPE_DWORD
+#define TYPE_UBYTE unsigned TYPE_BYTE
+#define TYPE_UWORD unsigned TYPE_WORD
+#define TYPE_UDWORD unsigned TYPE_DWORD
+
 #undef OPT_DISABLE_MCS51
 #undef OPT_DISABLE_GBZ80
 #undef OPT_DISABLE_Z80

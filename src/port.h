@@ -81,7 +81,7 @@ typedef struct
 	/* assembler file extension */
 	const char *file_ext;
         /** If non-null will be used to execute the assembler. */
-	void (*do_assemble) (const char * const*);	
+	void (*do_assemble) (set *);	
       }
     assembler;
 

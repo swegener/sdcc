@@ -800,7 +800,7 @@ loop:
 		break;
 
 	case S_MODUL:
-		getst(id, -1);
+	        getst(id, getnb()); // a module can start with a digit
 		if (pass == 0) {
 			if (module[0]) {
 				err('m');

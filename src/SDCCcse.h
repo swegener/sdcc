@@ -51,7 +51,7 @@ DEFSETFUNC (findPrevIc);
 DEFSETFUNC (ifOperandsHave);
 DEFSETFUNC (findCheaperOp);
 int cseBBlock (eBBlock *, int, eBBlock **, int);
-int cseAllBlocks (eBBlock **, int);
+int cseAllBlocks (eBBlock **, int, int computeOnly);
 void ifxOptimize (iCode *, set *, int, eBBlock *, int *, eBBlock **, int);
 void unsetDefsAndUses (iCode *);
 void updateSpillLocation (iCode * ic,int);

@@ -1401,7 +1401,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 
   /* if this block is not reachable */
   if (ebb->noPath)
-    return change;
+    return 0;
 
   /* set of common subexpressions */
   cseSet = setFromSet (ebb->inExprs);
@@ -1521,9 +1521,11 @@ cseBBlock (eBBlock * ebb, int computeOnly,
       if (SKIP_IC (ic))
 	continue;
 
-      /* do some algebraic optimizations if possible */
-      algebraicOpts (ic);
-      while (constFold (ic, cseSet));
+      if (!computeOnly) {
+	/* do some algebraic optimizations if possible */
+	algebraicOpts (ic);
+	while (constFold (ic, cseSet));
+      }
 
       /* small klugde */
       if (POINTER_GET (ic) && !IS_PTR (operandType (IC_LEFT (ic))))
@@ -1541,7 +1543,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 
       /* if this is a condition statment then */
       /* check if the condition can be replaced */
-      if (ic->op == IFX)
+      if (!computeOnly && ic->op == IFX)
 	{
 	  ifxOptimize (ic, cseSet, computeOnly,
 		       ebb, &change,
@@ -1551,7 +1553,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 
       /* if the assignment & result is a temp */
       /* see if we can replace it             */
-      if (ic->op == '=')
+      if (!computeOnly && ic->op == '=')
 	{
 
 	  /* update the spill location for this */
@@ -1635,7 +1637,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	  while (constFold (ic, cseSet));
 	}
 
-      /* if after all this it becomes a assignment to self
+      /* if after all this it becomes an assignment to self
          then delete it and continue */
       if (ASSIGNMENT_TO_SELF (ic))
 	{
@@ -1797,7 +1799,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 /* cseAllBlocks - will sequentially go thru & do cse for all blocks */
 /*-----------------------------------------------------------------*/
 int 
-cseAllBlocks (eBBlock ** ebbs, int count)
+cseAllBlocks (eBBlock ** ebbs, int count, int computeOnly)
 {
   int i;
   int change = 0;
@@ -1805,7 +1807,7 @@ cseAllBlocks (eBBlock ** ebbs, int count)
   /* if optimization turned off */
 
   for (i = 0; i < count; i++)
-    change += cseBBlock (ebbs[i], FALSE, ebbs, count);
+    change += cseBBlock (ebbs[i], computeOnly, ebbs, count);
 
   return change;
 }

@@ -695,6 +695,7 @@ killDeadCode (eBBlock ** ebbs, int count)
 	      /* kill this one if required */
 	      if (kill)
 		{
+		  printf ("kill ic %d\n", ic->key);
 		  change = 1;
 		  gchange++;
 		  /* eliminate this */
@@ -830,7 +831,7 @@ eBBlockFromiCode (iCode * ic)
     dumpEbbsToFileExt (DUMP_RAW1, ebbs, count);
 
   /* do common subexpression elimination for each block */
-  change = cseAllBlocks (ebbs, saveCount);
+  change = cseAllBlocks (ebbs, saveCount, FALSE);
 
   /* dumpraw if asked for */
   if (options.dump_raw)
@@ -846,9 +847,14 @@ eBBlockFromiCode (iCode * ic)
   /* global common subexpression elimination  */
   if (optimize.global_cse)
     {
-      change += cseAllBlocks (ebbs, saveCount);
+      change += cseAllBlocks (ebbs, saveCount, TRUE);
       if (options.dump_gcse)
 	dumpEbbsToFileExt (DUMP_GCSE, ebbs, saveCount);
+    }
+  else
+    {
+      // compute the dataflow only
+      assert(cseAllBlocks (ebbs, saveCount, FALSE)==0);
     }
   /* kill dead code */
   kchange = killDeadCode (ebbs, saveCount);
@@ -871,7 +877,7 @@ eBBlockFromiCode (iCode * ic)
   if (lchange || kchange)
     {
       computeDataFlow (ebbs, saveCount);
-      change += cseAllBlocks (ebbs, saveCount);
+      change += cseAllBlocks (ebbs, saveCount, TRUE);
       if (options.dump_loop)
 	dumpEbbsToFileExt (DUMP_LOOPG, ebbs, count);
 

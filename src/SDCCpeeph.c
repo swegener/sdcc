@@ -45,7 +45,7 @@ static void buildLabelRefCountHash(lineNode *head);
 static bool matchLine (char *, char *, hTab **);
 
 #define FBYNAME(x) int x (hTab *vars, lineNode *currPl, lineNode *head, \
-			  const char *cmdLine)
+        const char *cmdLine)
 
 /*-----------------------------------------------------------------*/
 /* pcDistance - afinds a label back ward or forward                */
@@ -139,14 +139,14 @@ FBYNAME(operandsNotSame)
     return TRUE;
 }
 
-/* labelRefCount: 
+/* labelRefCount:
  *
  * takes two parameters: a variable (bound to a label name)
  * and an expected reference count.
  *
  * Returns TRUE if that label is defined and referenced exactly
  * the given number of times.
- */ 
+ */
 FBYNAME(labelRefCount)
 {
     int  varNumber, expectedRefCount;
@@ -155,57 +155,57 @@ FBYNAME(labelRefCount)
     /* If we don't have the label hash table yet, build it. */
     if (!labelHash)
     {
-    	buildLabelRefCountHash(head);
+      buildLabelRefCountHash(head);
     }
 
     if (sscanf(cmdLine, "%*[ \t%]%d %d", &varNumber, &expectedRefCount) == 2)
     {
         char *label = hTabItemWithKey(vars, varNumber);
-        
+
         if (label)
         {
-	    labelHashEntry *entry;
-	    
-	    entry = hTabFirstItemWK(labelHash, hashSymbolName(label));
-	    
-	    while (entry)
-	    {
-	        if (!strcmp(label, entry->name))
-	        {
-	            break;
-	        }
-	        entry = hTabNextItemWK(labelHash);
-	    }
-	    if (entry)
-	    {
+      labelHashEntry *entry;
+
+      entry = hTabFirstItemWK(labelHash, hashSymbolName(label));
+
+      while (entry)
+      {
+          if (!strcmp(label, entry->name))
+          {
+              break;
+          }
+          entry = hTabNextItemWK(labelHash);
+      }
+      if (entry)
+      {
 #if 0
-		/* debug spew. */	       
-	        fprintf(stderr, "labelRefCount: %s has refCount %d, want %d\n",
-	        	label, entry->refCount, expectedRefCount);
+    /* debug spew. */
+          fprintf(stderr, "labelRefCount: %s has refCount %d, want %d\n",
+            label, entry->refCount, expectedRefCount);
 #endif
-	        	
-	        rc = (expectedRefCount == entry->refCount);
-	    }
-	    else
-	    {
-	        fprintf(stderr, "*** internal error: no label has entry for"
-	        	       " %s in labelRefCount peephole.\n",
-	        	       label);
-	    }
+
+          rc = (expectedRefCount == entry->refCount);
+      }
+      else
+      {
+          fprintf(stderr, "*** internal error: no label has entry for"
+                   " %s in labelRefCount peephole.\n",
+                   label);
+      }
         }
         else
         {
             fprintf(stderr, "*** internal error: var %d not bound"
-            		    " in peephole labelRefCount rule.\n",
-            		    varNumber);
+                    " in peephole labelRefCount rule.\n",
+                    varNumber);
         }
-        
+
     }
     else
     {
- 	  fprintf(stderr, 
- 	      	  "*** internal error: labelRefCount peephole restriction"
- 	      	  " malformed: %s\n", cmdLine);
+    fprintf(stderr,
+            "*** internal error: labelRefCount peephole restriction"
+            " malformed: %s\n", cmdLine);
     }
     return rc;
 }
@@ -218,16 +218,16 @@ int callFuncByName ( char *fname,
              lineNode *currPl,
              lineNode *head)
 {
-    struct ftab 
+    struct ftab
     {
-    	char *fname ;
-    	int (*func)(hTab *,lineNode *,lineNode *,const char *) ;
-    }  ftab[] = 
+      char *fname ;
+      int (*func)(hTab *,lineNode *,lineNode *,const char *) ;
+    }  ftab[] =
     {
-    	{"labelInRange",   labelInRange },
-    	{"operandsNotSame", operandsNotSame },
-    	{"24bitMode", flat24bitMode },
-    	{"labelRefCount", labelRefCount },
+      {"labelInRange",   labelInRange },
+      {"operandsNotSame", operandsNotSame },
+      {"24bitMode", flat24bitMode },
+      {"labelRefCount", labelRefCount },
     };
     int i;
 
@@ -271,13 +271,13 @@ peepRule *newPeepRule (lineNode *match  ,
 {
     peepRule *pr ;
 
-    pr= Safe_calloc(sizeof(peepRule));
+    pr= Safe_calloc(1,sizeof(peepRule));
     pr->match = match;
     pr->replace= replace;
     pr->restart = restart;
 
     if (cond && *cond) {
-    pr->cond = Safe_calloc(strlen(cond)+1);
+    pr->cond = Safe_calloc(1,strlen(cond)+1);
     strcpy(pr->cond,cond);
     } else
     pr->cond = NULL ;
@@ -300,8 +300,8 @@ lineNode *newLineNode (char *line)
 {
     lineNode *pl;
 
-    pl = Safe_calloc(sizeof(lineNode));
-    pl->line = Safe_calloc(strlen(line)+1);
+    pl = Safe_calloc(1,sizeof(lineNode));
+    pl->line = Safe_calloc(1,strlen(line)+1);
     strcpy(pl->line,line);
     return pl;
 }
@@ -507,7 +507,7 @@ static void bindVar (int key, char **s, hTab **vtab)
     *s = vvx ;
     *vv = '\0';
     /* got value */
-    vvx = Safe_calloc(strlen(vval)+1);
+    vvx = Safe_calloc(1,strlen(vval)+1);
     strcpy(vvx,vval);
     hTabAddItem(vtab,key,vvx);
 
@@ -713,34 +713,34 @@ static void replaceRule (lineNode **shead, lineNode *stail, peepRule *pr)
 bool isLabelDefinition(const char *line, const char **start, int *len)
 {
     const char *cp = line;
-    
+
     /* This line is a label if if consists of:
-     * [optional whitespace] followed by identifier chars 
+     * [optional whitespace] followed by identifier chars
      * (alnum | $ | _ ) followed by a colon.
      */
-    
+
     while (*cp && isspace(*cp))
     {
         cp++;
-    } 
-    
+    }
+
     if (!*cp)
     {
        return FALSE;
     }
-    
+
     *start = cp;
-    
+
     while (isalnum(*cp) || (*cp == '$') || (*cp == '_'))
     {
-    	cp++;
+      cp++;
     }
-    
+
     if ((cp == *start) || (*cp != ':'))
     {
         return FALSE;
     }
-    
+
     *len = (cp - (*start));
     return TRUE;
 }
@@ -749,18 +749,18 @@ bool isLabelDefinition(const char *line, const char **start, int *len)
 static int hashSymbolName(const char *name)
 {
     int hash = 0;
-    
+
     while (*name)
     {
        hash = (hash << 6) ^ *name;
        name++;
     }
-    
+
     if (hash < 0)
     {
-    	hash = -hash;
+      hash = -hash;
     }
-    
+
     return hash % HTAB_SIZE;
 }
 
@@ -769,32 +769,32 @@ static int hashSymbolName(const char *name)
  */
 static void buildLabelRefCountHash(lineNode *head)
 {
-    lineNode 	*line;
-    const char 	*label;
-    int 	labelLen;
-    int		i;
+    lineNode  *line;
+    const char  *label;
+    int   labelLen;
+    int   i;
 
     assert(labelHash == NULL);
     labelHash = newHashTable(HTAB_SIZE);
-    
+
     /* First pass: locate all the labels. */
     line = head;
-    
+
     while (line)
     {
-    	if (isLabelDefinition(line->line, &label, &labelLen)
-    	 && labelLen <= SDCC_NAME_MAX)
-    	{
-    	    labelHashEntry *entry;
-    	    
-    	    entry = Safe_calloc(sizeof(labelHashEntry));
-    	    
-    	    memcpy(entry->name, label, labelLen);
-    	    entry->name[labelLen] = 0;
-    	    entry->refCount = -1;
+      if (isLabelDefinition(line->line, &label, &labelLen)
+       && labelLen <= SDCC_NAME_MAX)
+      {
+          labelHashEntry *entry;
 
-    	    hTabAddItem(&labelHash, hashSymbolName(entry->name), entry);
-    	}
+          entry = Safe_calloc(1,sizeof(labelHashEntry));
+
+          memcpy(entry->name, label, labelLen);
+          entry->name[labelLen] = 0;
+          entry->refCount = -1;
+
+          hTabAddItem(&labelHash, hashSymbolName(entry->name), entry);
+      }
         line = line->next;
     }
 
@@ -804,40 +804,40 @@ static void buildLabelRefCountHash(lineNode *head)
     line = head;
     while (line)
     {
-    	for (i = 0; i < HTAB_SIZE; i++)
-    	{
+      for (i = 0; i < HTAB_SIZE; i++)
+      {
             labelHashEntry *thisEntry;
-        
+
             thisEntry = hTabFirstItemWK(labelHash, i);
-        
+
             while (thisEntry)
             {
                 if (strstr(line->line, thisEntry->name))
                 {
                     thisEntry->refCount++;
                 }
-            	thisEntry = hTabNextItemWK(labelHash);
+              thisEntry = hTabNextItemWK(labelHash);
             }
-        }    
+        }
         line = line->next;
     }
 
 #if 0
-    /* Spew the contents of the table. Debugging fun only. */    
+    /* Spew the contents of the table. Debugging fun only. */
     for (i = 0; i < HTAB_SIZE; i++)
     {
         labelHashEntry *thisEntry;
-        
+
         thisEntry = hTabFirstItemWK(labelHash, i);
-        
+
         while (thisEntry)
         {
-            fprintf(stderr, "label: %s ref %d\n", 
-            	     thisEntry->name, thisEntry->refCount);
+            fprintf(stderr, "label: %s ref %d\n",
+                   thisEntry->name, thisEntry->refCount);
             thisEntry = hTabNextItemWK(labelHash);
         }
     }
-#endif    
+#endif
 }
 
 /*-----------------------------------------------------------------*/
@@ -851,7 +851,7 @@ void peepHole (lineNode **pls )
 
     if (labelHash)
     {
-    	hTabDeleteAll(labelHash);
+      hTabDeleteAll(labelHash);
     }
     labelHash = NULL;
 
@@ -913,7 +913,7 @@ static char *readFileIntoBuffer (char *fname)
         rs = Safe_realloc(rs,strlen(rs)+strlen(lb)+1);
         strcat(rs,lb);
         } else {
-        rs = Safe_calloc(strlen(lb)+1);
+        rs = Safe_calloc(1,strlen(lb)+1);
         strcpy(rs,lb);
         }
         nch = 0 ;
@@ -928,7 +928,7 @@ static char *readFileIntoBuffer (char *fname)
         rs = Safe_realloc(rs,strlen(rs)+strlen(lb)+1);
         strcat(rs,lb);
     } else {
-        rs = Safe_calloc(strlen(lb)+1);
+        rs = Safe_calloc(1,strlen(lb)+1);
         strcpy(rs,lb);
     }
     }

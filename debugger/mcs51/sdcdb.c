@@ -1,24 +1,24 @@
 /*-------------------------------------------------------------------------
   sdcdb.c - main source file for sdcdb debugger
-	      Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1999)
+        Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1999)
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
    Free Software Foundation; either version 2, or (at your option) any
    later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-   
+
    In other words, you are welcome to use, share and improve this program.
    You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!  
+   what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
 #include "sdcdb.h"
@@ -50,10 +50,10 @@ int fatalError = 0;
 /* command table */
 struct cmdtab
 {
-    char      *cmd ;  /* command the user will enter */       
+    char      *cmd ;  /* command the user will enter */
     int (*cmdfunc)(char *,context *);   /* function to execute when command is entered */
-    char *htxt ;    /* short help text */    
-    
+    char *htxt ;    /* short help text */
+
 } cmdTab[] = {
     /* NOTE:- the search is done from the top, so "break" should
        precede the synonym "b" */
@@ -80,10 +80,10 @@ struct cmdtab
 
     { "help"     ,  cmdHelp       ,
       "{h|?}elp\t\t this message\n"
-    },    
+    },
     { "?"        ,  cmdHelp       , NULL },
     { "h"        ,  cmdHelp       , NULL },
-    
+
     { "info"     ,  cmdInfo       ,
       "info\n"
       "\t {break}\t list all break points\n"
@@ -98,38 +98,38 @@ struct cmdtab
     { "la"       ,  cmdListAsm    , NULL },
     { "list"     ,  cmdListSrc    ,
       "{l}ist\t\t\t [LINE | FILE:LINE | FILE:FUNCTION | FUNCTION]\n"
-    },    
+    },
     { "l"        ,  cmdListSrc    , NULL },
     { "show"     ,  cmdShow       ,
       "show\n"
       "\t {copying}\t copying & distribution terms\n"
       "\t {warranty}\t warranty information\n"
     },
-    { "set"      ,  cmdSetOption  , NULL },    
+    { "set"      ,  cmdSetOption  , NULL },
     { "step"     ,  cmdStep       ,
       "{s}tep\t\t\t Step program until it reaches a different source line.\n"
     },
     { "s"        ,  cmdStep       , NULL },
-    { "next"     ,  cmdNext       , 
+    { "next"     ,  cmdNext       ,
       "{n}ext\t\t\t Step program, proceeding through subroutine calls.\n"
     },
     { "n"        ,  cmdNext       , NULL },
-    { "run"      ,  cmdRun        , 
+    { "run"      ,  cmdRun        ,
       "{r}un\t\t\t Start debugged program. \n"
     },
     { "r"        ,  cmdRun        , NULL },
-    { "ptype"    ,  cmdPrintType  , 
+    { "ptype"    ,  cmdPrintType  ,
       "{pt}ype <variable>\t print type information of a variable\n"
     },
     { "pt"       ,  cmdPrintType  , NULL },
-    { "print"    ,  cmdPrint      , 
+    { "print"    ,  cmdPrint      ,
       "{p}rint <variable>\t print value of given variable\n"
     },
     { "p"        ,  cmdPrint      , NULL },
     { "file"     ,  cmdFile       ,
       "file <filename>\t\t load symbolic information from <filename>\n"
-    },  
-    { "frame"    ,  cmdFrame      , 
+    },
+    { "frame"    ,  cmdFrame      ,
       "{fr}ame\t\t\t print information about the current Stack\n"
     },
     { "finish"   ,  cmdFinish     ,
@@ -138,10 +138,10 @@ struct cmdtab
     { "fi"       ,  cmdFinish     , NULL },
     { "fr"       ,  cmdFrame      , NULL },
     { "f"        ,  cmdFrame      , NULL },
-    { "!"        ,  cmdSimulator  , 
+    { "!"        ,  cmdSimulator  ,
       "!<simulator command>\t send a command directly to the simulator\n"
     },
-    { "quit"     ,  cmdQuit       , 
+    { "quit"     ,  cmdQuit       ,
       "{q}uit\t\t\t \"Watch me now. Iam going Down. My name is Bobby Brown\"\n"
     },
     { "q"        ,  cmdQuit       , NULL }
@@ -153,7 +153,7 @@ struct cmdtab
 char *gc_strdup(const char *s)
 {
     char *ret;
-    Safe_calloc(ret, strlen(s)+1);
+    Safe_calloc(1,ret, strlen(s)+1);
     strcpy(ret, s);
     return ret;
 }
@@ -166,9 +166,9 @@ char *alloccpy ( char *s, int size)
     char *d;
 
     if (!size)
-	return NULL;
+  return NULL;
 
-    Safe_calloc(d,size+1);
+    Safe_calloc(1,d,size+1);
     memcpy(d,s,size);
     d[size] = '\0';
 
@@ -183,17 +183,17 @@ void **resize (void **array, int newSize)
     void **vptr;
 
     if (array)
-	vptr = Safe_realloc(array,newSize*(sizeof(void **)));
+  vptr = Safe_realloc(array,newSize*(sizeof(void **)));
     else
-	vptr = calloc(1, sizeof(void **));
-    
+  vptr = calloc(1, sizeof(void **));
+
     if (!vptr) {
-	fprintf(stderr,"sdcdb: out of memory \n");
-	exit(1);
+  fprintf(stderr,"sdcdb: out of memory \n");
+  exit(1);
     }
 
     return vptr;
-	
+
 }
 
 /*-----------------------------------------------------------------*/
@@ -205,51 +205,51 @@ static int readCdb (FILE *file)
     cdbrecs *currl ;
     char buffer[1024];
     char *bp ;
-    
+
     if (!(bp = fgets(buffer,sizeof(buffer),file)))
-	    return 0;
-    
-    Safe_calloc(currl,sizeof(cdbrecs));
+      return 0;
+
+    Safe_calloc(1,currl,sizeof(cdbrecs));
     recsRoot = currl ;
 
     while (1) {
-	
-	/* make sure this is a cdb record */
-	if (strchr("STLFM",*bp) && *(bp+1) == ':') {
-	    /* depending on the record type */
-	    
-	    switch (*bp) {
-	    case 'S':
-		/* symbol record */
-		currl->type = SYM_REC;
-		break;
-	    case 'T':
-		currl->type = STRUCT_REC;
-		break;
-	    case 'L':
-		currl->type = LNK_REC;
-		break;
-	    case 'F':
-		currl->type = FUNC_REC;
-		break;
-	    case 'M':
-		currl->type = MOD_REC ;
-	    }
-	    
-	    bp += 2;
-	    Safe_calloc(currl->line,strlen(bp));
-	    strncpy(currl->line,bp,strlen(bp)-1);
-	    currl->line[strlen(bp)-1] = '\0';
-	}
-	
-	if (!(bp = fgets(buffer,sizeof(buffer),file)))
-	    break;
-	
-	if (feof(file))
-	    break;
-	
-	Safe_calloc(currl->next,sizeof(cdbrecs));
-	currl = currl->next;
+
+  /* make sure this is a cdb record */
+  if (strchr("STLFM",*bp) && *(bp+1) == ':') {
+      /* depending on the record type */
+
+      switch (*bp) {
+      case 'S':
+    /* symbol record */
+    currl->type = SYM_REC;
+    break;
+      case 'T':
+    currl->type = STRUCT_REC;
+    break;
+      case 'L':
+    currl->type = LNK_REC;
+    break;
+      case 'F':
+    currl->type = FUNC_REC;
+    break;
+      case 'M':
+    currl->type = MOD_REC ;
+      }
+
+      bp += 2;
+      Safe_calloc(1,currl->line,strlen(bp));
+      strncpy(currl->line,bp,strlen(bp)-1);
+      currl->line[strlen(bp)-1] = '\0';
+  }
+
+  if (!(bp = fgets(buffer,sizeof(buffer),file)))
+      break;
+
+  if (feof(file))
+      break;
+
+  Safe_calloc(1,currl->next,sizeof(cdbrecs));
+  currl = currl->next;
     }
 
     return (recsRoot->line ? 1 : 0);
@@ -266,35 +266,35 @@ char *searchDirsFname (char *fname)
 
     /* first try the current directory */
     if ((rfile = fopen(fname,"r"))) {
-	fclose(rfile);
-	return strdup(fname) ;
+  fclose(rfile);
+  return strdup(fname) ;
     }
 
     if (!ssdirl)
-	return strdup(fname);
+  return strdup(fname);
 
     /* make a copy of the source directories */
-    dirs = sdirs = strdup(ssdirl);    
-   
-    /* assume that the separator is ':' 
+    dirs = sdirs = strdup(ssdirl);
+
+    /* assume that the separator is ':'
        and try for each directory in the search list */
     dirs = strtok(dirs,":");
     while (dirs) {
-	if (dirs[strlen(dirs)] == '/')
-	    sprintf(buffer,"%s%s",dirs,fname);
-	else
-	    sprintf(buffer,"%s/%s",dirs,fname);
-	if ((rfile = fopen(buffer,"r")))
-	    break ;
-	dirs = strtok(NULL,":");
+  if (dirs[strlen(dirs)] == '/')
+      sprintf(buffer,"%s%s",dirs,fname);
+  else
+      sprintf(buffer,"%s/%s",dirs,fname);
+  if ((rfile = fopen(buffer,"r")))
+      break ;
+  dirs = strtok(NULL,":");
     }
-    
+
     free(sdirs);
     if (rfile) {
-	fclose(rfile);
-	return strdup(buffer);
+  fclose(rfile);
+  return strdup(buffer);
     } else
-	return strdup(fname);    
+  return strdup(fname);
 }
 
 /*-----------------------------------------------------------------*/
@@ -308,26 +308,26 @@ FILE *searchDirsFopen(char *fname)
 
     /* first try the current directory */
     if ((rfile = fopen(fname,"r")))
-	return rfile;
+  return rfile;
 
     if (!ssdirl)
-	return NULL;
+  return NULL;
     /* make a copy of the source directories */
-    dirs = sdirs = strdup(ssdirl);    
-   
-    /* assume that the separator is ':' 
+    dirs = sdirs = strdup(ssdirl);
+
+    /* assume that the separator is ':'
        and try for each directory in the search list */
     dirs = strtok(dirs,":");
     while (dirs) {
-	sprintf(buffer,"%s/%s",dirs,fname);
-	if ((rfile = fopen(buffer,"r")))
-	    break ;
-	dirs = strtok(NULL,":");
+  sprintf(buffer,"%s/%s",dirs,fname);
+  if ((rfile = fopen(buffer,"r")))
+      break ;
+  dirs = strtok(NULL,":");
     }
-    
+
     free(sdirs);
     return rfile ;
-    
+
 }
 
 /*-----------------------------------------------------------------*/
@@ -339,20 +339,20 @@ srcLine **loadFile (char *name, int *nlines)
     char buffer[512];
     char *bp;
     srcLine **slines = NULL;
-    
-    
+
+
     if (!(mfile = searchDirsFopen(name))) {
-	fprintf(stderr,"sdcdb: cannot open module %s -- use '--directory=<source directory> option\n",name);
-	return NULL;
+  fprintf(stderr,"sdcdb: cannot open module %s -- use '--directory=<source directory> option\n",name);
+  return NULL;
     }
 
     while ((bp = fgets(buffer,sizeof(buffer),mfile))) {
-	(*nlines)++;
+  (*nlines)++;
 
-	slines = (srcLine **)resize((void **)slines,*nlines);
+  slines = (srcLine **)resize((void **)slines,*nlines);
 
-	Safe_calloc(slines[(*nlines)-1],sizeof(srcLine));
-	slines[(*nlines)-1]->src = alloccpy(bp,strlen(bp));	
+  Safe_calloc(1,slines[(*nlines)-1],sizeof(srcLine));
+  slines[(*nlines)-1]->src = alloccpy(bp,strlen(bp));
     }
 
     fclose(mfile);
@@ -372,44 +372,44 @@ static void loadModules ()
     /* go thru the records & find out the module
        records & load the modules specified */
     for ( loop = recsRoot ; loop ; loop = loop->next ) {
-	
-	switch (loop->type) {
-	/* for module records do */
-	case MOD_REC: 
-	    currMod = parseModule(loop->line,TRUE);
-	    currModName = currMod->name ;
-	    
-	    currMod->cfullname = searchDirsFname(currMod->c_name);
 
-	    /* load it into buffer */
-	    currMod->cLines = loadFile (currMod->c_name,
-					&currMod->ncLines);
+  switch (loop->type) {
+  /* for module records do */
+  case MOD_REC:
+      currMod = parseModule(loop->line,TRUE);
+      currModName = currMod->name ;
 
-	    /* do the same for the assembler file */
-	    currMod->afullname = searchDirsFname(currMod->asm_name);
-	    currMod->asmLines=loadFile (currMod->asm_name,
-					&currMod->nasmLines);
-	    break;
+      currMod->cfullname = searchDirsFname(currMod->c_name);
 
-	/* if this is a function record */
-	case FUNC_REC:
-	    parseFunc(loop->line);
-	    break;
+      /* load it into buffer */
+      currMod->cLines = loadFile (currMod->c_name,
+          &currMod->ncLines);
 
-	/* if this is a structure record */
-	case STRUCT_REC:
-	    parseStruct(loop->line);
-	    break;
+      /* do the same for the assembler file */
+      currMod->afullname = searchDirsFname(currMod->asm_name);
+      currMod->asmLines=loadFile (currMod->asm_name,
+          &currMod->nasmLines);
+      break;
 
-	/* if symbol then parse the symbol */
-	case  SYM_REC:
-	    parseSymbol(loop->line,&rs);
-	    break;	
+  /* if this is a function record */
+  case FUNC_REC:
+      parseFunc(loop->line);
+      break;
 
-	case LNK_REC:
-	    parseLnkRec(loop->line);
-	    break;
-	}
+  /* if this is a structure record */
+  case STRUCT_REC:
+      parseStruct(loop->line);
+      break;
+
+  /* if symbol then parse the symbol */
+  case  SYM_REC:
+      parseSymbol(loop->line,&rs);
+      break;
+
+  case LNK_REC:
+      parseLnkRec(loop->line);
+      break;
+  }
     }
 }
 
@@ -423,93 +423,93 @@ static void functionPoints ()
 
     /* for all functions do */
     for ( func = setFirstItem(functions); func;
-	  func = setNextItem(functions)) {
-	int j ;
-	module *mod;
-       
-	sym = func->sym;
+    func = setNextItem(functions)) {
+  int j ;
+  module *mod;
 
-#ifdef SDCDB_DEBUG	
-	printf("func '%s' has entry '%x' exit '%x'\n",
-	       func->sym->name,
-	       func->sym->addr,
-	       func->sym->eaddr);
-#endif
-	if (!func->sym->addr && !func->sym->eaddr)
-	    continue ;
-
-	/* for all source lines in the module find
-	   the ones with address >= start and <= end
-	   and put them in the point */
-	mod = NULL ;
-	if (! applyToSet(modules,moduleWithName,func->modName,&mod))
-	    continue ;
-	func->mod = mod ;	
-	func->entryline= INT_MAX;
-	func->exitline =  0;
-	func->aentryline = INT_MAX ;
-	func->aexitline = 0;
-
-	/* do it for the C Lines first */
-	for ( j = 0 ; j < mod->ncLines ; j++ ) {
-	    if (mod->cLines[j]->addr >= sym->addr &&
-		mod->cLines[j]->addr <= sym->eaddr ) {
-		
-		exePoint *ep ;
-
-		/* add it to the execution point */
-		if (func->entryline > j)
-		    func->entryline = j;
-
-		if (func->exitline < j)
-		    func->exitline = j;
-
-		Safe_calloc(ep,sizeof(exePoint));
-		ep->addr =  mod->cLines[j]->addr ;
-		ep->line = j;
-		ep->block= mod->cLines[j]->block;
-		ep->level= mod->cLines[j]->level;
-		addSet(&func->cfpoints,ep);
-	    }
-	}
-
-	/* do the same for asm execution points */
-	for ( j = 0 ; j < mod->nasmLines ; j++ ) {
-	    if (mod->asmLines[j]->addr >= sym->addr &&
-		mod->asmLines[j]->addr <= sym->eaddr ) {
-		
-		exePoint *ep ;
-		/* add it to the execution point */
-		if (func->aentryline > j)
-		    func->aentryline = j;
-
-		if (func->aexitline < j)
-		    func->aexitline = j;
-
-		/* add it to the execution point */
-		Safe_calloc(ep,sizeof(exePoint));
-		ep->addr =  mod->asmLines[j]->addr ;
-		ep->line = j;
-		addSet(&func->afpoints,ep);	
-	    }
-	}
+  sym = func->sym;
 
 #ifdef SDCDB_DEBUG
-	printf("function '%s' has the following C exePoints\n",
-	       func->sym->name);
-	{
-	    exePoint *ep;
+  printf("func '%s' has entry '%x' exit '%x'\n",
+         func->sym->name,
+         func->sym->addr,
+         func->sym->eaddr);
+#endif
+  if (!func->sym->addr && !func->sym->eaddr)
+      continue ;
 
-	    for (ep = setFirstItem(func->cfpoints); ep;
-		 ep = setNextItem(func->cfpoints))
-		fprintf (stdout,"{%x,%d} %s",ep->addr,ep->line,mod->cLines[ep->line]->src);
+  /* for all source lines in the module find
+     the ones with address >= start and <= end
+     and put them in the point */
+  mod = NULL ;
+  if (! applyToSet(modules,moduleWithName,func->modName,&mod))
+      continue ;
+  func->mod = mod ;
+  func->entryline= INT_MAX;
+  func->exitline =  0;
+  func->aentryline = INT_MAX ;
+  func->aexitline = 0;
 
-	    fprintf(stdout," and the following ASM exePoints\n");
-	    for (ep = setFirstItem(func->afpoints); ep;
-		 ep = setNextItem(func->afpoints))
-		fprintf (stdout,"{%x,%d} %s",ep->addr,ep->line,mod->asmLines[ep->line]->src);
-		    
-	}
+  /* do it for the C Lines first */
+  for ( j = 0 ; j < mod->ncLines ; j++ ) {
+      if (mod->cLines[j]->addr >= sym->addr &&
+    mod->cLines[j]->addr <= sym->eaddr ) {
+
+    exePoint *ep ;
+
+    /* add it to the execution point */
+    if (func->entryline > j)
+        func->entryline = j;
+
+    if (func->exitline < j)
+        func->exitline = j;
+
+    Safe_calloc(1,ep,sizeof(exePoint));
+    ep->addr =  mod->cLines[j]->addr ;
+    ep->line = j;
+    ep->block= mod->cLines[j]->block;
+    ep->level= mod->cLines[j]->level;
+    addSet(&func->cfpoints,ep);
+      }
+  }
+
+  /* do the same for asm execution points */
+  for ( j = 0 ; j < mod->nasmLines ; j++ ) {
+      if (mod->asmLines[j]->addr >= sym->addr &&
+    mod->asmLines[j]->addr <= sym->eaddr ) {
+
+    exePoint *ep ;
+    /* add it to the execution point */
+    if (func->aentryline > j)
+        func->aentryline = j;
+
+    if (func->aexitline < j)
+        func->aexitline = j;
+
+    /* add it to the execution point */
+    Safe_calloc(1,ep,sizeof(exePoint));
+    ep->addr =  mod->asmLines[j]->addr ;
+    ep->line = j;
+    addSet(&func->afpoints,ep);
+      }
+  }
+
+#ifdef SDCDB_DEBUG
+  printf("function '%s' has the following C exePoints\n",
+         func->sym->name);
+  {
+      exePoint *ep;
+
+      for (ep = setFirstItem(func->cfpoints); ep;
+     ep = setNextItem(func->cfpoints))
+    fprintf (stdout,"{%x,%d} %s",ep->addr,ep->line,mod->cLines[ep->line]->src);
+
+      fprintf(stdout," and the following ASM exePoints\n");
+      for (ep = setFirstItem(func->afpoints); ep;
+     ep = setNextItem(func->afpoints))
+    fprintf (stdout,"{%x,%d} %s",ep->addr,ep->line,mod->asmLines[ep->line]->src);
+
+  }
 #endif
     }
 }
@@ -524,13 +524,13 @@ DEFSETFUNC(setEntryExitBP)
 
     if (func->sym && func->sym->addr && func->sym->eaddr) {
 
-	/* set the entry break point */
-	setBreakPoint (func->sym->addr , CODE , FENTRY , 
-		       fentryCB ,func->mod->c_name , func->entryline);
+  /* set the entry break point */
+  setBreakPoint (func->sym->addr , CODE , FENTRY ,
+           fentryCB ,func->mod->c_name , func->entryline);
 
-	/* set the exit break point */
-	setBreakPoint (func->sym->eaddr , CODE , FEXIT  ,
-		       fexitCB  ,func->mod->c_name , func->exitline );
+  /* set the exit break point */
+  setBreakPoint (func->sym->eaddr , CODE , FEXIT  ,
+           fexitCB  ,func->mod->c_name , func->exitline );
     }
 
     return 0;
@@ -547,29 +547,29 @@ int cmdFile (char *s,context *cctxt)
 
     while (isspace(*s)) s++;
     if (!*s) {
-	fprintf(stdout,"No exec file now.\nNo symbol file now.\n");
-	return 0;
+  fprintf(stdout,"No exec file now.\nNo symbol file now.\n");
+  return 0;
     }
 
     sprintf(buffer,"%s.cdb",s);
     /* try creating the cdbfile */
     if (!(cdbFile = searchDirsFopen(buffer))) {
-	fprintf(stdout,"Cannot open file\"%s\"",buffer);
-	return 0;
+  fprintf(stdout,"Cannot open file\"%s\"",buffer);
+  return 0;
     }
 
     /* allocate for context */
-    Safe_calloc(currCtxt ,sizeof(context));
-    
+    Safe_calloc(1,currCtxt ,sizeof(context));
+
     /* readin the debug information */
     if (!readCdb (cdbFile)) {
-	fprintf(stdout,"No symbolic information found in file %s.cdb\n",s);
-	return 0;
-    }	
-	
+  fprintf(stdout,"No symbolic information found in file %s.cdb\n",s);
+  return 0;
+    }
+
     /* parse and load the modules required */
     loadModules();
-    
+
     /* determine the execution points for this
        module */
     functionPoints();
@@ -577,7 +577,7 @@ int cmdFile (char *s,context *cctxt)
     /* start the simulator & setup connection to it */
     openSimulator((char **)simArgs,nsimArgs);
     fprintf(stdout,"%s",simResponse());
-    /* now send the filename to be loaded to the simulator */    
+    /* now send the filename to be loaded to the simulator */
     sprintf(buffer,"%s.ihx",s);
     bp=searchDirsFname(buffer);
     simLoadFile(bp);
@@ -596,16 +596,16 @@ int cmdFile (char *s,context *cctxt)
 /* cmdHelp - help command                                          */
 /*-----------------------------------------------------------------*/
 int cmdHelp (char *s, context *cctxt)
-{   
+{
     int i ;
-        
+
     for (i = 0 ; i < (sizeof(cmdTab)/sizeof(struct cmdtab)) ; i++) {
-	
-	/* command string matches */
-	if (cmdTab[i].htxt)
-	    fprintf(stdout,"%s",cmdTab[i].htxt);
+
+  /* command string matches */
+  if (cmdTab[i].htxt)
+      fprintf(stdout,"%s",cmdTab[i].htxt);
     }
-	    
+
     return 0;
 }
 
@@ -624,43 +624,43 @@ int interpretCmd (char *s)
     /* if nothing & previous command exists then
        execute the previous command again */
     if (*s == '\n' && pcmd)
-	strcpy(s,pcmd);
+  strcpy(s,pcmd);
     /* if previous command exists & is different
        from the current command then copy it */
     if (pcmd) {
-	if (strcmp(pcmd,s)) {
-	    free(pcmd);
-	    pcmd = strdup(s);
-	}
+  if (strcmp(pcmd,s)) {
+      free(pcmd);
+      pcmd = strdup(s);
+  }
     } else
-	pcmd = strdup(s);
+  pcmd = strdup(s);
     /* lookup the command table and do the
        task required */
     strtok(s,"\n");
 
     for (i = 0 ; i < (sizeof(cmdTab)/sizeof(struct cmdtab)) ; i++) {
-	
-	/* command string matches */
-	if (strncmp(s,cmdTab[i].cmd,strlen(cmdTab[i].cmd)) == 0) {
-	    if (!cmdTab[i].cmdfunc)
-		return 1;
-	    rv = (*cmdTab[i].cmdfunc)(s + strlen(cmdTab[i].cmd),currCtxt);
-	    
-	    /* if full name then give the file name & position */
-	    if (fullname && currCtxt && currCtxt->func) {
-		if (srcMode == SRC_CMODE)
-		    fprintf(stdout,"\032\032%s:%d:1\n",
-			    currCtxt->func->mod->cfullname,
-			    currCtxt->cline+1);
-		else
-		    fprintf(stdout,"\032\032%s:%d:1\n",
-			    currCtxt->func->mod->afullname,
-			    currCtxt->asmline+1); 
-	    }
-	    goto ret;
-	}
+
+  /* command string matches */
+  if (strncmp(s,cmdTab[i].cmd,strlen(cmdTab[i].cmd)) == 0) {
+      if (!cmdTab[i].cmdfunc)
+    return 1;
+      rv = (*cmdTab[i].cmdfunc)(s + strlen(cmdTab[i].cmd),currCtxt);
+
+      /* if full name then give the file name & position */
+      if (fullname && currCtxt && currCtxt->func) {
+    if (srcMode == SRC_CMODE)
+        fprintf(stdout,"\032\032%s:%d:1\n",
+          currCtxt->func->mod->cfullname,
+          currCtxt->cline+1);
+    else
+        fprintf(stdout,"\032\032%s:%d:1\n",
+          currCtxt->func->mod->afullname,
+          currCtxt->asmline+1);
+      }
+      goto ret;
+  }
     }
-   
+
     fprintf(stdout,"Undefined command: \"%s\".  Try \"help\".\n",s);
  ret:
     return rv;
@@ -673,15 +673,15 @@ void commandLoop()
 {
 
     while (1) {
-	fprintf(stdout,"%s",prompt);
-	fflush(stdout);
+  fprintf(stdout,"%s",prompt);
+  fflush(stdout);
 
-	if (fgets(cmdbuff,sizeof(cmdbuff),stdin) == NULL)
-	    break;
+  if (fgets(cmdbuff,sizeof(cmdbuff),stdin) == NULL)
+      break;
 
-	if (interpretCmd(cmdbuff))
-	    break;
-	
+  if (interpretCmd(cmdbuff))
+      break;
+
     }
 }
 
@@ -691,11 +691,11 @@ void commandLoop()
 static void printVersionInfo()
 {
     fprintf(stdout,
-	    "SDCDB is free software and you are welcome to distribute copies of it\n"
-	    "under certain conditions; type \"show copying\" to see the conditions.\n"
-	    "There is absolutely no warranty for SDCDB; type \"show warranty\" for details.\n"
-	    "SDCDB 0.8 . Copyright (C) 1999 Sandeep Dutta (sandeep.dutta@usa.net)\n"
-	    "Type ? for help\n");
+      "SDCDB is free software and you are welcome to distribute copies of it\n"
+      "under certain conditions; type \"show copying\" to see the conditions.\n"
+      "There is absolutely no warranty for SDCDB; type \"show warranty\" for details.\n"
+      "SDCDB 0.8 . Copyright (C) 1999 Sandeep Dutta (sandeep.dutta@usa.net)\n"
+      "Type ? for help\n");
 
 }
 
@@ -708,90 +708,90 @@ static void parseCmdLine (int argc, char **argv)
     char *filename = NULL;
     char buffer[100];
     for ( i = 1; i < argc ; i++) {
-	fprintf(stdout,"%s\n",argv[i]);
-	
-	/* if this is an option */
-	if (argv[i][0] == '-') {
-	    
-	    /* if directory then mark directory */
-	    if (strncmp(argv[i],"--directory=",12) == 0) {
-		if (!ssdirl)
-		    ssdirl = &argv[i][12];
-		else {
-		    char *p = Safe_malloc(strlen(ssdirl)+strlen(&argv[i][12])+2);
-		    strcat(strcat(strcpy(p,&argv[i][12]),":"),ssdirl);
-		    ssdirl = p;
-		}
-		continue;
-	    }
-	    
-	    if (strncmp(argv[i],"-fullname",9) == 0) {
-		fullname = TRUE;
-		continue;
-	    }
-	    
-	    if (strcmp(argv[i],"-cd") == 0) {
-		i++;
-		chdir(argv[i]);
-		continue;
-	    }
-	    
-	    if (strncmp(argv[i],"-cd=",4) == 0) {
-		chdir(argv[i][4]);
-		continue;
-	    }
-	    
-	    /* the simulator arguments */
+  fprintf(stdout,"%s\n",argv[i]);
 
-	    /* cpu */
-	    if (strcmp(argv[i],"-t") == 0 ||
-		strcmp(argv[i],"-cpu") == 0) {
+  /* if this is an option */
+  if (argv[i][0] == '-') {
 
-		    simArgs[nsimArgs++] = "-t";		 
-		    simArgs[nsimArgs++] = strdup(argv[++i]);
-		    continue ;
-	    }
-	    
-	    /* XTAL Frequency */
-	    if (strcmp(argv[i],"-X") == 0 ||
-		strcmp(argv[i],"-frequency") == 0) {
-		    simArgs[nsimArgs++] = "-X";
-		    simArgs[nsimArgs++] = strdup(argv[++i]);
-		    continue ;
-	    }
-
-	    /* serial port */
-	    if (strcmp(argv[i],"-s") == 0) {
-		    simArgs[nsimArgs++] = "-s";		
-		    simArgs[nsimArgs++] = strdup(argv[++i]);
-		    continue ;
-	    }
-
-	    if (strcmp(argv[i],"-S") == 0) {
-		    simArgs[nsimArgs++] = "-s";		
-		    simArgs[nsimArgs++] = strdup(argv[++i]);
-		    continue ;
-	    }	
-
-	    fprintf(stderr,"unknown option %s --- ignored\n",
-		    argv[i]);
-	} else {
-	    /* must be file name */
-	    if (filename) {
-		fprintf(stderr,"too many filenames .. parameter '%s' ignored\n",
-			argv[i]);
-		continue ;
-	    }
-
-	    filename = strtok(argv[i],".");
-
-	}	    
+      /* if directory then mark directory */
+      if (strncmp(argv[i],"--directory=",12) == 0) {
+    if (!ssdirl)
+        ssdirl = &argv[i][12];
+    else {
+        char *p = Safe_malloc(strlen(ssdirl)+strlen(&argv[i][12])+2);
+        strcat(strcat(strcpy(p,&argv[i][12]),":"),ssdirl);
+        ssdirl = p;
     }
-    
+    continue;
+      }
+
+      if (strncmp(argv[i],"-fullname",9) == 0) {
+    fullname = TRUE;
+    continue;
+      }
+
+      if (strcmp(argv[i],"-cd") == 0) {
+    i++;
+    chdir(argv[i]);
+    continue;
+      }
+
+      if (strncmp(argv[i],"-cd=",4) == 0) {
+    chdir(argv[i][4]);
+    continue;
+      }
+
+      /* the simulator arguments */
+
+      /* cpu */
+      if (strcmp(argv[i],"-t") == 0 ||
+    strcmp(argv[i],"-cpu") == 0) {
+
+        simArgs[nsimArgs++] = "-t";
+        simArgs[nsimArgs++] = strdup(argv[++i]);
+        continue ;
+      }
+
+      /* XTAL Frequency */
+      if (strcmp(argv[i],"-X") == 0 ||
+    strcmp(argv[i],"-frequency") == 0) {
+        simArgs[nsimArgs++] = "-X";
+        simArgs[nsimArgs++] = strdup(argv[++i]);
+        continue ;
+      }
+
+      /* serial port */
+      if (strcmp(argv[i],"-s") == 0) {
+        simArgs[nsimArgs++] = "-s";
+        simArgs[nsimArgs++] = strdup(argv[++i]);
+        continue ;
+      }
+
+      if (strcmp(argv[i],"-S") == 0) {
+        simArgs[nsimArgs++] = "-s";
+        simArgs[nsimArgs++] = strdup(argv[++i]);
+        continue ;
+      }
+
+      fprintf(stderr,"unknown option %s --- ignored\n",
+        argv[i]);
+  } else {
+      /* must be file name */
+      if (filename) {
+    fprintf(stderr,"too many filenames .. parameter '%s' ignored\n",
+      argv[i]);
+    continue ;
+      }
+
+      filename = strtok(argv[i],".");
+
+  }
+    }
+
     if (filename)
-	cmdFile(filename,NULL);
+  cmdFile(filename,NULL);
 }
-  
+
 /*-----------------------------------------------------------------*/
 /* main -                                                          */
 /*-----------------------------------------------------------------*/
@@ -803,6 +803,6 @@ int main ( int argc, char **argv)
     parseCmdLine(argc,argv);
 
     commandLoop();
-    
+
     return 0;
 }

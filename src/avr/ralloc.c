@@ -1935,7 +1935,7 @@ static void packRegisters (eBBlock *ebp)
              bitVectnBitsOn(OP_DEFS(IC_RESULT(ic))) == 1 &&
 	     IS_OP_LITERAL(IC_RIGHT(ic))) ) {
 
-	    int i = operandLitValue(IC_RIGHT(ic));
+	    int i = (int) operandLitValue(IC_RIGHT(ic));
 	    if ( i < 255 && i > -255) {
 		OP_SYMBOL(IC_RESULT(ic))->remat = 1;
 		OP_SYMBOL(IC_RESULT(ic))->rematiCode = ic;

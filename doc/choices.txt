@@ -86,3 +86,24 @@ PlusIncr on pairs:
 	adc	a,b		; 4
 	ld	b,a		; 4 	= 30
 So n <= 5 (1) is better.
+
+Frame pointer:
+It's nice to use HL as the temp register, but what if I used it as the
+frame pointer instead of ix?
+
+Instead of:
+	ld	e,5(ix)		; 19
+	ld	d,6(ix)		; 19	= 38
+
+	ld	hl,#5		; 10
+	add	hl,sp		; 11
+	ld	e,(hl)		; 7
+	inc	hl		; 6
+	ld	d,(hl)		; 7	= 41
+
+Things get better when you access the same set over, as you get rid
+of the setup.  But they get worse when both ops are on the stack/in
+direct space.  Easiest this way for now.  iy may benifit...
+
+	
+ 

@@ -648,12 +648,13 @@ link *operandType (operand *op)
 	
     case TYPE :
 	return op->operand.typeOperand ;
+    default:
+	werror (E_INTERNAL_ERROR,__FILE__,__LINE__,
+		" operand type not known ");
+	assert (0) ; /* should never come here */
+	/*  Just to keep the compiler happy */
+	return (link *)0;
     }
-    werror (E_INTERNAL_ERROR,__FILE__,__LINE__,
-	    " operand type not known ");
-    assert (0) ; /* should never come here */
-    /*  Just to keep the compiler happy */
-    return (link *)0;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1327,7 +1328,7 @@ operand *geniCodeCast (link *type, operand *op, bool implicit)
 	return op;
     
     /* if this is a literal then just change the type & return */
-    if (IS_LITERAL(opetype) && !IS_PTR(type) && !IS_PTR(optype))
+    if (IS_LITERAL(opetype) && op->type == VALUE && !IS_PTR(type) && !IS_PTR(optype))
 	return operandFromValue(valCastLiteral(type,
 					       operandLitValue(op)));
           
@@ -2202,7 +2203,7 @@ operand *geniCodeAssign (operand *left, operand *right, int nosupdate)
 	
     /* left is integral type and right is literal then
        check if the literal value is within bounds */
-    if (IS_INTEGRAL(ltype) && IS_LITERAL(rtype)) {
+    if (IS_INTEGRAL(ltype) && right->type == VALUE && IS_LITERAL(rtype)) {
 	int nbits = bitsForType(ltype);
 	long v = operandLitValue(right);
 

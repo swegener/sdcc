@@ -285,11 +285,11 @@ struct	sym
  */
 struct	tsym
 {
-	struct	tsym *t_lnk;	/* Link to next */
-	char t_num;		/* 0-255$ */
-	char t_flg;		/* flags */
-	struct	area *t_area;	/* Area */
-	addr_t	t_addr;		/* Address */
+    struct	tsym *t_lnk;	/* Link to next */
+    int t_num;		/* 0-lots$ */
+    char t_flg;		/* flags */
+    struct	area *t_area;	/* Area */
+    addr_t	t_addr;		/* Address */
 };
 
 /*

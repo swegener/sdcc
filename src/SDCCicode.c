@@ -2505,10 +2505,10 @@ geniCodeLogic (operand * left, operand * right, int op)
   ic = newiCode (op, left, right);
   IC_RESULT (ic) = newiTempOperand (newCharLink (), 1);
 
-  /* if comparing anything greater than one byte
+  /* if comparing float
      and not a '==' || '!=' || '&&' || '||' (these
      will be inlined */
-  if (getSize (ctype) > 1 &&
+  if (IS_FLOAT(ctype) &&
       op != EQ_OP &&
       op != NE_OP &&
       op != AND_OP &&

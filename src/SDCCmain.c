@@ -180,7 +180,7 @@ extern void pic14glue ();
     @param    The name minus the option (eg 'mcs51')
     @return     0 on success.
 */
-static int 
+static int
 _setPort (const char *name)
 {
   int i;
@@ -197,7 +197,7 @@ _setPort (const char *name)
   exit (1);
 }
 
-static void 
+static void
 _validatePorts (void)
 {
   int i;
@@ -212,7 +212,7 @@ _validatePorts (void)
 }
 
 #ifdef USE_SYSTEM_SYSTEM_CALLS
-void 
+void
 buildCmdLine (char *into, const char **cmds,
 	      const char *p1, const char *p2,
 	      const char *p3, const char **list)
@@ -273,7 +273,7 @@ buildCmdLine (char *into, const char **cmds,
     }
 }
 #else
-void 
+void
 buildCmdLine (char *into, char **args, const char **cmds,
 	      const char *p1, const char *p2,
 	      const char *p3, const char **list)
@@ -343,7 +343,7 @@ buildCmdLine (char *into, char **args, const char **cmds,
 /*-----------------------------------------------------------------*/
 /* printVersionInfo - prints the version info        */
 /*-----------------------------------------------------------------*/
-void 
+void
 printVersionInfo ()
 {
   int i;
@@ -378,7 +378,7 @@ printVersionInfo ()
 /*-----------------------------------------------------------------*/
 /* printUsage - prints command line syntax         */
 /*-----------------------------------------------------------------*/
-void 
+void
 printUsage ()
 {
   printVersionInfo ();
@@ -412,7 +412,7 @@ printUsage ()
 /*-----------------------------------------------------------------*/
 /* parseWithComma - separates string with comma                    */
 /*-----------------------------------------------------------------*/
-void 
+void
 parseWithComma (char **dest, char *src)
 {
   int i = 0;
@@ -439,7 +439,7 @@ parseWithComma (char **dest, char *src)
 /*-----------------------------------------------------------------*/
 /* setDefaultOptions - sets the default options                    */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 setDefaultOptions ()
 {
   int i;
@@ -479,7 +479,7 @@ setDefaultOptions ()
 /*-----------------------------------------------------------------*/
 /* processFile - determines the type of file from the extension    */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 processFile (char *s)
 {
   char *fext = NULL;
@@ -560,7 +560,7 @@ processFile (char *s)
 
 }
 
-static void 
+static void
 _processC1Arg (char *s)
 {
   if (srcFileName)
@@ -578,7 +578,7 @@ _processC1Arg (char *s)
     }
 }
 
-static void 
+static void
 _addToList (const char **list, const char *str)
 {
   /* This is the bad way to do things :) */
@@ -593,7 +593,7 @@ _addToList (const char **list, const char *str)
   *(++list) = NULL;
 }
 
-static void 
+static void
 _setModel (int model, const char *sz)
 {
   if (port->general.supported_models & model)
@@ -605,7 +605,7 @@ _setModel (int model, const char *sz)
 /*-----------------------------------------------------------------*/
 /* parseCmdLine - parses the command line and sets the options     */
 /*-----------------------------------------------------------------*/
-int 
+int
 parseCmdLine (int argc, char **argv)
 {
   int i;
@@ -1269,11 +1269,11 @@ parseCmdLine (int argc, char **argv)
 
 //char *try_dir[]= {SRCDIR "/bin",PREFIX "/bin", NULL};
 char *try_dir[] =
-{NULL, NULL}; /* First entry may be overwritten, so use two. */
+{NULL, NULL};			/* First entry may be overwritten, so use two. */
 
 
 #ifdef USE_SYSTEM_SYSTEM_CALLS
-int 
+int
 my_system (const char *cmd)
 {
   int argsStart, e, i = 0;
@@ -1341,7 +1341,7 @@ my_system (const char *cmd)
 
 #else
 
-int 
+int
 my_system (const char *cmd, char **cmd_argv)
 {
   char *dir, *got = NULL;
@@ -1413,7 +1413,7 @@ my_system (const char *cmd, char **cmd_argv)
 /*-----------------------------------------------------------------*/
 /* linkEdit : - calls the linkage editor  with options             */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 linkEdit (char **envp)
 {
   FILE *lnkfile;
@@ -1534,8 +1534,8 @@ linkEdit (char **envp)
   if (my_system (buffer))
     {
       /* either system() or the linker itself has reported an error
-	 perror ("Cannot exec linker");
-      */
+         perror ("Cannot exec linker");
+       */
       exit (1);
     }
 #else
@@ -1561,7 +1561,7 @@ linkEdit (char **envp)
 /*-----------------------------------------------------------------*/
 /* assemble - spawns the assembler with arguments                  */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 assemble (char **envp)
 {
 #ifdef USE_SYSTEM_SYSTEM_CALLS
@@ -1569,8 +1569,8 @@ assemble (char **envp)
   if (my_system (buffer))
     {
       /* either system() or the assembler itself has reported an error
-	 perror ("Cannot exec assembler");
-      */
+         perror ("Cannot exec assembler");
+       */
       exit (1);
     }
 #else
@@ -1591,7 +1591,7 @@ assemble (char **envp)
 /*-----------------------------------------------------------------*/
 /* preProcess - spawns the preprocessor with arguments       */
 /*-----------------------------------------------------------------*/
-static int 
+static int
 preProcess (char **envp)
 {
 #ifndef USE_SYSTEM_SYSTEM_CALLS
@@ -1656,7 +1656,7 @@ preProcess (char **envp)
 	{
 	  /* either system() or the preprocessor itself has reported an error
 	     perror ("Cannot exec Preprocessor");
-	  */
+	   */
 	  exit (1);
 	}
 #else
@@ -1689,7 +1689,7 @@ preProcess (char **envp)
   return 0;
 }
 
-static void 
+static void
 _findPort (int argc, char **argv)
 {
   _validatePorts ();
@@ -1714,7 +1714,7 @@ _findPort (int argc, char **argv)
  * initialises and calls the parser
  */
 
-int 
+int
 main (int argc, char **argv, char **envp)
 {
   /* turn all optimizations off by default */
@@ -1727,16 +1727,16 @@ main (int argc, char **argv, char **envp)
   if (port->init)
     port->init ();
 
-    // Create a default exe search path from the path to the sdcc command
+  // Create a default exe search path from the path to the sdcc command
 
 
 
-  if (strchr(argv[0], DIR_SEPARATOR_CHAR))
-  {
-      strcpy(DefaultExePath, argv[0]);
-      *(strrchr(DefaultExePath, DIR_SEPARATOR_CHAR)) = 0;
+  if (strchr (argv[0], DIR_SEPARATOR_CHAR))
+    {
+      strcpy (DefaultExePath, argv[0]);
+      *(strrchr (DefaultExePath, DIR_SEPARATOR_CHAR)) = 0;
       try_dir[0] = DefaultExePath;
-  }
+    }
 
 
   setDefaultOptions ();

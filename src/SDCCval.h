@@ -25,75 +25,82 @@
 #define SDCCVAL_H
 
 /* value wrapper */
-typedef struct value  {
-	char	name[ SDCC_NAME_MAX + 1 ]; /* operand accessing this value */	
-	sym_link *type ;                 /* start of type chain     */
-	sym_link *etype;                 /* end of type chain       */
-	symbol   *sym  ;                 /* Original Symbol         */
-	struct   value *next ;           /* used in initializer list*/
-	unsigned    vArgs  : 1 ;	  /* arg list ended with variable arg		*/
+typedef struct value
+  {
+    char name[SDCC_NAME_MAX + 1];	/* operand accessing this value */
+    sym_link *type;		/* start of type chain     */
+    sym_link *etype;		/* end of type chain       */
+    symbol *sym;		/* Original Symbol         */
+    struct value *next;		/* used in initializer list */
+    unsigned vArgs:1;		/* arg list ended with variable arg           */
 
-} value ;
+  }
+value;
 
-enum  {
-   INIT_NODE   ,
-   INIT_DEEP   ,
-   INIT_HOLE   
-};
+enum
+  {
+    INIT_NODE,
+    INIT_DEEP,
+    INIT_HOLE
+  };
 
 /* initializer lists use this structure */
-typedef  struct   initList {
-    int		type  ;
-    int		lineno ;
-    union  {
-	struct ast       *node ;
-	struct initList   *deep ;
-    } init ;
-    
-    struct   initList    *next ;
-} initList ;
+typedef struct initList
+  {
+    int type;
+    int lineno;
+    union
+      {
+	struct ast *node;
+	struct initList *deep;
+      }
+    init;
+
+    struct initList *next;
+  }
+initList;
 
 #define  IS_VARG(x)		(x->vArgs)
 
 /* forward definitions for the symbol table related functions */
-void			 initValue        (                     );
-value			*newValue         (                     );
-value			*constVal         (char    *            );
-value			*reverseVal       (value   *            );
-value			*reverseValWithType(value   *           );
-value			*copyValue        (value   *            );
-value                   *copyValueChain   (value   *            );
-value			*strVal           (char    *            );
-value			*charVal          (char    *            );
-value			*symbolVal        (symbol  *            );
-void			 printVal         (value   *            );
-double 		         floatFromVal     (value   *            );
-value			*array2Ptr        (value   *            );
-value			*valUnaryPM       (value   *            );
-value			*valComplement    (value   *            );
-value			*valNot           (value   *            );
-value			*valMult          (value   *, value *   );
-value			*valDiv           (value   *, value *   );
-value			*valMod           (value   *, value *   );
-value			*valPlus          (value   *, value *   );
-value			*valMinus         (value   *, value *   );
-value			*valShift         (value   *, value *,int);
-value			*valCompare       (value   *, value *,int);
-value			*valBitwise       (value   *, value *,int);
-value			*valLogicAndOr    (value   *, value *,int);
-value                   *valCastLiteral   (sym_link    *, double );
-value                   *valueFromLit     (float );
-initList		*newiList         (int      , void  *   );
-initList		*revinit          (initList  *          );
-initList		*copyIlist	  (initList  *		);
-double            	 list2int         (initList  *          );
-value			*list2val         (initList  *          );
-struct ast		*list2expr	  (initList  *		);
-void                     resolveIvalSym   (initList  *          );
-value                   *valFromType      (sym_link *           );
-value                   *constFloatVal    (char *               );
-int                      getNelements     (sym_link *, initList *   );
-value                   *valForArray      (struct ast  *        );
-value                   *valForStructElem (struct ast  *, struct ast *);
-value                   *valForCastAggr   (struct ast *, sym_link *, struct ast *, int ) ;
+void initValue ();
+value *newValue ();
+value *constVal (char *);
+value *reverseVal (value *);
+value *reverseValWithType (value *);
+value *copyValue (value *);
+value *copyValueChain (value *);
+value *strVal (char *);
+value *charVal (char *);
+value *symbolVal (symbol *);
+void printVal (value *);
+double floatFromVal (value *);
+value *array2Ptr (value *);
+value *valUnaryPM (value *);
+value *valComplement (value *);
+value *valNot (value *);
+value *valMult (value *, value *);
+value *valDiv (value *, value *);
+value *valMod (value *, value *);
+value *valPlus (value *, value *);
+value *valMinus (value *, value *);
+value *valShift (value *, value *, int);
+value *valCompare (value *, value *, int);
+value *valBitwise (value *, value *, int);
+value *valLogicAndOr (value *, value *, int);
+value *valCastLiteral (sym_link *, double);
+value *valueFromLit (float);
+initList *newiList (int, void *);
+initList *revinit (initList *);
+initList *copyIlist (initList *);
+double list2int (initList *);
+value *list2val (initList *);
+struct ast *list2expr (initList *);
+void resolveIvalSym (initList *);
+value *valFromType (sym_link *);
+value *constFloatVal (char *);
+int getNelements (sym_link *, initList *);
+value *valForArray (struct ast *);
+value *valForStructElem (struct ast *, struct ast *);
+value *valForCastAggr (struct ast *, sym_link *, struct ast *, int);
 #endif

@@ -27,55 +27,56 @@
 #include <stdarg.h>
 
 #if defined(_MSC_VER)
-#	include "sdcc_vc.h"
+#include "sdcc_vc.h"
 #else
-#	include "sdccconf.h"
-#endif		// _MSC_VER
+#include "sdccconf.h"
+#endif // _MSC_VER
 
 
 #ifndef THROWS
 #define THROWS
-#define THROW_NONE  0 
-#define THROW_SRC   1 
+#define THROW_NONE  0
+#define THROW_SRC   1
 #define THROW_DEST  2
 #define THROW_BOTH  3
 #endif
 
 /* linear linked list generic */
 typedef struct set
-{
-    void    *item ;
-    struct  set *curr ;
-    struct  set *next ;
-} set ;
+  {
+    void *item;
+    struct set *curr;
+    struct set *next;
+  }
+set;
 
 #define DEFSETFUNC(fname)  int fname ( void *item, va_list ap)
-#define V_ARG(type,var) type var = va_arg(ap,type) 
+#define V_ARG(type,var) type var = va_arg(ap,type)
 
 /* set related functions */
-void          *addSet             ( set  ** , void   *         );
-void          *addSetHead         ( set  ** , void   *         );
-void          *getSet             ( set  ** );
-void          deleteSetItem       ( set  ** , void * );
-void          deleteItemIf        ( set  ** , int (*cond) (void *, va_list), ... );
-int            isinSet            ( set  * , void * );
-int            isinSetWith        ( set  *,  void *, int (*cfunc)(void*,void*));
-int           applyToSet          ( set  *list ,int (*somefunc)(void *,va_list), ...);
-int           applyToSetFTrue     ( set  *list ,int (*somefunc)(void *,va_list), ...);
-set         *unionSets           ( set *, set *, int);
-set         *unionSetsWith       ( set *, set *, int (*cFunc)(),int);
-set         *intersectSets       ( set *, set *, int);
-void          *addSetIfnotP       ( set **, void *);
-set         *setFromSet        ( set * );
-int           isSetsEqual        ( set *, set *);
-set         *subtractFromSet     ( set *, set *,int);
-int          elementsInSet       (set *);
-set         *intersectSetsWith (set *, set *,int (*cFunc)(void *,void *),int );
-int         isSetsEqualWith    ( set *, set *, int (*cFunc)(void *,void *));
-void        *peekSet           ( set *);
-void        *setFirstItem      ( set *);
-void        *setNextItem       ( set *);
-void         setToNull         (void ** );
+void *addSet (set **, void *);
+void *addSetHead (set **, void *);
+void *getSet (set **);
+void deleteSetItem (set **, void *);
+void deleteItemIf (set **, int (*cond) (void *, va_list),...);
+int isinSet (set *, void *);
+int isinSetWith (set *, void *, int (*cfunc) (void *, void *));
+int applyToSet (set * list, int (*somefunc) (void *, va_list),...);
+int applyToSetFTrue (set * list, int (*somefunc) (void *, va_list),...);
+set *unionSets (set *, set *, int);
+set *unionSetsWith (set *, set *, int (*cFunc) (), int);
+set *intersectSets (set *, set *, int);
+void *addSetIfnotP (set **, void *);
+set *setFromSet (set *);
+int isSetsEqual (set *, set *);
+set *subtractFromSet (set *, set *, int);
+int elementsInSet (set *);
+set *intersectSetsWith (set *, set *, int (*cFunc) (void *, void *), int);
+int isSetsEqualWith (set *, set *, int (*cFunc) (void *, void *));
+void *peekSet (set *);
+void *setFirstItem (set *);
+void *setNextItem (set *);
+void setToNull (void **);
 
 
 #endif

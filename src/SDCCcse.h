@@ -28,31 +28,33 @@
 #ifndef SDCCCSE_H
 #define SDCCCSE_H 1
 
-typedef struct cseDef {
-    
-    unsigned int key;
-    operand *sym    ;            /* defining symbol */
-    iCode  *diCode ;             /* defining instruction */
+typedef struct cseDef
+  {
 
-} cseDef ;
+    unsigned int key;
+    operand *sym;		/* defining symbol */
+    iCode *diCode;		/* defining instruction */
+
+  }
+cseDef;
 
 
 cseDef *newCseDef (operand *, iCode *);
-int isCseDefEqual ( void *, void *);
-int pcseDef (void *, va_list );
+int isCseDefEqual (void *, void *);
+int pcseDef (void *, va_list);
 void algebraicOpts (iCode *);
-DEFSETFUNC(ifDiCodeIsX);
-int ifDiCodeIs (set *,iCode *);
-DEFSETFUNC(ifDefSymIsX);
-int ifDefSymIs (set *,operand *);
-DEFSETFUNC(findPrevIc);
-DEFSETFUNC(ifOperandsHave);
-DEFSETFUNC(findCheaperOp) ;
-int cseBBlock ( eBBlock *,int ,eBBlock **, int);
-int cseAllBlocks (eBBlock **,int );
-void ifxOptimize (iCode *,set *,int,eBBlock *,int *,eBBlock **,int);
-void unsetDefsAndUses ( iCode *) ;
-void updateSpillLocation ( iCode *ic);
-void setUsesDefs (operand *,bitVect *,bitVect *,bitVect **);
-void replaceAllSymBySym (iCode *,operand *,operand *,bitVect **);
+DEFSETFUNC (ifDiCodeIsX);
+int ifDiCodeIs (set *, iCode *);
+DEFSETFUNC (ifDefSymIsX);
+int ifDefSymIs (set *, operand *);
+DEFSETFUNC (findPrevIc);
+DEFSETFUNC (ifOperandsHave);
+DEFSETFUNC (findCheaperOp);
+int cseBBlock (eBBlock *, int, eBBlock **, int);
+int cseAllBlocks (eBBlock **, int);
+void ifxOptimize (iCode *, set *, int, eBBlock *, int *, eBBlock **, int);
+void unsetDefsAndUses (iCode *);
+void updateSpillLocation (iCode * ic);
+void setUsesDefs (operand *, bitVect *, bitVect *, bitVect **);
+void replaceAllSymBySym (iCode *, operand *, operand *, bitVect **);
 #endif

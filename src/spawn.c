@@ -26,20 +26,21 @@ sequence which doesn't work for djgpp.
 
 ***************************************************************************/
 
-int spawnv(int mode, const char *path, char *const argv[])
+int 
+spawnv (int mode, const char *path, char *const argv[])
 {
- int pStatus;
+  int pStatus;
 
- if (mode==P_OVERLAY)
-    return execv(path,argv);
- if (!fork())
-   {
-    if (execv(path,argv))
-       return -1;
-   }
- if (mode==P_WAIT)
-    wait(&pStatus);
- return 0;
+  if (mode == P_OVERLAY)
+    return execv (path, argv);
+  if (!fork ())
+    {
+      if (execv (path, argv))
+	return -1;
+    }
+  if (mode == P_WAIT)
+    wait (&pStatus);
+  return 0;
 }
 
 /**[txh]********************************************************************
@@ -49,20 +50,21 @@ int spawnv(int mode, const char *path, char *const argv[])
 
 ***************************************************************************/
 
-int spawnvp(int mode, const char *path, char *const argv[])
+int 
+spawnvp (int mode, const char *path, char *const argv[])
 {
- int pStatus;
+  int pStatus;
 
- if (mode==P_OVERLAY)
-    return execv(path,argv);
- if (!fork())
-   {
-    if (execvp(path,argv))
-       return -1;
-   }
- if (mode==P_WAIT)
-    wait(&pStatus);
- return 0;
+  if (mode == P_OVERLAY)
+    return execv (path, argv);
+  if (!fork ())
+    {
+      if (execvp (path, argv))
+	return -1;
+    }
+  if (mode == P_WAIT)
+    wait (&pStatus);
+  return 0;
 }
 #endif
 #endif

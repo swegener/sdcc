@@ -29,11 +29,11 @@
 #ifndef SDCCDFLOW_H
 #define SDCCDFLOW_H 1
 
-DEFSETFUNC(mergeInExprs);
-DEFSETFUNC(ifKilledInBlock) ;
-void computeDataFlow (eBBlock **, int );
-DEFSETFUNC(mergeInDefs);
-DEFSETFUNC(isDefAlive);
-iCode *usedInRemaining (operand *,iCode *);
-int usedBetweenPoints ( operand *,iCode *,iCode *);
+DEFSETFUNC (mergeInExprs);
+DEFSETFUNC (ifKilledInBlock);
+void computeDataFlow (eBBlock **, int);
+DEFSETFUNC (mergeInDefs);
+DEFSETFUNC (isDefAlive);
+iCode *usedInRemaining (operand *, iCode *);
+int usedBetweenPoints (operand *, iCode *, iCode *);
 #endif

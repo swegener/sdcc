@@ -28,84 +28,94 @@
 /*-----------------------------------------------------------------------*/
 /* findPointerGetSet - find the pointer get or set for a operand         */
 /*-----------------------------------------------------------------------*/
-static iCode *findPointerGetSet(iCode *sic,operand *op)
+static iCode *
+findPointerGetSet (iCode * sic, operand * op)
 {
-    iCode *ic = sic;
+  iCode *ic = sic;
 
-    for (; ic ; ic = ic->next) {
-	if ((POINTER_SET(ic) && isOperandEqual(op,IC_RESULT(ic))) ||
-	    (POINTER_GET(ic) && isOperandEqual(op,IC_LEFT(ic))))
-	    return ic;
+  for (; ic; ic = ic->next)
+    {
+      if ((POINTER_SET (ic) && isOperandEqual (op, IC_RESULT (ic))) ||
+	  (POINTER_GET (ic) && isOperandEqual (op, IC_LEFT (ic))))
+	return ic;
 
-	/* if we find any other usage or definition of op null */
-	if (IC_RESULT(ic) && isOperandEqual(IC_RESULT(ic),op))
-	    return NULL;
+      /* if we find any other usage or definition of op null */
+      if (IC_RESULT (ic) && isOperandEqual (IC_RESULT (ic), op))
+	return NULL;
 
-	if (IC_RIGHT(ic) && isOperandEqual(IC_RIGHT(ic),op))
-	    return NULL;
-	
-	if (IC_LEFT(ic) && isOperandEqual(IC_LEFT(ic),op))
-	    return NULL;
+      if (IC_RIGHT (ic) && isOperandEqual (IC_RIGHT (ic), op))
+	return NULL;
+
+      if (IC_LEFT (ic) && isOperandEqual (IC_LEFT (ic), op))
+	return NULL;
 
     }
 
-    return NULL;
+  return NULL;
 }
 
 /*-----------------------------------------------------------------------*/
 /* ptrPostIncDecOpts - will do some pointer post increment optimizations */
 /*                     this will help register allocation amongst others */
 /*-----------------------------------------------------------------------*/
-void ptrPostIncDecOpt (iCode *sic)
+void 
+ptrPostIncDecOpt (iCode * sic)
 {
-    /* this is what we do. look for sequences like
+  /* this is what we do. look for sequences like
 
-       iTempX := _SOME_POINTER_;
-       iTempY := _SOME_POINTER_ + nn ;   nn  = sizeof (pointed to object)
-       _SOME_POINTER_ := iTempY;
-       either       
-               iTempZ := @[iTempX];
-       or
-               *(iTempX) := ..something..
-       if we find this then transform this to
-       iTempX := _SOME_POINTER_;
-       either       
-               iTempZ := @[iTempX];
-       or 
-               *(iTempX) := ..something..
-       iTempY := _SOME_POINTER_ + nn ;   nn  = sizeof (pointed to object)
-       _SOME_POINTER_ := iTempY; */
+     iTempX := _SOME_POINTER_;
+     iTempY := _SOME_POINTER_ + nn ;   nn  = sizeof (pointed to object)
+     _SOME_POINTER_ := iTempY;
+     either       
+     iTempZ := @[iTempX];
+     or
+     *(iTempX) := ..something..
+     if we find this then transform this to
+     iTempX := _SOME_POINTER_;
+     either       
+     iTempZ := @[iTempX];
+     or 
+     *(iTempX) := ..something..
+     iTempY := _SOME_POINTER_ + nn ;   nn  = sizeof (pointed to object)
+     _SOME_POINTER_ := iTempY; */
 
-    /* sounds simple enough so lets start , here I use -ve
-       tests all the way to return if any test fails */
-    iCode *pgs, *sh,*st;
+  /* sounds simple enough so lets start , here I use -ve
+     tests all the way to return if any test fails */
+  iCode *pgs, *sh, *st;
 
-    if (!( sic->next && sic->next->next && sic->next->next->next))
-	return ;    
-    if (sic->next->op != '+' && sic->next->op != '-') return;
-    if (!(sic->next->next->op == '=' &&
-	  !POINTER_SET(sic->next->next))) return;    
-    if (!isOperandEqual(IC_LEFT(sic->next),IC_RIGHT(sic)) ||
-	!IS_OP_LITERAL(IC_RIGHT(sic->next))    ) return;
-    if (operandLitValue(IC_RIGHT(sic->next)) !=
-	getSize(operandType(IC_RIGHT(sic))->next)) return;
-    if (!isOperandEqual(IC_RESULT(sic->next->next),
-			IC_RIGHT(sic))) return;
-    if (!isOperandEqual(IC_RESULT(sic->next),IC_RIGHT(sic->next->next))) return;
-    if (!(pgs = findPointerGetSet(sic->next->next,IC_RESULT(sic)))) 
-	return;
+  if (!(sic->next && sic->next->next && sic->next->next->next))
+    return;
+  if (sic->next->op != '+' && sic->next->op != '-')
+    return;
+  if (!(sic->next->next->op == '=' &&
+	!POINTER_SET (sic->next->next)))
+    return;
+  if (!isOperandEqual (IC_LEFT (sic->next), IC_RIGHT (sic)) ||
+      !IS_OP_LITERAL (IC_RIGHT (sic->next)))
+    return;
+  if (operandLitValue (IC_RIGHT (sic->next)) !=
+      getSize (operandType (IC_RIGHT (sic))->next))
+    return;
+  if (!isOperandEqual (IC_RESULT (sic->next->next),
+		       IC_RIGHT (sic)))
+    return;
+  if (!isOperandEqual (IC_RESULT (sic->next), IC_RIGHT (sic->next->next)))
+    return;
+  if (!(pgs = findPointerGetSet (sic->next->next, IC_RESULT (sic))))
+    return;
 
-    /* found the patter .. now do the transformation */
-    sh = sic->next; st = sic->next->next ;
+  /* found the patter .. now do the transformation */
+  sh = sic->next;
+  st = sic->next->next;
 
-    /* take the two out of the chain */
-    sic->next = st->next;
-    st->next->prev = sic;
-    
-    /* and put them after the pointer get/set icode */
-    if ((st->next = pgs->next))
-	st->next->prev = st;
-    pgs->next = sh;
-    sh->prev  = pgs;
-    
+  /* take the two out of the chain */
+  sic->next = st->next;
+  st->next->prev = sic;
+
+  /* and put them after the pointer get/set icode */
+  if ((st->next = pgs->next))
+    st->next->prev = st;
+  pgs->next = sh;
+  sh->prev = pgs;
+
 }

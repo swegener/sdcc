@@ -27,7 +27,7 @@
 #define SDCCLRANGE_H 1
 
 extern hTab *liveRanges;
-extern hTab *iCodehTab ;
+extern hTab *iCodehTab;
 
 void computeLiveRanges (eBBlock **, int);
 

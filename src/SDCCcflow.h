@@ -28,17 +28,17 @@
 #ifndef SDCCCFLOW_H
 #define SDCCCFLOW_H 1
 
-void computeDFOrdering ( eBBlock * , int *) ;
+void computeDFOrdering (eBBlock *, int *);
 set *domSetFromVect (eBBlock **, bitVect *);
 void addSuccessor (eBBlock *, eBBlock *);
-void eBBSuccessors ( eBBlock **, int );
-void eBBPredecessors ( eBBlock **, int );
-eBBlock *immedDom (eBBlock **,eBBlock *);
-DEFSETFUNC(DFOrdering);
-void markNoPath ( eBBlock **, int);
-void computeControlFlow (eBBlock **,int , int);
+void eBBSuccessors (eBBlock **, int);
+void eBBPredecessors (eBBlock **, int);
+eBBlock *immedDom (eBBlock **, eBBlock *);
+DEFSETFUNC (DFOrdering);
+void markNoPath (eBBlock **, int);
+void computeControlFlow (eBBlock **, int, int);
 int dfNumCompare (const void *, const void *);
 int bbNumCompare (const void *, const void *);
-void disconBBlock (eBBlock *,eBBlock **,int);
+void disconBBlock (eBBlock *, eBBlock **, int);
 
 #endif

@@ -28,19 +28,20 @@
 #include "newalloc.h"
 
 peepRule *rootRules = NULL;
-peepRule *currRule  = NULL;
+peepRule *currRule = NULL;
 
 #define HTAB_SIZE 53
 typedef struct
-{
+  {
     char name[SDCC_NAME_MAX + 1];
     int refCount;
-} labelHashEntry;
+  }
+labelHashEntry;
 
 hTab *labelHash = NULL;
 
-static int hashSymbolName(const char *name);
-static void buildLabelRefCountHash(lineNode *head);
+static int hashSymbolName (const char *name);
+static void buildLabelRefCountHash (lineNode * head);
 
 static bool matchLine (char *, char *, hTab **);
 
@@ -50,276 +51,300 @@ static bool matchLine (char *, char *, hTab **);
 /*-----------------------------------------------------------------*/
 /* pcDistance - afinds a label back ward or forward                */
 /*-----------------------------------------------------------------*/
-int pcDistance (lineNode *cpos, char *lbl, bool back)
+int 
+pcDistance (lineNode * cpos, char *lbl, bool back)
 {
-    lineNode *pl = cpos;
-    char buff[MAX_PATTERN_LEN];
-    int dist = 0 ;
+  lineNode *pl = cpos;
+  char buff[MAX_PATTERN_LEN];
+  int dist = 0;
 
-    sprintf(buff,"%s:",lbl);
-    while (pl) {
+  sprintf (buff, "%s:", lbl);
+  while (pl)
+    {
 
-    if (pl->line &&
-        *pl->line != ';' &&
-        pl->line[strlen(pl->line)-1] != ':' &&
-        !pl->isDebug)
+      if (pl->line &&
+	  *pl->line != ';' &&
+	  pl->line[strlen (pl->line) - 1] != ':' &&
+	  !pl->isDebug)
 
-        dist ++;
+	dist++;
 
-    if (strncmp(pl->line,buff,strlen(buff)) == 0)
-        return dist;
+      if (strncmp (pl->line, buff, strlen (buff)) == 0)
+	return dist;
 
-    if (back)
-        pl = pl->prev;
-    else
-        pl = pl->next;
+      if (back)
+	pl = pl->prev;
+      else
+	pl = pl->next;
 
     }
-    return 0;
+  return 0;
 }
 
 /*-----------------------------------------------------------------*/
 /* flat24bitMode - will check to see if we are in flat24 mode      */
 /*-----------------------------------------------------------------*/
-FBYNAME(flat24bitMode)
+FBYNAME (flat24bitMode)
 {
-    return (options.model == MODEL_FLAT24);
+  return (options.model == MODEL_FLAT24);
 }
 
 /*-----------------------------------------------------------------*/
 /* labelInRange - will check to see if label %5 is within range    */
 /*-----------------------------------------------------------------*/
-FBYNAME(labelInRange)
+FBYNAME (labelInRange)
 {
-    /* assumes that %5 pattern variable has the label name */
-    char *lbl = hTabItemWithKey(vars,5);
-    int dist = 0 ;
+  /* assumes that %5 pattern variable has the label name */
+  char *lbl = hTabItemWithKey (vars, 5);
+  int dist = 0;
 
-    if (!lbl)
+  if (!lbl)
     return FALSE;
 
-    /* if the previous teo instructions are "ljmp"s then don't
-       do it since it can be part of a jump table */
-    if (currPl->prev && currPl->prev->prev &&
-    strstr(currPl->prev->line,"ljmp") &&
-    strstr(currPl->prev->prev->line,"ljmp"))
-    return FALSE ;
+  /* if the previous teo instructions are "ljmp"s then don't
+     do it since it can be part of a jump table */
+  if (currPl->prev && currPl->prev->prev &&
+      strstr (currPl->prev->line, "ljmp") &&
+      strstr (currPl->prev->prev->line, "ljmp"))
+    return FALSE;
 
-    /* calculate the label distance : the jump for reladdr can be
-       +/- 127 bytes, here Iam assuming that an average 8051
-       instruction is 2 bytes long, so if the label is more than
-       63 intructions away, the label is considered out of range
-       for a relative jump. we could get more precise this will
-       suffice for now since it catches > 90% cases */
-    dist = (pcDistance(currPl,lbl,TRUE) +
-        pcDistance(currPl,lbl,FALSE)) ;
+  /* calculate the label distance : the jump for reladdr can be
+     +/- 127 bytes, here Iam assuming that an average 8051
+     instruction is 2 bytes long, so if the label is more than
+     63 intructions away, the label is considered out of range
+     for a relative jump. we could get more precise this will
+     suffice for now since it catches > 90% cases */
+  dist = (pcDistance (currPl, lbl, TRUE) +
+	  pcDistance (currPl, lbl, FALSE));
 
 /*    if (!dist || dist > 45) has produced wrong sjmp */
-    /* 07-Sep-2000 Michael Schmitt */
-    /* FIX for Peephole 132 */
-    /* switch with lots of case can lead to a sjmp with a distance */
-    /* out of the range for sjmp */
-    if (!dist || dist > 43)
+  /* 07-Sep-2000 Michael Schmitt */
+  /* FIX for Peephole 132 */
+  /* switch with lots of case can lead to a sjmp with a distance */
+  /* out of the range for sjmp */
+  if (!dist || dist > 43)
     return FALSE;
 
-    return TRUE;
+  return TRUE;
 }
 
 /*-----------------------------------------------------------------*/
 /* operandsNotSame - check if %1 & %2 are the same                 */
 /*-----------------------------------------------------------------*/
-FBYNAME(operandsNotSame)
+FBYNAME (operandsNotSame)
 {
-    char *op1 = hTabItemWithKey(vars,1);
-    char *op2 = hTabItemWithKey(vars,2);
+  char *op1 = hTabItemWithKey (vars, 1);
+  char *op2 = hTabItemWithKey (vars, 2);
 
-    if (strcmp(op1,op2) == 0)
+  if (strcmp (op1, op2) == 0)
     return FALSE;
-    else
+  else
     return TRUE;
 }
 
 /* labelRefCount:
- *
+
  * takes two parameters: a variable (bound to a label name)
  * and an expected reference count.
  *
  * Returns TRUE if that label is defined and referenced exactly
  * the given number of times.
  */
-FBYNAME(labelRefCount)
+FBYNAME (labelRefCount)
 {
-    int  varNumber, expectedRefCount;
-    bool rc = FALSE;
+  int varNumber, expectedRefCount;
+  bool rc = FALSE;
 
-    /* If we don't have the label hash table yet, build it. */
-    if (!labelHash)
+  /* If we don't have the label hash table yet, build it. */
+  if (!labelHash)
     {
-      buildLabelRefCountHash(head);
+      buildLabelRefCountHash (head);
     }
 
-    if (sscanf(cmdLine, "%*[ \t%]%d %d", &varNumber, &expectedRefCount) == 2)
+  if (sscanf (cmdLine, "%*[ \t%]%d %d", &varNumber, &expectedRefCount) == 2)
     {
-        char *label = hTabItemWithKey(vars, varNumber);
+      char *label = hTabItemWithKey (vars, varNumber);
 
-        if (label)
-        {
-      labelHashEntry *entry;
+      if (label)
+	{
+	  labelHashEntry *entry;
 
-      entry = hTabFirstItemWK(labelHash, hashSymbolName(label));
+	  entry = hTabFirstItemWK (labelHash, hashSymbolName (label));
 
-      while (entry)
-      {
-          if (!strcmp(label, entry->name))
-          {
-              break;
-          }
-          entry = hTabNextItemWK(labelHash);
-      }
-      if (entry)
-      {
+	  while (entry)
+	    {
+	      if (!strcmp (label, entry->name))
+		{
+		  break;
+		}
+	      entry = hTabNextItemWK (labelHash);
+	    }
+	  if (entry)
+	    {
 #if 0
-    /* debug spew. */
-          fprintf(stderr, "labelRefCount: %s has refCount %d, want %d\n",
-            label, entry->refCount, expectedRefCount);
+	      /* debug spew. */
+	      fprintf (stderr, "labelRefCount: %s has refCount %d, want %d\n",
+		       label, entry->refCount, expectedRefCount);
 #endif
 
-          rc = (expectedRefCount == entry->refCount);
-      }
+	      rc = (expectedRefCount == entry->refCount);
+	    }
+	  else
+	    {
+	      fprintf (stderr, "*** internal error: no label has entry for"
+		       " %s in labelRefCount peephole.\n",
+		       label);
+	    }
+	}
       else
-      {
-          fprintf(stderr, "*** internal error: no label has entry for"
-                   " %s in labelRefCount peephole.\n",
-                   label);
-      }
-        }
-        else
-        {
-            fprintf(stderr, "*** internal error: var %d not bound"
-                    " in peephole labelRefCount rule.\n",
-                    varNumber);
-        }
+	{
+	  fprintf (stderr, "*** internal error: var %d not bound"
+		   " in peephole labelRefCount rule.\n",
+		   varNumber);
+	}
 
     }
-    else
+  else
     {
-    fprintf(stderr,
-            "*** internal error: labelRefCount peephole restriction"
-            " malformed: %s\n", cmdLine);
+      fprintf (stderr,
+	       "*** internal error: labelRefCount peephole restriction"
+	       " malformed: %s\n", cmdLine);
     }
-    return rc;
+  return rc;
 }
 
 /*-----------------------------------------------------------------*/
 /* callFuncByName - calls a function as defined in the table       */
 /*-----------------------------------------------------------------*/
-int callFuncByName ( char *fname,
-             hTab *vars,
-             lineNode *currPl,
-             lineNode *head)
+int 
+callFuncByName (char *fname,
+		hTab * vars,
+		lineNode * currPl,
+		lineNode * head)
 {
-    struct ftab
+  struct ftab
+  {
+    char *fname;
+    int (*func) (hTab *, lineNode *, lineNode *, const char *);
+  }
+  ftab[] =
+  {
     {
-      char *fname ;
-      int (*func)(hTab *,lineNode *,lineNode *,const char *) ;
-    }  ftab[] =
-    {
-      {"labelInRange",   labelInRange },
-      {"operandsNotSame", operandsNotSame },
-      {"24bitMode", flat24bitMode },
-      {"labelRefCount", labelRefCount },
-    };
-    int i;
-
-    for ( i = 0 ; i < ((sizeof (ftab))/(sizeof(struct ftab))); i++)
-    if (strncmp(ftab[i].fname,fname,strlen(ftab[i].fname)) == 0)
-    {
-        return (*ftab[i].func)(vars,currPl,head,
-                 fname + strlen(ftab[i].fname));
+      "labelInRange", labelInRange
     }
-    fprintf(stderr,"could not find named function in function table\n");
-    return TRUE;
+    ,
+    {
+      "operandsNotSame", operandsNotSame
+    }
+    ,
+    {
+      "24bitMode", flat24bitMode
+    }
+    ,
+    {
+      "labelRefCount", labelRefCount
+    }
+    ,
+  };
+  int i;
+
+  for (i = 0; i < ((sizeof (ftab)) / (sizeof (struct ftab))); i++)
+    if (strncmp (ftab[i].fname, fname, strlen (ftab[i].fname)) == 0)
+      {
+	return (*ftab[i].func) (vars, currPl, head,
+				fname + strlen (ftab[i].fname));
+      }
+  fprintf (stderr, "could not find named function in function table\n");
+  return TRUE;
 }
 
 /*-----------------------------------------------------------------*/
 /* printLine - prints a line chain into a given file               */
 /*-----------------------------------------------------------------*/
-void printLine (lineNode *head, FILE *of)
+void 
+printLine (lineNode * head, FILE * of)
 {
-    if (!of)
-    of = stdout ;
+  if (!of)
+    of = stdout;
 
-    while (head) {
-    /* don't indent comments & labels */
-    if (head->line &&
-        ( *head->line == ';' ||
-          head->line[strlen(head->line)-1] == ':'))
-        fprintf(of,"%s\n",head->line);
-    else
-        fprintf(of,"\t%s\n",head->line);
-    head = head->next;
+  while (head)
+    {
+      /* don't indent comments & labels */
+      if (head->line &&
+	  (*head->line == ';' ||
+	   head->line[strlen (head->line) - 1] == ':'))
+	fprintf (of, "%s\n", head->line);
+      else
+	fprintf (of, "\t%s\n", head->line);
+      head = head->next;
     }
 }
 
 /*-----------------------------------------------------------------*/
 /* newPeepRule - creates a new peeprule and attach it to the root  */
 /*-----------------------------------------------------------------*/
-peepRule *newPeepRule (lineNode *match  ,
-               lineNode *replace,
-               char *cond       ,
-               int restart)
+peepRule *
+newPeepRule (lineNode * match,
+	     lineNode * replace,
+	     char *cond,
+	     int restart)
 {
-    peepRule *pr ;
+  peepRule *pr;
 
-    pr= Safe_calloc(1,sizeof(peepRule));
-    pr->match = match;
-    pr->replace= replace;
-    pr->restart = restart;
+  pr = Safe_calloc (1, sizeof (peepRule));
+  pr->match = match;
+  pr->replace = replace;
+  pr->restart = restart;
 
-    if (cond && *cond) {
-    pr->cond = Safe_calloc(1,strlen(cond)+1);
-    strcpy(pr->cond,cond);
-    } else
-    pr->cond = NULL ;
+  if (cond && *cond)
+    {
+      pr->cond = Safe_calloc (1, strlen (cond) + 1);
+      strcpy (pr->cond, cond);
+    }
+  else
+    pr->cond = NULL;
 
-    pr->vars = newHashTable(100);
+  pr->vars = newHashTable (100);
 
-    /* if root is empty */
-    if (!rootRules)
+  /* if root is empty */
+  if (!rootRules)
     rootRules = currRule = pr;
-    else
+  else
     currRule = currRule->next = pr;
 
-    return pr;
+  return pr;
 }
 
 /*-----------------------------------------------------------------*/
 /* newLineNode - creates a new peep line                           */
 /*-----------------------------------------------------------------*/
-lineNode *newLineNode (char *line)
+lineNode *
+newLineNode (char *line)
 {
-    lineNode *pl;
+  lineNode *pl;
 
-    pl = Safe_calloc(1,sizeof(lineNode));
-    pl->line = Safe_calloc(1,strlen(line)+1);
-    strcpy(pl->line,line);
-    return pl;
+  pl = Safe_calloc (1, sizeof (lineNode));
+  pl->line = Safe_calloc (1, strlen (line) + 1);
+  strcpy (pl->line, line);
+  return pl;
 }
 
 /*-----------------------------------------------------------------*/
 /* connectLine - connects two lines                                */
 /*-----------------------------------------------------------------*/
-lineNode *connectLine (lineNode *pl1, lineNode *pl2)
+lineNode *
+connectLine (lineNode * pl1, lineNode * pl2)
 {
-    if (!pl1 || !pl2) {
-    fprintf (stderr,"trying to connect null line\n");
-    return NULL ;
+  if (!pl1 || !pl2)
+    {
+      fprintf (stderr, "trying to connect null line\n");
+      return NULL;
     }
 
-    pl2->prev = pl1;
-    pl1->next = pl2;
+  pl2->prev = pl1;
+  pl1->next = pl2;
 
-    return pl2;
+  return pl2;
 }
 
 #define SKIP_SPACE(x,y) { while (*x && (isspace(*x) || *x == '\n')) x++; \
@@ -333,509 +358,574 @@ lineNode *connectLine (lineNode *pl1, lineNode *pl2)
 /*-----------------------------------------------------------------*/
 /* getPeepLine - parses the peep lines                             */
 /*-----------------------------------------------------------------*/
-static void getPeepLine (lineNode **head, char **bpp)
+static void 
+getPeepLine (lineNode ** head, char **bpp)
 {
-    char lines[MAX_PATTERN_LEN];
-    char *lp;
+  char lines[MAX_PATTERN_LEN];
+  char *lp;
 
-    lineNode *currL = NULL ;
-    char *bp = *bpp;
-    while (1) {
+  lineNode *currL = NULL;
+  char *bp = *bpp;
+  while (1)
+    {
 
-    if (!*bp) {
-        fprintf(stderr,"unexpected end of match pattern\n");
-        return ;
+      if (!*bp)
+	{
+	  fprintf (stderr, "unexpected end of match pattern\n");
+	  return;
+	}
+
+      if (*bp == '\n')
+	{
+	  bp++;
+	  while (isspace (*bp) ||
+		 *bp == '\n')
+	    bp++;
+	}
+
+      if (*bp == '}')
+	{
+	  bp++;
+	  break;
+	}
+
+      /* read till end of line */
+      lp = lines;
+      while ((*bp != '\n' && *bp != '}') && *bp)
+	*lp++ = *bp++;
+
+      *lp = '\0';
+      if (!currL)
+	*head = currL = newLineNode (lines);
+      else
+	currL = connectLine (currL, newLineNode (lines));
     }
 
-    if (*bp == '\n') {
-        bp++ ;
-        while (isspace(*bp) ||
-           *bp == '\n') bp++;
-    }
-
-    if (*bp == '}') {
-        bp++ ;
-        break;
-    }
-
-    /* read till end of line */
-    lp = lines ;
-    while ((*bp != '\n' && *bp != '}' ) && *bp)
-        *lp++ = *bp++ ;
-
-    *lp = '\0';
-    if (!currL)
-        *head = currL = newLineNode (lines);
-    else
-        currL = connectLine(currL,newLineNode(lines));
-    }
-
-    *bpp = bp;
+  *bpp = bp;
 }
 
 /*-----------------------------------------------------------------*/
 /* readRules - reads the rules from a string buffer                */
 /*-----------------------------------------------------------------*/
-static void readRules (char *bp)
+static void 
+readRules (char *bp)
 {
-    char restart = 0 ;
-    char lines[MAX_PATTERN_LEN];
-    char *lp;
-    lineNode *match;
-    lineNode *replace;
-    lineNode *currL = NULL;
+  char restart = 0;
+  char lines[MAX_PATTERN_LEN];
+  char *lp;
+  lineNode *match;
+  lineNode *replace;
+  lineNode *currL = NULL;
 
-    if (!bp)
+  if (!bp)
     return;
- top:
-    restart = 0;
-    /* look for the token "replace" that is the
-       start of a rule */
-    while (*bp && strncmp(bp,"replace",7)) bp++;
-
-    /* if not found */
-    if (!*bp)
-    return ;
-
-    /* then look for either "restart" or '{' */
-    while (strncmp(bp,"restart",7) &&
-       *bp != '{'  && bp ) bp++ ;
-
-    /* not found */
-    if (!*bp) {
-    fprintf(stderr,"expected 'restart' or '{'\n");
-    return ;
-    }
-
-    /* if brace */
-    if (*bp == '{')
-    bp++ ;
-    else { /* must be restart */
-    restart++;
-    bp += strlen("restart");
-    /* look for '{' */
-    EXPECT_CHR(bp,'{',"expected '{'\n");
+top:
+  restart = 0;
+  /* look for the token "replace" that is the
+     start of a rule */
+  while (*bp && strncmp (bp, "replace", 7))
     bp++;
+
+  /* if not found */
+  if (!*bp)
+    return;
+
+  /* then look for either "restart" or '{' */
+  while (strncmp (bp, "restart", 7) &&
+	 *bp != '{' && bp)
+    bp++;
+
+  /* not found */
+  if (!*bp)
+    {
+      fprintf (stderr, "expected 'restart' or '{'\n");
+      return;
     }
 
-    /* skip thru all the blank space */
-    SKIP_SPACE(bp,"unexpected end of rule\n");
-
-    match = replace = currL = NULL ;
-    /* we are the start of a rule */
-    getPeepLine(&match, &bp);
-
-    /* now look for by */
-    EXPECT_STR(bp,"by","expected 'by'\n");
-
-    /* then look for a '{' */
-    EXPECT_CHR(bp,'{',"expected '{'\n");
-    bp++ ;
-
-    SKIP_SPACE(bp,"unexpected end of rule\n");
-    getPeepLine (&replace, &bp);
-
-    /* look for a 'if' */
-    while ((isspace(*bp) || *bp == '\n') && *bp) bp++;
-
-    if (strncmp(bp,"if",2) == 0) {
-    bp += 2;
-    while ((isspace(*bp) || *bp == '\n') && *bp) bp++;
-    if (!*bp) {
-        fprintf(stderr,"expected condition name\n");
-        return;
+  /* if brace */
+  if (*bp == '{')
+    bp++;
+  else
+    {				/* must be restart */
+      restart++;
+      bp += strlen ("restart");
+      /* look for '{' */
+      EXPECT_CHR (bp, '{', "expected '{'\n");
+      bp++;
     }
 
-    /* look for the condition */
-    lp = lines;
-    while (*bp && (*bp != '\n')) {
-        *lp++ = *bp++;
-    }
-    *lp = '\0';
+  /* skip thru all the blank space */
+  SKIP_SPACE (bp, "unexpected end of rule\n");
 
-    newPeepRule(match,replace,lines,restart);
-    } else
-    newPeepRule(match,replace,NULL,restart);
-    goto top;
+  match = replace = currL = NULL;
+  /* we are the start of a rule */
+  getPeepLine (&match, &bp);
+
+  /* now look for by */
+  EXPECT_STR (bp, "by", "expected 'by'\n");
+
+  /* then look for a '{' */
+  EXPECT_CHR (bp, '{', "expected '{'\n");
+  bp++;
+
+  SKIP_SPACE (bp, "unexpected end of rule\n");
+  getPeepLine (&replace, &bp);
+
+  /* look for a 'if' */
+  while ((isspace (*bp) || *bp == '\n') && *bp)
+    bp++;
+
+  if (strncmp (bp, "if", 2) == 0)
+    {
+      bp += 2;
+      while ((isspace (*bp) || *bp == '\n') && *bp)
+	bp++;
+      if (!*bp)
+	{
+	  fprintf (stderr, "expected condition name\n");
+	  return;
+	}
+
+      /* look for the condition */
+      lp = lines;
+      while (*bp && (*bp != '\n'))
+	{
+	  *lp++ = *bp++;
+	}
+      *lp = '\0';
+
+      newPeepRule (match, replace, lines, restart);
+    }
+  else
+    newPeepRule (match, replace, NULL, restart);
+  goto top;
 
 }
 
 /*-----------------------------------------------------------------*/
 /* keyForVar - returns the numeric key for a var                   */
 /*-----------------------------------------------------------------*/
-static int keyForVar (char *d)
+static int 
+keyForVar (char *d)
 {
-    int i = 0;
+  int i = 0;
 
-    while (isdigit(*d)) {
-    i *= 10 ;
-    i += (*d++ - '0') ;
+  while (isdigit (*d))
+    {
+      i *= 10;
+      i += (*d++ - '0');
     }
 
-    return i;
+  return i;
 }
 
 /*-----------------------------------------------------------------*/
 /* bindVar - binds a value to a variable in the given hashtable    */
 /*-----------------------------------------------------------------*/
-static void bindVar (int key, char **s, hTab **vtab)
+static void 
+bindVar (int key, char **s, hTab ** vtab)
 {
-    char vval[MAX_PATTERN_LEN];
-    char *vvx;
-    char *vv = vval;
+  char vval[MAX_PATTERN_LEN];
+  char *vvx;
+  char *vv = vval;
 
-    /* first get the value of the variable */
-    vvx = *s;
-    /* the value is ended by a ',' or space or newline or null */
-    while (*vvx           &&
-       *vvx != ','    &&
-       !isspace(*vvx) &&
-       *vvx != '\n'   &&
-       *vvx != ':' ) {
-    char ubb = 0 ;
-    /* if we find a '(' then we need to balance it */
-    if (*vvx == '(') {
-        ubb++ ;
-        while (ubb) {
-        *vv++ = *vvx++ ;
-        if (*vvx == '(') ubb++;
-        if (*vvx == ')') ubb--;
-        }
-    } else
-        *vv++ = *vvx++ ;
+  /* first get the value of the variable */
+  vvx = *s;
+  /* the value is ended by a ',' or space or newline or null */
+  while (*vvx &&
+	 *vvx != ',' &&
+	 !isspace (*vvx) &&
+	 *vvx != '\n' &&
+	 *vvx != ':')
+    {
+      char ubb = 0;
+      /* if we find a '(' then we need to balance it */
+      if (*vvx == '(')
+	{
+	  ubb++;
+	  while (ubb)
+	    {
+	      *vv++ = *vvx++;
+	      if (*vvx == '(')
+		ubb++;
+	      if (*vvx == ')')
+		ubb--;
+	    }
+	}
+      else
+	*vv++ = *vvx++;
     }
-    *s = vvx ;
-    *vv = '\0';
-    /* got value */
-    vvx = Safe_calloc(1,strlen(vval)+1);
-    strcpy(vvx,vval);
-    hTabAddItem(vtab,key,vvx);
+  *s = vvx;
+  *vv = '\0';
+  /* got value */
+  vvx = Safe_calloc (1, strlen (vval) + 1);
+  strcpy (vvx, vval);
+  hTabAddItem (vtab, key, vvx);
 
 }
 
 /*-----------------------------------------------------------------*/
 /* matchLine - matches one line                                    */
 /*-----------------------------------------------------------------*/
-static bool matchLine (char *s, char *d, hTab **vars)
+static bool 
+matchLine (char *s, char *d, hTab ** vars)
 {
 
-    if (!s || !(*s))
+  if (!s || !(*s))
     return FALSE;
 
-    while (*s && *d) {
+  while (*s && *d)
+    {
 
-    /* skip white space in both */
-    while (isspace(*s)) s++;
-    while (isspace(*d)) d++;
+      /* skip white space in both */
+      while (isspace (*s))
+	s++;
+      while (isspace (*d))
+	d++;
 
-    /* if the destination is a var */
-    if (*d == '%' && isdigit(*(d+1))) {
-        char *v = hTabItemWithKey(*vars,keyForVar(d+1));
-        /* if the variable is already bound
-           then it MUST match with dest */
-        if (v) {
-        while (*v)
-            if (*v++ != *s++) return FALSE;
-        } else
-        /* variable not bound we need to
-           bind it */
-        bindVar (keyForVar(d+1),&s,vars);
+      /* if the destination is a var */
+      if (*d == '%' && isdigit (*(d + 1)))
+	{
+	  char *v = hTabItemWithKey (*vars, keyForVar (d + 1));
+	  /* if the variable is already bound
+	     then it MUST match with dest */
+	  if (v)
+	    {
+	      while (*v)
+		if (*v++ != *s++)
+		  return FALSE;
+	    }
+	  else
+	    /* variable not bound we need to
+	       bind it */
+	    bindVar (keyForVar (d + 1), &s, vars);
 
-        /* in either case go past the variable */
-        d++ ;
-        while (isdigit(*d)) d++;
+	  /* in either case go past the variable */
+	  d++;
+	  while (isdigit (*d))
+	    d++;
+	}
+
+      /* they should be an exact match other wise */
+      if (*s && *d)
+	{
+	  while (isspace (*s))
+	    s++;
+	  while (isspace (*d))
+	    d++;
+	  if (*s++ != *d++)
+	    return FALSE;
+	}
+
     }
 
-    /* they should be an exact match other wise */
-    if (*s && *d) {
-        while (isspace(*s))s++;
-        while (isspace(*d))d++;
-        if (*s++ != *d++)
-        return FALSE;
-    }
+  /* get rid of the trailing spaces
+     in both source & destination */
+  if (*s)
+    while (isspace (*s))
+      s++;
 
-    }
+  if (*d)
+    while (isspace (*d))
+      d++;
 
-    /* get rid of the trailing spaces
-       in both source & destination */
-    if (*s)
-    while (isspace(*s)) s++;
+  /* after all this if only one of them
+     has something left over then no match */
+  if (*s || *d)
+    return FALSE;
 
-    if (*d)
-    while (isspace(*d)) d++;
-
-    /* after all this if only one of them
-       has something left over then no match */
-    if (*s || *d)
-    return FALSE ;
-
-    return TRUE ;
+  return TRUE;
 }
 
 /*-----------------------------------------------------------------*/
 /* matchRule - matches a all the rule lines                        */
 /*-----------------------------------------------------------------*/
-static bool matchRule (lineNode *pl,
-               lineNode **mtail,
-               peepRule *pr,
-               lineNode *head)
+static bool 
+matchRule (lineNode * pl,
+	   lineNode ** mtail,
+	   peepRule * pr,
+	   lineNode * head)
 {
-    lineNode *spl ; /* source pl */
-    lineNode *rpl ; /* rule peep line */
+  lineNode *spl;		/* source pl */
+  lineNode *rpl;		/* rule peep line */
 
-    hTabClearAll(pr->vars);
+  hTabClearAll (pr->vars);
 /*     setToNull((void **) &pr->vars);    */
 /*     pr->vars = newHashTable(100); */
 
-    /* for all the lines defined in the rule */
-    rpl = pr->match;
-    spl = pl ;
-    while (spl && rpl) {
+  /* for all the lines defined in the rule */
+  rpl = pr->match;
+  spl = pl;
+  while (spl && rpl)
+    {
 
-    /* if the source line starts with a ';' then
-       comment line don't process or the source line
-       contains == . debugger information skip it */
-    if (spl->line &&
-        (*spl->line == ';' || spl->isDebug)) {
-        spl = spl->next;
-        continue;
+      /* if the source line starts with a ';' then
+         comment line don't process or the source line
+         contains == . debugger information skip it */
+      if (spl->line &&
+	  (*spl->line == ';' || spl->isDebug))
+	{
+	  spl = spl->next;
+	  continue;
+	}
+
+      if (!matchLine (spl->line, rpl->line, &pr->vars))
+	return FALSE;
+
+      rpl = rpl->next;
+      if (rpl)
+	spl = spl->next;
     }
 
-    if (!matchLine(spl->line,rpl->line,&pr->vars))
-        return FALSE ;
-
-    rpl = rpl->next ;
-    if (rpl)
-        spl = spl->next ;
+  /* if rules ended */
+  if (!rpl)
+    {
+      /* if this rule has additional conditions */
+      if (pr->cond)
+	{
+	  if (callFuncByName (pr->cond, pr->vars, pl, head))
+	    {
+	      *mtail = spl;
+	      return TRUE;
+	    }
+	  else
+	    return FALSE;
+	}
+      else
+	{
+	  *mtail = spl;
+	  return TRUE;
+	}
     }
-
-    /* if rules ended */
-    if (!rpl) {
-    /* if this rule has additional conditions */
-    if ( pr->cond) {
-        if (callFuncByName (pr->cond, pr->vars,pl,head) ) {
-        *mtail = spl;
-        return TRUE;
-        } else
-        return FALSE;
-    } else {
-        *mtail = spl;
-        return TRUE;
-    }
-    }
-    else
+  else
     return FALSE;
 }
 
 /*-----------------------------------------------------------------*/
 /* replaceRule - does replacement of a matching pattern            */
 /*-----------------------------------------------------------------*/
-static void replaceRule (lineNode **shead, lineNode *stail, peepRule *pr)
+static void 
+replaceRule (lineNode ** shead, lineNode * stail, peepRule * pr)
 {
-    lineNode *cl = NULL;
-    lineNode *pl = NULL , *lhead = NULL;
-    char lb[MAX_PATTERN_LEN];
-    char *lbp;
-    lineNode *comment = NULL;
+  lineNode *cl = NULL;
+  lineNode *pl = NULL, *lhead = NULL;
+  char lb[MAX_PATTERN_LEN];
+  char *lbp;
+  lineNode *comment = NULL;
 
-    /* collect all the comment lines in the source */
-    for (cl = *shead ; cl != stail ; cl = cl->next) {
-    if (cl->line && ( *cl->line == ';' || cl->isDebug)) {
-        pl = (pl ? connectLine (pl,newLineNode(cl->line)) :
-          (comment = newLineNode(cl->line)));
-        pl->isDebug = cl->isDebug;
+  /* collect all the comment lines in the source */
+  for (cl = *shead; cl != stail; cl = cl->next)
+    {
+      if (cl->line && (*cl->line == ';' || cl->isDebug))
+	{
+	  pl = (pl ? connectLine (pl, newLineNode (cl->line)) :
+		(comment = newLineNode (cl->line)));
+	  pl->isDebug = cl->isDebug;
+	}
     }
-    }
-    cl = NULL;
+  cl = NULL;
 
-    /* for all the lines in the replacement pattern do */
-    for ( pl = pr->replace ; pl ; pl = pl->next ) {
-    char *v;
-    char *l;
-    lbp = lb;
+  /* for all the lines in the replacement pattern do */
+  for (pl = pr->replace; pl; pl = pl->next)
+    {
+      char *v;
+      char *l;
+      lbp = lb;
 
-    l = pl->line;
-    while (*l) {
-        /* if the line contains a variable */
-        if (*l == '%' && isdigit(*(l+1))) {
-        v = hTabItemWithKey(pr->vars,keyForVar(l+1));
-        if (!v) {
-            fprintf(stderr,"used unbound variable in replacement\n");
-            l++;
-            continue;
-        }
-        while (*v)
-            *lbp++ = *v++;
-        l++;
-        while (isdigit(*l)) l++;
-        continue ;
-        }
-        *lbp++ = *l++;
-    }
+      l = pl->line;
+      while (*l)
+	{
+	  /* if the line contains a variable */
+	  if (*l == '%' && isdigit (*(l + 1)))
+	    {
+	      v = hTabItemWithKey (pr->vars, keyForVar (l + 1));
+	      if (!v)
+		{
+		  fprintf (stderr, "used unbound variable in replacement\n");
+		  l++;
+		  continue;
+		}
+	      while (*v)
+		*lbp++ = *v++;
+	      l++;
+	      while (isdigit (*l))
+		l++;
+	      continue;
+	    }
+	  *lbp++ = *l++;
+	}
 
-    *lbp = '\0';
-    if (cl)
-        cl = connectLine(cl,newLineNode(lb));
-    else
-        lhead = cl = newLineNode(lb);
-    }
-
-    /* add the comments if any to the head of list */
-    if (comment) {
-    lineNode *lc = comment;
-    while (lc->next) lc = lc->next;
-    lc->next = lhead;
-    if (lhead)
-        lhead->prev = lc;
-    lhead = comment;
+      *lbp = '\0';
+      if (cl)
+	cl = connectLine (cl, newLineNode (lb));
+      else
+	lhead = cl = newLineNode (lb);
     }
 
-    /* now we need to connect / replace the original chain */
-    /* if there is a prev then change it */
-    if ((*shead)->prev) {
-    (*shead)->prev->next = lhead;
-    lhead->prev = (*shead)->prev;
-    } else
+  /* add the comments if any to the head of list */
+  if (comment)
+    {
+      lineNode *lc = comment;
+      while (lc->next)
+	lc = lc->next;
+      lc->next = lhead;
+      if (lhead)
+	lhead->prev = lc;
+      lhead = comment;
+    }
+
+  /* now we need to connect / replace the original chain */
+  /* if there is a prev then change it */
+  if ((*shead)->prev)
+    {
+      (*shead)->prev->next = lhead;
+      lhead->prev = (*shead)->prev;
+    }
+  else
     *shead = lhead;
-    /* now for the tail */
-    if (stail && stail->next) {
-    stail->next->prev = cl;
-    if (cl)
-        cl->next = stail->next;
+  /* now for the tail */
+  if (stail && stail->next)
+    {
+      stail->next->prev = cl;
+      if (cl)
+	cl->next = stail->next;
     }
 }
 
 /* Returns TRUE if this line is a label definition.
- *
+
  * If so, start will point to the start of the label name,
  * and len will be it's length.
  */
-bool isLabelDefinition(const char *line, const char **start, int *len)
+bool 
+isLabelDefinition (const char *line, const char **start, int *len)
 {
-    const char *cp = line;
+  const char *cp = line;
 
-    /* This line is a label if if consists of:
-     * [optional whitespace] followed by identifier chars
-     * (alnum | $ | _ ) followed by a colon.
-     */
+  /* This line is a label if if consists of:
+   * [optional whitespace] followed by identifier chars
+   * (alnum | $ | _ ) followed by a colon.
+   */
 
-    while (*cp && isspace(*cp))
-    {
-        cp++;
-    }
-
-    if (!*cp)
-    {
-       return FALSE;
-    }
-
-    *start = cp;
-
-    while (isalnum(*cp) || (*cp == '$') || (*cp == '_'))
+  while (*cp && isspace (*cp))
     {
       cp++;
     }
 
-    if ((cp == *start) || (*cp != ':'))
+  if (!*cp)
     {
-        return FALSE;
+      return FALSE;
     }
 
-    *len = (cp - (*start));
-    return TRUE;
+  *start = cp;
+
+  while (isalnum (*cp) || (*cp == '$') || (*cp == '_'))
+    {
+      cp++;
+    }
+
+  if ((cp == *start) || (*cp != ':'))
+    {
+      return FALSE;
+    }
+
+  *len = (cp - (*start));
+  return TRUE;
 }
 
 /* Quick & dirty string hash function. */
-static int hashSymbolName(const char *name)
+static int 
+hashSymbolName (const char *name)
 {
-    int hash = 0;
+  int hash = 0;
 
-    while (*name)
+  while (*name)
     {
-       hash = (hash << 6) ^ *name;
-       name++;
+      hash = (hash << 6) ^ *name;
+      name++;
     }
 
-    if (hash < 0)
+  if (hash < 0)
     {
       hash = -hash;
     }
 
-    return hash % HTAB_SIZE;
+  return hash % HTAB_SIZE;
 }
 
 /* Build a hash of all labels in the passed set of lines
  * and how many times they are referenced.
  */
-static void buildLabelRefCountHash(lineNode *head)
+static void 
+buildLabelRefCountHash (lineNode * head)
 {
-    lineNode  *line;
-    const char  *label;
-    int   labelLen;
-    int   i;
+  lineNode *line;
+  const char *label;
+  int labelLen;
+  int i;
 
-    assert(labelHash == NULL);
-    labelHash = newHashTable(HTAB_SIZE);
+  assert (labelHash == NULL);
+  labelHash = newHashTable (HTAB_SIZE);
 
-    /* First pass: locate all the labels. */
-    line = head;
+  /* First pass: locate all the labels. */
+  line = head;
 
-    while (line)
+  while (line)
     {
-      if (isLabelDefinition(line->line, &label, &labelLen)
-       && labelLen <= SDCC_NAME_MAX)
-      {
-          labelHashEntry *entry;
+      if (isLabelDefinition (line->line, &label, &labelLen)
+	  && labelLen <= SDCC_NAME_MAX)
+	{
+	  labelHashEntry *entry;
 
-          entry = Safe_calloc(1,sizeof(labelHashEntry));
+	  entry = Safe_calloc (1, sizeof (labelHashEntry));
 
-          memcpy(entry->name, label, labelLen);
-          entry->name[labelLen] = 0;
-          entry->refCount = -1;
+	  memcpy (entry->name, label, labelLen);
+	  entry->name[labelLen] = 0;
+	  entry->refCount = -1;
 
-          hTabAddItem(&labelHash, hashSymbolName(entry->name), entry);
-      }
-        line = line->next;
+	  hTabAddItem (&labelHash, hashSymbolName (entry->name), entry);
+	}
+      line = line->next;
     }
 
 
-    /* Second pass: for each line, note all the referenced labels. */
-    /* This is ugly, O(N^2) stuff. Optimizations welcome... */
-    line = head;
-    while (line)
+  /* Second pass: for each line, note all the referenced labels. */
+  /* This is ugly, O(N^2) stuff. Optimizations welcome... */
+  line = head;
+  while (line)
     {
       for (i = 0; i < HTAB_SIZE; i++)
-      {
-            labelHashEntry *thisEntry;
+	{
+	  labelHashEntry *thisEntry;
 
-            thisEntry = hTabFirstItemWK(labelHash, i);
+	  thisEntry = hTabFirstItemWK (labelHash, i);
 
-            while (thisEntry)
-            {
-                if (strstr(line->line, thisEntry->name))
-                {
-                    thisEntry->refCount++;
-                }
-              thisEntry = hTabNextItemWK(labelHash);
-            }
-        }
-        line = line->next;
+	  while (thisEntry)
+	    {
+	      if (strstr (line->line, thisEntry->name))
+		{
+		  thisEntry->refCount++;
+		}
+	      thisEntry = hTabNextItemWK (labelHash);
+	    }
+	}
+      line = line->next;
     }
 
 #if 0
-    /* Spew the contents of the table. Debugging fun only. */
-    for (i = 0; i < HTAB_SIZE; i++)
+  /* Spew the contents of the table. Debugging fun only. */
+  for (i = 0; i < HTAB_SIZE; i++)
     {
-        labelHashEntry *thisEntry;
+      labelHashEntry *thisEntry;
 
-        thisEntry = hTabFirstItemWK(labelHash, i);
+      thisEntry = hTabFirstItemWK (labelHash, i);
 
-        while (thisEntry)
-        {
-            fprintf(stderr, "label: %s ref %d\n",
-                   thisEntry->name, thisEntry->refCount);
-            thisEntry = hTabNextItemWK(labelHash);
-        }
+      while (thisEntry)
+	{
+	  fprintf (stderr, "label: %s ref %d\n",
+		   thisEntry->name, thisEntry->refCount);
+	  thisEntry = hTabNextItemWK (labelHash);
+	}
     }
 #endif
 }
@@ -843,45 +933,49 @@ static void buildLabelRefCountHash(lineNode *head)
 /*-----------------------------------------------------------------*/
 /* peepHole - matches & substitutes rules                          */
 /*-----------------------------------------------------------------*/
-void peepHole (lineNode **pls )
+void 
+peepHole (lineNode ** pls)
 {
-    lineNode *spl ;
-    peepRule *pr ;
-    lineNode *mtail = NULL;
+  lineNode *spl;
+  peepRule *pr;
+  lineNode *mtail = NULL;
 
-    if (labelHash)
+  if (labelHash)
     {
-      hTabDeleteAll(labelHash);
+      hTabDeleteAll (labelHash);
     }
-    labelHash = NULL;
+  labelHash = NULL;
 
- top:
-    /* for all rules */
-    for (pr = rootRules ; pr ; pr = pr->next ) {
+top:
+  /* for all rules */
+  for (pr = rootRules; pr; pr = pr->next)
+    {
 
-    for (spl = *pls ; spl ; spl = spl->next ) {
+      for (spl = *pls; spl; spl = spl->next)
+	{
 
-        /* if inline assembler then no peep hole */
-        if (spl->isInline)
-        continue ;
+	  /* if inline assembler then no peep hole */
+	  if (spl->isInline)
+	    continue;
 
-        mtail = NULL ;
+	  mtail = NULL;
 
-        /* if it matches */
-        if (matchRule (spl,&mtail,pr, *pls)) {
+	  /* if it matches */
+	  if (matchRule (spl, &mtail, pr, *pls))
+	    {
 
-        /* then replace */
-        if (spl == *pls)
-            replaceRule(pls, mtail, pr);
-        else
-            replaceRule (&spl, mtail,pr);
+	      /* then replace */
+	      if (spl == *pls)
+		replaceRule (pls, mtail, pr);
+	      else
+		replaceRule (&spl, mtail, pr);
 
-        /* if restart rule type then
-           start at the top again */
-        if (pr->restart)
-            goto top;
-        }
-    }
+	      /* if restart rule type then
+	         start at the top again */
+	      if (pr->restart)
+		goto top;
+	    }
+	}
     }
 }
 
@@ -889,65 +983,78 @@ void peepHole (lineNode **pls )
 /*-----------------------------------------------------------------*/
 /* readFileIntoBuffer - reads a file into a string buffer          */
 /*-----------------------------------------------------------------*/
-static char *readFileIntoBuffer (char *fname)
+static char *
+readFileIntoBuffer (char *fname)
 {
-    FILE *f;
-    char *rs = NULL;
-    int nch = 0 ;
-    int ch;
-    char lb[MAX_PATTERN_LEN];
+  FILE *f;
+  char *rs = NULL;
+  int nch = 0;
+  int ch;
+  char lb[MAX_PATTERN_LEN];
 
-    if (!(f = fopen(fname,"r"))) {
-    fprintf(stderr,"cannot open peep rule file\n");
-    return NULL;
-    }
-
-    while ((ch = fgetc(f)) != EOF) {
-    lb[nch++] = ch;
-
-    /* if we maxed out our local buffer */
-    if (nch >= (MAX_PATTERN_LEN - 2)) {
-        lb[nch] = '\0';
-        /* copy it into allocated buffer */
-        if (rs) {
-        rs = Safe_realloc(rs,strlen(rs)+strlen(lb)+1);
-        strcat(rs,lb);
-        } else {
-        rs = Safe_calloc(1,strlen(lb)+1);
-        strcpy(rs,lb);
-        }
-        nch = 0 ;
-    }
+  if (!(f = fopen (fname, "r")))
+    {
+      fprintf (stderr, "cannot open peep rule file\n");
+      return NULL;
     }
 
-    /* if some charaters left over */
-    if (nch) {
-    lb[nch] = '\0';
-    /* copy it into allocated buffer */
-    if (rs) {
-        rs = Safe_realloc(rs,strlen(rs)+strlen(lb)+1);
-        strcat(rs,lb);
-    } else {
-        rs = Safe_calloc(1,strlen(lb)+1);
-        strcpy(rs,lb);
+  while ((ch = fgetc (f)) != EOF)
+    {
+      lb[nch++] = ch;
+
+      /* if we maxed out our local buffer */
+      if (nch >= (MAX_PATTERN_LEN - 2))
+	{
+	  lb[nch] = '\0';
+	  /* copy it into allocated buffer */
+	  if (rs)
+	    {
+	      rs = Safe_realloc (rs, strlen (rs) + strlen (lb) + 1);
+	      strcat (rs, lb);
+	    }
+	  else
+	    {
+	      rs = Safe_calloc (1, strlen (lb) + 1);
+	      strcpy (rs, lb);
+	    }
+	  nch = 0;
+	}
     }
+
+  /* if some charaters left over */
+  if (nch)
+    {
+      lb[nch] = '\0';
+      /* copy it into allocated buffer */
+      if (rs)
+	{
+	  rs = Safe_realloc (rs, strlen (rs) + strlen (lb) + 1);
+	  strcat (rs, lb);
+	}
+      else
+	{
+	  rs = Safe_calloc (1, strlen (lb) + 1);
+	  strcpy (rs, lb);
+	}
     }
-    return rs;
+  return rs;
 }
 
 /*-----------------------------------------------------------------*/
 /* initPeepHole - initiaises the peep hole optimizer stuff         */
 /*-----------------------------------------------------------------*/
-void initPeepHole ()
+void 
+initPeepHole ()
 {
-    char *s;
+  char *s;
 
-    /* read in the default rules */
-    readRules(port->peep.default_rules);
+  /* read in the default rules */
+  readRules (port->peep.default_rules);
 
-    /* if we have any additional file read it too */
-    if (options.peep_file) {
-    readRules(s=readFileIntoBuffer(options.peep_file));
-    setToNull((void **) &s);
+  /* if we have any additional file read it too */
+  if (options.peep_file)
+    {
+      readRules (s = readFileIntoBuffer (options.peep_file));
+      setToNull ((void **) &s);
     }
 }

@@ -27,11 +27,11 @@
 #ifndef SDCCGLUE_H
 #define SDCCGLUE_H 1
 
-void glue();
+void glue ();
 /* drdani Jan 30 2000
- This is needed in gen.c of z80 port */
+   This is needed in gen.c of z80 port */
 char *aopLiteral (value *, int);
-void flushStatics(void);
+void flushStatics (void);
 
 extern symbol *interrupts[];
 extern set *publics;

@@ -29,29 +29,31 @@
 #define MAX_PATTERN_LEN 128
 
 typedef struct lineNode
-{
-    char *line ;
+  {
+    char *line;
     unsigned int isInline:1;
     unsigned int isComment:1;
     unsigned int isDebug:1;
     struct lineNode *prev;
     struct lineNode *next;
-} lineNode;
+  }
+lineNode;
 
 typedef struct peepRule
-{
-    lineNode *match ;
-    lineNode *replace ;
-    unsigned int restart : 1;
+  {
+    lineNode *match;
+    lineNode *replace;
+    unsigned int restart:1;
     char *cond;
     hTab *vars;
     struct peepRule *next;
-} peepRule;
+  }
+peepRule;
 
-void printLine (lineNode *,FILE *);
+void printLine (lineNode *, FILE *);
 lineNode *newLineNode (char *);
-lineNode *connectLine (lineNode *,lineNode *);
-void initPeepHole(void);
+lineNode *connectLine (lineNode *, lineNode *);
+void initPeepHole (void);
 void peepHole (lineNode **);
 
 #endif

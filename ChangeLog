@@ -1,3 +1,12 @@
+2004-08-02 Slade Rich <slade_rich AT users.sourceforge.net>
+
+	* src/pic/gen.c tidied up tabs
+	* src/pic/genarith.c tidied up tabs and fixed bug with literal multiple where same register was used for hi and low byte
+	* src/pic/main.c tidied up tabs
+	* src/pic/pcode.c tidied up tabs and disabled verbose code generation
+	* src/pic/pcoderegs.c tidied up tabs
+	* src/pic/ralloc.c tidied up tabs
+
 2004-07-30 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/SDCCmem.c (allocGlobal): don't turn S_REGISTER storage class

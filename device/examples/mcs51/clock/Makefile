@@ -9,7 +9,7 @@ all: clock.bin
 OBJECTS = clock.rel hwinit.rel
 
 clock.bin: clock.ihx
-	../hex2bin <clock.ihx >clock.bin
+	hex2bin <clock.ihx >clock.bin
 	cat clock.bin >/dev/par0
 	cu -l /dev/ttyS0 -s 19200 dir
 

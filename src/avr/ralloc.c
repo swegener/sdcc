@@ -1339,10 +1339,10 @@ static int needsPair (iCode *ic)
 		int ikey = bitVectFirstBit(uses_defs);
 		iCode *uic = hTabItemWithKey(iCodehTab,ikey);
 		sym_link *otype = NULL; 
+		bitVectUnSetBit(uses_defs,ikey);
 		if (!uic) continue;		
 		otype = (IC_RIGHT(uic) ? operandType(IC_RIGHT(uic)) : NULL);
 		if (otype && IS_LITERAL(otype)) return 1;
-		bitVectUnSetBit(uses_defs,ikey);
 	}
 	return 0;	
 }

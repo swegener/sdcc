@@ -1225,10 +1225,15 @@ toBoolean (operand * oper, char *r, bool clr)
 {
 	int size = AOP_SIZE (oper);
 	int offset = 0;
-	if (clr)
+	if (clr) {
 		emitcode ("clr", "%s", r);
-	while (size--)
-		emitcode ("or", "%s,%s", r, aopGet (AOP (oper), offset++));
+		while (size--)
+			emitcode ("or", "%s,%s", r, aopGet (AOP (oper), offset++));
+	} else {
+		size--;
+		emitcode("mov","%s,%s",r,aopGet (AOP (oper), offset++));
+		if (size) while (size--) emitcode ("or", "%s,%s", r, aopGet (AOP (oper), offset++));
+	}
 }
 
 
@@ -1890,7 +1895,7 @@ genLabel (iCode * ic)
 static void
 genGoto (iCode * ic)
 {
-	emitcode ("rjmp", "L%05d", (IC_LABEL (ic)->key + 100));
+	emitcode ("rjmp", "L%05d", (IC_LABEL (ic)->key));
 }
 
 /*-----------------------------------------------------------------*/
@@ -3321,21 +3326,21 @@ genShiftRightLit (iCode * ic)
 					aopGet (AOP (left), offset), offset);
 				offset++;
 			}
-			size = size = AOP_SIZE (result);
+			size = AOP_SIZE (result);
 			offset = 0;
 		}
 		/* be as economical as possible */
 		if (shCount <= 4) {
-			offset = size - 1;
 			while (shCount--) {
-				offset = size - 1;
 				size = AOP_SIZE (result);
+				offset = size - 1;
 				while (size--) {
-					if (offset == (size - 1))
+					/* highest order byte */
+					if (offset == (AOP_SIZE(result)-1)) 
 						emitcode ("asr", "%s", aopGet (AOP (result), offset));
 					else
-						emitcode ("lsr", "%s", aopGet (AOP (result), offset));
-					offset--;
+						emitcode ("ror", "%s", aopGet (AOP (result), offset));
+					offset--;						
 				}
 			}
 		}
@@ -3345,10 +3350,10 @@ genShiftRightLit (iCode * ic)
 			emitcode ("", "L%05d:", tlbl->key);
 			offset = size - 1;
 			while (size--) {
-				if (offset == (size - 1))
+				if (offset == (AOP_SIZE(result) - 1))
 					emitcode ("asr", "%s", aopGet (AOP (result), offset));
 				else
-					emitcode ("lsr", "%s", aopGet (AOP (result), offset));
+					emitcode ("ror", "%s", aopGet (AOP (result), offset));
 				offset--;
 			}
 			emitcode ("dec", "r24");
@@ -4547,6 +4552,7 @@ genIfx (iCode * ic, iCode * popIc)
 	operand *cond = IC_COND (ic);
 	char *cname ;
 	symbol *lbl;
+	int tob = 0;
 
 	aopOp (cond, ic, FALSE);
 
@@ -4554,24 +4560,32 @@ genIfx (iCode * ic, iCode * popIc)
 	if (AOP_SIZE(cond) == 1 && AOP_ISHIGHREG(AOP(cond),0)) {
 		cname = aopGet(AOP(cond),0);
 	} else {
-		toBoolean (cond, "r24", 1);
+		toBoolean (cond, "r24", 0);
+		tob = 1;
 		cname = "r24";
 	}
 	/* the result is now in the accumulator */
 	freeAsmop (cond, NULL, ic, TRUE);
 
 	/* if there was something to be popped then do it */
-	if (popIc)
+	if (popIc) {
 		genIpop (popIc);
-	
-	emitcode("cpi","%s,0",cname);
+		emitcode("cpi","%s,0",cname);
+	} else if (!tob) emitcode("cpi","%s,0",cname);
+
 	lbl = newiTempLabel(NULL);
 	if (IC_TRUE(ic)) {
-		emitcode ("brne","L%05d",lbl->key);
+		if (tob)
+			emitcode ("breq","L%05d",lbl->key);
+		else
+			emitcode ("brne","L%05d",lbl->key);
 		emitcode ("jmp","L%05d",IC_TRUE(ic)->key);
 		emitcode ("","L%05d:",lbl->key);
 	} else {
-		emitcode ("breq","L%05d",lbl->key);
+		if (tob)
+			emitcode ("brne","L%05d",lbl->key);
+		else
+			emitcode ("breq","L%05d",lbl->key);
 		emitcode ("jmp","L%05d",IC_FALSE(ic)->key);
 		emitcode ("","L%05d:",lbl->key);
 	}

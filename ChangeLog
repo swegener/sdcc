@@ -1,3 +1,9 @@
+2003-03-22  Frieder Ferlemann <Frieder.Ferlemann@web.de>
+
+	* doc/sdccman.lyx: added latex preamble for hyperref package.
+	  Using pdflatex this will give you a hyperlinked pdf file with
+          bookmarks. (prepend '%' before /usepackage if this breaks something)
+
 2003-05-24  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	 * doc/sdccman.lyx: updated information about .adb files (fixed bug 742649)

@@ -2297,8 +2297,6 @@ packRegisters (eBBlock * ebp)
 
       /* if this is a +/- operation with a rematerizable 
          then mark this as rematerializable as well */
-#if 0
-      // jwk 20010716: temporary disabled because of bug #441448
       if ((ic->op == '+' || ic->op == '-') &&
 	  (IS_SYMOP (IC_LEFT (ic)) &&
 	   IS_ITEMP (IC_RESULT (ic)) &&
@@ -2310,7 +2308,6 @@ packRegisters (eBBlock * ebp)
 	  OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
 	  OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
 	}
-#endif
 
       /* mark the pointer usages */
       if (POINTER_SET (ic))

@@ -34,6 +34,23 @@
   #endif
 #endif
 
+#if defined(SDCC_mcs51)
+  #if defined(SDCC_STACK_AUTO)
+    #if defined(SDCC_USE_XSTACK)
+      #define NEAR pdata
+    #else
+      //strange enough "idata" doesn't work
+      #define NEAR data
+    #endif
+  #elif defined(SDCC_MODEL_LARGE)
+    #define NEAR xdata
+  #else
+    #define NEAR data
+  #endif
+#else
+  #define NEAR
+#endif
+
 #if defined(__ds390)
 #define USE_FLOATS 1
 #endif
@@ -160,7 +177,7 @@ static void calculate_digit( value_t* value, unsigned char radix )
 
   for( i = 32; i != 0; i-- )
   {
-    value->byte[4] = (value->byte[4] << 1) | (value->ul >> 31) & 0x01;
+    value->byte[4] = (value->byte[4] << 1) | ((value->ul >> 31) & 0x01);
     value->ul <<= 1;
 
     if (radix <= value->byte[4] )
@@ -177,7 +194,7 @@ static void calculate_digit( unsigned char radix )
 
   for( i = 32; i != 0; i-- )
   {
-    value.byte[4] = (value.byte[4] << 1) | (value.ul >> 31) & 0x01;
+    value.byte[4] = (value.byte[4] << 1) | ((value.ul >> 31) & 0x01);
     value.ul <<= 1;
 
     if (radix <= value.byte[4] )
@@ -622,7 +639,10 @@ get_conversion_spec:
       {
         // Apperently we have to output an integral type
         // with radix "radix"
-        unsigned char store = 0;
+#ifndef ASM_ALLOWED
+        unsigned char store[6];
+        unsigned char NEAR *pstore = &store[5];
+#endif
 
         // store value in byte[0] (LSB) ... byte[3] (MSB)
         if (char_argument)
@@ -684,11 +704,12 @@ _endasm;
 #else
           if (!lsd)
           {
-            store = (value.byte[4] << 4) | (value.byte[4] >> 4) | store;
+            *pstore = (value.byte[4] << 4) | (value.byte[4] >> 4) | *pstore;
+            pstore--;
           }
           else
           {
-            store = value.byte[4];
+            *pstore = value.byte[4];
           }
 #endif
           length++;
@@ -779,11 +800,12 @@ _endasm;
 #else
           if (!lsd)
           {
-            value.byte[4] = store >> 4;
+            pstore++;
+            value.byte[4] = *pstore >> 4;
           }
           else
           {
-            value.byte[4] = store & 0x0F;
+            value.byte[4] = *pstore & 0x0F;
           }
 #endif
 #ifdef SDCC_STACK_AUTO

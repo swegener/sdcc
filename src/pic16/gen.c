@@ -11817,6 +11817,9 @@ static void genJumpTab (iCode *ic)
 {
     symbol *jtab;
     char *l;
+    pCodeOp *jt_offs;
+    pCodeOp *jt_offs_hi;
+    pCodeOp *jt_label;
 
     DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
@@ -11843,9 +11846,9 @@ static void genJumpTab (iCode *ic)
 
 #else
 
-    pCodeOp *jt_offs = pic16_popGetTempReg(0);
-    pCodeOp *jt_offs_hi = pic16_popGetTempReg(1);
-    pCodeOp *jt_label = pic16_popGetLabel (jtab->key);
+    jt_offs = pic16_popGetTempReg(0);
+    jt_offs_hi = pic16_popGetTempReg(1);
+    jt_label = pic16_popGetLabel (jtab->key);
     //fprintf (stderr, "Creating jump table...\n");
 
     // calculate offset into jump table (idx * sizeof (GOTO))

@@ -6043,7 +6043,33 @@ status Collapsed
 
 \end_inset 
 
- Causes the linker use unused register banks for data variables or stack.
+ Causes the linker to use unused register banks for data variables and pack
+ data, idata and stack together.
+ This is the default now.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-no-pack-iram
+\series default 
+\SpecialChar ~
+
+\begin_inset LatexCommand \index{-\/-pack-iram}
+
+\end_inset 
+
+ Causes the linker to use old style for allocating memory areas.
 \layout Subsection
 
 DS390 / DS400 Options
@@ -6905,6 +6931,7 @@ reentrant
  Parameters and Local Variables for more details.
  If this option is used all source files in the project should be compiled
  with this option.
+ It automatically implies --int-long-reent and --float-reent.
  
 \layout List
 \labelwidthstring 00.00.0000
@@ -8245,8 +8272,10 @@ pdata
 
 \layout Standard
 
-Paged xdata access is currently not as straightforward as using the other
- addressing modes of a 8051.
+Paged xdata access is just as straightforward as using the other addressing
+ modes of a 8051.
+ It is typically located at the start of xdata and has a maximum size of
+ 256 bytes.
  The following example writes 0x01 to the address pointed to.
  Please note, pdata access physically accesses xdata memory.
  The high byte of the address is determined by port P2 
@@ -8329,7 +8358,7 @@ F2\SpecialChar ~
 movx @r0,a 
 \layout Standard
 
-Be extremely carefull if you use pdata together with the -
+If the -
 \begin_inset ERT
 status Collapsed
 
@@ -8344,7 +8373,8 @@ status Collapsed
 
 \end_inset 
 
- option.
+ option is used the pdata memory area is followed by the xstack memory area
+ and the sum of their sizes is limited to 256 bytes.
 \layout Subsubsection
 
 code
@@ -8775,14 +8805,15 @@ data
 
  grows, it will use up the remaining register banks, and the 16 bytes used
  by the 128 bit variables, and 80 bytes for general purpose use.
- If any bit variables are used, the data variables will be placed after
- the byte holding the last bit variable.
+ If any bit variables are used, the data variables will be placed in unused
+ register banks and after the byte holding the last bit variable.
  For example, if register banks 0 and 1 are used, and there are 9 bit variables
  (two bytes used), 
 \emph on 
 data
 \emph default 
- variables will be placed starting at address 0x22.
+ variables will be placed starting from address 0x10 to 0x20 and continue
+ at address 0x22.
  You can also use -
 \begin_inset ERT
 status Collapsed
@@ -8824,7 +8855,7 @@ idata
  
 \layout Standard
 
-By default the 8051 linker will place the stack after the last byte of data
+By default the 8051 linker will place the stack after the last byte of (i)data
  variables.
  Option -
 \begin_inset ERT
@@ -11060,10 +11091,30 @@ _sdcc_external_startup()
  or perform some other critical operation prior to static & global variable
  initialization.
  On some mcs51 variants xdata has to be explicitly enabled before it can
- be accessed, this is the place to do it.
- The startup code clears the complete 256 byte of idata memory, this might
- cause problems for 128 byte devices (endless loop reported for Chipcon
- CC1010).
+ be accessed or if the watchdog needs to be disabled, this is the place
+ to do it.
+ The startup code clears all internal data memory, 256 bytes by default,
+ but from 0 to n-1 if 
+\emph on 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-iram-size
+\begin_inset LatexCommand \index{-\/-iram-size}
+
+\end_inset 
+
+n
+\emph default 
+ is used.
+ (recommended for Chipcon CC1010).
 \layout Standard
 
 See also the compiler option 

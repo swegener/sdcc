@@ -1,3 +1,28 @@
+2004-11-06 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/xa51/xa_version.h,
+	* device/include/errno.h,
+	* device/include/regc515c.h,
+	* device/lib/_itoa.c,
+	* device/lib/_ltoa.c,
+	* device/lib/ser_ir_cts_rts.c,
+	* sim/ucsim/xa.src/glob.cc,
+	* sim/ucsim/xa.src/inst_gen.cc,
+	* sim/ucsim/xa.src/xa_bit.cc,
+	* sim/ucsim/xa.src/xa_sfr.cc,
+	* sim/ucsim/z80.src/inst_dd.cc,
+	* sim/ucsim/z80.src/inst_fdcb.cc,
+	* support/scripts/keil2sdcc.pl,
+	* src/pic16/pic16.dsp,
+	* src/pic16/pic16a.dsp: corrected cvs line endings
+	* device/lib/printf_large.c: fixed bug 1057979
+	* src/pic16/gen.c: fixed non-C standard code
+	* src/SDCCmain.c: made --pack-iram default, added --no-pack-iram
+	* src/SDCCglobl.h: changed pack_iram to no_pack_iram
+	* support/regression/ports/mcs51/support.c: reload T1 asap
+	* doc/sdccman.lyx: updated for options --pack-iram and --no-pack-iram,
+	  pdata use and clear idata startup behaviour
+
 2004-11-04 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/examples/ds390/ow390/ad26.h,

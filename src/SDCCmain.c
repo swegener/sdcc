@@ -130,6 +130,7 @@ char buffer[PATH_MAX * 2];
 #define OPTION_MSVC_ERROR_STYLE "--vc"
 #define OPTION_USE_STDOUT       "--use-stdout"
 #define OPTION_PACK_IRAM        "--pack-iram"
+#define OPTION_NO_PACK_IRAM     "--no-pack-iram"
 #define OPTION_NO_PEEP_COMMENTS "--no-peep-comments"
 #define OPTION_OPT_CODE_SPEED   "--opt-code-speed"
 #define OPTION_OPT_CODE_SIZE    "--opt-code-size"
@@ -250,7 +251,8 @@ optionsTable[] = {
     { 0,    OPTION_IDATA_LOC,       NULL, NULL },
 #if !OPT_DISABLE_DS390 || !OPT_DISABLE_MCS51
     { 0,    OPTION_STACK_SIZE,      NULL,"MCS51/DS390 - Tells the linker to allocate this space for stack"},
-    { 0,    OPTION_PACK_IRAM,       &options.pack_iram,"MCS51/DS390 - Tells the linker to pack variables in internal ram"},
+    { 0,    OPTION_PACK_IRAM,       NULL,"MCS51/DS390 - Tells the linker to pack variables in internal ram (default)"},
+    { 0,    OPTION_NO_PACK_IRAM,    &options.no_pack_iram,"MCS51/DS390 - Tells the linker not to pack variables in internal ram"},
 #endif
     
     /* End of options */
@@ -1410,7 +1412,7 @@ linkEdit (char **envp)
       else /*For all the other ports.  Including pics???*/
         {
           fprintf (lnkfile, "-myux%c\n", out_fmt);
-          if(options.pack_iram)
+          if(!options.no_pack_iram)
               fprintf (lnkfile, "-Y\n");
         }
 

@@ -9302,7 +9302,8 @@ genDataPointerSet (operand * right,
 static void
 genNearPointerSet (operand * right,
 		   operand * result,
-		   iCode * ic)
+		   iCode * ic,
+		   iCode * pi)
 {
   asmop *aop = NULL;
   regs *preg = NULL;
@@ -9341,7 +9342,6 @@ genNearPointerSet (operand * right,
   else
     rname = aopGet (AOP (result), 0, FALSE, FALSE, FALSE);
 
-  freeAsmop (result, NULL, ic, TRUE);
   aopOp (right, ic, FALSE, FALSE);
 
   /* if bitfield then unpack the bits */
@@ -9363,7 +9363,7 @@ genNearPointerSet (operand * right,
 	    }
 	  else
 	    emitcode ("mov", "@%s,%s", rname, l);
-	  if (size)
+	  if (size || pi)
 	    emitcode ("inc", "%s", rname);
 	  offset++;
 	}
@@ -9373,6 +9373,7 @@ genNearPointerSet (operand * right,
   if (aop)
     {
       /* we had to allocate for this iCode */
+      if (pi) aopPut (AOP (result),rname,0);
       freeAsmop (NULL, aop, ic, TRUE);
     }
   else
@@ -9385,7 +9386,8 @@ genNearPointerSet (operand * right,
       if (AOP_SIZE (right) > 1 &&
 	  !OP_SYMBOL (result)->remat &&
 	  (OP_SYMBOL (result)->liveTo > ic->seq ||
-	   ic->depth))
+	   ic->depth) &&
+	  !pi)
 	{
 	  int size = AOP_SIZE (right) - 1;
 	  while (size--)
@@ -9394,6 +9396,8 @@ genNearPointerSet (operand * right,
     }
 
   /* done */
+  if (pi) pi->generated = 1;
+  freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, TRUE);
 
 
@@ -9405,7 +9409,8 @@ genNearPointerSet (operand * right,
 static void
 genPagedPointerSet (operand * right,
 		    operand * result,
-		    iCode * ic)
+		    iCode * ic,
+		    iCode *pi)
 {
   asmop *aop = NULL;
   regs *preg = NULL;
@@ -9432,7 +9437,6 @@ genPagedPointerSet (operand * right,
   else
     rname = aopGet (AOP (result), 0, FALSE, FALSE, FALSE);
 
-  freeAsmop (result, NULL, ic, TRUE);
   aopOp (right, ic, FALSE, FALSE);
 
   /* if bitfield then unpack the bits */
@@ -9451,7 +9455,7 @@ genPagedPointerSet (operand * right,
 	  MOVA (l);
 	  emitcode ("movx", "@%s,a", rname);
 
-	  if (size)
+	  if (size || pi)
 	    emitcode ("inc", "%s", rname);
 
 	  offset++;
@@ -9461,6 +9465,7 @@ genPagedPointerSet (operand * right,
   /* now some housekeeping stuff */
   if (aop)
     {
+      if (pi) aopPut (AOP (result),rname,0);
       /* we had to allocate for this iCode */
       freeAsmop (NULL, aop, ic, TRUE);
     }
@@ -9474,7 +9479,8 @@ genPagedPointerSet (operand * right,
       if (AOP_SIZE (right) > 1 &&
 	  !OP_SYMBOL (result)->remat &&
 	  (OP_SYMBOL (result)->liveTo > ic->seq ||
-	   ic->depth))
+	   ic->depth) &&
+	  !pi)
 	{
 	  int size = AOP_SIZE (right) - 1;
 	  while (size--)
@@ -9483,6 +9489,8 @@ genPagedPointerSet (operand * right,
     }
 
   /* done */
+  if (pi) pi->generated = 1;
+  freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, TRUE);
 
 
@@ -9493,7 +9501,7 @@ genPagedPointerSet (operand * right,
 /*-----------------------------------------------------------------*/
 static void
 genFarPointerSet (operand * right,
-		  operand * result, iCode * ic)
+		  operand * result, iCode * ic, iCode *pi)
 {
   int size, offset;
   sym_link *retype = getSpec (operandType (right));
@@ -9535,7 +9543,6 @@ genFarPointerSet (operand * right,
 	}
     }
   /* so dptr know contains the address */
-  freeAsmop (result, NULL, ic, TRUE);
   aopOp (right, ic, FALSE, TRUE);
 
   /* if bit then unpack */
@@ -9556,12 +9563,20 @@ genFarPointerSet (operand * right,
 	  _flushLazyDPS ();
 
 	  emitcode ("movx", "@dptr,a");
-	  if (size)
+	  if (size || pi)
 	    emitcode ("inc", "dptr");
 	}
       _endLazyDPSEvaluation ();
     }
 
+  if (pi && AOP_TYPE (result) != AOP_STR && AOP_TYPE (result) != AOP_IMMD) {
+    aopPut (AOP(result),"dpl",0);
+    aopPut (AOP(result),"dph",1);
+    if (options.model == MODEL_FLAT24)
+	aopPut (AOP(result),"dpx",2);
+    pi->generated=1;
+  }
+  freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, TRUE);
 }
 
@@ -9570,7 +9585,7 @@ genFarPointerSet (operand * right,
 /*-----------------------------------------------------------------*/
 static void
 genGenPointerSet (operand * right,
-		  operand * result, iCode * ic)
+		  operand * result, iCode * ic, iCode *pi)
 {
   int size, offset;
   sym_link *retype = getSpec (operandType (right));
@@ -9606,7 +9621,6 @@ genGenPointerSet (operand * right,
       _endLazyDPSEvaluation ();
     }
   /* so dptr know contains the address */
-  freeAsmop (result, NULL, ic, TRUE);
   aopOp (right, ic, FALSE, TRUE);
 
   /* if bit then unpack */
@@ -9627,12 +9641,24 @@ genGenPointerSet (operand * right,
 	  _flushLazyDPS ();
 
 	  emitcode ("lcall", "__gptrput");
-	  if (size)
+	  if (size || pi)
 	    emitcode ("inc", "dptr");
 	}
       _endLazyDPSEvaluation ();
     }
 
+  if (pi && AOP_TYPE (result) != AOP_STR && AOP_TYPE (result) != AOP_IMMD) {
+    aopPut (AOP(result),"dpl",0);
+    aopPut (AOP(result),"dph",1);
+    if (options.model == MODEL_FLAT24) {
+	aopPut (AOP(result),"dpx",2);
+	aopPut (AOP(result),"b",3);
+    } else {
+	aopPut (AOP(result),"b",2);
+    }
+    pi->generated=1;
+  }
+  freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, TRUE);
 }
 
@@ -9681,19 +9707,19 @@ genPointerSet (iCode * ic, iCode *pi)
 
     case POINTER:
     case IPOINTER:
-      genNearPointerSet (right, result, ic);
+      genNearPointerSet (right, result, ic, pi);
       break;
 
     case PPOINTER:
-      genPagedPointerSet (right, result, ic);
+      genPagedPointerSet (right, result, ic, pi);
       break;
 
     case FPOINTER:
-      genFarPointerSet (right, result, ic);
+      genFarPointerSet (right, result, ic, pi);
       break;
 
     case GPOINTER:
-      genGenPointerSet (right, result, ic);
+      genGenPointerSet (right, result, ic, pi);
       break;
     }
 

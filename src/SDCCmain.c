@@ -1613,33 +1613,29 @@ preProcess (char **envp)
               preOutName = Safe_strdup (fullDstFileName);
 	    }
         }
-      else
-          preOutName = Safe_strdup (tempfilename ());
 
       /* Have to set cppoutfilename to something, even if just pre-processing. */
       setMainValue ("cppoutfilename", preOutName ? preOutName : "");
-      addSetHead (&tmpfileNameSet, preOutName);
 
       if (options.verbose)
 	printf ("sdcc: Calling preprocessor...\n");
 
       buildCmdLine2 (buffer, _preCmd, sizeof(buffer));
 
-      if (my_system (buffer))
-	{
+      if (preProcOnly) {
+        if (my_system (buffer)) {
 	  exit (1);
 	}
-      if (preProcOnly)
-        {
-	  exit (0);
-        }
-      yyin = fopen (preOutName, "r");
-      if (yyin == NULL)
-        {
-          perror ("Preproc file not found\n");
+
+        exit (0);
+      }
+
+      yyin = my_popen (buffer);
+      if (yyin == NULL) {
+          perror ("Preproc file not found");
           exit (1);
-        }
-      addSetHead (&tmpfileSet, yyin);
+      }
+      addSetHead (&pipeSet, yyin);
     }
 
   return 0;
@@ -1929,6 +1925,10 @@ main (int argc, char **argv, char **envp)
 	printf ("sdcc: Generating code...\n");
 
       yyparse ();
+
+      pclose(yyin);
+      deleteSetItem(&pipeSet, yyin);
+
       if (fatalError) {
         exit (1);
       }

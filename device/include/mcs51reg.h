@@ -991,7 +991,7 @@
 #define CCAP3H_AT_0XFD
 #define CCAP4H_AT_0XFE
 #endif
-// end of definitions for the Philiüs P89C668
+// end of definitions for the Philips P89C668
 
 
 // definitions for the Infineon / Siemens SAB80515 & SAB80535
@@ -1048,6 +1048,7 @@
 #define DAPR__SAB80515
 #define P4_AT_0XE8
 #define P5_AT_0XF8
+#define P6_AT_0XDB
 #endif
 // end of definitions for the Infineon / Siemens SAB80515
 

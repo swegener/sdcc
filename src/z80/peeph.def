@@ -178,3 +178,17 @@ replace {
         push    de
         inc     sp
 }
+replace {
+	ld	a,%1
+	sub	a,#%2
+	jp	m,%3
+	ld	a,%1
+	sub	a,#%4
+	jp	p,%5
+} by {
+	ld	a,%1
+	cp	a,#%2
+	jp	m,%3
+	cp	a,#%4
+	jp	p,%5
+}

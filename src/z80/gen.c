@@ -233,6 +233,25 @@ static struct
 
 static const char *aopGet (asmop * aop, int offset, bool bit16);
 
+static const char *aopNames[] = {
+  "AOP_INVALID",
+  "AOP_LIT",
+  "AOP_REG",
+  "AOP_DIR",
+  "AOP_SFR",
+  "AOP_STK",
+  "AOP_IMMD",
+  "AOP_STR",
+  "AOP_CRY",
+  "AOP_IY",
+  "AOP_HL",
+  "AOP_ACC",
+  "AOP_HLREG",
+  "AOP_SIMPLELIT",
+  "AOP_EXSTK",
+  "AOP_PAIRPT"
+};
+
 static PAIR_ID
 _getTempPairId(void)
 {
@@ -389,6 +408,20 @@ _emitMove(const char *to, const char *from)
     {
       // Optimise it out.
       // Could leave this to the peephole, but sometimes the peephole is inhibited.
+    }
+}
+
+static void
+aopDump(const char *plabel, asmop *aop)
+{
+  emitDebug("; Dump of %s: type %s size %u", plabel, aopNames[aop->type], aop->size);
+  switch (aop->type)
+    {
+    case AOP_STK:
+      emitDebug(";  aop_stk %d", aop->aopu.aop_stk);
+      break;
+    default:
+      /* No information. */
     }
 }
 
@@ -554,7 +587,9 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool requires_a)
 
   /* if already has one */
   if (sym->aop)
-    return sym->aop;
+    {
+      return sym->aop;
+    }
 
   /* Assign depending on the storage class */
   if (sym->onStack || sym->iaccess)
@@ -791,7 +826,9 @@ aopOp (operand * op, iCode * ic, bool result, bool requires_a)
 
   /* if already has a asmop then continue */
   if (op->aop)
-    return;
+    {
+      return;
+    }
 
   /* if the underlying symbol has a aop */
   if (IS_SYMOP (op) && OP_SYMBOL (op)->aop)
@@ -883,9 +920,12 @@ aopOp (operand * op, iCode * ic, bool result, bool requires_a)
 	}
 
       /* else spill location  */
-      sym->aop = op->aop = aop =
+      op->aop = aop =
 	aopForSym (ic, sym->usl.spillLoc, result, requires_a);
+      wassertl (aop->size >= getSize (sym->type), "Operand doesn't fit in the spill location");
       aop->size = getSize (sym->type);
+      /* PENDING: HACK.  Can have different sizes in the same AOP. */
+      sym->usl.spillLoc->aop = NULL;
       return;
     }
 
@@ -1278,6 +1318,7 @@ setupPair (PAIR_ID pairId, asmop * aop, int offset)
       {
 	/* Doesnt include _G.stack.pushed */
 	int abso = aop->aopu.aop_stk + offset + _G.stack.offset;
+
 	if (aop->aopu.aop_stk > 0)
 	  {
 	    abso += _G.stack.param_offset;
@@ -5127,6 +5168,7 @@ genGetHbit (iCode * ic)
   operand *left, *result;
   left = IC_LEFT (ic);
   result = IC_RESULT (ic);
+
   aopOp (left, ic, FALSE, FALSE);
   aopOp (result, ic, FALSE, FALSE);
 
@@ -5141,8 +5183,7 @@ genGetHbit (iCode * ic)
   else
     {
       emit2 ("rlc a");
-      /* PENDING: For re-target. */
-      emit2 ("and a,#1");
+      emit2 ("and a,!one");
       outAcc (result);
     }
 
@@ -5865,6 +5906,8 @@ genGenPointerGet (operand * left,
           aopPut (AOP (result), at, offset);
           offset++;
         }
+ 
+      freeAsmop (left, NULL, ic);
       goto release;
     }
 

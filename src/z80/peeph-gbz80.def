@@ -61,3 +61,13 @@ replace {
         ld      (hl),a
         ld      %1,a
 }
+replace {
+	ld	(hl),a
+	inc	de
+	ld	a,(de)
+	inc	hl
+} by {
+	ld	(hl+),a
+	inc	de
+	ld	a,(de)
+}

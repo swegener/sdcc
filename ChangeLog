@@ -1,5 +1,15 @@
-2001-11-25  Bernhard Held  <bernhard@bernhardheld.de>
+2001-11-25  Michael Hope  <michaelh@juju.net.nz>
+	* support/regression/tests/bug-485362.c: Added.
 
+	* support/regression/tests/simplefloat.c (testDivNearOne): Added.
+
+	* src/z80/gen.c (aopOp): Fixed case where left and result are in the same spill loc and they have different sizes.
+
+	* src/z80/peeph.def: Added rules for optimising two byte compares on the same thing, and to optimise two ptr assign.
+
+	* src/z80/gen.c (aopDump): Added a dump function.
+
+2001-11-25  Bernhard Held  <bernhard@bernhardheld.de>
 	* sim/ucsim/s51.src/glob.cc: DS390 SFRs and bits added.
 
 	* sim/ucsim/s51.src/port.cc: Port 4 and 5 added.

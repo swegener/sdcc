@@ -50,6 +50,7 @@ int noAlloc = 0;
 symbol *currFunc;
 static ast *createIval (ast *, sym_link *, initList *, ast *);
 static ast *createIvalCharPtr (ast *, sym_link *, ast *);
+static ast *optimizeCompare (ast *);
 ast *optimizeRRCRLC (ast *);
 ast *optimizeGetHbit (ast *);
 ast *backPatchLabels (ast *, symbol *, symbol *);
@@ -3942,7 +3943,7 @@ tryNext2:
 /*-----------------------------------------------------------------*/
 /* optimizeCompare - otimizes compares for bit variables     */
 /*-----------------------------------------------------------------*/
-ast *
+static ast *
 optimizeCompare (ast * root)
 {
   ast *optExpr = NULL;

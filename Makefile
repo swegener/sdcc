@@ -12,15 +12,15 @@ srcdir          = .
 include $(srcdir)/Makefile.common
 
 SDCC_MISC	= debugger/mcs51 sim/ucsim
-
 SDCC_LIBS	= support/cpp support/cpp2
+SDCC_DOC        = doc
 
 SDCC_ASLINK	= as/mcs51 as link
 SDCC_PACKIHX	= packihx
 
-TARGETS         = sdcc-libs sdcc-cc sdcc-aslink
+TARGETS         = sdcc-libs sdcc-cc sdcc-aslink sdcc-doc
 
-PKGS		= $(SDCC_LIBS) src $(SDCC_ASLINK)
+PKGS		= $(SDCC_LIBS) src $(SDCC_ASLINK) $(SDCC_DOC)
 
 ifneq ($(OPT_ENABLE_UCSIM), no)
 TARGETS         += sdcc-misc 
@@ -70,6 +70,9 @@ sdcc-device:
 sdcc-device-tini:
 	$(MAKE) -C device/include
 	$(MAKE) -C device/lib modelDS390
+
+# Empty for now, as doc depends on latex and latex2html
+sdcc-doc:
 
 sdcc: $(TARGETS)
 

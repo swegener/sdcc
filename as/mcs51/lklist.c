@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <alloc.h>
+#include <stdlib.h>
 #include "aslink.h"
 
 /*)Module	lklist.c
@@ -116,6 +117,23 @@ FILE *fp;
 	lop = 1;
 }
 
+/* Used for qsort call in lstsym */
+static int _cmpSymByAddr(const void *p1, const void *p2)
+{
+    struct sym **s1 = (struct sym **)(p1);
+    struct sym **s2 = (struct sym **)(p2);
+    int delta = ((*s1)->s_addr + (*s1)->s_axp->a_addr) -
+     	   	((*s2)->s_addr + (*s2)->s_axp->a_addr);
+
+    /* Sort first by address, then by name. */
+    if (delta)
+    {
+    	return delta;
+    }
+    return strcmp((*s1)->s_id,(*s2)->s_id);    
+}
+
+
 #if	NCPS-8
 
 /* NCPS != 8 */
@@ -167,10 +185,12 @@ lstarea(xp)
 struct area *xp;
 {
 	register struct areax *oxp;
-	register int i, j;
+	register int i;
+	/* int j; */
 	register char *ptr;
 	int nmsym;
-	addr_t a0, ai, aj;
+	/* addr_t a0; */
+	addr_t 	   ai, aj;
 	struct sym *sp;
 	struct sym **p;
 	int memPage;
@@ -289,6 +309,7 @@ struct area *xp;
 		oxp = oxp->a_axp;
 	}
 
+#if 0
 	/*
 	 * Bubble Sort of Addresses in Symbol Table Array
 	 */
@@ -308,6 +329,9 @@ struct area *xp;
 			a0 = ai;
 		}
 	}
+#else
+	qsort(p, nmsym, sizeof(struct sym *), _cmpSymByAddr);
+#endif	
 
 	/*
 	 * Symbol Table Output
@@ -521,6 +545,7 @@ struct area *xp;
 		oxp = oxp->a_axp;
 	}
 
+#if 0
 	/*
 	 * Bubble Sort of Addresses in Symbol Table Array
 	 */
@@ -540,6 +565,9 @@ struct area *xp;
 			a0 = ai;
 		}
 	}
+#else
+	qsort(p, nmsym, sizeof(struct sym *), _cmpSymByAddr);
+#endif	
 
 	/*
 	 * Symbol Table Output

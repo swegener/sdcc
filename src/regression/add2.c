@@ -104,16 +104,33 @@ void add_uint2uint2(void)
     failures++;
 
   aint1 += aint0;
-  if(aint1 != 39)
+  if(aint1 != 0x27)
     failures++;
 
   aint2 = aint1 + aint0;
-  if(aint2 != 46)
+  if(aint2 != 0x2e)
     failures++;
 
   aint3 = aint2 + aint1 + aint0;
-  if(aint3 != 92)
+  if(aint3 != 0x5c)
     failures++;
+
+  aint3 += 0xa0;
+  if(aint3 != 0xfc)
+    failures++;
+
+  aint3 += aint0;
+  if(aint3 != 0x103)
+    failures++;
+
+  aint1 += 0xffc0;
+  if(aint1 != 0xffe7)
+    failures++;
+
+  aint3 = aint2 + aint1 + aint0;
+  if(aint3 != 0x1c)
+    failures++;
+
 
 }
 
@@ -282,18 +299,23 @@ void main(void)
 
   aint0=16;
   aint1=0;
-  //  add_uint2uint();
+  add_uint2uint();
 
 
   aint0 = 0;
   aint1 = 32;
-  //  add_uint2uint2();
+  aint2 = 0;
+  add_uint2uint2();
 
 #if SUPPORT_BIT_TYPES
-  //  add_bits();
+  add_bits();
 
-  //  add_bit2uchar();
-  //  add_bit2uint();
+  achar0 = 7;
+  add_bit2uchar();
+
+  aint0 = 0;
+  bit0 = 1;
+  add_bit2uint();
 #endif
 
   aint0 = 0;

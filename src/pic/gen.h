@@ -113,7 +113,7 @@ extern unsigned fReturnSizePic;
 #define MSB32   3
 
 
-#define FUNCTION_LABEL_INC  20
+#define FUNCTION_LABEL_INC  40
 
 /*-----------------------------------------------------------------*/
 /* Macros for emitting skip instructions                           */

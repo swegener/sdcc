@@ -1130,7 +1130,10 @@ pCode *newpCodeCharP(char *cP)
   pcc->pc.destruct = genericDestruct;
   pcc->pc.print = genericPrint;
 
-  pcc->comment = Safe_strdup(cP);
+  if(cP)
+    pcc->comment = Safe_strdup(cP);
+  else
+    pcc->comment = NULL;
 
   return ( (pCode *)pcc);
 
@@ -1206,11 +1209,13 @@ pCode *newpCodeLabel(int key)
 
   pcl->key = key;
 
+  pcl->label = NULL;
   if(key>0) {
     sprintf(s,"_%05d_DS_",key);
-    pcl->label = Safe_strdup(s);
-  } else
-    pcl->label = NULL;
+    if(s)
+      pcl->label = Safe_strdup(s);
+  }
+
 
   return ( (pCode *)pcl);
 
@@ -1219,7 +1224,10 @@ pCode *newpCodeLabelStr(char *str)
 {
   pCode *pc = newpCodeLabel(-1);
 
-  PCL(pc)->label = Safe_strdup(str);
+  if(str)
+    PCL(pc)->label = Safe_strdup(str);
+  else
+    PCL(pc)->label = NULL;
 
   return pc;
 }
@@ -1279,11 +1287,13 @@ pCodeOp *newpCodeOpLabel(int key)
   pcop = Safe_calloc(1,sizeof(pCodeOpLabel) );
   pcop->type = PO_LABEL;
 
+  pcop->name = NULL;
   if(key>0) {
     sprintf(s,"_%05d_DS_",key);
-    pcop->name = Safe_strdup(s);
-  } else
-    pcop->name = NULL;
+    if(s)
+      pcop->name = Safe_strdup(s);
+  } 
+
 
   ((pCodeOpLabel *)pcop)->key = key;
 
@@ -1298,11 +1308,13 @@ pCodeOp *newpCodeOpLit(int lit)
 
   pcop = Safe_calloc(1,sizeof(pCodeOpLit) );
   pcop->type = PO_LITERAL;
+  pcop->name = NULL;
   if(lit>=0) {
     sprintf(s,"0x%02x",lit);
-    pcop->name = Safe_strdup(s);
-  } else
-    pcop->name = NULL;
+    if(s)
+      pcop->name = Safe_strdup(s);
+  } 
+
 
   ((pCodeOpLit *)pcop)->lit = lit;
 
@@ -1339,7 +1351,10 @@ pCodeOp *newpCodeOpBit(char *s, int bit, int inBitSpace)
 
   pcop = Safe_calloc(1,sizeof(pCodeOpBit) );
   pcop->type = PO_BIT;
-  pcop->name = Safe_strdup(s);   
+  if(s)
+    pcop->name = Safe_strdup(s);   
+  else
+    pcop->name = NULL;
 
   PCOB(pcop)->bit = bit;
   PCOB(pcop)->inBitSpace = inBitSpace;
@@ -1383,7 +1398,10 @@ pCodeOp *newpCodeOp(char *name, PIC_OPTYPE type)
   default:
     pcop = Safe_calloc(1,sizeof(pCodeOp) );
     pcop->type = type;
-    pcop->name = Safe_strdup(name);   
+    if(name)
+      pcop->name = Safe_strdup(name);   
+    else
+      pcop->name = NULL;
   }
 
   return pcop;
@@ -2477,7 +2495,10 @@ set *register_usage(pBlock *pb)
 		  r1->rIdx, newreg->rIdx);
 	  r2->rIdx = newreg->rIdx;
 	  //if(r2->name) free(r2->name);
-	  r2->name = Safe_strdup(newreg->name);
+	  if(newreg->name)
+	    r2->name = Safe_strdup(newreg->name);
+	  else
+	    r2->name = NULL;
 	  newreg->isFree = 0;
 	  newreg->wasUsed = 1;
 	}
@@ -2593,7 +2614,10 @@ void pct2(FILE *of,pBlock *pb,int indent)
 		  r1->rIdx, newreg->rIdx);
 	  r2->rIdx = newreg->rIdx;
 	  //if(r2->name) free(r2->name);
-	  r2->name = Safe_strdup(newreg->name);
+	  if(newreg->name)
+	    r2->name = Safe_strdup(newreg->name);
+	  else
+	    r2->name = NULL;
 	  newreg->isFree = 0;
 	  newreg->wasUsed = 1;
 	}

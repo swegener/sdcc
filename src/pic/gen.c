@@ -63,7 +63,13 @@ static int labelOffset=0;
 static int debug_verbose=1;
 static int optimized_for_speed = 0;
 
+/* max_key keeps track of the largest label number used in 
+   a function. This is then used to adjust the label offset
+   for the next function.
+*/
+static int max_key=0;
 unsigned int pic14aopLiteral (value *val, int offset);
+const char *AopType(short type);
 
 /* this is the down and dirty file with all kinds of 
    kludgy & hacky stuff. This is what it is all about
@@ -133,6 +139,41 @@ static int my_powof2 (unsigned long num)
   return -1;
 }
 
+void DEBUGpic14_emitcode (char *inst,char *fmt, ...)
+{
+    va_list ap;
+    char lb[INITIAL_INLINEASM];  
+    char *lbp = lb;
+
+    if(!debug_verbose)
+      return;
+
+    va_start(ap,fmt);   
+
+    if (inst && *inst) {
+	if (fmt && *fmt)
+	    sprintf(lb,"%s\t",inst);
+	else
+	    sprintf(lb,"%s",inst);
+        vsprintf(lb+(strlen(lb)),fmt,ap);
+    }  else
+        vsprintf(lb,fmt,ap);
+
+    while (isspace(*lbp)) lbp++;
+
+    if (lbp && *lbp) 
+        lineCurr = (lineCurr ?
+                    connectLine(lineCurr,newLineNode(lb)) :
+                    (lineHead = newLineNode(lb)));
+    lineCurr->isInline = _G.inLine;
+    lineCurr->isDebug  = _G.debugLine;
+
+    addpCode2pBlock(pb,newpCodeCharP(lb));
+
+    va_end(ap);
+}
+
+
 static void emitpLabel(int key)
 {
   addpCode2pBlock(pb,newpCodeLabel(key));
@@ -141,9 +182,19 @@ static void emitpLabel(int key)
 void emitpcode(PIC_OPCODE poc, pCodeOp *pcop)
 {
 
-  addpCode2pBlock(pb,newpCode(poc,pcop));
+  if(pcop)
+    addpCode2pBlock(pb,newpCode(poc,pcop));
+  else
+    DEBUGpic14_emitcode(";","%s  ignoring NULL pcop",__FUNCTION__);
+}
+
+void emitpcodeNULLop(PIC_OPCODE poc)
+{
+
+  addpCode2pBlock(pb,newpCode(poc,NULL));
 
 }
+
 /*-----------------------------------------------------------------*/
 /* pic14_emitcode - writes the code into a file : for now it is simple    */
 /*-----------------------------------------------------------------*/
@@ -175,40 +226,6 @@ void pic14_emitcode (char *inst,char *fmt, ...)
 
     if(debug_verbose)
       addpCode2pBlock(pb,newpCodeCharP(lb));
-
-    va_end(ap);
-}
-
-void DEBUGpic14_emitcode (char *inst,char *fmt, ...)
-{
-    va_list ap;
-    char lb[INITIAL_INLINEASM];  
-    char *lbp = lb;
-
-    if(!debug_verbose)
-      return;
-
-    va_start(ap,fmt);   
-
-    if (inst && *inst) {
-	if (fmt && *fmt)
-	    sprintf(lb,"%s\t",inst);
-	else
-	    sprintf(lb,"%s",inst);
-        vsprintf(lb+(strlen(lb)),fmt,ap);
-    }  else
-        vsprintf(lb,fmt,ap);
-
-    while (isspace(*lbp)) lbp++;
-
-    if (lbp && *lbp) 
-        lineCurr = (lineCurr ?
-                    connectLine(lineCurr,newLineNode(lb)) :
-                    (lineHead = newLineNode(lb)));
-    lineCurr->isInline = _G.inLine;
-    lineCurr->isDebug  = _G.debugLine;
-
-    addpCode2pBlock(pb,newpCodeCharP(lb));
 
     va_end(ap);
 }
@@ -960,6 +977,12 @@ char *aopGet (asmop *aop, int offset, bool bit16, bool dname)
 /*-----------------------------------------------------------------*/
 pCodeOp *popGetLabel(unsigned int key)
 {
+
+  DEBUGpic14_emitcode ("; ***","%s  key=%d, label offset %d",__FUNCTION__,key, labelOffset);
+
+  if(key>max_key)
+    max_key = key;
+
   return newpCodeOpLabel(key+100+labelOffset);
 }
 
@@ -1068,17 +1091,17 @@ pCodeOp *popGet (asmop *aop, int offset, bool bit16, bool dname)
     case AOP_DPTR:
     case AOP_DPTR2:
     case AOP_ACC:
-        DEBUGpic14_emitcode(";8051 legacy","%d",__LINE__);
-	pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
-	pcop->type = PO_SFR_REGISTER;
+        DEBUGpic14_emitcode(";8051 legacy","%d type = %s",__LINE__,AopType(aop->type));
+	//pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
+	//pcop->type = PO_SFR_REGISTER;
 
-	PCOR(pcop)->rIdx = -1;
-	PCOR(pcop)->r = NULL;
+	//PCOR(pcop)->rIdx = -1;
+	//PCOR(pcop)->r = NULL;
 	// Really nasty hack to check for temporary registers
 
-	pcop->name = Safe_strdup("BAD_REGISTER");
+	//pcop->name = Safe_strdup("BAD_REGISTER");
 
-	return pcop;
+	return NULL;
 	
     case AOP_IMMD:
       DEBUGpic14_emitcode(";","%d",__LINE__);
@@ -2367,8 +2390,10 @@ static void genFunction (iCode *ic)
     symbol *sym;
     sym_link *fetype;
 
-    DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    labelOffset += FUNCTION_LABEL_INC;
+    DEBUGpic14_emitcode ("; ***","%s  %d previous max_key=%d ",__FUNCTION__,__LINE__,max_key);
+
+    labelOffset += (max_key+1);
+    max_key=0;
 
     _G.nRegsSaved = 0;
     /* create the function header */
@@ -2675,7 +2700,7 @@ static void genEndFunction (iCode *ic)
 	}
 
         pic14_emitcode ("return","");
-	emitpcode(POC_RETURN,NULL);
+	emitpcodeNULLop(POC_RETURN);
 
 	/* Mark the end of a function */
 	addpCode2pBlock(pb,newpCodeFunction(NULL,NULL));
@@ -8540,10 +8565,12 @@ static void genCast (iCode *ic)
     offset = 0 ;
     while (size--) {
       pic14_emitcode(";","%d",__LINE__);
-        aopPut(AOP(result),
-               aopGet(AOP(right),offset,FALSE,FALSE),
-               offset);
-        offset++;
+      /* aopPut(AOP(result),
+	     aopGet(AOP(right),offset,FALSE,FALSE),
+	     offset); */
+      emitpcode(POC_MOVFW,   popGet(AOP(right),offset,FALSE,FALSE));
+      emitpcode(POC_MOVWF,   popGet(AOP(result),offset,FALSE,FALSE));
+      offset++;
     }
 
     /* now depending on the sign of the destination */
@@ -8557,11 +8584,14 @@ static void genCast (iCode *ic)
       }
     } else {
       /* we need to extend the sign :{ */
-      //char *l = aopGet(AOP(right),AOP_SIZE(right) - 1,FALSE,FALSE);
-      //MOVA(l);
 
-      emitpcode(POC_CLRW,    NULL);
-      emitpcode(POC_BTFSC,   popGet(AOP(right),0,FALSE,FALSE));
+      emitpcodeNULLop(POC_CLRW);
+
+      if(offset)
+	emitpcode(POC_BTFSC,   newpCodeOpBit(aopGet(AOP(right),offset-1,FALSE,FALSE),7,0));
+      else
+	emitpcode(POC_BTFSC,   newpCodeOpBit(aopGet(AOP(right),offset,FALSE,FALSE),7,0));
+
       emitpcode(POC_MOVLW,   popGetLit(0xff));
 
         pic14_emitcode("clrw","");

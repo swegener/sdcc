@@ -57,17 +57,20 @@ SIMULATE = simulate
 SRC = b.c \
 	add.c \
 	add2.c \
+	add3.c \
 	bool1.c \
 	call1.c \
 	compare.c \
 	compare2.c \
 	compare3.c \
+	compare4.c \
 	for.c \
 	rotate1.c \
 	rotate2.c \
 	rotate3.c \
 	struct1.c \
 	sub.c \
+	sub2.c \
 	switch1.c \
 	while.c \
 	xor.c

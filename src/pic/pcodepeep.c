@@ -1763,7 +1763,10 @@ static pCodeOp *pCodeOpCopy(pCodeOp *pcop)
   }
 
   pcopnew->type = pcop->type;
-  pcopnew->name = Safe_strdup(pcop->name);
+  if(pcop->name)
+    pcopnew->name = Safe_strdup(pcop->name);
+  else
+    pcopnew->name = NULL;
 
   return pcopnew;
 }

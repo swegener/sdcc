@@ -133,13 +133,8 @@ eBBSuccessors (eBBlock ** ebbs, int count)
 		}
 	      else
 		{
-		  int j=i;
-		  while (j--) {
-		    if (ebbs[j]->ech && ebbs[j]->ech->op==IFX &&
-			(isSymbolEqual(IC_TRUE(ebbs[j]->ech), ebbs[i]->entryLabel) ||
-			 isSymbolEqual(IC_FALSE(ebbs[j]->ech), ebbs[i]->entryLabel))) {
-		      ebbs[i]->hasConditionalExit=1;
-		    }
+		  if (i && ebbs[i-1]->ech && ebbs[i-1]->ech->op==IFX) {
+		    ebbs[i]->isConditionalExitFrom=ebbs[i-1];
 		  }
 		}
 	    }			/* no instructions in the block */

@@ -201,6 +201,8 @@ int main(void)
 	DPRINTF(("Looping.\n"));
     } /* loop "for Run_Index" */
 
+    _printTStates();
+
     printf("Run_Index = %d\n", Run_Index);
 
     runTime = _clock() - runTime;

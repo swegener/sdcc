@@ -1256,8 +1256,8 @@ static int packRegsForAssign (iCode *ic,eBBlock *ebp)
     iCode *dic, *sic;
     
     if (
- 	!IS_TRUE_SYMOP(IC_RESULT(ic)) ||
-	!IS_ITEMP(IC_RIGHT(ic))       ||	
+	/* 	!IS_TRUE_SYMOP(IC_RESULT(ic)) ||*/
+	!IS_ITEMP(IC_RIGHT(ic))       ||
 	OP_LIVETO(IC_RIGHT(ic)) > ic->seq ||
 	OP_SYMBOL(IC_RIGHT(ic))->isind)
 	return 0;
@@ -1277,7 +1277,6 @@ static int packRegsForAssign (iCode *ic,eBBlock *ebp)
        a use of the true symbol in before we find the definition then 
        we cannot */	
     for ( dic = ic->prev ; dic ; dic = dic->prev) {
-
 	/* if there is a function call and this is
 	   a parameter & not my parameter then don't pack it */
 	if ( (dic->op == CALL || dic->op == PCALL) &&
@@ -1288,13 +1287,10 @@ static int packRegsForAssign (iCode *ic,eBBlock *ebp)
 	}
 
 	if (SKIP_IC2(dic))
-	    continue;
+		continue;
 
-#if 0	
 	if (IS_SYMOP(IC_RESULT(dic)) &&
 	    IC_RESULT(dic)->key == IC_RIGHT(ic)->key) {
-	    if (POINTER_SET(dic))
-		dic = NULL;
 	    break;	    
 	}
 
@@ -1316,7 +1312,6 @@ static int packRegsForAssign (iCode *ic,eBBlock *ebp)
 	    dic = NULL ;
 	    break;
 	}
-#endif
     }
     
     if (!dic)
@@ -1326,7 +1321,7 @@ static int packRegsForAssign (iCode *ic,eBBlock *ebp)
        the same atleast one of the operands */
     if (OP_SYMBOL(IC_RESULT(ic))->onStack  || 
  	OP_SYMBOL(IC_RESULT(ic))->iaccess ) {
-	
+
 	/* the operation has only one symbol
 	   operator then we can pack */
 	if ((IC_LEFT(dic) && !IS_SYMOP(IC_LEFT(dic))) ||
@@ -1433,7 +1428,6 @@ iCode *findAssignToSym (operand *op,iCode *ic)
 	
 }
 
-#if 0
 /*-----------------------------------------------------------------*/
 /* packRegsForSupport :- reduce some registers for support calls   */
 /*-----------------------------------------------------------------*/
@@ -1488,7 +1482,6 @@ static int packRegsForSupport (iCode *ic, eBBlock *ebp)
    
     return change ;
 }
-#endif
 
 #define IS_OP_RUONLY(x) (x && IS_SYMOP(x) && OP_SYMBOL(x)->ruonly)
 

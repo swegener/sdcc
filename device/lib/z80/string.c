@@ -1,17 +1,15 @@
 /* Dumb strings stub.
    Wanted a quick hack for now - will use the libc version later.
 */
-#if 0
-char *strcpy(char *dest, const char *source)
+char *_strcpy(char *dest, const char *source)
 {
-    char *ret = dest;
-    while (*dest++ = *source++);
-    return ret;
+    char *d = dest;
+    const char *s = source;
+    while (*d++ = *s++);
+    return dest;
 }
-#endif
 
-#if 0
-void *memcpy(void *dest, const void *source, int count)
+void *_memcpy(void *dest, const void *source, int count)
 {
     char *d = dest;
     const char *s = source;
@@ -20,11 +18,10 @@ void *memcpy(void *dest, const void *source, int count)
 
     return dest;
 }
-#endif
 
-int __strcmp(const char *s1, const char *s2)
+int _strcmp(const char *s1, const char *s2)
 {
-    int ret = 0;
+    char ret = 0;
 
     while (!(ret = *s1 - *s2) && *s2)
 	++s1, ++s2;
@@ -35,4 +32,3 @@ int __strcmp(const char *s1, const char *s2)
 	return 1;
     return 0;
 }
-

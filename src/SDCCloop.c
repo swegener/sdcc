@@ -537,8 +537,9 @@ DEFSETFUNC(hasNonPtrUse)
 	for (cdp = setFirstItem(lInvars); cdp ; cdp = setNextItem(lInvars)) {
 
 	    /* maintain data flow .. add it to the */
-	    /* defSet & outExprs of the preheader  */
+	    /* ldefs defSet & outExprs of the preheader  */
 	    preHdr->defSet = bitVectSetBit (preHdr->defSet,cdp->diCode->key);
+	    preHdr->ldefs = bitVectSetBit (preHdr->ldefs,cdp->diCode->key);
 	    cdp->diCode->lineno = preHdr->ech->lineno;
 	    addSetHead (&preHdr->outExprs,cdp);
 	    

@@ -617,7 +617,7 @@ spillThis (symbol * sym)
      LIVE ranges */
   if (!ds390_ptrRegReq && isSpiltOnStack (sym))
     {
-      ds390_ptrRegReq++;
+      ds390_ptrRegReq += !options.stack10bit;
       spillLRWithPtrReg (sym);
     }
 
@@ -760,9 +760,9 @@ spilSomething (iCode * ic, eBBlock * ebp, symbol * forSym)
 
   /* if spilt on stack then free up r0 & r1 
      if they could have been assigned to as gprs */
-  if (!ds390_ptrRegReq && isSpiltOnStack (ssym))
+  if (!ds390_ptrRegReq && isSpiltOnStack (ssym) && !options.stack10bit)
     {
-      ds390_ptrRegReq++;
+	    ds390_ptrRegReq++;
       spillLRWithPtrReg (ssym);
     }
 
@@ -2335,22 +2335,22 @@ packRegisters (eBBlock * ebp)
 	  /* if we are using a symbol on the stack
 	     then we should say ds390_ptrRegReq */
 	  if (ic->op == IFX && IS_SYMOP (IC_COND (ic)))
-	    ds390_ptrRegReq += ((OP_SYMBOL (IC_COND (ic))->onStack ||
-				 OP_SYMBOL (IC_COND (ic))->iaccess) ? 1 : 0);
+		  ds390_ptrRegReq += ((OP_SYMBOL (IC_COND (ic))->onStack ? !options.stack10bit : 0) +
+				      OP_SYMBOL (IC_COND (ic))->iaccess);
 	  else if (ic->op == JUMPTABLE && IS_SYMOP (IC_JTCOND (ic)))
-	    ds390_ptrRegReq += ((OP_SYMBOL (IC_JTCOND (ic))->onStack ||
-			      OP_SYMBOL (IC_JTCOND (ic))->iaccess) ? 1 : 0);
+		  ds390_ptrRegReq += ((OP_SYMBOL (IC_JTCOND (ic))->onStack ? !options.stack10bit : 0) +
+				      OP_SYMBOL (IC_JTCOND (ic))->iaccess);
 	  else
 	    {
 	      if (IS_SYMOP (IC_LEFT (ic)))
-		ds390_ptrRegReq += ((OP_SYMBOL (IC_LEFT (ic))->onStack ||
-				OP_SYMBOL (IC_LEFT (ic))->iaccess) ? 1 : 0);
+		      ds390_ptrRegReq += ((OP_SYMBOL (IC_LEFT (ic))->onStack ? !options.stack10bit : 0) +
+					  OP_SYMBOL (IC_LEFT (ic))->iaccess);
 	      if (IS_SYMOP (IC_RIGHT (ic)))
-		ds390_ptrRegReq += ((OP_SYMBOL (IC_RIGHT (ic))->onStack ||
-			       OP_SYMBOL (IC_RIGHT (ic))->iaccess) ? 1 : 0);
+		      ds390_ptrRegReq += ((OP_SYMBOL (IC_RIGHT (ic))->onStack ? !options.stack10bit : 0) +
+					  OP_SYMBOL (IC_RIGHT (ic))->iaccess);
 	      if (IS_SYMOP (IC_RESULT (ic)))
-		ds390_ptrRegReq += ((OP_SYMBOL (IC_RESULT (ic))->onStack ||
-			      OP_SYMBOL (IC_RESULT (ic))->iaccess) ? 1 : 0);
+		      ds390_ptrRegReq += ((OP_SYMBOL (IC_RESULT (ic))->onStack ? !options.stack10bit : 0) +
+					  OP_SYMBOL (IC_RESULT (ic))->iaccess);
 	    }
 	}
 
@@ -2514,7 +2514,7 @@ ds390_assignRegisters (eBBlock ** ebbs, int count)
   setToNull ((void *) &_G.funcrUsed);
   ds390_ptrRegReq = _G.stackExtend = _G.dataExtend = 0;
   ds390_nRegs = 8;
-
+  if (options.model != MODEL_FLAT24) options.stack10bit = 0;
   /* change assignments this will remove some
      live ranges reducing some register pressure */
   for (i = 0; i < count; i++)

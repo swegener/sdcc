@@ -2,7 +2,7 @@ CC = ../../../bin/sdcc
 
 #VERBOSE = --verbose
 
-OBJECTS = tinibios.rel memcpyx.rel
+OBJECTS = tinibios.rel memcpyx.rel ds400rom.rel
 
 SOURCES = $(patsubst %.rel,%.c,$(OBJECTS))
 

@@ -211,7 +211,8 @@ pcDistance (lineNode * cpos, char *lbl, bool back)
 /*-----------------------------------------------------------------*/
 FBYNAME (flat24bitModeAndPortDS390)
 {
-    return ((strcmp(port->target,"ds390") == 0) && 
+    return (((strcmp(port->target,"ds390") == 0) ||
+	     (strcmp(port->target,"ds400") == 0)) && 
 	    (options.model == MODEL_FLAT24));
 }
 
@@ -220,7 +221,8 @@ FBYNAME (flat24bitModeAndPortDS390)
 /*-----------------------------------------------------------------*/
 FBYNAME (portIsDS390)
 {
-    return (strcmp(port->target,"ds390") == 0);
+    return ((strcmp(port->target,"ds390") == 0) ||
+	    (strcmp(port->target,"ds400") == 0));
 }
 
 /*-----------------------------------------------------------------*/

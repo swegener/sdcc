@@ -925,7 +925,9 @@ eBBlockFromiCode (iCode * ic)
   if (!options.lessPedantic) {
     // this is a good place to check missing return values
     if (currFunc) {
-      if (!IS_VOID(currFunc->etype)) {
+      // the user is on his own with naked functions...
+      if (!IS_VOID(currFunc->etype)
+       && !FUNC_ISNAKED(currFunc->type)) {
 	eBBlock *bp;
 	// make sure all predecessors of the last block end in a return
 	for (bp=setFirstItem(ebbs[saveCount-1]->predList); 

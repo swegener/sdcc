@@ -1420,7 +1420,8 @@ _cpp_create_definition (pfile, node)
 	      macro->count--;
 	    }
 	  /* Let assembler get away with murder.  */
-	  else if (CPP_OPTION (pfile, lang) != CLK_ASM)
+	  else if ((CPP_OPTION (pfile, lang) != CLK_ASM)
+		&& (!CPP_OPTION(pfile, allow_naked_hash)))
 	    {
 	      ok = 0;
 	      cpp_error (pfile, "'#' is not followed by a macro parameter");

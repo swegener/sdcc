@@ -384,6 +384,11 @@ struct cpp_options
      options.  Stand-alone CPP should then bail out after option
      parsing; drivers might want to continue printing help.  */
   unsigned char help_only;
+    
+  /* SDCC abuse by Kevin: allow naked '#' characters in expanded macros
+   * (see _cpp_create_definition in cppmacro.c)
+   */
+  unsigned char allow_naked_hash;
 };
 
 /* This structure is passed to the call back when changing file.  */

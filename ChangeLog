@@ -1,3 +1,7 @@
+2003-06-27 Kevin Vigor <kevin@vigor.nu>
+
+	* More support for DS80C400. Now includes beginning of interface to ROM.
+
 2003-06-25  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/mcs51/gen.c (gencjneshort): fixed bug #760345

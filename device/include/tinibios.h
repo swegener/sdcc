@@ -16,6 +16,8 @@ void Serial0Baud(unsigned long baud);
 void Serial0SendBreak(void);
 void Serial0Flush(void);
 
+void Serial0SwitchToBuffered(void); // ds400 only.
+
 void Serial1Init (unsigned long baud, unsigned char buffered);
 char Serial1GetChar(void);
 void Serial1PutChar(char);

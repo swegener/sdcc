@@ -25,43 +25,15 @@
 -------------------------------------------------------------------------*/
 
 #include <tinibios.h>
+#include <ds400rom.h>
 
 #define TIMED_ACCESS(sfr,value) { TA=0xaa; TA=0x55; sfr=value; }
 
-// FIXME: Doesn't work, maybe?
-static void _installInterrupt(void (*isrPtr)(void), unsigned char offset)
-{
-    unsigned char xdata * vectPtr = (unsigned char xdata *) offset;
-    unsigned long isr = (unsigned long)isrPtr;
-    
-    *vectPtr++ = 0x02;
-    *vectPtr++ = (unsigned char)(isr >> 16);
-    *vectPtr++ = (unsigned char)(isr >> 8);
-    *vectPtr = (unsigned char)isr;
-}
-
 unsigned char _sdcc_external_startup(void)
 {
-#if 0    
-    int i, j;
-
-    // Do some blinking of the LED.
-    for  (j = 0; j < 10; j++)
-    {
-	P5 |= 4;
-	for (i = 0; i < 32767; i++)
-	{
-	    ;
-	}
-	P5 &= ~4;
-	for (i = 0; i < 32767; i++)
-	{
-	    ;
-	}	
-    }
-#endif    
-    
     IE = 0; // Disable all interrupts.
+
+    PSW = 0;
     
   _asm
     ; save the 24-bit return address
@@ -118,16 +90,11 @@ void Serial0Init (unsigned long baud, unsigned char buffered) {
   // Need no port setup, done by boot rom.
   
   baud;
-  
-  // hack serial ISR in, no magic support for ISR routines yet.
-  //
-  // FIXME: this doesn't work, use only non-buffered mode!
-  
-  _installInterrupt(Serial0IrqHandler, 0x23);  
-    
+
   serial0Buffered=buffered;
  
  if (buffered) {
+    installInterrupt(Serial0IrqHandler, 0x23);
     RI_0=TI_0=0; // clear "pending" interrupts
     ES0 = 1; // enable serial channel 0 interrupt
   } else {
@@ -145,8 +112,21 @@ void Serial0Baud(unsigned long baud) {
   TR2=1; // start timer
 }  
 
+
+void Serial0SwitchToBuffered(void)
+{
+    IE &= ~0x80;
+    
+    serial0Buffered = 1;
+    installInterrupt(Serial0IrqHandler, 0x23);
+    RI_0=TI_0=0; // clear "pending" interrupts
+    ES0 = 1; // enable serial channel 0 interrupt
+    
+    IE |= 0x80;
+}
+
+
 void Serial0IrqHandler (void) interrupt 4 {
-  P5 |= 4;
   if (RI_0) {
     receive0Buffer[receive0BufferHead]=SBUF0;
     receive0BufferHead=(receive0BufferHead+1)&(S0RBS-1);
@@ -183,8 +163,9 @@ void Serial0PutChar (char c)
   } else {
     while (!TI_0)
       ;
+    TI_0 = 0;
     SBUF0=c;
-    TI_0=0;
+    // TI_0=0;
   }
 }
 

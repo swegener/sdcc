@@ -8644,7 +8644,7 @@ genRightShiftLiteral (operand * left,
    && (shCount < (size * 8))
    && (size != 1)
    && (size != 2)
-   /* && (size != 4) in a minute... */)
+   && (size != 4))
   {
       D(emitcode (";", "genRightShiftLiteral wimping out"););	
       return FALSE;

@@ -799,6 +799,10 @@ _ds400_finaliseOptions (void)
     if (options.parms_in_bank1) {
 	addSet(&preArgvSet, Safe_strdup("-DSDCC_PARMS_IN_BANK1"));
     }
+     
+    // the DS400 rom calling interface uses register bank 3.
+    RegBankUsed[3] = 1;
+      
   }  /* MODEL_FLAT24 */
 }
 

@@ -141,7 +141,9 @@ dumpLiveRanges (int id, hTab * liveRanges)
   } else {
     file = stdout;
   }
-
+  
+  if (currFunc) 
+      fprintf(file,"------------- Func %s -------------\n",currFunc->name);
   for (sym = hTabFirstItem (liveRanges, &k); sym;
        sym = hTabNextItem (liveRanges, &k))
     {
@@ -160,7 +162,8 @@ dumpLiveRanges (int id, hTab * liveRanges)
 	{
 	  fprintf (file, "}{ sir@ %s", sym->usl.spillLoc->rname);
 	}
-      fprintf (file, "}");
+      fprintf (file, "} clashes with ");
+      bitVectDebugOn(sym->clashes,file);
       fprintf (file, "\n");
     }
 

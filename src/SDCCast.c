@@ -734,7 +734,7 @@ processParms (ast * func,
        * Therefore, if there are more defined parameters, the caller didn't
        * supply enough.
        */
-      if (0 && rightmost && defParm->next)
+      if (rightmost && defParm->next)
 	{
 	  werror (E_TOO_FEW_PARMS);
 	  return 1;

@@ -1764,23 +1764,29 @@ processFuncArgs (symbol * func, int ignoreName)
 {
   value *val;
   int pNum = 1;
+  sym_link *funcType=func->type;
+
+  // if this is a pointer to a function
+  if (DCL_TYPE(funcType)==CPOINTER) {
+    funcType=funcType->next;
+  }
 
   /* if this function has variable argument list */
   /* then make the function a reentrant one    */
-  if (IFFUNC_HASVARARGS(func->type))
-    FUNC_ISREENT(func->type)=1;
+  if (IFFUNC_HASVARARGS(funcType))
+    FUNC_ISREENT(funcType)=1;
 
   /* check if this function is defined as calleeSaves
      then mark it as such */
-  FUNC_CALLEESAVES(func->type) = inCalleeSaveList (func->name);
+  FUNC_CALLEESAVES(funcType) = inCalleeSaveList (func->name);
 
   /* loop thru all the arguments   */
-  val = FUNC_ARGS(func->type);
+  val = FUNC_ARGS(funcType);
 
   /* if it is void then remove parameters */
   if (val && IS_VOID (val->type))
     {
-      FUNC_ARGS(func->type) = NULL;
+      FUNC_ARGS(funcType) = NULL;
       return;
     }
 
@@ -1793,7 +1799,7 @@ processFuncArgs (symbol * func, int ignoreName)
       /* mark it as a register parameter if
          the function does not have VA_ARG
          and as port dictates */
-      if (!IFFUNC_HASVARARGS(func->type) &&
+      if (!IFFUNC_HASVARARGS(funcType) &&
 	  (*port->reg_parm) (val->type))
 	{
 	  SPEC_REGPARM (val->etype) = 1;
@@ -1811,17 +1817,17 @@ processFuncArgs (symbol * func, int ignoreName)
   if (func->cdef) {
     /* ignore --stack-auto for this one, we don't know how it is compiled */
     /* simply trust on --int-long-reent or --float-reent */
-    if (IFFUNC_ISREENT(func->type)) {
+    if (IFFUNC_ISREENT(funcType)) {
       return;
     }
   } else {
     /* if this function is reentrant or */
     /* automatics r 2b stacked then nothing */
-    if (IFFUNC_ISREENT (func->type) || options.stackAuto)
+    if (IFFUNC_ISREENT (funcType) || options.stackAuto)
       return;
   }
 
-  val = FUNC_ARGS(func->type);
+  val = FUNC_ARGS(funcType);
   pNum = 1;
   while (val)
     {

@@ -24,7 +24,7 @@
 
 #include "common.h"
 
-enum 
+enum
   {
     MAX_STRING_LENGTH     = 2048,
     MAX_MACRO_NAME_LENGTH = 128
@@ -42,16 +42,16 @@ _evalMacros(char *apinto, hTab *pvals, const char *pfrom, size_t alen)
   assert(pvals);
   assert(pfrom);
 
-  while (plen && *pfrom) {
+  while (plen > 0 && *pfrom) {
     switch (*pfrom) {
     case '"':
     case '\'':
       if (quote != '\0') {
         /* write previous quote */
         *pinto++ = quote;
+        --plen;
       }
-      quote = *pfrom;
-      ++pfrom;
+      quote = *pfrom++;
       break;
 
     case '{':
@@ -61,27 +61,27 @@ _evalMacros(char *apinto, hTab *pvals, const char *pfrom, size_t alen)
         const char *pval;
 
         /* Find the end of macro */
-        while (*pend && *pend != '}') {
-            pend++;
+        while (*pend && '}' != *pend) {
+          pend++;
         }
-        if (*pend != '}') {
-            wassertl(0, "Unterminated macro expansion");
+        if ('}' != *pend) {
+          wassertl(0, "Unterminated macro expansion");
         }
 
         /* Pull out the macro name */
         if (pend - pfrom >= MAX_MACRO_NAME_LENGTH) {
-            wassertl(0, "macro name too long");
+          wassertl(0, "macro name too long");
         }
 
-        strncpy(name, pfrom, pend-pfrom);
-        name[pend-pfrom] = '\0';
+        strncpy(name, pfrom, pend - pfrom);
+        name[pend - pfrom] = '\0';
 
         /* Look up the value in the hash table */
         pval = shash_find (pvals, name);
-        
-        if (pval == NULL) {
+
+        if (NULL == pval) {
           /* Empty macro value */
-          if (quote != '\0') {
+          if ('\0' != quote) {
             /* It was a quote */
             if (pend[1] == quote) {
               /* Start quote equals end quote: skip both */
@@ -95,12 +95,13 @@ _evalMacros(char *apinto, hTab *pvals, const char *pfrom, size_t alen)
           }
         }
         else {
-          if (quote != '\0') {
+          if ('\0' != quote) {
             /* It was a quote, add it */
             *pinto++ = quote;
+            --plen;
           }
-          if (--plen > 0) {
-            /* Replace macro*/
+          if (plen > 0) {
+            /* Replace macro */
             strncpy(pinto, pval, plen);
             pinto += strlen(pval);
             plen -= plen > strlen(pval) ? strlen(pval) : plen;
@@ -114,12 +115,13 @@ _evalMacros(char *apinto, hTab *pvals, const char *pfrom, size_t alen)
       break;
 
     default:
-      if (quote != '\0') {
+      if ('\0' != quote) {
         *pinto++ = quote;
+        --plen;
         quote = '\0';
       }
 
-      if (--plen > 0) {
+      if (plen > 0) {
         /* Pass through */
         *pinto++ = *pfrom++;
         --plen;
@@ -127,10 +129,15 @@ _evalMacros(char *apinto, hTab *pvals, const char *pfrom, size_t alen)
     }
   }
 
-  if (!plen) {
+  if (plen > 0 && '\0' != quote) {
+    *pinto++ = quote;
+    --plen;
+  }
+
+  if (plen <= 0) {
     wassertl(0, "macro expansion too long");
   }
-    
+
   *pinto = '\0';
 
   /* If we did something then recursivly expand any expanded macros */
@@ -155,8 +162,8 @@ mvsprintf(hTab *pvals, const char *pformat, va_list ap)
     {
         fprintf(stderr, "Internal error: mvsprintf output truncated.\n");
     }
-#else    
-    {   
+#else
+    {
         int wlen; 
         
         wlen = vsprintf(atmp, ainto, ap);
@@ -166,8 +173,8 @@ mvsprintf(hTab *pvals, const char *pformat, va_list ap)
             wassertl(0, "mvsprintf overflowed.");
         }
     }
-#endif    
-    
+#endif
+
   /* Recursivly evaluate any macros that were used as arguments */
   _evalMacros(ainto, pvals, atmp, MAX_STRING_LENGTH);
 

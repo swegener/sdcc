@@ -319,8 +319,8 @@ symbolVal (symbol * sym)
 /* cheapestVal - convert a val to the cheapest as possible value      */
 /*--------------------------------------------------------------------*/
 value *cheapestVal (value *val) {
-  long sval=0;
-  unsigned long uval=0;
+  TYPE_DWORD  sval=0;
+  TYPE_UDWORD uval=0;
 
   if (IS_FLOAT(val->type) || IS_CHAR(val->type))
     return val;
@@ -378,9 +378,9 @@ valueFromLit (double lit)
 {
   char buffer[50];
 
-  if ((((long) lit) - lit) == 0)
+  if ((((TYPE_DWORD) lit) - lit) == 0)
     {
-      SNPRINTF (buffer, sizeof(buffer), "%ld", (long) lit);
+      SNPRINTF (buffer, sizeof(buffer), "%d", (TYPE_DWORD) lit);
       return constVal (buffer);
     }
 
@@ -428,7 +428,7 @@ value *constVal (char *s)
   SPEC_SCLS (val->type) = S_LITERAL;
   // let's start with an unsigned char
   SPEC_NOUN (val->type) = V_CHAR;
-  SPEC_USIGN (val->type) = 1;
+  SPEC_USIGN (val->type) = 0;
 
   hex = ((strchr (s, 'x') || strchr (s, 'X')) ? 1 : 0);
 
@@ -454,6 +454,7 @@ value *constVal (char *s)
     unsigned long sval;
     sscanf (s, scanFmt, &sval);
     dval=sval;
+    SPEC_USIGN (val->type) = 1;
   } else {
     sscanf (s, scanFmt, &dval);
   }
@@ -465,8 +466,12 @@ value *constVal (char *s)
     SPEC_LONG (val->type) = 1;
   }
 
+  /* set the unsigned flag if 'uU' is found */
+  if (strchr (s, 'u') || strchr (s, 'U')) {
+    SPEC_USIGN (val->type) = 1;
+  }
+
   if (dval<0) { // "-28u" will still be signed and negative
-    SPEC_USIGN (val->type) = 0;
     if (dval<-128) { // check if we have to promote to int
       SPEC_NOUN (val->type) = V_INT;
     }
@@ -474,10 +479,16 @@ value *constVal (char *s)
       SPEC_LONG (val->type) = 1;
     }
   } else { // >=0
-    if (dval>0xff) { // check if we have to promote to int
+    if (dval>0xff && SPEC_USIGN (val->type)) { // check if we have to promote to int
       SPEC_NOUN (val->type) = V_INT;
     }
-    if (dval>0xffff) { // check if we have to promote to long int
+    else if (dval>0x7f && !SPEC_USIGN (val->type)) { // check if we have to promote to int
+      SPEC_NOUN (val->type) = V_INT;
+    }
+    if (dval>0xffff && SPEC_USIGN (val->type)) { // check if we have to promote to long
+      SPEC_LONG (val->type) = 1;
+    }
+    else if (dval>0x7fff && !SPEC_USIGN (val->type)) { // check if we have to promote to long int
       SPEC_LONG (val->type) = 1;
     }
   }
@@ -769,7 +780,6 @@ value *
 charVal (char *s)
 {
   value *val;
-//  unsigned uValue ;
 
   val = newValue ();
 
@@ -1017,23 +1027,39 @@ valMult (value * lval, value * rval)
   val->type = val->etype = newLink (SPECIFIER);
   SPEC_NOUN (val->type) = (IS_FLOAT (lval->etype) ||
 			   IS_FLOAT (rval->etype) ? V_FLOAT : V_INT);
-  SPEC_SCLS (val->type) = S_LITERAL;	/* will remain literal */
-  SPEC_USIGN (val->type) = (SPEC_USIGN (lval->etype) & SPEC_USIGN (rval->etype));
-  SPEC_LONG (val->type) = 1;
+  SPEC_SCLS  (val->type) = S_LITERAL;	/* will remain literal */
+  SPEC_USIGN (val->type) = (SPEC_USIGN (lval->etype) | SPEC_USIGN (rval->etype));
+  SPEC_LONG  (val->type) = (SPEC_LONG  (lval->etype) | SPEC_LONG  (rval->etype));
 
   if (IS_FLOAT (val->type))
     SPEC_CVAL (val->type).v_float = floatFromVal (lval) * floatFromVal (rval);
   else
     {
+      /* signed and unsigned mul are the same, as long as the precision of the
+         result isn't bigger than the precision of the operands. */
       if (SPEC_LONG (val->type))
-	{
-	  if (SPEC_USIGN (val->type))
-	    SPEC_CVAL (val->type).v_ulong = (unsigned long) floatFromVal (lval) *
-	      (unsigned long) floatFromVal (rval);
-	  else
-	    SPEC_CVAL (val->type).v_long = (long) floatFromVal (lval) *
-	      (long) floatFromVal (rval);
-	}
+        SPEC_CVAL (val->type).v_ulong = (TYPE_UDWORD) floatFromVal (lval) *
+	                                (TYPE_UDWORD) floatFromVal (rval);
+      else
+        {
+          TYPE_UDWORD ul = (TYPE_UWORD) floatFromVal (lval) *
+                           (TYPE_UWORD) floatFromVal (rval);
+          
+          SPEC_CVAL (val->type).v_uint = (TYPE_UWORD) ul;
+          if (!options.lessPedantic)
+            {
+              if (SPEC_USIGN (val->type))
+                {
+                  if (ul != SPEC_CVAL (val->type).v_uint)
+                    werror (W_INT_OVL);
+                }
+              else /* signed result */
+                {
+                  if ((TYPE_DWORD) ul != SPEC_CVAL (val->type).v_int)
+                    werror (W_INT_OVL);
+                }
+            }
+        }
     }
   return cheapestVal(val);
 }
@@ -1058,7 +1084,7 @@ valDiv (value * lval, value * rval)
   SPEC_NOUN (val->type) = (IS_FLOAT (lval->etype) ||
 			   IS_FLOAT (rval->etype) ? V_FLOAT : V_INT);
   SPEC_SCLS (val->etype) = S_LITERAL;
-  SPEC_USIGN (val->type) = (SPEC_USIGN (lval->etype) & SPEC_USIGN (rval->etype));
+  SPEC_USIGN (val->type) = (SPEC_USIGN (lval->etype) | SPEC_USIGN (rval->etype));
   SPEC_LONG (val->type) = (SPEC_LONG (lval->etype) | SPEC_LONG (rval->etype));
 
   if (IS_FLOAT (val->type))
@@ -1102,7 +1128,7 @@ valMod (value * lval, value * rval)
   val->type = val->etype = newLink (SPECIFIER);
   SPEC_NOUN (val->type) = V_INT;	/* type is int */
   SPEC_SCLS (val->type) = S_LITERAL;	/* will remain literal */
-  SPEC_USIGN (val->type) = (SPEC_USIGN (lval->etype) & SPEC_USIGN (rval->etype));
+  SPEC_USIGN (val->type) = (SPEC_USIGN (lval->etype) | SPEC_USIGN (rval->etype));
   SPEC_LONG (val->type) = (SPEC_LONG (lval->etype) | SPEC_LONG (rval->etype));
 
   if (SPEC_LONG (val->type))

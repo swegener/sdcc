@@ -1043,7 +1043,7 @@ operandOperation (operand * left, operand * right,
   let = getSpec(operandType(left));
   if (right) {
     assert (isOperandLiteral (right));
-    ret = getSpec(operandType(left));
+    ret = getSpec(operandType(right));
   }
 
   switch (op)
@@ -1081,41 +1081,34 @@ operandOperation (operand * left, operand * right,
 	  retval = right;
       }
       else
-	retval = operandFromLit ((SPEC_USIGN(let) ?
-				  (TYPE_UDWORD) operandLitValue (left) :
-				  (TYPE_DWORD) operandLitValue (left)) %
-				 (SPEC_USIGN(ret) ?
-				  (TYPE_UDWORD) operandLitValue (right) :
-				  (TYPE_DWORD) operandLitValue (right)));
-
+        {
+          if (SPEC_USIGN(let) || SPEC_USIGN(ret))
+	    /* one of the operands is unsigned */
+	    retval = operandFromLit ((TYPE_UDWORD) operandLitValue (left) %
+				     (TYPE_UDWORD) operandLitValue (right));
+	  else
+	    /* both operands are signed */
+	    retval = operandFromLit ((TYPE_DWORD) operandLitValue (left) %
+				     (TYPE_DWORD) operandLitValue (right));
+        }
       break;
     case LEFT_OP:
-      retval = operandFromLit ((SPEC_USIGN(let) ?
-				  (TYPE_UDWORD) operandLitValue (left) :
-				  (TYPE_UDWORD) operandLitValue (left)) <<
-				 (SPEC_USIGN(ret) ?
-				  (TYPE_UDWORD) operandLitValue (right) :
-				  (TYPE_UDWORD) operandLitValue (right)));
+      /* The number of left shifts is always unsigned. Signed doesn't make
+	 sense here. Shifting by a negative number is impossible. */
+      retval = operandFromLit ((TYPE_UDWORD) operandLitValue (left) <<
+			       (TYPE_UDWORD) operandLitValue (right));
       break;
     case RIGHT_OP: {
-      double lval = operandLitValue(left), rval = operandLitValue(right);
-      double res=0;
-      switch ((SPEC_USIGN(let) ? 2 : 0) + (SPEC_USIGN(ret) ? 1 : 0))
-	{
-	case 0: // left=unsigned right=unsigned
-	  res=(TYPE_UDWORD)lval >> (TYPE_UDWORD)rval;
-	  break;
-	case 1: // left=unsigned right=signed
-	  res=(TYPE_UDWORD)lval >> (TYPE_DWORD)rval;
-	  break;
-	case 2: // left=signed right=unsigned
-	  res=(TYPE_DWORD)lval >> (TYPE_UDWORD)rval;
-	  break;
-	case 3: // left=signed right=signed
-	  res=(TYPE_DWORD)lval >> (TYPE_DWORD)rval;
-	  break;
-	}
-      retval = operandFromLit (res);
+      /* The number of right shifts is always unsigned. Signed doesn't make
+	 sense here. Shifting by a negative number is impossible. */
+      if (SPEC_USIGN(let))
+        /* unsigned: logic shift right */
+        retval = operandFromLit ((TYPE_UDWORD) operandLitValue (left) >>
+				 (TYPE_UDWORD) operandLitValue (right));
+      else
+        /* signed: arithmetic shift right */
+        retval = operandFromLit ((TYPE_DWORD ) operandLitValue (left) >>
+				 (TYPE_UDWORD) operandLitValue (right));
       break;
     }
     case EQ_OP:

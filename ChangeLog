@@ -1,3 +1,13 @@
+2003-08-05  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCval.c (cheapestVal, valueFromLit): use TYPE_* types
+	* src/SDCCval.c (constVal): changed default to signed; hex and octal
+	constants are unsigned; added recognition of "u" flag for unsigned
+	* src/SDCCval.c (valMult): fixed signdness, added warning for overflow
+	* src/SDCCval.c (valDiv, valMod): fixed signdness
+	* src/SDCCicode.c (operandOperation): fixed critical typo; fixed
+	signedness of modulo, left and right shift
+
 2003-08-04  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	Fixed some warnings when building with MSVC:

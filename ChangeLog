@@ -1,5 +1,9 @@
 2003-06-19  Borut Razem <borut.razem@siol.net>
 
+	* src/z80/main.c: fixed Z80 port again: missing -k library paths in linker command line
+
+2003-06-19  Borut Razem <borut.razem@siol.net>
+
 	* src/SDCCutil.h, src/SDCCutil.c, src/SDCCglobl.h, src/SDCCmain.c, src/z80/main.c:
 	fixed Z80 port - crt0.o: cannot open.
 

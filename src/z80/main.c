@@ -27,6 +27,7 @@
 #include "MySystem.h"
 #include "BuildCmd.h"
 #include "SDCCutil.h"
+#include "dbuf.h"
 
 static char _z80_defaultRules[] =
 {
@@ -288,8 +289,20 @@ _setValues(void)
     {
       const char *s;
       char path[PATH_MAX];
+      struct dbuf_s dbuf;
 
-      setMainValue ("z80libspec", "-l\"{port}.lib\"");
+      dbuf_init(&dbuf, PATH_MAX);
+
+      for (s = setFirstItem(libDirsSet); s != NULL; s = setNextItem(libDirsSet))
+        {
+          buildCmdLine2(path, sizeof path, "-k\"%s" DIR_SEPARATOR_STRING "{port}\" ", s);
+          dbuf_append(&dbuf, path, strlen(path));
+        }
+      buildCmdLine2(path, sizeof path, "-l\"{port}.lib\"", s);
+      dbuf_append(&dbuf, path, strlen(path));
+
+      setMainValue ("z80libspec", dbuf_c_str(&dbuf));
+      dbuf_destroy(&dbuf);
 
       for (s = setFirstItem(libDirsSet); s != NULL; s = setNextItem(libDirsSet))
         {

@@ -303,9 +303,13 @@ DEFSETFUNC (findCheaperOp)
 
   if ((*opp) && 
       (isOperandLiteral(*opp) || 
+#if 0 // jwk: because of bug #480645, this is clumsy anyway. E.g.
        getSize(operandType(*opp)) == getSize(operandType(cop)) ||
        (SPEC_USIGN(operandType (cop))==SPEC_USIGN(operandType (*opp)) &&
 	(SPEC_LONG(operandType (cop))==SPEC_LONG(operandType (*opp))))))
+#else
+       compareType(operandType(*opp), operandType(cop))==1))
+#endif
     {
 
       if ((isGlobalInNearSpace (cop) &&

@@ -1,3 +1,7 @@
+2004-02-16 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* doc/sdccman.lyx: added Vangelis' contribution
+
 2004-02-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCClrange.c (rlivePoint): live range of SEND operand should

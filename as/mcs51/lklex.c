@@ -160,13 +160,13 @@ char *id;
  *		int	c		this is first character to
  *					copy to the string buffer
  *
- *	The function getfid() scans the current input text line
- *	from the current position copying the next string
- *	into the external string buffer (str).  The string ends when a
- *	non SPACE type character is found. The maximum number of
- *	characters copied is PATH_MAX. If the input string is larger than
- *	PATH_MAX characters then the string is truncated, if the input string
- *	is shorter than PATH_MAX characters then the string is NULL filled.
+ *	The function getfid() scans the current input text line from
+ *	the current position copying the next string into the external
+ *	string buffer (str).  The string ends when end of line is found.
+ *	Trailing spacers are removed. The maximum number of characters
+ *	copied is PATH_MAX. If the input string is larger than PATH_MAX
+ *	characters then the string is truncated. The string is NULL
+ *	terminated.
  *
  *	local variables:
  *		char *	p		pointer to external string buffer
@@ -194,16 +194,18 @@ char *str;
 	register char *p;
 
 	p = str;
-	do {
+	do
+	{
 		if (p < &str[PATH_MAX-1])
 			*p++ = c;
 		c = get();
 	} while (c);
-        /* trim trailing spaces */
-        while (ctype[*(--p)] == SPACE)
-          ;
-        /* terminate the string */
-        *(++p) = '\0';
+	/* trim trailing spaces */
+	--p;
+	while (p >= str && ctype[(int)*p] == SPACE)
+		--p;
+	/* terminate the string */
+	*(++p) = '\0';
 }
 
 /*)Function	char	getnb()

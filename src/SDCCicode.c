@@ -2661,6 +2661,11 @@ geniCodeCall (operand * left, ast * parms,int lvl)
   sym_link *type, *etype;
   int stack = 0;
 
+  if (!IS_FUNC(OP_SYMBOL(left)->type)) {
+    werror (E_FUNCTION_EXPECTED);
+    return NULL;
+  }
+
   /* take care of parameters with side-effecting
      function calls in them, this is required to take care
      of overlaying function parameters */

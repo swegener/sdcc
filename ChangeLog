@@ -1,3 +1,16 @@
+2003-08-16  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	Fixed bug #748310 (pointer to function type mishandled when the
+	function name is omitted). Also fixed a SIGSEGV when a function
+	attribute (reentrant, etc) is used on a non-function or on a
+	function but misplaced before the parameter list.
+
+	* src/SDCC.y (abstract_declarator, abstract_declaractor2): fixed
+	bug #748310
+	* src/SDCC.y (declarator2_function_attributes): avoided SIGSEGV
+	* support/Util/SDCCerr.h,
+	* support/Util/SDCCerr.c: Added func attr misuse error msg
+
 2003-08-13  Bernhard Held <bernhard@bernhardheld.de>
 
 	Fixed bug #787649 by anonymous

@@ -393,6 +393,8 @@ struct
     "interrupt number '%u' is not valid" },
 { W_BITFLD_NAMED, ERROR_LEVEL_WARNING,
     "ignoring declarator of 0 length bitfield" },
+{ E_FUNC_ATTR, ERROR_LEVEL_ERROR,
+    "function attribute following non-function declaration"},
 };
 
 /*

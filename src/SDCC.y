@@ -928,22 +928,32 @@ declarator
 declarator2_function_attributes
    : declarator2		  { $$ = $1 ; } 
    | declarator2 function_attribute  { 
-       // copy the functionAttributes (not the args and hasVargs !!)
-       sym_link *funcType=$1->etype;
-       struct value *args=FUNC_ARGS(funcType);
-       unsigned hasVargs=FUNC_HASVARARGS(funcType);
+       if ((! $1) || (! IS_FUNC($1->etype)))
+         {
+           // function_attribute is only allowed if declarator2 was
+           // an actual function
+           werror(E_FUNC_ATTR);
+           $$=$1;
+         }
+       else
+         {
+           // copy the functionAttributes (not the args and hasVargs !!)
+           sym_link *funcType=$1->etype;
+           struct value *args=FUNC_ARGS(funcType);
+           unsigned hasVargs=FUNC_HASVARARGS(funcType);
 
-       memcpy (&funcType->funcAttrs, &$2->funcAttrs, 
-	       sizeof($2->funcAttrs));
+           memcpy (&funcType->funcAttrs, &$2->funcAttrs, 
+    	       sizeof($2->funcAttrs));
 
-       FUNC_ARGS(funcType)=args;
-       FUNC_HASVARARGS(funcType)=hasVargs;
+           FUNC_ARGS(funcType)=args;
+           FUNC_HASVARARGS(funcType)=hasVargs;
 
-       // just to be sure
-       memset (&$2->funcAttrs, 0,
-	       sizeof($2->funcAttrs));
-       
-       addDecl ($1,0,$2); 
+           // just to be sure
+           memset (&$2->funcAttrs, 0,
+    	       sizeof($2->funcAttrs));
+           
+           addDecl ($1,0,$2); 
+         }
    }     
    ;
 
@@ -1153,7 +1163,10 @@ type_name
 abstract_declarator
    : pointer { $$ = reverseLink($1); }
    | abstract_declarator2
-   | pointer abstract_declarator2   { $1 = reverseLink($1); $1->next = $2 ; $$ = $1;} 
+   | pointer abstract_declarator2   { $1 = reverseLink($1); $1->next = $2 ; $$ = $1;
+	  if (IS_PTR($1) && IS_FUNC($2))
+	    DCL_TYPE($1) = CPOINTER;
+	} 
    ;
 
 abstract_declarator2
@@ -1197,22 +1210,21 @@ abstract_declarator2
      }
      $1->next=p;
    }
-   | abstract_declarator2 '(' parameter_type_list ')' {
-     if (!IS_VOID($3->etype)) {
-       // this is nonsense, so let's just burp something
-       werror(E_TOO_FEW_PARMS);
-     } else {
-       // $1 must be a pointer to a function
+   | abstract_declarator2 '(' { NestLevel++ ; currBlockno++; } parameter_type_list ')' {
        sym_link *p=newLink(DECLARATOR);
        DCL_TYPE(p) = FUNCTION;
-       if (!$1) {
-	 // ((void (code *) (void)) 0) ()
-	 $1=newLink(DECLARATOR);
-	 DCL_TYPE($1)=CPOINTER;
-	 $$ = $1;
-       }
-       $1->next=p;
-     }
+	   
+       FUNC_HASVARARGS(p) = IS_VARG($4);
+       FUNC_ARGS(p) = reverseVal($4);
+	     
+       /* nest level was incremented to take care of the parms  */
+       NestLevel-- ;
+       currBlockno--;
+       p->next = $1;
+       $$ = p;
+
+       // remove the symbol args (if any)
+       cleanUpLevel(SymbolTab,NestLevel+1);
    }
    ;
 

@@ -1,6 +1,9 @@
 2004-01-30 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* support/regression/tests/libmullong.c: fixed for 64 bit hosts
+	Slade Rich fixed an optimization bug
+	* src/pic/pcodepeep.c,
+	* src/pic/pcoderegs.c
 
 2004-01-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

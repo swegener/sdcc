@@ -40,7 +40,7 @@ extern void dbg_dumpregusage(void);
 extern pCode * findPrevInstruction(pCode *pci);
 extern pBranch * pBranchAppend(pBranch *h, pBranch *n);
 void unlinkpCode(pCode *pc);
-extern int pCodeSearchCondition(pCode *pc, unsigned int cond);
+extern int pCodeSearchCondition(pCode *pc, unsigned int cond, int contIfSkip);
 char *pCode2str(char *str, int size, pCode *pc);
 void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...);
 int total_registers_saved=0;
@@ -458,64 +458,38 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
   //pc2->print(stderr,pc2);
 
   if((PCI(pc1)->op == POC_CLRF) && (PCI(pc2)->op == POC_MOVFW) ){
-    pCode *pc;
+    pCode *newpc;
     int regUsed = 0;
     int wUsed   = 0;
     int wSaved  = 0;
-    int wChgd   = 0;
-
     /*
-      clrf  reg
+      clrf  reg    ; pc1
       stuff...
-      movf  reg,w
+      movf  reg,w  ; pc2
 
-      can be replaced with (only if next instructions are not going to use W and reg is not used again later)
+      can be replaced with (only if following instructions are not going to use W and reg is not used again later)
 
       stuff...
       movlw 0 or clrf  reg
     */
-
-    pCode *newpc;
     DFPRINTF((stderr, "   optimising CLRF reg ... MOVF reg,W to ... MOVLW 0\n"));
-    pct1 = pc = findNextInstruction(pc2->next);
+    pct2 = findNextInstruction(pc2->next);
 
-    if(PCI(pct1)->op == POC_MOVWF) {
+    if(pct2 && PCI(pct2)->op == POC_MOVWF) {
       wSaved = wUsed = 1; /* Maybe able to replace with clrf pc2->next->reg. */
-      pc = findNextInstruction(pc->next);
+	} else {
+		wUsed = pCodeSearchCondition(pct2,PCC_W,1) > 0;
     }
-    for (; pc; pc = findNextInstruction(pc->next)) {
-      if (isPCI(pc)) {
-        regs *r;
-        if (!wChgd) {
-          if (PCI(pc)->inCond & PCC_W)
-            wUsed = 1;
-          if (PCI(pc)->outCond & PCC_W) {
-            pCode *pcp = findPrevInstruction(pc);
-            if (pcp && !isPCI_SKIP(pcp)) {
-              wChgd = 1; /* W has changed so we no longer care if it is used, however if there is a preceding skip instruction then maybe current W is still going to be used */
-            if (regUsed)
-              break;
-            }
-          }
-        }
-        r = getRegFromInstruction(pc); /* Check if reg is used later. */
-        if (r && (r->rIdx==reg->rIdx)) {
-          if (!(PCI(pc)->outCond & PCC_REGISTER))
-            regUsed = 1;
-          if (wChgd)
-            break;
-        }
-      }
-    }
-    if(regUsed&&wUsed) {
+    regUsed = regUsedinRange(pct2,0,reg);
+    if ((regUsed&&wUsed) || (pCodeSearchCondition(pct2,PCC_Z,0) > 1)) {
       /* Do not optimise as exisiting code is required. */
     } else {
       /* Can optimise. */
       if(regUsed) {
         newpc = newpCode(POC_CLRF, PCI(pc1)->pcop);
       } else if(wSaved && !wUsed) {
-        newpc = newpCode(POC_CLRF, PCI(pct1)->pcop);
-        pct1->destruct(pct1);
+        newpc = newpCode(POC_CLRF, PCI(pct2)->pcop);
+        pct2->destruct(pct2);
       } else {
         newpc = newpCode(POC_MOVLW, newpCodeOpLit(0));
       }
@@ -532,7 +506,7 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
 
     pct2 = findNextInstruction(pc2->next);
 
-    if(pCodeSearchCondition(pct2, PCC_Z) > 0) {
+    if(pCodeSearchCondition(pct2, PCC_Z,0) > 0) {
       pct2 = newpCode(POC_IORLW, newpCodeOpLit(0));
       pct2->seq = pc2->seq;
       PCI(pct2)->pcflow = PCFL(pcfl_used);
@@ -553,47 +527,36 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
         /*
         Change:
 
-        movwf   reg
-
+        movwf   reg    ; pc1
         stuff...
+        movf    reg,w  ; pc2
+        movwf   reg2   ; pct2
 
-        movf    reg,w
+        To: ( as long as 'stuff' does not use reg2 or if following instructions do not use W or reg is not used later)
+
         movwf   reg2
-
-        To:
-
+        stuff...
 
         */
         reg2 = getRegFromInstruction(pct2);
-        if(reg2 && !regUsedinRange(pc1,pc2,reg2)) {
-
-          if(pCodeSearchCondition(pct2, PCC_Z) < 1) {
-            pCode *pct3 = findNextInstruction(pct2->next);
-            DFPRINTF((stderr, "   optimising MOVF reg ... MOVF reg,W MOVWF reg2\n"));
+        /* Check reg2 is not used for something else before it is loaded with reg */
+        if (reg2 && !regUsedinRange(pc1,pc2,reg2)) {
+          pCode *pct3 = findNextInstruction(pct2->next);
+          /* Check following instructions are not relying on the use of W or the Z flag condiction */
+          if ((pCodeSearchCondition(pct3,PCC_Z,0) < 1) || (pCodeSearchCondition(pct3,PCC_W,0) < 1)) {
+            DFPRINTF((stderr, "   optimising MOVF reg ... MOVF reg,W MOVWF reg2 to MOVWF reg2 ...\n"));
             pct2->seq = pc1->seq;
             unlinkpCode(pct2);
-            pCodeInsertAfter(findPrevInstruction(pc1->prev),pct2);
-
-#define usesW(x)       ((x) && (isPCI(x)) && ( (PCI(x)->inCond & PCC_W) != 0))
-
-            if(usesW(pct3))
-              ; // Remove2pcodes(pcfl_used, pc1, NULL, reg, can_free);
+            pCodeInsertBefore(pc1,pct2);
+            if(regUsedinRange(pct2,0,reg))
+              Remove2pcodes(pcfl_used, pc2, NULL, reg, can_free);
             else
               Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
 
             total_registers_saved++;  // debugging stats.
             return 1;
-            } else {
-              //fprintf(stderr,"didn't optimize because Z bit is used\n");
-            }
+          }
         }
-/*
-        fprintf(stderr, " couldn't optimize\n");
-        if(reg2)
-          fprintf(stderr, " %s is used in range\n",reg2->name);
-        else
-          fprintf(stderr, " reg2 is NULL\n");
-*/
       }
     }
 

@@ -47,6 +47,7 @@ char *pCode2str(char *str, int size, pCode *pc);
 char *get_op( pCodeOp *pcop,char *buf,int buf_size);
 
 extern pCodeInstruction *pic14Mnemonics[];
+extern pCode * findPrevInstruction(pCode *pci);
 
 
 #define IS_PCCOMMENT(x) ( x && (x->type==PC_COMMENT))
@@ -1476,9 +1477,8 @@ static void * DLL_append(_DLL *list, _DLL *next)
 /* -1 - The Condition was found for a pCode's output               */
 /*                                                                 */
 /*-----------------------------------------------------------------*/
-int pCodeSearchCondition(pCode *pc, unsigned int cond)
+int pCodeSearchCondition(pCode *pc, unsigned int cond, int contIfSkip)
 {
-  //fprintf(stderr,"Checking conditions %d\n",cond);
   while(pc) {
 
     /* If we reach a function end (presumably an end since we most
@@ -1488,13 +1488,28 @@ int pCodeSearchCondition(pCode *pc, unsigned int cond)
       return 0;
 
     if(pc->type == PC_OPCODE) {
-      //fprintf(stderr," checking conditions of: ");
-      //pc->print(stderr,pc);
-      //fprintf(stderr,"\t\tinCond=%d\toutCond=%d\n",PCI(pc)->inCond,PCI(pc)->outCond);
-      if(PCI(pc)->inCond & cond)
-	return 1;
-      if(PCI(pc)->outCond & cond)
-	return -1;
+      if(PCI(pc)->inCond & cond) {
+        if (contIfSkip) {
+          /* If previous instruction is a skip then continue search as condiction is not certain */
+          pCode *pcp = findPrevInstruction(pc);
+          if (pcp && !isPCI_SKIP(pcp)) {
+            return 1;
+          }
+        } else {
+          return 1;
+        }
+      }
+      if(PCI(pc)->outCond & cond) {
+        if (contIfSkip) {
+          /* If previous instruction is a skip then continue search as condiction is not certain */
+          pCode *pcp = findPrevInstruction(pc);
+          if (pcp && !isPCI_SKIP(pcp)) {
+            return -1;
+          }
+        } else {
+          return -1;
+        }
+      }
     }
 
     pc = pc->next;
@@ -1966,7 +1981,7 @@ int pCodePeepMatchRule(pCode *pc)
       //pcin->print(stderr,pcin);
       
       if (pcin && peepBlock->postFalseCond && 
-	  (pCodeSearchCondition(pcin,peepBlock->postFalseCond) > 0) )
+	  (pCodeSearchCondition(pcin,peepBlock->postFalseCond,0) > 0) )
 	matched = 0;
 
       //fprintf(stderr," condition results = %d\n",pCodeSearchCondition(pcin,peepBlock->postFalseCond));

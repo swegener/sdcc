@@ -1,3 +1,17 @@
+2005-04-06 Vangelis Rokas <vrokas AT users.sourceforge.net>
+
+        * device/include/pic16/usart.h: added, missing in previous commit,
+        * device/include/pic16/adc.h: fixed typo,
+        * device/lib/pic16/libc/utils/cvtdec.S: added missing in previous
+        commit,
+        * device/lib/pic16/libc/stdlib/g_ftoa.S: modified to include
+        <p18fxxx.inc>
+        * device/lib/pic16/libc/stdio/streams.c: leave stdin, stdout
+        uninitialized because a bug appears with gplink
+        * device/lib/pic16/{some makefiles}: moved $(CSTD) from CFLAGS to
+        COMPILE_FLAGS and added CPPFLAGS with -nostdinc because sdcpp
+        complains for unrecognised option
+
 2005-04-05 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/gen.c (pic16_popCopyReg): made copying work for extended

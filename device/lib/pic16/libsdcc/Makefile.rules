@@ -23,10 +23,15 @@ DEBUG	=
 
 OPT_FLAGS	+= --optimize-cmp
 #OPT_FLAGS	+= --stack-auto
-COMPILE_FLAGS	+= $(MODELFLAGS) $(OPT_FLAGS) $(DEBUG)
 
-CFLAGS  += $(CSTD)
+COMPILE_FLAGS	+= $(MODELFLAGS)
+COMPILE_FLAGS   += $(OPT_FLAGS) $(DEBUG)
+COMPILE_FLAGS   += $(CSTD)
+
+CPPFLAGS        := -nostdinc $(CFLAGS) -I$(LIBC_INC_DIR)
+
 CFLAGS	+= --nostdinc -I$(LIBC_INC_DIR)
+
 
 CFILES	= $(patsubst %,%.c,$(SRCS))
 COFILES	= $(patsubst %.c,%.o,$(CFILES))
@@ -57,7 +62,7 @@ clean: clean-intermediate
 dep .depend:
 	rm -f .depend
 	for temp in $(CFILES); do \
-		$(CPP) $(MM) $(CFLAGS) $$temp > .tmpdepend; \
+		$(CPP) $(MM) $(CPPFLAGS) $$temp > .tmpdepend; \
 		$(SED) s/.rel/.o/g .tmpdepend >> .depend; \
 		$(RM) -f .tmpdepend; \
 	done;

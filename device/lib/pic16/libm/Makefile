@@ -61,9 +61,9 @@ SRCS	=	acosf  \
 		tanhf
 
 COMPILE_FLAGS	+= $(MODELFLAGS) $(OPT_FLAGS)
+COMPILE_FLAGS   += $(CSTD)
 
-CFLAGS	+= $(CSTD)
-CFLAGS += -I $(PRJDIR)/device/include/pic16
+CFLAGS  += -I $(PRJDIR)/device/include/pic16
 
 
 CFILES	= $(patsubst %,%.c,$(SRCS))

@@ -29,5 +29,7 @@
 
 #include <stdio.h>
 
-FILE *stdout = STREAM_USER;
-FILE *stdin = STREAM_USER;
+FILE *stdout;
+// = STREAM_USER;
+FILE *stdin;
+// = STREAM_USER;

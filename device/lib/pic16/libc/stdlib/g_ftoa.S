@@ -21,7 +21,7 @@
 		list	r=dec, n=96, st=off, mm=off
 
 		nolist
-		include		"/usr/local/share/gputils/header/p18f452.inc"
+		include		<p18fxxx.inc>
 		list
 
 		udata

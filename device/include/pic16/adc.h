@@ -91,7 +91,7 @@ void adc_conv(void);
 /* return 1 if AD is performing a conversion, 0 if done */
 char adc_busy(void) __naked;
 
-/* get value of convertion */
+/* get value of conversion */
 int adc_read(void) __naked;
 
 /* setup conversion channel */

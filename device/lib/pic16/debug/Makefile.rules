@@ -21,7 +21,8 @@ LIBC_INC_DIR	= $(PRJDIR)/device/include/pic16
 
 COMPILE_FLAGS	+= $(MODELFLAGS) $(OPT_FLAGS)
 
-CFLAGS	= --nostdinc -I$(LIBC_INC_DIR)
+CPPFLAGS        := -nostdinc -I$(LIBC_INC_DIR)
+CFLAGS  += --nostdinc -I$(LIBC_INC_DIR)
 
 CFILES	= $(patsubst %,%.c,$(SRCS))
 OFILES	= $(patsubst %.c,%.o,$(CFILES))
@@ -42,7 +43,7 @@ clean: clean-intermediate
 dep .depend:
 	rm -f .depend
 	for temp in $(CFILES); do \
-		$(CPP) $(MM) $(CFLAGS) $$temp > .tmpdepend; \
+		$(CPP) $(MM) $(CPPFLAGS) $$temp > .tmpdepend; \
 		$(SED) s/.rel/.o/g .tmpdepend >> .depend; \
 		$(RM) -f .tmpdepend; \
 	done;

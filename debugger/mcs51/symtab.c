@@ -26,6 +26,7 @@
 #include "newalloc.h"
 
 structdef *structWithName (char *);
+DEFSETFUNC(symWithRName);
 
 /*------------------------------------------------------------------*/
 /* getSize - returns size of a type chain in bits                   */
@@ -88,13 +89,21 @@ unsigned int   getSize ( link *p )
 void parseFunc (char *line)
 {
     function *func ;
-    char *rs;
+    char *rs = line ;
     int i;
+
+    while (*rs && *rs != '(') rs++ ;
+    *--rs = '\0';
+
     func = Safe_calloc(1,sizeof(function));
-    func->sym = parseSymbol(line,&rs);
+    func->sym = NULL;
+    applyToSet(symbols,symWithRName,line,&func->sym);
+    *rs++ = '0';
+    if (! func->sym)
+        func->sym = parseSymbol(line,&rs);
     func->sym->isfunc = 1;
     func->modName = currModName ;
-    while(*rs != ',') rs++;
+    while(*rs && *rs != ',') rs++;
     rs++;
     sscanf(rs,"%d,%d,%d",&i,
      &(SPEC_INTN(func->sym->etype)),
@@ -608,7 +617,7 @@ static void lnkFuncEnd (char *s)
     s++;
     sscanf(s,"%x",&func->sym->eaddr);
 
-    Dprintf(D_symtab, ("%s(eaddr%x)\n",func->sym->name,func->sym->eaddr));
+    Dprintf(D_symtab, ("symtab: %s(eaddr 0x%x)\n",func->sym->name,func->sym->eaddr));
 }
 
 /*-----------------------------------------------------------------*/
@@ -633,7 +642,7 @@ static void lnkSymRec (char *s)
     s++;
     sscanf(s,"%x",&sym->addr);
 
-    Dprintf(D_symtab, ("%s(%x)\n",sym->name,sym->addr));
+    Dprintf(D_symtab, ("symtab: %s(0x%x)\n",sym->name,sym->addr));
 }
 
 /*-----------------------------------------------------------------*/
@@ -663,7 +672,7 @@ static void lnkAsmSrc (char *s)
     line--;
     if (line < mod->nasmLines) {
   mod->asmLines[line]->addr = addr;
-  Dprintf(D_symtab, ("%s(%d:%x) %s",mod->asm_name,line,addr,mod->asmLines[line]->src));
+  Dprintf(D_symtab, ("symtab: %s(%d:0x%x) %s",mod->asm_name,line,addr,mod->asmLines[line]->src));
     }
 }
 
@@ -703,7 +712,7 @@ static void lnkCSrc (char *s)
   mod->cLines[line]->addr = addr;
   mod->cLines[line]->block = block;
   mod->cLines[line]->level = level;
-  Dprintf(D_symtab, ("%s(%d:%x) %s",mod->c_name,
+  Dprintf(D_symtab, ("symtab: %s(%d:0x%x) %s",mod->c_name,
          line+1,addr,mod->cLines[line]->src));
     }
     return;

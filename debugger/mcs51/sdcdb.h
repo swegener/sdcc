@@ -24,16 +24,18 @@
 #ifndef  SDCDB_H
 #define  SDCDB_H
 
-// #define SDCDB_DEBUG
+#define SDCDB_DEBUG
 
 #ifdef SDCDB_DEBUG
 // set D_x to 0 to turn off, 1 to turn on.
-#define D_break  0
-#define D_simi   1
-#define D_sdcdb  1
-#define D_symtab 0
+#define D_break  0x01
+#define D_simi   0x02
+#define D_sdcdb  0x04
+#define D_symtab 0x08
 
-#define Dprintf(f, fs) {if (f) printf fs ; }
+extern int sdcdbDebug;
+
+#define Dprintf(f, fs) {if (f & sdcdbDebug) printf fs ; }
 #else
 #define Dprintf(f, fs) { }
 #endif

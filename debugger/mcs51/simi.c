@@ -45,11 +45,6 @@ static char *sbp = simibuff;           /* simulator buffer pointer */
 extern char **environ;
 char simactive = 0;
 
-
-#if 0
-#define MS_SLEEP(_ms) usleep(_ms * 1000)
-#endif
-
 /*-----------------------------------------------------------------*/
 /* waitForSim - wait till simulator is done its job                */
 /*-----------------------------------------------------------------*/
@@ -58,54 +53,14 @@ void waitForSim(int timeout_ms, char *expect)
   int i=0;
   int ch;
 
-Dprintf(D_simi, ("waitForSim start(%d)\n", timeout_ms));
+Dprintf(D_simi, ("simi: waitForSim start(%d)\n", timeout_ms));
     sbp = simibuff;
-
-    // MS_SLEEP(timeout_ms); dont need, in blocking mode.
 
     while ((ch = fgetc(simin)) > 0 ) {
       *sbp++ = ch;
     }
     *sbp = 0;
     Dprintf(D_simi, ("waitForSim(%d) got[%s]\n", timeout_ms, simibuff));
-
-#if 0
-  hmmmm, I guess we are not running non-blocking, we may still
-  need this code...Im not sure how the above works, it must block
-  until something gets into the buffer, then fgetc() reads down the
-  buffer...
-    do {
-      while ((ch = fgetc(simin))) {
-        *sbp++ = ch;
-      }
-      *sbp = 0;
-printf("got1[%s]\n", simibuff);
-      MS_SLEEP(20);
-      timeout_ms -= 20;
-printf("..\n");
-
-      if (expect) {
-        if (strstr(expect, sbp)) {
-          timeout_ms = 0;
-        }
-      } else if (sbp != simibuff) {
-        timeout_ms = 0;
-      }
-
-      /* pull in data one more time after delay to try and
-         guarentee we pull in complete responce line */
-      if (timeout_ms <= 0) {
-printf(",,\n");
-        while ((ch = fgetc(simin))) {
-          *sbp++ = ch;
-        }
-        *sbp = 0;
-printf("got2[%s]\n", simibuff);
-      }
-    }
-    while (timeout_ms > 0);
-printf("...\n");
-#endif
 
 }
 
@@ -117,14 +72,19 @@ void openSimulator (char **args, int nargs)
     struct sockaddr_in sin;     
     int retry = 0;
     int i ;
- Dprintf(D_simi, ("openSimulator\n"));
+ Dprintf(D_simi, ("simi: openSimulator\n"));
 
     /* fork and start the simulator as a subprocess */
     if ((simPid = fork())) {
-      Dprintf(D_simi, ("simulator pid %d\n",(int) simPid));
+      Dprintf(D_simi, ("simi: simulator pid %d\n",(int) simPid));
     }
     else {
       /* we are in the child process : start the simulator */
+      signal(SIGHUP , SIG_IGN );
+      signal(SIGINT , SIG_IGN );
+      signal(SIGABRT, SIG_IGN );
+      signal(SIGCHLD, SIG_IGN );
+
       if (execvp(args[0],args) < 0) {
         perror("cannot exec simulator");
         exit(1);
@@ -183,7 +143,7 @@ void sendSim(char *s)
     if ( ! simout ) 
         return;
 
-    Dprintf(D_simi, ("sendSim-->%s", s));  // s has LF at end already
+    Dprintf(D_simi, ("simi: sendSim-->%s", s));  // s has LF at end already
     fputs(s,simout);
     fflush(simout);
 }

@@ -1,9 +1,11 @@
 sdcc/debugger
 
-SDCDB debugger
+SDCDB debugger - Development notes.
 ======================
-Notes April 23, 2003
 
+
+Notes April 23, 2003
+========================
 Martin Helmling added support for ddd GUI debugger.
 Code added to display assembly, set variables, and other commands
 to interface to ddd.
@@ -40,9 +42,35 @@ Is this a known bug  in sdcc ?
 Also sometimes not the correct breakpoints for stepping found  in sdcdb. 
 I try to fix this tomorrow.
 
+Additional patches and notes from Martin(4-24-03):
+in the attachment you found three patches:
+debugpatch: Only for debugging, you can switch on and off the 4 different
+             debug and you can grep the debug by the prefix.
+signalpatch:Now the simulator stops if the user sends an interrupt
+             ( or 'ddd' ) and also the simulator does not die by another
+             user signal.
+
+sympatch:   This is not a feature, THIS is the fix of a BUG !!!
+             In some circumstances in the *.cdb file the Symbol record
+             comes before the function record. So the symbol was
+             generated TWO TIMES in the symbol list. The L:G and L:XG 
+
+             records then insert entry and exit address to the wrong
+             symbol. So before a new symbol is generated for the
+             function, a lookup in the symboltable is done.
+
+Example of a *.cdb:
+
+S:G$ZpuInitialize$0$0({2}DF,SV:S),C,0,0
+S:G$ZpuInitialize$0$0({2}DF,SV:S),C,0,0
+F:G$ZpuInitialize$0$0({2}DF,SV:S),Z,0,0,0,0,0
+S:LZpuInitialize$i$1$1({2}SI:S),R,0,0,[]
+L:G$ZpuInitialize$0$0:ADF
+L:XG$ZpuInitialize$0$0:BBB
 
 
 Notes Feb 10, 2002 - Karl Bongers
+========================
 
 SDCDB is a debugger for SDCC compiler.  It works as a front
 end to the ucSim simulator/disassembler program.

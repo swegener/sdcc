@@ -28,6 +28,10 @@
 #include "cmd.h"
 #include "newalloc.h"
 
+#ifdef SDCDB_DEBUG
+int   sdcdbDebug = 0;
+#endif
+
 char *currModName = NULL;
 cdbrecs *recsRoot = NULL ;
 set  *modules = NULL;    /* set of all modules */
@@ -447,7 +451,7 @@ static void functionPoints ()
 
   sym = func->sym;
 
-  Dprintf(D_sdcdb, ("func '%s' has entry '%x' exit '%x'\n",
+  Dprintf(D_sdcdb, ("sdcdb: func '%s' has entry '0x%x' exit '0x%x'\n",
          func->sym->name,
          func->sym->addr,
          func->sym->eaddr));
@@ -512,20 +516,23 @@ static void functionPoints ()
   }
 
 #ifdef SDCDB_DEBUG
-  Dprintf(D_sdcdb, ("function '%s' has the following C exePoints\n",
+  if (!( D_sdcdb & sdcdbDebug))
+      return;
+
+  Dprintf(D_sdcdb, ("sdcdb: function '%s' has the following C exePoints\n",
          func->sym->name));
   {
       exePoint *ep;
 
       for (ep = setFirstItem(func->cfpoints); ep;
      ep = setNextItem(func->cfpoints))
-     Dprintf(D_sdcdb, ("{%x,%d} %s",
+     Dprintf(D_sdcdb, ("sdcdb: {0x%x,%d} %s",
          ep->addr,ep->line,mod->cLines[ep->line]->src));
 
-      Dprintf(D_sdcdb, (" and the following ASM exePoints\n"));
+      Dprintf(D_sdcdb, ("sdcdb:  and the following ASM exePoints\n"));
       for (ep = setFirstItem(func->afpoints); ep;
            ep = setNextItem(func->afpoints))
-        Dprintf (D_sdcdb, ("{%x,%d} %s",
+        Dprintf (D_sdcdb, ("sdcdb: {0x%x,%d} %s",
             ep->addr,ep->line,mod->asmLines[ep->line]->src));
   }
 #endif
@@ -794,7 +801,7 @@ static void parseCmdLine (int argc, char **argv)
     char *filename = NULL;
     int passon_args_flag = 0;  /* if true, pass on args to simulator */
 
-    Dprintf(D_sdcdb, ("parseCmdLine\n"));
+    Dprintf(D_sdcdb, ("sdcdb: parseCmdLine\n"));
 
     for ( i = 1; i < argc ; i++) {
   //fprintf(stdout,"%s\n",argv[i]);
@@ -834,6 +841,13 @@ static void parseCmdLine (int argc, char **argv)
     chdir(argv[i][4]);
     continue;
       }
+
+#ifdef SDCDB_DEBUG
+      if (strncmp(argv[i],"-d=",3) == 0) {
+          sdcdbDebug = strtol(&argv[i][3],0,0);
+          continue;
+      }
+#endif
 
       /* model string */
       if (strncmp(argv[i],"-m",2) == 0) {
@@ -915,8 +929,9 @@ bad_signal(int sig)
 static void
 sigintr(int sig)
 {
-    /* may be interrupt from user: stop debugger ( also simulator ??) */
+    /* may be interrupt from user: stop debugger and also simulator */
     userinterrupt = 1;
+    sendSim("\n");
 }
 
 /* the only child can be the simulator */
@@ -937,7 +952,6 @@ setsignals()
     signal(SIGTERM, bad_signal);	
     signal(SIGCHLD, sigchld );
 
-    signal(SIGPIPE, SIG_IGN);
     signal(SIGABRT, bad_signal);
     signal(SIGALRM, bad_signal);
     signal(SIGFPE,  bad_signal);
@@ -954,7 +968,7 @@ setsignals()
 int main ( int argc, char **argv)
 {
     printVersionInfo();
-    printf("WARNING: SDCDB is EXPERIMENTAL and NOT A FULLY FUNCTIONING TOOL.\n");
+    printf("WARNING: SDCDB is EXPERIMENTAL.\n");
 
     simArgs[nsimArgs++] = "s51";
     simArgs[nsimArgs++] = "-P";

@@ -6710,7 +6710,7 @@ static void shiftR2Left2Result (operand *left, int offl,
 	case 2:
 	case 3:
 		if(sign)
-			emitpcode(POC_RLFW,popGet(AOP(result),offr+MSB16));
+			emitpcode(POC_RLFW,popGet(AOP(left),offl+MSB16));
 		else
 			emitCLRC;
 		

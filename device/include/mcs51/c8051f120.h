@@ -457,6 +457,7 @@ __sbit __at 0xFF P7_7    ;
 #define CAPP              0x20    /* PCA0CPMn                            */
 #define ECOM              0x40    /* PCA0CPMn                            */
 #define PWM16             0x80    /* PCA0CPMn                            */
+#define PINRSF             0x01    /* RSTSRC                              */
 #define PORSF             0x02    /* RSTSRC                              */
 #define SWRSF             0x10    /* RSTSRC                              */
 

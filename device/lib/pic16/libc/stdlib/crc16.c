@@ -79,7 +79,7 @@ __code uint16_t crc_table[256] = {
  *
  * DESCRIPTION
  *	The OSTA-UDF(tm) 1.50 standard states that using CRCs is mandatory.
- *	The polynomial used is:	x^16 + x^12 + x^15 + 1
+ *	The polynomial used is:	x^16 + x^12 + x^5 + 1
  *
  * PRE-CONDITIONS
  *	data		Pointer to the data block.

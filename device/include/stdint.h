@@ -62,8 +62,13 @@ typedef unsigned long int       uint_fast32_t;
 
 
 /* Types for `void *' pointers.  */
-typedef long int                intptr_t;
-typedef unsigned long int       uintptr_t;
+#if defined (SDCC_mcs51) || defined (SDCC_ds390)
+  typedef long int              intptr_t;
+  typedef unsigned long int     uintptr_t;
+#else
+  typedef int                   intptr_t;
+  typedef unsigned int          uintptr_t;
+#endif
 
 
 /* Largest integral types.  */
@@ -117,9 +122,15 @@ typedef unsigned long int       uintmax_t;
 # define UINT_FAST32_MAX        (4294967295UL)
 
 /* Values to test for integral types holding `void *' pointer.  */
+#if defined (SDCC_mcs51) || defined (SDCC_ds390)
 # define INTPTR_MIN             (-2147483647L-1)
 # define INTPTR_MAX             (2147483647L)
 # define UINTPTR_MAX            (4294967295UL)
+#else
+# define INTPTR_MIN             (-32767-1)
+# define INTPTR_MAX             (32767)
+# define UINTPTR_MAX            (65535)
+#endif
 
 /* Minimum for largest signed integral type.  */
 # define INTMAX_MIN             (-__INT32_C(-2147483647L)-1)
@@ -133,8 +144,13 @@ typedef unsigned long int       uintmax_t;
 /* Limits of other integer types.  */
 
 /* Limits of `ptrdiff_t' type.  */
+#if defined (SDCC_mcs51) || defined (SDCC_ds390)
 # define PTRDIFF_MIN           (-2147483647L-1)
 # define PTRDIFF_MAX           (2147483647L)
+#else
+# define PTRDIFF_MIN           (-32767-1)
+# define PTRDIFF_MAX           (32767)
+#endif
 
 /* Limit of `size_t' type.  */
 # define SIZE_MAX               (65535)

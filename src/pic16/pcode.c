@@ -34,6 +34,7 @@
 
 #if defined(__BORLANDC__) || defined(_MSC_VER)
 #define STRCASECMP stricmp
+#define inline
 #else
 #define STRCASECMP strcasecmp
 #endif
@@ -9431,7 +9432,7 @@ static int pic16_safepCodeUnlink (pCode *pc, char *comment) {
   if (0 || pic16_debug_verbose || pic16_pcode_verbose) {
     len = strlen (buf) + strlen (comment) + 10;
     total = (char *) Safe_malloc (len);
-    snprintf (total, len, "%s: %s", comment, buf);
+    SNPRINTF (total, len, "%s: %s", comment, buf);
     pic16_pCodeInsertAfter (pc, pic16_newpCodeCharP(total));
     Safe_free (total);
   }
@@ -9531,9 +9532,6 @@ static symbol_t symFromStr (const char *str) {
 
   if (!map_symToStr) {
     int i;
-    map_strToSym = newHashTable (128);
-    map_symToStr = newHashTable (128);
-
     struct { char *name; symbol_t sym; } predefsyms[] = {
 	{"WREG", SPO_WREG},
 	{"STATUS", SPO_STATUS},
@@ -9574,6 +9572,9 @@ static symbol_t symFromStr (const char *str) {
 	{"TBLPTRU", SPO_TBLPTRU},
 	{NULL, 0}
     };
+
+    map_strToSym = newHashTable (128);
+    map_symToStr = newHashTable (128);
 
     for (i=0; predefsyms[i].name; i++) {
       char *name;
@@ -11457,8 +11458,8 @@ static void assignValnums (pCode *pc) {
   case POC_XORLW: /* modifies STATUS (Z,N) */
     /* can be optimized iff WREG contains a known literal (0x100 - 0x1FF) */
     if (pci->pcop->type == PO_LITERAL) {
-      lit = (unsigned char) PCOL(pci->pcop)->lit;
       int vallit = -1;
+      lit = (unsigned char) PCOL(pci->pcop)->lit;
       val = defmapCurr (list, SPO_WREG, pc);
       if (val) vallit = litFromValnum (val->in_val);
       if (vallit != -1) {
@@ -12059,7 +12060,7 @@ static void pic16_vcg_close (FILE *of) {
 }
 
 #define BUF_SIZE 128
-#define pcTitle(pc) (snprintf (buf, BUF_SIZE, "n_%p, %p/%u", PCODE(pc), isPCI(pc) ? PCI(pc)->pcflow : NULL, PCODE(pc)->seq), &buf[0])
+#define pcTitle(pc) (SNPRINTF (buf, BUF_SIZE, "n_%p, %p/%u", PCODE(pc), isPCI(pc) ? PCI(pc)->pcflow : NULL, PCODE(pc)->seq), &buf[0])
 
 #if 0
 static int ptrcmp (const void *p1, const void *p2) {
@@ -12236,9 +12237,9 @@ static void pic16_vcg_dump_default (pBlock *pb) {
   pc = pb->pcHead;
   while (pc && !isPCF(pc)) pc = pc->next;
   if (pc) {
-    snprintf (buf, BUF_SIZE, "%s_%s.vcg", PCF(pc)->modname, PCF(pc)->fname);
+    SNPRINTF (buf, BUF_SIZE, "%s_%s.vcg", PCF(pc)->modname, PCF(pc)->fname);
   } else {
-    snprintf (buf, BUF_SIZE, "pb_%p.vcg", pb);
+    SNPRINTF (buf, BUF_SIZE, "pb_%p.vcg", pb);
   }
 
   //fprintf (stderr, "now dumping %s\n", buf);

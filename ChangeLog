@@ -1,3 +1,19 @@
+2005-04-06 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/stdarg.h: changed SDCC specific keywords to double
+	  underlined form.
+	* device/include/stdint.h: changed intptr_t and uintptr_t for others than
+	  mcs51 and ds390.
+	* device/include/hc08/mc68hc908gp32.h,
+	* device/include/hc08/mc68hc908jb8.h,
+	* device/include/hc08/mc68hc908jkjl.h,
+	* device/include/hc08/mc68hc908qy.h: fixed comments
+	* device/include/mcs51/README: updated
+	* device/include/mcs51/c8051f120.h: added PINRSF
+	* device/lib/pic16/libc/stdlib/crc16.c: fixed comments
+	* src/pic16/pcode.c: MSVC6 doesn't accept declaring new variables
+	  amidst code. Also inline is not supported.
+
 2005-04-06 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/pcode.c (pic16_pCodeReplace): also update pcflow->end
@@ -6,17 +22,17 @@
 
 2005-04-06 Vangelis Rokas <vrokas AT users.sourceforge.net>
 
-        * device/include/pic16/usart.h: added, missing in previous commit,
-        * device/include/pic16/adc.h: fixed typo,
-        * device/lib/pic16/libc/utils/cvtdec.S: added missing in previous
-        commit,
-        * device/lib/pic16/libc/stdlib/g_ftoa.S: modified to include
-        <p18fxxx.inc>
-        * device/lib/pic16/libc/stdio/streams.c: leave stdin, stdout
-        uninitialized because a bug appears with gplink
-        * device/lib/pic16/{some makefiles}: moved $(CSTD) from CFLAGS to
-        COMPILE_FLAGS and added CPPFLAGS with -nostdinc because sdcpp
-        complains for unrecognised option
+	* device/include/pic16/usart.h: added, missing in previous commit,
+	* device/include/pic16/adc.h: fixed typo,
+	* device/lib/pic16/libc/utils/cvtdec.S: added missing in previous
+	commit,
+	* device/lib/pic16/libc/stdlib/g_ftoa.S: modified to include
+	<p18fxxx.inc>
+	* device/lib/pic16/libc/stdio/streams.c: leave stdin, stdout
+	uninitialized because a bug appears with gplink
+	* device/lib/pic16/{some makefiles}: moved $(CSTD) from CFLAGS to
+	COMPILE_FLAGS and added CPPFLAGS with -nostdinc because sdcpp
+	complains for unrecognised option
 
 2005-04-05 Raphael Neider <rneider AT web.de>
 
@@ -159,7 +175,7 @@
 	* device/include/mcs51/c8051f350.h,
 	* device/include/z180.h: Changed SDCC specific keywords to double
 	underlined form.
-        
+
 2005-03-31 Vangelis Rokas <vrokas AT users.sourceforge.net>
 
 	* src/pic16/device.c (Pics16[]): added devices 18F2550, 18F4331,
@@ -204,7 +220,7 @@
         should be removed from local register store/restore in/from stack
         block,
         * src/pic16/ralloc.c (pic16_decodeOp): added decode for
-        DUMMY_READ_VOLATILE, 
+        DUMMY_READ_VOLATILE,
 
         * device/include/pic16/adc.h: minor prototype modifications and
         update,

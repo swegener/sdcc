@@ -89,15 +89,15 @@ install: installdirs
 	 $(CP) $$model/*.asm $(datadir)/lib/$$model/; \
 	 $(CP) $$model/*.cdb $(datadir)/lib/$$model/; \
 	done
-	$(MAKE) modelDS390 
-	$(CP) ds390/*.lib ds390/*.rel ds390/*.asm ds390/*.cbd $(datadir)/lib/ds390
+	$(CP) ds390/*.lib ds390/*.rel ds390/*.asm ds390/*.cdb $(datadir)/lib/ds390
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	for hdr in *.h; do rm -f $(datadir)/$$hdr; done
-	for model i $(MODELS); do \
+	for hdr in ../include/*.h; do rm -f $(datadir)/include/$$hdr; done
+	for cfl in *.c; do rm -f $(datadir)/lib/$$cfl; done
+	for model in $(MODELS); do \
 	  rm -rf $(datadir)/lib/$$model; \
 	done
 	rm -rf $(datadir)/lib/ds390

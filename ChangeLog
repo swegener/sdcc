@@ -1,3 +1,16 @@
+2004-05-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCdwarf2.c (dwMatchTypes): structs must have matching
+	SPEC_STRUCT
+	* src/SDCCdwarf2.c (dwTagFromType): fix to handle recursive
+	struct definitions
+	* src/SDCCdwarf2.c (dwWriteModule, dwNewDebugSymbol, dwWriteEndFunction,
+	dwWriteLabel): fix to create valid debugger symbols even when
+	the module name has non-alphanumeric symbols in it
+	* src/SDCCdwarf2.c (dwWriteSymbolInternal): better detection for
+	when a variable's allocation has been optimized away
+	
+
 2004-05-13 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (hc08_emitDebuggerSymbol),

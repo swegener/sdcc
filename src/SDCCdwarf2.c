@@ -98,7 +98,7 @@ dwNewDebugSymbol ()
 {
   char debugSym[SDCC_NAME_MAX];
         
-  sprintf (debugSym, "S%s$%s$%d", moduleName, currFunc->name, dwDebugSymbol);
+  sprintf (debugSym, "S%s$%s$%d", dwModuleName, currFunc->name, dwDebugSymbol);
   dwDebugSymbol++;
   return Safe_strdup (debugSym);
 }
@@ -2107,6 +2107,9 @@ dwMatchTypes (const void * type1v, const void * type2v)
 	    {
 	      if (SPEC_NOUN (type1) != SPEC_NOUN (type2))
 	        return 0;
+	      if (SPEC_NOUN (type1) == V_STRUCT
+	          && SPEC_STRUCT (type1) != SPEC_STRUCT (type2))
+		return 0;
 	      if (SPEC_CONST (type1) != SPEC_CONST (type2))
 	        return 0;
 	      if (SPEC_VOLATILE (type1) != SPEC_VOLATILE (type2))
@@ -2163,6 +2166,7 @@ dwTagFromType (sym_link * type, dwtag * parent)
   dwtag * modtp;
   dwtag * subtp;
   int key;
+  int tableUpdated = 0;
   
   key = dwHashType (type) % dwTypeTagTable->size;
   oldtp = hTabFindByKey (dwTypeTagTable, key, type, dwMatchTypes);
@@ -2257,6 +2261,12 @@ dwTagFromType (sym_link * type, dwtag * parent)
 	      /* is a complete type */
 	      dwAddTagAttr (tp, dwNewAttrConst (DW_AT_byte_size,
 						getSize (type)));
+	      
+	      /* Must add this before processing the struct fields */
+	      /* in case there is a recursive definition.          */
+	      hTabAddItemLong (&dwTypeTagTable, key, type, tp);
+	      tableUpdated = 1;
+
 	      field = sdp->fields;
 	      while (field)
 		{
@@ -2381,7 +2391,10 @@ dwTagFromType (sym_link * type, dwtag * parent)
 	}
     }
   
-  hTabAddItemLong (&dwTypeTagTable, key, type, tp);
+  if (!tableUpdated)
+    hTabAddItemLong (&dwTypeTagTable, key, type, tp);
+  if (!tp->parent)
+    dwAddTagChild (parent, tp);
   return tp;
 }
 /*------------------------------------------------------------------------*/
@@ -2595,12 +2608,15 @@ dwWriteSymbolInternal (symbol *sym)
   else if (symloc->onStack)
     {
       /* stack allocation */
-      lp = dwNewLoc (DW_OP_fbreg, NULL, sym->stack);
+      lp = dwNewLoc (DW_OP_fbreg, NULL, symloc->stack);
     }
   else
     {
       /* global allocation */
-      lp = dwNewLoc (DW_OP_addr, sym->rname, 0);
+      if (sym->level && !sym->allocreq)
+        lp = NULL;
+      else
+        lp = dwNewLoc (DW_OP_addr, symloc->rname, 0);
     }
 
   /* Only create the DW_AT_location if a known location exists.   */
@@ -2700,7 +2716,7 @@ int dwWriteEndFunction(symbol *sym, iCode *ic, int offset)
     }
 
   if (IS_STATIC (sym->etype))
-    sprintf (debugSym, "XF%s$%s$0$0", moduleName, sym->name);
+    sprintf (debugSym, "XF%s$%s$0$0", dwModuleName, sym->name);
   else
     sprintf (debugSym, "XG$%s$0$0", sym->name);
   emitDebuggerSymbol (debugSym);
@@ -2735,7 +2751,7 @@ int dwWriteLabel(symbol *sym, iCode *ic)
   if (sym->isitmp)
     return 1;
 
-  sprintf (debugSym, "L%s$%s$%s", moduleName, currFunc->name, sym->name);
+  sprintf (debugSym, "L%s$%s$%s", dwModuleName, currFunc->name, sym->name);
   emitDebuggerSymbol (debugSym);
 
   tp = dwNewTag (DW_TAG_label);
@@ -2827,9 +2843,15 @@ int dwWriteType(structdef *sdef, int block, int inStruct, char *tag)
 int dwWriteModule(char *name)
 {
   dwtag * tp;
+  char * s;
   
   if(!dwarf2FilePtr) return 0;
   
+  dwModuleName = Safe_strdup (name);
+  for (s = dwModuleName; *s; s++)
+    if (ispunct (*s) || isspace (*s))
+      *s = '_';
+    
   tp = dwNewTag (DW_TAG_compile_unit);
   dwAddTagAttr (tp, dwNewAttrString (DW_AT_producer, "SDCC version "
 					     SDCC_VERSION_STR));

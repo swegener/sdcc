@@ -2655,6 +2655,15 @@ decorateType (ast * tree)
 				   tree->opval.val->type);
 	  return tree;
 	}
+      /* a left shift must be done with at least 16bits */
+      if ((tree->opval.op==LEFT_OP) && (getSize(LTYPE(tree))<2)) {
+	// insert a cast
+	tree->left = 
+	  decorateType (newNode (CAST,
+				 newAst_LINK(copyLinkChain(LTYPE(tree))),
+				 tree->left));
+	SPEC_NOUN(tree->left->left->ftype)=V_INT;
+      }
       /* if only the right side is a literal & we are
          shifting more than size of the left operand then zero */
       if (IS_LITERAL (RTYPE (tree)) &&

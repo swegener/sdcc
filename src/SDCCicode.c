@@ -1345,6 +1345,43 @@ setOperandType (operand * op, sym_link * type)
     }
 
 }
+/*-----------------------------------------------------------------*/
+/* Get size in byte of ptr need to access an array                 */
+/*-----------------------------------------------------------------*/
+int
+getArraySizePtr (operand * op)
+{
+  sym_link *ltype = operandType(op);
+
+  if(IS_PTR(ltype))
+    {
+      int size = getSize(ltype);
+      return(IS_GENPTR(ltype)?(size-1):size);
+    }
+
+  if(IS_ARRAY(ltype))
+    {
+      sym_link *letype = getSpec(ltype);
+      switch (PTR_TYPE (SPEC_OCLS (letype)))
+	{
+	case IPOINTER:
+	case PPOINTER:
+	case POINTER:
+	  return (PTRSIZE);
+	case EEPPOINTER:
+	case FPOINTER:
+	case CPOINTER:
+	case FUNCTION:
+	  return (FPTRSIZE);
+	case GPOINTER:
+	  return (GPTRSIZE-1);
+
+	default:
+	  return (FPTRSIZE);
+	}
+    }
+  return (FPTRSIZE);
+}
 
 /*-----------------------------------------------------------------*/
 /* perform "usual unary conversions"                               */
@@ -1649,8 +1686,7 @@ geniCodeGoto (symbol * label)
 /* geniCodeMultiply - gen intermediate code for multiplication     */
 /*-----------------------------------------------------------------*/
 operand *
-geniCodeMultiply (operand * left, operand * right, bool ptrSizeCalculation,
-		  int resultIsInt)
+geniCodeMultiply (operand * left, operand * right,int resultIsInt)
 {
   iCode *ic;
   int p2 = 0;
@@ -1663,37 +1699,28 @@ geniCodeMultiply (operand * left, operand * right, bool ptrSizeCalculation,
     return operandFromValue (valMult (left->operand.valOperand,
 				      right->operand.valOperand));
 
-
-  //Force 1 byte * 1 byte = 2 bytes result if we are computing ptr size
-  if ((ptrSizeCalculation) && (1 == getSize (rtype)) &&
-      (1 == getSize (ltype)))
+  if (resultIsInt)
     {
       saveOption = options.ANSIint;
       options.ANSIint = 0;
-      resType = usualBinaryConversions (&left, &right);
-      ltype = operandType (left);
-      rtype = operandType (right);
-      SPEC_SHORT (getSpec (resType)) = 0;
-      options.ANSIint = saveOption;
     }
-  else {
-	  resType = usualBinaryConversions (&left, &right);
-	  if (resultIsInt) {
-		  SPEC_NOUN(getSpec(resType))=V_INT;
-		  SPEC_SHORT(getSpec(resType))=0;
-	  }
-  }
+  resType = usualBinaryConversions (&left, &right);
+  if (resultIsInt)
+    {
+      options.ANSIint = saveOption;
+      SPEC_NOUN(getSpec(resType))=V_INT;
+      SPEC_SHORT(getSpec(resType))=0;
+    }
 
   /* if the right is a literal & power of 2 */
   /* then make it a left shift              */
-  /*If we are computing  ptr size then normal multiplication */
   /*code generated for 1 byte * 1 byte literal = 2 bytes result is more efficient in most cases */
   /*than 2 bytes result = 2 bytes << literal if port as 1 byte muldiv */
   if (IS_LITERAL (retype) && !IS_FLOAT (letype) &&
-      !((ptrSizeCalculation) && (getSize (resType) != getSize (ltype)) && (1 == port->muldiv.native_below)) &&
+      !((resultIsInt) && (getSize (resType) != getSize (ltype)) && (1 == port->muldiv.native_below)) &&
    (p2 = powof2 ((unsigned long) floatFromVal (right->operand.valOperand))))
     {
-      if ((ptrSizeCalculation) && (getSize (resType) != getSize (ltype)))
+      if ((resultIsInt) && (getSize (resType) != getSize (ltype)))
 	{
 	  /* LEFT_OP need same size for left and result, */
 	  left = geniCodeCast (resType, left, TRUE);
@@ -1834,7 +1861,7 @@ geniCodeSubtract (operand * left, operand * right)
     {
       isarray = left->isaddr;
       right = geniCodeMultiply (right,
-			      operandFromLit (getSize (ltype->next)), TRUE, FALSE);
+				operandFromLit (getSize (ltype->next)), (getArraySizePtr(left) == INTSIZE));
       resType = copyLinkChain (IS_ARRAY (ltype) ? ltype->next : ltype);
     }
   else
@@ -1883,13 +1910,9 @@ geniCodeAdd (operand * left, operand * right)
   /* if left is an array or pointer then size */
   if (IS_PTR (ltype))
     {
-
       isarray = left->isaddr;
-      size =
-	operandFromLit (getSize (ltype->next));
-
-      right = geniCodeMultiply (right, size, (getSize (ltype) != 1),FALSE);
-
+      size  =	operandFromLit (getSize (ltype->next));
+      right = geniCodeMultiply (right, size, (getArraySizePtr(left) == INTSIZE));
       resType = copyLinkChain (ltype);
     }
   else
@@ -1996,9 +2019,8 @@ geniCodeArray (operand * left, operand * right)
       return geniCodeDerefPtr (geniCodeAdd (left, right));
     }
 
-  /* array access */
   right = geniCodeMultiply (right,
-			    operandFromLit (getSize (ltype->next)), TRUE,FALSE);
+			    operandFromLit (getSize (ltype->next)), (getArraySizePtr(left) == INTSIZE));
 
   /* we can check for limits here */
   if (isOperandLiteral (right) &&
@@ -3250,7 +3272,7 @@ ast2iCode (ast * tree)
     case '*':
       if (right)
 	return geniCodeMultiply (geniCodeRValue (left, FALSE),
-				 geniCodeRValue (right, FALSE), FALSE,IS_INT(tree->ftype));
+				 geniCodeRValue (right, FALSE),IS_INT(tree->ftype));
       else
 	return geniCodeDerefPtr (geniCodeRValue (left, FALSE));
 
@@ -3326,7 +3348,7 @@ ast2iCode (ast * tree)
 	geniCodeAssign (left,
 		geniCodeMultiply (geniCodeRValue (operandFromOperand (left),
 						  FALSE),
-				  geniCodeRValue (right, FALSE), FALSE,FALSE), 0);
+				  geniCodeRValue (right, FALSE),FALSE), 0);
 
     case DIV_ASSIGN:
       return

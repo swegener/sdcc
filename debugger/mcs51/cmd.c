@@ -33,7 +33,9 @@ EXTERN_STACK_DCL(callStack,function *,1024);
 
 #if defined(__APPLE__) && defined(__MACH__)
 static char *copying=
-{"                   GNU GENERAL PUBLIC LICENSE Version 2"};
+{" GNU GENERAL PUBLIC LICENSE Version 2"};
+static char *warranty=
+{" NO WARRANTY"};
 #else
 static char *copying=
 "                   GNU GENERAL PUBLIC LICENSE

@@ -545,44 +545,86 @@ markLiveRanges (eBBlock * ebp, eBBlock ** ebbs, int count)
 void 
 rlivePoint (eBBlock ** ebbs, int count)
 {
-	int i;
-
-	/* for all blocks do */
-	for (i = 0; i < count; i++) {
-		iCode *ic;
-
-		/* for all instruction in the block do */
-		for (ic = ebbs[i]->sch; ic; ic = ic->next) {
-			symbol *lrange;
-			int k;
-
-			ic->rlive = newBitVect (operandKey);
-			/* for all symbols in the liverange table */
-			for (lrange = hTabFirstItem (liveRanges, &k); lrange;
-			     lrange = hTabNextItem (liveRanges, &k)) {
-
-				/* if it is live then add the lrange to ic->rlive */
-				if (lrange->liveFrom <= ic->seq &&
-				    lrange->liveTo >= ic->seq) {
-					lrange->isLiveFcall |= (ic->op == CALL || ic->op == PCALL || ic->op == SEND);
-					ic->rlive = bitVectSetBit (ic->rlive, lrange->key);
-				}
-			}
-			/* overlapping live ranges should be eliminated */
-			if (ASSIGN_ITEMP_TO_ITEMP (ic)) {
-
-				if (SPIL_LOC(IC_RIGHT(ic)) == SPIL_LOC(IC_RESULT(ic)) 	&& /* left & right share the same spil location */
-				    OP_SYMBOL(IC_RESULT(ic))->isreqv 			&& /* left of assign is a register requivalent */
-				    !OP_SYMBOL(IC_RIGHT(ic))->isreqv 			&& /* right side is not */
-				    OP_SYMBOL(IC_RIGHT(ic))->liveTo > ic->key 		&& /* right side live beyond this point */
-				    bitVectnBitsOn(OP_DEFS(IC_RESULT(ic))) > 1 ) 	{  /* left has multiple definitions */
-					SPIL_LOC(IC_RIGHT(ic)) = NULL; /* then cannot share */
-				}
-			}
+    int i;
+    
+    /* for all blocks do */
+    for (i = 0; i < count; i++) {
+	iCode *ic;
+	
+	/* for all instruction in the block do */
+	for (ic = ebbs[i]->sch; ic; ic = ic->next) {
+	    symbol *lrange;
+	    int k;
+	    
+	    ic->rlive = newBitVect (operandKey);
+	    /* for all symbols in the liverange table */
+	    for (lrange = hTabFirstItem (liveRanges, &k); lrange;
+		 lrange = hTabNextItem (liveRanges, &k)) {
+		
+		/* if it is live then add the lrange to ic->rlive */
+		if (lrange->liveFrom <= ic->seq &&
+		    lrange->liveTo >= ic->seq) {
+		    lrange->isLiveFcall |= (ic->op == CALL || ic->op == PCALL || ic->op == SEND);
+		    ic->rlive = bitVectSetBit (ic->rlive, lrange->key);
 		}
+	    }
 	}
+    }
 }
 
+/*-----------------------------------------------------------------*/
+/* computeClash - find out which live ranges collide with others   */
+/*-----------------------------------------------------------------*/
+static void computeClash ()
+{
+    hTab *lRangeCopy = newHashTable(hTabMaxKey(liveRanges));
+    void *item;
+    symbol *outer, *inner;
+    int key, key1;
+
+    /* have to make a copy of the liveRanges hashTable :: UGHH .*/
+    for (item = hTabFirstItem(liveRanges,&key); item ; 
+	 item = hTabNextItem(liveRanges,&key)) {
+	hTabAddItem(&lRangeCopy,key,item);
+    }
+   
+    /* outerloop : for each liverange do */
+    for (outer = hTabFirstItem(liveRanges,&key); outer ; 
+	 outer = hTabNextItem(liveRanges,&key)) {
+
+	/* if the liveFrom & To are the same then skip, 
+	   could happen for unused return values from functions */
+	if (outer->liveFrom == outer->liveTo) continue;
+
+	/* innerloop : for the inner loop we can start from the
+	   item after the outer loop */
+	inner = hTabFirstItemWK (lRangeCopy,outer->key);
+	inner = hTabNextItem (lRangeCopy,&key1 );
+	for (; inner ; inner = hTabNextItem( lRangeCopy ,&key1)) {
+
+	    if (inner->liveFrom == inner->liveTo) continue;
+	    if (inner->liveTo < outer->liveFrom)  continue;
+	    if (inner->liveFrom > outer->liveTo)  continue;
+	    
+	    /* if one of them are being defined where the other
+	       one end , then no overlap (i.e. they can goto same registers */
+	    if (inner->liveFrom == outer->liveTo ||
+		outer->liveFrom == inner->liveTo) continue;
+
+	    /* so they overlap : set both their clashes */
+	    inner->clashes = bitVectSetBit(inner->clashes,outer->key);
+	    outer->clashes = bitVectSetBit(outer->clashes,inner->key);
+	    
+	    /* check if they share the same spillocation */
+	    if (SYM_SPIL_LOC(inner) && SYM_SPIL_LOC(outer)) {
+		if (inner->reqv && !outer->reqv) SYM_SPIL_LOC(outer)=NULL;
+		else if (outer->reqv && !inner->reqv) SYM_SPIL_LOC(inner)=NULL;
+		else if (inner->used > outer->used) SYM_SPIL_LOC(outer)=NULL;
+		else SYM_SPIL_LOC(inner)=NULL;
+	    }
+	}
+    }
+}
 
 /*-----------------------------------------------------------------*/
 /* computeLiveRanges - computes the live ranges for variables      */
@@ -607,4 +649,7 @@ computeLiveRanges (eBBlock ** ebbs, int count)
 
   /* mark the ranges live for each point */
   rlivePoint (ebbs, count);
+
+  /* compute which overlaps with what */
+  computeClash();
 }

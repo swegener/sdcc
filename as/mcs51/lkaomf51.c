@@ -86,6 +86,12 @@ _UsageType UsageType[]=
 {
 	{"CSEG",		0},
 	{"GSINIT",		0},
+	{"GSINIT0",		0},
+	{"GSINIT1",		0},
+	{"GSINIT2",		0},
+	{"GSINIT3",		0},
+	{"GSINIT4",		0},
+	{"GSINIT5",		0},
 	{"GSFINAL",		0},
 	{"HOME",		0},
 	{"XINIT",		0},

@@ -152,6 +152,9 @@ int summary(struct area * areap)
 		}
 
 		else if( EQ(xp->a_id, "CSEG") || EQ(xp->a_id, "GSINIT") ||
+				 EQ(xp->a_id, "GSINIT0") || EQ(xp->a_id, "GSINIT1") ||
+				 EQ(xp->a_id, "GSINIT2") || EQ(xp->a_id, "GSINIT3") ||
+				 EQ(xp->a_id, "GSINIT4") || EQ(xp->a_id, "GSINIT5") ||
 				 EQ(xp->a_id, "GSFINAL") || EQ(xp->a_id, "HOME") )
 		{
 			Rom.Size+=xp->a_size;
@@ -403,7 +406,10 @@ int summary2(struct area * areap)
 	while (xp)
 	{
 		if( EQ(xp->a_id, "CSEG") || EQ(xp->a_id, "GSINIT") ||
-				 EQ(xp->a_id, "GSFINAL") || EQ(xp->a_id, "HOME") )
+			EQ(xp->a_id, "GSINIT0") || EQ(xp->a_id, "GSINIT1") ||
+			EQ(xp->a_id, "GSINIT2") || EQ(xp->a_id, "GSINIT3") ||
+			EQ(xp->a_id, "GSINIT4") || EQ(xp->a_id, "GSINIT5") ||
+			EQ(xp->a_id, "GSFINAL") || EQ(xp->a_id, "HOME") )
 		{
 			Rom.Size+=xp->a_size;
 			if(xp->a_addr<Rom.Start) Rom.Start=xp->a_addr;

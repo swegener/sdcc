@@ -1,3 +1,7 @@
+2004-04-27 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* as/mcs51/lkmem.c, as/mcs51/lkaomf51: fixed bug 954173
+
 2004-05-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCsymt.h: added IS_AUTO(symbol) test macro

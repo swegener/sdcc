@@ -333,21 +333,21 @@ void allocParms ( value  *val )
 
     for ( lval = val ; lval ; lval = lval->next, pNum++ ) {
 
-	/* if this is a literal e.g. enumerated type */
-	if (IS_LITERAL(lval->etype)) {
-	    SPEC_OCLS(lval->etype) = SPEC_OCLS(lval->sym->etype) = 
-		( options.model  ? xdata : data );
-	    continue;
-	}
+	/* check the declaration */
+	checkDecl (lval->sym);
+	
+	//	/* if this is a literal e.g. enumerated type */
+	//	if (IS_LITERAL(lval->etype)) {
+	//    SPEC_OCLS(lval->etype) = SPEC_OCLS(lval->sym->etype) = 
+	//	( options.model  ? xdata : data );
+	//    continue;
+	//}
 	/* if this a register parm then allocate
 	   it as a local variable by adding it
 	   to the first block we see in the body */
 	if (IS_REGPARM(lval->etype)) 
 	    continue ;
 
-	/* check the declaration */
-	checkDecl (lval->sym);
-	
 	/* mark it as my parameter */
 	lval->sym->ismyparm = 1;
 	lval->sym->localof = currFunc;

@@ -381,7 +381,6 @@ char        *genSymName       ( int                            );
 int          compStructSize   ( int    ,structdef *            );
 link        *copyLinkChain    ( link    *                      );
 int          checkDecl        ( symbol *                       );
-void         checkSClass      ( symbol   *                     );
 void         checkBasic       ( link   *, link  *              );
 value       *checkPointerIval ( link   *, value *              );
 value       *checkStructIval  ( symbol *, value *              );

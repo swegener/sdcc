@@ -852,9 +852,9 @@ int   parseCmdLine ( int argc, char **argv )
 		    /* assembler options */
 		    if (argv[i][2] == 'a') {
 			if (argv[i][3])
-			    parseWithComma(asmOptions,&argv[i][3]);
+			    parseWithComma((char **)asmOptions,&argv[i][3]);
 			else
-			    parseWithComma(asmOptions,argv[++i]);
+			    parseWithComma((char **)asmOptions,argv[++i]);
 			
 		    } else {
 			werror(W_UNKNOWN_OPTION,argv[i]);		       

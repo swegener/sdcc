@@ -898,8 +898,13 @@ int   compStructSize (int su, structdef  *sdef )
 /*------------------------------------------------------------------*/
 /* checkSClass - check the storage class specification              */
 /*------------------------------------------------------------------*/
-void  checkSClass ( symbol *sym )
+static void  checkSClass ( symbol *sym )
 {         
+    /* type is literal can happen foe enums change
+       to auto */
+    if (SPEC_SCLS(sym->etype) == S_LITERAL && !SPEC_ENUM(sym->etype))
+	SPEC_SCLS(sym->etype) = S_AUTO;
+
     /* if sfr or sbit then must also be */
     /* volatile the initial value will be xlated */
     /* to an absolute address */
@@ -958,7 +963,7 @@ void  checkSClass ( symbol *sym )
 	 ( SPEC_SCLS(sym->etype) != S_AUTO      &&
 	   SPEC_SCLS(sym->etype) != S_FIXED     &&
 	   SPEC_SCLS(sym->etype) != S_REGISTER  &&
-	   SPEC_SCLS(sym->etype) != S_CONSTANT ))  {
+	   SPEC_SCLS(sym->etype) != S_CONSTANT  )) {
 
 	werror(E_AUTO_ASSUMED,sym->name) ;
 	SPEC_SCLS(sym->etype) = S_AUTO   ;

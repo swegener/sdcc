@@ -564,8 +564,8 @@ iCode *copyiCode (iCode *ic)
     switch (ic->op) {
     case IFX:
 	IC_COND(nic) = operandFromOperand(IC_COND(ic));
-	IC_TRUE(nic) = operandFromOperand(IC_TRUE(ic));
-	IC_FALSE(nic)= operandFromOperand(IC_FALSE(ic));
+	IC_TRUE(nic) = IC_TRUE(ic);
+	IC_FALSE(nic)= IC_FALSE(ic);
 	break;
 
     case JUMPTABLE:
@@ -2380,12 +2380,12 @@ static void geniCodeParms ( ast *parms , int *stack, link *fetype)
 	    geniCodeAssign(top,pval,1);
 	}
 	else { 
-
+	    link *p = operandType(pval);
 	    /* push */
 	    ic = newiCode(IPUSH,pval,NULL);
 	    ic->parmPush = 1;
 	    /* update the stack adjustment */
-	    *stack += getSize(operandType(pval));
+	    *stack += getSize(IS_AGGREGATE(p)? aggrToPtr(p,FALSE):p);
 	    ADDTOCHAIN(ic);
 	}
     }

@@ -1,3 +1,9 @@
+2004-09-09 Slade Rich <slade_rich AT users.sourceforge.net>
+
+	* src/pic/device.c : When no max ram set validate full memory range.
+	* src/pic/pcode.c,
+	* src/pic/pcodepeep.c : Copy C code comments to optimised replacement code.
+
 2004-09-08 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/_gptrget.c,

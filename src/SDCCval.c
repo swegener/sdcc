@@ -310,8 +310,9 @@ constVal (char *s)
     sval = atol (s);
 
 
-  if (SPEC_LONG (val->type) || sval > 32768)
-    {
+  if (SPEC_LONG (val->type) || 
+      (SPEC_USIGN(val->type) && sval>0xffff) ||
+      (!SPEC_USIGN(val->type) && ((long)sval>32767 || (long)sval<-32768)) {
       if (SPEC_USIGN (val->type))
 	SPEC_CVAL (val->type).v_ulong = sval;
       else

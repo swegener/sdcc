@@ -2114,7 +2114,7 @@ replace {
 	mov  	r%4,a
 	movx	@dptr,a
 }
-
+	
 replace {
 	mov	r%1,dpl
 	mov	r%2,dph
@@ -2129,6 +2129,76 @@ replace {
 	mov	r%3,dpx
 }
 
+replace {
+        mov     dpl,r%1
+        mov     dph,r%2
+        mov     dpx,r%3
+        movx    a,@dptr
+        mov     r%4,a
+        orl     ar%4,#%5
+        mov     dpl,r%1
+        mov     dph,r%2
+        mov     dpx,r%3
+        mov     a,r1
+        movx    @dptr,a
+} by {
+	; Peephole 230.e save reload dptr
+        mov     dpl,r%1
+        mov     dph,r%2
+        mov     dpx,r%3
+        movx    a,@dptr
+        orl     a,#%5
+        mov     r%4,a
+        movx    @dptr,a
+}
+	
+replace {
+        mov     dpl,r%1
+        mov     dph,r%2
+        mov     dpx,r%3
+        movx    a,@dptr
+        mov     r%4,a
+        anl     ar%4,#%5
+        mov     dpl,r%1
+        mov     dph,r%2
+        mov     dpx,r%3
+        mov     a,r1
+        movx    @dptr,a
+} by {
+	; Peephole 230.e save reload dptr
+        mov     dpl,r%1
+        mov     dph,r%2
+        mov     dpx,r%3
+        movx    a,@dptr
+        anl     a,#%5
+        mov     r%4,a
+        movx    @dptr,a
+}
+
+replace {
+	mov	r%1,dpl
+	mov	r%2,dph
+	mov	r%3,dpx
+	mov	a,r%4
+	inc	dps
+	movx	@dptr,a
+	inc	dptr
+	mov	dps,#0
+	mov	dpl,r%1
+	mov	dph,r%2
+	mov	dpx,r%3
+} by {
+	; Peephole 230.f save reload dptr
+	mov	r%1,dpl
+	mov	r%2,dph
+	mov	r%3,dpx
+	mov	a,r%4
+	inc	dps
+	movx	@dptr,a
+	inc	dptr
+	mov	dps,#0
+}
+	
 replace {
 	mov	ar%1,r%2
 	mov	ar%3,r%1
@@ -2181,6 +2251,17 @@ replace {
 	mov	r%4,a
 } by {
 	; Peehole 232.b simplified xch
-	mov	r%3,#%1
-	mov	r%4,#%2
+	mov	r%3,#%2
+	mov	r%4,#%1
 }
+
+replace {
+	mov	dpl1,#%1
+	mov	dph1,#(%1 >> 8)
+	mov	dpx1,#(%1 >> 16)
+} by {
+	; Peephole 233 24 bit load of dptr1
+	inc	dps
+	mov	dptr,#%1
+	dec	dps
+} 

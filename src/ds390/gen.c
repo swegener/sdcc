@@ -294,12 +294,12 @@ genSetDPTR (int n)
 
   if (!n)
     {
-      emitcode ("mov", "dps, #0x00");
+      emitcode ("mov", "dps,#0");
     }
   else
     {
       TR_DPTR("#1");
-      emitcode ("mov", "dps, #0x01");
+      emitcode ("mov", "dps,#1");
     }
 }
 
@@ -1637,7 +1637,7 @@ genNot (iCode * ic)
   toBoolean (IC_LEFT (ic));
 
   tlbl = newiTempLabel (NULL);
-  emitcode ("cjne", "a,#0x01,!tlabel", tlbl->key + 100);
+  emitcode ("cjne", "a,#1,!tlabel", tlbl->key + 100);
   emitcode ("", "!tlabeldef", tlbl->key + 100);
   outBitC (IC_RESULT (ic));
 
@@ -2679,11 +2679,11 @@ genFunction (iCode * ic)
 	{
 	  if (regs390[i].print) {
 	      if (strcmp (regs390[i].base, "0") == 0)
-		  emitcode ("", "%s = !constbyte",
+		  emitcode ("", "%s !equ !constbyte",
 			    regs390[i].dname,
 			    8 * rbank + regs390[i].offset);
 	      else
-		  emitcode ("", "%s = %s + !constbyte",
+		  emitcode ("", "%s !equ %s + !constbyte",
 			    regs390[i].dname,
 			    regs390[i].base,
 			    8 * rbank + regs390[i].offset);
@@ -2709,7 +2709,7 @@ genFunction (iCode * ic)
 	  emitcode ("push", "dpx");
 	  /* Make sure we're using standard DPTR */
 	  emitcode ("push", "dps");
-	  emitcode ("mov", "dps, #0x00");
+	  emitcode ("mov", "dps,#0");
 	  if (options.stack10bit)
 	    {
 	      /* This ISR could conceivably use DPTR2. Better save it. */
@@ -3320,7 +3320,7 @@ genPlusIncr (iCode * ic)
       emitcode ("inc", "%s", aopGet (AOP (IC_RESULT (ic)), LSB, FALSE, FALSE, FALSE));
       if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
 	  IS_AOP_PREG (IC_RESULT (ic)))
-	emitcode ("cjne", "%s,#0x00,!tlabel"
+	emitcode ("cjne", "%s,#0,!tlabel"
 		  ,aopGet (AOP (IC_RESULT (ic)), LSB, FALSE, FALSE, FALSE)
 		  ,tlbl->key + 100);
       else
@@ -3336,7 +3336,7 @@ genPlusIncr (iCode * ic)
 	{
 	  if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
 	      IS_AOP_PREG (IC_RESULT (ic)))
-	    emitcode ("cjne", "%s,#0x00,!tlabel"
+	    emitcode ("cjne", "%s,#0,!tlabel"
 		  ,aopGet (AOP (IC_RESULT (ic)), MSB16, FALSE, FALSE, FALSE)
 		      ,tlbl->key + 100);
 	  else
@@ -3350,7 +3350,7 @@ genPlusIncr (iCode * ic)
 	{
 	  if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
 	      IS_AOP_PREG (IC_RESULT (ic)))
-	    emitcode ("cjne", "%s,#0x00,!tlabel"
+	    emitcode ("cjne", "%s,#0,!tlabel"
 		  ,aopGet (AOP (IC_RESULT (ic)), MSB24, FALSE, FALSE, FALSE)
 		      ,tlbl->key + 100);
 	  else
@@ -3450,7 +3450,7 @@ genPlusBits (iCode * ic)
       emitcode ("mov", "c,%s", AOP (IC_LEFT (ic))->aopu.aop_dir);
       emitcode ("rlc", "a");
       emitcode ("mov", "c,%s", AOP (IC_RIGHT (ic))->aopu.aop_dir);
-      emitcode ("addc", "a,#0x00");
+      emitcode ("addc", "a,#0");
       outAcc (IC_RESULT (ic));
     }
 }
@@ -3821,12 +3821,12 @@ genMinusDec (iCode * ic)
       if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
 	  AOP_TYPE (IC_RESULT (ic)) == AOP_DPTR ||
 	  IS_AOP_PREG (IC_RESULT (ic)))
-	emitcode ("cjne", "%s,#0xff,!tlabel"
-		  ,aopGet (AOP (IC_RESULT (ic)), LSB, FALSE, FALSE, FALSE)
+	emitcode ("cjne", "%s,#!constbyte,!tlabel"
+		  ,aopGet (AOP (IC_RESULT (ic)), LSB, FALSE, FALSE, FALSE), 0xff
 		  ,tlbl->key + 100);
       else
 	{
-	  emitcode ("mov", "a,#0xff");
+	  emitcode ("mov", "a,#!constbyte",0xff);
 	  emitcode ("cjne", "a,%s,!tlabel"
 		    ,aopGet (AOP (IC_RESULT (ic)), LSB, FALSE, FALSE, FALSE)
 		    ,tlbl->key + 100);
@@ -3837,8 +3837,8 @@ genMinusDec (iCode * ic)
 	  if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
 	      AOP_TYPE (IC_RESULT (ic)) == AOP_DPTR ||
 	      IS_AOP_PREG (IC_RESULT (ic)))
-	    emitcode ("cjne", "%s,#0xff,!tlabel"
-		  ,aopGet (AOP (IC_RESULT (ic)), MSB16, FALSE, FALSE, FALSE)
+	    emitcode ("cjne", "%s,#!constbyte,!tlabel"
+		      ,aopGet (AOP (IC_RESULT (ic)), MSB16, FALSE, FALSE, FALSE),0xff
 		      ,tlbl->key + 100);
 	  else
 	    {
@@ -3853,8 +3853,8 @@ genMinusDec (iCode * ic)
 	  if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
 	      AOP_TYPE (IC_RESULT (ic)) == AOP_DPTR ||
 	      IS_AOP_PREG (IC_RESULT (ic)))
-	    emitcode ("cjne", "%s,#0xff,!tlabel"
-		  ,aopGet (AOP (IC_RESULT (ic)), MSB24, FALSE, FALSE, FALSE)
+	    emitcode ("cjne", "%s,#!constbyte,!tlabel"
+		      ,aopGet (AOP (IC_RESULT (ic)), MSB24, FALSE, FALSE, FALSE),0xff
 		      ,tlbl->key + 100);
 	  else
 	    {
@@ -4293,7 +4293,7 @@ static void genMultTwoByte (operand *left, operand *right,
 	lbl = newiTempLabel(NULL);
 	emitcode("","!tlabeldef", lbl->key+100);
 	emitcode("mov","a,mcnt1");
-	emitcode("anl","a,#0x80");
+	emitcode("anl","a,#!constbyte",0x80);
 	emitcode("jnz","!tlabel",lbl->key+100);
 	
 	freeAsmop (left, NULL, ic, TRUE);
@@ -4623,7 +4623,7 @@ static void genDivTwoByte (operand *left, operand *right,
 	lbl = newiTempLabel(NULL);
 	emitcode("","!tlabeldef", lbl->key+100);
 	emitcode("mov","a,mcnt1");
-	emitcode("anl","a,#0x80");
+	emitcode("anl","a,#!constbyte",0x80);
 	emitcode("jnz","!tlabel",lbl->key+100);
 	
 	freeAsmop (left, NULL, ic, TRUE);
@@ -4877,7 +4877,7 @@ static void genModTwoByte (operand *left, operand *right,
 	lbl = newiTempLabel(NULL);
 	emitcode("","!tlabeldef", lbl->key+100);
 	emitcode("mov","a,mcnt1");
-	emitcode("anl","a,#0x80");
+	emitcode("anl","a,#!constbyte",0x80);
 	emitcode("jnz","!tlabel",lbl->key+100);
 	
 	freeAsmop (left, NULL, ic, TRUE);
@@ -5067,8 +5067,8 @@ genCmp (operand * left, operand * right,
 	      //emitcode (";", "genCmp #2");
 	      if (sign && (size == 0))
 		{
-		  //emitcode (";", "genCmp #3");
-		  emitcode ("xrl", "a,#0x80");
+		    //emitcode (";", "genCmp #3");
+		  emitcode ("xrl", "a,#!constbyte",0x80);
 		  if (AOP_TYPE (right) == AOP_LIT)
 		    {
 		      unsigned long lit = (unsigned long)
@@ -5086,7 +5086,7 @@ genCmp (operand * left, operand * right,
 			}
 		      emitcode ("mov", "b,%s", aopGet (AOP (right), offset++,
 						       FALSE, FALSE, FALSE));
-		      emitcode ("xrl", "b,#0x80");
+		      emitcode ("xrl", "b,#!constbyte",0x80);
 		      if (AOP_NEEDSACC (right))
 			{
 			  emitcode ("pop", "acc");
@@ -6533,7 +6533,7 @@ genXor (iCode * ic, iCode * ifx)
 		  MOVA (aopGet (AOP (right), sizer - 1, FALSE, FALSE, TRUE));
 		  if (sizer == 1)
 		    // test the msb of the lsb
-		    emitcode ("anl", "a,#0xfe");
+		    emitcode ("anl", "a,#!constbyte",0xfe);
 		  emitcode ("jnz", "!tlabel", tlbl->key + 100);
 		  sizer--;
 		}
@@ -6870,7 +6870,7 @@ genGetHbit (iCode * ic)
   else
     {
       emitcode ("rl", "a");
-      emitcode ("anl", "a,#0x01");
+      emitcode ("anl", "a,#1");
       outAcc (result);
     }
 
@@ -10205,7 +10205,7 @@ genFarFarAssign (operand * result, operand * right, iCode * ic)
       /* We can use the '390 auto-toggle feature to good effect here. */
       
       D(emitcode(";","genFarFarAssign (390 auto-toggle fun)"););
-      emitcode("mov", "dps, #0x21"); 	/* Select DPTR2 & auto-toggle. */
+      emitcode("mov", "dps,#!constbyte",0x21); 	/* Select DPTR2 & auto-toggle. */
       emitcode ("mov", "dptr,#%s", rSym->rname); 
       /* DP2 = result, DP1 = right, DP1 is current. */
       while (size)
@@ -10218,13 +10218,13 @@ genFarFarAssign (operand * result, operand * right, iCode * ic)
                emitcode("inc", "dptr");
           }
       }
-      emitcode("mov", "dps, #0");
+      emitcode("mov", "dps,#0");
       freeAsmop (right, NULL, ic, FALSE);
 #if 0
 some alternative code for processors without auto-toggle
 no time to test now, so later well put in...kpb
         D(emitcode(";","genFarFarAssign (dual-dptr fun)"););
-        emitcode("mov", "dps, #0x01"); 	/* Select DPTR2. */
+        emitcode("mov", "dps,#1"); 	/* Select DPTR2. */
         emitcode ("mov", "dptr,#%s", rSym->rname); 
         /* DP2 = result, DP1 = right, DP1 is current. */
         while (size)
@@ -10239,7 +10239,7 @@ no time to test now, so later well put in...kpb
             emitcode("inc", "dptr");
           emitcode("inc", "dps");
         }
-        emitcode("mov", "dps, #0");
+        emitcode("mov", "dps,#0");
         freeAsmop (right, NULL, ic, FALSE);
 #endif
   }
@@ -10836,8 +10836,8 @@ static void genMemcpyX2X( iCode *ic, int nparms, operand **parms, int fromc)
     /* now for the actual copy */
     if (AOP_TYPE(count) == AOP_LIT && 
 	(int)floatFromVal (AOP(count)->aopu.aop_lit) <= 256) {
-	emitcode (";","OH! JOY auto increment with djnz (very fast)");
-	emitcode ("mov", "dps, #0x21"); 	/* Select DPTR2 & auto-toggle. */
+	emitcode (";","OH  JOY auto increment with djnz (very fast)");
+	emitcode ("mov", "dps,#!constbyte",0x21); 	/* Select DPTR2 & auto-toggle. */
 	emitcode ("mov", "b,%s",aopGet(AOP(count),0,FALSE,FALSE,FALSE));
 	emitcode ("","!tlabeldef",lbl->key+100);
 	if (fromc) {
@@ -10855,7 +10855,7 @@ static void genMemcpyX2X( iCode *ic, int nparms, operand **parms, int fromc)
 	emitcode (";"," Auto increment but no djnz");
 	emitcode ("mov","ap,%s",aopGet (AOP (count), 0, FALSE, TRUE, TRUE));
 	emitcode ("mov","b,%s",aopGet (AOP (count), 1, FALSE, TRUE, TRUE));
-	emitcode ("mov", "dps, #0x21"); 	/* Select DPTR2 & auto-toggle. */
+	emitcode ("mov", "dps,#!constbyte",0x21); 	/* Select DPTR2 & auto-toggle. */
 	emitcode ("","!tlabeldef",lbl->key+100);
 	if (fromc) {
 	    emitcode ("clr","a");
@@ -10869,15 +10869,15 @@ static void genMemcpyX2X( iCode *ic, int nparms, operand **parms, int fromc)
 	emitcode ("orl","a,ap");
 	emitcode ("jz","!tlabel",lbl1->key+100);
 	emitcode ("mov","a,ap");
-	emitcode ("add","a,#0xFF");
+	emitcode ("add","a,#!constbyte",0xFF);
 	emitcode ("mov","ap,a");
 	emitcode ("mov","a,b");
-	emitcode ("addc","a,#0xFF");
+	emitcode ("addc","a,#!constbyte",0xFF);
 	emitcode ("mov","b,a");
 	emitcode ("sjmp","!tlabel",lbl->key+100);
 	emitcode ("","!tlabeldef",lbl1->key+100);
     }
-    emitcode ("mov", "dps, #0"); 
+    emitcode ("mov", "dps,#0"); 
     freeAsmop (count, NULL, ic, FALSE);
 
 }
@@ -10954,10 +10954,10 @@ static void genMemsetX(iCode *ic, int nparms, operand **parms)
 	emitcode ("orl","a,ap");
 	emitcode ("jz","!tlabel",lbl1->key+100);
 	emitcode ("mov","a,ap");
-	emitcode ("add","a,#0xFF");
+	emitcode ("add","a,#!constbyte",0xFF);
 	emitcode ("mov","ap,a");
 	emitcode ("mov","a,b");
-	emitcode ("addc","a,#0xFF");
+	emitcode ("addc","a,#!constbyte",0xFF);
 	emitcode ("mov","b,a");
 	emitcode ("sjmp","!tlabel",lbl->key+100);
 	emitcode ("","!tlabeldef",lbl1->key+100);

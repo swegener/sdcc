@@ -284,6 +284,13 @@ fi
 if test "$PICOPT"x != "x"; then
     SHAREDLIB="yes"
 fi
+# If this is Cygwin neither use Position Independant Code
+# nor build .so
+# Quick + dirty by Bernhard
+if gcc -v 2>&1 | grep -i cygwin > /dev/null; then
+    PICOPT=""
+    SHAREDLIB="no"
+fi
 AC_SUBST(SHAREDLIB)
 AC_SUBST(PICOPT)
 

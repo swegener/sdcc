@@ -188,6 +188,7 @@ void AddRel(void)
     long newlibpos, indexsize;
     char symname[MAXLINE+1];
     char c;
+    int IsDOSStyle=0;
 
     strcpy(LibNameTmp, LibName);
     ChangeExtension(LibNameTmp, "__L");
@@ -332,10 +333,17 @@ void AddRel(void)
     lib=fopen(LibName, "w");
     libindex=fopen(IndexName, "r");
 
-    fprintf(lib, "<SDCCLIB>\n\n");
-    fprintf(lib, "<INDEX>\n");
+    fprintf(lib, "<SDCCLIB>\n\n<INDEX>\n");
 
-    indexsize+=ftell(lib)+12+14;
+    /*Find out if the \n is expanded to \r\n or not*/
+    if(ftell(lib)!=(long)strlen("<SDCCLIB>\n\n<INDEX>\n"))
+    {
+        IsDOSStyle=1;
+    }
+
+    indexsize+=ftell(lib)+strlen("0123456789\n\n</INDEX>\n\n");
+    if(IsDOSStyle) indexsize+=4;
+
     fprintf(lib, "%10ld\n", indexsize);
 
     while(!feof(libindex))

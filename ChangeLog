@@ -1,3 +1,8 @@
+2003-07-06  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+    * support/librarian/sdcclib.c: Generate correct offsets for libraries with
+    Unix (/n) and DOS (/r/n) line terminations.
+
 2003-09-17  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCCopt.c (cnvFromFloatCast, cnvToFloatCast): fixed

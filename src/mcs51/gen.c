@@ -61,10 +61,10 @@ static char *zero = "#0x00";
 static char *one  = "#0x01";
 static char *spname ;
 
-static char *fReturn8051[] = {"dpl","dph","b","a" };
-static char *fReturn390[] = {"dpl","dph","dpx", "b","a" };
+char *fReturn8051[] = {"dpl","dph","b","a" };
+char *fReturn390[] = {"dpl","dph","dpx", "b","a" };
 unsigned fReturnSize = 4; /* shared with ralloc.c */
-static char **fReturn = fReturn8051;
+char **fReturn = fReturn8051;
 static char *accUse[] = {"a","b"};
 
 static short rbank = -1;
@@ -7286,13 +7286,6 @@ void gen51Code (iCode *lic)
 {
     iCode *ic;
     int cln = 0;
-
-    /* Hack-o-matic: change fReturn based on model. */
-    if (options.model == MODEL_FLAT24)
-    {
-        fReturn = fReturn390;
-        fReturnSize = 5;
-    }
 
     lineHead = lineCurr = NULL;
 

@@ -25,6 +25,7 @@
 
 #include "common.h"
 #include "ralloc.h"
+#include "gen.h"
 
 /*-----------------------------------------------------------------*/
 /* At this point we start getting processor specific although      */

@@ -7,6 +7,7 @@
 #include "common.h"
 #include "main.h"
 #include "ralloc.h"
+#include "gen.h"
 
 static char _defaultRules[] =
 {
@@ -67,8 +68,9 @@ static void _mcs51_finaliseOptions(void)
         				    * but is ugly. There must be a 
         				    * better way.
         				    */
-	#endif        				    
-        
+	#endif
+        fReturn = fReturn390;
+        fReturnSize = 5;
     } 
 }
 

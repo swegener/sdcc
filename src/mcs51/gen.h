@@ -68,5 +68,9 @@ typedef struct asmop {
 
 void gen51Code (iCode *);
 
+extern char *fReturn8051[];
+extern char *fReturn390[];
+extern unsigned fReturnSize;
+extern char **fReturn;
 
 #endif

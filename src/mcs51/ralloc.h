@@ -54,7 +54,4 @@ extern regs regs8051[];
 
 regs  *mcs51_regWithIdx (int);
 
-/* in gen.c */
-extern unsigned fReturnSize;
-
 #endif

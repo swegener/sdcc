@@ -113,7 +113,7 @@ XA51SOURCES      = _atoi.c _atol.c _schar2fs.c \
 		  asincosf.c asinf.c acosf.c atanf.c atan2f.c sincoshf.c \
 		  sinhf.c coshf.c tanhf.c floorf.c ceilf.c modff.c
 
-XA51OBJECTS      = $(XA51SOURCES:%.c=$(PORTDIR)/%.xa)
+XA51OBJECTS      = $(XA51SOURCES:%.c=$(PORTDIR)/%.rel)
 
 OEXT            = .rel
 
@@ -139,11 +139,11 @@ model-ds390:
 
 model-xa51:
 	if [ "`grep xa51 ../../ports.build`" = xa51 ]; then \
-	  $(MAKE) MODELFLAGS="-mxa51" PORT=xa51 objects-xa51 OEXT=.xa; \
+	  $(MAKE) MODELFLAGS="-mxa51" PORT=xa51 objects-xa51; \
 	fi
 
 objects-xa51: build-dir $(XA51OBJECTS) port-specific-objects
-	cd $(PORTDIR); ls *$(OEXT) > $(PORT).lib
+	cd $(PORTDIR); ls *$(OEXT) > lib$(PORT).lib
 
 model-z80:
 	if [ "`grep z80 ../../ports.build`" = z80 ]; then \
@@ -234,7 +234,7 @@ include clean.mk
 $(PORTDIR)/%$(OEXT): %.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c $<
 	mv -f `basename $@` $@
-	-mv -f `basename $@ $(OEXT)`.asm $(PORTDIR)
+	mv -f `basename $@ $(OEXT)`.asm $(PORTDIR)
 
 # Remaking configuration
 # ----------------------

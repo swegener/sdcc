@@ -861,28 +861,31 @@ genEndFunction (iCode * ic)
 /*-----------------------------------------------------------------*/
 static void genRet (iCode * ic) {
 
-  printIc ("genRet", ic, 0,1,0);
+  if (!IC_LEFT(ic)) {
+    printIc ("genRet", ic, 0, 0, 0);
+  } else {
+    printIc ("genRet", ic, 0, 1, 0);
+    aopOp(IC_LEFT(ic), TRUE, TRUE);
+    switch (AOP_SIZE(IC_LEFT(ic)))
+      {
+      case 4:
+	emitcode ("mov", "r1,%s", AOP_NAME(IC_LEFT(ic))[1]);
+	emitcode ("mov", "r0,%s", AOP_NAME(IC_LEFT(ic))[0]);
+	break;
+      case 3:
+	emitcode ("mov", "r1l,%s", AOP_NAME(IC_LEFT(ic))[1]);
+	// fall through
+      case 2:
+	emitcode ("mov", "r0,%s", AOP_NAME(IC_LEFT(ic))[0]);
+	break;
+      case 1:
+	emitcode ("mov", "r0l,%s", AOP_NAME(IC_LEFT(ic))[0]);
+	break;
+      default:
+	bailOut("genRet");
+      }
+  }
 
-  aopOp(IC_LEFT(ic), TRUE, TRUE);
-
-  switch (AOP_SIZE(IC_LEFT(ic)))
-    {
-    case 4:
-      emitcode ("mov", "r1,%s", AOP_NAME(IC_LEFT(ic))[1]);
-      emitcode ("mov", "r0,%s", AOP_NAME(IC_LEFT(ic))[0]);
-      break;
-    case 3:
-      emitcode ("mov", "r1l,%s", AOP_NAME(IC_LEFT(ic))[1]);
-      // fall through
-    case 2:
-      emitcode ("mov", "r0,%s", AOP_NAME(IC_LEFT(ic))[0]);
-      break;
-    case 1:
-      emitcode ("mov", "r0l,%s", AOP_NAME(IC_LEFT(ic))[0]);
-      break;
-    default:
-      bailOut("genRet");
-    }
   emitcode ("jmp", "%05d$", returnLabel->key+100);
 }
 
@@ -940,6 +943,27 @@ static void genPlus (iCode * ic) {
   
   aopOp(left, !aopIsPtr(result), !aopIsDir(result));
   aopOp(right, !aopIsPtr(result), !aopIsDir(result));
+
+  // special case for * = * + char, needs a closer look
+  // heck, this shouldn't have come here but bug-223113 does
+  if (size==3 && AOP_SIZE(right)==1) {
+    emitcode ("mov", "r1l,%s", AOP_NAME(right)[0]);
+    emitcode ("mov", "r1h,#0"); // ptr arith unsigned????????????
+    emitcode ("mov", "%s,%s", AOP_NAME(result)[0], AOP_NAME(left)[0]);
+    emitcode ("add.w", "%s,r1", AOP_NAME(result)[0]);
+    emitcode ("mov", "%s,%s", AOP_NAME(result)[1], AOP_NAME(left)[1]);
+    return;
+  }
+
+  // special case for (whatever)* = (whatever)** + char, needs a closer look
+  // heck, this shouldn't have come here but bug-441448 does
+  if (size==2 && AOP_SIZE(right)==1) {
+    emitcode ("mov", "r1l,%s", AOP_NAME(right)[0]);
+    emitcode ("mov", "r1h,#0"); // ptr arith unsigned????????????
+    emitcode ("mov", "%s,%s", AOP_NAME(result)[0], AOP_NAME(left)[0]);
+    emitcode ("add.w", "%s,r1", AOP_NAME(result)[0]);
+    return;
+  }
 
   if (size>1) {
     instr="add.w";
@@ -1276,6 +1300,10 @@ static void genPointerGet (iCode * ic, iCode *pi) {
 
   switch (AOP_TYPE(left)) 
     {
+    case AOP_LIT:
+      emitcode("mov","r1,%s", AOP_NAME(left)[0]);
+      sprintf (AOP_NAME(left)[0], "r1");
+      // fall through
     case AOP_REG:
       if (size>1) {
 	if (codePointer) {
@@ -1472,7 +1500,7 @@ static void genAddrOf (iCode * ic) {
 	      getStackOffset(OP_SYMBOL(left)->stack));
     if (size > 2) {
       // this must be a generic pointer
-      emitcode ("mov", "%s,#0x%02x", AOP_NAME(IC_RESULT(ic))[1], FPOINTER);
+      emitcode ("mov.b", "%s,#0x%02x", AOP_NAME(IC_RESULT(ic))[1], FPOINTER);
     }
     return;
   }
@@ -1648,13 +1676,13 @@ static void genCast (iCode * ic) {
       switch (ptrType)
 	{
 	case POINTER:
-	  emitcode ("mov", "%s,#0x00", AOP_NAME(result)[1]);
+	  emitcode ("mov.b", "%s,#0x00", AOP_NAME(result)[1]);
 	  break;
 	case FPOINTER:
-	  emitcode ("mov", "%s,#0x01", AOP_NAME(result)[1]);
+	  emitcode ("mov.b", "%s,#0x01", AOP_NAME(result)[1]);
 	  break;
 	case CPOINTER:
-	  emitcode ("mov", "%s,#0x02", AOP_NAME(result)[1]);
+	  emitcode ("mov.b", "%s,#0x02", AOP_NAME(result)[1]);
 	  break;
 	default:
 	  bailOut("genCast: got unknown storage class");

@@ -1,6 +1,6 @@
 CC = sdcc
 
-CFLAGS= -Wa-s -V
+CFLAGS= -Wa-s 
 MFLAGS= -mxa51
 LFLAGS= --xram-loc 0x4000
 

@@ -25,7 +25,7 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJEXT)
 # run simulator with 10 seconds timeout
 %.out: %$(EXEEXT) fwk/lib/timeout
 	mkdir -p `dirname $@`
-	-fwk/lib/timeout 10 $(SXA) -S in=/dev/null,out=$@ $< < $(PORTS_DIR)/xa51/uCsim.cmd >/dev/null || \
+	-fwk/lib/timeout 1 $(SXA) -S in=/dev/null,out=$@ $< < $(PORTS_DIR)/xa51/uCsim.cmd >/dev/null || \
           echo -e --- FAIL: \"timeout, simulation killed\" in $(<:.ihx=.c)"\n"--- Summary: 1/1/1: timeout >> $@
 	-grep -n FAIL $@ /dev/null || true
 

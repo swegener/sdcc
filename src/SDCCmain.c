@@ -1160,10 +1160,13 @@ linkEdit (char **envp)
       mfprintf (lnkfile, getRuntimeVariables(), "-k {libdir}{sep}%s\n", c);
 
       /* standard library files */
-      /* if (strcmp (port->target, "ds390") == 0) */
       if (options.model == MODEL_FLAT24)
 	{
 	  fprintf (lnkfile, "-l %s\n", STD_DS390_LIB);
+	}
+      if (options.model == MODEL_PAGE0)
+	{
+	  fprintf (lnkfile, "-l %s\n", STD_XA51_LIB);
 	}
       fprintf (lnkfile, "-l %s\n", STD_LIB);
       fprintf (lnkfile, "-l %s\n", STD_INT_LIB);

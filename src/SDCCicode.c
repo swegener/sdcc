@@ -1645,7 +1645,6 @@ geniCodeRValue (operand * op, bool force)
   if (IS_SPEC (type) &&
       IS_TRUE_SYMOP (op) &&
       (!IN_FARSPACE (SPEC_OCLS (etype)) ||
-      /* TARGET_IS_DS390)) */
       (options.model == MODEL_FLAT24) ))
     {
       op = operandFromOperand (op);
@@ -2933,7 +2932,6 @@ geniCodeReceive (value * args)
 
 	      if (IN_FARSPACE (SPEC_OCLS (sym->etype)) &&
 		  options.stackAuto == 0 &&
-		  /* !TARGET_IS_DS390) */
 		  (!(options.model == MODEL_FLAT24)) )
 		{
 		}

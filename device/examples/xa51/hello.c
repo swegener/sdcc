@@ -13,7 +13,7 @@ xdata at 0x1234 abs;
 extern xdata xee;
 
 void main(void) {
-  xe=getchar();
+  //xe=getchar();
   abs=1;
   putchar('1');
   putchar('2');

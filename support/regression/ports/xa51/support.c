@@ -22,9 +22,14 @@
 
 #include <tinibios.h>
 
+void external_startup(void) {
+  return;
+}
+
 void
 _putchar (char c)
 {
+  c;
   _asm
     mov.b r0l,[r7+2]
     trap #0x0e

@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
   Register Declarations for 8051 Processor    
   
-       Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
+   Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the

@@ -89,8 +89,8 @@ _ds390_finaliseOptions (void)
   if (options.model != MODEL_FLAT24)
     {
       fprintf (stderr,
-	       "*** warning: ds390 port only supports the flat24 model.\n");
-      options.model = MODEL_FLAT24;
+	       "*** error: ds390 port only supports the flat24 model.\n");
+      exit (1);
     }
   port->s.fptr_size = 3;
   port->s.gptr_size = 4;
@@ -103,40 +103,27 @@ _ds390_finaliseOptions (void)
 				 */
 #endif
 
-  if (options.model)
+  port->mem.default_local_map = xdata;
+  port->mem.default_globl_map = xdata;
+
+  if (!options.stack10bit)
     {
-      port->mem.default_local_map = xdata;
-      port->mem.default_globl_map = xdata;
-    }
-  else
-    {
-      port->mem.default_local_map = data;
-      port->mem.default_globl_map = data;
+    fprintf (stderr,
+	     "*** error: ds390 port only supports the 10 bit stack mode.\n");
     }
 
-  if (options.stack10bit)
-    {
-      if (options.model != MODEL_FLAT24)
-	{
-	  fprintf (stderr,
-		   "*** warning: 10 bit stack mode is only supported in flat24 model.\n");
-	  fprintf (stderr, "\t10 bit stack mode disabled.\n");
-	  options.stack10bit = 0;
-	}
-      else
-	{
-	  /* Fixup the memory map for the stack; it is now in
-	   * far space and requires a FPOINTER to access it.
-	   */
-	  istack->fmap = 1;
-	  istack->ptrType = FPOINTER;
-	}
-    }
+  /* Fixup the memory map for the stack; it is now in
+   * far space and requires a FPOINTER to access it.
+   */
+  istack->fmap = 1;
+  istack->ptrType = FPOINTER;
 }
 
 static void
 _ds390_setDefaultOptions (void)
 {
+  options.model=MODEL_FLAT24;
+  options.stack10bit=1;
 }
 
 static const char *

@@ -1,3 +1,8 @@
+2002-09-20  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+	* \sdcc\as\mcs51\lklist.c: added boundary check before using
+	dram[] array.
+
 2002-09-18    <wiml@hhhh.org>
 
 	* SDCClrange.h: exposed setFromRange() and setToRange()

@@ -40,6 +40,11 @@ IS      (u|U|l|L)*
 #define TKEYWORD(token) return (isTargetKeyword(yytext) ? token :\
                                 check_type())
 
+#define TKEYWORDSDCC(token) return (options.std_sdcc && isTargetKeyword(yytext)\
+                                    ? token : check_type())
+
+#define TKEYWORD99(token) return (options.std_c99 ? token : check_type())
+
 extern int lineno, column;
 extern char *filename;
 
@@ -61,18 +66,27 @@ static int checkCurrFile(char *s);
 
 %x asm
 %%
-"_asm"         {
+_?"_asm"         {
   count();
+  if (!options.std_sdcc && yytext[1] != '_')
+    return check_type();
   assert(asmbuff.alloc == 0 && asmbuff.len == 0 && asmbuff.buf == NULL);
   dbuf_init(&asmbuff, INITIAL_INLINEASM);
   BEGIN(asm);
 }
-<asm>"_endasm" {
+<asm>_?"_endasm" {
   count();
-  yylval.yyinline = dbuf_c_str(&asmbuff);
-  dbuf_detach(&asmbuff);
-  BEGIN(INITIAL);
-  return (INLINEASM);
+  if (!options.std_sdcc && yytext[1] != '_')
+    {
+      dbuf_append(&asmbuff, yytext, strlen(yytext));
+    }
+  else
+    {
+      yylval.yyinline = dbuf_c_str(&asmbuff);
+      dbuf_detach(&asmbuff);
+      BEGIN(INITIAL);
+      return (INLINEASM);
+    }
 }
 <asm>\n        {
   count();
@@ -81,49 +95,69 @@ static int checkCurrFile(char *s);
 <asm>.         {
   dbuf_append(&asmbuff, yytext, 1);
 }
-"at"           { count(); TKEYWORD(AT); }
+"at"           { count(); TKEYWORDSDCC(AT); }
+"__at"         { count(); TKEYWORD(AT); }
 "auto"         { count(); return(AUTO); }
-"bit"          { count(); TKEYWORD(BIT); }
+"bit"          { count(); TKEYWORDSDCC(BIT); }
+"__bit"        { count(); TKEYWORD(BIT); }
 "break"        { count(); return(BREAK); }
 "case"         { count(); return(CASE); }
 "char"         { count(); return(CHAR); }
-"code"         { count(); TKEYWORD(CODE); }
+"code"         { count(); TKEYWORDSDCC(CODE); }
+"__code"       { count(); TKEYWORD(CODE); }
 "const"        { count(); return(CONST); }
 "continue"     { count(); return(CONTINUE); }
-"critical"     { count(); TKEYWORD(CRITICAL); }
-"data"         { count(); TKEYWORD(DATA); }
+"critical"     { count(); TKEYWORDSDCC(CRITICAL); }
+"__critical"   { count(); TKEYWORD(CRITICAL); }
+"data"         { count(); TKEYWORDSDCC(DATA); }
+"__data"       { count(); TKEYWORD(DATA); }
 "default"      { count(); return(DEFAULT); }
 "do"           { count(); return(DO); }
 "double"       { count(); werror(W_DOUBLE_UNSUPPORTED);return(FLOAT); }
 "else"         { count(); return(ELSE); }
 "enum"         { count(); return(ENUM); }
 "extern"       { count(); return(EXTERN); }
-"far"          { count(); TKEYWORD(XDATA); }
-"eeprom"       { count(); TKEYWORD(EEPROM); }
+"far"          { count(); TKEYWORDSDCC(XDATA); }
+"__far"        { count(); TKEYWORD(XDATA); }
+"eeprom"       { count(); TKEYWORDSDCC(EEPROM); }
+"__eeprom"     { count(); TKEYWORD(EEPROM); }
 "float"        { count(); return(FLOAT); }
-"flash"        { count(); TKEYWORD(CODE); }
+"flash"        { count(); TKEYWORDSDCC(CODE); }
+"__flash"      { count(); TKEYWORD(CODE); }
 "for"          { count(); return(FOR); }
 "goto"         { count(); return(GOTO); }
-"idata"        { count(); TKEYWORD(IDATA); }
+"idata"        { count(); TKEYWORDSDCC(IDATA); }
+"__idata"      { count(); TKEYWORD(IDATA); }
 "if"           { count(); return(IF); }
 "int"          { count(); return(INT); }
-"interrupt"    { count(); return(INTERRUPT); }
-"nonbanked"    { count(); TKEYWORD(NONBANKED); }
-"banked"       { count(); TKEYWORD(BANKED); }
+"interrupt"    { count(); TKEYWORDSDCC(INTERRUPT); }
+"__interrupt"  { count(); TKEYWORD(INTERRUPT); }
+"nonbanked"    { count(); TKEYWORDSDCC(NONBANKED); }
+"__nonbanked"  { count(); TKEYWORD(NONBANKED); }
+"banked"       { count(); TKEYWORDSDCC(BANKED); }
+"__banked"     { count(); TKEYWORD(BANKED); }
 "long"         { count(); return(LONG); }
-"near"         { count(); TKEYWORD(DATA); }
-"pdata"        { count(); TKEYWORD(PDATA); }
-"reentrant"    { count(); TKEYWORD(REENTRANT); }
-"shadowregs"   { count(); TKEYWORD(SHADOWREGS); }
-"wparam"       { count(); TKEYWORD(WPARAM); }
+"near"         { count(); TKEYWORDSDCC(DATA); }
+"__near"       { count(); TKEYWORD(DATA); }
+"pdata"        { count(); TKEYWORDSDCC(PDATA); }
+"__pdata"      { count(); TKEYWORD(PDATA); }
+"reentrant"    { count(); TKEYWORDSDCC(REENTRANT); }
+"__reentrant"  { count(); TKEYWORD(REENTRANT); }
+"shadowregs"   { count(); TKEYWORDSDCC(SHADOWREGS); }
+"__shadowregs" { count(); TKEYWORD(SHADOWREGS); }
+"wparam"       { count(); TKEYWORDSDCC(WPARAM); }
+"__wparam"     { count(); TKEYWORD(WPARAM); }
 "register"     { count(); return(REGISTER); }
 "return"       { count(); return(RETURN); }
-"sfr"          { count(); TKEYWORD(SFR); }
-"sbit"         { count(); TKEYWORD(SBIT); }
+"sfr"          { count(); TKEYWORDSDCC(SFR); }
+"__sfr"        { count(); TKEYWORD(SFR); }
+"sbit"         { count(); TKEYWORDSDCC(SBIT); }
+"__sbit"       { count(); TKEYWORD(SBIT); }
 "short"        { count(); return(SHORT); }
 "signed"       { count(); return(SIGNED); }
 "sizeof"       { count(); return(SIZEOF); }
-"sram"         { count(); TKEYWORD(XDATA); }
+"sram"         { count(); TKEYWORDSDCC(XDATA); }
+"__sram"       { count(); TKEYWORD(XDATA); }
 "static"       { count(); return(STATIC); }
 "struct"       { count(); return(STRUCT); }
 "switch"       { count(); return(SWITCH); }
@@ -132,14 +166,20 @@ static int checkCurrFile(char *s);
 "unsigned"     { count(); return(UNSIGNED); }
 "void"         { count(); return(VOID); }
 "volatile"     { count(); return(VOLATILE); }
-"using"        { count(); TKEYWORD(USING); }
-"_naked"       { count(); TKEYWORD(NAKED); }
+"using"        { count(); TKEYWORDSDCC(USING); }
+"__using"      { count(); TKEYWORD(USING); }
+"_naked"       { count(); TKEYWORDSDCC(NAKED); }
+"__naked"      { count(); TKEYWORD(NAKED); }
 "while"        { count(); return(WHILE); }
-"xdata"        { count(); TKEYWORD(XDATA); }
+"xdata"        { count(); TKEYWORDSDCC(XDATA); }
+"__xdata"      { count(); TKEYWORD(XDATA); }
 "..."          { count(); return(VAR_ARGS); }
 "__typeof"     { count(); return TYPEOF; }
 "_JavaNative"  { count(); TKEYWORD(JAVANATIVE); }
-"_overlay"     { count(); TKEYWORD(OVERLAY); }
+"_overlay"     { count(); TKEYWORDSDCC(OVERLAY); }
+"__overlay"    { count(); TKEYWORD(OVERLAY); }
+"inline"       { count(); TKEYWORD99(INLINE); }
+"restrict"     { count(); TKEYWORD99(RESTRICT); }
 {L}({L}|{D})*  { count(); return(check_type()); }
 0[xX]{H}+{IS}? { count(); yylval.val = constVal(yytext); return(CONSTANT); }
 0[0-7]*{IS}?     { count(); yylval.val = constVal(yytext); return(CONSTANT); }
@@ -421,7 +461,11 @@ enum pragma_id {
      P_DISABLEWARN,
      P_OPTCODESPEED,
      P_OPTCODESIZE,
-     P_OPTCODEBALANCED
+     P_OPTCODEBALANCED,
+     P_STD_C89,
+     P_STD_C99,
+     P_STD_SDCC89,
+     P_STD_SDCC99
 };
 
 
@@ -617,7 +661,26 @@ static void doPragma(int op, char *cp)
     optimize.codeSpeed = 0;
     optimize.codeSize = 0;
     break;
-
+  
+  case P_STD_C89:
+    options.std_c99 = 0;
+    options.std_sdcc = 0;
+    break;
+  
+  case P_STD_C99:
+    options.std_c99 = 1;
+    options.std_sdcc = 0;
+    break;
+  
+  case P_STD_SDCC89:
+    options.std_c99 = 0;
+    options.std_sdcc = 1;
+    break;
+  
+  case P_STD_SDCC99:
+    options.std_c99 = 1;
+    options.std_sdcc = 1;
+    break;
   }
 }
 
@@ -652,6 +715,10 @@ static int process_pragma(char *s)
     { "opt_code_speed", P_OPTCODESPEED, 0 },
     { "opt_code_size",  P_OPTCODESIZE,  0 },
     { "opt_code_balanced",  P_OPTCODEBALANCED,  0 },
+    { "std_c89",	P_STD_C89, 0 },
+    { "std_c99",	P_STD_C99, 0 },
+    { "std_sdcc89",	P_STD_SDCC89, 0 },
+    { "std_sdcc99",	P_STD_SDCC99, 0 },
 
     /*
      * The following lines are deprecated pragmas,
@@ -727,12 +794,30 @@ static int isTargetKeyword(char *s)
 
   if (port->keywords == NULL)
     return 0;
-  for (i = 0 ; port->keywords[i] ; i++ ) {
-    if (strcmp(port->keywords[i],s) == 0)
-      return 1;
-  }
+  
+  if (s[0] == '_' && s[1] == '_')
+    {
+      /* Keywords in the port's array have either 0 or 1 underscore, */
+      /* so skip over the appropriate number of chars when comparing */
+      for (i = 0 ; port->keywords[i] ; i++ )
+        {
+          if (port->keywords[i][0] == '_' &&
+              strcmp(port->keywords[i],s+1) == 0)
+            return 1;
+          else if (strcmp(port->keywords[i],s+2) == 0)
+            return 1;
+        }
+    }
+  else
+    {
+      for (i = 0 ; port->keywords[i] ; i++ )
+        {
+          if (strcmp(port->keywords[i],s) == 0)
+            return 1;
+        }
+    }
 
-    return 0;
+  return 0;
 }
 
 int yywrap(void)

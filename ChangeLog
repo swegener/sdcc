@@ -1,3 +1,18 @@
+2005-03-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCmain.c (setDefaultOptions, optionsTable[], parseCmdLine),
+	* src/z80/main.c (_keywords[]),
+	* src/SDCCglobal.h (struct options),
+	* src/SDCC.y,
+	* src/SDCC.lex (isTargetKeyword, doPragma, pragma_tbl[]): new pragmas
+	to enable/disable SDCC and C99 extensions/keywords (std_c89, std_sdcc89,
+	std_c99, std_sdcc99). Also, equivalent command line options (--std-c89,
+	--std-sdcc89, --std-c99, --std-sdcc99). SDCC specific keywords are
+	always available in leading double underscore form. The C99 support is
+	mostly missing, but it's a start.
+	* support/regression/tests/bug-227710.c: fixed nonconforming use of
+	reserved identifier "__data".
+
 2005-03-24 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/peeph.def: fixed bug 1170013

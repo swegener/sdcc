@@ -135,6 +135,10 @@ char buffer[PATH_MAX * 2];
 #define OPTION_NO_PEEP_COMMENTS "--no-peep-comments"
 #define OPTION_OPT_CODE_SPEED   "--opt-code-speed"
 #define OPTION_OPT_CODE_SIZE    "--opt-code-size"
+#define OPTION_STD_C89          "--std-c89"
+#define OPTION_STD_C99          "--std-c99"
+#define OPTION_STD_SDCC89       "--std-sdcc89"
+#define OPTION_STD_SDCC99       "--std-sdcc99"
 
 static const OPTION
 optionsTable[] = {
@@ -165,7 +169,11 @@ optionsTable[] = {
     { 0,    OPTION_DISABLE_WARNING, NULL, "<nnnn> Disable specific warning" },
     { 0,    "--debug",              &options.debug, "Enable debugging symbol output" },
     { 0,    "--cyclomatic",         &options.cyclomatic, "Display complexity of compiled functions" },
-
+    { 0,    OPTION_STD_C89,         NULL, "Use C89 standard only" },
+    { 0,    OPTION_STD_SDCC89,      NULL, "Use C89 standard with SDCC extensions (default)" },
+    { 0,    OPTION_STD_C99,         NULL, "Use C99 standard only (incomplete)" },
+    { 0,    OPTION_STD_SDCC99,      NULL, "Use C99 standard with SDCC extensions (incomplete)" },
+    
     { 0,    NULL,                   NULL, "Code generation options"},    
     { 'm',  NULL,                   NULL, "Set the port to use e.g. -mz80." },
     { 'p',  NULL,                   NULL, "Select port specific processor e.g. -mpic14 -p16f84" },
@@ -548,6 +556,8 @@ setDefaultOptions (void)
   options.nostdinc = 0;
   options.verbose = 0;
   options.shortis8bits = 0;
+  options.std_sdcc = 1;         /* enable SDCC language extensions */
+  options.std_c99 = 0;          /* default to C89 until more C99 support */
 
   options.stack10bit=0;
 
@@ -1075,6 +1085,34 @@ parseCmdLine (int argc, char **argv)
           if (strcmp (argv[i], OPTION_TINI_LIBID) == 0)
             {
               options.tini_libid = getIntArg(OPTION_TINI_LIBID, argv, &i, argc);
+              continue;
+            }
+
+          if (strcmp (argv[i], OPTION_STD_C89) == 0)
+            {
+              options.std_c99 = 0;
+              options.std_sdcc = 0;
+              continue;
+            }
+          
+          if (strcmp (argv[i], OPTION_STD_C99) == 0)
+            {
+              options.std_c99 = 1;
+              options.std_sdcc = 0;
+              continue;
+            }
+
+          if (strcmp (argv[i], OPTION_STD_SDCC89) == 0)
+            {
+              options.std_c99 = 0;
+              options.std_sdcc = 1;
+              continue;
+            }
+          
+          if (strcmp (argv[i], OPTION_STD_SDCC99) == 0)
+            {
+              options.std_c99 = 1;
+              options.std_sdcc = 1;
               continue;
             }
 

@@ -251,6 +251,8 @@ struct options
     int vc_err_style;           /* errors and warnings are compatible with Micro$oft visual studio */
     int use_stdout;             /* send errors to stdout instead of stderr */
     int no_std_crt0;            /*For the z80/gbz80 do not link default crt0.o*/
+    int std_c99;		/* enable C99 keywords/constructs */
+    int std_sdcc;		/* enable SDCC extensions to C */
     /* sets */
     set *calleeSavesSet;        /* list of functions using callee save */
     set *excludeRegsSet;        /* registers excluded from saving */

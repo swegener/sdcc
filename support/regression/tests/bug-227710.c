@@ -2,7 +2,7 @@
  */
 #include <testfwk.h>
 
-static unsigned char __data[] = {
+static unsigned char dataset[] = {
     1, 2, 3, 4
 };
 
@@ -22,7 +22,7 @@ foo(void)
 void
 testPostIncrement(void)
 {
-    p = __data;
+    p = dataset;
     ASSERT(foo() == 1);
     ASSERT(foo() == 2);
     ASSERT(foo() == 3);

@@ -514,6 +514,14 @@ hTabItemWithKey (hTab * htab, int key)
 }
 
 /*-----------------------------------------------------------------*/
+/* hTabMaxKey - return the maxKey of item in the hashTable         */
+/*-----------------------------------------------------------------*/
+int hTabMaxKey (hTab *htab)
+{
+    return (htab ? htab->maxKey : 0);
+}	
+
+/*-----------------------------------------------------------------*/
 /*hTabAddItemIfNotP - adds an item with nothing found with key     */
 /*-----------------------------------------------------------------*/
 void 

@@ -106,6 +106,7 @@ void hTabDeleteAll (hTab *);
 void *hTabFirstItemWK (hTab * htab, int wk);
 void *hTabNextItemWK (hTab * htab);
 void hTabClearAll (hTab * htab);
+int hTabMaxKey (hTab *htab);
 
 /** Find the first item that either is 'item' or which
     according to 'compareFunc' is the same as item.

@@ -1,5 +1,9 @@
 2003-12-01 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
+	* device/lib/hc08/_mullong.c: Removed extra #endif
+
+2003-12-01 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
 	* sim/ucsim/hc08.src/inst.cc,
 	* sim/ucsim/hc08.src/hc08mac.h: fixed some problems with CC flag bits and
 	carries from x to h

@@ -94,4 +94,3 @@ _mullong (long a, long b)
         return t.l + b;
 }
 
-#endif // _MULLONG_ASM

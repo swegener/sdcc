@@ -1383,7 +1383,7 @@ pCodeOp *popGet (asmop *aop, int offset) //, bool bit16, bool dname)
       return newpCodeOpLit(pic14aopLiteral (aop->aopu.aop_lit,offset));
 
     case AOP_STR:
-      DEBUGpic14_emitcode(";","%d",__LINE__);
+      DEBUGpic14_emitcode(";","%d  %s",__LINE__,aop->aopu.aop_str[offset]);
       return newpCodeOpRegFromStr(aop->aopu.aop_str[offset]);
       /*
       pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
@@ -3030,7 +3030,6 @@ static void genRet (iCode *ic)
 	}
 	if(size) {
 	  emitpcode(POC_MOVWF,popRegFromIdx(offset + Gstack_base_addr));
-	  pic14_emitcode("movwf","%s",fReturn[offset]);
 	}
 	offset++;
       }

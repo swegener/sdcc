@@ -12,5 +12,5 @@ fi
 echo "load s $1" > $2
 echo "break e _done" >> $2
 echo "run" >> $2
-echo "x _success" >> $2
+echo "x _failures" >> $2
 echo "abort_gpsim_now" >> $2

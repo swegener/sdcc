@@ -660,12 +660,13 @@ static void * cvt_altpat_mnem2a(void *pp,pCodeWildBlock *pcwb)
 
 static void tokenizeLineNode(char *ln)
 {
-
+  char *lnstart=ln;
   tokIdx = 0;               // Starting off at the beginning
   tokArr[0].tt = PCT_NULL;  // and assume invalid character for first token.
 
   if(!ln || !*ln)
     return;
+
 
   while(*ln) {
 
@@ -723,6 +724,11 @@ static void tokenizeLineNode(char *ln)
 	tokArr[tokIdx].tok.s = Safe_strdup(buffer);
 	tokArr[tokIdx++].tt = PCT_STRING;
 
+      } else {
+	fprintf(stderr, "Error while parsing peep rules (check peeph.def)\n");
+	fprintf(stderr, "Line: %s\n",lnstart);
+	fprintf(stderr, "Token: '%c'\n",*ln);
+	exit(1);
       }
     }
 
@@ -1028,6 +1034,8 @@ void parseTokens(pCodeWildBlock *pcwb)
 	      state = PS_HAVE_COMMA;
 	    } else
 	      fprintf(stderr,"  unexpected comma\n");
+	    break;
+
 	  }
 
 	  matching = 1;
@@ -1227,7 +1235,7 @@ void  peepRules2pCode(peepRule *rules)
     peepRuleBlock2pCodeBlock(pr->match, &currentRule->target);
 
     //DFPRINTF((stderr,"finished target, here it is in pcode form:\n"));
-    //printpBlock(stderr, curBlock);
+    //printpBlock(stderr, currentRule->target.pb);
 
     //DFPRINTF((stderr,"target with labels merged:\n"));
     //pBlockMergeLabels(curBlock);
@@ -1356,7 +1364,7 @@ static void * DLL_append(_DLL *list, _DLL *next)
 /*-----------------------------------------------------------------*/
 int pCodeSearchCondition(pCode *pc, unsigned int cond)
 {
-
+  //fprintf(stderr,"Checking conditions %d\n",cond);
   while(pc) {
 
     /* If we reach a function end (presumably an end since we most
@@ -1368,6 +1376,7 @@ int pCodeSearchCondition(pCode *pc, unsigned int cond)
     if(pc->type == PC_OPCODE) {
       //fprintf(stderr," checking conditions of: ");
       //pc->print(stderr,pc);
+      //fprintf(stderr,"\t\tinCond=%d\toutCond=%d\n",PCI(pc)->inCond,PCI(pc)->outCond);
       if(PCI(pc)->inCond & cond)
 	return 1;
       if(PCI(pc)->outCond & cond)
@@ -1402,6 +1411,14 @@ int pCodeOpCompare(pCodeOp *pcops, pCodeOp *pcopd)
   if(pcops->type != pcopd->type) {
     //fprintf(stderr,"  - fail - diff types\n");
     return 0;  // different types
+  }
+
+  if(pcops->type == PO_LITERAL) {
+
+    if((PCOL(pcops)->lit >= 0) && (PCOL(pcops)->lit == PCOL(pcopd)->lit))
+      return 1;
+
+    return 0;
   }
 
   b[0]=0;
@@ -1547,7 +1564,6 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
       if(PCI(pcd)->pcop) {
 	if (PCI(pcd)->pcop->type == PO_WILD) {
 	  index = PCOW(PCI(pcd)->pcop)->id;
-
 	  //DFPRINTF((stderr,"destination is wild\n"));
 #ifdef DEBUG_PCODEPEEP
 	  if (index > peepBlock->nops) {
@@ -1598,6 +1614,9 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 	    }
 	  }
 
+	} else if (PCI(pcd)->pcop->type == PO_LITERAL) {
+	  return pCodeOpCompare(PCI(pcs)->pcop, PCI(pcd)->pcop);
+
 	}
 	/* FIXME - need an else to check the case when the destination 
 	 * isn't a wild card */
@@ -1610,7 +1629,6 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
   /* Compare a wild instruction to a regular one. */
 
   if((pcd->type == PC_WILD) && (pcs->type == PC_OPCODE)) {
-
 
     index = PCW(pcd)->id;
 #ifdef PCODE_DEBUG
@@ -1687,12 +1705,12 @@ void pCodePeepClrVars(pCodePeep *pcp)
   int i;
   if(!pcp)
     return;
-
+/*
   DFPRINTF((stderr," Clearing peep rule vars\n"));
   DFPRINTF((stderr," %d %d %d  %d %d %d\n",
 	    pcp->target.nvars,pcp->target.nops,pcp->target.nwildpCodes,
 	    pcp->replace.nvars,pcp->replace.nops,pcp->replace.nwildpCodes));
-
+*/
   for(i=0;i<pcp->target.nvars; i++)
     pcp->target.vars[i] = NULL;
   for(i=0;i<pcp->target.nops; i++)
@@ -1934,11 +1952,8 @@ int pCodePeepMatchRule(pCode *pc)
       }
     }
 
-    if(matched) {
+    if(matched && pcin) {
 
-      //pCode *pcr = peepBlock->replace.pb->pcHead;
-      //if(pcr) pcr->print(stderr,pcr);
-      
       /* So far we matched the rule up to the point of the conditions .
        * In other words, all of the opcodes match. Now we need to see
        * if the post conditions are satisfied.
@@ -1948,11 +1963,16 @@ int pCodePeepMatchRule(pCode *pc)
        * the `postFalseCond' as input then we abort the match
        */
       DFPRINTF((stderr,"    matched rule so far, now checking conditions\n"));
+      //pcin->print(stderr,pcin);
+      
       if (pcin && peepBlock->postFalseCond && 
 	  (pCodeSearchCondition(pcin,peepBlock->postFalseCond) > 0) )
 	matched = 0;
 
-      if(!matched) fprintf(stderr,"failed on conditions\n");
+      //fprintf(stderr," condition results = %d\n",pCodeSearchCondition(pcin,peepBlock->postFalseCond));
+
+
+      //if(!matched) fprintf(stderr,"failed on conditions\n");
     }
 
     if(matched) {
@@ -1982,7 +2002,7 @@ int pCodePeepMatchRule(pCode *pc)
 	pcin->prev = pc->prev;
 
 
-#if 0
+      //#if 0
       {
 	/*     DEBUG    */
 	/* Converted the deleted pCodes into comments */
@@ -2014,7 +2034,7 @@ int pCodePeepMatchRule(pCode *pc)
 	if(pc_cline2)
 	  pc_cline2->pc.next = NULL;
       }
-#endif
+      //#endif
 
       if(pcin)
 	pCodeDeleteChain(pc,pcin);

@@ -310,9 +310,12 @@ typedef struct pCodeOpLit
 typedef struct pCodeOpImmd
 {
   pCodeOp pcop;
-  int offset;                   /* low,med, or high byte of immediat value */
-  int index;                    /* add this to the immediate value */
-  unsigned _const:1;		/* is in code space    */
+  int offset;           /* low,med, or high byte of immediat value */
+  int index;            /* add this to the immediate value */
+  unsigned _const:1;    /* is in code space    */
+
+  int rIdx;             /* If this immd points to a register */
+  struct regs *r;       /* then this is the reg. */
 
 } pCodeOpImmd;
 

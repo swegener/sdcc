@@ -176,7 +176,7 @@ pCodeInstruction pciADDLW = {
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
   POC_NOP,
-  PCC_W,   // inCond
+  (PCC_W | PCC_LITERAL),   // inCond
   (PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
 };
 
@@ -197,7 +197,7 @@ pCodeInstruction pciANDLW = {
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
   POC_NOP,
-  PCC_W,   // inCond
+  (PCC_W | PCC_LITERAL),   // inCond
   (PCC_W | PCC_Z) // outCond
 };
 
@@ -260,7 +260,7 @@ pCodeInstruction pciBCF = {
   1,1,  // dest, bit instruction
   0,0,  // branch, skip
   POC_BSF,
-  PCC_REGISTER,   // inCond
+  (PCC_REGISTER | PCC_EXAMINE_PCOP),   // inCond
   PCC_REGISTER // outCond
 };
 
@@ -281,8 +281,8 @@ pCodeInstruction pciBSF = {
   1,1,  // dest, bit instruction
   0,0,  // branch, skip
   POC_BCF,
-  PCC_REGISTER,   // inCond
-  PCC_REGISTER // outCond
+  (PCC_REGISTER | PCC_EXAMINE_PCOP),   // inCond
+  (PCC_REGISTER | PCC_EXAMINE_PCOP) // outCond
 };
 
 pCodeInstruction pciBTFSC = {
@@ -302,8 +302,8 @@ pCodeInstruction pciBTFSC = {
   0,1,  // dest, bit instruction
   1,1,  // branch, skip
   POC_BTFSS,
-  PCC_REGISTER,   // inCond
-  PCC_NONE // outCond
+  (PCC_REGISTER | PCC_EXAMINE_PCOP),   // inCond
+  PCC_EXAMINE_PCOP // outCond
 };
 
 pCodeInstruction pciBTFSS = {
@@ -323,8 +323,8 @@ pCodeInstruction pciBTFSS = {
   0,1,  // dest, bit instruction
   1,1,  // branch, skip
   POC_BTFSC,
-  PCC_REGISTER,   // inCond
-  PCC_NONE // outCond
+  (PCC_REGISTER | PCC_EXAMINE_PCOP),   // inCond
+  PCC_EXAMINE_PCOP // outCond
 };
 
 pCodeInstruction pciCALL = {
@@ -680,7 +680,7 @@ pCodeInstruction pciIORLW = {
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
   POC_NOP,
-  PCC_W,   // inCond
+  (PCC_W | PCC_LITERAL),   // inCond
   (PCC_W | PCC_Z) // outCond
 };
 
@@ -764,7 +764,7 @@ pCodeInstruction pciMOVLW = {
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
   POC_NOP,
-  PCC_NONE,   // inCond
+  (PCC_NONE | PCC_LITERAL),   // inCond
   PCC_W // outCond
 };
 
@@ -826,7 +826,7 @@ pCodeInstruction pciRETLW = {
   0,0,  // dest, bit instruction
   1,0,  // branch, skip
   POC_NOP,
-  PCC_NONE,   // inCond
+  PCC_LITERAL,   // inCond
   PCC_W // outCond
 };
 
@@ -994,7 +994,7 @@ pCodeInstruction pciSUBLW = {
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
   POC_NOP,
-  PCC_W,   // inCond
+  (PCC_W | PCC_LITERAL),   // inCond
   (PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
 };
 
@@ -1120,7 +1120,7 @@ pCodeInstruction pciXORLW = {
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
   POC_NOP,
-  PCC_W,   // inCond
+  (PCC_W | PCC_LITERAL),   // inCond
   (PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
 };
 
@@ -1593,11 +1593,11 @@ pCode *newpCode (PIC_OPCODE op, pCodeOp *pcop)
     memcpy(pci, pic14Mnemonics[op], sizeof(pCodeInstruction));
     pci->pcop = pcop;
 
-    if(pci->inCond == PCC_EXAMINE_PCOP)
-      pci->inCond   = RegCond(pcop);
+    if(pci->inCond & PCC_EXAMINE_PCOP)
+      pci->inCond  |= RegCond(pcop);
 
-    if(pci->outCond == PCC_EXAMINE_PCOP)
-      pci->outCond   = RegCond(pcop);
+    if(pci->outCond & PCC_EXAMINE_PCOP)
+      pci->outCond  |= RegCond(pcop);
 
     pci->pc.prev = pci->pc.next = NULL;
     return (pCode *)pci;
@@ -2013,12 +2013,20 @@ pCodeOp *newpCodeOpImmd(char *name, int offset, int index, int code_space)
   pcop = Safe_calloc(1,sizeof(pCodeOpImmd) );
   pcop->type = PO_IMMEDIATE;
   if(name) {
+    regs *r = dirregWithName(name);
     pcop->name = Safe_strdup(name);
+    PCOI(pcop)->r = r;
+    if(r) {
+      //fprintf(stderr, " newpCodeOpImmd reg %s exists\n",name);
+      PCOI(pcop)->rIdx = r->rIdx;
+    } else {
+      //fprintf(stderr, " newpCodeOpImmd reg %s doesn't exist\n",name);
+      PCOI(pcop)->rIdx = -1;
+    }
     //fprintf(stderr,"%s %s %d\n",__FUNCTION__,name,offset);
   } else {
     pcop->name = NULL;
   }
-
 
   PCOI(pcop)->index = index;
   PCOI(pcop)->offset = offset;
@@ -3124,6 +3132,7 @@ static void AnalyzeRETURN(pCode *pc)
 /*-----------------------------------------------------------------*/
 regs * getRegFromInstruction(pCode *pc)
 {
+
   if(!pc                   || 
      !isPCI(pc)            ||
      !PCI(pc)->pcop        ||
@@ -3141,8 +3150,12 @@ regs * getRegFromInstruction(pCode *pc)
     return PCOR(PCI(pc)->pcop)->r;
 
   case PO_IMMEDIATE:
+    if(PCOI(PCI(pc)->pcop)->r)
+      return (PCOI(PCI(pc)->pcop)->r);
+
     //fprintf(stderr, "getRegFromInstruction - immediate\n");
-    return NULL; // PCOR(PCI(pc)->pcop)->r;
+    return dirregWithName(PCI(pc)->pcop->name);
+    //return NULL; // PCOR(PCI(pc)->pcop)->r;
 
   case PO_GPR_BIT:
     return PCOR(PCI(pc)->pcop)->r;
@@ -4618,6 +4631,8 @@ void AnalyzeBanking(void)
 
   //  for(pb = the_pFile->pbHead; pb; pb = pb->next)
   pCodeRegOptimizeRegUsage();
+
+  OptimizepCode('*');
 
 /*
   for(pb = the_pFile->pbHead; pb; pb = pb->next)

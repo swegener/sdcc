@@ -199,3 +199,31 @@ replace restart {
 	; peep 6 - Removed redundant move
 	movwf	%1
 }
+
+replace restart {
+	movlw	0
+	iorwf	%1,w
+} by {
+	; peep 7 - Removed redundant move
+	movf	%1,w
+}
+
+replace restart {
+	movf	%1,w
+	movwf	%2
+	decf	%2,f
+} by {
+	; peep 8 - Removed redundant move
+	decf	%1,w
+	movwf	%2
+}
+
+replace restart {
+	movwf	%1
+	movf	%2,w
+	xorwf	%1,w
+} by {
+	; peep 9 - Removed redundant move
+	movwf	%1
+	xorwf	%2,w
+}

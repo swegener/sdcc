@@ -13,7 +13,7 @@ LOGFILE=$2
 touch $2
 echo "Test $GPSIM_SCRIPT" >> $LOGFILE
 gpsim --cli -c $GPSIM_SCRIPT $2> test
-grep "success " test | grep "= 0x0"
+grep "failures " test | grep "= 0x0"
 if [ $? -eq 0 ] ; then
   echo "PASSED" >> $LOGFILE
 else

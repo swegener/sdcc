@@ -56,6 +56,7 @@
 #define  PCC_REG_BANK1     (1<<7)
 #define  PCC_REG_BANK2     (1<<8)
 #define  PCC_REG_BANK3     (1<<9)
+#define  PCC_LITERAL       (1<<10)
 
 /*------------------------------------------------------------*/
 

@@ -40,12 +40,20 @@ enum
     X12_IDX, CND_IDX
   };
 
-
-#define REG_PTR 0x01
-#define REG_GPR 0x02
-#define REG_CND 0x04
-#define REG_SFR 0x08
-#define REG_STK 0x10  /* Use a register as a psuedo stack */
+enum {
+ REG_PTR=1,
+ REG_GPR,
+ REG_CND,
+ REG_SFR,
+ REG_STK,
+ REG_TMP
+};
+//#define REG_PTR 0x01
+//#define REG_GPR 0x02
+//#define REG_CND 0x04
+//#define REG_SFR 0x08
+//#define REG_STK 0x10  /* Use a register as a psuedo stack */
+//#define REG_TMP 0x20  
 
 /* definition for the registers */
 typedef struct regs

@@ -133,22 +133,6 @@ pathCharsEquivalent(char c1, char c2)
 #endif
 }
 
-static bool
-pathEquivalent(const char *p1, const char *p2)
-{
-  while (*p1 != '\0' && *p2 != '\0')
-    {
-      if (pathCharsEquivalent (*p1, *p2) == FALSE)
-        {
-          break;
-        }
-      p1++;
-      p2++;
-    }
-
-  return *p1 == *p2;
-}
-
 static char
 pathCharTransform(char c)
 {

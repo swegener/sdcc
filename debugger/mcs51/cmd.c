@@ -707,6 +707,12 @@ void simGo (unsigned int gaddr)
         userinterrupt = 0;
         return;
     }
+    if ( gaddr == 0 )
+    {
+        function *func = NULL;;
+        if (applyToSet(functions,funcInAddr,gaddr,&func))
+            STACK_PUSH(callStack,func);
+    }
     addr = simGoTillBp (gaddr);
 
     /* got the pc for the break point now first

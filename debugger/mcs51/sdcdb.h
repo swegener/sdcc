@@ -105,7 +105,7 @@ typedef short bool;
                               : STACK_PUSH_(stack,x)              )
 
 #define  STACK_POP(stack)     (STACK_EMPTY(stack)                 \
-                              ?((t_##stack)(long)(STACK_ERR(0)))  \
+                              ?((t_##stack) NULL)  \
                               : STACK_POP_(stack)                 )
 
 #define  STACK_PEEK(stack)    (STACK_EMPTY(stack)                 \

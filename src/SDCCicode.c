@@ -2244,8 +2244,11 @@ operand *geniCodeLeftShift (operand *left, operand *right)
     /* Note that we don't use the usual binary conversions for the 
      * shift operations, in accordance with our ANSI friends.
      */
-    right = usualUnaryConversions(right);
-    left = usualUnaryConversions(left);
+    if (options.ANSIint)
+    { 
+    	right = usualUnaryConversions(right);
+    	left = usualUnaryConversions(left);
+    }
 
     ic = newiCode(LEFT_OP,left,right);
     IC_RESULT(ic) = newiTempOperand(operandType(left),0);
@@ -2263,8 +2266,11 @@ operand *geniCodeRightShift (operand *left, operand *right)
     /* Note that we don't use the usual binary conversions for the 
      * shift operations, in accordance with our ANSI friends.
      */
-    right = usualUnaryConversions(right);
-    left = usualUnaryConversions(left);
+    if (options.ANSIint)
+    { 
+    	right = usualUnaryConversions(right);
+    	left = usualUnaryConversions(left);
+    }
     
     ic = newiCode(RIGHT_OP,left,right);
     IC_RESULT(ic) = newiTempOperand(operandType(left),0);

@@ -62,8 +62,8 @@ char *aopLiteral (value * val, int offset);
    CODE GENERATION for a specific MCU . some of the
    routines may be reusable, will have to see */
 
-static char *zero = "#0x00";
-static char *one = "#0x01";
+static char *zero = "#0";
+static char *one = "#1";
 static char *spname;
 
 #define D(x) x

@@ -29,11 +29,23 @@ void  isr(void) interrupt 1 using 1
 
 void lcd1(const unsigned char *str)
 {
-  if(str && str[2] != 'r')
+  const char *p = "hellow world!\r\n";
+
+  if(!str)
+    failures++;
+
+ if(str && str[2] != 'r')
     failures++;
 
   if(arr[3]!=9)
     failures++;
+
+  while (1) {
+    if (0 == *p) break;
+    PORTB = *p;
+    p++;
+  }
+
 }
 
 void main(void)

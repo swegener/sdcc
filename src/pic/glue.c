@@ -67,17 +67,6 @@ extern void printChar (FILE * ofile, char *s, int plen);
 
 
 /*-----------------------------------------------------------------*/
-/* aopLiteral - byte from a literal value                          */
-/*-----------------------------------------------------------------*/
-static int
-_aopLiteral (value * val, int offset)
-{
-  unsigned long ul = (unsigned long) floatFromVal (val);
-
-  return  (ul >> (8*_ENDIAN(offset)) &0xff);
-}
-
-/*-----------------------------------------------------------------*/
 /* aopLiteral - string from a literal value                        */
 /*-----------------------------------------------------------------*/
 int pic14aopLiteral (value *val, int offset)
@@ -254,54 +243,21 @@ printIvalType (symbol *sym, sym_link * type, initList * ilist, pBlock *pb)
 
   switch (getSize (type)) {
   case 1:
-    //tfprintf (oFile, "\t!dbs\n",aopLiteral (val, 0));
     addpCode2pBlock(pb,newpCode(POC_RETLW,newpCodeOpLit(BYTE_IN_LONG(ulval,0))));
-    //fprintf(stderr,"0x%02x\n",_aopLiteral(val,0));
-
     break;
 
   case 2:
-    // if (port->use_dw_for_init) {
-    //tfprintf (oFile, "\t!dws\n", aopLiteralLong (val, 0, 2));
-    //  fprintf(stderr,"%s:%d  aopLiteralLong\n",__FILE__,__LINE__);
-    //}else
-    //fprintf (oFile, "\t.byte %s,%s\n", aopLiteral (val, 0), aopLiteral (val, 1));
-    //fprintf(stderr,"0x%02x  0x%02x\n",_aopLiteral(val,0),_aopLiteral(val,1));
     addpCode2pBlock(pb,newpCode(POC_RETLW,newpCodeOpLit(BYTE_IN_LONG(ulval,0))));
     addpCode2pBlock(pb,newpCode(POC_RETLW,newpCodeOpLit(BYTE_IN_LONG(ulval,1))));
     break;
+
   case 4:
-    /*
-    if (!val) {
-      tfprintf (oFile, "\t!dw !constword\n", 0);
-      tfprintf (oFile, "\t!dw !constword\n", 0);
-    }
-    else {
-      fprintf (oFile, "\t.byte %s,%s,%s,%s\n",
-	       aopLiteral (val, 0), aopLiteral (val, 1),
-	       aopLiteral (val, 2), aopLiteral (val, 3));
-      fprintf(stderr,"0x%02x  0x%02x 0x%02x  0x%02x\n",
-	      _aopLiteral(val,0),_aopLiteral(val,1),
-	      _aopLiteral(val,2),_aopLiteral(val,3));
-    }
-    */
     addpCode2pBlock(pb,newpCode(POC_RETLW,newpCodeOpLit(BYTE_IN_LONG(ulval,0))));
     addpCode2pBlock(pb,newpCode(POC_RETLW,newpCodeOpLit(BYTE_IN_LONG(ulval,1))));
     addpCode2pBlock(pb,newpCode(POC_RETLW,newpCodeOpLit(BYTE_IN_LONG(ulval,2))));
     addpCode2pBlock(pb,newpCode(POC_RETLW,newpCodeOpLit(BYTE_IN_LONG(ulval,3))));
     break;
   }
-#if 0
-  {
-    int size = getSize(type);
-
-    fprintf(stderr," size=%d, val =",size);
-    if(val)
-      fprintf(stderr,"0x%02x\n",_aopLiteral(val,0));
-    else
-      fprintf(stderr,"none\n");
-  }
-#endif
 }
 
 /*-----------------------------------------------------------------*/
@@ -316,7 +272,7 @@ printIvalChar (sym_link * type, initList * ilist, pBlock *pb, char *s)
   if(!pb)
     return 0;
 
-  //fprintf(stderr, "%s\n",__FUNCTION__);
+  fprintf(stderr, "%s\n",__FUNCTION__);
   if (!s)
     {
 

@@ -1842,7 +1842,7 @@ pCodeOp *newpCodeOpLit(int lit)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-pCodeOp *newpCodeOpImmd(char *name, int offset)
+pCodeOp *newpCodeOpImmd(char *name, int offset, int index, int code_space)
 {
   pCodeOp *pcop;
 
@@ -1856,7 +1856,9 @@ pCodeOp *newpCodeOpImmd(char *name, int offset)
   }
 
 
+  PCOI(pcop)->index = index;
   PCOI(pcop)->offset = offset;
+  PCOI(pcop)->_const = code_space;
 
   return pcop;
 }
@@ -2190,23 +2192,27 @@ static char *get_op( pCodeInstruction *pcc)
     case PO_IMMEDIATE:
       s = buffer;
       size = sizeof(buffer);
+      fprintf(stderr,"PO_IMMEDIATE name = %s  offset = %d\n",pcc->pcop->name,
+	      PCOI(pcc->pcop)->offset);
+      if(PCOI(pcc->pcop)->_const) {
 
+	if( PCOI(pcc->pcop)->offset && PCOI(pcc->pcop)->offset<4) {
+	  SAFE_snprintf(&s,&size,"(((%s+%d) >> %d)&0xff)",
+			pcc->pcop->name,
+			PCOI(pcc->pcop)->index,
+			8 * PCOI(pcc->pcop)->offset );
+	} else
+	  SAFE_snprintf(&s,&size,"LOW(%s+%d)",pcc->pcop->name,PCOI(pcc->pcop)->index);
+      } else {
+      
+	if( PCOI(pcc->pcop)->index) { // && PCOI(pcc->pcop)->offset<4) {
+	  SAFE_snprintf(&s,&size,"(%s + %d)",
+			pcc->pcop->name,
+			PCOI(pcc->pcop)->index );
+	} else
+	  SAFE_snprintf(&s,&size,"%s",pcc->pcop->name);
+      }
 
-/*
-      if( PCOI(pcc->pcop)->offset && PCOI(pcc->pcop)->offset<4) {
-	SAFE_snprintf(&s,&size,"((%s >> %d)&0xff)",
-		      pcc->pcop->name,
-		      8 * PCOI(pcc->pcop)->offset );
-      } else
-	SAFE_snprintf(&s,&size,"LOW(%s)",pcc->pcop->name);
-*/    
-
-      if( PCOI(pcc->pcop)->offset && PCOI(pcc->pcop)->offset<4) {
-	SAFE_snprintf(&s,&size,"(%s + %d)",
-		      pcc->pcop->name,
-		      PCOI(pcc->pcop)->offset );
-      } else
-	SAFE_snprintf(&s,&size,"%s",pcc->pcop->name);
       return buffer;
 
     case PO_DIR:

@@ -75,7 +75,7 @@ static int optimized_for_speed = 0;
 static int max_key=0;
 static int GpsuedoStkPtr=0;
 
-pCodeOp *popGetImmd(char *name, unsigned int offset);
+pCodeOp *popGetImmd(char *name, unsigned int offset, int index);
 unsigned int pic14aopLiteral (value *val, int offset);
 const char *AopType(short type);
 static iCode *ifxForOp ( operand *op, iCode *ic );
@@ -546,11 +546,27 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
 
     /* only remaining is far space */
     /* in which case DPTR gets the address */
+    sym->aop = aop = newAsmop(AOP_PCODE);
+
+    aop->aopu.pcop = popGetImmd(sym->rname,0,0);
+    PCOI(aop->aopu.pcop)->_const = IN_CODESPACE(space);
+    PCOI(aop->aopu.pcop)->index = 0;
+
+    DEBUGpic14_emitcode(";"," rname %s, val %d, const = %d",
+			sym->rname, 0, PCOI(aop->aopu.pcop)->_const);
+
+    allocDirReg (IC_LEFT(ic));
+
+    aop->size = FPTRSIZE; 
+/*
+    DEBUGpic14_emitcode(";","%d size = %d, name =%s",__LINE__,aop->size,sym->rname);
     sym->aop = aop = newAsmop(AOP_DPTR);
     pic14_emitcode ("mov","dptr,#%s", sym->rname);
     aop->size = getSize(sym->type);
 
     DEBUGpic14_emitcode(";","%d size = %d",__LINE__,aop->size);
+*/
+
     /* if it is in code space */
     if (IN_CODESPACE(space))
         aop->code = 1;
@@ -561,13 +577,15 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
 /*-----------------------------------------------------------------*/
 /* aopForRemat - rematerialzes an object                           */
 /*-----------------------------------------------------------------*/
-static asmop *aopForRemat (symbol *sym)
+static asmop *aopForRemat (operand *op) // x symbol *sym)
 {
-    iCode *ic = sym->rematiCode;
-    //X asmop *aop = newAsmop(AOP_IMMD);
-    asmop *aop = newAsmop(AOP_PCODE);
-    int val = 0;
-    int offset = 0;
+  symbol *sym = OP_SYMBOL(op);
+  iCode *ic = NULL;
+  asmop *aop = newAsmop(AOP_PCODE);
+  int val = 0;
+  int offset = 0;
+
+  ic = sym->rematiCode;
 
     DEBUGpic14_emitcode(";","%s %d",__FUNCTION__,__LINE__);
 
@@ -581,22 +599,17 @@ static asmop *aopForRemat (symbol *sym)
 	
 	ic = OP_SYMBOL(IC_LEFT(ic))->rematiCode;
     }
-/* X
-    if (val) {
-    	sprintf(buffer,"(%s %c 0x%04x)",
-	        OP_SYMBOL(IC_LEFT(ic))->rname, 
-		val >= 0 ? '+' : '-',
-		abs(val) & 0xffff);
-	fprintf(stderr,"hmmm %s\n",buffer);
-    } else
-        strcpy(buffer,OP_SYMBOL(IC_LEFT(ic))->rname);
-*/
-    //ic = sym->rematiCode;
+
     offset = OP_SYMBOL(IC_LEFT(ic))->offset;
-    aop->aopu.pcop = popGetImmd(OP_SYMBOL(IC_LEFT(ic))->rname,val);
-    DEBUGpic14_emitcode(";"," rname %s, val %d ",OP_SYMBOL(IC_LEFT(ic))->rname,val);
-    //X aop->aopu.aop_immd = Safe_calloc(1,strlen(buffer)+1);
-    //X strcpy(aop->aopu.aop_immd,buffer);    
+    aop->aopu.pcop = popGetImmd(OP_SYMBOL(IC_LEFT(ic))->rname,0,val);
+    PCOI(aop->aopu.pcop)->_const = IS_PTR_CONST(operandType(op));
+    PCOI(aop->aopu.pcop)->index = val;
+
+    DEBUGpic14_emitcode(";"," rname %s, val %d, const = %d",
+			OP_SYMBOL(IC_LEFT(ic))->rname,
+			val, IS_PTR_CONST(operandType(op)));
+
+    //    DEBUGpic14_emitcode(";","aop type  %s",AopType(AOP_TYPE(IC_LEFT(ic))));
 
     allocDirReg (IC_LEFT(ic));
 
@@ -790,8 +803,9 @@ void aopOp (operand *op, iCode *ic, bool result)
       DEBUGpic14_emitcode(";","%d",__LINE__);
         /* rematerialize it NOW */
         if (sym->remat) {
+
             sym->aop = op->aop = aop =
-                                      aopForRemat (sym);
+                                      aopForRemat (op);
             aop->size = getSize(sym->type);
 	    //DEBUGpic14_emitcode(";"," %d: size %d, %s\n",__LINE__,aop->size,aop->aopu.aop_immd);
             return;
@@ -828,7 +842,7 @@ void aopOp (operand *op, iCode *ic, bool result)
 			    sym->rname, sym->usl.spillLoc->offset);
         // X sym->aop = op->aop = aop = aopForSym(ic,sym->usl.spillLoc,result);
 	sym->aop = op->aop = aop = newAsmop(AOP_PCODE);
-	aop->aopu.pcop = popGetImmd(sym->usl.spillLoc->rname,sym->usl.spillLoc->offset);
+	aop->aopu.pcop = popGetImmd(sym->usl.spillLoc->rname,0,sym->usl.spillLoc->offset);
 	//allocDirReg (IC_LEFT(ic));
         aop->size = getSize(sym->type);
 
@@ -1187,10 +1201,10 @@ pCodeOp *popGetLit(unsigned int lit)
 /*-----------------------------------------------------------------*/
 /* popGetImmd - asm operator to pcode immediate conversion         */
 /*-----------------------------------------------------------------*/
-pCodeOp *popGetImmd(char *name, unsigned int offset)
+pCodeOp *popGetImmd(char *name, unsigned int offset, int index)
 {
 
-  return newpCodeOpImmd(name, offset);
+  return newpCodeOpImmd(name, offset,index, 0);
 }
 
 
@@ -1274,7 +1288,7 @@ pCodeOp *popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 	
     case AOP_IMMD:
       DEBUGpic14_emitcode(";","%d",__LINE__);
-      return popGetImmd(aop->aopu.aop_immd,offset);
+      return popGetImmd(aop->aopu.aop_immd,offset,0);
 
     case AOP_DIR:
 	pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
@@ -1342,7 +1356,9 @@ pCodeOp *popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 
     case AOP_PCODE:
       DEBUGpic14_emitcode(";","popGet AOP_PCODE%d",__LINE__);
-      return pCodeOpCopy(aop->aopu.pcop);
+      pcop = pCodeOpCopy(aop->aopu.pcop);
+      PCOI(pcop)->offset = offset;
+      return pcop;
     }
 
     werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
@@ -1389,7 +1405,7 @@ void aopPut (asmop *aop, char *s, int offset)
 	      emitpcode(POC_CLRF,popGet(aop,offset));
 	      break;
 	    } else
-	      emitpcode(POC_MOVLW,popGetImmd(s,offset));
+	      emitpcode(POC_MOVLW,popGetImmd(s,offset,0));
 	  }
 
 	  emitpcode(POC_MOVWF,popGet(aop,offset));
@@ -2341,7 +2357,7 @@ static void genCall (iCode *ic)
 
 	//if (strcmp(l,fReturn[offset])) {
 
-	if ( ((AOP(IC_LEFT(sic))->type) == AOP_IMMD) ||
+	if ( ((AOP(IC_LEFT(sic))->type) == AOP_PCODE) ||
 	     ((AOP(IC_LEFT(sic))->type) == AOP_LIT) )
 	  emitpcode(POC_MOVLW,popGet(AOP(IC_LEFT(sic)),offset));
 	else
@@ -7929,7 +7945,7 @@ static void genConstPointerGet (operand *left,
   emitpcode(POC_GOTO,popGetLabel(blbl->key));
   emitpLabel(albl->key);
 
-  poc = ( (AOP_TYPE(left) == AOP_IMMD) ? POC_MOVLW : POC_MOVFW);
+  poc = ( (AOP_TYPE(left) == AOP_PCODE) ? POC_MOVLW : POC_MOVFW);
     
   emitpcode(poc,popGet(AOP(left),1));
   emitpcode(POC_MOVWF,popCopyReg(&pc_pclath));
@@ -8707,9 +8723,8 @@ static void genIfx (iCode *ic, iCode *popIc)
 /*-----------------------------------------------------------------*/
 static void genAddrOf (iCode *ic)
 {
-  //symbol *sym = OP_SYMBOL(IC_LEFT(ic));
   operand *right, *result, *left;
-  //int size, offset ;
+  int size, offset ;
 
   DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
@@ -8722,28 +8737,15 @@ static void genAddrOf (iCode *ic)
 
   DEBUGpic14_AopType(__LINE__,left,right,result);
 
-  emitpcode(POC_MOVLW, popGet(AOP(left),0));
-  emitpcode(POC_MOVWF, popGet(AOP(result),0));
-
-#if 0
-  /* object not on stack then we need the name */
   size = AOP_SIZE(IC_RESULT(ic));
   offset = 0;
 
   while (size--) {
-    char s[SDCC_NAME_MAX];
-    if (offset) 
-      sprintf(s,"#(%s >> %d)",
-	      sym->rname,
-	      offset*8);
-    else
-      sprintf(s,"#%s",sym->rname);
-    aopPut(AOP(IC_RESULT(ic)),s,offset++);
+    emitpcode(POC_MOVLW, popGet(AOP(left),offset));
+    emitpcode(POC_MOVWF, popGet(AOP(result),offset));
+    offset++;
   }
-#endif
 
-
-  //  freeAsmop(IC_RESULT(ic),NULL,ic,TRUE);
   freeAsmop(left,NULL,ic,FALSE);
   freeAsmop(result,NULL,ic,TRUE);
 
@@ -9176,15 +9178,22 @@ static void genCast (iCode *ic)
       if (IS_PTR_CONST(operandType(IC_RESULT(ic))))
 	DEBUGpic14_emitcode ("; ***","%d - result is const pointer",__LINE__);
 
+      if ((AOP_TYPE(right) == AOP_PCODE) && AOP(right)->aopu.pcop->type == PO_IMMEDIATE) {
+	emitpcode(POC_MOVLW, popGet(AOP(right),0));
+	emitpcode(POC_MOVWF, popGet(AOP(result),0));
+	emitpcode(POC_MOVLW, popGet(AOP(right),1));
+	emitpcode(POC_MOVWF, popGet(AOP(result),1));
+        if(AOP_SIZE(result) <2)
+	  fprintf(stderr,"%d -- result is not big enough to hold a ptr\n",__LINE__);
+
+      } else {
+
         /* if they in different places then copy */
         size = AOP_SIZE(result);
         offset = 0 ;
         while (size--) {
-	  if(AOP_TYPE(right) == AOP_IMMD)
-	    emitpcode(POC_MOVLW, popGetImmd(AOP(right)->aopu.aop_dir,offset));
-	  else
-	    emitpcode(POC_MOVFW,   popGet(AOP(right),offset));
-	  emitpcode(POC_MOVWF,   popGet(AOP(result),offset));
+	  emitpcode(POC_MOVFW, popGet(AOP(right),offset));
+	  emitpcode(POC_MOVWF, popGet(AOP(result),offset));
 
 	  //aopPut(AOP(result),
 	  // aopGet(AOP(right),offset,FALSE,FALSE),
@@ -9192,7 +9201,8 @@ static void genCast (iCode *ic)
 
 	  offset++;
         }
-        goto release;
+      }
+      goto release;
     }
 
 

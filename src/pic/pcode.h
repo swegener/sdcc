@@ -304,7 +304,10 @@ typedef struct pCodeOpLit
 typedef struct pCodeOpImmd
 {
   pCodeOp pcop;
-  int offset;
+  int offset;                   /* low,med, or high byte of immediat value */
+  int index;                    /* add this to the immediate value */
+  unsigned _const:1;		/* is in code space    */
+
 } pCodeOpImmd;
 
 typedef struct pCodeOpLabel
@@ -707,7 +710,7 @@ void pCodePeepInit(void);
 void pBlockConvert2ISR(pBlock *pb);
 
 pCodeOp *newpCodeOpLabel(char *name, int key);
-pCodeOp *newpCodeOpImmd(char *name, int offset);
+pCodeOp *newpCodeOpImmd(char *name, int offset, int index, int code_space);
 pCodeOp *newpCodeOpLit(int lit);
 pCodeOp *newpCodeOpBit(char *name, int bit,int inBitSpace);
 pCodeOp *newpCodeOpRegFromStr(char *name);

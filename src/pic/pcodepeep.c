@@ -391,7 +391,7 @@ static void * cvt_altpat_mnem0a(void *pp, pCodeWildBlock *pcwb)
   //if(p[0].pct[1].tok.n > sMaxWildVar)
   //  sMaxWildMnem = p[0].pct[1].tok.n;
 
-  if(p[0].pct[1].tok.n > pcwb->nvars)
+  if(p[0].pct[1].tok.n > pcwb->nwildpCodes)
     pcwb->nwildpCodes = p[0].pct[1].tok.n;
 
   return newpCodeWild(p[0].pct[1].tok.n,NULL,NULL);
@@ -470,7 +470,7 @@ static void * cvt_altpat_mnem1a(void *pp,pCodeWildBlock *pcwb)
       return NULL;
     }
 
-    if(p[0].pct[1].tok.n > pcwb->nvars)
+    if(p[0].pct[1].tok.n > pcwb->nwildpCodes)
       pcwb->nwildpCodes = p[0].pct[1].tok.n;
 
     pc =  newpCodeWild(p[1].pct[1].tok.n,NULL,NULL);
@@ -1689,7 +1689,9 @@ pCodeOp *pCodeOpCopy(pCodeOp *pcop)
 
   case PO_IMMEDIATE:
     pcopnew = Safe_calloc(1,sizeof(pCodeOpImmd) );
+    PCOI(pcopnew)->index = PCOI(pcop)->index;
     PCOI(pcopnew)->offset = PCOI(pcop)->offset;
+    PCOI(pcopnew)->_const = PCOI(pcop)->_const;
     break;
 
   case PO_LITERAL:

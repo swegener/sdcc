@@ -1,4 +1,5 @@
-#LyX 1.1 created this file. For more info see http://www.lyx.org/
+#This file was created by <sandeep> Sun Mar 26 12:40:23 2000
+#LyX 1.0 (C) 1995-1999 Matthias Ettrich and the LyX Team
 \lyxformat 2.15
 \textclass linuxdoc
 \language english
@@ -1447,6 +1448,27 @@ Command Line options
 \emph default 
 
 \begin_inset LatexCommand \label{--model-small}
+
+\end_inset 
+
+Generate code for Small Model programs see section Memory Models for more
+ details.
+ This is the default model.
+\layout Itemize
+
+
+\series bold 
+\size large 
+\bar under 
+--model-flat24
+\series default 
+\emph on 
+\bar default 
+ 
+\size default 
+\emph default 
+
+\begin_inset LatexCommand \ref[--model-flat24]{--model-flat24}
 
 \end_inset 
 
@@ -5602,7 +5624,7 @@ Note if all these routines are used simultaneously the data space might
  overflow.
  For serious floating point usage it is strongly recommended that the Large
  model be used (in which case the floating point routines mentioned above
- will need to recompiled with the --model-Large option).
+ will need to recompiled with the --model-Large option)
 \layout Section
 
 Memory Models
@@ -5633,6 +5655,78 @@ Judicious usage of the processor specific storage classes and the 'reentrant'
  Several optimizations are disabled when the program is compiled using the
  large model, it is therefore strongly recommdended that the small model
  be used unless absolutely required.
+\layout Section
+
+Flat 24 bit addressing model.
+\begin_inset LatexCommand \label{--model-flat24}
+
+\end_inset 
+
+
+\layout Standard
+
+This option generates code for the 24 bit contiguous addressing mode of
+ the Dallas DS80C390 part.
+ In this mode, up to four meg of external RAM or code space can be directly
+ addressed.
+ See the data sheets at www.dalsemi.com for further information on this part.
+\layout Standard
+
+Note that the compiler does not generate any code to place the processor
+ into this mode (it defaults to 8051 compatible mode).
+ Boot loader or similar code must ensure that the processor is in 24 bit
+ contiguous addressing mode before calling the SDCC startup code.
+\layout Standard
+
+Like the --model-large option, variables will by default be placed into
+ the XDATA segment.
+ However, a current limitation is that the compiler will spill variables
+ into the DATA segment when it runs out of registers.
+ This means that compiling complex code can rapidly fill up the DATA segment.
+ This limitation is being worked on, and should be addressed in the next
+ release of sdcc.
+\layout Standard
+
+Segments may be placed anywhere in the 4 meg address space using the usual
+ --*-loc options.
+ Note that if any segments are located above 64K, the -r flag must be passed
+ to the linker to generate the proper segment relocations, and the Intel
+ HEX output format must be used.
+ The -r flag can be passed to the linker by using the option -Wl-r on the
+ sdcc command line.
+\layout Standard
+
+--stack-10bit:
+\layout Standard
+
+This option generates code for the 10 bit stack mode of the Dallas DS80C390
+ part.
+ In this mode, the stack is located in the lower 1K of the internal RAM,
+ which is mapped to 0x400000.
+\layout Standard
+
+With this option, sdcc will generate the proper addressing for stack variables.
+\layout Standard
+
+Note that the support is incomplete, since it still uses a single byte as
+ the stack pointer.
+ This means that only the lower 256 bytes of the potential 1K stack space
+ can actually be used.
+ However, this does allow you to reclaim the precious 256 bytes of low RAM
+ for use for the DATA and IDATA segments.
+\layout Standard
+
+The compiler will not generate any code to put the processor into 10 bit
+ stack mode.
+ It is important to ensure that the processor is in this mode before calling
+ any re-entrant functions compiled with this option.
+\layout Standard
+
+In principle, this should work with the --stack-auto option, but that has
+ not been tested.
+ It is incompatible with the --xstack option.
+ It also only makes sense if the processor is in 24 bit contiguous addressing
+ mode (see the --model-flat24 option).
 \layout Section
 
 Defines created by the compiler.
@@ -11665,7 +11759,7 @@ As always, the code is the authoritave reference - see z80/ralloc.c and z80/gen.
 \layout Standard
 
 
-\begin_inset LatexCommand \index{}
+\begin_inset LatexCommand \index
 
 \end_inset 
 

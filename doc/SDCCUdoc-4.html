@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="SGML-Tools 1.0.9">
+ <META NAME="GENERATOR" CONTENT="SGML-Tools 1.0.7">
  <TITLE>SDCC Compiler User Guide: Command Line options</TITLE>
  <LINK HREF="SDCCUdoc-5.html" REL=next>
  <LINK HREF="SDCCUdoc-3.html" REL=previous>
@@ -23,6 +23,9 @@ should be compiled with this option. In addition the standard library routines
 are compiled with small model , they will need to be recompiled.</LI>
 <LI><B>--model-small</B> 
 <A NAME="--model-small"></A> Generate code for Small Model programs see section Memory
+Models for more details. This is the default model.</LI>
+<LI><B>--model-flat24</B> 
+<A HREF="SDCCUdoc-17.html#--model-flat24">--model-flat24</A>Generate code for Small Model programs see section Memory
 Models for more details. This is the default model.</LI>
 <LI><B>--stack-auto</B> 
 <A NAME="--stack-auto"></A> All functions in the source file will be compiled as reentrant,
@@ -80,8 +83,8 @@ function the appropriate library function needs to be recompiled with the same
 option. If the project consists of multiple source files then all the source
 file should be compiled with the same --callee-saves option string. Also see
 Pragma Directive
-<A HREF="SDCCUdoc-18.html#Pragmaa"></A> CALLEE-SAVES.
-<A HREF="SDCCUdoc-18.html#pragma callee-saves"></A> .</LI>
+<A HREF="SDCCUdoc-19.html#Pragmaa"></A> CALLEE-SAVES.
+<A HREF="SDCCUdoc-19.html#pragma callee-saves"></A> .</LI>
 <LI><B>--debug </B>
 <A NAME="--debug"></A> When this option is used the compiler will generate debug information
 , that can be used with the SDCDB. The debug information is collected in a

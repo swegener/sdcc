@@ -1,7 +1,6 @@
-float __ulong2fs (unsigned long a );
+#include <float.h>
 
 /* convert unsigned int to float */
 float __uint2fs (unsigned int ui) {
-  unsigned long ul=ui;
-  return __ulong2fs(ul);
+  return __ulong2fs(ui);
 }

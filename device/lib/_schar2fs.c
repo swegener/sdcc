@@ -1,7 +1,6 @@
-float __slong2fs (long a );
+#include <float.h>
 
 /* convert signed char to float */
 float __schar2fs (signed char sc) {
-  signed long sl=sc;
-  return __slong2fs(sl);
+  return __slong2fs(sc);
 }

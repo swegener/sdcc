@@ -1,20 +1,31 @@
-/* the following deal with IEEE single-precision numbers */
-#define EXCESS          126
-#define SIGNBIT         ((unsigned long)0x80000000)
-#define HIDDEN          (unsigned long)(1 << 23)
-#define SIGN(fp)        ((fp >> (8*sizeof(fp)-1)) & 1) 
-#define EXP(fp)         (((fp) >> 23) & (unsigned int)0x00FF)
-#define MANT(fp)        (((fp) & (unsigned long)0x007FFFFF) | HIDDEN)
-#define PACK(s,e,m)     ((s) | ((e) << 23) | (m))
+/*
+** libgcc support for software floating point.
+** Copyright (C) 1991 by Pipeline Associates, Inc.  All rights reserved.
+** Permission is granted to do *anything* you want with this file,
+** commercial or otherwise, provided this message remains intact.  So there!
+** I would appreciate receiving any updates/patches/changes that anyone
+** makes, and am willing to be the repository for said changes (am I
+** making a big mistake?).
+**
+** Pat Wood
+** Pipeline Associates, Inc.
+** pipeline!phw@motown.com or
+** sun!pipeline!phw or
+** uunet!motown!pipeline!phw
+*/
+
+/* (c)2000/2001: hacked a little by johan.knol@iduna.nl for sdcc */
+
+#include <float.h>
 
 union float_long
   {
     float f;
-    long l;
+    unsigned long l;
   };
+
 /* add two floats */
-float
-__fsadd (float a1, float a2)
+float __fsadd (float a1, float a2)
 {
   volatile long mant1, mant2;
   volatile union float_long fl1, fl2;
@@ -38,9 +49,8 @@ __fsadd (float a1, float a2)
   if (exp2 > exp1 + 25)
     return (fl2.f);
 
-  /* do everything in excess precision so's we can round later */
-  mant1 = MANT (fl1.l) << 6;
-  mant2 = MANT (fl2.l) << 6;
+  mant1 = MANT (fl1.l);
+  mant2 = MANT (fl2.l);
 
   if (SIGN (fl1.l))
     mant1 = -mant1;
@@ -66,37 +76,27 @@ __fsadd (float a1, float a2)
   else if (!mant1)
     return (0);
 
-  /* normalize up */
-  while (!((unsigned long)mant1 & (unsigned long) 0xE0000000))
-    {
-      mant1 <<= 1;
-      exp1--;
-    }
+  /* normalize */
+  /* jwk: TODO: changing the next two whiles in nested ifs 
+     seriously breaks it. Why?????????????????? */ 
+  while (mant1<HIDDEN) {
+    mant1 <<= 1;
+    exp1--;
+  }
 
-  /* normalize down? */
-  if ((unsigned long)mant1 & (unsigned long)(1 << 30))
-    {
-      mant1 >>= 1 ;
-      exp1++;
-    }
-
-  /* round to even */
-  mant1 += (mant1 & (unsigned long)0x40) ? (unsigned long) 0x20 : (unsigned long) 0x1F;
-
-  /* normalize down? */
-  if (mant1 & (unsigned long)(1 << 30))
-    {
-      mant1 >>= 1;
-      exp1++;
-    }
-
-  /* lose extra precision */
-  mant1 >>= 6;
+  while (mant1 & 0xff000000) {
+    // round off
+    if (mant1&1)
+      mant1 += 2;
+    mant1 >>= 1 ;
+    exp1++;
+  }
 
   /* turn off hidden bit */
-  mant1 = (unsigned long)mant1 & ~HIDDEN;
+  mant1 &= ~HIDDEN;
 
   /* pack up and go home */
   fl1.l = PACK (sign, (unsigned long) exp1, mant1);
+
   return (fl1.f);
 }

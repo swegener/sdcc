@@ -14,16 +14,9 @@
 ** uunet!motown!pipeline!phw
 */
 
-/* (c)2000: hacked a little by johan.knol@iduna.nl for sdcc */
+/* (c)2000/2001: hacked a little by johan.knol@iduna.nl for sdcc */
 
-/* the following deal with IEEE single-precision numbers */
-#define EXCESS		126
-#define SIGNBIT		((unsigned long)0x80000000)
-#define HIDDEN		(unsigned long)(1 << 23)
-#define SIGN(fp)	((fp) & SIGNBIT)
-#define EXP(fp)		(((fp) >> 23) & (unsigned int) 0x00FF)
-#define MANT(fp)	(((fp) & (unsigned long)0x007FFFFF) | HIDDEN)
-#define PACK(s,e,m)	((s) | ((e) << 23) | (m))
+#include <float.h>
 
 union float_long
   {
@@ -31,8 +24,7 @@ union float_long
     long l;
   };
 
-float 
-__ulong2fs (unsigned long a )
+float __ulong2fs (unsigned long a )
 {
   int exp = 24 + EXCESS;
   volatile union float_long fl;
@@ -42,13 +34,27 @@ __ulong2fs (unsigned long a )
       return 0.0;
     }
 
+  while (a & NORM) 
+    {
+      // we lose accuracy here
+      a >>= 1;
+      exp++;
+    }
+  
   while (a < HIDDEN)
     {
       a <<= 1;
       exp--;
     }
 
-   a &= ~HIDDEN ;
+#if 1
+  if ((a&0x7fffff)==0x7fffff) {
+    a=0;
+    exp++;
+  }
+#endif
+
+  a &= ~HIDDEN ;
   /* pack up and go home */
   fl.l = PACK(0,(unsigned long)exp, a);
 

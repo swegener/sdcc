@@ -1,7 +1,6 @@
-float __slong2fs (signed long sl);
+#include <float.h>
 
 /* convert signed int to float */
 float __sint2fs (signed int si) {
-  signed long sl=si;
-  return __slong2fs(sl);
+  return __slong2fs(si);
 }

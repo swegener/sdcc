@@ -24,6 +24,9 @@
 
 #ifndef __SDC51_FLOAT_H
 #define __SDC51_FLOAT_H 1
+
+#include <limits.h>
+
 #define FLT_RADIX       2
 #define FLT_MANT_DIG    24
 #define FLT_EPSILON     1.192092896E-07F
@@ -34,6 +37,38 @@
 #define FLT_MAX_EXP     (+128)
 #define FLT_MAX         3.402823466E+38F
 #define FLT_MAX_10_EXP  (+38)
+
+/* the following deal with IEEE single-precision numbers */
+#define EXCESS		126
+#define SIGNBIT		((unsigned long)0x80000000)
+#define HIDDEN		(unsigned long)(1 << 23)
+#define SIGN(fp)	((fp >> (8*sizeof(fp)-1)) & 1)
+#define EXP(fp)		(((fp) >> 23) & (unsigned int) 0x00FF)
+#define MANT(fp)	(((fp) & (unsigned long)0x007FFFFF) | HIDDEN)
+#define NORM            0xff000000
+#define PACK(s,e,m)	((s) | ((e) << 23) | (m))
+
+float _uchar2fs (unsigned char);
+float _schar2fs (signed char);
+float _uint2fs (unsigned int);
+float _sint2fs (signed int);
+float _ulong2fs (unsigned long);
+float _slong2fs (signed long);
+unsigned char _fs2uchar (float);
+signed char _fs2schar (float);
+unsigned int _fs2uint (float);
+signed int _fs2sint (float);
+unsigned long _fs2ulong (float);
+signed long _fs2slong (float);
+
+float _fsadd (float, float);
+float _fssub (float, float);
+float _fsmul (float, float);
+float _fsdiv (float, float);
+
+char _fslt (float, float);
+char _fseq (float, float);
+char _fsqt (float, float);
 
 #endif
 

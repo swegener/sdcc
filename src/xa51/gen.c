@@ -96,6 +96,8 @@ static char *MOV="mov";
 static char *MOVB="mov.b";
 static char *MOVW="mov.w";
 static char *MOVC="movc";
+static char *MOVCB="movc.b";
+static char *MOVCW="movc.w";
 
 static char *R1L="r1l";
 static char *R1="r1";
@@ -984,11 +986,22 @@ static iCode *hasInc (operand *op, iCode *ic, int osize) {
 
   while (lic) {
     /* if operand of the form op = op + <sizeof *op> */
-    if (lic->op == '+' && isOperandEqual(IC_LEFT(lic),op) &&
-	isOperandEqual(IC_RESULT(lic),op) && 
-	isOperandLiteral(IC_RIGHT(lic)) &&
-	operandLitValue(IC_RIGHT(lic)) == isize) {
-      return lic;
+    if (lic->op == '+') {
+      fprintf (stderr, "isOperandEqual(IC_LEFT(lic),op):%d\n",
+	       isOperandEqual(IC_LEFT(lic),op));
+      fprintf (stderr, "isOperandEqual(IC_RESULT(lic),op):%d\n",
+	       isOperandEqual(IC_RESULT(lic),op));
+      fprintf (stderr, "isOperandLiteral(IC_RIGHT(lic)):%d\n",
+	       isOperandLiteral(IC_RIGHT(lic)));
+      fprintf (stderr, "operandLitValue(IC_RIGHT(lic)) %f %d\n",
+	       operandLitValue(IC_RIGHT(lic)), isize);
+      if (isOperandEqual(IC_LEFT(lic),op) &&
+	  //isOperandEqual(IC_RESULT(lic),op) && 
+	  isOperandLiteral(IC_RIGHT(lic)) &&
+	  operandLitValue(IC_RIGHT(lic)) == isize) {
+	emitcode (";", "Found hasInc");
+	return lic;
+      }
     }
     /* if the operand used or deffed */
     if (bitVectBitValue(OP_USES(op),lic->key) || (unsigned) lic->defKey == op->key) {
@@ -1132,6 +1145,7 @@ static void genRightShift (iCode * ic) {
 static void genPointerGet (iCode * ic, iCode *pi) {
   char *instr, *scratchReg;
   operand *result=IC_RESULT(ic), *left=IC_LEFT(ic);
+  bool codePointer=IS_CODEPTR(operandType(left));
   int size;
 
   printIc ("genPointerGet", ic, 1,1,0);
@@ -1149,17 +1163,35 @@ static void genPointerGet (iCode * ic, iCode *pi) {
     emitcode ("cmp", "%s,#0x%02x", AOP_NAME(left)[1], CPOINTER);
     emitcode ("bne", "%05d$", tlbl1->key+100);
     // far/near pointer
-    emitcode ("mov", "%s,[%s]", AOP_NAME(result)[0], AOP_NAME(left)[0]);
+    if (pi) {
+      emitcode ("mov", "%s,[%s+]", AOP_NAME(result)[0], AOP_NAME(left)[0]);
+      pi->generated=1;
+    } else {
+      emitcode ("mov", "%s,[%s]", AOP_NAME(result)[0], AOP_NAME(left)[0]);
+    }
     if (size>2) {
-      emitcode ("mov", "%s,[%s+2]", AOP_NAME(result)[1], AOP_NAME(left)[0]);
+      if (pi) {
+	emitcode ("mov", "%s,[%s+]", AOP_NAME(result)[1], AOP_NAME(left)[0]);
+      } else {
+	emitcode ("mov", "%s,[%s+2]", AOP_NAME(result)[1], AOP_NAME(left)[0]);
+      }
     }
     emitcode ("br", "%05d$", tlbl2->key+100);
     emitcode ("", "%05d$:", tlbl1->key+100);
     // code pointer
-    emitcode ("mov", "r0,%s", AOP_NAME(left)[0]);
-    emitcode ("movc", "%s,[r0+]", AOP_NAME(result)[0]);
+    if (pi) {
+      emitcode ("movc", "%s,[%s+]", AOP_NAME(result)[0], AOP_NAME(left)[0]);
+      pi->generated=1;
+    } else {
+      emitcode ("mov", "r0,%s", AOP_NAME(left)[0]);
+      emitcode ("movc", "%s,[r0+]", AOP_NAME(result)[0]);
+    }
     if (size>2) {
-      emitcode ("movc", "%s,[r0+]", AOP_NAME(result)[1], AOP_NAME(left)[1]);
+      if (pi) {
+	emitcode ("movc", "%s,[%s+]", AOP_NAME(result)[1], AOP_NAME(left)[0]);
+      } else {
+	emitcode ("movc", "%s,[r0+]", AOP_NAME(result)[1]);
+      }
     }
     emitcode ("", "%05d$:", tlbl2->key+100);
     return;
@@ -1169,10 +1201,18 @@ static void genPointerGet (iCode * ic, iCode *pi) {
     {
     case AOP_REG:
       if (size>1) {
-	instr=MOVW;
+	if (codePointer) {
+	  instr=MOVCW;
+	} else {
+	  instr=MOVW;
+	}
 	scratchReg=R1;
       } else {
-	instr=MOVB;
+	if (codePointer) {
+	  instr=MOVCB;
+	} else {
+	  instr=MOVB;
+	}
 	scratchReg=R1L;
       }
       if (AOP_TYPE(result)==AOP_STK) {
@@ -1180,15 +1220,26 @@ static void genPointerGet (iCode * ic, iCode *pi) {
 	emitcode (MOV, "%s,%s", AOP_NAME(result)[0], scratchReg);
       } else {
 	if (pi) {
-	  emitcode (instr, "%s,[%s+]", AOP_NAME(result)[0], AOP_NAME(left)[0]);
+	  emitcode (instr, "%s,[%s+]", AOP_NAME(result)[0], 
+		    AOP_NAME(left)[0]);
 	  pi->generated=1;
 	} else {
-	  emitcode (instr, "%s,[%s]", AOP_NAME(result)[0], AOP_NAME(left)[0]);
+	  if (codePointer) {
+	    emitcode (MOV, "r1,%s", AOP_NAME(left)[0]);
+	    emitcode (instr, "%s,[r1+]", AOP_NAME(result)[0]);
+	  } else {
+	    emitcode (instr, "%s,[%s]", AOP_NAME(result)[0], 
+		      AOP_NAME(left)[0]);
+	  }
 	}
       }
       if (size > 2) {
 	if (size==3) {
-	  instr=MOVB;
+	  if (codePointer) {
+	    instr=MOVCB;
+	  } else {
+	    instr=MOVB;
+	  }
 	  scratchReg=R1L;
 	}
 	if (AOP_TYPE(result)==AOP_STK) {
@@ -1199,8 +1250,12 @@ static void genPointerGet (iCode * ic, iCode *pi) {
 	    emitcode (instr, "%s,[%s+]", AOP_NAME(result)[1], 
 		      AOP_NAME(left)[0]);
 	  } else {
-	    emitcode (instr, "%s,[%s+2]", AOP_NAME(result)[1], 
-		      AOP_NAME(left)[0]);
+	    if (codePointer) {
+	      emitcode (instr, "%s,[r1]", AOP_NAME(result)[1]);
+	    } else {
+	      emitcode (instr, "%s,[%s+2]", AOP_NAME(result)[1], 
+			AOP_NAME(left)[0]);
+	    }
 	  }
 	}
       }
@@ -1686,7 +1741,7 @@ void genXA51Code (iCode * lic) {
 	break;
 	
       case GET_VALUE_AT_ADDRESS:
-	genPointerGet (ic, hasInc(IC_LEFT(ic), ic, getSize(operandType(IC_LEFT(ic)))));
+	genPointerGet (ic, hasInc(IC_LEFT(ic), ic, getSize(operandType(IC_RESULT(ic)))));
 	break;
 	
       case '=':

@@ -8979,7 +8979,7 @@ gen51Code (iCode * lic)
 	  break;
 
 	case GET_VALUE_AT_ADDRESS:
-	  genPointerGet (ic, hasInc(IC_LEFT(ic),ic,getSize(operandType(IC_LEFT(ic)))));
+	  genPointerGet (ic, hasInc(IC_LEFT(ic),ic,getSize(operandType(IC_RESULT(ic)))));
 	  break;
 
 	case '=':

@@ -980,8 +980,9 @@ serialRegAssign (eBBlock ** ebbs, int count)
 
 	    /* if result is present && is a true symbol */
 	    if (IC_RESULT (ic) && ic->op != IFX &&
-		IS_TRUE_SYMOP (IC_RESULT (ic)))
-		OP_SYMBOL (IC_RESULT (ic))->allocreq++;
+		IS_TRUE_SYMOP (IC_RESULT (ic))) {
+	      OP_SYMBOL (IC_RESULT (ic))->allocreq++;
+	    }
 
 	    /* take away registers from live
 	       ranges that end at this instruction */
@@ -1468,6 +1469,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 
   }
 
+  return 0;
   if (!dic)
     return 0;			/* did not find */
 
@@ -1888,6 +1890,7 @@ static void packRegisters (eBBlock * ebp) {
   int change = 0;
   
   return; // that's it for now
+
   while (1) {
     change = 0;
     

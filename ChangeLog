@@ -1,3 +1,12 @@
+2001-09-05    <johan@FRIJA>
+
+	* src/SDCCglue.c (emitRegularMap): a fix for bug #458099/2
+
+2001-09-04    <johan@FRIJA>
+
+	* src/SDCCsymt.c (checkSClass): a fix for bug #458099/1
+
+
 2001-09-04  Paul Stoffregen  <paul@pjrc.com>
 
 	* pragma noinduction broke memcpy on mcs51 large model.  Moved it inside z80 optimization

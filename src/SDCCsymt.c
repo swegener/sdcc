@@ -1047,7 +1047,8 @@ structElemType (sym_link * stype, value * id)
     }
   werror (E_NOT_MEMBER, id->name);
 
-  return NULL;
+  // the show must go on
+  return newIntLink();
 }
 
 /*------------------------------------------------------------------*/

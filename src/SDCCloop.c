@@ -446,11 +446,21 @@ loopInvariants (region * theLoop, eBBlock ** ebbs, int count)
 	  int lin, rin;
 	  cseDef *ivar;
 
-	  /* if there are function calls in this block and this
-	     is a pointer get, the function could have changed it
-	     so skip, ISO-C99 according to David A. Long */
-	  if (fCallsInBlock && POINTER_GET(ic)) {
-	    continue;
+	  /* jwk: TODO this is only needed if the call is between
+	     here and the definition, but I am too lazy to do that now */
+
+	  /* if there are function calls in this block */
+	  if (fCallsInBlock) {
+
+	    /* if this is a pointer get */
+	    if (POINTER_GET(ic)) {
+	      continue;
+	    }
+
+	    /* if this is an assignment from a global */
+	    if (ic->op=='=' && isOperandGlobal(IC_RIGHT(ic))) {
+	      continue;
+	    }
 	  }
 
 	  if (SKIP_IC (ic) || POINTER_SET (ic) || ic->op == IFX)

@@ -1,3 +1,8 @@
+2004-01-31 Borut Razem <borut.razem AT siol.net>
+
+	* support/scripts/sdcc.nsi: added include/asm/ds390, include/asm/mcs51,
+	  include/mcs51 and include/z80 directories to the package
+
 2004-01-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (genFunction): fixed bug #1112752

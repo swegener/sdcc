@@ -146,12 +146,12 @@ printOperand (operand * op, FILE * file)
     case SYMBOL:
 #define REGA 1
 #ifdef REGA
-      fprintf (file, "%s [k%d lr%d:%d so:%d]{ ia%d re%d rm%d}",		/*{ar%d rm%d ru%d p%d a%d u%d i%d au%d k%d ks%d}"  , */
+      fprintf (file, "%s [k%d lr%d:%d so:%d]{ ia%d re%d rm%d nos%d}",		/*{ar%d rm%d ru%d p%d a%d u%d i%d au%d k%d ks%d}"  , */
 	       (OP_SYMBOL (op)->rname[0] ? OP_SYMBOL (op)->rname : OP_SYMBOL (op)->name),
 	       op->key,
 	       OP_LIVEFROM (op), OP_LIVETO (op),
 	       OP_SYMBOL (op)->stack,
-	       op->isaddr, OP_SYMBOL (op)->isreqv, OP_SYMBOL (op)->remat
+	       op->isaddr, OP_SYMBOL (op)->isreqv, OP_SYMBOL (op)->remat,OP_SYMBOL(op)->noSpilLoc
 	);
       {
 	fprintf (file, "{");
@@ -1089,7 +1089,6 @@ newiTempFromOp (operand * op)
   nop->isvolatile = op->isvolatile;
   nop->isGlobal = op->isGlobal;
   nop->isLiteral = op->isLiteral;
-  nop->noSpilLoc = op->noSpilLoc;
   nop->usesDefs = op->usesDefs;
   nop->isParm = op->isParm;
   return nop;
@@ -1112,7 +1111,6 @@ operandFromOperand (operand * op)
   nop->isvolatile = op->isvolatile;
   nop->isGlobal = op->isGlobal;
   nop->isLiteral = op->isLiteral;
-  nop->noSpilLoc = op->noSpilLoc;
   nop->usesDefs = op->usesDefs;
   nop->isParm = op->isParm;
 
@@ -2021,10 +2019,10 @@ geniCodePostInc (operand * op)
     }
 
   rOp = newiTempOperand (rvtype, 0);
-  rOp->noSpilLoc = 1;
+  OP_SYMBOL(rOp)->noSpilLoc = 1;
 
   if (IS_ITEMP (rv))
-    rv->noSpilLoc = 1;
+    OP_SYMBOL(rv)->noSpilLoc = 1;
 
   geniCodeAssign (rOp, rv, 0);
 
@@ -2101,10 +2099,10 @@ geniCodePostDec (operand * op)
     }
 
   rOp = newiTempOperand (rvtype, 0);
-  rOp->noSpilLoc = 1;
+  OP_SYMBOL(rOp)->noSpilLoc = 1;
 
   if (IS_ITEMP (rv))
-    rv->noSpilLoc = 1;
+    OP_SYMBOL(rv)->noSpilLoc = 1;
 
   geniCodeAssign (rOp, rv, 0);
 

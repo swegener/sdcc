@@ -38,7 +38,7 @@ static int regParmFlg = 0;	/* determine if we can register a parameter */
 static void
 _avr_init (void)
 {
-	asm_addTree (&asm_gas_mapping);
+	asm_addTree (&asm_asxxxx_mapping);
 }
 
 static void
@@ -138,11 +138,11 @@ _avr_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
     MUST be terminated with a NULL.
 */
 static const char *_linkCmd[] = {
-	"avr-ld", "", "$1", NULL
+	"linkavr", "", "$1", NULL
 };
 
 static const char *_asmCmd[] = {
-	"avr-as", "-mmcu=avr3" , "$1.s", NULL
+	"asavr", "$l" , "-plosgff", "$1.s", NULL
 };
 
 /* Globals */
@@ -156,7 +156,7 @@ PORT avr_port = {
 	 MODEL_SMALL},
 	{
 	 _asmCmd,
-	 "-plosgffc",		/* Options with debug */
+	 "-plosgff",		/* Options with debug */
 	 "-plosgff",		/* Options without debug */
 	 0,
 	".s"},

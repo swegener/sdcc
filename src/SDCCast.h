@@ -171,7 +171,7 @@ ast;
 /* forward declarations for global variables */
 extern ast *staticAutos;
 extern FILE *codeOutFile;
-extern memmap *GcurMemmap;
+extern struct memmap *GcurMemmap;
 
 /* forward definitions for functions   */
 ast *newAst_VALUE (value * val);

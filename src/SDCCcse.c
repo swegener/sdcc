@@ -866,7 +866,7 @@ updateSpillLocation (iCode * ic)
 
       setype = getSpec (operandType (IC_RESULT (ic)));
 
-      if (!IC_RIGHT (ic)->noSpilLoc &&
+      if (!OP_SYMBOL(IC_RIGHT (ic))->noSpilLoc &&
 	  !IS_VOLATILE (setype) &&
 	  !IN_FARSPACE (SPEC_OCLS (setype)) &&
           /* PENDING */
@@ -885,7 +885,7 @@ updateSpillLocation (iCode * ic)
 
       setype = getSpec (operandType (IC_RESULT (ic)));
 
-      if (!IC_RIGHT (ic)->noSpilLoc &&
+      if (!OP_SYMBOL(IC_RIGHT (ic))->noSpilLoc &&
 	  !IS_VOLATILE (setype) &&
 	  !IN_FARSPACE (SPEC_OCLS (setype)) &&
           /* PENDING */
@@ -1123,7 +1123,7 @@ constFold (iCode * ic, set * cseSet)
   if (IS_ITEMP (IC_RESULT (ic)))
     {
       SPIL_LOC (IC_RESULT (ic)) = NULL;
-      IC_RESULT (ic)->noSpilLoc = 1;
+      OP_SYMBOL(IC_RESULT (ic))->noSpilLoc = 1;
     }
 
 

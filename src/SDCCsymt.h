@@ -227,6 +227,7 @@ typedef struct symbol
     unsigned ruonly:1;		/* used in return statement only */
     unsigned spildir:1;		/* spilt in direct space */
     unsigned ptrreg:1;		/* this symbol assigned to a ptr reg */
+    unsigned noSpilLoc:1;	/* cannot be assigned a spil location */
     unsigned accuse;		/* can be left in the accumulator
 				   On the Z80 accuse is devided into
 				   ACCUSE_A and ACCUSE_HL as the idea

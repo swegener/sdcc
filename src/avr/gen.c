@@ -475,10 +475,10 @@ aopForSym (iCode * ic, symbol * sym, bool result)
 						   _G.nRegsSaved));
 				}
 				else {
-					emitcode ("subi", "%s,lo8(%d)",
+					emitcode ("subi", "%s,(%d & 0xff)",
 						  aop->aopu.aop_ptr->name,
 						  sym->stack - _G.nRegsSaved);
-					emitcode ("sbci", "%s,hi8(%d)",
+					emitcode ("sbci", "%s,((%d >> 8) & 0xff)",
 						  aop->aop_ptr2->name,
 						  sym->stack - _G.nRegsSaved);
 				}
@@ -490,10 +490,10 @@ aopForSym (iCode * ic, symbol * sym, bool result)
 						  sym->stack);
 				}
 				else {
-					emitcode ("subi", "%s,lo8(-%d)",
+					emitcode ("subi", "%s,((-%d) & 0xff)",
 						  aop->aopu.aop_ptr->name,
 						  sym->stack);
-					emitcode ("sbci", "%s,hi8(-%d)",
+					emitcode ("sbci", "%s,(((-%d) >> 8) & 0xff))",
 						  aop->aop_ptr2->name,
 						  sym->stack);
 				}
@@ -5041,7 +5041,7 @@ genAVRCode (iCode * lic)
 	if (currFunc) {
 		cdbSymbol (currFunc, cdbFile, FALSE, TRUE);
 		_G.debugLine = 1;
-		emitcode ("", ".type %s,@function", currFunc->name);
+/* 		emitcode ("", ".type %s,@function", currFunc->name); */
 		_G.debugLine = 0;
 	}
 	/* stack pointer name */

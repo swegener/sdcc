@@ -2073,8 +2073,11 @@ packRegisters (eBBlock * ebp)
 		if (POINTER_SET (ic))
 			OP_SYMBOL (IC_RESULT (ic))->uptr = 1;
 
-		if (POINTER_GET (ic))
+		if (POINTER_GET (ic)) {
 			OP_SYMBOL (IC_LEFT (ic))->uptr = 1;
+			if (OP_SYMBOL (IC_LEFT(ic))->remat) 
+				OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
+		}
 
 		/* if the condition of an if instruction
 		   is defined in the previous instruction then
@@ -2218,8 +2221,8 @@ setDefaultRegs (eBBlock ** ebbs, int count)
 	else {
 		regsAVR[R26_IDX].type = (regsAVR[R26_IDX].type & ~REG_MASK) | REG_PTR;
 		regsAVR[R27_IDX].type = (regsAVR[R27_IDX].type & ~REG_MASK) | REG_PTR;
-		regsAVR[R28_IDX].type = (regsAVR[R28_IDX].type & ~REG_MASK) | REG_PTR;
-		regsAVR[R29_IDX].type = (regsAVR[R29_IDX].type & ~REG_MASK) | REG_PTR;
+		regsAVR[R30_IDX].type = (regsAVR[R30_IDX].type & ~REG_MASK) | REG_PTR;
+		regsAVR[R31_IDX].type = (regsAVR[R31_IDX].type & ~REG_MASK) | REG_PTR;
 	}
 
 	/* registers 0-1 / 24-25 used as scratch */

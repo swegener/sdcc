@@ -84,7 +84,6 @@ typedef struct operand
     unsigned int isGptr:1;	/* is a generic pointer  */
     unsigned int isParm:1;	/* is a parameter        */
     unsigned int isLiteral:1;	/* operand is literal    */
-    unsigned int noSpilLoc:1;	/* cannot be assigned a spil location */
 
     unsigned key;
     union

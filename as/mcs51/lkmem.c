@@ -254,40 +254,43 @@ int summary(struct area * areap)
 	fprintf(of, "\nStack starts at: 0x%02lx", Stack.Start);
 
 	/*Check that the stack pointer is landing in a safe place:*/
-	if( (dram[Stack.Start] & 0x8000) == 0x8000 )
+	// if (!flat24Mode) TODO: bypass stack check for ds390
 	{
-		fprintf(of, ".\n");
-		sprintf(buff, "Stack set to unavailable memory.\n");
-		REPORT_ERROR(buff, 1);
-	}
-	else if(dram[Stack.Start])
-	{
-		fprintf(of, ".\n");
-		sprintf(buff, "Stack overlaps area ");
-		REPORT_ERROR(buff, 1);
-		for(j=0; j<7; j++)
+		if( (dram[Stack.Start] & 0x8000) == 0x8000 )
 		{
-			if(dram[Stack.Start]&Ram[j].flag)
+			fprintf(of, ".\n");
+			sprintf(buff, "Stack set to unavailable memory.\n");
+			REPORT_ERROR(buff, 1);
+		}
+		else if(dram[Stack.Start+1])
+		{
+			fprintf(of, ".\n");
+			sprintf(buff, "Stack overlaps area ");
+			REPORT_ERROR(buff, 1);
+			for(j=0; j<7; j++)
 			{
-				sprintf(buff, "'%s'\n", Ram[j].Name);
-				break;
+        	                if(dram[Stack.Start+1]&Ram[j].flag)
+				{
+					sprintf(buff, "'%s'\n", Ram[j].Name);
+					break;
+				}
 			}
+			if(dram[Stack.Start]&IRam.flag)
+			{
+				sprintf(buff, "'%s'\n", IRam.Name);
+			}
+			REPORT_ERROR(buff, 0);
 		}
-		if(dram[Stack.Start]&IRam.flag)
+		else
 		{
-			sprintf(buff, "'%s'\n", IRam.Name);
-		}
-		REPORT_ERROR(buff, 0);
-	}
-	else	
-	{
-		for(j=Stack.Start, k=0; (j<(int)iram_size)&&(dram[j]==0); j++, k++);
-		fprintf(of, " with %d bytes available\n", k);
-		if (k<MIN_STACK)
-		{
-			sprintf(buff, "Only %d byte%s available for stack.\n",
+			for(j=Stack.Start, k=0; (j<(int)iram_size)&&(dram[j]==0); j++, k++);
+			fprintf(of, " with %d bytes available\n", k);
+			if (k<MIN_STACK)
+			{
+				sprintf(buff, "Only %d byte%s available for stack.\n",
 					k, (k==1)?"":"s");
-			REPORT_WARNING(buff, 1);
+				REPORT_WARNING(buff, 1);
+			}
 		}
 	}
 

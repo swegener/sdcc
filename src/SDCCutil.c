@@ -72,7 +72,6 @@ char *
 join(const char **pplist)
 {
   char *pinto = buffer;
-  *pinto = '\0';
 
   while (*pplist)
     {
@@ -81,6 +80,7 @@ join(const char **pplist)
       *pinto++ = ' ';
       pplist++;
     }
+  *pinto = '\0';
 
   return buffer;
 }

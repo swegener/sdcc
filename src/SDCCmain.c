@@ -1780,12 +1780,15 @@ main (int argc, char **argv, char **envp)
   initValues ();
   _discoverPaths (argv[0]);
 
+  /* initMem() is expensive, but
+     initMem() must called before port->finaliseOptions ().
+     And the z80 port needs port->finaliseOptions(),
+     even if we're only linking. */
+  initMem ();
+  port->finaliseOptions ();
+
   if (fullSrcFileName)
     {
-
-      initMem ();
-
-      port->finaliseOptions ();
       preProcess (envp);
 
       initSymt ();

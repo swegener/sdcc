@@ -1,3 +1,9 @@
+2003-01-12  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCmain.c (main): port->finaliseOptions() moved for z80 linking
+	* src/SDCCutil.c (join): ugly bug: missing '\0'
+	* as/mcs51/lkmem.c (summary): sp on address 7 is save
+
 2003-01-11  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCmain.c (assemble, linkEdit): preparations for -o

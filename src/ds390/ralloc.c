@@ -2220,7 +2220,7 @@ packForPush (iCode * ic, eBBlock * ebp)
 
     if (SPEC_USIGN(itype)!=SPEC_USIGN(ditype) ||
 	SPEC_SHORT(itype)!=SPEC_SHORT(ditype) ||
-	SPEC_USIGN(itype)!=SPEC_USIGN(ditype))
+	SPEC_LONG(itype)!=SPEC_LONG(ditype))
       return;
   }
   /* extend the live range of replaced operand if needed */

@@ -218,7 +218,7 @@ printOperand (operand * op, FILE * file)
       if (SPEC_NOUN (opetype) == V_FLOAT)
 	fprintf (file, "%g {", SPEC_CVAL (opetype).v_float);
       else
-	fprintf (file, "0x%x {", (int) floatFromVal (op->operand.valOperand));
+	fprintf (file, "0x%x {", (unsigned) floatFromVal (op->operand.valOperand));
       printTypeChain (operandType (op), file);
       fprintf (file, "}");
       break;

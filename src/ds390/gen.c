@@ -3680,6 +3680,7 @@ adjustArithmeticResult (iCode * ic)
     }
 }
 
+#ifdef KEVIN_SCREWED_UP
 // Macro to aopOp all three operands of an ic. If this cannot be done, 
 // the IC_LEFT and IC_RIGHT operands will be aopOp'd, and the rc parameter
 // will be set TRUE. The caller must then handle the case specially, noting
@@ -3712,6 +3713,88 @@ adjustArithmeticResult (iCode * ic)
 #define AOP_OP_2(ic) \
     aopOp (IC_RIGHT(ic),ic,FALSE, FALSE); \
     aopOp (IC_LEFT(ic),ic,FALSE, (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR));
+
+#else // Kevin didn't screw up...
+
+#define AOP_IS_STR(x) (IS_SYMOP(x) && OP_SYMBOL(x)->ruonly)
+
+// The guts of AOP_OP_3_NOFATAL. Generates the left & right opcodes of an IC,
+// generates the result if possible. If result is generated, returns TRUE; otherwise
+// returns false and caller must deal with fact that result isn't aopOp'd.
+bool aopOp3(iCode * ic)
+{
+    bool dp1InUse, dp2InUse;
+    
+    // First, generate the right opcode. DPTR may be used if neither left nor result are
+    // of type AOP_STR.
+    
+    D(emitcode(";", "aopOp3: AOP_IS_STR left: %s right %s result: %s",
+	       AOP_IS_STR(IC_LEFT(ic)) ? "true" : "false",
+	       AOP_IS_STR(IC_RIGHT(ic)) ? "true" : "false",
+	       AOP_IS_STR(IC_RESULT(ic)) ? "true" : "false");
+      );
+    
+    aopOp (IC_RIGHT(ic),ic,FALSE, AOP_IS_STR(IC_LEFT(ic)) || AOP_IS_STR(IC_RESULT(ic)));
+    
+    // Now, the left opcode. This can use DPTR if the right didn't AND the result is not
+    // AOP_STR (however, if the result is the same operand as the left, then DPTR may be used).
+    aopOp (IC_LEFT(ic),ic,FALSE, AOP_USESDPTR(IC_RIGHT(ic)) ||
+                                  (AOP_IS_STR(IC_RESULT(ic)) && !isOperandEqual(IC_LEFT(ic),IC_RESULT(ic))));
+    
+    // We've op'd the left. So, if left & result are the same operand, we know aopOp
+    // will succeed, and we can just do it & bail.
+    if (isOperandEqual(IC_LEFT(ic),IC_RESULT(ic)))
+    {
+	D(emitcode(";", "aopOp3: left & result equal"););
+	aopOp(IC_RESULT(ic),ic,TRUE, FALSE);
+	return TRUE;
+    }
+    
+    // Note which dptrs are currently in use.
+    dp1InUse = (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR) || (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR) ||
+	        AOP_IS_STR(IC_RIGHT(ic)) || AOP_IS_STR(IC_LEFT(ic));
+    dp2InUse = (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR2) || (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR2);
+    
+    // OK, now if either left or right uses DPTR and the result is an AOP_STR, we cannot generate it.
+    if (dp1InUse && AOP_IS_STR(IC_RESULT(ic)))
+    {
+	return FALSE;
+    }
+    
+    // or, if both dp1 & dp2 are in use and the result needs a dptr, we're out of luck    
+    if (dp1InUse && dp2InUse && isOperandInFarSpace(IC_RESULT(ic)))
+    {
+	return FALSE;
+    }
+
+    aopOp (IC_RESULT(ic),ic,TRUE, dp1InUse);
+
+    // SOme sanity checking...
+    if (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR2 &&
+	AOP_TYPE(IC_RESULT(ic)) == AOP_DPTR2)
+    {
+	fprintf(stderr,
+		"Ack: got unexpected DP2! (%s:%d %s:%d)\n",
+		__FILE__, __LINE__, ic->filename, ic->lineno);  
+    }
+	
+    return TRUE;
+}
+
+// Macro to aopOp all three operands of an ic. If this cannot be done, 
+// the IC_LEFT and IC_RIGHT operands will be aopOp'd, and the rc parameter
+// will be set TRUE. The caller must then handle the case specially, noting
+// that the IC_RESULT operand is not aopOp'd.
+// 
+#define AOP_OP_3_NOFATAL(ic, rc) \
+	    do { rc = !aopOp3(ic); } while (0)
+
+// aopOp the left & right operands of an ic.
+#define AOP_OP_2(ic) \
+    aopOp (IC_RIGHT(ic),ic,FALSE, AOP_IS_STR(IC_LEFT(ic))); \
+    aopOp (IC_LEFT(ic),ic,FALSE, AOP_USESDPTR(IC_RIGHT(ic)));
+
+#endif
 
 // convienience macro.
 #define AOP_SET_LOCALS(ic) \
@@ -9382,7 +9465,8 @@ genGenPointerGet (operand * left,
       else
 	{			/* we need to get it byte by byte */
 	  _startLazyDPSEvaluation ();
-#if 1	// I see no point at all to this code and will likely yank it soon.
+#if 0	// I see no point at all to this code.
+	// So I yanked it. Kill at some future date if no bugs rear their heads.
 	  if (AOP(left)->type==AOP_DPTR2) {
 	    char *l;
 	    l=aopGet(AOP(left),0,FALSE,FALSE,TRUE);
@@ -9434,10 +9518,25 @@ genGenPointerGet (operand * left,
 
       while (size--)
 	{
-	  emitcode ("lcall", "__gptrget");
-	  aopPut (AOP (result), "a", offset++);
-	  if (size || (pi && AOP_TYPE (left) != AOP_IMMD))
-	    emitcode ("inc", "dptr");
+	    if (size)
+	    {
+		emitcode("push", "b");
+		emitcode ("lcall", "__gptrgetWord");
+		aopPut (AOP (result), "b", offset++);
+		aopPut (AOP (result), "a", offset++);
+		emitcode("pop", "b");
+		size--;
+	    }
+	    else
+	    {
+		emitcode ("lcall", "__gptrget");
+		aopPut (AOP (result), "a", offset++);
+	    }
+	    
+	    if (size || (pi && AOP_TYPE (left) != AOP_IMMD))
+	    {
+		emitcode ("inc", "dptr");
+	    }
 	}
     }
 

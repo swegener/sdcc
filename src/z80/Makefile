@@ -18,6 +18,6 @@ $(LIB): peeph.rul peeph-z80.rul peeph-gbz80.rul $(OBJ)
 %.rul: %.def
 	$(AWK) -f ../SDCCpeeph.awk $< > $@
 
-main.o: main.c peeph.rul peeph-z80.rul peeph-gbz80.rul
+main.o: main.c peeph.rul peeph-z80.rul peeph-gbz80.rul mappings.i
 
 include clean.mk

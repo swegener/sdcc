@@ -15,11 +15,6 @@ typedef struct {
 
 extern Z80_OPTS z80_opts;
 
-#define wassertl(a,s)	((a) ? 0 : \
-        (werror (E_INTERNAL_ERROR,__FILE__,__LINE__, s), 0))
-
-#define wassert(a)    wassertl(a,"code generator internal error")
-
 #define IS_GB  (z80_opts.sub == SUB_GBZ80)
 #define IS_Z80 (z80_opts.sub == SUB_Z80)
 

@@ -683,7 +683,6 @@ copyiCode (iCode * ic)
     case PCALL:
       IC_RESULT (nic) = operandFromOperand (IC_RESULT (ic));
       IC_LEFT (nic) = operandFromOperand (IC_LEFT (ic));
-      IC_ARGS (nic) = IC_ARGS (ic);
       break;
 
     case INLINEASM:
@@ -2794,7 +2793,6 @@ geniCodeCall (operand * left, ast * parms,int lvl)
   else
     ic = newiCode (CALL, left, NULL);
 
-  IC_ARGS (ic) = FUNC_ARGS(left->operand.symOperand->type);
   type = copyLinkChain (operandType (left)->next);
   etype = getSpec (type);
   SPEC_EXTR (etype) = 0;
@@ -2886,9 +2884,6 @@ geniCodeFunctionBody (ast * tree,int lvl)
 
   /* create a proc icode */
   ic = newiCode (FUNCTION, func, NULL);
-  /* if the function has parmas   then */
-  /* save the parameters information    */
-  ic->argLabel.args = tree->values.args;
   ic->lineno = OP_SYMBOL (func)->lineDef;
 
   ADDTOCHAIN (ic);

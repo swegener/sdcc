@@ -252,9 +252,16 @@ usedBetweenPoints (operand * op, iCode * start, iCode * end)
       /* true if there is a call       */
       if (IS_PARM (op) &&
 	  (lic->op == CALL ||
-	   lic->op == PCALL))
-	if (isParameterToCall (IC_ARGS (lic), op))
+	   lic->op == PCALL)) {
+	value *args;
+	if (lic->op == CALL) {
+	  args=FUNC_ARGS(OP_SYMBOL(IC_LEFT(lic))->type);
+	} else {
+	  args=FUNC_ARGS(OP_SYMBOL(IC_LEFT(lic))->type->next);
+	}
+	if (isParameterToCall (args, op))
 	  return 1;
+      }
 
       if (SKIP_IC2 (lic))
 	continue;
@@ -310,9 +317,14 @@ usedInRemaining (operand * op, iCode * ic)
          return true */
       if (lic->op == CALL || lic->op == PCALL)
 	{
-
+	  value *args;
+	  if (lic->op == CALL) {
+	    args=FUNC_ARGS(OP_SYMBOL(IC_LEFT(lic))->type);
+	  } else {
+	    args=FUNC_ARGS(OP_SYMBOL(IC_LEFT(lic))->type->next);
+	  }
 	  if ((IS_PARM (op) &&
-	       isParameterToCall (IC_ARGS (lic), op)) ||
+	       isParameterToCall (args, op)) ||
 	      isOperandGlobal (op))
 	    return lic;
 	}

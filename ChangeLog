@@ -1,7 +1,14 @@
+2004-11-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/printf_large.c (_print_format): fixed bug 1073386,
+	  (calculate_digit): added optimization for octal and hex
+	* support/regression/tests/bug1057979.c: added test for bug 1073386
+
 2004-11-25 Vangelis Rokas <vrokas AT otenet.gr>
-        * src/pic16/pcode.c: fixed bug which may produce error in non-GNU
-        compilers
- 
+
+	* src/pic16/pcode.c: fixed bug which may produce error in non-GNU
+	compilers
+
 2004-11-25 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/device.h,
@@ -25,7 +32,7 @@
 	Library is not automatically build yet. But one can build it by
 	invoking 'make' inside the libc directory.
 	* added ADC library under libio. Preliminary version yet.
-	
+
 	* src/pic16/gen.h: added emitTOGC macro, to toggle Carry flag,
 	* src/pic16/gen.c (aopForRemat): asmop size is filled by
 	aopForRemat() now and not by pic16_aopOp(),

@@ -23,5 +23,9 @@ test_sprintf(void)
   sprintf( s, "%ld", 2147483647L );
   ASSERT( 0 == strcmp( s, "2147483647" ) );
 
+  //and from bug 1073386
+  sprintf( s, "%04X", 0x8765u );
+  ASSERT( 0 == strcmp( s, "8765" ) );
+
   ASSERT( s[12]==0x12 );
 }

@@ -141,6 +141,18 @@ static const char memory_id[] = "IXCP-";
 #if defined ASM_ALLOWED
 static void calculate_digit( unsigned char radix )
 {
+  if (radix == 8)
+  {
+    value.byte[4] = value.ul & 0x07;
+    value.ul >>= 3;
+  }
+  else if (radix == 16)
+  {
+    value.byte[4] = value.ul & 0x0F;
+    value.ul >>= 4;
+  }
+  else
+  {
   unsigned char i;
 
   for( i = 32; i != 0; i-- )
@@ -170,9 +182,22 @@ _endasm;
     }
   }
 }
+}
 #elif defined SDCC_STACK_AUTO
 static void calculate_digit( value_t* value, unsigned char radix )
 {
+  if (radix == 8)
+  {
+    value->byte[4] = value->ul & 0x07;
+    value->ul >>= 3;
+  }
+  else if (radix == 16)
+  {
+    value->byte[4] = value->ul & 0x0F;
+    value->ul >>= 4;
+  }
+  else
+  {
   unsigned char i;
 
   for( i = 32; i != 0; i-- )
@@ -187,9 +212,22 @@ static void calculate_digit( value_t* value, unsigned char radix )
     }
   }
 }
+}
 #else
 static void calculate_digit( unsigned char radix )
 {
+  if (radix == 8)
+  {
+    value.byte[4] = value.ul & 0x07;
+    value.ul >>= 3;
+  }
+  else if (radix == 16)
+  {
+    value.byte[4] = value.ul & 0x0F;
+    value.ul >>= 4;
+  }
+  else
+  {
   unsigned char i;
 
   for( i = 32; i != 0; i-- )
@@ -203,6 +241,7 @@ static void calculate_digit( unsigned char radix )
       value.ul |= 1;
     }
   }
+}
 }
 #endif
 
@@ -648,6 +687,10 @@ get_conversion_spec:
         if (char_argument)
         {
           value.l = va_arg(ap,char);
+          if (!signed_argument)
+          {
+          	value.l &= 0xFF;
+          }
         }
         else if (long_argument)
         {
@@ -656,6 +699,10 @@ get_conversion_spec:
         else // must be int
         {
           value.l = va_arg(ap,int);
+          if (!signed_argument)
+          {
+            value.l &= 0xFFFF;
+          }
         }
 
         if ( signed_argument )

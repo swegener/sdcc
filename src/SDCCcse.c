@@ -1401,7 +1401,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	{
 
 	  /* update the spill location for this */
-	  updateSpillLocation (ic,1);
+	  updateSpillLocation (ic,0);
 
 	  if (POINTER_SET (ic) &&
 	      !(IS_BITFIELD (OP_SYMBOL (IC_RESULT (ic))->etype)))

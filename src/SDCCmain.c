@@ -112,6 +112,7 @@ char    *preOutName;
 #define OPTION_VERSION     "-version"
 #define OPTION_STKAFTRDATA "-stack-after-data"
 #define OPTION_PREPROC_ONLY "-preprocessonly"
+#define OPTION_C1_MODE   "-c1mode"
 #define OPTION_HELP         "-help"
 #define OPTION_CALLEE_SAVES "-callee-saves"
 #define OPTION_NOREGPARMS   "-noregparms"
@@ -345,7 +346,7 @@ static void processFile (char *s)
     }
 
     /* otherwise depending on the file type */
-    if (strcmp(fext,".c") == 0 || strcmp(fext,".C") == 0) {
+    if (strcmp(fext,".c") == 0 || strcmp(fext,".C") == 0 || options.c1mode) {
 	/* source file name : not if we already have a 
 	   source file */
 	if (srcFileName) {
@@ -400,6 +401,20 @@ static void processFile (char *s)
 
     werror(W_UNKNOWN_FEXT,s);
   
+}
+
+static void _processC1Arg(char *s)
+{
+    if (srcFileName) {
+	if (options.out_name) {
+	    werror(W_TOO_MANY_SRC,s);
+	    return;
+	}
+	options.out_name = strdup(s);
+    }
+    else {
+	processFile(s);
+    }
 }
 
 static void _addToList(const char **list, const char *str)
@@ -533,6 +548,11 @@ int   parseCmdLine ( int argc, char **argv )
 
 	    if (strcmp(&argv[i][1],OPTION_PREPROC_ONLY) == 0) {
 		preProcOnly = 1;
+                continue;
+	    }
+
+	    if (strcmp(&argv[i][1],OPTION_C1_MODE) == 0) {
+		options.c1mode = 1;
                 continue;
 	    }
 
@@ -737,8 +757,10 @@ int   parseCmdLine ( int argc, char **argv )
 	/* these are undocumented options */
 	/* if preceded by '/' then turn off certain optmizations, used
 	   for debugging only these are also the legacy options from
-	   version 1.xx will be removed gradually */
-	if ( *argv[i] == '/') {
+	   version 1.xx will be removed gradually.
+	   It may be an absolute filename.
+	*/
+	if ( *argv[i] == '/' && strlen(argv[i]) < 3) {
 	    switch (argv[i][1]) {
 		
 	    case 'p':
@@ -926,7 +948,10 @@ int   parseCmdLine ( int argc, char **argv )
 
 	if (!port->parseOption(&argc, argv, &i)) {
 	    /* no option must be a filename */
-	    processFile(argv[i]);
+	    if (options.c1mode)
+		_processC1Arg(argv[i]);
+	    else
+		processFile(argv[i]);
 	}
     }	
 
@@ -1128,52 +1153,57 @@ static int preProcess (char **envp)
 
     preOutName = NULL;
 
-    /* if using external stack define the macro */
-    if ( options.useXstack )
-	_addToList(preArgv, "-DSDCC_USE_XSTACK");
+    if (!options.c1mode) {
+	/* if using external stack define the macro */
+	if ( options.useXstack )
+	    _addToList(preArgv, "-DSDCC_USE_XSTACK");
+	
+	/* set the macro for stack autos	*/
+	if ( options.stackAuto )
+	    _addToList(preArgv, "-DSDCC_STACK_AUTO");
     
-    /* set the macro for stack autos	*/
-    if ( options.stackAuto )
-	_addToList(preArgv, "-DSDCC_STACK_AUTO");
-    
-    /* set the macro for large model	*/
-    switch(options.model)
-    {
-        case MODEL_LARGE:
-	    _addToList(preArgv, "-DSDCC_MODEL_LARGE");
-	    break;
-    	case MODEL_SMALL:
-	    _addToList(preArgv, "-DSDCC_MODEL_SMALL");
-	    break;
-	case MODEL_FLAT24:
-	    _addToList(preArgv, "-DSDCC_MODEL_FLAT24");
-	    break;
-	default:
-	    werror(W_UNKNOWN_MODEL, __FILE__, __LINE__);
-	    break;
-    }	    
+	/* set the macro for large model	*/
+	switch(options.model)
+	    {
+	    case MODEL_LARGE:
+		_addToList(preArgv, "-DSDCC_MODEL_LARGE");
+		break;
+	    case MODEL_SMALL:
+		_addToList(preArgv, "-DSDCC_MODEL_SMALL");
+		break;
+	    case MODEL_FLAT24:
+		_addToList(preArgv, "-DSDCC_MODEL_FLAT24");
+		break;
+	    default:
+		werror(W_UNKNOWN_MODEL, __FILE__, __LINE__);
+		break;
+	    }	    
 	    
     
-    /* add port (processor information to processor */
-    sprintf(procDef,"-DSDCC_%s",port->target);
-    _addToList(preArgv,procDef);
+	/* add port (processor information to processor */
+	sprintf(procDef,"-DSDCC_%s",port->target);
+	_addToList(preArgv,procDef);
 
-    if (!preProcOnly)
-	preOutName = strdup(tmpnam(NULL));
+	if (!preProcOnly)
+	    preOutName = strdup(tmpnam(NULL));
 
-    _buildCmdLine(buffer, argv, _preCmd, fullSrcFileName, 
-		  preOutName, srcFileName, preArgv);
+	_buildCmdLine(buffer, argv, _preCmd, fullSrcFileName, 
+		      preOutName, srcFileName, preArgv);
 
-    if (my_system(argv[0], argv)) {
-	unlink (preOutName);
-	perror("Cannot exec Preprocessor");
-	exit(1);
+	if (my_system(argv[0], argv)) {
+	    unlink (preOutName);
+	    perror("Cannot exec Preprocessor");
+	    exit(1);
+	}
+
+	if (preProcOnly)
+	    exit(0);
+    }
+    else {
+	preOutName = fullSrcFileName;
     }
 
-    if (preProcOnly)
-	exit(0);
-
-    yyin = fopen(preOutName,"r");
+    yyin = fopen(preOutName, "r");
     if (yyin == NULL) {
 	perror("Preproc file not found\n");
 	exit(1);
@@ -1218,7 +1248,7 @@ int main ( int argc, char **argv , char **envp)
     parseCmdLine(argc,argv);
 
     /* if no input then printUsage & exit */
-    if (!srcFileName && !nrelFiles) {
+    if ((!options.c1mode && !srcFileName && !nrelFiles) || (options.c1mode && !srcFileName && !options.out_name)) {
 	printUsage();
 	exit(0);
     }
@@ -1238,7 +1268,8 @@ int main ( int argc, char **argv , char **envp)
 
 	if (!fatalError) {
 	    glue();
-	    assemble(envp);
+	    if (!options.c1mode)
+		assemble(envp);
 	}
 	
     }
@@ -1249,13 +1280,14 @@ int main ( int argc, char **argv , char **envp)
     if (!options.cc_only && 
 	!fatalError      &&
 	!noAssemble      &&
+	!options.c1mode  &&
 	(srcFileName || nrelFiles))
 	linkEdit (envp);
 
     if (yyin && yyin != stdin)
 	fclose(yyin);
 
-    if (preOutName) {
+    if (preOutName && !options.c1mode) {
 	unlink(preOutName);
 	free(preOutName);
     }

@@ -2343,7 +2343,7 @@ static void genOrOp (iCode *ic)
         toBoolean(left);
         emitcode(_shortJP, "nz," LABEL_STR,tlbl->key+100);
         toBoolean(right);
-        emitcode("", LABEL_STR,tlbl->key+100);
+        emitcode("", LABEL_STR ":",tlbl->key+100);
         outBitAcc(result);
     }
 
@@ -2370,6 +2370,26 @@ int isLiteralBit(unsigned long lit)
         if(lit == pw[idx])
             return idx+1;
     return 0;
+}
+
+/*-----------------------------------------------------------------*/
+/* jmpTrueOrFalse -                                                */
+/*-----------------------------------------------------------------*/
+static void jmpTrueOrFalse (iCode *ic, symbol *tlbl)
+{
+    // ugly but optimized by peephole
+    if(IC_TRUE(ic)){
+        symbol *nlbl = newiTempLabel(NULL);
+        emitcode("jp", LABEL_STR, nlbl->key+100);                 
+        emitcode("", LABEL_STR ":",tlbl->key+100);
+        emitcode("jp",LABEL_STR,IC_TRUE(ic)->key+100);
+        emitcode("", LABEL_STR ":",nlbl->key+100);
+    }
+    else{
+        emitcode("jp", LABEL_STR, IC_FALSE(ic)->key+100);
+        emitcode("", LABEL_STR ":",tlbl->key+100);
+    }
+    ic->generated = 1;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2485,11 +2505,7 @@ static void genAnd (iCode *ic, iCode *ifx)
             // if(left & literal)
             else{
                 if(ifx)
-#if 0
                     jmpTrueOrFalse(ifx, tlbl);
-#else
-		assert(0);
-#endif
                 goto release ;
             }
         }
@@ -3499,7 +3515,7 @@ static void genGenPointerSet (operand *right,
         while (size--) {
             char *l = aopGet(AOP(right),offset,FALSE);
 	    if (isRegOrLit(AOP(right)) && !IS_GB) {
-		emitcode("ld", "(%s),%s", l);
+		emitcode("ld", "(%s),%s", ptr, l);
 	    }
 	    else {
 		MOVA(l);

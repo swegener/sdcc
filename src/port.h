@@ -13,6 +13,15 @@ typedef struct {
     /** Target name string, used for --help */
     const char *target_name;
 
+    struct {
+	/** TRUE if all types of glue functions should be inseted into
+	    the file that also defines main.
+	    We dont want this in cases like the z80 where the startup
+	    code is provided by a seperate module.
+	*/
+	bool glue_up_main;
+    } general;
+
     /* assembler related information */
     struct {
 	/** Command to run and arguments (eg as-z80) */
@@ -80,7 +89,7 @@ typedef struct {
 	/** One more than the smallest 
 	    mul/div operation the processor can do nativley 
 	    Eg if the processor has an 8 bit mul, nativebelow is 2 */
-	int nativebelow;
+	int native_below;
     } muldiv;
 
     /** Called once the processor target has been selected.

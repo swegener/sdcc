@@ -2674,7 +2674,7 @@ int geniCodeJumpTable (operand *cond, value *caseVals, ast *tree)
     /* if the min is not zero then we no make it zero */
     if (min) {
 	cond = geniCodeSubtract(cond,operandFromLit(min));
-	setOperandType(cond,ucharType);
+	setOperandType(cond, UCHARTYPE);
     }
 
     /* now create the jumptable */
@@ -2903,7 +2903,7 @@ operand *ast2iCode (ast *tree)
     case GETHBIT:
 	{
 	    operand *op = geniCodeUnary (geniCodeRValue(left,FALSE),tree->opval.op);
-	    setOperandType(op,ucharType);
+	    setOperandType(op, UCHARTYPE);
 	    return op;
 	}
     case '>' :

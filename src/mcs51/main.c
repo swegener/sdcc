@@ -142,6 +142,9 @@ static const char *_asmCmd[] = {
 PORT mcs51_port = {
     "mcs51",
     "MCU 8051",			/* Target name */
+    {
+	TRUE,			/* Emit glue around main */
+    },
     {	
 	_asmCmd,
 	"-plosgffc",		/* Options with debug */

@@ -892,8 +892,13 @@ void glue ()
     if (options.debug)
 	cdbStructBlock (0,cdbFile);
 
-    /* create the interrupt vector table */
-    createInterruptVect ((vFile = tmpfile ()));
+    vFile = tmpfile();
+    /* PENDING: this isnt the best place but it will do */
+    if (port->general.glue_up_main) {
+	/* create the interrupt vector table */
+	createInterruptVect (vFile);
+    }
+
     addSetHead(&tmpfileSet,vFile);
     
     /* emit code for the all the variables declared */
@@ -903,8 +908,15 @@ void glue ()
 
     /* now put it all together into the assembler file */
     /* create the assembler file name */
-    sprintf (buffer, srcFileName);
-    strcat (buffer, ".asm");
+    
+    if (!options.c1mode) {
+	sprintf (buffer, srcFileName);
+	strcat (buffer, ".asm");
+    }
+    else {
+	strcpy(buffer, options.out_name);
+    }
+
     if (!(asmFile = fopen (buffer, "w"))) {
 	werror (E_FILE_OPEN_ERR, buffer);
 	exit (1);
@@ -924,7 +936,6 @@ void glue ()
     
     /* print the global variables in this module */
     printPublics (asmFile);
-
     
     /* copy the sfr segment */
     fprintf (asmFile, "%s", iComments2);

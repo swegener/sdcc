@@ -22,6 +22,6 @@ peeph-gbz80.rul: peeph-gbz80.def
 	$(AWK) -f ../SDCCpeeph.awk peeph-gbz80.def > peeph-gbz80.rul
 
 main.o: main.c peeph.rul
-gbz80.o: gbz80.o peeph-gbz80.rul
+gbz80.o: gbz80.c peeph-gbz80.rul
 
 include clean.mk

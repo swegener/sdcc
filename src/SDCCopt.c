@@ -160,27 +160,22 @@ static void cnvToFloatCast (iCode *ic, eBBlock *ebp)
     symbol *func;
     link *type = operandType(IC_RIGHT(ic));
     int linenno = ic->lineno;
+    int bwd, su;
 
     ip = ic->next ;
     /* remove it from the iCode */
     remiCodeFromeBBlock (ebp,ic);
     /* depending on the type */
-    if (checkType(type,charType) == 1)
-	func = __char2fs ;
-    else
-	if (checkType(type,ucharType) == 1)
-	    func = __uchar2fs;
-	else
-	    if (checkType(type,intType) == 1)
-		func = __int2fs;
-	    else
-		if (checkType(type,uintType) == 1)
-		    func = __uint2fs ;
-		else
-		    if (checkType(type,longType) == 1)
-			func = __long2fs;
-		    else
-			func = __ulong2fs ;
+    for (bwd = 0; bwd < 3; bwd++) {
+	for (su = 0; su < 2; su++) {
+	    if (checkType(type, __multypes[bwd][su]) == 1) {
+		func = __conv[0][bwd][su];
+		goto found;
+	    }
+	}
+    }
+    assert(0);
+ found:
 
     /* if float support routines NOT compiled as reentrant */
     if (! options.float_rent) {
@@ -224,28 +219,23 @@ static void cnvFromFloatCast (iCode *ic, eBBlock *ebp)
     symbol *func;
     link *type = operandType(IC_LEFT(ic));
     int lineno = ic->lineno ;
+    int bwd, su;
 
     ip = ic->next ;
     /* remove it from the iCode */
     remiCodeFromeBBlock (ebp,ic);
 
     /* depending on the type */
-    if (checkType(type,charType) == 1)
-	func = __fs2char ;
-    else
-	if (checkType(type,ucharType) == 1)
-	    func = __fs2uchar;
-	else
-	    if (checkType(type,intType) == 1)
-		func = __fs2int;
-	    else
-		if (checkType(type,uintType) == 1)
-		    func = __fs2uint ;
-		else
-		    if (checkType(type,longType) == 1)
-			func = __fs2long;
-		    else
-			func = __fs2ulong ;
+    for (bwd = 0; bwd < 3; bwd++) {
+	for (su = 0; su < 2; su++) {
+	    if (checkType(type, __multypes[bwd][su]) == 1) {
+		func = __conv[1][bwd][su];
+		goto found;
+	    }
+	}
+    }
+    assert(0);
+ found:
 
     /* if float support routines NOT compiled as reentrant */
     if (! options.float_rent) {	
@@ -286,29 +276,32 @@ static void cnvFromFloatCast (iCode *ic, eBBlock *ebp)
 /*-----------------------------------------------------------------*/
 static void convilong (iCode *ic, eBBlock *ebp, link *type, int op)
 {    
-    symbol *func;
+    symbol *func = NULL;
     iCode *ip = ic->next;
     iCode *newic ;
     int lineno = ic->lineno;
-
+    int bwd;
+    int su;
     remiCodeFromeBBlock (ebp,ic);
 
     /* depending on the type */
-    if (checkType(type,intType) == 1)
-	func = (op == '*' ? __mulsint : 
-		(op == '%' ? __modsint :__divsint));
-    else
-	if (checkType(type,uintType) == 1)
-	    func = (op == '*' ? __muluint : 
-		    (op == '%' ? __moduint : __divuint));
-	else
-	    if (checkType(type,longType) == 1)
-		func = (op == '*' ? __mulslong : 
-			(op == '%' ? __modslong : __divslong));
-	    else
-		func = (op == '*'?  __mululong : 
-			(op == '%' ? __modulong : __divulong));
-
+    for (bwd = 0; bwd < 3; bwd++) {
+	for (su = 0; su < 2; su++) {
+	    if (checkType(type, __multypes[bwd][su]) == 1) {
+		if (op == '*')
+		    func = __muldiv[0][bwd][su];
+		else if (op == '/')
+		    func = __muldiv[1][bwd][su];
+		else if (op == '%')
+		    func = __muldiv[2][bwd][su];
+		else
+		    assert(0);
+		goto found;
+	    }
+	}
+    }
+    assert(0);
+ found:
     /* if int & long support routines NOT compiled as reentrant */
     if (! options.intlong_rent) {
 	/* first one */
@@ -401,7 +394,7 @@ static void convertToFcall (eBBlock **ebbs, int count)
 	    if (ic->op == '*' || ic->op == '/' || ic->op == '%' ) {
 
 		link *type = operandType(IC_LEFT(ic));
-		if (IS_INTEGRAL(type) && getSize(type) > 1)
+		if (IS_INTEGRAL(type) && getSize(type) > port->muldiv.native_below)
 		    convilong (ic,ebbs[i],type,ic->op);
 	    }
 	}

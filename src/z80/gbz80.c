@@ -73,6 +73,9 @@ static const char *_asmCmd[] = {
 PORT gbz80_port = {
     "gbz80",
     "Gameboy Z80-like",		/* Target name */
+    {
+	FALSE,
+    },
     {	
 	_asmCmd,
 	"-plosgff",		/* Options with debug */

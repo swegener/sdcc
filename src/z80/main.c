@@ -68,6 +68,9 @@ static const char *_asmCmd[] = {
 PORT z80_port = {
     "z80",
     "Zilog Z80",		/* Target name */
+    {
+	FALSE,
+    },
     {	
 	_asmCmd,
 	"-plosgff",		/* Options with debug */

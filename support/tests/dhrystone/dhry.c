@@ -43,11 +43,8 @@
 #include <string.h>
 /** For printf */
 #include <stdio.h>
-
-/** Returns the current device time in ticks.  Check HZ in the Makefile
-    as well - HZ ticks = 1 second.
-*/
-unsigned _clock(void);
+/** For clock() */
+#include <time.h>
 
 /** Print the number of t-states this program has been executing for.
     Optional :)
@@ -89,11 +86,7 @@ Enumeration Func_1 (Capital_Letter Ch_1_Par_Val, Capital_Letter Ch_2_Par_Val);
 Boolean Func_2 (char *Str_1_Par_Ref, char *Str_2_Par_Ref);
 Boolean Func_3 (Enumeration Enum_Par_Val);
 
-#if SDCC
-int _main(void) 
-#else
 int main(void)
-#endif
 {
     One_Fifty       Int_1_Loc;
     REG   One_Fifty       Int_2_Loc;
@@ -106,7 +99,7 @@ int main(void)
     REG   int             Number_Of_Runs;
     unsigned runTime;
 
-    //    printf("[dhry]\n");
+    printf("[dhry]\n");
 
     Next_Ptr_Glob = &_r[0];
     Ptr_Glob = &_r[1];
@@ -131,7 +124,7 @@ int main(void)
     /* 32766 is the highest value for a 16 bitter */
     Number_Of_Runs = 32766;
 
-    runTime = _clock();
+    runTime = clock();
 
     /* Main test loop */
     for (Run_Index = 1; Run_Index <= Number_Of_Runs; ++Run_Index) {
@@ -205,7 +198,7 @@ int main(void)
 
     printf("Run_Index = %d\n", Run_Index);
 
-    runTime = _clock() - runTime;
+    runTime = clock() - runTime;
 
     printf ("Execution ends\n");
     printf ("\n");
@@ -261,7 +254,7 @@ int main(void)
     printf ("\n");
 
     printf("Time: %u ticks\n", runTime);
-    printf("Dhrystones/s = %u\n", Number_Of_Runs / (runTime/HZ));
+    printf("Dhrystones/s = %u\n", Number_Of_Runs / (runTime/CLOCKS_PER_SEC));
     printf("MIPS = d/s/1757 = (sigh, need floats...)\n");
     _printTStates();
 }
@@ -309,17 +302,17 @@ void Proc_2 (One_Fifty *Int_Par_Ref)
 
     Int_Loc = *Int_Par_Ref + 10;
     do {
-	DPRINTF(("1\n"));
+	DPRINTF(("1"));
 	/* executed once */
 	if (Ch_1_Glob == 'A')
 	    /* then, executed */
 	    {
-		DPRINTF(("2\n"));
+		DPRINTF(("2"));
 		Int_Loc -= 1;
 		*Int_Par_Ref = Int_Loc - Int_Glob;
 		Enum_Loc = Ident_1;
 	    } /* if */
-	DPRINTF(("3\n"));
+	DPRINTF(("3"));
     } while (Enum_Loc != Ident_1); /* true */
     DPRINTF(("Proc_2 done.\n"));
 } /* Proc_2 */

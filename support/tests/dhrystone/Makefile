@@ -1,27 +1,26 @@
 # Simple Makefile for dhrystone and sdcc
 
-CC = /home/michaelh/projects/sdcc/bin/sdcc
+PROC = gbz80
+PORT = gb
+
+CC = /home/michaelh/projects/gbdk-support/lcc/lcc
 # -DNOENUM is here to make the results more predictable
-CFLAGS = -mgbz80 -v --dumpall
-CFLAGS += -DREG= -DNOSTRUCTASSIGN -DNOENUM -DBROKEN_SDCC=0 -DHZ=100
-LIBDIR = /home/michaelh/projects/sdcc/device/lib/gbz80/
-LD = link-gb
-AS = as-gb
+CFLAGS =
+CFLAGS += -DREG= -DNOSTRUCTASSIGN -DNOENUM
+LIBDIR = /home/michaelh/projects/gbdk-lib/build/
+LD = link-$(PROC)
+LDFLAGS = -v
+AS = as-$(PROC)
 
 OBJ = dhry.o
 
 all: dhry
 
 dhry: $(OBJ)
-	$(LD) -n -- -z -m -k$(LIBDIR) -lz80.lib \
-	-b_CODE=0x200 dhry.gb $(LIBDIR)crt0.o $(OBJ)
-#	cat dhry.ihx | ../../makebin/makebin > dhry.rom
+	$(CC) -o dhry.gb dhry.o
 
 native:
 	gcc -g -O2 -DREG= -DNOSTRUCTASSIGN -DNOENUM -o dhry dhry.c
-
-.c.o:
-	$(CC) $(CFLAGS) $<
 
 dhry.c:
 

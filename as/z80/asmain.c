@@ -153,8 +153,7 @@
  */
 
 VOID
-main(argc, argv)
-char *argv[];
+main(int argc, char **argv)
 {
 	register char *p;
 	register c, i;

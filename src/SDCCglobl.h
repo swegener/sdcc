@@ -194,7 +194,9 @@ struct options {
     int debug     : 1  ; /* generate extra debug info */
     int stackOnData:1  ; /* stack after data segment  */
     int noregparms: 1  ; /* do not pass parameters in registers */
-    char *peep_file    ; /* additional rules for peep hole */    
+    int c1mode	  : 1  ; /* Act like c1 - no pre-proc, asm or link */
+    char *peep_file    ; /* additional rules for peep hole */
+    char *out_name     ; /* Asm output name for c1 mode */
 
     char *calleeSaves[128]; /* list of functions using callee save */
     char *excludeRegs[32] ; /* registers excluded from saving */

@@ -1842,93 +1842,90 @@ symbol *__fslt  ;
 symbol *__fslteq;
 symbol *__fsgt  ;
 symbol *__fsgteq;
-symbol *__fs2uchar;
-symbol *__fs2uint ;
-symbol *__fs2ulong;
-symbol *__fs2char;
-symbol *__fs2int ;
-symbol *__fs2long;
-symbol *__long2fs;
-symbol *__ulong2fs;
-symbol *__int2fs;
-symbol *__uint2fs;
-symbol *__char2fs;
-symbol *__uchar2fs;
-symbol *__muluint;
-symbol *__mulsint;
-symbol *__divuint;
-symbol *__divsint;
-symbol *__mululong;
-symbol *__mulslong;
-symbol *__divulong;
-symbol *__divslong;
-symbol *__moduint;
-symbol *__modsint;
-symbol *__modulong;
-symbol *__modslong;
 
-link *charType ;
-link *intType  ;
+/* Dims: mul/div/mod, BYTE/WORD/DWORD, SIGNED/UNSIGNED */
+symbol *__muldiv[3][3][2];
+/* Dims: BYTE/WORD/DWORD SIGNED/UNSIGNED */
+link *__multypes[3][2];
+/* Dims: to/from float, BYTE/WORD/DWORD, SIGNED/USIGNED */
+symbol *__conv[2][3][2];
+
 link *floatType;
-link *longType ;
-link *ucharType ;
-link *uintType  ;
-link *ulongType ;
 
 /*-----------------------------------------------------------------*/ 
 /* initCSupport - create functions for C support routines          */
 /*-----------------------------------------------------------------*/ 
 void initCSupport ()
 {
-    charType = newCharLink();
-    intType  = newIntLink();
-    floatType= newFloatLink();
-    longType = newLongLink();
-    ucharType = copyLinkChain(charType);
-    SPEC_USIGN(ucharType) = 1;
-    ulongType = copyLinkChain(longType);
-    SPEC_USIGN(ulongType) = 1;
-    uintType = copyLinkChain(intType);
-    SPEC_USIGN(uintType) = 1;
+    const char *smuldivmod[] = {
+	"mul", "div", "mod"
+    };
+    const char *sbwd[] = {
+	"char", "int", "long"
+    };
+    const char *ssu[] = {
+	"s", "u"
+    };
+	
+    int bwd, su, muldivmod, tofrom;
 
+    floatType= newFloatLink();
+
+    for (bwd = 0; bwd < 3; bwd++) {
+	link *l;
+	switch (bwd) {
+	case 0:
+	    l = newCharLink();
+	    break;
+	case 1:
+	    l = newIntLink();
+	    break;
+	case 2:
+	    l = newLongLink();
+	    break;
+	default:
+	    assert(0);
+	}
+	__multypes[bwd][0] = l;
+	__multypes[bwd][1] = copyLinkChain(l);
+	SPEC_USIGN(__multypes[bwd][1]) = 1;
+    }
 
     __fsadd = funcOfType ("__fsadd", floatType, floatType, 2, options.float_rent);
     __fssub = funcOfType ("__fssub", floatType, floatType, 2, options.float_rent);
     __fsmul = funcOfType ("__fsmul", floatType, floatType, 2, options.float_rent);
     __fsdiv = funcOfType ("__fsdiv", floatType, floatType, 2, options.float_rent);
-    __fseq  = funcOfType ("__fseq", charType, floatType, 2, options.float_rent);
-    __fsneq = funcOfType ("__fsneq", charType, floatType, 2, options.float_rent);
-    __fslt  = funcOfType ("__fslt", charType, floatType, 2, options.float_rent);
-    __fslteq= funcOfType ("__fslteq", charType, floatType, 2, options.float_rent);
-    __fsgt  = funcOfType ("__fsgt", charType, floatType, 2, options.float_rent);
-    __fsgteq= funcOfType ("__fsgteq", charType, floatType, 2, options.float_rent);
-    
-    __fs2uchar = funcOfType ("__fs2uchar",ucharType,floatType,1, options.float_rent);
-    __fs2uint  = funcOfType ("__fs2uint",uintType,floatType,1, options.float_rent);
-    __fs2ulong = funcOfType ("__fs2ulong",ulongType,floatType,1, options.float_rent);
-    __fs2char  = funcOfType ("__fs2char",charType,floatType,1, options.float_rent);
-    __fs2int   = funcOfType ("__fs2int",intType,floatType,1, options.float_rent);
-    __fs2long  = funcOfType ("__fs2long",longType,floatType,1, options.float_rent);
+    __fseq  = funcOfType ("__fseq", CHARTYPE, floatType, 2, options.float_rent);
+    __fsneq = funcOfType ("__fsneq", CHARTYPE, floatType, 2, options.float_rent);
+    __fslt  = funcOfType ("__fslt", CHARTYPE, floatType, 2, options.float_rent);
+    __fslteq= funcOfType ("__fslteq", CHARTYPE, floatType, 2, options.float_rent);
+    __fsgt  = funcOfType ("__fsgt", CHARTYPE, floatType, 2, options.float_rent);
+    __fsgteq= funcOfType ("__fsgteq", CHARTYPE, floatType, 2, options.float_rent);
 
-    __long2fs  = funcOfType ("__long2fs",floatType,longType,1, options.float_rent);
-    __ulong2fs = funcOfType ("__ulong2fs",floatType,ulongType,1, options.float_rent);
-    __int2fs   = funcOfType ("__int2fs",floatType,intType,1, options.float_rent);
-    __uint2fs  = funcOfType ("__uint2fs",floatType,uintType,1, options.float_rent);
-    __char2fs  = funcOfType ("__char2fs",floatType,charType,1, options.float_rent);
-    __uchar2fs = funcOfType ("__uchar2fs",floatType,ucharType,1, options.float_rent);
+    for (tofrom = 0; tofrom < 2; tofrom++) {
+	for (bwd = 0; bwd < 3; bwd++) {
+	    for (su = 0; su < 2; su++) {
+		if (tofrom) {
+		    sprintf(buffer, "__fs2%s%s", ssu[su], sbwd[bwd]);
+		    __conv[tofrom][bwd][su] = funcOfType(buffer, __multypes[bwd][su], floatType, 2, options.float_rent);
+		}
+		else {
+		    sprintf(buffer, "__%s%s2fs", ssu[su], sbwd[bwd]);
+		    __conv[tofrom][bwd][su] = funcOfType(buffer, floatType, __multypes[bwd][su], 2, options.float_rent);
+		}
+	    }
+	}
+    }
 
-    __muluint  = funcOfType ("_muluint",uintType,uintType,2,options.intlong_rent);
-    __mulsint  = funcOfType ("_mulsint",intType,intType,2,options.intlong_rent);
-    __divuint  = funcOfType ("_divuint",uintType,uintType,2,options.intlong_rent);
-    __divsint  = funcOfType ("_divsint",intType,intType,2,options.intlong_rent);
-    __moduint  = funcOfType ("_moduint",uintType,uintType,2,options.intlong_rent);
-    __modsint  = funcOfType ("_modsint",intType,intType,2,options.intlong_rent);
-  
-    __mululong = funcOfType ("_mululong",ulongType,ulongType,2,options.intlong_rent);
-    __mulslong = funcOfType ("_mulslong",longType,longType,2,options.intlong_rent);
-    __divulong  = funcOfType ("_divulong",ulongType,ulongType,2,options.intlong_rent);
-    __divslong  = funcOfType ("_divslong",longType,longType,2,options.intlong_rent);
-    __modulong  = funcOfType ("_modulong",ulongType,ulongType,2,options.intlong_rent);
-    __modslong  = funcOfType ("_modslong",longType,longType,2,options.intlong_rent);
- 
+    for (muldivmod = 0; muldivmod < 3; muldivmod++) {
+	for (bwd = 0; bwd < 3; bwd++) {
+	    for (su = 0; su < 2; su++) {
+		sprintf(buffer, "_%s%s%s", 
+			smuldivmod[muldivmod],
+			ssu[su],
+			sbwd[bwd]);
+		__muldiv[muldivmod][bwd][su] = funcOfType(buffer, __multypes[bwd][su], __multypes[bwd][su], 2, options.intlong_rent);
+	    }
+	}
+    }
 }

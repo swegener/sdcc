@@ -1517,7 +1517,7 @@ ast *decorateType (ast *tree)
 		  TTYPE(tree) = TETYPE(tree) =
 		    tree->opval.val->type = tree->opval.val->sym->type = 
 		    tree->opval.val->etype = tree->opval.val->sym->etype = 
-		    copyLinkChain(intType);
+		    copyLinkChain(INTTYPE);
 		}
 		else {
 		  

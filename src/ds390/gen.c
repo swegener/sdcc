@@ -4095,9 +4095,9 @@ static void genMultTwoByte (operand *left, operand *right,
 			if (val < 0) {
 				emitcode("setb","F0");
 				val = -val;
-			} 
-			emitcode ("mov","mb,#0x%02x",(val >> 8) & 0xff);
+			}
 			emitcode ("mov","mb,#0x%02x",val & 0xff);
+			emitcode ("mov","mb,#0x%02x",(val >> 8) & 0xff);		    
 		} else {
 			lbl = newiTempLabel(NULL);
 			emitcode ("mov","b,%s",aopGet(AOP(right),0,FALSE,FALSE,TRUE));
@@ -4169,7 +4169,19 @@ static void genMultTwoByte (operand *left, operand *right,
 		emitcode("cpl","a");
 		emitcode("add","a,#1");
 		emitcode("","%05d$:", lbl->key+100);
-		aopPut(AOP(result),"a",0);
+	        if (AOP_TYPE(result) == AOP_ACC)
+	        {
+		    D(emitcode(";", "ACC special case."););
+		    /* We know result is the only live aop, and 
+		     * it's obviously not a DPTR2, so AP is available.
+		     */
+		    emitcode("mov", "%s,acc", DP2_RESULT_REG);
+	        }
+	        else
+	        {
+		    aopPut(AOP(result),"a",0);
+		}
+	    
 		emitcode("pop","acc");
 		lbl = newiTempLabel(NULL); 	
 		emitcode("jnb","F0,%05d$",lbl->key+100);
@@ -4195,6 +4207,11 @@ static void genMultTwoByte (operand *left, operand *right,
 			emitcode("","%05d$:", lbl->key+100);
 			aopPut(AOP(result),"a",3);
 		}
+	        if (AOP_TYPE(result) == AOP_ACC)
+	        {
+		    /* We stashed the result away above. */
+		    emitcode("mov", "acc,%s", DP2_RESULT_REG);
+	        }	    
 		
 	}
 	freeAsmop (result, NULL, ic, TRUE);
@@ -4415,8 +4432,8 @@ static void genDivTwoByte (operand *left, operand *right,
 				emitcode ("","%05d$:",lbl->key+100);
 				val = -val;
 			} 
+			emitcode ("mov","mb,#0x%02x",val & 0xff);		    
 			emitcode ("mov","mb,#0x%02x",(val >> 8) & 0xff);
-			emitcode ("mov","mb,#0x%02x",val & 0xff);
 		} else {
 			lbl = newiTempLabel(NULL);
 			emitcode ("mov","b,%s",aopGet(AOP(right),0,FALSE,FALSE,TRUE));

@@ -709,7 +709,9 @@ replaceRule (lineNode ** shead, lineNode * stail, peepRule * pr)
 {
   lineNode *cl = NULL;
   lineNode *pl = NULL, *lhead = NULL;
-  char lb[MAX_PATTERN_LEN];
+  /* a long function name and long variable name can evaluate to
+     4x max pattern length e.g. "mov dptr,((fie_var>>8)<<8)+fie_var" */
+  char lb[MAX_PATTERN_LEN*4];
   char *lbp;
   lineNode *comment = NULL;
 
@@ -745,11 +747,13 @@ replaceRule (lineNode ** shead, lineNode * stail, peepRule * pr)
 		  l++;
 		  continue;
 		}
-	      while (*v)
+	      while (*v) {
 		*lbp++ = *v++;
+	      }
 	      l++;
-	      while (isdigit (*l))
+	      while (isdigit (*l)) {
 		l++;
+	      }
 	      continue;
 	    }
 	  *lbp++ = *l++;
@@ -953,7 +957,6 @@ top:
 
       for (spl = *pls; spl; spl = spl->next)
 	{
-
 	  /* if inline assembler then no peep hole */
 	  if (spl->isInline)
 	    continue;

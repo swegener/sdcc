@@ -944,6 +944,7 @@ createStackSpil (symbol * sym)
   sloc->etype = getSpec (sloc->type);
   SPEC_SCLS (sloc->etype) = S_DATA;
   SPEC_EXTR (sloc->etype) = 0;
+  SPEC_STAT (sloc->etype) = 0;
 
   /* we don't allow it to be allocated`
      onto the external stack since : so we

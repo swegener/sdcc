@@ -457,6 +457,7 @@ createStackSpil (symbol * sym)
   sloc->type = copyLinkChain (sym->type);
   sloc->etype = getSpec (sloc->type);
   SPEC_SCLS (sloc->etype) = S_AUTO;
+  SPEC_STAT (sloc->etype) = 0;
 
   allocLocal (sloc);
 

@@ -82,7 +82,7 @@ SDCC Compiler User Guide
 
 
 \size normal 
-SDCC 2.4.2
+SDCC 2.4.3
 \size footnotesize 
 
 \newline 
@@ -9197,47 +9197,51 @@ le space.
 
 
 \family typewriter 
-extern volatile bit SDI;
+extern volatile bit MOSI;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/* master out, slave in */
 \newline 
-extern volatile bit SCLK;
+extern volatile bit MISO;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/* master in, slave out */
 \newline 
-extern volatile bit CPOL;
+extern volatile bit MCLK;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/* master clock */
 \newline 
 
 \newline 
-void DS1306_put(unsigned char value)
-\newline 
-{
+/* Input and Output of a byte on a 3-wire serial bus.
 \newline 
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-\SpecialChar ~
-unsigned char mask=0x80;
-\newline 
-
+If needed adapt polarity of clock, polarity of data and bit order
 \newline 
 \SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-while(mask)
+*/
+\newline 
+unsigned char spi_io(unsigned char out_byte) 
+\newline 
+{ 
 \newline 
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-{
+unsigned char i=8;
 \newline 
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-SDI=(value & mask)?1:0;
+do { 
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -9247,7 +9251,7 @@ SDI=(value & mask)?1:0;
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-SCLK=!CPOL;
+MOSI = out_byte & 0x80; 
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -9257,7 +9261,7 @@ SCLK=!CPOL;
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-SCLK=CPOL;
+out_byte <<= 1;
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -9267,13 +9271,71 @@ SCLK=CPOL;
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-mask/=2;
+MCLK = 1; 
 \newline 
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-}
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/* _asm nop _endasm; */\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/* for slow peripherals */
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+if(MISO) 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+out_byte += 1; 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+MCLK = 0; 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+} while(--i);
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+return out_byte; 
 \newline 
 }
 \layout Standard
@@ -9283,29 +9345,23 @@ Then, someplace in the code for the first hardware you would use
 
 
 \family typewriter 
-bit at 0x80 SDI;\SpecialChar ~
+bit at 0x80 MOSI;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 /* I/O port 0, bit 0 */
 \newline 
-bit at 0x81 SCLK;\SpecialChar ~
+bit at 0x81 MISO;\SpecialChar ~
+\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 /* I/O port 0, bit 1 */
 \newline 
-bit CPOL;\SpecialChar ~
+bit at 0x82 MCLK;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-/* This is a variable, let the linker allocate this one */
+/* I/O port 0, bit 2 */
 \layout Standard
 
 Similarly, for the second hardware you would use
@@ -9313,13 +9369,14 @@ Similarly, for the second hardware you would use
 
 
 \family typewriter 
-bit at 0x83 SDI;\SpecialChar ~
+bit at 0x83 MOSI;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 /* I/O port 0, bit 3 */
 \newline 
-bit at 0x91 SCLK;\SpecialChar ~
+bit at 0x91 MISO;\SpecialChar ~
+\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 /* I/O port 1, bit 1 */
@@ -9329,18 +9386,11 @@ bit
 
 \end_inset 
 
- CPOL;\SpecialChar ~
+ at 0x92 MCLK;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-/* This is a variable, let the linker allocate this one */
+/* I/O port 1, bit 2 */
 \layout Standard
 
 and you can use the same hardware dependent routine without changes, as

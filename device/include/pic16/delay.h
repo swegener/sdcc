@@ -40,11 +40,11 @@
  *   1m  1000000*n cycles delay
  */
  
-void delay10tcy(unsigned char) wparam;
-void delay100tcy(unsigned char) wparam;
-void delay1ktcy(unsigned char) wparam;
-void delay10ktcy(unsigned char) wparam;
-void delay100ktcy(unsigned char) wparam;
-void delay1mtcy(unsigned char) wparam;
+void delay10tcy(unsigned char) __wparam;
+void delay100tcy(unsigned char) __wparam;
+void delay1ktcy(unsigned char) __wparam;
+void delay10ktcy(unsigned char) __wparam;
+void delay100ktcy(unsigned char) __wparam;
+void delay1mtcy(unsigned char) __wparam;
 
 #endif

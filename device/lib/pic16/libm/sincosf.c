@@ -28,10 +28,10 @@
 #include <math.h>
 #include <errno.h>
 
-#define r1      -0.1666665668E+0
-#define r2       0.8333025139E-2
-#define r3      -0.1980741872E-3
-#define r4       0.2601903036E-5
+#define r1      (-0.1666665668E+0)
+#define r2      (0.8333025139E-2)
+#define r3      (-0.1980741872E-3)
+#define r4       (0.2601903036E-5)
 
 /* PI=C1+C2 */
 #define C1       3.140625

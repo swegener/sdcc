@@ -33,7 +33,7 @@
 
 extern union USART USART_Status;
 
-void usart_putc(unsigned char dat) wparam _naked
+void usart_putc(unsigned char dat) __wparam __naked
 {
 #if 0
   if(TXSTAbits.TX9) {
@@ -44,7 +44,7 @@ void usart_putc(unsigned char dat) wparam _naked
   TXREG = dat;      // Write the data byte to the USART
 #else
   dat;
-  _asm
+  __asm
     btfss       _TXSTAbits, 6
     bra         _01_
     
@@ -56,6 +56,6 @@ void usart_putc(unsigned char dat) wparam _naked
 _01_:
     movwf       _TXREG
     return
-    _endasm;
+  __endasm;
 #endif
 }

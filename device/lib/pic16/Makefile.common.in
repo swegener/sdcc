@@ -28,6 +28,8 @@ SED	= @SED@
 # but it's needed for `make clean`; Bernhard
 MM = -MM
 
+CSTD    = --std-c99
+
 MODELFLAGS      = -mpic16
 
 OPT_FLAGS	+= --denable-peeps

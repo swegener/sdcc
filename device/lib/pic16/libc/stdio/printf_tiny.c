@@ -85,7 +85,7 @@ void printf_tiny(char *fmt, ...)
   char upcase;
 
   char *str, *ch;
-  data char *str1;
+  __data char *str1;
   long val;
 //  static char buffer[16];
   char buffer[16];

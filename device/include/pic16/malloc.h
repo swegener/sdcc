@@ -60,7 +60,7 @@
 
 #pragma library c
 
-#define _MALLOC_SPEC	data
+#define _MALLOC_SPEC	__data
 
 #endif
 

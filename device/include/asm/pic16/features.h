@@ -19,8 +19,8 @@
 #define _FS_REENTRANT
 #define _MATH_REENTRANT
 
-#define _CODE	code
-#define _DATA	data
+#define _CODE	__code
+#define _DATA	__data
 #define _AUTOMEM
 #define _STATMEM
 

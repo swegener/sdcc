@@ -64,7 +64,7 @@ unsigned int vfprintf(FILE *stream, char *fmt, va_list ap)
   unsigned char upcase;
   unsigned int count=0;
   unsigned char *str, *ch;
-  data char *str1;
+  __data char *str1;
   long val;
 //  static char buffer[16];
   char buffer[16];

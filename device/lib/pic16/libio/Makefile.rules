@@ -26,7 +26,7 @@ COMPILE_FLAGS	+= $(OPT_FLAGS)
 
 OPT_FLAGS2      +=
 
-CFLAGS	= -I$(LIBC_INC_DIR) $(OPT_FLAGS2)
+CFLAGS	= $(CSTD) -I$(LIBC_INC_DIR) $(OPT_FLAGS2)
 
 
 CFILES	= $(patsubst %,%.c,$(SRCS))

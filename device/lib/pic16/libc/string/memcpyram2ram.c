@@ -23,11 +23,11 @@
 -------------------------------------------------------------------------*/
 #include <string.h>
 
-data void *memcpyram2ram (data void *dst, data void *src, size_t acount) 
+__data void *memcpyram2ram (__data void *dst, __data void *src, size_t acount) 
 {
-  void data *ret = dst;	/* perhaps ret should be removed, use dst instead */
-  char data *d = dst;
-  char data *s = src;
+  void __data *ret = dst;	/* perhaps ret should be removed, use dst instead */
+  char __data *d = dst;
+  char __data *s = src;
 	
     /*
      * copy from lower addresses to higher addresses

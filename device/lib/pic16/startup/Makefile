@@ -25,6 +25,8 @@ SRCS	=	crt0	\
 COMPILE_FLAGS	+= $(MODELFLAGS) $(OPT_FLAGS)
 COMPILE_FLAGS	+= --nostdinc --nostdlib --fommit-frame-pointer
 
+CFLAGS  += $(CSTD)
+
 CFILES	= $(patsubst %,%.c,$(SRCS))
 OFILES	= $(patsubst %.c,%.o,$(CFILES))
 

@@ -30,11 +30,11 @@ extern WREG;
 extern SSPBUF;
 
 /* note that USART should already been initialized */
-void __stream_mssp_putchar(unsigned char c) _naked wparam
+void __stream_mssp_putchar(unsigned char c) __wparam __naked
 {
   c;
-  _asm
+  __asm
     MOVWF	_SSPBUF
     RETURN
-  _endasm;
+  __endasm;
 }

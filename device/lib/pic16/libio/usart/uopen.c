@@ -34,7 +34,7 @@
 // USART Status Structure
 extern union USART USART_Status;
 
-void usart_open(unsigned char config, unsigned int spbrg) wparam
+void usart_open(unsigned char config, unsigned int spbrg) __wparam
 {
   TXSTA = 0;           // Reset USART registers to POR state
   RCSTA = 0;

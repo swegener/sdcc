@@ -25,7 +25,9 @@ SRCS	= 	atof \
 		memmisc \
 		realloc \
 		x_ftoa \
-		putchar
+		putchar \
+		rand \
+		crc16
 
 S_SRCS	= g_ftoa
 

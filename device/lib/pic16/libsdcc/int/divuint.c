@@ -30,7 +30,7 @@ unsigned int _divuint (unsigned int a, unsigned int b) _IL_REENTRANT
 {
   unsigned int reste = 0;
   unsigned char count = 16;
-    char c;
+  unsigned char c;
 
   do
   {

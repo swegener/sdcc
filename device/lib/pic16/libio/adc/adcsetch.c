@@ -32,14 +32,14 @@
 #include <adc.h>
 
 
-void adc_setchannel(unsigned char channel) _naked
+void adc_setchannel(unsigned char channel) __naked
 {
 #if 0
   ADCON0 &= ~(0x7 << 3);
   ADCON0 |= channel << 3;
 #else
   channel;
-  _asm
+  __asm
     movlw       0xc7
     andwf       _ADCON0, f
     
@@ -53,6 +53,6 @@ void adc_setchannel(unsigned char channel) _naked
     iorwf       _ADCON0, f
 
     return
-  _endasm;
+  __endasm;
 #endif    
 }

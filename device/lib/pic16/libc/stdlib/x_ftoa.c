@@ -29,7 +29,7 @@
 extern convert_frac;
 extern convert_int;
 
-/* char x_ftoa(float, data char *, unsigned char, unsigned char); */
+/* char x_ftoa(float, __data char *, unsigned char, unsigned char); */
 
 
 extern POSTDEC1;
@@ -47,12 +47,12 @@ extern FSR2H;
 #define _vv0x03	0x03
 #define _vv0x04	0x04
 
-char x_cnvint_wrap(unsigned long num, data char *buffer)
+char x_cnvint_wrap(unsigned long num, __data char *buffer)
 {
   num;
   buffer;
   
-  _asm
+  __asm
     movff	_vv0x00, _POSTDEC1
     movff	_vv0x01, _POSTDEC1
     movff	_vv0x02, _POSTDEC1
@@ -80,16 +80,16 @@ char x_cnvint_wrap(unsigned long num, data char *buffer)
     movff	_PREINC1, _vv0x02
     movff	_PREINC1, _vv0x01
     movff	_PREINC1, _vv0x00
-  _endasm ;
+  __endasm ;
 }
 
-char x_cnvfrac_wrap(unsigned long num, data char *buffer, unsigned char prec)
+char x_cnvfrac_wrap(unsigned long num, __data char *buffer, unsigned char prec)
 {
   num;
   buffer;
   prec;
   
-  _asm
+  __asm
     movff	_vv0x00, _POSTDEC1
     movff	_vv0x01, _POSTDEC1
     movff	_vv0x02, _POSTDEC1
@@ -122,7 +122,7 @@ char x_cnvfrac_wrap(unsigned long num, data char *buffer, unsigned char prec)
     movff	_PREINC1, _vv0x02
     movff	_PREINC1, _vv0x01
     movff	_PREINC1, _vv0x00
-  _endasm ;
+  __endasm ;
 }
 
 
@@ -132,7 +132,7 @@ union float_long {
   float f;
 };
 
-char x_ftoa(float num, data char *buffer, unsigned char buflen, unsigned char prec)
+char x_ftoa(float num, __data char *buffer, unsigned char buflen, unsigned char prec)
 {
   char len;
   char expn;

@@ -422,6 +422,7 @@ static int insideLRBlock(pCode *pc)
         t2 = PCOLR (PCINF (pc1)->oper1)->type;
         break;
       }
+      pc1 = pc1->next;
     }
     
     if((t1 == LR_ENTRY_BEGIN && t2 == LR_ENTRY_END)

@@ -37,23 +37,23 @@ extern TBLPTRU;
 extern void main (void);
 
 /* prototype for the startup function */
-void _entry (void) _naked interrupt 0;
-void _startup (void) _naked;
+void _entry (void) __naked __interrupt 0;
+void _startup (void) __naked;
 
 
 /*
  * entry function, placed at interrupt vector 0 (RESET)
  */
 
-void _entry (void) _naked interrupt 0
+void _entry (void) __naked __interrupt 0
 {
-  _asm goto __startup _endasm;
+  __asm goto __startup __endasm;
 }
 
 
-void _startup (void) _naked
+void _startup (void) __naked
 {
-  _asm
+  __asm
     // Initialize the stack pointer
     lfsr 1, _stack_end
     lfsr 2, _stack_end
@@ -64,7 +64,7 @@ void _startup (void) _naked
     bsf 0xa6, 7, 0
     bcf 0xa6, 6, 0
 
-  _endasm ;
+  __endasm ;
     
   /* Call the user's main routine */
   main();

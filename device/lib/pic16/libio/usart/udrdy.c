@@ -31,17 +31,17 @@
 #include <usart.h>
 
 
-unsigned char usart_drdy(void) _naked
+unsigned char usart_drdy(void) __naked
 {
 #if 0
   if(PIR1bits.RCIF)return 1;
   else return 0;
 #else
-  _asm
+  __asm
     movlw       0x00
     btfsc       _PIR1bits, 5
     addlw       0x01
     return
-  _endasm;
+  __endasm;
 #endif
 }

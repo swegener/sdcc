@@ -4,16 +4,16 @@
 #include <adc.h>
 
 
-char adc_busy(void) _naked
+char adc_busy(void) __naked
 {
-#if 1
+#if 0
   return (ADCON0bits.GO);
 #else
-  _asm
+  __asm
     movlw       0x00
     btfsc       _ADCON0bits, 2
     addlw       0x01
     return
-  _endasm;
+  __endasm;
 #endif
 }

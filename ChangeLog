@@ -1,3 +1,63 @@
+2005-04-02 Vangelis Rokas <vrokas AT users.sourceforge.net>
+
+        * device/include/asm/pic16/features.h,
+        * pic18f*.h headers,
+        * device/include/pic16/adc.h,
+        * device/include/pic16/delay.h,
+        * device/include/pic16/i2c.h,
+        * device/include/pic16/malloc.h,
+        * device/include/pic16/stdio.h,
+        * device/include/pic16/stdlib.h,
+        * device/include/pic16/string.h,
+        * device/lib/pic16/libc/stdio/printf_tiny.c,
+        * device/lib/pic16/libc/stdio/printf_small.c,
+        * device/lib/pic16/libc/stdio/strmgpsim.c,
+        * device/lib/pic16/libc/stdio/strmmssp.c,
+        * device/lib/pic16/libc/stdio/strmusart.c,
+        * device/lib/pic16/libc/stdio/vfprintf.c,
+        * device/lib/pic16/libc/stdlib/ltoa.c,
+        * device/lib/pic16/libc/stdlib/putchar.c,
+        * device/lib/pic16/libc/stdlib/x_ftoa.c,
+        * device/lib/pic16/libc/stdlib/memchrpgm.c,
+        * device/lib/pic16/libc/stdlib/memchrram.c,
+        * device/lib/pic16/libc/stdlib/memcpypgm2ram.c,
+        * device/lib/pic16/libc/stdlib/memcpyram2ram.c,
+        * device/lib/pic16/libio/adc/adcbusy.c,
+        * device/lib/pic16/libio/adc/adcread.c,
+        * device/lib/pic16/libio/adc/adcsetch.c,
+        * device/lib/pic16/libio/usart/ubaud.c,
+        * device/lib/pic16/libio/usart/ubusy.c,
+        * device/lib/pic16/libio/usart/udrdy.c,
+        * device/lib/pic16/libio/usart/uopen.c,
+        * device/lib/pic16/libio/usart/uputc.c,
+        * device/lib/pic16/libsdcc/gptr/gptrget1.c,
+        * device/lib/pic16/libsdcc/gptr/gptrget2.c,
+        * device/lib/pic16/libsdcc/gptr/gptrget3.c,
+        * device/lib/pic16/libsdcc/gptr/gptrget4.c,
+        * device/lib/pic16/libsdcc/gptr/gptrput1.c,
+        * device/lib/pic16/libsdcc/gptr/gptrput2.c,
+        * device/lib/pic16/libsdcc/gptr/gptrput3.c,
+        * device/lib/pic16/libsdcc/gptr/gptrput4.c: modified all SDCC
+        specific keywords to double underlined form,
+        * device/lib/pic16/libc/Makefile.rules,
+        * device/lib/pic16/libsdcc/Makefile.rules,
+        * device/lib/pic16/libm/Makefile,
+        * device/lib/pic16/libio/Makefile.rules: added CSTD macro in CFLAGS
+        to compile with C standard set in Makefile.common
+        * device/lib/pic16/libc/stdlib/Makefile: added new C sources
+        rand.c and crc.c in compilation process,
+        * device/lib/pic16/libsdcc/int/divuint.c,
+        * device/lib/pic16/libsdcc/long/divulong.c: changed declaration of
+        `c' from signed to unsigned,
+        * device/lib/pic16/startup/crt0.c,
+        * device/lib/pic16/startup/crt0i.c,
+        * device/lib/pic16/startup/crt0iz.c: adopted to all SDCC specific
+        keywords to double underlined form, bug fixes in _do_cinit function
+        which prevented the correct initialization of the .idata segment,
+        * src/pic16/pcoderegs.c (insideLRBlock): fixed a bug that caused the
+        core to enter a infinite loop
+        * device/lib/pic16/libc/stdlib/rand.c, crc.c: new files
+
 2005-04-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCicode.c (getArraySizePtr): fixed bug #1122171

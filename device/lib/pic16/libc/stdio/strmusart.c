@@ -33,14 +33,14 @@ extern TXREG;
 extern TXSTA;
 
 /* note that USART should already been initialized */
-void __stream_usart_putchar(unsigned char c) _naked wparam
+void __stream_usart_putchar(unsigned char c) __wparam __naked
 {
   c;
-  _asm
+  __asm
 @1:
     BTFSS	_TXSTA, 1
     BRA		@1
     MOVWF	_TXREG
     RETURN
-  _endasm;
+  __endasm;
 }

@@ -30,7 +30,7 @@ unsigned long _divulong (unsigned long a, unsigned long b) _IL_REENTRANT
 {
   unsigned long reste = 0L;
   unsigned char count = 32;
-  char c;
+  unsigned char c;
 
   do
   {

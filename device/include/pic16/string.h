@@ -30,7 +30,7 @@
 #ifndef __STRING_H	/* { */
 #define __STRING_H 1
 
-#define _STRING_SPEC	data
+#define _STRING_SPEC	__data
 
 #ifndef NULL
 # define NULL (void *)0
@@ -41,29 +41,35 @@
   typedef unsigned int size_t;
 #endif
 
-extern char *strcat (char *, char *);
-extern char *strchr (char *, char);
-extern int   strcmp (char *, char *);
-extern char *strcpy (char *, char *);
-extern int   strcspn(char *, char *);
-extern int   strlen (char *);
-extern char *strlwr (char *);
-extern char *strncat(char *, char *, size_t );
-extern int   strncmp(char *, char *, size_t );
-extern char *strncpy(char *, char *, size_t );
-extern char *strpbrk(char *, char *);
-extern char *strrchr(char *, char);
-extern int   strspn (char *, char *);
-extern char *strstr (char *, char *);
-extern char *strtok (char *, char *);
-extern char *strupr (char *);
+char *strcat (char *, char *);
+char *strchr (char *, char);
+int   strcmp (char *, char *);
+char *strcpy (char *, char *);
+int   strcspn(char *, char *);
+int   strlen (char *);
+char *strlwr (char *);
+char *strncat(char *, char *, size_t );
+int   strncmp(char *, char *, size_t );
+char *strncpy(char *, char *, size_t );
+char *strpbrk(char *, char *);
+char *strrchr(char *, char);
+int   strspn (char *, char *);
+char *strstr (char *, char *);
+char *strtok (char *, char *);
+char *strupr (char *);
 
-extern void *memccpy(void *, void *, char, size_t);
-extern void *memchr(void *, char, size_t);
-extern int   memcmp (void *, void *, size_t);
-extern void *memcpy (void *, void *, size_t);
-extern void *memmove (void *, void *, size_t);
-extern void *memrchr(void *, char, size_t);
-extern void *memset (_STRING_SPEC void *, unsigned char, size_t );
+void *memccpy(void *, void *, char, size_t);
+void *memchr(void *, char, size_t);
+int   memcmp (void *, void *, size_t);
+void *memcpy (void *, void *, size_t);
+void *memmove (void *, void *, size_t);
+void *memrchr(void *, char, size_t);
+void *memset (_STRING_SPEC void *, unsigned char, size_t );
+
+__code void *memchrpgm(__code void *, char, size_t);
+__data void *memchrram(__data void *, char, size_t);
+__data void *memcpypgm2ram(__data void *, __code void *, size_t);
+__data void *memcpyram2ram(__data void *, __data void *, size_t);
+
 
 #endif	/* } */

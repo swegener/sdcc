@@ -32,7 +32,7 @@
 PUTCHAR(c)
 {
   c;
-  _asm
+  __asm
     return
-  _endasm;
+  __endasm;
 }

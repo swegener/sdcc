@@ -45,9 +45,9 @@ extern TABLAT;
 extern PRODL;
 extern PRODH;
 
-void _gptrput3(void) _naked
+void _gptrput3(void) __naked
 {
-  _asm
+  __asm
     /* decode generic pointer MSB (in WREG) bits 6 and 7:
      * 00 -> code (unimplemented)
      * 01 -> EEPROM (unimplemented)
@@ -83,5 +83,5 @@ _lab_02_:
 
 
   return
-  _endasm;
+  __endasm;
 }

@@ -31,11 +31,11 @@
 extern WREG;
 
 /* note that USART should already been initialized */
-void __stream_gpsim_putchar(unsigned char c) _naked wparam
+void __stream_gpsim_putchar(unsigned char c) __wparam __naked
 {
   c;
-  _asm
+  __asm
     MOVFF	_WREG, 0xf7f
     RETURN
-  _endasm;
+  __endasm;
 }

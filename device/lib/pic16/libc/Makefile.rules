@@ -24,7 +24,7 @@ LIBC_INC_DIR	= $(PRJDIR)/device/include/pic16
 COMPILE_FLAGS	+= $(MODELFLAGS) $(OPT_FLAGS)
 
 
-CFLAGS	= -I$(LIBC_INC_DIR)
+CFLAGS	= $(CSTD) -I$(LIBC_INC_DIR)
 
 CFILES	= $(patsubst %,%.c,$(SRCS))
 COFILES	= $(patsubst %.c,%.o,$(CFILES))

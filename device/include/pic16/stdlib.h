@@ -28,29 +28,57 @@
 ** $Id$
 */
 
-#ifndef __PIC16_STDLIB_H
-#define __PIC16_STDLIB_H 1
+#ifndef __STDLIB_H__
+#define __STDLIB_H__ 1
 
 #pragma library c
+
+#include <stdint.h>
+
 
 #ifndef NULL
 # define NULL (void *)0
 #endif
 
-//#include <malloc.h>
+#define RAND_MAX        0x7fffffff
 
-extern float atof (char *);
-extern int atoi (char *);
-extern long atol (char *);
+/* initialize random seed */
+void srand(unsigned long seed);
 
-extern void uitoa(unsigned int, data char *, unsigned char);
-extern void itoa(int, data char*, unsigned char);
+/* return a random number between 0 and RAND_MAX */
+long rand(void);
 
-extern void ultoa(unsigned long, data unsigned char *, unsigned char);
-extern void ltoa(long, data unsigned char*, unsigned char);
+/* reentrant version of rand() */
+long rand_r(unsigned long *ctx);
 
-extern char x_ftoa(float, data char *, unsigned char, unsigned char);
 
-extern void g_ftoa(data char *, float, char);
+/* returns the CRC16 checksum of the data buffer, takes as
+ * last argument an old value of crc16 checksum */
+uint16_t crc16(uint8_t *, uint32_t, uint16_t);
 
-#endif	/* __PIC16_STDLIB_H */
+
+/* convert a ASCII string to float */
+float atof (char *);
+
+/* convert a ASCII string to integer */
+int atoi (char *);
+
+/* convert a ASCII string to long */
+long atol (char *);
+
+/* convert an unsigned/signed integer to ASCII string */
+void uitoa(unsigned int, __data char *, unsigned char);
+void itoa(int, __data char*, unsigned char);
+
+/* convert an unsigned/signed long integer to ASCII string */
+void ultoa(unsigned long, __data unsigned char *, unsigned char);
+void ltoa(long, __data unsigned char*, unsigned char);
+
+/* helper functions: convert a float to ASCII string */
+extern char x_ftoa(float, __data char *, unsigned char, unsigned char);
+
+/* George M. Gallant's version of ftoa() */
+extern void g_ftoa(__data char *, float, char);
+
+
+#endif	/* __STDLIB_H__ */

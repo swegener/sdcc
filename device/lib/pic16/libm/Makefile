@@ -62,7 +62,7 @@ SRCS	=	acosf  \
 
 COMPILE_FLAGS	+= $(MODELFLAGS) $(OPT_FLAGS)
 
-#CFLAGS	+= -I$(LIBC_INC_DIR)
+CFLAGS	+= $(CSTD)
 CFLAGS += -I $(PRJDIR)/device/include/pic16
 
 
@@ -84,9 +84,10 @@ $(LIB): $(OFILES)
 		else \
 			$(AR) -r $(LIB) $$object ; \
 		fi; \
-		echo adding $$object ; \
+		echo -n "$$object " ; \
 	done ;
-	mv -v $(LIB) ../bin
+	@echo
+	@mv -v $(LIB) ../bin
 
 
 all-clean: clean

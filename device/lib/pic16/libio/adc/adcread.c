@@ -32,11 +32,11 @@
 #include <adc.h>
 
 
-int adc_read(void) _naked
+int adc_read(void) __naked
 {
-  _asm
+  __asm
     movff       _ADRESH, _PRODL
     movf        _ADRESL, w
     return
-  _endasm;
+  __endasm;
 }

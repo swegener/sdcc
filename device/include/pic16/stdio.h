@@ -28,8 +28,8 @@
 ** $Id$
 */
 
-#ifndef __PIC16_STDIO_H
-#define __PIC16_STDIO_H 1
+#ifndef __STDIO_H
+#define __STDIO_H 1
 
 /* link the C library */
 #pragma library c
@@ -100,10 +100,10 @@ extern FILE * stdout;
 //extern int _print_format (pfn_outputchar pfn, void* pvoid, const char *format, va_list ap);
 
 /* printf_small() supports float print */
-extern void printf_small(char *, ...);
+void printf_small(char *, ...);
 
 /* printf_tiny() does not support float print */
-extern void printf_tiny(char *, ...) reentrant;
+void printf_tiny(char *, ...);  // __reentrant;
 
 extern unsigned int printf (char *,...);
 extern unsigned int sprintf (char *, char *, ...);
@@ -117,14 +117,14 @@ extern int puts(char *);
 
 extern void __stream_putchar(FILE *, unsigned char);
 
-#define PUTCHAR(arg)	void putchar(unsigned char arg) wparam
+#define PUTCHAR(arg)	void putchar(unsigned char arg) __wparam
 extern PUTCHAR(c);
 
-extern void __stream_usart_putchar(unsigned char c) _naked wparam;
-extern void __stream_mssp_putchar(unsigned char c) _naked wparam;
-extern void __stream_gpsim_putchar(unsigned char c) _naked wparam;
+extern void __stream_usart_putchar(unsigned char c) __wparam __naked;
+extern void __stream_mssp_putchar(unsigned char c) __wparam __naked;
+extern void __stream_gpsim_putchar(unsigned char c) __wparam __naked;
 
 extern char *gets(char *);
 extern char getchar(void);
 
-#endif /* __PIC16_STDIO_H */
+#endif /* __STDIO_H */

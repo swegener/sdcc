@@ -30,7 +30,7 @@
 
 #include <usart.h>
 
-void usart_baud(unsigned char baudconfig) wparam
+void usart_baud(unsigned char baudconfig) __wparam
 {
     BAUDREG = baudconfig;
 }

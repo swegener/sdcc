@@ -37,7 +37,7 @@
 #include <pic18fregs.h>
 
 
-#define _I2CPARAM_SPEC	data
+#define _I2CPARAM_SPEC	__data
 
 
 /* I2C modes of operation */

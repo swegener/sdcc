@@ -27,12 +27,12 @@
 
 #include <string.h>
 
-code void *memchrpgm(code void *s, char c, size_t count)
+__code void *memchrpgm(__code void *s, char c, size_t count)
 {
   if(!count)return (void *)0x00;
 	
-  while((*(code char *)s != c) && (count)) {
-    s = (code char *)s + sizeof(code char *);
+  while((*(__code char *)s != c) && (count)) {
+    s = (__code char *)s + sizeof(__code char *);
     count--;
   }
 

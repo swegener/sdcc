@@ -23,10 +23,10 @@
 -------------------------------------------------------------------------*/
 #include <string.h>
 
-void *memcpypgm2ram (data void *dst, void code *src, size_t acount) 
+__data void *memcpypgm2ram (__data void *dst, void __code *src, size_t acount) 
 {
   void *ret = dst;	/* perhaps ret should be removed, use dst instead */
-  char data *d = dst;
+  char __data *d = dst;
   char *s = src;
 	
     /*

@@ -49,26 +49,26 @@ char __uflags = 0;
 extern void main (void);
 
 /* prototype for the startup function */
-void _entry (void) _naked interrupt 0;
-void _startup (void) _naked;
+void _entry (void) __naked __interrupt 0;
+void _startup (void) __naked;
 
 /* prototype for the initialized data setup */
-void _do_cinit (void) _naked;
+void _do_cinit (void) __naked;
 
 
 /*
  * entry function, placed at interrupt vector 0 (RESET)
  */
 
-void _entry (void) _naked interrupt 0
+void _entry (void) __naked __interrupt 0
 {
-  _asm goto __startup _endasm;
+  __asm goto __startup __endasm;
 }
 
 
-void _startup (void) _naked
+void _startup (void) __naked
 {
-  _asm
+  __asm
     // Initialize the stack pointer
     lfsr 1, _stack_end
     lfsr 2, _stack_end
@@ -79,7 +79,7 @@ void _startup (void) _naked
     bsf 0xa6, 7, 0
     bcf 0xa6, 6, 0
 
-  _endasm ;
+  __endasm ;
     
   _do_cinit();
 
@@ -93,7 +93,7 @@ loop:
 
 
 /* the cinit table will be filled by the linker */
-extern code struct
+extern __code struct
 {
   unsigned short num_init;
   struct _init_entry {
@@ -119,12 +119,12 @@ extern code struct
  */
 
 /* the variable initialisation routine */
-void _do_cinit (void) _naked
+void _do_cinit (void) __naked
 {
   /*
    * access registers 0x00 - 0x09 are not saved in this function
    */
-  _asm
+  __asm
       ; TBLPTR = &cinit
     movlw low(_cinit)
     movwf _TBLPTRL
@@ -145,7 +145,7 @@ void _do_cinit (void) _naked
 
                   ; while (curr_entry) {
 test:
-    bnz done1
+    bnz cont1   ;;done1
     tstfsz curr_entry, 1
     bra cont1
 
@@ -193,7 +193,7 @@ cont1:
     TBLRDPOSTINC
     TBLRDPOSTINC
 
-    ; read the destination address directly into FSR0 
+    ; read the size of data to transfer destination address
     TBLRDPOSTINC
     movf _TABLAT, w
     movwf curr_byte
@@ -202,7 +202,6 @@ cont1:
     movf _TABLAT, w
     movwf curr_byte+1
     
-
     ; skip two bytes since it is stored as a 32bit int 
     TBLRDPOSTINC
     TBLRDPOSTINC
@@ -232,8 +231,8 @@ cont1:
 
     ; determine if we have any more bytes to copy 
                   ; movlb curr_byte 
-    movf curr_byte, w
 
+    movf curr_byte, w
 copy_loop:
     bnz copy_one_byte 		; copy_one_byte 
     movf curr_byte + 1, w
@@ -244,12 +243,14 @@ copy_one_byte:
     movf _TABLAT, w
     movwf _POSTINC0
 
+    movff _TABLAT, 0xf7e
+
     ; decrement byte counter 
     decf curr_byte, f
-    bnc copy_loop 		; copy_loop 
+    bc copy_loop 		; copy_loop
     decf curr_byte + 1, f
+    bra copy_one_byte
 
-    bra copy_loop
 done_copying:
 
   
@@ -259,8 +260,11 @@ done_copying:
     movff data_ptr + 1, _TBLPTRH
     movff data_ptr + 2, _TBLPTRU
 
-    dcfsnz curr_entry, f
+    decf curr_entry, f
+    bc do_next    
     decf curr_entry + 1, f
+
+do_next:
 
     ; next entry...
     ; _do_cinit_curr_entry--; 
@@ -270,6 +274,6 @@ done_copying:
     ; emit done label 
 done:
     return
-  _endasm;
+  __endasm;
 }
 

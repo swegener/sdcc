@@ -25,7 +25,8 @@ OPT_FLAGS	+= --optimize-cmp
 #OPT_FLAGS	+= --stack-auto
 COMPILE_FLAGS	+= $(MODELFLAGS) $(OPT_FLAGS) $(DEBUG)
 
-CFLAGS	= --nostdinc -I$(LIBC_INC_DIR)
+CFLAGS  += $(CSTD)
+CFLAGS	+= --nostdinc -I$(LIBC_INC_DIR)
 
 CFILES	= $(patsubst %,%.c,$(SRCS))
 COFILES	= $(patsubst %.c,%.o,$(CFILES))

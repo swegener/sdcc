@@ -31,17 +31,17 @@
 
 #include <usart.h>
 
-unsigned char usart_busy(void) _naked
+unsigned char usart_busy(void) __naked
 {
 #if 0
   if(!TXSTAbits.TRMT)return 1;
   else return 0;
 #else
-  _asm
+  __asm
     movlw       0x00
     btfss       _TXSTAbits, 1
     addlw       0x01
     return
-  _endasm;
+  __endasm;
 #endif
 }

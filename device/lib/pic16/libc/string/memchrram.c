@@ -27,12 +27,12 @@
 
 #include <string.h>
 
-data void *memchrram(data void *s, char c, size_t count)
+__data void *memchrram(__data void *s, char c, size_t count)
 {
   if(!count)return (void *)0x00;
 	
-  while((*(data char *)s != c) && (count)) {
-    s = (data char *)s + sizeof(data char *);
+  while((*(__data char *)s != c) && (count)) {
+    s = (__data char *)s + sizeof(__data char *);
     count--;
   }
 

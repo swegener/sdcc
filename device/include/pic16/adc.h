@@ -89,12 +89,12 @@ void adc_close(void);
 void adc_conv(void);
 
 /* return 1 if AD is performing a conversion, 0 if done */
-char adc_busy(void) _naked;
+char adc_busy(void) __naked;
 
 /* get value of convertion */
-int adc_read(void) _naked;
+int adc_read(void) __naked;
 
 /* setup conversion channel */
-void adc_setchannel(unsigned char channel) _naked;
+void adc_setchannel(unsigned char channel) __naked;
 
 #endif

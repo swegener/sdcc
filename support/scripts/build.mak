@@ -15,27 +15,44 @@ VER = 2.2.1
 # Used as a branch name.
 SHORTVER = 221
 
+# Options:
+# linux-linux	 Building on Linux, targeting Linux
+# linux-ming32	 Building on Linux, targeting mingw32 based win32
+# cygwin-mingw32 Building via cygwin on win32, targeting mingw32
+
+COMPILE_MODE = linux-mingw32
+SDCC_OR_GBDK = sdcc
+
 ROOT_GBDK = :pserver:anonymous@cvs.gbdk.sourceforge.net:/cvsroot/gbdk
 ROOT_SDCC = :pserver:anonymous@cvs.sdcc.sourceforge.net:/cvsroot/sdcc
 
-# For mingw32 hosted on Linux
-# Source extension - what the gcc generated files have appended
-#SE =
-# Dest extenstion - what extension we want them to have.
-#E = .exe
-#SDCC_ROOT = \\\\gbdk
-
-# For mingw32 on win32
-# Source extension - what the gcc generated files have appended
-#SE = .exe
-# Dest extenstion - what extension we want them to have.
-#E = .exe
-#SDCC_ROOT = \\\\gbdk
-
+ifeq ($(COMPILE_MODE),linux-linux)
 # For Linux
 SE = 
 E =
-SDCC_ROOT = /usr/lib/sdcc
+SDCC_ROOT = /usr/lib/$(SDCC_OR_GBDK)
+endif
+
+ifeq ($(COMPILE_MODE),linux-mingw32)
+# For mingw32 hosted on Linux
+# Tools name prefix
+TNP = i386-mingw32-
+# Source extension - what the gcc generated files have appended
+SE =
+# Dest extenstion - what extension we want them to have.
+E = .exe
+SDCC_ROOT = /$(SDCC_OR_GBDK)
+# Set to cross to bypass the detection
+CROSS_LIBGC = 1
+endif
+
+ifeq ($(COMPILE_MODE),cygwin-mingw32)
+# For mingw32 on win32
+# Source extension - what the gcc generated files have appended
+SE = .exe
+# Dest extenstion - what extension we want them to have.
+SDCC_ROOT = /$(SDCC_OR_GBDK)
+endif
 
 all: logged_in dist
 
@@ -49,19 +66,34 @@ update: logged_in
 	cd $(DIR); cvs $(CVSFLAGS) -d$(ROOT_GBDK) co -r sdcc-$(SHORTVER) gbdk-lib
 	cd $(DIR); cvs $(CVSFLAGS) -d$(ROOT_GBDK) co -r sdcc-$(SHORTVER) gbdk-support
 
-_sdcc: sdcc-bin sdcc-lib sdcc-doc
+_sdcc: sdcc-bin sdcc-misc sdcc-lib sdcc-doc
 
 tidy:
 	rm -rf `find $(BUILD) -name "CVS"`
 	rm -rf `find $(BUILD)/lib -name "*.asm"`
-	-strip $(BUILD)/bin/*
+	-$(TNP)strip $(BUILD)/bin/*
 
 sdcc-bin: sdcc/sdccconf.h
+<<<<<<< build.mak
 	make -C sdcc sdcc-bin
 	mkdir -p $(BUILD)/bin
 	for i in \
 	sdcc sdcpp link-z80 as-z80 aslink asx8051 sdcdb; \
 	do cp sdcc/bin/$$i$(SE) $(BUILD)/bin/$$i$(E); done
+=======
+	make -C sdcc sdcc-bin CROSS_LIBGC=$(CROSS_LIBGC)
+	mkdir -p $(BUILD)/bin
+	for i in \
+	sdcc sdcpp link-z80 as-z80 aslink asx8051; \
+	do cp sdcc/bin/$$i$(SE) $(BUILD)/bin/$$i$(E); done
+
+sdcc-misc: sdcc/sdccconf.h
+	make -C sdcc sdcc-misc CROSS_LIBGC=$(CROSS_LIBGC)
+	mkdir -p $(BUILD)/bin
+	for i in \
+	sdcdb; \
+	do cp sdcc/bin/$$i$(SE) $(BUILD)/bin/$$i$(E); done
+>>>>>>> 1.1.2.5
 	cp sdcc/sim/ucsim/s51.src/s51$(E) $(BUILD)/bin
 	cp sdcc/sim/ucsim/z80.src/sz80$(E) $(BUILD)/bin
 	cp sdcc/sim/ucsim/avr.src/savr$(E) $(BUILD)/bin
@@ -89,13 +121,28 @@ sdcc-lib-z80:
 sdcc-lib-gen:
 	make -C sdcc sdcc-device
 
+<<<<<<< build.mak
 lcc:
 	make -C gbdk-support/lcc SDCCLIB=$(SDCC_ROOT)/
 	cp gbdk-support/lcc/lcc$(E) $(BUILD)/bin
 
+=======
+lcc:
+	make -C gbdk-support/lcc SDCCLIB=$(SDCC_ROOT)/ TNP=$(TNP)
+	cp gbdk-support/lcc/lcc$(SE) $(BUILD)/bin/lcc$(E)
+
+>>>>>>> 1.1.2.5
 sdcc/sdccconf.h: sdcc/configure
+ifdef TNP
 	cd sdcc; \
+	export CCC=$(TNP)c++; \
+	export RANLIB=$(TNP)ranlib; \
+	export CC=$(TNP)gcc; \
 	./configure --datadir=$(SDCC_ROOT)
+	echo $$CCC
+else
+	cd sdcc; ./configure --datadir=$(SDCC_ROOT)
+endif
 
 dist: _sdcc lcc tidy
 
@@ -106,4 +153,7 @@ logged_in:
 	cvs -d$(ROOT_GBDK) login
 	cvs -d$(ROOT_SDCC) login
 	touch logged_in
-	make update
+<<<<<<< build.mak
+	make update=======
+	make -f build.mak update
+>>>>>>> 1.1.2.5

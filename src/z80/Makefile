@@ -5,7 +5,6 @@ include $(PRJDIR)/Makefile.common
 OBJ = gen.o ralloc.o main.o support.o
 LIB = port.a
 
-CFLAGS = -ggdb -Wall
 CFLAGS += -I.. -I. -I../..
 
 all: $(LIB)
@@ -13,7 +12,7 @@ all: $(LIB)
 $(LIB): peeph.rul peeph-z80.rul peeph-gbz80.rul $(OBJ)
 	rm -f $(LIB)
 	ar r $(LIB) $(OBJ)
-	ranlib $(LIB)
+	$(RANLIB) $(LIB)
 
 %.rul: %.def
 	$(AWK) -f ../SDCCpeeph.awk $< > $@

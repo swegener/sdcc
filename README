@@ -12,6 +12,44 @@ The Z80 port was started by Michael Hope <michaelh@earthling.net>
 Some of the Z80 related files are borrowed from the Gameboy
 Development Kit (GBDK) originally by Pascal Felber.
 
+Notes on the z80 port
+---------------------
+The 2.2.1 release finally includes the required libraries and
+tools to target the z80.  2.2.0a included z80 compiler support
+but not the assembler, linker, etc.
+
+Things are still not perfect.  The z80 port is partly wedged in
+due to the different ports using different base libraries, but most
+of this is hidden by lcc.  It is reccomended that to compile for
+the z80 you use:
+
+lcc -mz80/consolez80 -c -o file.o file.c
+lcc -mz80/consolez80 -o file.ihx file.o
+
+etc.
+lcc is a wrapper for sdcc, the assembler, linker etc.  It has the
+added advantage that it accepts more of the standard command line
+options than raw sdcc.
+
+The -mz80/consolez80 is very important as it selects the libraries
+to use and which crt0 module to use.  Unfortunatly each target system
+requires its own startup code (crt0) and definitions for the base
+of RAM, ROM etc.  Those adventurous enough should get a copy of gbdk-lib,
+build the appropriate crt0.s, and then manually link the object files
+together with the appropriate base definitions and the appropriate
+crt0.o.  Try 
+
+lcc -mz80/consolez80 -v -o file.ihx file.c
+
+to see the current liker command line.
+
+If you succeed, please consider sending Michael Hope a copy of crt0.s
+and the appropriate base definitions, and he will roll them into the
+next release of sdcc.
+
+If you find a bug and really cant wait, download the latest copy of
+gbdk and use the copy of sdcc from that.
+
 Notes:
 ------
 000123 mlh: You can set the processor type at run time.  Try:
@@ -51,7 +89,8 @@ Links:
   http://www.geocities.com/ResearchTriangle/Forum/1353/
 
 * SDCC mailing list
-  http://sdcc.listbot.com/
+  http://lists.sourceforge.net/mailman/listinfo/sdcc-user
+
 
 * Yahoo! Random link
   http://random.yahoo.com/bin/ryl

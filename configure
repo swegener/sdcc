@@ -2681,6 +2681,7 @@ ac_given_INSTALL="$INSTALL"
 
 trap 'rm -fr `echo "main.mk:main_in.mk
 support/gc/Makefile
+support/gc/Makefile.cross
 src/Makefile
 as/mcs51/Makefile
 support/cpp/Makefile
@@ -2784,6 +2785,7 @@ cat >> $CONFIG_STATUS <<EOF
 
 CONFIG_FILES=\${CONFIG_FILES-"main.mk:main_in.mk
 support/gc/Makefile
+support/gc/Makefile.cross
 src/Makefile
 as/mcs51/Makefile
 support/cpp/Makefile

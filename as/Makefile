@@ -6,11 +6,11 @@ PORTS = z80 gbz80
 all:
 	for i in $(PORTS); do make _as THIS=$$i; done
 
-_as: clean
+_as:
 ifeq ($(THIS), gbz80)
-	make -C z80 BUILDDIR=../../bin EXT=-$(THIS)$(E) OPTS=-DGAMEBOY
+	make -C z80 BUILDDIR=../../bin EXT=-$(THIS)$(E) OPTS=-DGAMEBOY wary
 else
-	make -C z80 BUILDDIR=../../bin EXT=-$(THIS)$(E)
+	make -C z80 BUILDDIR=../../bin EXT=-$(THIS)$(E) wary
 endif
 
 clean:

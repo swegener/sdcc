@@ -7,7 +7,7 @@ AUTOCONF	= autoconf
 
 PRJDIR		= .
 PKGS		= debugger/mcs51 sim/ucsim
-SDCC_LIBS	= support/gc support/cpp
+SDCC_LIBS	= support/cpp
 SDCC_ASLINK	= as/mcs51 as link
 
 PRJS		= sim/ucsim
@@ -20,6 +20,11 @@ srcdir          = .
 all: checkconf sdcc
 
 sdcc-libs:
+ifeq ($(CROSS_LIBGC),1)
+	$(MAKE) -C support/gc -f Makefile.cross
+else
+	$(MAKE) -C support/gc
+endif
 	for lib in $(SDCC_LIBS); do $(MAKE) -C $$lib; done
 
 sdcc-cc: sdcc-libs

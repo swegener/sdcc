@@ -31,7 +31,7 @@ man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
 
-CPPFLAGS        = -I$(INCDIR) 
+CPPFLAGS        = -I$(INCDIR) -lang-c++
 CFLAGS		= 
 
 OBJECTS		= _atoi.rel _atol.rel _autobaud.rel _bp.rel _schar2fs.rel \

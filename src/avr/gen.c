@@ -231,6 +231,26 @@ isLiteralBit (unsigned long lit)
 			return idx + 1;
 	return 0;
 }
+
+/*-----------------------------------------------------------------*/
+/* outAcc - output Acc                                             */
+/*-----------------------------------------------------------------*/
+static void
+outAcc (operand * result)
+{
+	int size, offset;
+	size = getDataSize (result);
+	if (size) {
+		aopPut (AOP (result), "r0", 0);
+		size--;
+		offset = 1;
+		/* unsigned or positive */
+		while (size--) {
+			aopPut (AOP (result), zero, offset++);
+		}
+	}
+}
+
 #endif	// End Unused code section
 
 /*-----------------------------------------------------------------*/
@@ -1195,25 +1215,6 @@ getDataSize (operand * op)
 		}
 	}
 	return size;
-}
-
-/*-----------------------------------------------------------------*/
-/* outAcc - output Acc                                             */
-/*-----------------------------------------------------------------*/
-static void
-outAcc (operand * result)
-{
-	int size, offset;
-	size = getDataSize (result);
-	if (size) {
-		aopPut (AOP (result), "r0", 0);
-		size--;
-		offset = 1;
-		/* unsigned or positive */
-		while (size--) {
-			aopPut (AOP (result), zero, offset++);
-		}
-	}
 }
 
 /*-----------------------------------------------------------------*/

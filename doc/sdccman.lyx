@@ -15406,8 +15406,15 @@ status Collapsed
 \layout List
 \labelwidthstring 00.00.0000
 
-1 checkes previous used register and if it is the same then doesn't emit
+1 checks previous used register and if it is the same then does not emit
  BANKSEL, accounts only for labels.
+\layout List
+\labelwidthstring 00.00.0000
+
+2 tries to check the location of (even different) symbols and removes BANKSELs
+ if they are in the same bank.
+ Important: This will only work properly if the linker script does not have
+ sections across bank borders!
 \end_deeper 
 \layout List
 \labelwidthstring 00.00.0000
@@ -15627,8 +15634,7 @@ status Collapsed
 /
 \end_inset 
 
--flr-support When entering/leaving a function, call support functions to
- store/restore used registers
+-optimize-goto Try to use (conditional) BRA instead of GOTO
 \layout Subsubsection
 
 Debugging Options
@@ -15958,6 +15964,34 @@ Example:
 \layout LyX-Code
 
 #pragma stack 0x200 100
+\layout List
+\labelwidthstring 00.00.0000
+
+wparam use the WREG to pass one byte of the first function argument.
+ This improves speed but you may not use this for functions with arguments
+ that are called via function pointers, otherwise one byte of the first
+ parameter will get lost.
+ This pragma should be placed in the header file to propagate the calling
+ convention to all callers.
+\layout LyX-Code
+
+#pragma wparam function1[, function2, ...]
+\layout LyX-Code
+
+\layout LyX-Code
+
+Example:
+\layout LyX-Code
+
+\layout LyX-Code
+
+/* pass one byte via stack and one byte via WREG */
+\layout LyX-Code
+
+#pragma wparam foo
+\layout LyX-Code
+
+void foo(int x);
 \layout List
 \labelwidthstring 00.00.0000
 

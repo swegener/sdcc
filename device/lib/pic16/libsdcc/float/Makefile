@@ -35,7 +35,7 @@ SRCS	=	fs2schar \
 		uint2fs \
 		ulong2fs
 
-COMPILE_FLAGS	+= --obanksel=9
+#COMPILE_FLAGS	+= --obanksel=9
 
 include ../Makefile.rules
 

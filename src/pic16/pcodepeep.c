@@ -2243,6 +2243,9 @@ pCodeOp *pic16_pCodeOpCopy(pCodeOp *pcop)
   case PO_GPR_TEMP:
   case PO_FSR0:
   case PO_INDF0:
+  case PO_WREG: // moved from below
+  case PO_PRODL: // moved from below
+  case PO_PRODH: // moved from below
     //DFPRINTF((stderr,"pCodeOpCopy GPR register\n"));
     pcopnew = Safe_calloc(1,sizeof(pCodeOpReg) );
     PCOR(pcopnew)->r = PCOR(pcop)->r;
@@ -2266,13 +2269,13 @@ pCodeOp *pic16_pCodeOpCopy(pCodeOp *pcop)
   case PO_STR:
   case PO_NONE:
   case PO_W:
-  case PO_WREG:
+  //case PO_WREG: // moved up
   case PO_INTCON:
   case PO_PCL:
   case PO_PCLATH:
   case PO_PCLATU:
-  case PO_PRODL:
-  case PO_PRODH:
+  //case PO_PRODL: // moved up
+  //case PO_PRODH: // moved up
   case PO_REL_ADDR:
     //DFPRINTF((stderr,"pCodeOpCopy register type %d\n", pcop->type));
     pcopnew = Safe_calloc(1,sizeof(pCodeOp) );

@@ -17,6 +17,7 @@ include ./Makefile.common
 
 DIRS	=	libdev	\
 		libsdcc	\
+		libc	\
 		startup \
 		debug
 

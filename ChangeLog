@@ -1,3 +1,14 @@
+2005-01-21 Raphael Neider <rneider AT web.de>
+
+	* device/lib/Makefile.in: fixed test for pic16 install dir
+	* device/lib/pic16/*/Makefile*: modified compile flags to enable
+	  optimizations
+	* doc/sdccman.lyx: updated banksel optimization, removed --flr-support and
+	  added --optimize-goto compiler switch and pragma wparam documentation
+	* src/pic16/pcode.c (pic16_OptimizeBanksel): removed statistics dump
+	* src/pic16/pcodepeep.c (pic16_pCodeOpCopy): fixed copying of WREG, PRODL
+	  and PRODH closing bug #1071770 (peephole optimizer)
+
 2005-01-19 Raphael Neider <rneider AT web.de>
 
 	* src/SDCCglobl.h: ensure that PATH_MAX >= 2048 to guarantee

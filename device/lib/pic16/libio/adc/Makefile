@@ -26,7 +26,7 @@ OFILES	= $(patsubst %.c,%.o,$(CFILES))
 
 
 DEBUG=
-#COMPILE_FLAGS   += --pomit-config-words --pomit-ivt --no-peep
+#COMPILE_FLAGS   += --pomit-config-words --pomit-ivt --denable-peeps --optimize-goto --obanksel=2
 COMPILE_FLAGS	+= $(DEBUG)
 
 CFILES	= $(patsubst %,%.c,$(SRCS))

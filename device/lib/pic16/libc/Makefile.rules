@@ -18,7 +18,7 @@ PRJDIR	= ../../../../..
 
 LIBC_INC_DIR	= $(PRJDIR)/device/include/pic16
 
-COMPILE_FLAGS	+= $(MODELFLAGS) --pomit-config-words --pomit-ivt --no-peep --i-code-in-asm
+COMPILE_FLAGS	+= $(MODELFLAGS) --pomit-config-words --pomit-ivt --denable-peeps --optimize-goto --obanksel=2 --i-code-in-asm
 CFLAGS	= -I$(LIBC_INC_DIR)
 
 CFILES	= $(patsubst %,%.c,$(SRCS))

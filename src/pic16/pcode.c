@@ -9148,7 +9148,7 @@ void pic16_OptimizeBanksel ()
     } // while
     
     if (maxWeight > 0) {
-#if 1
+#if 0
       fprintf (stderr, "%s:%d: merging (%4u) %d(%s) and %d(%s)\n", __FUNCTION__, __LINE__, maxWeight,
 	       max->src->hash, getSymFromBank (max->src->hash),
 	       max->node->hash, getSymFromBank (max->node->hash));
@@ -9188,7 +9188,7 @@ void pic16_OptimizeBanksel ()
 #endif
 
   deleteGraph (adj);
-  fprintf (stderr, "%s:%s:%d: leaving, %u/%u BANKSELs removed...\n", __FILE__, __FUNCTION__, __LINE__, bankselsRemoved, bankselsTotal);
+  //fprintf (stderr, "%s:%s:%d: leaving, %u/%u BANKSELs removed...\n", __FILE__, __FUNCTION__, __LINE__, bankselsRemoved, bankselsTotal);
 }
 
 /*** END of stuff belonging to the BANKSEL optimization ***/

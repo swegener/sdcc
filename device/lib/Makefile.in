@@ -166,6 +166,7 @@ include incl.mk
 all: checkconf models model-ds390 model-ds400 model-z80 model-gbz80 model-hc08
 
 # model-pic16
+# (needs gputils curently not available of sourceforge's compile farm)
 
 objects: build-dir $(OBJECTS) port-specific-objects lib-files clean_intermediate
 
@@ -297,7 +298,7 @@ installdirs:
 	[ -d $(sdcc_libdir)/ds390 ] || mkdir -p $(sdcc_libdir)/ds390
 	[ -d $(sdcc_libdir)/ds400 ] || mkdir -p $(sdcc_libdir)/ds400
 	[ -d $(sdcc_libdir)/hc08 ] || mkdir -p $(sdcc_libdir)/hc08
-	[ -f $(sdcc_libdir)/pic16 ] || mkdir -p $(sdcc_libdir)/pic16
+	[ -d $(sdcc_libdir)/pic16 ] || mkdir -p $(sdcc_libdir)/pic16
 	mkdir -p $(sdcc_libdir)/src
 
 # Creating dependencies

@@ -46,7 +46,7 @@ OFILES	= $(COFILES)
 OFILES	+= $(SOFILES)
 
 DEBUG=
-#COMPILE_FLAGS   += --pomit-config-words --pomit-ivt --no-peep
+#COMPILE_FLAGS   += --pomit-config-words --pomit-ivt --denable-peeps --optimize-goto --obanksel=2
 COMPILE_FLAGS	+= $(DEBUG)
 
 %.o: %.c

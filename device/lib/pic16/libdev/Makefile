@@ -46,7 +46,7 @@ PIC16_INCDIR	= $(INCDIR)/pic16
 
 CFLAGS	= -I$(PIC16_INCDIR)
 
-#COMPILE_FLAGS	= --pomit-config-words --pomit-ivt --no-peep
+#COMPILE_FLAGS	= --pomit-config-words --pomit-ivt --denable-peeps --optimize-goto --obanksel=2
 COMPILE_FLAGS	+= $(MODELFLAGS) --nostdinc
 
 

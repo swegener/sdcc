@@ -27,6 +27,9 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
 %$(OBJEXT): %.c
 	$(SDCC) $(SDCCFLAGS) -c $<
 
+fwk/lib/testfwk$(OBJEXT): fwk/lib/testfwk.c
+	$(SDCC) $(SDCCFLAGS) -c $<
+
 # PENDING: Path to sdcc-extra
 %.out: %$(EXEEXT)
 	mkdir -p `dirname $@`

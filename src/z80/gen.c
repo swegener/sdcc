@@ -2862,7 +2862,7 @@ couldDestroyCarry (asmop *aop)
 static void
 shiftIntoPair (int idx, asmop *aop)
 {
-  PAIR_ID id;
+  PAIR_ID id = PAIR_INVALID;
 
   wassertl (IS_Z80, "Only implemented for the Z80");
   //  wassertl (aop->type == AOP_EXSTK, "Only implemented for EXSTK");

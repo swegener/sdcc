@@ -1,3 +1,13 @@
+2001-10-09  Michael Hope  <michaelh@juju.net.nz>
+
+	* src/z80/gen.c (shiftIntoPair): Fixed up warning.
+
+2001-10-08  Michael Hope  <michaelh@juju.net.nz>
+
+	* src/SDCCmain.c: Added --fommit-frame-pointer option and implemented in the z80 port.
+
+	* src/z80/gen.c (genPlus): Fixed to work with extended stack.  Also fixed genMinus, genCmp.  genUMinus is still left.
+
 2001-10-08  Bernhar Held  <bernhard@bernhardheld.de>
 
 	* src/SDCCmain.c (preProcess): added define SDCC_NOOVERLAY

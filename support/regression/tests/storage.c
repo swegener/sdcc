@@ -8,13 +8,13 @@
 
 /** Simple function that spoils sdcc's optimiser by hiding an assign.
  */
-static {type}
+{type}
 spoilAssign({type} in)
 {
     return in;
 }
 
-static void
+void
 testStorageTypes(void)
 {
     {source_storage} {type} source;

@@ -1,7 +1,19 @@
+2004-03-23 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* device/lib/vprintf.c (vsprintf): minor optimization, see bug #801101
+
 2004-03-23  Scott Dattalo  <scott AT dattalo.com>
 
 	* src/pic/gen.c (genCpl): multi-byte complements were not working.
 	* src/regression/Makefile: Regression test was not running.
+
+2004-03-23 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCast.c (resultTypePropagate, decorateType): avoid promotion to int for
+	complement if possible
+	* src/SDCCval.c (valComplement),
+	* src/SDCCicode.c (operandOperation): fixed complement of literal
+	* support/regression/tests/onebyte.c (testComplement): added
 
 2004-03-22 Bernhard Held <bernhard AT bernhardheld.de>
 

@@ -564,7 +564,7 @@ _endasm;
 	/* prepend spaces if needed */
 	if (!zero_padding && !left_justify)
 	{
-	  while ( width > length+1 )
+	  while ( width > (unsigned char) (length+1) )
 	  {
 	    output_char( ' ' );
 	    width--;

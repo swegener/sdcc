@@ -115,11 +115,21 @@ addSym (bucket ** stab,
   bucket *bp;			/* temp bucket    *         */
 
   if (checkType) {
+    symbol *csym = (symbol *)sym;
+
     if (getenv("DEBUG_SANITY")) {
       fprintf (stderr, "addSym: %s ", sname);
     }
     /* make sure the type is complete and sane */
-    checkTypeSanity(((symbol *)sym)->etype, ((symbol *)sym)->name);
+    checkTypeSanity(csym->etype, csym->name);
+
+    // jwk: if this is a function ptr with a void arg, remove it
+    if (IS_DECL(csym->type) && DCL_TYPE(csym->type)==CPOINTER) {
+      sym_link *type=csym->type->next;
+      if (FUNC_ARGS(type) && SPEC_NOUN(FUNC_ARGS(type)->type)==V_VOID) {
+	FUNC_ARGS(type)=NULL;
+      }
+    }
   }
 
   /* prevent overflow of the (r)name buffers */
@@ -1766,11 +1776,6 @@ processFuncArgs (symbol * func, int ignoreName)
   int pNum = 1;
   sym_link *funcType=func->type;
 
-  // if this is a pointer to a function
-  if (DCL_TYPE(funcType)==CPOINTER) {
-    funcType=funcType->next;
-  }
-
   /* if this function has variable argument list */
   /* then make the function a reentrant one    */
   if (IFFUNC_HASVARARGS(funcType))
@@ -1809,11 +1814,6 @@ processFuncArgs (symbol * func, int ignoreName)
 	{
 	  aggregateToPointer (val);
 	}
-
-      // jwk: this should not be here
-      if (IS_CODEPTR(val->type) && IS_FUNC(val->type->next)) {
-	processFuncArgs (val->sym, ignoreName);
-      }
 
       val = val->next;
       pNum++;

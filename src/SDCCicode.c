@@ -1470,7 +1470,7 @@ operandFromSymbol (symbol * sym)
       ok &&			/* farspace check */
       !IS_BITVAR (sym->etype)	/* not a bit variable */
     )
-    {
+    {                                   
 
       /* we will use it after all optimizations
          and before liveRange calculation */
@@ -2712,6 +2712,49 @@ geniCodeLogic (operand * left, operand * right, int op)
     {
       checkConstantRange(ltype,
 			 OP_VALUE(right), "compare operation", 1);
+    }
+
+  /* if one operand is a pointer and the other is a literal generic void pointer,
+     change the type of the literal generic void pointer to match the other pointer */
+  if (IS_GENPTR (ltype) && IS_VOID (ltype->next) && IS_ITEMP (left)
+      && IS_PTR (rtype) && !IS_GENPTR(rtype))
+    {
+      /* find left's definition */
+      ic = (iCode *) setFirstItem (iCodeChain);
+      while (ic)
+        {
+          if (((ic->op == CAST) || (ic->op == '='))
+              && isOperandEqual(left, IC_RESULT (ic)))
+            break;
+          else
+            ic = setNextItem (iCodeChain);
+        }
+      /* if casting literal to generic pointer, then cast to rtype instead */
+      if (ic && (ic->op == CAST) && isOperandLiteral(IC_RIGHT (ic))) 
+        {
+          left = operandFromValue (valCastLiteral (rtype, operandLitValue (IC_RIGHT (ic))));
+          ltype = operandType(left);
+        }
+    }
+  if (IS_GENPTR (rtype) && IS_VOID (rtype->next) && IS_ITEMP (right)
+      && IS_PTR (ltype) && !IS_GENPTR(ltype))
+    {
+      /* find right's definition */
+      ic = (iCode *) setFirstItem (iCodeChain);
+      while (ic)
+        {
+          if (((ic->op == CAST) || (ic->op == '='))
+              && isOperandEqual(right, IC_RESULT (ic)))
+            break;
+          else
+            ic = setNextItem (iCodeChain);
+        }
+      /* if casting literal to generic pointer, then cast to rtype instead */
+      if (ic && (ic->op == CAST) && isOperandLiteral(IC_RIGHT (ic))) 
+        {
+          right = operandFromValue (valCastLiteral (ltype, operandLitValue (IC_RIGHT (ic))));
+          rtype = operandType(right);
+        }
     }
 
   ctype = usualBinaryConversions (&left, &right);

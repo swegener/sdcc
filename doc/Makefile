@@ -4,9 +4,9 @@ MANUAL = sdccman
 TSS = test_suite_spec
 CDB = cdbfileformat
 
-all: $(MANUAL).html $(MANUAL).pdf $(MANUAL).txt \
-	$(TSS).html $(TSS).pdf $(TSS).txt \
-	$(CDB).html $(CDB).pdf $(CDB).txt
+all: $(MANUAL).pdf $(MANUAL).html $(MANUAL).txt \
+#	$(TSS).pdf $(TSS).html $(TSS).txt \
+#	$(CDB).pdf $(CDB).html $(CDB).txt
 
 install:
 	$(INSTALL) -d $(docdir)
@@ -18,7 +18,6 @@ install:
 
 uninstall:
 	rm -rf $(docdir)
-
 
 $(MANUAL).html: $(MANUAL).tex $(MANUAL).ind ;#$(MANUAL).glo
 	mkdir -p $@
@@ -53,8 +52,13 @@ $(CDB).html: $(CDB).tex
 %.txt: %.lyx
 	lyx -e text $<
 
-%.pdf: %.tex %.dvi
-	which pdflatex > /dev/null && pdflatex $* || dvipdf $*
+%.pdf: %.tex %.dvi %.ind
+	dvipdf $*
+# pdflatex creates documents for acrobat reader >= 5.0	
+#	which pdflatex > /dev/null && pdflatex $* || dvipdf $*
+
+%.ps:  %.pdf
+	dvips $*
 
 %.dvi: %.tex
 	latex $<
@@ -63,7 +67,11 @@ $(CDB).html: $(CDB).tex
 	lyx -e latex $<
 
 %.ind: %.dvi
-	makeindex -s l2hidx.ist $*
+	latex $*
+	-makeindex $*
+#	-makeindex -s l2hidx.ist $*
+	latex $*
+	latex $*
 
 %.glo: %.dvi
 	# the glossary, not implemented yet

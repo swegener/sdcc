@@ -2170,9 +2170,8 @@ static void gencjneshort(operand *left, operand *right, symbol *lbl)
         /* right is a pointer reg need both a & b */
 	/* PENDING: is this required? */
         while(size--) {
-            char *l = aopGet(AOP(left),offset,FALSE);
             MOVA(aopGet(AOP(right),offset,FALSE));
-	    emitcode("cp", "%s ; 5", l);
+	    emitcode("cp", "%s ; 5", aopGet(AOP(left), offset, FALSE));
 	    emitcode("jr", "nz," LABEL_STR, lbl->key+100);
             offset++;
         }

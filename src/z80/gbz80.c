@@ -62,11 +62,11 @@ static const char *_gbz80_getRegName(struct regs *reg)
     MUST be terminated with a NULL.
 */
 static const char *_linkCmd[] = {
-    "link-gb", "-nf", "$1", NULL
+    "link-gbz80", "-nf", "$1", NULL
 };
 
 static const char *_asmCmd[] = {
-    "as-gb", "-plosgff", "$1.o", "$1.asm", NULL
+    "as-gbz80", "-plosgff", "$1.o", "$1.asm", NULL
 };
 
 /* Globals */

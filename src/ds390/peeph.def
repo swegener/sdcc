@@ -2707,3 +2707,35 @@ replace {
 } by {
         ;       Peephole 243b    jump optimization
 } if labelRefCount %1 1
+
+
+// This allows non-interrupt and interrupt code to safely compete
+// for a resource without the non-interrupt code having to disable
+// interrupts:
+// volatile bit resource_is_free;
+// if( resource_is_free ) {
+//     resource_is_free=0; do_something; resource_is_free=1;
+// }
+replace {
+        jnb     %1,%2
+%3:
+        clr     %1
+} by {
+        ;       Peephole 244.a  using atomic test and clear
+        jbc     %1,%3
+        sjmp    %2
+%3:
+} if labelRefCount %3 0
+
+replace {
+        jb      %1,%2
+        ljmp    %3
+%2:
+        clr     %1
+} by {
+        ;       Peephole 244.b  using atomic test and clear
+        jbc     %1,%2
+        ljmp    %3
+%2:
+} if labelRefCount %2 1
+

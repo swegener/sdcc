@@ -59,9 +59,9 @@ testShiftByteMultiples(void)
     ASSERT(i>>24 == ({type})({vals} >> 24));
 
     i = ({type}){vals};
-    ASSERT(({type})(i<<8)  == ({type})({vals} << 8));;
-    ASSERT(({type})(i<<16) == ({type})({vals} << 16));
-    ASSERT(({type})(i<<24) == ({type})({vals} << 24));
+    ASSERT( ({type})(i<<8)  ==  ({type})({vals} << 8));;
+    ASSERT((({type}) i<<16) == (({type}) {vals} << 16));
+    ASSERT((({type}) i<<24) == (({type}) {vals} << 24));
 }
 
 static void

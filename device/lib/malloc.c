@@ -44,13 +44,13 @@
             //     {
             //         ...
             //         init_dynamic_memory(dynamic_memory_pool,DYNAMIC_MEMORY_SIZE);
-            //         //Now it's possible to use malloc.
+            //         Now it is possible to use malloc.
             //         ...
             //         current_buffer = malloc(0x100);
             //
             //
 
-              if ( !array ) //Reserved memory starts on 0x0000 but it's NULL...
+              if ( !array ) /*Reserved memory starts on 0x0000 but it's NULL...*/
               {             //So, we lost one byte!
                  array = (MEMHEADER _xdata * )((char _xdata * ) array + 1) ;
                  size --;

@@ -88,7 +88,7 @@ install: installDS390
 	for model in $(MODELS); do \
 	 [ -d $$model ] || $(MAKE) all; \
 	 $(CP) $$model/*.rel *.lib $(sdcc_datadir)/lib/$$model/; \
-	 $(CP) $$model/*.asm $(sdcc_datadir)/lib/$$model/;
+	 $(CP) $$model/*.asm $(sdcc_datadir)/lib/$$model/; \
 	done
 
 installDS390: installdirs

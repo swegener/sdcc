@@ -1046,11 +1046,8 @@ aopPut (asmop * aop, char *s, int offset)
 		  MOVA (s);
 		}
 	      {
-		symbol *lbl = newiTempLabel (NULL);
-		emitcode ("clr", "c");
-		emitcode ("jz", "%05d$", lbl->key + 100);
-		emitcode ("cpl", "c");
-		emitcode ("", "%05d$:", lbl->key + 100);
+		/* set C, if a >= 1 */
+                emitcode ("add", "a,#0xff");
 		emitcode ("mov", "%s,c", aop->aopu.aop_dir);
 	      }
 	    }

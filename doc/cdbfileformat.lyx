@@ -695,31 +695,7 @@ If the address space is 'R', this field indicates the register that the
 \series bold 
 
 \newline 
-{G 
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-|
-\end_inset 
-
- F<Filename> 
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-|
-\end_inset 
-
- L { <function> 
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-|
-\end_inset 
-
- 
+{ G | F<Filename> | L { <function> | 
 \begin_inset Quotes eld
 \end_inset 
 
@@ -1471,31 +1447,7 @@ Function Records
 \series bold 
 
 \newline 
-{G 
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-|
-\end_inset 
-
- F<Filename> 
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-|
-\end_inset 
-
- L { <function> 
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-|
-\end_inset 
-
- 
+{ G | F<Filename> | L { <function> | 
 \begin_inset Quotes eld
 \end_inset 
 
@@ -2035,23 +1987,7 @@ Link Address of Symbol
 \series bold 
 
 \newline 
-{<G> 
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-|
-\end_inset 
-
- F<filename> 
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-|
-\end_inset 
-
- L<function> } 
+{ <G> | F<filename> | L<function> } 
 \newline 
 <$><name>
 \newline 
@@ -2249,23 +2185,7 @@ Linker Symbol End Address Record
 \series bold 
 
 \newline 
-{ <G> 
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-|
-\end_inset 
-
- F<filename> 
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-|
-\end_inset 
-
- L<functionName> }
+{ <G> | F<filename> | L<functionName> }
 \newline 
 <$><name>
 \newline 

@@ -3545,7 +3545,7 @@ ast2iCode (ast * tree,int lvl)
       return geniCodeRightShift (geniCodeRValue (left, FALSE),
 				 geniCodeRValue (right, FALSE));
     case CAST: 
-#if 1 // just in case Paul detects another sloc regression again :)
+#if 0 // this indeed needs a second thought
       {
 	operand *op;
 	
@@ -3559,7 +3559,7 @@ ast2iCode (ast * tree,int lvl)
 	}
 	return op;
       }
-#else // bug #604575
+#else // bug #604575, is it a bug ????
       return geniCodeCast (operandType (left),
 			   geniCodeRValue (right, FALSE), FALSE);
 #endif

@@ -2762,7 +2762,7 @@ static void adjustArithmeticResult(iCode *ic)
     { \
         /* werror(E_INTERNAL_ERROR,__FILE__,__LINE__, */ \
         fprintf(stderr,                                  \
-               "Ack: three operands in far space!\n");   \
+               "Ack: three operands in far space! (%s:%d %s:%d)\n", __FILE__, __LINE__, ic->filename, ic->lineno);   \
     }
 
 #define AOP_SET_LOCALS(ic) \

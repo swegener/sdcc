@@ -12,6 +12,8 @@
 
 #if !defined(__BORLANDC__) && !defined(_MSC_VER)
 #define DEBUGpc(fmt,...)  DEBUGpic16_emitcode("; =:=", "%s:%s:%d: " fmt, __FILE__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+#else
+#define DEBUGpc           1 ? (void)0 : printf
 #endif
 #define isAOP_LIT(x)      (AOP_TYPE(x) == AOP_LIT)
 #define isAOP_REGlike(x)  (AOP_TYPE(x) == AOP_REG || AOP_TYPE(x) == AOP_DIR || AOP_TYPE(x) == AOP_PCODE || AOP_TYPE(x) == AOP_STA)

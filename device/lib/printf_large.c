@@ -24,16 +24,6 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
-#ifdef SDCC_STACK_AUTO
-  #ifdef ASM_ALLOWED
-    /* Eventually we should get rid of ASM_ALLOWED completely as it   */
-    /* prevents portability, clobbers this source and brings only 2%  */
-    /* optimization. A better alternative is a completely handcrafted */
-    /* asm version if needed. */
-    #undef ASM_ALLOWED
-  #endif
-#endif
-
 #if defined(__ds390)
 #define USE_FLOATS 1
 #endif
@@ -79,15 +69,7 @@ static const char memory_id[] = "IXCP-";
   static BOOL lower_case;
   static pfn_outputchar output_char;
   static void* p;
-
-  #ifdef ASM_ALLOWED
-    static bool   lsd;
-
-    /* this one NEEDS to be in data */
-    static data value_t value;
-  #else
-    static value_t value;
-  #endif
+  static value_t value;
 #endif
 
 /****************************************************************************/
@@ -122,39 +104,7 @@ static const char memory_id[] = "IXCP-";
 
 /*--------------------------------------------------------------------------*/
 
-#if defined ASM_ALLOWED
-static void calculate_digit( unsigned char radix )
-{
-  unsigned char i;
-
-  for( i = 32; i != 0; i-- )
-  {
-_asm
-  clr  c
-  mov  a,_value+0
-  rlc  a
-  mov  _value+0,a
-  mov  a,_value+1
-  rlc  a
-  mov  _value+1,a
-  mov  a,_value+2
-  rlc  a
-  mov  _value+2,a
-  mov  a,_value+3
-  rlc  a
-  mov  _value+3,a
-  mov  a,_value+4
-  rlc  a
-  mov  _value+4,a
-_endasm;
-    if (radix <= value.byte[4] )
-    {
-      value.byte[4] -= radix;
-      value.byte[0]++;
-    }
-  }
-}
-#elif defined SDCC_STACK_AUTO
+#if defined SDCC_STACK_AUTO
 static void calculate_digit( value_t* value, unsigned char radix )
 {
   unsigned char i;
@@ -400,9 +350,7 @@ int _print_format (pfn_outputchar pfn, void* pvoid, const char *format, va_list 
   BOOL   lower_case;
   value_t value;
 #endif
-#ifndef ASM_ALLOWED
   BOOL   lsd;
-#endif
 
   unsigned char radix;
   int charsOutputted;
@@ -623,10 +571,8 @@ get_conversion_spec:
       {
         // Apperently we have to output an integral type
         // with radix "radix"
-#ifndef ASM_ALLOWED
         unsigned char store[6];
         unsigned char _AUTOMEM *pstore = &store[5];
-#endif
 
         // store value in byte[0] (LSB) ... byte[3] (MSB)
         if (char_argument)
@@ -668,21 +614,6 @@ get_conversion_spec:
 #else
           calculate_digit(radix);
 #endif
-#if defined ASM_ALLOWED
-_asm
-  jb   _lsd,1$
-  pop  b                ; b = <lsd>
-  mov  a,_value+4       ; a = <msd>
-  swap a
-  orl  b,a              ; b = <msd><lsd>
-  push b
-  sjmp 2$
-1$:
-  mov  a,_value+4       ; a = <lsd>
-  push acc
-2$:
-_endasm;
-#else
           if (!lsd)
           {
             *pstore = (value.byte[4] << 4) | (value.byte[4] >> 4) | *pstore;
@@ -692,7 +623,6 @@ _endasm;
           {
             *pstore = value.byte[4];
           }
-#endif
           length++;
           lsd = !lsd;
         } while( value.ul );
@@ -762,22 +692,6 @@ _endasm;
         while( length-- )
         {
           lsd = !lsd;
-#ifdef ASM_ALLOWED
-_asm
-  jb   _lsd,3$
-  pop  acc              ; a = <msd><lsd>
-  nop                   ; to disable the "optimizer"
-  push acc
-  swap a
-  anl  a,#0x0F          ; a = <msd>
-  sjmp 4$
-3$:
-  pop  acc
-  anl  a,#0x0F          ; a = <lsd>
-4$:
-  mov  _value+4,a
-_endasm;
-#else
           if (!lsd)
           {
             pstore++;
@@ -787,7 +701,6 @@ _endasm;
           {
             value.byte[4] = *pstore & 0x0F;
           }
-#endif
 #ifdef SDCC_STACK_AUTO
           output_digit( value.byte[4], lower_case, output_char, p );
 #else

@@ -1,3 +1,10 @@
+2005-03-15 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/printf_large.c: removed inline assembly for portability and
+	  readability. Use printf_fast if speed or size are more important.
+	* src/pic16/gen.c: removed conditions around use of DEBUGpc
+	* src/pic16/genutils.h: added define for DEBUGpc for MSVC
+
 2005-03-15 Vangelis Rokas <vrokas AT users.sourceforge.net>
 
 	* src/pic16/genutils.c (pic16_genCmp_special): initialized offs to
@@ -84,7 +91,7 @@
 	* src/pic16/gen.c (pic16_loadFSR0, genPackBits, genUnpackBits,
 	  genNearPointerGet): (hopefully) fixed access to bitfields via
 	  pointers (p->bitN = x; and x = p->bitN; failed)
-	
+
 2005-03-09 Paul Stoffregen <paul AT pjrc.com>
 
 	* device/lib/printf_fast.c: fix leading zero format, eg "%02d"

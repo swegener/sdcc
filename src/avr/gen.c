@@ -5093,7 +5093,7 @@ static void
 genDummyRead (iCode * ic)
 {
   emitcode (";     genDummyRead","");
-  emitcode (";     not implemented,"");
+  emitcode (";     not implemented","");
 
   ic;
 }

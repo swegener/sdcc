@@ -233,7 +233,8 @@ printOperand (operand * op, FILE * file)
 
     case SYMBOL:
 #define REGA 1
-#if REGA
+//#if REGA	/* { */
+    if(REGA && !getenv("PRINT_SHORT_OPERANDS")) {
       fprintf (file, "%s [k%d lr%d:%d so:%d]{ ia%d a2p%d re%d rm%d nos%d ru%d dp%d}",		/*{ar%d rm%d ru%d p%d a%d u%d i%d au%d k%d ks%d}"  , */
 	       (OP_SYMBOL (op)->rname[0] ? OP_SYMBOL (op)->rname : OP_SYMBOL (op)->name),
 	       op->key,
@@ -276,28 +277,26 @@ printOperand (operand * op, FILE * file)
 	      fprintf (file, "]");
 	    }
 	}
-#else
-
+//#else		/* } else { */
+    } else {
+      /* (getenv("PRINT_SHORT_OPERANDS") != NULL) */
       fprintf (file, "%s ", (OP_SYMBOL (op)->rname[0] ? OP_SYMBOL (op)->rname : OP_SYMBOL (op)->name));
 
-#if 0
-
-      fprintf (file, "[lr%d:%d so:%d]",
+      if(getenv("PRINT_SHORT_OPERANDS")[0] < '1')
+        {
+          fprintf (file, "[lr%d:%d so:%d]",
 	       OP_LIVEFROM (op), OP_LIVETO (op),
-	       OP_SYMBOL (op)->stack
-	);
-#endif
+	       OP_SYMBOL (op)->stack);
+        }
 
-#if 1
-      {
-	fprintf (file, "{");
-	printTypeChain (operandType (op), file);
-	if (SPIL_LOC (op) && IS_ITEMP (op))
-	  fprintf (file, "}{ sir@ %s", SPIL_LOC (op)->rname);
-	fprintf (file, "}");
-
-      }
-#endif
+      if(getenv("PRINT_SHORT_OPERANDS")[0] < '2')
+        {
+          fprintf (file, "{");
+          printTypeChain (operandType (op), file);
+          if (SPIL_LOC (op) && IS_ITEMP (op))
+              fprintf (file, "}{ sir@ %s", SPIL_LOC (op)->rname);
+          fprintf (file, "}");
+        }
 
       /* if assigned to registers */
       if (OP_SYMBOL (op)->nRegs)
@@ -323,7 +322,8 @@ printOperand (operand * op, FILE * file)
 	      fprintf (file, "]");
 	    }
 	}
-#endif
+//#endif		/* } */
+    }
       break;
 
     case TYPE:

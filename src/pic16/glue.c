@@ -1402,7 +1402,7 @@ pic16createInterruptVect (FILE * vFile)
 		return;
 	}
 #endif
-
+#if 0
 	if((!pic16_options.omit_ivt) || (pic16_options.omit_ivt && pic16_options.leave_reset)) {
 		fprintf (vFile, ";\t.area\t%s\n", CODE_NAME);
 		fprintf(vFile, ".intvecs\tcode\t0x%06x\n", pic16_options.ivt_loc);
@@ -1413,6 +1413,7 @@ pic16createInterruptVect (FILE * vFile)
 			port->genIVT(vFile, interrupts, maxInterrupts);
 		}
 	}
+#endif
 	
 }
 

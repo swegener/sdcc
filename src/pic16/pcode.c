@@ -127,7 +127,7 @@ pCodeOpReg *pic16_frame_plusw;
 pCodeOpReg pic16_pc_gpsimio   = {{PO_GPR_REGISTER, "GPSIMIO"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_gpsimio2  = {{PO_GPR_REGISTER, "GPSIMIO2"}, -1, NULL, 0, NULL};
 
-char *OPT_TYPE_STR[] = { "begin", "end" };
+char *OPT_TYPE_STR[] = { "begin", "end", "jumptable_begin", "jumptable_end" };
 char *LR_TYPE_STR[] = { "entry begin", "entry end", "exit begin", "exit end" };
 
 
@@ -281,7 +281,7 @@ pCodeInstruction pic16_pciADDWFC = { // mdubuc - New
   0,	// second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER | PCC_C),   // inCond
-  (PCC_REGISTER | PCC_Z), // outCond
+  (PCC_REGISTER | PCC_Z | PCC_DC | PCC_Z | PCC_OV | PCC_N), // outCond
   PCI_MAGIC
 };
 
@@ -309,7 +309,7 @@ pCodeInstruction pic16_pciADDFWC = {
   0,	// second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER | PCC_C),   // inCond
-  (PCC_W | PCC_Z), // outCond
+  (PCC_W | PCC_Z | PCC_DC | PCC_Z | PCC_OV | PCC_N), // outCond
   PCI_MAGIC
 };
 
@@ -868,7 +868,7 @@ pCodeInstruction pic16_pciCOMF = {
   0,	// second literal operand
   POC_NOP,
   PCC_REGISTER,  // inCond
-  PCC_REGISTER  , // outCond
+  (PCC_REGISTER | PCC_Z | PCC_N) , // outCond
   PCI_MAGIC
 };
 
@@ -924,7 +924,7 @@ pCodeInstruction pic16_pciCLRF = {
   0,	// second literal operand
   POC_NOP,
   PCC_REGISTER, // inCond
-  PCC_REGISTER , // outCond
+  (PCC_REGISTER | PCC_Z), // outCond
   PCI_MAGIC
 };
 

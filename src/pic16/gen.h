@@ -188,7 +188,7 @@ pCodeOp *pic16_popGetLit2(int lit, pCodeOp *arg2);
 pCodeOp *popGetWithString(char *str);
 pCodeOp *pic16_popGet (asmop *aop, int offset);//, bool bit16, bool dname);
 pCodeOp *pic16_popGetTempReg(int lock);
-pCodeOp *pic16_popGetTempRegCond(bitVect *, int lock);
+pCodeOp *pic16_popGetTempRegCond(bitVect *, bitVect *, int lock);
 void pic16_popReleaseTempReg(pCodeOp *pcop, int lock);
 
 pCodeOp *pic16_popCombine2(pCodeOpReg *src, pCodeOpReg *dst, int noalloc);

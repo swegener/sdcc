@@ -54,6 +54,7 @@
 #include "SDCCpeeph.h"
 #include "ralloc.h"
 #include "pcode.h"
+#include "device.h"
 #include "gen.h"
 
 #include "genutils.h"
@@ -462,4 +463,96 @@ void gpsimDebug_StackDump(char *fname, int line, char *info)
                 pic16_popCopyReg(&pic16_pc_gpsimio2)));
 
   gpsimio2_lit('\n');
+}
+
+
+
+/* check all condition and return appropriate instruction, POC_CPFSGT or POC_CPFFSLT */
+static int selectCompareOp(resolvedIfx *rIfx, iCode *ifx,
+        operand *result, int offset, int invert_op)
+{
+  /* add code here */
+  
+  /* check condition, > or < ?? */
+  if(rIfx->condition != 0)invert_op ^= 1;
+  
+  if(ifx && IC_FALSE(ifx))invert_op ^= 1;
+
+  if(!ifx)invert_op ^= 1;
+
+  DEBUGpic16_emitcode("; +++", "%s:%d %s] rIfx->condition= %d, ifx&&IC_FALSE(ifx)= %d, invert_op = %d",
+      __FILE__, __LINE__, __FUNCTION__, rIfx->condition, (ifx && IC_FALSE(ifx)), invert_op);
+  
+  /* do selection */
+  if(!invert_op)return POC_CPFSGT;
+  else return POC_CPFSLT;
+}
+
+/* return 1 if function handles compare, 0 otherwise */
+/* this functions handles special cases like:
+ * reg vs. zero
+ * reg vs. one
+ */
+int pic16_genCmp_special(operand *left, operand *right, operand *result,
+                    iCode *ifx, resolvedIfx *rIfx, int sign)
+{
+  int size;
+  int offs;
+  symbol *tmplbl;
+  unsigned long lit;
+  int op, cmp_op=0;
+
+    FENTRY;
+    
+    if(!(pic16_options.opt_flags & OF_OPTIMIZE_CMP))return 0;
+
+    size = max(AOP_SIZE(left), AOP_SIZE(right));
+    
+    if(!isAOP_REGlike(left)) {
+      operand *dummy;
+
+        dummy = left;
+        left = right;
+        right = dummy;
+        
+        /* invert comparing operand */
+//        cmp_op ^= 1;
+        rIfx->condition ^= 1;
+    }
+    
+    
+    if(isAOP_REGlike(left) && isAOP_LIT(right)) {
+      /* comparing register vs. literal */
+      lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
+      
+      
+      if(size == 1) {
+        op = selectCompareOp(rIfx, ifx, result, offs, cmp_op);
+        
+        DEBUGpic16_emitcode("%%", "comparing operand %s, condition: %d", (op==POC_CPFSLT?"POC_CPFSLT":"POC_CPFSGT"), rIfx->condition);
+
+        if(!sign) {
+          /* unsigned compare */
+          switch( lit ) {
+            case 0:
+              if(ifx && IC_FALSE(ifx)) {
+                tmplbl = newiTempLabel( NULL );
+                pic16_emitpcode(POC_TSTFSZ, pic16_popGet(AOP(left), 0));
+                pic16_emitpcode(POC_BRA, pic16_popGetLabel(tmplbl->key));
+                pic16_emitpcode(POC_BRA, pic16_popGetLabel(rIfx->lbl->key));
+                pic16_emitpLabel(tmplbl->key);
+
+                ifx->generated = 1;
+                return 1;
+              }
+              break;
+          }	/* switch */
+
+        }	/* if(!sign) */
+
+      }		/* if(size==1) */
+
+    }		/* */
+      
+  return 0;
 }

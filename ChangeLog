@@ -1,5 +1,75 @@
 2005-03-12 Vangelis Rokas <vrokas AT users.sourceforge.net>
 
+	* device/lib/pic16/startup/crt0i.c (_cinit): local variables where
+	moved to level 0 and declared as static. Also they are explicit
+	placed in access bank. This was necessery because some times they
+	might cross memory bank boundaries. crt0iz.c is *NOT* updated!!!
+	* src/pic16/device.h: added flag OPTIMIZE_CMP to enable some compare
+	optimizations. Currently only compare to unsigned char is implemented,
+	* src/pic16/gen.c: added fReturnIdx array,
+	* (struct resolvedIfx) is moved to gen.h and made public,
+	* (struct _G): added sregsAlloc and sregsAllocSet fields,
+	* (aopForSym): added an optimization to directly store in stack of
+	the operand of a SEND iCode,
+	* (pic16_aopOp): don't return return registers as strings (AOP_STR)
+	but as registers instead (AOP_REG) using the fReturnIdx array,
+	* (pic16_freeAsmop): remove the freed register from the
+	_G.sregsAlloc field,
+	* (pic16_aopGet): in case AOP_STR, the compare to 'a' is changed to
+	a compare of 'WREG',
+	* (pic16_popGetTempRegCond): changed function prototype, now
+	function takes also a bitVector argument v which holds the current
+	set of registers that are allocated for stack access by aopForSym,
+	registers allocated in aopForSym for accessing stack symbols are not
+	any more part of the functions usedRegs field,
+	* (genCall): some times aopOp is called for a stack variable to be
+	send, aopForSym might perform the push, if this is true make sure
+	that genCall doesn't push the variable twice by testing _G.resDirect,
+	* (genFunction): changed testing for unspecified interrupt number
+	from 256 to INTNO_UNSPEC,
+	* modified selection scheme of frame pointer generation. Previously
+	if function did use local registers a frame pointer was generated,
+	now a frame pointer is generated only if function has arguments
+	(that need PLUSW2 register access), or has stack arguments, or the
+	compiler is not instructed to omit the frame pointer,
+	* (genEndFunction): before restoring local registers that were saved
+	in the function preamble, also restore the registers that *might*
+	have been allocated for stack access,
+	* (genRet): removed some old comments,
+	* (genCmp, the active (RN's) version): added a call to the
+	pic16_genCmp_special function to perform the compare with a more
+	robust and optimized way,
+	* (genInline): a feature has been added in inline code generation,
+	which allows a wildcard variable substitution when writing inline
+	assembly. Code is incomplete and experimental therefore undocumented,
+	* (genCast): changed order of aopOp for result and right to allow
+	aopForSym to directly load the result if possible,
+	* src/pic16/genutils.c (selectCompareOp, pic16_genCmp_special): NEW,
+	perform an optimized compare on some selected special occasions,
+	* src/pic16/genutils.h: declaration of resolvedIfx structure from gen.c,
+	* src/pic16/glue.c (pic16createInterrupVect): make sure we never
+	generate an IVT any more,
+	* src/pic16/main.c (pic16_optionsTable): added command line option
+	--optimize-cmp,
+	* (_pic16_initPaths): when calling C preprocessor define pic18fXXXX
+	macro too, when calling assembler define pic18fXXXX *and* __18Fxxxx
+	macros,
+	* src/pic16/NOTES: Raphael Neider added in list of active developers
+	* src/pic16/pcode.c (OPT_TYPE_STR): added strings jumptable_begin and
+	jumptable_end to prevent bug #,
+	* (pic16_pciADDWFC, ADDFWC, COMF, CLRF): added some missing flags in
+	inCond and outCond fields,
+	* src/pic16/pcoderegs.c (pCodeOptime2pCodes): add a fix for bug #,
+	* src/pic16/ralloc.c (serialRegAssign): explicit set willCS to 0 to
+	turn off register spilling,
+	* (packRegsForOneUse): synced with other ports' versions although it
+	is not used currently,
+	* (pic16_packRegisters): added an optimization while reading
+	structure bitfields, some registers may be saved (malloc code is
+	decreased by 80 bytes)
+
+2005-03-12 Vangelis Rokas <vrokas AT users.sourceforge.net>
+
 	* src/SDCCcse.c (cseBBlock): inside 'do operand lookup' loop test if
 	left is a bitfield, if yes, then don't optimize assignment. Perhaps
 	this can be optimized more?

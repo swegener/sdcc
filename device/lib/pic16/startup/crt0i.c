@@ -86,6 +86,14 @@ extern code struct
 #define tblrdpostinc	tblrd*+
 
 
+#pragma udata access _do_cinit_prom, _do_cinit_curr_byte
+#pragma udata access _do_cinit_ curr_entry, _do_cinit_data_ptr
+
+static short long _do_cinit_prom;
+static unsigned short _do_cinit_curr_byte;
+static unsigned short _do_cinit_curr_entry;
+static short long _do_cinit_data_ptr;
+
 /* the variable initialisation routine */
 void _do_cinit (void)
 {
@@ -93,10 +101,6 @@ void _do_cinit (void)
    * we'll make the assumption in the following code that these statics
    * will be allocated into the same bank.
    */
-  static short long prom;
-  static unsigned short curr_byte;
-  static unsigned short curr_entry;
-  static short long data_ptr;
 
 
 	/* TBLPTR = &cinit */
@@ -112,13 +116,13 @@ void _do_cinit (void)
 	
 	/* curr_entry = cinit.num_init */
 	_asm
-		movlb __do_cinit_data_ptr_1_1
+		movlb __do_cinit_data_ptr
 		tblrdpostinc
 		movf _TABLAT, 0, 0
-		movwf __do_cinit_curr_entry_1_1, 1
+		movwf __do_cinit_curr_entry, 1
 		tblrdpostinc
 		movf _TABLAT, 0, 0
-		movwf __do_cinit_curr_entry_1_1+1, 1
+		movwf __do_cinit_curr_entry+1, 1
 	_endasm;
 
 
@@ -126,7 +130,7 @@ void _do_cinit (void)
 	_asm
 test:
 	bnz done1
-	tstfsz __do_cinit_curr_entry_1_1, 1
+	tstfsz __do_cinit_curr_entry, 1
 	bra cont1
 
 done1:
@@ -148,17 +152,17 @@ cont1:
 		/* read the source address low */
 		tblrdpostinc
 		movf _TABLAT, 0, 0
-		movwf __do_cinit_prom_1_1, 1
+		movwf __do_cinit_prom, 1
 		
 		/* source address high */
 		tblrdpostinc
 		movf _TABLAT, 0, 0
-		movwf __do_cinit_prom_1_1 + 1, 1
+		movwf __do_cinit_prom + 1, 1
 
 		/* source address upper */
 		tblrdpostinc
 		movf _TABLAT, 0, 0
-		movwf __do_cinit_prom_1_1 + 2, 1
+		movwf __do_cinit_prom + 2, 1
 
 		/* skip a byte since it's stored as a 32bit int */
 		tblrdpostinc
@@ -181,10 +185,10 @@ cont1:
 		/* read the destination address directly into FSR0 */
 		tblrdpostinc
 		movf _TABLAT, 0, 0
-		movwf __do_cinit_curr_byte_1_1, 1
+		movwf __do_cinit_curr_byte, 1
 		tblrdpostinc
 		movf _TABLAT, 0, 0
-		movwf __do_cinit_curr_byte_1_1+1, 1
+		movwf __do_cinit_curr_byte+1, 1
 
 		/* skip two bytes since it's stored as a 32bit int */
 		tblrdpostinc
@@ -200,29 +204,29 @@ cont1:
   
 	/*  data_ptr = TBLPTR */
 	_asm
-		movff _TBLPTRL, __do_cinit_data_ptr_1_1
-		movff _TBLPTRH, __do_cinit_data_ptr_1_1 + 1
-		movff _TBLPTRU, __do_cinit_data_ptr_1_1 + 2
+		movff _TBLPTRL, __do_cinit_data_ptr
+		movff _TBLPTRH, __do_cinit_data_ptr + 1
+		movff _TBLPTRU, __do_cinit_data_ptr + 2
 	_endasm;
   
       
 	/* now assign the source address to the table pointer */
 	/*  TBLPTR = prom */
 	_asm
-		movff __do_cinit_prom_1_1, _TBLPTRL
-		movff __do_cinit_prom_1_1 + 1, _TBLPTRH
-		movff __do_cinit_prom_1_1 + 2, _TBLPTRU
+		movff __do_cinit_prom, _TBLPTRL
+		movff __do_cinit_prom + 1, _TBLPTRH
+		movff __do_cinit_prom + 2, _TBLPTRU
 	_endasm;
 
 	/* do the copy loop */
 	_asm
 
 		/* determine if we have any more bytes to copy */
-		movlb __do_cinit_curr_byte_1_1
-		movf __do_cinit_curr_byte_1_1, 1, 1
+		movlb __do_cinit_curr_byte
+		movf __do_cinit_curr_byte, 1, 1
 copy_loop:
 		bnz copy_one_byte // copy_one_byte
-		movf __do_cinit_curr_byte_1_1 + 1, 1, 1
+		movf __do_cinit_curr_byte + 1, 1, 1
 		bz done_copying
 
 copy_one_byte:
@@ -231,9 +235,9 @@ copy_one_byte:
 		movwf _POSTINC0, 0
 
 		/* decrement byte counter */
-		decf __do_cinit_curr_byte_1_1, 1, 1
+		decf __do_cinit_curr_byte, 1, 1
 		bnc copy_loop // copy_loop
-		decf __do_cinit_curr_byte_1_1 + 1, 1, 1
+		decf __do_cinit_curr_byte + 1, 1, 1
 
 		bra copy_loop
 done_copying:
@@ -242,14 +246,14 @@ done_copying:
 	/* restore the table pointer for the next entry */
 	/*  TBLPTR = data_ptr */
 	_asm
-		movff __do_cinit_data_ptr_1_1, _TBLPTRL
-		movff __do_cinit_data_ptr_1_1 + 1, _TBLPTRH
-		movff __do_cinit_data_ptr_1_1 + 2, _TBLPTRU
+		movff __do_cinit_data_ptr, _TBLPTRL
+		movff __do_cinit_data_ptr + 1, _TBLPTRH
+		movff __do_cinit_data_ptr + 2, _TBLPTRU
 	_endasm;
 
   
 	/* next entry... */
-	curr_entry--;
+	_do_cinit_curr_entry--;
 
 	_asm
 		goto test;

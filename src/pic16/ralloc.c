@@ -737,7 +737,7 @@ pic16_allocDirReg (operand *op )
 
 
 	if(!SPEC_OCLS( OP_SYM_ETYPE(op))) {
-#if 1
+#if 0
 		if(pic16_debug_verbose)
 		{
 			fprintf(stderr, "%s:%d symbol %s(r:%s) is not assigned to a memmap\n", __FILE__, __LINE__,
@@ -2304,6 +2304,10 @@ serialRegAssign (eBBlock ** ebbs, int count)
 	         or this one is rematerializable then
 	         spill this one */
 	      willCS = willCauseSpill (sym->nRegs, sym->regType);
+
+	      /* explicit turn off register spilling */
+	      willCS = 0;
+	      
 	      spillable = computeSpillable (ic);
 	      if (sym->remat ||
 		  (willCS && bitVectIsZero (spillable)))
@@ -2319,12 +2323,13 @@ serialRegAssign (eBBlock ** ebbs, int count)
 		 have been allocated after sym->liveFrom but freed
 		 before ic->seq. This is complicated, so spill this
 		 symbol instead and let fillGaps handle the allocation. */
+#if 0
 	      if (sym->liveFrom < ic->seq)
 		{
 		    spillThis (sym);
 		    continue;		      
 		}
-
+#endif
 	      /* if it has a spillocation & is used less than
 	         all other live ranges then spill this */
 		if (willCS) {
@@ -3322,11 +3327,17 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
   if (!IS_SYMOP (op))
     return NULL;
 
+  if(OP_SYMBOL(op)->remat || OP_SYMBOL(op)->ruonly)
+    return NULL;
+
   /* only upto 2 bytes since we cannot predict
      the usage of b, & acc */
-  if (getSize (operandType (op)) > (pic16_fReturnSizePic - 3) &&	/* was 2, changed to 3 -- VR */
-      ic->op != RETURN &&
-      ic->op != SEND)
+  if (getSize (operandType (op)) > (pic16_fReturnSizePic - 1)
+      && ic->op != RETURN
+      && ic->op != SEND
+      && !POINTER_SET(ic)
+      && !POINTER_GET(ic)
+      )
     return NULL;
 
   /* this routine will mark the a symbol as used in one 
@@ -3335,10 +3346,18 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
      that definition is either a return value from a 
      function or does not contain any variables in
      far space */
+
+#if 0
   uses = bitVectCopy (OP_USES (op));
   bitVectUnSetBit (uses, ic->key);	/* take away this iCode */
   if (!bitVectIsZero (uses))	/* has other uses */
     return NULL;
+#endif
+
+#if 1
+  if (bitVectnBitsOn (OP_USES (op)) > 1)
+    return NULL;
+#endif
 
   /* if it has only one defintion */
   if (bitVectnBitsOn (OP_DEFS (op)) > 1)
@@ -3367,6 +3386,8 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
 	}
       dic = dic->next;
     }
+  else
+    {
 
 
   /* otherwise check that the definition does
@@ -3388,6 +3409,7 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
   if (POINTER_GET (dic) &&
       !IS_DATA_PTR (aggrToPtr (operandType (IC_LEFT (dic)), FALSE)))
     return NULL;
+    }
 
   sic = dic;
 
@@ -3418,7 +3440,7 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
          operation is a '*','/' or '%' then 'b' may
          cause a problem */
       if ((dic->op == '%' || dic->op == '/' || dic->op == '*') &&
-	  getSize (operandType (op)) >= 3)
+	  getSize (operandType (op)) >= 2)
 	return NULL;
 
       /* if left or right or result is in far space */
@@ -3968,6 +3990,32 @@ pic16_packRegisters (eBBlock * ebp)
           OP_SYMBOL (IC_LEFT (ic))->uptr = 1;
           debugLog ("  marking as a pointer (get) =>");
           debugAopGet ("  left:", IC_LEFT (ic));
+        }
+        
+        if(getenv("OPTIMIZE_BITFIELD_POINTER_GET")) {
+          if(IS_ITEMP(IC_LEFT(ic)) && IS_BITFIELD(OP_SYM_ETYPE(IC_LEFT(ic)))) {
+            iCode *dic = ic->prev;
+
+            fprintf(stderr, "%s:%d might give opt POINTER_GET && IS_BITFIELD(IC_LEFT)\n", __FILE__, __LINE__);
+          
+            if(dic && dic->op == '='
+              && isOperandEqual(IC_RESULT(dic), IC_LEFT(ic))) {
+              
+                fprintf(stderr, "%s:%d && prev is '=' && prev->result == ic->left\n", __FILE__, __LINE__);
+
+
+                /* replace prev->left with ic->left */
+                IC_LEFT(ic) = IC_RIGHT(dic);
+                IC_RIGHT(ic->prev) = NULL;
+                
+                /* remove ic->prev iCode (assignment) */
+                remiCodeFromeBBlock (ebp, dic);
+                bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,ic->key);
+
+
+                hTabDeleteItem (&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
+            }
+          }
         }
       }
 

@@ -293,3 +293,16 @@ replace restart {
         movf    %2,w
 }
 
+replace restart {
+	movf	%1,w
+	xorlw	%2
+	bz	%3
+	bra	%4
+%3:	%5
+} by {
+	;	peep 101 - test for equality
+	movlw	%2
+	cpfseq	%1
+	bra	%4
+%3:	%5
+}

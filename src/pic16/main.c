@@ -140,6 +140,8 @@ set *sectNames=NULL;			/* list of section listed in pragma directives */
 set *sectSyms=NULL;			/* list of symbols set in a specific section */
 set *wparamList=NULL;
 
+set *asmInlineMap=NULL;
+
 struct {
   unsigned ignore: 1;
   unsigned want_libc: 1;
@@ -154,190 +156,209 @@ _process_pragma(const char *sz)
 {
   static const char *WHITE = " \t\n";
   static const char *WHITECOMMA = " \t\n,";
+  char *ptr = strtok((char *)sz, WHITE);
+
+    /* #pragma maxram [maxram] */
+    if (startsWith (ptr, "maxram")) {
+      char *maxRAM = strtok((char *)NULL, WHITE);
+
+        if (maxRAM != (char *)NULL) {
+          int maxRAMaddress;
+          value *maxRAMVal;
+
+            maxRAMVal = constVal(maxRAM);
+            maxRAMaddress = (int)floatFromVal(maxRAMVal);
+            pic16_setMaxRAM(maxRAMaddress);
+        }
+
+        return 0;
+    }
   
-  char	*ptr = strtok((char *)sz, WHITE);
+  /* #pragma stack [stack-position] [stack-len] */
+  if(startsWith(ptr, "stack")) {
+    char *stackPosS = strtok((char *)NULL, WHITE);
+    char *stackLenS = strtok((char *)NULL, WHITE);
+    value *stackPosVal;
+    value *stackLenVal;
+    regs *reg;
+    symbol *sym;
 
-  	/* #pragma maxram [maxram] */
-	if (startsWith (ptr, "maxram")) {
-	  char *maxRAM = strtok((char *)NULL, WHITE);
+      stackPosVal = constVal( stackPosS );
+      stackPos = (unsigned int)floatFromVal( stackPosVal );
 
-		if (maxRAM != (char *)NULL) {
-		  int maxRAMaddress;
-		  value *maxRAMVal;
+      if(stackLenS) {
+        stackLenVal = constVal( stackLenS );
+        stackLen = (unsigned int)floatFromVal( stackLenVal );
+      }
 
-			maxRAMVal = constVal(maxRAM);
-			maxRAMaddress = (int)floatFromVal(maxRAMVal);
-			pic16_setMaxRAM(maxRAMaddress);
-		}
-
-          return 0;
-	}
-	
-	/* #pragma stack [stack-position] [stack-len] */
-	if(startsWith(ptr, "stack")) {
-	  char *stackPosS = strtok((char *)NULL, WHITE);
-	  char *stackLenS = strtok((char *)NULL, WHITE);
-	  value *stackPosVal;
-	  value *stackLenVal;
-	  regs *reg;
-	  symbol *sym;
-
-		stackPosVal = constVal( stackPosS );
-		stackPos = (unsigned int)floatFromVal( stackPosVal );
-
-		
-		if(stackLenS) {
-			stackLenVal = constVal( stackLenS );
-			stackLen = (unsigned int)floatFromVal( stackLenVal );
-		}
-
-		if(stackLen < 1) {
-			stackLen = 64;
-			fprintf(stderr, "%s:%d: warning: setting stack to default size %d (0x%04x)\n",
-		                      filename, lineno-1, stackLen, stackLen);
+      if(stackLen < 1) {
+        stackLen = 64;
+        fprintf(stderr, "%s:%d: warning: setting stack to default size %d (0x%04x)\n",
+                filename, lineno-1, stackLen, stackLen);
                         
-//			fprintf(stderr, "%s:%d setting stack to default size %d\n", __FILE__, __LINE__, stackLen);
-		}
+//      fprintf(stderr, "%s:%d setting stack to default size %d\n", __FILE__, __LINE__, stackLen);
+      }
 
-//	  	fprintf(stderr, "Initializing stack pointer at 0x%x len 0x%x\n", stackPos, stackLen);
-				
-		reg=newReg(REG_SFR, PO_SFR_REGISTER, stackPos, "_stack", stackLen-1, 0, NULL);
-		addSet(&pic16_fix_udata, reg);
-		
-		reg = newReg(REG_SFR, PO_SFR_REGISTER, stackPos + stackLen-1, "_stack_end", 1, 0, NULL);
-		addSet(&pic16_fix_udata, reg);
+//      fprintf(stderr, "Initializing stack pointer at 0x%x len 0x%x\n", stackPos, stackLen);
+        
+      reg=newReg(REG_SFR, PO_SFR_REGISTER, stackPos, "_stack", stackLen-1, 0, NULL);
+      addSet(&pic16_fix_udata, reg);
+    
+      reg = newReg(REG_SFR, PO_SFR_REGISTER, stackPos + stackLen-1, "_stack_end", 1, 0, NULL);
+      addSet(&pic16_fix_udata, reg);
+    
+      sym = newSymbol("stack", 0);
+      sprintf(sym->rname, "_%s", sym->name);
+      addSet(&publics, sym);
 
-		sym = newSymbol("stack", 0);
-		sprintf(sym->rname, "_%s", sym->name);
-		addSet(&publics, sym);
+      sym = newSymbol("stack_end", 0);
+      sprintf(sym->rname, "_%s", sym->name);
+      addSet(&publics, sym);
+    
+      initsfpnt = 1;    // force glue() to initialize stack/frame pointers */
 
-		sym = newSymbol("stack_end", 0);
-		sprintf(sym->rname, "_%s", sym->name);
-		addSet(&publics, sym);
-		
-		initsfpnt = 1;		// force glue() to initialize stack/frame pointers */
+    return 0;
+  }
+  
+  /* #pragma code [symbol] [location] */
+  if(startsWith(ptr, "code")) {
+    char *symname = strtok((char *)NULL, WHITE);
+    char *location = strtok((char *)NULL, WHITE);
+    absSym *absS;
+    value *addr;
 
-	  return 0;
-	}
-	
-	/* #pragma code [symbol] [location] */
-	if(startsWith(ptr, "code")) {
-	  char *symname = strtok((char *)NULL, WHITE);
-	  char *location = strtok((char *)NULL, WHITE);
-	  absSym *absS;
-	  value *addr;
+      absS = Safe_calloc(1, sizeof(absSym));
+      sprintf(absS->name, "_%s", symname);
+    
+      addr = constVal( location );
+      absS->address = (unsigned int)floatFromVal( addr );
 
-		absS = Safe_calloc(1, sizeof(absSym));
-		sprintf(absS->name, "_%s", symname);
-		
-		addr = constVal( location );
-		absS->address = (unsigned int)floatFromVal( addr );
+      if((absS->address % 2) != 0) {
+        absS->address--;
+        fprintf(stderr, "%s:%d: warning: code memory locations should be word aligned, will locate to 0x%06x instead\n",
+                filename, lineno-1, absS->address);
+      }
 
-		if((absS->address % 2) != 0) {
-		  absS->address--;
-		  fprintf(stderr, "%s:%d: warning: code memory locations should be word aligned, will locate to 0x%06x instead\n",
-		                      filename, lineno-1, absS->address);
-                }
+      addSet(&absSymSet, absS);
+//    fprintf(stderr, "%s:%d symbol %s will be placed in location 0x%06x in code memory\n",
+//      __FILE__, __LINE__, symname, absS->address);
 
-		addSet(&absSymSet, absS);
-//		fprintf(stderr, "%s:%d symbol %s will be placed in location 0x%06x in code memory\n",
-//			__FILE__, __LINE__, symname, absS->address);
+    return 0;
+  }
 
-	  return 0;
-	}
+  /* #pragma udata [section-name] [symbol] */
+  if(startsWith(ptr, "udata")) {
+    char *sectname = strtok((char *)NULL, WHITE);
+    char *symname = strtok((char *)NULL, WHITE);
+    symbol *nsym;
+    sectSym *ssym;
+    sectName *snam;
+    int found=0;
+    
+      while(symname) {
+        ssym = Safe_calloc(1, sizeof(sectSym));
+        ssym->name = Safe_calloc(1, strlen(symname)+2);
+        sprintf(ssym->name, "_%s", symname);
+        ssym->reg = NULL;
 
-	/* #pragma udata [section-name] [symbol] */
-	if(startsWith(ptr, "udata")) {
-	  char *sectname = strtok((char *)NULL, WHITE);
-	  char *symname = strtok((char *)NULL, WHITE);
-	  symbol *nsym;
-	  sectSym *ssym;
-	  sectName *snam;
-	  int found=0;
-	  
-	  	while(symname) {
-	  		ssym = Safe_calloc(1, sizeof(sectSym));
-			ssym->name = Safe_calloc(1, strlen(symname)+2);
-			sprintf(ssym->name, "_%s", symname);
-	  		ssym->reg = NULL;
+        addSet(&sectSyms, ssym);
 
-			addSet(&sectSyms, ssym);
+        nsym = newSymbol(symname, 0);
+        strcpy(nsym->rname, ssym->name);
 
-                        nsym = newSymbol(symname, 0);
-                        strcpy(nsym->rname, ssym->name);
 #if 0
-			checkAddSym(&publics, nsym);
+        checkAddSym(&publics, nsym);
 #endif
 
-			found = 0;
-			for(snam=setFirstItem(sectNames);snam;snam=setNextItem(sectNames)) {
-				if(!strcmp(sectname, snam->name)){ found=1; break; }
-			}
-			
-			if(!found) {
-				snam = Safe_calloc(1, sizeof(sectName));
-				snam->name = Safe_strdup( sectname );
-				snam->regsSet = NULL;
-				
-				addSet(&sectNames, snam);
-			}
-			
-			ssym->section = snam;
-				
+        found = 0;
+        for(snam=setFirstItem(sectNames);snam;snam=setNextItem(sectNames)) {
+          if(!strcmp(sectname, snam->name)){ found=1; break; }
+        }
+      
+        if(!found) {
+          snam = Safe_calloc(1, sizeof(sectName));
+          snam->name = Safe_strdup( sectname );
+          snam->regsSet = NULL;
+        
+          addSet(&sectNames, snam);
+        }
+      
+        ssym->section = snam;
+        
 #if 0
-	  		fprintf(stderr, "%s:%d placing symbol %s at section %s (%p)\n", __FILE__, __LINE__,
-	  		 	ssym->name, snam->name, snam);
+        fprintf(stderr, "%s:%d placing symbol %s at section %s (%p)\n", __FILE__, __LINE__,
+           ssym->name, snam->name, snam);
 #endif
 
-	  		symname = strtok((char *)NULL, WHITE);
-		}
+        symname = strtok((char *)NULL, WHITE);
+    }
 
-	  return 0;
-	}
-	
-	/* #pragma wparam function1[, function2[,...]] */
-	if(startsWith(ptr, "wparam")) {
-	  char *fname = strtok((char *)NULL, WHITECOMMA);
-	  
-            while(fname) {
-              addSet(&wparamList, Safe_strdup(fname));
+    return 0;
+  }
+  
+  /* #pragma wparam function1[, function2[,...]] */
+  if(startsWith(ptr, "wparam")) {
+    char *fname = strtok((char *)NULL, WHITECOMMA);
+
+      
+      while(fname) {
+        fprintf(stderr, "PIC16 Warning: `%s' wparam pragma is obsolete. use function attribute `wparam' instead.\n", fname);
+        addSet(&wparamList, Safe_strdup(fname));
               
-//              debugf("passing with WREG to %s\n", fname);
-              fname = strtok((char *)NULL, WHITECOMMA);
-            }
+//        debugf("passing with WREG to %s\n", fname);
+        fname = strtok((char *)NULL, WHITECOMMA);
+      }
             
-          return 0;
-        }
+      return 0;
+  }
         
-        /* #pragma library library_module */
-        if(startsWith(ptr, "library")) {
-          char *lmodule = strtok((char *)NULL, WHITE);
+  /* #pragma library library_module */
+  if(startsWith(ptr, "library")) {
+  char *lmodule = strtok((char *)NULL, WHITE);
         
-            if(lmodule) {
-              /* lmodule can be:
-               * c	link the C library
-               * math	link the math library
-               * io	link the IO library
-               * debug	link the debug libary
-               * anything else, will link as-is */
-              if(!strcmp(lmodule, "c"))libflags.want_libc = 1;
-              else if(!strcmp(lmodule, "math"))libflags.want_libm = 1;
-              else if(!strcmp(lmodule, "io"))libflags.want_libio = 1;
-              else if(!strcmp(lmodule, "debug"))libflags.want_libdebug = 1;
-              else if(!strcmp(lmodule, "ignore"))libflags.ignore = 1;
-              else {
-                if(!libflags.ignore) {
-                  fprintf(stderr, "link library %s\n", lmodule);
-                  addSetHead(&libFilesSet, lmodule);
-                }
-              }
-            }
-            
-            return 0;
+    if(lmodule) {
+      /* lmodule can be:
+       * c	link the C library
+       * math	link the math library
+       * io	link the IO library
+       * debug	link the debug libary
+       * anything else, will link as-is */
+       
+      if(!strcmp(lmodule, "c"))libflags.want_libc = 1;
+      else if(!strcmp(lmodule, "math"))libflags.want_libm = 1;
+      else if(!strcmp(lmodule, "io"))libflags.want_libio = 1;
+      else if(!strcmp(lmodule, "debug"))libflags.want_libdebug = 1;
+      else if(!strcmp(lmodule, "ignore"))libflags.ignore = 1;
+      else {
+        if(!libflags.ignore) {
+          fprintf(stderr, "link library %s\n", lmodule);
+          addSetHead(&libFilesSet, lmodule);
         }
-                
-              
-	
+      }
+    }
+    
+    return 0;
+  }
+      
+  if(startsWith(ptr, "inline")) {
+    char *tmp = strtok((char *)NULL, WHITECOMMA);
+
+      while(tmp) {
+        addSet(&asmInlineMap, Safe_strdup( tmp ));
+        tmp = strtok((char *)NULL, WHITECOMMA);
+      }
+
+      {
+        char *s;
+          
+          for(s = setFirstItem(asmInlineMap); s ; s = setNextItem(asmInlineMap)) {
+            debugf("inline asm: `%s'\n", s);
+          }
+      }
+      
+      return 0;
+  }
+  
   return 1;
 }
 
@@ -349,7 +370,7 @@ _process_pragma(const char *sz)
 #define ALT_ASM		"--asm="
 #define ALT_LINK	"--link="
 
-#define IVT_LOC		"--ivt-loc"
+#define IVT_LOC		"--ivt-loc="
 #define NO_DEFLIBS	"--nodefaultlibs"
 #define MPLAB_COMPAT	"--mplab-comp"
 
@@ -359,6 +380,7 @@ _process_pragma(const char *sz)
 #define	OFMSG_LRSUPPORT	"--flr-support"
 
 #define OPTIMIZE_GOTO   "--optimize-goto"
+#define	OPTIMIZE_CMP	"--optimize-cmp"
 
 char *alt_asm=NULL;
 char *alt_link=NULL;
@@ -399,8 +421,8 @@ OPTION pic16_optionsTable[]= {
 	{ 0,	USE_CRT,	NULL,	"use <crt-o> run-time initialization module"},
 	{ 0,	"--no-crt",	&pic16_options.no_crt,	"do not link any default run-time initialization module"},
 	{ 0,	"--gstack",	&pic16_options.gstack,	"trace stack pointer push/pop to overflow"},
-//	{ 0,	OFMSG_LRSUPPORT,	NULL,		"use support functions for local register store/restore"},
 	{ 0,    OPTIMIZE_GOTO,  NULL,			"try to use (conditional) BRA instead of GOTO"},
+	{ 0,	OPTIMIZE_CMP,	NULL,			"try to optimize some compares"},
 	{ 0,	NULL,		NULL,	NULL}
 	};
 
@@ -462,6 +484,7 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
 
     if(ISOPT(IVT_LOC)) {
       pic16_options.ivt_loc = getIntArg(IVT_LOC, argv, i, *pargc);
+      fprintf(stderr, "%s:%d setting interrupt vector addresses 0x%x\n", __FILE__, __LINE__, pic16_options.ivt_loc);
       return TRUE;
     }
 	
@@ -492,12 +515,16 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
     }
 #endif
 
-#if 1
     if (ISOPT(OPTIMIZE_GOTO)) {
       pic16_options.opt_flags |= OF_OPTIMIZE_GOTO;
       return TRUE;
     }
-#endif
+
+    if(ISOPT(OPTIMIZE_CMP)) {
+      pic16_options.opt_flags |= OF_OPTIMIZE_CMP;
+      return TRUE;
+    }
+    
 
   return FALSE;
 }
@@ -514,6 +541,9 @@ static void _pic16_initPaths(void)
 
     setMainValue("mcu", pic16->name[2] );
     addSet(&preArgvSet, Safe_strdup("-D{mcu}"));
+
+    setMainValue("mcu1", pic16->name[1] );
+    addSet(&preArgvSet, Safe_strdup("-D__{mcu1}"));
 
     sprintf(pic16incDir, "%s%cpic16", INCLUDE_DIR_SUFFIX, DIR_SEPARATOR_CHAR);
     sprintf(pic16libDir, "%s%cpic16", LIB_DIR_SUFFIX, DIR_SEPARATOR_CHAR);
@@ -660,6 +690,15 @@ _pic16_finaliseOptions (void)
     else
     if(options.model == MODEL_LARGE)
       addSet(&asmOptionsSet, Safe_strdup("-DSDCC_MODEL_LARGE"));
+    
+    {
+      char buf[128];
+
+        sprintf(buf, "-D%s -D%s", pic16->name[2], pic16->name[1]);
+        *(strrchr(buf, 'f')) = 'F';
+        addSet(&asmOptionsSet, Safe_strdup( buf ));
+    }
+    
     
     if(STACK_MODEL_LARGE) {
       addSet(&preArgvSet, Safe_strdup("-DSTACK_MODEL_LARGE"));

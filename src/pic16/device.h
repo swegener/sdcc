@@ -88,6 +88,7 @@ typedef struct PIC16_device {
 
 #define OF_LR_SUPPORT		0x00000001
 #define OF_OPTIMIZE_GOTO	0x00000002
+#define OF_OPTIMIZE_CMP		0x00000004
 
 typedef struct {
   int no_banksel;
@@ -112,6 +113,8 @@ typedef struct {
 
 extern set *fix_idataSymSet;
 extern set *rel_idataSymSet;
+
+extern set *asmInlineMap;
 
 typedef struct {
   unsigned long isize;

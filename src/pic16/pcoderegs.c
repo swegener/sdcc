@@ -168,6 +168,7 @@ static void pCodeRegMapLiveRangesInFlow(pCodeFlow *pcfl)
     reg = pic16_getRegFromInstruction(pc);
 
     if(reg && (reg->type != REG_TMP)) {
+
 #if 0
       fprintf(stderr, "reg= %p\n", reg);
       fprintf(stderr, "flow seq %d, inst seq %d  %s  ",PCODE(pcfl)->seq,pc->seq,reg->name);
@@ -358,6 +359,9 @@ static void  RemoveRegsFromSet(set *regset)
 	    fprintf(stderr,"reg %s, type =%d\n",r->name, r->type);
 	  }
 
+
+	  pc->print(stderr, pc);
+
 	  fprintf(stderr,"%s:%d: removing reg %s because it is used only once\n",__FILE__, __LINE__, reg->name);
 
 
@@ -470,6 +474,8 @@ static int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *re
 
   int t = total_registers_saved;
 
+  if(reg->type == REG_SFR)return 0;
+
   if(pc2->seq < pc1->seq) {
     pct1 = pc2;
     pc2 = pc1;
@@ -508,7 +514,27 @@ static int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *re
     PCI(newpc)->pcflow = PCFL(pcfl_used);
     newpc->seq = pc2->seq;
 
-    Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
+    /* take care if register is used after pc2, if yes, then don't delete
+     * clrf reg, because, reg should be initialized with zero */
+    {
+      pCode *spc;
+      int maxSeq=0;
+
+        for(spc=setFirstItem(reg->reglives.usedpCodes);spc;spc=setNextItem(reg->reglives.usedpCodes)) {
+          if(maxSeq < spc->seq)maxSeq = spc->seq;
+        }
+
+//        fprintf(stderr, "pc1->seq = %d\tpc2->seq = %d\tspc->seq = %d\n", pc1->seq, pc2->seq, maxSeq);
+
+        if(maxSeq > pc2->seq) {
+          /* this means that a pCode uses register after pc2, then
+           * we can't delete pc1 pCode */
+          Remove2pcodes(pcfl_used, NULL, pc2, reg, can_free);
+        } else {
+          /* we can remove both pCodes */
+          Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
+        }
+    }
     total_registers_saved++;  // debugging stats.
 
   } else if((PCI(pc1)->op == POC_CLRF) && (PCI(pc2)->op == POC_IORFW) ){
@@ -827,6 +853,7 @@ void pic16_pCodeRegOptimizeRegUsage(int level)
 
   if(!register_optimization)
     return;
+
 #define OPT_PASSES 4
   passes = OPT_PASSES;
 

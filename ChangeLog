@@ -1,3 +1,8 @@
+2003-09-26  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCdflow.c (computeDataFlow): Fixed bug #810746
+	* src/asm.c (printILine): Fixed bug #811015
+
 2003-09-22  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	*link/z80/lklibr.c, as/mcs51/lklibr.c: Improved memory allocation and

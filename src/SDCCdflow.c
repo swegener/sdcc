@@ -151,6 +151,7 @@ DEFSETFUNC (mergeInDefs)
 
 }
 
+
 /*-----------------------------------------------------------------*/
 /* computeDataFlow - does computations for data flow accross blocks */
 /*-----------------------------------------------------------------*/
@@ -170,7 +171,8 @@ computeDataFlow (eBBlock ** ebbs, int count)
 	{
 
 	  set *pred;
-	  set *oldOut;
+	  set *oldOutExprs = NULL;
+          bitVect *oldOutDefs = NULL;
 	  int firstTime;
 	  eBBlock *pBlock;
 
@@ -182,9 +184,12 @@ computeDataFlow (eBBlock ** ebbs, int count)
 	  /* get blocks that can come to this block */
 	  pred = edgesTo (ebbs[i]);
 
-	  /* make a copy of the outExpressions : to be */
+	  /* make a copy of the outExpressions or outDefs : to be */
 	  /* used for iteration   */
-	  oldOut = setFromSet (ebbs[i]->outExprs);
+	  if (optimize.global_cse)
+	    oldOutExprs = setFromSet (ebbs[i]->outExprs);
+	  else
+	    oldOutDefs = bitVectCopy (ebbs[i]->outDefs);
 	  setToNull ((void **) &ebbs[i]->inDefs);
 
 	  /* indefitions are easy just merge them by union */
@@ -226,7 +231,10 @@ computeDataFlow (eBBlock ** ebbs, int count)
 	  cseBBlock (ebbs[i], TRUE, ebbs, count);
 
 	  /* if it change we will need to iterate */
-	  change += !isSetsEqualWith (ebbs[i]->outExprs, oldOut, isCseDefEqual);
+	  if (optimize.global_cse)
+	    change += !isSetsEqualWith (ebbs[i]->outExprs, oldOutExprs, isCseDefEqual);
+	  else
+	    change += !bitVectEqual (ebbs[i]->outDefs, oldOutDefs);
 	}
 
       if (!change)		/* iterate till no change */

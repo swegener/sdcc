@@ -280,7 +280,10 @@ char *printILine (iCode *ic) {
 
   // stuff the pipe with the readable icode
   pipeStream=fdopen(filedes[1],"w");
-  icTab->iCodePrint(pipeStream, ic, icTab->printName);
+  if (ic->op != INLINEASM)
+    icTab->iCodePrint(pipeStream, ic, icTab->printName);
+  else
+    fprintf(pipeStream, "inline\n");
   // it really needs an extra push
   fflush(pipeStream);
   // now swallow it

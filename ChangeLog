@@ -1,3 +1,8 @@
+2004-09-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/ralloc.c (canDefAccResult): multi-byte shift is unsafe for
+	accumulator result if it needs sign extension
+
 2004-09-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/hc08/ralloc.c (canUseAccOperand): fixed comparison bug

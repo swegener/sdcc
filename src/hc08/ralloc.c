@@ -2538,7 +2538,8 @@ canDefAccResult (iCode * ic)
         {
         case LEFT_OP:
         case RIGHT_OP:
-          return isOperandLiteral (IC_RIGHT (ic));
+          return isOperandLiteral (IC_RIGHT (ic))
+                  && SPEC_USIGN (operandType (IC_RESULT (ic)));
         case CALL:
         case PCALL:
         case '*':

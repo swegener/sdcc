@@ -769,7 +769,7 @@ struct_declaration
 		   sym->etype = getSpec(sym->type);
 	       }
 	       else
-		   addDecl (sym,0,cloneSpec($1));   	       
+		 addDecl (sym,0,copyLinkChain($1));
 	       /* make sure the type is complete and sane */
 	       checkTypeSanity(sym->etype, sym->name);
 	   }

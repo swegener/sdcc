@@ -646,23 +646,6 @@ mergeSpec (sym_link * dest, sym_link * src, char *name)
 }
 
 /*------------------------------------------------------------------*/
-/* cloneSpec - copies the entire spec and returns a new spec        */
-/*------------------------------------------------------------------*/
-sym_link *
-cloneSpec (sym_link * src)
-{
-  sym_link *spec;
-
-  /* go thru chain till we find the specifier */
-  while (src && src->class != SPECIFIER)
-    src = src->next;
-
-  spec = newLink ();
-  memcpy (spec, src, sizeof (sym_link));
-  return spec;
-}
-
-/*------------------------------------------------------------------*/
 /* genSymName - generates and returns a name used for anonymous vars */
 /*------------------------------------------------------------------*/
 char *

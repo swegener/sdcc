@@ -36,8 +36,6 @@
 /* since the pack the registers depending strictly on the MCU      */
 /*-----------------------------------------------------------------*/
 
-extern void gen390Code(iCode *);
-
 /* Global data */
 static struct {
     bitVect *spiltSet;
@@ -2100,7 +2098,7 @@ static void packRegisters (eBBlock *ebp)
              bitVectnBitsOn(OP_DEFS(IC_RESULT(ic))) == 1 &&
 	     IS_OP_LITERAL(IC_RIGHT(ic))) ) {
 
-	    int i = operandLitValue(IC_RIGHT(ic));
+	    //int i = operandLitValue(IC_RIGHT(ic));
 	    OP_SYMBOL(IC_RESULT(ic))->remat = 1;
 	    OP_SYMBOL(IC_RESULT(ic))->rematiCode = ic;
 	    OP_SYMBOL(IC_RESULT(ic))->usl.spillLoc = NULL;

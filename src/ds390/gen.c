@@ -32,7 +32,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "SDCCglobl.h"
+
+#include <common.h>
+#include "ralloc.h"
+#include "gen.h"
 
 #ifdef HAVE_SYS_ISA_DEFS_H
 #include <sys/isa_defs.h>
@@ -47,13 +50,11 @@
 #endif
 #endif
 
-#include "common.h"
-#include "SDCCpeeph.h"
-#include "ralloc.h"
-#include "gen.h"
-
 char *aopLiteral (value *val, int offset);
+#if 0
+//REMOVE ME!!!
 extern int allocInfo;
+#endif
 
 /* this is the down and dirty file with all kinds of 
    kludgy & hacky stuff. This is what it is all about
@@ -82,10 +83,8 @@ static struct {
     set *sendSet;
 } _G;
 
-extern int ds390_ptrRegReq ;
-extern int ds390_nRegs;
-extern FILE *codeOutFile;
 static void saverbank (int, iCode *,bool);
+
 #define RESULTONSTACK(x) \
                          (IC_RESULT(x) && IC_RESULT(x)->aop && \
                          IC_RESULT(x)->aop->type == AOP_STK )
@@ -8349,7 +8348,7 @@ static void genReceive (iCode *ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* gen390Code - generate code for 8051 based controllers            */
+/* gen390Code - generate code for Dallas 390 based controllers     */
 /*-----------------------------------------------------------------*/
 void gen390Code (iCode *lic)
 {
@@ -8358,12 +8357,15 @@ void gen390Code (iCode *lic)
 
     lineHead = lineCurr = NULL;
 
+#if 0
+    //REMOVE ME!!!
     /* print the allocation information */
     if (allocInfo)
 	printAllocInfo( currFunc, codeOutFile);
+#endif
     /* if debug information required */
-/*     if (options.debug && currFunc) { */
-    if (currFunc) {
+    if (options.debug && currFunc) {
+    //jwk if (currFunc) {
 	cdbSymbol(currFunc,cdbFile,FALSE,TRUE);
 	_G.debugLine = 1;
 	if (IS_STATIC(currFunc->etype))

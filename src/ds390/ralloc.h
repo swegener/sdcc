@@ -54,4 +54,7 @@ extern regs regs390[];
 
 regs  *ds390_regWithIdx (int);
 
+extern int ds390_ptrRegReq;
+extern int ds390_nRegs;
+
 #endif

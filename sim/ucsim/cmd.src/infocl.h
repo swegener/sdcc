@@ -31,41 +31,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "newcmdcl.h"
 
 
-class cl_info_bp_cmd: public cl_cmd
-{
-public:
-  cl_info_bp_cmd(class cl_sim *asim,
-		 char *aname,
-		 int  can_rep,
-		 char *short_hlp,
-		 char *long_hlp):
-    cl_cmd(asim, aname, can_rep, short_hlp, long_hlp) {}
-  virtual int do_work(class cl_cmdline *cmdline, class cl_console *con);
-};
+// INFO BP
+COMMAND(cl_info_bp_cmd);
 
-class cl_info_reg_cmd: public cl_cmd
-{
-public:
-  cl_info_reg_cmd(class cl_sim *asim,
-		  char *aname,
-		  int  can_rep,
-		  char *short_hlp,
-		  char *long_hlp):
-    cl_cmd(asim, aname, can_rep, short_hlp, long_hlp) {}
-  virtual int do_work(class cl_cmdline *cmdline, class cl_console *con);
-};
+// INFO REG
+COMMAND(cl_info_reg_cmd);
 
-class cl_info_hw_cmd: public cl_cmd
-{
-public:
-  cl_info_hw_cmd(class cl_sim *asim,
-		 char *aname,
-		 int  can_rep,
-		 char *short_hlp,
-		 char *long_hlp):
-    cl_cmd(asim, aname, can_rep, short_hlp, long_hlp) {}
-  virtual int do_work(class cl_cmdline *cmdline, class cl_console *con);
-};
+// INFO HW
+COMMAND(cl_info_hw_cmd);
 
 
 #endif

@@ -33,13 +33,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "stypes.h"
 
 
-extern class cl_sim *simulator;
+//extern class cl_sim *simulator;
 
 extern char delimiters[];
 
 extern struct id_element mem_ids[];
+extern struct id_element mem_classes[];
 extern struct id_element cpu_states[];
 
+extern char *warranty;
+extern char *copying;
 
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (brkcl.h)
+ * Simulator of microcontrollers (sim.src/brkcl.h)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -25,8 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef BRKCL_HEADER
-#define BRKCL_HEADER
+#ifndef SIM_BRKCL_HEADER
+#define SIM_BRKCL_HEADER
 
 #include "ddconfig.h"
 
@@ -197,11 +197,12 @@ public:
   virtual int  compare(void *key1, void *key2);
 
   virtual bool there_is_event(enum brk_event ev);
-  virtual int make_new_nr(void);
+  //virtual int make_new_nr(void);
 
   virtual void add_bp(class cl_brk *bp);
   virtual void del_bp(t_addr addr);
   virtual class cl_brk *get_bp(t_addr addr, int *idx);
+  virtual class cl_brk *get_bp(int nr);
   virtual bool bp_at(t_addr addr);
 };
 

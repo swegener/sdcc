@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (itsrccl.h)
+ * Simulator of microcontrollers (sim.src/itsrccl.h)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -25,8 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef ITSRCCL_HEADER
-#define ITSRCCL_HEADER
+#ifndef SIM_ITSRCCL_HEADER
+#define SIM_ITSRCCL_HEADER
 
 #include "pobjcl.h"
 #include "stypes.h"

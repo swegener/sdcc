@@ -37,37 +37,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // local
 #include "cmdsetcl.h"
-
-
-/*
- * Command: conf
- *----------------------------------------------------------------------------
- */
-
-int
-cl_conf_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
-{
-  int i;
-
-  con->printf("ucsim version %s\n", VERSIONSTR);
-  con->printf("Type of microcontroller: %s\n", sim->uc->id_string());
-  con->printf("Controller has %d hardware element(s).\n",
-	      sim->uc->hws->count);
-  for (i= 0; i < sim->uc->hws->count; i++)
-    {
-      class cl_hw *hw= (class cl_hw *)(sim->uc->hws->at(i));
-      con->printf("  %s[%d]\n", hw->id_string, hw->id);
-    }
-  con->printf("Memories:\n");
-  for (i= MEM_ROM; i < MEM_TYPES; i++)
-    {
-      class cl_mem *mem= (class cl_mem *)(sim->uc->mems->at(i));
-      if (mem)
-	con->printf("  %s size= 0x%06x %d\n",
-		    mem->id_string(), mem->size, mem->size);
-    }
-  return(0);
-}
+#include "cmdutil.h"
 
 
 /*
@@ -76,7 +46,8 @@ cl_conf_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
  */
 
 int
-cl_state_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
+cl_state_cmd::do_work(class cl_sim *sim,
+		      class cl_cmdline *cmdline, class cl_console *con)
 {
   //con->printf("sim state= %d\n", sim->state);
   con->printf("CPU state= %s PC= 0x%06x XTAL= %g\n",
@@ -109,7 +80,8 @@ cl_state_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
  */
 
 int
-cl_file_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
+cl_file_cmd::do_work(class cl_sim *sim,
+		     class cl_cmdline *cmdline, class cl_console *con)
 {
   char *fname= 0;
   long l;
@@ -133,7 +105,8 @@ cl_file_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
  */
 
 int
-cl_dl_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
+cl_dl_cmd::do_work(class cl_sim *sim,
+		   class cl_cmdline *cmdline, class cl_console *con)
 {
   long l;
   
@@ -145,69 +118,76 @@ cl_dl_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
 
 
 /*
- * Command: get
- *----------------------------------------------------------------------------
- */
-
-int
-cl_get_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
-{
-  char *s;
-
-  if (cmdline->param(0) == 0)
-    {
-      con->printf("Get what?\n");
-      return(0);
-    }
-  if ((s= cmdline->param(0)->get_svalue()))
-    {
-      if (strstr(s, "t") == s)
-	return(timer(cmdline, con));
-      else
-	con->printf("Unknow keyword of get command\n");
-    }
-  return(0);
-}
-
-
-/*
- * Command: set
- *----------------------------------------------------------------------------
- */
-
-
-int
-cl_set_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
-{
-  char *s;
-
-  if (cmdline->param(0) == 0)
-    {
-      con->printf("Set what?\n");
-      return(0);
-    }
-  if ((s= cmdline->param(0)->get_svalue()))
-    {
-      if (strstr(s, "t") == s)
-	return(timer(cmdline, con));
-      else
-	con->printf("Unknow keyword of set command\n");
-    }
-  return(0);
-}
-
-
-/*
  * Command: run
  *----------------------------------------------------------------------------
  */
 
+int
+cl_run_cmd::do_work(class cl_sim *sim,
+		    class cl_cmdline *cmdline, class cl_console *con)
+{
+  class cl_brk *b;
+  t_addr start, end;
+  class cl_cmd_arg *params[4]= { cmdline->param(0),
+				 cmdline->param(1),
+				 cmdline->param(2),
+				 cmdline->param(3) };
+
+  if (params[0])
+    if (!(params[0]->get_address(&start)))
+      {
+	con->printf("Error: wrong start address\n");
+	return(DD_FALSE);
+      }
+  if (params[1])
+    if (!(params[1]->get_address(&end)))
+      {
+	con->printf("Error: wromg end address\n");
+	return(DD_FALSE);
+      }
+  if (params[0])
+    {
+      if (!sim->uc->inst_at(start))
+	con->printf("Warning: maybe not instruction at 0x%06lx\n", start);
+      sim->uc->PC= start;
+      if (params[1])
+	{
+	  if (start == end)
+	    {
+	      con->printf("Addresses must be different.\n");
+	      return(DD_FALSE);
+	    }
+	  if ((b= sim->uc->fbrk_at(end)))
+	    {
+	    }
+	  else
+	    {
+	      b= new cl_fetch_brk(sim->uc->make_new_brknr(), end,
+				  brkDYNAMIC, 1);
+	      sim->uc->fbrk->add_bp(b);
+	    }
+	}
+    }
+  con->printf("Simulation started, PC=0x%06x\n", sim->uc->PC);
+  if (sim->uc->fbrk_at(start))
+    sim->uc->do_inst(1);
+  sim->start(con);
+  return(DD_FALSE);
+}
+
+
+/*
+ * Command: stop
+ *----------------------------------------------------------------------------
+ */
 
 int
-cl_run_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
+cl_stop_cmd::do_work(class cl_sim *sim,
+		     class cl_cmdline *cmdline, class cl_console *con)
 {
-  sim->start(con);
-  return(0);
+  sim->stop(resUSER);
+  sim->uc->print_disass(sim->uc->PC, con);
+  return(DD_FALSE);
 }
 
 
@@ -216,9 +196,9 @@ cl_run_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
  *----------------------------------------------------------------------------
  */
 
-
 int
-cl_step_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
+cl_step_cmd::do_work(class cl_sim *sim,
+		     class cl_cmdline *cmdline, class cl_console *con)
 {
   sim->uc->do_inst(1);
   sim->uc->print_regs(con);
@@ -227,13 +207,85 @@ cl_step_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
 
 
 /*
+ * Command: next
+ *----------------------------------------------------------------------------
+ */
+
+int
+cl_next_cmd::do_work(class cl_sim *sim,
+		     class cl_cmdline *cmdline, class cl_console *con)
+{
+  class cl_brk *b;
+  t_addr next;
+  struct dis_entry *de;
+
+  t_mem code= sim->uc->get_mem(MEM_ROM, sim->uc->PC);
+  int i= 0;
+  de= &(sim->uc->dis_tbl()[i]);
+  while ((code & de->mask) != de->code &&
+	 de->mnemonic)
+    {
+      i++;
+      de= &(sim->uc->dis_tbl()[i]);
+    }
+  if ((de->branch == 'a') ||
+      (de->branch == 'l'))
+    {
+      next= sim->uc->PC + de->length;
+      if (!sim->uc->fbrk_at(next))
+	{
+	  b= new cl_fetch_brk(sim->uc->make_new_brknr(),
+			      next, brkDYNAMIC, 1);
+	  sim->uc->fbrk->add(b);
+	}
+      sim->start(con);
+      //sim->uc->do_inst(-1);
+    }
+  else
+    sim->uc->do_inst(1);
+  sim->uc->print_regs(con);
+  return(DD_FALSE);
+}
+
+
+/*
+ * Command: pc
+ *----------------------------------------------------------------------------
+ */
+
+int
+cl_pc_cmd::do_work(class cl_sim *sim,
+		   class cl_cmdline *cmdline, class cl_console *con)
+{
+  t_addr addr;
+  class cl_cmd_arg *params[1]= { cmdline->param(0) };
+
+  if (params[0])
+    {
+      if (!(params[0]->get_address(&addr)))
+	{
+	  con->printf("Error: wrong parameter\n");
+	  return(DD_FALSE);
+	}
+      if (addr >= sim->uc->get_mem_size(MEM_ROM))
+	addr= 0;
+      if (!sim->uc->inst_at(addr))
+	con->printf("Warning: maybe not instruction at 0x%06x\n", addr);
+      sim->uc->PC= addr;
+    }
+  sim->uc->print_disass(sim->uc->PC, con);
+  return(DD_FALSE);
+}
+
+
+/*
  * Command: reset
  *----------------------------------------------------------------------------
  */
 
-
 int
-cl_reset_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
+cl_reset_cmd::do_work(class cl_sim *sim,
+		      class cl_cmdline *cmdline, class cl_console *con)
 {
   sim->uc->reset();
   return(0);
@@ -246,75 +298,71 @@ cl_reset_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
  */
 
 int
-cl_dump_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
+cl_dump_cmd::do_work(class cl_sim *sim,
+		     class cl_cmdline *cmdline, class cl_console *con)
 {
-  class cl_mem *mem;
-  char *s;
-  long l, start= -1, end= 10*8-1, bpl= 8;
+  class cl_mem *mem= 0;
+  long bpl= 8;
+  t_addr start= 0, end;
   class cl_cmd_arg *params[4]= { cmdline->param(0),
 				 cmdline->param(1),
 				 cmdline->param(2),
 				 cmdline->param(3) };
 
-  if (params[0] == 0)
+  if (params[0] &&
+      params[0]->as_bit(sim->uc))
     {
-      con->printf("Memory type missing\n");
-      return(0);
+      int i= 0;
+      while (params[0] &&
+	     params[0]->as_bit(sim->uc))
+	{
+	  t_mem m;
+	  mem= params[0]->value.bit.mem;
+	  m= mem->read(params[0]->value.bit.mem_address);
+	  char *sn=
+	    sim->uc->symbolic_bit_name((t_addr)-1,
+				       mem,
+				       params[0]->value.bit.mem_address,
+				       params[0]->value.bit.mask);
+	  con->printf("%10s ", sn?sn:"");
+	  con->printf(mem->addr_format, params[0]->value.bit.mem_address);
+	  con->printf(" ");
+	  con->printf(mem->data_format, m);
+	  con->printf(" %c\n", (m&(params[0]->value.bit.mask))?'1':'0');
+	  i++;
+	  params[0]= cmdline->param(i);
+	}
+      if (params[0])
+	con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
     }
-  if ((s= params[0]->get_svalue()))
+  else if (cmdline->syntax_match(sim, MEMORY))
     {
-      if (strstr(s, "i") == s)
-	mem= sim->uc->mem(MEM_IRAM);
-      else if (strstr(s, "x") == s)
-	mem= sim->uc->mem(MEM_XRAM);
-      else if (strstr(s, "r") == s)
-	mem= sim->uc->mem(MEM_ROM);
-      else if (strstr(s, "s") == s)
-	mem= sim->uc->mem(MEM_SFR);
-      else
-	{
-	  con->printf("Unknown memory type\n");
-	  return(0);
-	}
-      if (!mem)
-	{
-	  con->printf("No such memory\n");
-	  return(0);
-	}
+      mem= params[0]->value.memory;
+      mem->dump(con);
     }
+  else if (cmdline->syntax_match(sim, MEMORY ADDRESS)) {
+    mem  = params[0]->value.memory;
+    start= params[1]->value.address;
+    end  = start+10*8-1;
+    mem->dump(start, end, bpl, con);
+  }
+  else if (cmdline->syntax_match(sim, MEMORY ADDRESS ADDRESS)) {
+    mem  = params[0]->value.memory;
+    start= params[1]->value.address;
+    end  = params[2]->value.address;
+    mem->dump(start, end, bpl, con);
+  }
+  else if (cmdline->syntax_match(sim, MEMORY ADDRESS ADDRESS NUMBER)) {
+    mem  = params[0]->value.memory;
+    start= params[1]->value.address;
+    end  = params[2]->value.address;
+    bpl  = params[3]->value.number;
+    mem->dump(start, end, bpl, con);
+  }
   else
-    {
-      con->printf("Wrong memory type\n");
-      return(0);
-    }
+    con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
 
-  if (params[1])
-    {
-      if ((start= params[1]->get_address()) >= 0)
-	{
-	  end+= start;
-	  if (params[2])
-	    {
-	      if ((l= params[2]->get_address()) >= 0)
-		end= l;
-	      else
-		{
-		  con->printf("End address is wrong\n");
-		  return(0);
-		}
-	    }
-	}
-      else
-	{
-	  con->printf("Start address is wrong\n");
-	  return(0);
-	}
-    }
-  if (params[3] &&
-      (l= params[3]->get_address()) >= 0)
-    bpl= l;
-  mem->dump(start, end, bpl, con);
-  return(0);
+  return(DD_FALSE);;
 }
 
 
@@ -324,10 +372,11 @@ cl_dump_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
  */
 
 int
-cl_di_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
+cl_di_cmd::do_work(class cl_sim *sim,
+		   class cl_cmdline *cmdline, class cl_console *con)
 {
-  cmdline->insert_param(0, new cl_cmd_sym_arg("i"));
-  cl_dump_cmd::do_work(cmdline, con);
+  cmdline->insert_param(0, new cl_cmd_sym_arg(sim->uc, "i"));
+  cl_dump_cmd::do_work(sim, cmdline, con);
   return(0);
 }
 
@@ -338,10 +387,11 @@ cl_di_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
  */
 
 int
-cl_dx_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
+cl_dx_cmd::do_work(class cl_sim *sim,
+		   class cl_cmdline *cmdline, class cl_console *con)
 {
-  cmdline->insert_param(0, new cl_cmd_sym_arg("x"));
-  cl_dump_cmd::do_work(cmdline, con);
+  cmdline->insert_param(0, new cl_cmd_sym_arg(sim->uc, "x"));
+  cl_dump_cmd::do_work(sim, cmdline, con);
   return(0);
 }
 
@@ -352,10 +402,11 @@ cl_dx_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
  */
 
 int
-cl_dch_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
+cl_dch_cmd::do_work(class cl_sim *sim,
+		    class cl_cmdline *cmdline, class cl_console *con)
 {
-  cmdline->insert_param(0, new cl_cmd_sym_arg("r"));
-  cl_dump_cmd::do_work(cmdline, con);
+  cmdline->insert_param(0, new cl_cmd_sym_arg(sim->uc, "r"));
+  cl_dump_cmd::do_work(sim, cmdline, con);
   return(0);
 }
 
@@ -366,10 +417,11 @@ cl_dch_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
  */
 
 int
-cl_ds_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
+cl_ds_cmd::do_work(class cl_sim *sim,
+		   class cl_cmdline *cmdline, class cl_console *con)
 {
-  cmdline->insert_param(0, new cl_cmd_sym_arg("s"));
-  cl_dump_cmd::do_work(cmdline, con);
+  cmdline->insert_param(0, new cl_cmd_sym_arg(sim->uc, "s"));
+  cl_dump_cmd::do_work(sim, cmdline, con);
   return(0);
 }
 
@@ -380,40 +432,212 @@ cl_ds_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
  */
 
 int
-cl_dc_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
+cl_dc_cmd::do_work(class cl_sim *sim,
+		   class cl_cmdline *cmdline, class cl_console *con)
 {
-  long i, l, start= last, end= -1;
+  t_addr start= last, end= last+20;
+  class cl_cmd_arg *params[2]= { cmdline->param(0),
+				 cmdline->param(1) };
+  class cl_mem *rom= sim->uc->mem(MEM_ROM);
+
+  if (!rom)
+    return(DD_FALSE);
+  if (params[0] == 0)
+    ;
+  else if (cmdline->syntax_match(sim, ADDRESS)) {
+    start= params[0]->value.address;
+    end= start+20;
+  }
+  else if (cmdline->syntax_match(sim, ADDRESS ADDRESS)) {
+    start= params[0]->value.address;
+    end= params[1]->value.address;
+  }
+  if (start >= rom->size)
+    {
+      con->printf("Error: start address is wrong\n");
+      return(DD_FALSE);
+    }
+  if (end >= rom->size)
+    {
+      con->printf("Error: end address is wrong\n");
+      return(DD_FALSE);
+    }
+
+  for (;
+       start <= end;
+       start+= sim->uc->inst_length(rom->get(start)))
+    sim->uc->print_disass(start, con);
+  last= start;
+  return(DD_FALSE);
+}
+
+
+/*
+ * Command: disassemble
+ *----------------------------------------------------------------------------
+ */
+
+static int disass_last_stop= 0;
+
+int
+cl_disassemble_cmd::do_work(class cl_sim *sim,
+			    class cl_cmdline *cmdline, class cl_console *con)
+{
+  t_addr start, realstart;
+  int offset= -1, dir, lines= 20;
+  class cl_cmd_arg *params[4]= { cmdline->param(0),
+				 cmdline->param(1),
+				 cmdline->param(2),
+				 cmdline->param(3) };
+
+  start= disass_last_stop;
+  if (params[0] == 0) ;
+  else if (cmdline->syntax_match(sim, ADDRESS)) {
+    start= params[0]->value.address;
+  }
+  else if (cmdline->syntax_match(sim, ADDRESS NUMBER)) {
+    start= params[0]->value.address;
+    offset= params[1]->value.number;
+  }
+  else if (cmdline->syntax_match(sim, ADDRESS NUMBER NUMBER)) {
+    start= params[0]->value.address;
+    offset= params[1]->value.number;
+    lines= params[2]->value.number;
+  }
+  else
+    {
+      con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");    
+      return(DD_FALSE);
+    }
+
+  if (lines < 1)
+    {
+      con->printf("Error: wrong `lines' parameter\n");
+      return(DD_FALSE);
+    }
+  if (!sim->uc->there_is_inst())
+    return(DD_FALSE);
+  realstart= start;
+  class cl_mem *rom= sim->uc->mem(MEM_ROM);
+  if (!rom)
+    return(DD_FALSE);
+  while (realstart < rom->size &&
+	 !sim->uc->inst_at(realstart))
+    realstart= realstart+1;
+  if (offset)
+    {
+      dir= (offset < 0)?-1:+1;
+      while (offset)
+	{
+	  realstart= (realstart+dir) % rom->size;
+	  while (!sim->uc->inst_at(realstart))
+	    realstart= (realstart+dir) % rom->size;
+	  offset+= -dir;
+	}
+    }
+  
+  while (lines)
+    {
+      sim->uc->print_disass(realstart, sim->cmd->actual_console);
+      realstart= (realstart+1) % rom->size;
+      while (!sim->uc->inst_at(realstart))
+	realstart= (realstart+1) % rom->size;
+      lines--;
+    }
+
+  disass_last_stop= realstart;
+
+  return(DD_FALSE);;
+}
+
+
+/*
+ * Command: fill
+ *----------------------------------------------------------------------------
+ */
+
+int
+cl_fill_cmd::do_work(class cl_sim *sim,
+		     class cl_cmdline *cmdline, class cl_console *con)
+{
+  class cl_mem *mem= 0;
+  t_mem what= 0;
+  t_addr start= 0, end;
+  class cl_cmd_arg *params[4]= { cmdline->param(0),
+				 cmdline->param(1),
+				 cmdline->param(2),
+				 cmdline->param(3) };
+
+  if (cmdline->syntax_match(sim, MEMORY ADDRESS ADDRESS NUMBER)) {
+    mem  = params[0]->value.memory;
+    start= params[1]->value.address;
+    end  = params[2]->value.address;
+    what = params[3]->value.number;
+    t_addr i;
+    for (i= start; i <= end; i++)
+      {
+	t_mem d;
+	d= what;
+	mem->write(i, &d);
+      }
+  }
+  else
+    con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+
+  return(DD_FALSE);;
+}
+
+
+/*
+ * Command: where
+ *----------------------------------------------------------------------------
+ */
+
+int
+cl_where_cmd::do_real_work(class cl_sim *sim,
+			   class cl_cmdline *cmdline, class cl_console *con,
+			   bool case_sensitive)
+{
+  class cl_mem *mem= 0;
   class cl_cmd_arg *params[2]= { cmdline->param(0),
 				 cmdline->param(1) };
 
-  if (params[0])
-    {
-      if ((start= params[0]->get_address()) >= 0)
-	{
-	  if (params[1])
-	    {
-	      if ((l= params[1]->get_address()) >= 0)
-		end= l;
-	      else
-		{
-		  con->printf("End address is wrong\n");
-		  return(0);
-		}
-	    }
-	}
-      else
-	{
-	  con->printf("Start address is wrong\n");
-	  return(0);
-	}
-    }
-  i= 0;
-  for (l= start;
-       (end < 0 && i < 20) || l <= end;
-       l+= sim->uc->inst_length(sim->uc->get_mem(MEM_ROM, l)), i++)
-    sim->uc->print_disass(l, con);
-  last= l;
-  return(0);
+  if (cmdline->syntax_match(sim, MEMORY DATALIST)) {
+    mem= params[0]->value.memory;
+    t_mem *array= params[1]->value.data_list.array;
+    int len= params[1]->value.data_list.len;
+    if (!len)
+      {
+	con->printf("Error: nothing to search for\n");
+	return(DD_FALSE);
+      }
+    t_addr addr= 0;
+    bool found= mem->search_next(case_sensitive, array, len, &addr);
+    while (found)
+      {
+	mem->dump(addr, addr+len-1, 8, con);
+	addr++;
+	found= mem->search_next(case_sensitive, array, len, &addr);
+      }
+  }
+  else
+    con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+
+  return(DD_FALSE);
+}
+
+int
+cl_where_cmd::do_work(class cl_sim *sim,
+		      class cl_cmdline *cmdline, class cl_console *con)
+{
+  return(do_real_work(sim, cmdline, con, DD_FALSE));
+}
+
+int
+cl_Where_cmd::do_work(class cl_sim *sim,
+		      class cl_cmdline *cmdline, class cl_console *con)
+{
+  return(do_real_work(sim, cmdline, con, DD_TRUE));
 }
 
 
@@ -423,19 +647,68 @@ cl_dc_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
  */
 
 int
-cl_help_cmd::do_work(class cl_cmdline */*cmdline*/, class cl_console *con)
+cl_help_cmd::do_work(class cl_sim *sim,
+		     class cl_cmdline *cmdline, class cl_console *con)
 {
   class cl_cmd *c;
   int i;
+  class cl_cmd_arg *parm= cmdline->param(0);
 
-  for (i= 0; i < sim->cmdset->count; i++)
-    {
-      c= (class cl_cmd *)(sim->cmdset->at(i));
-      if (c->short_help)
-	con->printf("%s\n", c->short_help);
-      else
-	con->printf("%s\n", (char*)(c->names->at(0)));
-    }
+  if (!parm) {
+    for (i= 0; i < sim->cmd->cmdset->count; i++)
+      {
+	c= (class cl_cmd *)(sim->cmd->cmdset->at(i));
+	if (c->short_help)
+	  con->printf("%s\n", c->short_help);
+	else
+	  con->printf("%s\n", (char*)(c->names->at(0)));
+      }
+  }
+  else if (cmdline->syntax_match(sim, STRING)) {
+    int matches= 0;
+    for (i= 0; i < sim->cmd->cmdset->count; i++)
+      {
+	c= (class cl_cmd *)(sim->cmd->cmdset->at(i));
+	if (c->name_match(parm->value.string.string, DD_FALSE))
+	  matches++;
+      }
+    if (!matches)
+      con->printf("No such command\n");
+    else if (matches > 1)
+      for (i= 0; i < sim->cmd->cmdset->count; i++)
+	{
+	  c= (class cl_cmd *)(sim->cmd->cmdset->at(i));
+	  if (!c->name_match(parm->value.string.string, DD_FALSE))
+	    continue;
+	  if (c->short_help)
+	    con->printf("%s\n", c->short_help);
+	  else
+	    con->printf("%s\n", (char*)(c->names->at(0)));
+	}
+    else
+      for (i= 0; i < sim->cmd->cmdset->count; i++)
+	{
+	  c= (class cl_cmd *)(sim->cmd->cmdset->at(i));
+	  if (!c->name_match(parm->value.string.string, DD_FALSE))
+	    continue;
+	  if (c->short_help)
+	    con->printf("%s\n", c->short_help);
+	  else
+	    con->printf("%s\n", (char*)(c->names->at(0)));
+	  int names;
+	  con->printf("Names of command:");
+	  for (names= 0; names < c->names->count; names++)
+	    con->printf(" %s", (char*)(c->names->at(names)));
+	  con->printf("\n");
+	  if (c->long_help)
+	    con->printf("%s\n", c->long_help);
+	  else
+	    con->printf("%s\n", (char*)(c->names->at(0)));
+	}
+  }
+  else
+    con->printf("%s\n", short_help?short_help:"Error: wrong syntax");
+
   return(0);
 }
 
@@ -446,10 +719,12 @@ cl_help_cmd::do_work(class cl_cmdline */*cmdline*/, class cl_console *con)
  */
 
 int
-cl_quit_cmd::do_work(class cl_cmdline */*cmdline*/, class cl_console */*con*/)
+cl_quit_cmd::do_work(class cl_sim *sim,
+		     class cl_cmdline */*cmdline*/, class cl_console */*con*/)
 {
   return(1);
 }
+
 
 /*
  * Command: kill
@@ -457,7 +732,8 @@ cl_quit_cmd::do_work(class cl_cmdline */*cmdline*/, class cl_console */*con*/)
  */
 
 int
-cl_kill_cmd::do_work(class cl_cmdline */*cmdline*/, class cl_console */*con*/)
+cl_kill_cmd::do_work(class cl_sim *sim,
+		     class cl_cmdline */*cmdline*/, class cl_console */*con*/)
 {
   sim->state|= SIM_QUIT;
   return(1);

@@ -111,6 +111,7 @@ libutil.a: $(OBJECTS)
 # ----------------------
 checkconf:
 	@if [ -f devel ]; then\
+	  echo "MAIN.MK checkconf";\
 	  $(MAKE) -f conf.mk srcdir="$(srcdir)" freshconf;\
 	fi
 

@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (stackcl.h)
+ * Simulator of microcontrollers (sim.src/stackcl.h)
  *
  * Copyright (C) 2000,00 Drotos Daniel, Talker Bt.
  * 
@@ -25,8 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef STACKCL_HEADER
-#define STACKCL_HEADER
+#ifndef SIM_STACKCL_HEADER
+#define SIM_STACKCL_HEADER
 
 #include "stypes.h"
 #include "pobjcl.h"

@@ -17,12 +17,12 @@ PRJDIR		= ..
 
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 CPPFLAGS        = @CPPFLAGS@ -I. -I$(PRJDIR) \
-		  -I$(PRJDIR)/cmd.src -I$(PRJDIR)/sim.src
+		  -I$(PRJDIR)/cmd.src -I$(PRJDIR)/sim.src -I$(PRJDIR)/gui.src
 CFLAGS          = @CFLAGS@ -Wall
 CXXFLAGS        = @CXXFLAGS@ -Wall
 M_OR_MM         = @M_OR_MM@
 
-LIBS		= @LIBS@ -L$(PRJDIR) -lsim -lcmd -lutil
+LIBS		= @LIBS@ -L$(PRJDIR) -lsim -lcmd -lutil -lguiucsim
 
 prefix          = @prefix@
 exec_prefix     = @exec_prefix@

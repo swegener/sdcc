@@ -88,20 +88,23 @@ public:
   virtual int    init(void);
   virtual char  *id_string(void);
   virtual void mk_hw_elements(void);
-  virtual class cl_mem *mk_mem(enum mem_class type);
+  virtual class cl_mem *mk_mem(enum mem_class type, char *class_name);
 
-          void   write_rom(uint addr, ulong data);
+          void   write_rom(t_addr addr, ulong data);
   virtual int clock_per_cycle(void) { return(12); }
   virtual struct dis_entry *dis_tbl(void);
   virtual struct name_entry *sfr_tbl(void);
   virtual struct name_entry *bit_tbl(void);
   //virtual char   *disass(uint addr, char *sep);
-  virtual char *disass(uint addr, char *sep);
-  virtual void   print_disass(uint addr, class cl_console *con);
+  virtual char *disass(t_addr addr, char *sep);
   virtual void   print_regs(class cl_console *con);
+  virtual bool   extract_bit_address(t_addr bit_address,
+				     class cl_mem **mem,
+				     t_addr *mem_addr,
+				     t_mem *bit_mask);
   virtual void   reset(void);
   virtual void   clear_sfr(void);
-  virtual void   analyze(uint addr);
+  virtual void   analyze(t_addr addr);
   virtual void   set_p_flag(void);
   virtual void   proc_write(uchar *addr);
   virtual void   proc_write_sp(uchar val);

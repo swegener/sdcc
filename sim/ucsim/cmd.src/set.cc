@@ -27,46 +27,167 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "ddconfig.h"
 
+#include <ctype.h>
+
 // sim
 #include "simcl.h"
+#include "optioncl.h"
 
 // local
-#include "cmdsetcl.h"
+#include "setcl.h"
+#include "cmdutil.h"
 
 
 /*
- * SET TIMER
+ * Command: set memory
+ *----------------------------------------------------------------------------
  */
 
 int
-cl_set_cmd::timer(class cl_cmdline *cmdline, class cl_console *con)
+cl_set_mem_cmd::do_work(class cl_sim *sim,
+			class cl_cmdline *cmdline, class cl_console *con)
 {
+  class cl_mem *mem= 0;
   class cl_cmd_arg *params[4]= { cmdline->param(0),
 				 cmdline->param(1),
 				 cmdline->param(2),
 				 cmdline->param(3) };
-  int what, dir;
-  class cl_ticker *ticker;
-  
-  if (params[1] == 0)
-    {
-      con->printf("Timer number is missing\n");
-      return(0);
-    }
-  what= (params[1])->get_ivalue();
-  if ((ticker= sim->uc->get_counter(what)) != 0)
-    {
-      con->printf("Timer %d already exists\n", what);
-      return(0);
-    }
-  if (params[2] != 0)
-    dir= (params[2])->get_ivalue();
-  else
-    dir= 1;
-  ticker= new cl_ticker(dir, 0, 0);
-  sim->uc->add_counter(ticker, what);
 
-  return(0);
+  if (cmdline->syntax_match(sim, MEMORY ADDRESS DATALIST)) {
+    mem= params[0]->value.memory;
+    t_addr start= params[1]->value.address;
+    t_mem *array= params[2]->value.data_list.array;
+    int len= params[2]->value.data_list.len;
+    
+    if (len == 0)
+      con->printf("Error: no data\n");
+    else
+      {
+	int i;
+	t_addr addr;
+	for (i= 0, addr= start;
+	     i < len && addr < mem->size;
+	     i++, addr++)
+	  mem->write(addr, &(array[i]));
+	mem->dump(start, start+len-1, 8, con);
+      }
+  }
+  else
+    con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+  
+  return(DD_FALSE);;
+}
+
+
+/*
+ * Command: set bit
+ *----------------------------------------------------------------------------
+ */
+
+int
+cl_set_bit_cmd::do_work(class cl_sim *sim,
+			class cl_cmdline *cmdline, class cl_console *con)
+{
+  class cl_mem *mem;
+  t_addr mem_addr= 0;
+  t_mem bit_mask= 0;
+  class cl_cmd_arg *params[4]= { cmdline->param(0),
+				 cmdline->param(1),
+				 cmdline->param(2),
+				 cmdline->param(3) };
+  
+  if (cmdline->syntax_match(sim, BIT NUMBER)) {
+    mem= params[0]->value.bit.mem;
+    mem_addr= params[0]->value.bit.mem_address;
+    bit_mask= params[0]->value.bit.mask;
+    if (params[1]->value.number)
+      mem->set_bit1(mem_addr, bit_mask);
+    else
+      mem->set_bit0(mem_addr, bit_mask);
+    mem->dump(mem_addr, mem_addr, 1, con);
+  }
+  else
+    con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+
+  return(DD_FALSE);;
+}
+
+
+/*
+ * Command: set port
+ *----------------------------------------------------------------------------
+ */
+
+int
+cl_set_port_cmd::do_work(class cl_sim *sim,
+			 class cl_cmdline *cmdline, class cl_console *con)
+{
+  class cl_hw *hw;
+  long l= 0, pn= -1;
+  class cl_cmd_arg *params[4]= { cmdline->param(0),
+				 cmdline->param(1),
+				 cmdline->param(2),
+				 cmdline->param(3) };
+  
+  if (cmdline->syntax_match(sim, HW NUMBER)) {
+    hw= params[0]->value.hw;
+    pn= hw->id;
+    l= params[1]->value.number;
+  }
+  else if (cmdline->syntax_match(sim, NUMBER NUMBER)) {
+    pn= params[0]->value.number;
+    l= params[1]->value.number;
+  }
+  else
+    con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+  if (pn < 0 ||
+      pn > 3)
+    con->printf("Error: wrong port\n");
+  else
+    sim->uc->port_pins[pn]= l;
+  return(DD_FALSE);;
+}
+
+
+/*
+ * Command: set option
+ *----------------------------------------------------------------------------
+ */
+
+int
+cl_set_option_cmd::do_work(class cl_sim *sim,
+			   class cl_cmdline *cmdline, class cl_console *con)
+{
+  char *id= 0, *s= 0;
+  class cl_cmd_arg *params[4]= { cmdline->param(0),
+				 cmdline->param(1),
+				 cmdline->param(2),
+				 cmdline->param(3) };
+  
+  if (cmdline->syntax_match(sim, STRING STRING)) {
+    id= params[0]->value.string.string;
+    s= params[1]->value.string.string;
+  }
+  else
+    con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+  if (!id ||
+      !s)
+    {
+      con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+      return(DD_FALSE);
+    }
+
+  int i;
+  for (i= 0; i < sim->uc->options->count; i++)
+    {
+      class cl_option *o= (class cl_option *)(sim->uc->options->at(i));
+      if (!strcmp(id, o->id))
+	{
+	  o->set_value(s);
+	  break;
+	}
+    }
+  return(DD_FALSE);;
 }
 
 

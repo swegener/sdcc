@@ -61,7 +61,9 @@ t_uc51r::reset(void)
   t_uc52::reset();
   WDT= -1; // Disable WDT
   wdtrst= 0;
-  MEM(MEM_SFR)[SADDR]= MEM(MEM_SFR)[SADEN]= 0;
+  //MEM(MEM_SFR)[SADDR]= MEM(MEM_SFR)[SADEN]= 0;
+  sfr->set(SADDR, 0);
+  sfr->set(SADEN, 0);
 }
 
 
@@ -102,7 +104,7 @@ t_uc51r::proc_write(uchar *addr)
 {
   t_uc52::proc_write(addr);
   // Handling WDT
-  if (addr == &(MEM(MEM_SFR)[WDTRST]))
+  if (addr == &(/*MEM(MEM_SFR)*/sfr->umem8[WDTRST]))
     {
       if ((wdtrst == 0x1e) &&
 	  (*addr == 0xe1))
@@ -194,31 +196,38 @@ t_uc51r::do_timer2(int cycles)
 		  if (p1 & port_pins[1] & bmT2EX)
 		    {
 		      // UP
-		      if (!++(MEM(MEM_SFR)[TL2]))
-			if (!++(MEM(MEM_SFR)[TH2]))
+		      if (!/*++(MEM(MEM_SFR)[TL2])*/sfr->add(TL2, 1))
+			if (!/*++(MEM(MEM_SFR)[TH2])*/sfr->add(TH2, 1))
 			  {
 			    overflow++;
-			    MEM(MEM_SFR)[TH2]= MEM(MEM_SFR)[RCAP2H];
-			    MEM(MEM_SFR)[TL2]= MEM(MEM_SFR)[RCAP2L];
+			    //MEM(MEM_SFR)[TH2]= MEM(MEM_SFR)[RCAP2H];
+			    sfr->set(TH2, sfr->get(RCAP2H));
+			    //MEM(MEM_SFR)[TL2]= MEM(MEM_SFR)[RCAP2L];
+			    sfr->set(TL2, sfr->get(RCAP2L));
 			    mem(MEM_SFR)->set_bit1(T2CON, bmTF2);
 			  }
 		    }
 		  else
 		    {
 		      // DOWN
-		      MEM(MEM_SFR)[TL2]--;
-		      if (MEM(MEM_SFR)[TL2] == 0xff)
-			  MEM(MEM_SFR)[TH2]--;
-		      if (MEM(MEM_SFR)[TH2] == MEM(MEM_SFR)[RCAP2H] &&
-			  MEM(MEM_SFR)[TL2] == MEM(MEM_SFR)[RCAP2L])
+		      //MEM(MEM_SFR)[TL2]--;
+		      if (/*MEM(MEM_SFR)[TL2]*/sfr->add(TL2, -1) == 0xff)
+			/*MEM(MEM_SFR)[TH2]--*/sfr->add(TH2, -1);
+		      /*if (MEM(MEM_SFR)[TH2] == MEM(MEM_SFR)[RCAP2H] &&
+			MEM(MEM_SFR)[TL2] == MEM(MEM_SFR)[RCAP2L])*/
+		      if (sfr->get(TH2) == sfr->get(RCAP2H) &&
+			  sfr->get(TL2) == sfr->get(RCAP2L))
 			{
 			  overflow++;
-			  MEM(MEM_SFR)[TH2]= MEM(MEM_SFR)[TL2]= 0xff;
+			  //MEM(MEM_SFR)[TH2]= MEM(MEM_SFR)[TL2]= 0xff;
+			  sfr->set(TH2, 0xff);
+			  sfr->set(TL2, 0xff);
 			  mem(MEM_SFR)->set_bit1(T2CON, bmTF2);
 			}
 		    }
 		  while (overflow--)
-		    MEM(MEM_SFR)[P1]^= bmEXF2;
+		    //MEM(MEM_SFR)[P1]^= bmEXF2;
+		    sfr->set(P1, sfr->get(P1) ^ bmEXF2);
 		}
 	    }
 	  else
@@ -261,11 +270,13 @@ t_uc51r::do_t2_clockout(int cycles)
   if (t2con & bmTR2)
     while (cycles--)
       {
-	if (!++(MEM(MEM_SFR)[TL2]))
-	  if (!++(MEM(MEM_SFR)[TH2]))
+	if (!/*++(MEM(MEM_SFR)[TL2])*/sfr->add(TL2, 1))
+	  if (!/*++(MEM(MEM_SFR)[TH2])*/sfr->add(TH2, 1))
 	    {
-	      MEM(MEM_SFR)[TH2]= MEM(MEM_SFR)[RCAP2H];
-	      MEM(MEM_SFR)[TL2]= MEM(MEM_SFR)[RCAP2L];
+	      //MEM(MEM_SFR)[TH2]= MEM(MEM_SFR)[RCAP2H];
+	      sfr->set(TH2, sfr->get(RCAP2H));
+	      //MEM(MEM_SFR)[TL2]= MEM(MEM_SFR)[RCAP2L];
+	      sfr->set(TL2, sfr->get(RCAP2L));
 	      clock_out++;
 	      if (!(t2con & bmC_T2))
 		{
@@ -383,13 +394,19 @@ int
 t_uc51r::inst_movx_a_$dptr(uchar code)
 {
   if ((get_mem(MEM_SFR, AUXR) & bmEXTRAM) ||
-      MEM(MEM_SFR)[DPH])
-    MEM(MEM_SFR)[event_at.ws= ACC]= read_mem(MEM_XRAM,
+      /*MEM(MEM_SFR)[DPH]*/sfr->get(DPH))
+    /*MEM(MEM_SFR)[event_at.ws= ACC]= read_mem(MEM_XRAM,
 					     event_at.rx=
 					     MEM(MEM_SFR)[DPH]*256+
-					     MEM(MEM_SFR)[DPL]);
+					     MEM(MEM_SFR)[DPL]);*/
+    sfr->set(event_at.ws= ACC, read_mem(MEM_XRAM,
+					event_at.rx=
+					/*MEM(MEM_SFR)[DPH]*/sfr->get(DPH)*256+
+					/*MEM(MEM_SFR)[DPL]*/sfr->get(DPL)));
   else
-    MEM(MEM_SFR)[event_at.ws= ACC]= ERAM[event_at.rx= MEM(MEM_SFR)[DPL]];
+    //MEM(MEM_SFR)[event_at.ws= ACC]= ERAM[event_at.rx= MEM(MEM_SFR)[DPL]];
+    sfr->set(event_at.ws= ACC, ERAM[event_at.rx=
+				   /*MEM(MEM_SFR)[DPL]*/sfr->get(DPL)]);
   tick(1);
   return(resGO);
 }
@@ -409,11 +426,16 @@ t_uc51r::inst_movx_a_$ri(uchar code)
 
   addr= get_indirect(*(get_reg(code & 0x01)), &res);
   if (get_mem(MEM_SFR, AUXR) & bmEXTRAM)
-    MEM(MEM_SFR)[event_at.ws= ACC]=
+    /*MEM(MEM_SFR)[event_at.ws= ACC]=
       read_mem(MEM_XRAM,
-	       event_at.rx= (MEM(MEM_SFR)[P2]&port_pins[2])*256+*addr);
+      event_at.rx= (MEM(MEM_SFR)[P2]&port_pins[2])*256+*addr);*/
+    sfr->set(event_at.ws= ACC,
+	     read_mem(MEM_XRAM,
+		      event_at.rx=
+		      (/*MEM(MEM_SFR)[P2]*/sfr->get(P2)&port_pins[2])*256+*addr));
   else
-    MEM(MEM_SFR)[event_at.ws= ACC]= ERAM[event_at.rx= *addr];
+    //MEM(MEM_SFR)[event_at.ws= ACC]= ERAM[event_at.rx= *addr];
+    sfr->set(event_at.ws= ACC, ERAM[event_at.rx= *addr]);
   tick(1);
   return(res);
 }
@@ -429,12 +451,14 @@ int
 t_uc51r::inst_movx_$dptr_a(uchar code)
 {
   if ((get_mem(MEM_SFR, AUXR) & bmEXTRAM) ||
-      MEM(MEM_SFR)[DPH])
+      /*MEM(MEM_SFR)[DPH]*/sfr->get(DPH))
     write_mem(MEM_XRAM,
-	      event_at.wx= MEM(MEM_SFR)[DPH]*256+MEM(MEM_SFR)[DPL],
-	      MEM(MEM_SFR)[event_at.rs= ACC]);
+	      event_at.wx= /*MEM(MEM_SFR)[DPH]*/sfr->get(DPH)*256 +
+	                   /*MEM(MEM_SFR)[DPL]*/sfr->get(DPL),
+	      /*MEM(MEM_SFR)[event_at.rs= ACC]*/sfr->get(event_at.rs= ACC));
   else
-    ERAM[event_at.wx= MEM(MEM_SFR)[DPL]]= MEM(MEM_SFR)[event_at.rs= ACC];
+    ERAM[event_at.wx= /*MEM(MEM_SFR)[DPL]*/sfr->get(DPL)]=
+      /*MEM(MEM_SFR)[*/sfr->get(event_at.rs= ACC)/*]*/;
   return(resGO);
 }
 
@@ -454,10 +478,11 @@ t_uc51r::inst_movx_$ri_a(uchar code)
   addr= get_indirect(event_at.wi= *(get_reg(code & 0x01)), &res);
   if (get_mem(MEM_SFR, AUXR) & bmEXTRAM)
     write_mem(MEM_XRAM,
-	      event_at.wx= (MEM(MEM_SFR)[P2] & port_pins[2])*256 + *addr,
-	      MEM(MEM_SFR)[ACC]);
+	      event_at.wx=
+	      (/*MEM(MEM_SFR)[P2]*/sfr->get(P2) & port_pins[2])*256 + *addr,
+	      /*MEM(MEM_SFR)[ACC]*/sfr->get(ACC));
   else
-    ERAM[event_at.wx= *addr]= MEM(MEM_SFR)[ACC];
+    ERAM[event_at.wx= *addr]= /*MEM(MEM_SFR)[ACC]*/sfr->get(ACC);
   tick(1);
   return(res);
 }

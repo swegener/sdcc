@@ -55,7 +55,6 @@ cl_base::cl_base(void) {}
 
 cl_base::~cl_base(void) {}
 
-
 int cl_base::init(void) {return(0);}
 
 

@@ -44,7 +44,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  */
 
 int
-cl_timer_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
+cl_timer_cmd::do_work(class cl_sim *sim,
+		      class cl_cmdline *cmdline, class cl_console *con)
 {
   char *s;
 
@@ -63,21 +64,21 @@ cl_timer_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
 	  con->printf("Timer number is missing\n");
 	  return(0);
 	}
-      set_ticker(cmdline->param(1));
+      set_ticker(sim, cmdline->param(1));
       if (strstr(s, "c") == s ||
 	  strstr(s, "m") == s ||
 	  strstr(s, "a") == s)
-	return(add(cmdline, con));
+	return(add(sim, cmdline, con));
       else if (strstr(s, "d") == s)
-	return(del(cmdline, con));
+	return(del(sim, cmdline, con));
       else if (strstr(s, "g") == s)
-	return(get(cmdline, con));
+	return(get(sim, cmdline, con));
       else if (strstr(s, "r") == s)
-	return(run(cmdline, con));
+	return(run(sim, cmdline, con));
       else if (strstr(s, "s") == s)
-	return(stop(cmdline, con));
+	return(stop(sim, cmdline, con));
       else if (strstr(s, "v") == s)
-	return(val(cmdline, con));
+	return(val(sim, cmdline, con));
       else
 	con->printf("Undefined timer command: \"%s\". Try \"help timer\"\n",
 		    s);
@@ -86,14 +87,14 @@ cl_timer_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
 }
 
 void
-cl_timer_cmd::set_ticker(class cl_cmd_arg *param)
+cl_timer_cmd::set_ticker(class cl_sim *sim,
+			 class cl_cmd_arg *param)
 {
-  if ((name= param->get_svalue()) == 0)
-    what= param->get_ivalue();
-  if (name)
+  if ((name= param->get_svalue()))
     ticker= sim->uc->get_counter(name);
   else
-    ticker= sim->uc->get_counter(what);
+    if (param->get_ivalue(&what))
+      ticker= sim->uc->get_counter(what);
 }
 
 /*
@@ -101,32 +102,41 @@ cl_timer_cmd::set_ticker(class cl_cmd_arg *param)
  */
 
 int
-cl_timer_cmd::add(class cl_cmdline *cmdline, class cl_console *con)
+cl_timer_cmd::add(class cl_sim *sim,
+		  class cl_cmdline *cmdline, class cl_console *con)
 {
   class cl_cmd_arg *params[4]= { cmdline->param(0),
 				 cmdline->param(1),
 				 cmdline->param(2),
 				 cmdline->param(3) };
-  int dir= +1, in_isr= 0;
+  long dir= +1, in_isr= 0;
   
   if (!name &&
       what < 1)
     {
-      con->printf("Timer id must be greater then zero or a string\n");
-      return(0);
+      con->printf("Error: Timer id must be greater then zero or a string\n");
+      return(DD_FALSE);
     }
   if (ticker)
     {
       if (name)
-	con->printf("Timer \"%s\" already exists\n", name);
+	con->printf("Error: Timer \"%s\" already exists\n", name);
       else
-	con->printf("Timer %d already exists\n", what);
+	con->printf("Error: Timer %d already exists\n", what);
       return(0);
     }
-  if (params[2] != 0)
-    dir= (params[2])->get_ivalue();
-  if (params[3] != 0)
-    in_isr= (params[3])->get_ivalue();
+  if (params[2])
+    if (!params[2]->get_ivalue(&dir))
+      {
+	con->printf("Error: Wrong direction\n");
+	return(DD_FALSE);
+      }
+  if (params[3])
+    if (!params[3]->get_ivalue(&in_isr))
+      {
+	con->printf("Error: Wrong parameter\n");
+	return(DD_FALSE);
+      }
 
   if (name)
     {
@@ -139,7 +149,7 @@ cl_timer_cmd::add(class cl_cmdline *cmdline, class cl_console *con)
       sim->uc->add_counter(ticker, what);
     }
 
-  return(0);
+  return(DD_FALSE);
 }
 
 /*
@@ -147,7 +157,8 @@ cl_timer_cmd::add(class cl_cmdline *cmdline, class cl_console *con)
  */
 
 int
-cl_timer_cmd::del(class cl_cmdline *cmdline, class cl_console *con)
+cl_timer_cmd::del(class cl_sim *sim,
+		  class cl_cmdline *cmdline, class cl_console *con)
 {
   if (!ticker)
     {
@@ -170,7 +181,8 @@ cl_timer_cmd::del(class cl_cmdline *cmdline, class cl_console *con)
  */
 
 int
-cl_timer_cmd::get(class cl_cmdline *cmdline, class cl_console *con)
+cl_timer_cmd::get(class cl_sim *sim,
+		  class cl_cmdline *cmdline, class cl_console *con)
 {
   if (ticker)
     ticker->dump(what, sim->uc->xtal, con);
@@ -195,7 +207,8 @@ cl_timer_cmd::get(class cl_cmdline *cmdline, class cl_console *con)
  */
 
 int
-cl_timer_cmd::run(class cl_cmdline *cmdline, class cl_console *con)
+cl_timer_cmd::run(class cl_sim *sim,
+		  class cl_cmdline *cmdline, class cl_console *con)
 {
   if (!ticker)
     {
@@ -215,7 +228,8 @@ cl_timer_cmd::run(class cl_cmdline *cmdline, class cl_console *con)
  */
 
 int
-cl_timer_cmd::stop(class cl_cmdline *cmdline, class cl_console *con)
+cl_timer_cmd::stop(class cl_sim *sim,
+		   class cl_cmdline *cmdline, class cl_console *con)
 {
   if (!ticker)
     {
@@ -236,7 +250,8 @@ cl_timer_cmd::stop(class cl_cmdline *cmdline, class cl_console *con)
  */
 
 int
-cl_timer_cmd::val(class cl_cmdline *cmdline, class cl_console *con)
+cl_timer_cmd::val(class cl_sim *sim,
+		  class cl_cmdline *cmdline, class cl_console *con)
 {
   class cl_cmd_arg *params[4]= { cmdline->param(0),
 				 cmdline->param(1),
@@ -246,20 +261,25 @@ cl_timer_cmd::val(class cl_cmdline *cmdline, class cl_console *con)
   if (!ticker)
     {
       if (name)
-	con->printf("Timer %d does not exist\n", name);
+	con->printf("Error: Timer %d does not exist\n", name);
       else
-	con->printf("Timer %d does not exist\n", what);
+	con->printf("Error: Timer %d does not exist\n", what);
       return(0);
     }
-  if (params[2] == 0)
+  if (params[2])
     {
-      con->printf("Value is missing\n");
-      return(0);
+      con->printf("Error: Value is missing\n");
+      return(DD_FALSE);
     }
-  long val= (params[2])->get_ivalue();
+  long val;
+  if (!params[2]->get_ivalue(&val))
+    {
+      con->printf("Error: Wrong parameter\n");
+      return(DD_FALSE);
+    }
   ticker->ticks= val;
 
-  return(0);
+  return(DD_FALSE);
 }
 
 

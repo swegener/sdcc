@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (memcl.h)
+ * Simulator of microcontrollers (sim.src/memcl.h)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -25,11 +25,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef MEMCL_HEADER
-#define MEMCL_HEADER
+#ifndef SIM_MEMCL_HEADER
+#define SIM_MEMCL_HEADER
 
 #include "stypes.h"
 #include "pobjcl.h"
+
+#include "guiobjcl.h"
 
 
 class cl_mem;
@@ -39,15 +41,15 @@ class cl_mem;
 class cl_memloc: public cl_base
 {
 public:
-  long address;
+  t_addr address;
   class cl_list *hws;
 
 public:
-  cl_memloc(long addr);
+  cl_memloc(t_addr addr);
   ~cl_memloc(void);
 
   virtual ulong read(class cl_mem *mem);
-  virtual void write(class cl_mem *mem, long addr, ulong *val);
+  virtual void write(class cl_mem *mem, t_addr addr, t_mem *val);
 };
 
 class cl_memloc_coll: public cl_sorted_list
@@ -58,16 +60,18 @@ public:
   virtual void *key_of(void *item);
   virtual int compare(void *key1, void *key2);
 
-  class cl_memloc *get_loc(long address);
+  class cl_memloc *get_loc(t_addr address);
 };
 
 
 /* Memory */
 
-class cl_mem: public cl_base
+class cl_mem: public cl_guiobj
 {
 public:
   enum mem_class type;
+  char *class_name;
+  char *addr_format, *data_format;
   t_addr size;
   ulong mask;
   int width; // in bits
@@ -76,21 +80,26 @@ public:
     uchar *umem8;
   };
   class cl_memloc_coll *read_locs, *write_locs;
-  int dump_finished;
+  t_addr dump_finished;
 
 public:
-  cl_mem(enum mem_class atype, t_addr asize, int awidth);
+  cl_mem(enum mem_class atype, char *aclass_name, t_addr asize, int awidth);
   ~cl_mem(void);
   virtual int init(void);
   virtual char *id_string(void);
 
-  virtual ulong read(t_addr addr);
-  virtual ulong get(t_addr addr);
+  virtual t_mem read(t_addr addr);
+  virtual t_mem get(t_addr addr);
   virtual void write(t_addr addr, t_mem *val);
   virtual void set(t_addr addr, t_mem val);
   virtual void set_bit1(t_addr addr, t_mem bits);
   virtual void set_bit0(t_addr addr, t_mem bits);
-  virtual void dump(t_addr start, t_addr stop, int bpl, class cl_console *con);
+  virtual t_mem add(t_addr addr, long what);
+  virtual t_addr dump(t_addr start, t_addr stop, int bpl,
+		      class cl_console *con);
+  virtual t_addr dump(class cl_console *con);
+  virtual bool search_next(bool case_sensitive,
+			   t_mem *array, int len, t_addr *addr);
 };
 
 /* Spec for CODE */
@@ -101,11 +110,11 @@ public:
   uchar *map;
   int size;
 public:
-  cl_bitmap(long asize);
+  cl_bitmap(t_addr asize);
   ~cl_bitmap(void);
-  virtual void set(long pos);
-  virtual void clear(long pos);
-  virtual bool get(long pos);
+  virtual void set(t_addr pos);
+  virtual void clear(t_addr pos);
+  virtual bool get(t_addr pos);
   virtual bool empty(void);
 };
 
@@ -115,7 +124,7 @@ public:
   class cl_bitmap *bp_map;
   class cl_bitmap *inst_map;
 public:
-  cl_rom(long asize, int awidth);
+  cl_rom(t_addr asize, int awidth);
   ~cl_rom(void);
 };
 

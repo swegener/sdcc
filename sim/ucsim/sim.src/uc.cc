@@ -30,7 +30,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <ctype.h>
 #include "i_string.h"
+
+#include "globals.h"
+#include "utils.h"
 
 #include "uccl.h"
 #include "hwcl.h"
@@ -146,12 +150,14 @@ cl_uc::init(void)
     xtal= sim->get_farg('X', 0);
   for (mc= MEM_ROM; mc < MEM_TYPES; mc++)
     {
-      class cl_mem *m= mk_mem((enum mem_class)mc);
+      class cl_mem *m= mk_mem((enum mem_class)mc,
+			      get_id_string(mem_classes, mc));
       mems->put_at(mc, m);
     }
   ebrk= new brk_coll(2, 2, (class cl_rom *)mem(MEM_ROM));
   fbrk= new brk_coll(2, 2, (class cl_rom *)mem(MEM_ROM));
   fbrk->Duplicates= DD_FALSE;
+  brk_counter= 0;
   mk_hw_elements();
   reset();
   return(0);
@@ -191,7 +197,7 @@ cl_uc::reset(void)
  */
 
 class cl_mem *
-cl_uc::mk_mem(enum mem_class type)
+cl_uc::mk_mem(enum mem_class type, char *class_name)
 {
   class cl_mem *m;
 
@@ -200,7 +206,8 @@ cl_uc::mk_mem(enum mem_class type)
   if (type == MEM_ROM)
     m= new cl_rom(get_mem_size(type), get_mem_width(type));
   else
-    m= new cl_mem(type, get_mem_size(type), get_mem_width(type));
+    m= new cl_mem(type, get_id_string(mem_classes, type),
+		  get_mem_size(type), get_mem_width(type));
   m->init();
   return(m);
 }
@@ -237,7 +244,7 @@ cl_uc::mk_hw_elements(void)
  */
 
 ulong
-cl_uc::read_mem(enum mem_class type, long addr)
+cl_uc::read_mem(enum mem_class type, t_mem addr)
 {
   class cl_mem *m;
 
@@ -249,7 +256,7 @@ fprintf(stderr, "cl_uc::read_mem(type= %d, 0x%06lx) TROUBLE\n", type, addr);
 }
 
 ulong
-cl_uc::get_mem(enum mem_class type, long addr)
+cl_uc::get_mem(enum mem_class type, t_addr addr)
 {
   class cl_mem *m;
 
@@ -261,7 +268,7 @@ printf("cl_uc::get_mem(type= %d, 0x%06lx) TROUBLE\n", type, addr);
 }
 
 void
-cl_uc::write_mem(enum mem_class type, long addr, ulong val)
+cl_uc::write_mem(enum mem_class type, t_addr addr, t_mem val)
 {
   class cl_mem *m;
 
@@ -275,7 +282,7 @@ else printf("cl_uc::write_mem(type= %d, 0x%06lx, 0x%lx) TROUBLE\n", type, addr, 
 }
 
 void
-cl_uc::set_mem(enum mem_class type, long addr, ulong val)
+cl_uc::set_mem(enum mem_class type, t_addr addr, t_mem val)
 {
   class cl_mem *m;
 
@@ -295,7 +302,50 @@ cl_uc::mem(enum mem_class type)
   return((class cl_mem *)(mems->at(type)));
 }
 
-TYPE_UBYTE *
+class cl_mem *
+cl_uc::mem(char *class_name)
+{
+  int i, found= 0;
+  char *mcn, *n, *s;
+
+  if (!class_name)
+    return(0);
+  s= n= strdup(class_name);
+  while (*s)
+    {
+      *s= toupper(*s);
+      s++;
+    }
+  if (!class_name ||
+      !(*class_name))
+    return(0);
+  for (i= 0; !found && i < mems->count; i++)
+    {
+      cl_mem *m= (cl_mem *)(mems->at(i));
+      if (!m ||
+	  !m->class_name ||
+	  !(*(m->class_name)))
+	continue;
+      s= mcn= strdup(m->class_name);
+      while (*s)
+	{
+	  *s= toupper(*s);
+	  s++;
+	}
+      if (strstr(/*m->class_name*/mcn,/*class_name*/n) == /*m->class_name*/mcn)
+	found= 1;
+      free(mcn);
+      if (found)
+	{
+	  free(n);
+	  return(m);
+	}
+    }
+  free(n);
+  return(0);
+}
+
+/*TYPE_UBYTE *
 cl_uc::MEM(enum mem_class type)
 {
   class cl_mem *m;
@@ -304,8 +354,8 @@ cl_uc::MEM(enum mem_class type)
     //FIXME
 {printf("TROUBLE\n");    return(0);
 }
-  return((uchar *)(m->mem));
-}
+  return((TYPE_UBYTE *)(m->mem));
+}*/
 
 
 /* Local function for `read_hex_file' method to read some bytes */
@@ -465,7 +515,7 @@ cl_uc::read_hex_file(const char *name)
  */
 
 bool
-cl_uc::inst_at(uint addr)
+cl_uc::inst_at(t_addr addr)
 {
   class cl_rom *rom= (class cl_rom *)mem(MEM_ROM);
   
@@ -475,7 +525,7 @@ cl_uc::inst_at(uint addr)
 }
 
 void
-cl_uc::set_inst_at(uint addr)
+cl_uc::set_inst_at(t_addr addr)
 {
   class cl_rom *rom= (class cl_rom *)mem(MEM_ROM);
   
@@ -484,7 +534,7 @@ cl_uc::set_inst_at(uint addr)
 }
 
 void
-cl_uc::del_inst_at(uint addr)
+cl_uc::del_inst_at(t_addr addr)
 {
   class cl_rom *rom= (class cl_rom *)mem(MEM_ROM);
   
@@ -511,7 +561,7 @@ cl_uc::there_is_inst(void)
 /* Register callback hw objects for mem read/write */
 
 void
-cl_uc::register_hw_read(enum mem_class type, long addr, class cl_hw *hw)
+cl_uc::register_hw_read(enum mem_class type, t_addr addr, class cl_hw *hw)
 {
   class cl_mem *m;
   class cl_memloc *l;
@@ -531,7 +581,7 @@ cl_uc::register_hw_read(enum mem_class type, long addr, class cl_hw *hw)
 }
 
 void
-cl_uc::register_hw_write(enum mem_class type, long addr, class cl_hw *hw)
+cl_uc::register_hw_write(enum mem_class type, t_addr addr, class cl_hw *hw)
 {
 }
 
@@ -559,6 +609,27 @@ cl_uc::get_hw(enum hw_cath cath, int *idx)
 }
 
 class cl_hw *
+cl_uc::get_hw(char *id_string, int *idx)
+{
+  class cl_hw *hw= 0;
+  int i= 0;
+
+  if (idx)
+    i= *idx;
+  for (; i < hws->count; i++)
+    {
+      hw= (class cl_hw *)(hws->at(i));
+      if (strstr(hw->id_string, id_string) == hw->id_string)
+	break;
+    }
+  if (i >= hws->count)
+    return(0);
+  if (idx)
+    *idx= i;
+  return(hw);
+}
+
+class cl_hw *
 cl_uc::get_hw(enum hw_cath cath, int hwid, int *idx)
 {
   class cl_hw *hw;
@@ -572,6 +643,27 @@ cl_uc::get_hw(enum hw_cath cath, int hwid, int *idx)
     {
       i++;
       hw= get_hw(cath, &i);
+    }
+  if (hw && 
+      idx)
+    *idx= i;
+  return(hw);
+}
+
+class cl_hw *
+cl_uc::get_hw(char *id_string, int hwid, int *idx)
+{
+  class cl_hw *hw;
+  int i= 0;
+
+  if (idx)
+    i= *idx;
+  hw= get_hw(id_string, &i);
+  while (hw &&
+	 hw->id != hwid)
+    {
+      i++;
+      hw= get_hw(id_string, &i);
     }
   if (hw && 
       idx)
@@ -606,7 +698,7 @@ cl_uc::bit_tbl(void)
 }
 
 char *
-cl_uc::disass(uint addr, char *sep)
+cl_uc::disass(t_addr addr, char *sep)
 {
   char *buf;
 
@@ -616,9 +708,41 @@ cl_uc::disass(uint addr, char *sep)
 }
 
 void
-cl_uc::print_disass(uint addr, class cl_console *con)
+cl_uc::print_disass(t_addr addr, class cl_console *con)
 {
-  con->printf("uc::print_disass unimplemented\n");
+  char *dis;
+  class cl_brk *b;
+  int i;
+  class cl_mem *rom= mem(MEM_ROM);
+  t_mem code= get_mem(MEM_ROM, addr);
+
+  if (!rom)
+    return;
+  b= fbrk_at(addr);
+  dis= disass(addr, NULL);
+  if (b)
+    con->printf("%c", (b->perm == brkFIX)?'F':'D');
+  else
+    con->printf(" ");
+  con->printf("%c ", inst_at(addr)?' ':'?');
+  con->printf(rom->addr_format, addr); con->printf(" ");
+  con->printf(rom->data_format, code);
+  for (i= 1; i < inst_length(code); i++)
+    {
+      con->printf(" ");
+      con->printf(rom->data_format, get_mem(MEM_ROM, addr+i));
+    }
+  int li= longest_inst();
+  while (i < li)
+    {
+      int j;
+      j= rom->width/4 + ((rom->width%4)?1:0) + 1;
+      while (j)
+	con->printf(" "), j--;
+      i++;
+    }
+  con->printf(" %s\n", dis);
+  free(dis);
 }
 
 void
@@ -628,7 +752,7 @@ cl_uc::print_regs(class cl_console *con)
 }
 
 int
-cl_uc::inst_length(uint code)
+cl_uc::inst_length(t_mem code)
 {
   struct dis_entry *tabl= dis_tbl();
   int i;
@@ -637,8 +761,24 @@ cl_uc::inst_length(uint code)
   return(tabl[i].mnemonic?tabl[i].length:1);	 
 }
 
+int
+cl_uc::longest_inst(void)
+{
+  struct dis_entry *de= dis_tbl();
+  int max= 0;
+
+  while (de &&
+	 de->mnemonic)
+    {
+      if (de->length > max)
+	max= de->length;
+      de++;
+    }
+  return(max);
+}
+
 bool
-cl_uc::get_name(uint addr, struct name_entry tab[], char *buf)
+cl_uc::get_name(t_addr addr, struct name_entry tab[], char *buf)
 {
   int i;
 
@@ -650,6 +790,57 @@ cl_uc::get_name(uint addr, struct name_entry tab[], char *buf)
   if (tab[i].name)
     strcpy(buf, tab[i].name);
   return(tab[i].name != NULL);
+}
+
+char *
+cl_uc::symbolic_bit_name(t_addr bit_address,
+			 class cl_mem *mem,
+			 t_addr mem_addr,
+			 t_mem bit_mask)
+{
+  char *sym_name= 0;
+  int i;
+
+  i= 0;
+  while (bit_tbl()[i].name &&
+	 (bit_tbl()[i].addr != bit_address))
+    i++;
+  if (bit_tbl()[i].name)
+    {
+      sym_name= strdup(bit_tbl()[i].name);
+      return(sym_name);
+    }
+
+  if (mem &&
+      mem->class_name &&
+      strstr(mem->class_name, "sfr") == mem->class_name)
+    {
+      i= 0;
+      while (sfr_tbl()[i].name &&
+	     (sfr_tbl()[i].addr != mem_addr))
+	i++;
+      if (sfr_tbl()[i].name)
+	sym_name= strdup(sfr_tbl()[i].name);
+      else
+	sym_name= 0;
+    }
+  if (!sym_name)
+    {
+      sym_name= (char *)malloc(16);
+      sprintf(sym_name, mem?(mem->addr_format):"0x%06x", mem_addr);
+    }
+  sym_name= (char *)realloc(sym_name, strlen(sym_name)+2);
+  strcat(sym_name, ".");
+  i= 0;
+  while (bit_mask > 1)
+    {
+      bit_mask>>=1;
+      i++;
+    }
+  char bitnumstr[10];
+  sprintf(bitnumstr, "%1d", i);
+  strcat(sym_name, bitnumstr);
+  return(sym_name);
 }
 
 
@@ -798,7 +989,7 @@ cl_uc::fetch(void)
  */
 
 bool
-cl_uc::fetch(ulong *code)
+cl_uc::fetch(t_mem *code)
 {
   class cl_brk *brk;
   int idx;
@@ -916,7 +1107,7 @@ cl_uc::st_ret(class cl_stack_op *op)
  */
 
 class cl_fetch_brk *
-cl_uc::fbrk_at(long addr)
+cl_uc::fbrk_at(t_addr addr)
 {
   int idx;
   
@@ -945,6 +1136,34 @@ cl_uc::rm_fbrk(long addr)
   fbrk->del_bp(addr);
 }*/
 
+/* Get a breakpoint specified by its number */
+
+class cl_brk *
+cl_uc::brk_by_nr(int nr)
+{
+  class cl_brk *bp;
+
+  if ((bp= fbrk->get_bp(nr)))
+    return(bp);
+  if ((bp= ebrk->get_bp(nr)))
+    return(bp);
+  return(0);
+}
+
+/* Get a breakpoint from the specified collection by its number */
+
+class cl_brk *
+cl_uc::brk_by_nr(class brk_coll *bpcoll, int nr)
+{
+  class cl_brk *bp;
+
+  if ((bp= bpcoll->get_bp(nr)))
+    return(bp);
+  return(0);
+}
+
+/* Remove an event breakpoint specified by its address and id */
+
 void
 cl_uc::rm_ebrk(t_addr addr, char *id)
 {
@@ -960,13 +1179,93 @@ cl_uc::rm_ebrk(t_addr addr, char *id)
     }
 }
 
+/* Remove a breakpoint specified by its number */
+
+void
+cl_uc::rm_brk(int nr)
+{
+  class cl_brk *bp;
+
+  if ((bp= brk_by_nr(fbrk, nr)))
+    fbrk->del_bp(bp->addr);
+  else if ((bp= brk_by_nr(ebrk, nr)))
+    ebrk->free_at(ebrk->index_of(bp));
+}
+
 void
 cl_uc::put_breaks(void)
 {}
 
+/* Remove all fetch and event breakpoints */
+
 void
-cl_uc::remove_breaks(void)
-{}
+cl_uc::remove_all_breaks(void)
+{
+  while (fbrk->count)
+    {
+      class cl_brk *brk= (class cl_brk *)(fbrk->at(0));
+      fbrk->del_bp(brk->addr);
+    }
+  while (ebrk->count)
+    ebrk->free_at(ebrk->count-1);
+}
+
+int
+cl_uc::make_new_brknr(void)
+{
+  if (brk_counter == 0)
+    return(brk_counter= 1);
+  if (fbrk->count == 0 &&
+      ebrk->count == 0)
+    return(brk_counter= 1);
+  return(++brk_counter);
+}
+
+class cl_ev_brk *
+cl_uc::mk_ebrk(enum brk_perm perm, class cl_mem *mem,
+	       char op, t_addr addr, int hit)
+{
+  class cl_ev_brk *b;
+  op= toupper(op);
+
+  switch (mem->type)
+    {
+    case MEM_ROM:
+      if (op == 'R')
+	b= new cl_rc_brk(make_new_brknr(), addr, perm, hit);
+      else
+	return(0);
+      break;
+    case MEM_IRAM:
+      if (op == 'R')
+	b= new cl_ri_brk(make_new_brknr(), addr, perm, hit);
+      else if (op == 'W')
+	b= new cl_wi_brk(make_new_brknr(), addr, perm, hit);
+      else
+	return(0);
+      break;
+    case MEM_XRAM:
+      if (op == 'R')
+	b= new cl_rx_brk(make_new_brknr(), addr, perm, hit);
+      else if (op == 'W')
+	b= new cl_wx_brk(make_new_brknr(), addr, perm, hit);
+      else
+	return(0);
+      break;
+    case MEM_SFR:
+      if (op == 'R')
+	b= new cl_rs_brk(make_new_brknr(), addr, perm, hit);
+      else if (op == 'W')
+	b= new cl_ws_brk(make_new_brknr(), addr, perm, hit);
+      else
+	return(0);
+      break;
+    default:
+      return(0);
+    }
+  b->init();
+  return(b);
+}
 
 
 /* End of uc.cc */

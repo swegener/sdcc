@@ -66,7 +66,7 @@ t_uc51::inst_rrc(uchar code)
   bool cy;
   uchar acc;
 
-  cy= GET_C;
+  cy= SFR_GET_C;
   SET_C((acc= sfr->read(ACC)) & 0x01);
   event_at.ws= event_at.rs= ACC;
   acc>>= 1;
@@ -215,7 +215,7 @@ t_uc51::inst_rlc(uchar code)
   bool cy;
   uchar acc;
 
-  cy= GET_C;
+  cy= SFR_GET_C;
   SET_C((acc= sfr->get(event_at.rs= ACC)) & 0x80);
   acc<<= 1;
   if (cy)
@@ -239,7 +239,7 @@ t_uc51::inst_addc_a_$data(uchar code)
 
   data= fetch();
   acc = sfr->get(ACC);
-  newC= (((uint)acc+(uint)data+((orgC= GET_C)?1:0)) > 255)?0x80:0;
+  newC= (((uint)acc+(uint)data+((orgC= SFR_GET_C)?1:0)) > 255)?0x80:0;
   newA= ((acc&0x0f)+(data&0x0f)+(orgC?1:0)) & 0xf0;
   c6  = ((acc&0x7f)+(data&0x7f)+(orgC?1:0)) & 0x80;
   sfr->set(event_at.ws= ACC, acc + data + (orgC?1:0));
@@ -264,7 +264,7 @@ t_uc51::inst_addc_a_addr(uchar code)
 
   data= read(get_direct(fetch(), &event_at.ri, &event_at.rs));
   acc = sfr->get(ACC);
-  newC= (((uint)acc+(uint)data+((orgC= GET_C)?1:0)) > 255)?0x80:0;
+  newC= (((uint)acc+(uint)data+((orgC= SFR_GET_C)?1:0)) > 255)?0x80:0;
   newA= ((acc&0x0f)+(data&0x0f)+(orgC?1:0)) & 0xf0;
   c6  = ((acc&0x7f)+(data&0x7f)+(orgC?1:0)) & 0x80;
   sfr->set(event_at.ws= ACC, acc + data + (orgC?1:0));
@@ -291,7 +291,7 @@ t_uc51::inst_addc_a_$ri(uchar code)
   addr= get_indirect(event_at.ri= *(get_reg(code & 0x01)), &res);
   acc = sfr->get(ACC);
   data= *addr;
-  newC= (((uint)acc+(uint)data+((orgC= GET_C)?1:0)) > 255)?0x80:0;
+  newC= (((uint)acc+(uint)data+((orgC= SFR_GET_C)?1:0)) > 255)?0x80:0;
   newA= ((acc&0x0f)+(data&0x0f)+(orgC?1:0)) & 0xf0;
   c6  = ((acc&0x7f)+(data&0x7f)+(orgC?1:0)) & 0x80;
   sfr->set(event_at.ws= ACC, acc + data + (orgC?1:0));
@@ -316,7 +316,7 @@ t_uc51::inst_addc_a_rn(uchar code)
 
   data= *(get_reg(code & 0x07, &event_at.ri));
   acc = sfr->get(ACC);
-  newC= (((uint)acc+(uint)data+((orgC= GET_C)?1:0)) > 255)?0x80:0;
+  newC= (((uint)acc+(uint)data+((orgC= SFR_GET_C)?1:0)) > 255)?0x80:0;
   newA= ((acc&0x0f)+(data&0x0f)+(orgC?1:0)) & 0xf0;
   c6  = ((acc&0x7f)+(data&0x7f)+(orgC?1:0)) & 0x80;
   sfr->set(event_at.ws= ACC, acc + data + (orgC?1:0));
@@ -364,22 +364,22 @@ t_uc51::inst_div_ab(uchar code)
 int
 t_uc51::inst_subb_a_$data(uchar code)
 {
-  uchar data, d, acc;
-  bool newC, newA, c6;
+  uchar data, acc, result, psw, c;
 
   data= fetch();
   acc = sfr->get(ACC);
-  d= ~data + (GET_C?0:1);
-  newC= (acc < data+(GET_C?1:0))?0x80:0;
-  newA= !(((acc&0x0f)+(d&0x0f)) & 0xf0);
-  c6  = (((acc&0x7f)+(d&0x7f)) & 0x80)?0:0x80;
-  acc-= data;
-  if (GET_C)
-    acc--;
-  sfr->set(event_at.ws= ACC, acc);
-  SET_C(newC);
-  SET_BIT(newC ^ c6, PSW, bmOV);
-  SET_BIT(newA, PSW, bmAC);
+  result= acc-data;
+  psw= sfr->get(PSW);
+  if ((c= (psw & bmCY)?1:0))
+    result--;
+  sfr->set(event_at.ws= ACC, result);
+  sfr->set(PSW,
+	   (psw & ~(bmCY|bmOV|bmAC)) |
+	   (((unsigned int)acc < (unsigned int)(data+c))?bmCY:0) |
+	   (((acc<0x80 && data>0x7f && result>0x7f) ||
+	     (acc>0x7f && data<0x80 && result<0x80))?bmOV:0) |
+	   (((acc&0x0f) < ((data+c)&0x0f) ||
+	     (c && ((data&0x0f)==0x0f)))?bmAC:0));
   return(resGO);
 }
 
@@ -393,24 +393,23 @@ t_uc51::inst_subb_a_$data(uchar code)
 int
 t_uc51::inst_subb_a_addr(uchar code)
 {
-  uchar *addr, data, d, acc;
-  bool newC, newA, c6;
+  uchar *addr, data, acc, result, psw,c ;
 
   addr= get_direct(fetch(), &event_at.ri, &event_at.rs);
   acc = sfr->get(ACC);
   data= read(addr);
-  d= ~data + (GET_C?0:1);
-  newC= (acc < data+(GET_C?1:0))?0x80:0;
-  newA= !(((acc&0x0f)+(d&0x0f)) & 0xf0);
-  c6  = (((acc&0x7f)+(d&0x7f)) & 0x80)?0:0x80;
-  acc-= data;
-  event_at.ws= ACC;
-  if (GET_C)
-    acc--;
-  sfr->set(ACC, acc);
-  SET_C(newC);
-  SET_BIT(newC ^ c6, PSW, bmOV);
-  SET_BIT(newA, PSW, bmAC);
+  result= acc-data;
+  psw= sfr->get(PSW);
+  if ((c= (psw & bmCY)?1:0))
+    result--;
+  sfr->set(event_at.ws= ACC, result);
+  sfr->set(PSW,
+	   (psw & ~(bmCY|bmOV|bmAC)) |
+	   (((unsigned int)acc < (unsigned int)(data+c))?bmCY:0) |
+	   (((acc<0x80 && data>0x7f && result>0x7f) ||
+	     (acc>0x7f && data<0x80 && result<0x80))?bmOV:0) |
+	   (((acc&0x0f) < ((data+c)&0x0f) ||
+	     (c && ((data&0x0f)==0x0f)))?bmAC:0));
   return(resGO);
 }
 
@@ -424,24 +423,23 @@ t_uc51::inst_subb_a_addr(uchar code)
 int
 t_uc51::inst_subb_a_$ri(uchar code)
 {
-  uchar data, d, acc;
-  bool newC, newA, c6;
+  uchar data, acc, result, psw, c;
   int res;
 
   data= *(get_indirect(event_at.ri= *(get_reg(code & 0x01)), &res));
   acc = sfr->get(ACC);
-  d= ~data + (GET_C?0:1);
-  newC= (acc < data+(GET_C?1:0))?0x80:0;
-  newA= !(((acc&0x0f)+(d&0x0f)) & 0xf0);
-  c6  = (((acc&0x7f)+(d&0x7f)) & 0x80)?0:0x80;
-  acc-= data;
-  event_at.ws= ACC;
-  if (GET_C)
-    acc--;
-  sfr->set(ACC, acc);
-  SET_C(newC);
-  SET_BIT(newC ^ (acc & 0x80), PSW, bmOV);
-  SET_BIT(newA, PSW, bmAC);
+  result= acc-data;
+  psw= sfr->get(PSW);
+  if ((c= (psw & bmCY)?1:0))
+    result--;
+  sfr->set(event_at.ws= ACC, result);
+  sfr->set(PSW,
+	   (psw & ~(bmCY|bmOV|bmAC)) |
+	   (((unsigned int)acc < (unsigned int)(data+c))?bmCY:0) |
+	   (((acc<0x80 && data>0x7f && result>0x7f) ||
+	     (acc>0x7f && data<0x80 && result<0x80))?bmOV:0) |
+	   (((acc&0x0f) < ((data+c)&0x0f) ||
+	     (c && ((data&0x0f)==0x0f)))?bmAC:0));
   return(res);
 }
 
@@ -455,23 +453,22 @@ t_uc51::inst_subb_a_$ri(uchar code)
 int
 t_uc51::inst_subb_a_rn(uchar code)
 {
-  uchar data, d, acc;
-  bool newC, newA, c6;
+  uchar data, acc, result, psw, c;
 
   data= *(get_reg(code & 0x07, &event_at.ri));
   acc = sfr->get(ACC);
-  d= ~data + (GET_C?0:1);
-  newC= (acc < data+(GET_C?1:0))?0x80:0;
-  newA= !(((acc&0x0f)+(d&0x0f)) & 0xf0);
-  c6  = (((acc&0x7f)+(d&0x7f)) & 0x80)?0:0x80;
-  acc-= data;
-  event_at.ws= ACC;
-  if (GET_C)
-    acc--;
-  sfr->set(ACC, acc);
-  SET_C(newC);
-  SET_BIT(newC ^ (acc & 0x80), PSW, bmOV);
-  SET_BIT(newA, PSW, bmAC);
+  result= acc-data;
+  psw= sfr->get(PSW);
+  if ((c= (psw & bmCY)?1:0))
+    result--;
+  sfr->set(event_at.ws= ACC, result);
+  sfr->set(PSW,
+	   (psw & ~(bmCY|bmOV|bmAC)) |
+	   (((unsigned int)acc < (unsigned int)(data+c))?bmCY:0) |
+	   (((acc<0x80 && data>0x7f && result>0x7f) ||
+	     (acc>0x7f && data<0x80 && result<0x80))?bmOV:0) |
+	   (((acc&0x0f) < ((data+c)&0x0f) ||
+	     (c && ((data&0x0f)==0x0f)))?bmAC:0));
   return(resGO);
 }
 
@@ -493,6 +490,7 @@ t_uc51::inst_mul_ab(uchar code)
   sfr->set(event_at.ws= ACC, temp & 0xff);
   sfr->set(event_at.rs= B, (temp >> 8) & 0xff);
   SET_BIT(sfr->get(B), PSW, bmOV);
+  SET_BIT(0, PSW, bmCY);
   tick(3);
   return(resGO);
 }

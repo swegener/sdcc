@@ -5,12 +5,82 @@
 
 <body bgcolor="white">
 
-                                                                 <!-- DUMP -->
 
 <h2>Dump commands of uCsim</h2>
 
-<a name="dis"><h3><img src="burst.gif" alt="[Repeatable]"> dis
-[start [offset [lines]]]</h3></a>
+<a name="dump"><h3>dump memory_type [start [end
+[bytes_per_line]]]
+<br>dump bit_name...</h3></a>
+
+First form can be used get content of memory while second form can be
+used to check value of bit or bits.
+
+
+<a name="dump_memory"><h4>dump memory_type [start [end
+[bytes_per_line]]]</h4></a>
+
+Hexadecimal dump of a memory region. First parameter specifies
+memory. Class name of the memory must be used, it can be checked using
+<a href="cmd_general.html#conf">conf</a> command which lists size and
+class name of all available memories.
+
+<p><b>start</b> and <b>end</b> parameters can be used to specify the
+first and last address of the region. If <b>end</b> is omitted then 64
+memory location is dumped. If both <b>start</b> and <b>end</b> are
+omitted then next 64 memory location will be dumped out. Every time
+when dump command is used the address of last dumped memory location
+is stored and next dump command automatically continues at next
+address.
+
+<p>Last parameter can be used to specify how many memory locations
+should be dumped out in one line. It is 8 by default.
+
+<pre>
+$ <font color="#118811">s51 remo.hex</font>
+ucsim 0.2.38-pre2, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+> 55470 words read from remo.hex
+55470 words read from remo.hex
+> <font color="#118811">run</font>
+Simulation started, PC=0x000000
+
+Stop at 0x000515: (105) User stopped
+F 0x000515
+> <font color="#118811">du rom 20</font>
+0x0014 00 ac ff ff ff ff ff ff ........
+0x001c ff ff ff ff ff ff ff 02 ........
+0x0024 01 1c ff ff ff ff ff 32 .......2
+0x002c ff ff ff ff 02 0f a7 02 ........
+0x0034 0e 9c 02 0d d2 02 08 41 .......A
+0x003c c0 82 c0 83 c0 d0 c0 e0 ........
+0x0044 c0 00 a2 90 c0 d0 c2 90 ........
+0x004c 78 18 06 30 03 4b 20 92 x..0.K .
+0x0054 48 30 07 05 c2 07 02 00 H0......
+0x005c 9d 30 08 05 20 93 3a c2 .0.. .:.
+> <font color="#118811">du x 10 20 10</font>
+0x000a ff 01 00 fa 01 01 40 01 01 44 ......@..D
+0x0014 01                            .
+> <font color="#118811">du x</font>
+0x0015 00 00 00 00 00 00 00 00 ........
+0x001d 00 10 01 00 ae 01 00 ae ........
+0x0025 02 12 e1 00 5a 85 00 01 ....Z...
+0x002d 00 3b 00 00 5a 85 00 ab .;..Z...
+0x0035 1f 80 00 00 01 00 01 00 ........
+0x003d fa 0c 02 01 00 fa 00 02 ........
+0x0045 00 01 00 ab 00 00 00 00 ........
+0x004d 00 00 5a 85 ff 00 01 00 ..Z.....
+0x0055 00 00 00 94 a7 01 0c a6 ........
+0x005d 00 6f ff 00 00 00 00 00 .o......
+> </pre>
+
+
+<a name="dump_bit"><h4>dump bit_name...</h4></a>
+
+
+<a name="disassemble"><h3>disassemble [start [offset
+[lines]]]</h3></a>
 
 Disassemble code. This command can be used to list disassembled
 instructions which discovered by the code analyzer. First two
@@ -82,8 +152,7 @@ of instruction's code. Last element of the list is disassembled
 instruction. Every number appeared on the list is hexadecimal number.
 
 
-<a name="dc"><h3><img src="burst.gif" alt="[Repeatable]"> dc
-[start [stop]]</h3></a>
+<a name="dc"><h3>dc [start [stop]]</h3></a>
 
 Disassembled dump of code memory area. This command simply produces
 disassambled list of memory area specified by the parameters. Default
@@ -123,8 +192,7 @@ under certain conditions; type `show c' for details.
 > </pre>
 
 
-<a name="dch"><h3><img src="burst.gif" alt="[Repeatable]"> dch
-[start [stop]]</h3></a>
+<a name="dch"><h3>dch [start [stop]]</h3></a>
 
 Hexadecimal dump of code memory area from address <b>start</b> to
 address <b>stop</b>. Default value of start address is address of
@@ -160,8 +228,7 @@ ASCII charactes of bytes dumped out in the line. If value of the
 memory cell is not printable than a dot is dumped out.
 
 
-<a name="di"><h3><img src="burst.gif" alt="[Repeatable]"> di
-[start [stop]]</h3></a>
+<a name="di"><h3>di [start [stop]]</h3></a>
 
 Hexadecimal dump of internal RAM area from address <b>start</b> to
 address <b>stop</b>. Default value of start address is address of
@@ -195,8 +262,7 @@ F 000023
 > </pre>
 
 
-<a name="dx"><h3><img src="burst.gif" alt="[Repeatable]"> dx
-[start [stop]]</h3></a>
+<a name="dx"><h3>dx [start [stop]]</h3></a>
 
 Hexadecimal dump of external RAM area from address <b>start</b> to
 address <b>stop</b>. Default value of start address is address of
@@ -227,160 +293,6 @@ F 000023
 000138 07 00 00 ff 00 00 07 cb ........
 000140 08 0c 32 00 07 cb 06 05 ..2.....
 000148 02 00 24 00 00 00 00 00 ..$.....
-> </pre>
-
-
-<a name="dp"><h3>dp</h3></a>
-
-Dump out ports. This command shows actual value of ports.
-
-<pre>
-$ <font color="#118811">s51 remoansi.hex</font> 
-ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
-ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
-This is free software, and you are welcome to redistribute it
-under certain conditions; type `show c' for details.
-58659 bytes read from remoansi.hex
-> <font color="#118811">sopt stopit 1</font>
-> <font color="#118811">g</font>
-5
- * 000023 02 01 1c LJMP  011c
-> <font color="#118811">dp</font>
-P0    11111111 0xff 255 .    P1    11111110 0xfe 254 .
-Pin0  11111111 0xff 255 .    Pin1  11111111 0xff 255 .
-Port0 11111111 0xff 255 .    Port1 11111110 0xfe 254 .
-
-P2    11111111 0xff 255 .    P3    11111111 0xff 255 .
-Pin2  11111111 0xff 255 .    Pin3  11111111 0xff 255 .
-Port2 11111111 0xff 255 .    Port3 11111111 0xff 255 .
-> </pre>
-
-First lines on the list (labeled with Px) are value of SFRs which are
-internal latch registers. Second lines (labeled with Pinx) are outputs
-of external devices connected to port pins of the
-microcontroller. These values can be set by you using <a
-href="#sp"><b>sp</b></a> command. Third lines (labeled with Portx)
-show actual values can be measured on pins of the device. These values
-are calculated with following pseudo formula:
-
-<p><tt>Portx= Px AND Pinx</tt>
-
-<p>All three values are displayed in binary, hexadecimal, decimal form
-and then the ASCII character of the value is shown.
-
-
-<a name="ds"><h3>ds [addr...]</h3></a>
-
-Print out SFR. This command can be used to get value of all or some
-SFRs. If you do not specify any parameter the <b>ds</b> command simply
-dumps out full SFR area 16 bytes per line.
-
-<pre>
-$ <font color="#118811">s51 remoansi.hex</font> 
-ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
-ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
-This is free software, and you are welcome to redistribute it
-under certain conditions; type `show c' for details.
-58659 bytes read from remoansi.hex
-> <font color="#118811">sopt stopit 1</font>
-> <font color="#118811">g</font>
-5
- * 000023 02 01 1c LJMP  011c
-> <font color="#118811">ds</font>
-000080 ff 2a ba 16 00 00 00 00 55 a1 d7 fe 50 fd 00 00 .*......U...P...
-000090 fe 00 00 00 00 00 00 00 7e 00 00 00 00 00 00 00 ........~.......
-0000a0 ff 00 00 00 00 00 00 00 97 00 00 00 00 00 00 00 ................
-0000b0 ff 00 00 00 00 00 00 00 15 00 00 00 00 00 00 00 ................
-0000c0 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
-0000d0 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
-0000e0 0a 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
-0000f0 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
-> <font color="#118811">ds p1 0x87</font>
-    P1 fe 254 .
-000087 00   0 .
-> <font color="#118811">ds p2 ip scon</font>
-    P2 ff 255 .
-    IP 15  21 .
-  SCON 7e 126 ~
-> </pre>
-
-If you specify one or more parameter the <b>ds</b> command prints out
-value of registers specified by parameters. Parameter can be an
-address or a symbolic name of the register. Note that the simulator
-implements a register at all address in the address space which is not
-true in real microcontroller where reading of an unimplemented
-register gets undefined value. Value of the registers printed out in
-hexadecimal, decimal, and ASCII form.
-
-<p>Note that different type of controllers can implement different
-registers:
-
-<pre>
-$ <font color="#118811">s51</font>
-ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
-ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
-This is free software, and you are welcome to redistribute it
-under certain conditions; type `show c' for details.
-> <font color="#118811">ds rcap2l</font>
-> <font color="#118811">q</font>
-$ <font color="#118811">s51 -t 52</font>
-ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
-ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
-This is free software, and you are welcome to redistribute it
-under certain conditions; type `show c' for details.
-> <font color="#118811">ds rcap2l</font>
-RCAP2L 00   0 .
-> </pre>
-
-
-<a name="db"><h3><img src="burst.gif" alt="[Repeatable]"> db
-addr...</h3></a>
-
-Dump bits. This command can be used to get value of bits. At least one
-parameter must be given. Bit address can be specified in three
-forms. First of all name of the bit can be used if it has any. Direct
-bit address is accepted too and it can be specified by address of IRAM
-or SFR which contains the bit and bit number within the byte separated
-by a dot. If the requested bit is in an SFR the address of the
-register can be specified by its name.
-
-<pre>
-$ <font color="#118811">s51</font>
-ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
-ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
-This is free software, and you are welcome to redistribute it
-under certain conditions; type `show c' for details.
-> <font color="#118811">db it1 0x20.3 0x43 p2.5</font>
-000088    IT1 0
-000020   20.3 0
-000028   28.3 0
-0000a0   P2.5 1
-> </pre>
-
-Value of bits are printed out one per line. The list starts direct
-address of the bit followed by bit name or address of the memory cell
-or SFR which contains the displayed bit and bit number within the byte
-separated by a dot. At last the value of the bit is shown. Displaying
-a port bit you get value of SFR latch:
-
-<pre>
-> <font color="#118811">sp 1 0x0f</font>
-> <font color="#118811">ss p1 0x55</font>
-000090 55                                              U
-> <font color="#118811">dp</font>
-P0    11111111 0xff 255 .    P1    01010101 0x55  85 U
-Pin0  11111111 0xff 255 .    Pin1  00001111 0x0f  15 .
-Port0 11111111 0xff 255 .    Port1 00000101 0x05   5 .
-
-P2    11111111 0xff 255 .    P3    11111111 0xff 255 .
-Pin2  11111111 0xff 255 .    Pin3  11111111 0xff 255 .
-Port2 11111111 0xff 255 .    Port3 11111111 0xff 255 .
-> <font color="#118811">db p1.2 p1.3 p1.4 p1.5 p1.6</font>
-000090   P1.2 1
-000090   P1.3 0
-000090   P1.4 1
-000090   P1.5 0
-000090   P1.6 1
 > </pre>
 
 

@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (optioncl.h)
+ * Simulator of microcontrollers (sim.src/optioncl.h)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -25,8 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef OPTIONCL_HEADER
-#define OPTIONCL_HEADER
+#ifndef SIM_OPTIONCL_HEADER
+#define SIM_OPTIONCL_HEADER
 
 #include "ddconfig.h"
 

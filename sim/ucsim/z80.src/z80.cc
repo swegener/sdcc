@@ -86,14 +86,6 @@ cl_z80::get_mem_size(enum mem_class type)
  return(cl_uc::get_mem_size(type));
 }
 
-/*int
-cl_z80::get_mem_width(enum mem_class type)
-{
-  if (type == MEM_ROM)
-    return(16);
-  return(cl_uc::get_mem_width(type));
-}*/
-
 void
 cl_z80::mk_hw_elements(void)
 {
@@ -126,7 +118,7 @@ cl_z80::bit_tbl(void)
 }*/
 
 char *
-cl_z80::disass(uint addr, char *sep)
+cl_z80::disass(t_addr addr, char *sep)
 {
   char work[256], temp[20];
   char *buf, *p, *b, *t;
@@ -263,32 +255,6 @@ cl_z80::disass(uint addr, char *sep)
   return(buf);
 }
 
-void
-cl_z80::print_disass(uint addr, class cl_console *con)
-{
-  char *dis;
-  class cl_brk *b;
-  int i;
-
-  b  = fbrk_at(addr);
-  dis= disass(addr, NULL);
-  if (b)
-    con->printf("%c", (b->perm == brkFIX)?'F':'D');
-  else
-    con->printf(" ");
-  con->printf("%c %06x %04x",
-	      inst_at(addr)?' ':'*',
-	      addr, get_mem(MEM_ROM, addr));
-  for (i= 1; i < inst_length(get_mem(MEM_ROM, addr)); i++)
-    con->printf(" %04x", get_mem(MEM_ROM, addr+i));
-  while (i < 2)
-    {
-      con->printf("     ");
-      i++;
-    }
-  con->printf(" %s\n", dis);
-  free(dis);
-}
 
 void
 cl_z80::print_regs(class cl_console *con)

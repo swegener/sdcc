@@ -99,12 +99,14 @@ cmd_do_print(FILE *f, char *format, va_list ap)
  *____________________________________________________________________________
  */
 
-cl_cmdline::cl_cmdline(char *acmd)
+cl_cmdline::cl_cmdline(char *acmd, class cl_console *acon)
 {
   cmd= strdup(acmd);
   params= new cl_list(2, 2);
   tokens= new cl_ustrings(2, 2);
   name= 0;
+  matched_syntax= 0;
+  con= acon;
 }
 
 cl_cmdline::~cl_cmdline(void)
@@ -173,16 +175,25 @@ cl_cmdline::split(void)
 	  end= start;
 	  while (*end &&
 		 *end != '"')
-	    end++;
+	    {
+	      if (*end == '\\')
+		{
+		  end++;
+		  if (*end)
+		    end++;
+		}
+	      else
+		end++;
+	    }
 	  if (*end == '"')
 	    end--;
 	  else
-	    simulator->cmd->printf("Unterminated string\n");
+	    con->printf("Unterminated string\n");
 	  param_str= (char *)malloc(end-start+2);
 	  strncpy(param_str, start, 1+end-start);
 	  param_str[1+end-start]= '\0';
 	  tokens->add(strdup(param_str));
-	  params->add(simulator->mk_cmd_str_arg(param_str));
+	  params->add(con->sim->mk_cmd_str_arg(param_str));
 	  free(param_str);
 	  if (*end)
 	    end++;
@@ -205,35 +216,80 @@ cl_cmdline::split(void)
 	      *dot= '\0';
 	      dot++;
 	      if (strchr("0123456789", *param_str) != NULL)
-		sfr= simulator->mk_cmd_int_arg((long long)
+		sfr= con->sim->mk_cmd_int_arg((long long)
 					       strtol(param_str, 0, 0));
 	      else
-		sfr= simulator->mk_cmd_sym_arg(param_str);
+		sfr= con->sim->mk_cmd_sym_arg(param_str);
 	      if (*dot == '\0')
 		{
 		  bit= 0;
-		  simulator->cmd->printf("Uncomplete bit address\n");
+		  con->printf("Uncomplete bit address\n");
+		  delete sfr;
 		}
 	      else
 		{
 		  if (strchr("0123456789", *dot) != NULL)
-		    bit= simulator->mk_cmd_int_arg((long long)
+		    bit= con->sim->mk_cmd_int_arg((long long)
 						   strtol(dot, 0, 0));
 		  else
-		    bit= simulator->mk_cmd_sym_arg(dot);
+		    bit= con->sim->mk_cmd_sym_arg(dot);
+		  params->add(con->sim->mk_cmd_bit_arg(sfr, bit));
 		}
-	      params->add(simulator->mk_cmd_bit_arg(sfr, bit));
+	    }
+	  else if ((dot= strchr(param_str, '[')) != NULL)
+	    {
+	      // array
+	      class cl_cmd_arg *aname, *aindex;
+	      *dot= '\0';
+	      dot++;
+	      if (strchr("0123456789", *param_str) != NULL)
+		aname= con->sim->mk_cmd_int_arg((long long)
+						 strtol(param_str, 0, 0));
+	      else
+		aname= con->sim->mk_cmd_sym_arg(param_str);
+	      if (*dot == '\0')
+		{
+		  aname= 0;
+		  con->printf("Uncomplete array\n");
+		}
+	      else
+		{
+		  char *p;
+		  p= dot + strlen(dot) - 1;
+		  while (p > dot &&
+			 *p != ']')
+		    {
+		      *p= '\0';
+		      p--;
+		    }
+		  if (*p == ']')
+		    *p= '\0';
+		  if (strlen(dot) == 0)
+		    {
+		      con->printf("Uncomplete array index\n");
+		      delete aname;
+		    }
+		  else    
+		    {
+		      if (strchr("0123456789", *dot) != NULL)
+			aindex= con->sim->mk_cmd_int_arg((long long)
+							  strtol(dot, 0, 0));
+		      else
+			aindex= con->sim->mk_cmd_sym_arg(dot);
+		      params->add(con->sim->mk_cmd_array_arg(aname, aindex));
+		    }
+		}
 	    }
 	  else if (strchr("0123456789", *param_str) != NULL)
 	    {
 	      // number
-	      params->add(simulator->mk_cmd_int_arg((long long)
+	      params->add(con->sim->mk_cmd_int_arg((long long)
 						    strtol(param_str, 0, 0)));
 	    }
 	  else
 	    {
 	      // symbol
-	      params->add(simulator->mk_cmd_sym_arg(param_str));
+	      params->add(con->sim->mk_cmd_sym_arg(param_str));
 	    }
 	  free(param_str);
 	}
@@ -290,20 +346,150 @@ cl_cmdline::insert_param(int pos, class cl_cmd_arg *param)
     params->add_at(pos, param);
 }
 
+bool
+cl_cmdline::syntax_match(class cl_sim *sim, char *syntax)
+{
+  if (!syntax)
+    return(DD_FALSE);
+  if (!*syntax &&
+      !params->count)
+    {
+      matched_syntax= syntax;
+      return(DD_TRUE);
+    }
+  if (!params->count)
+    return(DD_FALSE);
+  //printf("syntax %s?\n",syntax);
+  char *p= syntax;
+  int iparam= 0;
+  class cl_cmd_arg *parm= (class cl_cmd_arg *)(params->at(iparam));
+  while (*p &&
+	 parm)
+    {
+      //printf("Checking %s as %c\n",parm->get_svalue(),*p);
+      switch (*p)
+	{
+	case SY_ADDR:
+	  if (!parm->as_address())
+	    return(DD_FALSE);
+	  //printf("ADDRESS match %lx\n",parm->value.address);
+	  break;
+	case SY_NUMBER:
+	  if (!parm->as_number())
+	    return(DD_FALSE);
+	  break;
+	case SY_DATA:
+	  if (!parm->as_data())
+	    return(DD_FALSE);
+	  break;
+	case SY_MEMORY:
+	  if (!parm->as_memory())
+	    return(DD_FALSE);
+	  //printf("MEMORY match %s\n",parm->value.memory->class_name);
+	  break;
+	case SY_HW:
+	  if (!parm->as_hw(sim->uc))
+	    return(DD_FALSE);
+	  break;
+	case SY_STRING:
+	  if (!parm->as_string())
+	    return(DD_FALSE);
+	  break;
+	case SY_DATALIST:
+	  if (!set_data_list(parm, &iparam))
+	    return(DD_FALSE);
+	  break;
+	case SY_BIT:
+	  if (!parm->as_bit(sim->uc))
+	    return(DD_FALSE);
+	  break;
+	default:
+	  return(DD_FALSE);
+	}
+      p++;
+      iparam++;
+      if (iparam < params->count)
+	parm= (class cl_cmd_arg *)(params->at(iparam));
+      else
+	parm= 0;
+    }
+  if (!*p &&
+      !parm)
+    {
+      matched_syntax= syntax;
+      return(DD_TRUE);
+    }
+  return(DD_FALSE);
+}
+
+bool
+cl_cmdline::set_data_list(class cl_cmd_arg *parm, int *iparm)
+{
+  class cl_cmd_arg *next_parm;
+  int len, i, j;
+  t_mem *array;
+
+  len= 0;
+  array= 0;
+  for (i= *iparm, next_parm= param(i); next_parm; i++, next_parm= param(i))
+    {
+      if (next_parm->is_string())
+	{
+	  int l;
+	  char *s;
+	  //s= proc_escape(next_parm->get_svalue(), &l);
+	  if (!next_parm->as_string())
+	    continue;
+	  s= next_parm->value.string.string;
+	  l= next_parm->value.string.len;
+	  if (!array)
+	    array= (t_mem*)malloc(sizeof(t_mem)*l);
+	  else
+	    array= (t_mem*)realloc(array, sizeof(t_mem)*(l+len));
+	  for (j= 0; j < l; j++)
+	    {
+	      array[len]= s[j];
+	      len++;
+	    }
+	  //if (s)
+	  //free(s);
+	}
+      else
+	{
+	  if (!next_parm->as_data())
+	    {
+	      if (array)
+		free(array);
+	      return(DD_FALSE);
+	    }
+	  if (!array)
+	    array= (t_mem*)malloc(sizeof(t_mem));
+	  else
+	    array= (t_mem*)realloc(array, sizeof(t_mem)*(1+len));
+	  array[len]= next_parm->value.data;
+	  len++;
+	}
+    }
+  *iparm= i;
+  parm->value.data_list.array= array;
+  parm->value.data_list.len= len;
+  return(DD_TRUE);
+}
+
 
 /*
  * Command
  *____________________________________________________________________________
  */
 
-cl_cmd::cl_cmd(class cl_sim *asim,
+cl_cmd::cl_cmd(//class cl_sim *asim,
 	       char *aname,
 	       int can_rep,
 	       char *short_hlp,
 	       char *long_hlp):
   cl_base()
 {
-  sim= asim;
+  //sim= asim;
   names= new cl_strings(1, 1);
   names->add(aname?strdup(aname):strdup("unknown"));
   can_repeat= can_rep;
@@ -379,15 +565,17 @@ cl_cmd::syntax_ok(class cl_cmdline *cmdline)
 }
 
 int
-cl_cmd::work(class cl_cmdline *cmdline, class cl_console *con)
+cl_cmd::work(class cl_sim *sim,
+	     class cl_cmdline *cmdline, class cl_console *con)
 {
   if (!syntax_ok(cmdline))
     return(0);
-  return(do_work(cmdline, con));
+  return(do_work(sim, cmdline, con));
 }
 
 int
-cl_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
+cl_cmd::do_work(class cl_sim *sim,
+		class cl_cmdline *cmdline, class cl_console *con)
 {
   con->printf("Command \"%s\" does nothing.\n", (char*)(names->at(0)));
   return(0);
@@ -442,6 +630,20 @@ cl_cmdset::get_cmd(class cl_cmdline *cmdline)
   //return(0);
 }
 
+class cl_cmd *
+cl_cmdset::get_cmd(char *cmd_name)
+{
+  int i;
+
+  for (i= 0; i < count; i++)
+    {
+      class cl_cmd *c= (class cl_cmd *)at(i);
+      if (c->name_match(cmd_name, 1))
+	return(c);
+    }
+  return(0);
+}
+
 void
 cl_cmdset::del(char *name)
 {
@@ -481,13 +683,13 @@ cl_cmdset::replace(char *name, class cl_cmd *cmd)
  *____________________________________________________________________________
  */
 
-cl_super_cmd::cl_super_cmd(class cl_sim *asim,
+cl_super_cmd::cl_super_cmd(//class cl_sim *asim,
 			   char *aname,
 			   int  can_rep,
 			   char *short_hlp,
 			   char *long_hlp,
 			   class cl_cmdset *acommands):
-  cl_cmd(asim, aname, can_rep, short_hlp, long_hlp)
+  cl_cmd(aname, can_rep, short_hlp, long_hlp)
 {
   commands= acommands;
 }
@@ -499,15 +701,18 @@ cl_super_cmd::~cl_super_cmd(void)
 }
 
 int
-cl_super_cmd::work(class cl_cmdline *cmdline, class cl_console *con)
+cl_super_cmd::work(class cl_sim *sim,
+		   class cl_cmdline *cmdline, class cl_console *con)
 {
-  class cl_cmd *cmd;
+  class cl_cmd *cmd= 0;
 
   if (!commands)
     return(0);
   
   if (!cmdline->shift())
     {
+      if ((cmd= commands->get_cmd("_no_parameters_")) != 0)
+	return(cmd->work(sim, cmdline, con));
       int i;
       con->printf("\"%s\" must be followed by the name of a subcommand\n"
 		  "List of subcommands:\n", (char*)(names->at(0)));
@@ -524,7 +729,7 @@ cl_super_cmd::work(class cl_cmdline *cmdline, class cl_console *con)
 		  cmdline->name, (char*)(names->at(0)));
       return(0);
     }
-  return(cmd->work(cmdline, con));
+  return(cmd->work(sim, cmdline, con));
 }
 
 
@@ -540,16 +745,21 @@ cl_console::cl_console(char *fin, char *fout, class cl_sim *asim):
 
   last_command= NULL;
   sim= asim;
-  in= stdin;
+  in= 0;
   if (fin)
-    if (f= fopen(fin, "r+"), in= f?f:stdin, !f)
+    if (f= fopen(fin, "r+"), in= f, !f)
       fprintf(stderr, "Can't open `%s': %s\n", fin, strerror(errno));
-  out= stdout;
+  out= 0;
   if (fout)
-    if (f= fopen(fout, "w+"), out= f?f:stdout, !f)
+    if (f= fopen(fout, "w+"), out= f, !f)
       fprintf(stderr, "Can't open `%s': %s\n", fout, strerror(errno));
   prompt= 0;
   flags= CONS_NONE;
+  if (in &&
+      isatty(fileno(in)))
+    flags|= CONS_INTERACTIVE;
+  else
+    printf("Warning: non-interactive console\n");
 }
 
 cl_console::cl_console(FILE *fin, FILE *fout, class cl_sim *asim):
@@ -559,7 +769,13 @@ cl_console::cl_console(FILE *fin, FILE *fout, class cl_sim *asim):
   sim= asim;
   in = fin;
   out= fout;
+  prompt= 0;
   flags= CONS_NONE;
+  if (in &&
+      isatty(fileno(in)))
+    flags|= CONS_INTERACTIVE;
+  else
+    printf("Warning: non-interactive console\n");
 }
 
 /*
@@ -636,8 +852,9 @@ cl_console::~cl_console(void)
 void
 cl_console::welcome(void)
 {
-  fprintf(out,
-	  "ucsim %s, Copyright (C) 1997 Daniel Drotos, Talker Bt.\n"
+  if (!out)
+    return;
+  fprintf(out, "ucsim %s, Copyright (C) 1997 Daniel Drotos, Talker Bt.\n"
 	  "ucsim comes with ABSOLUTELY NO WARRANTY; for details type "
 	  "`show w'.\n"
 	  "This is free software, and you are welcome to redistribute it\n"
@@ -767,17 +984,17 @@ cl_console::read_line(void)
 }
 
 int
-cl_console::proc_input(void)
+cl_console::proc_input(class cl_cmdset *cmdset)
 {
-  int retval;
+  int retval= 0;
 
   if (feof(in))
     {
       fprintf(out, "End\n");
       return(1);
     }
-  char *cmd= read_line();
-  if (!cmd)
+  char *cmdstr= read_line();
+  if (!cmdstr)
     return(1);
   if (flags & CONS_FROZEN)
     {
@@ -786,16 +1003,28 @@ cl_console::proc_input(void)
       retval= 0;
     }
   else
-    retval= sim->do_cmd(cmd, this);
+    {
+      class cl_cmdline *cmdline;
+      class cl_cmd *cm;
+      cmdline= new cl_cmdline(cmdstr, this);
+      cmdline->init();
+      cm= cmdset->get_cmd(cmdline);
+      if (cm)
+	retval= cm->work(sim, cmdline, this);
+      delete cmdline;
+      if (!cm)
+	retval= interpret(cmdstr);
+    }
+  //retval= sim->do_cmd(cmd, this);
   if (!retval)
     print_prompt();
-  free(cmd);
+  free(cmdstr);
   return(retval);
 }
 
 /*
  * Old version, sim->do_cmd() falls into this if it doesn't find a new
- * command object which can handle enetered command
+ * command object which can handle entered command
  */
 
 int
@@ -837,7 +1066,7 @@ cl_listen_console::get_in_fd(void)
 }
 
 int
-cl_listen_console::proc_input(void)
+cl_listen_console::proc_input(class cl_cmdset *cmdset)
 {
   int newsock;
   ACCEPT_SOCKLEN_T size;
@@ -854,7 +1083,10 @@ cl_listen_console::proc_input(void)
     fprintf(stderr, "cannot open port for input\n");
   if (!(out= fdopen(newsock, "w+")))
     fprintf(stderr, "cannot open port for output\n");
-  sim->cmd->add_console(sim->cmd->mk_console(in, out, sim));
+  class cl_console *c= sim->cmd->mk_console(in, out, sim);
+  c->flags|= CONS_INTERACTIVE;
+  c->init();
+  sim->cmd->add_console(c);
   in= out= 0;
   return(0);
 }
@@ -867,11 +1099,12 @@ cl_listen_console::proc_input(void)
  *____________________________________________________________________________
  */
 
-cl_commander::cl_commander(class cl_sim *asim):
+cl_commander::cl_commander(class cl_cmdset *acmdset, class cl_sim *asim):
   cl_base()
 {
   cons= new cl_list(1, 1); 
   actual_console= frozen_console= 0;
+  cmdset= acmdset;
   sim= asim;
 }
 
@@ -898,6 +1131,7 @@ cl_commander::init(void)
 cl_commander::~cl_commander(void)
 {
   delete cons;
+  delete cmdset;
 }
 
 class cl_console *
@@ -939,7 +1173,8 @@ void
 cl_commander::set_fd_set(void)
 {
   int i;
-  
+
+  //fprintf(stderr, "** Setting fd set\n");  
   FD_ZERO(&read_set);
   fd_num= 0;
   for (i= 0; i < cons->count; i++)
@@ -948,10 +1183,16 @@ cl_commander::set_fd_set(void)
       class cl_console *c= (class cl_console*)(cons->at(i));
       if ((fd= c->get_in_fd()) >= 0)
 	{
-	  if (fd > fd_num)
-	    fd_num= fd;
-	  FD_SET(fd, &read_set);
+	  if ((c->flags & CONS_FROZEN) == 0 ||
+	      (c->flags & CONS_INTERACTIVE) != 0)
+	    {
+	      FD_SET(fd, &read_set);
+	      if (fd > fd_num)
+		fd_num= fd;
+	    }
 	}
+      else
+	;//fprintf(stderr, "** Skipping console %p\n",c);
     }
   fd_num++;
 }
@@ -1069,14 +1310,19 @@ cl_commander::input_avail(void)
 
   tv.tv_sec= tv.tv_usec= 0;
   active_set= read_set;
-  i= select(fd_num/*FD_SETSIZE*/, &active_set, NULL, NULL, &tv);
+  i= select(fd_num, &active_set, NULL, NULL, &tv);
   return(i);
 }
 
 int
 cl_commander::input_avail_on_frozen(void)
 {
+  int fd;
+
   if (!frozen_console)
+    return(0);
+  if ((fd= frozen_console->get_in_fd()) >= 0 &&
+      !isatty(fd))
     return(0);
   return(frozen_console->input_avail());
 }
@@ -1087,7 +1333,7 @@ cl_commander::wait_input(void)
   int i;
 
   active_set= read_set;
-  i= select(fd_num/*FD_SETSIZE*/, &active_set, NULL, NULL, NULL);
+  i= select(fd_num, &active_set, NULL, NULL, NULL);
   return(i);
 }
 
@@ -1096,7 +1342,7 @@ cl_commander::proc_input(void)
 {
   int i;
 
-  for (i= 0; i < fd_num/*FD_SETSIZE*/; i++)
+  for (i= 0; i < fd_num; i++)
     if (FD_ISSET(i, &active_set))
       {
 	class cl_console *c;
@@ -1107,7 +1353,7 @@ cl_commander::proc_input(void)
 	    if (c->match(i))
 	      {
 		actual_console= c;
-		int retval= c->proc_input();
+		int retval= c->proc_input(cmdset);
 		if (retval)
 		  {
 		    del_console(c);

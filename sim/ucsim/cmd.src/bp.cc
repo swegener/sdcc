@@ -36,6 +36,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // cmd
 #include "cmdsetcl.h"
+#include "bpcl.h"
 
 
 /*
@@ -43,31 +44,64 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  */
 
 int
-cl_break_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
+cl_break_cmd::do_work(class cl_sim *sim,
+		      class cl_cmdline *cmdline, class cl_console *con)
 {
-  long addr;
-  int  hit= 1;
-  class cl_cmd_arg *params[2]= { cmdline->param(0),
-				 cmdline->param(1) };
+  t_addr addr= 0;
+  int hit= 1;
+  char op;
+  class cl_mem *mem;
+  class cl_cmd_arg *params[4]= { cmdline->param(0),
+				 cmdline->param(1),
+				 cmdline->param(2),
+				 cmdline->param(3) };
 
-  if (params[0] == 0)
+  if (cmdline->syntax_match(sim, ADDRESS)) {
+    addr= params[0]->value.address;
+    hit= 1;
+    do_fetch(sim, addr, hit, con);
+  }
+  else if (cmdline->syntax_match(sim, ADDRESS NUMBER)) {
+    addr= params[0]->value.address;
+    hit= params[1]->value.number;
+    do_fetch(sim, addr, hit, con);
+  }
+  else if (cmdline->syntax_match(sim, MEMORY STRING ADDRESS)) {
+    mem= params[0]->value.memory;
+    op= *(params[1]->get_svalue());
+    addr= params[2]->value.address;
+    hit= 1;
+    do_event(sim, mem, op, addr, hit, con);
+  }
+  else if (cmdline->syntax_match(sim, MEMORY STRING ADDRESS NUMBER)) {
+    mem= params[0]->value.memory;
+    op= *(params[1]->get_svalue());
+    addr= params[2]->value.address;
+    hit= params[3]->value.number;
+    do_event(sim, mem, op, addr, hit, con);
+  }
+  else
     {
-      con->printf("Address is missing.\n");
+      con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
       return(DD_FALSE);
     }
-  addr= (params[0])->get_address();
-  if (params[1])
-    hit= (params[1])->get_ivalue();
+  return(DD_FALSE);
+}
+
+void
+cl_break_cmd::do_fetch(class cl_sim *sim,
+		       t_addr addr, int hit, class cl_console *con)
+{
   if (hit > 99999)
     {
       con->printf("Hit value %d is too big.\n", hit);
-      return(0);
+      return;
     }
   if (sim->uc->fbrk->bp_at(addr))
     con->printf("Breakpoint at 0x%06x is already set.\n", addr);
   else
     {
-      class cl_brk *b= new cl_fetch_brk(sim->uc->fbrk->make_new_nr(),
+      class cl_brk *b= new cl_fetch_brk(sim->uc->make_new_brknr(),
 					addr, perm, hit);
       b->init();
       sim->uc->fbrk->add_bp(b);
@@ -75,7 +109,20 @@ cl_break_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
       con->printf("Breakpoint %d at 0x%06x: %s\n", b->nr, addr, s);
       free(s);
     }
-  return(0);
+}
+
+void
+cl_break_cmd::do_event(class cl_sim *sim,
+		       class cl_mem *mem, char op, t_addr addr, int hit,
+		       class cl_console *con)
+{
+  class cl_ev_brk *b= NULL;
+
+  b= sim->uc->mk_ebrk(perm, mem, op, addr, hit);
+  if (b)
+    sim->uc->ebrk->add_bp(b);
+  else
+    con->printf("Couldn't make event breakpoint\n");
 }
 
 
@@ -84,9 +131,9 @@ cl_break_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
  */
 
 int
-cl_clear_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
+cl_clear_cmd::do_work(class cl_sim *sim,
+		      class cl_cmdline *cmdline, class cl_console *con)
 {
-  uint addr;
   int idx;
   class cl_brk *brk= sim->uc->fbrk->get_bp(sim->uc->PC, &idx);
 
@@ -105,14 +152,45 @@ cl_clear_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
   class cl_cmd_arg *param;
   while ((param= cmdline->param(i++)))
     {
-      addr= param->get_ivalue();
+      t_addr addr;
+      if (!param->as_address())
+	return(DD_FALSE);
+      addr= param->value.address;
       if (sim->uc->fbrk->bp_at(addr) == 0)
 	sim->cmd->printf("No breakpoint at 0x%06x\n", addr);
       else
 	sim->uc->fbrk->del_bp(addr);
     }
 
-  return(0);
+  return(DD_FALSE);
+}
+
+
+/*
+ * DELETE nr nr ...
+ */
+
+int
+cl_delete_cmd::do_work(class cl_sim *sim,
+		       class cl_cmdline *cmdline, class cl_console *con)
+{
+  if (cmdline->param(0) == 0)
+    {
+      // delete all
+      sim->uc->remove_all_breaks();
+    }
+  else
+    {
+      int i= 0;
+      class cl_cmd_arg *param;
+      while ((param= cmdline->param(i++)))
+	{
+	  long num;
+	  if (param->get_ivalue(&num))
+	    sim->uc->rm_brk(num);
+	}
+    }
+  return(DD_FALSE);
 }
 
 

@@ -2,18 +2,13 @@
 # Makefile targets to remake configuration
 #
 
-freshconf: $(srcdir)/configure main.mk ddconfig.h
+freshconf: main.mk ddconfig.h
 
-$(srcdir)/configure: $(srcdir)/configure.in
-	cd $(srcdir) && $(SHELL) autoconf
-
-main.mk: $(srcdir)/main_in.mk $(srcdir)/configure.in
+main.mk: $(srcdir)/main_in.mk config.status
 	$(SHELL) ./config.status
 
 ddconfig.h: ddconfig_in.h config.status
+	@echo "Re-making ddconfig.h"
 	$(SHELL) ./config.status
-
-config.status: $(srcdir)/configure
-	$(SHELL) ./config.status --recheck
 
 # End of conf.mk

@@ -267,14 +267,14 @@ brk_coll::there_is_event(enum brk_event ev)
   return(DD_FALSE);
 }
 
-int
+/*int
 brk_coll::make_new_nr(void)
 {
   if (count == 0)
     return(1);
   class cl_brk *b= (class cl_brk *)(at(count-1));
   return(b->nr+1);
-}
+}*/
 
 void
 brk_coll::add_bp(class cl_brk *bp)
@@ -310,6 +310,20 @@ brk_coll::get_bp(t_addr addr, int *idx)
 	  if (b->addr == addr)
 	    return(b);
 	}
+    }
+  return(0);
+}
+
+class cl_brk *
+brk_coll::get_bp(int nr)
+{
+  int i;
+
+  for (i= 0; i < count; i++)
+    {
+      class cl_brk *bp= (class cl_brk *)(at(i));
+      if (bp->nr == nr)
+	return(bp);
     }
   return(0);
 }

@@ -48,7 +48,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "uc51cl.h"
 #include "glob.h"
 #include "regs51.h"
-#include "dump.h"
 #include "timer0cl.h"
 #include "timer1cl.h"
 #include "serialcl.h"
@@ -198,9 +197,9 @@ t_uc51::mk_hw_elements(void)
 }
 
 class cl_mem *
-t_uc51::mk_mem(enum mem_class type)
+t_uc51::mk_mem(enum mem_class type, char *class_name)
 {
-  class cl_mem *m= cl_uc::mk_mem(type);
+  class cl_mem *m= cl_uc::mk_mem(type, class_name);
   if (type == MEM_SFR)
     sfr= m;
   if (type == MEM_IRAM)
@@ -235,7 +234,7 @@ t_uc51::~t_uc51(void)
  */
 
 void
-t_uc51::write_rom(uint addr, ulong data)
+t_uc51::write_rom(t_addr addr, ulong data)
 {
   if (addr < EROM_SIZE)
     set_mem(MEM_ROM, addr, data);
@@ -265,11 +264,11 @@ t_uc51::bit_tbl(void)
 }
 
 char *
-t_uc51::disass(uint addr, char *sep)
+t_uc51::disass(t_addr addr, char *sep)
 {
   char work[256], temp[20], c[2];
   char *buf, *p, *b, *t;
-  uint code= get_mem(MEM_ROM, addr);
+  t_mem code= get_mem(MEM_ROM, addr);
 
   p= work;
   b= dis_tbl()[code].mnemonic;
@@ -315,11 +314,11 @@ t_uc51::disass(uint addr, char *sep)
 		      get_mem(MEM_ROM, addr+1)&0x07);
 	      break;
 	    case 'r': // rel8 address at 2nd byte
-	      sprintf(temp, "%04x",
+	      sprintf(temp, "%04lx",
 		      addr+2+(signed char)(get_mem(MEM_ROM, addr+1)));
 	      break;
 	    case 'R': // rel8 address at 3rd byte
-	      sprintf(temp, "%04x",
+	      sprintf(temp, "%04lx",
 		      addr+3+(signed char)(get_mem(MEM_ROM, addr+2)));
 	      break;
 	    case 'd': // data8 at 2nd byte
@@ -370,33 +369,6 @@ t_uc51::disass(uint addr, char *sep)
   return(buf);
 }
 
-void
-t_uc51::print_disass(uint addr, class cl_console *con)
-{
-  char *dis;
-  class cl_brk *b;
-  int i;
-  uint code= get_mem(MEM_ROM, addr);
-
-  b  = fbrk_at(addr);
-  dis= disass(addr, NULL);
-  if (b)
-    con->printf("%c", (b->perm == brkFIX)?'F':'D');
-  else
-    con->printf(" ");
-  con->printf("%c %06x %02x",
-	      inst_at(addr)?' ':'*',
-	      addr, code);
-  for (i= 1; i < inst_length(code); i++)
-    con->printf(" %02x", get_mem(MEM_ROM, addr+i));
-  while (i < 3)
-    {
-      con->printf("   ");
-      i++;
-    }
-  con->printf(" %s\n", dis);
-  free(dis);
-}
 
 void
 t_uc51::print_regs(class cl_console *con)
@@ -405,7 +377,8 @@ t_uc51::print_regs(class cl_console *con)
   uchar data;
 
   start= sfr->get(PSW) & 0x18;
-  dump_memory(iram, &start, start+7, 8, /*sim->cmd_out()*/con, sim);
+  //dump_memory(iram, &start, start+7, 8, /*sim->cmd_out()*/con, sim);
+  iram->dump(start, start+7, 8, con);
   start= sfr->get(PSW) & 0x18;
   data= iram->get(iram->get(start));
   con->printf("%06x %02x %c",
@@ -427,6 +400,29 @@ t_uc51::print_regs(class cl_console *con)
 	      (data&bmOV)?'1':'0', (data&bmP)?'1':'0');
 
   print_disass(PC, con);
+}
+
+
+bool
+t_uc51::extract_bit_address(t_addr bit_address,
+			    class cl_mem **mem,
+			    t_addr *mem_addr,
+			    t_mem *bit_mask)
+{
+  if (mem)
+    *mem= sfr;
+  if (bit_address > 0xff)
+    return(DD_FALSE);
+  if (bit_mask)
+    *bit_mask= 1 << (bit_address % 8);
+  if (mem_addr)
+    {
+      if (bit_address < 0x80)
+	*mem_addr= bit_address/8 + 0x20;
+      else
+	*mem_addr= bit_address & 0xf8;
+    }
+  return(DD_TRUE);
 }
 
 
@@ -484,7 +480,7 @@ t_uc51::clear_sfr(void)
  */
 
 void
-t_uc51::analyze(uint addr)
+t_uc51::analyze(t_addr addr)
 {
   uint code;
   struct dis_entry *tabl;
@@ -572,9 +568,15 @@ uchar *
 t_uc51::get_direct(t_mem addr, t_addr *ev_i, t_addr *ev_s)
 {
   if (addr < SFR_START)
-    return(&(MEM(MEM_IRAM)[*ev_i= addr]));
+    {
+      return(&(iram->umem8[*ev_i= addr]));
+      //return(&(MEM(MEM_IRAM)[*ev_i= addr]));
+    }
   else
-    return(&(MEM(MEM_SFR)[*ev_s= addr]));
+    {
+      return(&(sfr->umem8[*ev_s= addr]));
+      //return(&(MEM(MEM_SFR)[*ev_s= addr]));
+    }
 }
 
 /*
@@ -589,7 +591,8 @@ t_uc51::get_indirect(uchar addr, int *res)
     *res= resINV_ADDR;
   else
     *res= resGO;
-  return(&(MEM(MEM_IRAM)[addr]));
+  return(&(iram->umem8[addr]));
+  //return(&(MEM(MEM_IRAM)[addr]));
 }
 
 
@@ -600,15 +603,19 @@ t_uc51::get_indirect(uchar addr, int *res)
 uchar *
 t_uc51::get_reg(uchar regnum)
 {
-  return(&(MEM(MEM_IRAM)[(sfr->get(PSW) & (bmRS0|bmRS1)) |
-			(regnum & 0x07)]));
+  return(&(iram->umem8[(sfr->get(PSW) & (bmRS0|bmRS1)) |
+		      (regnum & 0x07)]));
+  //return(&(MEM(MEM_IRAM)[(sfr->get(PSW) & (bmRS0|bmRS1)) |
+  //		(regnum & 0x07)]));
 }
 
 uchar *
 t_uc51::get_reg(uchar regnum, t_addr *event)
 {
-  return(&(MEM(MEM_IRAM)[*event= (sfr->get(PSW) & (bmRS0|bmRS1)) |
-			(regnum & 0x07)]));
+  return(&(iram->umem8[*event= (sfr->get(PSW) & (bmRS0|bmRS1)) |
+		      (regnum & 0x07)]));
+  //return(&(MEM(MEM_IRAM)[*event= (sfr->get(PSW) & (bmRS0|bmRS1)) |
+  //		(regnum & 0x07)]));
 }
 
 
@@ -621,16 +628,24 @@ uchar *
 t_uc51::get_bit(uchar bitaddr)
 {
   if (bitaddr < 128)
-    return(&(MEM(MEM_IRAM)[(bitaddr/8)+32]));
-  return(&(MEM(MEM_SFR)[bitaddr & 0xf8]));
+    {
+      return(&(iram->umem8[(bitaddr/8)+32]));
+      //return(&(MEM(MEM_IRAM)[(bitaddr/8)+32]));
+    }
+  return(&(iram->umem8[bitaddr & 0xf8]));
+  //return(&(MEM(MEM_SFR)[bitaddr & 0xf8]));
 }
 
 uchar *
 t_uc51::get_bit(uchar bitaddr, t_addr *ev_i, t_addr *ev_s)
 {
   if (bitaddr < 128)
-    return(&(MEM(MEM_IRAM)[*ev_i= (bitaddr/8)+32]));
-  return(&(MEM(MEM_SFR)[*ev_s= bitaddr & 0xf8]));
+    {
+      return(&(iram->umem8[*ev_i= (bitaddr/8)+32]));
+      //return(&(MEM(MEM_IRAM)[*ev_i= (bitaddr/8)+32]));
+    }
+  return(&(sfr->umem8[*ev_s= bitaddr & 0xf8]));
+  //return(&(MEM(MEM_SFR)[*ev_s= bitaddr & 0xf8]));
 }
 
 uchar
@@ -681,13 +696,17 @@ t_uc51::proc_write_sp(uchar val)
 uchar
 t_uc51::read(uchar *addr)
 {
-  if (addr == &(MEM(MEM_SFR)[P0]))
+  //if (addr == &(MEM(MEM_SFR)[P0]))
+  if (addr == &(sfr->umem8[P0]))
     return(get_mem(MEM_SFR, P0) & port_pins[0]);
-  if (addr == &(MEM(MEM_SFR)[P1]))
+  //if (addr == &(MEM(MEM_SFR)[P1]))
+  if (addr == &(sfr->umem8[P1]))
     return(get_mem(MEM_SFR, P1) & port_pins[1]);
-  if (addr == &(MEM(MEM_SFR)[P2]))
+  //if (addr == &(MEM(MEM_SFR)[P2]))
+  if (addr == &(sfr->umem8[P2]))
     return(get_mem(MEM_SFR, P2) & port_pins[2]);
-  if (addr == &(MEM(MEM_SFR)[P3]))
+  //if (addr == &(MEM(MEM_SFR)[P3]))
+  if (addr == &(sfr->umem8[P3]))
     return(get_mem(MEM_SFR, P3) & port_pins[3]);
   return(*addr);
 }
@@ -1198,11 +1217,12 @@ t_uc51::do_timer0(int cycles)
 	      while (cycles--)
 		{
 		  // mod 0, TH= 8 bit t/c, TL= 5 bit precounter
-		  (MEM(MEM_SFR)[TL0])++;
+		  //(MEM(MEM_SFR)[TL0])++;
+		  sfr->add(TL0, 1);
 		  if (sfr->get(TL0) > 0x1f)
 		    {
 		      sfr->set_bit0(TL0, ~0x1f);
-		      if (!++(MEM(MEM_SFR)[TH0]))
+		      if (!/*++(MEM(MEM_SFR)[TH0])*/sfr->add(TH0, 1))
 			{
 			  sfr->set_bit1(TCON, bmTF0);
 			  t0_overflow();
@@ -1218,9 +1238,9 @@ t_uc51::do_timer0(int cycles)
 	      while (cycles--)
 		{
 		  // mod 1 TH+TL= 16 bit t/c
-		  if (!++(MEM(MEM_SFR)[TL0]))
+		  if (!/*++(MEM(MEM_SFR)[TL0])*/sfr->add(TL0, 1))
 		    {
-		      if (!++(MEM(MEM_SFR)[TH0]))
+		      if (!/*++(MEM(MEM_SFR)[TH0])*/sfr->add(TH0, 1))
 			{
 			  sfr->set_bit1(TCON, bmTF0);
 			  t0_overflow();
@@ -1236,7 +1256,7 @@ t_uc51::do_timer0(int cycles)
 	      while (cycles--)
 		{
 		  // mod 2 TL= 8 bit t/c auto reload from TH
-		  if (!++(MEM(MEM_SFR)[TL0]))
+		  if (!/*++(MEM(MEM_SFR)[TL0])*/sfr->add(TL0, 1))
 		    {
 		      sfr->set(TL0, sfr->get(TH0));
 		      sfr->set_bit1(TCON, bmTF0);
@@ -1248,7 +1268,7 @@ t_uc51::do_timer0(int cycles)
 	    {
 	      // mod 3 TL= 8 bit t/c
 	      //       TH= 8 bit timer controlled with T1's bits
-	      if (!++(MEM(MEM_SFR)[TL0]))
+	      if (!/*++(MEM(MEM_SFR)[TL0])*/sfr->add(TL0, 1))
 		{
 		  sfr->set_bit1(TCON, bmTF0);
 		  t0_overflow();
@@ -1263,7 +1283,7 @@ t_uc51::do_timer0(int cycles)
 	   (p3 & port_pins[3] & bm_INT1)) ||
 	  (tcon & bmTR1))
 	{
-	  if (!++(MEM(MEM_SFR)[TH0]))
+	  if (!/*++(MEM(MEM_SFR)[TH0])*/sfr->add(TH0, 1))
 	    {
 	      sfr->set_bit1(TCON, bmTF1);
 	      s_tr_t1++;
@@ -1313,10 +1333,10 @@ t_uc51::do_timer1(int cycles)
 	      while (cycles--)
 		{
 		  // mod 0, TH= 8 bit t/c, TL= 5 bit precounter
-		  if (++(MEM(MEM_SFR)[TL1]) > 0x1f)
+		  if (/*++(MEM(MEM_SFR)[TL1])*/sfr->add(TL1, 1) > 0x1f)
 		    {
 		      sfr->set_bit0(TL1, ~0x1f);
-		      if (!++(MEM(MEM_SFR)[TH1]))
+		      if (!/*++(MEM(MEM_SFR)[TH1])*/sfr->add(TH1, 1))
 			{
 			  sfr->set_bit1(TCON, bmTF1);
 			  s_tr_t1++;
@@ -1333,8 +1353,8 @@ t_uc51::do_timer1(int cycles)
 	      while (cycles--)
 		{
 		  // mod 1 TH+TL= 16 bit t/c
-		  if (!++(MEM(MEM_SFR)[TL1]))
-		    if (!++(MEM(MEM_SFR)[TH1]))
+		  if (!/*++(MEM(MEM_SFR)[TL1])*/sfr->add(TL1, 1))
+		    if (!/*++(MEM(MEM_SFR)[TH1])*/sfr->add(TH1, 1))
 		      {
 			sfr->set_bit1(TCON, bmTF1);
 			s_tr_t1++;
@@ -1350,7 +1370,7 @@ t_uc51::do_timer1(int cycles)
 	      while (cycles--)
 		{
 		  // mod 2 TL= 8 bit t/c auto reload from TH
-		  if (!++(MEM(MEM_SFR)[TL1]))
+		  if (!/*++(MEM(MEM_SFR)[TL1])*/sfr->add(TL1, 1))
 		    {
 		      sfr->set(TL1, sfr->get(TH1));
 		      sfr->set_bit1(TCON, bmTF1);

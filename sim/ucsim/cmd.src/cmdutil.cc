@@ -110,6 +110,10 @@ get_name_entry(struct name_entry tabl[], char *name, class cl_uc *uc)
   int i= 0;
   char *p;
 
+  if (!tabl ||
+      !name ||
+      !(*name))
+    return(0);
   for (p= name; *p; *p= toupper(*p), p++);
   while (tabl[i].name &&
 	 (!(tabl[i].cpu_type & uc->type) ||
@@ -118,7 +122,7 @@ get_name_entry(struct name_entry tabl[], char *name, class cl_uc *uc)
   if (tabl[i].name != NULL)
     return(&tabl[i]);
   else
-    return(NULL);
+    return(0);
 }
 
 
@@ -227,8 +231,8 @@ interpret_bitname(char *name, class cl_uc *uc,
 char *
 proc_escape(char *string, int *len)
 {
-  char  spec_chars[]= "fnrtvab";
-  char  spec[]= "\f\n\r\t\v\a\b";
+  char  spec_chars[]= "fnrtvab\"";
+  char  spec[]= "\f\n\r\t\v\a\b\"";
   char  *s, *str, *p;
 
   s  = string;

@@ -17,7 +17,7 @@ PRJDIR		= ..
 
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 CPPFLAGS        = @CPPFLAGS@ -I. -I$(PRJDIR) \
-		  -I$(PRJDIR)/sim.src
+		  -I$(PRJDIR)/sim.src -I$(PRJDIR)/gui.src
 CFLAGS          = @CFLAGS@ -Wall
 CXXFLAGS        = @CXXFLAGS@ -Wall
 M_OR_MM         = @M_OR_MM@
@@ -34,8 +34,8 @@ man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
 
-OBJECTS		= newcmd.o cmdutil.o cmdset.o syntax.o \
-		  get.o set.o timer.o bp.o info.o
+OBJECTS		= cmdset.o newcmd.o cmdutil.o syntax.o \
+		  get.o set.o timer.o bp.o info.o show.o cmdgui.o cmdconf.o
 
 
 # Compiling entire program or any subproject

@@ -35,10 +35,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 int
 main(int argc, char *argv[])
 {
-  simulator= new cl_simz80(0, argc, argv);
-  simulator->init();
-  simulator->main();
-  delete simulator;
+  class cl_sim *sim= new cl_simz80(0, argc, argv);
+  sim->init();
+  sim->main();
+  delete sim;
   return(0);
 }
 

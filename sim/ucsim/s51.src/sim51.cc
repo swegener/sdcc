@@ -35,9 +35,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "globals.h"
 #include "utils.h"
+#include "cmdutil.h"
+#ifdef SOCKET_AVAIL
+#include <sys/socket.h>
+#endif
 
 #include "sim51cl.h"
-#include "cmd51cl.h"
+//#include "cmd51cl.h"
 #include "uc51cl.h"
 #include "uc52cl.h"
 #include "uc51rcl.h"
@@ -47,7 +51,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 cl_sim51::cl_sim51(int iargc, char *iargv[]):
-  cl_sim("t:s:S:hH", iargc, iargv)
+  cl_sim("t:s:S:hHk:", iargc, iargv)
 {}
 
 static void
@@ -57,7 +61,7 @@ print_help(char *name)
   printf("Usage: %s [-hHVvP] [-p prompt] [-t CPU] [-X freq[k|M]]\n"
 	 "       [-c file] [-s file] [-S optionlist]"
 #ifdef SOCKET_AVAIL
-	 " [-Z portnum]"
+	 " [-Z portnum] [-k portnum]"
 #endif
 	 "\n"
 	 "       [files...]\n", name);
@@ -69,6 +73,7 @@ print_help(char *name)
      "  -c file      Open command console on `file'\n"
 #ifdef SOCKET_AVAIL
      "  -Z portnum   Use localhost:portnumber for command console\n"
+     "  -k portnum   Use localhost:portnum for serial I/O\n"
 #endif
      "  -s file      Connect serial interface to `file'\n"
      "  -S options   `options' is a comma separated list of options\n"
@@ -122,7 +127,7 @@ cl_sim51::proc_arg(char optopt, char *optarg)
 	    fprintf(stderr, "-s option can not be used more than once.\n");
 	    break;
 	  }
-	arguments->add(new cl_prg_arg('s', 0, (long long)1));
+	arguments->add(new cl_prg_arg('s', 0, (long)1));
 	if ((Ser_in= fopen(optarg, "r")) == NULL)
 	  {
 	    fprintf(stderr,
@@ -140,6 +145,50 @@ cl_sim51::proc_arg(char optopt, char *optarg)
 	break;
       }
 
+#ifdef SOCKET_AVAIL
+      // socket serial I/O by Alexandre Frey <Alexandre.Frey@trusted-logic.fr>
+    case 'k':
+      {
+        FILE *Ser_in, *Ser_out;
+        int  sock;
+        unsigned short serverport;
+        int client_sock;
+
+        if (arg_avail("Ser_in")) {
+          fprintf(stderr, "Serial input specified more than once.\n");
+        }
+        if (arg_avail("Ser_out")) {
+          fprintf(stderr, "Serial output specified more than once.\n");
+        }
+
+        serverport = atoi(optarg);
+        sock = make_server_socket(serverport);
+        if (listen(sock, 1) < 0) {
+          fprintf(stderr, "Listen on port %d: %s\n", serverport,
+		  strerror(errno));
+          return (4);
+        }
+        fprintf(stderr, "Listening on port %d for a serial connection.\n",
+		serverport);
+        if ((client_sock = accept(sock, NULL, NULL)) < 0) {
+          fprintf(stderr, "accept: %s\n", strerror(errno));
+        }
+        fprintf(stderr, "Serial connection established.\n");
+
+        if ((Ser_in = fdopen(client_sock, "r")) == NULL) {
+          fprintf(stderr, "Can't create input stream: %s\n", strerror(errno));
+          return (4);
+        }
+        arguments->add(new cl_prg_arg(0, "Ser_in", Ser_in));
+        if ((Ser_out = fdopen(client_sock, "w")) == NULL) {
+          fprintf(stderr, "Can't create output stream: %s\n", strerror(errno));
+          return (4);
+        }
+        arguments->add(new cl_prg_arg(0, "Ser_out", Ser_out));
+        break;
+      }
+#endif
+      
     case 'S':
 
       subopts= optarg;
@@ -223,12 +272,6 @@ cl_sim51::proc_arg(char optopt, char *optarg)
   return(0);
 }
 
-class cl_commander *
-cl_sim51::mk_commander(void)
-{
-  class cl_commander *cmd= new cl_51cmd(this);
-  return(cmd);
-}
 
 class cl_uc *
 cl_sim51::mk_controller(void)
@@ -237,7 +280,7 @@ cl_sim51::mk_controller(void)
 
   i= 0;
   if (get_sarg('t', 0) == NULL)
-    simulator->arguments->add(new cl_prg_arg('t', 0, "C51"));
+    arguments->add(new cl_prg_arg('t', 0, "C51"));
   while ((cpus_51[i].type_str != NULL) &&
 	 (strcmp(get_sarg('t', 0), cpus_51[i].type_str) != 0))
     i++;
@@ -261,13 +304,6 @@ cl_sim51::mk_controller(void)
       return(new t_uc251(cpus_51[i].type, cpus_51[i].technology, this));
     }
   return(NULL);
-}
-
-void
-cl_sim51::build_cmd_set(void)
-{
-  cl_sim::build_cmd_set();
-  cmdset->del("ds");
 }
 
 

@@ -35,7 +35,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 cl_hw::cl_hw(class cl_uc *auc, enum hw_cath cath, int aid, char *aid_string):
-  cl_base()
+  cl_guiobj()
 {
   flags= HWF_INSIDE;
   uc= auc;

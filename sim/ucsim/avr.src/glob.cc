@@ -78,7 +78,7 @@ struct dis_entry disass_avr[]= {
   { 0xf000, 0xfc00, ' ', 1, "brbs %b,%k" },
   { 0x9408, 0xff8f, ' ', 1, "bset %s" },
   { 0xfa00, 0xfe00, ' ', 1, "bst %d,%b" },
-  { 0x940e, 0xfe0e, ' ', 2, "call %A" },
+  { 0x940e, 0xfe0e, 'l', 2, "call %A" },
   { 0x9800, 0xff00, ' ', 1, "cbi %P,%b" },
   { 0x9400, 0xfe0f, ' ', 1, "com %d" },
   { 0x1400, 0xfc00, ' ', 1, "cp %d,%r" },

@@ -40,7 +40,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  */
 
 int
-cl_info_bp_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
+cl_info_bp_cmd::do_work(class cl_sim *sim,
+			class cl_cmdline *cmdline, class cl_console *con)
 {
   int i;
   char *s;
@@ -80,7 +81,8 @@ cl_info_bp_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
  */
 
 int
-cl_info_reg_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
+cl_info_reg_cmd::do_work(class cl_sim *sim,
+			 class cl_cmdline *cmdline, class cl_console *con)
 {
   sim->uc->print_regs(con);
   return(0);
@@ -92,64 +94,23 @@ cl_info_reg_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
  */
 
 int
-cl_info_hw_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
+cl_info_hw_cmd::do_work(class cl_sim *sim,
+			class cl_cmdline *cmdline, class cl_console *con)
 {
+  class cl_hw *hw;
   class cl_cmd_arg *params[4]= { cmdline->param(0),
 				 cmdline->param(1),
 				 cmdline->param(2),
 				 cmdline->param(3) };
-  char *p0;
-  enum hw_cath cath;
-  class cl_hw *hw;
-  int i= 0;
 
-  if (params[0] == 0)
-    {
-      con->printf("Cathegory missing\n");
-      return(0);
-    }
-  p0= (params[0])->get_svalue();
-  if (strstr(p0, "t") == p0)
-    cath= HW_TIMER;
-  else if (strstr(p0, "u") == p0)
-    cath= HW_UART;
-  else if (strstr(p0, "po") == p0)
-    cath= HW_PORT;
-  else if (strstr(p0, "pc") == p0)
-    cath= HW_PCA;
-  else if (strstr(p0, "i") == p0)
-    cath= HW_INTERRUPT;
-  else if (strstr(p0, "w") == p0)
-    cath= HW_WDT;
+  if (cmdline->syntax_match(sim, HW)) {
+    hw= params[0]->value.hw;
+    hw->print_info(con);
+  }
   else
-    {
-      con->printf("Unknown cathegory\n");
-      return(0);
-    }
-  if (params[1] == 0)
-    {
-      // no ID
-      hw= sim->uc->get_hw(cath, &i);
-      while (hw)
-	{
-	  hw->print_info(con);
-	  i++;
-	  hw= sim->uc->get_hw(cath, &i);
-	}
-    }
-  else
-    {
-      // ID given
-      int id= (params[1])->get_ivalue();
-      hw= sim->uc->get_hw(cath, id, &i);
-      while (hw)
-	{
-	  hw->print_info(con);
-	  i++;
-	  hw= sim->uc->get_hw(cath, id, &i);
-	}      
-    }
-  return(0);
+    con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+
+  return(DD_FALSE);
 }
 
 

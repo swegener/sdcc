@@ -98,10 +98,11 @@ enum mem_class
 };
 
 // Flags of consoles
-#define CONS_NONE	0
-#define CONS_DEBUG	0x01	// Print debug messages on this console
-#define CONS_FROZEN	0x02	// Console is frozen (g command issued)
-#define CONS_PROMPT	0x04	// Prompt is out, waiting for input
+#define CONS_NONE	 0
+#define CONS_DEBUG	 0x01	// Print debug messages on this console
+#define CONS_FROZEN	 0x02	// Console is frozen (g command issued)
+#define CONS_PROMPT	 0x04	// Prompt is out, waiting for input
+#define CONS_INTERACTIVE 0x08	// Interactive console
 
 // States of simulator
 #define SIM_NONE	0
@@ -132,7 +133,13 @@ if (newbit) \
   (mem(MEM_SFR))->set_bit1((reg), (bitmask)); \
 else \
   (mem(MEM_SFR))->set_bit0((reg), (bitmask));
-#define GET_C (get_mem(MEM_SFR, PSW) & bmCY)
+#define SFR_SET_BIT(newbit, reg, bitmask) \
+if (newbit) \
+  sfr->set_bit1((reg), (bitmask)); \
+else \
+  sfr->set_bit0((reg), (bitmask));
+#define GET_C     (get_mem(MEM_SFR, PSW) & bmCY)
+#define SFR_GET_C (sfr->get(PSW) & bmCY)
 #define SET_C(newC) SET_BIT((newC), PSW, bmCY)
 
 #define IRAM_SIZE 256	  /* Size of Internal RAM */

@@ -49,14 +49,12 @@ public:
   virtual char *id_string(void);
 
   virtual t_addr get_mem_size(enum mem_class type);
-  //virtual int get_mem_width(enum mem_class type);
   virtual void mk_hw_elements(void);
 
   virtual struct dis_entry *dis_tbl(void);
   //virtual struct name_entry *sfr_tbl(void);
   //virtual struct name_entry *bit_tbl(void);
-  virtual char *disass(uint addr, char *sep);
-  virtual void print_disass(uint addr, class cl_console *con);
+  virtual char *disass(t_addr addr, char *sep);
   virtual void print_regs(class cl_console *con);
 
   virtual int exec_inst(void);

@@ -17,16 +17,21 @@ PRJDIR		= ..
 
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 CPPFLAGS        = @CPPFLAGS@ -I. -I$(PRJDIR) \
-		  -I$(PRJDIR)/cmd.src -I$(PRJDIR)/sim.src
+		  -I$(PRJDIR)/cmd.src -I$(PRJDIR)/sim.src -I$(PRJDIR)/gui.src
 CFLAGS          = @CFLAGS@ -Wall
 CXXFLAGS        = @CXXFLAGS@ -Wall
 M_OR_MM         = @M_OR_MM@
+PICOPT		= @PICOPT@
+SHAREDLIB	= @SHAREDLIB@
 
 SDCC		= sdcc
 SDCFLAGS	= --debug --stack-after-data --model-small
 SDCPPFLAGS	= 
 
-LIBS		= @LIBS@ -L$(PRJDIR) -lutil -lsim -lcmd
+LIBS		= @LIBS@ -L$(PRJDIR) -lsim -lcmd -lguiucsim -lutil
+DL		= @DL@
+
+dl_ok		= @dl_ok@
 
 prefix          = @prefix@
 exec_prefix     = @exec_prefix@
@@ -40,11 +45,12 @@ man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
 
-OBJECTS         = s51.o glob.o sim51.o cmd51.o \
+OBJECTS_SHARED	= glob.o sim51.o \
 		  inc.o jmp.o mov.o logic.o arith.o bit.o \
 		  timer0.o timer1.o timer2.o serial.o port.o interrupt.o \
-		  uc51.o uc52.o uc51r.o uc89c51r.o uc251.o \
-		  cmd.o dump.o go.o cmd_brk.o set.o where.o show.o
+		  uc51.o uc52.o uc51r.o uc89c51r.o uc251.o
+OBJECTS_EXE	= s51.o 
+OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)
 
 
 # Compiling entire program or any subproject
@@ -104,17 +110,28 @@ include clean.mk
 # --------
 .SUFFIXES: .rel
 
-s51.src: s51
+s51.src: s51 shared_lib
 
 s51: $(OBJECTS) $(PRJDIR)/*.a
 	$(CXX) $(CXXFLAGS) -o s51 $(OBJECTS) $(LIBS)
 
+ifeq ($(SHAREDLIB),yes)
+shared_lib: $(PRJDIR)/s51.so
+else
+shared_lib:
+	@echo "No shared lib made."
+endif
+
+$(PRJDIR)/s51.so: $(OBJECTS_SHARED)
+	$(CXX) -shared $(OBJECTS_SHARED) -o $(PRJDIR)/s51.so
+
 otherlibs:
 	cd $(PRJDIR)/cmd.src && $(MAKE) all
 	cd $(PRJDIR)/sim.src && $(MAKE) all
+	$(MAKE) -C $(PRJDIR)/gui.src checkconf ucsim_lib
 
 .cc.o:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(PICOPT) $(CPPFLAGS) -c $< -o $@
 
 .c.rel:
 	$(SDCC) $(SDCFLAGS) $(SDCPPFLAGS) -c $<

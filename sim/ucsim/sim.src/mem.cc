@@ -46,7 +46,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * Memory location handled specially by a hw element
  */
 
-cl_memloc::cl_memloc(long addr):
+cl_memloc::cl_memloc(t_addr addr):
   cl_base()
 {
   address= addr;
@@ -75,7 +75,7 @@ cl_memloc::read(class cl_mem *mem)
 }
 
 void
-cl_memloc::write(class cl_mem *mem, long addr, ulong *val)
+cl_memloc::write(class cl_mem *mem, t_addr addr, t_mem *val)
 {
   class cl_hw *hw;
   int i;
@@ -117,7 +117,7 @@ cl_memloc_coll::compare(void *key1, void *key2)
 }
 
 class cl_memloc *
-cl_memloc_coll::get_loc(long address)
+cl_memloc_coll::get_loc(t_addr address)
 {
   t_index i;
 
@@ -132,12 +132,14 @@ cl_memloc_coll::get_loc(long address)
  ******************************************************************************
  */
 
-cl_mem::cl_mem(enum mem_class atype, t_addr asize, int awidth):
-  cl_base()
+cl_mem::cl_mem(enum mem_class atype, char *aclass_name,
+	       t_addr asize, int awidth):
+  cl_guiobj()
 {
   int i;
 
   type= atype;
+  class_name= aclass_name;
   width= awidth;
   size= asize;
   mem= 0;
@@ -152,12 +154,26 @@ cl_mem::cl_mem(enum mem_class atype, t_addr asize, int awidth):
   read_locs= new cl_memloc_coll();
   write_locs= new cl_memloc_coll();
   dump_finished= 0;
+  addr_format= (char *)malloc(10);
+  sprintf(addr_format, "0x%%0%dx",
+	  size-1<=0xf?1:
+	  (size-1<=0xff?2:
+	   (size-1<=0xfff?3:
+	    (size-1<=0xffff?4:
+	     (size-1<=0xfffff?5:
+	      (size-1<=0xffffff?6:12))))));
+  data_format= (char *)malloc(10);
+  sprintf(data_format, "%%0%dx", width/4+((width%4)?1:0));
 }
 
 cl_mem::~cl_mem(void)
 {
   if (mem)
     free(mem);
+  if (addr_format)
+    free(addr_format);
+  if (data_format)
+    free(data_format);
   delete read_locs;
   delete write_locs;
 }
@@ -180,7 +196,7 @@ cl_mem::id_string(void)
   return(s?s:(char*)"NONE");
 }
 
-ulong
+t_mem
 cl_mem::read(t_addr addr)
 {
   class cl_memloc *loc;
@@ -201,7 +217,7 @@ cl_mem::read(t_addr addr)
     return((((TYPE_UDWORD*)mem)[addr])&mask);
 }
 
-ulong
+t_mem
 cl_mem::get(t_addr addr)
 {
   if (addr >= size)
@@ -283,33 +299,54 @@ cl_mem::set_bit0(t_addr addr, t_mem bits)
     ((TYPE_UDWORD*)mem)[addr]&= ~bits;
 }
 
-void
+t_mem
+cl_mem::add(t_addr addr, long what)
+{
+  if (addr >= size)
+    return(0);
+  if (width <= 8)
+    {
+      ((TYPE_UBYTE*)mem)[addr]= ((TYPE_UBYTE*)mem)[addr] + what;
+      return(((TYPE_UBYTE*)mem)[addr]);
+    }
+  else if (width <= 16)
+    {
+      ((TYPE_UWORD*)mem)[addr]= ((TYPE_UWORD*)mem)[addr] + what;
+      return(((TYPE_UWORD*)mem)[addr]);
+    }
+  else
+    {
+      ((TYPE_UDWORD*)mem)[addr]= ((TYPE_UDWORD*)mem)[addr] + what;
+      return(((TYPE_UDWORD*)mem)[addr]);
+    }
+}
+
+t_addr
 cl_mem::dump(t_addr start, t_addr stop, int bpl, class cl_console *con)
 {
   int i;
 
-  if (start < 0)
-    {
-      start= dump_finished;
-      stop= start+stop;
-    }
   while ((start <= stop) &&
 	 (start < size))
     {
-      con->printf("%06x ", start);
-      for (i= 0; (i < bpl) &&
+      con->printf(addr_format, start); con->printf(" ");
+      for (i= 0;
+	   (i < bpl) &&
 	     (start+i < size) &&
 	     (start+i <= stop);
 	   i++)
 	{
-	  char format[10];
-	  sprintf(format, "%%0%dx ", width/4);
-	  con->printf(format/*"%02x "*/, get(start+i));
+	  con->printf(data_format, read(start+i)); con->printf(" ");
 	}
       while (i < bpl)
 	{
-	  //FIXME
-	  con->printf("   ");
+	  int j;
+	  j= width/4 + ((width%4)?1:0) + 1;
+	  while (j)
+	    {
+	      con->printf(" ");
+	      j--;
+	    }
 	  i++;
 	}
       for (i= 0; (i < bpl) &&
@@ -330,6 +367,57 @@ cl_mem::dump(t_addr start, t_addr stop, int bpl, class cl_console *con)
       dump_finished= start+i;
       start+= bpl;
     }
+  return(dump_finished);
+}
+
+t_addr
+cl_mem::dump(class cl_console *con)
+{
+  return(dump(dump_finished, dump_finished+10*8-1, 8, con));
+}
+
+bool
+cl_mem::search_next(bool case_sensitive, t_mem *array, int len, t_addr *addr)
+{
+  t_addr a;
+  int i;
+  bool found;
+
+  if (addr == NULL)
+    a= 0;
+  else
+    a= *addr;
+  
+  if (a+len > size)
+    return(DD_FALSE);
+
+  found= DD_FALSE;
+  while (!found &&
+	 a+len <= size)
+    {
+      bool match= DD_TRUE;
+      for (i= 0; i < len && match; i++)
+	{
+	  t_mem d1, d2;
+	  d1= get(a+i);
+	  d2= array[i];
+	  if (!case_sensitive)
+	    {
+	      if (/*d1 < 128*/isalpha(d1))
+		d1= toupper(d1);
+	      if (/*d2 < 128*/isalpha(d2))
+		d2= toupper(d2);
+	    }
+	  match= d1 == d2;
+	}
+      found= match;
+      if (!found)
+	a++;
+    }
+
+  if (addr)
+    *addr= a;
+  return(found);
 }
 
 
@@ -337,7 +425,7 @@ cl_mem::dump(t_addr start, t_addr stop, int bpl, class cl_console *con)
  * Bitmap
  */
 
-cl_bitmap::cl_bitmap(long asize):
+cl_bitmap::cl_bitmap(t_addr asize):
   cl_base()
 {
   map= (uchar*)malloc(size= asize/(8*SIZEOF_CHAR));
@@ -350,7 +438,7 @@ cl_bitmap::~cl_bitmap(void)
 }
 
 void
-cl_bitmap::set(long pos)
+cl_bitmap::set(t_addr pos)
 {
   int i;
 
@@ -359,7 +447,7 @@ cl_bitmap::set(long pos)
 }
 
 void
-cl_bitmap::clear(long pos)
+cl_bitmap::clear(t_addr pos)
 {
   int i;
 
@@ -368,7 +456,7 @@ cl_bitmap::clear(long pos)
 }
 
 bool
-cl_bitmap::get(long pos)
+cl_bitmap::get(t_addr pos)
 {
   return(map[pos/(8*SIZEOF_CHAR)] & (1 << (pos & ((8*SIZEOF_CHAR)-1))));
 }
@@ -386,8 +474,8 @@ cl_bitmap::empty(void)
  * Special memory for code (ROM)
  */
 
-cl_rom::cl_rom(long asize, int awidth):
-  cl_mem(MEM_ROM, asize, awidth)
+cl_rom::cl_rom(t_addr asize, int awidth):
+  cl_mem(MEM_ROM, get_id_string(mem_classes, MEM_ROM), asize, awidth)
 {
   bp_map= new cl_bitmap(asize);
   inst_map= new cl_bitmap(asize);

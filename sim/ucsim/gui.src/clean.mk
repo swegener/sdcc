@@ -1,6 +1,6 @@
 # uCsim gui.src/clean.mk
 
-PKGS		= serio.src portmon.src
+PKGS		= serio.src
 
 # Deleting all files created by building the program
 # --------------------------------------------------

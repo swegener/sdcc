@@ -16,7 +16,8 @@ INSTALL		= @INSTALL@
 PRJDIR		= ..
 
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
-CPPFLAGS        = @CPPFLAGS@ -I. -I$(PRJDIR) -I$(PRJDIR)/cmd.src
+CPPFLAGS        = @CPPFLAGS@ -I. -I$(PRJDIR) \
+		  -I$(PRJDIR)/cmd.src -I$(PRJDIR)/gui.src
 CFLAGS          = @CFLAGS@ -Wall
 CXXFLAGS        = @CXXFLAGS@ -Wall
 M_OR_MM         = @M_OR_MM@
@@ -33,8 +34,8 @@ man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
 
-OBJECTS         = sim.o itsrc.o brk.o option.o arg.o stack.o \
-		  uc.o hw.o mem.o
+OBJECTS         = app.o sim.o itsrc.o brk.o option.o arg.o stack.o \
+		  guiobj.o uc.o hw.o mem.o
 
 
 # Compiling entire program or any subproject

@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (hwcl.h)
+ * Simulator of microcontrollers (sim.src/hwcl.h)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -27,17 +27,18 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 /* Abstract hw element. It can be a timer, serial line or whatever */
 
-#ifndef HWCL_HEADER
-#define HWCL_HEADER
+#ifndef SIM_HWCL_HEADER
+#define SIM_HWCL_HEADER
 
 #include "stypes.h"
 #include "pobjcl.h"
 #include "uccl.h"
+#include "guiobjcl.h"
 
 #include "newcmdcl.h"
 
 
-class cl_hw: public cl_base
+class cl_hw: public cl_guiobj
 {
 public:
   int flags;

@@ -69,5 +69,34 @@ get_id_string(struct id_element *ids, int id)
   return(ids[i].id_string);
 }
 
+char *
+get_id_string(struct id_element *ids, int id, char *def)
+{
+  char *s= get_id_string(ids, id);
+
+  return(s?s:def);
+}
+
+int
+get_string_id(struct id_element *ids, char *str)
+{
+  int i= 0;
+
+  while (ids[i].id_string &&
+	 strcmp(ids[i].id_string, str) != 0)
+    i++;
+  return(ids[i].id);
+}
+
+int
+get_string_id(struct id_element *ids, char *str, int def)
+{
+  int i= 0;
+
+  while (ids[i].id_string &&
+	 strcmp(ids[i].id_string, str) != 0)
+    i++;
+  return(ids[i].id_string?ids[i].id:def);
+}
 
 /* End of utils.cc */

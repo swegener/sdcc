@@ -9,15 +9,14 @@ STARTYEAR	= 1997
 SHELL		= /bin/sh
 
 PRJDIR		= .
-PKGS		= cmd.src sim.src s51.src avr.src z80.src doc
-#gui.src
+PKGS		= cmd.src sim.src gui.src s51.src avr.src z80.src doc
 
 srcdir          = .
 
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: main.mk
+all: checkconf
 	$(MAKE) -f main.mk all
 	@for pkg in $(PKGS); do\
 	  cd $$pkg && $(MAKE) $$pkg ; cd ..;\
@@ -151,22 +150,29 @@ lines:
 # Remaking configuration
 # ----------------------
 configure: configure.in
-	$(SHELL) autoconf
-
-main.mk: $(srcdir)/main_in.mk $(srcdir)/configure.in config.status
-	$(SHELL) ./config.status
+	@echo "RE-CREATING CONFIGURE"
+	$(SHELL) autoconf configure.in >configure
+	chmod 755 configure
 
 config.status: configure
-	$(SHELL) ./config.status --recheck
+	@echo "RE-CHECKING CONFIGURATION"
+	./config.status -recheck
 
-makefiles:
+makefiles: config.status
+	@echo "RE-MAKING MAKEFILES"
 	$(SHELL) ./config.status
 
-freshconf: main.mk
+main.mk: $(srcdir)/main_in.mk $(srcdir)/configure.in
+	@echo "RE-MAKING MAIN.MK"
+	$(SHELL) ./config.status
+
+freshconf: echo_freshconf configure main.mk
+
+echo_freshconf:
+	@echo "FRESHCONF"
 
 checkconf:
-	@if [ -f devel ]; then\
-	  $(MAKE) freshconf;\
-	fi
+	@echo "CHECKCONF"
+	@if [ -f devel ]; then $(MAKE) freshconf; fi
 
 # End of Makefile

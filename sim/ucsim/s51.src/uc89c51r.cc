@@ -71,32 +71,32 @@ t_uc89c51r::proc_write(uchar *addr)
 {
   t_uc51r::proc_write(addr);
 
-  if (addr == &(MEM(MEM_SFR)[CCAP0L]))
+  if (addr == &(/*MEM(MEM_SFR)*/sfr->umem8[CCAP0L]))
     mem(MEM_SFR)->set_bit0(CCAPM0, bmECOM);
-  if (addr == &(MEM(MEM_SFR)[CCAP0H]))
+  if (addr == &(/*MEM(MEM_SFR)*/sfr->umem8[CCAP0H]))
     mem(MEM_SFR)->set_bit1(CCAPM0, bmECOM);
 
-  if (addr == &(MEM(MEM_SFR)[CCAP1L]))
+  if (addr == &(/*MEM(MEM_SFR)*/sfr->umem8[CCAP1L]))
     mem(MEM_SFR)->set_bit0(CCAPM1, bmECOM);
-  if (addr == &(MEM(MEM_SFR)[CCAP1H]))
+  if (addr == &(/*MEM(MEM_SFR)*/sfr->umem8[CCAP1H]))
     mem(MEM_SFR)->set_bit1(CCAPM1, bmECOM);
 
-  if (addr == &(MEM(MEM_SFR)[CCAP2L]))
+  if (addr == &(/*MEM(MEM_SFR)*/sfr->umem8[CCAP2L]))
     mem(MEM_SFR)->set_bit0(CCAPM2, bmECOM);
-  if (addr == &(MEM(MEM_SFR)[CCAP2H]))
+  if (addr == &(/*MEM(MEM_SFR)*/sfr->umem8[CCAP2H]))
     mem(MEM_SFR)->set_bit1(CCAPM2, bmECOM);
 
-  if (addr == &(MEM(MEM_SFR)[CCAP3L]))
+  if (addr == &(/*MEM(MEM_SFR)*/sfr->umem8[CCAP3L]))
     mem(MEM_SFR)->set_bit0(CCAPM3, bmECOM);
-  if (addr == &(MEM(MEM_SFR)[CCAP3H]))
+  if (addr == &(/*MEM(MEM_SFR)*/sfr->umem8[CCAP3H]))
     mem(MEM_SFR)->set_bit1(CCAPM3, bmECOM);
 
-  if (addr == &(MEM(MEM_SFR)[CCAP4L]))
+  if (addr == &(/*MEM(MEM_SFR)*/sfr->umem8[CCAP4L]))
     mem(MEM_SFR)->set_bit0(CCAPM4, bmECOM);
-  if (addr == &(MEM(MEM_SFR)[CCAP4H]))
+  if (addr == &(/*MEM(MEM_SFR)*/sfr->umem8[CCAP4H]))
     mem(MEM_SFR)->set_bit1(CCAPM4, bmECOM);
 
-  if (addr == &(MEM(MEM_SFR)[AUXR]))
+  if (addr == &(/*MEM(MEM_SFR)*/sfr->umem8[AUXR]))
     mem(MEM_SFR)->set_bit0(AUXR, 0x04);
 }
 
@@ -225,9 +225,9 @@ t_uc89c51r::do_pca_counter(int cycles)
 {
   while (cycles--)
     {
-      if (++(MEM(MEM_SFR)[CL]) == 0)
+      if (/*++(MEM(MEM_SFR)[CL])*/sfr->add(CL, 1) == 0)
 	{
-	  if (++(MEM(MEM_SFR)[CH]) == 0)
+	  if (/*++(MEM(MEM_SFR)[CH])*/sfr->add(CH, 1) == 0)
 	    {
 	      /* CH,CL overflow */
 	      mem(MEM_SFR)->set_bit1(CCON, bmCF);
@@ -264,20 +264,24 @@ t_uc89c51r::do_pca_module(int nr)
       )
     {
       /* Capture */
-      MEM(MEM_SFR)[CCAPL[nr]]= MEM(MEM_SFR)[CL];
-      MEM(MEM_SFR)[CCAPH[nr]]= MEM(MEM_SFR)[CH];
+      //MEM(MEM_SFR)[CCAPL[nr]]= MEM(MEM_SFR)[CL];
+      sfr->set(CCAPL[nr], sfr->get(CL));
+      //MEM(MEM_SFR)[CCAPH[nr]]= MEM(MEM_SFR)[CH];
+      sfr->set(CCAPH[nr], sfr->get(CH));
       mem(MEM_SFR)->set_bit1(CCON, bmCCF[nr]);
     }
 
   if (ccapm & bmECOM)
     {
       /* Comparator enabled */
-      if (MEM(MEM_SFR)[CL] == MEM(MEM_SFR)[CCAPL[nr]] &&
-	  MEM(MEM_SFR)[CH] == MEM(MEM_SFR)[CCAPH[nr]])
+      /*if (MEM(MEM_SFR)[CL] == MEM(MEM_SFR)[CCAPL[nr]] &&
+	MEM(MEM_SFR)[CH] == MEM(MEM_SFR)[CCAPH[nr]])*/
+      if (sfr->get(CL) == sfr->get(CCAPL[nr]) &&
+	  sfr->get(CH) == sfr->get(CCAPH[nr]))
 	{
 	  /* Match */
 	  if (nr == 4 &&
-	      (MEM(MEM_SFR)[CMOD] & bmWDTE))
+	      (/*MEM(MEM_SFR)[CMOD]*/sfr->get(CMOD) & bmWDTE))
 	    {
 	      reset();
 	    }
@@ -285,16 +289,20 @@ t_uc89c51r::do_pca_module(int nr)
 	  if (ccapm & bmTOG)
 	    {
 	      /* Toggle */
-	      MEM(MEM_SFR)[P1]^= bmCEX[nr];
+	      //MEM(MEM_SFR)[P1]^= bmCEX[nr];
+	      sfr->set(P1, sfr->get(P1) ^ bmCEX[nr]);
 	    }
 	}
       if (ccapm & bmPWM)
 	{
 	  /* PWM */
-	  if (MEM(MEM_SFR)[CL] == 0)
-	    MEM(MEM_SFR)[CCAPL[nr]]= MEM(MEM_SFR)[CCAPH[nr]];
-	  if (MEM(MEM_SFR)[CL] < MEM(MEM_SFR)[CCAPL[nr]])
-	    MEM(MEM_SFR)[P1]&= ~(bmCEX[nr]);
+	  if (/*MEM(MEM_SFR)[CL]*/sfr->get(CL) == 0)
+	    //MEM(MEM_SFR)[CCAPL[nr]]= MEM(MEM_SFR)[CCAPH[nr]];
+	    sfr->set(CCAPL[nr], sfr->get(CCAPH[nr]));
+	  if (/*MEM(MEM_SFR)[CL]*/sfr->get(CL) <
+	      /*MEM(MEM_SFR)[CCAPL[nr]]*/sfr->get(CCAPL[nr]))
+	    //MEM(MEM_SFR)[P1]&= ~(bmCEX[nr]);
+	    sfr->set(P1, sfr->get(P1) & ~(bmCEX[nr]));
 	  else
 	    mem(MEM_SFR)->set_bit1(P1, bmCEX[nr]);
 	}

@@ -43,6 +43,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // cmd
 #include "cmdsetcl.h"
 #include "infocl.h"
+#include "setcl.h"
+#include "getcl.h"
+#include "showcl.h"
+#include "bpcl.h"
+#include "cmdguicl.h"
+#include "cmdconfcl.h"
 
 // local
 #include "simcl.h"
@@ -61,6 +67,7 @@ cl_sim::cl_sim(char *more_args, int iargc, char *iargv[]):
   arguments= new cl_list(2, 2);
   accept_args= more_args?strdup(more_args):0;
   in_files= new cl_ustrings(2, 2);
+  gui= new cl_gui(this);
 }
 
 int
@@ -70,14 +77,20 @@ cl_sim::init(void)
 
   cl_base::init();
   proc_arguments(argc, argv);
-  cmdset= mk_cmdset();
+  class cl_cmdset *cmdset= new cl_cmdset(this);
   cmdset->init();
-  build_cmd_set();
+  build_cmd_set(cmdset);
   if (!(uc= mk_controller()))
     return(1);
   uc->init();
-  cmd= mk_commander();
+  cmd= new cl_commander(cmdset, this);
   cmd->init();
+  char *Config= get_sarg(0, "Config");
+  if (Config)
+    {
+      class cl_console *con= cmd->mk_console(Config, 0/*"/dev/tty"*/, this);
+      cmd->add_console(con);
+    }
   if (cmd->cons->get_count() == 0)
     {
       fprintf(stderr, "No command console available.\n");
@@ -114,7 +127,7 @@ cl_sim::proc_arguments(int argc, char *argv[])
   char *opts, *cp;
 
   opts= (char*)malloc((accept_args?strlen(accept_args):0)+100);
-  strcpy(opts, "c:p:PX:vV");
+  strcpy(opts, "c:C:p:PX:vV");
 #ifdef SOCKET_AVAIL
   strcat(opts, "Z:r:");
 #endif
@@ -129,15 +142,19 @@ cl_sim::proc_arguments(int argc, char *argv[])
 	arguments->add(new cl_prg_arg('c', 0, optarg));
 	break;
 
+      case 'C':
+	arguments->add(new cl_prg_arg(0, "Config", optarg));
+	break;
+
 #ifdef SOCKET_AVAIL
       case 'Z':
 	// By Sandeep
-	arguments->add(new cl_prg_arg('Z', 0, (long long)1));
+	arguments->add(new cl_prg_arg('Z', 0, (long)1));
 	if (!optarg || !isdigit(*optarg))
 	  fprintf(stderr, "expected portnumber to follow -Z\n");
 	else {
 	  char *p;
-	  long long l= strtol(optarg, &p, 0);
+	  long l= strtol(optarg, &p, 0);
 	  arguments->add(new cl_prg_arg(0, "Zport", l));
 	}
 	break;
@@ -148,13 +165,13 @@ cl_sim::proc_arguments(int argc, char *argv[])
 	break;
 
       case 'P':
-	arguments->add(new cl_prg_arg('P', 0, (long long)1));
+	arguments->add(new cl_prg_arg('P', 0, (long)1));
 	break;
 
 #ifdef SOCKET_AVAIL
       case 'r':
 	arguments->add(new cl_prg_arg('r', 0,
-				      (long long)strtol(optarg, NULL, 0)));
+				      (long)strtol(optarg, NULL, 0)));
 	break;
 #endif
 
@@ -182,7 +199,7 @@ cl_sim::proc_arguments(int argc, char *argv[])
         break;
 
       case 'V':
-	arguments->add(new cl_prg_arg('V', 0, (long long)1));
+	arguments->add(new cl_prg_arg('V', 0, (long)1));
 	break;
 
       case '?':
@@ -252,7 +269,14 @@ cl_sim::get_iarg(char sname, char *lname)
       a= (class cl_prg_arg *)(arguments->at(i));
       if ((sname && a->short_name == sname) ||
 	  (lname && a->long_name && strcmp(a->long_name, lname) == 0))
-	return(a->get_ivalue());
+	{
+	  long iv;
+	  if (a->get_ivalue(&iv))
+	    return(iv);
+	  else
+	    //FIXME
+	    return(0);
+	}
     }
   return(0);
 }
@@ -306,29 +330,16 @@ cl_sim::get_parg(char sname, char *lname)
   return(0);
 }
 
-class cl_commander *
-cl_sim::mk_commander()
-{
-  class cl_commander *cmd= new cl_commander(this);
-  return(cmd);
-}
-
 class cl_uc *
 cl_sim::mk_controller(void)
 {
   return(new cl_uc(this));
 }
 
-class cl_cmdset *
-cl_sim::mk_cmdset(void)
-{
-  return(new cl_cmdset(this));
-}
-
 class cl_cmd_arg *
 cl_sim::mk_cmd_int_arg(long long i)
 {
-  class cl_cmd_arg *arg= new cl_cmd_int_arg(i);
+  class cl_cmd_arg *arg= new cl_cmd_int_arg(uc, i);
   arg->init();
   return(arg);
 }
@@ -336,7 +347,7 @@ cl_sim::mk_cmd_int_arg(long long i)
 class cl_cmd_arg *
 cl_sim::mk_cmd_sym_arg(char *s)
 {
-  class cl_cmd_arg *arg= new cl_cmd_sym_arg(s);
+  class cl_cmd_arg *arg= new cl_cmd_sym_arg(uc, s);
   arg->init();
   return(arg);
 }
@@ -344,7 +355,7 @@ cl_sim::mk_cmd_sym_arg(char *s)
 class cl_cmd_arg *
 cl_sim::mk_cmd_str_arg(char *s)
 {
-  class cl_cmd_arg *arg= new cl_cmd_str_arg(s);
+  class cl_cmd_arg *arg= new cl_cmd_str_arg(uc, s);
   arg->init();
   return(arg);
 }
@@ -352,7 +363,15 @@ cl_sim::mk_cmd_str_arg(char *s)
 class cl_cmd_arg *
 cl_sim::mk_cmd_bit_arg(class cl_cmd_arg *sfr, class cl_cmd_arg *bit)
 {
-  class cl_cmd_arg *arg= new cl_cmd_bit_arg(sfr, bit);
+  class cl_cmd_arg *arg= new cl_cmd_bit_arg(uc, sfr, bit);
+  arg->init();
+  return(arg);
+}
+
+class cl_cmd_arg *
+cl_sim::mk_cmd_array_arg(class cl_cmd_arg *aname, class cl_cmd_arg *aindex)
+{
+  class cl_cmd_arg *arg= new cl_cmd_array_arg(uc, aname, aindex);
   arg->init();
   return(arg);
 }
@@ -374,7 +393,9 @@ cl_sim::main(void)
 	{
 	  uc->do_inst(-1);
 	  if (cmd->input_avail())
-	    done= cmd->proc_input();
+	    {
+	      done= cmd->proc_input();
+	    }
 	}
       else
 	{
@@ -385,25 +406,23 @@ cl_sim::main(void)
   return(0);
 }
 
-int
+/*int
 cl_sim::do_cmd(char *cmdstr, class cl_console *console)
 {
   class cl_cmdline *cmdline;
-  class cl_cmd *cmd;
+  class cl_cmd *cm;
   int retval= 0;
 
-  cmdline= new cl_cmdline(cmdstr);
+  cmdline= new cl_cmdline(cmdstr, console);
   cmdline->init();
-  if (console->old_command(cmdline))
-    return(console->interpret(cmdstr));
-  cmd= cmdset->get_cmd(cmdline);
-  if (cmd)
-    retval= cmd->work(cmdline, console);
+  cm= cmd->cmdset->get_cmd(cmdline);
+  if (cm)
+    retval= cm->work(cmdline, console);
   delete cmdline;
-  if (cmd)
+  if (cm)
     return(retval);
   return(console->interpret(cmdstr));
-}
+}*/
 
 void
 cl_sim::start(class cl_console *con)
@@ -411,6 +430,7 @@ cl_sim::start(class cl_console *con)
   state|= SIM_GO;
   con->flags|= CONS_FROZEN;
   cmd->frozen_console= con;
+  cmd->set_fd_set();
 }
 
 void
@@ -460,103 +480,125 @@ cl_sim::stop(int reason)
       cmd->frozen_console->print_prompt();
       cmd->frozen_console= 0;
     }
+  cmd->set_fd_set();
 }
-
-
-/*
- * Obsolete methods for old commander
- */
-
-/*FILE *
-cl_sim::cmd_in(void)
-{
-  if (!cmd ||
-      cmd->cons->get_count() == 0)
-    return(stdin);
-  if (cmd->actual_console)
-    return(cmd->actual_console->in?cmd->actual_console->in:stdin);
-  class cl_console *con= (class cl_console *)(cmd->cons->at(0));
-  return(con->in?con->in:stdin);
-}*/
-
-/*FILE *
-cl_sim::cmd_out(void)
-{
-  if (!cmd ||
-      cmd->cons->get_count() == 0)
-    return(stdout);
-  if (cmd->actual_console)
-    return(cmd->actual_console->out?cmd->actual_console->out:stdout);
-  class cl_console *con= (class cl_console *)(cmd->cons->at(0));
-  return(con->out?con->out:stdout);
-}*/
 
 
 /*
  */
 
 void
-cl_sim::build_cmd_set(void)
+cl_sim::build_cmd_set(class cl_cmdset *cmdset)
 {
   class cl_cmd *cmd;
   class cl_cmdset *cset;
 
-  cmdset->add(cmd= new cl_conf_cmd(this, "conf", 0,
+  {
+    cset= new cl_cmdset(this);
+    cset->init();
+    cset->add(cmd= new cl_conf_cmd("_no_parameters_", 0,
 "conf               Configuration",
 "long help of conf"));
+    cmd->init();
+    cset->add(cmd= new cl_conf_addmem_cmd("addmem", 0,
+"conf addmem\n"
+"                   Make memory",
+"long help of conf addmem"));
+    cmd->init();
+  }
+  cmdset->add(cmd= new cl_super_cmd("conf", 0,
+"conf subcommand    Information, see `conf' command for more help",
+"long help of conf", cset));
   cmd->init();
 
-  cmdset->add(cmd= new cl_state_cmd(this, "state", 0,
+  cmdset->add(cmd= new cl_state_cmd("state", 0,
 "state              State of simulator",
 "long help of state"));
   cmd->init();
 
-  cmdset->add(cmd= new cl_file_cmd(this, "file", 0,
+  cmdset->add(cmd= new cl_file_cmd("file", 0,
 "file \"FILE\"        Load FILE into ROM",
 "long help of file"));
   cmd->init();
   cmd->add_name("load");
 
-  cmdset->add(cmd= new cl_dl_cmd(this, "download", 0,
+  cmdset->add(cmd= new cl_dl_cmd("download", 0,
 "download,dl          Load (intel.hex) data",
 "long help of download"));
   cmd->init();
   cmd->add_name("dl");
 
-  cset= new cl_cmdset(this);
-  cset->init();
-  cset->add(cmd= new cl_info_bp_cmd(this, "breakpoints", 0, 
+  {
+    cset= new cl_cmdset(this);
+    cset->init();
+    cset->add(cmd= new cl_info_bp_cmd("breakpoints", 0, 
 "info breakpoints   Status of user-settable breakpoints",
 "long help of info breakpoints"));
-  cmd->add_name("bp");
-  cmd->init();
-  cset->add(cmd= new cl_info_reg_cmd(this, "registers", 0, 
+    cmd->add_name("bp");
+    cmd->init();
+    cset->add(cmd= new cl_info_reg_cmd("registers", 0, 
 "info registers     List of integer registers and their contents",
 "long help of info registers"));
-  cmd->init();
-  cset->add(cmd= new cl_info_hw_cmd(this, "hardware", 0, 
+    cmd->init();
+    cset->add(cmd= new cl_info_hw_cmd("hardware", 0, 
 "info hardware cathegory\n"
 "                   Status of hardware elements of the CPU",
 "long help of info hardware"));
-  cmd->add_name("hw");
-  cmd->init();
-
-  cmdset->add(cmd= new cl_super_cmd(this, "info", 0,
+    cmd->add_name("h	w");
+    cmd->init();
+  }
+  cmdset->add(cmd= new cl_super_cmd("info", 0,
 "info subcommand    Information, see `info' command for more help",
 "long help of info", cset));
   cmd->init();
 
-  cmdset->add(cmd= new cl_get_cmd(this, "get", 0,
-"get                Get",
-"long help of get"));
+  {
+    cset= new cl_cmdset(this);
+    cset->init();
+    cset->add(cmd= new cl_get_sfr_cmd("sfr", 0,
+"get sfr address...\n"
+"                   Get value of addressed SFRs",
+"long help of get sfr"));
+    cmd->init();
+    cset->add(cmd= new cl_get_option_cmd("option", 0,
+"get option name\n"
+"                   Get value of an option",
+"long help of get option"));
+    cmd->init();
+  }
+  cmdset->add(cmd= new cl_super_cmd("get", 0,
+"get subcommand     Get, see `get' command for more help",
+"long help of get", cset));
   cmd->init();
 
-  cmdset->add(cmd= new cl_set_cmd(this, "set", 0,
-"set                Set",
-"long help of set"));
+  {
+    cset= new cl_cmdset(this);
+    cset->init();
+    cset->add(cmd= new cl_set_mem_cmd("memory", 0,
+"set memory memory_type address data...\n"
+"                   Place list of data into memory",
+"long help of set memory"));
+    cmd->init();
+    cset->add(cmd= new cl_set_bit_cmd("bit", 0,
+"set bit addr 0|1   Set specified bit to 0 or 1",
+"long help of set bit"));
+    cmd->init();
+    cset->add(cmd= new cl_set_port_cmd("port", 0,
+"set port hw data   Set data connected to port",
+"long help of set port"));
+    cmd->init();
+    cset->add(cmd= new cl_set_option_cmd("option", 0,
+"set option name value\n"
+"                   Set value of an option",
+"long help of set option"));
+    cmd->init();
+  }
+  cmdset->add(cmd= new cl_super_cmd("set", 0,
+"set subcommand     Set, see `set' command for more help",
+"long help of set", cset));
   cmd->init();
 
-  cmdset->add(cmd= new cl_timer_cmd(this, "timer", 0,
+  cmdset->add(cmd= new cl_timer_cmd("timer", 0,
 "timer a|d|g|r|s|v id [direction|value]\n"
 "                   Timer add|del|get|run|stop|value",
 "timer add|create|make id [direction] -- create a new timer\n"
@@ -567,83 +609,168 @@ cl_sim::build_cmd_set(void)
 "timer value id val -- set value of a timer to `val'"));
   cmd->init();
 
-  cmdset->add(cmd= new cl_run_cmd(this, "run", 0,
-"run                Go",
+  cmdset->add(cmd= new cl_run_cmd("run", 0,
+"run [start [stop]] Go",
 "long help of run"));
   cmd->init();
-  //cmd->add_name("g");
+  cmd->add_name("go");
+  cmd->add_name("r");
 
-  cmdset->add(cmd= new cl_step_cmd(this, "step", 0,
+  cmdset->add(cmd= new cl_stop_cmd("stop", 0,
+"stop               Stop",
+"long help of stop"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_step_cmd("step", 0,
 "step               Step",
 "long help of step"));
   cmd->init();
   cmd->add_name("s");
 
-  cmdset->add(cmd= new cl_reset_cmd(this, "reset", 0,
+  cmdset->add(cmd= new cl_next_cmd("next", 0,
+"next               Next",
+"long help of next"));
+  cmd->init();
+  cmd->add_name("n");
+
+  cmdset->add(cmd= new cl_pc_cmd("pc", 0,
+"pc [addr]          Set/get PC",
+"long help of pc"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_reset_cmd("reset", 0,
 "reset              Reset",
 "long help of reset"));
   cmd->init();
 
-  cmdset->add(cmd= new cl_dump_cmd(this, "dump", 0,
-"dump i|x|r|s [start [stop]]\n"
-"                   Dump memory",
+  cmdset->add(cmd= new cl_dump_cmd("dump", 0,
+"dump memory_type [start [stop [bytes_per_line]]]\n"
+"                   Dump memory of specified type\n"
+"dump bit...        Dump bits",
 "long help of dump"));
   cmd->init();
 
-  cmdset->add(cmd= new cl_di_cmd(this, "di", 0,
+  cmdset->add(cmd= new cl_di_cmd("di", 0,
 "di [start [stop]]  Dump Internal RAM",
 "long help of di"));
   cmd->init();
 
-  cmdset->add(cmd= new cl_dx_cmd(this, "dx", 0,
+  cmdset->add(cmd= new cl_dx_cmd("dx", 0,
 "dx [start [stop]]  Dump External RAM",
 "long help of dx"));
   cmd->init();
 
-  cmdset->add(cmd= new cl_ds_cmd(this, "ds", 0,
+  cmdset->add(cmd= new cl_ds_cmd("ds", 0,
 "ds [start [stop]]  Dump SFR",
 "long help of ds"));
   cmd->init();
 
-  cmdset->add(cmd= new cl_dch_cmd(this, "dch", 0,
+  cmdset->add(cmd= new cl_dch_cmd("dch", 0,
 "dch [start [stop]] Dump code in hex form",
 "long help of dch"));
   cmd->init();
 
-  cmdset->add(cmd= new cl_dc_cmd(this, "dc", 0,
+  cmdset->add(cmd= new cl_dc_cmd("dc", 0,
 "dc [start [stop]]  Dump code in disass form",
 "long help of dc"));
   cmd->init();
 
-  cmdset->add(cmd= new cl_break_cmd(this, "break", 0,
-"break addr [hit]   Set fix breakpoint",
+  cmdset->add(cmd= new cl_disassemble_cmd("disassemble", 0,
+"disassemble [start [offset [lines]]]\n"
+"                   Disassemble code",
+"long help of disassemble"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_fill_cmd("fill", 0,
+"fill memory_type start end data\n"
+"                   Fill memory region with data",
+"long help of fill"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_where_cmd("where", 0,
+"where memory_type data...\n"
+"                   Case unsensitive search for data",
+"long help of where"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_Where_cmd("Where", 0,
+"Where memory_type data...\n"
+"                   Case sensitive search for data",
+"long help of Where"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_break_cmd("break", 0,
+"break addr [hit]   Set fix breakpoint\n"
+"break mem_type r|w addr [hit]\n"
+"                   Set fix event breakpoint",
 "long help of break"));
   cmd->init();
 
-  cmdset->add(cmd= new cl_tbreak_cmd(this, "tbreak", 0,
-"tbreak addr [hit]  Set temporary breakpoint",
+  cmdset->add(cmd= new cl_tbreak_cmd("tbreak", 0,
+"tbreak addr [hit]  Set temporary breakpoint\n"
+"tbreak mem_type r|w addr [hit]\n"
+"                   Set temporary event breakpoint",
 "long help of tbreak"));
   cmd->init();
 
-  cmdset->add(cmd= new cl_clear_cmd(this, "clear", 0,
+  cmdset->add(cmd= new cl_clear_cmd("clear", 0,
 "clear [addr...]    Clear fix breakpoint",
 "long help of clear"));
   cmd->init();
 
-  cmdset->add(cmd= new cl_help_cmd(this, "help", 0,
-"help               Help",
+  cmdset->add(cmd= new cl_delete_cmd("delete", 0,
+"delete [nr...]     Delete breakpoint(s)",
+"long help of clear"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_help_cmd("help", 0,
+"help [command]     Help about command(s)",
 "long help of help"));
   cmd->init();
   cmd->add_name("?");
 
-  cmdset->add(cmd= new cl_quit_cmd(this, "quit", 0,
+  cmdset->add(cmd= new cl_quit_cmd("quit", 0,
 "quit               Quit",
 "long help of quit"));
   cmd->init();
 
-  cmdset->add(cmd= new cl_kill_cmd(this, "kill", 0,
+  cmdset->add(cmd= new cl_kill_cmd("kill", 0,
 "kill               Shutdown simulator",
 "long help of kill"));
+  cmd->init();
+
+  {
+    cset= new cl_cmdset(this);
+    cset->init();
+    cset->add(cmd= new cl_show_copying_cmd("copying", 0, 
+"show copying       Conditions for redistributing copies of uCsim",
+"long help of show copying"));
+    cmd->init();
+    cset->add(cmd= new cl_show_warranty_cmd("warranty", 0, 
+"show warranty      Various kinds of warranty you do not have",
+"long help of show warranty"));
+    cmd->init();
+  }
+  cmdset->add(cmd= new cl_super_cmd("show", 0,
+"show subcommand    Generic command for showing things about the uCsim",
+"long help of show", cset));
+  cmd->init();
+
+  {
+    cset= new cl_cmdset(this);
+    cset->init();
+    cset->add(cmd= new cl_gui_start_cmd("start", 0, 
+"gui start          Start interfacing with GUI tool",
+"long help of gui start"));
+    cmd->init();
+    cset->add(cmd= new cl_gui_stop_cmd("stop", 0, 
+"gui stop           Stop interfacing with GUI tool",
+"long help of gui stop"));
+    cmd->init();
+  }
+  cmdset->add(cmd= new cl_super_cmd("gui", 0,
+"gui subcommand     Operations to support GUI tools",
+"long help of gui", cset));
   cmd->init();
 }
 

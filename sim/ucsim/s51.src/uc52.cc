@@ -73,7 +73,7 @@ uchar *
 t_uc52::get_indirect(uchar addr, int *res)
 {
   *res= resGO;
-  return(&(MEM(MEM_IRAM)[addr]));
+  return(&(/*MEM(MEM_IRAM)*/iram->umem8[addr]));
 }
 
 
@@ -168,11 +168,13 @@ t_uc52::do_t2_baud(int cycles)
   if (t2con & bmTR2)
     while (cycles--)
       {
-	if (!++(MEM(MEM_SFR)[TL2]))
-	  if (!++(MEM(MEM_SFR)[TH2]))
+	if (!/*++(MEM(MEM_SFR)[TL2])*/sfr->add(TL2, 1))
+	  if (!/*++(MEM(MEM_SFR)[TH2])*/sfr->add(TH2, 1))
 	    {
-	      MEM(MEM_SFR)[TH2]= MEM(MEM_SFR)[RCAP2H];
-	      MEM(MEM_SFR)[TL2]= MEM(MEM_SFR)[RCAP2L];
+	      //MEM(MEM_SFR)[TH2]= MEM(MEM_SFR)[RCAP2H];
+	      sfr->set(TH2, sfr->get(RCAP2H));
+	      //MEM(MEM_SFR)[TL2]= MEM(MEM_SFR)[RCAP2L];
+	      sfr->set(TL2, sfr->get(RCAP2L));
 	      s_rec_t2++;
 	      s_tr_t2++;
 	    }
@@ -196,9 +198,9 @@ t_uc52::do_t2_capture(int *cycles, bool nocount)
     *cycles= 0;
   else
     {
-      if (!++(MEM(MEM_SFR)[TL2]))
+      if (!/*++(MEM(MEM_SFR)[TL2])*/sfr->add(TL2, 1))
 	{
-	  if (!++(MEM(MEM_SFR)[TH2]))
+	  if (!/*++(MEM(MEM_SFR)[TH2])*/sfr->add(TH2, 1))
 	    mem(MEM_SFR)->set_bit1(T2CON, bmTF2);
 	}
     }
@@ -207,8 +209,10 @@ t_uc52::do_t2_capture(int *cycles, bool nocount)
       !(p1 & port_pins[1] & bmT2EX) &&
       (t2con & bmEXEN2))
     {
-      MEM(MEM_SFR)[RCAP2H]= MEM(MEM_SFR)[TH2];
-      MEM(MEM_SFR)[RCAP2L]= MEM(MEM_SFR)[TL2];
+      //MEM(MEM_SFR)[RCAP2H]= MEM(MEM_SFR)[TH2];
+      sfr->set(RCAP2H, sfr->get(TH2));
+      //MEM(MEM_SFR)[RCAP2L]= MEM(MEM_SFR)[TL2];
+      sfr->set(RCAP2L, sfr->get(TL2));
       mem(MEM_SFR)->set_bit1(T2CON, bmEXF2);
       prev_p1&= ~bmT2EX; // Falling edge has been handled
     }
@@ -231,9 +235,9 @@ t_uc52::do_t2_reload(int *cycles, bool nocount)
     *cycles= 0;
   else
     {
-      if (!++(MEM(MEM_SFR)[TL2]))
+      if (!/*++(MEM(MEM_SFR)[TL2])*/sfr->add(TL2, 1))
 	{
-	  if (!++(MEM(MEM_SFR)[TH2]))
+	  if (!/*++(MEM(MEM_SFR)[TH2])*/sfr->add(TH2, 1))
 	    {
 	      mem(MEM_SFR)->set_bit1(T2CON, bmTF2);
 	      overflow++;
@@ -252,8 +256,10 @@ t_uc52::do_t2_reload(int *cycles, bool nocount)
   if (overflow ||
       ext2)
     {
-      MEM(MEM_SFR)[TH2]= MEM(MEM_SFR)[RCAP2H];
-      MEM(MEM_SFR)[TL2]= MEM(MEM_SFR)[RCAP2L];
+      //MEM(MEM_SFR)[TH2]= MEM(MEM_SFR)[RCAP2H];
+      sfr->set(TH2, sfr->get(RCAP2H));
+      //MEM(MEM_SFR)[TL2]= MEM(MEM_SFR)[RCAP2L];
+      sfr->set(TL2, sfr->get(RCAP2L));
     }
 }
 

@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (uccl.h)
+ * Simulator of microcontrollers (sim.src/uccl.h)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -25,8 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef UCCL_HEADER
-#define UCCL_HEADER
+#ifndef SIM_UCCL_HEADER
+#define SIM_UCCL_HEADER
 
 // prj
 #include "stypes.h"
@@ -78,6 +78,7 @@ public:
   class cl_list *counters;	// User definable timers (tickers)
   double xtal;			// Clock speed
 
+  int brk_counter;		// Number of breakpoints
   class brk_coll *fbrk;		// Collection of FETCH break-points
   class brk_coll *ebrk;		// Collection of EVENT breakpoints
   class cl_sim *sim;
@@ -99,34 +100,37 @@ public:
   virtual void reset(void);
 
   // making objects
-  virtual class cl_mem *mk_mem(enum mem_class type);
+  virtual class cl_mem *mk_mem(enum mem_class type, char *class_name);
   virtual t_addr get_mem_size(enum mem_class type);
   virtual int get_mem_width(enum mem_class type);
   virtual void mk_hw_elements(void);
 
   // manipulating memories
-  virtual ulong read_mem(enum mem_class type, long addr);
-  virtual ulong get_mem(enum mem_class type, long addr);
-  virtual void write_mem(enum mem_class type, long addr, ulong val);
-  virtual void set_mem(enum mem_class type, long addr, ulong val);
+  virtual ulong read_mem(enum mem_class type, t_addr addr);
+  virtual ulong get_mem(enum mem_class type, t_addr addr);
+  virtual void write_mem(enum mem_class type, t_addr addr, t_mem val);
+  virtual void set_mem(enum mem_class type, t_addr addr, t_mem val);
   virtual class cl_mem *mem(enum mem_class type);
-  virtual TYPE_UBYTE *MEM(enum mem_class type);
+  virtual class cl_mem *mem(char *class_name);
+  //virtual TYPE_UBYTE *MEM(enum mem_class type);
 
   // file handling
   virtual long read_hex_file(const char *name);
 
   // instructions, code analyzer
-  virtual void analyze(uint addr) {}
-  virtual bool inst_at(uint addr);
-  virtual void set_inst_at(uint addr);
-  virtual void del_inst_at(uint addr);
+  virtual void analyze(t_addr addr) {}
+  virtual bool inst_at(t_addr addr);
+  virtual void set_inst_at(t_addr addr);
+  virtual void del_inst_at(t_addr addr);
   virtual bool there_is_inst(void);
 
   // manipulating hw elements
-  virtual void register_hw_read(enum mem_class, long addr, class cl_hw *hw);
-  virtual void register_hw_write(enum mem_class, long addr, class cl_hw *hw);
+  virtual void register_hw_read(enum mem_class, t_addr addr, class cl_hw *hw);
+  virtual void register_hw_write(enum mem_class, t_addr addr, class cl_hw *hw);
   virtual class cl_hw *get_hw(enum hw_cath cath, int *idx);
+  virtual class cl_hw *get_hw(char *id_string, int *idx);
   virtual class cl_hw *get_hw(enum hw_cath cath, int hwid, int *idx);
+  virtual class cl_hw *get_hw(char *id_string, int hwid, int *idx);
 
   // "virtual" timers
   virtual int tick(int cycles);
@@ -141,7 +145,7 @@ public:
 
   // execution
   virtual t_mem fetch(void);
-  virtual bool fetch(ulong *code);
+  virtual bool fetch(t_mem *code);
   virtual int do_inst(int step);
   virtual void pre_inst(void);
   virtual int exec_inst(void);
@@ -156,27 +160,42 @@ public:
   virtual int st_ret(class cl_stack_op *op);
 
   // breakpoints
-  virtual class cl_fetch_brk *fbrk_at(long addr);
+  virtual class cl_fetch_brk *fbrk_at(t_addr addr);
   virtual class cl_ev_brk *ebrk_at(t_addr addr, char *id);
   //virtual void rm_fbrk(long addr);
+  virtual class cl_brk *brk_by_nr(int nr);
+  virtual class cl_brk *brk_by_nr(class brk_coll *bpcoll, int nr);
   virtual void rm_ebrk(t_addr addr, char *id);
+  virtual void rm_brk(int nr);
   virtual void put_breaks(void);
-  virtual void remove_breaks(void);
+  virtual void remove_all_breaks(void);
+  virtual int make_new_brknr(void);
+  virtual class cl_ev_brk *mk_ebrk(enum brk_perm perm, class cl_mem *mem,
+				   char op, t_addr addr, int hit);
 
   // disassembling and symbol recognition
-  virtual char *disass(uint addr, char *sep);
+  virtual char *disass(t_addr addr, char *sep);
   virtual struct dis_entry *dis_tbl(void);
   virtual struct name_entry *sfr_tbl(void);
   virtual struct name_entry *bit_tbl(void);
-  virtual void print_disass(uint addr, class cl_console *con);
+  virtual void print_disass(t_addr addr, class cl_console *con);
   virtual void print_regs(class cl_console *con);
-  virtual int inst_length(uint code);
-  virtual bool get_name(uint addr, struct name_entry tab[], char *buf);
+  virtual int inst_length(t_mem code);
+  virtual int longest_inst(void);
+  virtual bool get_name(t_addr addr, struct name_entry tab[], char *buf);
+  virtual bool extract_bit_address(t_addr bit_address,
+				   class cl_mem **mem,
+				   t_addr *mem_addr,
+				   t_mem *bit_mask) {return(DD_FALSE);}
+  virtual char *symbolic_bit_name(t_addr bit_address,
+				  class cl_mem *mem,
+				  t_addr mem_addr,
+				  t_mem bit_mask);
 
   /* Following fields and virtual methods defined in uc51 I don't have
      energy to redesign them:-( */
 public:
-  uchar port_pins[3];	// Port pins
+  uchar port_pins[4];	// Port pins
 public:
   virtual void proc_write(uchar *addr) {}
   virtual void set_p_flag(void) {}

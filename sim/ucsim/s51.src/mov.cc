@@ -276,7 +276,7 @@ t_uc51::inst_push(uchar code)
   int res;
 
   addr= get_direct(fetch(), &event_at.ri, &event_at.rs);
-  MEM(MEM_SFR)[SP]++;
+  sfr->add(SP, 1);
   sp= get_indirect(sfr->get(SP), &res);
   if (res != resGO)
     res= resSTACK_OV;
@@ -361,7 +361,7 @@ t_uc51::inst_pop(uchar code)
   sp= get_indirect(get_mem(MEM_SFR, SP), &res);
   if (res != resGO)
     res= resSTACK_OV;
-  MEM(MEM_SFR)[SP]--;
+  sfr->add(SP, -1);
   (*addr)= *sp;
   proc_write(addr);
   tick(1);
@@ -485,6 +485,7 @@ t_uc51::inst_movx_$dptr_a(uchar code)
 {
   set_mem(MEM_XRAM, event_at.wx= sfr->get(DPH)*256+sfr->get(DPL),
 	  sfr->get(event_at.rs= ACC));
+  tick(1);
   return(resGO);
 }
 

@@ -53,8 +53,7 @@ public:
   virtual struct dis_entry *dis_tbl(void);
   virtual struct name_entry *sfr_tbl(void);
   virtual struct name_entry *bit_tbl(void);
-  virtual char *disass(uint addr, char *sep);
-  virtual void print_disass(uint addr, class cl_console *con);
+  virtual char *disass(t_addr addr, char *sep);
   virtual void print_regs(class cl_console *con);
 
   virtual int exec_inst(void);

@@ -77,6 +77,7 @@ t_uc51::inst_jbc_bit_addr(uchar code)
       (*addr)&= ~BIT_MASK(bitaddr);
       PC= (PC + (signed char)jaddr) & (EROM_SIZE - 1);
     }
+  tick(1);
   return(resGO);
 }
 
@@ -382,6 +383,7 @@ t_uc51::inst_jmp_$a_dptr(uchar code)
   PC= (sfr->get(DPH)*256 + sfr->get(DPL) +
        read_mem(MEM_SFR, ACC)) &
     (EROM_SIZE - 1);
+  tick(1);
   return(resGO);
 }
 

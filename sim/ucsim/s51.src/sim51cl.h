@@ -36,9 +36,7 @@ class cl_sim51: public cl_sim
 public:
   cl_sim51(int iargc, char *iargv[]);
   virtual int proc_arg(char optopt, char *optarg);
-  virtual class cl_commander *mk_commander(void);
   virtual class cl_uc *mk_controller(void);
-  virtual void build_cmd_set(void);
 };
 
 

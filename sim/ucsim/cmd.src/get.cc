@@ -27,52 +27,85 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "ddconfig.h"
 
+#include <ctype.h>
+
 // sim
 #include "simcl.h"
+#include "optioncl.h"
 
 // local
 #include "cmdsetcl.h"
+#include "getcl.h"
+#include "cmdutil.h"
 
 
 /*
- * GET TIMER
+ * Command: get sfr
+ *----------------------------------------------------------------------------
  */
 
 int
-cl_get_cmd::timer(class cl_cmdline *cmdline, class cl_console *con)
+cl_get_sfr_cmd::do_work(class cl_sim *sim,
+			class cl_cmdline *cmdline, class cl_console *con)
 {
-  class cl_cmd_arg *params[4]= { cmdline->param(0),
-				 cmdline->param(1),
-				 cmdline->param(2),
-				 cmdline->param(3) };
-  int what;
-  class cl_ticker *ticker;
-  
-  if (params[1] != 0)
+  class cl_mem *mem= sim->uc->mem(MEM_SFR);
+  class cl_cmd_arg *parm;
+  int i;
+
+  if (!mem)
     {
-      what= (params[1])->get_ivalue();
-      if ((ticker= sim->uc->get_counter(what)) == 0)
-	{
-	  con->printf("Timer %d does not exist\n", what);
-	  return(0);
-	}
-      con->printf("timer #%d: %g sec (%lu clks)\n", what,
-		  ticker->get_rtime(sim->uc->xtal), ticker->ticks);
+      con->printf("Error: No SFR\n");
+      return(DD_FALSE);
     }
-  else
+  for (i= 0, parm= cmdline->param(i);
+       parm;
+       i++, parm= cmdline->param(i))
     {
-      con->printf("time: %g sec (%lu clks)\n",
-		  sim->uc->get_rtime(), sim->uc->ticks->ticks);
-      for (what= 0; what < sim->uc->counters->count; what++)
-	{
-	  ticker= sim->uc->get_counter(what);
-	  if (ticker)
-	    con->printf("timer #%d: %g sec (%lu clks)\n", what,
-			ticker->get_rtime(sim->uc->xtal), ticker->ticks);
-	}
+      if (!parm->as_address())
+	con->printf("Warning: Invalid address %s\n",
+		    (char*)cmdline->tokens->at(i+1));
+      else
+	mem->dump(parm->value.address, parm->value.address, 1, con);
     }
 
-  return(0);
+  return(DD_FALSE);;
+}
+
+
+/*
+ * Command: get option
+ *----------------------------------------------------------------------------
+ */
+
+int
+cl_get_option_cmd::do_work(class cl_sim *sim,
+			   class cl_cmdline *cmdline, class cl_console *con)
+{
+  class cl_cmd_arg *parm= cmdline->param(0);
+  char *s= 0;
+
+  if (!parm)
+    ;
+  else if (cmdline->syntax_match(sim, STRING)) {
+    s= parm->value.string.string;
+  }
+  else
+    con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+
+  int i;
+  for (i= 0; i < sim->uc->options->count; i++)
+    {
+      class cl_option *o= (class cl_option *)(sim->uc->options->at(i));
+      if (!s ||
+	  !strcmp(s, o->id))
+	{
+	  con->printf("%s ", o->id);
+	  o->print(con);
+	  con->printf(" %s\n", o->help);
+	}
+    }
+  
+  return(DD_FALSE);;
 }
 
 

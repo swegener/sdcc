@@ -1,3 +1,8 @@
+2004-08-14 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/mcs51/gen.c (genJumpTab): jumptables for more than 16 switch
+	cases use more compact code.
+
 2004-08-13 Slade Rich <slade_rich AT users.sourceforge.net>
 
 	* src/pic/gen.c: Fixed problem with fn returning a variable bigger than a char.

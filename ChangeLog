@@ -1,3 +1,10 @@
+2003-05-05  Karl Bongers(apply patches from Martin Helmling)
+
+	* debugger/mcs51/sdcdb.c,simi.c,cmd.c,symtab.c and .h files.
+  cache sfr, optimize next,step, fix off by one sourceline,
+  support ddd list function.
+	* sim/ucsim/cmd.src/newcmd.cc - small fix for sdcdb use.
+
 2003-05-04  Bernhard Held <bernhard@bernhardheld.de>
 
 	* support/regression/HTMLgen.py: added compare_s2f()

@@ -311,6 +311,14 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
         /* It's on the 10 bit stack, which is located in
          * far data space.
          */
+         
+         if (result)
+         {
+             fprintf(stderr, 
+             	     "*** Internal error: 10 bit stack var used as result.\n");
+             emitcode(";", "look at me!");
+         }
+         
         
         if ( _G.accInUse )
         	emitcode("push","acc");
@@ -321,14 +329,29 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
                    ((char)(sym->stack - _G.nRegsSaved )) :
                    ((char)sym->stack)) & 0xff);
         
+        if (/* result */ 1)
+        {
+            emitcode (";", "#switchDPTR(2)");
+        }
     	emitcode ("mov","dpx,#0x40");
     	emitcode ("mov","dph,#0x00");
     	emitcode ("mov", "dpl, a");
+    	if (/* result */ 1)
+    	{
+    	    emitcode (";", "#switchDPTR(1)");
+    	}
     	
         if ( _G.accInUse )
             emitcode("pop","acc");
             
-    	sym->aop = aop = newAsmop(AOP_DPTR);
+        if (/* !result */ 0)
+        {
+    	    sym->aop = aop = newAsmop(AOP_DPTR);
+    	}
+    	else
+    	{
+    	    sym->aop = aop = newAsmop(AOP_DPTR2);
+    	}
     	aop->size = getSize(sym->type); 
     	return aop;
     }
@@ -747,6 +770,13 @@ static char *aopGet (asmop *aop, int offset, bool bit16, bool dname)
 	return rs;
 	
     case AOP_DPTR:
+    case AOP_DPTR2:
+    
+    	if (aop->type == AOP_DPTR2)
+    	{
+    	    emitcode (";", "#switchDPTR(2)");
+    	}
+    
 	while (offset > aop->coff) {
 	    emitcode ("inc","dptr");
 	    aop->coff++;
@@ -764,6 +794,12 @@ static char *aopGet (asmop *aop, int offset, bool bit16, bool dname)
         }
 	else
 	    emitcode("movx","a,@dptr");
+	    
+    	if (aop->type == AOP_DPTR2)
+    	{
+    	    emitcode (";", "#switchDPTR(1)");
+    	}	    
+	    
 	return (dname ? "acc" : "a");
 	
 	
@@ -877,6 +913,13 @@ static void aopPut (asmop *aop, char *s, int offset)
 	break;
 	
     case AOP_DPTR:
+    case AOP_DPTR2:
+    
+        if (aop->type == AOP_DPTR2)
+    	{
+    	    emitcode (";", "#switchDPTR(2)");
+    	}
+    
 	if (aop->code) {
 	    werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
 		   "aopPut writting to code space");
@@ -899,6 +942,11 @@ static void aopPut (asmop *aop, char *s, int offset)
 	MOVA(s);        
 	
 	emitcode ("movx","@dptr,a");
+	
+    if (aop->type == AOP_DPTR2)
+    	{
+    	    emitcode (";", "#switchDPTR(1)");
+    	}	
 	break;
 	
     case AOP_R0:
@@ -1043,9 +1091,19 @@ static void reAdjustPreg (asmop *aop)
             while (size--)
                 emitcode("dec","%s",aop->aopu.aop_ptr->name);
             break;          
-        case AOP_DPTR : 
+        case AOP_DPTR :
+        case AOP_DPTR2:
+            if (aop->type == AOP_DPTR2)
+    	    {
+    	        emitcode (";", "#switchDPTR(2)");
+    	    } 
             while (size--)
                 emitcode("lcall","__decdptr");
+                
+    	    if (aop->type == AOP_DPTR2)
+    	    {
+    	        emitcode (";", "#switchDPTR(1)");
+    	    }                
             break;  
 
     }   
@@ -1059,7 +1117,8 @@ static void reAdjustPreg (asmop *aop)
                        AOP_TYPE(x) == AOP_R0))
 
 #define AOP_NEEDSACC(x) (AOP(x) && (AOP_TYPE(x) == AOP_CRY ||  \
-                        AOP_TYPE(x) == AOP_DPTR || AOP(x)->paged)) 
+                        AOP_TYPE(x) == AOP_DPTR || AOP_TYPE(x) == AOP_DPTR2 || \
+                         AOP(x)->paged)) 
 
 #define AOP_INPREG(x) (x && (x->type == AOP_REG &&                        \
                       (x->aopu.aop_reg[0] == mcs51_regWithIdx(R0_IDX) || \
@@ -2246,6 +2305,7 @@ static void genRet (iCode *ic)
     while (size--) {
 	    char *l ;
 	    if (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR) {
+	    	    /* #NOCHANGE */
 		    l = aopGet(AOP(IC_LEFT(ic)),offset++,
 			   FALSE,TRUE);
 		    emitcode("push","%s",l);
@@ -6222,7 +6282,7 @@ static void genGenPointerGet (operand *left,
     }
     /* so dptr know contains the address */
     freeAsmop(left,NULL,ic,TRUE);
-    aopOp(result,ic,FALSE);
+    aopOp(result,ic, /* FALSE */ TRUE); 
 
     /* if bit then unpack */
     if (IS_BITVAR(retype)) 
@@ -6981,12 +7041,26 @@ static void genAssign (iCode *ic)
     aopOp(right,ic,FALSE);
     
     /* special case both in far space */
+    /* However, if we are using 10 bit stack mode,
+     * the result should be held in DPTR2,
+     * so we can operate without the special case.
+     *
+     * I think.
+     */
     if (AOP_TYPE(right) == AOP_DPTR &&
 	IS_TRUE_SYMOP(result)       &&
 	isOperandInFarSpace(result)) {
-
-	genFarFarAssign (result,right,ic);
-        return ;
+	
+	if (!options.stack10bit)
+	{
+	    genFarFarAssign (result,right,ic);
+            return ;
+        }
+        else
+        {
+            fprintf(stderr, "*** 10bit stack opt 1\n");
+            emitcode(";", "look at me: optimization possible?\n");
+        }
     }
 
     aopOp(result,ic,TRUE);

@@ -28,7 +28,7 @@
 enum {
     AOP_LIT = 1,
     AOP_REG, AOP_DIR, 
-    AOP_DPTR,AOP_R0,AOP_R1,
+    AOP_DPTR, AOP_DPTR2, AOP_R0,AOP_R1,
     AOP_STK ,AOP_IMMD, AOP_STR,
     AOP_CRY, AOP_ACC };
 
@@ -42,6 +42,7 @@ typedef struct asmop {
 		     AOP_REG    -  is in registers
 		     AOP_DIR    -  direct just a name
 		     AOP_DPTR   -  dptr contains address of operand
+		     AOP_DPTR2  -  dptr2 contains address of operand (DS80C390 only).
 		     AOP_R0/R1  -  r0/r1 contains address of operand		   
 		     AOP_STK    -  should be pushed on stack this
 		                   can happen only for the result

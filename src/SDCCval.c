@@ -425,7 +425,7 @@ value *constVal (char *s)
   short hex = 0, octal = 0;
   char scanFmt[10];
   int scI = 0;
-  LONG_LONG sval;
+  double sval;
 
   val = newValue ();		/* alloc space for value   */
 
@@ -446,7 +446,7 @@ value *constVal (char *s)
   scanFmt[scI++] = '%';
 
   scanFmt[scI++] = 'l';
-  scanFmt[scI++] = 'l';
+  scanFmt[scI++] = 'f';
 
   if (octal)
     scanFmt[scI++] = 'o';

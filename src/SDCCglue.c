@@ -26,7 +26,7 @@
 #include <time.h>
 
 symbol *interrupts[256];
-extern char *aopLiteral (value *, int);
+/*extern char *aopLiteral (value *, int);*//* drdani Jan 30 2000 */
 void printIval (symbol *, link *, initList *, FILE *);
 extern int noAlloc;
 set *publics = NULL;		/* public variables */

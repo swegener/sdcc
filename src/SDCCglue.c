@@ -1480,7 +1480,7 @@ glue ()
       /* initialise the stack pointer */
       /* if the user specified a value then use it */
       if (options.stack_loc)
-	fprintf (asmFile, "\tmov\tsp,#%d\n", options.stack_loc);
+	fprintf (asmFile, "\tmov\tsp,#%d\n", options.stack_loc & 0xff);
       else
 	/* no: we have to compute it */
       if (!options.stackOnData && maxRegBank <= 3)

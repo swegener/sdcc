@@ -1165,21 +1165,25 @@ static void linkEdit (char **envp)
 	fprintf(lnkfile,"%s\n",linkOptions[i]);
 
     /* standard library path */
-    switch(options.model)
-    {
+    if (strcmp(port->target,"ds390")==0) {
+      c="ds390";
+    } else {
+      switch(options.model)
+	{
         case MODEL_SMALL:
-       	    c = "small";
-       	    break;
+	  c = "small";
+	  break;
        	case MODEL_LARGE:
-       	    c = "large";
-       	    break;
+	  c = "large";
+	  break;
        	case MODEL_FLAT24:
-       	    c = "flat24";
-       	    break;
+	  c = "flat24";
+	  break;
         default:
-            werror(W_UNKNOWN_MODEL, __FILE__, __LINE__);
-            c = "unknown";
-            break;
+	  werror(W_UNKNOWN_MODEL, __FILE__, __LINE__);
+	  c = "unknown";
+	  break;
+	}
     }
     fprintf (lnkfile,"-k %s/%s\n",SDCC_LIB_DIR/*STD_LIB_PATH*/,c);
 	    
@@ -1188,6 +1192,9 @@ static void linkEdit (char **envp)
 	fprintf (lnkfile,"-k %s\n",libPaths[i]);
         
     /* standard library files */
+    if (strcmp(port->target, "ds390")==0) {
+      fprintf (lnkfile,"-l %s\n",STD_DS390_LIB);
+    }
     fprintf (lnkfile,"-l %s\n",STD_LIB);
     fprintf (lnkfile,"-l %s\n",STD_INT_LIB);
     fprintf (lnkfile,"-l %s\n",STD_LONG_LIB);

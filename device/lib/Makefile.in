@@ -50,14 +50,15 @@ OBJECTS		= _atoi.rel _atol.rel _autobaud.rel _bp.rel _char2fs.rel \
 		  _strncpy.rel _strpbrk.rel _strrchr.rel _strspn.rel \
 		  _strstr.rel _strtok.rel _uchar2fs.rel _uint2fs.rel \
 		  _ulong2fs.rel malloc.rel serial.rel ser_ir.rel printfl.rel \
-		  printf_large.rel vprintf.rel puts.rel assert.rel _strcat.rel
+		  printf_large.rel vprintf.rel puts.rel gets.rel \
+		  assert.rel _strcat.rel
 SOURCES		= $(patsubst %.rel,%.c,$(OBJECTS))
 
 include incl.mk
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf models
+all: checkconf models modelDS390
 
 objects: $(OBJECTS)
 
@@ -70,6 +71,14 @@ models:
 	  mv *.cdb $$model; \
 	done
 
+modelDS390:
+	test -d ds390 || mkdir ds390
+	$(MAKE) CFLAGS="$(CFLAGS) -mds390 --model-flat24 \
+		--stack-10bit" objects
+	cd ds390; $(MAKE)
+	cp *.lib ds390
+	mv *.rel *.asm *.cdb ds390
+
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: installdirs
@@ -80,6 +89,8 @@ install: installdirs
 	 $(CP) $$model/*.asm $(datadir)/lib/$$model/; \
 	 $(CP) $$model/*.cdb $(datadir)/lib/$$model/; \
 	done
+	$(MAKE) modelDS390 
+	$(CP) ds390/*.lib ds390/*.rel ds390/*.asm ds390/*.cbd $(datadir)/lib/ds390
 
 
 # Deleting all the installed files
@@ -89,6 +100,7 @@ uninstall:
 	for model i $(MODELS); do \
 	  rm -rf $(datadir)/lib/$$model; \
 	done
+	rm -rf $(datadir)/lib/ds390
 
 
 # Performing self-test
@@ -109,7 +121,7 @@ installdirs:
 	 [ -d $(datadir)/lib/$$model ] || \
 	 mkdir -p $(datadir)/lib/$$model; \
 	done
-
+	[ -d $(datadir)/lib/ds390 ] || mkdir -p $(datadir)/lib/ds390
 
 # Creating dependencies
 # ---------------------

@@ -25,7 +25,13 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-int printf (const char *format, ...) reentrant
+#if defined(SDCC_MODEL_LARGE) || defined(SDCC_MODEL_FLAT24)
+#define XSPEC xdata
+#else
+#define XSPEC
+#endif
+
+int printf (XSPEC const char *format, ...) reentrant
 {
   va_list arg;
   int done;
@@ -37,7 +43,7 @@ int printf (const char *format, ...) reentrant
   return done;
 }
 
-int sprintf (const char *buf, const char *format, ...) reentrant
+int sprintf (const char *buf, XSPEC const char *format, ...) reentrant
 {
   va_list arg;
   int done;

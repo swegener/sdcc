@@ -9,13 +9,14 @@ clean:
 	for model in $(MODELS); do \
 	  rm -rf $$model; \
 	done
+	cd ds390; make clean
 
 
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------
 distclean: clean
 	rm -f Makefile *.dep
-
+	rm -f ds390/*.dep
 
 # Like clean but some files may still exist
 # -----------------------------------------

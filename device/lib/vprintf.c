@@ -27,8 +27,6 @@
 #include <ctype.h>
 #include <stdio.h>
 
-extern void putchar(const char);
-
 #define PTR value.p 
 
 /****************************************************************************/

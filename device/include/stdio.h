@@ -27,12 +27,21 @@
 
 #include <stdarg.h>
 
+#if defined(SDCC_MODEL_LARGE) || defined(SDCC_MODEL_FLAT24)
+#define XSPEC xdata
+#else
+#define XSPEC
+#endif
+
 extern printf_small (char *,...) reentrant;
-extern printf (const char *,...) reentrant;
+extern printf (XSPEC const char *,...) reentrant;
 extern int vprintf (const char *, va_list);
-extern int sprintf (const char *, const char *, ...) reentrant;
+extern int sprintf (const char *, XSPEC const char *, ...) reentrant;
 extern int vsprintf (const char *, const char *, va_list);
 extern int puts(const char *);
+extern char *gets(char *);
+extern char getchar(void);
+extern void putchar(char);
 #endif
 
 

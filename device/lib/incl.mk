@@ -1,1 +1,1 @@
-MODELS		= small large flat24
+MODELS		= small large flat24 

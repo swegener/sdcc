@@ -156,7 +156,7 @@ dumpEbbsToFileExt (char *ext, eBBlock ** ebbs, int count)
       strcpy (buffer, srcFileName);
       strcat (buffer, ext);
 
-      if (!(of = fopen (buffer, "a+")))
+      if (!(of = fopen (buffer, "w")))
 	{
 	  werror (E_FILE_OPEN_ERR, buffer);
 	  exit (1);

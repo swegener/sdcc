@@ -1619,17 +1619,20 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
       }	else { 
 	// shouldn't do that with float, array or structure unless to void
 	if (!IS_VOID(getSpec(type)) && 
-	    !(IS_CODEPTR(type) && IS_FUNC(optype))) {
+	    !(IS_CODEPTR(type) && IS_FUNC(type->next) && IS_FUNC(optype))) {
 	  werror(E_INCOMPAT_TYPES);
 	  errors++;
 	}
       }
     } else { // from a pointer to a pointer
       if (!TARGET_IS_Z80 && !TARGET_IS_GBZ80) {
-	if (implicit) { // if not to generic, they have to match 
-	  if ((!IS_GENPTR(type) && (DCL_TYPE(optype) != DCL_TYPE(type)))) {
-	    werror(E_INCOMPAT_PTYPES);
-	    errors++;
+	// if not a pointer to a function
+	if (!(IS_CODEPTR(type) && IS_FUNC(type->next) && IS_FUNC(optype))) {
+	  if (implicit) { // if not to generic, they have to match 
+	    if ((!IS_GENPTR(type) && (DCL_TYPE(optype) != DCL_TYPE(type)))) {
+	      werror(E_INCOMPAT_PTYPES);
+	      errors++;
+	    }
 	  }
 	}
       }

@@ -1,3 +1,8 @@
+2004-03-12 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/ds390/main.c (_ds390_genAssemblerPreamble): cosmetic change,
+	made ds390 register extensions look less like error messages
+
 2004-03-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCglue.c (printIvalPtr): fixed bug with pointer initializer

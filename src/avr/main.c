@@ -217,6 +217,7 @@ PORT avr_port = {
 	0,			/* leave ge */
 	0,			/* leave !=  */
 	0,			/* leave == */
-	FALSE,                        /* No array initializer support. */
+	FALSE,                  /* No array initializer support. */
+	0,                      /* no CSE cost estimation yet */
 	PORT_MAGIC
 };

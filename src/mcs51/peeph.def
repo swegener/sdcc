@@ -1007,6 +1007,15 @@ replace {
 //        mov  %1,%2
 //}
 
+// applies to f.e. scott-add.asm (--model-large)
+replace {
+        mov     r%1,a
+        mov     a,ar%1
+} by {
+        ;       Peephole 177    removed redundant mov
+        mov     r%1,a
+}
+
 replace {
         mov     a,%1
         mov     b,a
@@ -1036,15 +1045,6 @@ replace {
         clr     a
 }
 
-// saving 3 byte, 2 cycles, return(NULL) profits here
-replace {
-        mov     dpl,#0x00
-        mov     dph,#0x00
-} by {
-        ;       Peephole 181    used 16 bit load of dptr
-        mov     dptr,#0x0000
-}
-
 // saving 3 bytes, 2 cycles
 // provided by Bernhard Held <bernhard.held@de.westinghouse.com>
 replace {
@@ -1055,12 +1055,21 @@ replace {
         mov     dptr,#%1
 }
 
-// saving 3 byte, 2 cycles, return(float_constant) profits here
+// saving 3 byte, 2 cycles, return(NULL) profits here
+replace {
+        mov     dpl,#0x%1
+        mov     dph,#0x%2
+} by {
+        ;       Peephole 182.b  used 16 bit load of dptr
+        mov     dptr,#0x%2%1
+}
+
+// saving 3 byte, 2 cycles. Probably obsoleted by 182.b
 replace {
         mov     dpl,#%1
         mov     dph,#%2
 } by {
-        ;       Peephole 182    used 16 bit load of dptr
+        ;       Peephole 182.c  used 16 bit load of dptr
         mov     dptr,#(((%2)<<8) + %1)
 }
 
@@ -1110,7 +1119,7 @@ replace {
         movc    a,@a+dptr
         mov     %4,a
         inc     dptr
-        clr     a	
+        clr     a       
 } by {
         ;       Peephole 186.a  optimized movc sequence
         mov     dptr,#%1
@@ -1118,7 +1127,7 @@ replace {
         movc    a,@a+dptr
         mov     %2,a
         mov     acc,b
-        inc     dptr	
+        inc     dptr    
         movc    a,@a+dptr
         mov     %3,a
         mov     acc,b
@@ -1150,11 +1159,11 @@ replace {
         movc    a,@a+dptr
         mov     %2,a
         mov     acc,b
-        inc     dptr	
+        inc     dptr    
         movc    a,@a+dptr
         mov     %3,a
         mov     acc,b
-        inc     dptr	
+        inc     dptr    
 }
 
 replace {
@@ -1296,7 +1305,7 @@ replace {
 %3:
         sjmp    %8
 } by {
-        ;       Peephole 193    optimized misc jump sequence
+        ;       Peephole 193.b  optimized misc jump sequence
         cjne    %1,%2,%8
         mov     a,%4
         cjne    %5,%6,%8
@@ -1320,7 +1329,7 @@ replace {
 %3:
         sjmp    %8
 } by {
-        ;       Peephole 193.a  optimized misc jump sequence
+        ;       Peephole 193.c  optimized misc jump sequence
         cjne    @%1,%2,%8
         inc     %1
         cjne    @%1,%6,%8
@@ -1778,8 +1787,8 @@ replace {
 }
 
 replace {
-        dec	r%1
-        inc	r%1
+        dec     r%1
+        inc     r%1
 } by {
         ;       Peephole 222    removed dec/inc pair
 }
@@ -2213,3 +2222,195 @@ replace restart {
 	addc	a,%1
 }
 
+// peepholes 241.a to 241.c and 241.d to 241.f need to be in order
+replace {
+        cjne    r%1,#%2,%3
+        cjne    r%4,#%5,%3
+        cjne    r%6,#%7,%3
+        cjne    r%8,#%9,%3
+        mov     a,#0x01
+        sjmp    %10      
+%3:     
+        clr     a
+%10:     
+} by {
+        ;       Peephole 241.a  optimized compare
+        clr     a
+        cjne    r%1,#%2,%3
+        cjne    r%4,#%5,%3
+        cjne    r%6,#%7,%3
+        cjne    r%8,#%9,%3
+        inc     a
+%3:
+%10:
+} 
+
+// applies to f.e. time.c
+replace {
+        cjne    r%1,#%2,%3
+        cjne    r%4,#%5,%3
+        mov     a,#0x01
+        sjmp    %6      
+%3:     
+        clr     a
+%6:     
+} by {
+        ;       Peephole 241.b  optimized compare
+        clr     a
+        cjne    r%1,#%2,%3
+        cjne    r%4,#%5,%3
+        inc     a
+%3:
+%6:
+} 
+
+// applies to f.e. malloc.c
+replace {
+        cjne    r%1,#%2,%3
+        mov     a,#0x01
+        sjmp    %4
+%3:     
+        clr     a
+%4:     
+} by {
+        ;       Peephole 241.c  optimized compare
+        clr     a
+        cjne    r%1,#%2,%3
+        inc     a
+%3:
+%4:
+} 
+
+// applies to f.e. j = (k!=0x1000); 
+// with volatile idata long k;
+replace {
+        cjne    @r%1,#%2,%3
+	inc	r%1	
+        cjne    @r%1,#%4,%3
+	inc	r%1	
+        cjne    @r%1,#%5,%3
+	inc	r%1	
+        cjne    @r%1,#%6,%3
+        mov     a,#0x01
+        sjmp    %7      
+%3:     
+        clr     a
+%7:     
+} by {
+        ;       Peephole 241.d  optimized compare
+        clr     a
+        cjne    @r%1,#%2,%3
+	inc	r%1
+        cjne    @r%1,#%4,%3
+	inc	r%1
+        cjne    @r%1,#%5,%3
+	inc	r%1
+        cjne    @r%1,#%6,%3
+        inc     a
+%3:
+%7:
+} 
+
+// applies to f.e. j = (k!=0x1000); 
+// with volatile idata int k;
+replace {
+        cjne    @r%1,#%2,%3
+	inc	r%1	
+        cjne    @r%1,#%4,%3
+        mov     a,#0x01
+        sjmp    %7      
+%3:     
+        clr     a
+%7:     
+} by {
+        ;       Peephole 241.e  optimized compare
+        clr     a
+        cjne    @r%1,#%2,%3
+	inc	r%1
+        cjne    @r%1,#%4,%3
+        inc     a
+%3:
+%7:
+} 
+
+// applies to f.e. vprintf.asm (--stack-auto)
+replace {
+        cjne    @r%1,#%2,%3
+        mov     a,#0x01
+        sjmp    %7
+%3:     
+        clr     a
+%7:     
+} by {
+        ;       Peephole 241.f  optimized compare
+        clr     a
+        cjne    @r%1,#%2,%3
+        inc     a
+%3:
+%7:
+} 
+
+// applies to f.e. scott-bool1.c
+replace {
+        jnz     %1
+        mov     %2,%3
+%1:
+        jz      %4
+} by {
+        ;       Peephole 242.a  avoided branch jnz to jz
+        jnz     %1
+        mov     %2,%3
+        jz      %4
+%1:
+} if labelRefCount %1 1
+
+// applies to f.e. scott-bool1.c
+replace {
+        jnz     %1
+        mov     %2,%3
+        orl     a,%5
+%1:
+        jz      %4
+} by {
+        ;       Peephole 242.b  avoided branch jnz to jz
+        jnz     %1
+        mov     %2,%3
+        orl     a,%5
+        jz      %4
+%1:
+} if labelRefCount %1 1
+
+// applies to f.e. logic.c
+replace {
+        jnz     %1
+        mov     %2,%3
+        orl     a,%5
+        orl     a,%6
+        orl     a,%7
+%1:
+        jz      %4
+} by {
+        ;       Peephole 242.c  avoided branch jnz to jz
+        jnz     %1
+        mov     %2,%3
+        orl     a,%5
+        orl     a,%6
+        orl     a,%7
+        jz      %4
+%1:
+} if labelRefCount %1 1
+
+// applies to f.e. vprintf.c
+// this is a rare case, usually the "tail increment" is noticed earlier
+replace {
+        cjne    %1,%2,%3
+        inc     %4
+%3:
+        sjmp    %5      
+} by {
+        ;       Peephole 243    avoided branch to sjmp
+        cjne    %1,%2,%5
+        inc     %4
+%3:
+        sjmp    %5      
+} if labelInRange

@@ -386,7 +386,7 @@ extern sym_link *__multypes[3][2];
 /* Dims: to/from float, BYTE/WORD/DWORD, SIGNED/USIGNED */
 extern symbol *__conv[2][3][2];
 /* Dims: shift left/shift right, BYTE/WORD/DWORD, SIGNED/UNSIGNED */
-symbol *__rlrr[2][3][2];
+extern symbol *__rlrr[2][3][2];
 
 #define CHARTYPE	__multypes[0][0]
 #define UCHARTYPE	__multypes[0][1]

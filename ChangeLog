@@ -1,3 +1,8 @@
+2003-01-28  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/ds390/gen.c: fix deps by replacing <common.h> with "common.h"
+	* src/SDCC.lex: rename P_OVERLAY to P_OVERLAY_ for cross-gcc 3.2 MINGW32 
+
 2003-01-26    <johan@balder>
 
 	* src/SDCClrange.c:  fixed Bernhard's "char * code ptr = &c"
@@ -7,7 +12,7 @@
 
 2003-01-26  Bernhard Held <bernhard@bernhardheld.de>
 
-	* as/mcs51/strcmpi.c: added, provides as_strcmpi(); strcmpi() is not ANSI
+	* as/mcs51/strcmpi.c: added, provides Aurelien Jarno's as_strcmpi(); strcmpi() is not ANSI
 	* as/mcs51/strcmpi.h: added
 	* as/mcs51/asm.h: remove ugly "#define strcmpi strcmp"
 	* as/mcs51/aslink.h: remove ugly "#define strcmpi strcmp"

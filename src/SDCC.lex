@@ -77,7 +77,8 @@ struct options  save_options  ;
      P_CALLEE_SAVES,
      P_EXCLUDE   ,
      P_LOOPREV   ,
-     P_OVERLAY
+     P_OVERLAY_	     /* I had a strange conflict with P_OVERLAY while */
+     		     /* cross-compiling for MINGW32 with gcc 3.2 */
  };
 
 %}
@@ -460,7 +461,7 @@ void doPragma (int op, char *cp)
     case P_LOOPREV:
 	optimize.noLoopReverse = 1;
 	break;
-    case P_OVERLAY:
+    case P_OVERLAY_:
 	break; /* notyet */
     }
 }

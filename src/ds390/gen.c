@@ -30,7 +30,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include <common.h>
+#include "common.h"
 #include "ralloc.h"
 #include "gen.h"
 #include "SDCCglobl.h"

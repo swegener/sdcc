@@ -1,3 +1,14 @@
+2004-01-20 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c (genPlusIncr, genUminus, genMinusDec, genCmp,
+	shiftL2Left2Result): fixed bug #879326
+	(genAnd, genOr, genXor): fixed bug when result was of type AOP_CRY
+	(genMultOneByte): fixed bug in signed vs unsigned multiplication
+	* sim/ucsim/hc08.src/inst.cc (inst_clr): added missing effective
+	address fetch for clr instruction
+	* device/lib/hc08/_mulint.c: created optimized assembly version
+	* src/SDCCdflow.c (computeDataFlow): fixed bug #878209
+
 2004-01-19 Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCicode.c (geniCodeArray): applied patch from Stas Sergeev

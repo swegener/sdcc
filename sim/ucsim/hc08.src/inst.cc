@@ -673,6 +673,7 @@ cl_hc08::inst_clr(t_mem code, bool prefix)
   else if ((code & 0xf0) == 0x50)
     regs.X = operand;
   else {
+    ea = fetchea(code,prefix);
     store1(ea, operand);
   }
   return(resGO);

@@ -26,12 +26,78 @@
    has the same precision as the input.
 
    Assembler-functions are provided for:
-     ds390
-     mcs51 small
-     mcs51 small stack-auto
-     mcs51 large
+     hc08
+     hc08 stack-auto
 */
 
+
+#if !defined(_SDCC_NO_ASM_LIB_FUNCS)
+
+#pragma save
+#pragma less_pedantic
+int
+_mulint (int a, int b)
+{
+  a,b;	/* reference to make compiler happy */
+
+#if !defined(SDCC_STACK_AUTO)
+   _asm
+   	ais #-2
+	psha
+	pshx
+
+	ldx __mulint_PARM_2+1
+	mul
+	sta 4,s
+	stx 3,s
+
+	lda 1,s
+	ldx __mulint_PARM_2+1
+	mul
+	add 3,s
+	sta 3,s
+
+	lda 2,s
+	ldx __mulint_PARM_2
+	mul
+	add 3,s
+	sta 3,s
+
+	ais #2
+	pulx
+	pula
+   _endasm;
+#else
+   _asm
+   	ais #-2
+	psha
+	pshx
+
+	ldx 8,s
+	mul
+	sta 4,s
+	stx 3,s
+
+	lda 1,s
+	ldx 8,s
+	mul
+	add 3,s
+	sta 3,s
+
+	lda 2,s
+	ldx 7,s
+	mul
+	add 3,s
+	sta 3,s
+
+	ais #2
+	pulx
+	pula
+#endif
+}
+#pragma restore
+
+#else
 
 union uu {
 	struct { unsigned char hi,lo ;} s;
@@ -60,6 +126,7 @@ _mulint (int a, int b)
 
        return t.t;
 }
+#endif
 
 
 #undef _MULINT_ASM

@@ -90,6 +90,9 @@ struct cpu_entry
 #define CPU_XA		0x0001
 #define CPU_ALL_XA	(CPU_XA)
 
+#define CPU_HC08	0x0001
+#define CPU_ALL_HC08	(CPU_HC08)
+
 #define CPU_CMOS	0x0001
 #define CPU_HMOS	0x0002
 

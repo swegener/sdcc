@@ -1,8 +1,8 @@
-# Port specification for the xxxx port running with uCsim
-#
-
 # path to uCsim
-UCHC08 = $(SDCC_DIR)/bin/shc08
+UCHC08A = $(SDCC_DIR)/sim/ucsim/hc08.src/shc08
+UCHC08B = $(SDCC_DIR)/bin/shc08
+
+UCHC08 = $(shell if [ -f $(UCHC08A) ]; then echo $(UCHC08A); else echo $(UCHC08B); fi)
 
 SDCCFLAGS +=-mhc08 --less-pedantic --out-fmt-ihx -DREENTRANT=
 #SDCCFLAGS +=--less-pedantic -DREENTRANT=reentrant

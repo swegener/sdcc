@@ -1,3 +1,8 @@
+2004-03-05 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/mcs51/peephole.def: added 251.b and 253.x. 253.x are applied
+	more than 500 times in the regression tests
+
 2004-03-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/Util/SDCCerr.h,

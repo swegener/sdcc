@@ -65,7 +65,7 @@ regs regsXA51[]={
   {0x25, 2, REG_PTR, "r5",  0x0c00, 10, 1, NULL}, 
   {0x26, 2, REG_PTR, "r6",  0x3000, 12, 1, NULL}, 
   {0x27, 2, REG_STK, "r7",  0xc000, 14, 1, NULL}, // r7=SP
-#if 0 // some derivates have even more! (only word access and gpr use)
+#if 0 // some derivates have even more! (only bit/word access no ptr use)
   {0x28, 2, REG_GPR, "r8",  0x10000, 16, 1, NULL},
   {0x29, 2, REG_GPR, "r9",  0x20000, 18, 1, NULL},
   {0x2a, 2, REG_GPR, "r10", 0x40000, 20, 1, NULL},
@@ -194,7 +194,7 @@ static bool allocReg (short size, short type, symbol *sym,
   checkRegMask(__FUNCTION__);
 
   if (!silent) {
-    fprintf (stderr, "allocReg (0x%08x) for %s size:%d, type:%s ", 
+    fprintf (stderr, "allocReg (%08x) for %s size:%d, type:%s ", 
 	     xa51RegsInUse,
 	     sym->name,
 	     size, regTypeToStr(type));

@@ -56,6 +56,7 @@
 #define BETTER_LITERAL_SHIFT
 
 char *aopLiteral (value * val, int offset);
+extern int allocInfo;
 
 /* this is the down and dirty file with all kinds of
    kludgy & hacky stuff. This is what it is all about
@@ -11780,8 +11781,7 @@ gen390Code (iCode * lic)
     fReturn = fReturn16;
     options.stack10bit=0;
   }
-#if 0
-  //REMOVE ME!!!
+#if 1
   /* print the allocation information */
   if (allocInfo)
     printAllocInfo (currFunc, codeOutFile);
@@ -11817,7 +11817,8 @@ gen390Code (iCode * lic)
 			ic->level, ic->block);
 	      _G.debugLine = 0;
 	    }
-	  emitcode (";", "%s %d", ic->filename, ic->lineno);
+	  emitcode ("", ";\t%s:%d: %s", ic->filename, ic->lineno, 
+		    printCLine(ic->filename, ic->lineno));
 	  cln = ic->lineno;
 	}
       /* if the result is marked as

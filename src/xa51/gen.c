@@ -3,6 +3,7 @@
    genIfx
    genAddrOf
    genPointerSet
+   genPointerGet
 */
 
 /*-------------------------------------------------------------------------
@@ -139,6 +140,15 @@ static void emitcode (char *inst, char *fmt,...) {
   va_end (ap);
 }
 
+char *getStackOffset(int stack) {
+  static char gsoBuf[1024];
+  sprintf (gsoBuf, "r7%+d+0%+d%+d", stack,
+	   FUNC_ISISR(currFunc->type) ? 
+	     port->stack.isr_overhead : port->stack.call_overhead,
+	   _G.nRegsSaved);
+  return gsoBuf;
+}
+
 /*-----------------------------------------------------------------*/
 /* newAsmop - creates a new asmOp                                  */
 /*-----------------------------------------------------------------*/
@@ -171,16 +181,17 @@ char *aopTypeName(asmop *aop) {
 /* aopForSym - for a true symbol                                   */
 /*-----------------------------------------------------------------*/
 static asmop *aopForSym(symbol *sym, bool result) {
+  int size;
   asmop *aop;
 
   sym->aop = aop = newAsmop(0);
-  aop->size=getSize(sym->type);
+  size=aop->size=getSize(sym->type);
 
-  // if it is in registers
+  // if the sym has registers
   if (sym->nRegs && sym->regs[0]) {
     aop->type=AOP_REG;
     sprintf (aop->name[0], sym->regs[0]->name);
-    if (sym->regs[1]) {
+    if (size>2) {
       sprintf (aop->name[1], sym->regs[1]->name);
     }
     return aop;
@@ -189,11 +200,9 @@ static asmop *aopForSym(symbol *sym, bool result) {
   // if it is on stack
   if (sym->onStack) {
     aop->type=AOP_STK;
-    sprintf (aop->name[0], "[r7%+d+0%+d%+d]", sym->stack, 
-	     FUNC_ISISR(currFunc->type) ? 6 : 4, _G.nRegsSaved);
-    if (aop->size > 2) {
-      sprintf (aop->name[1], "[r7%+d+2%+d%+d]", sym->stack,
-	       FUNC_ISISR(currFunc->type) ? 6 : 4, _G.nRegsSaved);
+    sprintf (aop->name[0], "[%s]", getStackOffset(sym->stack));
+    if (size > 2) {
+      sprintf (aop->name[1], "[%s]", getStackOffset(sym->stack+2));
     }
     return aop;
   }
@@ -214,18 +223,23 @@ static asmop *aopForSym(symbol *sym, bool result) {
   if (IN_DIRSPACE(SPEC_OCLS(sym->etype))) {
     aop->type=AOP_DIR;
     sprintf (aop->name[0], sym->rname);
+    if (size>2) {
+      sprintf (aop->name[0], "%s+2", sym->rname);
+    }
     return aop;
   }
 
   // if in code space
   if (IN_CODESPACE(SPEC_OCLS(sym->etype))) {
     if (result) {
-      fprintf (stderr, "aopForSym: result can not be in code space\n");
-      exit (1);
+      bailOut("aopForSym: result can not be in code space");
     }
     aop->type=AOP_CODE;
     emitcode ("mov", "r0,#%s", sym->rname);
-    sprintf (aop->name[0], "r0");
+    sprintf (aop->name[0], "[r0]");
+    if (size>2) {
+      sprintf (aop->name[1], "[r0+1]");
+    }
     return aop;
   }
 
@@ -233,12 +247,15 @@ static asmop *aopForSym(symbol *sym, bool result) {
   if (IN_FARSPACE(SPEC_OCLS(sym->etype))) {
     aop->type=AOP_FAR;
     emitcode ("mov", "r0,#%s", sym->rname);
-    sprintf (aop->name[0], "r0");
+    sprintf (aop->name[0], "[r0]");
+    if (size>2) {
+      sprintf (aop->name[1], "[r0+1]");
+    }
     return aop;
   }
 
-  fprintf (stderr, "aopForSym (%s): What's up?\n", sym->name);
-  exit (1);
+  bailOut("aopForSym");
+  return NULL;
 }
 
 /*-----------------------------------------------------------------*/
@@ -283,8 +300,7 @@ static asmop *aopForVal(operand *op) {
 	return aop;
       }
   }
-  fprintf (stderr, "aopForVal: unknown type\n");
-  exit (1);
+  bailOut ("aopForVal: unknown type");
   return NULL;
 }
 
@@ -296,23 +312,20 @@ static void aopOp(operand *op, bool result) {
   }
   if (IS_VALOP(op)) {
     if (result) {
-      fprintf (stderr, "aopOp: result can not be a value\n");
-      exit (1);
+      bailOut("aopOp: result can not be a value");
     }
     aopForVal (op);
     return;
   }
 
-  fprintf (stderr, "aopOp: unexpected operand\n");
-  exit (1);
+  bailOut("aopOp: unexpected operand");
 }
 
 char *opRegName(operand *op, int offset, char *opName) {
 
   if (IS_SYMOP(op)) {
     if (OP_SYMBOL(op)->onStack) {
-      sprintf (opName, "[r7%+d+0%+d%+d]", OP_SYMBOL(op)->stack, 
-	       FUNC_ISISR(currFunc->type) ? 6 : 4, _G.nRegsSaved);
+      sprintf (opName, "[%s]", getStackOffset(OP_SYMBOL(op)->stack));
       return opName;
     }
     if (IS_TRUE_SYMOP(op))
@@ -320,7 +333,7 @@ char *opRegName(operand *op, int offset, char *opName) {
     else if (OP_SYMBOL(op)->regs[offset])
       return OP_SYMBOL(op)->regs[offset]->name;
     else
-      return "NULL";
+      bailOut("opRegName: unknown regs");
   }
 
   if (IS_VALOP(op)) {
@@ -329,9 +342,7 @@ char *opRegName(operand *op, int offset, char *opName) {
     case V_BIT:
       if (SPEC_CVAL(OP_VALUE(op)->type).v_int &&
 	  SPEC_CVAL(OP_VALUE(op)->type).v_int != 1) {
-	fprintf (stderr, "opRegName: invalid bit value (%d)\n",
-		 SPEC_CVAL(OP_VALUE(op)->type).v_int);
-	exit (1);
+	bailOut("opRegName: invalid bit value");
       }
       // fall through
     case V_CHAR:
@@ -345,17 +356,15 @@ char *opRegName(operand *op, int offset, char *opName) {
       }
       break;
     case V_FLOAT:
-      sprintf (opName, "#0x%02lx", SPEC_CVAL(OP_VALUE(op)->type).v_long);
+      sprintf (opName, "#%f", SPEC_CVAL(OP_VALUE(op)->type).v_float);
       break;
     default: 
-      fprintf (stderr, "opRegName: unexpected noun\n");
-      exit (1);
+      bailOut("opRegName: unexpected noun");
     }
     return opName;
   }
-  fprintf (stderr, "opRegName: unexpected operand type\n");
-  exit (1);
-  return NULL; // to keep the compiler happy
+  bailOut("opRegName: unexpected operand type");
+  return NULL;
 }
 
 char * printOp (operand *op) {
@@ -436,8 +445,7 @@ char * printOp (operand *op) {
     strcat (line, nounName(operandType(op)));
     strcat (line, "]");
   } else {
-    fprintf (stderr, "printOp: unexpected operand type\n");
-    exit (1);
+    bailOut("printOp: unexpected operand type");
   }
   return line;
 }
@@ -473,8 +481,7 @@ static char *toBoolean (operand * op) {
       return "z";
     }
 
-  fprintf (stderr, "toBoolean: unknown size %d\n", AOP_SIZE(op));
-  exit (1);
+  bailOut("toBoolean: unknown size");
   return NULL;
 }
 
@@ -629,7 +636,28 @@ genEndFunction (iCode * ic)
 /* genRet - generate code for return statement                     */
 /*-----------------------------------------------------------------*/
 static void genRet (iCode * ic) {
+
   printIc ("genRet", ic, 0,1,0);
+
+  aopOp(IC_LEFT(ic),FALSE);
+
+  switch (AOP_SIZE(IC_LEFT(ic)))
+    {
+    case 4:
+      emitcode ("mov", "r1,%s", AOP_NAME(IC_LEFT(ic))[1]);
+      emitcode ("mov", "r0,%s", AOP_NAME(IC_LEFT(ic))[0]);
+      return;
+    case 3:
+      emitcode ("mov", "r1l,%s", AOP_NAME(IC_LEFT(ic))[1]);
+      // fall through
+    case 2:
+      emitcode ("mov", "r0,%s", AOP_NAME(IC_LEFT(ic))[0]);
+      return;
+    case 1:
+      emitcode ("mov", "r0l,%s", AOP_NAME(IC_LEFT(ic))[0]);
+      return;
+    }
+  bailOut("genRet");
 }
 
 /*-----------------------------------------------------------------*/
@@ -691,19 +719,37 @@ static void genMod (iCode * ic) {
 /*-----------------------------------------------------------------*/
 /* genCmpGt :- greater than comparison                             */
 /*-----------------------------------------------------------------*/
-static void genCmpGt (iCode * ic, iCode * ifx) {
+static void genCmpGt (iCode * ic) {
+  printIc ("genCmpGt", ic, 1,1,1);
+}
+/*-----------------------------------------------------------------*/
+/* genCmpGt :- greater than comparison                             */
+/*-----------------------------------------------------------------*/
+static void genCmpLe (iCode * ic) {
+  printIc ("genCmpGt", ic, 1,1,1);
+}
+/*-----------------------------------------------------------------*/
+/* genCmpGt :- greater than comparison                             */
+/*-----------------------------------------------------------------*/
+static void genCmpGe (iCode * ic) {
+  printIc ("genCmpGt", ic, 1,1,1);
+}
+/*-----------------------------------------------------------------*/
+/* genCmpGt :- greater than comparison                             */
+/*-----------------------------------------------------------------*/
+static void genCmpNe (iCode * ic) {
   printIc ("genCmpGt", ic, 1,1,1);
 }
 /*-----------------------------------------------------------------*/
 /* genCmpLt - less than comparisons                                */
 /*-----------------------------------------------------------------*/
-static void genCmpLt (iCode * ic, iCode * ifx) {
+static void genCmpLt (iCode * ic) {
   printIc ("genCmpLt", ic, 1,1,1);
 }
 /*-----------------------------------------------------------------*/
 /* genCmpEq - generates code for equal to                          */
 /*-----------------------------------------------------------------*/
-static void genCmpEq (iCode * ic, iCode * ifx) {
+static void genCmpEq (iCode * ic) {
   printIc ("genCmpEq", ic, 1,1,1);
 }
 
@@ -857,7 +903,7 @@ static void genPointerGet (iCode * ic, iCode *pi) {
   aopOp(result,TRUE);
 
   if (IS_GENPTR(operandType(left))) {
-    emitcode ("INLINE", "_gptrget %s %s= [%s,%s]", 
+    emitcode ("INLINE", "_gptrget %s %s = [%s %s]", 
 	      AOP_NAME(result)[0], AOP_NAME(result)[1],
 	      AOP_NAME(left)[0], AOP_NAME(left)[1]);
     return;
@@ -868,16 +914,30 @@ static void genPointerGet (iCode * ic, iCode *pi) {
     case AOP_CODE:
       instr="movc";
       // fall through
-    case AOP_REG:
-    case AOP_DIR:
     case AOP_FAR:
-    case AOP_STK:
+      emitcode (instr, "%s,[%s]", AOP_NAME(result)[0], AOP_NAME(left)[0]);
+      if (AOP_SIZE(result) > 2) {
+	emitcode (instr, "%s,[%s+2]", AOP_NAME(result)[1], AOP_NAME(left)[0]);
+      }
+      return;
+    case AOP_DIR:
+      emitcode (instr, "%s,%s", AOP_NAME(result)[0], AOP_NAME(left)[0]);
+      if (AOP_SIZE(result) > 2) {
+	emitcode (instr, "%s,%s+2", AOP_NAME(result)[1], AOP_NAME(left)[0]);
+      }
+      return;
+    case AOP_REG:
       emitcode (instr, "%s,[%s]", AOP_NAME(result)[0], AOP_NAME(left)[0]);
       if (AOP_SIZE(result) > 2) {
 	emitcode (instr, "%s,[%s]", AOP_NAME(result)[1], AOP_NAME(left)[1]);
       }
       return;
-    case AOP_GPTR:
+    case AOP_STK:
+      emitcode (instr, "%s,%s", AOP_NAME(result)[0], AOP_NAME(left)[0]);
+      if (AOP_SIZE(result) > 2) {
+	emitcode (instr, "%s,%s", AOP_NAME(result)[1], AOP_NAME(left)[1]);
+      }
+      return;
     }
   bailOut ("genPointerGet: unknown pointer");
 }
@@ -900,7 +960,7 @@ static void genPointerSet (iCode * ic, iCode *pi) {
   aopOp(result,TRUE);
 
   if (IS_GENPTR(operandType(result))) {
-    emitcode ("INLINE", "_gptrset %s,%s= [%s,%s]", 
+    emitcode ("INLINE", "_gptrset [%s %s]=  %s %s", 
 	      AOP_NAME(result)[0], AOP_NAME(result)[1],
 	      AOP_NAME(right)[0], AOP_NAME(right)[1]);
     return;
@@ -960,10 +1020,10 @@ static void genIfx (iCode * ic, iCode * popIc) {
     case AOP_STK:
       tlbl=newiTempLabel(NULL);
       emitcode ("cmp", "%s,#0", AOP_NAME(cond)[0]);
-      emitcode (trueOrFalse ? "bne" : "beq", "%05d$", tlbl->key+100);
+      emitcode (trueOrFalse ? "beq" : "bne", "%05d$", tlbl->key+100);
       if (AOP_SIZE(cond) > 2) {
 	emitcode ("cmp", "%s,#0", AOP_NAME(cond)[1]);
-	emitcode (trueOrFalse ? "bne" : "beq", "%05d$", tlbl->key+100);
+	emitcode (trueOrFalse ? "beq" : "bne", "%05d$", tlbl->key+100);
       }
       emitcode ("jmp", "%05d$", jlbl->key+100);
       emitcode ("", "%05d$:", tlbl->key+100);
@@ -1023,8 +1083,7 @@ static void genAssign (iCode * ic) {
   printIc ("genAssign", ic, 1,0,1);
   
   if (!IS_SYMOP(result)) {
-    fprintf (stderr, "genAssign: result is not a symbol\n");
-    exit (1);
+    bailOut("genAssign: result is not a symbol");
   }
   
   aopOp(right, FALSE);
@@ -1095,8 +1154,48 @@ static void genCast (iCode * ic) {
 /* genDjnz - generate decrement & jump if not zero instrucion      */
 /*-----------------------------------------------------------------*/
 static bool genDjnz (iCode * ic, iCode * ifx) {
-  printIc ("genDjnz", ic, 0,0,0);
-  return FALSE;
+  symbol *lbl, *lbl1;
+
+  if (!ifx)
+    return 0;
+
+  /* if the if condition has a false label
+     then we cannot save */
+  if (IC_FALSE (ifx))
+    return 0;
+
+  /* if the minus is not of the form
+     a = a - 1 */
+  if (!isOperandEqual (IC_RESULT (ic), IC_LEFT (ic)) ||
+      !IS_OP_LITERAL (IC_RIGHT (ic)))
+    return 0;
+
+  if (operandLitValue (IC_RIGHT (ic)) != 1)
+    return 0;
+
+  /* if the size of this greater than two then no
+     saving */
+  if (getSize (operandType (IC_RESULT (ic))) > 2)
+    return 0;
+
+  printIc ("genDjnz", ic, 1,1,1);
+
+  /* otherwise we can save BIG */
+  lbl = newiTempLabel (NULL);
+  lbl1 = newiTempLabel (NULL);
+
+  aopOp (IC_RESULT (ic), TRUE);
+
+  if (AOP_TYPE(IC_RESULT(ic))==AOP_REG || AOP_TYPE(IC_RESULT(ic))==AOP_DIR) {
+    emitcode ("djnz", "%s,%05d$", AOP_NAME(IC_RESULT(ic)), lbl->key+100);
+    emitcode ("bra", "%05d$", lbl1->key + 100);
+    emitcode ("", "%05d$:", lbl->key + 100);
+    emitcode ("jmp", "%05d$", IC_TRUE (ifx)->key + 100);
+    emitcode ("", "%05d$:", lbl1->key + 100);
+    return TRUE;
+  }
+    bailOut("genDjnz: aop type");
+    return FALSE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1141,7 +1240,8 @@ void genXA51Code (iCode * lic) {
 		  ic->level, ic->block);
 	_G.debugLine = 0;
       }
-      emitcode (";", "%s %d", ic->filename, ic->lineno);
+      emitcode ("", ";\t%s:%d: %s", ic->filename, ic->lineno, 
+		printCLine(ic->filename, ic->lineno));
       cln = ic->lineno;
     }
     /* if the result is marked as
@@ -1235,25 +1335,27 @@ void genXA51Code (iCode * lic) {
 	break;
 	
       case '>':
-	genCmpGt (ic, ifxForOp (IC_RESULT (ic), ic));
+	genCmpGt (ic);
 	break;
 	
       case '<':
-	genCmpLt (ic, ifxForOp (IC_RESULT (ic), ic));
+	genCmpLt (ic);
 	break;
 	
       case LE_OP:
-      case GE_OP:
-      case NE_OP:
-	
-	/* note these two are xlated by algebraic equivalence
-	   during parsing SDCC.y */
-	werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-		"got '>=' or '<=' shouldn't have come here");
+	genCmpLe (ic);
 	break;
-	
+
+      case GE_OP:
+	genCmpGe (ic);
+	break;
+
+      case NE_OP:
+	genCmpNe (ic);
+	break;
+
       case EQ_OP:
-	genCmpEq (ic, ifxForOp (IC_RESULT (ic), ic));
+	genCmpEq (ic);
 	break;
 	
       case AND_OP:

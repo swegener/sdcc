@@ -8812,7 +8812,8 @@ gen51Code (iCode * lic)
 			ic->level, ic->block);
 	      _G.debugLine = 0;
 	    }
-	  emitcode (";", "%s %d", ic->filename, ic->lineno);
+	  emitcode ("", ";\t%s:%d: %s", ic->filename, ic->lineno, 
+		    printCLine(ic->filename, ic->lineno));
 	  cln = ic->lineno;
 	}
       /* if the result is marked as

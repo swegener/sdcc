@@ -44,6 +44,11 @@ static char *_xa51_keywords[] =
   NULL
 };
 
+extern int rewinds;
+void   _xa51_genAssemblerEnd () {
+  fprintf (stderr, "Did %d rewind%c for c-line in asm comments\n", rewinds,
+	   rewinds==1 ? '\0' : 's');
+}
 
 void xa51_assignRegisters (eBBlock ** ebbs, int count);
 
@@ -262,20 +267,20 @@ PORT xa51_port =
   _xa51_getRegName,
   _xa51_keywords,
   _xa51_genAssemblerPreamble,
-  NULL,				/* no genAssemblerEnd */
+  _xa51_genAssemblerEnd,
   _xa51_genIVT,
   _xa51_genXINIT,
   _xa51_reset_regparm,
   _xa51_regparm,
-  NULL,
-  NULL,
-  NULL,
-  FALSE,
+  NULL, // process_pragma()
+  NULL, // getMangledFunctionName()
+  NULL, // hasNativeMulFor()
+  TRUE, // use_dw_for_init
   0,				/* leave lt */
   0,				/* leave gt */
-  1,				/* transform <= to ! > */
-  1,				/* transform >= to ! < */
-  1,				/* transform != to !(a == b) */
+  0,				/* transform <= to ! > */
+  0,				/* transform >= to ! < */
+  0,				/* transform != to !(a == b) */
   0,				/* leave == */
   FALSE,                        /* No array initializer support. */
   cseCostEstimation,

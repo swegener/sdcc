@@ -31,6 +31,9 @@
 #ifndef __PIC16_STDIO_H
 #define __PIC16_STDIO_H 1
 
+/* link the C library */
+#pragma library c
+
 #include <stdarg.h>
 
 #include <sdcc-lib.h>
@@ -44,25 +47,26 @@
   typedef unsigned int size_t;
 #endif
 
-typedef void (*pfn_outputchar)(char c, void* p) _REENTRANT;
+//typedef void (*pfn_outputchar)(char c, void* p) _REENTRANT;
 
-extern int _print_format (pfn_outputchar pfn, void* pvoid, const char *format, va_list ap);
+//extern int _print_format (pfn_outputchar pfn, void* pvoid, const char *format, va_list ap);
 
 /*-----------------------------------------------------------------------*/
 
-extern void printfl(char *, ...);
+extern void printf_small(char *, ...);
 
-//extern void printf_small (char *,...) _REENTRANT;
-extern int printf (const char *,...);
-extern int vprintf (const char *, va_list);
+extern int printf (char *,...);
+extern int vprintf (char *, va_list);
+
 extern int sprintf (char *, const char *, ...);
 extern int vsprintf (char *, const char *, va_list);
-extern int puts(const char *);
-extern char *gets(char *);
-extern char getchar(void);
+
+extern int puts(char *);
 
 #pragma wparam putchar
 extern void putchar(char);
 
+extern char *gets(char *);
+extern char getchar(void);
 
 #endif /* __PIC16_STDIO_H */

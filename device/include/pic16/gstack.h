@@ -29,6 +29,9 @@
 #ifndef __PIC16_GSTACK_H__
 #define __PIC16_GSTACK_H__
 
+/* link the debug library */
+#pragma library debug
+
 extern void (* _gstack_overflow_handler)(void);
 
 #endif	/* __PIC16_GSTACK_H__ */

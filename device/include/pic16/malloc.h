@@ -17,7 +17,7 @@
 #ifndef __MALLOC_H__
 #define __MALLOC_H__
 
-#include <../asm/pic16/features.h>
+#pragma library c
 
 #define EMULATION	0
 

@@ -28,6 +28,8 @@
 #ifndef __PIC16_MATH_H
 #define __PIC16_MATH_H	1
 
+#pragma library math
+
 #include <sdcc-lib.h>
 
 #define PI          3.1415926536

@@ -14,10 +14,13 @@
 
 DIRS	=	ctype \
 		stdlib \
+		stdio \
 		string \
 		utils
 
-LIB	= libp18c.lib
+LOBJS	= $(patsubst %,%/*.o,$(DIRS))
+
+LIB	= libc18f.lib
 
 all: build-libraries
 
@@ -27,7 +30,7 @@ build-libraries:
 	for dir in $(DIRS) ; do	 \
 		$(MAKE) -C $$dir ; \
 	done;
-	gplib -c $(LIB) string/*.o
+	gplib -c $(LIB) $(LOBJS)
 	mv -v $(LIB) ../bin
 	
 

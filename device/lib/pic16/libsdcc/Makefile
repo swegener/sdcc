@@ -16,9 +16,12 @@ DIRS	=	char \
 		int \
 		long \
 		float \
-		gptr \
-		lregs
+		gptr
 
+#		lregs
+#		fixed16_16
+
+LOBJS	= $(patsubst %,%/*.o,$(DIRS))
 
 LIB	= libsdcc.lib
 
@@ -30,7 +33,7 @@ build-libraries:
 	for dir in $(DIRS) ; do	 \
 		$(MAKE) -C $$dir ; \
 	done;
-	gplib -c $(LIB) char/*.o int/*.o long/*.o float/*.o gptr/*.o lregs/*.o
+	gplib -c $(LIB) $(LOBJS)
 	mv -v $(LIB) ../bin
 	
 

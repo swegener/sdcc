@@ -1,3 +1,33 @@
+2005-01-22 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* .version: bumped version number to 2.4.8
+	* device/lib/pic16/pics.all: list of PIC18F devices supported by
+	pic16 port,
+	* device/lib/pic16/libio/i2c/: I2C module support library,
+	* device/include/pic16/i2c.h: I2C support library header,
+	* device/lib/pic16/libc/stdio/: standard IO support sources,
+	* (printf_small.c): printf_small() source, supports float print,
+	* (printf_tiny.c): printf_tiny() source, does not support floats,
+	* device/lib/pic16/Makefile.common.in: added OPT_FLAGS macro to
+	enable global optimizations for entire library source, other
+	Makefiles in the source tree are also modified to reflect this,
+	* device/lib/pic16/libc/stdlib/putchar.c (putchar): dummy putchar()
+	function,
+	* doc/sdccman.lyx: updated to reflect new changes,
+	* src/pic16/gen.c (aopForSym): don't handle sym->iaccess in
+	sym->onStack if-case,
+	* src/pic16/main.c (_pic16_keywords): commented out keywords bit,
+	sbit, idata, _idata, xdata, _xdata,
+	* added pragma library, to link an external library, (see doc),
+	* removed command line options, --pomit-config-words, --pomit-ivt,
+	--pleave-reset-vector,
+	* (pic16_finaliseOptions): when define macro SDCC_MODEL_{SMALL/LARGE}
+	when calling assembler to reflect memory model used, also define
+	macro STACK_MODEL_{SMALL/LARGE} when compiling and assembling to
+	reflect stack model used,
+	* src/pic16/ralloc.c (pic16_allocDirReg): when operand is allocated
+	on stack return NULL,
+
 2005-01-22 Daniel Winkler <post AT danielwinkler.de>
 
 	* src/SDCCopt.c (killDeadCode): do not throw iCodes away if one

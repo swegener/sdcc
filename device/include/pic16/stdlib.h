@@ -31,6 +31,8 @@
 #ifndef __PIC16_STDLIB_H
 #define __PIC16_STDLIB_H 1
 
+#pragma library c
+
 #ifndef NULL
 # define NULL (void *)0
 #endif
@@ -41,11 +43,11 @@ extern float atof (char *);
 extern int atoi (char *);
 extern long atol (char *);
 
-extern void uitoa(unsigned int, char*, unsigned char);
-extern void itoa(unsigned int, char*, unsigned char);
+extern void uitoa(unsigned int, data char *, unsigned char);
+extern void itoa(unsigned int, data char*, unsigned char);
 
-extern void ultoa(unsigned long, char*, unsigned char);
-extern void ltoa(unsigned long, char*, unsigned char);
+extern void ultoa(unsigned long, data char *, unsigned char);
+extern void ltoa(unsigned long, data char*, unsigned char);
 
 extern char x_ftoa(float, data char *, unsigned char, unsigned char);
 

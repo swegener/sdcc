@@ -35,7 +35,8 @@ SRCS	=	fs2schar \
 		uint2fs \
 		ulong2fs
 
-#COMPILE_FLAGS	+= --obanksel=9
+LOCAL_FLAGS	=
+COMPILE_FLAGS	+= $(LOCAL_FLAGS)
 
 include ../Makefile.rules
 
@@ -43,7 +44,7 @@ all: build-library
 
 build-library: $(LIB)
 
-$(LIB): $(OFILES)
+$(LIB): $(OFILES) clean-intermediate-no-asm
 	@echo Creating $(LIB) ...
 	@for object in $(OFILES) ; do \
 		if [ ! -e $(LIB) ]; then \

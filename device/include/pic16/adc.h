@@ -30,6 +30,8 @@
 #ifndef __ADC_H__
 #define __ADC_H__
 
+/* link I/O libarary */
+#pragma library io
 
 /* interrupt on/off flag */
 #define ADC_INT_OFF	0x00

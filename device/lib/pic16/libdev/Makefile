@@ -20,25 +20,30 @@ PRJDIR	= ../../../..
 INCDIR	= $(PRJDIR)/device/include
 
 
+# MCUs to build
+MCUS	= $(shell cat ../pics.build)
+
 # Supported devices
-DEVS	= 	18f242 \
-		18f248 \
-		18f252 \
-		18f258 \
-		18f442 \
-		18f448 \
-		18f452 \
-		18f458 \
-		18f1220 \
-		18f2220 \
-		18f6520 \
-		18f6620 \
-		18f6680 \
-		18f6720 \
-		18f8520 \
-		18f8620 \
-		18f8680 \
-		18f8720
+DEVS	= $(patsubst	%,18f%,$(MCUS))
+
+#DEVS	= 	18f242 \
+#		18f248 \
+#		18f252 \
+#		18f258 \
+#		18f442 \
+#		18f448 \
+#		18f452 \
+#		18f458 \
+#		18f1220 \
+#		18f2220 \
+#		18f6520 \
+#		18f6620 \
+#		18f6680 \
+#		18f6720 \
+#		18f8520 \
+#		18f8620 \
+#		18f8680 \
+#		18f8720
 
 
 # pic16 port specific headers
@@ -66,7 +71,7 @@ LFILE	= $(patsubst %.c,%.lib,$<)
 	
 all: make-lib
 
-make-lib: $(LFILES)
+make-lib: $(LFILES) clean-intermediate-no-asm
 	@$(MV) -v $(LFILES) ../bin
 	
 $(LFILES): $(OFILES)
@@ -76,6 +81,9 @@ $(OFILES): $(CFILES)
 
 clean-intermediate:
 	$(RM) -f *.lst *.asm *.dump*
+
+clean-intermediate-no-asm:
+	$(RM) -f *.lst *.dump*
 	
 clean: clean-intermediate
 	$(RM) -f *.o

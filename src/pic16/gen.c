@@ -6,7 +6,7 @@
   Bug Fixes  -  Wojciech Stryjewski  wstryj1@tiger.lsu.edu (1999 v2.1.9a)
   PIC port   -  Scott Dattalo scott@dattalo.com (2000)
   PIC16 port -  Martin Dubuc m.dubuc@rogers.com (2002)
-             -  Vangelis Rokas vrokas@otenet.gr (2003,2004)
+             -  Vangelis Rokas vrokas@otenet.gr (2003,2004,2005)
   
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -648,11 +648,29 @@ static asmop *aopForSym (iCode *ic, operand *op, bool result)
     }
 #endif
 
+
+#if 0
+    if(sym->iaccess) {
+      if(space->paged) {
+        fprintf(stderr, "%s:%d symbol %s points to paged data\n", __FILE__, __LINE__, sym->name);
+
+        sym->aop = aop = newAsmop (AOP_PAGED);
+        aop->aopu.aop_dir = sym->rname ;
+        aop->size = getSize(sym->type);
+	DEBUGpic16_emitcode(";","%d sym->rname = %s, size = %d",__LINE__,sym->rname,aop->size);
+	pic16_allocDirReg( IC_LEFT(ic) );
+        return aop;
+      }
+      assert( 0 );
+    }
+#endif
+    
 #if 1
     /* assign depending on the storage class */
     /* if it is on the stack or indirectly addressable */
     /* space we need to assign either r0 or r1 to it   */    
-    if (sym->onStack || sym->iaccess) {
+    if (sym->onStack)	// || sym->iaccess)
+    {
       pCodeOp *pcop[4];
       int i;
       
@@ -857,6 +875,10 @@ static asmop *aopForSym (iCode *ic, operand *op, bool result)
 	else if(sym->onStack) {
 	        aop->size = PTRSIZE;
         } else {
+          if(SPEC_SCLS(sym->etype) == S_PDATA) {
+            fprintf(stderr, "%s: %d symbol in PDATA space\n", __FILE__, __LINE__);
+            aop->size = FPTRSIZE;
+          } else
 		assert( 0 );
 	}
 
@@ -1172,6 +1194,7 @@ void pic16_aopOp (operand *op, iCode *ic, bool result)
     b) has a spill location */
     if (sym->isspilt || sym->nRegs == 0) {
 
+//      debugf2("%s:%d symbol %s\tisspilt: %d\tnRegs: %d\n", sym->isspilt, sym->nRegs);
       DEBUGpic16_emitcode(";","%d",__LINE__);
         /* rematerialize it NOW */
         if (sym->remat) {
@@ -1544,6 +1567,21 @@ char *pic16_aopGet (asmop *aop, int offset, bool bit16, bool dname)
       rs = Safe_calloc(1,strlen(s)+1);
       strcpy(rs,s);   
       return rs;
+
+#if 0
+    case AOP_PAGED:
+      DEBUGpic16_emitcode(";","oops AOP_PAGED did this %s\n",s);
+      if (offset) {
+	sprintf(s,"(%s + %d)",
+		aop->aopu.aop_dir,
+		offset);
+      } else
+	    sprintf(s,"%s",aop->aopu.aop_dir);
+      DEBUGpic16_emitcode(";","oops AOP_PAGED did this %s\n",s);
+      rs = Safe_calloc(1,strlen(s)+1);
+      strcpy(rs,s);   
+      return rs;
+#endif
 
     case AOP_STA:
         rs = Safe_strdup(PCOR(aop->aopu.stk.pop[offset])->r->name);
@@ -1943,6 +1981,12 @@ pCodeOp *pic16_popGet (asmop *aop, int offset) //, bool bit16, bool dname)
       DEBUGpic16_emitcode(";","%d\tAOP_DIR", __LINE__);
       return pic16_popRegFromString(aop->aopu.aop_dir, aop->size, offset, NULL);
 	
+#if 0
+    case AOP_PAGED:
+      DEBUGpic16_emitcode(";","%d\tAOP_DIR", __LINE__);
+      return pic16_popRegFromString(aop->aopu.aop_dir, aop->size, offset, NULL);
+#endif
+
     case AOP_REG:
       {
 	int rIdx;

@@ -39,6 +39,9 @@
 #ifndef __CTYPE_H
 #define __CTYPE_H 1
 
+/* link the C libarary */
+#pragma library c
+
 #include <sdcc-lib.h>
 
 extern char  iscntrl   (unsigned char )  ;

@@ -15,11 +15,14 @@
 include ./Makefile.common
 
 
-DIRS	=	libdev	\
+DIRS	=	startup \
+		libdev	\
 		libsdcc	\
-		libc	\
-		startup \
+		libc \
+		libm \
 		debug
+		
+#		libio 
 
 
 all: build-all-libraries
@@ -29,6 +32,9 @@ build-all-libraries:
 		$(MAKE) -C $$temp MODELFLAGS=$(MODELFLAGS) ; \
 	done
 
+
+lib-io:
+	$(MAKE) -C libio MODELFLAGS=$(MODELFLAGS)
 
 clean: all-clean
 	$(RM) -f bin/*.*

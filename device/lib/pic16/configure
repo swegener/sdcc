@@ -1484,7 +1484,10 @@ fi
 
 # Checks for library functions.
 
+cp pics.all pics.build
+
           ac_config_files="$ac_config_files Makefile.common"
+
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure

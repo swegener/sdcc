@@ -37,5 +37,7 @@ AC_CHECK_PROG(SED,	sed,	sed, :)
 
 # Checks for library functions.
 
+cp pics.all pics.build
+
 AC_CONFIG_FILES([Makefile.common])
 AC_OUTPUT

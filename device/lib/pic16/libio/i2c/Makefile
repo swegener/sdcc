@@ -13,16 +13,19 @@
 
 include ../Makefile.rules
 
-SRCS	= 	atof \
-		atoi \
-		atol \
-		calloc \
-		free \
-		ltoa \
-		malloc \
-		realloc \
-		x_ftoa \
-		putchar
+SRCS	=	i2cack \
+		i2cclose \
+		i2cdrdy \
+		i2cidle \
+		i2cnack \
+		i2copen \
+		i2creadc \
+		i2creads \
+		i2crestart \
+		i2cstart \
+		i2cstop \
+		i2cwritec \
+		i2cwrites
 
 
 CFILES	= $(patsubst %,%.c,$(SRCS))
@@ -30,7 +33,7 @@ OFILES	= $(patsubst %.c,%.o,$(CFILES))
 
 
 DEBUG=
-#COMPILE_FLAGS   += --pomit-config-words --pomit-ivt --denable-peeps --optimize-goto --obanksel=2
+#COMPILE_FLAGS   += --pomit-config-words --pomit-ivt --no-peep
 COMPILE_FLAGS	+= $(DEBUG)
 
 CFILES	= $(patsubst %,%.c,$(SRCS))

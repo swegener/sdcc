@@ -6,6 +6,7 @@ PRJDIR = ..
 clean:
 	rm -f *core *[%~] *.[oa] *.output
 	rm -f .[a-z]*~ \#*
+	rm -f version.h
 	rm -f $(PRJDIR)/bin/sdcc$(EXEEXT) sdcc$(EXEEXT)
 	for port in $(CLEANALLPORTS) ; do\
 	  $(MAKE) -C $$port -f ../port-clean.mk clean ;\

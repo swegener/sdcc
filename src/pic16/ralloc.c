@@ -778,8 +778,12 @@ pic16_allocDirReg (operand *op )
 
 	if(IS_ITEMP(op))return NULL;
 	
+//	if(IS_STATIC(OP_SYM_ETYPE(op)))return NULL;
+	
+	if(IN_STACK(OP_SYM_ETYPE(op)))return NULL;
+	
 	debugLog ("%s:%d symbol name %s\n", __FUNCTION__, __LINE__, name);
-//	fprintf(stderr, "%s symbol name %s\n", __FUNCTION__,name);
+//	fprintf(stderr, "%s symbol name %s\tSTATIC:%d\n", __FUNCTION__,name, IS_STATIC(OP_SYM_ETYPE(op)));
 
 	{
 		if(SPEC_CONST ( OP_SYM_ETYPE(op)) && (IS_CHAR ( OP_SYM_ETYPE(op)) )) {
@@ -2940,10 +2944,11 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
     debugLog ("  %d - result is not temp\n", __LINE__);
   }
 
+//  if(IS_VALOP(IC_RIGHT(ic)))return 0;
 
 /* See BUGLOG0001 - VR */
 #if 1
-  if (!IS_ITEMP (IC_RIGHT (ic))) {
+  if (!IS_ITEMP (IC_RIGHT (ic)) /*&& (!IS_PARM(IC_RESULT(ic)))*/) {
     debugLog ("  %d - not packing - right is not temp\n", __LINE__);
     pic16_allocDirReg(IC_RIGHT (ic));
     return 0;

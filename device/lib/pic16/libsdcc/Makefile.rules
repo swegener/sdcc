@@ -19,21 +19,30 @@ PRJDIR	= ../../../../..
 
 LIBC_INC_DIR	= $(PRJDIR)/device/include/pic16
 
-COMPILE_FLAGS	+= $(MODELFLAGS) --pomit-config-words --pomit-ivt --denable-peeps --optimize-goto --obanksel=2 --i-code-in-asm
+COMPILE_FLAGS	+= $(MODELFLAGS) $(OPT_FLAGS)
+
 CFLAGS	= --nostdinc -I$(LIBC_INC_DIR)
 
 CFILES	= $(patsubst %,%.c,$(SRCS))
 OFILES	= $(patsubst %.c,%.o,$(CFILES))
 
+SFILES	= $(patsubst %,%.S,$(AS_SRCS))
+SOFILES	= $(patsubst %.S,%.o,$(SFILES))
+
 %.o: %.c
 	$(CC) $(CFLAGS) $(COMPILE_FLAGS) -c $<
 
+.S.o:
+	$(AS) -c $<
 
-all: build-library
+
+all: build-library clean-intermediate-no-asm
 
 clean-intermediate:
 	$(RM) -f *.lst *.asm *.dump* *.p *.d *.adb
 
+clean-intermediate-no-asm:
+	$(RM) -f *.lst *.dump* *.p *.d *.adb
 
 clean: clean-intermediate
 	$(RM) -f $(LIB) *.o
@@ -45,5 +54,5 @@ dep .depend:
 		$(SED) s/.rel/.o/g .tmpdepend >> .depend; \
 		$(RM) -f .tmpdepend; \
 	done;
-
+	if [ ! -e .depend ]; then touch .depend ; fi ;
 include .depend

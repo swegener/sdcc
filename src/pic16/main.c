@@ -43,28 +43,28 @@ static char _defaultRules[] =
 static char *_pic16_keywords[] =
 {
   "at",
-  "bit",
+//  "bit",
   "code",
   "critical",
   "register",
   "data",
   "far",
-  "idata",
+//  "idata",
   "interrupt",
   "near",
   "pdata",
   "reentrant",
   "sfr",
-  "sbit",
+//  "sbit",
   "using",
-  "xdata",
+//  "xdata",
   "_data",
   "_code",
   "_generic",
   "_near",
-  "_xdata",
+//  "_xdata",
   "_pdata",
-  "_idata",
+//  "_idata",
   "_naked",
   NULL
 };
@@ -136,6 +136,15 @@ set *absSymSet;
 set *sectNames=NULL;			/* list of section listed in pragma directives */
 set *sectSyms=NULL;			/* list of symbols set in a specific section */
 set *wparamList=NULL;
+
+struct {
+  unsigned ignore: 1;
+  unsigned want_libc: 1;
+  unsigned want_libm: 1;
+  unsigned want_libio: 1;
+  unsigned want_libdebug: 1;
+} libflags = { 0, 0, 0, 0, 0 };
+  
 
 static int
 _process_pragma(const char *sz)
@@ -272,7 +281,7 @@ _process_pragma(const char *sz)
 			
 			ssym->section = snam;
 				
-#if 1
+#if 0
 	  		fprintf(stderr, "%s:%d placing symbol %s at section %s (%p)\n", __FILE__, __LINE__,
 	  		 	ssym->name, snam->name, snam);
 #endif
@@ -283,6 +292,7 @@ _process_pragma(const char *sz)
 	  return 0;
 	}
 	
+	/* #pragma wparam function1[, function2[,...]] */
 	if(startsWith(ptr, "wparam")) {
 	  char *fname = strtok((char *)NULL, WHITECOMMA);
 	  
@@ -295,6 +305,35 @@ _process_pragma(const char *sz)
             
           return 0;
         }
+        
+        /* #pragma library library_module */
+        if(startsWith(ptr, "library")) {
+          char *lmodule = strtok((char *)NULL, WHITE);
+        
+            if(lmodule) {
+              /* lmodule can be:
+               * c	link the C library
+               * math	link the math library
+               * io	link the IO library
+               * debug	link the debug libary
+               * anything else, will link as-is */
+              if(!strcmp(lmodule, "c"))libflags.want_libc = 1;
+              else if(!strcmp(lmodule, "math"))libflags.want_libm = 1;
+              else if(!strcmp(lmodule, "io"))libflags.want_libio = 1;
+              else if(!strcmp(lmodule, "debug"))libflags.want_libdebug = 1;
+              else if(!strcmp(lmodule, "ignore"))libflags.ignore = 1;
+              else {
+                if(!libflags.ignore) {
+                  fprintf(stderr, "link library %s\n", lmodule);
+                  addSetHead(&libFilesSet, lmodule);
+                }
+              }
+            }
+            
+            return 0;
+        }
+                
+              
 	
   return 1;
 }
@@ -334,9 +373,9 @@ OPTION pic16_optionsTable[]= {
 	{ 0,	NO_DEFLIBS,		&pic16_options.nodefaultlibs,	"do not link default libraries when linking"},
 	{ 0,	"--pno-banksel",	&pic16_options.no_banksel,	"do not generate BANKSEL assembler directives"},
 	{ 0,	OPT_BANKSEL,		NULL,				"set banksel optimization level (default=0 no)"},
-	{ 0,	"--pomit-config-words",	&pic16_options.omit_configw,	"omit the generation of configuration words"},
-	{ 0,	"--pomit-ivt",		&pic16_options.omit_ivt,	"omit the generation of the Interrupt Vector Table"},
-	{ 0,	"--pleave-reset-vector",&pic16_options.leave_reset,	"when omitting IVT leave RESET vector"},
+//	{ 0,	"--pomit-config-words",	&pic16_options.omit_configw,	"omit the generation of configuration words"},
+//	{ 0,	"--pomit-ivt",		&pic16_options.omit_ivt,	"omit the generation of the Interrupt Vector Table"},
+//	{ 0,	"--pleave-reset-vector",&pic16_options.leave_reset,	"when omitting IVT leave RESET vector"},
 	{ 0,	STACK_MODEL,		NULL,				"use stack model 'small' (default) or 'large'"},
 
 	{ 0,	"--debug-xtra",		&pic16_debug_verbose,	"show more debug info in assembly output"},
@@ -546,6 +585,23 @@ static void _pic16_linkEdit(void)
           shash_add(&linkValues, "spec_ofiles", pic16_options.crt_name);
 
   	shash_add(&linkValues, "ofiles", joinStrSet(relFilesSet));
+
+  	if(!libflags.ignore) {
+  	  if(libflags.want_libc)
+  	    addSet(&libFilesSet, Safe_strdup("libc18f.lib"));
+        
+          if(libflags.want_libm)
+            addSet(&libFilesSet, Safe_strdup("libm18f.lib"));
+        
+          if(libflags.want_libio) {
+            sprintf(temp, "libio%s.lib", pic16->name[1]);	/* build libio18f452.lib name */
+            addSet(&libFilesSet, Safe_strdup(temp));
+          }
+        
+          if(libflags.want_libdebug)
+            addSet(&libFilesSet, Safe_strdup("libdebug.lib"));
+        }
+
   	shash_add(&linkValues, "libs", joinStrSet(libFilesSet));
   	
   	lcmd = msprintf(linkValues, lfrm);
@@ -562,6 +618,7 @@ static void _pic16_linkEdit(void)
 /* forward declarations */
 extern const char *pic16_linkCmd[];
 extern const char *pic16_asmCmd[];
+extern set *asmOptionsSet;
 
 static void
 _pic16_finaliseOptions (void)
@@ -595,10 +652,18 @@ _pic16_finaliseOptions (void)
       pic16_options.leave_reset = 0;
     }
     
+    if(options.model == MODEL_SMALL)
+      addSet(&asmOptionsSet, Safe_strdup("-DSDCC_MODEL_SMALL"));
+    else
+    if(options.model == MODEL_LARGE)
+      addSet(&asmOptionsSet, Safe_strdup("-DSDCC_MODEL_LARGE"));
+    
     if(STACK_MODEL_LARGE) {
       addSet(&preArgvSet, Safe_strdup("-DSTACK_MODEL_LARGE"));
+      addSet(&asmOptionsSet, Safe_strdup("-DSTACK_MODEL_LARGE"));
     } else {
       addSet(&preArgvSet, Safe_strdup("-DSTACK_MODEL_SMALL"));
+      addSet(&asmOptionsSet, Safe_strdup("-DSTACK_MODEL_SMALL"));
     }
 }
 
@@ -904,14 +969,14 @@ PORT pic16_port =
     "CSEG    (CODE)",		// code
     "DSEG    (DATA)",		// data
     "ISEG    (DATA)",		// idata
-    NULL,					// pdata
+    "PSEG    (DATA)",		// pdata
     "XSEG    (XDATA)",		// xdata
     "BSEG    (BIT)",		// bit
     "RSEG    (DATA)",		// reg
     "GSINIT  (CODE)",		// static
     "OSEG    (OVR,DATA)",	// overlay
     "GSFINAL (CODE)",		// post static
-    "HOME	 (CODE)",	// home
+    "HOME    (CODE)",	// home
     NULL,			// xidata
     NULL,			// xinit
     NULL,			// default location for auto vars

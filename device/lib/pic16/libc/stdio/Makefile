@@ -13,16 +13,8 @@
 
 include ../Makefile.rules
 
-SRCS	= 	atof \
-		atoi \
-		atol \
-		calloc \
-		free \
-		ltoa \
-		malloc \
-		realloc \
-		x_ftoa \
-		putchar
+SRCS	= 	printf_tiny \
+		printf_small
 
 
 CFILES	= $(patsubst %,%.c,$(SRCS))
@@ -30,7 +22,7 @@ OFILES	= $(patsubst %.c,%.o,$(CFILES))
 
 
 DEBUG=
-#COMPILE_FLAGS   += --pomit-config-words --pomit-ivt --denable-peeps --optimize-goto --obanksel=2
+#COMPILE_FLAGS   += --pomit-config-words --pomit-ivt --no-peep
 COMPILE_FLAGS	+= $(DEBUG)
 
 CFILES	= $(patsubst %,%.c,$(SRCS))

@@ -18,7 +18,11 @@ PRJDIR	= ../../../../..
 
 LIBC_INC_DIR	= $(PRJDIR)/device/include/pic16
 
-COMPILE_FLAGS	+= $(MODELFLAGS) --pomit-config-words --pomit-ivt --denable-peeps --optimize-goto --obanksel=2 --i-code-in-asm
+COMPILE_FLAGS	+= $(MODELFLAGS)
+COMPILE_FLAGS	+= -p$(MCU)
+#COMPILE_FLAGS	+= --pomit-config-words --pomit-ivt
+COMPILE_FLAGS	+= --no-peep
+COMPILE_FLAGS	+= --i-code-in-asm
 CFLAGS	= -I$(LIBC_INC_DIR)
 
 CFILES	= $(patsubst %,%.c,$(SRCS))
@@ -27,11 +31,18 @@ OFILES	= $(patsubst %.c,%.o,$(CFILES))
 %.o: %.c
 	$(CC) $(CFLAGS) $(COMPILE_FLAGS) -c $<
 
+all:
+	@echo "Please make target build-mcu-library setting"
+	@echo "MCU= to the target device (i.e. MCU=18f452)"
 
-all: build-library
+
+build-mcu-library: build-library clean-intermediate-no-asm
 
 clean-intermediate:
 	$(RM) -f *.lst *.asm *.dump* *.p *.d *.adb
+
+clean-intermediate-no-asm:
+	$(RM) -f *.lst *.dump* *.p *.d *.adb
 
 
 clean: clean-intermediate

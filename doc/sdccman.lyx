@@ -16028,8 +16028,8 @@ Example:
 char foo;
 \layout Standard
 
-In order for this pragma to work there are some changes that must be made
- in the .lkr script used in link stage.
+In order for this pragma to work extra SECTION directives should be added
+ in the .lkr script.
  In the following example a sample .lkr file is shown:
 \layout LyX-Code
 
@@ -16092,16 +16092,16 @@ SECTION    NAME=CONFIG     ROM=config
 
 \layout LyX-Code
 
-SECTION    NAME=bank0      RAM=gpr0
+SECTION    NAME=bank0      RAM=gpr0       # these SECTION directives
 \layout LyX-Code
 
-SECTION    NAME=bank1      RAM=gpr1
+SECTION    NAME=bank1      RAM=gpr1       # should be added to link
 \layout LyX-Code
 
-SECTION    NAME=bank2      RAM=gpr2
+SECTION    NAME=bank2      RAM=gpr2       # section name 'bank?' with
 \layout LyX-Code
 
-SECTION    NAME=bank3      RAM=gpr3
+SECTION    NAME=bank3      RAM=gpr3       # a specific DATABANK name
 \layout LyX-Code
 
 SECTION    NAME=bank4      RAM=gpr4
@@ -16113,6 +16113,234 @@ SECTION    NAME=bank5      RAM=gpr5
 The linker will recognise the section name set in the pragma statement and
  will position the variable at the memory bank set with the RAM field at
  the SECTION line in the linker script file.
+\layout List
+\labelwidthstring 00.00.0000
+
+library instructs the linker to use a library module.
+\newline 
+Usage:
+\layout LyX-Code
+
+#pragma library module_name
+\layout Standard
+
+
+\emph on 
+module_name
+\emph default 
+ can be any library or object file (including its path).
+ Note that there are four reserved keywords which have special meaning.
+ These are:
+\layout Standard
+\align center 
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="6" columns="3">
+<features>
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="block" valignment="top" leftline="true" width="20page%">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Keyword
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Description
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Module to link
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\series bold 
+ignore
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+ignore all library pragmas
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+(none)
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\series bold 
+c
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+link the C library
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+libc18f
+\emph default 
+.lib
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\series bold 
+math
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+link the Math libarary
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+libm18f
+\emph default 
+.lib
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\series bold 
+io
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+link the I/O library
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+libio18f*
+\emph default 
+.lib
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\series bold 
+debug
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+link the debug library
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+libdebug
+\emph default 
+.lib
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\newline 
+* is the device number, i.e.
+ 452 for PIC18F452 MCU.
+\layout Standard
+
+This feature allows for linking with specific libraries withoug having to
+ explicit name them in the command line.
+ Note that the 
+\noun on 
+ignore
+\noun default 
+ keyword will reject all modules specified by the library pragma.
 \layout Subsection
 
 Header Files
@@ -16168,6 +16396,47 @@ Libraries are created with gplib which is part of the gputils package
 \end_inset 
 
 .
+\layout Subsubsection
+
+Building the libraries
+\layout Standard
+
+Before using SDCC/pic16 there are some libraries that need to be compiled.
+ This process is not done automatically by SDCC since not all users use
+ SDCC for pic16 projects.
+ So each user should compile the libraries separately.
+\layout Standard
+
+The steps to compile the pic16 libraries under Linux are:
+\layout LyX-Code
+
+cd device/lib/pic16
+\layout LyX-Code
+
+./configure
+\layout LyX-Code
+
+make
+\layout LyX-Code
+
+cd ..
+\layout LyX-Code
+
+make model-pic16
+\layout LyX-Code
+
+su -c 'make install'     # install the libraries, you need the root password
+\layout Standard
+
+If you need to install the headers to, do:
+\layout LyX-Code
+
+cd device/include
+\layout LyX-Code
+
+su -c 'make install'     # install the headers, you need the root password
+\layout LyX-Code
+
 \layout Subsection
 
 Memory Models
@@ -16450,6 +16719,8 @@ Large
 stack model is currently not working properly throughout the code generator.
  So its use is not advised.
  Also there are some other points that need special care:
+\newline 
+
 \layout Enumerate
 
 Do not create stack sections with size more than one physical bank (that

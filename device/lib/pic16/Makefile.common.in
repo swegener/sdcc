@@ -29,3 +29,8 @@ SED	= @SED@
 MM = -MM
 
 MODELFLAGS      = -mpic16
+
+OPT_FLAGS	+= --denable-peeps
+OPT_FLAGS	+= --obanksel=9
+OPT_FLAGS	+= --optimize-goto
+OPT_FLAGS	+= --i-code-in-asm

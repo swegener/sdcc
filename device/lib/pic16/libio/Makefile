@@ -11,21 +11,35 @@
 #
 #
 
+MCUS	= $(shell cat ../pics.build)
 
-DIRS	=	adc
+PROCESSORS	= $(MCUS)
 
 
-LIB	= libio.lib
+DIRS	= adc i2c
+
+LOBJS	= $(patsubst %,%/*.o,$(DIRS))
+
+# library name example libio18f8720.lib
+LIB	= libio18f$(MMCU).lib
 
 all: build-libraries
 
 make-target: build-libraries
 
 build-libraries:
+	for proc in $(PROCESSORS) ; do \
+		echo "Building libraries for processor pic18f $$proc" ; \
+		$(MAKE) -C . build-processor-library MMCU=$$proc ;  \
+	done ;
+
+# Should have externally specified PROC
+build-processor-library:
 	for dir in $(DIRS) ; do	 \
-		$(MAKE) -C $$dir ; \
+		$(MAKE) -C $$dir clean ; \
+		$(MAKE) -C $$dir build-mcu-library MCU=18f$(MMCU); \
 	done;
-	gplib -c $(LIB) adc/*.o
+	gplib -c $(LIB) $(LOBJS)
 	mv -v $(LIB) ../bin
 	
 

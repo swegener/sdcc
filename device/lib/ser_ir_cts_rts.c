@@ -34,8 +34,6 @@
 *   so it can run on devices with _little_ memory like at89cx051.
 * - It won't overwrite characters which already are stored in the
 *   receive-/transmit-buffer.
-* - It checks receiver first to minimize probability for overruns
-*   in the serial receiver.
 */
 
 /* BUG: those definitions (and the #include) should be set dynamically
@@ -88,9 +86,10 @@
 #define CTS P3_6          // CTS & RTS can be assigned to any free pins
 #define RTS P3_7
 
+// You might want to specify idata, pdata or xdata for the buffers
 static unsigned char rxbuf[RXBUFLEN], txbuf[TXBUFLEN];
 static unsigned char rxcnt, txcnt, rxpos, txpos;
-static unsigned char busy;
+static bit busy;
 
 void ser_init()
 {
@@ -117,7 +116,7 @@ void ser_handler(void) interrupt 4
   if (RI) {
     RI = 0;
     /* don't overwrite chars already in buffer */
-    if(rxcnt < RXBUFLEN) rxbuf [(rxpos + rxcnt++) % RXBUFLEN] = SBUF;
+    if(rxcnt < RXBUFLEN) rxbuf [(unsigned char)(rxpos + rxcnt++) % RXBUFLEN] = SBUF;
     if(rxcnt >= (RXBUFLEN - THRESHOLD)) CTS = DISABLE;
   }
 
@@ -139,7 +138,7 @@ void ser_putc(unsigned char c)
 
   ES = 0;
   if (busy) {
-    txbuf[(txpos + txcnt++) % TXBUFLEN] = c;
+    txbuf[(unsigned char)(txpos + txcnt++) % TXBUFLEN] = c;
   } else {
     SBUF = c;
     busy = 1;

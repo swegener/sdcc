@@ -31,20 +31,19 @@
 *   so it can run on devices with _little_ memory like at89cx051.
 * - It won't overwrite characters which already are stored in the
 *   receive-/transmit-buffer.
-* - It checks receiver first to minimize probability for overruns
-*   in the serial receiver.
 */
 
 /* BUG: those definitions (and the #include) should be set dynamically
 * (while linking or at runtime) to make this file a _real_ library.
 */
 #include <8051.h>
-#define XBUFLEN 10
-#define RBUFLEN 10
+#define XBUFLEN 4
+#define RBUFLEN 8
 
-static unsigned char rbuf[RBUFLEN], xbuf[XBUFLEN];
+/* You might want to specify idata, pdata or xdata for the buffers */
+static unsigned char pdata rbuf[RBUFLEN], xbuf[XBUFLEN];
 static unsigned char rcnt, xcnt, rpos, xpos;
-static unsigned char busy;
+static bit busy;
 
 void ser_init (void)
 {
@@ -65,7 +64,7 @@ void ser_handler (void) interrupt 4
 	   RI = 0;
 	   /* don't overwrite chars already in buffer */
 	   if (rcnt < RBUFLEN)
-		   rbuf [(rpos+rcnt++) % RBUFLEN] = SBUF;
+		   rbuf [(unsigned char)(rpos+rcnt++) % RBUFLEN] = SBUF;
    }
    if (TI) {
 	   TI = 0;
@@ -84,7 +83,7 @@ void ser_putc (unsigned char c)
 	   ;
    ES = 0;
    if (busy) {
-	   xbuf[(xpos+xcnt++) % XBUFLEN] = c;
+	   xbuf[(unsigned char)(xpos+xcnt++) % XBUFLEN] = c;
    } else {
 	   SBUF = c;
 	   busy = 1;

@@ -3539,6 +3539,21 @@ Compile this by typing
  
 \series medium 
 (see the Install trouble-shooting section for suggestions).
+
+\series default 
+ To find exactly where SDCC is looking for the include files try compiling
+ using 
+\family sans 
+\series bold 
+-
+\family default 
+\series default 
+V
+\begin_inset LatexCommand \index{-V}
+
+\end_inset 
+
+.
 \layout Subsection
 
 Install Trouble-shooting
@@ -4161,6 +4176,14 @@ first
 \noun default 
  file specified in the command line, since the linkage editor processes
  file in the order they are presented to it.
+ The linker is invoked from sdcc using a script file with extension .lnk
+\begin_inset LatexCommand \index{.lnk}
+
+\end_inset 
+
+.
+ You can view this file to troubleshoot linking problems such as those arising
+ from missing libraries.
 \layout Subsubsection
 
 Projects with Additional Libraries
@@ -4222,7 +4245,12 @@ Note here that
 \newline 
 The most efficient way to use libraries is to keep separate modules in separate
  source files.
- The lib file now should name all the modules.rel files.
+ The lib file now should name all the modules.rel
+\begin_inset LatexCommand \index{rel}
+
+\end_inset 
+
+ files.
  For an example see the standard library file 
 \emph on 
 libsdcc.lib
@@ -8536,8 +8564,8 @@ For signed & unsigned int (16 bit) and long (32 bit) variables, division,
 \begin_inset  Tabular
 <lyxtabular version="3" rows="11" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -8820,9 +8848,9 @@ Floating Point Support
 
 \layout Standard
 
-SDCC supports IEEE (single precision 4bytes) floating point numbers.The floating
- point support routines are derived from gcc's floatlib.c and consists of
- the following routines:
+SDCC supports IEEE (single precision 4 bytes) floating point numbers.The
+ floating point support routines are derived from gcc's floatlib.c and consists
+ of the following routines:
 \newline 
 
 \newline 
@@ -8832,8 +8860,8 @@ SDCC supports IEEE (single precision 4bytes) floating point numbers.The floating
 \begin_inset  Tabular
 <lyxtabular version="3" rows="17" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -9804,7 +9832,7 @@ standard error
 \end_inset 
 
 .
- The windows shell (command or cmd) can't redirect it to a file.
+ The windows 95/98/me shell (command or cmd) can't redirect it to a file.
  The solution is to use a reasonable shell or a helper program like redir.exe:
 \layout Standard
 
@@ -9830,6 +9858,55 @@ standard error
 \end_inset 
 
 
+\newline 
+
+\newline 
+If you are using a windows NT/2K/XP shell, you can redirect the 
+\begin_inset Quotes sld
+\end_inset 
+
+standard error
+\begin_inset Quotes srd
+\end_inset 
+
+ output to a file using 
+\begin_inset Quotes sld
+\end_inset 
+
+2>
+\begin_inset Quotes srd
+\end_inset 
+
+.
+ For example:
+\newline 
+
+\series bold 
+
+\newline 
+sdcc -c foo.c 2> foo.err
+\newline 
+
+\newline 
+
+\series default 
+To append the 
+\begin_inset Quotes sld
+\end_inset 
+
+standard error
+\begin_inset Quotes srd
+\end_inset 
+
+ output of SDCC to a file you can use 
+\begin_inset Quotes sld
+\end_inset 
+
+2>>
+\begin_inset Quotes srd
+\end_inset 
+
+.
 \layout Section
 \pagebreak_top 
 SDCC Technical Data
@@ -14695,7 +14772,7 @@ The recommended way of reporting bugs is using the infrastructure of the
 Bug reports are automatically forwarded to the developer mailing list and
  will be fixed ASAP.
  When reporting a bug, it is very useful to include a small test program
- which reproduces the problem.
+ (the smaller the better) which reproduces the problem.
  If you can isolate the problem by looking at the generated assembly code,
  this can be very helpful.
  Compiling your program with the -
@@ -14714,6 +14791,33 @@ status Collapsed
 \end_inset 
 
  option can sometimes be useful in locating optimization problems.
+ When reporting a bug please maker sure you:
+\layout Enumerate
+
+Attach the code you are compiling with SDCC.
+ 
+\layout Enumerate
+
+Specify the exact command you use to run SDCC, or attach your Makefile.
+ 
+\layout Enumerate
+
+Specify the SDCC version (type "sdcc -v"), your platform, and operating
+ system.
+ 
+\layout Enumerate
+
+Provide an exact copy of any error message or incorrect output.
+ 
+\layout Standard
+
+Please attempt to include these 4 important parts, as applicable, in all
+ requests for support or when reporting any problems or bugs with SDCC.
+ Though this will make your message lengthy, it will greatly improve your
+ chance that SDCC users and developers will be able to help you.
+ Some SDCC developers are frustrated by bug reports without code provided
+ that they can use to reproduce and ultimately fix the problem, so please
+ be sure to provide sample code if you are reporting a bug! 
 \layout Standard
 
 Please have a short check that you are using a recent version of SDCC and
@@ -14759,7 +14863,7 @@ These links should take you directly to the
 
 
 \begin_inset Foot
-collapsed false
+collapsed true
 
 \layout Standard
 
@@ -14810,7 +14914,19 @@ Historically there often were long delays between official releases and
  Current excuses might refer to problems with live range analysis, but if
  this is fixed, the next problem rising is that another excuse will have
  to be found.
- Kidding aside, we have to get better there!
+ Kidding aside, we have to get better there! On the other hand there are
+ daily snapshots available at 
+\begin_inset LatexCommand \htmlurl[snap]{http://sdcc.sourceforge.net/snap.php}
+
+\end_inset 
+
+, and you can always built the very last version (hopefully with many bugs
+ fixed, and features added) from the source code available at 
+\begin_inset LatexCommand \htmlurl[Source]{http://sdcc.sourceforge.net/snap.php#Source}
+
+\end_inset 
+
+.
 \layout Subsection
 
 Examples

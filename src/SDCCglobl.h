@@ -1,4 +1,4 @@
-;/* SDCCglobl.h - global macros etc required by all files */
+/* SDCCglobl.h - global macros etc required by all files */
 #ifndef SDCCGLOBL_H
 #define SDCCGLOBL_H
 #include <memory.h>
@@ -87,22 +87,6 @@ typedef int bool;
     type       *type##Pool        ; \
     type *type##FreeStack [size]  ; \
     int   type##StackPtr = 0      ;
-
-#if 0
-#define  ALLOC(x,sz) if (!(x = calloc(1, sz)))      \
-         {                                          \ 
-            werror(E_OUT_OF_MEM,__FILE__,(long) sz);\
-            exit (1);                               \
-         }
-#endif
-
-#if 0
-#define ALLOCTYPE(type,size) if (!(type##Pool = calloc(1, size*sizeof(type))))\
-         {                                                            \
-            werror(E_OUT_OF_MEM,__FILE__,(long) size);		      \
-            exit (1);                                                \
-         }
-#endif
 
 #define PUSH(x,y)   x##FreeStack[x##StackPtr++] = y
 #define PEEK(x)     x##FreeStack[x##StackPtr-1]

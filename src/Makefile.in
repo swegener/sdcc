@@ -18,8 +18,10 @@ LIBS		= -lm @LIBS@
 ifdef SDCC_SUB_VERSION
 CFLAGS		+= -DSDCC_SUB_VERSION_STR=\"$(SDCC_SUB_VERSION)\"
 endif
+ 
+SLIBOBJS	= SDCCerr.o NewAlloc.o
 
-OBJECTS 	= SDCCy.o SDCCerr.o SDCChasht.o SDCCmain.o \
+OBJECTS 	= SDCCy.o SDCChasht.o SDCCmain.o \
 		  SDCCsymt.o SDCCopt.o SDCCast.o SDCCmem.o SDCCval.o \
 		  SDCCicode.o SDCCbitv.o SDCCset.o SDCClabel.o \
 		  SDCCBBlock.o SDCCloop.o SDCCcse.o SDCCcflow.o SDCCdflow.o \
@@ -40,7 +42,7 @@ TARGET		= $(PRJDIR)/bin/sdcc
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: ports checkconf $(LIBGC) $(TARGET)
+all: ports checkconf $(TARGET)
 
 ports:
 	for i in $(PORTS); do $(MAKE) -C $$i; done
@@ -89,10 +91,13 @@ include clean.mk
 
 # My rules
 # --------
-$(TARGET): $(OBJECTS) $(PORT_LIBS)
-	$(CC) -o $@ $(OBJECTS) $(PORT_LIBS) $(LIBDIRS) $(LIBS)
+$(TARGET): $(SLIBOBJS) $(OBJECTS) $(PORT_LIBS)
+	$(CC) -o $@ $(SLIBOBJS) $(OBJECTS) $(PORT_LIBS) $(LIBDIRS) $(LIBS)
 
 .c.o:
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+
+$(SLIBOBJS):%.o:$(SLIB)/%.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 reswords.h: reswords.gperf Makefile

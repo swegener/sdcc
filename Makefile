@@ -2,6 +2,7 @@
 #
 #
 
+CFLAGS+=-g
 
 SHELL		= /bin/sh
 AUTOCONF	= autoconf

@@ -26,10 +26,14 @@ man1dir         = $(mandir)/man1
 man2dir         = $(mandir)/man2
 infodir         = ${prefix}/info
 
-CPPFLAGS	= @CPPFLAGS@ -I. -I$(PRJDIR) -I$(PRJDIR)/as/z80
+SLIB	=$(PRJDIR)/support/Util
+
+CPPFLAGS	= @CPPFLAGS@ -I. -I$(PRJDIR) -I$(PRJDIR)/as/z80 -I$(SLIB)
 CFLAGS		= @CFLAGS@ -Wall -DINDEXLIB -DMLH_MAP -DUNIX -DSDK -DSDK_VERSION_STRING="\"3.0.0\"" -DTARGET_STRING="\"gbz80\"" -funsigned-char
 M_OR_MM		= @M_OR_MM@
 LDFLAGS		= @LDFLAGS@ -lm
+
+SLIBOBJS	= NewAlloc.o
 
 LKOBJECTS	= lkarea.o lkdata.o lkeval.o lkhead.o lkihx.o lklex.o \
 		  lklibr.o lklist.o lkmain.o lkrloc.o lks19.o lksym.o \
@@ -42,8 +46,8 @@ LKZ80		= $(PRJDIR)/bin/link-z80
 # ------------------------------------------
 all: checkconf $(LKZ80)
 
-$(LKZ80): $(LKOBJECTS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(LKOBJECTS) 
+$(LKZ80): $(SLIBOBJS) $(LKOBJECTS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SLIBOBJS) $(LKOBJECTS) 
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
@@ -87,6 +91,8 @@ include clean.mk
 .c.o:
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
 
+$(SLIBOBJS):%.o:$(SLIB)/%.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 # Remaking configuration
 # ----------------------

@@ -33,9 +33,12 @@ man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
 
+SLIB			= $(PRJDIR)/support/Util
+
 # Flags
+
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
-CPPFLAGS        = @CPPFLAGS@ -I$(PRJDIR)
+CPPFLAGS        = @CPPFLAGS@ -I$(PRJDIR) -I$(SLIB)
 CFLAGS          = @CFLAGS@ -Wall
 M_OR_MM         = @M_OR_MM@
 

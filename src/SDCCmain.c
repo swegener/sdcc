@@ -22,11 +22,12 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
-#define USE_SYSTEM_SYSTEM_CALLS
+//#define USE_SYSTEM_SYSTEM_CALLS
 
 #include "common.h"
 #include <ctype.h>
 #include "newalloc.h"
+#include "SDCCerr.h"
 
 #if NATIVE_WIN32
 #include <process.h>

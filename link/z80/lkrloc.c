@@ -15,7 +15,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <alloc.h>
+//#include <alloc.h>
 #include "aslink.h"
 
 /*)Module	lkrloc.c

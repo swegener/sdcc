@@ -14,7 +14,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <alloc.h>
+//#include <alloc.h>
 #include "aslink.h"
 
 #ifndef SDK_VERSION_STRING

@@ -12,6 +12,10 @@ CC		= @CC@
 CPP		= @CPP@
 INSTALL		= @INSTALL@
 
+# Source library
+
+SLIB		=  ../Util
+
 PRJDIR		= ../..
 
 srcdir		= @srcdir@
@@ -27,10 +31,12 @@ man2dir         = $(mandir)/man2
 infodir         = ${prefix}/info
 
 STD_INC		= @sdcc_include_dir@
-CPPFLAGS	= @CPPFLAGS@ -I. -I$(PRJDIR) -D_FORASXXXX_
+CPPFLAGS	= @CPPFLAGS@ -I. -I$(PRJDIR) -I$(SLIB) -D_FORASXXXX_
 CFLAGS		= @CFLAGS@
 M_OR_MM		= @M_OR_MM@
 LDFLAGS		= @LDFLAGS@
+
+SLIBOBJS	= NewAlloc.o
 
 OBJECTS		= cppalloc.o cpperror.o cppexp.o cpphash.o cpplib.o cppmain.o support.o
 SOURCES		= $(patsubst %.o,%.c,$(OBJECTS))
@@ -42,8 +48,8 @@ TARGET		= $(PRJDIR)/bin/sdcpp
 # ------------------------------------------
 all: checkconf $(TARGET)
 
-$(TARGET): $(OBJECTS)
-	$(CC) $(LDFLAGS) -o $@ $(OBJECTS)
+$(TARGET): $(SLIBOBJS) $(OBJECTS)
+	$(CC) $(LDFLAGS) -o $@ $(SLIBOBJS) $(OBJECTS)
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
@@ -88,6 +94,8 @@ include clean.mk
 .c.o:
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
 
+$(SLIBOBJS):%.o:$(SLIB)/%.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 # Remaking configuration
 # ----------------------

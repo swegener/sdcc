@@ -16,13 +16,14 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include <string.h>
+#include <malloc.h>
 
 //#include "newalloc.h"
-#if defined(_MSC_VER)
-#include <malloc.h>
-#else
-#include <alloc.h>
-#endif
+//#if defined(_MSC_VER)
+//#include <malloc.h>
+//#else
+//#include <alloc.h>
+//#endif
 
 #include "asm.h"
 

@@ -33,6 +33,7 @@
 #include "SDCCast.h"
 #include "port.h"
 #include "newalloc.h"
+#include "SDCCerr.h"
 
 extern int yyerror (char *);
 extern FILE	*yyin;

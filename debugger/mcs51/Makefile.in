@@ -13,6 +13,7 @@ CPP		= @CPP@
 INSTALL		= @INSTALL@
 
 PRJDIR		= ../..
+SLIB		= $(PRJDIR)/support/Util
 
 srcdir		= @srcdir@
 prefix		= @prefix@
@@ -27,7 +28,7 @@ man2dir         = $(mandir)/man2
 infodir         = ${prefix}/info
 
 STD_INC		= @sdcc_include_dir@
-CPPFLAGS	= @CPPFLAGS@ -I. -I$(PRJDIR) -I$(PRJDIR)/support
+CPPFLAGS	= @CPPFLAGS@ -I. -I$(PRJDIR) -I$(PRJDIR)/support -I$(SLIB)
 CFLAGS		= @CFLAGS@
 M_OR_MM		= @M_OR_MM@
 LDFLAGS		= @LDFLAGS@
@@ -35,6 +36,7 @@ LDFLAGS		= @LDFLAGS@
 LIBS            = @LIBS@
 LIBDIRS         =
 
+SLIBOBJS		= NewAlloc.o
 
 OBJECTS		= sdcdb.o symtab.o simi.o $(PRJDIR)/src/SDCCset.o \
 		  break.o cmd.o $(PRJDIR)/src/SDCChasht.o \
@@ -90,12 +92,14 @@ include clean.mk
 
 # My rules
 # --------
-$(TARGET): $(OBJECTS)
-	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBDIRS) $(LIBS)
+$(TARGET): $(OBJECTS) $(SLIBOBJS)
+	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(SLIBOBJS) $(LIBDIRS) $(LIBS)
 
 .c.o:
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
 
+$(SLIBOBJS):%.o:$(SLIB)/%.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
 
 # Remaking configuration
 # ----------------------

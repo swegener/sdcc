@@ -88,12 +88,11 @@ install: installDS390
 	for model in $(MODELS); do \
 	 [ -d $$model ] || $(MAKE) all; \
 	 $(CP) $$model/*.rel *.lib $(sdcc_datadir)/lib/$$model/; \
-	 $(CP) $$model/*.asm $(sdcc_datadir)/lib/$$model/; \
-	 $(CP) $$model/*.cdb $(sdcc_datadir)/lib/$$model/; \
+	 $(CP) $$model/*.asm $(sdcc_datadir)/lib/$$model/;
 	done
 
 installDS390: installdirs
-	$(CP) ds390/*.lib ds390/*.rel ds390/*.asm ds390/*.cdb $(sdcc_datadir)/lib/ds390
+	$(CP) ds390/*.lib ds390/*.rel ds390/*.asm $(sdcc_datadir)/lib/ds390
 
 # Deleting all the installed files
 # --------------------------------

@@ -37,6 +37,7 @@
 /*-----------------------------------------------------------------*/
 
 extern void gen51Code (iCode *);
+#define D(x)
 
 /* Global data */
 static struct

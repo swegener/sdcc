@@ -1236,9 +1236,9 @@ constExprValue (ast * cexpr, int check)
       /* if we are casting a literal value then */
       if (IS_AST_OP (cexpr) &&
 	  cexpr->opval.op == CAST &&
-	  IS_LITERAL (cexpr->left->ftype))
+	  IS_LITERAL (cexpr->right->ftype))
 	return valCastLiteral (cexpr->ftype,
-			       floatFromVal (cexpr->left->opval.val));
+			       floatFromVal (cexpr->right->opval.val));
 
       if (IS_AST_VALUE (cexpr))
 	return cexpr->opval.val;
@@ -3095,13 +3095,8 @@ decorateType (ast * tree)
       if (compareType (LTYPE (tree), RTYPE (tree)) == 0)
 	{
 	  werror (E_TYPE_MISMATCH, "assignment", " ");
-	  fprintf (stderr, "type --> '");
-	  printTypeChain (RTYPE (tree), stderr);
-	  fprintf (stderr, "' ");
-	  fprintf (stderr, "assigned to type --> '");
-	  printTypeChain (LTYPE (tree), stderr);
-	  fprintf (stderr, "'\n");
-	  goto errorTreeReturn;
+	  printFromToType(RTYPE(tree),LTYPE(tree));
+	  //goto errorTreeReturn;
 	}
 
       /* if the left side of the tree is of type void

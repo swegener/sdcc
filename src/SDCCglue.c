@@ -794,6 +794,16 @@ printIvalFuncPtr (sym_link * type, initList * ilist, FILE * oFile)
   int dLvl = 0;
 
   val = list2val (ilist);
+
+  if (IS_LITERAL(val->etype)) {
+    if (compareType(type,val->etype)==0) {
+      werror (E_INCOMPAT_TYPES);
+      printFromToType (val->type, type);
+    }
+    printIvalCharPtr (NULL, type, val, oFile);
+    return;
+  }
+
   /* check the types   */
   if ((dLvl = compareType (val->type, type->next)) <= 0)
     {
@@ -893,8 +903,8 @@ printIvalCharPtr (symbol * sym, sym_link * type, value * val, FILE * oFile)
 		      aopLiteral (val, 0), aopLiteral (val, 1));
 	  break;
 	case 3:
-	  // mcs51 generic pointer
-	  if (floatFromVal(val)!=0) {
+	  if (IS_GENPTR(type) && floatFromVal(val)!=0) {
+	    // non-zero mcs51 generic pointer
 	    werror (E_LITERAL_GENERIC);
 	  }
 	  fprintf (oFile, "\t.byte %s,%s,%s\n",
@@ -903,8 +913,8 @@ printIvalCharPtr (symbol * sym, sym_link * type, value * val, FILE * oFile)
 		   aopLiteral (val, 2));
 	  break;
 	case 4:
-	  // ds390 generic pointer
-	  if (floatFromVal(val)!=0) {
+	  if (IS_GENPTR(type) && floatFromVal(val)!=0) {
+	    // non-zero ds390 generic pointer
 	    werror (E_LITERAL_GENERIC);
 	  }
 	  fprintf (oFile, "\t.byte %s,%s,%s,%s\n",

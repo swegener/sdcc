@@ -1,5 +1,11 @@
 2001-01-02  Bernhard Held  <bernhard@bernhardheld.de>
 
+	* src/SDCCast.c: fix #498138 by Johan
+
+	* src/SDCCglue.c: fix #498138 by Johan
+
+2001-01-02  Bernhard Held  <bernhard@bernhardheld.de>
+
 	* support/regression/Makefile: fix clean
 
 	* support/regression/ports/ds390/support.c: fix transmission of last character

@@ -280,15 +280,15 @@ void
 asm_addTree (const ASM_MAPPINGS * pMappings)
 {
   const ASM_MAPPING *pMap;
+
   /* Traverse down first */
   if (pMappings->pParent)
     asm_addTree (pMappings->pParent);
   pMap = pMappings->pMappings;
-  while (pMap->szKey && pMap->szValue)
-    {
+  while (pMap->szKey && pMap->szValue) {
       shash_add (&_h, pMap->szKey, pMap->szValue);
       pMap++;
-    }
+  }
 }
 
 static const ASM_MAPPING _asxxxx_mapping[] =
@@ -330,8 +330,53 @@ static const ASM_MAPPING _asxxxx_mapping[] =
   {NULL, NULL}
 };
 
+static const ASM_MAPPING _gas_mapping[] =
+{
+  {"labeldef", "%s::"},
+  {"slabeldef", "%s:"},
+  {"tlabeldef", "%05d$:"},
+  {"tlabel", "%05d$"},
+  {"immed", "#"},
+  {"zero", "#0x00"},
+  {"one", "#0x01"},
+  {"area", ".section %s"},
+  {"areacode", ".section %s"},
+  {"areadata", ".section %s"},
+  {"areahome", ".section %s"},
+  {"ascii", ".ascii \"%s\""},
+  {"ds", ".ds %d"},
+  {"db", ".db"},
+  {"dbs", ".db %s"},
+  {"dw", ".dw"},
+  {"dws", ".dw %s"},
+  {"constbyte", "0x%02X"},
+  {"constword", "0x%04X"},
+  {"immedword", "#0x%04X"},
+  {"immedbyte", "#0x%02X"},
+  {"hashedstr", "#%s"},
+  {"lsbimmeds", "#<%s"},
+  {"msbimmeds", "#>%s"},
+  {"module", ".file \"%s.c\""},
+  {"global", ".globl %s"},
+  {"fileprelude", ""},
+  {"functionheader",
+   "; ---------------------------------\n"
+   "; Function %s\n"
+   "; ---------------------------------"
+  },
+  {"functionlabeldef", "%s:"},
+  {"bankimmeds", "0	; PENDING: bank support"},
+  {NULL, NULL}
+};
+
 const ASM_MAPPINGS asm_asxxxx_mapping =
 {
   NULL,
   _asxxxx_mapping
+};
+
+const ASM_MAPPINGS asm_gas_mapping =
+{
+  NULL,
+  _gas_mapping
 };

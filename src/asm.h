@@ -25,6 +25,7 @@ struct _ASM_MAPPINGS
 /* The default asxxxx token mapping.
  */
 extern const ASM_MAPPINGS asm_asxxxx_mapping;
+extern const ASM_MAPPINGS asm_gas_mapping;
 
 /** Last entry has szKey = NULL.
  */

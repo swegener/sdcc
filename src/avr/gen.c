@@ -3740,91 +3740,114 @@ R0Rsh (int shCount)
 static void
 genUnpackBits (operand * result, char *rname, int ptype)
 {
-  int shCnt;
-  int rlen = 0;
-  sym_link *etype;
-  int offset = 0;
+	int shCnt;
+	int rlen = 0;
+	sym_link *etype;
+	int offset = 0;
+	int rsize;
 
-  etype = getSpec (operandType (result));
+	etype = getSpec (operandType (result));
+	rsize = getSize (operandType (result));
+	/* read the first byte  */
+	switch (ptype) {
 
-  /* read the first byte  */
-  switch (ptype)
-    {
-
-    case POINTER:
-    case IPOINTER:
-    case PPOINTER:
-    case FPOINTER:
-      emitcode ("ld", "r0,%s+", rname);
-      break;
-
-    case CPOINTER:
-      emitcode ("ldm", "r0,%s+", rname);
-      break;
-
-    case GPOINTER:
-      emitcode ("call", "__gptrget_pi");
-      break;
-    }
-
-  /* if we have bitdisplacement then it fits   */
-  /* into this byte completely or if length is */
-  /* less than a byte                          */
-  if ((shCnt = SPEC_BSTR (etype)) || (SPEC_BLEN (etype) <= 8))
-    {
-
-      /* shift right r0 */
-      R0Rsh (shCnt);
-      emitcode ("andi", "r0,0x%02x",
-		((unsigned char) -1) >> (8 - SPEC_BLEN (etype)));
-
-      aopPut (AOP (result), "r0", offset);
-      return;
-    }
-
-  /* bit field did not fit in a byte  */
-  rlen = SPEC_BLEN (etype) - 8;
-  aopPut (AOP (result), "a", offset++);
-
-  while (1)
-    {
-
-      switch (ptype)
-	{
 	case POINTER:
 	case IPOINTER:
+		emitcode ("mov", "a,@%s", rname);
+		break;
+
 	case PPOINTER:
+		emitcode ("movx", "a,@%s", rname);
+		break;
+
 	case FPOINTER:
-	  emitcode ("ld", "r0,%s+", rname);
-	  break;
+		emitcode ("movx", "a,@dptr");
+		break;
 
 	case CPOINTER:
-	  emitcode ("ldm", "r0,%s+", rname);
-	  break;
+		emitcode ("clr", "a");
+		emitcode ("movc", "a", "@a+dptr");
+		break;
 
 	case GPOINTER:
-	  emitcode ("lcall", "__gptrget_pi");
-	  break;
+		emitcode ("lcall", "__gptrget");
+		break;
 	}
 
-      rlen -= 8;
-      /* if we are done */
-      if (rlen <= 0)
-	break;
+	rlen = SPEC_BLEN (etype);
 
-      aopPut (AOP (result), "r0", offset++);
+	/* if we have bitdisplacement then it fits   */
+	/* into this byte completely or if length is */
+	/* less than a byte                          */
+	if ((shCnt = SPEC_BSTR (etype)) || (SPEC_BLEN (etype) <= 8)) {
 
-    }
+		/* shift right acc */
+		AccRsh (shCnt);
 
-  if (rlen)
-    {
-      emitcode ("andi", "r0,#0x%02x", ((unsigned char) -1) >> (-rlen));
-      aopPut (AOP (result), "r0", offset);
-    }
+		emitcode ("anl", "a,#0x%02x",
+			  ((unsigned char) -1) >> (8 - SPEC_BLEN (etype)));
+		aopPut (AOP (result), "a", offset++);
+		goto finish;
+	}
 
-  return;
+	/* bit field did not fit in a byte  */
+	aopPut (AOP (result), "a", offset++);
+  
+	while (1) {
+
+		switch (ptype) {
+
+		case POINTER:
+		case IPOINTER:
+			emitcode ("inc", "%s", rname);
+			emitcode ("mov", "a,@%s", rname);
+			break;
+
+		case PPOINTER:
+			emitcode ("inc", "%s", rname);
+			emitcode ("movx", "a,@%s", rname);
+			break;
+
+		case FPOINTER:
+			emitcode ("inc", "dptr");
+			emitcode ("movx", "a,@dptr");
+			break;
+
+		case CPOINTER:
+			emitcode ("clr", "a");
+			emitcode ("inc", "dptr");
+			emitcode ("movc", "a", "@a+dptr");
+			break;
+
+		case GPOINTER:
+			emitcode ("inc", "dptr");
+			emitcode ("lcall", "__gptrget");
+			break;
+		}
+
+		rlen -= 8;
+		/* if we are done */
+		if (rlen < 8)
+			break;
+
+		aopPut (AOP (result), "a", offset++);
+
+	}
+
+	if (rlen) {
+		//  emitcode("anl","a,#0x%02x",((unsigned char)-1)>>(rlen));
+		AccLsh (8 - rlen);
+		aopPut (AOP (result), "a", offset++);
+	}
+
+ finish:
+	if (offset < rsize) {
+		rsize -= offset;
+		while (rsize--)
+			aopPut (AOP (result), zero, offset++);
+	}
+	return;
 }
-
 
 /*-----------------------------------------------------------------*/
 /* genDataPointerGet - generates code when ptr offset is known     */
@@ -3834,25 +3857,24 @@ genDataPointerGet (operand * left,
 		   operand * result,
 		   iCode * ic)
 {
-  char *l;
-  char buffer[256];
-  int size, offset = 0;
-  aopOp (result, ic, TRUE);
+	char *l;
+	char buffer[256];
+	int size, offset = 0;
+	aopOp (result, ic, TRUE);
 
-  /* get the string representation of the name */
-  l = aopGet (AOP (left), 0);
-  size = AOP_SIZE (result);
-  while (size--)
-    {
-      if (offset)
-	sprintf (buffer, "(%s + %d)", l + 1, offset);
-      else
-	sprintf (buffer, "%s", l + 1);
-      emitcode ("lds", "%s,%s", aopGet (AOP (result), offset++), buffer);
-    }
+	/* get the string representation of the name */
+	l = aopGet (AOP (left), 0);
+	size = AOP_SIZE (result);
+	while (size--) {
+		if (offset)
+			sprintf (buffer, "(%s + %d)", l + 1, offset);
+		else
+			sprintf (buffer, "%s", l + 1);
+		emitcode ("lds", "%s,%s", aopGet (AOP (result), offset++), buffer);
+	}
 
-  freeAsmop (left, NULL, ic, TRUE);
-  freeAsmop (result, NULL, ic, TRUE);
+	freeAsmop (left, NULL, ic, TRUE);
+	freeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -3881,16 +3903,14 @@ genNearPointerGet (operand * left,
      lower 128 bytes of space */
   if (AOP_TYPE (left) == AOP_IMMD &&
       !IS_BITVAR (retype) &&
-      DCL_TYPE (ltype) == POINTER)
-    {
+      DCL_TYPE (ltype) == POINTER) {
       genDataPointerGet (left, result, ic);
       return;
     }
 
   /* if the value is already in a pointer register
      then don't need anything more */
-  if (!AOP_INPREG (AOP (left)))
-    {
+  if (!AOP_INPREG (AOP (left))) {
       /* otherwise get a free pointer register */
       aop = newAsmop (0);
       preg = getFreePtr (ic, &aop, FALSE, 0);
@@ -3908,16 +3928,13 @@ genNearPointerGet (operand * left,
   /* if bitfield then unpack the bits */
   if (IS_BITVAR (retype))
     genUnpackBits (result, rname, POINTER);
-  else
-    {
+  else {
       /* we have can just get the values */
       int size = AOP_SIZE (result);
       int offset = 0;
 
-      while (size--)
-	{
-	  if (IS_AOP_PREG (result) || AOP_TYPE (result) == AOP_STK)
-	    {
+      while (size--) {
+	  if (IS_AOP_PREG (result) || AOP_TYPE (result) == AOP_STK) {
 
 	      emitcode ("mov", "a,@%s", rname);
 	      aopPut (AOP (result), "a", offset);

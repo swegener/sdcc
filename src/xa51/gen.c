@@ -264,27 +264,28 @@ static asmop *aopForSym(symbol *sym,
 	{
 	case 1:
 	  emitcode (MOV, "r0,#%s", sym->rname);
-	  emitcode (MOVC, "r0l,[r0]");
+	  emitcode (MOVC, "r0l,[r0+]");
 	  sprintf (aop->name[0], "r0l");
 	  return aop;
 	case 2:
 	  emitcode (MOV, "r0,#%s", sym->rname);
-	  emitcode (MOVC, "r0,[r0]");
+	  emitcode (MOVC, "r0,[r0+]");
 	  sprintf (aop->name[0], "r0");
 	  return aop;
 	case 3:
 	  emitcode (MOV, "r0,#%s", sym->rname);
-	  emitcode (MOVC, "r1l,[r0+2]");
-	  sprintf (aop->name[1], "r1l");
-	  emitcode (MOV, "r0,[r0]");
-	  sprintf (aop->name[0], "r0");
+	  emitcode (MOVC, "r0,[r0+]");
+	  sprintf (aop->name[1], "r0");
+	  emitcode (MOV, "r1l,[r0+]");
+	  sprintf (aop->name[0], "r1l");
 	  return aop;
 	case 4:
 	  emitcode (MOV, "r0,#%s", sym->rname);
-	  emitcode (MOVC, "r1,[r0+2]");
-	  sprintf (aop->name[1], "r1");
-	  emitcode (MOVC, "r0,[r0]");
+	  emitcode (MOVC, "r1,[r0+]");
+	  emitcode (MOVC, "r0,[r0+]");
+	  emitcode ("xch", "r0,r1");
 	  sprintf (aop->name[0], "r0");
+	  sprintf (aop->name[1], "r1");
 	  return aop;
 	}
       
@@ -1016,29 +1017,11 @@ static void genMod (iCode * ic) {
   printIc ("genMod", ic, 1,1,1);
 }
 
-/*-----------------------------------------------------------------*/
+ /*-----------------------------------------------------------------*/
 /* genCmpGt :- greater than comparison                             */
 /*-----------------------------------------------------------------*/
 static void genCmpGt (iCode * ic) {
   printIc ("genCmpGt", ic, 1,1,1);
-}
-/*-----------------------------------------------------------------*/
-/* genCmpGt :- greater than comparison                             */
-/*-----------------------------------------------------------------*/
-static void genCmpLe (iCode * ic) {
-  printIc ("genCmpLe", ic, 1,1,1);
-}
-/*-----------------------------------------------------------------*/
-/* genCmpGt :- greater than comparison                             */
-/*-----------------------------------------------------------------*/
-static void genCmpGe (iCode * ic) {
-  printIc ("genCmpGe", ic, 1,1,1);
-}
-/*-----------------------------------------------------------------*/
-/* genCmpGt :- greater than comparison                             */
-/*-----------------------------------------------------------------*/
-static void genCmpNe (iCode * ic) {
-  printIc ("genCmpNe", ic, 1,1,1);
 }
 /*-----------------------------------------------------------------*/
 /* genCmpLt - less than comparisons                                */
@@ -1934,15 +1917,13 @@ void genXA51Code (iCode * lic) {
 	break;
 	
       case LE_OP:
-	genCmpLe (ic);
-	break;
-
       case GE_OP:
-	genCmpGe (ic);
-	break;
-
       case NE_OP:
-	genCmpNe (ic);
+
+	/* note these two are xlated by algebraic equivalence
+	   during parsing SDCC.y */
+	werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+		"got '>=' or '<=' shouldn't have come here");
 	break;
 
       case EQ_OP:

@@ -192,6 +192,16 @@ struct SYMBOL *findSymbolByName(char *symName) {
   return 0;
 }
 
+struct MODULE *findModuleByName(char *modName) {
+  struct MODULE *module;
+  for (module=modules; module; module=module->next) {
+    if (strcmp(module->name, modName)==0) {
+      return module;
+    }
+  }
+  return NULL;
+}
+
 void addToModules (char *name, int isLib) {
   struct MODULE *module;
   int s;
@@ -262,7 +272,7 @@ void addToDefs(char *def, int address, char absolute) {
   // no duplicates allowed
   if ((symbol=findSymbolByName(def))) {
     fprintf (stderr, "*** %s:%d duplicate symbol %s first defined in "
-	     "module %s:%d\n", 
+	     "module %s:%d\n",
 	     currentModule->name, currentLine, def, 
 	     symbol->module->name, symbol->lineno);
     fatalErrors++;
@@ -585,14 +595,17 @@ int scanLibraries(int unresolved) {
 	  continue;
 	}
 	while (fgets(line, 132, lf)) {
-	  if (sscanf(line, "S %[^ ] Def", symName)==1) {
+	  int dummy; // we need this to get the right count of the next sscanf
+	  if (sscanf(line, "S %[^ ] Def%04x", symName, &dummy)==2) {
 	    if (isUnresolved(symName, 1)) {
-	      fprintf (stderr, "%s:%s\n", libFile, symName);
+	      //fprintf (stderr, "%s:%s\n", libFile, symName);
 	      readModule(libFile,1);
 	      if (resolved++ == unresolved) {
 		// we are done
 		return resolved;
 	      }
+	      // skip to next lib module
+	      break;
 	    }
 	  }
 	}
@@ -697,10 +710,11 @@ int main(int argc, char **argv) {
   // mark the resolved references
   resolve();
 
-  // now do something :) EXTREMELY SLOW AND INEFFICIENT
+  // now do something EXTREMELY SLOW AND INEFFICIENT :)
   while ((unresolved=relocate())) {
     if (!scanLibraries(unresolved)) {
       struct REFERENCE *reference;
+      resolve();
       for (reference=references; reference; reference=reference->next) {
 	if (!reference->resolved) {
 	  fprintf (stderr, "*** unresolved symbol %s in %s:%d\n",

@@ -285,9 +285,9 @@ PORT xa51_port =
   TRUE, // use_dw_for_init
   0,				/* leave lt */
   0,				/* leave gt */
-  0,				/* transform <= to ! > */
-  0,				/* transform >= to ! < */
-  0,				/* transform != to !(a == b) */
+  1,				/* transform <= to ! > */
+  1,				/* transform >= to ! < */
+  1,				/* transform != to !(a == b) */
   0,				/* leave == */
   FALSE,                        /* No array initializer support. */
   cseCostEstimation,

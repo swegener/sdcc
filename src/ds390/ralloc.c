@@ -1302,7 +1302,7 @@ static void fillGaps()
     
     /* First try to do DPTRuse once more since now we know what got into
        registers */
-#if 1
+
     for (sym = hTabFirstItem(liveRanges,&key) ; sym ; 
 	 sym = hTabNextItem(liveRanges,&key)) {
 
@@ -1322,7 +1322,7 @@ static void fillGaps()
 	    }
 	}
     }
-#endif    
+
     /* look for livernages that was spilt by the allocator */
     for (sym = hTabFirstItem(liveRanges,&key) ; sym ; 
 	 sym = hTabNextItem(liveRanges,&key)) {
@@ -2110,20 +2110,21 @@ packRegsDPTRuse (operand * op)
 	/* if PCALL cannot be sure give up */
 	if (ic->op == PCALL) return NULL;
 
-	/* if CALL then make sure it is VOID || return value not used */
+	/* if CALL then make sure it is VOID || return value not used 
+	   or the return value is assigned to this one */
 	if (ic->op == CALL) {
 	    if (OP_SYMBOL(IC_RESULT(ic))->liveTo == 
 		OP_SYMBOL(IC_RESULT(ic))->liveFrom) continue ;
 	    etype = getSpec(type = operandType(IC_RESULT(ic)));
-	    if (getSize(type) == 0) continue ;
+	    if (getSize(type) == 0 || isOperandEqual(op,IC_RESULT(ic))) continue ;
 	    return NULL ;
 	}
 
 	/* special case of add with a [remat] */
 	if (ic->op == '+' && 
 	    OP_SYMBOL(IC_LEFT(ic))->remat &&
-	    (!isOperandInFarSpace(IC_RIGHT(ic)) || 
-	     isOperandInReg(IC_RIGHT(ic)))) continue ;
+	    (isOperandInFarSpace(IC_RIGHT(ic)) &&
+	     !isOperandInReg(IC_RIGHT(ic)))) return NULL ;
 
 	/* special cases  */
 	/* pointerGet */
@@ -2505,6 +2506,9 @@ packRegisters (eBBlock * ebp)
 
       if (POINTER_GET (ic))
 	OP_SYMBOL (IC_LEFT (ic))->uptr = 1;
+
+      if (ic->op == RETURN && IS_SYMOP (IC_LEFT(ic)))
+	  OP_SYMBOL (IC_LEFT (ic))->uptr = 1;
 
       if (!SKIP_IC2 (ic))
 	{

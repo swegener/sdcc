@@ -2977,6 +2977,22 @@ sfr at 0x98 S0CON ; // serial channel 0 control register P80C552 specific
 //sbit at 0x9F SM0  ;
 #endif
  
+#ifdef S0CON__SM0__SM1__SM20__REN0__TB80__RB80__TI0__RI0
+#undef S0CON__SM0__SM1__SM20__REN0__TB80__RB80__TI0__RI0
+// serial channel 0 buffer register SAB80517 specific(same as stock SCON)
+sfr at 0x98 S0CON ;
+sbit at 0x98 RI0  ;
+sbit at 0x99 TI0  ;
+sbit at 0x9A RB80 ;
+sbit at 0x9B TB80  ;
+sbit at 0x9C REN0  ;
+sbit at 0x9D SM20  ;
+sbit at 0x9E SM1  ;
+sbit at 0x9F SM0  ;
+
+#endif
+
+
 #ifdef S0RELL
 #undef S0RELL
 sfr at 0xAA S0RELL ; // serial channel 0 reload register low byte SAB80517 specific

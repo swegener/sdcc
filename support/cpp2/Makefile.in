@@ -106,7 +106,7 @@ OBSTACK=obstack.o
 
 install: all
 	$(INSTALL) $(TARGET) `echo $(bindir)/sdcpp|sed '$(transform)'`
-	$(STRIP) -s `echo $(bindir)/sdcpp|sed '$(transform)'`
+	$(STRIP) `echo $(bindir)/sdcpp|sed '$(transform)'`
 
 clean:
 	-rm -f $(TARGET) *.o core libcpp.a

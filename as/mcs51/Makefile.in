@@ -62,9 +62,9 @@ $(ASLINK): $(LKOBJECTS)
 # ---------------------------------------------------
 install: all installdirs
 	$(INSTALL) $(ASX8051) `echo $(bindir)/asx8051|sed '$(transform)'`
-	$(STRIP) -s `echo $(bindir)/asx8051|sed '$(transform)'`
+	$(STRIP) `echo $(bindir)/asx8051|sed '$(transform)'`
 	$(INSTALL) $(ASLINK) `echo $(bindir)/aslink|sed '$(transform)'`
-	$(STRIP) -s `echo $(bindir)/aslink|sed '$(transform)'`
+	$(STRIP) `echo $(bindir)/aslink|sed '$(transform)'`
 
 # Deleting all the installed files
 # --------------------------------

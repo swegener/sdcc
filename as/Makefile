@@ -9,9 +9,9 @@ all:
 
 install: all install-doc
 	$(INSTALL) $(PRJDIR)/bin/as-z80 `echo $(bindir)/as-z80|sed '$(transform)'`
-	$(STRIP) -s `echo $(bindir)/as-z80|sed '$(transform)'`
+	$(STRIP) `echo $(bindir)/as-z80|sed '$(transform)'`
 	$(INSTALL) $(PRJDIR)/bin/as-gbz80 `echo $(bindir)/as-gbz80|sed '$(transform)'`
-	$(STRIP) -s `echo $(bindir)/as-gbz80|sed '$(transform)'`
+	$(STRIP) `echo $(bindir)/as-gbz80|sed '$(transform)'`
 
 install-doc:
 	$(INSTALL) -d $(docdir)/aslink

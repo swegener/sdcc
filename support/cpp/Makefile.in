@@ -57,7 +57,7 @@ $(TARGET): $(SLIBOBJS) $(OBJECTS)
 # ---------------------------------------------------
 install: all installdirs
 	$(INSTALL) $(TARGET) `echo $(bindir)/sdcppold|sed '$(transform)'`
-	$(STRIP) -s `echo $(bindir)/sdcppold|sed '$(transform)'`
+	$(STRIP) `echo $(bindir)/sdcppold|sed '$(transform)'`
 
 # Deleting all the installed files
 # --------------------------------

@@ -55,7 +55,7 @@ $(PRJDIR)/support/gc/libgc.a:
 # ---------------------------------------------------
 install: all installdirs
 	$(INSTALL) $(TARGET) `echo $(bindir)/sdcc|sed '$(transform)'`
-	$(STRIP) -s `echo $(bindir)/sdcc|sed '$(transform)'`
+	$(STRIP) `echo $(bindir)/sdcc|sed '$(transform)'`
 
 
 # Deleting all the installed files

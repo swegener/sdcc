@@ -14,7 +14,7 @@ all: $(TARGET)
 
 install: all installdirs
 	$(INSTALL) $(TARGET) `echo $(bindir)/packihx|sed '$(transform)'`
-	$(STRIP) -s `echo $(bindir)/packihx|sed '$(transform)'`
+	$(STRIP) `echo $(bindir)/packihx|sed '$(transform)'`
 
 # Deleting all the installed files
 # --------------------------------

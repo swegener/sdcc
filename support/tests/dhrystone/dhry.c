@@ -59,7 +59,7 @@ Enumeration Func_1 (Capital_Letter Ch_1_Par_Val, Capital_Letter Ch_2_Par_Val);
 Boolean Func_2 (char *Str_1_Par_Ref, char *Str_2_Par_Ref);
 Boolean Func_3 (Enumeration Enum_Par_Val);
 
-int main(void) 
+int _main(void) 
 {
     One_Fifty       Int_1_Loc;
     REG   One_Fifty       Int_2_Loc;

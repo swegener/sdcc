@@ -37,6 +37,7 @@ static const char *_z80_getRegName(struct regs *reg)
 {
     if (reg)
 	return reg->name;
+    assert(0);
     return "err";
 }
 

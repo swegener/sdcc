@@ -1,10 +1,26 @@
 # Simple Makefile for dhrystone and sdcc
 
-CC = /home/michaelh/projects/sdcc/bin/sdcc -mz80 -v
-CFLAGS = -DREG= -DNOSTRUCTASSIGN -DNOENUM
+CC = /home/michaelh/projects/sdcc/bin/sdcc
+# -DNOENUM is here to make the results more predictable
+CFLAGS = -mz80 -v
+CFLAGS += -DREG= -DNOSTRUCTASSIGN -DNOENUM
+LIBDIR = /home/michaelh/projects/sdcc/device/lib/z80/
+LD = link-z80
+
+OBJ = dhry.o
 
 all: dhry
 
+dhry: $(OBJ)
+	$(LD) -n -- -i -j -k$(LIBDIR) -lz80.lib \
+	-b_CODE=0x200 dhry.ihx $(LIBDIR)crt0.o $(OBJ)
+	cat dhry.ihx | ../../makebin/makebin > dhry.rom
+
+.c.o:
+	$(CC) $(CFLAGS) $<
+
+dhry.c: $(CC)
+
 clean:
 	rm -r *~ dhry
-	
+

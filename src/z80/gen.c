@@ -1097,13 +1097,19 @@ static void emitCall (iCode *ic, bool ispcall)
     /* adjust the stack for parameters if required */
     if (IC_LEFT(ic)->parmBytes) {
 	int i = IC_LEFT(ic)->parmBytes;
-	/* PENDING: do better */
-	while (i>1) {
-	    emitcode("pop", "hl");
-	    i-=2;
+	if (i>6) {
+	    emitcode("ld", "hl,#%d", i);
+	    emitcode("add", "hl,sp");
+	    emitcode("ld", "sp,hl");
 	}
-	if (i) 
-	    emitcode("inc", "sp");
+	else {
+	    while (i>1) {
+		emitcode("pop", "hl");
+		i-=2;
+	    }
+	    if (i) 
+		emitcode("inc", "sp");
+	}
     }
 
 }

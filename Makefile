@@ -17,6 +17,7 @@ SDCC_EXTRA      = support/regression
 
 SDCC_ASLINK	= as/mcs51 as link
 SDCC_PACKIHX	= packihx
+SDCC_LIBRARIAN	= support/librarian
 
 TARGETS         = sdcc-libs sdcc-cc sdcc-aslink sdcc-doc
 
@@ -37,8 +38,13 @@ TARGETS         += sdcc-packihx
 PKGS            += $(SDCC_PACKIHX)
 endif
 
+ifneq ($(OPT_ENABLE_LIBRARIAN), no)
+TARGETS         += sdcc-librarian
+PKGS            += $(SDCC_LIBRARIAN)
+endif
+
 PKGS_TINI	= $(SDCC_LIBS) $(SDCC_ASLINK) \
-		  src device/include $(SDCC_PACKIHX)
+		  src device/include $(SDCC_PACKIHX) $(SDCC_LIBRARIAN)
 PORTS		= $(shell cat ports.build)
 ALLPORTS	= $(shell cat ports.all)
 
@@ -63,6 +69,9 @@ sdcc-misc:
 sdcc-packihx:
 	$(MAKE) -C $(SDCC_PACKIHX)
 
+sdcc-librarian:
+	$(MAKE) -C $(SDCC_LIBRARIAN)
+
 sdcc-device: sdcc-cc sdcc-aslink
 	$(MAKE) -C device/include
 	$(MAKE) -C device/lib
@@ -76,7 +85,7 @@ sdcc-doc:
 
 sdcc: $(TARGETS)
 
-sdcc-tini: sdcc-cc sdcc-aslink sdcc-device-tini sdcc-packihx
+sdcc-tini: sdcc-cc sdcc-aslink sdcc-device-tini sdcc-packihx sdcc-librarian
 	$(MAKE) -f main.mk all
 
 # Some interesting sub rules

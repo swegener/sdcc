@@ -3,7 +3,7 @@
 	* src/SDCCicode.c (operandOperation): 3. fix, this time for Alpha; ULONG has 64 bits
 	there, while the mantissa of a double is "only" 53 bits wide.
 
-2003-07-30  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+2003-07-31  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	Adding sdcclib to the build.  MSVC project coming soon.
 	Files added/changed:
@@ -16,6 +16,10 @@
 	* support\librarian\Makefile.in
 	* support\librarian\sdcclib.c
 	* Makefile.bcc
+	* Makefile
+	* Makefile.common.in
+	* configure
+	* configure.in
 
 2003-07-29  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 

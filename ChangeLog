@@ -1,6 +1,15 @@
 2003-10-31  Borut Razem <borut.razem@siol.net>
 
-	* support\cpp2\cpplex.c: Fixed _WIN32 problem with CR-CR-LF sequences
+	* support/cpp2/cpplib.h,
+	  support/cpp2/cpplib.c,
+	  support/cpp2/cpplex.c,
+	  support/cpp2/cppinit.c: introduced #pragma preproc_asm [ + | - ]
+	  to switch _asm block preprocessing on / off. Default is
+	  #pragma preproc_asm +
+
+2003-10-31  Borut Razem <borut.razem@siol.net>
+
+	* support/cpp2/cpplex.c: Fixed _WIN32 problem with CR-CR-LF sequences
 	  when outputting comment blocks (when executed with -C option) and
 	  _asm (SDCPP specific) blocks
 

@@ -5,7 +5,7 @@ PORT = gb
 
 CC = /home/michaelh/projects/gbdk-support/lcc/lcc
 # -DNOENUM is here to make the results more predictable
-CFLAGS = -v --gbdkdir=/home/michaelh/projects/gbdk-current/
+CFLAGS = -v --prefix=/home/michaelh/projects/gbdk-current/
 CFLAGS += -DREG= -DNOSTRUCTASSIGN -DNOENUM
 LIBDIR = /home/michaelh/projects/gbdk-lib/build/
 LD = link-$(PROC)
@@ -29,4 +29,4 @@ native:
 dhry.c:
 
 clean:
-	rm -r *~ dhry
+	rm -f *~ dhry *.o *.gb

@@ -2396,7 +2396,7 @@ static void genCall (iCode *ic)
 	}
 	emitpcode(POC_CALL,popGetWithString(name,isExtern));
 	if (isExtern) {
-		emitpcode(POC_PAGESEL,popGetWithString("$",0)); /* May have returned from another page - must call pagesel */
+		emitpcode(POC_PAGESEL,popGetWithString("$",0)); /* May have returned from another page - must call pagesel to restore PCLATH before next goto or call instruction */
 	}
 	GpsuedoStkPtr=0;
 	/* if we need assign a result value */

@@ -2,7 +2,7 @@
 # For Borland 5.0, replace bc45 by bc5.
 # If you have the Borland assembler, remove "-DUSE_GENERIC"
 #
-bc=        c:\bc45
+bc=        c:\borland\bcc55
 bcbin=     $(bc)\bin
 bclib=     $(bc)\lib
 bcinclude= $(bc)\include

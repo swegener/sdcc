@@ -240,6 +240,7 @@ DEFSETFUNC (findCheaperOp)
   cseDef *cdp = item;
   V_ARG (operand *, cop);
   V_ARG (operand **, opp);
+  V_ARG (int, checkSign);
 
   /* if we have already found it */
   if (*opp)
@@ -302,15 +303,11 @@ DEFSETFUNC (findCheaperOp)
     *opp = IC_RESULT (cdp->diCode);
 
   if ((*opp) && 
-      (isOperandLiteral(*opp) || 
-#if 0 // jwk: because of bug #480645, this is clumsy anyway. E.g.
-       getSize(operandType(*opp)) == getSize(operandType(cop)) ||
-       (SPEC_USIGN(operandType (cop))==SPEC_USIGN(operandType (*opp)) &&
-	(SPEC_LONG(operandType (cop))==SPEC_LONG(operandType (*opp))))))
-#else
-       compareType(operandType(*opp), operandType(cop))==1))
-#endif
-    {
+      (isOperandLiteral(*opp) || !checkSign || 
+       (checkSign &&
+	(SPEC_USIGN(operandType (cop))==SPEC_USIGN(operandType (*opp)) &&
+	 (SPEC_LONG(operandType (cop))==SPEC_LONG(operandType (*opp)))))))
+      {
 
       if ((isGlobalInNearSpace (cop) &&
 	   !isOperandLiteral (*opp)) ||
@@ -993,7 +990,7 @@ ifxOptimize (iCode * ic, set * cseSet,
   if (!computeOnly)
     {
       pdop = NULL;
-      applyToSetFTrue (cseSet, findCheaperOp, IC_COND (ic), &pdop);
+      applyToSetFTrue (cseSet, findCheaperOp, IC_COND (ic), &pdop, 0);
       if (pdop)
 	{
 	  IC_COND (ic) = pdop;
@@ -1266,6 +1263,55 @@ fixUpTypes (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* isSignedOp - will return 1 if sign is important to operation    */
+/*-----------------------------------------------------------------*/
+static int isSignedOp (iCode *ic)
+{
+    switch (ic->op) {
+    case '!':
+    case '~':
+    case UNARYMINUS:
+    case IPUSH:
+    case IPOP:
+    case CALL:
+    case PCALL:
+    case RETURN:
+    case '+':
+    case '-':
+    case EQ_OP:
+    case AND_OP:
+    case OR_OP:
+    case '^':
+    case '|':
+    case BITWISEAND:
+    case INLINEASM:
+    case LEFT_OP:
+    case GET_VALUE_AT_ADDRESS:
+    case '=':
+    case IFX:
+    case RECEIVE:
+    case SEND:
+ 	return 0;
+    case '*':
+    case '/':
+    case '%':
+    case '>':
+    case '<':
+    case LE_OP:
+    case GE_OP:
+    case NE_OP:
+    case RRC:
+    case RLC:
+    case GETHBIT:
+    case RIGHT_OP:
+    case CAST:
+    case ARRAYINIT:
+ 	return 1;
+    default:
+ 	return 0;
+    }
+ }
+/*-----------------------------------------------------------------*/
 /* cseBBlock - common subexpression elimination for basic blocks   */
 /*             this is the hackiest kludgiest routine in the whole */
 /*             system. also the most important, since almost all   */
@@ -1308,7 +1354,8 @@ cseBBlock (eBBlock * ebb, int computeOnly,
       iCode *pdic;
       operand *pdop;
       iCode *defic;
-      
+      int checkSign ;
+
       ic->eBBlockNum = ebb->bbnum;
 
       if (SKIP_IC2 (ic))
@@ -1361,7 +1408,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	  if (!computeOnly)
 	    {
 	      pdop = NULL;
-	      applyToSetFTrue (cseSet, findCheaperOp, IC_LEFT (ic), &pdop);
+	      applyToSetFTrue (cseSet, findCheaperOp, IC_LEFT (ic), &pdop, 0);
 	      if (pdop)
 		IC_LEFT (ic) = pdop;
 	    }
@@ -1443,11 +1490,13 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	      !(IS_BITFIELD (OP_SYMBOL (IC_RESULT (ic))->etype)))
 	    {
 	      pdop = NULL;
-	      applyToSetFTrue (cseSet, findCheaperOp, IC_RESULT (ic), &pdop);
+	      applyToSetFTrue (cseSet, findCheaperOp, IC_RESULT (ic), &pdop, 0);
 	      if (pdop && IS_ITEMP (pdop) && !computeOnly)
 		IC_RESULT (ic) = pdop;
 	    }
 	}
+
+      checkSign = isSignedOp(ic);
 
       /* do the operand lookup i.e. for both the */
       /* right & left operand : check the cseSet */
@@ -1460,7 +1509,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	{
 
 	  pdop = NULL;
-	  applyToSetFTrue (cseSet, findCheaperOp, IC_LEFT (ic), &pdop);
+	  applyToSetFTrue (cseSet, findCheaperOp, IC_LEFT (ic), &pdop, checkSign);
 	  if (pdop)
 	    {
 	      if (POINTER_GET (ic))
@@ -1497,7 +1546,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	{
 
 	  pdop = NULL;
-	  applyToSetFTrue (cseSet, findCheaperOp, IC_RIGHT (ic), &pdop);
+	  applyToSetFTrue (cseSet, findCheaperOp, IC_RIGHT (ic), &pdop, checkSign);
 	  if (pdop)
 	    {
 	      IC_RIGHT (ic) = pdop;

@@ -3,5 +3,16 @@
 	* link/z80/aslink.h: Fixed long file name support.  Is now based off PATH_MAX instead of a constant.
 
 	* src/z80/gen.c: Fixed add and sub for the case where left or right are in static space.
-	
 
+2001-08-30 Bernhard Held   <bernhard@bernhardheld.de>
+
+  * sim/ucsim/configure:    little improvement of Cygwin-detection	
+  * sim/ucsim/configure.in: little improvement of Cygwin-detection	
+  * sim/ucsim/cmd.src/newcmdcl.h: include <sys/types.h> to define fd_set automated build
+  * support/regression/tests/bug-221100.c: small changes for mcs51
+  * support/regression/tests/bug-221168.c: small changes for mcs51
+  * support/regression/tests/bug-227710.c: small changes for mcs51
+  * support/regression/tests/staticinit.c: small changes for mcs51
+  * as/mcs51/aslink.h: accept everything as symbol name in rel-files, bug fix ID 452601
+  * as/mcs51/lklex.c:  accept everything as symbol name in rel-files, bug fix ID 452601
+  * as/mcs51/lksym.c:  accept everything as symbol name in rel-files, bug fix ID 452601

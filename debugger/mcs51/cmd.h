@@ -67,6 +67,7 @@ extern int cmdListFunctions (char *s, context *cctxt);
 extern int cmdListSymbols (char *s, context *cctxt);
 
 extern void setMainContext( void);
+extern function *needExtraMainFunction(void);
 int conditionIsTrue( char *s, context *cctxt);
 
 #endif

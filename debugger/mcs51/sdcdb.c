@@ -398,18 +398,19 @@ srcLine **loadFile (char *name, int *nlines)
 
 
     if (!(mfile = searchDirsFopen(name))) {
-  fprintf(stderr,"sdcdb: cannot open module %s -- use '--directory=<source directory> option\n",name);
-  return NULL;
+        fprintf(stderr,"sdcdb: cannot open module %s -- use '--directory=<source directory> option\n",name);
+        return NULL;
     }
 
     while ((bp = fgets(buffer,sizeof(buffer),mfile))) {
-  (*nlines)++;
+        (*nlines)++;
 
-  slines = (srcLine **)resize((void **)slines,*nlines);
+        slines = (srcLine **)resize((void **)slines,*nlines);
 
-  slines[(*nlines)-1] = Safe_calloc(1,sizeof(srcLine));
-  slines[(*nlines)-1]->src = alloccpy(bp,strlen(bp));
-    }
+        slines[(*nlines)-1] = Safe_calloc(1,sizeof(srcLine));
+        slines[(*nlines)-1]->src = alloccpy(bp,strlen(bp));
+        slines[(*nlines)-1]->addr= INT_MAX;
+            }
 
     fclose(mfile);
     return slines;
@@ -495,106 +496,130 @@ static void functionPoints ()
     symbol *sym;
     exePoint *ep ;
 
+    // add _main dummy for runtime env
+    if ((func = needExtraMainFunction()))
+    {
+        function *func1;
+
+        /* alloc new _main function */
+        func1 = Safe_calloc(1,sizeof(function));
+        *func1 = *func;
+        func1->sym = Safe_calloc(1,sizeof(symbol));
+        *func1->sym =  *func->sym;
+        func1->sym->name  = alloccpy("_main",5);
+        func1->sym->rname = alloccpy("G$_main$0$",10);
+        /* TODO must be set by symbol information */
+        func1->sym->addr  = 0;
+        func1->sym->eaddr = 0x2f;
+        addSet(&functions,func1);
+    }
+
     /* for all functions do */
     for ( func = setFirstItem(functions); func;
-    func = setNextItem(functions)) {
-  int j ;
-  module *mod;
+          func = setNextItem(functions)) {
+        int j ;
+        module *mod;
 
-  sym = func->sym;
+        sym = func->sym;
 
-  Dprintf(D_sdcdb, ("sdcdb: func '%s' has entry '0x%x' exit '0x%x'\n",
-         func->sym->name,
-         func->sym->addr,
-         func->sym->eaddr));
+        Dprintf(D_sdcdb, ("sdcdb: func '%s' has entry '0x%x' exit '0x%x'\n",
+                          func->sym->name,
+                          func->sym->addr,
+                          func->sym->eaddr));
 
-  if (!func->sym->addr && !func->sym->eaddr)
-      continue ;
+        if (!func->sym->addr && !func->sym->eaddr)
+            continue ;
 
-  /* for all source lines in the module find
-     the ones with address >= start and <= end
-     and put them in the point */
-  mod = NULL ;
-  if (! applyToSet(modules,moduleWithName,func->modName,&mod))
-      continue ;
-  func->mod = mod ;
-  func->entryline= INT_MAX;
-  func->exitline =  0;
-  func->aentryline = INT_MAX ;
-  func->aexitline = 0;
+        /* for all source lines in the module find
+           the ones with address >= start and <= end
+           and put them in the point */
+        mod = NULL ;
+        if (! applyToSet(modules,moduleWithName,func->modName,&mod))
+            continue ;
+        func->mod = mod ;
+        func->entryline= INT_MAX-2;
+        func->exitline =  0;
+        func->aentryline = INT_MAX-2 ;
+        func->aexitline = 0;
 
-  /* do it for the C Lines first */
-  for ( j = 0 ; j < mod->ncLines ; j++ ) {
-      if (mod->cLines[j]->addr >= sym->addr &&
-    mod->cLines[j]->addr <= sym->eaddr ) {
+        /* do it for the C Lines first */
+        for ( j = 0 ; j < mod->ncLines ; j++ ) {
+            if (mod->cLines[j]->addr < INT_MAX &&
+                mod->cLines[j]->addr >= sym->addr &&
+                mod->cLines[j]->addr <= sym->eaddr ) {
 
 
-    /* add it to the execution point */
-    if (func->entryline > j)
-        func->entryline = j;
+                /* add it to the execution point */
+                if (func->entryline > j)
+                    func->entryline = j;
 
-    if (func->exitline < j)
-        func->exitline = j;
+                if (func->exitline < j)
+                    func->exitline = j;
 
-    ep = Safe_calloc(1,sizeof(exePoint));
-    ep->addr =  mod->cLines[j]->addr ;
-    ep->line = j;
-    ep->block= mod->cLines[j]->block;
-    ep->level= mod->cLines[j]->level;
-    addSet(&func->cfpoints,ep);
-      }
-  }
-  /* check double line execution points of module */
-  for (ep = setFirstItem(mod->cfpoints); ep;
-       ep = setNextItem(mod->cfpoints))
-  {
-      if (ep->addr >= sym->addr &&
-          ep->addr <= sym->eaddr ) 
-      {
-          addSet(&func->cfpoints,ep);
-      }
-  }
-  /* do the same for asm execution points */
-  for ( j = 0 ; j < mod->nasmLines ; j++ ) {
-      if (mod->asmLines[j]->addr >= sym->addr &&
-    mod->asmLines[j]->addr <= sym->eaddr ) {
+                ep = Safe_calloc(1,sizeof(exePoint));
+                ep->addr =  mod->cLines[j]->addr ;
+                ep->line = j;
+                ep->block= mod->cLines[j]->block;
+                ep->level= mod->cLines[j]->level;
+                addSet(&func->cfpoints,ep);
+            }
+        }
+        /* check double line execution points of module */
+        for (ep = setFirstItem(mod->cfpoints); ep;
+             ep = setNextItem(mod->cfpoints))
+        {
+            if (ep->addr >= sym->addr &&
+                ep->addr <= sym->eaddr ) 
+            {
+                addSet(&func->cfpoints,ep);
+            }
+        }
+        /* do the same for asm execution points */
+        for ( j = 0 ; j < mod->nasmLines ; j++ ) {
+            if (mod->asmLines[j]->addr < INT_MAX &&
+                mod->asmLines[j]->addr >= sym->addr &&
+                mod->asmLines[j]->addr <= sym->eaddr ) {
 
-    exePoint *ep ;
-    /* add it to the execution point */
-    if (func->aentryline > j)
-        func->aentryline = j;
+                exePoint *ep ;
+                /* add it to the execution point */
+                if (func->aentryline > j)
+                    func->aentryline = j;
 
-    if (func->aexitline < j)
-        func->aexitline = j;
+                if (func->aexitline < j)
+                    func->aexitline = j;
 
-    /* add it to the execution point */
-    ep = Safe_calloc(1,sizeof(exePoint));
-    ep->addr =  mod->asmLines[j]->addr ;
-    ep->line = j;
-    addSet(&func->afpoints,ep);
-      }
-  }
+                /* add it to the execution point */
+                ep = Safe_calloc(1,sizeof(exePoint));
+                ep->addr =  mod->asmLines[j]->addr ;
+                ep->line = j;
+                addSet(&func->afpoints,ep);
+            }
+        }
+        if ( func->entryline == INT_MAX-2 )
+            func->entryline = 0;
+        if ( func->aentryline == INT_MAX-2 )
+            func->aentryline = 0;
 
 #ifdef SDCDB_DEBUG
-  if (!( D_sdcdb & sdcdbDebug))
-      continue;
+        if (!( D_sdcdb & sdcdbDebug))
+            continue;
 
-  Dprintf(D_sdcdb, ("sdcdb: function '%s' has the following C exePoints\n",
-         func->sym->name));
-  {
-      exePoint *ep;
+        Dprintf(D_sdcdb, ("sdcdb: function '%s' has the following C exePoints\n",
+                          func->sym->name));
+        {
+            exePoint *ep;
 
-      for (ep = setFirstItem(func->cfpoints); ep;
-     ep = setNextItem(func->cfpoints))
-     Dprintf(D_sdcdb, ("sdcdb: {0x%x,%d} %s",
-         ep->addr,ep->line+1,mod->cLines[ep->line]->src));
+            for (ep = setFirstItem(func->cfpoints); ep;
+                 ep = setNextItem(func->cfpoints))
+                Dprintf(D_sdcdb, ("sdcdb: {0x%x,%d} %s",
+                                  ep->addr,ep->line+1,mod->cLines[ep->line]->src));
 
-      Dprintf(D_sdcdb, ("sdcdb:  and the following ASM exePoints\n"));
-      for (ep = setFirstItem(func->afpoints); ep;
-           ep = setNextItem(func->afpoints))
-        Dprintf (D_sdcdb, ("sdcdb: {0x%x,%d} %s",
-            ep->addr,ep->line+1,mod->asmLines[ep->line]->src));
-  }
+            Dprintf(D_sdcdb, ("sdcdb:  and the following ASM exePoints\n"));
+            for (ep = setFirstItem(func->afpoints); ep;
+                 ep = setNextItem(func->afpoints))
+                Dprintf (D_sdcdb, ("sdcdb: {0x%x,%d} %s",
+                                   ep->addr,ep->line+1,mod->asmLines[ep->line]->src));
+        }
 #endif
     }
 }

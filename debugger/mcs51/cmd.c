@@ -678,15 +678,15 @@ context *discoverContext (unsigned addr, function *func)
                   &line,&currCtxt->block,&currCtxt->level)) 
             currCtxt->cline = func->lline = line;
         else
-            currCtxt->cline = func->exitline;
+            currCtxt->cline = -1;
     }    
     /* find the asm line number */
     line = 0;
     if (applyToSet(func->afpoints,lineAtAddr,addr,
 		   &line,NULL,NULL))
-	currCtxt->asmline = line;       
+        currCtxt->asmline = line;       
     else
-	currCtxt->asmline = -1;
+        currCtxt->asmline = -1;
         
     return currCtxt ;
 }
@@ -2276,9 +2276,8 @@ int cmdListSrc (char *s, context *cctxt)
                 func ? func->sym->name : "?",
                 func ? lastaddr -func->sym->addr : 0);
         llines = pline +1;
-        while ( pline < list_mod->ncLines )
+        for ( ; pline < list_mod->ncLines; pline++ )
         {
-            pline++;
             if ( list_mod->cLines[pline]->addr > lastaddr )
             {
                 lastaddr = list_mod->cLines[pline]->addr -1;
@@ -3200,11 +3199,24 @@ void setMainContext()
 {
     function *func = NULL;
     currentFrame = 0; 
-    if (!applyToSet(functions,funcWithName,"main",&func) &&
-        !applyToSet(functions,funcWithName,"_main",&func))
-        return;
+    if (!applyToSet(functions,funcWithName,"_main",&func) &&
+        !applyToSet(functions,funcWithName,"main",&func))
+            return;
 
     discoverContext (func->sym->addr, func);
+}
+
+function *needExtraMainFunction()
+{
+    function *func = NULL;
+    if (!applyToSet(functions,funcWithName,"_main",&func))
+    {
+        if (applyToSet(functions,funcWithName,"main",&func))
+        {
+            return func;
+        }
+    }
+    return NULL;
 }
     
 static void printFrame()

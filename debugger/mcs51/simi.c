@@ -144,7 +144,17 @@ void openSimulator (char **args, int nargs)
     int retry = 0;
     int i ;
     Dprintf(D_simi, ("simi: openSimulator\n"));
-
+#ifdef SDCDB_DEBUG
+    if (D_simi & sdcdbDebug)
+    {
+        printf("simi: openSimulator: ");
+        for (i=0; i < nargs; i++ )
+        {
+            printf("arg%d: %s ",i,args[i]);
+        }
+        printf("\n");
+    }
+#endif
     invalidateCache(XMEM_CACHE);
     invalidateCache(IMEM_CACHE);
     invalidateCache(SREG_CACHE);

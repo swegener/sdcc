@@ -712,7 +712,7 @@ static void lnkCSrc (char *s)
     module *mod ;
 
     /* input will be of format
-       filename.ext$<level>$<block>$<line>:<address> */
+       filename.ext$<line>$<level>$<block>:<address> */
     /* get the module name */
     while (*s != '$' )
   *bp++ = *s++;
@@ -738,7 +738,7 @@ static void lnkCSrc (char *s)
         ( !mod->cLines[line]->addr ||
         mod->cLines[line]->level > level )*/ ) 
     {
-        if ( mod->cLines[line]->addr )
+        if ( mod->cLines[line]->addr != INT_MAX )
         {
             /* save double line information for exepoints */
             exePoint *ep ;

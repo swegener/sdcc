@@ -334,6 +334,7 @@ DEFSETFUNC (findCheaperOp)
   if ((*opp) && 
       (isOperandLiteral(*opp) || !checkSign || 
        (checkSign &&
+	IS_SPEC(operandType (cop)) && IS_SPEC(operandType (*opp)) &&
 	(SPEC_USIGN(operandType (cop))==SPEC_USIGN(operandType (*opp)) &&
 	 (SPEC_LONG(operandType (cop))==SPEC_LONG(operandType (*opp)))))))
       {
@@ -358,6 +359,19 @@ DEFSETFUNC (findCheaperOp)
 	  *opp = operandFromOperand (*opp);
 	  (*opp)->isaddr = cop->isaddr;
 	}
+	  
+      if (IS_SPEC(operandType (cop)) && IS_SPEC(operandType (*opp)) &&
+	  SPEC_NOUN(operandType(cop)) != SPEC_NOUN(operandType(*opp)))
+	{
+	    //fprintf(stderr, 
+	    //	    "findCheaperOp: "
+	    //      "was about to replace %s with %s, Kev says no.\n",
+	    //	    nounName(operandType(cop)),
+	    //	    nounName(operandType(*opp)));
+	    *opp = NULL;
+	    return 0;
+        }
+	  
       LRH(printf ("findCheaperOp: %s < %s\n",\
 	      IS_SYMOP((*opp)) ? OP_SYMBOL((*opp))->name : "!SYM",\
 	      OP_SYMBOL(cop)->name));

@@ -1,3 +1,8 @@
+2003-03-11 Kevin Vigor <kevin@vigor.nu>
+
+	* src/SDCCcse.c: fix findCheaperOp to prevent replacing int types
+	with shorter literals. Fixes bug 700121.
+
 2003-03-11    <johan@balder>
 
 	* src/SDCCsymt.c (compareType): a (void *) can be assigned to any pointer

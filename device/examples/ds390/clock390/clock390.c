@@ -35,8 +35,8 @@ void main (void) {
     }
     if (Serial0CharArrived()) {
       switch (getchar()) {
-      case '2': CpuSpeed(2); break;
-      case '4': CpuSpeed(4); break;
+      case '2': printf ("Switching to 2 clocks/cycle\n"); CpuSpeed(2); break;
+      case '4': printf ("Switching to 4 clocks/cycle\n"); CpuSpeed(4); break;
       }
     }
   }

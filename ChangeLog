@@ -8,6 +8,8 @@
 	* debugger/mcs51/cmd.c: converted multi-line string literals
 	* sim/ucsim/globals.cc: converted multi-line string literals
 	* src/SDCCmain.c: introduced signal handler to remove temp files
+	* doc/Makefile: small tweaks, implement clean
+	* doc: removed generated files
 
 2003-02-05  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 

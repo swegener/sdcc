@@ -31,7 +31,7 @@ man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
 
-CPPFLAGS        = -I$(INCDIR) -lang-c++
+CPPFLAGS        = -I$(INCDIR)
 CFLAGS		= 
 
 OBJECTS		= _atoi.rel _atol.rel _autobaud.rel _bp.rel _schar2fs.rel \
@@ -134,7 +134,7 @@ dep: Makefile.dep
 Makefile.dep: $(SOURCES) $(INCDIR)/*.h
 	rm -f Makefile.dep
 	for i in $(SOURCES); do \
-	  $(CPP) -M $(CPPFLAGS) $$i >$${i}.dep; \
+	  $(CPP) -lang-c++ -M $(CPPFLAGS) $$i >$${i}.dep; \
 	  cat $${i}.dep >>Makefile.dep; \
 	  rm $${i}.dep; \
 	done

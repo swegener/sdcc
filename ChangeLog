@@ -14,6 +14,7 @@
 
 	* as/z80/Makefile: fix permanent rebuild of z80
 	* sim/ucsim/gui.src/Makefile.in: target "install" builds the same packages as target "all"
+	* support/regression/tests/bitfields.c: added Johan's bitfields.c
 
 2003-04-18 	Kevin Vigor <kevin@vigor.nu>
 

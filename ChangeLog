@@ -1,3 +1,9 @@
+2004-02-20 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/SDCCpeeph.def: new keyword "labelRefCountChange" which allows peepholes
+	to keep the correct label reference count when adding/removing references
+	to labels. A peephole file using this is appended to patch #1144962.
+
 2005-02-14 Raphael Neider <rneider AT web.de>
 
 	* device/lib/pic16/libc/string/memccpy.c: changed 3rd argument to char

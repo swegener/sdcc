@@ -24,6 +24,11 @@
 \papersides 1
 \paperpagestyle fancy
 
+\layout Comment
+
+Please note: double dashed options (e.g.
+ --version) need three dashes in this document to be visable in html and
+ pdf output.
 \layout Title
 
 SDCC Compiler User Guide
@@ -391,8 +396,8 @@ SDCCHOME)/include
 \newline 
 - /usr/local/share/sdcc/include (gcc builds)
 \newline 
-- path(arv[0])/../include and then /sdcc/include (windoze msvc and borland
- builds)
+- path(arv[0])/../include and then /sdcc/include (as a last resort for windoze
+ msvc and borland builds)
 \layout Enumerate
 
 Library files (the 
@@ -446,7 +451,7 @@ model
 \shape italic 
 model
 \shape default 
- (windoze msvc and borland builds)
+ (as a last resort for windoze msvc and borland builds)
 \layout Enumerate
 
 Documentation (although never really searched for, you have to do that yourself
@@ -5571,10 +5576,11 @@ none.
 \layout Itemize
 
 NOIV - Do not generate interrupt vector table entries for all ISR functions
- defined after the pragma. This is useful in cases where the interrupt
- vector table must be defined manually, or when there is a secondary, manually
- defined interrupt vector table (e.g. for the autovector feature of the Cypress
- EZ-USB FX2).
+ defined after the pragma.
+ This is useful in cases where the interrupt vector table must be defined
+ manually, or when there is a secondary, manually defined interrupt vector
+ table (e.g.
+ for the autovector feature of the Cypress EZ-USB FX2).
 \layout Itemize
 
 CALLEE-SAVES function1[,function2[,function3...]] - The compiler by default

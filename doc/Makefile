@@ -27,6 +27,8 @@ $(TSS).html: $(TSS).tex
 
 %.txt: %.lyx
 	lyx -e text $<
+	sed s/---/--/ $@ > $*.tmp
+	mv $*.tmp $@
 
 %.pdf: %.tex %.dvi
 	which pdflatex > /dev/null && pdflatex $* || dvipdf $*

@@ -373,7 +373,9 @@ pointerTypes (sym_link * ptr, sym_link * type)
 	  break;
 	}
       /* the storage class of type ends here */
-      SPEC_SCLS (type) = 0;
+      SPEC_SCLS (type) = 
+	SPEC_CONST (type) =
+	SPEC_VOLATILE (type) = 0;
     }
 
   /* now change all the remaining unknown pointers
@@ -469,7 +471,8 @@ addDecl (symbol * sym, int type, sym_link * p)
 	{
 	  sym->etype = sym->etype->next = newLink (SPECIFIER);
 	}
-      
+
+      SPEC_SCLS (sym->etype) = SPEC_SCLS (DCL_TSPEC (p));
       DCL_PTR_CONST (sym->type) = SPEC_CONST (DCL_TSPEC (p));
       DCL_PTR_VOLATILE (sym->type) = SPEC_VOLATILE (DCL_TSPEC (p));
       DCL_TSPEC (p) = NULL;
@@ -557,14 +560,7 @@ sym_link *
 mergeSpec (sym_link * dest, sym_link * src, char *name)
 {
   if (!IS_SPEC(dest) || !IS_SPEC(src)) {
-#if 0
-    werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "cannot merge declarator");
-    exit (1);
-#else
     werror (E_SYNTAX_ERROR, yytext);
-    // the show must go on
-    return newIntLink();
-#endif
   }
 
   if (SPEC_NOUN(src)) {
@@ -592,17 +588,6 @@ mergeSpec (sym_link * dest, sym_link * src, char *name)
   }
 
   /* copy all the specifications  */
-
-  // we really should do: 
-#if 0
-  if (SPEC_what(src)) {
-    if (SPEC_what(dest)) {
-      werror(W_DUPLICATE_SPEC, "what");
-    }
-    SPEC_what(dst)|=SPEC_what(src);
-  }
-#endif
-  // but there are more important thing right now
 
   SPEC_LONG (dest) |= SPEC_LONG (src);
   dest->select.s._short|=src->select.s._short;
@@ -1170,13 +1155,17 @@ checkSClass (symbol * sym, int isProto)
       !IS_FUNC(sym->type)) {
     SPEC_SCLS (sym->etype) = S_CODE;
   }
-  
+
   /* global variable in code space is a constant */
   if (sym->level == 0 &&
       SPEC_SCLS (sym->etype) == S_CODE &&
-      port->mem.code_ro)
-    SPEC_CONST (sym->etype) = 1;
-  
+      port->mem.code_ro) {
+    if (IS_SPEC(sym->type)) {
+      SPEC_CONST (sym->type) = 1;
+    } else {
+      DCL_PTR_CONST (sym->type) = 1;
+    }
+  }
 
   /* if bit variable then no storage class can be */
   /* specified since bit is already a storage */
@@ -1933,6 +1922,7 @@ printTypeChain (sym_link * start, FILE * of)
 {
   int nlr = 0;
   sym_link * type, * search;
+  STORAGE_CLASS scls;
 
   if (!of)
     {
@@ -1945,16 +1935,44 @@ printTypeChain (sym_link * start, FILE * of)
     return;
   }
 
-  /* print the chain as it is written in the source: */
-  /* start with the last entry                       */
+  /* Print the chain as it is written in the source: */
+  /* start with the last entry.                      */
+  /* However, the storage class at the end of the    */
+  /* chain reall applies to the first in the chain!  */
+
   for (type = start; type && type->next; type = type->next)
     ;
+  scls=SPEC_SCLS(type);
   while (type)
     {
+      if (type==start) {
+	switch (scls) 
+	  {
+	  case S_DATA: fprintf (of, "data-"); break;
+	  case S_XDATA: fprintf (of, "xdata-"); break;
+	  case S_SFR: fprintf (of, "sfr-"); break;
+	  case S_SBIT: fprintf (of, "sbit-"); break;
+	  case S_CODE: fprintf (of, "code-"); break;
+	  case S_IDATA: fprintf (of, "idata-"); break;
+	  case S_PDATA: fprintf (of, "pdata-"); break;
+	  case S_LITERAL: fprintf (of, "literal-"); break;
+	  case S_STACK: fprintf (of, "stack-"); break;
+	  case S_XSTACK: fprintf (of, "xstack-"); break;
+	  case S_BIT: fprintf (of, "bit-"); break;
+	  case S_EEPROM: fprintf (of, "eeprom-"); break;
+	  default: break;
+	  }
+      }
+
       if (IS_DECL (type))
 	{
-	  if (DCL_PTR_VOLATILE (type)) {
-	    fprintf (of, "volatile ");
+	  if (!IS_FUNC(type)) {
+	    if (DCL_PTR_VOLATILE (type)) {
+	      fprintf (of, "volatile-");
+	    }
+	    if (DCL_PTR_CONST (type)) {
+	      fprintf (of, "const-");
+	    }
 	  }
 	  switch (DCL_TYPE (type))
 	    {
@@ -1964,45 +1982,28 @@ printTypeChain (sym_link * start, FILE * of)
 		       (IFFUNC_ISJAVANATIVE(type) ? "_JavaNative" : " "));
 	      break;
 	    case GPOINTER:
-	      if (DCL_PTR_CONST (type))
-		fprintf (of, "const ");
-	      fprintf (of, "generic * ");
+	      fprintf (of, "generic* ");
 	      break;
 	    case CPOINTER:
-	      if (DCL_PTR_CONST (type))
-		fprintf (of, "const ");
-	      fprintf (of, "code * ");
+	      fprintf (of, "code* ");
 	      break;
 	    case FPOINTER:
-	      if (DCL_PTR_CONST (type))
-		fprintf (of, "const ");
-	      fprintf (of, "xdata * ");
+	      fprintf (of, "xdata* ");
 	      break;
 	    case EEPPOINTER:
-	      if (DCL_PTR_CONST (type))
-		fprintf (of, "const ");
-	      fprintf (of, "eeprom * ");
+	      fprintf (of, "eeprom* ");
 	      break;
-
 	    case POINTER:
-	      if (DCL_PTR_CONST (type))
-		fprintf (of, "const ");
-	      fprintf (of, "near *");
+	      fprintf (of, "near* ");
 	      break;
 	    case IPOINTER:
-	      if (DCL_PTR_CONST (type))
-		fprintf (of, "const ");
-	      fprintf (of, "idata * ");
+	      fprintf (of, "idata* ");
 	      break;
 	    case PPOINTER:
-	      if (DCL_PTR_CONST (type))
-		fprintf (of, "const ");
-	      fprintf (of, "pdata * ");
+	      fprintf (of, "pdata* ");
 	      break;
 	    case UPOINTER:
-	      if (DCL_PTR_CONST (type))
-		fprintf (of, "const ");
-	      fprintf (of, "unkown * ");
+	      fprintf (of, "unkown* ");
 	      break;
 	    case ARRAY:
 	      if (DCL_ELEM(type)) {
@@ -2015,34 +2016,17 @@ printTypeChain (sym_link * start, FILE * of)
 	}
       else
 	{
-	  switch (SPEC_SCLS(type)) 
-	    {
-	    case S_DATA: fprintf (of, "data "); break;
-	    case S_XDATA: fprintf (of, "xdata "); break;
-	    case S_SFR: fprintf (of, "sfr "); break;
-	    case S_SBIT: fprintf (of, "sbit "); break;
-	    case S_CODE: fprintf (of, "code "); break;
-	    case S_IDATA: fprintf (of, "idata "); break;
-	    case S_PDATA: fprintf (of, "pdata "); break;
-	    case S_LITERAL: fprintf (of, "literal "); break;
-	    case S_STACK: fprintf (of, "stack "); break;
-	    case S_XSTACK: fprintf (of, "xstack "); break;
-	    case S_BIT: fprintf (of, "bit "); break;
-	    case S_EEPROM: fprintf (of, "eeprom "); break;
-	    default: break;
-	    }
-
 	  if (SPEC_VOLATILE (type))
-	    fprintf (of, "volatile ");
-	  if (SPEC_USIGN (type))
-	    fprintf (of, "unsigned ");
+	    fprintf (of, "volatile-");
 	  if (SPEC_CONST (type))
-	    fprintf (of, "const ");
+	    fprintf (of, "const-");
+	  if (SPEC_USIGN (type))
+	    fprintf (of, "unsigned-");
 	  switch (SPEC_NOUN (type))
 	    {
 	    case V_INT:
 	      if (IS_LONG (type))
-		fprintf (of, "long ");
+		fprintf (of, "long-");
 	      fprintf (of, "int");
 	      break;
 

@@ -839,10 +839,20 @@ isOperandGlobal (operand * op)
 int 
 isOperandVolatile (operand * op, bool chkTemp)
 {
+  sym_link *optype;
+  sym_link *opetype;
+
   if (IS_ITEMP (op) && !chkTemp)
     return 0;
 
-  return IS_VOLATILE(operandType(op));
+  opetype = getSpec (optype = operandType (op));
+    
+  if (IS_PTR (optype) && DCL_PTR_VOLATILE (optype))   
+    return 1;   
+    
+  if (IS_VOLATILE (opetype))   
+    return 1;   
+  return 0; 
 }
 
 /*-----------------------------------------------------------------*/
@@ -2119,7 +2129,6 @@ aggrToPtr (sym_link * type, bool force)
 
   ptype->next = type;
 
-#ifdef JWK
   /* if the output class is code */
   if ((DCL_TYPE (ptype) = PTR_TYPE (SPEC_OCLS (etype))) == CPOINTER)
     DCL_PTR_CONST (ptype) = port->mem.code_ro;
@@ -2132,9 +2141,6 @@ aggrToPtr (sym_link * type, bool force)
   /* the variable was volatile then pointer to volatile */
   if (IS_VOLATILE (etype))
     DCL_PTR_VOLATILE (ptype) = 1;
-#else
-  DCL_TYPE (ptype) = PTR_TYPE (SPEC_OCLS (etype));
-#endif
 
   return ptype;
 }
@@ -2148,7 +2154,6 @@ geniCodeArray2Ptr (operand * op)
   sym_link *optype = operandType (op);
   sym_link *opetype = getSpec (optype);
 
-#ifdef JWK
   /* set the pointer depending on the storage class */
   if ((DCL_TYPE (optype) = PTR_TYPE (SPEC_OCLS (opetype))) == CPOINTER)
     DCL_PTR_CONST (optype) = port->mem.code_ro;
@@ -2161,9 +2166,6 @@ geniCodeArray2Ptr (operand * op)
   /* the variable was volatile then pointer to volatile */
   if (IS_VOLATILE (opetype))
     DCL_PTR_VOLATILE (optype) = 1;
-#else
-  DCL_TYPE (optype) = PTR_TYPE (SPEC_OCLS (opetype));
-#endif
 
   op->isaddr = 0;
   return op;
@@ -2450,7 +2452,6 @@ geniCodeAddressOf (operand * op)
 
   p = newLink (DECLARATOR);
 
-#ifdef JWK
   /* set the pointer depending on the storage class */
   if ((DCL_TYPE (p) = PTR_TYPE (SPEC_OCLS (opetype))) == CPOINTER)
     DCL_PTR_CONST (p) = port->mem.code_ro;
@@ -2461,10 +2462,6 @@ geniCodeAddressOf (operand * op)
 
   if (IS_VOLATILE (opetype))
     DCL_PTR_VOLATILE (p) = 1;
-#else
-  DCL_TYPE (p) = PTR_TYPE (SPEC_OCLS (opetype));
-#endif
-
 
   p->next = copyLinkChain (optype);
 
@@ -2562,10 +2559,12 @@ geniCodeDerefPtr (operand * op,int lvl)
 
   op->isGptr = IS_GENPTR (optype);
 
+#ifdef JWK
   /* if the pointer was declared as a constant */
   /* then we cannot allow assignment to the derefed */
   if (IS_PTR_CONST (optype))
     SPEC_CONST (retype) = 1;
+#endif
 
   op->isaddr = (IS_PTR (rtype) ||
 		IS_STRUCT (rtype) ||

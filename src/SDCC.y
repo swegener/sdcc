@@ -976,6 +976,7 @@ pointer
 		     DCL_TYPE($3) = POINTER ;
 		     break;
 		 case S_CODE:
+		     DCL_PTR_CONST($3) = 1;
 		     DCL_TYPE($3) = CPOINTER ;
 		     break;
 		 case S_EEPROM:

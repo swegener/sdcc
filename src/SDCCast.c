@@ -2061,6 +2061,9 @@ decorateType (ast * tree)
 	}
       RRVAL (tree) = 1;
       COPYTYPE (TTYPE (tree), TETYPE (tree), LTYPE (tree)->next);
+      if (IS_PTR(LTYPE(tree))) {
+	SPEC_CONST (TETYPE (tree)) = DCL_PTR_CONST (LTYPE(tree));
+      }
       return tree;
 
       /*------------------------------------------------------------------*/
@@ -2237,7 +2240,10 @@ decorateType (ast * tree)
 	  goto errorTreeReturn;
 	}
       if (SPEC_SCLS (tree->left->etype) == S_CODE)
-	DCL_TYPE (p) = CPOINTER;
+	{
+	  DCL_TYPE (p) = CPOINTER;
+	  DCL_PTR_CONST (p) = port->mem.code_ro;
+	}
       else if (SPEC_SCLS (tree->left->etype) == S_XDATA)
 	DCL_TYPE (p) = FPOINTER;
       else if (SPEC_SCLS (tree->left->etype) == S_XSTACK)
@@ -2260,6 +2266,8 @@ decorateType (ast * tree)
       p->next = LTYPE (tree);
       TTYPE (tree) = p;
       TETYPE (tree) = getSpec (TTYPE (tree));
+      DCL_PTR_CONST (p) = SPEC_CONST (TETYPE (tree));   
+      DCL_PTR_VOLATILE (p) = SPEC_VOLATILE (TETYPE (tree)); 
       LLVAL (tree) = 1;
       TLVAL (tree) = 1;
       return tree;
@@ -2389,9 +2397,9 @@ decorateType (ast * tree)
 	      werror (E_LVALUE_REQUIRED, "pointer deref");
 	      goto errorTreeReturn;
 	    }
-	  TTYPE (tree) = copyLinkChain ((IS_PTR (LTYPE (tree)) || IS_ARRAY (LTYPE (tree))) ?
-					LTYPE (tree)->next : NULL);
+	  TTYPE (tree) = copyLinkChain (LTYPE (tree)->next);
  	  TETYPE (tree) = getSpec (TTYPE (tree));
+	  SPEC_CONST (TETYPE (tree)) = DCL_PTR_CONST (LTYPE(tree));
 	  return tree;
 	}
 

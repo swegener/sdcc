@@ -2012,17 +2012,17 @@ isBitwiseOptimizable (iCode * ic)
   /* bitwise operations are considered optimizable
      under the following conditions (Jean-Louis VERN) 
 
-     x & lit
+     x & lit   <== jwk: should be x && lit
      bit & bit
      bit & x
      bit ^ bit
      bit ^ x
-     x   ^ lit
-     x   | lit
+     x   ^ lit <== jwk: should be x ^^ lit
+     x   | lit <== jwk: should be x || lit
      bit | bit
      bit | x
    */
-  if (IS_LITERAL (rtype) ||
+  if ( /* jwk IS_LITERAL (rtype) || */
       (IS_BITVAR (ltype) && IN_BITSPACE (SPEC_OCLS (ltype))))
     return TRUE;
   else
@@ -2319,10 +2319,7 @@ packRegisters (eBBlock * ebp)
          is defined in the previous instruction then
          mark the itemp as a conditional */
       if ((IS_CONDITIONAL (ic) ||
-	   ((ic->op == BITWISEAND ||
-	     ic->op == '|' ||
-	     ic->op == '^') &&
-	    isBitwiseOptimizable (ic))) &&
+	   (IS_BITWISE_OP(ic) && isBitwiseOptimizable(ic))) &&
 	  ic->next && ic->next->op == IFX &&
 	  isOperandEqual (IC_RESULT (ic), IC_COND (ic->next)) &&
 	  OP_SYMBOL (IC_RESULT (ic))->liveTo <= ic->next->seq)

@@ -1187,7 +1187,6 @@ genNotFloat (operand * op, operand * res)
 		aopGet (op->aop,
 			offset++, FALSE, FALSE));
     }
-  tlbl = newiTempLabel (NULL);
 
   tlbl = newiTempLabel (NULL);
   aopPut (res->aop, one, 1);

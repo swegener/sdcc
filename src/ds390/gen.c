@@ -1374,7 +1374,6 @@ genNotFloat (operand * op, operand * res)
 			offset++, FALSE, FALSE, FALSE));
     }
   _endLazyDPSEvaluation ();
-  tlbl = newiTempLabel (NULL);
 
   tlbl = newiTempLabel (NULL);
   aopPut (res->aop, one, 1);

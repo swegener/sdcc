@@ -2163,10 +2163,19 @@ packRegsDPTRuse (operand * op)
 	if (POINTER_SET(ic) && !isOperandEqual(IC_RESULT(ic),op) &&
 	    getSize(operandType(IC_RESULT(ic))) > 1 ) return NULL;
 
-	/* conditionals can destroy 'b' - make sure B wont be used in this one*/
+	/* conditionals can destroy 'b' - make sure B wont 
+	   be used in this one*/
 	if ((IS_CONDITIONAL(ic) || ic->op == '*' || ic->op == '/'  || 
 	     ic->op == LEFT_OP || ic->op == RIGHT_OP ) && 
 	    getSize(operandType(op)) > 3) return NULL;
+
+	/* if this is a cast to a bigger type */
+	if (ic->op==CAST) {
+	  if (getSize(OP_SYM_TYPE(IC_RESULT(ic))) >
+	      getSize(OP_SYM_TYPE(IC_RIGHT(ic)))) {
+	    return 0;
+	  }
+	}
 
 	/* general case */
 	if (IC_RESULT(ic) && IS_SYMOP(IC_RESULT(ic)) && 

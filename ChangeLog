@@ -1,3 +1,19 @@
+2005-01-04 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c (genIfxJump) fixed inverted skips on CARRY
+	* (genIfx) fixed (?) read from uninitialized SPIL_LOC (now assumes CARRY
+	  to hold the condition bit)
+	* added new version of genCmp (old code available via #define)
+	* added new version of genShiftLeft/genShiftRight in a generic
+	  way, now supports shifting by negative values
+	* (genLeftShiftLiteral, genRightShiftLiteral) use absolute value of
+	  shiftCount (expected by genGenericShift)
+	* src/pic16/genarith.c (genPlus) added code for adding CARRY+literal
+	* src/pic16/pcode.c (pic16_OptimizeJumps) removed annoying statistics
+	  dump
+	* (pic16_newpCodeOpLit) changed to cast to unsigned char (as e.g. -32766
+	  is an invalid literal too...)
+
 2005-01-04 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/gen.c (aopForSym, genEndFunction): applied some fixes

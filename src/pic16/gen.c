@@ -1933,7 +1933,7 @@ pCodeOp *pic16_popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 	
 	DEBUGpic16_emitcode(";*+*", "%d\tAOP_REG type = %s\n", __LINE__, dumpPicOptype(pcop->type));
 	rs = aop->aopu.aop_reg[offset]->name;
-	DEBUGpic16_emitcode(";","%d regiser idx = %d name = %s",__LINE__,rIdx,rs);
+	DEBUGpic16_emitcode(";","%d register idx = %d name = %s",__LINE__,rIdx,rs);
 	return pcop;
       }
 
@@ -12233,16 +12233,6 @@ static void genAssign (iCode *ic)
     goto release;
   }
 
-
-  if (AOP_TYPE(right) == AOP_REG) {
-    DEBUGpic16_emitcode(";   ", "%s:%d assign from register\n", __FUNCTION__, __LINE__);
-    while (size--) {
-      
-      pic16_emitpcode (POC_MOVFF, pic16_popGet2(AOP(right), AOP(result), offset++));
-    } // while
-    goto release;
-  }
-
   if(AOP_TYPE(right) != AOP_LIT
   	&& IN_CODESPACE(SPEC_OCLS(OP_SYMBOL(right)->etype))
   	&& !IS_FUNC(OP_SYM_TYPE(right))
@@ -12857,7 +12847,6 @@ static void genCast (iCode *ic)
       mov2f(AOP(result), AOP(right), offset);
       offset++;
     }
-    pic16_emitpinfo (INF_OPTIMIZATION, pic16_newpCodeOpOpt (OPT_JUMPTABLE_END, ""));
 
     /* now depending on the sign of the destination */
     size = AOP_SIZE(result) - AOP_SIZE(right);

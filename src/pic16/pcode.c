@@ -4657,7 +4657,7 @@ const char *immdmod[3]={"LOW", "HIGH", "UPPER"};
 char *pic16_get_op(pCodeOp *pcop,char *buffer, size_t size)
 {
   regs *r;
-  static char b[50];
+  static char b[128];
   char *s;
   int use_buffer = 1;    // copy the string to the passed buffer pointer
 
@@ -7106,9 +7106,10 @@ pCode *getNegatedBcc (pCode *bcc, pCodeOp *pcop)
   return newBcc;
 }
 
-#define MAX_DIST_GOTO 0x7FFFFFFF
-#define MAX_DIST_BRA 1020
-#define MAX_DIST_BCC 120
+#define MAX_DIST_GOTO         0x7FFFFFFF
+#define MAX_DIST_BRA                1020	// maximum offset (in bytes) possible with BRA
+#define MAX_DIST_BCC                 120	// maximum offset (in bytes) possible with Bcc
+#define MAX_JUMPCHAIN_DEPTH           16	// number of GOTOs to follow in resolveJumpChain() (to prevent endless loops)
 #define IS_GOTO(arg) ((arg) && isPCI(arg) && (PCI(arg)->op == POC_GOTO || PCI(arg)->op == POC_BRA))
 
 /* Follows GOTO/BRA instructions to their target instructions, stores the
@@ -7116,37 +7117,46 @@ pCode *getNegatedBcc (pCode *bcc, pCodeOp *pcop)
  * the distance from the original pc to *target.
  */
 int resolveJumpChain (pCode *pc, pCode **target, pCodeOp **pcop) {
-  pCode *curr = pc;
-  pCode *last = NULL;
-  pCodeOp *lastPCOP = NULL;
-  int dist = 0;
+	pCode *curr = pc;
+	pCode *last = NULL;
+	pCodeOp *lastPCOP = NULL;
+	int dist = 0;
+	int depth = 0;
 
-  /* only follow unconditional branches, except for the initial pCode (which may be a conditional branch) */
-  while (curr && isPCI(curr) && (PCI(curr)->op == POC_GOTO || PCI(curr)->op == POC_BRA
-				 || (curr == pc && isConditionalBranch(curr)))) {
-    last = curr;
-    lastPCOP = PCI(curr)->pcop;
-    dist = findpCodeLabel (pc, PCI(curr)->pcop->name, MAX_DIST_GOTO, &curr);
-  } // while
-  
-  if (target) *target = last;
-  if (pcop) *pcop = lastPCOP;
-  return dist;
+	//fprintf (stderr, "%s:%d: -=-", __FUNCTION__, __LINE__);
+
+	/* only follow unconditional branches, except for the initial pCode (which may be a conditional branch) */
+	while (curr && (last != curr) && (depth++ < MAX_JUMPCHAIN_DEPTH) && isPCI(curr)
+			&& (PCI(curr)->op == POC_GOTO || PCI(curr)->op == POC_BRA || (curr == pc && isConditionalBranch(curr)))) {
+		last = curr;
+		lastPCOP = PCI(curr)->pcop;
+		dist = findpCodeLabel (pc, PCI(curr)->pcop->name, MAX_DIST_GOTO, &curr);
+		//fprintf (stderr, "last:%p, curr:%p, label:%s\n", last, curr, PCI(last)->pcop->name);
+	} // while
+
+	if (target) *target = last;
+	if (pcop) *pcop = lastPCOP;
+	return dist;
 }
 
 /* Returns pc if it is not a OPT_JUMPTABLE_BEGIN INFO pCode.
  * Otherwise the first pCode after the jumptable (after
  * the OPT_JUMPTABLE_END tag) is returned.
  */
-pCode *skipJumptables (pCode *pc)
+pCode *skipJumptables (pCode *pc, int *isJumptable)
 {
+  *isJumptable = 0;
   if (!pc) return NULL;
-
+  
   while (pc->type == PC_INFO && PCINF(pc)->type == INF_OPTIMIZATION && PCOO(PCINF(pc)->oper1)->type == OPT_JUMPTABLE_BEGIN) {
+    *isJumptable = 1;
+    //fprintf (stderr, "SKIPPING jumptable\n");
     do {
+      //pc->print(stderr, pc);
       pc = pc->next;
     } while (pc && (pc->type != PC_INFO || PCINF(pc)->type != INF_OPTIMIZATION
 		    || PCOO(PCINF(pc)->oper1)->type != OPT_JUMPTABLE_END));
+    //fprintf (stderr, "<<JUMPTAB:\n");
     // skip OPT_END as well
     if (pc) pc = pc->next;
   } // while
@@ -7154,10 +7164,20 @@ pCode *skipJumptables (pCode *pc)
   return pc;
 }
 
-pCode *pic16_findNextInstructionSkipJumptables (pCode *pc)
+pCode *pic16_findNextInstructionSkipJumptables (pCode *pc, int *isJumptable)
 {
+  int isJumptab;
+  *isJumptable = 0;
   while (pc && !isPCI(pc) && !isPCAD(pc) && !isPCW(pc)) {
-    pc = skipJumptables (pc->next);
+    // set pc to the first pCode after a jumptable, leave pc untouched otherwise
+    pc = skipJumptables (pc, &isJumptab);
+    if (isJumptab) {
+        // pc is the first pCode after the jumptable
+	*isJumptable = 1;
+    } else {
+        // pc has not been changed by skipJumptables()
+	pc = pc->next;
+    }
   } // while
   
   return pc;
@@ -7177,7 +7197,7 @@ void pic16_OptimizeJumps ()
   pCode *pc_next = NULL;
   pBlock *pb;
   pCode *target;
-  int change, iteration;
+  int change, iteration, isJumptab;
   int isHandled = 0;
   char *label;
   int opt=0, toofar=0, opt_cond = 0, cond_toofar=0, opt_reorder = 0, opt_gotonext = 0, opt_gotochain = 0;
@@ -7195,8 +7215,13 @@ void pic16_OptimizeJumps ()
       pc = pic16_findNextInstruction (pb->pcHead);
     
       while (pc) {
-	pc_next = pic16_findNextInstructionSkipJumptables (pc->next);
-	
+	pc_next = pic16_findNextInstructionSkipJumptables (pc->next, &isJumptab);
+	if (isJumptab) {
+		// skip jumptable, i.e. start over with no pc_prev!	
+		pc_prev = NULL;
+		pc = pc_next;
+		continue;
+	} // if
 
 	/* (1) resolve chained jumps
 	 * Do not perform this until pattern (4) is no longer present! Otherwise we will
@@ -7370,9 +7395,11 @@ void pic16_OptimizeJumps ()
 	     "\t%5d chained GOTOs resolved\n",
 	     opt, toofar, opt_cond, cond_toofar, opt_reorder, opt_gotonext, opt_gotochain);
   } // if
+  //fprintf (stderr, "%s:%d: %s\n", __FILE__, __LINE__, __FUNCTION__);
 }
 
 #undef IS_GOTO
+#undef MAX_JUMPCHAIN_DEPTH
 #undef MAX_DIST_GOTO
 #undef MAX_DIST_BRA
 #undef MAX_DIST_BCC

@@ -1,3 +1,10 @@
+2004-12-22 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* applied a previous patch from Raphael Neider that wasn't included
+	in the previous commits, which fixes infinite loops within jumptable
+	improvements,
+	* made some fixes that previous patches introduced
+
 2004-12-21 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/gen.c (pic16_aopGet): applied fix from Raphael Neider

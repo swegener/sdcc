@@ -1739,7 +1739,7 @@ int pic16_pCodeSearchCondition(pCode *pc, unsigned int cond)
  *-----------------------------------------------------------------*/
 static int pCodeOpCompare(pCodeOp *pcops, pCodeOp *pcopd)
 {
-  char b[50], *n2;
+  char b[128], *n2;
 
   if(!pcops || !pcopd)
     return 0;
@@ -1766,7 +1766,7 @@ static int pCodeOpCompare(pCodeOp *pcops, pCodeOp *pcopd)
   }
 
   b[0]=0;
-  pic16_get_op(pcops,b,50);
+  pic16_get_op(pcops,b,128);
 
   n2 = pic16_get_op(pcopd,NULL,0);
 

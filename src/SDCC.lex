@@ -251,7 +251,7 @@ struct options  save_options  ;
 .			   { count()	; }
 %%
 
-int checkCurrFile ( char *s)
+static int checkCurrFile (char *s)
 {
     char lineNum[10]			;
     int  lNum				;
@@ -305,9 +305,9 @@ int checkCurrFile ( char *s)
 }
     
 int column = 0;
-int plineIdx=0;
+int plineIdx =0;
 
-void count()
+static void count(void)
 {
   int i;
   for (i = 0; yytext[i] != '\0'; i++)   {				
@@ -324,7 +324,7 @@ void count()
   /* ECHO; */
 }
 
-int check_type()
+static int check_type(void)
 {
 	/* check if it is in the typedef table */
 	if (findSym(TypedefTab,NULL,yytext)) {
@@ -342,7 +342,7 @@ int check_type()
  * to support ANSI hex and octal escape sequences in string liteals 
  */
 
-char *stringLiteral()
+static char *stringLiteral(void)
 {
 #define STR_BUF_CHUNCK_LEN  1024
   int ch;
@@ -453,22 +453,70 @@ enum pragma_id {
 STACK_DCL(options_stack, struct options *, SAVE_RESTORE_SIZE)
 STACK_DCL(optimize_stack, struct optimize *, SAVE_RESTORE_SIZE)
 
+/*
+ * cloneXxx functions should be updated every time a new set is
+ * added to the options or optimize structure!
+ */
 
-void doPragma (int op, char *cp)
+static struct options *cloneOptions(struct options *opt)
+{
+  struct options *new_opt;
+
+  new_opt = Safe_malloc(sizeof (struct options));
+
+  /* clone scalar values */
+  *new_opt = *opt;
+
+  /* clone sets */
+  new_opt->calleeSavesSet = setFromSetNonRev(opt->calleeSavesSet);
+  new_opt->excludeRegsSet = setFromSetNonRev(opt->excludeRegsSet);
+  /* not implemented yet: */
+  /* new_opt->olaysSet = setFromSetNonRev(opt->olaysSet); */
+
+  return new_opt;
+}
+
+static struct optimize *cloneOptimize(struct optimize *opt)
+{
+  struct optimize *new_opt;
+
+  new_opt = Safe_malloc(sizeof (struct options));
+
+  /* clone scalar values */
+  *new_opt = *opt;
+
+  return new_opt;
+}
+
+static void copyAndFreeOptions(struct options *dest, struct options *src)
+{
+  /* delete dest sets */
+  deleteSet(&dest->calleeSavesSet);
+  deleteSet(&dest->excludeRegsSet);
+  /* not implemented yet: */
+  /* deleteSet(&dest->olaysSet); */
+
+  /* dopy src to dest */
+  *dest = *src;
+
+  Safe_free(src);
+}
+
+static void copyAndFreeOptimize(struct optimize *dest, struct optimize *src)
+{
+  /* dopy src to dest */
+  *dest = *src;
+
+  Safe_free(src);
+}
+
+static void doPragma(int op, char *cp)
 {
   switch (op) {
   case P_SAVE:
     {
-      struct options *optionsp;
-      struct optimize *optimizep;
-
-      optionsp = Safe_malloc(sizeof (struct options));
-      *optionsp = options;
-      STACK_PUSH(options_stack, optionsp);
-
-      optimizep = Safe_malloc(sizeof (struct optimize));
-      *optimizep = optimize;
-      STACK_PUSH(optimize_stack, optimizep);
+      STACK_PUSH(options_stack, cloneOptions(&options));
+      STACK_PUSH(optimize_stack, cloneOptimize(&optimize));
     }
     break;
 
@@ -478,12 +526,10 @@ void doPragma (int op, char *cp)
       struct optimize *optimizep;
 
       optionsp = STACK_POP(options_stack);
-      options = *optionsp;
-      Safe_free(optionsp);
+      copyAndFreeOptions(&options, optionsp);
 
       optimizep = STACK_POP(optimize_stack);
-      optimize = *optimizep;
-      Safe_free(optimizep);
+      copyAndFreeOptimize(&optimize, optimizep);
     }
     break;
 
@@ -520,17 +566,16 @@ void doPragma (int op, char *cp)
     break;
 
   case P_CALLEE_SAVES:
-    {
-      int i=0;
-      /* append to the functions already listed
-         in callee-saves */
-      for (; options.calleeSaves[i] ;i++);
-        parseWithComma(&options.calleeSaves[i], Safe_strdup(cp));
-    }
+    /* append to the functions already listed
+       in callee-saves */
+    setParseWithComma(&options.calleeSavesSet, cp);
     break;
 
   case P_EXCLUDE:
-    parseWithComma(options.excludeRegs, Safe_strdup(cp));
+    {
+      deleteSet(&options.excludeRegsSet);
+      setParseWithComma(&options.excludeRegsSet, cp);
+    }
     break;
 
   case P_NOIV:
@@ -546,7 +591,7 @@ void doPragma (int op, char *cp)
   }
 }
 
-int process_pragma(char *s)
+static int process_pragma(char *s)
 {
 #define NELEM(x)  (sizeof (x) / sizeof (x)[0])
 #define PRAGMA    "#pragma"
@@ -608,7 +653,7 @@ int process_pragma(char *s)
 
 /* will return 1 if the string is a part
    of a target specific keyword */
-int isTargetKeyword(char *s)
+static int isTargetKeyword(char *s)
 {
     int i;
     
@@ -621,8 +666,6 @@ int isTargetKeyword(char *s)
     
     return 0;
 }
-
-extern int fatalError;
 
 int yyerror(char *s)
 {
@@ -639,7 +682,7 @@ int yyerror(char *s)
 			s,yytext,column);
      fatalError++;
    } else {
-     // this comes from an empy file, no problem
+     /* this comes from an empy file, no problem */
    }
    return 0;
 }

@@ -258,7 +258,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 
       /* if extern then do nothing or is a function
          then do nothing */
-      if (IS_FUNC (sym->type))
+      if (IS_FUNC (sym->type) && !(sym->isitmp))
 	continue;
 
       /* print extra debug info if required */

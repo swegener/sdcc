@@ -1,3 +1,9 @@
+2003-08-13  Bernhard Held <bernhard@bernhardheld.de>
+
+	Fixed bug #787649 by anonymous
+	* src/SDCCglue.c (emitRegularMap): added emission of sloc for func ptr
+	* src/ds390/gen.c (aopForSym): fixed func ptr in sloc
+
 2003-08-14  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	Fixed numerous bitfield problems.
@@ -10,7 +16,7 @@
 	* src/mcs51/gen.c (genPackBits, genUnpackBits): fixed mask bugs
 	* src/ds390/gen.c (genPackBits, genUnpackBits): fixed mask bugs
 	* support/regression/tests/bitfields.c: tests added
-	
+
 2003-08-13  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	Made the constant following the "interrupt" keyword optional. If

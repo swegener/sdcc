@@ -602,14 +602,14 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool useDP2)
     }
 
   /* special case for a function */
-  if (IS_FUNC (sym->type))
+  if (IS_FUNC (sym->type) && !(sym->isitmp))
     {
       sym->aop = aop = newAsmop (AOP_IMMD);
-      aop->aopu.aop_immd.aop_immd1 = Safe_strdup(sym->rname);	
+      aop->aopu.aop_immd.aop_immd1 = Safe_strdup(sym->rname);
       aop->size = FPTRSIZE;
       return aop;
     }
-  
+
   /* only remaining is far space */
   /* in which case DPTR gets the address */
   sym->aop = aop = newAsmop ((short) (useDP2 ? AOP_DPTR2 : AOP_DPTR));

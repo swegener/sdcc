@@ -2798,7 +2798,8 @@ geniCodeSEParms (ast * parms,int lvl)
     geniCodeRValue (ast2iCode (parms,lvl+1), FALSE);
 		
   parms->type = EX_OPERAND;
-  AST_ARGREG(parms) = SPEC_ARGREG(parms->etype);
+  AST_ARGREG(parms) = parms->etype ? SPEC_ARGREG(parms->etype) :
+  		SPEC_ARGREG(parms->ftype);
 }
 
 /*-----------------------------------------------------------------*/

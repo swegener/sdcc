@@ -1,3 +1,13 @@
+2004-09-14 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/device.h (pic16_options): removed field use_crt,
+	* src/pic16/gen.c (genUnpackBits): added call to pic16_loadFSR0
+	until an optimization to handle single bits is added,
+	* (pic16_loadFSR0): moved before genUnpackBits,
+	* (genAnd): some white lines removed,
+	* src/pic16/main.c (_pic16_finaliseOptions): set omit_ivt and clear
+	leave_reset flags in pic16_options when using crt modules,
+
 2004-09-12 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/ralloc.c (packRegisters): applied fix by Bernhard Held
@@ -20,7 +30,7 @@
 	linker command line except than when --no-crt is specified,
 	* src/pic16/pcode.c,
 	* src/pic16/pcode.h: added some structures and functions for a new
-	optimization scheme to compansete for instruction overhead between
+	optimization scheme to compansate for instruction overhead between
 	same iCodes, this scheme is currently under development and is not
 	working in any way,
 	* src/pic16/gen.c (genAnd): added patch provided by Aaron Collwell
@@ -28,7 +38,6 @@
 	* device/lib/pic16/startup/crt0i.c,
 	* device/lib/pic16/startup/crt0iz.c: added global char variable
 	__uflags to force the generation of an idata section
-
 
 2004-09-12 Bernhard Held <bernhard AT bernhardheld.de>
 

@@ -6605,21 +6605,16 @@ static void genAnd (iCode *ic, iCode *ifx)
       symbol *tlbl = newiTempLabel(NULL);
       int sizel = AOP_SIZE(left);
 
-      /* here to add patch from Aaron */
       if(size)
-        emitSETC;			//pic16_emitcode("setb","c");
-
+        emitSETC;
 
       while(sizel--) {
-        if((bytelit = ((lit >> (offset*8)) & 0x0FFL)) != 0x0L){
-
+        if((bytelit = ((lit >> (offset*8)) & 0x0FFL)) != 0x0L) {
 
           /* patch provided by Aaron Colwell */
           if((posbit = isLiteralBit(bytelit)) != 0) {
               pic16_emitpcode(((rIfx.condition) ? POC_BTFSS : POC_BTFSC ),
-                              pic16_newpCodeOpBit(pic16_aopGet(AOP(left),
-                                                offset,FALSE,
-                                                FALSE),
+                              pic16_newpCodeOpBit(pic16_aopGet(AOP(left), offset,FALSE,FALSE),
                                                 (posbit-1),0, PO_GPR_REGISTER));
 
               pic16_emitpcode(POC_BRA, pic16_popGetLabel(tlbl->key));
@@ -9219,6 +9214,12 @@ release:
     pic16_freeAsmop(result,NULL,ic,TRUE);
 }
 
+
+void pic16_loadFSR0(operand *op)
+{
+	pic16_emitpcode(POC_LFSR, pic16_popGetLit2(0, pic16_popGet(AOP(op), 0)));
+}
+
 /*-----------------------------------------------------------------*/
 /* genUnpackBits - generates code for unpacking bits               */
 /*-----------------------------------------------------------------*/
@@ -9232,6 +9233,11 @@ static void genUnpackBits (operand *result, operand *left, char *rname, int ptyp
 	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	etype = getSpec(operandType(result));
 
+        /* the following call to pic16_loadFSR0 is temporary until
+         * optimization to handle single bit assignments is added
+         * to the function. Until then use the old safe way! -- VR */
+        pic16_loadFSR0( left );
+ 
 	/* read the first byte  */
 	switch (ptype) {
 		case POINTER:
@@ -9407,10 +9413,6 @@ release:
     pic16_freeAsmop(result,NULL,ic,TRUE);
 }
 
-void pic16_loadFSR0(operand *op)
-{
-	pic16_emitpcode(POC_LFSR, pic16_popGetLit2(0, pic16_popGet(AOP(op), 0)));
-}
 
 
 /*-----------------------------------------------------------------*/

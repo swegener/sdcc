@@ -407,9 +407,8 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
         if(ISOPT(USE_CRT)) {
           char *tmp;
         
-            tmp = Safe_strdup( getStringArg(USE_CRT, argv, i, *pargc) );
-            pic16_options.use_crt = 1; pic16_options.no_crt = 0;
-            pic16_options.crt_name = tmp;
+            pic16_options.no_crt = 0;
+            pic16_options.crt_name = Safe_strdup( getStringArg(USE_CRT, argv, i, *pargc) );
         }
         
   return FALSE;
@@ -482,12 +481,12 @@ static void _pic16_linkEdit(void)
 
   	if(fullSrcFileName) {
 		sprintf(temp, "%s.o", dstFileName);
-//		shash_add(&linkValues, "srcofile", temp);
-		addSetHead(&relFilesSet, temp);
+		addSetHead(&relFilesSet, Safe_strdup(temp));
 	}
 
-	if(pic16_options.use_crt && !pic16_options.no_crt)
-	    shash_add(&linkValues, "spec_ofiles", pic16_options.crt_name);	//"crt0i.o");
+	if(!pic16_options.no_crt)
+          shash_add(&linkValues, "spec_ofiles", pic16_options.crt_name);
+
   	shash_add(&linkValues, "ofiles", joinStrSet(relFilesSet));
   	shash_add(&linkValues, "libs", joinStrSet(libFilesSet));
   	
@@ -509,55 +508,35 @@ extern const char *pic16_asmCmd[];
 static void
 _pic16_finaliseOptions (void)
 {
-	port->mem.default_local_map = data;
-	port->mem.default_globl_map = data;
+    port->mem.default_local_map = data;
+    port->mem.default_globl_map = data;
 
-	/* peepholes are disabled for the time being */
-	options.nopeep = 1;
+    /* peepholes are disabled for the time being */
+    options.nopeep = 1;
 
-	/* explicit enable peepholes for testing */
-	if(pic16_enable_peeps)
-		options.nopeep = 0;
+    /* explicit enable peepholes for testing */
+    if(pic16_enable_peeps)
+      options.nopeep = 0;
 
-	options.all_callee_saves = 1;		// always callee saves
-//	options.float_rent = 1;
-//	options.intlong_rent = 1;
+    options.all_callee_saves = 1;		// always callee saves
+//    options.float_rent = 1;
+//    options.intlong_rent = 1;
 	
 
-	if(alt_asm && strlen(alt_asm))
-		pic16_asmCmd[0] = alt_asm;
+    if(alt_asm && strlen(alt_asm))
+      pic16_asmCmd[0] = alt_asm;
 	
-	if(alt_link && strlen(alt_link))
-		pic16_linkCmd[0] = alt_link;
+    if(alt_link && strlen(alt_link))
+      pic16_linkCmd[0] = alt_link;
+        
+    if(!pic16_options.no_crt) {
+      pic16_options.omit_ivt = 1;
+      pic16_options.leave_reset = 0;
+    }
 }
 
 
-/* all the rest is commented ifdef'd out */
 #if 0
-  /* Hack-o-matic: if we are using the flat24 model,
-   * adjust pointer sizes.
-   */
-  if (options.model == MODEL_FLAT24)
-    {
-
-      fprintf (stderr, "*** WARNING: you should use the '-mds390' option "
-	       "for DS80C390 support. This code generator is "
-	       "badly out of date and probably broken.\n");
-
-      port->s.fptr_size = 3;
-      port->s.gptr_size = 4;
-      port->stack.isr_overhead++;	/* Will save dpx on ISR entry. */
-#if 1
-      port->stack.call_overhead++;	/* This acounts for the extra byte 
-					 * of return addres on the stack.
-					 * but is ugly. There must be a 
-					 * better way.
-					 */
-#endif
-      fReturn = fReturn390;
-      fReturnSize = 5;
-    }
-
   if (options.model == MODEL_LARGE)
     {
       port->mem.default_local_map = xdata;
@@ -606,9 +585,8 @@ _pic16_setDefaultOptions (void)
 	pic16_options.ivt_loc = 0x000000;
 	pic16_options.nodefaultlibs = 0;
 	pic16_options.dumpcalltree = 0;
-	pic16_options.use_crt = 1;
-	pic16_options.crt_name = "crt0i";		/* the default crt to link */
-	pic16_options.no_crt = 0;
+	pic16_options.crt_name = "crt0i.o";		/* the default crt to link */
+	pic16_options.no_crt = 0;			/* use crt by default */
 }
 
 static const char *

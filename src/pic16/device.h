@@ -100,7 +100,6 @@ typedef struct {
 	int ivt_loc;
 	int nodefaultlibs;
 	int dumpcalltree;
-	int use_crt;
 	char *crt_name;
 	int no_crt;
 } pic16_options_t;

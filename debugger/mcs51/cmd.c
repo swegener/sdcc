@@ -978,6 +978,7 @@ static int commonSetUserBp(char *s, context *cctxt, char bpType)
 
 	/* if current context is known */
 	if (cctxt->func) {
+        Dprintf(D_break, ("commonSetUserBp: a) cctxtaddr:%x \n",cctxt->addr));
 	    if (srcMode == SRC_CMODE)
 		/* set the break point */
 		setBreakPoint ( cctxt->addr , CODE , bpType , userBpCB ,
@@ -1006,6 +1007,7 @@ static int commonSetUserBp(char *s, context *cctxt, char bpType)
             }
             else
             {
+                Dprintf(D_break, ("commonSetUserBp: g) addr:%x \n",braddr));
                 setBreakPoint ( braddr , CODE , bpType , userBpCB ,
                             modul->c_name,line);
             }
@@ -1024,9 +1026,10 @@ static int commonSetUserBp(char *s, context *cctxt, char bpType)
     }
     /* case b) lineno */
     /* check if line number */
-    if (isdigit(*s)) {
+    if ( !strchr(s,':') && isdigit(*s)) {
 	/* get the lineno */
 	int line = atoi(s) -1;
+    Dprintf(D_break, ("commonSetUserBp: b) line:%d \n",line));
 
 	/* if current context not present then we must get the module
 	   which has main & set the break point @ line number provided
@@ -1070,8 +1073,8 @@ static int commonSetUserBp(char *s, context *cctxt, char bpType)
 	}
 	    	
 	/* case c) filename:lineno */
-	if (isdigit(*(bp +1))) {	    	    
-	 
+	if (isdigit(*(bp +1))) {	    	    	 
+        Dprintf(D_break, ("commonSetUserBp: c) line:%d \n",atoi(bp+1)));
 	    setBPatModLine (mod,atoi(bp+1)-1,bpType);	    
 	    goto ret;
 	    
@@ -1080,6 +1083,7 @@ static int commonSetUserBp(char *s, context *cctxt, char bpType)
 	if (!applyToSet(functions,funcWithNameModule,bp+1,s,&func)) 
 	    fprintf(stderr,"Function \"%s\" not defined.\n",bp+1); 
 	else 	    
+        Dprintf(D_break, ("commonSetUserBp: d) \n"));
 	    setBPatModLine (mod,
 			    (srcMode == SRC_CMODE ? 
 			     func->entryline :
@@ -1089,6 +1093,7 @@ static int commonSetUserBp(char *s, context *cctxt, char bpType)
     }
             
     /* case e) function */
+    Dprintf(D_break, ("commonSetUserBp: e) \n"));
     if (!applyToSet(functions,funcWithName,s,&func))
 	fprintf(stderr,"Function \"%s\" not defined.\n",s); 
     else

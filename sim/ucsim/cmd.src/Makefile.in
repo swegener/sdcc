@@ -43,6 +43,7 @@ OBJECTS		= cmdset.o command.o newcmd.o cmdutil.o syntax.o \
 		  cmduc.o cmdstat.o cmdmem.o \
 		  cmdpars.o cmdlex.o
 
+DEVEL		= $(shell ( bash -c "test -e $(PRJDIR)/devel && echo yes" ))
 
 # Compiling entire program or any subproject
 # ------------------------------------------
@@ -90,7 +91,9 @@ include clean.mk
 
 cmdpars.cc: cmdpars.y
 
-cmdlex.cc: cmdlex.l cmdpars.h
+ifeq ($(DEVEL),yes)
+  cmdlex.cc: cmdlex.l cmdpars.h
+endif
 
 # My rules
 # --------
@@ -114,9 +117,11 @@ $(PRJDIR)/libcmd.a: $(OBJECTS)
 	rm -f $*.cc $*.h
 	$(BISON_PLUS_PLUS) -d -o $*.cc $<
 
+ifeq ($(DEVEL),yes)
 .l.cc:
 	rm -f $*.cc
 	$(LEX) --c++ -o $*.cc $<
+endif
 
 
 # Remaking configuration

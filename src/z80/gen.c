@@ -1025,7 +1025,7 @@ static char *aopGet(asmop *aop, int offset, bool bit16)
     exit(0);
 }
 
-bool isRegString(char *s)
+bool isRegString(const char *s)
 {
     if (!strcmp(s, "b") ||
 	!strcmp(s, "c") ||
@@ -1044,7 +1044,7 @@ bool isConstant(const char *s)
     return  (*s == '#' || *s == '$');
 }
 
-bool canAssignToPtr(char *s)
+bool canAssignToPtr(const char *s)
 {
     if (isRegString(s))
 	return TRUE;
@@ -1056,7 +1056,7 @@ bool canAssignToPtr(char *s)
 /*-----------------------------------------------------------------*/
 /* aopPut - puts a string for a aop                                */
 /*-----------------------------------------------------------------*/
-static void aopPut (asmop *aop, char *s, int offset)
+static void aopPut (asmop *aop, const char *s, int offset)
 {
     if (aop->size && offset > ( aop->size - 1)) {
         werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
@@ -1126,7 +1126,7 @@ static void aopPut (asmop *aop, char *s, int offset)
 		emit2("ld !*hl,a");
 	    }
 	    else
-		emit2("ld !*hl,%s ; 3", s);
+		emit2("ld !*hl,%s", s);
 	}
 	else {
 	    if (!canAssignToPtr(s)) {
@@ -1186,6 +1186,20 @@ static void aopPut (asmop *aop, char *s, int offset)
 #define AOP_TYPE(op) AOP(op)->type
 #define AOP_SIZE(op) AOP(op)->size
 #define AOP_NEEDSACC(x) (AOP(x) && (AOP_TYPE(x) == AOP_CRY))
+
+static void commitPair(asmop *aop, PAIR_ID id)
+{
+    if (id == PAIR_HL && requiresHL(aop)) {
+	emit2("ld a,l");
+	emit2("ld d,h");
+	aopPut(aop, "a", 0);
+	aopPut(aop, "d", 1);
+    }
+    else {
+	aopPut(aop, _pairs[id].l, 0);
+	aopPut(aop, _pairs[id].h, 1);
+    }
+}
 
 /*-----------------------------------------------------------------*/
 /* getDataSize - get the operand data size                         */
@@ -2153,6 +2167,8 @@ static void genPlus (iCode *ic)
     if (genPlusIncr (ic) == TRUE)
         goto release;   
 
+    emit2("; genPlusIncr failed");
+
     size = getDataSize(IC_RESULT(ic));
 
     /* Special case when left and right are constant */
@@ -2179,38 +2195,83 @@ static void genPlus (iCode *ic)
 	goto release;
     }
 
+    /* Special case:
+       ld hl,sp+n trashes C so we cant afford to do it during an
+       add with stack based varibles.  Worst case is:
+       	ld  hl,sp+left
+	ld  a,(hl)
+	ld  hl,sp+right
+	add (hl)
+	ld  hl,sp+result
+	ld  (hl),a
+	ld  hl,sp+left+1
+	ld  a,(hl)
+	ld  hl,sp+right+1
+	adc (hl)
+	ld  hl,sp+result+1
+	ld  (hl),a
+	So you cant afford to load up hl if either left, right, or result
+	is on the stack (*sigh*)  The alt is:
+	ld  hl,sp+left
+	ld  de,(hl)
+	ld  hl,sp+right
+	ld  hl,(hl)
+	add hl,de
+	ld  hl,sp+result
+	ld  (hl),hl
+	Combinations in here are:
+	 * If left or right are in bc then the loss is small - trap later
+	 * If the result is in bc then the loss is also small
+    */
+    if (IS_GB) {
+	if (AOP_TYPE(IC_LEFT(ic)) == AOP_STK ||
+	    AOP_TYPE(IC_RIGHT(ic)) == AOP_STK ||
+	    AOP_TYPE(IC_RESULT(ic)) == AOP_STK) {
+	    if (size == 2) {
+		if (getPairId(AOP(IC_RIGHT(ic))) == PAIR_BC) {
+		    /* Swap left and right */
+		    operand *t = IC_RIGHT(ic);
+		    IC_RIGHT(ic) = IC_LEFT(ic);
+		    IC_LEFT(ic) = t;
+		}
+		if (getPairId(AOP(IC_LEFT(ic))) == PAIR_BC) {
+		    fetchPair(PAIR_HL, AOP(IC_RIGHT(ic)));
+		    emit2("add hl,bc");
+		}
+		else {
+		    fetchPair(PAIR_DE, AOP(IC_LEFT(ic)));
+		    fetchPair(PAIR_HL, AOP(IC_RIGHT(ic)));
+		    emit2("add hl,de");
+		}
+		commitPair(AOP(IC_RESULT(ic)), PAIR_HL);
+		goto release;
+	    }
+	    else if (size == 4) {
+		emit2("; WARNING: This add is probably broken.\n");
+	    }
+	}
+    }
+
     while(size--) {
 	if (AOP_TYPE(IC_LEFT(ic)) == AOP_ACC) {
 	    MOVA(aopGet(AOP(IC_LEFT(ic)),offset,FALSE));
 	    if(offset == 0)
-		emitcode("add","a,%s",
-			 aopGet(AOP(IC_RIGHT(ic)),offset,FALSE));
+		emit2("add a,%s",
+		      aopGet(AOP(IC_RIGHT(ic)),offset,FALSE));
 	    else
-		emitcode("adc","a,%s",
-			 aopGet(AOP(IC_RIGHT(ic)),offset,FALSE));
+		emit2("adc a,%s",
+		      aopGet(AOP(IC_RIGHT(ic)),offset,FALSE));
 	} else {
 	    MOVA(aopGet(AOP(IC_LEFT(ic)),offset,FALSE));
 	    if(offset == 0)
-		emitcode("add","a,%s",
-			 aopGet(AOP(IC_RIGHT(ic)),offset,FALSE));
+		emit2("add a,%s",
+		      aopGet(AOP(IC_RIGHT(ic)),offset,FALSE));
 	    else
-		emitcode("adc","a,%s",
-			 aopGet(AOP(IC_RIGHT(ic)),offset,FALSE));
+		emit2("adc a,%s",
+		      aopGet(AOP(IC_RIGHT(ic)),offset,FALSE));
 	}
-        aopPut(AOP(IC_RESULT(ic)),"a",offset++);      
+	aopPut(AOP(IC_RESULT(ic)),"a",offset++);      
     }
-
-    /* Some kind of pointer arith. */
-    if (AOP_SIZE(IC_RESULT(ic)) == 3 && 
-	AOP_SIZE(IC_LEFT(ic)) == 3   &&
-	!sameRegs(AOP(IC_RESULT(ic)),AOP(IC_LEFT(ic))))
-	wassert(0);
-
-     if (AOP_SIZE(IC_RESULT(ic)) == 3 && 
-	AOP_SIZE(IC_RIGHT(ic)) == 3   &&
-	!sameRegs(AOP(IC_RESULT(ic)),AOP(IC_RIGHT(ic))))
-	 wassert(0);
-
    
 release:
     freeAsmop(IC_LEFT(ic),NULL,ic);
@@ -2323,7 +2384,44 @@ static void genMinus (iCode *ic)
         lit = - (long)lit;
     }
 
+    /* Same logic as genPlus */
+    if (IS_GB) {
+	if (AOP_TYPE(IC_LEFT(ic)) == AOP_STK ||
+	    AOP_TYPE(IC_RIGHT(ic)) == AOP_STK ||
+	    AOP_TYPE(IC_RESULT(ic)) == AOP_STK) {
+	    if (size == 2) {
+		PAIR_ID left = getPairId(AOP(IC_LEFT(ic)));
+		PAIR_ID right = getPairId(AOP(IC_RIGHT(ic)));
 
+		if (left == PAIR_INVALID && right == PAIR_INVALID) {
+		    left = PAIR_DE;
+		    right = PAIR_HL;
+		}
+		else if (right == PAIR_INVALID)
+		    right = PAIR_DE;
+		else if (left == PAIR_INVALID)
+		    left = PAIR_DE;
+		
+		fetchPair(left, AOP(IC_LEFT(ic)));
+		/* Order is important.  Right may be HL */
+		fetchPair(right, AOP(IC_RIGHT(ic)));
+
+		emit2("ld a,%s", _pairs[left].l);
+		emit2("sub a,%s", _pairs[right].l);
+		emit2("ld e,a");
+		emit2("ld a,%s", _pairs[left].h);
+		emit2("sbc a,%s", _pairs[right].h);
+
+		aopPut(AOP(IC_RESULT(ic)), "a", 1);
+		aopPut(AOP(IC_RESULT(ic)), "e", 0);
+		goto release;
+	    }
+	    else if (size == 4) {
+		emit2("; WARNING: This sub is probably broken.\n");
+	    }
+	}
+    }
+    
     /* if literal, add a,#-lit, else normal subb */
     while (size--) {
 	MOVA(aopGet(AOP(IC_LEFT(ic)),offset,FALSE));    

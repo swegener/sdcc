@@ -1,3 +1,9 @@
+2003-10-09  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCmain.c (setParseWithComma): fixed bug #816685
+	* src/z80/gen.c: fixed part of bug #817589
+	* src/SDCCsymt.c (checkFunction): fixed bug #817895
+
 2003-10-08 Bernhard Held <bernhard@bernhardheld.de>
 
 	Replaced cast (void **) with (void *) to avoid gcc 3 warning:

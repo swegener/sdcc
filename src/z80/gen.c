@@ -221,7 +221,7 @@ static struct
   bool in_home;
   const char *lastFunctionName;
   iCode *current_iCode;
-
+  
   set *sendSet;
 
   struct
@@ -235,6 +235,7 @@ static struct
     lineNode *head;
     lineNode *current;
     int isInline;
+    int isDebug;
     allocTrace trace;
   } lines;
 
@@ -409,6 +410,7 @@ _vemit2 (const char *szFormat, va_list ap)
 	      (_G.lines.head = _newLineNode (buffer)));
 
   _G.lines.current->isInline = _G.lines.isInline;
+  _G.lines.current->isDebug = _G.lines.isDebug;
   _G.lines.current->ic = _G.current_iCode;
 }
 
@@ -3143,7 +3145,22 @@ genEndFunction (iCode * ic)
         }
 
 
-      /* Both baned and non-banked just ret */
+      if (options.debug && currFunc)
+	{
+	  _G.lines.isDebug = 1;
+	  sprintf (buffer, "C$%s$%d$%d$%d",
+		    FileBaseName (ic->filename), currFunc->lastLine,
+		    ic->level, ic->block);
+          emit2 ("!labeldef", buffer);
+	  if (IS_STATIC (currFunc->etype))
+	    sprintf (buffer, "XF%s$%s$0$0", moduleName, currFunc->name);
+	  else
+	    sprintf (buffer, "XG$%s$0$0", currFunc->name);
+          emit2 ("!labeldef", buffer);
+	  _G.lines.isDebug = 0;
+	}
+      
+      /* Both banked and non-banked just ret */
       emit2 ("ret");
 
       sprintf (buffer, "%s_end", sym->rname);
@@ -7671,13 +7688,36 @@ genZ80Code (iCode * lic)
     }
 
   _G.lines.head = _G.lines.current = NULL;
+  
+  /* if debug information required */
+  if (options.debug && currFunc)
+    {
+      debugFile->writeFunction(currFunc);
+      _G.lines.isDebug = 1;
+      if (IS_STATIC (currFunc->etype))
+	sprintf (buffer, "F%s$%s$0$0", moduleName, currFunc->name);
+      else
+	sprintf (buffer, "G$%s$0$0", currFunc->name);
+      emit2 ("!labeldef", buffer);
+      _G.lines.isDebug = 0;
+    }
 
   for (ic = lic; ic; ic = ic->next)
     {
       _G.current_iCode = ic;
 
-      if (cln != ic->lineno)
+      if (ic->lineno && cln != ic->lineno)
 	{
+	  if (options.debug)
+	    {
+	      _G.lines.isDebug = 1;
+	      sprintf (buffer, "C$%s$%d$%d$%d",
+			FileBaseName (ic->filename), ic->lineno,
+			ic->level, ic->block);
+              emit2 ("%s !equ .", buffer);
+              emit2 ("!global", buffer);
+	      _G.lines.isDebug = 0;
+	    }
 	  if (!options.noCcodeInAsm) {
 	    emit2 (";%s:%d: %s", ic->filename, ic->lineno,
 		   printCLine(ic->filename, ic->lineno));

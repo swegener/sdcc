@@ -1028,7 +1028,7 @@ funcInChain (sym_link * lnk)
 }
 
 /*------------------------------------------------------------------*/
-/* structElemType - returns the type info of a sturct member        */
+/* structElemType - returns the type info of a struct member        */
 /*------------------------------------------------------------------*/
 sym_link *
 structElemType (sym_link * stype, value * id)
@@ -1776,6 +1776,7 @@ checkFunction (symbol * sym, symbol *csym)
       werror(E_PARAM_NAME_OMITTED, sym->name, argCnt);
     }
   }
+  argCnt--;
 
   if (!csym && !(csym = findSym (SymbolTab, sym, sym->name)))
     return 1;			/* not defined nothing more to check  */
@@ -1808,6 +1809,17 @@ checkFunction (symbol * sym, symbol *csym)
   if (IFFUNC_ISNAKED (csym->type) != IFFUNC_ISNAKED (sym->type))
     {
       werror (E_PREV_DEF_CONFLICT, csym->name, "_naked");
+    }
+  
+  /* Really, reentrant should match regardless of argCnt, but     */
+  /* this breaks some existing code (the fp lib functions). If    */
+  /* the first argument is always passed the same way, this       */
+  /* lax checking is ok (but may not be true for in future ports) */
+  if (IFFUNC_ISREENT (csym->type) != IFFUNC_ISREENT (sym->type)
+      && argCnt>1)
+    {
+      //printf("argCnt = %d\n",argCnt);
+      werror (E_PREV_DEF_CONFLICT, csym->name, "reentrant");
     }
 
   /* compare expected args with actual args */

@@ -48,6 +48,8 @@ int	oflag;		/*	Output file type flag
 			 */
 int	mflag;		/*	Map output flag
 			 */
+int	sflag;		/*	JCF: Memory usage output flag
+			 */
 int	aflag;		/*	Overlapping area warning flag
 			 */
 int	jflag;		/*	NoICE output flag

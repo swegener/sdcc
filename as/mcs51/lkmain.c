@@ -51,6 +51,40 @@ extern int unlink(const char *);
  *
  */
 
+/*JCF: 	Creates some of the default areas so they are allocated in the right order.*/
+void Areas51 (void)
+{
+	char * rel[]={
+		"XH",
+		"H 7 areas 0 global symbols",
+		"A _CODE size 0 flags 0",		/*Each .rel has one, so...*/
+		"A REG_BANK_0 size 0 flags 4",	/*Register banks are overlayable*/
+		"A REG_BANK_1 size 0 flags 4",
+		"A REG_BANK_2 size 0 flags 4",
+		"A REG_BANK_3 size 0 flags 4",
+		"A BSEG size 0 flags 80",		/*BSEG must be just before BITS*/
+		"A BSEG_BYTES size 0 flags 0",	/*Size will be obtained from BSEG in lnkarea()*/
+		""
+	};
+	int j;
+
+	for (j=0; rel[j][0]!=0; j++)
+	{
+		ip=rel[j];
+		link_main();
+	}
+	
+	/*Set the start address of the default areas:*/
+	for(ap=areap; ap; ap=ap->a_ap)
+	{
+		/**/ if (!strcmp(ap->a_id, "REG_BANK_0")) { ap->a_addr=0x00; ap->a_type=1; }
+		else if (!strcmp(ap->a_id, "REG_BANK_1")) { ap->a_addr=0x08; ap->a_type=1; }
+		else if (!strcmp(ap->a_id, "REG_BANK_2")) { ap->a_addr=0x10; ap->a_type=1; }
+		else if (!strcmp(ap->a_id, "REG_BANK_3")) { ap->a_addr=0x18; ap->a_type=1; }
+		else if (!strcmp(ap->a_id, "BSEG_BYTES")) { ap->a_addr=0x20; ap->a_type=1; }
+	}
+}
+
 /*)Function	VOID	main(argc,argv)
  *
  *		int	argc		number of command line arguments + 1
@@ -221,6 +255,8 @@ char *argv[];
 		filep = linkp;
 		hp = NULL;
 		radix = 10;
+		
+		Areas51(); /*JCF: Create the default 8051 areas in the right order*/
 
 		while (getline()) {
 			ip = ib;
@@ -268,6 +304,9 @@ char *argv[];
 			 */
 			if (mflag || jflag)
 				map();
+
+			if (sflag) /*JCF: memory usage summary output*/
+				if(summary(areap))lkexit(1);
 
 			if (iram_size)
 				iramcheck();
@@ -672,6 +711,11 @@ parse()
 				case 'm':
 				case 'M':
 					++mflag;
+					break;
+
+				case 'y': /*JCF: memory usage summary output*/
+				case 'Y':
+					++sflag;
 					break;
 
 				case 'j':

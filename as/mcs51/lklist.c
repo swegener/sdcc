@@ -205,7 +205,8 @@ struct area *xp;
 		fprintf(mfp, "Decimal\n\n");
 	}
 	fprintf(mfp, "Area                               ");
-	fprintf(mfp, "Addr   Size   Decimal Bytes (Attributes)\n");
+	fprintf(mfp, "Addr   Size   Decimal %s (Attributes)\n",
+		(xp->a_flag & A_BIT)?"Bits ":"Bytes");/* JCF: For BIT print bits...*/
 	fprintf(mfp, "--------------------------------   ");
 	fprintf(mfp, "----   ----   ------- ----- ------------\n");
 	/*
@@ -224,7 +225,8 @@ struct area *xp;
 	if (xflag == 2) {
 		fprintf(mfp, "  %05u  %05u", ai, aj);
 	}
-	fprintf(mfp, " = %6u. bytes ", aj);
+	fprintf(mfp, " = %6u. %s ", aj,
+		(xp->a_flag & A_BIT)?"bits ":"bytes"); /* JCF: For BIT print bits...*/
 	if (xp->a_flag & A_ABS) {
 		fprintf(mfp, "(ABS");
 	} else {
@@ -1093,4 +1095,270 @@ char *str;
 			return(0);
 	}
 	return(1);
+}
+
+/*JCF: Create a memory summary file with extension .mem*/
+int summary(struct area * areap) 
+{
+	#define EQ(A,B) !strcmpi((A),(B))
+	#define MIN_STACK 16
+	#define REPORT_ERROR(A) { fprintf(of, "%s", (A)); \
+		                      printf("%s", (A)); \
+							  toreturn=1; }
+
+	#define REPORT_WARNING(A) { fprintf(of, "%s", (A)); \
+		                      printf("%s", (A));}
+
+	char buff[128];
+	int j, toreturn=0;
+	unsigned int Total_Last=0, k; 
+
+	struct area * xp;
+	FILE * of;
+	
+	/*Artifacts used for printing*/
+	char start[8], end[8], size[8];
+	char format[]="   %-20.20s %-7.7s %-7.7s %-7.7s\n";
+	char line[]="---------------------";
+
+	typedef struct
+	{
+		unsigned int Start;
+		unsigned int Size;
+		char Name[NCPS];
+		unsigned int flag;
+	} _Mem;
+
+	unsigned int dram[0x100];
+	_Mem Ram[]={
+		{0,		8, "REG_BANK_0", 0x0001},
+		{0x8,	8, "REG_BANK_1", 0x0002},
+		{0x10,	8, "REG_BANK_2", 0x0004},
+		{0x18,	8, "REG_BANK_3", 0x0008},
+		{0x20,	0, "BSEG_BYTES", 0x0010},
+		{0,		0, "UNUSED",     0x0000},
+		{0x7f,	0, "DATA",       0x0020},
+		{0,		0, "TOTAL:",     0x0000}
+	};
+	
+	_Mem IRam= {0xff,   0, "INDIRECT RAM", 0x0080};
+	_Mem Stack={0xff,   0, "STACK", 0x0000};
+	_Mem XRam= {0xffff, 0, "EXTERNAL RAM", 0x0100};
+	_Mem Rom=  {0xffff, 0, "ROM/EPROM/FLASH", 0x0200};
+
+	for(j=0; j<0x100; j++) dram[j]=0;
+
+	/* Open Memory Summary File*/
+	of = afile(linkp->f_idp, "mem", 1);
+	if (of == NULL)
+	{
+		lkexit(1);
+	}
+
+	xp=areap;
+	while (xp)
+	{
+		/**/ if (EQ(xp->a_id, "REG_BANK_0"))
+		{
+			Ram[0].Size=xp->a_size;
+		}
+		else if (EQ(xp->a_id, "REG_BANK_1"))
+		{
+			Ram[1].Size=xp->a_size;
+		}
+		else if (EQ(xp->a_id, "REG_BANK_2"))
+		{
+			Ram[2].Size=xp->a_size;
+		}
+		else if (EQ(xp->a_id, "REG_BANK_3"))
+		{
+			Ram[3].Size=xp->a_size;
+		}
+		else if (EQ(xp->a_id, "BSEG_BYTES"))
+		{
+			Ram[4].Size=xp->a_size;
+		}
+		else if ( EQ(xp->a_id, "DSEG") || EQ(xp->a_id, "OSEG") )
+		{
+			Ram[6].Size+=xp->a_size;
+			if(xp->a_addr<Ram[6].Start) Ram[6].Start=xp->a_addr;
+		}
+
+		else if( EQ(xp->a_id, "CSEG") || EQ(xp->a_id, "GSINIT") ||
+				 EQ(xp->a_id, "GSFINAL") || EQ(xp->a_id, "HOME") )
+		{
+			Rom.Size+=xp->a_size;
+			if(xp->a_addr<Rom.Start) Rom.Start=xp->a_addr;
+		}
+		
+		else if (EQ(xp->a_id, "SSEG"))
+		{
+			Stack.Size+=xp->a_size;
+			if(xp->a_addr<Stack.Start) Stack.Start=xp->a_addr;
+		}
+
+		else if (EQ(xp->a_id, "XSEG") || EQ(xp->a_id, "XISEG")) 
+		{
+			XRam.Size+=xp->a_size;
+			if(xp->a_addr<XRam.Start) XRam.Start=xp->a_addr;
+		}
+
+		else if (EQ(xp->a_id, "ISEG"))
+		{
+			IRam.Size+=xp->a_size;
+			if(xp->a_addr<IRam.Start) IRam.Start=xp->a_addr;
+		}
+		xp=xp->a_ap;
+	}
+
+	for(j=0; j<7; j++)
+		for(k=Ram[j].Start; k<(Ram[j].Start+Ram[j].Size); k++)
+			dram[k]|=Ram[j].flag; /*Mark as used*/
+	
+	for(k=IRam.Start; k<(IRam.Start+IRam.Size); k++)
+		dram[k]|=IRam.flag; /*Mark as used*/
+
+	/*Compute the amount of unused memory in direct data Ram.  This is the
+	gap between the last register bank or bit segment and the data segment.*/
+	for(k=Ram[6].Start-1; (dram[k]==0) && (k>0); k--);
+	Ram[5].Start=k+1;
+	Ram[5].Size=Ram[6].Start-Ram[5].Start; /*It may be zero (which is good!)*/
+
+	/*Compute the data Ram totals*/
+	for(j=0; j<7; j++)
+	{
+		if(Ram[7].Start>Ram[j].Start) Ram[7].Start=Ram[j].Start;
+		Ram[7].Size+=Ram[j].Size;
+	}
+	Total_Last=Ram[6].Size+Ram[6].Start-1;
+
+	/*Report the Ram totals*/
+	fprintf(of, "Direct Internal RAM:\n");
+	fprintf(of, format, "Name", "Start", "End", "Size");
+
+	for(j=0; j<8; j++)
+	{
+		if((j==0) || (j==7)) fprintf(of, format, line, line, line, line);
+		if((j!=5) || (Ram[j].Size>0))
+		{
+			sprintf(start, "0x%02x", Ram[j].Start);
+			if(Ram[j].Size==0)
+				end[0]=0;/*Empty string*/
+			else
+				sprintf(end,  "0x%02x", j==7?Total_Last:Ram[j].Size+Ram[j].Start-1);
+			sprintf(size, "%5u", Ram[j].Size);
+			fprintf(of, format, Ram[j].Name, start, end, size);
+		}
+	}
+
+	for(k=Ram[6].Start; k<(Ram[6].Start+Ram[6].Size); k++)
+	{
+		if(dram[k]!=Ram[6].flag)
+		{
+			sprintf(buff, "*** ERROR: There is a memory overlap starting at 0x%02x.\n", k);
+			REPORT_ERROR(buff);
+			break;
+		}
+	}
+
+	if(Ram[7].Size>0x80)
+	{
+		sprintf(buff, "*** ERROR: Insuficient DRAM memory.  "
+					"%d byte%s short.", Ram[7].Size-0x80);
+		REPORT_ERROR(buff);
+	}
+
+	if(Ram[5].Size!=0)
+	{
+		sprintf(buff, "*** WARNING: %d bytes in DRAM wasted.  "
+		            "Link could use: --data-loc 0x%02x\n",
+					Ram[5].Size, Ram[6].Start-Ram[5].Size);
+		REPORT_WARNING(buff);
+	}
+
+	/*Report the position of the begining of the stack*/
+	fprintf(of, "\nStack starts at: 0x%02x", Stack.Start);
+
+	/*Check that the stack pointer is landing in a safe place:*/
+	if(dram[Stack.Start])
+	{
+		fprintf(of, ".\n");
+		sprintf(buff, "*** ERROR: Stack overlaps area ");
+		REPORT_ERROR(buff);
+		for(j=0; j<7; j++)
+		{
+			if(dram[Stack.Start]&Ram[j].flag)
+			{
+				sprintf(buff, "'%s'\n", Ram[j].Name);
+				break;
+			}
+		}
+		if(dram[Stack.Start]&IRam.flag)
+		{
+			sprintf(buff, "'%s'\n", IRam.Name);
+		}
+		REPORT_ERROR(buff);
+	}
+	else	
+	{
+		for(j=Stack.Start, k=0; (j<0x100)&&(dram[j]==0); j++, k++);
+		fprintf(of, " with %d bytes available\n", k);
+		if (k<MIN_STACK)
+		{
+			sprintf(buff, "*** WARNING: Only %d byte%s available for stack.\n",
+					k, (k==1)?"":"s");
+			REPORT_WARNING(buff);
+		}
+	}
+
+	fprintf(of, "\nOther memory:\n");
+	fprintf(of, format, "Name", "Start", "End", "Size");
+	fprintf(of, format, line, line, line, line);
+
+	/*Report IRam totals:*/
+	sprintf(start, "0x%02x", IRam.Start);
+	if(IRam.Size==0)
+		end[0]=0;/*Empty string*/
+	else
+		sprintf(end,  "0x%02x", IRam.Size+IRam.Start-1);
+	sprintf(size, "%5u", IRam.Size);
+	fprintf(of, format, IRam.Name, start, end, size);
+
+	/*Report XRam totals:*/
+	sprintf(start, "0x%04x", XRam.Start);
+	if(XRam.Size==0)
+		end[0]=0;/*Empty string*/
+	else
+		sprintf(end,  "0x%04x", XRam.Size+XRam.Start-1);
+	sprintf(size, "%5u", XRam.Size);
+	fprintf(of, format, XRam.Name, start, end, size);
+
+	/*Report Rom/Flash totals:*/
+	sprintf(start, "0x%04x", Rom.Start);
+	if(Rom.Size==0)
+		end[0]=0;/*Empty string*/
+	else
+		sprintf(end,  "0x%04x", Rom.Size+Rom.Start-1);
+	sprintf(size, "%5u", Rom.Size);
+	fprintf(of, format, Rom.Name, start, end, size);
+
+	/*Report any excess:*/
+	if(IRam.Size>0x80)
+	{
+		sprintf(buff, "*** ERROR: Insuficient INDIRECT RAM memory.\n");
+		REPORT_ERROR(buff);
+	}
+	if(XRam.Size>0x10000)
+	{
+		sprintf(buff, "*** ERROR: Insuficient EXTERNAL RAM memory.\n");
+		REPORT_ERROR(buff);
+	}
+	if(Rom.Size>0x10000)
+	{
+		sprintf(buff, "*** ERROR: Insuficient ROM/EPROM/FLASH memory.\n");
+		REPORT_ERROR(buff);
+	}
+
+	fclose(of);
+	return toreturn;		
 }

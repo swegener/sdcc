@@ -565,6 +565,8 @@ extern	int	oflag;		/*	Output file type flag
 				 */
 extern	int	mflag;		/*	Map output flag
 				 */
+extern	int	sflag;		/*	JCF: Memory usage output flag
+				 */
 extern	int	jflag;		/*	NoICE output flag
 				 */
 extern	int	xflag;		/*	Map file radix type flag
@@ -746,6 +748,9 @@ extern char 		*StoreString( char *str );
 
 /* lknoice.c */
 extern void             DefineNoICE( char *name, Addr_T value, int page );
+
+/* JCF: lksmry.c */
+extern int summary(struct area * xp);
 
 /* SD added this to change
 	strcmpi --> strcmp (strcmpi NOT ANSI) */

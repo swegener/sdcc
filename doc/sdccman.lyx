@@ -14486,8 +14486,8 @@ The PIC16
 
 \end_inset 
 
- port (refered from now on as pic16) is the portion of SDCC that is responsible
- to produce code for the Microchip
+ port is the portion of SDCC that is responsible to produce code for the
+ Microchip
 \begin_inset LatexCommand \index{Microchip}
 
 \end_inset 
@@ -14499,8 +14499,8 @@ The PIC16
 Global Options
 \layout Standard
 
-The pic16 port supports the standard command line arguments as supposed,
- with the exception of certain cases that will be mentioned in the following
+PIC16 port supports the standard command line arguments as supposed, with
+ the exception of certain cases that will be mentioned in the following
  list:
 \layout List
 \labelwidthstring 00.00.0000
@@ -14683,6 +14683,13 @@ status Collapsed
  This command line soon will be deprecated and stack will be enabled by
  default.
  For the time being it must be entered if one wants to have stack.
+\newline 
+
+\series bold 
+This option is deprecated.
+ Stack is enabled by default in the port and there is no way to disable
+ it.
+ It is left here only for reference.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -15030,6 +15037,122 @@ small model
 \layout Itemize
 
 large model
+\layout Standard
+
+Memory model affects the default size of pointers within the source.
+ The sizes are shown in the next table:
+\layout Standard
+\align center 
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features>
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Pointer sizes according to memory model
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+small model
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+large model
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+code pointers
+\end_inset 
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+16-bits
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+24-bits
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+data pointers
+\end_inset 
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+16-bits
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+16-bits
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Standard
+
+It is advisable that all sources within a project are compiled with the
+ same memory model.
+ If one wants to override the default memory model, this can be done by
+ declaring a pointer as 
+\series bold 
+far
+\series default 
+ or 
+\series bold 
+near
+\series default 
+.
+ Far selects large memory model's pointers, while near selects small memory
+ model's pointers.
+\layout Standard
+
+The standard device libraries (see 4.5.6) contain no reference to pointers,
+ so they can be used with both memory models.
 \layout Subsection
 
 Stack
@@ -15164,14 +15287,18 @@ Frame pointer FSR2
 
 \layout Subsection
 
-Pointers
+Function return values
+\layout Standard
+
+Return values from functions are placed to the appropriate registers following
+ a modified Microchip policy optimized for SDCC.
+ The following table shows these registers:
 \layout Standard
 \align center 
 
 \begin_inset  Tabular
-<lyxtabular version="3" rows="3" columns="3">
+<lyxtabular version="3" rows="6" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <column alignment="center" valignment="top" leftline="true" width="0">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
@@ -15180,15 +15307,7 @@ Pointers
 
 \layout Standard
 
-Pointer sizes according to memory model
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-small model
+size
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -15196,7 +15315,79 @@ small model
 
 \layout Standard
 
-large model
+destination register
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+8 bits
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+WREG
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+16 bits
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+PRODL:WREG
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+24 bits
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+PRODH:PRODL:WREG
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+32 bits
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+FSR0L:PRODH:PRODL:WREG
 \end_inset 
 </cell>
 </row>
@@ -15206,15 +15397,7 @@ large model
 
 \layout Standard
 
-code pointers
-\end_inset 
-</cell>
-<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-16-bits
+>32 bits
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -15222,33 +15405,7 @@ code pointers
 
 \layout Standard
 
-24-bits
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-data pointers
-\end_inset 
-</cell>
-<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-16-bits
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-24-bits
+on stack, FSR0 points to the beginning
 \end_inset 
 </cell>
 </row>
@@ -15257,6 +15414,46 @@ data pointers
 \end_inset 
 
 
+\layout Subsection
+
+Interrupts
+\layout Standard
+
+When entering an interrupt, currently the PIC16 port automatically saves
+ the following registers:
+\layout Itemize
+
+WREG
+\layout Itemize
+
+STATUS
+\layout Itemize
+
+BSR
+\layout Itemize
+
+PROD (PRODL and PRODH)
+\layout Itemize
+
+FSR0 (FSR0L and FSR0H)
+\layout Standard
+
+These registers are restored upon return from the interrupt routine
+\begin_inset Foot
+collapsed false
+
+\layout Standard
+
+NOTE that when the _naked attribute is specified for an interrupt routine,
+ then NO registers are stored or restored.
+\end_inset 
+
+.
+\layout Standard
+
+Currently interrupt enable flags are left unaffected when entering an interrupt
+ routine.
+ This may change in the future.
 \layout Chapter
 
 Debugging with SDCDB

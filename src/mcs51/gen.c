@@ -6957,12 +6957,8 @@ genNearPointerGet (operand * left,
     }
   else
     rname = aopGet (AOP (left), 0, FALSE, FALSE);
-
-#ifdef THIS_COULD_BE_THE_EVER_LASTING_MIN_MIN_STACK_AUTO_BUG
+  
   aopOp (result, ic, FALSE);
-#else
-  aopOp (result, ic, result?TRUE:FALSE);
-#endif
 
   /* if bitfield then unpack the bits */
   if (IS_BITVAR (retype))
@@ -7563,7 +7559,7 @@ genNearPointerSet (operand * right,
       genDataPointerSet (right, result, ic);
       return;
     }
-
+  
   /* if the value is already in a pointer register
      then don't need anything more */
   if (!AOP_INPREG (AOP (result)))

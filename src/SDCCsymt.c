@@ -610,6 +610,9 @@ mergeSpec (sym_link * dest, sym_link * src, char *name)
   FUNC_ISCRITICAL(dest) |= FUNC_ISCRITICAL(src);
   FUNC_ISREENT(dest) |= FUNC_ISREENT(src);
   FUNC_ISNAKED(dest) |= FUNC_ISNAKED(src);
+  FUNC_ISISR(dest) |= FUNC_ISISR(src);
+  FUNC_INTNO(dest) |= FUNC_INTNO(src);
+  FUNC_REGBANK(dest) |= FUNC_REGBANK(src);
 
   return symlink;
 }

@@ -643,7 +643,7 @@ processParms (ast * func,
       return 1;
     }
 
-  if (IS_VOID(actParm->etype)) {
+  if (IS_VOID(actParm->ftype)) {
     werror (E_VOID_VALUE_USED);
     return 1;
   }
@@ -1032,7 +1032,7 @@ ast * initAggregates (symbol * sym, initList * ival, ast * wid) {
 
     if (!TARGET_IS_MCS51 || !(options.model==MODEL_LARGE)) {
       fprintf (stderr, "Can't \"TRY_THE_NEW_INITIALIZER\" unless "
-	       "with -mmcs51 and --model-large");
+	       "with -mmcs51 and --model-large\n");
       exit(404);
     }
 

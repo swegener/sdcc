@@ -2809,14 +2809,6 @@ decorateType (ast * tree)
 					    RTYPE (tree),
 					    TRUE));
 
-      /* promote result to int if left & right are char
-	 this will facilitate hardware multiplies 8bit x 8bit = 16bit */
-      /* now done by computeType
-      if (IS_CHAR(LETYPE(tree)) && IS_CHAR(RETYPE(tree))) {
-	SPEC_NOUN(TETYPE(tree)) = V_INT;
-      }
-      */
-
       return tree;
 
       /*------------------------------------------------------------------*/
@@ -3187,28 +3179,43 @@ decorateType (ast * tree)
 	  return tree;
 	}
 
+      LRVAL (tree) = RRVAL (tree) = 1;
+      if (tree->opval.op == LEFT_OP)
+	{
+	  /* promote char to int */
+	  TETYPE (tree) = getSpec (TTYPE (tree) =
+				   computeType (LTYPE (tree),
+						LTYPE (tree), /* no, not RTYPE! */
+						TRUE));
+	}
+      else /* RIGHT_OP */
+	{
+	  /* no promotion necessary */
+	  TTYPE (tree) = TETYPE (tree) = copyLinkChain (LTYPE (tree));
+	  if (IS_LITERAL (TTYPE (tree)))
+	    SPEC_SCLS (TTYPE (tree)) &= ~S_LITERAL;
+	}
+
       /* if only the right side is a literal & we are
          shifting more than size of the left operand then zero */
       if (IS_LITERAL (RTYPE (tree)) &&
-	  ((unsigned) floatFromVal (valFromType (RETYPE (tree)))) >=
-	  (getSize (LTYPE (tree)) * 8))
+	  ((TYPE_UDWORD) floatFromVal (valFromType (RETYPE (tree)))) >=
+	  (getSize (TETYPE (tree)) * 8))
 	{
 	  if (tree->opval.op==LEFT_OP ||
-	      (tree->opval.op==RIGHT_OP && SPEC_USIGN(LETYPE(tree)))) {
-	    lineno=tree->lineno;
-	    werror (W_SHIFT_CHANGED,
-		    (tree->opval.op == LEFT_OP ? "left" : "right"));
-	    tree->type = EX_VALUE;
-	    tree->left = tree->right = NULL;
-	    tree->opval.val = constVal ("0");
-	    TETYPE (tree) = TTYPE (tree) = tree->opval.val->type;
-	    return tree;
-	  }
+	      (tree->opval.op==RIGHT_OP && SPEC_USIGN(LETYPE(tree))))
+	    {
+	      lineno=tree->lineno;
+	      werror (W_SHIFT_CHANGED,
+		      (tree->opval.op == LEFT_OP ? "left" : "right"));
+	      tree->type = EX_VALUE;
+	      tree->left = tree->right = NULL;
+	      tree->opval.val = constVal ("0");
+	      TETYPE (tree) = TTYPE (tree) = tree->opval.val->type;
+	      return tree;
+	    }
 	}
-      LRVAL (tree) = RRVAL (tree) = 1;
-      TTYPE (tree) = TETYPE (tree) = copyLinkChain (LTYPE (tree));
-      if (IS_LITERAL (TTYPE (tree)))
-        SPEC_SCLS (TTYPE (tree)) &= ~S_LITERAL;
+
       return tree;
 
       /*------------------------------------------------------------------*/

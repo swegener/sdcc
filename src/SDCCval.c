@@ -1306,7 +1306,7 @@ valShift (value * lval, value * rval, int lr)
     SPEC_USIGN (val->type) = SPEC_USIGN (lval->etype);
   SPEC_LONG (val->type) = SPEC_LONG (lval->etype);
 
-  if (getSize (lval->type) * 8 <= (TYPE_UDWORD) floatFromVal (rval) &&
+  if (getSize (val->type) * 8 <= (TYPE_UDWORD) floatFromVal (rval) &&
        /* left shift */
       (lr ||
 	/* right shift and unsigned */

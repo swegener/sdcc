@@ -11,11 +11,11 @@ void foo(void)
 #ifdef TEST1
 void foo(void)
 {
-  i = 1  << 10;		/* WARNING(SDCC) */
-  i = 1u << 10;
-  i = 1u << 18;		/* WARNING(SDCC) */
+  i = 1  << 10;
+  i = 1  << 16;		/* WARNING(SDCC) */
+  i = 1u << 16;		/* WARNING(SDCC) */
   i = 1L << 31;
-  i = 1L << 32;		/* WARNING(SDCC) */
+  i = 1L << 32;		/* WARNING */
 }
 #endif
 

@@ -1732,7 +1732,7 @@ getArraySizePtr (operand * op)
 /*-----------------------------------------------------------------*/
 /* perform "usual unary conversions"                               */
 /*-----------------------------------------------------------------*/
-operand *
+static operand *
 usualUnaryConversions (operand * op)
 {
   if (IS_INTEGRAL (operandType (op)))
@@ -2730,6 +2730,7 @@ geniCodeLeftShift (operand * left, operand * right)
 {
   iCode *ic;
 
+  left = usualUnaryConversions (left);
   ic = newiCode (LEFT_OP, left, right);
   IC_RESULT (ic) = newiTempOperand (operandType (left), 0);
   ADDTOCHAIN (ic);
@@ -3796,11 +3797,11 @@ ast2iCode (ast * tree,int lvl)
     case RIGHT_OP:
       return geniCodeRightShift (geniCodeRValue (left, FALSE),
 				 geniCodeRValue (right, FALSE));
-    case CAST: 
+    case CAST:
 #if 0 // this indeed needs a second thought
       {
 	operand *op;
-	
+
 	// let's keep this simple: get the rvalue we need
 	op=geniCodeRValue (right, FALSE);
 	// now cast it to whatever we want
@@ -4000,7 +4001,7 @@ ast2iCode (ast * tree,int lvl)
 	return NULL;
     
     case CRITICAL:
-	geniCodeCritical (tree, lvl);    
+	geniCodeCritical (tree, lvl);
     }
 
   return NULL;

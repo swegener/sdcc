@@ -1,7 +1,11 @@
 2004-01-06 Bernhard Held <bernhard@bernhardheld.de>
 
-	* src/SDCCval.c (valShift): changed from 16 to 32 bit shift count
+	* src/SDCCval.c (valShift): changed from 16 to 32 bit shift count,
+	fixed warning
 	* support/valdiag/tests/overflow.c: added
+	* src/SDCCast.c (decorateType),
+	* src/SDCCicode.c (geniCodeLeftShift): added promotion to int for
+	LEFT_OP (left shift)
 
 2004-01-06  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 

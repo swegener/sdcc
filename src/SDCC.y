@@ -788,13 +788,33 @@ struct_declarator_list
 
 struct_declarator
    : declarator 
-   | ':' constant_expr  {  
+   | ':' constant_expr  {
+                           int bitsize;
                            $$ = newSymbol (genSymName(NestLevel),NestLevel) ; 
-                           $$->bitVar = (int) floatFromVal(constExprValue($2,TRUE));
+                           bitsize= (int) floatFromVal(constExprValue($2,TRUE));
+                           if (bitsize > (port->s.int_size * 8)) {
+                             bitsize = port->s.int_size * 8;
+                             werror(E_BITFLD_SIZE, bitsize);
+                           }
+                           if (!bitsize)
+                             bitsize = BITVAR_PAD;
+                           $$->bitVar = bitsize;
                         }                        
    | declarator ':' constant_expr 
-                        { 
-			  $1->bitVar = (int) floatFromVal(constExprValue($3,TRUE));			
+                        {
+                          int bitsize;
+                          bitsize= (int) floatFromVal(constExprValue($3,TRUE));
+                          if (bitsize > (port->s.int_size * 8)) {
+                            bitsize = port->s.int_size * 8;
+                            werror(E_BITFLD_SIZE, bitsize);
+                          }
+                          if (!bitsize) {
+                            $$ = newSymbol (genSymName(NestLevel),NestLevel) ; 
+                            $$->bitVar = BITVAR_PAD;
+                            werror(W_BITFLD_NAMED);
+                          }
+			  else
+			    $1->bitVar = bitsize;
                         }
    ;
 

@@ -115,7 +115,7 @@ struct
 { E_INT_REQD, ERROR_LEVEL_ERROR,
    "type must be INT for bit field definition" },
 { E_BITFLD_SIZE, ERROR_LEVEL_ERROR,
-   "bit field size greater than 16. assuming 16" },
+   "bit field size cannot be greater than int (%d bits)" },
 { W_TRUNCATION, ERROR_LEVEL_WARNING,
    "high order truncation might occur" },
 { E_CODE_WRITE, ERROR_LEVEL_ERROR,
@@ -391,6 +391,8 @@ struct
     "useless declaration (possible use of keyword as variable name)" },
 { E_INT_BAD_INTNO, ERROR_LEVEL_ERROR,
     "interrupt number '%u' is not valid" },
+{ W_BITFLD_NAMED, ERROR_LEVEL_WARNING,
+    "ignoring declarator of 0 length bitfield" },
 };
 
 /*

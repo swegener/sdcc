@@ -183,6 +183,7 @@ SDCCERR - SDCC Standard error handler
 #define W_INT_OVL 165               /* integer overflow in expression */
 #define W_USELESS_DECL 166	    /* useless declaration */
 #define E_INT_BAD_INTNO 167         /* invalid interrupt number */
+#define W_BITFLD_NAMED 168          /* declarator used with 0 length bitfield */
 
 /** Describes the maximum error level that will be logged.  Any level
  *  includes all of the levels listed after it.

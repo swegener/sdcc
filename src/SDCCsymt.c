@@ -1066,7 +1066,10 @@ compStructSize (int su, structdef * sdef)
 
 	/* create the internal name for this variable */
 	SNPRINTF (loop->rname, sizeof(loop->rname), "_%s", loop->name);
-	loop->offset = (su == UNION ? sum = 0 : sum);
+	if (su == UNION) {
+	    sum = 0;
+	    bitOffset = 0;
+	}
 	SPEC_VOLATILE (loop->etype) |= (su == UNION ? 1 : 0);
 
 	/* if this is a bit field  */
@@ -1075,46 +1078,76 @@ compStructSize (int su, structdef * sdef)
 	    /* change it to a unsigned bit */
 	    SPEC_NOUN (loop->etype) = V_BIT;
 	    SPEC_USIGN (loop->etype) = 1;
-	    /* check if this fit into the remaining   */
-	    /* bits of this byte else align it to the */
-	    /* next byte boundary                     */
-	    if ((SPEC_BLEN (loop->etype) = loop->bitVar) <= (8 - bitOffset)) {
-		SPEC_BSTR (loop->etype) = bitOffset;
-		if ((bitOffset += (loop->bitVar % 8)) == 8)
+	    SPEC_BLEN (loop->etype) = loop->bitVar;
+
+	    if (loop->bitVar == BITVAR_PAD) {
+	        /* A zero length bitfield forces padding */
+	        SPEC_BSTR (loop->etype) = bitOffset;
+		SPEC_BLEN (loop->etype) = 0;
+	        bitOffset = 8;
+	        loop->offset = sum;
+	    }
+	    else {
+	        if (bitOffset == 8) {
+	            bitOffset = 0;
+	            sum++;
+	        }
+		/* check if this fit into the remaining   */
+		/* bits of this byte else align it to the */
+		/* next byte boundary                     */
+		if (loop->bitVar <= (8 - bitOffset)) {
+		    /* fits into current byte */
+		    loop->offset = sum;
+		    SPEC_BSTR (loop->etype) = bitOffset;
+		    bitOffset += loop->bitVar;
+		}
+		else if (!bitOffset) {
+		    /* does not fit, but is already byte aligned */
+		    loop->offset = sum;
+		    SPEC_BSTR (loop->etype) = bitOffset;
+		    bitOffset += loop->bitVar;
+		} 
+		else {
+		    /* does not fit; need to realign first */
 		    sum++;
-	    }
-	    else /* does not fit */ {
-		bitOffset = 0;
-		SPEC_BSTR (loop->etype) = bitOffset;
-		sum += (loop->bitVar / 8);
-		bitOffset += (loop->bitVar % 8);
-	    }
-	    /* if this is the last field then pad */
-	    if (!loop->next && bitOffset && bitOffset != 8) {
-		bitOffset = 0;
-		sum++;
+		    loop->offset = (su == UNION ? sum = 0 : sum);
+		    bitOffset = 0;
+		    SPEC_BSTR (loop->etype) = bitOffset;
+		    bitOffset += loop->bitVar;
+	        }
+	        while (bitOffset>8) {
+	            bitOffset -= 8;
+	            sum++;
+	        } 
 	    }
 	}
 	else {
+	    /* This is a non-bit field. Make sure we are */
+	    /* byte aligned first */
+	    if (bitOffset) {
+		sum++;
+		loop->offset = (su == UNION ? sum = 0 : sum);
+		bitOffset = 0;
+	    }
+	    loop->offset = sum;
 	    checkDecl (loop, 1);
 	    sum += getSize (loop->type);
 	}
 
 	loop = loop->next;
 
-	/* if this is not a bitfield but the */
-	/* previous one was and did not take */
-	/* the whole byte then pad the rest  */
-	if ((loop && !loop->bitVar) && bitOffset) {
-	    bitOffset = 0;
-	    sum++;
+	/* if union then size = sizeof larget field */
+	if (su == UNION) {
+	    /* For UNION, round up after each field */
+	    sum += ((bitOffset+7)/8);
+	    usum = max (usum, sum);
 	}
 
-	/* if union then size = sizeof larget field */
-	if (su == UNION)
-	    usum = max (usum, sum);
-
     }
+    
+    /* For STRUCT, round up after all fields processed */
+    if (su != UNION)
+	sum += ((bitOffset+7)/8);
 
     return (su == UNION ? usum : sum);
 }

@@ -7220,8 +7220,7 @@ genUnpackBits (operand * result, char *rname, int ptype)
 
   if (rlen)
     {
-      //  emitcode("anl","a,#0x%02x",((unsigned char)-1)>>(rlen));
-      AccLsh (8 - rlen);
+      emitcode ("anl", "a,#0x%02x", ((unsigned char) -1) >> (8-rlen));
       aopPut (AOP (result), "a", offset++, isOperandVolatile (result, FALSE));
     }
 
@@ -7232,7 +7231,6 @@ finish:
       while (rsize--)
 	aopPut (AOP (result), zero, offset++, isOperandVolatile (result, FALSE));
     }
-  return;
 }
 
 
@@ -7748,6 +7746,8 @@ genPackBits (sym_link * etype,
   /* it exactly fits a byte then         */
   if (SPEC_BLEN (etype) <= 8)
     {
+      unsigned char mask = ((unsigned char) (0xFF << (blen + bstr)) |
+		            (unsigned char) (0xFF >> (8 - bstr)));
       shCount = SPEC_BSTR (etype);
 
       /* shift left acc */
@@ -7756,6 +7756,7 @@ genPackBits (sym_link * etype,
       if (SPEC_BLEN (etype) < 8)
 	{			/* if smaller than a byte */
 
+	  emitcode ("anl", "a,#0x%02x", (~mask) & 0xff);
 
 	  switch (p_type)
 	    {
@@ -7777,9 +7778,7 @@ genPackBits (sym_link * etype,
 	      break;
 	    }
 
-	  emitcode ("anl", "a,#0x%02x", (unsigned char)
-		    ((unsigned char) (0xFF << (blen + bstr)) |
-		     (unsigned char) (0xFF >> (8 - bstr))));
+	  emitcode ("anl", "a,#0x%02x", mask);
 	  emitcode ("orl", "a,b");
 	  if (p_type == GPOINTER)
 	    emitcode ("pop", "b");
@@ -7848,6 +7847,9 @@ genPackBits (sym_link * etype,
   /* last last was not complete */
   if (rLen)
     {
+      emitcode ("anl", "a,#0x%02x",
+                (~(((unsigned char) -1 << rLen) & 0xff)) &0xff);
+
       /* save the byte & read byte */
       switch (p_type)
 	{
@@ -8633,8 +8635,8 @@ genCast (iCode * ic)
   aopOp (right, ic, FALSE);
   aopOp (result, ic, FALSE);
 
-  /* if the result is a bit */
-  if (IS_BITVAR(OP_SYMBOL(result)->type))
+  /* if the result is a bit (and not a bitfield) */
+  if (AOP_TYPE (result) == AOP_CRY)
     {
       /* if the right size is a literal then
          we know what the value is */
@@ -8661,6 +8663,7 @@ genCast (iCode * ic)
       aopPut (AOP (result), "a", 0, isOperandVolatile (result, FALSE));
       goto release;
     }
+
 
   /* if they are the same size : or less */
   if (AOP_SIZE (result) <= AOP_SIZE (right))

@@ -8979,13 +8979,15 @@ static void
 genUnpackBits (operand * result, char *rname, int ptype)
 {
   int shCnt;
-  int rlen;
+  int rlen = 0;
   sym_link *etype;
   int offset = 0;
+  int rsize;
 
   D (emitcode (";", "genUnpackBits "););
 
   etype = getSpec (operandType (result));
+  rsize = getSize (operandType (result));
 
   /* read the first byte  */
   switch (ptype)
@@ -9025,12 +9027,12 @@ genUnpackBits (operand * result, char *rname, int ptype)
 
       emitcode ("anl", "a,#!constbyte",
 		((unsigned char) -1) >> (8 - SPEC_BLEN (etype)));
-      aopPut (AOP (result), "a", offset);
-      return;
+      aopPut (AOP (result), "a", offset++);
+      goto finish;
     }
 
   /* bit field did not fit in a byte  */
-  rlen = SPEC_BLEN (etype) - 8;
+  rlen = SPEC_BLEN (etype);
   aopPut (AOP (result), "a", offset++);
 
   while (1)
@@ -9077,11 +9079,17 @@ genUnpackBits (operand * result, char *rname, int ptype)
 
   if (rlen)
     {
-      emitcode ("anl", "a,#!constbyte", ((unsigned char) -1) >> (rlen));
-      aopPut (AOP (result), "a", offset);
+      emitcode ("anl", "a,#!constbyte", ((unsigned char) -1) >> (8-rlen));
+      aopPut (AOP (result), "a", offset++);
     }
 
-  return;
+finish:
+  if (offset < rsize)
+    {
+      rsize -=offset;
+      while (rsize--)
+        aopPut (AOP (result), zero, offset++);
+    }
 }
 
 
@@ -9760,6 +9768,7 @@ genPackBits (sym_link * etype,
 	     operand * right,
 	     char *rname, int p_type)
 {
+  int shCount = 0;
   int offset = 0;
   int rLen;
   int blen, bstr;
@@ -9774,12 +9783,17 @@ genPackBits (sym_link * etype,
   /* it exactly fits a byte then         */
   if (SPEC_BLEN (etype) <= 8)
     {
+      unsigned char mask = ((unsigned char) (0xFF << (blen + bstr)) |
+                            (unsigned char) (0xFF >> (8 - bstr)));
+      shCount = SPEC_BSTR (etype);
+      
       /* shift left acc */
-      AccLsh (SPEC_BSTR (etype));
+      AccLsh (shCount);
 
       if (SPEC_BLEN (etype) < 8)
 	{			/* if smaller than a byte */
 
+          emitcode ("anl", "a,#0x%02x", (~mask) & 0xff);
 
 	  switch (p_type)
 	    {
@@ -9801,9 +9815,7 @@ genPackBits (sym_link * etype,
 	      break;
 	    }
 
-	  emitcode ("anl", "a,#!constbyte", (unsigned char)
-		    ((unsigned char) (0xFF << (blen + bstr)) |
-		     (unsigned char) (0xFF >> (8 - bstr))));
+	  emitcode ("anl", "a,#!constbyte", mask);
 	  emitcode ("orl", "a,b");
 	  if (p_type == GPOINTER)
 	    emitcode ("pop", "b");
@@ -9872,6 +9884,9 @@ genPackBits (sym_link * etype,
   /* last last was not complete */
   if (rLen)
     {
+      emitcode ("anl", "a,#!constbyte",
+                (~(((unsigned char) -1 << rLen) & 0xff)) & 0xff);
+
       /* save the byte & read byte */
       switch (p_type)
 	{
@@ -9893,7 +9908,7 @@ genPackBits (sym_link * etype,
 	  break;
 	}
 
-      emitcode ("anl", "a,#!constbyte", ((unsigned char) -1 << rLen));
+      emitcode ("anl", "a,#!constbyte", (((unsigned char) -1 << rLen) & 0xff));
       emitcode ("orl", "a,b");
     }
 

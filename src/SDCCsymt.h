@@ -33,6 +33,8 @@
 #define INTNO_MAX 255			/* maximum allowed interrupt number */
 #define INTNO_UNSPEC (INTNO_MAX+1)	/* interrupt number unspecified */
 
+#define BITVAR_PAD -1
+
 enum {
     TYPEOF_INT=1,
     TYPEOF_SHORT,

@@ -1,3 +1,33 @@
+2003-08-14  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	Fixed numerous bitfield problems.
+
+	* src/SDCC.y: More bitfield related error checking
+	* src/SDCCsymt.h,
+	* src/SDCCsymt.c (compStructSize): fixed bitfield offset calc
+	* support/Util/SDCCerr.h,
+	* support/Util/SDCCerr.c: Added & edited some bitfield err msgs
+	* src/mcs51/gen.c (genPackBits, genUnpackBits): fixed mask bugs
+	* src/ds390/gen.c (genPackBits, genUnpackBits): fixed mask bugs
+	* support/regression/tests/bitfields.c: tests added
+	
+2003-08-13  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	Made the constant following the "interrupt" keyword optional. If
+	omitted, the function will not automatically be given an entry
+	in the interrupt vector table (similar to #pragma NOIV, but
+	less syntacticly kludgy). The interrupt number is also now
+	range checked. Also fixed a bug in the high order bit example
+	in the manual.
+
+	* src/SDCC.y
+	* src/SDCCmem.c
+	* src/SDCCglue.c
+	* src/SDCCsymt.h
+	* support/Util/SDCCerr.c
+	* support/Util/SDCCerr.h
+	* doc/sdccman.lyx
+
 2003-08-13  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCcse.c (algebraicOpts): fix bug converting op from value to type

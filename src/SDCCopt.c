@@ -58,6 +58,7 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
   operand *right;
   symbol *func = NULL;
   int lineno = ic->lineno;
+  int bytesPushed=0;
 
   ip = ic->next;		/* insertion point */
   /* remove it from the iCode */
@@ -144,6 +145,7 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
 	{
 	  newic = newiCode (IPUSH, right, NULL);
 	  newic->parmPush = 1;
+	  bytesPushed+=4;
 	}
 
       addiCodeToeBBlock (ebp, newic, ip);
@@ -158,6 +160,7 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
 	{
 	  newic = newiCode (IPUSH, left, NULL);
 	  newic->parmPush = 1;
+	  bytesPushed+=4;
 	}
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
@@ -165,8 +168,9 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
   /* insert the call */
   newic = newiCode (CALL, operandFromSymbol (func), NULL);
   IC_RESULT (newic) = IC_RESULT (ic);
-  addiCodeToeBBlock (ebp, newic, ip);
   newic->lineno = lineno;
+  newic->parmBytes+=bytesPushed;
+  addiCodeToeBBlock (ebp, newic, ip);
 }
 
 /*-----------------------------------------------------------------*/
@@ -319,6 +323,8 @@ convilong (iCode * ic, eBBlock * ebp, sym_link * type, int op)
   int lineno = ic->lineno;
   int bwd;
   int su;
+  int bytesPushed=0;
+
   remiCodeFromeBBlock (ebp, ic);
 
   /* depending on the type */
@@ -380,6 +386,7 @@ found:
 	{
 	  newic = newiCode (IPUSH, IC_RIGHT (ic), NULL);
 	  newic->parmPush = 1;
+	  bytesPushed=getSize(type);
 	}
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
@@ -391,6 +398,7 @@ found:
 	{
 	  newic = newiCode (IPUSH, IC_LEFT (ic), NULL);
 	  newic->parmPush = 1;
+	  bytesPushed=getSize(type);
 	}
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
@@ -400,9 +408,9 @@ found:
   /* for the result */
   newic = newiCode (CALL, operandFromSymbol (func), NULL);
   IC_RESULT (newic) = IC_RESULT (ic);
-  addiCodeToeBBlock (ebp, newic, ip);
   newic->lineno = lineno;
-
+  newic->parmBytes+=bytesPushed; // to clear the stack after the call
+  addiCodeToeBBlock (ebp, newic, ip);
 }
 
 /*-----------------------------------------------------------------*/

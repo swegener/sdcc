@@ -2756,8 +2756,11 @@ operand *ast2iCode (ast *tree)
     switch (tree->opval.op) {
 	
     case '[' :    /* array operation */
-	left= geniCodeRValue (left,TRUE);
-	right=geniCodeRValue (right,TRUE);		   
+	{
+	    link *ltype = operandType(left);
+	    left= geniCodeRValue (left,IS_PTR(ltype->next) ? TRUE : FALSE);
+	    right=geniCodeRValue (right,TRUE);		   
+	}
 	
 	return geniCodeArray (left,right);
 	

@@ -1,3 +1,7 @@
+2003-06-19  Bernhard Held <bernhard@bernhardheld.de>
+
+	* support/Util/MySystem.c (merge_command): revert bad fix
+
 2003-06-18  Borut Razem <borut.razem@siol.net>
 
 	* src/SDCC.lex, src/SDCCmain.c: fixed some warnings, introduced with changes made 15.06.1003

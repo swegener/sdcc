@@ -237,8 +237,7 @@ merge_command(const char *command, const char *params)
 {
   /* allocate extra space for 2x'"', ' ' and '\0' */
   char *cmd_line = (char *)Safe_alloc(strlen(command) + strlen(params) + 4);
-  sprintf(cmd_line, "%s %s", command, params);
-
+  sprintf(cmd_line, "\"%s\" %s", command, params);
   return cmd_line;
 }
 

@@ -7409,7 +7409,7 @@ shiftLLong (operand * left, operand * result, int offr)
 
   if (size >= MSB24 + offr)
     {
-      if (!(sameRegs (AOP (left), AOP (left)) && size >= MSB24 + offr && offr != LSB))
+      if (!(sameRegs (AOP (result), AOP (left)) && size >= MSB24 + offr && offr != LSB))
         {
           l = aopGet (AOP (left), MSB24, FALSE, FALSE);
           MOVA (l);

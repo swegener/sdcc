@@ -6043,6 +6043,9 @@ genLeftShift (iCode * ic)
   aopOp (left, ic, FALSE, FALSE);
   aopOp (result, ic, FALSE, FALSE);
 
+  if (AOP_TYPE (left) != AOP_REG || AOP_TYPE (result) != AOP_REG)
+     _push (PAIR_AF);
+  
   /* now move the left to the result if they are not the
      same */
 
@@ -6064,6 +6067,9 @@ genLeftShift (iCode * ic)
   offset = 0;
   tlbl1 = newiTempLabel (NULL);
 
+  if (AOP_TYPE (left) != AOP_REG || AOP_TYPE (result) != AOP_REG)
+     _pop (PAIR_AF);
+  
   emit2 ("!shortjp !tlabel", tlbl1->key + 100);
   emitLabel (tlbl->key + 100);
   l = aopGet (AOP (result), offset, FALSE);
@@ -6317,6 +6323,9 @@ genRightShift (iCode * ic)
   aopOp (left, ic, FALSE, FALSE);
   aopOp (result, ic, FALSE, FALSE);
 
+  if (AOP_TYPE (left) != AOP_REG || AOP_TYPE (result) != AOP_REG)
+     _push (PAIR_AF);
+  
   /* now move the left to the result if they are not the
      same */
   if (!sameRegs (AOP (left), AOP (result)))
@@ -6336,6 +6345,9 @@ genRightShift (iCode * ic)
   tlbl1 = newiTempLabel (NULL);
   size = AOP_SIZE (result);
   offset = size - 1;
+  
+  if (AOP_TYPE (left) != AOP_REG || AOP_TYPE (result) != AOP_REG)
+     _pop (PAIR_AF);
 
   emit2 ("!shortjp !tlabel", tlbl1->key + 100);
   emitLabel (tlbl->key + 100);

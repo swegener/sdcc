@@ -6234,6 +6234,7 @@ shiftLLong (operand * left, operand * result, int offr)
       loadRegFromAop (hc08_reg_a, AOP (left), MSB24);
       rmwWithReg ("rol", hc08_reg_a);
       storeRegToAop (hc08_reg_a, AOP (result), offr+2);
+      storeConstToAop (zero, AOP (result), 0);
     }
 
   pullOrFreeReg (hc08_reg_x, needpulx);
@@ -6561,6 +6562,7 @@ shiftRLong (operand * left, int offl,
       else
         rmwWithReg ("lsr", hc08_reg_a);
       storeRegToAop (hc08_reg_a, AOP (result), MSB24);
+      storeRegSignToUpperAop (hc08_reg_a, AOP (result), MSB32, sign);
     }
 
   loadRegFromAop (hc08_reg_xa, AOP (left), offl);
@@ -6624,7 +6626,8 @@ genrshFour (operand * result, operand * left,
 	  loadRegFromConst (hc08_reg_a, zero);
 	  XAccRsh (shCount-8, sign);
 	  accopWithAop ("ora", AOP (result), 1);
-	  storeRegToFullAop (hc08_reg_xa, AOP (result), 1);
+	  storeRegToAop (hc08_reg_xa, AOP (result), 1);
+          storeRegSignToUpperAop (hc08_reg_x, AOP(result), 3, sign);
 	}
     }
   else

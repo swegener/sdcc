@@ -657,6 +657,7 @@ PORT tininative_port =
   "DS80C390",			/* Target name */
 	NULL,			/* processor */
   {
+    glue,
     FALSE,			/* Emit glue around main */
     MODEL_FLAT24,
     MODEL_FLAT24

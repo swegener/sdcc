@@ -985,8 +985,9 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr)
       /* to the array element */
       char *s = SPEC_CVAL (iexpr->etype).v_char;
       int i = 0;
+      int size = getSize (iexpr->ftype);
 
-      while (*s)
+      for (i=0;i<size;i++)
 	{
 	  rast = newNode (NULLOP,
 			  rast,
@@ -994,15 +995,8 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr)
 				   newNode ('[', sym,
 				   newAst_VALUE (valueFromLit ((float) i))),
 				   newAst_VALUE (valueFromLit (*s))));
-	  i++;
 	  s++;
 	}
-      rast = newNode (NULLOP,
-		      rast,
-		      newNode ('=',
-			       newNode ('[', sym,
-				   newAst_VALUE (valueFromLit ((float) i))),
-			       newAst_VALUE (valueFromLit (*s))));
 
       // now WE don't need iexpr's symbol anymore
       freeStringSymbol(AST_SYMBOL(iexpr));
@@ -1194,12 +1188,14 @@ stringToSymbol (value * val)
   static int charLbl = 0;
   symbol *sym;
   set *sp;
+  int size;
 
   // have we heard this before?
   for (sp=statsg->syms; sp; sp=sp->next) {
     sym=sp->item;
-    if (sym->isstrlit && 
-	!strcmp(SPEC_CVAL(sym->etype).v_char, SPEC_CVAL(val->etype).v_char)) {
+    size = getSize (sym->type);
+    if (sym->isstrlit && size == getSize (val->type) &&
+	!memcmp(SPEC_CVAL(sym->etype).v_char, SPEC_CVAL(val->etype).v_char, size)) {
       // yes, this is old news. Don't publish it again.
       sym->isstrlit++; // but raise the usage count
       return symbolVal(sym);

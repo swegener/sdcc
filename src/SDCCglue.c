@@ -512,7 +512,7 @@ printChar (FILE * ofile, char *s, int plen)
   while (len && pplen < plen)
     {
       i = 60;
-      while (i && *s && pplen < plen)
+      while (i && pplen < plen)
 	{
 	  if (*s < ' ' || *s == '\"' || *s=='\\')
 	    {
@@ -543,7 +543,6 @@ printChar (FILE * ofile, char *s, int plen)
       else
 	len = 0;
     }
-  tfprintf (ofile, "\t!db !constbyte\n", 0);
 }
 
 /*-----------------------------------------------------------------*/
@@ -765,7 +764,6 @@ int
 printIvalChar (sym_link * type, initList * ilist, FILE * oFile, char *s)
 {
   value *val;
-  int remain;
 
   if (!s)
     {
@@ -778,10 +776,6 @@ printIvalChar (sym_link * type, initList * ilist, FILE * oFile, char *s)
 	    DCL_ELEM (type) = strlen (SPEC_CVAL (val->etype).v_char) + 1;
 
 	  printChar (oFile, SPEC_CVAL (val->etype).v_char, DCL_ELEM (type));
-
-	  if ((remain = (DCL_ELEM (type) - strlen (SPEC_CVAL (val->etype).v_char) - 1)) > 0)
-	    while (remain--)
-	      tfprintf (oFile, "\t!db !constbyte\n", 0);
 
 	  return 1;
 	}
@@ -1268,7 +1262,7 @@ emitStaticSeg (memmap * map, FILE * out)
 		  SPEC_CVAL (sym->etype).v_char)
 		  printChar (out,
 			     SPEC_CVAL (sym->etype).v_char,
-			     strlen (SPEC_CVAL (sym->etype).v_char) + 1);
+			     size);
 	      else
 		  tfprintf (out, "\t!ds\n", (unsigned int) size & 0xffff);
 	    }

@@ -1,6 +1,8 @@
 2004-01-11 Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCicode.c (operandOperation): fixed bug #874819
+	* src/SDCCast.c (decorateType): fixed
+	char foo (unsigned long ul) { return ul > 0; }
 
 2004-01-11 Frieder Ferlemann <Frieder.Ferlemann@web.de>
 

@@ -1746,7 +1746,7 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
     case '?':
     case ':':
     case SIZEOF:		/* evaluate wihout code generation */
-      
+
       if (IS_AST_SYM_VALUE (pbody->left) &&
 	  isSymbolEqual (AST_SYMBOL (pbody->left), sym))
 	return FALSE;
@@ -3478,7 +3478,7 @@ decorateType (ast * tree)
 	      }
 	}
       /* if unsigned value < 0  then always false */
-      /* if (unsigned value) > 0 then (unsigned value) */
+      /* if (unsigned value) > 0 then '(unsigned value) ? 1 : 0' */
       if (SPEC_USIGN(LETYPE(tree)) && IS_LITERAL(RTYPE(tree))  &&
 	  ((int) floatFromVal (valFromType (RETYPE (tree)))) == 0)
 	{
@@ -3488,7 +3488,13 @@ decorateType (ast * tree)
 	    }
 	  if (tree->opval.op == '>')
 	    {
-	      return tree->left;
+	      tree->opval.op = '?';
+	      tree->right = newNode (':',
+				     newAst_VALUE (constVal ("1")),
+				     tree->right); /* val 0 */
+	      tree->right->lineno = tree->lineno;
+	      tree->right->left->lineno = tree->lineno;
+	      decorateType (tree->right);
 	    }
         }
       /* if they are both literal then */

@@ -1,3 +1,9 @@
+2003-02-24  Bernhard Held <bernhard@bernhardheld.de>
+
+	* device/include/ctype.h: removed warning while using --stack-auto
+	* device/include/malloc.h: removed warning while using --stack-auto
+	* device/include/string.h: removed warning while using --stack-auto
+
 2003-02-23  Borut Razem <borut.razem@siol.net>
 
 	* src/asm.h: corrected assertion in function printILine(): _pipe() was not executed on MSVC,

@@ -47,7 +47,6 @@ MEMHEADER
 };
 
 #ifdef SDCC_STACK_AUTO
-#warning Make sure you recompile malloc.c as 'reentrant'
 
 extern void init_dynamic_memory(MEMHEADER xdata *  , unsigned int ) reentrant;
 extern void xdata * malloc (unsigned int ) reentrant;

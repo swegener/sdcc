@@ -37,9 +37,6 @@
 #define memmove memcpy
 
 #ifdef SDCC_STACK_AUTO
-#ifdef SDCC_mcs51
-#warning Make sure you recompiled _str*.c and _mem*.c library functions as 'reentrant'
-#endif
 
 extern char *strcpy (char *, char *) reentrant ;
 extern char *strncpy(char *, char *,int ) reentrant ;

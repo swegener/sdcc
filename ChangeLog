@@ -1,3 +1,9 @@
+2001-09-29  Michael Hope  <michaelh@juju.net.nz>
+
+	* Makefile (sdcc-libs): Added makebin to the list of standard targets.
+
+	* support/regression/ports/z80/spec.mk: Updated to use env for sdcc bin dir for automatic regression.
+
 2001-09-25  Michael Hope  <michaelh@juju.net.nz>
 
 	* configure.in: Fixed up so that ucsim is only configured once.

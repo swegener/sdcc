@@ -9,11 +9,11 @@ PRJDIR		= .
 include $(PRJDIR)/Makefile.common
 
 SDCC_MISC	= debugger/mcs51 sim/ucsim
-SDCC_LIBS	= support/cpp support/cpp2
+SDCC_LIBS	= support/cpp support/cpp2 support/makebin
 SDCC_DOC        = doc
 
 # Parts that are not normally compiled but need to be cleaned
-SDCC_EXTRA      = support/regression support/makebin
+SDCC_EXTRA      = support/regression
 
 SDCC_ASLINK	= as/mcs51 as link
 SDCC_PACKIHX	= packihx

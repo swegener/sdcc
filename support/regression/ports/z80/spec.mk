@@ -12,17 +12,17 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
 
 # Rule to generate a Emulator .bin file from the .ihx linker output.
 %$(EXEEXT): %.ihx
-	../makebin/makebin -s 32768 < $< > $@  # Must be 32768 due to a bug in ConsoleZ80
+	$(SDCC_DIR)/bin/makebin -s 32768 < $< > $@
 
 # Rule to link into .ihx
 %.ihx: %.c $(EXTRAS)
 	$(SDCC) $(SDCCFLAGS) $< $(EXTRAS)
 
 %$(OBJEXT): %.asm
-	../../bin/as-z80 -plosgff $@ $<
+	$(SDCC_DIR)/bin/as-z80 -plosgff $@ $<
 
 %$(OBJEXT): %.s
-	../../bin/as-z80 -plosgff $@ $<
+	$(SDCC_DIR)/bin/as-z80 -plosgff $@ $<
 
 %$(OBJEXT): %.c
 	$(SDCC) $(SDCCFLAGS) -c $<

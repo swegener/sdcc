@@ -122,6 +122,23 @@ allocReg (short type)
 }
 
 /*-----------------------------------------------------------------*/
+/* allocThisReg - allocates a particular register (if free)        */
+/*-----------------------------------------------------------------*/
+static regs *
+allocThisReg (regs * reg)
+{
+  if (!reg->isFree)
+    return NULL;
+
+  reg->isFree = 0;
+  if (currFunc)
+    currFunc->regsUsed = bitVectSetBit (currFunc->regsUsed, reg->rIdx);
+  
+  return reg;
+}
+
+
+/*-----------------------------------------------------------------*/
 /* mcs51_regWithIdx - returns pointer to register wit index number       */
 /*-----------------------------------------------------------------*/
 regs *
@@ -1162,7 +1179,6 @@ serialRegAssign (eBBlock ** ebbs, int count)
 	      }
 	    }
 #endif
-
 	    /* if this is an ipop that means some live
 	       range will have to be assigned again */
 	    if (ic->op == IPOP)
@@ -1267,18 +1283,32 @@ serialRegAssign (eBBlock ** ebbs, int count)
 		_G.totRegAssigned = bitVectSetBit (_G.totRegAssigned, sym->key);
 
 		for (j = 0; j < sym->nRegs; j++) {
+		    sym->regs[j] = NULL;
 		    if (sym->regType == REG_PTR)
 			sym->regs[j] = getRegPtr (ic, ebbs[i], sym);
 		    else
-			sym->regs[j] = getRegGpr (ic, ebbs[i], sym);
+		      { /*
+		        if (ic->op == CAST && IS_SYMOP (IC_RIGHT (ic)))
+			  {
+			    symbol * right = OP_SYMBOL (IC_RIGHT (ic));
+			    
+			    if (right->regs[j])
+			      sym->regs[j] = allocThisReg (right->regs[j]);
+			  }
+			if (!sym->regs[j]) */
+			  sym->regs[j] = getRegGpr (ic, ebbs[i], sym);
+		      }
 
 		    /* if the allocation failed which means
 		       this was spilt then break */
-		    if (!sym->regs[j]) {
-		      break;
-		    }
+		    if (!sym->regs[j])
+		      {
+			for (i=0; i < sym->nRegs ; i++ )
+			  sym->regs[i] = NULL;
+			break;
+		      }
 		}
-
+		
 		if (!POINTER_SET(ic) && !POINTER_GET(ic)) {
                     /* if it shares registers with operands make sure
 		       that they are in the same position */
@@ -1346,6 +1376,7 @@ static void fillGaps()
     symbol *sym =NULL;
     int key =0;
     int pass;
+    iCode *ic = NULL;
     
     if (getenv("DISABLE_FILL_GAPS")) return;
     
@@ -1370,7 +1401,7 @@ static void fillGaps()
 
 		clr = hTabItemWithKey(liveRanges,i);
 	    assert(clr);
-	 
+
 	    /* mark these registers as used */
 	    for (k = 0 ; k < clr->nRegs ; k++ ) 
 		useReg(clr->regs[k]);
@@ -1382,13 +1413,36 @@ static void fillGaps()
 	    continue ;
 	}
 
+	ic = NULL;	    
+	for (i = 0 ; i < sym->defs->size ; i++ )
+          {
+	    if (bitVectBitValue(sym->defs,i))
+	      {
+	        if (!(ic = hTabItemWithKey(iCodehTab,i)))
+	          continue;
+	        if (ic->op == CAST)
+	          break;
+	      }
+	  }
+
         D(printf("Atemping fillGaps on %s: [",sym->name));
 	/* THERE IS HOPE !!!! */
 	for (i=0; i < sym->nRegs ; i++ ) {
 	    if (sym->regType == REG_PTR)
 		sym->regs[i] = getRegPtrNoSpil ();
 	    else
-		sym->regs[i] = getRegGprNoSpil ();		  
+	      {
+	        sym->regs[i] = NULL;
+	        if (ic && ic->op == CAST && IS_SYMOP (IC_RIGHT (ic)))
+		  {
+		    symbol * right = OP_SYMBOL (IC_RIGHT (ic));
+		    
+		    if (right->regs[i])
+		      sym->regs[i] = allocThisReg (right->regs[i]);
+		  }
+		if (!sym->regs[i])
+		  sym->regs[i] = getRegGprNoSpil ();
+	      }
             D(printf("%s ", sym->regs[i]->name));
 	}
         D(printf("]\n"));
@@ -1407,7 +1461,6 @@ static void fillGaps()
             D(printf(" checking definitions\n"));
 	    for (i = 0 ; i < sym->defs->size ; i++ ) {
 	        if (bitVectBitValue(sym->defs,i)) {
-		    iCode *ic;
 		    if (!(ic = hTabItemWithKey(iCodehTab,i))) continue ;
                     D(printf("  ic->seq = %d\n", ic->seq));
 		    if (SKIP_IC(ic)) continue;
@@ -1477,6 +1530,7 @@ static void fillGaps()
 	    continue ;	    
 	}
 	D(printf ("FILLED GAP for %s in function %s\n",sym->name, currFunc ? currFunc->name : "UNKNOWN"));
+	
 	_G.totRegAssigned = bitVectSetBit(_G.totRegAssigned,sym->key);
 	sym->isspilt = sym->spillA = 0 ;
 	sym->usl.spillLoc->allocreq--;

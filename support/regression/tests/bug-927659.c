@@ -34,7 +34,7 @@ testReverse(void)
 
 /*************************************************************/
 
-#ifndef PORT_HOST
+#if !defined(PORT_HOST) && !defined(SDCC_ds390)
 void putchar (char c)
 {
   c;

@@ -1,3 +1,13 @@
+2004-04-13 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/mcs51/ralloc.c (serialRegAssign, fillGaps, allocThisReg): try
+	harder to keep the same registers during a CAST iCode
+	* src/SDCCopt.c (optimizeCastCast, eBBlockFromiCode): casts of char to
+	long via int can be done in a single cast, if the signedness is
+	correct.
+	* support/regression/tests/bug-927659.c: fixed to avoid conflict with
+	putchar() in tinibios.c in ds390's library
+	
 2004-04-12 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCast.c (decorateType): fixed bug #898889,

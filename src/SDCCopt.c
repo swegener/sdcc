@@ -996,6 +996,76 @@ discardDeadParamReceives (eBBlock ** ebbs, int count)
 }
 
 /*-----------------------------------------------------------------*/
+/* optimizeCastCast - remove unneeded intermediate casts.          */
+/* Integer promotion may cast (un)signed char to int and then      */
+/* recast the int to (un)signed long. If the signedness of the     */
+/* char and long are the same, the cast can be safely performed in */
+/* a single step.                                                  */
+/*-----------------------------------------------------------------*/
+static void 
+optimizeCastCast (eBBlock ** ebbs, int count)
+{
+  int i;
+  iCode *ic;
+  iCode *uic;
+  sym_link * type1;
+  sym_link * type2;
+  sym_link * type3;
+  symbol * sym;
+
+  for (i = 0; i < count; i++)
+    {
+      for (ic = ebbs[i]->sch; ic; ic = ic->next)
+	{
+	  
+	  if (ic->op == CAST && IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)))
+	    {
+	      type1 = operandType (IC_RIGHT (ic));
+	      type2 = operandType (IC_RESULT (ic));
+
+	      /* Look only for a cast from an integer type to an */
+	      /* integer type that has no loss of bits */
+	      if (!IS_INTEGRAL (type1) || !IS_INTEGRAL (type2))
+	        continue;
+	      if (getSize (type2) < getSize (type1))
+	        continue;
+	      
+	      /* There must be only one use of this first result */
+	      if (bitVectnBitsOn (OP_USES (IC_RESULT (ic))) != 1)
+	        continue;
+	      
+	      /* This use must be a second cast */
+	      uic = hTabItemWithKey (iCodehTab,
+			bitVectFirstBit (OP_USES (IC_RESULT (ic))));
+	      if (!uic || uic->op != CAST)
+	        continue;
+  
+	      /* It must be a cast to another integer type that */
+	      /* has no loss of bits */
+	      type3 = operandType (IC_RESULT (uic));
+	      if (!IS_INTEGRAL (type3))
+		 continue;
+	      if (getSize (type3) < getSize (type2))
+		 continue;
+	      
+	      /* The signedness between the first and last types */
+	      /* must match */
+	      if (SPEC_USIGN (type3) != SPEC_USIGN (type1))
+		 continue;
+
+	      /* Change the first cast to a simple assignment and */
+	      /* let the second cast do all the work */
+	      ic->op = '=';
+	      IC_LEFT (ic) = NULL;
+	      sym = OP_SYMBOL (IC_RESULT (ic));
+	      sym->type = copyLinkChain (type1);
+	      sym->etype = getSpec (sym->type);
+	    }
+	}
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* eBBlockFromiCode - creates extended basic blocks from iCode     */
 /*                    will return an array of eBBlock pointers     */
 /*-----------------------------------------------------------------*/
@@ -1052,6 +1122,8 @@ eBBlockFromiCode (iCode * ic)
   if (options.dump_raw)
     dumpEbbsToFileExt (DUMP_RAW1, ebbs, count);
 
+  optimizeCastCast (ebbs, saveCount);
+    
   /* do common subexpression elimination for each block */
   change = cseAllBlocks (ebbs, saveCount, FALSE);
 

@@ -120,7 +120,7 @@
 enum 
 {
   /* Set to enable debugging trace statements in the output assembly code. */
-  DISABLE_DEBUG = 0
+  DISABLE_DEBUG = 0,
 };
 
 static char *_z80_return[] =
@@ -539,7 +539,7 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool requires_a)
          Normally everything is AOP_STK, but for offsets of < -127 or
          > 128 on the Z80 an extended stack pointer is used.
       */
-      if (IS_Z80 && (sym->stack < -127 || sym->stack > (int)(128-getSize (sym->type))))
+      if (IS_Z80 && (options.ommitFramePtr || sym->stack < -127 || sym->stack > (int)(128-getSize (sym->type))))
         {
           emitDebug ("; AOP_EXSTK for %s", sym->rname);
           sym->aop = aop = newAsmop (AOP_EXSTK);
@@ -886,6 +886,11 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic)
 
   aop->freed = 1;
 
+  if (aop->type == AOP_PAIRPTR && IS_Z80 && aop->aopu.aop_pairId == PAIR_DE)
+    {
+      _pop (aop->aopu.aop_pairId);
+    }
+
 dealloc:
   /* all other cases just dealloc */
   if (op)
@@ -899,6 +904,7 @@ dealloc:
 	    SPIL_LOC (op)->aop = NULL;
 	}
     }
+
 }
 
 bool
@@ -1155,23 +1161,23 @@ fetchHL (asmop * aop)
 static void
 setupPair (PAIR_ID pairId, asmop * aop, int offset)
 {
-  assert (pairId == PAIR_HL || pairId == PAIR_IY);
-
   switch (aop->type)
     {
     case AOP_IY:
-      wassertl (pairId == PAIR_IY, "AOP_IY must be in IY");
+      wassertl (pairId == PAIR_IY || pairId == PAIR_HL, "AOP_IY must be in IY or HL");
       fetchLitPair (pairId, aop, 0);
       break;
 
     case AOP_HL:
+      wassertl (pairId == PAIR_HL, "AOP_HL must be in HL");
+      
       fetchLitPair (pairId, aop, offset);
       _G.pairs[pairId].offset = offset;
       break;
 
     case AOP_EXSTK:
       wassertl (IS_Z80, "Only the Z80 has an extended stack");
-      wassertl (pairId == PAIR_IY, "The Z80 extended stack must be in IY");
+      wassertl (pairId == PAIR_IY || pairId == PAIR_HL, "The Z80 extended stack must be in IY or HL");
 
       {
 	int offset = aop->aopu.aop_stk + _G.stack.offset;
@@ -1185,8 +1191,8 @@ setupPair (PAIR_ID pairId, asmop * aop, int offset)
           {
             /* PENDING: Do this better. */
             sprintf (buffer, "%d", offset + _G.stack.pushed);
-            emit2 ("ld iy,!hashedstr", buffer);
-            emit2 ("add iy,sp");
+            emit2 ("ld %s,!hashedstr", _pairs[pairId].name, buffer);
+            emit2 ("add %s,sp", _pairs[pairId].name);
             _G.pairs[pairId].last_type = aop->type;
             _G.pairs[pairId].offset = offset;
           }
@@ -1214,6 +1220,11 @@ setupPair (PAIR_ID pairId, asmop * aop, int offset)
 	_G.pairs[pairId].offset = abso;
 	break;
       }
+
+    case AOP_PAIRPTR:
+      adjustPair (_pairs[pairId].name, &_G.pairs[pairId].offset, offset);
+      break;
+      
     default:
       wassert (0);
     }
@@ -1355,6 +1366,12 @@ aopGet (asmop * aop, int offset, bool bit16)
     case AOP_STR:
       aop->coff = offset;
       return aop->aopu.aop_str[offset];
+
+    case AOP_PAIRPTR:
+      setupPair (aop->aopu.aop_pairId, aop, offset);
+      sprintf (s, "(%s)", _pairs[aop->aopu.aop_pairId].name);
+
+      return traceAlloc(&_G.trace.aops, Safe_strdup(s));
 
     default:
       break;
@@ -1555,6 +1572,11 @@ aopPut (asmop * aop, const char *s, int offset)
     case AOP_HLREG:
       wassert (offset < 2);
       emit2 ("ld %s,%s", aop->aopu.aop_str[offset], s);
+      break;
+
+    case AOP_PAIRPTR:
+      setupPair (aop->aopu.aop_pairId, aop, offset);
+      emit2 ("ld (%s),%s", _pairs[aop->aopu.aop_pairId].name, s);
       break;
 
     default:
@@ -2824,6 +2846,86 @@ outBitAcc (operand * result)
     }
 }
 
+bool
+couldDestroyCarry (asmop *aop)
+{
+  if (aop)
+    {
+      if (aop->type == AOP_EXSTK || aop->type == AOP_IY)
+        {
+          return TRUE;
+        }
+    }
+  return FALSE;
+}
+
+static void
+shiftIntoPair (int idx, asmop *aop)
+{
+  PAIR_ID id;
+
+  wassertl (IS_Z80, "Only implemented for the Z80");
+  //  wassertl (aop->type == AOP_EXSTK, "Only implemented for EXSTK");
+
+  switch (idx) 
+    {
+    case 0:
+      id = PAIR_HL;
+      break;
+    case 1:
+      id = PAIR_DE;
+      _push (PAIR_DE);
+      break;
+    default:
+      wassertl (0, "Internal error - hit default case");
+    }
+
+  emitDebug ("; Shift into pair idx %u", idx);
+
+  if (id == PAIR_HL)
+    {
+      setupPair (PAIR_HL, aop, 0);
+    }
+  else
+    {
+      setupPair (PAIR_IY, aop, 0);
+      emit2 ("push iy");
+      emit2 ("pop %s", _pairs[id].name);
+    }
+
+  aop->type = AOP_PAIRPTR;
+  aop->aopu.aop_pairId = id;
+  _G.pairs[id].offset = 0;
+  _G.pairs[id].last_type = aop->type;
+}
+
+static void 
+setupToPreserveCarry (asmop *result, asmop *left, asmop *right)
+{
+  wassert (left && right);
+
+  if (IS_Z80)
+    {
+      if (couldDestroyCarry (right) && couldDestroyCarry (result))
+        {
+          shiftIntoPair (0, right);
+          shiftIntoPair (1, result);
+        }
+      else if (couldDestroyCarry (right))
+        {
+          shiftIntoPair (0, right);
+        }
+      else if (couldDestroyCarry (result))
+        {
+          shiftIntoPair (0, result);
+        }
+      else
+        {
+          /* Fine */
+        }
+    }
+}
+
 /*-----------------------------------------------------------------*/
 /* genPlus - generates code for addition                           */
 /*-----------------------------------------------------------------*/
@@ -2977,6 +3079,8 @@ genPlus (iCode * ic)
           goto release;
         }
     }
+
+  setupToPreserveCarry (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic)), AOP (IC_RIGHT (ic)));
 
   while (size--)
     {
@@ -3170,6 +3274,8 @@ genMinus (iCode * ic)
           goto release;
         }
     }
+
+  setupToPreserveCarry (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic)), AOP (IC_RIGHT (ic)));
 
   /* if literal, add a,#-lit, else normal subb */
   while (size--)
@@ -3399,6 +3505,43 @@ genCmp (operand * left, operand * right,
             }
           spillPair (PAIR_HL);
         }
+      else if (size == 4 && IS_Z80 && couldDestroyCarry(AOP(right)) && couldDestroyCarry(AOP(left)))
+        {
+          setupPair (PAIR_HL, AOP (left), 0);
+          aopGet (AOP(right), LSB, FALSE);
+
+          while (size--)
+            {
+              if (size == 0 && sign)
+                {
+                  // Highest byte when signed needs the bits flipped
+                  // Save the flags
+                  emit2 ("push af");
+                  emit2 ("ld a,(hl)");
+                  emit2 ("xor #0x80");
+                  emit2 ("ld l,a");
+                  emit2 ("ld a,%d(iy)", offset);
+                  emit2 ("xor #0x80");
+                  emit2 ("ld h,a");
+                  emit2 ("pop af");
+                  emit2 ("ld a,l");
+                  emit2 ("%s a,h", offset == 0 ? "sub" : "sbc");
+                }
+              else
+                {
+                  emit2 ("ld a,(hl)");
+                  emit2 ("%s a,%d(iy)", offset == 0 ? "sub" : "sbc", offset);
+                }
+              
+              if (size != 0)
+                {
+                  emit2 ("inc hl");
+                }
+              offset++;
+            }
+          spillPair (PAIR_HL);
+          spillPair (PAIR_IY);
+        }
       else
 	{
 	  if (AOP_TYPE (right) == AOP_LIT)
@@ -3427,6 +3570,7 @@ genCmp (operand * left, operand * right,
 		  goto release;
 		}
 	    }
+          
 	  if (sign)
 	    {
 	      /* First setup h and l contaning the top most bytes XORed */

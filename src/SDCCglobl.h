@@ -219,6 +219,8 @@ struct options
     int shortis8bits;           /* treat short like int or char */
     int lessPedantic;           /* disable some warnings */
     int profile;                /* Turn on extra profiling information */
+    int ommitFramePtr;		/* Turn off the frame pointer. */
+
     char *calleeSaves[128];	/* list of functions using callee save */
     char *excludeRegs[32];	/* registers excluded from saving */
 

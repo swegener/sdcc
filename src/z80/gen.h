@@ -55,7 +55,9 @@ typedef enum
     /* Simple literal. */
     AOP_SIMPLELIT,
     /* Is in the extended stack pointer (IY on the Z80) */
-    AOP_EXSTK
+    AOP_EXSTK,
+    /* Is referenced by a pointer in a register pair. */
+    AOP_PAIRPTR
   }
 AOP_TYPE;
 
@@ -67,9 +69,9 @@ typedef struct asmop
     AOP_TYPE type;
     short coff;                 /* current offset */
     short size;                 /* total size */
-    unsigned code:1;            /* is in Code space */
-    unsigned paged:1;           /* in paged memory  */
-    unsigned freed:1;           /* already freed    */
+    bool code;                  /* is in Code space */
+    bool paged;                 /* in paged memory  */
+    bool freed;                 /* already freed    */
     union
       {
         value *aop_lit;         /* if literal */
@@ -79,6 +81,7 @@ typedef struct asmop
         int aop_stk;            /* stack offset when AOP_STK */
         const char *aop_str[4]; /* just a string array containing the location */
         unsigned long aop_simplelit; /* Just the value. */
+        int aop_pairId;		/* The pair ID */
       }
     aopu;
   }

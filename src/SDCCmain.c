@@ -203,7 +203,8 @@ optionsTable[] = {
     { 0,    "--verbose",            &options.verbose, "Trace calls to the preprocessor, assembler, and linker" },
     { 0,    OPTION_LESS_PEDANTIC,   NULL, "Disable some of the more pedantic warnings" },
     { 0,    OPTION_SHORT_IS_8BITS,   NULL, "Make short 8bits (for old times sake)" },
-    { 0,    "--profile",            &options.profile, "On supported ports, generate extra profiling information" }
+    { 0,    "--profile",            &options.profile, "On supported ports, generate extra profiling information" },
+    { 0,    "--fommit-frame-pointer", &options.ommitFramePtr, "Leave out the frame pointer." }
 };
 
 /** Table of all unsupported options and help text to display when one

@@ -293,6 +293,35 @@ InputPath=.\bin_vc\sdcc.exe
 # End Source File
 # Begin Source File
 
+SOURCE=.\bin_vc\sdcclib.exe
+
+!IF  "$(CFG)" == "all - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build
+InputPath=.\bin_vc\sdcclib.exe
+
+"bin\sdcclib.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\sdcclib.exe  bin /y > nul
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "all - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build
+InputPath=.\bin_vc\sdcclib.exe
+
+"bin\sdcclib.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\sdcclib.exe  bin /y > nul
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\bin_vc\sdcpp.exe
 
 !IF  "$(CFG)" == "all - Win32 Release"

@@ -38,6 +38,9 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name as_gbz80
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name librarian
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -157,6 +160,18 @@ Package=<4>
 ###############################################################################
 
 Project: "ds390a"=.\src\ds390\ds390a.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "librarian"=.\support\librarian\librarian.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

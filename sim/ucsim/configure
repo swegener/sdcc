@@ -3706,7 +3706,7 @@ fi
 # If this is Cygwin neither use Position Independant Code
 # nor build .so
 # Quick + dirty by Bernhard
-if gcc -v 2>&1 | grep -i cygwin > /dev/null; then
+if $CXX -v 2>&1 | grep -i cygwin 1>&5 2>&5; then
     PICOPT=""
     SHAREDLIB="no"
 fi

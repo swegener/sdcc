@@ -710,7 +710,7 @@ void aopOp (operand *op, iCode *ic, bool result)
     }
 
     /* if already has a asmop then continue */
-    if (op->aop && aop->size == getSize(sym->type))
+    if (op->aop)
         return ;
 
     /* if the underlying symbol has a aop */
@@ -780,6 +780,10 @@ void aopOp (operand *op, iCode *ic, bool result)
         }
 
         /* else spill location  */
+	if (sym->usl.spillLoc && getSize(sym->type) != getSize(sym->usl.spillLoc->type)) {
+	    /* force a new aop if sizes differ */
+	    sym->usl.spillLoc->aop = NULL;
+	}
 	DEBUGpic14_emitcode(";","%s %d %s",__FUNCTION__,__LINE__,sym->usl.spillLoc->rname);
         sym->aop = op->aop = aop = 
                                   aopForSym(ic,sym->usl.spillLoc,result);

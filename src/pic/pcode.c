@@ -136,6 +136,7 @@ pCodeInstruction pciADDWF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_Z) // outCond
@@ -157,6 +158,7 @@ pCodeInstruction pciADDFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_W | PCC_Z) // outCond
@@ -178,6 +180,7 @@ pCodeInstruction pciADDLW = {
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  1,    // literal operand
   POC_NOP,
   (PCC_W | PCC_LITERAL),   // inCond
   (PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
@@ -199,6 +202,7 @@ pCodeInstruction pciANDLW = {
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  1,    // literal operand
   POC_NOP,
   (PCC_W | PCC_LITERAL),   // inCond
   (PCC_W | PCC_Z) // outCond
@@ -220,6 +224,7 @@ pCodeInstruction pciANDWF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_Z) // outCond
@@ -241,6 +246,7 @@ pCodeInstruction pciANDFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_W | PCC_Z) // outCond
@@ -262,6 +268,7 @@ pCodeInstruction pciBCF = {
   2,    // num ops
   1,1,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_BSF,
   (PCC_REGISTER | PCC_EXAMINE_PCOP),   // inCond
   PCC_REGISTER // outCond
@@ -283,6 +290,7 @@ pCodeInstruction pciBSF = {
   2,    // num ops
   1,1,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_BCF,
   (PCC_REGISTER | PCC_EXAMINE_PCOP),   // inCond
   (PCC_REGISTER | PCC_EXAMINE_PCOP) // outCond
@@ -304,6 +312,7 @@ pCodeInstruction pciBTFSC = {
   2,    // num ops
   0,1,  // dest, bit instruction
   1,1,  // branch, skip
+  0,    // literal operand
   POC_BTFSS,
   (PCC_REGISTER | PCC_EXAMINE_PCOP),   // inCond
   PCC_EXAMINE_PCOP // outCond
@@ -325,6 +334,7 @@ pCodeInstruction pciBTFSS = {
   2,    // num ops
   0,1,  // dest, bit instruction
   1,1,  // branch, skip
+  0,    // literal operand
   POC_BTFSC,
   (PCC_REGISTER | PCC_EXAMINE_PCOP),   // inCond
   PCC_EXAMINE_PCOP // outCond
@@ -346,6 +356,7 @@ pCodeInstruction pciCALL = {
   1,    // num ops
   0,0,  // dest, bit instruction
   1,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   PCC_NONE, // inCond
   PCC_NONE  // outCond
@@ -367,6 +378,7 @@ pCodeInstruction pciCOMF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   PCC_REGISTER,  // inCond
   PCC_REGISTER   // outCond
@@ -388,6 +400,7 @@ pCodeInstruction pciCOMFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   PCC_REGISTER,  // inCond
   PCC_W   // outCond
@@ -409,6 +422,7 @@ pCodeInstruction pciCLRF = {
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   PCC_NONE, // inCond
   PCC_REGISTER  // outCond
@@ -430,6 +444,7 @@ pCodeInstruction pciCLRW = {
   0,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   PCC_NONE, // inCond
   PCC_W  // outCond
@@ -451,6 +466,7 @@ pCodeInstruction pciCLRWDT = {
   0,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   PCC_NONE, // inCond
   PCC_NONE  // outCond
@@ -472,6 +488,7 @@ pCodeInstruction pciDECF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_REGISTER    // outCond
@@ -493,6 +510,7 @@ pCodeInstruction pciDECFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_W    // outCond
@@ -514,6 +532,7 @@ pCodeInstruction pciDECFSZ = {
   2,    // num ops
   1,0,  // dest, bit instruction
   1,1,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_REGISTER    // outCond
@@ -535,6 +554,7 @@ pCodeInstruction pciDECFSZW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   1,1,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_W           // outCond
@@ -556,6 +576,7 @@ pCodeInstruction pciGOTO = {
   1,    // num ops
   0,0,  // dest, bit instruction
   1,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   PCC_NONE,   // inCond
   PCC_NONE    // outCond
@@ -577,6 +598,7 @@ pCodeInstruction pciINCF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_REGISTER    // outCond
@@ -598,6 +620,7 @@ pCodeInstruction pciINCFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_W    // outCond
@@ -619,6 +642,7 @@ pCodeInstruction pciINCFSZ = {
   2,    // num ops
   1,0,  // dest, bit instruction
   1,1,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_REGISTER    // outCond
@@ -640,6 +664,7 @@ pCodeInstruction pciINCFSZW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   1,1,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_W           // outCond
@@ -661,6 +686,7 @@ pCodeInstruction pciIORWF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_Z) // outCond
@@ -682,6 +708,7 @@ pCodeInstruction pciIORFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_W | PCC_Z) // outCond
@@ -703,6 +730,7 @@ pCodeInstruction pciIORLW = {
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  1,    // literal operand
   POC_NOP,
   (PCC_W | PCC_LITERAL),   // inCond
   (PCC_W | PCC_Z) // outCond
@@ -724,6 +752,7 @@ pCodeInstruction pciMOVF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_Z // outCond
@@ -745,6 +774,7 @@ pCodeInstruction pciMOVFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   (PCC_W | PCC_Z) // outCond
@@ -766,6 +796,7 @@ pCodeInstruction pciMOVWF = {
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   PCC_W,   // inCond
   PCC_REGISTER // outCond
@@ -773,7 +804,6 @@ pCodeInstruction pciMOVWF = {
 
 pCodeInstruction pciMOVLW = {
   {PC_OPCODE, NULL, NULL, 0, NULL, 
-   //   genericAnalyze,
    genericDestruct,
    genericPrint},
   POC_MOVLW,
@@ -787,6 +817,7 @@ pCodeInstruction pciMOVLW = {
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  1,    // literal operand
   POC_NOP,
   (PCC_NONE | PCC_LITERAL),   // inCond
   PCC_W // outCond
@@ -807,6 +838,7 @@ pCodeInstruction pciNOP = {
   0,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   PCC_NONE,   // inCond
   PCC_NONE // outCond
@@ -828,6 +860,7 @@ pCodeInstruction pciRETFIE = {
   0,    // num ops
   0,0,  // dest, bit instruction
   1,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   PCC_NONE,   // inCond
   PCC_NONE // outCond (not true... affects the GIE bit too)
@@ -849,6 +882,7 @@ pCodeInstruction pciRETLW = {
   1,    // num ops
   0,0,  // dest, bit instruction
   1,0,  // branch, skip
+  1,    // literal operand
   POC_NOP,
   PCC_LITERAL,   // inCond
   PCC_W // outCond
@@ -870,6 +904,7 @@ pCodeInstruction pciRETURN = {
   0,    // num ops
   0,0,  // dest, bit instruction
   1,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   PCC_NONE,   // inCond
   PCC_NONE // outCond
@@ -891,6 +926,7 @@ pCodeInstruction pciRLF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   (PCC_C | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_Z | PCC_C | PCC_DC) // outCond
@@ -912,6 +948,7 @@ pCodeInstruction pciRLFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   (PCC_C | PCC_REGISTER),   // inCond
   (PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
@@ -933,6 +970,7 @@ pCodeInstruction pciRRF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   (PCC_C | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_Z | PCC_C | PCC_DC) // outCond
@@ -954,6 +992,7 @@ pCodeInstruction pciRRFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   (PCC_C | PCC_REGISTER),   // inCond
   (PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
@@ -975,6 +1014,7 @@ pCodeInstruction pciSUBWF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_Z) // outCond
@@ -996,6 +1036,7 @@ pCodeInstruction pciSUBFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_W | PCC_Z) // outCond
@@ -1017,6 +1058,7 @@ pCodeInstruction pciSUBLW = {
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  1,    // literal operand
   POC_NOP,
   (PCC_W | PCC_LITERAL),   // inCond
   (PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
@@ -1038,6 +1080,7 @@ pCodeInstruction pciSWAPF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   (PCC_REGISTER),   // inCond
   (PCC_REGISTER) // outCond
@@ -1059,6 +1102,7 @@ pCodeInstruction pciSWAPFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   (PCC_REGISTER),   // inCond
   (PCC_W) // outCond
@@ -1080,6 +1124,7 @@ pCodeInstruction pciTRIS = {
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   PCC_NONE,   // inCond
   PCC_REGISTER // outCond
@@ -1101,6 +1146,7 @@ pCodeInstruction pciXORWF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_Z) // outCond
@@ -1122,6 +1168,7 @@ pCodeInstruction pciXORFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  0,    // literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_W | PCC_Z) // outCond
@@ -1143,6 +1190,7 @@ pCodeInstruction pciXORLW = {
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  1,    // literal operand
   POC_NOP,
   (PCC_W | PCC_LITERAL),   // inCond
   (PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
@@ -2496,8 +2544,12 @@ char *get_op(pCodeOp *pcop,char *buffer, int size)
 	  SAFE_snprintf(&s,&size,"(%s + %d)",
 			pcop->name,
 			PCOI(pcop)->index );
-	} else
-	  SAFE_snprintf(&s,&size,"%s",pcop->name);
+	} else {
+	  if(PCOI(pcop)->offset)
+	    SAFE_snprintf(&s,&size,"(%s >> %d)&0xff",pcop->name, 8*PCOI(pcop)->offset);
+	  else
+	    SAFE_snprintf(&s,&size,"%s",pcop->name);
+	}
       }
 
       return buffer;
@@ -3887,8 +3939,9 @@ void FixRegisterBankingInFlow(pCodeFlow *pcfl, int cur_bank)
     }
 #endif
 
-    if((reg && REG_BANK(reg)!=cur_bank) || 
-       ((PCI(pc)->op == POC_CALL) && (cur_bank != 0) ))  {
+    if( ( (reg && REG_BANK(reg)!=cur_bank) || 
+	  ((PCI(pc)->op == POC_CALL) && (cur_bank != 0) ) ) &&
+	(!isPCI_LIT(pc)) ){
 
       /* Examine the instruction before this one to make sure it is
        * not a skip type instruction */
@@ -4546,8 +4599,10 @@ void FixRegisterBanking(pBlock *pb)
 	}
 #endif
 
-	if((reg && REG_BANK(reg)!=cur_bank) || 
-	   ((PCI(pc)->op == POC_CALL) && (cur_bank != 0) ))  {
+	if( ( (reg && REG_BANK(reg)!=cur_bank) || 
+	      ((PCI(pc)->op == POC_CALL) && (cur_bank != 0) ) ) &&
+	    (!isPCI_LIT(pc)) ){
+
 
 	  /* Examine the instruction before this one to make sure it is
 	   * not a skip type instruction */

@@ -373,7 +373,7 @@ PORT pic_port =
   },
   {
 	/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
-    1, 2, 2, 4, 1, 2, 2, 1, 4, 4
+    1, 2, 2, 4, 2, 2, 2, 1, 4, 4
 	/* TSD - I changed the size of gptr from 3 to 1. However, it should be
 	   2 so that we can accomodate the PIC's with 4 register banks (like the
 	   16f877)

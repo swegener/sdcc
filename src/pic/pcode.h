@@ -518,6 +518,7 @@ typedef struct pCodeInstruction
   unsigned int isBitInst: 1;   /* e.g. BCF */
   unsigned int isBranch:  1;   /* True if this is a branching instruction */
   unsigned int isSkip:    1;   /* True if this is a skip instruction */
+  unsigned int isLit:     1;   /* True if this instruction has an literal operand */
 
   PIC_OPCODE inverted_op;      /* Opcode of instruction that's the opposite of this one */
   unsigned int inCond;   // Input conditions for this instruction
@@ -758,6 +759,7 @@ typedef struct peepCommand {
 #define isPCI(x)        ((PCODE(x)->type == PC_OPCODE))
 #define isPCI_BRANCH(x) ((PCODE(x)->type == PC_OPCODE) &&  PCI(x)->isBranch)
 #define isPCI_SKIP(x)   ((PCODE(x)->type == PC_OPCODE) &&  PCI(x)->isSkip)
+#define isPCI_LIT(x)    ((PCODE(x)->type == PC_OPCODE) &&  PCI(x)->isLit)
 #define isPCI_BITSKIP(x)((PCODE(x)->type == PC_OPCODE) &&  PCI(x)->isSkip && PCI(x)->isBitInst)
 #define isPCFL(x)       ((PCODE(x)->type == PC_FLOW))
 #define isPCF(x)        ((PCODE(x)->type == PC_FUNCTION))

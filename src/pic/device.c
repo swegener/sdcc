@@ -512,7 +512,7 @@ int assignRegister(regs *reg, int start_address)
       }
     }
 
-    fprintf(stderr, "WARNING: No more RAM available\n");
+    fprintf(stderr, "WARNING: No more RAM available for %s\n",reg->name);
 
   }
 

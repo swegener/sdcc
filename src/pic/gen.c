@@ -558,8 +558,8 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
     PCOI(aop->aopu.pcop)->_const = IN_CODESPACE(space);
     PCOI(aop->aopu.pcop)->index = 0;
 
-    DEBUGpic14_emitcode(";"," rname %s, val %d, const = %d",
-			sym->rname, 0, PCOI(aop->aopu.pcop)->_const);
+    DEBUGpic14_emitcode(";","%d: rname %s, val %d, const = %d",
+			__LINE__,sym->rname, 0, PCOI(aop->aopu.pcop)->_const);
 
     allocDirReg (IC_LEFT(ic));
 
@@ -613,8 +613,8 @@ static asmop *aopForRemat (operand *op) // x symbol *sym)
   PCOI(aop->aopu.pcop)->_const = IS_PTR_CONST(operandType(op));
   PCOI(aop->aopu.pcop)->index = val;
 
-  DEBUGpic14_emitcode(";"," rname %s, val %d, const = %d",
-		      OP_SYMBOL(IC_LEFT(ic))->rname,
+  DEBUGpic14_emitcode(";","%d: rname %s, val %d, const = %d",
+		      __LINE__,OP_SYMBOL(IC_LEFT(ic))->rname,
 		      val, IS_PTR_CONST(operandType(op)));
 
   //    DEBUGpic14_emitcode(";","aop type  %s",AopType(AOP_TYPE(IC_LEFT(ic))));
@@ -1653,6 +1653,8 @@ void mov2w (asmop *aop, int offset)
 
   if(!aop)
     return;
+
+  DEBUGpic14_emitcode ("; ***","%s  %d  offset=%d",__FUNCTION__,__LINE__,offset);
 
   if ( aop->type == AOP_PCODE ||
        aop->type == AOP_LIT )
@@ -8974,8 +8976,16 @@ static void genGenPointerSet (operand *right,
       /* hack hack! see if this the FSR. If so don't load W */
       if(AOP_TYPE(right) != AOP_ACC) {
 
+
 	emitpcode(POC_MOVFW,popGet(AOP(result),0));
 	emitpcode(POC_MOVWF,popCopyReg(&pc_fsr));
+
+	if(AOP_SIZE(result) > 1) {
+	  emitpcode(POC_BCF,  popCopyGPR2Bit(PCOP(&pc_status),PIC_IRP_BIT));
+	  emitpcode(POC_BTFSC,newpCodeOpBit(aopGet(AOP(result),1,FALSE,FALSE),0,0));
+	  emitpcode(POC_BSF,  popCopyGPR2Bit(PCOP(&pc_status),PIC_IRP_BIT));
+
+	}
 
 	//if(size==2)
 	//emitpcode(POC_DECF,popCopyReg(&pc_fsr));

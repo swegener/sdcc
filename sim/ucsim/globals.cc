@@ -33,7 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 // No other global variable should exists!
-//class cl_sim *simulator;
+class cl_app *application;
 
 
 /* Delimiters to split up command line */

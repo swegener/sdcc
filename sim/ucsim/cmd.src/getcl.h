@@ -59,7 +59,7 @@ public:
   virtual int do_work(class cl_sim *sim,
 		      class cl_cmdline *cmdline, class cl_console *con);
 };*/
-COMMAND_ON(uc,cl_get_option_cmd);
+COMMAND_ON(app,cl_get_option_cmd);
 
 #endif
 

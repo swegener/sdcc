@@ -25,9 +25,18 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+#include "ddconfig.h"
+
+#include <stdio.h>
+#include <ctype.h>
+#include <stdarg.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include "i_string.h"
 
+  // prj
 #include "stypes.h"
+#include "pobjcl.h"
 
 
 int
@@ -98,5 +107,79 @@ get_string_id(struct id_element *ids, char *str, int def)
     i++;
   return(ids[i].id_string?ids[i].id:def);
 }
+
+
+extern "C" int vasprintf(char **strp, const  char *format, va_list ap);
+extern "C" int vsnprintf(char *str, size_t size,const char *format,va_list ap);
+
+static char *
+vformat_string(char *format, va_list ap)
+{
+#ifdef HAVE_VASPRINTF
+  char *msg= NULL;
+  vasprintf(&msg, format, ap);
+  return(msg);
+#else
+#  ifdef HAVE_VSNPRINTF
+  char *msg= malloc(80*25);
+  vsnprintf(msg, 80*25, format, ap);
+  return(msg);
+#  else
+#    ifdef HAVE_VPRINTF
+  char *msg= malloc(80*25);
+  vsprintf(msg, format, ap); /* Dangerous */
+  return(msg);
+#    endif
+#  endif
+#endif
+}
+
+char *
+format_string(char *format, ...)
+{
+  va_list ap;
+
+  va_start(ap, format);
+  char *s= vformat_string(format, ap);
+  va_end(ap);
+  return(s);
+}
+
+
+void
+print_char_octal(char c, FILE *f)
+{
+  if (strchr("\a\b\f\n\r\t\v\"", c))
+    switch (c)
+      {
+      case '\a': fprintf(f, "\a"); break;
+      case '\b': fprintf(f, "\b"); break;
+      case '\f': fprintf(f, "\f"); break;
+      case '\n': fprintf(f, "\n"); break;
+      case '\r': fprintf(f, "\r"); break;
+      case '\t': fprintf(f, "\t"); break;
+      case '\v': fprintf(f, "\v"); break;
+      case '\"': fprintf(f, "\""); break;
+      }
+  else if (isprint(c))
+    fprintf(f, "%c", c);
+  else
+    fprintf(f, "\\%03hho", c);
+}
+
+
+char *
+object_name(class cl_base *o)
+{
+  char *name= 0;
+
+  if (o)
+    name= o->get_name();
+  if (name &&
+      *name)
+    return(name);
+  return("(unkown)");
+}
+
 
 /* End of utils.cc */

@@ -45,6 +45,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "setcl.h"
 #include "infocl.h"
 #include "timercl.h"
+#include "cmdstatcl.h"
 
 // local, sim.src
 #include "uccl.h"
@@ -65,14 +66,10 @@ cl_ticker::cl_ticker(int adir, int in_isr, char *aname)
     options|= TICK_INISR;
   dir= adir;
   ticks= 0;
-  name= aname?strdup(aname):0;
+  set_name(aname);
 }
 
-cl_ticker::~cl_ticker(void)
-{
-  if (name)
-    free(name);
-}
+cl_ticker::~cl_ticker(void) {}
 
 int
 cl_ticker::tick(int nr)
@@ -95,7 +92,7 @@ void
 cl_ticker::dump(int nr, double xtal, class cl_console *con)
 {
   con->dd_printf("timer #%d(\"%s\") %s%s: %g sec (%lu clks)\n",
-		 nr, name?name:"unnamed",
+		 nr, get_name("unnamed"),
 		 (options&TICK_RUN)?"ON":"OFF",
 		 (options&TICK_INISR)?",ISR":"",
 		 get_rtime(xtal), ticks);
@@ -114,7 +111,7 @@ cl_uc::cl_uc(class cl_sim *asim):
   sim = asim;
   mems= new cl_list(MEM_TYPES, 1);
   hws = new cl_hws();
-  options= new cl_list(2, 2);
+  //options= new cl_list(2, 2);
   for (i= MEM_ROM; i < MEM_TYPES; i++)
     mems->add(0);
   ticks= new cl_ticker(+1, 0, "time");
@@ -138,7 +135,7 @@ cl_uc::~cl_uc(void)
 {
   delete mems;
   delete hws;
-  delete options;
+  //delete options;
   delete ticks;
   delete isr_ticks;
   delete idle_ticks;
@@ -277,12 +274,21 @@ void
 cl_uc::build_cmdset(class cl_cmdset *cmdset)
 {
   class cl_cmd *cmd;
+  class cl_super_cmd *super_cmd;
   class cl_cmdset *cset;
 
   cmdset->add(cmd= new cl_state_cmd("state", 0,
 "state              State of microcontroller",
 "long help of state"));
   cmd->init();
+
+#ifdef STATISTIC
+  cmdset->add(cmd= new cl_statistic_cmd("statistic", 0,
+"statistic [mem [startaddr [endaddr]]]\n"
+"                   Statistic of memory accesses",
+"long help of statistic"));
+  cmd->init();
+#endif
 
   cmdset->add(cmd= new cl_file_cmd("file", 0,
 "file \"FILE\"        Load FILE into ROM",
@@ -387,27 +393,40 @@ cl_uc::build_cmdset(class cl_cmdset *cmdset)
   cmd->init();
 
   {
-    cset= new cl_cmdset();
-    cset->init();
+    super_cmd= (class cl_super_cmd *)(cmdset->get_cmd("get"));
+    if (super_cmd)
+      cset= super_cmd->commands;
+    else {
+      cset= new cl_cmdset();
+      cset->init();
+    }
     cset->add(cmd= new cl_get_sfr_cmd("sfr", 0,
 "get sfr address...\n"
 "                   Get value of addressed SFRs",
 "long help of get sfr"));
     cmd->init();
-    cset->add(cmd= new cl_get_option_cmd("option", 0,
+    /*cset->add(cmd= new cl_get_option_cmd("option", 0,
 "get option name\n"
 "                   Get value of an option",
 "long help of get option"));
-    cmd->init();
+cmd->init();*/
   }
-  cmdset->add(cmd= new cl_super_cmd("get", 0,
+  if (!super_cmd)
+    {
+      cmdset->add(cmd= new cl_super_cmd("get", 0,
 "get subcommand     Get, see `get' command for more help",
 "long help of get", cset));
-  cmd->init();
+      cmd->init();
+    }
 
   {
-    cset= new cl_cmdset();
-    cset->init();
+    super_cmd= (class cl_super_cmd *)(cmdset->get_cmd("set"));
+    if (super_cmd)
+      cset= super_cmd->commands;
+    else {
+      cset= new cl_cmdset();
+      cset->init();
+    }
     cset->add(cmd= new cl_set_mem_cmd("memory", 0,
 "set memory memory_type address data...\n"
 "                   Place list of data into memory",
@@ -423,16 +442,14 @@ cl_uc::build_cmdset(class cl_cmdset *cmdset)
 "long help of set hardware"));
     cmd->add_name("hw");
     cmd->init();
-    cset->add(cmd= new cl_set_option_cmd("option", 0,
-"set option name value\n"
-"                   Set value of an option",
-"long help of set option"));
-    cmd->init();
   }
-  cmdset->add(cmd= new cl_super_cmd("set", 0,
+  if (!super_cmd)
+    {
+      cmdset->add(cmd= new cl_super_cmd("set", 0,
 "set subcommand     Set, see `set' command for more help",
 "long help of set", cset));
-  cmd->init();
+      cmd->init();
+    }
 
   {
     cset= new cl_cmdset();
@@ -599,7 +616,7 @@ ReadInt(FILE *f, bool *ok, int bytes)
  */
 
 long
-cl_uc::read_hex_file(const char *name)
+cl_uc::read_hex_file(const char *nam)
 {
   FILE *f;
   int c;
@@ -615,16 +632,16 @@ cl_uc::read_hex_file(const char *name)
   bool ok, get_low= 1;
   uchar low= 0, high;
 
-  if (!name)
+  if (!nam)
     {
       sim->app->get_commander()->
 	dd_printf("cl_uc::read_hex_file File name not specified\n");
       return(-1);
     }
   else
-    if ((f= fopen(name, "r")) == NULL)
+    if ((f= fopen(nam, "r")) == NULL)
       {
-	fprintf(stderr, "Can't open `%s': %s\n", name, strerror(errno));
+	fprintf(stderr, "Can't open `%s': %s\n", nam, strerror(errno));
 	return(-1);
       }
 
@@ -709,7 +726,7 @@ cl_uc::read_hex_file(const char *name)
       !get_low)
     set_mem(MEM_ROM, addr, low);
 
-  if (name)
+  if (nam)
     fclose(f);
   if (sim->app->args->get_iarg('V', 0))
     sim->app->get_commander()->dd_printf("%ld records have been read\n", recnum);
@@ -1221,18 +1238,18 @@ cl_uc::get_counter(int nr)
 }
 
 class cl_ticker *
-cl_uc::get_counter(char *name)
+cl_uc::get_counter(char *nam)
 {
   int i;
 
-  if (!name)
+  if (!nam)
     return(0);
   for (i= 0; i < counters->count; i++)
     {
       class cl_ticker *t= (class cl_ticker *)(counters->at(i));
       if (t &&
-	  t->name &&
-	  strcmp(t->name, name) == 0)
+	  t->get_name() &&
+	  strcmp(t->get_name(), nam) == 0)
 	return(t);
     }
   return(0);
@@ -1247,7 +1264,7 @@ cl_uc::add_counter(class cl_ticker *ticker, int nr)
 }
 
 void
-cl_uc::add_counter(class cl_ticker *ticker, char */*name*/)
+cl_uc::add_counter(class cl_ticker *ticker, char */*nam*/)
 {
   int i;
 
@@ -1278,18 +1295,18 @@ cl_uc::del_counter(int nr)
 }
 
 void
-cl_uc::del_counter(char *name)
+cl_uc::del_counter(char *nam)
 {
   int i;
   
-  if (!name)
+  if (!nam)
     return;
   for (i= 0; i < counters->count; i++)
     {
       class cl_ticker *t= (class cl_ticker *)(counters->at(i));
       if (t &&
-	  t->name &&
-	  strcmp(t->name, name) == 0)
+	  t->get_name() &&
+	  strcmp(t->get_name(), nam) == 0)
 	{
 	  delete t;
 	  counters->put_at(i, 0);

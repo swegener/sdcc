@@ -50,7 +50,7 @@ public:
   unsigned long ticks;
   int options; // see TICK_XXX above
   int dir;
-  char *name;
+  //char *name;
 
   cl_ticker(int adir, int in_isr, char *aname);
   virtual ~cl_ticker(void);
@@ -69,7 +69,7 @@ public:
   int type;			// CPU family
   int technology;		// CMOS, HMOS
   int state;			// GO, IDLE, PD
-  class cl_list *options;
+  //class cl_list *options;
 
   t_addr PC, instPC;		// Program Counter
   bool inst_exec;		// Instruction is executed
@@ -120,7 +120,7 @@ public:
   virtual class cl_mem *mem(char *class_name);
 
   // file handling
-  virtual long read_hex_file(const char *name);
+  virtual long read_hex_file(const char *nam);
 
   // instructions, code analyzer
   virtual void analyze(t_addr addr) {}
@@ -140,11 +140,11 @@ public:
   virtual void do_extra_hw(int cycles);
   virtual int tick(int cycles);
   virtual class cl_ticker *get_counter(int nr);
-  virtual class cl_ticker *get_counter(char *name);
+  virtual class cl_ticker *get_counter(char *nam);
   virtual void add_counter(class cl_ticker *ticker, int nr);
-  virtual void add_counter(class cl_ticker *ticker, char *name);
+  virtual void add_counter(class cl_ticker *ticker, char *nam);
   virtual void del_counter(int nr);
-  virtual void del_counter(char *name);
+  virtual void del_counter(char *nam);
   virtual double get_rtime(void);
   virtual int clock_per_cycle(void);
 

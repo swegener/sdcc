@@ -379,14 +379,14 @@ cl_cmd_array_arg::cl_cmd_array_arg(/*class cl_uc *iuc,*/
 				   class cl_cmd_arg *aindex):
   cl_cmd_arg(/*iuc,*/ (long)0)
 {
-  name = aname;
+  name_arg= aname;
   index= aindex;
 }
 
 cl_cmd_array_arg::~cl_cmd_array_arg(void)
 {
-  if (name)
-    delete name;
+  if (name_arg)
+    delete name_arg;
   if (index)
     delete index;
 }
@@ -397,9 +397,9 @@ cl_cmd_array_arg::as_hw(class cl_uc *uc)
   char *n;
   t_addr a;
 
-  if (name == 0 ||
+  if (name_arg == 0 ||
       index == 0 ||
-      (n= name->get_svalue()) == NULL ||
+      (n= name_arg->get_svalue()) == NULL ||
       !index->get_address(uc, &a))
     return(DD_FALSE);
   
@@ -454,7 +454,7 @@ cl_prg_arg::~cl_prg_arg(void)
  */
 
 int
-cl_arguments::arg_avail(char name)
+cl_arguments::arg_avail(char nam)
 {
   class cl_prg_arg *a;
   int i;
@@ -462,14 +462,14 @@ cl_arguments::arg_avail(char name)
   for (i= 0; i < count; i++)
     {
       a= (class cl_prg_arg *)(at(i));
-      if (a->short_name == name)
+      if (a->short_name == nam)
 	return(1);
     }
   return(0);
 }
 
 int
-cl_arguments::arg_avail(char *name)
+cl_arguments::arg_avail(char *nam)
 {
   class cl_prg_arg *a;
   int i;
@@ -478,7 +478,7 @@ cl_arguments::arg_avail(char *name)
     {
       a= (class cl_prg_arg *)(at(i));
       if (a->long_name &&
-	  strcmp(a->long_name, name) == 0)
+	  strcmp(a->long_name, nam) == 0)
 	return(1);
     }
   return(0);

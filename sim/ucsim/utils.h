@@ -28,6 +28,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef UTILS_HEADER
 #define UTILS_HEADER
 
+#include <stdio.h>
+
 
 extern int get_sub_opt(char **option,
 		       const char * const *tokens,
@@ -36,6 +38,9 @@ extern char *get_id_string(struct id_element *ids, int id);
 extern char *get_id_string(struct id_element *ids, int id, char *def);
 extern int get_string_id(struct id_element *ids, char *str);
 extern int get_string_id(struct id_element *ids, char *str, int def);
+extern char *format_string(char *format, ...);
+extern void print_char_octal(char c, FILE *f);
+extern char *object_name(class cl_base *o);
 
 
 #endif

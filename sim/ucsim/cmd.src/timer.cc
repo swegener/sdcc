@@ -90,8 +90,8 @@ void
 cl_timer_cmd::set_ticker(class cl_uc *uc,
 			 class cl_cmd_arg *param)
 {
-  if ((name= param->get_svalue()))
-    ticker= uc->get_counter(name);
+  if (set_name(param->get_svalue()))
+    ticker= uc->get_counter(get_name());
   else
     if (param->get_ivalue(&what))
       ticker= uc->get_counter(what);
@@ -111,7 +111,7 @@ cl_timer_cmd::add(class cl_uc *uc,
 				 cmdline->param(3) };
   long dir= +1, in_isr= 0;
   
-  if (!name &&
+  if (!get_name() &&
       what < 1)
     {
       con->dd_printf("Error: Timer id must be greater then zero or a string\n");
@@ -119,8 +119,8 @@ cl_timer_cmd::add(class cl_uc *uc,
     }
   if (ticker)
     {
-      if (name)
-	con->dd_printf("Error: Timer \"%s\" already exists\n", name);
+      if (get_name())
+	con->dd_printf("Error: Timer \"%s\" already exists\n", get_name());
       else
 	con->dd_printf("Error: Timer %d already exists\n", what);
       return(0);
@@ -138,10 +138,10 @@ cl_timer_cmd::add(class cl_uc *uc,
 	return(DD_FALSE);
       }
 
-  if (name)
+  if (get_name())
     {
-      ticker= new cl_ticker(dir, in_isr, name);
-      uc->add_counter(ticker, name);
+      ticker= new cl_ticker(dir, in_isr, get_name());
+      uc->add_counter(ticker, get_name());
     }
   else
     {
@@ -162,14 +162,14 @@ cl_timer_cmd::del(class cl_uc *uc,
 {
   if (!ticker)
     {
-      if (name)
-	con->dd_printf("Timer \"%s\" does not exist\n", name);
+      if (get_name())
+	con->dd_printf("Timer \"%s\" does not exist\n", get_name());
       else
 	con->dd_printf("Timer %d does not exist\n", what);
       return(0);
     }
-  if (name)
-    uc->del_counter(name);
+  if (get_name())
+    uc->del_counter(get_name());
   else
     uc->del_counter(what);
 
@@ -212,8 +212,8 @@ cl_timer_cmd::run(class cl_uc *uc,
 {
   if (!ticker)
     {
-      if (name)
-	con->dd_printf("Timer %d does not exist\n", name);
+      if (get_name())
+	con->dd_printf("Timer %d does not exist\n", get_name());
       else
 	con->dd_printf("Timer %d does not exist\n", what);
       return(0);
@@ -233,8 +233,8 @@ cl_timer_cmd::stop(class cl_uc *uc,
 {
   if (!ticker)
     {
-      if (name)
-	con->dd_printf("Timer %d does not exist\n", name);
+      if (get_name())
+	con->dd_printf("Timer %d does not exist\n", get_name());
       else
 	con->dd_printf("Timer %d does not exist\n", what);
       return(0);
@@ -260,8 +260,8 @@ cl_timer_cmd::val(class cl_uc *uc,
   
   if (!ticker)
     {
-      if (name)
-	con->dd_printf("Error: Timer %d does not exist\n", name);
+      if (get_name())
+	con->dd_printf("Error: Timer %d does not exist\n", get_name());
       else
 	con->dd_printf("Error: Timer %d does not exist\n", what);
       return(0);

@@ -37,6 +37,9 @@ COMMAND(cl_show_copying_cmd);
 // SHOW WARRANTY
 COMMAND(cl_show_warranty_cmd);
 
+// SHOW OPTION
+COMMAND_ON(app,cl_show_option_cmd);
+
 
 #endif
 

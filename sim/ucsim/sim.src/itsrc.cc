@@ -57,16 +57,13 @@ cl_it_src::cl_it_src(uchar Iie_mask,
   addr    = Iaddr;
   clr_bit = Iclr_bit;
   if (Iname != NULL)
-    name= strdup(Iname);
+    set_name(Iname);
   else
-    name= strdup("unknown");
+    set_name("unknown");
   active= DD_TRUE;
 }
 
-cl_it_src::~cl_it_src(void)
-{
-  free(name);
-}
+cl_it_src::~cl_it_src(void) {}
 
 bool
 cl_it_src::is_active(void)

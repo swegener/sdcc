@@ -30,6 +30,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <ctype.h>
 #include "i_string.h"
 
+// prj
+#include "utils.h"
+
 // sim
 #include "simcl.h"
 #include "optioncl.h"
@@ -82,29 +85,31 @@ COMMAND_DO_WORK_UC(cl_get_sfr_cmd)
 //int
 //cl_get_option_cmd::do_work(class cl_sim *sim,
 //			   class cl_cmdline *cmdline, class cl_console *con)
-COMMAND_DO_WORK_UC(cl_get_option_cmd)
+COMMAND_DO_WORK_APP(cl_get_option_cmd)
 {
   class cl_cmd_arg *parm= cmdline->param(0);
   char *s= 0;
 
   if (!parm)
     ;
-  else if (cmdline->syntax_match(uc, STRING)) {
+  else if (cmdline->syntax_match(0/*app->get_uc()*/, STRING)) {
     s= parm->value.string.string;
   }
   else
     con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
 
   int i;
-  for (i= 0; i < uc->options->count; i++)
+  for (i= 0; i < app->options->count; i++)
     {
-      class cl_option *o= (class cl_option *)(uc->options->at(i));
-      if (!s ||
-	  !strcmp(s, o->id))
+      class cl_option *o= (class cl_option *)(/*uc*/app->options->at(i));
+      if ((!s ||
+	   !strcmp(s, o->get_name())) &&
+	  !o->hidden)
 	{
-	  con->dd_printf("%s ", o->id);
+	  con->dd_printf("%2d. %s(by %s): ", i, object_name(o),
+			 object_name(o->get_creator()));
 	  o->print(con);
-	  con->dd_printf(" %s\n", o->help);
+	  con->dd_printf(" - %s\n", o->help);
 	}
     }
   

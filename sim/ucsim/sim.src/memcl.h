@@ -30,6 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 // prj
+#include "ddconfig.h"
 #include "stypes.h"
 #include "pobjcl.h"
 
@@ -55,8 +56,12 @@ class cl_event_handler;
 
 class cl_cell: public cl_base
 {
+#ifdef STATISTIC
 public:
-  cl_cell(void): cl_base() {}
+  unsigned long nuof_writes, nuof_reads;
+#endif
+public:
+  cl_cell(void);
 public:
   virtual TYPE_UBYTE get_type(void)= 0;
   virtual void set_type(TYPE_UBYTE what)= 0;
@@ -95,10 +100,21 @@ public:
   virtual void set_type(TYPE_UBYTE what) { type= what; }
   virtual t_mem get_mask(void) { return(mask); }
 
-  virtual t_mem read(void) { return(data); }
+  virtual t_mem read(void) {
+#ifdef STATISTIC
+    nuof_reads++;
+#endif
+    return(data);
+  }
   virtual t_mem read(enum hw_cath /*skip*/) { return(data); }
   virtual t_mem get(void)  { return(data); }
-  virtual t_mem write(t_mem val) { data= val & mask; return(data); }
+  virtual t_mem write(t_mem val) {
+    data= val & mask;
+#ifdef STATISTIC
+    nuof_writes++;
+#endif
+    return(data);
+  }
   virtual t_mem set(t_mem val) { return(data= val & mask); }
   virtual t_mem add(long what);
   virtual t_mem wadd(long what);
@@ -194,6 +210,12 @@ public:
   { return(0); }
   virtual void set_brk(t_addr /*addr*/, class cl_brk */*brk*/) {}
   virtual void del_brk(t_addr addr, class cl_brk *brk) {}
+#ifdef STATISTIC
+  virtual unsigned long get_nuof_reads(void) {return(0);}
+  virtual unsigned long get_nuof_writes(void) {return(0);}
+  virtual void set_nuof_reads(unsigned long value) {}
+  virtual void set_nuof_writes(unsigned long value) {}
+#endif
 };
 
 /* Spec for CODE */
@@ -356,6 +378,13 @@ public:
 				     bool announce);
   virtual void set_brk(t_addr addr, class cl_brk *brk);
   virtual void del_brk(t_addr addr, class cl_brk *brk);
+
+#ifdef STATISTIC
+  virtual unsigned long get_nuof_reads(void);
+  virtual unsigned long get_nuof_writes(void);
+  virtual void set_nuof_reads(unsigned long value);
+  virtual void set_nuof_writes(unsigned long value);
+#endif
 };
 
 

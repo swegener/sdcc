@@ -27,6 +27,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <stdio.h>
 
+  // prj
+#include "globals.h"
+
 // sim.src
 #include "appcl.h"
 
@@ -37,16 +40,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 int
 main(int argc, char *argv[])
 {
-  class cl_app *app;
   class cl_sim *sim;
   
-  app= new cl_app();
-  app->init(argc, argv);
-  sim= new cl_simavr(app);
+  application= new cl_app();
+  application->init(argc, argv);
+  sim= new cl_simavr(application);
   sim->init();
-  app->set_simulator(sim);
+  application->set_simulator(sim);
   sim->main();
-  delete app;
+  delete application;
   return(0);
 }
 

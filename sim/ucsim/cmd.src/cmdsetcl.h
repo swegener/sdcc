@@ -28,6 +28,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef CMD_CMDSETCL_HEADER
 #define CMD_CMDSETCL_HEADER
 
+// local, cmd
+#include "commandcl.h"
 #include "newcmdcl.h"
 
 // STATE
@@ -38,6 +40,7 @@ COMMAND_ON(sim,cl_next_cmd);
 COMMAND_ON(app,cl_help_cmd);
 COMMAND(cl_quit_cmd);
 COMMAND_ON(app,cl_kill_cmd);
+COMMAND_ON(app,cl_exec_cmd);
 
 
 #endif

@@ -100,6 +100,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #undef ACCEPT_SOCKLEN_T
 
+#undef STATISTIC
+
 #endif
 
 /* End of ddconfig.h */

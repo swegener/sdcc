@@ -34,9 +34,9 @@ man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
 
-OBJECTS		= cmdset.o newcmd.o cmdutil.o syntax.o \
+OBJECTS		= cmdset.o command.o newcmd.o cmdutil.o syntax.o \
 		  get.o set.o timer.o bp.o info.o show.o cmdgui.o cmdconf.o \
-		  cmduc.o
+		  cmduc.o cmdstat.o
 
 
 # Compiling entire program or any subproject

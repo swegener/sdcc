@@ -24,6 +24,9 @@ along with UCSIM; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
+  
+// prj
+#include "globals.h"
 
 // sim.src
 #include "appcl.h"
@@ -35,16 +38,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 int
 main(int argc, char *argv[])
 {
-  class cl_app *app;
   class cl_sim *sim;
 
-  app= new cl_app();
-  app->init(argc, argv);
-  sim= new cl_simz80(app);
+  application= new cl_app();
+  application->init(argc, argv);
+  sim= new cl_simz80(application);
   sim->init();
-  app->set_simulator(sim);
-  app->run();
-  delete app;
+  application->set_simulator(sim);
+  application->run();
+  delete application;
   return(0);
 }
 

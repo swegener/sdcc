@@ -42,11 +42,18 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 class cl_base
 {
+private:
+  char *name;
 public:
   cl_base(void);
   virtual ~cl_base(void);
 
   virtual int init(void);
+  virtual char *get_name(void) { return(name); }
+  virtual char *get_name(char *def);
+  virtual bool have_name(void) { return(name != 0); }
+  virtual bool have_real_name(void) { return(name != 0 && *name != '\0'); }
+  char *set_name(char *new_name);
 };
 
 

@@ -26,7 +26,7 @@ CFLAGS          = @CFLAGS@ -I$(PRJDIR) -Wall
 CXXFLAGS        = @CXXFLAGS@ -I$(PRJDIR) -Wall
 M_OR_MM         = @M_OR_MM@
 
-LIB_LIST	= sim cmd sim util
+LIB_LIST	= util sim cmd sim
 UCSIM_LIBS	= $(patsubst %,-l%,$(LIB_LIST))
 UCSIM_LIB_FILES	= $(patsubst %,lib%.a,$(LIB_LIST))
 
@@ -42,7 +42,7 @@ man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
 
-OBJECTS         = pobj.o globals.o utils.o error.o
+OBJECTS         = pobj.o globals.o utils.o error.o app.o option.o
 SOURCES		= $(patsubst %.o,%.cc,$(OBJECTS))
 UCSIM_OBJECTS	= ucsim.o
 UCSIM_SOURCES	= $(patsubst %.o,%.cc,$(UCSIM_OBJECTS))

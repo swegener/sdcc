@@ -46,16 +46,45 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * Initializing the object
  */
 
-cl_base::cl_base(void) {}
+cl_base::cl_base(void)
+{
+  name= 0;
+}
 
 
 /* 
  * Destructing the object: calling hte virtual Done method
  */
 
-cl_base::~cl_base(void) {}
+cl_base::~cl_base(void)
+{
+  if (name)
+    free(name);
+}
 
 int cl_base::init(void) {return(0);}
+
+char *
+cl_base::get_name(char *def)
+{
+  if (!name)
+    return(def);
+  return(name);
+}
+
+char *
+cl_base::set_name(char *new_name)
+{
+  if (name)
+    free(name);
+  if (!new_name)
+    name= 0;
+  else if (*new_name)
+    name= strdup(new_name);
+  else
+    name= strdup("");
+  return(name);
+}
 
 
 /*									    *

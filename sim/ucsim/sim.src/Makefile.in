@@ -34,7 +34,7 @@ man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
 
-OBJECTS         = mem.o app.o sim.o itsrc.o brk.o option.o arg.o stack.o \
+OBJECTS         = mem.o sim.o itsrc.o brk.o arg.o stack.o \
 		  guiobj.o uc.o hw.o
 
 

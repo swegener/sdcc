@@ -37,6 +37,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <sys/time.h>
 #include <strings.h>
 
+// prj
+#include "globals.h"
+
 // local
 #include "serialcl.h"
 #include "regs51.h"
@@ -81,8 +84,8 @@ cl_serial::init(void)
       register_cell(sfr, SCON, &scon, wtd_restore_write);
     }
 
-  serial_in = (FILE*)uc->sim->app->args->get_parg(0, "Ser_in");
-  serial_out= (FILE*)uc->sim->app->args->get_parg(0, "Ser_out");
+  serial_in = (FILE*)application->args->get_parg(0, "Ser_in");
+  serial_out= (FILE*)application->args->get_parg(0, "Ser_out");
   if (serial_in)
     {
       // making `serial' unbuffered

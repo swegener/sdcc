@@ -25,18 +25,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+// prj
+#include "globals.h"
 #include "appcl.h"
 
 int
 main(int argc, char *argv[])
 {
-  class cl_app *app;
   int ret;
 
-  app= new cl_app();
-  app->init(argc, argv);
-  ret= app->run();
-  app->done();
+  application= new cl_app();
+  application->init(argc, argv);
+  ret= application->run();
+  application->done();
   return(ret);
 }
 

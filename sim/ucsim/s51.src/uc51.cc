@@ -41,6 +41,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif
 #include "i_string.h"
 
+// prj
+#include "utils.h"
+
 // sim
 #include "optioncl.h"
 
@@ -72,11 +75,15 @@ t_uc51::t_uc51(int Itype, int Itech, class cl_sim *asim):
 
   debug= asim->app->args->get_iarg('V', 0);
   stop_at_it= DD_FALSE;
-  options->add(new cl_bool_opt(&debug, "verbose", "Verbose flag."));
-  options->add(new cl_bool_opt(&stop_at_it, "stopit",
-			       "Stop if interrupt accepted."));
+  /*class cl_option *opt;
+  options->add(opt= new cl_bool_opt("verbose", "Verbose flag."));
+  opt->init();
+  opt->set_value((bool)debug);
+  options->add(opt= new cl_bool_opt("stopit", "Stop if interrupt accepted."));
+  opt->init();
+  opt->set_value((bool)stop_at_it);
   options->add(new cl_cons_debug_opt(asim->app, "debug",
-				     "Debug messages appears on this console."));
+  "Debug messages appears on this console."));*/
 
   /*
   serial_in = (FILE*)asim->app->args->get_parg(0, "Ser_in");
@@ -485,6 +492,8 @@ t_uc51::clear_sfr(void)
   sfr->/*set*/write(SP, 7);
   prev_p1= /*port_pins[1] &*/ sfr->/*get*/read(P1);
   prev_p3= /*port_pins[3] &*/ sfr->/*get*/read(P3);
+  sfr->set_nuof_writes(0);
+  sfr->set_nuof_reads(0);
 }
 
 
@@ -941,7 +950,7 @@ t_uc51::do_interrupt(void)
 	    sfr->set_bit0(is->src_reg, is->src_mask);
 	  sim->app->get_commander()->
 	    debug("%g sec (%d clks): Accepting interrupt `%s' PC= 0x%06x\n",
-			  get_rtime(), ticks->ticks, is->name, PC);
+			  get_rtime(), ticks->ticks, object_name(is), PC);
 	  IL= new it_level(pr, is->addr, PC, is);
 	  return(accept_it(IL));
 	}

@@ -29,6 +29,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "ddconfig.h"
 
+#include <stdlib.h>
+
 // local
 #include "z80cl.h"
 #include "regsz80.h"

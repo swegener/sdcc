@@ -66,6 +66,8 @@ public:
   virtual class cl_uc *mk_controller(void);
   virtual void build_cmdset(class cl_cmdset *cmdset);
 
+  virtual class cl_uc *get_uc(void) { return(uc); }
+
   // messages from app to handle and broadcast
   virtual void mem_cell_changed(class cl_mem *mem, t_addr addr);
   

@@ -504,6 +504,15 @@ cl_rom::~cl_rom(void)
  * New type of memory simulation
  */
 
+cl_cell::cl_cell(void):
+  cl_base()
+{
+#ifdef STATISTIC
+  nuof_writes= nuof_reads= 0;
+#endif
+}
+
+
 cl_normal_cell::cl_normal_cell(uchar awidth):
   cl_cell()
 {
@@ -598,6 +607,9 @@ cl_registered_cell::read(void)
 	d= hardwares[i]->read(this);
 	;
       }
+#ifdef STATISTIC
+  nuof_reads++;
+#endif
   return(d & mask);
 }
 
@@ -614,6 +626,9 @@ cl_registered_cell::read(enum hw_cath skip)
 	  d= hardwares[i]->read(this);
 	;
       }
+#ifdef STATISTIC
+  nuof_reads++;
+#endif
   return(d & mask);
 }
 
@@ -629,6 +644,9 @@ cl_registered_cell::write(t_mem val)
 	hardwares[i]->write(this, &val);
 	;
       }
+#ifdef STATISTIC
+  nuof_writes++;
+#endif
   return(data= val & mask);
 }
 
@@ -1406,6 +1424,47 @@ cl_m::del_brk(t_addr addr, class cl_brk *brk)
     }
   uc->sim->/*app->*/mem_cell_changed(this, addr);
 }
+
+
+#ifdef STATISTIC
+unsigned long
+cl_m::get_nuof_reads(void)
+{
+  unsigned long res= 0;
+  t_addr i;
+  for (i= 0; i < size; i++)
+    res+= array[i]->nuof_reads;
+  return(res);
+}
+
+unsigned long
+cl_m::get_nuof_writes(void)
+{
+  unsigned long res= 0;
+  t_addr i;
+  for (i= 0; i < size; i++)
+    res+= array[i]->nuof_writes;
+  return(res);
+}
+
+void
+cl_m::set_nuof_reads(unsigned long value)
+{
+  t_addr i;
+  for (i= 0; i < size; i++)
+    array[i]->nuof_reads= value;
+  dummy->nuof_reads= value;
+}
+
+void
+cl_m::set_nuof_writes(unsigned long value)
+{
+  t_addr i;
+  for (i= 0; i < size; i++)
+    array[i]->nuof_writes= value;
+  dummy->nuof_writes= value;
+}
+#endif
 
 
 /*

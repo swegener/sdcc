@@ -307,4 +307,31 @@ COMMAND_DO_WORK_APP(cl_kill_cmd)
 }
 
 
+/*
+ * EXEC file
+ */
+
+COMMAND_DO_WORK_APP(cl_exec_cmd)
+{
+  class cl_cmd_arg *parm= cmdline->param(0);
+  char *fn= 0;
+
+  if (cmdline->syntax_match(0, STRING)) {
+    fn= parm->value.string.string; 
+  }
+  else
+    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+
+  class cl_commander *c= app->get_commander();
+  class cl_console *cons= con->clone_for_exec(fn);
+  if (cons)
+    {
+      cons->flags|= CONS_NOWELCOME;
+      c->add_console(cons);
+    }
+
+  return(DD_FALSE);
+}
+
+
 /* End of cmd.src/cmdset.cc */

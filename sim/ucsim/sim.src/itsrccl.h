@@ -45,7 +45,7 @@ public:
   uchar src_mask; // Mask of source bit in src_reg
   uint  addr;     // Address of service routine
   bool  clr_bit;  // Request bit must be cleared when IT accepted
-  char  *name;	  // For debug
+  //char  *name;	  // For debug
   bool  active;   // Acceptance can be disabled
 
   cl_it_src(uchar Iie_mask,

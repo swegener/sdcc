@@ -105,13 +105,6 @@ enum mem_class
   MEM_TYPES
 };
 
-// Flags of consoles
-#define CONS_NONE	 0
-#define CONS_DEBUG	 0x01	// Print debug messages on this console
-#define CONS_FROZEN	 0x02	// Console is frozen (g command issued)
-#define CONS_PROMPT	 0x04	// Prompt is out, waiting for input
-#define CONS_INTERACTIVE 0x08	// Interactive console
-
 // States of simulator
 #define SIM_NONE	0
 #define SIM_GO		0x01	// Processor is running

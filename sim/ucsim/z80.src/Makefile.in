@@ -24,7 +24,7 @@ M_OR_MM         = @M_OR_MM@
 PICOPT		= @PICOPT@
 SHAREDLIB	= @SHAREDLIB@
 
-LIBS		= @LIBS@ -L$(PRJDIR) -lsim -lcmd -lutil -lguiucsim
+LIBS		= @LIBS@ -L$(PRJDIR) -lutil -lsim -lutil -lcmd -lguiucsim
 DL		= @DL@
 dl_ok		= @dl_ok@
 

@@ -25,6 +25,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+// prj
+#include "utils.h"
+
 // sim
 #include "itsrccl.h"
 
@@ -145,7 +148,7 @@ cl_interrupt::print_info(class cl_console *con)
 		     (uc->get_mem(MEM_SFR, is->src_reg)&(is->src_mask))?
 		     "YES":"no");
       con->dd_printf(" %-3s", (is->active)?"act":"no");
-      con->dd_printf(" %s", is->name);
+      con->dd_printf(" %s", object_name(is));
       con->dd_printf("\n");
     }
   con->dd_printf("Active interrupt service(s):\n");
@@ -158,7 +161,8 @@ cl_interrupt::print_info(class cl_console *con)
 	  con->dd_printf("  %2d", il->level);
 	  con->dd_printf(" 0x%06x", il->addr);
 	  con->dd_printf(" 0x%06x", il->PC);
-	  con->dd_printf(" %s", (il->source)?(il->source->name):"nothing");
+	  con->dd_printf(" %s", (il->source)?(object_name(il->source)):
+			 "nothing");
 	  con->dd_printf("\n");
 	}
     }

@@ -41,7 +41,7 @@ COMMAND_ON(uc,cl_set_bit_cmd);
 COMMAND_ON(uc,cl_set_hw_cmd);
 
 // SET OPTION
-COMMAND_ON(uc,cl_set_option_cmd);
+COMMAND_ON(app,cl_set_option_cmd);
 
 
 #endif

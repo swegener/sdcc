@@ -29,7 +29,7 @@ SDCC		= sdcc
 SDCFLAGS	= --debug --stack-after-data --model-small
 SDCPPFLAGS	= 
 
-LIBS		= @LIBS@ -L$(PRJDIR) -lsim -lcmd -lguiucsim -lutil
+LIBS		= @LIBS@ -L$(PRJDIR) -lsim -lutil -lsim -lcmd -lguiucsim
 DL		= @DL@
 dl_ok		= @dl_ok@
 

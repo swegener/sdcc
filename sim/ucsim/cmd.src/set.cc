@@ -167,37 +167,63 @@ COMMAND_DO_WORK_UC(cl_set_hw_cmd)
 //int
 //cl_set_option_cmd::do_work(class cl_sim *sim,
 //			   class cl_cmdline *cmdline, class cl_console *con)
-COMMAND_DO_WORK_UC(cl_set_option_cmd)
+COMMAND_DO_WORK_APP(cl_set_option_cmd)
 {
   char *id= 0, *s= 0;
+  int idx;
   class cl_cmd_arg *params[4]= { cmdline->param(0),
 				 cmdline->param(1),
 				 cmdline->param(2),
 				 cmdline->param(3) };
-  
-  if (cmdline->syntax_match(uc, STRING STRING)) {
+  class cl_option *option= 0;
+
+  if (cmdline->syntax_match(0, STRING STRING STRING)) {
+    id= params[0]->value.string.string;
+    char *cr= params[1]->value.string.string;
+    s= params[2]->value.string.string;
+    int n= app->options->nuof_options(id, cr);
+    if (n > 1)
+      {
+	con->dd_printf("Ambiguous option name, use number instead\n");
+	return(DD_FALSE);
+      }
+    else if (n == 0)
+      ;//con->dd_printf("Named option does not exist\n");
+    else
+      {
+	if ((option= app->options->get_option(id, cr)) == 0)
+	  option= app->options->get_option(cr, id);
+      }
+  }
+  else if (cmdline->syntax_match(0/*app->get_uc()*/, NUMBER STRING)) {
+    idx= params[0]->value.number;
+    s= params[1]->value.string.string;
+    option= app->options->get_option(idx);
+  }
+  else if (cmdline->syntax_match(0/*app->get_uc()*/, STRING STRING)) {
     id= params[0]->value.string.string;
     s= params[1]->value.string.string;
+    int n= app->options->nuof_options(id);
+    if (n > 1)
+      {
+	con->dd_printf("Ambiguous option name, use number instead\n");
+	return(DD_FALSE);
+      }
+    else if (n == 0)
+      ;//con->dd_printf("Named option does not exist\n");
+    else
+      option= app->options->get_option(id);
   }
   else
     con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
-  if (!id ||
-      !s)
+  if (!option)
     {
-      con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+      con->dd_printf("Option does not exist\n");
       return(DD_FALSE);
     }
 
-  int i;
-  for (i= 0; i < uc->options->count; i++)
-    {
-      class cl_option *o= (class cl_option *)(uc->options->at(i));
-      if (!strcmp(id, o->id))
-	{
-	  o->set_value(s);
-	  break;
-	}
-    }
+  option->set_value(s);
+
   return(DD_FALSE);;
 }
 

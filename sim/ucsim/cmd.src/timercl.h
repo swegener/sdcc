@@ -35,7 +35,7 @@ COMMAND_HEAD(cl_timer_cmd)
 public:
   class cl_ticker *ticker;
   long what;
-  char *name;
+//char *name;
 COMMAND_METHODS_ON(uc,cl_timer_cmd)
   void set_ticker(class cl_uc *uc,
 		  class cl_cmd_arg *param);

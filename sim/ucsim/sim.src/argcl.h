@@ -170,7 +170,7 @@ public:
 class cl_cmd_array_arg: public cl_cmd_arg
 {
 public:
-  class cl_cmd_arg *name, *index;
+  class cl_cmd_arg *name_arg, *index;
 
 public:
   cl_cmd_array_arg(/*class cl_uc *iuc,*/
@@ -208,8 +208,8 @@ class cl_arguments: public cl_list
 public:
   cl_arguments(void): cl_list(5, 5) {}
 
-  int arg_avail(char name);
-  int arg_avail(char *name);
+  int arg_avail(char nam);
+  int arg_avail(char *nam);
   virtual long get_iarg(char sname, char *lname);
   virtual char *get_sarg(char sname, char *lname);
   virtual double get_farg(char sname, char *lname);

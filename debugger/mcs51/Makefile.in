@@ -36,7 +36,8 @@ LIBDIRS         = -L$(PRJDIR)/support/gc
 
 
 OBJECTS		= sdcdb.o symtab.o simi.o $(PRJDIR)/src/SDCCset.o \
-		  break.o cmd.o $(PRJDIR)/src/SDCChasht.o
+		  break.o cmd.o $(PRJDIR)/src/SDCChasht.o \
+		  $(PRJDIR)/src/SDCCerr.o
 SOURCES		= $(patsubst %.o,%.c,$(OBJECTS))
 
 TARGET		= $(PRJDIR)/bin/sdcdb

@@ -42,6 +42,11 @@ char *ssdirl = SDCC_LIB_DIR ":" SDCC_LIB_DIR "/small" ;
 char *simArgs[8];
 int nsimArgs = 0;
 
+/* fake filename & lineno to make linker */
+char *filename=NULL;
+int lineno = 0;
+int fatalError = 0;
+
 /* command table */
 struct cmdtab
 {
@@ -141,6 +146,17 @@ struct cmdtab
     },
     { "q"        ,  cmdQuit       , NULL }
 };
+
+/*-----------------------------------------------------------------*/
+/* gc_strdup - make a string duplicate garbage collector aware     */
+/*-----------------------------------------------------------------*/
+char *gc_strdup(const char *s)
+{
+    char *ret;
+    ALLOC_ATOMIC(ret, strlen(s)+1);
+    strcpy(ret, s);
+    return ret;
+}
 
 /*-----------------------------------------------------------------*/
 /* alloccpy - allocate copy and return a new string                */

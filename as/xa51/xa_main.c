@@ -27,7 +27,7 @@
 #define printf(x...) fprintf(stderr,x)
 
 #include "xa_main.h"
-
+#include "xa_version.h"
 extern void yyrestart(FILE *new_file);
 extern int yyparse();
 
@@ -52,7 +52,7 @@ int expr_result, expr_ok, jump_dest, inst;
 int opcode, operand;
 char symbol_name[1000];
 struct area_struct area[NUM_AREAS];
-int current_area=AREA_CSEG;
+int current_area=0;
 
 char rel_line[2][132];
 
@@ -261,6 +261,8 @@ void print_symbol_table()
       fprintf (sym_fp, "%-5s", "SFR");
     } else if (p->isbit && !p->area) {
       fprintf (sym_fp, "%-5s", "SBIT");
+    } else if (!p->isdef) {
+      fprintf (sym_fp,"EXTRN");
     } else {
       fprintf (sym_fp, "%-5s", areaToString(p->area));
     }
@@ -507,12 +509,12 @@ void init_areas(void)
   area[AREA_HOME].start=area[AREA_HOME].alloc_position = 0;
 }
 
-void addAreaSymbols() {
+void relPrelude() {
   //char buffer[132];
   int i, areas=0, globals=0;
   struct symbol *p;
 
-  fprintf (frel, "XH\n");
+  fprintf (frel, "SDCCXA rel, version %1.1f\n", version);
   for (i=0; i<NUM_AREAS; i++) {
     if ((area[i].size=area[i].alloc_position-area[i].start)) {
       areas++;
@@ -647,7 +649,7 @@ int main(int argc, char **argv)
 	init_areas();
 	yyparse();
 
-	addAreaSymbols();
+	relPrelude();
 	if (createSymbolFile) print_symbol_table();
 
 	if (verbose) printf("Pass 3: Generating Object Code:\n");

@@ -4,6 +4,8 @@ YACC = bison -y -d
 LEX = flex -i
 LEXLIB = 
 
+all: xa_rasm xa_link
+
 xa_rasm: xa_main.o xa_rasm.tab.o xa_rasm.lex.o 
 	$(CC) -o xa_rasm xa_main.o xa_rasm.tab.o xa_rasm.lex.o $(LEXLIB)
 	#strip xa_rasm
@@ -30,5 +32,5 @@ all: xa_rasm
 
 clean:
 	rm -f *.tab.c *.tab.h *.lex.c *.o *.bak y.output *.hex *.lst *.obj
-	rm -f xa_rasm core *~
+	rm -f xa_rasm xa_link core *~
 

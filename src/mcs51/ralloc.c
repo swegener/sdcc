@@ -272,7 +272,7 @@ static int notUsedInBlock (symbol *sym, eBBlock *ebp, iCode *ic)
 static int notUsedInRemaining (symbol *sym, eBBlock *ebp, iCode *ic)
 {
     return ((usedInRemaining (operandFromSymbol(sym),ic) ? 0 : 1) &&
-	    allDefsOutOfRange (sym->defs,ic->seq,ebp->lSeq));
+	    allDefsOutOfRange (sym->defs,ebp->fSeq,ebp->lSeq));
 }
 
 /*-----------------------------------------------------------------*/
@@ -609,8 +609,8 @@ static symbol *selectSpil (iCode *ic, eBBlock *ebp, symbol *forSym)
 	return sym;
     }
 
-    /* if the symbol is local to the block then */        
-    if (forSym->liveTo < ebp->lSeq ) {       
+    /* if the symbol is local to the block then */
+    if (forSym->liveTo < ebp->lSeq) {       
 
 	/* check if there are any live ranges allocated
 	   to registers that are not used in this block */
@@ -1568,6 +1568,7 @@ pack:
         
     remiCodeFromeBBlock(ebp,ic);
     hTabDeleteItem (&iCodehTab,ic->key,ic,DELETE_ITEM,NULL);
+    OP_DEFS(IC_RESULT(dic)) = bitVectSetBit(OP_DEFS(IC_RESULT(dic)),dic->key);
     return 1;
     
 }
@@ -2199,6 +2200,7 @@ static void packRegisters (eBBlock *ebp)
 			IC_RESULT(dic) = IC_RESULT(ic);
 			remiCodeFromeBBlock(ebp,ic);
 			hTabDeleteItem (&iCodehTab,ic->key,ic,DELETE_ITEM,NULL);
+			OP_DEFS(IC_RESULT(dic)) = bitVectSetBit(OP_DEFS(IC_RESULT(dic)),dic->key);
 			ic = ic->prev;
 		    } else
 			OP_SYMBOL(IC_RIGHT(ic))->ruonly =  0;
@@ -2214,6 +2216,7 @@ static void packRegisters (eBBlock *ebp)
 			IC_RESULT(dic) = IC_RESULT(ic);
 			remiCodeFromeBBlock(ebp,ic);
 			hTabDeleteItem (&iCodehTab,ic->key,ic,DELETE_ITEM,NULL);
+			OP_DEFS(IC_RESULT(dic)) = bitVectSetBit(OP_DEFS(IC_RESULT(dic)),dic->key);
 			ic = ic->prev;
 		    }
 		}

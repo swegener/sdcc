@@ -2152,41 +2152,7 @@ genCall (iCode * ic)
 {
   sym_link *detype;
 
-  D (emitcode (";", "genCall ");
-    );
-
-  /* if send set is not empty the assign */
-  if (_G.sendSet)
-    {
-      iCode *sic;
-
-      for (sic = setFirstItem (_G.sendSet); sic;
-	   sic = setNextItem (_G.sendSet))
-	{
-	  int size, offset = 0;
-
-	  aopOp (IC_LEFT (sic), sic, FALSE, TRUE);
-	  size = AOP_SIZE (IC_LEFT (sic));
-
-	  _startLazyDPSEvaluation ();
-	  while (size--)
-	    {
-	      char *l = aopGet (AOP (IC_LEFT (sic)), offset,
-				FALSE, FALSE, TRUE);
-	      if (strcmp (l, fReturn[offset])) {
-		genSetDPTR(0);
-		_flushLazyDPS();
-		emitcode ("mov", "%s,%s",
-			  fReturn[offset],
-			  l);
-	      }
-	      offset++;
-	    }
-	  _endLazyDPSEvaluation ();
-	  freeAsmop (IC_LEFT (sic), NULL, sic, TRUE);
-	}
-      _G.sendSet = NULL;
-    }
+  D (emitcode (";", "genCall "););
 
   /* if we are calling a function that is not using
      the same register bank then we need to save the
@@ -2202,6 +2168,61 @@ genCall (iCode * ic)
     if (!ic->regsSaved)
       saveRegisters (ic);
   }
+  
+  /* if send set is not empty the assign */
+  /* We've saved all the registers we care about;
+  * therefore, we may clobber any register not used
+  * in the calling convention (i.e. anything not in
+  * fReturn.
+  */
+  if (_G.sendSet)
+    {
+      iCode *sic;
+
+      for (sic = setFirstItem (_G.sendSet); sic;
+	   sic = setNextItem (_G.sendSet))
+	{
+	  int size, offset = 0;
+
+	  aopOp (IC_LEFT (sic), sic, FALSE, FALSE);
+	  size = AOP_SIZE (IC_LEFT (sic));
+
+	  _startLazyDPSEvaluation ();
+	  while (size--)
+	    {
+	      char *l = aopGet (AOP(IC_LEFT(sic)), offset,
+				FALSE, FALSE, TRUE);
+	        if ((AOP_TYPE(IC_LEFT(sic)) == AOP_DPTR) && size)
+	        {
+	            emitcode("mov", "%s,%s", regs390[offset].name, l);
+	        }
+	        else if (strcmp (l, fReturn[offset]))
+	        {
+		    emitcode ("mov", "%s,%s",
+			      fReturn[offset],
+			      l);
+	        }
+	      offset++;
+	    }
+	  _endLazyDPSEvaluation ();
+	  if (AOP_TYPE(IC_LEFT(sic)) == AOP_DPTR)
+	  {
+	      size = AOP_SIZE (IC_LEFT (sic));
+	      if (size)
+	      {
+	         size--;
+	      }
+	      while (size)
+	      {
+	      	   size--;
+		   emitcode("mov", "%s,%s",
+		   		    fReturn[size], regs390[size].name);
+	      }
+	  }
+	  freeAsmop (IC_LEFT (sic), NULL, sic, TRUE);
+	}
+      _G.sendSet = NULL;
+    }  
 
   /* make the call */
   emitcode ("lcall", "%s", (OP_SYMBOL (IC_LEFT (ic))->rname[0] ?

@@ -129,7 +129,7 @@ char    *preOutName;
 
 static const char *_preCmd[] = {
     "sdcpp", "-Wall", "-lang-c++", "-DSDCC=1", 
-    "-I" SDCC_INCLUDE_DIR, "$l", "$1", "$2", NULL
+    "$l", "-I" SDCC_INCLUDE_DIR, "$1", "$2", NULL
 };
 
 #if !OPT_DISABLE_MCS51
@@ -1164,6 +1164,10 @@ static void linkEdit (char **envp)
     for (i=0; linkOptions[i] ; i++)
 	fprintf(lnkfile,"%s\n",linkOptions[i]);
 
+    /* other library paths if specified */
+    for (i = 0 ; i < nlibPaths ; i++ )
+	fprintf (lnkfile,"-k %s\n",libPaths[i]);
+
     /* standard library path */
     if (strcmp(port->target,"ds390")==0) {
       c="ds390";
@@ -1187,10 +1191,6 @@ static void linkEdit (char **envp)
     }
     fprintf (lnkfile,"-k %s/%s\n",SDCC_LIB_DIR/*STD_LIB_PATH*/,c);
 	    
-    /* other library paths if specified */
-    for (i = 0 ; i < nlibPaths ; i++ )
-	fprintf (lnkfile,"-k %s\n",libPaths[i]);
-        
     /* standard library files */
     if (strcmp(port->target, "ds390")==0) {
       fprintf (lnkfile,"-l %s\n",STD_DS390_LIB);

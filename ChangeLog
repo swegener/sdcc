@@ -1,3 +1,7 @@
+2004-06-01 Maarten Brock <sourceforge.brock AT dse.nl>
+	* support/regression/tests/zeropad.c: never meant to commit the
+	  nestedstruct test: removed, added check for GCC version
+
 2004-05-31 Maarten Brock <sourceforge.brock AT dse.nl>
 	* src/SDCCast.c (createIvalArray): fixed bug 770487 SIGSEGV
 	* src/SDCCglue.c (emitRegularMap): fixed bug 770484 allocation problem

@@ -1400,7 +1400,7 @@ rematStr (symbol * sym)
 /* regTypeNum - computes the type & number of registers required   */
 /*-----------------------------------------------------------------*/
 static void
-regTypeNum ()
+regTypeNum (eBBlock *ebbs)
 {
   symbol *sym;
   int k;
@@ -1452,7 +1452,6 @@ regTypeNum ()
 		  !IS_CAST_ICODE(OP_SYMBOL (IC_LEFT (ic))->rematiCode) &&
 		  DCL_TYPE (aggrToPtr (sym->type, FALSE)) == POINTER)
 		{
-
 		  /* create a psuedo symbol & force a spil */
 		  symbol *psym = newSymbol (rematStr (OP_SYMBOL (IC_LEFT (ic))), 1);
 		  psym->type = sym->type;
@@ -1460,6 +1459,16 @@ regTypeNum ()
 		  strcpy (psym->rname, psym->name);
 		  sym->isspilt = 1;
 		  sym->usl.spillLoc = psym;
+#if 0 // an alternative fix for bug #480076
+		  /* now this is a useless assignment to itself */
+		  remiCodeFromeBBlock (ebbs, ic);
+#else
+		  /* now this really is an assignment to itself, make it so;
+		     it will be optimized out later */
+		  ic->op='=';
+		  IC_RIGHT(ic)=IC_RESULT(ic);
+		  IC_LEFT(ic)=NULL;
+#endif
 		  continue;
 		}
 
@@ -2527,7 +2536,7 @@ mcs51_assignRegisters (eBBlock ** ebbs, int count)
 
   /* first determine for each live range the number of 
      registers & the type of registers required for each */
-  regTypeNum ();
+  regTypeNum (*ebbs);
 
   /* and serially allocate registers */
   serialRegAssign (ebbs, count);

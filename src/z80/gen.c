@@ -28,6 +28,7 @@
   4. Optimised strcmp fun		21999 149 2294
   5. Optimised strcmp further		21660 151 228C
   6. Optimised memcpy by unroling	20885 157 2201
+  7. After turning loop induction on	19862 165 236D
 
   Michael Hope <michaelh@juju.net.nz> 2000
   Based on the mcs51 generator -
@@ -5566,6 +5567,246 @@ genReceive (iCode * ic)
   freeAsmop (IC_RESULT (ic), NULL, ic);
 }
 
+enum
+  {
+    /** Maximum number of bytes to emit per line. */
+    DBEMIT_MAX_RUN = 8
+  };
+
+/** Context for the byte output chunker. */
+typedef struct
+{
+  unsigned char buffer[DBEMIT_MAX_RUN];
+  int pos;
+} DBEMITCTX;
+
+
+/** Flushes a byte chunker by writing out all in the buffer and
+    reseting. 
+*/
+static void
+_dbFlush(DBEMITCTX *self)
+{
+  char line[256];
+
+  if (self->pos > 0)
+    {
+      int i;
+      sprintf(line, ".db 0x%02X", self->buffer[0]);
+
+      for (i = 1; i < self->pos; i++)
+        {
+          sprintf(line + strlen(line), ", 0x%02X", self->buffer[i]);
+        }
+      emit2(line);
+    }
+  self->pos = 0;
+}
+
+/** Write out another byte, buffering until a decent line is
+    generated.
+*/
+static void
+_dbEmit(DBEMITCTX *self, int c)
+{
+  if (self->pos == DBEMIT_MAX_RUN)
+    {
+      _dbFlush(self);
+    }
+  self->buffer[self->pos++] = c;
+}
+
+/** Context for a simple run length encoder. */
+typedef struct
+{
+  unsigned last;
+  unsigned char buffer[128];
+  int pos;
+  /** runLen may be equivalent to pos. */
+  int runLen;
+} RLECTX;
+
+enum
+  {
+    RLE_CHANGE_COST = 4,
+    RLE_MAX_BLOCK = 127
+  };
+
+/** Flush the buffer of a run length encoder by writing out the run or
+    data that it currently contains.
+*/
+static void
+_rleCommit(RLECTX *self)
+{
+  int i;
+  if (self->pos != 0)
+    {
+      DBEMITCTX db;
+      memset(&db, 0, sizeof(db));
+          
+      emit2(".db %u", self->pos);
+      
+      for (i = 0; i < self->pos; i++)
+        {
+          _dbEmit(&db, self->buffer[i]);
+        }
+      _dbFlush(&db);
+    }
+  /* Reset */
+  self->pos = 0;
+}
+
+/* Encoder design:
+   Can get either a run or a block of random stuff.
+   Only want to change state if a good run comes in or a run ends.
+   Detecting run end is easy.
+   Initial state?
+
+   Say initial state is in run, len zero, last zero.  Then if you get a
+   few zeros then something else then a short run will be output.
+   Seems OK.  While in run mode, keep counting.  While in random mode,
+   keep a count of the run.  If run hits margin, output all up to run,
+   restart, enter run mode.
+*/
+
+/** Add another byte into the run length encoder, flushing as
+    required.  The run length encoder uses the Amiga IFF style, where
+    a block is prefixed by its run length.  A positive length means
+    the next n bytes pass straight through.  A negative length means
+    that the next byte is repeated -n times.  A zero terminates the
+    chunks.
+*/
+static void
+_rleAppend(RLECTX *self, int c)
+{
+  int i;
+
+  if (c != self->last)
+    {
+      /* The run has stopped.  See if it is worthwhile writing it out
+         as a run.  Note that the random data comes in as runs of
+         length one.
+      */
+      if (self->runLen > RLE_CHANGE_COST)
+        {
+          /* Yes, worthwhile. */
+          /* Commit whatever was in the buffer. */
+          _rleCommit(self);
+          emit2(".db -%u,0x%02X", self->runLen, self->last);
+        }
+      else
+        {
+          /* Not worthwhile.  Append to the end of the random list. */
+          for (i = 0; i < self->runLen; i++)
+            {
+              if (self->pos >= RLE_MAX_BLOCK)
+                {
+                  /* Commit. */
+                  _rleCommit(self);
+                }
+              self->buffer[self->pos++] = self->last;
+            }
+        }
+      self->runLen = 1;
+      self->last = c;
+    }
+  else
+    {
+      if (self->runLen >= RLE_MAX_BLOCK)
+        {
+          /* Commit whatever was in the buffer. */
+          _rleCommit(self);
+
+          emit2 (".db -%u,0x%02X", self->runLen, self->last);
+          self->runLen = 0;
+        }
+      self->runLen++;
+    }
+}
+
+static void
+_rleFlush(RLECTX *self)
+{
+  _rleAppend(self, -1);
+  _rleCommit(self);
+  self->pos = 0;
+  self->last = 0;
+  self->runLen = 0;
+}
+
+/** genArrayInit - Special code for initialising an array with constant
+   data.
+*/
+static void
+genArrayInit (iCode * ic)
+{
+  literalList *iLoop;
+  int         ix;
+  int         elementSize = 0, eIndex, i;
+  unsigned    val, lastVal;
+  sym_link    *type;
+  RLECTX      rle;
+
+  memset(&rle, 0, sizeof(rle));
+
+  aopOp (IC_LEFT(ic), ic, FALSE, FALSE);
+
+  if (AOP_TYPE(IC_LEFT(ic)) == AOP_IMMD)
+    {
+      /* Emit the support function call and the destination address. */
+      emit2("call __initrleblock");
+      emit2(".dw %s", aopGetWord (AOP(IC_LEFT(ic)), 0));
+    }
+  else
+    {
+      wassertl (0, "Unexpected operand to genArrayInit.\n");
+    }
+    
+  type = operandType(IC_LEFT(ic));
+    
+  if (type && type->next)
+    {
+      elementSize = getSize(type->next);
+    }
+  else
+    {
+      wassertl (0, "Can't determine element size in genArrayInit.");
+    }
+
+  iLoop = IC_ARRAYILIST(ic);
+  lastVal = (unsigned)-1;
+
+  /* Feed all the bytes into the run length encoder which will handle
+     the actual output.
+     This works well for mixed char data, and for random int and long
+     data.
+  */
+  while (iLoop)
+    {
+      ix = iLoop->count;
+
+      if (ix != 0)
+        {
+          for (i = 0; i < ix; i++)
+            {
+              for (eIndex = 0; eIndex < elementSize; eIndex++)
+                {
+                  val = (((int)iLoop->literalValue) >> (eIndex * 8)) & 0xff;
+                  _rleAppend(&rle, val);
+                }
+            }
+	}
+	
+      iLoop = iLoop->next;
+    }
+
+  _rleFlush(&rle);
+  /* Mark the end of the run. */
+  emit2(".db 0");
+
+  freeAsmop (IC_LEFT(ic), NULL, ic);
+}
+
 /*-----------------------------------------------------------------*/
 /* genZ80Code - generate code for Z80 based controllers            */
 /*-----------------------------------------------------------------*/
@@ -5837,6 +6078,10 @@ genZ80Code (iCode * lic)
 	  addSet (&_G.sendSet, ic);
 	  break;
 
+	case ARRAYINIT:
+	    genArrayInit(ic);
+	    break;
+	    
 	default:
 	  ic = ic;
 	  /*      piCode(ic,stdout); */

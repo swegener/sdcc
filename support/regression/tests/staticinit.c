@@ -42,3 +42,73 @@ static {type} smallSparseZero[] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
+static {type} smallSparseZeroTail[] = {
+    1, 2, 3
+};
+
+static void
+testSmallSparseZero(void)
+{
+    ASSERT(smallSparseZero[0] == 0);
+    ASSERT(smallSparseZero[1] == 0);
+    ASSERT(smallSparseZero[2] == 0);
+    ASSERT(smallSparseZero[3] == 0);
+    ASSERT(smallSparseZero[4] == 0);
+    ASSERT(smallSparseZero[5] == 0);
+    ASSERT(smallSparseZero[6] == 0);
+    ASSERT(smallSparseZero[7] == 0);
+    ASSERT(smallSparseZero[8] == 0);
+}
+
+static {type} largeMixed[] = {
+    1, 2, 3, 4, 5, 6, 7,	/* 0-6 */
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,	/* 8*12 = 96+7 = -102 */
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    3, 4, 5, 6, 3, 4, 5, 6,	/* 8*17 = 136+7 */
+    3, 4, 5, 6, 3, 4, 5, 6,
+    3, 4, 5, 6, 3, 4, 5, 6,
+    3, 4, 5, 6, 3, 4, 5, 6,
+    3, 4, 5, 6, 3, 4, 5, 6,
+    3, 4, 5, 6, 3, 4, 5, 6,
+    3, 4, 5, 6, 3, 4, 5, 6,
+    3, 4, 5, 6, 3, 4, 5, 6,
+    3, 4, 5, 6, 3, 4, 5, 6,
+    3, 4, 5, 6, 3, 4, 5, 6,
+    3, 4, 5, 6, 3, 4, 5, 6,
+    3, 4, 5, 6, 3, 4, 5, 6,
+    3, 4, 5, 6, 3, 4, 5, 6,
+    3, 4, 5, 6, 3, 4, 5, 6,
+    3, 4, 5, 6, 3, 4, 5, 6,
+    3, 4, 5, 6, 3, 4, 5, 6,
+    3, 4, 5, 6, 3, 4, 5, 6
+};
+
+static void
+testLargeMixed(void)
+{
+    ASSERT(largeMixed[0] == 1);
+    ASSERT(largeMixed[1] == 2);
+    ASSERT(largeMixed[7] == 1);
+    ASSERT(largeMixed[102] == 1);
+    ASSERT(largeMixed[143] == 3);
+    ASSERT(largeMixed[143+8] == 3);
+    ASSERT(largeMixed[143+16] == 3);
+    ASSERT(largeMixed[143+1] == 4);
+    ASSERT(largeMixed[143+8+1] == 4);
+    ASSERT(largeMixed[143+16+1] == 4);
+}

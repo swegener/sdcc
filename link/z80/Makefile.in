@@ -47,7 +47,7 @@ LKZ80		= $(PRJDIR)/bin/link-z80
 all: checkconf $(LKZ80)
 
 $(LKZ80): $(SLIBOBJS) $(LKOBJECTS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SLIBOBJS) $(LKOBJECTS) 
+	$(CC) $(CFLAGS) -o $@ $(SLIBOBJS) $(LKOBJECTS) $(LDFLAGS)
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------

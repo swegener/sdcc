@@ -3568,24 +3568,32 @@ replace {
 	mov	%1,a
 } if notVolatile %1
 
+// Peepholes 259.x are not compatible with peepholex 250.x
+// Peepholes 250.x add jumps to a previously unused label. As the 
+// labelRefCount is not increased, peepholes 259.x are (mistakenly) applied.
+// (Mail on sdcc-devel 2004-10-25)
+// Note: Peepholes 193..199, 251 remove jumps to previously used labels without
+// decreasing labelRefCount (less dangerous - this f.e. leads to 253.c being
+// applied instead of 253.b))
+//
 // applies to f.e. vprintf.c
-replace {
-	sjmp	%1
-%2:	
-	ret
-} by {
-	sjmp	%1
-	;	Peephole 259.a	removed redundant label %2 and ret
-	;
-} if labelRefCount %2 0
+//replace {
+//	sjmp	%1
+//%2:	
+//	ret
+//} by {
+//	sjmp	%1
+//	;	Peephole 259.a	removed redundant label %2 and ret
+//	;
+//} if labelRefCount %2 0
 
 // applies to f.e. gets.c
-replace {
-	ljmp	%1
-%2:	
-	ret
-} by {
-	ljmp	%1
-	;	Peephole 259.b	removed redundant label %2 and ret
-	;
-} if labelRefCount %2 0
+//replace {
+//	ljmp	%1
+//%2:	
+//	ret
+//} by {
+//	ljmp	%1
+//	;	Peephole 259.b	removed redundant label %2 and ret
+//	;
+//} if labelRefCount %2 0

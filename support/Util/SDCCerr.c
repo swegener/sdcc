@@ -202,18 +202,20 @@ vwerror - Output a standard eror message with variable number of arguements
 */
 
 void vwerror (int errNum, va_list marker)
-
 {
-if (!ErrorOut)
-	ErrorOut = DEFAULT_ERROR_OUT ;
-
-if ( ErrTab[errNum].errType == ERROR )
+  if (!ErrorOut)
+    ErrorOut = DEFAULT_ERROR_OUT ;
+  
+  if ( ErrTab[errNum].errType == ERROR )
     fatalError++ ;
-
-if ( filename && lineno ) 
+  
+  if ( filename && lineno ) {
     fprintf(ErrorOut, "%s(%d):",filename,lineno);
-
-vfprintf(ErrorOut, ErrTab[errNum].errText,marker);
+  } else {
+    fprintf(ErrorOut, "at %d:", lineno);
+  }
+  
+  vfprintf(ErrorOut, ErrTab[errNum].errText,marker);
 }
 /*
 -------------------------------------------------------------------------------

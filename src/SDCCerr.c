@@ -164,6 +164,8 @@ void	vwerror (int errNum, va_list marker)
     
     if ( filename && lineno ) {
 	fprintf(ERRSINK, "%s(%d):",filename,lineno);
+    } else {
+        fprintf(ERRSINK, "at %d:",lineno);
     }
     vfprintf(ERRSINK, ErrTab[errNum].errText,marker);
 }

@@ -883,7 +883,11 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
     }
   else if (size == FPTRSIZE)
     {
-      tfprintf (oFile, "\t!dws\n", val->name);
+      if (port->use_dw_for_init) {
+	tfprintf (oFile, "\t!dws\n", val->name);
+      } else {
+	printPointerType (oFile, val->name);
+      }
     }
   else if (size == GPTRSIZE)
     {

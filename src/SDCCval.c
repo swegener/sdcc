@@ -403,8 +403,7 @@ constFloatVal (char *s)
       return constVal ("0");
     }
 
-  val->type = val->etype = newLink ();
-  val->type->class = SPECIFIER;
+  val->type = val->etype = newLink (SPECIFIER);
   SPEC_NOUN (val->type) = V_FLOAT;
   SPEC_SCLS (val->type) = S_LITERAL;
   SPEC_CVAL (val->type).v_float = sval;
@@ -425,8 +424,7 @@ value *constVal (char *s)
 
   val = newValue ();		/* alloc space for value   */
 
-  val->type = val->etype = newLink ();	/* create the spcifier */
-  val->type->class = SPECIFIER;
+  val->type = val->etype = newLink (SPECIFIER);	/* create the spcifier */
   SPEC_SCLS (val->type) = S_LITERAL;
   // let's start with an unsigned char
   SPEC_NOUN (val->type) = V_CHAR;
@@ -665,10 +663,9 @@ strVal (char *s)
   val = newValue ();		/* get a new one */
 
   /* get a declarator */
-  val->type = newLink ();
+  val->type = newLink (DECLARATOR);
   DCL_TYPE (val->type) = ARRAY;
-  val->type->next = val->etype = newLink ();
-  val->etype->class = SPECIFIER;
+  val->type->next = val->etype = newLink (SPECIFIER);
   SPEC_NOUN (val->etype) = V_CHAR;
   SPEC_SCLS (val->etype) = S_LITERAL;
 
@@ -776,8 +773,7 @@ charVal (char *s)
 
   val = newValue ();
 
-  val->type = val->etype = newLink ();
-  val->type->class = SPECIFIER;
+  val->type = val->etype = newLink (SPECIFIER);
   SPEC_NOUN (val->type) = V_CHAR;
   SPEC_USIGN(val->type) = 1;
   SPEC_SCLS (val->type) = S_LITERAL;
@@ -1018,8 +1014,7 @@ valMult (value * lval, value * rval)
 
   /* create a new value */
   val = newValue ();
-  val->type = val->etype = newLink ();
-  val->type->class = SPECIFIER;
+  val->type = val->etype = newLink (SPECIFIER);
   SPEC_NOUN (val->type) = (IS_FLOAT (lval->etype) ||
 			   IS_FLOAT (rval->etype) ? V_FLOAT : V_INT);
   SPEC_SCLS (val->type) = S_LITERAL;	/* will remain literal */
@@ -1059,8 +1054,7 @@ valDiv (value * lval, value * rval)
 
   /* create a new value */
   val = newValue ();
-  val->type = val->etype = newLink();
-  val->type->class = SPECIFIER;
+  val->type = val->etype = newLink(SPECIFIER);
   SPEC_NOUN (val->type) = (IS_FLOAT (lval->etype) ||
 			   IS_FLOAT (rval->etype) ? V_FLOAT : V_INT);
   SPEC_SCLS (val->etype) = S_LITERAL;
@@ -1105,8 +1099,7 @@ valMod (value * lval, value * rval)
 
   /* create a new value */
   val = newValue ();
-  val->type = val->etype = newLink ();
-  val->type->class = SPECIFIER;
+  val->type = val->etype = newLink (SPECIFIER);
   SPEC_NOUN (val->type) = V_INT;	/* type is int */
   SPEC_SCLS (val->type) = S_LITERAL;	/* will remain literal */
   SPEC_USIGN (val->type) = (SPEC_USIGN (lval->etype) & SPEC_USIGN (rval->etype));
@@ -1145,8 +1138,7 @@ valPlus (value * lval, value * rval)
 
   /* create a new value */
   val = newValue ();
-  val->type = val->etype = newLink ();
-  val->type->class = SPECIFIER;
+  val->type = val->etype = newLink (SPECIFIER);
   SPEC_NOUN (val->type) = (IS_FLOAT (lval->etype) ||
 			   IS_FLOAT (rval->etype) ? V_FLOAT : V_INT);
   SPEC_SCLS (val->type) = S_LITERAL;	/* will remain literal */
@@ -1184,8 +1176,7 @@ valMinus (value * lval, value * rval)
 
   /* create a new value */
   val = newValue ();
-  val->type = val->etype = newLink ();
-  val->type->class = SPECIFIER;
+  val->type = val->etype = newLink (SPECIFIER);
   SPEC_NOUN (val->type) = (IS_FLOAT (lval->etype) ||
 			   IS_FLOAT (rval->etype) ? V_FLOAT : V_INT);
   SPEC_SCLS (val->type) = S_LITERAL;	/* will remain literal */
@@ -1542,7 +1533,7 @@ valForArray (ast * arrExpr)
   SNPRINTF (val->name, sizeof(val->name), "(%s + %d)", buffer,
 	   (int) AST_LIT_VALUE (arrExpr->right) * size);
 
-  val->type = newLink ();
+  val->type = newLink (DECLARATOR);
   if (SPEC_SCLS (arrExpr->left->etype) == S_CODE)
     {
       DCL_TYPE (val->type) = CPOINTER;
@@ -1612,7 +1603,7 @@ valForStructElem (ast * structT, ast * elemT)
   SNPRINTF (val->name, sizeof(val->name), "(%s + %d)", buffer,
 	   (int) sym->offset);
 
-  val->type = newLink ();
+  val->type = newLink (DECLARATOR);
   if (SPEC_SCLS (structT->etype) == S_CODE)
     {
       DCL_TYPE (val->type) = CPOINTER;

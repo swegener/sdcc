@@ -405,7 +405,7 @@ initPointer (initList * ilist, sym_link *toType)
 		/* address of symbol */
 		if (IS_AST_SYM_VALUE (expr->left)) {
 			val = copyValue (AST_VALUE (expr->left));
-			val->type = newLink ();
+			val->type = newLink (DECLARATOR);
 			if (SPEC_SCLS (expr->left->etype) == S_CODE) {
 				DCL_TYPE (val->type) = CPOINTER;
 			}
@@ -463,7 +463,7 @@ initPointer (initList * ilist, sym_link *toType)
 	    IS_ARRAY(expr->right->ftype)) {
 
 		val = copyValue (AST_VALUE (expr->right));
-		val->type = newLink ();
+		val->type = newLink (DECLARATOR);
 		if (SPEC_SCLS (expr->right->etype) == S_CODE) {
 			DCL_TYPE (val->type) = CPOINTER;
 		}
@@ -808,8 +808,11 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
 
   iloop = ilist->init.deep;
   lcnt = DCL_ELEM (type);
-  for (last_type = type->next; last_type && DCL_ELEM (last_type); last_type = last_type->next)
+  for (last_type = type->next; 
+       last_type && IS_DECL(last_type) && DCL_ELEM (last_type); 
+       last_type = last_type->next) {
     lcnt *= DCL_ELEM (last_type);
+  }
 
   for (;;)
     {

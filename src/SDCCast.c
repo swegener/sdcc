@@ -448,7 +448,7 @@ resolveSymbols (ast * tree)
 	  /* mark it as returning an int     */
 	  if (tree->funcName)
 	    {
-	      tree->opval.val->sym->type = newLink ();
+	      tree->opval.val->sym->type = newLink (DECLARATOR);
 	      DCL_TYPE (tree->opval.val->sym->type) = FUNCTION;
 	      tree->opval.val->sym->type->next =
 		tree->opval.val->sym->etype = newIntLink ();
@@ -501,7 +501,7 @@ funcOfType (char *name, sym_link * type, sym_link * argType,
   sym = newSymbol (name, 0);
 
   /* setup return value */
-  sym->type = newLink ();
+  sym->type = newLink (DECLARATOR);
   DCL_TYPE (sym->type) = FUNCTION;
   sym->type->next = copyLinkChain (type);
   sym->etype = getSpec (sym->type);
@@ -545,7 +545,7 @@ funcOfTypeVarg (char *name, char * rtype, int nArgs , char **atypes)
     sym = newSymbol (name, 0);
     
     /* setup return value */
-    sym->type = newLink ();
+    sym->type = newLink (DECLARATOR);
     DCL_TYPE (sym->type) = FUNCTION;
     sym->type->next = typeFromStr(rtype);
     sym->etype = getSpec (sym->type);
@@ -2205,8 +2205,7 @@ decorateType (ast * tree)
       /*----------------------------*/
       /*  address of                */
       /*----------------------------*/
-      p = newLink ();
-      p->class = DECLARATOR;
+      p = newLink (DECLARATOR);
       /* if bit field then error */
       if (IS_BITVAR (tree->left->etype))
 	{
@@ -2783,7 +2782,7 @@ decorateType (ast * tree)
 			 ((int)floatFromVal(valFromType(RETYPE(tree)))) !=0 ) /* special case of NULL */  {
 		      sym_link *rest = LTYPE(tree)->next;
 		      werror(W_LITERAL_GENERIC);		      
-		      TTYPE(tree) = newLink();
+		      TTYPE(tree) = newLink(DECLARATOR);
 		      DCL_TYPE(TTYPE(tree)) = FPOINTER;
 		      TTYPE(tree)->next = rest;
 		      tree->left->opval.lnk = TTYPE(tree);

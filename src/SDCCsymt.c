@@ -298,11 +298,12 @@ newSymbol (char *name, int scope)
 /* newLink - creates a new link (declarator,specifier)              */
 /*------------------------------------------------------------------*/
 sym_link *
-newLink ()
+newLink (SYM_LINK_CLASS select)
 {
   sym_link *p;
 
   p = Safe_alloc ( sizeof (sym_link));
+  p->class=select;
 
   return p;
 }
@@ -419,7 +420,7 @@ addDecl (symbol * sym, int type, sym_link * p)
     }
   else
     {
-      head = tail = newLink ();
+      head = tail = newLink (DECLARATOR);
       DCL_TYPE (head) = type;
     }
 
@@ -468,8 +469,7 @@ addDecl (symbol * sym, int type, sym_link * p)
 
       if (!IS_SPEC (sym->etype))
 	{
-	  sym->etype = sym->etype->next = newLink ();
-	  sym->etype->class = SPECIFIER;
+	  sym->etype = sym->etype->next = newLink (SPECIFIER);
 	}
       
       DCL_PTR_CONST (sym->type) = SPEC_CONST (DCL_TSPEC (p));
@@ -682,8 +682,7 @@ newCharLink ()
 {
   sym_link *p;
 
-  p = newLink ();
-  p->class = SPECIFIER;
+  p = newLink (SPECIFIER);
   SPEC_NOUN (p) = V_CHAR;
 
   return p;
@@ -697,8 +696,7 @@ newFloatLink ()
 {
   sym_link *p;
 
-  p = newLink ();
-  p->class = SPECIFIER;
+  p = newLink (SPECIFIER);
   SPEC_NOUN (p) = V_FLOAT;
 
   return p;
@@ -712,8 +710,7 @@ newLongLink ()
 {
   sym_link *p;
 
-  p = newLink ();
-  p->class = SPECIFIER;
+  p = newLink (SPECIFIER);
   SPEC_NOUN (p) = V_INT;
   SPEC_LONG (p) = 1;
 
@@ -728,8 +725,7 @@ newIntLink ()
 {
   sym_link *p;
 
-  p = newLink ();
-  p->class = SPECIFIER;
+  p = newLink (SPECIFIER);
   SPEC_NOUN (p) = V_INT;
 
   return p;
@@ -1330,11 +1326,11 @@ copyLinkChain (sym_link * p)
   sym_link *head, *curr, *loop;
 
   curr = p;
-  head = loop = (curr ? newLink () : (void *) NULL);
+  head = loop = (curr ? newLink (p->class) : (void *) NULL);
   while (curr)
     {
       memcpy (loop, curr, sizeof (sym_link));	/* copy it */
-      loop->next = (curr->next ? newLink () : (void *) NULL);
+      loop->next = (curr->next ? newLink (curr->next->class) : (void *) NULL);
       loop = loop->next;
       curr = curr->next;
     }
@@ -1572,7 +1568,7 @@ aggregateToPointer (value * val)
 	  sym_link *p = val->type;
 
 	  werror (W_STRUCT_AS_ARG, val->name);
-	  val->type = newLink ();
+	  val->type = newLink (DECLARATOR);
 	  val->type->next = p;
 	}
 
@@ -1879,8 +1875,10 @@ processFuncArgs (symbol * func)
 	  val->sym->etype = getSpec (val->sym->type);
 	  val->sym->_isparm = 1;
 	  strncpyz (val->sym->rname, val->name, sizeof(val->sym->rname));
-	  SPEC_STAT (val->etype) = SPEC_STAT (val->sym->etype) =
-	    SPEC_STAT (func->etype);
+	  if (IS_SPEC(func->etype)) {
+	    SPEC_STAT (val->etype) = SPEC_STAT (val->sym->etype) =
+	      SPEC_STAT (func->etype);
+	  }
 	  addSymChain (val->sym);
 
 	}
@@ -1892,8 +1890,10 @@ processFuncArgs (symbol * func)
 	  val->sym->_isparm = 1;
 	  SPEC_OCLS (val->etype) = SPEC_OCLS (val->sym->etype) =
 	    (options.model != MODEL_SMALL ? xdata : data);
-	  SPEC_STAT (val->etype) = SPEC_STAT (val->sym->etype) =
-	    SPEC_STAT (func->etype);
+	  if (IS_SPEC(func->etype)) {
+	    SPEC_STAT (val->etype) = SPEC_STAT (val->sym->etype) =
+	      SPEC_STAT (func->etype);
+	  }
 	}
       if (!isinSet(operKeyReset, val->sym)) {
 	addSet (&operKeyReset, val->sym);
@@ -2373,7 +2373,7 @@ _mangleFunctionName(char *in)
 /*-----------------------------------------------------------------*/
 sym_link *typeFromStr (char *s)
 {
-    sym_link *r = newLink();
+    sym_link *r = newLink(DECLARATOR);
     int usign = 0;
 
     do {
@@ -2415,10 +2415,9 @@ sym_link *typeFromStr (char *s)
 	case 'd':
 	case 'F':
 	    assert(*(s+1)=='*');
-	    nr = newLink();
+	    nr = newLink(DECLARATOR);
 	    nr->next = r;
 	    r = nr;
-	    r->class = DECLARATOR ;
 	    switch (*s) {
 	    case 'g':
 		DCL_TYPE(r) = GPOINTER;
@@ -2434,10 +2433,9 @@ sym_link *typeFromStr (char *s)
 		break;
 	    case 'F':
 		DCL_TYPE(r) = FUNCTION;
-		nr = newLink();
+		nr = newLink(DECLARATOR);
 		nr->next = r;
 		r = nr;
-		r->class = DECLARATOR ;
 		DCL_TYPE(r) = CPOINTER;
 		break;
 	    }
@@ -2593,4 +2591,24 @@ void initBuiltIns()
 	FUNC_ISBUILTIN(sym->type) = 1;
 	FUNC_ISREENT(sym->type) = 0;	/* can never be reentrant */
     }
+}
+
+sym_link *validateLink(sym_link 	*l, 
+			const char 	*macro,
+			const char 	*args,
+			const char 	select,
+			const char 	*file, 
+			unsigned 	line)
+{    
+  if (l && l->class==select)
+    {
+	return l;
+    }
+    fprintf(stderr, 
+	    "Internal error: validateLink failed in %s(%s) @ %s:%u:"
+	    " expected %s, got %s\n",
+	    macro, args, file, line, 
+	    DECLSPEC2TXT(select), l ? DECLSPEC2TXT(l->class) : "null-link");
+    exit(-1);
+    return l; // never reached, makes compiler happy.
 }

@@ -177,39 +177,31 @@ function_attribute
 
 function_attributes
    :  USING CONSTANT {
-                        $$ = newLink() ;
-                        $$->class = SPECIFIER   ;
+                        $$ = newLink(SPECIFIER) ;
 			FUNC_REGBANK($$) = (int) floatFromVal($2);
                      }
-   |  REENTRANT      {  $$ = newLink ();
-                        $$->class = SPECIFIER   ;
+   |  REENTRANT      {  $$ = newLink (SPECIFIER);
 			FUNC_ISREENT($$)=1;
                      }
-   |  CRITICAL       {  $$ = newLink ();
-                        $$->class = SPECIFIER   ;
+   |  CRITICAL       {  $$ = newLink (SPECIFIER);
 			FUNC_ISCRITICAL($$) = 1;
                      }
-   |  NAKED          {  $$ = newLink ();
-                        $$->class = SPECIFIER   ;
+   |  NAKED          {  $$ = newLink (SPECIFIER);
 			FUNC_ISNAKED($$)=1;
                      }
-   |  JAVANATIVE     {  $$ = newLink ();
-                        $$->class = SPECIFIER   ;
+   |  JAVANATIVE     {  $$ = newLink (SPECIFIER);
 			FUNC_ISJAVANATIVE($$)=1;
                      }
-   |  OVERLAY        {  $$ = newLink ();
-                        $$->class = SPECIFIER   ;
+   |  OVERLAY        {  $$ = newLink (SPECIFIER);
 			FUNC_ISOVERLAY($$)=1;
                      }
-   |  NONBANKED      {$$ = newLink ();
-                        $$->class = SPECIFIER   ;
+   |  NONBANKED      {$$ = newLink (SPECIFIER);
                         FUNC_NONBANKED($$) = 1;
 			if (FUNC_BANKED($$)) {
 			    werror(W_BANKED_WITH_NONBANKED);
 			}
                      }
-   |  BANKED         {$$ = newLink ();
-                        $$->class = SPECIFIER   ;
+   |  BANKED         {$$ = newLink (SPECIFIER);
                         FUNC_BANKED($$) = 1;
 			if (FUNC_NONBANKED($$)) {
 			    werror(W_BANKED_WITH_NONBANKED);
@@ -220,8 +212,7 @@ function_attributes
                      }
    |  Interrupt_storage
                      {
-                        $$ = newLink () ;
-                        $$->class = SPECIFIER ;
+                        $$ = newLink (SPECIFIER) ;
                         FUNC_INTNO($$) = $1 ;
                         FUNC_ISISR($$) = 1;
                      }
@@ -528,28 +519,23 @@ init_declarator
 
 storage_class_specifier
    : TYPEDEF   {
-                  $$ = newLink () ;
-                  $$->class = SPECIFIER ;
+                  $$ = newLink (SPECIFIER) ;
                   SPEC_TYPEDEF($$) = 1 ;
                }
    | EXTERN    {
-                  $$ = newLink();
-                  $$->class = SPECIFIER ;
+                  $$ = newLink(SPECIFIER);
                   SPEC_EXTR($$) = 1 ;
                }
    | STATIC    {
-                  $$ = newLink ();
-                  $$->class = SPECIFIER ;
+                  $$ = newLink (SPECIFIER);
                   SPEC_STAT($$) = 1 ;
                }
    | AUTO      {
-                  $$ = newLink () ;
-                  $$->class = SPECIFIER ;
+                  $$ = newLink (SPECIFIER) ;
                   SPEC_SCLS($$) = S_AUTO  ;
                }
    | REGISTER  {
-                  $$ = newLink ();
-                  $$->class = SPECIFIER ;
+                  $$ = newLink (SPECIFIER);
                   SPEC_SCLS($$) = S_REGISTER ;
                }
    ;
@@ -571,88 +557,71 @@ type_specifier
 
 type_specifier2
    : CHAR   {
-               $$=newLink();
-               $$->class = SPECIFIER   ;
+               $$=newLink(SPECIFIER);
                SPEC_NOUN($$) = V_CHAR  ;
             }
    | SHORT  {
-               $$=newLink();
-               $$->class = SPECIFIER   ;
+               $$=newLink(SPECIFIER);
 	       $$->select.s._short = 1 ;
             }
    | INT    {
-               $$=newLink();
-               $$->class = SPECIFIER   ;
+               $$=newLink(SPECIFIER);
                SPEC_NOUN($$) = V_INT   ;
             }
    | LONG   {
-               $$=newLink();
-               $$->class = SPECIFIER   ;
+               $$=newLink(SPECIFIER);
 	       SPEC_LONG($$) = 1       ;
             }
    | SIGNED {
-               $$=newLink();
-               $$->class = SPECIFIER   ;
+               $$=newLink(SPECIFIER);
                $$->select.s._signed = 1;
             }
    | UNSIGNED  {
-               $$=newLink();
-               $$->class = SPECIFIER   ;
+               $$=newLink(SPECIFIER);
                SPEC_USIGN($$) = 1      ;
             }
    | VOID   {
-               $$=newLink();
-               $$->class = SPECIFIER   ;
+               $$=newLink(SPECIFIER);
                SPEC_NOUN($$) = V_VOID  ;
             }
    | CONST  {
-               $$=newLink();
-	       $$->class = SPECIFIER ;
+               $$=newLink(SPECIFIER);
 	       SPEC_CONST($$) = 1;
             }
    | VOLATILE  {
-               $$=newLink();
-	       $$->class = SPECIFIER ;
+               $$=newLink(SPECIFIER);
 	       SPEC_VOLATILE($$) = 1 ;
             }
    | FLOAT  {
-               $$=newLink();
+               $$=newLink(SPECIFIER);
 	       SPEC_NOUN($$) = V_FLOAT;
-	       $$->class = SPECIFIER ;
             }
    | XDATA     {
-                  $$ = newLink ();
-                  $$->class = SPECIFIER ;
+                  $$ = newLink (SPECIFIER);
                   SPEC_SCLS($$) = S_XDATA  ;
                }
    | CODE      {
-                  $$ = newLink () ;
-                  $$->class = SPECIFIER  ;
+                  $$ = newLink (SPECIFIER) ;
                   SPEC_SCLS($$) = S_CODE ;                 
                }
    | EEPROM      {
-                  $$ = newLink () ;
-                  $$->class = SPECIFIER  ;
+                  $$ = newLink (SPECIFIER) ;
                   SPEC_SCLS($$) = S_EEPROM ;
                }
    | DATA      {
-                  $$ = newLink ();
-                  $$->class = SPECIFIER ;
+                  $$ = newLink (SPECIFIER);
                   SPEC_SCLS($$) = S_DATA   ;
                }
    | IDATA     {
-                  $$ = newLink ();
-                  $$->class = SPECIFIER ;
+                  $$ = newLink (SPECIFIER);
                   SPEC_SCLS($$) = S_IDATA  ;
                }
    | PDATA     { 
-                  $$ = newLink ();
-                  $$->class = SPECIFIER ;
+                  $$ = newLink (SPECIFIER);
                   SPEC_SCLS($$) = S_PDATA  ;
                }
    | BIT    {
-               $$=newLink();
-               $$->class = SPECIFIER   ;
+               $$=newLink(SPECIFIER);
                SPEC_NOUN($$) = V_BIT   ;
 	       SPEC_SCLS($$) = S_BIT   ;
 	       SPEC_BLEN($$) = 1;
@@ -677,14 +646,12 @@ type_specifier2
 
 sfr_reg_bit
    :  SBIT  {
-               $$ = newLink() ;
-               $$->class = SPECIFIER ;
+               $$ = newLink(SPECIFIER) ;
                SPEC_NOUN($$) = V_SBIT;
                SPEC_SCLS($$) = S_SBIT;
             }
    |  SFR   {
-               $$ = newLink() ;
-               $$->class = SPECIFIER ;
+               $$ = newLink(SPECIFIER) ;
                SPEC_NOUN($$) = V_CHAR;
                SPEC_SCLS($$) = S_SFR ;
 	       SPEC_USIGN($$) = 1 ;
@@ -702,15 +669,13 @@ struct_or_union_specifier
            sdef->size  = compStructSize($1,sdef);   /* update size of  */
 
            /* Create the specifier */
-           $$ = newLink () ;
-           $$->class = SPECIFIER   ;
+           $$ = newLink (SPECIFIER) ;
            SPEC_NOUN($$) = V_STRUCT;
            SPEC_STRUCT($$)= sdef ;
         }
    | struct_or_union stag
          {
-            $$ = newLink() ;
-            $$->class = SPECIFIER   ;
+            $$ = newLink(SPECIFIER) ;
             SPEC_NOUN($$) = V_STRUCT;
             SPEC_STRUCT($$) = $2 ;
          }
@@ -827,8 +792,7 @@ enum_specifier
                                                 if ((csym = findSym(enumTab,$2,$2->name)))
                                                    $$ = copyLinkChain(csym->type);
                                                 else  {
-                                                   $$ = newLink() ;
-                                                   $$->class = SPECIFIER   ;
+                                                   $$ = newLink(SPECIFIER) ;
                                                    SPEC_NOUN($$) = V_INT   ;
                                                 }
 
@@ -919,7 +883,7 @@ declarator2
          {
             sym_link   *p;
 
-            p = newLink ();
+            p = newLink (DECLARATOR);
             DCL_TYPE(p) = ARRAY ;
             DCL_ELEM(p) = 0     ;
             addDecl($1,0,p);
@@ -934,7 +898,7 @@ declarator2
             if ( SPEC_SCLS(p) != S_LITERAL)
                werror(E_CONST_EXPECTED) ;
             else {
-               p = newLink ();
+               p = newLink (DECLARATOR);
                DCL_TYPE(p) = ARRAY ;
                DCL_ELEM(p) = (int) floatFromVal(tval) ;
                addDecl($1,0,p);
@@ -1029,7 +993,7 @@ pointer
 unqualified_pointer
    :  '*'   
       {
-	$$ = newLink();
+	$$ = newLink(DECLARATOR);
 	DCL_TYPE($$)=UPOINTER;
       }
    ;
@@ -1123,18 +1087,18 @@ abstract_declarator
 abstract_declarator2
    : '(' abstract_declarator ')'    { $$ = $2 ; }
    | '[' ']'                        {             
-                                       $$ = newLink ();
+                                       $$ = newLink (DECLARATOR);
                                        DCL_TYPE($$) = ARRAY ;
                                        DCL_ELEM($$) = 0     ;
                                     }
    | '[' constant_expr ']'          { 
                                        value *val ;
-                                       $$ = newLink ();
+                                       $$ = newLink (DECLARATOR);
                                        DCL_TYPE($$) = ARRAY ;
                                        DCL_ELEM($$) = (int) floatFromVal(val = constExprValue($2,TRUE));
                                     }
    | abstract_declarator2 '[' ']'   {
-                                       $$ = newLink ();
+                                       $$ = newLink (DECLARATOR);
                                        DCL_TYPE($$) = ARRAY ;
                                        DCL_ELEM($$) = 0     ;
                                        $$->next = $1 ;
@@ -1142,7 +1106,7 @@ abstract_declarator2
    | abstract_declarator2 '[' constant_expr ']'
                                     {
                                        value *val ;
-                                       $$ = newLink ();
+                                       $$ = newLink (DECLARATOR);
                                        DCL_TYPE($$) = ARRAY ;
                                        DCL_ELEM($$) = (int) floatFromVal(val = constExprValue($3,TRUE));
                                        $$->next = $1 ;
@@ -1151,11 +1115,11 @@ abstract_declarator2
    | '(' parameter_type_list ')'    { $$ = NULL;}   
    | abstract_declarator2 '(' ')' {
      // $1 must be a pointer to a function
-     sym_link *p=newLink();
+     sym_link *p=newLink(DECLARATOR);
      DCL_TYPE(p) = FUNCTION;
      if (!$1) {
        // ((void (code *) ()) 0) ()
-       $1=newLink();
+       $1=newLink(DECLARATOR);
        DCL_TYPE($1)=CPOINTER;
        $$ = $1;
      }
@@ -1167,11 +1131,11 @@ abstract_declarator2
        werror(E_TOO_FEW_PARMS);
      } else {
        // $1 must be a pointer to a function
-       sym_link *p=newLink();
+       sym_link *p=newLink(DECLARATOR);
        DCL_TYPE(p) = FUNCTION;
        if (!$1) {
 	 // ((void (code *) (void)) 0) ()
-	 $1=newLink();
+	 $1=newLink(DECLARATOR);
 	 DCL_TYPE($1)=CPOINTER;
 	 $$ = $1;
        }

@@ -2118,7 +2118,7 @@ aggrToPtr (sym_link * type, bool force)
     return type;
 
   etype = getSpec (type);
-  ptype = newLink ();
+  ptype = newLink (DECLARATOR);
 
   ptype->next = type;
 
@@ -2451,8 +2451,7 @@ geniCodeAddressOf (operand * op)
 /*  return op; */
 /*     } */
 
-  p = newLink ();
-  p->class = DECLARATOR;
+  p = newLink (DECLARATOR);
 
 #ifdef JWK
   /* set the pointer depending on the storage class */

@@ -2503,6 +2503,7 @@ packForPush (iCode * ic, eBBlock ** ebpp, int blockno)
 	return ;
     }
     /* make sure they have the same type */
+    if (IS_SPEC(operandType(IC_LEFT(ic))))
     {
       sym_link *itype=operandType(IC_LEFT(ic));
       sym_link *ditype=operandType(IC_RIGHT(dic));

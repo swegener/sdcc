@@ -183,12 +183,15 @@ typedef struct declarator
   }
 declarator;
 
-#define DECLARATOR   0
-#define SPECIFIER    1
+typedef enum {
+  DECLARATOR=1,
+  SPECIFIER
+} SYM_LINK_CLASS;
+#define DECLSPEC2TXT(select) (select==DECLARATOR?"DECLARATOR":select==SPECIFIER?"SPECIFIER":"UNKNOW")
 
 typedef struct sym_link
   {
-    unsigned class:1;		/* DECLARATOR or SPECIFIER    */
+    SYM_LINK_CLASS class;	/* DECLARATOR or SPECIFIER    */
     unsigned tdef:1;		/* current link created by    */
     /* typedef if this flag is set */
     union
@@ -313,12 +316,18 @@ typedef struct symbol
   }
 symbol;
 
+extern sym_link *validateLink(sym_link 	*l, 
+			       const char 	*macro,
+			       const char 	*args,
+			       const char 	select,
+			       const char 	*file, 
+			       unsigned 	line);
 /* Easy Access Macros */
-#define DCL_TYPE(l)  l->select.d.dcl_type
-#define DCL_ELEM(l)  l->select.d.num_elem
-#define DCL_PTR_CONST(l) l->select.d.ptr_const
-#define DCL_PTR_VOLATILE(l) l->select.d.ptr_volatile
-#define DCL_TSPEC(l) l->select.d.tspec
+#define DCL_TYPE(l)  validateLink(l, "DCL_TYPE", #l, DECLARATOR, __FILE__, __LINE__)->select.d.dcl_type
+#define DCL_ELEM(l)  validateLink(l, "DCL_ELEM", #l, DECLARATOR, __FILE__, __LINE__)->select.d.num_elem
+#define DCL_PTR_CONST(l) validateLink(l, "DCL_PTR_CONST", #l, DECLARATOR, __FILE__, __LINE__)->select.d.ptr_const
+#define DCL_PTR_VOLATILE(l) validateLink(l, "DCL_PTR_VOLATILE", #l, DECLARATOR, __FILE__, __LINE__)->select.d.ptr_volatile
+#define DCL_TSPEC(l) validateLink(l, "DCL_TSPEC", #l, DECLARATOR, __FILE__, __LINE__)->select.d.tspec
 
 #define FUNC_DEBUG //assert(IS_FUNC(x));
 #define FUNC_HASVARARGS(x) (x->funcAttrs.hasVargs)
@@ -362,35 +371,35 @@ symbol;
    options.model == MODEL_MEDIUM || \
   IFFUNC_BANKED(x)))
 
-#define SPEC_NOUN(x) x->select.s.noun
-#define SPEC_LONG(x) x->select.s._long
-#define SPEC_USIGN(x) x->select.s._unsigned
-#define SPEC_SCLS(x) x->select.s.sclass
-#define SPEC_ENUM(x) x->select.s._isenum
-#define SPEC_OCLS(x) x->select.s.oclass
-#define SPEC_STAT(x) x->select.s._static
-#define SPEC_EXTR(x) x->select.s._extern
-#define SPEC_CODE(x) x->select.s._codesg
-#define SPEC_ABSA(x) x->select.s._absadr
-#define SPEC_BANK(x) x->select.s._regbank
-#define SPEC_ADDR(x) x->select.s._addr
-#define SPEC_STAK(x) x->select.s._stack
-#define SPEC_CVAL(x) x->select.s.const_val
-#define SPEC_BSTR(x) x->select.s._bitStart
-#define SPEC_BLEN(x) x->select.s._bitLength
+#define SPEC_NOUN(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.noun
+#define SPEC_LONG(x) validateLink(x, "SPEC_LONG", #x, SPECIFIER, __FILE__, __LINE__)->select.s._long
+#define SPEC_USIGN(x) validateLink(x, "SPEC_USIGN", #x, SPECIFIER, __FILE__, __LINE__)->select.s._unsigned
+#define SPEC_SCLS(x) validateLink(x, "SPEC_SCLS", #x, SPECIFIER, __FILE__, __LINE__)->select.s.sclass
+#define SPEC_ENUM(x) validateLink(x, "SPEC_ENUM", #x, SPECIFIER, __FILE__, __LINE__)->select.s._isenum
+#define SPEC_OCLS(x) validateLink(x, "SPEC_OCLS", #x, SPECIFIER, __FILE__, __LINE__)->select.s.oclass
+#define SPEC_STAT(x) validateLink(x, "SPEC_STAT", #x, SPECIFIER, __FILE__, __LINE__)->select.s._static
+#define SPEC_EXTR(x) validateLink(x, "SPEC_EXTR", #x, SPECIFIER, __FILE__, __LINE__)->select.s._extern
+#define SPEC_CODE(x) validateLink(x, "SPEC_CODE", #x, SPECIFIER, __FILE__, __LINE__)->select.s._codesg
+#define SPEC_ABSA(x) validateLink(x, "SPEC_ABSA", #x, SPECIFIER, __FILE__, __LINE__)->select.s._absadr
+#define SPEC_BANK(x) validateLink(x, "SPEC_BANK", #x, SPECIFIER, __FILE__, __LINE__)->select.s._regbank
+#define SPEC_ADDR(x) validateLink(x, "SPEC_ADDR", #x, SPECIFIER, __FILE__, __LINE__)->select.s._addr
+#define SPEC_STAK(x) validateLink(x, "SPEC_STAK", #x, SPECIFIER, __FILE__, __LINE__)->select.s._stack
+#define SPEC_CVAL(x) validateLink(x, "SPEC_CVAL", #x, SPECIFIER, __FILE__, __LINE__)->select.s.const_val
+#define SPEC_BSTR(x) validateLink(x, "SPEC_BSTR", #x, SPECIFIER, __FILE__, __LINE__)->select.s._bitStart
+#define SPEC_BLEN(x) validateLink(x, "SPEC_BLEN", #x, SPECIFIER, __FILE__, __LINE__)->select.s._bitLength
 
 /* Sleaze: SPEC_ISR_SAVED_BANKS is only used on 
  * function type symbols, which obviously cannot
  * be of BIT type. Therefore, we recycle the 
  * _bitStart field instead of defining a new field.
  */
-#define SPEC_ISR_SAVED_BANKS(x) x->select.s._bitStart
-#define SPEC_VOLATILE(x) x->select.s._volatile
-#define SPEC_CONST(x) x->select.s._const
-#define SPEC_STRUCT(x) x->select.s.v_struct
-#define SPEC_TYPEDEF(x) x->select.s._typedef
-#define SPEC_REGPARM(x) x->select.s._isregparm
-#define SPEC_ARGREG(x) x->select.s.argreg
+#define SPEC_ISR_SAVED_BANKS(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s._bitStart
+#define SPEC_VOLATILE(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s._volatile
+#define SPEC_CONST(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s._const
+#define SPEC_STRUCT(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.v_struct
+#define SPEC_TYPEDEF(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s._typedef
+#define SPEC_REGPARM(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s._isregparm
+#define SPEC_ARGREG(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.argreg
 
 /* type check macros */
 #define IS_DECL(x)   ( x && x->class == DECLARATOR	)
@@ -415,7 +424,7 @@ symbol;
 #define IS_TYPEDEF(x)(IS_SPEC(x) && x->select.s._typedef)
 #define IS_CONSTANT(x)  (!x ? 0 : \
                            IS_SPEC(x) ? \
-                           x->select.s._const == 1 : \
+                           x->select.s._const : \
                            x->select.d.ptr_const)
 #define IS_STRUCT(x) (IS_SPEC(x) && x->select.s.noun == V_STRUCT)
 #define IS_ABSOLUTE(x)  (IS_SPEC(x) && x->select.s._absadr )
@@ -485,7 +494,7 @@ extern sym_link *floatType;
 /* forward definitions for the symbol table related functions */
 void initSymt ();
 symbol *newSymbol (char *, int);
-sym_link *newLink ();
+sym_link *newLink (SYM_LINK_CLASS);
 sym_link *newFloatLink ();
 structdef *newStruct (char *);
 void addDecl (symbol *, int, sym_link *);

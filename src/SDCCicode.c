@@ -1904,10 +1904,12 @@ geniCodeDivision (operand * left, operand * right)
 
   resType = usualBinaryConversions (&left, &right);
 
-  /* if the right is a literal & power of 2 */
-  /* then make it a right shift             */
+  /* if the right is a literal & power of 2 
+     and left is unsigned then make it a    
+     right shift */
   if (IS_LITERAL (retype) &&
       !IS_FLOAT (letype) &&
+      SPEC_USIGN(letype) &&
       (p2 = powof2 ((unsigned long)
 		    floatFromVal (right->operand.valOperand)))) {
     ic = newiCode (RIGHT_OP, left, operandFromLit (p2)); /* right shift */

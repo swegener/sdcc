@@ -58,6 +58,8 @@
 
 #ifdef _MULINT_ASM_LARGE
 
+#pragma SAVE
+#pragma LESS_PEDANTIC
 unsigned int
 _muluint (unsigned int a, unsigned int b)	// in future: _mulint
 {
@@ -109,6 +111,7 @@ _muluint (unsigned int a, unsigned int b)	// in future: _mulint
     ret
   _endasm;
 }
+#pragma RESTORE
 
 int
 _mulsint (int a, int b)		// obsolete

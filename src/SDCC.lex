@@ -73,6 +73,7 @@ struct options  save_options  ;
      P_STACKAUTO ,
      P_NOJTBOUND ,
      P_NOOVERLAY ,
+     P_LESSPEDANTIC,
      P_NOGCSE    ,
      P_CALLEE_SAVES,
      P_EXCLUDE   ,
@@ -456,6 +457,9 @@ void doPragma (int op, char *cp)
     case P_NOOVERLAY:
 	options.noOverlay = 1;
 	break;
+    case P_LESSPEDANTIC:
+        options.lessPedantic = 1;
+	break;
     case P_CALLEE_SAVES:
 	{
 	    int i=0;
@@ -543,6 +547,11 @@ int process_pragma(char *s)
 
     if (strncmp(cp,PRAGMA_NOOVERLAY,strlen(PRAGMA_NOOVERLAY)) == 0) {
 	doPragma (P_NOOVERLAY,NULL);
+	return 0;
+    }
+    
+    if (strncmp(cp,PRAGMA_LESSPEDANTIC,strlen(PRAGMA_LESSPEDANTIC)) == 0) {
+	doPragma(P_LESSPEDANTIC,cp+strlen(PRAGMA_LESSPEDANTIC));
 	return 0;
     }
     

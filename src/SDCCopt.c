@@ -886,16 +886,18 @@ eBBlockFromiCode (iCode * ic)
 
     }
 
-  // this is a good place to check missing return values
-  if (currFunc) {
-    if (!IS_VOID(currFunc->type->next)) {
-      eBBlock *bp;
-      // make sure all predecessors of the last block end in a return
-      for (bp=setFirstItem(ebbs[saveCount-1]->predList); 
-	   bp; 
-	   bp=setNextItem(ebbs[saveCount-1]->predList)) {
-	if (bp->ech->op != RETURN) {
-	  werror (W_VOID_FUNC, currFunc->name);
+  if (!options.lessPedantic) {
+    // this is a good place to check missing return values
+    if (currFunc) {
+      if (!IS_VOID(currFunc->type->next)) {
+	eBBlock *bp;
+	// make sure all predecessors of the last block end in a return
+	for (bp=setFirstItem(ebbs[saveCount-1]->predList); 
+	     bp; 
+	     bp=setNextItem(ebbs[saveCount-1]->predList)) {
+	  if (bp->ech->op != RETURN) {
+	    werror (W_VOID_FUNC, currFunc->name);
+	  }
 	}
       }
     }

@@ -97,6 +97,8 @@ typedef int bool;
 #define PRAGMA_EXCLUDE     "EXCLUDE"
 #define PRAGMA_NOIV        "NOIV"
 #define PRAGMA_OVERLAY     "OVERLAY"
+#define PRAGMA_LESSPEDANTIC "LESS_PEDANTIC"
+
 #define  SMALL_MODEL 0
 #define  LARGE_MODEL 1
 #define  TRUE 1

@@ -1,3 +1,11 @@
+2003-04-03    <johan@balder>
+
+	* device/lib/_mulint.c (_muluint): new #pragma LESS_PEDANTIC
+	* src/SDCCopt.c (eBBlockFromiCode): new #pragma LESS_PEDANTIC
+	* src/SDCCglobl.h (PRAGMA_LESSPEDANTIC): new #pragma LESS_PEDANTIC
+	* src/SDCC.lex (doPragma): new #pragma LESS_PEDANTIC
+	* src/SDCCmain.c (parseCmdLine): new #pragma LESS_PEDANTIC
+
 2003-04-03  Bernhard Held <bernhard@bernhardheld.de>
 
 	* _decdptr.c: fix return values

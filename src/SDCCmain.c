@@ -114,7 +114,7 @@ char buffer[PATH_MAX * 2];
 #define OPTION_NO_LABEL_OPT     "--nolabelopt"
 #define OPTION_NO_LOOP_INV 	"--noinvariant"
 #define OPTION_NO_LOOP_IND	"--noinduction"
-#define OPTION_LESS_PEDANTIC	"--lesspedantic"
+#define OPTION_LESS_PEDANTIC	"--less-pedantic"
 #define OPTION_NO_GCSE		"--nogcse"
 #define OPTION_SHORT_IS_8BITS 	"--short-is-8bits"
 #define OPTION_TINI_LIBID 	"--tini-libid"

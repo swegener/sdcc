@@ -2287,7 +2287,10 @@ decorateType (ast * tree, RESULT_TYPE resultType)
        upon tree->opval.op, if resultType can be propagated */
     resultTypeProp = resultTypePropagate (tree, resultType);
 
-    dtl = decorateType (tree->left, resultTypeProp);
+    if (tree->opval.op == '?')
+      dtl = decorateType (tree->left, RESULT_TYPE_NONE);
+    else
+      dtl = decorateType (tree->left, resultTypeProp);
 
     /* if an array node, we may need to swap branches */
     if (tree->opval.op == '[')
@@ -2791,7 +2794,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	{
 	  tree->type = EX_VALUE;
 	  tree->opval.val = valDiv (valFromType (LETYPE (tree)),
-				    valFromType (RETYPE (tree)));
+				    valFromType (RETYPE (tree)),
+		               resultType == RESULT_TYPE_CHAR ? FALSE : TRUE);
 	  tree->right = tree->left = NULL;
 	  TETYPE (tree) = getSpec (TTYPE (tree) =
 				   tree->opval.val->type);
@@ -2946,7 +2950,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	{
 	  tree->type = EX_VALUE;
 	  tree->opval.val = valMult (valFromType (LETYPE (tree)),
-				     valFromType (RETYPE (tree)));
+				     valFromType (RETYPE (tree)),
+		               resultType == RESULT_TYPE_CHAR ? FALSE : TRUE);
 	  tree->right = tree->left = NULL;
 	  TETYPE (tree) = getSpec (TTYPE (tree) =
 				   tree->opval.val->type);

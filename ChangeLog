@@ -1,3 +1,7 @@
+2004-02-23 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCast.c (decorateType): fixed bug #902362
+
 2004-02-21 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* device/include/Makefile.in (install): fixed by replacing spaces

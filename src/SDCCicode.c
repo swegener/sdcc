@@ -1560,25 +1560,50 @@ void geniCodeGoto (symbol *label)
 /*-----------------------------------------------------------------*/
 /* geniCodeMultiply - gen intermediate code for multiplication     */
 /*-----------------------------------------------------------------*/
-operand *geniCodeMultiply (operand *left, operand *right)
-{
+operand *geniCodeMultiply (operand *left, operand *right,bool ptrSizeCalculation)
+{ 
     iCode *ic ;
     int p2 = 0;
+	int saveOption;
     sym_link *resType ;
     LRTYPE ;
 
     /* if they are both literal then we know the result */
-    if (IS_LITERAL(letype) && IS_LITERAL(retype))
-  return operandFromValue (valMult(left->operand.valOperand,
-           right->operand.valOperand));
+    if (IS_LITERAL(letype) && IS_LITERAL(retype)) 
+	return operandFromValue (valMult(left->operand.valOperand,
+					 right->operand.valOperand));
+        
 
-    resType = usualBinaryConversions(&left, &right);
+	//Force 1 byte * 1 byte = 2 bytes result if we are computing ptr size
+	if ((ptrSizeCalculation)&&(1==getSize(rtype))&&
+		(1==getSize(ltype))) {
+		saveOption = options.ANSIint;
+		options.ANSIint = 0;
+		resType = usualBinaryConversions(&left, &right);
+ 		ltype = operandType(left);
+		rtype = operandType(right);
+		SPEC_SHORT(getSpec(resType)) = 0;
+		options.ANSIint = saveOption;
+	}
+	else
+	   resType = usualBinaryConversions(&left, &right);
 
     /* if the right is a literal & power of 2 */
     /* then make it a left shift              */
-    if (IS_LITERAL(retype) && !IS_FLOAT(letype) &&
-  (p2 = powof2 ((unsigned long)floatFromVal(right->operand.valOperand))))
-  ic = newiCode(LEFT_OP, left,operandFromLit(p2)); /* left shift */
+	/*If we are computing  ptr size then normal multiplication*/
+	/*code generated for 1 byte * 1 byte literal = 2 bytes result is more efficient in most cases*/
+	/*than 2 bytes result = 2 bytes << literal if port as 1 byte muldiv*/
+    if	(IS_LITERAL(retype) && !IS_FLOAT(letype) &&
+		!((ptrSizeCalculation)&&(getSize(resType)!=getSize(ltype))&&(1==port->muldiv.native_below))&&
+		(p2 = powof2 ((unsigned long)floatFromVal(right->operand.valOperand))))
+	{
+		if((ptrSizeCalculation)&&(getSize(resType)!=getSize(ltype))){
+			/* LEFT_OP need same size for left and result, */
+			left = geniCodeCast(resType,left,TRUE);
+			ltype = operandType(left);
+		}
+		ic = newiCode(LEFT_OP, left,operandFromLit(p2)); /* left shift */
+	}
     else {
   ic = newiCode('*',left,right);  /* normal multiplication */
   /* if the size left or right > 1 then support routine */
@@ -1702,10 +1727,10 @@ operand *geniCodeSubtract (operand *left, operand *right)
 
     /* if left is an array or pointer */
     if ( IS_PTR(ltype) || IS_ARRAY(ltype) ) {
-  isarray = left->isaddr ;
-  right = geniCodeMultiply (right,
-          operandFromLit(getSize(ltype->next)));
-  resType = copyLinkChain(IS_ARRAY(ltype) ? ltype->next : ltype);
+	  isarray = left->isaddr ;
+	  right = geniCodeMultiply (right,
+					  operandFromLit(getSize(ltype->next)),TRUE);
+	  resType = copyLinkChain(IS_ARRAY(ltype) ? ltype->next : ltype);
     }
     else { /* make them the same size */
         resType = usualBinaryConversions(&left, &right);
@@ -1749,16 +1774,13 @@ operand *geniCodeAdd (operand *left, operand *right )
   return right ;
 
     /* if left is an array or pointer then size */
-    if (IS_PTR(ltype)) {
+    if (IS_PTR(ltype)) {    
+	
+	isarray = left->isaddr;
+	size = 
+	    operandFromLit(getSize(ltype->next));
 
-  isarray = left->isaddr;
-  size =
-      operandFromLit(getSize(ltype->next));
-  if (getSize(ltype) > 1 && (getSize(rtype) < INTSIZE))
-  {
-      right = geniCodeCast(INTTYPE,right,TRUE);
-  }
-  right = geniCodeMultiply (right ,size);
+	right = geniCodeMultiply (right ,size,(getSize(ltype)!= 1));
 
   resType = copyLinkChain(ltype);
     }
@@ -1862,9 +1884,8 @@ operand *geniCodeArray (operand *left,operand *right)
     }
 
     /* array access */
-    right = usualUnaryConversions(right);
     right = geniCodeMultiply(right,
-           operandFromLit(getSize(ltype->next)));
+			     operandFromLit(getSize(ltype->next)),TRUE);
 
     /* we can check for limits here */
     if (isOperandLiteral(right) &&
@@ -1949,9 +1970,13 @@ operand *geniCodePostInc (operand *op)
   rv->noSpilLoc = 1;
 
     geniCodeAssign(rOp,rv,0);
-
+   
     size = (IS_PTR(rvtype) ? getSize(rvtype->next) : 1);
-    ic = newiCode('+',rv,operandFromLit(size));
+	if (IS_FLOAT(rvtype))
+		ic = newiCode('+',rv,operandFromValue(constFloatVal("1.0")));
+	else
+		ic = newiCode('+',rv,operandFromLit(size));
+
     IC_RESULT(ic) = result =newiTempOperand(rvtype,0);
     ADDTOCHAIN(ic);
 
@@ -1982,7 +2007,10 @@ operand *geniCodePreInc (operand *op)
 
 
     size = (IS_PTR(roptype) ? getSize(roptype->next) : 1);
-    ic = newiCode('+',rop,operandFromLit(size));
+	if (IS_FLOAT(roptype))
+		ic = newiCode('+',rop,operandFromValue(constFloatVal("1.0")));
+	else
+		ic = newiCode('+',rop,operandFromLit(size));
     IC_RESULT(ic) = result = newiTempOperand(roptype,0) ;
     ADDTOCHAIN(ic);
 
@@ -2018,9 +2046,13 @@ operand *geniCodePostDec (operand *op)
   rv->noSpilLoc = 1;
 
     geniCodeAssign(rOp,rv,0);
-
+   
     size = (IS_PTR(rvtype) ? getSize(rvtype->next) : 1);
-    ic = newiCode('-',rv,operandFromLit(size));
+	if (IS_FLOAT(rvtype))
+		ic = newiCode('-',rv,operandFromValue(constFloatVal("1.0")));
+	else
+		ic = newiCode('-',rv,operandFromLit(size));          
+
     IC_RESULT(ic) = result =newiTempOperand(rvtype,0);
     ADDTOCHAIN(ic);
 
@@ -2051,7 +2083,10 @@ operand *geniCodePreDec (operand *op)
 
 
     size = (IS_PTR(roptype) ? getSize(roptype->next) : 1);
-    ic = newiCode('-',rop,operandFromLit(size));
+	if (IS_FLOAT(roptype))
+		ic = newiCode('-',rop,operandFromValue(constFloatVal("1.0")));
+	else
+		ic = newiCode('-',rop,operandFromLit(size));
     IC_RESULT(ic) = result = newiTempOperand(roptype,0) ;
     ADDTOCHAIN(ic);
 
@@ -2242,6 +2277,12 @@ operand *geniCodeLeftShift (operand *left, operand *right)
 {
     iCode *ic;
 
+    /* Operands must be promoted to int, according to ISO. */    
+    if (getSize(operandType(right)) < INTSIZE) 
+    {
+	right = geniCodeCast(INTTYPE,right,TRUE);	    
+    }    
+
     /* Note that we don't use the usual binary conversions for the
      * shift operations, in accordance with our ANSI friends.
      */
@@ -2263,6 +2304,12 @@ operand *geniCodeLeftShift (operand *left, operand *right)
 operand *geniCodeRightShift (operand *left, operand *right)
 {
     iCode *ic;
+
+    /* Operands must be promoted to int, according to ISO. */    
+    if (getSize(operandType(right)) < INTSIZE) 
+    {
+	right = geniCodeCast(INTTYPE,right,TRUE);	    
+    }    
 
     /* Note that we don't use the usual binary conversions for the
      * shift operations, in accordance with our ANSI friends.
@@ -3022,7 +3069,7 @@ operand *ast2iCode (ast *tree)
     case '*':
   if ( right )
       return geniCodeMultiply (geniCodeRValue(left,FALSE),
-             geniCodeRValue(right,FALSE));
+				     geniCodeRValue(right,FALSE),FALSE);
   else
       return geniCodeDerefPtr (geniCodeRValue(left,FALSE));
 
@@ -3098,7 +3145,7 @@ operand *ast2iCode (ast *tree)
       geniCodeAssign(left,
          geniCodeMultiply(geniCodeRValue (operandFromOperand(left),
                   FALSE),
-              geniCodeRValue(right,FALSE)),0);
+					    geniCodeRValue(right,FALSE),FALSE),0);
 
     case DIV_ASSIGN:
   return

@@ -907,7 +907,7 @@ floatFromVal (value * val)
   }
 
   if (IS_BITVAR(val->etype)) {
-    return (double) SPEC_CVAL (val->etype).v_ulong;
+    return (double) SPEC_CVAL (val->etype).v_uint;
   }
 
   if (SPEC_NOUN (val->etype) == V_VOID) {

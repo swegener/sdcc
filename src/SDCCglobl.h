@@ -173,6 +173,7 @@ struct options {
     int model  : 3     ; /* see MODEL_* defines above */
     int stackAuto : 3  ; /* Stack Automatic  */
     int useXstack : 3  ; /* use Xternal Stack */
+    int stack10bit : 3;  /* use 10 bit stack (flat24 model only) */
     int genericPtr: 1  ; /* use generic pointers */
     int regExtend : 1  ; /* don't use extended registers */
     int dump_raw  : 1  ; /* dump after intermediate code generation */

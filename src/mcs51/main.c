@@ -80,6 +80,25 @@ static void _mcs51_finaliseOptions(void)
 	port->mem.default_local_map = data;
 	port->mem.default_globl_map = data;
     }
+    
+    if (options.stack10bit)
+    {
+    	if (options.model != MODEL_FLAT24)
+    	{
+            fprintf(stderr, 
+        	    "*** warning: 10 bit stack mode is only supported in flat24 model.\n");
+            fprintf(stderr, "\t10 bit stack mode disabled.\n");
+            options.stack10bit = 0;
+        }
+        else
+        {
+            /* Fixup the memory map for the stack; it is now in
+             * far space and requires a FPOINTER to access it.
+             */
+            istack->fmap = 1;
+            istack->ptrType = FPOINTER; 
+        }
+    }
 }
 
 static void _mcs51_setDefaultOptions(void)

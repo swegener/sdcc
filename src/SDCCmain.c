@@ -78,6 +78,7 @@ char    *preOutName;
 #define OPTION_SMALL_MODEL "-model-small"
 #define OPTION_FLAT24_MODEL "-model-flat24"
 #define OPTION_STACK_AUTO  "-stack-auto"
+#define OPTION_STACK_10BIT "-stack-10bit"
 #define OPTION_XSTACK      "-xstack"
 #define OPTION_GENERIC     "-generic"
 #define OPTION_NO_GCSE     "-nogcse"
@@ -474,7 +475,12 @@ int   parseCmdLine ( int argc, char **argv )
 	    if (strcmp(&argv[i][1],OPTION_FLAT24_MODEL) == 0) {
 		options.model = MODEL_FLAT24;
                 continue;
-	    }	    
+	    }
+	    
+	    if (strcmp(&argv[i][1],OPTION_STACK_10BIT) == 0) {
+	    	options.stack10bit = 1;
+	    	continue;
+	    }
 
 	    if (strcmp(&argv[i][1],OPTION_STACK_AUTO) == 0) {
 		options.stackAuto = 1;

@@ -273,7 +273,7 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
     /* assign depending on the storage class */
     /* if it is on the stack or indirectly addressable */
     /* space we need to assign either r0 or r1 to it   */    
-    if (sym->onStack || sym->iaccess) {
+    if ((sym->onStack && !options.stack10bit) || sym->iaccess) {
         sym->aop = aop = newAsmop(0);
         aop->aopu.aop_ptr = getFreePtr(ic,&aop,result);
         aop->size = getSize(sym->type);
@@ -283,7 +283,6 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
         if (aop->type != AOP_STK) {
 
             if (sym->onStack) {
-
                     if ( _G.accInUse )
                         emitcode("push","acc");
 
@@ -297,7 +296,6 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
 
                     if ( _G.accInUse )
                         emitcode("pop","acc");
-
             } else
                 emitcode("mov","%s,#%s",
                          aop->aopu.aop_ptr->name,
@@ -306,6 +304,33 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
         } else
             aop->aopu.aop_stk = sym->stack;
         return aop;
+    }
+    
+    if (sym->onStack && options.stack10bit)
+    {
+        /* It's on the 10 bit stack, which is located in
+         * far data space.
+         */
+        
+        if ( _G.accInUse )
+        	emitcode("push","acc");
+
+        emitcode("mov","a,_bp");
+        emitcode("add","a,#0x%02x",
+                 ((sym->stack < 0) ?
+                   ((char)(sym->stack - _G.nRegsSaved )) :
+                   ((char)sym->stack)) & 0xff);
+        
+    	emitcode ("mov","dpx,#0x40");
+    	emitcode ("mov","dph,#0x00");
+    	emitcode ("mov", "dpl, a");
+    	
+        if ( _G.accInUse )
+            emitcode("pop","acc");
+            
+    	sym->aop = aop = newAsmop(AOP_DPTR);
+    	aop->size = getSize(sym->type); 
+    	return aop;
     }
 
     /* if in bit space */
@@ -630,12 +655,23 @@ static void freeAsmop (operand *op, asmop *aaop, iCode *ic, bool pop)
             bitVectUnSetBit(ic->rUsed,R1_IDX);          
 
             getFreePtr(ic,&aop,FALSE);
+            
+            if (options.stack10bit)
+            {
+                /* I'm not sure what to do here yet... */
+                /* #STUB */
+            	fprintf(stderr, 
+            		"*** Warning: probably generating bad code for "
+            		"10 bit stack mode.\n");
+            }
+            
             if (stk) {
                 emitcode ("mov","a,_bp");
                 emitcode ("add","a,#0x%02x",((char)stk) & 0xff);
                 emitcode ("mov","%s,a",aop->aopu.aop_ptr->name);
-            } else
+            } else {
                 emitcode ("mov","%s,_bp",aop->aopu.aop_ptr->name);
+            }
 
             while (sz--) {
                 emitcode("pop","acc");
@@ -2016,8 +2052,10 @@ static void genFunction (iCode *ic)
 	    emitcode("inc","%s",spname);
 	}
 	else
+	{
 	    /* set up the stack */
 	    emitcode ("push","_bp");     /* save the callers stack  */
+	}
 	emitcode ("mov","_bp,%s",spname);
     }
 
@@ -2057,7 +2095,9 @@ static void genEndFunction (iCode *ic)
     symbol *sym = OP_SYMBOL(IC_LEFT(ic));
 
     if (IS_RENT(sym->etype) || options.stackAuto)
+    {
         emitcode ("mov","%s,_bp",spname);
+    }
 
     /* if use external stack but some variables were
     added to the local stack then decrement the
@@ -2077,7 +2117,9 @@ static void genEndFunction (iCode *ic)
 	    emitcode("dec","%s",spname);
 	}
 	else
+	{
 	    emitcode ("pop","_bp");
+	}
     }
 
     /* restore the register bank  */    
@@ -6842,14 +6884,33 @@ static void genAddrOf (iCode *ic)
             emitcode("mov","a,_bp");
             emitcode("add","a,#0x%02x",((char) sym->stack & 0xff));
             aopPut(AOP(IC_RESULT(ic)),"a",0);       
-        } else 
+        } else {
             /* we can just move _bp */
             aopPut(AOP(IC_RESULT(ic)),"_bp",0);
+        }
         /* fill the result with zero */
         size = AOP_SIZE(IC_RESULT(ic)) - 1;
+        
+        
+        if (options.stack10bit && size < (FPTRSIZE - 1))
+        {
+            fprintf(stderr, 
+            	    "*** warning: pointer to stack var truncated.\n");
+        }
+        
         offset = 1;
-        while (size--) 
-            aopPut(AOP(IC_RESULT(ic)),zero,offset++);
+        while (size--)
+        {
+            /* Yuck! */
+            if (options.stack10bit && offset == 2)
+            {
+                aopPut(AOP(IC_RESULT(ic)),"#0x40", offset++);
+            }
+            else
+            {
+            	aopPut(AOP(IC_RESULT(ic)),zero,offset++);
+            }
+        }
 
         goto release;
     }

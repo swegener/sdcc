@@ -54,7 +54,6 @@ extern memmap *statsg;		/* static code segment        */
 extern memmap *sfr;		/* register space             */
 extern memmap *sfrbit;		/* sfr bit space              */
 extern memmap *reg;		/* register space             */
-extern memmap *_const;		/* constant segment           */
 extern memmap *generic;		/* unknown                    */
 extern memmap *overlay;		/* the overlay segment        */
 extern memmap *eeprom;		/* eepromp space              */

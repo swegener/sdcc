@@ -1913,6 +1913,9 @@ decorateType (ast * tree)
 	}
       RRVAL (tree) = 1;
       COPYTYPE (TTYPE (tree), TETYPE (tree), LTYPE (tree)->next);
+      if (IS_PTR(LTYPE(tree))) {
+	      SPEC_CONST (TETYPE (tree)) = DCL_PTR_CONST (LTYPE(tree));
+      }
       return tree;
 
 /*------------------------------------------------------------------*/

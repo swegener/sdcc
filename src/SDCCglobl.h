@@ -242,6 +242,8 @@ struct options
     int all_callee_saves; 	/* callee saves for all functions */
     int stack_probe;            /* insert call to function __stack_probe */
     int tini_libid;		/* library ID for TINI */
+    int protect_sp_update;	/* DS390 - will disable interrupts during ESP:SP updates */
+    int parms_in_bank1;       	/* DS390 - use reg bank1 to pass parameters */
     olay olays[128];            /* overlay segments used in #pragma OVERLAY */
     /* starting address of the segments */
     int xstack_loc;		/* initial location of external stack */

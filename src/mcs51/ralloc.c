@@ -2508,7 +2508,7 @@ mcs51_assignRegisters (eBBlock ** ebbs, int count)
   if (options.dump_rassgn)
     {
       dumpEbbsToFileExt (".dumprassgn", ebbs, count);
-      dumpLiveRanges (".lrange", liveRanges);
+      dumpLiveRanges (".dumplrange", liveRanges);
     }
 
   /* do the overlaysegment stuff SDCCmem.c */

@@ -1112,17 +1112,15 @@ pointToEnd (asmop * aop)
 static void
 reAdjustPreg (asmop * aop)
 {
-  int size;
-
   aop->coff = 0;
-  if ((size = aop->size) <= 1)
+  if ((aop->coff==0) || aop->size <= 1)
     return;
-  size--;
+
   switch (aop->type)
     {
     case AOP_R0:
     case AOP_R1:
-      while (size--)
+      while (aop->coff--)
 	emitcode ("dec", "%s", aop->aopu.aop_ptr->name);
       break;
     case AOP_DPTR:
@@ -1131,7 +1129,7 @@ reAdjustPreg (asmop * aop)
 	{
 	  genSetDPTR (1);
 	}
-      while (size--)
+      while (aop->coff--)
 	{
 	  emitcode ("lcall", "__decdptr");
 	}

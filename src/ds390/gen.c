@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-  gen.c - source file for code generation for 8051
+  gen.c - source file for code generation for DS80C390
 
   Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
          and -  Jean-Louis VERN.jlvern@writeme.com (1999)
@@ -22,10 +22,6 @@
   In other words, you are welcome to use, share and improve this program.
   You are forbidden to forbid anyone else to use, share and improve
   what you give them.   Help stamp out software-hoarding!
-
-  Notes:
-  000123 mlh  Moved aopLiteral to SDCCglue.c to help the split
-      Made everything static
 -------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -53,10 +49,6 @@
 #endif
 
 char *aopLiteral (value * val, int offset);
-#if 0
-//REMOVE ME!!!
-extern int allocInfo;
-#endif
 
 /* this is the down and dirty file with all kinds of
    kludgy & hacky stuff. This is what it is all about
@@ -1274,7 +1266,6 @@ aopPut (asmop * aop, char *s, int offset)
 static void
 reAdjustPreg (asmop * aop)
 {
-  emitcode (";jwk","reAdjustPreg: %d", aop->coff);
   if ((aop->coff==0) || (aop->size <= 1)) {
     return;
   }

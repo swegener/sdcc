@@ -483,9 +483,9 @@ mcs51opcodedata;
 static mcs51opcodedata mcs51opcodeDataTable[] =
   {
     {"acall","j", "",   "",   ""},
-    {"ajmp", "j", "",   "",   ""},
     {"add",  "",  "w",  "rw", "r"},
     {"addc", "",  "rw", "rw", "r"},
+    {"ajmp", "j", "",   "",   ""},
     {"anl",  "",  "",   "rw", "r"},
     {"cjne", "j", "w",  "r",  "r"},
     {"clr",  "",  "",   "w",  ""},

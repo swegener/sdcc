@@ -1,3 +1,13 @@
+2004-05-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/ds390/main.c,
+	* src/mcs51/main.c: fixed sort order of mnemonics (thanks to Maarten
+	Brock for spotting this)
+	* src/ds390/gen.c (genEndFunction),
+	* src/mcs51/gen.c (genEndFunction): always save psw if function is an
+	interrupt handler and critical. Disable push/pop optimizations when
+	peephole optimizations disabled.
+
 2004-05-25 Vangelis Rokas <vrokas AT otenet.gr>
 
 	Updated pic16 library sources and headers.

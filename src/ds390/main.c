@@ -630,9 +630,9 @@ ds390opcodedata;
 static ds390opcodedata ds390opcodeDataTable[] =
   {
     {"acall","j", "",   "",   ""},
-    {"ajmp", "j", "",   "",   ""},
     {"add",  "",  "w",  "rw", "r"},
     {"addc", "",  "rw", "rw", "r"},
+    {"ajmp", "j", "",   "",   ""},
     {"anl",  "",  "",   "rw", "r"},
     {"cjne", "j", "w",  "r",  "r"},
     {"clr",  "",  "",   "w",  ""},

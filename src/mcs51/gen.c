@@ -3050,7 +3050,7 @@ genEndFunction (iCode * ic)
       emitcode ("ret", "");
     }
 
-  if (!port->peep.getRegsRead || !port->peep.getRegsWritten)
+  if (!port->peep.getRegsRead || !port->peep.getRegsWritten || options.nopeep)
     return;
   
   /* If this was an interrupt handler using bank 0 that called another */
@@ -3090,8 +3090,8 @@ genEndFunction (iCode * ic)
       && !bitVectBitValue (regsUsed, CND_IDX))
     {
       regsUsed = bitVectUnion (regsUsed, regsUsedPrologue);
-      if (IFFUNC_ISISR (sym->type) && !FUNC_REGBANK(sym->type)
-          && !sym->stack)
+      if (IFFUNC_ISISR (sym->type) && !FUNC_REGBANK (sym->type)
+          && !sym->stack && !FUNC_ISCRITICAL (sym->type))
         bitVectUnSetBit (regsUsed, CND_IDX);
     }
   else

@@ -46,7 +46,13 @@ Z80_OPTS z80_opts;
 static OPTION _z80_options[] = 
   {
     {  0,   "--callee-saves-bc", &z80_opts.calleeSavesBC, "Force a called function to always save BC" },
-    { 80,   "--portmode",        &z80_opts.port_mode,     "Determine PORT I/O mode (z80/z180)" },
+    {  0,   "--portmode=",       NULL,                    "Determine PORT I/O mode (z80/z180)" },
+    {  0, NULL }
+  };
+
+static OPTION _gbz80_options[] = 
+  {
+    {  0,   "--callee-saves-bc", &z80_opts.calleeSavesBC, "Force a called function to always save BC" },
     {  0, NULL }
   };
 
@@ -304,6 +310,19 @@ _parseOptions (int *pargc, char **argv, int *i)
 	      return TRUE;
 	    }
 	}
+      else if (!strncmp (argv[*i], "--portmode=", 11))
+	{
+	  if (!strcmp (argv[*i], "--portmode=z80"))
+	    {
+	      z80_opts.port_mode =  80;
+	      return TRUE;
+	    }
+	  else if (!strcmp (argv[*i], "--portmode=z180"))
+	    {
+	      z80_opts.port_mode =  180;
+	      return TRUE;
+	    }
+	 }
     }
   return FALSE;
 }
@@ -707,7 +726,7 @@ PORT gbz80_port =
   "_",
   _gbz80_init,
   _parseOptions,
-  _z80_options,
+  _gbz80_options,
   _finaliseOptions,
   _setDefaultOptions,
   z80_assignRegisters,

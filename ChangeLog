@@ -1,5 +1,11 @@
 2004-01-13 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
+	* src/z80/main.c (_parseOptions): fixed the portmode= command line
+	option so that it actually works. Made it specific to the z80, since
+	the gbz80 doesn't have these kinds of I/O ports.
+
+2004-01-13 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
 	* device/include/z180.h,
 	* device/lib/_memcpy.c,
 	* device/lib/_memmove.c,

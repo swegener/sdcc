@@ -89,6 +89,7 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
 // PENDING: Straighten this out into configure
+#include <time.h> // all compilers need this
 #ifdef __MINGW32__
 #include <time.h>
 #else

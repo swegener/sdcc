@@ -96,11 +96,17 @@ replace restart {
 } by {
         xor     a,a
 }
-replace restart {
+replace {
         ld      e,#0x00
         ld      d,#0x00
 } by {
         ld      de,#0x0000
+}
+replace {
+	ld	l,#0x00
+	ld	h,#0x00
+} by {
+        ld      hl,#0x0000
 }
 replace restart {
 	ld	%1,a
@@ -118,4 +124,21 @@ replace restart {
 	jr	%3
 %2:
 	jp	%4
+}
+replace {
+	ld	l,e
+	ld	h,d
+	push	hl
+	ld	l,c
+	ld	h,b
+	push	hl
+} by {
+        push	de
+        push    bc
+}
+replace {
+	and	a,#%1
+	or	a,a
+} by {
+        and     a,#%1
 }

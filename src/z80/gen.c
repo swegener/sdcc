@@ -940,7 +940,6 @@ char *
 aopGetLitWordLong (asmop * aop, int offset, bool with_hash)
 {
   char *s = buffer;
-  char *rs;
 
   /* depending on type */
   switch (aop->type)
@@ -994,15 +993,27 @@ aopGetLitWordLong (asmop * aop, int offset, bool with_hash)
 	  }
 	else
 	  {
-	    /* A float */
-	    Z80_FLOAT f;
-	    convertFloat (&f, floatFromVal (val));
+            union {
+              float f;
+              unsigned char c[4];
+            }
+            fl;
+            unsigned int i;
+
+            /* it is type float */
+            fl.f = (float) floatFromVal (val);
+
+#ifdef _BIG_ENDIAN
+            i = fl.c[3-offset] | (fl.c[3-offset-1]<<8);
+#else
+            i = fl.c[offset] | (fl.c[offset+1]<<8);
+#endif
 	    if (with_hash)
-	      tsprintf (buffer, "!immedword", f.w[offset / 2]);
+	      tsprintf (buffer, "!immedword", i);
 	    else
-	      tsprintf (buffer, "!constword", f.w[offset / 2]);
-	    rs = Safe_calloc (1, strlen (buffer) + 1);
-	    return strcpy (rs, buffer);
+	      tsprintf (buffer, "!constword", i);
+
+            return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
 	  }
       }
     default:
@@ -1788,6 +1799,44 @@ _toBoolean (operand * oper)
 }
 
 /*-----------------------------------------------------------------*/
+/* genNotFloat - generates not for float operations              */
+/*-----------------------------------------------------------------*/
+static void
+genNotFloat (operand * op, operand * res)
+{
+  int size, offset;
+  symbol *tlbl;
+
+  emitDebug ("; genNotFloat");
+
+  /* we will put 127 in the first byte of
+     the result */
+  aopPut (AOP (res), "!immedbyte", 0x7F);
+  size = AOP_SIZE (op) - 1;
+  offset = 1;
+
+  _moveA (aopGet (op->aop, offset++, FALSE));
+
+  while (size--)
+    {
+      emit2 ("or a,%s", aopGet (op->aop, offset++, FALSE));
+    }
+
+  tlbl = newiTempLabel (NULL);
+  aopPut (res->aop, "!one", 1);
+  emit2 ("!shortjp z !tlabel", tlbl->key + 100);
+  aopPut (res->aop, "!zero", 1);
+
+  emitLabel(tlbl->key + 100);
+
+  size = res->aop->size - 2;
+  offset = 2;
+  /* put zeros in the rest */
+  while (size--)
+    aopPut (res->aop, "!zero", offset++);
+}
+
+/*-----------------------------------------------------------------*/
 /* genNot - generate code for ! operation                          */
 /*-----------------------------------------------------------------*/
 static void
@@ -1808,7 +1857,8 @@ genNot (iCode * ic)
   /* if type float then do float */
   if (IS_FLOAT (optype))
     {
-      wassertl (0, "Tried to negate a float");
+      genNotFloat (IC_LEFT (ic), IC_RESULT (ic));
+      goto release;
     }
 
   _toBoolean (IC_LEFT (ic));
@@ -1820,6 +1870,7 @@ genNot (iCode * ic)
   emit2 ("sub a,!one");
   outBitC (IC_RESULT (ic));
 
+ release:
   /* release the aops */
   freeAsmop (IC_LEFT (ic), NULL, ic);
   freeAsmop (IC_RESULT (ic), NULL, ic);
@@ -1915,6 +1966,32 @@ _gbz80_emitAddSubLong (iCode *ic, bool isAdd)
 }
 
 /*-----------------------------------------------------------------*/
+/* genUminusFloat - unary minus for floating points                */
+/*-----------------------------------------------------------------*/
+static void
+genUminusFloat (operand * op, operand * result)
+{
+  int size, offset = 0;
+
+  emitDebug("; genUminusFloat");
+
+  /* for this we just need to flip the
+     first it then copy the rest in place */
+  size = AOP_SIZE (op) - 1;
+
+  _moveA(aopGet (AOP (op), MSB32, FALSE));
+
+  emit2("xor a,!immedbyte", 0x80);
+  aopPut (AOP (result), "a", MSB32);
+
+  while (size--)
+    {
+      aopPut (AOP (result), aopGet (AOP (op), offset, FALSE), offset);
+      offset++;
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* genUminus - unary minus code generation                         */
 /*-----------------------------------------------------------------*/
 static void
@@ -1942,7 +2019,7 @@ genUminus (iCode * ic)
   /* if float then do float stuff */
   if (IS_FLOAT (optype))
     {
-      wassertl (0, "Tried to do a unary minus on a float");
+      genUminusFloat (IC_LEFT (ic), IC_RESULT (ic));
       goto release;
     }
 
@@ -2140,7 +2217,7 @@ genIpush (iCode * ic)
 
   size = AOP_SIZE (IC_LEFT (ic));
 
-  if (isPair (AOP (IC_LEFT (ic))))
+  if (isPair (AOP (IC_LEFT (ic))) && size == 2)
     {
       _G.stack.pushed += 2;
       emit2 ("push %s", getPairName (AOP (IC_LEFT (ic))));

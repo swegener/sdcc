@@ -1,5 +1,7 @@
 #include <limits.h>
 
+unsigned long __fs2ulong (float a1);
+
 /* convert float to unsigned char */
 unsigned char __fs2uchar (float f) {
   unsigned long ul=__fs2ulong(f);

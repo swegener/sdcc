@@ -2018,6 +2018,12 @@ packRegsForHLUse (iCode * ic)
 {
   iCode *uic;
 
+  /* PENDING: Could do IFX */
+  if (ic->op == IFX)
+    {
+      return;
+    }
+
   /* has only one definition */
   if (bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) > 1)
     {
@@ -2046,9 +2052,17 @@ packRegsForHLUse (iCode * ic)
       return;
     }
 
-  if (getSize (operandType (IC_RESULT (ic))) != 2)
+  if (uic->op ==IFX)
+    {
+      return;
+    }
+
+  if (getSize (operandType (IC_RESULT (ic))) != 2 ||
+      (IC_LEFT(uic) && getSize (operandType (IC_LEFT (uic))) != 2) ||
+      (IC_RIGHT(uic) && getSize (operandType (IC_RIGHT (uic))) != 2))
     {
       D (D_HLUSE, ("  + Dropping as the result size is not 2\n"));
+      return;
     }
 
   if (IS_Z80)
@@ -2056,6 +2070,8 @@ packRegsForHLUse (iCode * ic)
       if (ic->op == CAST && uic->op == IPUSH)
         goto hluse;
       if (ic->op == ADDRESS_OF && uic->op == IPUSH)
+        goto hluse;
+      if (ic->op == ADDRESS_OF && POINTER_GET (uic) && IS_ITEMP( IC_RESULT (uic)))
         goto hluse;
       if (ic->op == CALL && ic->parmBytes == 0 && (uic->op == '-' || uic->op == '+'))
         goto hluse;
@@ -2223,6 +2239,7 @@ packRegsForAccUse2 (iCode * ic)
        ic->op != '=' &&
        ic->op != EQ_OP &&
        ic->op != CAST &&
+       ic->op != GETHBIT &&
        1)
     {
       D (D_ACCUSE2, ("  + Dropping as not a 'good' source command\n"));

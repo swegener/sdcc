@@ -4,7 +4,7 @@
 #include <testfwk.h>
 
 /* Set to one to show the bug */
-#if 0
+#if 1
 #define NAME(_a)	_a
 #else
 #define NAME(_a)
@@ -38,8 +38,8 @@ static devsw_t _sillyDriver = {
 };
 
 int
-initProxy(void)
+initProxy(devsw_t *pdrv)
 {
-  return (*_sillyDriver.dev_init)(5);
+  return (*pdrv->dev_init)(5);
 }
 

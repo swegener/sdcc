@@ -1,3 +1,5 @@
+float __ulong2fs (unsigned long a );
+
 /* convert unsigned char to float */
 float __uchar2fs (unsigned char uc) {
   unsigned long ul=uc;

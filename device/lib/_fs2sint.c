@@ -1,5 +1,7 @@
 #include <limits.h>
 
+signed long __fs2slong (float f);
+
 /* convert float to signed int */
 signed int __fs2sint (float f) {
   signed long sl=__fs2slong(f);

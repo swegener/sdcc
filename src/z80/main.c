@@ -320,6 +320,7 @@ _setDefaultOptions (void)
   options.mainreturn = 1;
   /* first the options part */
   options.intlong_rent = 1;
+  options.float_rent = 1;
   options.noRegParams = 1;
   /* Default code and data locations. */
   options.code_loc = 0x200;

@@ -1,3 +1,23 @@
+2001-11-07  Michael Hope  <michaelh@juju.net.nz>
+
+	* src/z80/ralloc.c (packRegsForHLUse): Banned IFXs from being packed into HL.
+	(packRegsForHLUse): Added rule to pack address of/pointer get for itemps into HL for the Z80.
+	(packRegsForAccUse2): Added rule to pack hbit IFXs into A.
+
+	* src/z80/main.c (_setDefaultOptions): Made float code re-entrant by default.
+
+	* src/z80/gen.c (aopGetLitWordLong): Added word support for floats.
+	(genNotFloat): Added.
+	(genUminusFloat): Added.
+
+	* device/lib/z80/Makefile: Added floating pt stubs.
+
+	* device/lib/Makefile.in (Z80SOURCES): Added floating pt support.
+
+	* src/z80/gen.c (genIpush): Fixed up a push of one byte when left is in a pair.
+
+	* device/lib/_fsadd.c (__fsadd): Fixed up return where the numbers are hugely different.
+
 2001-11-07  Bernhard Held  <bernhard@bernhardheld.de>
 
 	* sdcc/sim/ucsim/s51.src/glob.cc: Minor fix.

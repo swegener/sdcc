@@ -658,6 +658,7 @@ extern	VOID		out_tw();
 extern	VOID		out_t24(int);
 extern	VOID		outr11();	/* JLH */
 extern	VOID		outr19(struct expr *, int, int);
+extern  VOID		outdp(struct area *, struct expr *);
 
 /* asstore.c */
 extern char *StoreString( char *str );

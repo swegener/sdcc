@@ -5277,7 +5277,7 @@ XAccRsh (int shCount, bool sign)
       return;
     }
   
-  shCount &= 0x000f;		// shCount : 0..7
+  shCount &= 0x000f;		// shCount : 0..f
 
   /* if we can beat 2n cycles or bytes for some special case, do it here */
   switch (shCount)
@@ -5416,87 +5416,6 @@ movLeft2Result (operand * left, int offl,
 
 
 /*-----------------------------------------------------------------*/
-/* AccAXRsh1 - right shift 0->a:x->c by 1                         */
-/*-----------------------------------------------------------------*/
-static void
-AccAXRsh1 (char *x)
-{
-  emitcode ("lsra", "");
-  emitcode ("ror", "%s", x);
-}
-
-
-/*-----------------------------------------------------------------*/
-/* AccAXRshS1 - signed right shift s->a:x->c by 1                         */
-/*-----------------------------------------------------------------*/
-static void
-AccAXRshS1 (char *x)
-{
-  emitcode ("asra", "");
-  emitcode ("ror", "%s", x);
-}
-
-/*-----------------------------------------------------------------*/
-/* AccAXLrl1 - left rotate c<-a:x<-c by 1                          */
-/*-----------------------------------------------------------------*/
-static void
-AccAXLrl1 (char *x)
-{
-  emitcode ("rol", "%s", x);
-  emitcode ("rola", "");
-}
-
-/*-----------------------------------------------------------------*/
-/* AccAXLsh1 - left shift a:x<-0 by 1                              */
-/*-----------------------------------------------------------------*/
-static void
-AccAXLsh1 (char *x)
-{
-  emitcode ("lsl", "%s", x);
-  emitcode ("rola", "");
-}
-
-/*-----------------------------------------------------------------*/
-/* AccAXLsh - left shift a:x by known count (0..7)                 */
-/*-----------------------------------------------------------------*/
-static void
-AccAXLsh (char *x, int shCount)
-{
-  int i;
-
-  for (i=0;i<shCount;i++) {
-    AccAXLsh1 (x);
-  }
-}
-
-/*-----------------------------------------------------------------*/
-/* AccAXRsh - right shift a:x known count (0..7)                   */
-/*-----------------------------------------------------------------*/
-static void
-AccAXRsh (char *x, int shCount)
-{
-  int i;
-
-  for (i=0;i<shCount;i++) {
-    AccAXRsh1 (x);
-  }
-  
-}
-
-/*-----------------------------------------------------------------*/
-/* AccAXRshS - right shift signed a:x known count (0..7)           */
-/*-----------------------------------------------------------------*/
-static void
-AccAXRshS (char *x, int shCount)
-{
-  int i;
-
-  for (i=0;i<shCount;i++) {
-    AccAXRshS1 (x);
-  }
-}
-
-/*-----------------------------------------------------------------*/
 /* shiftL2Left2Result - shift left two bytes from left to result   */
 /*-----------------------------------------------------------------*/
 static void
@@ -5625,6 +5544,7 @@ genlshTwo (operand * result, operand * left, int shCount)
 
   D(emitcode (";     genlshTwo",""));
 
+  
   size = getDataSize (result);
 
   /* if shCount >= 8 */
@@ -5634,10 +5554,9 @@ genlshTwo (operand * result, operand * left, int shCount)
 
       if (size > 1)
 	{
-	  if (shCount)
-	    shiftL1Left2Result (left, LSB, result, MSB16, shCount);
-	  else
-	    movLeft2Result (left, LSB, result, MSB16, 0);
+          loadRegFromAop (hc08_reg_a, AOP (left), 0);
+          AccLsh (shCount);
+	  storeRegToAop (hc08_reg_a, AOP (result), 1);
 	}
       storeConstToAop(zero, AOP (result), LSB);
     }
@@ -5645,10 +5564,9 @@ genlshTwo (operand * result, operand * left, int shCount)
   /*  1 <= shCount <= 7 */
   else
     {
-      if (size == 1)
-	shiftL1Left2Result (left, LSB, result, LSB, shCount);
-      else
-	shiftL2Left2Result (left, LSB, result, LSB, shCount);
+      loadRegFromAop (hc08_reg_xa, AOP (left), 0);
+      XAccLsh (shCount);
+      storeRegToFullAop (hc08_reg_xa, AOP (result), 0);
     }
 }
 
@@ -6343,6 +6261,7 @@ genDataPointerGet (operand * left,
   freeAsmop (result, NULL, ic, TRUE);
 }
 
+#if 0
 /*-----------------------------------------------------------------*/
 /* genNearPointerGet - emitcode for near pointer fetch             */
 /*-----------------------------------------------------------------*/
@@ -6415,9 +6334,8 @@ genNearPointerGet (operand * left,
   }
 
   hc08_freeReg (hc08_reg_hx);
-  
 }
-
+#endif
 
 /*-----------------------------------------------------------------*/
 /* genFarPointerGet - get value from far space                     */
@@ -6699,6 +6617,7 @@ genDataPointerSet (operand * right,
   freeAsmop (NULL, derefaop, ic, TRUE);
 }
 
+#if 0
 /*-----------------------------------------------------------------*/
 /* genNearPointerSet - emitcode for near pointer put                */
 /*-----------------------------------------------------------------*/
@@ -6770,7 +6689,7 @@ genNearPointerSet (operand * right,
   hc08_freeReg (hc08_reg_hx);
   
 }
-
+#endif
 
 /*-----------------------------------------------------------------*/
 /* genFarPointerSet - set value from far space                     */

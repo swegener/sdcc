@@ -1,3 +1,12 @@
+2003-10-28 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* as/hc08/asm.h,
+	* as/hc08/lkrloc.c,
+	* src/hc08/gen.c,
+	* src/hc08/ralloc.c: Fix various warnings related to the hc08
+	* src/SDCCicode.c (geniCodePreInc, geniCodePreDec): Fixed bug #829717
+	(tweaked fix for bug #818696)
+
 2003-10-23 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/z80/ralloc.c (joinPushes): Fixed bug #828742

@@ -1768,6 +1768,7 @@ DEFSETFUNC (deallocStackSpil)
   return 0;
 }
 
+#if 0
 /*-----------------------------------------------------------------*/
 /* farSpacePackable - returns the packable icode for far variables */
 /*-----------------------------------------------------------------*/
@@ -1835,6 +1836,7 @@ farSpacePackable (iCode * ic)
 
   return NULL;
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* packRegsForAssign - register reduction for assignment           */
@@ -2172,6 +2174,7 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
 #define IS_OP_RUONLY(x) (x && IS_SYMOP(x) && OP_SYMBOL(x)->ruonly)
 
 
+#if 0
 /*-----------------------------------------------------------------*/
 /* packRegsForOneuse : - will reduce some registers for single Use */
 /*-----------------------------------------------------------------*/
@@ -2185,8 +2188,7 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
   if (!IS_SYMOP (op))
     return NULL;
 
-  /* only upto 2 bytes since we cannot predict
-     the usage of b, & acc */
+  /* only up to 2 bytes */
   if (getSize (operandType (op)) > (fReturnSizeHC08 - 2))
     return NULL;
 
@@ -2328,6 +2330,7 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
   OP_SYMBOL (op)->ruonly = 1;
   return sic;
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* isBitwiseOptimizable - requirements of JEAN LOUIS VERN          */
@@ -2889,14 +2892,14 @@ packRegisters (eBBlock ** ebpp, int blockno)
 	}
 
 
-      #if 0
+      #if 1
       /* pack registers for accumulator use, when the
          result of an arithmetic or bit wise operation
          has only one use, that use is immediately following
          the defintion and the using iCode has only one
          operand or has two operands but one is literal &
          the result of that operation is not on stack then
-         we can leave the result of this operation in acc:b
+         we can leave the result of this operation in x:a
          combination */
       if ((IS_ARITHMETIC_OP (ic)
 	   || IS_CONDITIONAL(ic)
@@ -2907,7 +2910,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
 	   || (ic->op == ADDRESS_OF && isOperandOnStack (IC_LEFT (ic)))
 	  ) &&
 	  IS_ITEMP (IC_RESULT (ic)) &&
-	  getSize (operandType (IC_RESULT (ic))) <= 2)
+	  getSize (operandType (IC_RESULT (ic))) <= 1)
 
 	packRegsForAccUse (ic);
       #endif

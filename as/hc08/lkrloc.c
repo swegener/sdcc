@@ -515,6 +515,7 @@ relr()
 
 	/* JLH: output only if data (beyond two byte address) */
 	if ((oflag == 1) && (rtcnt > 2)) {
+#if 0
 		int extendedAddress = (a[aindex]->a_addr >> 16) & 0xffff;
 		
 		/* Boy, is this a hack: for ABS sections, the
@@ -542,7 +543,6 @@ relr()
 			newArea();
 		}
 		
-#if 0
 		if (extendedAddress != lastExtendedAddress)
 		{
 		

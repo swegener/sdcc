@@ -2402,7 +2402,7 @@ geniCodePreInc (operand * op, bool lvalue)
   ADDTOCHAIN (ic);
 
   (void) geniCodeAssign (op, result, 0);
-  if (lvalue)
+  if (lvalue || IS_TRUE_SYMOP (op))
     return op;
   else
     return result;
@@ -2485,7 +2485,7 @@ geniCodePreDec (operand * op, bool lvalue)
   ADDTOCHAIN (ic);
 
   (void) geniCodeAssign (op, result, 0);
-  if (lvalue)
+  if (lvalue || IS_TRUE_SYMOP (op))
     return op;
   else
     return result;

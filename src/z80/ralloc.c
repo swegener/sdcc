@@ -2071,7 +2071,6 @@ static void packRegisters (eBBlock *ebp)
 	   result of that operation is not on stack then we can leave the
 	   result of this operation in acc:b combination */
 #if 0
-#if 0
 	if ((IS_ARITHMETIC_OP(ic) 
 	     || IS_BITWISE_OP(ic)
 	     || ic->op == LEFT_OP || ic->op == RIGHT_OP
@@ -2083,7 +2082,6 @@ static void packRegisters (eBBlock *ebp)
 	if (IS_ITEMP(IC_RESULT(ic)) &&
 	    getSize(operandType(IC_RESULT(ic))) == 1)
 	    packRegsForAccUse2(ic);
-#endif
 #endif
     }
 }

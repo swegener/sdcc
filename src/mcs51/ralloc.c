@@ -1841,7 +1841,12 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
     {
       sym_link *etype = operandType (IC_RIGHT (dic));
       if (IS_BITFIELD (etype))
-	return 0;
+        {
+          /* if result is a bit too then it's ok */
+	  etype = operandType (IC_RESULT (dic));
+          if (!IS_BITFIELD (etype))
+	    return 0;
+	}
     }
   /* if the result is on stack or iaccess then it must be
      the same atleast one of the operands */

@@ -1,3 +1,7 @@
+2003-03-15  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/mcs51/ralloc.c (packRegsForAssign): fixed bug #703541
+
 2003-03-13    <johan@balder>
 
 	Hackup const and volatile modifiers in type chains a bit:

@@ -31,7 +31,7 @@ enum
     AOP_REG, AOP_DIR,
     AOP_DPTR, AOP_DPTR2, AOP_R0, AOP_R1,
     AOP_STK, AOP_IMMD, AOP_STR,
-    AOP_CRY, AOP_ACC
+    AOP_CRY, AOP_ACC, AOP_DPTRn
   };
 
 /* type asmop : a homogenised type for 
@@ -53,6 +53,7 @@ typedef struct asmop
 				   AOP_CRY    -  carry contains the value of this
 				   AOP_STR    -  array of strings
 				   AOP_ACC    -  result is in the acc:b pair
+				   AOP_DPTRn  -  is in dptr(n)
 				 */
     short coff;			/* current offset */
     short size;			/* total size */
@@ -61,6 +62,7 @@ typedef struct asmop
     unsigned freed:1;		/* already freed    */
     union
       {
+	short dptr;             /* if AOP_DPTRn */
 	value *aop_lit;		/* if literal */
 	regs *aop_reg[4];	/* array of registers */
 	char *aop_dir;		/* if direct  */

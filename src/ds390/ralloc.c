@@ -83,6 +83,7 @@ int ds390_nRegs = 13;
 static void spillThis (symbol *);
 static void freeAllRegs ();
 static iCode * packRegsDPTRuse (operand *);
+static int packRegsDPTRnuse (operand *,int);
 
 /*-----------------------------------------------------------------*/
 /* allocReg - allocates register of given type                     */
@@ -221,7 +222,9 @@ allDefsOutOfRange (bitVect * defs, int fseq, int toseq)
 static int isOperandInReg(operand *op)
 {
     if (!IS_SYMOP(op)) return 0;
-
+    if (OP_SYMBOL(op)->ruonly) return 1;
+    if (OP_SYMBOL(op)->accuse) return 1;
+    if (OP_SYMBOL(op)->dptr) return 1;
     return bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(op)->key);
 }
 
@@ -308,7 +311,8 @@ static int
 notUsedInBlock (symbol * sym, eBBlock * ebp, iCode * ic)
 {
   return (!bitVectBitsInCommon (sym->defs, ebp->usesDefs) &&
-	  allDefsOutOfRange (sym->defs, ebp->fSeq, ebp->lSeq));
+	  allDefsOutOfRange (sym->defs, ebp->fSeq, ebp->lSeq) &&
+	  allDefsOutOfRange (sym->uses, ebp->fSeq, ebp->lSeq));
 /*     return (!bitVectBitsInCommon(sym->defs,ebp->usesDefs)); */
 }
 
@@ -1150,7 +1154,9 @@ serialRegAssign (eBBlock ** ebbs, int count)
 	  (ebbs[i]->entryLabel != entryLabel &&
 	   ebbs[i]->entryLabel != returnLabel))
 	continue;
-
+      
+/*       if (returnsAtEnd(ebbs[i])) */
+      
       /* of all instructions do */
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
 	{
@@ -1298,131 +1304,159 @@ static void fillGaps()
 {
     symbol *sym =NULL;
     int key =0;    
-    
+    int loop = 0, change;
+
     if (getenv("DISABLE_FILL_GAPS")) return;
     
     /* First try to do DPTRuse once more since now we know what got into
-       registers */
+       registers */ 
+    
+    while (loop++ < 10) {
+	change = 0;
 
-    for (sym = hTabFirstItem(liveRanges,&key) ; sym ; 
-	 sym = hTabNextItem(liveRanges,&key)) {
+	for (sym = hTabFirstItem(liveRanges,&key) ; sym ; 
+	     sym = hTabNextItem(liveRanges,&key)) {
+	    int size = getSize(sym->type);
 
-	if (sym->uptr && !sym->ruonly && getSize(sym->type) < 4) {
-	    if (packRegsDPTRuse(operandFromSymbol(sym))) {
+	    if (sym->liveFrom == sym->liveTo) continue;
 
-                D (fprintf (stderr, "FILL GAPS: found more DPTR use for "
-			    "%s in func %s\n",
-			    sym->name, currFunc ? currFunc->name : "UNKNOWN"));
-		/* if this was ssigned to registers then */
-		if (bitVectBitValue(_G.totRegAssigned,sym->key)) {
+	    if (sym->uptr && sym->dptr==0 && !sym->ruonly && 
+		size < 4 && size > 1) {
 
-		    /* take it out of the register assigned set */
-		    bitVectUnSetBit(_G.totRegAssigned,sym->key);
+		if (packRegsDPTRuse(operandFromSymbol(sym))) {
+		    
+		    /* if this was ssigned to registers then */
+		    if (bitVectBitValue(_G.totRegAssigned,sym->key)) {
+			/* take it out of the register assigned set */
+			bitVectUnSetBit(_G.totRegAssigned,sym->key);
+		    } else if (sym->usl.spillLoc) {
+			sym->usl.spillLoc->allocreq--;
+			sym->usl.spillLoc = NULL;
+		    }
+		    
 		    sym->nRegs = 0;		    
-		} else if (sym->usl.spillLoc) sym->usl.spillLoc->allocreq--;
+		    sym->isspilt = sym->spillA = 0;
+		    continue ;
+		}
 
-		sym->isspilt = sym->spillA = 0;
+		/* try assigning other dptrs */
+		if (sym->dptr == 0 && packRegsDPTRnuse(operandFromSymbol(sym),1) && !getenv("DPTRnDISABLE")) {
+		    /* if this was ssigned to registers then */
+		    if (bitVectBitValue(_G.totRegAssigned,sym->key)) {
+			/* take it out of the register assigned set */
+			bitVectUnSetBit(_G.totRegAssigned,sym->key);
+		    } else if (sym->usl.spillLoc) {
+			sym->usl.spillLoc->allocreq--;
+			sym->usl.spillLoc = NULL;
+		    }
+/* 		    printf("Allocated %s in function %s to DPTR1\n",sym->name,currFunc->name); */
+		    sym->nRegs = 0;		    
+		    sym->isspilt = sym->spillA = 0;		    
+		}
 	    }
 	}
-    }
-
-    /* look for livernages that was spilt by the allocator */
-    for (sym = hTabFirstItem(liveRanges,&key) ; sym ; 
-	 sym = hTabNextItem(liveRanges,&key)) {
-
-	int i;
-	int pdone = 0;
-
-	if (!sym->spillA || !sym->clashes || sym->remat) continue ;
-
-	/* find the liveRanges this one clashes with, that are
-	   still assigned to registers & mark the registers as used*/
-	for ( i = 0 ; i < sym->clashes->size ; i ++) {
-	    int k;
-	    symbol *clr;
-
-	    if (bitVectBitValue(sym->clashes,i) == 0 ||    /* those that clash with this */
-		bitVectBitValue(_G.totRegAssigned,i) == 0) /* and are still assigned to registers */
+	
+	/* look for livernages that was spilt by the allocator */
+	for (sym = hTabFirstItem(liveRanges,&key) ; sym ; 
+	     sym = hTabNextItem(liveRanges,&key)) {
+	    
+	    int i;
+	    int pdone = 0;
+	    
+	    if (!sym->spillA || !sym->clashes || sym->remat) continue ;
+	    if (!sym->uses || !sym->defs) continue ;
+	    /* find the liveRanges this one clashes with, that are
+	       still assigned to registers & mark the registers as used*/
+	    for ( i = 0 ; i < sym->clashes->size ; i ++) {
+		int k;
+		symbol *clr;
+		
+		if (bitVectBitValue(sym->clashes,i) == 0 ||    /* those that clash with this */
+		    bitVectBitValue(_G.totRegAssigned,i) == 0) /* and are still assigned to registers */
+		    continue ;
+		
+		assert (clr = hTabItemWithKey(liveRanges,i));
+		
+		/* mark these registers as used */
+		for (k = 0 ; k < clr->nRegs ; k++ ) 
+		    useReg(clr->regs[k]);
+	    }
+	    
+	    if (willCauseSpill(sym->nRegs,sym->regType)) {
+		/* NOPE :( clear all registers & and continue */
+		freeAllRegs();
 		continue ;
-
-	    assert (clr = hTabItemWithKey(liveRanges,i));
-	 
-	    /* mark these registers as used */
-	    for (k = 0 ; k < clr->nRegs ; k++ ) 
-		useReg(clr->regs[k]);
-	}
-
-	if (willCauseSpill(sym->nRegs,sym->regType)) {
-	    /* NOPE :( clear all registers & and continue */
-	    freeAllRegs();
-	    continue ;
-	}
-
-	/* THERE IS HOPE !!!! */
-	for (i=0; i < sym->nRegs ; i++ ) {
-	    if (sym->regType == REG_PTR)
-		sym->regs[i] = getRegPtrNoSpil ();
-	    else
-		sym->regs[i] = getRegGprNoSpil ();		  
-	}
-
-	/* for all its definitions & uses check if the registers
-	   allocated needs positioning NOTE: we can position
-	   only ONCE if more than One positioning required 
-	   then give up */
-	sym->isspilt = 0;
-	for (i = 0 ; i < sym->defs->size ; i++ ) {
-	    if (bitVectBitValue(sym->defs,i)) {
-		iCode *ic;
-		if (!(ic = hTabItemWithKey(iCodehTab,i))) continue ;
-		if (SKIP_IC(ic)) continue;
-		assert(isSymbolEqual(sym,OP_SYMBOL(IC_RESULT(ic)))); /* just making sure */
-		/* if left is assigned to registers */
-		if (IS_SYMOP(IC_LEFT(ic)) && 
-		    bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_LEFT(ic))->key)) {
-		    pdone += positionRegs(sym,OP_SYMBOL(IC_LEFT(ic)));
-		}
-		if (IS_SYMOP(IC_RIGHT(ic)) && 
-		    bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_RIGHT(ic))->key)) {
-		    pdone += positionRegs(sym,OP_SYMBOL(IC_RIGHT(ic)));
-		}
-		if (pdone > 1) break;
 	    }
-	}
-       	for (i = 0 ; i < sym->uses->size ; i++ ) {
-	    if (bitVectBitValue(sym->uses,i)) {
-		iCode *ic;
-		if (!(ic = hTabItemWithKey(iCodehTab,i))) continue ;
-		if (SKIP_IC(ic)) continue;
-		if (!IS_ASSIGN_ICODE(ic)) continue ;
-
-		/* if result is assigned to registers */
-		if (IS_SYMOP(IC_RESULT(ic)) && 
-		    bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_RESULT(ic))->key)) {
-		    pdone += positionRegs(sym,OP_SYMBOL(IC_RESULT(ic)));
-		}
-		if (pdone > 1) break;
-	    }
-	}
-	/* had to position more than once GIVE UP */
-	if (pdone > 1) {
-	    /* UNDO all the changes we made to try this */
-	    sym->isspilt = 1;
+	    
+	    /* THERE IS HOPE !!!! */
 	    for (i=0; i < sym->nRegs ; i++ ) {
-		sym->regs[i] = NULL;
+		if (sym->regType == REG_PTR)
+		    sym->regs[i] = getRegPtrNoSpil ();
+		else
+		    sym->regs[i] = getRegGprNoSpil ();		  
 	    }
-	    freeAllRegs();
-	    D (fprintf (stderr, "Fill Gap gave up due to positioning for "
-			"%s in function %s\n",
+	    
+	    /* for all its definitions & uses check if the registers
+	       allocated needs positioning NOTE: we can position
+	       only ONCE if more than One positioning required 
+	       then give up */
+	    sym->isspilt = 0;
+	    for (i = 0 ; i < sym->defs->size ; i++ ) {
+		if (bitVectBitValue(sym->defs,i)) {
+		    iCode *ic;
+		    if (!(ic = hTabItemWithKey(iCodehTab,i))) continue ;
+		    if (SKIP_IC(ic)) continue;
+		    assert(isSymbolEqual(sym,OP_SYMBOL(IC_RESULT(ic)))); /* just making sure */
+		    /* if left is assigned to registers */
+		    if (IS_SYMOP(IC_LEFT(ic)) && 
+			bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_LEFT(ic))->key)) {
+			pdone += positionRegs(sym,OP_SYMBOL(IC_LEFT(ic)));
+		    }
+		    if (IS_SYMOP(IC_RIGHT(ic)) && 
+			bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_RIGHT(ic))->key)) {
+			pdone += positionRegs(sym,OP_SYMBOL(IC_RIGHT(ic)));
+		    }
+		    if (pdone > 1) break;
+		}
+	    }
+	    for (i = 0 ; i < sym->uses->size ; i++ ) {
+		if (bitVectBitValue(sym->uses,i)) {
+		    iCode *ic;
+		    if (!(ic = hTabItemWithKey(iCodehTab,i))) continue ;
+		    if (SKIP_IC(ic)) continue;
+		    if (!IS_ASSIGN_ICODE(ic)) continue ;
+		    
+		    /* if result is assigned to registers */
+		    if (IS_SYMOP(IC_RESULT(ic)) && 
+			bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_RESULT(ic))->key)) {
+			pdone += positionRegs(sym,OP_SYMBOL(IC_RESULT(ic)));
+		    }
+		    if (pdone > 1) break;
+		}
+	    }
+	    /* had to position more than once GIVE UP */
+	    if (pdone > 1) {
+		/* UNDO all the changes we made to try this */
+		sym->isspilt = 1;
+		for (i=0; i < sym->nRegs ; i++ ) {
+		    sym->regs[i] = NULL;
+		}
+		freeAllRegs();
+		D (fprintf (stderr, "Fill Gap gave up due to positioning for "
+			    "%s in function %s\n",
+			    sym->name, currFunc ? currFunc->name : "UNKNOWN"));
+		continue ;	    
+	    }
+	    D (fprintf (stderr, "FILLED GAP for %s in function %s\n",
 			sym->name, currFunc ? currFunc->name : "UNKNOWN"));
-	    continue ;	    
+	    _G.totRegAssigned = bitVectSetBit(_G.totRegAssigned,sym->key);
+	    sym->isspilt = sym->spillA = 0 ;
+	    sym->usl.spillLoc->allocreq--;
+	    sym->usl.spillLoc = NULL;
+	    freeAllRegs();
+	    change ++;
 	}
-	D (fprintf (stderr, "FILLED GAP for %s in function %s\n",
-		    sym->name, currFunc ? currFunc->name : "UNKNOWN"));
-	_G.totRegAssigned = bitVectSetBit(_G.totRegAssigned,sym->key);
-	sym->isspilt = sym->spillA = 0 ;
-	sym->usl.spillLoc->allocreq--;
-	freeAllRegs();
+	if (!change) break;
     }
 }
 
@@ -1917,6 +1951,7 @@ pack:
   /* replace the result with the result of */
   /* this assignment and remove this assignment */
   bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
+
   IC_RESULT (dic) = IC_RESULT (ic);
 
   if (IS_ITEMP (IC_RESULT (dic)) && OP_SYMBOL (IC_RESULT (dic))->liveFrom > dic->seq)
@@ -2099,6 +2134,103 @@ right:
 
 
 /*-----------------------------------------------------------------*/
+/* packRegsDPTRnuse - color live ranges that can go into extra DPTRS */
+/*-----------------------------------------------------------------*/
+static int packRegsDPTRnuse( operand *op , int dptr)
+{
+    int i,key;
+    iCode *ic;
+
+    if (!IS_SYMOP(op) || !IS_ITEMP(op)) return 0;
+    if (OP_SYMBOL(op)->remat || OP_SYMBOL(op)->ruonly || OP_SYMBOL(op)->dptr) 
+	return 0; 
+    
+    /* first check if any overlapping liverange has already been
+       assigned to this DPTR */
+    if (OP_SYMBOL(op)->clashes) {
+	for (i = 0 ; i < OP_SYMBOL(op)->clashes->size ; i++ ) {
+	    symbol *sym;
+	    if (bitVectBitValue(OP_SYMBOL(op)->clashes,i)) {
+		sym = hTabItemWithKey(liveRanges,i);
+		if (sym->dptr == dptr) return 0;
+	    }
+	}
+    }
+   
+    /* future for more dptrs */
+    if (dptr > 1) {
+	OP_SYMBOL(op)->dptr = dptr;
+	return 1;
+    }
+
+    /* DPTR1 is special since it is also used as a scratch by the backend .
+       so we walk thru the entire live range of this operand and make sure
+       DPTR1 will not be used by the backed . The logic here is to find out if 
+       more than one operand in an icode is in far space then we give up : we 
+       don't keep it live across functions for now
+    */
+    
+    ic = hTabFirstItemWK(iCodeSeqhTab,OP_SYMBOL(op)->liveFrom);
+    for (; ic && ic->seq <= OP_SYMBOL(op)->liveTo;
+	 ic = hTabNextItem(iCodeSeqhTab,&key)) {
+	int nfs =0;
+	
+	if (ic->op == CALL || ic->op == PCALL) return 0;
+
+	/* single operand icode are ok */
+	if (ic->op == IFX || ic->op == IPUSH)
+	    continue ;
+
+	if (ic->op == SEND ) {
+	    if (ic->argreg != 1) return 0;
+	    else continue ;
+	}
+	/* two special cases first */
+	if (POINTER_GET(ic) && !isOperandEqual(IC_LEFT(ic),op) 	&& /* pointer get */
+	    !OP_SYMBOL(IC_LEFT(ic))->ruonly 			&& /* with result in far space */
+	    (isOperandInFarSpace(IC_RESULT(ic)) && 		
+	     !isOperandInReg(IC_RESULT(ic)))) {
+	    return 0;
+	}
+
+	if (POINTER_SET(ic) && !isOperandEqual(IC_RESULT(ic),op) 	&& /* pointer set */
+	    !OP_SYMBOL(IC_RESULT(ic))->ruonly 				&& /* with right in far space */
+	    (isOperandInFarSpace(IC_RIGHT(ic)) && 		
+	     !isOperandInReg(IC_RIGHT(ic)))) {
+	    return 0;
+	}
+
+	if (IC_RESULT(ic) && IS_SYMOP(IC_RESULT(ic))    && /* if symbol operand */
+	    !isOperandEqual(IC_RESULT(ic),op) 		&& /* not the same as this */
+	    ((isOperandInFarSpace(IC_RESULT(ic)) || 	   /* in farspace or */
+	      OP_SYMBOL(IC_RESULT(ic))->onStack)        && /* on the stack   */
+	     !isOperandInReg(IC_RESULT(ic)))) {		   /* and not in register */
+	    nfs++;
+	}
+	/* same for left */
+	if (IC_LEFT(ic) && IS_SYMOP(IC_LEFT(ic))    	&& /* if symbol operand */
+	    !isOperandEqual(IC_LEFT(ic),op) 		&& /* not the same as this */
+	    ((isOperandInFarSpace(IC_LEFT(ic)) || 	   /* in farspace or */
+	      OP_SYMBOL(IC_LEFT(ic))->onStack)        	&& /* on the stack   */
+	     !isOperandInReg(IC_LEFT(ic)))) {		   /* and not in register */
+	    nfs++;
+	}
+	/* same for right */
+	if (IC_RIGHT(ic) && IS_SYMOP(IC_RIGHT(ic))    	&& /* if symbol operand */
+	    !isOperandEqual(IC_RIGHT(ic),op) 		&& /* not the same as this */
+	    ((isOperandInFarSpace(IC_RIGHT(ic)) || 	   /* in farspace or */
+	      OP_SYMBOL(IC_RIGHT(ic))->onStack)        	&& /* on the stack   */
+	     !isOperandInReg(IC_RIGHT(ic)))) {		   /* and not in register */
+	    nfs++;
+	}
+	
+	if (nfs > 1) return 0;
+    }
+    OP_SYMBOL(op)->dptr = dptr;
+    return 1;
+}
+
+/*-----------------------------------------------------------------*/
 /* packRegsDPTRuse : - will reduce some registers for single Use */
 /*-----------------------------------------------------------------*/
 static iCode *
@@ -2137,6 +2269,9 @@ packRegsDPTRuse (operand * op)
 	/* if PCALL cannot be sure give up */
 	if (ic->op == PCALL) return NULL;
 
+	/* if SEND & not the first parameter then giveup */
+	if (ic->op == SEND && ic->argreg != 1) return NULL;
+
 	/* if CALL then make sure it is VOID || return value not used 
 	   or the return value is assigned to this one */
 	if (ic->op == CALL) {
@@ -2171,7 +2306,8 @@ packRegsDPTRuse (operand * op)
 
 	/* if this is a cast to a bigger type */
 	if (ic->op==CAST) {
-	  if (getSize(OP_SYM_TYPE(IC_RESULT(ic))) >
+	  if (!IS_PTR(OP_SYM_TYPE(IC_RESULT(ic))) && 
+	      getSize(OP_SYM_TYPE(IC_RESULT(ic))) >
 	      getSize(OP_SYM_TYPE(IC_RIGHT(ic)))) {
 	    return 0;
 	  }
@@ -2180,25 +2316,25 @@ packRegsDPTRuse (operand * op)
 	/* general case */
 	if (IC_RESULT(ic) && IS_SYMOP(IC_RESULT(ic)) && 
 	    !isOperandEqual(IC_RESULT(ic),op) &&
-	    ((isOperandInFarSpace(IC_RESULT(ic)) && !isOperandInReg(IC_RESULT(ic))) || 
-	     OP_SYMBOL(IC_RESULT(ic))->ruonly   ||
-	     OP_SYMBOL(IC_RESULT(ic))->onStack)) return NULL;
+	    ( ( ( isOperandInFarSpace(IC_RESULT(ic)) || OP_SYMBOL(IC_RESULT(ic))->onStack) && 
+		!isOperandInReg(IC_RESULT(ic))) || 
+	     OP_SYMBOL(IC_RESULT(ic))->ruonly)) return NULL;
 
 	if (IC_RIGHT(ic) && IS_SYMOP(IC_RIGHT(ic)) && 
 	    !isOperandEqual(IC_RIGHT(ic),op) &&
 	    (OP_SYMBOL(IC_RIGHT(ic))->liveTo >= ic->seq || 
 	     IS_TRUE_SYMOP(IC_RIGHT(ic))	       ||
 	     OP_SYMBOL(IC_RIGHT(ic))->ruonly) &&
-	    ((isOperandInFarSpace(IC_RIGHT(ic)) && !isOperandInReg(IC_RIGHT(ic)))|| 
-	     OP_SYMBOL(IC_RIGHT(ic))->onStack)) return NULL;
+	    ( ( isOperandInFarSpace(IC_RIGHT(ic)) || OP_SYMBOL(IC_RIGHT(ic))->onStack) && 
+		!isOperandInReg(IC_RIGHT(ic))) ) return NULL;
 
 	if (IC_LEFT(ic) && IS_SYMOP(IC_LEFT(ic)) && 
 	    !isOperandEqual(IC_LEFT(ic),op) &&
 	    (OP_SYMBOL(IC_LEFT(ic))->liveTo > ic->seq || 
 	     IS_TRUE_SYMOP(IC_LEFT(ic))  	      ||
 	     OP_SYMBOL(IC_LEFT(ic))->ruonly) &&
-	    ((isOperandInFarSpace(IC_LEFT(ic)) && !isOperandInReg(IC_LEFT(ic)))|| 
-	     OP_SYMBOL(IC_LEFT(ic))->onStack)) return NULL;
+	    ( ( isOperandInFarSpace(IC_LEFT(ic)) || OP_SYMBOL(IC_LEFT(ic))->onStack) && 
+		!isOperandInReg(IC_LEFT(ic))) ) return NULL;
 	
 	if (IC_LEFT(ic) && IC_RIGHT(ic) && 
 	    IS_ITEMP(IC_LEFT(ic)) && IS_ITEMP(IC_RIGHT(ic)) &&
@@ -2338,14 +2474,8 @@ packRegsForAccUse (iCode * ic)
 
   /* make sure that the result of this icode is not on the
      stack, since acc is used to compute stack offset */
-#if 0
-  if (IS_TRUE_SYMOP (IC_RESULT (uic)) &&
-      OP_SYMBOL (IC_RESULT (uic))->onStack)
-    return;
-#else
   if (isOperandOnStack(IC_RESULT(uic)))
     return;
-#endif
 
   /* if either one of them in far space then we cannot */
   if ((IS_TRUE_SYMOP (IC_LEFT (uic)) &&
@@ -2364,19 +2494,6 @@ packRegsForAccUse (iCode * ic)
   if (ic->op != '+' &&
       IC_LEFT (uic)->key != IC_RESULT (ic)->key)
     return;
-
-#if 0
-  // this is too dangerous and need further restrictions
-  // see bug #447547
-
-  /* if one of them is a literal then we can */
-  if ((IC_LEFT (uic) && IS_OP_LITERAL (IC_LEFT (uic))) ||
-      (IC_RIGHT (uic) && IS_OP_LITERAL (IC_RIGHT (uic))))
-    {
-      OP_SYMBOL (IC_RESULT (ic))->accuse = 1;
-      return;
-    }
-#endif
 
   /* if the other one is not on stack then we can */
   if (IC_LEFT (uic)->key == IC_RESULT (ic)->key &&
@@ -2408,7 +2525,7 @@ packForPush (iCode * ic, eBBlock * ebp)
   iCode *dic, *lic;
   bitVect *dbv;
 
-  if (ic->op != IPUSH || !IS_ITEMP (IC_LEFT (ic)))
+  if ((ic->op != IPUSH && ic->op != SEND) || !IS_ITEMP (IC_LEFT (ic)))
     return;
 
   /* must have only definition & one usage */
@@ -2443,6 +2560,12 @@ packForPush (iCode * ic, eBBlock * ebp)
   if (OP_SYMBOL(IC_RIGHT(dic))->liveTo < ic->seq) {
 	  OP_SYMBOL(IC_RIGHT(dic))->liveTo = ic->seq;
   }
+  for (lic = ic; lic && lic != dic; lic = lic->prev)
+    {
+      bitVectUnSetBit (lic->rlive, IC_LEFT (ic)->key);
+      if (IS_ITEMP (IC_RIGHT (dic)))
+	bitVectSetBit (lic->rlive, IC_RIGHT (dic)->key);
+    }
   /* we now we know that it has one & only one def & use
      and the that the definition is an assignment */
   IC_LEFT (ic) = IC_RIGHT (dic);
@@ -2502,6 +2625,18 @@ packRegisters (eBBlock * ebp)
 
 	}
 
+	/* if this is an itemp & used as a pointer
+	   & assigned to a literal then remat */
+	if (IS_ASSIGN_ICODE(ic) && 
+	    IS_ITEMP(IC_RESULT(ic)) &&
+	    bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 &&
+	    isOperandLiteral(IC_RIGHT(ic))) 
+	{
+	  OP_SYMBOL (IC_RESULT (ic))->remat = 1;
+	  OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
+	  OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;	    
+	}
+
       /* if straight assignment then carry remat flag if
          this is the only definition */
       if (ic->op == '=' &&
@@ -2522,6 +2657,7 @@ packRegisters (eBBlock * ebp)
 	 cast is remat, then we can remat this cast as well */
       if (ic->op == CAST && 
 	  IS_SYMOP(IC_RIGHT(ic)) &&
+	  !OP_SYMBOL(IC_RESULT(ic))->isreqv &&
 	  OP_SYMBOL(IC_RIGHT(ic))->remat ) {
 	      sym_link *to_type = operandType(IC_LEFT(ic));
 	      sym_link *from_type = operandType(IC_RIGHT(ic));
@@ -2559,6 +2695,10 @@ packRegisters (eBBlock * ebp)
       if (ic->op == RETURN && IS_SYMOP (IC_LEFT(ic)))
 	  OP_SYMBOL (IC_LEFT (ic))->uptr = 1;
 
+      if (ic->op == RECEIVE && ic->argreg == 1 &&
+	  getSize (operandType(IC_RESULT(ic))) <= 3)
+	  OP_SYMBOL (IC_RESULT(ic))->uptr = 1;
+
       if (!SKIP_IC2 (ic))
 	{
 	  /* if we are using a symbol on the stack
@@ -2583,21 +2723,6 @@ packRegisters (eBBlock * ebp)
 	    }
 	}
 
-#if 0
-      /* if the condition of an if instruction
-         is defined in the previous instruction then
-         mark the itemp as a conditional */
-      if ((IS_CONDITIONAL (ic) ||
-	   (IS_BITWISE_OP(ic) && isBitwiseOptimizable(ic))) &&
-	  ic->next && ic->next->op == IFX &&
-	  isOperandEqual (IC_RESULT (ic), IC_COND (ic->next)) &&
-	  OP_SYMBOL (IC_RESULT (ic))->liveTo <= ic->next->seq)
-	{
-
-	  OP_SYMBOL (IC_RESULT (ic))->regType = REG_CND;
-	  continue;
-	}
-#else
       /* if the condition of an if instruction
          is defined in the previous instruction and
 	 this is the only usage then
@@ -2612,15 +2737,15 @@ packRegisters (eBBlock * ebp)
 	  OP_SYMBOL (IC_RESULT (ic))->regType = REG_CND;
 	  continue;
 	}
-#endif
-
+#if 1
       /* reduce for support function calls */
       if (ic->supportRtn || ic->op == '+' || ic->op == '-')
 	packRegsForSupport (ic, ebp);
-
+#endif
       /* some cases the redundant moves can
-         can be eliminated for return statements */
-      if ((ic->op == RETURN || ic->op == SEND) &&	  
+         can be eliminated for return statements . Can be elminated for the first SEND */      
+      if ((ic->op == RETURN || 
+	   ((ic->op == SEND || ic->op == RECEIVE)&& ic->argreg == 1)) &&	  
 	  !isOperandInFarSpace (IC_LEFT (ic)) &&
 	  !options.model) {
 	 
@@ -2717,7 +2842,7 @@ packRegisters (eBBlock * ebp)
          -------------
          push V1
        */
-      if (ic->op == IPUSH)
+      if (ic->op == IPUSH || ic->op == SEND)
 	{
 	  packForPush (ic, ebp);
 	}
@@ -2734,7 +2859,7 @@ packRegisters (eBBlock * ebp)
       if ((IS_ARITHMETIC_OP (ic)
 	   || IS_CONDITIONAL(ic)
 	   || IS_BITWISE_OP (ic)
-	   || ic->op == LEFT_OP || ic->op == RIGHT_OP || ic->op == CALL
+	   || ic->op == LEFT_OP || ic->op == RIGHT_OP 
 	   || (ic->op == ADDRESS_OF && isOperandOnStack (IC_LEFT (ic)))
 	  ) &&
 	  IS_ITEMP (IC_RESULT (ic)) &&

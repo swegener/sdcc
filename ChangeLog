@@ -1,3 +1,7 @@
+2003-04-11  Borut Razem <borut.razem@siol.net>
+
+	* support/Util/dbuf.c, support/Util/dbuf.h: update to version 1.1.1 - re-added C++ stuff to make it still more portable
+
 2003-04-10  Scott Dattalo  <scott@dattalo.com>
 
 	* src/pic/* Applied the pointer-to-function patch from Steve Tell.

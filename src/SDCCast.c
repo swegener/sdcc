@@ -588,10 +588,50 @@ int processParms (ast *func, value *defParm,
 	return 1;
     }
         
+    /* If this is a varagrs function... */ 
+    if (!defParm && actParm && func->hasVargs )
+    {
+        ast *newType = NULL;
+        
+	if (IS_CAST_OP(actParm) 
+	 || (IS_AST_LIT_VALUE(actParm) && actParm->values.literalFromCast))
+	{
+	   /* Parameter was explicitly typecast; don't touch it. */
+	   return 0;
+	}    
+        
+        /* If it's a small integer, upcast to int. */
+    	if (IS_INTEGRAL(actParm->ftype)
+         && getSize(actParm->ftype) < INTSIZE)
+        {
+	    newType = newAst_LINK(INTTYPE);
+        }
+        
+        if (IS_PTR(actParm->ftype) && !IS_GENPTR(actParm->ftype))
+        {
+            newType = newAst_LINK(copyLinkChain(actParm->ftype));
+            DCL_TYPE(newType->opval.lnk) = GPOINTER;
+        }
+        
+        if (newType)
+        {
+     	    /* cast required; change this op to a cast. */
+            ast *parmCopy = resolveSymbols(copyAst(actParm));
+           
+	    actParm->type = EX_OP;
+	    actParm->opval.op = CAST;
+	    actParm->left = newType;
+	    actParm->right= parmCopy;
+	    decorateType(actParm);           
+        }
+        
+        return 0;
+    }        
+        
     /* if defined parameters ended but actual has not & */
-    /* has a variable argument list or statckAuto       */
+    /* stackAuto       					*/
     if (! defParm && actParm && 
-	(func->hasVargs || options.stackAuto || IS_RENT(fetype)))
+	(options.stackAuto || IS_RENT(fetype)))
 	return 0;
     
     resolveSymbols(actParm);
@@ -2360,6 +2400,7 @@ ast *decorateType (ast *tree)
 	    tree->left = NULL;
 	    tree->right = NULL;
 	    TTYPE(tree) = tree->opval.val->type;	    
+	    tree->values.literalFromCast = 1;
 	}
 	else {
 	    TTYPE(tree) = LTYPE(tree);

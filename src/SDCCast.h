@@ -79,6 +79,9 @@ typedef  struct   ast {
 	    symbol   *continueLabel;  /* conditional check   */
 	    symbol   *condLabel;      /* conditional label   */
 	} forVals ;
+	unsigned literalFromCast;     /* true if this is an EX_VALUE of LITERAL 
+				       * type resulting from a typecast.
+				       */
     } values ;
     
     int   lineno         ;  /* source file line number     */   

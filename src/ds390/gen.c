@@ -6946,7 +6946,7 @@ static void emitcodePointerGet (operand *left,
     }
     /* so dptr know contains the address */
     freeAsmop(left,NULL,ic,TRUE);
-    aopOp(result,ic,FALSE, FALSE);
+    aopOp(result,ic,FALSE, TRUE);
 
     /* if bit then unpack */
     if (IS_BITVAR(retype)) 
@@ -6955,13 +6955,19 @@ static void emitcodePointerGet (operand *left,
         size = AOP_SIZE(result);
         offset = 0 ;
 
-        while (size--) {
+	_startLazyDPSEvaluation();
+        while (size--) 
+        {
+            genSetDPTR(0);
+            _flushLazyDPS();
+                              
             emitcode("clr","a");
             emitcode("movc","a,@a+dptr");
-            aopPut(AOP(result),"a",offset++);
             if (size)
-                emitcode("inc","dptr");
+                emitcode("inc","dptr");            
+            aopPut(AOP(result),"a",offset++);
         }
+        _endLazyDPSEvaluation();
     }
 
     freeAsmop(result,NULL,ic,TRUE);

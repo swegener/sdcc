@@ -2,6 +2,14 @@
 
 #include "common.h"
 
+#define USE_STDOUT_FOR_ERRORS		0
+
+#if USE_STDOUT_FOR_ERRORS
+#define ERRSINK		stdout
+#else
+#define ERRSINK		stderr
+#endif
+
 #define ERROR		0
 #define WARNING		1
 extern FILE *lstFile;
@@ -163,10 +171,10 @@ void	werror (int errNum, ... )
 		fatalError++ ;
 	
 	if ( filename && lineno ) {
-		fprintf(stderr,"%s(%d):",filename,lineno);
+		fprintf(ERRSINK, "%s(%d):",filename,lineno);
 	}
 	va_start(marker,errNum);
-	vfprintf(stderr,ErrTab[errNum].errText,marker);
+	vfprintf(ERRSINK, ErrTab[errNum].errText,marker);
 	va_end( marker );
 }
 

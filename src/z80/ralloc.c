@@ -1899,6 +1899,36 @@ bool opPreservesA(iCode *ic, iCode *uic)
     return FALSE;
 }
 
+static void joinPushes(iCode *ic)
+{
+#if 0
+    if (ic->op == IPUSH &&
+	isOperandLiteral(IC_LEFT(ic)) &&
+	getSize(operandType(IC_LEFT(ic))) == 1 &&
+	ic->next->op == IPUSH &&
+	isOperandLiteral(IC_LEFT(ic->next)) &&
+	getSize(operandType(IC_LEFT(ic->next))) == 1) {
+	/* This is a bit tricky as michaelh doesnt know what he's doing.
+	 */
+	/* First upgrade the size of (first) to int */
+	SPEC_NOUN(operandType(IC_LEFT(ic))) = V_INT;
+	SPEC_SHORT(operandType(IC_LEFT(ic))) = 0;
+
+	floatFromVal(AOP
+	/* Now get and join the values */
+	value * val = aop->aopu.aop_lit;
+	/* if it is a float then it gets tricky */
+	/* otherwise it is fairly simple */
+	if (!IS_FLOAT(val->type)) {
+	    unsigned long v = floatFromVal(val);
+
+	floatFrom
+	printf("Size %u\n", getSize(operandType(IC_LEFT(ic))));
+	ic->next = ic->next->next;
+    }
+#endif
+}
+
 /** Pack registers for acc use.
     When the result of this operation is small and short lived it may
     be able to be stored in the accumulator.
@@ -2222,6 +2252,7 @@ static void packRegisters (eBBlock *ebp)
 	    packRegsForAccUse2(ic);
 	}
 #endif
+	joinPushes(ic);
     }
 }
   

@@ -723,8 +723,10 @@ char *aopGetLitWordLong(asmop *aop, int offset, bool with_hash)
 	/* otherwise it is fairly simple */
 	if (!IS_FLOAT(val->type)) {
 	    unsigned long v = floatFromVal(val);
+
 	    if (offset == 2)
 		v >>= 16;
+
 	    if (with_hash)
 		tsprintf(buffer, "!immedword", v);
 	    else
@@ -800,6 +802,26 @@ static bool requiresHL(asmop *aop)
     default:
 	return FALSE;
     }
+}
+
+static char *fetchLitSpecial(asmop *aop, bool negate, bool xor)
+{
+    unsigned long v;
+    value * val = aop->aopu.aop_lit;
+
+    wassert(aop->type == AOP_LIT);
+    wassert(!IS_FLOAT(val->type));
+    
+    v = floatFromVal(val);
+
+    if (xor)
+	v ^= 0x8000;
+    if (negate)
+	v = -v;
+    v &= 0xFFFF;
+
+    tsprintf(buffer, "!immedword", v);
+    return gc_strdup(buffer);
 }
 
 static void fetchLitPair(PAIR_ID pairId, asmop *left, int offset)
@@ -1274,7 +1296,7 @@ void outAcc(operand *result)
 
 /** Take the value in carry and put it into a register
  */
-void outBitC(operand *result)
+void outBitCLong(operand *result, bool swap_sense)
 {
     /* if the result is bit */
     if (AOP_TYPE(result) == AOP_CRY) {
@@ -1284,8 +1306,15 @@ void outBitC(operand *result)
     else {
 	emit2("ld a,!zero");
 	emit2("rla");
+	if (swap_sense)
+	    emit2("xor a,!immedbyte", 1);
         outAcc(result);
     }
+}
+
+void outBitC(operand *result)
+{
+    outBitCLong(result, FALSE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2546,13 +2575,16 @@ static void genIfxJump (iCode *ic, char *jval)
 
     /* if true label then we jump if condition
     supplied is true */
-    if ( IC_TRUE(ic) ) {
+    if (IC_TRUE(ic)) {
         jlbl = IC_TRUE(ic);
 	if (!strcmp(jval, "a")) {
 	    inst = "nz";
 	}
 	else if (!strcmp(jval, "c")) {
 	    inst = "c";
+	}
+	else if (!strcmp(jval, "nc")) {
+	    inst = "nc";
 	}
 	else {
 	    /* The buffer contains the bit on A that we should test */
@@ -2568,6 +2600,9 @@ static void genIfxJump (iCode *ic, char *jval)
 	else if (!strcmp(jval, "c")) {
 	    inst = "nc";
 	}
+	else if (!strcmp(jval, "nc")) {
+	    inst = "c";
+	}
 	else {
 	    /* The buffer contains the bit on A that we should test */
 	    inst = "z";
@@ -2579,6 +2614,8 @@ static void genIfxJump (iCode *ic, char *jval)
     }
     else if (!strcmp(jval, "c")) {
     }
+    else if (!strcmp(jval, "nc")) {
+    }
     else {
 	emitcode("bit", "%s,a", jval);
     }
@@ -2588,6 +2625,11 @@ static void genIfxJump (iCode *ic, char *jval)
     ic->generated = 1;
 }
 
+const char *getPairIdName(PAIR_ID id)
+{
+    return _pairs[id].name;
+}
+
 /** Generic compare for > or <
  */
 static void genCmp (operand *left,operand *right,
@@ -2595,6 +2637,7 @@ static void genCmp (operand *left,operand *right,
 {
     int size, offset = 0 ;
     unsigned long lit = 0L;
+    bool swap_sense = FALSE;
 
     /* if left & right are bit variables */
     if (AOP_TYPE(left) == AOP_CRY &&
@@ -2619,6 +2662,30 @@ static void genCmp (operand *left,operand *right,
 		emitcode("cp", "%s", aopGet(AOP(right), offset, FALSE));
         } 
 	else {
+	    /* Special cases:
+	       On the GB:
+	       	  If the left or the right is a lit:
+		  	Load -lit into HL, add to right via, check sense.
+	    */
+	    if (size == 2 && (AOP_TYPE(right) == AOP_LIT || AOP_TYPE(left) == AOP_LIT)) {
+		asmop *lit = AOP(right);
+		asmop *op = AOP(left);
+		swap_sense = TRUE;
+		if (AOP_TYPE(left) == AOP_LIT) {
+		    swap_sense = FALSE;
+		    lit = AOP(left);
+		    op = AOP(right);
+		}
+		if (sign) {
+		    emit2("ld e,%s", aopGet(op, 0, 0));
+		    emit2("ld a,%s", aopGet(op, 1, 0));
+		    emit2("xor a,!immedbyte", 0x80);
+		    emit2("ld d,a");
+		}
+		emit2("ld hl,%s", fetchLitSpecial(lit, TRUE, sign));
+		emit2("add hl,de");
+		goto release;
+	    }
             if(AOP_TYPE(right) == AOP_LIT) {
                 lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
                 /* optimize if(x < 0) or if(x >= 0) */
@@ -2692,15 +2759,15 @@ static void genCmp (operand *left,operand *right,
 
 release:
     if (AOP_TYPE(result) == AOP_CRY && AOP_SIZE(result)) {
-        outBitC(result);
+        outBitCLong(result, swap_sense);
     } else {
         /* if the result is used in the next
         ifx conditional branch then generate
         code a little differently */
-        if (ifx )
-            genIfxJump (ifx,"c");
+        if (ifx)
+            genIfxJump(ifx, swap_sense ? "nc" : "c");
         else
-            outBitC(result);
+            outBitCLong(result, swap_sense);
         /* leave the result in acc */
     }
 }

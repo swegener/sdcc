@@ -1,5 +1,17 @@
+/** @file asm.c
+    Provides output functions that modify the output string
+    based on the input tokens and the assembler token mapping
+    specification loaded.
+
+    Note that the functions below only handle digit format modifiers.
+    eg %02X is ok, but %lu and %.4u will fail.
+*/
 #include "common.h"
 #include "asm.h"
+
+/* A 'token' is like !blah or %24f and is under the programmers
+   control. */
+#define MAX_TOKEN_LEN		64
 
 static hTab *_h;
 
@@ -8,10 +20,10 @@ static const char *_findMapping(const char *szKey)
     return shash_find(_h, szKey);
 }
 
-static va_list _iprintf(char *pInto, const char *szFormat, va_list ap)
+static va_list _iprintf(char *pInto, const char *sz, va_list ap)
 {
+    char format[MAX_TOKEN_LEN];
     char *pStart = pInto;
-    char *sz = gc_strdup(szFormat);
     static int count;
 
     while (*sz) {
@@ -40,16 +52,15 @@ static va_list _iprintf(char *pInto, const char *szFormat, va_list ap)
 	    default:
 		{
 		    /* Scan out the arg and pass it on to sprintf */
-		    char *p = sz-1, tmp;
+		    char *p = format;
+		    *p++ = '%';
 		    while (isdigit(*sz))
-			sz++;
-		    /* Skip the format */
-		    tmp = *++sz;
-		    *sz = '\0';
-		    vsprintf(pInto, p, ap);
+			*p++ = *sz++;
+		    *p++ = *sz++;
+		    *p = '\0';
+		    vsprintf(pInto, format, ap);
 		    /* PENDING: Assume that the arg length was an int */
 		    va_arg(ap, int);
-		    *sz = tmp;
 		}
 	    }
 	    pInto = pStart + strlen(pStart);
@@ -63,10 +74,11 @@ static va_list _iprintf(char *pInto, const char *szFormat, va_list ap)
     return ap;
 }
 
-void tvsprintf(char *buffer, const char *szFormat, va_list ap)
+void tvsprintf(char *buffer, const char *sz, va_list ap)
 {
-    char *sz = gc_strdup(szFormat);
-    char *pInto = buffer, *p;
+    char *pInto = buffer;
+    char *p;
+    char token[MAX_TOKEN_LEN];
 
     buffer[0] = '\0';
     
@@ -74,37 +86,33 @@ void tvsprintf(char *buffer, const char *szFormat, va_list ap)
 	if (*sz == '!') {
 	    /* Start of a token.  Search until the first
 	       [non alplha, *] and call it a token. */
-	    char old;
 	    const char *t;
-	    p = ++sz;
+	    p = token;
+	    sz++;
 	    while (isalpha(*sz) || *sz == '*') {
-		sz++;
+		*p++ = *sz++;
 	    }
-	    old = *sz;
-	    *sz = '\0';
+	    *p = '\0';
 	    /* Now find the token in the token list */
-	    if ((t = _findMapping(p))) {
+	    if ((t = _findMapping(token))) {
 		ap = _iprintf(pInto, t, ap);
 		pInto = buffer + strlen(buffer);
 	    }
 	    else {
-		fprintf(stderr, "Cant find token \"%s\"\n", p);
+		fprintf(stderr, "Cant find token \"%s\"\n", token);
 		wassert(0);
 	    }
-	    *sz = old;
 	}
 	else if (*sz == '%') {
-	    char *pFormat = sz;
-	    char old;
-	    sz++;
-	    while (!isalpha(*sz))
-		sz++;
-	    sz++;
-	    old = *sz;
-	    *sz = '\0';
-	    vsprintf(pInto, pFormat, ap);
+	    p = token;
+	    *p++ = *sz++;
+	    while (!isalpha(*sz)) {
+		*p++ = *sz++;
+	    }
+	    *p++ = *sz++;
+	    *p = '\0';
+	    vsprintf(pInto, token, ap);
 	    pInto = buffer + strlen(buffer);
-	    *sz = old;
 	    va_arg(ap, int);
 	}
 	else {

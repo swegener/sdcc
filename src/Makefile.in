@@ -9,7 +9,7 @@ include $(PRJDIR)/Makefile.common
 PORTS		= mcs51 z80 avr
 PORT_LIBS	= $(PORTS:%=%/port.a)
 
-LIBS		= -lgc @LIBS@
+LIBS		= -lgc -lm @LIBS@
 ifeq ($(HAVE_LIBGC), 1)
 else
 LIBDIRS		= -L$(PRJDIR)/support/gc

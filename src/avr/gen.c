@@ -164,7 +164,7 @@ hasInc (operand *op, iCode *ic)
       return lic;
     }
     /* if the operand used or deffed */
-    if (bitVectBitValue(ic->uses,op->key) || ic->defKey == op->key) {
+    if (bitVectBitValue(ic->uses,op->key) || ((unsigned) ic->defKey == op->key)) {
       return NULL;
     }
     lic = lic->next;
@@ -1876,7 +1876,7 @@ genPlusIncr (iCode * ic)
 			return TRUE;
 		}
 		emitcode ("subi", "%s,lo8(%d)",
-			  aopGet (AOP (IC_LEFT (ic)), 0), -icount);
+			  aopGet (AOP (IC_LEFT (ic)), 0), 0-icount);
 		return TRUE;
 	}
 
@@ -1893,21 +1893,21 @@ genPlusIncr (iCode * ic)
 
 		/* use subi */
 		emitcode ("subi", "%s,lo8(%d)",
-			  aopGet (AOP (IC_RESULT (ic)), 0), -icount);
+			  aopGet (AOP (IC_RESULT (ic)), 0), 0-icount);
 		emitcode ("sbci", "%s,hi8(%d)",
-			  aopGet (AOP (IC_RESULT (ic)), 1), -icount);
+			  aopGet (AOP (IC_RESULT (ic)), 1), 0-icount);
 		return TRUE;
 	}
 
 	/* for 32 bit longs */
 	emitcode ("subi", "%s,lo8(%d)", aopGet (AOP (IC_RESULT (ic)), 0),
-		  -icount);
+		  0-icount);
 	emitcode ("sbci", "%s,hi8(%d)", aopGet (AOP (IC_RESULT (ic)), 1),
-		  -icount);
+		  0-icount);
 	emitcode ("sbci", "%s,hlo8(%d)", aopGet (AOP (IC_RESULT (ic)), 2),
-		  -icount);
+		  0-icount);
 	emitcode ("sbci", "%s,hhi8(%d)", aopGet (AOP (IC_RESULT (ic)), 3),
-		  -icount);
+		  0-icount);
 	return TRUE;
 
 }

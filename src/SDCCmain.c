@@ -22,8 +22,6 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
-#define USE_SYSTEM_SYSTEM_CALLS
-
 #include "common.h"
 #include <ctype.h>
 #include "newalloc.h"
@@ -84,6 +82,7 @@ char DefaultExePath[128];
 #define OPTION_SMALL_MODEL "-model-small"
 #define OPTION_FLAT24_MODEL "-model-flat24"
 #define OPTION_STACK_AUTO  "-stack-auto"
+#define OPTION_STACK_8BIT "-stack-8bit"
 #define OPTION_STACK_10BIT "-stack-10bit"
 #define OPTION_XSTACK      "-xstack"
 #define OPTION_GENERIC     "-generic"
@@ -189,10 +188,6 @@ _setPort (const char *name)
       if (!strcmp (_ports[i]->target, name))
 	{
 	  port = _ports[i];
-	  if (strcmp(name,"ds390")==0) {
-	    options.model=MODEL_FLAT24;
-	    options.stack10bit=1;
-	  }
 	  return 0;
 	}
     }
@@ -215,7 +210,6 @@ _validatePorts (void)
     }
 }
 
-#ifdef USE_SYSTEM_SYSTEM_CALLS
 void
 buildCmdLine (char *into, const char **cmds,
 	      const char *p1, const char *p2,
@@ -276,73 +270,6 @@ buildCmdLine (char *into, const char **cmds,
       strcat (into, " ");
     }
 }
-#else
-void
-buildCmdLine (char *into, char **args, const char **cmds,
-	      const char *p1, const char *p2,
-	      const char *p3, const char **list)
-{
-  const char *p, *from;
-
-  while (*cmds)
-    {
-      *args = into;
-      args++;
-
-      from = *cmds;
-      cmds++;
-      *into = '\0';
-
-      /* See if it has a '$' anywhere - if not, just copy */
-      if ((p = strchr (from, '$')))
-	{
-	  strncpy (into, from, p - from);
-	  /* NULL terminate it */
-	  into[p - from] = '\0';
-	  from = p + 2;
-	  p++;
-	  switch (*p)
-	    {
-	    case '1':
-	      if (p1)
-		strcat (into, p1);
-	      break;
-	    case '2':
-	      if (p2)
-		strcat (into, p2);
-	      break;
-	    case '3':
-	      if (p3)
-		strcat (into, p3);
-	      break;
-	    case 'l':
-	      {
-		const char **tmp = list;
-		if (tmp)
-		  {
-		    while (*tmp)
-		      {
-			strcpy (into, *tmp);
-			into += strlen (into) + 1;
-			*args = into;
-			args++;
-			tmp++;
-		      }
-		  }
-		break;
-	      }
-	    default:
-	      assert (0);
-	    }
-	}
-      strcat (into, from);
-      if (strlen (into) == 0)
-	args--;
-      into += strlen (into) + 1;
-    }
-  *args = NULL;
-}
-#endif
 
 /*-----------------------------------------------------------------*/
 /* printVersionInfo - prints the version info        */
@@ -467,6 +394,8 @@ setDefaultOptions ()
   options.nostdinc = 0;
   options.verbose = 0;
 
+  options.stack10bit=0;
+
   /* now for the optimizations */
   /* turn on the everything */
   optimize.global_cse = 1;
@@ -477,6 +406,7 @@ setDefaultOptions ()
   optimize.loopInvariant = 1;
   optimize.loopInduction = 1;
 
+  /* now for the ports */
   port->setDefaultOptions ();
 }
 
@@ -664,6 +594,12 @@ parseCmdLine (int argc, char **argv)
 	  if (strcmp (&argv[i][1], OPTION_STACK_10BIT) == 0)
 	    {
 	      options.stack10bit = 1;
+	      continue;
+	    }
+
+	  if (strcmp (&argv[i][1], OPTION_STACK_8BIT) == 0)
+	    {
+	      options.stack10bit = 0;
 	      continue;
 	    }
 
@@ -1276,7 +1212,6 @@ char *try_dir[] =
 {NULL, NULL};			/* First entry may be overwritten, so use two. */
 
 
-#ifdef USE_SYSTEM_SYSTEM_CALLS
 int
 my_system (const char *cmd)
 {
@@ -1296,21 +1231,6 @@ my_system (const char *cmd)
 
 #if NATIVE_WIN32
       strcat (cmdLine, ".exe");
-
-#if 0
-      /* Mung slashes into backslashes to keep WIndoze happy. */
-      {
-	char *r = cmdLine;
-	while (*r)
-	  {
-	    if (*r == '/')
-	      {
-		*r = '\\';
-	      }
-	    r++;
-	  }
-      }
-#endif
 #endif
 
       if (access (cmdLine, X_OK) == 0)
@@ -1343,76 +1263,6 @@ my_system (const char *cmd)
   return e;
 }
 
-#else
-
-int
-my_system (const char *cmd, char **cmd_argv)
-{
-  char *dir, *got = NULL;
-  int i = 0;
-
-  while (!got && try_dir[i])
-    {
-      dir = (char *) Safe_malloc (strlen (try_dir[i]) + strlen (cmd) + 10);
-      strcpy (dir, try_dir[i]);
-      strcat (dir, "/");
-      strcat (dir, cmd);
-
-#if NATIVE_WIN32
-      strcat (dir, ".exe");
-
-      /* Mung slashes into backslashes to keep WIndoze happy. */
-      {
-	char *r;
-	r = dir;
-
-	while (*r)
-	  {
-	    if (*r == '/')
-	      {
-		*r = '\\';
-	      }
-	    r++;
-	  }
-      }
-#endif
-
-      if (access (dir, X_OK) == 0)
-	{
-	  got = strdup (dir);
-	}
-      free (dir);
-      i++;
-    }
-
-  if (verboseExec)
-    {
-      char **pCmd = cmd_argv;
-      printf ("+ ");
-      while (*pCmd)
-	{
-	  printf ("%s ", *pCmd);
-	  pCmd++;
-	}
-      printf ("\n");
-    }
-
-  if (got)
-    {
-      i = spawnv (P_WAIT, got, cmd_argv) == -1;
-      free (got);
-    }
-  else
-    i = spawnvp (P_WAIT, cmd, cmd_argv) == -1;
-  if (i)
-    {
-      perror ("Cannot exec process ");
-      return -1;
-    }
-
-  return 0;
-}
-#endif
 
 /*-----------------------------------------------------------------*/
 /* linkEdit : - calls the linkage editor  with options             */
@@ -1421,9 +1271,6 @@ static void
 linkEdit (char **envp)
 {
   FILE *lnkfile;
-#ifndef USE_SYSTEM_SYSTEM_CALLS
-  char *argv[128];
-#endif
   char *segName, *c;
 
   int i;
@@ -1533,24 +1380,11 @@ linkEdit (char **envp)
   if (options.verbose)
     printf ("sdcc: Calling linker...\n");
 
-#ifdef USE_SYSTEM_SYSTEM_CALLS
   buildCmdLine (buffer, port->linker.cmd, srcFileName, NULL, NULL, NULL);
   if (my_system (buffer))
     {
-      /* either system() or the linker itself has reported an error
-         perror ("Cannot exec linker");
-       */
       exit (1);
     }
-#else
-  buildCmdLine (buffer, argv, port->linker.cmd, srcFileName, NULL, NULL, NULL);
-  if (my_system (argv[0], argv))
-    {
-      perror ("Cannot exec linker");
-      exit (1);
-    }
-
-#endif
 
   if (strcmp (srcFileName, "temp") == 0)
     {
@@ -1568,7 +1402,6 @@ linkEdit (char **envp)
 static void
 assemble (char **envp)
 {
-#ifdef USE_SYSTEM_SYSTEM_CALLS
   buildCmdLine (buffer, port->assembler.cmd, srcFileName, NULL, NULL, asmOptions);
   if (my_system (buffer))
     {
@@ -1577,17 +1410,6 @@ assemble (char **envp)
        */
       exit (1);
     }
-#else
-  char *argv[128];		/* assembler arguments */
-
-  buildCmdLine (buffer, argv, port->assembler.cmd, srcFileName, NULL, NULL, asmOptions);
-
-  if (my_system (argv[0], argv))
-    {
-      perror ("Cannot exec assembler");
-      exit (1);
-    }
-#endif
 }
 
 
@@ -1598,9 +1420,6 @@ assemble (char **envp)
 static int
 preProcess (char **envp)
 {
-#ifndef USE_SYSTEM_SYSTEM_CALLS
-  char *argv[128];
-#endif
   char procDef[128];
 
   preOutName = NULL;
@@ -1646,6 +1465,8 @@ preProcess (char **envp)
       /* add port (processor information to processor */
       sprintf (procDef, "-DSDCC_%s", port->target);
       _addToList (preArgv, procDef);
+      sprintf (procDef, "-D__%s", port->target);
+      _addToList (preArgv, procDef);
 
       if (!preProcOnly)
 	preOutName = strdup (tmpnam (NULL));
@@ -1653,28 +1474,13 @@ preProcess (char **envp)
       if (options.verbose)
 	printf ("sdcc: Calling preprocessor...\n");
 
-#ifdef USE_SYSTEM_SYSTEM_CALLS
       buildCmdLine (buffer, _preCmd, fullSrcFileName,
 		    preOutName, srcFileName, preArgv);
       if (my_system (buffer))
 	{
-	  /* either system() or the preprocessor itself has reported an error
-	     perror ("Cannot exec Preprocessor");
-	   */
-	  exit (1);
-	}
-#else
-      buildCmdLine (buffer, argv, _preCmd, fullSrcFileName,
-		    preOutName, srcFileName, preArgv);
-
-      if (my_system (argv[0], argv))
-	{
-	  unlink (preOutName);
-	  perror ("Cannot exec Preprocessor");
 	  exit (1);
 	}
 
-#endif
       if (preProcOnly)
 	exit (0);
     }
@@ -1773,16 +1579,14 @@ main (int argc, char **argv, char **envp)
 
       if (!fatalError)
 	{
-/* TSD PIC port hack - if the PIC port option is enabled
-   and SDCC is used to generate PIC code, then we will
-   generate .asm files in gpasm's format instead of SDCC's
-   assembler's format
- */
-#if !OPT_DISABLE_PIC
-	  if (IS_PIC_PORT)
+ 	  if (IS_PIC14_PORT)
+	    /* TSD PIC port hack - if the PIC port option is enabled
+	       and SDCC is used to generate PIC code, then we will
+	       generate .asm files in gpasm's format instead of SDCC's
+	       assembler's format
+	    */
 	    pic14glue ();
 	  else
-#endif
 	    glue ();
 	  if (fatalError)
 	    {
@@ -1792,7 +1596,6 @@ main (int argc, char **argv, char **envp)
 	    {
 	      if (options.verbose)
 		printf ("sdcc: Calling assembler...\n");
-
 	      assemble (envp);
 	    }
 	}

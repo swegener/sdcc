@@ -305,9 +305,11 @@ void comment()
   char c, c1;
   
  loop:
-  while ((c = input()) != '*' && c)
-    if ( c == '\n')
-      yylineno++ ;
+  while ((c = input()) != '*' && c) {
+    if ( c == '\n') {
+      lineno=++yylineno;
+    }
+  }
   
   if (c && (c1 = input()) != '/') {
     unput(c1);
@@ -322,20 +324,19 @@ int plineIdx=0;
 
 void count()
 {
-	int i;
-	for (i = 0; yytext[i] != '\0'; i++)   {				
-		if (yytext[i] == '\n')      {         
-		   column = 0;
-		   lineno = ++yylineno ;
-		}
-		else 
-			if (yytext[i] == '\t')
-				column += 8 - (column % 8);
-			else
-				column++;
-   }
-         
-   /* ECHO; */
+  int i;
+  for (i = 0; yytext[i] != '\0'; i++)   {				
+    if (yytext[i] == '\n')      {         
+      column = 0;
+      lineno = ++yylineno ;
+    }
+    else 
+      if (yytext[i] == '\t')
+	column += 8 - (column % 8);
+      else
+	column++;
+  }
+  /* ECHO; */
 }
 
 int check_type()
@@ -351,7 +352,7 @@ int check_type()
 	}
 }
 
-char strLitBuff[2048]			;
+char strLitBuff[2048]; // TODO: this is asking for the next bug :)
 
 /*
  * Change by JTV 2001-05-19 to not concantenate strings
@@ -373,14 +374,30 @@ char *stringLiteral () {
     
     /* if it is a \ then escape char's are allowed */
     if (ch == '\\') {
-      *str++ = ch; /* backslash in place */
-      *str++=input(); /* get the escape char, no check */
+      ch=input();
+      if (ch=='\r') {
+	// input() translates \n into \r\n
+	if ((ch=input())!='\n') {
+	  unput (ch);
+	}
+	/* \<newline> is a continuator */
+	lineno=++yylineno;
+	continue;
+      }
+      *str++ = '\\'; /* backslash in place */
+      *str++ = ch; /* get the escape char, no further check */
       continue; /* carry on */
     }
     
-    /* if new line we have a new line break */
-    if (ch == '\n') {
-      yylineno++;
+    /* if new line we have a new line break, which is illegal */
+    if (ch == '\r') {
+      // input() translates \n into \r\n
+      if ((ch=input())!='\n') {
+	unput (ch);
+      }
+      werror (W_NEWLINE_IN_STRING);
+      *str++ = '\n';
+      lineno=++yylineno;
       continue;
     }
     
@@ -389,11 +406,10 @@ char *stringLiteral () {
     /* if that is a double quote then carry on    */
     if (ch == '\"') {
       *str++  = ch ; /* Pass end of this string or substring to evaluator */
-      
       while ((ch = input()) && (isspace(ch) || ch=='\\')) {
 	switch (ch) {
 	case '\\':
-	  werror (W_STRAY_BACKSLASH, filename, yylineno);
+	  //werror (W_STRAY_BACKSLASH)
 	  break;
 	case '\n':
 	  yylineno++;

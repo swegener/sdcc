@@ -353,6 +353,8 @@ struct
    "Option %s requires an argument." },
 { W_STRAY_BACKSLASH, ERROR_LEVEL_WARNING,
     "stray '\\' in program" },
+{ W_NEWLINE_IN_STRING, ERROR_LEVEL_WARNING,
+    "newline in string constant" },
 };
 
 /*

@@ -2,7 +2,6 @@
  */
 #include <testfwk.h>
 #include <string.h>
-#include <stdio.h>
 
 int
 verifyBlock(char *p, char val, int len)

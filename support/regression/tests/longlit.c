@@ -2,7 +2,6 @@
  */
 
 #include <testfwk.h>
-#include <stdio.h>
 
 #define OSCILLATOR 11059200
 #define BAUD 19200

@@ -1,5 +1,24 @@
 2001-12-24  Sandeep Dutta  <sandeep@ddi.com>
 
+	* /src/ds390/gen.c, /src/ds390/main.c:
+	More builtin function additions for TININative
+
+	* /src/ds390/ralloc.c:
+	Had broken the regression testsuite
+
+	* /src/SDCCast.c: Fixed a bug in dumptree
+
+	* /src/SDCCsymt.c, /src/SDCCsymt.h:
+	Added funcattr hasStackParms will be set for reentrant functions when there
+	are paramteres on the stack, this helps in minimizing frame pointer generation
+	typeFromStr can handle function pointers now
+
+	* /doc/builtins.txt, /doc/TININative.txt:
+	*** empty log message ***
+
+
+2001-12-24  Sandeep Dutta  <sandeep@ddi.com>
+
 	* /src/ds390/gen.c, /src/ds390/main.c, /src/ds390/peeph.def, /src/ds390/ralloc.c:
 	ALPHA version for -mTININative
 

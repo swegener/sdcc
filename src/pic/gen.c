@@ -34,6 +34,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "SDCCglobl.h"
+#include "newalloc.h"
 
 #if defined(_MSC_VER)
 #define __FUNCTION__		__FILE__
@@ -337,7 +338,7 @@ static asmop *newAsmop (short type)
 {
     asmop *aop;
 
-    _ALLOC(aop,sizeof(asmop));
+    aop = Safe_calloc(1,sizeof(asmop));
     aop->type = type;
     return aop;
 }
@@ -467,7 +468,8 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
     /* special case for a function */
     if (IS_FUNC(sym->type)) {   
         sym->aop = aop = newAsmop(AOP_IMMD);    
-        _ALLOC_ATOMIC(aop->aopu.aop_immd,strlen(sym->rname)+1);
+        //_ALLOC_ATOMIC(aop->aopu.aop_immd,strlen(sym->rname)+1);
+	aop->aopu.aop_immd = Safe_calloc(1,strlen(sym->rname)+1);
         strcpy(aop->aopu.aop_immd,sym->rname);
         aop->size = FPTRSIZE; 
         return aop;
@@ -517,7 +519,7 @@ static asmop *aopForRemat (symbol *sym)
 	strcpy(buffer,OP_SYMBOL(IC_LEFT(ic))->rname);
 
     //DEBUGemitcode(";","%s",buffer);
-    _ALLOC_ATOMIC(aop->aopu.aop_immd,strlen(buffer)+1);
+    aop->aopu.aop_immd = Safe_calloc(1,strlen(buffer)+1);
     strcpy(aop->aopu.aop_immd,buffer);    
     return aop;        
 }
@@ -876,7 +878,7 @@ static char *aopGet (asmop *aop, int offset, bool bit16, bool dname)
 	    return (dname ? "acc" : "a");
 	}       
 	sprintf(s,"@%s",aop->aopu.aop_ptr->name);
-	_ALLOC_ATOMIC(rs,strlen(s)+1);
+	rs = Safe_calloc(1,strlen(s)+1);
 	strcpy(rs,s);   
 	return rs;
 	
@@ -927,7 +929,7 @@ static char *aopGet (asmop *aop, int offset, bool bit16, bool dname)
 	    else
 		sprintf(s,"%s",
 			aop->aopu.aop_immd);
-	_ALLOC_ATOMIC(rs,strlen(s)+1);
+	rs = Safe_calloc(1,strlen(s)+1);
 	strcpy(rs,s);   
 	return rs;
 	
@@ -938,7 +940,7 @@ static char *aopGet (asmop *aop, int offset, bool bit16, bool dname)
 		    offset);
 	else
 	    sprintf(s,"%s",aop->aopu.aop_dir);
-	_ALLOC_ATOMIC(rs,strlen(s)+1);
+	rs = Safe_calloc(1,strlen(s)+1);
 	strcpy(rs,s);   
 	return rs;
 	
@@ -967,7 +969,7 @@ static char *aopGet (asmop *aop, int offset, bool bit16, bool dname)
     case AOP_LIT:
         DEBUGemitcode(";","%d",__LINE__);
 	sprintf(s,"0x%02x", pic14aopLiteral (aop->aopu.aop_lit,offset));
-	_ALLOC_ATOMIC(rs,strlen(s)+1);
+	rs = Safe_calloc(1,strlen(s)+1);
 	strcpy(rs,s);   
 	return rs;
 	
@@ -1002,7 +1004,7 @@ static pCodeOp *popCopy(pCodeOp *pc)
 {
   pCodeOp *pcop;
 
-  _ALLOC(pcop,sizeof(pCodeOp) );
+  pcop = Safe_calloc(1,sizeof(pCodeOp) );
   pcop->type = pc->type;
   if(!(pcop->name = strdup(pc->name)))
     fprintf(stderr,"oops %s %d",__FILE__,__LINE__);
@@ -1017,7 +1019,7 @@ static pCodeOp *popCopyGPR2Bit(pCodeOp *pc, int bitval)
 {
   pCodeOp *pcop;
 
-  _ALLOC(pcop,sizeof(pCodeOpBit) );
+  pcop = Safe_calloc(1,sizeof(pCodeOpBit) );
   pcop->type = PO_BIT;
   if(!(pcop->name = strdup(pc->name)))
     fprintf(stderr,"oops %s %d",__FILE__,__LINE__);
@@ -1094,7 +1096,7 @@ static pCodeOp *popGet (asmop *aop, int offset, bool bit16, bool dname)
 	
     case AOP_IMMD:
       DEBUGemitcode(";","%d",__LINE__);
-	_ALLOC(pcop,sizeof(pCodeOp) );
+	pcop = Safe_calloc(1,sizeof(pCodeOp) );
 	pcop->type = PO_IMMEDIATE;
 	if (bit16) 
 	    sprintf (s,"%s",aop->aopu.aop_immd);
@@ -1106,12 +1108,12 @@ static pCodeOp *popGet (asmop *aop, int offset, bool bit16, bool dname)
 	    else
 		sprintf(s,"%s",
 			aop->aopu.aop_immd);
-	_ALLOC_ATOMIC(pcop->name,strlen(s)+1);
+	pcop->name = Safe_calloc(1,strlen(s)+1);
 	strcpy(pcop->name,s);   
 	return pcop;
 	
     case AOP_DIR:
-	_ALLOC(pcop,sizeof(pCodeOp) );
+	pcop = Safe_calloc(1,sizeof(pCodeOp) );
 	pcop->type = PO_DIR;
 	if (offset)
 	    sprintf(s,"(%s + %d)",
@@ -1119,13 +1121,13 @@ static pCodeOp *popGet (asmop *aop, int offset, bool bit16, bool dname)
 		    offset);
 	else
 	    sprintf(s,"%s",aop->aopu.aop_dir);
-	_ALLOC(pcop->name,strlen(s)+1);
+	pcop->name = Safe_calloc(1,strlen(s)+1);
 	strcpy(pcop->name,s);   
 	return pcop;
 	
     case AOP_REG:
       DEBUGemitcode(";","%d",__LINE__);
-      _ALLOC(pcop,sizeof(pCodeOp) );
+      pcop = Safe_calloc(1,sizeof(pCodeOp) );
       pcop->type = PO_GPR_REGISTER;
       if (dname)
 	rs = aop->aopu.aop_reg[offset]->dname;
@@ -1133,7 +1135,7 @@ static pCodeOp *popGet (asmop *aop, int offset, bool bit16, bool dname)
 	rs = aop->aopu.aop_reg[offset]->name;
 
       DEBUGemitcode(";","%d  %s",__LINE__,rs);
-      _ALLOC_ATOMIC((pcop->name),(strlen(rs)+1));
+      pcop->name = Safe_calloc(1,(strlen(rs)+1));
       strcpy(pcop->name,rs);   
       return pcop;
 
@@ -1148,7 +1150,7 @@ static pCodeOp *popGet (asmop *aop, int offset, bool bit16, bool dname)
     case AOP_STR:
       DEBUGemitcode(";","%d",__LINE__);
 
-      _ALLOC(pcop,sizeof(pCodeOp) );
+      pcop = Safe_calloc(1,sizeof(pCodeOp) );
       pcop->type = PO_STR;
 
       //aop->coff = offset ;
@@ -1156,7 +1158,7 @@ static pCodeOp *popGet (asmop *aop, int offset, bool bit16, bool dname)
 	  sprintf(s,"%s","acc");
 	else
 	  sprintf(s,"%s",aop->aopu.aop_str[offset]);
-	_ALLOC_ATOMIC(pcop->name,strlen(s)+1);
+	pcop->name = Safe_calloc(1,strlen(s)+1);
 	strcpy(pcop->name,s);   
 	return pcop;
 	
@@ -2638,7 +2640,7 @@ static void genEndFunction (iCode *ic)
 	if (currFunc) {
 	    _G.debugLine = 1;
 	    emitcode(";","C$%s$%d$%d$%d ==.",
-		     ic->filename,currFunc->lastLine,
+		     FileBaseName(ic->filename),currFunc->lastLine,
 		     ic->level,ic->block); 
 	    if (IS_STATIC(currFunc->etype))	    
 		emitcode(";","XF%s$%s$0$0 ==.",moduleName,currFunc->name); 
@@ -2672,7 +2674,7 @@ static void genEndFunction (iCode *ic)
 	if (currFunc) {
 	    _G.debugLine = 1;
 	    emitcode(";","C$%s$%d$%d$%d ==.",
-		     ic->filename,currFunc->lastLine,
+		     FileBaseName(ic->filename),currFunc->lastLine,
 		     ic->level,ic->block); 
 	    if (IS_STATIC(currFunc->etype))	    
 		emitcode(";","XF%s$%s$0$0 ==.",moduleName,currFunc->name); 
@@ -8970,11 +8972,11 @@ void genpic14Code (iCode *lic)
 	    if ( options.debug ) {
 		_G.debugLine = 1;
 		emitcode("",";C$%s$%d$%d$%d ==.",
-			 ic->filename,ic->lineno,
+			 FileBaseName(ic->filename),ic->lineno,
 			 ic->level,ic->block);
 		_G.debugLine = 0;
 	    }
-	    emitcode(";","%s %d",ic->filename,ic->lineno);
+	    emitcode(";","%s %d",FileBaseName(ic->filename),ic->lineno);
 	    cln = ic->lineno ;
 	}
 	/* if the result is marked as

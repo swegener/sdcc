@@ -159,8 +159,6 @@ _modsint_dummy (void) _naked
 
 		jnb	acc.7,b_not_negative
 
-		cpl	F0
-
 		dec	r0
 
 		clr	a
@@ -205,7 +203,7 @@ int _modsint (int a, int b)
        r = _moduint((a < 0 ? -a : a),
 	            (b < 0 ? -b : b));
 
-       if ( (a < 0) ^ (b < 0))
+       if (a < 0)
 	    return -r;
 	else
 	    return r;

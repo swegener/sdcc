@@ -210,8 +210,6 @@ _modslong_dummy (void) _naked
 
 		jnb	acc.7,b_not_negative
 
-		cpl	F0
-
 		clr	a		; b = -b;
 		clr	c
 		subb	a,b0
@@ -261,7 +259,7 @@ _modslong (long a, long b)
 
   r = _modulong((a < 0 ? -a : a),
                 (b < 0 ? -b : b));
-  if ( (a < 0) ^ (b < 0))
+  if (a < 0)
     return -r;
   else
     return r;

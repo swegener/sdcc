@@ -2440,6 +2440,11 @@ genFunction (iCode * ic)
 			emitcode ("push", "%s", mcs51_regWithIdx (i)->dname);
 		    }
 		}
+	      else if (mcs51_ptrRegReq)
+	        {
+		  emitcode ("push", "%s", mcs51_regWithIdx (R0_IDX)->dname);
+		  emitcode ("push", "%s", mcs51_regWithIdx (R1_IDX)->dname);
+		}
 
 	    }
 	  else
@@ -2573,6 +2578,11 @@ genFunction (iCode * ic)
 		    }
 		}
 	    }
+	  else if (mcs51_ptrRegReq)
+	    {
+	      emitcode ("push", "%s", mcs51_regWithIdx (R0_IDX)->dname);
+	      emitcode ("push", "%s", mcs51_regWithIdx (R1_IDX)->dname);
+	    }
 	}
     }
 
@@ -2678,7 +2688,12 @@ static void
 genEndFunction (iCode * ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
-
+  lineNode *lnp = lineCurr;
+  bitVect *regsUsed;
+  bitVect *regsUsedPrologue;
+  bitVect *regsUnneeded;
+  int idx;
+  
   _G.currentFunc = NULL;
   if (IFFUNC_ISNAKED(sym->type))
   {
@@ -2762,6 +2777,11 @@ genEndFunction (iCode * ic)
 			  (mcs51_ptrRegReq && (i == R0_IDX || i == R1_IDX)))
 			emitcode ("pop", "%s", mcs51_regWithIdx (i)->dname);
 		    }
+		}
+	      else if (mcs51_ptrRegReq)
+	        {
+		  emitcode ("pop", "%s", mcs51_regWithIdx (R1_IDX)->dname);
+		  emitcode ("pop", "%s", mcs51_regWithIdx (R0_IDX)->dname);
 		}
 
 	    }
@@ -2848,6 +2868,11 @@ genEndFunction (iCode * ic)
 		    emitcode ("pop", "%s", mcs51_regWithIdx (i)->dname);
 		}
 	    }
+          else if (mcs51_ptrRegReq)
+	    {
+	      emitcode ("pop", "%s", mcs51_regWithIdx (R1_IDX)->dname);
+	      emitcode ("pop", "%s", mcs51_regWithIdx (R0_IDX)->dname);
+	    }
 
 	}
 
@@ -2868,6 +2893,90 @@ genEndFunction (iCode * ic)
       emitcode ("ret", "");
     }
 
+  if (!port->peep.getRegsRead || !port->peep.getRegsWritten)
+    return;
+  
+  /* If this was an interrupt handler using bank 0 that called another */
+  /* function, then all registers must be saved; nothing to optimized. */
+  if (IFFUNC_ISISR (sym->type) && IFFUNC_HASFCALL(sym->type)
+      && !FUNC_REGBANK(sym->type))
+    return;
+    
+  /* Compute the registers actually used */
+  regsUsed = newBitVect (mcs51_nRegs);
+  regsUsedPrologue = newBitVect (mcs51_nRegs);
+  while (lnp)
+    {
+      if (lnp->ic && lnp->ic->op == FUNCTION)
+        regsUsedPrologue = bitVectUnion (regsUsedPrologue, port->peep.getRegsWritten(lnp));
+      else
+        regsUsed = bitVectUnion (regsUsed, port->peep.getRegsWritten(lnp));
+      
+      if (lnp->ic && lnp->ic->op == FUNCTION && lnp->prev
+          && lnp->prev->ic && lnp->prev->ic->op != FUNCTION)
+	break;
+      if (!lnp->prev)
+        break;
+      lnp = lnp->prev;
+    }
+
+  if (bitVectBitValue (regsUsedPrologue, CND_IDX)
+      && !bitVectBitValue (regsUsed, CND_IDX))
+    {
+      regsUsed = bitVectUnion (regsUsed, regsUsedPrologue);
+      if (IFFUNC_ISISR (sym->type) && !FUNC_REGBANK(sym->type)
+          && !sym->stack)
+        bitVectUnSetBit (regsUsed, CND_IDX);
+    }
+  else
+    regsUsed = bitVectUnion (regsUsed, regsUsedPrologue);
+    
+  /* If this was an interrupt handler that called another function */
+  /* function, then assume A, B, DPH, & DPL may be modified by it. */
+  if (IFFUNC_ISISR (sym->type) && IFFUNC_HASFCALL(sym->type))
+    {
+      regsUsed = bitVectSetBit (regsUsed, DPL_IDX);
+      regsUsed = bitVectSetBit (regsUsed, DPH_IDX);
+      regsUsed = bitVectSetBit (regsUsed, B_IDX);
+      regsUsed = bitVectSetBit (regsUsed, A_IDX);
+      regsUsed = bitVectSetBit (regsUsed, CND_IDX);
+    }
+
+  /* Remove the unneeded push/pops */
+  regsUnneeded = newBitVect (mcs51_nRegs);
+  while (lnp)
+    {
+      if (lnp->ic && (lnp->ic->op == FUNCTION || lnp->ic->op == ENDFUNCTION))
+        {
+	  if (!strncmp(lnp->line, "push", 4))
+	    {
+	      idx = bitVectFirstBit (port->peep.getRegsRead(lnp));
+	      if (idx>=0 && !bitVectBitValue (regsUsed, idx))
+	        {
+	          connectLine (lnp->prev, lnp->next);
+		  regsUnneeded = bitVectSetBit (regsUnneeded, idx);
+		}
+	    }
+	  if (!strncmp(lnp->line, "pop", 3) || !strncmp(lnp->line, "mov", 3))
+	    {
+	      idx = bitVectFirstBit (port->peep.getRegsWritten(lnp));
+	      if (idx>=0 && !bitVectBitValue (regsUsed, idx))
+	        {
+		  connectLine (lnp->prev, lnp->next);
+		  regsUnneeded = bitVectSetBit (regsUnneeded, idx);
+		}
+	    }
+	}
+      lnp = lnp->next;
+    }  
+  
+  for (idx = 0; idx < regsUnneeded->size; idx++)
+    if (bitVectBitValue (regsUnneeded, idx))
+      emitcode ("", ";\teliminated unneeded push/pop %s", mcs51_regWithIdx (idx)->dname);
+  
+  freeBitVect (regsUnneeded);
+  freeBitVect (regsUsed);
+  freeBitVect (regsUsedPrologue);
 }
 
 /*-----------------------------------------------------------------*/
@@ -9584,6 +9693,7 @@ gen51Code (iCode * lic)
 {
   iCode *ic;
   int cln = 0;
+  /* int cseq = 0; */
 
   _G.currentFunc = NULL;
   lineHead = lineCurr = NULL;
@@ -9629,6 +9739,13 @@ gen51Code (iCode * lic)
 	  }
 	  cln = ic->lineno;
 	}
+      #if 0
+      if (ic->seqPoint && ic->seqPoint != cseq)
+        {
+	  emitcode ("", "; sequence point %d", ic->seqPoint);
+	  cseq = ic->seqPoint;
+	}
+      #endif
       if (options.iCodeInAsm) {
 	char regsInUse[80];
 	int i;

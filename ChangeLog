@@ -1,3 +1,23 @@
+2004-02-28 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCpeeph.h,
+	* src/SDCCpeeph.c (pcDistance),
+	* src/port.h,
+	* src/mcs51/ralloc.h,
+	* src/mcs51/ralloc.c (mcs51_regWithIdx),
+	* src/mcs51/main.h,
+	* src/mcs51/main.c (instructionSize, asmLineNode, updateOpRW,
+	mcs51opcodeCompare, asmLineNodeFromLineNode, getInstructionSize,
+	mcs51operandCompare, getRegsRead, getRegsWritten): made instruction
+	size calculation port specific,	started basis for some register
+	optimizations
+	* src/mcs51/gen.c (genFunction, genEndFunction): added case to handle
+	missing push/pop of r0/r1. Optimized push/pops
+	* src/mcs51/ralloc.c (packregisters): fixed bug #727095
+	* device/lib/_modsint.c (_modsint),
+	* device/lib/_modslong.c (_modslong): fixed sign of result in non-asm
+	and stack version so regression tests pass
+
 2004-02-26 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/Makefile.in (dep): include SLIBOBJS in dependency check

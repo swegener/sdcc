@@ -74,9 +74,13 @@ regs regs8051[] =
   {REG_GPR, X10_IDX, REG_GPR, "x10", "x10", "xreg", 2, 1},
   {REG_GPR, X11_IDX, REG_GPR, "x11", "x11", "xreg", 3, 1},
   {REG_GPR, X12_IDX, REG_GPR, "x12", "x12", "xreg", 4, 1},
-  {REG_CND, CND_IDX, REG_CND, "C", "C", "xreg", 0, 1},
+  {REG_CND, CND_IDX, REG_CND, "C", "psw", "0xd0", 0, 1},
+  {0, DPL_IDX, 0, "dpl", "dpl", "0x82", 0, 0},
+  {0, DPH_IDX, 0, "dph", "dph", "0x83", 0, 0},
+  {0, B_IDX, 0, "b", "b", "0xf0", 0, 0},
+  {0, A_IDX, 0, "a", "acc", "0xe0", 0, 0},
 };
-int mcs51_nRegs = 13;
+int mcs51_nRegs = 17;
 static void spillThis (symbol *);
 static void freeAllRegs ();
 
@@ -125,7 +129,7 @@ mcs51_regWithIdx (int idx)
 {
   int i;
 
-  for (i = 0; i < mcs51_nRegs; i++)
+  for (i = 0; i < sizeof(regs8051)/sizeof(regs); i++)
     if (regs8051[i].rIdx == idx)
       return &regs8051[i];
 
@@ -2822,6 +2826,12 @@ packRegisters (eBBlock ** ebpp, int blockno)
 		mcs51_ptrRegReq += ((OP_SYMBOL (IC_RESULT (ic))->onStack ||
 			      OP_SYMBOL (IC_RESULT (ic))->iaccess ||
 			      SPEC_OCLS(OP_SYMBOL (IC_RESULT (ic))->etype) == idata) ? 1 : 0);
+	      if (POINTER_GET (ic) && IS_SYMOP (IC_LEFT (ic))
+		  && getSize (OP_SYMBOL (IC_LEFT (ic))->type) <= (unsigned int) PTRSIZE)
+		mcs51_ptrRegReq ++;
+	      if (POINTER_SET (ic) && IS_SYMOP (IC_RESULT (ic))
+		  && getSize (OP_SYMBOL (IC_RESULT (ic))->type) <= (unsigned int) PTRSIZE)
+		mcs51_ptrRegReq ++;
 	    }
 	}
 

@@ -46,6 +46,7 @@ static char *_mcs51_keywords[] =
 };
 
 
+
 void mcs51_assignRegisters (eBBlock ** ebbs, int count);
 
 static int regParmFlg = 0;	/* determine if we can register a parameter */
@@ -248,6 +249,388 @@ oclsExpense (struct memmap *oclass)
   return 0;
 }
 
+
+
+static int
+instructionSize(char *inst, char *op1, char *op2)
+{
+  #define ISINST(s) (strncmp(inst, (s), sizeof(s)-1) == 0)
+  #define IS_A(s) (*(s) == 'a' && *(s+1) == '\0')
+  #define IS_C(s) (*(s) == 'c' && *(s+1) == '\0')
+  #define IS_Rn(s) (*(s) == 'r' && *(s+1) >= '0' && *(s+1) <= '7')
+  #define IS_atRi(s) (*(s) == '@' && *(s+1) == 'r')
+
+  /* Based on the current (2003-08-22) code generation for the
+     small library, the top instruction probability is:
+   
+       57% mov/movx/movc
+        6% push
+        6% pop
+        4% inc
+        4% lcall
+        4% add
+        3% clr
+        2% subb
+  */
+  /* mov, push, & pop are the 69% of the cases. Check them first! */
+  if (ISINST ("mov"))
+    {
+      if (*(inst+3)=='x') return 1; /* movx */
+      if (*(inst+3)=='c') return 1; /* movc */
+      if (IS_C (op1) || IS_C (op2)) return 2;
+      if (IS_A (op1))
+	{
+	  if (IS_Rn (op2) || IS_atRi (op2)) return 1;
+	  return 2;
+	}
+      if (IS_Rn(op1) || IS_atRi(op1))
+	{
+	  if (IS_A(op2)) return 1;
+	  return 2;
+	}
+      if (strcmp (op1, "dptr") == 0) return 3;
+      if (IS_A (op2) || IS_Rn (op2) || IS_atRi (op2)) return 2;
+      return 3;
+    }
+  
+  if (ISINST ("push")) return 2;
+  if (ISINST ("pop")) return 2;
+
+  if (ISINST ("lcall")) return 3;
+  if (ISINST ("ret")) return 1;
+  if (ISINST ("ljmp")) return 3;
+  if (ISINST ("sjmp")) return 2;
+  if (ISINST ("rlc")) return 1;
+  if (ISINST ("rrc")) return 1;
+  if (ISINST ("rl")) return 1;
+  if (ISINST ("rr")) return 1;
+  if (ISINST ("swap")) return 1;
+  if (ISINST ("jc")) return 2;
+  if (ISINST ("jnc")) return 2;
+  if (ISINST ("jb")) return 3;
+  if (ISINST ("jnb")) return 3;
+  if (ISINST ("jbc")) return 3;
+  if (ISINST ("jmp")) return 1;	// always jmp @a+dptr
+  if (ISINST ("jz")) return 2;
+  if (ISINST ("jnz")) return 2;
+  if (ISINST ("cjne")) return 3;
+  if (ISINST ("mul")) return 1;
+  if (ISINST ("div")) return 1;
+  if (ISINST ("da")) return 1;
+  if (ISINST ("xchd")) return 1;
+  if (ISINST ("reti")) return 1;
+  if (ISINST ("nop")) return 1;
+  if (ISINST ("acall")) return 1;
+  if (ISINST ("ajmp")) return 2;
+
+    
+  if (ISINST ("add") || ISINST ("addc") || ISINST ("subb") || ISINST ("xch"))
+    {
+      if (IS_Rn(op2) || IS_atRi(op2)) return 1;
+      return 2;
+    }
+  if (ISINST ("inc") || ISINST ("dec"))
+    {
+      if (IS_A(op1) || IS_Rn(op1) || IS_atRi(op1)) return 1;
+      if (strcmp(op1, "dptr") == 0) return 1;
+      return 2;
+    }
+  if (ISINST ("anl") || ISINST ("orl") || ISINST ("xrl"))
+    {
+      if (IS_C(op1)) return 2;
+      if (IS_A(op1))
+	{
+	  if (IS_Rn(op2) || IS_atRi(op2)) return 1;
+	  return 2;
+	}
+      else
+	{
+	  if (IS_A(op2)) return 2;
+	  return 3;
+	}
+    }
+  if (ISINST ("clr") || ISINST ("setb") || ISINST ("cpl"))
+    {
+      if (IS_A(op1) || IS_C(op1)) return 1;
+      return 2;
+    }
+  if (ISINST ("djnz"))
+    {
+      if (IS_Rn(op1)) return 2;
+      return 3;
+    }
+
+  /* If the instruction is unrecognized, we shouldn't try to optimize. */
+  /* Return a large value to discourage optimization.                  */
+  return 999;
+}
+
+static asmLineNode *
+newAsmLineNode (void)
+{
+  asmLineNode *aln;
+
+  aln = Safe_alloc ( sizeof (asmLineNode));
+  aln->size = 0;
+  aln->regsRead = NULL;
+  aln->regsWritten = NULL;
+  
+  return aln;
+}
+
+
+typedef struct mcs51operanddata
+  {
+    char name[6];
+    int regIdx1;
+    int regIdx2;
+  }
+mcs51operanddata;
+
+static mcs51operanddata mcs51operandDataTable[] =
+  {
+    {"a", A_IDX, -1},
+    {"ab", A_IDX, B_IDX},
+    {"ac", CND_IDX, -1},
+    {"acc", A_IDX, -1},
+    {"ar0", R0_IDX, -1},
+    {"ar1", R1_IDX, -1},
+    {"ar2", R2_IDX, -1},
+    {"ar3", R3_IDX, -1},
+    {"ar4", R4_IDX, -1},
+    {"ar5", R5_IDX, -1},
+    {"ar6", R6_IDX, -1},
+    {"ar7", R7_IDX, -1},
+    {"b", B_IDX, -1},
+    {"c", CND_IDX, -1},
+    {"cy", CND_IDX, -1},
+    {"dph", DPH_IDX, -1},
+    {"dpl", DPL_IDX, -1},
+    {"dptr", DPL_IDX, DPH_IDX},
+    {"f0", CND_IDX, -1},
+    {"f1", CND_IDX, -1},
+    {"ov", CND_IDX, -1},
+    {"p", CND_IDX, -1},
+    {"psw", CND_IDX, -1},
+    {"r0", R0_IDX, -1},
+    {"r1", R1_IDX, -1},
+    {"r2", R2_IDX, -1},
+    {"r3", R3_IDX, -1},
+    {"r4", R4_IDX, -1},
+    {"r5", R5_IDX, -1},
+    {"r6", R6_IDX, -1},
+    {"r7", R7_IDX, -1},
+  };
+
+static int
+mcs51operandCompare (const void *key, const void *member)
+{
+  return strcmp((const char *)key, ((mcs51operanddata *)member)->name);
+}
+
+static void      
+updateOpRW (asmLineNode *aln, char *op, char *optype)
+{
+  mcs51operanddata *opdat;
+  char *dot;
+  
+  dot = strchr(op, '.');
+  if (dot)
+    *dot = '\0';
+
+  opdat = bsearch (op, mcs51operandDataTable,
+		   sizeof(mcs51operandDataTable)/sizeof(mcs51operanddata),
+		   sizeof(mcs51operanddata), mcs51operandCompare);
+  
+  if (opdat && strchr(optype,'r'))
+    {
+      if (opdat->regIdx1 >= 0)
+        aln->regsRead = bitVectSetBit (aln->regsRead, opdat->regIdx1);
+      if (opdat->regIdx2 >= 0)
+        aln->regsRead = bitVectSetBit (aln->regsRead, opdat->regIdx2);
+    }
+  if (opdat && strchr(optype,'w'))
+    {
+      if (opdat->regIdx1 >= 0)
+        aln->regsWritten = bitVectSetBit (aln->regsWritten, opdat->regIdx1);
+      if (opdat->regIdx2 >= 0)
+        aln->regsWritten = bitVectSetBit (aln->regsWritten, opdat->regIdx2);
+    }
+  if (op[0] == '@')
+    {
+      if (!strcmp(op, "@r0"))
+        aln->regsRead = bitVectSetBit (aln->regsRead, R0_IDX);
+      if (!strcmp(op, "@r1"))
+        aln->regsRead = bitVectSetBit (aln->regsRead, R1_IDX);
+      if (!strstr(op, "dptr"))
+	{
+	  aln->regsRead = bitVectSetBit (aln->regsRead, DPL_IDX);
+	  aln->regsRead = bitVectSetBit (aln->regsRead, DPH_IDX);
+	}
+      if (!strstr(op, "a+"))
+	aln->regsRead = bitVectSetBit (aln->regsRead, A_IDX);
+    }
+}
+
+typedef struct mcs51opcodedata
+  {
+    char name[6];
+    char class[3];
+    char pswtype[3];
+    char op1type[3];
+    char op2type[3];
+  }
+mcs51opcodedata;
+
+static mcs51opcodedata mcs51opcodeDataTable[] =
+  {
+    {"acall","j", "",   "",   ""},
+    {"ajmp", "j", "",   "",   ""},
+    {"add",  "",  "w",  "rw", "r"},
+    {"addc", "",  "rw", "rw", "r"},
+    {"anl",  "",  "",   "rw", "r"},
+    {"cjne", "j", "w",  "r",  "r"},
+    {"clr",  "",  "",   "w",  ""},
+    {"cpl",  "",  "",   "rw", ""},
+    {"da",   "",  "rw", "rw", ""},
+    {"dec",  "",  "",   "rw", ""},
+    {"div",  "",  "w",  "rw", ""},
+    {"djnz", "j", "",  "rw",  ""},
+    {"inc",  "",  "",   "rw", ""},
+    {"jb",   "j", "",   "r",  ""},
+    {"jbc",  "j", "",  "rw",  ""},
+    {"jc",   "j", "",   "",   ""},
+    {"jmp",  "j", "",  "",    ""},
+    {"jnb",  "j", "",   "r",  ""},
+    {"jnc",  "j", "",   "",   ""},
+    {"jnz",  "j", "",  "",    ""},
+    {"jz",   "j", "",  "",    ""},
+    {"lcall","j", "",   "",   ""},
+    {"ljmp", "j", "",   "",   ""},
+    {"mov",  "",  "",   "w",  "r"},
+    {"movc", "",  "",   "w",  "r"},
+    {"movx", "",  "",   "w",  "r"},
+    {"mul",  "",  "w",  "rw", ""},
+    {"nop",  "",  "",   "",   ""},
+    {"orl",  "",  "",   "rw", "r"},
+    {"pop",  "",  "",   "w",  ""},
+    {"push", "",  "",   "r",  ""},
+    {"ret",  "j", "",   "",   ""},
+    {"reti", "j", "",   "",   ""},
+    {"rl",   "",  "",   "rw", ""},
+    {"rlc",  "",  "rw", "rw", ""},
+    {"rr",   "",  "",   "rw", ""},
+    {"rrc",  "",  "rw", "rw", ""},
+    {"setb", "",  "",   "w",  ""},
+    {"sjmp", "j", "",   "",   ""},
+    {"subb", "",  "rw", "rw", "r"},
+    {"swap", "",  "",   "rw", ""},
+    {"xch",  "",  "",   "rw", "rw"},
+    {"xchd", "",  "",   "rw", "rw"},
+    {"xrl",  "",  "",   "rw", "r"},
+  };
+  
+static int
+mcs51opcodeCompare (const void *key, const void *member)
+{
+  return strcmp((const char *)key, ((mcs51opcodedata *)member)->name);
+}
+
+static asmLineNode *
+asmLineNodeFromLineNode (lineNode *ln)
+{
+  asmLineNode *aln = newAsmLineNode();
+  char *op, op1[256], op2[256];
+  int opsize;
+  const char *p;
+  char inst[8];
+  mcs51opcodedata *opdat;
+
+  p = ln->line;
+  
+  while (*p && isspace(*p)) p++;
+  for (op = inst, opsize=1; *p; p++)
+    {
+      if (isspace(*p) || *p == ';' || *p == ':' || *p == '=')
+        break;
+      else
+        if (opsize < sizeof(inst))
+	  *op++ = tolower(*p), opsize++;
+    }
+  *op = '\0';
+
+  if (*p == ';' || *p == ':' || *p == '=')
+    return aln;
+    
+  while (*p && isspace(*p)) p++;
+  if (*p == '=')
+    return aln;
+
+  for (op = op1, opsize=1; *p && *p != ','; p++)
+    {
+      if (!isspace(*p) && opsize < sizeof(op1))
+        *op++ = tolower(*p), opsize++;
+    }
+  *op = '\0';
+  
+  if (*p == ',') p++;
+  for (op = op2, opsize=1; *p && *p != ','; p++)
+    {
+      if (!isspace(*p) && opsize < sizeof(op2))
+        *op++ = tolower(*p), opsize++;
+    }
+  *op = '\0';
+
+  aln->size = instructionSize(inst, op1, op2);
+
+  aln->regsRead = newBitVect (END_IDX);
+  aln->regsWritten = newBitVect (END_IDX);
+
+  opdat = bsearch (inst, mcs51opcodeDataTable,
+		   sizeof(mcs51opcodeDataTable)/sizeof(mcs51opcodedata),
+		   sizeof(mcs51opcodedata), mcs51opcodeCompare);
+
+  if (opdat)
+    {
+      updateOpRW (aln, op1, opdat->op1type);
+      updateOpRW (aln, op2, opdat->op2type);
+      if (strchr(opdat->pswtype,'r'))
+        aln->regsRead = bitVectSetBit (aln->regsRead, CND_IDX);
+      if (strchr(opdat->pswtype,'w'))
+        aln->regsWritten = bitVectSetBit (aln->regsWritten, CND_IDX);
+    }
+
+  return aln;
+}
+
+static int
+getInstructionSize (lineNode *line)
+{
+  if (!line->aln)
+    line->aln = asmLineNodeFromLineNode (line);
+  
+  return line->aln->size;
+}
+
+static bitVect *
+getRegsRead (lineNode *line)
+{
+  if (!line->aln)
+    line->aln = asmLineNodeFromLineNode (line);
+  
+  return line->aln->regsRead;
+}
+
+static bitVect *
+getRegsWritten (lineNode *line)
+{
+  if (!line->aln)
+    line->aln = asmLineNodeFromLineNode (line);
+  
+  return line->aln->regsWritten;
+}
+
+
 /** $1 is always the basename.
     $2 is always the output file.
     $3 varies
@@ -295,7 +678,10 @@ PORT mcs51_port =
     1
   },
   {
-    _defaultRules
+    _defaultRules,
+    getInstructionSize,
+    getRegsRead,
+    getRegsWritten
   },
   {
 	/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */

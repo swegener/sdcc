@@ -7,6 +7,7 @@
 
 #include "SDCCicode.h"
 #include "SDCCargs.h"
+#include "SDCCpeeph.h"
 
 #define TARGET_ID_MCS51    1
 #define TARGET_ID_GBZ80    2
@@ -113,6 +114,9 @@ typedef struct
       {
 /** Default peephole rules */
 	char *default_rules;
+	int (*getSize)(lineNode *line);
+	bitVect * (*getRegsRead)(lineNode *line);
+	bitVect * (*getRegsWritten)(lineNode *line);
       }
     peep;
 

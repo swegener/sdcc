@@ -28,6 +28,9 @@
 
 #define MAX_PATTERN_LEN 128
 
+struct asmLineNode;	/* defined in each port */
+struct lineNode;
+
 typedef struct lineNode
   {
     char *line;
@@ -35,6 +38,7 @@ typedef struct lineNode
     unsigned int isInline:1;
     unsigned int isComment:1;
     unsigned int isDebug:1;
+    struct asmLineNode *aln;
     struct lineNode *prev;
     struct lineNode *next;
   }

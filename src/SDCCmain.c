@@ -1107,7 +1107,7 @@ parseCmdLine (int argc, char **argv)
   /* if debug option is set the open the cdbFile */
   if (options.debug && srcFileName)
     {
-      sprintf (scratchFileName, "%s.cdb", srcFileName);
+      sprintf (scratchFileName, "%s.adb", srcFileName); //JCF: Nov 30, 2002
       if ((cdbFile = fopen (scratchFileName, "w")) == NULL)
 	werror (E_FILE_OPEN_ERR, scratchFileName);
       else

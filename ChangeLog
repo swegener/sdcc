@@ -1,3 +1,8 @@
+2004-10-05 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* device/lib/pic16/libsdcc/gptr/gptr*.c: added return statements
+	* device/include/pic16/stdio.h: fixed bug with colon
+
 2004-10-03 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* device/include/pic16/stdio.h,

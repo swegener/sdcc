@@ -50,7 +50,7 @@ extern int _print_format (pfn_outputchar pfn, void* pvoid, const char *format, v
 
 /*-----------------------------------------------------------------------*/
 
-extern void printf_small (char *,...);	_REENTRANT;
+extern void printf_small (char *,...) _REENTRANT;
 extern int printf (const char *,...);
 extern int vprintf (const char *, va_list);
 extern int sprintf (char *, const char *, ...);

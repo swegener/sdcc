@@ -64,7 +64,7 @@ void _gptrget4(void) _naked
     movff	_POSTINC0, _PRODH
     movff	_POSTINC0, _FSR0L
     
-    goto _end_
+    return
     
 
 _lab_01_:
@@ -93,15 +93,14 @@ _lab_01_:
     TBLRD*+
     movff	_TABLAT, _FSR0L
     
-    goto _end_
- 
+    return 
   
 _lab_02_:
     /* EEPROM pointer */
 
     /* unimplemented yet */
 
-_end_:
-
+  return
+  
   _endasm;
 }

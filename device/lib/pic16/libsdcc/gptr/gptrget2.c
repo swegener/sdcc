@@ -61,7 +61,7 @@ void _gptrget2(void) _naked
     movf	_POSTINC0, w
     movff	_POSTINC0, _PRODL
     
-    goto _end_
+    return
     
 
 _lab_01_:
@@ -82,7 +82,7 @@ _lab_01_:
     TBLRD*+
     movff	_TABLAT, _PRODL
     
-    goto _end_
+    return
  
   
 _lab_02_:
@@ -92,5 +92,6 @@ _lab_02_:
 
 _end_:
 
+  return
   _endasm;
 }

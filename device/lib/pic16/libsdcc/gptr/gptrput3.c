@@ -62,25 +62,23 @@ void _gptrput3(void) _naked
     movff	_PRODH, _POSTINC0
     movff	_TBLPTRL, _POSTINC0
     
-    goto _end_
+    return
     
 
 _lab_01_:
     /* code or eeprom */
-    btfsc	_WREG, 6
-    goto	_lab_02_
+    btfss	_WREG, 6
+    return
     
     /* code pointer, cannot write code pointers */
     
-    goto _end_
- 
   
 _lab_02_:
     /* EEPROM pointer */
 
     /* unimplemented yet */
 
-_end_:
 
+  return
   _endasm;
 }

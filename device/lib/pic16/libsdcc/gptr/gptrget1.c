@@ -61,7 +61,7 @@ void _gptrget1(void) _naked
     /* debug info */
     movf	_POSTINC0, w
 
-    goto _end_
+    return
     
 
 _lab_01_:
@@ -79,8 +79,7 @@ _lab_01_:
     /* result in TBLAT */
     movf	_TABLAT, w
     
-    goto _end_
- 
+    return 
   
 _lab_02_:
     /* EEPROM pointer */
@@ -89,5 +88,6 @@ _lab_02_:
 
 _end_:
 
+  return
   _endasm;
 }

@@ -1241,10 +1241,6 @@ serialRegAssign (eBBlock ** ebbs, int count)
 		    /* if the allocation failed which means
 		       this was spilt then break */
 		    if (!sym->regs[j]) {
-		      if (j) {
-			fprintf (stderr, "%d reg(s) lost in %s:%d\n",
-				 j, __FILE__,__LINE__);
-		      }
 		      break;
 		    }
 		}

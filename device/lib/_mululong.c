@@ -32,7 +32,7 @@ union bil {
         unsigned long l;
         struct { unsigned char b0; unsigned int i12; unsigned char b3;} bi;
 } ;
-#if defined(SDCC_MODEL_LARGE) || defined (SDCC_MODEL_FLAT24)
+#if defined(SDCC_MODEL_LARGE) || defined (SDCC_ds390)
 #define bcast(x) ((union bil _xdata  *)&(x))
 #else
 #define bcast(x) ((union bil _near *)&(x))
@@ -56,28 +56,30 @@ union bil {
                         |3.0|         G
                           |-------> only this side 32 x 32 -> 32
 */
+
 unsigned long _mululong (unsigned long a, unsigned long b) 
 {
         union bil t;
 
-        t.i.hi = (unsigned int)bcast(a)->b.b0 * bcast(b)->b.b2;       // A
-        t.i.lo = (unsigned int)bcast(a)->b.b0 * bcast(b)->b.b0;       // A
-        t.b.b3 += (unsigned char)(bcast(a)->b.b3 *
-                                  bcast(b)->b.b0);      // G
-        t.b.b3 += (unsigned char)(bcast(a)->b.b2 *
-                                  bcast(b)->b.b1);      // F
-        t.i.hi += (unsigned int)bcast(a)->b.b2 * bcast(b)->b.b0;      // E <- b lost in .lst
+        t.i.hi = bcast(a)->b.b0 * bcast(b)->b.b2;       // A
+        t.i.lo = bcast(a)->b.b0 * bcast(b)->b.b0;       // A
+	_asm ;johan _endasm;
+        t.b.b3 += bcast(a)->b.b3 *
+                                  bcast(b)->b.b0;       // G
+        t.b.b3 += bcast(a)->b.b2 *
+                                  bcast(b)->b.b1;       // F
+        t.i.hi += bcast(a)->b.b2 * bcast(b)->b.b0;      // E <- b lost in .lst
         // bcast(a)->i.hi is free !
-        t.i.hi += (unsigned int)bcast(a)->b.b1 * bcast(b)->b.b1;      // D <- b lost in .lst
+        t.i.hi += bcast(a)->b.b1 * bcast(b)->b.b1;      // D <- b lost in .lst
 
-        bcast(a)->bi.b3 = (unsigned char)(bcast(a)->b.b1 *
-                                          bcast(b)->b.b2);
-        bcast(a)->bi.i12 = (unsigned int)bcast(a)->b.b1 *
+        bcast(a)->bi.b3 = bcast(a)->b.b1 *
+                                          bcast(b)->b.b2;
+        bcast(a)->bi.i12 = bcast(a)->b.b1 *
                            bcast(b)->b.b0;              // C
 
-        bcast(b)->bi.b3 = (unsigned char)(bcast(a)->b.b0 *
-                                          bcast(b)->b.b3);
-        bcast(b)->bi.i12 = (unsigned int)bcast(a)->b.b0 *
+        bcast(b)->bi.b3 = bcast(a)->b.b0 *
+                                          bcast(b)->b.b3;
+        bcast(b)->bi.i12 = bcast(a)->b.b0 *
                            bcast(b)->b.b1;              // B
         bcast(b)->bi.b0 = 0;                            // B
         bcast(a)->bi.b0 = 0;                            // C

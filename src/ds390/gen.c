@@ -2843,10 +2843,15 @@ genRet (iCode * ic)
 	}
       else
 	{
+	  /* Since A is the last element of fReturn,
+	   * it is OK to clobber it in the aopGet.
+	   */
 	  l = aopGet (AOP (IC_LEFT (ic)), offset,
-		      FALSE, FALSE, FALSE);
+		      FALSE, FALSE, TRUE);
 	  if (strcmp (fReturn[offset], l))
+	  {
 	    emitcode ("mov", "%s,%s", fReturn[offset++], l);
+	  }
 	}
     }
   _endLazyDPSEvaluation ();

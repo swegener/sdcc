@@ -456,11 +456,9 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool useDP2)
 
       if (useDP2)
 	{
-	  /* genSetDPTR(1); */
 	  emitcode ("mov", "dpx1,#0x40");
 	  emitcode ("mov", "dph1,#0x00");
 	  emitcode ("mov", "dpl1, a");
-	  /* genSetDPTR(0); */
 	}
       else
 	{
@@ -8954,47 +8952,60 @@ genFarFarAssign (operand * result, operand * right, iCode * ic)
 {
   int size = AOP_SIZE (right);
   int offset = 0;
-  char *l;
+  symbol *rSym = NULL;
 
-  if (size > 1)
-    {
-      /* This is a net loss for size == 1, but a big gain
-       * otherwise.
-       */
-
-// #define BETTER_FAR_FAR_ASSIGN
-#ifdef BETTER_FAR_FAR_ASSIGN
-      if ((IS_SYMOP(result) && OP_SYMBOL(result) && OP_SYMBOL(result)->rname)
-       && (IS_TRUE_SYMOP(result) 
-        || (IS_ITEMP(result) && OP_SYMBOL(result)->isspilt && OP_SYMBOL(result)->usl.spillLoc->rname))) 
+  if (size == 1)
+  {
+      /* quick & easy case. */
+      D(emitcode(";","genFarFarAssign (1 byte case)"););      
+      MOVA(aopGet(AOP(right), 0, FALSE, FALSE, TRUE));
+      freeAsmop (right, NULL, ic, FALSE);
+      /* now assign DPTR to result */
+      _G.accInUse++;
+      aopOp(result, ic, FALSE, FALSE);
+      _G.accInUse--;
+      aopPut(AOP(result), "a", 0);
+      freeAsmop(result, NULL, ic, FALSE);
+      return;
+  }
+  
+  /* See if we've got an underlying symbol to abuse. */
+  if (IS_SYMOP(result) && OP_SYMBOL(result))
+  {
+      if (IS_TRUE_SYMOP(result))
       {
-          D(emitcode(";","genFarFarAssign ('390 auto-toggle fun)"););
-          emitcode("mov", "dps, #21"); 	/* Select DPTR2 & auto-toggle. */
-          if (IS_TRUE_SYMOP(result))
-          {
-          	emitcode ("mov", "dptr,#%s", OP_SYMBOL(result)->rname); 
-          }
-          else
-          {
-                emitcode ("mov", "dptr,#%s", OP_SYMBOL(result)->usl.spillLoc->rname);
-          }
-          /* DP2 = result, DP1 = right, DP1 is current. */
-          while (size)
-          {
-              emitcode("movx", "a,@dptr");
-              emitcode("movx", "@dptr,a");
-              if (--size)
-              {
-              	   emitcode("inc", "dptr");
-              	   emitcode("inc", "dptr");
-              }
-          }
-          emitcode("mov", "dps, #0");
+	  rSym = OP_SYMBOL(result);
       }
-      else
-#endif      
+      else if (IS_ITEMP(result) && OP_SYMBOL(result)->isspilt && OP_SYMBOL(result)->usl.spillLoc)
       {
-      D (emitcode (";", "genFarFarAssign (improved)"););
+	  rSym = OP_SYMBOL(result)->usl.spillLoc;
+      }
+  }
+	     
+  if (size > 1 && rSym && rSym->rname && !rSym->onStack)
+  {
+      /* We can use the '390 auto-toggle feature to good effect here. */
+      
+      D(emitcode(";","genFarFarAssign ('390 auto-toggle fun)"););
+      emitcode("mov", "dps, #0x21"); 	/* Select DPTR2 & auto-toggle. */
+      emitcode ("mov", "dptr,#%s", rSym->rname); 
+      /* DP2 = result, DP1 = right, DP1 is current. */
+      while (size)
+      {
+          emitcode("movx", "a,@dptr");
+          emitcode("movx", "@dptr,a");
+          if (--size)
+          {
+               emitcode("inc", "dptr");
+               emitcode("inc", "dptr");
+          }
+      }
+      emitcode("mov", "dps, #0");
+      freeAsmop (right, NULL, ic, FALSE);
+  }
+  else
+  {
+      D (emitcode (";", "genFarFarAssign"););
       aopOp (result, ic, TRUE, TRUE);
 
       _startLazyDPSEvaluation ();
@@ -9007,34 +9018,8 @@ genFarFarAssign (operand * result, operand * right, iCode * ic)
 	}
       _endLazyDPSEvaluation ();
       freeAsmop (result, NULL, ic, FALSE);
-      }
       freeAsmop (right, NULL, ic, FALSE);
-    }
-  else
-    {
-      D (emitcode (";", "genFarFarAssign "););
-
-      /* first push the right side on to the stack */
-      _startLazyDPSEvaluation ();
-      while (size--)
-	{
-	  l = aopGet (AOP (right), offset++, FALSE, FALSE, TRUE);
-	  MOVA (l);
-	  emitcode ("push", "acc");
-	}
-
-      freeAsmop (right, NULL, ic, FALSE);
-      /* now assign DPTR to result */
-      aopOp (result, ic, FALSE, FALSE);
-      size = AOP_SIZE (result);
-      while (size--)
-	{
-	  emitcode ("pop", "acc");
-	  aopPut (AOP (result), "a", --offset);
-	}
-      freeAsmop (result, NULL, ic, FALSE);
-      _endLazyDPSEvaluation ();
-    }
+  }
 }
 
 /*-----------------------------------------------------------------*/

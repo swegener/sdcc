@@ -17,7 +17,7 @@ EXTRAS = ports/$(PORT)/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
 	-grep -n FAIL $@ /dev/null || true	
 
 %$(EXEEXT): %$(OBJEXT) $(EXTRAS)
-	$(SDCC) $(SDCCFLAGS) -o $@ $< $(EXTRAS)
+	$(SDCC) $(SDCCFLAGS) -o $@ $< $(EXTRAS) -lm
 
 %$(OBJEXT): %.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@

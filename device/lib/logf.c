@@ -36,7 +36,12 @@
 
 float logf(const float x) reentrant
 {
-    float Rz, f, z, w, znum, zden, xn;
+#if     defined(SDCC_mcs51) && defined(SDCC_MODEL_SMALL) \
+    && !defined(SDCC_NOOVERLAY)
+    volatile
+#endif
+    float Rz;
+    float f, z, w, znum, zden, xn;
     int n;
 
     if (x<=0.0)

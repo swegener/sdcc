@@ -1,3 +1,7 @@
+2003-03-29  Bernhard Held <bernhard@bernhardheld.de>
+
+	* support/Util/dbuf.h: remove C++ stuff to make it portable
+
 2003-03-28  Borut Razem <borut.razem@siol.net>
 
 	* src/SDCC.lex: Fix for bug #711240: dynamic buffer handling of C

@@ -28,37 +28,22 @@
 #ifndef __DBUF_H
 #define __DBUF_H
 
-#ifndef _WIN32
-#include <ansidecl.h>
-#else
-#define PARAMS(paramlist)   paramlist
-#endif
-
 struct dbuf_s {
   size_t alloc;   /* size of allocated buffer in bytes */
   size_t len;     /* actual size of the buffer in bytes */
   void *buf;      /* pointer to the buffer, allocated on heap */
 };
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-struct dbuf_s *dbuf_new PARAMS ((size_t size));
-int dbuf_init PARAMS ((struct dbuf_s *dbuf, size_t size));
-int dbuf_set_size PARAMS ((struct dbuf_s *dbuf, size_t size));
-int dbuf_append PARAMS ((struct dbuf_s *dbuf, const void *buf, size_t size));
-const void *dbuf_get_buf PARAMS ((struct dbuf_s *dbuf));
-size_t dbuf_get_size PARAMS ((struct dbuf_s *dbuf));
-const char *dbuf_c_str PARAMS ((struct dbuf_s *dbuf));
+struct dbuf_s *dbuf_new (size_t size);
+int dbuf_init (struct dbuf_s *dbuf, size_t size);
+int dbuf_set_size (struct dbuf_s *dbuf, size_t size);
+int dbuf_append (struct dbuf_s *dbuf, const void *buf, size_t size);
+const void *dbuf_get_buf (struct dbuf_s *dbuf);
+size_t dbuf_get_size (struct dbuf_s *dbuf);
+const char *dbuf_c_str (struct dbuf_s *dbuf);
 int dbuf_trim(struct dbuf_s *dbuf);
-void *dbuf_detach PARAMS ((struct dbuf_s *dbuf));
-void dbuf_destroy PARAMS ((struct dbuf_s *dbuf));
-void dbuf_delete PARAMS ((struct dbuf_s *dbuf));
-
-#ifdef __cplusplus
-}
-#endif
+void *dbuf_detach (struct dbuf_s *dbuf);
+void dbuf_destroy (struct dbuf_s *dbuf);
+void dbuf_delete (struct dbuf_s *dbuf);
 
 #endif  /* __DBUF_H */

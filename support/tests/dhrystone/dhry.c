@@ -18,7 +18,11 @@
     * The comment at the start of Func_1 about the input being
       H, R on the first call is wrong - Func_1 is first called
       from Func_2 where the input is R, Y.  The test still succeeds.
-      
+
+    References:
+    * http://www.netlib.org/performance/html/dhry.intro.html
+    * http://www.netlib.org/performance/html/dhry.data.col0.html
+
     I couldnt find a copyright in the original - the most relevent
     part follows:
 
@@ -36,13 +40,24 @@
 */
 
 #include "dhry.h"
+#include <string.h>
+/** For printf */
+#include <stdio.h>
 
-/* Temporary definitions.  Remove soon :) */
-#if SDCC
-void *memcpy(void *dest, const char *src, int wLen);
+/** Returns the current device time in ticks.  Check HZ in the Makefile
+    as well - HZ ticks = 1 second.
+*/
+unsigned _clock(void);
+
+/** Set to one to print more messages about expected values etc. 
+ */
+#define DEBUG	0
+
+#if DEBUG
+#define DPRINTF(_a)  printf _a
+#else
+#define DPRINTF(_a)
 #endif
-char *strcpy(char *dest, const char *src);
-int strcmp(const char *s1, const char *s2);
 
 Rec_Pointer     Ptr_Glob,
                 Next_Ptr_Glob;
@@ -52,6 +67,7 @@ char            Ch_1_Glob,
                 Ch_2_Glob;
 int             Arr_1_Glob [50];
 int             Arr_2_Glob [50] [50];
+
 
 /* Used instead of malloc() */
 static Rec_Type _r[2];
@@ -69,15 +85,6 @@ Enumeration Func_1 (Capital_Letter Ch_1_Par_Val, Capital_Letter Ch_2_Par_Val);
 Boolean Func_2 (char *Str_1_Par_Ref, char *Str_2_Par_Ref);
 Boolean Func_3 (Enumeration Enum_Par_Val);
 
-void printf(const char *format, ...);
-void exit(int val);
-unsigned _clock(void);
-
-/*#define DPRINTF(_a)  printf _a*/
-#define DPRINTF(_a)
-
-unsigned getsp(void);
-
 #if SDCC
 int _main(void) 
 #else
@@ -93,7 +100,7 @@ int main(void)
     Str_30          Str_2_Loc;
     REG   int             Run_Index;
     REG   int             Number_Of_Runs;
-    unsigned endTime;
+    unsigned runTime;
 
     printf("[dhry]\n");
 
@@ -110,12 +117,16 @@ int main(void)
     strcpy (Str_1_Loc, "DHRYSTONE PROGRAM, 1'ST STRING");
 
     Arr_2_Glob [8][7] = 10;
+
     /* Was missing in published program. Without this statement,    */
     /* Arr_2_Glob [8][7] would have an undefined value.             */
     /* Warning: With 16-Bit processors and Number_Of_Runs > 32000,  */
     /* overflow may occur for this array element.                   */
 
-    Number_Of_Runs = 32766;
+    /* 32766 is the highest value for a 16 bitter */
+    Number_Of_Runs = 20000;
+
+    runTime = _clock();
 
     /* Main test loop */
     for (Run_Index = 1; Run_Index <= Number_Of_Runs; ++Run_Index) {
@@ -187,7 +198,7 @@ int main(void)
 
     printf("Run_Index = %d\n", Run_Index);
 
-    endTime = _clock();
+    runTime = _clock() - runTime;
 
     printf ("Execution ends\n");
     printf ("\n");
@@ -242,8 +253,9 @@ int main(void)
     printf ("        should be:   DHRYSTONE PROGRAM, 2'ND STRING\n");
     printf ("\n");
 
-    printf("Time: %u ticks\n", endTime);
-    printf("Dhrystones/tick = %u\n", Number_Of_Runs / (endTime/100));
+    printf("Time: %u ticks\n", runTime);
+    printf("Dhrystones/s = %u\n", Number_Of_Runs / (runTime/HZ));
+    printf("MIPS = d/s/1757 = (sigh, need floats...)\n");
 }
 
 void Proc_1 (REG Rec_Pointer Ptr_Val_Par)
@@ -384,8 +396,8 @@ Enumeration Func_1 (Capital_Letter Ch_1_Par_Val, Capital_Letter Ch_2_Par_Val)
     Capital_Letter        Ch_2_Loc;
 
     DPRINTF(("-> Func_1\n"));
-    DPRINTF(("  Inputs: Ch_1_Par_Val '%c' == { H, A, B }\n", (char)Ch_1_Par_Val));
-    DPRINTF(("          Ch_2_Par_Val '%c' == { R, C, C }\n", (char)Ch_2_Par_Val));
+    DPRINTF(("  Inputs: Ch_1_Par_Val '%c' == { R, A, B }\n", (char)Ch_1_Par_Val));
+    DPRINTF(("          Ch_2_Par_Val '%c' == { Y, C, C }\n", (char)Ch_2_Par_Val));
 
     Ch_1_Loc = Ch_1_Par_Val;
     Ch_2_Loc = Ch_1_Loc;
@@ -473,17 +485,8 @@ Boolean Func_2 (char *Str_1_Par_Ref, char *Str_2_Par_Ref)
     Int_Loc = 2;
 
     while (Int_Loc <= 2) {
-#if BROKEN_SDCC
-	char a, b;
-	DPRINTF(("  2.1 Runs once Int_Loc %u = 2.\n", (unsigned)Int_Loc));
-	/* loop body executed once */
-	a = Str_1_Par_Ref[Int_Loc];
-	b = Str_2_Par_Ref[Int_Loc+1];
-	if (Func_1 (a, b) == Ident_1)
-#else
 	if (Func_1 (Str_1_Par_Ref[Int_Loc],
 		    Str_2_Par_Ref[Int_Loc+1]) == Ident_1)
-#endif
 	    /* then, executed */
 	    {
 		DPRINTF(("  2.3 Then OK.\n"));

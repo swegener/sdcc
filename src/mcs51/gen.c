@@ -928,10 +928,11 @@ static void aopPut (asmop *aop, char *s, int offset)
 			
 			if (strcmp(s,"a")) {
 			    MOVA(s);
-			}  
-			emitcode("cjne","a,#0x01,%05d$",lbl->key+100);
-			emitcode("","%05d$:",lbl->key+100);
+			}
+			emitcode("clr","c");
+			emitcode("jz","%05d$",lbl->key+100);
 			emitcode("cpl","c");
+			emitcode("","%05d$:",lbl->key+100);
 			emitcode("mov","%s,c",aop->aopu.aop_dir);
 		    }
 	}

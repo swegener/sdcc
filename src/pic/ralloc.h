@@ -122,5 +122,6 @@ regs *allocRegByName (char *name, int size );
 #define IDX_KZ      0x7fff   /* Known zero - actually just a general purpose reg. */
 #define IDX_WSAVE   0x7ffe
 #define IDX_SSAVE   0x7ffd
+#define IDX_PSAVE   0x7ffc
 
 #endif

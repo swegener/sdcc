@@ -106,10 +106,10 @@ pic14emitRegularMap (memmap * map, bool addPublics, bool arFlag)
   symbol *sym;
   int bitvars = 0;;
 
+  /* print the area name */
   if (addPublics)
     fprintf (map->oFile, ";\t.area\t%s\n", map->sname);
 
-  /* print the area name */
   for (sym = setFirstItem (map->syms); sym;
        sym = setNextItem (map->syms)) {
 
@@ -307,7 +307,7 @@ printIvalChar (sym_link * type, initList * ilist, pBlock *pb, char *s)
   else {
     //printChar (oFile, s, strlen (s) + 1);
 
-    for(remain=0; remain<strlen(s); remain++) {
+    for(remain=0; remain<(int)strlen(s); remain++) {
       addpCode2pBlock(pb,newpCode(POC_RETLW,newpCodeOpLit(s[remain])));
       //fprintf(stderr,"0x%02x ",s[remain]);
     }
@@ -572,14 +572,15 @@ pic14createInterruptVect (FILE * vFile)
   fprintf (vFile, "\t__config 0x%x\n", getConfigWord(0x2007));
 
   fprintf (vFile, "%s", iComments2);
-  fprintf (vFile, "; reset and interrupt vectors \n");
+  fprintf (vFile, "; reset vector \n");
   fprintf (vFile, "%s", iComments2);
   fprintf (vFile, "STARTUP\t%s\n", CODE_NAME);
+  fprintf (vFile, "\tnop\n"); /* first location used by incircuit debugger */
   fprintf (vFile, "\tgoto\t__sdcc_gsinit_startup\n");
-  fprintf (vFile, "\tnop\n");
+/* during an interrupt PCLATH must be cleared before a goto  - delete me
   fprintf (vFile, "\tnop\n");
   fprintf (vFile, "\tgoto\t__sdcc_interrupt\n");
-
+*/
 }
 
 
@@ -919,11 +920,15 @@ picglue ()
     copyFile (asmFile, vFile);
     
     fprintf (asmFile, "%s", iComments2);
-    fprintf (asmFile, "; initialization and interrupt code \n");
+    fprintf (asmFile, "; interrupt and initialization code\n");
     fprintf (asmFile, "%s", iComments2);
+    fprintf (asmFile, "code_init\t%s\t0x4\n", CODE_NAME);
+
+    /* interrupt service routine */
+    fprintf (asmFile, "__sdcc_interrupt:\n");
+    copypCode(asmFile, 'I');
 
     /* initialize data memory */
-    fprintf (asmFile, "code_init\t%s\t0x10\n", CODE_NAME);
     fprintf (asmFile,"__sdcc_gsinit_startup:\n");
     /* FIXME: This is temporary.  The idata section should be used.  If 
        not, we could add a special feature to the linker.  This will 
@@ -931,11 +936,6 @@ picglue ()
     copypCode(asmFile, statsg->dbName);
     fprintf (asmFile,"\tpagesel _main\n");
     fprintf (asmFile,"\tgoto _main\n");
-
-    /* interrupt service routine */
-    fprintf (asmFile, "__sdcc_interrupt:\n");
-    copypCode(asmFile, 'I');
-    fprintf (asmFile,"\tgoto $\n");
   }
 
 #if 0    

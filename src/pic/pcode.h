@@ -326,6 +326,7 @@ typedef struct pCodeOpLabel
 {
   pCodeOp pcop;
   int key;
+  int offset;           /* low or high byte of label */
 } pCodeOpLabel;
 
 typedef struct pCodeOpReg
@@ -832,8 +833,9 @@ extern pCodeOpReg pc_fsr;
 extern pCodeOpReg pc_pcl;
 extern pCodeOpReg pc_pclath;
 extern pCodeOpReg pc_kzero;
-extern pCodeOpReg pc_wsave;     /* wsave and ssave are used to save W and the Status */
+extern pCodeOpReg pc_wsave;     /* wsave, ssave and psave are used to save W, the Status and PCLATH*/
 extern pCodeOpReg pc_ssave;     /* registers during an interrupt */
+extern pCodeOpReg pc_psave;     /* registers during an interrupt */
 
 
 #endif // __PCODE_H__

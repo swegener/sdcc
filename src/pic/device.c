@@ -167,7 +167,7 @@ int isREGinBank(regs *reg, int bank)
   if(!reg || !pic)
     return 0;
 
-  if(((reg->address | reg->alias) & pic->bankMask & bank) == bank)
+  if((int)((reg->address | reg->alias) & pic->bankMask & bank) == bank)
     return 1;
 
   return 0;
@@ -257,10 +257,18 @@ void dump_sfr(FILE *of)
              (!finalMapping[start].instance) && 
 	     (!finalMapping[start].isSFR)) {
 
-	    fprintf(of,"%s\tres\t%i\n",
+	    if (finalMapping[start].reg->isFixed) {
+	      unsigned i;
+	      for (i=0; i<finalMapping[start].reg->size; i++) {
+	        fprintf(of,"%s\tEQU\t0x%04x\n",
+                    finalMapping[start].reg->name, 
+                    finalMapping[start].reg->address+i);
+	      }
+	    } else {
+	      fprintf(of,"%s\tres\t%i\n",
                     finalMapping[start].reg->name, 
                     finalMapping[start].reg->size);
-
+	    }
 	    finalMapping[start].reg->isEmitted = 1;
 	  }
 	}
@@ -440,7 +448,7 @@ int validAddress(int address, int reg_size)
 void mapRegister(regs *reg)
 {
 
-  int i;
+  unsigned i;
   int alias;
 
   if(!reg || !reg->size) {
@@ -553,9 +561,30 @@ void assignRelocatableRegisters(set *regset, int used)
 
     //fprintf(stdout,"assigning %s isFixed=%d, wasUsed=%d\n",reg->name,reg->isFixed,reg->wasUsed);
 
-    if((!reg->isFixed) && ( used || reg->wasUsed))
-      address = assignRegister(reg,address);
-
+    if((!reg->isFixed) && ( used || reg->wasUsed)) {
+      /* If register have been reused then shall not print it a second time. */
+// Undefine REUSE_GPR in files pcode.c & device.c to prevent local function registers being reused.
+#define REUSE_GPR
+#ifdef REUSE_GPR
+      set *s;
+      int done = 0;
+      for (s = regset; s; s = s->next) {
+        regs *r;
+        r = s->item;
+        if (r == reg)
+          break;
+        if((!r->isFixed) && ( used || r->wasUsed)) {
+          if (r->rIdx == reg->rIdx) {
+            reg->address = r->address;
+            done = 1;
+            break;
+          }
+        }
+      }
+      if (!done)
+#endif // REUSE_GPR
+        address = assignRegister(reg,address);
+    }
   }
 
 }

@@ -60,6 +60,7 @@ pCodeOpReg pc_pclath    = {{PO_PCLATH,  "PCLATH"}, -1, NULL,0,NULL};
 pCodeOpReg pc_kzero     = {{PO_GPR_REGISTER,  "KZ"}, -1, NULL,0,NULL};
 pCodeOpReg pc_wsave     = {{PO_GPR_REGISTER,  "WSAVE"}, -1, NULL,0,NULL};
 pCodeOpReg pc_ssave     = {{PO_GPR_REGISTER,  "SSAVE"}, -1, NULL,0,NULL};
+pCodeOpReg pc_psave     = {{PO_GPR_REGISTER,  "PSAVE"}, -1, NULL,0,NULL};
 
 static int mnemonics_initialized = 0;
 
@@ -1226,7 +1227,7 @@ void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...)
   va_end (val);
 
   len = strlen(*str);
-  if(len > *size) {
+  if((size_t)len > *size) {
     fprintf(stderr,"WARNING, it looks like %s has overflowed\n",__FUNCTION__);
     fprintf(stderr,"len = %d is > str size %d\n",len,(int)*size);
   }
@@ -1277,6 +1278,7 @@ extern void init_pic(char *);
 void  pCodeInitRegisters(void)
 {
   static int initialized=0;
+  int shareBankAddress;
 
   if(initialized)
     return;
@@ -1299,13 +1301,19 @@ void  pCodeInitRegisters(void)
   pc_pcl.rIdx = IDX_PCL;
   pc_pclath.rIdx = IDX_PCLATH;
 
-  pc_kzero.r = allocInternalRegister(IDX_KZ,"KZ",PO_GPR_REGISTER,0);
-  pc_ssave.r = allocInternalRegister(IDX_SSAVE,"SSAVE", PO_GPR_REGISTER, 0x80);
-  pc_wsave.r = allocInternalRegister(IDX_WSAVE,"WSAVE", PO_GPR_REGISTER, 0);
+  pc_kzero.r = allocInternalRegister(IDX_KZ,"KZ",PO_GPR_REGISTER,0); /* Known Zero - actually just a general purpose reg. */
+  pc_wsave.r = allocInternalRegister(IDX_WSAVE,"WSAVE", PO_GPR_REGISTER, 0x80); /* Interupt storage for working register - must be same address in all banks ie section SHAREBANK. */
+  pc_ssave.r = allocInternalRegister(IDX_SSAVE,"SSAVE", PO_GPR_REGISTER, 0); /* Interupt storage for status register. */
+  pc_psave.r = allocInternalRegister(IDX_PSAVE,"PSAVE", PO_GPR_REGISTER, 0); /* Interupt storage for pclath register. */
 
-  pc_kzero.rIdx = IDX_KZ;
-  pc_wsave.rIdx = IDX_WSAVE;
-  pc_ssave.rIdx = IDX_SSAVE;
+  pc_kzero.rIdx = pc_kzero.r->rIdx;
+  pc_wsave.rIdx = pc_wsave.r->rIdx;
+  pc_ssave.rIdx = pc_ssave.r->rIdx;
+  pc_psave.rIdx = pc_psave.r->rIdx;
+
+  shareBankAddress = 0x7f; /* FIXME - this is different for some PICs ICs if the sharebank does not exist then this address needs to be reserved across all banks. */
+  pc_wsave.r->isFixed = 1;
+  pc_wsave.r->address = shareBankAddress;
 
   /* probably should put this in a separate initialization routine */
   pb_dead_pcodes = newpBlock();
@@ -1621,16 +1629,20 @@ static int RegCond(pCodeOp *pcop)
   if(!pcop)
     return 0;
 
-  if(pcop->type == PO_GPR_BIT  && !strcmp(pcop->name, pc_status.pcop.name)) {
-    switch(PCORB(pcop)->bit) {
-    case PIC_C_BIT:
-      return PCC_C;
-    case PIC_DC_BIT:
-	return PCC_DC;
-    case PIC_Z_BIT:
-      return PCC_Z;
-    }
-
+  if (pcop->type == PO_GPR_BIT) {
+    char *name = pcop->name;
+      if (!name) 
+        name = PCOR(pcop)->r->name;
+//      if (strcmp(name, pc_status.pcop.name) != 0) { <<< This breaks the peep 2 optimisation
+      switch(PCORB(pcop)->bit) {
+      case PIC_C_BIT:
+        return PCC_C;
+      case PIC_DC_BIT:
+        return PCC_DC;
+      case PIC_Z_BIT:
+        return PCC_Z;
+	  }
+//    }
   }
 
   return 0;
@@ -2049,6 +2061,7 @@ pCodeOp *newpCodeOpLabel(char *name, int key)
   else 
     s = name, key = label_key--;
 
+  PCOLAB(pcop)->offset = 0;
   if(s)
     pcop->name = Safe_strdup(s);
 
@@ -2148,20 +2161,31 @@ pCodeOp *newpCodeOpWild(int id, pCodeWildBlock *pcwb, pCodeOp *subtype)
 pCodeOp *newpCodeOpBit(char *s, int bit, int inBitSpace)
 {
   pCodeOp *pcop;
+  struct regs *r = 0;
 
   pcop = Safe_calloc(1,sizeof(pCodeOpRegBit) );
   pcop->type = PO_GPR_BIT;
-  if(s)
-    pcop->name = Safe_strdup(s);   
-  else
-    pcop->name = NULL;
 
   PCORB(pcop)->bit = bit;
   PCORB(pcop)->inBitSpace = inBitSpace;
 
   /* pCodeOpBit is derived from pCodeOpReg. We need to init this too */
-  PCOR(pcop)->r = NULL;
-  PCOR(pcop)->rIdx = 0;
+  if (s && !inBitSpace) {
+    r = dirregWithName(s);
+    if (!r) {
+      unsigned char idx = ((s[3] - (((s[3]>='0')&&(s[3]<='9'))?'0':'A'-10))<<4)|(s[4] - (((s[4]>='0')&&(s[4]<='9'))?'0':'A'-10));
+      r = pic14_regWithIdx(idx);
+    }
+  }
+  if (r) {
+    pcop->name = NULL;
+    PCOR(pcop)->r = r;
+    PCOR(pcop)->rIdx = r->rIdx;
+  } else {
+    pcop->name = Safe_strdup(s);   
+    PCOR(pcop)->r = NULL;
+    PCOR(pcop)->rIdx = 0;
+  }
   return pcop;
 }
 
@@ -2587,6 +2611,16 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 	SAFE_snprintf(&s,&size,"%s",pcop->name);
       return buffer;
 
+    case PO_LABEL:
+      s = buffer;
+      if  (pcop->name) {
+        if(PCOLAB(pcop)->offset == 1)
+          SAFE_snprintf(&s,&size,"HIGH(%s)",pcop->name);
+	    else
+          SAFE_snprintf(&s,&size,"%s",pcop->name);
+      }
+      return buffer;
+
     default:
       if  (pcop->name) {
 	if(use_buffer) {
@@ -2642,13 +2676,14 @@ char *pCode2str(char *str, size_t size, pCode *pc)
 
       if(PCI(pc)->isBitInst) {
 	if(PCI(pc)->pcop->type == PO_GPR_BIT) {
-	  if( (((pCodeOpRegBit *)(PCI(pc)->pcop))->inBitSpace) )
-	    SAFE_snprintf(&s,&size,"(%s >> 3), (%s & 7)", 
-			  PCI(pc)->pcop->name ,
-			  PCI(pc)->pcop->name );
-	  else
-	    SAFE_snprintf(&s,&size,"%s,%d", get_op_from_instruction(PCI(pc)), 
-			  (((pCodeOpRegBit *)(PCI(pc)->pcop))->bit ));
+      char *name = PCI(pc)->pcop->name;
+      if (!name) 
+        name = PCOR(PCI(pc)->pcop)->r->name;
+      if( (((pCodeOpRegBit *)(PCI(pc)->pcop))->inBitSpace) )
+	    SAFE_snprintf(&s,&size,"(%s >> 3), (%s & 7)", name, name);
+      else
+	    SAFE_snprintf(&s,&size,"%s,%d", name, 
+			  (((pCodeOpRegBit *)(PCI(pc)->pcop))->bit)&7);
 	} else if(PCI(pc)->pcop->type == PO_GPR_BIT) {
 	  SAFE_snprintf(&s,&size,"%s,%d", get_op_from_instruction(PCI(pc)),PCORB(PCI(pc)->pcop)->bit);
 	}else
@@ -3330,7 +3365,8 @@ void AnalyzepBlock(pBlock *pb)
     /* Is this an instruction with operands? */
     if(pc->type == PC_OPCODE && PCI(pc)->pcop) {
 
-      if(PCI(pc)->pcop->type == PO_GPR_TEMP) {
+      if((PCI(pc)->pcop->type == PO_GPR_TEMP) 
+        || ((PCI(pc)->pcop->type == PO_GPR_BIT) && PCOR(PCI(pc)->pcop)->r && (PCOR(PCI(pc)->pcop)->r->pc_type == PO_GPR_TEMP))) {
 
 	/* Loop through all of the registers declared so far in
 	   this block and see if we find this one there */
@@ -4968,22 +5004,121 @@ void AnalyzeBanking(void)
 
 }
 
+// Undefine REUSE_GPR in files pcode.c & device.c to prevent local function registers being reused.
+#define REUSE_GPR
+#ifdef REUSE_GPR
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+DEFSETFUNC (resetrIdx)
+{
+  if (!((regs *)item)->isFixed)
+    ((regs *)item)->rIdx = 0;
+
+  return 0;
+}
+
+pCode *findFunction(char *fname);
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+unsigned register_reassign(pBlock *pb, unsigned idx)
+{
+  pCode *pc;
+
+  /* check recursion */
+  pc = setFirstItem(pb->function_entries);
+  if(!pc)
+    return idx;
+
+  DFPRINTF((stderr," reassigning registers for function \"%s\"\n",PCF(pc)->fname));
+
+  if (pb->tregisters) {
+    regs *r;
+    for (r = setFirstItem(pb->tregisters); r; r = setNextItem(pb->tregisters)) {
+      if (r->type == REG_GPR) {
+        if (!r->isFixed) {
+          if (r->rIdx < (int)idx) {
+            char s[20];
+            r->rIdx = idx++;
+            sprintf(s,"r0x%02X", r->rIdx);
+            DFPRINTF((stderr," reassigning register \"%s\" to \"%s\"\n",r->name,s));
+            free(r->name);
+            r->name = Safe_strdup(s);
+          }
+        }
+      }
+    }
+  }
+  for(pc = setFirstItem(pb->function_calls); pc; pc = setNextItem(pb->function_calls)) {
+
+    if(pc->type == PC_OPCODE && PCI(pc)->op == POC_CALL) {
+      char *dest = get_op_from_instruction(PCI(pc));
+
+      pCode *pcn = findFunction(dest);
+      if(pcn) {
+         register_reassign(pcn->pb,idx);
+      }
+    }
+
+  }
+
+  return idx;
+}
+
+/*-----------------------------------------------------------------*/
+/* Re-allocate the GPR for optimum reuse for a given pblock        */
+/* eg  if a function m() calls function f1() and f2(), where f1    */
+/* allocates a local variable vf1 and f2 allocates a local         */
+/* variable vf2. Then providing f1 and f2 do not call each other   */
+/* they may share the same general purpose registers for vf1 and   */
+/* vf2.                                                            */
+/* This is done by first setting the the regs rIdx to start after  */
+/* all the global variables, then walking through the call tree    */
+/* renaming the registers to match their new idx and incrementng   */
+/* it as it goes. If a function has already been called it will    */ 
+/* only rename the registers if it has already used up those       */
+/* registers ie rIdx of the function's registers is lower than the */
+/* current rIdx. That way the register will not be reused while    */
+/* still being used by an eariler function call.                   */
+/*-----------------------------------------------------------------*/
+void register_reusage(pBlock *mainPb)
+{
+  static int exercised = 0;
+  if (!exercised) { /* Only do this once */
+	/* Find end of statically allocated variables for start idx */
+    unsigned idx = 0x20; /* Start from begining of GPR. Note may not be 0x20 on some PICs */
+    regs *r;
+    for (r = setFirstItem(dynDirectRegs); r; r = setNextItem(dynDirectRegs)) {
+      if (r->type != REG_SFR) {
+        idx += r->size; /* Increment for all statically allocated variables */
+      }
+    }
+
+    applyToSet(dynAllocRegs,resetrIdx); /* Reset all rIdx to zero. */
+
+    if (mainPb)
+      idx = register_reassign(mainPb,idx); /* Do main and all the functions that are called from it. */
+    idx = register_reassign(the_pFile->pbHead,idx); /* Do the other functions such as interrupts. */
+  }
+  exercised++;
+}
+#endif // REUSE_GPR
+
 /*-----------------------------------------------------------------*/
 /* buildCallTree - look at the flow and extract all of the calls   */
 /*                                                                 */
 /*-----------------------------------------------------------------*/
 set *register_usage(pBlock *pb);
 
+
 void buildCallTree(void    )
 {
   pBranch *pbr;
-  pBlock  *pb;
+  pBlock  *pb, *mainPb = 0;
   pCode   *pc;
 
   if(!the_pFile)
     return;
-
-
 
   /* Now build the call tree.
      First we examine all of the pCodes for functions.
@@ -5015,36 +5150,42 @@ void buildCallTree(void    )
     pCode *pc_fstart=NULL;
     for(pc = pb->pcHead; pc; pc = pc->next) {
       if(isPCF(pc)) {
-	if (PCF(pc)->fname) {
+        pCodeFunction *pcf = PCF(pc);
+        if (pcf->fname) {
 
-	  if(STRCASECMP(PCF(pc)->fname, "_main") == 0) {
-	    //fprintf(stderr," found main \n");
-	    pb->cmemmap = NULL;  /* FIXME do we need to free ? */
-	    pb->dbName = 'M';
-	  }
+          if(STRCASECMP(pcf->fname, "_main") == 0) {
+            //fprintf(stderr," found main \n");
+            pb->cmemmap = NULL;  /* FIXME do we need to free ? */
+            pb->dbName = 'M';
+			mainPb = pb;
+          }
 
-	  pbr = Safe_calloc(1,sizeof(pBranch));
-	  pbr->pc = pc_fstart = pc;
-	  pbr->next = NULL;
+          pbr = Safe_calloc(1,sizeof(pBranch));
+          pbr->pc = pc_fstart = pc;
+          pbr->next = NULL;
 
-	  the_pFile->functions = pBranchAppend(the_pFile->functions,pbr);
+          the_pFile->functions = pBranchAppend(the_pFile->functions,pbr);
 
-	  // Here's a better way of doing the same:
-	  addSet(&pb->function_entries, pc);
+          // Here's a better way of doing the same:
+          addSet(&pb->function_entries, pc);
 
-	} else {
-	  // Found an exit point in a function, e.g. return
-	  // (Note, there may be more than one return per function)
-	  if(pc_fstart)
-	    pBranchLink(PCF(pc_fstart), PCF(pc));
+        } else {
+          // Found an exit point in a function, e.g. return
+          // (Note, there may be more than one return per function)
+          if(pc_fstart)
+            pBranchLink(PCF(pc_fstart), pcf);
 
-	  addSet(&pb->function_exits, pc);
-	}
+          addSet(&pb->function_exits, pc);
+        }
       } else if(isCALL(pc)) {
-	addSet(&pb->function_calls,pc);
+        addSet(&pb->function_calls,pc);
       }
     }
   }
+
+#ifdef REUSE_GPR
+  register_reusage(mainPb); /* Comment out this line to prevent local function registers being reused. Note from this point onwards finding a GPR by its rIdx value will no longer work.*/
+#endif // REUSE_GPR
 
   /* Re-allocate the registers so that there are no collisions
    * between local variables when one function call another */

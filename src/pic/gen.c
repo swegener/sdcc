@@ -216,7 +216,6 @@ void emitpLabel(int key)
 
 void emitpcode(PIC_OPCODE poc, pCodeOp *pcop)
 {
-
   if(pcop)
     addpCode2pBlock(pb,newpCode(poc,pcop));
   else
@@ -227,6 +226,16 @@ void emitpcodeNULLop(PIC_OPCODE poc)
 {
 
   addpCode2pBlock(pb,newpCode(poc,NULL));
+
+}
+
+void emitpcodePagesel(const char *label)
+{
+
+  char code[81];
+  strcpy(code,"\tpagesel ");
+  strcat(code,label);
+  addpCode2pBlock(pb,newpCodeInlineP(code));
 
 }
 
@@ -1182,10 +1191,26 @@ pCodeOp *popGetLabel(unsigned int key)
 
   DEBUGpic14_emitcode ("; ***","%s  key=%d, label offset %d",__FUNCTION__,key, labelOffset);
 
-  if(key>max_key)
+  if(key>(unsigned int)max_key)
     max_key = key;
 
   return newpCodeOpLabel(NULL,key+100+labelOffset);
+}
+
+/*-------------------------------------------------------------------*/
+/* popGetLabel - create a new pCodeOp of type PO_LABEL with offset=1 */
+/*-------------------------------------------------------------------*/
+pCodeOp *popGetHighLabel(unsigned int key)
+{
+  pCodeOp *pcop;
+  DEBUGpic14_emitcode ("; ***","%s  key=%d, label offset %d",__FUNCTION__,key, labelOffset);
+
+  if(key>(unsigned int)max_key)
+    max_key = key;
+
+  pcop = newpCodeOpLabel(NULL,key+100+labelOffset);
+  PCOLAB(pcop)->offset = 1;
+  return pcop;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2554,6 +2579,7 @@ static void genPcall (iCode *ic)
     }
 */
     emitpcode(POC_CALL,popGetLabel(albl->key));
+    emitpcodePagesel(popGetLabel(blbl->key)->name); /* Must restore PCLATH before goto, without destroying W */
     emitpcode(POC_GOTO,popGetLabel(blbl->key));
     emitpLabel(albl->key);
 
@@ -2691,17 +2717,21 @@ static void genFunction (iCode *ic)
     }
 #endif
 
-    /* if this is an interrupt service routine then
-    save acc, b, dpl, dph  */
+    /* if this is an interrupt service routine */
     if (IFFUNC_ISISR(sym->type)) {
+/*  already done in pic14createInterruptVect() - delete me
       addpCode2pBlock(pb,newpCode(POC_GOTO,newpCodeOp("END_OF_INTERRUPT+1",PO_STR)));
       emitpcodeNULLop(POC_NOP);
       emitpcodeNULLop(POC_NOP);
       emitpcodeNULLop(POC_NOP);
+*/
       emitpcode(POC_MOVWF,  popCopyReg(&pc_wsave));
       emitpcode(POC_SWAPFW, popCopyReg(&pc_status));
       emitpcode(POC_CLRF,   popCopyReg(&pc_status));
       emitpcode(POC_MOVWF,  popCopyReg(&pc_ssave));
+      emitpcode(POC_MOVFW,  popCopyReg(&pc_pclath));
+      emitpcode(POC_MOVWF,  popCopyReg(&pc_psave));
+      emitpcode(POC_CLRF,   popCopyReg(&pc_pclath));/* durring an interrupt PCLATH must be cleared before a goto or call statement */
 
       pBlockConvert2ISR(pb);
 #if 0  
@@ -2936,18 +2966,17 @@ static void genEndFunction (iCode *ic)
 		pic14_emitcode(";","XG$%s$0$0 ==.",currFunc->name);
 	    _G.debugLine = 0;
 	}
-	
+
         pic14_emitcode ("reti","");
-
-	emitpcode(POC_CLRF,   popCopyReg(&pc_status));
-	emitpcode(POC_SWAPFW, popCopyReg(&pc_ssave));
-	emitpcode(POC_MOVWF,  popCopyReg(&pc_status));
-	emitpcode(POC_SWAPF,  popCopyReg(&pc_wsave));
-	emitpcode(POC_SWAPFW, popCopyReg(&pc_wsave));
-	addpCode2pBlock(pb,newpCodeLabel("END_OF_INTERRUPT",-1));
-
-	emitpcodeNULLop(POC_RETFIE);
-
+        emitpcode(POC_MOVFW,  popCopyReg(&pc_psave));
+        emitpcode(POC_MOVWF,  popCopyReg(&pc_pclath));
+        emitpcode(POC_CLRF,   popCopyReg(&pc_status));
+        emitpcode(POC_SWAPFW, popCopyReg(&pc_ssave));
+        emitpcode(POC_MOVWF,  popCopyReg(&pc_status));
+        emitpcode(POC_SWAPF,  popCopyReg(&pc_wsave));
+        emitpcode(POC_SWAPFW, popCopyReg(&pc_wsave));
+        addpCode2pBlock(pb,newpCodeLabel("END_OF_INTERRUPT",-1));
+        emitpcodeNULLop(POC_RETFIE);
     }
     else {
         if (IFFUNC_ISCRITICAL(sym->type))
@@ -5424,7 +5453,7 @@ static void genAnd (iCode *ic, iCode *ifx)
 	    } else {
 	      pic14_emitcode("movlw","0x%x", (lit & 0xff));
 	      pic14_emitcode("andwf","%s,f",aopGet(AOP(left),offset,FALSE,TRUE));
-	      if(know_W != (lit&0xff))
+	      if(know_W != (int)(lit&0xff))
 		emitpcode(POC_MOVLW, popGetLit(lit & 0xff));
 	      know_W = lit &0xff;
 	      emitpcode(POC_ANDWF,popGet(AOP(left),offset));
@@ -5731,7 +5760,7 @@ static void genOr (iCode *ic, iCode *ifx)
 	      emitpcode(POC_BSF,
 			newpCodeOpBit(aopGet(AOP(left),offset,FALSE,FALSE),p,0));
 	    } else {
-	      if(know_W != (lit & 0xff))
+	      if(know_W != (int)(lit & 0xff))
 		emitpcode(POC_MOVLW, popGetLit(lit & 0xff));
 	      know_W = lit & 0xff;
 	      emitpcode(POC_IORWF, popGet(AOP(left),offset));
@@ -8370,6 +8399,7 @@ static void genConstPointerGet (operand *left,
   DEBUGpic14_emitcode ("; "," %d getting const pointer",__LINE__);
 
   emitpcode(POC_CALL,popGetLabel(albl->key));
+  emitpcodePagesel(popGetLabel(blbl->key)->name); /* Must restore PCLATH before goto, without destroying W */
   emitpcode(POC_GOTO,popGetLabel(blbl->key));
   emitpLabel(albl->key);
 
@@ -9328,7 +9358,7 @@ static void genAssign (iCode *ic)
   DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
     if(AOP_TYPE(right) == AOP_LIT) {
       if(lit&0xff) {
-	if(know_W != (lit&0xff))
+	if(know_W != (int)(lit&0xff))
 	  emitpcode(POC_MOVLW,popGetLit(lit&0xff));
 	know_W = lit&0xff;
 	emitpcode(POC_MOVWF, popGet(AOP(result),offset));
@@ -9380,6 +9410,8 @@ static void genJumpTab (iCode *ic)
     pic14_emitcode("jmp","@a+dptr");
     pic14_emitcode("","%05d_DS_:",jtab->key+100);
 
+    emitpcode(POC_MOVLW, popGetHighLabel(jtab->key));
+    emitpcode(POC_MOVWF, popCopyReg(&pc_pclath));
     emitpcode(POC_MOVLW, popGetLabel(jtab->key));
     emitpcode(POC_ADDFW, popGet(AOP(IC_JTCOND(ic)),0));
     emitSKPNC;

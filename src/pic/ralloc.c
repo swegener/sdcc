@@ -487,7 +487,7 @@ regWithIdx (set *dRegs, int idx, int fixed)
   for (dReg = setFirstItem(dRegs) ; dReg ; 
        dReg = setNextItem(dRegs)) {
 
-    if(idx == dReg->rIdx && (fixed == dReg->isFixed)) {
+    if(idx == dReg->rIdx && (fixed == (int)dReg->isFixed)) {
       return dReg;
     }
   }
@@ -838,6 +838,8 @@ pic14_allocWithIdx (int idx)
     debugLog ("Found a Processor Register!\n");
   } else if( (dReg = regWithIdx ( dynInternalRegs, idx,0)) != NULL ) {
     debugLog ("Found an Internal Register!\n");
+  } else if( (dReg = regWithIdx ( dynInternalRegs, idx,1)) != NULL ) {
+    debugLog ("Found an Internal Register!\n");
   } else {
     
     debugLog ("Dynamic Register not found\n");
@@ -1075,6 +1077,7 @@ void writeUsedRegs(FILE *of)
 {
   packBits(dynDirectBitRegs);
 
+  assignFixedRegisters(dynInternalRegs);
   assignFixedRegisters(dynAllocRegs);
   assignFixedRegisters(dynStackRegs);
   assignFixedRegisters(dynDirectRegs);
@@ -2134,7 +2137,6 @@ serialRegAssign (eBBlock ** ebbs, int count)
 	      debugLog ("  %d - \n", __LINE__);
 	      if(debugF) 
 		bitVectDebugOn(_G.regAssigned, debugF);
-
 	      for (j = 0; j < sym->nRegs; j++)
 		{
 		  if (sym->regType == REG_PTR)
@@ -2142,7 +2144,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 		  else
 		    sym->regs[j] = getRegGpr (ic, ebbs[i], sym);
 
-		  /* if the allocation falied which means
+		  /* if the allocation failed which means
 		     this was spilt then break */
 		  if (!sym->regs[j])
 		    break;

@@ -5716,7 +5716,7 @@ shiftL2Left2Result (operand * left, int offl,
             rmwWithReg ("rol", hc08_reg_x);
           }
     }
-  storeRegToAop (hc08_reg_xa, AOP (result), offl);
+  storeRegToAop (hc08_reg_xa, AOP (result), offr);
 
   pullOrFreeReg (hc08_reg_x, needpulx);
   pullOrFreeReg (hc08_reg_a, needpula);

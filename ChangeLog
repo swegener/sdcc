@@ -1,5 +1,10 @@
 2004-08-28 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
+	* src/hc08/gen.c (shiftL2Left2Result): fix for bug-500536 regression
+	test
+
+2004-08-28 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
 	* src/SDCCsymt.c (processFuncArgs): make sure parameter types
 	are sane and complete before asking the port its prefered parameter
 	passing method (fixes bug #1017633)

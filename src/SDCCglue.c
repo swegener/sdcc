@@ -1682,7 +1682,6 @@ rm_tmpfiles (void)
 char *
 tempfilename (void)
 {
-#if !defined(_MSC_VER)
   const char *tmpdir = NULL;
   if (getenv ("TMP"))
     tmpdir = getenv ("TMP");
@@ -1698,7 +1697,6 @@ tempfilename (void)
           return name;
         }
     }
-#endif
   return tmpnam (NULL);
 }
 
@@ -1709,7 +1707,6 @@ tempfilename (void)
 FILE *
 tempfile (void)
 {
-#if !defined(_MSC_VER)
   const char *tmpdir = NULL;
   if (getenv ("TMP"))
     tmpdir = getenv ("TMP");
@@ -1731,7 +1728,5 @@ tempfile (void)
 	}
       return NULL;
     }
-#endif
   return tmpfile ();
 }
-

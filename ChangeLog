@@ -1,3 +1,15 @@
+2003-02-02  Borut Razem <borut.razem@siol.net>
+
+	* Makefile.bcc: removed non existing cpp project and non compilable izt project from makefile
+	* as/mcs51/asm.h: fixed compilation with Borland C
+	* support/cpp2/Makefile.bcc: added rule to generate auto-host.h
+	* support/cpp2/auto-host_vc_in.h: fixed compilation with Borland C
+	* src/mcs51/mcs51a.dsp: corrected misspelled project name from msc51a to mcs51a
+	* src/avr/Makefile.bcc, src/ds390/Makefile.bcc, src/izt/Makefile.bcc,
+	src/mcs51/Makefile.bcc, src/pic16/Makefile.bcc, src/xa51/Makefile.bcc,
+	src/z80/Makefile.bcc: delete $(LIB) only if exist
+	* src/Makefile.bcc, src/pic/Makefile.bcc:  fixed compilation with Borland C
+
 2003-02-02  Bernhard Held <bernhard@bernhardheld.de>
 
 	* device/include/malloc.h: introduced NULL
@@ -19,7 +31,6 @@
 	* device/lib/_strstr.c: removed NULL
 	* device/lib/_strtok.c: removed NULL
 	* device/lib/malloc.c: removed NULL, include own header
-
 
 2003-02-02    <johan@balder>
 

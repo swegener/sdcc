@@ -141,11 +141,10 @@
 
    Additional definitions (use them prior the #include mcs51reg.h statement):
 
-   Ports P0 & P2 are not available for the programmer if external ROM used.
-   Use statement "#define MCS51REG_EXTERNAL_RAM" to undefine P0 & P2.
+   Ports P0 & P2 are not available if external ROM used.
+   Use statement "#define MCS51REG_EXTERNAL_ROM" to undefine P0 & P2.
 
-   Ports P0, P2, P3_6, WR, P3_7 & RD are not available for the programmer if
-   external RAM is used.
+   Ports P0, P2, P3_6, WR, P3_7 & RD are not available if external RAM is used.
    Use statement "#define MCS51REG_EXTERNAL_RAM" to undefine P0, P2,
    P3_6, WR, P3_7 & RD.
 

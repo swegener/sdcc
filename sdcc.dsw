@@ -117,6 +117,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "linkz80"=.\link\z80\linkz80.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "mcs51"=.\src\mcs51\mcs51.dsp - Package Owner=<4>
 
 Package=<5>
@@ -138,7 +150,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "msc51a"=.\src\mcs51\mcs51a.dsp - Package Owner=<4>
+Project: "mcs51a"=.\src\mcs51\mcs51a.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

@@ -14,6 +14,15 @@
  */
 #include <limits.h>
 
+#ifndef PATH_MAX
+ #if defined(__BORLANDC__) || defined(_MSC_VER)
+  #include <stdlib.h>
+  #define PATH_MAX	_MAX_PATH
+ #else
+  #define PATH_MAX	255	/* define a reasonable value */
+ #endif
+#endif
+
 #define	VERSION	"V01.75"
 
 /*

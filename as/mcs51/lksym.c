@@ -177,6 +177,7 @@ newsym()
 	}
 	fprintf(stderr, "Header symbol list overflow\n");
 	lkexit(1);
+	return(0);
 }
 
 /*)Function	sym *	lkpsym(id,f)

@@ -303,6 +303,7 @@ term()
 			return(symval(sp));
 		}
 	}
+	return(0);
 }
 
 /*)Function	int	digit(c, r)

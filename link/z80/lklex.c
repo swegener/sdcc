@@ -144,6 +144,9 @@ char *str;
 		if (p < &str[FILSPC-1])
 			*p++ = c;
 		c = get();
+		if (c == ';')
+			while (c)
+				c = get();
 #ifdef SDK
 	} while (c);
 #else /* SDK */

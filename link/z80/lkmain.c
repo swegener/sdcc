@@ -911,6 +911,8 @@ parse()
 	char fid[NINPUT];
 
 	while ((c = getnb()) != 0) {
+		if (c == ';')
+			return(0);
 		if ( c == '-') {
 			while (ctype[c=get()] & LETTER) {
 				switch(c) {
@@ -1040,6 +1042,8 @@ parse()
 					lkexit(1);
 				}
 			}
+			if (c == ';')
+				return(0);
 		} else
 		if (ctype[c] != ILL) {
 			if (linkp == NULL) {
@@ -1335,11 +1339,16 @@ afile(fn, ft, wf)
 char *fn;
 char *ft;
 {
+#if 0
 	register char *p1, *p2, *p3;
 	register int c;
+#else
+	int i;
+#endif	
 	FILE *fp;
 	char fb[FILSPC];
 
+#if 0	
 	p1 = fn;
 	p2 = fb;
 	p3 = ft;
@@ -1364,6 +1373,32 @@ char *ft;
 			*p2++ = c;
 	}
 	*p2++ = 0;
+#else
+	/*Look backward the name path and get rid of the extension, if any*/
+	i=strlen(fn);
+	for(; (fn[i]!='.')&&(fn[i]!='\\')&&(fn[i]!='/')&&(i>=0); i--);
+	if( (fn[i]=='.') && *ft && strcmp(ft, "lnk") )
+	{
+		strncpy(fb, fn, i);
+		fb[i]=0;
+	}
+	else
+	{
+		strcpy(fb, fn);
+	}
+
+	/*Add the extension*/
+	if (fb[i] != '.')
+	{
+		strcat(fb, ".");
+#ifdef SDK
+		strcat(fb, strlen(ft)?ft:"rel");
+#else
+		strcat(fb, strlen(ft)?ft:"REL");
+#endif
+	}
+#endif
+
 #ifdef SDK
 	if ((fp = fopen(fb, wf?(binary?"wb":"w"):(binary?"rb":"r"))) == NULL) {
 #else /* SDK */

@@ -800,6 +800,8 @@ parse()
 	char fid[NINPUT];
 
 	while ((c = getnb()) != 0) {
+		if ( c == ';')
+			return(0);
 		if ( c == '-') {
 			while (ctype[c=get()] & LETTER) {
 				switch(c) {
@@ -923,6 +925,8 @@ parse()
 					lkexit(1);
 				}
 			}
+			if ( c == ';')
+				return(0);
 		} else
                if (ctype[c] & ILL) {
                        fprintf(stderr, "Invalid input");
@@ -1228,8 +1232,11 @@ char *ft;
 	}
 
 	/*Add the extension*/
-	strcat(fb, ".");
-	strcat(fb, strlen(ft)?ft:"rel");
+	if (fb[i] != '.')
+	{
+		strcat(fb, ".");
+		strcat(fb, strlen(ft)?ft:"rel");
+	}
 	
 	fp = fopen(fb, omode);
 	if (fp==NULL)

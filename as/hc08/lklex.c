@@ -199,6 +199,9 @@ char *str;
 		if (p < &str[PATH_MAX-1])
 			*p++ = c;
 		c = get();
+		if (c == ';')
+			while (c)
+				c = get();
 	} while (c);
 	/* trim trailing spaces */
 	--p;

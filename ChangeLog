@@ -1,3 +1,18 @@
+2004-04-21 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* link/z80/lkmain.c (afile): allow periods in directory names
+	* link/z80/lkmain.c (afile),
+	* as/mcs51/lkmain.c (afile),
+	* as/hc08/lkmain.c (afile): allow linker script file to have an
+	extension other than ".lnk"
+	* link/z80/lklex.c (getfid),
+	* link/z80/lkmain.c (parse),
+	* as/mcs51/lklex.c (getfid),
+	* as/mcs51/lkmain.c (parse),
+	* as/hc08/lklex.c (getfid),
+	* as/hc08/lkmain.c (parse): Support comments in the linker script
+	file on lines by themselves and after filenames
+
 2004-04-20 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* as/link_hc08.dsp: Added as/hc08/lkelf.c to project.

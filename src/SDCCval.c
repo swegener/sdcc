@@ -1414,34 +1414,30 @@ valCastLiteral (sym_link * dtype, double fval)
   SPEC_SCLS (val->etype) = S_LITERAL;
   /* if it is not a specifier then we can assume that */
   /* it will be an unsigned long                      */
-  if (!IS_SPEC (val->type))
-    {
+  if (!IS_SPEC (val->type)) {
       SPEC_CVAL (val->etype).v_ulong = (unsigned long) fval;
       return val;
-    }
+  }
 
   if (SPEC_NOUN (val->etype) == V_FLOAT)
-    SPEC_CVAL (val->etype).v_float = fval;
-  else
-    {
-      if (SPEC_LONG (val->etype))
-	{
+      SPEC_CVAL (val->etype).v_float = fval;
+  else {
+      unsigned long l = fval;
+      if (SPEC_LONG (val->etype)) {
 	  if (SPEC_USIGN (val->etype))
-	    SPEC_CVAL (val->etype).v_ulong = (unsigned long) fval;
+	      SPEC_CVAL (val->etype).v_ulong = (unsigned long) l;
 	  else
-	    SPEC_CVAL (val->etype).v_long = (long) fval;
-	}
-      else
-	{
+	      SPEC_CVAL (val->etype).v_long = (long) l;
+      } else {
 	  if (SPEC_USIGN (val->etype))
-	    SPEC_CVAL (val->etype).v_uint = (unsigned short)fval;
+	      SPEC_CVAL (val->etype).v_uint = (unsigned short)l;
 	  else
-	    SPEC_CVAL (val->etype).v_int = (short)fval;
+	      SPEC_CVAL (val->etype).v_int = (short)l;
 	  if (SPEC_NOUN (val->etype)==V_CHAR) {
-	    SPEC_CVAL (val->etype).v_uint &= 0xff; 
+	      SPEC_CVAL (val->etype).v_uint &= 0xff; 
 	  }
-	}
-    }
+      }
+  }
   return val;
 }
 

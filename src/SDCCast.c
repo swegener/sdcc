@@ -3164,6 +3164,11 @@ decorateType (ast * tree)
       if (compareType (currFunc->type->next, RTYPE (tree)) == 0)
 	{
 	  werror (W_RETURN_MISMATCH);
+	  fprintf (stderr, "from type '");
+	  printTypeChain (RTYPE(tree), stderr);
+	  fprintf (stderr, "' to type '");
+	  printTypeChain (currFunc->type->next, stderr);
+	  fprintf (stderr, "'\n");
 	  goto errorTreeReturn;
 	}
 

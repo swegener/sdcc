@@ -24,6 +24,8 @@
 #include "common.h"
 #include "newalloc.h"
 
+value *aggregateToPointer (value *val);
+
 /* noun strings */
 char *nounName(sym_link *sl) {
   switch (SPEC_NOUN(sl)) 
@@ -1461,12 +1463,17 @@ compareType (sym_link * dest, sym_link * src)
 	{
 	  if (DCL_TYPE (src) == DCL_TYPE (dest))
 	    return compareType (dest->next, src->next);
-	  if (IS_PTR (src) && IS_PTR (dest))
+	  if (IS_PTR (src) && IS_GENPTR (dest))
 	    return -1;
-	  if (IS_PTR (dest) && IS_ARRAY (src))
-	    return -1;
+	  if (IS_PTR (dest) && IS_ARRAY (src)) {
+	    value *val=aggregateToPointer (valFromType(src));
+	    int res=compareType (dest, val->type);
+	    Safe_free(val->type);
+	    Safe_free(val);
+	    return res;
+	  }
 	  if (IS_PTR (dest) && IS_FUNC (dest->next) && IS_FUNC (src))
-	    return -1 * compareType (dest->next, src);
+	    return compareType (dest->next, src);
 	  return 0;
 	}
       else if (IS_PTR (dest) && IS_INTEGRAL (src))
@@ -1540,11 +1547,11 @@ inCalleeSaveList (char *s)
 }
 
 /*-----------------------------------------------------------------*/
-/* aggregateArgToPointer:  change an agggregate type function      */
+/* aggregateToPointer:  change an agggregate type function      */
 /*         argument to a pointer to that type.     */
 /*-----------------------------------------------------------------*/
-void 
-aggregateArgToPointer (value * val)
+value *
+aggregateToPointer (value * val)
 {
   int wasArray=IS_ARRAY(val->type);
 
@@ -1615,6 +1622,7 @@ aggregateArgToPointer (value * val)
 	  val->sym->etype = getSpec (val->sym->type);
 	}
     }
+  return val;
 }
 /*------------------------------------------------------------------*/
 /* checkFunction - does all kinds of check on a function            */
@@ -1728,7 +1736,7 @@ checkFunction (symbol * sym)
       if (IS_AGGREGATE (acargs->type))
 	{
 	  checkValue = copyValue (acargs);
-	  aggregateArgToPointer (checkValue);
+	  aggregateToPointer (checkValue);
 	}
       else
 	{
@@ -1803,7 +1811,7 @@ processFuncArgs (symbol * func, int ignoreName)
 
       if (IS_AGGREGATE (val->type))
 	{
-	  aggregateArgToPointer (val);
+	  aggregateToPointer (val);
 	}
       val = val->next;
       pNum++;
@@ -1920,56 +1928,73 @@ printTypeChain (sym_link * start, FILE * of)
 	  switch (DCL_TYPE (type))
 	    {
 	    case FUNCTION:
-	      fprintf (of, "function");
+	      fprintf (of, "function ");
 	      break;
 	    case GPOINTER:
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
-	      fprintf (of, "generic *");
+	      fprintf (of, "* generic ");
 	      break;
 	    case CPOINTER:
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
-	      fprintf (of, "code *");
+	      fprintf (of, "* code ");
 	      break;
 	    case FPOINTER:
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
-	      fprintf (of, "far *");
+	      fprintf (of, "* xdata ");
 	      break;
 	    case EEPPOINTER:
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
-	      fprintf (of, "eeprom * ");
+	      fprintf (of, "* eeprom ");
 	      break;
 
 	    case POINTER:
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
-	      fprintf (of, "near *");
+	      fprintf (of, "* near ");
 	      break;
 	    case IPOINTER:
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
-	      fprintf (of, "idata *");
+	      fprintf (of, "* idata ");
 	      break;
 	    case PPOINTER:
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
-	      fprintf (of, "pdata *");
+	      fprintf (of, "* pdata ");
 	      break;
 	    case UPOINTER:
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
-	      fprintf (of, "unkown *");
+	      fprintf (of, "* unkown ");
 	      break;
 	    case ARRAY:
-	      fprintf (of, "array of");
+	      fprintf (of, "[] ");
 	      break;
 	    }
 	}
       else
 	{
+	  switch (SPEC_SCLS(type)) 
+	    {
+	    case S_DATA: fprintf (of, "data "); break;
+	    case S_XDATA: fprintf (of, "xdata "); break;
+	    case S_SFR: fprintf (of, "sfr "); break;
+	    case S_SBIT: fprintf (of, "sbit "); break;
+	    case S_CODE: fprintf (of, "code "); break;
+	    case S_IDATA: fprintf (of, "idata "); break;
+	    case S_PDATA: fprintf (of, "pdata "); break;
+	    case S_LITERAL: fprintf (of, "literal "); break;
+	    case S_STACK: fprintf (of, "stack "); break;
+	    case S_XSTACK: fprintf (of, "xstack "); break;
+	    case S_BIT: fprintf (of, "bit "); break;
+	    case S_EEPROM: fprintf (of, "eeprom "); break;
+	    default: break;
+	    }
+
 	  if (SPEC_VOLATILE (type))
 	    fprintf (of, "volatile ");
 	  if (SPEC_USIGN (type))

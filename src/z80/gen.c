@@ -51,6 +51,7 @@
 #include "ralloc.h"
 #include "gen.h"
 #include "SDCCpeeph.h"
+#include "SDCCglue.h" /* drdani Jan 30 2000 */
 
 /* this is the down and dirty file with all kinds of kludgy & hacky
    stuff. This is what it is all about CODE GENERATION for a specific MCU.

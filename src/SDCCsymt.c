@@ -1092,7 +1092,7 @@ compStructSize (int su, structdef * sdef)
 	    }
 	}
 	else {
-	    checkDecl (loop);
+	    checkDecl (loop, 1);
 	    sum += getSize (loop->type);
 	}
 
@@ -1124,7 +1124,7 @@ compStructSize (int su, structdef * sdef)
 /* checkSClass - check the storage class specification              */
 /*------------------------------------------------------------------*/
 static void 
-checkSClass (symbol * sym)
+checkSClass (symbol * sym, int isProto)
 {
   if (getenv("DEBUG_SANITY")) {
     fprintf (stderr, "checkSClass: %s \n", sym->name);
@@ -1252,15 +1252,17 @@ checkSClass (symbol * sym)
       SPEC_BSTR (sym->etype) = 0;
     }
 
-  /* variables declared in CODE space must have */
-  /* initializers if not an extern */
-  if (SPEC_SCLS (sym->etype) == S_CODE &&
-      sym->ival == NULL &&
-      !sym->level &&
-      port->mem.code_ro &&
-      !IS_EXTERN (sym->etype) &&
-      !funcInChain (sym->type))
-    werror (E_CODE_NO_INIT, sym->name);
+  if (!isProto) {
+    /* variables declared in CODE space must have */
+    /* initializers if not an extern */
+    if (SPEC_SCLS (sym->etype) == S_CODE &&
+	sym->ival == NULL &&
+	!sym->level &&
+	port->mem.code_ro &&
+	!IS_EXTERN (sym->etype) &&
+	!funcInChain (sym->type))
+      werror (E_CODE_NO_INIT, sym->name);
+  }
 
   /* if parameter or local variable then change */
   /* the storage class to reflect where the var will go */
@@ -1310,10 +1312,10 @@ changePointer (symbol * sym)
 /* checkDecl - does semantic validation of a declaration                   */
 /*------------------------------------------------------------------*/
 int 
-checkDecl (symbol * sym)
+checkDecl (symbol * sym, int isProto)
 {
 
-  checkSClass (sym);		/* check the storage class      */
+  checkSClass (sym, isProto);		/* check the storage class      */
   changePointer (sym);		/* change pointers if required */
 
   /* if this is an array without any dimension

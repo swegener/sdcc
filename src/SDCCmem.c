@@ -420,7 +420,7 @@ allocParms (value * val)
     {
 
       /* check the declaration */
-      checkDecl (lval->sym);
+      checkDecl (lval->sym, 0);
 
       /* if this a register parm then allocate
          it as a local variable by adding it
@@ -793,7 +793,7 @@ allocVariables (symbol * symChain)
 	csym = sym;
 
       /* check the declaration */
-      checkDecl (csym);
+      checkDecl (csym,0);
 
       /* if this is a function or a pointer to function */
       /* then args  processing  */

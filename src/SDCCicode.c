@@ -918,12 +918,11 @@ isOperandInDirSpace (operand * op)
   return (IN_DIRSPACE (SPEC_OCLS (etype)) ? TRUE : FALSE);
 }
 
-/*-----------------------------------------------------------------*/
-/* isOperandOnStack - will return true if operand is on stack      */
-/*-----------------------------------------------------------------*/
-#if 0
+/*------------------------------------------------------------------*/
+/* isOperandInDirSpace - will return true if operand is in dirSpace */
+/*------------------------------------------------------------------*/
 bool 
-isOperandOnStack (operand * op)
+isOperandInCodeSpace (operand * op)
 {
   sym_link *etype;
 
@@ -933,11 +932,23 @@ isOperandOnStack (operand * op)
   if (!IS_SYMOP (op))
     return FALSE;
 
-  etype = getSpec (operandType (op));
-
-  return ((IN_STACK (etype)) ? TRUE : FALSE);
+  if (!IS_TRUE_SYMOP (op))
+    {
+      if (SPIL_LOC (op))
+	etype = SPIL_LOC (op)->etype;
+      else
+	return FALSE;
+    }
+  else
+    {
+      etype = getSpec (operandType (op));
+    }
+  return (IN_CODESPACE (SPEC_OCLS (etype)) ? TRUE : FALSE);
 }
-#else
+
+/*-----------------------------------------------------------------*/
+/* isOperandOnStack - will return true if operand is on stack      */
+/*-----------------------------------------------------------------*/
 bool 
 isOperandOnStack (operand * op)
 {
@@ -957,7 +968,6 @@ isOperandOnStack (operand * op)
 
   return FALSE;
 }
-#endif
 
 /*-----------------------------------------------------------------*/
 /* operandLitValue - literal value of an operand                   */

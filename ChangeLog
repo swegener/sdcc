@@ -1,3 +1,7 @@
+2003-01-25    <johan@CP255758-A>
+
+	* src/SDCCglue.c (emitRegularMap): That was a little too efficient
+
 2003-01-24  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/Makefile.in: remove spawn.o

@@ -1,8 +1,14 @@
+2005-03-10 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c (pic16_loadFSR0, genPackBits, genUnpackBits,
+	  genNearPointerGet): (hopefully) fixed access to bitfields via
+	  pointers (p->bitN = x; and x = p->bitN; failed)
+	
 2005-03-09 Paul Stoffregen <paul AT pjrc.com>
 
 	* device/lib/printf_fast.c: fix leading zero format, eg "%02d"
 
-2005-05-09 Raphael Neider <rneider AT web.de>
+2005-03-09 Raphael Neider <rneider AT web.de>
 
 	* src/SDCCopt.c (killDeadCode): fixed bug #1156016
 

@@ -81,7 +81,7 @@ int pcseDef (void *item, va_list ap)
 /* replaceAllSymBySym - replaces all operands by operand in an     */
 /*                      instruction chain                          */
 /*-----------------------------------------------------------------*/
-void replaceAllSymBySym (iCode *ic, operand *from , operand *to)
+void replaceAllSymBySym (iCode *ic, operand *from , operand *to, bitVect **ndpset)
 {
     iCode *lic;
 
@@ -122,12 +122,20 @@ void replaceAllSymBySym (iCode *ic, operand *from , operand *to)
 	    if (POINTER_SET(lic)) {
 		bitVectUnSetBit (OP_USES(from),lic->key);
 		OP_USES(to) = bitVectSetBit (OP_USES(to),lic->key);
+
+		/* also check if the "from" was in the non-dominating 
+		   pointer sets and replace it with "to" in the bitVector */
+		if (bitVectBitValue(*ndpset,from->key)) {
+		    bitVectUnSetBit(*ndpset,from->key);
+		    bitVectSetBit(*ndpset,to->key);
+		}
+
 	    }
 	    else {		
 		bitVectUnSetBit (OP_DEFS(from),lic->key);
 		OP_DEFS(to) = bitVectSetBit (OP_DEFS(to),lic->key);
-	    }
-	    siaddr = IC_RESULT(lic)->isaddr ;
+	    }	    
+	    siaddr = IC_RESULT(lic)->isaddr ;	    
 	    IC_RESULT(lic) = operandFromOperand(to);
 	    IC_RESULT(lic)->isaddr = siaddr ;
 	}
@@ -148,7 +156,7 @@ void replaceAllSymBySym (iCode *ic, operand *from , operand *to)
 	    siaddr = IC_LEFT(lic)->isaddr ;
 	    IC_LEFT(lic) = operandFromOperand(to);
 	    IC_LEFT(lic)->isaddr = siaddr ;
-	}
+	}	
     }
 }
 
@@ -183,7 +191,7 @@ DEFSETFUNC(removeFromInExprs)
     ebp->visited = 1;
     deleteItemIf(&ebp->inExprs,iCodeKeyIs,ic->key);
     if (ebp != cbp && !bitVectBitValue(cbp->domVect,ebp->bbnum))
-	replaceAllSymBySym(ebp->sch,from,to);
+	replaceAllSymBySym(ebp->sch,from,to,&ebp->ndompset);
 
     applyToSet(ebp->succList,removeFromInExprs,ic,from,to,cbp);
     return 0;
@@ -1318,7 +1326,8 @@ int cseBBlock ( eBBlock *ebb, int computeOnly,
 	pdic = NULL ;  	
 	if (!( POINTER_GET(ic)                      &&
 	       (IS_BITFIELD(OP_SYMBOL(IC_RESULT(ic))->etype) ||
-	       isOperandVolatile(IC_LEFT(ic),TRUE))) &&
+	       isOperandVolatile(IC_LEFT(ic),TRUE)           ||
+	       bitVectBitValue(ebb->ndompset,IC_LEFT(ic)->key))) &&
 	    ! ASSIGNMENT(ic)                        && 
 	      IS_ITEMP(IC_RESULT(ic))               &&
 	    ! computeOnly) {
@@ -1333,7 +1342,7 @@ int cseBBlock ( eBBlock *ebb, int computeOnly,
 	    if (IS_ITEMP(IC_RESULT(ic))) {
 
 		/* replace in the remaining of this block */
-		replaceAllSymBySym(ic->next,IC_RESULT(ic),IC_RESULT(pdic));
+		replaceAllSymBySym(ic->next,IC_RESULT(ic),IC_RESULT(pdic),&ebb->ndompset);
 		/* remove this iCode from inexpressions of all
 		   its successors, it cannot be in the in expressions
 		   of any of the predecessors */        
@@ -1347,7 +1356,7 @@ int cseBBlock ( eBBlock *ebb, int computeOnly,
 		    eBBlock *owner ;
 		    for (owner = setFirstItem(ic->movedFrom); owner ;
 			 owner = setNextItem(ic->movedFrom))
-			replaceAllSymBySym(owner->sch,IC_RESULT(ic),IC_RESULT(pdic));
+			replaceAllSymBySym(owner->sch,IC_RESULT(ic),IC_RESULT(pdic),&owner->ndompset);
 		}
 		pdic->movedFrom = unionSets(pdic->movedFrom,ic->movedFrom,THROW_NONE);
 	    } 
@@ -1399,7 +1408,7 @@ int cseBBlock ( eBBlock *ebb, int computeOnly,
 	    /* if we find it then locally replace all
 	       references to the result with what we assigned */
 	    if (pdop) {
-		replaceAllSymBySym(ic->next,IC_RESULT(ic),pdop);
+		replaceAllSymBySym(ic->next,IC_RESULT(ic),pdop,&ebb->ndompset);
 	    }
 	}
 

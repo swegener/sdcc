@@ -61,6 +61,7 @@ typedef struct eBasicBlock {
     bitVect *usesDefs;/* which definitions are used in this block */
     bitVect *ptrsSet; /* pointers assigned values in the block */
     bitVect *inPtrsSet;/* in coming pointers assigned values */
+    bitVect *ndompset; /* pointers set by non-dominating basic blocks */
     set     *addrOf ; /* symbols for which addres has been taken in the block */
     bitVect *linds ;  /* if loop exit this contains defNumbers
 			 for the inductions */

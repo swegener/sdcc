@@ -97,18 +97,26 @@ DEFSETFUNC(mergeInExprs)
     /* if in the dominator list then */
     if (bitVectBitValue(dest->domVect,ebp->bbnum) && dest != ebp) {
 	/* if already present then intersect */
-	if (!dest->inExprs && *firstTime) 
+	if (!dest->inExprs && *firstTime) {
 	    dest->inExprs = setFromSet(ebp->outExprs);
-	else
+	    /* copy the pointer set from the dominator */
+	    dest->inPtrsSet = bitVectCopy(ebp->ptrsSet);
+	    dest->ndompset  = bitVectCopy(ebp->ndompset);
+	}
+	else {
 	    dest->inExprs = intersectSets (dest->inExprs,
 					   ebp->outExprs,
-					   THROW_DEST);    
-	/* copy the pointer set from the dominator */
-	dest->inPtrsSet = bitVectCopy(ebp->ptrsSet);
+					   THROW_DEST);  
+	    dest->inPtrsSet = bitVectUnion(dest->inPtrsSet,ebp->ptrsSet);
+	    dest->ndompset  = bitVectUnion(dest->ndompset,ebp->ndompset);
+	}
     }
-    else 
+    else {
 	/* delete only if killed in this block */
 	deleteItemIf (&dest->inExprs,ifKilledInBlock, ebp);
+	/* union the ndompset with pointers set in this block*/
+	dest->ndompset = bitVectUnion(dest->ndompset,ebp->ptrsSet);
+    }
     
     *firstTime = 0;
 

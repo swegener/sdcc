@@ -54,5 +54,5 @@ void ifxOptimize (iCode *,set *,int,eBBlock *,int *,eBBlock **,int);
 void unsetDefsAndUses ( iCode *) ;
 void updateSpillLocation ( iCode *ic);
 void setUsesDefs (operand *,bitVect *,bitVect *,bitVect **);
-void replaceAllSymBySym (iCode *,operand *,operand *);
+void replaceAllSymBySym (iCode *,operand *,operand *,bitVect **);
 #endif

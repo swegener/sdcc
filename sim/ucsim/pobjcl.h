@@ -72,6 +72,7 @@ public:
 
 	  void	   *at(t_index index);
   virtual t_index  index_of(void *item);
+  virtual bool     index_of(void *item, t_index *idx);
   	  int	   get_count(void);
   virtual void     *pop(void);
   virtual void     *top(void);
@@ -80,6 +81,7 @@ public:
   virtual void	   set_limit(t_index alimit);
 
 	  void	   free_at(t_index index);
+          void     free_all(void);
 	  void	   disconn_at(t_index index);
 	  void	   disconn(void *item);
 	  void	   disconn_all(void);

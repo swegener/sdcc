@@ -38,13 +38,23 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class cl_interrupt: public cl_hw
 {
 public:
+  bool was_reti, bit_IT0, bit_IT1, bit_INT0, bit_INT1;
+  class cl_cell *cell_tcon;
+public:
   cl_interrupt(class cl_uc *auc);
-  //virtual int init(void);
+  virtual int init(void);
 
-  //virtual ulong read(class cl_mem *mem, long addr);
-  //virtual void write(class cl_mem *mem, long addr, ulong *val);
+  virtual void added_to_uc(void);
 
-  //virtual int tick(int cycles);
+  //virtual t_mem read(class cl_cell *cell);
+  virtual void write(class cl_cell *cell, t_mem *val);
+
+  //virtual void mem_cell_changed(class cl_mem *mem, t_addr addr);
+
+  virtual int tick(int cycles);
+  virtual void reset(void);
+  virtual void happen(class cl_hw *where, enum hw_event he, void *params);
+
   virtual void print_info(class cl_console *con);
 };
 

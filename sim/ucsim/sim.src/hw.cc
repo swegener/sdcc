@@ -34,6 +34,71 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "hwcl.h"
 
 
+/*
+ *____________________________________________________________________________
+ */
+
+cl_watched_cell::cl_watched_cell(class cl_mem *amem, t_addr aaddr,
+				 class cl_cell **astore,
+				 enum what_to_do_on_cell_change awtd)
+{
+  mem= amem;
+  addr= aaddr;
+  store= astore;
+  wtd= awtd;
+  if (mem)
+    {
+      cell= mem->get_cell(addr);
+      if (store)
+	*store= cell;
+    }
+}
+
+void
+cl_watched_cell::mem_cell_changed(class cl_mem *amem, t_addr aaddr,
+				  class cl_hw *hw)
+{
+  if (mem &&
+      mem == amem &&
+      addr == aaddr)
+    {
+      cell= mem->get_cell(addr);
+      if (store &&
+	  (wtd & WTD_RESTORE))
+	*store= cell;
+      if (wtd & WTD_WRITE)
+	{
+	  t_mem d= cell->get();
+	  hw->write(cell, &d);
+	}
+    }
+}
+
+/*void
+cl_used_cell::mem_cell_changed(class cl_mem *amem, t_addr aaddr, 
+class cl_hw *hw)
+{
+  if (mem &&
+      mem == amem &&
+      addr == aaddr)
+    {
+      cell= mem->get_cell(addr);
+      if (store &&
+	  (wtd & WTD_RESTORE))
+	*store= cell;
+      if (wtd & WTD_WRITE)
+	{
+	  t_mem d= cell->get();
+	  hw->write(cell, &d);
+	}
+    }
+}*/
+
+
+/*
+ *____________________________________________________________________________
+ */
+
 cl_hw::cl_hw(class cl_uc *auc, enum hw_cath cath, int aid, char *aid_string):
   cl_guiobj()
 {
@@ -46,11 +111,46 @@ cl_hw::cl_hw(class cl_uc *auc, enum hw_cath cath, int aid, char *aid_string):
     id_string= strdup(aid_string);
   else
     id_string= strdup("unknown hw element");
+  partners= new cl_list(2, 2);
+  watched_cells= new cl_list(2, 2);
 }
 
 cl_hw::~cl_hw(void)
 {
   free(id_string);
+  //hws_to_inform->disconn_all();
+  delete partners;
+  delete watched_cells;
+}
+
+
+void
+cl_hw::new_hw_adding(class cl_hw *new_hw)
+{
+}
+
+void
+cl_hw::new_hw_added(class cl_hw *new_hw)
+{
+  int i;
+
+  for (i= 0; i < partners->count; i++)
+    {
+      class cl_partner_hw *ph= (class cl_partner_hw *)(partners->at(i));
+      ph->refresh(new_hw);
+    }
+}
+
+class cl_hw *
+cl_hw::make_partner(enum hw_cath cath, int id)
+{
+  class cl_partner_hw *ph;
+  class cl_hw *hw;
+
+  ph= new cl_partner_hw(uc, cath, id);
+  partners->add(ph);
+  hw= ph->get_partner();
+  return(hw);
 }
 
 
@@ -58,17 +158,63 @@ cl_hw::~cl_hw(void)
  * Callback functions for changing memory locations
  */
 
-t_mem
+/*t_mem
 cl_hw::read(class cl_mem *mem, t_addr addr)
 {
   // Simply return the value
   return(mem->get(addr));
-}
+}*/
 
-void
+/*void
 cl_hw::write(class cl_mem *mem, t_addr addr, t_mem *val)
 {
   // Do not change *val by default
+}*/
+
+
+class cl_cell *
+cl_hw::register_cell(class cl_mem *mem, t_addr addr, class cl_cell **store,
+		     enum what_to_do_on_cell_change awtd)
+{
+  class cl_watched_cell *wc;
+  class cl_cell *cell;
+
+  if (mem)
+    mem->register_hw(addr, this, (int*)0, DD_FALSE);
+  wc= new cl_watched_cell(mem, addr, &cell, awtd);
+  if (store)
+    *store= cell;
+  watched_cells->add(wc);
+  // announce
+  uc->sim->mem_cell_changed(mem, addr);
+  return(cell);
+}
+
+class cl_cell *
+cl_hw::use_cell(class cl_mem *mem, t_addr addr, class cl_cell **store,
+		enum what_to_do_on_cell_change awtd)
+{
+  class cl_watched_cell *wc;
+  class cl_cell *cell;
+
+  wc= new cl_used_cell(mem, addr, &cell, awtd);
+  if (store)
+    *store= cell;
+  watched_cells->add(wc);
+  return(cell);
+}
+
+void
+cl_hw::mem_cell_changed(class cl_mem *mem, t_addr addr)
+{
+  int i;
+
+  for (i= 0; i < watched_cells->count; i++)
+    {
+      class cl_watched_cell *wc=
+	(class cl_watched_cell *)(watched_cells->at(i));
+      wc->mem_cell_changed(mem, addr, this);
+    }
 }
 
 
@@ -81,6 +227,19 @@ cl_hw::tick(int cycles)
 {
   return(0);
 }
+
+void
+cl_hw::inform_partners(enum hw_event he, void *params)
+{
+  int i;
+
+  for (i= 0; i < partners->count; i++)
+    {
+      class cl_partner_hw *ph= (class cl_partner_hw *)(partners->at(i));
+      ph->happen(this, he, params);
+    }
+}
+
 
 void
 cl_hw::print_info(class cl_console *con)
@@ -99,7 +258,7 @@ cl_hws::add(void *item)
   for (i= 0; i < count; i++)
     {
       class cl_hw *hw= (class cl_hw *)(at(i));
-      hw->adding((class cl_hw *)item);
+      hw->new_hw_adding((class cl_hw *)item);
     }
   // add
   res= cl_list::add(item);
@@ -107,9 +266,89 @@ cl_hws::add(void *item)
   for (i= 0; i < count; i++)
     {
       class cl_hw *hw= (class cl_hw *)(at(i));
-      hw->added((class cl_hw *)item);
+      hw->new_hw_added((class cl_hw *)item);
     }
+  ((class cl_hw *)item)->added_to_uc();
   return(res);
+}
+
+
+void
+cl_hws::mem_cell_changed(class cl_mem *mem, t_addr addr)
+{
+  int i;
+  
+  for (i= 0; i < count; i++)
+    {
+      class cl_hw *hw= (class cl_hw *)(at(i));
+      hw->mem_cell_changed(mem, addr);
+    }
+}
+
+
+/*
+ *____________________________________________________________________________
+ */
+
+cl_partner_hw::cl_partner_hw(class cl_uc *auc, enum hw_cath cath, int aid):
+  cl_base()
+{
+  uc= auc;
+  cathegory= cath;
+  id= aid;
+  partner= uc->get_hw(cathegory, id, 0);
+}
+
+class cl_hw *
+cl_partner_hw::get_partner(void)
+{
+  return(partner);
+}
+
+void
+cl_partner_hw::refresh(void)
+{
+  class cl_hw *hw= uc->get_hw(cathegory, id, 0);
+
+  if (!hw)
+    return;
+  if (partner)
+    {
+      // partner is already set
+      if (partner != hw)
+	{
+	  // partner changed?
+	  partner= hw;
+	}
+      else
+	partner= hw;
+    }
+  partner= hw;
+}
+
+void
+cl_partner_hw::refresh(class cl_hw *new_hw)
+{
+  if (!new_hw)
+    return;
+  if (cathegory == new_hw->cathegory &&
+      id == new_hw->id)
+    {
+      if (partner)
+	{
+	  // partner changed?
+	  partner= new_hw;
+	}
+      else
+	partner= new_hw;
+    }
+}
+
+void
+cl_partner_hw::happen(class cl_hw *where, enum hw_event he, void *params)
+{
+  if (partner)
+    partner->happen(where, he, params);
 }
 
 

@@ -34,16 +34,16 @@ man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
 
-OBJECTS         = app.o sim.o itsrc.o brk.o option.o arg.o stack.o \
-		  guiobj.o uc.o hw.o mem.o
+OBJECTS         = mem.o app.o sim.o itsrc.o brk.o option.o arg.o stack.o \
+		  guiobj.o uc.o hw.o
 
 
 # Compiling entire program or any subproject
 # ------------------------------------------
 all: checkconf sim_lib
 
-test_mem_speed: $(PRJDIR)/libsim.a $(PRJDIR)/libutil.a test_mem_speed.o
-	$(CC) -o $@ test_mem_speed.o -L$(PRJDIR) -lsim -lutil
+test_mem_speed: $(PRJDIR)/lib*.a test_mem_speed.o
+	$(CC) -o $@ test_mem_speed.o -L$(PRJDIR) -lsim -lutil -lcmd -lsim
 
 sim.src: all
 
@@ -60,8 +60,10 @@ uninstall:
 
 # Performing self-test
 # --------------------
-check:
+check: test
+	./test_mem_speed
 
+test: test_mem_speed
 
 # Performing installation test
 # ----------------------------
@@ -72,8 +74,6 @@ installcheck:
 # ---------------------------------
 installdirs:
 
-
-test: test_mem_speed
 
 # Creating dependencies
 # ---------------------
@@ -95,7 +95,7 @@ include clean.mk
 sim_lib: $(PRJDIR)/libsim.a
 
 $(PRJDIR)/libsim.a: $(OBJECTS)
-	$(AR) -rcu $*.a $(OBJECTS)
+	ar -rcu $*.a $(OBJECTS)
 	$(RANLIB) $*.a
 
 .cc.o:

@@ -462,7 +462,19 @@ cl_app::get_cmd(class cl_cmdline *cmdline)
 }
 
 
-/* Adding and removing comonents */
+/*
+ * Messages to broadcast
+ */
+
+void
+cl_app::mem_cell_changed(class cl_mem *mem, t_addr addr)
+{
+  if (sim)
+    sim->mem_cell_changed(mem, addr);
+}
+
+
+/* Adding and removing components */
 
 void
 cl_app::set_simulator(class cl_sim *simulator)

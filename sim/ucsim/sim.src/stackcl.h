@@ -52,7 +52,7 @@ public:
   cl_stack_op(enum stack_op itype,
 	      t_addr iPC, t_addr iaddr, t_mem idata,
 	      t_addr iSP_before, t_addr iSP_after);
-  ~cl_stack_op(void);
+  virtual ~cl_stack_op(void);
 };
 
 

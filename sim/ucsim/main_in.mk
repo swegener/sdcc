@@ -15,10 +15,13 @@ INSTALL		= @INSTALL@
 
 PRJDIR		= .
 SIMDIR		= sim.src
+CMDDIR		= cmd.src
+GUIDIR		= gui.src
 
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 # FIXME: -Imcs51 must be removed!!!
-CPPFLAGS        = @CPPFLAGS@ -I$(PRJDIR) -I$(PRJDIR)/$(SIMDIR)
+CPPFLAGS        = @CPPFLAGS@ -I$(PRJDIR) -I$(PRJDIR)/$(SIMDIR) \
+		  -I$(CMDDIR) -I$(GUIDIR)
 CFLAGS          = @CFLAGS@ -I$(PRJDIR) -Wall
 CXXFLAGS        = @CXXFLAGS@ -I$(PRJDIR) -Wall
 M_OR_MM         = @M_OR_MM@
@@ -26,7 +29,6 @@ M_OR_MM         = @M_OR_MM@
 LIB_LIST	= sim cmd sim util
 UCSIM_LIBS	= $(patsubst %,-l%,$(LIB_LIST))
 UCSIM_LIB_FILES	= $(patsubst %,lib%.a,$(LIB_LIST))
-LIBS		= @LIBS@
 
 prefix          = @prefix@
 exec_prefix     = @exec_prefix@
@@ -40,11 +42,13 @@ man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
 
-OBJECTS         = pobj.o globals.o utils.o
+OBJECTS         = pobj.o globals.o utils.o error.o
 SOURCES		= $(patsubst %.o,%.cc,$(OBJECTS))
 UCSIM_OBJECTS	= ucsim.o
 UCSIM_SOURCES	= $(patsubst %.o,%.cc,$(UCSIM_OBJECTS))
 ALL_SOURCES	= $(SOURCES) $(UCSIM_SOURCES)
+
+enable_ucsim	= @enable_ucsim@
 
 
 # Compiling entire program or any subproject
@@ -73,6 +77,7 @@ uninstall:
 # --------------------
 check:
 
+test:
 
 # Performing installation test
 # ----------------------------
@@ -101,13 +106,19 @@ include clean.mk
 # My rules
 # --------
 libutil.a: $(OBJECTS)
-	$(AR) -rcu $*.a $(OBJECTS)
+	ar -rcu $*.a $(OBJECTS)
 	$(RANLIB) $*.a
 
+
+ifeq ($(enable_ucsim),yes)
 ucsim_app: libs ucsim
+else
+ucsim_app:
+endif
 
 ucsim: $(UCSIM_OBJECTS) $(UCSIM_LIB_FILES)
-	$(CXX) $(CXXFLAGS) -o $@ $< -L$(PRJDIR) $(UCSIM_LIBS) $(LIBS)
+	echo $(UCSIM_LIB_FILES)
+	$(CXX) $(CXXFLAGS) -o $@ $< -L$(PRJDIR) $(UCSIM_LIBS)
 
 .cc.o:
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@

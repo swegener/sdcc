@@ -21,8 +21,12 @@ CPPFLAGS        = @CPPFLAGS@ -I. -I$(PRJDIR) \
 CFLAGS          = @CFLAGS@ -Wall
 CXXFLAGS        = @CXXFLAGS@ -Wall
 M_OR_MM         = @M_OR_MM@
+PICOPT		= @PICOPT@
+SHAREDLIB	= @SHAREDLIB@
 
 LIBS		= @LIBS@ -L$(PRJDIR) -lsim -lcmd -lutil -lguiucsim
+DL		= @DL@
+dl_ok		= @dl_ok@
 
 prefix          = @prefix@
 exec_prefix     = @exec_prefix@
@@ -36,10 +40,15 @@ man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
 
-OBJECTS         = savr.o glob.o \
+OBJECTS_SHARED	= glob.o \
 		  simavr.o avr.o port.o \
 		  inst.o bit_inst.o jump_inst.o move_inst.o logic_inst.o \
 		  arith_inst.o
+OBJECTS_EXE	= savr.o
+OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)
+
+enable_dlso	= @enable_dlso@
+dlso_ok		= @dlso_ok@
 
 AVRASM		= tavrasm
 TEST_OBJ	= test_bit.hex test_dis.hex test_mov.hex test_jmp.hex \
@@ -49,8 +58,6 @@ TEST_OBJ	= test_bit.hex test_dis.hex test_mov.hex test_jmp.hex \
 # Compiling entire program or any subproject
 # ------------------------------------------
 all: checkconf otherlibs avr.src
-
-tests: $(TEST_OBJ)
 
 
 # Compiling and installing everything and runing test
@@ -67,7 +74,9 @@ uninstall:
 
 # Performing self-test
 # --------------------
-check:
+check: $(TEST_OBJ)
+
+test:
 
 
 # Performing installation test
@@ -99,10 +108,21 @@ include clean.mk
 # --------
 .SUFFIXES: .asm .hex
 
-avr.src: savr
+avr.src: savr shared_lib
 
 savr: $(OBJECTS) $(PRJDIR)/*.a
-	$(CXX) $(CXXFLAGS) -o savr $(OBJECTS) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(OBJECTS) $(LIBS) -o savr
+
+ifeq ($(dlso_ok),yes)
+shared_lib: $(PRJDIR)/savr.so
+else
+shared_lib:
+	@echo "No AVR shared lib made."
+	@echo "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
+endif
+
+$(PRJDIR)/savr.so: $(OBJECTS_SHARED)
+	$(CXX) -shared $(OBJECTS_SHARED) -o $(PRJDIR)/savr.so
 
 otherlibs:
 	cd $(PRJDIR)/cmd.src && $(MAKE) all

@@ -60,6 +60,8 @@ uninstall:
 # --------------------
 check:
 
+test:
+
 
 # Performing installation test
 # ----------------------------
@@ -91,7 +93,7 @@ include clean.mk
 cmdlib: $(PRJDIR)/libcmd.a
 
 $(PRJDIR)/libcmd.a: $(OBJECTS)
-	$(AR) -rcu $*.a $(OBJECTS)
+	ar -rcu $*.a $(OBJECTS)
 	$(RANLIB) $*.a
 
 .cc.o:

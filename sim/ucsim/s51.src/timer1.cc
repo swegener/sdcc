@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (timer1.cc)
+ * Simulator of microcontrollers (s51.src/timer1.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -29,9 +29,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "regs51.h"
 
 
-cl_timer1::cl_timer1(class cl_uc *auc):
-  cl_hw(auc, HW_TIMER, 1, "timer1")
-{}
+cl_timer1::cl_timer1(class cl_uc *auc, int aid, char *aid_string):
+  cl_timer0(auc, aid, aid_string)
+{
+  make_partner(HW_UART, 0);
+}
 
 /*int
 cl_timer1::init(void)
@@ -39,31 +41,50 @@ cl_timer1::init(void)
   return(0);
 }*/
 
+/*void
+cl_timer1::added(class cl_hw *new_hw)
+{
+  if (new_hw->cathegory == HW_UART)
+    hws_to_inform->add(new_hw);
+}*/
+
+int
+cl_timer1::do_mode3(int cycles)
+{
+  return(0);
+}
+
+/*void
+cl_timer1::overflow(void)
+{
+  inform_partners(EV_OVERFLOW, 0);
+}*/
+
 void
 cl_timer1::print_info(class cl_console *con)
 {
   char *modes[]= { "13 bit", "16 bit", "8 bit autoreload", "stop" };
-  int tmod= uc->get_mem(MEM_SFR, TMOD);
+  //int tmod= cell_tmod->get();
   int on;
 
   con->dd_printf("%s[%d] 0x%04x", id_string, id,
-		 256*uc->get_mem(MEM_SFR, TH1)+uc->get_mem(MEM_SFR, TL1));
-  int mode= (tmod & (bmM11|bmM01)) >> 4;
+		 256*cell_th->get()+cell_tl->get());
+  //int mode= (tmod & (bmM11|bmM01)) >> 4;
   con->dd_printf(" %s", modes[mode]);
-  con->dd_printf(" %s", (tmod&bmC_T1)?"counter":"timer");
-  if (tmod&bmGATE1)
+  con->dd_printf(" %s", (/*tmod&bm*/C_T/*1*/)?"counter":"timer");
+  if (/*tmod&bm*/GATE/*1*/)
     {
       con->dd_printf(" gated");
-      on= uc->get_mem(MEM_SFR, P3) & uc->port_pins[3] & bm_INT0;
+      on= /*uc->get_mem(MEM_SFR, P3) & uc->port_pins[3] & mask_*/INT/*bm_INT1*/;
     }
   else
-    on= uc->get_mem(MEM_SFR, TCON) & bmTR1;
+    on= cell_tcon->get() & mask_TR/*bmTR1*/;
   con->dd_printf(" %s", on?"ON":"OFF");
-  con->dd_printf(" irq=%c", (uc->get_mem(MEM_SFR, TCON)&bmTF1)?'1':'0');
+  con->dd_printf(" irq=%c", (cell_tcon->get()&mask_TF)?'1':'0');
   con->dd_printf(" %s", (uc->get_mem(MEM_SFR, IE)&bmET1)?"en":"dis");
   con->dd_printf(" prio=%d", uc->it_priority(bmPT1));
   con->dd_printf("\n");
 }
 
 
-/* End of timer1.cc */
+/* End of s51.src/timer1.cc */

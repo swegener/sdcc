@@ -340,7 +340,7 @@ COMMAND_DO_WORK_UC(cl_dc_cmd)
 
   for (;
        start <= end;
-       start+= uc->inst_length(rom->get(start)))
+       start+= uc->inst_length(start))
     uc->print_disass(start, con);
   last= start;
   return(DD_FALSE);
@@ -455,7 +455,7 @@ COMMAND_DO_WORK_UC(cl_fill_cmd)
       {
 	t_mem d;
 	d= what;
-	mem->write(i, &d);
+	mem->write(i, d);
       }
   }
   else

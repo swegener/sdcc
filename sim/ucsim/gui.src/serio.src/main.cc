@@ -11,7 +11,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <signal.h>
-#include <getopt.h>
+#include <getopt.h> // FIXME
 #include "fileio.hh"
 #include "frontend.hh"
 #include "posix_signal.hh"

@@ -38,10 +38,10 @@ extern int make_server_socket(unsigned short int port);
 extern struct name_entry *get_name_entry(struct name_entry tabl[],
 					 char *name,
 					 class cl_uc *uc);
-extern bool interpret_bitname(char *name, class cl_uc *uc,
+/*extern bool interpret_bitname(char *name, class cl_uc *uc,
 			      uchar **cell, uchar *celladdr,
 			      uchar *bitaddr, uchar *bitmask,
-			      char **symname);
+			      char **symname);*/
 extern char *proc_escape(char *string, int *len);
 
 

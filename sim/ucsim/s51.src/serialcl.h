@@ -32,19 +32,52 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "pobjcl.h"
 #include "uccl.h"
 
-#include "newcmdcl.h"
+//#include "newcmdcl.h"
 
 
 class cl_serial: public cl_hw
 {
+protected:
+  bool there_is_t2, t2_baud;
+  class cl_cell *sbuf, *pcon, *scon;
+  struct termios saved_attributes_in; // Attributes of serial interface
+  struct termios saved_attributes_out;
+  FILE *serial_in;	// Serial line input
+  FILE *serial_out;	// Serial line output
+  uchar s_in;		// Serial channel input reg
+  uchar s_out;		// Serial channel output reg
+  bool  s_sending;	// Transmitter is working
+  bool  s_receiving;	// Receiver is working
+  int   s_rec_bit;	// Bit counter of receiver
+  int   s_tr_bit;	// Bit counter of transmitter
+  int   s_rec_t1;	// T1 overflows for receiving
+  int   s_tr_t1;	// T1 overflows for sending
+  int   s_rec_tick;	// Machine cycles for receiving
+  int   s_tr_tick;	// Machine cycles for sending
+  uchar _mode;
+  uchar _bmREN;
+  uchar _bmSMOD;
+  uchar _bits;
+  uchar _divby;
 public:
   cl_serial(class cl_uc *auc);
-  //virtual int init(void);
+  virtual ~cl_serial(void);
+  virtual int init(void);
 
-  //virtual ulong read(class cl_mem *mem, long addr);
-  //virtual void write(class cl_mem *mem, long addr, ulong *val);
+  virtual void new_hw_added(class cl_hw *new_hw);
+  virtual void added_to_uc(void);
+  virtual t_mem read(class cl_cell *cell);
+  virtual void write(class cl_cell *cell, t_mem *val);
 
-  //virtual int tick(int cycles);
+  //virtual void mem_cell_changed(class cl_mem *mem, t_addr addr);
+
+  virtual int  serial_bit_cnt(void);
+  virtual void received(int c);
+
+  virtual int tick(int cycles);
+  virtual void reset(void);
+  virtual void happen(class cl_hw *where, enum hw_event he, void *params);
+
   virtual void print_info(class cl_console *con);
 };
 

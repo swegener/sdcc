@@ -25,6 +25,58 @@ AC_DEFINE_UNQUOTED(VERSIONHI, $VERSIONHI)
 AC_DEFINE_UNQUOTED(VERSIONLO, $VERSIONLO)
 AC_DEFINE_UNQUOTED(VERSIONP, $VERSIONP)
 
+# Some options
+#==============
+AC_ARG_ENABLE(ucsim,
+[  --enable-ucsim          compile ucsim frontend],
+if test $enable_ucsim != "no"; then
+    enable_ucsim="yes"
+fi,
+#default
+enable_ucsim="no")
+AC_ARG_ENABLE(dlso,
+[  --enable-dlso           compile dynamically loadable shared libraries],
+if test $enable_dlso != "no"; then
+    enable_dlso="yes"
+fi,
+enable_dlso="no")
+AC_ARG_ENABLE(51,
+[  --disable-51            do not compile simulator for MCS51],
+if test $enable_51 != "no"; then
+    enable_51="yes"
+fi,
+enable_51="yes")
+AC_ARG_ENABLE(avr,
+[  --disable-avr           do not compile simulator for AVR],
+if test $enable_avr != "no"; then
+    enable_avr="yes"
+fi,
+enable_avr="yes")
+AC_ARG_ENABLE(z80,
+[  --enable-z80            compile simulator for Z80],
+if test $enable_z80 != "no"; then
+    enable_z80="yes"
+fi,
+enable_z80="no")
+AC_ARG_ENABLE(xa,
+[  --enable-xa             compile simulator for XA],
+if test $enable_xa != "no"; then
+    enable_xa="yes"
+fi,
+enable_xa="no")
+AC_ARG_ENABLE(portmon,
+[  --enable-serio          compile serio GUI tool (needs curses)],
+if test $enable_serio != "no"; then
+    enable_serio="yes"
+fi,
+enable_serio="yes")
+AC_SUBST(enable_ucsim)
+AC_SUBST(enable_dlso)
+AC_SUBST(enable_51)
+AC_SUBST(enable_avr)
+AC_SUBST(enable_z80)
+AC_SUBST(enable_xa)
+AC_SUBST(enable_serio)
 
 # Required programs
 #-------------------
@@ -194,8 +246,7 @@ AC_DEFUN(ucsim_ACCEPT_LENGTH_T,
         [ucsim_cv_accept_length_type=$ac_val; break])
     done
     CPPFLAGS="$ac_save_CPPFLAGS"])
-
-  if test $ucsim_cv_accept_length_type != no; then
+  if test "$ucsim_cv_accept_length_type" != no; then
     AC_DEFINE_UNQUOTED(ACCEPT_SOCKLEN_T, $ucsim_cv_accept_length_type,
       [Define to be the type of length parameter of accept (without the \*').])
   fi
@@ -232,6 +283,7 @@ rm -f _test_.* a.out)
 # --------------------------------------------------------
 
 # Cross compiling overrides
+# FIXME
 if test "$CC" = "i586-mingw32msvc-gcc"; then
   ac_cv_c_bigendian=no
   ac_cv_sizeof_char=1
@@ -241,7 +293,19 @@ if test "$CC" = "i586-mingw32msvc-gcc"; then
   ac_cv_sizeof_long_long=4
 fi
 
-AC_C_BIGENDIAN
+if test "$cross_compiling" == "no"
+then
+    AC_C_BIGENDIAN
+else
+#echo "CROSS ENDIAN"
+    if $CXX -v 2>&1|grep "mingw" >/dev/null 2>&1; then
+	ac_cv_c_bigendian=no
+    else
+	: # FIXME
+    fi
+#echo "CROSS ENDIAN DONE"
+fi
+
 AC_CACHE_CHECK(whether preprocessor accepts -MM or -M,ucsim_cv_MM,
 echo "#include <stdio.h>" >_test_.c
 echo "" >>_test_.c
@@ -260,7 +324,7 @@ AC_SUBST(M_OR_MM)
 DD_COPT(CXX, ggdb)
 if test "$ucsim_cv_CXXggdb" = "yes"; then
     if test "$CXXFLAGS"x = x ;then
-	CXXFLAGS="-ggdb -O"
+	CXXFLAGS="-ggdb"
     else
 	CXXFLAGS="$CXXFLAGS -ggdb"
     fi
@@ -288,6 +352,7 @@ fi
 # If this is Cygwin neither use Position Independant Code
 # nor build .so
 # Quick + dirty by Bernhard
+# FIXME
 if $CXX -v 2>&1 | grep -i cygwin 1>&5 2>&5; then
     PICOPT=""
     SHAREDLIB="no"
@@ -295,17 +360,34 @@ fi
 AC_SUBST(SHAREDLIB)
 AC_SUBST(PICOPT)
 
+dlso_ok="no"
+if test $SHAREDLIB = "yes" -a $dl_ok = "yes" -a $enable_dlso = "yes"; then
+    dlso_ok="yes"
+fi
+AC_SUBST(dlso_ok)
 
 # Checks for typedefs, structures, and compiler characteristics.
 # ===========================================================================
 
-
 AC_TYPE_SIGNAL
+if test "$cross_compiling" = "no"; then
 AC_CHECK_SIZEOF(char)
 AC_CHECK_SIZEOF(short)
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(long)
 AC_CHECK_SIZEOF(long long)
+else
+    if $CXX -v 2>&1|grep "mingw" >/dev/null 2>&1; then
+	ac_cv_sizeof_char=1
+	ac_cv_sizeof_short=2
+	ac_cv_sizeof_int=4 
+	ac_cv_sizeof_long=4
+	ac_cv_sizeof_long_long=4
+    else
+	: # FIXME
+    fi
+#echo
+fi
 
 type_name()
 {
@@ -345,15 +427,34 @@ AC_DEFINE_UNQUOTED(TYPE_BYTE, $TYPE_BYTE)
 AC_DEFINE_UNQUOTED(TYPE_WORD, $TYPE_WORD)
 AC_DEFINE_UNQUOTED(TYPE_DWORD, $TYPE_DWORD)
 
+if echo $TYPE_DWORD|grep short >/dev/null; then
+    A="h"
+elif echo $TYPE_DWORD|grep long >/dev/null; then
+    A="l"
+else
+    A=""
+fi
+
+if echo $TYPE_WORD|grep short >/dev/null; then M="h"
+elif echo $TYPE_WORD|grep long >/dev/null; then M="l"
+else M=""
+fi
+
+AC_DEFINE_UNQUOTED(_A_, "${A}")
+AC_DEFINE_UNQUOTED(_M_, "${M}")
+
+
 # Generating output files
 # ===========================================================================
 
 AC_OUTPUT(main.mk:main_in.mk
+packages.mk:packages_in.mk
 sim.src/Makefile
 cmd.src/Makefile
 s51.src/Makefile
 avr.src/Makefile
 z80.src/Makefile
+xa.src/Makefile
 gui.src/Makefile
 gui.src/serio.src/Makefile
 doc/Makefile

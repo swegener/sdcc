@@ -122,12 +122,15 @@ cl_uc::cl_uc(class cl_sim *asim):
   idle_ticks= new cl_ticker(+1, TICK_IDLE, "idle");
   counters= new cl_list(2, 2);
   it_levels= new cl_list(2, 2);
-  it_sources= new cl_list(2, 2);
+  it_sources= new cl_irqs(2, 2);
   class it_level *il= new it_level(-1, 0, 0, 0);
   it_levels->push(il);
   st_ops= new cl_list(2, 2);
+  errors= new cl_list(2, 2);
+  events= new cl_list(2, 2);
   sp_max= 0;
   sp_avg= 0;
+  inst_exec= DD_FALSE;
 }
 
 
@@ -140,11 +143,15 @@ cl_uc::~cl_uc(void)
   delete isr_ticks;
   delete idle_ticks;
   delete counters;
+  events->disconn_all();
+  delete events;
   delete fbrk;
   delete ebrk;
   delete it_levels;
   delete it_sources;
   delete st_ops;
+  errors->free_all();
+  delete errors;
 }
 
 
@@ -165,8 +172,8 @@ cl_uc::init(void)
 			      get_id_string(mem_classes, mc));
       mems->put_at(mc, m);
     }
-  ebrk= new brk_coll(2, 2, (class cl_rom *)mem(MEM_ROM));
-  fbrk= new brk_coll(2, 2, (class cl_rom *)mem(MEM_ROM));
+  ebrk= new brk_coll(2, 2, /*(class cl_rom *)*/mem(MEM_ROM));
+  fbrk= new brk_coll(2, 2, /*(class cl_rom *)*/mem(MEM_ROM));
   fbrk->Duplicates= DD_FALSE;
   brk_counter= 0;
   mk_hw_elements();
@@ -214,6 +221,13 @@ cl_uc::reset(void)
     }
   sp_max= 0;
   sp_avg= 0;
+  
+  int i;
+  for (i= 0; i < hws->count; i++)
+    {
+      class cl_hw *hw= (class cl_hw *)(hws->at(i));
+      hw->reset();
+    }
 }
 
 /*
@@ -225,13 +239,10 @@ cl_uc::mk_mem(enum mem_class type, char *class_name)
 {
   class cl_mem *m;
 
-  if (get_mem_size(type) <= 0)
+  if (get_mem_size(type) < 0)
     return(0);
-  if (type == MEM_ROM)
-    m= new cl_rom(get_mem_size(type), get_mem_width(type));
-  else
-    m= new cl_mem(type, get_id_string(mem_classes, type),
-		  get_mem_size(type), get_mem_width(type));
+  m= new cl_m(type, get_id_string(mem_classes, type),
+	      get_mem_size(type), get_mem_width(type), this);
   m->init();
   return(m);
 }
@@ -243,7 +254,7 @@ cl_uc::get_mem_size(enum mem_class type)
     {
     case MEM_ROM: return(0x10000);
     case MEM_XRAM: return(0x10000);
-    case MEM_IRAM: return(0x100);
+    case MEM_IRAM: return(0x80);
     case MEM_SFR: return(0x100);
     case MEM_TYPES:
     default: return(0);
@@ -406,9 +417,11 @@ cl_uc::build_cmdset(class cl_cmdset *cmdset)
 "set bit addr 0|1   Set specified bit to 0 or 1",
 "long help of set bit"));
     cmd->init();
-    cset->add(cmd= new cl_set_port_cmd("port", 0,
-"set port hw data   Set data connected to port",
-"long help of set port"));
+    cset->add(cmd= new cl_set_hw_cmd("hardware", 0,
+"set hardware cathegory params...\n"
+"                   Set parameters of specified hardware element",
+"long help of set hardware"));
+    cmd->add_name("hw");
     cmd->init();
     cset->add(cmd= new cl_set_option_cmd("option", 0,
 "set option name value\n"
@@ -437,7 +450,7 @@ cl_uc::build_cmdset(class cl_cmdset *cmdset)
 "info hardware cathegory\n"
 "                   Status of hardware elements of the CPU",
 "long help of info hardware"));
-    cmd->add_name("h	w");
+    cmd->add_name("hw");
     cmd->init();
   }
   cmdset->add(cmd= new cl_super_cmd("info", 0,
@@ -462,28 +475,24 @@ cl_uc::build_cmdset(class cl_cmdset *cmdset)
  * Read/write simulated memory
  */
 
-ulong
-cl_uc::read_mem(enum mem_class type, t_mem addr)
+t_mem
+cl_uc::read_mem(enum mem_class type, t_addr addr)
 {
   class cl_mem *m;
 
-  if ((m= (class cl_mem*)mems->at(type)))
-    return(m->read(addr));
-  //FIXME
-fprintf(stderr, "cl_uc::read_mem(type= %d, 0x%06lx) TROUBLE\n", type, addr);
-  return(0);
+  if ((m= (class cl_mem*)mems->at(type)) == 0)
+    m= (class cl_mem*)(mems->at(MEM_DUMMY));
+  return(m->read(addr));
 }
 
-ulong
+t_mem
 cl_uc::get_mem(enum mem_class type, t_addr addr)
 {
   class cl_mem *m;
 
-  if ((m= (class cl_mem*)mems->at(type)))
-    return(m->get(addr));
-  //FIXME
-printf("cl_uc::get_mem(type= %d, 0x%06lx) TROUBLE\n", type, addr);
-  return(0);
+  if ((m= (class cl_mem*)mems->at(type)) == 0)
+    m= (class cl_mem*)(mems->at(MEM_DUMMY));
+  return(m->get(addr));
 }
 
 void
@@ -491,13 +500,9 @@ cl_uc::write_mem(enum mem_class type, t_addr addr, t_mem val)
 {
   class cl_mem *m;
 
-  if ((m= (class cl_mem*)mems->at(type)))
-    {
-      m->write(addr, &val);
-      //m->mem[addr]= val;
-    }
-  //FIXME
-else printf("cl_uc::write_mem(type= %d, 0x%06lx, 0x%lx) TROUBLE\n", type, addr, val);
+  if ((m= (class cl_mem*)mems->at(type)) == 0)
+    m= (class cl_mem*)(mems->at(MEM_DUMMY));
+  m->write(addr, val);
 }
 
 void
@@ -505,20 +510,21 @@ cl_uc::set_mem(enum mem_class type, t_addr addr, t_mem val)
 {
   class cl_mem *m;
 
-  if ((m= (class cl_mem*)mems->at(type)))
-    m->set(addr, val);
-  //FIXME
-else printf("cl_uc::set_mem(type= %d, 0x%06lx, 0x%lx) TROUBLE\n", type, addr, val);
+  if ((m= (class cl_mem*)mems->at(type)) == 0)
+    m= (class cl_mem*)(mems->at(MEM_DUMMY));
+  m->set(addr, val);
 }
 
 class cl_mem *
 cl_uc::mem(enum mem_class type)
 {
+  class cl_mem *m;
+    
   if (mems->count < type)
-    //FIXME
-{printf("TROUBLE\n");    return(0);
-}
-  return((class cl_mem *)(mems->at(type)));
+    m= (class cl_mem *)(mems->at(MEM_DUMMY));
+  else
+    m= (class cl_mem *)(mems->at(type));
+  return(m);
 }
 
 class cl_mem *
@@ -563,21 +569,6 @@ cl_uc::mem(char *class_name)
   free(n);
   return(0);
 }
-
-/*TYPE_UBYTE *
-cl_uc::MEM(enum mem_class type)
-{
-  class cl_mem *m;
-
-  if ((m= mem(type)) == 0)
-    //FIXME
-{printf("TROUBLE\n");    return(0);
-}
-  return((TYPE_UBYTE *)(m->mem));
-}*/
-
-
-/* Local function for `read_hex_file' method to read some bytes */
 
 static long
 ReadInt(FILE *f, bool *ok, int bytes)
@@ -700,14 +691,13 @@ cl_uc::read_hex_file(const char *name)
 		    if (sim->app->args->get_iarg('V', 0) &&
 			rtyp != 1)
 		      sim->app->get_commander()->
-			dd_printf("Unknown record type %d(0x%x)\n",
-				  rtyp, rtyp);
+			dd_printf("Unknown record type %d(0x%x)\n", rtyp, rtyp);
 		}
 	      else
 		if (sim->app->args->get_iarg('V', 0))
 		  sim->app->get_commander()->
 		    dd_printf("Checksum error (%x instead of %x) in "
-			      "record %ld.\n", chk, sum, recnum);
+			   "record %ld.\n", chk, sum, recnum);
 	    }
 	  else
 	    if (sim->app->args->get_iarg('V', 0))
@@ -722,8 +712,7 @@ cl_uc::read_hex_file(const char *name)
   if (name)
     fclose(f);
   if (sim->app->args->get_iarg('V', 0))
-    sim->app->get_commander()->dd_printf("%ld records have been read\n",
-					 recnum);
+    sim->app->get_commander()->dd_printf("%ld records have been read\n", recnum);
   analyze(0);
   return(written);
 }
@@ -741,39 +730,47 @@ cl_uc::read_hex_file(const char *name)
 bool
 cl_uc::inst_at(t_addr addr)
 {
-  class cl_rom *rom= (class cl_rom *)mem(MEM_ROM);
+  class cl_mem/*rom*/ *rom= /*(class cl_rom *)*/mem(MEM_ROM);
   
   if (!rom)
     return(0);
-  return(rom->inst_map->get(addr));
+  //return(rom->inst_map->get(addr));
+  return(rom->get_cell_flag(addr, CELL_INST));
 }
 
 void
 cl_uc::set_inst_at(t_addr addr)
 {
-  class cl_rom *rom= (class cl_rom *)mem(MEM_ROM);
+  class cl_mem/*rom*/ *rom= /*(class cl_rom *)*/mem(MEM_ROM);
   
   if (rom)
-    rom->inst_map->set(addr);
+    //rom->inst_map->set(addr);
+    rom->set_cell_flag(addr, DD_TRUE, CELL_INST);
 }
 
 void
 cl_uc::del_inst_at(t_addr addr)
 {
-  class cl_rom *rom= (class cl_rom *)mem(MEM_ROM);
+  class cl_mem/*rom*/ *rom= /*(class cl_rom *)*/mem(MEM_ROM);
   
   if (rom)
-    rom->inst_map->clear(addr);
+    //rom->inst_map->clear(addr);
+    rom->set_cell_flag(addr, DD_FALSE, CELL_INST);
 }
 
 bool
 cl_uc::there_is_inst(void)
 {
-  class cl_rom *rom= (class cl_rom *)mem(MEM_ROM);
+  class cl_mem/*rom*/ *rom= /*(class cl_rom *)*/mem(MEM_ROM);
   
   if (!rom)
     return(0);
-  return(!(rom->inst_map->empty()));
+  //return(!(rom->inst_map->empty()));
+  bool got= DD_FALSE;
+  t_addr addr;
+  for (addr= 0; addr < rom->size && !got; addr++)
+    got= rom->get_cell_flag(addr, CELL_INST);
+  return(got);
 }
 
 
@@ -784,7 +781,7 @@ cl_uc::there_is_inst(void)
 
 /* Register callback hw objects for mem read/write */
 
-void
+/*void
 cl_uc::register_hw_read(enum mem_class type, t_addr addr, class cl_hw *hw)
 {
   class cl_mem *m;
@@ -802,12 +799,12 @@ cl_uc::register_hw_read(enum mem_class type, t_addr addr, class cl_hw *hw)
     }
   else
     printf("cl_uc::register_hw_read TROUBLE\n");
-}
+}*/
 
-void
+/*void
 cl_uc::register_hw_write(enum mem_class type, t_addr addr, class cl_hw *hw)
 {
-}
+}*/
 
 /* Looking for a specific HW element */
 
@@ -927,7 +924,7 @@ cl_uc::disass(t_addr addr, char *sep)
   char *buf;
 
   buf= (char*)malloc(100);
-  strcpy(buf, "uc::do_disass unimplemented\n");
+  strcpy(buf, "uc::disass() unimplemented\n");
   return(buf);
 }
 
@@ -951,7 +948,7 @@ cl_uc::print_disass(t_addr addr, class cl_console *con)
   con->dd_printf("%c ", inst_at(addr)?' ':'?');
   con->dd_printf(rom->addr_format, addr); con->dd_printf(" ");
   con->dd_printf(rom->data_format, code);
-  for (i= 1; i < inst_length(code); i++)
+  for (i= 1; i < inst_length(addr); i++)
     {
       con->dd_printf(" ");
       con->dd_printf(rom->data_format, get_mem(MEM_ROM, addr+i));
@@ -976,13 +973,28 @@ cl_uc::print_regs(class cl_console *con)
 }
 
 int
-cl_uc::inst_length(t_mem code)
+cl_uc::inst_length(t_addr addr)
 {
   struct dis_entry *tabl= dis_tbl();
   int i;
+  t_mem code;
 
+  code = get_mem(MEM_ROM, addr);
   for (i= 0; tabl[i].mnemonic && (code & tabl[i].mask) != tabl[i].code; i++) ;
-  return(tabl[i].mnemonic?tabl[i].length:1);	 
+  return(tabl[i].mnemonic?tabl[i].length:1);
+}
+
+int
+cl_uc::inst_branch(t_addr addr)
+{
+  struct dis_entry *tabl= dis_tbl();
+  int i;
+  t_mem code;
+
+  code = get_mem(MEM_ROM, addr);
+  for (i= 0; tabl[i].mnemonic && (code & tabl[i].mask) != tabl[i].code; i++)
+    ;
+  return tabl[i].branch;
 }
 
 int
@@ -1069,13 +1081,112 @@ cl_uc::symbolic_bit_name(t_addr bit_address,
 
 
 /*
+ * Messages to broadcast
+ */
+
+void
+cl_uc::mem_cell_changed(class cl_mem *mem, t_addr addr)
+{
+  if (hws)
+    hws->mem_cell_changed(mem, addr);
+  else
+    printf("JAJ uc\n");//FIXME
+  if (mems &&
+      mems->count)
+    {
+      int i;
+      for (i= 0; i < mems->count; i++)
+	{
+	}
+    }
+}
+
+
+/*
+ * Error handling
+ */
+
+void
+cl_uc::error(class cl_error *error)
+{
+  errors->add(error);
+  if ((error->inst= inst_exec))
+    error->PC= instPC;
+}
+
+void
+cl_uc::check_errors(void)
+{
+  int i;
+  class cl_commander *c= sim->app->get_commander();
+
+  if (c)
+    {
+      for (i= 0; i < errors->count; i++)
+	{
+	  class cl_error *error= (class cl_error *)(errors->at(i));
+	  error->print(c);
+	  if (error->inst)
+	    {
+	      class cl_console *con;
+	      con= c->actual_console;
+	      if (!con)
+		con= c->frozen_console;
+	      if (con)
+		print_disass(error->PC, con);
+	    }
+	}
+      errors->free_all();
+    }
+  else
+    fprintf(stderr, "no actual console, %d errors\n", errors->count);
+}
+
+
+/*
+ * Converting bit address into real memory
+ */
+
+class cl_mem *
+cl_uc::bit2mem(t_addr bitaddr, t_addr *memaddr, t_mem *bitmask)
+{
+  if (memaddr)
+    *memaddr= bitaddr;
+  if (bitmask)
+    *bitmask= 1 << (bitaddr & 0x7);
+  return(0); // abstract...
+}
+
+
+/*
  * Execution
  */
 
 int
-cl_uc::tick(int cycles)
+cl_uc::tick_hw(int cycles)
 {
   class cl_hw *hw;
+  int i;//, cpc= clock_per_cycle();
+
+  // tick hws
+  for (i= 0; i < hws->count; i++)
+    {
+      hw= (class cl_hw *)(hws->at(i));
+      if (hw->flags & HWF_INSIDE)
+	hw->tick(cycles);
+    }
+  do_extra_hw(cycles);
+  return(0);
+}
+
+void
+cl_uc::do_extra_hw(int cycles)
+{}
+
+int
+cl_uc::tick(int cycles)
+{
+  //class cl_hw *hw;
   int i, cpc= clock_per_cycle();
 
   // increase time
@@ -1096,13 +1207,8 @@ cl_uc::tick(int cycles)
 	}
     }
 
-  // tick hws
-  for (i= 0; i < hws->count; i++)
-    {
-      hw= (class cl_hw *)(hws->at(i));
-      if (hw->flags & HWF_INSIDE)
-	hw->tick(cycles);
-    }
+  // tick for hardwares
+  inst_ticks+= cycles;
   return(0);
 }
 
@@ -1209,7 +1315,8 @@ cl_uc::fetch(void)
 }
 
 /*
- * Fetch but checking for breakpoint hit first
+ * Fetch but checking for breakpoint hit first, returns TRUE if
+ * a breakpoint is hit
  */
 
 bool
@@ -1222,7 +1329,8 @@ cl_uc::fetch(t_mem *code)
     return(0);
   if (sim->state & SIM_GO)
     {
-      if ((brk= fbrk->get_bp(PC, &idx)) &&
+      if (mem(MEM_ROM)->get_cell_flag(PC, CELL_FETCH_BRK) &&
+	  (brk= fbrk->get_bp(PC, &idx)) &&
 	  (brk->do_hit()))
 	{
 	  if (brk->perm == brkDYNAMIC)
@@ -1255,17 +1363,29 @@ cl_uc::do_inst(int step)
 
 void
 cl_uc::pre_inst(void)
-{}
+{
+  inst_exec= DD_TRUE;
+  inst_ticks= 0;
+  events->disconn_all();
+}
 
 int
 cl_uc::exec_inst(void)
 {
+  instPC= PC;
   return(resGO);
 }
 
 void
 cl_uc::post_inst(void)
-{}
+{
+  tick_hw(inst_ticks);
+  if (errors->count)
+    check_errors();
+  if (events->count)
+    check_events();
+  inst_exec= DD_FALSE;
+}
 
 
 /*
@@ -1399,21 +1519,28 @@ cl_uc::rm_ebrk(t_addr addr, char *id)
       eb= (class cl_ev_brk *)(ebrk->at(i));
       if (eb->addr == addr &&
 	  !strcmp(eb->id, id))
-	ebrk->free_at(i);
+	ebrk->del_bp(i, 0);
     }
 }
 
 /* Remove a breakpoint specified by its number */
 
-void
+bool
 cl_uc::rm_brk(int nr)
 {
   class cl_brk *bp;
 
   if ((bp= brk_by_nr(fbrk, nr)))
-    fbrk->del_bp(bp->addr);
+    {
+      fbrk->del_bp(bp->addr);
+      return(DD_TRUE);
+    }
   else if ((bp= brk_by_nr(ebrk, nr)))
-    ebrk->free_at(ebrk->index_of(bp));
+    {
+      ebrk->del_bp(ebrk->index_of(bp), 0);
+      return(DD_TRUE);
+    }
+  return(DD_FALSE);
 }
 
 void
@@ -1431,7 +1558,7 @@ cl_uc::remove_all_breaks(void)
       fbrk->del_bp(brk->addr);
     }
   while (ebrk->count)
-    ebrk->free_at(ebrk->count-1);
+    ebrk->del_bp(ebrk->count-1, 0);
 }
 
 int
@@ -1452,43 +1579,15 @@ cl_uc::mk_ebrk(enum brk_perm perm, class cl_mem *mem,
   class cl_ev_brk *b;
   op= toupper(op);
 
-  switch (mem->type)
-    {
-    case MEM_ROM:
-      if (op == 'R')
-	b= new cl_rc_brk(make_new_brknr(), addr, perm, hit);
-      else
-	return(0);
-      break;
-    case MEM_IRAM:
-      if (op == 'R')
-	b= new cl_ri_brk(make_new_brknr(), addr, perm, hit);
-      else if (op == 'W')
-	b= new cl_wi_brk(make_new_brknr(), addr, perm, hit);
-      else
-	return(0);
-      break;
-    case MEM_XRAM:
-      if (op == 'R')
-	b= new cl_rx_brk(make_new_brknr(), addr, perm, hit);
-      else if (op == 'W')
-	b= new cl_wx_brk(make_new_brknr(), addr, perm, hit);
-      else
-	return(0);
-      break;
-    case MEM_SFR:
-      if (op == 'R')
-	b= new cl_rs_brk(make_new_brknr(), addr, perm, hit);
-      else if (op == 'W')
-	b= new cl_ws_brk(make_new_brknr(), addr, perm, hit);
-      else
-	return(0);
-      break;
-    default:
-      return(0);
-    }
+  b= new cl_ev_brk(mem, make_new_brknr(), addr, perm, hit, op);
   b->init();
   return(b);
+}
+
+void
+cl_uc::check_events(void)
+{
+  sim->stop(resBREAKPOINT);
 }
 
 

@@ -45,7 +45,7 @@ cl_avr::ori_Rd_K(t_mem code)
   d= (code&0xf0)>>4;
   K= ((code&0xf00)>>4)|(code&0xf);
   data= K | ram->read(d);
-  ram->write(d+16, &data);
+  ram->write(d+16, data);
   set_zn0s(data);
   return(resGO);
 }
@@ -67,7 +67,7 @@ cl_avr::andi_Rd_K(t_mem code)
   d= (code&0xf0)>>4;
   K= ((code&0xf00)>>4)|(code&0xf);
   data= K & ram->read(d);
-  ram->write(d+16, &data);
+  ram->write(d+16, data);
   set_zn0s(data);
   return(resGO);
 }
@@ -89,7 +89,7 @@ cl_avr::and_Rd_Rr(t_mem code)
   d= (code&0x1f0)>>4;
   r= ((code&0x200)>>5)|(code&0xf);
   data= ram->read(d) & ram->read(r);
-  ram->write(d, &data);
+  ram->write(d, data);
   set_zn0s(data);
   return(resGO);
 }
@@ -111,7 +111,7 @@ cl_avr::eor_Rd_Rr(t_mem code)
   d= (code&0x1f0)>>4;
   r= ((code&0x200)>>5)|(code&0xf);
   data= ram->read(d) ^ ram->read(r);
-  ram->write(d, &data);
+  ram->write(d, data);
   set_zn0s(data);
   return(resGO);
 }
@@ -133,7 +133,7 @@ cl_avr::or_Rd_Rr(t_mem code)
   d= (code&0x1f0)>>4;
   r= ((code&0x200)>>5)|(code&0xf);
   data= ram->read(d) | ram->read(r);
-  ram->write(d, &data);
+  ram->write(d, data);
   set_zn0s(data);
   return(resGO);
 }

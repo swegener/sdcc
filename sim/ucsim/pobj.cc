@@ -86,7 +86,8 @@ cl_list::cl_list(t_index alimit, t_index adelta):
 
 cl_list::~cl_list(void)
 {
-  delete Items;
+  //delete Items;
+  free(Items);
 }
 
 
@@ -135,7 +136,10 @@ cl_list::disconn_at(t_index index)
 void
 cl_list::disconn(void *item)
 {
-  disconn_at(index_of(item));
+  t_index i;
+
+  if (index_of(item, &i))
+    disconn_at(i);
 }
 
 
@@ -161,6 +165,19 @@ cl_list::free_at(t_index index)
 
   disconn_at(index);
   free_item(Item);
+}
+
+void
+cl_list::free_all(void)
+{
+  t_index i;
+
+  if (count)
+    {
+      for (i= count-1; i; i--)
+	free_at(i);
+      free_at(0);
+    }
 }
 
 
@@ -296,6 +313,19 @@ cl_list::index_of(void *item)
   return(0);    /* Needed by Sun! */
 }
 
+bool
+cl_list::index_of(void *item, t_index *idx)
+{
+  for (t_index i= 0; i < count; i++)
+    if (item == Items[i])
+      {
+	if (idx)
+	  *idx= i;
+	return(DD_TRUE);
+      }
+  return(DD_FALSE);
+}
+
 
 /* 
  * Inserting a new item to the collection.
@@ -376,13 +406,14 @@ cl_list::set_limit(t_index alimit)
 	AItems= 0;
       else
 	{
-	  AItems = new void *[alimit];
-	  //i= ALimit*(sizeof(void *));
-	  //AItems= (void **)malloc(i);
+	  //AItems = new void *[alimit];
+	  int i= alimit*(sizeof(void *));
+	  AItems= (void **)malloc(i);
 	  if (count)
 	    memcpy(AItems, Items, count*sizeof(void *));
 	}
-      delete Items;
+      //delete Items;
+      free(Items);
       Items= AItems;
       Limit= alimit;
     }

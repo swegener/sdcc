@@ -34,17 +34,36 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "newcmdcl.h"
 
+#include "uc51cl.h"
+
 
 class cl_timer0: public cl_hw
 {
+protected:
+  class cl_cell *cell_tmod, *cell_tcon, *cell_tl, *cell_th;
+  t_mem mask_M0, mask_M1, mask_C_T, mask_GATE, mask_TR, mask_INT,
+    mask_T, mask_TF;
+  t_addr addr_tl, addr_th;
+  int mode, GATE, C_T, TR, INT, T_edge;
 public:
-  cl_timer0(class cl_uc *auc);
-  //virtual int init(void);
+  cl_timer0(class cl_uc *auc, int aid, char *aid_string);
+  virtual int init(void);
 
-  //virtual ulong read(class cl_mem *mem, long addr);
-  //virtual void write(class cl_mem *mem, long addr, ulong *val);
+  virtual void added_to_uc(void);
 
-  //virtual int tick(int cycles);
+  //virtual t_mem read(class cl_cell *cell);
+  virtual void write(class cl_cell *cell, t_mem *val);
+  
+  //virtual void mem_cell_changed(class cl_mem *mem, t_addr addr);
+
+  virtual int tick(int cycles);
+  virtual int do_mode0(int cycles);
+  virtual int do_mode1(int cycles);
+  virtual int do_mode2(int cycles);
+  virtual int do_mode3(int cycles);
+  virtual void overflow(void);
+  virtual void happen(class cl_hw *where, enum hw_event he, void *params);
+
   virtual void print_info(class cl_console *con);
 };
 

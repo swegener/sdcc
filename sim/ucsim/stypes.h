@@ -34,8 +34,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 typedef unsigned char uchar;
 typedef unsigned int  uint;
 typedef unsigned long ulong;
-typedef unsigned long t_addr;
-typedef unsigned long t_mem;
+typedef TYPE_UDWORD t_addr;	/* 32 bit max */
+typedef TYPE_UWORD  t_mem;	/* 16 bit max */
+typedef TYPE_WORD   t_smem;	/* signed 16 bit memory */
 
 struct id_element
 {
@@ -75,8 +76,8 @@ struct cpu_entry
 #define CPU_51R		0x0010
 #define CPU_89C51R	0x0020
 #define CPU_251		0x0040
-#define CPU_DS390		0x0080
-#define CPU_DS390F		0x0100
+#define CPU_DS390	0x0080
+#define CPU_DS390F	0x0100
 #define CPU_ALL_51	(CPU_51|CPU_31)
 #define CPU_ALL_52	(CPU_52|CPU_32|CPU_51R|CPU_89C51R|CPU_251|CPU_DS390|CPU_DS390F)
 
@@ -85,6 +86,9 @@ struct cpu_entry
 
 #define CPU_Z80		0x0001
 #define CPU_ALL_Z80	(CPU_Z80)
+
+#define CPU_XA		0x0001
+#define CPU_ALL_XA	(CPU_XA)
 
 #define CPU_CMOS	0x0001
 #define CPU_HMOS	0x0002
@@ -96,6 +100,7 @@ enum mem_class
   MEM_XRAM,
   MEM_IRAM,
   MEM_SFR,
+  MEM_DUMMY,
   MEM_IXRAM,
   MEM_TYPES
 };
@@ -128,22 +133,9 @@ enum mem_class
 #define resBREAKPOINT	104	/* Breakpoint */
 #define resUSER		105	/* Stopped by user */
 #define resINV_INST	106	/* Invalid instruction */
-
+#define resBITADDR	107	/* Bit address is uninterpretable */
 
 #define BIT_MASK(bitaddr) (1 << (bitaddr & 0x07))
-#define SET_BIT(newbit, reg, bitmask) \
-if (newbit) \
-  (mem(MEM_SFR))->set_bit1((reg), (bitmask)); \
-else \
-  (mem(MEM_SFR))->set_bit0((reg), (bitmask));
-#define SFR_SET_BIT(newbit, reg, bitmask) \
-if (newbit) \
-  sfr->set_bit1((reg), (bitmask)); \
-else \
-  sfr->set_bit0((reg), (bitmask));
-#define GET_C     (get_mem(MEM_SFR, PSW) & bmCY)
-#define SFR_GET_C (sfr->get(PSW) & bmCY)
-#define SET_C(newC) SET_BIT((newC), PSW, bmCY)
 
 #define IRAM_SIZE 256	  /* Size of Internal RAM */
 #define SFR_SIZE  256     /* Size of SFR area */
@@ -176,19 +168,22 @@ enum brk_event
   brkWIRAM,	/* wi */
   brkRIRAM,	/* ri */
   brkWSFR,	/* ws */
-  brkRSFR	/* rs */
+  brkRSFR,	/* rs */
+  brkREAD,
+  brkWRITE,
+  brkACCESS
 };
 
-struct event_rec
-{
-  t_addr wx; /* write to XRAM at this address, else -1 */
-  t_addr rx; /* read from XRAM at this address, else -1 */
-  t_addr wi; /* write to IRAM at this address, else -1 */
-  t_addr ri; /* read from IRAM at this address, else -1 */
-  t_addr ws; /* write to SFR at this address, else -1 */
-  t_addr rs; /* read from SFR at this address, else -1 */
-  t_addr rc; /* read from ROM at this address, else -1 */
-};
+//struct event_rec
+//{
+//  t_addr wx; /* write to XRAM at this address, else -1 */
+//  t_addr rx; /* read from XRAM at this address, else -1 */
+//  t_addr wi; /* write to IRAM at this address, else -1 */
+//  t_addr ri; /* read from IRAM at this address, else -1 */
+//  t_addr ws; /* write to SFR at this address, else -1 */
+//  t_addr rs; /* read from SFR at this address, else -1 */
+//  t_addr rc; /* read from ROM at this address, else -1 */
+//};
 
 /* Interrupt levels */
 //#define IT_NO		-1 /* not in interroupt service */
@@ -197,12 +192,20 @@ struct event_rec
 
 /* cathegories of hw elements (peripherials) */
 enum hw_cath {
-  HW_TIMER,
-  HW_UART,
-  HW_PORT,
-  HW_PCA,
-  HW_INTERRUPT,
-  HW_WDT
+  HW_DUMMY	= 0x0000,
+  HW_TIMER	= 0x0002,
+  HW_UART	= 0x0004,
+  HW_PORT	= 0x0008,
+  HW_PCA	= 0x0010,
+  HW_INTERRUPT	= 0x0020,
+  HW_WDT	= 0x0040
+};
+
+// Events that can happen in peripherals
+enum hw_event {
+  EV_OVERFLOW,
+  EV_PORT_CHANGED,
+  EV_T2_MODE_CHANGED
 };
 
 // flags of hw units

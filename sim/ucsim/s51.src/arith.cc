@@ -32,6 +32,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // local
 #include "uc51cl.h"
 #include "regs51.h"
+#include "types51.h"
 
 
 /*
@@ -43,13 +44,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 int
 t_uc51::inst_rr(uchar code)
 {
-  uchar acc;
+  uchar ac;
 
-  acc= sfr->read(event_at.ws= event_at.rs= ACC); 
-  if (acc & 0x01)
-    sfr->set(ACC, (acc >> 1) | 0x80);
+  ac= acc->read(); 
+  if (ac & 0x01)
+    acc->write((ac >> 1) | 0x80);
   else
-    sfr->set(ACC, acc >> 1);
+    acc->write(ac >> 1);
   return(resGO);
 }
 
@@ -64,15 +65,14 @@ int
 t_uc51::inst_rrc(uchar code)
 {
   bool cy;
-  uchar acc;
+  uchar ac;
 
   cy= SFR_GET_C;
-  SET_C((acc= sfr->read(ACC)) & 0x01);
-  event_at.ws= event_at.rs= ACC;
-  acc>>= 1;
+  SFR_SET_C((ac= acc->read()) & 0x01);
+  ac>>= 1;
   if (cy)
-    acc|= 0x80;
-  sfr->set(ACC, acc);
+    ac|= 0x80;
+  sfr->write(ACC, ac);
   return(resGO);
 }
 
@@ -86,13 +86,13 @@ t_uc51::inst_rrc(uchar code)
 int
 t_uc51::inst_rl(uchar code)
 {
-  uchar acc;
+  uchar ac;
 
-  acc= sfr->read(event_at.ws= event_at.rs= ACC);
-  if (acc & 0x80)
-    sfr->set(ACC, (acc << 1 ) | 0x01);
+  ac= acc->read();
+  if (ac & 0x80)
+    acc->write((ac << 1 ) | 0x01);
   else
-    sfr->set(ACC, acc << 1);
+    acc->write(ac << 1);
   return(resGO);
 }
 
@@ -106,19 +106,18 @@ t_uc51::inst_rl(uchar code)
 int
 t_uc51::inst_add_a_$data(uchar code)
 {
-  uchar data, acc;
+  uchar data, ac;
   bool newC, newA, c6;
 
   data= fetch();
-  acc = sfr->get(ACC);
-  newC= (((uint)acc+(uint)(data)) > 255)?0x80:0;
-  newA= ((acc&0x0f)+(data&0x0f)) & 0xf0;
-  c6  = ((acc&0x7f)+(data&0x7f)) & 0x80;
-  event_at.ws= ACC;
-  sfr->set(ACC, acc+data);
-  SET_C(newC);
-  SET_BIT(newC ^ c6, PSW, bmOV);
-  SET_BIT(newA, PSW, bmAC);
+  ac  = acc->read();
+  newC= (((uint)ac+(uint)(data)) > 255)?0x80:0;
+  newA= ((ac&0x0f)+(data&0x0f)) & 0xf0;
+  c6  = ((ac&0x7f)+(data&0x7f)) & 0x80;
+  acc->write(ac+data);
+  SFR_SET_C(newC);
+  SFR_SET_BIT(newC ^ c6, PSW, bmOV);
+  SFR_SET_BIT(newA, PSW, bmAC);
   return(resGO);
 }
 
@@ -132,19 +131,21 @@ t_uc51::inst_add_a_$data(uchar code)
 int
 t_uc51::inst_add_a_addr(uchar code)
 {
-  uchar data, acc;
+  uchar data, ac;
   bool newC, newA, c6;
+  class cl_cell *cell;
+  t_addr a;
 
-  data= read(get_direct(fetch(), &event_at.ri, &event_at.rs));
-  acc = sfr->get(ACC);
-  newC= (((uint)acc+(uint)(data)) > 255)?0x80:0;
-  newA= ((acc&0x0f)+(data&0x0f)) & 0xf0;
-  c6  = ((acc&0x7f)+(data&0x7f)) & 0x80;
-  event_at.ws= ACC;
-  sfr->set(ACC, acc+data);
-  SET_C(newC);
-  SET_BIT(newC ^ c6, PSW, bmOV);
-  SET_BIT(newA, PSW, bmAC);
+  cell= get_direct(a= fetch());
+  data= cell->read();
+  ac  = acc->get();
+  newC= (((uint)ac+(uint)(data)) > 255)?0x80:0;
+  newA= ((ac&0x0f)+(data&0x0f)) & 0xf0;
+  c6  = ((ac&0x7f)+(data&0x7f)) & 0x80;
+  acc->write(ac+data);
+  SFR_SET_C(newC);
+  SFR_SET_BIT(newC ^ c6, PSW, bmOV);
+  SFR_SET_BIT(newA, PSW, bmAC);
   return(resGO);
 }
 
@@ -158,22 +159,21 @@ t_uc51::inst_add_a_addr(uchar code)
 int
 t_uc51::inst_add_a_$ri(uchar code)
 {
-  uchar data, *addr, acc;
+  uchar data, ac;
   bool newC, newA, c6;
-  int res;
+  class cl_cell *cell;
 
-  addr= get_indirect(event_at.ri= *(get_reg(code & 0x01)), &res);
-  acc = sfr->get(ACC);
-  data= *addr;
-  newC= (((uint)acc+(uint)data) > 255)?0x80:0;
-  newA= ((acc&0x0f)+(data&0x0f)) & 0xf0;
-  c6  = ((acc&0x7f)+(data&0x7f)) & 0x80;
-  event_at.ws= ACC;
-  sfr->set(ACC, acc+data);
-  SET_C(newC);
-  SET_BIT(newC ^ c6, PSW, bmOV);
-  SET_BIT(newA, PSW, bmAC);
-  return(res);
+  cell= iram->get_cell(get_reg(code & 0x01)->read());
+  ac  = acc->get();
+  data= cell->read();
+  newC= (((uint)ac+(uint)data) > 255)?0x80:0;
+  newA= ((ac&0x0f)+(data&0x0f)) & 0xf0;
+  c6  = ((ac&0x7f)+(data&0x7f)) & 0x80;
+  acc->write(ac+data);
+  SFR_SET_C(newC);
+  SFR_SET_BIT(newC ^ c6, PSW, bmOV);
+  SFR_SET_BIT(newA, PSW, bmAC);
+  return(resGO);
 }
 
 
@@ -186,19 +186,18 @@ t_uc51::inst_add_a_$ri(uchar code)
 int
 t_uc51::inst_add_a_rn(uchar code)
 {
-  uchar data, acc;
+  uchar data, ac;
   bool newC, newA, c6;
 
-  data= *(get_reg(code & 0x07, &event_at.ri));
-  acc = sfr->get(ACC);
-  newC= (((uint)acc+(uint)data) > 255)?0x80:0;
-  newA= ((acc&0x0f)+(data&0x0f)) & 0xf0;
-  c6  = ((acc&0x7f)+(data&0x7f)) & 0x80;
-  event_at.ws= ACC;
-  sfr->set(ACC, acc+data);
-  SET_C(newC);
-  SET_BIT(newC ^ c6, PSW, bmOV);
-  SET_BIT(newA, PSW, bmAC);
+  data= get_reg(code & 0x07)->read();
+  ac  = acc->get();
+  newC= (((uint)ac+(uint)data) > 255)?0x80:0;
+  newA= ((ac&0x0f)+(data&0x0f)) & 0xf0;
+  c6  = ((ac&0x7f)+(data&0x7f)) & 0x80;
+  acc->write(ac+data);
+  SFR_SET_C(newC);
+  SFR_SET_BIT(newC ^ c6, PSW, bmOV);
+  SFR_SET_BIT(newA, PSW, bmAC);
   return(resGO);
 }
 
@@ -213,14 +212,14 @@ int
 t_uc51::inst_rlc(uchar code)
 {
   bool cy;
-  uchar acc;
+  uchar ac;
 
   cy= SFR_GET_C;
-  SET_C((acc= sfr->get(event_at.rs= ACC)) & 0x80);
-  acc<<= 1;
+  SFR_SET_C((ac= acc->get()) & 0x80);
+  ac<<= 1;
   if (cy)
-    acc|= 0x01;
-  sfr->set(event_at.ws= ACC, acc);
+    ac|= 0x01;
+  acc->write(ac);
   return(resGO);
 }
 
@@ -234,18 +233,18 @@ t_uc51::inst_rlc(uchar code)
 int
 t_uc51::inst_addc_a_$data(uchar code)
 {
-  uchar data, acc;
+  uchar data, ac;
   bool orgC, newC, newA, c6;
 
   data= fetch();
-  acc = sfr->get(ACC);
-  newC= (((uint)acc+(uint)data+((orgC= SFR_GET_C)?1:0)) > 255)?0x80:0;
-  newA= ((acc&0x0f)+(data&0x0f)+(orgC?1:0)) & 0xf0;
-  c6  = ((acc&0x7f)+(data&0x7f)+(orgC?1:0)) & 0x80;
-  sfr->set(event_at.ws= ACC, acc + data + (orgC?1:0));
-  SET_C(newC);
-  SET_BIT(newC ^ c6, PSW, bmOV);
-  SET_BIT(newA, PSW, bmAC);
+  ac  = acc->get();
+  newC= (((uint)ac+(uint)data+((orgC= SFR_GET_C)?1:0)) > 255)?0x80:0;
+  newA= ((ac&0x0f)+(data&0x0f)+(orgC?1:0)) & 0xf0;
+  c6  = ((ac&0x7f)+(data&0x7f)+(orgC?1:0)) & 0x80;
+  acc->write(ac + data + (orgC?1:0));
+  SFR_SET_C(newC);
+  SFR_SET_BIT(newC ^ c6, PSW, bmOV);
+  SFR_SET_BIT(newA, PSW, bmAC);
   return(resGO);
 }
 
@@ -259,18 +258,21 @@ t_uc51::inst_addc_a_$data(uchar code)
 int
 t_uc51::inst_addc_a_addr(uchar code)
 {
-  uchar data, acc;
+  uchar data, ac;
   bool orgC, newC, newA, c6;
+  class cl_cell *cell;
+  t_addr a;
 
-  data= read(get_direct(fetch(), &event_at.ri, &event_at.rs));
-  acc = sfr->get(ACC);
-  newC= (((uint)acc+(uint)data+((orgC= SFR_GET_C)?1:0)) > 255)?0x80:0;
-  newA= ((acc&0x0f)+(data&0x0f)+(orgC?1:0)) & 0xf0;
-  c6  = ((acc&0x7f)+(data&0x7f)+(orgC?1:0)) & 0x80;
-  sfr->set(event_at.ws= ACC, acc + data + (orgC?1:0));
-  SET_C(newC);
-  SET_BIT(newC ^ c6, PSW, bmOV);
-  SET_BIT(newA, PSW, bmAC);
+  cell= get_direct(a= fetch());
+  data= cell->read();
+  ac  = acc->get();
+  newC= (((uint)ac+(uint)data+((orgC= SFR_GET_C)?1:0)) > 255)?0x80:0;
+  newA= ((ac&0x0f)+(data&0x0f)+(orgC?1:0)) & 0xf0;
+  c6  = ((ac&0x7f)+(data&0x7f)+(orgC?1:0)) & 0x80;
+  acc->write(ac + data + (orgC?1:0));
+  SFR_SET_C(newC);
+  SFR_SET_BIT(newC ^ c6, PSW, bmOV);
+  SFR_SET_BIT(newA, PSW, bmAC);
   return(resGO);
 }
 
@@ -284,21 +286,21 @@ t_uc51::inst_addc_a_addr(uchar code)
 int
 t_uc51::inst_addc_a_$ri(uchar code)
 {
-  uchar data, *addr, acc;
+  uchar data, ac;
   bool orgC, newC, newA, c6;
-  int res;
-
-  addr= get_indirect(event_at.ri= *(get_reg(code & 0x01)), &res);
-  acc = sfr->get(ACC);
-  data= *addr;
-  newC= (((uint)acc+(uint)data+((orgC= SFR_GET_C)?1:0)) > 255)?0x80:0;
-  newA= ((acc&0x0f)+(data&0x0f)+(orgC?1:0)) & 0xf0;
-  c6  = ((acc&0x7f)+(data&0x7f)+(orgC?1:0)) & 0x80;
-  sfr->set(event_at.ws= ACC, acc + data + (orgC?1:0));
-  SET_C(newC);
-  SET_BIT(newC ^ c6, PSW, bmOV);
-  SET_BIT(newA, PSW, bmAC);
-  return(res);
+  class cl_cell *cell;
+  
+  cell= iram->get_cell(get_reg(code & 0x01)->read());
+  ac  = acc->get();
+  data= cell->read();
+  newC= (((uint)ac+(uint)data+((orgC= SFR_GET_C)?1:0)) > 255)?0x80:0;
+  newA= ((ac&0x0f)+(data&0x0f)+(orgC?1:0)) & 0xf0;
+  c6  = ((ac&0x7f)+(data&0x7f)+(orgC?1:0)) & 0x80;
+  acc->write(ac + data + (orgC?1:0));
+  SFR_SET_C(newC);
+  SFR_SET_BIT(newC ^ c6, PSW, bmOV);
+  SFR_SET_BIT(newA, PSW, bmAC);
+  return(resGO);
 }
 
 
@@ -311,18 +313,18 @@ t_uc51::inst_addc_a_$ri(uchar code)
 int
 t_uc51::inst_addc_a_rn(uchar code)
 {
-  uchar data, acc;
+  uchar data, ac;
   bool orgC, newC, newA, c6;
 
-  data= *(get_reg(code & 0x07, &event_at.ri));
-  acc = sfr->get(ACC);
-  newC= (((uint)acc+(uint)data+((orgC= SFR_GET_C)?1:0)) > 255)?0x80:0;
-  newA= ((acc&0x0f)+(data&0x0f)+(orgC?1:0)) & 0xf0;
-  c6  = ((acc&0x7f)+(data&0x7f)+(orgC?1:0)) & 0x80;
-  sfr->set(event_at.ws= ACC, acc + data + (orgC?1:0));
-  SET_C(newC);
-  SET_BIT(newC ^ c6, PSW, bmOV);
-  SET_BIT(newA, PSW, bmAC);
+  data= get_reg(code & 0x07)->read();
+  ac  = acc->get();
+  newC= (((uint)ac+(uint)data+((orgC= SFR_GET_C)?1:0)) > 255)?0x80:0;
+  newA= ((ac&0x0f)+(data&0x0f)+(orgC?1:0)) & 0xf0;
+  c6  = ((ac&0x7f)+(data&0x7f)+(orgC?1:0)) & 0x80;
+  acc->write(ac + data + (orgC?1:0));
+  SFR_SET_C(newC);
+  SFR_SET_BIT(newC ^ c6, PSW, bmOV);
+  SFR_SET_BIT(newA, PSW, bmAC);
   return(resGO);
 }
 
@@ -336,20 +338,20 @@ t_uc51::inst_addc_a_rn(uchar code)
 int
 t_uc51::inst_div_ab(uchar code)
 {
-  uchar temp, psw, b, acc;
+  uchar temp, pw, b, ac;
 
-  psw= sfr->get(PSW);
-  psw&= ~bmCY;
-  if (!(b= sfr->get(event_at.rs= B)))
-    psw|= bmOV;
+  pw= psw->get();
+  pw&= ~bmCY;
+  if (!(b= sfr->get(B)))
+    pw|= bmOV;
   else
     {
-      psw&= ~bmOV;
-      temp= (acc= sfr->get(ACC)) / b;
-      sfr->set(B, acc % b);
-      sfr->set(event_at.ws= ACC, temp);
+      pw&= ~bmOV;
+      temp= (ac= acc->get()) / b;
+      sfr->write(B, ac % b);
+      acc->write(temp);
     }
-  sfr->set(PSW, psw);
+  psw->write(pw);
   tick(3);
   return(resGO);
 }
@@ -364,22 +366,21 @@ t_uc51::inst_div_ab(uchar code)
 int
 t_uc51::inst_subb_a_$data(uchar code)
 {
-  uchar data, acc, result, psw, c;
+  uchar data, ac, result, pw, c;
 
   data= fetch();
-  acc = sfr->get(ACC);
-  result= acc-data;
-  psw= sfr->get(PSW);
-  if ((c= (psw & bmCY)?1:0))
+  ac  = acc->get();
+  result= ac-data;
+  pw= psw->get();
+  if ((c= (pw & bmCY)?1:0))
     result--;
-  sfr->set(event_at.ws= ACC, result);
-  sfr->set(PSW,
-	   (psw & ~(bmCY|bmOV|bmAC)) |
-	   (((unsigned int)acc < (unsigned int)(data+c))?bmCY:0) |
-	   (((acc<0x80 && data>0x7f && result>0x7f) ||
-	     (acc>0x7f && data<0x80 && result<0x80))?bmOV:0) |
-	   (((acc&0x0f) < ((data+c)&0x0f) ||
-	     (c && ((data&0x0f)==0x0f)))?bmAC:0));
+  acc->write(result);
+  psw->write((pw & ~(bmCY|bmOV|bmAC)) |
+	     (((unsigned int)ac < (unsigned int)(data+c))?bmCY:0) |
+	     (((ac<0x80 && data>0x7f && result>0x7f) ||
+	       (ac>0x7f && data<0x80 && result<0x80))?bmOV:0) |
+	     (((ac&0x0f) < ((data+c)&0x0f) ||
+	       (c && ((data&0x0f)==0x0f)))?bmAC:0));
   return(resGO);
 }
 
@@ -393,22 +394,22 @@ t_uc51::inst_subb_a_$data(uchar code)
 int
 t_uc51::inst_subb_a_addr(uchar code)
 {
-  uchar *addr, data, acc, result, psw,c ;
-
-  addr= get_direct(fetch(), &event_at.ri, &event_at.rs);
-  acc = sfr->get(ACC);
-  data= read(addr);
-  result= acc-data;
-  psw= sfr->get(PSW);
-  if ((c= (psw & bmCY)?1:0))
+  uchar data, ac, result, pw, c;
+  class cl_cell *cell;
+  
+  cell= get_direct(fetch());
+  ac  = acc->get();
+  data= cell->read();
+  result= ac-data;
+  pw= psw->get();
+  if ((c= (pw & bmCY)?1:0))
     result--;
-  sfr->set(event_at.ws= ACC, result);
-  sfr->set(PSW,
-	   (psw & ~(bmCY|bmOV|bmAC)) |
-	   (((unsigned int)acc < (unsigned int)(data+c))?bmCY:0) |
-	   (((acc<0x80 && data>0x7f && result>0x7f) ||
-	     (acc>0x7f && data<0x80 && result<0x80))?bmOV:0) |
-	   (((acc&0x0f) < ((data+c)&0x0f) ||
+  acc->write(result);
+  psw->set((pw & ~(bmCY|bmOV|bmAC)) |
+	   (((unsigned int)ac < (unsigned int)(data+c))?bmCY:0) |
+	   (((ac<0x80 && data>0x7f && result>0x7f) ||
+	     (ac>0x7f && data<0x80 && result<0x80))?bmOV:0) |
+	   (((ac&0x0f) < ((data+c)&0x0f) ||
 	     (c && ((data&0x0f)==0x0f)))?bmAC:0));
   return(resGO);
 }
@@ -423,24 +424,24 @@ t_uc51::inst_subb_a_addr(uchar code)
 int
 t_uc51::inst_subb_a_$ri(uchar code)
 {
-  uchar data, acc, result, psw, c;
-  int res;
+  uchar data, ac, result, pw, c;
+  class cl_cell *cell;
 
-  data= *(get_indirect(event_at.ri= *(get_reg(code & 0x01)), &res));
-  acc = sfr->get(ACC);
-  result= acc-data;
-  psw= sfr->get(PSW);
-  if ((c= (psw & bmCY)?1:0))
+  cell= iram->get_cell(get_reg(code & 0x01)->read());
+  data= cell->read();
+  ac  = acc->get();
+  result= ac-data;
+  pw= psw->get();
+  if ((c= (pw & bmCY)?1:0))
     result--;
-  sfr->set(event_at.ws= ACC, result);
-  sfr->set(PSW,
-	   (psw & ~(bmCY|bmOV|bmAC)) |
-	   (((unsigned int)acc < (unsigned int)(data+c))?bmCY:0) |
-	   (((acc<0x80 && data>0x7f && result>0x7f) ||
-	     (acc>0x7f && data<0x80 && result<0x80))?bmOV:0) |
-	   (((acc&0x0f) < ((data+c)&0x0f) ||
-	     (c && ((data&0x0f)==0x0f)))?bmAC:0));
-  return(res);
+  acc->write(result);
+  psw->write((pw & ~(bmCY|bmOV|bmAC)) |
+	     (((unsigned int)ac < (unsigned int)(data+c))?bmCY:0) |
+	     (((ac<0x80 && data>0x7f && result>0x7f) ||
+	       (ac>0x7f && data<0x80 && result<0x80))?bmOV:0) |
+	     (((ac&0x0f) < ((data+c)&0x0f) ||
+	       (c && ((data&0x0f)==0x0f)))?bmAC:0));
+  return(resGO);
 }
 
 
@@ -453,22 +454,21 @@ t_uc51::inst_subb_a_$ri(uchar code)
 int
 t_uc51::inst_subb_a_rn(uchar code)
 {
-  uchar data, acc, result, psw, c;
+  uchar data, ac, result, pw, c;
 
-  data= *(get_reg(code & 0x07, &event_at.ri));
-  acc = sfr->get(ACC);
-  result= acc-data;
-  psw= sfr->get(PSW);
-  if ((c= (psw & bmCY)?1:0))
+  data= get_reg(code & 0x07)->read();
+  ac  = acc->get();
+  result= ac-data;
+  pw= psw->get();
+  if ((c= (pw & bmCY)?1:0))
     result--;
-  sfr->set(event_at.ws= ACC, result);
-  sfr->set(PSW,
-	   (psw & ~(bmCY|bmOV|bmAC)) |
-	   (((unsigned int)acc < (unsigned int)(data+c))?bmCY:0) |
-	   (((acc<0x80 && data>0x7f && result>0x7f) ||
-	     (acc>0x7f && data<0x80 && result<0x80))?bmOV:0) |
-	   (((acc&0x0f) < ((data+c)&0x0f) ||
-	     (c && ((data&0x0f)==0x0f)))?bmAC:0));
+  acc->write(result);
+  psw->write((pw & ~(bmCY|bmOV|bmAC)) |
+	     (((unsigned int)ac < (unsigned int)(data+c))?bmCY:0) |
+	     (((ac<0x80 && data>0x7f && result>0x7f) ||
+	       (ac>0x7f && data<0x80 && result<0x80))?bmOV:0) |
+	     (((ac&0x0f) < ((data+c)&0x0f) ||
+	       (c && ((data&0x0f)==0x0f)))?bmAC:0));
   return(resGO);
 }
 
@@ -482,15 +482,15 @@ t_uc51::inst_subb_a_rn(uchar code)
 int
 t_uc51::inst_mul_ab(uchar code)
 {
-  uint temp, psw, acc, b;
+  uint temp, pw, ac, b, x;
 
-  psw= sfr->get(PSW);
-  psw&= ~bmCY;
-  temp= (acc= sfr->get(ACC)) * (b= sfr->get(B));
-  sfr->set(event_at.ws= ACC, temp & 0xff);
-  sfr->set(event_at.rs= B, (temp >> 8) & 0xff);
-  SET_BIT(sfr->get(B), PSW, bmOV);
-  SET_BIT(0, PSW, bmCY);
+  pw= psw->get();
+  pw&= ~bmCY;
+  temp= (ac= acc->read()) * (b= sfr->get(B));
+  acc->write(temp & 0xff);
+  x= sfr->write(B, (temp >> 8) & 0xff);
+  SFR_SET_BIT(x/*sfr->get(B)*/, PSW, bmOV);
+  SFR_SET_BIT(0, PSW, bmCY);
   tick(3);
   return(resGO);
 }
@@ -505,27 +505,26 @@ t_uc51::inst_mul_ab(uchar code)
 int
 t_uc51::inst_da_a(uchar code)
 {
-  uchar acc, psw;
+  uchar ac, pw;
 
-  acc= sfr->get(ACC);
-  psw= sfr->get(PSW);
-  event_at.ws= ACC;
-  if ((acc & 0x0f) > 9 ||
-      (psw & bmAC))
+  ac= acc->get();
+  pw= psw->get();
+  if ((ac & 0x0f) > 9 ||
+      (pw & bmAC))
     {
-      if (((uint)acc+(uint)0x06) > 255)
-	psw|= bmCY;
-      acc+= 0x06;
+      if (((uint)ac+(uint)0x06) > 255)
+	pw|= bmCY;
+      ac+= 0x06;
     }
-  if ((acc & 0xf0) > 0x90 ||
-      (psw & bmCY))
+  if ((ac & 0xf0) > 0x90 ||
+      (pw & bmCY))
     {
-      if (((uint)acc+(uint)0x60) > 255)
-	psw|= bmCY;
-      acc+= 0x60;
+      if (((uint)ac+(uint)0x60) > 255)
+	pw|= bmCY;
+      ac+= 0x60;
     }
-  sfr->set(ACC, acc);
-  sfr->set(PSW, psw);
+  acc->write(ac);
+  psw->write(pw);
   return(resGO);
 }
 

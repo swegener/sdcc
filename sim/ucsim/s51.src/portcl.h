@@ -38,14 +38,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class cl_port: public cl_hw
 {
 public:
-  int sfr;
-
+  t_addr addr_p;
+  class cl_cell *cell_p;
+  t_mem port_pins;
+  t_mem prev;
 public:
   cl_port(class cl_uc *auc, int aid);
   virtual int init(void);
 
-  //virtual ulong read(class cl_mem *mem, long addr);
-  //virtual void write(class cl_mem *mem, long addr, ulong *val);
+  virtual t_mem read(class cl_cell *cell);
+  virtual void write(class cl_cell *cell, t_mem *val);
+
+  virtual void set_cmd(class cl_cmdline *cmdline, class cl_console *con);
+  //virtual void mem_cell_changed(class cl_mem *mem, t_addr addr);
 
   //virtual int tick(int cycles);
   virtual void print_info(class cl_console *con);

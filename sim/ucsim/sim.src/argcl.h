@@ -52,7 +52,7 @@ public:
   cl_arg(char *lv);
   cl_arg(double fv);
   cl_arg(void *pv);
-  ~cl_arg(void);
+  virtual ~cl_arg(void);
 
   virtual bool get_ivalue(long *value);
   virtual char *get_svalue(void);
@@ -101,7 +101,7 @@ public:
   { /*uc= iuc;*/ interpreted_as_string= DD_FALSE; }
   cl_cmd_arg(/*class cl_uc *iuc,*/ char *s): cl_arg(s)
   { /*uc= iuc;*/ interpreted_as_string= DD_FALSE; }
-  ~cl_cmd_arg(void);
+  virtual ~cl_cmd_arg(void);
 
   virtual int is_string(void) { return(DD_FALSE); }
   virtual bool get_address(class cl_uc *uc, t_addr *addr) { return(DD_FALSE); }
@@ -158,7 +158,7 @@ public:
 public:
   cl_cmd_bit_arg(/*class cl_uc *iuc,*/
 		 class cl_cmd_arg *asfr, class cl_cmd_arg *abit);
-  ~cl_cmd_bit_arg(void);
+  virtual ~cl_cmd_bit_arg(void);
 
   virtual bool get_address(class cl_uc *uc, t_addr *addr);
   virtual bool get_bit_address(class cl_uc *uc, // input
@@ -175,7 +175,7 @@ public:
 public:
   cl_cmd_array_arg(/*class cl_uc *iuc,*/
 		   class cl_cmd_arg *aname, class cl_cmd_arg *aindex);
-  ~cl_cmd_array_arg(void);
+  virtual ~cl_cmd_array_arg(void);
   virtual bool as_hw(class cl_uc *uc);
 };
 
@@ -195,7 +195,7 @@ public:
   cl_prg_arg(char sn, char *ln, char *lv);
   cl_prg_arg(char sn, char *ln, double fv);
   cl_prg_arg(char sn, char *ln, void *pv);
-  ~cl_prg_arg(void);
+  virtual ~cl_prg_arg(void);
 };
 
 

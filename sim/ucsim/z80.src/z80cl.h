@@ -52,12 +52,19 @@ public:
   virtual void mk_hw_elements(void);
 
   virtual struct dis_entry *dis_tbl(void);
-  //virtual struct name_entry *sfr_tbl(void);
-  //virtual struct name_entry *bit_tbl(void);
+  virtual int inst_length(t_addr addr);
+  virtual int inst_branch(t_addr addr);
+  virtual int longest_inst(void);
   virtual char *disass(t_addr addr, char *sep);
   virtual void print_regs(class cl_console *con);
 
   virtual int exec_inst(void);
+
+  virtual char * get_disasm_info(t_addr addr,
+                        int *ret_len,
+                        int *ret_branch,
+                        int *immed_offset);
+
 #include "instcl.h"
 };
 

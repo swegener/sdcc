@@ -46,7 +46,7 @@ public:
 
 public:
   cl_option(void *opt, char *Iid, char *Ihelp);
-  ~cl_option(void);
+  virtual ~cl_option(void);
 
   virtual void print(class cl_console *con)= 0;
 

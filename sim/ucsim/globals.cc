@@ -45,6 +45,7 @@ struct id_element mem_ids[]= {
   { MEM_IRAM , "IRAM " },
   { MEM_SFR  , "SFR  " },
   { MEM_IXRAM, "IXRAM" },
+  { MEM_DUMMY, "DUMMY" },
   { 0, 0 }
 };
 
@@ -54,6 +55,7 @@ struct id_element mem_classes[]= {
   { MEM_IRAM , "iram" },
   { MEM_SFR  , "sfr" },
   { MEM_IXRAM, "ixram" },
+  { MEM_DUMMY, "dummy" },
   { 0, 0 }
 };
 
@@ -65,7 +67,7 @@ struct id_element cpu_states[]= {
 };
 
 
-char *warranty=
+char *warranty= 
 "                            NO WARRANTY
 
   11. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY

@@ -41,7 +41,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 int
 t_uc51::inst_inc_a(uchar code)
 {
-  sfr->set(event_at.ws= ACC, sfr->get(ACC)+1);
+  acc->wadd(1);
   return(resGO);
 }
 
@@ -55,11 +55,10 @@ t_uc51::inst_inc_a(uchar code)
 int
 t_uc51::inst_inc_addr(uchar code)
 {
-  uchar *addr;
+  class cl_cell *cell= get_direct(fetch());
 
-  addr= get_direct(fetch(), &event_at.wi, &event_at.ws);
-  (*addr)++;
-  proc_write(addr);
+  t_mem d= cell->read(HW_PORT);
+  cell->write(d+1);
   return(resGO);
 }
 
@@ -73,13 +72,11 @@ t_uc51::inst_inc_addr(uchar code)
 int
 t_uc51::inst_inc_$ri(uchar code)
 {
-  uchar *addr;
-  int res;
+  class cl_cell *cell;
 
-  addr= get_indirect(event_at.wi= *(get_reg(code & 0x01)), &res);
-  (*addr)++;
-  proc_write(addr);
-  return(res);
+  cell= iram->get_cell(get_reg(code & 0x01)->read());
+  cell->wadd(1);
+  return(resGO);
 }
 
 
@@ -92,7 +89,9 @@ t_uc51::inst_inc_$ri(uchar code)
 int
 t_uc51::inst_inc_rn(uchar code)
 {
-  (*(get_reg(code & 0x07, &event_at.wi)))++;
+  class cl_cell *reg= get_reg(code & 0x07);
+
+  reg->wadd(1);
   return(resGO);
 }
 
@@ -106,7 +105,8 @@ t_uc51::inst_inc_rn(uchar code)
 int
 t_uc51::inst_dec_a(uchar code)
 {
-  sfr->set(event_at.ws= ACC, sfr->get(ACC)-1);
+  acc->wadd(-1);
+
   return(resGO);
 }
 
@@ -120,11 +120,11 @@ t_uc51::inst_dec_a(uchar code)
 int
 t_uc51::inst_dec_addr(uchar code)
 {
-  uchar *addr;
+  class cl_cell *cell;
 
-  addr= get_direct(fetch(), &event_at.wi, &event_at.ws);
-  (*addr)--;
-  proc_write(addr);
+  cell= get_direct(fetch());
+  t_mem d= cell->read(HW_PORT);
+  cell->write(d-1);
   return(resGO);
 }
 
@@ -138,13 +138,11 @@ t_uc51::inst_dec_addr(uchar code)
 int
 t_uc51::inst_dec_$ri(uchar code)
 {
-  uchar *addr;
-  int res;
+  class cl_cell *cell;
 
-  addr= get_indirect(event_at.wi= *(get_reg(code & 0x01)), &res);
-  (*addr)--;
-  proc_write(addr);
-  return(res);
+  cell= iram->get_cell(get_reg(code & 0x01)->read());
+  cell->add(-1);
+  return(resGO);
 }
 
 
@@ -157,7 +155,9 @@ t_uc51::inst_dec_$ri(uchar code)
 int
 t_uc51::inst_dec_rn(uchar code)
 {
-  (*(get_reg(code & 0x07, &event_at.wi)))--;
+  class cl_cell *reg= get_reg(code & 0x07);
+
+  reg->wadd(-1);
   return(resGO);
 }
 
@@ -173,9 +173,9 @@ t_uc51::inst_inc_dptr(uchar code)
 {
   uint dptr;
 
-  dptr= sfr->get(DPH)*256 + sfr->get(DPL) + 1;
-  sfr->set(event_at.ws= DPH, (dptr >> 8) & 0xff);
-  sfr->set(DPL, dptr & 0xff);
+  dptr= sfr->read(DPH)*256 + sfr->read(DPL) + 1;
+  sfr->write(DPH, (dptr >> 8) & 0xff);
+  sfr->write(DPL, dptr & 0xff);
   tick(1);
   return(resGO);
 }

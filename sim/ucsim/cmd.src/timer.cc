@@ -81,7 +81,7 @@ COMMAND_DO_WORK_UC(cl_timer_cmd)
 	return(val(uc, cmdline, con));
       else
 	con->dd_printf("Undefined timer command: \"%s\". Try \"help timer\"\n",
-		       s);
+		    s);
     }
   return(0);
 }
@@ -114,8 +114,7 @@ cl_timer_cmd::add(class cl_uc *uc,
   if (!name &&
       what < 1)
     {
-      con->dd_printf("Error: "
-		     "Timer id must be greater then zero or a string\n");
+      con->dd_printf("Error: Timer id must be greater then zero or a string\n");
       return(DD_FALSE);
     }
   if (ticker)

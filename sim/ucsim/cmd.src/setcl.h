@@ -37,8 +37,8 @@ COMMAND_ON(uc,cl_set_mem_cmd);
 // SET BIT
 COMMAND_ON(uc,cl_set_bit_cmd);
 
-// SET PORT
-COMMAND_ON(uc,cl_set_port_cmd);
+// SET HW
+COMMAND_ON(uc,cl_set_hw_cmd);
 
 // SET OPTION
 COMMAND_ON(uc,cl_set_option_cmd);

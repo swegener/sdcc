@@ -32,11 +32,55 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "stypes.h"
 #include "pobjcl.h"
-#include "uccl.h"
 #include "guiobjcl.h"
 
+// cmd.src
 #include "newcmdcl.h"
 
+// local
+#include "memcl.h"
+#include "uccl.h"
+
+
+enum what_to_do_on_cell_change {
+  wtd_none		= 0x01,
+  wtd_write		= 0x02,
+  wtd_restore		= 0x04,
+  wtd_restore_write	= 0x08
+};
+
+#define WTD_WRITE	(wtd_write|wtd_restore_write)
+#define WTD_RESTORE	(wtd_restore|wtd_restore_write)
+
+class cl_hw; // forward
+
+class cl_watched_cell: public cl_base
+{
+protected:
+  class cl_mem *mem;
+  t_addr addr;
+  class cl_cell *cell;
+  class cl_cell **store;
+public:
+  enum what_to_do_on_cell_change wtd;
+public:
+  cl_watched_cell(class cl_mem *amem, t_addr aaddr, class cl_cell **astore,
+		  enum what_to_do_on_cell_change awtd);
+
+  virtual void mem_cell_changed(class cl_mem *amem, t_addr aaddr,
+				class cl_hw *hw);
+};
+
+class cl_used_cell: public cl_watched_cell
+{
+public:
+  cl_used_cell(class cl_mem *amem, t_addr aaddr, class cl_cell **astore,
+	       enum what_to_do_on_cell_change awtd):
+    cl_watched_cell(amem, aaddr, astore, awtd) {}
+
+  /*virtual void mem_cell_changed(class cl_mem *amem, t_addr aaddr,
+    class cl_hw *hw);*/
+};
 
 class cl_hw: public cl_guiobj
 {
@@ -46,17 +90,36 @@ public:
   enum hw_cath cathegory;
   int id;
   char *id_string;
-
+protected:
+  class cl_list *partners;
+  class cl_list *watched_cells;
 public:
   cl_hw(class cl_uc *auc, enum hw_cath cath, int aid, char *aid_string);
-  ~cl_hw(void);
+  virtual ~cl_hw(void);
 
-  virtual void adding(class cl_hw *new_hw) {}
-  virtual void added(class cl_hw *new_hw) {}
-  virtual t_mem read(class cl_mem *mem, t_addr addr);
-  virtual void write(class cl_mem *mem, t_addr addr, t_mem *val);
+  virtual void new_hw_adding(class cl_hw *new_hw);
+  virtual void new_hw_added(class cl_hw *new_hw);
+  virtual void added_to_uc(void) {}
+  virtual class cl_hw *make_partner(enum hw_cath cath, int id);
+
+  virtual t_mem read(class cl_cell *cell) { return(cell->get()); }
+  virtual void write(class cl_cell */*cell*/, t_mem */*val*/) {}
+
+  virtual void set_cmd(class cl_cmdline *cmdline, class cl_console *con) {}
+  virtual class cl_cell *register_cell(class cl_mem *mem, t_addr addr,
+				       class cl_cell **store,
+				       enum what_to_do_on_cell_change awtd);
+  virtual class cl_cell *use_cell(class cl_mem *mem, t_addr addr,
+				  class cl_cell **store,
+				  enum what_to_do_on_cell_change awtd);
+  virtual void mem_cell_changed(class cl_mem *mem, t_addr addr);
 
   virtual int tick(int cycles);
+  virtual void reset(void) {}
+  virtual void happen(class cl_hw */*where*/, enum hw_event /*he*/,
+		      void */*params*/) {}
+  virtual void inform_partners(enum hw_event he, void *params);
+
   virtual void print_info(class cl_console *con);
 };
 
@@ -65,6 +128,25 @@ class cl_hws: public cl_list
 public:
   cl_hws(void): cl_list(2, 2) {}
   virtual t_index add(void *item);
+  virtual void mem_cell_changed(class cl_mem *mem, t_addr addr);
+};
+
+
+class cl_partner_hw: public cl_base
+{
+protected:
+  class cl_uc *uc;
+  enum hw_cath cathegory;
+  int id;
+  class cl_hw *partner;
+public:
+  cl_partner_hw(class cl_uc *auc, enum hw_cath cath, int aid);
+
+  virtual class cl_hw *get_partner(void);
+  virtual void refresh(void);
+  virtual void refresh(class cl_hw *new_hw);
+
+  virtual void happen(class cl_hw *where, enum hw_event he, void *params);
 };
 
 

@@ -4,6 +4,7 @@
  ******************************************************************************/
 #include <sys/types.h>
 #include <curses.h>
+/*#include <term.h>*/
 #include "config.h"
 
 struct COORDS_S

@@ -103,7 +103,7 @@ cl_avr::sbci_Rd_K(t_mem code)
   t_mem sreg= ram->get(SREG);
   (signed)result= (signed)D-(signed)K-(sreg&BIT_C)?1:0;
   res= result & 0xff;
-  ram->write(d, &res);
+  ram->write(d, res);
   
   sreg= sreg & ~(BIT_H|BIT_S|BIT_V|BIT_N|BIT_C);
   if (0x08 & (((~D)&K) | (K&res) | (res&(~D))))
@@ -153,7 +153,7 @@ cl_avr::subi_Rd_K(t_mem code)
     D|= ~0xff;
   (signed)result= (signed)D-(signed)K;
   res= result & 0xff;
-  ram->write(d, &res);
+  ram->write(d, res);
   
   t_mem sreg= ram->get(SREG) & ~(BIT_H|BIT_S|BIT_V|BIT_N|BIT_Z|BIT_C);
   if (0x08 & (((~D)&K) | (K&res) | (res&(~D))))
@@ -289,7 +289,7 @@ cl_avr::sbc_Rd_Rr(t_mem code)
   t_mem sreg= ram->get(SREG);
   (signed)result= (signed)D-(signed)R-(sreg&BIT_C)?1:0;
   res= result & 0xff;
-  ram->write(d, &res);
+  ram->write(d, res);
   
   sreg= sreg & ~(BIT_H|BIT_S|BIT_V|BIT_N|BIT_C);
   if (0x08 & (((~D)&R) | (R&res) | (res&(~D))))
@@ -335,7 +335,7 @@ cl_avr::add_Rd_Rr(t_mem code)
   D= ram->read(d);
   result= D+R;
   res= result & 0xff;
-  ram->write(d, &res);
+  ram->write(d, res);
   
   t_mem sreg= ram->get(SREG);
   if (!res)
@@ -440,7 +440,7 @@ cl_avr::sub_Rd_Rr(t_mem code)
     D|= ~0xff;
   (signed)result= (signed)D-(signed)R;
   res= result & 0xff;
-  ram->write(d, &res);
+  ram->write(d, res);
   
   t_mem sreg= ram->get(SREG) & ~(BIT_H|BIT_S|BIT_V|BIT_N|BIT_Z|BIT_C);
   if (0x08 & (((~D)&R) | (R&res) | (res&(~D))))
@@ -487,7 +487,7 @@ cl_avr::adc_Rd_Rr(t_mem code)
   t_mem sreg= ram->get(SREG);
   result= D+R+((sreg&BIT_C)?1:0);
   res= result & 0xff;
-  ram->write(d, &res);
+  ram->write(d, res);
   
   if (!res)
     sreg|= BIT_Z;
@@ -536,7 +536,7 @@ cl_avr::com_Rd(t_mem code)
   D= ram->read(d);
   result= ~D;
   res= result & 0xff;
-  ram->write(d, &res);
+  ram->write(d, res);
   
   t_mem sreg= ram->get(SREG);
   if (!res)
@@ -572,7 +572,7 @@ cl_avr::neg_Rd(t_mem code)
   D= ram->read(d);
   result= (~D)+1;
   res= result & 0xff;
-  ram->write(d, &res);
+  ram->write(d, res);
   
   t_mem sreg= ram->get(SREG);
   if (res & (~d) & 0x08)
@@ -621,7 +621,7 @@ cl_avr::inc_Rd(t_mem code)
 
   d= (code&0x1f0)>>4;
   t_mem data= ram->read(d)+1;
-  ram->write(d, &data);
+  ram->write(d, data);
 
   t_mem sreg= ram->get(SREG);
   data= data&0xff;
@@ -679,7 +679,7 @@ cl_avr::asr_Rd(t_mem code)
   if (result & 0x40)
     result|= 0x80;
   res= result & 0xff;
-  ram->write(d, &res);
+  ram->write(d, res);
   if (res & 0x80)
     {
       sreg|= BIT_N;
@@ -694,7 +694,7 @@ cl_avr::asr_Rd(t_mem code)
     sreg|= BIT_S;
   if (!res)
     sreg|= BIT_Z;
-  ram->write(SREG, &sreg);
+  ram->write(SREG, sreg);
   return(resGO);
 }
 
@@ -719,10 +719,10 @@ cl_avr::lsr_Rd(t_mem code)
     sreg|= (BIT_C|BIT_V|BIT_S);
   result= D >> 1;
   res= result & 0xff;
-  ram->write(d, &res);
+  ram->write(d, res);
   if (!res)
     sreg|= BIT_Z;
-  ram->write(SREG, &sreg);
+  ram->write(SREG, sreg);
   return(resGO);
 }
 
@@ -753,7 +753,7 @@ cl_avr::ror_Rd(t_mem code)
     }
   result= (D >> 1) | oldc?0x80:0;
   res= result & 0xff;
-  ram->write(d, &res);
+  ram->write(d, res);
   if (res & 0x80)
     {
       sreg|= BIT_N;
@@ -768,7 +768,7 @@ cl_avr::ror_Rd(t_mem code)
     sreg|= BIT_S;
   if (!res)
     sreg|= BIT_Z;
-  ram->write(SREG, &sreg);
+  ram->write(SREG, sreg);
   return(resGO);
 }
 
@@ -790,7 +790,7 @@ cl_avr::dec_Rd(t_mem code)
   D= ram->read(d);
   result= D-1;
   res= result & 0xff;
-  ram->write(d, &res);
+  ram->write(d, res);
 
   t_mem sreg= ram->get(SREG);
   if (!res)
@@ -842,12 +842,12 @@ cl_avr::mul_Rd_Rr(t_mem code)
   result= R*D;
   resl= result & 0xff;
   resh= (result>>8) & 0xff;
-  ram->write(0, &resl);
-  ram->write(1, &resh);
+  ram->write(0, resl);
+  ram->write(1, resh);
   t_mem sreg= ram->read(SREG) & ~BIT_C;
   if (resh & 0x80)
     sreg|= BIT_C;
-  ram->write(SREG, &sreg);
+  ram->write(SREG, sreg);
   tick(1);
   return(resGO);
 }
@@ -872,8 +872,8 @@ cl_avr::adiw_Rdl_K(t_mem code)
   result= D+K;
   res= result & 0xffff;
   t_mem resl= result&0xff, resh= (result>>8)&0xff;
-  ram->write(dl+1, &resh);
-  ram->write(dl, &resl);
+  ram->write(dl+1, resh);
+  ram->write(dl, resl);
   
   t_mem sreg= ram->get(SREG);
   if (!res)
@@ -925,8 +925,8 @@ cl_avr::sbiw_Rdl_K(t_mem code)
   (signed)result= (signed)D-(signed)K;
   res= result & 0xffff;
   t_mem resl= res&0xff, resh= (res>>8)&0xff;
-  ram->write(dl+1, &resh);
-  ram->write(dl, &resl);
+  ram->write(dl+1, resh);
+  ram->write(dl, resl);
 
   t_mem sreg= ram->get(SREG) & ~(BIT_S|BIT_V|BIT_N|BIT_Z|BIT_C);
   int n= 0, v= 0;

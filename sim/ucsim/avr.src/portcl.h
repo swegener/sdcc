@@ -36,7 +36,7 @@ class cl_port: public cl_hw
 public:
   cl_port(class cl_uc *auc);
 
-  virtual ulong read(class cl_mem *mem, long addr);
+  //virtual ulong read(class cl_mem *mem, long addr);
 };
 
 

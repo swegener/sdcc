@@ -638,7 +638,7 @@ int
 cl_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
 {
   con->dd_printf("Command \"%s\" does nothing.\n",
-	      (char*)(names->at(0)));
+		 (char*)(names->at(0)));
   return(0);
 }
 
@@ -647,7 +647,7 @@ cl_cmd::do_work(class cl_app *app,
 		class cl_cmdline *cmdline, class cl_console *con)
 {
   con->dd_printf("Command \"%s\" does nothing on application.\n",
-	      (char*)(names->at(0)));
+		 (char*)(names->at(0)));
   return(0);
 }
 
@@ -656,7 +656,7 @@ cl_cmd::do_work(class cl_sim *sim,
 		class cl_cmdline *cmdline, class cl_console *con)
 {
   con->dd_printf("Command \"%s\" does nothing on simulator.\n",
-	      (char*)(names->at(0)));
+		 (char*)(names->at(0)));
   return(0);
 }
 
@@ -665,7 +665,7 @@ cl_cmd::do_work(class cl_uc *uc,
 		class cl_cmdline *cmdline, class cl_console *con)
 {
   con->dd_printf("Command \"%s\" does nothing on microcontroller.\n",
-	      (char*)(names->at(0)));
+		 (char*)(names->at(0)));
   return(0);
 }
 
@@ -1349,12 +1349,19 @@ cl_commander::dd_printf(char *format, ...)
 {
   va_list ap;
   int ret= 0;
+  FILE *f;
 
-  if (actual_console &&
-      actual_console->out)
+  if (actual_console)
+    f= actual_console->out;
+  else if (frozen_console)
+    f= frozen_console->out;
+  else
+    f= 0;
+  if (/*actual_console &&
+	actual_console->out*/f)
     {
       va_start(ap, format);
-      ret= cmd_do_print(actual_console->out, format, ap);
+      ret= cmd_do_print(f/*actual_console->out*/, format, ap);
       va_end(ap);
     }
   return(ret);

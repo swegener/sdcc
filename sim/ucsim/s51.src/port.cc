@@ -29,27 +29,120 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "portcl.h"
 #include "regs51.h"
+#include "types51.h"
 
 
 cl_port::cl_port(class cl_uc *auc, int aid):
   cl_hw(auc, HW_PORT, aid, "port")
-{}
+{
+  port_pins= 0xff;
+}
 
 int
 cl_port::init(void)
 {
   switch (id)
     {
-    case 0: sfr= P0; break;
-    case 1: sfr= P1; break;
-    case 2: sfr= P2; break;
-    case 3: sfr= P3; break;
-    case 4: sfr= P4; break;
-    case 5: sfr= P5; break;
-    default: sfr= P0; return(1);
+    case 0: addr_p= P0; break;
+    case 1:
+      {
+	addr_p= P1;
+	/*class cl_hw *hw;
+	if ((hw= uc->get_hw(HW_TIMER, 2, 0)))
+	hws_to_inform->add(hw);*/
+	make_partner(HW_TIMER, 2);
+	make_partner(HW_PCA, 0);
+	break;
+      }
+    case 2: addr_p= P2; break;
+    case 3:
+      {
+	addr_p= P3;
+	//class cl_hw *hw;
+	/*if ((hw= uc->get_hw(HW_TIMER, 0, 0)))
+	  hws_to_inform->add(hw);
+	if ((hw= uc->get_hw(HW_TIMER, 1, 0)))
+	  hws_to_inform->add(hw);
+	if ((hw= uc->get_hw(HW_DUMMY, 0, 0)))
+	hws_to_inform->add(hw);*/
+	make_partner(HW_TIMER, 0);
+	make_partner(HW_TIMER, 1);
+	make_partner(HW_INTERRUPT, 0);
+	make_partner(HW_DUMMY, 0);
+	break;
+      }
+    default: addr_p= P0; return(1);
     }
+  class cl_mem *sfr= uc->mem(MEM_SFR);
+  if (!sfr)
+    {
+      fprintf(stderr, "No SFR to register port into\n");
+    }
+  //cell_p= sfr->register_hw(addr_p, this, (int*)0);
+  register_cell(sfr, addr_p, &cell_p, wtd_restore_write);
+  prev= cell_p->get();
   return(0);
 }
+
+t_mem
+cl_port::read(class cl_cell *cell)
+{
+  //printf("port[%d] read\n",id);
+  return(cell->get() & port_pins);
+}
+
+void
+cl_port::write(class cl_cell *cell, t_mem *val)
+{
+  struct ev_port_changed ep;
+
+  (*val)&= 0xff; // 8 bit port
+  ep.id= id;
+  ep.addr= addr_p;
+  ep.prev_value= cell_p->get();
+  ep.new_value= *val;
+  ep.pins= ep.new_pins= port_pins;
+  if (ep.prev_value != ep.new_value)
+    inform_partners(EV_PORT_CHANGED, &ep);
+  prev= cell_p->get();
+  //printf("port[%d] write 0x%x\n",id,val);
+}
+
+void
+cl_port::set_cmd(class cl_cmdline *cmdline, class cl_console *con)
+{
+  struct ev_port_changed ep;
+  class cl_cmd_arg *params[1]= { cmdline->param(0) };
+  long value;
+
+  if (cmdline->syntax_match(uc, NUMBER))
+    {
+      value= params[0]->value.number & 0xff;
+
+      ep.id= id;
+      ep.addr= addr_p;
+      ep.pins= port_pins;
+      port_pins= value;
+      ep.prev_value= cell_p->get();
+      ep.new_value= cell_p->get();
+      ep.new_pins= port_pins;
+      if (ep.pins != ep.new_pins)
+	inform_partners(EV_PORT_CHANGED, &ep);
+    }
+  else
+    {
+      con->dd_printf("Error: wrong systax\n");
+      value= 0;
+    }
+}
+
+/*void
+cl_port::mem_cell_changed(class cl_mem *mem, t_addr addr)
+{
+  cl_hw::mem_cell_changed(mem, addr);
+  t_mem d= sfr->get();
+  write(sfr, &d);
+}*/
 
 void
 cl_port::print_info(class cl_console *con)
@@ -57,19 +150,20 @@ cl_port::print_info(class cl_console *con)
   uchar data;
 
   con->dd_printf("%s[%d]\n", id_string, id);
-  data= uc->get_mem(MEM_SFR, sfr);
+  data= cell_p->get();//uc->get_mem(MEM_SFR, sfr);
   con->dd_printf("P%d    ", id);
   con->print_bin(data, 8);
   con->dd_printf(" 0x%02x %3d %c (Value in SFR register)\n",
 		 data, data, isprint(data)?data:'.');
 
-  data= uc->port_pins[id];
+  data= /*uc->*/port_pins/*[id]*/;
   con->dd_printf("Pin%d  ", id);
   con->print_bin(data, 8);
   con->dd_printf(" 0x%02x %3d %c (Output of outside circuits)\n",
 		 data, data, isprint(data)?data:'.');
 
-  data= uc->port_pins[id] & uc->get_mem(MEM_SFR, sfr);
+  //data= /*uc->*/port_pins/*[id]*/ & sfr->get();//uc->get_mem(MEM_SFR, sfr);
+  data= cell_p->read();
   con->dd_printf("Port%d ", id);
   con->print_bin(data, 8);
   con->dd_printf(" 0x%02x %3d %c (Value on the port pins)\n",

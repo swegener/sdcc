@@ -34,17 +34,53 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "newcmdcl.h"
 
+#include "timer0cl.h"
 
-class cl_timer2: public cl_hw
+
+#define T2MODE_RELOAD	0
+#define T2MODE_CAPTURE	1
+#define T2MODE_BAUDRATE	2
+#define T2MODE_OFF	3
+#define T2MODE_DOWN	4
+#define T2MODE_CLKOUT	5
+
+enum t2_features {
+  t2_default	= 0x01,
+  t2_down	= 0x02,
+  t2_clock_out	= 0x04
+};
+
+
+class cl_timer2: public cl_timer0
 {
+protected:
+  int features;
+  class cl_it_src *exf2it;
+  t_mem mask_RCLK, mask_TCLK, mask_CP_RL2;
+  t_mem RCLK, TCLK, CP_RL2, EXEN2;
+  long t2ex_edge;
+  class cl_cell *cell_rcap2l, *cell_rcap2h, *cell_t2mod;
+  bool bit_dcen, bit_t2oe, bit_t2ex;
 public:
-  cl_timer2(class cl_uc *auc);
-  //virtual int init(void);
+  cl_timer2(class cl_uc *auc, int aid, char *aid_string, int afeautres);
+  virtual int init(void);
+
+  virtual void added_to_uc(void);
+  //virtual void new_hw_added(class cl_hw *new_hw);
 
   //virtual ulong read(class cl_mem *mem, long addr);
-  //virtual void write(class cl_mem *mem, long addr, ulong *val);
+  virtual void write(class cl_cell *cell, t_mem *val);
 
-  //virtual int tick(int cycles);
+  //virtual void mem_cell_changed(class cl_mem *mem, t_addr addr);
+
+  virtual int  tick(int cycles);
+  virtual int  do_t2_baud(int cycles);
+  virtual void do_t2_capture(int cycles);
+  virtual void do_t2_reload(int cycles);
+  virtual void do_t2_down(int cycles);
+  virtual void do_t2_clock_out(int cycles);
+  virtual void happen(class cl_hw *where, enum hw_event he, void *params);
+  
   virtual void print_info(class cl_console *con);
 };
 

@@ -21,8 +21,12 @@ CPPFLAGS        = @CPPFLAGS@ -I. -I$(PRJDIR) \
 CFLAGS          = @CFLAGS@ -Wall
 CXXFLAGS        = @CXXFLAGS@ -Wall
 M_OR_MM         = @M_OR_MM@
+PICOPT		= @PICOPT@
+SHAREDLIB	= @SHAREDLIB@
 
 LIBS		= @LIBS@ -L$(PRJDIR) -lsim -lcmd -lutil -lguiucsim
+DL		= @DL@
+dl_ok		= @dl_ok@
 
 prefix          = @prefix@
 exec_prefix     = @exec_prefix@
@@ -36,14 +40,25 @@ man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
 
-OBJECTS         = sz80.o glob.o \
+OBJECTS_SHARED	= glob.o \
 		  inst.o \
+		  inst_cb.o \
+		  inst_dd.o \
+		  inst_ed.o \
+		  inst_fd.o \
+		  inst_ddcb.o \
+		  inst_fdcb.o \
 		  simz80.o z80.o
+OBJECTS_EXE	= sz80.o
+OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)
 
 Z80ASM		= 
+
+enable_dlso	= @enable_dlso@
+dlso_ok		= @dlso_ok@
+
 #TEST_OBJ	= test_bit.hex test_dis.hex test_mov.hex test_jmp.hex \
 #		  test_arith.hex
-
 
 # Compiling entire program or any subproject
 # ------------------------------------------
@@ -66,7 +81,9 @@ uninstall:
 
 # Performing self-test
 # --------------------
-check:
+check: test
+
+test:
 
 
 # Performing installation test
@@ -94,10 +111,21 @@ include clean.mk
 # --------
 .SUFFIXES: .asm .hex
 
-z80.src: sz80
+z80.src: sz80  shared_lib
 
 sz80: $(OBJECTS) $(PRJDIR)/*.a
 	$(CXX) $(CXXFLAGS) -o sz80 $(OBJECTS) $(LIBS)
+
+ifeq ($(dlso_ok),yes)
+shared_lib: $(PRJDIR)/sz80.so
+else
+shared_lib:
+	@echo "No z80 shared lib made."
+	@echo "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
+endif
+
+$(PRJDIR)/sz80.so: $(OBJECTS_SHARED)
+	$(CXX) -shared $(OBJECTS_SHARED) -o $(PRJDIR)/sz80.so
 
 otherlibs:
 	cd $(PRJDIR)/cmd.src && $(MAKE) all

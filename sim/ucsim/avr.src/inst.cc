@@ -88,7 +88,7 @@ cl_avr::ser_Rd(t_mem code)
 {
   t_addr d= (code&0xf0)>>4;
   t_mem data= 0xff;
-  ram->write(d, &data);
+  ram->write(d, data);
   return(resGO);
 }
 

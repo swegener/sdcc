@@ -90,6 +90,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define TYPE_UWORD unsigned TYPE_WORD
 #define TYPE_UDWORD unsigned TYPE_DWORD
 #undef WORDS_BIGENDIAN
+#undef _M_
+#undef _A_
 
 #undef VERSIONSTR
 #undef VERSIONHI

@@ -50,7 +50,8 @@ COMMAND_DO_WORK_UC(cl_conf_cmd)
 
   con->dd_printf("ucsim version %s\n", VERSIONSTR);
   con->dd_printf("Type of microcontroller: %s\n", uc->id_string());
-  con->dd_printf("Controller has %d hardware element(s).\n", uc->hws->count);
+  con->dd_printf("Controller has %d hardware element(s).\n",
+		 uc->hws->count);
   for (i= 0; i < uc->hws->count; i++)
     {
       class cl_hw *hw= (class cl_hw *)(uc->hws->at(i));

@@ -37,15 +37,16 @@ class t_uc390: public t_uc52
 {
 public:
   t_uc390(int Itype, int Itech, class cl_sim *asim);
+  virtual void mk_hw_elements (void);
 
-  virtual void   clear_sfr(void);
+  virtual void clear_sfr (void);
 
   // making objects
   virtual t_addr get_mem_size (enum mem_class type);
 
   // manipulating memories
-  virtual ulong read_mem (enum mem_class type, t_mem addr);
-  virtual ulong get_mem (enum mem_class type, t_addr addr);
+  virtual t_mem read_mem (enum mem_class type, t_addr addr);
+  virtual t_mem get_mem (enum mem_class type, t_addr addr);
   virtual void  write_mem (enum mem_class type, t_addr addr, t_mem val);
   virtual void  set_mem (enum mem_class type, t_addr addr, t_mem val);
 
@@ -69,9 +70,6 @@ public:
   virtual int inst_push (uchar code);
   virtual int inst_pop (uchar code);
 
-  /* miscellaneous */
-  virtual void   proc_write(uchar *addr);
-
   /* mods for disassembly of flat24 */
   virtual struct dis_entry *dis_tbl(void);
   virtual char * disass(t_addr addr, char *sep);
@@ -79,12 +77,8 @@ public:
 
 protected:
   int flat24_flag; /* true if processor == ds390f */
-  unsigned long ctm_ticks; /* mini-state-machine for "crystal multiplier" */
-  unsigned long timed_access_ticks;
-  int timed_access_state; /* 0: idle; 1: $aa written; 2: $55 written */
-  virtual int push_byte (uchar uc);
-  virtual uchar pop_byte (int *Pres);
-  virtual uchar read(uchar *addr);
+  virtual void push_byte (t_mem uc);
+  virtual t_mem pop_byte (void);
 };
 
 /* End of s51.src/uc390cl.h */

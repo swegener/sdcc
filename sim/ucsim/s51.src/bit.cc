@@ -30,6 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // local
 #include "uc51cl.h"
 #include "regs51.h"
+#include "types51.h"
 
 
 /*
@@ -41,12 +42,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 int
 t_uc51::inst_orl_c_bit(uchar code)
 {
-  uchar *addr, bitaddr;
+  uchar bitaddr;
 
-  addr= get_bit(bitaddr= fetch(), &event_at.ri, &event_at.rs);
-  SET_C(GET_C ||
-	(read(addr) & BIT_MASK(bitaddr)));
-  event_at.ws= PSW;
+  t_addr a;
+  t_mem m;
+  class cl_mem *mem;
+  mem= bit2mem(bitaddr= fetch(), &a, &m);
+  SFR_SET_C(SFR_GET_C ||
+	    (mem->read(a) & m));
   tick(1);
   return(resGO);
 }
@@ -61,12 +64,13 @@ t_uc51::inst_orl_c_bit(uchar code)
 int
 t_uc51::inst_anl_c_bit(uchar code)
 {
-  uchar *addr, bitaddr;
+  t_mem m;
+  t_addr a;
+  class cl_mem *mem;
 
-  addr= get_bit(bitaddr= fetch(), &event_at.ri, &event_at.rs);
-  SET_C(GET_C &&
-	(read(addr) & BIT_MASK(bitaddr)));
-  event_at.ws= PSW;
+  mem= bit2mem(fetch(), &a, &m);
+  SFR_SET_C(SFR_GET_C &&
+	    (mem->read(a) & m));
   tick(1);
   return(resGO);
 }
@@ -81,15 +85,16 @@ t_uc51::inst_anl_c_bit(uchar code)
 int
 t_uc51::inst_mov_bit_c(uchar code)
 {
-  uchar *addr, bitaddr;
+  t_addr a;
+  t_mem m, d;
+  class cl_mem *mem;
 
-  addr= get_bit(bitaddr= fetch(), &event_at.wi, &event_at.ws);
-  if (GET_C)
-    (*addr)|= BIT_MASK(bitaddr);
+  mem= bit2mem(fetch(), &a, &m);
+  d= mem->read(a, HW_PORT);
+  if (SFR_GET_C)
+    mem->write(a, d|m);
   else
-    (*addr)&= ~BIT_MASK(bitaddr);
-  event_at.rs= PSW;
-  proc_write(addr);
+    mem->write(a, d&~m);
   tick(1);
   return(resGO);
 }
@@ -104,11 +109,12 @@ t_uc51::inst_mov_bit_c(uchar code)
 int
 t_uc51::inst_mov_c_bit(uchar code)
 {
-  uchar *addr, bitaddr;
+  t_addr a;
+  t_mem m;
+  class cl_mem *mem;
 
-  addr= get_bit(bitaddr= fetch(), &event_at.ri, &event_at.rs);
-  SET_C(read(addr) & BIT_MASK(bitaddr));
-  event_at.ws= PSW;
+  mem= bit2mem(fetch(), &a, &m);
+  SFR_SET_C(mem->read(a) & m);
   return(resGO);
 }
 
@@ -122,12 +128,13 @@ t_uc51::inst_mov_c_bit(uchar code)
 int
 t_uc51::inst_anl_c_$bit(uchar code)
 {
-  uchar *addr, bitaddr;
+  t_mem m;
+  t_addr a;
+  class cl_mem *mem;
 
-  addr= get_bit(bitaddr= fetch(), &event_at.ri, &event_at.rs);
-  SET_C(GET_C &&
-	!(read(addr) & BIT_MASK(bitaddr)));
-  event_at.ws= PSW;
+  mem= bit2mem(fetch(), &a, &m);
+  SFR_SET_C(SFR_GET_C &&
+	    !(mem->read(a) & m));
   tick(1);
   return(resGO);
 }
@@ -142,11 +149,13 @@ t_uc51::inst_anl_c_$bit(uchar code)
 int
 t_uc51::inst_cpl_bit(uchar code)
 {
-  uchar *addr, bitaddr;
+  t_addr a;
+  t_mem m, d;
+  class cl_mem *mem;
 
-  addr= get_bit(bitaddr= fetch(), &event_at.wi, &event_at.ws);
-  (*addr)^= BIT_MASK(bitaddr);
-  proc_write(addr);
+  mem= bit2mem(fetch(), &a, &m);
+  d= mem->read(a, HW_PORT);
+  mem->write(a, d^m);
   return(resGO);
 }
 
@@ -160,8 +169,7 @@ t_uc51::inst_cpl_bit(uchar code)
 int
 t_uc51::inst_cpl_c(uchar code)
 {
-  sfr->set(PSW, sfr->get(PSW) ^ bmCY);
-  event_at.ws= PSW;
+  psw->write(psw->read() ^ bmCY);
   return(resGO);
 }
 
@@ -175,11 +183,13 @@ t_uc51::inst_cpl_c(uchar code)
 int
 t_uc51::inst_clr_bit(uchar code)
 {
-  uchar *addr, bitaddr;
+  t_addr a;
+  t_mem m;
+  class cl_mem *mem;
 
-  addr= get_bit(bitaddr= fetch(), &event_at.wi, &event_at.ws);
-  (*addr)&= ~BIT_MASK(bitaddr);
-  proc_write(addr);
+  mem= bit2mem(fetch(), &a, &m);
+  t_mem d= mem->read(a, HW_PORT);
+  mem->write(a, d&~m);
   return(resGO);
 }
 
@@ -193,8 +203,7 @@ t_uc51::inst_clr_bit(uchar code)
 int
 t_uc51::inst_clr_c(uchar code)
 {
-  sfr->set(PSW, sfr->get(PSW) & ~bmCY);
-  event_at.ws= PSW;
+  psw->write(psw->read() & ~bmCY);
   return(resGO);
 }
 
@@ -208,11 +217,13 @@ t_uc51::inst_clr_c(uchar code)
 int
 t_uc51::inst_setb_bit(uchar code)
 {
-  uchar *addr, bitaddr;
+  t_addr a;
+  t_mem m, d;
+  class cl_mem *mem;
 
-  addr= get_bit(bitaddr= fetch(), &event_at.wi, &event_at.ws);
-  (*addr)|= BIT_MASK(bitaddr);
-  proc_write(addr);
+  mem= bit2mem(fetch(), &a, &m);
+  d= mem->read(a, HW_PORT);
+  mem->write(a, d|m);
   return(resGO);
 }
 
@@ -226,8 +237,7 @@ t_uc51::inst_setb_bit(uchar code)
 int
 t_uc51::inst_setb_c(uchar code)
 {
-  sfr->set(PSW, sfr->get(PSW) | bmCY);
-  event_at.ws= PSW;
+  psw->write(psw->read() | bmCY);
   return(resGO);
 }
 

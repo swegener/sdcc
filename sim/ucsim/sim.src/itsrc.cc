@@ -46,9 +46,11 @@ cl_it_src::cl_it_src(uchar Iie_mask,
 		     uchar Isrc_mask,
 		     uint  Iaddr,
 		     bool  Iclr_bit,
-		     char  *Iname):
+		     char  *Iname,
+		     int   apoll_priority):
   cl_base()
 {
+  poll_priority= apoll_priority;
   ie_mask = Iie_mask;
   src_reg = Isrc_reg;
   src_mask= Isrc_mask;
@@ -88,6 +90,35 @@ void
 cl_it_src::deactivate(void)
 {
   set_active_status(DD_FALSE);
+}
+
+
+/*
+ */
+
+cl_irqs::cl_irqs(t_index alimit, t_index adelta):
+  cl_sorted_list(alimit, adelta)
+{
+  Duplicates= DD_TRUE;
+}
+
+void *
+cl_irqs::key_of(void *item)
+{
+  class cl_it_src *itsrc= (class cl_it_src *)item;
+  return(&itsrc->poll_priority);
+}
+
+int
+cl_irqs::compare(void *key1, void *key2)
+{
+  int *k1= (int*)key1, *k2= (int*)key2;
+
+  if (*k1 == *k2)
+    return(0);
+  else if (*k1 < *k2)
+    return(-1);
+  return(1);
 }
 
 

@@ -1,6 +1,8 @@
 /*
  * Simulator of microcontrollers (z80.cc)
  *
+ * some z80 code base from Karl Bongers karl@turbobit.com
+ * 
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
@@ -27,6 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "ddconfig.h"
 
+#include <stdarg.h> /* for va_list */
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -43,6 +46,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "glob.h"
 #include "regsz80.h"
 
+#define uint32 t_addr
+#define uint8 unsigned char
+#define int8 char
+
+/*******************************************************************/
+
 
 /*
  * Base type of Z80 controllers
@@ -58,8 +67,16 @@ int
 cl_z80::init(void)
 {
   cl_uc::init(); /* Memories now exist */
-  ram= mem(MEM_XRAM);
+
   rom= mem(MEM_ROM);
+//  ram= mem(MEM_XRAM);
+  ram= rom;
+
+  // zero out ram(this is assumed in regression tests)
+  for (int i=0x8000; i<0x10000; i++) {
+    ram->set((t_addr) i, 0);
+  }
+
   return(0);
 }
 
@@ -117,28 +134,178 @@ cl_z80::bit_tbl(void)
   return(0);
 }*/
 
+int
+cl_z80::inst_length(t_addr addr)
+{
+  int len = 0;
+  char *s;
+
+  s = get_disasm_info(addr, &len, NULL, NULL);
+
+  return len;
+}
+
+int
+cl_z80::inst_branch(t_addr addr)
+{
+  int b;
+  char *s;
+
+  s = get_disasm_info(addr, NULL, &b, NULL);
+
+  return b;
+}
+
+int
+cl_z80::longest_inst(void)
+{
+  return 4;
+}
+
+
+char *
+cl_z80::get_disasm_info(t_addr addr,
+                        int *ret_len,
+                        int *ret_branch,
+                        int *immed_offset)
+{
+  char *b = NULL;
+  uint code;
+  int len = 0;
+  int immed_n = 0;
+  int i;
+  int start_addr = addr;
+  struct dis_entry *dis_e;
+
+  code= get_mem(MEM_ROM, addr++);
+  dis_e = NULL;
+
+  switch(code) {
+    case 0xcb:  /* ESC code to lots of op-codes, all 2-byte */
+      code= get_mem(MEM_ROM, addr++);
+      i= 0;
+      while ((code & disass_z80_cb[i].mask) != disass_z80_cb[i].code &&
+        disass_z80_cb[i].mnemonic)
+        i++;
+      dis_e = &disass_z80_cb[i];
+      b= disass_z80_cb[i].mnemonic;
+      if (b != NULL)
+        len += (disass_z80_cb[i].length + 1);
+    break;
+
+    case 0xed: /* ESC code to about 80 opcodes of various lengths */
+      code= get_mem(MEM_ROM, addr++);
+      i= 0;
+      while ((code & disass_z80_ed[i].mask) != disass_z80_ed[i].code &&
+        disass_z80_ed[i].mnemonic)
+        i++;
+      dis_e = &disass_z80_ed[i];
+      b= disass_z80_ed[i].mnemonic;
+      if (b != NULL)
+        len += (disass_z80_ed[i].length + 1);
+    break;
+
+    case 0xdd: /* ESC codes,about 284, vary lengths, IX centric */
+      code= get_mem(MEM_ROM, addr++);
+      if (code == 0xcb) {
+        immed_n = 2;
+        addr++;  // pass up immed data
+        code= get_mem(MEM_ROM, addr++);
+        i= 0;
+        while ((code & disass_z80_ddcb[i].mask) != disass_z80_ddcb[i].code &&
+          disass_z80_ddcb[i].mnemonic)
+          i++;
+        dis_e = &disass_z80_ddcb[i];
+        b= disass_z80_ddcb[i].mnemonic;
+        if (b != NULL)
+          len += (disass_z80_ddcb[i].length + 2);
+      } else {
+        i= 0;
+        while ((code & disass_z80_dd[i].mask) != disass_z80_dd[i].code &&
+          disass_z80_dd[i].mnemonic)
+          i++;
+        dis_e = &disass_z80_dd[i];
+        b= disass_z80_dd[i].mnemonic;
+        if (b != NULL)
+          len += (disass_z80_dd[i].length + 1);
+      }
+    break;
+
+    case 0xfd: /* ESC codes,sme as dd but IY centric */
+      code= get_mem(MEM_ROM, addr++);
+      if (code == 0xcb) {
+        immed_n = 2;
+        addr++;  // pass up immed data
+        code= get_mem(MEM_ROM, addr++);
+        i= 0;
+        while ((code & disass_z80_fdcb[i].mask) != disass_z80_fdcb[i].code &&
+          disass_z80_fdcb[i].mnemonic)
+          i++;
+        dis_e = &disass_z80_fdcb[i];
+        b= disass_z80_fdcb[i].mnemonic;
+        if (b != NULL)
+          len += (disass_z80_fdcb[i].length + 2);
+      } else {
+        i= 0;
+        while ((code & disass_z80_fd[i].mask) != disass_z80_fd[i].code &&
+          disass_z80_fd[i].mnemonic)
+          i++;
+        dis_e = &disass_z80_fd[i];
+        b= disass_z80_fd[i].mnemonic;
+        if (b != NULL)
+          len += (disass_z80_fd[i].length + 1);
+      }
+    break;
+
+    default:
+      i= 0;
+      while ((code & disass_z80[i].mask) != disass_z80[i].code &&
+             disass_z80[i].mnemonic)
+        i++;
+      dis_e = &disass_z80[i];
+      b= disass_z80[i].mnemonic;
+      if (b != NULL)
+        len += (disass_z80[i].length);
+    break;
+  }
+
+
+  if (ret_branch) {
+    *ret_branch = dis_e->branch;
+  }
+
+  if (immed_offset) {
+    if (immed_n > 0)
+         *immed_offset = immed_n;
+    else *immed_offset = (addr - start_addr);
+  }
+
+  if (len == 0)
+    len = 1;
+
+  if (ret_len)
+    *ret_len = len;
+
+  return b;
+}
+
 char *
 cl_z80::disass(t_addr addr, char *sep)
 {
   char work[256], temp[20];
   char *buf, *p, *b, *t;
-  uint code, data= 0;
-  int i;
+  int len = 0;
+  int immed_offset = 0;
 
   p= work;
+
+  b = get_disasm_info(addr, &len, NULL, &immed_offset);
   
-  code= get_mem(MEM_ROM, addr);
-  i= 0;
-  while ((code & dis_tbl()[i].mask) != dis_tbl()[i].code &&
-	 dis_tbl()[i].mnemonic)
-    i++;
-  if (dis_tbl()[i].mnemonic == NULL)
-    {
-      buf= (char*)malloc(30);
-      strcpy(buf, "UNKNOWN/INVALID");
-      return(buf);
-    }
-  b= dis_tbl()[i].mnemonic;
+  if (b == NULL) {
+    buf= (char*)malloc(30);
+    strcpy(buf, "UNKNOWN/INVALID");
+    return(buf);
+  }
 
   while (*b)
     {
@@ -147,76 +314,21 @@ cl_z80::disass(t_addr addr, char *sep)
 	  b++;
 	  switch (*(b++))
 	    {
-	    case 'd': // Rd   .... ...d dddd ....  0<=d<=31
-	      if (!get_name(data= (code&0x01f0)>>4, sfr_tbl(), temp))
-		sprintf(temp, "r%d", data);
+	    case 'd': // d    jump relative target, signed? byte immediate operand
+	      sprintf(temp, "#%d", (char)get_mem(MEM_ROM, addr+immed_offset));
+	      ++immed_offset;
 	      break;
-	    case 'D': // Rd   .... .... dddd ....  16<=d<=31
-	      if (!get_name(data= 16+((code&0xf0)>>4), sfr_tbl(), temp))
-		sprintf(temp, "r%d", data);
+	    case 'w': // w    word immediate operand
+	      sprintf(temp, "#0x%04x",
+	         (uint)((get_mem(MEM_ROM, addr+immed_offset)) |
+	                (get_mem(MEM_ROM, addr+immed_offset+1)<<8)) );
+	      ++immed_offset;
+	      ++immed_offset;
 	      break;
-	    case 'K': // K    .... KKKK .... KKKK  0<=K<=255
-	      sprintf(temp, "%d", ((code&0xf00)>>4)|(code&0xf));
+	    case 'b': // b    byte immediate operand
+	      sprintf(temp, "#0x%02x", (uint)get_mem(MEM_ROM, addr+immed_offset));
+	      ++immed_offset;
 	      break;
-	    case 'r': // Rr   .... ..r. .... rrrr  0<=r<=31
-	      if (!get_name(data= ((code&0x0200)>>5)|(code&0x000f),
-			    sfr_tbl(), temp))
-		sprintf(temp, "r%d", data);
-	      break;
-	    case '2': // Rdl  .... .... ..dd ....  dl= {24,26,28,30}
-	      if (!get_name(data= 24+(2*((code&0x0030)>>4)),
-			    sfr_tbl(), temp))
-		sprintf(temp, "r%d", data);
-	      break;
-	    case '6': // K    .... .... KK.. KKKK  0<=K<=63
-	      sprintf(temp, "%d", ((code&0xc0)>>2)|(code&0xf));
-	      break;
-	    case 's': // s    .... .... .sss ....  0<=s<=7
-	      sprintf(temp, "%d", (code&0x70)>>4);
-	      break;
-	    case 'b': // b    .... .... .... .bbb  0<=b<=7
-	      sprintf(temp, "%d", code&0x7);
-	      break;
-	    case 'k': // k    .... ..kk kkkk k...  -64<=k<=+63
-	      {
-		int k= (code&0x3f8)>>3;
-		if (code&0x200)
-		  k|= -128;
-		sprintf(temp, "0x%06x", k+1+(signed int)addr);
-		break;
-	      }
-	    case 'A': // k    .... ...k kkkk ...k  0<=k<=64K
-	              //      kkkk kkkk kkkk kkkk  0<=k<=4M
-	      sprintf(temp, "0x%06x",
-		      (((code&0x1f0)>>3)|(code&1))*0x10000+
-		      (uint)get_mem(MEM_ROM, addr+1));
-	      break;
-	    case 'P': // P    .... .... pppp p...  0<=P<=31
-	      data= (code&0xf8)>>3;
-	      if (!get_name(data+0x20, sfr_tbl(), temp))
-		sprintf(temp, "%d", data);
-	      break;
-	    case 'p': // P    .... .PP. .... PPPP  0<=P<=63
-	      data= ((code&0x600)>>5)|(code&0xf);
-	      if (!get_name(data+0x20, sfr_tbl(), temp))
-		sprintf(temp, "%d", data);
-	      break;
-	    case 'q': // q    ..q. qq.. .... .qqq  0<=q<=63
-	      sprintf(temp, "%d",
-		      ((code&0x2000)>>8)|((code&0xc00)>>7)|(code&7));
-	      break;
-	    case 'R': // k    SRAM address on second word 0<=k<=65535
-	      sprintf(temp, "0x%06x", (uint)get_mem(MEM_ROM, addr+1));
-	      break;
-	    case 'a': // k    .... kkkk kkkk kkkk  -2k<=k<=2k
-	      {
-		int k= code&0xfff;
-		if (code&0x800)
-		  k|= -4096;
-		sprintf(temp, "0x%06lx",
-			(k+1+(signed int)addr) % rom->size);
-		break;
-	      }
 	    default:
 	      strcpy(temp, "?");
 	      break;
@@ -291,7 +403,6 @@ cl_z80::print_regs(class cl_console *con)
   print_disass(PC, con);
 }
 
-
 /*
  * Execution
  */
@@ -306,14 +417,187 @@ cl_z80::exec_inst(void)
   tick(1);
   switch (code)
     {
-    case 0x00:
-      return(nop(code));
+    case 0x00: return(inst_nop(code));
+    case 0x01: case 0x02: case 0x06: return(inst_ld(code));
+    case 0x03: case 0x04: return(inst_inc(code));
+    case 0x05: return(inst_dec(code));
+    case 0x07: return(inst_rlca(code));
+
+    case 0x08: return(inst_ex(code));
+    case 0x09: return(inst_add(code));
+    case 0x0a: case 0x0e: return(inst_ld(code));
+    case 0x0b: case 0x0d: return(inst_dec(code));
+    case 0x0c: return(inst_inc(code));
+    case 0x0f: return(inst_rrca(code));
+
+
+    case 0x10: return(inst_djnz(code));
+    case 0x11: case 0x12: case 0x16: return(inst_ld(code));
+    case 0x13: case 0x14: return(inst_inc(code));
+    case 0x15: return(inst_dec(code));
+    case 0x17: return(inst_rla(code));
+
+    case 0x18: return(inst_jr(code));
+    case 0x19: return(inst_add(code));
+    case 0x1a: case 0x1e: return(inst_ld(code));
+    case 0x1b: case 0x1d: return(inst_dec(code));
+    case 0x1c: return(inst_inc(code));
+    case 0x1f: return(inst_rra(code));
+
+
+    case 0x20: return(inst_jr(code));
+    case 0x21: case 0x22: case 0x26: return(inst_ld(code));
+    case 0x23: case 0x24: return(inst_inc(code));
+    case 0x25: return(inst_dec(code));
+    case 0x27: return(inst_daa(code));
+
+    case 0x28: return(inst_jr(code));
+    case 0x29: return(inst_add(code));
+    case 0x2a: case 0x2e: return(inst_ld(code));
+    case 0x2b: case 0x2d: return(inst_dec(code));
+    case 0x2c: return(inst_inc(code));
+    case 0x2f: return(inst_cpl(code));
+
+
+    case 0x30: return(inst_jr(code));
+    case 0x31: case 0x32: case 0x36: return(inst_ld(code));
+    case 0x33: case 0x34: return(inst_inc(code));
+    case 0x35: return(inst_dec(code));
+    case 0x37: return(inst_scf(code));
+
+    case 0x38: return(inst_jr(code));
+    case 0x39: return(inst_add(code));
+    case 0x3a: case 0x3e: return(inst_ld(code));
+    case 0x3b: case 0x3d: return(inst_dec(code));
+    case 0x3c: return(inst_inc(code));
+    case 0x3f: return(inst_ccf(code));
+
+    case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x46: case 0x47:
+    case 0x48: case 0x49: case 0x4a: case 0x4b: case 0x4c: case 0x4d: case 0x4e: case 0x4f:
+      return(inst_ld(code));
+
+    case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57:
+    case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:
+      return(inst_ld(code));
+
+    case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67:
+    case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
+      return(inst_ld(code));
+
+    case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x77:
+    case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
+      return(inst_ld(code));
+    case 0x76: 
+      return(inst_halt(code));
+
+    case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87:
+      return(inst_add(code));
+    case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f:
+      return(inst_adc(code));
+
+    case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
+      return(inst_sub(code));
+    case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: case 0x9e: case 0x9f:
+      return(inst_sbc(code));
+
+    case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
+      return(inst_and(code));
+    case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
+      return(inst_xor(code));
+
+    case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
+      return(inst_or(code));
+    case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
+      return(inst_cp(code));
+
+    case 0xc0: return(inst_ret(code));
+    case 0xc1: return(inst_pop(code));
+    case 0xc2: case 0xc3: return(inst_jp(code));
+    case 0xc4: return(inst_call(code));
+    case 0xc5: return(inst_push(code));
+    case 0xc6: return(inst_add(code));
+    case 0xc7: return(inst_rst(code));
+
+    case 0xc8: case 0xc9: return(inst_ret(code));
+    case 0xca: return(inst_jp(code));
+
+      /* CB escapes out to 2 byte opcodes(CB include), opcodes
+         to do register bit manipulations */
+    case 0xcb: return(inst_cb());
+    case 0xcc: case 0xcd: return(inst_call(code));
+    case 0xce: return(inst_adc(code));
+    case 0xcf: return(inst_rst(code));
+
+
+    case 0xd0: return(inst_ret(code));
+    case 0xd1: return(inst_pop(code));
+    case 0xd2: return(inst_jp(code));
+    case 0xd3: return(inst_out(code));
+    case 0xd4: return(inst_call(code));
+    case 0xd5: return(inst_push(code));
+    case 0xd6: return(inst_sub(code));
+    case 0xd7: return(inst_rst(code));
+
+    case 0xd8: return(inst_ret(code));
+    case 0xd9: return(inst_exx(code));
+    case 0xda: return(inst_jp(code));
+    case 0xdb: return(inst_in(code));
+    case 0xdc: return(inst_call(code));
+      /* DD escapes out to 2 to 4 byte opcodes(DD included)
+        with a variety of uses.  It can precede the CB escape
+        sequence to extend CB codes with IX+immed_byte */
+    case 0xdd: return(inst_dd());
+    case 0xde: return(inst_sbc(code));
+    case 0xdf: return(inst_rst(code));
+
+
+    case 0xe0: return(inst_ret(code));
+    case 0xe1: return(inst_pop(code));
+    case 0xe2: return(inst_jp(code));
+    case 0xe3: return(inst_ex(code));
+    case 0xe4: return(inst_call(code));
+    case 0xe5: return(inst_push(code));
+    case 0xe6: return(inst_and(code));
+    case 0xe7: return(inst_rst(code));
+
+    case 0xe8: return(inst_ret(code));
+    case 0xe9: return(inst_jp(code));
+    case 0xea: return(inst_jp(code));
+    case 0xeb: return(inst_ex(code));
+    case 0xec: return(inst_call(code));
+      /* ED escapes out to misc IN, OUT and other oddball opcodes */
+    case 0xed: return(inst_ed());
+    case 0xee: return(inst_xor(code));
+    case 0xef: return(inst_rst(code));
+
+
+    case 0xf0: return(inst_ret(code));
+    case 0xf1: return(inst_pop(code));
+    case 0xf2: return(inst_jp(code));
+    case 0xf3: return(inst_di(code));
+    case 0xf4: return(inst_call(code));
+    case 0xf5: return(inst_push(code));
+    case 0xf6: return(inst_or(code));
+    case 0xf7: return(inst_rst(code));
+
+    case 0xf8: return(inst_ret(code));
+    case 0xf9: return(inst_ld(code));
+    case 0xfa: return(inst_jp(code));
+    case 0xfb: return(inst_ei(code));
+    case 0xfc: return(inst_call(code));
+      /* DD escapes out to 2 to 4 byte opcodes(DD included)
+        with a variety of uses.  It can precede the CB escape
+        sequence to extend CB codes with IX+immed_byte */
+    case 0xfd: return(inst_fd());
+    case 0xfe: return(inst_cp(code));
+    case 0xff: return(inst_rst(code));
     }
+
   if (PC)
     PC--;
   else
     PC= get_mem_size(MEM_ROM)-1;
-  //tick(-clock_per_cycle());
+
   sim->stop(resINV_INST);
   return(resINV_INST);
 }

@@ -41,7 +41,7 @@ int
 cl_avr::sec(t_mem code)
 {
   t_mem d= BIT_C | ram->read(SREG);
-  ram->write(SREG, &d);
+  ram->write(SREG, d);
   return(resGO);
 }
 
@@ -57,7 +57,7 @@ int
 cl_avr::sen(t_mem code)
 {
   t_mem d= BIT_N | ram->read(SREG);
-  ram->write(SREG, &d);
+  ram->write(SREG, d);
   return(resGO);
 }
 
@@ -73,7 +73,7 @@ int
 cl_avr::sez(t_mem code)
 {
   t_mem d= BIT_Z | ram->read(SREG);
-  ram->write(SREG, &d);
+  ram->write(SREG, d);
   return(resGO);
 }
 
@@ -89,7 +89,7 @@ int
 cl_avr::sei(t_mem code)
 {
   t_mem d= BIT_I | ram->read(SREG);
-  ram->write(SREG, &d);
+  ram->write(SREG, d);
   return(resGO);
 }
 
@@ -105,7 +105,7 @@ int
 cl_avr::ses(t_mem code)
 {
   t_mem d= BIT_S | ram->read(SREG);
-  ram->write(SREG, &d);
+  ram->write(SREG, d);
   return(resGO);
 }
 
@@ -121,7 +121,7 @@ int
 cl_avr::sev(t_mem code)
 {
   t_mem d= BIT_V | ram->read(SREG);
-  ram->write(SREG, &d);
+  ram->write(SREG, d);
   return(resGO);
 }
 
@@ -137,7 +137,7 @@ int
 cl_avr::set(t_mem code)
 {
   t_mem d= BIT_T | ram->read(SREG);
-  ram->write(SREG, &d);
+  ram->write(SREG, d);
   return(resGO);
 }
 
@@ -153,7 +153,7 @@ int
 cl_avr::seh(t_mem code)
 {
   t_mem d= BIT_H | ram->read(SREG);
-  ram->write(SREG, &d);
+  ram->write(SREG, d);
   return(resGO);
 }
 
@@ -169,7 +169,7 @@ int
 cl_avr::clc(t_mem code)
 {
   t_mem d= ~BIT_C & ram->read(SREG);
-  ram->write(SREG, &d);
+  ram->write(SREG, d);
   return(resGO);
 }
 
@@ -185,7 +185,7 @@ int
 cl_avr::cln(t_mem code)
 {
   t_mem d= ~BIT_N & ram->read(SREG);
-  ram->write(SREG, &d);
+  ram->write(SREG, d);
   return(resGO);
 }
 
@@ -201,7 +201,7 @@ int
 cl_avr::clz(t_mem code)
 {
   t_mem d= ~BIT_Z & ram->read(SREG);
-  ram->write(SREG, &d);
+  ram->write(SREG, d);
   return(resGO);
 }
 
@@ -217,7 +217,7 @@ int
 cl_avr::cli(t_mem code)
 {
   t_mem d= ~BIT_I & ram->read(SREG);
-  ram->write(SREG, &d);
+  ram->write(SREG, d);
   return(resGO);
 }
 
@@ -233,7 +233,7 @@ int
 cl_avr::cls(t_mem code)
 {
   t_mem d= ~BIT_S & ram->read(SREG);
-  ram->write(SREG, &d);
+  ram->write(SREG, d);
   return(resGO);
 }
 
@@ -249,7 +249,7 @@ int
 cl_avr::clv(t_mem code)
 {
   t_mem d= ~BIT_V & ram->read(SREG);
-  ram->write(SREG, &d);
+  ram->write(SREG, d);
   return(resGO);
 }
 
@@ -265,7 +265,7 @@ int
 cl_avr::clt(t_mem code)
 {
   t_mem d= ~BIT_T & ram->read(SREG);
-  ram->write(SREG, &d);
+  ram->write(SREG, d);
   return(resGO);
 }
 
@@ -281,7 +281,7 @@ int
 cl_avr::clh(t_mem code)
 {
   t_mem d= ~BIT_H & ram->read(SREG);
-  ram->write(SREG, &d);
+  ram->write(SREG, d);
   return(resGO);
 }
 
@@ -302,7 +302,7 @@ cl_avr::cbi_A_b(t_mem code)
   addr= ((code&0xf8)>>3)+0x20;
   mask= 1 << (code&7);
   d= ~mask & ram->read(addr);
-  ram->write(addr, &d);
+  ram->write(addr, d);
   tick(1);
   return(resGO);
 }
@@ -323,7 +323,7 @@ cl_avr::sbi_A_b(t_mem code)
   addr= ((code&0xf8)>>3)+0x20;
   mask= 1 << (code&7);
   t_mem d= mask | ram->read(addr);
-  ram->write(addr, &d);
+  ram->write(addr, d);
   tick(1);
   return(resGO);
 }
@@ -350,7 +350,7 @@ cl_avr::bld_Rd_b(t_mem code)
     data= ram->read(d) | mask;
   else
     data= ram->read(d) & ~mask;
-  ram->write(d, &data);
+  ram->write(d, data);
   return(resGO);
 }
 

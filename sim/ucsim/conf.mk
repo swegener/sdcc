@@ -10,5 +10,6 @@ main.mk: $(srcdir)/main_in.mk config.status
 ddconfig.h: ddconfig_in.h config.status
 	@echo "Re-making ddconfig.h"
 	$(SHELL) ./config.status
+	touch ddconfig.h
 
 # End of conf.mk

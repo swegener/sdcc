@@ -60,12 +60,15 @@ public:
   
 public:
   cl_sim(class cl_app *the_app);
-  ~cl_sim(void);
+  virtual ~cl_sim(void);
   virtual int init(void);
   
   virtual class cl_uc *mk_controller(void);
   virtual void build_cmdset(class cl_cmdset *cmdset);
 
+  // messages from app to handle and broadcast
+  virtual void mem_cell_changed(class cl_mem *mem, t_addr addr);
+  
   virtual int main(void);
   virtual void start(class cl_console *con);
   virtual void stop(int reason);

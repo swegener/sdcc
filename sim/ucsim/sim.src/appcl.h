@@ -35,6 +35,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // local, sim.src
 #include "argcl.h"
+#include "simcl.h"
 
 
 /* Options */
@@ -58,7 +59,7 @@ public:
 
 public:
   cl_option(int atype, char sn, char *ln);
-  ~cl_option(void);
+  virtual ~cl_option(void);
 
   virtual int add_value(char *value);
   virtual char *get_value(int index);
@@ -85,7 +86,7 @@ public:
 
 public:
   cl_app(void);
-  ~cl_app(void);
+  virtual ~cl_app(void);
 
 public:
   virtual int init(int argc , char *argv[]);
@@ -99,6 +100,9 @@ public:
   class cl_sim *get_sim(void) { return(sim); }
   class cl_commander *get_commander(void) { return(commander); }
   virtual class cl_cmd *get_cmd(class cl_cmdline *cmdline);
+
+public: // messages to broadcast
+  virtual void mem_cell_changed(class cl_mem *mem, t_addr addr);
 
 public:
   virtual void set_simulator(class cl_sim *simulator);

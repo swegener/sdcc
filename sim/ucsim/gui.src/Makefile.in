@@ -36,8 +36,14 @@ man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
 
+enable_serio	= @enable_serio@
 PKGS		=
-CURSES_PKGS	= serio.src
+ifeq ($(enable_serio),yes)
+SERIO_PKG	= serio.src
+else
+SERIO_PKG	=
+endif
+CURSES_PKGS	= $(SERIO.PKG)
 
 # Common code
 OBJECTS		= rec.o
@@ -60,8 +66,8 @@ all: gui.src
 
 gui.src: checkconf gui_api
 ifeq ($(curses_ok),yes)
-	@for pkg in $(CURSES_PKGS); do\
-	  $(MAKE) -C $$pkg $$pkg ;\
+	@for pkg in dummy $(CURSES_PKGS); do\
+	  if test -d $$pkg; then $(MAKE) -C $$pkg $$pkg; else : ; fi ;\
 	done
 endif
 #	@for pkg in $(PKGS); do\
@@ -93,12 +99,19 @@ uninstall_gui_api:
 
 # Performing self-test
 # --------------------
-check: check_gui_api
+check: check_local
 	@for pkg in $(PKGS); do\
 	  cd $$pkg && $(MAKE) check ; cd ..;\
 	done
 
-check_gui_api:
+check_local:
+
+test: test_local
+	@for pkg in $(PKGS); do\
+	  cd $$pkg && $(MAKE) test ; cd ..;\
+	done
+
+test_local:
 
 
 # Performing installation test
@@ -135,13 +148,13 @@ include clean.mk
 ucsim_lib: $(PRJDIR)/libguiucsim.a
 
 $(PRJDIR)/libguiucsim.a: $(OBJECTS) $(UCSIM_OBJECTS)
-	$(AR) -rcu $*.a $(OBJECTS) $(UCSIM_OBJECTS)
+	ar -rcu $*.a $(OBJECTS) $(UCSIM_OBJECTS)
 	$(RANLIB) $*.a
 
 tool_lib: $(PRJDIR)/libguitool.a
 
 $(PRJDIR)/libguitool.a: $(OBJECTS) $(TOOL_OBJECTS)
-	$(AR) -rcu $*.a $(OBJECTS) $(TOOL_OBJECTS)
+	ar -rcu $*.a $(OBJECTS) $(TOOL_OBJECTS)
 	$(RANLIB) $*.a
 
 .cc.o:

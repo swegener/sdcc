@@ -40,6 +40,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "brkcl.h"
 #include "stypes.h"
 
+#include "interruptcl.h"
+
 
 class t_uc51: public cl_uc
 {
@@ -47,44 +49,28 @@ public:
   // Options
   bool debug;
   bool stop_at_it;
-int jaj;
-  // Data for breakpoint handling
-  struct event_rec event_at;
 
-  FILE *serial_in;	// Serial line input
-  FILE *serial_out;	// Serial line output
-
+  // memories and cells for faster access
   class cl_mem *sfr, *iram;
+  class cl_cell *acc, *psw;
 
-protected:
-  struct termios saved_attributes_in; // Attributes of serial interface
-  struct termios saved_attributes_out;
-
+public:
   // Help to detect external it requests (falling edge)
   uchar prev_p1;	// Prev state of P1
   uchar prev_p3;	// Prev state of P3
-  
-  // Seral line simulation
-  uchar s_in;		// Serial channel input reg
-  uchar s_out;		// Serial channel output reg
-  bool  s_sending;	// Transmitter is working
-  bool  s_receiving;	// Receiver is working
-  int   s_rec_bit;	// Bit counter of receiver
-  int   s_tr_bit;	// Bit counter of transmitter
-  int   s_rec_t1;	// T1 overflows for receiving
-  int   s_tr_t1;	// T1 overflows for sending
-  int   s_rec_tick;	// Machine cycles for receiving
-  int   s_tr_tick;	// Machine cycles for sending
+  int p3_int0_edge, p3_int1_edge;
 
+public:
   // Simulation of interrupt system
-  bool  was_reti;	// Instruction had an effect on IE
+  class cl_interrupt *interrupt;
+  //bool  was_reti;	// Instruction had an effect on IE
 
 public:
   int result;		// result of instruction execution
 
   t_uc51(int Itype, int Itech,
 	 class cl_sim *asim);
-  ~t_uc51(void);
+  virtual ~t_uc51(void);
   virtual int    init(void);
   virtual char  *id_string(void);
   virtual void mk_hw_elements(void);
@@ -95,50 +81,30 @@ public:
   virtual struct dis_entry *dis_tbl(void);
   virtual struct name_entry *sfr_tbl(void);
   virtual struct name_entry *bit_tbl(void);
-  //virtual char   *disass(uint addr, char *sep);
   virtual char *disass(t_addr addr, char *sep);
   virtual void   print_regs(class cl_console *con);
-  virtual bool   extract_bit_address(t_addr bit_address,
-				     class cl_mem **mem,
-				     t_addr *mem_addr,
-				     t_mem *bit_mask);
+  virtual class cl_mem *bit2mem(t_addr bitaddr,
+				t_addr *memaddr, t_mem *bitmask);
   virtual void   reset(void);
   virtual void   clear_sfr(void);
   virtual void   analyze(t_addr addr);
-  virtual void   set_p_flag(void);
-  virtual void   proc_write(uchar *addr);
-  virtual void   proc_write_sp(uchar val);
-  virtual uchar  *get_bit(uchar bitaddr);
-  virtual uchar  *get_bit(uchar bitaddr, t_addr *ev_i, t_addr *ev_s);
   virtual int    it_priority(uchar ie_mask);
 
   virtual int    do_inst(int step);
 
+  virtual void mem_cell_changed(class cl_mem *mem, t_addr addr);
+
 protected:
-  virtual int  do_hardware(int cycles);
   virtual int  do_interrupt(void);
   virtual int  accept_it(class it_level *il);
-  virtual int  serial_bit_cnt(int mode);
-  virtual int  do_serial(int cycles);
-  virtual void received(int c);
-  virtual int  do_timers(int cycles);
-  virtual int  do_timer0(int cycles);
-  virtual int  t0_overflow(void);
-  virtual int  do_timer1(int cycles);
-  virtual int  do_wdt(int cycles);
+protected:
   virtual int  idle_pd(void);
-  virtual int  tick(int cycles);
-  virtual int  check_events(void);
 
-  virtual uchar *get_direct(t_mem addr, t_addr *ev_i, t_addr *ev_s);
-  virtual uchar *get_indirect(uchar addr, int *res);
-  virtual uchar *get_reg(uchar regnum);
-  virtual uchar *get_reg(uchar regnum, t_addr *event);
-  virtual uchar get_bitidx(uchar bitaddr);
-  virtual uchar read(uchar *addr);
-  virtual void  pre_inst(void);
+  virtual class cl_cell *get_direct(t_mem addr);
+  virtual class cl_cell *get_reg(uchar regnum);
+
   virtual int   exec_inst(void);
-  virtual void  post_inst(void);
+  //virtual void  post_inst(void);
 
   virtual int inst_unknown(uchar code);
   virtual int inst_nop(uchar code);			/* 00 */
@@ -251,6 +217,20 @@ protected:
   virtual int inst_mov_addr_a(uchar code);		/* f5 */
   virtual int inst_mov_$ri_a(uchar code);		/* f6,f7 */
   virtual int inst_mov_rn_a(uchar code);		/* f8-ff */
+};
+
+
+class cl_uc51_dummy_hw: public cl_hw
+{
+protected:
+  //class t_uc51 *uc51;
+  class cl_cell *cell_acc, *cell_sp, *cell_psw;
+public:
+  cl_uc51_dummy_hw(class cl_uc *auc);
+  virtual int init(void);
+
+  virtual void write(class cl_cell *cell, t_mem *val);
+  //virtual void happen(class cl_hw *where, enum hw_event he, void *params);
 };
 
 

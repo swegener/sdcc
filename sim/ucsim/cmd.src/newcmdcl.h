@@ -32,7 +32,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ddconfig.h"
 
 #include <stdio.h>
-#include <sys/types.h>	// to define fd_set
+#include <sys/types.h>
 #if FD_HEADER_OK
 # include HEADER_FD
 #endif
@@ -121,7 +121,7 @@ public:
 	 int  can_rep,
 	 char *short_hlp,
 	 char *long_hlp);
-  ~cl_cmd(void);
+  virtual ~cl_cmd(void);
 
   virtual void add_name(char *name);
   virtual int name_match(char *aname, int strict);
@@ -270,7 +270,7 @@ public:
 	       char *short_hlp,
 	       char *long_hlp,
 	       class cl_cmdset *acommands);
-  ~cl_super_cmd(void);
+  virtual ~cl_super_cmd(void);
 
   virtual int work(class cl_app *app,
 		   class cl_cmdline *cmdline, class cl_console *con);
@@ -299,7 +299,7 @@ public:
 #ifdef SOCKET_AVAIL
   cl_console(int portnumber, class cl_app *the_app);
 #endif
-  ~cl_console(void);
+  virtual ~cl_console(void);
   virtual int init(void);
 
   virtual void welcome(void);
@@ -350,7 +350,7 @@ public:
 public:
   cl_commander(class cl_app *the_app,
 	       class cl_cmdset *acmdset/*, class cl_sim *asim*/);
-  ~cl_commander(void);
+  virtual ~cl_commander(void);
   virtual int init(void);
 
   virtual class cl_console *mk_console(char *fin, char *fout);

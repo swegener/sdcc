@@ -34,17 +34,22 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "newcmdcl.h"
 
+#include "timer0cl.h"
 
-class cl_timer1: public cl_hw
+class cl_timer1: public cl_timer0
 {
 public:
-  cl_timer1(class cl_uc *auc);
+  cl_timer1(class cl_uc *auc, int aid, char *aid_string);
   //virtual int init(void);
 
+  //virtual void new_hw_added(class cl_hw *new_hw);
   //virtual ulong read(class cl_mem *mem, long addr);
   //virtual void write(class cl_mem *mem, long addr, ulong *val);
 
   //virtual int tick(int cycles);
+  virtual int do_mode3(int cycles);
+  //virtual void overflow(void);
+
   virtual void print_info(class cl_console *con);
 };
 

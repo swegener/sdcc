@@ -4,7 +4,7 @@
 # --------------------------------------------------
 clean:
 	rm -f *core *[%~] *.[oa]
-	rm -f test_*.??* '(null).cdb'
+	rm -f test_*.??* '(null).cdb' *.lnk *.ihx
 	rm -f .[a-z]*~
 	rm -f s51
 

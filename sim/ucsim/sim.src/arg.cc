@@ -214,7 +214,10 @@ cl_cmd_int_arg::get_bit_address(class cl_uc *uc, // input
 
   if (!get_address(uc, &bit_addr))
     return(DD_FALSE);
-  return(uc->extract_bit_address(bit_addr, mem, mem_addr, bit_mask));
+  
+  if (mem)
+    *mem= uc->bit2mem(bit_addr, mem_addr, bit_mask);
+  return(mem && *mem);
 }
 
 bool
@@ -272,7 +275,9 @@ cl_cmd_sym_arg::get_bit_address(class cl_uc *uc, // input
 			  get_svalue(),
 			  uc)) == NULL)
     return(DD_FALSE);
-  return(uc->extract_bit_address(ne->addr, mem, mem_addr, bit_mask));
+  if (mem)
+    *mem= uc->bit2mem(ne->addr, mem_addr, bit_mask);
+  return(mem && *mem);
 }
 
 bool

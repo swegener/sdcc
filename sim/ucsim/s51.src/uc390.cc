@@ -26,17 +26,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-
 // Bernhard's ToDo list:
 
 // - implement math accelerator
 // - consider ACON bits
-// - proc_write_sp (*aof_SP) / resSTACK_OV / event_at: insert this at the appropriate places
 // - buy some memory to run s51 with 2*4 Meg ROM/XRAM
 
 // strcpy (mem(MEM_ROM) ->addr_format, "0x%06x");
 // strcpy (mem(MEM_XRAM)->addr_format, "0x%06x");
-
 
 #include "ddconfig.h"
 
@@ -48,6 +45,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "glob.h"
 #include "uc390cl.h"
 #include "regs51.h"
+#include "uc390hwcl.h"
+
+
+#include "uc52cl.h"
+#include "regs51.h"
+#include "timer2cl.h"
 
 /*
  * Names of instructions
@@ -325,6 +328,17 @@ t_uc390::t_uc390 (int Itype, int Itech, class cl_sim *asim):
       printf ("24-bit flat mode, warning: lots of sfr-functions not implemented!\n> ");
       flat24_flag = 1;
     }
+  // todo: add interrupt sources
+}
+
+void
+t_uc390::mk_hw_elements (void)
+{
+  class cl_hw *h;
+
+  t_uc52::mk_hw_elements();
+  hws->add (h = new cl_uc390_hw (this));
+  h->init();
 }
 
 /*
@@ -361,8 +375,13 @@ t_uc390::clear_sfr(void)
   sfr->set(0xd2, 0x2f); /* MCNT1  */
   sfr->set(0xe3, 0x09); /* C1C    */
 
-  prev_p1 = port_pins[1] & sfr->get(P1);
-  prev_p3 = port_pins[3] & sfr->get(P3);
+  sfr->/*set*/write(P0, 0xff);
+  sfr->/*set*/write(P1, 0xff);
+  sfr->/*set*/write(P2, 0xff);
+  sfr->/*set*/write(P3, 0xff);
+  sfr->/*set*/write(SP, 7);
+  prev_p1 = sfr->/*get*/read(P1);
+  prev_p3 = sfr->/*get*/read(P3);
 }
 
 t_addr
@@ -387,8 +406,8 @@ t_uc390::get_mem_size (enum mem_class type)
   return 0;
 }
 
-ulong
-t_uc390::read_mem(enum mem_class type, t_mem addr)
+t_mem
+t_uc390::read_mem(enum mem_class type, t_addr addr)
 {
 
   if (type == MEM_XRAM &&
@@ -401,7 +420,7 @@ t_uc390::read_mem(enum mem_class type, t_mem addr)
   return t_uc51::read_mem (type, addr); /* 24 bit */
 }
 
-ulong
+t_mem
 t_uc390::get_mem (enum mem_class type, t_addr addr)
 {
   if (type == MEM_XRAM &&
@@ -444,63 +463,53 @@ t_uc390::set_mem (enum mem_class type, t_addr addr, t_mem val)
  *____________________________________________________________________________
  */
 
-int
-t_uc390::push_byte (uchar uc)
+void
+t_uc390::push_byte (t_mem uc)
 {
-  int res;
+  t_addr sp;
 
-  sfr->add (SP, 1);
+  sp = sfr->wadd (SP, 1);
   if (sfr->get (ACON) & 0x04) /* SA: 10 bit stack */
     {
-      uint sp10;
-
-      if (get_mem (MEM_SFR, SP) == 0x00) /* overflow SP */
-        sfr->add (ESP, 1);
-      sp10 = (get_mem (MEM_SFR, ESP) & 0x3) * 256 +
-             get_mem (MEM_SFR, SP);
-      write_mem (MEM_IXRAM, sp10, uc);
-      res = 0;
+      if (sp == 0) /* overflow SP */
+        sfr->wadd (ESP, 1);
+      sp += (sfr->read (ESP) & 0x3) * 256;
+      write_mem (MEM_IXRAM, sp, uc); // fixme
     }
   else
     {
-      uchar *sp;
+      class cl_cell *stck;
 
-      sp = get_indirect (sfr->get (SP), &res);
-      if (res != resGO)
-        res = resSTACK_OV;
-      *sp = uc;
+      stck = iram->get_cell (sp);
+      stck->write (uc);
     }
-  return res;
 }
 
-uchar
-t_uc390::pop_byte (int *Pres)
+t_mem
+t_uc390::pop_byte (void)
 {
-  uchar uc;
+  t_mem temp;
+  t_addr sp;
 
   if (sfr->get (ACON) & 0x04) /* SA: 10 bit stack */
     {
-      uint sp10;
-
-      sp10 = (get_mem (MEM_SFR, ESP) & 0x3) * 256 +
-             get_mem (MEM_SFR, SP);
-      sfr->add (SP, -1);
-      if (get_mem (MEM_SFR, SP) == 0xff) /* underflow SP */
-        sfr->add (ESP, -1);
-      uc = get_mem (MEM_IXRAM, sp10);
-      *Pres = 0;
+      sp = sfr->read (SP);
+      sp += (sfr->read (ESP) & 0x3) * 256;
+      temp = read_mem (MEM_IXRAM, sp); // fixme
+      sp = sfr->wadd (SP, -1);
+      if (sp == 0xff) /* underflow SP */
+        sfr->wadd (ESP, -1);
+      return temp;
     }
   else
     {
-      uchar *sp;
+      class cl_cell *stck;
 
-      sp = get_indirect (get_mem (MEM_SFR, SP), Pres);
-      if (*Pres != resGO)
-        *Pres = resSTACK_OV;
-      sfr->add (SP, -1);
-      uc = *sp;
+      stck = iram->get_cell (sfr->get (SP));
+      temp = stck->read();
+      sp = sfr->wadd (SP, -1);
+      return temp;
     }
-  return uc;
 }
 
 /*
@@ -517,7 +526,7 @@ t_uc390::inst_inc_dptr (uchar code)
   uchar pl, ph, px, dps;
 
   dps = sfr->get (DPS);
-  if (dps & 1)
+  if (dps & 0x01)
     {
       pl = DPL1;
       ph = DPH1;
@@ -530,21 +539,21 @@ t_uc390::inst_inc_dptr (uchar code)
       px = DPX;
     }
 
-  dptr = sfr->get (ph) * 256 + sfr->get (pl);
+  dptr = sfr->read (ph) * 256 + sfr->read (pl);
   if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
-    dptr += sfr->get (px) *256*256;
+    dptr += sfr->read (px) *256*256;
   if (dps & 0x80) /* decr set */
     dptr--;
   else
     dptr++;
 
   if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
-    sfr->set (px, (dptr >> 16) & 0xff);
-  sfr->set (event_at.ws = ph, (dptr >> 8) & 0xff);
-  sfr->set (pl, dptr & 0xff);
+    sfr->write (px, (dptr >> 16) & 0xff);
+  sfr->write (ph, (dptr >> 8) & 0xff);
+  sfr->write (pl, dptr & 0xff);
 
   if (dps & 0x20)                      /* auto-switch dptr */
-    sfr->set (DPS, dps ^ 1);    /* toggle dual-dptr switch */
+    sfr->write (DPS, dps ^ 1);  /* toggle dual-dptr switch */
   tick (1);
   return resGO;
 }
@@ -561,7 +570,7 @@ t_uc390::inst_jmp_$a_dptr (uchar code)
   uchar pl, ph, px, dps;
 
   dps = sfr->get (DPS);
-  if (dps & 1)
+  if (dps & 0x01)
     {
       pl = DPL1;
       ph = DPH1;
@@ -574,11 +583,10 @@ t_uc390::inst_jmp_$a_dptr (uchar code)
       px = DPX;
     }
 
-  PC = (sfr->get (ph) * 256 + sfr->get (pl) +
-      read_mem (MEM_SFR, ACC)) &
-      (EROM_SIZE - 1);
+  PC = (sfr->read (ph) * 256 + sfr->read (pl) + acc->read()) &
+       (EROM_SIZE - 1);
   if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
-    PC += sfr->get (px) * 256*256;
+    PC += sfr->read (px) * 256*256;
 
   tick (1);
   return resGO;
@@ -596,7 +604,7 @@ t_uc390::inst_mov_dptr_$data (uchar code)
   uchar pl, ph, px, dps;
 
   dps = sfr->get (DPS);
-  if (dps & 1)
+  if (dps & 0x01)
     {
       pl = DPL1;
       ph = DPH1;
@@ -610,12 +618,12 @@ t_uc390::inst_mov_dptr_$data (uchar code)
     }
 
   if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
-    sfr->set (px, fetch ());
-  sfr->set (event_at.ws = ph, fetch ());
-  sfr->set (pl, fetch ());
+    sfr->write (px, fetch ());
+  sfr->write (ph, fetch ());
+  sfr->write (pl, fetch ());
 
   if (dps & 0x20)                      /* auto-switch dptr */
-    sfr->set (DPS, dps ^ 1);    /* toggle dual-dptr switch */
+    sfr->write (DPS, dps ^ 1);    /* toggle dual-dptr switch */
 
   tick (1);
   return resGO;
@@ -634,7 +642,7 @@ t_uc390::inst_movc_a_$a_dptr (uchar code)
   uchar pl, ph, px, dps;
 
   dps = sfr->get (DPS);
-  if (dps & 1)
+  if (dps & 0x01)
     {
       pl = DPL1;
       ph = DPH1;
@@ -648,17 +656,16 @@ t_uc390::inst_movc_a_$a_dptr (uchar code)
     }
 
   if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
-    sfr->set (ACC, get_mem (MEM_ROM,
-              event_at.rc =
-              (sfr->get (px) * 256*256 + sfr->get (ph) * 256 + sfr->get (pl) +
-              sfr->get (ACC)) & (EROM_SIZE-1)));
+    acc->write (read_mem (MEM_ROM,
+                (sfr->read (px) * 256*256 + sfr->read (ph) * 256 + sfr->read (pl) +
+                acc->read())));
   else
-    sfr->set (ACC, get_mem (MEM_ROM, event_at.rc =
-              (sfr->get (ph) * 256 + sfr->get (pl) +
-              sfr->get (ACC)) & (EROM_SIZE-1)));
+    acc->write (read_mem (MEM_ROM,
+                (sfr->read (ph) * 256 + sfr->read (pl) +
+                acc->read())));
 
   if (dps & 0x20)                      /* auto-switch dptr */
-    sfr->set (DPS, dps ^ 1);    /* toggle dual-dptr switch */
+    sfr->write (DPS, dps ^ 1);  /* toggle dual-dptr switch */
 
   tick (1);
   return resGO;
@@ -673,13 +680,12 @@ t_uc390::inst_movc_a_$a_dptr (uchar code)
 int
 t_uc390::inst_push (uchar code)
 {
-  uchar *addr;
-  int res;
+  class cl_cell *cell;
 
-  addr = get_direct (fetch (), &event_at.wi, &event_at.ws);
-  res = push_byte (read (addr));
+  cell = get_direct(fetch());
+  push_byte (cell->read());
   tick (1);
-  return res;
+  return resGO;
 }
 
 
@@ -692,14 +698,12 @@ t_uc390::inst_push (uchar code)
 int
 t_uc390::inst_pop (uchar code)
 {
-  uchar *addr;
-  int res;
+  class cl_cell *cell;
 
-  addr = get_direct (fetch (), &event_at.wi, &event_at.ws);
-  *addr = pop_byte (&res);
-  proc_write (addr);
+  cell = get_direct (fetch());
+  cell->write (pop_byte());
   tick (1);
-  return res;
+  return resGO;
 }
 
 
@@ -715,7 +719,7 @@ t_uc390::inst_movx_a_$dptr (uchar code)
   uchar pl, ph, px, dps;
 
   dps = sfr->get (DPS);
-  if (dps & 1)
+  if (dps & 0x01)
     {
       pl = DPL1;
       ph = DPH1;
@@ -729,16 +733,14 @@ t_uc390::inst_movx_a_$dptr (uchar code)
     }
 
   if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
-    sfr->set (event_at.ws = ACC,
-              get_mem (MEM_XRAM,
-              event_at.rx = sfr->get (px) * 256*256 + sfr->get (ph) * 256 + sfr->get (pl)));
+    acc->write (read_mem (MEM_XRAM,
+                sfr->read (px) * 256*256 + sfr->read (ph) * 256 + sfr->read (pl)));
   else
-    sfr->set (event_at.ws = ACC,
-             get_mem (MEM_XRAM,
-             event_at.rx = sfr->get (ph) * 256 + sfr->get (pl)));
+    acc->write (read_mem (MEM_XRAM,
+                sfr->read (ph) * 256 + sfr->read (pl)));
 
   if (dps & 0x20)                      /* auto-switch dptr */
-    sfr->set (DPS, dps ^ 1);    /* toggle dual-dptr switch */
+    sfr->write (DPS, dps ^ 1);   /* toggle dual-dptr switch */
 
   tick (1);
   return resGO;
@@ -756,7 +758,7 @@ t_uc390::inst_movx_$dptr_a (uchar code)
   uchar pl, ph, px, dps;
 
   dps = sfr->get (DPS);
-  if (dps & 1)
+  if (dps & 0x01)
     {
       pl = DPL1;
       ph = DPH1;
@@ -770,16 +772,16 @@ t_uc390::inst_movx_$dptr_a (uchar code)
     }
 
   if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
-    set_mem (MEM_XRAM,
-             event_at.wx = sfr->get (px) * 256*256 + sfr->get (ph) * 256 + sfr->get (pl),
-             sfr->get (event_at.rs = ACC));
+    write_mem (MEM_XRAM,
+               sfr->read (px) * 256*256 + sfr->read (ph) * 256 + sfr->read (pl),
+               acc->read());
   else
-    set_mem (MEM_XRAM,
-             event_at.wx = sfr->get (ph) * 256 + sfr->get (pl),
-             sfr->get (event_at.rs = ACC));
+    write_mem (MEM_XRAM,
+               sfr->read (ph) * 256 + sfr->read (pl),
+               acc->read());
 
   if (dps & 0x20)                      /* auto-switch dptr */
-    sfr->set (DPS, dps ^ 1);    /* toggle dual-dptr switch */
+    sfr->write (DPS, dps ^ 1);   /* toggle dual-dptr switch */
 
   tick (1);
   return resGO;
@@ -850,8 +852,7 @@ t_uc390::inst_ljmp (uchar code)
 int
 t_uc390::inst_acall_addr (uchar code)
 {
-  uchar x, h, l, *sp, *aof_SP;
-  int res;
+  uchar x, h, l;
 
   if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
     {
@@ -859,39 +860,31 @@ t_uc390::inst_acall_addr (uchar code)
       h = fetch ();
       l = fetch ();
 
-      res = push_byte ( PC        & 0xff); /* push low byte  */
-      res = push_byte ((PC >>  8) & 0xff); /* push high byte */
-      res = push_byte ((PC >> 16) & 0xff); /* push x byte    */
+      push_byte ( PC        & 0xff); /* push low byte  */
+      push_byte ((PC >>  8) & 0xff); /* push high byte */
+      push_byte ((PC >> 16) & 0xff); /* push x byte    */
 
       PC = (PC & 0xf800) | (x * 256*256 + h * 256 + l);
     }
   else
     {
       /* stock mcs51 mode */
+      class cl_cell *stck;
+      t_mem sp;
+
       h = (code >> 5) & 0x07;
-      l = fetch ();
-      aof_SP = &((sfr->umem8)[SP]);
+      l = fetch();
+      sp = sfr->wadd (SP, 1);
+      stck = iram->get_cell (sp);
+      stck->write (PC & 0xff); // push low byte
 
-      //MEM(MEM_SFR)[SP]++;
-      (*aof_SP)++;
-      proc_write_sp (*aof_SP);
-      sp = get_indirect (*aof_SP/*sfr->get (SP)*/, &res);
-      if (res != resGO)
-        res = resSTACK_OV;
-      *sp = PC & 0xff; // push low byte
-
-      //MEM(MEM_SFR)[SP]++;
-      (*aof_SP)++;
-      proc_write_sp (*aof_SP);
-      sp = get_indirect (*aof_SP/*sfr->get (SP)*/, &res);
-      if (res != resGO)
-        res = resSTACK_OV;
-      *sp = (PC >> 8) & 0xff; // push high byte
-
-      PC = (PC & 0xf800) | (h * 256 + l);
+      sp = sfr->wadd (SP, 1);
+      stck = iram->get_cell (sp);
+      stck->write ((PC >> 8) & 0xff); // push high byte
+      PC = (PC & 0xf800) | (h*256 + l);
     }
   tick (1);
-  return res;
+  return resGO;
 }
 
 
@@ -905,7 +898,6 @@ int
 t_uc390::inst_lcall (uchar code, uint addr)
 {
   uchar x = 0, h = 0, l = 0;
-  int res;
 
   if (!addr)
     { /* this is a normal lcall */
@@ -916,12 +908,12 @@ t_uc390::inst_lcall (uchar code, uint addr)
     }
     /* else, this is interrupt processing */
 
-  res = push_byte ( PC       & 0xff); /* push low byte  */
-  res = push_byte ((PC >> 8) & 0xff); /* push high byte */
+  push_byte ( PC       & 0xff); /* push low byte  */
+  push_byte ((PC >> 8) & 0xff); /* push high byte */
 
   if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
     {
-      res = push_byte ((PC >> 16) & 0xff); /* push x byte */
+      push_byte ((PC >> 16) & 0xff); /* push x byte */
       if (addr)
         PC = addr & 0xfffful; /* if interrupt: x-Byte is 0 */
       else
@@ -934,7 +926,7 @@ t_uc390::inst_lcall (uchar code, uint addr)
       else
         PC = h * 256 + l;
     }
-  return res;
+  return resGO;
 }
 
 /*
@@ -947,12 +939,11 @@ int
 t_uc390::inst_ret (uchar code)
 {
   uchar x = 0, h, l;
-  int res;
 
   if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
-    x = pop_byte (&res);
-  h = pop_byte (&res);
-  l = pop_byte (&res);
+    x = pop_byte ();
+  h = pop_byte ();
+  l = pop_byte ();
 
   tick (1);
 
@@ -964,7 +955,7 @@ t_uc390::inst_ret (uchar code)
   else
     PC = h * 256 + l;
 
-  return res;
+  return resGO;
 }
 
 /*
@@ -977,12 +968,11 @@ int
 t_uc390::inst_reti (uchar code)
 {
   uchar x = 0, h, l;
-  int res;
 
   if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
-    x = pop_byte (&res);
-  h = pop_byte (&res);
-  l = pop_byte (&res);
+    x = pop_byte ();
+  h = pop_byte ();
+  l = pop_byte ();
   tick (1);
 
   if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
@@ -993,7 +983,7 @@ t_uc390::inst_reti (uchar code)
   else
     PC = h * 256 + l;
 
-  was_reti = DD_TRUE;
+  interrupt->was_reti = DD_TRUE;
   class it_level *il = (class it_level *) (it_levels->top ());
   if (il &&
       il->level >= 0)
@@ -1002,142 +992,7 @@ t_uc390::inst_reti (uchar code)
       delete il;
     }
 
-  return res;
-}
-
-/*
- * Processing write operation to IRAM
- *
- * It starts serial transmition if address is in SFR and it is
- * SBUF. Effect on IE is also checked.
- */
-
-void
-t_uc390::proc_write(uchar *addr)
-{
-  if (addr == &((sfr->umem8)[SBUF]))
-    {
-      s_out= sfr->get(SBUF);
-      s_sending= DD_TRUE;
-      s_tr_bit = 0;
-      s_tr_tick= 0;
-      s_tr_t1  = 0;
-    }
-  else if (addr == &((sfr->umem8)[IE]))
-    was_reti= DD_TRUE;
-  else if (addr == &((sfr->umem8)[DPS]))
-    {
-      *addr &= 0xe5;
-      *addr |= 0x04;
-    }
-  else if (addr == &((sfr->umem8)[EXIF]))
-    {
-    }
-  else if (addr == &((sfr->umem8)[P4CNT]))
-    {
-      ;
-    }
-  else if (addr == &((sfr->umem8)[ACON]))
-    {
-      *addr |= 0xf8;
-      /* lockout: IDM1:IDM0 and SA can't be set at the same time */
-      if (((sfr->umem8)[MCON] & 0xc0) == 0xc0) /* IDM1 and IDM0 set? */
-        *addr &= ~0x04; /* lockout SA */
-    }
-  else if (addr == &((sfr->umem8)[P5CNT]))
-    {
-      ;
-    }
-  else if (addr == &((sfr->umem8)[C0C]))
-    {
-      ;
-    }
-  else if (addr == &((sfr->umem8)[PMR]))
-    {
-      *addr |= 0x03;
-      // todo: check previous state
-      if ((*addr & 0xd0) == 0x90) /* CD1:CD0 set to 10, CTM set */
-        {
-	  ctm_ticks = ticks->ticks;
-	  (sfr->umem8)[EXIF] &= ~0x08; /* clear CKRDY */
-        }
-      else
-        ctm_ticks = 0;
-    }
-  else if (addr == &((sfr->umem8)[MCON]))
-    {
-      *addr |= 0x10;
-      /* lockout: IDM1:IDM0 and SA can't be set at the same time */
-      if (((sfr->umem8)[ACON] & 0x04) == 0x04) /* SA set? */
-        *addr &= ~0xc0; /* lockout IDM1:IDM0 */
-    }
-  else if (addr == &((sfr->umem8)[TA]))
-    {
-      if (*addr == 0x55)
-        {
-	  timed_access_ticks = ticks->ticks;
-	  timed_access_state = 1;
-        }
-      else if (*addr == 0xaa &&
-               timed_access_state == 1 &&
-	       timed_access_ticks == ticks->ticks + 1)
-        {
-	  timed_access_ticks = ticks->ticks;
-	  timed_access_state = 2;
-        }
-      else
-        timed_access_state = 0;
-    }
-  else if (addr == &((sfr->umem8)[T2MOD]))
-    *addr |= 0xe0;
-  else if (addr == &((sfr->umem8)[COR]))
-    {
-      ;
-    }
-  else if (addr == &((sfr->umem8)[WDCON]))
-    {
-      ;
-    }
-  else if (addr == &((sfr->umem8)[C1C]))
-    {
-      ;
-    }
-  else if (addr == &((sfr->umem8)[MCNT1]))
-    *addr |= 0x0f;
-}
-
-
-/*
- * Reading IRAM or SFR, but if address points to a port, it reads
- * port pins instead of port latches
- */
-
-uchar
-t_uc390::read(uchar *addr)
-{
-  //if (addr == &(MEM(MEM_SFR)[P1]))
-  if (addr == &(sfr->umem8[P1]))
-    return get_mem (MEM_SFR, P1) & port_pins[1];
-  //if (addr == &(MEM(MEM_SFR)[P2]))
-  else if (addr == &(sfr->umem8[P2]))
-    return get_mem (MEM_SFR, P2) & port_pins[2];
-  //if (addr == &(MEM(MEM_SFR)[P3]))
-  else if (addr == &(sfr->umem8[P3]))
-    return get_mem (MEM_SFR, P3) & port_pins[3];
-  //if (addr == &(MEM(MEM_SFR)[P4]))
-  else if (addr == &(sfr->umem8[P4]))
-    return get_mem (MEM_SFR, P4) & port_pins[4];
-  //if (addr == &(MEM(MEM_SFR)[P5]))
-  else if (addr == &(sfr->umem8[P5]))
-    return get_mem (MEM_SFR, P5) & port_pins[5];
-  else if (addr == &(sfr->umem8[EXIF]))
-    if (ctm_ticks &&
-        ticks->ticks >= ctm_ticks + 65535)
-      {
-        *addr |= 0x08; /* set CKRDY */
-	ctm_ticks = 0;
-      }
-  return *addr;
+  return resGO;
 }
 
 
@@ -1168,7 +1023,7 @@ t_uc390::disass (t_addr addr, char *sep)
   code = get_mem (MEM_ROM, addr);
 
   p = work;
-  b = dis_tbl ()[code].mnemonic;
+  b = dis_tbl()[code].mnemonic;
   while (*b)
     {
       if (*b == '%')
@@ -1184,55 +1039,55 @@ t_uc390::disass (t_addr addr, char *sep)
                 //          get_mem (MEM_ROM, addr + 1)));
 
                 sprintf (temp, "%06lx",
-                         (addr & 0xf80000) |
+                         (addr & 0xf80000L) |
                          (((code >> 5) & 0x07) * (256 * 256) +
                          (get_mem (MEM_ROM, addr + 1) * 256) +
                           get_mem (MEM_ROM, addr + 2)));
               break;
             case 'l': // long address
               sprintf (temp, "%06lx",
-                       get_mem (MEM_ROM, addr + 1) * (256*256) +
+                       get_mem (MEM_ROM, addr + 1) * (256*256L) +
                        get_mem (MEM_ROM, addr + 2) * 256 +
                        get_mem (MEM_ROM, addr + 3));
                        // get_mem (MEM_ROM, addr + 1) * 256 + get_mem (MEM_ROM, addr + 2));
               break;
             case 'a': // addr8 (direct address) at 2nd byte
                if (!get_name (get_mem (MEM_ROM, addr + 1), sfr_tbl (), temp))
-                 sprintf (temp, "%02lx", get_mem (MEM_ROM, addr + 1));
+                 sprintf (temp, "%02"_M_"x", get_mem (MEM_ROM, addr + 1));
               break;
             case '8': // addr8 (direct address) at 3rd byte
               if (!get_name (get_mem (MEM_ROM, addr + 2), sfr_tbl (), temp))
-                sprintf (temp, "%02lx", get_mem (MEM_ROM, addr + 1));
-              sprintf (temp, "%02lx", get_mem (MEM_ROM, addr + 2));
+                sprintf (temp, "%02"_M_"x", get_mem (MEM_ROM, addr + 2));
               break;
             case 'b': // bitaddr at 2nd byte
-              if (get_name (get_mem (MEM_ROM, addr + 1), bit_tbl (), temp))
-                break;
-              if (get_name (get_bitidx (get_mem (MEM_ROM, addr + 1)),
-                            sfr_tbl (), temp))
-                {
-                  strcat (temp, ".");
-                  sprintf (c, "%1ld", get_mem (MEM_ROM, addr + 1) & 0x07);
-                  strcat (temp, c);
-                  break;
-                }
-              sprintf (temp, "%02x.%ld",
-                       get_bitidx (get_mem (MEM_ROM, addr + 1)),
-                       get_mem (MEM_ROM, addr + 1) & 0x07);
-              break;
+	      {
+		t_addr ba = get_mem (MEM_ROM, addr+1);
+		if (get_name (ba, bit_tbl(), temp))
+		  break;
+		if (get_name ((ba<128) ? ((ba/8)+32) : (ba&0xf8), sfr_tbl(), temp))
+		  {
+		    strcat (temp, ".");
+		    sprintf (c, "%1"_M_"d", ba & 0x07);
+		    strcat (temp, c);
+		    break;
+		  }
+		sprintf (temp, "%02x.%"_M_"d", (ba<128) ? ((ba/8)+32) : (ba&0xf8),
+		 	 ba & 0x07);
+		break;
+	      }
             case 'r': // rel8 address at 2nd byte
-              sprintf (temp, "%04lx",
-                       addr + 2 + (signed char) (get_mem (MEM_ROM, addr + 1)));
+              sprintf (temp, "%04"_A_"x",
+                       t_addr (addr + 2 + (signed char) (get_mem (MEM_ROM, addr + 1))));
               break;
             case 'R': // rel8 address at 3rd byte
-              sprintf (temp, "%04lx",
-                       addr + 3 + (signed char) (get_mem (MEM_ROM, addr + 2)));
+              sprintf (temp, "%04"_A_"x",
+                       t_addr (addr + 3 + (signed char) (get_mem (MEM_ROM, addr + 2))));
               break;
             case 'd': // data8 at 2nd byte
-              sprintf (temp, "%02lx", get_mem (MEM_ROM, addr + 1));
+              sprintf (temp, "%02"_M_"x", get_mem (MEM_ROM, addr + 1));
               break;
             case 'D': // data8 at 3rd byte
-              sprintf (temp, "%02lx", get_mem (MEM_ROM, addr + 2));
+              sprintf (temp, "%02"_M_"x", get_mem (MEM_ROM, addr + 2));
               break;
             default:
               strcpy (temp, "?");
@@ -1274,7 +1129,7 @@ void
 t_uc390::print_regs (class cl_console *con)
 {
   t_addr start;
-  uchar data;
+  t_mem data;
 
   if (! (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
     {

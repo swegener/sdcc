@@ -53,7 +53,7 @@ public:
   char *name;
 
   cl_ticker(int adir, int in_isr, char *aname);
-  ~cl_ticker(void);
+  virtual ~cl_ticker(void);
   
   virtual int tick(int nr);
   virtual double get_rtime(double xtal);
@@ -71,11 +71,13 @@ public:
   int state;			// GO, IDLE, PD
   class cl_list *options;
 
-  t_addr PC;			// Program Counter
+  t_addr PC, instPC;		// Program Counter
+  bool inst_exec;		// Instruction is executed
   class cl_ticker *ticks;	// Nr of XTAL clocks
   class cl_ticker *isr_ticks;	// Time in ISRs
   class cl_ticker *idle_ticks;	// Time in idle mode
   class cl_list *counters;	// User definable timers (tickers)
+  int inst_ticks;		// ticks of an instruction
   double xtal;			// Clock speed
 
   int brk_counter;		// Number of breakpoints
@@ -85,16 +87,19 @@ public:
   class cl_list *mems;
   class cl_hws *hws;
 
-  class cl_list *it_sources;	// Sources of interrupts
+  class cl_irqs *it_sources;	// Sources of interrupts
   class cl_list *it_levels;	// Follow interrupt services
   class cl_list *st_ops;	// Track stack operations
+
+  class cl_list *errors;	// Errors of instruction execution
+  class cl_list *events;	// Events happened during inst exec
 
   t_addr sp_max;
   t_addr sp_avg;
 
 public:
   cl_uc(class cl_sim *asim);
-  ~cl_uc(void);
+  virtual ~cl_uc(void);
   virtual int init(void);
   virtual char *id_string(void);
   virtual void reset(void);
@@ -107,13 +112,12 @@ public:
   virtual void build_cmdset(class cl_cmdset *cmdset);
 
   // manipulating memories
-  virtual ulong read_mem(enum mem_class type, t_addr addr);
-  virtual ulong get_mem(enum mem_class type, t_addr addr);
+  virtual t_mem read_mem(enum mem_class type, t_addr addr);
+  virtual t_mem get_mem(enum mem_class type, t_addr addr);
   virtual void write_mem(enum mem_class type, t_addr addr, t_mem val);
   virtual void set_mem(enum mem_class type, t_addr addr, t_mem val);
   virtual class cl_mem *mem(enum mem_class type);
   virtual class cl_mem *mem(char *class_name);
-  //virtual TYPE_UBYTE *MEM(enum mem_class type);
 
   // file handling
   virtual long read_hex_file(const char *name);
@@ -126,14 +130,14 @@ public:
   virtual bool there_is_inst(void);
 
   // manipulating hw elements
-  virtual void register_hw_read(enum mem_class, t_addr addr, class cl_hw *hw);
-  virtual void register_hw_write(enum mem_class, t_addr addr, class cl_hw *hw);
   virtual class cl_hw *get_hw(enum hw_cath cath, int *idx);
   virtual class cl_hw *get_hw(char *id_string, int *idx);
   virtual class cl_hw *get_hw(enum hw_cath cath, int hwid, int *idx);
   virtual class cl_hw *get_hw(char *id_string, int hwid, int *idx);
 
   // "virtual" timers
+  virtual int tick_hw(int cycles);
+  virtual void do_extra_hw(int cycles);
   virtual int tick(int cycles);
   virtual class cl_ticker *get_counter(int nr);
   virtual class cl_ticker *get_counter(char *name);
@@ -163,16 +167,16 @@ public:
   // breakpoints
   virtual class cl_fetch_brk *fbrk_at(t_addr addr);
   virtual class cl_ev_brk *ebrk_at(t_addr addr, char *id);
-  //virtual void rm_fbrk(long addr);
   virtual class cl_brk *brk_by_nr(int nr);
   virtual class cl_brk *brk_by_nr(class brk_coll *bpcoll, int nr);
   virtual void rm_ebrk(t_addr addr, char *id);
-  virtual void rm_brk(int nr);
+  virtual bool rm_brk(int nr);
   virtual void put_breaks(void);
   virtual void remove_all_breaks(void);
   virtual int make_new_brknr(void);
   virtual class cl_ev_brk *mk_ebrk(enum brk_perm perm, class cl_mem *mem,
 				   char op, t_addr addr, int hit);
+  virtual void check_events(void);
 
   // disassembling and symbol recognition
   virtual char *disass(t_addr addr, char *sep);
@@ -181,26 +185,29 @@ public:
   virtual struct name_entry *bit_tbl(void);
   virtual void print_disass(t_addr addr, class cl_console *con);
   virtual void print_regs(class cl_console *con);
-  virtual int inst_length(t_mem code);
+  virtual int inst_length(t_addr addr);
+  virtual int inst_branch(t_addr addr);
   virtual int longest_inst(void);
   virtual bool get_name(t_addr addr, struct name_entry tab[], char *buf);
-  virtual bool extract_bit_address(t_addr bit_address,
-				   class cl_mem **mem,
-				   t_addr *mem_addr,
-				   t_mem *bit_mask) {return(DD_FALSE);}
   virtual char *symbolic_bit_name(t_addr bit_address,
 				  class cl_mem *mem,
 				  t_addr mem_addr,
 				  t_mem bit_mask);
 
+  /* Converting abstract address spaces into real ones */
+  virtual class cl_mem *bit2mem(t_addr bitaddr,
+				t_addr *memaddr, t_mem *bitmask);
+
+  // messages from app to handle and broadcast
+  virtual void mem_cell_changed(class cl_mem *mem, t_addr addr);
+
+  // Error handling
+  virtual void error(class cl_error *error);
+  virtual void check_errors(void);
+  
   /* Following fields and virtual methods defined in uc51 I don't have
      energy to redesign them:-( */
 public:
-  uchar port_pins[6];	// Port pins; 0...5 for DS390
-public:
-  virtual void proc_write(uchar *addr) {}
-  virtual void set_p_flag(void) {}
-  virtual uchar *get_bit(uchar bitaddr) { return(0); }
   virtual void eram2xram(void) {} // Dirty hack for 51R
   virtual void xram2eram(void) {}
 };

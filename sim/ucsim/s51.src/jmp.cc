@@ -37,6 +37,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // local
 #include "uc51cl.h"
 #include "regs51.h"
+#include "types51.h"
+#include "interruptcl.h"
 
 
 /*
@@ -67,16 +69,19 @@ t_uc51::inst_ajmp_addr(uchar code)
 int
 t_uc51::inst_jbc_bit_addr(uchar code)
 {
-  uchar bitaddr, *addr, jaddr;
+  uchar bitaddr, jaddr;
 
   bitaddr= fetch();
   jaddr  = fetch();
-  addr   = get_bit(bitaddr, &event_at.ri, &event_at.rs);
-  if (*addr & BIT_MASK(bitaddr))
-    {
-      (*addr)&= ~BIT_MASK(bitaddr);
-      PC= (PC + (signed char)jaddr) & (EROM_SIZE - 1);
-    }
+  t_addr a;
+  t_mem m;
+  class cl_mem *mem;
+  if ((mem= bit2mem(bitaddr, &a, &m)) == 0)
+    return(resBITADDR);
+  t_mem d= mem->read(a, HW_PORT);
+  mem->write(a, d & ~m);
+  if (d & m)
+    PC= (PC + (signed char)jaddr) & (EROM_SIZE - 1);
   tick(1);
   return(resGO);
 }
@@ -106,30 +111,24 @@ t_uc51::inst_ljmp(uchar code)
 int
 t_uc51::inst_acall_addr(uchar code)
 {
-  uchar h, l, *sp, *aof_SP;
-  int res;
+  uchar h, l;
+  class cl_cell *stck;
+  t_mem sp;
 
   h= (code >> 5) & 0x07;
   l= fetch();
-  aof_SP= &((sfr->umem8)[SP]);
-  //MEM(MEM_SFR)[SP]++;
-  (*aof_SP)++;
-  proc_write_sp(*aof_SP);
-  sp= get_indirect(*aof_SP/*sfr->get(SP)*/, &res);
-  if (res != resGO)
-    res= resSTACK_OV;
-  (*sp)= PC & 0xff; // push low byte
+  sp= sfr->wadd(SP, 1);
+  //proc_write_sp(sp);
+  stck= iram->get_cell(sp);
+  stck->write(PC & 0xff); // push low byte
   tick(1);
 
-  //MEM(MEM_SFR)[SP]++;
-  (*aof_SP)++;
-  proc_write_sp(*aof_SP);
-  sp= get_indirect(*aof_SP/*sfr->get(SP)*/, &res);
-  if (res != resGO)
-    res= resSTACK_OV;
-  (*sp)= (PC >> 8) & 0xff; // push high byte
+  sp= sfr->wadd(SP, 1);
+  //proc_write_sp(sp);
+  stck= iram->get_cell(sp);
+  stck->write((PC >> 8) & 0xff); // push high byte
   PC= (PC & 0xf800) | (h*256 + l);
-  return(res);
+  return(resGO);
 }
 
 
@@ -142,37 +141,31 @@ t_uc51::inst_acall_addr(uchar code)
 int
 t_uc51::inst_lcall(uchar code, uint addr)
 {
-  uchar h= 0, l= 0, *sp, *aof_SP;
-  int res;
+  uchar h= 0, l= 0;
+  t_mem sp;
+  class cl_cell *stck;
 
   if (!addr)
     {
       h= fetch();
       l= fetch();
     }
-  aof_SP= &((sfr->umem8)[SP]);
-  //MEM(MEM_SFR)[SP]++;
-  (*aof_SP)++;
-  proc_write_sp(*aof_SP);
-  sp= get_indirect(*aof_SP/*sfr->get(SP)*/, &res);
-  if (res != resGO)
-    res= resSTACK_OV;
-  (*sp)= PC & 0xff; // push low byte
+  sp= sfr->wadd(SP, 1);
+  //proc_write_sp(sp);
+  stck= iram->get_cell(sp);
+  stck->write(PC & 0xff); // push low byte
   if (!addr)
     tick(1);
 
-  //MEM(MEM_SFR)[SP]++;
-  (*aof_SP)++;
-  proc_write_sp(*aof_SP);
-  sp= get_indirect(*aof_SP/*sfr->get(SP)*/, &res);
-  if (res != resGO)
-    res= resSTACK_OV;
-  (*sp)= (PC >> 8) & 0xff; // push high byte
+  sp= sfr->wadd(SP, 1);
+  //proc_write_sp(sp);
+  stck= iram->get_cell(sp);
+  stck->write((PC >> 8) & 0xff); // push high byte
   if (addr)
     PC= addr;
   else
     PC= h*256 + l;
-  return(res);
+  return(resGO);
 }
 
 
@@ -185,12 +178,16 @@ t_uc51::inst_lcall(uchar code, uint addr)
 int
 t_uc51::inst_jb_bit_addr(uchar code)
 {
-  uchar *addr, bitaddr, jaddr;
+  uchar bitaddr, jaddr;
+  t_addr a;
+  t_mem m;
 
-  addr= get_bit(bitaddr= fetch(), &event_at.ri, &event_at.rs);
+  class cl_mem *mem;
+  if ((mem= bit2mem(bitaddr= fetch(), &a, &m)) == 0)
+    return(resBITADDR);
   tick(1);
   jaddr= fetch();
-  if (read(addr) & BIT_MASK(bitaddr))
+  if (mem->read(a) & m)
     PC= (PC + (signed char)jaddr) & (EROM_SIZE-1);
   return(resGO);
 }
@@ -205,28 +202,21 @@ t_uc51::inst_jb_bit_addr(uchar code)
 int
 t_uc51::inst_ret(uchar code)
 {
-  uchar h, l, *sp, *aof_SP;
-  int res;
+  uchar h= 0, l= 0;
+  t_mem sp;
+  class cl_cell *stck;
 
-  aof_SP= &((sfr->umem8)[SP]);
-  sp= get_indirect(*aof_SP/*sfr->get(SP)*/, &res);
-  if (res != resGO)
-    res= resSTACK_OV;
-  h= *sp;
-  //MEM(MEM_SFR)[SP]--;
-  (*aof_SP)--;
-  proc_write_sp(*aof_SP);
+  sp= sfr->read(SP);
+  stck= iram->get_cell(sp);
+  h= stck->read();
+  sp= sfr->wadd(SP, -1);
   tick(1);
 
-  sp= get_indirect(*aof_SP/*sfr->get(SP)*/, &res);
-  if (res != resGO)
-    res= resSTACK_OV;
-  l= *sp;
-  //MEM(MEM_SFR)[SP]--;
-  (*aof_SP)--;
-  proc_write_sp(*aof_SP);
+  stck= iram->get_cell(sp);
+  l= stck->read();
+  sp= sfr->wadd(SP, -1);
   PC= h*256 + l;
-  return(res);
+  return(resGO);
 }
 
 
@@ -239,12 +229,16 @@ t_uc51::inst_ret(uchar code)
 int
 t_uc51::inst_jnb_bit_addr(uchar code)
 {
-  uchar *addr, bitaddr, jaddr;
+  uchar bitaddr, jaddr;
+  t_mem m;
+  t_addr a;
+  class cl_mem *mem;
 
-  addr= get_bit(bitaddr= fetch(), &event_at.ri, &event_at.rs);
+  if ((mem= bit2mem(bitaddr= fetch(), &a, &m)) == 0)
+    return(resBITADDR);
   tick(1);
   jaddr= fetch();
-  if (!(read(addr) & BIT_MASK(bitaddr)))
+  if (!(mem->read(a) & m))
     PC= (PC + (signed char)jaddr) & (get_mem_size(MEM_ROM)-1);
   return(resGO);
 }
@@ -259,29 +253,22 @@ t_uc51::inst_jnb_bit_addr(uchar code)
 int
 t_uc51::inst_reti(uchar code)
 {
-  uchar h, l, *sp, *aof_SP;
-  int res;
+  uchar h= 0, l= 0;
+  t_mem sp;
+  class cl_cell *stck;
 
-  aof_SP= &((sfr->umem8)[SP]);
-  sp= get_indirect(*aof_SP/*sfr->get(SP)*/, &res);
-  if (res != resGO)
-    res= resSTACK_OV;
-  h= *sp;
-  //MEM(MEM_SFR)[SP]--;
-  (*aof_SP)--;
-  proc_write_sp(*aof_SP);
+  sp= sfr->read(SP);
+  stck= iram->get_cell(sp);
+  h= stck->read();
+  sp= sfr->wadd(SP, -1);
   tick(1);
 
-  sp= get_indirect(*aof_SP/*sfr->get(SP)*/, &res);
-  if (res != resGO)
-    res= resSTACK_OV;
-  l= *sp;
-  //MEM(MEM_SFR)[SP]--;
-  (*aof_SP)--;
-  proc_write_sp(*aof_SP);
+  stck= iram->get_cell(sp);
+  l= stck->read();
+  sp= sfr->wadd(SP, -1);
   PC= h*256 + l;
 
-  was_reti= DD_TRUE;
+  interrupt->was_reti= DD_TRUE;
   class it_level *il= (class it_level *)(it_levels->top());
   if (il &&
       il->level >= 0)
@@ -289,7 +276,7 @@ t_uc51::inst_reti(uchar code)
       il= (class it_level *)(it_levels->pop());
       delete il;
     }
-  return(res);
+  return(resGO);
 }
 
 
@@ -306,9 +293,8 @@ t_uc51::inst_jc_addr(uchar code)
 
   jaddr= fetch();
   tick(1);
-  if (GET_C)
+  if (SFR_GET_C)
     PC= (PC + (signed char)jaddr) & (EROM_SIZE-1);
-  event_at.rs= PSW;
   return(resGO);
 }
 
@@ -326,9 +312,8 @@ t_uc51::inst_jnc_addr(uchar code)
 
   jaddr= fetch();
   tick(1);
-  if (!GET_C)
+  if (!SFR_GET_C)
     PC= (PC + (signed char)jaddr) & (EROM_SIZE-1);
-  event_at.rs= ACC;
   return(resGO);
 }
 
@@ -346,7 +331,7 @@ t_uc51::inst_jz_addr(uchar code)
 
   jaddr= fetch();
   tick(1);
-  if (!sfr->get(ACC))
+  if (!acc->read())
     PC= (PC + (signed char)jaddr) & (EROM_SIZE-1);
   return(resGO);
 }
@@ -365,7 +350,7 @@ t_uc51::inst_jnz_addr(uchar code)
 
   jaddr= fetch();
   tick(1);
-  if (sfr->get(ACC))
+  if (acc->read())
     PC= (PC + (signed char)jaddr) & (EROM_SIZE-1);
   return(resGO);
 }
@@ -380,8 +365,7 @@ t_uc51::inst_jnz_addr(uchar code)
 int
 t_uc51::inst_jmp_$a_dptr(uchar code)
 {
-  PC= (sfr->get(DPH)*256 + sfr->get(DPL) +
-       read_mem(MEM_SFR, ACC)) &
+  PC= (sfr->read(DPH)*256 + sfr->read(DPL) + acc->read()) &
     (EROM_SIZE - 1);
   tick(1);
   return(resGO);
@@ -398,6 +382,7 @@ int
 t_uc51::inst_sjmp(uchar code)
 {
   signed char target= fetch();
+
   PC= (PC + target) & (EROM_SIZE -1);
   tick(1);
   return(resGO);
@@ -413,13 +398,13 @@ t_uc51::inst_sjmp(uchar code)
 int
 t_uc51::inst_cjne_a_$data_addr(uchar code)
 {
-  uchar data, jaddr;
+  uchar data, jaddr, ac;
 
   data = fetch();
   jaddr= fetch();
   tick(1);
-  SET_C(sfr->get(ACC) < data);
-  if (read_mem(MEM_SFR, event_at.rs= ACC) != data)
+  SFR_SET_C((ac= acc->read()) < data);
+  if (ac != data)
     PC= (PC + (signed char)jaddr) & (EROM_SIZE - 1);
   return(resGO);
 }
@@ -434,14 +419,16 @@ t_uc51::inst_cjne_a_$data_addr(uchar code)
 int
 t_uc51::inst_cjne_a_addr_addr(uchar code)
 {
-  uchar data, *addr, jaddr;
+  uchar data, jaddr;
+  t_addr a;
+  class cl_cell *cell;
 
-  addr = get_direct(fetch(), &event_at.ri, &event_at.rs);
+  cell= get_direct(a= fetch());
   jaddr= fetch();
   tick(1);
-  data= read(addr);
-  SET_C(sfr->get(ACC) < data);
-  if (sfr->get(event_at.rs= ACC) != data)
+  data= cell->read();
+  SFR_SET_C(acc->get() < data);
+  if (acc->read() != data)
     PC= (PC + (signed char)jaddr) & (EROM_SIZE - 1);
   return(resGO);
 }
@@ -456,17 +443,18 @@ t_uc51::inst_cjne_a_addr_addr(uchar code)
 int
 t_uc51::inst_cjne_$ri_$data_addr(uchar code)
 {
-  uchar *addr, data, jaddr;
-  int res;
+  uchar data, jaddr;
+  class cl_cell *cell;
 
-  addr = get_indirect(event_at.ri= *(get_reg(code & 0x01)), &res);
+  cell= iram->get_cell(get_reg(code & 0x01)->read());
   data = fetch();
   jaddr= fetch();
   tick(1);
-  SET_C(*addr < data);
-  if (*addr != data)
+  t_mem d;
+  SFR_SET_C((d= cell->read()) < data);
+  if (d != data)
     PC= (PC + (signed char)jaddr) & (EROM_SIZE - 1);
-  return(res);
+  return(resGO);
 }
 
 
@@ -479,14 +467,16 @@ t_uc51::inst_cjne_$ri_$data_addr(uchar code)
 int
 t_uc51::inst_cjne_rn_$data_addr(uchar code)
 {
-  uchar *reg, data, jaddr;
+  uchar data, jaddr;
+  class cl_cell *reg;
 
-  reg  = get_reg(code & 0x07, &event_at.ri);
+  reg  = get_reg(code & 0x07);
   data = fetch();
   jaddr= fetch();
   tick(1);
-  SET_C(*reg < data);
-  if (*reg != data)
+  t_mem r;
+  SFR_SET_C((r= reg->read()) < data);
+  if (r != data)
     PC= (PC + (signed char)jaddr) & (EROM_SIZE - 1);
   return(resGO);
 }
@@ -501,12 +491,15 @@ t_uc51::inst_cjne_rn_$data_addr(uchar code)
 int
 t_uc51::inst_djnz_addr_addr(uchar code)
 {
-  uchar *addr, jaddr;
-  
-  addr = get_direct(fetch(), &event_at.wi, &event_at.ws);
+  uchar jaddr;
+  class cl_cell *cell;
+
+  cell = get_direct(fetch());
   jaddr= fetch();
   tick(1);
-  if (--(*addr))
+  t_mem d= cell->read(HW_PORT);//cell->wadd(-1);
+  d= cell->write(d-1);
+  if (d)
     PC= (PC + (signed char)jaddr) & (EROM_SIZE-1);
   return(resGO);
 }
@@ -521,12 +514,14 @@ t_uc51::inst_djnz_addr_addr(uchar code)
 int
 t_uc51::inst_djnz_rn_addr(uchar code)
 {
-  uchar *reg, jaddr;
-  
-  reg  = get_reg(code & 0x07, &event_at.wi);
+  uchar jaddr;
+  class cl_cell *reg;
+
+  reg  = get_reg(code & 0x07);
   jaddr= fetch();
   tick(1);
-  if (--(*reg))
+  t_mem r= reg->wadd(-1);
+  if (r)
     PC= (PC + (signed char)jaddr) & (EROM_SIZE-1);
   return(resGO);
 }

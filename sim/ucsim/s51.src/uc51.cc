@@ -53,6 +53,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "serialcl.h"
 #include "portcl.h"
 #include "interruptcl.h"
+#include "types51.h"
 
 
 /*
@@ -62,9 +63,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 t_uc51::t_uc51(int Itype, int Itech, class cl_sim *asim):
   cl_uc(asim)
 {
-  int i;
+  //int i;
+  /*
   struct termios tattr;
-  
+  */  
   type= Itype;
   technology= Itech;
 
@@ -76,6 +78,7 @@ t_uc51::t_uc51(int Itype, int Itech, class cl_sim *asim):
   options->add(new cl_cons_debug_opt(asim->app, "debug",
 				     "Debug messages appears on this console."));
 
+  /*
   serial_in = (FILE*)asim->app->args->get_parg(0, "Ser_in");
   serial_out= (FILE*)asim->app->args->get_parg(0, "Ser_out");
   if (serial_in)
@@ -128,21 +131,22 @@ t_uc51::t_uc51(int Itype, int Itech, class cl_sim *asim):
 	fprintf(stderr, "Warning: serial output interface connected to a "
 		"non-terminal file.\n");
     }
+  */
 
-  for (i= 0; i < 4; i++)
-    port_pins[i]= 0xff;
-  it_sources->add(new cl_it_src(bmEX0, TCON, bmIE0, 0x0003, true,
-				"external #0"));
-  it_sources->add(new cl_it_src(bmET0, TCON, bmTF0, 0x000b, true,
-				"timer #0"));
-  it_sources->add(new cl_it_src(bmEX1, TCON, bmIE1, 0x0013, true,
-				"external #1"));
-  it_sources->add(new cl_it_src(bmET1, TCON, bmTF1, 0x001b, true,
-				"timer #1"));
-  it_sources->add(new cl_it_src(bmES , SCON, bmTI , 0x0023, false,
+  /*for (i= 0; i < 4; i++)
+    port_pins[i]= 0xff;*/
+  /*it_sources->add(new cl_it_src(bmEX0, TCON, bmIE0, 0x0003, true,
+    "external #0"));*/
+  /*it_sources->add(new cl_it_src(bmET0, TCON, bmTF0, 0x000b, true,
+    "timer #0"));*/
+  /*it_sources->add(new cl_it_src(bmEX1, TCON, bmIE1, 0x0013, true,
+    "external #1"));*/
+  /*it_sources->add(new cl_it_src(bmET1, TCON, bmTF1, 0x001b, true,
+    "timer #1"));*/
+  /*it_sources->add(new cl_it_src(bmES , SCON, bmTI , 0x0023, false,
 				"serial transmit"));
   it_sources->add(new cl_it_src(bmES , SCON, bmRI , 0x0023, false,
-				"serial receive"));
+  "serial receive"));*/
 }
 
 
@@ -178,9 +182,12 @@ t_uc51::mk_hw_elements(void)
 {
   class cl_hw *h;
 
-  hws->add(h= new cl_timer0(this));
+  acc= sfr->get_cell(ACC);
+  psw= sfr->get_cell(PSW);
+
+  hws->add(h= new cl_timer0(this, 0, "timer0"));
   h->init();
-  hws->add(h= new cl_timer1(this));
+  hws->add(h= new cl_timer1(this, 1, "timer1"));
   h->init();
   hws->add(h= new cl_serial(this));
   h->init();
@@ -192,8 +199,14 @@ t_uc51::mk_hw_elements(void)
   h->init();
   hws->add(h= new cl_port(this, 3));
   h->init();
-  hws->add(h= new cl_interrupt(this));
+  hws->add(interrupt= new cl_interrupt(this));
+  interrupt->init();
+  hws->add(h= new cl_uc51_dummy_hw(this));
   h->init();
+  /*
+  acc= sfr->get_cell(ACC);
+  psw= sfr->get_cell(PSW);
+  */
 }
 
 class cl_mem *
@@ -214,6 +227,7 @@ t_uc51::mk_mem(enum mem_class type, char *class_name)
 
 t_uc51::~t_uc51(void)
 {
+  /*
   if (serial_out)
     {
       if (isatty(fileno(serial_out)))
@@ -226,6 +240,7 @@ t_uc51::~t_uc51(void)
 	tcsetattr(fileno(serial_in), TCSANOW, &saved_attributes_in);
       fclose(serial_in);
     }
+  */
 }
 
 
@@ -280,56 +295,59 @@ t_uc51::disass(t_addr addr, char *sep)
 	  switch (*(b++))
 	    {
 	    case 'A': // absolute address
-	      sprintf(temp, "%04lx",
-		      (addr&0xf800)|
-		      (((code>>5)&0x07)*256 +
-		       get_mem(MEM_ROM, addr+1)));
+	      sprintf(temp, "%04"_A_"x",
+		      t_addr((addr&0xf800)|
+			     (((code>>5)&0x07)*256 +
+			      get_mem(MEM_ROM, addr+1))));
 	      break;
 	    case 'l': // long address
-	      sprintf(temp, "%04lx",
-		      get_mem(MEM_ROM, addr+1)*256 + get_mem(MEM_ROM, addr+2));
+	      sprintf(temp, "%04"_A_"x",
+		      t_addr(get_mem(MEM_ROM, addr+1)*256 +
+			     get_mem(MEM_ROM, addr+2)));
 	      break;
 	    case 'a': // addr8 (direct address) at 2nd byte
  	      if (!get_name(get_mem(MEM_ROM, addr+1), sfr_tbl(), temp))
-		sprintf(temp, "%02lx", get_mem(MEM_ROM, addr+1));
+		sprintf(temp, "%02"_M_"x", get_mem(MEM_ROM, addr+1));
 	      break;
 	    case '8': // addr8 (direct address) at 3rd byte
  	      if (!get_name(get_mem(MEM_ROM, addr+2), sfr_tbl(), temp))
-		sprintf(temp, "%02lx", get_mem(MEM_ROM, addr+1));
-	      sprintf(temp, "%02lx", get_mem(MEM_ROM, addr+2));
+		sprintf(temp, "%02"_M_"x", get_mem(MEM_ROM, addr+1));
+	      sprintf(temp, "%02"_M_"x", get_mem(MEM_ROM, addr+2));
 	      break;
 	    case 'b': // bitaddr at 2nd byte
-	      if (get_name(get_mem(MEM_ROM, addr+1), bit_tbl(), temp))
-		break;
-	      if (get_name(get_bitidx(get_mem(MEM_ROM, addr+1)),
-			   sfr_tbl(), temp))
-		{
-		  strcat(temp, ".");
-		  sprintf(c, "%1ld", get_mem(MEM_ROM, addr+1)&0x07);
-		  strcat(temp, c);
+	      {
+		t_addr ba= get_mem(MEM_ROM, addr+1);
+		if (get_name(ba, bit_tbl(), temp))
 		  break;
-		}
-	      sprintf(temp, "%02x.%ld",
-		      get_bitidx(get_mem(MEM_ROM, addr+1)),
-		      get_mem(MEM_ROM, addr+1)&0x07);
-	      break;
+		if (get_name((ba<128)?((ba/8)+32):(ba&0xf8), sfr_tbl(), temp))
+		  {
+		    strcat(temp, ".");
+		    sprintf(c, "%1"_M_"d", ba & 0x07);
+		    strcat(temp, c);
+		    break;
+		  }
+		sprintf(temp, "%02x.%"_M_"d", (ba<128)?((ba/8)+32):(ba&0xf8),
+			ba & 0x07);
+		break;
+	      }
 	    case 'r': // rel8 address at 2nd byte
-	      sprintf(temp, "%04lx",
-		      addr+2+(signed char)(get_mem(MEM_ROM, addr+1)));
+	      sprintf(temp, "%04"_A_"x",
+		      t_addr(addr+2+(signed char)(get_mem(MEM_ROM, addr+1))));
 	      break;
 	    case 'R': // rel8 address at 3rd byte
-	      sprintf(temp, "%04lx",
-		      addr+3+(signed char)(get_mem(MEM_ROM, addr+2)));
+	      sprintf(temp, "%04"_A_"x",
+		      t_addr(addr+3+(signed char)(get_mem(MEM_ROM, addr+2))));
 	      break;
 	    case 'd': // data8 at 2nd byte
-	      sprintf(temp, "%02lx", get_mem(MEM_ROM, addr+1));
+	      sprintf(temp, "%02"_M_"x", get_mem(MEM_ROM, addr+1));
 	      break;
 	    case 'D': // data8 at 3rd byte
-	      sprintf(temp, "%02lx", get_mem(MEM_ROM, addr+2));
+	      sprintf(temp, "%02"_M_"x", get_mem(MEM_ROM, addr+2));
 	      break;
 	    case '6': // data16 at 2nd(H)-3rd(L) byte
-	      sprintf(temp, "%04lx",
-		      get_mem(MEM_ROM, addr+1)*256 + get_mem(MEM_ROM, addr+2));
+	      sprintf(temp, "%04"_A_"x",
+		      t_addr(get_mem(MEM_ROM, addr+1)*256 +
+			     get_mem(MEM_ROM, addr+2)));
 	      break;
 	    default:
 	      strcpy(temp, "?");
@@ -376,54 +394,59 @@ t_uc51::print_regs(class cl_console *con)
   t_addr start;
   uchar data;
 
-  start= sfr->get(PSW) & 0x18;
+  start= psw->get() & 0x18;
   //dump_memory(iram, &start, start+7, 8, /*sim->cmd_out()*/con, sim);
   iram->dump(start, start+7, 8, con);
-  start= sfr->get(PSW) & 0x18;
+  start= psw->get() & 0x18;
   data= iram->get(iram->get(start));
   con->dd_printf("%06x %02x %c",
-		 iram->get(start), data, isprint(data)?data:'.');
+	      iram->get(start), data, isprint(data)?data:'.');
 
-  con->dd_printf("  ACC= 0x%02x %3d %c  B= 0x%02x",
-		 sfr->get(ACC), sfr->get(ACC),
-		 isprint(sfr->get(ACC))?(sfr->get(ACC)):'.', sfr->get(B)); 
+  con->dd_printf("  ACC= 0x%02x %3d %c  B= 0x%02x", sfr->get(ACC), sfr->get(ACC),
+	      isprint(sfr->get(ACC))?(sfr->get(ACC)):'.', sfr->get(B)); 
   eram2xram();
   data= get_mem(MEM_XRAM, sfr->get(DPH)*256+sfr->get(DPL));
   con->dd_printf("   DPTR= 0x%02x%02x @DPTR= 0x%02x %3d %c\n", sfr->get(DPH),
-		 sfr->get(DPL), data, data, isprint(data)?data:'.');
+	      sfr->get(DPL), data, data, isprint(data)?data:'.');
 
   data= iram->get(iram->get(start+1));
   con->dd_printf("%06x %02x %c", iram->get(start+1), data,
-		 isprint(data)?data:'.');
-  data= sfr->get(PSW);
+	      isprint(data)?data:'.');
+  data= psw->get();
   con->dd_printf("  PSW= 0x%02x CY=%c AC=%c OV=%c P=%c\n", data,
-		 (data&bmCY)?'1':'0', (data&bmAC)?'1':'0',
-		 (data&bmOV)?'1':'0', (data&bmP)?'1':'0');
+	      (data&bmCY)?'1':'0', (data&bmAC)?'1':'0',
+	      (data&bmOV)?'1':'0', (data&bmP)?'1':'0');
 
   print_disass(PC, con);
 }
 
 
-bool
-t_uc51::extract_bit_address(t_addr bit_address,
-			    class cl_mem **mem,
-			    t_addr *mem_addr,
-			    t_mem *bit_mask)
+/*
+ * Converting bit address into real memory
+ */
+
+class cl_mem *
+t_uc51::bit2mem(t_addr bitaddr, t_addr *memaddr, t_mem *bitmask)
 {
-  if (mem)
-    *mem= sfr;
-  if (bit_address > 0xff)
-    return(DD_FALSE);
-  if (bit_mask)
-    *bit_mask= 1 << (bit_address % 8);
-  if (mem_addr)
+  class cl_mem *m;
+  t_addr ma;
+
+  bitaddr&= 0xff;
+  if (bitaddr < 128)
     {
-      if (bit_address < 0x80)
-	*mem_addr= bit_address/8 + 0x20;
-      else
-	*mem_addr= bit_address & 0xf8;
+      m= iram;
+      ma= bitaddr/8 + 0x20;
     }
-  return(DD_TRUE);
+  else
+    {
+      m= sfr;
+      ma= bitaddr & 0xf8;
+    }
+  if (memaddr)
+    *memaddr= ma;
+  if (bitmask)
+    *bitmask= 1 << (bitaddr & 0x7);
+  return(m);
 }
 
 
@@ -440,18 +463,7 @@ t_uc51::reset(void)
 
   result= resGO;
 
-  was_reti= DD_FALSE;
-
-  s_tr_t1    = 0;
-  s_rec_t1   = 0;
-  s_tr_tick  = 0;
-  s_rec_tick = 0;
-  s_in       = 0;
-  s_out      = 0;
-  s_sending  = DD_FALSE;
-  s_receiving= DD_FALSE;
-  s_rec_bit  = 0;
-  s_tr_bit   = 0;
+  //was_reti= DD_FALSE;
 }
 
 
@@ -466,13 +478,13 @@ t_uc51::clear_sfr(void)
   
   for (i= 0; i < SFR_SIZE; i++)
     sfr->set(i, 0);
-  sfr->set(P0, 0xff);
-  sfr->set(P1, 0xff);
-  sfr->set(P2, 0xff);
-  sfr->set(P3, 0xff);
-  sfr->set(SP, 7);
-  prev_p1= port_pins[1] & sfr->get(P1);
-  prev_p3= port_pins[3] & sfr->get(P3);
+  sfr->/*set*/write(P0, 0xff);
+  sfr->/*set*/write(P1, 0xff);
+  sfr->/*set*/write(P2, 0xff);
+  sfr->/*set*/write(P3, 0xff);
+  sfr->/*set*/write(SP, 7);
+  prev_p1= /*port_pins[1] &*/ sfr->/*get*/read(P1);
+  prev_p3= /*port_pins[3] &*/ sfr->/*get*/read(P3);
 }
 
 
@@ -545,17 +557,21 @@ t_uc51::analyze(t_addr addr)
  * Inform hardware elements that `cycles' machine cycles have elapsed
  */
 
-int
+/*int
+t_uc51::tick_hw(int cycles)
+{
+  cl_uc::tick_hw(cycles);
+  //do_hardware(cycles);
+  return(0);
+}*/
+
+/*int
 t_uc51::tick(int cycles)
 {
-  int l;
-
   cl_uc::tick(cycles);
-  do_hardware(cycles);
-  s_tr_tick+= (l= cycles * clock_per_cycle());
-  s_rec_tick+= l;
+  //do_hardware(cycles);
   return(0);
-}
+}*/
 
 
 /*
@@ -565,35 +581,13 @@ t_uc51::tick(int cycles)
  * or an SFR.
  */
 
-uchar *
-t_uc51::get_direct(t_mem addr, t_addr *ev_i, t_addr *ev_s)
+class cl_cell *
+t_uc51::get_direct(t_mem addr)
 {
   if (addr < SFR_START)
-    {
-      return(&(iram->umem8[*ev_i= addr]));
-      //return(&(MEM(MEM_IRAM)[*ev_i= addr]));
-    }
+    return(iram->get_cell(addr));
   else
-    {
-      return(&(sfr->umem8[*ev_s= addr]));
-      //return(&(MEM(MEM_SFR)[*ev_s= addr]));
-    }
-}
-
-/*
- * Calculating address of indirectly addressed IRAM cell
- * If CPU is 8051 and addr is over 127, it must be illegal!
- */
-
-uchar *
-t_uc51::get_indirect(uchar addr, int *res)
-{
-  if (addr >= SFR_START)
-    *res= resINV_ADDR;
-  else
-    *res= resGO;
-  return(&(iram->umem8[addr]));
-  //return(&(MEM(MEM_IRAM)[addr]));
+    return(sfr->get_cell(addr));
 }
 
 
@@ -601,115 +595,11 @@ t_uc51::get_indirect(uchar addr, int *res)
  * Calculating address of specified register cell in IRAM
  */
 
-uchar *
+class cl_cell *
 t_uc51::get_reg(uchar regnum)
 {
-  return(&(iram->umem8[(sfr->get(PSW) & (bmRS0|bmRS1)) |
-		      (regnum & 0x07)]));
-  //return(&(MEM(MEM_IRAM)[(sfr->get(PSW) & (bmRS0|bmRS1)) |
-  //		(regnum & 0x07)]));
-}
-
-uchar *
-t_uc51::get_reg(uchar regnum, t_addr *event)
-{
-  return(&(iram->umem8[*event= (sfr->get(PSW) & (bmRS0|bmRS1)) |
-		      (regnum & 0x07)]));
-  //return(&(MEM(MEM_IRAM)[*event= (sfr->get(PSW) & (bmRS0|bmRS1)) |
-  //		(regnum & 0x07)]));
-}
-
-
-/*
- * Calculating address of IRAM or SFR cell which contains addressed bit
- * Next function returns index of cell which contains addressed bit.
- */
-
-uchar *
-t_uc51::get_bit(uchar bitaddr)
-{
-  if (bitaddr < 128)
-    {
-      return(&(iram->umem8[(bitaddr/8)+32]));
-      //return(&(MEM(MEM_IRAM)[(bitaddr/8)+32]));
-    }
-  return(&(iram->umem8[bitaddr & 0xf8]));
-  //return(&(MEM(MEM_SFR)[bitaddr & 0xf8]));
-}
-
-uchar *
-t_uc51::get_bit(uchar bitaddr, t_addr *ev_i, t_addr *ev_s)
-{
-  if (bitaddr < 128)
-    {
-      return(&(iram->umem8[*ev_i= (bitaddr/8)+32]));
-      //return(&(MEM(MEM_IRAM)[*ev_i= (bitaddr/8)+32]));
-    }
-  return(&(sfr->umem8[*ev_s= bitaddr & 0xf8]));
-  //return(&(MEM(MEM_SFR)[*ev_s= bitaddr & 0xf8]));
-}
-
-uchar
-t_uc51::get_bitidx(uchar bitaddr)
-{
-  if (bitaddr < 128)
-    return((bitaddr/8)+32);
-  return(bitaddr & 0xf8);
-}
-
-
-/*
- * Processing write operation to IRAM
- *
- * It starts serial transmition if address is in SFR and it is
- * SBUF. Effect on IE is also checked.
- */
-
-void
-t_uc51::proc_write(uchar *addr)
-{
-  if (addr == &((sfr->umem8)[SBUF]))
-    {
-      s_out= sfr->get(SBUF);
-      s_sending= DD_TRUE;
-      s_tr_bit = 0;
-      s_tr_tick= 0;
-      s_tr_t1  = 0;
-    }
-  if (addr == &((sfr->umem8)[IE]))
-    was_reti= DD_TRUE;
-}
-
-void
-t_uc51::proc_write_sp(uchar val)
-{
-  if (val > sp_max)
-    sp_max= val;
-  sp_avg= (sp_avg+val)/2;
-}
-
-
-/*
- * Reading IRAM or SFR, but if address points to a port, it reads
- * port pins instead of port latches
- */
-
-uchar
-t_uc51::read(uchar *addr)
-{
-  //if (addr == &(MEM(MEM_SFR)[P0]))
-  if (addr == &(sfr->umem8[P0]))
-    return(get_mem(MEM_SFR, P0) & port_pins[0]);
-  //if (addr == &(MEM(MEM_SFR)[P1]))
-  if (addr == &(sfr->umem8[P1]))
-    return(get_mem(MEM_SFR, P1) & port_pins[1]);
-  //if (addr == &(MEM(MEM_SFR)[P2]))
-  if (addr == &(sfr->umem8[P2]))
-    return(get_mem(MEM_SFR, P2) & port_pins[2]);
-  //if (addr == &(MEM(MEM_SFR)[P3]))
-  if (addr == &(sfr->umem8[P3]))
-    return(get_mem(MEM_SFR, P3) & port_pins[3]);
-  return(*addr);
+  t_addr a= (psw->get() & (bmRS0|bmRS1)) | (regnum & 0x07);
+  return(iram->get_cell(a));
 }
 
 
@@ -717,27 +607,17 @@ t_uc51::read(uchar *addr)
  * Fetching one instruction and executing it
  */
 
-void
-t_uc51::pre_inst(void)
-{
-  event_at.wi= (t_addr)-1;
-  event_at.ri= (t_addr)-1;
-  event_at.wx= (t_addr)-1;
-  event_at.rx= (t_addr)-1;
-  event_at.ws= (t_addr)-1;
-  event_at.rs= (t_addr)-1;
-  event_at.rc= (t_addr)-1;
-}
-
 int
 t_uc51::exec_inst(void)
 {
-  ulong code;
+  t_mem code;
   int res;
 
   //pr_inst();
+  instPC= PC;
   if (fetch(&code))
     return(resBREAKPOINT);
+  //tick_hw(1);
   tick(1);
   switch (code)
     {
@@ -904,12 +784,12 @@ t_uc51::do_inst(int step)
 	step--;
       if (state == stGO)
 	{
-	  was_reti= DD_FALSE;
+	  interrupt->was_reti= DD_FALSE;
 	  pre_inst();
 	  result= exec_inst();
 	  post_inst();
-	  if (result == resGO)
-	    result= check_events();
+	  /*if (result == resGO)
+	    result= check_events();*/
 	}
       else
 	{
@@ -957,35 +837,33 @@ t_uc51::do_inst(int step)
   return(result);
 }
 
-void
+/*void
 t_uc51::post_inst(void)
-{
-  uint tcon= sfr->get(TCON);
-  uint p3= sfr->get(P3);
+{*/
+  //uint tcon= sfr->get(TCON);
+  //uint p3= sfr->read(P3);
 
-  set_p_flag();
-
-  // Read of SBUF must be serial input data
-  sfr->set(SBUF, s_in);
+  //cl_uc::post_inst();
+  //set_p_flag();
 
   // Setting up external interrupt request bits (IEx)
-  if ((tcon & bmIT0))
+  /*if ((tcon & bmIT0))
     {
       // IE0 edge triggered
-      if ((prev_p3 & bm_INT0) &&
-	  !(p3 & port_pins[3] & bm_INT0))
-	// falling edge on INT0
+      if (p3_int0_edge)
 	{
+	  // falling edge on INT0
 	  sim->app->get_commander()->
 	    debug("%g sec (%d clks): Falling edge detected on INT0 (P3.2)\n",
 			  get_rtime(), ticks->ticks);
 	  sfr->set_bit1(TCON, bmIE0);
+	  p3_int0_edge= 0;
 	}
     }
   else
     {
       // IE0 level triggered
-      if (p3 & port_pins[3] & bm_INT0)
+      if (p3 & bm_INT0)
 	sfr->set_bit0(TCON, bmIE0);
       else
 	sfr->set_bit1(TCON, bmIE0);
@@ -993,413 +871,35 @@ t_uc51::post_inst(void)
   if ((tcon & bmIT1))
     {
       // IE1 edge triggered
-      if ((prev_p3 & bm_INT1) &&
-	  !(p3 & port_pins[3] & bm_INT1))
-	// falling edge on INT1
-	sfr->set_bit1(TCON, bmIE1);
+      if (p3_int1_edge)
+	{
+	  // falling edge on INT1
+	  sfr->set_bit1(TCON, bmIE1);
+	  p3_int1_edge= 0;
+	}
     }
   else
     {
       // IE1 level triggered
-      if (p3 & port_pins[3] & bm_INT1)
+      if (p3 & bm_INT1)
 	sfr->set_bit0(TCON, bmIE1);
       else
 	sfr->set_bit1(TCON, bmIE1);
-    }
-  prev_p3= p3 & port_pins[3];
-  prev_p1= p3 & port_pins[1];
-}
-
-
-/*
- * Setting up parity flag
- */
-
-void
-t_uc51::set_p_flag(void)
-{
-  bool p;
-  int i;
-  uchar uc;
-
-  p = DD_FALSE;
-  uc= sfr->get(ACC);
-  for (i= 0; i < 8; i++)
-    {
-      if (uc & 1)
-	p= !p;
-      uc>>= 1;
-    }
-  SET_BIT(p, PSW, bmP);
-}
-
-/*
- * Simulating hardware elements
- */
-
-int
-t_uc51::do_hardware(int cycles)
-{
-  int res;
-
-  if ((res= do_timers(cycles)) != resGO)
-    return(res);
-  if ((res= do_serial(cycles)) != resGO)
-    return(res);
-  return(do_wdt(cycles));
-}
-
-
-/*
- *
- */
-
-int
-t_uc51::serial_bit_cnt(int mode)
-{
-  int /*mode,*/ divby= 12;
-  int *tr_src= 0, *rec_src= 0;
-
-  //mode= sfr->get(SCON) >> 6;
-  switch (mode)
-    {
-    case 0:
-      divby  = 12;
-      tr_src = &s_tr_tick;
-      rec_src= &s_rec_tick;
-      break;
-    case 1:
-    case 3:
-      divby  = (sfr->get(PCON)&bmSMOD)?16:32;
-      tr_src = &s_tr_t1;
-      rec_src= &s_rec_t1;
-      break;
-    case 2:
-      divby  = (sfr->get(PCON)&bmSMOD)?16:32;
-      tr_src = &s_tr_tick;
-      rec_src= &s_rec_tick;
-      break;
-    }
-  if (s_sending)
-    {
-      while (*tr_src >= divby)
-	{
-	  (*tr_src)-= divby;
-	  s_tr_bit++;
-	}
-    }
-  if (s_receiving)
-    {
-      while (*rec_src >= divby)
-	{
-	  (*rec_src)-= divby;
-	  s_rec_bit++;
-	}
-    }
-  return(0);
-}
-
-
-/*
- * Simulating serial line
- */
-
-int
-t_uc51::do_serial(int cycles)
-{
-  int mode, bits= 8;
-  char c;
-  uint scon= sfr->get(SCON);
-
-  mode= scon >> 6;
-  switch (mode)
-    {
-    case 0:
-      bits= 8;
-      break;
-    case 1:
-      bits= 10;
-      break;
-    case 2:
-    case 3:
-      bits= 11;
-      break;
-    }
-  serial_bit_cnt(mode);
-  if (s_sending &&
-      (s_tr_bit >= bits))
-    {
-      s_sending= DD_FALSE;
-      sfr->set_bit1(SCON, bmTI);
-      if (serial_out)
-	{
-	  putc(s_out, serial_out);
-	  fflush(serial_out);
-	}
-      s_tr_bit-= bits;
-    }
-  if ((scon & bmREN) &&
-      serial_in &&
-      !s_receiving)
-    {
-      fd_set set; static struct timeval timeout= {0,0};
-      FD_ZERO(&set);
-      FD_SET(fileno(serial_in), &set);
-      int i= select(fileno(serial_in)+1, &set, NULL, NULL, &timeout);
-      if (i > 0 &&
-      	  FD_ISSET(fileno(serial_in), &set))
-	{
-	  s_receiving= DD_TRUE;
-	  s_rec_bit= 0;
-	  s_rec_tick= s_rec_t1= 0;
-	}
-    }
-  if (s_receiving &&
-      (s_rec_bit >= bits))
-    {
-      if (::read(fileno(serial_in), &c, 1) == 1)
-	{
-	  s_in= c;
-	  sfr->set(SBUF, s_in);
-	  received(c);
-	}
-      s_receiving= DD_FALSE;
-      s_rec_bit-= bits;
-    }
-  return(resGO);
-}
-
-void
-t_uc51::received(int c)
-{
-  sfr->set_bit1(SCON, bmRI);
-}
-
-
-/*
- * Simulating timers
- */
-
-int
-t_uc51::do_timers(int cycles)
-{
-  int res;
-
-  if ((res= do_timer0(cycles)) != resGO)
-    return(res);
-  return(do_timer1(cycles));
-}
-
-
-/*
- * Simulating timer 0
- */
-
-int
-t_uc51::do_timer0(int cycles)
-{
-  uint tmod= sfr->get(TMOD);
-  uint tcon= sfr->get(TCON);
-  uint p3= sfr->get(P3);
-
-  if (((tmod & bmGATE0) &&
-       (p3 & port_pins[3] & bm_INT0)) ||
-      (tcon & bmTR0))
-    {
-      if (!(tmod & bmC_T0) ||
-	  ((prev_p3 & bmT0) &&
-	   !(p3 & port_pins[3] & bmT0)))
-	{
-	  if (!(tmod & bmM00) &&
-	      !(tmod & bmM10))
-	    {
-	      if (tmod & bmC_T0)
-		cycles= 1;
-	      while (cycles--)
-		{
-		  // mod 0, TH= 8 bit t/c, TL= 5 bit precounter
-		  //(MEM(MEM_SFR)[TL0])++;
-		  sfr->add(TL0, 1);
-		  if ((sfr->get(TL0) & 0x1f) == 0)
-		    {
-		      //sfr->set_bit0(TL0, ~0x1f);
-		      sfr->set(TL0, 0);
-		      if (!/*++(MEM(MEM_SFR)[TH0])*/sfr->add(TH0, 1))
-			{
-			  sfr->set_bit1(TCON, bmTF0);
-			  t0_overflow();
-			}
-		    }
-		}
-	    }
-	  else if ((tmod & bmM00) &&
-		   !(tmod & bmM10))
-	    {
-	      if (tmod & bmC_T0)
-		cycles= 1;
-	      while (cycles--)
-		{
-		  // mod 1 TH+TL= 16 bit t/c
-		  if (!/*++(MEM(MEM_SFR)[TL0])*/sfr->add(TL0, 1))
-		    {
-		      if (!/*++(MEM(MEM_SFR)[TH0])*/sfr->add(TH0, 1))
-			{
-			  sfr->set_bit1(TCON, bmTF0);
-			  t0_overflow();
-			}
-		    }
-		}
-	    }
-	  else if (!(tmod & bmM00) &&
-		   (tmod & bmM10))
-	    {
-	      if (tmod & bmC_T0)
-		cycles= 1;
-	      while (cycles--)
-		{
-		  // mod 2 TL= 8 bit t/c auto reload from TH
-		  if (!/*++(MEM(MEM_SFR)[TL0])*/sfr->add(TL0, 1))
-		    {
-		      sfr->set(TL0, sfr->get(TH0));
-		      sfr->set_bit1(TCON, bmTF0);
-		      t0_overflow();
-		    }
-		}
-	    }
-	  else
-	    {
-	      // mod 3 TL= 8 bit t/c
-	      //       TH= 8 bit timer controlled with T1's bits
-	      if (!/*++(MEM(MEM_SFR)[TL0])*/sfr->add(TL0, 1))
-		{
-		  sfr->set_bit1(TCON, bmTF0);
-		  t0_overflow();
-		}
-	    }
-	}
-    }
-  if ((tmod & bmM00) &&
-      (tmod & bmM10))
-    {
-      if (((tmod & bmGATE1) &&
-	   (p3 & port_pins[3] & bm_INT1)) ||
-	  (tcon & bmTR1))
-	{
-	  if (!/*++(MEM(MEM_SFR)[TH0])*/sfr->add(TH0, 1))
-	    {
-	      sfr->set_bit1(TCON, bmTF1);
-	      s_tr_t1++;
-	      s_rec_t1++;
-	      t0_overflow();
-	    }
-	}
-    }
-  return(resGO);
-}
-
-/*
- * Called every time when T0 overflows
- */
-
-int
-t_uc51::t0_overflow(void)
-{
-  return(0);
-}
-
-
-/*
- * Simulating timer 1
- */
-
-int
-t_uc51::do_timer1(int cycles)
-{
-  uint tmod= sfr->get(TMOD);
-  uint tcon= sfr->get(TCON);
-  uint p3= sfr->get(P3);
-
-  if (((tmod & bmGATE1) &&
-       (p3 & port_pins[3] & bm_INT1)) ||
-      (tcon & bmTR1))
-    {
-      if (!(tmod & bmC_T1) ||
-	  ((prev_p3 & bmT1) &&
-	   !(p3 & port_pins[3] & bmT1)))
-	{
-	  if (!(tmod & bmM01) &&
-	      !(tmod & bmM11))
-	    {
-	      if (tmod & bmC_T0)
-		cycles= 1;
-	      while (cycles--)
-		{
-		  // mod 0, TH= 8 bit t/c, TL= 5 bit precounter
-		  if (/*++(MEM(MEM_SFR)[TL1])*/(sfr->add(TL1, 1) & 0x1f) == 0)
-		    {
-		      //sfr->set_bit0(TL1, ~0x1f);
-		      sfr->set(TL1, 0);
-		      if (!/*++(MEM(MEM_SFR)[TH1])*/sfr->add(TH1, 1))
-			{
-			  sfr->set_bit1(TCON, bmTF1);
-			  s_tr_t1++;
-			  s_rec_t1++;
-			}
-		    }
-		}
-	    }
-	  else if ((tmod & bmM01) &&
-		   !(tmod & bmM11))
-	    {
-	      if (tmod & bmC_T0)
-		cycles= 1;
-	      while (cycles--)
-		{
-		  // mod 1 TH+TL= 16 bit t/c
-		  if (!/*++(MEM(MEM_SFR)[TL1])*/sfr->add(TL1, 1))
-		    if (!/*++(MEM(MEM_SFR)[TH1])*/sfr->add(TH1, 1))
-		      {
-			sfr->set_bit1(TCON, bmTF1);
-			s_tr_t1++;
-			s_rec_t1++;
-		      }
-		}
-	    }
-	  else if (!(tmod & bmM01) &&
-		   (tmod & bmM11))
-	    {
-	      if (tmod & bmC_T1)
-		cycles= 1;
-	      while (cycles--)
-		{
-		  // mod 2 TL= 8 bit t/c auto reload from TH
-		  if (!/*++(MEM(MEM_SFR)[TL1])*/sfr->add(TL1, 1))
-		    {
-		      sfr->set(TL1, sfr->get(TH1));
-		      sfr->set_bit1(TCON, bmTF1);
-		      s_tr_t1++;
-		      s_rec_t1++;
-		    }
-		}
-	    }
-	  else
-	    // mod 3 stop
-	    ;
-	}
-    }
-  return(resGO);
-}
+	}*/
+  //prev_p3= p3 & port_pins[3];
+  //prev_p1= p3 & port_pins[1];
+//}
 
 
 /*
  * Abstract method to handle WDT
  */
 
-int
+/*int
 t_uc51::do_wdt(int cycles)
 {
   return(resGO);
-}
+}*/
 
 
 /*
@@ -1411,9 +911,9 @@ t_uc51::do_interrupt(void)
 {
   int i, ie= 0;
 
-  if (was_reti)
+  if (interrupt->was_reti)
     {
-      was_reti= DD_FALSE;
+      interrupt->was_reti= DD_FALSE;
       return(resGO);
     }
   if (!((ie= sfr->get(IE)) & bmEA))
@@ -1434,7 +934,7 @@ t_uc51::do_interrupt(void)
 	    {
 	      state= stGO;
 	      sfr->set_bit0(PCON, bmIDL);
-	      was_reti= 1;
+	      interrupt->was_reti= DD_TRUE;
 	      return(resGO);
 	    }
 	  if (is->clr_bit)
@@ -1513,7 +1013,7 @@ t_uc51::idle_pd(void)
  * Checking if EVENT break happened
  */
 
-int
+/*int
 t_uc51::check_events(void)
 {
   int i;
@@ -1528,6 +1028,22 @@ t_uc51::check_events(void)
 	return(resBREAKPOINT);
     }
   return(resGO);
+}*/
+
+
+/*
+ */
+
+void
+t_uc51::mem_cell_changed(class cl_mem *mem, t_addr addr)
+{
+  if (mem == sfr)
+    switch (addr)
+      {
+      case ACC: acc= mem->get_cell(ACC); break;
+      case PSW: psw= mem->get_cell(PSW); break;
+      }
+  cl_uc::mem_cell_changed(mem, addr);
 }
 
 
@@ -1567,9 +1083,7 @@ t_uc51::inst_nop(uchar code)
 int
 t_uc51::inst_clr_a(uchar code)
 {
-  ulong d= 0;
-
-  sfr->write(ACC, &d);
+  acc->write(0);
   return(resGO);
 }
 
@@ -1583,10 +1097,86 @@ t_uc51::inst_swap(uchar code)
 {
   uchar temp;
 
-  temp= (sfr->read(ACC) >> 4) & 0x0f;
-  sfr->set(ACC, (sfr->get(ACC) << 4) | temp);
+  temp= (acc->read() >> 4) & 0x0f;
+  sfr->write(ACC, (acc->get() << 4) | temp);
   return(resGO);
 }
+
+
+/*
+ */
+
+cl_uc51_dummy_hw::cl_uc51_dummy_hw(class cl_uc *auc):
+  cl_hw(auc, HW_DUMMY, 0, "_51_dummy")
+{
+  //uc51= (class t_uc51 *)uc;
+}
+
+int
+cl_uc51_dummy_hw::init(void)
+{
+  class cl_mem *sfr= uc->mem(MEM_SFR);
+  if (!sfr)
+    {
+      fprintf(stderr, "No SFR to register %s[%d] into\n", id_string, id);
+    }
+  //acc= sfr->register_hw(ACC, this, 0);
+  //sp = sfr->register_hw(SP , this, 0);
+  use_cell(sfr, PSW, &cell_psw, wtd_restore);
+  register_cell(sfr, ACC, &cell_acc, wtd_restore_write);
+  register_cell(sfr, SP , &cell_sp , wtd_restore);
+  return(0);
+}
+
+void
+cl_uc51_dummy_hw::write(class cl_cell *cell, t_mem *val)
+{
+  if (cell == cell_acc)
+    {
+      bool p;
+      int i;
+      uchar uc;
+
+      p = DD_FALSE;
+      uc= *val;
+      for (i= 0; i < 8; i++)
+	{
+	  if (uc & 1)
+	    p= !p;
+	  uc>>= 1;
+	}
+      if (p)
+	cell_psw->set_bit1(bmP);
+      else
+	cell_psw->set_bit0(bmP);
+    }
+  else if (cell == cell_sp)
+    {
+      if (*val > uc->sp_max)
+	uc->sp_max= *val;
+      uc->sp_avg= (uc->sp_avg+(*val))/2;
+    }
+}
+
+/*void
+cl_uc51_dummy_hw::happen(class cl_hw *where, enum hw_event he, void *params)
+{
+  struct ev_port_changed *ep= (struct ev_port_changed *)params;
+
+  if (where->cathegory == HW_PORT &&
+      he == EV_PORT_CHANGED &&
+      ep->id == 3)
+    {
+      t_mem p3o= ep->pins & ep->prev_value;
+      t_mem p3n= ep->new_pins & ep->new_value;
+      if ((p3o & bm_INT0) &&
+	  !(p3n & bm_INT0))
+	uc51->p3_int0_edge++;
+      if ((p3o & bm_INT1) &&
+	  !(p3n & bm_INT1))
+	uc51->p3_int1_edge++;
+    }
+}*/
 
 
 /* End of s51.src/uc51.cc */

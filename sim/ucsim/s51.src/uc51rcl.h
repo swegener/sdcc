@@ -36,30 +36,24 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 class t_uc51r: public t_uc52
 {
-protected:
+public:
   int   clock_out;
-  int   WDT; // If negative then WDT is disabled
-  uchar wdtrst;
 
 public:
   uchar ERAM[ERAM_SIZE];
 
 public:
   t_uc51r(int Itype, int Itech, class cl_sim *asim);
+  virtual void mk_hw_elements(void);
 
   virtual void reset(void);
 
   virtual void eram2xram(void);
   virtual void xram2eram(void);
 
-  virtual void proc_write(uchar *addr);
+  //virtual void proc_write(t_addr addr);
 
-  virtual int  do_timers(int cycles);
-  virtual int  do_timer2(int cycles);
-  virtual int  do_t2_clockout(int cycles);
-  virtual int  serial_bit_cnt(int mode);
   virtual void received(int c);
-  virtual int  do_wdt(int cycles);
 
   virtual int inst_movx_a_$dptr(uchar code);		/* e0 */
   virtual int inst_movx_a_$ri(uchar code);		/* e2,e3 */

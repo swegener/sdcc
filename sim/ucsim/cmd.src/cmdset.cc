@@ -86,15 +86,17 @@ COMMAND_DO_WORK_SIM(cl_run_cmd)
 	    }
 	  else
 	    {
-	      b= new cl_fetch_brk(sim->uc->make_new_brknr(), end,
+	      b= new cl_fetch_brk(sim->uc->mem(MEM_ROM),
+				  sim->uc->make_new_brknr(), end,
 				  brkDYNAMIC, 1);
 	      sim->uc->fbrk->add_bp(b);
 	    }
 	}
     }
   con->dd_printf("Simulation started, PC=0x%06x\n", sim->uc->PC);
-  if (sim->uc->fbrk_at(start))
+  if (sim->uc->fbrk_at(sim->uc->PC))
     sim->uc->do_inst(1);
+
   sim->start(con);
   return(DD_FALSE);
 }
@@ -126,7 +128,9 @@ COMMAND_DO_WORK_SIM(cl_stop_cmd)
 //		     class cl_cmdline *cmdline, class cl_console *con)
 COMMAND_DO_WORK_UC(cl_step_cmd)
 {
+  printf("step %x\n",uc->PC);
   uc->do_inst(1);
+  printf("step done %x\n",uc->PC);
   uc->print_regs(con);
   return(0);
 }
@@ -144,8 +148,11 @@ COMMAND_DO_WORK_SIM(cl_next_cmd)
 {
   class cl_brk *b;
   t_addr next;
-  struct dis_entry *de;
+  int branch;
+  int inst_len;
 
+#if 0
+  struct dis_entry *de;
   t_mem code= sim->uc->get_mem(MEM_ROM, sim->uc->PC);
   int i= 0;
   de= &(sim->uc->dis_tbl()[i]);
@@ -155,16 +162,28 @@ COMMAND_DO_WORK_SIM(cl_next_cmd)
       i++;
       de= &(sim->uc->dis_tbl()[i]);
     }
-  if ((de->branch == 'a') ||
-      (de->branch == 'l'))
+#endif
+
+  branch = sim->uc->inst_branch(sim->uc->PC);
+  inst_len = sim->uc->inst_length(sim->uc->PC);
+
+  if ((branch == 'a') || (branch == 'l'))
     {
-      next= sim->uc->PC + de->length;
+      next= sim->uc->PC + inst_len;
       if (!sim->uc->fbrk_at(next))
 	{
-	  b= new cl_fetch_brk(sim->uc->make_new_brknr(),
+	  b= new cl_fetch_brk(sim->uc->mem(MEM_ROM),
+			      sim->uc->make_new_brknr(),
 			      next, brkDYNAMIC, 1);
+
+	  b->init();
+//	  sim->uc->fbrk->add_bp(b);
+
 	  sim->uc->fbrk->add(b);
+	  b->activate();
 	}
+      if (sim->uc->fbrk_at(sim->uc->PC))
+	sim->uc->do_inst(1);
       sim->start(con);
       //sim->uc->do_inst(-1);
     }

@@ -183,7 +183,7 @@ cl_sim::stop(int reason)
 	  break;
 	case resINV_INST:
 	  cmd->frozen_console->dd_printf("Invalid instruction 0x%04x\n",
-					 uc->get_mem(MEM_ROM, uc->PC));
+				      uc->get_mem(MEM_ROM, uc->PC));
 	  break;
 	default:
 	  cmd->frozen_console->dd_printf("Unknown reason\n");
@@ -248,6 +248,20 @@ cl_sim::build_cmdset(class cl_cmdset *cmdset)
 "gui subcommand     Operations to support GUI tools",
 "long help of gui", cset));
   cmd->init();
+}
+
+
+/*
+ * Messages to broadcast
+ */
+
+void
+cl_sim::mem_cell_changed(class cl_mem *mem, t_addr addr)
+{
+  if (uc)
+    uc->mem_cell_changed(mem, addr);
+  else
+    printf("JAJ sim\n");
 }
 
 

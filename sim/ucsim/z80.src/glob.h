@@ -33,6 +33,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 extern struct dis_entry disass_z80[];
 
+extern struct dis_entry disass_z80_ed[];
+extern struct dis_entry disass_z80_cb[];
+extern struct dis_entry disass_z80_dd[];
+extern struct dis_entry disass_z80_fd[];
+extern struct dis_entry disass_z80_ddcb[];
+extern struct dis_entry disass_z80_fdcb[];
+
 
 #endif
 

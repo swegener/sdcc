@@ -130,7 +130,7 @@ get_name_entry(struct name_entry tabl[], char *name, class cl_uc *uc)
  * Interpreting a bitname
  */
 
-bool
+/*bool
 interpret_bitname(char *name, class cl_uc *uc,
 		  uchar **cell, uchar *celladdr,
 		  uchar *bitaddr, uchar *bitmask,
@@ -189,7 +189,8 @@ interpret_bitname(char *name, class cl_uc *uc,
 	*celladdr= (*bitaddr >> 3) + 0x20;
     }
   // *bitaddr, *celladdr now OK
-  *cell= uc->get_bit/*FIXME*/(*bitaddr);
+  *cell= uc->get_bit//FIXME
+    (*bitaddr);
   *bitmask= BIT_MASK(*bitaddr);
   // making symbolic name
   if (!symname)
@@ -221,7 +222,7 @@ interpret_bitname(char *name, class cl_uc *uc,
   strcat(sym, bitnumstr);
   *symname= sym;
   return(DD_TRUE);
-}
+}*/
 
 
 /*

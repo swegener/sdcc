@@ -121,7 +121,7 @@ cl_avr::reti(t_mem code)
   PC= a % rom->size;
   t_mem sreg= ram->read(SREG);
   sreg|= BIT_I;
-  ram->write(SREG, &sreg);
+  ram->write(SREG, sreg);
   tick(3);
   return(resGO);
 }

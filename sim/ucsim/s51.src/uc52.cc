@@ -42,11 +42,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 t_uc52::t_uc52(int Itype, int Itech, class cl_sim *asim):
   t_uc51(Itype, Itech, asim)
 {
-  it_sources->add(new cl_it_src(bmET2, T2CON, bmTF2, 0x002b, false,
-				"timer #2 TF2"));
-  exf2it= new cl_it_src(bmET2, T2CON, bmEXF2, 0x002b, false,
+  /*it_sources->add(new cl_it_src(bmET2, T2CON, bmTF2, 0x002b, false,
+    "timer #2 TF2"));*/
+  /*exf2it= new cl_it_src(bmET2, T2CON, bmEXF2, 0x002b, false,
 			"timer #2 EXF2");
-  it_sources->add(exf2it);
+			it_sources->add(exf2it);*/
 }
 
 
@@ -56,8 +56,20 @@ t_uc52::mk_hw_elements(void)
   class cl_hw *h;
 
   t_uc51::mk_hw_elements();
-  hws->add(h= new cl_timer2(this));
+  hws->add(h= new cl_timer2(this, 2, "timer2", t2_default|t2_down));
   h->init();
+}
+
+
+t_addr
+t_uc52::get_mem_size(enum mem_class type)
+{
+  switch (type)
+    {
+    case MEM_IRAM: return(0x100);
+    default: return(t_uc51::get_mem_size(type));
+    }
+  return(0);
 }
 
 
@@ -69,11 +81,11 @@ t_uc52::mk_hw_elements(void)
  *
  */
 
-uchar *
+class cl_cell *
 t_uc52::get_indirect(uchar addr, int *res)
 {
   *res= resGO;
-  return(&(/*MEM(MEM_IRAM)*/iram->umem8[addr]));
+  return(iram->get_cell(addr));
 }
 
 
@@ -85,22 +97,18 @@ t_uc52::get_indirect(uchar addr, int *res)
  *
  */
 
-int
-t_uc52::do_timers(int cycles)
+/*void
+t_uc52::do_extra_hw(int cycles)
 {
-  int res;
-
-  if ((res= t_uc51::do_timers(cycles)) != resGO)
-    return(res);
-  return(do_timer2(cycles));
-}
+  do_timer2(cycles);
+}*/
 
 
 /*
  * Simulating timer 2
  */
 
-int
+/*int
 t_uc52::do_timer2(int cycles)
 {
   bool nocount= DD_FALSE;
@@ -108,13 +116,13 @@ t_uc52::do_timer2(int cycles)
 
   exf2it->activate();
   if (!(t2con & bmTR2))
-    /* Timer OFF */
+    // Timer OFF
     return(resGO);
 
   if (t2con & (bmRCLK | bmTCLK))
     return(do_t2_baud(cycles));
 
-  /* Determining nr of input clocks */
+  // Determining nr of input clocks
   if (!(t2con & bmTR2))
     nocount= DD_TRUE; // Timer OFF
   else
@@ -122,12 +130,12 @@ t_uc52::do_timer2(int cycles)
       {
 	// Counter mode, falling edge on P1.0 (T2)
 	if ((prev_p1 & bmT2) &&
-	    !(get_mem(MEM_SFR, P1) & port_pins[1] & bmT2))
+	    !(sfr->read(P1) & bmT2))
 	  cycles= 1;
 	else
 	  nocount= DD_TRUE;
       }
-  /* Counting */
+  // Counting
   while (cycles--)
     {
       if (t2con & bmCP_RL2)
@@ -137,28 +145,28 @@ t_uc52::do_timer2(int cycles)
     }// while cycles
   
   return(resGO);
-}
+}*/
 
 
 /*
  * Baud rate generator mode of Timer #2
  */
 
-int
+/*int
 t_uc52::do_t2_baud(int cycles)
 {
-  uint t2con= get_mem(MEM_SFR, T2CON);
-  uint p1= get_mem(MEM_SFR, P1);
+  t_mem t2con= sfr->get(T2CON);
+  //uint p1= get_mem(MEM_SFR, P1);
 
-  /* Baud Rate Generator */
+  // Baud Rate Generator
   if ((prev_p1 & bmT2EX) &&
-      !(p1 & port_pins[1] & bmT2EX) &&
+      !(sfr->read(P1) & bmT2EX) &&
       (t2con & bmEXEN2))
     mem(MEM_SFR)->set_bit1(T2CON, bmEXF2);
   if (t2con & bmC_T2)
     {
       if ((prev_p1 & bmT2) &&
-	  !(p1 & port_pins[1] & bmT2))
+	  !(sfr->read(P1) & bmT2))
 	cycles= 1;
       else
 	cycles= 0;
@@ -168,107 +176,101 @@ t_uc52::do_t2_baud(int cycles)
   if (t2con & bmTR2)
     while (cycles--)
       {
-	if (!/*++(MEM(MEM_SFR)[TL2])*/sfr->add(TL2, 1))
-	  if (!/*++(MEM(MEM_SFR)[TH2])*/sfr->add(TH2, 1))
+	if (!sfr->add(TL2, 1))
+	  if (!sfr->add(TH2, 1))
 	    {
-	      //MEM(MEM_SFR)[TH2]= MEM(MEM_SFR)[RCAP2H];
 	      sfr->set(TH2, sfr->get(RCAP2H));
-	      //MEM(MEM_SFR)[TL2]= MEM(MEM_SFR)[RCAP2L];
 	      sfr->set(TL2, sfr->get(RCAP2L));
 	      s_rec_t2++;
 	      s_tr_t2++;
 	    }
       }
   return(resGO);
-}
+}*/
 
 
 /*
  * Capture function of Timer #2
  */
 
-void
+/*void
 t_uc52::do_t2_capture(int *cycles, bool nocount)
 {
-  uint p1= get_mem(MEM_SFR, P1);
-  uint t2con= get_mem(MEM_SFR, T2CON);
+  //uint p1= get_mem(MEM_SFR, P1);
+  t_mem t2con= sfr->get(T2CON);
 
-  /* Capture mode */
+  // Capture mode
   if (nocount)
     *cycles= 0;
   else
     {
-      if (!/*++(MEM(MEM_SFR)[TL2])*/sfr->add(TL2, 1))
+      if (!sfr->add(TL2, 1))
 	{
-	  if (!/*++(MEM(MEM_SFR)[TH2])*/sfr->add(TH2, 1))
+	  if (!sfr->add(TH2, 1))
 	    mem(MEM_SFR)->set_bit1(T2CON, bmTF2);
 	}
     }
   // capture
   if ((prev_p1 & bmT2EX) &&
-      !(p1 & port_pins[1] & bmT2EX) &&
+      !(sfr->read(P1) & bmT2EX) &&
       (t2con & bmEXEN2))
     {
-      //MEM(MEM_SFR)[RCAP2H]= MEM(MEM_SFR)[TH2];
       sfr->set(RCAP2H, sfr->get(TH2));
-      //MEM(MEM_SFR)[RCAP2L]= MEM(MEM_SFR)[TL2];
       sfr->set(RCAP2L, sfr->get(TL2));
       mem(MEM_SFR)->set_bit1(T2CON, bmEXF2);
       prev_p1&= ~bmT2EX; // Falling edge has been handled
     }
-}
+}*/
 
 
 /*
  * Auto Reload mode of Timer #2, counting UP
  */
 
-void
+/*void
 t_uc52::do_t2_reload(int *cycles, bool nocount)
 {
   int overflow;
   bool ext2= 0;
   
-  /* Auto-Relode mode */
+  // Auto-Relode mode
   overflow= 0;
   if (nocount)
     *cycles= 0;
   else
     {
-      if (!/*++(MEM(MEM_SFR)[TL2])*/sfr->add(TL2, 1))
+      if (!sfr->add(TL2, 1))
 	{
-	  if (!/*++(MEM(MEM_SFR)[TH2])*/sfr->add(TH2, 1))
+	  if (!sfr->add(TH2, 1))
 	    {
-	      mem(MEM_SFR)->set_bit1(T2CON, bmTF2);
+	      sfr->set_bit1(T2CON, bmTF2);
 	      overflow++;
 	    }
 	}
     }
   // reload
   if ((prev_p1 & bmT2EX) &&
-      !(get_mem(MEM_SFR, P1) & port_pins[1] & bmT2EX) &&
-      (get_mem(MEM_SFR, T2CON) & bmEXEN2))
+      !(sfr->read(P1) & bmT2EX) &&
+      (sfr->get(T2CON) & bmEXEN2))
     {
       ext2= DD_TRUE;
-      mem(MEM_SFR)->set_bit1(T2CON, bmEXF2);
+      sfr->set_bit1(T2CON, bmEXF2);
       prev_p1&= ~bmT2EX; // Falling edge has been handled
     }
   if (overflow ||
       ext2)
     {
-      //MEM(MEM_SFR)[TH2]= MEM(MEM_SFR)[RCAP2H];
       sfr->set(TH2, sfr->get(RCAP2H));
-      //MEM(MEM_SFR)[TL2]= MEM(MEM_SFR)[RCAP2L];
       sfr->set(TL2, sfr->get(RCAP2L));
     }
-}
+}*/
 
 
 /*
  *
  */
 
-int
+/*int
 t_uc52::serial_bit_cnt(int mode)
 {
   int divby= 12;
@@ -308,9 +310,9 @@ t_uc52::serial_bit_cnt(int mode)
 	  (*rec_src)-= divby;
 	  s_rec_bit++;
 	}
-    }
+	}
   return(0);
-}
+}*/
 
 
 /* End of s51.src/uc52.cc */

@@ -28,6 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ddconfig.h"
 
 #include <stdio.h>
+#include <ctype.h>
 
 #include "pobjcl.h"
 #include "brkcl.h"
@@ -37,9 +38,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * Base object of breakpoints
  */
 
-cl_brk::cl_brk(int inr, t_addr iaddr, enum brk_perm iperm, int ihit):
+cl_brk::cl_brk(class cl_mem *imem, int inr, t_addr iaddr,
+	       enum brk_perm iperm, int ihit):
   cl_base()
 {
+  mem  = imem;
   nr   = inr;
   addr = iaddr;
   perm = iperm;
@@ -49,6 +52,20 @@ cl_brk::cl_brk(int inr, t_addr iaddr, enum brk_perm iperm, int ihit):
 
 cl_brk::~cl_brk(void)
 {}
+
+void
+cl_brk::activate(void)
+{
+  if (mem)
+    mem->set_brk(addr, this);
+}
+
+void
+cl_brk::inactivate(void)
+{
+  if (mem)
+    mem->del_brk(addr, this);
+}
 
 bool
 cl_brk::do_hit(void)
@@ -67,8 +84,9 @@ cl_brk::do_hit(void)
  * FETCH type of breakpoint
  */
 
-cl_fetch_brk::cl_fetch_brk(int inr, t_addr iaddr, enum brk_perm iperm, int ihit):
-  cl_brk(inr, iaddr, iperm, ihit)
+cl_fetch_brk::cl_fetch_brk(class cl_mem *imem, int inr, t_addr iaddr,
+			   enum brk_perm iperm, int ihit):
+  cl_brk(imem, inr, iaddr, iperm, ihit)
 {
   code = 0;
 }
@@ -84,12 +102,36 @@ cl_fetch_brk::type(void)
  * Base of EVENT type of breakpoints
  */
 
-cl_ev_brk::cl_ev_brk(int inr, t_addr iaddr, enum brk_perm iperm, int ihit,
+cl_ev_brk::cl_ev_brk(class cl_mem *imem, int inr, t_addr iaddr,
+		     enum brk_perm iperm, int ihit,
 		     enum brk_event ievent, const char *iid):
-  cl_brk(inr, iaddr, iperm, ihit)
+  cl_brk(imem, inr, iaddr, iperm, ihit)
 {
   event= ievent;
   id   = iid;
+  mem  = imem;
+}
+
+cl_ev_brk::cl_ev_brk(class cl_mem *imem, int inr, t_addr iaddr,
+		     enum brk_perm iperm, int ihit, char op):
+  cl_brk(imem, inr, iaddr, iperm, ihit)
+{
+  mem  = imem;
+  if ((op= toupper(op)) == 'R')
+    {
+      event= brkREAD;
+      id= "read";
+    }
+  else if (op == 'W')
+    {
+      event= brkWRITE;
+      id= "write";
+    }
+  else
+    {
+      event= brkACCESS;
+      id= "access";
+    }
 }
 
 enum brk_type
@@ -109,105 +151,112 @@ cl_ev_brk::match(struct event_rec *ev)
  * WRITE IRAM type of EVENT breakpoints
  */
 
-cl_wi_brk::cl_wi_brk(int inr, t_addr iaddr, enum brk_perm iperm, int ihit):
-  cl_ev_brk(inr, iaddr, iperm, ihit, brkWIRAM, "wi")
+/*cl_wi_brk::cl_wi_brk(class cl_mem *imem, int inr, t_addr iaddr,
+		     enum brk_perm iperm, int ihit):
+  cl_ev_brk(imem, inr, iaddr, iperm, ihit, brkWIRAM, "wi")
 {}
 
 bool
 cl_wi_brk::match(struct event_rec *ev)
 {
   return(ev->wi == addr);
-}
+}*/
 
 
 /*
  * READ IRAM type of EVENT breakpoints
  */
 
-cl_ri_brk::cl_ri_brk(int inr, t_addr iaddr, enum brk_perm iperm, int ihit):
-  cl_ev_brk(inr, iaddr, iperm, ihit, brkRIRAM, "ri")
+/*cl_ri_brk::cl_ri_brk(class cl_mem *imem, int inr, t_addr iaddr,
+		     enum brk_perm iperm, int ihit):
+  cl_ev_brk(imem, inr, iaddr, iperm, ihit, brkRIRAM, "ri")
 {}
 
 bool
 cl_ri_brk::match(struct event_rec *ev)
 {
   return(ev->ri == addr);
-}
+}*/
 
 
 /*
  * WRITE XRAM type of EVENT breakpoints
  */
 
-cl_wx_brk::cl_wx_brk(int inr, t_addr iaddr, enum brk_perm iperm, int ihit):
-  cl_ev_brk(inr, iaddr, iperm, ihit, brkWXRAM, "wx")
+/*cl_wx_brk::cl_wx_brk(class cl_mem *imem, int inr, t_addr iaddr,
+		     enum brk_perm iperm, int ihit):
+  cl_ev_brk(imem, inr, iaddr, iperm, ihit, brkWXRAM, "wx")
 {}
 
 bool
 cl_wx_brk::match(struct event_rec *ev)
 {
   return(ev->wx == addr);
-}
+}*/
 
 
 /*
  * READ XRAM type of EVENT breakpoints
  */
 
-cl_rx_brk::cl_rx_brk(int inr, t_addr iaddr, enum brk_perm iperm, int ihit):
-  cl_ev_brk(inr, iaddr, iperm, ihit, brkRXRAM, "rx")
+/*cl_rx_brk::cl_rx_brk(class cl_mem *imem, int inr, t_addr iaddr,
+		     enum brk_perm iperm, int ihit):
+  cl_ev_brk(imem, inr, iaddr, iperm, ihit, brkRXRAM, "rx")
 {}
 
 bool
 cl_rx_brk::match(struct event_rec *ev)
 {
   return(ev->rx == addr);
-}
+}*/
 
 
 /*
  * WRITE SFR type of EVENT breakpoints
  */
 
-cl_ws_brk::cl_ws_brk(int inr, t_addr iaddr, enum brk_perm iperm, int ihit):
-  cl_ev_brk(inr, iaddr, iperm, ihit, brkWSFR, "ws")
+/*cl_ws_brk::cl_ws_brk(class cl_mem *imem, int inr, t_addr iaddr,
+		     enum brk_perm iperm, int ihit):
+  cl_ev_brk(imem, inr, iaddr, iperm, ihit, brkWSFR, "ws")
 {}
 
 bool
 cl_ws_brk::match(struct event_rec *ev)
 {
   return(ev->ws == addr);
-}
+}*/
 
 
 /*
  * READ SFR type of EVENT breakpoints
  */
 
-cl_rs_brk::cl_rs_brk(int inr, t_addr iaddr, enum brk_perm iperm, int ihit):
-  cl_ev_brk(inr, iaddr, iperm, ihit, brkRSFR, "rs")
+/*cl_rs_brk::cl_rs_brk(class cl_mem *imem, int inr, t_addr iaddr,
+		     enum brk_perm iperm, int ihit):
+  cl_ev_brk(imem, inr, iaddr, iperm, ihit, brkRSFR, "rs")
 {}
 
 bool
 cl_rs_brk::match(struct event_rec *ev)
 {
   return(ev->rs == addr);
-}
+}*/
 
 
 /*
  * READ CODE type of EVENT breakpoints
  */
 
-cl_rc_brk::cl_rc_brk(int inr, t_addr iaddr, enum brk_perm iperm, int ihit):
-  cl_ev_brk(inr, iaddr, iperm, ihit, brkRCODE, "rc")
+/*cl_rc_brk::cl_rc_brk(class cl_mem *imem, int inr, t_addr iaddr,
+		     enum brk_perm iperm, int ihit):
+  cl_ev_brk(imem, inr, iaddr, iperm, ihit, brkRCODE, "rc")
 {}
 
 bool
 cl_rc_brk::match(struct event_rec *ev)
 {
   return(ev->rc == addr);
-}
+}*/
 
 
 /*
@@ -216,7 +265,7 @@ cl_rc_brk::match(struct event_rec *ev)
  * This is a sorted collection, sorted by nr field of brk items.
  */
 
-brk_coll::brk_coll(t_index alimit, t_index adelta, class cl_rom *arom):
+brk_coll::brk_coll(t_index alimit, t_index adelta, class cl_mem *arom):
   cl_sorted_list(alimit, adelta)
 {
   rom= arom;
@@ -280,21 +329,45 @@ void
 brk_coll::add_bp(class cl_brk *bp)
 {
   add(bp);
-  if (rom &&
+  bp->activate();
+  return;
+  /*if (rom &&
       bp->addr < rom->size)
-    rom->bp_map->set(bp->addr);
+      / *rom->bp_map->set(bp->addr)* /rom->set_brk(bp->addr, bp);*/
 }
 
 void
 brk_coll::del_bp(t_addr addr)
 {
   int idx;
+  class cl_brk *bp;
 
-  if (get_bp(addr, &idx))
-    free_at(idx);
-  if (rom &&
+  if ((bp= get_bp(addr, &idx)))
+    {
+      bp->inactivate();
+      free_at(idx);
+    }
+  return;
+  /*if (rom &&
       addr < rom->size)
-    rom->bp_map->clear(addr);
+    {
+      fprintf(stderr, "brk_coll::del_bp(0x%"_A_"x\n", addr);//FIXME
+      //rom->bp_map->clear(addr);
+      }*/
+}
+
+void
+brk_coll::del_bp(t_index idx, int /*dummy*/)
+{
+  class cl_brk *bp;
+
+  if (idx >= count)
+    return;
+  bp= (class cl_brk *)(at(idx));
+  if (!bp)
+    return;
+  bp->inactivate();
+  free_at(idx);
 }
 
 class cl_brk *
@@ -302,7 +375,8 @@ brk_coll::get_bp(t_addr addr, int *idx)
 {
   if (rom &&
       addr < rom->size &&
-      rom->bp_map->get(addr))
+      /*rom->bp_map->get(addr)*/
+      rom->get_cell_flag(addr,  CELL_FETCH_BRK))
     {
       for (*idx= 0; *idx < count; (*idx)++)
 	{
@@ -333,7 +407,8 @@ brk_coll::bp_at(t_addr addr)
 {
   return(rom &&
 	 addr < rom->size &&
-	 rom->bp_map->get(addr));
+	 /*rom->bp_map->get(addr)*/
+	 rom->get_cell_flag(addr, CELL_FETCH_BRK));
 }
 
 

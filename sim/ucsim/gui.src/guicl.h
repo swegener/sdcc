@@ -47,7 +47,7 @@ public:
   class cl_list *ifs;
 public:
   cl_gui(class cl_sim *asim);
-  ~cl_gui(void);
+  virtual ~cl_gui(void);
   
   virtual class cl_gui_if *if_by_obj(class cl_guiobj *o);
 };

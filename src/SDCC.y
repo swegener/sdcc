@@ -179,7 +179,6 @@ function_attributes
                         $$ = newLink() ;
                         $$->class = SPECIFIER   ;
 			FUNC_REGBANK($$) = (int) floatFromVal($2);
-                        //FUNC_RBANK($$) = 1;
                      }
    |  REENTRANT      {  $$ = newLink ();
                         $$->class = SPECIFIER   ;
@@ -880,7 +879,7 @@ declarator
 declarator2_function_attributes
    : declarator2		  { $$ = $1 ; } 
    | declarator2 function_attribute  { 
-       // do the functionAttributes (not the args and hasVargs !!)
+       // copy the functionAttributes (not the args and hasVargs !!)
        sym_link *funcType=$1->etype;
        struct value *args=FUNC_ARGS(funcType);
        unsigned hasVargs=FUNC_HASVARARGS(funcType);
@@ -1003,7 +1002,8 @@ pointer
 		     DCL_TYPE($3) = EEPPOINTER;
 		     break;
 		 default:
-		     werror(W_PTR_TYPE_INVALID);
+		   // this could be just "constant" 
+		   // werror(W_PTR_TYPE_INVALID);
 		 }
 	     }
 	     else 

@@ -81,7 +81,7 @@ SDCC Compiler User Guide
 
 
 \size normal 
-SDCC 2.3.8
+SDCC 2.4.0
 \size footnotesize 
 
 \newline 
@@ -4228,7 +4228,7 @@ objdump
 \end_inset 
 
 ).
- Both formats are documented in the the documentation of srecord
+ Both formats are documented in the documentation of srecord
 \begin_inset LatexCommand \index{srecord (tool)}
 
 \end_inset 
@@ -4237,7 +4237,7 @@ objdump
 \layout Itemize
 
 sourcefile.adb
-\begin_inset LatexCommand \index{.adb}
+\begin_inset LatexCommand \index{<file>.adb}
 
 \end_inset 
 
@@ -4487,7 +4487,7 @@ first
  file specified in the command line, since the linkage editor processes
  file in the order they are presented to it.
  The linker is invoked from SDCC using a script file with extension .lnk
-\begin_inset LatexCommand \index{.lnk}
+\begin_inset LatexCommand \index{<file>.lnk}
 
 \end_inset 
 
@@ -4509,7 +4509,7 @@ Some reusable routines may be compiled into a library, see the documentation
  for how to create a 
 \emph on 
 .lib
-\begin_inset LatexCommand \index{.lib}
+\begin_inset LatexCommand \index{<file>.lib}
 
 \end_inset 
 
@@ -10888,7 +10888,7 @@ unsigned char head,tail;
 \newline 
 
 \newline 
-#if USE_ASSEMBLY
+#if !USE_ASSEMBLY
 \newline 
 
 \newline 
@@ -12194,8 +12194,8 @@ For signed & unsigned int (16 bit) and long (32 bit) variables, division,
 \begin_inset  Tabular
 <lyxtabular version="3" rows="11" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -12488,8 +12488,8 @@ SDCC supports IEEE (single precision 4 bytes) floating point numbers.The
 \begin_inset  Tabular
 <lyxtabular version="3" rows="17" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -13811,8 +13811,8 @@ The compiler creates the following #defines
 \begin_inset  Tabular
 <lyxtabular version="3" rows="10" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -14183,7 +14183,17 @@ The \SpecialChar \-
 debug option must be specified for all files for which debug information
  is to be generated.
  The complier generates a .adb file for each of these files.
- The linker creates the .cdb file from the .adb files and the address information.
+ The linker creates the .cdb
+\begin_inset LatexCommand \index{<file>.cdb}
+
+\end_inset 
+
+ file from the .adb
+\begin_inset LatexCommand \index{<file>.adb}
+
+\end_inset 
+
+ files and the address information.
  This .cdb is used by the debugger.
 \layout Section
 
@@ -15886,7 +15896,7 @@ Documentation
 \begin_inset  Tabular
 <lyxtabular version="3" rows="10" columns="2">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="0(null)">
+<column alignment="left" valignment="top" leftline="true" width="0">
 <column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -16138,7 +16148,7 @@ Related open source tools
 \align center 
 
 \begin_inset  Tabular
-<lyxtabular version="3" rows="10" columns="3">
+<lyxtabular version="3" rows="11" columns="3">
 <features>
 <column alignment="center" valignment="top" leftline="true" width="0pt">
 <column alignment="block" valignment="top" leftline="true" width="30line%">
@@ -16176,7 +16186,7 @@ Where to get
 \layout Standard
 
 gpsim
-\begin_inset LatexCommand \index{gpsim (PIC simulator)}
+\begin_inset LatexCommand \index{gpsim (pic simulator)}
 
 \end_inset 
 
@@ -16198,6 +16208,42 @@ PIC simulator
 
 
 \begin_inset LatexCommand \url{http://www.dattalo.com/gnupic/gpsim.html}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+gputils
+\begin_inset LatexCommand \index{gputils (pic tools)}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+GNU PIC utilities
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset LatexCommand \url{http://gputils.sourceforge.net/}
 
 \end_inset 
 
@@ -16497,7 +16543,7 @@ Related documentation / recommended reading
 \align center 
 
 \begin_inset  Tabular
-<lyxtabular version="3" rows="4" columns="3">
+<lyxtabular version="3" rows="6" columns="3">
 <features>
 <column alignment="center" valignment="top" leftline="true" width="0pt">
 <column alignment="block" valignment="top" leftline="true" width="30line%">
@@ -16604,6 +16650,56 @@ C-FAQ-list
 \end_inset 
 </cell>
 </row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Latest datasheet of the target CPU
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+vendor
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Revision history of datasheet
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+vendor
+\end_inset 
+</cell>
+</row>
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -16674,9 +16770,9 @@ if you're the project manager, marketing department and maybe even the customer
 
 is the project done if you think it is done? Or is just that other interface/pro
 tocol/feature/configuration/option missing? How about website, manual(s),
- internationalization, packaging, labels, electromagnetic compatability/interfer
-ence, documentation for production, production test software, update mechanism,
- patent issues?
+ internationali(z|s)ation, packaging, labels, 2nd source for components,
+ electromagnetic compatability/interference, documentation for production,
+ production test software, update mechanism, patent issues?
 \layout Itemize
 
 is your project adequately positioned in that magic triangle: fame, fortune,
@@ -19350,7 +19446,12 @@ Linking and assembling
 \bar default 
 
 \newline 
-For assembling you can use either GPUTILS' gpasm.exe or MPLAB's mpasmwin.exe.
+For assembling you can use either GPUTILS'
+\begin_inset LatexCommand \index{gputils (pic tools)}
+
+\end_inset 
+
+ gpasm.exe or MPLAB's mpasmwin.exe.
  For linking you can use either GPUTIL's gplink or MPLAB's mplink.exe.
  If you use MPLAB and an interrupt function then the linker script file
  vectors section will need to be enlarged to link with mplink.

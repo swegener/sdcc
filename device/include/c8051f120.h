@@ -21,186 +21,188 @@
 #ifndef C8051F120_H
 #define C8051F120_H
 
+
 /*  BYTE Registers  */
 
 /*  All Pages */
-sfr at 0x80 P0       ;	/* PORT 0                                        */
-sfr at 0x81 SP       ;	/* STACK POINTER                                 */
-sfr at 0x82 DPL      ;	/* DATA POINTER - LOW BYTE                       */
-sfr at 0x83 DPH      ;	/* DATA POINTER - HIGH BYTE                      */
-sfr at 0x84 SFRPAGE  ;	/* SFR PAGE SELECT                               */
-sfr at 0x85 SFRNEXT  ;	/* SFR STACK NEXT PAGE                           */
-sfr at 0x86 SFRLAST  ;	/* SFR STACK LAST PAGE                           */
-sfr at 0x87 PCON     ;	/* POWER CONTROL                                 */
-sfr at 0x90 P1       ;	/* PORT 1                                        */
-sfr at 0xA0 P2       ;	/* PORT 2                                        */
-sfr at 0xA8 IE       ;	/* INTERRUPT ENABLE                              */
-sfr at 0xB0 P3       ;	/* PORT 3                                        */
-sfr at 0xB1 PSBANK   ;	/* FLASH BANK SELECT                             */
-sfr at 0xB8 IP       ;	/* INTERRUPT PRIORITY                            */
-sfr at 0xD0 PSW      ;	/* PROGRAM STATUS WORD                           */
-sfr at 0xE0 ACC      ;	/* ACCUMULATOR                                   */
-sfr at 0xE6 EIE1     ;	/* EXTERNAL INTERRUPT ENABLE 1                   */
-sfr at 0xE7 EIE2     ;	/* EXTERNAL INTERRUPT ENABLE 2                   */
-sfr at 0xF0 B        ;	/* B REGISTER                                    */
-sfr at 0xF6 EIP1     ;	/* EXTERNAL INTERRUPT PRIORITY REGISTER 1        */
-sfr at 0xF7 EIP2     ;	/* EXTERNAL INTERRUPT PRIORITY REGISTER 2        */
-sfr at 0xFF WDTCN    ;	/* WATCHDOG TIMER CONTROL                        */
+sfr at 0x80 P0       ;  /* PORT 0                                        */
+sfr at 0x81 SP       ;  /* STACK POINTER                                 */
+sfr at 0x82 DPL      ;  /* DATA POINTER - LOW BYTE                       */
+sfr at 0x83 DPH      ;  /* DATA POINTER - HIGH BYTE                      */
+sfr at 0x84 SFRPAGE  ;  /* SFR PAGE SELECT                               */
+sfr at 0x85 SFRNEXT  ;  /* SFR STACK NEXT PAGE                           */
+sfr at 0x86 SFRLAST  ;  /* SFR STACK LAST PAGE                           */
+sfr at 0x87 PCON     ;  /* POWER CONTROL                                 */
+sfr at 0x90 P1       ;  /* PORT 1                                        */
+sfr at 0xA0 P2       ;  /* PORT 2                                        */
+sfr at 0xA8 IE       ;  /* INTERRUPT ENABLE                              */
+sfr at 0xB0 P3       ;  /* PORT 3                                        */
+sfr at 0xB1 PSBANK   ;  /* FLASH BANK SELECT                             */
+sfr at 0xB8 IP       ;  /* INTERRUPT PRIORITY                            */
+sfr at 0xD0 PSW      ;  /* PROGRAM STATUS WORD                           */
+sfr at 0xE0 ACC      ;  /* ACCUMULATOR                                   */
+sfr at 0xE6 EIE1     ;  /* EXTERNAL INTERRUPT ENABLE 1                   */
+sfr at 0xE7 EIE2     ;  /* EXTERNAL INTERRUPT ENABLE 2                   */
+sfr at 0xF0 B        ;  /* B REGISTER                                    */
+sfr at 0xF6 EIP1     ;  /* EXTERNAL INTERRUPT PRIORITY REGISTER 1        */
+sfr at 0xF7 EIP2     ;  /* EXTERNAL INTERRUPT PRIORITY REGISTER 2        */
+sfr at 0xFF WDTCN    ;  /* WATCHDOG TIMER CONTROL                        */
 
 /*  Page 0x00 */
-sfr at 0x88 TCON     ;	/* TIMER CONTROL                                 */
-sfr at 0x89 TMOD     ;	/* TIMER MODE                                    */
-sfr at 0x8A TL0      ;	/* TIMER 0 - LOW BYTE                            */
-sfr at 0x8B TL1      ;	/* TIMER 1 - LOW BYTE                            */
-sfr at 0x8C TH0      ;	/* TIMER 0 - HIGH BYTE                           */
-sfr at 0x8D TH1      ;	/* TIMER 1 - HIGH BYTE                           */
-sfr at 0x8E CKCON    ;	/* TIMER 0/1 CLOCK CONTROL                       */
-sfr at 0x8F PSCTL    ;	/* FLASH WRITE/ERASE CONTROL                     */
-sfr at 0x91 SSTA0    ;	/* UART 0 STATUS                                 */
-sfr at 0x98 SCON0    ;	/* UART 0 CONTROL                                */
-sfr at 0x98 SCON     ;	/* UART 0 CONTROL                                */
-sfr at 0x99 SBUF0    ;	/* UART 0 BUFFER                                 */
-sfr at 0x99 SBUF     ;	/* UART 0 BUFFER                                 */
-sfr at 0x9A SPI0CFG  ;	/* SPI 0 CONFIGURATION                           */
-sfr at 0x9B SPI0DAT  ;	/* SPI 0 DATA                                    */
-sfr at 0x9D SPI0CKR  ;	/* SPI 0 CLOCK RATE CONTROL                      */
-sfr at 0xA1 EMI0TC   ;	/* EMIF TIMING CONTROL                           */
-sfr at 0xA2 EMI0CN   ;	/* EMIF CONTROL                                  */
-sfr at 0xA3 EMI0CF   ;	/* EMIF CONFIGURATION                            */
-sfr at 0xA9 SADDR0   ;	/* UART 0 SLAVE ADDRESS                          */
-sfr at 0xB7 FLSCL    ;	/* FLASH SCALE                                   */
-sfr at 0xB9 SADEN0   ;	/* UART 0 SLAVE ADDRESS MASK                     */
-sfr at 0xBA AMX0CF   ;	/* ADC 0 MUX CONFIGURATION                       */
-sfr at 0xBB AMX0SL   ;	/* ADC 0 MUX CHANNEL SELECTION                   */
-sfr at 0xBC ADC0CF   ;	/* ADC 0 CONFIGURATION                           */
-sfr at 0xBE ADC0L    ;	/* ADC 0 DATA - LOW BYTE                         */
-sfr at 0xBF ADC0H    ;	/* ADC 0 DATA - HIGH BYTE                        */
-sfr at 0xC0 SMB0CN   ;	/* SMBUS 0 CONTROL                               */
-sfr at 0xC1 SMB0STA  ;	/* SMBUS 0 STATUS                                */
-sfr at 0xC2 SMB0DAT  ;	/* SMBUS 0 DATA                                  */
-sfr at 0xC3 SMB0ADR  ;	/* SMBUS 0 SLAVE ADDRESS                         */
-sfr at 0xC4 ADC0GTL  ;	/* ADC 0 GREATER-THAN REGISTER - LOW BYTE        */
-sfr at 0xC5 ADC0GTH  ;	/* ADC 0 GREATER-THAN REGISTER - HIGH BYTE       */
-sfr at 0xC6 ADC0LTL  ;	/* ADC 0 LESS-THAN REGISTER - LOW BYTE           */
-sfr at 0xC7 ADC0LTH  ;	/* ADC 0 LESS-THAN REGISTER - HIGH BYTE          */
-sfr at 0xC8 TMR2CN   ;	/* TIMER 2 CONTROL                               */
-sfr at 0xC9 TMR2CF   ;	/* TIMER 2 CONFIGURATION                         */
-sfr at 0xCA RCAP2L   ;	/* TIMER 2 CAPTURE REGISTER - LOW BYTE           */
-sfr at 0xCB RCAP2H   ;	/* TIMER 2 CAPTURE REGISTER - HIGH BYTE          */
-sfr at 0xCC TMR2L    ;	/* TIMER 2 - LOW BYTE                            */
-sfr at 0xCC TL2      ;	/* TIMER 2 - LOW BYTE                            */
-sfr at 0xCD TMR2H    ;	/* TIMER 2 - HIGH BYTE                           */
-sfr at 0xCD TH2      ;	/* TIMER 2 - HIGH BYTE                           */
-sfr at 0xCF SMB0CR   ;	/* SMBUS 0 CLOCK RATE                            */
-sfr at 0xD1 REF0CN   ;	/* VOLTAGE REFERENCE 0 CONTROL                   */
-sfr at 0xD2 DAC0L    ;	/* DAC 0 REGISTER - LOW BYTE                     */
-sfr at 0xD3 DAC0H    ;	/* DAC 0 REGISTER - HIGH BYTE                    */
-sfr at 0xD4 DAC0CN   ;	/* DAC 0 CONTROL                                 */
-sfr at 0xD8 PCA0CN   ;	/* PCA 0 COUNTER CONTROL                         */
-sfr at 0xD9 PCA0MD   ;	/* PCA 0 COUNTER MODE                            */
-sfr at 0xDA PCA0CPM0 ;	/* PCA 0 MODULE 0 CONTROL                        */
-sfr at 0xDB PCA0CPM1 ;	/* PCA 0 MODULE 1 CONTROL                        */
-sfr at 0xDC PCA0CPM2 ;	/* PCA 0 MODULE 2 CONTROL                        */
-sfr at 0xDD PCA0CPM3 ;	/* PCA 0 MODULE 3 CONTROL                        */
-sfr at 0xDE PCA0CPM4 ;	/* PCA 0 MODULE 4 CONTROL                        */
-sfr at 0xDF PCA0CPM5 ;	/* PCA 0 MODULE 5 CONTROL                        */
-sfr at 0xE1 PCA0CPL5 ;	/* PCA 0 MODULE 5 CAPTURE/COMPARE - LOW BYTE     */
-sfr at 0xE2 PCA0CPH5 ;	/* PCA 0 MODULE 5 CAPTURE/COMPARE - HIGH BYTE    */
-sfr at 0xE8 ADC0CN   ;	/* ADC 0 CONTROL                                 */
-sfr at 0xE9 PCA0CPL2 ;	/* PCA 0 MODULE 2 CAPTURE/COMPARE - LOW BYTE     */
-sfr at 0xEA PCA0CPH2 ;	/* PCA 0 MODULE 2 CAPTURE/COMPARE - HIGH BYTE    */
-sfr at 0xEB PCA0CPL3 ;	/* PCA 0 MODULE 3 CAPTURE/COMPARE - LOW BYTE     */
-sfr at 0xEC PCA0CPH3 ;	/* PCA 0 MODULE 3 CAPTURE/COMPARE - HIGH BYTE    */
-sfr at 0xED PCA0CPL4 ;	/* PCA 0 MODULE 4 CAPTURE/COMPARE - LOW BYTE     */
-sfr at 0xEE PCA0CPH4 ;	/* PCA 0 MODULE 4 CAPTURE/COMPARE - HIGH BYTE    */
-sfr at 0xEF RSTSRC   ;	/* RESET SOURCE                                  */
-sfr at 0xF8 SPI0CN   ;	/* SPI 0 CONTROL                                 */
-sfr at 0xF9 PCA0L    ;	/* PCA 0 TIMER - LOW BYTE                        */
-sfr at 0xFA PCA0H    ;	/* PCA 0 TIMER - HIGH BYTE                       */
-sfr at 0xFB PCA0CPL0 ;	/* PCA 0 MODULE 0 CAPTURE/COMPARE - LOW BYTE     */
-sfr at 0xFC PCA0CPH0 ;	/* PCA 0 MODULE 0 CAPTURE/COMPARE - HIGH BYTE    */
-sfr at 0xFD PCA0CPL1 ;	/* PCA 0 MODULE 1 CAPTURE/COMPARE - LOW BYTE     */
-sfr at 0xFE PCA0CPH1 ;	/* PCA 0 MODULE 1 CAPTURE/COMPARE - HIGH BYTE    */
+sfr at 0x88 TCON     ;  /* TIMER CONTROL                                 */
+sfr at 0x89 TMOD     ;  /* TIMER MODE                                    */
+sfr at 0x8A TL0      ;  /* TIMER 0 - LOW BYTE                            */
+sfr at 0x8B TL1      ;  /* TIMER 1 - LOW BYTE                            */
+sfr at 0x8C TH0      ;  /* TIMER 0 - HIGH BYTE                           */
+sfr at 0x8D TH1      ;  /* TIMER 1 - HIGH BYTE                           */
+sfr at 0x8E CKCON    ;  /* TIMER 0/1 CLOCK CONTROL                       */
+sfr at 0x8F PSCTL    ;  /* FLASH WRITE/ERASE CONTROL                     */
+sfr at 0x91 SSTA0    ;  /* UART 0 STATUS                                 */
+sfr at 0x98 SCON0    ;  /* UART 0 CONTROL                                */
+sfr at 0x98 SCON     ;  /* UART 0 CONTROL                                */
+sfr at 0x99 SBUF0    ;  /* UART 0 BUFFER                                 */
+sfr at 0x99 SBUF     ;  /* UART 0 BUFFER                                 */
+sfr at 0x9A SPI0CFG  ;  /* SPI 0 CONFIGURATION                           */
+sfr at 0x9B SPI0DAT  ;  /* SPI 0 DATA                                    */
+sfr at 0x9D SPI0CKR  ;  /* SPI 0 CLOCK RATE CONTROL                      */
+sfr at 0xA1 EMI0TC   ;  /* EMIF TIMING CONTROL                           */
+sfr at 0xA2 EMI0CN   ;  /* EMIF CONTROL                                  */
+sfr at 0xA2 _XPAGE   ;  /* XDATA/PDATA PAGE                              */
+sfr at 0xA3 EMI0CF   ;  /* EMIF CONFIGURATION                            */
+sfr at 0xA9 SADDR0   ;  /* UART 0 SLAVE ADDRESS                          */
+sfr at 0xB7 FLSCL    ;  /* FLASH SCALE                                   */
+sfr at 0xB9 SADEN0   ;  /* UART 0 SLAVE ADDRESS MASK                     */
+sfr at 0xBA AMX0CF   ;  /* ADC 0 MUX CONFIGURATION                       */
+sfr at 0xBB AMX0SL   ;  /* ADC 0 MUX CHANNEL SELECTION                   */
+sfr at 0xBC ADC0CF   ;  /* ADC 0 CONFIGURATION                           */
+sfr at 0xBE ADC0L    ;  /* ADC 0 DATA - LOW BYTE                         */
+sfr at 0xBF ADC0H    ;  /* ADC 0 DATA - HIGH BYTE                        */
+sfr at 0xC0 SMB0CN   ;  /* SMBUS 0 CONTROL                               */
+sfr at 0xC1 SMB0STA  ;  /* SMBUS 0 STATUS                                */
+sfr at 0xC2 SMB0DAT  ;  /* SMBUS 0 DATA                                  */
+sfr at 0xC3 SMB0ADR  ;  /* SMBUS 0 SLAVE ADDRESS                         */
+sfr at 0xC4 ADC0GTL  ;  /* ADC 0 GREATER-THAN REGISTER - LOW BYTE        */
+sfr at 0xC5 ADC0GTH  ;  /* ADC 0 GREATER-THAN REGISTER - HIGH BYTE       */
+sfr at 0xC6 ADC0LTL  ;  /* ADC 0 LESS-THAN REGISTER - LOW BYTE           */
+sfr at 0xC7 ADC0LTH  ;  /* ADC 0 LESS-THAN REGISTER - HIGH BYTE          */
+sfr at 0xC8 TMR2CN   ;  /* TIMER 2 CONTROL                               */
+sfr at 0xC9 TMR2CF   ;  /* TIMER 2 CONFIGURATION                         */
+sfr at 0xCA RCAP2L   ;  /* TIMER 2 CAPTURE REGISTER - LOW BYTE           */
+sfr at 0xCB RCAP2H   ;  /* TIMER 2 CAPTURE REGISTER - HIGH BYTE          */
+sfr at 0xCC TMR2L    ;  /* TIMER 2 - LOW BYTE                            */
+sfr at 0xCC TL2      ;  /* TIMER 2 - LOW BYTE                            */
+sfr at 0xCD TMR2H    ;  /* TIMER 2 - HIGH BYTE                           */
+sfr at 0xCD TH2      ;  /* TIMER 2 - HIGH BYTE                           */
+sfr at 0xCF SMB0CR   ;  /* SMBUS 0 CLOCK RATE                            */
+sfr at 0xD1 REF0CN   ;  /* VOLTAGE REFERENCE 0 CONTROL                   */
+sfr at 0xD2 DAC0L    ;  /* DAC 0 REGISTER - LOW BYTE                     */
+sfr at 0xD3 DAC0H    ;  /* DAC 0 REGISTER - HIGH BYTE                    */
+sfr at 0xD4 DAC0CN   ;  /* DAC 0 CONTROL                                 */
+sfr at 0xD8 PCA0CN   ;  /* PCA 0 COUNTER CONTROL                         */
+sfr at 0xD9 PCA0MD   ;  /* PCA 0 COUNTER MODE                            */
+sfr at 0xDA PCA0CPM0 ;  /* PCA 0 MODULE 0 CONTROL                        */
+sfr at 0xDB PCA0CPM1 ;  /* PCA 0 MODULE 1 CONTROL                        */
+sfr at 0xDC PCA0CPM2 ;  /* PCA 0 MODULE 2 CONTROL                        */
+sfr at 0xDD PCA0CPM3 ;  /* PCA 0 MODULE 3 CONTROL                        */
+sfr at 0xDE PCA0CPM4 ;  /* PCA 0 MODULE 4 CONTROL                        */
+sfr at 0xDF PCA0CPM5 ;  /* PCA 0 MODULE 5 CONTROL                        */
+sfr at 0xE1 PCA0CPL5 ;  /* PCA 0 MODULE 5 CAPTURE/COMPARE - LOW BYTE     */
+sfr at 0xE2 PCA0CPH5 ;  /* PCA 0 MODULE 5 CAPTURE/COMPARE - HIGH BYTE    */
+sfr at 0xE8 ADC0CN   ;  /* ADC 0 CONTROL                                 */
+sfr at 0xE9 PCA0CPL2 ;  /* PCA 0 MODULE 2 CAPTURE/COMPARE - LOW BYTE     */
+sfr at 0xEA PCA0CPH2 ;  /* PCA 0 MODULE 2 CAPTURE/COMPARE - HIGH BYTE    */
+sfr at 0xEB PCA0CPL3 ;  /* PCA 0 MODULE 3 CAPTURE/COMPARE - LOW BYTE     */
+sfr at 0xEC PCA0CPH3 ;  /* PCA 0 MODULE 3 CAPTURE/COMPARE - HIGH BYTE    */
+sfr at 0xED PCA0CPL4 ;  /* PCA 0 MODULE 4 CAPTURE/COMPARE - LOW BYTE     */
+sfr at 0xEE PCA0CPH4 ;  /* PCA 0 MODULE 4 CAPTURE/COMPARE - HIGH BYTE    */
+sfr at 0xEF RSTSRC   ;  /* RESET SOURCE                                  */
+sfr at 0xF8 SPI0CN   ;  /* SPI 0 CONTROL                                 */
+sfr at 0xF9 PCA0L    ;  /* PCA 0 TIMER - LOW BYTE                        */
+sfr at 0xFA PCA0H    ;  /* PCA 0 TIMER - HIGH BYTE                       */
+sfr at 0xFB PCA0CPL0 ;  /* PCA 0 MODULE 0 CAPTURE/COMPARE - LOW BYTE     */
+sfr at 0xFC PCA0CPH0 ;  /* PCA 0 MODULE 0 CAPTURE/COMPARE - HIGH BYTE    */
+sfr at 0xFD PCA0CPL1 ;  /* PCA 0 MODULE 1 CAPTURE/COMPARE - LOW BYTE     */
+sfr at 0xFE PCA0CPH1 ;  /* PCA 0 MODULE 1 CAPTURE/COMPARE - HIGH BYTE    */
 
 /*  Page 0x01 */
-sfr at 0x88 CPT0CN   ;	/* COMPARATOR 0 CONTROL                          */
-sfr at 0x89 CPT0MD   ;	/* COMPARATOR 0 CONFIGURATION                    */
-sfr at 0x98 SCON1    ;	/* UART 1 CONTROL                                */
-sfr at 0x99 SBUF1    ;	/* UART 1 BUFFER                                 */
-sfr at 0xC8 TMR3CN   ;	/* TIMER 3 CONTROL                               */
-sfr at 0xC9 TMR3CF   ;	/* TIMER 3 CONFIGURATION                         */
-sfr at 0xCA RCAP3L   ;	/* TIMER 3 CAPTURE REGISTER - LOW BYTE           */
-sfr at 0xCB RCAP3H   ;	/* TIMER 3 CAPTURE REGISTER - HIGH BYTE          */
-sfr at 0xCC TMR3L    ;	/* TIMER 3 - LOW BYTE                            */
-sfr at 0xCD TMR3H    ;	/* TIMER 3 - HIGH BYTE                           */
-sfr at 0xD2 DAC1L    ;	/* DAC 1 REGISTER - LOW BYTE                     */
-sfr at 0xD3 DAC1H    ;	/* DAC 1 REGISTER - HIGH BYTE                    */
-sfr at 0xD4 DAC1CN   ;	/* DAC 1 CONTROL                                 */
+sfr at 0x88 CPT0CN   ;  /* COMPARATOR 0 CONTROL                          */
+sfr at 0x89 CPT0MD   ;  /* COMPARATOR 0 CONFIGURATION                    */
+sfr at 0x98 SCON1    ;  /* UART 1 CONTROL                                */
+sfr at 0x99 SBUF1    ;  /* UART 1 BUFFER                                 */
+sfr at 0xC8 TMR3CN   ;  /* TIMER 3 CONTROL                               */
+sfr at 0xC9 TMR3CF   ;  /* TIMER 3 CONFIGURATION                         */
+sfr at 0xCA RCAP3L   ;  /* TIMER 3 CAPTURE REGISTER - LOW BYTE           */
+sfr at 0xCB RCAP3H   ;  /* TIMER 3 CAPTURE REGISTER - HIGH BYTE          */
+sfr at 0xCC TMR3L    ;  /* TIMER 3 - LOW BYTE                            */
+sfr at 0xCD TMR3H    ;  /* TIMER 3 - HIGH BYTE                           */
+sfr at 0xD2 DAC1L    ;  /* DAC 1 REGISTER - LOW BYTE                     */
+sfr at 0xD3 DAC1H    ;  /* DAC 1 REGISTER - HIGH BYTE                    */
+sfr at 0xD4 DAC1CN   ;  /* DAC 1 CONTROL                                 */
 
 /*  Page 0x02 */
-sfr at 0x88 CPT1CN   ;	/* COMPARATOR 1 CONTROL                          */
-sfr at 0x89 CPT1MD   ;	/* COMPARATOR 1 CONFIGURATION                    */
-sfr at 0xBA AMX2CF   ;	/* ADC 2 MUX CONFIGURATION                       */
-sfr at 0xBB AMX2SL   ;	/* ADC 2 MUX CHANNEL SELECTION                   */
-sfr at 0xBC ADC2CF   ;	/* ADC 2 CONFIGURATION                           */
-sfr at 0xBE ADC2     ;	/* ADC 2 DATA                                    */
-sfr at 0xC4 ADC2GT   ;	/* ADC 2 GREATER-THAN REGISTER                   */
-sfr at 0xC6 ADC2LT   ;	/* ADC 2 LESS-THAN REGISTER                      */
-sfr at 0xC8 TMR4CN   ;	/* TIMER 4 CONTROL                               */
-sfr at 0xC9 TMR4CF   ;	/* TIMER 4 CONFIGURATION                         */
-sfr at 0xCA RCAP4L   ;	/* TIMER 4 CAPTURE REGISTER - LOW BYTE           */
-sfr at 0xCB RCAP4H   ;	/* TIMER 4 CAPTURE REGISTER - HIGH BYTE          */
-sfr at 0xCC TMR4L    ;	/* TIMER 4 - LOW BYTE                            */
-sfr at 0xCD TMR4H    ;	/* TIMER 4 - HIGH BYTE                           */
+sfr at 0x88 CPT1CN   ;  /* COMPARATOR 1 CONTROL                          */
+sfr at 0x89 CPT1MD   ;  /* COMPARATOR 1 CONFIGURATION                    */
+sfr at 0xBA AMX2CF   ;  /* ADC 2 MUX CONFIGURATION                       */
+sfr at 0xBB AMX2SL   ;  /* ADC 2 MUX CHANNEL SELECTION                   */
+sfr at 0xBC ADC2CF   ;  /* ADC 2 CONFIGURATION                           */
+sfr at 0xBE ADC2     ;  /* ADC 2 DATA                                    */
+sfr at 0xC4 ADC2GT   ;  /* ADC 2 GREATER-THAN REGISTER                   */
+sfr at 0xC6 ADC2LT   ;  /* ADC 2 LESS-THAN REGISTER                      */
+sfr at 0xC8 TMR4CN   ;  /* TIMER 4 CONTROL                               */
+sfr at 0xC9 TMR4CF   ;  /* TIMER 4 CONFIGURATION                         */
+sfr at 0xCA RCAP4L   ;  /* TIMER 4 CAPTURE REGISTER - LOW BYTE           */
+sfr at 0xCB RCAP4H   ;  /* TIMER 4 CAPTURE REGISTER - HIGH BYTE          */
+sfr at 0xCC TMR4L    ;  /* TIMER 4 - LOW BYTE                            */
+sfr at 0xCD TMR4H    ;  /* TIMER 4 - HIGH BYTE                           */
 
 /*  Page 0x02 */
-sfr at 0x91 MAC0BL   ;	/* MAC0 B Register Low Byte                      */
-sfr at 0x92 MAC0BH   ;	/* MAC0 B Register High Byte                     */
-sfr at 0x93 MAC0ACC0 ;	/* MAC0 Accumulator Byte 0 (LSB)                 */
-sfr at 0x94 MAC0ACC1 ;	/* MAC0 Accumulator Byte 1                       */
-sfr at 0x95 MAC0ACC2 ;	/* MAC0 Accumulator Byte 2                       */
-sfr at 0x96 MAC0ACC3 ;	/* MAC0 Accumulator Byte 3 (MSB)                 */
-sfr at 0x97 MAC0OVR  ;	/* MAC0 Accumulator Overflow                     */
-sfr at 0xC0 MAC0STA  ;	/* MAC0 Status Register                          */
-sfr at 0xC1 MAC0AL   ;	/* MAC0 A Register Low Byte                      */
-sfr at 0xC2 MAC0AH   ;	/* MAC0 A Register High Byte                     */
-sfr at 0xC3 MAC0CF   ;	/* MAC0 Configuration                            */
-sfr at 0xCE MAC0RNDL ;	/* MAC0 Rounding Register Low Byte               */
-sfr at 0xCF MAC0RNDH ;	/* MAC0 Rounding Register High Byte              */
+sfr at 0x91 MAC0BL   ;  /* MAC0 B Register Low Byte                      */
+sfr at 0x92 MAC0BH   ;  /* MAC0 B Register High Byte                     */
+sfr at 0x93 MAC0ACC0 ;  /* MAC0 Accumulator Byte 0 (LSB)                 */
+sfr at 0x94 MAC0ACC1 ;  /* MAC0 Accumulator Byte 1                       */
+sfr at 0x95 MAC0ACC2 ;  /* MAC0 Accumulator Byte 2                       */
+sfr at 0x96 MAC0ACC3 ;  /* MAC0 Accumulator Byte 3 (MSB)                 */
+sfr at 0x97 MAC0OVR  ;  /* MAC0 Accumulator Overflow                     */
+sfr at 0xC0 MAC0STA  ;  /* MAC0 Status Register                          */
+sfr at 0xC1 MAC0AL   ;  /* MAC0 A Register Low Byte                      */
+sfr at 0xC2 MAC0AH   ;  /* MAC0 A Register High Byte                     */
+sfr at 0xC3 MAC0CF   ;  /* MAC0 Configuration                            */
+sfr at 0xCE MAC0RNDL ;  /* MAC0 Rounding Register Low Byte               */
+sfr at 0xCF MAC0RNDH ;  /* MAC0 Rounding Register High Byte              */
 
 /*  Page 0x0F */
-sfr at 0x88 FLSTAT   ;	/* FLASH STATUS                                  */
-sfr at 0x89 PLL0CN   ;	/* PLL 0 CONTROL                                 */
-sfr at 0x8A OSCICN   ;	/* INTERNAL OSCILLATOR CONTROL                   */
-sfr at 0x8B OSCICL   ;	/* INTERNAL OSCILLATOR CALIBRATION               */
-sfr at 0x8C OSCXCN   ;	/* EXTERNAL OSCILLATOR CONTROL                   */
-sfr at 0x8D PLL0DIV  ;	/* PLL 0 DIVIDER                                 */
-sfr at 0x8E PLL0MUL  ;	/* PLL 0 MULTIPLIER                              */
-sfr at 0x8F PLL0FLT  ;	/* PLL 0 FILTER                                  */
-sfr at 0x96 SFRPGCN  ;	/* SFR PAGE CONTROL                              */
-sfr at 0x97 CLKSEL   ;	/* SYSTEM CLOCK SELECT                           */
-sfr at 0x9A CCH0MA   ;	/* CACHE MISS ACCUMULATOR                        */
-sfr at 0x9C P4MDOUT  ;	/* PORT 4 OUTPUT MODE                            */
-sfr at 0x9D P5MDOUT  ;	/* PORT 5 OUTPUT MODE                            */
-sfr at 0x9E P6MDOUT  ;	/* PORT 6 OUTPUT MODE                            */
-sfr at 0x9F P7MDOUT  ;	/* PORT 7 OUTPUT MODE                            */
-sfr at 0xA1 CCH0CN   ;	/* CACHE CONTROL                                 */
-sfr at 0xA2 CCH0TN   ;	/* CACHE TUNING REGISTER                         */
-sfr at 0xA3 CCH0LC   ;	/* CACHE LOCK                                    */
-sfr at 0xA4 P0MDOUT  ;	/* PORT 0 OUTPUT MODE                            */
-sfr at 0xA5 P1MDOUT  ;	/* PORT 1 OUTPUT MODE                            */
-sfr at 0xA6 P2MDOUT  ;	/* PORT 2 OUTPUT MODE CONFIGURATION              */
-sfr at 0xA7 P3MDOUT  ;	/* PORT 3 OUTPUT MODE CONFIGURATION              */
-sfr at 0xAD P1MDIN   ;	/* PORT 1 INPUT MODE                             */
-sfr at 0xB7 FLACL    ;	/* FLASH ACCESS LIMIT                            */
-sfr at 0xC8 P4       ;	/* PORT 4                                        */
-sfr at 0xD8 P5       ;	/* PORT 5                                        */
-sfr at 0xE1 XBR0     ;	/* CROSSBAR CONFIGURATION REGISTER 0             */
-sfr at 0xE2 XBR1     ;	/* CROSSBAR CONFIGURATION REGISTER 1             */
-sfr at 0xE3 XBR2     ;	/* CROSSBAR CONFIGURATION REGISTER 2             */
-sfr at 0xE8 ADC2CN   ;	/* ADC 2 CONTROL                                 */
-sfr at 0xE8 P6       ;	/* PORT 6                                        */
-sfr at 0xF8 P7       ;	/* PORT 7                                        */
+sfr at 0x88 FLSTAT   ;  /* FLASH STATUS                                  */
+sfr at 0x89 PLL0CN   ;  /* PLL 0 CONTROL                                 */
+sfr at 0x8A OSCICN   ;  /* INTERNAL OSCILLATOR CONTROL                   */
+sfr at 0x8B OSCICL   ;  /* INTERNAL OSCILLATOR CALIBRATION               */
+sfr at 0x8C OSCXCN   ;  /* EXTERNAL OSCILLATOR CONTROL                   */
+sfr at 0x8D PLL0DIV  ;  /* PLL 0 DIVIDER                                 */
+sfr at 0x8E PLL0MUL  ;  /* PLL 0 MULTIPLIER                              */
+sfr at 0x8F PLL0FLT  ;  /* PLL 0 FILTER                                  */
+sfr at 0x96 SFRPGCN  ;  /* SFR PAGE CONTROL                              */
+sfr at 0x97 CLKSEL   ;  /* SYSTEM CLOCK SELECT                           */
+sfr at 0x9A CCH0MA   ;  /* CACHE MISS ACCUMULATOR                        */
+sfr at 0x9C P4MDOUT  ;  /* PORT 4 OUTPUT MODE                            */
+sfr at 0x9D P5MDOUT  ;  /* PORT 5 OUTPUT MODE                            */
+sfr at 0x9E P6MDOUT  ;  /* PORT 6 OUTPUT MODE                            */
+sfr at 0x9F P7MDOUT  ;  /* PORT 7 OUTPUT MODE                            */
+sfr at 0xA1 CCH0CN   ;  /* CACHE CONTROL                                 */
+sfr at 0xA2 CCH0TN   ;  /* CACHE TUNING REGISTER                         */
+sfr at 0xA3 CCH0LC   ;  /* CACHE LOCK                                    */
+sfr at 0xA4 P0MDOUT  ;  /* PORT 0 OUTPUT MODE                            */
+sfr at 0xA5 P1MDOUT  ;  /* PORT 1 OUTPUT MODE                            */
+sfr at 0xA6 P2MDOUT  ;  /* PORT 2 OUTPUT MODE CONFIGURATION              */
+sfr at 0xA7 P3MDOUT  ;  /* PORT 3 OUTPUT MODE CONFIGURATION              */
+sfr at 0xAD P1MDIN   ;  /* PORT 1 INPUT MODE                             */
+sfr at 0xB7 FLACL    ;  /* FLASH ACCESS LIMIT                            */
+sfr at 0xC8 P4       ;  /* PORT 4                                        */
+sfr at 0xD8 P5       ;  /* PORT 5                                        */
+sfr at 0xE1 XBR0     ;  /* CROSSBAR CONFIGURATION REGISTER 0             */
+sfr at 0xE2 XBR1     ;  /* CROSSBAR CONFIGURATION REGISTER 1             */
+sfr at 0xE3 XBR2     ;  /* CROSSBAR CONFIGURATION REGISTER 2             */
+sfr at 0xE8 ADC2CN   ;  /* ADC 2 CONTROL                                 */
+sfr at 0xE8 P6       ;  /* PORT 6                                        */
+sfr at 0xF8 P7       ;  /* PORT 7                                        */
 
 
 /*  BIT Registers  */
@@ -216,7 +218,7 @@ sbit at 0x86 P0_6    ;
 sbit at 0x87 P0_7    ;
 
 /*  TCON  0x88 */
-sbit at 0x88 IT0     ;	/* EXT. INTERRUPT 0 TYPE                         */
+sbit at 0x88 IT0     ;  /* EXT. INTERRUPT 0 TYPE                         */
 sbit at 0x89 IE0     ;  /* EXT. INTERRUPT 0 EDGE FLAG                    */
 sbit at 0x8A IT1     ;  /* EXT. INTERRUPT 1 TYPE                         */
 sbit at 0x8B IE1     ;  /* EXT. INTERRUPT 1 EDGE FLAG                    */

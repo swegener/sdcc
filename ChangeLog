@@ -1,6 +1,10 @@
+2004-01-29 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/Makefile.in: create/copy mcs51 and z80 include subdirs
+
 2004-01-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
-	* device/include/c8051fxxx.h: removed these 6 new files
+	* device/include/c8051fxxx.h: removed these 6 files
 	* device/include/mcs51/c8051fxxx.h: added these 11 new files
 
 2005-01-26 Raphael Neider <rneider AT web.de>

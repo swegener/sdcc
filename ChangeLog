@@ -1,3 +1,9 @@
+2003-02-05  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+	* as/mcs51/aslink.h, as/mcs51/lkihx.c, as/mcs51/lkrloc.c:  Applied
+	patch from Jan Rejlek <jr@apex-lib.cz> to fix Bug 677692: "Extended
+	Address Record is not correctly generated for DS390."
+	
 2003-02-02  Borut Razem <borut.razem@siol.net>
 
 	* Makefile.bcc: removed non existing cpp project and non compilable izt project from makefile

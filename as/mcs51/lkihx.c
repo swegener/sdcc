@@ -19,10 +19,12 @@
  *	output the relocated object code in the
  *	Intel Hex format.
  *
- *	lkihx.c contains the following function:
+ *	lkihx.c contains the following functions:
+ *		VOID	hexRecord(addr, rtvalIndex)
  *		VOID	ihx(i)
+ *		VOID	ihxEntendedLinearAddress(a)
  *
- *	lkihx.c contains no local variables.
+ *	local variables: hexPageOverrun, lastHexAddr
  */
 
 /*Intel Hex Format
@@ -76,19 +78,34 @@
  *                              first.  
  */
 
-/*)Function	ihx(i)
+/* Static variable which holds the count of hex page overruns
+ * (crossings of the 64kB boundary). Cleared at explicit extended
+ * address output.
+ */
+static int hexPageOverrun = 0;
+
+/* Global which holds the last (16 bit) address of hex record.
+ * Cleared at begin of new area or when the extended address is output.
+ */
+unsigned int lastHexAddr = 0;
+
+
+/*)Function	hexRecord(addr, rtvalIndex)
  *
- *		int	i		0 - process data
- *					1 - end of data
+ *		unsigned addr	starting address of hex record
+ *		int rtvalIndex	starting index into the rtval[] array
  *
- *	The function ihx() outputs the relocated data
- *	in the standard Intel Hex format.
+ *	The function hexRecord() outputs the relocated data
+ *	in the standard Intel Hex format (with inserting
+ *	the extended address record if necessary).
  *
  *	local variables:
  *		Addr_T	chksum		byte checksum
+ *		int		i			index for loops
+ *		int		overrun		temporary storage for hexPageOverrun
+ *		int		bytes		counter for bytes written
  *
  *	global variables:
- *		int	hilo		byte order
  *		FILE *	ofp		output file handle
  *		int	rtcnt		count of data words
  *		int	rtflg[]		output the data flag
@@ -96,59 +113,112 @@
  *
  *	functions called:
  *		int	fprintf()	c_library
+ *		ihxEntendedLinearAddress()	lkihx.c
+ *		hexRecord()		lkihx.c		(recursion)
  *
  *	side effects:
- *		The data is output to the file defined by ofp.
+ *		hexPageOverrun is eventually incremented,
+ *		lastHexAddr is updated
+ */
+
+VOID
+hexRecord(unsigned addr, int rtvalIndex)
+{
+	Addr_T chksum;
+	int i, overrun, bytes;
+
+	for (i = rtvalIndex, chksum = 0; i < rtcnt; i++) {
+		if (rtflg[i]) {
+			if (addr + ++chksum > 0xffff)
+				break;
+		}
+	}
+	if (chksum == 0)
+		return;			// nothing to output
+
+	if (lastHexAddr > addr) {
+		overrun = hexPageOverrun + 1;
+		ihxEntendedLinearAddress(lastExtendedAddress + overrun);
+		hexPageOverrun = overrun;
+		hexRecord(addr, rtvalIndex);
+		return;
+	}
+
+	lastHexAddr = addr;
+	fprintf(ofp, ":%02X%04X00", chksum, addr);
+	chksum += (addr >> 8) + (addr & 0xff);
+	for (i = rtvalIndex, bytes = 0; i < rtcnt; i++) {
+		if (rtflg[i]) {
+		    fprintf(ofp, "%02X", rtval[i]);
+		    chksum += rtval[i];
+			if (addr + ++bytes > 0xffff) {
+				if (rflag) {
+					fprintf(ofp, "%02X\n", (0-chksum) & 0xff);
+					overrun = hexPageOverrun + 1;
+					ihxEntendedLinearAddress(lastExtendedAddress + overrun);
+					hexPageOverrun = overrun;
+					hexRecord(0, i + 1);
+					return;
+				} else {
+					fprintf(stderr, 
+						"warning: extended linear address encountered; "
+						"you probably want the -r flag.\n");
+				}
+			}
+		}
+	}
+	fprintf(ofp, "%02X\n", (0-chksum) & 0xff);
+}
+
+/*)Function	ihx(i)
+ *
+ *		int	i		0 - process data
+ *					1 - end of data
+ *
+ *	The function ihx() calls the hexRecord() function for processing data
+ *	or writes the End of Data record to the file defined by ofp.
+ *
+ *	local variables:
+ *		Addr_T	n		auxiliary variable
+ *
+ *	global variables:
+ *		int	hilo		byte order
+ *		FILE *	ofp		output file handle
+ *		Addr_T	rtval[]		relocated data
+ *
+ *	functions called:
+ *		VOID hexRecord()	lkihx.c
+ *		int	fprintf()		c_library
+ *
+ *	side effects:
+ *		The sequence of rtval[0], rtval[1] is eventually changed.
  */
 
 VOID
 ihx(i)
 {
-	register Addr_T chksum;
-	int byte, bytes, address=0;
+	Addr_T n;
 	if (i) {
 		if (hilo == 0) {
-			chksum = rtval[0];
+			n = rtval[0];
 			rtval[0] = rtval[1];
-			rtval[1] = chksum;
+			rtval[1] = n;
 		}
-		for (i = 0, chksum = -2; i < rtcnt; i++) {
-			if (rtflg[i])
-				chksum++;
-		}
-		fprintf(ofp, ":%02X", chksum);
-		// how much bytes?
-		for (i=0, bytes=0; i<rtcnt; i++) {
-		  if (rtflg[i]) {
-		    bytes++;
-		  }
-		}
-		byte=0;
-		for (i = 0; i < rtcnt ; i++) {
-		  if (rtflg[i]) {
-		    switch (byte) {
-		    case 0: 
-		      address=rtval[0]<<8; 
-		      break;
-		    case 1: 
-		      address+=rtval[1]; 
-		      if ((address+bytes)>0xffff) {
-			fprintf (stderr, "64k boundary cross at %04x\n", address);
-		      }
-		      break;
-		    }
-		    fprintf(ofp, "%02X", rtval[i]);
-		    chksum += rtval[i];
-		    byte++;
-		  }
-		  if (i == 1) {
-		    fprintf(ofp, "00");
-		  }
-		}
-		fprintf(ofp, "%02X\n", (0-chksum) & 0xff);
+		hexRecord((rtval[0]<<8) + rtval[1], 2);
 	} else {
 		fprintf(ofp, ":00000001FF\n");
 	}
+}
+
+/*)Function	newArea(i)
+ * The function newArea() is called when processing of new area is started.
+ * It resets the value of lastHexAddr.
+ */ 
+
+VOID
+newArea()
+{
+	lastHexAddr = 0;
 }
 
 /*)Function	ihxEntendedLinearAddress(i)
@@ -169,6 +239,7 @@ ihx(i)
  *
  *	side effects:
  *		The data is output to the file defined by ofp.
+ *		hexPageOverrun and lastHexAddr is cleared
  */
 VOID
 ihxEntendedLinearAddress(Addr_T a)
@@ -182,4 +253,6 @@ ihxEntendedLinearAddress(Addr_T a)
     chksum = 2 + 4 + (a & 0xff) + ((a >> 8) & 0xff);    
     
     fprintf(ofp, ":02000004%04X%02X\n", a & 0xffff, (0-chksum) & 0xff);
+	hexPageOverrun = 0;
+	lastHexAddr = 0;
 }

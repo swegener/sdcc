@@ -51,6 +51,11 @@
  */
 int    lastExtendedAddress=-1;
 
+/* Static variable which holds the index of last processed area.
+ * Useful only for iHex mode.
+ */
+static int lastAreaIndex = -1;
+
 /*)Function	VOID	reloc(c)
  *
  *			char c		process code
@@ -528,7 +533,13 @@ relr()
 		 * This is another reason why we can't have areas greater
 		 * than 64K yet, even in flat24 mode.
 		 */
-		extendedAddress += ((a[aindex]->a_size) >> 16 & 0xffff);
+	//	extendedAddress += ((a[aindex]->a_size) >> 16 & 0xffff);
+	//	commented out by jr 
+		
+		if (lastAreaIndex != aindex) {
+			lastAreaIndex = aindex;
+			newArea();
+		}
 		
 		if (extendedAddress != lastExtendedAddress)
 		{

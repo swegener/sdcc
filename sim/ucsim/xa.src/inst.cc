@@ -329,11 +329,17 @@ cl_xa::inst_XCH(uint code, int operands)
 int
 cl_xa::inst_SETB(uint code, int operands)
 {
+  unsigned short bitAddr = (code&0x03 << 8) + fetch();
+  // fixme: implement
+  bitAddr=bitAddr;
   return(resGO);
 }
 int
 cl_xa::inst_CLR(uint code, int operands)
 {
+  unsigned short bitAddr = (code&0x03 << 8) + fetch();
+  // fixme: implement
+  bitAddr=bitAddr;
   return(resGO);
 }
 int
@@ -357,8 +363,19 @@ cl_xa::inst_ORL(uint code, int operands)
   return(resGO);
 }
 int
+cl_xa::inst_BEQ(uint code, int operands)
+{
+  short jmpAddr = fetch1()*2;
+  if (get_psw() & BIT_Z) {
+    PC=(PC+jmpAddr)&0xfffffffe;
+  }
+  return(resGO);
+}
+int
 cl_xa::inst_BR(uint code, int operands)
 {
+  short jmpAddr = fetch1()*2;
+  PC=(PC+jmpAddr)&0xfffffffe;
   return(resGO);
 }
 int
@@ -457,7 +474,7 @@ int
 cl_xa::inst_JZ(uint code, int operands)
 {
   short saddr = (fetch1() * 2);
-  if (get_psw() & BIT_Z) {
+  if (reg1(8)==0) {
       PC += saddr;
   }
   return(resGO);
@@ -466,8 +483,8 @@ int
 cl_xa::inst_JNZ(uint code, int operands)
 {
   short saddr = (fetch1() * 2);
-  if (!(get_psw() & BIT_Z)) {
-      PC += saddr;
+  if (reg1(8)!=0) {
+    PC = (PC + saddr) & 0xfffffe;
   }
   return(resGO);
 }

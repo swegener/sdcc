@@ -426,5 +426,24 @@ struct xa_dis_entry disass_xa[]= {
  {0x0000,0x0000,  0,1,BAD_OPCODE, REG_REG}
 };
 
+#if 0
+/*
+ * Names of SFRs
+ */
+
+struct name_entry sfr_tabXA51[]=
+{
+  {CPU_XA51G3,                    0x400, "PSW"},
+};
+
+/*
+ * Names SBITs
+ */
+
+struct name_entry bit_tabXA51[]=
+{
+  {CPU_XA51G3,                    0x33b, "ETI1"},
+};
+#endif
 
 /* End of xa.src/glob.cc */

@@ -36,6 +36,7 @@
   virtual int inst_MOV(uint code, int operands);
   virtual int inst_ANL(uint code, int operands);
   virtual int inst_ORL(uint code, int operands);
+  virtual int inst_BEQ(uint code, int operands);
   virtual int inst_BR(uint code, int operands);
   virtual int inst_JMP(uint code, int operands);
   virtual int inst_CALL(uint code, int operands);

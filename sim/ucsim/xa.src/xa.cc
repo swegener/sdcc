@@ -334,7 +334,7 @@ cl_xa::disass(t_addr addr, char *sep)
       ++immed_offset;
     break;
     case REG_DATA16 :
-      sprintf(parm_str, "%s,#%04x",
+      sprintf(parm_str, "%s,#0x%04x",
               reg_strs[((code >> 4) & 0xf)],
               (short)((get_mem(MEM_ROM, addr+immed_offset+1)) |
                      (get_mem(MEM_ROM, addr+immed_offset)<<8)) );
@@ -669,6 +669,8 @@ cl_xa::exec_inst(void)
     return inst_ANL(code, operands);
     case ORL:
     return inst_ORL(code, operands);
+    case BEQ:
+    return inst_BEQ(code, operands);
     case BR:
     return inst_BR(code, operands);
     case JMP:

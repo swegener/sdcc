@@ -1673,8 +1673,20 @@ geniCodeMultiply (operand * left, operand * right, bool ptrSizeCalculation)
       SPEC_SHORT (getSpec (resType)) = 0;
       options.ANSIint = saveOption;
     }
-  else
+  else {
     resType = usualBinaryConversions (&left, &right);
+    if (IS_DS390_PORT) {
+      /* jwk char*char=int
+	 Now be can use the 16bit result of "mul a,b" instead of explicit
+	 casts and support function calls as with --ansiint
+      */
+      if ((IS_CHAR(letype) || IS_SHORT(letype)) && 
+	   (IS_CHAR(retype) || IS_SHORT(retype))) {
+	SPEC_NOUN(getSpec(resType))=V_INT;
+	SPEC_SHORT(getSpec(resType))=0;
+      }
+    }
+  }
 
   /* if the right is a literal & power of 2 */
   /* then make it a left shift              */

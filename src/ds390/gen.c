@@ -965,7 +965,6 @@ aopGet (asmop * aop,
       if (aop->type == AOP_DPTR2)
 	{
 	  genSetDPTR (1);
-
 	  if (!canClobberACC)
 	    {
 	      emitcode ("xch", "a, ap");
@@ -1000,14 +999,12 @@ aopGet (asmop * aop,
       if (aop->type == AOP_DPTR2)
 	{
 	  genSetDPTR (0);
-
 	  if (!canClobberACC)
 	    {
 	      emitcode ("xch", "a, ap");
 	      return "ap";
 	    }
 	}
-
       return (dname ? "acc" : "a");
 
     case AOP_IMMD:
@@ -3688,19 +3685,44 @@ genMultbits (operand * left,
 
 
 /*-----------------------------------------------------------------*/
-/* genMultOneByte : 8 bit multiplication & division                */
+/* genMultOneByte : 8*8=16 bit multiplication                      */
 /*-----------------------------------------------------------------*/
+void catchMe() {
+  emitcode(";catch","me");
+}
+
 static void
 genMultOneByte (operand * left,
 		operand * right,
 		operand * result)
 {
   sym_link *opetype = operandType (result);
-  char *l;
   symbol *lbl;
-  int size, offset;
 
-  /* (if two literals, the value is computed before) */
+  if (AOP_SIZE (result)!=2) {
+    // this should never happen
+      fprintf (stderr, "size!=2 in geniCodeMultOneByte\n");
+  }
+
+  if (SPEC_USIGN(opetype) || 
+      // ignore the sign of left and right, what else can we do?
+      (SPEC_USIGN(operandType(left)) && 
+       SPEC_USIGN(operandType(right)))) {
+    // just an unsigned 8*8=16 multiply
+    emitcode ("mov", "b,%s", aopGet (AOP (right), 0, FALSE, FALSE, TRUE));
+    MOVA (aopGet (AOP (left), 0, FALSE, FALSE, TRUE));
+    emitcode ("mul", "ab");
+    aopPut (AOP (result), "a", 0);
+    aopPut (AOP (result), "b", 1);
+    return;
+  }
+
+  // we have to do a signed multiply
+
+#if 0
+  // literals ignored for now
+
+  /* (if two literals: the value is computed before) */
   /* if one literal, literal on the right */
   if (AOP_TYPE (left) == AOP_LIT)
     {
@@ -3708,77 +3730,48 @@ genMultOneByte (operand * left,
       right = left;
       left = t;
     }
+#endif
 
-  size = AOP_SIZE (result);
-  /* signed or unsigned */
-  emitcode ("mov", "b,%s", aopGet (AOP (right), 0, FALSE, FALSE, FALSE));
-  l = aopGet (AOP (left), 0, FALSE, FALSE, TRUE);
-  MOVA (l);
+  emitcode ("mov", "ap,#0"); // can't we use some flag bit here?
+  MOVA (aopGet (AOP (right), 0, FALSE, FALSE, TRUE));
+  lbl=newiTempLabel(NULL);
+  emitcode ("jnb", "acc.7,%05d$",  lbl->key+100);
+  // right side is negative, should test for litteral too
+  emitcode ("inc", "ap"); // opRight is negative
+  emitcode ("cpl", "a"); // 8-bit two's complement, this fails for -128
+  emitcode ("inc", "a");
+  emitcode ("", "%05d$:", lbl->key+100);
+  emitcode ("mov", "b,a");
+
+  MOVA (aopGet (AOP (left), 0, FALSE, FALSE, TRUE));
+  lbl=newiTempLabel(NULL);
+  emitcode ("jnb", "acc.7,%05d$", lbl->key+100);
+  // left side is negative
+  emitcode ("inc", "ap"); // opLeft is negative
+  emitcode ("cpl", "a"); // 8-bit two's complement, this fails for -128
+  emitcode ("inc", "a");
+  emitcode ("", "%05d$:", lbl->key+100);
   emitcode ("mul", "ab");
-  /* if result size = 1, mul signed = mul unsigned */
+    
+  lbl=newiTempLabel(NULL);
+  emitcode ("xch", "a,ap");
+  emitcode ("rrc", "a");
+  emitcode ("xch", "a,ap");
+  emitcode ("jnc", "%05d$", lbl->key+100);
+  // only ONE op was negative, we have to do a 16-bit two's complement
+  emitcode ("setb", "c");
+  emitcode ("cpl", "a");
+  emitcode ("addc", "a,#0");
+  emitcode ("push", "acc"); // lsb
+  emitcode ("mov", "a,b");
+  emitcode ("cpl", "a");
+  emitcode ("addc", "a,#0");
+  emitcode ("mov", "b,a"); // msb
+  emitcode ("pop", "acc"); // lsb
+
+  emitcode ("", "%05d$:", lbl->key+100);
   aopPut (AOP (result), "a", 0);
-  if (size > 1)
-    {
-      if (SPEC_USIGN (opetype))
-	{
-	  aopPut (AOP (result), "b", 1);
-	  if (size > 2)
-	    /* for filling the MSBs */
-	    emitcode ("clr", "a");
-	}
-      else
-	{
-	  emitcode ("mov", "a,b");
-
-	  /* adjust the MSB if left or right neg */
-
-	  /* if one literal */
-	  if (AOP_TYPE (right) == AOP_LIT)
-	    {
-	      /* AND literal negative */
-	      if ((int) floatFromVal (AOP (right)->aopu.aop_lit) < 0)
-		{
-		  /* adjust MSB (c==0 after mul) */
-		  emitcode ("subb", "a,%s", aopGet (AOP (left), 0, FALSE, FALSE, FALSE));
-		}
-	    }
-	  else
-	    {
-	      lbl = newiTempLabel (NULL);
-	      emitcode ("xch", "a,%s", aopGet (AOP (right), 0, FALSE, FALSE, FALSE));
-	      emitcode ("cjne", "a,#0x80,%05d$", (lbl->key + 100));
-	      emitcode ("", "%05d$:", (lbl->key + 100));
-	      emitcode ("xch", "a,%s", aopGet (AOP (right), 0, FALSE, FALSE, FALSE));
-	      lbl = newiTempLabel (NULL);
-	      emitcode ("jc", "%05d$", (lbl->key + 100));
-	      emitcode ("subb", "a,%s", aopGet (AOP (left), 0, FALSE, FALSE, FALSE));
-	      emitcode ("", "%05d$:", (lbl->key + 100));
-	    }
-
-	  lbl = newiTempLabel (NULL);
-	  emitcode ("xch", "a,%s", aopGet (AOP (left), 0, FALSE, FALSE, FALSE));
-	  emitcode ("cjne", "a,#0x80,%05d$", (lbl->key + 100));
-	  emitcode ("", "%05d$:", (lbl->key + 100));
-	  emitcode ("xch", "a,%s", aopGet (AOP (left), 0, FALSE, FALSE, FALSE));
-	  lbl = newiTempLabel (NULL);
-	  emitcode ("jc", "%05d$", (lbl->key + 100));
-	  emitcode ("subb", "a,%s", aopGet (AOP (right), 0, FALSE, FALSE, FALSE));
-	  emitcode ("", "%05d$:", (lbl->key + 100));
-
-	  aopPut (AOP (result), "a", 1);
-	  if (size > 2)
-	    {
-	      /* get the sign */
-	      emitcode ("rlc", "a");
-	      emitcode ("subb", "a,acc");
-	    }
-	}
-      size -= 2;
-      offset = 2;
-      if (size > 0)
-	while (size--)
-	  aopPut (AOP (result), "a", offset++);
-    }
+  aopPut (AOP (result), "b", 1);
 }
 
 /*-----------------------------------------------------------------*/

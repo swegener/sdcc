@@ -776,7 +776,13 @@ struct_declarator_list
    ;
 
 struct_declarator
-   : declarator
+   : declarator 
+     {
+       // if this was a function declarator, remove the symbol args (if any)
+       if (IS_FUNC($1->etype)) {
+	 cleanUpLevel(SymbolTab,NestLevel+1);
+       }
+     }
    | ':' constant_expr  {  
                            $$ = newSymbol (genSymName(NestLevel),NestLevel) ; 
                            $$->bitVar = (int) floatFromVal(constExprValue($2,TRUE));
@@ -916,6 +922,7 @@ declarator2
 	   
 	     $1->hasVargs = IS_VARG($4);
 	     $1->args = reverseVal($4)  ;
+	     
 	     
 	     /* nest level was incremented to take care of the parms  */
 	     NestLevel-- ;

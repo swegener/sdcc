@@ -1,3 +1,9 @@
+2003-11-07 Frieder Ferlemann <Frieder.Ferlemann@web.de>
+
+	* doc/Makefile: sdccman.pdf should build with correct references (more info in commit msg)
+	* doc/clean.mk: also remove *.out files
+	* doc/sdccman.lyx: some additions, larger top/bottom margins
+
 2003-11-07 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCC.y: fixed bug #837365

@@ -1399,7 +1399,8 @@ critical_statement
       
 labeled_statement
 //   : identifier ':' statement          {  $$ = createLabel($1,$3);  }   
-   : identifier ':'                    {  $$ = createLabel($1,NULL);  }   
+   : identifier ':'                    {  $$ = createLabel($1,NULL);
+					  $1->isitmp = 0;  }   
    | CASE constant_expr ':'
      {
        if (STACK_EMPTY(swStk))

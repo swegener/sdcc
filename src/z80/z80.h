@@ -3,6 +3,7 @@
 */
 #include "common.h"
 #include "ralloc.h"
+#include "gen.h"
 #include "support.h"
 
 typedef enum

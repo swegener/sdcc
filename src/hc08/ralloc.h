@@ -34,23 +34,22 @@ enum
     X_IDX,
     HX_IDX,
     XA_IDX,
-    CND_IDX
+    CND_IDX,
+    SP_IDX
   };
 
 
 #define REG_PTR 0x01
 #define REG_GPR 0x02
 #define REG_CND 0x04
+
 /* definition for the registers */
 typedef struct regs
   {
     short type;			/* can have value 
 				   REG_GPR, REG_PTR or REG_CND */
     short rIdx;			/* index into register table */
-    short otype;
     char *name;			/* name */
-    char *dname;		/* name when direct access needed */
-    char *base;			/* base address */
     short mask;			/* bitmask for pair allocation */
     struct asmop *aop;		/* last operand */
     int aopofs;			/* last operand offset */
@@ -63,6 +62,7 @@ extern regs *hc08_reg_x;
 extern regs *hc08_reg_h;
 extern regs *hc08_reg_hx;
 extern regs *hc08_reg_xa;
+extern regs *hc08_reg_sp;
 
 regs *hc08_regWithIdx (int);
 void hc08_useReg (regs * reg);

@@ -740,6 +740,37 @@ loop:
 		} while ((c = getnb()) == ',');
 		unget(c);
 		break;
+	
+	case S_ULEB128:
+	case S_SLEB128:
+		do {
+			Addr_T val = absexpr();
+			int bit = sizeof(val)*8 - 1;
+			int impliedBit;
+
+			if (mp->m_type == S_ULEB128) {
+				impliedBit = 0;
+			} else {
+				impliedBit = (val & (1 << bit)) ? 1 : 0;
+			}
+			while ((bit>0) && (((val & (1 << bit)) ? 1 : 0) == impliedBit)) {
+				bit--;
+			}
+			if (mp->m_type == S_SLEB128) {
+				bit++;
+			}
+			while (bit>=0) {
+				if (bit<7) {
+					outab(val & 0x7f);
+				} else {
+					outab(0x80 | (val & 0x7f));
+				}
+				bit -= 7;
+				val >>= 7;
+			}
+		} while ((c = getnb()) == ',');
+		unget(c);
+		break;
 
 	case S_ASCII:
 	case S_ASCIZ:

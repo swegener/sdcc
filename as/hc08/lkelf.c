@@ -753,7 +753,7 @@ elf (int i)
         }
 
       /* Copy the data into the image buffer */
-      for (i = 2; i < rtcnt ; i++, address++)
+      for (i = 2; i < rtcnt ; i++)
         {
           if (rtflg[i])
             {
@@ -775,6 +775,7 @@ elf (int i)
                       execStartLSBfound = 1;
                     }
                 }
+	      address++;
             }
         }
     }

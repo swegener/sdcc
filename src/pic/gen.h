@@ -139,6 +139,7 @@ void emitpcode(PIC_OPCODE poc, pCodeOp *pcop);
 void emitpLabel(int key);
 void pic14_emitcode (char *inst,char *fmt, ...);
 void DEBUGpic14_emitcode (char *inst,char *fmt, ...);
+void pic14_emitDebuggerSymbol (char *);
 asmop *newAsmop (short type);
 bool pic14_sameRegs (asmop *aop1, asmop *aop2 );
 char *aopGet (asmop *aop, int offset, bool bit16, bool dname);

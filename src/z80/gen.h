@@ -92,6 +92,7 @@ typedef struct asmop
 asmop;
 
 void genZ80Code (iCode *);
+void z80_emitDebuggerSymbol (char *);
 
 
 #endif

@@ -61,21 +61,23 @@ int hc08_ptrRegReq;		/* one byte pointer register required */
 regs regshc08[] =
 {
 
-  {REG_GPR, A_IDX, REG_GPR, "a", "a", "0", 1, NULL, 0, 1},
-  {REG_GPR, X_IDX, REG_GPR, "x", "x", "0", 2, NULL, 0, 1},
-  {REG_GPR, H_IDX, REG_GPR, "h", "h", "0", 4, NULL, 0, 1},
-  {REG_PTR, HX_IDX, REG_PTR, "hx", "hx", "0", 6, NULL, 0, 1},
-  {REG_GPR, XA_IDX, REG_GPR, "xa", "xa", "0", 3, NULL, 0, 1},
+  {REG_GPR, A_IDX,   "a",  1, NULL, 0, 1},
+  {REG_GPR, X_IDX,   "x",  2, NULL, 0, 1},
+  {REG_GPR, H_IDX,   "h",  4, NULL, 0, 1},
+  {REG_PTR, HX_IDX,  "hx", 6, NULL, 0, 1},
+  {REG_GPR, XA_IDX,  "xa", 3, NULL, 0, 1},
 
-  {REG_CND, CND_IDX, REG_CND, "C", "C", "xreg", 0, NULL, 0, 1},
+  {REG_CND, CND_IDX, "C",  0, NULL, 0, 1},
+  {0,       SP_IDX,  "sp", 0, NULL, 0, 1},
 };
-int hc08_nRegs = 6;
+int hc08_nRegs = 7;
 
 regs *hc08_reg_a;
 regs *hc08_reg_x;
 regs *hc08_reg_h;
 regs *hc08_reg_hx;
 regs *hc08_reg_xa;
+regs *hc08_reg_sp;
 
 static void spillThis (symbol *);
 static void freeAllRegs ();
@@ -3020,12 +3022,14 @@ hc08_assignRegisters (eBBlock ** ebbs, int count)
   setToNull ((void *) &_G.regAssigned);
   setToNull ((void *) &_G.totRegAssigned);
   hc08_ptrRegReq = _G.stackExtend = _G.dataExtend = 0;
-  hc08_nRegs = 5;
+  hc08_nRegs = 7;
   hc08_reg_a = hc08_regWithIdx(A_IDX);
   hc08_reg_x = hc08_regWithIdx(X_IDX);
   hc08_reg_h = hc08_regWithIdx(H_IDX);
   hc08_reg_hx = hc08_regWithIdx(HX_IDX);
   hc08_reg_xa = hc08_regWithIdx(XA_IDX);
+  hc08_reg_sp = hc08_regWithIdx(SP_IDX);
+  hc08_nRegs = 5;
 
   /* change assignments this will remove some
      live ranges reducing some register pressure */

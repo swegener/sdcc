@@ -27,7 +27,7 @@ OBJECTS 	= SDCCy.o SDCChasht.o SDCCmain.o \
 		  SDCCicode.o SDCCbitv.o SDCCset.o SDCClabel.o \
 		  SDCCBBlock.o SDCCloop.o SDCCcse.o SDCCcflow.o SDCCdflow.o \
 		  SDCClrange.o SDCCptropt.o SDCCpeeph.o SDCCglue.o \
-		  asm.o SDCCmacro.o SDCCutil.o SDCCdebug.o cdbFile.o
+		  asm.o SDCCmacro.o SDCCutil.o SDCCdebug.o cdbFile.o SDCCdwarf2.o
 
 SPECIAL		= SDCCy.h 
 ifeq ($(USE_ALT_LEX), 1)

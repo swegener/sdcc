@@ -88,6 +88,7 @@ typedef struct asmop
 asmop;
 
 void genhc08Code (iCode *);
+void hc08_emitDebuggerSymbol (char *);
 
 //extern char *fReturn8051[];
 extern unsigned fReturnSizeHC08;

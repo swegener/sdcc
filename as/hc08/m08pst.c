@@ -33,6 +33,8 @@ struct	mne	mne[] = {
     {	NULL,	"LOAD",		S_ATYP,		0,	A_LOAD	},
     {	NULL,	"NOLOAD",	S_ATYP,		0,	A_NOLOAD },
 
+    {	NULL,	".uleb128",	S_ULEB128,	0,	0	},
+    {	NULL,	".sleb128",	S_SLEB128,	0,	0	},
     {	NULL,	".byte",	S_BYTE,		0,	1	},
     {	NULL,	".db",		S_BYTE,		0,	1	},
     {	NULL,	".word",	S_WORD,		0,	2	},

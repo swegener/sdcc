@@ -4446,6 +4446,7 @@ createLabel (symbol * label, ast * stmnt)
   else
     addSym (LabelTab, label, name, label->level, 0, 0);
 
+  label->isitmp = 1;
   label->islbl = 1;
   label->key = labelKey++;
   rValue = newNode (LABEL, newAst_VALUE (symbolVal (label)), stmnt);

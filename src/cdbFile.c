@@ -12,12 +12,16 @@
 
 int cdbOpenFile(char *file);
 int cdbCloseFile(void);
-int cdbWriteFunction(symbol *pSym);
+int cdbWriteFunction(symbol *pSym, iCode *ic);
+int cdbWriteEndFunction(symbol *pSym, iCode *ic, int offset);
+int cdbWriteLabel(symbol *pSym, iCode *ic);
+int cdbWriteScope(iCode *ic);
 int cdbWriteSymbol(symbol *pSym);
 int cdbWriteType(structdef *sdef, int block, int inStruct, char *tag);
 int cdbWriteModule(char *name);
-int cdbWriteCLine(char *module, int Line, int Level, int Block);
+int cdbWriteCLine(iCode *ic);
 int cdbWriteALine(char *module, int Line);
+int cdbWriteFrameAddress(char *variable, struct regs *reg, int offset);
 int cdbWriteBasicSymbol(symbol *sym, int isStructSym, int isFunc);
 void cdbTypeInfo (sym_link * type);
      
@@ -28,10 +32,14 @@ DEBUGFILE cdbDebugFile =
     &cdbCloseFile,
     &cdbWriteModule,
     &cdbWriteFunction,
+    &cdbWriteEndFunction,
+    &cdbWriteLabel,
+    &cdbWriteScope,
     &cdbWriteSymbol,
     &cdbWriteType,
     &cdbWriteCLine,
-    &cdbWriteALine
+    &cdbWriteALine,
+    &cdbWriteFrameAddress
   };
 
 FILE *cdbFilePtr = NULL;
@@ -79,15 +87,90 @@ int cdbCloseFile(void)
  *
  *****************************************************************/
 
-int cdbWriteFunction(symbol *pSym)
+int cdbWriteFunction(symbol *pSym, iCode *ic)
 {
+  char debugSym[INITIAL_INLINEASM];
+  
   if (getenv("SDCC_DEBUG_FUNCTION_POINTERS"))
     fprintf (stderr, "cdbFile.c:cdbWriteFunction()\n");
 
 
   if(!cdbFilePtr) return 0;
 
+  if (IS_STATIC (pSym->etype))
+    sprintf (debugSym, "F%s$%s$0$0", moduleName, pSym->name);
+  else
+    sprintf (debugSym, "G$%s$0$0", pSym->name);
+  emitDebuggerSymbol (debugSym);
+    
   return cdbWriteBasicSymbol(pSym, FALSE, TRUE);
+}
+
+/******************************************************************
+ *
+ *
+ *
+ *
+ *****************************************************************/
+
+int cdbWriteEndFunction(symbol *pSym, iCode *ic, int offset)
+{
+  char debugSym[INITIAL_INLINEASM];
+  
+  if (getenv("SDCC_DEBUG_FUNCTION_POINTERS"))
+    fprintf (stderr, "cdbFile.c:cdbWriteEndFunction()\n");
+
+  if(!cdbFilePtr) return 0;
+	  
+  if (ic)
+    {
+      sprintf (debugSym, "C$%s$%d$%d$%d",
+	       FileBaseName (ic->filename), pSym->lastLine,
+	       ic->level, ic->block);
+      emitDebuggerSymbol (debugSym);
+    }
+
+  if (IS_STATIC (pSym->etype))
+    sprintf (debugSym, "XF%s$%s$0$0", moduleName, pSym->name);
+  else
+    sprintf (debugSym, "XG$%s$0$0", pSym->name);
+  emitDebuggerSymbol (debugSym);
+    
+  return 1;
+}
+
+/******************************************************************
+ *
+ *
+ *
+ *
+ *****************************************************************/
+
+int cdbWriteLabel(symbol *pSym, iCode *ic)
+{
+  if (getenv("SDCC_DEBUG_FUNCTION_POINTERS"))
+    fprintf (stderr, "cdbFile.c:cdbWriteLabel()\n");
+
+  if(!cdbFilePtr) return 0;
+	  
+  return 1;
+}
+
+/******************************************************************
+ *
+ *
+ *
+ *
+ *****************************************************************/
+
+int cdbWriteScope(iCode *ic)
+{
+  if (getenv("SDCC_DEBUG_FUNCTION_POINTERS"))
+    fprintf (stderr, "cdbFile.c:cdbWriteScope()\n");
+
+  if(!cdbFilePtr) return 0;
+	  
+  return 1;
 }
 
 /******************************************************************
@@ -171,9 +254,16 @@ int cdbWriteModule(char *name)
  *
  *
  *****************************************************************/
-int cdbWriteCLine(char *module, int Line, int Level, int Block)
+int cdbWriteCLine(iCode *ic)
 {
+  char debugSym[INITIAL_INLINEASM];
+  
   if(!cdbFilePtr) return 0;
+	      
+  sprintf (debugSym, "C$%s$%d$%d$%d", 
+	   FileBaseName (ic->filename), ic->lineno,
+	   ic->level, ic->block);
+  emitDebuggerSymbol (debugSym);
 
   return 1;
 }
@@ -189,6 +279,23 @@ int cdbWriteALine(char *module, int Line)
 {
   if(!cdbFilePtr) return 0;
 
+  return 1;
+}
+
+/******************************************************************
+ *
+ *
+ *
+ *
+ *****************************************************************/
+
+int cdbWriteFrameAddress(char *variable, struct regs *reg, int offset)
+{
+  if (getenv("SDCC_DEBUG_FUNCTION_POINTERS"))
+    fprintf (stderr, "cdbFile.c:cdbWriteFrameAddress()\n");
+
+  if(!cdbFilePtr) return 0;
+	  
   return 1;
 }
 

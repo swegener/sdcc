@@ -375,7 +375,7 @@ char *argv[];
 		}
 	}
 	//JCF:
-	CreateAOMF51();
+	//CreateAOMF51();
 
 #ifdef WIN32T
     Timer(1, "Linker execution time");

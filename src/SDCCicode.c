@@ -3363,6 +3363,7 @@ geniCodeFunctionBody (ast * tree,int lvl)
   /* create a proc icode */
   ic = newiCode (FUNCTION, func, NULL);
   lineno=ic->lineno = OP_SYMBOL (func)->lineDef;
+  ic->tree = tree;
 
   ADDTOCHAIN (ic);
 
@@ -3378,6 +3379,7 @@ geniCodeFunctionBody (ast * tree,int lvl)
 
   /* now generate the end proc */
   ic = newiCode (ENDFUNCTION, func, NULL);
+  ic->tree = tree;
   ADDTOCHAIN (ic);
   return;
 }

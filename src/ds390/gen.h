@@ -81,6 +81,7 @@ typedef struct asmop
 asmop;
 
 void gen390Code (iCode *);
+void ds390_emitDebuggerSymbol (char *);
 
 extern unsigned fReturnSizeDS390;
 

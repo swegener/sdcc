@@ -4,7 +4,7 @@
 
 #include "SDCCerr.h"
 
-#ifdef OPT_DISABLE_GC
+#if OPT_DISABLE_GC != 0
 
 # include <malloc.h>
 # define GC_malloc(x) calloc((x), 1)

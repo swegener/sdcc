@@ -263,8 +263,10 @@ void allocIntoSeg (symbol *sym)
 /*-----------------------------------------------------------------*/
 void allocGlobal ( symbol *sym )
 {
+	
     /* symbol name is internal name  */
-    sprintf (sym->rname,"%s%s", port->fun_prefix, sym->name);
+    if (!sym->level) /* local statics can come here */
+	    sprintf (sym->rname,"%s%s", port->fun_prefix, sym->name);
     
     /* add it to the operandKey reset */
     addSet(&operKeyReset,sym);
@@ -535,8 +537,7 @@ void allocLocal ( symbol *sym  )
 
     /* if this is a static variable */
     if ( IS_STATIC (sym->etype)) {
-	SPEC_OCLS(sym->etype) = port->mem.default_local_map;
-	allocIntoSeg (sym);
+	allocGlobal(sym);
         sym->allocreq = 1;
 	return   ;
     }

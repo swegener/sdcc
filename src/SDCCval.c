@@ -1143,7 +1143,7 @@ valDiv (value * lval, value * rval)
   SPEC_LONG  (val->type) = (SPEC_LONG  (lval->etype) | SPEC_LONG  (rval->etype));
   SPEC_USIGN (val->type) = SPEC_USIGN (computeType (lval->etype,
 						    rval->etype,
-						    TRUE));
+						    FALSE));
 
   if (IS_FLOAT (val->type))
     SPEC_CVAL (val->type).v_float = floatFromVal (lval) / floatFromVal (rval);

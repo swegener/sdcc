@@ -45,7 +45,7 @@ symbol *entryLabel;		/* function entry  label */
 
 /*-----------------------------------------------------------------*/
 /* forward definition of some functions */
-operand *geniCodeDivision (operand *, operand *);
+operand *geniCodeDivision (operand *, operand *, bool);
 operand *geniCodeAssign (operand *, operand *, int);
 static operand *geniCodeArray (operand *, operand *,int);
 static operand *geniCodeArray2Ptr (operand *);
@@ -1753,36 +1753,90 @@ usualUnaryConversions (operand * op)
 /*-----------------------------------------------------------------*/
 /* perform "usual binary conversions"                              */
 /*-----------------------------------------------------------------*/
+
 static sym_link *
 usualBinaryConversions (operand ** op1, operand ** op2,
-                        bool promoteCharToInt, bool isMul)
+                        bool resultIsInt, char op)
 {
   sym_link *ctype;
   sym_link *rtype = operandType (*op2);
   sym_link *ltype = operandType (*op1);
 
-  ctype = computeType (ltype, rtype, promoteCharToInt);
+#define OLDONEBYTEOPS 1
 
-  /* special for multiplication:
-     This if for 'mul a,b', which takes two chars and returns an int */
-  if (   isMul
-      /* && promoteCharToInt	superfluous, already handled by computeType() */
-      && IS_INT  (getSpec (ctype)))
+#ifdef OLDONEBYTEOPS  
+  bool oldOneByteOps = FALSE;
+  static bool saidHello = FALSE;
+  
+  if (   strcmp (port->target, "pic14") == 0
+      || strcmp (port->target, "pic16") == 0)
+    oldOneByteOps = TRUE;
+  if (getenv ("SDCC_NEWONEBYTEOPS"))
     {
-      sym_link *retype = getSpec (rtype);
-      sym_link *letype = getSpec (ltype);
-
-      if (   IS_CHAR (letype)
-	  && IS_CHAR (retype)
-	  && IS_UNSIGNED (letype)
-	  && IS_UNSIGNED (retype))
-	{
-	  return ctype;
+      if (!saidHello)
+        {
+	  fprintf (stderr, "Override: oldOneByteOps = FALSE\n");
+	  saidHello = TRUE;
 	}
+      oldOneByteOps = FALSE;
     }
+  else if (getenv ("SDCC_OLDONEBYTEOPS"))
+    {
+      if (!saidHello)
+        {
+          fprintf (stderr, "Override: oldOneByteOps = TRUE\n");
+	  saidHello = TRUE;
+	}
+      oldOneByteOps = TRUE;
+    }
+
+
+  if (   oldOneByteOps
+      && (   (IS_CHAR (getSpec (ltype)) && !IS_UNSIGNED (getSpec (ltype)))
+	  || (IS_CHAR (getSpec (rtype)) && !IS_UNSIGNED (getSpec (rtype)))))
+    /* one or two signed char operands: promote to int */
+    resultIsInt = TRUE;
+#endif
+  
+  ctype = computeType (ltype, rtype, resultIsInt);
+
+#ifdef OLDONEBYTEOPS
+
+  if (oldOneByteOps)
+    {
+      if (   op == '*'
+          && IS_CHAR (getSpec (ltype)) && IS_UNSIGNED (getSpec (ltype))
+	  && IS_CHAR (getSpec (rtype)) && IS_UNSIGNED (getSpec (rtype)))
+	  {
+	    /* two unsigned char operands and Mult: no promotion */
+	    return ctype;
+	  }
+      *op1 = geniCodeCast (ctype, *op1, TRUE);
+      *op2 = geniCodeCast (ctype, *op2, TRUE);
+
+      return ctype;
+    }
+
+#endif
+
+  switch (op)
+    {
+      case '*':
+      case '/':
+      case '%':
+	if (IS_CHAR (getSpec (ltype)) && IS_CHAR (getSpec (rtype)))
+	  {
+	    /* one byte operations: keep signedness for code generator */
+	    return ctype;
+	  }
+	break;
+      default:
+	break;
+    }
+
   *op1 = geniCodeCast (ctype, *op1, TRUE);
   *op2 = geniCodeCast (ctype, *op2, TRUE);
-
+	
   return ctype;
 }
 
@@ -2007,7 +2061,7 @@ geniCodeGoto (symbol * label)
 /* geniCodeMultiply - gen intermediate code for multiplication     */
 /*-----------------------------------------------------------------*/
 operand *
-geniCodeMultiply (operand * left, operand * right, int resultIsInt)
+geniCodeMultiply (operand * left, operand * right, bool resultIsInt)
 {
   iCode *ic;
   int p2 = 0;
@@ -2023,7 +2077,7 @@ geniCodeMultiply (operand * left, operand * right, int resultIsInt)
     p2 = powof2 ((TYPE_UDWORD) floatFromVal (right->operand.valOperand));
   }
 
-  resType = usualBinaryConversions (&left, &right, resultIsInt, TRUE);
+  resType = usualBinaryConversions (&left, &right, resultIsInt, '*');
 #if 1
   rtype = operandType (right);
   retype = getSpec (rtype);
@@ -2066,7 +2120,7 @@ geniCodeMultiply (operand * left, operand * right, int resultIsInt)
 /* geniCodeDivision - gen intermediate code for division           */
 /*-----------------------------------------------------------------*/
 operand *
-geniCodeDivision (operand * left, operand * right)
+geniCodeDivision (operand * left, operand * right, bool resultIsInt)
 {
   iCode *ic;
   int p2 = 0;
@@ -2076,9 +2130,7 @@ geniCodeDivision (operand * left, operand * right)
   sym_link *ltype = operandType (left);
   sym_link *letype = getSpec (ltype);
 
-  resType = usualBinaryConversions (&left, &right,
-              (IS_UNSIGNED (retype) && IS_UNSIGNED (letype)) ? FALSE : TRUE,
-	      FALSE);
+  resType = usualBinaryConversions (&left, &right, resultIsInt, '/');
 
   /* if the right is a literal & power of 2
      and left is unsigned then make it a
@@ -2106,7 +2158,7 @@ geniCodeDivision (operand * left, operand * right)
 /* geniCodeModulus  - gen intermediate code for modulus            */
 /*-----------------------------------------------------------------*/
 operand *
-geniCodeModulus (operand * left, operand * right)
+geniCodeModulus (operand * left, operand * right, bool resultIsInt)
 {
   iCode *ic;
   sym_link *resType;
@@ -2117,9 +2169,7 @@ geniCodeModulus (operand * left, operand * right)
     return operandFromValue (valMod (left->operand.valOperand,
 				     right->operand.valOperand));
 
-  resType = usualBinaryConversions (&left, &right,
-              (IS_UNSIGNED (retype) && IS_UNSIGNED (letype)) ? FALSE : TRUE,
-	      FALSE);
+  resType = usualBinaryConversions (&left, &right, resultIsInt, '%');
 
   /* now they are the same size */
   ic = newiCode ('%', left, right);
@@ -2163,7 +2213,8 @@ subtractExit:
   
   // should we really do this? is this ANSI?
   return geniCodeDivision (result,
-			   operandFromLit (getSize (ltype->next)));
+			   operandFromLit (getSize (ltype->next)),
+			   FALSE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2198,7 +2249,7 @@ geniCodeSubtract (operand * left, operand * right)
     }
   else
     {				/* make them the same size */
-      resType = usualBinaryConversions (&left, &right, FALSE, FALSE);
+      resType = usualBinaryConversions (&left, &right, FALSE, '-');
     }
 
   ic = newiCode ('-', left, right);
@@ -2257,7 +2308,7 @@ geniCodeAdd (operand * left, operand * right, int lvl)
     }
   else
     { // make them the same size
-      resType = usualBinaryConversions (&left, &right, FALSE, FALSE);
+      resType = usualBinaryConversions (&left, &right, FALSE, '+');
     }
 
   /* if they are both literals then we know */
@@ -2847,7 +2898,7 @@ geniCodeLogic (operand * left, operand * right, int op)
         }
     }
 
-  ctype = usualBinaryConversions (&left, &right, FALSE, FALSE);
+  ctype = usualBinaryConversions (&left, &right, FALSE, ' ');
 
   ic = newiCode (op, left, right);
   IC_RESULT (ic) = newiTempOperand (newCharLink (), 1);
@@ -3803,15 +3854,18 @@ ast2iCode (ast * tree,int lvl)
 
     case '/':
       return geniCodeDivision (geniCodeRValue (left, FALSE),
-			       geniCodeRValue (right, FALSE));
+			       geniCodeRValue (right, FALSE),
+			       IS_INT (tree->ftype));
 
     case '%':
       return geniCodeModulus (geniCodeRValue (left, FALSE),
-			      geniCodeRValue (right, FALSE));
+			      geniCodeRValue (right, FALSE),
+			      IS_INT (tree->ftype));
     case '*':
       if (right)
 	return geniCodeMultiply (geniCodeRValue (left, FALSE),
-				 geniCodeRValue (right, FALSE),IS_INT(tree->ftype));
+				 geniCodeRValue (right, FALSE),
+				 IS_INT (tree->ftype));
       else
 	return geniCodeDerefPtr (geniCodeRValue (left, FALSE),lvl);
 
@@ -3923,13 +3977,17 @@ ast2iCode (ast * tree,int lvl)
 	geniCodeAssign (left,
 		geniCodeDivision (geniCodeRValue (operandFromOperand (left),
 						  FALSE),
-				  geniCodeRValue (right, FALSE)), 0);
+				  geniCodeRValue (right, FALSE),
+				  IS_INT (tree->ftype)),
+			0);
     case MOD_ASSIGN:
       return
 	geniCodeAssign (left,
 		 geniCodeModulus (geniCodeRValue (operandFromOperand (left),
 						  FALSE),
-				  geniCodeRValue (right, FALSE)), 0);
+				  geniCodeRValue (right, FALSE),
+				  IS_INT (tree->ftype)),
+			0);
     case ADD_ASSIGN:
       {
 	sym_link *rtype = operandType (right);

@@ -90,8 +90,6 @@ _modsint_dummy (void) _naked
 		mov	a,b1
 		jnb	acc.7,b_not_negative
 
-		cpl	F0
-
 		clr	a
 		clr	c
 		subb	a,b0

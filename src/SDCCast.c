@@ -2084,6 +2084,7 @@ addCast (ast *tree, RESULT_TYPE resultType, bool upcast)
     }
   tree->decorated = 0;
   tree = newNode (CAST, newAst_LINK (newLink), tree);
+  tree->lineno = tree->right->lineno;
   /* keep unsigned type during cast to smaller type,
      but not when promoting from char to int */
   if (!upCasted)
@@ -2104,6 +2105,10 @@ resultTypePropagate (ast *tree, RESULT_TYPE resultType)
       case ':':
       case '|':
       case '^':
+      case '*':
+      case '+':
+      case '-':
+      case LABEL:
 	return resultType;
       case '&':
 	if (!tree->right)
@@ -2111,6 +2116,8 @@ resultTypePropagate (ast *tree, RESULT_TYPE resultType)
 	  return RESULT_TYPE_NONE;
 	else
 	  return resultType;
+      case IFX:
+	return RESULT_TYPE_IFX;
       default:
 	return RESULT_TYPE_NONE;
     }
@@ -2792,10 +2799,11 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	}
 
       LRVAL (tree) = RRVAL (tree) = 1;
+
       TETYPE (tree) = getSpec (TTYPE (tree) =
 			       computeType (LTYPE (tree),
 					    RTYPE (tree),
-		! (IS_UNSIGNED (LTYPE (tree)) && IS_UNSIGNED (RTYPE (tree)))));
+		               resultType == RESULT_TYPE_CHAR ? FALSE : TRUE));
 
       /* if right is a literal and */
       /* left is also a division by a literal then */
@@ -2861,7 +2869,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       TETYPE (tree) = getSpec (TTYPE (tree) =
 			       computeType (LTYPE (tree),
 					    RTYPE (tree),
-		! (IS_UNSIGNED (LTYPE (tree)) && IS_UNSIGNED (RTYPE (tree)))));
+		               resultType == RESULT_TYPE_CHAR ? FALSE : TRUE));
       return tree;
 
       /*------------------------------------------------------------------*/
@@ -2977,7 +2985,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 				   computeType (LTYPE (tree),
 					        RTYPE (tree),
 		               resultType == RESULT_TYPE_CHAR ? FALSE : TRUE));
-      
+
       return tree;
 
       /*------------------------------------------------------------------*/
@@ -3363,7 +3371,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	  tree->left = addCast (tree->left, resultType, TRUE);
 	  TETYPE (tree) = getSpec (TTYPE (tree) =
 				       computeType (LTYPE (tree),
-					            RTYPE (tree),
+					            NULL,
 			       resultType == RESULT_TYPE_CHAR ? FALSE : TRUE));
 	}
       else /* RIGHT_OP */
@@ -3685,8 +3693,14 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	    }
 	  if (tree->opval.op == '>')
 	    {
-	      /* if the parent is an ifx, then we could do */
-	      /* return tree->left; */
+	      if (resultType == RESULT_TYPE_IFX)
+		{
+		  /* the parent is an ifx: */
+		  /* if (unsigned value) */
+		  return tree->left;
+		}
+	      
+	      /* (unsigned value) ? 1 : 0 */
 	      tree->opval.op = '?';
 	      tree->right = newNode (':',
 				     newAst_VALUE (constVal ("1")),

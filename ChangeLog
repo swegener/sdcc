@@ -1,3 +1,28 @@
+2004-02-11 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* device/lib/_modsint.c,
+	* device/lib/_modslong.c: sign follows divisor only
+	* src/hc08/gen.c (genMultOneByte): if result size is 1,
+	signs or signedness can be ignored
+	* src/SDCCast.c (addCast): cosmetic - added lineno to CAST
+	* src/SDCCast.c (resultTypePropagate): added even more ops: +, - and *,
+	added optimization for IFX,
+	(decorateType): Mult/Div/ModOneByte ops can handle all kind of signed
+	arguments;
+	reenabled optimization for IFX, which was removed on 2004-01-11
+	* src/SDCCast.h: added return type IFX
+	* src/SDCCicode.c: Mult/Div/ModOneByte ops can handle all kind of signed
+	arguments with 8 or 16 bit results; pic14 and pic16 ports use old
+	promotion behaviour; env. var. SDCC_NEWONEBYTEOPS selects the new,
+	SDCC_OLDONEBYTEOPS selects the old behaviour
+	* src/SDCCsymt.c (computeType): type2 can be NULL (for LEFT_OP);
+	changed again and commented promotion rule (it's still not perfect)
+	* src/SDCCval.c (valDiv): promotion no longer necessary
+	* src/ds390/gen.c (genMultOneByte) (genDivOneByte) (genModOneByte),
+	* src/mcs51/gen.c (genMultOneByte) (genDivOneByte) (genModOneByte):
+	rewritten
+	* support/regression/tests/onebyte.c: added
+
 2004-02-11 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* gen.c (genInline): reverted to old code for assemnling inline
@@ -127,28 +152,28 @@
 
 	* pcode.c (pic16initMnemonics): fixed typo in assignment to PCOP_RLNCF
 	PCOP_RLCF was overwritten!
-	* gen.c (genSkip) commented out calls to pic16_emitcode,
-	* (genCmpEQ) fixed "long" compares, only high word did get compared,
+	* gen.c (genSkip): commented out calls to pic16_emitcode,
+	* (genCmpEQ): fixed "long" compares, only high word did get compared,
 	* (genlshTwo),
-	* (genRRC) added debugging info,
-	* (shiftL2Left2Result) Fixed bug, if offr > offl. Result got
+	* (genRRC): added debugging info,
+	* (shiftL2Left2Result): Fixed bug, if offr > offl. Result got
 	overwritten while shifting,
-	* (shiftR2Left2Result) Fixed bug, if offr < offl. Result got
+	* (shiftR2Left2Result): Fixed bug, if offr < offl. Result got
 	overwritten while shifting,
 	* (AccLsh),
 	* (AccRsh),
 	* (shiftLLeftOrResult),
 	* (shiftRLeftOrResult),
 	* (shiftRLong),
-	* (shiftLLong) Implemented with pic16_emitpcode
-	* (genlshFour) Replaced pic16_aopPut with pic16_emitpcode,
-	* (genLeftShift) Fixed bug, operand for shift by variable always
+	* (shiftLLong): Implemented with pic16_emitpcode
+	* (genlshFour): Replaced pic16_aopPut with pic16_emitpcode,
+	* (genLeftShift): Fixed bug, operand for shift by variable always
 	was "and"ed with 0x0f,
 	* (genLeftShiftLiteral),
 	* (genrshTwo),
-	* (genRightShiftLiteral) added debugging info,
-	* (genrshFour) added comment,
-	* (genRightShift) determined signedness from operand "left"
+	* (genRightShiftLiteral): added debugging info,
+	* (genrshFour): added comment,
+	* (genRightShift): determined signedness from operand "left"
 	instead of "result"
 
 2004-02-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>

@@ -1519,7 +1519,9 @@ computeType (sym_link * type1, sym_link * type2, bool promoteCharToInt)
   sym_link *rType;
   sym_link *reType;
   sym_link *etype1 = getSpec (type1);
-  sym_link *etype2 = getSpec (type2);
+  sym_link *etype2;
+   
+  etype2 = type2 ? getSpec (type2) : type1;
 
   /* if one of them is a float then result is a float */
   /* here we assume that the types passed are okay */
@@ -1554,18 +1556,25 @@ computeType (sym_link * type1, sym_link * type2, bool promoteCharToInt)
   if (IS_CHAR (reType) && promoteCharToInt)
     SPEC_NOUN (reType) = V_INT;
 
-  if (   (   (   SPEC_USIGN (etype1)
+  if (!IS_FLOAT (reType)
+      && (   (   SPEC_USIGN (etype1)
               /* if this operand is promoted to a larger
 		 type don't check it's signedness */
 	      && (getSize (etype1) >= getSize (reType))
-	      /* We store signed literals in the range 0...255 as
-		 'unsigned char'. If there was no promotion to 'signed int'
-		 they must not force an unsigned operation: */
-	      && !(IS_CHAR (etype1) && IS_LITERAL (etype1)))
+	      /* char has to handled as it would have
+		 been promoted to int */
+	      && !IS_CHAR (etype1))
+	      /* same for 2nd operand */  
 	  || (   SPEC_USIGN (etype2)
 	      && (getSize (etype2) >= getSize (reType))
-	      && !(IS_CHAR (etype2) && IS_LITERAL (etype2))))
-      && !IS_FLOAT (reType))
+	      && !IS_CHAR (etype2))
+	  /* if both are unsigned char and not promoted
+	     let the result be unsigned too */
+	  || (   SPEC_USIGN (etype1)
+	      && SPEC_USIGN (etype2)
+	      && IS_CHAR (etype1)
+	      && IS_CHAR (etype2)
+	      && !promoteCharToInt)))
     SPEC_USIGN (reType) = 1;
   else
     SPEC_USIGN (reType) = 0;

@@ -101,8 +101,6 @@ _modslong_dummy (void) _naked
 		mov	a,b3
 		jnb	acc.7,b_not_negative
 
-		cpl	F0
-
 		clr	a		; b = -b;
 		clr	c
 		subb	a,b0

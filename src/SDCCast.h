@@ -177,7 +177,8 @@ typedef enum
   RESULT_TYPE_BIT,
   RESULT_TYPE_CHAR,
   RESULT_TYPE_INT,
-  RESULT_TYPE_OTHER
+  RESULT_TYPE_OTHER,
+  RESULT_TYPE_IFX,
 } RESULT_TYPE;
 
 /* forward declarations for global variables */

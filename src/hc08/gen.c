@@ -3451,7 +3451,7 @@ genMultOneByte (operand * left,
       //emitcode (";", "swapped left and right");
     }
 
-  if (SPEC_USIGN(opetype)
+  if (size == 1
       || (SPEC_USIGN(operandType(left)) &&
 	  SPEC_USIGN(operandType(right))))
     {

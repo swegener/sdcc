@@ -613,7 +613,7 @@ int processParms (ast *func, value *defParm,
             DCL_TYPE(newType->opval.lnk) = GPOINTER;
         }
         
-        if (0 && newType)
+        if (newType)
         {
      	    /* cast required; change this op to a cast. */
             ast *parmCopy = resolveSymbols(copyAst(actParm));

@@ -260,6 +260,10 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	  if (IS_AGGREGATE (sym->type)) {
 	    ival = initAggregates (sym, sym->ival, NULL);
 	  } else {
+	    if (getNelements(sym->type, sym->ival)>1) {
+	      werror (W_EXCESS_INITIALIZERS, "scalar", 
+		      sym->name, sym->lineDef);
+	    }
 	    ival = newNode ('=', newAst_VALUE (symbolVal (sym)),
 		     decorateType (resolveSymbols (list2expr (sym->ival))));
 	  }
@@ -527,7 +531,7 @@ printIvalType (symbol *sym, sym_link * type, initList * ilist, FILE * oFile)
 	if (ilist->type == INIT_DEEP)
 		ilist = ilist->init.deep;
 
-	if (sym && ilist->next) {
+	if (!IS_AGGREGATE(sym->type) && getNelements(type, ilist)>1) {
 	  werror (W_EXCESS_INITIALIZERS, "scalar", sym->name, sym->lineDef);
 	}
 
@@ -633,7 +637,7 @@ printIvalStruct (symbol * sym, sym_link * type,
 		if (IS_BITFIELD(sflds->type)) {
 			printIvalBitFields(&sflds,&iloop,oFile);
 		} else {
-			printIval (NULL, sflds->type, iloop, oFile);
+			printIval (sym, sflds->type, iloop, oFile);
 		}
 	}
 	if (iloop) {
@@ -709,7 +713,7 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
   for (;;)
     {
       size++;
-      printIval (NULL, type->next, iloop, oFile);
+      printIval (sym, type->next, iloop, oFile);
       iloop = (iloop ? iloop->next : NULL);
 
 

@@ -1095,11 +1095,16 @@ gatherAutoInit (symbol * autoChain)
 	  addSym (SymbolTab, newSym, newSym->rname, 0, 0, 1);
 
 	  /* now lift the code to main */
-	  if (IS_AGGREGATE (sym->type))
+	  if (IS_AGGREGATE (sym->type)) {
 	    work = initAggregates (sym, sym->ival, NULL);
-	  else
+	  } else {
+	    if (getNelements(sym->type, sym->ival)>1) {
+	      werror (W_EXCESS_INITIALIZERS, "scalar", 
+		      sym->name, sym->lineDef);
+	    }
 	    work = newNode ('=', newAst_VALUE (symbolVal (newSym)),
 			    list2expr (sym->ival));
+	  }
 
 	  setAstLineno (work, sym->lineDef);
 
@@ -1118,6 +1123,10 @@ gatherAutoInit (symbol * autoChain)
 	  if (IS_AGGREGATE (sym->type)) {
 	    work = initAggregates (sym, sym->ival, NULL);
 	  } else {
+	    if (getNelements(sym->type, sym->ival)>1) {
+	      werror (W_EXCESS_INITIALIZERS, "scalar", 
+		      sym->name, sym->lineDef);
+	    }
 	    work = newNode ('=', newAst_VALUE (symbolVal (sym)),
 			    list2expr (sym->ival));
 	  }

@@ -11440,36 +11440,66 @@ Notes on MCS51 memory
  layout
 \layout Standard
 
-The 8051 family of micro controller have a minimum of 128 bytes of internal
- memory which is structured as follows
+The 8051 family of microcontrollers have a minimum of 128 bytes of internal
+ RAM memory which is structured as follows
 \newline 
 
 \newline 
-- Bytes 00-1F - 32 bytes to hold up to 4 banks of the registers R7 to R7
+- Bytes 00-1F - 32 bytes to hold up to 4 banks of the registers R0 to R7,
  
 \newline 
-- Bytes 20-2F - 16 bytes to hold 128 bit variables and 
+- Bytes 20-2F - 16 bytes to hold 128 bit variables and, 
 \newline 
 - Bytes 30-7F - 60 bytes for general purpose use.
 \newline 
 
-\newline 
-Normally the SDCC compiler will only utilise the first bank
+\layout Standard
+
+Adittionally some members of the MCS51 family may have up to 128 bytes of
+ additional, indirectly addressable, internal RAM memory (
+\emph on 
+idata
+\emph default 
+).
+ Furtermore, some chips may have some built in external memory (
+\emph on 
+xdata
+\emph default 
+) which should not be confused with the internal, direclty addressable RAM
+ memory (
+\emph on 
+data
+\emph default 
+).
+ Usually this built in 
+\emph on 
+xdata
+\emph default 
+ memory has to be activated before using it (you can probably find this
+ information on the datasheet of the microcontroller your are using).
+\layout Standard
+
+Normally SDCC will only use the first bank
 \begin_inset LatexCommand \index{bank}
 
 \end_inset 
 
- of registers, but it is possible to specify that other banks of registers
- should be used in interrupt
+ of registers (register bank 0), but it is possible to specify that other
+ banks of registers should be used in interrupt
 \begin_inset LatexCommand \index{interrupt}
 
 \end_inset 
 
  routines.
- By default, the compiler will place the stack after the last bank of used
- registers, i.e.
- if the first 2 banks of registers are used, it will position the base of
- the internal stack at address 16 (0X10).
+ By default, the compiler will place the stack after the last byte of allocated
+ memory for variables.
+ For example, if the first 2 banks of registers are used, and only four
+ bytes are used for 
+\emph on 
+data
+\emph default 
+ variables, it will position the base of the internal stack at address 20
+ (0x14).
  This implies that as the stack
 \begin_inset LatexCommand \index{stack}
 
@@ -11477,92 +11507,15 @@ Normally the SDCC compiler will only utilise the first bank
 
  grows, it will use up the remaining register banks, and the 16 bytes used
  by the 128 bit variables, and 60 bytes for general purpose use.
-\layout Standard
-
-By default, the compiler uses the 60 general purpose bytes to hold "near
- data".
- The compiler/optimiser may also declare some Local Variables in this area
- to hold local data.
- 
-\layout Standard
-
-If any of the 128 bit variables are used, or near data is being used then
- care needs to be taken to ensure that the stack does not grow so much that
- it starts to over write either your bit variables or "near data".
- There is no runtime checking to prevent this from happening.
-\layout Standard
-
-The amount of stack being used is affected by the use of the "internal stack"
- to save registers before a subroutine call is made (-
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--stack-auto
-\begin_inset LatexCommand \index{-\/-stack-auto}
-
-\end_inset 
-
- will declare parameters and local variables on the stack) and the number
- of nested subroutines.
-\layout Standard
-
-If you detect that the stack is over writing you data, then the following
- can be done.
- -
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--xstack will cause an external stack to be used for saving registers and
- (if -
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--stack-auto is being used) storing parameters and local variables.
- However this will produce more code which will be slower to execute.
- 
-\layout Standard
-
--
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--stack-loc
-\begin_inset LatexCommand \index{-\/-stack-loc}
-
-\end_inset 
-
- will allow you specify the start of the stack, i.e.
- you could start it after any data in the general purpose area.
- However this may waste the memory not used by the register banks and if
- the size of the "near data" increases, it may creep into the bottom of
- the stack.
-\layout Standard
-
--
+ If any bit variables are used, the data variables will be placed after
+ the byte holding the last bit variable.
+ For example, if register banks 0 and 1 are used, and there are 9 bit variables
+ (two bytes used), 
+\emph on 
+data
+\emph default 
+ variables will be placed starting at address 0x22.
+ You can also use -
 \begin_inset ERT
 status Collapsed
 
@@ -11577,22 +11530,11 @@ status Collapsed
 
 \end_inset 
 
- allows you to specify the start address of the near data.
- This could be used to move the "near data" further away from the stack
- giving it more room to grow.
- This will only work if no bit variables are being used and the stack can
- grow to use the bit variable space.
-\newline 
-
-\newline 
-Conclusion.
-\newline 
-
-\newline 
-If you find that the stack is over writing your bit variables or "near data"
- then the approach which best utilised the internal memory is to position
- the "near data" after the last bank of used registers or, if you use bit
- variables, after the last bit variable by using the -
+ to specify the start address of the 
+\emph on 
+data
+\emph default 
+ and -
 \begin_inset ERT
 status Collapsed
 
@@ -11602,8 +11544,21 @@ status Collapsed
 /
 \end_inset 
 
--data-loc, e.g.
- if two register banks are being used and no bit variables, -
+-iram-size to specify the size of the total internal RAM (
+\emph on 
+data
+\emph default 
++
+\emph on 
+idata
+\emph default 
+).
+ 
+\layout Standard
+
+By default the 8051 linker will place the stack after the last byte of data
+ variables.
+ Option -
 \begin_inset ERT
 status Collapsed
 
@@ -11613,12 +11568,98 @@ status Collapsed
 /
 \end_inset 
 
--data-loc 16.
+-stack-loc
+\begin_inset LatexCommand \index{-\/-stack-loc}
+
+\end_inset 
+
+ allows you to specify the start of the stack, i.e.
+ you could start it after any data in the general purpose area.
+ If your microcontroller has aditional indirectly addressable internal RAM
+ (
+\emph on 
+idata
+\emph default 
+) you can place the stack on it.
+ You may also need to use -
+\begin_inset ERT
+status Collapsed
+
 \layout Standard
 
-If bit variables are being used, another method would be to try and squeeze
- the data area in the unused register banks if it will fit, and start the
- stack after the last bit variable.
+\backslash 
+/
+\end_inset 
+
+-xdata-loc
+\begin_inset LatexCommand \index{-\/-data-loc}
+
+\end_inset 
+
+ to set the start address of the external RAM (
+\emph on 
+xdata
+\emph default 
+) and -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-xram-size
+\begin_inset LatexCommand \index{-\/-data-loc}
+
+\end_inset 
+
+ to specify its size.
+ Same goes for the code memory, using -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-code-loc
+\begin_inset LatexCommand \index{-\/-data-loc}
+
+\end_inset 
+
+ and -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-code-size
+\begin_inset LatexCommand \index{-\/-data-loc}
+
+\end_inset 
+
+.
+ If in doubt, don't specify any options and see if the resulting memory
+ layout is appropiate, then you can twik it.
+\layout Standard
+
+The 8051 linker generates two files with memory allocation information.
+ The first, with extension .map shows all the variables and segments.
+ The second with extension .mem shows the final memory layout.
+ The linker will complaint either if memory segments overlap, there is not
+ enough memory, or there is not enough space for stack.
+ If you get any linking warnings and/or errors related to stack or segments
+ allocation, take a look at either the .map or .mem files to find out what
+ the problem is.
+ The .mem file may even suggest a solution to the problem.
 \layout Subsection
 
 Tools
@@ -11631,7 +11672,7 @@ Tools
 
 
 \begin_inset  Tabular
-<lyxtabular version="3" rows="9" columns="3">
+<lyxtabular version="3" rows="12" columns="3">
 <features>
 <column alignment="center" valignment="top" leftline="true" width="0pt">
 <column alignment="center" valignment="top" leftline="true" width="0pt">
@@ -11886,6 +11927,7 @@ sdcc/bin
 
 \layout Standard
 
+aslink
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -11893,6 +11935,7 @@ sdcc/bin
 
 \layout Standard
 
+Linker
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -11900,6 +11943,121 @@ sdcc/bin
 
 \layout Standard
 
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+sdcc/bin
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+link-z80
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Linker
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+sdcc/bin
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+link-gbz80
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Linker
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+sdcc/bin
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+packihx
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+ihx packer
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+sdcc/bin
 \end_inset 
 </cell>
 </row>

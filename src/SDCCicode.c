@@ -52,7 +52,6 @@ operand *geniCodeRValue (operand *, bool );
 operand *geniCodeDerefPtr (operand *);
 
 #define PRINTFUNC(x) void x (FILE *of, iCode *ic, char *s)
-
 /* forward definition of print functions */
 PRINTFUNC(picGetValueAtAddr);
 PRINTFUNC(picSetValueAtAddr);
@@ -60,8 +59,6 @@ PRINTFUNC(picAddrOf);
 PRINTFUNC(picGeneric);
 PRINTFUNC(picGenericOne);
 PRINTFUNC(picCast);
-PRINTFUNC(picIncrement);
-PRINTFUNC(picDecrement);
 PRINTFUNC(picAssign);
 PRINTFUNC(picLabel);
 PRINTFUNC(picGoto);
@@ -552,6 +549,51 @@ void initiCode ()
 }
 
 /*-----------------------------------------------------------------*/
+/* copyiCode - make a copy of the iCode given                      */
+/*-----------------------------------------------------------------*/
+iCode *copyiCode (iCode *ic)
+{
+    iCode *nic = newiCode(ic->op,NULL,NULL);
+
+    nic->lineno = ic->lineno ;
+    nic->filename= ic->filename ;
+    nic->block = ic->block;
+    nic->level = ic->level;
+
+    /* deal with the special cases first */
+    switch (ic->op) {
+    case IFX:
+	IC_COND(nic) = operandFromOperand(IC_COND(ic));
+	IC_TRUE(nic) = operandFromOperand(IC_TRUE(ic));
+	IC_FALSE(nic)= operandFromOperand(IC_FALSE(ic));
+	break;
+
+    case JUMPTABLE:
+	IC_JTCOND(nic) = operandFromOperand(IC_JTCOND(ic));
+	IC_JTLABELS(nic) = IC_JTLABLES(ic);
+	break;
+
+    case CALL:
+    case PCALL:
+	IC_RESULT(nic) = operandFromOperand(IC_RESULT(ic));
+	IC_LEFT(nic)   = operandFromOperand(IC_LEFT(ic));
+	IC_ARGS(nic)   = IC_ARGS(ic);
+	break;
+
+    case INLINEASM:
+	IC_INLINE(nic) = IC_ININE(ic);
+	break;
+	
+    default:
+	IC_RESULT(nic) = operandFromOperand(IC_RESULT(ic));
+	IC_LEFT(nic) = operandFromOperand(IC_LEFT(ic));
+	IC_RIGHT(nic)= operandFromOperand(IC_RIGHT(ic));
+    }
+
+    return nic;
+}
+
+/*-----------------------------------------------------------------*/
 /* getTableEntry - gets the table entry for the given operator     */
 /*-----------------------------------------------------------------*/
 iCodeTable *getTableEntry (int oper )
@@ -942,12 +984,40 @@ int isiCodeEqual (iCode *left, iCode *right)
 }
 
 /*-----------------------------------------------------------------*/
+/* newiTempFromOp - create a temp Operand with same attributes     */
+/*-----------------------------------------------------------------*/
+operand *newiTempFromOp (operand *op)
+{
+    operand *nop;
+
+    if (!op)
+	return NULL;
+    
+    if (!IS_ITEMP(op))
+	return op;
+
+    nop = newiTempOperand(operandType(op),TRUE);
+    nop->isaddr = op->isaddr ;
+    nop->isvolatile = op->isvolatile ;
+    nop->isGlobal = op->isGlobal ;
+    nop->isLiteral= op->isLiteral ;
+    nop->noSpilLoc= op->noSpilLoc;
+    nop->usesDefs = op->usesDefs;
+    nop->isParm = op->isParm;
+    nop->parmBytes = op->parmBytes;
+    return nop;
+}
+
+/*-----------------------------------------------------------------*/
 /* operand from operand - creates an operand holder for the type   */
 /*-----------------------------------------------------------------*/
 operand *operandFromOperand (operand *op)
 {
-    operand *nop = newOperand();
+    operand *nop ;
     
+    if (!op)
+	return NULL;
+    nop = newOperand();
     nop->type = op->type;
     nop->isaddr = op->isaddr ;
     nop->key = op->key ;

@@ -163,7 +163,7 @@ typedef struct icodeFuncTable
     int icode ;
     char *printName ;
     void (*iCodePrint)(FILE *,iCode *,char *) ;
-    void (*iCodeGen)() ;
+    iCode * (*iCodeCopy)(iCode *) ;
 } iCodeTable ;
 
 /* useful macros */
@@ -273,5 +273,6 @@ int      printOperand (operand *,FILE *);
 void     setOperandType (operand *, link *);
 bool     isOperandInFarSpace (operand *);
 operand *opFromOpWithDU (operand *,bitVect *,bitVect *);
-
+iCode   *copyiCode (iCode *);
+operand *newiTempFromOp( operand *);
 #endif

@@ -37,7 +37,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir ""
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /nologo /G3 /ML /W3 /WX /Gm /GX /ZI /Od /I ".." /I "." /I "..\.." /I "..\..\support\util" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /FR /J /FD /Zm500 /GZ /c
+# ADD CPP /nologo /G3 /ML /W3 /Gm /GX /ZI /Od /I ".." /I "." /I "..\.." /I "..\..\support\util" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /FR /J /FD /Zm500 /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -52,6 +52,10 @@ LIB32=link.exe -lib
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
+# Begin Source File
+
+SOURCE=.\device.c
+# End Source File
 # Begin Source File
 
 SOURCE=.\gen.c
@@ -74,7 +78,15 @@ SOURCE=.\pcode.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\pcodeflow.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\pcodepeep.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\pcoderegs.c
 # End Source File
 # Begin Source File
 
@@ -84,6 +96,10 @@ SOURCE=.\ralloc.c
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=.\device.h
+# End Source File
 # Begin Source File
 
 SOURCE=.\gen.h
@@ -99,6 +115,14 @@ SOURCE=.\main.h
 # Begin Source File
 
 SOURCE=.\pcode.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\pcodeflow.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\pcoderegs.h
 # End Source File
 # Begin Source File
 

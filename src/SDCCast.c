@@ -1633,9 +1633,16 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
       if (astHasVolatile (pbody->left))
 	return FALSE;
 
-      if (IS_AST_SYM_VALUE (pbody->left) &&
-	  isSymbolEqual (AST_SYMBOL (pbody->left), sym))
-	return FALSE;
+      if (IS_AST_SYM_VALUE (pbody->left)) {
+	// if the loopvar has an assignment
+	if (isSymbolEqual (AST_SYMBOL (pbody->left), sym))
+	  return FALSE;
+	// if the loopvar is used in another (maybe conditional) block
+	if (astHasSymbol (pbody->right, sym) &&
+	    (pbody->level > body->level)) {
+	  return FALSE;
+	}
+      }
 
       if (astHasVolatile (pbody->left))
 	return FALSE;

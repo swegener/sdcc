@@ -75,7 +75,7 @@ struct
 { E_TMPFILE_FAILED, ERROR_LEVEL_ERROR,
    "Creation of temp file failed" },
 { E_FUNCTION_EXPECTED, ERROR_LEVEL_ERROR,
-   "Function expected here '%s'" },
+   "called object is not a function" },
 { E_USING_ERROR, ERROR_LEVEL_ERROR,
    "'using', 'interrupt' or 'reentrant' must follow a function definiton .'%s'" },
 { E_SFR_INIT, ERROR_LEVEL_ERROR,

@@ -1,5 +1,9 @@
 2003-02-09  Bernhard Held <bernhard@bernhardheld.de>
 
+	* src/SDCCmain.c: signal handling is switched off by SDCC_LEAVE_SIGNALS
+
+2003-02-09  Bernhard Held <bernhard@bernhardheld.de>
+
 	* src/SDCCmain.c: signal handling is switched off by --debug
 	* doc/Makefile: small fix for install; use clean.mk again
 	* doc/clean.mk: clean *.pdf and *.html too

@@ -1784,6 +1784,16 @@ main (int argc, char **argv, char **envp)
   /* install atexit handler */
   atexit(rm_tmpfiles);
 
+  /* install signal handler;
+     it's only purpuse is to call exit() to remove temp files */
+  if (!getenv("SDCC_LEAVE_SIGNALS"))
+    {
+      signal (SIGABRT, sig_handler);
+      signal (SIGTERM, sig_handler);
+      signal (SIGINT , sig_handler);
+      signal (SIGSEGV, sig_handler);
+    }
+
   /* Before parsing the command line options, do a
    * search for the port and processor and initialize
    * them if they're found. (We can't gurantee that these
@@ -1817,16 +1827,6 @@ main (int argc, char **argv, char **envp)
   }
 #endif
   parseCmdLine (argc, argv);
-
-  /* install signal handler;
-     it's only purpuse is to call exit() to remove temp files */
-  if (!options.debug)
-    {
-      signal (SIGABRT, sig_handler);
-      signal (SIGTERM, sig_handler);
-      signal (SIGINT , sig_handler);
-      signal (SIGSEGV, sig_handler);
-    }
 
   /* if no input then printUsage & exit */
   if ((!options.c1mode && !fullSrcFileName && !nrelFiles) ||

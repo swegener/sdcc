@@ -557,7 +557,8 @@ PORT z80_port =
     NULL,
     LINKCMD,
     NULL,
-    ".o"
+    ".o",
+    1
   },
   {
     _z80_defaultRules

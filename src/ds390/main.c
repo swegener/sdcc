@@ -381,7 +381,8 @@ PORT ds390_port =
     _linkCmd,
     NULL,
     NULL,
-    ".rel"
+    ".rel",
+    1
   },
   {
     _defaultRules
@@ -676,6 +677,7 @@ PORT tininative_port =
     NULL,
     NULL,
     ".tlib",
+    1
   },
   {
     _defaultRules

@@ -516,7 +516,13 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool useDP2)
 
   /* if already has one */
   if (sym->aop)
-    return sym->aop;
+    {
+      if ((sym->aop->type == AOP_DPTR && useDP2)
+          || (sym->aop->type == AOP_DPTR2 && !useDP2))
+	sym->aop = NULL;
+      else
+        return sym->aop;
+    }
 
   /* assign depending on the storage class */
   /* if it is on the stack or indirectly addressable */
@@ -862,6 +868,14 @@ operandsEqu (operand * op1, operand * op2)
       (sym2->usl.spillLoc == sym1))
     return TRUE;
 
+  /* are they spilt to the same location */
+  if (IS_ITEMP (op2) &&
+      IS_ITEMP (op1) &&
+      sym2->isspilt &&
+      sym1->isspilt &&
+      (sym1->usl.spillLoc == sym1->usl.spillLoc))
+    return TRUE;
+    
   return FALSE;
 }
 
@@ -921,13 +935,23 @@ aopOp (operand * op, iCode * ic, bool result, bool useDP2)
 
   /* if already has a asmop then continue */
   if (op->aop)
-    return;
+    {
+      if ((op->aop->type == AOP_DPTR && useDP2)
+          || (op->aop->type == AOP_DPTR2 && !useDP2))
+	op->aop = NULL;
+      else
+        return;
+    }
 
   /* if the underlying symbol has a aop */
   if (IS_SYMOP (op) && OP_SYMBOL (op)->aop)
     {
       op->aop = OP_SYMBOL (op)->aop;
-      return;
+      if ((op->aop->type == AOP_DPTR && useDP2)
+          || (op->aop->type == AOP_DPTR2 && !useDP2))
+	op->aop = NULL;
+      else
+        return;
     }
 
   /* if this is a true symbol */
@@ -3919,7 +3943,8 @@ bool aopOp3(iCode * ic)
     }
 
     aopOp(IC_LEFT(ic), ic, FALSE, useDp2);
-    
+
+        
     // We've op'd the left & right. So, if left or right are the same operand as result, 
     // we know aopOp will succeed, and we can just do it & bail.
     if (isOperandEqual(IC_LEFT(ic),IC_RESULT(ic)) ||
@@ -3929,6 +3954,19 @@ bool aopOp3(iCode * ic)
 	aopOp(IC_RESULT(ic),ic,TRUE, FALSE);
 	return TRUE;
     }
+    
+    // Operands may be equivalent (but not equal) if they share a spill location. If
+    // so, use the same DPTR or DPTR2.
+    if (operandsEqu (IC_LEFT(ic), IC_RESULT(ic)))
+      {
+        aopOp (IC_RESULT (ic), ic, TRUE, AOP_USESDPTR2 (IC_LEFT (ic)));
+	return TRUE;
+      }
+    if (operandsEqu (IC_RIGHT(ic), IC_RESULT(ic)))
+      {
+        aopOp (IC_RESULT (ic), ic, TRUE, AOP_USESDPTR2 (IC_RIGHT (ic)));
+	return TRUE;
+      }
     
     // Note which dptrs are currently in use.
     dp1InUse = AOP_USESDPTR(IC_LEFT(ic)) || AOP_USESDPTR(IC_RIGHT(ic));

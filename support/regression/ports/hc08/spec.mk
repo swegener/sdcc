@@ -4,7 +4,7 @@ UCHC08B = $(SDCC_DIR)/bin/shc08
 
 UCHC08 = $(shell if [ -f $(UCHC08A) ]; then echo $(UCHC08A); else echo $(UCHC08B); fi)
 
-SDCCFLAGS +=-mhc08 --less-pedantic --out-fmt-ihx -DREENTRANT=
+SDCCFLAGS +=-mhc08 --less-pedantic --out-fmt-ihx -DREENTRANT=reentrant
 #SDCCFLAGS +=--less-pedantic -DREENTRANT=reentrant
 
 OBJEXT = .rel

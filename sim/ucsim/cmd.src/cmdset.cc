@@ -128,9 +128,9 @@ COMMAND_DO_WORK_SIM(cl_stop_cmd)
 //		     class cl_cmdline *cmdline, class cl_console *con)
 COMMAND_DO_WORK_UC(cl_step_cmd)
 {
-  printf("step %x\n",uc->PC);
+  //printf("step %x\n",uc->PC);
   uc->do_inst(1);
-  printf("step done %x\n",uc->PC);
+  //printf("step done %x\n",uc->PC);
   uc->print_regs(con);
   return(0);
 }

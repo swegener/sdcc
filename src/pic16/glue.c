@@ -969,23 +969,24 @@ pic16glue ()
 
   //copyFile (stderr, code->oFile);
 
-	fprintf(asmFile, "; I code from now on!\n");
-  pic16_copypCode(asmFile, 'I');
+//		fprintf(asmFile, "; I code from now on!\n");
+	pic16_copypCode(asmFile, 'I');
 
-	fprintf(asmFile, "; dbName from now on!\n");
-  pic16_copypCode(asmFile, statsg->dbName);
+	
+//		fprintf(asmFile, "; dbName from now on!\n");
+	fprintf(asmFile, "__sdcc_program_startup:\n");
+	pic16_copypCode(asmFile, statsg->dbName);
 
-	fprintf(asmFile, "; X code from now on!\n");
-  pic16_copypCode(asmFile, 'X');
-	fprintf(asmFile, "; M code from now on!\n");
-  pic16_copypCode(asmFile, 'M');
-  pic16_copypCode(asmFile, code->dbName);
-  pic16_copypCode(asmFile, 'P');
+		fprintf(asmFile, "; X code from now on!\n");
+	pic16_copypCode(asmFile, 'X');
+		fprintf(asmFile, "; M code from now on!\n");
+	pic16_copypCode(asmFile, 'M');
+	pic16_copypCode(asmFile, code->dbName);
+	pic16_copypCode(asmFile, 'P');
 
+	fprintf (asmFile,"\tend\n");
 
-  fprintf (asmFile,"\tend\n");
+	fclose (asmFile);
 
-  fclose (asmFile);
-
-  rm_tmpfiles();
+	rm_tmpfiles();
 }

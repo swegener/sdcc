@@ -41,9 +41,6 @@
 #include <unistd.h>
 #endif
 
-/** Name of the environment variable checked for other instalations. */
-#define SDCCDIR_NAME "SDCCDIR"
-
 //REMOVE ME!!!
 extern int yyparse ();
 
@@ -246,7 +243,7 @@ static const char *_baseValues[] = {
   NULL
 };
 
-static const char *_preCmd = "{cpp} -nostdinc -Wall -std=c99 -DSDCC=1 {cppextraopts} {fullsrcfilename} {cppoutfilename}";
+static const char *_preCmd = "{cpp} -nostdinc -Wall -std=c99 -DSDCC=1 {cppextraopts} \"{fullsrcfilename}\" \"{cppoutfilename}\"";
 
 PORT *port;
 
@@ -1158,7 +1155,8 @@ parseCmdLine (int argc, char **argv)
 		if (sOpt == 'Y')
 		  sOpt = 'I';
 
-		SNPRINTF (buffer, sizeof(buffer), "-%c%s", sOpt, rest);
+                SNPRINTF (buffer, sizeof(buffer),
+                  ((sOpt == 'I') ? "-%c\"%s\"": "-%c%s"), sOpt, rest);
 		addToList (preArgv, buffer);
 	      }
 	      break;
@@ -1611,7 +1609,7 @@ preProcess (char **envp)
 
       /* standard include path */
       if (!options.nostdinc) {
-	addToList (preArgv, "-I{includedir}");
+	addToList (preArgv, "-I\"{includedir}\"");
       }
 
       setMainValue ("cppextraopts", join(preArgv));
@@ -1651,133 +1649,107 @@ preProcess (char **envp)
   return 0;
 }
 
-static bool
-_setPaths (const char *pprefix)
+/* Set bin paths */
+static void
+setBinPaths(const char *argv0)
 {
-  /* Logic:
-      Given the prefix and how the directories were layed out at
-      configure time, see if the library and include directories are
-      where expected.  If so, set.
-  */
-  getPathDifference (buffer, PREFIX, SDCC_INCLUDE_DIR);
-  strncpyz (scratchFileName, pprefix, sizeof(scratchFileName));
-  strncatz (scratchFileName, buffer, sizeof(scratchFileName));
+  char *p;
+  char buf[PATH_MAX];
 
-  if (pathExists (scratchFileName))
-    {
-      setMainValue ("includedir", scratchFileName);
-    }
-  else
-    {
-      return FALSE;
-    }
+  /*
+   * Search logic:
+   *
+   * 1. - $SDCCDIR/PREFIX2BIN_DIR
+   * 2. - path(argv[0])
+   * 3. - $PATH
+   */
 
-  getPathDifference (buffer, PREFIX, SDCC_LIB_DIR);
-  strncpyz (scratchFileName, pprefix, sizeof(scratchFileName));
-  strncatz (scratchFileName, buffer, sizeof(scratchFileName));
+  /* do it in reverse mode, so that addSetHead() can be used
+     instaed of slower addSet() */
 
-  if (pathExists (scratchFileName))
-    {
-      setMainValue ("libdir", scratchFileName);
-    }
-  else
-    {
-      return FALSE;
-    }
+  if ((p = getBinPath(argv0)) != NULL)
+    addSetHead(&binPathSet, Safe_strdup(p));
 
-  return TRUE;
+  if ((p = getenv(SDCC_DIR_NAME)) != NULL) {
+    SNPRINTF(buf, sizeof buf, "%s" PREFIX2BIN_DIR, p);
+    addSetHead(&binPathSet, Safe_strdup(buf));
+  }
 }
 
+/* Set system include path */
 static void
-_discoverPaths (const char *argv0)
+setIncludePath(const char *argv0)
 {
-  /* Logic:
-      1.  Try the SDCCDIR environment variable.
-      2.  If (1) fails, and if the argv[0] includes a path, attempt to find the include
-      and library paths with respect to that.  Note that under win32
-      argv[0] is always the full path to the program.
-      3.  If (1) and (2) fail, fall back to the compile time defaults.
+  char *p;
+  char buf[PATH_MAX];
 
-      Detecting assumes the same layout as when configured.  If the
-      directories have been further moved about then discovery will
-      fail.
-  */
-
-  /* Some input cases:
-        "c:\fish\sdcc\bin\sdcc"
-        "../bin/sdcc"
-        "/home/fish/bin/sdcc"
-
-      Note that ./sdcc is explicitly not supported as there isn't
-      enough information.
-  */
-  /* bindir is handled differently to the lib and include directories.
-     It's rather unfortunate, but required due to the different
-     install and development layouts.  Logic is different as well.
-     Sigh.
+  /*
+   * Search logic:
+   *
+   * 1. - $SDCC_INCLUDE
+   * 2. - $SDCC_HOME/PREFIX2DATA_DIR/INCLUDE_DIR_SUFFIX
+   * 2. - path(argv[0])/BIN2DATA_DIR/INCLUDE_DIR_SUFFIX
+   * 3. - DATADIR/INCLUDE_DIR_SUFFIX (only on *nix)
    */
-  if (strchr (argv0, DIR_SEPARATOR_CHAR))
-    {
-      strncpyz (scratchFileName, argv0, sizeof(scratchFileName));
-      *strrchr (scratchFileName, DIR_SEPARATOR_CHAR) = '\0';
-      setMainValue ("bindir", scratchFileName);
-      addSet(&binPathSet, Safe_strdup (scratchFileName));
-    }
-  else if (getenv (SDCCDIR_NAME) != NULL)
-    {
-      getPathDifference (buffer, PREFIX, BINDIR);
-      strncpyz (scratchFileName, getenv (SDCCDIR_NAME), sizeof(scratchFileName));
-      strncatz (scratchFileName, buffer, sizeof(scratchFileName));
-      setMainValue ("bindir", scratchFileName);
-      addSet(&binPathSet, Safe_strdup (scratchFileName));
-    }
-  else
-    {
-      setMainValue ("bindir", BINDIR);
-      addSet(&binPathSet, BINDIR);
-    }
 
-  do
-    {
-      /* Case 1 */
-      if (getenv (SDCCDIR_NAME) != NULL)
-        {
-          if (_setPaths (getenv (SDCCDIR_NAME)))
-            {
-              /* Successfully set. */
-              break;
-            }
-          else
-            {
-              /* Include and lib weren't where expected. */
-            }
-        }
-      /* Case 2 */
-      if (strchr (argv0, DIR_SEPARATOR_CHAR))
-        {
-          char *pbase = getPrefixFromBinPath (argv0);
+  if ((p = getenv(SDCC_INCLUDE_NAME)) == NULL) {
+    if ((p = getenv(SDCC_DIR_NAME)) != NULL) {
+      SNPRINTF(buf, sizeof buf, "%s" PREFIX2DATA_DIR INCLUDE_DIR_SUFFIX, p);
+      p = buf;
+    }
+    else {
+      if ((p = getBinPath(argv0)) == NULL)
+        p = ".";
 
-          if (pbase == NULL)
-            {
-              /* A bad path.  Skip. */
-            }
-          else
-            {
-              if (_setPaths (pbase))
-                {
-                  /* Successfully set. */
-                  break;
-                }
-              else
-                {
-                  /* Include and lib weren't where expected. */
-                }
-            }
-        }
-      /* Case 3 */
-      setMainValue ("includedir", SDCC_INCLUDE_DIR);
-      setMainValue ("libdir", SDCC_LIB_DIR);
-    } while (0);
+      SNPRINTF(buf, sizeof buf, "%s" BIN2DATA_DIR INCLUDE_DIR_SUFFIX, p);
+      p = buf;
+
+#ifndef _WIN32  /* *nix paltform */
+      if (!pathExists(p))
+        p = DATADIR INCLUDE_DIR_SUFFIX; /* last resort */
+#endif
+    }
+  }
+
+  setMainValue ("includedir", p);
+}
+
+/* Set system lib path */
+static void
+setLibPath(const char *argv0)
+{
+  char *p;
+  char buf[PATH_MAX];
+
+  /*
+   * Search logic:
+   *
+   * 1. - $SDCC_LIB
+   * 2. - $SDCC_HOME/PREFIX2DATA_DIR/LIB_DIR_SUFFIX/<model>
+   * 2. - path(argv[0])/BIN2DATA_DIR/LIB_DIR_SUFFIX/<model>
+   * 3. - DATADIR/LIB_DIR_SUFFIX/<model> (only on *nix)
+   */
+
+  if ((p = getenv(SDCC_LIB_NAME)) == NULL) {
+    if ((p = getenv(SDCC_DIR_NAME)) != NULL) {
+      SNPRINTF(buf, sizeof buf, "%s" PREFIX2DATA_DIR LIB_DIR_SUFFIX, p);
+      p = buf;
+    }
+    else {
+      if ((p = getBinPath(argv0)) == NULL)
+        p = ".";
+
+      SNPRINTF(buf, sizeof buf, "%s" BIN2DATA_DIR LIB_DIR_SUFFIX, p);
+      p = buf;
+
+#ifndef _WIN32  /* *nix palforn */
+      if (!pathExists(p))
+        p = DATADIR LIB_DIR_SUFFIX; /* last resort */
+#endif
+    }
+  }
+
+  setMainValue ("libdir", p);
 }
 
 static void
@@ -1912,7 +1884,9 @@ main (int argc, char **argv, char **envp)
     }
 
   initValues ();
-  _discoverPaths (argv[0]);
+  setBinPaths(argv[0]);
+  setIncludePath(argv[0]);
+  setLibPath(argv[0]);
 
   /* initMem() is expensive, but
      initMem() must called before port->finaliseOptions ().

@@ -222,12 +222,13 @@ printOperand (operand * op, FILE * file)
     case SYMBOL:
 #define REGA 1
 #ifdef REGA
-      fprintf (file, "%s [k%d lr%d:%d so:%d]{ ia%d re%d rm%d nos%d}",		/*{ar%d rm%d ru%d p%d a%d u%d i%d au%d k%d ks%d}"  , */
+      fprintf (file, "%s [k%d lr%d:%d so:%d]{ ia%d re%d rm%d nos%d ru%d}",		/*{ar%d rm%d ru%d p%d a%d u%d i%d au%d k%d ks%d}"  , */
 	       (OP_SYMBOL (op)->rname[0] ? OP_SYMBOL (op)->rname : OP_SYMBOL (op)->name),
 	       op->key,
 	       OP_LIVEFROM (op), OP_LIVETO (op),
 	       OP_SYMBOL (op)->stack,
-	       op->isaddr, OP_SYMBOL (op)->isreqv, OP_SYMBOL (op)->remat,OP_SYMBOL(op)->noSpilLoc
+	       op->isaddr, OP_SYMBOL (op)->isreqv, OP_SYMBOL (op)->remat,OP_SYMBOL(op)->noSpilLoc,
+	       OP_SYMBOL(op)->ruonly
 	);
       {
 	fprintf (file, "{");

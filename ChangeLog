@@ -1,3 +1,11 @@
+2003-11-14 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+	
+	* src/SDCCicode.c (geniCodeAddressOf): fixed part of bug #840381
+	* src/SDCCopt.c (replaceRegEqv, isLocalWithoutDef): fixed other part
+	(SIGSEV) of bug #840381
+	* src/SDCCmain.c (linkEdit, assemble): fixed bug #841606 (don't
+	unlink new file before rename if new and old filenames are the same)
+
 2003-11-13 Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
 	* src/mcs51/main.c: started fixing bug #737001 (SDCC not clearing

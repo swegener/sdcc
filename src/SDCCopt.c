@@ -551,12 +551,43 @@ convertToFcall (eBBlock ** ebbs, int count)
 }
 
 /*-----------------------------------------------------------------*/
+/* isLocalWithoutDef - return 1 if sym might be used without a     */
+/*                     defining iCode                              */
+/*-----------------------------------------------------------------*/
+static int
+isLocalWithoutDef (symbol * sym)
+{
+  if (!sym->level)
+    return 0;
+  
+  if (IS_STATIC (sym->etype))
+    return 0;
+  
+  if (IS_VOLATILE (sym->type))
+    return 0;
+  
+  if (sym->_isparm)
+    return 0;
+  
+  if (IS_AGGREGATE (sym->type))
+    return 0;
+  
+  return !sym->defs;
+}
+
+/*-----------------------------------------------------------------*/
 /* replaceRegEqv - replace all local variables with their reqv     */
 /*-----------------------------------------------------------------*/
 static void 
 replaceRegEqv (eBBlock ** ebbs, int count)
 {
   int i;
+
+  /* Update the symbols' def bitvector so we know if there is   */
+  /* a defining iCode or not. Only replace a local variable     */
+  /* with its register equivalent if there is a defining iCode; */
+  /* otherwise, the port's register allocater may choke.        */
+  cseAllBlocks (ebbs, count, TRUE);
 
   for (i = 0; i < count; i++)
     {
@@ -571,7 +602,17 @@ replaceRegEqv (eBBlock ** ebbs, int count)
 
 	  if (ic->op == IFX)
 	    {
-
+	      if (IC_COND (ic) &&
+		  IS_TRUE_SYMOP (IC_COND (ic)) &&
+                  isLocalWithoutDef (OP_SYMBOL (IC_COND (ic))))
+		{
+		  werror (W_LOCAL_NOINIT,
+			  OP_SYMBOL (IC_COND (ic))->name,
+			  ic->filename, ic->lineno);
+		  OP_REQV (IC_COND (ic)) = NULL;
+		  OP_SYMBOL (IC_COND (ic))->allocreq = 1;
+		}
+	      
 	      if (IS_TRUE_SYMOP (IC_COND (ic)) &&
 		  OP_REQV (IC_COND (ic)))
 		IC_COND (ic) = opFromOpWithDU (OP_REQV (IC_COND (ic)),
@@ -581,8 +622,20 @@ replaceRegEqv (eBBlock ** ebbs, int count)
 	      continue;
 	    }
 
+	  
 	  if (ic->op == JUMPTABLE)
 	    {
+	      if (IC_JTCOND (ic) &&
+		  IS_TRUE_SYMOP (IC_JTCOND (ic)) &&
+                  isLocalWithoutDef (OP_SYMBOL (IC_JTCOND (ic))))
+		{
+		  werror (W_LOCAL_NOINIT,
+			  OP_SYMBOL (IC_JTCOND (ic))->name,
+			  ic->filename, ic->lineno);
+		  OP_REQV (IC_JTCOND (ic)) = NULL;
+		  OP_SYMBOL (IC_JTCOND (ic))->allocreq = 1;
+		}
+	      
 	      if (IS_TRUE_SYMOP (IC_JTCOND (ic)) &&
 		  OP_REQV (IC_JTCOND (ic)))
 		IC_JTCOND (ic) = opFromOpWithDU (OP_REQV (IC_JTCOND (ic)),
@@ -617,6 +670,17 @@ replaceRegEqv (eBBlock ** ebbs, int count)
 
 	  if (IC_RIGHT (ic) &&
 	      IS_TRUE_SYMOP (IC_RIGHT (ic)) &&
+	      isLocalWithoutDef (OP_SYMBOL (IC_RIGHT (ic))))
+	    {
+	      werror (W_LOCAL_NOINIT,
+		      OP_SYMBOL (IC_RIGHT (ic))->name,
+		      ic->filename, ic->lineno);
+	      OP_REQV (IC_RIGHT (ic)) = NULL;
+	      OP_SYMBOL (IC_RIGHT (ic))->allocreq = 1;
+	    }
+	  
+	  if (IC_RIGHT (ic) &&
+	      IS_TRUE_SYMOP (IC_RIGHT (ic)) &&
 	      OP_REQV (IC_RIGHT (ic)))
 	    {
 	      IC_RIGHT (ic) = opFromOpWithDU (OP_REQV (IC_RIGHT (ic)),
@@ -625,6 +689,17 @@ replaceRegEqv (eBBlock ** ebbs, int count)
 	      IC_RIGHT (ic)->isaddr = 0;
 	    }
 
+	  if (IC_LEFT (ic) &&
+	      IS_TRUE_SYMOP (IC_LEFT (ic)) &&
+	      isLocalWithoutDef (OP_SYMBOL (IC_LEFT (ic))))
+	    {
+	      werror (W_LOCAL_NOINIT,
+		      OP_SYMBOL (IC_LEFT (ic))->name,
+		      ic->filename, ic->lineno);
+	      OP_REQV (IC_LEFT (ic)) = NULL;
+	      OP_SYMBOL (IC_LEFT (ic))->allocreq = 1;
+	    }
+            
 	  if (IC_LEFT (ic) &&
 	      IS_TRUE_SYMOP (IC_LEFT (ic)) &&
 	      OP_REQV (IC_LEFT (ic)))

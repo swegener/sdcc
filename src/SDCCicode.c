@@ -2108,7 +2108,7 @@ subtractExit:
   if (IS_VOID(ltype->next) || IS_VOID(rtype->next)) {
     return result;
   }
-
+  
   // should we really do this? is this ANSI?
   return geniCodeDivision (result,
 			   operandFromLit (getSize (ltype->next)));
@@ -2275,6 +2275,7 @@ geniCodeArray (operand * left, operand * right,int lvl)
 	{
 	  left = geniCodeRValue (left, FALSE);
 	}
+      
       return geniCodeDerefPtr (geniCodeAdd (left, right, lvl), lvl);
     }
 
@@ -2300,7 +2301,7 @@ geniCodeArray (operand * left, operand * right,int lvl)
 
   IC_RESULT (ic)->isaddr = (!IS_AGGREGATE (ltype->next));
   ADDTOCHAIN (ic);
-  
+
   return IC_RESULT (ic);
 }
 
@@ -2538,6 +2539,13 @@ geniCodeAddressOf (operand * op)
   sym_link *optype = operandType (op);
   sym_link *opetype = getSpec (optype);
 
+  if (IS_ITEMP (op) && op->isaddr && IS_PTR (optype))
+    {
+      op = operandFromOperand (op);
+      op->isaddr = 0;
+      return op;
+    }
+  
   /* lvalue check already done in decorateType */
   /* this must be a lvalue */
 /*     if (!op->isaddr && !IS_AGGREGATE(optype)) { */
@@ -3731,7 +3739,7 @@ ast2iCode (ast * tree,int lvl)
 	return geniCodeDerefPtr (geniCodeRValue (left, FALSE),lvl);
 
     case '-':
-      if (right)
+      if (right) 
 	return geniCodeSubtract (geniCodeRValue (left, FALSE),
 				 geniCodeRValue (right, FALSE));
       else

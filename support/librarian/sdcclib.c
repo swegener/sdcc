@@ -204,7 +204,7 @@ void AddRel(void)
         if(rel==NULL)
         {
             printf("ERROR: Couldn't open file '%s'", RelName);
-            fclose(lib);
+            if(lib!=NULL) fclose(lib);
             return;
         }
     }
@@ -214,7 +214,7 @@ void AddRel(void)
     if(newlib==NULL)
     {
         printf("ERROR: Couldn't create temporary file '%s'", LibNameTmp);
-        fclose(lib);
+        if(lib!=NULL) fclose(lib);
         fclose(rel);
         return;
     }
@@ -224,7 +224,7 @@ void AddRel(void)
     if(libindex==NULL)
     {
         printf("ERROR: Couldn't create temporary file '%s'", IndexName);
-        fclose(lib);
+        if(lib!=NULL) fclose(lib);
         fclose(newlib);
         fclose(rel);
         return;

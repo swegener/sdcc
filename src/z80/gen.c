@@ -1165,8 +1165,6 @@ static void genIpop (iCode *ic)
  */
 static void emitCall (iCode *ic, bool ispcall)
 {
-    int isPrintf = 0;
-
     /* if caller saves & we have not saved then */
     if (!ic->regsSaved) {
 	/* PENDING */
@@ -1199,14 +1197,15 @@ static void emitCall (iCode *ic, bool ispcall)
 
 	emitcode("ld", "hl,#" LABEL_STR, (rlbl->key+100));
 	emitcode("push", "hl");
+	_pushed += 2;
 
 	aopOp(IC_LEFT(ic),ic,FALSE);
-	emitcode("ld", "l,%s", aopGet(AOP(IC_LEFT(ic)), 0,FALSE));
-	emitcode("ld", "h,%s", aopGet(AOP(IC_LEFT(ic)), 1,FALSE));
+	fetchHL(AOP(IC_LEFT(ic)));
 	freeAsmop(IC_LEFT(ic),NULL,ic); 
 	
 	emitcode("jp", "(hl)");
 	emitcode("","%05d$:",(rlbl->key+100));
+	_pushed -= 2;
     }
     else {
 	/* make the call */
@@ -1214,9 +1213,6 @@ static void emitCall (iCode *ic, bool ispcall)
 	    OP_SYMBOL(IC_LEFT(ic))->rname :
 	    OP_SYMBOL(IC_LEFT(ic))->name;
 	emitcode("call", "%s", name);
-	if (!strcmp(name, "__printf"))
-	    isPrintf = 1;
-
     }
 
     /* if we need assign a result value */
@@ -1237,9 +1233,6 @@ static void emitCall (iCode *ic, bool ispcall)
     /* adjust the stack for parameters if required */
     if (IC_LEFT(ic)->parmBytes) {
 	int i = IC_LEFT(ic)->parmBytes;
-	emitcode("", ";parmBytes = %u\n", i);
-	if (isPrintf)
-	    i+=2;
 	_pushed -= i;
 	if (i>6) {
 	    emitcode("ld", "hl,#%d", i);
@@ -3291,6 +3284,10 @@ static void genGenPointerGet (operand *left,
 {
     int size, offset ;
     link *retype = getSpec(operandType(result));
+    const char *ptr = "hl";
+
+    if (IS_GB)
+	ptr = "de";
 
     aopOp(left,ic,FALSE);
     aopOp(result,ic,FALSE);
@@ -3306,9 +3303,14 @@ static void genGenPointerGet (operand *left,
     /* For now we always load into IY */
     /* if this is remateriazable */
     if (AOP_TYPE(left) == AOP_IMMD)
-	emitcode("ld","hl,%s",aopGet(AOP(left),0,TRUE));
+	emitcode("ld","%s,%s", ptr, aopGet(AOP(left),0,TRUE));
     else { /* we need to get it byte by byte */
-	fetchHL(AOP(left));
+	if (IS_GB) {
+	    emitcode("ld", "e,%s", aopGet(AOP(left), 0, FALSE));
+	    emitcode("ld", "d,%s", aopGet(AOP(left), 1, FALSE));
+	}
+	else
+	    fetchHL(AOP(left));
     }
     /* so iy now contains the address */
     freeAsmop(left,NULL,ic);
@@ -3323,15 +3325,15 @@ static void genGenPointerGet (operand *left,
 
         while (size--) {
 	    /* PENDING: make this better */
-	    if (AOP(result)->type == AOP_REG) {
+	    if (!IS_GB && AOP(result)->type == AOP_REG) {
 		aopPut(AOP(result),"(hl)",offset++);
 	    }
 	    else {
-		emitcode("ld", "a,(hl)", offset);
+		emitcode("ld", "a,(%s)", ptr, offset);
 		aopPut(AOP(result),"a",offset++);
 	    }
 	    if (size) {
-		emitcode("inc", "hl");
+		emitcode("inc", "%s", ptr);
 	    }
         }
     }

@@ -37,8 +37,6 @@ static void _printn(unsigned u, unsigned base, char issigned, EMIT *emitter, voi
 static void _printf(const char *format, EMIT *emitter, void *pData, va_list va)
 {
     while (*format) {
-	putchar(*format);
-#if 0
 	if (*format == '%') {
 	    switch (*++format) {
 	    case 'c': {
@@ -59,7 +57,7 @@ static void _printf(const char *format, EMIT *emitter, void *pData, va_list va)
 		    break;
 		}
 	    case 'x':
-		{
+	 	{
 		    unsigned u = va_arg(va, unsigned);
 		    _printn(u, 16, 0, emitter, pData);
 		    break;
@@ -77,7 +75,6 @@ static void _printf(const char *format, EMIT *emitter, void *pData, va_list va)
 	else {
 	    (*emitter)(*format, pData);
 	}
-#endif
 	format++;
     }
 }

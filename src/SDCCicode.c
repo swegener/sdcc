@@ -2416,7 +2416,8 @@ operand *geniCodeCall (operand *left, ast *parms)
     /* take care of parameters with side-effecting
        function calls in them, this is required to take care 
        of overlaying function parameters */
-    geniCodeSEParms ( parms );
+    if (!options.stackAuto)
+	geniCodeSEParms ( parms );
 
     /* first the parameters */
     geniCodeParms ( parms , &stack , getSpec(operandType(left)));

@@ -1,3 +1,13 @@
+2004-10-06 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* device/lib/pic16/libsdcc/Makefile.rules: fixed bug concerning
+	sources that searched for headers in installation path, now the
+	device/include/pic16 is used,
+	* src/pic16/glue.c (pic16glue),
+	* src/pic16/pcode.c (pCode2str, genericPrint): don't print .file or
+	.line directives if not in debug mode, this suppresses assembler's
+	warnings for ignored directives
+
 2004-10-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/port.h: made reset_regparms prototype void parameter explicit.

@@ -57,7 +57,6 @@ extern set *tmpfileSet;
 extern set *tmpfileNameSet;
 extern char *iComments1;
 extern char *iComments2;
-//extern void emitStaticSeg (memmap * map);
 
 extern int initsfpnt;
 
@@ -1720,7 +1719,8 @@ pic16glue ()
 	pic16initialComments (asmFile);
 
 	/* print module name */
-	fprintf(asmFile, "#FILE\t\"%s\"\n", fullSrcFileName);
+	if(options.debug)
+		fprintf(asmFile, "\t.file\t\"%s\"\n", fullSrcFileName);
 
 	/* Let the port generate any global directives, etc. */
 	if (port->genAssemblerPreamble) {

@@ -262,6 +262,7 @@ iCodeTable;
 #define ASSIGNMENT_TO_SELF(ic) (!POINTER_SET(ic) && !POINTER_GET(ic) && \
 			        ic->op == '=' && IC_RESULT(ic)->key == IC_RIGHT(ic)->key )
 
+#define IS_CAST_ICODE(ic) (ic && ic->op == CAST)
 #define SET_ISADDR(op,v) {op = operandFromOperand(op); op->isaddr = v;}
 #define SET_RESULT_RIGHT(ic) {SET_ISADDR(IC_RIGHT(ic),0); SET_ISADDR(IC_RESULT(ic),0);}
 

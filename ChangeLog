@@ -1,3 +1,7 @@
+2003-04-19  Bernhard Held <bernhard@bernhardheld.de>
+
+	* as/z80/Makefile: fix permanent rebuild of z80
+
 2003-04-18 	Kevin Vigor <kevin@vigor.nu>
 
 	* src/SDCCopt.c: add special case optimization to replace modulo by

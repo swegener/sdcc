@@ -31,17 +31,24 @@ Makefile.dep: $(SRC) *.h
 
 include Makefile.dep
 
-$(OBJDIR):
+# We need a '.stamp'-file in $(OBJDIR), because the time stamp
+# of $(OBJDIR) itself is always updated, when a file in $(OBJDIR)
+# is updated. A rule like
+#	$(OBJDIR)/anyfile: $(OBJDIR)
+# will always force a remake (at least on Linux ext2).
+
+$(OBJDIR)/.stamp:
 	mkdir -p $(OBJDIR)
+	touch $(OBJDIR)/.stamp
 
 $(BINS): $(OBJS) $(SLIBOBJS)
 	$(CC) -o $(BINS) $(OBJS) $(SLIBOBJS) $(LDFLAGS)
 
 
-$(OBJDIR)/%.o:	%.c $(OBJDIR)
+$(OBJDIR)/%.o:	%.c $(OBJDIR)/.stamp
 	$(CC) -c $(CFLAGS) -o $@ $<
 
-$(OBJDIR)/%.o:	$(SLIB)/%.c $(OBJDIR)
+$(OBJDIR)/%.o:	$(SLIB)/%.c $(OBJDIR)/.stamp
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 _as-z80:

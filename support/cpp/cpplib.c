@@ -916,7 +916,7 @@ skip_comment (
      cpp_reader *pfile,
      long *linep)
 {
-  int c;
+  int c = 0;
   while (PEEKC() == '\\' && PEEKN(1) == '\n')
     {
       if (linep)

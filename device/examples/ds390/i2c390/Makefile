@@ -17,4 +17,4 @@ i2c390.ihx: $(OBJECTS)
 	$(CC) $(MFLAGS) $(LFLAGS) $(OBJECTS)
 
 %.rel: %.c
-	$(CC) -c $(MFLAGS) -I../float390 $<
+	$(CC) -c $(MFLAGS) $<

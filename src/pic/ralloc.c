@@ -2560,6 +2560,12 @@ packRegsForAccUse (iCode * ic)
   iCode *uic;
 
   debugLog ("%s\n", __FUNCTION__);
+
+  /* if this is an aggregate, e.g. a one byte char array */
+  if (IS_AGGREGATE(operandType(IC_RESULT(ic)))) {
+    return;
+  }
+
   /* if + or - then it has to be one byte result */
   if ((ic->op == '+' || ic->op == '-')
       && getSize (operandType (IC_RESULT (ic))) > 1)

@@ -56,24 +56,24 @@ cl_port::print_info(class cl_console *con)
 {
   uchar data;
 
-  con->printf("%s[%d]\n", id_string, id);
+  con->dd_printf("%s[%d]\n", id_string, id);
   data= uc->get_mem(MEM_SFR, sfr);
-  con->printf("P%d    ", id);
+  con->dd_printf("P%d    ", id);
   con->print_bin(data, 8);
-  con->printf(" 0x%02x %3d %c (Value in SFR register)\n",
-	      data, data, isprint(data)?data:'.');
+  con->dd_printf(" 0x%02x %3d %c (Value in SFR register)\n",
+		 data, data, isprint(data)?data:'.');
 
   data= uc->port_pins[id];
-  con->printf("Pin%d  ", id);
+  con->dd_printf("Pin%d  ", id);
   con->print_bin(data, 8);
-  con->printf(" 0x%02x %3d %c (Output of outside circuits)\n",
-	      data, data, isprint(data)?data:'.');
+  con->dd_printf(" 0x%02x %3d %c (Output of outside circuits)\n",
+		 data, data, isprint(data)?data:'.');
 
   data= uc->port_pins[id] & uc->get_mem(MEM_SFR, sfr);
-  con->printf("Port%d ", id);
+  con->dd_printf("Port%d ", id);
   con->print_bin(data, 8);
-  con->printf(" 0x%02x %3d %c (Value on the port pins)\n",
-	      data, data, isprint(data)?data:'.');
+  con->dd_printf(" 0x%02x %3d %c (Value on the port pins)\n",
+		 data, data, isprint(data)?data:'.');
 }
 
 

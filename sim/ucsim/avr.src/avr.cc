@@ -277,32 +277,32 @@ cl_avr::print_regs(class cl_console *con)
 
   ram->dump(0, 31, 16, con);
 
-  con->printf("ITHSVNZC  SREG= 0x%02x %3d %c\n",
-	      sreg, sreg, isprint(sreg)?sreg:'.');
-  con->printf("%c%c%c%c%c%c%c%c  ",
-	      (sreg&BIT_I)?'1':'0',
-	      (sreg&BIT_T)?'1':'0',
-	      (sreg&BIT_H)?'1':'0',
-	      (sreg&BIT_S)?'1':'0',
-	      (sreg&BIT_V)?'1':'0',
-	      (sreg&BIT_N)?'1':'0',
-	      (sreg&BIT_Z)?'1':'0',
-	      (sreg&BIT_C)?'1':'0');
-  con->printf("SP  = 0x%06x\n",
-	      ram->get(SPH)*256+ram->get(SPL));
+  con->dd_printf("ITHSVNZC  SREG= 0x%02x %3d %c\n",
+		 sreg, sreg, isprint(sreg)?sreg:'.');
+  con->dd_printf("%c%c%c%c%c%c%c%c  ",
+		 (sreg&BIT_I)?'1':'0',
+		 (sreg&BIT_T)?'1':'0',
+		 (sreg&BIT_H)?'1':'0',
+		 (sreg&BIT_S)?'1':'0',
+		 (sreg&BIT_V)?'1':'0',
+		 (sreg&BIT_N)?'1':'0',
+		 (sreg&BIT_Z)?'1':'0',
+		 (sreg&BIT_C)?'1':'0');
+  con->dd_printf("SP  = 0x%06x\n",
+		 ram->get(SPH)*256+ram->get(SPL));
 
   x= ram->get(XH)*256 + ram->get(XL);
   data= ram->get(x);
-  con->printf("X= 0x%04x [X]= 0x%02x %3d %c  ", x,
-	      data, data, isprint(data)?data:'.');
+  con->dd_printf("X= 0x%04x [X]= 0x%02x %3d %c  ", x,
+		 data, data, isprint(data)?data:'.');
   y= ram->get(YH)*256 + ram->get(YL);
   data= ram->get(y);
-  con->printf("Y= 0x%04x [Y]= 0x%02x %3d %c  ", y,
-	      data, data, isprint(data)?data:'.');
+  con->dd_printf("Y= 0x%04x [Y]= 0x%02x %3d %c  ", y,
+		 data, data, isprint(data)?data:'.');
   z= ram->get(ZH)*256 + ram->get(ZL);
   data= ram->get(z);
-  con->printf("Z= 0x%04x [Z]= 0x%02x %3d %c\n", z,
-	      data, data, isprint(data)?data:'.');
+  con->dd_printf("Z= 0x%04x [Z]= 0x%02x %3d %c\n", z,
+		 data, data, isprint(data)?data:'.');
 
   print_disass(PC, con);
 }

@@ -195,7 +195,7 @@ cl_cmdline::split(void)
 	  if (*end == '"')
 	    end--;
 	  else
-	    con->printf("Unterminated string\n");
+	    con->dd_printf("Unterminated string\n");
 	  param_str= (char *)malloc(end-start+2);
 	  strncpy(param_str, start, 1+end-start);
 	  param_str[1+end-start]= '\0';
@@ -236,7 +236,7 @@ cl_cmdline::split(void)
 	      if (*dot == '\0')
 		{
 		  bit= 0;
-		  con->printf("Uncomplete bit address\n");
+		  con->dd_printf("Uncomplete bit address\n");
 		  delete sfr;
 		}
 	      else
@@ -274,7 +274,7 @@ cl_cmdline::split(void)
 	      if (*dot == '\0')
 		{
 		  aname= 0;
-		  con->printf("Uncomplete array\n");
+		  con->dd_printf("Uncomplete array\n");
 		}
 	      else
 		{
@@ -290,7 +290,7 @@ cl_cmdline::split(void)
 		    *p= '\0';
 		  if (strlen(dot) == 0)
 		    {
-		      con->printf("Uncomplete array index\n");
+		      con->dd_printf("Uncomplete array index\n");
 		      delete aname;
 		    }
 		  else    
@@ -611,21 +611,21 @@ cl_cmd::work(class cl_app *app,
     case operate_on_app:
       if (!app)
 	{
-	  con->printf("There is no application to work on!\n");
+	  con->dd_printf("There is no application to work on!\n");
 	  return(DD_TRUE);
 	}
       return(do_work(app, cmdline, con));
     case operate_on_sim:
       if (!sim)
 	{
-	  con->printf("There is no simulator to work on!\n");
+	  con->dd_printf("There is no simulator to work on!\n");
 	  return(DD_TRUE);
 	}
       return(do_work(sim, cmdline, con));
     case operate_on_uc:
       if (!sim)
 	{
-	  con->printf("There is no microcontroller to work on!\n");
+	  con->dd_printf("There is no microcontroller to work on!\n");
 	  return(DD_TRUE);
 	}
       return(do_work(uc, cmdline, con));
@@ -637,7 +637,7 @@ cl_cmd::work(class cl_app *app,
 int
 cl_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
 {
-  con->printf("Command \"%s\" does nothing.\n",
+  con->dd_printf("Command \"%s\" does nothing.\n",
 	      (char*)(names->at(0)));
   return(0);
 }
@@ -646,7 +646,7 @@ int
 cl_cmd::do_work(class cl_app *app,
 		class cl_cmdline *cmdline, class cl_console *con)
 {
-  con->printf("Command \"%s\" does nothing on application.\n",
+  con->dd_printf("Command \"%s\" does nothing on application.\n",
 	      (char*)(names->at(0)));
   return(0);
 }
@@ -655,7 +655,7 @@ int
 cl_cmd::do_work(class cl_sim *sim,
 		class cl_cmdline *cmdline, class cl_console *con)
 {
-  con->printf("Command \"%s\" does nothing on simulator.\n",
+  con->dd_printf("Command \"%s\" does nothing on simulator.\n",
 	      (char*)(names->at(0)));
   return(0);
 }
@@ -664,7 +664,7 @@ int
 cl_cmd::do_work(class cl_uc *uc,
 		class cl_cmdline *cmdline, class cl_console *con)
 {
-  con->printf("Command \"%s\" does nothing on microcontroller.\n",
+  con->dd_printf("Command \"%s\" does nothing on microcontroller.\n",
 	      (char*)(names->at(0)));
   return(0);
 }
@@ -808,19 +808,19 @@ cl_super_cmd::work(class cl_app *app,
       if ((cmd= commands->get_cmd("_no_parameters_")) != 0)
 	return(cmd->work(app, cmdline, con));
       int i;
-      con->printf("\"%s\" must be followed by the name of a subcommand\n"
-		  "List of subcommands:\n", (char*)(names->at(0)));
+      con->dd_printf("\"%s\" must be followed by the name of a subcommand\n"
+		     "List of subcommands:\n", (char*)(names->at(0)));
       for (i= 0; i < commands->count; i++)
 	{
 	  cmd= (class cl_cmd *)(commands->at(i));
-	  con->printf("%s\n", cmd->short_help);
+	  con->dd_printf("%s\n", cmd->short_help);
 	}
       return(0);
     }
   if ((cmd= commands->get_cmd(cmdline)) == NULL)
     {
-      con->printf("Undefined subcommand: \"%s\". Try \"help %s\".\n",
-		  cmdline->name, (char*)(names->at(0)));
+      con->dd_printf("Undefined subcommand: \"%s\". Try \"help %s\".\n",
+		     cmdline->name, (char*)(names->at(0)));
       return(0);
     }
   return(cmd->work(app, cmdline, con));
@@ -853,7 +853,7 @@ cl_console::cl_console(char *fin, char *fout, class cl_app *the_app):
       isatty(fileno(in)))
     flags|= CONS_INTERACTIVE;
   else
-    printf("Warning: non-interactive console\n");
+    dd_printf("Warning: non-interactive console\n");
 }
 
 cl_console::cl_console(FILE *fin, FILE *fout, class cl_app *the_app):
@@ -869,7 +869,7 @@ cl_console::cl_console(FILE *fin, FILE *fout, class cl_app *the_app):
       isatty(fileno(in)))
     flags|= CONS_INTERACTIVE;
   else
-    printf("Warning: non-interactive console\n");
+    dd_printf("Warning: non-interactive console\n");
 }
 
 /*
@@ -976,7 +976,7 @@ cl_console::print_prompt(void)
 }
 
 int
-cl_console::printf(char *format, ...)
+cl_console::dd_printf(char *format, ...)
 {
   va_list ap;
   int ret= 0;
@@ -1345,7 +1345,7 @@ cl_commander::all_print(char *string, int length)
  */
 
 int
-cl_commander::printf(char *format, ...)
+cl_commander::dd_printf(char *format, ...)
 {
   va_list ap;
   int ret= 0;

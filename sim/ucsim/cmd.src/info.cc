@@ -47,31 +47,31 @@ COMMAND_DO_WORK_UC(cl_info_bp_cmd)
   int i;
   char *s;
 
-  con->printf("Num Type       Disp Hit   Cnt   Address  What\n");
+  con->dd_printf("Num Type       Disp Hit   Cnt   Address  What\n");
   for (i= 0; i < uc->fbrk->count; i++)
     {
       class cl_brk *fb= (class cl_brk *)(uc->fbrk->at(i));
       s= uc->disass(fb->addr, NULL);
-      con->printf("%-3d %-10s %s %-5d %-5d 0x%06x %s\n", fb->nr,
-		  "fetch", (fb->perm==brkFIX)?"keep":"del ",
-		  fb->hit, fb->cnt,
-		  fb->addr, s);
+      con->dd_printf("%-3d %-10s %s %-5d %-5d 0x%06x %s\n", fb->nr,
+		     "fetch", (fb->perm==brkFIX)?"keep":"del ",
+		     fb->hit, fb->cnt,
+		     fb->addr, s);
       free(s);
     }
   for (i= 0; i < uc->ebrk->count; i++)
     {
       class cl_ev_brk *eb= (class cl_ev_brk *)(uc->ebrk->at(i));
-      con->printf("%-3d %-10s %s %-5d %-5d 0x%06x %s\n", eb->nr,
-		  "event", (eb->perm==brkFIX)?"keep":"del ",
-		  eb->hit, eb->cnt,
-		  eb->addr, eb->id);
+      con->dd_printf("%-3d %-10s %s %-5d %-5d 0x%06x %s\n", eb->nr,
+		     "event", (eb->perm==brkFIX)?"keep":"del ",
+		     eb->hit, eb->cnt,
+		     eb->addr, eb->id);
     }
   /*t_addr a;
   class cl_rom *r= (class cl_rom *)(sim->uc->mem(MEM_ROM));
   for (a= 0; a < sim->uc->get_mem_size(MEM_ROM); a++)
     {
       if (r->bp_map->get(a))
-	con->printf("0x%06x\n", a);
+	con->dd_printf("0x%06x\n", a);
 	}*/
   return(0);
 }
@@ -111,7 +111,7 @@ COMMAND_DO_WORK_UC(cl_info_hw_cmd)
     hw->print_info(con);
   }
   else
-    con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
 
   return(DD_FALSE);
 }

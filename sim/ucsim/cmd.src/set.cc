@@ -62,7 +62,7 @@ COMMAND_DO_WORK_UC(cl_set_mem_cmd)
     int len= params[2]->value.data_list.len;
     
     if (len == 0)
-      con->printf("Error: no data\n");
+      con->dd_printf("Error: no data\n");
     else
       {
 	int i;
@@ -75,7 +75,7 @@ COMMAND_DO_WORK_UC(cl_set_mem_cmd)
       }
   }
   else
-    con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
   
   return(DD_FALSE);;
 }
@@ -110,7 +110,7 @@ COMMAND_DO_WORK_UC(cl_set_bit_cmd)
     mem->dump(mem_addr, mem_addr, 1, con);
   }
   else
-    con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
 
   return(DD_FALSE);;
 }
@@ -143,10 +143,10 @@ COMMAND_DO_WORK_UC(cl_set_port_cmd)
     l= params[1]->value.number;
   }
   else
-    con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
   if (pn < 0 ||
       pn > 3)
-    con->printf("Error: wrong port\n");
+    con->dd_printf("Error: wrong port\n");
   else
     uc->port_pins[pn]= l;
   return(DD_FALSE);;
@@ -174,11 +174,11 @@ COMMAND_DO_WORK_UC(cl_set_option_cmd)
     s= params[1]->value.string.string;
   }
   else
-    con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
   if (!id ||
       !s)
     {
-      con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+      con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
       return(DD_FALSE);
     }
 

@@ -83,7 +83,7 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
   }
   else
     {
-      con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+      con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
       return(DD_FALSE);
     }
   return(DD_FALSE);
@@ -95,11 +95,11 @@ cl_break_cmd::do_fetch(class cl_uc *uc,
 {
   if (hit > 99999)
     {
-      con->printf("Hit value %d is too big.\n", hit);
+      con->dd_printf("Hit value %d is too big.\n", hit);
       return;
     }
   if (uc->fbrk->bp_at(addr))
-    con->printf("Breakpoint at 0x%06x is already set.\n", addr);
+    con->dd_printf("Breakpoint at 0x%06x is already set.\n", addr);
   else
     {
       class cl_brk *b= new cl_fetch_brk(uc->make_new_brknr(),
@@ -107,7 +107,7 @@ cl_break_cmd::do_fetch(class cl_uc *uc,
       b->init();
       uc->fbrk->add_bp(b);
       char *s= uc->disass(addr, NULL);
-      con->printf("Breakpoint %d at 0x%06x: %s\n", b->nr, addr, s);
+      con->dd_printf("Breakpoint %d at 0x%06x: %s\n", b->nr, addr, s);
       free(s);
     }
 }
@@ -123,7 +123,7 @@ cl_break_cmd::do_event(class cl_uc *uc,
   if (b)
     uc->ebrk->add_bp(b);
   else
-    con->printf("Couldn't make event breakpoint\n");
+    con->dd_printf("Couldn't make event breakpoint\n");
 }
 
 
@@ -143,7 +143,7 @@ COMMAND_DO_WORK_UC(cl_clear_cmd)
     {
       if (!brk)
 	{
-	  con->printf("No breakpoint at this address.\n");
+	  con->dd_printf("No breakpoint at this address.\n");
 	  return(0);
 	}
       uc->fbrk->del_bp(uc->PC);
@@ -159,7 +159,7 @@ COMMAND_DO_WORK_UC(cl_clear_cmd)
 	return(DD_FALSE);
       addr= param->value.address;
       if (uc->fbrk->bp_at(addr) == 0)
-	con->printf("No breakpoint at 0x%06x\n", addr);
+	con->dd_printf("No breakpoint at 0x%06x\n", addr);
       else
 	uc->fbrk->del_bp(addr);
     }

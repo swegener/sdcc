@@ -85,7 +85,7 @@ cl_hw::tick(int cycles)
 void
 cl_hw::print_info(class cl_console *con)
 {
-  con->printf("%s[%d]\n", id_string, id);
+  con->dd_printf("%s[%d]\n", id_string, id);
 }
 
 

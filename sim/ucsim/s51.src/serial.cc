@@ -48,24 +48,24 @@ cl_serial::print_info(class cl_console *con)
 		   "9 bit UART timer clocked" };
   int scon= uc->get_mem(MEM_SFR, SCON);
 
-  con->printf("%s[%d]", id_string, id);
+  con->dd_printf("%s[%d]", id_string, id);
   int mode= (scon&(bmSM0|bmSM1))>>6;
-  con->printf(" %s MultiProc=%s", modes[mode],
-	      (mode&2)?((scon&bmSM2)?"ON":"OFF"):"none");
-  con->printf(" irq=%s", (uc->get_mem(MEM_SFR, IE)&bmES)?"en":"dis");
-  con->printf(" prio=%d", uc->it_priority(bmPS));
-  con->printf("\n");
+  con->dd_printf(" %s MultiProc=%s", modes[mode],
+		 (mode&2)?((scon&bmSM2)?"ON":"OFF"):"none");
+  con->dd_printf(" irq=%s", (uc->get_mem(MEM_SFR, IE)&bmES)?"en":"dis");
+  con->dd_printf(" prio=%d", uc->it_priority(bmPS));
+  con->dd_printf("\n");
 
-  con->printf("Receiver");
-  con->printf(" %s", (scon&bmREN)?"ON":"OFF");
-  con->printf(" RB8=%c", (scon&bmRB8)?'1':'0');
-  con->printf(" irq=%c", (scon&bmRI)?'1':'0');
-  con->printf("\n");
+  con->dd_printf("Receiver");
+  con->dd_printf(" %s", (scon&bmREN)?"ON":"OFF");
+  con->dd_printf(" RB8=%c", (scon&bmRB8)?'1':'0');
+  con->dd_printf(" irq=%c", (scon&bmRI)?'1':'0');
+  con->dd_printf("\n");
 
-  con->printf("Transmitter");
-  con->printf(" TB8=%c", (scon&bmTB8)?'1':'0');
-  con->printf(" irq=%c", (scon&bmTI)?'1':'0');
-  con->printf("\n");
+  con->dd_printf("Transmitter");
+  con->dd_printf(" TB8=%c", (scon&bmTB8)?'1':'0');
+  con->dd_printf(" irq=%c", (scon&bmTI)?'1':'0');
+  con->dd_printf("\n");
 }
 
 

@@ -56,7 +56,7 @@ COMMAND_DO_WORK_UC(cl_get_sfr_cmd)
 
   if (!mem)
     {
-      con->printf("Error: No SFR\n");
+      con->dd_printf("Error: No SFR\n");
       return(DD_FALSE);
     }
   for (i= 0, parm= cmdline->param(i);
@@ -64,8 +64,8 @@ COMMAND_DO_WORK_UC(cl_get_sfr_cmd)
        i++, parm= cmdline->param(i))
     {
       if (!parm->as_address(uc))
-	con->printf("Warning: Invalid address %s\n",
-		    (char*)cmdline->tokens->at(i+1));
+	con->dd_printf("Warning: Invalid address %s\n",
+		       (char*)cmdline->tokens->at(i+1));
       else
 	mem->dump(parm->value.address, parm->value.address, 1, con);
     }
@@ -93,7 +93,7 @@ COMMAND_DO_WORK_UC(cl_get_option_cmd)
     s= parm->value.string.string;
   }
   else
-    con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
 
   int i;
   for (i= 0; i < uc->options->count; i++)
@@ -102,9 +102,9 @@ COMMAND_DO_WORK_UC(cl_get_option_cmd)
       if (!s ||
 	  !strcmp(s, o->id))
 	{
-	  con->printf("%s ", o->id);
+	  con->dd_printf("%s ", o->id);
 	  o->print(con);
-	  con->printf(" %s\n", o->help);
+	  con->dd_printf(" %s\n", o->help);
 	}
     }
   

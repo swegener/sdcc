@@ -60,25 +60,25 @@ COMMAND_DO_WORK_SIM(cl_run_cmd)
   if (params[0])
     if (!(params[0]->get_address(sim->uc, &start)))
       {
-	con->printf("Error: wrong start address\n");
+	con->dd_printf("Error: wrong start address\n");
 	return(DD_FALSE);
       }
   if (params[1])
     if (!(params[1]->get_address(sim->uc, &end)))
       {
-	con->printf("Error: wromg end address\n");
+	con->dd_printf("Error: wromg end address\n");
 	return(DD_FALSE);
       }
   if (params[0])
     {
       if (!sim->uc->inst_at(start))
-	con->printf("Warning: maybe not instruction at 0x%06lx\n", start);
+	con->dd_printf("Warning: maybe not instruction at 0x%06lx\n", start);
       sim->uc->PC= start;
       if (params[1])
 	{
 	  if (start == end)
 	    {
-	      con->printf("Addresses must be different.\n");
+	      con->dd_printf("Addresses must be different.\n");
 	      return(DD_FALSE);
 	    }
 	  if ((b= sim->uc->fbrk_at(end)))
@@ -92,7 +92,7 @@ COMMAND_DO_WORK_SIM(cl_run_cmd)
 	    }
 	}
     }
-  con->printf("Simulation started, PC=0x%06x\n", sim->uc->PC);
+  con->dd_printf("Simulation started, PC=0x%06x\n", sim->uc->PC);
   if (sim->uc->fbrk_at(start))
     sim->uc->do_inst(1);
   sim->start(con);
@@ -202,9 +202,9 @@ COMMAND_DO_WORK_APP(cl_help_cmd)
       {
 	c= (class cl_cmd *)(cmdset->at(i));
 	if (c->short_help)
-	  con->printf("%s\n", c->short_help);
+	  con->dd_printf("%s\n", c->short_help);
 	else
-	  con->printf("%s\n", (char*)(c->names->at(0)));
+	  con->dd_printf("%s\n", (char*)(c->names->at(0)));
       }
   }
   else if (cmdline->syntax_match(/*sim*/0, STRING)) {
@@ -216,7 +216,7 @@ COMMAND_DO_WORK_APP(cl_help_cmd)
 	  matches++;
       }
     if (!matches)
-      con->printf("No such command\n");
+      con->dd_printf("No such command\n");
     else if (matches > 1)
       for (i= 0; i < cmdset->count; i++)
 	{
@@ -224,9 +224,9 @@ COMMAND_DO_WORK_APP(cl_help_cmd)
 	  if (!c->name_match(parm->value.string.string, DD_FALSE))
 	    continue;
 	  if (c->short_help)
-	    con->printf("%s\n", c->short_help);
+	    con->dd_printf("%s\n", c->short_help);
 	  else
-	    con->printf("%s\n", (char*)(c->names->at(0)));
+	    con->dd_printf("%s\n", (char*)(c->names->at(0)));
 	}
     else
       for (i= 0; i < cmdset->count; i++)
@@ -235,22 +235,22 @@ COMMAND_DO_WORK_APP(cl_help_cmd)
 	  if (!c->name_match(parm->value.string.string, DD_FALSE))
 	    continue;
 	  if (c->short_help)
-	    con->printf("%s\n", c->short_help);
+	    con->dd_printf("%s\n", c->short_help);
 	  else
-	    con->printf("%s\n", (char*)(c->names->at(0)));
+	    con->dd_printf("%s\n", (char*)(c->names->at(0)));
 	  int names;
-	  con->printf("Names of command:");
+	  con->dd_printf("Names of command:");
 	  for (names= 0; names < c->names->count; names++)
-	    con->printf(" %s", (char*)(c->names->at(names)));
-	  con->printf("\n");
+	    con->dd_printf(" %s", (char*)(c->names->at(names)));
+	  con->dd_printf("\n");
 	  if (c->long_help)
-	    con->printf("%s\n", c->long_help);
+	    con->dd_printf("%s\n", c->long_help);
 	  else
-	    con->printf("%s\n", (char*)(c->names->at(0)));
+	    con->dd_printf("%s\n", (char*)(c->names->at(0)));
 	}
   }
   else
-    con->printf("%s\n", short_help?short_help:"Error: wrong syntax");
+    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax");
 
   return(0);
 }

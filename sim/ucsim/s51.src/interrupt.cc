@@ -49,34 +49,34 @@ cl_interrupt::print_info(class cl_console *con)
   int ie= uc->get_mem(MEM_SFR, IE);
   int i;
 
-  con->printf("Interrupts are %s. Interrupt sources:\n",
-	      (ie&bmEA)?"enabled":"disabled");
-  con->printf("  Handler  En  Pr Req Act Name\n");
+  con->dd_printf("Interrupts are %s. Interrupt sources:\n",
+		 (ie&bmEA)?"enabled":"disabled");
+  con->dd_printf("  Handler  En  Pr Req Act Name\n");
   for (i= 0; i < uc->it_sources->count; i++)
     {
       class cl_it_src *is= (class cl_it_src *)(uc->it_sources->at(i));
-      con->printf("  0x%06x", is->addr);
-      con->printf(" %-3s", (ie&(is->ie_mask))?"en":"dis");
-      con->printf(" %2d", uc->it_priority(is->ie_mask));
-      con->printf(" %-3s",
-		  (uc->get_mem(MEM_SFR, is->src_reg)&(is->src_mask))?
-		  "YES":"no");
-      con->printf(" %-3s", (is->active)?"act":"no");
-      con->printf(" %s", is->name);
-      con->printf("\n");
+      con->dd_printf("  0x%06x", is->addr);
+      con->dd_printf(" %-3s", (ie&(is->ie_mask))?"en":"dis");
+      con->dd_printf(" %2d", uc->it_priority(is->ie_mask));
+      con->dd_printf(" %-3s",
+		     (uc->get_mem(MEM_SFR, is->src_reg)&(is->src_mask))?
+		     "YES":"no");
+      con->dd_printf(" %-3s", (is->active)?"act":"no");
+      con->dd_printf(" %s", is->name);
+      con->dd_printf("\n");
     }
-  con->printf("Active interrupt service(s):\n");
-  con->printf("  Pr Handler  PC       Source\n");
+  con->dd_printf("Active interrupt service(s):\n");
+  con->dd_printf("  Pr Handler  PC       Source\n");
   for (i= 0; i < uc->it_levels->count; i++)
     {
       class it_level *il= (class it_level *)(uc->it_levels->at(i));
       if (il->level >= 0)
 	{
-	  con->printf("  %2d", il->level);
-	  con->printf(" 0x%06x", il->addr);
-	  con->printf(" 0x%06x", il->PC);
-	  con->printf(" %s", (il->source)?(il->source->name):"nothing");
-	  con->printf("\n");
+	  con->dd_printf("  %2d", il->level);
+	  con->dd_printf(" 0x%06x", il->addr);
+	  con->dd_printf(" 0x%06x", il->PC);
+	  con->dd_printf(" %s", (il->source)?(il->source->name):"nothing");
+	  con->dd_printf("\n");
 	}
     }
 }

@@ -259,34 +259,34 @@ cl_z80::disass(t_addr addr, char *sep)
 void
 cl_z80::print_regs(class cl_console *con)
 {
-  con->printf("SZ-A--P-C  Flags= 0x%02x %3d %c  ",
-	      regs.F, regs.F, isprint(regs.F)?regs.F:'.');
-  con->printf("A= 0x%02x %3d %c\n",
-	      regs.A, regs.A, isprint(regs.A)?regs.A:'.');
-  con->printf("%c%c-%c--%c-%c\n",
-	      (regs.F&BIT_S)?'1':'0',
-	      (regs.F&BIT_Z)?'1':'0',
-	      (regs.F&BIT_A)?'1':'0',
-	      (regs.F&BIT_P)?'1':'0',
-	      (regs.F&BIT_C)?'1':'0');
-  con->printf("BC= 0x%04x [BC]= %02x %3d %c  ",
-	      regs.BC, ram->get(regs.BC), ram->get(regs.BC),
-	      isprint(ram->get(regs.BC))?ram->get(regs.BC):'.');
-  con->printf("DE= 0x%04x [DE]= %02x %3d %c  ",
-	      regs.DE, ram->get(regs.DE), ram->get(regs.DE),
-	      isprint(ram->get(regs.DE))?ram->get(regs.DE):'.');
-  con->printf("HL= 0x%04x [HL]= %02x %3d %c\n",
-	      regs.HL, ram->get(regs.HL), ram->get(regs.HL),
-	      isprint(ram->get(regs.HL))?ram->get(regs.HL):'.');
-  con->printf("IX= 0x%04x [IX]= %02x %3d %c  ",
-	      regs.IX, ram->get(regs.IX), ram->get(regs.IX),
-	      isprint(ram->get(regs.IX))?ram->get(regs.IX):'.');
-  con->printf("IY= 0x%04x [IY]= %02x %3d %c  ",
-	      regs.IY, ram->get(regs.IY), ram->get(regs.IY),
-	      isprint(ram->get(regs.IY))?ram->get(regs.IY):'.');
-  con->printf("SP= 0x%04x [SP]= %02x %3d %c\n",
-	      regs.SP, ram->get(regs.SP), ram->get(regs.SP),
-	      isprint(ram->get(regs.SP))?ram->get(regs.SP):'.');
+  con->dd_printf("SZ-A--P-C  Flags= 0x%02x %3d %c  ",
+		 regs.F, regs.F, isprint(regs.F)?regs.F:'.');
+  con->dd_printf("A= 0x%02x %3d %c\n",
+		 regs.A, regs.A, isprint(regs.A)?regs.A:'.');
+  con->dd_printf("%c%c-%c--%c-%c\n",
+		 (regs.F&BIT_S)?'1':'0',
+		 (regs.F&BIT_Z)?'1':'0',
+		 (regs.F&BIT_A)?'1':'0',
+		 (regs.F&BIT_P)?'1':'0',
+		 (regs.F&BIT_C)?'1':'0');
+  con->dd_printf("BC= 0x%04x [BC]= %02x %3d %c  ",
+		 regs.BC, ram->get(regs.BC), ram->get(regs.BC),
+		 isprint(ram->get(regs.BC))?ram->get(regs.BC):'.');
+  con->dd_printf("DE= 0x%04x [DE]= %02x %3d %c  ",
+		 regs.DE, ram->get(regs.DE), ram->get(regs.DE),
+		 isprint(ram->get(regs.DE))?ram->get(regs.DE):'.');
+  con->dd_printf("HL= 0x%04x [HL]= %02x %3d %c\n",
+		 regs.HL, ram->get(regs.HL), ram->get(regs.HL),
+		 isprint(ram->get(regs.HL))?ram->get(regs.HL):'.');
+  con->dd_printf("IX= 0x%04x [IX]= %02x %3d %c  ",
+		 regs.IX, ram->get(regs.IX), ram->get(regs.IX),
+		 isprint(ram->get(regs.IX))?ram->get(regs.IX):'.');
+  con->dd_printf("IY= 0x%04x [IY]= %02x %3d %c  ",
+		 regs.IY, ram->get(regs.IY), ram->get(regs.IY),
+		 isprint(ram->get(regs.IY))?ram->get(regs.IY):'.');
+  con->dd_printf("SP= 0x%04x [SP]= %02x %3d %c\n",
+		 regs.SP, ram->get(regs.SP), ram->get(regs.SP),
+		 isprint(ram->get(regs.SP))?ram->get(regs.SP):'.');
   
   print_disass(PC, con);
 }

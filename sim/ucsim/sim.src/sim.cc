@@ -157,39 +157,39 @@ cl_sim::stop(int reason)
       if (reason == resUSER &&
 	  cmd->frozen_console->input_avail())
 	cmd->frozen_console->read_line();
-      cmd->frozen_console->printf("Stop at 0x%06x: (%d) ", uc->PC, reason);
+      cmd->frozen_console->dd_printf("Stop at 0x%06x: (%d) ", uc->PC, reason);
       switch (reason)
 	{
 	case resHALT:
-	  cmd->frozen_console->printf("Halted\n");
+	  cmd->frozen_console->dd_printf("Halted\n");
 	  break;
 	case resINV_ADDR:
-	  cmd->frozen_console->printf("Invalid address\n");
+	  cmd->frozen_console->dd_printf("Invalid address\n");
 	  break;
 	case resSTACK_OV:
-	  cmd->frozen_console->printf("Stack overflow\n");
+	  cmd->frozen_console->dd_printf("Stack overflow\n");
 	  break;
 	case resBREAKPOINT:
-	  cmd->frozen_console->printf("Breakpoint\n");
+	  cmd->frozen_console->dd_printf("Breakpoint\n");
 	  break;
 	case resINTERRUPT:
-	  cmd->frozen_console->printf("Interrupt\n");
+	  cmd->frozen_console->dd_printf("Interrupt\n");
 	  break;
 	case resWDTRESET:
-	  cmd->frozen_console->printf("Watchdog reset\n");
+	  cmd->frozen_console->dd_printf("Watchdog reset\n");
 	  break;
 	case resUSER:
-	  cmd->frozen_console->printf("User stopped\n");
+	  cmd->frozen_console->dd_printf("User stopped\n");
 	  break;
 	case resINV_INST:
-	  cmd->frozen_console->printf("Invalid instruction 0x%04x\n",
-				      uc->get_mem(MEM_ROM, uc->PC));
+	  cmd->frozen_console->dd_printf("Invalid instruction 0x%04x\n",
+					 uc->get_mem(MEM_ROM, uc->PC));
 	  break;
 	default:
-	  cmd->frozen_console->printf("Unknown reason\n");
+	  cmd->frozen_console->dd_printf("Unknown reason\n");
 	  break;
 	}
-      cmd->frozen_console->printf("F 0x%06x\n", uc->PC); // for sdcdb
+      cmd->frozen_console->dd_printf("F 0x%06x\n", uc->PC); // for sdcdb
       //if (cmd->actual_console != cmd->frozen_console)
       cmd->frozen_console->flags&= ~CONS_FROZEN;
       cmd->frozen_console->print_prompt();

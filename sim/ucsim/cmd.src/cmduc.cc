@@ -46,26 +46,26 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //		      class cl_cmdline *cmdline, class cl_console *con)
 COMMAND_DO_WORK_UC(cl_state_cmd)
 {
-  con->printf("CPU state= %s PC= 0x%06x XTAL= %g\n",
-	      get_id_string(cpu_states, uc->state),
-	      uc->PC, 
-	      uc->xtal);
-  con->printf("Total time since last reset= %g sec (%lu clks)\n",
-	      uc->get_rtime(), uc->ticks->ticks);
-  con->printf("Time in isr = %g sec (%lu clks) %3.2g%%\n",
-	      uc->isr_ticks->get_rtime(uc->xtal),
-	      uc->isr_ticks->ticks,
-	      (uc->ticks->ticks == 0)?0.0:
-	      (100.0*((double)(uc->isr_ticks->ticks)/
-		      (double)(uc->ticks->ticks))));
-  con->printf("Time in idle= %g sec (%lu clks) %3.2g%%\n",
-	      uc->idle_ticks->get_rtime(uc->xtal),
-	      uc->idle_ticks->ticks,
-	      (uc->ticks->ticks == 0)?0.0:
-	      (100.0*((double)(uc->idle_ticks->ticks)/
-		      (double)(uc->ticks->ticks))));
-  con->printf("Max value of stack pointer= 0x%06x, avg= 0x%06x\n",
-	      uc->sp_max, uc->sp_avg);
+  con->dd_printf("CPU state= %s PC= 0x%06x XTAL= %g\n",
+		 get_id_string(cpu_states, uc->state),
+		 uc->PC, 
+		 uc->xtal);
+  con->dd_printf("Total time since last reset= %g sec (%lu clks)\n",
+		 uc->get_rtime(), uc->ticks->ticks);
+  con->dd_printf("Time in isr = %g sec (%lu clks) %3.2g%%\n",
+		 uc->isr_ticks->get_rtime(uc->xtal),
+		 uc->isr_ticks->ticks,
+		 (uc->ticks->ticks == 0)?0.0:
+		 (100.0*((double)(uc->isr_ticks->ticks)/
+			 (double)(uc->ticks->ticks))));
+  con->dd_printf("Time in idle= %g sec (%lu clks) %3.2g%%\n",
+		 uc->idle_ticks->get_rtime(uc->xtal),
+		 uc->idle_ticks->ticks,
+		 (uc->ticks->ticks == 0)?0.0:
+		 (100.0*((double)(uc->idle_ticks->ticks)/
+			 (double)(uc->ticks->ticks))));
+  con->dd_printf("Max value of stack pointer= 0x%06x, avg= 0x%06x\n",
+		 uc->sp_max, uc->sp_avg);
   return(0);
 }
 
@@ -86,11 +86,11 @@ COMMAND_DO_WORK_UC(cl_file_cmd)
   if ((cmdline->param(0) == 0) ||
       ((fname= cmdline->param(0)->get_svalue()) == NULL))
     {
-      con->printf("File name is missing.\n");
+      con->dd_printf("File name is missing.\n");
       return(0);
     }
   if ((l= uc->read_hex_file(fname)) >= 0)
-    con->printf("%ld words read from %s\n", l, fname);
+    con->dd_printf("%ld words read from %s\n", l, fname);
 
   return(0);
 }
@@ -109,7 +109,7 @@ COMMAND_DO_WORK_UC(cl_dl_cmd)
   long l;
   
   if ((l= uc->read_hex_file(NULL)) >= 0)
-    con->printf("%ld words loaded\n", l);
+    con->dd_printf("%ld words loaded\n", l);
 
   return(0);
 }
@@ -132,13 +132,13 @@ COMMAND_DO_WORK_UC(cl_pc_cmd)
     {
       if (!(params[0]->get_address(uc, &addr)))
 	{
-	  con->printf("Error: wrong parameter\n");
+	  con->dd_printf("Error: wrong parameter\n");
 	  return(DD_FALSE);
 	}
       if (addr >= uc->get_mem_size(MEM_ROM))
 	addr= 0;
       if (!uc->inst_at(addr))
-	con->printf("Warning: maybe not instruction at 0x%06x\n", addr);
+	con->dd_printf("Warning: maybe not instruction at 0x%06x\n", addr);
       uc->PC= addr;
     }
   uc->print_disass(uc->PC, con);
@@ -194,16 +194,16 @@ COMMAND_DO_WORK_UC(cl_dump_cmd)
 				  mem,
 				  params[0]->value.bit.mem_address,
 				  params[0]->value.bit.mask);
-	  con->printf("%10s ", sn?sn:"");
-	  con->printf(mem->addr_format, params[0]->value.bit.mem_address);
-	  con->printf(" ");
-	  con->printf(mem->data_format, m);
-	  con->printf(" %c\n", (m&(params[0]->value.bit.mask))?'1':'0');
+	  con->dd_printf("%10s ", sn?sn:"");
+	  con->dd_printf(mem->addr_format, params[0]->value.bit.mem_address);
+	  con->dd_printf(" ");
+	  con->dd_printf(mem->data_format, m);
+	  con->dd_printf(" %c\n", (m&(params[0]->value.bit.mask))?'1':'0');
 	  i++;
 	  params[0]= cmdline->param(i);
 	}
       if (params[0])
-	con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+	con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
     }
   else if (cmdline->syntax_match(uc, MEMORY))
     {
@@ -230,7 +230,7 @@ COMMAND_DO_WORK_UC(cl_dump_cmd)
     mem->dump(start, end, bpl, con);
   }
   else
-    con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
 
   return(DD_FALSE);;
 }
@@ -329,12 +329,12 @@ COMMAND_DO_WORK_UC(cl_dc_cmd)
   }
   if (start >= rom->size)
     {
-      con->printf("Error: start address is wrong\n");
+      con->dd_printf("Error: start address is wrong\n");
       return(DD_FALSE);
     }
   if (end >= rom->size)
     {
-      con->printf("Error: end address is wrong\n");
+      con->dd_printf("Error: end address is wrong\n");
       return(DD_FALSE);
     }
 
@@ -382,13 +382,13 @@ COMMAND_DO_WORK_UC(cl_disassemble_cmd)
   }
   else
     {
-      con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");    
+      con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
       return(DD_FALSE);
     }
 
   if (lines < 1)
     {
-      con->printf("Error: wrong `lines' parameter\n");
+      con->dd_printf("Error: wrong `lines' parameter\n");
       return(DD_FALSE);
     }
   if (!uc->there_is_inst())
@@ -459,7 +459,7 @@ COMMAND_DO_WORK_UC(cl_fill_cmd)
       }
   }
   else
-    con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
 
   return(DD_FALSE);;
 }
@@ -485,7 +485,7 @@ cl_where_cmd::do_real_work(class cl_uc *uc,
     int len= params[1]->value.data_list.len;
     if (!len)
       {
-	con->printf("Error: nothing to search for\n");
+	con->dd_printf("Error: nothing to search for\n");
 	return(DD_FALSE);
       }
     t_addr addr= 0;
@@ -498,7 +498,7 @@ cl_where_cmd::do_real_work(class cl_uc *uc,
       }
   }
   else
-    con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
 
   return(DD_FALSE);
 }

@@ -481,14 +481,14 @@ cl_mem::dump(t_addr start, t_addr stop, int bpl, class cl_console *con)
   while ((start <= stop) &&
 	 (start < size))
     {
-      con->printf(addr_format, start); con->printf(" ");
+      con->dd_printf(addr_format, start); con->dd_printf(" ");
       for (i= 0;
 	   (i < bpl) &&
 	     (start+i < size) &&
 	     (start+i <= stop);
 	   i++)
 	{
-	  con->printf(data_format, read(start+i)); con->printf(" ");
+	  con->dd_printf(data_format, read(start+i)); con->dd_printf(" ");
 	}
       while (i < bpl)
 	{
@@ -496,7 +496,7 @@ cl_mem::dump(t_addr start, t_addr stop, int bpl, class cl_console *con)
 	  j= width/4 + ((width%4)?1:0) + 1;
 	  while (j)
 	    {
-	      con->printf(" ");
+	      con->dd_printf(" ");
 	      j--;
 	    }
 	  i++;
@@ -507,15 +507,15 @@ cl_mem::dump(t_addr start, t_addr stop, int bpl, class cl_console *con)
 	   i++)
 	{
 	  long c= get(start+i);
-	  con->printf("%c", isprint(255&c)?(255&c):'.');
+	  con->dd_printf("%c", isprint(255&c)?(255&c):'.');
 	  if (width > 8)
-	    con->printf("%c", isprint(255&(c>>8))?(255&(c>>8)):'.');
+	    con->dd_printf("%c", isprint(255&(c>>8))?(255&(c>>8)):'.');
 	  if (width > 16)
-	    con->printf("%c", isprint(255&(c>>16))?(255&(c>>16)):'.');
+	    con->dd_printf("%c", isprint(255&(c>>16))?(255&(c>>16)):'.');
 	  if (width > 24)
-	    con->printf("%c", isprint(255&(c>>24))?(255&(c>>24)):'.');
+	    con->dd_printf("%c", isprint(255&(c>>24))?(255&(c>>24)):'.');
 	}
-      con->printf("\n");
+      con->dd_printf("\n");
       dump_finished= start+i;
       start+= bpl;
     }

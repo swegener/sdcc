@@ -94,11 +94,11 @@ cl_ticker::get_rtime(double xtal)
 void
 cl_ticker::dump(int nr, double xtal, class cl_console *con)
 {
-  con->printf("timer #%d(\"%s\") %s%s: %g sec (%lu clks)\n",
-	      nr, name?name:"unnamed",
-	      (options&TICK_RUN)?"ON":"OFF",
-	      (options&TICK_INISR)?",ISR":"",
-	      get_rtime(xtal), ticks);
+  con->dd_printf("timer #%d(\"%s\") %s%s: %g sec (%lu clks)\n",
+		 nr, name?name:"unnamed",
+		 (options&TICK_RUN)?"ON":"OFF",
+		 (options&TICK_INISR)?",ISR":"",
+		 get_rtime(xtal), ticks);
 }
 
 
@@ -627,7 +627,7 @@ cl_uc::read_hex_file(const char *name)
   if (!name)
     {
       sim->app->get_commander()->
-	printf("cl_uc::read_hex_file File name not specified\n");
+	dd_printf("cl_uc::read_hex_file File name not specified\n");
       return(-1);
     }
   else
@@ -700,18 +700,19 @@ cl_uc::read_hex_file(const char *name)
 		    if (sim->app->args->get_iarg('V', 0) &&
 			rtyp != 1)
 		      sim->app->get_commander()->
-			printf("Unknown record type %d(0x%x)\n", rtyp, rtyp);
+			dd_printf("Unknown record type %d(0x%x)\n",
+				  rtyp, rtyp);
 		}
 	      else
 		if (sim->app->args->get_iarg('V', 0))
 		  sim->app->get_commander()->
-		    printf("Checksum error (%x instead of %x) in "
-			   "record %ld.\n", chk, sum, recnum);
+		    dd_printf("Checksum error (%x instead of %x) in "
+			      "record %ld.\n", chk, sum, recnum);
 	    }
 	  else
 	    if (sim->app->args->get_iarg('V', 0))
 	      sim->app->get_commander()->
-		printf("Read error in record %ld.\n", recnum);
+		dd_printf("Read error in record %ld.\n", recnum);
 	}
     }
   if (get_mem_width(MEM_ROM) > 8 &&
@@ -721,7 +722,8 @@ cl_uc::read_hex_file(const char *name)
   if (name)
     fclose(f);
   if (sim->app->args->get_iarg('V', 0))
-    sim->app->get_commander()->printf("%ld records have been read\n", recnum);
+    sim->app->get_commander()->dd_printf("%ld records have been read\n",
+					 recnum);
   analyze(0);
   return(written);
 }
@@ -943,16 +945,16 @@ cl_uc::print_disass(t_addr addr, class cl_console *con)
   b= fbrk_at(addr);
   dis= disass(addr, NULL);
   if (b)
-    con->printf("%c", (b->perm == brkFIX)?'F':'D');
+    con->dd_printf("%c", (b->perm == brkFIX)?'F':'D');
   else
-    con->printf(" ");
-  con->printf("%c ", inst_at(addr)?' ':'?');
-  con->printf(rom->addr_format, addr); con->printf(" ");
-  con->printf(rom->data_format, code);
+    con->dd_printf(" ");
+  con->dd_printf("%c ", inst_at(addr)?' ':'?');
+  con->dd_printf(rom->addr_format, addr); con->dd_printf(" ");
+  con->dd_printf(rom->data_format, code);
   for (i= 1; i < inst_length(code); i++)
     {
-      con->printf(" ");
-      con->printf(rom->data_format, get_mem(MEM_ROM, addr+i));
+      con->dd_printf(" ");
+      con->dd_printf(rom->data_format, get_mem(MEM_ROM, addr+i));
     }
   int li= longest_inst();
   while (i < li)
@@ -960,17 +962,17 @@ cl_uc::print_disass(t_addr addr, class cl_console *con)
       int j;
       j= rom->width/4 + ((rom->width%4)?1:0) + 1;
       while (j)
-	con->printf(" "), j--;
+	con->dd_printf(" "), j--;
       i++;
     }
-  con->printf(" %s\n", dis);
+  con->dd_printf(" %s\n", dis);
   free(dis);
 }
 
 void
 cl_uc::print_regs(class cl_console *con)
 {
-  con->printf("No registers\n");
+  con->dd_printf("No registers\n");
 }
 
 int

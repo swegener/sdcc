@@ -65,8 +65,8 @@ COMMAND_DO_WORK_UC(cl_gui_start_cmd)
   }
   else
     {
-      con->printf("Error: wrong syntax\n"
-		  "%s\n", short_help?short_help:"no help");
+      con->dd_printf("Error: wrong syntax\n"
+		     "%s\n", short_help?short_help:"no help");
     }
 
   return(DD_FALSE);;

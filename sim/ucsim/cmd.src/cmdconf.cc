@@ -48,23 +48,22 @@ COMMAND_DO_WORK_UC(cl_conf_cmd)
 {
   int i;
 
-  con->printf("ucsim version %s\n", VERSIONSTR);
-  con->printf("Type of microcontroller: %s\n", uc->id_string());
-  con->printf("Controller has %d hardware element(s).\n",
-	      uc->hws->count);
+  con->dd_printf("ucsim version %s\n", VERSIONSTR);
+  con->dd_printf("Type of microcontroller: %s\n", uc->id_string());
+  con->dd_printf("Controller has %d hardware element(s).\n", uc->hws->count);
   for (i= 0; i < uc->hws->count; i++)
     {
       class cl_hw *hw= (class cl_hw *)(uc->hws->at(i));
-      con->printf("  %s[%d]\n", hw->id_string, hw->id);
+      con->dd_printf("  %s[%d]\n", hw->id_string, hw->id);
     }
-  con->printf("Memories:\n");
+  con->dd_printf("Memories:\n");
   for (i= MEM_ROM; i < MEM_TYPES; i++)
     {
       class cl_mem *mem= (class cl_mem *)(uc->mems->at(i));
       if (mem)
-	con->printf("  %s size= 0x%06x %6d width= %2d class= \"%s\"\n",
-		    mem->id_string(), mem->size, mem->size, mem->width,
-		    (mem->class_name)?(mem->class_name):"unknown");
+	con->dd_printf("  %s size= 0x%06x %6d width= %2d class= \"%s\"\n",
+		       mem->id_string(), mem->size, mem->size, mem->width,
+		       (mem->class_name)?(mem->class_name):"unknown");
     }
   return(0);
 }
@@ -99,7 +98,7 @@ COMMAND_DO_WORK_UC(cl_conf_addmem_cmd)
 	uc->mems->put_at(type, mem);
       }
     else
-      con->printf("Can not make memory \"%s\"\n", mem_class);
+      con->dd_printf("Can not make memory \"%s\"\n", mem_class);
   }
   return(DD_FALSE);
 }

@@ -304,7 +304,7 @@ public:
 
   virtual void welcome(void);
   virtual void print_prompt(void);
-  virtual int  printf(char *format, ...);
+  virtual int  dd_printf(char *format, ...);
   virtual void print_bin(long data, int bits);
   virtual int  match(int fdnum);
   virtual int  get_in_fd(void);
@@ -364,7 +364,7 @@ public:
 
   int all_printf(char *format, ...);	// print to all consoles
   int all_print(char *string, int length);
-  int printf(char *format, ...);	// print to actual_console
+  int dd_printf(char *format, ...);	// print to actual_console
   int debug(char *format, ...);		// print consoles with debug flag set
   int flag_printf(int iflags, char *format, ...);
   int input_avail(void);

@@ -46,23 +46,23 @@ cl_timer0::print_info(class cl_console *con)
   int tmod= uc->get_mem(MEM_SFR, TMOD);
   int on;
 
-  con->printf("%s[%d] 0x%04x", id_string, id,
-	      256*uc->get_mem(MEM_SFR, TH0)+uc->get_mem(MEM_SFR, TL0));
+  con->dd_printf("%s[%d] 0x%04x", id_string, id,
+		 256*uc->get_mem(MEM_SFR, TH0)+uc->get_mem(MEM_SFR, TL0));
   int mode= tmod & (bmM00|bmM10);
-  con->printf(" %s", modes[mode]);
-  con->printf(" %s", (tmod&bmC_T0)?"counter":"timer");
+  con->dd_printf(" %s", modes[mode]);
+  con->dd_printf(" %s", (tmod&bmC_T0)?"counter":"timer");
   if (tmod&bmGATE0)
     {
-      con->printf(" gated");
+      con->dd_printf(" gated");
       on= uc->get_mem(MEM_SFR, P3) & uc->port_pins[3] & bm_INT0;
     }
   else
     on= uc->get_mem(MEM_SFR, TCON) & bmTR0;
-  con->printf(" %s", on?"ON":"OFF");
-  con->printf(" irq=%c", (uc->get_mem(MEM_SFR, TCON)&bmTF0)?'1':'0');
-  con->printf(" %s", (uc->get_mem(MEM_SFR, IE)&bmET0)?"en":"dis");
-  con->printf(" prio=%d", uc->it_priority(bmPT0));
-  con->printf("\n");
+  con->dd_printf(" %s", on?"ON":"OFF");
+  con->dd_printf(" irq=%c", (uc->get_mem(MEM_SFR, TCON)&bmTF0)?'1':'0');
+  con->dd_printf(" %s", (uc->get_mem(MEM_SFR, IE)&bmET0)?"en":"dis");
+  con->dd_printf(" prio=%d", uc->it_priority(bmPT0));
+  con->dd_printf("\n");
 }
 
 

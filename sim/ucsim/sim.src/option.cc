@@ -73,9 +73,9 @@ void
 cl_bool_opt::print(class cl_console *con)
 {
   if (*(bool *)option)
-    con->printf("TRUE");
+    con->dd_printf("TRUE");
   else
-    con->printf("FALSE");
+    con->dd_printf("FALSE");
 }
 
 bool
@@ -125,9 +125,9 @@ cl_cons_debug_opt::print(class cl_console *con)
 {
   if (/*sim->cmd->actual_console &&
 	sim->cmd->actual_console*/con->flags & CONS_DEBUG)
-    con->printf("TRUE");
+    con->dd_printf("TRUE");
   else
-    con->printf("FALSE");
+    con->dd_printf("FALSE");
 }
 
 bool

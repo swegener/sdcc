@@ -381,23 +381,24 @@ t_uc51::print_regs(class cl_console *con)
   iram->dump(start, start+7, 8, con);
   start= sfr->get(PSW) & 0x18;
   data= iram->get(iram->get(start));
-  con->printf("%06x %02x %c",
-	      iram->get(start), data, isprint(data)?data:'.');
+  con->dd_printf("%06x %02x %c",
+		 iram->get(start), data, isprint(data)?data:'.');
 
-  con->printf("  ACC= 0x%02x %3d %c  B= 0x%02x", sfr->get(ACC), sfr->get(ACC),
-	      isprint(sfr->get(ACC))?(sfr->get(ACC)):'.', sfr->get(B)); 
+  con->dd_printf("  ACC= 0x%02x %3d %c  B= 0x%02x",
+		 sfr->get(ACC), sfr->get(ACC),
+		 isprint(sfr->get(ACC))?(sfr->get(ACC)):'.', sfr->get(B)); 
   eram2xram();
   data= get_mem(MEM_XRAM, sfr->get(DPH)*256+sfr->get(DPL));
-  con->printf("   DPTR= 0x%02x%02x @DPTR= 0x%02x %3d %c\n", sfr->get(DPH),
-	      sfr->get(DPL), data, data, isprint(data)?data:'.');
+  con->dd_printf("   DPTR= 0x%02x%02x @DPTR= 0x%02x %3d %c\n", sfr->get(DPH),
+		 sfr->get(DPL), data, data, isprint(data)?data:'.');
 
   data= iram->get(iram->get(start+1));
-  con->printf("%06x %02x %c", iram->get(start+1), data,
-	      isprint(data)?data:'.');
+  con->dd_printf("%06x %02x %c", iram->get(start+1), data,
+		 isprint(data)?data:'.');
   data= sfr->get(PSW);
-  con->printf("  PSW= 0x%02x CY=%c AC=%c OV=%c P=%c\n", data,
-	      (data&bmCY)?'1':'0', (data&bmAC)?'1':'0',
-	      (data&bmOV)?'1':'0', (data&bmP)?'1':'0');
+  con->dd_printf("  PSW= 0x%02x CY=%c AC=%c OV=%c P=%c\n", data,
+		 (data&bmCY)?'1':'0', (data&bmAC)?'1':'0',
+		 (data&bmOV)?'1':'0', (data&bmP)?'1':'0');
 
   print_disass(PC, con);
 }

@@ -44,26 +44,27 @@ cl_timer2::print_info(class cl_console *con)
 {
   int t2con= uc->get_mem(MEM_SFR, T2CON);
 
-  con->printf("%s[%d] 0x%04x", id_string, id,
-	      256*uc->get_mem(MEM_SFR, TH2)+uc->get_mem(MEM_SFR, TL2));
+  con->dd_printf("%s[%d] 0x%04x", id_string, id,
+		 256*uc->get_mem(MEM_SFR, TH2)+uc->get_mem(MEM_SFR, TL2));
   if (t2con & (bmRCLK|bmTCLK))
     {
-      con->printf(" baud");
+      con->dd_printf(" baud");
       if (t2con & bmRCLK)
-	con->printf(" RCLK");
+	con->dd_printf(" RCLK");
       if (t2con & bmTCLK)
-	con->printf(" TCLK");
+	con->dd_printf(" TCLK");
     }
   else
-    con->printf(" %s", (t2con&bmCP_RL2)?"capture":"reload");
-  con->printf(" 0x%04x",
-	      256*uc->get_mem(MEM_SFR, RCAP2H)+uc->get_mem(MEM_SFR, RCAP2L));
-  con->printf(" %s", (t2con&bmC_T2)?"counter":"timer");
-  con->printf(" %s", (t2con&bmTR2)?"ON":"OFF");
-  con->printf(" irq=%c", (t2con&bmTF2)?'1':'0');
-  con->printf(" %s", (uc->get_mem(MEM_SFR, IE)&bmET2)?"en":"dis");
-  con->printf(" prio=%d", uc->it_priority(bmPT2));
-  con->printf("\n");
+    con->dd_printf(" %s", (t2con&bmCP_RL2)?"capture":"reload");
+  con->dd_printf(" 0x%04x",
+		 256*uc->get_mem(MEM_SFR, RCAP2H)+
+		 uc->get_mem(MEM_SFR, RCAP2L));
+  con->dd_printf(" %s", (t2con&bmC_T2)?"counter":"timer");
+  con->dd_printf(" %s", (t2con&bmTR2)?"ON":"OFF");
+  con->dd_printf(" irq=%c", (t2con&bmTF2)?'1':'0');
+  con->dd_printf(" %s", (uc->get_mem(MEM_SFR, IE)&bmET2)?"en":"dis");
+  con->dd_printf(" prio=%d", uc->it_priority(bmPT2));
+  con->dd_printf("\n");
 }
 
 

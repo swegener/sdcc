@@ -97,10 +97,7 @@ asmop;
 
 void genpic16Code (iCode *);
 
-//extern char *fReturnpic16[];
-//extern char *fReturn390[];
 extern unsigned pic16_fReturnSizePic;
-//extern char **fReturn;
 
 
 #define AOP(op) op->aop
@@ -120,6 +117,8 @@ extern unsigned pic16_fReturnSizePic;
 #define RESULTONSTACK(x) \
                          (IC_RESULT(x) && IC_RESULT(x)->aop && \
                          IC_RESULT(x)->aop->type == AOP_STK )
+#define RESULTONSTA(x)	(IC_RESULT(x) && IC_RESULT(x)->aop && IC_RESULT(x)->aop->type == AOP_STA)
+
 
 #define MOVA(x) if (strcmp(x,"a") && strcmp(x,"acc")) pic16_emitcode(";XXX mov","a,%s  %s,%d",x,__FILE__,__LINE__);
 #define CLRC    pic16_emitcode(";XXX clr","c %s,%d",__FILE__,__LINE__);

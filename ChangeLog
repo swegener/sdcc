@@ -1,3 +1,12 @@
+2004-10-03 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* device/lib/Makefile.in (target port-specific-objects-pic16):
+	changed * to *.* so to ignore the CVS directory,
+	* src/pic16/gen.c (pic16_freeAsmop): added code to store result of
+	stacked variables back in stack,
+	* (genEndFunction): fixed bug reported by G.M. Gallant with stack
+	corruption
+
 2004-10-01 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* .version: bumped version number to 2.4.5

@@ -1241,13 +1241,22 @@ void pic16_freeAsmop (operand *op, asmop *aaop, iCode *ic, bool pop)
           {
             int i;
 
+              /* we must store the result on stack */
+              if((op == IC_RESULT(ic)) && RESULTONSTA(ic)) {
+                if(_G.accInUse)pic16_pushpCodeOp( pic16_popCopyReg(&pic16_pc_wreg) );
+                for(i=0;i<aop->size;i++) {
+                  /* initialise for stack access via frame pointer */
+                  pic16_emitpcode(POC_MOVLW, pic16_popGetLit(OP_SYMBOL(IC_RESULT(ic))->stack + i + _G.stack_lat));
+
+                  pic16_emitpcode(POC_MOVFF, pic16_popGet2p(
+                        aop->aopu.stk.pop[i], pic16_popCopyReg(&pic16_pc_plusw2)));
+                }
+	
+                if(_G.accInUse)pic16_poppCodeOp( pic16_popCopyReg(&pic16_pc_wreg) );
+              }
+
               for(i=0;i<aop->size;i++)
-#if 1
                 PCOR(aop->aopu.stk.pop[i] )->r->isFree = 1;
-#else
-                pic16_popReleaseTempReg( aop->aopu.stk.pop[i], 0 );
-                bitVectUnSetBit(_G.fregsUsed, PCOR(aop->aopu.stk.pop[i])->r->rIdx );
-#endif
           }
           break;
 #if 0
@@ -3737,7 +3746,7 @@ static void genEndFunction (iCode *ic)
 	 
 
 		if(strcmp(sym->name, "main")) {
-			if(/*!options.ommitFramePtr ||*/ sym->regsUsed) {
+			if(1/*!options.ommitFramePtr ||*/ /*sym->regsUsed*/) {
 				/* restore stack frame */
 				if(STACK_MODEL_LARGE)
 					pic16_emitpcode(POC_MOVFF,

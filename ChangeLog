@@ -1,3 +1,22 @@
+2002-03-16  Sandeep Dutta  <sandeep@ddi.com>
+
+	* /src/SDCCast.c:
+	Fixed left shift. Will promote the left side of a left shift
+	if a) left shifting more than size of operand or b) when assigned
+	to something size > size of left side
+
+2002-03-04  johanknol  <johanknol@manik>
+
+	* /src/SDCCval.c: fixed
+
+	const unsigned char arr[][2] = { { 0, 1 } };
+	t18.c:1: error: Initializer element is not constant
+
+2002-03-04  bela  <bela@manik>
+
+	* /device/include/mcs51reg.h:
+	ds89c420 register definition update
+
 2002-03-03    <johan@FRIJA>
 
 	* support/Util/SDCCerr.c: did something, but don't no why anymore

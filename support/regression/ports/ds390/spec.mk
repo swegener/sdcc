@@ -1,7 +1,10 @@
 # Port specification for the ds390 port running with uCsim
 
 # path to uCsim
-S51 = $(SDCC_DIR)/sim/ucsim/s51.src/s51
+S51A = $(SDCC_DIR)/sim/ucsim/s51.src/s51
+S51B = $(SDCC_DIR)/bin/s51
+
+S51 = $(shell if [ -f $(S51A) ]; then echo $(S51A); else echo $(S51B); fi)
 
 SDCCFLAGS +=-mds390 --lesspedantic -DREENTRANT=reentrant --stack-after-data
 

@@ -56,7 +56,7 @@ static void _pic14_reset_regparm()
     regParmFlg = 0;
 }
 
-static int _pic14_regparm( link *l)
+static int _pic14_regparm( sym_link *l)
 {
     /* for this processor it is simple
        can pass only the first parameter in a register */

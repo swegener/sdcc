@@ -49,8 +49,8 @@ char  buffer[1024];
 int noLineno = 0;
 int noAlloc = 0 ;
 symbol *currFunc ;
-ast  *createIval  (ast *, link *, initList *, ast *);
-ast *createIvalCharPtr (ast *, link *, ast *);
+ast  *createIval  (ast *, sym_link *, initList *, ast *);
+ast *createIvalCharPtr (ast *, sym_link *, ast *);
 ast *optimizeRRCRLC ( ast * );
 ast *optimizeGetHbit(ast *);
 ast *backPatchLabels (ast *,symbol *,symbol *);
@@ -89,7 +89,7 @@ ast  *newAst (int  type, void *op )
 	ex->opval.op   = (long) op ;
 	break ;
     case EX_LINK   :
-	ex->opval.lnk  = (link *) op;
+	ex->opval.lnk  = (sym_link *) op;
 	break ;
     case EX_STMNT  :
 	ex->opval.stmnt= (unsigned) op;
@@ -129,7 +129,7 @@ ast* newAst_OP(unsigned op)
       return ex;
 }
 
-ast* newAst_LINK(link*val)
+ast* newAst_LINK(sym_link*val)
 {
       ast* ex = newAst_(EX_LINK);
       ex->opval.lnk = val;
@@ -490,7 +490,7 @@ value *resolveFromTable (value *val)
 /*-----------------------------------------------------------------*/
 /* funcOfType :- function of type with name                        */
 /*-----------------------------------------------------------------*/
-symbol *funcOfType (char *name, link *type, link *argType, 
+symbol *funcOfType (char *name, sym_link *type, sym_link *argType, 
 		    int nArgs , int rent)
 {
     symbol *sym;    
@@ -559,7 +559,7 @@ int processParms (ast *func, value *defParm,
 		  ast *actParm, 
 		  int *parmNumber)
 {
-    link *fetype = func->etype;
+    sym_link *fetype = func->etype;
     
     /* if none of them exist */
     if ( !defParm && !actParm)
@@ -635,7 +635,7 @@ int processParms (ast *func, value *defParm,
 /*-----------------------------------------------------------------*/
 /* createIvalType - generates ival for basic types                 */
 /*-----------------------------------------------------------------*/
-ast *createIvalType ( ast *sym,link  *type, initList *ilist)
+ast *createIvalType ( ast *sym,sym_link  *type, initList *ilist)
 {
     ast *iExpr;
 
@@ -650,7 +650,7 @@ ast *createIvalType ( ast *sym,link  *type, initList *ilist)
 /*-----------------------------------------------------------------*/
 /* createIvalStruct - generates initial value for structures       */
 /*-----------------------------------------------------------------*/
-ast *createIvalStruct (ast *sym,link *type,initList *ilist)
+ast *createIvalStruct (ast *sym,sym_link *type,initList *ilist)
 {
     ast *rast = NULL ;
     symbol   *sflds  ;
@@ -682,7 +682,7 @@ ast *createIvalStruct (ast *sym,link *type,initList *ilist)
 /*-----------------------------------------------------------------*/
 /* createIvalArray - generates code for array initialization       */
 /*-----------------------------------------------------------------*/
-ast *createIvalArray (ast  *sym, link *type, initList *ilist)
+ast *createIvalArray (ast  *sym, sym_link *type, initList *ilist)
 {
     ast *rast = NULL;
     initList *iloop ;
@@ -739,7 +739,7 @@ ast *createIvalArray (ast  *sym, link *type, initList *ilist)
 /*-----------------------------------------------------------------*/
 /* createIvalCharPtr - generates initial values for char pointers  */
 /*-----------------------------------------------------------------*/
-ast *createIvalCharPtr (ast *sym, link *type, ast *iexpr)
+ast *createIvalCharPtr (ast *sym, sym_link *type, ast *iexpr)
 {      
     ast *rast = NULL ;
 
@@ -786,7 +786,7 @@ ast *createIvalCharPtr (ast *sym, link *type, ast *iexpr)
 /*-----------------------------------------------------------------*/
 /* createIvalPtr - generates initial value for pointers            */
 /*-----------------------------------------------------------------*/
-ast *createIvalPtr (ast *sym,link *type,initList *ilist)
+ast *createIvalPtr (ast *sym,sym_link *type,initList *ilist)
 {    
     ast *rast;
     ast *iexpr ;
@@ -808,7 +808,7 @@ ast *createIvalPtr (ast *sym,link *type,initList *ilist)
 /*-----------------------------------------------------------------*/
 /* createIval - generates code for initial value                   */
 /*-----------------------------------------------------------------*/
-ast  *createIval  (ast *sym, link *type, initList *ilist, ast *wid)
+ast  *createIval  (ast *sym, sym_link *type, initList *ilist, ast *wid)
 {
     ast *rast = NULL;  
 
@@ -1514,7 +1514,7 @@ ast *reverseLoop (ast *loop, symbol *sym, ast *init, ast *end)
 ast *decorateType (ast *tree)
 {         
     int parmNumber ;
-    link *p;
+    sym_link *p;
     
     if ( ! tree )
 	return tree ;
@@ -1703,7 +1703,7 @@ ast *decorateType (ast *tree)
     case  INC_OP:  /* incerement operator unary so left only */
     case  DEC_OP:
 	{
-	    link *ltc = (tree->right ? RTYPE(tree) : LTYPE(tree) );
+	    sym_link *ltc = (tree->right ? RTYPE(tree) : LTYPE(tree) );
 	    COPYTYPE(TTYPE(tree),TETYPE(tree),ltc);
 	    if (!tree->initMode && IS_CONSTANT(TETYPE(tree)))
 		werror(E_CODE_WRITE,"++/--");
@@ -2752,7 +2752,7 @@ ast *decorateType (ast *tree)
 /*-----------------------------------------------------------------*/
 /* sizeofOp - processes size of operation                          */
 /*-----------------------------------------------------------------*/
-value  *sizeofOp( link  *type)
+value  *sizeofOp( sym_link  *type)
 {
 	char buff[10];
 
@@ -3565,7 +3565,7 @@ ast  *createFunction   (symbol  *name,   ast  *body )
     ast  *ex ;
     symbol *csym;
     int stack = 0 ;
-    link *fetype;       
+    sym_link *fetype;       
     iCode *piCode = NULL;
     
     /* if check function return 0 then some problem */

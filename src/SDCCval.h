@@ -27,8 +27,8 @@
 /* value wrapper */
 typedef struct value  {
 	char	name[ SDCC_NAME_MAX + 1 ]; /* operand accessing this value */	
-	link     *type ;                 /* start of type chain     */
-	link     *etype;                 /* end of type chain       */
+	sym_link *type ;                 /* start of type chain     */
+	sym_link *etype;                 /* end of type chain       */
 	symbol   *sym  ;                 /* Original Symbol         */
 	struct   value *next ;           /* used in initializer list*/
 	unsigned    vArgs  : 1 ;	  /* arg list ended with variable arg		*/
@@ -81,7 +81,7 @@ value			*valShift         (value   *, value *,int);
 value			*valCompare       (value   *, value *,int);
 value			*valBitwise       (value   *, value *,int);
 value			*valLogicAndOr    (value   *, value *,int);
-value                   *valCastLiteral   (link    *, double     );
+value                   *valCastLiteral   (sym_link    *, double );
 value                   *valueFromLit     (float );
 initList		*newiList         (int      , void  *   );
 initList		*revinit          (initList  *          );
@@ -90,10 +90,10 @@ double            	 list2int         (initList  *          );
 value			*list2val         (initList  *          );
 struct ast		*list2expr	  (initList  *		);
 void                     resolveIvalSym   (initList  *          );
-value                   *valFromType      (link *               );
+value                   *valFromType      (sym_link *           );
 value                   *constFloatVal    (char *               );
-int                      getNelements     (link *, initList *   );
+int                      getNelements     (sym_link *, initList *   );
 value                   *valForArray      (struct ast  *        );
 value                   *valForStructElem (struct ast  *, struct ast *);
-value                   *valForCastAggr   (struct ast *, link *, struct ast *, int ) ;
+value                   *valForCastAggr   (struct ast *, sym_link *, struct ast *, int ) ;
 #endif

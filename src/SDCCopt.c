@@ -158,7 +158,7 @@ static void cnvToFloatCast (iCode *ic, eBBlock *ebp)
 {    
     iCode *ip, *newic;    
     symbol *func;
-    link *type = operandType(IC_RIGHT(ic));
+    sym_link *type = operandType(IC_RIGHT(ic));
     int linenno = ic->lineno;
     int bwd, su;
 
@@ -217,7 +217,7 @@ static void cnvFromFloatCast (iCode *ic, eBBlock *ebp)
 {
     iCode *ip, *newic;    
     symbol *func;
-    link *type = operandType(IC_LEFT(ic));
+    sym_link *type = operandType(IC_LEFT(ic));
     int lineno = ic->lineno ;
     int bwd, su;
 
@@ -274,7 +274,7 @@ static void cnvFromFloatCast (iCode *ic, eBBlock *ebp)
 /*-----------------------------------------------------------------*/
 /* convilong - converts int or long mults or divs to fcalls        */
 /*-----------------------------------------------------------------*/
-static void convilong (iCode *ic, eBBlock *ebp, link *type, int op)
+static void convilong (iCode *ic, eBBlock *ebp, sym_link *type, int op)
 {    
     symbol *func = NULL;
     iCode *ip = ic->next;
@@ -393,7 +393,7 @@ static void convertToFcall (eBBlock **ebbs, int count)
 	    /* if long / int mult or divide or mod */
 	    if (ic->op == '*' || ic->op == '/' || ic->op == '%' ) {
 
-		link *type = operandType(IC_LEFT(ic));
+		sym_link *type = operandType(IC_LEFT(ic));
 		if (IS_INTEGRAL(type) && getSize(type) > port->muldiv.native_below)
 		    convilong (ic,ebbs[i],type,ic->op);
 	    }

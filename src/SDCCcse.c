@@ -202,7 +202,7 @@ DEFSETFUNC(removeFromInExprs)
 /*-----------------------------------------------------------------*/
 static bool isGlobalInNearSpace (operand *op)
 {
-    link *type = getSpec(operandType(op));
+    sym_link *type = getSpec(operandType(op));
     /* this is 8051 specific: optimization
        suggested by Jean-Louis VERN, with 8051s we have no
        advantage of putting variables in near space into
@@ -792,7 +792,7 @@ void algebraicOpts (iCode *ic)
 void updateSpillLocation ( iCode *ic)
 {
 
-    link *setype;
+    sym_link *setype;
 
     if (POINTER_SET(ic)) 
 	return;
@@ -1124,7 +1124,7 @@ DEFSETFUNC(delGetPointerSucc)
 /*-----------------------------------------------------------------*/
 static void fixUpTypes(iCode *ic)
 {
-	link *t1 = operandType(IC_LEFT(ic)) ,*t2;
+	sym_link *t1 = operandType(IC_LEFT(ic)) ,*t2;
 	
 	if (IS_DS390_PORT)
 	{

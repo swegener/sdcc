@@ -55,7 +55,7 @@ static void _reset_regparm()
     regParmFlg = 0;
 }
 
-static int _reg_parm(link *l)
+static int _reg_parm(sym_link *l)
 {
     if (regParmFlg == 2)
 	return 0;

@@ -413,8 +413,8 @@ value *strVal  ( char	*s )
 /*------------------------------------------------------------------*/
 value	*reverseValWithType ( value *val )
 {
-    link *type ;
-    link *etype;
+    sym_link *type ;
+    sym_link *etype;
     
     if (!val) 
 	return NULL ;
@@ -562,7 +562,7 @@ value *charVal ( char *s )
 /*------------------------------------------------------------------*/
 /* valFromType - creates a value from type given                    */
 /*------------------------------------------------------------------*/
-value *valFromType ( link *type)
+value *valFromType ( sym_link *type)
 {
     value *val = newValue();
     val->type = copyLinkChain(type);
@@ -1082,7 +1082,7 @@ value *valLogicAndOr (value  *lval, value *rval, int op)
 /*------------------------------------------------------------------*/
 /* valCastLiteral - casts a literal value to another type           */
 /*------------------------------------------------------------------*/
-value *valCastLiteral (link *dtype, double fval)
+value *valCastLiteral (sym_link *dtype, double fval)
 {
     value *val ;
 
@@ -1121,9 +1121,9 @@ value *valCastLiteral (link *dtype, double fval)
 /*------------------------------------------------------------------*/
 /* getNelements - determines # of elements from init list           */
 /*------------------------------------------------------------------*/
-int getNelements (link *type,initList *ilist)
+int getNelements (sym_link *type,initList *ilist)
 {
-    link *etype = getSpec(type);
+    sym_link *etype = getSpec(type);
     int i;
 
     if (! ilist)
@@ -1295,7 +1295,7 @@ value *valForStructElem(ast *structT, ast *elemT)
 /* valForCastAggr - will return value for a cast of an aggregate   */
 /*                  plus minus a constant                          */
 /*-----------------------------------------------------------------*/
-value *valForCastAggr (ast *aexpr, link *type, ast *cnst, int op)
+value *valForCastAggr (ast *aexpr, sym_link *type, ast *cnst, int op)
 {
     value *val;
 

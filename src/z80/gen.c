@@ -1348,7 +1348,7 @@ void toBoolean(operand *oper)
 /*-----------------------------------------------------------------*/
 static void genNot (iCode *ic)
 {
-    link *optype = operandType(IC_LEFT(ic));
+    sym_link *optype = operandType(IC_LEFT(ic));
 
     /* assign asmOps to operand & result */
     aopOp (IC_LEFT(ic),ic,FALSE, TRUE);
@@ -1417,7 +1417,7 @@ static void genCpl (iCode *ic)
 static void genUminus (iCode *ic)
 {
     int offset ,size ;
-    link *optype, *rtype;
+    sym_link *optype, *rtype;
 
     /* assign asmops */
     aopOp(IC_LEFT(ic),ic,FALSE, FALSE);
@@ -1712,7 +1712,7 @@ static bool isInHome(void)
 static void emitCall(iCode *ic, bool ispcall)
 {
     int pushed_de = 0;
-    link *detype = getSpec(operandType(IC_LEFT(ic)));
+    sym_link *detype = getSpec(operandType(IC_LEFT(ic)));
 
     /* if caller saves & we have not saved then */
     if (!ic->regsSaved) {
@@ -1872,7 +1872,7 @@ static void emitCall(iCode *ic, bool ispcall)
 /*-----------------------------------------------------------------*/
 static void genCall (iCode *ic)
 {
-    link *detype = getSpec(operandType(IC_LEFT(ic)));
+    sym_link *detype = getSpec(operandType(IC_LEFT(ic)));
     emitCall(ic, FALSE);
 }
 
@@ -1909,7 +1909,7 @@ extern set *publics;
 static void genFunction (iCode *ic)
 {
     symbol *sym = OP_SYMBOL(IC_LEFT(ic));
-    link *fetype;
+    sym_link *fetype;
 
     nregssaved = 0;
     setArea(IS_NONBANKED(sym->etype));
@@ -2793,7 +2793,7 @@ release:
 static void genCmpGt (iCode *ic, iCode *ifx)
 {
     operand *left, *right, *result;
-    link *letype , *retype;
+    sym_link *letype , *retype;
     int sign ;
 
     left = IC_LEFT(ic);
@@ -2821,7 +2821,7 @@ static void genCmpGt (iCode *ic, iCode *ifx)
 static void genCmpLt (iCode *ic, iCode *ifx)
 {
     operand *left, *right, *result;
-    link *letype , *retype;
+    sym_link *letype , *retype;
     int sign ;
 
     left = IC_LEFT(ic);
@@ -4091,7 +4091,7 @@ static void genRightShiftLiteral (operand *left,
 static void genRightShift (iCode *ic)
 {
     operand *right, *left, *result;
-    link *retype ;
+    sym_link *retype ;
     int size, offset, first = 1;
     char *l;
     bool is_signed;
@@ -4179,7 +4179,7 @@ static void genGenPointerGet (operand *left,
                               operand *result, iCode *ic)
 {
     int size, offset ;
-    link *retype = getSpec(operandType(result));
+    sym_link *retype = getSpec(operandType(result));
     int pair = PAIR_HL;
 
     if (IS_GB)
@@ -4244,7 +4244,7 @@ static void genGenPointerGet (operand *left,
 static void genPointerGet (iCode *ic)
 {
     operand *left, *result ;
-    link *type, *etype;
+    sym_link *type, *etype;
 
     left = IC_LEFT(ic);
     result = IC_RESULT(ic) ;
@@ -4271,7 +4271,7 @@ static void genGenPointerSet (operand *right,
                               operand *result, iCode *ic)
 {    
     int size, offset ;
-    link *retype = getSpec(operandType(right));
+    sym_link *retype = getSpec(operandType(right));
     PAIR_ID pairId = PAIR_HL;
 
     aopOp(result,ic,FALSE, FALSE);
@@ -4337,7 +4337,7 @@ static void genGenPointerSet (operand *right,
 static void genPointerSet (iCode *ic)
 {    
     operand *right, *result ;
-    link *type, *etype;
+    sym_link *type, *etype;
 
     right = IC_RIGHT(ic);
     result = IC_RESULT(ic) ;
@@ -4571,7 +4571,7 @@ static void genJumpTab (iCode *ic)
 static void genCast (iCode *ic)
 {
     operand *result = IC_RESULT(ic);
-    link *ctype = operandType(IC_LEFT(ic));
+    sym_link *ctype = operandType(IC_LEFT(ic));
     operand *right = IC_RIGHT(ic);
     int size, offset ;
 

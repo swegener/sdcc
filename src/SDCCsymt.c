@@ -233,11 +233,11 @@ symbol *newSymbol (char *name, int scope )
 /*------------------------------------------------------------------*/
 /* newLink - creates a new link (declarator,specifier)              */
 /*------------------------------------------------------------------*/
-link  *newLink ()
+sym_link  *newLink ()
 {
-   link *p ;
+   sym_link *p ;
 
-   ALLOC(p,sizeof(link));
+   ALLOC(p,sizeof(sym_link));
 
    return p;
 }
@@ -258,7 +258,7 @@ structdef   *newStruct  ( char   *tag   )
 /*------------------------------------------------------------------*/
 /* pointerTypes - do the computation for the pointer types          */
 /*------------------------------------------------------------------*/
-void pointerTypes (link *ptr, link *type)
+void pointerTypes (sym_link *ptr, sym_link *type)
 {    
     if (IS_SPEC(ptr))
 	return ;
@@ -328,11 +328,11 @@ void pointerTypes (link *ptr, link *type)
 /*------------------------------------------------------------------*/
 /* addDecl - adds a declarator @ the end of a chain                 */
 /*------------------------------------------------------------------*/
-void  addDecl ( symbol *sym, int type , link *p )
+void  addDecl ( symbol *sym, int type , sym_link *p )
 {
-    link    *head;
-    link    *tail;
-    link        *t ;
+    sym_link    *head;
+    sym_link    *tail;
+    sym_link        *t ;
     
     /* if we are passed a link then set head & tail */
     if ( p )  {
@@ -390,7 +390,7 @@ void  addDecl ( symbol *sym, int type , link *p )
 /*------------------------------------------------------------------*/
 /* mergeSpec - merges two specifiers and returns the new one       */
 /*------------------------------------------------------------------*/
-link  *mergeSpec ( link *dest, link *src )
+sym_link  *mergeSpec ( sym_link *dest, sym_link *src )
 {
     /* if noun different then src overrides */
     if ( SPEC_NOUN(dest) != SPEC_NOUN(src) && !SPEC_NOUN(dest))
@@ -427,16 +427,16 @@ link  *mergeSpec ( link *dest, link *src )
 /*------------------------------------------------------------------*/
 /* cloneSpec - copies the entire spec and returns a new spec        */
 /*------------------------------------------------------------------*/
-link  *cloneSpec ( link *src )
+sym_link  *cloneSpec ( sym_link *src )
 {
-    link  *spec ;
+    sym_link  *spec ;
     
     /* go thru chain till we find the specifier */
     while ( src && src->class != SPECIFIER )
 	src = src->next ;
     
     spec = newLink() ;
-    memcpy (spec,src,sizeof(link));
+    memcpy (spec,src,sizeof(sym_link));
     return spec ;
 }
 
@@ -455,9 +455,9 @@ char  *genSymName ( int level )
 /*------------------------------------------------------------------*/
 /* getSpec - returns the specifier part from a declaration chain    */
 /*------------------------------------------------------------------*/
-link  *getSpec ( link *p )
+sym_link  *getSpec ( sym_link *p )
 {
-    link *loop ;
+    sym_link *loop ;
     
     loop = p ;
     while ( p && ! (IS_SPEC(p)))
@@ -469,9 +469,9 @@ link  *getSpec ( link *p )
 /*------------------------------------------------------------------*/
 /* newCharLink() - creates an int type                              */
 /*------------------------------------------------------------------*/
-link  *newCharLink()
+sym_link  *newCharLink()
 {
-    link *p;
+    sym_link *p;
     
     p = newLink();
     p->class = SPECIFIER ;
@@ -483,9 +483,9 @@ link  *newCharLink()
 /*------------------------------------------------------------------*/
 /* newFloatLink - a new Float type                                  */
 /*------------------------------------------------------------------*/
-link *newFloatLink()
+sym_link *newFloatLink()
 {
-    link *p;
+    sym_link *p;
     
     p = newLink();
     p->class = SPECIFIER ;
@@ -497,9 +497,9 @@ link *newFloatLink()
 /*------------------------------------------------------------------*/
 /* newLongLink() - new long type                                    */
 /*------------------------------------------------------------------*/
-link *newLongLink()
+sym_link *newLongLink()
 {
-    link *p;
+    sym_link *p;
 
     p = newLink();
     p->class = SPECIFIER ;
@@ -512,9 +512,9 @@ link *newLongLink()
 /*------------------------------------------------------------------*/
 /* newIntLink() - creates an int type                               */
 /*------------------------------------------------------------------*/
-link  *newIntLink()
+sym_link  *newIntLink()
 {
-    link *p;
+    sym_link *p;
     
     p = newLink();
     p->class = SPECIFIER ;
@@ -526,7 +526,7 @@ link  *newIntLink()
 /*------------------------------------------------------------------*/
 /* getSize - returns size of a type chain in bits                   */
 /*------------------------------------------------------------------*/
-unsigned int   getSize ( link *p )
+unsigned int   getSize ( sym_link *p )
 {
     /* if nothing return 0 */
     if ( ! p )
@@ -579,7 +579,7 @@ unsigned int   getSize ( link *p )
 /*------------------------------------------------------------------*/
 /* bitsForType - returns # of bits required to store this type      */
 /*------------------------------------------------------------------*/
-unsigned int   bitsForType ( link *p )
+unsigned int   bitsForType ( sym_link *p )
 {
     /* if nothing return 0 */
     if ( ! p )
@@ -698,9 +698,9 @@ symbol   *reverseSyms ( symbol *sym)
 /*------------------------------------------------------------------*/
 /* reverseLink - reverses the links for a type chain        */
 /*------------------------------------------------------------------*/
-link     *reverseLink ( link *type)
+sym_link     *reverseLink ( sym_link *type)
 {
-   link *prev  , *curr, *next ;
+   sym_link *prev  , *curr, *next ;
 
    if (!type)
       return NULL ;
@@ -770,7 +770,7 @@ void addSymChain ( symbol *symHead )
 /*------------------------------------------------------------------*/
 /* funcInChain - DCL Type 'FUNCTION' found in type chain            */
 /*------------------------------------------------------------------*/
-int funcInChain (link *lnk)
+int funcInChain (sym_link *lnk)
 {
     while (lnk) {
 	if (IS_FUNC(lnk))
@@ -783,11 +783,11 @@ int funcInChain (link *lnk)
 /*------------------------------------------------------------------*/
 /* structElemType - returns the type info of a sturct member        */
 /*------------------------------------------------------------------*/
-link *structElemType (link *stype, value *id ,value **argsp)
+sym_link *structElemType (sym_link *stype, value *id ,value **argsp)
 {
     symbol *fields = (SPEC_STRUCT(stype) ? SPEC_STRUCT(stype)->fields : NULL);
-    link *type, *etype;
-    link *petype = getSpec(stype);
+    sym_link *type, *etype;
+    sym_link *petype = getSpec(stype);
 
     if ( ! fields || ! id)
 	return NULL ;
@@ -1037,7 +1037,7 @@ static void  checkSClass ( symbol *sym )
 /*------------------------------------------------------------------*/
 void  changePointer  (symbol  *sym)
 {
-    link *p ;
+    sym_link *p ;
     
     /* go thru the chain of declarations   */
     /* if we find a pointer to a function  */
@@ -1071,14 +1071,14 @@ int checkDecl ( symbol *sym )
 /*------------------------------------------------------------------*/
 /* copyLinkChain - makes a copy of the link chain & rets ptr 2 head */
 /*------------------------------------------------------------------*/
-link  *copyLinkChain ( link *p)
+sym_link  *copyLinkChain ( sym_link *p)
 {
-    link  *head, *curr , *loop;
+    sym_link  *head, *curr , *loop;
     
     curr = p ;
     head = loop = ( curr ? newLink() : (void *) NULL) ;
     while (curr)   {
-	memcpy(loop,curr,sizeof(link)) ; /* copy it */
+	memcpy(loop,curr,sizeof(sym_link)) ; /* copy it */
 	loop->next = (curr->next ? newLink() : (void *) NULL) ;
 	loop = loop->next ;
 	curr = curr->next ;
@@ -1129,12 +1129,12 @@ void  cleanUpLevel   (bucket  **table, int level )
 /*------------------------------------------------------------------*/
 /* computeType - computes the resultant type from two types         */
 /*------------------------------------------------------------------*/
-link *computeType ( link *type1, link *type2)
+sym_link *computeType ( sym_link *type1, sym_link *type2)
 {
-    link *rType ;
-    link *reType;
-    link *etype1 = getSpec(type1);
-    link *etype2 = getSpec(type2);
+    sym_link *rType ;
+    sym_link *reType;
+    sym_link *etype1 = getSpec(type1);
+    sym_link *etype2 = getSpec(type2);
     
     /* if one of them is a float then result is a float */
     /* here we assume that the types passed are okay */
@@ -1180,7 +1180,7 @@ link *computeType ( link *type1, link *type2)
 /*------------------------------------------------------------------*/
 /* checkType - will do type check return 1 if match                 */
 /*------------------------------------------------------------------*/
-int checkType ( link *dest, link *src )
+int checkType ( sym_link *dest, sym_link *src )
 {
     if ( !dest && !src)
 	return 1;
@@ -1437,7 +1437,7 @@ void  processFuncArgs   (symbol *func, int ignoreName)
 	    /* then we need to add a new link */
 	    if (IS_STRUCT(val->type)) {
 				/* first lets add DECLARATOR type */
-		link *p = val->type ;
+		sym_link *p = val->type ;
 		
 		werror(W_STRUCT_AS_ARG,val->name);
 		val->type = newLink();
@@ -1547,7 +1547,7 @@ int isSymbolEqual (symbol *dest, symbol *src)
 /*-----------------------------------------------------------------*/ 
 /* printTypeChain - prints the type chain in human readable form   */
 /*-----------------------------------------------------------------*/ 
-void printTypeChain (link *type, FILE *of)
+void printTypeChain (sym_link *type, FILE *of)
 {
     int nlr = 0;
 
@@ -1662,7 +1662,7 @@ void printTypeChain (link *type, FILE *of)
 /*-----------------------------------------------------------------*/ 
 /* cdbTypeInfo - print the type information for debugger           */
 /*-----------------------------------------------------------------*/
-void cdbTypeInfo (link *type,FILE *of)
+void cdbTypeInfo (sym_link *type,FILE *of)
 {
     fprintf(of,"{%d}",getSize(type));
     while (type) {
@@ -1878,11 +1878,11 @@ symbol *__fsgteq;
 /* Dims: mul/div/mod, BYTE/WORD/DWORD, SIGNED/UNSIGNED */
 symbol *__muldiv[3][3][2];
 /* Dims: BYTE/WORD/DWORD SIGNED/UNSIGNED */
-link *__multypes[3][2];
+sym_link *__multypes[3][2];
 /* Dims: to/from float, BYTE/WORD/DWORD, SIGNED/USIGNED */
 symbol *__conv[2][3][2];
 
-link *floatType;
+sym_link *floatType;
 
 static void _makeRegParam(symbol *sym)
 {
@@ -1919,7 +1919,7 @@ void initCSupport ()
     floatType= newFloatLink();
 
     for (bwd = 0; bwd < 3; bwd++) {
-	link *l;
+	sym_link *l;
 	switch (bwd) {
 	case 0:
 	    l = newCharLink();

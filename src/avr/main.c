@@ -46,7 +46,7 @@ static void _avr_reset_regparm()
     regParmFlg = 0;
 }
 
-static int _avr_regparm( link *l)
+static int _avr_regparm( sym_link *l)
 {
     /* the first eight bytes will be passed in
        registers r16-r23. but we won't split variables

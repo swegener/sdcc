@@ -47,9 +47,9 @@ typedef enum {
 #define IS_SYMOP(op) (op && op->type == SYMBOL)
 #define ADDTOCHAIN(x) addSetHead(&iCodeChain,x)
 
-#define LRFTYPE       link *ltype = operandType(left), \
+#define LRFTYPE       sym_link *ltype = operandType(left), \
                            *rtype = operandType(right) ;
-#define LRETYPE       link *letype= getSpec(ltype)   , \
+#define LRETYPE       sym_link *letype= getSpec(ltype)   , \
                            *retype= getSpec(rtype);
 #define LRTYPE        LRFTYPE LRETYPE
 #define IS_ITEMP(op)       (IS_SYMOP(op) && op->operand.symOperand->isitmp == 1)
@@ -86,7 +86,7 @@ typedef struct operand {
     union {
 	struct symbol *symOperand ; /* operand is of type symbol */
 	struct value  *valOperand ; /* operand is of type value  */
-	struct link   *typeOperand; /* operand is of type typechain */
+	struct sym_link *typeOperand; /* operand is of type typechain */
     } operand ;
     
     bitVect *usesDefs;             /* which definitions are used by this */
@@ -250,7 +250,7 @@ int      isOperandVolatile  (operand *,bool);
 int      isOperandGlobal    (operand *);
 void     printiCChain    ( iCode * , FILE *);
 operand *ast2iCode          ( ast *);
-operand *geniCodeCast       ( link *, operand *,bool);
+operand *geniCodeCast       ( sym_link *, operand *,bool);
 operand *geniCodePtrPtrSubtract (operand *, operand *);
 void     initiCode          ();
 iCode   *iCodeFromAst   ( ast * );
@@ -258,7 +258,7 @@ int      isiCodeEqual   ( iCode *,iCode *) ;
 int      isOperandEqual ( operand *, operand *);
 iCodeTable *getTableEntry (int  );
 int      isOperandLiteral (operand *);
-operand *operandOperation (operand *,operand *,int,link *);
+operand *operandOperation (operand *,operand *,int,sym_link *);
 double   operandLitValue ( operand * );
 operand *operandFromLit (float);
 operand *operandFromOperand(operand *);
@@ -268,13 +268,13 @@ symbol  *newiTemp(char *);
 symbol  *newiTempLabel (char *);
 symbol  *newiTempPreheaderLabel ();
 iCode   *newiCode (int, operand *, operand *);
-link    *operandType(operand *);
+sym_link *operandType(operand *);
 operand *operandFromValue (value *);
 operand *operandFromSymbol(symbol *);
-link    *aggrToPtr ( link *, bool);
+sym_link *aggrToPtr ( sym_link *, bool);
 int      piCode (void *, FILE * );
 int      printOperand (operand *,FILE *);
-void     setOperandType (operand *, link *);
+void     setOperandType (operand *, sym_link *);
 bool     isOperandInFarSpace (operand *);
 operand *opFromOpWithDU (operand *,bitVect *,bitVect *);
 iCode   *copyiCode (iCode *);

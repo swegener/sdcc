@@ -517,7 +517,7 @@ static symbol *createStackSpil (symbol *sym)
 /*-----------------------------------------------------------------*/
 static bool isSpiltOnStack (symbol *sym)
 {
-    link *etype;
+    sym_link *etype;
 
     if (!sym)
 	return FALSE ;
@@ -1692,7 +1692,7 @@ static int packRegsForSupport (iCode *ic, eBBlock *ebp)
 	/* if this is a subtraction & the result
 	   is a true symbol in far space then don't pack */
 	if (ic->op == '-' && IS_TRUE_SYMOP(IC_RESULT(dic))) {
-	    link *etype =getSpec(operandType(IC_RESULT(dic)));
+	    sym_link *etype =getSpec(operandType(IC_RESULT(dic)));
 	    if (IN_FARSPACE(SPEC_OCLS(etype)))
 		return change ;
 	}
@@ -1853,8 +1853,8 @@ static iCode *packRegsForOneuse (iCode *ic, operand *op , eBBlock *ebp)
 /*-----------------------------------------------------------------*/
 static bool isBitwiseOptimizable (iCode *ic)
 {
-    link *ltype = getSpec(operandType(IC_LEFT(ic)));
-    link *rtype = getSpec(operandType(IC_RIGHT(ic)));
+    sym_link *ltype = getSpec(operandType(IC_LEFT(ic)));
+    sym_link *rtype = getSpec(operandType(IC_RIGHT(ic)));
 
     /* bitwise operations are considered optimizable
        under the following conditions (Jean-Louis VERN) 
@@ -2196,8 +2196,8 @@ static void packRegisters (eBBlock *ebp)
 	   the result of that arithmetic operation with 
 	   this result and get rid of the cast */
 	if (ic->op == CAST) {
-	    link *fromType = operandType(IC_RIGHT(ic));
-	    link *toType = operandType(IC_LEFT(ic));
+	    sym_link *fromType = operandType(IC_RIGHT(ic));
+	    sym_link *toType = operandType(IC_LEFT(ic));
 
 	    if (IS_INTEGRAL(fromType) && IS_INTEGRAL(toType) &&
 		getSize(fromType) != getSize(toType) && 

@@ -242,7 +242,7 @@ static asmop *newAsmop (short type)
 /*-----------------------------------------------------------------*/
 /* pointerCode - returns the code for a pointer type               */
 /*-----------------------------------------------------------------*/
-static int pointerCode (link *etype)
+static int pointerCode (sym_link *etype)
 {
 
 	return PTR_TYPE(SPEC_OCLS(etype));
@@ -958,7 +958,7 @@ static void genNotFloat (operand *op, operand *res)
 /*-----------------------------------------------------------------*/ 
 static int opIsGptr(operand *op)
 {
-	link *type = operandType(op);
+	sym_link *type = operandType(op);
     
 	if ((AOP_SIZE(op) == GPTRSIZE) && IS_GENPTR(type))
 		{
@@ -976,7 +976,7 @@ static int getDataSize(operand *op)
 	size = AOP_SIZE(op);
 	if (size == GPTRSIZE)
 		{
-			link *type = operandType(op);
+			sym_link *type = operandType(op);
 			if (IS_GENPTR(type))
 				{
 					/* generic pointer; arithmetic operations
@@ -1035,7 +1035,7 @@ static void toBoolean(operand *oper, char *r, bool clr)
 static void genNot (iCode *ic)
 {
 	symbol *tlbl;
-	link *optype = operandType(IC_LEFT(ic));
+	sym_link *optype = operandType(IC_LEFT(ic));
 	int size, offset = 1;
 
 	/* assign asmOps to operand & result */
@@ -1138,7 +1138,7 @@ static void genUminusFloat(operand *op,operand *result)
 static void genUminus (iCode *ic)
 {
 	int offset ,size ;
-	link *optype, *rtype;
+	sym_link *optype, *rtype;
 	int samer ;
 
 	/* assign asmops */
@@ -1471,7 +1471,7 @@ static bool inExcludeList(char *s)
 static void genFunction (iCode *ic)
 {
 	symbol *sym;
-	link *fetype;
+	sym_link *fetype;
 	int i = 0;
 
 	_G.nRegsSaved = 0;
@@ -1949,7 +1949,7 @@ static void genMultOneByte (operand *left,
                             operand *right,
                             operand *result)
 {
-	link *opetype = operandType(result);
+	sym_link *opetype = operandType(result);
 	symbol *lbl ;
 	int size,offset;
     
@@ -2093,7 +2093,7 @@ static void genBranch (iCode *ifx, int br_type, int sign)
 static void genCmp (iCode *ic, iCode *ifx, int br_type)
 {
 	operand *left, *right, *result;
-	link *letype , *retype;
+	sym_link *letype , *retype;
 	symbol *lbl;
 	int sign, size, offset =0;
 
@@ -2908,7 +2908,7 @@ static void genShiftRightLit (iCode *ic)
 		,*result=IC_RESULT(ic);
 	int size , shCount, offset =0;
 	int hByteZ=0;
-	link *letype = getSpec(operandType(left));
+	sym_link *letype = getSpec(operandType(left));
 	int sign = !SPEC_USIGN(letype);
 
 	right = IC_RIGHT(ic);
@@ -3109,7 +3109,7 @@ static void genShiftRightLit (iCode *ic)
 static void genRightShift (iCode *ic)
 {
 	operand *right, *left, *result;
-	link *letype ;
+	sym_link *letype ;
 	int size, offset;
 	int sign = 0, first =1;
 	symbol *tlbl;
@@ -3211,7 +3211,7 @@ static void genUnpackBits (operand *result, char *rname, int ptype)
 {    
 	int shCnt ;
 	int rlen = 0 ;
-	link *etype;
+	sym_link *etype;
 	int offset = 0 ;
 
 	etype = getSpec(operandType(result));
@@ -3327,8 +3327,8 @@ static void genNearPointerGet (operand *left,
 	asmop *aop = NULL;
 	regs *preg = NULL ;
 	char *rname ;
-	link *rtype, *retype;
-	link *ltype = operandType(left);    
+	sym_link *rtype, *retype;
+	sym_link *ltype = operandType(left);    
 	char buffer[80];
 
 	rtype = operandType(result);
@@ -3421,7 +3421,7 @@ static void genPagedPointerGet (operand *left,
 	asmop *aop = NULL;
 	regs *preg = NULL ;
 	char *rname ;
-	link *rtype, *retype;    
+	sym_link *rtype, *retype;    
 
 	rtype = operandType(result);
 	retype= getSpec(rtype);
@@ -3497,7 +3497,7 @@ static void genFarPointerGet (operand *left,
 			      operand *result, iCode *ic)
 {
 	int size, offset ;
-	link *retype = getSpec(operandType(result));
+	sym_link *retype = getSpec(operandType(result));
 
 	aopOp(left,ic,FALSE);
 
@@ -3545,7 +3545,7 @@ static void emitcodePointerGet (operand *left,
 				operand *result, iCode *ic)
 {
 	int size, offset ;
-	link *retype = getSpec(operandType(result));
+	sym_link *retype = getSpec(operandType(result));
 
 	aopOp(left,ic,FALSE);
 
@@ -3594,7 +3594,7 @@ static void genGenPointerGet (operand *left,
 			      operand *result, iCode *ic)
 {
 	int size, offset ;
-	link *retype = getSpec(operandType(result));
+	sym_link *retype = getSpec(operandType(result));
 
 	aopOp(left,ic,FALSE);
 
@@ -3648,7 +3648,7 @@ static void genGenPointerGet (operand *left,
 static void genPointerGet (iCode *ic)
 {
 	operand *left, *result ;
-	link *type, *etype;
+	sym_link *type, *etype;
 	int p_type;
 
 	left = IC_LEFT(ic);
@@ -3712,7 +3712,7 @@ static void genPointerGet (iCode *ic)
 /*-----------------------------------------------------------------*/
 /* genPackBits - generates code for packed bit storage             */
 /*-----------------------------------------------------------------*/
-static void genPackBits (link    *etype ,
+static void genPackBits (sym_link    *etype ,
 			 operand *right ,
 			 char *rname, int p_type)
 {
@@ -3902,8 +3902,8 @@ static void genNearPointerSet (operand *right,
 	asmop *aop = NULL;
 	regs *preg = NULL ;
 	char *rname , *l;
-	link *retype;
-	link *ptype = operandType(result);
+	sym_link *retype;
+	sym_link *ptype = operandType(result);
     
 	retype= getSpec(operandType(right));
 
@@ -3991,7 +3991,7 @@ static void genPagedPointerSet (operand *right,
 	asmop *aop = NULL;
 	regs *preg = NULL ;
 	char *rname , *l;
-	link *retype;
+	sym_link *retype;
        
 	retype= getSpec(operandType(right));
     
@@ -4067,7 +4067,7 @@ static void genFarPointerSet (operand *right,
 			      operand *result, iCode *ic)
 {
 	int size, offset ;
-	link *retype = getSpec(operandType(right));
+	sym_link *retype = getSpec(operandType(right));
 
 	aopOp(result,ic,FALSE);
 
@@ -4116,7 +4116,7 @@ static void genGenPointerSet (operand *right,
 			      operand *result, iCode *ic)
 {
 	int size, offset ;
-	link *retype = getSpec(operandType(right));
+	sym_link *retype = getSpec(operandType(right));
 
 	aopOp(result,ic,FALSE);
 
@@ -4171,7 +4171,7 @@ static void genGenPointerSet (operand *right,
 static void genPointerSet (iCode *ic)
 {    
 	operand *right, *result ;
-	link *type, *etype;
+	sym_link *type, *etype;
 	int p_type;
 
 	right = IC_RIGHT(ic);
@@ -4489,8 +4489,8 @@ static void genJumpTab (iCode *ic)
 static void genCast (iCode *ic)
 {
 	operand *result = IC_RESULT(ic);
-	link *ctype = operandType(IC_LEFT(ic));
-	link *rtype = operandType(IC_RIGHT(ic));
+	sym_link *ctype = operandType(IC_LEFT(ic));
+	sym_link *rtype = operandType(IC_RIGHT(ic));
 	operand *right = IC_RIGHT(ic);
 	int size, offset ;
 
@@ -4551,8 +4551,8 @@ static void genCast (iCode *ic)
 	if (IS_PTR(ctype)) {
 
 		int p_type;
-		link *type = operandType(right);
-		link *etype = getSpec(type);
+		sym_link *type = operandType(right);
+		sym_link *etype = getSpec(type);
 
 				/* pointer to generic pointer */
 		if (IS_GENPTR(ctype)) {

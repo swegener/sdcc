@@ -141,13 +141,13 @@ typedef struct declarator {
     unsigned int    num_elem;       /* # of elems if type==array  */
     short           ptr_const :1;   /* pointer is constant        */
     short           ptr_volatile:1; /* pointer is volatile        */
-    struct link     *tspec;         /* pointer type specifier      */
+    struct sym_link *tspec;         /* pointer type specifier      */
 } declarator ;
 
 #define DECLARATOR   0
 #define SPECIFIER    1
 
-typedef struct link {
+typedef struct sym_link {
 	unsigned class : 1      ;  /* DECLARATOR or SPECIFIER    */
 	unsigned tdef  : 1      ;  /* current link created by    */
                                    /* typedef if this flag is set*/
@@ -156,8 +156,8 @@ typedef struct link {
 		declarator     d     ;  /* if CLASS == DECLARATOR     */
 	} select ;
 
-	struct link    *next    ;  /* next element on the chain  */
-} link ;
+	struct sym_link *next    ;  /* next element on the chain  */
+} sym_link ;
 
 typedef struct symbol {
     char name [SDCC_NAME_MAX+1]	;  /* Input Variable Name     */
@@ -230,12 +230,12 @@ typedef struct symbol {
     
     int      lineDef		;  /* defined line number        */
     int      lastLine           ;  /* for functions the last line*/
-    struct   link  *type        ;  /* 1st link to declator chain */
-    struct   link  *etype       ;  /* last link to declarator chn*/
+    struct   sym_link  *type    ;  /* 1st link to declator chain */
+    struct   sym_link  *etype   ;  /* last link to declarator chn*/
     struct   value *args        ;  /* arguments if function      */
     struct   symbol *next       ;  /* crosslink to next symbol   */
     struct   symbol *localof    ;  /* local variable of which function */
-    struct   initList *ival       ;  /* ptr to initializer if any  */
+    struct   initList *ival     ;  /* ptr to initializer if any  */
     struct   bitVect *defs      ;  /* bit vector for definitions */
     struct   bitVect *uses      ;  /* bit vector for uses        */        
     struct   bitVect *regsUsed  ;  /* for functions registers used */
@@ -352,7 +352,7 @@ extern symbol *__fsgteq;
 /* Dims: mul/div/mod, BYTE/WORD/DWORD, SIGNED/UNSIGNED */
 extern symbol *__muldiv[3][3][2];
 /* Dims: BYTE/WORD/DWORD SIGNED/UNSIGNED */
-extern link *__multypes[3][2];
+extern sym_link *__multypes[3][2];
 /* Dims: to/from float, BYTE/WORD/DWORD, SIGNED/USIGNED */
 extern symbol *__conv[2][3][2];
 
@@ -360,56 +360,56 @@ extern symbol *__conv[2][3][2];
 #define INTTYPE		__multypes[1][0]
 #define UCHARTYPE	__multypes[0][1]
 
-extern link *floatType;
+extern sym_link *floatType;
 
 #include "SDCCval.h"
 
 /* forward definitions for the symbol table related functions */
 void       initSymt           (                                );
 symbol      *newSymbol        ( char      *, int               );
-link        *newLink          (                                );
+sym_link    *newLink          (                                );
 structdef   *newStruct        ( char      *                    );
-void         addDecl          ( symbol   *, int   , link *     );
-link        *mergeSpec        ( link      *, link *            );
-link        *cloneSpec        ( link  *                        );
-symbol      *reverseSyms     ( symbol     *                   );
-link        *reverseLink      ( link *                         );
+void         addDecl          ( symbol   *, int   , sym_link * );
+sym_link    *mergeSpec        ( sym_link      *, sym_link *    );
+sym_link    *cloneSpec        ( sym_link  *                    );
+symbol      *reverseSyms      ( symbol     *                   );
+sym_link    *reverseLink      ( sym_link *                     );
 symbol	    *copySymbol	      ( symbol	   *		       );
 symbol	    *copySymbolChain  ( symbol	   *		       );
 void         printSymChain    ( symbol     *, int              );
 void         printStruct      ( structdef *, int               );
 char        *genSymName       ( int                            );
-link        *getSpec          ( link     *                     );
+sym_link    *getSpec          ( sym_link     *                 );
 char        *genSymName       ( int                            );
 int          compStructSize   ( int    ,structdef *            );
-link        *copyLinkChain    ( link    *                      );
+sym_link    *copyLinkChain    ( sym_link    *                  );
 int          checkDecl        ( symbol *                       );
-void         checkBasic       ( link   *, link  *              );
-value       *checkPointerIval ( link   *, value *              );
+void         checkBasic       ( sym_link   *, sym_link  *      );
+value       *checkPointerIval ( sym_link   *, value *          );
 value       *checkStructIval  ( symbol *, value *              );
-value       *checkArrayIval   ( link   *, value *              );
-value       *checkIval        ( link   *, value *              );
-unsigned int getSize	      ( link   *		       );
-unsigned int bitsForType      ( link   *                       );
-link        *newIntLink       (                                );
-link        *newCharLink      (                                );
-link        *newLongLink      (                                );
-int          checkType        ( link   *, link  *              );
+value       *checkArrayIval   ( sym_link   *, value *          );
+value       *checkIval        ( sym_link   *, value *          );
+unsigned int getSize	      ( sym_link   *		       );
+unsigned int bitsForType      ( sym_link   *                   );
+sym_link    *newIntLink       (                                );
+sym_link    *newCharLink      (                                );
+sym_link    *newLongLink      (                                );
+int          checkType        ( sym_link   *, sym_link  *      );
 int          checkFunction    ( symbol *                       );
 void         cleanUpLevel     ( bucket **,int                  );
 void         cleanUpBlock     ( bucket **,int                  );
-int          funcInChain      ( link   *                       );
+int          funcInChain      ( sym_link   *                   );
 void         addSymChain      ( symbol *                       );
-link        *structElemType   ( link   *, value * , value **   );
+sym_link    *structElemType   ( sym_link *, value * , value ** );
 symbol      *getStructElement ( structdef *, symbol *) ;
-link        *computeType      ( link *, link *);
+sym_link    *computeType      ( sym_link *, sym_link *);
 void         processFuncArgs  (symbol *,int);
 int          isSymbolEqual    (symbol *, symbol *);
 int          powof2           (unsigned long );
-void         printTypeChain   (link *,FILE *);
+void         printTypeChain   (sym_link *,FILE *);
 void         initCSupport     ();
-void         pointerTypes     (link *, link * );
-void         cdbTypeInfo      (link *,FILE *);
+void         pointerTypes     (sym_link *, sym_link * );
+void         cdbTypeInfo      (sym_link *,FILE *);
 void         cdbSymbol        (symbol *,FILE *,int,int);
 void         cdbStructBlock   (int ,FILE *);
 void	       initHashT	    (				   );

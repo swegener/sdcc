@@ -52,7 +52,7 @@ typedef  struct   ast {
     /* union of values expression can have */
     union {
 	value *val        ;  /* value if type = EX_VALUE */
-	link  *lnk        ;  /* link * if type= EX_LINK  */
+	sym_link  *lnk    ;  /* sym_link * if type= EX_LINK  */
 	struct operand *oprnd; /* used only for side effecting function calls */
 	unsigned stmnt    ;  /* statement if type=EX_STMNT */
 	unsigned op       ;  /* operator if type= EX_OP  */
@@ -84,8 +84,8 @@ typedef  struct   ast {
     int   lineno         ;  /* source file line number     */   
     char  *filename      ;  /* filename of the source file */
     
-    link  *ftype         ;  /* start of type chain for this subtree */
-    link  *etype         ;  /* end of type chain for this subtree   */
+    sym_link  *ftype     ;  /* start of type chain for this subtree */
+    sym_link  *etype     ;  /* end of type chain for this subtree   */
     
     symbol  *argSym      ;  /* argument symbols            */
     value   *args        ;  /* args of a function          */
@@ -157,13 +157,13 @@ extern FILE *codeOutFile;
 /* forward definitions for functions   */
 ast* newAst_VALUE(value*val);
 ast* newAst_OP   (unsigned op);
-ast* newAst_LINK (link*val);
+ast* newAst_LINK (sym_link*val);
 ast* newAst_STMNT(unsigned val);
 
 void      initAst      (                       );
 ast     *newNode       (long  ,ast *  ,ast *  );
 ast     *copyAst      (ast *                 );
-value    *sizeofOp      (link *                 );
+value    *sizeofOp      (sym_link *            );
 value    *evalStmnt     (ast *                 );
 ast     *createFunction(symbol  *,ast   *     );
 ast     *createBlock   (symbol  *,ast   *     );
@@ -181,7 +181,7 @@ ast     *createDo       (symbol *,symbol *,symbol *,ast *,ast *);
 ast     *createFor      (symbol *,symbol *,symbol *,symbol *,ast *,ast *,ast *, ast *);
 void     eval2icode     (ast *);
 value   *constExprValue (ast *,int);
-symbol  *funcOfType     (char *,link *,link *,int,int);
+symbol  *funcOfType     (char *,sym_link *,sym_link *,int,int);
 ast     *initAggregates ( symbol *,initList *, ast *);
 bool     hasSEFcalls    ( ast *);
 void     addSymToBlock (symbol *, ast *) ;

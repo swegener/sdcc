@@ -295,8 +295,8 @@ operand *operandLUse (operand *op, eBBlock **ebbs,
     
     if (!OP_SYMBOL(op)->udChked)
     {
-	link *type = operandType(op);
-	link *etype = getSpec(type);
+	sym_link *type = operandType(op);
+	sym_link *etype = getSpec(type);
 	
 	OP_SYMBOL(op)->udChked = 1;
 	/* good place to check if unintialised */

@@ -60,7 +60,7 @@ value *cenum = NULL  ;  /* current enumeration  type chain*/
     symbol     *sym ;      /* symbol table pointer       */
     structdef  *sdef;      /* structure definition       */
     char       yychar[SDCC_NAME_MAX+1];
-    link       *lnk ;      /* declarator  or specifier   */
+    sym_link       *lnk ;      /* declarator  or specifier   */
     int        yyint;      /* integer value returned     */
     value      *val ;      /* for integer constant       */
     initList   *ilist;     /* initial list               */
@@ -454,7 +454,7 @@ declaration
          symbol *sym , *sym1;
 
          for (sym1 = sym = reverseSyms($2);sym != NULL;sym = sym->next) {
-	     link *lnk = copyLinkChain($1);
+	     sym_link *lnk = copyLinkChain($1);
 	     /* do the pointer stuff */
 	     pointerTypes(sym->type,lnk);
 	     addDecl (sym,0,lnk) ;
@@ -470,7 +470,7 @@ declaration_specifiers
      /* if the decl $2 is not a specifier */
      /* find the spec and replace it      */
      if ( !IS_SPEC($2)) {
-       link *lnk = $2 ;
+       sym_link *lnk = $2 ;
        while (lnk && !IS_SPEC(lnk->next))
 	 lnk = lnk->next;
        lnk->next = mergeSpec($1,lnk->next);
@@ -484,7 +484,7 @@ declaration_specifiers
      /* if the decl $2 is not a specifier */
      /* find the spec and replace it      */
      if ( !IS_SPEC($2)) {
-       link *lnk = $2 ;
+       sym_link *lnk = $2 ;
        while (lnk && !IS_SPEC(lnk->next))
 	 lnk = lnk->next;
        lnk->next = mergeSpec($1,lnk->next);
@@ -650,7 +650,7 @@ type_specifier2
    | TYPE_NAME    
          {
             symbol *sym;
-            link   *p  ;
+            sym_link   *p  ;
 
             sym = findSym(TypedefTab,NULL,$1) ;
             $$ = p = copyLinkChain(sym->type);
@@ -875,7 +875,7 @@ declarator2
    | '(' declarator ')'     { $$ = $2; }
    | declarator2 '[' ']'
          {
-            link   *p;
+            sym_link   *p;
 
             p = newLink ();
             DCL_TYPE(p) = ARRAY ;
@@ -884,7 +884,7 @@ declarator2
          }
    | declarator2 '[' constant_expr ']'
          {
-            link   *p ;
+            sym_link   *p ;
 			value *tval;
 			
             p = (tval = constExprValue($3,TRUE))->etype;
@@ -1046,7 +1046,7 @@ type_name
    | type_specifier_list abstract_declarator 
                {
 		 /* go to the end of the list */
-		 link *p;
+		 sym_link *p;
 		 pointerTypes($2,$1);
 		 for ( p = $2 ; p->next ; p=p->next);
                   p->next = $1 ;

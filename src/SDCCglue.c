@@ -27,17 +27,21 @@
 #include <time.h>
 
 #ifndef __BORLANDC__
+#if 0 /* This should no longer be necessary. */
 // This is a bit messy because we define link ourself
 #define link NoLiNk
 #include <unistd.h>
 #undef link
+#else
+#include <unistd.h>
+#endif
 #else
 // No unistd.h in Borland C++
 #endif
 
 symbol *interrupts[256];
 
-void printIval (symbol *, link *, initList *, FILE *);
+void printIval (symbol *, sym_link *, initList *, FILE *);
 set *publics = NULL;		/* public variables */
 set *externs = NULL;		/* Varibles that are declared as extern */
 
@@ -446,7 +450,7 @@ void printGPointerType(FILE *oFile, const char *name,
 /*-----------------------------------------------------------------*/
 /* printIvalType - generates ival for int/char                     */
 /*-----------------------------------------------------------------*/
-void printIvalType (link * type, initList * ilist, FILE * oFile)
+void printIvalType (sym_link * type, initList * ilist, FILE * oFile)
 {
     value *val;
     
@@ -487,7 +491,7 @@ void printIvalType (link * type, initList * ilist, FILE * oFile)
 /*-----------------------------------------------------------------*/
 /* printIvalStruct - generates initial value for structures        */
 /*-----------------------------------------------------------------*/
-void printIvalStruct (symbol * sym,link * type,
+void printIvalStruct (symbol * sym,sym_link * type,
 		      initList * ilist, FILE * oFile)
 {
     symbol *sflds;
@@ -510,7 +514,7 @@ void printIvalStruct (symbol * sym,link * type,
 /*-----------------------------------------------------------------*/
 /* printIvalChar - generates initital value for character array    */
 /*-----------------------------------------------------------------*/
-int printIvalChar (link * type, initList * ilist, FILE * oFile, char *s)
+int printIvalChar (sym_link * type, initList * ilist, FILE * oFile, char *s)
 {
     value *val;
     int remain;
@@ -546,7 +550,7 @@ int printIvalChar (link * type, initList * ilist, FILE * oFile, char *s)
 /*-----------------------------------------------------------------*/
 /* printIvalArray - generates code for array initialization        */
 /*-----------------------------------------------------------------*/
-void printIvalArray (symbol * sym, link * type, initList * ilist,
+void printIvalArray (symbol * sym, sym_link * type, initList * ilist,
 		     FILE * oFile)
 {
     initList *iloop;
@@ -597,7 +601,7 @@ void printIvalArray (symbol * sym, link * type, initList * ilist,
 /*-----------------------------------------------------------------*/
 /* printIvalFuncPtr - generate initial value for function pointers */
 /*-----------------------------------------------------------------*/
-void printIvalFuncPtr (link * type, initList * ilist, FILE * oFile)
+void printIvalFuncPtr (sym_link * type, initList * ilist, FILE * oFile)
 {
     value *val;
     int dLvl = 0;
@@ -636,7 +640,7 @@ void printIvalFuncPtr (link * type, initList * ilist, FILE * oFile)
 /*-----------------------------------------------------------------*/
 /* printIvalCharPtr - generates initial values for character pointers */
 /*-----------------------------------------------------------------*/
-int printIvalCharPtr (symbol * sym, link * type, value * val, FILE * oFile)
+int printIvalCharPtr (symbol * sym, sym_link * type, value * val, FILE * oFile)
 {
     int size = 0;
     
@@ -709,7 +713,7 @@ int printIvalCharPtr (symbol * sym, link * type, value * val, FILE * oFile)
 /*-----------------------------------------------------------------*/
 /* printIvalPtr - generates initial value for pointers             */
 /*-----------------------------------------------------------------*/
-void printIvalPtr (symbol * sym, link * type, initList * ilist, FILE * oFile)
+void printIvalPtr (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
 {
     value *val;
     int size;
@@ -778,7 +782,7 @@ void printIvalPtr (symbol * sym, link * type, initList * ilist, FILE * oFile)
 /*-----------------------------------------------------------------*/
 /* printIval - generates code for initial value                    */
 /*-----------------------------------------------------------------*/
-void printIval (symbol * sym, link * type, initList * ilist, FILE * oFile)
+void printIval (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
 {
     if (!ilist)
 	return;    

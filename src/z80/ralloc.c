@@ -461,7 +461,7 @@ symbol *createStackSpil (symbol *sym)
 /*-----------------------------------------------------------------*/
 bool isSpiltOnStack (symbol *sym)
 {
-    link *etype;
+    sym_link *etype;
 
     if (!sym)
 	return FALSE ;
@@ -1653,7 +1653,7 @@ static iCode *packRegsForOneuse (iCode *ic, operand *op , eBBlock *ebp)
 /*-----------------------------------------------------------------*/
 static bool isBitwiseOptimizable (iCode *ic)
 {
-    link *rtype = getSpec(operandType(IC_RIGHT(ic)));
+    sym_link *rtype = getSpec(operandType(IC_RIGHT(ic)));
 
     /* bitwise operations are considered optimizable
        under the following conditions (Jean-Louis VERN) 

@@ -240,6 +240,7 @@ struct options
     char *excludeRegs[32];	/* registers excluded from saving */
     int all_callee_saves; 	/* callee saves for all functions */
     int stack_probe;            /* insert call to function __stack_probe */
+    int tini_libid;		/* library ID for TINI */
     olay olays[128];            /* overlay segments used in #pragma OVERLAY */
     /* starting address of the segments */
     int xstack_loc;		/* initial location of external stack */

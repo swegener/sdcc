@@ -48,14 +48,11 @@ static void _reset_regparm()
 
 static int _reg_parm(link *l)
 {
-        /* for this processor it is simple
-       can pass only the first parameter in a register */
-    if (regParmFlg)
+    if (regParmFlg == 2)
 	return 0;
-
-    regParmFlg = 1;
+    
+    regParmFlg++;
     return 1;
-
 }
 
 static bool _startsWith(const char *sz, const char *key)

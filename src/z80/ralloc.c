@@ -48,12 +48,17 @@
 enum {
     DISABLE_PACK_ACC	= 0,
     DISABLE_PACK_ASSIGN	= 0,
-    LIMITED_PACK_ACC	= 1
+    DISABLE_PACK_ONE_USE = 0,
+    DISABLE_PACK_HL	= 0,
+    LIMITED_PACK_ACC	= 1,
 };
 
-#define D_ALLOC		1
+enum {
+    D_ALLOC		= 0,
+    D_ALLOC2		= 0
+};
 
-#if 0
+#if 1
 #define D(_a, _s)	if (_a)  { printf _s; fflush(stdout); }
 #else
 #define D(_a, _s)
@@ -133,7 +138,7 @@ static regs *allocReg (short type)
 	    if (currFunc)
 		currFunc->regsUsed = 
 		    bitVectSetBit(currFunc->regsUsed,i);
-	    D(D_ALLOC, ("allocReg: alloced %zr\n", &regsZ80[i]));
+	    D(D_ALLOC, ("allocReg: alloced %p\n", &regsZ80[i]));
 	    return &regsZ80[i];
 	}
     }
@@ -162,7 +167,7 @@ static void freeReg (regs *reg)
 {
     wassert(!reg->isFree);
     reg->isFree = 1;
-    D(D_ALLOC, ("freeReg: freed %zr\n", reg));
+    D(D_ALLOC, ("freeReg: freed %p\n", reg));
 }
 
 
@@ -394,7 +399,7 @@ symbol *createStackSpil (symbol *sym)
 {
     symbol *sloc= NULL;
 
-    D(D_ALLOC, ("createStackSpil: for sym %zs\n", sym));
+    D(D_ALLOC, ("createStackSpil: for sym %p\n", sym));
 
     /* first go try and find a free one that is already 
        existing on the stack */
@@ -484,7 +489,7 @@ static void spillThis (symbol *sym)
 {
     int i;
 
-    D(D_ALLOC, ("spillThis: spilling %zs\n", sym));
+    D(D_ALLOC, ("spillThis: spilling %p\n", sym));
 
     /* if this is rematerializable or has a spillLocation
        we are okay, else we need to create a spillLocation
@@ -521,7 +526,7 @@ symbol *selectSpil (iCode *ic, eBBlock *ebp, symbol *forSym)
     set *selectS ;
     symbol *sym;
 
-    D(D_ALLOC, ("selectSpil: finding spill for ic %zi\n", ic));
+    D(D_ALLOC, ("selectSpil: finding spill for ic %p\n", ic));
     /* get the spillable live ranges */
     lrcs = computeSpillable (ic);
 
@@ -616,7 +621,7 @@ bool spilSomething (iCode *ic, eBBlock *ebp, symbol *forSym)
     symbol *ssym;
     int i ;
 
-    D(D_ALLOC, ("spilSomething: spilling on ic %zi\n", ic));
+    D(D_ALLOC, ("spilSomething: spilling on ic %p\n", ic));
 
     /* get something we can spil */
     ssym = selectSpil(ic,ebp,forSym);
@@ -682,7 +687,7 @@ regs *getRegGpr (iCode *ic, eBBlock *ebp,symbol *sym)
 {
     regs *reg;
 
-    D(D_ALLOC, ("getRegGpr: on ic %zi\n"));
+    D(D_ALLOC, ("getRegGpr: on ic %p\n", ic));
  tryAgain:
     /* try for gpr type */
     if ((reg = allocReg(REG_GPR))) {
@@ -754,7 +759,7 @@ static void deassignLRs (iCode *ic, eBBlock *ebp)
 	    !OP_SYMBOL(IC_LEFT(ic->prev))->isspilt) 
 	    psym = OP_SYMBOL(IC_LEFT(ic->prev));
 
-	D(D_ALLOC, ("deassignLRs: in loop on sym %zs", sym));
+	D(D_ALLOC, ("deassignLRs: in loop on sym %p nregs %u\n", sym, sym->nRegs));
 
 	if (sym->nRegs) {
 	    int i = 0;
@@ -823,7 +828,7 @@ static void reassignLR (operand *op)
     symbol *sym = OP_SYMBOL(op);
     int i;
 
-    D(D_ALLOC, ("reassingLR: on sym %zs\n", sym));
+    D(D_ALLOC, ("reassingLR: on sym %p\n", sym));
 
     /* not spilt any more */     
     sym->isspilt = sym->blockSpil  = sym->remainSpil = 0;
@@ -859,7 +864,7 @@ static void positionRegs (symbol *result, symbol *opsym, int lineno)
     int count = min(result->nRegs,opsym->nRegs);
     int i , j = 0, shared = 0;
 
-    D(D_ALLOC, ("positionRegs: on result %zs opsum %zs line %u\n", result, opsym, lineno));
+    D(D_ALLOC, ("positionRegs: on result %p opsum %p line %u\n", result, opsym, lineno));
 
     /* if the result has been spilt then cannot share */
     if (opsym->isspilt)
@@ -902,11 +907,11 @@ bool tryAllocatingRegPair(symbol *sym)
 		currFunc->regsUsed = 
 		    bitVectSetBit(currFunc->regsUsed,i+1);
 	    }
-	    D(D_ALLOC, ("tryAllocRegPair: succeded for sym %zs\n", sym));
+	    D(D_ALLOC, ("tryAllocRegPair: succeded for sym %p\n", sym));
 	    return TRUE;
 	}
     }
-    D(D_ALLOC, ("tryAllocRegPair: failed on sym %zs\n", sym));
+    D(D_ALLOC, ("tryAllocRegPair: failed on sym %p\n", sym));
     return FALSE;
 }
 
@@ -963,7 +968,7 @@ static void serialRegAssign (eBBlock **ebbs, int count)
 		int willCS ;
 		int j;
 
-		D(D_ALLOC, ("serialRegAssign: in loop on result %zs\n", sym));
+		D(D_ALLOC, ("serialRegAssign: in loop on result %p\n", sym));
 
 		/* if it does not need or is spilt 
 		   or is already assigned to registers
@@ -1030,6 +1035,7 @@ static void serialRegAssign (eBBlock **ebbs, int count)
 			/* if the allocation falied which means
 			   this was spilt then break */
 			if (!sym->regs[j]) {
+			    D(D_ALLOC, ("Couldnt alloc (spill)\n"))
 			    break;
 			}
 		    }
@@ -1223,7 +1229,7 @@ static void regTypeNum (void)
 	if ((sym->liveTo - sym->liveFrom) == 0)
 	    continue ;
 
-	D(D_ALLOC, ("regTypeNum: loop on sym %zs\n", sym));
+	D(D_ALLOC, ("regTypeNum: loop on sym %p\n", sym));
 	
 	/* if the live range is a temporary */
 	if (sym->isitmp) {
@@ -1241,11 +1247,13 @@ static void regTypeNum (void)
 	    }
 
 	    /* if not then we require registers */
+	    D(D_ALLOC, ("regTypeNum: isagg %u nRegs %u type %p\n", IS_AGGREGATE(sym->type) || sym->isptr, sym->nRegs, sym->type));
 	    sym->nRegs = ((IS_AGGREGATE(sym->type) || sym->isptr ) ?
 			  getSize(sym->type = aggrToPtr(sym->type,FALSE)) :
 			  getSize(sym->type));
+	    D(D_ALLOC, ("regTypeNum: setting nRegs of %s (%p) to %u\n", sym->name, sym, sym->nRegs));
 
-	    D(D_ALLOC, ("regTypeNum: setup to assign regs sym %zs\n", sym));
+	    D(D_ALLOC, ("regTypeNum: setup to assign regs sym %p\n", sym));
 
 	    if (sym->nRegs > 4) {
 		fprintf(stderr,"allocated more than 4 or 0 registers for type ");
@@ -1256,11 +1264,13 @@ static void regTypeNum (void)
 	    /* Always general purpose */
 	    sym->regType = REG_GPR ;
 	    
-	} else 
+	} else {
 	    /* for the first run we don't provide */
 	    /* registers for true symbols we will */
 	    /* see how things go                  */
-	    sym->nRegs = 0 ;	
+	    D(D_ALLOC, ("regTypeNum: #2 setting num of %p to 0\n", sym, 0)); 
+	    sym->nRegs = 0;
+	}
     }
     
 }
@@ -1294,7 +1304,7 @@ static int packRegsForAssign (iCode *ic,eBBlock *ebp)
 {
     iCode *dic, *sic;
 
-    D(D_ALLOC, ("packRegsForAssing: running on ic %zi\n", ic));
+    D(D_ALLOC, ("packRegsForAssing: running on ic %p\n", ic));
     
     if (
 	/* 	!IS_TRUE_SYMOP(IC_RESULT(ic)) ||*/
@@ -1479,7 +1489,7 @@ static int packRegsForSupport (iCode *ic, eBBlock *ebp)
     /* for the left & right operand :- look to see if the
        left was assigned a true symbol in far space in that
        case replace them */
-    D(D_ALLOC, ("packRegsForSupport: running on ic %zi\n", ic));
+    D(D_ALLOC, ("packRegsForSupport: running on ic %p\n", ic));
 
     if (IS_ITEMP(IC_LEFT(ic)) && 
 	OP_SYMBOL(IC_LEFT(ic))->liveTo <= ic->seq) {
@@ -1536,7 +1546,7 @@ static iCode *packRegsForOneuse (iCode *ic, operand *op , eBBlock *ebp)
     bitVect *uses ;
     iCode *dic, *sic;
 
-    D(D_ALLOC, ("packRegsForOneUse: running on ic %zi\n", ic));
+    D(D_ALLOC, ("packRegsForOneUse: running on ic %p\n", ic));
 
     /* if returning a literal then do nothing */
     if (!IS_SYMOP(op))
@@ -1899,7 +1909,7 @@ static void packRegsForAccUse2(iCode *ic)
 {
     iCode *uic;
 
-    D(D_ALLOC, ("packRegsForAccUse2: running on ic %zi\n", ic));
+    D(D_ALLOC, ("packRegsForAccUse2: running on ic %p\n", ic));
 
     /* Filter out all but those 'good' commands */
     if (
@@ -2108,8 +2118,7 @@ static void packRegisters (eBBlock *ebp)
 	/* Safe: address of a true sym is always constant. */
 	/* if this is an itemp & result of a address of a true sym 
 	   then mark this as rematerialisable   */
-
-	D(D_ALLOC, ("packRegisters: looping on ic %zi\n", ic));
+	D(D_ALLOC, ("packRegisters: looping on ic %p\n", ic));
     
 	if (ic->op == ADDRESS_OF && 
 	    IS_ITEMP(IC_RESULT(ic)) &&
@@ -2173,18 +2182,22 @@ static void packRegisters (eBBlock *ebp)
 	       !isOperandInFarSpace(IC_RIGHT(ic)) && */
 	    !OP_SYMBOL(IC_RESULT(ic))->remat   &&
 	    !IS_OP_RUONLY(IC_RIGHT(ic))        &&
-	    getSize(aggrToPtr(operandType(IC_RESULT(ic)),FALSE)) > 1 )
+	    getSize(aggrToPtr(operandType(IC_RESULT(ic)),FALSE)) > 1 ) {
 	    
 	    packRegsForOneuse (ic,IC_RESULT(ic),ebp);
+	}
 	
 	/* if pointer get */
-	if (POINTER_GET(ic)                    &&
+	if (!DISABLE_PACK_ONE_USE &&
+	    POINTER_GET(ic)                    &&
 	    /* MLH: dont have far space
 	       !isOperandInFarSpace(IC_RESULT(ic))&& */
 	    !OP_SYMBOL(IC_LEFT(ic))->remat     &&
 	    !IS_OP_RUONLY(IC_RESULT(ic))         &&
-	    getSize(aggrToPtr(operandType(IC_LEFT(ic)),FALSE)) > 1 )
+	    getSize(aggrToPtr(operandType(IC_LEFT(ic)),FALSE)) > 1 ) {
+
 	    packRegsForOneuse (ic,IC_LEFT(ic),ebp);
+	}
 	/* pack registers for accumulator use, when the result of an
 	   arithmetic or bit wise operation has only one use, that use is
 	   immediately following the defintion and the using iCode has
@@ -2192,7 +2205,7 @@ static void packRegisters (eBBlock *ebp)
 	   result of that operation is not on stack then we can leave the
 	   result of this operation in acc:b combination */
 
-	if (IS_ITEMP(IC_RESULT(ic))) {
+	if (!DISABLE_PACK_HL && IS_ITEMP(IC_RESULT(ic))) {
 	    packRegsForHLUse(ic);
 	}
 #if 0
@@ -2205,8 +2218,9 @@ static void packRegisters (eBBlock *ebp)
 	    packRegsForAccUse (ic);
 #else
 	if (!DISABLE_PACK_ACC && IS_ITEMP(IC_RESULT(ic)) &&
-	    getSize(operandType(IC_RESULT(ic))) == 1)
+	    getSize(operandType(IC_RESULT(ic))) == 1) {
 	    packRegsForAccUse2(ic);
+	}
 #endif
     }
 }

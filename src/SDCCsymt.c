@@ -23,6 +23,8 @@
 
 #include "common.h"
 
+#define ENABLE_MICHAELH_REGPARM_HACK		0
+
 bucket   *SymbolTab [256]  ;  /* the symbol    table  */
 bucket   *StructTab [256]  ;  /* the structure table  */
 bucket   *TypedefTab[256]  ;  /* the typedef   table  */
@@ -1405,7 +1407,6 @@ void  processFuncArgs   (symbol *func, int ignoreName)
     /* if any of the arguments is an aggregate */
     /* change it to pointer to the same type */
     while (val) {
-
 	/* mark it as a register parameter if
 	   the function does not have VA_ARG
 	   and as port dictates
@@ -1416,6 +1417,20 @@ void  processFuncArgs   (symbol *func, int ignoreName)
 
 	    SPEC_REGPARM(val->etype) = 1;
 	}
+
+#if ENABLE_MICHAELH_REGPARM_HACK
+	/* HACK: pull out later */
+	if (
+	    (
+	     !strcmp(func->name, "memcpy") ||
+	     !strcmp(func->name, "strcpy") ||
+	     !strcmp(func->name, "strcmp") ||
+	     0
+	     ) &&
+	    port->reg_parm(val->type)) {
+	    SPEC_REGPARM(val->etype) = 1;
+	}
+#endif						
 	
 	if ( IS_AGGREGATE(val->type)) {
 	    /* if this is a structure */
@@ -1868,6 +1883,21 @@ symbol *__conv[2][3][2];
 
 link *floatType;
 
+static void _makeRegParam(symbol *sym)
+{
+    value *val ;
+
+    val = sym->args; /* loop thru all the arguments   */
+
+    /* reset regparm for the port */
+    (*port->reset_regparms)();
+    while (val) {
+	SPEC_REGPARM(val->etype) = 1;
+	sym->argStack -= getSize(val->type);
+	val = val->next ;
+    }
+}
+
 /*-----------------------------------------------------------------*/ 
 /* initCSupport - create functions for C support routines          */
 /*-----------------------------------------------------------------*/ 
@@ -1941,6 +1971,10 @@ void initCSupport ()
 			ssu[su],
 			sbwd[bwd]);
 		__muldiv[muldivmod][bwd][su] = funcOfType(buffer, __multypes[bwd][su], __multypes[bwd][su], 2, options.intlong_rent);
+#if ENABLE_MICHAELH_REGPARM_HACK
+		if (bwd < 2) 
+		    _makeRegParam(__muldiv[muldivmod][bwd][su]);
+#endif
 	    }
 	}
     }

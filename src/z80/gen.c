@@ -19,8 +19,9 @@
   5/3/00					17741	185	17B6
 
   Michael Hope <michaelh@earthling.net>	2000
-  Based on the mcs51 generator - Sandeep Dutta . sandeep.dutta@usa.net (1998)
-                           and -  Jean-Louis VERN.jlvern@writeme.com (1999)
+  Based on the mcs51 generator - 
+  		Sandeep Dutta . sandeep.dutta@usa.net (1998)
+	 and -  Jean-Louis VERN.jlvern@writeme.com (1999)
 	 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -337,7 +338,13 @@ static asmop *newAsmop (short type)
 static asmop *aopForSym (iCode *ic,symbol *sym,bool result, bool requires_a)
 {
     asmop *aop;
-    memmap *space= SPEC_OCLS(sym->etype);
+    memmap *space;
+
+    wassert(ic);
+    wassert(sym);
+    wassert(sym->etype);
+
+    space = SPEC_OCLS(sym->etype);
 
     /* if already has one */
     if (sym->aop)
@@ -561,7 +568,7 @@ static void aopOp (operand *op, iCode *ic, bool result, bool requires_a)
 
     /* if this is a true symbol */
     if (IS_TRUE_SYMOP(op)) {    
-        op->aop = aopForSym(ic,OP_SYMBOL(op),result, requires_a);
+        op->aop = aopForSym(ic, OP_SYMBOL(op), result, requires_a);
         return ;
     }
 
@@ -1378,6 +1385,19 @@ release:
     freeAsmop(IC_RESULT(ic),NULL,ic);
 }
 
+static void _push(PAIR_ID pairId)
+{
+    emit2("push %s", _pairs[pairId].name);
+    _G.stack.pushed += 2;
+}
+
+static void _pop(PAIR_ID pairId)
+{
+    emit2("pop %s", _pairs[pairId].name);
+    _G.stack.pushed -= 2;
+}
+
+
 /*-----------------------------------------------------------------*/
 /* assignResultValue -						   */
 /*-----------------------------------------------------------------*/
@@ -1395,8 +1415,7 @@ void assignResultValue(operand * oper)
 #endif
     if (IS_GB && size == 4 && requiresHL(AOP(oper))) {
 	/* We do it the hard way here. */
-	emitcode("push", "hl");
-	_G.stack.pushed += 2;
+	_push(PAIR_HL);
 	aopPut(AOP(oper), _fReturn[0], 0);
 	aopPut(AOP(oper), _fReturn[1], 1);
 	emitcode("pop", "de");
@@ -1418,7 +1437,6 @@ static void genIpush (iCode *ic)
 {
     int size, offset = 0 ;
     char *l;
-
 
     /* if this is not a parm push : ie. it is spill push 
        and spill push is always done on the local stack */
@@ -1536,35 +1554,127 @@ static void genIpop (iCode *ic)
     freeAsmop(IC_LEFT(ic),NULL,ic);
 }
 
+static int _isPairUsed(iCode *ic, PAIR_ID pairId)
+{
+    int ret = 0;
+    switch (pairId) {
+    case PAIR_DE:
+	if (bitVectBitValue(ic->rUsed, D_IDX))
+	    ret++;
+	if (bitVectBitValue(ic->rUsed, E_IDX))
+	    ret++;
+	break;
+    default:
+	wassert(0);
+    }
+    return ret;
+}
+
+static int _opUsesPair(operand *op, iCode *ic, PAIR_ID pairId)
+{
+    int ret = 0;
+    asmop *aop;
+    symbol *sym = OP_SYMBOL(op);
+
+    if (sym->isspilt || sym->nRegs == 0)
+	return 0;
+
+    aopOp(op, ic, FALSE, FALSE);
+    
+    aop = AOP(op);
+    if (aop->type == AOP_REG) {
+	int i;
+	for (i=0; i < aop->size; i++) {
+	    if (pairId == PAIR_DE) {
+		emit2("; name %s", aop->aopu.aop_reg[i]->name);
+		if (!strcmp(aop->aopu.aop_reg[i]->name, "e"))
+		    ret++;
+		if (!strcmp(aop->aopu.aop_reg[i]->name, "d"))
+		    ret++;
+	    }
+	    else {
+		wassert(0);
+	    }
+	}
+    }
+
+    freeAsmop(IC_LEFT(ic),NULL,ic);
+    return ret;
+}
+
 /** Emit the code for a call statement 
  */
-static void emitCall (iCode *ic, bool ispcall)
+static void emitCall(iCode *ic, bool ispcall)
 {
+    int pushed_de = 0;
+
     /* if caller saves & we have not saved then */
     if (!ic->regsSaved) {
 	/* PENDING */
     }
-
+    
     /* if send set is not empty then assign */
     if (sendSet) {
-	iCode *sic ;
-	for (sic = setFirstItem(sendSet) ; sic ; 
-	     sic = setNextItem(sendSet)) {
-	    int size, offset = 0;
-	    aopOp(IC_LEFT(sic),sic,FALSE, FALSE);
-	    size = AOP_SIZE(IC_LEFT(sic));
-	    while (size--) {
-		char *l = aopGet(AOP(IC_LEFT(sic)),offset,
-				FALSE);
-		if (strcmp(l, _fReturn[offset]))
-		    emitcode("ld","%s,%s",
-			     _fReturn[offset],
-			     l);
-		offset++;
+	iCode *sic;
+	int send = 0;
+	int n = elementsInSet(sendSet);
+	if (IS_Z80 && n == 2 && _isPairUsed(ic, PAIR_DE)) {
+	    /* Only push de if it is used and if it's not used
+	       in the return value */
+	    /* Panic if partly used */
+	    if (_opUsesPair(IC_RESULT(ic), ic, PAIR_DE) == 1) {
+		emit2("; Warning: de crossover");
 	    }
+	    else if (!_opUsesPair(IC_RESULT(ic), ic, PAIR_DE)) {
+		/* Store away de */
+		_push(PAIR_DE);
+		pushed_de = 1;
+	    }
+	}
+	/* PENDING: HACK */
+	if (IS_Z80 && n == 2 ) {
+	    /* Want to load HL first, then DE as HL may = DE */
+	    sic = setFirstItem(sendSet);
+	    sic = setNextItem(sendSet);
+	    aopOp(IC_LEFT(sic),sic,FALSE, FALSE);
+	    fetchPair(PAIR_HL, AOP(IC_LEFT(sic)));
+	    send++;
+	    freeAsmop (IC_LEFT(sic),NULL,sic);
+	    sic = setFirstItem(sendSet);
+	    aopOp(IC_LEFT(sic),sic,FALSE, FALSE);
+	    fetchPair(PAIR_DE, AOP(IC_LEFT(sic)));
+	    send++;
 	    freeAsmop (IC_LEFT(sic),NULL,sic);
 	}
+	else {
+	    for (sic = setFirstItem(sendSet) ; sic ; 
+		 sic = setNextItem(sendSet)) {
+		int size;
+		aopOp(IC_LEFT(sic),sic,FALSE, FALSE);
+		size = AOP_SIZE(IC_LEFT(sic));
+		wassert(size <= 2);
+		/* Always send in pairs */
+		switch (send) {
+		case 0:
+		    if (IS_Z80 && n == 1)
+			fetchPair(PAIR_HL, AOP(IC_LEFT(sic)));
+		    else
+			fetchPair(PAIR_DE, AOP(IC_LEFT(sic)));
+		    break;
+		case 1:
+		    fetchPair(PAIR_HL, AOP(IC_LEFT(sic)));
+		    break;
+		default:
+		    /* Send set too big */
+		    wassert(0);
+		}
+		send++;
+		freeAsmop (IC_LEFT(sic),NULL,sic);
+	    }
+	}
 	sendSet = NULL;
+	if (pushed_de) {
+	}
     }
 
     if (ispcall) {
@@ -1637,7 +1747,8 @@ static void emitCall (iCode *ic, bool ispcall)
 	    spillCached();
 	}
     }
-
+    if (pushed_de)
+	_pop(PAIR_DE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -3218,11 +3329,12 @@ static void shiftR2Left2Result (operand *left, int offl,
 	    symbol *tlbl , *tlbl1;
 	    char *l;
 
+	    tlbl = newiTempLabel(NULL);
+	    tlbl1 = newiTempLabel(NULL);
+		
 	    /* Left is already in result - so now do the shift */
 	    if (shCount>1) {
 		emit2("ld a,!immedbyte+1", shCount);
-		tlbl = newiTempLabel(NULL);
-		tlbl1 = newiTempLabel(NULL);
 		emit2("!shortjp !tlabel", tlbl1->key+100); 
 		emitLabel(tlbl->key+100);    
 	    }
@@ -3263,11 +3375,12 @@ static void shiftL2Left2Result (operand *left, int offl,
 	symbol *tlbl , *tlbl1;
 	char *l;
 
+	tlbl = newiTempLabel(NULL);
+	tlbl1 = newiTempLabel(NULL);
+
 	/* Left is already in result - so now do the shift */
 	if (shCount>1) {
 	    emit2("ld a,!immedbyte+1", shCount);
-	    tlbl = newiTempLabel(NULL);
-	    tlbl1 = newiTempLabel(NULL);
 	    emit2("!shortjp !tlabel", tlbl1->key+100); 
 	    emitLabel(tlbl->key+100);    
 	}
@@ -3332,19 +3445,19 @@ static void AccRol (int shCount)
 /*-----------------------------------------------------------------*/
 static void AccLsh (int shCount)
 {
-    if(shCount != 0){
-        if(shCount == 1)
+    if(shCount != 0) {
+        if(shCount == 1) {
             emitcode("add","a,a");
-        else 
-	    if(shCount == 2) {
-            emitcode("add","a,a");
-            emitcode("add","a,a");
-        } else {
-            /* rotate left accumulator */
-            AccRol(shCount);
-            /* and kill the lower order bits */
-            emit2("and a,!immedbyte", SLMask[shCount]);
-        }
+	}
+        else if(shCount == 2) {
+	    emitcode("add","a,a");
+	    emitcode("add","a,a");
+	} else {
+	    /* rotate left accumulator */
+	    AccRol(shCount);
+	    /* and kill the lower order bits */
+	    emit2("and a,!immedbyte", SLMask[shCount]);
+	}
     }
 }
 
@@ -3375,19 +3488,20 @@ static void genlshTwo (operand *result,operand *left, int shCount)
     /* if shCount >= 8 */
     if (shCount >= 8) {
         shCount -= 8 ;
-
         if (size > 1){
             if (shCount) {
                 movLeft2Result(left, LSB, result, MSB16, 0);
 		aopPut(AOP(result),zero, 0);   
-		shiftL1Left2Result(left, MSB16, result, MSB16, shCount-8);
+		shiftL1Left2Result(left, MSB16, result, MSB16, shCount);
 	    }
             else {
                 movLeft2Result(left, LSB, result, MSB16, 0);
 		aopPut(AOP(result),zero, 0);   
 	    }
         }
-        aopPut(AOP(result),zero,LSB);   
+	else {
+	    aopPut(AOP(result),zero,LSB);   
+	}
     }
     /*  1 <= shCount <= 7 */
     else {  
@@ -3537,7 +3651,7 @@ static void genLeftShift (iCode *ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* genlshTwo - left shift two bytes by known amount != 0           */
+/* genrshOne - left shift two bytes by known amount != 0           */
 /*-----------------------------------------------------------------*/
 static void genrshOne (operand *result,operand *left, int shCount)
 {
@@ -3570,15 +3684,10 @@ static void genrshOne (operand *result,operand *left, int shCount)
 static void AccRsh (int shCount)
 {
     if(shCount != 0){
-        if(shCount == 1){
-            CLRC;
-            emitcode("rr","a");
-        } else {
-            /* rotate right accumulator */
-            AccRol(8 - shCount);
-            /* and kill the higher order bits */
-            emit2("and a,!immedbyte", SRMask[shCount]);
-        }
+	/* rotate right accumulator */
+	AccRol(8 - shCount);
+	/* and kill the higher order bits */
+	emit2("and a,!immedbyte", SRMask[shCount]);
     }
 }
 
@@ -3607,15 +3716,15 @@ static void genrshTwo (operand *result,operand *left,
 {
     /* if shCount >= 8 */
     if (shCount >= 8) {
-        shCount -= 8 ;
+        shCount -= 8;
         if (shCount) {
             shiftR1Left2Result(left, MSB16, result, LSB,
                                shCount, sign);
 	}
         else {
             movLeft2Result(left, MSB16, result, LSB, sign);
-	    aopPut(AOP(result),zero,1);
 	}
+	aopPut(AOP(result),zero,1);
     }
     /*  1 <= shCount <= 7 */
     else {
@@ -3760,7 +3869,7 @@ static void genRightShift (iCode *ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* genGenPointerGet - gget value from generic pointer space        */
+/* genGenPointerGet -  get value from generic pointer space        */
 /*-----------------------------------------------------------------*/
 static void genGenPointerGet (operand *left,
                               operand *result, iCode *ic)

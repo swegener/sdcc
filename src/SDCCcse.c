@@ -118,7 +118,9 @@ replaceAllSymBySym (iCode * ic, operand * from, operand * to, bitVect ** ndpset)
 {
   iCode *lic;
 
-  LRH(printf ("replaceAllSymBySym: from %s to %s\n", OP_SYMBOL(from)->name, OP_SYMBOL(to)->name));
+  LRH(printf ("replaceAllSymBySym: from %s to %s\n", 
+	      OP_SYMBOL(from)->name, 
+	      IS_SYMOP(to) ? OP_SYMBOL(to)->name) : "!SYM");
   for (lic = ic; lic; lic = lic->next)
     {
       int siaddr;
@@ -156,7 +158,8 @@ replaceAllSymBySym (iCode * ic, operand * from, operand * to, bitVect ** ndpset)
 	  continue;
 	}
 
-      if (IC_RESULT (lic) && IC_RESULT (lic)->key == from->key)
+      if (IS_SYMOP(to) && 
+	  IC_RESULT (lic) && IC_RESULT (lic)->key == from->key)
 	{
 	  /* maintain du chains */
 	  if (POINTER_SET (lic))

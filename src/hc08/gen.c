@@ -1352,7 +1352,7 @@ static asmop *
 aopForRemat (symbol * sym)
 {
   iCode *ic = sym->rematiCode;
-  asmop *aop = newAsmop (AOP_IMMD);
+  asmop *aop = NULL;
   int ptr_type=0;
   int val = 0;
 
@@ -1377,22 +1377,40 @@ aopForRemat (symbol * sym)
       ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
     }
 
-  if (val)
-    sprintf (buffer, "(%s %c 0x%04x)",
-	     OP_SYMBOL (IC_LEFT (ic))->rname,
-	     val >= 0 ? '+' : '-',
-	     abs (val) & 0xffff);
-  else
-    strcpy (buffer, OP_SYMBOL (IC_LEFT (ic))->rname);
+  if (ic->op == ADDRESS_OF)
+    {
+      if (val)
+        sprintf (buffer, "(%s %c 0x%04x)",
+		 OP_SYMBOL (IC_LEFT (ic))->rname,
+		 val >= 0 ? '+' : '-',
+		 abs (val) & 0xffff);
+      else
+        strcpy (buffer, OP_SYMBOL (IC_LEFT (ic))->rname);
 
-  aop->aopu.aop_immd.aop_immd1 = Safe_calloc (1, strlen (buffer) + 1);
-  strcpy (aop->aopu.aop_immd.aop_immd1, buffer);
-  /* set immd2 field if required */
-  if (aop->aopu.aop_immd.from_cast_remat) {
+      aop = newAsmop (AOP_IMMD);
+      aop->aopu.aop_immd.aop_immd1 = Safe_calloc (1, strlen (buffer) + 1);
+      strcpy (aop->aopu.aop_immd.aop_immd1, buffer);
+      /* set immd2 field if required */
+      if (aop->aopu.aop_immd.from_cast_remat)
+	{
 	  sprintf(buffer,"#0x%02x",ptr_type);
 	  aop->aopu.aop_immd.aop_immd2 = Safe_calloc (1, strlen (buffer) + 1);
 	  strcpy (aop->aopu.aop_immd.aop_immd2, buffer);
-  }
+	}
+    }
+  else if (ic->op == '=')
+    {
+      val += (int) operandLitValue (IC_RIGHT (ic));
+      val &= 0xffff;
+      sprintf (buffer, "0x%04x", val);
+      aop = newAsmop (AOP_LIT);
+      aop->aopu.aop_lit = constVal (buffer);
+    }
+  else
+    werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+	    "unexpected rematerialization");
+
+
 
   return aop;
 }
@@ -6633,6 +6651,7 @@ genPackBits (sym_link * etype,
       emitcode ("and", "#0x%02x", mask);
       emitcode ("ora", "1,s");
       emitcode ("sta", ",x");
+      pullReg (hc08_reg_a);
     }
 
   hc08_freeReg (hc08_reg_a);

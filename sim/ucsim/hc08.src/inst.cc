@@ -212,12 +212,23 @@ cl_hc08::inst_add(t_mem code, bool prefix)
   FLAG_NZ (result);
   FLAG_ASSIGN (BIT_V, 0x80 & ((regs.A & operand & ~result)
                               | (~regs.A & ~operand & result)));
-  FLAG_ASSIGN (BIT_H, 0x10 & ((regs.A & operand)
+  FLAG_ASSIGN (BIT_H, 0x08 & ((regs.A & operand)
                               | (operand & ~result)
                               | (~result & regs.A)));
   FLAG_ASSIGN (BIT_C, 0x80 & ((regs.A & operand)
                               | (operand & ~result)
                               | (~result & regs.A)));
+
+#if 0
+  fprintf (stdout, "add 0x%02x + 0x%02x      = 0x%02x ",regs.A, operand, result & 0xff);
+  fprintf (stdout, "(V=%d, H=%d, C=%d, N=%d, Z=%d), ",
+  	(regs.P & BIT_V)!=0,
+  	(regs.P & BIT_H)!=0,
+  	(regs.P & BIT_C)!=0,
+  	(regs.P & BIT_N)!=0,
+  	(regs.P & BIT_Z)!=0);
+#endif
+  
   regs.A = result;
   return(resGO);
 }
@@ -227,19 +238,37 @@ cl_hc08::inst_adc(t_mem code, bool prefix)
 {
   int result;
   uchar operand;
+  int sresult;
+  uchar carryin = (regs.P & BIT_C)!=0;
 
   operand = OPERAND(code, prefix);
-  result = (regs.A + operand + ((regs.P & BIT_C)!=0)) & 0xff;
-  FLAG_NZ (result);
-  FLAG_ASSIGN (BIT_V, 0x80 & ((regs.A & operand & ~result)
-                              | (~regs.A & ~operand & result)));
-  FLAG_ASSIGN (BIT_H, 0x10 & ((regs.A & operand)
+  result = regs.A + operand + carryin;
+  sresult = (signed char)regs.A + (signed char)operand + ((regs.P & BIT_C)!=0);
+  FLAG_NZ (result & 0xff);
+  FLAG_ASSIGN (BIT_V, (sresult<-128) || (sresult>127));
+  /* 0x80 & ((regs.A & operand & ~result)
+                              | (~regs.A & ~operand & result))); */
+  FLAG_ASSIGN (BIT_H, (result & 0xf) < (regs.A & 0xf));
+  /*				0x10 & ((regs.A & operand)
                               | (operand & ~result)
-                              | (~result & regs.A)));
-  FLAG_ASSIGN (BIT_C, 0x80 & ((regs.A & operand)
+                              | (~result & regs.A))); */
+  FLAG_ASSIGN (BIT_C, result & 0x100);
+  /*				0x80 & ((regs.A & operand)
                               | (operand & ~result)
-                              | (~result & regs.A)));
-  regs.A = result;
+                              | (~result & regs.A))); */
+  
+#if 0
+  fprintf (stdout, "adc 0x%02x + 0x%02x + %d = 0x%02x ",
+  	regs.A, operand, carryin, result & 0xff);
+  fprintf (stdout, "(V=%d, H=%d, C=%d, N=%d, Z=%d), ",
+  	(regs.P & BIT_V)!=0,
+  	(regs.P & BIT_H)!=0,
+  	(regs.P & BIT_C)!=0,
+  	(regs.P & BIT_N)!=0,
+  	(regs.P & BIT_Z)!=0);
+#endif
+  
+  regs.A = result & 0xff;
   return(resGO);
 }
 
@@ -257,6 +286,15 @@ cl_hc08::inst_sub(t_mem code, bool prefix)
   FLAG_ASSIGN (BIT_C, 0x80 & ((~regs.A & operand)
                               | (operand & result)
                               | (result & ~regs.A)));
+#if 0  
+  fprintf (stdout, "sub 0x%02x - 0x%02x      = 0x%02x ",regs.A, operand, result & 0xff);
+  fprintf (stdout, "(V=%d, H=%d, C=%d, N=%d, Z=%d), ",
+  	(regs.P & BIT_V)!=0,
+  	(regs.P & BIT_H)!=0,
+  	(regs.P & BIT_C)!=0,
+  	(regs.P & BIT_N)!=0,
+  	(regs.P & BIT_Z)!=0);
+#endif  
   regs.A = result;
   return(resGO);
 }
@@ -266,15 +304,26 @@ cl_hc08::inst_sbc(t_mem code, bool prefix)
 {
   int result;
   uchar operand;
+  uchar carryin = (regs.P & BIT_C)!=0;
 
   operand = OPERAND(code, prefix);
-  result = (regs.A - operand - ((regs.P & BIT_C)!=0) ) & 0xff;
+  result = (regs.A - operand - carryin) & 0xff;
   FLAG_NZ (result);
   FLAG_ASSIGN (BIT_V, 0x80 & ((regs.A & ~operand & ~result)
                               | (~regs.A & operand & result)));
   FLAG_ASSIGN (BIT_C, 0x80 & ((~regs.A & operand)
                               | (operand & result)
                               | (result & ~regs.A)));
+#if 0  
+  fprintf (stdout, "sbc 0x%02x - 0x%02x - %d = 0x%02x ",
+  	regs.A, operand, carryin, result & 0xff);
+  fprintf (stdout, "(V=%d, H=%d, C=%d, N=%d, Z=%d), ",
+  	(regs.P & BIT_V)!=0,
+  	(regs.P & BIT_H)!=0,
+  	(regs.P & BIT_C)!=0,
+  	(regs.P & BIT_N)!=0,
+  	(regs.P & BIT_Z)!=0);
+#endif  
   regs.A = result;
   return(resGO);
 }
@@ -1028,25 +1077,26 @@ cl_hc08::inst_mov(t_mem code, bool prefix)
   int ea;
   uchar operand;
   bool aix;
+  int hx = (regs.H << 8) | (regs.X);
   
   switch (code) {
-    case 0x4e:
+    case 0x4e:	//mov opr8a,opr8a
       operand = get1(fetch());
       ea = fetch();
       aix = 0;
       break;
-    case 0x5e:
+    case 0x5e:	//mov opr8a,x+
       operand = get1(fetch());
-      ea = regs.X;
+      ea = hx;
       aix = 1;
       break;
-    case 0x6e:
+    case 0x6e:	//mov #opr8i,opr8a
       operand = fetch();
       ea = fetch();
       aix = 0;
       break;
-    case 0x7e:
-      operand = get1(regs.X);
+    case 0x7e:	//mov x+,opr8a
+      operand = get1(hx);
       ea = fetch();
       aix = 1;
       break;

@@ -1,3 +1,17 @@
+2003-11-08 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* support/regression/fwk/lib/testfwk.c: printn is recursive and thus needs
+	the reentrant attribute.
+	* src/hc08/gen.c (genPackBits): added missing stack readjustment
+	* sim/ucsim/hc08.src/inst.cc (inst_mov): fixed bugs with mov instruction
+	simulation
+	* src/SDCCast.c (decorateType): fixed bug with storage class not being
+	updated during pointer dereference; f.e. ~(((char *)1)*) was being
+	erroneously reduced to a literal.
+	* src/hc08/ralloc.c (packRegisters, rematStr),
+	* src/hc08/gen.c (aopForRemat): allow literals to be rematerialized in
+	some cases
+
 2003-11-08 Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
 	* src/mcs51/main.c: fixed bug #838385. Thanks to Josef Pavlik for finding and fixing

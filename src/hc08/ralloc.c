@@ -1606,6 +1606,7 @@ rematStr (symbol * sym)
 	  ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
 	  continue;
 	}
+
 /*      
       if (ic->op == '+')
         {
@@ -1626,7 +1627,10 @@ rematStr (symbol * sym)
 	  continue;
       }
       /* we reached the end */
-      sprintf (s, "%s", OP_SYMBOL (IC_LEFT (ic))->rname);
+      if (ic->op == ADDRESS_OF)
+        sprintf (s, "%s", OP_SYMBOL (IC_LEFT (ic))->rname);
+      else if (ic->op == '=');
+        sprintf (s, "0x%04x", (int) operandLitValue (IC_RIGHT (ic)) );
       break;
     }
 
@@ -1837,6 +1841,43 @@ farSpacePackable (iCode * ic)
   return NULL;
 }
 #endif
+
+#if 0
+static void
+packRegsForLiteral (iCode * ic)
+{
+  int k;
+  iCode *uic;
+  
+  if (ic->op != '=')
+    return;
+  if (POINTER_SET (ic))
+    return;
+  if (!IS_LITERAL (getSpec (operandType (IC_RIGHT (ic)))))
+    return;
+  if (bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) > 1)
+    return;
+
+  for (k=0; k< OP_USES (IC_RESULT (ic))->size; k++)
+    if (bitVectBitValue (OP_USES (IC_RESULT (ic)), k))
+      {
+        uic = hTabItemWithKey (iCodehTab, k);
+        if (!uic) continue;
+        
+        if (uic->op != IFX && uic->op != JUMPTABLE)
+	  {
+	    if (IC_LEFT (uic) && IC_LEFT (uic)->key == IC_RESULT (ic)->key)
+	      ReplaceOpWithCheaperOp(&IC_LEFT(uic), IC_RIGHT(ic));
+	    if (IC_RIGHT (uic) && IC_RIGHT (uic)->key == IC_RESULT (ic)->key)
+	      ReplaceOpWithCheaperOp(&IC_RIGHT(uic), IC_RIGHT(ic));
+	    if (IC_RESULT (uic) && IC_RESULT (uic)->key == IC_RESULT (ic)->key)
+	      ReplaceOpWithCheaperOp(&IC_RESULT(uic), IC_RIGHT(ic));
+	  }
+      }
+
+}
+#endif
+
 
 /*-----------------------------------------------------------------*/
 /* packRegsForAssign - register reduction for assignment           */
@@ -2675,10 +2716,12 @@ packRegisters (eBBlock ** ebpp, int blockno)
 
   for (ic = ebp->sch; ic; ic = ic->next)
     {
+      //packRegsForLiteral (ic);
+      
       /* if this is an itemp & result of an address of a true sym 
          then mark this as rematerialisable   */
       if (ic->op == ADDRESS_OF &&
-	  IS_ITEMP (IC_RESULT (ic)) &&
+	  IS_ITEMP (IC_RESULT (ic)) && 
 	  IS_TRUE_SYMOP (IC_LEFT (ic)) &&
 	  bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 &&
 	  !OP_SYMBOL (IC_LEFT (ic))->onStack )
@@ -2689,7 +2732,20 @@ packRegisters (eBBlock ** ebpp, int blockno)
 	  OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
 
 	}
+#if 1
+      if (ic->op == '=' &&
+          !POINTER_SET (ic) &&
+	  IS_ITEMP (IC_RESULT (ic)) &&
+	  IS_VALOP (IC_RIGHT (ic)) &&
+	  bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1)
+	{
 
+	  OP_SYMBOL (IC_RESULT (ic))->remat = 1;
+	  OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
+	  OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
+
+	}
+#endif
       /* if straight assignment then carry remat flag if
          this is the only definition */
       if (ic->op == '=' &&
@@ -2903,6 +2959,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
 	   || ic->op == GETHBIT
 	   || ic->op == LEFT_OP || ic->op == RIGHT_OP || ic->op == CALL
 	   || (ic->op == ADDRESS_OF && isOperandOnStack (IC_LEFT (ic)))
+           || ic->op == RECEIVE
 	  ) &&
 	  IS_ITEMP (IC_RESULT (ic)) &&
 	  getSize (operandType (IC_RESULT (ic))) <= 1)

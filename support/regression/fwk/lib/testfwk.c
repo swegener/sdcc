@@ -7,6 +7,12 @@
 #include <tinibios.h> /* main() must see the ISR declarations */
 #endif
 
+#if defined(PORT_HOST) || defined(SDCC_z80) || defined(SDCC_gbz80)
+#define _REENTRANT
+#else
+#define _REENTRANT reentrant
+#endif
+
 /** Define this if the port's div or mod functions are broken.
     A slow loop based method will be substituded.
 */
@@ -45,7 +51,7 @@ int __mod(int num, int denom)
 }
 #endif
 
-static void _printn(int n) 
+static void _printn(int n) _REENTRANT
 {
     int rem;
 

@@ -175,6 +175,190 @@ FBYNAME (operandsNotSame)
     return TRUE;
 }
 
+/*-----------------------------------------------------------------*/
+/* operandsNotSame3- check if any pair of %1,%2,%3 are the same    */
+/*-----------------------------------------------------------------*/
+FBYNAME (operandsNotSame3)
+{
+  char *op1 = hTabItemWithKey (vars, 1);
+  char *op2 = hTabItemWithKey (vars, 2);
+  char *op3 = hTabItemWithKey (vars, 3);
+
+  if ( (strcmp (op1, op2) == 0) ||
+       (strcmp (op1, op3) == 0) ||
+       (strcmp (op2, op3) == 0) )
+    return FALSE;
+  else
+    return TRUE;
+}
+
+/*-----------------------------------------------------------------*/
+/* operandsNotSame4- check if any pair of %1,%2,%3,.. are the same */
+/*-----------------------------------------------------------------*/
+FBYNAME (operandsNotSame4)
+{
+  char *op1 = hTabItemWithKey (vars, 1);
+  char *op2 = hTabItemWithKey (vars, 2);
+  char *op3 = hTabItemWithKey (vars, 3);
+  char *op4 = hTabItemWithKey (vars, 4);
+
+  if ( (strcmp (op1, op2) == 0) ||
+       (strcmp (op1, op3) == 0) ||
+       (strcmp (op1, op4) == 0) ||
+       (strcmp (op2, op3) == 0) ||
+       (strcmp (op2, op4) == 0) ||
+       (strcmp (op3, op4) == 0) )
+    return FALSE;
+  else
+    return TRUE;
+}
+
+/*-----------------------------------------------------------------*/
+/* operandsNotSame5- check if any pair of %1,%2,%3,.. are the same */
+/*-----------------------------------------------------------------*/
+FBYNAME (operandsNotSame5)
+{
+  char *op1 = hTabItemWithKey (vars, 1);
+  char *op2 = hTabItemWithKey (vars, 2);
+  char *op3 = hTabItemWithKey (vars, 3);
+  char *op4 = hTabItemWithKey (vars, 4);
+  char *op5 = hTabItemWithKey (vars, 5);
+
+  if ( (strcmp (op1, op2) == 0) ||
+       (strcmp (op1, op3) == 0) ||
+       (strcmp (op1, op4) == 0) ||
+       (strcmp (op1, op5) == 0) ||
+       (strcmp (op2, op3) == 0) ||
+       (strcmp (op2, op4) == 0) ||
+       (strcmp (op2, op5) == 0) ||
+       (strcmp (op3, op4) == 0) ||
+       (strcmp (op3, op5) == 0) ||
+       (strcmp (op4, op5) == 0) )
+    return FALSE;
+  else
+    return TRUE;
+}
+
+/*-----------------------------------------------------------------*/
+/* operandsNotSame6- check if any pair of %1,%2,%3,.. are the same */
+/*-----------------------------------------------------------------*/
+FBYNAME (operandsNotSame6)
+{
+  char *op1 = hTabItemWithKey (vars, 1);
+  char *op2 = hTabItemWithKey (vars, 2);
+  char *op3 = hTabItemWithKey (vars, 3);
+  char *op4 = hTabItemWithKey (vars, 4);
+  char *op5 = hTabItemWithKey (vars, 5);
+  char *op6 = hTabItemWithKey (vars, 6);
+
+  if ( (strcmp (op1, op2) == 0) ||
+       (strcmp (op1, op3) == 0) ||
+       (strcmp (op1, op4) == 0) ||
+       (strcmp (op1, op5) == 0) ||
+       (strcmp (op1, op6) == 0) ||
+       (strcmp (op2, op3) == 0) ||
+       (strcmp (op2, op4) == 0) ||
+       (strcmp (op2, op5) == 0) ||
+       (strcmp (op2, op6) == 0) ||
+       (strcmp (op3, op4) == 0) ||
+       (strcmp (op3, op5) == 0) ||
+       (strcmp (op3, op6) == 0) ||
+       (strcmp (op4, op5) == 0) ||
+       (strcmp (op4, op6) == 0) ||
+       (strcmp (op5, op6) == 0) )
+    return FALSE;
+  else
+    return TRUE;
+}
+
+
+/*-----------------------------------------------------------------*/
+/* operandsNotSame7- check if any pair of %1,%2,%3,.. are the same */
+/*-----------------------------------------------------------------*/
+FBYNAME (operandsNotSame7)
+{
+  char *op1 = hTabItemWithKey (vars, 1);
+  char *op2 = hTabItemWithKey (vars, 2);
+  char *op3 = hTabItemWithKey (vars, 3);
+  char *op4 = hTabItemWithKey (vars, 4);
+  char *op5 = hTabItemWithKey (vars, 5);
+  char *op6 = hTabItemWithKey (vars, 6);
+  char *op7 = hTabItemWithKey (vars, 7);
+
+  if ( (strcmp (op1, op2) == 0) ||
+       (strcmp (op1, op3) == 0) ||
+       (strcmp (op1, op4) == 0) ||
+       (strcmp (op1, op5) == 0) ||
+       (strcmp (op1, op6) == 0) ||
+       (strcmp (op1, op7) == 0) ||
+       (strcmp (op2, op3) == 0) ||
+       (strcmp (op2, op4) == 0) ||
+       (strcmp (op2, op5) == 0) ||
+       (strcmp (op2, op6) == 0) ||
+       (strcmp (op2, op7) == 0) ||
+       (strcmp (op3, op4) == 0) ||
+       (strcmp (op3, op5) == 0) ||
+       (strcmp (op3, op6) == 0) ||
+       (strcmp (op3, op7) == 0) ||
+       (strcmp (op4, op5) == 0) ||
+       (strcmp (op4, op6) == 0) ||
+       (strcmp (op4, op7) == 0) ||
+       (strcmp (op5, op6) == 0) ||
+       (strcmp (op5, op7) == 0) ||
+       (strcmp (op6, op7) == 0) )
+    return FALSE;
+  else
+    return TRUE;
+}
+
+/*-----------------------------------------------------------------*/
+/* operandsNotSame8- check if any pair of %1,%2,%3,.. are the same */
+/*-----------------------------------------------------------------*/
+FBYNAME (operandsNotSame8)
+{
+  char *op1 = hTabItemWithKey (vars, 1);
+  char *op2 = hTabItemWithKey (vars, 2);
+  char *op3 = hTabItemWithKey (vars, 3);
+  char *op4 = hTabItemWithKey (vars, 4);
+  char *op5 = hTabItemWithKey (vars, 5);
+  char *op6 = hTabItemWithKey (vars, 6);
+  char *op7 = hTabItemWithKey (vars, 7);
+  char *op8 = hTabItemWithKey (vars, 8);
+
+  if ( (strcmp (op1, op2) == 0) ||
+       (strcmp (op1, op3) == 0) ||
+       (strcmp (op1, op4) == 0) ||
+       (strcmp (op1, op5) == 0) ||
+       (strcmp (op1, op6) == 0) ||
+       (strcmp (op1, op7) == 0) ||
+       (strcmp (op1, op8) == 0) ||
+       (strcmp (op2, op3) == 0) ||
+       (strcmp (op2, op4) == 0) ||
+       (strcmp (op2, op5) == 0) ||
+       (strcmp (op2, op6) == 0) ||
+       (strcmp (op2, op7) == 0) ||
+       (strcmp (op2, op8) == 0) ||
+       (strcmp (op3, op4) == 0) ||
+       (strcmp (op3, op5) == 0) ||
+       (strcmp (op3, op6) == 0) ||
+       (strcmp (op3, op7) == 0) ||
+       (strcmp (op3, op8) == 0) ||
+       (strcmp (op4, op5) == 0) ||
+       (strcmp (op4, op6) == 0) ||
+       (strcmp (op4, op7) == 0) ||
+       (strcmp (op4, op8) == 0) ||
+       (strcmp (op5, op6) == 0) ||
+       (strcmp (op5, op7) == 0) ||
+       (strcmp (op5, op8) == 0) ||
+       (strcmp (op6, op7) == 0) ||
+       (strcmp (op6, op8) == 0) ||
+       (strcmp (op7, op8) == 0) )
+    return FALSE;
+  else
+    return TRUE;
+}
+
+
 /* labelRefCount:
 
  * takes two parameters: a variable (bound to a label name)
@@ -268,6 +452,30 @@ callFuncByName (char *fname,
     ,
     {
       "operandsNotSame", operandsNotSame
+    }
+    ,
+    {
+      "operandsNotSame3", operandsNotSame3
+    }
+    ,
+    {
+      "operandsNotSame4", operandsNotSame4
+    }
+    ,
+    {
+      "operandsNotSame5", operandsNotSame5
+    }
+    ,
+    {
+      "operandsNotSame6", operandsNotSame6
+    }
+    ,
+    {
+      "operandsNotSame7", operandsNotSame7
+    }
+    ,
+    {
+      "operandsNotSame8", operandsNotSame8
     }
     ,
     {

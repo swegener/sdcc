@@ -40,6 +40,7 @@ static char *_mcs51_keywords[] =
   "_pdata",
   "_idata",
   "_naked",
+  "_overlay",
   NULL
 };
 
@@ -275,5 +276,8 @@ PORT mcs51_port =
   FALSE,                        /* No array initializer support. */
   cseCostEstimation,
   NULL, 			/* no builtin functions */
+  GPOINTER,			/* treat unqualified pointers as "generic" pointers */
+  1,				/* reset labelKey to 1 */
+  1,				/* globals & local static allowed */
   PORT_MAGIC
 };

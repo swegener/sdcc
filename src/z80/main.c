@@ -525,6 +525,9 @@ PORT z80_port =
   TRUE,                         /* Array initializer support. */	
   0,                            /* no CSE cost estimation yet */
   _z80_builtins,		/* no builtin functions */
+  GPOINTER,			/* treat unqualified pointers as "generic" pointers */
+  1,				/* reset labelKey to 1 */
+  1,				/* globals & local static allowed */
   PORT_MAGIC
 };
 
@@ -611,6 +614,9 @@ PORT gbz80_port =
   0,				/* leave == */
   TRUE,                         /* Array initializer support. */
   0,                            /* no CSE cost estimation yet */
-  NULL,				/* no builtin functions */
+  NULL, 			/* no builtin functions */
+  GPOINTER,			/* treat unqualified pointers as "generic" pointers */
+  1,				/* reset labelKey to 1 */
+  1,				/* globals & local static allowed */
   PORT_MAGIC
 };

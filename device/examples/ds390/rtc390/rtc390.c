@@ -59,7 +59,7 @@ char GetTime(struct tm *rtcTime) {
 void PrintTime(struct tm *rtcTime, char verbose) {
 
   printf ("%s%04d-%02d-%02d %02d:%02d:%02d.%02d\n", 
-	  verbose ? "RTC time: " : "", // this one still needs a cast
+	  verbose ? "RTC time: " : "",
 	  rtcTime->tm_year+1900, rtcTime->tm_mon+1, rtcTime->tm_mday,
 	  rtcTime->tm_hour, rtcTime->tm_min, rtcTime->tm_sec,
 	  rtcTime->tm_hundredth);

@@ -1,4 +1,4 @@
-CC = /home/johan/sdcc/bin/sdcc
+CC = sdcc
 #CFLAGS = -V
 MFLAGS = --model-small --stack-after-data
 #MFLAGS = --model-large --stack-after-data

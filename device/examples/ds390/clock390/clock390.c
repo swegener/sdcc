@@ -21,7 +21,7 @@ void main (void) {
     seconds=ms/1000;
 
 #ifdef USE_LCD
-    LcdLPrintf (2 + (4<<8), "%ld", ms);
+    LcdLPrintf (2 + (4<<8), "%10ld", ms);
 #endif
 
     if (seconds!=oldSeconds) {

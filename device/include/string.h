@@ -26,7 +26,7 @@
 #ifndef __SDC51_STRING_H
 #define __SDC51_STRING_H 1
 
-#ifndef SDCC_mcs51
+#if !defined(SDCC_mcs51) && !defined(SDCC_ds390)
 #define reentrant
 #endif
 

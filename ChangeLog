@@ -1,6 +1,7 @@
 2004-01-07  Borut Razem <borut.razem@siol.net>
 
 	* support/scripts/sdcc.nsi: update PATH
+	* support/scripts/sdcc.ico: craeted
 
 2004-01-07 Bernhard Held <bernhard@bernhardheld.de>
 

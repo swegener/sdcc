@@ -1798,7 +1798,7 @@ processFuncArgs (symbol * func)
 
   /* if this function has variable argument list */
   /* then make the function a reentrant one    */
-  if (IFFUNC_HASVARARGS(funcType) || options.stackAuto)
+  if (IFFUNC_HASVARARGS(funcType) || (options.stackAuto && !func->cdef))
     FUNC_ISREENT(funcType)=1;
 
   /* check if this function is defined as calleeSaves

@@ -32,6 +32,7 @@ void glue ();
    This is needed in gen.c of z80 port */
 char *aopLiteral (value *, int);
 void flushStatics (void);
+int printIvalChar (sym_link *, initList *, FILE *, char *);
 
 extern symbol *interrupts[];
 extern set *publics;

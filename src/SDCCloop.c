@@ -408,6 +408,7 @@ loopInvariants (region * theLoop, eBBlock ** ebbs, int count)
   set *lInvars = NULL;
 
   int change = 0;
+  int fCallsInBlock;
 
   /* if the preHeader does not exist then do nothing */
   /* or no exits then do nothing ( have to think about this situation */
@@ -429,6 +430,12 @@ loopInvariants (region * theLoop, eBBlock ** ebbs, int count)
       domsAllExits = (applyToSet (theLoop->exits, dominatedBy, lBlock) ==
 		      elementsInSet (theLoop->exits));
 
+      /* find out if we have a function call in this block */
+      for (ic = lBlock->sch, fCallsInBlock=0; ic; ic = ic->next) {
+	if (SKIP_IC(ic)) {
+	  fCallsInBlock++;
+	}
+      }
 
       /* now we go thru the instructions of this block and */
       /* collect those instructions with invariant operands */
@@ -437,6 +444,13 @@ loopInvariants (region * theLoop, eBBlock ** ebbs, int count)
 
 	  int lin, rin;
 	  cseDef *ivar;
+
+	  /* if there are function calls in this block and this
+	     is a pointer get, the function could have changed it
+	     so skip, ISO-C99 according to David A. Long */
+	  if (fCallsInBlock && POINTER_GET(ic)) {
+	    continue;
+	  }
 
 	  if (SKIP_IC (ic) || POINTER_SET (ic) || ic->op == IFX)
 	    continue;
@@ -453,26 +467,28 @@ loopInvariants (region * theLoop, eBBlock ** ebbs, int count)
 	    continue;
 
 	  lin = rin = 0;
-
+	  
 	  /* special case */
 	  /* if address of then it is an invariant */
 	  if (ic->op == ADDRESS_OF &&
 	      IS_SYMOP (IC_LEFT (ic)) &&
 	      IS_AGGREGATE (operandType (IC_LEFT (ic))))
 	    lin++;
-	  else
+	  else {
 	    /* check if left operand is an invariant */
-	  if ((lin = isOperandInvariant (IC_LEFT (ic), theLoop, lInvars)))
-	    /* if this is a pointer get then make sure
-	       that the pointer set does not exist in
-	       any of the blocks */
-	    if (POINTER_GET (ic) &&
-	    (applyToSet (theLoop->regBlocks, pointerAssigned, IC_LEFT (ic))))
-	      lin = 0;
-
+	    if ((lin = isOperandInvariant (IC_LEFT (ic), theLoop, lInvars)))
+	      /* if this is a pointer get then make sure
+		 that the pointer set does not exist in
+		 any of the blocks */
+	      if (POINTER_GET (ic) &&
+		  (applyToSet (theLoop->regBlocks, 
+			       pointerAssigned, IC_LEFT (ic))))
+		lin = 0;
+	  }
+	  
 	  /* do the same for right */
 	  rin = isOperandInvariant (IC_RIGHT (ic), theLoop, lInvars);
-
+	  
 	  /* if this is a POINTER_GET then special case, make sure all
 	     usages within the loop are POINTER_GET any other usage
 	     would mean that this is not an invariant , since the pointer

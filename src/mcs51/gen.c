@@ -67,9 +67,7 @@ static char *spname;
 
 char *fReturn8051[] =
 {"dpl", "dph", "b", "a"};
-char *fReturn390[] =
-{"dpl", "dph", "dpx", "b", "a"};
-unsigned fReturnSize = 4;	/* shared with ralloc.c */
+unsigned fReturnSizeMCS51 = 4;	/* shared with ralloc.c */
 char **fReturn = fReturn8051;
 static char *accUse[] =
 {"a", "b"};
@@ -297,7 +295,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
   /* assign depending on the storage class */
   /* if it is on the stack or indirectly addressable */
   /* space we need to assign either r0 or r1 to it   */
-  if ((sym->onStack && !options.stack10bit) || sym->iaccess)
+  if (sym->onStack || sym->iaccess)
     {
       sym->aop = aop = newAsmop (0);
       aop->aopu.aop_ptr = getFreePtr (ic, &aop, result);
@@ -332,35 +330,6 @@ aopForSym (iCode * ic, symbol * sym, bool result)
 	}
       else
 	aop->aopu.aop_stk = sym->stack;
-      return aop;
-    }
-
-  if (sym->onStack && options.stack10bit)
-    {
-      /* It's on the 10 bit stack, which is located in
-       * far data space.
-       */
-
-      if (_G.accInUse)
-	emitcode ("push", "acc");
-
-      emitcode ("mov", "a,_bp");
-      emitcode ("add", "a,#0x%02x",
-		((sym->stack < 0) ?
-		 ((char) (sym->stack - _G.nRegsSaved)) :
-		 ((char) sym->stack)) & 0xff);
-
-      genSetDPTR (1);
-      emitcode ("mov", "dpx1,#0x40");
-      emitcode ("mov", "dph1,#0x00");
-      emitcode ("mov", "dpl1, a");
-      genSetDPTR (0);
-
-      if (_G.accInUse)
-	emitcode ("pop", "acc");
-
-      sym->aop = aop = newAsmop (AOP_DPTR2);
-      aop->size = getSize (sym->type);
       return aop;
     }
 
@@ -638,7 +607,7 @@ aopOp (operand * op, iCode * ic, bool result)
 	  int i;
 	  aop = op->aop = sym->aop = newAsmop (AOP_STR);
 	  aop->size = getSize (sym->type);
-	  for (i = 0; i < fReturnSize; i++)
+	  for (i = 0; i < fReturnSizeMCS51; i++)
 	    aop->aopu.aop_str[i] = fReturn[i];
 	  return;
 	}
@@ -714,15 +683,6 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
 	bitVectUnSetBit (ic->rUsed, R1_IDX);
 
 	getFreePtr (ic, &aop, FALSE);
-
-	if (options.stack10bit)
-	  {
-	    /* I'm not sure what to do here yet... */
-	    /* #STUB */
-	    fprintf (stderr,
-		     "*** Warning: probably generating bad code for "
-		     "10 bit stack mode.\n");
-	  }
 
 	if (stk)
 	  {
@@ -2031,12 +1991,6 @@ genPcall (iCode * ic)
   emitcode ("mov", "a,#(%05d$ >> 8)", (rlbl->key + 100));
   emitcode ("push", "acc");
 
-  if (options.model == MODEL_FLAT24)
-    {
-      emitcode ("mov", "a,#(%05d$ >> 16)", (rlbl->key + 100));
-      emitcode ("push", "acc");
-    }
-
   /* now push the calling address */
   aopOp (IC_LEFT (ic), ic, FALSE);
 
@@ -2222,20 +2176,6 @@ genFunction (iCode * ic)
 	emitcode ("push", "dpl");
       if (!inExcludeList ("dph"))
 	emitcode ("push", "dph");
-      if (options.model == MODEL_FLAT24 && !inExcludeList ("dpx"))
-	{
-	  emitcode ("push", "dpx");
-	  /* Make sure we're using standard DPTR */
-	  emitcode ("push", "dps");
-	  emitcode ("mov", "dps, #0x00");
-	  if (options.stack10bit)
-	    {
-	      /* This ISR could conceivably use DPTR2. Better save it. */
-	      emitcode ("push", "dpl1");
-	      emitcode ("push", "dph1");
-	      emitcode ("push", "dpx1");
-	    }
-	}
       /* if this isr has no bank i.e. is going to
          run with bank 0 , then we need to save more
          registers :-) */
@@ -2434,17 +2374,6 @@ genEndFunction (iCode * ic)
 	    }
 	}
 
-      if (options.model == MODEL_FLAT24 && !inExcludeList ("dpx"))
-	{
-	  if (options.stack10bit)
-	    {
-	      emitcode ("pop", "dpx1");
-	      emitcode ("pop", "dph1");
-	      emitcode ("pop", "dpl1");
-	    }
-	  emitcode ("pop", "dps");
-	  emitcode ("pop", "dpx");
-	}
       if (!inExcludeList ("dph"))
 	emitcode ("pop", "dph");
       if (!inExcludeList ("dpl"))
@@ -6966,10 +6895,6 @@ genFarPointerGet (operand * left,
 	{			/* we need to get it byte by byte */
 	  emitcode ("mov", "dpl,%s", aopGet (AOP (left), 0, FALSE, FALSE));
 	  emitcode ("mov", "dph,%s", aopGet (AOP (left), 1, FALSE, FALSE));
-	  if (options.model == MODEL_FLAT24)
-	    {
-	      emitcode ("mov", "dpx,%s", aopGet (AOP (left), 2, FALSE, FALSE));
-	    }
 	}
     }
   /* so dptr know contains the address */
@@ -7019,10 +6944,6 @@ emitcodePointerGet (operand * left,
 	{			/* we need to get it byte by byte */
 	  emitcode ("mov", "dpl,%s", aopGet (AOP (left), 0, FALSE, FALSE));
 	  emitcode ("mov", "dph,%s", aopGet (AOP (left), 1, FALSE, FALSE));
-	  if (options.model == MODEL_FLAT24)
-	    {
-	      emitcode ("mov", "dpx,%s", aopGet (AOP (left), 2, FALSE, FALSE));
-	    }
 	}
     }
   /* so dptr know contains the address */
@@ -7076,15 +6997,7 @@ genGenPointerGet (operand * left,
 	{			/* we need to get it byte by byte */
 	  emitcode ("mov", "dpl,%s", aopGet (AOP (left), 0, FALSE, FALSE));
 	  emitcode ("mov", "dph,%s", aopGet (AOP (left), 1, FALSE, FALSE));
-	  if (options.model == MODEL_FLAT24)
-	    {
-	      emitcode ("mov", "dpx,%s", aopGet (AOP (left), 2, FALSE, FALSE));
-	      emitcode ("mov", "b,%s", aopGet (AOP (left), 3, FALSE, FALSE));
-	    }
-	  else
-	    {
-	      emitcode ("mov", "b,%s", aopGet (AOP (left), 2, FALSE, FALSE));
-	    }
+	  emitcode ("mov", "b,%s", aopGet (AOP (left), 2, FALSE, FALSE));
 	}
     }
   /* so dptr know contains the address */
@@ -7592,10 +7505,6 @@ genFarPointerSet (operand * right,
 	{			/* we need to get it byte by byte */
 	  emitcode ("mov", "dpl,%s", aopGet (AOP (result), 0, FALSE, FALSE));
 	  emitcode ("mov", "dph,%s", aopGet (AOP (result), 1, FALSE, FALSE));
-	  if (options.model == MODEL_FLAT24)
-	    {
-	      emitcode ("mov", "dpx,%s", aopGet (AOP (result), 2, FALSE, FALSE));
-	    }
 	}
     }
   /* so dptr know contains the address */
@@ -7650,15 +7559,7 @@ genGenPointerSet (operand * right,
 	{			/* we need to get it byte by byte */
 	  emitcode ("mov", "dpl,%s", aopGet (AOP (result), 0, FALSE, FALSE));
 	  emitcode ("mov", "dph,%s", aopGet (AOP (result), 1, FALSE, FALSE));
-	  if (options.model == MODEL_FLAT24)
-	    {
-	      emitcode ("mov", "dpx,%s", aopGet (AOP (result), 2, FALSE, FALSE));
-	      emitcode ("mov", "b,%s", aopGet (AOP (result), 3, FALSE, FALSE));
-	    }
-	  else
-	    {
-	      emitcode ("mov", "b,%s", aopGet (AOP (result), 2, FALSE, FALSE));
-	    }
+	  emitcode ("mov", "b,%s", aopGet (AOP (result), 2, FALSE, FALSE));
 	}
     }
   /* so dptr know contains the address */
@@ -7806,25 +7707,10 @@ genAddrOf (iCode * ic)
       /* fill the result with zero */
       size = AOP_SIZE (IC_RESULT (ic)) - 1;
 
-
-      if (options.stack10bit && size < (FPTRSIZE - 1))
-	{
-	  fprintf (stderr,
-		   "*** warning: pointer to stack var truncated.\n");
-	}
-
       offset = 1;
       while (size--)
 	{
-	  /* Yuck! */
-	  if (options.stack10bit && offset == 2)
-	    {
-	      aopPut (AOP (IC_RESULT (ic)), "#0x40", offset++);
-	    }
-	  else
-	    {
-	      aopPut (AOP (IC_RESULT (ic)), zero, offset++);
-	    }
+	  aopPut (AOP (IC_RESULT (ic)), zero, offset++);
 	}
 
       goto release;
@@ -8265,11 +8151,11 @@ genReceive (iCode * ic)
     {
 
       int size = getSize (operandType (IC_RESULT (ic)));
-      int offset = fReturnSize - size;
+      int offset = fReturnSizeMCS51 - size;
       while (size--)
 	{
-	  emitcode ("push", "%s", (strcmp (fReturn[fReturnSize - offset - 1], "a") ?
-				fReturn[fReturnSize - offset - 1] : "acc"));
+	  emitcode ("push", "%s", (strcmp (fReturn[fReturnSizeMCS51 - offset - 1], "a") ?
+				fReturn[fReturnSizeMCS51 - offset - 1] : "acc"));
 	  offset++;
 	}
       aopOp (IC_RESULT (ic), ic, FALSE);

@@ -40,20 +40,20 @@ enum
 typedef struct asmop
   {
 
-    short type;			/* can have values
-				   AOP_LIT    -  operand is a literal value
-				   AOP_REG    -  is in registers
-				   AOP_DIR    -  direct just a name
-				   AOP_DPTR   -  dptr contains address of operand
-				   AOP_DPTR2  -  dptr2 contains address of operand (DS80C390 only).
-				   AOP_R0/R1  -  r0/r1 contains address of operand               
-				   AOP_STK    -  should be pushed on stack this
-				   can happen only for the result
-				   AOP_IMMD   -  immediate value for eg. remateriazable 
-				   AOP_CRY    -  carry contains the value of this
-				   AOP_STR    -  array of strings
-				   AOP_ACC    -  result is in the acc:b pair
-				 */
+    short type;			
+    /* can have values
+       AOP_LIT    -  operand is a literal value
+       AOP_REG    -  is in registers
+       AOP_DIR    -  direct just a name
+       AOP_DPTR   -  dptr contains address of operand
+       AOP_R0/R1  -  r0/r1 contains address of operand               
+       AOP_STK    -  should be pushed on stack this
+       can happen only for the result
+       AOP_IMMD   -  immediate value for eg. remateriazable 
+       AOP_CRY    -  carry contains the value of this
+       AOP_STR    -  array of strings
+       AOP_ACC    -  result is in the acc:b pair
+    */
     short coff;			/* current offset */
     short size;			/* total size */
     unsigned code:1;		/* is in Code space */
@@ -75,9 +75,8 @@ asmop;
 
 void gen51Code (iCode *);
 
-extern char *fReturn8051[];
-extern char *fReturn390[];
-extern unsigned fReturnSize;
-extern char **fReturn;
+//extern char *fReturn8051[];
+extern unsigned fReturnSizeMCS51;
+//extern char **fReturn;
 
 #endif

@@ -147,6 +147,7 @@ static const char *_asmCmd[] = {
 
 /* Globals */
 PORT avr_port = {
+        TARGET_ID_AVR,
 	"avr",
 	"ATMEL AVR",		/* Target name */
 	{

@@ -83,30 +83,6 @@ _mcs51_parseOptions (int *pargc, char **argv, int *i)
 static void
 _mcs51_finaliseOptions (void)
 {
-  /* Hack-o-matic: if we are using the flat24 model,
-   * adjust pointer sizes.
-   */
-  if (options.model == MODEL_FLAT24)
-    {
-
-      fprintf (stderr, "*** WARNING: you should use the '-mds390' option "
-	       "for DS80C390 support. This code generator is "
-	       "badly out of date and probably broken.\n");
-
-      port->s.fptr_size = 3;
-      port->s.gptr_size = 4;
-      port->stack.isr_overhead++;	/* Will save dpx on ISR entry. */
-#if 1
-      port->stack.call_overhead++;	/* This acounts for the extra byte 
-					 * of return addres on the stack.
-					 * but is ugly. There must be a 
-					 * better way.
-					 */
-#endif
-      fReturn = fReturn390;
-      fReturnSize = 5;
-    }
-
   if (options.model == MODEL_LARGE)
     {
       port->mem.default_local_map = xdata;
@@ -116,25 +92,6 @@ _mcs51_finaliseOptions (void)
     {
       port->mem.default_local_map = data;
       port->mem.default_globl_map = data;
-    }
-
-  if (options.stack10bit)
-    {
-      if (options.model != MODEL_FLAT24)
-	{
-	  fprintf (stderr,
-		   "*** warning: 10 bit stack mode is only supported in flat24 model.\n");
-	  fprintf (stderr, "\t10 bit stack mode disabled.\n");
-	  options.stack10bit = 0;
-	}
-      else
-	{
-	  /* Fixup the memory map for the stack; it is now in
-	   * far space and requires a FPOINTER to access it.
-	   */
-	  istack->fmap = 1;
-	  istack->ptrType = FPOINTER;
-	}
     }
 }
 
@@ -154,45 +111,13 @@ _mcs51_getRegName (struct regs *reg)
 static void
 _mcs51_genAssemblerPreamble (FILE * of)
 {
-  if (options.model == MODEL_FLAT24)
-    {
-      fputs (".flat24 on\t\t; 24 bit flat addressing\n", of);
-      fputs ("dpx = 0x93\t\t; dpx register unknown to assembler\n", of);
-      fputs ("dps = 0x86\t\t; dps register unknown to assembler\n", of);
-      fputs ("dpl1 = 0x84\t\t; dpl1 register unknown to assembler\n", of);
-      fputs ("dph1 = 0x85\t\t; dph1 register unknown to assembler\n", of);
-      fputs ("dpx1 = 0x95\t\t; dpx1 register unknown to assembler\n", of);
-    }
 }
 
 /* Generate interrupt vector table. */
 static int
 _mcs51_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 {
-  int i;
-
-  if (options.model != MODEL_FLAT24)
-    {
-      /* Let the default code handle it. */
-      return FALSE;
-    }
-
-  fprintf (of, "\tajmp\t__sdcc_gsinit_startup\n");
-
-  /* now for the other interrupts */
-  for (i = 0; i < maxInterrupts; i++)
-    {
-      if (interrupts[i])
-	{
-	  fprintf (of, "\tljmp\t%s\n\t.ds\t4\n", interrupts[i]->rname);
-	}
-      else
-	{
-	  fprintf (of, "\treti\n\t.ds\t7\n");
-	}
-    }
-
-  return TRUE;
+  return FALSE;
 }
 
 /** $1 is always the basename.
@@ -214,11 +139,12 @@ static const char *_asmCmd[] =
 /* Globals */
 PORT mcs51_port =
 {
+  TARGET_ID_MCS51,
   "mcs51",
   "MCU 8051",			/* Target name */
   {
     TRUE,			/* Emit glue around main */
-    MODEL_SMALL | MODEL_LARGE | MODEL_FLAT24,
+    MODEL_SMALL | MODEL_LARGE,
     MODEL_SMALL
   },
   {

@@ -463,7 +463,7 @@ pointerTypeToGPByte (const int p_type)
 void 
 _printPointerType (FILE * oFile, const char *name)
 {
-  if (IS_DS390_PORT)
+  if (TARGET_IS_DS390)
     {
       fprintf (oFile, "\t.byte %s,(%s >> 8),(%s >> 16)", name, name, name);
     }

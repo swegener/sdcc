@@ -83,6 +83,7 @@ _pic14_parseOptions (int *pargc, char **argv, int *i)
 static void
 _pic14_finaliseOptions (void)
 {
+#if 0
   /* Hack-o-matic: if we are using the flat24 model,
    * adjust pointer sizes.
    */
@@ -136,6 +137,7 @@ _pic14_finaliseOptions (void)
 	  istack->ptrType = FPOINTER;
 	}
     }
+#endif
 }
 
 static void
@@ -207,8 +209,9 @@ static const char *_asmCmd[] =
 };
 
 /* Globals */
-PORT pic14_port =
+PORT pic_port =
 {
+  TARGET_ID_PIC,
   "pic14",
   "MCU pic",			/* Target name */
   {

@@ -1214,7 +1214,7 @@ fixUpTypes (iCode * ic)
 {
   sym_link *t1 = operandType (IC_LEFT (ic)), *t2;
 
-  if (IS_DS390_PORT)
+  if (TARGET_IS_DS390)
     {
       /* hack-o-matic! */
       return;

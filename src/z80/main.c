@@ -317,6 +317,7 @@ static const char *_gbz80_asmCmd[] =
 /* Globals */
 PORT z80_port =
 {
+  TARGET_ID_Z80,
   "z80",
   "Zilog Z80",			/* Target name */
   {
@@ -391,6 +392,7 @@ PORT z80_port =
 /* Globals */
 PORT gbz80_port =
 {
+  TARGET_ID_GBZ80,
   "gbz80",
   "Gameboy Z80-like",		/* Target name */
   {

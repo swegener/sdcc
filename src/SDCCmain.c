@@ -158,7 +158,7 @@ static PORT *_ports[] =
   &ds390_port,
 #endif
 #if !OPT_DISABLE_PIC
-  &pic14_port,
+  &pic_port,
 #endif
 #if !OPT_DISABLE_I186
   &i186_port,
@@ -173,13 +173,13 @@ static PORT *_ports[] =
 /**
    remove me - TSD a hack to force sdcc to generate gpasm format .asm files.
  */
-extern void pic14glue ();
+extern void picglue ();
 
 /** Sets the port to the one given by the command line option.
     @param    The name minus the option (eg 'mcs51')
     @return     0 on success.
 */
-static int
+static void
 _setPort (const char *name)
 {
   int i;
@@ -188,7 +188,7 @@ _setPort (const char *name)
       if (!strcmp (_ports[i]->target, name))
 	{
 	  port = _ports[i];
-	  return 0;
+	  return;
 	}
     }
   /* Error - didnt find */
@@ -283,11 +283,11 @@ printVersionInfo ()
 	   "SDCC : ");
   for (i = 0; i < NUM_PORTS; i++)
     fprintf (stderr, "%s%s", i == 0 ? "" : "/", _ports[i]->target);
+
   fprintf (stderr, " %s"
 #ifdef SDCC_SUB_VERSION_STR
 	   "/" SDCC_SUB_VERSION_STR
 #endif
-	   " ` "
 #ifdef __CYGWIN32__
 	   " (CYGWIN32)\n"
 #else
@@ -1034,10 +1034,7 @@ parseCmdLine (int argc, char **argv)
 
 	    case 'm':
 	      /* Used to select the port */
-	      if (_setPort (argv[i] + 2))
-		{
-		  werror (W_UNSUPP_OPTION, "-m", "Unrecognised processor");
-		}
+	      _setPort (argv[i] + 2);
 	      break;
 
 	    case 'a':
@@ -1327,7 +1324,7 @@ linkEdit (char **envp)
   /* standard library path */
   if (!options.nostdlib)
     {
-      if (IS_DS390_PORT)
+      if (TARGET_IS_DS390)
 	{
 	  c = "ds390";
 	}
@@ -1536,6 +1533,11 @@ main (int argc, char **argv, char **envp)
 
   /*printVersionInfo (); */
 
+  if (NUM_PORTS==0) {
+    fprintf (stderr, "Build error: no ports are enabled.\n");
+    exit (1);
+  }
+
   _findPort (argc, argv);
   /* Initalise the port. */
   if (port->init)
@@ -1583,13 +1585,14 @@ main (int argc, char **argv, char **envp)
 
       if (!fatalError)
 	{
- 	  if (IS_PIC14_PORT)
+ 	  if (!TARGET_IS_PIC) {
 	    /* TSD PIC port hack - if the PIC port option is enabled
 	       and SDCC is used to generate PIC code, then we will
 	       generate .asm files in gpasm's format instead of SDCC's
 	       assembler's format
 	    */
-	    pic14glue ();
+	    picglue ();
+	  }
 	  else
 	    glue ();
 	  if (fatalError)

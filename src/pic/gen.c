@@ -73,7 +73,7 @@ static char *spname = "sp";
 
 char *fReturnpic14[] = {"FSR","dph","b","a" };
 //char *fReturn390[] = {"dpl","dph","dpx", "b","a" };
-static unsigned fReturnSize = 4; /* shared with ralloc.c */
+unsigned fReturnSizePic = 4; /* shared with ralloc.c */
 static char **fReturn = fReturnpic14;
 
 static char *accUse[] = {"a","b"};
@@ -717,7 +717,7 @@ static void aopOp (operand *op, iCode *ic, bool result)
             int i;
             aop = op->aop = sym->aop = newAsmop(AOP_STR);
             aop->size = getSize(sym->type);
-            for ( i = 0 ; i < fReturnSize ; i++ )
+            for ( i = 0 ; i < fReturnSizePic ; i++ )
 	      aop->aopu.aop_str[i] = fReturn[i];
 	    DEBUGemitcode(";","%d",__LINE__);
             return;
@@ -8895,10 +8895,10 @@ static void genReceive (iCode *ic)
 	  IS_TRUE_SYMOP(IC_RESULT(ic))) ) {
 
 	int size = getSize(operandType(IC_RESULT(ic)));
-	int offset =  fReturnSize - size;
+	int offset =  fReturnSizePic - size;
 	while (size--) {
-	    emitcode ("push","%s", (strcmp(fReturn[fReturnSize - offset - 1],"a") ?
-				    fReturn[fReturnSize - offset - 1] : "acc"));
+	    emitcode ("push","%s", (strcmp(fReturn[fReturnSizePic - offset - 1],"a") ?
+				    fReturn[fReturnSizePic - offset - 1] : "acc"));
 	    offset++;
 	}
 	aopOp(IC_RESULT(ic),ic,FALSE);  

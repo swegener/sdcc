@@ -76,9 +76,9 @@ asmop;
 
 void genpic14Code (iCode *);
 
-extern char *fReturnpic14[];
-extern char *fReturn390[];
-extern unsigned fReturnSize;
-extern char **fReturn;
+//extern char *fReturnpic14[];
+//extern char *fReturn390[];
+extern unsigned fReturnSizePic;
+//extern char **fReturn;
 
 #endif

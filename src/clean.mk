@@ -4,7 +4,7 @@ clean:
 	rm -f *core *[%~] *.[oa] *.output
 	rm -f .[a-z]*~ \#*
 	rm -f $(PRJDIR)/bin/sdcc sdcc
-	for port in $(PORTS) ; do\
+	for port in $(ALLPORTS) ; do\
 	  $(MAKE) -C $$port -f clean.mk clean ;\
 	done
 

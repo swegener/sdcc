@@ -131,6 +131,7 @@ tlcs900h_assignRegisters (eBBlock ** ebbs, int count)
 /* Globals */
 PORT tlcs900h_port =
 {
+  TARGET_ID_TLCS900H,
   "tlcs900h",
   "Toshiba TLCS-900H",		/* Target name */
   {

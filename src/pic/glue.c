@@ -992,7 +992,7 @@ pic14emitOverlay (FILE * afile)
 /* glue - the final glue that hold the whole thing together        */
 /*-----------------------------------------------------------------*/
 void
-pic14glue ()
+picglue ()
 {
 
   FILE *vFile;

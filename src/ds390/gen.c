@@ -69,7 +69,7 @@ static char *spname;
 
 #define D(x) x
 
-unsigned fReturnSize_390 = 5;	/* shared with ralloc.c */
+unsigned fReturnSizeDS390 = 5;	/* shared with ralloc.c */
 static char *fReturn[] =
 {"dpl", "dph", "dpx", "b", "a"};
 static char *accUse[] =
@@ -769,7 +769,7 @@ aopOp (operand * op, iCode * ic, bool result, bool useDP2)
 
 	  aop = op->aop = sym->aop = newAsmop (AOP_STR);
 	  aop->size = getSize (sym->type);
-	  for (i = 0; i < (int) fReturnSize_390; i++)
+	  for (i = 0; i < (int) fReturnSizeDS390; i++)
 	    aop->aopu.aop_str[i] = fReturn[i];
 	  return;
 	}
@@ -9194,11 +9194,11 @@ genReceive (iCode * ic)
        IS_TRUE_SYMOP (IC_RESULT (ic))))
     {
       int size = getSize (operandType (IC_RESULT (ic)));
-      int offset = fReturnSize_390 - size;
+      int offset = fReturnSizeDS390 - size;
       while (size--)
 	{
-	  emitcode ("push", "%s", (strcmp (fReturn[fReturnSize_390 - offset - 1], "a") ?
-			    fReturn[fReturnSize_390 - offset - 1] : "acc"));
+	  emitcode ("push", "%s", (strcmp (fReturn[fReturnSizeDS390 - offset - 1], "a") ?
+			    fReturn[fReturnSizeDS390 - offset - 1] : "acc"));
 	  offset++;
 	}
       aopOp (IC_RESULT (ic), ic, FALSE, FALSE);

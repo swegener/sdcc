@@ -8,7 +8,8 @@ include $(PRJDIR)/Makefile.common
 
 USE_ALT_LEX	= 0
 
-PORTS		= mcs51 z80 avr ds390 pic izt
+PORTS		= $(shell cat ../ports.build)
+ALLPORTS	= $(shell cat ../ports.all)
 PORT_LIBS	= $(PORTS:%=%/port.a)
 
 LIBS		= -lm @LIBS@

@@ -185,6 +185,7 @@ i186_assignRegisters (eBBlock ** ebbs, int count)
 /* Globals */
 PORT i186_port =
 {
+  TARGET_ID_I186,
   "i186",
   "Intel 8086/80186",		/* Target name */
   {

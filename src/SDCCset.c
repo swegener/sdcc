@@ -23,6 +23,7 @@
 -------------------------------------------------------------------------*/
 
 #include <stdio.h>
+#include <malloc.h>
 #include "newalloc.h"
 #include <assert.h>
 #include "SDCCset.h"

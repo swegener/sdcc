@@ -75,6 +75,6 @@ asmop;
 
 void gen390Code (iCode *);
 
-extern unsigned fReturnSize_390;
+extern unsigned fReturnSizeDS390;
 
 #endif

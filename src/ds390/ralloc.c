@@ -1885,7 +1885,7 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
 
   /* only upto 2 bytes since we cannot predict
      the usage of b, & acc */
-  if (getSize (operandType (op)) > (fReturnSize_390 - 2) &&
+  if (getSize (operandType (op)) > (fReturnSizeDS390 - 2) &&
       ic->op != RETURN &&
       ic->op != SEND &&
       !POINTER_SET (ic) &&

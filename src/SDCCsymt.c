@@ -1111,7 +1111,7 @@ checkSClass (symbol * sym)
 	   * control this allcoation, but the code was originally that way, and
 	   * changing it for non-390 ports breaks the compiler badly.
 	   */
-	  bool useXdata = IS_DS390_PORT ? options.model : options.useXstack;
+	  bool useXdata = TARGET_IS_DS390 ? 1 : options.useXstack;
 	  SPEC_SCLS (sym->etype) = (useXdata ?
 				    S_XDATA : S_FIXED);
 	}
@@ -1421,7 +1421,7 @@ aggregateArgToPointer (value * val)
 	  DCL_TYPE (val->type) = PPOINTER;
 	  break;
 	case S_FIXED:
-	  if (IS_DS390_PORT)
+	  if (TARGET_IS_DS390)
 	    {
 	      /* The AUTO and REGISTER classes should probably
 	       * also become generic pointers, but I haven't yet

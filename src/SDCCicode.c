@@ -51,7 +51,7 @@ operand *geniCodeRValue (operand *, bool);
 operand *geniCodeDerefPtr (operand *);
 
 #define PRINTFUNC(x) void x (FILE *of, iCode *ic, char *s)
-/* forward definition of print functions */
+/* forward definition of ic print functions */
 PRINTFUNC (picGetValueAtAddr);
 PRINTFUNC (picSetValueAtAddr);
 PRINTFUNC (picAddrOf);
@@ -1166,7 +1166,7 @@ operandFromSymbol (symbol * sym)
   /* under the following conditions create a
      register equivalent for a local symbol */
   if (sym->level && sym->etype && SPEC_OCLS (sym->etype) &&
-      (IN_FARSPACE (SPEC_OCLS (sym->etype)) && (!IS_DS390_PORT)) &&
+      (IN_FARSPACE (SPEC_OCLS (sym->etype)) && (!TARGET_IS_DS390)) &&
       options.stackAuto == 0)
     ok = 0;
 
@@ -1519,7 +1519,7 @@ geniCodeRValue (operand * op, bool force)
 
   if (IS_SPEC (type) &&
       IS_TRUE_SYMOP (op) &&
-      (!IN_FARSPACE (SPEC_OCLS (etype)) || IS_DS390_PORT))
+      (!IN_FARSPACE (SPEC_OCLS (etype)) || TARGET_IS_DS390))
     {
       op = operandFromOperand (op);
       op->isaddr = 0;
@@ -1678,19 +1678,11 @@ geniCodeMultiply (operand * left, operand * right, bool ptrSizeCalculation,
     }
   else {
 	  resType = usualBinaryConversions (&left, &right);
-	  /*     if (IS_DS390_PORT) { */
-	  /* jwk char*char=int
-	     Now be can use the 16bit result of "mul a,b" instead of explicit
-	     casts and support function calls as with --ansiint
-	  */
-	  /*       if ((IS_CHAR(letype) || IS_SHORT(letype)) &&  */
-	  /* 	   (IS_CHAR(retype) || IS_SHORT(retype))) { */
 	  if (resultIsInt) {
 		  SPEC_NOUN(getSpec(resType))=V_INT;
 		  SPEC_SHORT(getSpec(resType))=0;
 	  }
   }
-/*   } */
 
   /* if the right is a literal & power of 2 */
   /* then make it a left shift              */
@@ -2794,7 +2786,7 @@ geniCodeReceive (value * args)
 
 	      if (IN_FARSPACE (SPEC_OCLS (sym->etype)) &&
 		  options.stackAuto == 0 &&
-		  !IS_DS390_PORT)
+		  !TARGET_IS_DS390)
 		{
 		}
 	      else

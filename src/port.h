@@ -5,9 +5,33 @@
 #ifndef PORT_INCLUDE
 #define PORT_INCLUDE
 
+#define TARGET_ID_MCS51    1
+#define TARGET_ID_GBZ80    2
+#define TARGET_ID_Z80      3
+#define TARGET_ID_AVR      4
+#define TARGET_ID_DS390    5
+#define TARGET_ID_PIC      6
+#define TARGET_ID_I186     7
+#define TARGET_ID_TLCS900H 8
+#define TARGET_ID_XA51     9
+
+/* Macro to test the target we are compiling for.
+   Can only be used after SDCCmain has defined the port
+*/
+#define TARGET_IS_MCS51 (port->id==TARGET_ID_MCS51)
+#define TARGET_IS_GBZ80 (port->id==TARGET_ID_GBZ80)
+#define TARGET_IS_Z80 (port->id==TARGET_ID_Z80)
+#define TARGET_IS_AVR (port->id==TARGET_ID_AVR)
+#define TARGET_IS_DS390 (port->id==TARGET_ID_DS390)
+#define TARGET_IS_PIC   (port->id==TARGET_ID_PIC)
+#define TARGET_IS_I186 (port->id==TARGET_ID_I186)
+#define TARGET_IS_TCLS900H (port->id==TARGET_ID_TCLS900H)
+
 /* Processor specific names */
 typedef struct
   {
+/** Unique id for this target */
+    const int id;
 /** Target name used for -m */
     const char *target;
 
@@ -16,7 +40,7 @@ typedef struct
 
     struct
       {
-	/** TRUE if all types of glue functions should be inseted into
+	/** TRUE if all types of glue functions should be inserted into
 	    the file that also defines main.
 	    We dont want this in cases like the z80 where the startup
 	    code is provided by a seperate module.
@@ -134,7 +158,7 @@ typedef struct
     const char *fun_prefix;
 
     /** Called once the processor target has been selected.
-	First chance to initalise and set any port specific varibles.
+	First chance to initalise and set any port specific variables.
 	'port' is set before calling this.  May be NULL.
     */
     void (*init) (void);
@@ -211,7 +235,7 @@ extern PORT avr_port;
 extern PORT ds390_port;
 #endif
 #if !OPT_DISABLE_PIC
-extern PORT pic14_port;
+extern PORT pic_port;
 #endif
 #if !OPT_DISABLE_I186
 extern PORT i186_port;
@@ -219,15 +243,5 @@ extern PORT i186_port;
 #if !OPT_DISABLE_TLCS900H
 extern PORT tlcs900h_port;
 #endif
-
-/* Test to see if we are current compiling in what? port. */
-#define IS_MCS51_PORT (port == &mcs51_port)
-#define IS_GBZ80_PORT (port == &gbz80_port)
-#define IS_Z80_PORT (port == &z80_port)
-#define IS_AVR_PORT (port == &avr_port)
-#define IS_DS390_PORT (port == &ds390_port)
-#define IS_PIC14_PORT (port == &pic14_port)
-#define IS_I186_PORT (port == &i186_port)
-#define IS_TCLS900H_PORT (port == &tlcs900h_port)
 
 #endif PORT_INCLUDE

@@ -198,6 +198,7 @@ static const char *_asmCmd[] =
 /* Globals */
 PORT ds390_port =
 {
+  TARGET_ID_DS390,
   "ds390",
   "DS80C390",			/* Target name */
   {

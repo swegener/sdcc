@@ -29,22 +29,35 @@ unsigned int _muluint (unsigned int a, unsigned int b)
 {
   a*b; // hush the compiler
 
-  // muluint=(int)(lsb_a*lsb_b) + (char)(msb_a*msb_b)<<8
-  //          ^^^
+  /* muluint=
+      (int)(lsb_a*lsb_b) +
+      (char)(msb_a*lsb_b)<<8 +
+      (char)(lsb_a*msb_b)<<8
+  */
 
   _asm 
-    push dph ; msb_a
-    mov b,dpl ; lsb_a
+    mov r2,dph ; msb_a
+    mov r3,dpl ; lsb_a
+
+    mov b,r3 ; lsb_a
     mov dptr,#__muluint_PARM_2
     movx a,@dptr ; lsb_b
-    mul ab
+    mul ab ; lsb_a*lsb_b
     mov r0,a
     mov r1,b
-    pop b ; msb_a
+
+    mov b,r2 ; msb_a
+    movx a,@dptr ; lsb_b
+    mul ab ; msb_a*lsb_b
+    add a,r1
+    mov r1,a
+
+    mov b,r3 ; lsb_a
     inc dptr
     movx a,@dptr ; msb_b
-    mul ab
+    mul ab ; lsb_a*msb_b
     add a,r1
+
     mov dph,a
     mov dpl,r0
     ret

@@ -1,3 +1,8 @@
+2004-02-11 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* gen.c (genInline): reverted to old code for assemnling inline
+	code because of bug reported James Chadd
+
 2004-02-10 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* ralloc.h: missing declarations from previous patch,

@@ -6350,7 +6350,11 @@ static void genInline (iCode *ic)
             *bp++ = '\0';
 
 	    if(*bp1)
-	      pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir(bp1, NULL));	//pic16_AssembleLine(bp1, 0));
+#if 0
+		pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir(bp1, NULL));
+#else
+		pic16_addpCode2pBlock(pb, pic16_AssembleLine(bp1, 0));
+#endif
 	      				// inline directly, no process
             bp1 = bp;
         } else {

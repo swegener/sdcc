@@ -1076,12 +1076,8 @@ setgbl()
  *	the assembler on an open error.
  *
  *	local variables:
- *		int	c		character value
  *		char	fb[]		constructed file specification string
  *		FILE *	fp		filehandle for opened file
- *		char *	p1		pointer to filespec string fn
- *		char *	p2		pointer to filespec string fb
- *		char *	p3		pointer to filetype string ft
  *
  *	global variables:
  *		int	lkerr		error flag
@@ -1099,36 +1095,35 @@ afile(fn, ft, wf)
 char *fn;
 char *ft;
 {
-	register char *p1, *p2, *p3;
-	register int c;
 	FILE *fp;
 	char fb[PATH_MAX];
 	char *omode = (wf ? (wf == 2 ? "a" : "w") : "r");
+	int i;
 
-	p1 = fn;
-	p2 = fb;
-	p3 = ft;
-	while ((c = *p1++) != 0 && c != FSEPX) {
-		if (p2 < &fb[PATH_MAX-4])
-			*p2++ = c;
+	/*Look backward the name path and get rid of the extension, if any*/
+	i=strlen(fn);
+	for(; (fn[i]!='.')&&(fn[i]!='\\')&&(fn[i]!='/')&&(i>=0); i--);
+	if( (fn[i]=='.') && strcmp(ft, "lnk") )
+	{
+		strncpy(fb, fn, i);
+		fb[i]=0;
 	}
-	*p2++ = FSEPX;
-	if (*p3 == 0) {
-		if (c == FSEPX) {
-			p3 = p1;
-		} else {
-			p3 = "rel";
-		}
+	else
+	{
+		strcpy(fb, fn);
 	}
-	while ((c = *p3++) != 0) {
-		if (p2 < &fb[PATH_MAX-1])
-			*p2++ = c;
-	}
-	*p2++ = 0;	
-	if ((fp = fopen(fb, omode)) == NULL) {
-	    if (strcmp(ft,"adb")) {
-		fprintf(stderr, "%s: cannot %s.\n", fb, wf?"create":"open");
-		lkerr++;
+
+	/*Add the extension*/
+	strcat(fb, ".");
+	strcat(fb, strlen(ft)?ft:"rel");
+	
+	fp = fopen(fb, omode);
+	if (fp==NULL)
+	{
+	    if (strcmp(ft,"adb"))/*Do not complaint for optional adb files*/
+		{
+			fprintf(stderr, "%s: cannot %s.\n", fb, wf?"create":"open");
+			lkerr++;
 	    }
 	}
 	return (fp);

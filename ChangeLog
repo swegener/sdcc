@@ -1,3 +1,7 @@
+2003-07-03  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+	* as/mcs51/lkmain.c: properly handle extensions in function afile.
+
 2003-07-02  Borut Razem <borut.razem@siol.net>
 
 	* src/port.h, src/SDCCmain.c, src/pic/glue.h, src/pic/main.c,
@@ -21,7 +25,7 @@
 
 2003-06-20  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
-	* as/mcs51/aomf51.c: Make sure the size of the last procedure is correct.
+	* as/mcs51/lkaomf51.c: Make sure the size of the last procedure is correct.
 
 2003-06-19  Borut Razem <borut.razem@siol.net>
 

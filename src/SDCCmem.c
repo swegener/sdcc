@@ -89,7 +89,7 @@ void initMem ()
 		   DEBUG-NAME     -   'A'
 		   POINTER-TYPE   -   FPOINTER
 	*/
-	xstack	  = allocMap (0, 1, 1, 0, 0, 0, options.xstack_loc, XSTACK_NAME,'A',FPOINTER);
+	xstack	  = allocMap (0, 1, 1, 0, 0, 0, options.xstack_loc, XSTACK_NAME,'A',PPOINTER);
 
 	/* internal stack segment ;   
 	           SFRSPACE       -   NO

@@ -1763,7 +1763,10 @@ ast *decorateType (ast *tree)
 		    if (SPEC_SCLS(tree->left->etype) == S_IDATA)
 			DCL_TYPE(p) = IPOINTER ;
 		    else
-			DCL_TYPE(p) = POINTER ;
+			if (SPEC_SCLS(tree->left->etype) == S_FLASH)
+			    DCL_TYPE(p) = FLPOINTER ;
+			else
+			    DCL_TYPE(p) = POINTER ;
 
 	if (IS_AST_SYM_VALUE(tree->left)) {
 	    AST_SYMBOL(tree->left)->addrtaken = 1;

@@ -236,21 +236,24 @@ static asmop *newAsmop (short type)
 static int pointerCode (link *etype)
 {
     int p_type;
-    if (SPEC_OCLS(etype)->codesp ) {
-	p_type = CPOINTER ;	
-    }
-    else
-	if (SPEC_OCLS(etype)->fmap && !SPEC_OCLS(etype)->paged)
-	    p_type = FPOINTER ;
-	else
-	    if (SPEC_OCLS(etype)->fmap && SPEC_OCLS(etype)->paged)
-		p_type = PPOINTER;
-	    else
-		if (SPEC_OCLS(etype) == idata )
-		    p_type = IPOINTER;
-		else
-		    p_type = POINTER ;
-    return p_type;
+
+    return PTR_TYPE(SPEC_OCLS(etype));
+
+/*     if (SPEC_OCLS(etype)->codesp ) { */
+/* 	p_type = CPOINTER ;	 */
+/*     } */
+/*     else */
+/* 	if (SPEC_OCLS(etype)->fmap && !SPEC_OCLS(etype)->paged) */
+/* 	    p_type = FPOINTER ; */
+/* 	else */
+/* 	    if (SPEC_OCLS(etype)->fmap && SPEC_OCLS(etype)->paged) */
+/* 		p_type = PPOINTER; */
+/* 	    else */
+/* 		if (SPEC_OCLS(etype) == idata ) */
+/* 		    p_type = IPOINTER; */
+/* 		else */
+/* 		    p_type = POINTER ; */
+/*     return p_type; */
 }
 
 /*-----------------------------------------------------------------*/
@@ -6134,22 +6137,23 @@ static void genPointerGet (iCode *ic)
     if (IS_PTR(type) && !IS_FUNC(type->next)) 
         p_type = DCL_TYPE(type);
     else {
-
 	/* we have to go by the storage class */
-	if (SPEC_OCLS(etype)->codesp ) {
-	    p_type = CPOINTER ;	
-	}
-	else
-	    if (SPEC_OCLS(etype)->fmap && !SPEC_OCLS(etype)->paged)
-		p_type = FPOINTER ;
-	    else
-		if (SPEC_OCLS(etype)->fmap && SPEC_OCLS(etype)->paged)
-		    p_type = PPOINTER;
-		else
-		    if (SPEC_OCLS(etype) == idata )
-			p_type = IPOINTER;
-		    else
-			p_type = POINTER ;
+	p_type = PTR_TYPE(SPEC_OCLS(etype));
+
+/* 	if (SPEC_OCLS(etype)->codesp ) { */
+/* 	    p_type = CPOINTER ;	 */
+/* 	} */
+/* 	else */
+/* 	    if (SPEC_OCLS(etype)->fmap && !SPEC_OCLS(etype)->paged) */
+/* 		p_type = FPOINTER ; */
+/* 	    else */
+/* 		if (SPEC_OCLS(etype)->fmap && SPEC_OCLS(etype)->paged) */
+/* 		    p_type = PPOINTER; */
+/* 		else */
+/* 		    if (SPEC_OCLS(etype) == idata ) */
+/* 			p_type = IPOINTER; */
+/* 		    else */
+/* 			p_type = POINTER ; */
     }
 
     /* now that we have the pointer type we assign
@@ -6657,22 +6661,23 @@ static void genPointerSet (iCode *ic)
         p_type = DCL_TYPE(type);
     }
     else {
-
 	/* we have to go by the storage class */
-	if (SPEC_OCLS(etype)->codesp ) {
-	    p_type = CPOINTER ;	
-	}
-	else
-	    if (SPEC_OCLS(etype)->fmap && !SPEC_OCLS(etype)->paged)
-		p_type = FPOINTER ;
-	    else
-		if (SPEC_OCLS(etype)->fmap && SPEC_OCLS(etype)->paged)
-		    p_type = PPOINTER ;
-		else
-		    if (SPEC_OCLS(etype) == idata )
-			p_type = IPOINTER ;
-		    else
-			p_type = POINTER ;
+	p_type = PTR_TYPE(SPEC_OCLS(etype));
+
+/* 	if (SPEC_OCLS(etype)->codesp ) { */
+/* 	    p_type = CPOINTER ;	 */
+/* 	} */
+/* 	else */
+/* 	    if (SPEC_OCLS(etype)->fmap && !SPEC_OCLS(etype)->paged) */
+/* 		p_type = FPOINTER ; */
+/* 	    else */
+/* 		if (SPEC_OCLS(etype)->fmap && SPEC_OCLS(etype)->paged) */
+/* 		    p_type = PPOINTER ; */
+/* 		else */
+/* 		    if (SPEC_OCLS(etype) == idata ) */
+/* 			p_type = IPOINTER ; */
+/* 		    else */
+/* 			p_type = POINTER ; */
     }
 
     /* now that we have the pointer type we assign
@@ -7006,60 +7011,62 @@ static void genCast (iCode *ic)
 
 	/* pointer to generic pointer */
 	if (IS_GENPTR(ctype)) {
-		char *l = zero;
+	    char *l = zero;
+	    
+	    if (IS_PTR(type)) 
+		p_type = DCL_TYPE(type);
+	    else {
+		/* we have to go by the storage class */
+		p_type = PTR_TYPE(SPEC_OCLS(etype));
 
-		if (IS_PTR(type)) 
-			p_type = DCL_TYPE(type);
-		else {
-			/* we have to go by the storage class */
-			if (SPEC_OCLS(etype)->codesp ) 
-				p_type = CPOINTER ;	
-			else
-				if (SPEC_OCLS(etype)->fmap && !SPEC_OCLS(etype)->paged)
-					p_type = FPOINTER ;
-				else
-					if (SPEC_OCLS(etype)->fmap && SPEC_OCLS(etype)->paged)
-						p_type = PPOINTER;
-					else
-						if (SPEC_OCLS(etype) == idata )
-							p_type = IPOINTER ;
-						else
-							p_type = POINTER ;
-		}
+/* 		if (SPEC_OCLS(etype)->codesp )  */
+/* 		    p_type = CPOINTER ;	 */
+/* 		else */
+/* 		    if (SPEC_OCLS(etype)->fmap && !SPEC_OCLS(etype)->paged) */
+/* 			p_type = FPOINTER ; */
+/* 		    else */
+/* 			if (SPEC_OCLS(etype)->fmap && SPEC_OCLS(etype)->paged) */
+/* 			    p_type = PPOINTER; */
+/* 			else */
+/* 			    if (SPEC_OCLS(etype) == idata ) */
+/* 				p_type = IPOINTER ; */
+/* 			    else */
+/* 				p_type = POINTER ; */
+	    }
 		
-		/* the first two bytes are known */
-		size = GPTRSIZE - 1; 
-		offset = 0 ;
-		while (size--) {
-			aopPut(AOP(result),
-			       aopGet(AOP(right),offset,FALSE,FALSE),
-			       offset);
-			offset++;
-		}
-		/* the last byte depending on type */
-		switch (p_type) {
-		case IPOINTER:
-		case POINTER:
-			l = zero;
-			break;
-		case FPOINTER:
-			l = one;
-			break;
-		case CPOINTER:
-			l = "#0x02";
-			break;				
-		case PPOINTER:
-			l = "#0x03";
-			break;
-			
-		default:
-			/* this should never happen */
-			werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
-			       "got unknown pointer type");
-			exit(1);
-		}
-		aopPut(AOP(result),l, GPTRSIZE - 1);	    
-		goto release ;
+	    /* the first two bytes are known */
+	    size = GPTRSIZE - 1; 
+	    offset = 0 ;
+	    while (size--) {
+		aopPut(AOP(result),
+		       aopGet(AOP(right),offset,FALSE,FALSE),
+		       offset);
+		offset++;
+	    }
+	    /* the last byte depending on type */
+	    switch (p_type) {
+	    case IPOINTER:
+	    case POINTER:
+		l = zero;
+		break;
+	    case FPOINTER:
+		l = one;
+		break;
+	    case CPOINTER:
+		l = "#0x02";
+		break;				
+	    case PPOINTER:
+		l = "#0x03";
+		break;
+		
+	    default:
+		/* this should never happen */
+		werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
+		       "got unknown pointer type");
+		exit(1);
+	    }
+	    aopPut(AOP(result),l, GPTRSIZE - 1);	    
+	    goto release ;
 	}
 	
 	/* just copy the pointers */

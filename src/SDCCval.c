@@ -1198,7 +1198,7 @@ value *valForArray (ast *arrExpr)
     sprintf(val->name,"(%s + %d)",buffer,
 	    (int)AST_LIT_VALUE(arrExpr->right)*size);    
     
-    val->type = newLink();
+    val->type = newLink();    
     if (SPEC_SCLS(arrExpr->left->etype) == S_CODE) {
 	DCL_TYPE(val->type) = CPOINTER ;
 	DCL_PTR_CONST(val->type) = 1;
@@ -1213,7 +1213,10 @@ value *valForArray (ast *arrExpr)
 		if (SPEC_SCLS(arrExpr->left->etype) == S_IDATA)
 		    DCL_TYPE(val->type) = IPOINTER ;
 		else
-		    DCL_TYPE(val->type) = POINTER ;
+		    if (SPEC_SCLS(arrExpr->left->etype) == S_FLASH)
+			DCL_TYPE(val->type) = FLPOINTER ;
+		    else
+			DCL_TYPE(val->type) = POINTER ;
     val->type->next = arrExpr->left->ftype;
     val->etype = getSpec(val->type);
     return val;
@@ -1279,7 +1282,10 @@ value *valForStructElem(ast *structT, ast *elemT)
 		if (SPEC_SCLS(structT->etype) == S_IDATA)
 		    DCL_TYPE(val->type) = IPOINTER ;
 		else
-		    DCL_TYPE(val->type) = POINTER ;
+		    if (SPEC_SCLS(structT->etype) == S_FLASH)
+			DCL_TYPE(val->type) = FLPOINTER ;
+		    else
+			DCL_TYPE(val->type) = POINTER ;
     val->type->next = sym->type;
     val->etype = getSpec(val->type);
     return val; 

@@ -1653,24 +1653,27 @@ link *aggrToPtr ( link *type, bool force)
 
     ptype->next = type;
     /* if the output class is generic */
-    if (SPEC_OCLS(etype) == generic)
-	DCL_TYPE(ptype) = GPOINTER;
-    else
-	if (SPEC_OCLS(etype)->codesp ) {
-	    DCL_TYPE(ptype) = CPOINTER ;
-	    DCL_PTR_CONST(ptype) = 1;
-	}
-	else
-	    if (SPEC_OCLS(etype)->fmap && !SPEC_OCLS(etype)->paged)
-		DCL_TYPE(ptype) = FPOINTER ;
-	    else
-		if (SPEC_OCLS(etype)->fmap && SPEC_OCLS(etype)->paged)
-		    DCL_TYPE(ptype) = PPOINTER ;
-		else
-		    if (SPEC_OCLS(etype) == idata)
-			DCL_TYPE(ptype) = IPOINTER;
-		    else
-			DCL_TYPE(ptype) = POINTER ;
+    if ((DCL_TYPE(ptype) = PTR_TYPE(SPEC_OCLS(etype))) == CPOINTER)
+	DCL_PTR_CONST(ptype) = 1;
+
+/*     if (SPEC_OCLS(etype) == generic) */
+/* 	DCL_TYPE(ptype) = GPOINTER; */
+/*     else */
+/* 	if (SPEC_OCLS(etype)->codesp ) { */
+/* 	    DCL_TYPE(ptype) = CPOINTER ; */
+/* 	    DCL_PTR_CONST(ptype) = 1; */
+/* 	} */
+/* 	else */
+/* 	    if (SPEC_OCLS(etype)->fmap && !SPEC_OCLS(etype)->paged) */
+/* 		DCL_TYPE(ptype) = FPOINTER ; */
+/* 	    else */
+/* 		if (SPEC_OCLS(etype)->fmap && SPEC_OCLS(etype)->paged) */
+/* 		    DCL_TYPE(ptype) = PPOINTER ; */
+/* 		else */
+/* 		    if (SPEC_OCLS(etype) == idata) */
+/* 			DCL_TYPE(ptype) = IPOINTER; */
+/* 		    else */
+/* 			DCL_TYPE(ptype) = POINTER ; */
     
     /* if the variable was declared a constant */
     /* then the pointer points to a constant */
@@ -1691,22 +1694,25 @@ operand *geniCodeArray2Ptr (operand *op)
     link *optype = operandType(op);
     link *opetype = getSpec(optype);
     
-    /* set the pointer depending on the storage class */
-    if (SPEC_OCLS(opetype)->codesp ) {
-	DCL_TYPE(optype) = CPOINTER ;
+    if ((DCL_TYPE(optype) = PTR_TYPE(SPEC_OCLS(opetype))) == CPOINTER)
 	DCL_PTR_CONST(optype) = 1;
-    }
-    else
-	if (SPEC_OCLS(opetype)->fmap && !SPEC_OCLS(opetype)->paged)
-	    DCL_TYPE(optype) = FPOINTER ;
-	else
-	    if (SPEC_OCLS(opetype)->fmap && SPEC_OCLS(opetype)->paged)
-		DCL_TYPE(optype) = PPOINTER ;
-	    else
-		if (SPEC_OCLS(opetype) == idata)
-		    DCL_TYPE(optype) = IPOINTER;
-		else
-		    DCL_TYPE(optype) = POINTER ;
+
+    /* set the pointer depending on the storage class */
+/*     if (SPEC_OCLS(opetype)->codesp ) { */
+/* 	DCL_TYPE(optype) = CPOINTER ; */
+/* 	DCL_PTR_CONST(optype) = 1; */
+/*     } */
+/*     else */
+/* 	if (SPEC_OCLS(opetype)->fmap && !SPEC_OCLS(opetype)->paged) */
+/* 	    DCL_TYPE(optype) = FPOINTER ; */
+/* 	else */
+/* 	    if (SPEC_OCLS(opetype)->fmap && SPEC_OCLS(opetype)->paged) */
+/* 		DCL_TYPE(optype) = PPOINTER ; */
+/* 	    else */
+/* 		if (SPEC_OCLS(opetype) == idata) */
+/* 		    DCL_TYPE(optype) = IPOINTER; */
+/* 		else */
+/* 		    DCL_TYPE(optype) = POINTER ; */
     
     /* if the variable was declared a constant */
     /* then the pointer points to a constant */
@@ -1975,26 +1981,30 @@ operand *geniCodeAddressOf (operand *op)
     
     p = newLink();
     p->class = DECLARATOR ;
-    /* set the pointer depending on the storage class */
-    if (SPEC_OCLS(opetype)->codesp ) {
-	DCL_TYPE(p) = CPOINTER ;
+    
+    if ((DCL_TYPE(p) = PTR_TYPE(SPEC_OCLS(opetype))) == CPOINTER)
 	DCL_PTR_CONST(p) = 1;
-    }
-    else
-	if (SPEC_OCLS(opetype)->fmap && !SPEC_OCLS(opetype)->paged)
-	    DCL_TYPE(p) = FPOINTER ;
-	else
-	    if (SPEC_OCLS(opetype)->fmap && SPEC_OCLS(opetype)->paged)
-		DCL_TYPE(p) = PPOINTER ;
-	    else
-		if (SPEC_OCLS(opetype) == idata)
-		    DCL_TYPE(p) = IPOINTER;
-		else
-		    if (SPEC_OCLS(opetype) == data ||
-			SPEC_OCLS(opetype) == overlay)
-			DCL_TYPE(p) = POINTER ;
-		    else
-			DCL_TYPE(p) = GPOINTER;
+
+    /* set the pointer depending on the storage class */
+/*     if (SPEC_OCLS(opetype)->codesp ) { */
+/* 	DCL_TYPE(p) = CPOINTER ; */
+/* 	DCL_PTR_CONST(p) = 1; */
+/*     } */
+/*     else */
+/* 	if (SPEC_OCLS(opetype)->fmap && !SPEC_OCLS(opetype)->paged) */
+/* 	    DCL_TYPE(p) = FPOINTER ; */
+/* 	else */
+/* 	    if (SPEC_OCLS(opetype)->fmap && SPEC_OCLS(opetype)->paged) */
+/* 		DCL_TYPE(p) = PPOINTER ; */
+/* 	    else */
+/* 		if (SPEC_OCLS(opetype) == idata) */
+/* 		    DCL_TYPE(p) = IPOINTER; */
+/* 		else */
+/* 		    if (SPEC_OCLS(opetype) == data || */
+/* 			SPEC_OCLS(opetype) == overlay) */
+/* 			DCL_TYPE(p) = POINTER ; */
+/* 		    else */
+/* 			DCL_TYPE(p) = GPOINTER; */
     
     /* make sure we preserve the const & volatile */
     if (IS_CONSTANT(opetype)) 

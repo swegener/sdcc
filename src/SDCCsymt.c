@@ -296,6 +296,9 @@ void pointerTypes (link *ptr, link *type)
 	    DCL_PTR_CONST(ptr) = 1;
 	    DCL_TYPE(ptr) = CPOINTER ;
 	    break;
+	case S_FLASH:
+	    DCL_TYPE(ptr) = FLPOINTER;
+	    break;
 	default:
 	    DCL_TYPE(ptr) = GPOINTER;
 	    break;
@@ -564,10 +567,11 @@ unsigned int   getSize ( link *p )
     case PPOINTER:
     case POINTER:
 	return ( PTRSIZE ) ;
+    case FLPOINTER:
     case FPOINTER:
     case CPOINTER:
 	return ( FPTRSIZE );
-    case GPOINTER:
+    case GPOINTER:	
 	return ( GPTRSIZE );
 	
     default     :
@@ -618,6 +622,7 @@ unsigned int   bitsForType ( link *p )
     case PPOINTER:
     case POINTER:
 	return ( PTRSIZE * 8) ;
+    case FLPOINTER:
     case FPOINTER:
     case CPOINTER:
 	return ( FPTRSIZE * 8);
@@ -1439,6 +1444,9 @@ void  processFuncArgs   (symbol *func, int ignoreName)
 	    case S_XDATA:
 		DCL_TYPE(val->type) = FPOINTER;
 		break;
+	    case S_FLASH:
+		DCL_TYPE(val->type) = FLPOINTER;
+		break;
 	    default :
 		DCL_TYPE(val->type) = GPOINTER;
 	    }
@@ -1548,6 +1556,12 @@ void printTypeChain (link *type, FILE *of)
 		if (DCL_PTR_CONST(type))
 		    fprintf(of,"const ");
 		break;
+	    case FLPOINTER:
+		fprintf (of,"_flash * ");
+		if (DCL_PTR_CONST(type))
+		    fprintf(of,"const ");
+		break;
+		
 	    case POINTER:
 		fprintf (of,"_near * ");
 		if (DCL_PTR_CONST(type))
@@ -1650,6 +1664,9 @@ void cdbTypeInfo (link *type,FILE *of)
 		break;
 	    case PPOINTER:
 		fprintf (of,"DP,");
+		break;
+	    case FLPOINTER:
+		fprintf (of,"DA,");
 		break;
 	    case ARRAY :
 		fprintf (of,"DA%d,",DCL_ELEM(type));

@@ -278,6 +278,7 @@ typedef struct symbol {
 			             DCL_TYPE(x) == GPOINTER   ||    \
 			             DCL_TYPE(x) == IPOINTER   ||    \
 			             DCL_TYPE(x) == PPOINTER   ||    \
+			             DCL_TYPE(x) == FLPOINTER  ||    \
                                      DCL_TYPE(x) == CPOINTER   ||    \
                                      DCL_TYPE(x) == UPOINTER  ))
 #define IS_PTR_CONST(x) (IS_PTR(x) && DCL_PTR_CONST(x))

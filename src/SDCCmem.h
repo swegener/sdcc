@@ -63,6 +63,8 @@ extern   struct  set     *ovrSetSets;
 #define IN_DIRSPACE(map)        (map && map->direct)
 #define IN_PAGEDSPACE(map)      (map && map->paged )
 #define IN_CODESPACE(map)       (map && map->codesp)
+#define PTR_TYPE(map)           (map ? (map->ptrType ? map->ptrType : POINTER)\
+                                     : GPOINTER)
 
 /* forward decls for functions    */
 memmap     *allocMap       (char,char,char,char,char,char,unsigned, const char *,char,int );

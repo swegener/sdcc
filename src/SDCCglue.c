@@ -226,7 +226,10 @@ value *initPointer (initList *ilist)
 			if (SPEC_SCLS(expr->left->etype) == S_IDATA)
 			    DCL_TYPE(val->type) = IPOINTER ;
 			else
-			    DCL_TYPE(val->type) = POINTER ;
+			    if (SPEC_SCLS(expr->left->etype) == S_FLASH)
+				DCL_TYPE(val->type) = FLPOINTER ;
+			    else
+				DCL_TYPE(val->type) = POINTER ;
 	    val->type->next = expr->left->ftype;
 	    val->etype = getSpec(val->type);
 	    return val;

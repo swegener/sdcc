@@ -49,6 +49,7 @@ typedef enum
 OPTYPE;
 
 #define IS_SYMOP(op) (op && op->type == SYMBOL)
+#define IS_VALOP(op) (op && op->type == VALUE)
 #define ADDTOCHAIN(x) addSetHead(&iCodeChain,x)
 
 #define LRFTYPE       sym_link *ltype = operandType(left), \

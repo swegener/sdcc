@@ -2400,7 +2400,7 @@ geniCodeLogic (operand * left, operand * right, int op)
 
   /* left is integral type and right is literal then
      check if the literal value is within bounds */
-  if (IS_INTEGRAL (ltype) && IS_LITERAL (rtype))
+  if (IS_INTEGRAL (ltype) && IS_VALOP (right) && IS_LITERAL (rtype))
     {
       int nbits = bitsForType (ltype);
       long v = (long) operandLitValue (right);

@@ -559,6 +559,7 @@ funcOfType (char *name, sym_link * type, sym_link * argType,
 	{
 	  args->type = copyLinkChain (argType);
 	  args->etype = getSpec (args->type);
+	  SPEC_EXTR(args->etype)=1;
 	  if (!nArgs)
 	    break;
 	  args = args->next = newValue ();

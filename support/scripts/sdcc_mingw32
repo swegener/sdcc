@@ -16,7 +16,6 @@ lib_dir_suffix=lib \
 sdccconf_h_dir_separator=\\\\ \
 --disable-device-lib-build \
 --disable-ucsim \
---program-suffix=.exe \
 --host=i586-mingw32msvc --build=unknown-unknown-linux-gnu"
 
 ./configure $SDCCCONFIGUREFLAGS

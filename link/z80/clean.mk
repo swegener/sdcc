@@ -1,9 +1,13 @@
 # Deleting all files created by building the program
 # --------------------------------------------------
+PRJDIR = ../..
+include $(PRJDIR)/Makefile.common
+
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f $(PRJDIR)/link-z80 link-z80
+	rm -f $(PRJDIR)/bin/link-z80$(EXEEXT) link-z80$(EXEEXT) \
+	      $(PRJDIR)/bin/link-gbz80$(EXEEXT) link-gbz80$(EXEEXT)
 	rm -f *.dep
 	rm -rf obj
 

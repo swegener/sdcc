@@ -17,6 +17,8 @@ M_OR_MM         = @M_OR_MM@
 
 LIBS		= @CURSES_LIBS@ @LIBS@
 
+EXEEXT          = @EXEEXT@
+
 curses_ok	= @curses_ok@
 
 prefix          = @prefix@
@@ -39,7 +41,7 @@ OBJECTS		= main.o fileio.o frontend.o posix_signal.o
 all: serio.src
 
 ifeq ($(curses_ok),yes)
-serio.src: checkconf serialview
+serio.src: checkconf serialview$(EXEEXT)
 else
 serio.src: checkconf
 endif
@@ -48,13 +50,13 @@ endif
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) -s serialview $(bindir)
+	$(INSTALL) -s serialview$(EXEEXT) $(bindir)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(bindir)/serialview
+	rm -f $(bindir)/serialview$(EXEEXT)
 
 
 # Performing self-test
@@ -88,7 +90,7 @@ include clean.mk
 
 # My rules
 # --------
-serialview: $(OBJECTS)
+serialview$(EXEEXT): $(OBJECTS)
 	$(CXX) -o $@ $(LDFLAGS) $(OBJECTS) $(LIBS)
 
 .cc.o:

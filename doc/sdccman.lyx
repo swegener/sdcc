@@ -1063,19 +1063,6 @@ lib
 
 \layout LyX-Code
 
-  ---program-suffix=
-\begin_inset Quotes srd
-\end_inset 
-
-.exe
-\begin_inset Quotes srd
-\end_inset 
-
- 
-\backslash 
-
-\layout LyX-Code
-
   ---host=i586-mingw32msvc ---build=unknown-unknown-linux-gnu
 \layout Standard
 

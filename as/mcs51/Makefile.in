@@ -27,6 +27,8 @@ man1dir         = $(mandir)/man1
 man2dir         = $(mandir)/man2
 infodir         = @info@
 
+EXEEXT          = @EXEEXT@
+
 CPPFLAGS	= @CPPFLAGS@ -I. -I$(PRJDIR)
 CFLAGS		= @CFLAGS@ -Wall
 M_OR_MM		= @M_OR_MM@
@@ -43,8 +45,8 @@ LKOBJECTS	= lkmain.o lkhead.o lkarea.o lkdata.o \
 		  lkstore.o lknoice.o lkmem.o lkaomf51.o strcmpi.o
 LKSOURCES	= $(patsubst %.o,%.c,$(LKOBJECTS))
 
-ASX8051		= $(PRJDIR)/bin/asx8051
-ASLINK		= $(PRJDIR)/bin/aslink
+ASX8051		= $(PRJDIR)/bin/asx8051$(EXEEXT)
+ASLINK		= $(PRJDIR)/bin/aslink$(EXEEXT)
 
 transform       = @program_transform_name@
 
@@ -61,15 +63,15 @@ $(ASLINK): $(LKOBJECTS)
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) $(ASX8051) `echo $(bindir)/asx8051|sed '$(transform)'`
-	$(STRIP) `echo $(bindir)/asx8051|sed '$(transform)'`
-	$(INSTALL) $(ASLINK) `echo $(bindir)/aslink|sed '$(transform)'`
-	$(STRIP) `echo $(bindir)/aslink|sed '$(transform)'`
+	$(INSTALL) $(ASX8051) `echo $(bindir)/asx8051$(EXEEXT)|sed '$(transform)'`
+	$(STRIP) `echo $(bindir)/asx8051$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(ASLINK) `echo $(bindir)/aslink$(EXEEXT)|sed '$(transform)'`
+	$(STRIP) `echo $(bindir)/aslink$(EXEEXT)|sed '$(transform)'`
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(bindir)/asx8051 $(bindir)/aslink
+	rm -f $(bindir)/asx8051$(EXEEXT) $(bindir)/aslink$(EXEEXT)
 
 
 # Performing self-test

@@ -5,7 +5,7 @@ PRJDIR = ../..
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f $(PRJDIR)/bin/sdcpp
+	rm -f $(PRJDIR)/bin/sdcpp$(EXEEXT)
 
 
 # Deleting all files created by configuring or building the program

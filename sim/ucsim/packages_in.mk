@@ -1,3 +1,5 @@
+EXEEXT          = @EXEEXT@
+
 enable_51	= @enable_51@
 enable_avr	= @enable_avr@
 enable_z80	= @enable_z80@

@@ -26,6 +26,8 @@ CFLAGS          = @CFLAGS@ -I$(PRJDIR) -Wall
 CXXFLAGS        = @CXXFLAGS@ -I$(PRJDIR) -Wall
 M_OR_MM         = @M_OR_MM@
 
+EXEEXT          = @EXEEXT@
+
 LIB_LIST	= util sim cmd sim
 UCSIM_LIBS	= $(patsubst %,-l%,$(LIB_LIST))
 UCSIM_LIB_FILES	= $(patsubst %,lib%.a,$(LIB_LIST))
@@ -67,10 +69,10 @@ install: all installdirs
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(bindir)/s51
-	rm -f $(bindir)/savr
-	rm -f $(bindir)/serialview
-	rm -f $(bindir)/portmon
+	rm -f $(bindir)/s51$(EXEEXT)
+	rm -f $(bindir)/savr$(EXEEXT)
+	rm -f $(bindir)/serialview$(EXEEXT)
+	rm -f $(bindir)/portmon$(EXEEXT)
 
 
 # Performing self-test

@@ -24,6 +24,8 @@ M_OR_MM         = @M_OR_MM@
 PICOPT		= @PICOPT@
 SHAREDLIB	= @SHAREDLIB@
 
+EXEEXT          = @EXEEXT@
+
 LIBS		= @LIBS@ -L$(PRJDIR) -lsim -lutil -lsim -lcmd -lguiucsim
 DL		= @DL@
 dl_ok		= @dl_ok@
@@ -63,13 +65,13 @@ all: checkconf otherlibs avr.src
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) -s savr $(bindir)
+	$(INSTALL) -s savr$(EXEEXT) $(bindir)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(bindir)/savr
+	rm -f $(bindir)/savr$(EXEEXT)
 
 
 # Performing self-test
@@ -108,10 +110,10 @@ include clean.mk
 # --------
 .SUFFIXES: .asm .hex
 
-avr.src: savr shared_lib
+avr.src: savr$(EXEEXT) shared_lib
 
-savr: $(OBJECTS) $(PRJDIR)/*.a
-	$(CXX) $(CXXFLAGS) $(OBJECTS) $(LIBS) -o savr
+savr$(EXEEXT): $(OBJECTS) $(PRJDIR)/*.a
+	$(CXX) $(CXXFLAGS) $(OBJECTS) $(LIBS) -o $@
 
 ifeq ($(dlso_ok),yes)
 shared_lib: $(PRJDIR)/savr.so

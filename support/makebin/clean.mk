@@ -1,8 +1,10 @@
 # Deleting all files created by building the program
 # --------------------------------------------------
+PRJDIR = ../..
+
 clean:
 	rm -rf obj
-	rm -f *core *[%~] *.[oa] makebin
+	rm -f *core *[%~] *.[oa] $(PRJDIR)/bin/makebin$(EXEEXT)
 	rm -f *.[a-z]*~
 
 # Deleting all files created by configuring or building the program

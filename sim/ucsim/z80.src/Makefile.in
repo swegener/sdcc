@@ -24,6 +24,8 @@ M_OR_MM         = @M_OR_MM@
 PICOPT		= @PICOPT@
 SHAREDLIB	= @SHAREDLIB@
 
+EXEEXT          = @EXEEXT@
+
 LIBS		= @LIBS@ -L$(PRJDIR) -lutil -lsim -lutil -lcmd -lguiucsim
 DL		= @DL@
 dl_ok		= @dl_ok@
@@ -70,13 +72,13 @@ tests: $(TEST_OBJ)
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) -s sz80 $(bindir)
+	$(INSTALL) -s sz80$(EXEEXT) $(bindir)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(bindir)/sz80
+	rm -f $(bindir)/sz80$(EXEEXT)
 
 
 # Performing self-test
@@ -111,10 +113,10 @@ include clean.mk
 # --------
 .SUFFIXES: .asm .hex
 
-z80.src: sz80  shared_lib
+z80.src: sz80$(EXEEXT)  shared_lib
 
-sz80: $(OBJECTS) $(PRJDIR)/*.a
-	$(CXX) $(CXXFLAGS) -o sz80 $(OBJECTS) $(LIBS)
+sz80$(EXEEXT): $(OBJECTS) $(PRJDIR)/*.a
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
 ifeq ($(dlso_ok),yes)
 shared_lib: $(PRJDIR)/sz80.so

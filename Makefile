@@ -117,7 +117,7 @@ clean:
 	$(MAKE) -f clean.mk clean
 	@echo "+ Cleaning packages in their directories..."
 	for pkg in $(PKGS); do\
-	  $(MAKE) PORTS="$(PORTS)" -C $$pkg -f clean.mk clean ;\
+	  $(MAKE) PORTS="$(PORTS)" EXEEXT=$(EXEEXT) -C $$pkg -f clean.mk clean ;\
 	done
 
 # Deleting all files created by configuring or building the program
@@ -127,7 +127,7 @@ distclean:
 	$(MAKE) -f clean.mk distclean
 	@echo "+ DistCleaning packages using clean.mk..."
 	for pkg in $(PKGS); do\
-	  $(MAKE) -C $$pkg PORTS="$(PORTS)" -f clean.mk distclean ;\
+	  $(MAKE) -C $$pkg PORTS="$(PORTS)" EXEEXT=$(EXEEXT) -f clean.mk distclean ;\
 	done
 	for pkg in $(SDCC_EXTRA); do \
 	  $(MAKE) -C $$pkg clean; \
@@ -138,7 +138,7 @@ distclean:
 mostlyclean: clean
 	$(MAKE) -f clean.mk mostlyclean
 	for pkg in $(PKGS); do\
-	  $(MAKE) -C $$pkg -f clean.mk PORTS="$(PORTS)" mostlyclean ;\
+	  $(MAKE) -C $$pkg -f clean.mk PORTS="$(PORTS)" EXEEXT=$(EXEEXT) mostlyclean ;\
 	done
 
 
@@ -148,7 +148,7 @@ mostlyclean: clean
 realclean: distclean
 	$(MAKE) -f clean.mk realclean
 	for pkg in $(PKGS); do\
-	  $(MAKE) -C $$pkg -f clean.mk PORTS="$(PORTS)" realclean ;\
+	  $(MAKE) -C $$pkg -f clean.mk PORTS="$(PORTS)" EXEEXT=$(EXEEXT) realclean ;\
 	done
 
 

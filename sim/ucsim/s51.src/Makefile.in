@@ -45,6 +45,8 @@ man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
 
+EXEEXT          = @EXEEXT@
+
 OBJECTS_SHARED	= glob.o sim51.o \
 		  inc.o jmp.o mov.o logic.o arith.o bit.o \
 		  timer0.o timer1.o timer2.o serial.o port.o interrupt.o \
@@ -66,14 +68,13 @@ all: checkconf otherlibs s51.src
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	if test -f s51.exe; then $(INSTALL) -s s51.exe $(bindir); $(STRIP) $(bindir)/s51.exe; fi
-	if test -f s51; then $(INSTALL) -s s51 $(bindir); $(STRIP) $(bindir)/s51; fi
+	$(INSTALL) -s s51$(EXEEXT) $(bindir)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(bindir)/s51
+	rm -f $(bindir)/s51$(EXEEXT)
 
 
 # Performing self-test
@@ -114,10 +115,10 @@ include clean.mk
 # --------
 .SUFFIXES: .rel
 
-s51.src: s51 shared_lib
+s51.src: s51$(EXEEXT) shared_lib
 
-s51: $(OBJECTS) $(PRJDIR)/*.a
-	$(CXX) $(CXXFLAGS) $(OBJECTS) $(LIBS) -o s51
+s51$(EXEEXT): $(OBJECTS) $(PRJDIR)/*.a
+	$(CXX) $(CXXFLAGS) $(OBJECTS) $(LIBS) -o $@
 
 ifeq ($(dlso_ok),yes)
 shared_lib: $(PRJDIR)/s51.so
@@ -128,7 +129,7 @@ shared_lib:
 endif
 
 $(PRJDIR)/s51.so: $(OBJECTS_SHARED)
-	$(CXX) -shared $(OBJECTS_SHARED) -o $(PRJDIR)/s51.so
+	$(CXX) -shared $(OBJECTS_SHARED) -o $@
 
 otherlibs:
 	cd $(PRJDIR)/cmd.src && $(MAKE) all

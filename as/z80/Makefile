@@ -14,7 +14,7 @@ SRC	= asdata.c asexpr.c aslex.c aslist.c asmain.c asout.c \
 OBJS	= $(SRC:%.c=$(OBJDIR)/%.o)
 SLIBOBJS	= $(SLIBSRC:%.c=$(OBJDIR)/%.o) 
 
-BINS	= $(BUILDDIR)as$(EXT)
+BINS	= $(BUILDDIR)as$(EXT)$(EXEEXT)
 
 CFLAGS	+= $(CPPFLAGS) $(OPTS) -I. -DINDEXLIB -DMLH_MAP -DUNIX -DSDK
 CFLAGS	+= -funsigned-char

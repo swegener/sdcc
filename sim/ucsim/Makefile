@@ -50,9 +50,9 @@ uninstall:
 # Deleting all files created by building the program
 # --------------------------------------------------
 clean:
-	$(MAKE) -f clean.mk clean
+	$(MAKE) -f clean.mk clean EXEEXT=$(EXEEXT)
 	@for pkg in $(PKGS); do\
-	  $(MAKE) -C $$pkg -f clean.mk clean ;\
+	  $(MAKE) -C $$pkg -f clean.mk clean EXEEXT=$(EXEEXT) ;\
 	done
 
 

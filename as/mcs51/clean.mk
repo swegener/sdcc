@@ -1,9 +1,12 @@
 # Deleting all files created by building the program
 # --------------------------------------------------
+include ../../Makefile.common
+PRJDIR = ../..
+
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f $(PRJDIR)/asx8051 $(PRJDIR)/aslink asx8051 aslink
+	rm -f $(PRJDIR)/bin/asx8051$(EXEEXT) $(PRJDIR)/bin/aslink$(EXEEXT) asx8051$(EXEEXT) aslink$(EXEEXT)
 
 
 # Deleting all files created by configuring or building the program

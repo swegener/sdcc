@@ -5,7 +5,7 @@
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f serialview
+	rm -f serialview$(EXEEXT)
 
 
 # Deleting all files created by configuring or building the program

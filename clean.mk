@@ -3,7 +3,7 @@
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	-rm -f bin/*
+	find bin -type f ! -name README -exec rm {} \;
 
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------

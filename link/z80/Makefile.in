@@ -14,6 +14,8 @@ INSTALL		= @INSTALL@
 
 PRJDIR		= ../..
 
+EXEEXT          = @EXEEXT@
+
 srcdir		= @srcdir@
 prefix		= @prefix@
 exec_prefix     = @exec_prefix@
@@ -40,7 +42,7 @@ LKOBJECTS	= lkarea.o lkdata.o lkeval.o lkhead.o lkihx.o lklex.o \
 		  lkgb.o lkgg.o 
 LKSOURCES	= $(patsubst %.o,%.c,$(LKOBJECTS))
 
-LKZ80		= $(PRJDIR)/bin/link-z80
+LKZ80		= $(PRJDIR)/bin/link-z80$(EXEEXT)
 
 # Compiling entire program or any subproject
 # ------------------------------------------
@@ -52,12 +54,12 @@ $(LKZ80): $(SLIBOBJS) $(LKOBJECTS)
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) $(LKZ80) $(bindir)/link-z80
+	$(INSTALL) $(LKZ80) $(bindir)/link-z80$(EXEEXT)
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(bindir)/link-z80
+	rm -f $(bindir)/link-z80$(EXEEXT)
 
 
 # Performing self-test

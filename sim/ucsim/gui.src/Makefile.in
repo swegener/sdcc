@@ -92,9 +92,11 @@ install_gui_api:
 # Deleting all the installed files
 # --------------------------------
 uninstall: uninstall_gui_api
+ifeq ($(curses_ok),yes)
 	@for pkg in $(PKGS); do\
 	  cd $$pkg && $(MAKE) uninstall ; cd ..;\
 	done
+endif
 
 uninstall_gui_api:
 

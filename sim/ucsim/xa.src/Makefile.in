@@ -15,6 +15,8 @@ INSTALL		= @INSTALL@
 
 PRJDIR		= ..
 
+EXEEXT          = @EXEEXT@
+
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 CPPFLAGS        = @CPPFLAGS@ -I. -I$(PRJDIR) \
 		  -I$(PRJDIR)/cmd.src -I$(PRJDIR)/sim.src -I$(PRJDIR)/gui.src
@@ -55,13 +57,13 @@ tests: $(TEST_OBJ)
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) -s sxa $(bindir)
+	$(INSTALL) -s sxa$(EXEEXT) $(bindir)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(bindir)/sxa
+	rm -f $(bindir)/sxa$(EXEEXT)
 
 
 # Performing self-test
@@ -94,10 +96,10 @@ include clean.mk
 # --------
 .SUFFIXES: .asm .hex
 
-xa.src: sxa
+xa.src: sxa$(EXEEXT)
 
-sxa: $(OBJECTS) $(PRJDIR)/*.a
-	$(CXX) $(CXXFLAGS) -o sxa $(OBJECTS) $(LIBS)
+sxa$(EXEEXT): $(OBJECTS) $(PRJDIR)/*.a
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
 otherlibs:
 	cd $(PRJDIR)/cmd.src && $(MAKE) all

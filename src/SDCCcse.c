@@ -377,6 +377,17 @@ DEFSETFUNC(ifDefGlobal)
 }
 
 /*-----------------------------------------------------------------*/
+/* ifAnyGetPointer - if get pointer icode                          */
+/*-----------------------------------------------------------------*/
+DEFSETFUNC(ifAnyGetPointer)
+{
+    cseDef *cdp = item;
+    
+    if (cdp->diCode && POINTER_GET(cdp->diCode)) return 1;
+    return 0;
+}
+
+/*-----------------------------------------------------------------*/
 /* ifOperandsHave - if any of the operand are the same as this     */
 /*-----------------------------------------------------------------*/
 DEFSETFUNC(ifOperandsHave)
@@ -1199,6 +1210,10 @@ int cseBBlock ( eBBlock *ebb, int computeOnly,
 	    /* delete global variables from the cseSet
 	       since they can be modified by the function call */
 	    deleteItemIf(&cseSet,ifDefGlobal);
+	    /* delete all getpointer iCodes from cseSet, this should
+	       be done only for global arrays & pointers but at this
+	       point we don't know if globals, so to be safe do all*/
+	    deleteItemIf(&cseSet,ifAnyGetPointer);
 	}
 
 	/* for pcall & ipush we need to add to the useSet */

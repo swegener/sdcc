@@ -1664,7 +1664,7 @@ lib
 
 \layout Standard
 
-path(argv[0]/
+path(argv[0])/
 \newline 
 
 \emph on 

@@ -76,6 +76,9 @@
    Version 1.0.10 (Sept 19, 2002)
    Register declarations for the Philips P89C668 added by Eric Limpens / Eric@limpens.net
 
+   Version 1.0.11 (Sept 19, 2004)
+   Dallas DS5000 MCON Register declarations corrected by Radek Zadera / a2i@swipnet.se
+
    Adding support for additional microcontrollers:
    -----------------------------------------------
 
@@ -456,7 +459,7 @@
 #define IE__EA__x__x__ES__ET1__EX1__ET0__EX0
 #define P3
 #define IP__RWT__x__x__PS__PT1__PX1__PT0__PX0
-#define MCON__SL__PAA__ECE2__RA32_8__PA0__PA1__PA2__PA3
+#define MCON__PA3__PA2__PA1__PA0__RA32_8__ECE2__PAA__SL
 #define TA
 #define PSW
 #define ACC

@@ -7,6 +7,8 @@
 	* src/pic16/main.c (_process_pragma): fixed nasty malloc bug
 	  (used sizeof(set *sectSyms) instead of sizeof(struct sectSym)),
 	  this might fix SIGSEGVs on MinGW...
+	* src/SDCCopt.c (killDeadCode): restored original behaviour
+	  (volatile operands might get thrown away though)
 
 2005-01-23 Vangelis Rokas <vrokas AT otenet.gr>
 

@@ -126,7 +126,8 @@ iCodeTable codeTable[] =
      pedantic>1: "char c=200" is not allowed (evaluates to -56)
 */
 
-void checkConstantRange(sym_link *ltype, value *val, char *msg, int pedantic) {
+void checkConstantRange(sym_link *ltype, value *val, char *msg, 
+			int pedantic) {
   double max;
   char message[132]="";
   int warnings=0;
@@ -178,6 +179,7 @@ void checkConstantRange(sym_link *ltype, value *val, char *msg, int pedantic) {
     warnings++;
   }
 
+#if 0 // temporary disabled, leaving the warning as a reminder
   if (warnings) {
     sprintf (message, "for %s %s in %s", 
 	     SPEC_USIGN(ltype) ? "unsigned" : "signed",
@@ -187,6 +189,7 @@ void checkConstantRange(sym_link *ltype, value *val, char *msg, int pedantic) {
     if (pedantic>1)
       fatalError++;
   }
+#endif
 }
 
 /*-----------------------------------------------------------------*/

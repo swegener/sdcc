@@ -17,4 +17,7 @@ install-doc:
 	$(INSTALL) -d $(docdir)/aslink
 	cp -f `find doc -maxdepth 1 -not -type d` $(docdir)/aslink
 
+uninstall:
+	cd $(bindir); rm -f as-z80 as-gbz80
+
 include clean.mk

@@ -1,4 +1,4 @@
-CLEANALLPORTS = avr ds390 izt mcs51 pic z80
+CLEANALLPORTS = avr ds390 izt mcs51 pic z80 xa51
 PRJDIR = ..
 
 # Deleting all files created by building the program

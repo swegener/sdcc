@@ -14,4 +14,7 @@ install: all
 	mkdir -p $(bindir)
 	$(INSTALL) $(BIN) `echo $(bindir)/makebin|sed '$(transform)'`
 
+uninstall:
+	rm -f $(bindir)/makebin
+
 include clean.mk

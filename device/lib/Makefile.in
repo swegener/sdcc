@@ -186,13 +186,7 @@ install: all installdirs
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	for hdr in ../include/*.h; do rm -f $(sdcc_datadir)/include/$$hdr; done
-	for cfl in *.c; do rm -f $(sdcc_datadir)/lib/$$cfl; done
-	for model in $(MODELS); do \
-	  rm -rf $(sdcc_datadir)/lib/$$model; \
-	done
-	rm -rf $(sdcc_datadir)/lib/ds390
-
+	rm -rf $(sdcc_datadir)/lib
 
 # Performing self-test
 # --------------------

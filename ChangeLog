@@ -1,3 +1,23 @@
+2003-02-14    <johan@balder>
+
+	* Install doc's in share/sdcc/doc
+	* removed some obsolete files
+	* Do a proper make distclean and uninstall
+	M Makefile.common.in
+	R sdccbuild.sh
+	M as/Makefile
+	M device/include/Makefile.in
+	M device/lib/Makefile.in
+	M doc/sdccman.lyx
+	M link/Makefile
+	M sim/ucsim/doc/Makefile.in
+	M src/clean.mk
+	R src/avr/peeph.rul
+	R src/xa51/peeph.rul
+	M support/cpp2/Makefile.in
+	M support/makebin/Makefile
+
+
 2003-02-13  Bernhard Held <bernhard@bernhardheld.de>
 
 	* support/regression/ports/host/spec.mk: use cc as host compiler for max osx

@@ -32,7 +32,7 @@ man1dir         = $(mandir)/man1
 man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
-docdir          = @datadir@/doc/sdcc
+docdir          = @datadir@/sdcc/doc
 
 # Modules to enable/disable
 OPT_ENABLE_UCSIM = @OPT_ENABLE_UCSIM@

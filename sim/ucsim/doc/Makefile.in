@@ -43,7 +43,7 @@ install: all installdirs
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(docdir)/*
+	rm -rf $(docdir)
 
 
 # Performing self-test

@@ -13,4 +13,7 @@ install: all
 	$(INSTALL) $(PRJDIR)/bin/link-gbz80 `echo $(bindir)/link-gbz80|sed '$(transform)'`
 	$(STRIP) `echo $(bindir)/link-gbz80|sed '$(transform)'`
 
+uninstall:
+	cd $(bindir); rm -f link-z80 link-gbz80
+
 include clean.mk

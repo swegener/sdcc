@@ -43,7 +43,7 @@ install: all installdirs
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	for hdr in *.h; do rm -f $(sdcc_datadir)/$$hdr; done
+	rm -rf $(sdcc_datadir)/include
 
 
 # Performing self-test

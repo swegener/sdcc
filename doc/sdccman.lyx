@@ -226,8 +226,8 @@ short is now equivalent to int (16 bits), it used to be equivalent to char
  (8 bits) which is not ANSI compliant
 \layout Itemize
 
-the default directory where include, library and documention files are stored
- is now in /usr/local/share
+the default directory for gcc-builds where include, library and documention
+ files are stored is now in /usr/local/share
 \layout Itemize
 
 char type parameters to vararg functions are casted to int unless explicitly
@@ -6192,7 +6192,7 @@ Here are a few guidelines that will help the compiler generate more efficient
 
 Use the smallest data type to represent your data-value.
  If it is known in advance that the value is going to be less than 256 then
- use a 'char' instead of a 'short' or 'int'.
+ use an 'unsigned char' instead of a 'short' or 'int'.
 \layout Itemize
 
 Use unsigned when it is known in advance that the value is not going to
@@ -6207,8 +6207,8 @@ Declare the variables to be local whenever possible, especially loop control
  variables (induction).
 \layout Itemize
 
-Since the compiler does not do implicit integral promotion, the programmer
- should do an explicit cast when integral promotion is required.
+Since the compiler does not always do implicit integral promotion, the programme
+r should do an explicit cast when integral promotion is required.
 \layout Itemize
 
 Reducing the size of division, multiplication & modulus operations can reduce
@@ -7909,12 +7909,7 @@ Sample.c(11:14:19:1) *(iTemp6 [lr5:16]{_near * int}[r0]) := iTemp10 [lr13:14]{in
 
 \size footnotesize 
 Sample.c(11:15:12:1) iTemp6 [lr5:16]{_near * int}[r0] = iTemp6 [lr5:16]{_near
- * int}[r0] + 
-\layout Standard
-
-
-\size footnotesize 
-0x2 {short}
+ * int}[r0] + 0x2 {short}
 \layout Standard
 
 
@@ -7976,12 +7971,7 @@ Sample.c(15:26:28:1) if iTemp13 [lr25:26]{char}[CC] == 0 goto _forbreak_0($7)
 
 \size footnotesize 
 Sample.c(16:27:31:1) iTemp2 [lr18:40]{short}[r2] = iTemp2 [lr18:40]{short}[r2]
- + 
-\layout Standard
-
-
-\size footnotesize 
-ITemp21 [lr21:38]{short}[r4]
+ + ITemp21 [lr21:38]{short}[r4]
 \layout Standard
 
 
@@ -7993,12 +7983,7 @@ Sample.c(17:29:33:1) iTemp15 [lr29:30]{short}[r1] = iTemp21 [lr21:38]{short}[r4]
 
 \size footnotesize 
 Sample.c(17:30:34:1) iTemp11 [lr19:40]{short}[r3] = iTemp11 [lr19:40]{short}[r3]
- + 
-\layout Standard
-
-
-\size footnotesize 
-iTemp15 [lr29:30]{short}[r1]
+ + iTemp15 [lr29:30]{short}[r1]
 \layout Standard
 
 
@@ -8038,27 +8023,22 @@ Sample.c(19:39:48:0)_forbreak_0($7) :
 
 \size footnotesize 
 Sample.c(20:40:49:0) iTemp24 [lr40:41]{short}[DPTR] = iTemp2 [lr18:40]{short}[r2]
- + 
+ + ITemp11 [lr19:40]{short}[r3]
 \layout Standard
 
 
 \size footnotesize 
-ITemp11 [lr19:40]{short}[r3]
+Sample.c(20:41:50:0) ret iTemp24 [lr40:41]{short}
 \layout Standard
 
 
 \size footnotesize 
-sample.c(20:41:50:0) ret iTemp24 [lr40:41]{short}
+Sample.c(20:42:51:0)_return($8) :
 \layout Standard
 
 
 \size footnotesize 
-sample.c(20:42:51:0)_return($8) :
-\layout Standard
-
-
-\size footnotesize 
-sample.c(20:43:52:0) eproc _function [lr0:0]{ ia0 re0 rm0}{function short}
+Sample.c(20:43:52:0) eproc _function [lr0:0]{ ia0 re0 rm0}{function short}
 \size default 
 
 \newline 

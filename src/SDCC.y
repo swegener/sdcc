@@ -1102,7 +1102,7 @@ abstract_declarator2
    | abstract_declarator2 '(' ')' {
      if (getenv("DONT_IGNORE_FUNCTION_SPECIFIERS")) {
        // this was previously ignored (cvs < 1.37)
-       // but $1 must be a pointer that points to a function
+       // $1 must be a pointer to a function
        sym_link *p=newLink();
        DCL_TYPE(p) = FUNCTION;
        $1->next=p;
@@ -1111,8 +1111,15 @@ abstract_declarator2
    | abstract_declarator2 '(' parameter_type_list ')' {
      if (getenv("DONT_IGNORE_FUNCTION_SPECIFIERS")) {
        // this was previously ignored (cvs < 1.37)
-       // this is nonsense, so let's just burp something
-       werror(E_TOO_FEW_PARMS);
+       if (!IS_VOID($3->type)) {
+	 // this is nonsense, so let's just burp something
+	 werror(E_TOO_FEW_PARMS);
+       } else {
+	 // $1 must be a pointer to a function
+	 sym_link *p=newLink();
+	 DCL_TYPE(p) = FUNCTION;
+	 $1->next=p;
+       }
      }
    }
 

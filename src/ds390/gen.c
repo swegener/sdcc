@@ -9491,8 +9491,7 @@ genAssign (iCode * ic)
     goto release;
 
   /* if the result is a bit */
-  // if (AOP_TYPE (result) == AOP_CRY) /* works only for true symbols */
-  if (IS_BITVAR(OP_SYMBOL(result)->type))
+  if (AOP_TYPE (result) == AOP_CRY) /* works only for true symbols */
     {
       /* if the right size is a literal then
          we know what the value is */
@@ -9624,7 +9623,8 @@ genCast (iCode * ic)
   aopOp (result, ic, FALSE, AOP_TYPE (right) == AOP_DPTR);
 
   /* if the result is a bit */
-  if (AOP_TYPE (result) == AOP_CRY)
+  // if (AOP_TYPE (result) == AOP_CRY) /* works only for true symbols */
+  if (IS_BITVAR(OP_SYMBOL(result)->type))
     {
       /* if the right size is a literal then
          we know what the value is */

@@ -131,7 +131,7 @@ iCodeTable codeTable[] =
      pedantic>1: "char c=200" is not allowed (evaluates to -56)
 */
 
-void checkConstantRange(sym_link *ltype, long v, char *msg, int pedantic) {
+void checkConstantRange(sym_link *ltype, double v, char *msg, int pedantic) {
   LONG_LONG max = (LONG_LONG) 1 << bitsForType(ltype);
   char message[132]="";
   int warnings=0;
@@ -2548,7 +2548,7 @@ geniCodeAssign (operand * left, operand * right, int nosupdate)
   if (IS_INTEGRAL (ltype) && right->type == VALUE && IS_LITERAL (rtype))
     {
       checkConstantRange(ltype, 
-			 (long)operandLitValue(right), "= operation", 0);
+			 operandLitValue(right), "= operation", 0);
     }
 
   /* if the left & right type don't exactly match */

@@ -509,7 +509,7 @@ int cl_xa::inst_JBC(uint code, int operands)
   if (get_bit(bitAddr)) {
     PC = (PC+jmpAddr)&0xfffffe;
   }
-  set_bit(bitAddr);
+  set_bit(bitAddr,0);
   return(resGO);
 }
 int cl_xa::inst_JNB(uint code, int operands)

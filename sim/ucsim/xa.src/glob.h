@@ -147,8 +147,9 @@ enum op_operands {
 
 // odd-ball ones
   NO_OPERANDS,  // for NOP
-  C_BIT,
-  C_NOTBIT,
+  CY_BIT,
+  BIT_CY,
+  CY_NOTBIT,
   DATA4,
   REG_DATA4,
   REG_DATA5,
@@ -162,6 +163,7 @@ enum op_operands {
   IREG,
   BIT_ALONE,
   DIRECT,
+  DIRECT_DIRECT,
   RLIST,
   ADDR24,
   BIT_REL8,
@@ -169,6 +171,9 @@ enum op_operands {
   DIRECT_REL8,
   REG_REGOFF8,
   REG_REGOFF16,
+
+  REG_USP,
+  USP_REG,
 
   REL8,
   REL16,

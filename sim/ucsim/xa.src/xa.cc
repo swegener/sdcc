@@ -472,8 +472,13 @@ cl_xa::disass(t_addr addr, char *sep)
     case NO_OPERANDS :  // for NOP
       strcpy(parm_str, "");
     break;
-    case C_BIT :
-      strcpy(parm_str, "C_BIT");
+    case CY_BIT :
+      sprintf(parm_str, "C,%s", 
+	     get_bit_name(((code&0x0003)<<8) + get_mem(MEM_ROM, addr+2)));
+    break;
+    case BIT_CY :
+      sprintf(parm_str, "%s,C", 
+	      get_bit_name(((code&0x0003)<<8) + get_mem(MEM_ROM, addr+2)));
     break;
     case REG_DATA4 :
       strcpy(parm_str, "REG_DATA4");
@@ -535,7 +540,12 @@ cl_xa::disass(t_addr addr, char *sep)
 			   get_mem(MEM_ROM, addr+2)),
 	      ((signed char)get_mem(MEM_ROM, addr+2)*2+addr+len)&0xfffe);
     break;
-
+    case REG_USP:
+      sprintf(parm_str, "REG_USP");
+    break;
+    case USP_REG:
+      sprintf(parm_str, "USP_REG");
+    break;
     case REL8 :
       sprintf(parm_str, "0x%04x",
 	      ((signed char)get_mem(MEM_ROM, addr+1)*2+addr+len)&0xfffe);

@@ -202,8 +202,8 @@ struct xa_dis_entry disass_xa[]= {
  {0,0x9605,0xff8f,' ',4, AND,DIRECT_DATA8    },  // AND direct, #data8         1 0 0 1 0 1 1 0  0 b b b 0 1 0 1 
  {0,0x9e05,0xff8f,' ',5, AND,DIRECT_DATA16   },  // AND direct, #data16        1 0 0 1 0 1 1 0  1 b b b 0 1 0 1 
 
- {0,0x0840,0xfffc,' ',2,ANL, C_BIT           }, //  ANL C, bit                 0 0 0 0 1 0 0 0  0 1 0 0 0 0 b b
- {0,0x0850,0xfffc,' ',2,ANL, C_NOTBIT        }, //  ANL C, /bit                0 0 0 0 1 0 0 0  0 1 0 1 0 0 b b
+ {0,0x0840,0xfffc,' ',2,ANL, CY_BIT          }, //  ANL C, bit                 0 0 0 0 1 0 0 0  0 1 0 0 0 0 b b
+ {0,0x0850,0xfffc,' ',2,ANL, CY_NOTBIT       }, //  ANL C, /bit                0 0 0 0 1 0 0 0  0 1 0 1 0 0 b b
  {0,0xc150,0xf300,' ',2,ASL, REG_REG         }, //  ASL Rd, Rs                 1 1 0 0 S S 0 1  d d d d s s s s
  {0,0xdd00,0xff00,' ',2,ASL, REG_DATA5       }, //  ASL Rd, #data5 (dword)     1 1 0 1 1 1 0 1  d d d #data5
  {0,0xd100,0xf700,' ',2,ASL, REG_DATA4       }, //  ASL Rd, #data4             1 1 0 1 S S 0 1  d d d d #data4
@@ -316,7 +316,11 @@ struct xa_dis_entry disass_xa[]= {
  {0,0x9d08,0xff8f,' ',6,MOV, IREGOFF16_DATA16},  // MOV [Rd+offset16], #data16 1 0 0 1 1 1 0 1  0 d d d 1 0 0 0
  {0,0x9608,0xff8f,' ',4,MOV, DIRECT_DATA8    },  // MOV direct, #data8         1 0 0 1 0 1 1 0  0 b b b 1 0 0 0
  {0,0x9e08,0xff8f,' ',5,MOV, DIRECT_DATA16   },  // MOV direct, #data16        1 0 0 1 0 1 1 0  0 b b b 1 0 0 0
-   /* MOV(5) */ 
+ {0,0x9700,0xf788,' ',4,MOV, DIRECT_DIRECT   },  // MOV direct, direct         1 0 0 1 S 1 1 1  0 d d d 0 d d d
+ {0,0x900f,0xff0f,' ',2,MOV, REG_USP         },  // MOV Rd, USP                1 0 0 1 0 0 0 0  d d d d 1 1 1 1
+ {0,0x980f,0xff0f,' ',2,MOV, USP_REG         },  // MOV USP, RS                1 0 0 1 0 0 0 0  s s s s 1 1 1 1
+ {0,0x0820,0xfffc,' ',3,MOV, CY_BIT          },  // MOV C, bit                 0 0 0 0 1 0 0 0  0 0 1 0 0 0 b b
+ {0,0x0830,0xfffc,' ',3,MOV, BIT_CY          },  // MOV bit, C                 0 0 0 0 1 0 0 0  0 0 1 1 0 0 b b
  {0,0x8000,0xf308,' ',2,MOVC, REG_IREGINC    },  // MOVC Rd,[Rs+]              1 0 0 0 S 0 0 0  d d d d 0 s s s
  {0,0x904e,0xffff,' ',2,MOVC, A_APLUSDPTR    },  // MOVC A,[A+DPTR]            1 0 0 1 0 0 0 0  0 1 0 0 1 1 1 0
  {0,0x904c,0xffff,' ',2,MOVC, A_APLUSPC      },  // MOVC A,[A+PC]              1 0 0 1 0 0 0 0  0 1 0 0 1 1 0 0
@@ -348,8 +352,8 @@ struct xa_dis_entry disass_xa[]= {
  {0,0x9d06,0xff8f,' ',6, OR, IREGOFF16_DATA16},  //  OR [Rd+offset16], #data16 1 0 0 1 1 1 0 1  0 d d d 0 1 1 0
  {0,0x9606,0xff8f,' ',4, OR, DIRECT_DATA8    },  //  OR direct, #data8         1 0 0 1 0 1 1 0  0 b b b 0 1 1 0
  {0,0x9e06,0xff8f,' ',5, OR, DIRECT_DATA16   },  //  OR direct, #data16        1 0 0 1 0 1 1 0  0 b b b 0 1 1 0
- {0,0x0860,0xfffc,' ',3, ORL, C_BIT          },  //  ORL C, bit                0 0 0 0 1 0 0 0  0 1 1 0 0 0 b b
- {0,0x0870,0xfffc,' ',3, ORL, C_NOTBIT       },  //  ORL C, /bit               0 0 0 0 1 0 0 0  0 1 1 1 0 0 b b
+ {0,0x0860,0xfffc,' ',3, ORL, CY_BIT         },  //  ORL C, bit                0 0 0 0 1 0 0 0  0 1 1 0 0 0 b b
+ {0,0x0870,0xfffc,' ',3, ORL, CY_NOTBIT       },  //  ORL C, /bit               0 0 0 0 1 0 0 0  0 1 1 1 0 0 b b
  {0,0x8710,0xf7f8,' ',3, POP, DIRECT         },  //  POP direct                1 0 0 0 S 1 1 1  0 0 0 1 0 d d d
  {1,0x2700,0xb700,' ',2, POP, RLIST          },  //  POP Rlist                 0 H 1 0 S 1 1 1  rlist
  {0,0x8700,0xf7f8,' ',3, POPU, DIRECT        },  //  POPU direct               1 0 0 0 S 1 1 1  0 0 0 0 0 d d d

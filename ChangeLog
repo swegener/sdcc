@@ -19,9 +19,6 @@
 	* device/lib/_strstr.c: removed NULL
 	* device/lib/_strtok.c: removed NULL
 	* device/lib/malloc.c: removed NULL, include own header
-	* device/lib/_strspn.c: removed NULL
-	* device/lib/_strspn.c: removed NULL
-	* device/lib/_strspn.c: removed NULL
 
 
 2003-02-02    <johan@balder>

@@ -1,3 +1,9 @@
+2003-11-11 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (removePostIncDecOps, removePreIncDecOps),
+	* src/SDCCast.h,
+	* src/SDCC.y: fixed bug #819403
+
 2003-11-08 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* support/regression/fwk/lib/testfwk.c: printn is recursive and thus needs

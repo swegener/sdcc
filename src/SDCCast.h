@@ -183,6 +183,8 @@ void initAst ();
 ast *newNode (long, ast *, ast *);
 ast *copyAst (ast *);
 ast *removeIncDecOps (ast *);
+ast *removePreIncDecOps (ast *);
+ast *removePostIncDecOps (ast *);
 value *sizeofOp (sym_link *);
 value *evalStmnt (ast *);
 ast *createFunction (symbol *, ast *);

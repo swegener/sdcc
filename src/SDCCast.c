@@ -274,6 +274,52 @@ ast *removeIncDecOps (ast * tree) {
 }
 
 /*-----------------------------------------------------------------*/
+/* removePreIncDecOps: remove for side effects in *_ASSIGN's       */
+/*                  "*++s += 3" -> "*++s = *++s + 3"               */
+/*-----------------------------------------------------------------*/
+ast *removePreIncDecOps (ast * tree) {
+
+  // traverse the tree and remove pre-inc/dec ops
+
+  if (!tree)
+    return NULL;
+
+  if (tree->type == EX_OP &&
+      (tree->opval.op == INC_OP || tree->opval.op == DEC_OP)) {
+    if (tree->right)
+      tree=tree->right;
+  }
+
+  tree->left=removePreIncDecOps(tree->left);
+  tree->right=removePreIncDecOps(tree->right);
+
+ return tree;
+}
+
+/*-----------------------------------------------------------------*/
+/* removePostIncDecOps: remove for side effects in *_ASSIGN's      */
+/*                  "*s++ += 3" -> "*s++ = *s++ + 3"               */
+/*-----------------------------------------------------------------*/
+ast *removePostIncDecOps (ast * tree) {
+
+  // traverse the tree and remove pre-inc/dec ops
+
+  if (!tree)
+    return NULL;
+
+  if (tree->type == EX_OP &&
+      (tree->opval.op == INC_OP || tree->opval.op == DEC_OP)) {
+    if (tree->left)
+      tree=tree->left;
+  }
+
+  tree->left=removePostIncDecOps(tree->left);
+  tree->right=removePostIncDecOps(tree->right);
+
+ return tree;
+}
+
+/*-----------------------------------------------------------------*/
 /* hasSEFcalls - returns TRUE if tree has a function call          */
 /*-----------------------------------------------------------------*/
 bool
@@ -3539,11 +3585,11 @@ decorateType (ast * tree)
       TETYPE (tree) = getSpec (TTYPE (tree) = LTYPE (tree));
 
       if (!tree->initMode && IS_CONSTANT (LTYPE (tree)))
-	werror (E_CODE_WRITE, *tree->opval.op==MUL_ASSIGN ? "*=" : "/=");
+	werror (E_CODE_WRITE, tree->opval.op==MUL_ASSIGN ? "*=" : "/=");
 
       if (LRVAL (tree))
 	{
-	  werror (E_LVALUE_REQUIRED, *tree->opval.op==MUL_ASSIGN ? "*=" : "/=");
+	  werror (E_LVALUE_REQUIRED, tree->opval.op==MUL_ASSIGN ? "*=" : "/=");
 	  goto errorTreeReturn;
 	}
       LLVAL (tree) = 1;

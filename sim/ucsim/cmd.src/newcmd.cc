@@ -57,8 +57,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "cmdutil.h"
 
 
-extern "C" int vasprintf();
-extern "C" int vsnprintf();
+extern "C" int vasprintf(char **strp, const  char *format, va_list ap);
+extern "C" int vsnprintf(char *str, size_t size,const char *format,va_list ap);
 
 static int
 cmd_do_print(FILE *f, char *format, va_list ap)

@@ -82,7 +82,7 @@
 #define	MAXFIL	6		/* Maximum command line input files */
 #define	MAXINC	6		/* Maximum nesting of include files */
 #define	MAXIF	10		/* Maximum nesting of if/else/endif */
-#define	FILSPC	80		/* Chars. in filespec */
+#define	FILSPC	256		/* Chars. in filespec */
 
 #define NLIST	0		/* No listing */
 #define SLIST	1		/* Source only */

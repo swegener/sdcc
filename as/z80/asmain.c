@@ -556,12 +556,13 @@ loop:
 	 * symbol, assembler directive, or assembler mnemonic is
 	 * being processed.
 	 */
-	if ((ctype[c] & LETTER) == 0)
-		if (flevel) {
-			return;
-		} else {
+	if ((ctype[c] & LETTER) == 0) {
+            	if (flevel) {
+                        return;
+                } else {
 			qerr();
 		}
+        }
 	getid(id, c);
 	c = getnb();
 	/*

@@ -26,20 +26,6 @@
 
 \layout Title
 
-
-\begin_inset ERT
-status Open
-
-\layout Standard
-
-\backslash 
-NotSpecial{
-\backslash 
-do
-\backslash 
--}
-\end_inset 
-
 SDCC Compiler User Guide
 \layout Standard
 
@@ -259,17 +245,13 @@ n", a, (char)a);
  will push a as an int and as a char resp.
 \layout Itemize
 
-option 
-\family typewriter 
---
-\family default 
-regextend has been removed
+option ---regextend has been removed
 \layout Itemize
 
-option --noregparms has been removed
+option ---noregparms has been removed
 \layout Itemize
 
-option --stack-after-data has been removed
+option ---stack-after-data has been removed
 \layout Standard
 
 
@@ -348,7 +330,7 @@ Install and search paths
 
 Linux (and other gcc-builds like Solaris, Cygwin, Mingw and OSX) by default
  install in /usr/local.
- You can override this when configuring with --prefix-path.
+ You can override this when configuring with ---prefix-path.
  Subdirs used will be bin, share/sdcc/include, share/sdcc/lib and share/sdcc/doc.
 \newline 
 Windows MSVC and Borland builds will install in one single tree (e.g.
@@ -822,7 +804,7 @@ The first thing you should do after installing your SDCC compiler is to
  Type 
 \family sans 
 \series bold 
-"sdcc --version"
+"sdcc ---version"
 \family default 
 \series default 
  at the prompt, and the program should run and tell you the version.
@@ -1175,7 +1157,7 @@ configure
 \end_inset 
 
  command has several options.
- The most commonly used option is --prefix=<directory name>, where <directory
+ The most commonly used option is ---prefix=<directory name>, where <directory
  name> is the final location for the sdcc executables and libraries, (default
  location is /usr/local).
  The installation process will create the following directory structure
@@ -1209,7 +1191,7 @@ The command
 \begin_inset Quotes sld
 \end_inset 
 
-./configure --prefix=/usr/local
+./configure ---prefix=/usr/local
 \begin_inset Quotes erd
 \end_inset 
 
@@ -1397,9 +1379,9 @@ sourcefile.rel - Object file created by the assembler, input to Linkage editor
 sourcefile.map - The memory map for the load module, created by the Linker
 \newline 
 sourcefile.ihx - The load module in Intel hex format (you can select the
- Motorola S19 format with --out-fmt-s19)
+ Motorola S19 format with ---out-fmt-s19)
 \newline 
-sourcefile.cdb - An optional file (with --debug) containing debug information
+sourcefile.cdb - An optional file (with ---debug) containing debug information
 \newline 
 
 \layout Subsubsection
@@ -1804,7 +1786,7 @@ the output path resp.
 
 \series bold 
 -L\SpecialChar ~
---lib-path
+---lib-path
 \bar under 
  
 \series default 
@@ -1819,35 +1801,35 @@ the output path resp.
 
 
 \series bold 
---xram-loc
+---xram-loc
 \series default 
 <Value> The start location of the external ram, default value is 0.
- The value entered can be in Hexadecimal or Decimal format, e.g.: --xram-loc
- 0x8000 or --xram-loc 32768.
+ The value entered can be in Hexadecimal or Decimal format, e.g.: ---xram-loc
+ 0x8000 or ---xram-loc 32768.
 \layout List
 \labelwidthstring 00.00.0000
 
 
 \series bold 
---code-loc
+---code-loc
 \series default 
 <Value> The start location of the code segment, default value 0.
  Note when this option is used the interrupt vector table is also relocated
  to the given address.
- The value entered can be in Hexadecimal or Decimal format, e.g.: --code-loc
- 0x8000 or --code-loc 32768.
+ The value entered can be in Hexadecimal or Decimal format, e.g.: ---code-loc
+ 0x8000 or ---code-loc 32768.
 \layout List
 \labelwidthstring 00.00.0000
 
 
 \series bold 
---stack-loc
+---stack-loc
 \series default 
 <Value> By default the stack is placed after the data segment.
  Using this option the stack can be placed anywhere in the internal memory
  space of the 8051.
  The value entered can be in Hexadecimal or Decimal format, e.g.
- --stack-loc 0x20 or --stack-loc 32.
+ ---stack-loc 0x20 or ---stack-loc 32.
  Since the sp register is incremented before a push or call, the initial
  sp will be set to one byte prior the provided value.
  The provided value should not overlap any other memory areas such as used
@@ -1858,33 +1840,33 @@ the output path resp.
 
 
 \series bold 
---data-loc
+---data-loc
 \series default 
 <Value> The start location of the internal ram data segment.
  The value entered can be in Hexadecimal or Decimal format, eg.
- --data-loc 0x20 or --data-loc 32.
+ ---data-loc 0x20 or ---data-loc 32.
  (By default, the start location of the internal ram data segment  is set
  as low as possible in memory, taking into account the used register banks
  and the bit segment at address 0x20.
  For example if register banks 0 and 1 are used without bit variables, the
- data segment will be set, if --data-loc is not used, to location 0x10.)
+ data segment will be set, if ---data-loc is not used, to location 0x10.)
 \layout List
 \labelwidthstring 00.00.0000
 
 
 \series bold 
---idata-loc
+---idata-loc
 \series default 
 <Value> The start location of the indirectly addressable internal ram, default
  value is 0x80.
  The value entered can be in Hexadecimal or Decimal format, eg.
- --idata-loc 0x88 or --idata-loc 136.
+ ---idata-loc 0x88 or ---idata-loc 136.
 \layout List
 \labelwidthstring 00.00.0000
 
 
 \series bold 
---out-fmt-ihx
+---out-fmt-ihx
 \bar under 
  
 \series default 
@@ -1896,7 +1878,7 @@ The linker output (final object code) is in Intel Hex format.
 
 
 \series bold 
---out-fmt-s19
+---out-fmt-s19
 \bar under 
  
 \series default 
@@ -1910,7 +1892,7 @@ MCS51 Options
 
 
 \series bold 
---model-large
+---model-large
 \series default 
  Generate code for Large model programs see section Memory Models for more
  details.
@@ -1923,7 +1905,7 @@ MCS51 Options
 
 
 \series bold 
---model-small
+---model-small
 \series default 
 \size large 
 \emph on 
@@ -1941,7 +1923,7 @@ DS390 Options
 
 
 \series bold 
---model-flat24
+---model-flat24
 \series default 
 \size large 
 \emph on 
@@ -1961,7 +1943,7 @@ Generate 24-bit flat mode code.
 
 
 \series bold 
---stack-10bit
+---stack-10bit
 \series default 
  Generate code for the 10 bit stack mode of the Dallas DS80C390 part.
  This is the one and only that the ds390 code generator supports right now
@@ -1984,18 +1966,18 @@ Generate 24-bit flat mode code.
  any re-entrant functions compiled with this option.
  In principle, this should work with the 
 \emph on 
---stack-auto
+---stack-auto
 \emph default 
  option, but that has not been tested.
  It is incompatible with the 
 \emph on 
---xstack
+---xstack
 \emph default 
  option.
  It also only makes sense if the processor is in 24 bit contiguous addressing
  mode (see the 
 \emph on 
---model-flat24 option
+---model-flat24 option
 \emph default 
 ).
 \layout Subsubsection
@@ -2006,7 +1988,7 @@ Optimization Options
 
 
 \series bold 
---nogcse
+---nogcse
 \series default 
  Will not do global subexpression elimination, this option may be used when
  the compiler creates undesirably large stack/data spaces to store compiler
@@ -2021,7 +2003,7 @@ NOGCSE can be used
 
 
 \series bold 
---noinvariant
+---noinvariant
 \series default 
  Will not do loop invariant optimizations, this may be turned off for reasons
  explained for the previous option.
@@ -2034,7 +2016,7 @@ NOINVARIANT can be used
 
 
 \series bold 
---noinduction
+---noinduction
 \series default 
  Will not do loop induction optimizations, see section strength reduction
  for more details.It is recommended that this option is NOT used, #pragma\SpecialChar ~
@@ -2046,7 +2028,7 @@ ION can be used to turn off induction optimizations for a given function
 
 
 \series bold 
---nojtbound
+---nojtbound
 \size large 
 \bar under 
  
@@ -2065,7 +2047,7 @@ NOJTBOUND can be
 
 
 \series bold 
---noloopreverse
+---noloopreverse
 \series default 
 \size large 
  
@@ -2076,7 +2058,7 @@ Will not do loop reversal optimization.
 
 
 \series bold 
---no-xinit-opt
+---no-xinit-opt
 \series default 
  This will disable the memcpy of initialized data in far space from code
  space
@@ -2089,7 +2071,7 @@ Other Options
 
 \series bold 
 -c\SpecialChar ~
---compile-only
+---compile-only
 \series default 
  will compile and assemble the source, but will not call the linkage editor.
 \layout List
@@ -2107,7 +2089,7 @@ Other Options
 
 
 \series bold 
---stack-auto
+---stack-auto
 \series default 
 \size large 
 \emph on 
@@ -2129,7 +2111,7 @@ reentrant
 
 
 \series bold 
---xstack
+---xstack
 \series default 
  Uses a pseudo stack in the first 256 bytes in the external ram for allocating
  variables and passing parameters.
@@ -2139,7 +2121,7 @@ reentrant
 
 
 \series bold 
---callee-saves function1[,function2][,function3]....
+---callee-saves function1[,function2][,function3]....
 
 \series default 
  The compiler by default uses a caller saves convention for register saving
@@ -2157,7 +2139,7 @@ reentrant
  option is used for a library function the appropriate library function
  needs to be recompiled with the same option.
  If the project consists of multiple source files then all the source file
- should be compiled with the same --callee-saves option string.
+ should be compiled with the same ---callee-saves option string.
  Also see #pragma\SpecialChar ~
 CALLEE-SAVES.
 \layout List
@@ -2165,7 +2147,7 @@ CALLEE-SAVES.
 
 
 \series bold 
---debug
+---debug
 \bar under 
  
 \series default 
@@ -2179,7 +2161,7 @@ When this option is used the compiler will generate debug information, that
 
 
 \series bold 
---peep-file
+---peep-file
 \series default 
 <filename> This option can be used to use additional rules to be used by
  the peep hole optimizer.
@@ -2221,7 +2203,7 @@ Stop after the stage of compilation proper; do not assemble.
 
 
 \series bold 
---int-long-reent
+---int-long-reent
 \series default 
 \size large 
  
@@ -2234,7 +2216,7 @@ Stop after the stage of compilation proper; do not assemble.
 
 
 \series bold 
---cyclomatic
+---cyclomatic
 \bar under 
  
 \series default 
@@ -2257,7 +2239,7 @@ cyclomatic complexity
 
 
 \series bold 
---float-reent
+---float-reent
 \bar under 
  
 \series default 
@@ -2269,7 +2251,7 @@ cyclomatic complexity
 
 
 \series bold 
---nooverlay
+---nooverlay
 \series default 
   The compiler will not overlay parameters and local variables of any function,
  see section Parameters and local variables for more details.
@@ -2278,7 +2260,7 @@ cyclomatic complexity
 
 
 \series bold 
---main-return
+---main-return
 \series default 
  This option can be used when the code generated is called by a monitor
  program.
@@ -2290,7 +2272,7 @@ cyclomatic complexity
 
 
 \series bold 
---no-peep
+---no-peep
 \series default 
   Disable peep-hole optimization.
 \layout List
@@ -2298,7 +2280,7 @@ cyclomatic complexity
 
 
 \series bold 
---peep-asm
+---peep-asm
 \series default 
   Pass the inline assembler code through the peep hole optimizer.
  This can cause unexpected changes to inline assembler code, please go through
@@ -2309,7 +2291,7 @@ cyclomatic complexity
 
 
 \series bold 
---iram-size
+---iram-size
 \series default 
 <Value> Causes the linker to check if the internal ram usage is within limits
  of the given value.
@@ -2318,7 +2300,7 @@ cyclomatic complexity
 
 
 \series bold 
---xram-size
+---xram-size
 \series default 
 <Value> Causes the linker to check if the external ram usage is within limits
  of the given value.
@@ -2327,7 +2309,7 @@ cyclomatic complexity
 
 
 \series bold 
---code-size
+---code-size
 \series default 
 <Value> Causes the linker to check if the code usage is within limits of
  the given value.
@@ -2336,7 +2318,7 @@ cyclomatic complexity
 
 
 \series bold 
---nostdincl
+---nostdincl
 \series default 
  This will prevent the compiler from passing on the default include path
  to the preprocessor.
@@ -2345,7 +2327,7 @@ cyclomatic complexity
 
 
 \series bold 
---nostdlib
+---nostdlib
 \series default 
  This will prevent the compiler from passing on the default library path
  to the linker.
@@ -2354,7 +2336,7 @@ cyclomatic complexity
 
 
 \series bold 
---verbose
+---verbose
 \series default 
  Shows the various actions the compiler is performing.
 \layout List
@@ -2381,7 +2363,7 @@ The following options are provided for the purpose of retargetting and debugging
 
 
 \series bold 
---dumpraw
+---dumpraw
 \series default 
  This option will cause the compiler to dump the intermediate code into
  a file of named 
@@ -2397,7 +2379,7 @@ The following options are provided for the purpose of retargetting and debugging
 
 
 \series bold 
---dumpgcse
+---dumpgcse
 \series default 
  Will create a dump of iCode's, after global subexpression elimination,
  into a file named 
@@ -2408,7 +2390,7 @@ The following options are provided for the purpose of retargetting and debugging
 
 
 \series bold 
---dumpdeadcode
+---dumpdeadcode
 \series default 
  Will create a dump of iCode's, after deadcode elimination, into a file
  named 
@@ -2419,7 +2401,7 @@ The following options are provided for the purpose of retargetting and debugging
 
 
 \series bold 
---dumploop
+---dumploop
 \series default 
 \size large 
  
@@ -2433,7 +2415,7 @@ Will create a dump of iCode's, after loop optimizations, into a file named
 
 
 \series bold 
---dumprange
+---dumprange
 \series default 
 \size large 
  
@@ -2447,7 +2429,7 @@ Will create a dump of iCode's, after live range analysis, into a file named
 
 
 \series bold 
---dumlrange
+---dumlrange
 \series default 
  Will dump the life ranges for all symbols.
 \layout List
@@ -2455,7 +2437,7 @@ Will create a dump of iCode's, after live range analysis, into a file named
 
 
 \series bold 
---dumpregassign
+---dumpregassign
 \bar under 
  
 \series default 
@@ -2469,7 +2451,7 @@ Will create a dump of iCode's, after register assignment, into a file named
 
 
 \series bold 
---dumplrange
+---dumplrange
 \series default 
  Will create a dump of the live ranges of iTemp's
 \layout List
@@ -2477,7 +2459,7 @@ Will create a dump of iCode's, after register assignment, into a file named
 
 
 \series bold 
---dumpall
+---dumpall
 \size large 
 \bar under 
  
@@ -2676,7 +2658,7 @@ static
 \newline 
 They can be placed on the stack either by using the
 \emph on 
- --stack-auto
+ ---stack-auto
 \emph default 
  option or by using the 
 \emph on 
@@ -2710,7 +2692,7 @@ reentrant
 \emph default 
 keyword or the
 \emph on 
- --stack-auto
+ ---stack-auto
 \emph default 
  option should be used sparingly.
  Note that the reentrant keyword just means that the parameters & local
@@ -2777,7 +2759,7 @@ bvar
  in internal ram.
  When compiled with 
 \emph on 
---stack-auto
+---stack-auto
 \emph default 
  or when a function is declared as 
 \emph on 
@@ -2941,11 +2923,11 @@ ation & modulus operations are implemented using external support routines
  these operations then the support routines (as mentioned in a following
  section) will have to be recompiled using the
 \emph on 
- --stack-auto
+ ---stack-auto
 \emph default 
  option and the source file will need to be compiled using the 
 \emph on 
---int-long-ren
+---int-long-ren
 \emph default 
 t compiler option.
 \layout Standard
@@ -3681,7 +3663,7 @@ per function
  be placed in a separate line (as the example shows).
  When the 
 \emph on 
---peep-asm
+---peep-asm
 \emph default 
  command line option is used, the inline assembler code will be passed through
  the peephole optimizer.
@@ -3892,11 +3874,11 @@ non-reentrant
  If this is unavoidable then the above routines will need to be compiled
  with the 
 \emph on 
---stack-auto
+---stack-auto
 \emph default 
  option, after which the source program will have to be compiled with 
 \emph on 
---int-long-rent
+---int-long-rent
 \emph default 
  option.
 \layout Subsection
@@ -4037,7 +4019,7 @@ tinibios
 \newline 
 Like the 
 \emph on 
---model-large
+---model-large
 \emph default 
  option, variables will by default be placed into the XDATA segment.
  
@@ -4045,7 +4027,7 @@ Like the
 
 \newline 
 Segments may be placed anywhere in the 4 meg address space using the usual
- --*-loc options.
+ ---*-loc options.
  Note that if any segments are located above 64K, the -r flag must be passed
  to the linker to generate the proper segment relocations, and the Intel
  HEX output format must be used.
@@ -4076,28 +4058,28 @@ __mcs51 or __ds390 or __z80, etc - depending on the model used (e.g.
 
 SDCC_STACK_AUTO - this symbol is defined when 
 \emph on 
---stack-auto
+---stack-auto
 \emph default 
  option is used.
 \layout Itemize
 
 SDCC_MODEL_SMALL - when 
 \emph on 
---model-small
+---model-small
 \emph default 
  is used.
 \layout Itemize
 
 SDCC_MODEL_LARGE - when 
 \emph on 
---model-large
+---model-large
 \emph default 
  is used.
 \layout Itemize
 
 SDCC_USE_XSTACK - when 
 \emph on 
---xstack
+---xstack
 \emph default 
  option is used.
 \layout Itemize
@@ -4335,7 +4317,7 @@ on causes an increase in register pressure, which may cause unwanted spilling
  The compiler will generate a warning message when it is forced to allocate
  extra space either on the stack or data space.
  If this extra space allocation is undesirable then induction optimization
- can be eliminated either for the entire source file (with --noinduction
+ can be eliminated either for the entire source file (with ---noinduction
  option) or for a given function only using #pragma\SpecialChar ~
 NOINDUCTION.
 \newline 
@@ -5157,7 +5139,7 @@ copt
  A default set of rules are compiled into the compiler, additional rules
  may be added with the 
 \emph on 
---peep-file <filename>
+---peep-file <filename>
 \emph default 
  option.
  The rule language is best illustrated with examples.
@@ -5247,7 +5229,7 @@ will remain unmodified.
 \newline 
 Other special case optimizations may be added by the user (via 
 \emph on 
---peep-file option
+---peep-file option
 \emph default 
 ).
  E.g.
@@ -5544,7 +5526,7 @@ g the variable bindings is passed as a parameter).
  have some better means.
  If you are looking at this file, you will also see the default rules that
  are compiled into the compiler, you can add your own rules in the default
- set there if you get tired of specifying the --peep-file option.
+ set there if you get tired of specifying the ---peep-file option.
 \layout Subsection
 
 Pragmas
@@ -5600,7 +5582,7 @@ CALLEE-SAVES function1[,function2[,function3...]] - The compiler by default
  reduce code & improve run time performance of the generated code.
  In future the compiler (with interprocedural analysis) will be able to
  determine the appropriate scheme to use for each function call.
- If --callee-saves command line option is used, the function names specified
+ If ---callee-saves command line option is used, the function names specified
  in #pragma\SpecialChar ~
 CALLEE-SAVES is appended to the list of functions specified inthe
  command line.
@@ -5688,7 +5670,7 @@ and
 \emph default 
  to pass the first parameter to a routine.
  The second parameter onwards is either allocated on the stack (for reentrant
- routines or if --stack-auto is used) or in the internal / external ram
+ routines or if ---stack-auto is used) or in the internal / external ram
  (depending on the memory model).
  
 \layout Subsubsection
@@ -6080,10 +6062,10 @@ External Stack
 
 The external stack is located at the start of the external ram segment,
  and is 256 bytes in size.
- When --xstack option is used to compile the program, the parameters and
+ When ---xstack option is used to compile the program, the parameters and
  local variables of all reentrant functions are allocated in this area.
  This option is provided for programs with large stack space requirements.
- When used with the --stack-auto option, all parameters and local variables
+ When used with the ---stack-auto option, all parameters and local variables
  are allocated on the external stack (note support libraries will need to
  be recompiled with the same options).
 \layout Standard
@@ -6377,32 +6359,32 @@ If any of the 128 bit variables are used, or near data is being used then
 \layout Standard
 
 The amount of stack being used is affected by the use of the "internal stack"
- to save registers before a subroutine call is made (--stack-auto will declare
- parameters and local variables on the stack) and the number of nested subroutin
-es.
+ to save registers before a subroutine call is made (---stack-auto will
+ declare parameters and local variables on the stack) and the number of
+ nested subroutines.
 \layout Standard
 
 If you detect that the stack is over writing you data, then the following
  can be done.
- --xstack will cause an external stack to be used for saving registers and
- (if --stack-auto is being used) storing parameters and local variables.
+ ---xstack will cause an external stack to be used for saving registers
+ and (if ---stack-auto is being used) storing parameters and local variables.
  However this will produce more code which will be slower to execute.
  
 \layout Standard
 
---stack-loc will allow you specify the start of the stack, i.e.
+---stack-loc will allow you specify the start of the stack, i.e.
  you could start it after any data in the general purpose area.
  However this may waste the memory not used by the register banks and if
  the size of the "near data" increases, it may creep into the bottom of
  the stack.
 \layout Standard
 
---stack-after-data, similar to the --stack-loc, but it automatically places
+---stack-after-data, similar to the ---stack-loc, but it automatically places
  the stack after the end of the "near data".
  Again this could waste any spare register space.
 \layout Standard
 
---data-loc allows you to specify the start address of the near data.
+---data-loc allows you to specify the start address of the near data.
  This could be used to move the "near data" further away from the stack
  giving it more room to grow.
  This will only work if no bit variables are being used and the stack can
@@ -6417,9 +6399,9 @@ Conclusion.
 If you find that the stack is over writing your bit variables or "near data"
  then the approach which best utilised the internal memory is to position
  the "near data" after the last bank of used registers or, if you use bit
- variables, after the last bit variable by using the --data-loc, e.g.
- if two register banks are being used and no bit variables, --data-loc 16,
- and use the --stack-after-data option.
+ variables, after the last bit variable by using the ---data-loc, e.g.
+ if two register banks are being used and no bit variables, ---data-loc
+ 16, and use the ---stack-after-data option.
 \layout Standard
 
 If bit variables are being used, another method would be to try and squeeze
@@ -6449,7 +6431,7 @@ The second phase involves generating an intermediate code which can be easy
  The intermediate code generation assumes the target machine has unlimited
  number of registers, and designates them with the name iTemp.
  The compiler can be made to dump a human readable form of the code generated
- by using the --dumpraw option.
+ by using the ---dumpraw option.
 \layout Itemize
 
 This phase does the bulk of the standard optimizations and is also MCU independe
@@ -6535,7 +6517,7 @@ debug option must be specified for all files for which debug information
 How the Debugger Works
 \layout Standard
 
-When the --debug option is specified the compiler generates extra symbol
+When the ---debug option is specified the compiler generates extra symbol
  information some of which are put into the the assembler source and some
  are put into the .cdb file, the linker updates the .cdb file with the address
  information for the symbols.
@@ -6580,13 +6562,13 @@ foo.ihx - the intel hex format object file.
 Command Line Options.
 \layout Itemize
 
---directory=<source file directory> this option can used to specify the
+---directory=<source file directory> this option can used to specify the
  directory search list.
  The debugger will look into the directory list specified for source, cdb
  & ihx files.
  The items in the directory list must be separated by ':', e.g.
  if the source files can be in the directories /home/src1 and /home/src2,
- the --directory option should be --directory=/home/src1:/home/src2.
+ the ---directory option should be ---directory=/home/src1:/home/src2.
  Note there can be no spaces in the option.
  
 \layout Itemize
@@ -6881,7 +6863,7 @@ Comment
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
--------\SpecialChar ~
+------\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -6903,7 +6885,7 @@ Comment
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-------- 
+-------- 
 \newline 
 ;; 
 \newline 
@@ -7609,7 +7591,7 @@ cc@sdcc.sourceforge.net'.
  which reproduces the problem.
  If you can isolate the problem by looking at the generated assembly code,
  this can be very helpful.
- Compiling your program with the --dumpall option can sometimes be useful
+ Compiling your program with the ---dumpall option can sometimes be useful
  in locating optimization problems.
 \layout Section
 
@@ -7647,7 +7629,7 @@ Parsing the input source file and creating an AST (Annotated Syntax Tree).
  xdata will be treated as a storage class specifier when parsing 8051 C
  code but will be treated as a C identifier when parsing z80 or ATMEL AVR
  C code.
-\layout Paragraph
+\layout Paragraph*
 
 Generating iCode
 \layout Standard
@@ -7658,7 +7640,7 @@ Intermediate code generation.
  ICode is the term given to the intermediate form generated by the compiler.
  ICode example section shows some examples of iCode generated for some simple
  C source functions.
-\layout Paragraph
+\layout Paragraph*
 
 Optimizations.
 \layout Standard
@@ -7667,7 +7649,7 @@ Bulk of the target independent optimizations is performed in this phase.
  The optimizations include constant propagation, common sub-expression eliminati
 on, loop invariant code movement, strength reduction of loop induction variables
  and dead-code elimination.
-\layout Paragraph
+\layout Paragraph*
 
 Live range analysis
 \layout Standard
@@ -7685,7 +7667,7 @@ nerated temporaries.
  The live ranges are computed in terms of these numbers.
  The from number is the number of the iCode which first defines the operand
  and the to number signifies the iCode which uses this operand last.
-\layout Paragraph
+\layout Paragraph*
 
 Register Allocation
 \layout Standard
@@ -7712,7 +7694,7 @@ The register allocation determines the type and number of registers needed
 There are other MCU specific considerations in this phase.
  Some MCUs have an accumulator; very short-lived operands could be assigned
  to the accumulator instead of general-purpose register.
-\layout Paragraph
+\layout Paragraph*
 
 Code generation
 \layout Standard
@@ -7724,11 +7706,15 @@ Figure II gives a table of iCode operations supported by the compiler.
  Some of the iCode operations are generated on a MCU specific manner for
  example, the z80 port does not use registers to pass parameters so the
  SEND and RECV iCode operations will not be generated, and it also does
- not support JUMPTABLES
-\layout Section*
+ not support JUMPTABLES.
+ 
+\newline 
 
+\series bold 
+\shape italic 
+\color red
 <Where is Figure II ?>
-\layout Paragraph
+\layout Paragraph*
 
 ICode Example
 \layout Standard
@@ -7802,7 +7788,7 @@ mul = 0;
 \newline 
 15.\SpecialChar ~
 \SpecialChar ~
-for (i = 0, j = 10 ; i < 10 ; i++, j--) {
+for (i = 0, j = 10 ; i < 10 ; i++, j---) {
 \newline 
 16.\SpecialChar ~
 \SpecialChar ~
@@ -7843,11 +7829,13 @@ In addition to the operands each iCode contains information about the filename
 \newline 
 
 \shape italic 
+\size footnotesize 
 Filename(linenumber: iCode Execution sequence number : ICode hash table
  key : loop depth of the iCode).
-\newline 
-
 \shape default 
+\size default 
+
+\newline 
 Then follows the human readable form of the ICode operation.
  Each operand of this triplet form can be of three basic types a) compiler
  generated temporary b) user defined variable c) a constant value.
@@ -7860,11 +7848,13 @@ Then follows the human readable form of the ICode operation.
 \newline 
 
 \shape italic 
+\size footnotesize 
 Operand Name [lr live-from : live-to ] { type information } [ registers
  allocated ].
-\newline 
-
 \shape default 
+\size default 
+
+\newline 
 As mentioned earlier the live ranges are computed in terms of the execution
  sequence number of the iCodes, for example 
 \newline 
@@ -7904,227 +7894,227 @@ Note the dead code elimination optimization eliminated the dead assignments
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c (5:1:0:0) _entry($9) :
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(5:2:1:0) proc _function [lr0:0]{function short}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(11:3:2:0) iTemp0 [lr3:5]{_near * int}[r2] = recv 
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(11:4:53:0) preHeaderLbl0($11) :
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(11:5:55:0) iTemp6 [lr5:16]{_near * int}[r0] := iTemp0 [lr3:5]{_near
  * int}[r2]
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(11:6:5:1) _whilecontinue_0($1) :
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(11:7:7:1) iTemp4 [lr7:8]{int}[r2 r3] = @[iTemp6 [lr5:16]{_near *
  int}[r0]]
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(11:8:8:1) if iTemp4 [lr7:8]{int}[r2 r3] == 0 goto _whilebreak_0($3)
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(11:9:14:1) iTemp7 [lr9:13]{_far * int}[DPTR] := _p [lr0:0]{_far
  * int}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(11:10:15:1) _p [lr0:0]{_far * int} = _p [lr0:0]{_far * int} + 0x2
  {short}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(11:13:18:1) iTemp10 [lr13:14]{int}[r2 r3] = @[iTemp7 [lr9:13]{_far
  * int}[DPTR]]
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(11:14:19:1) *(iTemp6 [lr5:16]{_near * int}[r0]) := iTemp10 [lr13:14]{int
 }[r2 r3]
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(11:15:12:1) iTemp6 [lr5:16]{_near * int}[r0] = iTemp6 [lr5:16]{_near
  * int}[r0] + 
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 0x2 {short}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(11:16:20:1) goto _whilecontinue_0($1)
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(11:17:21:0)_whilebreak_0($3) :
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(12:18:22:0) iTemp2 [lr18:40]{short}[r2] := 0x0 {short}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(13:19:23:0) iTemp11 [lr19:40]{short}[r3] := 0x0 {short}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(15:20:54:0)preHeaderLbl1($13) :
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(15:21:56:0) iTemp21 [lr21:38]{short}[r4] := 0x0 {short}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(15:22:57:0) iTemp23 [lr22:38]{int}[r5 r6] := 0xa {int}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(15:23:58:0) iTemp17 [lr23:38]{int}[r7 r0] := 0x1e {int}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(15:24:26:1)_forcond_0($4) :
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(15:25:27:1) iTemp13 [lr25:26]{char}[CC] = iTemp21 [lr21:38]{short}[r4]
  < 0xa {short}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(15:26:28:1) if iTemp13 [lr25:26]{char}[CC] == 0 goto _forbreak_0($7)
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(16:27:31:1) iTemp2 [lr18:40]{short}[r2] = iTemp2 [lr18:40]{short}[r2]
  + 
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ITemp21 [lr21:38]{short}[r4]
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(17:29:33:1) iTemp15 [lr29:30]{short}[r1] = iTemp21 [lr21:38]{short}[r4]
  * 0x3 {short}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(17:30:34:1) iTemp11 [lr19:40]{short}[r3] = iTemp11 [lr19:40]{short}[r3]
  + 
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 iTemp15 [lr29:30]{short}[r1]
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(18:32:36:1:1) iTemp17 [lr23:38]{int}[r7 r0]= iTemp17 [lr23:38]{int}[r7
  r0]- 0x3 {short}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(18:33:37:1) _gint [lr0:0]{int} = _gint [lr0:0]{int} + iTemp17 [lr23:38]{
 int}[r7 r0]
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(15:36:42:1) iTemp21 [lr21:38]{short}[r4] = iTemp21 [lr21:38]{short}[r4]
  + 0x1 {short}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(15:37:45:1) iTemp23 [lr22:38]{int}[r5 r6]= iTemp23 [lr22:38]{int}[r5
  r6]- 0x1 {short}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(19:38:47:1) goto _forcond_0($4)
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(19:39:48:0)_forbreak_0($7) :
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 Sample.c(20:40:49:0) iTemp24 [lr40:41]{short}[DPTR] = iTemp2 [lr18:40]{short}[r2]
  + 
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ITemp11 [lr19:40]{short}[r3]
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 sample.c(20:41:50:0) ret iTemp24 [lr40:41]{short}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 sample.c(20:42:51:0)_return($8) :
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 sample.c(20:43:52:0) eproc _function [lr0:0]{ ia0 re0 rm0}{function short}
-\newline 
+\size default 
 
-\family default 
+\newline 
 
 \newline 
 Finally the code generated for this function:
@@ -8133,751 +8123,751 @@ Finally the code generated for this function:
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 .area DSEG (DATA)
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 _p::
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 .ds 2
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 _gint::
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 .ds 2
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; sample.c 5
 \layout Standard
 
 
-\family typewriter 
-; -----------------------------------------
+\size footnotesize 
+; ----------------------------------------------
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; function function
 \layout Standard
 
 
-\family typewriter 
-; -----------------------------------------
+\size footnotesize 
+; ----------------------------------------------
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 _function:
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; iTemp0 [lr3:5]{_near * int}[r2] = recv 
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov r2,dpl
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; iTemp6 [lr5:16]{_near * int}[r0] := iTemp0 [lr3:5]{_near * int}[r2]
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov ar0,r2
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ;_whilecontinue_0($1) :
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 00101$:
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; iTemp4 [lr7:8]{int}[r2 r3] = @[iTemp6 [lr5:16]{_near * int}[r0]]
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; if iTemp4 [lr7:8]{int}[r2 r3] == 0 goto _whilebreak_0($3)
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov ar2,@r0
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 inc r0
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov ar3,@r0
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 dec r0
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov a,r2
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 orl a,r3
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 jz 00103$
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 00114$:
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; iTemp7 [lr9:13]{_far * int}[DPTR] := _p [lr0:0]{_far * int}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov dpl,_p
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov dph,(_p + 1)
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; _p [lr0:0]{_far * int} = _p [lr0:0]{_far * int} + 0x2 {short}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov a,#0x02
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 add a,_p
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov _p,a
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 clr a
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 addc a,(_p + 1)
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov (_p + 1),a
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; iTemp10 [lr13:14]{int}[r2 r3] = @[iTemp7 [lr9:13]{_far * int}[DPTR]]
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 movx a,@dptr
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov r2,a
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 inc dptr
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 movx a,@dptr
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov r3,a
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; *(iTemp6 [lr5:16]{_near * int}[r0]) := iTemp10 [lr13:14]{int}[r2 r3]
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov @r0,ar2
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 inc r0
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov @r0,ar3
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; iTemp6 [lr5:16]{_near * int}[r0] = 
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; iTemp6 [lr5:16]{_near * int}[r0] + 
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; 0x2 {short}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 inc r0
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; goto _whilecontinue_0($1)
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 sjmp 00101$
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; _whilebreak_0($3) :
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 00103$:
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; iTemp2 [lr18:40]{short}[r2] := 0x0 {short}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov r2,#0x00
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; iTemp11 [lr19:40]{short}[r3] := 0x0 {short}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov r3,#0x00
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; iTemp21 [lr21:38]{short}[r4] := 0x0 {short}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov r4,#0x00
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; iTemp23 [lr22:38]{int}[r5 r6] := 0xa {int}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov r5,#0x0A
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov r6,#0x00
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; iTemp17 [lr23:38]{int}[r7 r0] := 0x1e {int}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov r7,#0x1E
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov r0,#0x00
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; _forcond_0($4) :
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 00104$:
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; iTemp13 [lr25:26]{char}[CC] = iTemp21 [lr21:38]{short}[r4] < 0xa {short}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; if iTemp13 [lr25:26]{char}[CC] == 0 goto _forbreak_0($7)
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 clr c
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov a,r4
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 xrl a,#0x80
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 subb a,#0x8a
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 jnc 00107$
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 00115$:
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; iTemp2 [lr18:40]{short}[r2] = iTemp2 [lr18:40]{short}[r2] + 
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; iTemp21 [lr21:38]{short}[r4]
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov a,r4
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 add a,r2
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov r2,a
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; iTemp15 [lr29:30]{short}[r1] = iTemp21 [lr21:38]{short}[r4] * 0x3 {short}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov b,#0x03
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov a,r4
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mul ab
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov r1,a
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; iTemp11 [lr19:40]{short}[r3] = iTemp11 [lr19:40]{short}[r3] + 
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; iTemp15 [lr29:30]{short}[r1]
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 add a,r3
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov r3,a
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; iTemp17 [lr23:38]{int}[r7 r0]= iTemp17 [lr23:38]{int}[r7 r0]- 0x3 {short}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov a,r7
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 add a,#0xfd
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov r7,a
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov a,r0
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 addc a,#0xff
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov r0,a
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; _gint [lr0:0]{int} = _gint [lr0:0]{int} + iTemp17 [lr23:38]{int}[r7 r0]
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov a,r7
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 add a,_gint
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov _gint,a
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov a,r0
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 addc a,(_gint + 1)
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov (_gint + 1),a
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; iTemp21 [lr21:38]{short}[r4] = iTemp21 [lr21:38]{short}[r4] + 0x1 {short}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 inc r4
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; iTemp23 [lr22:38]{int}[r5 r6]= iTemp23 [lr22:38]{int}[r5 r6]- 0x1 {short}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 dec r5
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 cjne r5,#0xff,00104$
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 dec r6
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; goto _forcond_0($4)
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 sjmp 00104$
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; _forbreak_0($7) :
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 00107$:
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; ret iTemp24 [lr40:41]{short}
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov a,r3
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 add a,r2
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 mov dpl,a
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 ; _return($8) :
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 00108$:
 \layout Standard
 
 
-\family typewriter 
+\size footnotesize 
 \SpecialChar ~
 \SpecialChar ~
 ret
-\family default 
+\size default 
 
 \newline 
 

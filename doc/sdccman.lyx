@@ -3,7 +3,7 @@
 \textclass article
 \language english
 \inputencoding default
-\fontscheme times
+\fontscheme pslatex
 \graphics default
 \paperfontsize default
 \spacing single 

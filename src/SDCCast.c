@@ -367,6 +367,7 @@ resolveSymbols (ast * tree)
   if (tree == NULL)
     return tree;
 
+#if 0
   /* print the line          */
   /* if not block & function */
   if (tree->type == EX_OP &&
@@ -377,6 +378,7 @@ resolveSymbols (ast * tree)
       filename = tree->filename;
       lineno = tree->lineno;
     }
+#endif
 
   /* make sure we resolve the true & false labels for ifx */
   if (tree->type == EX_OP && tree->opval.op == IFX)
@@ -1085,6 +1087,16 @@ gatherAutoInit (symbol * autoChain)
       /* if there is an initial value */
       if (sym->ival && SPEC_SCLS (sym->etype) != S_CODE)
 	{
+	  initList *ilist=sym->ival;
+	  
+	  while (ilist->type == INIT_DEEP) {
+	    ilist = ilist->init.deep;
+	  }
+
+	  /* update lineno for error msg */
+	  lineno=sym->lineDef;
+	  setAstLineno (ilist->init.node, lineno);
+	  
 	  if (IS_AGGREGATE (sym->type)) {
 	    work = initAggregates (sym, sym->ival, NULL);
 	  } else {
@@ -1095,8 +1107,10 @@ gatherAutoInit (symbol * autoChain)
 	    work = newNode ('=', newAst_VALUE (symbolVal (sym)),
 			    list2expr (sym->ival));
 	  }
-
+	  
+	  // just to be sure
 	  setAstLineno (work, sym->lineDef);
+
 	  sym->ival = NULL;
 	  if (init)
 	    init = newNode (NULLOP, init, work);
@@ -1849,6 +1863,7 @@ decorateType (ast * tree)
 
   tree->decorated = 1;
 
+#if 0
   /* print the line          */
   /* if not block & function */
   if (tree->type == EX_OP &&
@@ -1859,6 +1874,7 @@ decorateType (ast * tree)
       filename = tree->filename;
       lineno = tree->lineno;
     }
+#endif
 
   /* if any child is an error | this one is an error do nothing */
   if (tree->isError ||
@@ -2454,7 +2470,7 @@ decorateType (ast * tree)
 
       LRVAL (tree) = RRVAL (tree) = 1;
       /* if the left is a pointer */
-      if (IS_PTR (LTYPE (tree)))
+      if (IS_PTR (LTYPE (tree)) || IS_ARRAY (LTYPE (tree)))
 	TETYPE (tree) = getSpec (TTYPE (tree) =
 				 LTYPE (tree));
       else

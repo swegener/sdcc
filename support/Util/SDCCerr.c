@@ -87,7 +87,7 @@ struct
    "storage class not allowed for automatic variable '%s' in reentrant function unless static" },
 { E_AUTO_ABSA, ERROR_LEVEL_ERROR,
    "absolute address not allowed for automatic var '%s' in reentrant function " },
-{ E_INIT_WRONG, ERROR_LEVEL_ERROR,
+{ W_INIT_WRONG, ERROR_LEVEL_WARNING,
    "Initializer different levels of indirections" },
 { E_FUNC_REDEF, ERROR_LEVEL_ERROR,
    "Function name '%s' redefined " },

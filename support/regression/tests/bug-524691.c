@@ -2,6 +2,12 @@
  */
 #include <testfwk.h>
 
+#if defined __mcs51 || defined __ds390 || defined __xa51
+#define XDATA xdata
+#else
+#define XDATA
+#endif
+
 typedef unsigned int UINT;
 
 typedef struct _HeapEntryState
@@ -43,9 +49,9 @@ void
 testDivByZero(void)
 {
   HeapEntryState aStates[] = {
-    { (void *)1, 0 }
+    { (void XDATA *)1, 0 }
   };
-  void *p = (void *)0x1234;
+  void *p = (void XDATA *)0x1234;
 
   ASSERT(_getHeapEntryState(p, aStates, 1) == NULL);
 

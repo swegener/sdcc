@@ -329,11 +329,23 @@ initPointer (initList * ilist, sym_link *toType)
 	if ((val = constExprValue (expr, FALSE)))
 		return val;
 	
+	/* ( ptr + constant ) */
+	if (IS_AST_OP (expr) &&
+	    (expr->opval.op == '+' || expr->opval.op == '-') &&
+	    IS_AST_SYM_VALUE (expr->left) &&
+	    (IS_ARRAY(expr->left->ftype) || IS_PTR(expr->left->ftype)) &&
+	    compareType(toType, expr->left->ftype) &&
+	    IS_AST_LIT_VALUE (expr->right)) {
+	  return valForCastAggr (expr->left, expr->left->ftype,
+				      expr->right,
+				      expr->opval.op);
+	}
+	
 	/* (char *)&a */
 	if (IS_AST_OP(expr) && expr->opval.op==CAST &&
 	    IS_AST_OP(expr->right) && expr->right->opval.op=='&') {
 	  if (compareType(toType, expr->left->ftype)!=1) {
-	    werror (E_INIT_WRONG);
+	    werror (W_INIT_WRONG);
 	    printFromToType(expr->left->ftype, toType);
 	  }
 	  // skip the cast ???
@@ -401,7 +413,6 @@ initPointer (initList * ilist, sym_link *toType)
 				       expr->right, expr->opval.op);
 
 	}
-	
 	/* case 4. (char *)(array type) */
 	if (IS_CAST_OP(expr) && IS_AST_SYM_VALUE (expr->right) &&
 	    IS_ARRAY(expr->right->ftype)) {
@@ -427,7 +438,7 @@ initPointer (initList * ilist, sym_link *toType)
 		return val;
 	}
  wrong:
-	werror (E_INIT_WRONG);
+	werror (E_INCOMPAT_PTYPES);
 	return NULL;
 
 }
@@ -493,12 +504,8 @@ pointerTypeToGPByte (const int p_type, const char *iname, const char *oname)
     case POINTER:
       return 0;
     case GPOINTER:
-      /* hack - if we get a generic pointer, we just assume
-       * it's an FPOINTER (i.e. in XDATA space).
-       */
       werror (E_CANNOT_USE_GENERIC_POINTER, iname, oname);
       exit (1);
-      // fall through
     case FPOINTER:
       return 1;
     case CPOINTER:
@@ -971,7 +978,7 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
 
   /* check the type      */
   if (compareType (type, val->type) == 0) {
-    werror (E_INIT_WRONG);
+    werror (W_INIT_WRONG);
     printFromToType (val->type, type);
   }
 

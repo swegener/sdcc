@@ -73,7 +73,7 @@ set *dynDirectBitRegs=NULL;
 set *dynInternalRegs=NULL;
 
 static hTab  *dynDirectRegNames= NULL;
-static hTab  *regHash = NULL;    /* a hash table containing ALL registers */
+// static hTab  *regHash = NULL;    /* a hash table containing ALL registers */
 
 static int dynrIdx=0x20;
 static int rDirectIdx=0;

@@ -277,8 +277,10 @@ _pic14_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 static bool
 _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 {
+/*
   sym_link *test = NULL;
   value *val;
+*/
 
   fprintf(stderr,"checking for native mult\n");
 

@@ -77,7 +77,7 @@ static int peepOptimizing = 1;        /* run the peephole optimizer if nonzero *
 static int functionInlining = 1;      /* inline functions if nonzero */
 int debug_verbose = 0;                /* Set true to inundate .asm file */
 
-static int GpCodeSequenceNumber = 1;
+// static int GpCodeSequenceNumber = 1;
 int GpcFlowSeq = 1;
 
 extern void RemoveUnusedRegisters(void);

@@ -205,13 +205,13 @@ int summary(struct area * areap)
 		if((j==0) || (j==7)) fprintf(of, format, line, line, line, line, line);
 		if((j!=5) || (Ram[j].Size>0))
 		{
-			sprintf(start, "0x%02x", Ram[j].Start);
+			sprintf(start, "0x%02lx", Ram[j].Start);
 			if(Ram[j].Size==0)
 				end[0]=0;/*Empty string*/
 			else
-				sprintf(end,  "0x%02x", j==7?Total_Last:Ram[j].Size+Ram[j].Start-1);
-			sprintf(size, "%5u", Ram[j].Size);
-			sprintf(max, "%5u", Ram[j].Max);
+				sprintf(end,  "0x%02lx", j==7?Total_Last:Ram[j].Size+Ram[j].Start-1);
+			sprintf(size, "%5lu", Ram[j].Size);
+			sprintf(max, "%5lu", Ram[j].Max);
 			fprintf(of, format, Ram[j].Name, start, end, size, max);
 		}
 	}
@@ -236,8 +236,8 @@ int summary(struct area * areap)
 
 	if(Ram[5].Size!=0)
 	{
-		sprintf(buff, "%d bytes in DRAM wasted.  "
-		            "SDCC link could use: --data-loc 0x%02x\n",
+		sprintf(buff, "%ld bytes in DRAM wasted.  "
+		            "SDCC link could use: --data-loc 0x%02lx\n",
 					Ram[5].Size, Ram[6].Start-Ram[5].Size);
 		REPORT_WARNING(buff, 1);
 	}
@@ -251,7 +251,7 @@ int summary(struct area * areap)
 	}
 
 	/*Report the position of the begining of the stack*/
-	fprintf(of, "\nStack starts at: 0x%02x", Stack.Start);
+	fprintf(of, "\nStack starts at: 0x%02lx", Stack.Start);
 
 	/*Check that the stack pointer is landing in a safe place:*/
 	if( (dram[Stack.Start] & 0x8000) == 0x8000 )
@@ -296,33 +296,33 @@ int summary(struct area * areap)
 	fprintf(of, format, line, line, line, line, line);
 
 	/*Report IRam totals:*/
-	sprintf(start, "0x%02x", IRam.Start);
+	sprintf(start, "0x%02lx", IRam.Start);
 	if(IRam.Size==0)
 		end[0]=0;/*Empty string*/
 	else
-		sprintf(end,  "0x%02x", IRam.Size+IRam.Start-1);
-	sprintf(size, "%5u", IRam.Size);
-	sprintf(max, "%5u", IRam.Max);
+		sprintf(end,  "0x%02lx", IRam.Size+IRam.Start-1);
+	sprintf(size, "%5lu", IRam.Size);
+	sprintf(max, "%5lu", IRam.Max);
 	fprintf(of, format, IRam.Name, start, end, size, max);
 
 	/*Report XRam totals:*/
-	sprintf(start, "0x%04x", XRam.Start);
+	sprintf(start, "0x%04lx", XRam.Start);
 	if(XRam.Size==0)
 		end[0]=0;/*Empty string*/
 	else
-		sprintf(end,  "0x%04x", XRam.Size+XRam.Start-1);
-	sprintf(size, "%5u", XRam.Size);
-	sprintf(max, "%5u", XRam.Max);
+		sprintf(end,  "0x%04lx", XRam.Size+XRam.Start-1);
+	sprintf(size, "%5lu", XRam.Size);
+	sprintf(max, "%5lu", XRam.Max);
 	fprintf(of, format, XRam.Name, start, end, size, max);
 
 	/*Report Rom/Flash totals:*/
-	sprintf(start, "0x%04x", Rom.Start);
+	sprintf(start, "0x%04lx", Rom.Start);
 	if(Rom.Size==0)
 		end[0]=0;/*Empty string*/
 	else
-		sprintf(end,  "0x%04x", Rom.Size+Rom.Start-1);
-	sprintf(size, "%5u", Rom.Size);
-	sprintf(max, "%5u", Rom.Max);
+		sprintf(end,  "0x%04lx", Rom.Size+Rom.Start-1);
+	sprintf(size, "%5lu", Rom.Size);
+	sprintf(max, "%5lu", Rom.Max);
 	fprintf(of, format, Rom.Name, start, end, size, max);
 
 	/*Report any excess:*/

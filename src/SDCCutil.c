@@ -185,8 +185,6 @@ void
 buildCmdLine2 (char *pbuffer, const char *pcmd)
 {
   char *poutcmd = msprintf(_mainValues, pcmd);
-  printf("In: \"%s\"\n", pcmd);
-  printf("Out: \"%s\"\n", poutcmd);
   strcpy(pbuffer, poutcmd);
 }
 

@@ -67,8 +67,6 @@ _evalMacros(char *apinto, hTab *pvals, const char *pfrom)
 	      wassertl (0, "Invalid macro name");
             }
 
-          printf("Mapping %s to \"%s\"\n", name, pval);
-
           /* Replace */
           strcpy(pinto, pval);
           pinto += strlen(pval);

@@ -70,7 +70,7 @@ rollers underlying hardware effectively.
 For the back-end SDCC uses a global register allocation scheme which should
  be well suited for other 8 bit MCUs.
  The peep hole optimizer uses a rule based substitution mechanism which
- is MCU independent.
+ is MCU dependent.
  Supported data-types are 
 \emph on 
 short (8 bits, 1 byte), char (8 bits, 1 byte), int (16 bits, 2 bytes ),
@@ -85,7 +85,7 @@ inline assembler code
  In addition routines developed in assembly can also be called.
  SDCC also provides an option to report the relative complexity of a function,
  these functions can then be further optimized, or hand coded in assembly
- if need be.
+ if needed.
  SDCC also comes with a companion source level debugger SDCDB, the debugger
  currently uses ucSim a freeware simulator for 8051 and other micro-controllers.
  The latest version can be downloaded from 
@@ -153,7 +153,7 @@ The SDCC home page at
  Web links to other SDCC related sites can also be found here.
  This document can be found in the DOC directory of the source package as
  a text or HTML file.
- Some of the other tools(simulator and assembler) included with SDCC contain
+ Some of the other tools (simulator and assembler) included with SDCC contain
  their own documentation and can be found in the source distribution.
  If you want the latest unreleased software, the complete source package
  is available directly by anonymous CVS on www.sourceforge.net.
@@ -393,7 +393,7 @@ sdcc --version
  If it doesn't run, or gives a message about not finding sdcc program, then
  you need to check over your installation.
  Make sure that the sdcc bin directory is in your executable search path
- defined by the PATH environment setting(see the Trouble-shooting section
+ defined by the PATH environment setting (see the Trouble-shooting section
  for suggestions).
  Make sure that the sdcc program is in the bin folder, if not perhaps something
  did not install correctly.
@@ -544,12 +544,20 @@ sdcc test.c
 .
  If all goes well the compiler will link with the libraries and produce
  a test.ihx output file.
- If this step fails(no test.ihx, and the linker generates warnings), then
- the problem is most likely that sdcc cannot find the usr/local/share/sdcc/lib
+ If this step fails
 \series default 
-/small
+ 
 \series medium 
- directory(see the Install trouble-shooting section for suggestions).
+(no test.ihx, and the linker generates warnings), then the problem is most
+ likely that sdcc cannot find the 
+\series default 
+/
+\series medium 
+usr/local/share/sdcc/lib directory
+\series default 
+ 
+\series medium 
+(see the Install trouble-shooting section for suggestions).
 \layout Standard
 
 
@@ -593,8 +601,11 @@ sdcc test.c
  This should generate a test.ihx output file, and it should give no warnings
  such as not finding the string.h file.
  If it cannot find the string.h file, then the problem is that sdcc cannot
- find the /usr/local/share/sdcc/include directory(see the Install trouble-shooti
-ng section for suggestions).
+ find the /usr/local/share/sdcc/include directory
+\series default 
+ 
+\series medium 
+(see the Install trouble-shooting section for suggestions).
 \layout Subsection
 
 Install Trouble-shooting
@@ -628,19 +639,25 @@ The default installation assumes the libraries and header files are located
 SDCC does not compile correctly.
 \layout Standard
 
-A few things to try include starting from scratch by unpacking the .tgz source
- package again in an empty directory.
- If this doesn't work, you could try downloading a different version.
- If this doesn't work, you can re-direct the install messages by doing the
- following:
+A things to try is starting from scratch by unpacking the .tgz source package
+ again in an empty directory.
+ Confure it again and build like:
 \layout Standard
 
-$./make > dump.txt 2>&1
+
+\begin_inset Quotes eld
+\end_inset 
+
+make 2&>1 | tee make.log
+\begin_inset Quotes erd
+\end_inset 
+
+
 \layout Standard
 
-After this you can examine the dump.txt files to locate the problem.
- Or these messages can be attached to an email that could be helpful when
- requesting help from the mailing list.
+After this you can review the make.log file to locate the problem.
+ Or a relevant part of this be attached to an email that could be helpful
+ when requesting help from the mailing list.
 \layout Subsubsection
 
 What the 
@@ -1147,8 +1164,8 @@ sourcefile.map - The memory map for the load module, created by the Linker.
 
 
 \size footnotesize 
-sourcefile.<ihx | s19> - The load module : ihx - Intel hex format (default
- ), s19 - Motorola S19 format when compiler option --out-fmt-s19 is used.
+sourcefile.ihx - The load module in Intel hex format (you can select the
+ Motorola S19 format with --out-fmt-s19)
 \layout Subsubsection
 
 Projects with Multiple Source Files
@@ -1243,9 +1260,9 @@ this describes how to create a
 \emph default 
  in the directory 
 \emph on 
-'mylib'
+'mylib
 \emph default 
-.
+' (if that is not the same as your current project).
 \layout Standard
 
 
@@ -1330,14 +1347,14 @@ Processor Selection Options
  Generate code for the Toshiba TLCS-900H processor(In development, not complete).
 \layout Subsubsection
 
-Path, Lib and Define Options
+Path and Define Options
 \layout List
 \labelwidthstring 00.00.0000
 
 
 \series bold 
 \bar under 
--I<path> 
+-I<path>
 \series default 
 \bar default 
  The additional location where the pre processor will look for <..h> or 
@@ -1356,19 +1373,6 @@ Path, Lib and Define Options
 \series bold 
 \size large 
 \bar under 
--D<macro[=value]>
-\series default 
-\size default 
-\bar default 
- Command line definition of macros.
- Passed to the pre processor.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
-\size large 
-\bar under 
 --lib-path(-L)
 \size default 
  
@@ -1378,7 +1382,20 @@ Path, Lib and Define Options
  editor, additional libraries search path.
  The path name must be absolute.
  Additional library files may be specified in the command line .
- See section Compiling programs for more details.
+ See section Compiling programs for more details
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+\size large 
+\bar under 
+-D<macro[=value]>
+\series default 
+\size default 
+\bar default 
+ Command line definition of macros.
+ Passed to the pre processor.
 \layout Subsubsection
 
 MCS51 Options
@@ -1421,26 +1438,9 @@ Generate code for Small Model programs see section Memory Models for more
 \series bold 
 \size large 
 \bar under 
---model-flat24
+--stack-auto
 \series default 
 \emph on 
-\bar default 
- 
-\size default 
-\emph default 
-Generate code forDS80C390 24-bit flat mode.
- See section Memory Models for more details.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
-\size large 
-\bar under 
---stack-
-\emph on 
-auto
-\series default 
 \bar default 
  
 \size default 
@@ -1580,17 +1580,42 @@ DS390 Options
 \labelwidthstring 00.00.0000
 
 
+\size large 
+\bar under 
+--
+\series bold 
+model
+\series default 
+-
+\series bold 
+flat24
+\series default 
+\emph on 
+\bar default 
+ 
+\size default 
+\emph default 
+Generate 24-bit flat mode code.
+ This is the one and only that the ds390 code generator supports right now
+ and is default when using -mds390.
+ See section Memory Models for more details.
+\layout List
+\labelwidthstring 00.00.0000
+
+
 \series bold 
 --stack-10bit
 \series default 
  This option generates code for the 10 bit stack mode of the Dallas DS80C390
  part.
+ This is the one and only that the ds390 code generator supports right now
+ and is default when using -mds390.
  In this mode, the stack is located in the lower 1K of the internal RAM,
  which is mapped to 0x400000.
  Note that the support is incomplete, since it still uses a single byte
  as the stack pointer.
  This means that only the lower 256 bytes of the potential 1K stack space
- can actually be used.
+ will actually be used.
  However, this does allow you to reclaim the precious 256 bytes of low RAM
  for use for the DATA and IDATA segments.
  The compiler will not generate any code to put the processor into 10 bit
@@ -1622,12 +1647,12 @@ Other Options
  & popping when calling small functions from larger functions.
  This option can be used to switch the register saving convention for the
  function names specified.
- The compiler will not save registers when calling these functions, extra
+ The compiler will not save registers when calling these functions, no extra
  code will be generated at the entry & exit for these functions to save
  & restore the registers used by these functions, this can SUBSTANTIALLY
  reduce code & improve run time performance of the generated code.
- In future the compiler (with interprocedural analysis) will be able to
- determine the appropriate scheme to use for each function call.
+ In the future the compiler (with interprocedural analysis) will be able
+ to determine the appropriate scheme to use for each function call.
  DO NOT use this option for built-in functions such as _muluint..., if this
  option is used for a library function the appropriate library function
  needs to be recompiled with the same option.
@@ -1676,7 +1701,7 @@ When this option is used the compiler will generate debug information ,
 \bar default 
 (-c) 
 \size default 
- will compile and assemble the source only, will not call the linkage editor.
+ will compile and assemble the source, but will not call the linkage editor.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -1847,7 +1872,11 @@ When this option is used the compiler will generate debug information ,
 \size default 
 \bar default 
 Like `-M' but the output mentions only the user header files included with
- `#include file"'.
+ `#include 
+\begin_inset Quotes eld
+\end_inset 
+
+file"'.
  System header files included with `#include <file>' are omitted.
 \layout List
 \labelwidthstring 00.00.0000
@@ -1944,7 +1973,7 @@ Like `-dD' except that the macro arguments and contents are omitted.
 \series default 
 \size default 
 \bar default 
-Stop after the stage of compilation proper; do not as- semble.
+Stop after the stage of compilation proper; do not assemble.
  The output is an assembler code file for the input file specified.
 \layout List
 \labelwidthstring 00.00.0000
@@ -2102,9 +2131,9 @@ The linker output (final object code) is in Motorola S19 format.
 \size default 
 \bar default 
   Pass the inline assembler code through the peep hole optimizer.
- Can cause unexpected changes to inline assembler code , please go through
- the peephole optimizer rules defnied in file 'SDCCpeeph.def' before using
- this option.
+ This can cause unexpected changes to inline assembler code, please go through
+ the peephole optimizer rules defined in the source file tree '<target>/peeph.def
+' before using this option.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -2136,17 +2165,16 @@ The following options are provided for the purpose of retargetting and debugging
 \series bold 
 \size large 
 \bar under 
---dumpraw 
+--dumpraw
 \series default 
 \size default 
 \bar default 
-.
  This option will cause the compiler to dump the intermediate code into
  a file of named 
 \emph on 
 <source filename>.dumpraw
 \emph default 
- just after the intermediate code has been generated for a function , i.e.
+ just after the intermediate code has been generated for a function, i.e.
  before any optimizations are done.
  The basic blocks at this stage ordered in the depth first number, so they
  may not be in sequence of execution.
@@ -2159,12 +2187,10 @@ The following options are provided for the purpose of retargetting and debugging
 \bar under 
 --dumpgcse
 \series default 
-\bar default 
-.
-
 \size default 
- Will create a dump if iCode, after global subexpression elimination, into
- a file named 
+\bar default 
+ Will create a dump of iCode's, after global subexpression elimination,
+ into a file named 
 \emph on 
 <source filename>.dumpgcse.
 \layout List
@@ -2174,12 +2200,12 @@ The following options are provided for the purpose of retargetting and debugging
 \series bold 
 \size large 
 \bar under 
---dumpdeadcode 
+--dumpdeadcode
 \series default 
 \size default 
 \bar default 
-.Will create a dump if iCode, after deadcode elimination, into a file named
- 
+ Will create a dump of iCode's, after deadcode elimination, into a file
+ named 
 \emph on 
 <source filename>.dumpdeadcode.
 \layout List
@@ -2189,13 +2215,12 @@ The following options are provided for the purpose of retargetting and debugging
 \series bold 
 \size large 
 \bar under 
---dumploop.
-
+--dumploop
 \series default 
 \bar default 
  
 \size default 
-Will create a dump if iCode, after loop optimizations, into a file named
+Will create a dump of iCode's, after loop optimizations, into a file named
  
 \emph on 
 <source filename>.dumploop.
@@ -2206,13 +2231,12 @@ Will create a dump if iCode, after loop optimizations, into a file named
 \series bold 
 \size large 
 \bar under 
---dumprange.
-
+--dumprange
 \series default 
 \bar default 
  
 \size default 
-Will create a dump if iCode, after live range analysis, into a file named
+Will create a dump of iCode's, after live range analysis, into a file named
  
 \emph on 
 <source filename>.dumprange.
@@ -2223,16 +2247,19 @@ Will create a dump if iCode, after live range analysis, into a file named
 \series bold 
 \size large 
 \bar under 
---dumpregassign.
-
+--dumpregassign
 \size default 
  
 \series default 
 \bar default 
-Will create a dump if iCode, after register assignment , into a file named
+Will create a dump of iCode's, after register assignment , into a file named
  
 \emph on 
 <source filename>.dumprassgn.
+\layout List
+\labelwidthstring 00.00.0000
+
+--dumplrange Will create a dump of the live ranges of iTemp's
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -2240,24 +2267,14 @@ Will create a dump if iCode, after register assignment , into a file named
 \series bold 
 \size large 
 \bar under 
---dumpall.
- 
+--dumpall 
 \series default 
 \size default 
 \bar default 
 Will cause all the above mentioned dumps to be created.
-\layout Standard
-
-Note that the files created for the dump are appended to each time.
- So the files should be deleted manually , before each dump is created.
- 
-\layout Standard
-
-When reporting bugs, it can be helpful to include these dumps along with
- the portion of the code that is causing the problem.
 \layout Subsection
 
-MCS51 Storage Class Language Extensions
+MCS51/DS390 Storage Class Language Extensions
 \layout Standard
 
 In addition to the ANSI storage classes SDCC allows the following MCS51
@@ -2433,7 +2450,8 @@ unsigned char _idata *uccp; \SpecialChar ~
 /* pointer to upper 128 bytes of ram */
 \layout Standard
 
-All unqualified pointers are treated as 3 - byte '_generic' pointers.
+All unqualified pointers are treated as 3-byte (4-bytes for the ds390) '_generic
+' pointers.
  These type of pointers can also to be explicitly declared.
 \layout Standard
 
@@ -2503,6 +2521,9 @@ When compiled with the default option (i.e.
  non-reentrant ), local variables can be assigned storage classes and absolute
  addresses.
  
+\layout Standard
+
+(jwk: pending: this is obsolete and need a rewrite)
 \layout Standard
 
 

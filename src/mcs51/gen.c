@@ -1775,7 +1775,7 @@ pushSide (operand * oper, int size)
 	  AOP_TYPE (oper) != AOP_DIR &&
 	  strcmp (l, "a"))
 	{
-	  emitcode ("mov", "a,%s", l);
+	  MOVA (l);
 	  emitcode ("push", "acc");
 	}
       else
@@ -1899,7 +1899,7 @@ genIpush (iCode * ic)
 	  AOP_TYPE (IC_LEFT (ic)) != AOP_DIR &&
 	  strcmp (l, "a"))
 	{
-	  emitcode ("mov", "a,%s", l);
+	  MOVA (l);
 	  emitcode ("push", "acc");
 	}
       else
@@ -7637,7 +7637,7 @@ genSignedRightShift (iCode * ic)
 
   size = AOP_SIZE (result);
   offset = size - 1;
-  emitcode ("mov", "a,%s", aopGet (AOP (left), offset, FALSE, FALSE));
+  MOVA (aopGet (AOP (left), offset, FALSE, FALSE));
   emitcode ("rlc", "a");
   emitcode ("mov", "ov,c");
   /* if it is only one byte then */
@@ -9529,7 +9529,7 @@ genDjnz (iCode * ic, iCode * ifx)
     {
       emitcode ("dec", "%s",
 		aopGet (AOP (IC_RESULT (ic)), 0, FALSE, FALSE));
-      emitcode ("mov", "a,%s", aopGet (AOP (IC_RESULT (ic)), 0, FALSE, FALSE));
+      MOVA (aopGet (AOP (IC_RESULT (ic)), 0, FALSE, FALSE));
       emitcode ("jnz", "%05d$", lbl->key + 100);
     }
   else

@@ -418,10 +418,23 @@ int
 t_uc51::inst_mov_a_addr(uchar code)
 {
   class cl_cell *cell;
+  int address = fetch();
 
-  cell= get_direct(fetch());
-  acc->write(cell->read());
-  return(resGO);
+  /* If this is ACC, it is an invalid instruction */
+  if (address == ACC)
+    {
+      sim->app->get_commander()->
+        debug ("Invalid Instruction : E5 E0  MOV A,ACC  at  %06x\n", PC);
+
+      return(resHALT);
+    }
+  else
+    {
+      cell= get_direct(address);
+      acc->write(cell->read());
+      return(resGO);
+    }
+  
 }
 
 

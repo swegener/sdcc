@@ -1,5 +1,14 @@
 2004-03-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
+	* src/mcs51/gen.c (pushSide, genSignedRightShift, genDjnz, geniPush):
+	use MOVA macro to avoid "mov a,acc" when peephole optimizer is
+	disabled (fixes bug #916294)
+	* sim/ucsim/s51.src/mov.cc (inst_mov_a_addr): Throw an error on
+	"mov a,acc"; patch provided by Lenny Story
+	* device/include/mc68hc908gp32.h: header contibuted by Juan Gonzalez
+
+2004-03-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
 	* src/mcs51/gen.c (genFunction): optimize RECEIVE in reentrant
 	functions
 	* src/ds390/gen.c (genFunction, genEndFunction),

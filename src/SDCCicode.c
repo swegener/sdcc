@@ -2074,7 +2074,16 @@ operand *geniCodeDerefPtr (operand *op)
     if (IS_PTR(optype)) 
 	setOClass(optype,retype);    
         
-
+    #if 1
+    /* This block moved here from its original location
+     * ten lines later by KV, 2/27/2000.
+     * 
+     * This allows code of the form "&array[const]" to
+     * compile properly.
+     */
+    if (!lvaluereq)
+    	op = geniCodeRValue(op, TRUE);
+    #endif
     op->isGptr = IS_GENPTR(optype);
 
     /* if the pointer was declared as a constant */
@@ -2088,8 +2097,11 @@ operand *geniCodeDerefPtr (operand *op)
 		  IS_CHAR(rtype)   ||
 		  IS_FLOAT(rtype) );
 
+    #if 0
+    /* Moved upwards */
     if (!lvaluereq)
 	op = geniCodeRValue(op,TRUE);
+    #endif
     setOperandType(op,rtype);
     
     return op;    

@@ -76,6 +76,7 @@ static struct
     short debugLine;
     short stackExtend;
     short nRegsSaved;
+    short parmsPushed;
     set *sendSet;
   }
 _G;
@@ -705,35 +706,43 @@ static void genIpush (iCode * ic) {
 
   printIc ("genIpush", ic, 0,1,0);
   aopOp(left,FALSE,FALSE);
+
+
   if (AOP_TYPE(left)==AOP_LIT) {
     switch (AOP_SIZE(left)) 
       {
       case 1:
 	emitcode ("mov", "r1l,%s", AOP_NAME(left)[0]);
 	emitcode ("push", "r1l");
+	_G.parmsPushed++;
 	return;
       case 2:
 	emitcode ("mov", "r1,%s", AOP_NAME(left)[0]);
 	emitcode ("push", "r1");
+	_G.parmsPushed++;
 	return;
       case 3:
 	emitcode ("mov", "r1l,%s", AOP_NAME(left)[1]);
 	emitcode ("push", "r1l");
 	emitcode ("mov", "r1,%s", AOP_NAME(left)[0]);
 	emitcode ("push", "r1");
+	_G.parmsPushed += 2;
 	return;
       case 4:
 	emitcode ("mov", "r1,%s", AOP_NAME(left)[1]);
 	emitcode ("push", "r1");
 	emitcode ("mov", "r1,%s", AOP_NAME(left)[0]);
 	emitcode ("push", "r1");
+	_G.parmsPushed += 2;
 	return;
       }
   } else {
     if (AOP_SIZE(left)>2) {
       emitcode ("push", "%s", AOP_NAME(left)[1]);
+      _G.parmsPushed++;
     }
     emitcode ("push", "%s", AOP_NAME(left)[0]);
+    _G.parmsPushed++;
   }
 }
 
@@ -754,6 +763,12 @@ static void genCall (iCode * ic) {
 	    OP_SYMBOL(IC_LEFT(ic))->name,
 	    printOp (IC_RESULT(ic)));
   emitcode ("call", "%s", OP_SYMBOL(IC_LEFT(ic))->rname);
+
+  /* readjust the stack if we have pushed some parms */
+  if (_G.parmsPushed) {
+    emitcode ("add", "r7,#0x%02x", _G.parmsPushed*2);
+    _G.parmsPushed=0;
+  }
 
   /* if we need to assign a result value */
   if (IS_ITEMP (IC_RESULT(ic)) &&
@@ -857,18 +872,20 @@ static void genRet (iCode * ic) {
     case 4:
       emitcode ("mov", "r1,%s", AOP_NAME(IC_LEFT(ic))[1]);
       emitcode ("mov", "r0,%s", AOP_NAME(IC_LEFT(ic))[0]);
-      return;
+      break;
     case 3:
       emitcode ("mov", "r1l,%s", AOP_NAME(IC_LEFT(ic))[1]);
       // fall through
     case 2:
       emitcode ("mov", "r0,%s", AOP_NAME(IC_LEFT(ic))[0]);
-      return;
+      break;
     case 1:
       emitcode ("mov", "r0l,%s", AOP_NAME(IC_LEFT(ic))[0]);
-      return;
+      break;
+    default:
+      bailOut("genRet");
     }
-  bailOut("genRet");
+  emitcode ("jmp", "%05d$", returnLabel->key+100);
 }
 
 /*-----------------------------------------------------------------*/
@@ -879,7 +896,7 @@ static void genLabel (iCode * ic) {
   if (IC_LABEL (ic) == entryLabel)
     return;
 
-  emitcode (";", "genLabel %s", IC_LABEL(ic)->name);
+  emitcode (";", "genLabel(%d) %s", ic->lineno, IC_LABEL(ic)->name);
   emitcode ("", "%05d$:", (IC_LABEL (ic)->key + 100));
 }
 
@@ -887,7 +904,7 @@ static void genLabel (iCode * ic) {
 /* genGoto - generates a jmp                                      */
 /*-----------------------------------------------------------------*/
 static void genGoto (iCode * ic) {
-  emitcode (";", "genGoto %s", IC_LABEL(ic)->name);
+  emitcode (";", "genGoto(%d) %s", ic->lineno, IC_LABEL(ic)->name);
   emitcode ("jmp", "%05d$", (IC_LABEL (ic)->key + 100));
 }
 
@@ -1388,8 +1405,8 @@ static void genIfx (iCode * ic, iCode * popIc) {
   symbol *jlbl, *tlbl;
   operand *cond=IC_COND(ic);
 
-  emitcode (";", "genIfx cond=%s trueLabel:%s falseLabel:%s", 
-	    printOp(cond),
+  emitcode (";", "genIfx(%d) cond=%s trueLabel:%s falseLabel:%s", 
+	    ic->lineno, printOp(cond),
 	    IC_TRUE(ic) ? IC_TRUE(ic)->name : "NULL",
 	    IC_FALSE(ic) ? IC_FALSE(ic)->name : "NULL");
 
@@ -1406,7 +1423,7 @@ static void genIfx (iCode * ic, iCode * popIc) {
   switch (AOP_TYPE(cond) )
     {
     case AOP_BIT:
-      emitcode (trueOrFalse ? "jb" : "jbc", "%s,%05d$", 
+      emitcode (trueOrFalse ? "jb" : "jnb", "%s,%05d$", 
 		AOP_NAME(cond)[0], jlbl->key+100);
       return;
     case AOP_REG:

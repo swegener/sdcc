@@ -840,7 +840,7 @@ int
 cl_listen_console::proc_input(void)
 {
   int newsock;
-  SOCKLEN_T size;
+  ACCEPT_SOCKLEN_T size;
   struct sockaddr_in sock_addr;
 
   size= sizeof(struct sockaddr); 

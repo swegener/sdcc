@@ -95,6 +95,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #undef VERSIONLO
 #undef VERSIONP
 
+#undef ACCEPT_SOCKLEN_T
+
 #endif
 
 /* End of ddconfig.h */

@@ -939,8 +939,6 @@ eBBlockFromiCode (iCode * ic)
   setToNull ((void **) &graphEdges);
   ebbs = NULL;
   
-  currFunc=NULL;
-
   return NULL;
 }
 

@@ -1919,7 +1919,13 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
 	}
       }
     } else { // from a pointer to a pointer
-      if (port->s.gptr_size > port->s.fptr_size /*!TARGET_IS_Z80 && !TARGET_IS_GBZ80*/) {
+      if (IS_GENPTR(type) && IS_VOID(type->next))
+	{ // cast to void* is always allowed
+	}
+      else if (IS_GENPTR(optype) && IS_VOID(optype->next))
+	{ // cast from void* is always allowed
+	}
+      else if (port->s.gptr_size > port->s.fptr_size /*!TARGET_IS_Z80 && !TARGET_IS_GBZ80*/) {
 	// if not a pointer to a function
 	if (!(IS_CODEPTR(type) && IS_FUNC(type->next) && IS_FUNC(optype))) {
 	  if (implicit) { // if not to generic, they have to match

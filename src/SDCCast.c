@@ -3466,6 +3466,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         }
 
       /* make sure the type is complete and sane */
+      changePointer(LTYPE(tree));
       checkTypeSanity(LETYPE(tree), "(cast)");
 
       /* If code memory is read only, then pointers to code memory */

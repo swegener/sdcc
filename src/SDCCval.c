@@ -1560,7 +1560,13 @@ valCastLiteral (sym_link * dtype, double fval)
     return NULL;
 
   val = newValue ();
-  val->etype = getSpec (val->type = copyLinkChain (dtype));
+  if (dtype)
+    val->etype = getSpec (val->type = copyLinkChain (dtype));
+  else
+    {
+      val->etype = val->type = newLink (SPECIFIER);
+      SPEC_NOUN (val->etype) = V_VOID;
+    }
   SPEC_SCLS (val->etype) = S_LITERAL;
 
   /* if it is not a specifier then we can assume that */

@@ -1013,7 +1013,7 @@ addSymChain (symbol * symHead)
 
   for (; sym != NULL; sym = sym->next)
     {
-      changePointer(sym);
+      changePointer(sym->type);
       checkTypeSanity(sym->etype, sym->name);
 
       if (!sym->level && !(IS_SPEC(sym->etype) && IS_TYPEDEF(sym->etype)))
@@ -1511,15 +1511,14 @@ checkSClass (symbol * sym, int isProto)
 /* changePointer - change pointer to functions                      */
 /*------------------------------------------------------------------*/
 void 
-changePointer (symbol * sym)
+changePointer (sym_link * p)
 {
-  sym_link *p;
 
   /* go thru the chain of declarations   */
   /* if we find a pointer to a function  */
   /* unconditionally change it to a ptr  */
   /* to code area                        */
-  for (p = sym->type; p; p = p->next)
+  for (; p; p = p->next)
     {
       if (!IS_SPEC (p) && DCL_TYPE (p) == UPOINTER)
         DCL_TYPE (p) = port->unqualified_pointer;
@@ -1536,7 +1535,7 @@ checkDecl (symbol * sym, int isProto)
 {
 
   checkSClass (sym, isProto);           /* check the storage class      */
-  changePointer (sym);          /* change pointers if required */
+  changePointer (sym->type);          /* change pointers if required */
 
   /* if this is an array without any dimension
      then update the dimension from the initial value */
@@ -1894,7 +1893,7 @@ compareType (sym_link * dest, sym_link * src)
             return compareType (dest->next, src->next);
           }
           if (IS_PTR (dest) && IS_GENPTR (src) && IS_VOID(src->next)) {
-            return 1;
+            return -1;
           }
           if (IS_PTR (src) && IS_GENPTR (dest))
             return -1;

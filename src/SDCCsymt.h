@@ -576,7 +576,7 @@ void deleteSym (bucket **, void *, char *);
 void *findSym (bucket **, void *, const char *);
 void *findSymWithLevel (bucket **, struct symbol *);
 void *findSymWithBlock (bucket **, struct symbol *, int);
-void changePointer (symbol * sym);
+void changePointer (sym_link * p);
 void checkTypeSanity(sym_link *etype, char *name);
 sym_link *typeFromStr (char *) ;
 STORAGE_CLASS sclsFromPtr(sym_link *ptr);

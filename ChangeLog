@@ -1,3 +1,15 @@
+2004-08-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCsymt.h,
+	* src/SDCCsymt.c (changePointer, checkDecl, addSymChain): changed
+	parameter of changePointer() from symbol* to sym_link*
+	* src/SDCCast.c (decorateType): call changePointer() for CAST op
+	* src/SDCCsymt.c (compareType): void* type is castable to other
+	pointers, but not necesarily an exact match.
+	* src/SDCCicode.c (geniCodeCast): allow void* casting here since it
+	is no longer blindly treated as an exact match.
+	* src/SDCCval.c (valCastLiteral): treat missing type as cast to void
+
 2004-08-12 Slade Rich <slade_rich AT users.sourceforge.net>
 
 	* src/pic/glue.c: Added struct initialisation fn printIvalStruct.

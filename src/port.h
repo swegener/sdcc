@@ -140,7 +140,10 @@ typedef struct {
 	processed, 1 otherwise.  May be NULL.
     */
     int (*process_pragma)(const char *sz);
-   
+
+    /** If TRUE, then tprintf and !dw will be used for some initalisers
+     */
+    bool use_dw_for_init;
 } PORT;
 
 extern PORT *port;

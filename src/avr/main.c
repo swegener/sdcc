@@ -190,6 +190,7 @@ PORT avr_port = {
     _avr_genAssemblerPreamble,
     _avr_genIVT,
     _avr_reset_regparm,
-    _avr_regparm
+    _avr_regparm,
+    FALSE
 };
 

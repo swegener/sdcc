@@ -344,6 +344,7 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result, bool requires_a)
 
     /* Assign depending on the storage class */
     if (sym->onStack || sym->iaccess) {
+	emitcode("", "; AOP_STK for %s", sym->rname);
         sym->aop = aop = newAsmop(AOP_STK);
         aop->size = getSize(sym->type);
 	aop->aopu.aop_stk = sym->stack;
@@ -361,7 +362,6 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result, bool requires_a)
 
     if (IS_GB) {
 	/* if it is in direct space */
-	printf("sname %s: regsp %u\n", space->sname, space->regsp);
 	if (IN_REGSP(space) && !requires_a) {
 	    sym->aop = aop = newAsmop (AOP_SFR);
 	    aop->aopu.aop_dir = sym->rname ;
@@ -374,6 +374,7 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result, bool requires_a)
     /* only remaining is far space */
     /* in which case DPTR gets the address */
     if (IS_GB) {
+	emitcode("", "; AOP_HL for %s", sym->rname);
 	sym->aop = aop = newAsmop(AOP_HL);
     }
     else {
@@ -777,13 +778,15 @@ static void fetchLitPair(PAIR_ID pairId, asmop *left, int offset)
 
     if (isPtr(pair)) {
 	if (pairId == PAIR_HL || pairId == PAIR_IY) {
-	    if (_G.pairs[pairId].lit && !strcmp(_G.pairs[pairId].lit, l)) {
-		if (pairId == PAIR_HL && abs(_G.pairs[pairId].offset - offset) < 3) {
-		    adjustPair(pair, &_G.pairs[pairId].offset, offset);
-		    return;
-		}
-		if (pairId == PAIR_IY && abs(offset)<127) {
-		    return;
+	    if (_G.pairs[pairId].last_type == left->type) {
+		if (_G.pairs[pairId].lit && !strcmp(_G.pairs[pairId].lit, l)) {
+		    if (pairId == PAIR_HL && abs(_G.pairs[pairId].offset - offset) < 3) {
+			adjustPair(pair, &_G.pairs[pairId].offset, offset);
+			return;
+		    }
+		    if (pairId == PAIR_IY && abs(offset)<127) {
+			return;
+		    }
 		}
 	    }
 	}
@@ -1811,16 +1814,14 @@ static bool genPlusIncr (iCode *ic)
 	) {
 	int offset = 0;
 	symbol *tlbl = NULL;
+	tlbl = newiTempLabel(NULL);
 	while (size--) {
-	    if (offset) {
-		emitIntLabel(tlbl->key+100);
-	    }
 	    emitcode("inc","%s",aopGet(AOP(IC_RESULT(ic)), offset++, FALSE));
 	    if (size) {
-		tlbl = newiTempLabel(NULL);
 		emit2("!shortjp nz,!tlabel", tlbl->key+100);
 	    }
 	}
+	emitLabel(tlbl->key+100);
         return TRUE;
     }
 
@@ -2830,9 +2831,9 @@ static void genAnd (iCode *ic, iCode *ifx)
 		if (AOP_TYPE(left) == AOP_ACC) 
 		    emitcode("and","a,%s",aopGet(AOP(right),offset,FALSE));
 		else {
-		    MOVA(aopGet(AOP(right),offset,FALSE));
+		    MOVA(aopGet(AOP(left),offset,FALSE));
 		    emitcode("and","a,%s",
-			     aopGet(AOP(left),offset,FALSE));
+			     aopGet(AOP(right),offset,FALSE));
 		}
 		aopPut(AOP(result),"a",offset);
 	    }
@@ -2950,9 +2951,9 @@ static void genOr (iCode *ic, iCode *ifx)
 	    if (AOP_TYPE(left) == AOP_ACC) 
 		emitcode("or","a,%s",aopGet(AOP(right),offset,FALSE));
 	    else {
-		MOVA(aopGet(AOP(right),offset,FALSE));
+		MOVA(aopGet(AOP(left),offset,FALSE));
 		emitcode("or","a,%s",
-			 aopGet(AOP(left),offset,FALSE));
+			 aopGet(AOP(right),offset,FALSE));
 	    }
 	    aopPut(AOP(result),"a",offset);			
 	    /* PENDING: something weird is going on here.  Add exception. */

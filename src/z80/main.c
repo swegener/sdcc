@@ -92,12 +92,12 @@ static bool _parseOptions(int *pargc, char **argv, int *i)
 	    switch (argv[*i][2]) {
 	    case 'o':
 		/* ROM bank */
-		sprintf(buffer, "_CODE_%u", bank);
+		sprintf(buffer, "CODE_%u", bank);
 		gbz80_port.mem.code_name = gc_strdup(buffer);
 		return TRUE;
 	    case 'a':
 		/* RAM bank */
-		sprintf(buffer, "_DATA_%u", bank);
+		sprintf(buffer, "DATA_%u", bank);
 		gbz80_port.mem.data_name = gc_strdup(buffer);
 		return TRUE;
 	    }
@@ -245,7 +245,8 @@ PORT z80_port = {
     0,	/* no assembler preamble */
     0,	/* no local IVT generation code */
     _reset_regparm,
-    _reg_parm
+    _reg_parm,
+    TRUE
 };
 
 /* Globals */
@@ -305,5 +306,6 @@ PORT gbz80_port = {
     0,	/* no local IVT generation code */
     _reset_regparm,
     _reg_parm,
-    _process_pragma
+    _process_pragma,
+    TRUE
 };

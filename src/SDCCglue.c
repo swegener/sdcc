@@ -515,13 +515,16 @@ void printIvalFuncPtr (link * type, initList * ilist, FILE * oFile)
     
     /* now generate the name */
     if (!val->sym) {
-	if (IS_LITERAL (val->etype))
-	    fprintf(oFile, "\t.byte %s,%s\n", aopLiteral(val, 0),aopLiteral(val, 1));
-	else
+        if (port->use_dw_for_init)
+	    tfprintf(oFile, "\t!dw %s\n", val->name);
+	else  
 	    fprintf(oFile, "\t.byte %s,(%s >> 8)\n", val->name,val->name);
     }
-    else 
-	fprintf(oFile, "\t.byte %s,(%s >> 8)\n", val->sym->rname,val->sym->rname);
+    else
+	if (port->use_dw_for_init)
+	    tfprintf(oFile, "\t!dws\n", val->sym->rname);
+	else 
+	    fprintf(oFile, "\t.byte %s,(%s >> 8)\n", val->sym->rname,val->sym->rname);
     
     return;
 }
@@ -546,7 +549,10 @@ int printIvalCharPtr (symbol * sym, link * type, value * val, FILE * oFile)
 		    "\t!dbs\n", val->name) ;
 	    break;
 	case 2:
-	    tfprintf(oFile, "\t.byte %s,(%s >> 8)\n", val->name, val->name);
+	    if (port->use_dw_for_init)
+	    	tfprintf(oFile, "\t!dws\n", val->name);
+	    else
+	    	fprintf(oFile, "\t.byte %s,(%s >> 8)\n", val->name, val->name);
 	    break;
 	    /* PENDING: probably just 3 */
 	default:

@@ -2,8 +2,13 @@
 
 Redirection of output of commands.
 
+
 0.4.1-pre4
 
 Redesigned of option handling.
 Start of libtool introduction.
 
+
+0.4.1-pre5
+
+Fix of cl_cmdline::syntax_match.

@@ -1,7 +1,7 @@
 #! /bin/sh
 
 # libtool - Provide generalized library-building support services.
-# Generated automatically by  (GNU  0.4.1-pre4)
+# Generated automatically by  (GNU  0.4.1-pre5)
 # NOTE: Changes made to this file will be lost: look at ltmain.sh.
 #
 # Copyright (C) 1996-2000 Free Software Foundation, Inc.
@@ -64,7 +64,7 @@ AR="ar"
 AR_FLAGS="cru"
 
 # The default C compiler.
-CC="gcc-3.0"
+CC="gcc"
 
 # Is the compiler the GNU C compiler?
 with_gcc=yes
@@ -113,7 +113,7 @@ libext="a"
 exeext=""
 
 # Additional compiler flags for building library objects.
-pic_flag=" -fPIC"
+pic_flag="  -fPIC"
 pic_mode=default
 
 # Does compiler simultaneously support -c and -o options?

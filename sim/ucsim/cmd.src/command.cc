@@ -363,6 +363,7 @@ cl_cmdline::syntax_match(class cl_uc *uc, char *syntax)
   char *p= syntax;
   int iparam= 0;
   class cl_cmd_arg *parm= (class cl_cmd_arg *)(params->at(iparam));
+  bool match;
   while (*p &&
 	 parm)
     {
@@ -371,19 +372,25 @@ cl_cmdline::syntax_match(class cl_uc *uc, char *syntax)
 	switch (*p)
 	  {
 	  case SY_ADDR:
-	    if (!uc || !parm->as_address(uc))
-	      return(DD_FALSE);
+	    match= parm->as_address(uc);
+	    if (!match)
+	      return(match);
 	    //printf("ADDRESS match %lx\n",parm->value.address);
 	    break;
 	  case SY_MEMORY:
-	    if (!uc || !parm->as_memory(uc))
+	    match= parm->as_memory(uc);
+	    if (!match)
 	      return(DD_FALSE);
 	    //printf("MEMORY match %s\n",parm->value.memory->class_name);
 	    break;
 	  case SY_BIT:
-	    if (!uc || !parm->as_bit(uc))
+	    if (!parm->as_bit(uc))
 	      return(DD_FALSE);
 	    break;
+	  }
+      switch (*p)
+	{
+	case SY_ADDR: case SY_MEMORY: case SY_BIT: break;
 	case SY_NUMBER:
 	  if (!parm->as_number())
 	    return(DD_FALSE);

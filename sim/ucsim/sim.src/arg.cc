@@ -130,7 +130,8 @@ cl_cmd_arg::~cl_cmd_arg(void)
 bool
 cl_cmd_arg::as_address(class cl_uc *uc)
 {
-  return(get_address(uc, &(value.address)));    
+  bool b= get_address(uc, &(value.address));
+  return(b);
 }
 
 bool

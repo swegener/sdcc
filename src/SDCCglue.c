@@ -158,6 +158,9 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
   ast *ival = NULL;
   memmap *segment;
 
+  if (!map)
+    return;
+
   if (addPublics)
     {
       /* PENDING: special case here - should remove */

@@ -180,6 +180,7 @@ ast *newAst_STMNT (unsigned val);
 void initAst ();
 ast *newNode (long, ast *, ast *);
 ast *copyAst (ast *);
+ast *removeIncDecOps (ast *);
 value *sizeofOp (sym_link *);
 value *evalStmnt (ast *);
 ast *createFunction (symbol *, ast *);

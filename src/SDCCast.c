@@ -210,7 +210,7 @@ copyAstValues (ast * dest, ast * src)
 /* copyAst - makes a copy of a given astession                     */
 /*-----------------------------------------------------------------*/
 ast *
-copyAst (ast * src)
+copyAst (ast * src) 
 {
   ast *dest;
 
@@ -254,6 +254,31 @@ copyAst (ast * src)
 exit:
   return dest;
 
+}
+
+/*-----------------------------------------------------------------*/
+/* removeIncDecOps: remove for side effects in *_ASSIGN's          */
+/*                  "*s++ += 3" -> "*s++ = *s++ + 3"               */
+/*-----------------------------------------------------------------*/
+ast *removeIncDecOps (ast * tree) {
+
+  // traverse the tree and remove inc/dec ops
+
+  if (!tree)
+    return NULL;
+
+  if (tree->type == EX_OP && 
+      (tree->opval.op == INC_OP || tree->opval.op == DEC_OP)) {
+    if (tree->left)
+      tree=tree->left;
+    else 
+      tree=tree->right;
+  }
+
+  tree->left=removeIncDecOps(tree->left);
+  tree->right=removeIncDecOps(tree->right);
+ 
+ return tree;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2946,6 +2971,7 @@ decorateType (ast * tree)
       return tree;
 
 
+#if 0 // assignment operators are converted by the parser
       /*------------------------------------------------------------------*/
       /*----------------------------*/
       /*    assignment operators    */
@@ -3078,6 +3104,7 @@ decorateType (ast * tree)
       tree->opval.op = '=';
 
       return tree;
+#endif
 
       /*------------------------------------------------------------------*/
       /*----------------------------*/

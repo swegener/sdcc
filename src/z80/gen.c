@@ -4447,7 +4447,7 @@ shiftR2Left2Result (operand * left, int offl,
   tlbl1 = newiTempLabel (NULL);
 
   /* Left is already in result - so now do the shift */
-  if (shCount <= 2)
+  if (shCount <= 4)
     {
       while (shCount--)
         {
@@ -4828,8 +4828,6 @@ genrshOne (operand * result, operand * left, int shCount, int is_signed)
 
   l = aopGet (AOP (left), 0, FALSE);
 
-  emit2 ("or a,a");
-
   if (AOP (result)->type == AOP_REG)
     {
       aopPut (AOP (result), l, 0);
@@ -4913,7 +4911,19 @@ genrshTwo (operand * result, operand * left,
 	{
 	  movLeft2Result (left, MSB16, result, LSB, sign);
 	}
-      aopPut (AOP (result), "!zero", 1);
+      if (sign)
+        {
+          /* Sign extend the result */
+          _moveA(aopGet (AOP (result), 0, FALSE));
+          emit2 ("rlc a");
+          emit2 ("sbc a,a");
+
+          aopPut (AOP (result), ACC_NAME, MSB16);
+        }
+      else
+        {
+          aopPut (AOP (result), "!zero", 1);
+        }
     }
   /*  1 <= shCount <= 7 */
   else
@@ -4959,7 +4969,6 @@ genRightShiftLiteral (operand * left,
 	  genrshOne (result, left, shCount, sign);
 	  break;
 	case 2:
-	  /* PENDING: sign support */
 	  genrshTwo (result, left, shCount, sign);
 	  break;
 	case 4:

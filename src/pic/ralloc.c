@@ -316,20 +316,6 @@ decodeOp (unsigned int op)
       return "RANGE";
     case FAR:
       return "FAR";
-    case _XDATA:
-      return "_XDATA";
-    case _CODE:
-      return "_CODE";
-    case _GENERIC:
-      return "_GENERIC";
-    case _NEAR:
-      return "_NEAR";
-    case _PDATA:
-      return "_PDATA";
-    case _IDATA:
-      return "_IDATA";
-    case _EEPROM:
-      return "_EEPROM";
     case CASE:
       return "CASE";
     case DEFAULT:

@@ -1,3 +1,18 @@
+2001-09-09  Michael Hope  <michaelh@juju.net.nz>
+
+	* src/pic/ralloc.c (debugLogRegType): Removed some old types to get it to compile.
+
+	* src/z80/gen.c (shiftR2Left2Result): Improved the case when v = v >> n for small values of n to use less code space and time.
+	(genrshTwo): Fixed v = v >> n where v is a negative int and n is > 8: bug 460010.
+
+	* src/z80/peeph.def: Added a rule to optimise shift then compare.
+
+	* support/regression/tests/bug-460000.c (testShiftByParam): Added test case.
+
+	* support/regression/tests/bug-460010.c: Added test case.
+
+	* support/regression/Makefile (test-host): Removed a silly 'clean' target when testing against gcc.
+
 2001-09-09  Bernhard Held <bernhard@bernhardheld.de>
 
 	* support/regression/Makefile: inter-port-clean adjusted for mcs51

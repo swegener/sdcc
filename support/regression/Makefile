@@ -83,7 +83,7 @@ test-mcs51:
 
 # Helper rule for testing the host cc only
 test-host:
-	$(MAKE) inter-port-clean clean test-port PORT=host
+	$(MAKE) inter-port-clean test-port PORT=host
 
 test-host2:
 	$(MAKE) test-port PORT=host

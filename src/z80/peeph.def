@@ -108,3 +108,9 @@ replace restart {
 } by {
         ld      de,#0x0000
 }
+replace restart {
+	ld	%1,a
+	ld	a,%1
+} by {
+        ld	%1,a
+}

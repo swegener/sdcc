@@ -13,7 +13,7 @@ all: $(LIB)
 i186.obj: i186.c i186_mappings.i
 
 $(LIB): $(OBJ)
-	del $(LIB)
+	if exist $(LIB) del $(LIB)
         tlib /a $(LIB) +i186.obj +ralloc.obj +gen.obj +tlcs900h.obj
         tlib /a $(LIB) +gen_generic.obj +aop.obj +util.obj
 	

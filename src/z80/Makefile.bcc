@@ -13,7 +13,7 @@ all: $(LIB)
 main.obj: main.c peeph.rul peeph-z80.rul peeph-gbz80.rul
 
 $(LIB): peeph.rul $(OBJ)
-	del $(LIB)
+	if exist $(LIB) del $(LIB)
         tlib /a $(LIB) +gen.obj +ralloc.obj +main.obj +support.obj
 
 peeph.rul: peeph.def

@@ -117,8 +117,8 @@ ifeq ($(dlso_ok),yes)
 shared_lib: $(PRJDIR)/savr.so
 else
 shared_lib:
-	@echo "No AVR shared lib made."
-	@echo "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
+	@$(PRJDIR)/mkecho $(PRJDIR) "No AVR shared lib made."
+	@$(PRJDIR)/mkecho $(PRJDIR) "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
 endif
 
 $(PRJDIR)/savr.so: $(OBJECTS_SHARED)

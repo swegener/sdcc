@@ -120,8 +120,8 @@ ifeq ($(dlso_ok),yes)
 shared_lib: $(PRJDIR)/sz80.so
 else
 shared_lib:
-	@echo "No z80 shared lib made."
-	@echo "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
+	@$(PRJDIR)/mkecho $(PRJDIR) "No z80 shared lib made."
+	@$(PRJDIR)/mkecho $(PRJDIR) "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
 endif
 
 $(PRJDIR)/sz80.so: $(OBJECTS_SHARED)

@@ -1,0 +1,4 @@
+if [ -f ${1}/devel ]; then
+	shift
+	echo "$@"
+fi

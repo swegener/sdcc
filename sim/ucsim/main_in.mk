@@ -138,7 +138,7 @@ ucsim: $(UCSIM_OBJECTS) $(UCSIM_LIB_FILES)
 # ----------------------
 checkconf:
 	@if [ -f devel ]; then\
-	  echo "MAIN.MK checkconf";\
+	  $(PRJDIR)/mkecho $(PRJDIR) "MAIN.MK checkconf";\
 	  $(MAKE) -f conf.mk srcdir="$(srcdir)" freshconf;\
 	fi
 

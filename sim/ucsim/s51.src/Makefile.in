@@ -123,8 +123,8 @@ ifeq ($(dlso_ok),yes)
 shared_lib: $(PRJDIR)/s51.so
 else
 shared_lib:
-	@echo "No 51 shared lib made."
-	@echo "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
+	@$(PRJDIR)/mkecho $(PRJDIR) "No 51 shared lib made."
+	@$(PRJDIR)/mkecho $(PRJDIR) "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
 endif
 
 $(PRJDIR)/s51.so: $(OBJECTS_SHARED)

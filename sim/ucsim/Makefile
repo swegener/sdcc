@@ -162,29 +162,29 @@ lines:
 # Remaking configuration
 # ----------------------
 configure: configure.in
-	@echo "RE-CREATING CONFIGURE"
+	@$(PRJDIR)/mkecho $(PRJDIR) "RE-CREATING CONFIGURE"
 	$(SHELL) autoconf configure.in >configure
 	chmod 755 configure
 
 config.status: configure
-	@echo "RE-CHECKING CONFIGURATION"
+	@$(PRJDIR)/mkecho $(PRJDIR) "RE-CHECKING CONFIGURATION"
 	./config.status -recheck
 
 makefiles: config.status
-	@echo "RE-MAKING MAKEFILES"
+	@$(PRJDIR)/mkecho $(PRJDIR) "RE-MAKING MAKEFILES"
 	$(SHELL) ./config.status
 
 main.mk: $(srcdir)/main_in.mk $(srcdir)/configure.in
-	@echo "RE-MAKING MAIN.MK"
+	@$(PRJDIR)/mkecho $(PRJDIR) "RE-MAKING MAIN.MK"
 	$(SHELL) ./config.status
 
 freshconf: echo_freshconf configure main.mk
 
 echo_freshconf:
-	@echo "FRESHCONF"
+	@$(PRJDIR)/mkecho $(PRJDIR) "FRESHCONF"
 
 checkconf:
-	@echo "CHECKCONF"
+	@$(PRJDIR)/mkecho $(PRJDIR) "CHECKCONF"
 	@if [ -f devel ]; then $(MAKE) freshconf; fi
 
 # End of Makefile

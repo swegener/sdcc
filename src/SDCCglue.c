@@ -1506,7 +1506,8 @@ glue (void)
   copyFile (asmFile, sfrbit->oFile);
   
   /*JCF: Create the areas for the register banks*/
-  if( TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_XA51 )
+  if(port->general.glue_up_main &&
+     (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_XA51))
   {
 	  if(RegBankUsed[0]||RegBankUsed[1]||RegBankUsed[2]||RegBankUsed[3])
 	  {

@@ -48,6 +48,7 @@ Function "typeFromStr" parses this encoded string and translates them into sym_l
 /*                      'x' - xdata                                */
 /*                      'p' - code                                 */
 /*                      'd' - data                                 */                     
+/*                      'F' - FUNCTION                             */                     
 /* examples : "ig*" - generic int *				   */
 /*            "cx*" - char xdata *                                 */
 /*            "ui" -  unsigned int                                 */

@@ -1,0 +1,171 @@
+Using SDCC to develop Native Java functions
+-------------------------------------------
+
+Prerequisites
+--------------
+
+1) Download the latest compiler sources from http://sdcc.sourceforge.net (cvs download), build & 
+   install the compiler.
+2) Download & install tini development kit. SDCC uses 'a390' assembler to generate Native libraries,
+   it is NOT distributed with the compiler. Tested with Version 1.02d.
+
+
+Small Example
+-------------
+
+Hello.java :-
+
+import com.dalsemi.comm.*;
+import com.dalsemi.system.*;
+
+public class Hello
+{
+	public static native int method1(int i,int j);    
+	static void main(String args[])
+	{	
+		System.out.println("Hello Started");
+		try {
+		    System.loadLibrary("myn.tlib");
+		    System.out.println("Load Success");       
+		    System.out.println("Native method1 returned " + method1(200,100));	    
+		} 
+		catch (Throwable t) {
+		      System.out.println(t);
+		}
+	}
+}
+
+myn.c :-
+
+long Native_method1() _JavaNative
+{
+    long l = NatLib_LoadInt(0);
+    long k = NatLib_LoadInt(1);
+    return l-k;
+}
+
+Before you start compiling make sure
+a) 'macro' & 'a390' are in the PATH
+b) The files tini.inc, ds80c390.inc, tinimacro.inc & apiequ.inc are in the SAME directory as
+   the C file.
+
+> javac -bootclasspath <path to>/tiniclasses.jar Hello.java
+> java -cp <path to>/tini.jar TINIConvertor -f Hello.class -o Hello.tini -d <path to>/tini.db
+> sdcc -mTININative myn.c
+
+Load Hello.tini & myn.tlib into the TINI board then
+
+TINI /> java Hello.tini
+Hello Started
+Load Success
+Native method1 returned 100
+
+TINI />
+
+Details you MUST know
+---------------------
+SDCC has a completely different and incompatible parameter passing and register usage
+than the TINI java environment. The Native API has been implemented using the __builtin, 
+or intrinsic function support in SDCC . Each of the Native API functions are mapped to an 
+SDCC intrinsic function, the code generator for the intrinsic function takes care of mapping 
+the registers and parameters to the TINI Java environment's expectations .
+
+The _JavaNative keyword is used to map the return value from a Native function to R4:R0, by 
+default SDCC uses DPTR:b:a to return a value.
+
+	Type Mapping
+	------------
+
+	SDCC can support types that are upto 4 bytes (32 bits).
+
+	Java				SDCC
+	----				----
+	char				char
+	short				short/int
+	int				long
+	long				NOT SUPPORTED
+	double				NOT SUPPORTED
+
+	_bpx & _ap
+	---------
+	SDCC requires a 16 bit frame pointer to access local variables (on the stack), and
+	function parameters . In the TININative environment _bpx is mapped to R7_B3:R6_B3 
+	(register R7:R6 in bank3). The compiler also uses AP as a temp register, for the
+	TINI environment this is mapped to R5_B3.
+
+Limitations
+-----------
+
+The TININative environment does not have a linker. Multiplication & Division of 16 & 32 bit
+numbers are implemented in SDCC as library functions this implies that , division & multiplication
+of these numbers are not supported in the TININative environment. The compiler transforms div/mul by
+power of 2 to shifts . For other mul/divs there are two ways around .
+
+a) Copy the library function from the library to your code . The sources can be found in
+   sdcc/device/lib.
+b) Use the --use-accelerator option, with this option the compiler will generate code to use
+   the on-chip arithmetic accelerator for 16 bit multiplication & division & modulus. 
+   NOTE The compiler will disable interrupts during this operation to prevent corruption of
+	MA & MB registers. MUL/DIV/MOD of unsigned quantities are more efficient than signed
+	quantities.
+
+API Mappings
+------------
+As mentioned earlier the Native APIs are implemented using compiler intrinsic functions, at this
+time only the following functions have been mapped (more will be mapped in the future). Some
+Native API calls return multiple values, I haven't found a good way to handle this yet, in most
+cases these return a HANDLE and a pointer to ABSOLUTE memory in DPTR, in such cases SDCC will
+return ONLY the HANDLE and igonre the POINTER value. The HANDLE can then be used with MM_Deref to
+obtain the POINTER value again (I hope my assumption is correct here).
+
+SDCC Prototype					   Native API
+--------------					   ----------
+char NatLib_LoadByte (char parmnum);		   NatLib_LoadPrimitive
+int  NatLib_LoadShort(char parmnum);		   NatLib_LoadPrimitive
+long NatLib_LoadInt  (char parmnum);		   NatLib_LoadPrimitive
+char *NatLib_LoadPointer (char parmnum);	   NatLib_LoadPointer
+
+/* in the following cases the compiler will fill in the pointer to LibraryID when required*/
+/* NatLib_Get* return mutiple values return value is HANDLE , pointer is ignored */
+  
+char NatLib_InstallImmutableStateBlock(void *state_block,int handle);
+					           NatLib_InstallImmutableStateBlock
+char NatLib_InstallEphemeralStateBlock(void *state_block,int handle);
+					           NatLib_InstallEphemeralStateBlock
+void NatLib_RemoveImmutableStateBlock ();	   NatLib_RemoveImmutableStateBlock
+void NatLib_RemoveEphemeralStateBlock ();	   NatLib_RemoveEphemeralStateBlock
+int  NatLib_GetImmutableStateBlock();              NatLib_GetImmutableStateBlock
+int  NatLib_GetEphemeralStateBlock();              NatLib_GetEphemeralStateBlock
+
+int MM_XMalloc (long size);			   MM_XMalloc	/* returns HANDLE */
+int MM_Malloc (int size);			   MM_Malloc    /* return HANDLE  */
+int MM_ApplicationMalloc ( int size );		   MM_ApplicationMalloc /* returns HANDLE */
+int MM_Free (int handle);			   MM_Free
+char *MM_Deref (int handle);			   MM_Deref
+char MM_UnrestrictedPersist(int handle);           MM_UnrestrictedPersist
+
+char System_ExecJavaProcess(char *image,int handle-to-processname)
+						   System_ExecJavaProcess
+void System_GetRTCRegisters(char *regsavearea)     System_GetRTCRegisters
+void System_SetRTCRegisters(char *regsavearea)     System_SetRTCRegisters
+void System_ThreadSleep(long timeout)              System_ThreadSleep
+void System_ThreadSleep_ExitCriticalSection(long timeout)              System_ThreadSleep_ExitCriticalSection
+void System_ThreadResume(char threadid,char processid)		       System_ThreadResume
+void System_SaveJavaThreadState()                  System_SaveJavaThreadState
+void System_RestoreJavaThreadState()               System_RestoreJavaThreadState
+void System_ProcessSleep(long timeout)             System_ProcessSleep
+void System_ProcessSleep_ExitCriticalSection(long timeout)             System_ProcessSleep_ExitCriticalSection
+void System_ProcessYield()                         System_ProcessYield
+void System_ProcessSuspend()                       System_ProcessSuspend
+void System_ProcessResume(char processid)          System_ProcessResume
+char System_RegisterPoll((void *)(funcpointer)())  System_RegisterPoll
+char System_RemovePoll((void *)(funcpointer)())    System_RemovePoll
+char System_GetCurrentThreadId()		   System_GetCurrentThreadId
+char System_GetCurrentProcessId()		   System_GetCurrentProcessId
+
+
+Some Notes
+----------
+
+The register convention mapping causes a lot of push & pops to be generated. 
+The source for the built in functions can be found in file src/ds390/gen.c.

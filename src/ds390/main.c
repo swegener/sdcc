@@ -11,7 +11,7 @@
 #include "BuildCmd.h"
 #include "MySystem.h"
 #include "../SDCCutil.h"
-extern const char *preArgv[128];	/* pre-processor arguments  */
+#include "../SDCCglobl.h"
 static char _defaultRules[] =
 {
 #include "peeph.rul"
@@ -175,7 +175,7 @@ _ds390_finaliseOptions (void)
     istack->ptrType = FPOINTER;
 
     if (options.parms_in_bank1) {
-	addToList (preArgv, "-DSDCC_PARMS_IN_BANK1");
+	addSet(&preArgvSet, Safe_strdup("-DSDCC_PARMS_IN_BANK1"));
     }
   }  /* MODEL_FLAT24 */
 }
@@ -740,8 +740,8 @@ _ds400_finaliseOptions (void)
   }
 
   // hackhack: we're a superset of the 390.
-  addToList (preArgv, "-DSDCC_ds390");  
-  addToList (preArgv, "-D__ds390");    
+  addSet(&preArgvSet, Safe_strdup("-DSDCC_ds390"));
+  addSet(&preArgvSet, Safe_strdup("-D__ds390"));
     
   /* Hack-o-matic: if we are using the flat24 model,
    * adjust pointer sizes.
@@ -797,7 +797,7 @@ _ds400_finaliseOptions (void)
     istack->ptrType = FPOINTER;
 
     if (options.parms_in_bank1) {
-	addToList (preArgv, "-DSDCC_PARMS_IN_BANK1");
+	addSet(&preArgvSet, Safe_strdup("-DSDCC_PARMS_IN_BANK1"));
     }
   }  /* MODEL_FLAT24 */
 }

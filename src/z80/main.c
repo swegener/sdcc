@@ -187,7 +187,6 @@ static void
 _gbz80_rgblink (void)
 {
   FILE *lnkfile;
-  int i;
 
   /* first we need to create the <filename>.lnk file */
   sprintf (scratchFileName, "%s.lnk", dstFileName);
@@ -201,14 +200,11 @@ _gbz80_rgblink (void)
 
   fprintf (lnkfile, "%s.o\n", dstFileName);
 
-  for (i = 0; i < nrelFiles; i++)
-    fprintf (lnkfile, "%s\n", relFiles[i]);
+  fputStrSet(lnkfile, relFilesSet);
 
   fprintf (lnkfile, "\n[Libraries]\n");
   /* additional libraries if any */
-  for (i = 0; i < nlibFiles; i++)
-    fprintf (lnkfile, "%s\n", libFiles[i]);
-
+  fputStrSet(lnkfile, libFilesSet);
 
   fprintf (lnkfile, "\n[Output]\n" "%s.gb", dstFileName);
 
@@ -285,10 +281,12 @@ _parseOptions (int *pargc, char **argv, int *i)
 static void
 _setValues(void)
 {
+  const char *s;
+
   if (options.nostdlib == FALSE)
     {
-      setMainValue ("z80libspec", "-k\"{libdir}{sep}{port}\" -l\"{port}.lib\"");
-      setMainValue ("z80crt0", "\"{libdir}{sep}{port}{sep}crt0{objext}\"");
+      setMainValue ("z80libspec", "-l\"{port}.lib\"");
+      setMainValue ("z80crt0", "\"crt0{objext}\"");
     }
   else
     {
@@ -296,8 +294,10 @@ _setValues(void)
       setMainValue ("z80crt0", "");
     }
 
-  setMainValue ("z80extralibfiles", joinn (libFiles, nlibFiles));
-  setMainValue ("z80extralibpaths", joinn (libPaths, nlibPaths));
+  setMainValue ("z80extralibfiles", (s = joinStrSet(libFilesSet)));
+  Safe_free((void *)s);
+  setMainValue ("z80extralibpaths", (s = joinStrSet(libPathsSet)));
+  Safe_free((void *)s);
 
   if (IS_GB)
     {
@@ -313,7 +313,8 @@ _setValues(void)
   setMainValue ("stdobjdstfilename" , "{dstfilename}{objext}");
   setMainValue ("stdlinkdstfilename", "{dstfilename}{z80outext}");
 
-  setMainValue ("z80extraobj", joinn (relFiles, nrelFiles));
+  setMainValue ("z80extraobj", (s = joinStrSet(relFilesSet)));
+  Safe_free((void *)s);
 
   sprintf (buffer, "-b_CODE=0x%04X -b_DATA=0x%04X", options.code_loc, options.data_loc);
   setMainValue ("z80bases", buffer);
@@ -401,7 +402,7 @@ _getRegName (struct regs *reg)
     {
       return reg->name;
     }
-  //  assert (0);
+  /*  assert (0); */
   return "err";
 }
 
@@ -497,8 +498,8 @@ PORT z80_port =
     "OVERLAY",
     "GSFINAL",
     "HOME",
-    NULL, // xidata
-    NULL, // xinit
+    NULL, /* xidata */
+    NULL, /* xinit */
     NULL,
     NULL,
     1
@@ -591,8 +592,8 @@ PORT gbz80_port =
     "OVERLAY",
     "GSFINAL",
     "HOME",
-    NULL, // xidata
-    NULL, // xinit
+    NULL, /* xidata */
+    NULL, /* xinit */
     NULL,
     NULL,
     1

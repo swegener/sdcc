@@ -139,6 +139,10 @@ typedef int bool;
                                           : "empty"))
 
 /* optimization options */
+/*
+ * cloneOptimize function in SDCC.lex should be updated every time
+ * a new set is added to the optimize structure!
+ */
 struct optimize
   {
     unsigned global_cse;
@@ -176,6 +180,10 @@ typedef struct {
 } olay;
 
 /* other command line options */
+/*
+ * cloneOptions function in SDCC.lex should be updated every time
+ * a new set is added to the options structure!
+ */
 struct options
   {
     int model;			/* see MODEL_* defines above */
@@ -212,15 +220,12 @@ struct options
     int profile;                /* Turn on extra profiling information */
     int ommitFramePtr;		/* Turn off the frame pointer. */
     int useAccelerator;		/* use ds390 Arithmetic Accelerator */
-    char *calleeSaves[128];	/* list of functions using callee save */
-    char *excludeRegs[32];	/* registers excluded from saving */
     int noiv;			/* do not generate irq vector table entries */
     int all_callee_saves; 	/* callee saves for all functions */
     int stack_probe;            /* insert call to function __stack_probe */
     int tini_libid;		/* library ID for TINI */
     int protect_sp_update;	/* DS390 - will disable interrupts during ESP:SP updates */
     int parms_in_bank1;       	/* DS390 - use reg bank1 to pass parameters */
-    olay olays[128];            /* overlay segments used in #pragma OVERLAY */
     /* starting address of the segments */
     int xstack_loc;		/* initial location of external stack */
     int stack_loc;		/* initial value of internal stack pointer */
@@ -237,7 +242,11 @@ struct options
     int noCcodeInAsm;           /* hide c-code from asm */
     int iCodeInAsm;             /* show i-code in asm */
     int printSearchDirs;        /* display the directories in the compiler's search path */
-	int vc_err_style;           /* errors and warnings are compatible with Micro$oft visual studio */
+    int vc_err_style;           /* errors and warnings are compatible with Micro$oft visual studio */
+    /* sets */
+    set *calleeSavesSet;        /* list of functions using callee save */
+    set *excludeRegsSet;        /* registers excluded from saving */
+/*  set *olaysSet;               * not implemented yet: overlay segments used in #pragma OVERLAY */
   };
 
 /* forward definition for variables accessed globally */
@@ -273,15 +282,12 @@ extern struct options options;
 extern unsigned maxInterrupts;
 
 /* Visible from SDCCmain.c */
-extern int nrelFiles;
-extern char *relFiles[128];
-extern char *libFiles[128];
-extern int nlibFiles;
-extern char *libPaths[128];
-extern int nlibPaths;
+extern set *preArgvSet;
+extern set *relFilesSet;
+extern set *libFilesSet;
+extern set *libPathsSet;
 
 void setParseWithComma (set **, char *);
-void parseWithComma (char **, char *);
 
 /** Creates a temporary file a'la tmpfile which avoids the bugs
     in cygwin wrt c:\tmp.

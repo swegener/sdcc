@@ -9,7 +9,6 @@
 #include "ralloc.h"
 #include "gen.h"
 #include "../SDCCutil.h"
-extern const char *preArgv[128];	/* pre-processor arguments  */
 
 static char _defaultRules[] =
 {
@@ -120,7 +119,7 @@ _mcs51_finaliseOptions (void)
     }
 
   if (options.parms_in_bank1) {
-      addToList (preArgv, "-DSDCC_PARMS_IN_BANK1");
+      addSet(&preArgvSet, Safe_strdup("-DSDCC_PARMS_IN_BANK1"));
   }
 }
 

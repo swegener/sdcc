@@ -2773,7 +2773,9 @@ operand *ast2iCode (ast *tree)
 	 tree->opval.op != SWITCH &&
 	 tree->opval.op != FUNCTION &&
 	 tree->opval.op != INLINEASM ) {
-	if (IS_ASSIGN_OP(tree->opval.op) || IS_DEREF_OP(tree)) {
+	if (IS_ASSIGN_OP(tree->opval.op) || 
+	    IS_DEREF_OP(tree)            || 
+	    tree->opval.op == PTR_OP) {
 	    lvaluereq++;
 	    left = operandFromAst(tree->left);
 	    lvaluereq--;

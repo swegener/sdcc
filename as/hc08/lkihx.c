@@ -201,6 +201,8 @@ ihx(i)
 {
 	Addr_T n;
 	if (i) {
+		if (ap->a_flag & A_NOLOAD)
+			return;
 		if (hilo == 0) {
 			n = rtval[0];
 			rtval[0] = rtval[1];

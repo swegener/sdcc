@@ -238,6 +238,7 @@ relt()
  *		Addr_T	adb_lo()	lkrloc.c
  *		Addr_T	adb_hi()	lkrloc.c
  *		Addr_T	adw_w()		lkrloc.c
+ *		VOID	elf()		lkelf.c
  *		Addr_T	evword()	lkrloc.c
  *		int	eval()		lkeval.c
  *		int	fprintf()	c_library
@@ -288,6 +289,7 @@ relr()
 		lkerr++;
 		return;
 	}
+        ap = a[aindex]->a_bap;
 
 	/*
 	 * Base values
@@ -512,7 +514,6 @@ relr()
 		lkulist(1);
 	}
 
-
 	/* JLH: output only if data (beyond two byte address) */
 	if ((oflag == 1) && (rtcnt > 2)) {
 		// int extendedAddress = (a[aindex]->a_addr >> 16) & 0xffff;
@@ -570,6 +571,9 @@ relr()
 	} else
 	if ((oflag == 2) && (rtcnt > 2)) {
 		s19(1);
+	} else
+	if ((oflag == 3) && (rtcnt > 2)) {
+		elf(1);
 	}
 }
 
@@ -726,6 +730,7 @@ relp()
  *		int	uflag		relocation listing flag
  *
  *	called functions:
+ *		VOID	elf()		lkelf.c
  *		VOID	ihx()		lkihx.c
  *		VOID	lkulist()	lklist.c
  *		VOID	s19()		lks19.c
@@ -746,6 +751,9 @@ rele()
 	} else
 	if (oflag == 2) {
 		s19(0);
+	} else
+	if (oflag == 3) {
+		elf(0);
 	}
 }
 

@@ -28,6 +28,10 @@ struct	mne	mne[] = {
     {	NULL,	"ABS",		S_ATYP,		0,	A_ABS|A_OVR	},
     {	NULL,	"NOPAG",	S_ATYP,		0,	A_NOPAG	},
     {	NULL,	"PAG",		S_ATYP,		0,	A_PAG	},
+    {	NULL,	"CODE",		S_ATYP,		0,	A_CODE	},
+    {	NULL,	"DATA",		S_ATYP,		0,	A_DATA	},
+    {	NULL,	"LOAD",		S_ATYP,		0,	A_LOAD	},
+    {	NULL,	"NOLOAD",	S_ATYP,		0,	A_NOLOAD },
 
     {	NULL,	".byte",	S_BYTE,		0,	1	},
     {	NULL,	".db",		S_BYTE,		0,	1	},

@@ -175,6 +175,9 @@ struct	area
 #define A_XDATA 0100		/* external data space */
 #define A_BIT   0200		/* bit addressable space */
 
+#define A_NOLOAD  0400		/* nonloadable */
+#define A_LOAD  0000		/* loadable (default) */
+
 /*
  *	The "R_" relocation constants define values used in
  *	generating the assembler relocation output data for

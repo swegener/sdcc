@@ -186,6 +186,9 @@
 #define A_XDATA 0100		/* external data space */
 #define A_BIT   0200		/* bit addressable space */
 
+#define A_NOLOAD  0400		/* nonloadable */
+#define A_LOAD  0000		/* loadable (default) */
+
 /*
  * File types
  */
@@ -245,8 +248,10 @@ struct	area
 	Addr_T	a_addr;		/* Beginning address of area */
 	Addr_T	a_size;		/* Total size of the area */
 	char	a_type;		/* Area subtype */
-	char	a_flag;		/* Flag byte */
+	int	a_flag;		/* Flag byte */
 	char	a_id[NCPS];	/* Name */
+	char	*a_image;
+	char	*a_used;
 };
 
 /*
@@ -773,3 +778,6 @@ extern int summary(struct area * xp);
 /* JCF: lkaomf51.c */
 extern void SaveLinkedFilePath(char * filepath);
 extern void CreateAOMF51(void);
+
+/* EEP: lkelf.c */
+extern VOID 		elf();

@@ -359,6 +359,12 @@ char *argv[];
 				}
 				/* include NoICE command to load hex file */
         	                if (jfp) fprintf( jfp, "LOAD %s.S19\n", linkp->f_idp );
+			} else
+			if (oflag == 3) {
+				ofp = afile(linkp->f_idp, "elf", 4);
+				if (ofp == NULL) {
+					lkexit(1);
+				}
 			}
 		} else {
 			/*
@@ -770,6 +776,11 @@ parse()
 					oflag = 2;
 					break;
 
+				case 't':
+				case 'T':
+					oflag = 3;
+					break;
+
 				case 'm':
 				case 'M':
 					++mflag;
@@ -1154,8 +1165,18 @@ char *ft;
 {
 	FILE *fp;
 	char fb[PATH_MAX];
-	char *omode = (wf ? (wf == 2 ? "a" : "w") : "r");
+	char *omode;
 	int i;
+	
+	switch (wf) {
+		case 0: omode = "r"; break;
+		case 1: omode = "w"; break;
+		case 2: omode = "a"; break;
+		case 3: omode = "rb"; break;
+		case 4: omode = "wb"; break;
+		case 5: omode = "ab"; break;
+		default: omode = "r"; break;
+	}
 
 	/*Look backward the name path and get rid of the extension, if any*/
 	i=strlen(fn);
@@ -1309,6 +1330,7 @@ char *usetxt[] = {
 	"Output:",
 	"  -i	Intel Hex as file[IHX]",
 	"  -s	Motorola S19 as file[S19]",
+        "  -t   ELF executable as file[elf]",
 	"  -j	Produce NoICE debug as file[NOI]",
 	"  -z   Produce SDCdb debug as file[cdb]",
 /*	"List:", */

@@ -1300,6 +1300,23 @@ linkEdit (char **envp)
 
   if(port->linker.needLinkerScript)
     {
+      char out_fmt;
+      
+      switch (options.out_fmt)
+        {
+	case 0:
+	  out_fmt = 'i';	/* Intel hex */
+	  break;
+	case 1:
+	  out_fmt = 's';	/* Motorola S19 */
+	  break;
+	case 2:
+	  out_fmt = 't';	/* Elf */
+	  break;
+	default:
+	  out_fmt = 'i';
+	}
+      
       /* first we need to create the <filename>.lnk file */
       SNPRINTF (scratchFileName, sizeof(scratchFileName),
         "%s.lnk", dstFileName);
@@ -1312,11 +1329,11 @@ linkEdit (char **envp)
       if (TARGET_IS_Z80 || TARGET_IS_GBZ80)
         {
           fprintf (lnkfile, "--\n-m\n-j\n-x\n-%c %s\n",
-            (options.out_fmt ? 's' : 'i'), dstFileName);
+            out_fmt, dstFileName);
         }
       else /*For all the other ports.  Including pics???*/
         {
-          fprintf (lnkfile, "-myux%c\n", (options.out_fmt ? 's' : 'i'));
+          fprintf (lnkfile, "-myux%c\n", out_fmt);
           if(options.pack_iram)
               fprintf (lnkfile, "-Y\n");
         }

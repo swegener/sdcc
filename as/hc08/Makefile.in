@@ -41,7 +41,7 @@ ASSOURCES	= $(patsubst %.o,%.c,$(ASOBJECTS))
 
 LKOBJECTS	= lkmain.o lkhead.o lkarea.o lkdata.o \
 		  lkeval.o lklex.o lksym.o lkrloc.o \
-		  lklibr.o lklist.o lkihx.o lks19.o \
+		  lklibr.o lklist.o lkihx.o lks19.o lkelf.o \
 		  lkstore.o lknoice.o lkmem.o lkaomf51.o strcmpi.o
 LKSOURCES	= $(patsubst %.o,%.c,$(LKOBJECTS))
 

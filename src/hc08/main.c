@@ -96,8 +96,20 @@ _hc08_regparm (sym_link * l)
 static bool
 _hc08_parseOptions (int *pargc, char **argv, int *i)
 {
+  if (!strcmp (argv[*i], "--out-fmt-elf"))
+    {
+      options.out_fmt = 2;
+      return TRUE;
+    }
+    
   return FALSE;
 }
+
+static OPTION _hc08_options[] = 
+  {
+    {  0,   "--out-fmt-elf", NULL, "Output executable in ELF format" },
+    {  0, NULL }
+  };
 
 static void
 _hc08_finaliseOptions (void)
@@ -374,16 +386,16 @@ PORT hc08_port =
   {
     "XSEG",
     "STACK",
-    "CSEG",
+    "CSEG (CODE)",
     "DSEG",
     NULL, /* "ISEG" */
     "XSEG",
     "BSEG",
     "RSEG",
-    "GSINIT",
+    "GSINIT (CODE)",
     "OSEG    (OVR)",
-    "GSFINAL",
-    "HOME",
+    "GSFINAL (CODE)",
+    "HOME (CODE)",
     "XISEG", // initialized xdata
     "XINIT", // a code copy of xiseg
     NULL,
@@ -402,7 +414,7 @@ PORT hc08_port =
   "_",
   _hc08_init,
   _hc08_parseOptions,
-  NULL,
+  _hc08_options,
   _hc08_finaliseOptions,
   _hc08_setDefaultOptions,
   hc08_assignRegisters,

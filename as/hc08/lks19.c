@@ -99,6 +99,8 @@ s19(i)
 	register Addr_T chksum;
 
 	if (i) {
+		if (ap->a_flag & A_NOLOAD)
+			return;
 		if (hilo == 0) {
 			chksum = rtval[0];
 			rtval[0] = rtval[1];

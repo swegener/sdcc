@@ -335,6 +335,7 @@ lnkarea()
 		} else {
 			/* Determine memory space */
             locIndex = 0;
+            #if 0
             if (ap->a_flag & A_CODE) {
                 locIndex = 1;
             }
@@ -344,6 +345,7 @@ lnkarea()
             if (ap->a_flag & A_BIT) {
                 locIndex = 3;
             }
+            #endif
 			/*
 			 * Relocatable sections
 			 */

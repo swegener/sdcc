@@ -2311,6 +2311,9 @@ void ds390_assignRegisters (eBBlock **ebbs, int count)
     if (options.dump_rassgn)
 	dumpEbbsToFileExt(".dumprassgn",ebbs,count);
 
+    /* do the overlaysegment stuff SDCCmem.c */
+    doOverlays(ebbs,count);
+
     /* now get back the chain */
     ic = iCodeLabelOptimize(iCodeFromeBBlock (ebbs,count));
 

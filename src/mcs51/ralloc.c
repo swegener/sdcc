@@ -479,20 +479,19 @@ static symbol *createStackSpil (symbol *sym)
        temporarily turn it off ; we also
        turn off memory model to prevent
        the spil from going to the external storage
-       and turn off overlaying 
     */
     
     useXstack = options.useXstack;
     model = options.model;
-    noOverlay = options.noOverlay;
-    options.noOverlay = 1;
+/*     noOverlay = options.noOverlay; */
+/*     options.noOverlay = 1; */
     options.model = options.useXstack = 0;
 
     allocLocal(sloc);
 
     options.useXstack = useXstack;
     options.model     = model;
-    options.noOverlay = noOverlay;
+/*     options.noOverlay = noOverlay; */
     sloc->isref = 1; /* to prevent compiler warning */
     
     /* if it is on the stack then update the stack */
@@ -2310,6 +2309,9 @@ void mcs51_assignRegisters (eBBlock **ebbs, int count)
 	dumpEbbsToFileExt(".dumprassgn",ebbs,count);
 	dumpLiveRanges(".lrange",liveRanges);
     }
+
+    /* do the overlaysegment stuff SDCCmem.c */
+    doOverlays(ebbs,count);
 
     /* now get back the chain */
     ic = iCodeLabelOptimize(iCodeFromeBBlock (ebbs,count));

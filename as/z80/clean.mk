@@ -4,7 +4,8 @@ clean:
 	rm -rf obj
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f $(PRJDIR)/as-z80 as-z80 
+	rm -f $(BUILDDIR)/as-z80   as-z80
+	rm -f $(BUILDDIR)/as-gbz80 as-gbz80
 
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------

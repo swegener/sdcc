@@ -1,11 +1,12 @@
 PRJDIR = ..
+BUILDDIR=../../bin/
 include $(PRJDIR)/Makefile.common
 
 PORTS = z80 gbz80
 DOCS = README abstra.doc appendk.txt asmlnk.doc asxhtm.html format.txt
 
 all:
-	$(MAKE) -C z80 _as-z80 _as-gbz80 E=$(E) BUILDDIR=../../bin/
+	$(MAKE) -C z80 _as-z80 _as-gbz80 E=$(E) BUILDDIR=$(BUILDDIR)
 
 install: all install-doc
 	$(INSTALL) $(PRJDIR)/bin/as-z80 `echo $(bindir)/as-z80|sed '$(transform)'`

@@ -4906,7 +4906,7 @@ genOr (iCode * ic, iCode * ifx)
     {
       if (AOP_TYPE (right) == AOP_LIT)
 	{
-	  // c = bit & literal;
+	  // c = bit | literal;
 	  if (lit)
 	    {
 	      // lit != 0 => result = 1

@@ -111,6 +111,10 @@ directive:     '.' ORG expr {
 			if (p1 || p2) assign_value(symbol_name, $5);
 			$$ = 0;
 		}
+             | normal_or_bit_symbol '=' expr {
+	                if (p1) build_sym_list(symbol_name);
+			if (p1 || p2) assign_value(symbol_name, $3);
+	        }
 	     | symbol EQU expr {
 			if (p1) build_sym_list(symbol_name);
 			if (p1 || p2) assign_value(symbol_name, $3);
@@ -125,6 +129,14 @@ directive:     '.' ORG expr {
 			$$ = 0;
 		}
 	     | bitsymbol BITDEF bit {
+			if (p1) {
+                                build_sym_list(symbol_name);
+                                mk_bit(symbol_name);
+                        }
+                        if (p1 || p2) assign_value(symbol_name, $3);
+                        $$ = 0;
+                }
+	     | bitsymbol BITDEF expr {
 			if (p1) {
                                 build_sym_list(symbol_name);
                                 mk_bit(symbol_name);

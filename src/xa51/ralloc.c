@@ -203,7 +203,7 @@ static bool allocReg (short size, short type, symbol *sym,
 
   switch (size) 
     {
-      // TODO: gaps should be filled for dwords too
+      // TODO: gaps could be filled for dwords too
     case 1:
       // let's see if we can fill a gap
       for (i=0; i<xa51_nRegs; i++) {
@@ -1030,6 +1030,39 @@ serialRegAssign (eBBlock ** ebbs, int count)
 		(IC_RESULT (ic) && POINTER_SET (ic)))
 		continue;
 
+#if 0
+	    /* xa51 has advance compare instructions */
+	    if (ic->op == '<' || ic->op == '>' || 
+		ic->op == LE_OP || ic->op == GE_OP ||
+		ic->op == NE_OP || ic->op == EQ_OP) {
+	      /* if this result is only used for an ifx, we don't
+		 need registers nor the ifx */
+	      int used=bitVectnBitsOn(OP_SYMBOL(IC_RESULT(ic))->uses);
+	      iCode *nic;
+	      if (used!=1) {
+		fprintf (stderr, "unexpected \"used\" for cmp:%d\n", ic->op);
+		exit (1);
+	      }
+	      // find the ifx
+	      for (nic=ic->next; nic; nic=nic->next) {
+		if (nic->op == IFX) {
+		  break;
+		}
+	      }
+	      if (!nic) {
+		// we are in big trouble
+		fprintf (stderr, "No ifx found for %d\n",
+			 ic->op);
+		exit (1);
+	      }
+	      // remove the ifx
+	      nic->prev->next=nic->next;
+	      if (nic->next) {
+		nic->next->prev=nic->prev;
+	      }
+	    }
+#endif
+
 	    /* now we need to allocate registers
 	       only for the result */
 	    if (IC_RESULT (ic)) {
@@ -1067,24 +1100,24 @@ serialRegAssign (eBBlock ** ebbs, int count)
 		/* if it has a spillocation & is used less than
 		   all other live ranges then spill this */
 		if (willCS) {
-		    if (sym->usl.spillLoc) {
-			symbol *leastUsed = leastUsedLR (liveRangesWith (spillable,
-									 allLRs, ebbs[i], ic));
-			if (leastUsed && leastUsed->used > sym->used) {
-			    spillThis (sym);
-			    continue;
-			}
-		    } else {
-			/* if none of the liveRanges have a spillLocation then better
-			   to spill this one than anything else already assigned to registers */
-			if (liveRangesWith(spillable,noSpilLoc,ebbs[i],ic)) {
-			    /* if this is local to this block then we might find a block spil */
-			    if (!(sym->liveFrom >= ebbs[i]->fSeq && sym->liveTo <= ebbs[i]->lSeq)) {
-				spillThis (sym);
-				continue;
-			    }
-			}
+		  if (sym->usl.spillLoc) {
+		    symbol *leastUsed = leastUsedLR (liveRangesWith (spillable,
+								     allLRs, ebbs[i], ic));
+		    if (leastUsed && leastUsed->used > sym->used) {
+		      spillThis (sym);
+		      continue;
 		    }
+		  } else {
+		    /* if none of the liveRanges have a spillLocation then better
+		       to spill this one than anything else already assigned to registers */
+		    if (liveRangesWith(spillable,noSpilLoc,ebbs[i],ic)) {
+		      /* if this is local to this block then we might find a block spil */
+		      if (!(sym->liveFrom >= ebbs[i]->fSeq && sym->liveTo <= ebbs[i]->lSeq)) {
+			spillThis (sym);
+			continue;
+		      }
+		    }
+		  }
 		}
 
 		/* else we assign registers to it */

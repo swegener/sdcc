@@ -28,6 +28,7 @@
 #define TARGET_IS_PIC   (port->id==TARGET_ID_PIC)
 #define TARGET_IS_I186 (port->id==TARGET_ID_I186)
 #define TARGET_IS_TCLS900H (port->id==TARGET_ID_TCLS900H)
+#define TARGET_IS_XA51 (port->id==TARGET_ID_XA51)
 
 #define MAX_BUILTIN_ARGS	16
 /* definition of builtin functions */

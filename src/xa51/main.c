@@ -114,13 +114,7 @@ _xa51_getRegName (struct regs *reg)
 static void
 _xa51_genAssemblerPreamble (FILE * of)
 {
-  // this needs to be an include file someday
-  fputs ("pswl\tsfr\t0x400\n", of);
-  fputs ("z\tbit\tpswl.0\n", of);
-  fputs ("n\tbit\tpswl.1\n", of);
-  fputs ("v\tbit\tpswl.2\n", of);
-  fputs ("ac\tbit\tpswl.6\n", of);
-  fputs ("cy\tbit\tpswl.7\n", of);
+  fprintf (of, "_errno\tsfr\t0x00; to keep the fp-lib's happy for now\n");
 }
 
 /* Generate interrupt vector table. */
@@ -184,7 +178,7 @@ static const char *_linkCmd[] =
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
 static const char *_asmCmd[] =
 {
-  "xa_asm -dontcomplain", "$l", "$3", "$1.xa", NULL
+  "xa_asm", "$l", "$3", "$1.xa", NULL
 };
 
 /* Globals */

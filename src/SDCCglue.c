@@ -279,11 +279,19 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
          an equate for this no need to allocate space */
       if (SPEC_ABSA (sym->etype))
 	{
+	  char *equ="=";
 	  if (options.debug) {
 	    fprintf (map->oFile, " == 0x%04x\n", SPEC_ADDR (sym->etype));
 	  }
-	  fprintf (map->oFile, "%s\t=\t0x%04x\n",
-		   sym->rname,
+	  if (TARGET_IS_XA51) {
+	    if (map==sfr) {
+	      equ="sfr";
+	    } else if (map==bit || map==sfrbit) {
+	      equ="bit";
+	    }
+	  }
+	  fprintf (map->oFile, "%s\t%s\t0x%04x\n",
+		   sym->rname, equ,
 		   SPEC_ADDR (sym->etype));
 	}
       else {

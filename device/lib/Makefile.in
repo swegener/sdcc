@@ -106,6 +106,7 @@ XA51SOURCES      = _atoi.c _atol.c _schar2fs.c \
 		  _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
 		  _strstr.c _strtok.c _uchar2fs.c _uint2fs.c \
 		  _ulong2fs.c malloc.c puts.c gets.c \
+		  printf_large.c puts.c gets.c \
 		  assert.c _strcat.c time.c \
 		  fabsf.c frexpf.c ldexpf.c expf.c powf.c sincosf.c sinf.c \
 		  cosf.c logf.c log10f.c sqrtf.c tancotf.c tanf.c cotf.c \

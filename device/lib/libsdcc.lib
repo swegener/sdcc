@@ -35,7 +35,10 @@ _bp
 _spx
 _atoi
 _atol
+calloc
 malloc
+realloc
+free
 serial
 _autobaud
 _startup

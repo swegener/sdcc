@@ -58,8 +58,10 @@ SOURCES		= _atof.c _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
 		  _spx.c _startup.c _strchr.c _strcmp.c _strcpy.c \
 		  _strcspn.c _strlen.c _strncat.c _strncmp.c \
 		  _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
-		  _strstr.c _strtok.c _uchar2fs.c _uint2fs.c \
-		  _ulong2fs.c malloc.c serial.c ser_ir.c printfl.c \
+		  _strstr.c _strtok.c \
+		  _uchar2fs.c _uint2fs.c _ulong2fs.c \
+		  calloc.c malloc.c realloc.c free.c \
+		  serial.c ser_ir.c printfl.c \
 		  printf_large.c vprintf.c puts.c gets.c \
 		  assert.c _strcat.c time.c printf_fast.c bpx.c \
 		  fabsf.c frexpf.c ldexpf.c expf.c powf.c sincosf.c sinf.c \
@@ -83,14 +85,14 @@ Z80SOURCES      = _atof.c _atoi.c \
 		  _modslong.c _modulong.c \
 		  _mullong.c \
 		  _divslong.c _divulong.c \
-		  malloc.c \
+		  calloc.c malloc.c realloc.c free.c \
 		  _fs2schar.c _fs2sint.c _fs2slong.c \
 		  _fs2uchar.c _fs2uint.c _fs2ulong.c _fsadd.c \
 		  _fsdiv.c _fseq.c _fsgt.c _fslt.c _fsmul.c \
 		  _fsneq.c _fssub.c \
 		  _uchar2fs.c _uint2fs.c \
 		  _ulong2fs.c \
-		  _slong2fs.c _sint2fs.c _schar2fs.c 
+		  _slong2fs.c _sint2fs.c _schar2fs.c
 
 Z80OBJECTS      = $(Z80SOURCES:%.c=$(PORTDIR)/%.o)
 
@@ -108,8 +110,10 @@ XA51SOURCES      = _atof.c _atoi.c _atol.c _schar2fs.c \
 		  _strchr.c _strcmp.c _strcpy.c \
 		  _strcspn.c _strlen.c _strncat.c _strncmp.c \
 		  _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
-		  _strstr.c _strtok.c _uchar2fs.c _uint2fs.c \
-		  _ulong2fs.c malloc.c puts.c gets.c \
+		  _strstr.c _strtok.c \
+		  _uchar2fs.c _uint2fs.c _ulong2fs.c \
+		  calloc.c malloc.c realloc.c free.c \
+		  puts.c gets.c \
 		  printf_large.c puts.c gets.c \
 		  assert.c _strcat.c time.c \
 		  fabsf.c frexpf.c ldexpf.c expf.c powf.c sincosf.c sinf.c \
@@ -134,8 +138,9 @@ HC08SOURCES	= _atof.c _atoi.c _atol.c _schar2fs.c \
 		  _spx.c _startup.c _strchr.c _strcmp.c _strcpy.c \
 		  _strcspn.c _strlen.c _strncat.c _strncmp.c \
 		  _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
-		  _strstr.c _strtok.c _uchar2fs.c _uint2fs.c \
-		  _ulong2fs.c malloc.c \
+		  _strstr.c _strtok.c \
+		  _uchar2fs.c _uint2fs.c _ulong2fs.c \
+		  calloc.c malloc.c realloc.c free.c \
 		  assert.c _strcat.c time.c \
 		  fabsf.c frexpf.c ldexpf.c expf.c powf.c sincosf.c sinf.c \
 		  cosf.c logf.c log10f.c sqrtf.c tancotf.c tanf.c cotf.c \
@@ -167,11 +172,11 @@ model-ds390:
 	if [ "`grep ds390 ../../ports.build`" = ds390 ]; then \
 	  $(MAKE) MODELFLAGS="-mds390" PORT=ds390 objects; \
 	fi
-	
+
 model-ds400:
 	if [ "`grep ds400 ../../ports.build`" = ds400 ]; then \
 	  $(MAKE) MODELFLAGS="-mds400" PORT=ds400 objects; \
-	fi	
+	fi
 
 model-xa51:
 	if [ "`grep xa51 ../../ports.build`" = xa51 ]; then \
@@ -197,7 +202,7 @@ objects-z80: build-dir $(Z80OBJECTS) port-specific-objects clean_intermediate
 model-hc08:
 	if [ "`grep hc08 ../../ports.build`" = hc08 ]; then \
 	  $(MAKE) MODELFLAGS="-mhc08" PORT=hc08 objects-hc08; \
-	fi	
+	fi
 
 objects-hc08: build-dir $(HC08OBJECTS) port-specific-objects clean_intermediate
 	cd $(PORTDIR); ls *$(OEXT) > $(PORT).lib
@@ -240,8 +245,8 @@ clean_intermediate-pic16:
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	cp -r $(BUILDDIR)/* $(sdcc_libdir)
-	cp -r ds390 ds400 gbz80 z80 hc08 *.c $(sdcc_libdir)/src
+	cp -r -u $(BUILDDIR)/* $(sdcc_libdir)
+	cp -r -u ds390 ds400 gbz80 z80 hc08 *.c $(sdcc_libdir)/src
 	rm -r `find $(sdcc_libdir)/src -name '*.rel' -or -name '*.dump*' -or -name '*.sym' -or -name '*.o' -or -name '*.lst' -or -name '*.asm' -or -name 'CVS'`
 
 # Deleting all the installed files
@@ -268,8 +273,8 @@ installdirs:
 	 mkdir -p $(sdcc_libdir)/$$model; \
 	done
 	[ -d $(sdcc_libdir)/ds390 ] || mkdir -p $(sdcc_libdir)/ds390
-	[ -d $(sdcc_libdir)/ds400 ] || mkdir -p $(sdcc_libdir)/ds400	
-	[ -d $(sdcc_libdir)/hc08 ] || mkdir -p $(sdcc_libdir)/hc08	
+	[ -d $(sdcc_libdir)/ds400 ] || mkdir -p $(sdcc_libdir)/ds400
+	[ -d $(sdcc_libdir)/hc08 ] || mkdir -p $(sdcc_libdir)/hc08
 	[ -f $(sdcc_libdir)/pic16 ] || mkdir -p $(sdcc_libdir)/pic16
 	mkdir -p $(sdcc_libdir)/src
 

@@ -996,8 +996,8 @@ void parseTokens(void)
 
 	if( altArr[k].f) {
 	  pc = altArr[k].f(&parsedPatArr[j]);
-	  if(pc && pc->print)
-	    pc->print(stderr,pc);
+	  //if(pc && pc->print)
+	  //  pc->print(stderr,pc);
 	  //if(pc && pc->destruct) pc->destruct(pc); dumps core?
 	  if(curBlock && pc)
 	    addpCode2pBlock(curBlock, pc);
@@ -1038,7 +1038,7 @@ void  peepRuleBlock2pCodeBlock(  lineNode *ln)
 
   for( ; ln; ln = ln->next) {
 
-    fprintf(stderr,"%s\n",ln->line);
+    //fprintf(stderr,"%s\n",ln->line);
 
     tokenizeLineNode(ln->line);
     parseTokens();
@@ -1054,12 +1054,12 @@ static void   peepRuleCondition(char *cond)
   if(!cond)
     return;
 
-  fprintf(stderr,"\nCondition:  %s\n",cond);
+  //fprintf(stderr,"\nCondition:  %s\n",cond);
 
   /* brute force compares for now */
 
   if(STRCASECMP(cond, "NZ") == 0) {
-    fprintf(stderr,"found NZ\n");
+    //fprintf(stderr,"found NZ\n");
     curPeep->postFalseCond = PCC_Z;
 
   }
@@ -1093,7 +1093,7 @@ void  peepRules2pCode(peepRule *rules)
 
   for (pr = rules; pr; pr = pr->next) {
 
-    fprintf(stderr,"\nRule:\n\n");
+    //fprintf(stderr,"\nRule:\n\n");
 
     pcps = Safe_calloc(1,sizeof(pCodePeepSnippets));
     curPeep = pcps->peep  = Safe_calloc(1,sizeof(pCodePeep));
@@ -1112,14 +1112,14 @@ void  peepRules2pCode(peepRule *rules)
     /* Convert the target block */
     peepRuleBlock2pCodeBlock(pr->match);
 
-    fprintf(stderr,"finished target, here it is in pcode form:\n");
-    printpBlock(stderr, curBlock);
+    //fprintf(stderr,"finished target, here it is in pcode form:\n");
+    //printpBlock(stderr, curBlock);
 
-    fprintf(stderr,"target with labels merged:\n");
+    //fprintf(stderr,"target with labels merged:\n");
     pBlockMergeLabels(curBlock);
     printpBlock(stderr, curBlock);
 
-    fprintf(stderr,"\nReplaced by:\n");
+    //fprintf(stderr,"\nReplaced by:\n");
 
 
     curPeep->replace = curBlock = newpCodeChain(NULL, 'W', NULL);
@@ -1127,12 +1127,12 @@ void  peepRules2pCode(peepRule *rules)
     /* Convert the replace block */
     peepRuleBlock2pCodeBlock(pr->replace);
 
-    fprintf(stderr,"finished replace block, here it is in pcode form:\n");
-    printpBlock(stderr, curBlock);
+    //fprintf(stderr,"finished replace block, here it is in pcode form:\n");
+    //printpBlock(stderr, curBlock);
 
-    fprintf(stderr,"replace with labels merged:\n");
+    //fprintf(stderr,"replace with labels merged:\n");
     pBlockMergeLabels(curBlock);
-    printpBlock(stderr, curBlock);
+    //printpBlock(stderr, curBlock);
 
     peepRuleCondition(pr->cond);
 
@@ -1267,22 +1267,22 @@ int pCodePeepMatchLabels(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
       return 0;
 
     pcl = pcd->label->pc;
-    //labindex = PCOW(pcl)->id;
+
     labindex = -PCL(pcl)->key;
-    fprintf(stderr,"label id = %d (labindex = %d)\n",PCL(pcl)->key,labindex);
+    //fprintf(stderr,"label id = %d (labindex = %d)\n",PCL(pcl)->key,labindex);
     if(peepBlock->vars[labindex] == NULL) {
       // First time to encounter this label
       peepBlock->vars[labindex] = PCL(pcs->label->pc)->label;
-      fprintf(stderr,"first time for a label: %d %s\n",labindex, peepBlock->vars[labindex]);
+      //fprintf(stderr,"first time for a label: %d %s\n",labindex, peepBlock->vars[labindex]);
     } else {
       if(strcmp(peepBlock->vars[labindex],PCL(pcs->label->pc)->label) != 0) {
-	fprintf(stderr,"labels don't match\n");
+	// fprintf(stderr,"labels don't match\n");
 	return 0;
       }
-      fprintf(stderr,"matched a label\n");
+      //fprintf(stderr,"matched a label\n");
     }
   } else {
-    fprintf(stderr,"destination doesn't have a label\n");
+    // fprintf(stderr,"destination doesn't have a label\n");
 
     if(pcs->label)
       return 0;
@@ -1331,9 +1331,11 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
       if(PCI(pcs)->op != PCI(pcd)->op)
 	return 0;
 
+      /*
       fprintf(stderr,"%s comparing\n",__FUNCTION__);
       pcs->print(stderr,pcs);
       pcd->print(stderr,pcd);
+      */
 
       if(!pCodePeepMatchLabels(peepBlock, pcs, pcd))
 	return 0;
@@ -1343,7 +1345,7 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 	if (PCI(pcd)->pcop->type == PO_WILD) {
 	  index = PCOW(PCI(pcd)->pcop)->id;
 
-	  fprintf(stderr,"destination is wild\n");
+	  //fprintf(stderr,"destination is wild\n");
 #ifdef DEBUG_PCODEPEEP
 	  if (index > peepBlock->nops) {
 	    fprintf(stderr,"%s - variables exceeded\n",__FUNCTION__);
@@ -1360,7 +1362,6 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 	  {
 	    char *n;
 
-	      fprintf(stderr,"line %d\n",__LINE__);
 	    switch(PCI(pcs)->pcop->type) {
 	    case PO_GPR_TEMP:
 	    case PO_FSR:
@@ -1369,15 +1370,14 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 
 	      break;
 	    default:
-	      fprintf(stderr,"line %d\n",__LINE__);
 	      n = PCI(pcs)->pcop->name;
 	    }
 
 	    if(peepBlock->vars[index])
 	      return  (strcmp(peepBlock->vars[index],n) == 0);
 	    else {
-	      fprintf(stderr,"first time for a variable: %d, %s\n",index,n);
-	      peepBlock->vars[index] = n; //PCI(pcs)->pcop->name;
+	      // fprintf(stderr,"first time for a variable: %d, %s\n",index,n);
+	      peepBlock->vars[index] = n;
 	      return 1;
 	    }
 	  }
@@ -1396,9 +1396,9 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 
     index = PCW(pcd)->id;
 
-    fprintf(stderr,"%s comparing wild cards\n",__FUNCTION__);
-    pcs->print(stderr,pcs);
-    pcd->print(stderr,pcd);
+    //    fprintf(stderr,"%s comparing wild cards\n",__FUNCTION__);
+    //pcs->print(stderr,pcs);
+    //pcd->print(stderr,pcd);
 
     peepBlock->wildpCodes[PCW(pcd)->id] = pcs;
 
@@ -1409,6 +1409,7 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
       PCOW(PCI(pcd)->pcop)->matched = PCI(pcs)->pcop;
       if(peepBlock->vars[index]) {
 	int i = (strcmp(peepBlock->vars[index],PCI(pcs)->pcop->name) == 0);
+	/*
 	if(i)
 	  fprintf(stderr," (matched)\n");
 	else {
@@ -1417,6 +1418,7 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 		  peepBlock->vars[index],
 		  PCI(pcs)->pcop->name);
 	}
+	*/
 	return i;
       } else {
 	peepBlock->vars[index] = PCI(pcs)->pcop->name;
@@ -1426,8 +1428,8 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 
     pcs = findNextInstruction(pcs->next); 
     if(pcs) {
-      fprintf(stderr," (next to match)\n");
-      pcs->print(stderr,pcs);
+      //fprintf(stderr," (next to match)\n");
+      //pcs->print(stderr,pcs);
     } else if(pcd->next) {
       /* oops, we ran out of code, but there's more to the rule */
       return 0;
@@ -1487,7 +1489,7 @@ static pCodeOp *pCodeOpCopy(pCodeOp *pcop)
   switch(pcop->type) { 
   case PO_CRY:
   case PO_BIT:
-    fprintf(stderr,"pCodeOpCopy bit\n");
+    //fprintf(stderr,"pCodeOpCopy bit\n");
     pcopnew = Safe_calloc(1,sizeof(pCodeOpBit) );
     PCOB(pcopnew)->bit = PCOB(pcop)->bit;
     PCOB(pcopnew)->inBitSpace = PCOB(pcop)->inBitSpace;
@@ -1497,28 +1499,28 @@ static pCodeOp *pCodeOpCopy(pCodeOp *pcop)
   case PO_WILD:
     /* Here we expand the wild card into the appropriate type: */
     /* By recursively calling pCodeOpCopy */
-    fprintf(stderr,"pCodeOpCopy wild\n");
+    //fprintf(stderr,"pCodeOpCopy wild\n");
     if(PCOW(pcop)->matched)
       pcopnew = pCodeOpCopy(PCOW(pcop)->matched);
     else {
       // Probably a label
       pcopnew = pCodeOpCopy(PCOW(pcop)->subtype);
       pcopnew->name = Safe_strdup(PCOW(pcop)->pcp->vars[PCOW(pcop)->id]);
-      fprintf(stderr,"copied a wild op named %s\n",pcopnew->name);
+      //fprintf(stderr,"copied a wild op named %s\n",pcopnew->name);
     }
 
     return pcopnew;
     break;
 
   case PO_LABEL:
-    fprintf(stderr,"pCodeOpCopy label\n");
+    //fprintf(stderr,"pCodeOpCopy label\n");
     pcopnew = Safe_calloc(1,sizeof(pCodeOpLabel) );
     PCOLAB(pcopnew)->key =  PCOLAB(pcop)->key;
     break;
 
   case PO_LITERAL:
   case PO_IMMEDIATE:
-    fprintf(stderr,"pCodeOpCopy lit\n");
+    //fprintf(stderr,"pCodeOpCopy lit\n");
     pcopnew = Safe_calloc(1,sizeof(pCodeOpLit) );
     PCOL(pcopnew)->lit = PCOL(pcop)->lit;
     break;
@@ -1528,7 +1530,7 @@ static pCodeOp *pCodeOpCopy(pCodeOp *pcop)
   case PO_GPR_BIT:
   case PO_FSR:
   case PO_INDF:
-    fprintf(stderr,"pCodeOpCopy GPR register\n");
+    //fprintf(stderr,"pCodeOpCopy GPR register\n");
     pcopnew = Safe_calloc(1,sizeof(pCodeOpReg) );
     PCOR(pcopnew)->r = PCOR(pcop)->r;
     PCOR(pcopnew)->rIdx = PCOR(pcop)->rIdx;
@@ -1536,7 +1538,7 @@ static pCodeOp *pCodeOpCopy(pCodeOp *pcop)
     break;
 
   case PO_DIR:
-    fprintf(stderr,"pCodeOpCopy PO_DIR\n");
+    //fprintf(stderr,"pCodeOpCopy PO_DIR\n");
   case PO_SFR_REGISTER:
   case PO_STR:
   case PO_NONE:
@@ -1545,7 +1547,7 @@ static pCodeOp *pCodeOpCopy(pCodeOp *pcop)
   case PO_PCL:
   case PO_PCLATH:
 
-    fprintf(stderr,"pCodeOpCopy register type %d\n", pcop->type);
+    //fprintf(stderr,"pCodeOpCopy register type %d\n", pcop->type);
     pcopnew = Safe_calloc(1,sizeof(pCodeOp) );
 
   }
@@ -1618,7 +1620,7 @@ int pCodePeepMatchRule(pCode *pc)
       pcin = findNextInstruction(pcin->next);
       pct = pct->next;
       //debug:
-      fprintf(stderr,"    matched\n");
+      //fprintf(stderr,"    matched\n");
       if(!pcin)
 	fprintf(stderr," end of code\n");
       if(!pct)
@@ -1698,7 +1700,7 @@ int pCodePeepMatchRule(pCode *pc)
 	     * Is it wild? */
 	    if(PCI(pcr)->pcop->type == PO_WILD) {
 	      int index = PCOW(PCI(pcr)->pcop)->id;
-	      fprintf(stderr,"copying wildopcode\n");
+	      //fprintf(stderr,"copying wildopcode\n");
 	      if(peepBlock->wildpCodeOps[index])
 		pcop = pCodeOpCopy(peepBlock->wildpCodeOps[index]);
 	      else
@@ -1706,7 +1708,7 @@ int pCodePeepMatchRule(pCode *pc)
 	    } else
 	      pcop = pCodeOpCopy(PCI(pcr)->pcop);
 	  }
-	  fprintf(stderr,"inserting pCode\n");
+	  //fprintf(stderr,"inserting pCode\n");
 	  pCodeInsertAfter(pc, newpCode(PCI(pcr)->op,pcop));
 	} else if (pcr->type == PC_WILD) {
 	  pCodeInsertAfter(pc,peepBlock->wildpCodes[PCW(pcr)->id]);
@@ -1716,8 +1718,8 @@ int pCodePeepMatchRule(pCode *pc)
 
 
 	pc = pc->next;
-	if(pc)
-	  pc->print(stderr,pc);
+	//if(pc)
+	//  pc->print(stderr,pc);
 	pcr = pcr->next;
       }
 
@@ -1729,84 +1731,3 @@ int pCodePeepMatchRule(pCode *pc)
 
   return 0;
 }
-
-
-
-
-
-
-
-
-
-
-#if 0
-/*******************/
-pCode *parseLineNode(char *ln)
-{
-  char buffer[50], *s;
-  int state=0;          //0 label, 1 mnemonic, 2 operand, 3 operand, 4 comment
-  int var;
-  pCode *pc = NULL;
-  //  pCodeLabel *pcl = NULL;
-
-  if(!ln || !*ln)
-    return pc;
-
-  s = buffer;
-  *s = 0;
-
-  while(*ln) {
-
-    /* skip white space */
-    while (isspace (*ln))
-      ln++;
-
-    switch(state) {
-
-    case 0:   // look for a label
-    case 1:   // look for mnemonic
-
-      if(*ln == '%') {
-
-	// Wild
-
-	ln++;
-	if(!isdigit(*ln) )
-	  break;
-	  //goto next_state;
-
-	var = strtol(ln, &ln, 10);
-	if(*ln  == ':') {
-	  // valid wild card label
-	  fprintf(stderr, " wildcard label: %d\n",var);
-	  ln++;
-	} else
-	  fprintf(stderr, " wild opcode: %d\n",var), state++;
-
-      } else {
-	// not wild
-	// Extract the label/mnemonic from the line
-
-	s = buffer;
-	while(*ln && !(isspace(*ln) || *ln == ':'))
-	  *s++ = *ln++;
-
-	*s = 0;
-	if(*ln == ':')
-	  fprintf(stderr," regular label: %s\n",buffer), ln++;
-	else
-	  fprintf(stderr," regular mnem: %s\n",buffer), state++;
-      }
-      state++;
-      break;
-
-    default:
-      ln++;
-
-    }
-  }
-
-  return pc;
-  
-}
-#endif

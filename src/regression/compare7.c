@@ -12,8 +12,8 @@ unsigned char dummy = 0;
 unsigned char result = 0;
 
 //bit bit0 = 0;
-long int0 = 0;
-long int1 = 0;
+int int0 = 0;
+int int1 = 0;
 signed char char0 = 0;
 signed char char1 = 0;
 char long0 = 0;

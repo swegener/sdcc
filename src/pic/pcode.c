@@ -2103,9 +2103,10 @@ void AnalyzepBlock(pBlock *pb)
 	  memcpy(r,PCOR(PCI(pc)->pcop)->r, sizeof(regs));
 	  addSet(&pb->registers, r);
 	  PCOR(PCI(pc)->pcop)->r = r;
-	  fprintf(stderr,"added register to pblock: reg %d\n",r->rIdx);
-	} else 
+	  //fprintf(stderr,"added register to pblock: reg %d\n",r->rIdx);
+	}/* else 
 	  fprintf(stderr,"found register in pblock: reg %d\n",r->rIdx);
+	 */
       }
       if(PCI(pc)->pcop->type == PO_GPR_REGISTER) {
 	if(PCOR(PCI(pc)->pcop)->r) {
@@ -2137,7 +2138,8 @@ int OptimizepBlock(pBlock *pb)
   fprintf(stderr," Optimizing pBlock: %c\n",getpBlock_dbName(pb));
   for(pc = pb->pcHead; pc; pc = pc->next)
     matches += pCodePeepMatchRule(pc);
-
+  if(matches)
+    fprintf(stderr," Optimizing pBlock: %c - matches=%d\n",getpBlock_dbName(pb),matches);
   return matches;
 
 }
@@ -2229,14 +2231,14 @@ void pBlockMergeLabels(pBlock *pb)
   for(pc = pb->pcHead; pc; pc = pc->next) {
 
     if(pc->type == PC_LABEL) {
-      fprintf(stderr,"Checking label key = %d\n",PCL(pc)->key);
+      //fprintf(stderr,"Checking label key = %d\n",PCL(pc)->key);
       if( !(pcnext = findNextInstruction(pc)) ) 
 	return;  // Couldn't find an instruction associated with this label
 
       // Unlink the pCode label from it's pCode chain
       unlinkPC(pc);
 
-      fprintf(stderr,"Merged label key = %d\n",PCL(pc)->key);
+      //fprintf(stderr,"Merged label key = %d\n",PCL(pc)->key);
       // And link it into the instruction's pBranch labels. (Note, since
       // it's possible to have multiple labels associated with one instruction
       // we must provide a means to accomodate the additional labels. Thus
@@ -2303,11 +2305,12 @@ void AnalyzepCode(char dbName)
   if(!the_pFile)
     return;
 
-  fprintf(stderr," Analyzing pCode");
 
-  changes = 0;
   i = 0;
   do {
+
+    fprintf(stderr," Analyzing pCode: PASS #%d\n",i+1);
+
     /* First, merge the labels with the instructions */
     for(pb = the_pFile->pbHead; pb; pb = pb->next) {
       if('*' == dbName || getpBlock_dbName(pb) == dbName) {
@@ -2317,6 +2320,8 @@ void AnalyzepCode(char dbName)
 	AnalyzepBlock(pb);
       }
     }
+
+    changes = 0;
 
     for(pb = the_pFile->pbHead; pb; pb = pb->next) {
       if('*' == dbName || getpBlock_dbName(pb) == dbName)

@@ -94,6 +94,30 @@ replace restart {
 %2:	%4
 }
 
+replace restart {
+        btfss	%1
+        goto	%4
+%2:	%3
+%4:	%5
+} by {
+	;peep 1b - test/jump to test/skip
+	btfsc	%1
+%2:	%3
+%4:	%5
+}
+
+replace restart {
+        btfsc	%1
+        goto	%4
+%2:	%3
+%4:	%5
+} by {
+	;peep 1c - test/jump to test/skip
+	btfss	%1
+%2:	%3
+%4:	%5
+}
+
 
 //bogus test for pcode
 //replace restart {

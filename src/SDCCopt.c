@@ -702,7 +702,7 @@ eBBlock **eBBlockFromiCode (iCode *ic)
     /* dumpraw if asked for */
     if (options.dump_raw)
 	dumpEbbsToFileExt(".dumpcse",ebbs,count);
- 
+    
     /* compute the data flow */
     computeDataFlow (ebbs,saveCount); 
 

@@ -2756,13 +2756,16 @@ operand *ast2iCode (ast *tree)
 	    (tree->opval.op == '&' && !tree->right) ||
 	    tree->opval.op == PTR_OP) {
 	    lvaluereq++;
-	    if (IS_ARRAY_OP(tree->left) && IS_ARRAY_OP(tree->left->left)) {
+	    if (IS_ARRAY_OP(tree->left) && IS_ARRAY_OP(tree->left->left))
+	    {
 		lvaluereq--;
 		left = operandFromAst(tree->left);
 	    } else {
 		left = operandFromAst(tree->left);
 		lvaluereq--;
 	    }
+	    if (IS_DEREF_OP(tree) && IS_DEREF_OP(tree->left))
+		    left = geniCodeRValue(left,TRUE);
 	} else {
 	    left =  operandFromAst(tree->left);
 	}

@@ -1109,6 +1109,20 @@ DEFSETFUNC(delGetPointerSucc)
 }    
 
 /*-----------------------------------------------------------------*/
+/* fixUpTypes - KLUGE HACK fixup a lowering problem                */
+/*-----------------------------------------------------------------*/
+static void fixUpTypes(iCode *ic)
+{
+	link *t1 = operandType(IC_LEFT(ic)) ,*t2;
+	/* for pointer_gets if the types of result & left r the
+	   same then change it type of result to next */
+	if (IS_PTR(t1) &&
+	    checkType(t2=operandType(IC_RESULT(ic)),t1) == 1) {
+		setOperandType(IC_RESULT(ic),t2->next);
+	}
+}
+
+/*-----------------------------------------------------------------*/
 /* cseBBlock - common subexpression elimination for basic blocks   */
 /*             this is the hackiest kludgiest routine in the whole */
 /*             system. also the most important, since almost all   */
@@ -1229,6 +1243,7 @@ int cseBBlock ( eBBlock *ebb, int computeOnly,
 	
 	/* do some algebraic optimizations if possible */
 	algebraicOpts (ic);
+	if (POINTER_GET(ic)) fixUpTypes(ic);
 	while (constFold(ic,cseSet));
 
 	/* small klugde */

@@ -1422,9 +1422,23 @@ astHasSymbol (ast * tree, symbol * sym)
       else
 	return FALSE;
     }
-
+  
   return astHasSymbol (tree->left, sym) ||
     astHasSymbol (tree->right, sym);
+}
+
+/*-----------------------------------------------------------------*/
+/* astHasDeref - return true if the ast has an indirect access     */
+/*-----------------------------------------------------------------*/
+static bool 
+astHasDeref (ast * tree)
+{
+  if (!tree || IS_AST_LINK (tree) || IS_AST_VALUE(tree))
+    return FALSE;
+
+  if (tree->opval.op == '*' && tree->right == NULL) return TRUE;
+  
+  return astHasDeref (tree->left) || astHasDeref (tree->right);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1577,6 +1591,8 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
 
       if (astHasVolatile (pbody->left))
 	return FALSE;
+      
+      if (astHasDeref(pbody->right)) return FALSE;
 
       return isConformingBody (pbody->left, sym, body) &&
 	isConformingBody (pbody->right, sym, body);

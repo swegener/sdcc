@@ -48,7 +48,7 @@ static hTab *pic14MnemonicsHash = NULL;
 
 
 static pFile *the_pFile = NULL;
-static int peepOptimizing = 1;
+static int peepOptimizing = 0;
 static int GpCodeSequenceNumber = 1;
 
 /****************************************************************/
@@ -775,6 +775,9 @@ void  pCodeInitRegisters(void)
 
   pc_fsr.rIdx = 4;
   pc_fsr.r = pic14_regWithIdx(4);
+
+  pc_indf.rIdx = 0;
+  pc_indf.r = pic14_regWithIdx(0);
 
 }
 
@@ -1553,8 +1556,9 @@ static char *get_op( pCodeInstruction *pcc)
 
 
     switch(pcc->pcop->type) {
-
+    case PO_INDF:
     case PO_FSR:
+      //fprintf(stderr,"get_op getting register name rIdx=%d\n",PCOR(pcc->pcop)->rIdx);
       r = pic14_regWithIdx(PCOR(pcc->pcop)->rIdx);
       return r->name;
       break;

@@ -1360,12 +1360,16 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 	  {
 	    char *n;
 
+	      fprintf(stderr,"line %d\n",__LINE__);
 	    switch(PCI(pcs)->pcop->type) {
 	    case PO_GPR_TEMP:
 	    case PO_FSR:
+	      //case PO_INDF:
 	      n = PCOR(PCI(pcs)->pcop)->r->name;
+
 	      break;
 	    default:
+	      fprintf(stderr,"line %d\n",__LINE__);
 	      n = PCI(pcs)->pcop->name;
 	    }
 
@@ -1522,6 +1526,8 @@ static pCodeOp *pCodeOpCopy(pCodeOp *pcop)
   case PO_GPR_REGISTER:
   case PO_GPR_TEMP:
   case PO_GPR_BIT:
+  case PO_FSR:
+  case PO_INDF:
     fprintf(stderr,"pCodeOpCopy GPR register\n");
     pcopnew = Safe_calloc(1,sizeof(pCodeOpReg) );
     PCOR(pcopnew)->r = PCOR(pcop)->r;
@@ -1536,8 +1542,6 @@ static pCodeOp *pCodeOpCopy(pCodeOp *pcop)
   case PO_NONE:
   case PO_W:
   case PO_STATUS:
-  case PO_FSR:
-  case PO_INDF:
   case PO_PCL:
   case PO_PCLATH:
 

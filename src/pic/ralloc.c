@@ -134,7 +134,8 @@ regs regspic14[] =
   {REG_STK, PO_GPR_TEMP, 0x46, "r0x46", "r0x46", 0x46, 1, 0},
   {REG_STK, PO_GPR_TEMP, 0x47, "r0x47", "r0x47", 0x47, 1, 0},
 
-  {REG_PTR, PO_FSR, 4, "FSR", "FSR", 4, 1, 0},
+  {REG_STK, PO_FSR, 4, "FSR", "FSR", 4, 1, 0},
+  {REG_STK, PO_INDF, 0, "INDF", "INDF", 0, 1, 0},
 
 };
 

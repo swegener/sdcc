@@ -1066,6 +1066,7 @@ pCodeOp *popCopyReg(pCodeOpReg *pc)
   pcor->r = pc->r;
   pcor->rIdx = pc->rIdx;
 
+  //DEBUGpic14_emitcode ("; ***","%s  , copying %s, rIdx=%d",__FUNCTION__,pc->pcop.name,pc->rIdx);
 
   return PCOP(pcor);
 }
@@ -1228,6 +1229,7 @@ pCodeOp *popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 	PCOR(pcop)->r = pic14_regWithIdx(rIdx);
 	pcop->type = PCOR(pcop)->r->pc_type;
 	rs = aop->aopu.aop_reg[offset]->name;
+	//DEBUGpic14_emitcode(";","%d regiser idx = %d name =%s",__LINE__,rIdx,rs);
 	return pcop;
       }
 
@@ -1652,7 +1654,6 @@ void pic14_toBoolean(operand *oper)
 
     if ( AOP_TYPE(oper) != AOP_ACC) {
       emitpcode(POC_MOVFW,popGet(AOP(oper),0));
-      pic14_emitcode("movf","%s,w",aopGet(AOP(oper),0,FALSE,FALSE));
     }
     while (size--) {
       emitpcode(POC_IORFW, popGet(AOP(oper),offset++));
@@ -7384,6 +7385,9 @@ static void genGenPointerGet (operand *left,
     }
     else { /* we need to get it byte by byte */
 
+      emitpcode(POC_MOVFW,popGet(AOP(left),0));
+      emitpcode(POC_MOVWF,popCopyReg(&pc_fsr));
+
       size = AOP_SIZE(result);
       offset = 0 ;
 
@@ -7969,13 +7973,15 @@ static void genGenPointerSet (operand *right,
       /* hack hack! see if this the FSR. If so don't load W */
       if(AOP_TYPE(right) != AOP_ACC) {
 
-	if(size==2)
-	  emitpcode(POC_DECF,popCopyReg(&pc_fsr));
+	emitpcode(POC_MOVFW,popGet(AOP(result),0));
+	emitpcode(POC_MOVWF,popCopyReg(&pc_fsr));
 
-	if(size==4) {
-	  emitpcode(POC_MOVLW,popGetLit(0xfd));
-	  emitpcode(POC_ADDWF,popCopyReg(&pc_fsr));
-	}
+	//if(size==2)
+	//emitpcode(POC_DECF,popCopyReg(&pc_fsr));
+	//if(size==4) {
+	//  emitpcode(POC_MOVLW,popGetLit(0xfd));
+	//  emitpcode(POC_ADDWF,popCopyReg(&pc_fsr));
+	//}
 
 	while(size--) {
 	  emitpcode(POC_MOVFW,popGet(AOP(right),offset++));
@@ -8293,7 +8299,9 @@ static void genAssign (iCode *ic)
     lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
 
   if( AOP_TYPE(right) == AOP_DIR  && (AOP_TYPE(result) == AOP_REG) && size==1)  {
+  DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
     if(aopIdx(AOP(result),0) == 4) {
+  DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
       emitpcode(POC_MOVFW, popGet(AOP(right),offset));
       emitpcode(POC_MOVWF, popGet(AOP(result),offset));
       goto release;
@@ -8303,6 +8311,7 @@ static void genAssign (iCode *ic)
 
   know_W=-1;
   while (size--) {
+  DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
     if(AOP_TYPE(right) == AOP_LIT) {
       if(lit&0xff) {
 	if(know_W != (lit&0xff))
@@ -8321,6 +8330,7 @@ static void genAssign (iCode *ic)
 	emitpcode(POC_INCF, popGet(AOP(result),0));
       }
     } else {
+  DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
       emitpcode(POC_MOVFW, popGet(AOP(right),offset));
       emitpcode(POC_MOVWF, popGet(AOP(result),offset));
     }

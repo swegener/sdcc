@@ -61,7 +61,11 @@ Boston, MA 02111-1307, USA.  */
 /* There are an extraordinary number of issues with <ctype.h>.
    The last straw is that it varies with the locale.  Use libiberty's
    replacement instead.  */
+#if defined(__APPLE__) && defined(__MACH__)
+#include <libiberty/safe-ctype.h>
+#else
 #include <safe-ctype.h>
+#endif
 
 /* Define a default escape character; it's different for EBCDIC.  */
 #ifndef TARGET_ESC

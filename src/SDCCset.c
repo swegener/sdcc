@@ -23,7 +23,11 @@
 -------------------------------------------------------------------------*/
 
 #include <stdio.h>
+#if defined(__APPLE__) && defined(__MACH__)
+#include <sys/malloc.h>
+#else
 #include <malloc.h>
+#endif
 #include "newalloc.h"
 #include <assert.h>
 #include "SDCCset.h"

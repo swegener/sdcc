@@ -31,6 +31,10 @@
 int listLines = 10;
 EXTERN_STACK_DCL(callStack,function *,1024);
 
+#if defined(__APPLE__) && defined(__MACH__)
+static char *copying=
+{"                   GNU GENERAL PUBLIC LICENSE Version 2"};
+#else
 static char *copying=
 "                   GNU GENERAL PUBLIC LICENSE
                        Version 2, June 1991
@@ -312,6 +316,7 @@ YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER
 PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGES.
 ";
+#endif
 
 static void printTypeInfo(link *);
 static void printValAggregates (symbol *,link *,char,unsigned int);

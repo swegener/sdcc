@@ -348,8 +348,8 @@ struct
     "both signed and unsigned specified for %s '%s'" },
 { E_TWO_OR_MORE_STORAGE_CLASSES, ERROR_LEVEL_ERROR,
     "two or more storage classes in declaration for '%s'" },
-{ W_EXESS_ARRAY_INITIALIZERS, ERROR_LEVEL_WARNING,
-    "excess elements in array initializer after `%s' at line %d" },
+{ W_EXCESS_INITIALIZERS, ERROR_LEVEL_WARNING,
+    "excess elements in %s initializer after `%s' at line %d" },
 { E_ARGUMENT_MISSING, ERROR_LEVEL_ERROR,
    "Option %s requires an argument." },
 { W_STRAY_BACKSLASH, ERROR_LEVEL_WARNING,
@@ -369,7 +369,7 @@ struct
 { W_SYMBOL_NAME_TOO_LONG, ERROR_LEVEL_WARNING,
     "symbol name too long, truncated to %d chars" },
 { W_CAST_STRUCT_PTR,ERROR_LEVEL_WARNING,
-	  "cast of struct %s * to struct %s * " }
+	  "cast of struct %s * to struct %s * " },
 };
 
 /*

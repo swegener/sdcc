@@ -162,7 +162,7 @@ SDCCERR - SDCC Standard error handler
 #define E_LONG_AND_SHORT_INVALID  144    /* long and short invalid for .. */
 #define E_SIGNED_AND_UNSIGNED_INVALID 145 /* signed and unsigned invalid for .. */
 #define E_TWO_OR_MORE_STORAGE_CLASSES 146
-#define W_EXESS_ARRAY_INITIALIZERS 147 /* too much initializers for array */
+#define W_EXCESS_INITIALIZERS 147 /* too much initializers for array */
 #define	E_ARGUMENT_MISSING	148	/* Option requires an argument. */
 #define W_STRAY_BACKSLASH 149
 #define W_NEWLINE_IN_STRING 150 
@@ -172,7 +172,7 @@ SDCCERR - SDCC Standard error handler
 #define W_INTEGRAL2PTR_NOCAST 154
 #define W_PTR2INTEGRAL_NOCAST 155
 #define W_SYMBOL_NAME_TOO_LONG 156
-#define W_CAST_STRUCT_PTR   157		/* pointer to different structure types */
+#define W_CAST_STRUCT_PTR 157 /* pointer to different structure types */
 
 /** Describes the maximum error level that will be logged.  Any level
  *  includes all of the levels listed after it.

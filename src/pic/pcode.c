@@ -1536,6 +1536,9 @@ static char *get_op( pCodeInstruction *pcc)
     switch(pcc->pcop->type) {
 
     case PO_FSR:
+      r = pic14_regWithIdx(PCOR(pcc->pcop)->rIdx);
+      return r->name;
+      break;
     case PO_GPR_TEMP:
     case PO_GPR_BIT:
       r = pic14_regWithIdx(PCOR(pcc->pcop)->r->rIdx);

@@ -499,7 +499,7 @@ pic14_regWithIdx (int idx)
 {
   int i;
 
-  debugLog ("%s\n", __FUNCTION__);
+  debugLog ("%s - requesting index = 0x%x\n", __FUNCTION__,idx);
 
   for (i = 0; i < pic14_nRegs; i++)
     if (regspic14[i].rIdx == idx)
@@ -1609,6 +1609,8 @@ serialRegAssign (eBBlock ** ebbs, int count)
 	      _G.regAssigned = bitVectSetBit (_G.regAssigned, sym->key);
 
 	      debugLog ("  %d - \n", __LINE__);
+	      if(debugF) 
+		bitVectDebugOn(_G.regAssigned, debugF);
 
 	      for (j = 0; j < sym->nRegs; j++)
 		{
@@ -1856,102 +1858,97 @@ regTypeNum ()
   debugLog ("%s\n", __FUNCTION__);
   /* for each live range do */
   for (sym = hTabFirstItem (liveRanges, &k); sym;
-       sym = hTabNextItem (liveRanges, &k))
-    {
+       sym = hTabNextItem (liveRanges, &k)) {
 
-      debugLog ("  %d - %s\n", __LINE__, sym->rname);
+    debugLog ("  %d - %s\n", __LINE__, sym->rname);
 
-      /* if used zero times then no registers needed */
-      if ((sym->liveTo - sym->liveFrom) == 0)
+    /* if used zero times then no registers needed */
+    if ((sym->liveTo - sym->liveFrom) == 0)
+      continue;
+
+
+    /* if the live range is a temporary */
+    if (sym->isitmp) {
+
+      debugLog ("  %d - itemp register\n", __LINE__);
+
+      /* if the type is marked as a conditional */
+      if (sym->regType == REG_CND)
 	continue;
 
+      /* if used in return only then we don't 
+	 need registers */
+      if (sym->ruonly || sym->accuse) {
+	if (IS_AGGREGATE (sym->type) || sym->isptr)
+	  sym->type = aggrToPtr (sym->type, FALSE);
+	debugLog ("  %d - no reg needed - used as a return\n", __LINE__);
 
-      /* if the live range is a temporary */
-      if (sym->isitmp)
-	{
+	continue;
+      }
 
-	  debugLog ("  %d - \n", __LINE__);
+      /* if the symbol has only one definition &
+	 that definition is a get_pointer and the
+	 pointer we are getting is rematerializable and
+	 in "data" space */
 
-	  /* if the type is marked as a conditional */
-	  if (sym->regType == REG_CND)
-	    continue;
+      if (bitVectnBitsOn (sym->defs) == 1 &&
+	  (ic = hTabItemWithKey (iCodehTab,
+				 bitVectFirstBit (sym->defs))) &&
+	  POINTER_GET (ic) &&
+	  !sym->noSpilLoc &&
+	  !IS_BITVAR (sym->etype)) {
+	
 
-	  /* if used in return only then we don't 
-	     need registers */
-	  if (sym->ruonly || sym->accuse)
-	    {
-	      if (IS_AGGREGATE (sym->type) || sym->isptr)
-		sym->type = aggrToPtr (sym->type, FALSE);
-	      debugLog ("  %d - \n", __LINE__);
+	debugLog ("  %d - \n", __LINE__);
 
-	      continue;
-	    }
+	/* if remat in data space */
+	if (OP_SYMBOL (IC_LEFT (ic))->remat &&
+	    DCL_TYPE (aggrToPtr (sym->type, FALSE)) == POINTER) {
 
-	  /* if the symbol has only one definition &
-	     that definition is a get_pointer and the
-	     pointer we are getting is rematerializable and
-	     in "data" space */
-
-	  if (bitVectnBitsOn (sym->defs) == 1 &&
-	      (ic = hTabItemWithKey (iCodehTab,
-				     bitVectFirstBit (sym->defs))) &&
-	      POINTER_GET (ic) &&
-	      !sym->noSpilLoc &&
-	      !IS_BITVAR (sym->etype))
-	    {
-
-	      debugLog ("  %d - \n", __LINE__);
-
-	      /* if remat in data space */
-	      if (OP_SYMBOL (IC_LEFT (ic))->remat &&
-		  DCL_TYPE (aggrToPtr (sym->type, FALSE)) == POINTER)
-		{
-
-		  /* create a psuedo symbol & force a spil */
-		  symbol *psym = newSymbol (rematStr (OP_SYMBOL (IC_LEFT (ic))), 1);
-		  psym->type = sym->type;
-		  psym->etype = sym->etype;
-		  strcpy (psym->rname, psym->name);
-		  sym->isspilt = 1;
-		  sym->usl.spillLoc = psym;
-		  continue;
-		}
-
-	      /* if in data space or idata space then try to
-	         allocate pointer register */
-
-	    }
-
-	  /* if not then we require registers */
-	  sym->nRegs = ((IS_AGGREGATE (sym->type) || sym->isptr) ?
-			getSize (sym->type = aggrToPtr (sym->type, FALSE)) :
-			getSize (sym->type));
-
-	  if (sym->nRegs > 4)
-	    {
-	      fprintf (stderr, "allocated more than 4 or 0 registers for type ");
-	      printTypeChain (sym->type, stderr);
-	      fprintf (stderr, "\n");
-	    }
-
-	  debugLog ("  %d - \n", __LINE__);
-
-	  /* determine the type of register required */
-	  if (sym->nRegs == 1 &&
-	      IS_PTR (sym->type) &&
-	      sym->uptr)
-	    sym->regType = REG_PTR;
-	  else
-	    sym->regType = REG_GPR;
-	  debugLog ("  reg type %s\n", debugLogRegType (sym->regType));
-
+	  /* create a psuedo symbol & force a spil */
+	  symbol *psym = newSymbol (rematStr (OP_SYMBOL (IC_LEFT (ic))), 1);
+	  psym->type = sym->type;
+	  psym->etype = sym->etype;
+	  strcpy (psym->rname, psym->name);
+	  sym->isspilt = 1;
+	  sym->usl.spillLoc = psym;
+	  continue;
 	}
+
+	/* if in data space or idata space then try to
+	   allocate pointer register */
+
+      }
+
+      /* if not then we require registers */
+      sym->nRegs = ((IS_AGGREGATE (sym->type) || sym->isptr) ?
+		    getSize (sym->type = aggrToPtr (sym->type, FALSE)) :
+		    getSize (sym->type));
+
+      if (sym->nRegs > 4) {
+	fprintf (stderr, "allocated more than 4 or 0 registers for type ");
+	printTypeChain (sym->type, stderr);
+	fprintf (stderr, "\n");
+      }
+
+      /* determine the type of register required */
+      if (sym->nRegs == 1 &&
+	  IS_PTR (sym->type) &&
+	  sym->uptr)
+	sym->regType = REG_PTR;
       else
-	/* for the first run we don't provide */
-	/* registers for true symbols we will */
-	/* see how things go                  */
-	sym->nRegs = 0;
+	sym->regType = REG_GPR;
+
+
+      debugLog ("  reg name %s,  reg type %s\n", sym->rname, debugLogRegType (sym->regType));
+
     }
+    else
+      /* for the first run we don't provide */
+      /* registers for true symbols we will */
+      /* see how things go                  */
+      sym->nRegs = 0;
+  }
 
 }
 
@@ -2083,6 +2080,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
       OP_SYMBOL (IC_RIGHT (ic))->isind ||
       OP_LIVETO (IC_RIGHT (ic)) > ic->seq)
     {
+      debugLog ("  %d - not packing - right side fails \n", __LINE__);
       return 0;
     }
 
@@ -2786,6 +2784,8 @@ packRegisters (eBBlock * ebp)
 	  !OP_SYMBOL (IC_LEFT (ic))->onStack)
 	{
 
+	  debugLog ("  %d - %s. result is rematerializable\n", __LINE__,__FUNCTION__);
+
 	  OP_SYMBOL (IC_RESULT (ic))->remat = 1;
 	  OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
 	  OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
@@ -2800,6 +2800,7 @@ packRegisters (eBBlock * ebp)
 	  OP_SYMBOL (IC_RIGHT (ic))->remat &&
 	  bitVectnBitsOn (OP_SYMBOL (IC_RESULT (ic))->defs) <= 1)
 	{
+	  debugLog ("  %d - %s. straight rematerializable\n", __LINE__,__FUNCTION__);
 
 	  OP_SYMBOL (IC_RESULT (ic))->remat =
 	    OP_SYMBOL (IC_RIGHT (ic))->remat;
@@ -2816,7 +2817,7 @@ packRegisters (eBBlock * ebp)
 	   bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 &&
 	   IS_OP_LITERAL (IC_RIGHT (ic))))
 	{
-
+	  debugLog ("  %d - %s. rematerializable because op is +/-\n", __LINE__,__FUNCTION__);
 	  //int i = 
 	  operandLitValue (IC_RIGHT (ic));
 	  OP_SYMBOL (IC_RESULT (ic))->remat = 1;
@@ -2828,12 +2829,14 @@ packRegisters (eBBlock * ebp)
       if (POINTER_SET (ic))
 	{
 	  OP_SYMBOL (IC_RESULT (ic))->uptr = 1;
-	  debugLog ("  marking as a pointer (set)\n");
+	  debugLog ("  marking as a pointer (set) =>");
+	  debugAopGet ("  result:", IC_RESULT (ic));
 	}
       if (POINTER_GET (ic))
 	{
 	  OP_SYMBOL (IC_LEFT (ic))->uptr = 1;
-	  debugLog ("  marking as a pointer (get)\n");
+	  debugLog ("  marking as a pointer (get) =>");
+	  debugAopGet ("  left:", IC_LEFT (ic));
 	}
 
       if (!SKIP_IC2 (ic))

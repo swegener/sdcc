@@ -288,7 +288,7 @@ main (void)
   c_a5();
 
   int0 = 0xabcd;
-  c_abcd();
+  //c_abcd();
 
   char0 = 0;
   char1 = 0;

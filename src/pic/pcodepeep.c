@@ -1580,10 +1580,14 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 	  {
 	    char *n;
 
-	    if(PCI(pcs)->pcop->type == PO_GPR_TEMP) 
+	    switch(PCI(pcs)->pcop->type) {
+	    case PO_GPR_TEMP:
+	    case PO_FSR:
 	      n = PCOR(PCI(pcs)->pcop)->r->name;
-	    else
+	      break;
+	    default:
 	      n = PCI(pcs)->pcop->name;
+	    }
 
 	    if(peepBlock->vars[index])
 	      return  (strcmp(peepBlock->vars[index],n) == 0);

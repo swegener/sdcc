@@ -21,3 +21,6 @@ extern char *lbasename(const char *path);
 #define WCHAR_TYPE_SIZE 32	/* ? maybe ? */
 
 #define SUPPORTS_ONE_ONLY 0
+
+#define TARGET_OBJECT_SUFFIX ".rel"
+

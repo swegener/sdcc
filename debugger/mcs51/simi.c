@@ -321,6 +321,7 @@ int simSetValue (unsigned int addr,char mem, int size, unsigned long val)
     sendSim(buffer);
     waitForSim(100,NULL);
     simResponse();   
+    return 0;
 }
 
 
@@ -420,7 +421,7 @@ void simLoadFile (char *s)
 {
     char buff[128];
 
-    sprintf(buff,"l \"%s\"\n",s);
+    sprintf(buff,"file \"%s\"\n",s);
     printf(buff);
     sendSim(buff);
     waitForSim(500,NULL);

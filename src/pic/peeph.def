@@ -1,3 +1,15 @@
+//bogus test for pcode
+replace restart {
+	movf	%1,w	;comment at end
+%4:	movf	%1,w
+	%2	%3,w
+} by {
+	; peep test remove redundant move
+%4:	movf	%1,w	;another comment
+	%2	%3,w
+} if AYBABTU %3
+
+
 // peep 1
 replace restart {
 	movf	%1,w

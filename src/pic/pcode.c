@@ -31,6 +31,9 @@ pCodeOpReg pc_status    = {{PO_STATUS,  "STATUS"}, -1, NULL,NULL};
 pCodeOpReg pc_indf      = {{PO_INDF,    "INDF"}, -1, NULL,NULL};
 pCodeOpReg pc_fsr       = {{PO_FSR,     "FSR"}, -1, NULL,NULL};
 
+static int mnemonics_initialized = 0;
+
+#if 0
 //static char *PIC_mnemonics[] = {
 static char *scpADDLW = "ADDLW";
 static char *scpADDWF = "ADDWF";
@@ -62,6 +65,10 @@ static char *scpSUBWF = "SUBWF";
 static char *scpTRIS = "TRIS";
 static char *scpXORLW = "XORLW";
 static char *scpXORWF = "XORWF";
+#endif
+
+static hTab *pic14MnemonicsHash = NULL;
+
 
 
 static pFile *the_pFile = NULL;
@@ -89,6 +96,575 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd);
 int pCodePeepMatchRule(pCode *pc);
 
 
+pCodeInstruction pciADDWF = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_ADDWF,
+  "ADDWF",
+  NULL, // operand
+  2,    // num ops
+  1,0,  // dest, bit instruction
+  (PCC_W | PCC_REGISTER),   // inCond
+  (PCC_REGISTER | PCC_Z) // outCond
+};
+
+pCodeInstruction pciADDFW = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_ADDWF,
+  "ADDWF",
+  NULL, // operand
+  2,    // num ops
+  0,0,  // dest, bit instruction
+  (PCC_W | PCC_REGISTER),   // inCond
+  (PCC_W | PCC_Z) // outCond
+};
+
+pCodeInstruction pciADDLW = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_ADDLW,
+  "ADDLW",
+  NULL, // operand
+  1,    // num ops
+  0,0,  // dest, bit instruction
+  PCC_W,   // inCond
+  (PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
+};
+
+pCodeInstruction pciANDLW = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_ANDLW,
+  "ANDLW",
+  NULL, // operand
+  1,    // num ops
+  0,0,  // dest, bit instruction
+  PCC_W,   // inCond
+  (PCC_W | PCC_Z) // outCond
+};
+
+pCodeInstruction pciANDWF = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_ANDWF,
+  "ANDWF",
+  NULL, // operand
+  2,    // num ops
+  1,0,  // dest, bit instruction
+  (PCC_W | PCC_REGISTER),   // inCond
+  (PCC_REGISTER | PCC_Z) // outCond
+};
+
+pCodeInstruction pciANDFW = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_ANDWF,
+  "ANDWF",
+  NULL, // operand
+  2,    // num ops
+  0,0,  // dest, bit instruction
+  (PCC_W | PCC_REGISTER),   // inCond
+  (PCC_W | PCC_Z) // outCond
+};
+
+pCodeInstruction pciBCF = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_BCF,
+  "BCF",
+  NULL, // operand
+  2,    // num ops
+  0,1,  // dest, bit instruction
+  PCC_NONE,   // inCond
+  PCC_EXAMINE_PCOP // outCond
+};
+
+pCodeInstruction pciBSF = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_BSF,
+  "BSF",
+  NULL, // operand
+  2,    // num ops
+  0,1,  // dest, bit instruction
+  PCC_NONE,   // inCond
+  PCC_EXAMINE_PCOP // outCond
+};
+
+pCodeInstruction pciBTFSC = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   AnalyzeSKIP,
+   genericDestruct,
+   genericPrint},
+  POC_BTFSC,
+  "BTFSC",
+  NULL, // operand
+  2,    // num ops
+  0,1,  // dest, bit instruction
+  PCC_EXAMINE_PCOP,   // inCond
+  PCC_NONE // outCond
+};
+
+pCodeInstruction pciBTFSS = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   AnalyzeSKIP,
+   genericDestruct,
+   genericPrint},
+  POC_BTFSS,
+  "BTFSS",
+  NULL, // operand
+  2,    // num ops
+  0,1,  // dest, bit instruction
+  PCC_EXAMINE_PCOP,   // inCond
+  PCC_NONE // outCond
+};
+
+pCodeInstruction pciCALL = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_CALL,
+  "CALL",
+  NULL, // operand
+  1,    // num ops
+  0,0,  // dest, bit instruction
+  PCC_NONE, // inCond
+  PCC_NONE  // outCond
+};
+
+//fixme - need a COMFW instruction.
+pCodeInstruction pciCOMF = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_COMF,
+  "COMF",
+  NULL, // operand
+  2,    // num ops
+  0,0,  // dest, bit instruction
+  PCC_NONE, // inCond
+  PCC_NONE  // outCond
+};
+
+pCodeInstruction pciCLRF = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_CLRF,
+  "CLRF",
+  NULL, // operand
+  1,    // num ops
+  0,0,  // dest, bit instruction
+  PCC_REGISTER, // inCond
+  PCC_REGISTER  // outCond
+};
+
+pCodeInstruction pciCLRW = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_CLRW,
+  "CLRW",
+  NULL, // operand
+  0,    // num ops
+  0,0,  // dest, bit instruction
+  PCC_W, // inCond
+  PCC_W  // outCond
+};
+
+pCodeInstruction pciDECF = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_DECF,
+  "DECF",
+  NULL, // operand
+  2,    // num ops
+  1,0,  // dest, bit instruction
+  PCC_REGISTER,   // inCond
+  PCC_REGISTER    // outCond
+};
+
+pCodeInstruction pciDECFW = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_DECFW,
+  "DECF",
+  NULL, // operand
+  2,    // num ops
+  0,0,  // dest, bit instruction
+  PCC_REGISTER,   // inCond
+  PCC_W    // outCond
+};
+
+pCodeInstruction pciDECFSZ = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   AnalyzeSKIP,
+   genericDestruct,
+   genericPrint},
+  POC_DECFSZ,
+  "DECFSZ",
+  NULL, // operand
+  2,    // num ops
+  1,0,  // dest, bit instruction
+  PCC_REGISTER,   // inCond
+  PCC_REGISTER    // outCond
+};
+
+pCodeInstruction pciDECFSZW = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   AnalyzeSKIP,
+   genericDestruct,
+   genericPrint},
+  POC_DECFSZW,
+  "DECFSZ",
+  NULL, // operand
+  2,    // num ops
+  0,0,  // dest, bit instruction
+  PCC_REGISTER,   // inCond
+  PCC_W           // outCond
+};
+
+pCodeInstruction pciGOTO = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   AnalyzeGOTO,
+   genericDestruct,
+   genericPrint},
+  POC_GOTO,
+  "GOTO",
+  NULL, // operand
+  1,    // num ops
+  0,0,  // dest, bit instruction
+  PCC_NONE,   // inCond
+  PCC_NONE    // outCond
+};
+
+
+pCodeInstruction pciINCF = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_INCF,
+  "INCF",
+  NULL, // operand
+  2,    // num ops
+  1,0,  // dest, bit instruction
+  PCC_REGISTER,   // inCond
+  PCC_REGISTER    // outCond
+};
+
+pCodeInstruction pciINCFW = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_INCFW,
+  "INCF",
+  NULL, // operand
+  2,    // num ops
+  0,0,  // dest, bit instruction
+  PCC_REGISTER,   // inCond
+  PCC_W    // outCond
+};
+
+pCodeInstruction pciINCFSZ = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   AnalyzeSKIP,
+   genericDestruct,
+   genericPrint},
+  POC_INCFSZ,
+  "INCFSZ",
+  NULL, // operand
+  2,    // num ops
+  1,0,  // dest, bit instruction
+  PCC_REGISTER,   // inCond
+  PCC_REGISTER    // outCond
+};
+
+pCodeInstruction pciINCFSZW = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   AnalyzeSKIP,
+   genericDestruct,
+   genericPrint},
+  POC_INCFSZW,
+  "INCFSZ",
+  NULL, // operand
+  2,    // num ops
+  0,0,  // dest, bit instruction
+  PCC_REGISTER,   // inCond
+  PCC_W           // outCond
+};
+
+pCodeInstruction pciIORWF = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_IORWF,
+  "IORWF",
+  NULL, // operand
+  2,    // num ops
+  1,0,  // dest, bit instruction
+  (PCC_W | PCC_REGISTER),   // inCond
+  (PCC_REGISTER | PCC_Z) // outCond
+};
+
+pCodeInstruction pciIORFW = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_IORWF,
+  "IORWF",
+  NULL, // operand
+  2,    // num ops
+  0,0,  // dest, bit instruction
+  (PCC_W | PCC_REGISTER),   // inCond
+  (PCC_W | PCC_Z) // outCond
+};
+
+pCodeInstruction pciIORLW = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_IORLW,
+  "IORLW",
+  NULL, // operand
+  1,    // num ops
+  0,0,  // dest, bit instruction
+  PCC_W,   // inCond
+  (PCC_W | PCC_Z) // outCond
+};
+
+pCodeInstruction pciMOVF = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_MOVF,
+  "MOVF",
+  NULL, // operand
+  2,    // num ops
+  1,0,  // dest, bit instruction
+  PCC_REGISTER,   // inCond
+  PCC_Z // outCond
+};
+
+pCodeInstruction pciMOVFW = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_MOVFW,
+  "MOVF",
+  NULL, // operand
+  2,    // num ops
+  0,0,  // dest, bit instruction
+  PCC_REGISTER,   // inCond
+  (PCC_W | PCC_Z) // outCond
+};
+
+pCodeInstruction pciMOVWF = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_MOVWF,
+  "MOVWF",
+  NULL, // operand
+  1,    // num ops
+  0,0,  // dest, bit instruction
+  PCC_W,   // inCond
+  0 // outCond
+};
+
+pCodeInstruction pciMOVLW = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_MOVLW,
+  "MOVLW",
+  NULL, // operand
+  1,    // num ops
+  0,0,  // dest, bit instruction
+  PCC_NONE,   // inCond
+  PCC_W // outCond
+};
+
+pCodeInstruction pciNEGF = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_NEGF,
+  "NEGF",
+  NULL, // operand
+  1,    // num ops
+  0,0,  // dest, bit instruction
+  PCC_REGISTER,   // inCond
+  PCC_NONE // outCond
+};
+
+
+pCodeInstruction pciRETLW = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   AnalyzeRETURN,
+   genericDestruct,
+   genericPrint},
+  POC_RETLW,
+  "RETLW",
+  NULL, // operand
+  1,    // num ops
+  0,0,  // dest, bit instruction
+  PCC_NONE,   // inCond
+  PCC_W // outCond
+};
+
+pCodeInstruction pciRETURN = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   AnalyzeRETURN,
+   genericDestruct,
+   genericPrint},
+  POC_RETLW,
+  "RETURN",
+  NULL, // operand
+  0,    // num ops
+  0,0,  // dest, bit instruction
+  PCC_NONE,   // inCond
+  PCC_W // outCond
+};
+
+
+pCodeInstruction pciSUBWF = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_SUBWF,
+  "SUBWF",
+  NULL, // operand
+  2,    // num ops
+  1,0,  // dest, bit instruction
+  (PCC_W | PCC_REGISTER),   // inCond
+  (PCC_REGISTER | PCC_Z) // outCond
+};
+
+pCodeInstruction pciSUBFW = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_SUBWF,
+  "SUBWF",
+  NULL, // operand
+  2,    // num ops
+  0,0,  // dest, bit instruction
+  (PCC_W | PCC_REGISTER),   // inCond
+  (PCC_W | PCC_Z) // outCond
+};
+
+pCodeInstruction pciSUBLW = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_SUBLW,
+  "SUBLW",
+  NULL, // operand
+  1,    // num ops
+  0,0,  // dest, bit instruction
+  PCC_W,   // inCond
+  (PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
+};
+
+pCodeInstruction pciTRIS = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_TRIS,
+  "TRIS",
+  NULL, // operand
+  1,    // num ops
+  0,0,  // dest, bit instruction
+  PCC_NONE,   // inCond
+  PCC_NONE
+};
+
+
+pCodeInstruction pciXORWF = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_XORWF,
+  "XORWF",
+  NULL, // operand
+  2,    // num ops
+  1,0,  // dest, bit instruction
+  (PCC_W | PCC_REGISTER),   // inCond
+  (PCC_REGISTER | PCC_Z) // outCond
+};
+
+pCodeInstruction pciXORFW = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_XORWF,
+  "XORWF",
+  NULL, // operand
+  2,    // num ops
+  0,0,  // dest, bit instruction
+  (PCC_W | PCC_REGISTER),   // inCond
+  (PCC_W | PCC_Z) // outCond
+};
+
+pCodeInstruction pciXORLW = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_XORLW,
+  "XORLW",
+  NULL, // operand
+  1,    // num ops
+  0,0,  // dest, bit instruction
+  PCC_W,   // inCond
+  (PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
+};
+
+
+#define MAX_PIC14MNEMONICS 100
+pCodeInstruction *pic14Mnemonics[MAX_PIC14MNEMONICS];
+
 char *Safe_strdup(char *str)
 {
   char *copy;
@@ -113,6 +689,127 @@ void  pCodeInitRegisters(void)
   pc_fsr.r = pic14_regWithIdx(4);
 
 }
+
+/*-----------------------------------------------------------------*/
+/*  mnem2key - convert a pic mnemonic into a hash key              */
+/*   (BTW - this spreads the mnemonics quite well)                 */
+/*                                                                 */
+/*-----------------------------------------------------------------*/
+
+int mnem2key(char *mnem)
+{
+  int key = 0;
+
+  if(!mnem)
+    return 0;
+
+  while(*mnem) {
+
+    key += *mnem++ +1;
+
+  }
+
+  return (key & 0x1f);
+
+}
+
+void pic14initMnemonics(void)
+{
+  int i = 0;
+  int key;
+  //  char *str;
+  pCodeInstruction *pci;
+
+  if(mnemonics_initialized)
+    return;
+
+  pic14Mnemonics[POC_ADDLW] = &pciADDLW;
+  pic14Mnemonics[POC_ADDWF] = &pciADDWF;
+  pic14Mnemonics[POC_ADDFW] = &pciADDFW;
+  pic14Mnemonics[POC_ANDLW] = &pciANDLW;
+  pic14Mnemonics[POC_ANDWF] = &pciANDWF;
+  pic14Mnemonics[POC_ANDFW] = &pciANDFW;
+  pic14Mnemonics[POC_BCF] = &pciBCF;
+  pic14Mnemonics[POC_BSF] = &pciBSF;
+  pic14Mnemonics[POC_BTFSC] = &pciBTFSC;
+  pic14Mnemonics[POC_BTFSS] = &pciBTFSS;
+  pic14Mnemonics[POC_CALL] = &pciCALL;
+  pic14Mnemonics[POC_COMF] = &pciCOMF;
+  pic14Mnemonics[POC_CLRF] = &pciCLRF;
+  pic14Mnemonics[POC_CLRW] = &pciCLRW;
+  pic14Mnemonics[POC_DECF] = &pciDECF;
+  pic14Mnemonics[POC_DECFW] = &pciDECFW;
+  pic14Mnemonics[POC_DECFSZ] = &pciDECFSZ;
+  pic14Mnemonics[POC_DECFSZW] = &pciDECFSZW;
+  pic14Mnemonics[POC_GOTO] = &pciGOTO;
+  pic14Mnemonics[POC_INCF] = &pciINCF;
+  pic14Mnemonics[POC_INCFW] = &pciINCFW;
+  pic14Mnemonics[POC_INCFSZ] = &pciINCFSZ;
+  pic14Mnemonics[POC_INCFSZW] = &pciINCFSZW;
+  pic14Mnemonics[POC_IORLW] = &pciIORLW;
+  pic14Mnemonics[POC_IORWF] = &pciIORWF;
+  pic14Mnemonics[POC_IORFW] = &pciIORFW;
+  pic14Mnemonics[POC_MOVF] = &pciMOVF;
+  pic14Mnemonics[POC_MOVFW] = &pciMOVFW;
+  pic14Mnemonics[POC_MOVLW] = &pciMOVLW;
+  pic14Mnemonics[POC_MOVWF] = &pciMOVWF;
+  pic14Mnemonics[POC_NEGF] = &pciNEGF;
+  pic14Mnemonics[POC_RETLW] = &pciRETLW;
+  pic14Mnemonics[POC_RETURN] = &pciRETURN;
+  pic14Mnemonics[POC_SUBLW] = &pciSUBLW;
+  pic14Mnemonics[POC_SUBWF] = &pciSUBWF;
+  pic14Mnemonics[POC_SUBFW] = &pciSUBFW;
+  pic14Mnemonics[POC_TRIS] = &pciTRIS;
+  pic14Mnemonics[POC_XORLW] = &pciXORLW;
+  pic14Mnemonics[POC_XORWF] = &pciXORWF;
+  pic14Mnemonics[POC_XORFW] = &pciXORFW;
+
+  for(i=0; i<MAX_PIC14MNEMONICS; i++)
+    if(pic14Mnemonics[i])
+      hTabAddItem(&pic14MnemonicsHash, mnem2key(pic14Mnemonics[i]->mnemonic), pic14Mnemonics[i]);
+/*
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpADDLW), scpADDLW);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpADDWF),scpADDWF);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpANDLW),scpANDLW);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpANDWF),scpANDWF);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpBCF),scpBCF);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpBSF),scpBSF);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpBTFSC),scpBTFSC);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpBTFSS),scpBTFSS);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpCALL),scpCALL);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpCOMF),scpCOMF);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpCLRF),scpCLRF);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpCLRW),scpCLRW);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpDECF),scpDECF);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpDECFSZ),scpDECFSZ);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpGOTO),scpGOTO);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpINCF),scpINCF);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpINCFSZ),scpINCFSZ);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpIORLW),scpIORLW);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpIORWF),scpIORWF);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpMOVF),scpMOVF);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpMOVLW),scpMOVLW);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpMOVWF),scpMOVWF);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpNEGF),scpNEGF);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpRETLW),scpRETLW);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpRETURN),scpRETURN);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpSUBLW),scpSUBLW);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpSUBWF),scpSUBWF);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpTRIS),scpTRIS);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpXORLW),scpXORLW);
+  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpXORWF),scpXORWF);
+*/
+
+  pci = hTabFirstItem(pic14MnemonicsHash, &key);
+
+  while(pci) {
+    fprintf( stderr, "element %d key %d, mnem %s\n",i++,key,pci->mnemonic);
+    pci = hTabNextItem(pic14MnemonicsHash, &key);
+  }
+
+  mnemonics_initialized = 1;
+}
+
 
 char getpBlock_dbName(pBlock *pb)
 {
@@ -185,6 +882,8 @@ void pcode_test(void)
 {
 
   printf("pcode is alive!\n");
+
+  //initMnemonics();
 
   if(the_pFile) {
 
@@ -260,198 +959,29 @@ static int RegCond(pCodeOp *pcop)
 pCode *newpCode (PIC_OPCODE op, pCodeOp *pcop)
 {
   pCodeInstruction *pci ;
-    
 
+  if(!mnemonics_initialized)
+    pic14initMnemonics();
+    
   pci = Safe_calloc(1, sizeof(pCodeInstruction));
 
-  pci->pc.analyze  = genericAnalyze;       // pointers to the generic functions, it
-  pci->pc.destruct = genericDestruct;      // doesn't hurt to think about C++ virtual
-  pci->pc.print    = genericPrint;         // functions here.
-  pci->pc.type = PC_OPCODE;                // 
-  pci->op = op;                            // the "opcode" for the instruction.
-  pci->pc.prev = pci->pc.next = NULL;      // The pCode gets linked in later
-  pci->pcop = pcop;                        // The operand of the instruction
-  pci->dest = 0;                           // e.g. W or F 
-  pci->bit_inst = 0;                       // e.g. btfxx instructions
-  pci->num_ops = 2;                        // Most instructions have two ops...
-  pci->inCond = pci->outCond = PCC_NONE;   /* input/output conditions. This is used during
-					    * optimization to ascertain instruction dependencies.
-					    * For example, if an instruction affects the Z bit,
-					    * then the output condition for this instruction
-					    * is "z bit is affected". The "conditions" are bit
-					    * constants defined in pcode.h. */
-  pci->pc.from = pci->pc.to = NULL;        // Flow linkages are defined later
-  pci->pc.label = NULL;                    // Labels get merged into instructions here.
-  pci->pc.pb = NULL;                       // The pBlock to which this instruction belongs
+  if((op < MAX_PIC14MNEMONICS) && pic14Mnemonics[op]) {
+    memcpy(pci, pic14Mnemonics[op], sizeof(pCodeInstruction));
+    pci->pcop = pcop;
 
-  if(pcop && pcop->name)
-    printf("newpCode  operand name %s\n",pcop->name);
+    if(pci->inCond == PCC_EXAMINE_PCOP)
+      pci->inCond   = RegCond(pcop);
 
-  // The most pic dependent portion of the pCode logic:
-  switch(op) { 
+    if(pci->outCond == PCC_EXAMINE_PCOP)
+      pci->outCond   = RegCond(pcop);
 
-  case POC_ANDLW:
-    pci->inCond   = PCC_W;
-    pci->outCond  = PCC_W | PCC_Z;
-    pci->mnemonic = scpANDLW;
-    pci->num_ops  = 1;
-    break;
-  case POC_ANDWF:
-    pci->dest = 1;
-    pci->inCond   = PCC_W | PCC_REGISTER;
-    pci->outCond  = PCC_REGISTER | PCC_Z;
-    pci->mnemonic = scpANDWF;
-    break;
-  case POC_ANDFW:
-    pci->inCond   = PCC_W | PCC_REGISTER;
-    pci->outCond  = PCC_W | PCC_Z;
-    pci->mnemonic = scpANDWF;
-    break;
-
-  case POC_ADDLW:
-    pci->inCond   = PCC_W;
-    pci->outCond  = PCC_W | PCC_Z | PCC_C | PCC_DC;
-    pci->mnemonic = scpADDLW;
-    pci->num_ops = 1;
-    break;
-  case POC_ADDWF:
-    pci->dest     = 1;
-    pci->inCond   = PCC_W | PCC_REGISTER;
-    pci->outCond  = PCC_REGISTER | PCC_Z | PCC_C | PCC_DC;
-    pci->mnemonic = scpADDWF;
-    break;
-  case POC_ADDFW:
-    pci->inCond   = PCC_W | PCC_REGISTER;
-    pci->outCond  = PCC_W | PCC_Z | PCC_C | PCC_DC;
-    pci->mnemonic = scpADDWF;
-    break;
-
-  case POC_BCF:
-    pci->bit_inst = 1;
-    pci->mnemonic = scpBCF;
-    pci->outCond   = RegCond(pcop);
-    break;
-  case POC_BSF:
-    pci->bit_inst = 1;
-    pci->mnemonic = scpBSF;
-    pci->outCond   = RegCond(pcop);
-    break;
-  case POC_BTFSC:
-    pci->bit_inst = 1;
-    pci->mnemonic = scpBTFSC;
-    pci->pc.analyze = AnalyzeSKIP;
-    pci->inCond   = RegCond(pcop);
-    break;
-  case POC_BTFSS:
-    pci->bit_inst = 1;
-    pci->mnemonic = scpBTFSS;
-    pci->pc.analyze = AnalyzeSKIP;
-    pci->inCond   = RegCond(pcop);
-    break;
-  case POC_CALL:
-    pci->num_ops = 1;
-    pci->mnemonic = scpCALL;
-    break;
-  case POC_COMF:
-    pci->mnemonic = scpCOMF;
-    break;
-  case POC_CLRF:
-    pci->num_ops = 1;
-    pci->mnemonic = scpCLRF;
-    break;
-  case POC_CLRW:
-    pci->num_ops = 0;
-    pci->mnemonic = scpCLRW;
-    break;
-  case POC_DECF:
-    pci->dest = 1;
-  case POC_DECFW:
-    pci->mnemonic = scpDECF;
-    break;
-  case POC_DECFSZ:
-    pci->dest = 1;
-  case POC_DECFSZW:
-    pci->mnemonic = scpDECFSZ;
-    pci->pc.analyze = AnalyzeSKIP;
-    break;
-  case POC_GOTO:
-    pci->num_ops = 1;
-    pci->mnemonic = scpGOTO;
-    pci->pc.analyze = AnalyzeGOTO;
-    break;
-  case POC_INCF:
-    pci->dest = 1;
-  case POC_INCFW:
-    pci->mnemonic = scpINCF;
-    break;
-  case POC_INCFSZ:
-    pci->dest = 1;
-  case POC_INCFSZW:
-    pci->mnemonic = scpINCFSZ;
-    pci->pc.analyze = AnalyzeSKIP;
-    break;
-  case POC_IORLW:
-    pci->num_ops = 1;
-    pci->mnemonic = scpIORLW;
-    break;
-  case POC_IORWF:
-    pci->dest = 1;
-  case POC_IORFW:
-    pci->mnemonic = scpIORWF;
-    break;
-  case POC_MOVF:
-    pci->dest = 1;
-  case POC_MOVFW:
-    pci->mnemonic = scpMOVF;
-    break;
-  case POC_MOVLW:
-    pci->num_ops = 1;
-    pci->mnemonic = scpMOVLW;
-    break;
-  case POC_MOVWF:
-    pci->num_ops = 1;
-    pci->mnemonic = scpMOVWF;
-    break;
-  case POC_NEGF:
-    pci->mnemonic = scpNEGF;
-    break;
-  case POC_RETLW:
-    pci->num_ops = 1;
-    pci->mnemonic = scpRETLW;
-    pci->pc.analyze = AnalyzeRETURN;
-    break;
-  case POC_RETURN:
-    pci->num_ops = 0;
-    pci->mnemonic = scpRETURN;
-    pci->pc.analyze = AnalyzeRETURN;
-    break;
-  case POC_SUBLW:
-    pci->mnemonic = scpSUBLW;
-    pci->num_ops = 1;
-    break;
-  case POC_SUBWF:
-    pci->dest = 1;
-  case POC_SUBFW:
-    pci->mnemonic = scpSUBWF;
-    break;
-  case POC_TRIS:
-    pci->mnemonic = scpTRIS;
-    break;
-  case POC_XORLW:
-    pci->num_ops = 1;
-    pci->mnemonic = scpXORLW;
-    break;
-  case POC_XORWF:
-    pci->dest = 1;
-  case POC_XORFW:
-    pci->mnemonic = scpXORWF;
-    break;
-
-  default:
-    pci->pc.print = genericPrint;
+    return (pCode *)pci;
   }
-   
-  return (pCode *)pci;
+
+  fprintf(stderr, "pCode mnemonic error %s,%d\n",__FUNCTION__,__LINE__);
+  exit(1);
+
+  return NULL;
 }     	
 
 /*-----------------------------------------------------------------*/

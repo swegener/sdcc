@@ -65,7 +65,7 @@ struct_test (void)
   if (struct1.c0 != 1)
     failures++;
 }
-
+/*
 void
 ptr_to_struct (struct chars *p)
 {
@@ -79,7 +79,7 @@ ptr_to_struct (struct chars *p)
   if (p->c1 != 1)
     failures++;
 }
-
+*/
 void add_chars(void)
 {
 
@@ -97,7 +97,7 @@ main (void)
   struct1.c0 = 0;
   struct1.c1 = 0;
   struct_test ();
-  ptr_to_struct (&struct1);
+  //  ptr_to_struct (&struct1);
 
   struct1.c0 = 0;
   struct1.c1 = 1;

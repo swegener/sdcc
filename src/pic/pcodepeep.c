@@ -19,6 +19,7 @@
 -------------------------------------------------------------------------*/
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "common.h"   // Include everything in the SDCC src directory
 #include "newalloc.h"
@@ -41,7 +42,9 @@ char *Safe_strdup(char *str);
  * defined in peep.def.
  */
 
-extern peepRule *rootRules;
+//extern peepRule *rootRules;
+
+
 
 
 /****************************************************************/
@@ -62,6 +65,514 @@ typedef struct pCodePeepSnippets
 
 static pCodePeepSnippets  *peepSnippets=NULL;
 
+typedef struct pCodeToken 
+{
+  int tt;  // token type;
+  union {
+    char c;  // character
+    int  n;  // number
+    char *s; // string
+  } tok;
+
+} pCodeToken;
+
+pCodeToken tokArr[50];
+unsigned   tokIdx=0;
+
+
+typedef enum  {
+  PCT_SPACE,
+  PCT_PERCENT,
+  PCT_COLON,
+  PCT_COMMA,
+  PCT_COMMENT,
+  PCT_STRING,
+  PCT_NUMBER
+
+} pCodeTokens;
+
+
+typedef struct parsedPattern {
+  struct pcPattern *pcp;
+  pCodeToken *pct;
+} parsedPattern;
+
+#define MAX_PARSEDPATARR 50
+parsedPattern parsedPatArr[MAX_PARSEDPATARR];
+unsigned int parsedPatIdx=0;
+
+
+typedef enum {
+  PCP_LABEL,
+  PCP_STR,
+  PCP_WILDVAR,
+  PCP_WILDSTR,
+  PCP_COMMA
+} pCodePatterns;
+
+static char pcpat_label[]      = {PCT_PERCENT, PCT_NUMBER, PCT_COLON, 0};
+static char pcpat_string[]     = {PCT_STRING, 0};
+static char pcpat_wildString[] = {PCT_PERCENT, PCT_STRING, 0};
+static char pcpat_wildVar[]    = {PCT_PERCENT, PCT_NUMBER, 0};
+static char pcpat_comma[]      = {PCT_COMMA, 0};
+
+
+typedef struct pcPattern {
+  int pt;                 // Pattern type
+  char *tokens;           // list of tokens that describe the pattern
+  void * (*f) (void *);
+} pcPattern;
+
+pcPattern pcpArr[] = {
+  {PCP_LABEL,     pcpat_label,      NULL},
+  {PCP_WILDSTR,   pcpat_wildString, NULL},
+  {PCP_STR,       pcpat_string,     NULL},
+  {PCP_WILDVAR,   pcpat_wildVar,    NULL},
+  {PCP_COMMA,     pcpat_comma,      NULL}
+};
+
+#define PCPATTERNS (sizeof(pcpArr)/sizeof(pcPattern))
+
+// Assembly Line Token
+typedef enum {
+  ALT_LABEL,
+  ALT_MNEM0,
+  ALT_MNEM1,
+  ALT_MNEM2
+} altPatterns;
+
+static char alt_label[]     = { PCP_LABEL, 0};
+static char alt_mnem0[]     = { PCP_STR, 0};
+static char alt_mnem1[]     = { PCP_STR, PCP_STR, 0};
+static char alt_mnem2[]     = { PCP_STR, PCP_STR, PCP_COMMA, PCP_STR, 0};
+
+static void * cvt_altpat_label(void *pp);
+
+pcPattern altArr[] = {
+  {ALT_LABEL,        alt_label,  cvt_altpat_label},
+  {ALT_MNEM2,        alt_mnem2,  NULL},
+
+};
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+static void * cvt_altpat_label(void *pp)
+{
+  fprintf(stderr,"altpat_label\n");
+  return NULL;
+}
+
+#if 0
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+static pCode * cvt_pcpat_wildMnem(parsedPattern *pp)
+{
+  fprintf(stderr,"pcpat_wildMnem\n");
+  return NULL;
+}
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+static pCode * cvt_pcpat_Mnem(parsedPattern *pp)
+{
+  fprintf(stderr,"pcpat_Mnem\n");
+  return NULL;
+}
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+static pCode * cvt_pcpat_wildVar(parsedPattern *pp)
+{
+  fprintf(stderr,"pcpat_wildVar\n");
+  return NULL;
+}
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+static pCode * cvt_pcpat_var(parsedPattern *pp)
+{
+  fprintf(stderr,"pcpat_var\n");
+  return NULL;
+}
+#endif
+
+
+
+
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+
+
+static void parseLineNode(char *ln)
+{
+
+  tokIdx = 0;
+
+  if(!ln || !*ln)
+    return;
+
+  while(*ln) {
+
+    if(isspace(*ln)) {
+      tokArr[tokIdx++].tt = PCT_SPACE;
+      while (isspace (*ln))
+	ln++;
+      continue;
+    }
+
+    if(isdigit(*ln)) {
+
+      tokArr[tokIdx].tt = PCT_NUMBER;
+      tokArr[tokIdx++].tok.n = strtol(ln, &ln, 10);
+
+      continue;
+
+    }
+
+    switch(*ln) {
+    case '%':
+      tokArr[tokIdx++].tt = PCT_PERCENT;
+      break;
+    case ':':
+      tokArr[tokIdx++].tt = PCT_COLON;
+      break;
+    case ';':
+      tokArr[tokIdx].tok.s = Safe_strdup(ln);
+      tokArr[tokIdx++].tt = PCT_COMMENT;
+      return;
+    case ',':
+      tokArr[tokIdx++].tt = PCT_COMMA;
+      break;
+
+
+    default:
+      if(isalpha(*ln)) {
+	char buffer[50];
+	int i=0;
+
+	while( (isalpha(*ln)  ||  isdigit(*ln)) && i<49)
+	  buffer[i++] = *ln++;
+
+	ln--;
+	buffer[i] = 0;
+
+	tokArr[tokIdx].tok.s = Safe_strdup(buffer);
+	//fprintf(stderr," string %s",tokArr[tokIdx].tok.s);
+
+	tokArr[tokIdx++].tt = PCT_STRING;
+
+      }
+    }
+    ln++;
+  }
+}
+
+
+
+
+void dump1Token(pCodeTokens tt)
+{
+
+  switch(tt) {
+  case PCT_SPACE:
+    fprintf(stderr, " space ");
+    break;
+  case PCT_PERCENT:
+    fprintf(stderr, " pct ");
+    fputc('%', stderr);
+    break;
+  case PCT_COLON:
+    fprintf(stderr, " col ");
+    fputc(':',stderr);
+    break;
+  case PCT_COMMA:
+    fprintf(stderr, " com ");
+    fputc(',',stderr);
+    break;
+  case PCT_COMMENT:
+  case PCT_STRING:
+    fprintf(stderr, " str ");
+    //fprintf(stderr,"%s",tokArr[i].tok.s);
+    break;
+  case PCT_NUMBER:
+    fprintf(stderr, " num ");
+    //fprintf(stderr,"%d",tokArr[i].tok.n);
+
+
+  }
+}
+
+
+int pcComparePattern(pCodeToken *pct, char *pat, int max_tokens)
+{
+  int i=0;
+
+  if(!pct || !pat || !*pat)
+    return 0;
+
+  //fprintf(stderr,"comparing against:\n");
+
+  while(i < max_tokens) {
+
+    if(*pat == 0){
+      //fprintf(stderr,"matched\n");
+      return (i+1);
+    }
+
+    //dump1Token(*pat); fprintf(stderr,"\n");
+
+    if(pct->tt != *pat) 
+      return 0;
+
+
+    pct++;
+    pat++;
+  }
+
+  return 0;
+
+}
+
+int advTokIdx(int *v, int amt)
+{
+
+  if(*v + amt > tokIdx)
+    return 1;
+
+  *v += amt;
+  return 0;
+
+}
+
+void dumpTokens(void)
+{
+  int i;
+
+  if(!tokIdx)
+    return;
+
+  for(i=0; i<=tokIdx; i++)
+    dump1Token(tokArr[i].tt);
+
+
+  fputc('\n',stderr);
+
+  {
+    int lparsedPatIdx=0;
+    int lpcpIdx;
+    int ltokIdx =0;
+    int matching = 0;
+    int j;
+
+    pCodeOp *pcl   = NULL;       // Storage for a label
+    pCodeOp *pco1  = NULL;       // 1st operand
+    pCodeOp *pco2  = NULL;       // 2nd operand
+    pCode   *pc    = NULL;       // Mnemonic
+
+    typedef enum {
+      PS_START,
+      PS_HAVE_LABEL,
+      PS_HAVE_MNEM,
+      PS_HAVE_1OPERAND,
+      PS_HAVE_COMMA,
+      PS_HAVE_2OPERANDS
+    } ParseStates;
+
+    ParseStates state = PS_START;
+
+    do {
+
+      lpcpIdx=0;
+      matching = 0;
+      //fprintf(stderr,"ltokIdx = %d\n",ltokIdx);
+
+      if(  ((tokArr[ltokIdx].tt == PCT_SPACE) )//|| (tokArr[ltokIdx].tt == PCT_COMMA))
+	   && (advTokIdx(&ltokIdx, 1)) ) // eat space
+	break;
+
+      do {
+	j = pcComparePattern(&tokArr[ltokIdx], pcpArr[lpcpIdx].tokens, tokIdx +1);
+	if( j ) {
+	  //fprintf(stderr,"found token pattern match\n");
+	  switch(pcpArr[lpcpIdx].pt) {
+	  case  PCP_LABEL:
+	    if(state == PS_START){
+	      fprintf(stderr,"  label\n");
+	      state = PS_HAVE_LABEL;
+	    } else 
+	      fprintf(stderr,"  bad state (%d) for label\n",state);
+	    break;
+
+	  case  PCP_STR:
+	    switch(state) {
+	    case PS_START:
+	    case PS_HAVE_LABEL:
+	      fprintf(stderr,"  mnem\n");
+	      state = PS_HAVE_MNEM;
+	      break;
+	    case PS_HAVE_MNEM:
+	      fprintf(stderr,"  1st operand\n");
+	      pco1 = newpCodeOp(NULL,PO_GPR_REGISTER);
+	      state = PS_HAVE_1OPERAND;
+	      break;
+	    case PS_HAVE_1OPERAND:
+	      fprintf(stderr,"  error expecting comma\n");
+	      break;
+	    case PS_HAVE_COMMA:
+	      fprintf(stderr,"  2 operands\n");
+	      break;
+	    }
+	    break;
+
+	  case  PCP_WILDVAR:
+	    switch(state) {
+	    case PS_START:
+	    case PS_HAVE_LABEL:
+	      fprintf(stderr,"  wild mnem\n");
+	      state = PS_HAVE_MNEM;
+	      break;
+	    case PS_HAVE_MNEM:
+	      fprintf(stderr,"  1st operand is wild\n");
+	      state = PS_HAVE_1OPERAND;
+	      break;
+	    case PS_HAVE_1OPERAND:
+	      fprintf(stderr,"  error expecting comma\n");
+	      break;
+	    case PS_HAVE_COMMA:
+	      fprintf(stderr,"  2nd operand is wild\n");
+	      break;
+	    }
+	    break;
+
+	  case  PCP_WILDSTR:
+	    break;
+	  case  PCP_COMMA:
+	    if(state == PS_HAVE_1OPERAND){
+	      fprintf(stderr,"  got a comma\n");
+	      state = PS_HAVE_COMMA;
+	    } else
+	      fprintf(stderr,"  unexpected comma\n");
+	  }
+
+	  matching = 1;
+	  parsedPatArr[lparsedPatIdx].pcp = &pcpArr[lpcpIdx];
+	  parsedPatArr[lparsedPatIdx].pct = &tokArr[ltokIdx];
+	  lparsedPatIdx++;
+
+	  //dump1Token(tokArr[ltokIdx].tt);
+
+	  if(advTokIdx(&ltokIdx, strlen(pcpArr[lpcpIdx].tokens) ) ) {
+	    fprintf(stderr," reached end \n");
+	    matching = 0;
+	    //return;
+	  }
+	}
+
+
+      } while ((++lpcpIdx < PCPATTERNS) && !matching);
+
+    } while (matching);
+
+    fprintf(stderr,"\nConverting parsed line to pCode:\n\n");
+
+    j = 0;
+    do {
+      if(parsedPatArr[j].pcp && parsedPatArr[j].pcp->f )
+	parsedPatArr[j].pcp->f(&parsedPatArr[j]);
+      j++;
+    }
+    while(j<lparsedPatIdx);
+
+    fprintf(stderr,"\n");
+
+  }
+  return;
+  /*now decode */
+#if 0
+  i=0;
+
+  if(pcComparePattern(&tokArr[0], pcpat_label, tokIdx +1)) {
+    fprintf(stderr,"has a wild label\n");
+    if(advTokIdx(&i, sizeof(pcpat_label) -1))
+      return;
+  }
+
+  if( (tokArr[i].tt == PCT_SPACE) && (advTokIdx(&i, 1)) ) // eat space
+    return;
+
+  if(pcComparePattern(&tokArr[i], pcpat_wildMnem, tokIdx +1 -i)) {
+    fprintf(stderr,"has a wild mnemonic\n");
+    if(advTokIdx(&i, sizeof(pcpat_wildMnem) -1))
+      return;
+  } else if(pcComparePattern(&tokArr[i], pcpat_Mnem, tokIdx +1 -i)) {
+    fprintf(stderr,"has a mnemonic\n");
+    if(advTokIdx(&i, sizeof(pcpat_Mnem) -1))
+     return;
+  } else
+    return;  // doesn't matter what follows
+
+  if( (tokArr[i].tt == PCT_SPACE) && (advTokIdx(&i, 1)) ) // eat space
+    return;
+
+  fprintf(stderr,"checking variable; next token  ");
+  dump1Token(tokArr[i].tt);
+  fprintf(stderr,"\n");
+
+  if(pcComparePattern(&tokArr[i], pcpat_wildVar, tokIdx +1 -i)) {
+    fprintf(stderr,"has a wild var\n");
+    if(advTokIdx(&i, sizeof(pcpat_wildVar) -1))
+      return;
+  } else if(pcComparePattern(&tokArr[i], pcpat_Var, tokIdx +1 -i)) {
+    fprintf(stderr,"has a var\n");
+    if(advTokIdx(&i, sizeof(pcpat_Var) -1))
+      return;
+  } else
+    return;
+
+  if(  ((tokArr[i].tt == PCT_SPACE) || (tokArr[i].tt == PCT_COMMA))
+       && (advTokIdx(&i, 1)) ) // eat space
+    return;
+
+  if(pcComparePattern(&tokArr[i], pcpat_wildVar, tokIdx +10 -i)) {
+    fprintf(stderr,"has a wild var\n");
+    if(advTokIdx(&i, sizeof(pcpat_wildVar) -1))
+      return;
+  } else if(pcComparePattern(&tokArr[i], pcpat_Var, tokIdx +10 -i)) {
+    fprintf(stderr,"has a var\n");
+    if(advTokIdx(&i, sizeof(pcpat_Var) -1))
+      return;
+  } else if(tokArr[i].tt == PCT_NUMBER) {
+    fprintf(stderr,"has a number\n");
+    if (advTokIdx(&i, 1))
+      return;
+  } else
+    return;
+#endif
+
+}
+
+void  peepRules2pCode(peepRule *rules)
+{
+  peepRule *pr;
+  lineNode *ln;
+
+  for (pr = rules; pr; pr = pr->next) {
+    fprintf(stderr,"\nRule:\n\n");
+    for(ln = pr->match; ln; ln = ln->next) {
+      fprintf(stderr,"%s\n",ln->line);
+      //parseLineNode(ln->line);
+      parseLineNode(ln->line);
+      dumpTokens();
+
+    }
+
+    fprintf(stderr,"\nReplaced by:\n");
+    for(ln = pr->replace; ln; ln = ln->next)
+      fprintf(stderr,"%s\n",ln->line);
+
+    if(pr->cond)
+      fprintf(stderr,"\nCondition:  %s\n",pr->cond);
+
+  }
+
+}
 
 void printpCodeString(FILE *of, pCode *pc, int max)
 {
@@ -233,11 +744,33 @@ void pCodePeepInit(void)
   peepSnippets = DLL_append((_DLL*)peepSnippets,(_DLL*)pcps);
 
   {
+    /*
+      target:
+
+          btfsc  %0
+           goto  %1
+          %3
+      %1: %4
+
+      replace:
+          btfss  %0
+      %1:  %4
+          %3
+
+	  The %3 and %4 are wild opcodes. Since the opcodes
+	  are stored in a different array than the wild operands,
+	  they can have the same indices and not conflict. So
+	  below, the %3 is really a %0, %4 is a %1.
+
+     */
     pCodeOp *pcl;
     pCodeOp *pcw;
     pCodeOp *pcwb;
 
+    // Create a new wild operand subtyped as a bit
     pcwb =  newpCodeOpWild(0,pcp,newpCodeOpBit(NULL,-1));
+
+    // Create a 
     pb = newpCodeChain(NULL, 'W',newpCode(POC_BTFSC,pcwb));
 
     pcl = newpCodeOpLabel(-1);
@@ -665,7 +1198,7 @@ int pCodePeepMatchRule(pCode *pc)
 	if(pcr->type == PC_OPCODE) {
 	  if(PCI(pcr)->pcop)
 	    pcop = pCodeOpCopy(PCI(pcr)->pcop);
-
+	  fprintf(stderr,"inserting pCode\n");
 	  pCodeInsertAfter(pc, newpCode(PCI(pcr)->op,pcop));
 	} else if (pcr->type == PC_WILD) {
 	  pCodeInsertAfter(pc,peepBlock->wildpCodes[PCW(pcr)->id]);
@@ -685,3 +1218,84 @@ int pCodePeepMatchRule(pCode *pc)
 
   return 0;
 }
+
+
+
+
+
+
+
+
+
+
+#if 0
+/*******************/
+pCode *parseLineNode(char *ln)
+{
+  char buffer[50], *s;
+  int state=0;          //0 label, 1 mnemonic, 2 operand, 3 operand, 4 comment
+  int var;
+  pCode *pc = NULL;
+  //  pCodeLabel *pcl = NULL;
+
+  if(!ln || !*ln)
+    return pc;
+
+  s = buffer;
+  *s = 0;
+
+  while(*ln) {
+
+    /* skip white space */
+    while (isspace (*ln))
+      ln++;
+
+    switch(state) {
+
+    case 0:   // look for a label
+    case 1:   // look for mnemonic
+
+      if(*ln == '%') {
+
+	// Wild
+
+	ln++;
+	if(!isdigit(*ln) )
+	  break;
+	  //goto next_state;
+
+	var = strtol(ln, &ln, 10);
+	if(*ln  == ':') {
+	  // valid wild card label
+	  fprintf(stderr, " wildcard label: %d\n",var);
+	  ln++;
+	} else
+	  fprintf(stderr, " wild opcode: %d\n",var), state++;
+
+      } else {
+	// not wild
+	// Extract the label/mnemonic from the line
+
+	s = buffer;
+	while(*ln && !(isspace(*ln) || *ln == ':'))
+	  *s++ = *ln++;
+
+	*s = 0;
+	if(*ln == ':')
+	  fprintf(stderr," regular label: %s\n",buffer), ln++;
+	else
+	  fprintf(stderr," regular mnem: %s\n",buffer), state++;
+      }
+      state++;
+      break;
+
+    default:
+      ln++;
+
+    }
+  }
+
+  return pc;
+  
+}
+#endif

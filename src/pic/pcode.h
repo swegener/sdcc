@@ -147,6 +147,7 @@ typedef enum
 #define  PCC_Z             (1<<2)
 #define  PCC_DC            (1<<3)
 #define  PCC_W             (1<<4)
+#define  PCC_EXAMINE_PCOP  (1<<5)
 
 /***********************************************************************
  *
@@ -361,7 +362,7 @@ typedef struct pCodeInstruction
 
   PIC_OPCODE op;        // The opcode of the instruction.
 
-  char *mnemonic;       // Pointer to mnemonic string
+  char const * const mnemonic;       // Pointer to mnemonic string
 
   pCodeOp *pcop;        // Operand
 

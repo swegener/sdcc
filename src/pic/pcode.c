@@ -35,6 +35,19 @@
 #define STRCASECMP strcasecmp
 #endif
 
+/****************************************************************/
+/****************************************************************/
+
+peepCommand peepCommands[] = {
+
+  {NOTBITSKIP, "_NOTBITSKIP_"},
+  {BITSKIP, "_BITSKIP_"},
+  {INVERTBITSKIP, "_INVERTBITSKIP_"},
+
+  {-1, NULL}
+};
+
+
 
 // Eventually this will go into device dependent files:
 pCodeOpReg pc_status    = {{PO_STATUS,  "STATUS"}, -1, NULL,0,NULL};
@@ -52,17 +65,19 @@ static int mnemonics_initialized = 0;
 
 
 static hTab *pic14MnemonicsHash = NULL;
+static hTab *pic14pCodePeepCommandsHash = NULL;
 
 
 
 static pFile *the_pFile = NULL;
-static int peepOptimizing = 1;
+static int peepOptimizing = 0;
 static int GpCodeSequenceNumber = 1;
 static int GpcFlowSeq = 1;
 
 #define isPCI(x)        ((PCODE(x)->type == PC_OPCODE))
 #define isPCI_BRANCH(x) ((PCODE(x)->type == PC_OPCODE) &&  PCI(x)->isBranch)
 #define isPCI_SKIP(x)   ((PCODE(x)->type == PC_OPCODE) &&  PCI(x)->isSkip)
+#define isPCI_BITSKIP(x)((PCODE(x)->type == PC_OPCODE) &&  PCI(x)->isSkip && PCI(x)->isBitInst)
 #define isPCFL(x)       ((PCODE(x)->type == PC_FLOW))
 #define isPCF(x)        ((PCODE(x)->type == PC_FUNCTION))
 #define isCALL(x)       ((isPCI(x)) && (PCI(x)->op == POC_CALL))
@@ -107,6 +122,7 @@ pCodeInstruction pciADDWF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_Z) // outCond
 };
@@ -116,7 +132,7 @@ pCodeInstruction pciADDFW = {
    //   genericAnalyze,
    genericDestruct,
    genericPrint},
-  POC_ADDWF,
+  POC_ADDFW,
   "ADDWF",
   NULL, // from branch
   NULL, // to branch
@@ -126,6 +142,7 @@ pCodeInstruction pciADDFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_W | PCC_Z) // outCond
 };
@@ -145,6 +162,7 @@ pCodeInstruction pciADDLW = {
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   PCC_W,   // inCond
   (PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
 };
@@ -164,6 +182,7 @@ pCodeInstruction pciANDLW = {
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   PCC_W,   // inCond
   (PCC_W | PCC_Z) // outCond
 };
@@ -183,6 +202,7 @@ pCodeInstruction pciANDWF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_Z) // outCond
 };
@@ -192,7 +212,7 @@ pCodeInstruction pciANDFW = {
    //   genericAnalyze,
    genericDestruct,
    genericPrint},
-  POC_ANDWF,
+  POC_ANDFW,
   "ANDWF",
   NULL, // from branch
   NULL, // to branch
@@ -202,6 +222,7 @@ pCodeInstruction pciANDFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_W | PCC_Z) // outCond
 };
@@ -221,6 +242,7 @@ pCodeInstruction pciBCF = {
   2,    // num ops
   1,1,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_BSF,
   PCC_REGISTER,   // inCond
   PCC_REGISTER // outCond
 };
@@ -240,6 +262,7 @@ pCodeInstruction pciBSF = {
   2,    // num ops
   1,1,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_BCF,
   PCC_REGISTER,   // inCond
   PCC_REGISTER // outCond
 };
@@ -259,6 +282,7 @@ pCodeInstruction pciBTFSC = {
   2,    // num ops
   0,1,  // dest, bit instruction
   1,1,  // branch, skip
+  POC_BTFSS,
   PCC_REGISTER,   // inCond
   PCC_NONE // outCond
 };
@@ -278,6 +302,7 @@ pCodeInstruction pciBTFSS = {
   2,    // num ops
   0,1,  // dest, bit instruction
   1,1,  // branch, skip
+  POC_BTFSC,
   PCC_REGISTER,   // inCond
   PCC_NONE // outCond
 };
@@ -297,6 +322,7 @@ pCodeInstruction pciCALL = {
   1,    // num ops
   0,0,  // dest, bit instruction
   1,0,  // branch, skip
+  POC_NOP,
   PCC_NONE, // inCond
   PCC_NONE  // outCond
 };
@@ -316,6 +342,7 @@ pCodeInstruction pciCOMF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   PCC_REGISTER,  // inCond
   PCC_REGISTER   // outCond
 };
@@ -335,6 +362,7 @@ pCodeInstruction pciCOMFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   PCC_REGISTER,  // inCond
   PCC_W   // outCond
 };
@@ -354,6 +382,7 @@ pCodeInstruction pciCLRF = {
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   PCC_REGISTER, // inCond
   PCC_REGISTER  // outCond
 };
@@ -373,6 +402,7 @@ pCodeInstruction pciCLRW = {
   0,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   PCC_W, // inCond
   PCC_W  // outCond
 };
@@ -392,6 +422,7 @@ pCodeInstruction pciDECF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_REGISTER    // outCond
 };
@@ -411,6 +442,7 @@ pCodeInstruction pciDECFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_W    // outCond
 };
@@ -430,6 +462,7 @@ pCodeInstruction pciDECFSZ = {
   2,    // num ops
   1,0,  // dest, bit instruction
   1,1,  // branch, skip
+  POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_REGISTER    // outCond
 };
@@ -449,6 +482,7 @@ pCodeInstruction pciDECFSZW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   1,1,  // branch, skip
+  POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_W           // outCond
 };
@@ -468,10 +502,10 @@ pCodeInstruction pciGOTO = {
   1,    // num ops
   0,0,  // dest, bit instruction
   1,0,  // branch, skip
+  POC_NOP,
   PCC_NONE,   // inCond
   PCC_NONE    // outCond
 };
-
 
 pCodeInstruction pciINCF = {
   {PC_OPCODE, NULL, NULL, 0, NULL, 
@@ -488,6 +522,7 @@ pCodeInstruction pciINCF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_REGISTER    // outCond
 };
@@ -507,6 +542,7 @@ pCodeInstruction pciINCFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_W    // outCond
 };
@@ -526,6 +562,7 @@ pCodeInstruction pciINCFSZ = {
   2,    // num ops
   1,0,  // dest, bit instruction
   1,1,  // branch, skip
+  POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_REGISTER    // outCond
 };
@@ -545,6 +582,7 @@ pCodeInstruction pciINCFSZW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   1,1,  // branch, skip
+  POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_W           // outCond
 };
@@ -564,6 +602,7 @@ pCodeInstruction pciIORWF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_Z) // outCond
 };
@@ -573,7 +612,7 @@ pCodeInstruction pciIORFW = {
    //   genericAnalyze,
    genericDestruct,
    genericPrint},
-  POC_IORWF,
+  POC_IORFW,
   "IORWF",
   NULL, // from branch
   NULL, // to branch
@@ -583,6 +622,7 @@ pCodeInstruction pciIORFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_W | PCC_Z) // outCond
 };
@@ -602,6 +642,7 @@ pCodeInstruction pciIORLW = {
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   PCC_W,   // inCond
   (PCC_W | PCC_Z) // outCond
 };
@@ -621,6 +662,7 @@ pCodeInstruction pciMOVF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_Z // outCond
 };
@@ -640,6 +682,7 @@ pCodeInstruction pciMOVFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   PCC_REGISTER,   // inCond
   (PCC_W | PCC_Z) // outCond
 };
@@ -659,6 +702,7 @@ pCodeInstruction pciMOVWF = {
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   PCC_W,   // inCond
   PCC_REGISTER // outCond
 };
@@ -678,6 +722,7 @@ pCodeInstruction pciMOVLW = {
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   PCC_NONE,   // inCond
   PCC_W // outCond
 };
@@ -696,6 +741,7 @@ pCodeInstruction pciNOP = {
   0,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   PCC_NONE,   // inCond
   PCC_NONE // outCond
 };
@@ -715,6 +761,7 @@ pCodeInstruction pciRETFIE = {
   0,    // num ops
   0,0,  // dest, bit instruction
   1,0,  // branch, skip
+  POC_NOP,
   PCC_NONE,   // inCond
   PCC_NONE // outCond (not true... affects the GIE bit too)
 };
@@ -734,6 +781,7 @@ pCodeInstruction pciRETLW = {
   1,    // num ops
   0,0,  // dest, bit instruction
   1,0,  // branch, skip
+  POC_NOP,
   PCC_NONE,   // inCond
   PCC_W // outCond
 };
@@ -753,6 +801,7 @@ pCodeInstruction pciRETURN = {
   0,    // num ops
   0,0,  // dest, bit instruction
   1,0,  // branch, skip
+  POC_NOP,
   PCC_NONE,   // inCond
   PCC_NONE // outCond
 };
@@ -772,6 +821,7 @@ pCodeInstruction pciRLF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   (PCC_C | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_Z | PCC_C | PCC_DC) // outCond
 };
@@ -791,6 +841,7 @@ pCodeInstruction pciRLFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   (PCC_C | PCC_REGISTER),   // inCond
   (PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
 };
@@ -810,6 +861,7 @@ pCodeInstruction pciRRF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   (PCC_C | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_Z | PCC_C | PCC_DC) // outCond
 };
@@ -829,6 +881,7 @@ pCodeInstruction pciRRFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   (PCC_C | PCC_REGISTER),   // inCond
   (PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
 };
@@ -848,6 +901,7 @@ pCodeInstruction pciSUBWF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_Z) // outCond
 };
@@ -857,7 +911,7 @@ pCodeInstruction pciSUBFW = {
    //   genericAnalyze,
    genericDestruct,
    genericPrint},
-  POC_SUBWF,
+  POC_SUBFW,
   "SUBWF",
   NULL, // from branch
   NULL, // to branch
@@ -867,6 +921,7 @@ pCodeInstruction pciSUBFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_W | PCC_Z) // outCond
 };
@@ -886,6 +941,7 @@ pCodeInstruction pciSUBLW = {
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   PCC_W,   // inCond
   (PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
 };
@@ -905,6 +961,7 @@ pCodeInstruction pciSWAPF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   (PCC_REGISTER),   // inCond
   (PCC_REGISTER) // outCond
 };
@@ -924,6 +981,7 @@ pCodeInstruction pciSWAPFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   (PCC_REGISTER),   // inCond
   (PCC_W) // outCond
 };
@@ -943,6 +1001,7 @@ pCodeInstruction pciTRIS = {
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   PCC_NONE,   // inCond
   PCC_REGISTER // outCond
 };
@@ -962,6 +1021,7 @@ pCodeInstruction pciXORWF = {
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_Z) // outCond
 };
@@ -971,7 +1031,7 @@ pCodeInstruction pciXORFW = {
    //   genericAnalyze,
    genericDestruct,
    genericPrint},
-  POC_XORWF,
+  POC_XORFW,
   "XORWF",
   NULL, // from branch
   NULL, // to branch
@@ -981,6 +1041,7 @@ pCodeInstruction pciXORFW = {
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_W | PCC_Z) // outCond
 };
@@ -1000,6 +1061,7 @@ pCodeInstruction pciXORLW = {
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
+  POC_NOP,
   PCC_W,   // inCond
   (PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
 };
@@ -1080,13 +1142,13 @@ void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...)
 extern  void initStack(int base_address, int size);
 extern regs *allocProcessorRegister(int rIdx, char * name, short po_type, int alias);
 extern regs *allocInternalRegister(int rIdx, char * name, short po_type, int alias);
-extern void init_pic(void);
+extern void init_pic(char *);
 
 void  pCodeInitRegisters(void)
 {
 
   initStack(0x38, 8);
-  init_pic();
+  init_pic(port->processor);
 
   pc_status.r = allocProcessorRegister(IDX_STATUS,"STATUS", PO_STATUS, 0x80);
   pc_pcl.r = allocProcessorRegister(IDX_PCL,"PCL", PO_PCL, 0x80);
@@ -1144,6 +1206,9 @@ void pic14initMnemonics(void)
 
   if(mnemonics_initialized)
     return;
+
+//FIXME - probably should NULL out the array before making the assignments
+//since we check the array contents below this initialization.
 
   pic14Mnemonics[POC_ADDLW] = &pciADDLW;
   pic14Mnemonics[POC_ADDWF] = &pciADDWF;
@@ -1207,6 +1272,8 @@ void pic14initMnemonics(void)
   mnemonics_initialized = 1;
 }
 
+int getpCodePeepCommand(char *cmd);
+
 int getpCode(char *mnem,unsigned dest)
 {
 
@@ -1226,6 +1293,59 @@ int getpCode(char *mnem,unsigned dest)
     }
 
     pci = hTabNextItemWK (pic14MnemonicsHash);
+  
+  }
+
+  return -1;
+}
+
+/*-----------------------------------------------------------------*
+ * pic14initpCodePeepCommands
+ *
+ *-----------------------------------------------------------------*/
+void pic14initpCodePeepCommands(void)
+{
+
+  int key, i;
+  peepCommand *pcmd;
+
+  i = 0;
+  do {
+    hTabAddItem(&pic14pCodePeepCommandsHash, 
+		mnem2key(peepCommands[i].cmd), &peepCommands[i]);
+    i++;
+  } while (peepCommands[i].cmd);
+
+  pcmd = hTabFirstItem(pic14pCodePeepCommandsHash, &key);
+
+  while(pcmd) {
+    //fprintf(stderr, "peep command %s  key %d\n",pcmd->cmd,pcmd->id);
+    pcmd = hTabNextItem(pic14pCodePeepCommandsHash, &key);
+  }
+
+}
+
+/*-----------------------------------------------------------------
+ *
+ *
+ *-----------------------------------------------------------------*/
+
+int getpCodePeepCommand(char *cmd)
+{
+
+  peepCommand *pcmd;
+  int key = mnem2key(cmd);
+
+
+  pcmd = hTabFirstItemWK(pic14pCodePeepCommandsHash, key);
+
+  while(pcmd) {
+    // fprintf(stderr," comparing %s to %s\n",pcmd->cmd,cmd);
+    if(STRCASECMP(pcmd->cmd, cmd) == 0) {
+      return pcmd->id;
+    }
+
+    pcmd = hTabNextItemWK (pic14pCodePeepCommandsHash);
   
   }
 
@@ -1462,6 +1582,10 @@ pCode *newpCodeWild(int pCodeID, pCodeOp *optional_operand, pCodeOp *optional_la
   pcw->id = pCodeID;              // this is the 'n' in %n
   pcw->operand = optional_operand;
   pcw->label   = optional_label;
+
+  pcw->mustBeBitSkipInst = 0;
+  pcw->mustNotBeBitSkipInst = 0;
+  pcw->invertBitSkipInst = 0;
 
   return ( (pCode *)pcw);
   
@@ -1722,11 +1846,11 @@ pCodeOp *newpCodeOpImmd(char *name, int offset)
 {
   pCodeOp *pcop;
 
-
   pcop = Safe_calloc(1,sizeof(pCodeOpImmd) );
   pcop->type = PO_IMMEDIATE;
   if(name) {
     pcop->name = Safe_strdup(name);
+    fprintf(stderr,"%s %s %d\n",__FUNCTION__,name,offset);
   } else {
     pcop->name = NULL;
   }
@@ -1739,13 +1863,13 @@ pCodeOp *newpCodeOpImmd(char *name, int offset)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-pCodeOp *newpCodeOpWild(int id, pCodePeep *pcp, pCodeOp *subtype)
+pCodeOp *newpCodeOpWild(int id, pCodeWildBlock *pcwb, pCodeOp *subtype)
 {
   char *s = buffer;
   pCodeOp *pcop;
 
 
-  if(!pcp || !subtype) {
+  if(!pcwb || !subtype) {
     fprintf(stderr, "Wild opcode declaration error: %s-%d\n",__FILE__,__LINE__);
     exit(1);
   }
@@ -1756,7 +1880,7 @@ pCodeOp *newpCodeOpWild(int id, pCodePeep *pcp, pCodeOp *subtype)
   pcop->name = Safe_strdup(s);
 
   PCOW(pcop)->id = id;
-  PCOW(pcop)->pcp = pcp;
+  PCOW(pcop)->pcwb = pcwb;
   PCOW(pcop)->subtype = subtype;
   PCOW(pcop)->matched = NULL;
 
@@ -1782,6 +1906,14 @@ pCodeOp *newpCodeOpBit(char *s, int bit, int inBitSpace)
   return pcop;
 }
 
+/*-----------------------------------------------------------------*
+ * pCodeOp *newpCodeOpReg(int rIdx) - allocate a new register
+ *
+ * If rIdx >=0 then a specific register from the set of registers
+ * will be selected. If rIdx <0, then a new register will be searched
+ * for.
+ *-----------------------------------------------------------------*/
+
 pCodeOp *newpCodeOpReg(int rIdx)
 {
   pCodeOp *pcop;
@@ -1789,18 +1921,29 @@ pCodeOp *newpCodeOpReg(int rIdx)
   pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
 
   pcop->name = NULL;
-  PCOR(pcop)->rIdx = rIdx;
-  PCOR(pcop)->r = pic14_regWithIdx(rIdx);
+
+  if(rIdx >= 0) {
+    PCOR(pcop)->rIdx = rIdx;
+    PCOR(pcop)->r = pic14_regWithIdx(rIdx);
+  } else {
+    PCOR(pcop)->r = pic14_findFreeReg(REG_GPR);
+
+    if(PCOR(pcop)->r)
+      PCOR(pcop)->rIdx = PCOR(pcop)->r->rIdx;
+    //fprintf(stderr, "newpcodeOpReg - rIdx = %d\n", PCOR(pcop)->r->rIdx);
+  }
+
   pcop->type = PCOR(pcop)->r->pc_type;
 
   return pcop;
 }
+
 pCodeOp *newpCodeOpRegFromStr(char *name)
 {
   pCodeOp *pcop;
 
   pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
-  PCOR(pcop)->r = allocRegByName(name);
+  PCOR(pcop)->r = allocRegByName(name, 1);
   PCOR(pcop)->rIdx = PCOR(pcop)->r->rIdx;
   pcop->type = PCOR(pcop)->r->pc_type;
   pcop->name = PCOR(pcop)->r->name;
@@ -1827,6 +1970,9 @@ pCodeOp *newpCodeOp(char *name, PIC_OPTYPE type)
 
   case PO_LABEL:
     pcop = newpCodeOpLabel(NULL,-1);
+    break;
+  case PO_GPR_TEMP:
+    pcop = newpCodeOpReg(-1);
     break;
 
   default:
@@ -2044,14 +2190,35 @@ static char *get_op( pCodeInstruction *pcc)
     case PO_IMMEDIATE:
       s = buffer;
       size = sizeof(buffer);
+
+
+/*
       if( PCOI(pcc->pcop)->offset && PCOI(pcc->pcop)->offset<4) {
 	SAFE_snprintf(&s,&size,"((%s >> %d)&0xff)",
 		      pcc->pcop->name,
 		      8 * PCOI(pcc->pcop)->offset );
       } else
 	SAFE_snprintf(&s,&size,"LOW(%s)",pcc->pcop->name);
+*/    
 
-      
+      if( PCOI(pcc->pcop)->offset && PCOI(pcc->pcop)->offset<4) {
+	SAFE_snprintf(&s,&size,"(%s + %d)",
+		      pcc->pcop->name,
+		      PCOI(pcc->pcop)->offset );
+      } else
+	SAFE_snprintf(&s,&size,"%s",pcc->pcop->name);
+      return buffer;
+
+    case PO_DIR:
+      s = buffer;
+      size = sizeof(buffer);
+      if( PCOR(pcc->pcop)->instance) {
+	SAFE_snprintf(&s,&size,"(%s + %d)",
+		      pcc->pcop->name,
+		      PCOR(pcc->pcop)->instance );
+	fprintf(stderr,"PO_DIR %s\n",buffer);
+      } else
+	SAFE_snprintf(&s,&size,"%s",pcc->pcop->name);
       return buffer;
 
     default:
@@ -3163,8 +3330,9 @@ void OptimizepCode(char dbName)
 }
 
 /*-----------------------------------------------------------------*/
-/* popCopy - copy a pcode operator                                 */
+/* popCopyGPR2Bit - copy a pcode operator                          */
 /*-----------------------------------------------------------------*/
+
 pCodeOp *popCopyGPR2Bit(pCodeOp *pc, int bitval)
 {
   pCodeOp *pcop;
@@ -3437,7 +3605,7 @@ void buildCallTree(void    )
 	if (PCF(pc)->fname) {
 
 	  if(STRCASECMP(PCF(pc)->fname, "_main") == 0) {
-	    fprintf(stderr," found main \n");
+	    //fprintf(stderr," found main \n");
 	    pb->cmemmap = NULL;  /* FIXME do we need to free ? */
 	    pb->dbName = 'M';
 	  }

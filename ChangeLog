@@ -1,3 +1,6 @@
+2002-05-10  Scott Dattal <scott@dattalo.com>
+	* src/pic/*: Added support for multiplication. Fixed many,many bugs.
+	
 2002-04-22  Michael Hope  <michaelh@vroom>
 
 	* device/lib/z80/printf.c: Changed emitter to volatile to work around a pcall bug.

@@ -207,6 +207,50 @@ _pic14_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
   return TRUE;
 }
 
+static bool
+_hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
+{
+  sym_link *test = NULL;
+  value *val;
+
+  fprintf(stderr,"checking for native mult\n");
+
+  if ( ic->op != '*')
+    {
+      return FALSE;
+    }
+
+  return TRUE;
+/*
+  if ( IS_LITERAL (left))
+    {
+      fprintf(stderr,"left is lit\n");
+      test = left;
+      val = OP_VALUE (IC_LEFT (ic));
+    }
+  else if ( IS_LITERAL (right))
+    {
+      fprintf(stderr,"right is lit\n");
+      test = left;
+      val = OP_VALUE (IC_RIGHT (ic));
+    }
+  else
+    {
+      fprintf(stderr,"oops, neither is lit so no\n");
+      return FALSE;
+    }
+
+  if ( getSize (test) <= 2)
+    {
+      fprintf(stderr,"yep\n");
+      return TRUE;
+    }
+  fprintf(stderr,"nope\n");
+
+  return FALSE;
+*/
+}
+
 /** $1 is always the basename.
     $2 is always the output file.
     $3 varies
@@ -234,7 +278,7 @@ PORT pic_port =
   TARGET_ID_PIC,
   "pic14",
   "MCU pic",			/* Target name */
-  NULL,                         /* Processor */
+  "p16f877",                    /* Processor */
   {
     TRUE,			/* Emit glue around main */
     MODEL_SMALL | MODEL_LARGE | MODEL_FLAT24,
@@ -285,7 +329,7 @@ PORT pic_port =
     NULL, // xinit
     NULL,
     NULL,
-    1
+    1        // code is read only
   },
   {
     +1, 1, 4, 1, 1, 0
@@ -311,7 +355,7 @@ PORT pic_port =
   _pic14_regparm,
   NULL,
   NULL,
-  NULL,
+  _hasNativeMulFor,
   FALSE,
   0,				/* leave lt */
   0,				/* leave gt */

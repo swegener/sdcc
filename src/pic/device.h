@@ -79,7 +79,7 @@ typedef struct PIC_device {
   memRange *ram;              /* RAM memory map */
   memRange *sfr;              /* SFR memory map */
 
-  int max_address;            /* maximum value for a data address */
+  int maxRAMaddress;         /* maximum value for a data address */
   //  int hasAliasedRAM:1;        /* True if there are bank independent registers */
 
 } PIC_device;

@@ -106,6 +106,9 @@ const char *AopType(short type)
   case AOP_ACC:
     return "AOP_ACC";
     break;
+  case AOP_PCODE:
+    return "AOP_PCODE";
+    break;
   }
 
   return "BAD TYPE";
@@ -1473,5 +1476,243 @@ void genMinus (iCode *ic)
   freeAsmop(IC_RIGHT(ic),NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
   freeAsmop(IC_RESULT(ic),NULL,ic,TRUE);
 }
+/*-----------------------------------------------------------------*
+ * genUMult8XLit_16 - unsigned multiplication of two 8-bit numbers.
+ * 
+ * 
+ *-----------------------------------------------------------------*/
+void genUMult8XLit_16 (operand *left,
+		       operand *right,
+		       operand *result,
+		       pCodeOpReg *result_hi)
+
+{
+
+  unsigned int lit;
+  unsigned int i,have_first_bit;
+
+  if (AOP_TYPE(right) != AOP_LIT){
+    fprintf(stderr,"%s %d - right operand is not a literal\n",__FILE__,__LINE__);
+    exit(1);
+  }
 
 
+  if(!result_hi) {
+    result_hi = PCOR(popGet(AOP(result),1));
+  }
+
+  lit = (unsigned int)floatFromVal(AOP(right)->aopu.aop_lit);
+  lit &= 0xff;
+  pic14_emitcode(";","Unrolled 8 X 8 multiplication");
+
+
+  if(!lit) {
+    emitpcode(POC_CLRF,  popGet(AOP(result),0));
+    emitpcode(POC_CLRF,  popCopyReg(result_hi));
+    return;
+  }
+
+  emitpcode(POC_MOVFW, popGet(AOP(left),0));
+  emitpcode(POC_CLRF,  popGet(AOP(result),0));
+  emitpcode(POC_CLRF,  popCopyReg(result_hi));
+
+  have_first_bit = 0;
+  for(i=0; i<8; i++) {
+
+    if(lit & 1) {
+      emitpcode(POC_ADDWF, popCopyReg(result_hi));
+      have_first_bit = 1;
+    }
+
+    if(have_first_bit) {
+      emitpcode(POC_RRF,   popCopyReg(result_hi));
+      emitpcode(POC_RRF,   popGet(AOP(result),0));
+    }
+
+    lit >>= 1;
+  }
+
+}
+
+/*-----------------------------------------------------------------*
+ * genUMult8X8_16 - unsigned multiplication of two 8-bit numbers.
+ * 
+ * 
+ *-----------------------------------------------------------------*/
+void genUMult8X8_16 (operand *left,
+		     operand *right,
+		     operand *result,
+		     pCodeOpReg *result_hi)
+
+{
+
+  int i;
+  int looped = 1;
+
+  if(!result_hi) {
+    result_hi = PCOR(popGet(AOP(result),1));
+  }
+
+  if(!looped) {
+    pic14_emitcode(";","Unrolled 8 X 8 multiplication");
+
+    emitpcode(POC_MOVFW, popGet(AOP(right),0));
+    emitpcode(POC_CLRF,  popGet(AOP(result),0));
+    emitpcode(POC_CLRF,  popCopyReg(result_hi));
+    emitCLRC;
+
+    for(i=0; i<8; i++) {
+      emitpcode(POC_BTFSC,  newpCodeOpBit(aopGet(AOP(left),0,FALSE,FALSE),i,0));
+      emitpcode(POC_ADDWF, popCopyReg(result_hi));
+      emitpcode(POC_RRF,   popCopyReg(result_hi));
+      emitpcode(POC_RRF,   popGet(AOP(result),0));
+    }
+
+
+    /*
+      Here's another version that does the same thing and takes the 
+      same number of instructions. The one above is slightly better
+      because the entry instructions have a higher probability of
+      being optimized out.
+    */
+    /*
+      emitpcode(POC_CLRF,  popCopyReg(result_hi));
+      emitpcode(POC_RRFW,  popGet(AOP(left),0));
+      emitpcode(POC_MOVWF, popGet(AOP(result),0));
+      emitpcode(POC_MOVFW, popGet(AOP(right),0));
+
+      for(i=0; i<8; i++) {
+      emitSKPNC;
+      emitpcode(POC_ADDWF, popCopyReg(result_hi));
+      emitpcode(POC_RRF,   popCopyReg(result_hi));
+      emitpcode(POC_RRF,   popGet(AOP(result),0));
+      }
+    */
+
+  } else {
+    symbol  *tlbl = newiTempLabel(NULL);
+    pCodeOp *temp = popGetTempReg();
+
+
+    pic14_emitcode(";","Looped 8 X 8 multiplication");
+
+    emitpcode(POC_CLRF,  popGet(AOP(result),0));
+    emitpcode(POC_CLRF,  popCopyReg(result_hi));
+    emitpcode(POC_BSF,   newpCodeOpBit(aopGet(AOP(result),0,FALSE,FALSE),7,0));
+
+    emitpcode(POC_MOVFW, popGet(AOP(right),0));
+    emitpcode(POC_MOVWF, popCopyReg(PCOR(temp)));
+
+    emitpcode(POC_MOVFW, popGet(AOP(left),0));
+
+    emitpLabel(tlbl->key);
+
+    emitpcode(POC_RRF,   popCopyReg(PCOR(temp)));
+    emitSKPNC;
+    emitpcode(POC_ADDWF, popCopyReg(result_hi));
+
+    emitpcode(POC_RRF,   popCopyReg(result_hi));
+    emitpcode(POC_RRF,   popGet(AOP(result),0));
+
+    emitSKPC;
+    emitpcode(POC_GOTO,  popGetLabel(tlbl->key));
+
+    popReleaseTempReg(temp);
+
+  }
+}
+
+/*-----------------------------------------------------------------*
+ * genSMult8X8_16 - signed multiplication of two 8-bit numbers
+ *
+ *  this routine will call the unsigned multiply routine and then
+ * post-fix the sign bit.
+ *-----------------------------------------------------------------*/
+void genSMult8X8_16 (operand *left,
+		     operand *right,
+		     operand *result,
+		     pCodeOpReg *result_hi)
+{
+
+  if(!result_hi) {
+    result_hi = PCOR(popGet(AOP(result),1));
+  }
+
+  genUMult8X8_16(left,right,result,result_hi);
+
+  emitpcode(POC_BTFSC, newpCodeOpBit(aopGet(AOP(left),0,FALSE,FALSE),7,0));
+  emitpcode(POC_SUBWF, popCopyReg(result_hi));
+  emitpcode(POC_MOVFW, popGet(AOP(left),0));
+  emitpcode(POC_BTFSC, newpCodeOpBit(aopGet(AOP(right),0,FALSE,FALSE),7,0));
+  emitpcode(POC_SUBWF, popGet(AOP(result),1));
+  
+}
+
+/*-----------------------------------------------------------------*
+ * genMult8X8_8 - multiplication of two 8-bit numbers
+ *
+ *  this routine will call the unsigned multiply 8X8=>16 routine and
+ * then throw away the high byte of the result.
+ *
+ *-----------------------------------------------------------------*/
+void genMult8X8_8 (operand *left,
+		   operand *right,
+		   operand *result)
+{
+  pCodeOp *result_hi = popGetTempReg();
+
+  if (AOP_TYPE(right) == AOP_LIT)
+    genUMult8XLit_16(left,right,result,PCOR(result_hi));
+  else
+    genUMult8X8_16(left,right,result,PCOR(result_hi));
+
+  popReleaseTempReg(result_hi);
+}
+#if 0
+/*-----------------------------------------------------------------*/
+/* constMult - generates code for multiplication by a constant     */
+/*-----------------------------------------------------------------*/
+void genMultConst(unsigned C)
+{
+
+  unsigned lit;
+  unsigned sr3; // Shift right 3
+  unsigned mask;
+
+  int size = 1;
+
+  /*
+    Convert a string of 3 binary 1's in the lit into
+    0111 = 1000 - 1;
+  */
+
+  mask = 7 << ( (size*8) - 3);
+  lit = C;
+  sr3 = 0;
+
+  while(mask < (1<<size*8)) {
+
+    if( (mask & lit) == lit) {
+      unsigned lsb;
+
+      /* We found 3 (or more) consecutive 1's */
+
+      lsb = mask & ~(mask & (mask-1));  // lsb of mask.
+
+      consecutive_bits = ((lit + lsb) & lit) ^ lit;
+
+      lit ^= consecutive_bits;
+
+      mask <<= 3;
+
+      sr3 |= (consecutive + lsb);
+
+    }
+
+    mask >>= 1;
+
+  }
+
+}
+
+#endif

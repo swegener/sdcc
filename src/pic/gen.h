@@ -26,13 +26,17 @@
 #ifndef SDCCGENPIC14_H
 #define SDCCGENPIC14_H
 
+struct pCodeOp;
+
 enum
   {
     AOP_LIT = 1,
     AOP_REG, AOP_DIR,
     AOP_DPTR, AOP_DPTR2, AOP_R0, AOP_R1,
     AOP_STK, AOP_IMMD, AOP_STR,
-    AOP_CRY, AOP_ACC
+    AOP_CRY, AOP_ACC,
+    AOP_PCODE
+
   };
 
 /* type asmop : a homogenised type for 
@@ -70,6 +74,7 @@ typedef struct asmop
 	int aop_stk;		/* stack offset when AOP_STK */
 	char *aop_str[4];	/* just a string array containing the location */
 /*	regs *aop_alloc_reg;     * points to a dynamically allocated register */
+	pCodeOp *pcop;
       }
     aopu;
   }
@@ -135,6 +140,7 @@ extern unsigned fReturnSizePic;
 
 int pic14_getDataSize(operand *op);
 void emitpcode(PIC_OPCODE poc, pCodeOp *pcop);
+void emitpLabel(int key);
 void pic14_emitcode (char *inst,char *fmt, ...);
 void DEBUGpic14_emitcode (char *inst,char *fmt, ...);
 asmop *newAsmop (short type);
@@ -159,6 +165,8 @@ pCodeOp *popGetLit(unsigned int lit);
 pCodeOp *popGetWithString(char *str);
 pCodeOp *popRegFromString(char *str);
 pCodeOp *popGet (asmop *aop, int offset);//, bool bit16, bool dname);
+pCodeOp *popGetTempReg(void);
+void popReleaseTempReg(pCodeOp *pcop);
 
 
 void aopPut (asmop *aop, char *s, int offset);

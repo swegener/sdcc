@@ -81,7 +81,7 @@ void  pic14_deallocateAllRegs ();
 regs *pic14_findFreeReg(short type);
 regs *pic14_allocWithIdx (int idx);
 regs *allocDirReg (operand *op );
-regs *allocRegByName (char *name );
+regs *allocRegByName (char *name, int size );
 
 /* Define register address that are constant across PIC family */
 #define IDX_INDF    0

@@ -146,7 +146,7 @@ static PIC_device Pics[] = {
 };
 
 static int num_of_supported_PICS = sizeof(Pics)/sizeof(PIC_device);
-static int default_pic = 0;
+
 #define DEFAULT_PIC "f877"
 
 static PIC_device *pic=NULL;
@@ -171,7 +171,7 @@ static void addMem(memRange *ranges,int type)
     do {
 
       for(i=r->start_address; i<= r->end_address; i++) {
-	if(i <= pic->max_address) {
+	if(i <= pic->maxRAMaddress) {
 	  finalMapping[i | alias].isValid = 1;
 	  finalMapping[i | alias].alias = r->alias;
 	  finalMapping[i | alias].bank  = r->bank;
@@ -210,12 +210,12 @@ static void addMaps(PIC_device *pPic)
   /* First, find the maximum address */
 
   r = pPic->ram;
-  pPic->max_address = 0;
+  pPic->maxRAMaddress = 0;
 
   do {
 
-    if((r->end_address | r->alias) > pPic->max_address)
-      pPic->max_address = r->end_address | r->alias;
+    if((r->end_address | r->alias) > pPic->maxRAMaddress)
+      pPic->maxRAMaddress = r->end_address | r->alias;
 
     r++;
 
@@ -223,11 +223,11 @@ static void addMaps(PIC_device *pPic)
 
 
 
-  finalMapping = Safe_calloc(1+pPic->max_address, sizeof(AssignedMemory));
+  finalMapping = Safe_calloc(1+pPic->maxRAMaddress, sizeof(AssignedMemory));
 
   /* Now initialize the finalMapping array */
 
-  for(i=0; i<=pPic->max_address; i++) {
+  for(i=0; i<=pPic->maxRAMaddress; i++) {
     finalMapping[i].reg = NULL;
     finalMapping[i].isValid = 0;
   }
@@ -245,7 +245,7 @@ void dump_map(void)
 {
   int i;
 
-  for(i=0; i<=pic->max_address; i++) {
+  for(i=0; i<=pic->maxRAMaddress; i++) {
     //fprintf(stdout , "addr 0x%02x is %s\n", i, ((finalMapping[i].isValid) ? "valid":"invalid"));
 
     if(finalMapping[i].isValid) {
@@ -309,7 +309,7 @@ void dump_cblock(FILE *of)
 
     addr++;
 
-  } while(addr <= pic->max_address);
+  } while(addr <= pic->maxRAMaddress);
   
 
 }
@@ -332,7 +332,6 @@ void list_valid_pics(int ncols, int list_alias)
   if(list_alias)
     list_alias = sizeof(Pics[0].name) / sizeof(Pics[0].name[0]);
 
-  fprintf(stderr,"list_alias size = %d\n",list_alias);
   /* decrement the column number if it's greater than zero */
   ncols = (ncols > 1) ? ncols-1 : 4;
 
@@ -397,12 +396,18 @@ PIC_device *find_device(char *name)
 /*-----------------------------------------------------------------*
  *  
  *-----------------------------------------------------------------*/
-void init_pic(void)
+void init_pic(char *pic_type)
 {
-  pic = find_device(DEFAULT_PIC);
+  pic = find_device(pic_type);
 
   if(!pic) {
-    fprintf(stderr, "%s was not found.\nValid devices are:\n",DEFAULT_PIC);
+    if(pic_type)
+      fprintf(stderr, "'%s' was not found.\n", pic_type);
+    else
+      fprintf(stderr, "No processor has been specified (use -pPROCESSOR_NAME)\n");
+
+    fprintf(stderr,"Valid devices are:\n");
+
     list_valid_pics(4,0);
     exit(1);
   }
@@ -428,7 +433,7 @@ char *processor_base_name(void)
 int isSFR(int address)
 {
 
-  if( (address > pic->max_address) || !finalMapping[address].isSFR)
+  if( (address > pic->maxRAMaddress) || !finalMapping[address].isSFR)
     return 0;
 
   return 1;
@@ -439,7 +444,7 @@ int validAddress(int address, int reg_size)
 {
   int i;
 
-  if(address > pic->max_address)
+  if(address > pic->maxRAMaddress)
     return 0;
 
   for (i=0; i<reg_size; i++)
@@ -457,7 +462,10 @@ void mapRegister(regs *reg)
   int i;
   int alias;
 
-
+  if(!reg || !reg->size) {
+    fprintf(stderr,"WARNING: %s:%s:%d Bad register\n",__FILE__,__FUNCTION__,__LINE__);
+    return;
+  }
 
   for(i=0; i<reg->size; i++) {
 
@@ -466,7 +474,7 @@ void mapRegister(regs *reg)
 
     do {
 
-      //fprintf(stdout,"mapping %s to address 0x%02x\n",reg->name, (reg->address+alias+i));
+      // fprintf(stdout,"mapping %s to address 0x%02x, reg size = %d\n",reg->name, (reg->address+alias+i),reg->size);
 
       finalMapping[reg->address + alias + i].reg = reg;
       finalMapping[reg->address + alias + i].instance = i;
@@ -480,6 +488,8 @@ void mapRegister(regs *reg)
     } while (alias>=0);
   }
 
+  //  fprintf(stderr,"%s - %s addr = 0x%03x, size %d\n",__FUNCTION__,reg->name, reg->address,reg->size);
+
   reg->isMapped = 1;
 
 }
@@ -488,6 +498,7 @@ int assignRegister(regs *reg, int start_address)
 {
   int i;
 
+  //fprintf(stderr,"%s -  %s start_address = 0x%03x\n",__FUNCTION__,reg->name, start_address);
   if(reg->isFixed) {
 
     if (validAddress(reg->address,reg->size)) {
@@ -509,7 +520,7 @@ int assignRegister(regs *reg, int start_address)
      * so we'll search through all availble ram address and
      * assign the first one */
 
-    for (i=start_address; i<=pic->max_address; i++) {
+    for (i=start_address; i<=pic->maxRAMaddress; i++) {
 
       if (validAddress(i,reg->size)) {
 	reg->address = i;
@@ -547,7 +558,7 @@ void assignRelocatableRegisters(set *regset, int used)
   for (reg = setFirstItem(regset) ; reg ; 
        reg = setNextItem(regset)) {
 
-    //fprintf(stdout,"assigning %s\n",reg->name);
+    // fprintf(stdout,"assigning %s\n",reg->name);
 
     if((!reg->isFixed) && ( (used==0) || reg->wasUsed))
       address = assignRegister(reg,address);

@@ -430,7 +430,7 @@ static regs* newReg(short type, short pc_type, int rIdx, char *name, int size, i
       *buffer = 's';
     dReg->name = Safe_strdup(buffer);
   }
-  //fprintf(stderr,"newReg: %s\n",dReg->name);
+  //fprintf(stderr,"newReg: %s, rIdx = 0x%02x\n",dReg->name,rIdx);
   dReg->isFree = 0;
   dReg->wasUsed = 1;
   dReg->isFixed = 0;
@@ -548,7 +548,7 @@ static int regname2key(char const *name)
 /* dirregWithName - search for register by name                    */
 /*-----------------------------------------------------------------*/
 regs *
-dirregWithName (char *name )
+dirregWithName (char *name)
 {
   int hkey;
   regs *reg;
@@ -654,7 +654,7 @@ allocDirReg (operand *op )
 /* allocDirReg - allocates register of given type                  */
 /*-----------------------------------------------------------------*/
 regs *
-allocRegByName (char *name )
+allocRegByName (char *name, int size)
 {
 
   regs *reg;
@@ -675,7 +675,7 @@ allocRegByName (char *name )
      * a new one and put it in the hash table AND in the 
      * dynDirectRegNames set */
 
-    reg = newReg(REG_GPR, PO_DIR, rDirectIdx++, name,1,0 );
+    reg = newReg(REG_GPR, PO_DIR, rDirectIdx++, name,size,0 );
 
     debugLog ("  -- added %s to hash, size = %d\n", name,reg->size);
 
@@ -792,7 +792,7 @@ pic14_findFreeReg(short type)
     if((dReg = regFindFree(dynAllocRegs)) != NULL)
       return dReg;
 
-    return addSet(&dynAllocRegs,newReg(REG_GPR, PO_GPR_TEMP,dynrIdx++,NULL,0,0));
+    return addSet(&dynAllocRegs,newReg(REG_GPR, PO_GPR_TEMP,dynrIdx++,NULL,1,0));
 
   case REG_STK:
 
@@ -2235,6 +2235,48 @@ createRegMask (eBBlock ** ebbs, int count)
 /*-----------------------------------------------------------------*/
 /* rematStr - returns the rematerialized string for a remat var    */
 /*-----------------------------------------------------------------*/
+static symbol *
+rematStr (symbol * sym)
+{
+  char *s = buffer;
+  iCode *ic = sym->rematiCode;
+  symbol *psym = NULL;
+
+  debugLog ("%s\n", __FUNCTION__);
+
+  printf ("%s\n", s);
+
+  /* if plus or minus print the right hand side */
+
+  if (ic->op == '+' || ic->op == '-') {
+	
+    iCode *ric = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
+
+    sprintf (s, "(%s %c 0x%04x)",
+	     OP_SYMBOL (IC_LEFT (ric))->rname,
+	     ic->op,
+	     (int) operandLitValue (IC_RIGHT (ic)));
+
+
+    fprintf(stderr, "ralloc.c:%d OOPS %s\n",__LINE__,s);
+
+    psym = newSymbol (OP_SYMBOL (IC_LEFT (ric))->rname, 1);
+    psym->offset = (int) operandLitValue (IC_RIGHT (ic));
+
+    return psym;
+  }
+
+  sprintf (s, "%s", OP_SYMBOL (IC_LEFT (ic))->rname);
+  psym = newSymbol (OP_SYMBOL (IC_LEFT (ic))->rname, 1);
+
+  printf ("%s\n", buffer);
+  return psym;
+}
+
+#if 0
+/*-----------------------------------------------------------------*/
+/* rematStr - returns the rematerialized string for a remat var    */
+/*-----------------------------------------------------------------*/
 static char *
 rematStr (symbol * sym)
 {
@@ -2267,6 +2309,7 @@ rematStr (symbol * sym)
 	  //s += strlen(s);
 	  //ic = OP_SYMBOL(IC_LEFT(ic))->rematiCode;
 	  //continue ;
+	  fprintf(stderr, "ralloc.c:%d OOPS %s\n",__LINE__,s);
 	  return buffer;
 	}
 
@@ -2278,6 +2321,7 @@ rematStr (symbol * sym)
   printf ("%s\n", buffer);
   return buffer;
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* regTypeNum - computes the type & number of registers required   */
@@ -2340,7 +2384,8 @@ regTypeNum ()
 	    DCL_TYPE (aggrToPtr (sym->type, FALSE)) == POINTER) {
 
 	  /* create a psuedo symbol & force a spil */
-	  symbol *psym = newSymbol (rematStr (OP_SYMBOL (IC_LEFT (ic))), 1);
+	  //X symbol *psym = newSymbol (rematStr (OP_SYMBOL (IC_LEFT (ic))), 1);
+	  symbol *psym = rematStr (OP_SYMBOL (IC_LEFT (ic)));
 	  psym->type = sym->type;
 	  psym->etype = sym->etype;
 	  strcpy (psym->rname, psym->name);

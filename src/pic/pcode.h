@@ -76,7 +76,7 @@ struct regs;
  * The double parenthesis (()) are necessary
  * 
  ***********************************************************************/
-#define PCODE_DEBUG
+//#define PCODE_DEBUG
 
 #ifdef PCODE_DEBUG
 #define DFPRINTF(args) (fprintf args)
@@ -240,6 +240,7 @@ typedef enum
 /***************  Structures ********************/
 /************************************************/
 struct pCode;
+struct pCodeWildBlock;
 
 /*************************************************
   pBranch
@@ -329,6 +330,22 @@ typedef struct pCodeOpRegBit
   unsigned int inBitSpace: 1; /* True if in bit space, else
 				 just a bit of a register */
 } pCodeOpRegBit;
+
+
+typedef struct pCodeOpWild
+{
+  pCodeOp pcop;
+
+  struct pCodeWildBlock *pcwb;
+
+  int id;                 /* index into an array of char *'s that will match
+			   * the wild card. The array is in *pcp. */
+  pCodeOp *subtype;       /* Pointer to the Operand type into which this wild
+			   * card will be expanded */
+  pCodeOp *matched;       /* When a wild matches, we'll store a pointer to the
+			   * opcode we matched */
+
+} pCodeOpWild;
 
 
 /*************************************************
@@ -440,6 +457,7 @@ typedef struct pCodeInstruction
   unsigned int isBranch:  1;   /* True if this is a branching instruction */
   unsigned int isSkip:    1;   /* True if this is a skip instruction */
 
+  PIC_OPCODE inverted_op;      /* Opcode of instruction that's the opposite of this one */
   unsigned int inCond;   // Input conditions for this instruction
   unsigned int outCond;  // Output conditions for this instruction
 
@@ -495,6 +513,10 @@ typedef struct pCodeWild
 		  * - this wild card will get expanded into that pCode
 		  *   that is stored at this index */
 
+  /* Conditions on wild pcode instruction */
+  int    mustBeBitSkipInst:1;
+  int    mustNotBeBitSkipInst:1;
+  int    invertBitSkipInst:1;
 
   pCodeOp *operand;  // Optional operand
   pCodeOp *label;    // Optional label
@@ -556,6 +578,28 @@ typedef struct pFile
 
 
 /*************************************************
+  pCodeWildBlock
+
+  The pCodeWildBlock object keeps track of the wild
+  variables, operands, and opcodes that exist in
+  a pBlock.
+**************************************************/
+typedef struct pCodeWildBlock {
+  pBlock    *pb;
+  struct pCodePeep *pcp;    // pointer back to ... I don't like this...
+
+  int       nvars;          // Number of wildcard registers in target.
+  char    **vars;           // array of pointers to them
+
+  int       nops;           // Number of wildcard operands in target.
+  pCodeOp **wildpCodeOps;   // array of pointers to the pCodeOp's.
+
+  int       nwildpCodes;    // Number of wildcard pCodes in target/replace
+  pCode   **wildpCodes;     // array of pointers to the pCode's.
+
+} pCodeWildBlock;
+
+/*************************************************
   pCodePeep
 
   The pCodePeep object mimics the peep hole optimizer
@@ -567,17 +611,12 @@ typedef struct pFile
   pCode chain.
 **************************************************/
 typedef struct pCodePeep {
+  pCodeWildBlock target;     // code we'd like to optimize
+  pCodeWildBlock replace;    // and this is what we'll optimize it with.
 
-  pBlock *target;    // code we'd like to optimize
-  pBlock *replace;   // and this is what we'll optimize it with.
+  //pBlock *target;
+  //pBlock replace;            // and this is what we'll optimize it with.
 
-  int     nvars;       // Number of wildcard registers in target.
-  char  **vars;        // array of pointers to them
-  int     nops;             // Number of wildcard operands in target.
-  pCodeOp **wildpCodeOps;   // array of pointers to the pCodeOp's.
-
-  int     nwildpCodes; // Number of wildcard pCodes in target/replace
-  pCode **wildpCodes;  // array of pointers to the pCode's.
 
 
   /* (Note: a wildcard register is a place holder. Any register
@@ -595,19 +634,32 @@ typedef struct pCodePeep {
 
 } pCodePeep;
 
-typedef struct pCodeOpWild
-{
-  pCodeOp pcop;
-  //PIC_OPTYPE subtype;      Wild get's expanded to this by the optimizer
-  pCodePeep *pcp;         // pointer to the parent peep block 
-  int id;                 /* index into an array of char *'s that will match
-			   * the wild card. The array is in *pcp. */
-  pCodeOp *subtype;       /* Pointer to the Operand type into which this wild
-			   * card will be expanded */
-  pCodeOp *matched;       /* When a wild matches, we'll store a pointer to the
-			   * opcode we matched */
+/*************************************************
 
-} pCodeOpWild;
+  pCode peep command definitions 
+
+ Here are some special commands that control the
+way the peep hole optimizer behaves
+
+**************************************************/
+
+enum peepCommandTypes{
+  NOTBITSKIP = 0,
+  BITSKIP,
+  INVERTBITSKIP,
+  _LAST_PEEP_COMMAND_
+};
+
+/*************************************************
+    peepCommand structure stores the peep commands.
+
+**************************************************/
+
+typedef struct peepCommand {
+  int id;
+  char *cmd;
+} peepCommand;
+
 
 /*************************************************
     pCode Macros
@@ -630,6 +682,8 @@ typedef struct pCodeOpWild
 #define PCOW(x)   ((pCodeOpWild *)(x))
 
 #define PBR(x)    ((pBranch *)(x))
+
+#define PCWB(x)   ((pCodeWildBlock *)(x))
 
 /*-----------------------------------------------------------------*
  * pCode functions.
@@ -658,6 +712,8 @@ pCodeOp *newpCodeOpLit(int lit);
 pCodeOp *newpCodeOpBit(char *name, int bit,int inBitSpace);
 pCodeOp *newpCodeOpRegFromStr(char *name);
 pCodeOp *newpCodeOp(char *name, PIC_OPTYPE p);
+pCodeOp *pCodeOpCopy(pCodeOp *pcop);
+
 extern void pcode_test(void);
 
 /*-----------------------------------------------------------------*

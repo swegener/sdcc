@@ -294,6 +294,15 @@ _setPort (const char *name)
   exit (1);
 }
 
+/* Override the default processor with the one specified 
+ * on the command line */
+static void
+_setProcessor (char *_processor)
+{
+  port->processor = _processor;
+  fprintf(stderr,"Processor: %s\n",_processor);
+}
+
 static void
 _validatePorts (void)
 {
@@ -328,6 +337,23 @@ _findPort (int argc, char **argv)
     }
   /* Use the first in the list */
   port = _ports[0];
+}
+
+/* search through the command line options for the processor */
+static void
+_findProcessor (int argc, char **argv)
+{
+  while (argc--)
+    {
+      if (!strncmp (*argv, "-p", 2))
+	{
+	  _setProcessor (*argv + 2);
+	  return;
+	}
+      argv++;
+    }
+
+  /* no error if processor was not specified. */
 }
 
 /*-----------------------------------------------------------------*/
@@ -595,13 +621,6 @@ _setModel (int model, const char *sz)
     options.model = model;
   else
     werror (W_UNSUPPORTED_MODEL, sz, port->target);
-}
-
-static void
-_setProcessor (char *_processor)
-{
-  port->processor = _processor;
-  fprintf(stderr,"Processor: %s\n",_processor);
 }
 
 /** Gets the string argument to this option.  If the option is '--opt'
@@ -966,13 +985,12 @@ parseCmdLine (int argc, char **argv)
 	      break;
 
 	    case 'm':
-	      /* Used to select the port */
-	      _setPort (argv[i] + 2);
+	      /* Used to select the port. But this has already been done. */
 	      break;
 
 	    case 'p':
-	      /* Used to select the processor in port */
-	      _setProcessor (getStringArg("-p", argv, &i, argc));
+	      /* Used to select the processor in port. But this has
+	       * already been done. */
 	      break;
 
 	    case 'c':
@@ -1542,7 +1560,14 @@ main (int argc, char **argv, char **envp)
     exit (1);
   }
 
+  /* Before parsing the command line options, do a 
+   * search for the port and processor and initialize
+   * them if they're found. (We can't gurantee that these
+   * will be the first options specified).
+   */
+
   _findPort (argc, argv);
+
 #ifdef JAMIN_DS390
   if (strcmp(port->target, "mcs51") == 0) {
     printf("DS390 jammed in A\n");
@@ -1550,6 +1575,9 @@ main (int argc, char **argv, char **envp)
     ds390_jammed = 1;
   }
 #endif
+
+  _findProcessor (argc, argv);
+
   /* Initalise the port. */
   if (port->init)
     port->init ();

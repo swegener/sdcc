@@ -36,6 +36,7 @@ srcdir          = @srcdir@
 # Modules to enable/disable
 OPT_ENABLE_UCSIM = @OPT_ENABLE_UCSIM@
 OPT_ENABLE_DEVICE_LIB_BUILD = @OPT_ENABLE_DEVICE_LIB_BUILD@
+OPT_ENABLE_PACKIHX = @OPT_ENABLE_PACKIHX@
 
 SLIB			= $(PRJDIR)/support/Util
 

@@ -18,7 +18,7 @@ SDCC_LIBS	= support/cpp support/cpp2
 SDCC_ASLINK	= as/mcs51 as link
 SDCC_PACKIHX	= packihx
 
-TARGETS         = sdcc-libs sdcc-cc sdcc-aslink sdcc-packihx
+TARGETS         = sdcc-libs sdcc-cc sdcc-aslink
 
 PKGS		= $(SDCC_LIBS) src $(SDCC_ASLINK) $(SDCC_PACKIHX)
 
@@ -30,6 +30,11 @@ endif
 ifneq ($(OPT_ENABLE_DEVICE_LIB_BUILD), no)
 TARGETS         += sdcc-device
 PKGS            += device/include device/lib
+endif
+
+ifneq ($(OPT_ENABLE_PACKIHX), no)
+TARGETS         += sdcc-packihx
+PKGS            += $(SDCC_PACKIHX)
 endif
 
 PKGS_TINI	= $(SDCC_LIBS) $(SDCC_ASLINK) \
@@ -67,7 +72,6 @@ sdcc-device-tini:
 	$(MAKE) -C device/lib modelDS390
 
 sdcc: $(TARGETS)
-	echo $(TARGETS)
 
 sdcc-tini: sdcc-cc sdcc-aslink sdcc-device-tini sdcc-packihx
 	$(MAKE) -f main.mk all

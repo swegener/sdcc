@@ -299,6 +299,10 @@ AC_ARG_ENABLE(device-lib-build,[  --disable-device-lib-build Disables automatica
 OPT_ENABLE_DEVICE_LIB_BUILD=$enable_device_lib_build
 AC_SUBST(OPT_ENABLE_DEVICE_LIB_BUILD)
 
+AC_ARG_ENABLE(packihx,[  -disable-packihx     Disables building packihx])
+OPT_ENABLE_PACKIHX=$enable_packihx
+AC_SUBST(OPT_ENABLE_PACKIHX)
+
 #remove duplicates
 cat ports.all | uniq >ports
 mv ports ports.all

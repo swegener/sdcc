@@ -565,8 +565,7 @@ type_specifier2
    | SHORT  {
                $$=newLink();
                $$->class = SPECIFIER   ;
-               SPEC_LONG($$) = 0      ;
-	       SPEC_SHORT($$) = 1	 ;
+	       SPEC_SHORT($$) = 1      ;
             }
    | INT    {
                $$=newLink();
@@ -576,18 +575,17 @@ type_specifier2
    | LONG   {
                $$=newLink();
                $$->class = SPECIFIER   ;
-               SPEC_LONG($$) = 1       ;
-	       SPEC_SHORT($$) = 0;
+	       SPEC_LONG($$) = 1       ;
             }
    | SIGNED {
                $$=newLink();
                $$->class = SPECIFIER   ;
-               SPEC_USIGN($$) = 0       ;
+               SPEC_SIGNED($$) = 1     ;
             }
    | UNSIGNED  {
                $$=newLink();
                $$->class = SPECIFIER   ;
-               SPEC_USIGN($$) = 1       ;
+               SPEC_USIGN($$) = 1      ;
             }
    | VOID   {
                $$=newLink();

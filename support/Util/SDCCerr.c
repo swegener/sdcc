@@ -335,6 +335,16 @@ struct
    "            Cannot determine which register bank to save." },
 { E_NO_SUCH_BANK, ERROR_LEVEL_ERROR,
    "called function uses unknown register bank %d." },
+{ E_TWO_OR_MORE_DATA_TYPES, ERROR_LEVEL_ERROR,
+    "two or more data types in declaration for '%s'" },
+{ E_LONG_OR_SHORT_INVALID, ERROR_LEVEL_ERROR,
+    "long or short specified for %s '%s'" },
+{ E_SIGNED_OR_UNSIGNED_INVALID, ERROR_LEVEL_ERROR,
+    "signed or unsigned specified for %s '%s'" },
+{ E_LONG_AND_SHORT_INVALID, ERROR_LEVEL_ERROR,
+    "both long and short specified for %s '%s'" },
+{ E_SIGNED_AND_UNSIGNED_INVALID, ERROR_LEVEL_ERROR,
+    "both signed and unsigned specified for %s '%s'" },
 };
 /*
 -------------------------------------------------------------------------------

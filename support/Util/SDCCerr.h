@@ -156,6 +156,11 @@ SDCCERR - SDCC Standard error handler
 #define  E_INVALID_HEX 138              /* \x used with no following hex digits */
 #define  W_FUNCPTR_IN_USING_ISR	139	/* Call via function pointer in ISR with using attribute. */
 #define  E_NO_SUCH_BANK		140	/* 'using' attribute specifies non-existant register bank. */
+#define E_TWO_OR_MORE_DATA_TYPES 141
+#define E_LONG_OR_SHORT_INVALID  142    /* long or short invalid for .. */
+#define E_SIGNED_OR_UNSIGNED_INVALID 143    /* signed or unsigned invalid for .. */
+#define E_LONG_AND_SHORT_INVALID  144    /* long and short invalid for .. */
+#define E_SIGNED_AND_UNSIGNED_INVALID 145 /* signed and unsigned invalid for .. */
 
 /** Describes the maximum error level that will be logged.  Any level
  *  includes all of the levels listed after it.

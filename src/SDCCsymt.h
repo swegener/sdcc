@@ -55,14 +55,15 @@ structdef;
 /* noun definitions */
 typedef enum
   {
-    V_INT = 0,
+    V_INT = 1,
     V_FLOAT,
     V_CHAR,
     V_VOID,
     V_STRUCT,
     V_LABEL,
     V_BIT,
-    V_SBIT
+    V_SBIT,
+    V_DOUBLE
   }
 NOUN;
 
@@ -88,15 +89,6 @@ typedef enum
   }
 STORAGE_CLASS;
 
-#define TF_LONG     0x00000001             /* type long int */
-#define TF_SHORT    0x00000002             /* type short    */
-#define TF_UNSIGNED 0x00000004             /* type is unsigned */
-#define TF_STATIC   0x00000008             /* type is static   */
-#define TF_EXTERN   0x00000010             /* type is extern   */
-#define TF_ABSADDR  0x00000020             /* type has absolute address */
-#define TF_REENT    0x00000040             /* type of func is reentrant func */
-#define TF_INTRRNT  0x00000080             /* is an interrupt routine */
-
 /* specifier is the last in the type-chain */
 typedef struct specifier
   {
@@ -106,6 +98,7 @@ typedef struct specifier
     unsigned _long:1;		/* 1=long            */
     unsigned _short:1;		/* 1=short int    */
     unsigned _unsigned:1;	/* 1=unsigned, 0=signed       */
+    unsigned _signed:1;         /* just for sanity checks only*/
     unsigned _static:1;		/* 1=static keyword found     */
     unsigned _extern:1;		/* 1=extern found             */
     unsigned _absadr:1;		/* absolute address specfied  */
@@ -288,6 +281,7 @@ symbol;
 #define SPEC_LONG(x) x->select.s._long
 #define SPEC_SHORT(x) x->select.s._short
 #define SPEC_USIGN(x) x->select.s._unsigned
+#define SPEC_SIGNED(x) x->select.s._signed
 #define SPEC_SCLS(x) x->select.s.sclass
 #define SPEC_ENUM(x) x->select.s._isenum
 #define SPEC_OCLS(x) x->select.s.oclass

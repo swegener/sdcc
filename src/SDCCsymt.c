@@ -424,12 +424,59 @@ addDecl (symbol * sym, int type, sym_link * p)
   return;
 }
 
+/*------------------------------------------------------------------
+  checkTypeSanity: prevent the user from doing e.g.:
+  unsigned float uf;
+  ------------------------------------------------------------------*/
+void checkTypeSanity(sym_link *dest) {
+  char *noun;
+  switch (SPEC_NOUN(dest)) 
+    {
+    case V_CHAR: noun="char"; break;
+    case V_INT: noun="int"; break;
+    case V_FLOAT: noun="float"; break;
+    case V_DOUBLE: noun="double"; break;
+    case V_VOID: noun="void"; break;
+    default: noun="unknown type"; break;
+    }
+  
+  if ((SPEC_NOUN(dest)==V_CHAR || 
+       SPEC_NOUN(dest)==V_FLOAT || 
+       SPEC_NOUN(dest)==V_DOUBLE || 
+       SPEC_NOUN(dest)==V_VOID) &&
+      (SPEC_SHORT(dest) || SPEC_LONG(dest))) {
+    // long or short for char float double or void
+    werror (E_LONG_OR_SHORT_INVALID, noun, yylval.yychar);
+  }
+  if ((SPEC_NOUN(dest)==V_FLOAT || 
+       SPEC_NOUN(dest)==V_DOUBLE || 
+       SPEC_NOUN(dest)==V_VOID) && 
+      (SPEC_SIGNED(dest) || SPEC_USIGN(dest))) {
+    // signed or unsigned for float double or void
+    werror (E_SIGNED_OR_UNSIGNED_INVALID, noun, yylval.yychar);
+  }
+  if (SPEC_SIGNED(dest) && SPEC_USIGN(dest)) {
+    // signed AND unsigned 
+    werror (E_SIGNED_AND_UNSIGNED_INVALID, noun, yylval.yychar);
+  }
+  if (SPEC_SHORT(dest) && SPEC_LONG(dest)) {
+    // short AND long
+    werror (E_LONG_AND_SHORT_INVALID, noun, yylval.yychar);
+  }
+}
+
 /*------------------------------------------------------------------*/
-/* mergeSpec - merges two specifiers and returns the new one       */
+/* mergeSpec - merges two specifiers and returns the new one        */
 /*------------------------------------------------------------------*/
 sym_link *
 mergeSpec (sym_link * dest, sym_link * src)
 {
+
+  /* we shouldn't redeclare the type */
+  if (SPEC_NOUN (dest) && SPEC_NOUN (src)) {
+    werror(E_TWO_OR_MORE_DATA_TYPES, yylval.yychar);
+  }
+
   /* if noun different then src overrides */
   if (SPEC_NOUN (dest) != SPEC_NOUN (src) && !SPEC_NOUN (dest))
     SPEC_NOUN (dest) = SPEC_NOUN (src);
@@ -444,6 +491,7 @@ mergeSpec (sym_link * dest, sym_link * src)
   SPEC_LONG (dest) |= SPEC_LONG (src);
   SPEC_SHORT (dest) |= SPEC_SHORT (src);
   SPEC_USIGN (dest) |= SPEC_USIGN (src);
+  SPEC_SIGNED (dest) |= SPEC_SIGNED (src);
   SPEC_STAT (dest) |= SPEC_STAT (src);
   SPEC_EXTR (dest) |= SPEC_EXTR (src);
   SPEC_ABSA (dest) |= SPEC_ABSA (src);
@@ -462,6 +510,8 @@ mergeSpec (sym_link * dest, sym_link * src)
 
   if (IS_STRUCT (dest) && SPEC_STRUCT (dest) == NULL)
     SPEC_STRUCT (dest) = SPEC_STRUCT (src);
+
+  checkTypeSanity(dest);
 
   return dest;
 }
@@ -512,7 +562,7 @@ getSpec (sym_link * p)
 }
 
 /*------------------------------------------------------------------*/
-/* newCharLink() - creates an int type                              */
+/* newCharLink() - creates an char type                              */
 /*------------------------------------------------------------------*/
 sym_link *
 newCharLink ()

@@ -259,7 +259,11 @@ n", a, (char)a);
  will push a as an int and as a char resp.
 \layout Itemize
 
-option --regextend has been removed
+option 
+\family typewriter 
+--
+\family default 
+regextend has been removed
 \layout Itemize
 
 option --noregparms has been removed

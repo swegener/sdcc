@@ -1064,7 +1064,7 @@ operandOperation (operand * left, operand * right,
 						 operandLitValue (right)));
       break;
     case '/':
-      if ((unsigned long) operandLitValue (right) == 0)
+      if ((TYPE_UDWORD) operandLitValue (right) == 0)
 	{
 	  werror (E_DIVIDE_BY_ZERO);
 	  retval = right;
@@ -1076,26 +1076,26 @@ operandOperation (operand * left, operand * right,
 						   operandLitValue (right)));
       break;
     case '%':
-      if ((unsigned long) operandLitValue (right) == 0) {
+      if ((TYPE_UDWORD) operandLitValue (right) == 0) {
 	  werror (E_DIVIDE_BY_ZERO);
 	  retval = right;
       }
       else
 	retval = operandFromLit ((SPEC_USIGN(let) ?
-				  (unsigned long) operandLitValue (left) :
-				  (long) operandLitValue (left)) %
+				  (TYPE_UDWORD) operandLitValue (left) :
+				  (TYPE_DWORD) operandLitValue (left)) %
 				 (SPEC_USIGN(ret) ?
-				  (unsigned long) operandLitValue (right) :
-				  (long) operandLitValue (right)));
+				  (TYPE_UDWORD) operandLitValue (right) :
+				  (TYPE_DWORD) operandLitValue (right)));
 
       break;
     case LEFT_OP:
       retval = operandFromLit ((SPEC_USIGN(let) ?
-				  (unsigned long) operandLitValue (left) :
-				  (long) operandLitValue (left)) <<
+				  (TYPE_UDWORD) operandLitValue (left) :
+				  (TYPE_UDWORD) operandLitValue (left)) <<
 				 (SPEC_USIGN(ret) ?
-				  (unsigned long) operandLitValue (right) :
-				  (long) operandLitValue (right)));
+				  (TYPE_UDWORD) operandLitValue (right) :
+				  (TYPE_UDWORD) operandLitValue (right)));
       break;
     case RIGHT_OP: {
       double lval = operandLitValue(left), rval = operandLitValue(right);
@@ -1103,16 +1103,16 @@ operandOperation (operand * left, operand * right,
       switch ((SPEC_USIGN(let) ? 2 : 0) + (SPEC_USIGN(ret) ? 1 : 0))
 	{
 	case 0: // left=unsigned right=unsigned
-	  res=(unsigned long)lval >> (unsigned long)rval;
+	  res=(TYPE_UDWORD)lval >> (TYPE_UDWORD)rval;
 	  break;
 	case 1: // left=unsigned right=signed
-	  res=(unsigned long)lval >> (signed long)rval;
+	  res=(TYPE_UDWORD)lval >> (TYPE_DWORD)rval;
 	  break;
 	case 2: // left=signed right=unsigned
-	  res=(signed long)lval >> (unsigned long)rval;
+	  res=(TYPE_DWORD)lval >> (TYPE_UDWORD)rval;
 	  break;
 	case 3: // left=signed right=signed
-	  res=(signed long)lval >> (signed long)rval;
+	  res=(TYPE_DWORD)lval >> (TYPE_DWORD)rval;
 	  break;
 	}
       retval = operandFromLit (res);
@@ -1144,18 +1144,18 @@ operandOperation (operand * left, operand * right,
       break;
     case BITWISEAND:
       retval = operandFromValue (valCastLiteral (type,
-                                                 (unsigned long)operandLitValue(left) &
-			                         (unsigned long)operandLitValue(right)));
+                                                 (TYPE_UDWORD)operandLitValue(left) &
+			                         (TYPE_UDWORD)operandLitValue(right)));
       break;
     case '|':
       retval = operandFromValue (valCastLiteral (type,
-                                                 (unsigned long)operandLitValue(left) |
-			                         (unsigned long)operandLitValue(right)));
+                                                 (TYPE_UDWORD)operandLitValue(left) |
+			                         (TYPE_UDWORD)operandLitValue(right)));
       break;
     case '^':
       retval = operandFromValue (valCastLiteral (type,
-                                                 (unsigned long)operandLitValue(left) ^
-			                         (unsigned long)operandLitValue(right)));
+                                                 (TYPE_UDWORD)operandLitValue(left) ^
+			                         (TYPE_UDWORD)operandLitValue(right)));
       break;
     case AND_OP:
       retval = operandFromLit (operandLitValue (left) &&
@@ -1167,7 +1167,7 @@ operandOperation (operand * left, operand * right,
       break;
     case RRC:
       {
-	unsigned long i = (unsigned long) operandLitValue (left);
+	TYPE_UDWORD i = (TYPE_UDWORD) operandLitValue (left);
 
 	retval = operandFromLit ((i >> (getSize (operandType (left)) * 8 - 1)) |
 				 (i << 1));
@@ -1175,7 +1175,7 @@ operandOperation (operand * left, operand * right,
       break;
     case RLC:
       {
-	unsigned long i = (unsigned long) operandLitValue (left);
+	TYPE_UDWORD i = (TYPE_UDWORD) operandLitValue (left);
 
 	retval = operandFromLit ((i << (getSize (operandType (left)) * 8 - 1)) |
 				 (i >> 1));
@@ -1187,7 +1187,7 @@ operandOperation (operand * left, operand * right,
       break;
 
     case '~':
-      retval = operandFromLit (~((unsigned long) operandLitValue (left)));
+      retval = operandFromLit (~((TYPE_UDWORD) operandLitValue (left)));
       break;
 
     case '!':

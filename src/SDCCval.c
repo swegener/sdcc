@@ -1408,3 +1408,25 @@ valForCastAggr (ast * aexpr, sym_link * type, ast * cnst, int op)
   val->etype = getSpec (val->type);
   return val;
 }
+
+/*-----------------------------------------------------------------*/
+/* valForCastAggr - will return value for a cast of an aggregate   */
+/*                  with no constant                               */
+/*-----------------------------------------------------------------*/
+value *
+valForCastArr (ast * aexpr, sym_link * type)
+{
+  value *val;
+
+  if (!IS_AST_SYM_VALUE (aexpr))
+    return NULL;
+
+  val = newValue ();
+
+  sprintf (val->name, "(%s)",
+	   AST_SYMBOL (aexpr)->rname);
+
+  val->type = type;
+  val->etype = getSpec (val->type);
+  return val;
+}

@@ -276,86 +276,105 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 value *
 initPointer (initList * ilist)
 {
-  value *val;
-  ast *expr = list2expr (ilist);
+	value *val;
+	ast *expr = list2expr (ilist);
+	
+	if (!expr)
+		goto wrong;
+	
+	/* try it the oldway first */
+	if ((val = constExprValue (expr, FALSE)))
+		return val;
+	
+	/* no then we have to do these cludgy checks */
+	/* pointers can be initialized with address of
+	   a variable or address of an array element */
+	if (IS_AST_OP (expr) && expr->opval.op == '&') {
+		/* address of symbol */
+		if (IS_AST_SYM_VALUE (expr->left)) {
+			val = copyValue (AST_VALUE (expr->left));
+			val->type = newLink ();
+			if (SPEC_SCLS (expr->left->etype) == S_CODE) {
+				DCL_TYPE (val->type) = CPOINTER;
+				DCL_PTR_CONST (val->type) = port->mem.code_ro;
+			}
+			else if (SPEC_SCLS (expr->left->etype) == S_XDATA)
+				DCL_TYPE (val->type) = FPOINTER;
+			else if (SPEC_SCLS (expr->left->etype) == S_XSTACK)
+				DCL_TYPE (val->type) = PPOINTER;
+			else if (SPEC_SCLS (expr->left->etype) == S_IDATA)
+				DCL_TYPE (val->type) = IPOINTER;
+			else if (SPEC_SCLS (expr->left->etype) == S_EEPROM)
+				DCL_TYPE (val->type) = EEPPOINTER;
+			else
+				DCL_TYPE (val->type) = POINTER;
+			val->type->next = expr->left->ftype;
+			val->etype = getSpec (val->type);
+			return val;
+		}
 
-  if (!expr)
-    goto wrong;
+		/* if address of indexed array */
+		if (IS_AST_OP (expr->left) && expr->left->opval.op == '[')
+			return valForArray (expr->left);
 
-  /* try it the oldway first */
-  if ((val = constExprValue (expr, FALSE)))
-    return val;
+		/* if address of structure element then
+		   case 1. a.b ; */
+		if (IS_AST_OP (expr->left) &&
+		    expr->left->opval.op == '.') {
+			return valForStructElem (expr->left->left,
+						 expr->left->right);
+		}
 
-  /* no then we have to do these cludgy checks */
-  /* pointers can be initialized with address of
-     a variable or address of an array element */
-  if (IS_AST_OP (expr) && expr->opval.op == '&')
-    {
-      /* address of symbol */
-      if (IS_AST_SYM_VALUE (expr->left))
-	{
-	  val = copyValue (AST_VALUE (expr->left));
-	  val->type = newLink ();
-	  if (SPEC_SCLS (expr->left->etype) == S_CODE)
-	    {
-	      DCL_TYPE (val->type) = CPOINTER;
-	      DCL_PTR_CONST (val->type) = port->mem.code_ro;
-	    }
-	  else if (SPEC_SCLS (expr->left->etype) == S_XDATA)
-	    DCL_TYPE (val->type) = FPOINTER;
-	  else if (SPEC_SCLS (expr->left->etype) == S_XSTACK)
-	    DCL_TYPE (val->type) = PPOINTER;
-	  else if (SPEC_SCLS (expr->left->etype) == S_IDATA)
-	    DCL_TYPE (val->type) = IPOINTER;
-	  else if (SPEC_SCLS (expr->left->etype) == S_EEPROM)
-	    DCL_TYPE (val->type) = EEPPOINTER;
-	  else
-	    DCL_TYPE (val->type) = POINTER;
-	  val->type->next = expr->left->ftype;
-	  val->etype = getSpec (val->type);
-	  return val;
+		/* case 2. (&a)->b ;
+		   (&some_struct)->element */
+		if (IS_AST_OP (expr->left) &&
+		    expr->left->opval.op == PTR_OP &&
+		    IS_ADDRESS_OF_OP (expr->left->left))
+			return valForStructElem (expr->left->left->left,
+						 expr->left->right);
+
 	}
+	/* case 3. (((char *) &a) +/- constant) */
+	if (IS_AST_OP (expr) &&
+	    (expr->opval.op == '+' || expr->opval.op == '-') &&
+	    IS_AST_OP (expr->left) && expr->left->opval.op == CAST &&
+	    IS_AST_OP (expr->left->right) &&
+	    expr->left->right->opval.op == '&' &&
+	    IS_AST_LIT_VALUE (expr->right)) {
 
-      /* if address of indexed array */
-      if (IS_AST_OP (expr->left) && expr->left->opval.op == '[')
-	return valForArray (expr->left);
+		return valForCastAggr (expr->left->right->left,
+				       expr->left->left->opval.lnk,
+				       expr->right, expr->opval.op);
 
-      /* if address of structure element then
-         case 1. a.b ; */
-      if (IS_AST_OP (expr->left) &&
-	  expr->left->opval.op == '.')
-	{
-	  return valForStructElem (expr->left->left,
-				   expr->left->right);
 	}
+	
+	/* case 4. (char *)(array type) */
+	if (IS_CAST_OP(expr) && IS_AST_SYM_VALUE (expr->right) &&
+	    IS_ARRAY(expr->right->ftype)) {
 
-      /* case 2. (&a)->b ;
-         (&some_struct)->element */
-      if (IS_AST_OP (expr->left) &&
-	  expr->left->opval.op == PTR_OP &&
-	  IS_ADDRESS_OF_OP (expr->left->left))
-	return valForStructElem (expr->left->left->left,
-				 expr->left->right);
-
-    }
-  /* case 3. (((char *) &a) +/- constant) */
-  if (IS_AST_OP (expr) &&
-      (expr->opval.op == '+' || expr->opval.op == '-') &&
-      IS_AST_OP (expr->left) && expr->left->opval.op == CAST &&
-      IS_AST_OP (expr->left->right) &&
-      expr->left->right->opval.op == '&' &&
-      IS_AST_LIT_VALUE (expr->right))
-    {
-
-      return valForCastAggr (expr->left->right->left,
-			     expr->left->left->opval.lnk,
-			     expr->right, expr->opval.op);
-
-    }
-
-wrong:
-  werror (E_INIT_WRONG);
-  return NULL;
+		val = copyValue (AST_VALUE (expr->right));
+		val->type = newLink ();
+		if (SPEC_SCLS (expr->right->etype) == S_CODE) {
+			DCL_TYPE (val->type) = CPOINTER;
+			DCL_PTR_CONST (val->type) = port->mem.code_ro;
+		}
+		else if (SPEC_SCLS (expr->right->etype) == S_XDATA)
+			DCL_TYPE (val->type) = FPOINTER;
+		else if (SPEC_SCLS (expr->right->etype) == S_XSTACK)
+			DCL_TYPE (val->type) = PPOINTER;
+		else if (SPEC_SCLS (expr->right->etype) == S_IDATA)
+			DCL_TYPE (val->type) = IPOINTER;
+		else if (SPEC_SCLS (expr->right->etype) == S_EEPROM)
+			DCL_TYPE (val->type) = EEPPOINTER;
+		else
+			DCL_TYPE (val->type) = POINTER;
+		val->type->next = expr->right->ftype->next;
+		val->etype = getSpec (val->type);
+		return val;
+	}
+ wrong:
+	werror (E_INIT_WRONG);
+	return NULL;
 
 }
 
@@ -831,7 +850,7 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
       return;
 
   /* check the type      */
-  if (checkType (type, val->type) != 1)
+  if (checkType (type, val->type) == 0)
     werror (E_INIT_WRONG);
 
   /* if val is literal */

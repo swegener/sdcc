@@ -141,6 +141,7 @@ ast;
 #define AST_VALUE(x)            (x->opval.val)
 #define AST_VALUES(x,y)	(x->values.y)
 #define AST_FOR(x,y) x->values.forVals.y
+#define  IS_AST_PARAM(x)	(IS_AST_OP(x) && x->opval.op == PARAM)
 
 #define  CAN_EVAL(x)	(     x	==  '[' || x == '.' || x == PTR_OP ||	\
 	      x	==  '&'	|| x ==	'|' || x == '^'	   || x	== '*' || \

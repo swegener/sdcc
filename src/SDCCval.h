@@ -103,4 +103,5 @@ int getNelements (sym_link *, initList *);
 value *valForArray (struct ast *);
 value *valForStructElem (struct ast *, struct ast *);
 value *valForCastAggr (struct ast *, sym_link *, struct ast *, int);
+value *valForCastArr (struct ast * , sym_link *);
 #endif

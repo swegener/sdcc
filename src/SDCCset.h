@@ -59,11 +59,13 @@ typedef int (* insetwithFunc) (void *, void *);
 int isinSetWith (set *, void *, insetwithFunc cfunc);
 int applyToSet (set * list, int (*somefunc) (void *, va_list),...);
 int applyToSetFTrue (set * list, int (*somefunc) (void *, va_list),...);
+void mergeSets (set **sset, set *list);
 set *unionSets (set *, set *, int);
 set *unionSetsWith (set *, set *, int (*cFunc) (), int);
 set *intersectSets (set *, set *, int);
 void *addSetIfnotP (set **, void *);
 set *setFromSet (set *);
+set *setFromSetNonRev (set *);
 int isSetsEqual (set *, set *);
 set *subtractFromSet (set *, set *, int);
 int elementsInSet (set *);
@@ -75,6 +77,6 @@ void *setFirstItem (set *);
 void *setNextItem (set *);
 void setToNull (void **);
 set *reverseSet (set *);
-void deleteSet(set **s);
+void deleteSet (set **s);
 
 #endif

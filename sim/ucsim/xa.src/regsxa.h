@@ -37,6 +37,10 @@ struct t_regs
   int dummy;
 };
 
+/* macros suck, can we use inline functions instead
+   for the same effect? karl
+*/
+
 /* direct is a special code space for built-in ram and SFR, 1K size */
 #ifdef WORDS_BIGENDIAN
 #define set_word_direct(_index, _value) { \
@@ -106,13 +110,7 @@ struct t_regs
 
 // fixme: I don't know where the psw is kept, just want to compile...
 #define get_psw() ((TYPE_UWORD)(get_word_direct(0x400+(0x80*2))))
-
-/* we also need to set flags, this scheme no setup well to do this yet... */
-#define add1(_a, _b) ( (unsigned char)((_a) + (_b)) )
-#define add2(_a, _b) ( (unsigned short)((_a) + (_b)) )
-
-#define addc1(_a, _b) ( (unsigned char)((_a) + (_b)) )
-#define addc2(_a, _b) ( (unsigned short)((_a) + (_b)) )
+#define set_psw(_flags) set_word_direct(0x400+(0x80*2), _flags)
 
 #if 0
 --------------------------------------------------------------------
@@ -187,6 +185,7 @@ default SPs are set to 100H.  So first PUSH would go to FEH-FFH.
 #define BIT_V  0x04
 #define BIT_N  0x02
 #define BIT_Z  0x01
+#define BIT_ALL (BIT_C | BIT_AC | BIT_V | BIT_N | BIT_Z)
 
 #endif
 /* End of xa.src/regsxa.h */

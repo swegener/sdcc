@@ -79,8 +79,303 @@ public:
   virtual int get_reg(int word_flag, unsigned int index);
 
 #include "instcl.h"
-};
 
+  private :
+
+   /* following are macros which get substituted for FUNC1() and FUNC2()
+      in the inst.cc to form the body of ADD,ADDC,SUB,XOR,... */
+  /* can I put these in the .cc file and still have them do the inline thing? */
+  /*-------------------------------------
+    add - flags changed:C,AC,V,N,Z.
+  |---------------------------------------*/
+  inline unsigned char add1(unsigned char dst, unsigned char src)
+  {
+    unsigned int result;
+    unsigned char flags;
+    flags = get_psw();
+    flags &= ~BIT_ALL; /* clear these bits */
+    result = dst + src;
+    if (result == 0) flags |= BIT_Z;
+    if (result > 0xff) flags |= BIT_C;
+    if (result & 0x80) flags |= BIT_N;
+    /* fixme: do AC, V */
+    set_psw(flags);
+    return (unsigned char) result;
+  }
+
+  inline unsigned short add2(unsigned short dst, unsigned short src)
+  {
+    unsigned int result;
+    unsigned char flags;
+    flags = get_psw();
+    flags &= ~BIT_ALL; /* clear these bits */
+    result = dst + src;
+    if (result == 0) flags |= BIT_Z;
+    if (result > 0xff) flags |= BIT_C;
+    if (result & 0x80) flags |= BIT_N;
+    /* fixme: do AC, V */
+    set_psw(flags);
+    return (unsigned short) result;
+  }
+
+  /*-------------------------------------
+    addc - flags changed:C,AC,V,N,Z.
+  |---------------------------------------*/
+  inline unsigned char addc1(unsigned char dst, unsigned char src)
+  {
+    unsigned int result;
+    unsigned char flags;
+    flags = get_psw();
+    if (flags & BIT_C) {
+      flags &= ~BIT_ALL; /* clear these bits */
+      result = dst + src + 1;
+    } else {
+      flags &= ~BIT_ALL; /* clear these bits */
+      result = dst + src;
+    }
+    if (result == 0) flags |= BIT_Z;
+    if (result > 0xff) flags |= BIT_C;
+    if (result & 0x80) flags |= BIT_N;
+    /* fixme: do AC, V */
+    set_psw(flags);
+    return (unsigned char) result;
+  }
+
+  inline unsigned short addc2(unsigned short dst, unsigned short src)
+  {
+    unsigned int result;
+    unsigned char flags;
+    flags = get_psw();
+    flags &= ~BIT_ALL; /* clear these bits */
+    if (flags & BIT_C) {
+      flags &= ~BIT_ALL; /* clear these bits */
+      result = dst + src + 1;
+    } else {
+      flags &= ~BIT_ALL; /* clear these bits */
+      result = dst + src;
+    }
+    if (result == 0) flags |= BIT_Z;
+    if (result > 0xff) flags |= BIT_C;
+    if (result & 0x80) flags |= BIT_N;
+    /* fixme: do AC, V */
+    set_psw(flags);
+    return (unsigned short) result;
+  }
+
+  /*-------------------------------------
+    sub - flags changed:C,AC,V,N,Z.
+  |---------------------------------------*/
+  inline unsigned char sub1(unsigned char dst, unsigned char src)
+  {
+    unsigned int result;
+    unsigned char flags;
+    flags = get_psw();
+    flags &= ~BIT_ALL; /* clear these bits */
+    result = dst - src;
+    if (result == 0) flags |= BIT_Z;
+    if (result > 0xff) flags |= BIT_C;
+    if (dst < src) flags |= BIT_N;
+    /* fixme: do AC, V */
+    set_psw(flags);
+    return (unsigned char) result;
+  }
+
+  inline unsigned short sub2(unsigned short dst, unsigned short src)
+  {
+    unsigned int result;
+    unsigned char flags;
+    flags = get_psw();
+    flags &= ~BIT_ALL; /* clear these bits */
+    result = dst - src;
+    if (result == 0) flags |= BIT_Z;
+    if (result > 0xff) flags |= BIT_C;
+    if (dst < src) flags |= BIT_N;
+    /* fixme: do AC, V */
+    set_psw(flags);
+    return (unsigned short) result;
+  }
+
+  /*-------------------------------------
+    subb - flags changed:C,AC,V,N,Z.
+  |---------------------------------------*/
+  inline unsigned char subb1(unsigned char dst, unsigned char src)
+  {
+    unsigned int result;
+    unsigned char flags;
+    flags = get_psw();
+    if (flags & BIT_C) {
+      flags &= ~BIT_ALL; /* clear these bits */
+      result = dst - src - 1;
+    } else {
+      flags &= ~BIT_ALL; /* clear these bits */
+      result = dst - src;
+    }
+    if (result == 0) flags |= BIT_Z;
+    if (result > 0xff) flags |= BIT_C;
+    if (dst < src) flags |= BIT_N;
+    /* fixme: do AC, V */
+    set_psw(flags);
+    return (unsigned char) result;
+  }
+
+  inline unsigned short subb2(unsigned short dst, unsigned short src)
+  {
+    unsigned int result;
+    unsigned char flags;
+    flags = get_psw();
+    flags &= ~BIT_ALL; /* clear these bits */
+    if (flags & BIT_C) {
+      flags &= ~BIT_ALL; /* clear these bits */
+      result = dst - src - 1;
+    } else {
+      flags &= ~BIT_ALL; /* clear these bits */
+      result = dst - src;
+    }
+    if (result == 0) flags |= BIT_Z;
+    if (result > 0xff) flags |= BIT_C;
+    if (dst < src) flags |= BIT_N;
+    /* fixme: do AC, V */
+    set_psw(flags);
+    return (unsigned short) result;
+  }
+
+  /*-------------------------------------
+    cmp - flags changed:C,AC,V,N,Z.
+  |---------------------------------------*/
+  inline unsigned char cmp1(unsigned char dst, unsigned char src)
+  {
+    unsigned int result;
+    unsigned char flags;
+    flags = get_psw();
+    flags &= ~BIT_ALL; /* clear these bits */
+    result = dst - src;
+    if (result == 0) flags |= BIT_Z;
+    if (result > 0xff) flags |= BIT_C;
+    if (dst < src) flags |= BIT_N;
+    /* fixme: do AC, V */
+    set_psw(flags);
+    return (unsigned char) dst;
+  }
+
+  inline unsigned short cmp2(unsigned short dst, unsigned short src)
+  {
+    unsigned int result;
+    unsigned char flags;
+    flags = get_psw();
+    flags &= ~BIT_ALL; /* clear these bits */
+    result = dst - src;
+    if (result == 0) flags |= BIT_Z;
+    if (result > 0xff) flags |= BIT_C;
+    if (dst < src) flags |= BIT_N;
+    /* fixme: do AC, V */
+    set_psw(flags);
+    return (unsigned short) dst;
+  }
+
+  /*-------------------------------------
+    and - flags changed:N,Z.
+  |---------------------------------------*/
+  inline unsigned char and1(unsigned char dst, unsigned char src)
+  {
+    unsigned int result;
+    unsigned char flags;
+    flags = get_psw() & ~(BIT_N | BIT_Z); /* clear these bits */
+    result = dst & src;
+    if (result == 0) flags |= BIT_Z;
+    if (result & 0x80) flags |= BIT_N;
+    set_psw(flags);
+    return (unsigned char) result;
+  }
+
+  inline unsigned short and2(unsigned short dst, unsigned short src)
+  {
+    unsigned int result;
+    unsigned char flags;
+    flags = get_psw() & ~(BIT_N | BIT_Z); /* clear these bits */
+    result = dst & src;
+    if (result == 0) flags |= BIT_Z;
+    if (result & 0x80) flags |= BIT_N;
+    set_psw(flags);
+    return (unsigned short) result;
+  }
+
+  /*-------------------------------------
+    or - flags changed:N,Z.
+  |---------------------------------------*/
+  inline unsigned char or1(unsigned char dst, unsigned char src)
+  {
+    unsigned int result;
+    unsigned char flags;
+    flags = get_psw() & ~(BIT_N | BIT_Z); /* clear these bits */
+    result = dst | src;
+    if (result == 0) flags |= BIT_Z;
+    if (result & 0x80) flags |= BIT_N;
+    set_psw(flags);
+    return (unsigned char) result;
+  }
+
+  inline unsigned short or2(unsigned short dst, unsigned short src)
+  {
+    unsigned int result;
+    unsigned char flags;
+    flags = get_psw() & ~(BIT_N | BIT_Z); /* clear these bits */
+    result = dst | src;
+    if (result == 0) flags |= BIT_Z;
+    if (result & 0x80) flags |= BIT_N;
+    set_psw(flags);
+    return (unsigned short) result;
+  }
+
+  /*-------------------------------------
+    xor - flags changed:N,Z.
+  |---------------------------------------*/
+  inline unsigned char xor1(unsigned char dst, unsigned char src)
+  {
+    unsigned char flags;
+    flags = get_psw() & ~(BIT_N | BIT_Z); /* clear these bits */
+    dst ^= src;
+    if (dst == 0) flags |= BIT_Z;
+    if (dst & 0x80) flags |= BIT_N;
+    set_psw(flags);
+    return (unsigned char) dst;
+  }
+
+  inline unsigned short xor2(unsigned short dst, unsigned short src)
+  {
+    unsigned char flags;
+    flags = get_psw() & ~(BIT_N | BIT_Z); /* clear these bits */
+    dst ^= src;
+    if (dst == 0) flags |= BIT_Z;
+    if (dst & 0x8000) flags |= BIT_N;
+    set_psw(flags);
+    return (unsigned short) dst;
+  }
+
+  /*-------------------------------------
+    mov - flags changed:N,Z.
+  |---------------------------------------*/
+  inline unsigned char mov1(unsigned char dst, unsigned char src)
+  {
+    unsigned char flags;
+    flags = get_psw() & ~(BIT_N | BIT_Z); /* clear these bits */
+    dst = src;
+    if (dst == 0) flags |= BIT_Z;
+    if (dst & 0x80) flags |= BIT_N;
+    set_psw(flags);
+    return (unsigned char) dst;
+  }
+
+  inline unsigned short mov2(unsigned short dst, unsigned short src)
+  {
+    unsigned char flags;
+    flags = get_psw() & ~(BIT_N | BIT_Z); /* clear these bits */
+    dst = src;
+    if (dst == 0) flags |= BIT_Z;
+    if (dst & 0x8000) flags |= BIT_N;
+    set_psw(flags);
+    return (unsigned short) dst;
+  }
+};
 
 #endif
 

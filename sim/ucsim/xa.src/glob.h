@@ -32,19 +32,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "stypes.h"
 
-
-#if 0
-enum {
-  REG,
-  IND_REG,
-  IND_REG_PLUS,
-  IND_REG_OFFSET,
-  DIRECT,
-  DATA8,
-  DATA16
-};
-#endif
-
+/* this needs to match char *op_mnemonic_str[] definition in glob.cc */
 enum {
 BAD_OPCODE=0,
 ADD,
@@ -104,12 +92,17 @@ TRAP,
 RESET,
 FCALL,
 FJMP,
+IREG,
 };
 
 extern char *op_mnemonic_str[];
 
+/* this classifies the operands and is used in the dissassembly
+   to print the operands.  Its also used in the simulation to characterize
+   the op-code function.
+ */   
 enum op_operands {
-   // the repeating common parameter encoding for ADD, ADDC, SUB, AND...
+   // the repeating parameter encoding for ADD, ADDC, SUB, SUBB, AND, XOR, ...
   REG_REG         ,
   REG_IREG        ,
   IREG_REG        ,
@@ -152,7 +145,7 @@ enum op_operands {
   DIRECT_REL8,
 
   REL8,
-  REL16,
+  REL16
 };
 
 // table of dissassembled instructions
@@ -161,8 +154,6 @@ struct xa_dis_entry
   uint  code, mask;
   char  branch;
   uchar length;
-//  enum op_mnemonic mnemonic;
-//  enum op_operands operands;
   int mnemonic;
   int operands;
 };

@@ -32,6 +32,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "stypes.h"
 #include "glob.h"
 
+/* this needs to match enum definition in glob.h */
 char *op_mnemonic_str[] = {
 "BAD_OPCODE",
 "ADD",
@@ -91,42 +92,20 @@ char *op_mnemonic_str[] = {
 "RESET"
 "FCALL",
 "FJMP",
+"IREG",
 };
 
+/* this is junk, but we need to keep it until main ucSim code
+   is cleaned of dis_entry[] references. */
 struct dis_entry glob_disass_xa[]= {
   { 0x0000, 0x00ff, ' ', 1, "nop" },
   { 0x0000, 0x00, 0, 0, NULL}
 };
 
+/* plan: keep this list in same order as in User Guide(pg 106)
+   until all op-codes are defined.  Figure out how to make simulation
+   lookup fast later. */
 struct xa_dis_entry disass_xa[]= {
- {0x0000,0xffff,' ',1,NOP, NO_OPERANDS     }, //  NOP   0 0 0 0 0 0 0 0
- {0xff00,0xffff,' ',1,NOP, NO_OPERANDS     }, //  BRPT  1 1 1 1 1 1 1 1
-
- {0x0840,0xfffc,' ',3,ANL, C_BIT           }, //  ANL C, bit                 0 0 0 0 1 0 0 0  0 1 0 0 0 0 b b
- {0x0850,0xfffc,' ',3,ANL, C_NOTBIT        }, //  ANL C, /bit                0 0 0 0 1 0 0 0  0 1 0 1 0 0 b b
- {0x0850,0xfffc,' ',3,ASL, REG_REG         }, //  ASL Rd, Rs                 1 1 0 0 S S 0 1  d d d d s s s s
- {0x900c,0xf70f,' ',2,CPL, REG_ALONE       }, //  CPL Rd                     1 0 0 1 S 0 0 0  d d d d 1 0 1 0
- {0xe708,0xff00,' ',2,DIV_w, REG_REG       }, //  DIV.w Rd, Rs               1 1 1 0 0 1 1 1  d d d d s s s s
- {0xe80b,0xff0f,' ',3,DIV_w, REG_DATA8     }, //  DIV.w Rd, #data8           1 1 1 0 1 0 0 0  d d d d 1 0 1 1
- {0xef00,0xff10,' ',2,DIV_d, REG_REG       }, //  DIV.d Rd, Rs               1 1 1 0 1 1 1 1  d d d 0 s s s s
- {0xe909,0xff1f,' ',4,DIV_d, REG_DATA16    }, //  DIV.d Rd, #data16          1 1 1 0 1 0 0 1  d d d 0 1 0 0 1
- {0xe801,0xff0f,' ',3,DIVU_b, REG_DATA8    }, //  DIVU.b Rd, #data8          1 1 1 0 1 0 0 0  d d d d 0 0 0 1
- {0xe500,0xff00,' ',2,DIVU_w, REG_REG      }, //  DIVU.w Rd, Rs              1 1 1 0 0 1 0 1  d d d d s s s s
- {0xe803,0xff0f,' ',3,DIVU_w, REG_DATA8    }, //  DIVU.w Rd, #data8          1 1 1 0 1 0 0 0  d d d d 0 0 1 1
- {0xed00,0xff10,' ',2,DIVU_d, REG_REG      }, //  DIVU.d Rd, Rs              1 1 1 0 1 1 0 1  d d d 0 s s s s
- {0xe901,0xff1f,' ',4,DIVU_d, REG_DATA16   }, //  DIVU.d Rd, #data16         1 1 1 0 1 0 0 1  d d d 0 0 0 0 1
- {0x8708,0xf70f,' ',3,DJNZ,   REG_REL8     }, //  DJNZ Rd, rel8              1 0 0 0 S 1 1 1  d d d d 1 0 0 0
- {0xe208,0xf7f8,' ',4,DJNZ,   DIRECT_REL8  }, //  DJNZ direct, rel8          1 1 1 0 S 0 1 0  0 0 0 0 1 x x x
- {0xc400,0xff00,' ',4,FCALL,  ADDR24       }, //  FCALL addr24               1 1 0 0 0 1 0 0  
- {0xd400,0xff00,' ',4,FJMP,   ADDR24       }, //  FJMP addr24                1 1 0 1 0 1 0 0
-
- {0x1408,0xf780,' ',2,ADDS, REG_DATA4      }, // ADDS Rd, #data4             1 0 1 0 S 0 0 1  d d d d #data4
- {0x1408,0xf780,' ',2,ADDS, IREG_DATA4     }, // ADDS [Rd], #data4           1 0 1 0 S 0 1 0  0 d d d #data4
- {0x1408,0xf780,' ',2,ADDS, IREGINC_DATA4  }, // ADDS [Rd+], #data4          1 0 1 0 S 0 1 1  0 d d d #data4
- {0x1408,0xf780,' ',3,ADDS, IREGOFF8_DATA4 }, // ADDS [Rd+offset8], #data4   1 0 1 0 S 1 0 0  0 d d d #data4
- {0x1408,0xf780,' ',4,ADDS, IREGOFF16_DATA4}, // ADDS [Rd+offset16], #data4  1 0 1 0 S 1 0 1  0 d d d #data4
- {0x1408,0xf780,' ',3,ADDS, DIRECT_DATA4   }, // ADDS direct, #data4         1 0 1 0 S 1 1 0  0 x x x #data4
-
  {0x0100,0xf700,' ',2,ADD, REG_REG         },  // ADD Rd, Rs                 0 0 0 0 S 0 0 1  d d d d s s s s
  {0x0200,0xf708,' ',2,ADD, REG_IREG        },  // ADD Rd, [Rs]               0 0 0 0 S 0 1 0  d d d d 0 s s s
  {0x0208,0xf708,' ',2,ADD, IREG_REG        },  // ADD [Rd], Rs               0 0 0 0 S 0 1 0  s s s s 1 d d d
@@ -175,6 +154,13 @@ struct xa_dis_entry disass_xa[]= {
  {0x9601,0xff8f,' ',4,ADDC,DIRECT_DATA8    },  //ADDC direct, #data8         1 0 0 1 0 1 1 0  0 b b b 0 0 0 1
  {0x9e01,0xff8f,' ',5,ADDC,DIRECT_DATA16   },  //ADDC direct, #data16        1 0 0 1 1 1 1 0  0 b b b 0 0 0 1
 
+ {0x1408,0xf780,' ',2,ADDS, REG_DATA4      }, // ADDS Rd, #data4             1 0 1 0 S 0 0 1  d d d d #data4
+ {0x1408,0xf780,' ',2,ADDS, IREG_DATA4     }, // ADDS [Rd], #data4           1 0 1 0 S 0 1 0  0 d d d #data4
+ {0x1408,0xf780,' ',2,ADDS, IREGINC_DATA4  }, // ADDS [Rd+], #data4          1 0 1 0 S 0 1 1  0 d d d #data4
+ {0x1408,0xf780,' ',3,ADDS, IREGOFF8_DATA4 }, // ADDS [Rd+offset8], #data4   1 0 1 0 S 1 0 0  0 d d d #data4
+ {0x1408,0xf780,' ',4,ADDS, IREGOFF16_DATA4}, // ADDS [Rd+offset16], #data4  1 0 1 0 S 1 0 1  0 d d d #data4
+ {0x1408,0xf780,' ',3,ADDS, DIRECT_DATA4   }, // ADDS direct, #data4         1 0 1 0 S 1 1 0  0 x x x #data4
+
  {0x5100,0xf700,' ',2, AND,REG_REG         },  // AND Rd, Rs                 0 1 0 1 S 0 0 1  d d d d s s s s 
  {0x5200,0xf708,' ',2, AND,REG_IREG        },  // AND Rd, [Rs]               0 1 0 1 S 0 1 0  d d d d 0 s s s 
  {0x5208,0xf708,' ',2, AND,IREG_REG        },  // AND [Rd], Rs               0 1 0 1 S 0 1 0  s s s s 1 d d d 
@@ -198,6 +184,18 @@ struct xa_dis_entry disass_xa[]= {
  {0x9d05,0xff8f,' ',6, AND,IREGOFF16_DATA16},  // AND [Rd+offset16], #data16 1 0 0 1 1 1 0 1  0 d d d 0 1 0 1 
  {0x9605,0xff8f,' ',4, AND,DIRECT_DATA8    },  // AND direct, #data8         1 0 0 1 0 1 1 0  0 b b b 0 1 0 1 
  {0x9e05,0xff8f,' ',5, AND,DIRECT_DATA16   },  // AND direct, #data16        1 0 0 1 0 1 1 0  1 b b b 0 1 0 1 
+
+ {0x0840,0xfffc,' ',3,ANL, C_BIT           }, //  ANL C, bit                 0 0 0 0 1 0 0 0  0 1 0 0 0 0 b b
+ {0x0850,0xfffc,' ',3,ANL, C_NOTBIT        }, //  ANL C, /bit                0 0 0 0 1 0 0 0  0 1 0 1 0 0 b b
+ {0x0850,0xfffc,' ',3,ASL, REG_REG         }, //  ASL Rd, Rs                 1 1 0 0 S S 0 1  d d d d s s s s
+/* ASR(3), BCC, BCS */
+ {0xf300,0xff00,' ',2,BEQ, REL8            }, //  BEQ rel8                   1 1 1 1 0 0 1 1  rel8
+/* BG, BGE, BGT */
+ {0xff00,0xff00,' ',1,BKPT, NO_OPERANDS    }, //  BKPT                       1 1 1 1 1 1 1 1
+/* BL, BLE, BLT, BMI, BNE, BNV, BOV, BPL, BR */
+ {0xc500,0xff00,' ',3,CALL, REL16          }, //  CALL rel16                 1 1 0 0 0 1 0 1  rel16
+ {0xc600,0xfff8,' ',2,CALL, IREG_ALONE     }, //  CALL [Rs]                  1 1 0 0 0 1 1 0  0 0 0 0 0 s s s
+/* CJNE(5), JNE, CLR */
 
  {0x4100,0xf700,' ',2,CMP, REG_REG         },  // CMP Rd, Rs                 0 1 0 0 S 0 0 1  d d d d s s s s
  {0x4200,0xf708,' ',2,CMP, REG_IREG        },  // CMP Rd, [Rs]               0 1 0 0 S 0 1 0  d d d d 0 s s s
@@ -223,6 +221,29 @@ struct xa_dis_entry disass_xa[]= {
  {0x9604,0xff8f,' ',4,CMP, DIRECT_DATA8    },  // CMP direct, #data8         1 0 0 1 0 1 1 0  0 b b b 0 1 0 0
  {0x9e04,0xff8f,' ',5,CMP, DIRECT_DATA16   },  // CMP direct, #data16        1 0 0 1 0 1 1 0  0 b b b 0 1 0 0
 
+ {0x900c,0xf70f,' ',2,CPL, REG_ALONE       }, //  CPL Rd                     1 0 0 1 S 0 0 0  d d d d 1 0 1 0
+   /* DA */
+ {0xe708,0xff00,' ',2,DIV_w, REG_REG       }, //  DIV.w Rd, Rs               1 1 1 0 0 1 1 1  d d d d s s s s
+ {0xe80b,0xff0f,' ',3,DIV_w, REG_DATA8     }, //  DIV.w Rd, #data8           1 1 1 0 1 0 0 0  d d d d 1 0 1 1
+ {0xef00,0xff10,' ',2,DIV_d, REG_REG       }, //  DIV.d Rd, Rs               1 1 1 0 1 1 1 1  d d d 0 s s s s
+ {0xe909,0xff1f,' ',4,DIV_d, REG_DATA16    }, //  DIV.d Rd, #data16          1 1 1 0 1 0 0 1  d d d 0 1 0 0 1
+ {0xe101,0xff00,' ',3,DIVU_b, REG_REG      }, //  DIVU.b Rd, Rs              1 1 1 0 0 0 0 1  d d d d s s s s
+ {0xe801,0xff0f,' ',3,DIVU_b, REG_DATA8    }, //  DIVU.b Rd, #data8          1 1 1 0 1 0 0 0  d d d d 0 0 0 1
+ {0xe500,0xff00,' ',2,DIVU_w, REG_REG      }, //  DIVU.w Rd, Rs              1 1 1 0 0 1 0 1  d d d d s s s s
+ {0xe803,0xff0f,' ',3,DIVU_w, REG_DATA8    }, //  DIVU.w Rd, #data8          1 1 1 0 1 0 0 0  d d d d 0 0 1 1
+ {0xed00,0xff10,' ',2,DIVU_d, REG_REG      }, //  DIVU.d Rd, Rs              1 1 1 0 1 1 0 1  d d d 0 s s s s
+ {0xe901,0xff1f,' ',4,DIVU_d, REG_DATA16   }, //  DIVU.d Rd, #data16         1 1 1 0 1 0 0 1  d d d 0 0 0 0 1
+
+ {0x8708,0xf70f,' ',3,DJNZ,   REG_REL8     }, //  DJNZ Rd, rel8              1 0 0 0 S 1 1 1  d d d d 1 0 0 0
+ {0xe208,0xf7f8,' ',4,DJNZ,   DIRECT_REL8  }, //  DJNZ direct, rel8          1 1 1 0 S 0 1 0  0 0 0 0 1 x x x
+
+ {0xc400,0xff00,' ',4,FCALL,  ADDR24       }, //  FCALL addr24               1 1 0 0 0 1 0 0  
+ {0xd400,0xff00,' ',4,FJMP,   ADDR24       }, //  FJMP addr24                1 1 0 1 0 1 0 0
+ /* JB, JBC */
+ {0xd670,0xfff8,' ',2, JMP,   IREG         }, //  JMP [Rs]                   1 1 0 1 0 1 1 0  0 1 1 1 0 s s s
+ {0xd500,0xff00,' ',3, JMP,   REL16        }, //  JMP rel16                  1 1 0 1 0 1 0 1  rel16
+ /* JMP(2), JNB, JNZ, JZ, LEA(2), LSR(3?)  */
+
  {0x8100,0xf700,' ',2,MOV, REG_REG         },  // MOV Rd, Rs                 1 0 0 0 S 0 0 1  d d d d s s s s
  {0x8200,0xf708,' ',2,MOV, REG_IREG        },  // MOV Rd, [Rs]               1 0 0 0 S 0 1 0  d d d d 0 s s s
  {0x8208,0xf708,' ',2,MOV, IREG_REG        },  // MOV [Rd], Rs               1 0 0 0 S 0 1 0  s s s s 1 d d d
@@ -246,7 +267,10 @@ struct xa_dis_entry disass_xa[]= {
  {0x9d08,0xff8f,' ',6,MOV, IREGOFF16_DATA16},  // MOV [Rd+offset16], #data16 1 0 0 1 1 1 0 1  0 d d d 1 0 0 0
  {0x9608,0xff8f,' ',4,MOV, DIRECT_DATA8    },  // MOV direct, #data8         1 0 0 1 0 1 1 0  0 b b b 1 0 0 0
  {0x9e08,0xff8f,' ',5,MOV, DIRECT_DATA16   },  // MOV direct, #data16        1 0 0 1 0 1 1 0  0 b b b 1 0 0 0
+   /* MOV(5), MOVC(3), MOVS(6), MOVX(2), MUL.x(6), NEG */
 
+ {0x0000,0xff00,' ',1,NOP, NO_OPERANDS     }, //  NOP                        0 0 0 0 0 0 0 0
+   /* NORM */
  {0x6100,0xf700,' ',2, OR, REG_REG         },  //  OR Rd, Rs                 0 1 1 0 S 0 0 1  d d d d s s s s
  {0x6200,0xf708,' ',2, OR, REG_IREG        },  //  OR Rd, [Rs]               0 1 1 0 S 0 1 0  d d d d 0 s s s
  {0x6208,0xf708,' ',2, OR, IREG_REG        },  //  OR [Rd], Rs               0 1 1 0 S 0 1 0  s s s s 1 d d d
@@ -270,6 +294,8 @@ struct xa_dis_entry disass_xa[]= {
  {0x9d06,0xff8f,' ',6, OR, IREGOFF16_DATA16},  //  OR [Rd+offset16], #data16 1 0 0 1 1 1 0 1  0 d d d 0 1 1 0
  {0x9606,0xff8f,' ',4, OR, DIRECT_DATA8    },  //  OR direct, #data8         1 0 0 1 0 1 1 0  0 b b b 0 1 1 0
  {0x9e06,0xff8f,' ',5, OR, DIRECT_DATA16   },  //  OR direct, #data16        1 0 0 1 0 1 1 0  0 b b b 0 1 1 0
+   /* ORL(2), POP(2), POPU(2), PUSH(2), PUSHU(2), RESET, RET, RETI,
+      RL, RLC, RR, RRC, SETB, SEXT */
 
  {0x2100,0xf700,' ',2,SUB, REG_REG         },  // SUB Rd, Rs                 0 0 1 0 S 0 0 1  d d d d s s s s
  {0x2200,0xf708,' ',2,SUB, REG_IREG        },  // SUB Rd, [Rs]               0 0 1 0 S 0 1 0  d d d d 0 s s s
@@ -318,6 +344,7 @@ struct xa_dis_entry disass_xa[]= {
  {0x9d03,0xff8f,' ',6,SUBB,IREGOFF16_DATA16},  //SUBB [Rd+offset16], #data16 1 0 0 1 1 1 0 1  0 d d d 0 0 1 1
  {0x9603,0xff8f,' ',4,SUBB,DIRECT_DATA8    },  //SUBB direct, #data8         1 0 0 1 0 1 1 0  0 b b b 0 0 1 1
  {0x9e03,0xff8f,' ',5,SUBB,DIRECT_DATA16   },  //SUBB direct, #data16        1 0 0 1 0 1 1 0  0 b b b 0 0 1 1
+   /* TRAP, XCH(3) */
 
  {0x7100,0xf700,' ',2,XOR, REG_REG         },  // XOR Rd, Rs                 0 1 1 1 S 0 0 1  d d d d s s s s
  {0x7200,0xf708,' ',2,XOR, REG_IREG        },  // XOR Rd, [Rs]               0 1 1 1 S 0 1 0  d d d d 0 s s s
@@ -342,11 +369,6 @@ struct xa_dis_entry disass_xa[]= {
  {0x9d07,0xff8f,' ',6,XOR, IREGOFF16_DATA16},  // XOR [Rd+offset16], #data16 1 0 0 1 1 1 0 1  0 d d d 0 1 1 1
  {0x9607,0xff8f,' ',4,XOR, DIRECT_DATA8    },  // XOR direct, #data8         1 0 0 1 0 1 1 0  0 b b b 0 1 1 1
  {0x9e07,0xff8f,' ',5,XOR, DIRECT_DATA16   },  // XOR direct, #data16        1 0 0 1 0 1 1 0  0 b b b 0 1 1 1
-
- {0xc500,0xff00,' ',3,CALL, REL16          },  // CALL rel16                 1 1 0 0 0 1 0 1  rel16
- {0xc600,0xfff8,' ',2,CALL, IREG_ALONE     },  // CALL [Rs]                  1 1 0 0 0 1 1 0  0 0 0 0 0 s s s
-
- {0xf300,0xff00,' ',2,BEQ, REL8            },  // BEQ rel8                   1 1 1 1 0 0 1 1  rel8
 
  {0x0000,0x0000,  0,1,BAD_OPCODE, REG_REG}
 };

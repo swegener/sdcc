@@ -539,133 +539,148 @@ cl_xa::print_regs(class cl_console *con)
 int
 cl_xa::exec_inst(void)
 {
-  t_mem code1, code2;
+  t_mem code1;
   uint code;
   int i;
+  int operands;
 
   if (fetch(&code1))
     return(resBREAKPOINT);
   tick(1);
 
-  if (code1 == 0) // nop, 1 byte instr
-    return(inst_NOP(code1));
+/* the following lookups make for a slow simulation, we will
+  figure out how to make it fast later... */
 
-  if (fetch(&code2))
-    return(resBREAKPOINT);
-  code = (code1 << 8) | code2;
-
+  /* scan to see if its a 1 byte-opcode */
+  code = (code1 << 8);
   i= 0;
-  while ((code & disass_xa[i].mask) != disass_xa[i].code &&
+  while ( ((code & disass_xa[i].mask) != disass_xa[i].code ||
+           ((disass_xa[i].mask & 0x00ff) != 0)) /* one byte op code */
+                    &&
          disass_xa[i].mnemonic != BAD_OPCODE)
     i++;
 
-  code |= ((int)(disass_xa[i].operands)) << 16;  // kludgy, tack on operands info
+  if (disass_xa[i].mnemonic == BAD_OPCODE) {
+    /* hit the end of the list, must be a 2 or more byte opcode */
+    /* fetch another code byte and search the list again */
+      //if (fetch(&code2))  ?not sure if break allowed in middle of opcode?
+      //  return(resBREAKPOINT);
+    code |= fetch();  /* add 2nd opcode */
+
+    i= 0;
+    while ((code & disass_xa[i].mask) != disass_xa[i].code &&
+           disass_xa[i].mnemonic != BAD_OPCODE)
+      i++;
+    /* we should have found the opcode by now, if not invalid entry at eol */
+  }
+
+  operands = (int)(disass_xa[i].operands);
   switch (disass_xa[i].mnemonic)
   {
     case ADD:
-    return inst_ADD(code);
+    return inst_ADD(code, operands);
     case ADDC:
-    return inst_ADDC(code);
+    return inst_ADDC(code, operands);
     case SUB:
-    return inst_SUB(code);
+    return inst_SUB(code, operands);
     case SUBB:
-    return inst_SUBB(code);
+    return inst_SUBB(code, operands);
     case CMP:
-    return inst_CMP(code);
+    return inst_CMP(code, operands);
     case AND:
-    return inst_AND(code);
+    return inst_AND(code, operands);
     case OR:
-    return inst_OR(code);
+    return inst_OR(code, operands);
     case XOR:
-    return inst_XOR(code);
+    return inst_XOR(code, operands);
     case ADDS:
-    return inst_ADDS(code);
+    return inst_ADDS(code, operands);
     case NEG:
-    return inst_NEG(code);
+    return inst_NEG(code, operands);
     case SEXT:
-    return inst_SEXT(code);
+    return inst_SEXT(code, operands);
     case MUL:
-    return inst_MUL(code);
+    return inst_MUL(code, operands);
     case DIV_w :
     case DIV_d :
     case DIVU_b:
     case DIVU_w:
     case DIVU_d:
-    return inst_DIV(code);
+    return inst_DIV(code, operands);
     case DA:
-    return inst_DA(code);
+    return inst_DA(code, operands);
     case ASL:
-    return inst_ASL(code);
+    return inst_ASL(code, operands);
     case ASR:
-    return inst_ASR(code);
+    return inst_ASR(code, operands);
     case LEA:
-    return inst_LEA(code);
+    return inst_LEA(code, operands);
     case CPL:
-    return inst_CPL(code);
+    return inst_CPL(code, operands);
     case LSR:
-    return inst_LSR(code);
+    return inst_LSR(code, operands);
     case NORM:
-    return inst_NORM(code);
+    return inst_NORM(code, operands);
     case RL:
-    return inst_RL(code);
+    return inst_RL(code, operands);
     case RLC:
-    return inst_RLC(code);
+    return inst_RLC(code, operands);
     case RR:
-    return inst_RR(code);
+    return inst_RR(code, operands);
     case RRC:
-    return inst_RRC(code);
+    return inst_RRC(code, operands);
     case MOVS:
-    return inst_MOVS(code);
+    return inst_MOVS(code, operands);
     case MOVC:
-    return inst_MOVC(code);
+    return inst_MOVC(code, operands);
     case MOVX:
-    return inst_MOVX(code);
+    return inst_MOVX(code, operands);
     case PUSH:
-    return inst_PUSH(code);
+    return inst_PUSH(code, operands);
     case POP:
-    return inst_POP(code);
+    return inst_POP(code, operands);
     case XCH:
-    return inst_XCH(code);
+    return inst_XCH(code, operands);
     case SETB:
-    return inst_SETB(code);
+    return inst_SETB(code, operands);
     case CLR:
-    return inst_CLR(code);
+    return inst_CLR(code, operands);
     case MOV:
-    return inst_MOV(code);
+    return inst_MOV(code, operands);
     case ANL:
-    return inst_ANL(code);
+    return inst_ANL(code, operands);
     case ORL:
-    return inst_ORL(code);
+    return inst_ORL(code, operands);
     case BR:
-    return inst_BR(code);
+    return inst_BR(code, operands);
     case JMP:
-    return inst_JMP(code);
+    return inst_JMP(code, operands);
     case CALL:
-    return inst_CALL(code);
+    return inst_CALL(code, operands);
     case RET:
-    return inst_RET(code);
+    return inst_RET(code, operands);
     case Bcc:
-    return inst_Bcc(code);
+    return inst_Bcc(code, operands);
     case JB:
-    return inst_JB(code);
+    return inst_JB(code, operands);
     case JNB:
-    return inst_JNB(code);
+    return inst_JNB(code, operands);
     case CJNE:
-    return inst_CJNE(code);
+    return inst_CJNE(code, operands);
     case DJNZ:
-    return inst_DJNZ(code);
+    return inst_DJNZ(code, operands);
     case JZ:
-    return inst_JZ(code);
+    return inst_JZ(code, operands);
     case JNZ:
-    return inst_JNZ(code);
+    return inst_JNZ(code, operands);
     case NOP:
-    return inst_NOP(code);
+    return inst_NOP(code, operands);
     case BKPT:
-    return inst_BKPT(code);
+    return inst_BKPT(code, operands);
     case TRAP:
-    return inst_TRAP(code);
+    return inst_TRAP(code, operands);
     case RESET:
-    return inst_RESET(code);
+    return inst_RESET(code, operands);
     case BAD_OPCODE:
     default:
     break;

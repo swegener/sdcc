@@ -20,7 +20,8 @@ static const char *_findMapping(const char *szKey)
     return shash_find(_h, szKey);
 }
 
-static va_list _iprintf(char *pInto, const char *sz, va_list ap)
+#if 0
+static void _iprintf(char *pInto, const char *sz, va_list *pap)
 {
     char format[MAX_TOKEN_LEN];
     char *pStart = pInto;
@@ -58,9 +59,9 @@ static va_list _iprintf(char *pInto, const char *sz, va_list ap)
 			*p++ = *sz++;
 		    *p++ = *sz++;
 		    *p = '\0';
-		    vsprintf(pInto, format, ap);
+		    vsprintf(pInto, format, *pap);
 		    /* PENDING: Assume that the arg length was an int */
-		    (void)va_arg(ap, int);
+		    (void)va_arg(*pap, int);
 		}
 	    }
 	    pInto = pStart + strlen(pStart);
@@ -70,8 +71,6 @@ static va_list _iprintf(char *pInto, const char *sz, va_list ap)
 	}
     }
     *pInto = '\0';
-
-    return ap;
 }
 
 void tvsprintf(char *buffer, const char *sz, va_list ap)
@@ -95,7 +94,8 @@ void tvsprintf(char *buffer, const char *sz, va_list ap)
 	    *p = '\0';
 	    /* Now find the token in the token list */
 	    if ((t = _findMapping(token))) {
-		ap = _iprintf(pInto, t, ap);
+		printf("tvsprintf: found token \"%s\" to \"%s\"\n", token, t);
+		_iprintf(pInto, t, &ap);
 		pInto = buffer + strlen(buffer);
 	    }
 	    else {
@@ -121,6 +121,97 @@ void tvsprintf(char *buffer, const char *sz, va_list ap)
     }
     *pInto = '\0';
 }
+#else
+// Append a string onto another, and update the pointer to the end of
+// the new string.
+static char *_appendAt(char *at, char *onto, const char *sz)
+{
+    wassert(at && onto && sz);
+    strcpy(at, sz);
+    return at + strlen(sz);
+}
+
+void tvsprintf(char *buffer, const char *format, va_list ap)
+{
+    // Under Linux PPC va_list is a structure instead of a primitive type,
+    // and doesnt like being passed around.  This version turns everything
+    // into one function.
+    
+    // Supports:
+    //  !tokens
+    //  %[CIF] - special formats with no argument (ie list isnt touched)
+    //  All of the system formats
+
+    // This is acheived by expanding the tokens and zero arg formats into
+    // one big format string, which is passed to the native printf.
+    static int count;
+    char newformat[MAX_INLINEASM];
+    char *pInto = newformat;
+    char *p;
+    char token[MAX_TOKEN_LEN];
+    const char *sz = format;
+
+    // NULL terminate it to let strlen work.
+    *pInto = '\0';
+    
+    while (*sz) {
+	if (*sz == '!') {
+	    /* Start of a token.  Search until the first
+	       [non alpha, *] and call it a token. */
+	    const char *t;
+	    p = token;
+	    sz++;
+	    while (isalpha(*sz) || *sz == '*') {
+		*p++ = *sz++;
+	    }
+	    *p = '\0';
+	    /* Now find the token in the token list */
+	    if ((t = _findMapping(token))) {
+		pInto = _appendAt(pInto, newformat, t);
+	    }
+	    else {
+		fprintf(stderr, "Cant find token \"%s\"\n", token);
+		wassert(0);
+	    }
+	}
+	else if (*sz == '%') {
+	    // See if its one that we handle.
+	    sz++;
+	    switch (*sz) {
+	    case 'C':
+		// Code segment name.
+		pInto = _appendAt(pInto, newformat, CODE_NAME);
+		break;
+	    case 'F':
+		// Source file name.
+		pInto = _appendAt(pInto, newformat, srcFileName);
+		break;
+	    case 'I': {
+		// Unique ID.
+		char id[20];
+		sprintf(id, "%u", ++count);
+		pInto = _appendAt(pInto, newformat, id);
+		break;
+	    }
+	    default:
+		// Not one of ours.  Copy until the end.
+		*pInto++ = '%';
+		while (!isalpha(*sz)) {
+		    *pInto++ = *sz++;
+		}
+		*pInto++ = *sz++;
+	    }
+	}
+	else {
+	    *pInto++ = *sz++;
+	}
+    }
+    *pInto = '\0';
+    
+    // Now do the actual printing
+    vsprintf(buffer, newformat, ap); 
+}
+#endif
 
 void tfprintf(FILE *fp, const char *szFormat, ...)
 {

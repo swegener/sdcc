@@ -94,17 +94,17 @@ typedef struct operand {
 } operand ;
 
 /* definition for intermediate code */ 
-#define IC_RESULT(x) x->ulrrcnd.lrr.result
-#define IC_LEFT(x)   x->ulrrcnd.lrr.left
-#define IC_RIGHT(x)  x->ulrrcnd.lrr.right
-#define IC_COND(x)   x->ulrrcnd.cnd.condition
-#define IC_TRUE(x)   x->ulrrcnd.cnd.trueLabel
-#define IC_FALSE(x)  x->ulrrcnd.cnd.falseLabel
-#define IC_LABEL(x)  x->argLabel.label
-#define IC_ARGS(x)   x->argLabel.args
-#define IC_JTCOND(x) x->ulrrcnd.jmpTab.condition
-#define IC_JTLABELS(x) x->ulrrcnd.jmpTab.labels
-#define IC_INLINE(x) x->inlineAsm
+#define IC_RESULT(x) (x)->ulrrcnd.lrr.result
+#define IC_LEFT(x)   (x)->ulrrcnd.lrr.left
+#define IC_RIGHT(x)  (x)->ulrrcnd.lrr.right
+#define IC_COND(x)   (x)->ulrrcnd.cnd.condition
+#define IC_TRUE(x)   (x)->ulrrcnd.cnd.trueLabel
+#define IC_FALSE(x)  (x)->ulrrcnd.cnd.falseLabel
+#define IC_LABEL(x)  (x)->argLabel.label
+#define IC_ARGS(x)   (x)->argLabel.args
+#define IC_JTCOND(x) (x)->ulrrcnd.jmpTab.condition
+#define IC_JTLABELS(x) (x)->ulrrcnd.jmpTab.labels
+#define IC_INLINE(x) (x)->inlineAsm
 
 typedef struct iCode 
 {

@@ -340,7 +340,14 @@ PORT z80_port = {
     _reset_regparm,
     _reg_parm,
     _process_pragma,
-    TRUE
+    TRUE,
+    0,  /* leave lt */
+    0,  /* leave gt */
+    1,  /* transform <= to ! > */
+    1,  /* transform >= to ! < */
+    1,  /* transform != to !(a == b) */
+    0,   /* leave == */
+    PORT_MAGIC
 };
 
 /* Globals */
@@ -413,5 +420,6 @@ PORT gbz80_port = {
     1,  /* transform <= to ! > */
     1,  /* transform >= to ! < */
     1,  /* transform != to !(a == b) */
-    0   /* leave == */
+    0,   /* leave == */
+    PORT_MAGIC
 };

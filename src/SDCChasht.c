@@ -223,13 +223,16 @@ static const hashtItem *_findByKey(hTab *htab, int key, const void *pkey, int (*
     if (!htab)
 	return NULL;
     
-    for (htip = htab->table[key] ; htip ; htip = htip->next ) {
+    for (htip = htab->table[key] ; htip ; htip = htip->next) {
 	/* if a compare function is given use it */
-	if (compare && compare(pkey, htip->pkey))
+	if (compare && compare(pkey, htip->pkey)) {
 	    break;
-	else
-	    if (pkey == htip->pkey)
+	}
+	else {
+	    if (pkey == htip->pkey) {
 		break;
+	    }
+	}
     }
     return htip;
 }

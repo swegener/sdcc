@@ -8,7 +8,7 @@ include $(PRJDIR)/Makefile.common
 
 USE_ALT_LEX	= 0
 
-PORTS		= mcs51 z80 avr ds390 pic
+PORTS		= mcs51 z80 avr ds390 pic izt
 PORT_LIBS	= $(PORTS:%=%/port.a)
 
 ifeq ($(DISABLE_GC),1)

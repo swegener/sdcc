@@ -267,6 +267,7 @@ PORT pic14_port = {
     1,  /* transform <= to ! > */
     1,  /* transform >= to ! < */
     1,  /* transform != to !(a == b) */
-    0   /* leave == */
+    0,  /* leave == */
+    PORT_MAGIC
 };
 

@@ -43,7 +43,7 @@ void iemit(const char *szFormat, ...)
 
     va_start(ap, szFormat);
 
-    vsprintf(buffer, szFormat, ap);
+    tvsprintf(buffer, szFormat, ap);
 
     _tidyUp(buffer);
 
@@ -235,7 +235,6 @@ static bool _tryEmittingiCode(hTab *h, iCode *ic)
 void izt_addEmittersToHTab(hTab **into, EMITTER _base_emitters[])
 {
     while (_base_emitters->emit != NULL) {
-	printf("Added an emitter for %u %p\n", _base_emitters->op, _base_emitters);
 	hTabAddItemLong(into, _base_emitters->op, _base_emitters, _base_emitters);
 	_base_emitters++;
     }

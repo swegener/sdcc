@@ -169,6 +169,10 @@ typedef struct {
     bool ge_nlt ;     /* transform (a >= b) to !(a < b)   */
     bool ne_neq ;     /* transform a != b --> ! (a == b)  */
     bool eq_nne ;     /* transform a == b --> ! (a != b)  */
+
+#define PORT_MAGIC 0xAC32
+    /** Used at runtime to detect if this structure has been completly filled in. */
+    int magic;
 } PORT;
 
 extern PORT *port;
@@ -190,6 +194,12 @@ extern PORT ds390_port;
 #endif
 #if !OPT_DISABLE_PIC
 extern PORT pic14_port;
+#endif
+#if !OPT_DISABLE_I186
+extern PORT i186_port;
+#endif
+#if !OPT_DISABLE_TLCS900H
+extern PORT tlcs900h_port;
 #endif
 
 /* Test to see if we are current compiling in DS390 mode. */

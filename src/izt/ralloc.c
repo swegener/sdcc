@@ -810,3 +810,11 @@ void izt_assignRegisters(eBBlock **ebbs, int count)
     // And free all registers.
     _freeAllRegs();
 }
+
+void warningStopper(void)
+{
+    // For now references all unused functions.
+    _dumpRegs();
+    _packRegisters(NULL);
+    _getSubReg(NULL, 0, 0);
+}

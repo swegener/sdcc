@@ -15,12 +15,15 @@ static REG _tlcs900h_regs[] = {
     { 0, REG_ID_NONE,"??",  0, { REG_ID_NONE, REG_ID_NONE, REG_ID_NONE } }
 };
 
+static IZT_PORT _tlcs900h_port = {
+    _tlcs900h_regs
+};
+
 static char _defaultRules[] =
 {
     //#include "peeph.rul"
 };
 
-/* list of key words used by msc51 */
 static char *_tlcs900h_keywords[] =     {
     NULL
 };
@@ -30,6 +33,7 @@ void tlcs900h_assignRegisters (eBBlock **ebbs, int count);
 static void _tlcs900h_init(void)
 {
     asm_addTree(&asm_asxxxx_mapping);
+    izt_init(&_tlcs900h_port);
 }
 
 static void _tlcs900h_reset_regparm()
@@ -170,5 +174,6 @@ PORT tlcs900h_port = {
     1,  /* transform <= to ! > */
     1,  /* transform >= to ! < */
     1,  /* transform != to !(a == b) */
-    0   /* leave == */
+    0,  /* leave == */
+    PORT_MAGIC
 };

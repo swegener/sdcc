@@ -207,6 +207,6 @@ PORT avr_port = {
     0,   /* leave ge */
     0,   /* leave !=  */
     0,   /* leave == */
-
+    PORT_MAGIC
 };
 

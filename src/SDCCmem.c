@@ -787,7 +787,7 @@ int allocVariables ( symbol *symChain )
 /*-----------------------------------------------------------------*/
 /* redoStackOffsets :- will reassign the values for stack offsets  */
 /*-----------------------------------------------------------------*/
-void redoStackOffsets ()
+void redoStackOffsets(void)
 {
     symbol *sym;
     int sPtr = 0;

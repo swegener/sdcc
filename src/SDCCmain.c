@@ -40,6 +40,7 @@
 // No unistd.h in Borland C++
 extern int access(const char *, int);
 #define X_OK 1
+
 #endif
 
 //REMOVE ME!!!
@@ -150,6 +151,12 @@ static PORT *_ports[] = {
 #if !OPT_DISABLE_PIC
     &pic14_port,
 #endif
+#if !OPT_DISABLE_I186
+   &i186_port,
+#endif
+#if !OPT_DISABLE_TLCS900H
+   &tlcs900h_port,
+#endif
 };
 
 #define NUM_PORTS (sizeof(_ports)/sizeof(_ports[0]))
@@ -175,6 +182,17 @@ static int _setPort(const char *name)
     /* Error - didnt find */
     werror(E_UNKNOWN_TARGET,name);
     exit(1);
+}
+
+static void _validatePorts(void)
+{
+    int i;
+    for (i=0; i<NUM_PORTS; i++) {
+	if (_ports[i]->magic != PORT_MAGIC) {
+	    printf("Error: port %s is incomplete.\n", _ports[i]->target);
+	    wassert(0);
+	}
+    }
 }
 
 void buildCmdLine(char *into, char **args, const char **cmds, 
@@ -1360,6 +1378,8 @@ static int preProcess (char **envp)
 
 static void _findPort(int argc, char **argv)
 {
+    _validatePorts();
+
     argc--;
     while (argc) {
 	if (!strncmp(*argv, "-m", 2)) {

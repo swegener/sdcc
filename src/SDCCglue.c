@@ -283,7 +283,8 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
          it is a global variable */
       if (sym->ival && sym->level == 0) {
 	if (SPEC_OCLS(sym->etype)==xidata) {
-	  // create a new "XINIT (CODE)" symbol, that will be emitted later
+	  /* create a new "XINIT (CODE)" symbol, that will be emitted later
+	     in the static seg */
 	  newSym=copySymbol (sym);
 	  SPEC_OCLS(newSym->etype)=xinit;
 	  SNPRINTF (newSym->name, sizeof(newSym->name), "__xinit_%s", sym->name);
@@ -620,10 +621,6 @@ printIvalType (symbol *sym, sym_link * type, initList * ilist, FILE * oFile)
 	/* if initList is deep */
 	if (ilist->type == INIT_DEEP)
 		ilist = ilist->init.deep;
-
-	if (!IS_AGGREGATE(sym->type) && getNelements(type, ilist)>1) {
-	  werror (W_EXCESS_INITIALIZERS, "scalar", sym->name, sym->lineDef);
-	}
 
 	if (!(val = list2val (ilist))) {
 	  // assuming a warning has been thrown
@@ -1089,6 +1086,8 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
 void 
 printIval (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
 {
+  value *val;
+  
   if (!ilist)
     return;
 
@@ -1102,17 +1101,39 @@ printIval (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
       return;
     }
 
-  /* if this is a pointer */
-  if (IS_PTR (type))
-    {
-      printIvalPtr (sym, type, ilist, oFile);
-      return;
-    }
-
   /* if this is an array   */
   if (IS_ARRAY (type))
     {
       printIvalArray (sym, type, ilist, oFile);
+      return;
+    }
+
+  // not an aggregate, ilist must be a node
+  if (ilist->type!=INIT_NODE &&
+      // or a 1-element list
+      ilist->init.deep->next) {
+    werror (W_EXCESS_INITIALIZERS, "scalar", 
+	    sym->name, sym->lineDef);
+  }
+
+  // and the type must match
+  val=list2val(ilist);
+  if (compareType(type, val->type)==0) {
+    // special case for literal strings
+    if (IS_ARRAY (val->type) && IS_CHAR (val->etype) &&
+	// which are really code pointers
+	IS_PTR(type) && DCL_TYPE(type)==CPOINTER) {
+      // no sweat
+    } else {
+      werror (E_TYPE_MISMATCH, "assignment", " ");
+      printFromToType(list2val(ilist)->type, type);
+    }
+  }
+
+  /* if this is a pointer */
+  if (IS_PTR (type))
+    {
+      printIvalPtr (sym, type, ilist, oFile);
       return;
     }
 

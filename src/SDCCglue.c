@@ -1800,22 +1800,25 @@ tempfileandname(char *fname, size_t len)
 
   const char *tmpdir = NULL;
   int fd;
-  static int warning_emitted;
 
   if ((tmpdir = getenv ("TMP")) == NULL)
     if ((tmpdir = getenv ("TEMP")) == NULL)
       tmpdir = getenv ("TMPDIR");
 
 #if defined(_WIN32)
-  if (tmpdir == NULL)
-    {
-      tmpdir = "c:\\";
-      if (!warning_emitted)
-        {
-          fprintf (stderr, "TMP not defined in environment, using %s for temporary files\n", tmpdir);
-	  warning_emitted = 1;
-	}
-    }
+  {
+    static int warning_emitted;
+
+    if (tmpdir == NULL)
+      {
+        tmpdir = "c:\\";
+        if (!warning_emitted)
+          {
+            fprintf (stderr, "TMP not defined in environment, using %s for temporary files\n.", tmpdir);
+	    warning_emitted = 1;
+	  }
+      }
+  }
 #else
   {
     /* try with /usr/tmp and /tmp on Un*x systems */
@@ -1826,10 +1829,6 @@ tempfileandname(char *fname, size_t len)
         tmpdir = "/usr/tmp";
       else if (stat("/tmp", &statbuf) != -1)
         tmpdir = "/tmp";
-      if (!warning_emitted)                                                                                                {
-          fprintf (stderr, "TMP not defined in environment, using %s for temporary files\n", tmpdir);
-          warning_emitted = 1;
-        }
     }
   }
 #endif

@@ -990,14 +990,16 @@ addSymChain (symbol * symHead)
 	    werror (E_EXTERN_MISMATCH, csym->name);
 	    continue;
 	  }
-	  /* delete current entry */
-	  deleteSym (SymbolTab, csym, csym->name);
-	  deleteFromSeg(csym);
 	} else {
 	  /* not extern */
-	  werror (E_DUPLICATE, sym->name);
-	  continue;
+	  if (compareType (csym->type, sym->type) != 1) {
+	    werror (E_DUPLICATE, sym->name);
+	    continue;
+	  }
 	}
+	/* delete current entry */
+	deleteSym (SymbolTab, csym, csym->name);
+	deleteFromSeg(csym);
       }
 
       /* add new entry */

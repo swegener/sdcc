@@ -1478,13 +1478,9 @@ linkEdit (char **envp)
   for (s = setFirstItem(libFilesSet); s != NULL; s = setNextItem(libFilesSet))
     fprintf (lnkfile, "-l %s\n", s);
 
-  /* put in the object files */
-  if (fullSrcFileName)
-    fprintf (lnkfile, "%s%s\n", dstFileName, port->linker.rel_ext);
-
-  fputStrSet(lnkfile, relFilesSet);
-
-  /*For the z80 and gbz80 ports, try to find where crt0.o is...*/
+  /*For the z80 and gbz80 ports, try to find where crt0.o is...
+  It is very important for this file to be first on the linking proccess
+  so the areas are set in the correct order, expecially _GSINIT*/
   if (TARGET_IS_Z80 || TARGET_IS_GBZ80) /*For the z80, gbz80*/
   {
       char crt0path[PATH_MAX];
@@ -1514,6 +1510,12 @@ linkEdit (char **envp)
       }
       if(s==NULL) fprintf (stderr, "Warning: couldn't find crt0.o\n");
   }
+
+  /* put in the object files */
+  if (fullSrcFileName)
+    fprintf (lnkfile, "%s%s\n", dstFileName, port->linker.rel_ext);
+
+  fputStrSet(lnkfile, relFilesSet);
 
   fprintf (lnkfile, "\n-e\n");
   fclose (lnkfile);

@@ -47,7 +47,8 @@ SOURCES		= _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
 		  _fsneq.c _fssub.c _gptrget.c _gptrgetc.c _gptrput.c \
 		  _sint2fs.c _iscntrl.c _isdigit.c _isgraph.c \
 		  _islower.c _isprint.c _ispunct.c _isspace.c \
-		  _isupper.c _isxdigit.c _slong2fs.c _memcmp.c \
+		  _isupper.c _isxdigit.c _itoa.c _ltoa.c \
+                  _slong2fs.c _memcmp.c \
 		  _memcpy.c _memset.c _modsint.c _modslong.c \
 		  _moduint.c _modulong.c _mulint.c _mullong.c \
 		  _ser.c _setjmp.c \

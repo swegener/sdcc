@@ -241,6 +241,7 @@ PORT mcs51_port = {
     _mcs51_genAssemblerPreamble,
     _mcs51_genIVT ,
     _mcs51_reset_regparm,
-    _mcs51_regparm
+    _mcs51_regparm,
+    NULL
 };
 

@@ -235,4 +235,10 @@ extern struct options options;
 extern int maxInterrupts;
 void parseWithComma (char **,char *) ;
 
+/** Creates a temporary file a'la tmpfile which avoids the bugs
+    in cygwin wrt c:\tmp.
+    Scans, in order: TMP, TEMP, TMPDIR, else uses tmpfile().
+*/
+FILE *tempfile(void);
+
 #endif

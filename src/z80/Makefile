@@ -2,7 +2,7 @@ PRJDIR = ../..
 
 include $(PRJDIR)/Makefile.common
 
-OBJ = gen.o ralloc.o main.o gbz80.o
+OBJ = gen.o ralloc.o main.o
 LIB = port.a
 
 CFLAGS = -ggdb -Wall
@@ -18,7 +18,6 @@ $(LIB): peeph.rul peeph-z80.rul peeph-gbz80.rul $(OBJ)
 %.rul: %.def
 	$(AWK) -f ../SDCCpeeph.awk $< > $@
 
-main.o: main.c peeph.rul peeph-z80.rul
-gbz80.o: gbz80.c peeph.rul peeph-gbz80.rul
+main.o: main.c peeph.rul peeph-z80.rul peeph-gbz80.rul
 
 include clean.mk

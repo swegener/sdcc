@@ -1,7 +1,7 @@
 # Simple Makefile for dhrystone and sdcc
 
-PROC = gbz80
-PORT = gb
+PROC = z80
+PORT = consolez80
 
 CC = /home/michaelh/projects/gbdk-support/lcc/lcc
 # -DNOENUM is here to make the results more predictable

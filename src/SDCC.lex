@@ -435,6 +435,10 @@ int process_pragma(char *s)
 	   (*s != '\n')) 
 	s++ ;    
 
+    /* First give the port a chance */
+    if (port->process_pragma && !port->process_pragma(cp))
+	return 0;
+
     /* now compare and do what needs to be done */
     if (strncmp(cp,PRAGMA_SAVE,strlen(PRAGMA_SAVE)) == 0) {
 	doPragma(P_SAVE,cp+strlen(PRAGMA_SAVE));

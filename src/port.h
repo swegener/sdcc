@@ -87,8 +87,8 @@ typedef struct {
 	int call_overhead;
 	/** Re-enterant space */
 	int reent_overhead;
-	
     } stack;
+
     struct {
 	/** One more than the smallest 
 	    mul/div operation the processor can do nativley 
@@ -132,6 +132,11 @@ typedef struct {
     /* parameter passing in register related functions */
     void (*reset_regparms)();          /* reset the register count */
     int  (*reg_parm)(struct link *);   /* will return 1 if can be passed in register */
+
+    /** Process the pragma string 'sz'.  Returns 0 if recognised and
+	processed, 1 otherwise.  May be NULL.
+    */
+    int (*process_pragma)(const char *sz);
    
 } PORT;
 

@@ -7,8 +7,9 @@
     hardware.  It allocates based on usage and how long the varible
     lives into registers or temporary memory on the stack.
 
-    On the Z80 hl, ix, iy, and a are reserved for the code generator,
-    leaving bc and de for allocation.  The extra register pressure
+    On the Z80 hl and ix and a are reserved for the code generator,
+    leaving bc and de for allocation.  iy is unusable due to currently
+    as it's only adressable as a pair.  The extra register pressure
     from reserving hl is made up for by how much easier the sub
     operations become.  You could swap hl for iy if the undocumented
     iyl/iyh instructions are available.

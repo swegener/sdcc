@@ -38,6 +38,7 @@ symbol *mainf;
 extern char *VersionString;
 extern FILE *codeOutFile;
 set *tmpfileSet = NULL; /* set of tmp file created by the compiler */
+set *tmpfileNameSet = NULL; /* All are unlinked at close. */
 /*-----------------------------------------------------------------*/
 /* closeTmpFiles - closes all tmp files created by the compiler    */
 /*                 because of BRAIN DEAD MS/DOS & CYGNUS Libraries */
@@ -49,6 +50,21 @@ DEFSETFUNC(closeTmpFiles)
     if (tfile)
 	fclose(tfile);
     
+    return 0;
+}
+
+/*-----------------------------------------------------------------*/
+/* rmTmpFiles - closes all tmp files created by the compiler    */
+/*                 because of BRAIN DEAD MS/DOS & CYGNUS Libraries */
+/*-----------------------------------------------------------------*/
+DEFSETFUNC(rmTmpFiles)
+{
+    char *name = item;
+
+    if (name) {
+	unlink(name);
+	free(name);
+    }
     return 0;
 }
 
@@ -885,14 +901,14 @@ void glue ()
 {
     FILE *vFile;
     FILE *asmFile;
-    FILE *ovrFile = tmpfile();
+    FILE *ovrFile = tempfile();
     
     addSetHead(&tmpfileSet,ovrFile);
     /* print the global struct definitions */
     if (options.debug)
 	cdbStructBlock (0,cdbFile);
 
-    vFile = tmpfile();
+    vFile = tempfile();
     /* PENDING: this isnt the best place but it will do */
     if (port->general.glue_up_main) {
 	/* create the interrupt vector table */
@@ -1092,4 +1108,31 @@ void glue ()
     
     fclose (asmFile);
     applyToSet(tmpfileSet,closeTmpFiles);
+    applyToSet(tmpfileNameSet, rmTmpFiles);
+}
+
+/** Creates a temporary file a'la tmpfile which avoids the bugs
+    in cygwin wrt c:\tmp.
+    Scans, in order: TMP, TEMP, TMPDIR, else uses tmpfile().
+*/
+FILE *tempfile(void)
+{
+    const char *tmpdir = NULL;
+    if (getenv("TMP"))
+	tmpdir = getenv("TMP");
+    else if (getenv("TEMP"))
+	tmpdir = getenv("TEMP");
+    else if (getenv("TMPDIR"))
+	tmpdir = getenv("TMPDIR");
+    if (tmpdir) {
+	char *name = tempnam(tmpdir, "sdcc");
+	if (name) {
+	    FILE *fp = fopen(name, "w+b");
+	    if (fp)
+		addSetHead(&tmpfileNameSet, name);
+	    return fp;
+	}
+	return NULL;
+    }
+    return tmpfile();
 }

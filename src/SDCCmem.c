@@ -63,7 +63,7 @@ memmap *allocMap (char rspace,     /* sfr space            */
 	map->sname = name ;
 	map->dbName = dbName ;
 	map->ptrType= ptrType;
-	if (!(map->oFile = tmpfile())) {
+	if (!(map->oFile = tempfile())) {
 		werror(E_TMPFILE_FAILED);
 		exit (1);
 	} 

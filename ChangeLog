@@ -1,3 +1,26 @@
+2004-09-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/xa51/xa_link.c,
+	* device/examples/ds390/ow390/ad26.c,
+	* device/examples/ds390/ow390/cnt1d.c,
+	* device/examples/ds390/ow390/counter.c,
+	* device/examples/ds390/ow390/ds2480.h,
+	* device/examples/ds390/ow390/ds2480ut.c,
+	* device/examples/ds390/ow390/findtype.c,
+	* device/examples/ds390/ow390/gethumd.c,
+	* device/examples/ds390/ow390/owllu.c,
+	* device/examples/ds390/ow390/ownetu.c,
+	* device/examples/ds390/ow390/swt12.c,
+	* device/examples/ds390/ow390/swtloop.c,
+	* device/examples/ds390/ow390/temp.c,
+	* device/examples/ds390/ow390/temp10.c,
+	* device/examples/ds390/ow390/thermo21.c,
+	* device/examples/ds390/ow390/tinilnk.c,
+	* device/examples/ds390/ow390/tstfind.c,
+	* device/examples/serialcomm/windows/serial.cpp,
+	* device/examples/serialcomm/windows/test_serialcomm.cpp,
+	* device/include/reg51.h: fixed line endings for cvs
+
 2004-09-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/ralloc.c (canDefAccResult, canUseAccOperand,

@@ -1,0 +1,290 @@
+#!/bin/sh
+
+AC_INIT(.version)
+AC_CONFIG_HEADER(ddconfig.h:ddconfig_in.h)
+
+AC_PROG_AWK
+
+AC_MSG_CHECKING(version of the package)
+if test -f .version; then
+  VERSION=`cat .version`
+  AC_MSG_RESULT($VERSION)
+else
+  VERSION="0.0.0"
+  AC_MSG_RESULT(unknown using 0.0.0)
+fi
+VERSIONHI=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $1}'`
+VERSIONLO=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $2}'`
+VERSIONP=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $3}'`
+AC_SUBST(VERSION)
+AC_SUBST(VERSIONHI)
+AC_SUBST(VERSIONLO)
+AC_SUBST(VERSIONP)
+AC_DEFINE_UNQUOTED(VERSIONSTR, "${VERSION}")
+AC_DEFINE_UNQUOTED(VERSIONHI, $VERSIONHI)
+AC_DEFINE_UNQUOTED(VERSIONLO, $VERSIONLO)
+AC_DEFINE_UNQUOTED(VERSIONP, $VERSIONP)
+
+
+# Required programs
+#-------------------
+AC_PROG_CXX
+AC_PROG_CXXCPP
+AC_PROG_INSTALL
+AC_PROG_RANLIB
+AC_LANG_CPLUSPLUS
+
+
+# Checking for header files.
+# ===========================================================================
+
+if test -d /stuff/include; then
+  CPPFLAGS="$CPPFLAGS -I/stuff/include"
+fi
+
+AC_HEADER_STDC
+AC_CHECK_HEADERS(getopt.h)
+AC_CHECK_HEADERS(unistd.h)
+AC_CHECK_HEADER(sys/socket.h,
+  AC_DEFINE(SOCKET_AVAIL)
+  AC_DEFINE(HAVE_SYS_SOCKET_H))
+AC_HEADER_DIRENT
+
+# This must be after CXXCPP
+
+AC_CACHE_CHECK(which header file defines FD_ macros, s51_cv_fd,
+[s51_cv_fd="unknown"
+AC_EGREP_CPP(yes, [
+#include <sys/time.h>
+#ifdef FD_ZERO
+yes
+#endif], s51_cv_fd="<sys/time.h>")
+AC_EGREP_CPP(yes, [
+#include <sys/types.h>
+#ifdef FD_ZERO
+yes
+#endif], s51_cv_fd="<sys/types.h>")
+AC_EGREP_CPP(yes, [
+#include <sys/select.h>
+#ifdef FD_ZERO
+yes
+#endif], s51_cv_fd="<sys/types.h>")])
+
+AC_DEFINE(FD_HEADER_OK, 0)
+if echo $s51_cv_fd|grep time >/dev/null 2>&1; then
+AC_DEFINE(FD_NEED_TIME_H, 1)
+AC_DEFINE(FD_HEADER_OK, 1)
+else
+AC_DEFINE(FD_NEED_TIME_H, 0)
+fi
+if echo $s51_cv_fd|grep types >/dev/null 2>&1; then
+AC_DEFINE(FD_NEED_TYPES_H, 1)
+AC_DEFINE(FD_HEADER_OK, 1)
+else
+AC_DEFINE(FD_NEED_TYPES_H, 0)
+fi
+if echo $s51_cv_fd|grep select >/dev/null 2>&1; then
+AC_DEFINE(FD_NEED_SELECT_H, 1)
+AC_DEFINE(FD_HEADER_OK, 1)
+else
+AC_DEFINE(FD_NEED_SELECT_H, 0)
+fi
+
+AC_DEFINE_UNQUOTED(HEADER_FD, ${s51_cv_fd})
+
+
+# Checking for functions/libs
+# ===========================================================================
+AC_CHECK_LIB(socket,socket)
+AC_CHECK_LIB(nsl,xdr_short)
+AC_CHECK_LIB(panel,panel_above,
+panel_ok="yes"
+curses_ok="yes"
+LIBS=$"$LIBS -lpanel -lcurses"
+,
+panel_ok="no"
+AC_CHECK_LIB(curses,nl,
+curses_ok="yes"
+LIBS="$LIBS -lcurses"
+,
+ncurses_ok="no")
+,
+-lcurses)
+AC_SUBST(panel_ok)
+AC_SUBST(curses_ok)
+
+AC_FUNC_VPRINTF
+AC_CHECK_FUNCS(vsnprintf vasprintf)
+AC_CHECK_FUNCS(strlen strcpy strcat strstr strcmp strerror strtok strdup)
+AC_CHECK_FUNCS(strchr memcpy)
+dnl AC_CHECK_FUNCS(getline)
+dnl AC_CHECK_FUNCS(getdelim)
+AC_CHECK_FUNCS(fgets)
+AC_CHECK_FUNCS(yylex)
+
+AC_CACHE_CHECK(whether scanf knows %a, s51_cv_scanf_a,
+[echo "a b" >conftest.data
+AC_TRY_RUN([
+#include <stdio.h>
+void main(void)
+{
+  FILE *f;
+  char *a;
+  int  i;
+  if ((f= fopen("conftest.data", "r")) == NULL)
+    exit(1);
+  i= fscanf(f, " %a[a-z] ", &a);
+  fclose(f);
+  if (i == 0)
+    exit(2);
+  if (i == 1)
+    exit(0);
+  exit(3);
+}],
+s51_cv_scanf_a="yes",
+s51_cv_scanf_a="no",
+s51_cv_scanf_a="unknown")
+])
+if test "$s51_cv_scanf_a" = "yes"; then
+  AC_DEFINE(SCANF_A)
+fi
+
+AC_CACHE_CHECK(whether getcwd is GNUish, s51_cv_getcwd,
+[AC_TRY_RUN([
+#include <unistd.h>
+void main(void)
+{
+  if ((getcwd(NULL, 0)) == NULL)
+    exit(1);
+  exit(0);
+}],
+s51_cv_getcwd="yes",
+s51_cv_getcwd="no",
+s51_cv_getcwd="unknown")
+])
+if test "$s51_cv_getcwd" = "yes"; then
+  AC_DEFINE(GNU_GETCWD)
+fi
+
+
+# Macro definitions
+###################
+
+# DD_COPT macro checks if the compiler specified as the 1st parameter
+# supports option specified as the 2nd parameter
+# For example: DD_CPORT(CXX, fPIC)
+
+AC_DEFUN(DD_COPT, [
+AC_CACHE_CHECK(whether $$1 accepts -$2,s51_cv_$1$2,
+cat >_test_.c <<EOF
+#include <stdio.h>
+void main(void) {}
+EOF
+$$1 -v -$2 -c _test_.c 1>&5 2>&5
+if test "$?" = "0"; then
+  s51_cv_$1$2="yes"
+else
+  s51_cv_$1$2="no"
+fi
+rm -f _test_.* a.out)
+])
+
+
+# Checking characteristics of compilers and other programs
+# --------------------------------------------------------
+AC_C_BIGENDIAN
+AC_CACHE_CHECK(whether preprocessor accepts -MM or -M,s51_cv_MM,
+echo "#include <stdio.h>" >_test_.c
+echo "" >>_test_.c
+$CXXCPP -v -MM _test_.c 1>&5 2>&5
+if test "$?" = "0"; then
+  s51_cv_MM="-MM"
+else
+  s51_cv_MM="-M"
+fi
+rm -f _test_.*)
+M_OR_MM=$s51_cv_MM
+AC_SUBST(M_OR_MM)
+
+# This is the first time when CFLAGS are set/modified!!
+
+DD_COPT(CXX, ggdb)
+if test "$s51_cv_CXXggdb" = "yes"; then
+    if test "$CXXFLAGS"x = x ;then
+	CXXFLAGS="-ggdb -O"
+    else
+	CXXFLAGS="$CXXFLAGS -ggdb"
+    fi
+fi
+
+DD_COPT(CXX, pipe)
+if test "$s51_cv_CXXpipe" = "yes"; then
+  CXXFLAGS="$CXXFLAGS -pipe"
+fi
+
+
+# Checks for typedefs, structures, and compiler characteristics.
+# ===========================================================================
+
+AC_TYPE_SIGNAL
+AC_CHECK_SIZEOF(char)
+AC_CHECK_SIZEOF(short)
+AC_CHECK_SIZEOF(int)
+AC_CHECK_SIZEOF(long)
+AC_CHECK_SIZEOF(long long)
+
+type_name()
+{
+    if expr "$ac_cv_sizeof_char" '>=' "$1" >/dev/null; then
+	echo "char"
+	exit
+    fi
+    if expr "$ac_cv_sizeof_short" '>=' "$1" >/dev/null; then
+	echo "short"
+	exit
+    fi
+    if expr "$ac_cv_sizeof_int" '>=' "$1" >/dev/null; then
+	echo "int"
+	exit
+    fi
+    if expr "$ac_cv_sizeof_long" '>=' "$1" >/dev/null; then
+	echo "long"
+	exit
+    fi
+    if expr "$ac_cv_sizeof_long_long" '>=' "$1" >/dev/null; then
+	echo "long long"
+	exit
+    fi
+    echo "long long"
+}
+
+AC_MSG_CHECKING(type name for byte)
+TYPE_BYTE=`type_name 1`
+AC_MSG_RESULT($TYPE_BYTE)
+AC_MSG_CHECKING(type name for word)
+TYPE_WORD=`type_name 2`
+AC_MSG_RESULT($TYPE_WORD)
+AC_MSG_CHECKING(type name for dword)
+TYPE_DWORD=`type_name 4`
+AC_MSG_RESULT($TYPE_DWORD)
+AC_DEFINE_UNQUOTED(TYPE_BYTE, $TYPE_BYTE)
+AC_DEFINE_UNQUOTED(TYPE_WORD, $TYPE_WORD)
+AC_DEFINE_UNQUOTED(TYPE_DWORD, $TYPE_DWORD)
+
+# Generating output files
+# ===========================================================================
+
+AC_OUTPUT(main.mk:main_in.mk
+sim.src/Makefile
+cmd.src/Makefile
+s51.src/Makefile
+avr.src/Makefile
+z80.src/Makefile
+gui.src/Makefile
+gui.src/serio.src/Makefile
+gui.src/portmon.src/Makefile
+doc/Makefile
+)
+
+
+# End of configure/configure.in

@@ -350,8 +350,8 @@ aopForSym (iCode * ic, symbol * sym, bool result)
   if (IS_FUNC (sym->type))
     {
       sym->aop = aop = newAsmop (AOP_IMMD);
-      aop->aopu.aop_immd = Safe_calloc (1, strlen (sym->rname) + 1);
-      strcpy (aop->aopu.aop_immd, sym->rname);
+      aop->aopu.aop_immd.aop_immd1 = Safe_calloc (1, strlen (sym->rname) + 1);
+      strcpy (aop->aopu.aop_immd.aop_immd1, sym->rname);
       aop->size = FPTRSIZE;
       return aop;
     }
@@ -377,6 +377,7 @@ aopForRemat (symbol * sym)
 {
   iCode *ic = sym->rematiCode;
   asmop *aop = newAsmop (AOP_IMMD);
+  int ptr_type ;
   int val = 0;
 
   for (;;)
@@ -385,8 +386,13 @@ aopForRemat (symbol * sym)
 	val += (int) operandLitValue (IC_RIGHT (ic));
       else if (ic->op == '-')
 	val -= (int) operandLitValue (IC_RIGHT (ic));
-      else
-	break;
+      else if (IS_CAST_ICODE(ic)) {
+	      sym_link *from_type = operandType(IC_RIGHT(ic));
+	      aop->aopu.aop_immd.from_cast_remat = 1;
+	      ic = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
+	      ptr_type = DCL_TYPE(from_type);
+	      continue ;
+      } else break;
 
       ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
     }
@@ -399,8 +405,15 @@ aopForRemat (symbol * sym)
   else
     strcpy (buffer, OP_SYMBOL (IC_LEFT (ic))->rname);
 
-  aop->aopu.aop_immd = Safe_calloc (1, strlen (buffer) + 1);
-  strcpy (aop->aopu.aop_immd, buffer);
+  aop->aopu.aop_immd.aop_immd1 = Safe_calloc (1, strlen (buffer) + 1);
+  strcpy (aop->aopu.aop_immd.aop_immd1, buffer);
+  /* set immd2 field if required */
+  if (aop->aopu.aop_immd.from_cast_remat) {
+	  sprintf(buffer,"#0x%02x",ptr_type);
+	  aop->aopu.aop_immd.aop_immd2 = Safe_calloc (1, strlen (buffer) + 1);
+	  strcpy (aop->aopu.aop_immd.aop_immd2, buffer);
+  }
+
   return aop;
 }
 
@@ -802,15 +815,17 @@ aopGet (asmop * aop, int offset, bool bit16, bool dname)
 
 
     case AOP_IMMD:
-      if (bit16)
-	sprintf (s, "#%s", aop->aopu.aop_immd);
+      if (aop->aopu.aop_immd.from_cast_remat && (offset == (aop->size-1))) {
+	      sprintf(s,"%s",aop->aopu.aop_immd.aop_immd2);
+      } else if (bit16)
+	sprintf (s, "#%s", aop->aopu.aop_immd.aop_immd1);
       else if (offset)
 	sprintf (s, "#(%s >> %d)",
-		 aop->aopu.aop_immd,
+		 aop->aopu.aop_immd.aop_immd1,
 		 offset * 8);
       else
 	sprintf (s, "#%s",
-		 aop->aopu.aop_immd);
+		 aop->aopu.aop_immd.aop_immd1);
       rs = Safe_calloc (1, strlen (s) + 1);
       strcpy (rs, s);
       return rs;

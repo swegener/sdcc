@@ -394,6 +394,20 @@ DEFSETFUNC (findPrevIc)
   return 0;
 }
 
+/*-------------------------------------------------------------------*/
+/* ifAssignedFromGlobal - if definition is an assignment from global */
+/*-------------------------------------------------------------------*/
+DEFSETFUNC (ifAssignedFromGlobal)
+{
+  cseDef *cdp = item;
+  iCode *dic=cdp->diCode;
+
+  if (dic->op=='=' && isOperandGlobal(IC_RIGHT(dic))) {
+    return 1;
+  }
+  return 0;
+}
+
 /*-----------------------------------------------------------------*/
 /* ifDefGlobal - if definition is global                           */
 /*-----------------------------------------------------------------*/
@@ -1317,6 +1331,10 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	  /* delete global variables from the cseSet
 	     since they can be modified by the function call */
 	  deleteItemIf (&cseSet, ifDefGlobal);
+
+	  /* and also itemps assigned from globals */
+	  deleteItemIf (&cseSet, ifAssignedFromGlobal);
+
 	  /* delete all getpointer iCodes from cseSet, this should
 	     be done only for global arrays & pointers but at this
 	     point we don't know if globals, so to be safe do all */
@@ -1474,7 +1492,6 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	  applyToSetFTrue (cseSet, findCheaperOp, IC_RIGHT (ic), &pdop);
 	  if (pdop)
 	    {
-
 	      IC_RIGHT (ic) = pdop;
 	      change = 1;
 	    }

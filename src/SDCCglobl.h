@@ -203,6 +203,7 @@ struct options
     int dump_range;		/* dump after live range analysis */
     int dump_pack;		/* dump after register packing */
     int dump_rassgn;		/* dump after register assignment */
+    int dump_tree;              /* dump front-end tree before lowering to iCode */
     int cc_only;		/* compile only flag              */
     int intlong_rent;		/* integer & long support routines reentrant */
     int float_rent;		/* floating point routines are reentrant */

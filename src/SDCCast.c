@@ -53,6 +53,7 @@ ast *createIvalCharPtr (ast *, sym_link *, ast *);
 ast *optimizeRRCRLC (ast *);
 ast *optimizeGetHbit (ast *);
 ast *backPatchLabels (ast *, symbol *, symbol *);
+void PA(ast *t);
 int inInitMode = 0;
 memmap *GcurMemmap=NULL;  /* points to the memmap that's currently active */
 FILE *codeOutFile;
@@ -4177,7 +4178,8 @@ createFunction (symbol * name, ast * body)
   ex = newAst_VALUE (symbolVal (name));		/* create name       */
   ex = newNode (FUNCTION, ex, body);
   ex->values.args = FUNC_ARGS(name->type);
-
+  ex->decorated=1;
+  if (options.dump_tree) PA(ex);
   if (fatalError)
     {
       werror (E_FUNC_NO_CODE, name->name);
@@ -4276,6 +4278,7 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 	}
 	if (tree->opval.op == BLOCK) {
 		symbol *decls = tree->values.sym;
+		INDENT(indent+4,outfile);
 		fprintf(outfile,"{\n");
 		while (decls) {
 			INDENT(indent+4,outfile);
@@ -4286,6 +4289,7 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 			decls = decls->next;			
 		}
 		ast_print(tree->right,outfile,indent+4);
+		INDENT(indent+4,outfile);
 		fprintf(outfile,"}\n");
 		return;
 	}
@@ -4845,18 +4849,17 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		/* ifx Statement              */
 		/*----------------------------*/
 	case IFX:
-		ast_print(tree->left,outfile,indent);
-		INDENT(indent,outfile);
 		fprintf(outfile,"IF (%p) \n",tree);
+		ast_print(tree->left,outfile,indent+4);
 		if (tree->trueLabel) {
 			INDENT(indent,outfile);
-			fprintf(outfile,"NE(==) 0 goto %s\n",tree->trueLabel->name);
+			fprintf(outfile,"NE(!=) 0 goto %s\n",tree->trueLabel->name);
 		}
 		if (tree->falseLabel) {
 			INDENT(indent,outfile);
 			fprintf(outfile,"EQ(==) 0 goto %s\n",tree->falseLabel->name);
 		}
-		ast_print(tree->right,outfile,indent);
+		ast_print(tree->right,outfile,indent+4);
 		return ;
 		/*------------------------------------------------------------------*/
 		/*----------------------------*/

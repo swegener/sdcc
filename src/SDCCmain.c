@@ -171,6 +171,7 @@ optionsTable[] = {
     { 0,    "--dumpliverange",      &options.dump_range, NULL },
     { 0,    "--dumpregpack",        &options.dump_pack, NULL },
     { 0,    "--dumpregassign",      &options.dump_rassgn, NULL },
+    { 0,    "--dumptree",           &options.dump_tree, NULL },
     { 0,    OPTION_DUMP_ALL,        NULL, "Dump the internal structure at all stages" },
     { 0,    OPTION_XRAM_LOC,        NULL, "<nnnn> External Ram start location" },
     { 0,    OPTION_IRAM_SIZE,       NULL, "<nnnn> Internal Ram size" },

@@ -1,3 +1,12 @@
+2003-11-19 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCcse.c (algebraicOpts): fixed bug #773153
+	* src/SDCClrange.c (rlivePoint): need to mark IC_RESULT used if POINTER_GET op
+	* src/SDCCopt.c (eBBlockFromiCode),
+	* src/SDCClrange.c (hashiCodeKeys, sequenceiCode, computeLiveRanges): seperated
+	the creation of the key hash table from the sequencing so it can be used
+	earlier (for some GCSE bug fixes still pending)
+
 2003-11-15 Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
 	* src/mcs51/gen.c (genPlus): generate shortcut for adding 0xab00

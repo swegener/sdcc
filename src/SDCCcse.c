@@ -736,13 +736,21 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
 	  return;
 	}
       /* if addition then check if one of them is a zero */
-      /* if yes turn it  into assignmnt */
+      /* if yes turn it into assignmnt or cast */
       if (IS_OP_LITERAL (IC_LEFT (ic)) &&
 	  operandLitValue (IC_LEFT (ic)) == 0.0)
 	{
-
-	  ic->op = '=';
-	  IC_LEFT (ic) = NULL;
+	  if (compareType (operandType (IC_RESULT (ic)),
+			   operandType (IC_RIGHT (ic)))<0)
+	    {
+	      ic->op = CAST;
+	      IC_LEFT (ic) = operandFromLink (operandType (IC_RESULT (ic)));
+	    }
+	  else
+            {
+	      ic->op = '=';
+	      IC_LEFT (ic) = NULL;
+            }
 	  SET_ISADDR (IC_RESULT (ic), 0);
 	  SET_ISADDR (IC_RIGHT (ic), 0);
 	  return;
@@ -750,10 +758,19 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
       if (IS_OP_LITERAL (IC_RIGHT (ic)) &&
 	  operandLitValue (IC_RIGHT (ic)) == 0.0)
 	{
-
-	  ic->op = '=';
-	  IC_RIGHT (ic) = IC_LEFT (ic);
-	  IC_LEFT (ic) = 0;
+	  if (compareType (operandType (IC_RESULT (ic)),
+			   operandType (IC_LEFT (ic)))<0)
+	    {
+	      ic->op = CAST;
+	      IC_RIGHT (ic) = IC_LEFT (ic);
+	      IC_LEFT (ic) = operandFromLink (operandType (IC_RESULT (ic)));
+	    }
+	  else
+            {
+	      ic->op = '=';
+	      IC_RIGHT (ic) = IC_LEFT (ic);
+	      IC_LEFT (ic) = NULL;
+            }
 	  SET_ISADDR (IC_RIGHT (ic), 0);
 	  SET_ISADDR (IC_RESULT (ic), 0);
 	  return;

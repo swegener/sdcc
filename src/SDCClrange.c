@@ -32,6 +32,22 @@ hTab *iCodehTab = NULL;
 hTab *iCodeSeqhTab = NULL;
 
 /*-----------------------------------------------------------------*/
+/* hashiCodeKeys - add all iCodes to the hash table                */
+/*-----------------------------------------------------------------*/
+void 
+hashiCodeKeys (eBBlock ** ebbs, int count)
+{
+  int i;
+
+  for (i = 0; i < count; i++)
+    {
+      iCode *ic;
+      for (ic = ebbs[i]->sch; ic; ic = ic->next)
+	hTabAddItem (&iCodehTab, ic->key, ic);
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* sequenceiCode - creates a sequence number for the iCode & add   */
 /*-----------------------------------------------------------------*/
 void 
@@ -48,7 +64,7 @@ sequenceiCode (eBBlock ** ebbs, int count)
 	{
 	  ic->seq = ++iCodeSeq;
 	  ic->depth = ebbs[i]->depth;
-	  hTabAddItem (&iCodehTab, ic->key, ic);
+	  //hTabAddItem (&iCodehTab, ic->key, ic);
 	  hTabAddItem (&iCodeSeqhTab, ic->seq, ic);
 	}
       ebbs[i]->lSeq = iCodeSeq;
@@ -406,6 +422,9 @@ rlivePoint (eBBlock ** ebbs, int count)
 		}
 	    }
 
+	  if (POINTER_SET(ic) && IS_SYMOP(IC_RESULT(ic)))
+	    incUsed (ic, IC_RESULT(ic));
+
 	  if (IS_ITEMP(IC_RESULT(ic)))
 	    {
 	      unvisitBlocks(ebbs, count);
@@ -613,6 +632,7 @@ computeLiveRanges (eBBlock ** ebbs, int count)
   iCodeSeq = 0;
   setToNull ((void *) &iCodehTab);
   iCodehTab = newHashTable (iCodeKey);
+  hashiCodeKeys (ebbs, count);
   setToNull ((void *) &iCodeSeqhTab);
   iCodeSeqhTab = newHashTable (iCodeKey);
   sequenceiCode (ebbs, count);

@@ -926,6 +926,12 @@ eBBlockFromiCode (iCode * ic)
   ebbs = iCodeBreakDown (ic, &count);
   saveCount = count;
 
+  /* hash the iCode keys so that we can quickly index */
+  /* them in the rest of the optimization steps */
+  setToNull ((void *) &iCodehTab);
+  iCodehTab = newHashTable (iCodeKey);
+  hashiCodeKeys (ebbs, count);
+  
   /* compute the control flow */
   computeControlFlow (ebbs, count, 0);
 

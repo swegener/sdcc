@@ -39,7 +39,7 @@ int nLinkrecs = 0;
 linkrec **linkrecs = NULL; /* all linkage editor records */
 context *currCtxt = NULL;
 short fullname = 0;
-char *ssdirl = SDCC_LIB_DIR ":" SDCC_LIB_DIR "/small" ;
+char *ssdirl = DATADIR LIB_DIR_SUFFIX ":" DATADIR LIB_DIR_SUFFIX "/small" ;
 char *simArgs[40];
 int nsimArgs = 0;
 char model_str[20];

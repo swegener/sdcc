@@ -1,3 +1,20 @@
+2003-04-12  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCutil.c (pathEquivalent): defined but not used
+	* debugger/mcs51/sdcdb.c: replace SDCC_LIB_DIR
+	* configure.in: remove sdcc_datadir, sdcc_lib_dir and sdcc_include_dir
+	* configure: rebuilt from configure.in
+	* sdccconf_in.h: remove SDCC_LIB_DIR and SDCC_INCLUDE_DIR
+	* sdcc_vc_in.h: remove SDCC_LIB_DIR and SDCC_INCLUDE_DIR
+	* device/include/Makefile.in: replace sdcc_datadir
+	* device/lib/Makefile.in: replace sdcc_datadir
+	* Makefile.common.in: add LDFLAGS from configure
+	* packihx/Makefile.in: use LDFLAGS
+	* src/Makefile.in: use LDFLAGS
+	* support/cpp2/Makefile.in: add LDFLAGS from configure
+	* support/makebin/Makefile: use LDFLAGS
+	* .version: bumped version number to 2.3.5
+
 2003-04-12  Borut Razem <borut.razem@siol.net>
 
 	* completed "different paths" task:

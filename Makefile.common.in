@@ -48,6 +48,7 @@ transform       = @program_transform_name@
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 CPPFLAGS        = $(INCLUDEFLAGS) -I. -I$(PRJDIR) -I$(SLIB)
 CFLAGS          = -Wall @CFLAGS@
+LDFLAGS         = @LDFLAGS@
 M_OR_MM         = @M_OR_MM@
 
 EXTRALIBS	= @LIBS@

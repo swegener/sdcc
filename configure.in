@@ -512,24 +512,6 @@ AC_DEFINE_UNQUOTED(STD_FP_LIB,    "libfloat")
 AC_DEFINE_UNQUOTED(STD_DS390_LIB, "libds390")
 AC_DEFINE_UNQUOTED(STD_xa51_LIB,  "xa51")
 
-### <Obsolete>
-sdcc_include_dir="\${datadir}/${include_dir_suffix}"
-AC_SUBST(sdcc_include_dir)
-AC_EXPAND(sdcc_include_dir,
-          "NONE", expanded_sdcc_include_dir)
-AC_DEFINE_UNQUOTED(SDCC_INCLUDE_DIR, "${expanded_sdcc_include_dir}")
-
-sdcc_lib_dir="\${datadir}/\${lib_dir_suffix}"
-# AC_SUBST(sdcc_lib_dir)
-AC_EXPAND(sdcc_lib_dir,
-          "NONE", expanded_sdcc_lib_dir)
-AC_DEFINE_UNQUOTED(SDCC_LIB_DIR, "${expanded_sdcc_lib_dir}")
-
-sdcc_datadir=${datadir}/sdcc
-AC_SUBST(sdcc_datadir)
-
-### </Obsolete>
-
 # environment variables
 sdcc_dir_name="SDCC_HOME"
 AC_DEFINE_UNQUOTED(SDCC_DIR_NAME, "${sdcc_dir_name}")

@@ -311,7 +311,7 @@ ac_includes_default="\
 ac_subdirs_all="$ac_subdirs_all support/cpp2"
 ac_subdirs_all="$ac_subdirs_all packihx"
 ac_subdirs_all="$ac_subdirs_all sim/ucsim"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS AWK VERSION VERSIONHI VERSIONLO VERSIONP CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB LEX LEXLIB LEX_OUTPUT_ROOT YACC AUTOCONF STRIP AS CP LYX LATEX LATEX2HTML PDFLATEX DVIPDF EGREP M_OR_MM include_dir_suffix lib_dir_suffix docdir sdcc_include_dir sdcc_datadir OPT_ENABLE_UCSIM OPT_ENABLE_DEVICE_LIB_BUILD OPT_ENABLE_PACKIHX subdirs LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS AWK VERSION VERSIONHI VERSIONLO VERSIONP CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB LEX LEXLIB LEX_OUTPUT_ROOT YACC AUTOCONF STRIP AS CP LYX LATEX LATEX2HTML PDFLATEX DVIPDF EGREP M_OR_MM include_dir_suffix lib_dir_suffix docdir OPT_ENABLE_UCSIM OPT_ENABLE_DEVICE_LIB_BUILD OPT_ENABLE_PACKIHX subdirs LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -6847,42 +6847,6 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
-### <Obsolete>
-sdcc_include_dir="\${datadir}/${include_dir_suffix}"
-
-
-  test "x$prefix" = xNONE && prefix="$ac_default_prefix"
-  test "x$exec_prefix" = xNONE && exec_prefix='${prefix}'
-  ac_expand=$sdcc_include_dir
-  test "x$ac_expand" = xNONE && ac_expand="$"NONE""
-  ac_expand=`eval echo $ac_expand`
-  expanded_sdcc_include_dir=`eval echo $ac_expand`
-
-cat >>confdefs.h <<_ACEOF
-#define SDCC_INCLUDE_DIR "${expanded_sdcc_include_dir}"
-_ACEOF
-
-
-sdcc_lib_dir="\${datadir}/\${lib_dir_suffix}"
-# AC_SUBST(sdcc_lib_dir)
-
-  test "x$prefix" = xNONE && prefix="$ac_default_prefix"
-  test "x$exec_prefix" = xNONE && exec_prefix='${prefix}'
-  ac_expand=$sdcc_lib_dir
-  test "x$ac_expand" = xNONE && ac_expand="$"NONE""
-  ac_expand=`eval echo $ac_expand`
-  expanded_sdcc_lib_dir=`eval echo $ac_expand`
-
-cat >>confdefs.h <<_ACEOF
-#define SDCC_LIB_DIR "${expanded_sdcc_lib_dir}"
-_ACEOF
-
-
-sdcc_datadir=${datadir}/sdcc
-
-
-### </Obsolete>
-
 # environment variables
 sdcc_dir_name="SDCC_HOME"
 cat >>confdefs.h <<_ACEOF
@@ -7826,8 +7790,6 @@ s,@M_OR_MM@,$M_OR_MM,;t t
 s,@include_dir_suffix@,$include_dir_suffix,;t t
 s,@lib_dir_suffix@,$lib_dir_suffix,;t t
 s,@docdir@,$docdir,;t t
-s,@sdcc_include_dir@,$sdcc_include_dir,;t t
-s,@sdcc_datadir@,$sdcc_datadir,;t t
 s,@OPT_ENABLE_UCSIM@,$OPT_ENABLE_UCSIM,;t t
 s,@OPT_ENABLE_DEVICE_LIB_BUILD@,$OPT_ENABLE_DEVICE_LIB_BUILD,;t t
 s,@OPT_ENABLE_PACKIHX@,$OPT_ENABLE_PACKIHX,;t t

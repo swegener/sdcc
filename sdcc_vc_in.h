@@ -27,10 +27,6 @@
 #define PREFIX2DATA_DIR       ""
 #define BINDIR PREFIX		  "\\bin"
 
-// Obsolete:
-#define SDCC_INCLUDE_DIR      "\\sdcc\\include"
-#define SDCC_LIB_DIR          "\\sdcc\\lib"
-
 /* environment variables */
 #define SDCC_DIR_NAME "SDCC_HOME"
 #define SDCC_INCLUDE_NAME "SDCC_INCLUDE"

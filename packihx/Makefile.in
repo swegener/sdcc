@@ -42,7 +42,7 @@ installdirs:
 dep:
 
 $(TARGET): $(OBJECTS)
-	$(CC) -o $@ $(OBJECTS)
+	$(CC) $(LDFLAGS) -o $@ $(OBJECTS)
 
 .c.o:
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@

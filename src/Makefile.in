@@ -95,7 +95,7 @@ include clean.mk
 # My rules
 # --------
 $(TARGET): $(SLIBOBJS) $(OBJECTS) $(PORT_LIBS)
-	$(CC) -o $@ $(SLIBOBJS) $(OBJECTS) $(PORT_LIBS) $(LIBDIRS) $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ $(SLIBOBJS) $(OBJECTS) $(PORT_LIBS) $(LIBDIRS) $(LIBS)
 
 .c.o:
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@

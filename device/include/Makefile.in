@@ -19,13 +19,16 @@ exec_prefix     = @exec_prefix@
 bindir          = @bindir@
 libdir          = @libdir@
 datadir         = @datadir@
-sdcc_datadir    = @sdcc_datadir@
 includedir      = @includedir@
 mandir          = @mandir@
 man1dir         = $(mandir)/man1
 man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
+
+include_dir_suffix = @include_dir_suffix@
+
+sdcc_includedir    = $(datadir)/$(include_dir_suffix)
 
 CPPFLAGS        = @CPPFLAGS@ -I$(PRJDIR)
 
@@ -37,13 +40,13 @@ all:
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(CP) -r asm *.h $(sdcc_datadir)/include/
+	$(CP) -r asm *.h $(sdcc_includedir)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -rf $(sdcc_datadir)/include
+	rm -rf $(sdcc_includedir)
 
 
 # Performing self-test
@@ -59,7 +62,7 @@ installcheck:
 # Creating installation directories
 # ---------------------------------
 installdirs:
-	[ -d $(sdcc_datadir)/include ] || mkdir -p $(sdcc_datadir)/include
+	[ -d $(sdcc_includedir) ] || mkdir -p $(sdcc_includedir)
 
 
 # Creating dependencies

@@ -8,7 +8,7 @@ include $(PRJDIR)/Makefile.common
 all: $(BIN)
 
 $(BIN): $(OBJ)
-	$(CC) -o $(BIN) $(OBJ)
+	$(CC) $(LDFLAGS) -o $(BIN) $(OBJ)
 
 install: all
 	mkdir -p $(bindir)

@@ -23,13 +23,16 @@ exec_prefix     = @exec_prefix@
 bindir          = @bindir@
 libdir          = @libdir@
 datadir         = @datadir@
-sdcc_datadir    = @sdcc_datadir@
 includedir      = @includedir@
 mandir          = @mandir@
 man1dir         = $(mandir)/man1
 man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
+
+lib_dir_suffix  = @lib_dir_suffix@
+
+sdcc_libdir     = $(datadir)/$(lib_dir_suffix)
 
 CPPFLAGS        = -I$(INCDIR)
 CFLAGS		= $(MODELFLAGS) --nostdinc --nostdlib
@@ -179,14 +182,14 @@ clean_intermediate:
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	cp -r $(BUILDDIR)/* $(sdcc_datadir)/lib
-	cp -r ds390 gbz80 z80 *.c $(sdcc_datadir)/lib/src
-	rm `find $(sdcc_datadir)/lib/src -name '*.rel' -or -name '*.dump*' -or -name '*.sym' -or -name '*.o' -or -name '*.lst' -or -name '*.asm'`
+	cp -r $(BUILDDIR)/* $(sdcc_libdir)
+	cp -r ds390 gbz80 z80 *.c $(sdcc_libdir)/src
+	rm `find $(sdcc_libdir)/src -name '*.rel' -or -name '*.dump*' -or -name '*.sym' -or -name '*.o' -or -name '*.lst' -or -name '*.asm'`
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -rf $(sdcc_datadir)/lib
+	rm -rf $(sdcc_libdir)
 
 # Performing self-test
 # --------------------
@@ -201,13 +204,13 @@ installcheck:
 # Creating installation directories
 # ---------------------------------
 installdirs:
-	[ -d $(sdcc_datadir)/lib ] || mkdir -p $(sdcc_datadir)/lib
+	[ -d $(sdcc_libdir) ] || mkdir -p $(sdcc_libdir)
 	for model in $(MODELS); do \
-	 [ -d $(sdcc_datadir)/lib/$$model ] || \
-	 mkdir -p $(sdcc_datadir)/lib/$$model; \
+	 [ -d $(sdcc_libdir)/$$model ] || \
+	 mkdir -p $(sdcc_libdir)/$$model; \
 	done
-	[ -d $(sdcc_datadir)/lib/ds390 ] || mkdir -p $(sdcc_datadir)/lib/ds390
-	mkdir -p $(sdcc_datadir)/lib/src
+	[ -d $(sdcc_libdir)/ds390 ] || mkdir -p $(sdcc_libdir)/ds390
+	mkdir -p $(sdcc_libdir)/src
 
 # Creating dependencies
 # ---------------------

@@ -25,10 +25,6 @@
 #undef PREFIX2BIN_DIR
 #undef PREFIX2DATA_DIR
 
-// Obsolete:
-#undef SDCC_INCLUDE_DIR
-#undef SDCC_LIB_DIR
-
 /* environment variables */
 #undef SDCC_DIR_NAME
 #undef SDCC_INCLUDE_NAME

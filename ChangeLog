@@ -1,3 +1,15 @@
+2003-09-16  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/mcs51/gen.c (genFunction, genEndFunction),
+	* src/ds390/gen.c (genFunction, genEndFunction): Moved save
+	and restore of EA so that stack offsets to parameters are
+	correct when using both critical and reentrant/stack-auto.
+	* src/z80/gen.c (aopOp): removed erroneous assertion about sloc
+	size (can be triggered in error if sloc is shared between
+	different sized objects)
+	* device/include/float.h: fixed macros to explicitly use
+	unsigned long where needed
+
 2003-09-15  Bernhard Held <bernhard@bernhardheld.de>
 
 	Feature req. 799831: added code to allow nesting of critical functions

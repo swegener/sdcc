@@ -41,12 +41,12 @@
 /* the following deal with IEEE single-precision numbers */
 #define EXCESS		126
 #define SIGNBIT		((unsigned long)0x80000000)
-#define HIDDEN		(unsigned long)(1 << 23)
-#define SIGN(fp)	((fp >> (8*sizeof(fp)-1)) & 1)
-#define EXP(fp)		(((fp) >> 23) & (unsigned int) 0x00FF)
+#define HIDDEN		(unsigned long)(1ul << 23)
+#define SIGN(fp)	(((unsigned long)(fp) >> (8*sizeof(fp)-1)) & 1)
+#define EXP(fp)		(((unsigned long)(fp) >> 23) & (unsigned int) 0x00FF)
 #define MANT(fp)	(((fp) & (unsigned long)0x007FFFFF) | HIDDEN)
 #define NORM            0xff000000
-#define PACK(s,e,m)	((s) | ((e) << 23) | (m))
+#define PACK(s,e,m)	((s) | ((unsigned long)(e) << 23) | (m))
 
 float __uchar2fs (unsigned char);
 float __schar2fs (signed char);

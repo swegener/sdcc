@@ -2897,13 +2897,6 @@ genFunction (iCode * ic)
   
   if (options.stack_probe) 
       emitcode ("lcall","__stack_probe");
-  /* if critical function then turn interrupts off */
-  if (IFFUNC_ISCRITICAL (ftype))
-    {
-      emitcode ("mov", "c,ea");
-      emitcode ("push", "psw"); /* save old ea via c in psw */
-      emitcode ("clr", "ea");
-    }
 
   /* here we need to generate the equates for the
      register bank if required */
@@ -3182,6 +3175,14 @@ genFunction (iCode * ic)
       emitcode ("add", "a,#!constbyte", ((char) sym->xstack & 0xff));
       emitcode ("mov", "_spx,a");
     }
+  
+  /* if critical function then turn interrupts off */
+  if (IFFUNC_ISCRITICAL (ftype))
+    {
+      emitcode ("mov", "c,ea");
+      emitcode ("push", "psw"); /* save old ea via c in psw */
+      emitcode ("clr", "ea");
+    }
 
 }
 
@@ -3201,6 +3202,12 @@ genEndFunction (iCode * ic)
       return;
   }
 
+  if (IFFUNC_ISCRITICAL (sym->type))
+    {
+      emitcode ("pop", "psw"); /* restore ea via c in psw */
+      emitcode ("mov", "ea,c");
+    }
+  
   if ((IFFUNC_ISREENT (sym->type) || options.stackAuto) &&
        (sym->stack || FUNC_HASSTACKPARM(sym->type))) {
 
@@ -3345,12 +3352,6 @@ genEndFunction (iCode * ic)
       if (!inExcludeList ("acc"))
 	emitcode ("pop", "acc");
 
-      if (IFFUNC_ISCRITICAL (sym->type))
-        {
-	  emitcode ("pop", "psw"); /* restore ea via c in psw */
-	  emitcode ("mov", "ea,c");
-        }
-
       /* if debug then send end of function */
       if (options.debug && currFunc) {
 	  _G.debugLine = 1;
@@ -3368,12 +3369,6 @@ genEndFunction (iCode * ic)
     }
   else
     {
-      if (IFFUNC_ISCRITICAL (sym->type))
-        {
-	  emitcode ("pop", "psw"); /* restore ea via c in psw */
-	  emitcode ("mov", "ea,c");
-        }
-
       if (IFFUNC_CALLEESAVES(sym->type))
 	{
 	  int i;

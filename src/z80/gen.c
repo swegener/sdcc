@@ -1039,7 +1039,6 @@ aopOp (operand * op, iCode * ic, bool result, bool requires_a)
       }
       sym->aop = op->aop = aop =
 	aopForSym (ic, sym->usl.spillLoc, result, requires_a);
-      wassertl (aop->size >= getSize (sym->type), "Operand doesn't fit in the spill location");
       aop->size = getSize (sym->type);
       return;
     }

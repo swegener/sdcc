@@ -8,10 +8,9 @@ if [ $# -lt 1 ] ; then
 fi
 
 # compile
-# ../../bin/sdcc -S -mpic14 $1.c
+
 ../../bin/sdcc -c -mpic14 -pp16f873 $1.c
-#gpasm -c  -I /usr/local/share/gpasm/header $1.asm
-#gpasm  $1.asm
+
 
 # create the executable
 

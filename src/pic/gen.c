@@ -1887,7 +1887,7 @@ static void genCpl (iCode *ic)
       emitpcode(POC_COMFW,popGet(AOP(left),offset));
     
     emitpcode(POC_MOVWF,popGet(AOP(result),offset));
-    
+    offset++;
   }
   
   

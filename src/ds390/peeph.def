@@ -1004,13 +1004,14 @@ replace {
         mov  %1,@r%2
 }
 
-replace {
-        mov  %1,%2
-        mov  %2,%1
-} by {
-        ; Peephole 177   removed redundant mov
-        mov  %1,%2
-}
+// this one will screw assignes to volatile/sfr's
+//replace {
+//        mov  %1,%2
+//        mov  %2,%1
+//} by {
+//        ; Peephole 177   removed redundant mov
+//        mov  %1,%2
+//}
 
 replace {
         mov  a,%1

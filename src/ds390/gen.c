@@ -6598,7 +6598,6 @@ AccAXRsh (char *x, int shCount)
 #endif
 
 #ifdef BETTER_LITERAL_SHIFT
-//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* AccAXRshS - right shift signed a:x known count (0..7)           */
 /*-----------------------------------------------------------------*/
@@ -6722,7 +6721,7 @@ _loadLeftIntoAx(char 	**lsb,
        char *leftByte;
        
        _startLazyDPSEvaluation();
-       if (AOP_TYPE(left) == AOP_DPTR2)
+      if (AOP_TYPE(left) == AOP_DPTR2)
        {
            // Get MSB in A.
        	   MOVA(aopGet(AOP(left), offl + MSB16, FALSE, FALSE, TRUE));
@@ -6820,11 +6819,11 @@ shiftR2Left2Result (operand * left, int offl,
   /* a:x >> shCount (x = lsb(result)) */
   if (sign)
   {
-    AccAXRshS(aopGet(AOP(result), offr, FALSE, FALSE, FALSE), shCount);
+     AccAXRshS(lsb, shCount);
   }
   else
   {
-    AccAXRsh(aopGet(AOP(result), offr, FALSE, FALSE, FALSE), shCount);
+    AccAXRsh(lsb, shCount);
   }
   
   _storeAxResults(lsb, result, offr);

@@ -990,6 +990,7 @@ addSymChain (symbol * symHead)
 	  }
 	  /* delete current entry */
 	  deleteSym (SymbolTab, csym, csym->name);
+	  deleteFromSeg(csym);
 	} else {
 	  /* not extern */
 	  werror (E_DUPLICATE, sym->name);
@@ -1772,6 +1773,7 @@ checkFunction (symbol * sym, symbol *csym)
   /* replace with this defition */
   sym->cdef = csym->cdef;
   deleteSym (SymbolTab, csym, csym->name);
+  deleteFromSeg(csym);
   addSym (SymbolTab, sym, sym->name, sym->level, sym->block, 1);
   if (IS_EXTERN (csym->etype) && !
       IS_EXTERN (sym->etype))

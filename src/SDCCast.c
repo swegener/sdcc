@@ -966,7 +966,14 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr)
 				   newAst_VALUE (valueFromLit ((float) i))),
 			       newAst_VALUE (valueFromLit (*s))));
 
-      return decorateType (resolveSymbols (rast));
+      // now we don't need iexpr's symbol anymore
+      {
+	symbol *sym=AST_SYMBOL(iexpr);
+	memmap *segment=SPEC_OCLS(sym->etype);
+	deleteSetItem(&segment->syms, sym);
+      }
+      
+      return decorateType(resolveSymbols (rast));
     }
 
   return NULL;
@@ -1224,6 +1231,10 @@ bool constExprTree (ast *cexpr) {
       }
       if (IS_AST_SYM_VALUE(cexpr) && IS_FUNC(AST_SYMBOL(cexpr)->type)) {
 	// a function's address will never change
+	return TRUE;
+      }
+      if (IS_AST_SYM_VALUE(cexpr) && IS_ARRAY(AST_SYMBOL(cexpr)->type)) {
+	// an array's address will never change
 	return TRUE;
       }
       if (IS_AST_SYM_VALUE(cexpr) && 

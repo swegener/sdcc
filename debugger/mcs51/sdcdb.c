@@ -558,17 +558,19 @@ int cmdFile (char *s,context *cctxt)
     sprintf(buffer,"%s.cdb",s);
     /* try creating the cdbfile */
     if (!(cdbFile = searchDirsFopen(buffer))) {
-  fprintf(stdout,"Cannot open file\"%s\"",buffer);
-  return 0;
+      fprintf(stdout,"Cannot open file\"%s\", no symbolic information loaded\n",buffer);
+      // return 0;
     }
 
     /* allocate for context */
     currCtxt = Safe_calloc(1,sizeof(context));
 
-    /* readin the debug information */
-    if (!readCdb (cdbFile)) {
-  fprintf(stdout,"No symbolic information found in file %s.cdb\n",s);
-  return 0;
+    if (cdbFile) {
+      /* readin the debug information */
+      if (!readCdb (cdbFile)) {
+        fprintf(stdout,"No symbolic information found in file %s.cdb\n",s);
+        //return 0;
+      }
     }
 
     /* parse and load the modules required */

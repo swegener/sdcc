@@ -22,6 +22,8 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
+#define DEBUG_CF(x) /* puts(x); */
+
 #include "common.h"
 
 int currLineno = 0;
@@ -1979,7 +1981,7 @@ searchLitOp (ast *tree, ast **parent, const char *ops)
           tree->right->right &&
           (tree->right->opval.op == ops[0] || tree->right->opval.op == ops[1]))
 	{
-	  if (IS_LITERAL (RTYPE (tree->right)) ^
+	  if (IS_LITERAL (RTYPE (tree->right)) !=
 	      IS_LITERAL (LTYPE (tree->right)))
 	    {
 	      tree->right->decorated = 0;
@@ -1996,7 +1998,7 @@ searchLitOp (ast *tree, ast **parent, const char *ops)
           tree->left->right &&
 	  (tree->left->opval.op == ops[0] || tree->left->opval.op == ops[1]))
 	{
-	  if (IS_LITERAL (RTYPE (tree->left)) ^
+	  if (IS_LITERAL (RTYPE (tree->left)) !=
 	      IS_LITERAL (LTYPE (tree->left)))
 	    {
 	      tree->left->decorated = 0;
@@ -2585,11 +2587,12 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	      ast *litTree = searchLitOp (tree, &parent, "&");
 	      if (litTree)
 		{
-	          ast *tTree = litTree->left;
+		  DEBUG_CF("&")
+		  ast *tTree = litTree->left;
 	          litTree->left = tree->right;
 	          tree->right = tTree;
 	          /* both operands in tTree are literal now */
-	          decorateType (parent, RESULT_CHECK);
+	          decorateType (parent, resultType);
 		}
 	    }
 
@@ -2712,11 +2715,12 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	  ast *litTree = searchLitOp (tree, &parent, "|");
 	  if (litTree)
 	    {
+	      DEBUG_CF("|")
 	      ast *tTree = litTree->left;
 	      litTree->left = tree->right;
 	      tree->right = tTree;
 	      /* both operands in tTree are literal now */
-	      decorateType (parent, RESULT_CHECK);
+	      decorateType (parent, resultType);
 	    }
         }
       /* fall through */
@@ -2769,11 +2773,12 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	  ast *litTree = searchLitOp (tree, &parent, "^");
 	  if (litTree)
 	    {
+	      DEBUG_CF("^")
 	      ast *tTree = litTree->left;
 	      litTree->left = tree->right;
 	      tree->right = tTree;
 	      /* both operands in litTree are literal now */
-	      decorateType (parent, RESULT_CHECK);
+	      decorateType (parent, resultType);
 	    }
         }
 
@@ -2831,11 +2836,14 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	      if (IS_LITERAL (RTYPE (litTree)))
 		{
 		  /* foo_div */
-		  litTree->right = newNode ('*', litTree->right, tree->right);
+		  DEBUG_CF("div r")
+		  litTree->right = newNode ('*',
+		                            litTree->right,
+		                            copyAst (tree->right));
 		  litTree->right->lineno = tree->lineno;
 
 		  tree->right->opval.val = constVal ("1");
-		  decorateType (parent, RESULT_CHECK);
+		  decorateType (parent, resultType);
 		}
 	      else
 		{
@@ -2843,7 +2851,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 		     We can't call decorateType(parent, RESULT_CHECK), because
 		     this would cause an infinit loop. */
 		  parent->decorated = 1;
-		  decorateType (litTree, RESULT_CHECK);
+		  decorateType (litTree, resultType);
 		}
 	    }
 	}
@@ -2983,11 +2991,12 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	  ast *litTree = searchLitOp (tree, &parent, "*");
 	  if (litTree)
 	    {
+	      DEBUG_CF("mul")
 	      ast *tTree = litTree->left;
 	      litTree->left = tree->right;
 	      tree->right = tTree;
 	      /* both operands in litTree are literal now */
-	      decorateType (parent, RESULT_CHECK);
+	      decorateType (parent, resultType);
 	    }
         }
 
@@ -3095,6 +3104,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	      if (litTree->opval.op == '+')
 	        {
 		  /* foo_aa */
+		  DEBUG_CF("+ 1 AA")
 		  ast *tTree = litTree->left;
 		  litTree->left = tree->right;
 		  tree->right = tree->left;
@@ -3104,6 +3114,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 		{
 		  if (IS_LITERAL (RTYPE (litTree)))
 		    {
+		      DEBUG_CF("+ 2 ASR")
 		      /* foo_asr */
 		      ast *tTree = litTree->left;
 		      litTree->left = tree->right;
@@ -3111,6 +3122,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 		    }
 		  else
 		    {
+		      DEBUG_CF("+ 3 ASL")
 		      /* foo_asl */
 		      ast *tTree = litTree->right;
 		      litTree->right = tree->right;
@@ -3119,7 +3131,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 		      tree->opval.op = '-';
 		    }
 		}
-	      decorateType (parent, RESULT_CHECK);
+	      decorateType (parent, resultType);
 	    }
 	}
 
@@ -3264,30 +3276,39 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	      if (litTree->opval.op == '+')
 	        {
 		  /* foo_sa */
-		  litTree->right = newNode ('-', litTree->right, tree->right);
-		  litTree->right->lineno = tree->lineno;
-
-		  tree->right->opval.val = constVal ("0");
+		  DEBUG_CF("- 1 SA")
+		  ast *tTree = litTree->left;
+		  litTree->left = litTree->right;
+		  litTree->right = tree->right;
+		  tree->right = tTree;
+		  tree->opval.op = '+';
+		  litTree->opval.op = '-';
 		}
 	      else if (litTree->opval.op == '-')
 		{
 		  if (IS_LITERAL (RTYPE (litTree)))
 		    {
 		      /* foo_ssr */
-		      litTree->right = newNode ('+', tree->right, litTree->right);
-		      litTree->right->lineno = tree->lineno;
-
-		      tree->right->opval.val = constVal ("0");
+		      DEBUG_CF("- 2 SSR")
+		      ast *tTree = litTree->left;
+		      litTree->left = tree->right;
+		      tree->right = litParent->left;
+		      litParent->left = tTree;
+		      litTree->opval.op = '+';
+		      
+		      tree->decorated = 0;
+		      decorateType (tree, resultType);
 		    }
 		  else
 		    {
 		      /* foo_ssl */
+		      DEBUG_CF("- 3 SSL")
 		      ast *tTree = litTree->right;
 		      litTree->right = tree->right;
 		      tree->right = tTree;
 		    }
 		}
-	      decorateType (litParent, RESULT_CHECK);
+	      decorateType (litParent, resultType);
 	    }
 	}
       return tree;
@@ -3616,7 +3637,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /*----------------------------*/
     case AND_OP:
     case OR_OP:
-      /* each must me arithmetic type or be a pointer */
+      /* each must be arithmetic type or be a pointer */
       if (!IS_PTR (LTYPE (tree)) &&
 	  !IS_ARRAY (LTYPE (tree)) &&
 	  !IS_INTEGRAL (LTYPE (tree)))

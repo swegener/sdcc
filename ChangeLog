@@ -1,3 +1,8 @@
+2004-03-10 Bernhard Held <bernhard AT bernhardheld.de>
+	
+	* src/SDCCast.c (decorateType): fixed with bug and promotion in
+	arithmetic optimizations, added debug output
+
 2004-03-09 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* device/lib/time.c (mktime): fixed bug reported by Bert Thomas

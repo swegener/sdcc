@@ -259,8 +259,11 @@ DEFSETFUNC (createLoop)
 {
   edge *ep = item;
   V_ARG (set **, allRegion);
+  V_ARG (eBBlock **,ebbs);
+  V_ARG (int,count);
   region *aloop = newRegion ();
   eBBlock *block;
+  int dfMin = count ,dfMax =0, i;
 
   /* make sure regionStack is empty */
   while (!STACK_EMPTY (regionStack))
@@ -279,7 +282,20 @@ DEFSETFUNC (createLoop)
     }
 
   aloop->entry = ep->to;
+  /* set max & min dfNum for loopRegion */
+  for ( block = setFirstItem(aloop->regBlocks); block; 
+	block = setNextItem(aloop->regBlocks)) {
+      if (block->dfnum > dfMax) dfMax = block->dfnum;
+      if (block->dfnum < dfMin) dfMin = block->dfnum;
+  }
 
+  /* all blocks that have dfnumbers between dfMin & dfMax are also
+     part of loop */
+  for (i = 0 ; i < count ; i++) {
+      if (ebbs[i]->dfnum > dfMin && ebbs[i]->dfnum < dfMax) {
+	      loopInsert(&aloop->regBlocks,ebbs[i]);
+      }
+  }
   /* now add it to the set */
   addSetHead (allRegion, aloop);
   return 0;
@@ -1154,7 +1170,7 @@ createLoopRegions (eBBlock ** ebbs, int count)
 
   /* for each of these back edges get the blocks that */
   /* constitute the loops                             */
-  applyToSet (bEdges, createLoop, &allRegion);
+  applyToSet (bEdges, createLoop, &allRegion, ebbs,count);
 
   /* now we will create regions from these loops               */
   /* loops with the same entry points are considered to be the */

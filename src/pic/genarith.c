@@ -786,6 +786,7 @@ void genPlus (iCode *ic)
     DEBUGpic14_emitcode(";","adding lit to something. size %d",size);
 
     genAddLit (ic,  lit);
+    goto release;
 
   } else if(AOP_TYPE(IC_RIGHT(ic)) == AOP_CRY) {
 

@@ -91,6 +91,21 @@ struct regs;
 #define PIC_C_BIT    0
 #define PIC_DC_BIT   1
 #define PIC_Z_BIT    2
+#define PIC_RP0_BIT  5   /* Register Bank select bits RP1:0 : */
+#define PIC_RP1_BIT  6   /* 00 - bank 0, 01 - bank 1, 10 - bank 2, 11 - bank 3 */
+#define PIC_IRP_BIT  7   /* Indirect register page select */
+
+/***********************************************************************
+ *  PIC INTCON bits - this will move into device dependent headers
+ ***********************************************************************/
+#define PIC_RBIF_BIT 0   /* Port B level has changed flag */
+#define PIC_INTF_BIT 1   /* Port B bit 0 interrupt on edge flag */
+#define PIC_T0IF_BIT 2   /* TMR0 has overflowed flag */
+#define PIC_RBIE_BIT 3   /* Port B level has changed - Interrupt Enable */
+#define PIC_INTE_BIT 4   /* Port B bit 0 interrupt on edge - Int Enable */
+#define PIC_T0IE_BIT 5   /* TMR0 overflow Interrupt Enable */
+#define PIC_PIE_BIT  6   /* Peripheral Interrupt Enable */
+#define PIC_GIE_BIT  7   /* Global Interrupt Enable */
 
 /***********************************************************************
  *  Operand types 
@@ -124,6 +139,7 @@ typedef enum
   PO_STATUS,         // The 'STATUS' register
   PO_FSR,            // The "file select register" (in 18c it's one of three)
   PO_INDF,           // The Indirect register
+  PO_INTCON,         // Interrupt Control register
   PO_GPR_REGISTER,   // A general purpose register
   PO_GPR_BIT,        // A bit of a general purpose register
   PO_GPR_TEMP,       // A general purpose temporary register
@@ -140,37 +156,6 @@ typedef enum
   PO_WILD            // Wild card operand in peep optimizer
 } PIC_OPTYPE;
 
-
-/*************************************************
- * pCode conditions:
- *
- * The "conditions" are bit-mapped flags that describe
- * input and/or output conditions that are affected by
- * the instructions. For example:
- *
- *    MOVF   SOME_REG,W
- *
- * This instruction depends upon 'SOME_REG'. Consequently
- * it has the input condition PCC_REGISTER set to true.
- *
- * In addition, this instruction affects the Z bit in the
- * status register and affects W. Thus the output conditions
- * are the logical or:
- *  PCC_ZERO_BIT | PCC_W
- *
- * The conditions are intialized when the pCode for an
- * instruction is created. They're subsequently used
- * by the pCode optimizer determine state information
- * in the program flow.
- *************************************************/
-
-#define  PCC_NONE          0
-#define  PCC_REGISTER      (1<<0)
-#define  PCC_C             (1<<1)
-#define  PCC_Z             (1<<2)
-#define  PCC_DC            (1<<3)
-#define  PCC_W             (1<<4)
-#define  PCC_EXAMINE_PCOP  (1<<5)
 
 /***********************************************************************
  *
@@ -216,9 +201,10 @@ typedef enum
   POC_MOVFW,
   POC_MOVLW,
   POC_MOVWF,
-  POC_NEGF,
+  POC_NOP,
   POC_RETLW,
   POC_RETURN,
+  POC_RETFIE,
   POC_RLF,
   POC_RLFW,
   POC_RRF,
@@ -241,11 +227,13 @@ typedef enum
 
 typedef enum
 {
-  PC_COMMENT=0,   // pCode is a comment
-  PC_OPCODE,      // PORT dependent opcode
-  PC_LABEL,       // assembly label
-  PC_FUNCTION,    // Function start or end
-  PC_WILD         // wildcard - an opcode place holder
+  PC_COMMENT=0,   /* pCode is a comment     */
+  PC_OPCODE,      /* PORT dependent opcode  */
+  PC_LABEL,       /* assembly label         */
+  PC_FLOW,        /* flow analysis          */
+  PC_FUNCTION,    /* Function start or end  */
+  PC_WILD         /* wildcard - an opcode place holder used 
+		   * in the pCode peep hole optimizer */
 } PC_TYPE;
 
 /************************************************/
@@ -297,7 +285,7 @@ typedef struct pCodeOp
   char *name;
   
 } pCodeOp;
-
+#if 0
 typedef struct pCodeOpBit
 {
   pCodeOp pcop;
@@ -305,12 +293,18 @@ typedef struct pCodeOpBit
   unsigned int inBitSpace: 1; /* True if in bit space, else
 				 just a bit of a register */
 } pCodeOpBit;
-
+#endif
 typedef struct pCodeOpLit
 {
   pCodeOp pcop;
   int lit;
 } pCodeOpLit;
+
+typedef struct pCodeOpImmd
+{
+  pCodeOp pcop;
+  int offset;
+} pCodeOpImmd;
 
 typedef struct pCodeOpLabel
 {
@@ -323,6 +317,7 @@ typedef struct pCodeOpReg
   pCodeOp pcop;    // Can be either GPR or SFR
   int rIdx;        // Index into the register table
   struct regs *r;
+  int instance;    // byte # of Multi-byte registers
   struct pBlock *pb;
 } pCodeOpReg;
 
@@ -331,6 +326,8 @@ typedef struct pCodeOpRegBit
   pCodeOpReg  pcor;       // The Register containing this bit
   int bit;                // 0-7 bit number.
   PIC_OPTYPE subtype;     // The type of this register.
+  unsigned int inBitSpace: 1; /* True if in bit space, else
+				 just a bit of a register */
 } pCodeOpRegBit;
 
 
@@ -352,10 +349,6 @@ typedef struct pCode
 
   int seq;             // sequence number
 
-  pBranch *from;       // pCodes that execute before this one
-  pBranch *to;         // pCodes that execute after
-  pBranch *label;      // pCode instructions that have labels
-
   struct pBlock *pb;   // The pBlock that contains this pCode.
 
   /* "virtual functions"
@@ -363,7 +356,7 @@ typedef struct pCode
    * in C++. The subsequent structures that "inherit"
    * the pCode structure will initialize these function
    * pointers to something useful */
-  void (*analyze) (struct pCode *_this);
+  //  void (*analyze) (struct pCode *_this);
   void (*destruct)(struct pCode *_this);
   void (*print)  (FILE *of,struct pCode *_this);
 
@@ -384,6 +377,39 @@ typedef struct pCodeComment
 } pCodeComment;
 
 /*************************************************
+    pCodeFlow
+
+  The Flow object is used as marker to separate 
+ the assembly code into contiguous chunks. In other
+ words, everytime an instruction cause or potentially
+ causes a branch, a Flow object will be inserted into
+ the pCode chain to mark the beginning of the next
+ contiguous chunk.
+**************************************************/
+
+typedef struct pCodeFlow
+{
+
+  pCode  pc;
+
+  pCode *end;   /* Last pCode in this flow. Note that
+		   the first pCode is pc.next */
+
+  set **uses;   /* map the pCode instruction inCond and outCond conditions 
+		 * in this array of set's. The reason we allocate an 
+		 * array of pointers instead of declaring each type of 
+		 * usage is because there are port dependent usage definitions */
+  int nuses;    /* number of uses sets */
+
+  set *from;    /* flow blocks that can send control to this flow block */
+  set *to;      /* flow blocks to which this one can send control */
+
+  int inCond;   /* Input conditions - stuff assumed defined at entry */
+  int outCond;  /* Output conditions - stuff modified by flow block */
+
+} pCodeFlow;
+
+/*************************************************
     pCodeInstruction
 
     Here we describe all the facets of a PIC instruction
@@ -400,11 +426,19 @@ typedef struct pCodeInstruction
 
   char const * const mnemonic;       // Pointer to mnemonic string
 
-  pCodeOp *pcop;        // Operand
+  pBranch *from;       // pCodes that execute before this one
+  pBranch *to;         // pCodes that execute after
+  pBranch *label;      // pCode instructions that have labels
 
-  unsigned int num_ops;
-  unsigned int dest:     1;       // If destination is W or F, then 1==F
-  unsigned int bit_inst: 1;
+  pCodeOp *pcop;              /* Operand, if this instruction has one */
+
+  pCodeFlow *pcflow;   /* flow block to which this instruction belongs */
+
+  unsigned int num_ops;        /* Number of operands (0,1,2 for mid range pics) */
+  unsigned int isModReg:  1;   /* If destination is W or F, then 1==F */
+  unsigned int isBitInst: 1;   /* e.g. BCF */
+  unsigned int isBranch:  1;   /* True if this is a branching instruction */
+  unsigned int isSkip:    1;   /* True if this is a skip instruction */
 
   unsigned int inCond;   // Input conditions for this instruction
   unsigned int outCond;  // Output conditions for this instruction
@@ -441,6 +475,10 @@ typedef struct pCodeFunction
 		      start and the name is contained
 		      here */
 
+  pBranch *from;       // pCodes that execute before this one
+  pBranch *to;         // pCodes that execute after
+  pBranch *label;      // pCode instructions that have labels
+
 } pCodeFunction;
 
 
@@ -451,7 +489,7 @@ typedef struct pCodeFunction
 typedef struct pCodeWild
 {
 
-  pCode  pc;
+  pCodeInstruction  pci;
 
   int    id;     /* Index into the wild card array of a peepBlock 
 		  * - this wild card will get expanded into that pCode
@@ -487,7 +525,7 @@ typedef struct pBlock
   set *function_entries;    /* dll of functions in this pblock */
   set *function_exits;
   set *function_calls;
-  set *registers;
+  set *tregisters;
 
   unsigned visited:1;       /* set true if traversed in call tree */
 
@@ -579,11 +617,13 @@ typedef struct pCodeOpWild
 #define PCI(x)    ((pCodeInstruction *)(x))
 #define PCL(x)    ((pCodeLabel *)(x))
 #define PCF(x)    ((pCodeFunction *)(x))
+#define PCFL(x)    ((pCodeFlow *)(x))
 #define PCW(x)    ((pCodeWild *)(x))
 
 #define PCOP(x)   ((pCodeOp *)(x))
-#define PCOB(x)   ((pCodeOpBit *)(x))
+//#define PCOB(x)   ((pCodeOpBit *)(x))
 #define PCOL(x)   ((pCodeOpLit *)(x))
+#define PCOI(x)   ((pCodeOpImmd *)(x))
 #define PCOLAB(x) ((pCodeOpLabel *)(x))
 #define PCOR(x)   ((pCodeOpReg *)(x))
 #define PCORB(x)  ((pCodeOpRegBit *)(x))
@@ -598,8 +638,7 @@ typedef struct pCodeOpWild
 pCode *newpCode (PIC_OPCODE op, pCodeOp *pcop); // Create a new pCode given an operand
 pCode *newpCodeCharP(char *cP);              // Create a new pCode given a char *
 pCode *newpCodeFunction(char *g, char *f);   // Create a new function
-pCode *newpCodeLabel(int key);               // Create a new label given a key
-pCode *newpCodeLabelStr(char *str);          // Create a new label given a string
+pCode *newpCodeLabel(char *name,int key);    // Create a new label given a key
 pBlock *newpCodeChain(memmap *cm,char c, pCode *pc); // Create a new pBlock
 void printpBlock(FILE *of, pBlock *pb);      // Write a pBlock to a file
 void printpCode(FILE *of, pCode *pc);        // Write a pCode to a file
@@ -611,10 +650,13 @@ void AnalyzepCode(char dbName);
 void OptimizepCode(char dbName);
 void printCallTree(FILE *of);
 void pCodePeepInit(void);
+void pBlockConvert2ISR(pBlock *pb);
 
-pCodeOp *newpCodeOpLabel(int key);
+pCodeOp *newpCodeOpLabel(char *name, int key);
+pCodeOp *newpCodeOpImmd(char *name, int offset);
 pCodeOp *newpCodeOpLit(int lit);
 pCodeOp *newpCodeOpBit(char *name, int bit,int inBitSpace);
+pCodeOp *newpCodeOpRegFromStr(char *name);
 pCodeOp *newpCodeOp(char *name, PIC_OPTYPE p);
 extern void pcode_test(void);
 
@@ -623,31 +665,14 @@ extern void pcode_test(void);
  *-----------------------------------------------------------------*/
 
 extern pCodeOpReg pc_status;
+extern pCodeOpReg pc_intcon;
 extern pCodeOpReg pc_indf;
 extern pCodeOpReg pc_fsr;
 extern pCodeOpReg pc_pcl;
 extern pCodeOpReg pc_pclath;
 extern pCodeOpReg pc_kzero;
+extern pCodeOpReg pc_wsave;     /* wsave and ssave are used to save W and the Status */
+extern pCodeOpReg pc_ssave;     /* registers during an interrupt */
 
-
-////////////////////   DELETE THIS ///////////////////
-/*-----------------------------------------------------------------*/
-/* Allocation macros that replace those in SDCCalloc.h             */
-/*   Why? I dunno. I ran across a bug with those macros that       */
-/*   I couldn't fix, but I could work around...                    */
-/*-----------------------------------------------------------------*/
-# define GC_malloc(x) calloc((x), 1)
-
-#define  _ALLOC(x,sz) if (!(x = calloc((sz),1) ))      \
-         {                                          \
-            werror(E_OUT_OF_MEM,__FILE__,(long) sz);\
-            exit (1);                               \
-         }
-
-#define _ALLOC_ATOMIC(x,y) if (!((x) = malloc(y)))   \
-         {                                               \
-            werror(E_OUT_OF_MEM,__FILE__,(long) y);     \
-            exit (1);                                    \
-         }
 
 #endif // __PCODE_H__

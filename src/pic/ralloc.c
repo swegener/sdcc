@@ -29,6 +29,12 @@
 #include "pcode.h"
 #include "gen.h"
 
+#if defined(__BORLANDC__) || defined(_MSC_VER)
+#define STRCASECMP stricmp
+#else
+#define STRCASECMP strcasecmp
+#endif
+
 /*-----------------------------------------------------------------*/
 /* At this point we start getting processor specific although      */
 /* some routines are non-processor specific & can be reused when   */
@@ -57,95 +63,27 @@ _G;
 /* Shared with gen.c */
 int pic14_ptrRegReq;		/* one byte pointer register required */
 
-/* pic14 registers */
-/* A nasty, awful, disgusting hack for register declarations */
-#ifdef p16c84
 
-regs regspic14[] =
-{
+static set *dynAllocRegs=NULL;
+static set *dynStackRegs=NULL;
+static set *dynProcessorRegs=NULL;
+static set *dynDirectRegs=NULL;
+static set *dynDirectBitRegs=NULL;
+static set *dynInternalRegs=NULL;
 
-  {REG_GPR, PO_GPR_TEMP, 0x0C, "r0x0C", "r0x0C", 0x0C, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x0D, "r0x0D", "r0x0C", 0x0D, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x0E, "r0x0E", "r0x0C", 0x0E, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x0F, "r0x0F", "r0x0C", 0x0F, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x10, "r0x10", "r0x10", 0x10, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x11, "r0x11", "r0x11", 0x11, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x12, "r0x12", "r0x12", 0x12, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x13, "r0x13", "r0x13", 0x13, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x14, "r0x14", "r0x14", 0x14, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x15, "r0x15", "r0x15", 0x15, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x16, "r0x16", "r0x16", 0x16, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x17, "r0x17", "r0x17", 0x17, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x18, "r0x18", "r0x18", 0x18, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x19, "r0x19", "r0x19", 0x19, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x1A, "r0x1A", "r0x1A", 0x1A, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x1B, "r0x1B", "r0x1B", 0x1B, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x1C, "r0x1C", "r0x1C", 0x1C, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x1D, "r0x1D", "r0x1D", 0x1D, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x1E, "r0x1E", "r0x1E", 0x1E, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x1F, "r0x1F", "r0x1F", 0x1F, 1, 0},
-  {REG_PTR, PO_FSR, 4, "FSR", "FSR", 4, 1, 0},
+static hTab  *dynDirectRegNames= NULL;
 
-};
-#else
+static int dynrIdx=0x20;
+static int rDirectIdx=0;
 
-int Gstack_base_addr=0x38; /* The starting address of registers that
-			    * are used to pass and return parameters */
-regs regspic14[] =
-{
-  {REG_GPR, PO_GPR_TEMP, 0x20, "r0x20", "r0x20", 0x20, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x21, "r0x21", "r0x21", 0x21, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x22, "r0x22", "r0x22", 0x22, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x23, "r0x23", "r0x23", 0x23, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x24, "r0x24", "r0x24", 0x24, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x25, "r0x25", "r0x25", 0x25, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x26, "r0x26", "r0x26", 0x26, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x27, "r0x27", "r0x27", 0x27, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x28, "r0x28", "r0x28", 0x28, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x29, "r0x29", "r0x29", 0x29, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x2A, "r0x2A", "r0x2A", 0x2A, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x2B, "r0x2B", "r0x2B", 0x2B, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x2C, "r0x2C", "r0x2C", 0x2C, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x2D, "r0x2D", "r0x2D", 0x2D, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x2E, "r0x2E", "r0x2E", 0x2E, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x2F, "r0x2F", "r0x2F", 0x2F, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x30, "r0x30", "r0x30", 0x30, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x31, "r0x31", "r0x31", 0x31, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x32, "r0x32", "r0x32", 0x32, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x33, "r0x33", "r0x33", 0x33, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x34, "r0x34", "r0x34", 0x34, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x35, "r0x35", "r0x35", 0x35, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x36, "r0x36", "r0x36", 0x36, 1, 0},
-  {REG_GPR, PO_GPR_TEMP, 0x37, "r0x37", "r0x37", 0x37, 1, 0},
-  {REG_STK, PO_GPR_TEMP, 0x38, "r0x38", "r0x38", 0x38, 1, 0},
-  {REG_STK, PO_GPR_TEMP, 0x39, "r0x39", "r0x39", 0x39, 1, 0},
-  {REG_STK, PO_GPR_TEMP, 0x3A, "r0x3A", "r0x3A", 0x3A, 1, 0},
-  {REG_STK, PO_GPR_TEMP, 0x3B, "r0x3B", "r0x3B", 0x3B, 1, 0},
-  {REG_STK, PO_GPR_TEMP, 0x3C, "r0x3C", "r0x3C", 0x3C, 1, 0},
-  {REG_STK, PO_GPR_TEMP, 0x3D, "r0x3D", "r0x3D", 0x3D, 1, 0},
-  {REG_STK, PO_GPR_TEMP, 0x3E, "r0x3E", "r0x3E", 0x3E, 1, 0},
-  {REG_STK, PO_GPR_TEMP, 0x3F, "r0x3F", "r0x3F", 0x3F, 1, 0},
-  {REG_STK, PO_GPR_TEMP, 0x40, "r0x40", "r0x40", 0x40, 1, 0},
-  {REG_STK, PO_GPR_TEMP, 0x41, "r0x41", "r0x41", 0x41, 1, 0},
-  {REG_STK, PO_GPR_TEMP, 0x42, "r0x42", "r0x42", 0x42, 1, 0},
-  {REG_STK, PO_GPR_TEMP, 0x43, "r0x43", "r0x43", 0x43, 1, 0},
-  {REG_STK, PO_GPR_TEMP, 0x44, "r0x44", "r0x44", 0x44, 1, 0},
-  {REG_STK, PO_GPR_TEMP, 0x45, "r0x45", "r0x45", 0x45, 1, 0},
-  {REG_STK, PO_GPR_TEMP, 0x46, "r0x46", "r0x46", 0x46, 1, 0},
-  {REG_STK, PO_GPR_TEMP, 0x47, "r0x47", "r0x47", 0x47, 1, 0},
+int pic14_nRegs = 128;   // = sizeof (regspic14) / sizeof (regs);
 
-  {REG_SFR, PO_GPR_REGISTER, IDX_KZ,    "KZ",  "KZ",   IDX_KZ,   1, 0}, /* Known zero */
+int Gstack_base_addr=0; /* The starting address of registers that
+			 * are used to pass and return parameters */
 
 
-  {REG_STK, PO_FSR,      IDX_FSR,  "FSR",  "FSR",  IDX_FSR,  1, 0},
-  {REG_STK, PO_INDF,     IDX_INDF, "INDF", "INDF", IDX_INDF, 1, 0},
 
 
-};
-
-#endif
-
-int pic14_nRegs = sizeof (regspic14) / sizeof (regs);
 static void spillThis (symbol *);
 static int debug = 1;
 static FILE *debugF = NULL;
@@ -473,107 +411,400 @@ debugLogRegType (short type)
 }
 
 /*-----------------------------------------------------------------*/
+/* newReg - allocate and init memory for a new register            */
+/*-----------------------------------------------------------------*/
+static regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alias)
+{
+
+  regs *dReg;
+
+  dReg = Safe_calloc(1,sizeof(regs));
+  dReg->type = type;
+  dReg->pc_type = pc_type;
+  dReg->rIdx = rIdx;
+  if(name) 
+    dReg->name = Safe_strdup(name);
+  else {
+    sprintf(buffer,"r0x%02X", dReg->rIdx);
+    if(type == REG_STK)
+      *buffer = 's';
+    dReg->name = Safe_strdup(buffer);
+  }
+  //fprintf(stderr,"newReg: %s\n",dReg->name);
+  dReg->isFree = 0;
+  dReg->wasUsed = 1;
+  dReg->isFixed = 0;
+  dReg->isMapped = 0;
+  dReg->isEmitted = 0;
+  dReg->address = 0;
+  dReg->size = size;
+  dReg->alias = alias;
+  dReg->reg_alias = NULL;
+
+  return dReg;
+}
+
+/*-----------------------------------------------------------------*/
+/* regWithIdx - Search through a set of registers that matches idx */
+/*-----------------------------------------------------------------*/
+static regs *
+regWithIdx (set *dRegs, int idx, int fixed)
+{
+  regs *dReg;
+
+  for (dReg = setFirstItem(dRegs) ; dReg ; 
+       dReg = setNextItem(dRegs)) {
+
+    if(idx == dReg->rIdx && (fixed == dReg->isFixed)) {
+      return dReg;
+    }
+  }
+
+  return NULL;
+}
+
+/*-----------------------------------------------------------------*/
+/* regFindFree - Search for a free register in a set of registers  */
+/*-----------------------------------------------------------------*/
+static regs *
+regFindFree (set *dRegs)
+{
+  regs *dReg;
+
+  for (dReg = setFirstItem(dRegs) ; dReg ; 
+       dReg = setNextItem(dRegs)) {
+
+    if(dReg->isFree)
+      return dReg;
+  }
+
+  return NULL;
+}
+/*-----------------------------------------------------------------*/
+/* initStack - allocate registers for a psuedo stack               */
+/*-----------------------------------------------------------------*/
+void initStack(int base_address, int size)
+{
+
+  int i;
+
+  Gstack_base_addr = base_address;
+  for(i = 0; i<size; i++)
+    addSet(&dynStackRegs,newReg(REG_STK, PO_GPR_TEMP,base_address++,NULL,1,0));
+}
+
+regs *
+allocProcessorRegister(int rIdx, char * name, short po_type, int alias)
+{
+  return addSet(&dynProcessorRegs,newReg(REG_SFR, po_type, rIdx, name,1,alias));
+}
+
+regs *
+allocInternalRegister(int rIdx, char * name, short po_type, int alias)
+{
+  regs * reg = newReg(REG_SFR, po_type, rIdx, name,1,alias);
+
+  if(reg) {
+    reg->wasUsed = 0;
+    return addSet(&dynInternalRegs,reg);
+  }
+
+  return NULL;
+}
+/*-----------------------------------------------------------------*/
 /* allocReg - allocates register of given type                     */
 /*-----------------------------------------------------------------*/
 static regs *
 allocReg (short type)
 {
-  int i;
 
   debugLog ("%s of type %s\n", __FUNCTION__, debugLogRegType (type));
 
-  for (i = 0; i < pic14_nRegs; i++)
-    {
 
-      /* if type is given as 0 then any
-         free register will do */
-      if (!type &&
-	  regspic14[i].isFree)
-	{
-	  regspic14[i].isFree = 0;
-	  regspic14[i].wasUsed = 1;
-	  if (currFunc)
-	    currFunc->regsUsed =
-	      bitVectSetBit (currFunc->regsUsed, i);
-	  debugLog ("  returning %s\n", regspic14[i].name);
-	  return &regspic14[i];
-	}
-      /* other wise look for specific type
-         of register */
-      if (regspic14[i].isFree &&
-	  regspic14[i].type == type)
-	{
-	  regspic14[i].isFree = 0;
-	  regspic14[i].wasUsed = 1;
-	  if (currFunc)
-	    currFunc->regsUsed =
-	      bitVectSetBit (currFunc->regsUsed, i);
-	  debugLog ("  returning %s\n", regspic14[i].name);
-	  return &regspic14[i];
-	}
+  return addSet(&dynAllocRegs,newReg(REG_GPR, PO_GPR_TEMP,dynrIdx++,NULL,1,0));
+
+}
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+static int regname2key(char const *name)
+{
+  int key = 0;
+
+  if(!name)
+    return 0;
+
+  while(*name) {
+
+    key += (*name++) + 1;
+
+  }
+
+  return ( (key + (key >> 4) + (key>>8)) & 0x3f);
+
+}
+
+/*-----------------------------------------------------------------*/
+/* dirregWithName - search for register by name                    */
+/*-----------------------------------------------------------------*/
+regs *
+dirregWithName (char *name )
+{
+  int hkey;
+  regs *reg;
+
+  if(!name)
+    return NULL;
+
+  /* hash the name to get a key */
+
+  hkey = regname2key(name);
+
+  reg = hTabFirstItemWK(dynDirectRegNames, hkey);
+
+  while(reg) {
+
+    if(STRCASECMP(reg->name, name) == 0) {
+      return(reg);
     }
+
+    reg = hTabNextItemWK (dynDirectRegNames);
+  
+  }
+
+  return NULL; // name wasn't found in the hash table
+}
+
+/*-----------------------------------------------------------------*/
+/* allocDirReg - allocates register of given type                  */
+/*-----------------------------------------------------------------*/
+regs *
+allocDirReg (operand *op )
+{
+
+  regs *reg;
+  char *name;
+
+  if(!IS_SYMOP(op)) {
+    debugLog ("%s BAD, op is NULL\n", __FUNCTION__);
+    return NULL;
+  }
+
+  name = OP_SYMBOL (op)->rname[0] ? OP_SYMBOL (op)->rname : OP_SYMBOL (op)->name;
+
+  /* If the symbol is at a fixed address, then remove the leading underscore
+   * from the name. This is hack to allow the .asm include file named registers
+   * to match the .c declared register names */
+
+  //if (SPEC_ABSA ( OP_SYM_ETYPE(op)) && (*name == '_'))
+  //name++;
+
+  debugLog ("%s symbol name %s\n", __FUNCTION__,name);
+  {
+    if(SPEC_CONST ( OP_SYM_ETYPE(op)) && (IS_CHAR ( OP_SYM_ETYPE(op)) )) {
+      debugLog(" %d  const char\n",__LINE__);
+      debugLog(" value = %s \n",SPEC_CVAL( OP_SYM_ETYPE(op)));
+    }
+
+    debugLog("  %d  storage class %d \n",__LINE__,SPEC_SCLS( OP_SYM_ETYPE(op)));
+    if (IS_CODE ( OP_SYM_ETYPE(op)) )
+      debugLog(" %d  code space\n",__LINE__);
+
+    if (IS_INTEGRAL ( OP_SYM_ETYPE(op)) )
+      debugLog(" %d  integral\n",__LINE__);
+    if (IS_LITERAL ( OP_SYM_ETYPE(op)) )
+      debugLog(" %d  literal\n",__LINE__);
+    if (IS_SPEC ( OP_SYM_ETYPE(op)) )
+      debugLog(" %d  specifier\n",__LINE__);
+    debugAopGet(NULL, op);
+  }
+
+  if (IS_CODE ( OP_SYM_ETYPE(op)) )
+    return NULL;
+
+  /* First, search the hash table to see if there is a register with this name */
+  reg = dirregWithName(name);
+
+  if(!reg) {
+
+    /* Register wasn't found in hash, so let's create
+     * a new one and put it in the hash table AND in the 
+     * dynDirectRegNames set */
+
+    reg = newReg(REG_GPR, PO_DIR, rDirectIdx++, name,getSize (OP_SYMBOL (op)->type),0 );
+    debugLog ("  -- added %s to hash, size = %d\n", name,reg->size);
+
+    if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
+      reg->isFixed = 1;
+      reg->address = SPEC_ADDR ( OP_SYM_ETYPE(op));
+      debugLog ("  -- and it is at a fixed address 0x%02x\n",reg->address);
+    }
+
+    hTabAddItem(&dynDirectRegNames, regname2key(name), reg);
+    if (IS_BITVAR (OP_SYM_ETYPE(op)))
+      addSet(&dynDirectBitRegs, reg);
+    else
+      addSet(&dynDirectRegs, reg);
+  }
+
+  return reg;
+}
+
+/*-----------------------------------------------------------------*/
+/* allocDirReg - allocates register of given type                  */
+/*-----------------------------------------------------------------*/
+regs *
+allocRegByName (char *name )
+{
+
+  regs *reg;
+
+  if(!name) {
+    fprintf(stderr, "%s - allocating a NULL register\n",__FUNCTION__);
+    exit(1);
+  }
+
+  debugLog ("%s symbol name %s\n", __FUNCTION__,name);
+
+  /* First, search the hash table to see if there is a register with this name */
+  reg = dirregWithName(name);
+
+  if(!reg) {
+
+    /* Register wasn't found in hash, so let's create
+     * a new one and put it in the hash table AND in the 
+     * dynDirectRegNames set */
+
+    reg = newReg(REG_GPR, PO_DIR, rDirectIdx++, name,1,0 );
+
+    debugLog ("  -- added %s to hash, size = %d\n", name,reg->size);
+
+    hTabAddItem(&dynDirectRegNames, regname2key(name), reg);
+    addSet(&dynDirectRegs, reg);
+  }
+
+  return reg;
+}
+
+/*-----------------------------------------------------------------*/
+/* RegWithIdx - returns pointer to register with index number       */
+/*-----------------------------------------------------------------*/
+static regs *
+typeRegWithIdx (int idx, int type, int fixed)
+{
+
+  regs *dReg;
+
+  debugLog ("%s - requesting index = 0x%x\n", __FUNCTION__,idx);
+
+  if( (dReg = regWithIdx ( dynAllocRegs, idx, fixed)) != NULL) {
+
+    debugLog ("Found a Dynamic Register!\n");
+    return dReg;
+  }
+
+  if( (dReg = regWithIdx ( dynStackRegs, idx, fixed)) != NULL ) {
+    debugLog ("Found a Stack Register!\n");
+    return dReg;
+  }
+
+  if( (dReg = regWithIdx ( dynDirectRegs, idx, fixed)) != NULL ) {
+    debugLog ("Found a Direct Register!\n");
+    return dReg;
+  }
+
+  if( (dReg = regWithIdx ( dynProcessorRegs, idx, fixed)) != NULL ) {
+    debugLog ("Found a Processor Register!\n");
+    return dReg;
+  }
+/*
+  if( (dReg = regWithIdx ( dynDirectBitRegs, idx, fixed)) != NULL ) {
+    debugLog ("Found a bit Register!\n");
+    return dReg;
+  }
+*/
+/*
+  fprintf(stderr,"%s %d - requested register: 0x%x\n",__FUNCTION__,__LINE__,idx);
+  werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+	  "regWithIdx not found");
+  exit (1);
+*/
   return NULL;
 }
 
 /*-----------------------------------------------------------------*/
-/* pic14_regWithIdx - returns pointer to register wit index number       */
+/* pic14_regWithIdx - returns pointer to register with index number*/
 /*-----------------------------------------------------------------*/
 regs *
 pic14_regWithIdx (int idx)
 {
-  int i;
 
-  debugLog ("%s - requesting index = 0x%x\n", __FUNCTION__,idx);
-
-  for (i = 0; i < pic14_nRegs; i++)
-    if (regspic14[i].rIdx == idx)
-      return &regspic14[i];
-
-  //return &regspic14[0];
-  fprintf(stderr,"%s %d - requested register: 0x%x\n",__FUNCTION__,__LINE__,idx);
-  werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-	  "regWithIdx not found");
-  exit (1);
+  return typeRegWithIdx(idx,-1,0);
 }
 
 /*-----------------------------------------------------------------*/
-/* pic14_regWithIdx - returns pointer to register wit index number       */
+/* pic14_regWithIdx - returns pointer to register with index number       */
 /*-----------------------------------------------------------------*/
 regs *
 pic14_allocWithIdx (int idx)
 {
-  int i;
+
+  regs *dReg;
 
   debugLog ("%s - allocating with index = 0x%x\n", __FUNCTION__,idx);
 
-  for (i = 0; i < pic14_nRegs; i++)
-    if (regspic14[i].rIdx == idx){
-      debugLog ("%s - alloc fount index = 0x%x\n", __FUNCTION__,idx);
-      regspic14[i].wasUsed = 1;
-      regspic14[i].isFree = 0;
-      return &regspic14[i];
-    }
-  //return &regspic14[0];
-  fprintf(stderr,"%s %d - requested register: 0x%x\n",__FUNCTION__,__LINE__,idx);
-  werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-	  "regWithIdx not found");
-  exit (1);
+  if( (dReg = regWithIdx ( dynAllocRegs, idx,0)) != NULL) {
+
+    debugLog ("Found a Dynamic Register!\n");
+  } else if( (dReg = regWithIdx ( dynStackRegs, idx,0)) != NULL ) {
+    debugLog ("Found a Stack Register!\n");
+  } else if( (dReg = regWithIdx ( dynProcessorRegs, idx,0)) != NULL ) {
+    debugLog ("Found a Processor Register!\n");
+  } else {
+    
+    debugLog ("Dynamic Register not found\n");
+
+
+    fprintf(stderr,"%s %d - requested register: 0x%x\n",__FUNCTION__,__LINE__,idx);
+    werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+	    "regWithIdx not found");
+    exit (1);
+
+  }
+
+  dReg->wasUsed = 1;
+  dReg->isFree = 0;
+
+  return dReg;
 }
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 regs *
 pic14_findFreeReg(short type)
 {
-  int i;
+  //  int i;
+  regs* dReg;
 
-  for (i = 0; i < pic14_nRegs; i++) {
-    if (!type && regspic14[i].isFree)
-      return &regspic14[i];
-    if (regspic14[i].isFree &&
-	regspic14[i].type == type)
-      return &regspic14[i];
+  switch (type) {
+  case REG_GPR:
+    if((dReg = regFindFree(dynAllocRegs)) != NULL)
+      return dReg;
+
+    return addSet(&dynAllocRegs,newReg(REG_GPR, PO_GPR_TEMP,dynrIdx++,NULL,0,0));
+
+  case REG_STK:
+
+    if((dReg = regFindFree(dynStackRegs)) != NULL)
+      return dReg;
+
+    return NULL;
+
+  case REG_PTR:
+  case REG_CND:
+  case REG_SFR:
+  default:
+    return NULL;
   }
-  return NULL;
 }
 /*-----------------------------------------------------------------*/
 /* freeReg - frees a register                                      */
@@ -592,6 +823,11 @@ freeReg (regs * reg)
 static int
 nFreeRegs (int type)
 {
+  /* dynamically allocate as many as we need and worry about
+   * fitting them into a PIC later */
+
+  return 100;
+#if 0
   int i;
   int nfr = 0;
 
@@ -600,6 +836,7 @@ nFreeRegs (int type)
     if (regspic14[i].isFree && regspic14[i].type == type)
       nfr++;
   return nfr;
+#endif
 }
 
 /*-----------------------------------------------------------------*/
@@ -619,6 +856,186 @@ nfreeRegsType (int type)
   return nFreeRegs (type);
 }
 
+//<<<<<<< ralloc.c
+void writeSetUsedRegs(FILE *of, set *dRegs)
+{
+
+  regs *dReg;
+
+  for (dReg = setFirstItem(dRegs) ; dReg ; 
+       dReg = setNextItem(dRegs)) {
+
+    if(dReg->wasUsed)
+      fprintf (of, "\t%s\n",dReg->name);
+  }
+
+}
+extern void assignFixedRegisters(set *regset);
+extern void assignRelocatableRegisters(set *regset);
+extern void dump_map(void);
+extern void dump_cblock(FILE *of);
+
+
+void packBits(set *bregs)
+{
+  set *regset;
+  regs *breg;
+  regs *bitfield=NULL;
+  regs *relocbitfield=NULL;
+  int bit_no=0;
+  int byte_no=-1;
+  char buffer[20];
+
+  for (regset = bregs ; regset ;
+       regset = regset->next) {
+
+    breg = regset->item;
+    breg->isBitField = 1;
+    //fprintf(stderr,"bit reg: %s\n",breg->name);
+
+    if(breg->isFixed) {
+      //fprintf(stderr,"packing bit at fixed address = 0x%03x\n",breg->address);
+
+      bitfield = typeRegWithIdx (breg->address >> 3, -1 , 1);
+      breg->rIdx = breg->address & 7;
+      breg->address >>= 3;
+
+      if(!bitfield) {
+	sprintf (buffer, "fbitfield%02x", breg->address);
+	//fprintf(stderr,"new bit field\n");
+	bitfield = newReg(REG_GPR, PO_GPR_BIT,breg->address,buffer,1,0);
+	bitfield->isBitField = 1;
+	bitfield->isFixed = 1;
+	bitfield->address = breg->address;
+	addSet(&dynDirectRegs,bitfield);
+	hTabAddItem(&dynDirectRegNames, regname2key(buffer), bitfield);
+      } else {
+	//fprintf(stderr,"  which is occupied by %s (addr = %d)\n",bitfield->name,bitfield->address);
+	;
+      }
+      breg->reg_alias = bitfield;
+      bitfield = NULL;
+
+    } else {
+      if(!relocbitfield || bit_no >7) {
+	byte_no++;
+	bit_no=0;
+	sprintf (buffer, "bitfield%d", byte_no);
+	//fprintf(stderr,"new relocatable bit field\n");
+	relocbitfield = newReg(REG_GPR, PO_GPR_BIT,rDirectIdx++,buffer,1,0);
+	relocbitfield->isBitField = 1;
+	addSet(&dynDirectRegs,relocbitfield);
+	hTabAddItem(&dynDirectRegNames, regname2key(buffer), relocbitfield);
+
+      }
+
+      breg->reg_alias = relocbitfield;
+      breg->address = rDirectIdx;   /* byte_no; */
+      breg->rIdx = bit_no++;
+    }
+  }
+      
+}
+
+
+
+void bitEQUs(FILE *of, set *bregs)
+{
+  regs *breg,*bytereg;
+  int bit_no=0;
+
+  //fprintf(stderr," %s\n",__FUNCTION__);
+  for (breg = setFirstItem(bregs) ; breg ;
+       breg = setNextItem(bregs)) {
+
+    //fprintf(stderr,"bit reg: %s\n",breg->name);
+
+    bytereg = breg->reg_alias;
+    if(bytereg)
+      fprintf (of, "%s\tEQU\t( (%s<<3)+%d)\n",
+	       breg->name,
+	       bytereg->name,
+	       breg->rIdx & 0x0007);
+
+    else {
+      fprintf(stderr, "bit field is not assigned to a register\n");
+      fprintf (of, "%s\tEQU\t( (bitfield%d<<3)+%d)\n",
+	       breg->name,
+	       bit_no>>3,
+	       bit_no & 0x0007);
+
+      bit_no++;
+    }
+  }
+      
+}
+void aliasEQUs(FILE *of, set *fregs)
+{
+  regs *reg;
+
+
+  for (reg = setFirstItem(fregs) ; reg ;
+       reg = setNextItem(fregs)) {
+
+    if(!reg->isEmitted)
+      fprintf (of, "%s\tEQU\t0x%03x\n",
+	       reg->name,
+	       reg->address);
+  }
+      
+}
+
+void writeUsedRegs(FILE *of) 
+{
+  packBits(dynDirectBitRegs);
+
+  assignFixedRegisters(dynAllocRegs);
+  assignFixedRegisters(dynStackRegs);
+  assignFixedRegisters(dynDirectRegs);
+
+  assignRelocatableRegisters(dynAllocRegs);
+  assignRelocatableRegisters(dynStackRegs);
+  assignRelocatableRegisters(dynDirectRegs);
+
+  //dump_map();
+
+  dump_cblock(of);
+  bitEQUs(of,dynDirectBitRegs);
+  aliasEQUs(of,dynAllocRegs);
+  aliasEQUs(of,dynDirectRegs);
+  aliasEQUs(of,dynStackRegs);
+
+}
+#if 0
+/*-----------------------------------------------------------------*/
+/* allDefsOutOfRange - all definitions are out of a range          */
+/*-----------------------------------------------------------------*/
+static bool
+allDefsOutOfRange (bitVect * defs, int fseq, int toseq)
+{
+  int i;
+
+  debugLog ("%s\n", __FUNCTION__);
+  if (!defs)
+    return TRUE;
+
+  for (i = 0; i < defs->size; i++)
+    {
+      iCode *ic;
+
+      if (bitVectBitValue (defs, i) &&
+	  (ic = hTabItemWithKey (iCodehTab, i)) &&
+	  (ic->seq >= fseq && ic->seq <= toseq))
+
+	return FALSE;
+
+    }
+
+  return TRUE;
+}
+#endif
+//=======
+//>>>>>>> 1.28
 /*-----------------------------------------------------------------*/
 /* computeSpillable - given a point find the spillable live ranges */
 /*-----------------------------------------------------------------*/
@@ -1939,6 +2356,12 @@ regTypeNum ()
 		    getSize (sym->type = aggrToPtr (sym->type, FALSE)) :
 		    getSize (sym->type));
 
+
+    if(IS_PTR_CONST (sym->type)) {
+      debugLog ("  %d const pointer type requires %d registers, changing to 2\n",__LINE__,sym->nRegs);
+      sym->nRegs = 2;
+    }
+
       if (sym->nRegs > 4) {
 	fprintf (stderr, "allocated more than 4 or 0 registers for type ");
 	printTypeChain (sym->type, stderr);
@@ -1965,18 +2388,37 @@ regTypeNum ()
   }
 
 }
+DEFSETFUNC (markRegFree)
+{
+  ((regs *)item)->isFree = 1;
 
+  return 0;
+}
+
+DEFSETFUNC (deallocReg)
+{
+  ((regs *)item)->isFree = 1;
+  ((regs *)item)->wasUsed = 0;
+
+  return 0;
+}
 /*-----------------------------------------------------------------*/
 /* freeAllRegs - mark all registers as free                        */
 /*-----------------------------------------------------------------*/
 void
 pic14_freeAllRegs ()
 {
-  int i;
+  //  int i;
 
   debugLog ("%s\n", __FUNCTION__);
+
+  applyToSet(dynAllocRegs,markRegFree);
+  applyToSet(dynStackRegs,markRegFree);
+
+/*
   for (i = 0; i < pic14_nRegs; i++)
     regspic14[i].isFree = 1;
+*/
 }
 
 /*-----------------------------------------------------------------*/
@@ -1984,15 +2426,20 @@ pic14_freeAllRegs ()
 void
 pic14_deallocateAllRegs ()
 {
-  int i;
+  //  int i;
 
   debugLog ("%s\n", __FUNCTION__);
+
+  applyToSet(dynAllocRegs,deallocReg);
+
+/*
   for (i = 0; i < pic14_nRegs; i++) {
     if(regspic14[i].pc_type == PO_GPR_TEMP) {
       regspic14[i].isFree = 1;
       regspic14[i].wasUsed = 0;
     }
   }
+*/
 }
 
 
@@ -2092,8 +2539,24 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
   debugAopGet ("  left:", IC_LEFT (ic));
   debugAopGet ("  right:", IC_RIGHT (ic));
 
-  if (!IS_ITEMP (IC_RIGHT (ic)) ||
-      OP_SYMBOL (IC_RIGHT (ic))->isind ||
+  if (!IS_ITEMP (IC_RESULT (ic))) {
+    allocDirReg(IC_RESULT (ic));
+    debugLog ("  %d - result is not temp\n", __LINE__);
+  }
+/*
+  if (IC_LEFT (ic) && !IS_ITEMP (IC_LEFT (ic))) {
+    debugLog ("  %d - left is not temp, allocating\n", __LINE__);
+    allocDirReg(IC_LEFT (ic));
+  }
+*/
+
+  if (!IS_ITEMP (IC_RIGHT (ic))) {
+    debugLog ("  %d - not packing - right is not temp\n", __LINE__);
+    allocDirReg(IC_RIGHT (ic));
+    return 0;
+  }
+
+  if (OP_SYMBOL (IC_RIGHT (ic))->isind ||
       OP_LIVETO (IC_RIGHT (ic)) > ic->seq)
     {
       debugLog ("  %d - not packing - right side fails \n", __LINE__);
@@ -2686,6 +3149,7 @@ packRegsForAccUse (iCode * ic)
   return;
 
 accuse:
+  debugLog ("%s - Yes we are using the accumulator\n", __FUNCTION__);
   OP_SYMBOL (IC_RESULT (ic))->accuse = 1;
 
 
@@ -2761,6 +3225,14 @@ packForPush (iCode * ic, eBBlock * ebp)
   hTabDeleteItem (&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
 }
 
+void printSymType(char * str, sym_link *sl)
+{
+  debugLog ("    %s Symbol type: ",str);
+  printTypeChain( sl, debugF);
+  debugLog ("\n");
+
+}
+
 /*-----------------------------------------------------------------*/
 /* packRegisters - does some transformations to reduce register    */
 /*                   pressure                                      */
@@ -2773,268 +3245,294 @@ packRegisters (eBBlock * ebp)
 
   debugLog ("%s\n", __FUNCTION__);
 
-  while (1)
-    {
+  while (1) {
 
-      change = 0;
+    change = 0;
 
-      /* look for assignments of the form */
-      /* iTempNN = TRueSym (someoperation) SomeOperand */
-      /*       ....                       */
-      /* TrueSym := iTempNN:1             */
-      for (ic = ebp->sch; ic; ic = ic->next)
-	{
+    /* look for assignments of the form */
+    /* iTempNN = TRueSym (someoperation) SomeOperand */
+    /*       ....                       */
+    /* TrueSym := iTempNN:1             */
+    for (ic = ebp->sch; ic; ic = ic->next)
+      {
 
-	  /* find assignment of the form TrueSym := iTempNN:1 */
-	  if (ic->op == '=' && !POINTER_SET (ic))
-	    change += packRegsForAssign (ic, ebp);
-	  /* debug stuff */
-	  if (ic->op == '=')
-	    {
-	      if (POINTER_SET (ic))
-		debugLog ("pointer is set\n");
-	      debugAopGet ("  result:", IC_RESULT (ic));
-	      debugAopGet ("  left:", IC_LEFT (ic));
-	      debugAopGet ("  right:", IC_RIGHT (ic));
-	    }
+	/* find assignment of the form TrueSym := iTempNN:1 */
+	if (ic->op == '=' && !POINTER_SET (ic))
+	  change += packRegsForAssign (ic, ebp);
+	/* debug stuff */
+	if (ic->op == '=')
+	  {
+	    if (POINTER_SET (ic))
+	      debugLog ("pointer is set\n");
+	    debugAopGet ("  result:", IC_RESULT (ic));
+	    debugAopGet ("  left:", IC_LEFT (ic));
+	    debugAopGet ("  right:", IC_RIGHT (ic));
+	  }
 
-	}
+      }
 
-      if (!change)
-	break;
+    if (!change)
+      break;
+  }
+
+  for (ic = ebp->sch; ic; ic = ic->next) {
+
+    if(IS_SYMOP ( IC_LEFT(ic))) {
+      //sym_link *etype = getSpec (operandType (IC_LEFT (ic)));
+
+      debugAopGet ("  left:", IC_LEFT (ic));
+      if(IS_PTR_CONST(OP_SYMBOL(IC_LEFT(ic))->type))
+	debugLog ("    is a pointer");
+
+      printSymType("   ", OP_SYMBOL(IC_LEFT(ic))->type);
     }
 
-  for (ic = ebp->sch; ic; ic = ic->next)
-    {
-
-      /* if this is an itemp & result of a address of a true sym 
-         then mark this as rematerialisable   */
-      if (ic->op == ADDRESS_OF &&
-	  IS_ITEMP (IC_RESULT (ic)) &&
-	  IS_TRUE_SYMOP (IC_LEFT (ic)) &&
-	  bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 &&
-	  !OP_SYMBOL (IC_LEFT (ic))->onStack)
-	{
-
-	  debugLog ("  %d - %s. result is rematerializable\n", __LINE__,__FUNCTION__);
-
-	  OP_SYMBOL (IC_RESULT (ic))->remat = 1;
-	  OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
-	  OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
-
-	}
-
-      /* if straight assignment then carry remat flag if
-         this is the only definition */
-      if (ic->op == '=' &&
-	  !POINTER_SET (ic) &&
-	  IS_SYMOP (IC_RIGHT (ic)) &&
-	  OP_SYMBOL (IC_RIGHT (ic))->remat &&
-	  bitVectnBitsOn (OP_SYMBOL (IC_RESULT (ic))->defs) <= 1)
-	{
-	  debugLog ("  %d - %s. straight rematerializable\n", __LINE__,__FUNCTION__);
-
-	  OP_SYMBOL (IC_RESULT (ic))->remat =
-	    OP_SYMBOL (IC_RIGHT (ic))->remat;
-	  OP_SYMBOL (IC_RESULT (ic))->rematiCode =
-	    OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
-	}
-
-      /* if this is a +/- operation with a rematerizable 
-         then mark this as rematerializable as well */
-      if ((ic->op == '+' || ic->op == '-') &&
-	  (IS_SYMOP (IC_LEFT (ic)) &&
-	   IS_ITEMP (IC_RESULT (ic)) &&
-	   OP_SYMBOL (IC_LEFT (ic))->remat &&
-	   bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 &&
-	   IS_OP_LITERAL (IC_RIGHT (ic))))
-	{
-	  debugLog ("  %d - %s. rematerializable because op is +/-\n", __LINE__,__FUNCTION__);
-	  //int i = 
-	  operandLitValue (IC_RIGHT (ic));
-	  OP_SYMBOL (IC_RESULT (ic))->remat = 1;
-	  OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
-	  OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
-	}
-
-      /* mark the pointer usages */
-      if (POINTER_SET (ic))
-	{
-	  OP_SYMBOL (IC_RESULT (ic))->uptr = 1;
-	  debugLog ("  marking as a pointer (set) =>");
-	  debugAopGet ("  result:", IC_RESULT (ic));
-	}
-      if (POINTER_GET (ic))
-	{
-	  OP_SYMBOL (IC_LEFT (ic))->uptr = 1;
-	  debugLog ("  marking as a pointer (get) =>");
-	  debugAopGet ("  left:", IC_LEFT (ic));
-	}
-
-      if (!SKIP_IC2 (ic))
-	{
-	  /* if we are using a symbol on the stack
-	     then we should say pic14_ptrRegReq */
-	  if (ic->op == IFX && IS_SYMOP (IC_COND (ic)))
-	    pic14_ptrRegReq += ((OP_SYMBOL (IC_COND (ic))->onStack ||
-				 OP_SYMBOL (IC_COND (ic))->iaccess) ? 1 : 0);
-	  else if (ic->op == JUMPTABLE && IS_SYMOP (IC_JTCOND (ic)))
-	    pic14_ptrRegReq += ((OP_SYMBOL (IC_JTCOND (ic))->onStack ||
-			      OP_SYMBOL (IC_JTCOND (ic))->iaccess) ? 1 : 0);
-	  else
-	    {
-	      if (IS_SYMOP (IC_LEFT (ic)))
-		pic14_ptrRegReq += ((OP_SYMBOL (IC_LEFT (ic))->onStack ||
-				OP_SYMBOL (IC_LEFT (ic))->iaccess) ? 1 : 0);
-	      if (IS_SYMOP (IC_RIGHT (ic)))
-		pic14_ptrRegReq += ((OP_SYMBOL (IC_RIGHT (ic))->onStack ||
-			       OP_SYMBOL (IC_RIGHT (ic))->iaccess) ? 1 : 0);
-	      if (IS_SYMOP (IC_RESULT (ic)))
-		pic14_ptrRegReq += ((OP_SYMBOL (IC_RESULT (ic))->onStack ||
-			      OP_SYMBOL (IC_RESULT (ic))->iaccess) ? 1 : 0);
-	    }
-	}
-
-      /* if the condition of an if instruction
-         is defined in the previous instruction then
-         mark the itemp as a conditional */
-      if ((IS_CONDITIONAL (ic) ||
-	   ((ic->op == BITWISEAND ||
-	     ic->op == '|' ||
-	     ic->op == '^') &&
-	    isBitwiseOptimizable (ic))) &&
-	  ic->next && ic->next->op == IFX &&
-	  isOperandEqual (IC_RESULT (ic), IC_COND (ic->next)) &&
-	  OP_SYMBOL (IC_RESULT (ic))->liveTo <= ic->next->seq)
-	{
-
-	  OP_SYMBOL (IC_RESULT (ic))->regType = REG_CND;
-	  continue;
-	}
-
-      /* reduce for support function calls */
-      if (ic->supportRtn || ic->op == '+' || ic->op == '-')
-	packRegsForSupport (ic, ebp);
-
-      /* if a parameter is passed, it's in W, so we may not
-         need to place a copy in a register */
-      if (ic->op == RECEIVE)
-	packForReceive (ic, ebp);
-
-      /* some cases the redundant moves can
-         can be eliminated for return statements */
-      if ((ic->op == RETURN || ic->op == SEND) &&
-	  !isOperandInFarSpace (IC_LEFT (ic)) &&
-	  !options.model)
-	packRegsForOneuse (ic, IC_LEFT (ic), ebp);
-
-      /* if pointer set & left has a size more than
-         one and right is not in far space */
-      if (POINTER_SET (ic) &&
-	  !isOperandInFarSpace (IC_RIGHT (ic)) &&
-	  !OP_SYMBOL (IC_RESULT (ic))->remat &&
-	  !IS_OP_RUONLY (IC_RIGHT (ic)) &&
-	  getSize (aggrToPtr (operandType (IC_RESULT (ic)), FALSE)) > 1)
-
-	packRegsForOneuse (ic, IC_RESULT (ic), ebp);
-
-      /* if pointer get */
-      if (POINTER_GET (ic) &&
-	  !isOperandInFarSpace (IC_RESULT (ic)) &&
-	  !OP_SYMBOL (IC_LEFT (ic))->remat &&
-	  !IS_OP_RUONLY (IC_RESULT (ic)) &&
-	  getSize (aggrToPtr (operandType (IC_LEFT (ic)), FALSE)) > 1)
-
-	packRegsForOneuse (ic, IC_LEFT (ic), ebp);
-
-
-      /* if this is cast for intergral promotion then
-         check if only use of  the definition of the 
-         operand being casted/ if yes then replace
-         the result of that arithmetic operation with 
-         this result and get rid of the cast */
-      if (ic->op == CAST)
-	{
-	  sym_link *fromType = operandType (IC_RIGHT (ic));
-	  sym_link *toType = operandType (IC_LEFT (ic));
-
-	  if (IS_INTEGRAL (fromType) && IS_INTEGRAL (toType) &&
-	      getSize (fromType) != getSize (toType))
-	    {
-
-	      iCode *dic = packRegsForOneuse (ic, IC_RIGHT (ic), ebp);
-	      if (dic)
-		{
-		  if (IS_ARITHMETIC_OP (dic))
-		    {
-		      bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
-		      IC_RESULT (dic) = IC_RESULT (ic);
-		      remiCodeFromeBBlock (ebp, ic);
-		      bitVectUnSetBit(OP_SYMBOL(IC_RESULT(ic))->defs,ic->key);
-		      hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);
-		      OP_DEFS (IC_RESULT (dic)) = bitVectSetBit (OP_DEFS (IC_RESULT (dic)), dic->key);
-		      ic = ic->prev;
-		    }
-		  else
-		    OP_SYMBOL (IC_RIGHT (ic))->ruonly = 0;
-		}
-	    }
-	  else
-	    {
-
-	      /* if the type from and type to are the same
-	         then if this is the only use then packit */
-	      if (compareType (operandType (IC_RIGHT (ic)),
-			     operandType (IC_LEFT (ic))) == 1)
-		{
-		  iCode *dic = packRegsForOneuse (ic, IC_RIGHT (ic), ebp);
-		  if (dic)
-		    {
-		      bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
-		      IC_RESULT (dic) = IC_RESULT (ic);
-		      bitVectUnSetBit(OP_SYMBOL(IC_RESULT(ic))->defs,ic->key);
-		      remiCodeFromeBBlock (ebp, ic);
-		      hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);
-		      OP_DEFS (IC_RESULT (dic)) = bitVectSetBit (OP_DEFS (IC_RESULT (dic)), dic->key);
-		      ic = ic->prev;
-		    }
-		}
-	    }
-	}
-
-      /* pack for PUSH 
-         iTempNN := (some variable in farspace) V1
-         push iTempNN ;
-         -------------
-         push V1
-       */
-      if (ic->op == IPUSH)
-	{
-	  packForPush (ic, ebp);
-	}
-
-
-      /* pack registers for accumulator use, when the
-         result of an arithmetic or bit wise operation
-         has only one use, that use is immediately following
-         the defintion and the using iCode has only one
-         operand or has two operands but one is literal &
-         the result of that operation is not on stack then
-         we can leave the result of this operation in acc:b
-         combination */
-      if ((IS_ARITHMETIC_OP (ic)
-
-	   || IS_BITWISE_OP (ic)
-
-	   || ic->op == LEFT_OP || ic->op == RIGHT_OP
-
-	  ) &&
-	  IS_ITEMP (IC_RESULT (ic)) &&
-	  getSize (operandType (IC_RESULT (ic))) <= 2)
-
-	packRegsForAccUse (ic);
-
+    if(IS_SYMOP ( IC_RIGHT(ic))) {
+      debugAopGet ("  right:", IC_RIGHT (ic));
+      printSymType("    ", OP_SYMBOL(IC_RIGHT(ic))->type);
     }
+
+    if(IS_SYMOP ( IC_RESULT(ic))) {
+      debugAopGet ("  result:", IC_RESULT (ic));
+      printSymType("     ", OP_SYMBOL(IC_RESULT(ic))->type);
+    }
+
+    if (POINTER_SET (ic))
+	debugLog ("  %d - Pointer set\n", __LINE__);
+
+
+    /* if this is an itemp & result of a address of a true sym 
+       then mark this as rematerialisable   */
+    if (ic->op == ADDRESS_OF &&
+	IS_ITEMP (IC_RESULT (ic)) &&
+	IS_TRUE_SYMOP (IC_LEFT (ic)) &&
+	bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 &&
+	!OP_SYMBOL (IC_LEFT (ic))->onStack)
+      {
+
+	debugLog ("  %d - %s. result is rematerializable\n", __LINE__,__FUNCTION__);
+
+	OP_SYMBOL (IC_RESULT (ic))->remat = 1;
+	OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
+	OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
+
+      }
+
+    /* if straight assignment then carry remat flag if
+       this is the only definition */
+    if (ic->op == '=' &&
+	!POINTER_SET (ic) &&
+	IS_SYMOP (IC_RIGHT (ic)) &&
+	OP_SYMBOL (IC_RIGHT (ic))->remat &&
+	bitVectnBitsOn (OP_SYMBOL (IC_RESULT (ic))->defs) <= 1)
+      {
+	debugLog ("  %d - %s. straight rematerializable\n", __LINE__,__FUNCTION__);
+
+	OP_SYMBOL (IC_RESULT (ic))->remat =
+	  OP_SYMBOL (IC_RIGHT (ic))->remat;
+	OP_SYMBOL (IC_RESULT (ic))->rematiCode =
+	  OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
+      }
+
+    /* if this is a +/- operation with a rematerizable 
+       then mark this as rematerializable as well */
+    if ((ic->op == '+' || ic->op == '-') &&
+	(IS_SYMOP (IC_LEFT (ic)) &&
+	 IS_ITEMP (IC_RESULT (ic)) &&
+	 OP_SYMBOL (IC_LEFT (ic))->remat &&
+	 bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 &&
+	 IS_OP_LITERAL (IC_RIGHT (ic))))
+      {
+	debugLog ("  %d - %s. rematerializable because op is +/-\n", __LINE__,__FUNCTION__);
+	//int i = 
+	operandLitValue (IC_RIGHT (ic));
+	OP_SYMBOL (IC_RESULT (ic))->remat = 1;
+	OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
+	OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
+      }
+
+    /* mark the pointer usages */
+    if (POINTER_SET (ic))
+      {
+	OP_SYMBOL (IC_RESULT (ic))->uptr = 1;
+	debugLog ("  marking as a pointer (set) =>");
+	debugAopGet ("  result:", IC_RESULT (ic));
+      }
+    if (POINTER_GET (ic))
+      {
+	OP_SYMBOL (IC_LEFT (ic))->uptr = 1;
+	debugLog ("  marking as a pointer (get) =>");
+	debugAopGet ("  left:", IC_LEFT (ic));
+      }
+
+    if (!SKIP_IC2 (ic))
+      {
+	/* if we are using a symbol on the stack
+	   then we should say pic14_ptrRegReq */
+	if (ic->op == IFX && IS_SYMOP (IC_COND (ic)))
+	  pic14_ptrRegReq += ((OP_SYMBOL (IC_COND (ic))->onStack ||
+			       OP_SYMBOL (IC_COND (ic))->iaccess) ? 1 : 0);
+	else if (ic->op == JUMPTABLE && IS_SYMOP (IC_JTCOND (ic)))
+	  pic14_ptrRegReq += ((OP_SYMBOL (IC_JTCOND (ic))->onStack ||
+			       OP_SYMBOL (IC_JTCOND (ic))->iaccess) ? 1 : 0);
+	else
+	  {
+	    if (IS_SYMOP (IC_LEFT (ic)))
+	      pic14_ptrRegReq += ((OP_SYMBOL (IC_LEFT (ic))->onStack ||
+				   OP_SYMBOL (IC_LEFT (ic))->iaccess) ? 1 : 0);
+	    if (IS_SYMOP (IC_RIGHT (ic)))
+	      pic14_ptrRegReq += ((OP_SYMBOL (IC_RIGHT (ic))->onStack ||
+				   OP_SYMBOL (IC_RIGHT (ic))->iaccess) ? 1 : 0);
+	    if (IS_SYMOP (IC_RESULT (ic)))
+	      pic14_ptrRegReq += ((OP_SYMBOL (IC_RESULT (ic))->onStack ||
+				   OP_SYMBOL (IC_RESULT (ic))->iaccess) ? 1 : 0);
+	  }
+
+	debugLog ("  %d - pointer reg req = %d\n", __LINE__,pic14_ptrRegReq);
+
+      }
+
+    /* if the condition of an if instruction
+       is defined in the previous instruction then
+       mark the itemp as a conditional */
+    if ((IS_CONDITIONAL (ic) ||
+	 ((ic->op == BITWISEAND ||
+	   ic->op == '|' ||
+	   ic->op == '^') &&
+	  isBitwiseOptimizable (ic))) &&
+	ic->next && ic->next->op == IFX &&
+	isOperandEqual (IC_RESULT (ic), IC_COND (ic->next)) &&
+	OP_SYMBOL (IC_RESULT (ic))->liveTo <= ic->next->seq)
+      {
+
+	debugLog ("  %d\n", __LINE__);
+	OP_SYMBOL (IC_RESULT (ic))->regType = REG_CND;
+	continue;
+      }
+
+    /* reduce for support function calls */
+    if (ic->supportRtn || ic->op == '+' || ic->op == '-')
+      packRegsForSupport (ic, ebp);
+
+    /* if a parameter is passed, it's in W, so we may not
+       need to place a copy in a register */
+    if (ic->op == RECEIVE)
+      packForReceive (ic, ebp);
+
+    /* some cases the redundant moves can
+       can be eliminated for return statements */
+    if ((ic->op == RETURN || ic->op == SEND) &&
+	!isOperandInFarSpace (IC_LEFT (ic)) &&
+	!options.model)
+      packRegsForOneuse (ic, IC_LEFT (ic), ebp);
+
+    /* if pointer set & left has a size more than
+       one and right is not in far space */
+    if (POINTER_SET (ic) &&
+	!isOperandInFarSpace (IC_RIGHT (ic)) &&
+	!OP_SYMBOL (IC_RESULT (ic))->remat &&
+	!IS_OP_RUONLY (IC_RIGHT (ic)) &&
+	getSize (aggrToPtr (operandType (IC_RESULT (ic)), FALSE)) > 1)
+
+      packRegsForOneuse (ic, IC_RESULT (ic), ebp);
+
+    /* if pointer get */
+    if (POINTER_GET (ic) &&
+	!isOperandInFarSpace (IC_RESULT (ic)) &&
+	!OP_SYMBOL (IC_LEFT (ic))->remat &&
+	!IS_OP_RUONLY (IC_RESULT (ic)) &&
+	getSize (aggrToPtr (operandType (IC_LEFT (ic)), FALSE)) > 1)
+
+      packRegsForOneuse (ic, IC_LEFT (ic), ebp);
+
+
+    /* if this is cast for intergral promotion then
+       check if only use of  the definition of the 
+       operand being casted/ if yes then replace
+       the result of that arithmetic operation with 
+       this result and get rid of the cast */
+    if (ic->op == CAST) {
+	
+      sym_link *fromType = operandType (IC_RIGHT (ic));
+      sym_link *toType = operandType (IC_LEFT (ic));
+
+      debugLog ("  %d - casting\n", __LINE__);
+
+      if (IS_INTEGRAL (fromType) && IS_INTEGRAL (toType) &&
+	  getSize (fromType) != getSize (toType)) {
+	    
+
+	iCode *dic = packRegsForOneuse (ic, IC_RIGHT (ic), ebp);
+	if (dic) {
+		
+	  if (IS_ARITHMETIC_OP (dic)) {
+		    
+	    bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
+	    IC_RESULT (dic) = IC_RESULT (ic);
+	    remiCodeFromeBBlock (ebp, ic);
+	    bitVectUnSetBit(OP_SYMBOL(IC_RESULT(ic))->defs,ic->key);
+	    hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);
+	    OP_DEFS (IC_RESULT (dic)) = bitVectSetBit (OP_DEFS (IC_RESULT (dic)), dic->key);
+	    ic = ic->prev;
+	  }  else
+		
+	    OP_SYMBOL (IC_RIGHT (ic))->ruonly = 0;
+	}
+      } else {
+
+	/* if the type from and type to are the same
+	   then if this is the only use then packit */
+	if (compareType (operandType (IC_RIGHT (ic)),
+			 operandType (IC_LEFT (ic))) == 1) {
+		
+	  iCode *dic = packRegsForOneuse (ic, IC_RIGHT (ic), ebp);
+	  if (dic) {
+		    
+	    bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
+	    IC_RESULT (dic) = IC_RESULT (ic);
+	    bitVectUnSetBit(OP_SYMBOL(IC_RESULT(ic))->defs,ic->key);
+	    remiCodeFromeBBlock (ebp, ic);
+	    hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);
+	    OP_DEFS (IC_RESULT (dic)) = bitVectSetBit (OP_DEFS (IC_RESULT (dic)), dic->key);
+	    ic = ic->prev;
+	  }
+	}
+      }
+    }
+
+    /* pack for PUSH 
+       iTempNN := (some variable in farspace) V1
+       push iTempNN ;
+       -------------
+       push V1
+    */
+    if (ic->op == IPUSH)
+      {
+	packForPush (ic, ebp);
+      }
+
+
+    /* pack registers for accumulator use, when the
+       result of an arithmetic or bit wise operation
+       has only one use, that use is immediately following
+       the defintion and the using iCode has only one
+       operand or has two operands but one is literal &
+       the result of that operation is not on stack then
+       we can leave the result of this operation in acc:b
+       combination */
+    if ((IS_ARITHMETIC_OP (ic)
+
+	 || IS_BITWISE_OP (ic)
+
+	 || ic->op == LEFT_OP || ic->op == RIGHT_OP
+
+	 ) &&
+	IS_ITEMP (IC_RESULT (ic)) &&
+	getSize (operandType (IC_RESULT (ic))) <= 2)
+
+      packRegsForAccUse (ic);
+
+  }
 }
 
 static void
@@ -3101,6 +3599,21 @@ pic14_assignRegisters (eBBlock ** ebbs, int count)
      live ranges reducing some register pressure */
   for (i = 0; i < count; i++)
     packRegisters (ebbs[i]);
+
+  {
+    regs *reg;
+    int hkey;
+    int i=0;
+
+    debugLog("dir registers allocated so far:\n");
+    reg = hTabFirstItem(dynDirectRegNames, &hkey);
+
+    while(reg) {
+      debugLog("  -- #%d reg = %s  key %d, rIdx = %d, size %d\n",i++,reg->name,hkey, reg->rIdx,reg->size);
+      reg = hTabNextItem(dynDirectRegNames, &hkey);
+    }
+
+  }
 
   if (options.dump_pack)
     dumpEbbsToFileExt (DUMP_PACK, ebbs, count);

@@ -69,6 +69,7 @@ typedef struct asmop
 	char *aop_immd;		/* if immediate others are implied */
 	int aop_stk;		/* stack offset when AOP_STK */
 	char *aop_str[4];	/* just a string array containing the location */
+/*	regs *aop_alloc_reg;     * points to a dynamically allocated register */
       }
     aopu;
   }

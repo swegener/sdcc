@@ -26,6 +26,7 @@
 
 
 #include "pcode.h"
+#include "pcodeflow.h"
 #include "ralloc.h"
 
 #if defined(__BORLANDC__) || defined(_MSC_VER)
@@ -308,7 +309,7 @@ static void * cvt_altpat_label(void *pp)
   parsedPattern *p = pp;
 
   DFPRINTF((stderr,"altpat_label with ID = %d\n",p->pct[1].tok.n));
-  return newpCodeLabel(-p->pct[1].tok.n);
+  return newpCodeLabel(NULL,-p->pct[1].tok.n);
 
 }
 
@@ -402,7 +403,7 @@ static void * cvt_altpat_mnem1(void *pp)
     return NULL;
   }
 
-  if(pic14Mnemonics[opcode]->bit_inst)
+  if(pic14Mnemonics[opcode]->isBitInst)
     pcosubtype = newpCodeOp(p[1].pct[0].tok.s,PO_BIT);
   else
     pcosubtype = newpCodeOp(p[1].pct[0].tok.s,PO_GPR_REGISTER);
@@ -441,7 +442,7 @@ static void * cvt_altpat_mnem1a(void *pp)
     return NULL;
   }
 
-  if(pic14Mnemonics[opcode]->bit_inst)
+  if(pic14Mnemonics[opcode]->isBitInst)
     pcosubtype = newpCodeOpBit(NULL,-1,0);
   else
     pcosubtype = newpCodeOp(NULL,PO_GPR_REGISTER);
@@ -513,7 +514,7 @@ static void * cvt_altpat_mnem2(void *pp)
     return NULL;
   }
 
-  if(pic14Mnemonics[opcode]->bit_inst) {
+  if(pic14Mnemonics[opcode]->isBitInst) {
     pcosubtype = cvt_extract_status(p[1].pct[0].tok.s, p[3].pct[0].tok.s);
     if(pcosubtype == NULL) {
       fprintf(stderr, "bad operand?\n");
@@ -568,7 +569,7 @@ static void * cvt_altpat_mnem2a(void *pp)
     return NULL;
   }
 
-  if(pic14Mnemonics[opcode]->bit_inst)
+  if(pic14Mnemonics[opcode]->isBitInst)
     pcosubtype = newpCodeOp(NULL,PO_BIT);
   else
     pcosubtype = newpCodeOp(NULL,PO_GPR_REGISTER);
@@ -1263,22 +1264,22 @@ int pCodePeepMatchLabels(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 
   /* Check for a label associated with this wild pCode */
   // If the wild card has a label, make sure the source code does too.
-  if(pcd->label) {
+  if(PCI(pcd)->label) {
     pCode *pcl;
 
-    if(!pcs->label)
+    if(!PCI(pcs)->label)
       return 0;
 
-    pcl = pcd->label->pc;
+    pcl = PCI(pcd)->label->pc;
 
     labindex = -PCL(pcl)->key;
     //DFPRINTF((stderr,"label id = %d (labindex = %d)\n",PCL(pcl)->key,labindex));
     if(peepBlock->vars[labindex] == NULL) {
       // First time to encounter this label
-      peepBlock->vars[labindex] = PCL(pcs->label->pc)->label;
+      peepBlock->vars[labindex] = PCL(PCI(pcs)->label->pc)->label;
       //DFPRINTF((stderr,"first time for a label: %d %s\n",labindex, peepBlock->vars[labindex]));
     } else {
-      if(strcmp(peepBlock->vars[labindex],PCL(pcs->label->pc)->label) != 0) {
+      if(strcmp(peepBlock->vars[labindex],PCL(PCI(pcs)->label->pc)->label) != 0) {
 	// DFPRINTF((stderr,"labels don't match\n"));
 	return 0;
       }
@@ -1287,7 +1288,7 @@ int pCodePeepMatchLabels(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
   } else {
     // DFPRINTF((stderr,"destination doesn't have a label\n"));
 
-    if(pcs->label)
+    if(PCI(pcs)->label)
       return 0;
   }
 
@@ -1493,9 +1494,9 @@ static pCodeOp *pCodeOpCopy(pCodeOp *pcop)
   case PO_CRY:
   case PO_BIT:
     //DFPRINTF((stderr,"pCodeOpCopy bit\n"));
-    pcopnew = Safe_calloc(1,sizeof(pCodeOpBit) );
-    PCOB(pcopnew)->bit = PCOB(pcop)->bit;
-    PCOB(pcopnew)->inBitSpace = PCOB(pcop)->inBitSpace;
+    pcopnew = Safe_calloc(1,sizeof(pCodeOpRegBit) );
+    PCORB(pcopnew)->bit = PCORB(pcop)->bit;
+    PCORB(pcopnew)->inBitSpace = PCORB(pcop)->inBitSpace;
 
     break;
 
@@ -1546,6 +1547,7 @@ static pCodeOp *pCodeOpCopy(pCodeOp *pcop)
   case PO_STR:
   case PO_NONE:
   case PO_W:
+  case PO_INTCON:
   case PO_STATUS:
   case PO_PCL:
   case PO_PCLATH:

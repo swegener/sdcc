@@ -159,12 +159,22 @@ _pic14_getRegName (struct regs *reg)
   return "err";
 }
 
+extern char *processor_base_name(void);
+
 static void
 _pic14_genAssemblerPreamble (FILE * of)
 {
-  fprintf (of, "\tlist\tp=16f877\n");
+  char * name = processor_base_name();
+
+  if(!name) {
+
+    name = "p16f877";
+    fprintf(stderr,"WARNING: No Pic has been selected, defaulting to %s\n",name);
+  }
+
+  fprintf (of, "\tlist\tp=%s\n",&name[1]);
   fprintf (of, "\t__config _wdt_off\n");
-  fprintf (of, "\ninclude \"p16f877.inc\"\n");
+  fprintf (of, "\ninclude \"%s.inc\"\n",name);
 }
 
 /* Generate interrupt vector table. */

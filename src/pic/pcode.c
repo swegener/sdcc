@@ -2811,7 +2811,8 @@ pCodeOp *popCopyReg(pCodeOpReg *pc)
 	} else {
 		pcor->r = pc->r;
 		pcor->rIdx = pc->rIdx;
-		pcor->r->wasUsed=1;
+		if (pcor->r)
+			pcor->r->wasUsed=1;
 	}	
 	//DEBUGpic14_emitcode ("; ***","%s  , copying %s, rIdx=%d",__FUNCTION__,pc->pcop.name,pc->rIdx);
 	
@@ -3676,7 +3677,7 @@ static void AnalyzeRETURN(pCode *pc)
 /*-----------------------------------------------------------------*/
 regs * getRegFromInstruction(pCode *pc)
 {
-	
+	regs *r;
 	if(!pc                   || 
 		!isPCI(pc)            ||
 		!PCI(pc)->pcop        ||
@@ -3687,36 +3688,33 @@ regs * getRegFromInstruction(pCode *pc)
 	case PO_INDF:
 	case PO_FSR:
 		return PCOR(PCI(pc)->pcop)->r;
-		
-		//    return typeRegWithIdx (PCOR(PCI(pc)->pcop)->rIdx, REG_SFR, 0);
-		
+
 	case PO_BIT:
 	case PO_GPR_TEMP:
-		//fprintf(stderr, "getRegFromInstruction - bit or temp\n");
 		return PCOR(PCI(pc)->pcop)->r;
 		
 	case PO_IMMEDIATE:
-		if(PCOI(PCI(pc)->pcop)->r)
-			return (PCOI(PCI(pc)->pcop)->r);
-		
-		//fprintf(stderr, "getRegFromInstruction - immediate\n");
+		r = PCOI(PCI(pc)->pcop)->r;
+		if (r)
+			return r;
 		return dirregWithName(PCI(pc)->pcop->name);
-		//return NULL; // PCOR(PCI(pc)->pcop)->r;
 		
 	case PO_GPR_BIT:
-		return PCOR(PCI(pc)->pcop)->r;
+		r = PCOR(PCI(pc)->pcop)->r;
+		if (r)
+			return r;
+		return dirregWithName(PCI(pc)->pcop->name);
 		
 	case PO_GPR_REGISTER:
 	case PO_DIR:
-		//fprintf(stderr, "getRegFromInstruction - dir\n");
-		return PCOR(PCI(pc)->pcop)->r;
+		r = PCOR(PCI(pc)->pcop)->r;
+		if (r)
+			return r;
+		return dirregWithName(PCI(pc)->pcop->name);
 	case PO_LITERAL:
-		//fprintf(stderr, "getRegFromInstruction - literal\n");
 		break;
 		
 	default:
-		//fprintf(stderr, "getRegFromInstruction - unknown reg type %d\n",PCI(pc)->pcop->type);
-		//genericPrint(stderr, pc);
 		break;
 	}
 	
@@ -4315,8 +4313,9 @@ static void BanksUsedFlow(pBlock *pb)
 */
 
 /*-----------------------------------------------------------------*/
+/* Inserts a new pCodeInstruction before an existing one           */
 /*-----------------------------------------------------------------*/
-static void pCodeInstructionInsertAfter(pCodeInstruction *pci, pCodeInstruction *new_pci)
+static void insertPCodeInstruction(pCodeInstruction *pci, pCodeInstruction *new_pci)
 {
 	
 	pCodeInsertAfter(pci->pc.prev, &new_pci->pc);
@@ -4348,7 +4347,7 @@ static void insertBankSwitch(pCodeInstruction *pci, int Set_Clear, int RP_BankBi
 	
 	new_pc = newpCode((Set_Clear?POC_BSF:POC_BCF),popCopyGPR2Bit(PCOP(&pc_status),RP_BankBit));
 	
-	pCodeInstructionInsertAfter(pci, PCI(new_pc));
+	insertPCodeInstruction(pci, PCI(new_pc));
 }
 
 /*-----------------------------------------------------------------*/
@@ -4363,7 +4362,7 @@ static void insertBankSel(pCodeInstruction  *pci, const char *name)
 		pcop->name = strdup(name);
 	new_pc = newpCode(POC_BANKSEL, pcop);
 	
-	pCodeInstructionInsertAfter(pci, PCI(new_pc));
+	insertPCodeInstruction(pci, PCI(new_pc));
 }
 
 /*-----------------------------------------------------------------*/
@@ -4489,7 +4488,8 @@ static int IsBankChange(pCode *pc, regs *reg, int *cur_bank) {
 		
 	} else if (PCI(pc)->op == POC_BANKSEL) {
 		int old_bank = *cur_bank;
-		*cur_bank = (PCOR(PCI(pc)->pcop)->r->isExtern) ? 'E' : 'L';
+		regs *r = PCOR(PCI(pc)->pcop)->r;
+		*cur_bank = (!r || r->isExtern) ? 'E' : 'L';
 		LastRegIdx = reg->rIdx;
 		return old_bank != *cur_bank;
 	}
@@ -4540,10 +4540,8 @@ static int DoBankSelect(pCode *pc, int cur_bank) {
 	
 	reg = getRegFromInstruction(pc);
 	if (reg) {
-		
 		if (IsBankChange(pc,reg,&cur_bank))
 			return cur_bank;
-		
 		if (!isPCI_LIT(pc)) {
 			
 			/* Examine the instruction before this one to make sure it is

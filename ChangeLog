@@ -1,5 +1,14 @@
 2004-08-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
+	* src/SDCCpeeph.c (labelIsReturnOnly): support hc08 rts opcode also
+	* src/SDCCpeeph.c (buildLabelRefCountHash): assume function entry point
+	labels are referenced at least once (even if a reference is not found)
+	* src/hc08/gen.c (emitcode): set isComment flag for comments
+	* src/hc08/peeph.def: added rules 5a..5f (optimize redundant immediate
+	loads), rules 6a..6b (optimize jumps to return)
+
+2004-08-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
 	* device/lib/acosf.c (acosf),
 	* device/lib/asinf.c (asinf),
 	* device/lib/atanf.c (atanf),

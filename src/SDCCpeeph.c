@@ -187,6 +187,7 @@ FBYNAME (labelIsReturnOnly)
   const char *label, *p;
   const lineNode *pl;
   int len;
+  char * retInst;
 
   label = hTabItemWithKey (vars, 5);
   if (!label) return FALSE;
@@ -212,7 +213,11 @@ FBYNAME (labelIsReturnOnly)
   p = pl->line;
   for (p = pl->line; *p && isspace(*p); p++)
 	  ;
-  if (strcmp(p, "ret") == 0) return TRUE;
+  
+  retInst = "ret";
+  if (TARGET_IS_HC08)
+    retInst = "rts";
+  if (strcmp(p, retInst) == 0) return TRUE;
   return FALSE;
 }
 
@@ -1687,6 +1692,12 @@ buildLabelRefCountHash (lineNode * head)
 	  memcpy (entry->name, label, labelLen);
 	  entry->name[labelLen] = 0;
 	  entry->refCount = -1;
+          
+          /* Assume function entry points are referenced somewhere,   */
+          /* even if we can't find a reference (might be from outside */
+          /* the function) */
+          if (line->ic && (line->ic->op == FUNCTION))
+            entry->refCount++;
 
 	  hTabAddItem (&labelHash, hashSymbolName (entry->name), entry);
 	}

@@ -172,6 +172,7 @@ emitcode (char *inst, char *fmt,...)
   lineCurr->isInline = _G.inLine;
   lineCurr->isDebug = _G.debugLine;
   lineCurr->ic = _G.current_iCode;
+  lineCurr->isComment = (*lbp==';');
 
   //printf("%s\n", lb);
   va_end (ap);

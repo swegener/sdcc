@@ -1582,10 +1582,12 @@ aggregateToPointer (value * val)
 	  DCL_TYPE (val->type) = PPOINTER;
 	  break;
 	case S_FIXED:
+	  if (SPEC_OCLS(val->etype)) {
 	    DCL_TYPE(val->type)=PTR_TYPE(SPEC_OCLS(val->etype));
-
-	  if (TARGET_IS_DS390)
-	    {
+	  } else {
+	    // this should not happen
+	    fprintf (stderr, "wild guess about storage type\n");
+	    if (TARGET_IS_DS390) {
 	      /* The AUTO and REGISTER classes should probably
 	       * also become generic pointers, but I haven't yet
 	       * devised a test case for that.
@@ -1593,9 +1595,10 @@ aggregateToPointer (value * val)
 	      DCL_TYPE (val->type) = GPOINTER;
 	      break;
 	    }
-	  if (options.model==MODEL_LARGE) {
-	    DCL_TYPE (val->type) = FPOINTER;
-	    break;
+	    if (options.model==MODEL_LARGE) {
+	      DCL_TYPE (val->type) = FPOINTER;
+	      break;
+	    }
 	  }
 	  break;
 	case S_AUTO:

@@ -2626,6 +2626,8 @@ genRet (iCode * ic)
 {
   int size, offset = 0, pushed = 0;
 
+  D(emitcode (";", "genRet"));
+
   /* if we have no return value then
      just generate the "ret" */
   if (!IC_LEFT (ic))

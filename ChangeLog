@@ -1,3 +1,9 @@
+2003-05-04  Bernhard Held <bernhard@bernhardheld.de>
+
+	* support/regression/HTMLgen.py: added compare_s2f()
+	* support/regression/Makefile: redo 1.27
+	* support/regression/generate-cases.py: redo 1.5
+
 2003-04-30  Bernhard Held <bernhard@bernhardheld.de>
 
 	* support/regression/tests/float.c: workaround 33 bit hex constant

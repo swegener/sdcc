@@ -68,8 +68,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /G3 /Zp1 /ML /W3 /Gm /GX /ZI /Od /I ".." /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FR /FD /GZ /c
-# SUBTRACT CPP /WX /YX
+# ADD CPP /nologo /G3 /Zp8 /ML /W3 /Gm /GX /ZI /Od /I ".." /I "..\support\util" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FR /J /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -92,6 +91,10 @@ LINK32=link.exe
 # Begin Source File
 
 SOURCE=.\asm.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\support\Util\NewAlloc.c
 # End Source File
 # Begin Source File
 
@@ -175,7 +178,7 @@ SOURCE=.\SDCCdflow.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\SDCCerr.c
+SOURCE=..\support\Util\sdccerr.c
 # End Source File
 # Begin Source File
 
@@ -247,11 +250,15 @@ SOURCE=.\sdccy.c
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
+SOURCE=..\support\Util\newalloc.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\sdcc_vc.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\SDCCalloc.h
+SOURCE=.\SDCCBBlock.h
 # End Source File
 # Begin Source File
 

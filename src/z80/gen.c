@@ -59,6 +59,7 @@
 #include "SDCCpeeph.h"
 #include "gen.h"
 #include "SDCCglue.h"
+#include "newalloc.h"
 
 /* this is the down and dirty file with all kinds of kludgy & hacky
    stuff. This is what it is all about CODE GENERATION for a specific MCU.
@@ -334,7 +335,7 @@ static asmop *newAsmop (short type)
 {
     asmop *aop;
 
-    ALLOC(aop,sizeof(asmop));
+    aop = Safe_calloc(sizeof(asmop));
     aop->type = type;
     return aop;
 }
@@ -369,7 +370,7 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result, bool requires_a)
     /* special case for a function */
     if (IS_FUNC(sym->type)) {   
         sym->aop = aop = newAsmop(AOP_IMMD);    
-        ALLOC(aop->aopu.aop_immd,strlen(sym->rname)+1);
+        aop->aopu.aop_immd = Safe_calloc(strlen(sym->rname)+1);
         strcpy(aop->aopu.aop_immd,sym->rname);
         aop->size = 2;
         return aop;
@@ -429,7 +430,7 @@ static asmop *aopForRemat (symbol *sym)
         break;
     }
 
-    ALLOC(aop->aopu.aop_immd,strlen(buffer)+1);
+    aop->aopu.aop_immd = Safe_calloc(strlen(buffer)+1);
     strcpy(aop->aopu.aop_immd,buffer);    
     return aop;        
 }
@@ -716,7 +717,7 @@ char *aopGetLitWordLong(asmop *aop, int offset, bool with_hash)
 	    tsprintf(s, "!hashedstr + %d", aop->aopu.aop_immd, offset);
 	else
 	    tsprintf(s, "%s + %d", aop->aopu.aop_immd, offset);
-	ALLOC(rs,strlen(s)+1);
+	rs = Safe_calloc(strlen(s)+1);
 	strcpy(rs,s);   
 	return rs;
     case AOP_LIT: {
@@ -733,7 +734,7 @@ char *aopGetLitWordLong(asmop *aop, int offset, bool with_hash)
 		tsprintf(buffer, "!immedword", v);
 	    else
 		tsprintf(buffer, "!constword", v);
-	    ALLOC(rs,strlen(buffer)+1);
+	    rs = Safe_calloc(strlen(buffer)+1);
 	    return strcpy (rs,buffer);
 	}
 	else {
@@ -744,7 +745,7 @@ char *aopGetLitWordLong(asmop *aop, int offset, bool with_hash)
 		tsprintf(buffer, "!immedword", f.w[offset/2]);
 	    else
 		tsprintf(buffer, "!constword", f.w[offset/2]);
-	    ALLOC(rs,strlen(buffer)+1);
+	    rs = Safe_calloc(strlen(buffer)+1);
 	    return strcpy (rs,buffer);
 	}
     }
@@ -994,7 +995,7 @@ static char *aopGet(asmop *aop, int offset, bool bit16)
 	    default:
 		wassert(0);
 	    }
-	ALLOC(rs,strlen(s)+1);
+	rs = Safe_calloc(strlen(s)+1);
 	strcpy(rs,s);   
 	return rs;
 	
@@ -1002,7 +1003,7 @@ static char *aopGet(asmop *aop, int offset, bool bit16)
 	wassert(IS_GB);
 	emitcode("ld", "a,(%s+%d) ; x", aop->aopu.aop_dir, offset);
 	sprintf(s, "a");
-	ALLOC(rs,strlen(s)+1);
+	rs = Safe_calloc(strlen(s)+1);
 	strcpy(rs,s);   
 	return rs;
 	
@@ -1010,7 +1011,7 @@ static char *aopGet(asmop *aop, int offset, bool bit16)
 	wassert(IS_GB);
 	emitcode("ldh", "a,(%s+%d) ; x", aop->aopu.aop_dir, offset);
 	sprintf(s, "a");
-	ALLOC(rs,strlen(s)+1);
+	rs = Safe_calloc(strlen(s)+1);
 	strcpy(rs,s);   
 	return rs;
 
@@ -1027,7 +1028,7 @@ static char *aopGet(asmop *aop, int offset, bool bit16)
 	wassert(IS_Z80);
 	setupPair(PAIR_IY, aop, offset);
 	tsprintf(s,"!*iyx", offset);
-	ALLOC(rs,strlen(s)+1);
+	rs = Safe_calloc(strlen(s)+1);
 	strcpy(rs,s);   
 	return rs;
 
@@ -1041,7 +1042,7 @@ static char *aopGet(asmop *aop, int offset, bool bit16)
 		offset += _G.stack.param_offset;
 	    tsprintf(s,"!*ixx ; x", aop->aopu.aop_stk+offset);
 	}
-	ALLOC(rs,strlen(s)+1);
+	rs = Safe_calloc(strlen(s)+1);
 	strcpy(rs,s);   
 	return rs;
 	

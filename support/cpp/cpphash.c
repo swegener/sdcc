@@ -24,7 +24,14 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cpplib.h"
 #include "cpphash.h"
-extern char *xmalloc PARAMS ((unsigned));
+//extern char *xmalloc PARAMS ((unsigned));
+
+#include "newalloc.h"
+
+#if defined(_MSC_VER)
+#include <string.h>
+#include <stdlib.h>
+#endif
 
 /* Define a generic NULL if one hasn't already been defined.  */
 
@@ -177,7 +184,7 @@ install (
     hash = hashf (name, len, HASHSIZE);
 
   i = sizeof (HASHNODE) + len + 1;
-  hp = (HASHNODE *) xmalloc (i);
+  hp = (HASHNODE *) Safe_malloc (i);
   bucket = hash;
   hp->bucket_hdr = &hashtab[bucket];
   hp->next = hashtab[bucket];

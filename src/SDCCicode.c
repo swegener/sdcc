@@ -23,6 +23,7 @@
 -------------------------------------------------------------------------*/
 
 #include "common.h"
+#include "newalloc.h"
 
 /*-----------------------------------------------------------------*/
 /* global variables       */
@@ -412,7 +413,7 @@ operand *newOperand ()
 {
     operand *op ;
     
-    ALLOC(op,sizeof(operand));
+    op = Safe_calloc(sizeof(operand));
     
     op->key = 0 ;
     return op;
@@ -425,7 +426,7 @@ iCode *newiCode (int op, operand *left, operand *right)
 {
     iCode *ic ;
     
-    ALLOC(ic,sizeof(iCode));
+    ic = Safe_calloc(sizeof(iCode));
    
     ic->lineno = lineno ;
     ic->filename= filename ;

@@ -24,6 +24,7 @@
 -------------------------------------------------------------------------*/
 
 #include "common.h"
+#include "newalloc.h"
 
 int eBBNum = 0;
 set *graphEdges = NULL ;  /* list of edges in this flow graph */
@@ -46,7 +47,7 @@ eBBlock *neweBBlock ()
 {
     eBBlock *ebb;
 
-    ALLOC(ebb,sizeof(eBBlock));   
+    ebb = Safe_calloc(sizeof(eBBlock));   
     return ebb ;
 }
 
@@ -57,7 +58,7 @@ edge *newEdge (eBBlock *from, eBBlock *to)
 {
     edge *ep ;
 
-    ALLOC(ep,sizeof(edge));     
+    ep = Safe_calloc(sizeof(edge));     
     
     ep->from = from;
     ep->to = to;
@@ -385,7 +386,8 @@ eBBlock **iCodeBreakDown (iCode *ic, int *count)
     *count = 0 ;
 
     /* allocate for the first entry */
-    ALLOC(ebbs,sizeof(eBBlock **));
+
+    ebbs = Safe_calloc(sizeof(eBBlock **));
 	
     while (loop) {       
 
@@ -400,12 +402,10 @@ eBBlock **iCodeBreakDown (iCode *ic, int *count)
 	/* put it in the array */
 	ebbs[(*count)++] = ebb ;
 	
-	  /* allocate for the next one. Remember to clear the new */
-	  /*  pointer at the end, that was created by realloc. */
-	if (!(ebbs = realloc(ebbs,(*count + 1)*sizeof(eBBlock **)))) {
-	    werror(E_OUT_OF_MEM,__FILE__,(*count + 1)*sizeof(eBBlock **)); 
-	    exit (1);
-	}
+	/* allocate for the next one. Remember to clear the new */
+	/*  pointer at the end, that was created by realloc. */
+
+	ebbs = Safe_realloc(ebbs,(*count + 1)*sizeof(eBBlock **)) ;
 
 	ebbs[*count] = 0;
 
@@ -444,11 +444,11 @@ eBBlock **iCodeBreakDown (iCode *ic, int *count)
 		}
 		
 		(*count)++ ;
+		
 		/* if we have stopped at the block , allocate for an extra one */
-		if (!(ebbs = realloc(ebbs,(*count + 1)*sizeof(eBBlock **)))) {
-		    werror(E_OUT_OF_MEM,__FILE__,(*count + 1)*sizeof(eBBlock **)); 
-		    exit (1);
-		}
+
+		ebbs = Safe_realloc(ebbs,(*count + 1)*sizeof(eBBlock **)) ;
+
 		ebbs[*count] = 0;
 		
 		/* then move the block down one count */  

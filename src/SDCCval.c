@@ -27,6 +27,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <limits.h>
+#include "newalloc.h"
 
 int		cNestLevel ;
 
@@ -37,7 +38,7 @@ value *newValue ()
 {
     value *val ;
     
-    ALLOC(val,sizeof(value));
+    val = Safe_calloc(sizeof(value));
     
     return val ;
 }
@@ -50,7 +51,7 @@ initList *newiList ( int type, void *ilist)
     initList *nilist;
     
     
-    ALLOC(nilist,sizeof(initList));	
+    nilist = Safe_calloc(sizeof(initList));	
     
     nilist->type = type	;
     nilist->lineno = yylineno ;
@@ -402,7 +403,7 @@ value *strVal  ( char	*s )
     SPEC_NOUN(val->etype)   =  V_CHAR   ;
     SPEC_SCLS(val->etype)   =  S_LITERAL;
     
-    ALLOC(SPEC_CVAL(val->etype).v_char,strlen(s)+1);
+    SPEC_CVAL(val->etype).v_char = Safe_calloc(strlen(s)+1);
     copyStr (SPEC_CVAL(val->etype).v_char,s);
     return val;
 }

@@ -24,6 +24,8 @@
 
 #include "common.h"
 
+#include "newalloc.h"
+
 int bitVectDefault = 1024;
 
 /* genernal note about a bitvectors:
@@ -38,11 +40,11 @@ bitVect *newBitVect (int size)
     bitVect *bvp;
     int byteSize ;
 
-    ALLOC(bvp,sizeof (bitVect));
+    bvp = Safe_calloc(sizeof (bitVect));
 
     bvp->size = size;    
     bvp->bSize = byteSize = ( size / 8) + 1 ;
-    ALLOC(bvp->vect,byteSize);
+    bvp->vect = Safe_calloc(byteSize);
     return bvp;
 }
 
@@ -63,9 +65,10 @@ bitVect *bitVectResize (bitVect *bvp, int size)
 	return bvp;
     }
 
+    bvp->vect = Clear_realloc(bvp->vect, bvp -> bSize, bSize);
     bvp->size = size;
     bvp->bSize= bSize;
-    bvp->vect = realloc(bvp->vect, bSize);
+
     return bvp;
 }
 

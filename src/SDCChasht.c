@@ -28,6 +28,7 @@
 #include <assert.h>
 #include "SDCCglobl.h"
 #include "SDCChasht.h"
+#include "newalloc.h"
 
 #define DEFAULT_HTAB_SIZE 128
 
@@ -38,7 +39,7 @@ static hashtItem *_newHashtItem (int key, void *pkey, void *item)
 {
     hashtItem *htip;
 
-    ALLOC(htip,sizeof(hashtItem));
+    htip = Safe_calloc(sizeof(hashtItem));
     
     htip->key = key ;
     htip->pkey = pkey;
@@ -54,7 +55,7 @@ hTab *newHashTable (int size)
 {
     hTab *htab;    
     
-    ALLOC(htab,sizeof(hTab));  
+    htab = Safe_calloc(sizeof(hTab));  
 
     if (!(htab->table = calloc((size +1),  sizeof(hashtItem *)))) {
 	fprintf(stderr,"out of virtual memory %s %d\n",
@@ -76,7 +77,7 @@ void hTabAddItemLong(hTab **htab, int key, void *pkey, void *item)
     
     if (key > (*htab)->size ) {	
 	int i;       
-	(*htab)->table = realloc ((*htab)->table, 
+	(*htab)->table = Safe_realloc ((*htab)->table, 
 				  (key*2 + 2)*sizeof(hashtItem *));
 	for ( i = (*htab)->size +1; i <= (key*2 + 1); i++ )
 	    (*htab)->table[i] = NULL ;

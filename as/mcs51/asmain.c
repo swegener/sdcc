@@ -14,10 +14,13 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include <string.h>
-#if !defined(_MSC_VER)
-#include <unistd.h>
-#include <alloc.h>
-#endif
+
+//#if defined(_MSC_VER)
+//#include <stdlib.h>
+//#else	  // _MSC_VER
+//#include <alloc.h>
+//#endif	  // _MSC_VER
+
 #include "asm.h"
 
 extern VOID machine(struct mne *);

@@ -41,7 +41,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir ""
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
-# ADD CPP /nologo /G3 /Zp1 /W3 /GX /O2 /I ".." /I "." /I "..\.." /I "..\..\support" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /FR /YX /J /FD /Zm500 /c
+# ADD CPP /nologo /G3 /Zp1 /W3 /GX /O2 /I ".." /I "." /I "..\.." /I "..\..\support" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /FR /YX /FD /Zm500 /c
 # SUBTRACT CPP /WX
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
@@ -65,8 +65,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir ""
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /nologo /G3 /Zp1 /ML /W3 /Gm /GX /ZI /Od /I ".." /I "." /I "..\.." /I "..\..\support" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /FR /J /FD /GZ /Zm500 /c
-# SUBTRACT CPP /WX
+# ADD CPP /nologo /G3 /Zp8 /ML /W3 /Gm /GX /ZI /Od /I ".." /I "." /I "..\.." /I "..\..\support\util" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /FR /J /FD /GZ /Zm500 /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe

@@ -48,7 +48,7 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
    for the sake of machines with limited C compilers.  */
 #ifndef EMACS
 #include "config.h"
-#include <malloc.h>
+#include "newalloc.h"
 #include <string.h>
 #endif /* not EMACS */
 #define GCC_INCLUDE_DIR "/usr/local/lib/gcc-lib/i386-unknown-freebsd_1.0/2.5.8/include"
@@ -272,7 +272,7 @@ struct cpp_pending {
 
 /* Forward declarations.  */
 
-extern char *xmalloc ();
+//extern char *Safe_malloc ();
 
 static void add_import ();
 static void append_include_chain ();
@@ -313,8 +313,8 @@ static int safe_read ();
 static void push_macro_expansion PARAMS ((cpp_reader *,
 					  U_CHAR*, int, HASHNODE*));
 static struct cpp_pending *nreverse_pending PARAMS ((struct cpp_pending*));
-extern char *xrealloc ();
-extern char *xcalloc ();
+//extern char *xrealloc ();
+//extern char *xcalloc ();
 static char *savestring ();
 
 static void conditional_skip ();
@@ -558,8 +558,7 @@ cpp_grow_buffer (
 {
   long old_written = CPP_WRITTEN (pfile);
   pfile->token_buffer_size = n + 2 * pfile->token_buffer_size;
-  pfile->token_buffer = (U_CHAR*)
-    xrealloc(pfile->token_buffer, pfile->token_buffer_size);
+  pfile->token_buffer = (U_CHAR*) Safe_realloc(pfile->token_buffer, pfile->token_buffer_size);
   CPP_SET_WRITTEN (pfile, old_written);
 }
 
@@ -733,7 +732,7 @@ deps_output (
   if (pfile->deps_size + size + 8 > pfile->deps_allocated_size)
     {
       pfile->deps_allocated_size = (pfile->deps_size + size + 50) * 2;
-      pfile->deps_buffer = (char *) xrealloc (pfile->deps_buffer,
+      pfile->deps_buffer = (char *) Safe_realloc(pfile->deps_buffer,
 					      pfile->deps_allocated_size);
     }
   if (spacer == ' ' && pfile->deps_column > 0)
@@ -768,18 +767,18 @@ path_include (
       while (*q != 0 && *q != PATH_SEPARATOR) q++;
       if (p == q) {
 	/* An empty name in the path stands for the current directory.  */
-	name = (char *) xmalloc (2);
+	name = (char *) Safe_malloc (2);
 	name[0] = '.';
 	name[1] = 0;
       } else {
 	/* Otherwise use the directory that is named.  */
-	name = (char *) xmalloc (q - p + 1);
+	name = (char *) Safe_malloc (q - p + 1);
 	bcopy (p, name, q - p);
 	name[q - p] = 0;
       }
 
       dirtmp = (struct file_name_list *)
-	xmalloc (sizeof (struct file_name_list));
+	Safe_malloc (sizeof (struct file_name_list));
       dirtmp->next = 0;		/* New one goes on the end */
       dirtmp->control_macro = 0;
       dirtmp->c_system_include_path = 0;
@@ -1287,7 +1286,7 @@ collect_expansion (
   while (p < limit)
     if (*p++ == '@')
       maxsize++;
-  defn = (DEFINITION *) xcalloc (1, maxsize);
+  defn = (DEFINITION *) Safe_calloc(maxsize);
 
   defn->nargs = nargs;
   exp_p = defn->expansion = (U_CHAR *) defn + sizeof (DEFINITION);
@@ -1450,7 +1449,7 @@ collect_expansion (
 	      break;
 	    /* make a pat node for this arg and append it to the end of
 	       the pat list */
-	    tpat = (struct reflist *) xmalloc (sizeof (struct reflist));
+	    tpat = (struct reflist *) Safe_malloc (sizeof (struct reflist));
 	    tpat->next = NULL;
 	    tpat->raw_before = concat == id_beg;
 	    tpat->raw_after = 0;
@@ -1513,7 +1512,7 @@ collect_expansion (
 #if 0
 /* This isn't worth the time it takes.  */
   /* give back excess storage */
-  defn->expansion = (U_CHAR *) xrealloc (defn->expansion, defn->length + 1);
+  defn->expansion = (U_CHAR *) Safe_realloc(defn->expansion, defn->length + 1);
 #endif
 
   return defn;
@@ -1647,7 +1646,7 @@ create_definition (
     /* Now set defn->args.argnames to the result of concatenating
        the argument names in reverse order
        with comma-space between them.  */
-    defn->args.argnames = (U_CHAR *) xmalloc (arglengths + 1);
+    defn->args.argnames = (U_CHAR *) Safe_malloc (arglengths + 1);
     {
       struct arglist *temp;
       int i = 0;
@@ -1929,7 +1928,7 @@ cpp_push_buffer (
   bzero ((char *) buf, sizeof (cpp_buffer));
   CPP_BUFFER (pfile) = buf;
 #else
-  register cpp_buffer *buf = (cpp_buffer*) xmalloc (sizeof(cpp_buffer));
+  register cpp_buffer *buf = (cpp_buffer*) Safe_malloc (sizeof(cpp_buffer));
   bzero ((char *) buf, sizeof (cpp_buffer));
   CPP_PREV_BUFFER (buf) = CPP_BUFFER (pfile);
   CPP_BUFFER (pfile) = buf;
@@ -2924,7 +2923,7 @@ macroexpand (
 	    args[ap->argno].use_count++;
 	}
 
-      xbuf = (U_CHAR *) xmalloc (xbuf_len + 1);
+      xbuf = (U_CHAR *) Safe_malloc (xbuf_len + 1);
 
       /* Generate in XBUF the complete expansion
 	 with arguments substituted in.
@@ -3327,7 +3326,7 @@ do_include (
 
   /* Allocate this permanently, because it gets stored in the definitions
      of macros.  */
-  fname = (char *) xmalloc (pfile->max_include_len + flen + 4);
+  fname = (char *) Safe_malloc (pfile->max_include_len + flen + 4);
   /* + 2 above for slash and terminating null.  */
   /* + 2 added for '.h' on VMS (to support '#include filename') */
 
@@ -3479,7 +3478,7 @@ do_include (
       /* This is the first time for this file.  */
       /* Add it to list of files included.  */
 
-      ptr = (struct file_name_list *) xmalloc (sizeof (struct file_name_list));
+      ptr = (struct file_name_list *) Safe_malloc (sizeof (struct file_name_list));
       ptr->control_macro = 0;
       ptr->c_system_include_path = 0;
       ptr->next = pfile->all_include_files;
@@ -3639,7 +3638,7 @@ assertion_install (
   register U_CHAR *p, *q;
 
   i = sizeof (ASSERTION_HASHNODE) + len + 1;
-  hp = (ASSERTION_HASHNODE *) xmalloc (i);
+  hp = (ASSERTION_HASHNODE *) Safe_malloc (i);
   bucket = hash;
   hp->bucket_hdr = &pfile->assertion_hashtab[bucket];
   hp->next = pfile->assertion_hashtab[bucket];
@@ -3867,7 +3866,7 @@ do_line (
       }
     if (hp == 0) {
       /* Didn't find it; cons up a new one.  */
-      hp = (HASHNODE *) xcalloc (1, sizeof (HASHNODE) + fname_length + 1);
+      hp = (HASHNODE *) Safe_calloc(sizeof (HASHNODE) + fname_length + 1);
       hp->next = *hash_bucket;
       *hash_bucket = hp;
 
@@ -3947,7 +3946,7 @@ do_error (
      U_CHAR *buf,U_CHAR *limit)
 {
   int length = limit - buf;
-  U_CHAR *copy = (U_CHAR *) xmalloc (length + 1);
+  U_CHAR *copy = (U_CHAR *) Safe_malloc (length + 1);
   bcopy (buf, copy, length);
   copy[length] = 0;
   SKIP_WHITE_SPACE (copy);
@@ -3968,7 +3967,7 @@ do_warning (
      U_CHAR *buf,U_CHAR *limit)
 {
   int length = limit - buf;
-  U_CHAR *copy = (U_CHAR *) xmalloc (length + 1);
+  U_CHAR *copy = (U_CHAR *) Safe_malloc (length + 1);
   bcopy (buf, copy, length);
   copy[length] = 0;
   SKIP_WHITE_SPACE (copy);
@@ -3995,7 +3994,7 @@ do_once (
     }
 
     
-  new = (struct file_name_list *) xmalloc (sizeof (struct file_name_list));
+  new = (struct file_name_list *) Safe_malloc (sizeof (struct file_name_list));
   new->next = pfile->dont_repeat_files;
   pfile->dont_repeat_files = new;
   new->fname = savestring (ip->fname);
@@ -4250,7 +4249,7 @@ do_xifdef (
       skip = (hp == NULL) ^ (keyword->type == T_IFNDEF);
       if (start_of_file && !skip)
 	{
-	  control_macro = (U_CHAR *) xmalloc (ident_length + 1);
+	  control_macro = (U_CHAR *) Safe_malloc (ident_length + 1);
 	  bcopy (ident, control_macro, ident_length + 1);
 	}
     }
@@ -4302,7 +4301,7 @@ conditional_skip (
 {
   IF_STACK_FRAME *temp;
 
-  temp = (IF_STACK_FRAME *) xcalloc (1, sizeof (IF_STACK_FRAME));
+  temp = (IF_STACK_FRAME *) Safe_calloc(sizeof (IF_STACK_FRAME));
   temp->fname = CPP_BUFFER (pfile)->nominal_fname;
 #if 0
   temp->lineno = CPP_BUFFER (pfile)->lineno;
@@ -4397,7 +4396,7 @@ skip_if_group (
 		case T_IFDEF:
 		case T_IFNDEF:
 		  temp
-		    = (IF_STACK_FRAME *) xcalloc (1, sizeof (IF_STACK_FRAME));
+		    = (IF_STACK_FRAME *) Safe_calloc(sizeof (IF_STACK_FRAME));
 		  temp->next = pfile->if_stack;
 		  pfile->if_stack = temp;
 #if 0
@@ -5195,7 +5194,7 @@ cpp_get_token (
 	      CPP_SET_WRITTEN (pfile, before_name_written);
 	      special_symbol (hp, pfile);
 	      xbuf_len = CPP_WRITTEN (pfile) - before_name_written;
-	      xbuf = (U_CHAR *) xmalloc (xbuf_len + 1);
+	      xbuf = (U_CHAR *) Safe_malloc (xbuf_len + 1);
 	      CPP_SET_WRITTEN (pfile, before_name_written);
 	      bcopy (CPP_PWRITTEN (pfile), xbuf, xbuf_len + 1);
 	      push_macro_expansion (pfile, xbuf, xbuf_len, hp);
@@ -5390,8 +5389,8 @@ add_import (
 
   hashval = import_hash (fname);
   fstat (fd, &sb);
-  i = (struct import_file *)xmalloc (sizeof (struct import_file));
-  i->name = (char *)xmalloc (strlen (fname)+1);
+  i = (struct import_file *)Safe_malloc (sizeof (struct import_file));
+  i->name = (char *)Safe_malloc (strlen (fname)+1);
   strcpy (i->name, fname);
   bcopy ((char *) &sb.st_ino, (char *) &i->inode, sizeof (sb.st_ino));
   i->dev = sb.st_dev;
@@ -5428,7 +5427,7 @@ read_filename_string (
   int len;
 
   len = 20;
-  set = alloc = xmalloc (len + 1);
+  set = alloc = Safe_malloc (len + 1);
   if (! is_space[ch])
     {
       *set++ = ch;
@@ -5437,7 +5436,7 @@ read_filename_string (
 	  if (set - alloc == len)
 	    {
 	      len *= 2;
-	      alloc = xrealloc (alloc, len + 1);
+	      alloc = Safe_realloc(alloc, len + 1);
 	      set = alloc + len / 2;
 	    }
 	  *set++ = ch;
@@ -5473,7 +5472,7 @@ read_name_map (
       return map_list_ptr->map_list_map;
 
   map_list_ptr = ((struct file_name_map_list *)
-		  xmalloc (sizeof (struct file_name_map_list)));
+		  Safe_malloc (sizeof (struct file_name_map_list)));
   map_list_ptr->map_list_name = savestring (dirname);
   map_list_ptr->map_list_map = NULL;
 
@@ -5503,7 +5502,7 @@ read_name_map (
 	  to = read_filename_string (ch, f);
 
 	  ptr = ((struct file_name_map *)
-		 xmalloc (sizeof (struct file_name_map)));
+		 Safe_malloc (sizeof (struct file_name_map)));
 	  ptr->map_from = from;
 
 	  /* Make the real filename absolute.  */
@@ -5511,7 +5510,7 @@ read_name_map (
 	    ptr->map_to = to;
 	  else
 	    {
-	      ptr->map_to = xmalloc (dirlen + strlen (to) + 2);
+	      ptr->map_to = Safe_malloc (dirlen + strlen (to) + 2);
 	      strcpy (ptr->map_to, dirname);
 	      ptr->map_to[dirlen] = '/';
 	      strcpy (ptr->map_to + dirlen + 1, to);
@@ -5654,7 +5653,7 @@ finclude (
   fp->cleanup = file_cleanup;
 
   if (S_ISREG (st_mode)) {
-    fp->buf = (U_CHAR *) xmalloc (st_size + 2);
+    fp->buf = (U_CHAR *) Safe_malloc (st_size + 2);
     fp->alimit = fp->buf + st_size + 2;
     fp->cur = fp->buf;
 
@@ -5676,7 +5675,7 @@ finclude (
     int bsize = 2000;
 
     st_size = 0;
-    fp->buf = (U_CHAR *) xmalloc (bsize + 2);
+    fp->buf = (U_CHAR *) Safe_malloc (bsize + 2);
 
     for (;;) {
       i = safe_read (f, fp->buf + st_size, bsize - st_size);
@@ -5686,7 +5685,7 @@ finclude (
       if (st_size != bsize)
 	break;	/* End of file */
       bsize *= 2;
-      fp->buf = (U_CHAR *) xrealloc (fp->buf, bsize + 2);
+      fp->buf = (U_CHAR *) Safe_realloc(fp->buf, bsize + 2);
     }
     fp->cur = fp->buf;
     length = st_size;
@@ -5912,7 +5911,7 @@ push_parse_file (
 	if (*startp == PATH_SEPARATOR)
 	  num_dirs++;
       include_defaults
-	= (struct default_include *) xmalloc ((num_dirs
+	= (struct default_include *) Safe_malloc ((num_dirs
 					       * sizeof (struct default_include))
 					      + sizeof (include_defaults_array));
       startp = endp = epath;
@@ -5970,9 +5969,9 @@ push_parse_file (
 	  if (!strncmp (p->fname, default_prefix, default_len)) {
 	    /* Yes; change prefix and add to search list.  */
 	    struct file_name_list *new
-	      = (struct file_name_list *) xmalloc (sizeof (struct file_name_list));
+	      = (struct file_name_list *) Safe_malloc (sizeof (struct file_name_list));
 	    int this_len = strlen (specd_prefix) + strlen (p->fname) - default_len;
-	    char *str = (char *) xmalloc (this_len + 1);
+	    char *str = (char *) Safe_malloc (this_len + 1);
 	    strcpy (str, specd_prefix);
 	    strcat (str, p->fname + default_len);
 	    new->fname = str;
@@ -5991,7 +5990,7 @@ push_parse_file (
       if (!p->cplusplus
 	  || (opts->cplusplus && !opts->no_standard_cplusplus_includes)) {
 	struct file_name_list *new
-	  = (struct file_name_list *) xmalloc (sizeof (struct file_name_list));
+	  = (struct file_name_list *) Safe_malloc (sizeof (struct file_name_list));
 	new->control_macro = 0;
 	new->c_system_include_path = !p->cxx_aware;
 	new->fname = p->fname;
@@ -6084,7 +6083,7 @@ push_parse_file (
     if (*s != 0)
       {
 	opts->deps_target = s + 1;
-	output_file = (char *) xmalloc (s - spec + 1);
+	output_file = (char *) Safe_malloc (s - spec + 1);
 	bcopy (spec, output_file, s - spec);
 	output_file[s - spec] = 0;
       }
@@ -6103,7 +6102,7 @@ push_parse_file (
   if (opts->print_deps)
     {
       pfile->deps_allocated_size = 200;
-      pfile->deps_buffer = (char *) xmalloc (pfile->deps_allocated_size);
+      pfile->deps_buffer = (char *) Safe_malloc (pfile->deps_allocated_size);
       pfile->deps_buffer[0] = 0;
       pfile->deps_size = 0;
       pfile->deps_column = 0;
@@ -6244,7 +6243,7 @@ init_parse_file (
   pfile->get_token = cpp_get_token;
 
   pfile->token_buffer_size = 200;
-  pfile->token_buffer = (U_CHAR*)xmalloc (pfile->token_buffer_size);
+  pfile->token_buffer = (U_CHAR*)Safe_malloc (pfile->token_buffer_size);
   CPP_SET_WRITTEN (pfile, 0);
 
   pfile->system_include_depth = 0;
@@ -6278,7 +6277,7 @@ push_pending (
      char *arg)
 {
   struct cpp_pending *pend
-    = (struct cpp_pending*)xmalloc (sizeof (struct cpp_pending));
+    = (struct cpp_pending*)Safe_malloc (sizeof (struct cpp_pending));
   pend->cmd = cmd;
   pend->arg = arg;
   pend->next = CPP_OPTIONS (pfile)->pending;
@@ -6333,11 +6332,11 @@ cpp_handle_options (
 						fatal ("Filename missing after `-isystem' option");
 					
 					dirtmp = (struct file_name_list *)
-						xmalloc (sizeof (struct file_name_list));
+						Safe_malloc (sizeof (struct file_name_list));
 					dirtmp->next = 0;
 					dirtmp->control_macro = 0;
 					dirtmp->c_system_include_path = 1;
-					dirtmp->fname = (char *) xmalloc (strlen (argv[i+1]) + 1);
+					dirtmp->fname = (char *) Safe_malloc (strlen (argv[i+1]) + 1);
 					strcpy (dirtmp->fname, argv[++i]);
 					dirtmp->got_name_map = 0;
 					
@@ -6363,14 +6362,14 @@ cpp_handle_options (
 					}
 					
 					dirtmp = (struct file_name_list *)
-						xmalloc (sizeof (struct file_name_list));
+						Safe_malloc (sizeof (struct file_name_list));
 					dirtmp->next = 0;	/* New one goes on the end */
 					dirtmp->control_macro = 0;
 					dirtmp->c_system_include_path = 0;
 					if (i + 1 == argc)
 						fatal ("Directory name missing after `-iwithprefix' option");
 					
-					dirtmp->fname = (char *) xmalloc (strlen (argv[i+1])
+					dirtmp->fname = (char *) Safe_malloc (strlen (argv[i+1])
 						+ strlen (prefix) + 1);
 					strcpy (dirtmp->fname, prefix);
 					strcat (dirtmp->fname, argv[++i]);
@@ -6398,14 +6397,14 @@ cpp_handle_options (
 					}
 					
 					dirtmp = (struct file_name_list *)
-						xmalloc (sizeof (struct file_name_list));
+						Safe_malloc (sizeof (struct file_name_list));
 					dirtmp->next = 0;	/* New one goes on the end */
 					dirtmp->control_macro = 0;
 					dirtmp->c_system_include_path = 0;
 					if (i + 1 == argc)
 						fatal ("Directory name missing after `-iwithprefixbefore' option");
 					
-					dirtmp->fname = (char *) xmalloc (strlen (argv[i+1])
+					dirtmp->fname = (char *) Safe_malloc (strlen (argv[i+1])
 						+ strlen (prefix) + 1);
 					strcpy (dirtmp->fname, prefix);
 					strcat (dirtmp->fname, argv[++i]);
@@ -6418,7 +6417,7 @@ cpp_handle_options (
 					struct file_name_list *dirtmp;
 					
 					dirtmp = (struct file_name_list *)
-						xmalloc (sizeof (struct file_name_list));
+						Safe_malloc (sizeof (struct file_name_list));
 					dirtmp->next = 0;	/* New one goes on the end */
 					dirtmp->control_macro = 0;
 					dirtmp->c_system_include_path = 0;
@@ -6701,7 +6700,7 @@ cpp_handle_options (
 							}
 							else {
 								dirtmp = (struct file_name_list *)
-									xmalloc (sizeof (struct file_name_list));
+									Safe_malloc (sizeof (struct file_name_list));
 								dirtmp->next = 0;		/* New one goes on the end */
 								dirtmp->control_macro = 0;
 								dirtmp->c_system_include_path = 0;
@@ -6903,7 +6902,7 @@ do_assert (
     U_CHAR *symname = pfile->token_buffer + symstart;
     int hashcode = hashf (symname, sym_length, ASSERTION_HASHSIZE);
     struct tokenlist_list *value
-      = (struct tokenlist_list *) xmalloc (sizeof (struct tokenlist_list));
+      = (struct tokenlist_list *) Safe_malloc (sizeof (struct tokenlist_list));
 
     hp = assertion_lookup (pfile, symname, sym_length, hashcode);
     if (hp == NULL) {
@@ -7154,7 +7153,7 @@ read_token_list (
 
       length = CPP_WRITTEN (pfile) - name_written;
       temp = (struct arglist *)
-	  xmalloc (sizeof (struct arglist) + length + 1);
+	  Safe_malloc (sizeof (struct arglist) + length + 1);
       temp->name = (U_CHAR *) (temp + 1);
       bcopy ((char *) (pfile->token_buffer + name_written),
 	     (char *) temp->name, length);
@@ -7242,7 +7241,7 @@ savestring (
      char *input)
 {
   unsigned size = strlen (input);
-  char *output = xmalloc (size + 1);
+  char *output = Safe_malloc (size + 1);
   strcpy (output, input);
   return output;
 }
@@ -7538,7 +7537,7 @@ cpp_error_from_errno (
   if (ip != NULL)
     cpp_file_line_for_message (pfile, ip->nominal_fname, ip->lineno, -1);
 
-  cpp_message (pfile, 1, "%s: %s", name, my_strerror (errno));
+  cpp_message (pfile, 1, "%s: %s", name, my_strerror (errno),NULL);
 }
 
 void

@@ -24,6 +24,7 @@
 -------------------------------------------------------------------------*/
 
 #include "common.h"
+#include "newalloc.h"
 
 DEFSETFUNC(isDefAlive);
 
@@ -37,7 +38,7 @@ induction *newInduction (operand *sym, unsigned int op,
 {
     induction *ip;
 
-    ALLOC(ip,sizeof(induction));
+    ip = Safe_calloc(sizeof(induction));
 
     ip->sym = sym;
     ip->asym= asym;
@@ -55,7 +56,7 @@ region *newRegion ()
 {
     region *lp ;
 
-    ALLOC(lp,sizeof(region));  
+    lp = Safe_calloc(sizeof(region));  
 
     return lp;
 }

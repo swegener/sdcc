@@ -24,15 +24,17 @@ Written by Per Bothner 1994. */
 
 /* Parse a C expression from text in a string  */
 
-#if defined(_MSC_VER)
-#include <malloc.h>
-#endif
+//#if defined(_MSC_VER)
+//#include <malloc.h>
+//#endif
 
 #include "config.h"   
 #include "cpplib.h"
 
-extern char *xmalloc PARAMS ((unsigned));
-extern char *xrealloc PARAMS ((char *, unsigned));
+#include "newalloc.h"
+
+//extern char *xmalloc PARAMS ((unsigned));
+//extern char *xrealloc PARAMS ((char *, unsigned));
 
 #ifdef MULTIBYTE_CHARS
 #include <stdlib.h>
@@ -68,7 +70,7 @@ struct arglist {
 #define NULL_PTR ((GENERIC_PTR)0)
 #endif
 
-extern char *xmalloc ();
+//extern char *xmalloc ();
 
 #ifndef CHAR_TYPE_SIZE
 #define CHAR_TYPE_SIZE BITS_PER_UNIT
@@ -979,10 +981,10 @@ cpp_parse_expr (
 	  int old_size = (char*)limit - (char*)stack;
 	  int new_size = 2 * old_size;
 	  if (stack != init_stack)
-	    new_stack = (struct operation*) xrealloc (stack, new_size);
+	    new_stack = (struct operation*) Safe_realloc (stack, new_size);
 	  else
 	    {
-	      new_stack = (struct operation*) xmalloc (new_size);
+	      new_stack = (struct operation*) Safe_malloc (new_size);
 	      bcopy ((char *) stack, (char *) new_stack, old_size);
 	    }
 	  stack = new_stack;

@@ -33,6 +33,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "SDCCglobl.h"
+#include "newalloc.h"
 
 #ifdef HAVE_SYS_ISA_DEFS_H
 #include <sys/isa_defs.h>
@@ -229,7 +230,7 @@ static asmop *newAsmop (short type)
 {
     asmop *aop;
 
-    ALLOC(aop,sizeof(asmop));
+    aop = Safe_calloc(sizeof(asmop));
     aop->type = type;
     return aop;
 }
@@ -353,7 +354,7 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
     /* special case for a function */
     if (IS_FUNC(sym->type)) {   
         sym->aop = aop = newAsmop(AOP_IMMD);    
-        ALLOC(aop->aopu.aop_immd,strlen(sym->rname)+1);
+        aop->aopu.aop_immd = Safe_calloc(strlen(sym->rname)+1);
         strcpy(aop->aopu.aop_immd,sym->rname);
         aop->size = FPTRSIZE; 
         return aop;
@@ -400,7 +401,7 @@ static asmop *aopForRemat (symbol *sym)
     else
 	strcpy(buffer,OP_SYMBOL(IC_LEFT(ic))->rname);
 
-    ALLOC(aop->aopu.aop_immd,strlen(buffer)+1);
+    aop->aopu.aop_immd = Safe_calloc(strlen(buffer)+1);
     strcpy(aop->aopu.aop_immd,buffer);    
     return aop;        
 }
@@ -747,7 +748,7 @@ static char *aopGet (asmop *aop, int offset, bool bit16, bool dname)
 	    return (dname ? "acc" : "a");
 	}       
 	sprintf(s,"@%s",aop->aopu.aop_ptr->name);
-	ALLOC(rs,strlen(s)+1);
+	rs = Safe_calloc(strlen(s)+1);
 	strcpy(rs,s);   
 	return rs;
 	
@@ -797,7 +798,7 @@ static char *aopGet (asmop *aop, int offset, bool bit16, bool dname)
 	    else
 		sprintf(s,"#%s",
 			aop->aopu.aop_immd);
-	ALLOC(rs,strlen(s)+1);
+	rs = Safe_calloc(strlen(s)+1);
 	strcpy(rs,s);   
 	return rs;
 	
@@ -808,7 +809,7 @@ static char *aopGet (asmop *aop, int offset, bool bit16, bool dname)
 		    offset);
 	else
 	    sprintf(s,"%s",aop->aopu.aop_dir);
-	ALLOC(rs,strlen(s)+1);
+	rs = Safe_calloc(strlen(s)+1);
 	strcpy(rs,s);   
 	return rs;
 	

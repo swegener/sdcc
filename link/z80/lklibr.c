@@ -480,7 +480,7 @@ int buildlibraryindex()
 				relfil[NINPUT+1] = '\0';
 				relfil[strlen(relfil) - 1] = '\0';
 				if (path != NULL) {
-					str = (char *)malloc(strlen(path)+strlen(relfil)+6);
+					str = (char *)Safe_malloc(strlen(path)+strlen(relfil)+6);
 					strcpy(str,path);
 #ifdef	OTHERSYSTEM
 #ifdef SDK
@@ -498,7 +498,7 @@ int buildlibraryindex()
 					}
 #endif
 				} else {
-					str = (char *)malloc(strlen(relfil) + 5);
+					str = (char *)Safe_malloc(strlen(relfil) + 5);
 				}
 #ifdef SDK
 #ifdef UNIX
@@ -523,7 +523,7 @@ int buildlibraryindex()
 /*3*/				if ((fp = fopen(str, "r")) != NULL) {
 
 					/* Opened OK - create a new libraryfile object for it */
-					This->next = (pmlibraryfile)malloc( sizeof( mlibraryfile ));
+					This->next = (pmlibraryfile)Safe_malloc( sizeof( mlibraryfile ));
 					if (This->next == NULL) {
 						printf("panic: cant allocate memory.\n");
 						exit(-1);

@@ -25,6 +25,7 @@
 
 #include "common.h"
 #include "SDCCpeeph.h"
+#include "newalloc.h"
 
 peepRule *rootRules = NULL;
 peepRule *currRule  = NULL;
@@ -270,13 +271,13 @@ peepRule *newPeepRule (lineNode *match  ,
 {
     peepRule *pr ;
 
-    ALLOC(pr,sizeof(peepRule));
+    pr= Safe_calloc(sizeof(peepRule));
     pr->match = match;
     pr->replace= replace;
     pr->restart = restart;
 
     if (cond && *cond) {
-    ALLOC(pr->cond,strlen(cond)+1);
+    pr->cond = Safe_calloc(strlen(cond)+1);
     strcpy(pr->cond,cond);
     } else
     pr->cond = NULL ;
@@ -299,8 +300,8 @@ lineNode *newLineNode (char *line)
 {
     lineNode *pl;
 
-    ALLOC(pl,sizeof(lineNode));
-    ALLOC(pl->line,strlen(line)+1);
+    pl = Safe_calloc(sizeof(lineNode));
+    pl->line = Safe_calloc(strlen(line)+1);
     strcpy(pl->line,line);
     return pl;
 }
@@ -506,7 +507,7 @@ static void bindVar (int key, char **s, hTab **vtab)
     *s = vvx ;
     *vv = '\0';
     /* got value */
-    ALLOC(vvx,strlen(vval)+1);
+    vvx = Safe_calloc(strlen(vval)+1);
     strcpy(vvx,vval);
     hTabAddItem(vtab,key,vvx);
 
@@ -786,9 +787,7 @@ static void buildLabelRefCountHash(lineNode *head)
     	{
     	    labelHashEntry *entry;
     	    
-    	    ALLOC(entry, sizeof(labelHashEntry));
-
-	    assert(entry != NULL);
+    	    entry = Safe_calloc(sizeof(labelHashEntry));
     	    
     	    memcpy(entry->name, label, labelLen);
     	    entry->name[labelLen] = 0;
@@ -911,10 +910,10 @@ static char *readFileIntoBuffer (char *fname)
         lb[nch] = '\0';
         /* copy it into allocated buffer */
         if (rs) {
-        rs = realloc(rs,strlen(rs)+strlen(lb)+1);
+        rs = Safe_realloc(rs,strlen(rs)+strlen(lb)+1);
         strcat(rs,lb);
         } else {
-        ALLOC(rs,strlen(lb)+1);
+        rs = Safe_calloc(strlen(lb)+1);
         strcpy(rs,lb);
         }
         nch = 0 ;
@@ -926,10 +925,10 @@ static char *readFileIntoBuffer (char *fname)
     lb[nch] = '\0';
     /* copy it into allocated buffer */
     if (rs) {
-        rs = realloc(rs,strlen(rs)+strlen(lb)+1);
+        rs = Safe_realloc(rs,strlen(rs)+strlen(lb)+1);
         strcat(rs,lb);
     } else {
-        ALLOC(rs,strlen(lb)+1);
+        rs = Safe_calloc(strlen(lb)+1);
         strcpy(rs,lb);
     }
     }

@@ -23,6 +23,7 @@
 -------------------------------------------------------------------------*/
 
 #include "common.h"
+#include "newalloc.h"
 
 /*-----------------------------------------------------------------*/
 /* newCseDef - new cseDef                                          */
@@ -32,7 +33,7 @@ cseDef *newCseDef (operand *sym, iCode *ic)
     cseDef *cdp ;
     
     assert (sym);
-    ALLOC(cdp,sizeof(cseDef));    
+    cdp = Safe_calloc(sizeof(cseDef));    
 
     cdp->sym = sym;
     cdp->diCode = ic;

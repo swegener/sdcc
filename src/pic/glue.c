@@ -25,6 +25,7 @@
 #include "../common.h"
 #include <time.h>
 #include "ralloc.h"
+#include "newalloc.h"
 
 extern symbol *interrupts[256];
 void printIval (symbol *, sym_link *, initList *, FILE *);
@@ -88,7 +89,7 @@ char *pic14aopLiteral (value *val, int offset)
 
         v >>= (offset * 8);
         sprintf(buffer,"0x%02x",((char) v) & 0xff);
-        ALLOC(rs,strlen(buffer)+1);
+        rs = Safe_calloc(strlen(buffer)+1);
         return strcpy (rs,buffer);
     }
 
@@ -99,7 +100,7 @@ char *pic14aopLiteral (value *val, int offset)
 #else
     sprintf(buffer,"0x%02x",fl.c[offset]);
 #endif
-    ALLOC(rs,strlen(buffer)+1);
+    rs = Safe_calloc(strlen(buffer)+1);
     return strcpy (rs,buffer);
 }
 

@@ -22,6 +22,7 @@
 -------------------------------------------------------------------------*/
 
 #include "common.h"
+#include "newalloc.h"
 
 bucket   *SymbolTab [256]  ;  /* the symbol    table  */
 bucket   *StructTab [256]  ;  /* the structure table  */
@@ -48,7 +49,7 @@ bucket	 *newBucket ()
 {
 	bucket *bp ;
 	      
-	ALLOC(bp,sizeof(bucket));
+	bp = Safe_calloc(sizeof(bucket));
 	
 	return bp ;
 }
@@ -80,7 +81,7 @@ void  addSym ( bucket **stab ,
     /* the symbols are always added at the head of the list  */
     i = hashKey(sname) ;      
     /* get a free entry */
-    ALLOC(bp,sizeof(bucket));
+    bp = Safe_calloc(sizeof(bucket));
     
     bp->sym = sym ;	/* update the symbol pointer  */
     bp->level = level;   /* update the nest level      */   
@@ -221,7 +222,7 @@ symbol *newSymbol (char *name, int scope )
 {
    symbol *sym ;
    
-   ALLOC(sym,sizeof(symbol));   
+   sym = Safe_calloc(sizeof(symbol));   
 
    strcpy(sym->name,name);             /* copy the name    */
    sym->level = scope ;                /* set the level    */
@@ -237,7 +238,7 @@ sym_link  *newLink ()
 {
    sym_link *p ;
 
-   ALLOC(p,sizeof(sym_link));
+   p = Safe_calloc(sizeof(sym_link));
 
    return p;
 }
@@ -249,7 +250,7 @@ structdef   *newStruct  ( char   *tag   )
 {
    structdef  *s;
 
-   ALLOC(s,sizeof(structdef));
+   s = Safe_calloc(sizeof(structdef));
    
    strcpy(s->tag,tag) ;                     /* copy the tag            */
    return s ;

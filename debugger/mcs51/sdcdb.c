@@ -153,7 +153,7 @@ struct cmdtab
 char *gc_strdup(const char *s)
 {
     char *ret;
-    ALLOC_ATOMIC(ret, strlen(s)+1);
+    Safe_calloc(ret, strlen(s)+1);
     strcpy(ret, s);
     return ret;
 }
@@ -168,7 +168,7 @@ char *alloccpy ( char *s, int size)
     if (!size)
 	return NULL;
 
-    ALLOC(d,size+1);
+    Safe_calloc(d,size+1);
     memcpy(d,s,size);
     d[size] = '\0';
 
@@ -183,7 +183,7 @@ void **resize (void **array, int newSize)
     void **vptr;
 
     if (array)
-	vptr = realloc(array,newSize*(sizeof(void **)));
+	vptr = Safe_realloc(array,newSize*(sizeof(void **)));
     else
 	vptr = calloc(1, sizeof(void **));
     
@@ -209,7 +209,7 @@ static int readCdb (FILE *file)
     if (!(bp = fgets(buffer,sizeof(buffer),file)))
 	    return 0;
     
-    ALLOC(currl,sizeof(cdbrecs));
+    Safe_calloc(currl,sizeof(cdbrecs));
     recsRoot = currl ;
 
     while (1) {
@@ -237,7 +237,7 @@ static int readCdb (FILE *file)
 	    }
 	    
 	    bp += 2;
-	    ALLOC(currl->line,strlen(bp));
+	    Safe_calloc(currl->line,strlen(bp));
 	    strncpy(currl->line,bp,strlen(bp)-1);
 	    currl->line[strlen(bp)-1] = '\0';
 	}
@@ -248,7 +248,7 @@ static int readCdb (FILE *file)
 	if (feof(file))
 	    break;
 	
-	ALLOC(currl->next,sizeof(cdbrecs));
+	Safe_calloc(currl->next,sizeof(cdbrecs));
 	currl = currl->next;
     }
 
@@ -351,7 +351,7 @@ srcLine **loadFile (char *name, int *nlines)
 
 	slines = (srcLine **)resize((void **)slines,*nlines);
 
-	ALLOC(slines[(*nlines)-1],sizeof(srcLine));
+	Safe_calloc(slines[(*nlines)-1],sizeof(srcLine));
 	slines[(*nlines)-1]->src = alloccpy(bp,strlen(bp));	
     }
 
@@ -464,7 +464,7 @@ static void functionPoints ()
 		if (func->exitline < j)
 		    func->exitline = j;
 
-		ALLOC(ep,sizeof(exePoint));
+		Safe_calloc(ep,sizeof(exePoint));
 		ep->addr =  mod->cLines[j]->addr ;
 		ep->line = j;
 		ep->block= mod->cLines[j]->block;
@@ -487,7 +487,7 @@ static void functionPoints ()
 		    func->aexitline = j;
 
 		/* add it to the execution point */
-		ALLOC(ep,sizeof(exePoint));
+		Safe_calloc(ep,sizeof(exePoint));
 		ep->addr =  mod->asmLines[j]->addr ;
 		ep->line = j;
 		addSet(&func->afpoints,ep);	
@@ -559,7 +559,7 @@ int cmdFile (char *s,context *cctxt)
     }
 
     /* allocate for context */
-    ALLOC(currCtxt ,sizeof(context));
+    Safe_calloc(currCtxt ,sizeof(context));
     
     /* readin the debug information */
     if (!readCdb (cdbFile)) {
@@ -718,7 +718,7 @@ static void parseCmdLine (int argc, char **argv)
 		if (!ssdirl)
 		    ssdirl = &argv[i][12];
 		else {
-		    char *p = malloc(strlen(ssdirl)+strlen(&argv[i][12])+2);
+		    char *p = Safe_malloc(strlen(ssdirl)+strlen(&argv[i][12])+2);
 		    strcat(strcat(strcpy(p,&argv[i][12]),":"),ssdirl);
 		    ssdirl = p;
 		}

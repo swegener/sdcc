@@ -22,42 +22,42 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  You are forbidden to forbid anyone else to use, share and improve
  what you give them.   Help stamp out software-hoarding!  */
 
-#include "config.h"
-#ifdef HAVE_MALLOC_H
-#include  <malloc.h>
-#endif
-
-static void
-memory_full ()
-{
-  perror ("Memory exhausted.");
-}
-
-char *xmalloc (     unsigned size)
-{
-	register char *ptr = (char *) malloc (size);
-	if (ptr != 0) return (ptr);
-	memory_full ();
-	/*NOTREACHED*/
-	return 0;
-}
-
-char *xrealloc (
-     char *old,
-     unsigned size )
-{
-  register char *ptr = (char *) realloc (old, size);
-  if (ptr == 0)
-    memory_full ();
-  return ptr;
-}
-
-char *xcalloc (
-     unsigned number, unsigned size)
-{
-  register unsigned total = number * size;
-  register char *ptr = (char *) calloc (number, size);
-  if (ptr == 0)
-    memory_full ();
-  return ptr;
-}
+// #include "config.h"
+// #ifdef HAVE_MALLOC_H
+// #include  <malloc.h>
+// #endif
+//
+// static void
+// memory_full ()
+// {
+//   perror ("Memory exhausted.");
+//}
+//
+// char *xmalloc (     unsigned size)
+// {
+//  register char *ptr = (char *) malloc (size);
+//  if (ptr != 0) return (ptr);
+//  memory_full ();
+  /*NOTREACHED*/
+//  return 0;
+// }
+//
+// char *xrealloc (
+//      char *old,
+//      unsigned size )
+// {
+//   register char *ptr = (char *) realloc (old, size);
+//   if (ptr == 0)
+//     memory_full ();
+//   return ptr;
+// }
+//
+// char *xcalloc (
+//      unsigned number, unsigned size)
+// {
+//   register unsigned total = number * size;
+//   register char *ptr = (char *) calloc (number, size);
+//   if (ptr == 0)
+//     memory_full ();
+//   return ptr;
+// }

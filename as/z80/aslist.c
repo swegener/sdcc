@@ -17,6 +17,7 @@
 #include <setjmp.h>
 #include <string.h>
 
+//#include "newalloc.h"
 #if defined(_MSC_VER)
 #include <malloc.h>
 #else

@@ -34,6 +34,7 @@ IS       (u|U|l|L)*
 #include <string.h>
 #include <ctype.h>
 #include "common.h"
+#include "newalloc.h"
     
 char *stringLiteral();
 char *currFname;
@@ -262,7 +263,7 @@ int checkCurrFile ( char *s)
 	/* mark the end of the filename */
 	while (*s != '"') s++;
 	*s = '\0';
-	ALLOC(currFname,strlen(sb)+1);
+	currFname = Safe_calloc(strlen(sb)+1);
 	strcpy(currFname,sb);
 	yylineno = lNum - 2;
     }

@@ -42,7 +42,7 @@ int setBreakPoint (unsigned addr, char addrType, char bpType,
     char simbuf[50];
 
     /* allocate & init a new bp */
-    ALLOC(bp,sizeof(breakp));
+    Safe_calloc(bp,sizeof(breakp));
     bp->addr = addr;
     bp->addrType = addrType;
     bp->bpType = bpType;

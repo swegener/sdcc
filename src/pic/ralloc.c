@@ -28,6 +28,10 @@
 #include "ralloc.h"
 #include "gen.h"
 
+#if defined(_MSC_VER)
+#define __FUNCTION__ __FILE__
+#endif
+
 /*-----------------------------------------------------------------*/
 /* At this point we start getting processor specific although      */
 /* some routines are non-processor specific & can be reused when   */

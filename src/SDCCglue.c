@@ -25,6 +25,7 @@
 #include "common.h"
 #include "asm.h"
 #include <time.h>
+#include "newalloc.h"
 
 #if	!defined(__BORLANDC__) && !defined(_MSC_VER)
 #if 0 /* This should no longer be necessary. */
@@ -121,7 +122,7 @@ char *aopLiteralLong(value *val, int offset, int size)
 	    /* Hmm.  Too big for now. */
 	    assert(0);
 	}
-        ALLOC(rs,strlen(buffer)+1);
+        rs = Safe_calloc(strlen(buffer)+1);
         return strcpy (rs,buffer);
     }
 
@@ -135,7 +136,7 @@ char *aopLiteralLong(value *val, int offset, int size)
 #else
     tsprintf(buffer, "!immedbyte", fl.c[offset]);
 #endif
-    ALLOC(rs,strlen(buffer)+1);
+    rs = Safe_calloc(strlen(buffer)+1);
     return strcpy (rs,buffer);
 }
 
@@ -1350,6 +1351,7 @@ void glue ()
 */
 FILE *tempfile(void)
 {
+#if !defined(_MSC_VER)
     const char *tmpdir = NULL;
     if (getenv("TMP"))
 	tmpdir = getenv("TMP");
@@ -1369,13 +1371,14 @@ FILE *tempfile(void)
 	}
 	return NULL;
     }
+#endif
     return tmpfile();
 }
 
 char *gc_strdup(const char *s)
 {
     char *ret;
-    ALLOC(ret, strlen(s)+1);
+    ret = Safe_calloc(strlen(s)+1);
     strcpy(ret, s);
     return ret;
 }

@@ -129,7 +129,14 @@ regs *mcs51_regWithIdx (int idx)
 /*-----------------------------------------------------------------*/
 static void freeReg (regs *reg)
 {
-    reg->isFree = 1;
+  if (!reg)
+  {
+    werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
+	   "freeReg - Freeing NULL register");
+    exit(1);
+  }
+
+  reg->isFree = 1;
 }
 
 

@@ -90,7 +90,7 @@ void parseFunc (char *line)
     function *func ;
     char *rs;
     int i;
-    ALLOC(func,sizeof(function));
+    Safe_calloc(func,sizeof(function));
     func->sym = parseSymbol(line,&rs);
     func->sym->isfunc = 1;
     func->modName = currModName ;   
@@ -119,7 +119,7 @@ static char  *parseTypeInfo (symbol *sym, char *s)
     s = ++bp;    
     while (*s != ')') { /* till we reach the end */
 	link *type;
-	ALLOC(type,sizeof(link));
+	Safe_calloc(type,sizeof(link));
 	if (*s == ',') s++;
 
 	/* is a declarator */
@@ -240,7 +240,7 @@ symbol *parseSymbol (char *s, char **rs)
     symbol *nsym ;
     char *bp = s;
 
-    ALLOC(nsym,sizeof(symbol));
+    Safe_calloc(nsym,sizeof(symbol));
 
     /* copy over the mangled name */
     while (*bp != '(') bp++;   
@@ -335,7 +335,7 @@ module *parseModule (char *s, bool createName )
     module *nmod ;
     char buffer[512];
 
-    ALLOC(nmod,sizeof(module));    
+    Safe_calloc(nmod,sizeof(module));    
     
     addSet (&modules,nmod);
     
@@ -346,11 +346,11 @@ module *parseModule (char *s, bool createName )
     if (createName) {
 	sprintf(buffer,"%s.c",s);
 	
-	ALLOC(nmod->c_name,strlen(buffer)+1);
+	Safe_calloc(nmod->c_name,strlen(buffer)+1);
 	strcpy(nmod->c_name,buffer);	   
 	
 	sprintf(buffer,"%s.asm",s);
-	ALLOC(nmod->asm_name,strlen(buffer)+1);
+	Safe_calloc(nmod->asm_name,strlen(buffer)+1);
 	strcpy(nmod->asm_name,buffer);	   	    
     }
     
@@ -432,7 +432,7 @@ structdef *structWithName (char *s)
 	    return structs[i];
     }
 
-    ALLOC(nsdef,sizeof(structdef));
+    Safe_calloc(nsdef,sizeof(structdef));
     nsdef->tag = alloccpy(s,strlen(s));
     nsdef->sname = currModName ;
     

@@ -32,6 +32,7 @@
 #include "SDCCmem.h"
 #include "SDCCast.h"
 #include "port.h"
+#include "newalloc.h"
 
 extern int yyerror (char *);
 extern FILE	*yyin;
@@ -1113,7 +1114,7 @@ statement
    | jump_statement
    | INLINEASM  ';'      {
                             ast *ex = newNode(INLINEASM,NULL,NULL);
-			    ALLOC(ex->values.inlineasm,strlen($1));
+			    ex->values.inlineasm = Safe_calloc(strlen($1));
 			    strcpy(ex->values.inlineasm,$1);			    
 			    $$ = ex;
                          }   

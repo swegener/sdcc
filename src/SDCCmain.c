@@ -26,6 +26,7 @@
 
 #include "common.h"
 #include <ctype.h>
+#include "newalloc.h"
 
 #if NATIVE_WIN32
 #include <process.h>
@@ -70,6 +71,14 @@ char *relFiles[128];
 int nrelFiles = 0;
 bool verboseExec = FALSE;
 char    *preOutName;
+
+// In MSC VC6 default search path for exe's to path for this
+
+#if defined(_MSC_VER)
+
+char DefaultExePath[_MAX_PATH] ;
+
+#endif
 
 /* Far functions, far data */
 #define OPTION_LARGE_MODEL "-model-large"
@@ -474,7 +483,7 @@ static void processFile (char *s)
 	
 	/* get rid of the "." */
 	strtok(buffer,".");
-	ALLOC(srcFileName,strlen(buffer)+1);
+	srcFileName = Safe_calloc(strlen(buffer)+1);
 	strcpy(srcFileName,buffer);
 
 	/* get rid of any path information 
@@ -487,7 +496,7 @@ static void processFile (char *s)
 	       *(fext-1) != '/'   &&
 	       *(fext-1) != ':')
 	    fext--;
-	ALLOC(moduleName,strlen(fext)+1);
+	moduleName = Safe_calloc(strlen(fext)+1);
 	strcpy(moduleName,fext);
 	
 	return ;
@@ -1138,7 +1147,7 @@ int   parseCmdLine ( int argc, char **argv )
 
 #if defined(_MSC_VER)
 
-char *try_dir[]= {NULL}; // TODO : Fill in some default search list
+char *try_dir[]= {DefaultExePath, NULL};			// TODO : Fill in some default search list
 
 #else
 
@@ -1198,14 +1207,16 @@ int my_system (const char *cmd)
   }
   return e;
 }
+
 #else
+
 int my_system (const char *cmd, char **cmd_argv)
 {    
     char *dir, *got= NULL; int i= 0;
 
     while (!got && try_dir[i])
     {
-        dir= (char*)malloc(strlen(try_dir[i])+strlen(cmd)+10);
+        dir= (char*)Safe_malloc(strlen(try_dir[i])+strlen(cmd)+10);
         strcpy(dir, try_dir[i]);
         strcat(dir, "/");
         strcat(dir, cmd);
@@ -1548,6 +1559,28 @@ int main ( int argc, char **argv , char **envp)
     if (port->init)
 	port->init();
 
+#if defined(_MSC_VER)
+
+      {
+      int i ;
+
+      // Create a default exe search path from the path to the sdcc command
+
+      strcpy(DefaultExePath,argv[0]) ;
+
+      for(i = strlen(DefaultExePath) ; i > 0 ; i--)
+	if (DefaultExePath[i] == '\\')
+	  {
+	  DefaultExePath[i] = '\0' ;
+	  break ;
+	  }
+
+      if (i == 0)
+	DefaultExePath[0] = '\0' ;
+      }
+
+#endif
+
     setDefaultOptions();
     parseCmdLine(argc,argv);
 
@@ -1630,4 +1663,4 @@ int main ( int argc, char **argv , char **envp)
 
     return 0;
     
-}
+  }

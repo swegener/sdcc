@@ -30,7 +30,7 @@ spoil(int a)
 #else
 
 // test mcs51 with much less memory
-#define ABOVE_MEM_SIZE       35
+#define ABOVE_MEM_SIZE       30
 #define ABOVE_MEM_TEST_SIZE  17
 #define BELOW_MEM_SIZE       20
 #define BELOW_MEM_TEST_SIZE   7

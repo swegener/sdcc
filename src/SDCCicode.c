@@ -48,6 +48,7 @@ operand *geniCodeArray (operand *, operand *,int);
 operand *geniCodeArray2Ptr (operand *);
 operand *geniCodeRValue (operand *, bool);
 operand *geniCodeDerefPtr (operand *,int);
+int isLvaluereq(int lvl);
 
 #define PRINTFUNC(x) void x (FILE *of, iCode *ic, char *s)
 /* forward definition of ic print functions */
@@ -838,7 +839,7 @@ operand *
 operandOperation (operand * left, operand * right,
 		  int op, sym_link * type)
 {
-  sym_link *let , *ret;
+  sym_link *let , *ret=NULL;
   operand *retval = (operand *) 0;
   
   assert (isOperandLiteral (left));
@@ -1677,8 +1678,9 @@ geniCodeDivision (operand * left, operand * right)
   if (IS_LITERAL (retype) &&
       !IS_FLOAT (letype) &&
       (p2 = powof2 ((unsigned long)
-		    floatFromVal (right->operand.valOperand))))
-    ic = newiCode (RIGHT_OP, left, operandFromLit (p2));	/* right shift */
+		    floatFromVal (right->operand.valOperand)))) {
+    ic = newiCode (RIGHT_OP, left, operandFromLit (p2)); /* right shift */
+  }
   else
     {
       ic = newiCode ('/', left, right);		/* normal division */

@@ -2213,6 +2213,16 @@ packForPush (iCode * ic, eBBlock * ebp)
   for (lic = ic; lic != dic ; lic = lic->prev) {
 	  if (bitVectBitValue(dbv,lic->key)) return ;
   }
+  /* make sure they have the same type */
+  {
+    sym_link *itype=operandType(IC_LEFT(ic));
+    sym_link *ditype=operandType(IC_RIGHT(dic));
+
+    if (SPEC_USIGN(itype)!=SPEC_USIGN(ditype) ||
+	SPEC_SHORT(itype)!=SPEC_SHORT(ditype) ||
+	SPEC_USIGN(itype)!=SPEC_USIGN(ditype))
+      return;
+  }
   /* extend the live range of replaced operand if needed */
   if (OP_SYMBOL(IC_RIGHT(dic))->liveTo < ic->seq) {
 	  OP_SYMBOL(IC_RIGHT(dic))->liveTo = ic->seq;

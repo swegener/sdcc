@@ -51,19 +51,17 @@ testLogicalAnd(void)
     ASSERT(true && !false);
     ASSERT(!false && true);
 
-#if 1
     /* PENDING: Doesn't work. */
     /* Test that the evaluation is aborted on the first false. */
     if (true && false && neverGetHere()) {
         /* Tested using neverGetHere() */
     }
-#else
+
     /* Alternate that is similar. */
     if (true && false) {
         neverGetHere();
         /* Tested using neverGetHere() */
     }
-#endif
 
     resetGetHere();
     /* Test that the evaluation is done left to right. */
@@ -82,15 +80,11 @@ testLogicalOr(void)
     ASSERT(!true || !false);
     ASSERT(false || true);
 
-#if 0
     /* PENDING: Doesn't work in sdcc. */
     /* Test that the evaluation is aborted on the first hit. */
     if (false || true || neverGetHere()) {
         /* Tested using neverGetHere() */
     }
-#else
-    /* No equivalent. */
-#endif
 
     resetGetHere();
     /* Test that the evaluation is done left to right. */

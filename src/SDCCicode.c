@@ -858,6 +858,7 @@ isOperandLiteral (operand * op)
 
   return 0;
 }
+
 /*-----------------------------------------------------------------*/
 /* isOperandInFarSpace - will return true if operand is in farSpace */
 /*-----------------------------------------------------------------*/
@@ -884,6 +885,34 @@ isOperandInFarSpace (operand * op)
       etype = getSpec (operandType (op));
     }
   return (IN_FARSPACE (SPEC_OCLS (etype)) ? TRUE : FALSE);
+}
+
+/*------------------------------------------------------------------*/
+/* isOperandInDirSpace - will return true if operand is in dirSpace */
+/*------------------------------------------------------------------*/
+bool 
+isOperandInDirSpace (operand * op)
+{
+  sym_link *etype;
+
+  if (!op)
+    return FALSE;
+
+  if (!IS_SYMOP (op))
+    return FALSE;
+
+  if (!IS_TRUE_SYMOP (op))
+    {
+      if (SPIL_LOC (op))
+	etype = SPIL_LOC (op)->etype;
+      else
+	return FALSE;
+    }
+  else
+    {
+      etype = getSpec (operandType (op));
+    }
+  return (IN_DIRSPACE (SPEC_OCLS (etype)) ? TRUE : FALSE);
 }
 
 /*-----------------------------------------------------------------*/

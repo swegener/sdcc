@@ -310,6 +310,7 @@ int piCode (void *, FILE *);
 int printOperand (operand *, FILE *);
 void setOperandType (operand *, sym_link *);
 bool isOperandInFarSpace (operand *);
+bool isOperandInDirSpace (operand *);
 operand *opFromOpWithDU (operand *, bitVect *, bitVect *);
 iCode *copyiCode (iCode *);
 operand *newiTempFromOp (operand *);

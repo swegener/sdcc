@@ -44,6 +44,7 @@
 */
 
 #include "z80.h"
+#include "SDCCicode.h"
 
 /* Flags to turn off optimisations.
  */
@@ -51,8 +52,7 @@ enum
   {
     DISABLE_PACK_ACC = 0,
     DISABLE_PACK_ASSIGN = 0,
-    /* Pack for one use is quite broken. */
-    DISABLE_PACK_ONE_USE = 1,
+    DISABLE_PACK_ONE_USE = 0,
     DISABLE_PACK_HL = 0,
   };
 
@@ -64,7 +64,9 @@ enum
     D_ALLOC2 = 0,
     D_ACCUSE2 = 0,
     D_ACCUSE2_VERBOSE = 0,
-    D_HLUSE = 0
+    D_HLUSE = 0,
+    D_HLUSE2 = 0,
+    D_HLUSE2_VERBOSE = 0
   };
 
 #if 1
@@ -383,6 +385,9 @@ noOverLap (set * itmpStack, symbol * fsym)
   for (sym = setFirstItem (itmpStack); sym;
        sym = setNextItem (itmpStack))
     {
+      if (bitVectBitValue(sym->clashes,fsym->key)) 
+        return 0;
+#if 0
             // if sym starts before (or on) our end point
             // and ends after (or on) our start point, 
             // it is an overlap.
@@ -391,6 +396,7 @@ noOverLap (set * itmpStack, symbol * fsym)
 	    {
 	    	return 0;
 	    }
+#endif
     }
   return 1;
 }
@@ -1017,6 +1023,8 @@ tryAllocatingRegPair (symbol * sym)
 	  sym->regs[0] = &regsZ80[i];
 	  regsZ80[i + 1].isFree = 0;
 	  sym->regs[1] = &regsZ80[i + 1];
+          sym->regType = REG_PAIR;
+
 	  if (currFunc)
 	    {
 	      currFunc->regsUsed =
@@ -1478,28 +1486,13 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
       return 0;
     }
 
-#if 0
-  /* if the true symbol is defined in far space or on stack
-     then we should not since this will increase register pressure */
-  if (isOperandInFarSpace (IC_RESULT (ic)))
-    {
-      if ((dic = farSpacePackable (ic)))
-	goto pack;
-      else
-	return 0;
-    }
-#endif
-
   /* find the definition of iTempNN scanning backwards if we find a 
      a use of the true symbol in before we find the definition then 
      we cannot */
   for (dic = ic->prev; dic; dic = dic->prev)
     {
-      /* if there is a function call and this is
-         a parameter & not my parameter then don't pack it */
-      if ((dic->op == CALL || dic->op == PCALL) &&
-	  (OP_SYMBOL (IC_RESULT (ic))->_isparm &&
-	   !OP_SYMBOL (IC_RESULT (ic))->ismyparm))
+      /* PENDING: Don't pack across function calls. */
+      if (dic->op == CALL || dic->op == PCALL)
 	{
 	  dic = NULL;
 	  break;
@@ -1529,14 +1522,6 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 	  dic = NULL;
 	  break;
 	}
-#if 0
-      if (POINTER_SET (dic) &&
-	  IC_RESULT (dic)->key == IC_RESULT (ic)->key)
-	{
-	  dic = NULL;
-	  break;
-	}
-#endif
     }
 
   if (!dic)
@@ -1547,7 +1532,6 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
   if (OP_SYMBOL (IC_RESULT (ic))->onStack ||
       OP_SYMBOL (IC_RESULT (ic))->iaccess)
     {
-
       /* the operation has only one symbol
          operator then we can pack */
       if ((IC_LEFT (dic) && !IS_SYMOP (IC_LEFT (dic))) ||
@@ -1753,8 +1737,10 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
 
   /* only upto 2 bytes since we cannot predict
      the usage of b, & acc */
-  if (getSize (operandType (op)) > 2 &&
-      ic->op != RETURN &&
+  if (getSize (operandType (op)) > 2)
+    return NULL;
+
+  if (ic->op != RETURN &&
       ic->op != SEND)
     return NULL;
 
@@ -2115,8 +2101,267 @@ hluse:
   OP_SYMBOL (IC_RESULT (ic))->accuse = ACCUSE_SCRATCH;
 }
 
+static iCode *
+packRegsForHLUse3 (iCode * lic, operand * op, eBBlock * ebp)
+{
+  int i, key;
+  symbol *sym;
+  iCode *ic, *dic;
+  bool isFirst = TRUE;
+
+#if 0
+  printf("Checking:\n");
+  piCode(lic, NULL);
+#endif
+
+  if ( OP_SYMBOL(op)->accuse)
+    {
+      return NULL;
+    }
+
+  if (OP_SYMBOL(op)->remat)
+    {
+      return NULL; 
+    }
+
+  /* Only defined once */
+  if (bitVectnBitsOn (OP_DEFS (op)) > 1)
+    return NULL;
+
+  if (getSize (operandType (op)) != 2)
+    return NULL;
+
+  /* And this is the definition */
+  if (bitVectFirstBit (OP_DEFS (op)) != lic->key)
+    return NULL;
+
+  /* first check if any overlapping liverange has already been
+     assigned to DPTR */
+  if (OP_SYMBOL(op)->clashes) 
+    {
+      for (i = 0 ; i < OP_SYMBOL(op)->clashes->size ; i++ ) 
+        {
+          if (bitVectBitValue(OP_SYMBOL(op)->clashes,i)) 
+            {
+              sym = hTabItemWithKey(liveRanges,i);
+              if (sym->accuse == ACCUSE_SCRATCH)
+                {
+                  return NULL;
+                }
+            }
+        }
+    }
+
+  /* Nothing else that clashes with this is using the scratch
+     register.  Scan through all of the intermediate instructions and
+     see if any of them could nuke HL.
+  */
+  dic = ic = hTabFirstItemWK(iCodeSeqhTab,OP_SYMBOL(op)->liveFrom);
+
+  for (; ic && ic->seq <= OP_SYMBOL(op)->liveTo;
+       ic = hTabNextItem(iCodeSeqhTab,&key)) 
+    {
+#if 0
+      piCode(ic, NULL);
+      printf("(op: %u)\n", ic->op);
+#endif
+      if (isFirst)
+        {
+          isFirst = FALSE;
+          if (ic->op == ADDRESS_OF)
+            continue;
+          if (POINTER_GET (ic))
+            continue;
+        }
+
+      /* Handle the non left/right/result ones first */
+      if (ic->op == IFX)
+        continue;
+      if (ic->op == JUMPTABLE)
+        return NULL;
+
+      if (SKIP_IC2(ic))
+        continue;
+
+      if (ic->op == IPUSH && isOperandEqual (op, IC_LEFT (ic)))
+        continue;
+
+      if ((ic->op == '=' && !POINTER_SET(ic)) ||
+          ic->op == UNARYMINUS ||
+          ic->op == '+' ||
+          ic->op == '-' ||
+          0)
+        continue;
+
+      if (POINTER_GET (ic) && isOperandEqual (op, IC_LEFT (ic)))
+        continue;
+
+      if (IS_VALOP (IC_RIGHT (ic)) &&
+          (ic->op == EQ_OP ||
+           0))
+        {
+          continue;
+        }
+
+      /* By default give up */
+      return NULL;
+    }
+
+#if 0
+  printf("Succeeded!\n");
+#endif
+  OP_SYMBOL (op)->accuse = ACCUSE_SCRATCH;
+
+  return dic;
+}
+
+static iCode *
+packRegsForIYUse (iCode * lic, operand * op, eBBlock * ebp)
+{
+  int i, key;
+  symbol *sym;
+  iCode *ic, *dic;
+  bitVect *uses;
+
+#if 0
+  printf("Checking IY on %p lic key %u first def %u:\n", OP_SYMBOL(op), lic->key, bitVectFirstBit(OP_DEFS(op)));
+  piCode(lic, NULL);
+#endif
+
+  if ( OP_SYMBOL(op)->accuse)
+    {
+      return NULL;
+    }
+
+  if (OP_SYMBOL(op)->remat)
+    {
+      return NULL; 
+    }
+
+  /* Only defined once */
+  if (bitVectnBitsOn (OP_DEFS (op)) > 1)
+    return NULL;
+
+  /* And this is the definition */
+  if (bitVectFirstBit (OP_DEFS (op)) != lic->key)
+    return NULL;
+
+  /* first check if any overlapping liverange has already been
+     assigned to DPTR */
+  if (OP_SYMBOL(op)->clashes) 
+    {
+      for (i = 0 ; i < OP_SYMBOL(op)->clashes->size ; i++ ) 
+        {
+          if (bitVectBitValue(OP_SYMBOL(op)->clashes,i)) 
+            {
+              sym = hTabItemWithKey(liveRanges,i);
+              if (sym->accuse == ACCUSE_IY)
+                {
+                  return NULL;
+                }
+            }
+        }
+    }
+
+  /* Only a few instructions can load into IY */
+  if (lic->op != '=')
+    {
+      return NULL;
+    }
+
+  /* Nothing else that clashes with this is using the scratch
+     register.  Scan through all of the intermediate instructions and
+     see if any of them could nuke HL.
+  */
+  dic = ic = hTabFirstItemWK(iCodeSeqhTab,OP_SYMBOL(op)->liveFrom);
+  uses = OP_USES(op);
+
+  for (; ic && ic->seq <= OP_SYMBOL(op)->liveTo;
+       ic = hTabNextItem(iCodeSeqhTab,&key)) 
+    {
+#if 0
+      piCode(ic, NULL);
+      printf("(op: %u uses %u)\n", ic->op, bitVectBitValue(uses, ic->key));
+#endif
+
+      if (ic->op == PCALL || 
+          ic->op == CALL ||
+          ic->op == JUMPTABLE
+          )
+        return NULL;
+
+      if (SKIP_IC2(ic))
+        continue;
+
+      /* Only certain rules will work against IY.  Check if this iCode uses
+         this symbol. */
+      if (bitVectBitValue(uses, ic->key) != 0)
+        {
+          if (ic->op == IFX)
+            return NULL;
+
+          if (ic->op == '=' &&
+              isOperandEqual(IC_RESULT(ic), op))
+            continue;
+
+          if (ic->op == GET_VALUE_AT_ADDRESS &&
+              isOperandEqual(IC_LEFT(ic), op))
+            continue;
+
+          if (isOperandEqual(IC_RESULT(ic), IC_LEFT(ic)) == FALSE)
+            return NULL;
+
+          if (IC_RIGHT (ic) && IS_VALOP (IC_RIGHT (ic)))
+            {
+              if (ic->op == '+' ||
+                  ic->op == '-')
+                {
+                  /* Only works if the constant is small */
+                  if (operandLitValue (IC_RIGHT (ic)) < 4)
+                    continue;
+                }
+            }
+
+          return NULL;
+        }
+      else
+        {
+          if (ic->op == IFX)
+            continue;
+
+          /* This iCode doesn't use the sym.  See if this iCode preserves IY.
+           */
+          if (IC_RESULT(ic) && IS_SYMOP(IC_RESULT(ic)) && 
+              isOperandInDirSpace(IC_RESULT(ic)))
+            return NULL;
+          
+          if (IC_RIGHT(ic) && IS_SYMOP(IC_RIGHT(ic)) && 
+              isOperandInFarSpace(IC_RIGHT(ic)))
+            return NULL;
+
+          if (IC_LEFT(ic) && IS_SYMOP(IC_LEFT(ic)) && 
+              isOperandInFarSpace(IC_LEFT(ic)))
+            return NULL;
+          
+          continue;
+        }
+
+      /* By default give up */
+      return NULL;
+    }
+
+#if 0
+  printf("Succeeded IY!\n");
+#endif
+  OP_SYMBOL (op)->accuse = ACCUSE_IY;
+
+  return dic;
+}
+
+/** Returns TRUE if this operation can use acc and if it preserves the value.
+ */
 static bool 
-opPreservesA (iCode * ic, iCode * uic)
+opPreservesA (iCode * uic)
 {
   if (uic->op == IFX)
     {
@@ -2161,6 +2406,8 @@ opPreservesA (iCode * ic, iCode * uic)
   return FALSE;
 }
 
+/** Returns true if this operand preserves the value of A.
+ */
 static bool
 opIgnoresA (iCode * ic, iCode * uic)
 {
@@ -2177,6 +2424,15 @@ opIgnoresA (iCode * ic, iCode * uic)
           IC_RESULT (uic)->operand.symOperand->key == IC_LEFT (uic)->operand.symOperand->key
           )
         {
+          return TRUE;
+        }
+    }
+  else if (uic->op == '=' && !POINTER_SET (uic))
+    {
+      /* If they are equal and get optimised out then things are OK. */
+      if (isOperandEqual (IC_RESULT (uic), IC_RIGHT (uic)))
+        {
+          /* Straight assign is OK. */
           return TRUE;
         }
     }
@@ -2246,7 +2502,7 @@ packRegsForAccUse2 (iCode * ic)
 {
   iCode *uic;
 
-  D (D_ALLOC, ("packRegsForAccUse2: running on ic %p\n", ic));
+  D (D_ACCUSE2, ("packRegsForAccUse2: running on ic %p line %u\n", ic, ic->lineno));
 
   /* Filter out all but those 'good' commands */
   if (
@@ -2255,6 +2511,8 @@ packRegsForAccUse2 (iCode * ic)
        !IS_BITWISE_OP (ic) &&
        ic->op != '=' &&
        ic->op != EQ_OP &&
+       ic->op != '<' &&
+       ic->op != '>' &&
        ic->op != CAST &&
        ic->op != GETHBIT &&
        1)
@@ -2312,7 +2570,7 @@ packRegsForAccUse2 (iCode * ic)
 
 	    bitVectUnSetBit (uses, setBit);
 	    /* Still contigous. */
-	    if (!opPreservesA (ic, next))
+	    if (!opPreservesA (next))
 	      {
                 D (D_ACCUSE2, ("  + Dropping as operation doesn't preserve A\n"));
 		return;
@@ -2324,7 +2582,7 @@ packRegsForAccUse2 (iCode * ic)
           {
             if (next->prev == NULL)
               {
-                if (!opPreservesA (ic, next))
+                if (!opPreservesA (next))
                   {
                     D (D_ACCUSE2, ("  + Dropping as operation doesn't preserve A #2\n"));
                     return;
@@ -2364,110 +2622,6 @@ packRegsForAccUse2 (iCode * ic)
     OP_SYMBOL (IC_RESULT (ic))->accuse = ACCUSE_A;
     return;
   }
-
-  /* OLD CODE FOLLOWS */
-  /* if it is a conditional branch then we definitely can
-     MLH: Depends.
-   */
-#if 0
-  if (uic->op == IFX)
-    goto accuse;
-
-  /* MLH: Depends. */
-  if (uic->op == JUMPTABLE)
-    return;
-#endif
-
-  /* if the usage is not is an assignment or an 
-     arithmetic / bitwise / shift operation then not.
-     MLH: Pending:  Invalid.  Our pointer sets are always peechy.
-   */
-#if 0
-  if (POINTER_SET (uic) &&
-      getSize (aggrToPtr (operandType (IC_RESULT (uic)), FALSE)) > 1)
-    {
-      printf ("e5 %u\n", getSize (aggrToPtr (operandType (IC_RESULT (uic)), FALSE)));
-      return;
-    }
-#endif
-
-  printf ("1\n");
-  if (uic->op != '=' &&
-      !IS_ARITHMETIC_OP (uic) &&
-      !IS_BITWISE_OP (uic) &&
-      uic->op != LEFT_OP &&
-      uic->op != RIGHT_OP)
-    {
-      printf ("e6\n");
-      return;
-    }
-
-  /* if used in ^ operation then make sure right is not a 
-     literl */
-  if (uic->op == '^' && isOperandLiteral (IC_RIGHT (uic)))
-    return;
-
-  /* if shift operation make sure right side is not a literal */
-  if (uic->op == RIGHT_OP &&
-      (isOperandLiteral (IC_RIGHT (uic)) ||
-       getSize (operandType (IC_RESULT (uic))) > 1))
-    return;
-
-  if (uic->op == LEFT_OP &&
-      (isOperandLiteral (IC_RIGHT (uic)) ||
-       getSize (operandType (IC_RESULT (uic))) > 1))
-    return;
-
-#if 0
-  /* make sure that the result of this icode is not on the
-     stack, since acc is used to compute stack offset */
-  if (IS_TRUE_SYMOP (IC_RESULT (uic)) &&
-      OP_SYMBOL (IC_RESULT (uic))->onStack)
-    return;
-#endif
-
-#if 0
-  /* if either one of them in far space then we cannot */
-  if ((IS_TRUE_SYMOP (IC_LEFT (uic)) &&
-       isOperandInFarSpace (IC_LEFT (uic))) ||
-      (IS_TRUE_SYMOP (IC_RIGHT (uic)) &&
-       isOperandInFarSpace (IC_RIGHT (uic))))
-    return;
-#endif
-
-  /* if the usage has only one operand then we can */
-  if (IC_LEFT (uic) == NULL ||
-      IC_RIGHT (uic) == NULL)
-    goto accuse;
-
-  /* make sure this is on the left side if not
-     a '+' since '+' is commutative */
-  if (ic->op != '+' &&
-      IC_LEFT (uic)->key != IC_RESULT (ic)->key)
-    return;
-
-  /* if one of them is a literal then we can */
-  if ((IC_LEFT (uic) && IS_OP_LITERAL (IC_LEFT (uic))) ||
-      (IC_RIGHT (uic) && IS_OP_LITERAL (IC_RIGHT (uic))))
-    {
-      goto accuse;
-      return;
-    }
-
-/** This is confusing :)  Guess for now */
-  if (IC_LEFT (uic)->key == IC_RESULT (ic)->key &&
-      (IS_ITEMP (IC_RIGHT (uic)) ||
-       (IS_TRUE_SYMOP (IC_RIGHT (uic)))))
-    goto accuse;
-
-  if (IC_RIGHT (uic)->key == IC_RESULT (ic)->key &&
-      (IS_ITEMP (IC_LEFT (uic)) ||
-       (IS_TRUE_SYMOP (IC_LEFT (uic)))))
-    goto accuse;
-  return;
-accuse:
-  printf ("acc ok!\n");
-  OP_SYMBOL (IC_RESULT (ic))->accuse = ACCUSE_A;
 }
 
 /** Does some transformations to reduce register pressure.
@@ -2555,6 +2709,13 @@ packRegisters (eBBlock * ebp)
 	packRegsForSupport (ic, ebp);
 #endif
 
+      /* some cases the redundant moves can
+         can be eliminated for return statements */
+      if (ic->op == RETURN || ic->op == SEND)
+        {
+	  packRegsForOneuse (ic, IC_LEFT (ic), ebp);
+	}
+
       /* if pointer set & left has a size more than
          one and right is not in far space */
       if (!DISABLE_PACK_ONE_USE &&
@@ -2591,7 +2752,15 @@ packRegisters (eBBlock * ebp)
 
       if (!DISABLE_PACK_HL && IS_ITEMP (IC_RESULT (ic)))
 	{
-	  packRegsForHLUse (ic);
+          if (IS_GB)
+            packRegsForHLUse (ic);
+          else
+            packRegsForHLUse3 (ic, IC_RESULT (ic), ebp);
+	}
+
+      if (!DISABLE_PACK_HL && IS_ITEMP (IC_RESULT (ic)) && IS_Z80)
+	{
+          packRegsForIYUse (ic, IC_RESULT (ic), ebp);
 	}
 
       if (!DISABLE_PACK_ACC && IS_ITEMP (IC_RESULT (ic)) &&

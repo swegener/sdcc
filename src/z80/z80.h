@@ -26,5 +26,6 @@ extern Z80_OPTS z80_opts;
 enum
   {
     ACCUSE_A = 1,
-    ACCUSE_SCRATCH
+    ACCUSE_SCRATCH,
+    ACCUSE_IY
   };

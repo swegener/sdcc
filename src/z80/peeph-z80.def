@@ -23,3 +23,11 @@ replace {
         or      a,a
 	jp	z,%2
 }
+replace {
+	rlca
+	ld	a,#0x00
+	rla
+} by {
+	rlca
+        and     a,#0x01
+}

@@ -3,7 +3,7 @@
 #include <testfwk.h>
 
 static 
-unsigned int divide(long a)
+unsigned long divide(long a)
 {
     return a/512ul;
 }
@@ -11,7 +11,7 @@ unsigned int divide(long a)
 static void
 testDivide()
 {
-    assert(divide(1300) == 2);
-    assert(divide(0x12345678) == 0x91A2B);
+  ASSERT(divide(1300) == 2);
+  ASSERT(divide(0x12345678) == 0x91A2B);
 }
 

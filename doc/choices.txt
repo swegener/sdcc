@@ -105,5 +105,90 @@ Things get better when you access the same set over, as you get rid
 of the setup.  But they get worse when both ops are on the stack/in
 direct space.  Easiest this way for now.  iy may benifit...
 
-	
- 
+cmpGt:
+	ld	l,#0x80		; 7
+	ld	a,-1(ix)        ; 19
+	xor	a,#0x80		; 7
+	ld	h,a		; 4
+	ld	a,#0x02		; 7
+	sub	a,-2(ix)	; 19
+	ld	a,l		; 4
+	sbc	a,h		; 4 = 71
+
+vs
+        ld      hl,0x8002	; 10
+        ld      a,-2(ix)	; 19
+        xor     0x80		; 7
+        ld      d,a		; 4
+        ld      e,-1(ix)	; 19
+        sbc     hl,de		; 15 = 74
+
+Why is there the whole xor thing going on?
+
+cmpGt using sub:
+        left    right   l-r  	c       expect
+        0       0       0       0       false
+        -1      0       -1	0       false
+        1       0       1       0       true
+        0       -1      1       1       true
+        0       1       -1      1       false
+
+With top most bits xored
+        80h     80h     0       0	false
+        7fh     80h     FFh     1       false
+        81h     80h     01h     0       true
+        80h     7fh     01h     0       true
+        80h     81h     FFh     1       false
+
+r-l instead - ah.
+        80h     80h     0       0	false
+        7fh     80h     01h     0       false
+        81h     80h     FFh     1       true
+        80h     7fh     FFh     1       true
+        80h     81h     01h     0       false
+
+How about using the sign bit and no XOR on r-l?
+        0       0        0              false
+        FFh     0   	 01h            false
+        01h     0        FFh            true
+        0       FFh      FFh            true
+        0       01h      01h            false  - works
+
+cmpEq:
+        ld      hl,#nn		; 10
+	ld	c,(ix+-5)	; 19
+	ld	b,(ix+-4)	; 19
+	or	a		; 4
+	sbc	hl,bc		; 15
+	jp	nz,l19          ; 10 = 77
+
+	ld	a,-82(ix)	; 19
+	cp	a,#0x01		; 7
+	jp	nz,00129$	; 10
+	ld	a,-81(ix)	; 19
+	or	a,a		; 7
+	jp	nz,00129$	; 10 - 72
+
+Add:
+	ld	a,c             ; 4
+	add	a,#0x04         ; 7
+	ld	-4(ix),a        ; 19
+	ld	a,b             ; 4
+	adc	a,#0x00         ; 7
+	ld	-3(ix),a        ; 19 = 60
+vs
+        ld      hl,#4           ; 10
+        add     hl,bc           ; 11
+        ld      -4(ix),l        ; 19
+        ld      -3(ix),h        ; 19 = 59
+
+Same argument as above - not worth the extra cycle.
+
+Pending optimisations:
+        iTemp1 = @iTemp2
+        iTemp3 = iTemp1
+
+        iTemp4 = something in direct space
+        ...
+        push    iTemp4
+

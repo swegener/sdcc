@@ -43,3 +43,8 @@ initProxy(devsw_t *pdrv)
   return (*pdrv->dev_init)(5);
 }
 
+void
+testDriverStruct(void)
+{
+  initProxy(&_sillyDriver);
+}

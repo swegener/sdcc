@@ -50,9 +50,14 @@ enum
     CND_IDX
   };
 
-#define REG_PTR 0x01
-#define REG_GPR 0x02
-#define REG_CND 0x04
+enum
+  {
+    REG_PTR = 1,
+    REG_GPR = 2,
+    REG_CND = 4,
+    REG_PAIR = 8
+  };
+
 /* definition for the registers */
 typedef struct regs
   {

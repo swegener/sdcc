@@ -40,8 +40,9 @@ linkrec **linkrecs = NULL; /* all linkage editor records */
 context *currCtxt = NULL;
 short fullname = 0;
 char *ssdirl = SDCC_LIB_DIR ":" SDCC_LIB_DIR "/small" ;
-char *simArgs[8];
+char *simArgs[20];
 int nsimArgs = 0;
+char model_str[20];
 
 /* fake filename & lineno to make linker */
 char *filename=NULL;
@@ -86,7 +87,7 @@ struct cmdtab
     { "h"        ,  cmdHelp       , NULL },
 
     { "info"     ,  cmdInfo       ,
-      "info\n"
+      "info"
       "\t {break}\t list all break points\n"
       "\t {stack}\t information about call stack\n"
       "\t {frame}\t current frame information\n"
@@ -102,7 +103,7 @@ struct cmdtab
     },
     { "l"        ,  cmdListSrc    , NULL },
     { "show"     ,  cmdShow       ,
-      "show\n"
+      "show"
       "\t {copying}\t copying & distribution terms\n"
       "\t {warranty}\t warranty information\n"
     },
@@ -774,6 +775,20 @@ static void parseCmdLine (int argc, char **argv)
         continue ;
       }
 
+      /* model string */
+      if (strncmp(argv[i],"-m",2) == 0) {
+        strncpy(model_str, &argv[i][2], 15);
+        if (strcmp(model_str,"avr") == 0)
+          simArgs[0] = "savr";
+        else if (strcmp(model_str,"rrz80") == 0)
+          simArgs[0] = "rrz80";
+        else if (strcmp(model_str,"xa") == 0)
+          simArgs[0] = "sxa";
+        else if (strcmp(model_str,"z80") == 0)
+          simArgs[0] = "sz80";
+        continue ;
+      }
+
       fprintf(stderr,"unknown option %s --- ignored\n",
         argv[i]);
   } else {
@@ -800,7 +815,12 @@ static void parseCmdLine (int argc, char **argv)
 int main ( int argc, char **argv)
 {
     printVersionInfo();
+
+    simArgs[nsimArgs++] = "s51";
+    simArgs[nsimArgs++] = "-P";
+    simArgs[nsimArgs++] = "-r 9756";
     /* parse command line */
+
     parseCmdLine(argc,argv);
 
     commandLoop();

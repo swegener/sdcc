@@ -88,6 +88,8 @@ void openSimulator (char **args, int nargs)
     struct sockaddr_in sin;     
     int retry = 0;
     int i ;
+
+#if 0
     char *simargs[32] = { "s51","-P","-r 9756", NULL };
     
     /* create the arguments */
@@ -95,6 +97,7 @@ void openSimulator (char **args, int nargs)
 	simargs[i+3] = args[i];       
     }
     simargs[i+3]= NULL;
+#endif
 
     /* fork and start the simulator as a subprocess */
     if ((simPid = fork())) {
@@ -103,7 +106,8 @@ void openSimulator (char **args, int nargs)
     else {
 	
 	/* we are in the child process : start the simulator */
-	if (execvp("s51",simargs) < 0) {
+//	if (execvp("s51",simargs) < 0) {
+	if (execvp(args[0],args) < 0) {
 	    perror("cannot exec simulator");
 	    exit(1);
 	}	

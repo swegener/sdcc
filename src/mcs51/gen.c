@@ -7119,7 +7119,7 @@ static void genAssign (iCode *ic)
     }
     
 release:
-    freeAsmop (right,NULL,ic,FALSE);
+    freeAsmop (right,NULL,ic,TRUE);
     freeAsmop (result,NULL,ic,TRUE);
 }   
 

@@ -107,7 +107,6 @@ libutil.a: $(OBJECTS)
 ucsim_app: libs ucsim
 
 ucsim: $(UCSIM_OBJECTS) $(UCSIM_LIB_FILES)
-	echo $(UCSIM_LIB_FILES)
 	$(CXX) $(CXXFLAGS) -o $@ $< -L$(PRJDIR) $(UCSIM_LIBS) $(LIBS)
 
 .cc.o:

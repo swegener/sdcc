@@ -2,10 +2,10 @@
 
 TOPDIR = ../../..
 
-SCC = $(TOPDIR)/bin/sdcc -mz80 -v
-SAS = as-z80
+SCC = $(TOPDIR)/bin/sdcc -mgbz80 -v
+SAS = as-gb
 
-OBJ = div.o mul.o putchar.o string.o printf.o # asm_strings.o
+OBJ = putchar.o string.o printf.o # asm_strings.o div.o mul.o 
 LIB = z80.lib
 CC = $(SCC)
 AS = $(SAS)
@@ -21,3 +21,5 @@ _dummy:
 
 clean:
 	rm -f $(OBJ) *~ $(CLEANSPEC)
+
+

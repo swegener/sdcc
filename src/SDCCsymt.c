@@ -532,20 +532,18 @@ unsigned int   getSize ( link *p )
     /* if nothing return 0 */
     if ( ! p )
 	return 0 ;
-    
     if ( IS_SPEC(p) ) { /* if this is the specifier then */
-	
 	switch (SPEC_NOUN(p)) { /* depending on the specifier type */
 	case V_INT:
 	    return (IS_LONG(p) ? LONGSIZE : ( IS_SHORT(p) ? SHORTSIZE: INTSIZE)) ;
 	case V_FLOAT:
 	    return FLOATSIZE ;
 	case V_CHAR:
-	    return   CHARSIZE ;
+	    return CHARSIZE ;
 	case V_VOID:
 	    return   0 ;
 	case V_STRUCT:
-	    return   SPEC_STRUCT(p)->size ;
+	    return SPEC_STRUCT(p)->size ;
 	case V_LABEL:
 	    return 0 ;
 	case V_SBIT:

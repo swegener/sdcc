@@ -73,7 +73,6 @@ char            Ch_1_Glob,
 int             Arr_1_Glob [50];
 int             Arr_2_Glob [50] [50];
 
-
 /* Used instead of malloc() */
 static Rec_Type _r[2];
 

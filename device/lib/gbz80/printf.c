@@ -2,6 +2,8 @@
     Again a stub - will use the std one later...
 */
 
+#include <stdio.h>
+
 #define NULL 0
 
 /* A hack because I dont understand how va_arg works...
@@ -35,6 +37,8 @@ static void _printn(unsigned u, unsigned base, char issigned, EMIT *emitter, voi
 static void _printf(const char *format, EMIT *emitter, void *pData, va_list va)
 {
     while (*format) {
+	putchar(*format);
+#if 0
 	if (*format == '%') {
 	    switch (*++format) {
 	    case 'c': {
@@ -73,11 +77,10 @@ static void _printf(const char *format, EMIT *emitter, void *pData, va_list va)
 	else {
 	    (*emitter)(*format, pData);
 	}
+#endif
 	format++;
     }
 }
-
-void putchar(char c);
 
 static void _char_emitter(char c, void *pData)
 {
@@ -89,6 +92,5 @@ void printf(const char *format, ...)
     va_list va;
     va_start(va, format);
 
-    _printf(format, _char_emitter, NULL, va);
     _printf(format, _char_emitter, NULL, va);
 }

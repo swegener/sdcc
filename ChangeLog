@@ -1,3 +1,8 @@
+2005-03-21 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCcflow.c (dfNumCompare): committed the wrong version of this
+	last time.
+
 2005-03-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/port.h (struct PORT),

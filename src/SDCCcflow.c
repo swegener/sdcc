@@ -358,6 +358,24 @@ markNoPath (ebbIndex * ebbi)
 }
 
 /*-----------------------------------------------------------------*/
+/* dfNumCompare - used by qsort to sort by dfNumber                */
+/*-----------------------------------------------------------------*/
+int 
+dfNumCompare (const void *a, const void *b)
+{
+  const eBBlock *const *i = a;
+  const eBBlock *const *j = b;
+
+  if ((*i)->dfnum > (*j)->dfnum)
+    return 1;
+
+  if ((*i)->dfnum < (*j)->dfnum)
+    return -1;
+
+  return 0;
+}
+
+/*-----------------------------------------------------------------*/
 /* computeControlFlow - does the control flow computation          */
 /*-----------------------------------------------------------------*/
 void 

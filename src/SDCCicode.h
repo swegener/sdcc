@@ -185,6 +185,7 @@ typedef struct iCode
     
     int parmBytes;		/* if call/pcall, count of parameter bytes 
     				   on stack */
+    int argreg;			/* argument regno for SEND/RECEIVE */
     int eBBlockNum;             /* belongs to which eBBlock */
   }
 iCode;

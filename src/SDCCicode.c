@@ -224,14 +224,14 @@ printOperand (operand * op, FILE * file)
     case SYMBOL:
 #define REGA 1
 #ifdef REGA
-      fprintf (file, "%s [k%d lr%d:%d so:%d]{ ia%d re%d rm%d nos%d ru%d}",		/*{ar%d rm%d ru%d p%d a%d u%d i%d au%d k%d ks%d}"  , */
+      fprintf (file, "%s [k%d lr%d:%d so:%d]{ ia%d re%d rm%d nos%d ru%d dp%d}",		/*{ar%d rm%d ru%d p%d a%d u%d i%d au%d k%d ks%d}"  , */
 	       (OP_SYMBOL (op)->rname[0] ? OP_SYMBOL (op)->rname : OP_SYMBOL (op)->name),
 	       op->key,
 	       OP_LIVEFROM (op), OP_LIVETO (op),
 	       OP_SYMBOL (op)->stack,
 	       op->isaddr, OP_SYMBOL (op)->isreqv, 
 	       OP_SYMBOL (op)->remat,OP_SYMBOL(op)->noSpilLoc,
-	       OP_SYMBOL(op)->ruonly
+	       OP_SYMBOL(op)->ruonly,OP_SYMBOL(op)->dptr
 	);
       {
 	fprintf (file, "{");
@@ -386,6 +386,9 @@ PRINTFUNC (picGenericOne)
   if (!IC_RESULT (ic) && !IC_LEFT (ic))
     fprintf (of, s);
 
+  if (ic->op == SEND || ic->op == RECEIVE) {
+      fprintf(of,"{argreg = %d}",ic->argreg);
+  }
   fprintf (of, "\n");
 }
 
@@ -931,6 +934,8 @@ isOperandInCodeSpace (operand * op)
 
   if (!IS_SYMOP (op))
     return FALSE;
+
+  etype = getSpec (operandType (op));
 
   if (!IS_TRUE_SYMOP (op))
     {
@@ -1776,7 +1781,8 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
   /* preserve the storage class & output class */
   /* of the original variable                  */
   restype = getSpec (operandType (IC_RESULT (ic)));
-  SPEC_SCLS (restype) = SPEC_SCLS (opetype);
+  if (!IS_LITERAL(opetype))
+      SPEC_SCLS (restype) = SPEC_SCLS (opetype);
   SPEC_OCLS (restype) = SPEC_OCLS (opetype);
 
   ADDTOCHAIN (ic);
@@ -2769,10 +2775,11 @@ geniCodeSEParms (ast * parms,int lvl)
       IS_ADDRESS_OF_OP (parms->right))
     parms->right->left->lvalue = 1;
 
-  parms->opval.oprnd =
+  parms->opval.oprnd = 
     geniCodeRValue (ast2iCode (parms,lvl+1), FALSE);
-
+		
   parms->type = EX_OPERAND;
+  AST_ARGREG(parms) = SPEC_ARGREG(parms->etype);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2825,6 +2832,7 @@ geniCodeParms (ast * parms, value *argVals, int *stack,
       IFFUNC_ISBUILTIN(func->type))
     {
       ic = newiCode (SEND, pval, NULL);
+      ic->argreg = SPEC_ARGREG(parms->etype);
       ic->builtinSEND = FUNC_ISBUILTIN(func->type);
       ADDTOCHAIN (ic);
     }
@@ -2910,7 +2918,7 @@ geniCodeReceive (value * args)
   /* for all arguments that are passed in registers */
   while (args)
     {
-
+      int first = 1;
       if (IS_REGPARM (args->etype))
 	{
 	  operand *opr = operandFromValue (args);
@@ -2941,8 +2949,12 @@ geniCodeReceive (value * args)
 		}
 	    }
 
-	  ic = newiCode (RECEIVE, NULL, NULL);
-	  currFunc->recvSize = getSize (sym->etype);
+	  ic = newiCode (RECEIVE, NULL, NULL);	  
+	  ic->argreg = SPEC_ARGREG(args->etype);
+	  if (first) {
+	      currFunc->recvSize = getSize (sym->type);
+	      first = 0;
+	  }
 	  IC_RESULT (ic) = opr;
 	  ADDTOCHAIN (ic);
 	}

@@ -34,6 +34,9 @@ testAdd(void)
   
   result = left+right;
   ASSERT(result == (-39-70));
+
+  result += 0xab00;
+  ASSERT(result == ({type})(0xab00-39-70));
 }
 
 void 

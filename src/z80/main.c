@@ -289,12 +289,25 @@ _getRegName (struct regs *reg)
 */
 static const char *_z80_linkCmd[] =
 {
-  "link-z80", "-nf", "$1", NULL
+    "link-z80", 
+    "-n",                       // Don't echo output
+    "-c",                       // Command line input
+    "--",                       // Again, command line input...
+    "-b_CODE=0x200",            // Code starts at 0x200
+    "-b_DATA=0x8000",           // RAM starts at 0x8000
+    "-j",                       // Output a symbol file as well
+    "-k" SDCC_LIB_DIR "/z80",   // Library path
+    "-lz80.lib",                // Library to use
+    "-i",                       // Output Intel IHX
+    "$1.ihx",                   // Output to
+    SDCC_LIB_DIR "/z80/crt0.o", // Link in crt0 first
+    "$1.o",                     // Actual code
+    NULL
 };
 
 static const char *_z80_asmCmd[] =
 {
-  "as-z80", "-plosgff", "$1.o", "$1.asm", NULL
+    "as-z80", "-plosgff", "$1.o", "$1.asm", NULL
 };
 
 /** $1 is always the basename.
@@ -305,12 +318,13 @@ static const char *_z80_asmCmd[] =
 */
 static const char *_gbz80_linkCmd[] =
 {
-  "link-gbz80", "-nf", "$1", NULL
+    // PENDING
+    "link-gbz80", "-nf", "$1", NULL
 };
 
 static const char *_gbz80_asmCmd[] =
 {
-  "as-gbz80", "-plosgff", "$1.o", "$1.asm", NULL
+    "as-gbz80", "-plosgff", "$1.o", "$1.asm", NULL
 };
 
 /* Globals */

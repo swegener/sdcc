@@ -12,17 +12,29 @@
 
 #undef PREFIX
 #undef DATADIR
-#undef SRCDIR
 
-#undef STANDARD_INCLUDE_DIR
+#undef BIN_DIR_SUFFIX
+#undef SEARCH_SUFFIX
+#undef INCLUDE_DIR_SUFFIX
+#undef LIB_DIR_SUFFIX
+
+// Obsolete:
 #undef SDCC_INCLUDE_DIR
 #undef SDCC_LIB_DIR
+
+/* environment variables */
+#undef SDCC_DIR_NAME
+#undef SDCC_INCLUDE_NAME
+#undef SDCC_LIB_NAME
+
+/* standard libraries */
 #undef STD_LIB
 #undef STD_INT_LIB
 #undef STD_LONG_LIB
 #undef STD_FP_LIB
 #undef STD_DS390_LIB
 #undef STD_XA51_LIB
+
 #undef HAVE_SYS_SOCKET_H
 
 #undef HAVE_STRERROR
@@ -30,6 +42,8 @@
 #undef HAVE_SNPRINTF
 #undef HAVE_VSPRINTF
 #undef HAVE_MKSTEMP
+
+#undef RETSIGTYPE
 
 #undef TYPE_BYTE
 #undef TYPE_WORD

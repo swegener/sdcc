@@ -1,6 +1,8 @@
 #!/bin/sh
 
-AC_INIT(Makefile)
+AC_PREREQ(2.54)
+AC_INIT
+AC_CONFIG_SRCDIR([Makefile])
 AC_CONFIG_HEADER(sdccconf.h:sdccconf_in.h)
 
 AC_PROG_AWK
@@ -34,19 +36,26 @@ sdcc_cv_versionhi=$VERSIONHI
 sdcc_cv_versionlo=$VERSIONLO
 sdcc_cv_versionp=$VERSIONP
 
+
 # Required programs
-#-------------------
+# ===========================================================================
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_RANLIB
-AC_PROG_LEX(flex, :)
-AC_CHECK_PROG(YACC, bison, bison -y, :)
+AC_PROG_LEX
+AC_PROG_YACC
 AC_CHECK_PROG(AUTOCONF, autoconf, autoconf, :)
 AC_CHECK_PROG(STRIP, strip, strip, :)
 AC_CHECK_PROG(AS, as, as, :)
 AC_CHECK_PROG(CP, cp, cp, :)
+
+AC_CHECK_PROG(LYX,        lyx,        lyx, :)
+AC_CHECK_PROG(LATEX,      latex,      latex, :)
+AC_CHECK_PROG(LATEX2HTML, latex2html, latex2html, :)
+AC_CHECK_PROG(PDFLATEX,   pdflatex,   pdflatex, :)
+AC_CHECK_PROG(DVIPDF,     dvipdf,     dvipdf, :)
 
 AC_DEFUN(SDCC_REQUIRE_PROG, 
 [if test "$1" = ":"; then
@@ -57,77 +66,22 @@ AC_DEFUN(SDCC_REQUIRE_PROG,
 SDCC_REQUIRE_PROG($YACC, bison)
 SDCC_REQUIRE_PROG($LEX, lex)
 
-AC_LANG_C
+AC_LANG([C])
+
 
 # Checking for header files.
 # ===========================================================================
-AC_HEADER_STDC
-AC_CHECK_HEADERS(getopt.h)
-AC_CHECK_HEADERS(unistd.h)
-AC_CHECK_HEADERS(malloc.h)
-AC_CHECK_HEADERS(sys/isa_defs.h)
 AC_CHECK_HEADERS(sys/socket.h)
-AC_HEADER_DIRENT
-
-# This must be after CPP
-
-AC_CACHE_CHECK(which header file defines FD_ macros, s51_cv_fd,
-[sdcc_cv_fd="unknown"
-AC_EGREP_CPP(yes, [
-#include <sys/time.h>
-#ifdef FD_ZERO
-yes
-#endif], sdcc_cv_fd="<sys/time.h>")
-AC_EGREP_CPP(yes, [
-#include <sys/types.h>
-#ifdef FD_ZERO
-yes
-#endif], sdcc_cv_fd="<sys/types.h>")
-AC_EGREP_CPP(yes, [
-#include <sys/select.h>
-#ifdef FD_ZERO
-yes
-#endif], sdcc_cv_fd="<sys/types.h>")])
-
-AC_DEFINE(FD_HEADER_OK, 0)
-if echo $sdcc_cv_fd|grep time >/dev/null 2>&1; then
-AC_DEFINE(FD_NEED_TIME_H, 1)
-AC_DEFINE(FD_HEADER_OK, 1)
-else
-AC_DEFINE(FD_NEED_TIME_H, 0)
-fi
-if echo $sdcc_cv_fd|grep types >/dev/null 2>&1; then
-AC_DEFINE(FD_NEED_TYPES_H, 1)
-AC_DEFINE(FD_HEADER_OK, 1)
-else
-AC_DEFINE(FD_NEED_TYPES_H, 0)
-fi
-if echo $sdcc_cv_fd|grep select >/dev/null 2>&1; then
-AC_DEFINE(FD_NEED_SELECT_H, 1)
-AC_DEFINE(FD_HEADER_OK, 1)
-else
-AC_DEFINE(FD_NEED_SELECT_H, 0)
-fi
-
-AC_DEFINE_UNQUOTED(HEADER_FD, ${sdcc_cv_fd})
 
 
 # Checking for functions
 # ===========================================================================
-AC_CHECK_FUNCS(strlen strcpy strcat strstr strcmp strerror strtok strdup)
-AC_CHECK_FUNCS(strchr memcpy vsnprintf snprintf vsprintf)
-AC_CHECK_FUNCS(mkstemp)
-dnl AC_CHECK_FUNCS(getline)
-dnl AC_CHECK_FUNCS(getdelim)
-AC_CHECK_FUNCS(fgets)
-AC_CHECK_FUNCS(yylex)
+AC_CHECK_FUNCS(strerror)
+AC_CHECK_FUNCS(vsnprintf snprintf vsprintf mkstemp)
 
-# check if -lsocket && -lxnet is required to compile socket stuff
-AC_SEARCH_LIBS(socket,socket)
-AC_SEARCH_LIBS(inet_addr,nsl xnet)
 
 # Macro definitions
-###################
+# ===========================================================================
 
 # DD_COPT macro checks if the compiler specified as the 1st parameter
 # supports option specified as the 2nd parameter
@@ -148,9 +102,30 @@ fi
 rm -f _test_.* a.out)
 ])
 
+# This macro _AC_DEFINEs VARNAME to the expansion of the DIR variable,
+# taking care of fixing up ${prefix} and such.
+#
+# Note that the 3 argument form is only supported with autoconf 2.13
+# and later (i.e. only where _AC_DEFINE supports 3 arguments).
+#
+# Examples:
+#
+#  AC_DEFINE_DIR(DATADIR, datadir)
+#  AC_DEFINE_DIR(PROG_PATH, bindir, [Location of installed binaries])
+
+AC_DEFUN([AC_DEFINE_DIR], [
+  test "x$prefix" = xNONE && prefix="$ac_default_prefix"
+  test "x$exec_prefix" = xNONE && exec_prefix='${prefix}'
+  ac_define_dir=`eval echo [$]$2`
+  ac_define_dir=`eval echo [$]ac_define_dir`
+  ifelse($3, ,
+    AC_DEFINE_UNQUOTED($1, "$ac_define_dir"),
+    AC_DEFINE_UNQUOTED($1, "$ac_define_dir", $3))
+])
+
 
 # Checking characteristics of compilers and other programs
-# --------------------------------------------------------
+# ===========================================================================
 AC_CACHE_CHECK(whether preprocessor accepts -MM or -M,sdcc_cv_MM,
 echo "#include <stdio.h>" >_test_.c
 echo "" >>_test_.c
@@ -175,27 +150,14 @@ if test "$sdcc_cv_CCpipe" = "yes"; then
   CFLAGS="$CFLAGS -pipe"
 fi
 
-
 # Checks for typedefs, structures, and compiler characteristics.
 # ===========================================================================
 AC_TYPE_SIGNAL
 
-if test "$cross_compiling" = "no"; then
 AC_CHECK_SIZEOF(char)
 AC_CHECK_SIZEOF(short)
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(long)
-else
-    if $CXX -v 2>&1|grep "mingw" >/dev/null 2>&1; then
-	ac_cv_sizeof_char=1
-	ac_cv_sizeof_short=2
-	ac_cv_sizeof_int=4 
-	ac_cv_sizeof_long=4
-    else
-	: # FIXME
-    fi
-#echo
-fi
 
 type_name()
 {
@@ -227,58 +189,104 @@ AC_MSG_RESULT($TYPE_WORD)
 AC_MSG_CHECKING(type name for dword)
 TYPE_DWORD=`type_name 4`
 AC_MSG_RESULT($TYPE_DWORD)
-AC_DEFINE_UNQUOTED(TYPE_BYTE, $TYPE_BYTE)
-AC_DEFINE_UNQUOTED(TYPE_WORD, $TYPE_WORD)
+AC_DEFINE_UNQUOTED(TYPE_BYTE,  $TYPE_BYTE)
+AC_DEFINE_UNQUOTED(TYPE_WORD,  $TYPE_WORD)
 AC_DEFINE_UNQUOTED(TYPE_DWORD, $TYPE_DWORD)
 
 AC_C_BIGENDIAN
 
-#
-#
-if test "${prefix}" = "NONE"; then
-    prefix="/usr/local"
+# Set standard installation paths
+# ===========================================================================
+case $host in
+    *mingw32*)
+	MINGW32_HOST="yes"
+	;;
+    *)
+	MINGW32_HOST="no"
+	;;
+esac
+
+AC_MSG_CHECKING(host mingw32)
+AC_MSG_RESULT($MINGW32_HOST)
+
+# prefix: *nix default is "NONE"
+# prefix: mingw32 default is "/sdcc"
+if test "$prefix" = NONE; then
+    if test "$MINGW32_HOST" = "no"; then
+	prefix="/usr/local"
+    else
+	prefix="/sdcc"
+    fi
 fi
 
-config_in=`pwd`
-sdcc_datadir=${datadir}/sdcc
+# datadir: *nix default is "${prefix}/share"
+if test "$datadir" = "\${prefix}/share"; then
+    if test "$MINGW32_HOST" = "no"; then
+	datadir="\${prefix}/share/sdcc"
+    fi
+# mingw32 default is "/sdcc"
+elif test "$datadir" = "/sdcc"; then
+    if test "$MINGW32_HOST" = "yes"; then
+	datadir="\${prefix}"
+    fi
+fi
+
+# standard libs
+AC_DEFINE_UNQUOTED(STD_LIB,       "libsdcc")
+AC_DEFINE_UNQUOTED(STD_INT_LIB,   "libint")
+AC_DEFINE_UNQUOTED(STD_LONG_LIB,  "liblong")
+AC_DEFINE_UNQUOTED(STD_FP_LIB,    "libfloat")
+AC_DEFINE_UNQUOTED(STD_DS390_LIB, "libds390")
+AC_DEFINE_UNQUOTED(STD_xa51_LIB,  "xa51")
+
+AC_DEFINE_DIR(PREFIX,  "${prefix}")
+AC_DEFINE_DIR(DATADIR, "$datadir")
+AC_SUBST(datadir)
+
+# search paths
+bin_dir_suffix="bin"
+AC_DEFINE_DIR(BIN_DIR_SUFFIX, "${bin_dir_suffix}")
+
+    if test "$MINGW32_HOST" = "no"; then
+	search_suffix="share/sdcc"
+    else
+	search_suffix=""
+    fi
+AC_DEFINE_DIR(SEARCH_SUFFIX, "${search_suffix}")
+
+include_dir_suffix="include"
+AC_DEFINE_DIR(INCLUDE_DIR_SUFFIX, "${include_dir_suffix}")
+
+lib_dir_suffix="lib"
+AC_DEFINE_UNQUOTED(LIB_DIR_SUFFIX, "${lib_dir_suffix}")
+
+### <Obsolete>
+# sdcc_datadir is still used in [device,lib]/Makefile
+sdcc_datadir=${datadir}
 AC_SUBST(sdcc_datadir)
 
-# For some unknown reason, putting this assignment in a subshell
-# like this causes the rvalue to be fully substituted. We need this
-# for the defines below to generate the right thing. We keep this
-# separate from the substituted sdcc_datadir because we want the
-# latter for makefiles.
-if test "${datadir}" = "\${prefix}/share"; then
-    sdcc_datadir_tmp=${prefix}/share/sdcc
-else
-    sdcc_datadir_tmp=${datadir}/sdcc
-fi
-
+# SDCC_[INCLUDE,LIB]_DIR is still used in SDCCmain.c
 if test "${includedir}" = "\${prefix}/include"; then
-   AC_DEFINE_UNQUOTED(STANDARD_INCLUDE_DIR, "${sdcc_datadir_tmp}/include")
-   AC_DEFINE_UNQUOTED(SDCC_INCLUDE_DIR, "${sdcc_datadir_tmp}/include")
-else 
-   AC_DEFINE_UNQUOTED(STANDARD_INCLUDE_DIR, "${includedir}")
-   AC_DEFINE_UNQUOTED(SDCC_INCLUDE_DIR, "${includedir}")
+    includedir="${datadir}/include"
 fi
+AC_DEFINE_DIR(SDCC_INCLUDE_DIR, "${includedir}")
+AC_DEFINE_DIR(SDCC_LIB_DIR,     "${datadir}/lib")
+### </Obsolete>
 
-AC_DEFINE_UNQUOTED(SDCC_LIB_DIR, "${sdcc_datadir_tmp}/lib")
-AC_DEFINE_UNQUOTED(STD_LIB, "libsdcc")
-AC_DEFINE_UNQUOTED(STD_INT_LIB, "libint")
-AC_DEFINE_UNQUOTED(STD_LONG_LIB, "liblong")
-AC_DEFINE_UNQUOTED(STD_FP_LIB, "libfloat")
-AC_DEFINE_UNQUOTED(STD_DS390_LIB, "libds390")
-AC_DEFINE_UNQUOTED(STD_xa51_LIB, "xa51")
-
-AC_DEFINE_UNQUOTED(PREFIX, "${prefix}")
-AC_DEFINE_UNQUOTED(DATADIR, "${sdcc_datadir_tmp}")
-AC_DEFINE_UNQUOTED(SRCDIR, "${config_in}")
-
-
+# environment variables
+sdcc_dir_name="SDCC_HOME"
+AC_DEFINE_DIR(SDCC_DIR_NAME, "${sdcc_dir_name}")
+sdcc_include_name="SDCC_INCLUDE"
+AC_DEFINE_DIR(SDCC_INCLUDE_NAME, "${sdcc_include_name}")
+sdcc_lib_name="SDCC_LIB"
+AC_DEFINE_DIR(SDCC_LIB_NAME, "${sdcc_lib_name}")
 
 # Now handle the port selection
+# ===========================================================================
 rm -f ports.all ports.build
-AC_ARG_ENABLE(mcs51-port,[  --disable-mcs51-port    Excludes the Intel mcs51 port])
+AC_ARG_ENABLE(mcs51-port,
+            AC_HELP_STRING([--disable-mcs51-port],
+                           [Excludes the Intel mcs51 port]))
 echo mcs51 >>ports.all
 if test "$enable_mcs51_port" = "no"; then
     AC_DEFINE_UNQUOTED(OPT_DISABLE_MCS51, 1)
@@ -287,7 +295,9 @@ else
     AC_DEFINE_UNQUOTED(OPT_DISABLE_MCS51, 0)
 fi
 
-AC_ARG_ENABLE(gbz80-port,[  --disable-gbz80-port    Excludes the Gameboy gbz80 port])
+AC_ARG_ENABLE(gbz80-port,
+            AC_HELP_STRING([--disable-gbz80-port],
+                           [Excludes the Gameboy gbz80 port]))
 echo z80 >>ports.all
 if test "$enable_gbz80_port" = "no"; then
     AC_DEFINE_UNQUOTED(OPT_DISABLE_GBZ80, 1)
@@ -296,7 +306,9 @@ else
     AC_DEFINE_UNQUOTED(OPT_DISABLE_GBZ80, 0)
 fi
 
-AC_ARG_ENABLE(z80-port,[  --disable-z80-port      Excludes the z80 port])
+AC_ARG_ENABLE(z80-port,
+            AC_HELP_STRING([--disable-z80-port],
+                           [Excludes the z80 port]))
 echo z80 >>ports.all
 if test "$enable_z80_port" = "no"; then
     AC_DEFINE_UNQUOTED(OPT_DISABLE_Z80, 1)
@@ -305,7 +317,9 @@ else
     AC_DEFINE_UNQUOTED(OPT_DISABLE_Z80, 0)
 fi
 
-AC_ARG_ENABLE(avr-port,[  --disable-avr-port      Excludes the AVR port])
+AC_ARG_ENABLE(avr-port,
+            AC_HELP_STRING([--disable-avr-port],
+                           [Excludes the AVR port]))
 echo avr >>ports.all
 if test "$enable_avr_port" = "no"; then
     AC_DEFINE_UNQUOTED(OPT_DISABLE_AVR, 1)
@@ -314,7 +328,9 @@ else
     AC_DEFINE_UNQUOTED(OPT_DISABLE_AVR, 0)
 fi
 
-AC_ARG_ENABLE(ds390-port,[  --disable-ds390-port    Excludes the DS390 port])
+AC_ARG_ENABLE(ds390-port,
+            AC_HELP_STRING([--disable-ds390-port],
+                           [Excludes the DS390 port]))
 echo ds390 >>ports.all
 if test "$enable_ds390_port" = "no"; then
     AC_DEFINE_UNQUOTED(OPT_DISABLE_DS390, 1)
@@ -325,7 +341,9 @@ else
     AC_DEFINE_UNQUOTED(OPT_DISABLE_TININative, 0)
 fi
 
-AC_ARG_ENABLE(pic-port,[  --disable-pic-port      Excludes the PIC port])
+AC_ARG_ENABLE(pic-port,
+            AC_HELP_STRING([--disable-pic-port],
+                           [Excludes the PIC port]))
 echo pic >>ports.all
 if test "$enable_pic_port" = "no"; then
     AC_DEFINE_UNQUOTED(OPT_DISABLE_PIC, 1)
@@ -334,7 +352,9 @@ else
     AC_DEFINE_UNQUOTED(OPT_DISABLE_PIC, 0)
 fi
 
-AC_ARG_ENABLE(xa51-port,[  --disable-xa51-port Excludes the XA51 port])
+AC_ARG_ENABLE(xa51-port,
+            AC_HELP_STRING([--disable-xa51-port],
+                           [Excludes the XA51 port]))
 echo xa51 >>ports.all
 if test "$enable_xa51_port" = "no"; then
     AC_DEFINE_UNQUOTED(OPT_DISABLE_XA51, 1)
@@ -343,19 +363,27 @@ else
     AC_DEFINE_UNQUOTED(OPT_DISABLE_XA51, 0)
 fi
 
-AC_ARG_ENABLE(ucsim,[  --disable-ucsim         Disables configuring and building of ucsim])
+AC_ARG_ENABLE(ucsim,
+              AC_HELP_STRING([--disable-ucsim],
+                             [Disables configuring and building of ucsim]))
 OPT_ENABLE_UCSIM=$enable_ucsim
 AC_SUBST(OPT_ENABLE_UCSIM)
 
-AC_ARG_ENABLE(device-lib-build,[  --disable-device-lib-build Disables automatically building device libraries])
+AC_ARG_ENABLE(device-lib-build,
+              AC_HELP_STRING([--disable-device-lib-build],
+                             [Disables automatically building device libraries]))
 OPT_ENABLE_DEVICE_LIB_BUILD=$enable_device_lib_build
 AC_SUBST(OPT_ENABLE_DEVICE_LIB_BUILD)
 
-AC_ARG_ENABLE(packihx,[  --disable-packihx       Disables building packihx])
+AC_ARG_ENABLE(packihx,
+              AC_HELP_STRING([--disable-packihx],
+                             [Disables building packihx]))
 OPT_ENABLE_PACKIHX=$enable_packihx
 AC_SUBST(OPT_ENABLE_PACKIHX)
 
-AC_ARG_ENABLE(libgc,[  --enable-libgc          Use the Bohem memory allocator.  Lower runtime footprint.])
+AC_ARG_ENABLE(libgc,
+              AC_HELP_STRING([--enable-libgc],
+                             [Use the Bohem memory allocator. Lower runtime footprint.]))
 if test "$enable_libgc" = "yes"; then
         AC_CHECK_LIB(gc, GC_malloc)
         OPT_ENABLE_LIBGC=1
@@ -375,16 +403,14 @@ mv ports ports.build
 AC_CONFIG_SUBDIRS(support/cpp2)
 AC_CONFIG_SUBDIRS(packihx)
 AC_CONFIG_SUBDIRS(sim/ucsim)
-# MLH: removed as the rules are already in Makefile.common
-#as/z80/Makefile
-#link/z80/Makefile
-AC_OUTPUT(main.mk:main_in.mk
+AC_CONFIG_FILES([main.mk:main_in.mk
 src/Makefile
 as/mcs51/Makefile
 device/include/Makefile
 device/lib/Makefile
 debugger/mcs51/Makefile
 Makefile.common:Makefile.common.in
-)
+])
+AC_OUTPUT
 
 # End of configure/configure.in

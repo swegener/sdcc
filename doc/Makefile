@@ -10,7 +10,7 @@ all: $(MANUAL).html $(MANUAL).pdf $(MANUAL).txt \
 
 install:
 	$(INSTALL) -d $(docdir)
-	cp -rf *.html *.txt z80 avr $(docdir)
+	cp -rf *.txt z80 avr $(docdir)
 	$(shell if [ -f $(MANUAL).html ]; then cp -rf $(MANUAL).html $(docdir); fi)
 	$(shell if [ -f $(TSS).html    ]; then cp -rf $(TSS).html    $(docdir); fi)
 	$(shell if [ -f $(CDB).html    ]; then cp -rf $(CDB).html    $(docdir); fi)

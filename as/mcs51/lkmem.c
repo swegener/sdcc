@@ -314,7 +314,7 @@ int summary(struct area * areap)
 	else
 		sprintf(end,  "0x%04lx", XRam.Size+XRam.Start-1);
 	sprintf(size, "%5lu", XRam.Size);
-	sprintf(max, "%5lu", XRam.Max);
+	sprintf(max, "%5lu", xram_size<0?XRam.Max:xram_size);
 	fprintf(of, format, XRam.Name, start, end, size, max);
 
 	/*Report Rom/Flash totals:*/
@@ -324,7 +324,7 @@ int summary(struct area * areap)
 	else
 		sprintf(end,  "0x%04lx", Rom.Size+Rom.Start-1);
 	sprintf(size, "%5lu", Rom.Size);
-	sprintf(max, "%5lu", Rom.Max);
+	sprintf(max, "%5lu", code_size<0?Rom.Max:code_size);
 	fprintf(of, format, Rom.Name, start, end, size, max);
 
 	/*Report any excess:*/
@@ -333,12 +333,14 @@ int summary(struct area * areap)
 		sprintf(buff, "Insufficient INDIRECT RAM memory.\n");
 		REPORT_ERROR(buff, 1);
 	}
-	if((XRam.Start+XRam.Size)>XRam.Max)
+	if( ((XRam.Start+XRam.Size)>XRam.Max) ||
+		(((int)XRam.Size>xram_size)&&(xram_size>=0)) )
 	{
 		sprintf(buff, "Insufficient EXTERNAL RAM memory.\n");
 		REPORT_ERROR(buff, 1);
 	}
-	if((Rom.Start+Rom.Size)>Rom.Max)
+	if( ((Rom.Start+Rom.Size)>Rom.Max) ||
+		(((int)Rom.Size>code_size)&&(code_size>=0)) )
 	{
 		sprintf(buff, "Insufficient ROM/EPROM/FLASH memory.\n");
 		REPORT_ERROR(buff, 1);

@@ -791,6 +791,16 @@ parse()
 					iramsav();
 					return(0);
 
+				case 'v':
+				case 'V':
+					xramsav();
+					return(0);
+
+				case 'w':
+				case 'W':
+					codesav();
+					return(0);
+
 				case 'z':
                                 case 'Z':
 				        dflag = 1;					
@@ -1161,6 +1171,29 @@ iramsav()
     iram_size = 128;		/* Default is 128 (0x80) bytes */
 }
 
+/*Similar to iramsav but for xram memory*/
+VOID
+xramsav()
+{
+  unget(getnb());
+  if (ip && *ip)
+    xram_size = expr(0);	/* evaluate size expression */
+  else
+	xram_size = rflag?0x1000000:0x10000;
+}
+
+/*Similar to iramsav but for code memory*/
+VOID
+codesav()
+{
+  unget(getnb());
+  if (ip && *ip)
+    code_size = expr(0);	/* evaluate size expression */
+  else
+	code_size = rflag?0x1000000:0x10000;
+}
+
+
 /*)Function	VOID	iramcheck()
  *
  *	The function iramcheck() is used at the end of linking to check that
@@ -1231,6 +1264,8 @@ char *usetxt[] = {
 	"  -u	Update listing file(s) with link data as file(s)[.RST]",
 	"Miscellaneous:\n"
 	"  -a	[iram-size] Check for internal RAM overflow",
+	"  -v	[xram-size] Check for external RAM overflow",
+	"  -w	[code-size] Check for code overflow",
 	"End:",
 	"  -e	or null line terminates input",
 	0

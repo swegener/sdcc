@@ -622,6 +622,10 @@ extern	struct lbfile *lbfhead;	/*	pointer to the first
 				 */
 extern	Addr_T iram_size;	/*	internal ram size
 				 */
+extern	long xram_size;	/*	external ram size
+				 */
+extern	long code_size;	/*	code size
+				 */
 
 
 /* C Library function definitions */
@@ -646,6 +650,8 @@ extern	FILE *		afile();
 extern	VOID		bassav();
 extern	VOID		gblsav();
 extern	VOID		iramsav();
+extern	VOID		xramsav();
+extern	VOID		codesav();
 extern	VOID		iramcheck();
 extern	VOID		link_main();
 extern	VOID		lkexit();

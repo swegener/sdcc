@@ -93,6 +93,10 @@ int	gcntr;		/*	LST file relocation active
 			 */
 Addr_T	iram_size;	/*	internal ram size
 			 */
+long	xram_size=-1;	/*	external ram size
+			 */
+long	code_size=-1;	/*	code size
+			 */
 
 /*
  *	The structure lfile contains a pointer to a

@@ -1,3 +1,12 @@
+2003-01-29  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+	* as/mcs51/aslink.h: Added options --xram-size and --code-size 
+	* as/mcs51/lkdata.c: Added options --xram-size and --code-size 
+	* as/mcs51/lkmain.c: Added options --xram-size and --code-size 
+	* as/mcs51/lkmem.c:  Added options --xram-size and --code-size 
+	* src/SDCCglobl.h:   Added options --xram-size and --code-size 
+	* src/SDCCmain.c:    Added options --xram-size and --code-size 
+
 2003-01-28  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/ds390/gen.c: fix deps by replacing <common.h> with "common.h"

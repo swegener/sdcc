@@ -2755,15 +2755,19 @@ operand *ast2iCode (ast *tree)
 	 tree->opval.op != SWITCH &&
 	 tree->opval.op != FUNCTION &&
 	 tree->opval.op != INLINEASM ) {
+
 	if (IS_ASSIGN_OP(tree->opval.op) || 
 	    IS_DEREF_OP(tree)            || 
 	    (tree->opval.op == '&' && !tree->right) ||
 	    tree->opval.op == PTR_OP) {
-	    lvaluereq++;
-	    if (IS_ARRAY_OP(tree->left) && IS_ARRAY_OP(tree->left->left))
+ 	    lvaluereq++;
+	    if ((IS_ARRAY_OP(tree->left) && IS_ARRAY_OP(tree->left->left)) ||
+		(IS_DEREF_OP(tree) && IS_ARRAY_OP(tree->left)))
 	    {
-		lvaluereq--;
+		int olvr = lvaluereq ;
+		lvaluereq = 0;
 		left = operandFromAst(tree->left);
+		lvaluereq = olvr - 1;
 	    } else {
 		left = operandFromAst(tree->left);
 		lvaluereq--;

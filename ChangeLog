@@ -1,3 +1,7 @@
+2003-02-14  Bernhard Held <bernhard@bernhardheld.de>
+
+	* doc/sdccman.lyx: Environment variables, -o and other minor things
+
 2003-02-14    <johan@balder>
 
 	* src/xa51/main.c: before anyone really tries to use it :)

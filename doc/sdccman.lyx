@@ -333,7 +333,7 @@ Installation
 Install and search paths
 \layout Standard
 
-Linux (and other gcc-builds like Solaris, Cygwin, Mingw and OSX) by default
+Linux (and other gcc-builds like Solaris, Cygwin, Mingw32 and OSX) by default
  install in /usr/local.
  You can override this when configuring with ---prefix-path.
  Subdirs used will be bin, share/sdcc/include, share/sdcc/lib and share/sdcc/doc.
@@ -482,7 +482,7 @@ So, for windoze it is highly recommended to set the environment variable
 rd paths.
 \layout Subsection
 
-Linux and other gcc-based systems (cygwin, mingw, osx)
+Linux and other gcc-based systems (cygwin, mingw32, osx)
 \layout Enumerate
 
 
@@ -583,7 +583,8 @@ Windows Install Using a Binary Package
 Download the binary package and unpack it using your favorite unpacking
  tool (gunzip, WinZip, etc).
  This should unpack to a group of sub-directories.
- An example directory structure after unpacking the mingw package is: c:
+ An example directory structure after unpacking the mingw32 package is:
+ c:
 \backslash 
 usr
 \backslash 
@@ -616,7 +617,7 @@ Adjust your environment variable PATH to include the location of the bin
  directory or start sdcc using the full path.
 \layout Subsubsection
 
-Windows Install Using Cygwin and Mingw
+Windows Install Using Cygwin and Mingw32
 \layout Standard
 
 Follow the instruction in 
@@ -1714,16 +1715,6 @@ Linker Options
 
 
 \series bold 
--o\SpecialChar ~
-<path/file> 
-\series default 
-the output path resp.
- file where everything will be placed
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
 -L\SpecialChar ~
 ---lib-path
 \bar under 
@@ -2023,6 +2014,19 @@ Other Options
  Run only the C preprocessor.
  Preprocess all the C source files specified and output the results to standard
  output.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-o\SpecialChar ~
+<path/file> 
+\series default 
+The output path resp.
+ file where everything will be placed.
+ If the parameter is a path, it must have a trailing slash (or backslash
+ for the Windows binaries) to be recognized as a path.
+ 
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -2406,6 +2410,116 @@ Will create a dump of iCode's, after register assignment, into a file named
 \size default 
 \bar default 
 Will cause all the above mentioned dumps to be created.
+\layout Subsection
+
+Environment variables
+\layout Standard
+
+SDCC recognizes the following environment variables:
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+SDCC_LEAVE_SIGNALS
+\series default 
+ SDCC installs a signal handler to be able to delete temporary files after
+ an user break (^C) or an exception.
+ If this environment variable is set, SDCC won't install the signal handler
+ in order to be able to debug SDCC.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+TMP,\SpecialChar ~
+TEMP,\SpecialChar ~
+TMPDIR
+\series default 
+ Path, where temporary files will be created.
+ The order of the variables is the search order.
+ In a standard *nix environment these variables are not set, and there's
+ no need to set them.
+ On Windows it's recommended to set one of them.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+(coming\SpecialChar ~
+soon:\SpecialChar ~
+SDCC_BIN_PATH)
+\series default 
+ Path, see 
+\begin_inset Quotes sld
+\end_inset 
+
+2.1 Install and search paths
+\begin_inset Quotes srd
+\end_inset 
+
+.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+(coming\SpecialChar ~
+soon:\SpecialChar ~
+SDCC_INCLUDE_PATH)
+\series default 
+ Path, see 
+\begin_inset Quotes sld
+\end_inset 
+
+2.1 Install and search paths
+\begin_inset Quotes srd
+\end_inset 
+
+.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+(coming\SpecialChar ~
+soon:\SpecialChar ~
+SDCC_LIB_PATH)
+\series default 
+ Path, see 
+\begin_inset Quotes sld
+\end_inset 
+
+2.1 Install and search paths
+\begin_inset Quotes srd
+\end_inset 
+
+.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+SDCCDIR\SpecialChar ~
+(soon\SpecialChar ~
+replaced\SpecialChar ~
+by:\SpecialChar ~
+SDCCPATH)
+\series default 
+ Path, see 
+\begin_inset Quotes sld
+\end_inset 
+
+2.1 Install and search paths
+\begin_inset Quotes srd
+\end_inset 
+
+.
+\layout Standard
+
+There are some more environment variables recognized by SDCC, but these
+ are solely used for debugging purposes.
+ They can change or disappear very quickly, and will never be documentated.
 \layout Subsection
 
 MCS51/DS390 Storage Class Language Extensions
@@ -2892,9 +3006,9 @@ Interrupt Numbers and the corresponding address & descriptions for the Standard
 \begin_inset  Tabular
 <lyxtabular version="3" rows="6" columns="3">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0pt">
+<column alignment="center" valignment="top" leftline="true" width="0pt">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0pt">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -3755,7 +3869,7 @@ The same goes the other way, ie.
  labels defines in inline assembly CANNOT be accessed by C statements.
 \layout Subsection
 
-int(16 bit) and long (32 bit) Support
+int (16 bit) and long (32 bit) Support
 \layout Standard
 
 For signed & unsigned int (16 bit) and long (32 bit) variables, division,

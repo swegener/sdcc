@@ -51,6 +51,10 @@ void  pCodeInitRegisters(void);
 
 void pic14_assignRegisters (eBBlock ** ebbs, int count);
 
+/* Also defined in gen.h, but the #include is commented out */
+/* for an unknowned reason. - EEP */
+void pic14_emitDebuggerSymbol (char *);
+
 static int regParmFlg = 0;	/* determine if we can register a parameter */
 
 static void
@@ -452,6 +456,9 @@ PORT pic_port =
 		/* pic14 has an 8 bit mul */
 	{
 		1, -1
+	},
+	{
+		pic14_emitDebuggerSymbol
 	},
 	"_",
 	_pic14_init,

@@ -195,6 +195,24 @@ typedef struct
       }
     support;
 
+    struct
+      {
+	void (*emitDebuggerSymbol) (char *);
+	struct
+	  {
+	    int (*regNum) (struct regs *);
+	    bitVect * cfiSame;
+	    bitVect * cfiUndef;
+	    int addressSize;
+	    int regNumRet;
+	    int regNumSP;
+	    int regNumBP;
+	    int offsetSP;
+	  }
+	dwarf;
+      }
+    debugger;
+    
 /** Prefix to add to a C function (eg "_") */
     const char *fun_prefix;
 

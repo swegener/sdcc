@@ -867,6 +867,9 @@ PORT ds390_port =
   {
     2, -1
   },
+  {
+    ds390_emitDebuggerSymbol
+  },
   "_",
   _ds390_init,
   _ds390_parseOptions,
@@ -1166,6 +1169,9 @@ PORT tininative_port =
   {
     2, -1
   },
+  {
+    ds390_emitDebuggerSymbol
+  },
   "",
   _tininative_init,
   _ds390_parseOptions,
@@ -1379,6 +1385,9 @@ PORT ds400_port =
     /* ds390 has an 16 bit mul & div */
   {
     2, -1
+  },
+  {
+    ds390_emitDebuggerSymbol
   },
   "_",
   _ds390_init,

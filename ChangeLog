@@ -1,3 +1,79 @@
+2004-05-13 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c (hc08_emitDebuggerSymbol),
+	* src/hc08/main.c,
+	* src/mcs51/gen.c (mcs51_emitDebuggerSymbol),
+	* src/mcs51/main.c,
+	* src/ds390/gen.c (ds390_emitDebuggerSymbol),
+	* src/ds390/main.c,
+	* src/z80/gen.c (z80_emitDebuggerSymbol),
+	* src/z80/main.c,
+	* src/pic/gen.c (pic14_emitDebuggerSymbol),
+	* src/pic/main.c,
+	* src/pic16/gen.c (pic14_emitDebuggerSymbol),
+	* src/pic16/main.c,
+	* src/avr/gen.c (avr_emitDebuggerSymbol),
+	* src/avr/main.c,
+	* src/xa51/gen.c (xa51_emitDebuggerSymbol),
+	* src/xa51/main.c,
+	* src/SDCCdebug.c (emitDebuggerSymbol),
+	* src/SDCCdebug.h,
+	* src/port.h: added a debugger struct to the port struct. Added a
+	callback for defining debugger symbols
+	
+	* src/SDCCast.c (createLabel),
+	* src/SDCC.y (labeled_statement): mark all compiler generated labels
+	with isitmp = 1
+	* src/SDCCicode.h,
+	* src/SDCCicode.c (geniCodeFunctionBody): added a link from the FUNCTION
+	iCode back to the ast for the function
+	
+	* src/hc08/ralloc.c (hc08_assignRegisters),
+	* src/hc08/ralloc.h: define a regs struct for the stack pointer. Removed
+	unneeded fields from the regs struct.
+	* src/hc08/gen.c (transferRegReg, genFunction, genEndFunction): use the
+	pushReg() & pullReg() functions instead of emitcode()
+	
+	* src/hc08/gen.c (genLabel, genhc08Code),
+	* src/SDCCdebug.h: Added additional debugger hooks needed for DWARF
+	
+	* src/cdbFile.c (cdbWriteLabel, cdbWriteScope): Added stubs for unneeded
+	debugger hooks
+	
+	* src/hc08/gen.c (genEndFunction, genhc08Code),
+	* src/hc08/gen.h,
+	* src/mcs51/gen.c (genEndFunction, gen51Code),
+	* src/mcs51/gen.h,
+	* src/ds390/gen.c (genEndFunction, gen390Code),
+	* src/ds390/gen.h,
+	* src/z80/gen.c (genEndFunction, genZ80Code),
+	* src/z80/gen.h,
+	* src/z80/z80.h,
+	* src/pic/gen.c (genEndFunction, genpic14Code),
+	* src/pic/gen.h,
+	* src/pic16/gen.c (genEndFunction, genpic16Code),
+	* src/pic16/gen.h,
+	* src/avr/gen.c (genEndFunction, genAVRCode),
+	* src/avr/gen.h,
+	* src/xa51/gen.c (genEndFunction, genXA51Code),
+	* src/xa51/gen.h,
+	* src/cdbFile.c (cdbWriteFunction, cdbWriteEndFunction): moved cdb
+	specific code to cdbFile.c and out of the backend code generators
+	
+	* as/hc08/lkmain.c (main): removed OMF51 support from link-hc08
+	* as/hc08/lkarea.c (lnkarea): areas with NOLOAD attribute default
+	starting address is now 0
+
+	* as/hc08/asm.h,
+	* as/hc08/m08pst.c,
+	* as/hc08/asmain.c (asmbl): implemented the .sleb128 and .uleb128
+	assembler directive for DWARF support
+	* as/hc08/lkelf.c (elf): only increment address when rtflg[] set
+	
+	* src/src.dsp,
+	* src/Makefile.in,
+	* src/SDCCdwarf2.c: preliminary DWARF (ver 2) debugger data generator
+	
 2004-05-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (genJumpTab, emitcode, genhc08code): fixed stack error

@@ -330,6 +330,17 @@ void pic16_emitcode (char *inst,char *fmt, ...)
 }
 #endif
 
+/*-----------------------------------------------------------------*/
+/* pic16_emitDebuggerSymbol - associate the current code location  */
+/*   with a debugger symbol                                        */
+/*-----------------------------------------------------------------*/
+void
+pic16_emitDebuggerSymbol (char * debugSym)
+{
+  _G.debugLine = 1;
+  pic16_emitcode (";", "%s ==.", debugSym);
+  _G.debugLine = 0;
+}
 
 /*-----------------------------------------------------------------*/
 /* getFreePtr - returns r0 or r1 whichever is free or can be pushed*/
@@ -3511,15 +3522,7 @@ static void genEndFunction (iCode *ic)
 		/* if debug then send end of function */
 /* 	if (options.debug && currFunc)  */
 		if (currFunc) {
-			_G.debugLine = 1;
-			pic16_emitcode(";","C$%s$%d$%d$%d ==.",
-					FileBaseName(ic->filename),currFunc->lastLine,
-					ic->level,ic->block); 
-			if (IS_STATIC(currFunc->etype))	    
-				pic16_emitcode(";","XF%s$%s$0$0 ==.",moduleName,currFunc->name); 
-			else
-				pic16_emitcode(";","XG$%s$0$0 ==.",currFunc->name);
-			_G.debugLine = 0;
+			debugFile->writeEndFunction (currFunc, ic, 1);
 		}
 	
 		pic16_emitpcodeNULLop(POC_RETFIE);
@@ -3556,15 +3559,7 @@ static void genEndFunction (iCode *ic)
 		pic16_emitpcomment("%s: _G.nRegsSaved upon exit from function: %d\n", __FUNCTION__, _G.nRegsSaved);
 		/* if debug then send end of function */
 		if (currFunc) {
-		    _G.debugLine = 1;
-		    pic16_emitcode(";","C$%s$%d$%d$%d ==.",
-			     FileBaseName(ic->filename),currFunc->lastLine,
-			     ic->level,ic->block); 
-		    if (IS_STATIC(currFunc->etype))	    
-			pic16_emitcode(";","XF%s$%s$0$0 ==.",moduleName,currFunc->name); 
-		    else
-			pic16_emitcode(";","XG$%s$0$0 ==.",currFunc->name);
-		    _G.debugLine = 0;
+			debugFile->writeEndFunction (currFunc, ic, 1);
 		}
 
 		/* insert code to restore stack frame, if user enabled it
@@ -11237,15 +11232,6 @@ void genpic16Code (iCode *lic)
     if (options.debug && currFunc) {
       if (currFunc) {
 	cdbSymbol(currFunc,cdbFile,FALSE,TRUE);
-	_G.debugLine = 1;
-	if (IS_STATIC(currFunc->etype)) {
-	  pic16_emitcode("",";F%s$%s$0$0     %d",moduleName,currFunc->name,__LINE__);
-	  //pic16_addpCode2pBlock(pb,pic16_newpCodeLabel(moduleName,currFunc->name));
-	} else {
-	  pic16_emitcode("",";G$%s$0$0   %d",currFunc->name,__LINE__);
-	  //pic16_addpCode2pBlock(pb,pic16_newpCodeLabel(NULL,currFunc->name));
-	}
-	_G.debugLine = 0;
       }
     }
 #endif
@@ -11255,11 +11241,7 @@ void genpic16Code (iCode *lic)
       DEBUGpic16_emitcode(";ic ", "\t%c 0x%x",ic->op, ic->op);
 	if ( cln != ic->lineno ) {
 	    if ( options.debug ) {
-		_G.debugLine = 1;
-		pic16_emitcode("",";C$%s$%d$%d$%d ==.",
-			 FileBaseName(ic->filename),ic->lineno,
-			 ic->level,ic->block);
-		_G.debugLine = 0;
+	      debugFile->writeCLine (ic);
 	    }
 	    
 	    if(!options.noCcodeInAsm) {

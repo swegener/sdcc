@@ -301,6 +301,9 @@ PORT xa51_port =
   {
     2, -2
   },
+  {
+    xa51_emitDebuggerSymbol
+  },
   "_",
   _xa51_init,
   _xa51_parseOptions,

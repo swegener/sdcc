@@ -262,6 +262,18 @@ emitcode (char *inst, char *fmt, ...)
 }
 
 /*-----------------------------------------------------------------*/
+/* avr_emitDebuggerSymbol - associate the current code location  */
+/*   with a debugger symbol                                        */
+/*-----------------------------------------------------------------*/
+void
+avr_emitDebuggerSymbol (char * debugSym)
+{
+  _G.debugLine = 1;
+  emitcode ("", "%s ==.", debugSym);
+  _G.debugLine = 0;
+}
+
+/*-----------------------------------------------------------------*/
 /* hasInc - operand is incremented before any other use            */
 /*-----------------------------------------------------------------*/
 static iCode *
@@ -1814,6 +1826,10 @@ genEndFunction (iCode * ic)
 
 	if (IFFUNC_ISCRITICAL (sym->type))
 		emitcode ("sti", "");
+
+	if (options.debug && currFunc) {
+		debugFile->writeEndFunction (currFunc, ic, 1);
+	}
 
 	if (IFFUNC_ISISR (sym->type)) {
 		emitcode ("rti", "");
@@ -5113,12 +5129,8 @@ genAVRCode (iCode * lic)
 	if (allocInfo)
 		printAllocInfo (currFunc, codeOutFile);
 	/* if debug information required */
-	/*     if (options.debug && currFunc) { */
-	if (currFunc) {
-		debugFile->writeFunction(currFunc);
-		_G.debugLine = 1;
-/* 		emitcode ("", ".type %s,@function", currFunc->name); */
-		_G.debugLine = 0;
+	if (options.debug && currFunc) {
+		debugFile->writeFunction (currFunc, lic);
 	}
 	/* stack pointer name */
 	spname = "sp";
@@ -5128,11 +5140,7 @@ genAVRCode (iCode * lic)
 
 		if (cln != ic->lineno) {
 			if (options.debug) {
-				_G.debugLine = 1;
-				emitcode ("", "C$%s$%d$%d$%d ==.",
-					  FileBaseName (ic->filename),
-					  ic->lineno, ic->level, ic->block);
-				_G.debugLine = 0;
+				debugFile->writeCLine (ic);
 			}
 			emitcode (";", "%s %d", ic->filename, ic->lineno);
 			cln = ic->lineno;

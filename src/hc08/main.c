@@ -12,6 +12,9 @@
 
 void copyFile(FILE *dest, FILE *src);
 extern char * iComments2;
+extern FILE * dwarf2FilePtr;
+extern DEBUGFILE dwarf2DebugFile;
+extern int dwarf2FinalizeFile(void);
 
 static char _defaultRules[] =
 {
@@ -99,6 +102,7 @@ _hc08_parseOptions (int *pargc, char **argv, int *i)
   if (!strcmp (argv[*i], "--out-fmt-elf"))
     {
       options.out_fmt = 2;
+      debugFile = &dwarf2DebugFile;
       return TRUE;
     }
     
@@ -232,6 +236,16 @@ _hc08_genAssemblerPreamble (FILE * of)
 }
 
 static void
+_hc08_genAssemblerEnd (FILE * of)
+{
+  if (options.out_fmt == 2 && options.debug)
+    {
+      dwarf2FinalizeFile();
+      copyFile(of, dwarf2FilePtr);
+    }
+}
+
+static void
 _hc08_genExtraAreas (FILE * asmFile, bool mainExists)
 {
     fprintf (asmFile, "%s", iComments2);
@@ -330,6 +344,26 @@ oclsExpense (struct memmap *oclass)
 }
 
 
+/*----------------------------------------------------------------------*/
+/* hc08_dwarfRegNum - return the DWARF register number for a register.  */
+/*   These are defined for the HC08 in "Motorola 8- and 16-bit Embedded */
+/*   Application Binary Interface (M8/16EABI)"                          */
+/*----------------------------------------------------------------------*/
+static int
+hc08_dwarfRegNum (regs * reg)
+{
+  switch (reg->rIdx)
+    {
+    case A_IDX: return 0;
+    case H_IDX: return 1;
+    case X_IDX: return 2;
+    case CND_IDX: return 17;
+    case SP_IDX: return 15;
+    }
+  return -1;
+}
+
+
 
 /** $1 is always the basename.
     $2 is always the output file.
@@ -406,11 +440,29 @@ PORT hc08_port =
   { _hc08_genExtraAreas,
     NULL },
   {
-    -1, 0, 4, 2, 0, 0
+    -1,		/* direction (-1 = stack grows down) */
+    0,		/* bank_overhead (switch between register banks) */
+    4,		/* isr_overhead */
+    2,		/* call_overhead */
+    0,		/* reent_overhead */
+    0		/* banked_overhead (switch between code banks) */
   },
     /* hc08 has an 8 bit mul */
   {
     1, -1
+  },
+  {
+    hc08_emitDebuggerSymbol,
+    {
+      hc08_dwarfRegNum,
+      NULL,
+      NULL,
+      4,				/* addressSize */
+      14,			/* regNumRet */
+      15,			/* regNumSP */
+      -1,			/* regNumBP */
+      1,			/* offsetSP */
+    },
   },
   "_",
   _hc08_init,
@@ -422,7 +474,7 @@ PORT hc08_port =
   _hc08_getRegName,
   _hc08_keywords,
   _hc08_genAssemblerPreamble,
-  NULL,				/* no genAssemblerEnd */
+  _hc08_genAssemblerEnd,	/* no genAssemblerEnd */
   _hc08_genIVT,
   _hc08_genXINIT,
   NULL, 			/* genInitStartup */

@@ -151,6 +151,18 @@ emitcode (char *inst, const char *fmt,...)
 }
 
 /*-----------------------------------------------------------------*/
+/* mcs51_emitDebuggerSymbol - associate the current code location  */
+/*   with a debugger symbol                                        */
+/*-----------------------------------------------------------------*/
+void
+mcs51_emitDebuggerSymbol (char * debugSym)
+{
+  _G.debugLine = 1;
+  emitcode ("", "%s ==.", debugSym);
+  _G.debugLine = 0;
+}
+
+/*-----------------------------------------------------------------*/
 /* mova - moves specified value into accumulator                   */
 /*-----------------------------------------------------------------*/
 static void
@@ -2864,6 +2876,8 @@ genEndFunction (iCode * ic)
   if (IFFUNC_ISNAKED(sym->type))
   {
       emitcode(";", "naked function: no epilogue.");
+      if (options.debug && currFunc)
+	debugFile->writeEndFunction (currFunc, ic, 0);
       return;
   }
 
@@ -2997,15 +3011,7 @@ genEndFunction (iCode * ic)
       /* if debug then send end of function */
       if (options.debug && currFunc)
 	{
-	  _G.debugLine = 1;
-	  emitcode ("", "C$%s$%d$%d$%d ==.",
-		    FileBaseName (ic->filename), currFunc->lastLine,
-		    ic->level, ic->block);
-	  if (IS_STATIC (currFunc->etype))
-	    emitcode ("", "XF%s$%s$0$0 ==.", moduleName, currFunc->name);
-	  else
-	    emitcode ("", "XG$%s$0$0 ==.", currFunc->name);
-	  _G.debugLine = 0;
+	  debugFile->writeEndFunction (currFunc, ic, 1);
 	}
 
       emitcode ("reti", "");
@@ -3038,15 +3044,7 @@ genEndFunction (iCode * ic)
       /* if debug then send end of function */
       if (options.debug && currFunc)
 	{
-	  _G.debugLine = 1;
-	  emitcode ("", "C$%s$%d$%d$%d ==.",
-		    FileBaseName (ic->filename), currFunc->lastLine,
-		    ic->level, ic->block);
-	  if (IS_STATIC (currFunc->etype))
-	    emitcode ("", "XF%s$%s$0$0 ==.", moduleName, currFunc->name);
-	  else
-	    emitcode ("", "XG$%s$0$0 ==.", currFunc->name);
-	  _G.debugLine = 0;
+	  debugFile->writeEndFunction (currFunc, ic, 1);
 	}
 
       emitcode ("ret", "");
@@ -9892,13 +9890,7 @@ gen51Code (iCode * lic)
   /* if debug information required */
   if (options.debug && currFunc)
     {
-      debugFile->writeFunction(currFunc);
-      _G.debugLine = 1;
-      if (IS_STATIC (currFunc->etype))
-	emitcode ("", "F%s$%s$0$0 ==.", moduleName, currFunc->name);
-      else
-	emitcode ("", "G$%s$0$0 ==.", currFunc->name);
-      _G.debugLine = 0;
+      debugFile->writeFunction (currFunc, lic);
     }
   /* stack pointer name */
   if (options.useXstack)
@@ -9915,11 +9907,7 @@ gen51Code (iCode * lic)
 	{
 	  if (options.debug)
 	    {
-	      _G.debugLine = 1;
-	      emitcode ("", "C$%s$%d$%d$%d ==.",
-			FileBaseName (ic->filename), ic->lineno,
-			ic->level, ic->block);
-	      _G.debugLine = 0;
+	      debugFile->writeCLine(ic);
 	    }
 	  if (!options.noCcodeInAsm) {
 	    emitcode ("", ";%s:%d: %s", ic->filename, ic->lineno,

@@ -227,6 +227,9 @@ PORT avr_port = {
 	{
           1, -1
         },
+	{
+          avr_emitDebuggerSymbol
+	},
 	"_",
 	_avr_init,
 	_avr_parseOptions,

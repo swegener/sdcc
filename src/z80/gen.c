@@ -443,6 +443,19 @@ emitDebug (const char *szFormat,...)
 }
 
 /*-----------------------------------------------------------------*/
+/* z80_emitDebuggerSymbol - associate the current code location    */
+/*   with a debugger symbol                                        */
+/*-----------------------------------------------------------------*/
+void
+z80_emitDebuggerSymbol (char * debugSym)
+{
+  _G.lines.isDebug = 1;
+  emit2 ("%s !equ .", debugSym);
+  emit2 ("!global", debugSym);
+  _G.lines.isDebug = 0;
+}
+
+/*-----------------------------------------------------------------*/
 /* emit2 - writes the code into a file : for now it is simple    */
 /*-----------------------------------------------------------------*/
 void
@@ -3254,17 +3267,7 @@ genEndFunction (iCode * ic)
 
       if (options.debug && currFunc)
 	{
-	  _G.lines.isDebug = 1;
-	  sprintf (buffer, "C$%s$%d$%d$%d",
-		    FileBaseName (ic->filename), currFunc->lastLine,
-		    ic->level, ic->block);
-          emit2 ("!labeldef", buffer);
-	  if (IS_STATIC (currFunc->etype))
-	    sprintf (buffer, "XF%s$%s$0$0", moduleName, currFunc->name);
-	  else
-	    sprintf (buffer, "XG$%s$0$0", currFunc->name);
-          emit2 ("!labeldef", buffer);
-	  _G.lines.isDebug = 0;
+	  debugFile->writeEndFunction (currFunc, ic, 1);
 	}
       
       /* Both banked and non-banked just ret */
@@ -7835,14 +7838,7 @@ genZ80Code (iCode * lic)
   /* if debug information required */
   if (options.debug && currFunc)
     {
-      debugFile->writeFunction(currFunc);
-      _G.lines.isDebug = 1;
-      if (IS_STATIC (currFunc->etype))
-	sprintf (buffer, "F%s$%s$0$0", moduleName, currFunc->name);
-      else
-	sprintf (buffer, "G$%s$0$0", currFunc->name);
-      emit2 ("!labeldef", buffer);
-      _G.lines.isDebug = 0;
+      debugFile->writeFunction (currFunc, lic);
     }
 
   for (ic = lic; ic; ic = ic->next)
@@ -7853,13 +7849,7 @@ genZ80Code (iCode * lic)
 	{
 	  if (options.debug)
 	    {
-	      _G.lines.isDebug = 1;
-	      sprintf (buffer, "C$%s$%d$%d$%d",
-			FileBaseName (ic->filename), ic->lineno,
-			ic->level, ic->block);
-              emit2 ("%s !equ .", buffer);
-              emit2 ("!global", buffer);
-	      _G.lines.isDebug = 0;
+	      debugFile->writeCLine (ic);
 	    }
 	  if (!options.noCcodeInAsm) {
 	    emit2 (";%s:%d: %s", ic->filename, ic->lineno,

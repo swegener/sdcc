@@ -149,5 +149,13 @@ void dumpSymInfo(char *pcName, memmap *memItem)
 }
 
 
-
-
+/*------------------------------------------------------------------*/
+/* emitDebuggerSymbol - call the port specific routine to associate */
+/* the current code location with a debugger symbol                 */
+/*------------------------------------------------------------------*/
+void
+emitDebuggerSymbol (char * debugSym)
+{
+  if (port->debugger.emitDebuggerSymbol)
+    port->debugger.emitDebuggerSymbol (debugSym);
+}

@@ -124,6 +124,19 @@ static void emitcode (char *inst, char *fmt,...) {
   va_end (ap);
 }
 
+/*-----------------------------------------------------------------*/
+/* xa51_emitDebuggerSymbol - associate the current code location  */
+/*   with a debugger symbol                                        */
+/*-----------------------------------------------------------------*/
+void
+xa51_emitDebuggerSymbol (char * debugSym)
+{
+  _G.debugLine = 1;
+  emitcode ("", "%s ==.", debugSym);
+  _G.debugLine = 0;
+}
+
+
 char *getStackOffset(int stack) {
   static char gsoBuf[1024];
   sprintf (gsoBuf, "r7+(%d%+d%+d)", stack,
@@ -829,12 +842,18 @@ genEndFunction (iCode * ic)
 
   if (IFFUNC_ISNAKED(sym->type)) {
       emitcode(";", "naked function: no epilogue.");
+      if (options.debug && currFunc)
+	debugFile->writeEndFunction (currFunc, ic, 0);
       return;
   }
 
   /* readjust the stock for locals used in this function */
   if (sym->stack) {
     emitcode ("add", "r7,#%d\t; release stack space for locals", sym->stack);
+  }
+
+  if (options.debug && currFunc) {
+    debugFile->writeEndFunction (currFunc, ic, 1);
   }
 
   if (IFFUNC_ISISR(sym->type)) {
@@ -1912,23 +1931,13 @@ void genXA51Code (iCode * lic) {
   /* if debug information required */
   if (options.debug && currFunc)
     {
-      debugFile->writeFunction(currFunc);
-      _G.debugLine = 1;
-      if (IS_STATIC (currFunc->etype))
-	emitcode ("", "F%s$%s$0$0 ==.", moduleName, currFunc->name);
-      else
-	emitcode ("", "G$%s$0$0 ==.", currFunc->name);
-      _G.debugLine = 0;
+      debugFile->writeFunction (currFunc, lic);
     }
 
   for (ic = lic; ic; ic = ic->next) {
     if (ic->lineno && cln != ic->lineno) {
       if (options.debug) {
-	_G.debugLine = 1;
-	emitcode ("", "C$%s$%d$%d$%d ==.",
-		  FileBaseName (ic->filename), ic->lineno,
-		  ic->level, ic->block);
-	_G.debugLine = 0;
+	debugFile->writeCLine (ic);
       }
       if (!options.noCcodeInAsm) {
 	emitcode ("", ";\t%s:%d: %s", ic->filename, ic->lineno,

@@ -623,6 +623,9 @@ PORT z80_port =
   {
     0, 2
   },
+  {
+    z80_emitDebuggerSymbol
+  },
   "_",
   _z80_init,
   _parseOptions,
@@ -723,6 +726,9 @@ PORT gbz80_port =
     /* gbZ80 has no native mul/div commands */
   {
     0, 2
+  },
+  {
+    z80_emitDebuggerSymbol
   },
   "_",
   _gbz80_init,

@@ -45,6 +45,8 @@
 char *aopLiteral (value * val, int offset);
 char *aopLiteralLong (value * val, int offset, int size);
 extern int allocInfo;
+static int pushReg (regs *reg, bool freereg);
+static void pullReg (regs *reg);
 
 static char *zero = "#0x00";
 static char *one = "#0x01";
@@ -187,6 +189,17 @@ emitLabel (symbol *tlbl)
   emitcode ("", "%05d$:", (tlbl->key +100));
 }
 
+/*-----------------------------------------------------------------*/
+/* hc08_emitDebuggerSymbol - associate the current code location   */
+/*   with a debugger symbol                                        */
+/*-----------------------------------------------------------------*/
+void
+hc08_emitDebuggerSymbol (char * debugSym)
+{
+  _G.debugLine = 1;
+  emitcode ("", "%s ==.", debugSym);
+  _G.debugLine = 0;
+}
 
 
 /*--------------------------------------------------------------------------*/
@@ -228,8 +241,8 @@ transferRegReg (regs *sreg, regs *dreg, bool freesrc)
         switch (srcidx)
           {
             case H_IDX: /* H to A */
-              emitcode ("pshh", "");
-              emitcode ("pula", "");
+	      pushReg (hc08_reg_h, FALSE);
+	      pullReg (hc08_reg_a);
               break;
             case X_IDX: /* X to A */
               emitcode ("txa", "");
@@ -242,12 +255,12 @@ transferRegReg (regs *sreg, regs *dreg, bool freesrc)
         switch (srcidx)
           {
             case A_IDX: /* A to H */
-              emitcode ("psha", "");
-              emitcode ("pulh", "");
+	      pushReg (hc08_reg_a, FALSE);
+	      pullReg (hc08_reg_h);
               break;
             case X_IDX: /* X to H */
-              emitcode ("pshx", "");
-              emitcode ("pulh", "");
+	      pushReg (hc08_reg_x, FALSE);
+	      pullReg (hc08_reg_h);
               break;
             default:
               error=1;
@@ -260,8 +273,8 @@ transferRegReg (regs *sreg, regs *dreg, bool freesrc)
               emitcode ("tax", "");
               break;
             case H_IDX: /* H to X */
-              emitcode ("pshh", "");
-              emitcode ("pulx", "");
+	      pushReg (hc08_reg_h, FALSE);
+	      pullReg (hc08_reg_x);
               break;
             default:
               error=1;
@@ -271,8 +284,8 @@ transferRegReg (regs *sreg, regs *dreg, bool freesrc)
         switch (srcidx)
           {
             case XA_IDX: /* XA to HX */
-              emitcode ("pshx", "");
-              emitcode ("pulh", "");
+	      pushReg (hc08_reg_x, FALSE);
+	      pullReg (hc08_reg_h);
               emitcode ("tax", "");
               break;
             default:
@@ -284,8 +297,8 @@ transferRegReg (regs *sreg, regs *dreg, bool freesrc)
           {
             case HX_IDX: /* HX to XA */
               emitcode ("txa", "");
-              emitcode ("pshh", "");
-              emitcode ("pulx", "");
+	      pushReg (hc08_reg_h, FALSE);
+	      pullReg (hc08_reg_x);
               break;
             default:
               error=1;
@@ -307,6 +320,21 @@ transferRegReg (regs *sreg, regs *dreg, bool freesrc)
 }
 
 /*--------------------------------------------------------------------------*/
+/* updateCFA - update the debugger information to reflect the current       */
+/*             connonical frame address relative to the stack pointer       */
+/*--------------------------------------------------------------------------*/
+static void
+updateCFA(void)
+{
+  /* there is no frame unless there is a function */
+  if (!currFunc)
+    return;
+  
+  debugFile->writeFrameAddress (NULL, hc08_reg_sp,
+				1 + _G.stackOfs + _G.stackPushes);
+}
+
+/*--------------------------------------------------------------------------*/
 /* pushReg - Push register reg onto the stack. If freereg is true, reg is   */
 /*           marked free and available for reuse.                           */
 /*--------------------------------------------------------------------------*/
@@ -320,24 +348,33 @@ pushReg (regs *reg, bool freereg)
       case A_IDX:
         emitcode ("psha", "");
         _G.stackPushes++;
+	updateCFA();
         break;
       case X_IDX:
         emitcode ("pshx", "");
         _G.stackPushes++;
+	updateCFA();
         break;
       case H_IDX:
         emitcode ("pshh", "");
         _G.stackPushes++;
+	updateCFA();
         break;
       case HX_IDX:
         emitcode ("pshx", "");
+        _G.stackPushes++;
+	updateCFA();
         emitcode ("pshh", "");
-        _G.stackPushes += 2;
+        _G.stackPushes++;
+	updateCFA();
         break;
       case XA_IDX:
         emitcode ("psha", "");
+	updateCFA();
+        _G.stackPushes++;
         emitcode ("pshx", "");
-        _G.stackPushes += 2;
+	updateCFA();
+        _G.stackPushes++;
         break;
       default:
         break;
@@ -360,24 +397,33 @@ pullReg (regs *reg)
       case A_IDX:
         emitcode ("pula", "");
         _G.stackPushes--;
+	updateCFA();
         break;
       case X_IDX:
         emitcode ("pulx", "");
         _G.stackPushes--;
+	updateCFA();
         break;
       case H_IDX:
         emitcode ("pulh", "");
         _G.stackPushes--;
+	updateCFA();
         break;
       case HX_IDX:
         emitcode ("pulx", "");
+        _G.stackPushes--;
+	updateCFA();
         emitcode ("pulh", "");
-        _G.stackPushes -= 2;
+        _G.stackPushes--;
+	updateCFA();
         break;
       case XA_IDX:
         emitcode ("pula", "");
+        _G.stackPushes--;
+	updateCFA();
         emitcode ("pulx", "");
-        _G.stackPushes -= 2;
+        _G.stackPushes--;
+	updateCFA();
         break;
       default:
         break;
@@ -396,6 +442,7 @@ pullNull (int n)
     {
       emitcode("ais","#%d",n);
       _G.stackPushes -= n;
+      updateCFA();
     }
 }
 
@@ -434,23 +481,28 @@ pullOrFreeReg (regs *reg, bool needpull)
 static void
 adjustStack (int n)
 {
-  _G.stackPushes -= n;
   while (n)
     {
       if (n>127)
         {
           emitcode ("ais","#127");
           n -= 127;
+	  _G.stackPushes -= 127;
+	  updateCFA();
         }
       else if (n<-128)
         {
           emitcode ("ais","#-128");
           n += 128;
+	  _G.stackPushes += 128;
+	  updateCFA();
         }
       else
         {
           emitcode ("ais", "#%d", n);
+	  _G.stackPushes -= n;
           n = 0;
+	  updateCFA();
         }
     }    
 }
@@ -2798,6 +2850,10 @@ genFunction (iCode * ic)
 
   emitcode ("", "%s:", sym->rname);
   ftype = operandType (IC_LEFT (ic));
+  
+  _G.stackOfs = 0;
+  _G.stackPushes = 0;
+  debugFile->writeFrameAddress (NULL, hc08_reg_sp, 0);
 
   if (IFFUNC_ISNAKED(ftype))
   {
@@ -2813,7 +2869,7 @@ genFunction (iCode * ic)
     {
 
       if (!inExcludeList ("h"))
-	emitcode ("pshh", "");
+        pushReg (hc08_reg_h, FALSE);
     }
   else
     {
@@ -2895,6 +2951,8 @@ genEndFunction (iCode * ic)
   if (IFFUNC_ISNAKED(sym->type))
   {
       emitcode(";", "naked function: no epilogue.");
+      if (options.debug && currFunc)
+        debugFile->writeEndFunction (currFunc, ic, 0);
       return;
   }
 
@@ -2936,21 +2994,13 @@ genEndFunction (iCode * ic)
     {
 
       if (!inExcludeList ("h"))
-	emitcode ("pulh", "");
+        pullReg (hc08_reg_h);
 
 
       /* if debug then send end of function */
       if (options.debug && currFunc)
 	{
-	  _G.debugLine = 1;
-	  emitcode ("", "C$%s$%d$%d$%d ==.",
-		    FileBaseName (ic->filename), currFunc->lastLine,
-		    ic->level, ic->block);
-	  if (IS_STATIC (currFunc->etype))
-	    emitcode ("", "XF%s$%s$0$0 ==.", moduleName, currFunc->name);
-	  else
-	    emitcode ("", "XG$%s$0$0 ==.", currFunc->name);
-	  _G.debugLine = 0;
+	  debugFile->writeEndFunction (currFunc, ic, 1);
 	}
 
       emitcode ("rti", "");
@@ -2969,7 +3019,7 @@ genEndFunction (iCode * ic)
 		{
 		  if (bitVectBitValue (sym->regsUsed, i) ||
 		      (hc08_ptrRegReq && (i == HX_IDX || i == HX_IDX)))
-		    emitcode ("pop", "%s", hc08_regWithIdx (i)->dname);
+		    emitcode ("pop", "%s", hc08_regWithIdx (i)->name);
 		}
 	    }
 
@@ -2978,15 +3028,7 @@ genEndFunction (iCode * ic)
       /* if debug then send end of function */
       if (options.debug && currFunc)
 	{
-	  _G.debugLine = 1;
-	  emitcode ("", "C$%s$%d$%d$%d ==.",
-		    FileBaseName (ic->filename), currFunc->lastLine,
-		    ic->level, ic->block);
-	  if (IS_STATIC (currFunc->etype))
-	    emitcode ("", "XF%s$%s$0$0 ==.", moduleName, currFunc->name);
-	  else
-	    emitcode ("", "XG$%s$0$0 ==.", currFunc->name);
-	  _G.debugLine = 0;
+	  debugFile->writeEndFunction (currFunc, ic, 1);
 	}
 
       emitcode ("rts", "");
@@ -3081,6 +3123,8 @@ genLabel (iCode * ic)
   /* special case never generate */
   if (IC_LABEL (ic) == entryLabel)
     return;
+	  
+  debugFile->writeLabel(IC_LABEL (ic), ic);
 
   emitcode ("", "%05d$:", (IC_LABEL (ic)->key + 100));
 
@@ -7554,6 +7598,7 @@ genEndCritical (iCode *ic)
 }
 
 
+
 /*-----------------------------------------------------------------*/
 /* genhc08Code - generate code for HC08 based controllers          */
 /*-----------------------------------------------------------------*/
@@ -7562,6 +7607,8 @@ genhc08Code (iCode * lic)
 {
   iCode *ic;
   int cln = 0;
+  int clevel = 0;
+  int cblock = 0;
 
   lineHead = lineCurr = NULL;
 
@@ -7571,19 +7618,23 @@ genhc08Code (iCode * lic)
   /* if debug information required */
   if (options.debug && currFunc)
     {
-      debugFile->writeFunction(currFunc);
+      debugFile->writeFunction (currFunc, lic);
+      #if 0
       _G.debugLine = 1;
       if (IS_STATIC (currFunc->etype))
 	emitcode ("", "F%s$%s$0$0 ==.", moduleName, currFunc->name);
       else
 	emitcode ("", "G$%s$0$0 ==.", currFunc->name);
       _G.debugLine = 0;
+      #endif
     }
   /* stack pointer name */
   if (options.useXstack)
     spname = "_spx";
   else
     spname = "sp";
+  
+  debugFile->writeFrameAddress (NULL, NULL, 0);  /* have no idea where frame is now */
 
   hc08_aop_pass[0] = newAsmop (AOP_REG);
   hc08_aop_pass[0]->size=1;
@@ -7600,17 +7651,31 @@ genhc08Code (iCode * lic)
 
   for (ic = lic; ic; ic = ic->next)
     {
+      
       _G.current_iCode = ic;
       
+      if (ic->level != clevel || ic->block != cblock)
+	{
+	  if (options.debug)
+	    {
+	      debugFile->writeScope(ic);
+	    }
+	  clevel = ic->level;
+	  cblock = ic->block;
+	}
+	
       if (ic->lineno && cln != ic->lineno)
 	{
 	  if (options.debug)
 	    {
+	      debugFile->writeCLine(ic);
+	      #if 0
 	      _G.debugLine = 1;
 	      emitcode ("", "C$%s$%d$%d$%d ==.",
 			FileBaseName (ic->filename), ic->lineno,
 			ic->level, ic->block);
 	      _G.debugLine = 0;
+	      #endif
 	    }
 	  if (!options.noCcodeInAsm) {
 	    emitcode ("", ";%s:%d: %s", ic->filename, ic->lineno, 
@@ -7898,6 +7963,8 @@ genhc08Code (iCode * lic)
         D(emitcode("","; forgot to free xa"));
     }
 
+  debugFile->writeFrameAddress (NULL, NULL, 0);  /* have no idea where frame is now */
+    
 
   /* now we are ready to call the
      peep hole optimizer */

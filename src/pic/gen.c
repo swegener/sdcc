@@ -265,6 +265,18 @@ void pic14_emitcode (char *inst,char *fmt, ...)
   va_end(ap);
 }
 
+/*-----------------------------------------------------------------*/
+/* pic14_emitDebuggerSymbol - associate the current code location  */
+/*   with a debugger symbol                                        */
+/*-----------------------------------------------------------------*/
+void
+pic14_emitDebuggerSymbol (char * debugSym)
+{
+  _G.debugLine = 1;
+  pic14_emitcode ("", ";%s ==.", debugSym);
+  _G.debugLine = 0;
+}
+
 
 /*-----------------------------------------------------------------*/
 /* getFreePtr - returns r0 or r1 whichever is free or can be pushed*/
@@ -2871,15 +2883,7 @@ registers :-) */
     /* if debug then send end of function */
     /*  if (options.debug && currFunc) { */
     if (currFunc) {
-      _G.debugLine = 1;
-      pic14_emitcode(";","C$%s$%d$%d$%d ==.",
-        FileBaseName(ic->filename),currFunc->lastLine,
-        ic->level,ic->block); 
-      if (IS_STATIC(currFunc->etype))     
-        pic14_emitcode(";","XF%s$%s$0$0 ==.",moduleName,currFunc->name); 
-      else
-        pic14_emitcode(";","XG$%s$0$0 ==.",currFunc->name);
-      _G.debugLine = 0;
+      debugFile->writeEndFunction (currFunc, ic, 1);
     }
     
     pic14_emitcode ("reti","");
@@ -2914,15 +2918,7 @@ registers :-) */
     
     /* if debug then send end of function */
     if (currFunc) {
-      _G.debugLine = 1;
-      pic14_emitcode(";","C$%s$%d$%d$%d ==.",
-        FileBaseName(ic->filename),currFunc->lastLine,
-        ic->level,ic->block); 
-      if (IS_STATIC(currFunc->etype))     
-        pic14_emitcode(";","XF%s$%s$0$0 ==.",moduleName,currFunc->name); 
-      else
-        pic14_emitcode(";","XG$%s$0$0 ==.",currFunc->name);
-      _G.debugLine = 0;
+      debugFile->writeEndFunction (currFunc, ic, 1);
     }
     
     pic14_emitcode ("return","");
@@ -9875,16 +9871,7 @@ void genpic14Code (iCode *lic)
   /* if debug information required */
   if (options.debug && currFunc) { 
     if (currFunc) {
-      debugFile->writeFunction(currFunc);
-      _G.debugLine = 1;
-      if (IS_STATIC(currFunc->etype)) {
-        pic14_emitcode("",";F%s$%s$0$0     %d",moduleName,currFunc->name,__LINE__);
-        //addpCode2pBlock(pb,newpCodeLabel(moduleName,currFunc->name));
-      } else {
-        pic14_emitcode("",";G$%s$0$0   %d",currFunc->name,__LINE__);
-        //addpCode2pBlock(pb,newpCodeLabel(NULL,currFunc->name));
-      }
-      _G.debugLine = 0;
+      debugFile->writeFunction (currFunc, lic);
     }
   }
   
@@ -9894,11 +9881,7 @@ void genpic14Code (iCode *lic)
     DEBUGpic14_emitcode(";ic","");
     if ( cln != ic->lineno ) {
       if ( options.debug ) {
-        _G.debugLine = 1;
-        pic14_emitcode("",";C$%s$%d$%d$%d ==.",
-          FileBaseName(ic->filename),ic->lineno,
-          ic->level,ic->block);
-        _G.debugLine = 0;
+        debugFile->writeCLine (ic);
       }
       /*
       pic14_emitcode("#CSRC","%s %d",FileBaseName(ic->filename),ic->lineno);

@@ -82,6 +82,10 @@ static int regParmFlg = 0;	/* determine if we can register a parameter */
 
 pic16_options_t pic16_options;
 
+/* Also defined in gen.h, but the #include is commented out */
+/* for an unknowned reason. - EEP */
+void pic16_emitDebuggerSymbol (char *);
+
 static void
 _pic16_init (void)
 {
@@ -805,6 +809,9 @@ PORT pic16_port =
     /* pic16 has an 8 bit mul */
   {
     1, -1
+  },
+  {
+    pic16_emitDebuggerSymbol
   },
   "_",
   _pic16_init,

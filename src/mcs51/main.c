@@ -712,6 +712,9 @@ PORT mcs51_port =
   {
     1, -1
   },
+  {
+    mcs51_emitDebuggerSymbol
+  },
   "_",
   _mcs51_init,
   _mcs51_parseOptions,

@@ -342,7 +342,7 @@ PORT z80_port =
   },
   {
 	/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
-    1, 1, 2, 4, 2, 2, 2, 1, 4, 4
+    1, 2, 2, 4, 2, 2, 2, 1, 4, 4
   },
   {
     "XSEG",

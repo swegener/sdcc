@@ -499,7 +499,7 @@ void checkTypeSanity(sym_link *etype, char *name) {
 
   // special case for "short"
   if (etype->select.s._short) {
-    SPEC_NOUN(etype) = options.shortisint ? V_INT : V_CHAR;
+    SPEC_NOUN(etype) = options.shortis8bits ? V_CHAR : V_INT;
     etype->select.s._short = 0;
   }
 

@@ -217,7 +217,7 @@ struct options
     int nostdlib;		/* Don't use standard lib files */
     int nostdinc;		/* Don't use standard include files */
     int verbose;		/* Show what the compiler is doing */
-    int shortisint;             /* treat short like int or char */
+    int shortis8bits;           /* treat short like int or char */
 
     char *calleeSaves[128];	/* list of functions using callee save */
     char *excludeRegs[32];	/* registers excluded from saving */

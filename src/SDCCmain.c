@@ -108,7 +108,7 @@ char DefaultExePath[128];
 #define OPTION_NO_LOOP_IND	"--noinduction"
 #define OPTION_LESS_PEDANTIC	"--lesspedantic"
 #define OPTION_NO_GCSE		"--nogcse"
-#define OPTION_SHORT_IS_CHAR 	"--short-is-char"
+#define OPTION_SHORT_IS_8BITS 	"--short-is-8bits"
 
 /** Table of all options supported by all ports.
     This table provides:
@@ -198,8 +198,7 @@ optionsTable[] = {
     { 0,    "--nostdinc",           &options.nostdinc, NULL },
     { 0,    "--verbose",            &options.verbose, "Trace calls to the preprocessor, assembler, and linker" },
     { 0,    OPTION_LESS_PEDANTIC,   NULL, "Disable some of the more pedantic warnings" },
-    { 0,    "--short-is-int",	    &options.shortisint, "Make short the same size as int" },
-    { 0,    OPTION_SHORT_IS_CHAR,   NULL, "Make short the same size as char (default)" }
+    { 0,    OPTION_SHORT_IS_8BITS,   NULL, "Make short 8bits (for old times sake)" }
 };
 
 /** Table of all unsupported options and help text to display when one
@@ -439,7 +438,7 @@ setDefaultOptions ()
   options.nostdlib = 0;
   options.nostdinc = 0;
   options.verbose = 0;
-  options.shortisint = 0;
+  options.shortis8bits = 1;
 
   options.stack10bit=0;
 
@@ -863,8 +862,8 @@ parseCmdLine (int argc, char **argv)
                   continue;
               }
 
-	  if (strcmp (&argv[i][1], OPTION_SHORT_IS_CHAR) == 0) {
-	    options.shortisint=0;
+	  if (strcmp (&argv[i][1], OPTION_SHORT_IS_8BITS) == 0) {
+	    options.shortis8bits=1;
 	    continue;
 	  }
           

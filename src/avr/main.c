@@ -168,7 +168,7 @@ PORT avr_port = {
 	 _defaultRules},
 	{
 	 /* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
-	 1, 1, 2, 4, 2, 2, 3, 1, 4, 4},
+	 1, 2, 2, 4, 2, 2, 3, 1, 4, 4},
 	{
 	 "XSEG",
 	 "STACK",

@@ -1288,249 +1288,255 @@ linkEdit (char **envp)
   const char *s;
 
 
-  if(port->linker.needLinkerScript) {
-  /* first we need to create the <filename>.lnk file */
-  SNPRINTF (scratchFileName, sizeof(scratchFileName),
-	    "%s.lnk", dstFileName);
-  if (!(lnkfile = fopen (scratchFileName, "w")))
+  if(port->linker.needLinkerScript)
     {
-      werror (E_FILE_OPEN_ERR, scratchFileName);
-      exit (1);
-    }
+      /* first we need to create the <filename>.lnk file */
+      SNPRINTF (scratchFileName, sizeof(scratchFileName),
+        "%s.lnk", dstFileName);
+      if (!(lnkfile = fopen (scratchFileName, "w")))
+        {
+          werror (E_FILE_OPEN_ERR, scratchFileName);
+          exit (1);
+        }
 
-   if (TARGET_IS_Z80 || TARGET_IS_GBZ80)
-   {
-	  fprintf (lnkfile, "--\n-m\n-j\n-x\n-%c %s\n",
-          (options.out_fmt ? 's' : 'i'), dstFileName);
-   }
-   else /*For all the other ports.  Including pics???*/
-   {
-	  fprintf (lnkfile, "-myux%c\n", (options.out_fmt ? 's' : 'i'));
-   }
+      if (TARGET_IS_Z80 || TARGET_IS_GBZ80)
+        {
+          fprintf (lnkfile, "--\n-m\n-j\n-x\n-%c %s\n",
+            (options.out_fmt ? 's' : 'i'), dstFileName);
+        }
+      else /*For all the other ports.  Including pics???*/
+        {
+          fprintf (lnkfile, "-myux%c\n", (options.out_fmt ? 's' : 'i'));
+        }
 
-   if (!(TARGET_IS_Z80 || TARGET_IS_GBZ80)) /*Not for the z80, gbz80*/
-   {
-	  /* if iram size specified */
-	  if (options.iram_size)
-		fprintf (lnkfile, "-a 0x%04x\n", options.iram_size);
+      if (!(TARGET_IS_Z80 || TARGET_IS_GBZ80)) /*Not for the z80, gbz80*/
+        {
+          /* if iram size specified */
+          if (options.iram_size)
+            fprintf (lnkfile, "-a 0x%04x\n", options.iram_size);
 
-	  /* if xram size specified */
-	  if (options.xram_size_set)
-		fprintf (lnkfile, "-v 0x%04x\n", options.xram_size);
+          /* if xram size specified */
+          if (options.xram_size_set)
+            fprintf (lnkfile, "-v 0x%04x\n", options.xram_size);
 
-	  /* if code size specified */
-	  if (options.code_size)
-		fprintf (lnkfile, "-w 0x%04x\n", options.code_size);
+          /* if code size specified */
+          if (options.code_size)
+            fprintf (lnkfile, "-w 0x%04x\n", options.code_size);
 
-	  if (options.debug)
-		fprintf (lnkfile, "-z\n");
-   }
+          if (options.debug)
+            fprintf (lnkfile, "-z\n");
+        }
 
 #define WRITE_SEG_LOC(N, L) \
-    segName = Safe_strdup(N); \
-    c = strtok(segName, " \t"); \
-    fprintf (lnkfile,"-b %s = 0x%04x\n", c, L); \
-    if (segName) { Safe_free(segName); }
+  segName = Safe_strdup(N); \
+  c = strtok(segName, " \t"); \
+  fprintf (lnkfile,"-b %s = 0x%04x\n", c, L); \
+  if (segName) { Safe_free(segName); }
 
-   if (!(TARGET_IS_Z80 || TARGET_IS_GBZ80)) /*Not for the z80, gbz80*/
-   {
-
-	  /* code segment start */
-	  WRITE_SEG_LOC (CODE_NAME, options.code_loc);
-
-	  /* data segment start. If zero, the linker chooses
-      the best place for data*/
-	  if(options.data_loc){
-		  WRITE_SEG_LOC (DATA_NAME, options.data_loc);
-	  }
-
-	  /* xdata start */
-	  WRITE_SEG_LOC (XDATA_NAME, options.xdata_loc);
-
-	  /* indirect data */
-	  if (IDATA_NAME) {
-		WRITE_SEG_LOC (IDATA_NAME, options.idata_loc);
-	  }
-
-	  /* bit segment start */
-	  WRITE_SEG_LOC (BIT_NAME, 0);
-
-	  /* stack start */
-	  if ( (options.stack_loc) && (options.stack_loc<0x100) ) {
-		WRITE_SEG_LOC ("SSEG", options.stack_loc);
-	  }
-   }
-   else /*For the z80, gbz80*/
-   {
-       WRITE_SEG_LOC ("_CODE", options.code_loc);
-       WRITE_SEG_LOC ("_DATA", options.data_loc);
-   }
-  
-  /* If the port has any special linker area declarations, get 'em */
-  if (port->extraAreas.genExtraAreaLinkOptions)
-  {
-	port->extraAreas.genExtraAreaLinkOptions(lnkfile);
-  }
-
-  /* add the extra linker options */
-  fputStrSet(lnkfile, linkOptionsSet);
-
-  /* other library paths if specified */
-  for (s = setFirstItem(libPathsSet); s != NULL; s = setNextItem(libPathsSet))
-    fprintf (lnkfile, "-k %s\n", s);
-  
-  /* standard library path */
-    if (!options.nostdlib)
-    {
-        if (!(TARGET_IS_Z80 || TARGET_IS_GBZ80 || TARGET_IS_HC08)) /*Not for the z80, gbz80*/
+      if (!(TARGET_IS_Z80 || TARGET_IS_GBZ80)) /*Not for the z80, gbz80*/
         {
-            switch (options.model)
+
+          /* code segment start */
+          WRITE_SEG_LOC (CODE_NAME, options.code_loc);
+
+          /* data segment start. If zero, the linker chooses
+             the best place for data */
+          if(options.data_loc)
             {
-                case MODEL_SMALL:
-                    c = "small";
-                    break;
-                case MODEL_LARGE:
-                    c = "large";
-                    break;
-                case MODEL_FLAT24:
-                    /* c = "flat24"; */
-                    if (TARGET_IS_DS390)
-                    {
-                        c = "ds390";
-                    }
-                    else if (TARGET_IS_DS400)
-                    {
-                        c = "ds400";
-                    }
-                    else
-                    {
-                        fprintf(stderr, 
-	                        "Add support for your FLAT24 target in %s @ line %d\n",
-	                        __FILE__, __LINE__);
-                        exit(-1);
-                    }
-	                break;
-	            case MODEL_PAGE0:
-	                c = "xa51";
-	                break;
-	            default:
-	                werror (W_UNKNOWN_MODEL, __FILE__, __LINE__);
-	                c = "unknown";
-	                break;
-	        }
-        }
-        else /*for the z80, gbz80*/
-        {
-            if (TARGET_IS_HC08)
-                c = "hc08";
-            else if (TARGET_IS_Z80)
-                c = "z80";
-            else
-                c = "gbz80";
-        }
-        for (s = setFirstItem(libDirsSet); s != NULL; s = setNextItem(libDirsSet))
-            mfprintf (lnkfile, getRuntimeVariables(), "-k %s{sep}%s\n", s, c);
+              WRITE_SEG_LOC (DATA_NAME, options.data_loc);
+            }
 
+          /* xdata start */
+          WRITE_SEG_LOC (XDATA_NAME, options.xdata_loc);
+
+          /* indirect data */
+          if (IDATA_NAME)
+            {
+              WRITE_SEG_LOC (IDATA_NAME, options.idata_loc);
+            }
+
+            /* bit segment start */
+            WRITE_SEG_LOC (BIT_NAME, 0);
+
+            /* stack start */
+            if ( (options.stack_loc) && (options.stack_loc<0x100) )
+              {
+                WRITE_SEG_LOC ("SSEG", options.stack_loc);
+              }
+        }
+      else /*For the z80, gbz80*/
+        {
+          WRITE_SEG_LOC ("_CODE", options.code_loc);
+          WRITE_SEG_LOC ("_DATA", options.data_loc);
+        }
+  
+      /* If the port has any special linker area declarations, get 'em */
+      if (port->extraAreas.genExtraAreaLinkOptions)
+        {
+          port->extraAreas.genExtraAreaLinkOptions(lnkfile);
+        }
+
+      /* add the extra linker options */
+      fputStrSet(lnkfile, linkOptionsSet);
+
+      /* command line defined library paths if specified */
+      for (s = setFirstItem(libPathsSet); s != NULL; s = setNextItem(libPathsSet))
+        fprintf (lnkfile, "-k %s\n", s);
+
+      /* standard library path */
+      if (!options.nostdlib)
+        {
+          if (!(TARGET_IS_Z80 || TARGET_IS_GBZ80 || TARGET_IS_HC08)) /*Not for the z80, gbz80*/
+            {
+              switch (options.model)
+                {
+                  case MODEL_SMALL:
+                  c = "small";
+                  break;
+                case MODEL_LARGE:
+                  c = "large";
+                  break;
+                case MODEL_FLAT24:
+                  /* c = "flat24"; */
+                  if (TARGET_IS_DS390)
+                    {
+                      c = "ds390";
+                    }
+                  else if (TARGET_IS_DS400)
+                    {
+                      c = "ds400";
+                    }
+                  else
+                    {
+                      fprintf(stderr, 
+                        "Add support for your FLAT24 target in %s @ line %d\n",
+                        __FILE__, __LINE__);
+                      exit(-1);
+                    }
+                  break;
+                case MODEL_PAGE0:
+                  c = "xa51";
+                  break;
+                default:
+                  werror (W_UNKNOWN_MODEL, __FILE__, __LINE__);
+                  c = "unknown";
+                  break;
+                }
+            }
+          else /*for the z80, gbz80*/
+            {
+              if (TARGET_IS_HC08)
+                c = "hc08";
+              else if (TARGET_IS_Z80)
+                c = "z80";
+              else
+                c = "gbz80";
+            }
+          for (s = setFirstItem(libDirsSet); s != NULL; s = setNextItem(libDirsSet))
+            mfprintf (lnkfile, getRuntimeVariables(), "-k %s{sep}%s\n", s, c);
+        }
+
+      /* command line defined library files if specified */
+      for (s = setFirstItem(libFilesSet); s != NULL; s = setNextItem(libFilesSet))
+        fprintf (lnkfile, "-l %s\n", s);
 
       /* standard library files */
-#if !OPT_DISABLE_DS390
-        if (options.model == MODEL_FLAT24)
+      if (!options.nostdlib)
         {
-            if (TARGET_IS_DS390)
+#if !OPT_DISABLE_DS390
+          if (options.model == MODEL_FLAT24)
             {
-                fprintf (lnkfile, "-l %s\n", STD_DS390_LIB);
-            }
-            else if (TARGET_IS_DS400)
-            {
-                fprintf (lnkfile, "-l %s\n", STD_DS400_LIB);
-            }
-            else
-            {
-                fprintf(stderr, 
+              if (TARGET_IS_DS390)
+                {
+                  fprintf (lnkfile, "-l %s\n", STD_DS390_LIB);
+                }
+              else if (TARGET_IS_DS400)
+                {
+                  fprintf (lnkfile, "-l %s\n", STD_DS400_LIB);
+                }
+              else
+                {
+                  fprintf(stderr, 
                     "Add support for your FLAT24 target in %s @ line %d\n",
                     __FILE__, __LINE__);
-                exit(-1);
-            }
-        }
+                  exit(-1);
+                }
+              }
 #endif
 
 #if !OPT_DISABLE_XA51 
 #ifdef STD_XA51_LIB
-        if (options.model == MODEL_PAGE0)
-        {
-            fprintf (lnkfile, "-l %s\n", STD_XA51_LIB);
-        }
+          if (options.model == MODEL_PAGE0)
+            {
+              fprintf (lnkfile, "-l %s\n", STD_XA51_LIB);
+            }
 #endif
 #endif
-        if (!(TARGET_IS_Z80 || TARGET_IS_GBZ80
-              || TARGET_IS_HC08)) /*Not for the z80, gbz80*/
-        { /*Why the z80 port is not using the standard libraries?*/
-            fprintf (lnkfile, "-l %s\n", STD_LIB);
-            fprintf (lnkfile, "-l %s\n", STD_INT_LIB);
-            fprintf (lnkfile, "-l %s\n", STD_LONG_LIB);
-            fprintf (lnkfile, "-l %s\n", STD_FP_LIB);
+          if (!(TARGET_IS_Z80 || TARGET_IS_GBZ80
+            || TARGET_IS_HC08)) /*Not for the z80, gbz80*/
+            { /*Why the z80 port is not using the standard libraries?*/
+              fprintf (lnkfile, "-l %s\n", STD_LIB);
+              fprintf (lnkfile, "-l %s\n", STD_INT_LIB);
+              fprintf (lnkfile, "-l %s\n", STD_LONG_LIB);
+              fprintf (lnkfile, "-l %s\n", STD_FP_LIB);
+            }
+          else if (TARGET_IS_HC08)
+            {
+              fprintf (lnkfile, "-l hc08\n");
+            }
+          else if (TARGET_IS_Z80)
+            {
+              fprintf (lnkfile, "-l z80\n");
+            }
+          else if (TARGET_IS_GBZ80)
+            {
+              fprintf (lnkfile, "-l gbz80\n");
+            }
         }
-        else if (TARGET_IS_HC08)
+
+      /*For the z80 and gbz80 ports, try to find where crt0.o is...
+      It is very important for this file to be first on the linking proccess
+      so the areas are set in the correct order, expecially _GSINIT*/
+      if ((TARGET_IS_Z80 || TARGET_IS_GBZ80) &&
+        !options.no_std_crt0 && !options.nostdlib) /*For the z80, gbz80*/
         {
-            fprintf (lnkfile, "-l hc08\n");
+          char crt0path[PATH_MAX];
+          FILE * crt0fp;
+          for (s = setFirstItem(libDirsSet); s != NULL; s = setNextItem(libDirsSet))
+            {
+              sprintf (crt0path, "%s%s%s%scrt0.o",
+                s, DIR_SEPARATOR_STRING, c, DIR_SEPARATOR_STRING);
+
+              crt0fp=fopen(crt0path, "r");
+              if(crt0fp!=NULL)/*Found it!*/
+                {
+                  fclose(crt0fp);
+                  #ifdef __CYGWIN__
+                  {
+                    /*The CYGWIN version of the z80-gbz80 linker is getting confused with
+                    windows paths, so convert them to the CYGWIN format*/
+                    char posix_path[PATH_MAX];
+                    void cygwin_conv_to_full_posix_path(char * win_path, char * posix_path);
+                    cygwin_conv_to_full_posix_path(crt0path, posix_path);
+                    strcpy(crt0path, posix_path);
+                  }
+                  #endif
+                  fprintf (lnkfile, "%s\n", crt0path);
+                  break;
+                }
+            }
+          if(s==NULL) fprintf (stderr, "Warning: couldn't find crt0.o\n");
         }
-        else if (TARGET_IS_Z80)
-        {
-            fprintf (lnkfile, "-l z80\n");
-        }
-        else if (TARGET_IS_GBZ80)
-        {
-            fprintf (lnkfile, "-l gbz80\n");
-        }
-    }
 
-  /* additional libraries if any */
-  for (s = setFirstItem(libFilesSet); s != NULL; s = setNextItem(libFilesSet))
-    fprintf (lnkfile, "-l %s\n", s);
+      /* put in the object files */
+      if (fullSrcFileName)
+        fprintf (lnkfile, "%s%s\n", dstFileName, port->linker.rel_ext);
 
-  /*For the z80 and gbz80 ports, try to find where crt0.o is...
-  It is very important for this file to be first on the linking proccess
-  so the areas are set in the correct order, expecially _GSINIT*/
-  if ((TARGET_IS_Z80 || TARGET_IS_GBZ80) &&
-      !options.no_std_crt0 && !options.nostdlib) /*For the z80, gbz80*/
-  {
-      char crt0path[PATH_MAX];
-      FILE * crt0fp;
-      for (s = setFirstItem(libDirsSet); s != NULL; s = setNextItem(libDirsSet))
-      {
-          sprintf (crt0path, "%s%s%s%scrt0.o",
-             s, DIR_SEPARATOR_STRING, c, DIR_SEPARATOR_STRING);
-          
-          crt0fp=fopen(crt0path, "r");
-          if(crt0fp!=NULL)/*Found it!*/
-          {
-              fclose(crt0fp);
-              #ifdef __CYGWIN__
-              {
-                 /*The CYGWIN version of the z80-gbz80 linker is getting confused with
-                 windows paths, so convert them to the CYGWIN format*/
-                 char posix_path[PATH_MAX];
-                 void cygwin_conv_to_full_posix_path(char * win_path, char * posix_path);
-                 cygwin_conv_to_full_posix_path(crt0path, posix_path);
-                 strcpy(crt0path, posix_path);
-              }
-              #endif
-              fprintf (lnkfile, "%s\n", crt0path);
-              break;
-          }
-      }
-      if(s==NULL) fprintf (stderr, "Warning: couldn't find crt0.o\n");
-  }
+      fputStrSet(lnkfile, relFilesSet);
 
-  /* put in the object files */
-  if (fullSrcFileName)
-    fprintf (lnkfile, "%s%s\n", dstFileName, port->linker.rel_ext);
-
-  fputStrSet(lnkfile, relFilesSet);
-
-  fprintf (lnkfile, "\n-e\n");
-  fclose (lnkfile);
-  }	/* if(port->linker.needLinkerScript) */
+      fprintf (lnkfile, "\n-e\n");
+      fclose (lnkfile);
+    } /* if(port->linker.needLinkerScript) */
 
   if (options.verbose)
     printf ("sdcc: Calling linker...\n");
@@ -1560,25 +1566,25 @@ linkEdit (char **envp)
           *strrchr (scratchFileName, '.') = '\0';
         }
       strncatz (scratchFileName, 
-		options.out_fmt ? ".S19" : ".ihx",
-		sizeof(scratchFileName));
+        options.out_fmt ? ".S19" : ".ihx",
+        sizeof(scratchFileName));
     }
 
   if (port->linker.cmd)
     {
       char buffer2[PATH_MAX];
 
-	/* VR 030517 - gplink needs linker options to set the linker script,*/
-	buildCmdLine (buffer2, port->linker.cmd, dstFileName, scratchFileName, NULL, linkOptionsSet);
+      /* VR 030517 - gplink needs linker options to set the linker script,*/
+      buildCmdLine (buffer2, port->linker.cmd, dstFileName, scratchFileName, NULL, linkOptionsSet);
 
-	buildCmdLine2 (buffer, sizeof(buffer), buffer2);
+      buildCmdLine2 (buffer, sizeof(buffer), buffer2);
     }
   else
     {
       buildCmdLine2 (buffer, sizeof(buffer), port->linker.mcmd);
     }
 
-/*  if (options.verbose)fprintf(stderr, "linker command line: %s\n", buffer); */
+  /*  if (options.verbose)fprintf(stderr, "linker command line: %s\n", buffer); */
 
   system_ret = my_system (buffer);
   /* TODO: most linker don't have a -o parameter */
@@ -1601,16 +1607,16 @@ linkEdit (char **envp)
           strncpyz (scratchFileName, s, sizeof(scratchFileName));
           /* strip ".rel" extension */
           p = strrchr (scratchFileName, '.');
-	  if (p)
-	    {
-	      *p = 0;
-	    }
+          if (p)
+            {
+              *p = 0;
+            }
         }
       strncatz (scratchFileName,
-		options.out_fmt ? ".S19" : ".ihx",
-		sizeof(scratchFileName));
+        options.out_fmt ? ".S19" : ".ihx",
+        sizeof(scratchFileName));
       if (strcmp (fullDstFileName, scratchFileName))
-	unlink (fullDstFileName);
+        unlink (fullDstFileName);
       rename (scratchFileName, fullDstFileName);
 
       strncpyz (buffer, fullDstFileName, sizeof(buffer));
@@ -1626,7 +1632,7 @@ linkEdit (char **envp)
       *q = 0;
       strncatz(buffer, ".map", sizeof(buffer));
       if (strcmp (scratchFileName, buffer))
-	unlink (buffer);
+        unlink (buffer);
       rename (scratchFileName, buffer);
       *p = 0;
       strncatz (scratchFileName, ".mem", sizeof(scratchFileName));

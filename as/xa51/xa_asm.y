@@ -53,7 +53,7 @@ static int bitmask[]={1, 2, 4, 8, 16, 32, 64, 128};
 %token SETB SEXT SUB SUBB TRAP XCH XOR
 %token REG DPTR PC A C USP
 %token WORD BIT NUMBER CHAR STRING EOL LOCAL_LABEL
-%token ORG EQU DB DW BITDEF REGDEF LOW HIGH
+%token ORG EQU SFR DB DW BITDEF REGDEF LOW HIGH
 %token RSHIFT LSHIFT
 %token AREA AREA_NAME AREA_DESC DS
 %token MODULE GLOBL 
@@ -115,9 +115,10 @@ directive:     '.' ORG expr {
 	                if (p1) build_sym_list(symbol_name);
 			if (p1 || p2) assign_value(symbol_name, $3);
 	        }
-	     | symbol EQU expr {
+	     | symbol SFR expr {
 			if (p1) build_sym_list(symbol_name);
 			if (p1 || p2) assign_value(symbol_name, $3);
+			if (p1 || p2) mk_sfr(symbol_name);
 			$$ = 0;
 		}
 	     | '.' BITDEF bitsymbol ',' bit {

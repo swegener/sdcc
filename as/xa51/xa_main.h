@@ -32,6 +32,7 @@ struct symbol {
         int isdef;      /* 1 if defined, 0 if no value yet */
         int line_def;   /* line in which is was defined */
         int isbit;      /* 1 if a bit address, 0 otherwise */
+        int issfr;
 	int isreg;	/* 1 if a register, 0 otehrwise */
   int area;       /* the area that this symbol is in */
         struct symbol *next; };
@@ -52,18 +53,21 @@ extern int current_area;
 
 #define MEM_POS (area[current_area].alloc_position)
 
-#define AREA_CSEG	0
-#define AREA_DSEG	1
-#define AREA_OSEG	2
-#define AREA_ISEG	3
-#define AREA_BSEG	4
-#define AREA_XSEG	5
-#define AREA_XISEG	6
-#define AREA_XINIT	7
-#define AREA_GSINIT	8
-#define AREA_GSFINAL	9
-#define AREA_HOME	10
-#define NUM_AREAS	11
+enum {
+  AREA_CSEG=0,
+  AREA_DSEG,
+  // AREA_OSEG,
+  // AREA_ISEG,
+  AREA_BSEG,
+  AREA_XSEG,
+  AREA_XISEG,
+  AREA_XINIT,
+  AREA_GSINIT,
+  AREA_GSFINAL,
+  AREA_HOME,
+  AREA_SSEG,
+  NUM_AREAS
+};
 
 extern struct area_struct area[NUM_AREAS];
 

@@ -192,7 +192,7 @@ usp		{LIST; return USP;}
 
 org		{LIST; return ORG;}
 equ		{LIST; return EQU;}
-sfr		{LIST; return EQU;}
+sfr		{LIST; return SFR;}
 db		{LIST; return DB;}
 dw		{LIST; return DW;}
 byte		{LIST; return DB;}
@@ -201,8 +201,6 @@ reg		{LIST; return REGDEF;}
 area		{LIST; return AREA;}
 ds		{LIST; return DS;}
 DSEG		{LIST; yylval = AREA_DSEG; return AREA_NAME;}
-OSEG		{LIST; yylval = AREA_OSEG; return AREA_NAME;}
-ISEG		{LIST; yylval = AREA_ISEG; return AREA_NAME;}
 BSEG		{LIST; yylval = AREA_BSEG; return AREA_NAME;}
 XSEG		{LIST; yylval = AREA_XSEG; return AREA_NAME;}
 XISEG		{LIST; yylval = AREA_XISEG; return AREA_NAME;}
@@ -210,11 +208,12 @@ XINIT		{LIST; yylval = AREA_XINIT; return AREA_NAME;}
 GSINIT		{LIST; yylval = AREA_GSINIT; return AREA_NAME;}
 GSFINAL		{LIST; yylval = AREA_GSFINAL; return AREA_NAME;}
 HOME		{LIST; yylval = AREA_HOME; return AREA_NAME;}
+SSEG            {LIST; yylval = AREA_SSEG; return AREA_NAME;}
 CSEG		{LIST; yylval = AREA_CSEG; return AREA_NAME;}
 module		{LIST; return MODULE;}
 globl		{LIST; return GLOBL;}
 \(DATA\)	{LIST; return AREA_DESC;}
-\(OVR,DATA\)	{LIST; return AREA_DESC;}
+\(OVR,XDATA\)	{LIST; return AREA_DESC;}
 \(BIT\)		{LIST; return AREA_DESC;}
 \(XDATA\)	{LIST; return AREA_DESC;}
 \(CODE\)	{LIST; return AREA_DESC;}

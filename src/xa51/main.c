@@ -40,7 +40,7 @@ static char *_xa51_keywords[] =
   //"_pdata",
   //"_idata",
   "_naked",
-  "_overlay",
+  //"_overlay",
   NULL
 };
 
@@ -101,6 +101,7 @@ _xa51_setDefaultOptions (void)
   options.stackAuto=1;
   options.intlong_rent=1;
   options.float_rent=1;
+  options.stack_loc=0x100;
 }
 
 static const char *
@@ -111,19 +112,10 @@ _xa51_getRegName (struct regs *reg)
   return "err";
 }
 
-static void
-_xa51_genAssemblerPreamble (FILE * of)
-{
-  fprintf (of, "_errno\tsfr\t0x00; to keep the fp-lib's happy for now\n");
-}
-
 /* Generate interrupt vector table. */
 static int
 _xa51_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 {
-  fprintf (of, "\t.dw\t0x8f00\n");
-  fprintf (of, "\t.dw\t__sdcc_gsinit_startup\n");
-  // no IVT yet
   return TRUE;
 }
 
@@ -134,13 +126,33 @@ static void _xa51_genXINIT (FILE * of) {
   fprintf (of, "	beq	00002$\n");
   fprintf (of, "	mov	r1,#s_XINIT\n");
   fprintf (of, "        mov     r2,#s_XISEG\n");
-  fprintf (of, "00001$  movc    r3l,[r1+]\n");
+  fprintf (of, "00001$: movc    r3l,[r1+]\n");
   fprintf (of, "        mov     [r2+],r3l\n");
   fprintf (of, "        djnz    r0,00001$\n");
   fprintf (of, "00002$:\n");
   fprintf (of, ";	_xa51_genXINIT() end\n");
 }
 
+static void
+_xa51_genAssemblerPreamble (FILE * of)
+{
+  fprintf (of, "_errno\tsfr\t0x00; to keep the fp-lib's happy for now\n\n");
+  fprintf (of, "\t.area CSEG\t(CODE)\n");
+  fprintf (of, "__interrupt_vect:\n");
+  fprintf (of, "\t.dw\t0x8f00\n");
+  fprintf (of, "\t.dw\t__sdcc_gsinit_startup\n");
+  fprintf (of, "\n");
+  fprintf (of, "__sdcc_gsinit_startup:\n");
+  fprintf (of, "\tmov\tr7,#0x%04x\n", options.stack_loc);
+  fprintf (of, "\tcall\t_external_startup\n");
+  _xa51_genXINIT(of);
+  fprintf (of, "\tcall\t_main\n");
+  fprintf (of, "\treset\t;main should not return\n");
+}
+
+/* dummy linker for now */
+void xa_link(void) {
+}
 
 /* Do CSE estimation */
 static bool cseCostEstimation (iCode *ic, iCode *pdic)
@@ -164,6 +176,7 @@ static bool cseCostEstimation (iCode *ic, iCode *pdic)
     return 1;
 }
 
+#if 0
 /** $1 is always the basename.
     $2 is always the output file.
     $3 varies
@@ -174,6 +187,7 @@ static const char *_linkCmd[] =
 {
   "{bindir}{sep}aslink", "-nf", "$1", NULL
 };
+#endif
 
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
 static const char *_asmCmd[] =
@@ -188,7 +202,7 @@ PORT xa51_port =
   "xa51",
   "MCU 80C51XA",       		/* Target name */
   {
-    TRUE,			/* Emit glue around main */
+    FALSE,			/* Emit glue around main */
     MODEL_LARGE,
     MODEL_LARGE
   },
@@ -202,9 +216,9 @@ PORT xa51_port =
     NULL			/* no do_assemble function */
   },
   {
-    _linkCmd,
+    NULL, //_linkCmd,
     NULL,
-    NULL,
+    xa_link,
     ".rel"
   },
   {
@@ -216,15 +230,15 @@ PORT xa51_port =
   },
   {
     "XSEG    (XDATA)",
-    "STACK   (DATA)",
+    "STACK   (XDATA)",
     "CSEG    (CODE)",
     "DSEG    (DATA)",
-    "ISEG    (DATA)",
+    NULL, //"ISEG    (DATA)",
     "XSEG    (XDATA)",
     "BSEG    (BIT)",
-    "RSEG    (DATA)",
+    NULL, //"RSEG    (DATA)",
     "GSINIT  (CODE)",
-    "OSEG    (OVR,DATA)",
+    NULL, //"OSEG    (OVR,XDATA)",
     "GSFINAL (CODE)",
     "HOME    (CODE)",
     "XISEG   (XDATA)", // initialized xdata

@@ -104,7 +104,12 @@ initMem ()
      DEBUG-NAME     -   'B'
      POINTER-TYPE   -   POINTER
    */
-  istack = allocMap (0, 0, 0, 0, 0, 0, options.stack_loc, ISTACK_NAME, 'B', POINTER);
+  if (ISTACK_NAME) {
+    istack = allocMap (0, 0, 0, 0, 0, 0, options.stack_loc, 
+		       ISTACK_NAME, 'B', POINTER);
+  } else {
+    istack=NULL;
+  }
 
   /* code  segment ;   
      SFRSPACE       -   NO
@@ -164,7 +169,11 @@ initMem ()
      DEBUG-NAME     -   'E'
      POINTER-TYPE   -   POINTER
    */
-  overlay = allocMap (0, 0, 0, 1, 0, 0, options.data_loc, DATA_NAME, 'E', POINTER);
+  if (OVERLAY_NAME) {
+    overlay = allocMap (0, 0, 0, 1, 0, 0, options.data_loc, DATA_NAME, 'E', POINTER);
+  } else {
+    overlay = NULL;
+  }
 
   /* Xternal Data segment - 
      SFRSPACE       -   NO
@@ -190,7 +199,12 @@ initMem ()
      DEBUG-NAME     -   'G'
      POINTER-TYPE   -   IPOINTER
    */
-  idata = allocMap (0, 0, 0, 0, 0, 0, options.idata_loc, IDATA_NAME, 'G', IPOINTER);
+  if (IDATA_NAME) {
+    idata = allocMap (0, 0, 0, 0, 0, 0, options.idata_loc, 
+		      IDATA_NAME, 'G', IPOINTER);
+  } else {
+    idata=NULL;
+  }
 
   /* Static segment (code for variables );
      SFRSPACE       -   NO
@@ -1063,6 +1077,10 @@ canOverlayLocals (eBBlock ** ebbs, int count)
 void 
 doOverlays (eBBlock ** ebbs, int count)
 {
+  if (!overlay) {
+    return;
+  }
+
   /* check if the parameters and local variables
      of this function can be put in the overlay segment
      This check is essentially to see if the function

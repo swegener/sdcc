@@ -43,6 +43,7 @@ extern FILE *junkFile;
 #define  REG_NAME      port->mem.reg_name
 #define  STATIC_NAME   port->mem.static_name
 #define	 HOME_NAME     port->mem.home_name
+#define  OVERLAY_NAME  port->mem.overlay_name
 
 /* forward definition for variables */
 extern memmap *xstack;		/* xternal stack data         */

@@ -1469,7 +1469,6 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 
   }
 
-  return 0;
   if (!dic)
     return 0;			/* did not find */
 

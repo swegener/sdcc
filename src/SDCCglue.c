@@ -1464,10 +1464,12 @@ glue ()
 
 
   /* create the overlay segments */
-  fprintf (asmFile, "%s", iComments2);
-  fprintf (asmFile, "; overlayable items in internal ram \n");
-  fprintf (asmFile, "%s", iComments2);
-  copyFile (asmFile, ovrFile);
+  if (overlay) {
+    fprintf (asmFile, "%s", iComments2);
+    fprintf (asmFile, "; overlayable items in internal ram \n");
+    fprintf (asmFile, "%s", iComments2);
+    copyFile (asmFile, ovrFile);
+  }
 
   /* create the stack segment MOF */
   if (mainf && IFFUNC_HASBODY(mainf->type))
@@ -1480,10 +1482,12 @@ glue ()
     }
 
   /* create the idata segment */
-  fprintf (asmFile, "%s", iComments2);
-  fprintf (asmFile, "; indirectly addressable internal ram data\n");
-  fprintf (asmFile, "%s", iComments2);
-  copyFile (asmFile, idata->oFile);
+  if (idata) {
+    fprintf (asmFile, "%s", iComments2);
+    fprintf (asmFile, "; indirectly addressable internal ram data\n");
+    fprintf (asmFile, "%s", iComments2);
+    copyFile (asmFile, idata->oFile);
+  }
 
   /* copy the bit segment */
   fprintf (asmFile, "%s", iComments2);

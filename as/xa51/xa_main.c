@@ -54,12 +54,16 @@ char *areaToString (int area) {
     {
     case AREA_CSEG: return "CSEG";
     case AREA_DSEG: return "DSEG";
-    case AREA_OSEG: return "OSEG";
-    case AREA_ISEG: return "ISEG";
+      //case AREA_OSEG: return "OSEG";
+      //case AREA_ISEG: return "ISEG";
     case AREA_BSEG: return "BSEG";
     case AREA_XSEG: return "XSEG";
     case AREA_XISEG: return "XISEG";
     case AREA_XINIT: return "XINIT";
+    case AREA_GSINIT: return "GSINIT";
+    case AREA_GSFINAL: return "GSFINAL";
+    case AREA_HOME: return "HOME";
+    case AREA_SSEG: return "SSEG";
     }
   return ("UNKNOW");
 }
@@ -120,6 +124,22 @@ int mk_bit(char *thename)
         while (p != NULL) {
                 if (!(strcasecmp(thename, p->name))) {
                         p->isbit = 1;
+                        return (0);
+                }
+                p = p->next;
+        }
+        fprintf(stderr, "Internal Error!  Couldn't find symbol\n");
+        exit(1);
+}
+
+int mk_sfr(char *thename)
+{
+        struct symbol *p;
+
+        p = sym_list;
+        while (p != NULL) {
+                if (!(strcasecmp(thename, p->name))) {
+                        p->issfr = 1;
                         return (0);
                 }
                 p = p->next;
@@ -202,12 +222,27 @@ void print_symbol_table()
   struct symbol *p;
   p = sym_list;
   while (p != NULL) {
+#if 0
     fprintf(sym_fp, "Sym in %-5s: %s\n", areaToString(p->area), p->name);
     fprintf(sym_fp, "  at: 0x%04X (%5d)", p->value, p->value);
     fprintf(sym_fp, " Def:%s", p->isdef ? "Yes" : "No ");
     fprintf(sym_fp, " Bit:%s", p->isbit ? "Yes" : "No ");
     fprintf(sym_fp, " Target:%s", p->istarget ? "Yes" : "No ");
     fprintf(sym_fp, " Line %d\n", p->line_def);
+#else
+    if (p->issfr) {
+      fprintf (sym_fp, "%-5s", "SFR");
+    } else if (p->isbit) {
+      fprintf (sym_fp, "%-5s", "BIT");
+    } else {
+      fprintf (sym_fp, "%-5s", areaToString(p->area));
+    }
+    fprintf (sym_fp, " 0x%04x (%5d)", p->value, p->value);
+    fprintf (sym_fp, " %s", p->isdef ? "D" : "-");
+    fprintf (sym_fp, "%s", p->isbit ? "B" : "-");
+    fprintf (sym_fp, "%s", p->istarget ? "T" : "-");
+    fprintf (sym_fp, " %s\n", p->name);
+#endif
     p = p->next;
   }
 }
@@ -382,15 +417,27 @@ void init_areas(void)
 {
   area[AREA_CSEG].start=area[AREA_CSEG].alloc_position = 0;
   area[AREA_DSEG].start=area[AREA_DSEG].alloc_position = 0x30;
-  area[AREA_OSEG].start=area[AREA_OSEG].alloc_position = 0x80;
-  area[AREA_ISEG].start=area[AREA_ISEG].alloc_position = 0;
   area[AREA_BSEG].start=area[AREA_BSEG].alloc_position = 0;
   area[AREA_XSEG].start=area[AREA_XSEG].alloc_position = 0;
   area[AREA_XISEG].start=area[AREA_XISEG].alloc_position = 0;
   area[AREA_XINIT].start=area[AREA_XINIT].alloc_position = 0;
   area[AREA_GSINIT].start=area[AREA_GSINIT].alloc_position = 0;
   area[AREA_GSFINAL].start=area[AREA_GSFINAL].alloc_position = 0;
-  area[AREA_HOME].alloc_position = 0;
+  area[AREA_HOME].start=area[AREA_HOME].alloc_position = 0;
+}
+
+void addAreaSymbols() {
+  char buffer[132];
+  int i;
+  for (i=0; i<NUM_AREAS; i++) {
+    current_area=i;
+    sprintf (buffer, "s_%s", areaToString(i));
+    build_sym_list (buffer);
+    assign_value (buffer, area[i].start);
+    buffer[0]='l';
+    build_sym_list (buffer);
+    assign_value (buffer, area[i].alloc_position-area[i].start);
+  }
 }
 
 void printVersion() {
@@ -498,7 +545,6 @@ int main(int argc, char **argv)
 	init_areas();
 	yyparse();
 	flag_targets();
-	if (createSymbolFile) print_symbol_table();
 	check_redefine();
 
 	if (verbose) printf("Pass 2: Aligning Branch Targets:\n");
@@ -509,6 +555,9 @@ int main(int argc, char **argv)
 	lineno = 1;
 	init_areas();
 	yyparse();
+
+	addAreaSymbols();
+	if (createSymbolFile) print_symbol_table();
 
 	if (verbose) printf("Pass 3: Generating Object Code:\n");
 	p2 = 0;

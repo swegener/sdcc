@@ -189,6 +189,9 @@ AC_DEFINE_UNQUOTED(PREFIX, "${prefix}")
 AC_DEFINE_UNQUOTED(DATADIR, "${sdcc_datadir}")
 AC_DEFINE_UNQUOTED(SRCDIR, "${config_in}")
 
+# mlh: dont compile libgc if it's available locally
+AC_CHECK_LIB(gc,GC_malloc,HAVE_LIBGC=1)
+AC_SUBST(HAVE_LIBGC)
 
 # Generating output files
 # ===========================================================================

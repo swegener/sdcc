@@ -24,7 +24,6 @@
 #undef HAVE_SYS_SOCKET_H
 #undef HAVE_SYS_ISA_DEFS_H
 #undef HAVE_ENDIAN_H
-
 #endif
 
 /* End of config.h */

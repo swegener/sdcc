@@ -10,7 +10,11 @@ PORTS		= mcs51 z80
 PORT_LIBS	= $(PORTS:%=%/port.a)
 
 LIBS		= -lgc @LIBS@
+ifeq ($(HAVE_LIBGC), 1)
+else
 LIBDIRS		= -L$(PRJDIR)/support/gc
+LIBGC		= $(PRJDIR)/support/gc/libgc.a
+endif
 
 OBJECTS 	= SDCCy.o SDCClex.o SDCCerr.o SDCChasht.o SDCCmain.o \
 		  SDCCsymt.o SDCCopt.o SDCCast.o SDCCmem.o SDCCval.o \
@@ -23,7 +27,7 @@ TARGET		= $(PRJDIR)/bin/sdcc
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: ports checkconf $(PRJDIR)/support/gc/libgc.a $(TARGET)
+all: ports checkconf $(LIBGC) $(TARGET)
 
 ports:
 	for i in $(PORTS); do $(MAKE) -C $$i; done

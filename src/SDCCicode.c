@@ -2103,7 +2103,7 @@ geniCodePostDec (operand * op)
   /* if this is not an address we have trouble */
   if (!op->isaddr)
     {
-      werror (E_LVALUE_REQUIRED, "++");
+      werror (E_LVALUE_REQUIRED, "--");
       return op;
     }
 
@@ -2147,7 +2147,7 @@ geniCodePreDec (operand * op)
 
   if (!op->isaddr)
     {
-      werror (E_LVALUE_REQUIRED, "++");
+      werror (E_LVALUE_REQUIRED, "--");
       return op;
     }
 

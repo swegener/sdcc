@@ -1743,7 +1743,7 @@ reverseLoop (ast * loop, symbol * sym, ast * init, ast * end)
 
 }
 
-#define DEMAND_INTEGER_PROMOTION
+//#define DEMAND_INTEGER_PROMOTION
 
 #ifdef DEMAND_INTEGER_PROMOTION
 

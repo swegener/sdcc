@@ -149,8 +149,9 @@ aopLiteral (value * val, int offset)
 static void 
 emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 {
-  symbol *sym;
+  symbol *sym, *symIval;
   ast *ival = NULL;
+  memmap *segment;
 
   if (addPublics)
     {
@@ -244,7 +245,6 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
          it is a global variable */
       if (sym->ival && sym->level == 0)
 	{
-
 	  if (IS_AGGREGATE (sym->type))
 	    ival = initAggregates (sym, sym->ival, NULL);
 	  else
@@ -258,6 +258,12 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 
 	  eBBlockFromiCode (iCodeFromAst (ival));
 	  allocInfo = 1;
+
+	  /* if the ival was a symbol, delete it from its segment */
+	  if (symIval=AST_SYMBOL(sym->ival->init.node)) {
+	    segment = SPEC_OCLS (symIval->etype);
+	    deleteSetItem (&segment->syms, symIval);
+	  }
 	  sym->ival = NULL;
 	}
     }

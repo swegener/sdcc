@@ -1078,11 +1078,13 @@ linkEdit (char **envp)
   /* standard library path */
   if (!options.nostdlib)
     {
+/****
       if (TARGET_IS_DS390)
 	{
 	  c = "ds390";
 	}
       else
+*****/
 	{
 	  switch (options.model)
 	    {
@@ -1093,7 +1095,8 @@ linkEdit (char **envp)
 	      c = "large";
 	      break;
 	    case MODEL_FLAT24:
-	      c = "flat24";
+	      /* c = "flat24"; */
+	      c = "ds390";
 	      break;
 	    default:
 	      werror (W_UNKNOWN_MODEL, __FILE__, __LINE__);
@@ -1104,7 +1107,8 @@ linkEdit (char **envp)
       fprintf (lnkfile, "-k %s/%s\n", SDCC_LIB_DIR /*STD_LIB_PATH */ , c);
 
       /* standard library files */
-      if (strcmp (port->target, "ds390") == 0)
+      /* if (strcmp (port->target, "ds390") == 0) */
+      if (options.model == MODEL_FLAT24)
 	{
 	  fprintf (lnkfile, "-l %s\n", STD_DS390_LIB);
 	}

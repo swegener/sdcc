@@ -1228,7 +1228,8 @@ fixUpTypes (iCode * ic)
 {
   sym_link *t1 = operandType (IC_LEFT (ic)), *t2;
 
-  if (TARGET_IS_DS390)
+  /* if (TARGET_IS_DS390) */
+  if (options.model == MODEL_FLAT24)
     {
       /* hack-o-matic! */
       return;

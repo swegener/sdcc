@@ -166,7 +166,8 @@ static void freeReg (regs * reg, bool silent) {
   }
   
   if (!silent) {
-    fprintf (stderr, "freeReg: (%08x) %s ", xa51RegsInUse, reg->name);
+    fprintf (stderr, "freeReg: (%08x) %s (%s) ", xa51RegsInUse, 
+	     reg->name, reg->sym->name);
   }
 
   if (reg->isFree || ((xa51RegsInUse&reg->regMask)!=reg->regMask)) {
@@ -276,8 +277,10 @@ static bool allocReg (short size, short type, symbol *sym,
 	  return TRUE;
 	}
       }
-      freeReg(sym->regs[offset], FALSE);
-      sym->regs[offset]=NULL;
+      if (sym->regs[offset]) {
+	freeReg(sym->regs[offset], FALSE);
+	sym->regs[offset]=NULL;
+      }
       checkRegMask(__FUNCTION__);
       return FALSE;
       break;

@@ -32,6 +32,7 @@ enum
     AOP_DIR, 
     AOP_FAR,
     AOP_CODE,
+    AOP_GPTR,
     AOP_STK, 
     AOP_IMMD, 
     AOP_CRY
@@ -49,6 +50,7 @@ typedef struct asmop {
      AOP_DIR    -  direct, just a name
      AOP_FAR    -  
      AOP_CODE   - 
+     AOP_GPTR   -
      AOP_STK    -  on stack (with offset)
      AOP_IMMD   -  immediate value for eg. remateriazable 
      AOP_CRY    -  carry contains the value of this

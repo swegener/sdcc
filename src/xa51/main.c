@@ -31,7 +31,7 @@ static char *_xa51_keywords[] =
   "sfr",
   "sbit",
   "using",
-  //"xdata",
+  "xdata",
   //"_data",
   //"_code",
   //"_generic",
@@ -94,6 +94,8 @@ static void
 _xa51_setDefaultOptions (void)
 {
   options.stackAuto=1;
+  options.intlong_rent=1;
+  options.float_rent=1;
 }
 
 static const char *
@@ -218,7 +220,7 @@ PORT xa51_port =
   },
   {
 	/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
-    1, 2, 2, 4, 1, 2, 3, 1, 4, 4
+    1, 2, 2, 4, 2, 2, 3, 1, 4, 4
   },
   {
     "XSEG    (XDATA)",

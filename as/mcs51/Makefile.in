@@ -24,7 +24,7 @@ includedir      = @includedir@
 mandir          = @mandir@
 man1dir         = $(mandir)/man1
 man2dir         = $(mandir)/man2
-infodir         = ${prefix}/info
+infodir         = @info@
 
 CPPFLAGS	= @CPPFLAGS@ -I. -I$(PRJDIR)
 CFLAGS		= @CFLAGS@ -Wall

@@ -1,3 +1,13 @@
+2004-12-21 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/gen.c (pic16_aopGet): applied fix from Raphael Neider
+	that fixes an issue with AOP_PCODE asmop's offset,
+	* (pic16_popCopyReg): update instance field too,
+	* (mov2w): modified to pic16_mov2w because it conflicts with mov2w
+	function of pic port,
+	* (genCmp, genAnd, genAssign),
+	* src/pic16/genarith.c (genAddLit): some fixes from Raphael Neider,
+
 2004-12-20 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/SDCCast.c (gatherAutoInit): allow pic16 to emit static

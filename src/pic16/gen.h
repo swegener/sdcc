@@ -202,7 +202,7 @@ void pic16_freeAsmop (operand *op, asmop *aaop, iCode *ic, bool pop);
 const char *pic16_pCodeOpType(  pCodeOp *pcop);
 int pic16_my_powof2 (unsigned long num);
 
-void mov2w (asmop *aop, int offset);
+void pic16_mov2w (asmop *aop, int offset);
 
 void dumpiCode(iCode *lic);
 

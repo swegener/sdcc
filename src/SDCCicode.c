@@ -1623,7 +1623,6 @@ geniCodeMultiply (operand * left, operand * right,int resultIsInt)
   if (resultIsInt)
     {
       SPEC_NOUN(getSpec(resType))=V_INT;
-      SPEC_SHORT(getSpec(resType))=0;
     }
 
   /* if the right is a literal & power of 2 */

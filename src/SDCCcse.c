@@ -302,7 +302,6 @@ DEFSETFUNC (findCheaperOp)
 
   if ((*opp) && 
       (SPEC_USIGN(operandType (cop))==SPEC_USIGN(operandType (*opp))) &&
-      (SPEC_SHORT(operandType (cop))==SPEC_SHORT(operandType (*opp))) &&
       (SPEC_LONG(operandType (cop))==SPEC_LONG(operandType (*opp))))
     {
 

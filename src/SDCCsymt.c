@@ -30,7 +30,7 @@ char *nounName(sym_link *sl) {
     {
     case V_INT: {
       if (SPEC_LONG(sl)) return "long";
-      if (SPEC_SHORT(sl)) return "short";
+      if (sl->select.s._short) return "short";
       return "int";
     }
     case V_FLOAT: return "float";
@@ -485,27 +485,26 @@ void checkTypeSanity(sym_link *etype, char *name) {
        SPEC_NOUN(etype)==V_FLOAT || 
        SPEC_NOUN(etype)==V_DOUBLE || 
        SPEC_NOUN(etype)==V_VOID) &&
-      (SPEC_SHORT(etype) || SPEC_LONG(etype))) {
+      (etype->select.s._short || SPEC_LONG(etype))) {
     // long or short for char float double or void
     werror (E_LONG_OR_SHORT_INVALID, noun, name);
   }
   if ((SPEC_NOUN(etype)==V_FLOAT || 
        SPEC_NOUN(etype)==V_DOUBLE || 
        SPEC_NOUN(etype)==V_VOID) && 
-      (SPEC_SIGNED(etype) || SPEC_USIGN(etype))) {
+      (etype->select.s._signed || SPEC_USIGN(etype))) {
     // signed or unsigned for float double or void
     werror (E_SIGNED_OR_UNSIGNED_INVALID, noun, name);
   }
 
   if (!SPEC_NOUN(etype)) {
     // special case for just "signed" or "unsigned" or "long"
-    if (SPEC_SIGNED(etype) || SPEC_USIGN(etype) || SPEC_LONG(etype)) {
+    if (etype->select.s._signed || SPEC_USIGN(etype) || SPEC_LONG(etype)) {
       SPEC_NOUN(etype)=V_INT;
     }
     // special case for just "short"
-    if (SPEC_SHORT(etype)) {
+    if (etype->select.s._short) {
       SPEC_NOUN(etype)=V_CHAR; // or maybe V_INT
-      SPEC_SHORT(etype)=0;
     }
   }
 
@@ -514,11 +513,11 @@ void checkTypeSanity(sym_link *etype, char *name) {
     SPEC_NOUN(etype)=V_INT;
   }
 
-  if (SPEC_SIGNED(etype) && SPEC_USIGN(etype)) {
+  if (etype->select.s._signed && SPEC_USIGN(etype)) {
     // signed AND unsigned 
     werror (E_SIGNED_AND_UNSIGNED_INVALID, noun, name);
   }
-  if (SPEC_SHORT(etype) && SPEC_LONG(etype)) {
+  if (etype->select.s._short && SPEC_LONG(etype)) {
     // short AND long
     werror (E_LONG_AND_SHORT_INVALID, noun, name);
   }
@@ -539,8 +538,8 @@ mergeSpec (sym_link * dest, sym_link * src)
       /* we shouldn't redeclare the type */
       if (getenv("DEBUG_SANITY")) {
 	fprintf (stderr, "mergeSpec: ");
-	werror(E_TWO_OR_MORE_DATA_TYPES, yylval.yychar);
       }
+      werror(E_TWO_OR_MORE_DATA_TYPES, yylval.yychar);
     }
   }
   
@@ -568,11 +567,11 @@ mergeSpec (sym_link * dest, sym_link * src)
   }
 #endif
   // but there are more important thing right now
-  
+
   SPEC_LONG (dest) |= SPEC_LONG (src);
-  SPEC_SHORT (dest) |= SPEC_SHORT (src);
+  dest->select.s._short=src->select.s._short;
   SPEC_USIGN (dest) |= SPEC_USIGN (src);
-  SPEC_SIGNED (dest) |= SPEC_SIGNED (src);
+  dest->select.s._signed=src->select.s._signed;
   SPEC_STAT (dest) |= SPEC_STAT (src);
   SPEC_EXTR (dest) |= SPEC_EXTR (src);
   SPEC_ABSA (dest) |= SPEC_ABSA (src);
@@ -715,7 +714,7 @@ getSize (sym_link * p)
       switch (SPEC_NOUN (p))
 	{			/* depending on the specifier type */
 	case V_INT:
-	  return (IS_LONG (p) ? LONGSIZE : (IS_SHORT (p) ? SHORTSIZE : INTSIZE));
+	  return (IS_LONG (p) ? LONGSIZE : INTSIZE);
 	case V_FLOAT:
 	  return FLOATSIZE;
 	case V_CHAR:
@@ -774,7 +773,7 @@ bitsForType (sym_link * p)
       switch (SPEC_NOUN (p))
 	{			/* depending on the specifier type */
 	case V_INT:
-	  return (IS_LONG (p) ? LONGSIZE * 8 : (IS_SHORT (p) ? SHORTSIZE * 8 : INTSIZE * 8));
+	  return (IS_LONG (p) ? LONGSIZE * 8 : INTSIZE * 8);
 	case V_FLOAT:
 	  return FLOATSIZE * 8;
 	case V_CHAR:
@@ -1456,17 +1455,6 @@ checkType (sym_link * dest, sym_link * src)
       SPEC_NOUN (src) == V_VOID)
     return -1;
 
-  /* char === to short */
-  if (SPEC_NOUN (dest) == V_CHAR &&
-      SPEC_NOUN (src) == V_INT &&
-      SPEC_SHORT (src))
-    return (SPEC_USIGN (src) == SPEC_USIGN (dest) ? 1 : -2);
-
-  if (SPEC_NOUN (src) == V_CHAR &&
-      SPEC_NOUN (dest) == V_INT &&
-      SPEC_SHORT (dest))
-    return (SPEC_USIGN (src) == SPEC_USIGN (dest) ? 1 : -2);
-
   /* if they are both bitfields then if the lengths
      and starts don't match */
   if (IS_BITFIELD (dest) && IS_BITFIELD (src) &&
@@ -1494,9 +1482,6 @@ checkType (sym_link * dest, sym_link * src)
 	return 1;
     }
   if (SPEC_LONG (dest) != SPEC_LONG (src))
-    return -1;
-
-  if (SPEC_SHORT (dest) != SPEC_SHORT (src))
     return -1;
 
   if (SPEC_USIGN (dest) != SPEC_USIGN (src))
@@ -1936,8 +1921,6 @@ printTypeChain (sym_link * type, FILE * of)
 	    case V_INT:
 	      if (IS_LONG (type))
 		fprintf (of, "long ");
-	      if (IS_SHORT (type))
-		fprintf (of, "short ");
 	      fprintf (of, "int ");
 	      break;
 
@@ -2031,8 +2014,6 @@ cdbTypeInfo (sym_link * type, FILE * of)
 	    case V_INT:
 	      if (IS_LONG (type))
 		fprintf (of, "SL");
-	      else if (IS_SHORT (type))
-		fprintf (of, "SS");
 	      else
 		fprintf (of, "SI");
 	      break;

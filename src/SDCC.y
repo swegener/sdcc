@@ -565,7 +565,7 @@ type_specifier2
    | SHORT  {
                $$=newLink();
                $$->class = SPECIFIER   ;
-	       SPEC_SHORT($$) = 1      ;
+	       $$->select.s._short = 1      ;
             }
    | INT    {
                $$=newLink();
@@ -580,7 +580,7 @@ type_specifier2
    | SIGNED {
                $$=newLink();
                $$->class = SPECIFIER   ;
-               SPEC_SIGNED($$) = 1     ;
+               $$->select.s._signed = 1     ;
             }
    | UNSIGNED  {
                $$=newLink();

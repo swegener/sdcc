@@ -1531,7 +1531,6 @@ farSpacePackable (iCode * ic)
      symbol on the right */
   for (dic = ic->prev; dic; dic = dic->prev)
     {
-
       /* if the definition is a call then no */
       if ((dic->op == CALL || dic->op == PCALL) &&
 	  IC_RESULT (dic)->key == IC_RIGHT (ic)->key)
@@ -1605,14 +1604,20 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 
   /* if the true symbol is defined in far space or on stack
      then we should not since this will increase register pressure */
+#if 0
   if (isOperandInFarSpace (IC_RESULT (ic)))
     {
       if ((dic = farSpacePackable (ic)))
 	goto pack;
       else
 	return 0;
-
     }
+#else
+  if (isOperandInFarSpace(IC_RESULT(ic)) && !farSpacePackable(ic)) {
+    return 0;
+  }
+#endif
+
   /* find the definition of iTempNN scanning backwards if we find a 
      a use of the true symbol in before we find the definition then 
      we cannot */

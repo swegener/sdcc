@@ -6397,7 +6397,13 @@ status Collapsed
 \series default 
  Will not do loop invariant optimizations, this may be turned off for reasons
  explained for the previous option.
- For more details of loop optimizations performed see section Loop Invariants.
+ For more details of loop optimizations performed see Loop Invariants in
+ section 
+\begin_inset LatexCommand \ref{sub:Loop-Optimizations}
+
+\end_inset 
+
+.
  It is recommended that this option NOT be used, #pragma\SpecialChar ~
 noinvariant
 \begin_inset LatexCommand \index{\#pragma noinvariant}
@@ -6813,7 +6819,12 @@ reentrant
 \end_inset 
 
 .
- see section Parameters and Local Variables for more details.
+ See section 
+\begin_inset LatexCommand \ref{sec:Parameters-and-Local-Variables}
+
+\end_inset 
+
+ Parameters and Local Variables for more details.
  If this option is used all source files in the project should be compiled
  with this option.
  
@@ -9354,6 +9365,11 @@ Parameters
 \end_inset 
 
 
+\begin_inset LatexCommand \label{sec:Parameters-and-Local-Variables}
+
+\end_inset 
+
+
 \layout Standard
 
 Automatic (local) variables and parameters to functions can either be placed
@@ -9384,7 +9400,7 @@ They can be placed on the stack
 
 \end_inset 
 
- either by using the
+ by using the
 \emph on 
  -
 \begin_inset ERT
@@ -9403,7 +9419,17 @@ status Collapsed
 
 
 \emph default 
- option or by using the 
+ option, by using 
+\emph on 
+#pragma\SpecialChar ~
+stackauto
+\emph default 
+
+\begin_inset LatexCommand \index{\#pragma stackauto}
+
+\end_inset 
+
+ or by using the 
 \emph on 
 reentrant
 \begin_inset LatexCommand \index{reentrant}
@@ -13748,7 +13774,8 @@ save
 \end_inset 
 
  - this will save all current options to the save/restore stack.
- See restore.
+ See #pragma\SpecialChar ~
+restore.
 \layout Itemize
 
 restore
@@ -13760,118 +13787,10 @@ restore
  saves & restores can be nested.
  SDCC uses a save/restore stack: save pushes current options to the stack,
  restore pulls current options from the stack.
- See save.
-\layout Itemize
+ See #pragma\SpecialChar ~
+save.
+\newline 
 
-nogcse
-\begin_inset LatexCommand \index{\#pragma nogcse}
-
-\end_inset 
-
- - will stop global common subexpression elimination.
-\layout Itemize
-
-noinduction
-\begin_inset LatexCommand \index{\#pragma noinduction}
-
-\end_inset 
-
- - will stop loop induction optimizations.
-\layout Itemize
-
-nojtbound
-\begin_inset LatexCommand \index{\#pragma nojtbound}
-
-\end_inset 
-
- - will not generate code for boundary value checking, when switch statements
- are turned into jump-tables (dangerous).
- For more details see section 
-\begin_inset LatexCommand \ref{sub:'switch'-Statements}
-
-\end_inset 
-
-.
-\layout Itemize
-
-nooverlay
-\begin_inset LatexCommand \index{\#pragma nooverlay}
-
-\end_inset 
-
- - the compiler will not overlay the parameters and local variables of a
- function.
-\layout Itemize
-
-less_pedantic
-\begin_inset LatexCommand \index{\#pragma less\_pedantic}
-
-\end_inset 
-
- - the compiler will not warn you anymore for obvious mistakes, you'r on
- your own now ;-(
-\layout Itemize
-
-noloopreverse
-\begin_inset LatexCommand \index{\#pragma noloopreverse}
-
-\end_inset 
-
- - Will not do loop reversal optimization
-\layout Itemize
-
-exclude
-\begin_inset LatexCommand \index{\#pragma exclude}
-
-\end_inset 
-
- none | {acc[,b[,dpl[,dph]]] - The exclude pragma disables generation of
- pair of push/pop
-\begin_inset LatexCommand \index{push/pop}
-
-\end_inset 
-
- instruction in ISR function (using interrupt
-\begin_inset LatexCommand \index{interrupt}
-
-\end_inset 
-
- keyword).
- The directive should be placed immediately before the ISR function definition
- and it affects ALL ISR functions following it.
- To enable the normal register saving for ISR functions use #pragma\SpecialChar ~
-exclude\SpecialChar ~
-none
-\begin_inset LatexCommand \index{\#pragma exclude}
-
-\end_inset 
-
-.
-\layout Itemize
-
-noiv
-\begin_inset LatexCommand \index{\#pragma noiv}
-
-\end_inset 
-
- - Do not generate interrupt
-\begin_inset LatexCommand \index{interrupt}
-
-\end_inset 
-
- vector table entries for all ISR functions defined after the pragma.
- This is useful in cases where the interrupt vector table must be defined
- manually, or when there is a secondary, manually defined interrupt vector
- table (e.g.
- for the autovector feature of the Cypress EZ-USB FX2).
- More elegantly this can be achieved by obmitting the optional interrupt
- number after the interrupt keyword, see section 
-\begin_inset LatexCommand \ref{sub:Interrupt-Service-Routines}
-
-\end_inset 
-
-\SpecialChar ~
-about interrupts.
 \layout Itemize
 
 callee_saves
@@ -13918,6 +13837,177 @@ callee_saves
 \end_inset 
 
  is appended to the list of functions specified in the command line.
+\layout Itemize
+
+exclude
+\begin_inset LatexCommand \index{\#pragma exclude}
+
+\end_inset 
+
+ none | {acc[,b[,dpl[,dph]]] - The exclude pragma disables the generation
+ of pairs of push/pop
+\begin_inset LatexCommand \index{push/pop}
+
+\end_inset 
+
+ instructions in 
+\emph on 
+I
+\emph default 
+nterrupt
+\begin_inset LatexCommand \index{interrupt}
+
+\end_inset 
+
+ 
+\emph on 
+S
+\emph default 
+ervice 
+\emph on 
+R
+\emph default 
+outines.
+ The directive should be placed immediately before the ISR function definition
+ and it affects ALL ISR functions following it.
+ To enable the normal register saving for ISR functions use #pragma\SpecialChar ~
+exclude\SpecialChar ~
+none
+\begin_inset LatexCommand \index{\#pragma exclude}
+
+\end_inset 
+
+.
+ See also the related keyword _naked
+\begin_inset LatexCommand \index{\_naked}
+
+\end_inset 
+
+.
+\layout Itemize
+
+less_pedantic
+\begin_inset LatexCommand \index{\#pragma less\_pedantic}
+
+\end_inset 
+
+ - the compiler will not warn you anymore for obvious mistakes, you'r on
+ your own now ;-(
+\layout Itemize
+
+nogcse
+\begin_inset LatexCommand \index{\#pragma nogcse}
+
+\end_inset 
+
+ - will stop global common subexpression elimination.
+\layout Itemize
+
+noinduction
+\begin_inset LatexCommand \index{\#pragma noinduction}
+
+\end_inset 
+
+ - will stop loop induction optimizations.
+\layout Itemize
+
+noinvariant
+\begin_inset LatexCommand \index{\#pragma noinvariant}
+
+\end_inset 
+
+ - will not do loop invariant optimizations.
+ For more details see Loop Invariants in section
+\begin_inset LatexCommand \ref{sub:Loop-Optimizations}
+
+\end_inset 
+
+.
+\layout Itemize
+
+noiv
+\begin_inset LatexCommand \index{\#pragma noiv}
+
+\end_inset 
+
+ - Do not generate interrupt
+\begin_inset LatexCommand \index{interrupt}
+
+\end_inset 
+
+ vector table entries for all ISR functions defined after the pragma.
+ This is useful in cases where the interrupt vector table must be defined
+ manually, or when there is a secondary, manually defined interrupt vector
+ table (e.g.
+ for the autovector feature of the Cypress EZ-USB FX2).
+ More elegantly this can be achieved by obmitting the optional interrupt
+ number after the interrupt keyword, see section 
+\begin_inset LatexCommand \ref{sub:Interrupt-Service-Routines}
+
+\end_inset 
+
+\SpecialChar ~
+about interrupts.
+\layout Itemize
+
+nojtbound
+\begin_inset LatexCommand \index{\#pragma nojtbound}
+
+\end_inset 
+
+ - will not generate code for boundary value checking, when switch statements
+ are turned into jump-tables (dangerous).
+ For more details see section 
+\begin_inset LatexCommand \ref{sub:'switch'-Statements}
+
+\end_inset 
+
+.
+\layout Itemize
+
+noloopreverse
+\begin_inset LatexCommand \index{\#pragma noloopreverse}
+
+\end_inset 
+
+ - Will not do loop reversal optimization
+\layout Itemize
+
+nooverlay
+\begin_inset LatexCommand \index{\#pragma nooverlay}
+
+\end_inset 
+
+ - the compiler will not overlay the parameters and local variables of a
+ function.
+\layout Itemize
+
+stackauto
+\begin_inset LatexCommand \index{\#pragma stackauto}
+
+\end_inset 
+
+- See option -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-auto
+\begin_inset LatexCommand \index{-\/-stack-auto}
+
+\end_inset 
+
+ and section 
+\begin_inset LatexCommand \ref{sec:Parameters-and-Local-Variables}
+
+\end_inset 
+
+ Parameters and Local Variables.
 \layout Standard
 
 SDCPP supports the following #pragma directives:
@@ -14461,6 +14551,24 @@ Some MCS51 variants offer features like Double DPTR
  These are currently not used for the MCS51 port.
  If you absolutely need them you can fall back to inline assembly or submit
  a patch to SDCC.
+\layout Section
+
+DS400 port
+\layout Standard
+
+The DS80C400 microcontroller has a rich set of peripherals.
+ In its built-in ROM library it includes functions to access some of the
+ features, among them is a TCP stack with IP4 and IP6 support.
+ Library headers (currently in beta status) and other files are provided
+ at 
+\size footnotesize 
+
+\begin_inset LatexCommand \url{ftp://ftp.dalsemi.com/pub/tini/ds80c400/c_libraries/sdcc/index.html}
+
+\end_inset 
+
+.
+ 
 \layout Section
 
 The Z80 and gbz80 port
@@ -19171,10 +19279,22 @@ Loop Optimizations
 \end_inset 
 
 
+\begin_inset LatexCommand \label{sub:Loop-Optimizations}
+
+\end_inset 
+
+
 \layout Standard
 
-Two types of loop optimizations are done by SDCC loop invariant lifting
- and strength reduction of loop induction variables.
+Two types of loop optimizations are done by SDCC 
+\emph on 
+loop invariant
+\emph default 
+ lifting and
+\emph on 
+ strength reduction
+\emph default 
+ of loop induction variables.
  In addition to the strength reduction the optimizer marks the induction
  variables and the register allocator tries to keep the induction variables
  in registers for the duration of the loop.

@@ -371,7 +371,7 @@ pointerTypes (sym_link * ptr, sym_link * type)
 	  DCL_TYPE (ptr) = EEPPOINTER;
 	  break;
 	default:
-	  DCL_TYPE (ptr) = GPOINTER;
+	  DCL_TYPE (ptr) = port->unqualified_pointer;
 	  break;
 	}
       /* the storage class of type ends here */
@@ -385,7 +385,7 @@ pointerTypes (sym_link * ptr, sym_link * type)
   while (ptr)
     {
       if (!IS_SPEC (ptr) && DCL_TYPE (ptr) == UPOINTER)
-	DCL_TYPE (ptr) = GPOINTER;
+	DCL_TYPE (ptr) = port->unqualified_pointer;
       ptr = ptr->next;
     }
 
@@ -394,7 +394,7 @@ pointerTypes (sym_link * ptr, sym_link * type)
   while (type)
     {
       if (!IS_SPEC (type) && DCL_TYPE (type) == UPOINTER)
-	DCL_TYPE (type) = GPOINTER;
+	DCL_TYPE (type) = port->unqualified_pointer;
       type = type->next;
     }
 
@@ -634,6 +634,9 @@ mergeSpec (sym_link * dest, sym_link * src, char *name)
   FUNC_ISREENT(dest) |= FUNC_ISREENT(src);
   FUNC_ISNAKED(dest) |= FUNC_ISNAKED(src);
   FUNC_ISISR(dest) |= FUNC_ISISR(src);
+  FUNC_ISJAVANATIVE(dest) |= FUNC_ISJAVANATIVE(src);
+  FUNC_ISBUILTIN(dest) |= FUNC_ISBUILTIN(src);
+  FUNC_ISOVERLAY(dest) |= FUNC_ISOVERLAY(src);
   FUNC_INTNO(dest) |= FUNC_INTNO(src);
   FUNC_REGBANK(dest) |= FUNC_REGBANK(src);
 
@@ -1300,7 +1303,7 @@ changePointer (symbol * sym)
   for (p = sym->type; p; p = p->next)
     {
       if (!IS_SPEC (p) && DCL_TYPE (p) == UPOINTER)
-	DCL_TYPE (p) = GPOINTER;
+	DCL_TYPE (p) = port->unqualified_pointer;
       if (IS_PTR (p) && IS_FUNC (p->next))
 	DCL_TYPE (p) = CPOINTER;
     }
@@ -1593,14 +1596,14 @@ aggregateToPointer (value * val)
 	  } else {
 #if 1
 	    // this happens for (external) function parameters
-	    DCL_TYPE (val->type) = GPOINTER;
+	    DCL_TYPE (val->type) = port->unqualified_pointer;
 #else
 	    if (TARGET_IS_DS390) {
 	      /* The AUTO and REGISTER classes should probably
 	       * also become generic pointers, but I haven't yet
 	       * devised a test case for that.
 	       */
-	      DCL_TYPE (val->type) = GPOINTER;
+	      DCL_TYPE (val->type) = port->unqualified_pointer;
 	      break;
 	    }
 	    if (options.model==MODEL_LARGE) {
@@ -1625,7 +1628,7 @@ aggregateToPointer (value * val)
 	  DCL_TYPE (val->type) = EEPPOINTER;
 	  break;
 	default:
-	  DCL_TYPE (val->type) = GPOINTER;
+	  DCL_TYPE (val->type) = port->unqualified_pointer;
 	}
       
       /* is there is a symbol associated then */
@@ -2388,7 +2391,7 @@ sym_link *typeFromStr (char *s)
 	    SPEC_NOUN(r) = V_VOID;
 	    break;
 	case '*':
-	    DCL_TYPE(r) = GPOINTER;
+	    DCL_TYPE(r) = port->unqualified_pointer;
 	    break;
 	case 'g':
 	case 'x':
@@ -2560,5 +2563,6 @@ void initBuiltIns()
 	sym = funcOfTypeVarg(port->builtintable[i].name,port->builtintable[i].rtype,
 			     port->builtintable[i].nParms,port->builtintable[i].parm_types);
 	FUNC_ISBUILTIN(sym->type) = 1;
+	FUNC_ISREENT(sym->type) = 0;	/* can never be reentrant */
     }
 }

@@ -130,7 +130,8 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 		/* if extern then add to externs */
 		if (IS_EXTERN (sym->etype)) {
 //			if(sym->used)				// fixme
-				addSetHead(&externs, sym);
+				checkAddSym(&externs, sym);
+//				addSetHead(&externs, sym);
 			continue;
 		}
 		
@@ -154,7 +155,8 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 			!IS_STATIC (sym->etype) && !IS_FUNC(sym->type)) {
 //		  regs *reg;
 		  
-			addSetHead (&publics, sym);
+			checkAddSym(&publics, sym);
+//			addSetHead(&publics, sym);
 
 //			reg = pic16_allocRegByName(sym->name, sym->size);	//( operandFromSymbol( sym ));
 //			checkAddReg(&pic16_rel_udata, reg);
@@ -177,7 +179,8 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 		if (IS_FUNC (sym->type) && !IS_STATIC(sym->etype)) {
 			if(SPEC_OCLS(sym->etype) == code) {
 //				fprintf(stderr, "%s:%d: symbol added: %s\n", __FILE__, __LINE__, sym->rname);
-				addSetHead(&publics, sym);
+				checkAddSym(&publics, sym);
+//				addSetHead(&publics, sym);
 			}
 			continue;
 		}
@@ -550,14 +553,17 @@ pic16emitStaticSeg (memmap * map)
 
       /* if it is "extern" then do nothing */
       if (IS_EXTERN (sym->etype)) {
-	addSetHead(&externs, sym);
+	checkAddSym(&externs, sym);
+//	addSetHead(&externs, sym);
 	continue;
       }
 
       /* if it is not static add it to the public
          table */
-      if (!IS_STATIC (sym->etype))
-	addSetHead (&publics, sym);
+      if (!IS_STATIC (sym->etype)) {
+        checkAddSym(&publics, sym);
+//	addSetHead (&publics, sym);
+      }
 
 #if 0
       /* print extra debug info if required */
@@ -781,8 +787,10 @@ pic16emitOverlay (FILE * afile)
 	  /* if global variable & not static or extern
 	     and addPublics allowed then add it to the public set */
 	  if ((sym->_isparm && !IS_REGPARM (sym->etype))
-	      && !IS_STATIC (sym->etype))
-	    addSetHead (&publics, sym);
+	      && !IS_STATIC (sym->etype)) {
+	      checkAddSym(&publics, sym);
+//	    addSetHead (&publics, sym);
+	  }
 
 	  /* if extern then do nothing or is a function
 	     then do nothing */

@@ -122,6 +122,7 @@ static struct {
     short debugLine;
     short nRegsSaved;
     set *sendSet;
+    int interruptvector;
 } _G;
 
 /* Resolved ifx structure. This structure stores information
@@ -2425,24 +2426,16 @@ static void assignResultValue(operand * oper, int rescall)
 			if(size>1) {
 				/* 16-bits, result in PRODL:WREG */
 				pic16_loadFromReturn(oper, 1, pic16_popCopyReg(&pic16_pc_prodl));
-//				pic16_emitpcode(POC_MOVFF,
-//					pic16_popGet2p(pic16_popCopyReg(&pic16_pc_prodl), pic16_popGet(AOP(oper), 1)));
 			}
 			
 			if(size>2) {
 				/* 24-bits, result in PRODH:PRODL:WREG */
 				pic16_loadFromReturn(oper, 2, pic16_popCopyReg(&pic16_pc_prodh)); // patch 14
-
-//				pic16_emitpcode(POC_MOVFF,
-//					pic16_popGet2p(pic16_popCopyReg(&pic16_pc_prodh), pic16_popGet(AOP(oper), 2)));
 			}
 			
 			if(size>3) {
 				/* 32-bits, result in FSR0L:PRODH:PRODL:WREG */
 				pic16_loadFromReturn(oper, 3, pic16_popCopyReg(&pic16_pc_fsr0l)); // patch14
-
-//				pic16_emitpcode(POC_MOVFF,
-//					pic16_popGet2p(pic16_popCopyReg(&pic16_pc_fsr0l), pic16_popGet(AOP(oper), 3)));
 			}
 		} else {
 			/* >32-bits, result on stack, and FSR0 points to beginning.
@@ -3155,7 +3148,7 @@ static void genFunction (iCode *ic)
 {
   symbol *sym;
   sym_link *ftype;
-
+  
 	DEBUGpic16_emitcode ("; ***","%s  %d curr label offset=%dprevious max_key=%d ",__FUNCTION__,__LINE__,labelOffset,max_key);
 
 	labelOffset += (max_key+4);
@@ -3166,20 +3159,18 @@ static void genFunction (iCode *ic)
 	ftype = operandType(IC_LEFT(ic));
 	sym = OP_SYMBOL(IC_LEFT(ic));
 
-	if(/*!IFFUNC_ISNAKED(ftype) &&*/ IFFUNC_ISISR(ftype)) {
+	if(IFFUNC_ISISR(sym->type /*ftype*/)) {
 		/* create an absolute section at the interrupt vector:
-		 * that is 0x0008 for interrupt 1, 0x0018 interrupt 2 */
-	  int ivec;
+		 * that is 0x0008 for interrupt 1 (high), 0x0018 interrupt 2 (low) */
 	  symbol *asym;
 	  char asymname[128];
-	  
+	  pBlock *apb;
+
 		{
 		  int i, found=-1;
 
 			sym = OP_SYMBOL( IC_LEFT(ic));
 			for(i=0;i<=2;i++) {
-//				fprintf(stderr, "comparing name int %d\t%s with %s\n",
-//						i, interrupts[i]->name, sym->name);
 				if(interrupts[i]->name
 					&& !STRCASECMP(interrupts[i]->name, sym->name)) {
 					found = i;
@@ -3190,23 +3181,28 @@ static void genFunction (iCode *ic)
 			if(found == -1) {
 				fprintf(stderr, "PIC16 port: %s:%d: interrupt function but cannot locate symbol (%s)\n",
 					__FILE__, __LINE__, sym->name);
-				exit(-1);
+				assert( 0 );
 			}
-			ivec = found;
+			_G.interruptvector = found;
 		}
-		sprintf(asymname, "ivec_%d_%s", ivec, sym->name);
+
+		sprintf(asymname, "ivec_%d_%s", _G.interruptvector, sym->name);
 		asym = newSymbol(asymname, 0);
-		pic16_emitcode(";","-----------------------------------------");
-		pic16_emitcode(";"," interrupt vector %d for function %s", ivec, sym->name);
-		pic16_emitcode(";","-----------------------------------------");
 
-		pic16_addpCode2pBlock(pb, pic16_newpCodeFunction(moduleName, asym->name));
-		pic16_pBlockConvert2Absolute(pb);
+		apb = pic16_newpCodeChain(NULL, 'A', pic16_newpCodeCharP("; Starting pCode block for absolute section"));
+		pic16_addpBlock( apb );
 
-		pic16_emitpcode(POC_GOTO, pic16_popGetWithString( sym->rname ));
+		pic16_addpCode2pBlock(apb,
+			pic16_newpCodeCharP(";-----------------------------------------"));
+
+
+		pic16_addpCode2pBlock(apb, pic16_newpCodeFunction(moduleName, asym->name));
+
+		pic16_addpCode2pBlock(apb,
+			pic16_newpCode(POC_GOTO, pic16_popGetWithString( sym->rname )));
 		
 		/* mark the end of this tiny function */
-		pic16_addpCode2pBlock(pb,pic16_newpCodeFunction(NULL,NULL));
+		pic16_addpCode2pBlock(apb,pic16_newpCodeFunction(NULL,NULL));
 
 		{
 		  absSym *abSym;
@@ -3214,7 +3210,7 @@ static void genFunction (iCode *ic)
 			abSym = Safe_calloc(1, sizeof(absSym));
 			abSym->name = Safe_strdup( asymname );
 
-			switch( ivec ) {
+			switch( _G.interruptvector ) {
 				case 0: abSym->address = 0x000000; break;
 				case 1: abSym->address = 0x000008; break;
 				case 2: abSym->address = 0x000018; break;
@@ -3233,6 +3229,7 @@ static void genFunction (iCode *ic)
 	pic16_emitcode("","%s:",sym->rname);
 	pic16_addpCode2pBlock(pb,pic16_newpCodeFunction(moduleName,sym->rname));
 
+
 	{
 	  absSym *ab;
 
@@ -3241,7 +3238,7 @@ static void genFunction (iCode *ic)
 				pic16_pBlockConvert2Absolute(pb);
 				break;
 			}
-		
+
 	}
 
 
@@ -3259,15 +3256,22 @@ static void genFunction (iCode *ic)
 	if (IFFUNC_ISISR(sym->type)) {
 	  int i;
 		/* an ISR should save: WREG, STATUS, BSR, PRODL, PRODH, FSR0L, FSR0H */
-		pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_wreg ));
-		pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_status ));
-		pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_bsr ));
+		if(!(_G.interruptvector == 1)) {
+
+			/* do not save WREG,STATUS,BSR for high priority interrupts
+			 * because they are stored in the hardware shadow registers already */
+			 
+			pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_wreg ));
+			pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_status ));
+			pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_bsr ));
+		}
+
 		pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_prodl ));
 		pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_prodh ));
 		pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_fsr0l ));
 		pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_fsr0h ));
 
-                pic16_pBlockConvert2ISR(pb);
+//                pic16_pBlockConvert2ISR(pb);
                 
 		/* if any registers used */
 		if (sym->regsUsed) {
@@ -3312,14 +3316,17 @@ static void genFunction (iCode *ic)
 				DEBUGpic16_emitcode("; **", "Saving used registers in stack");
 				for ( i = 0 ; i < sym->regsUsed->size ; i++) {
 					if (bitVectBitValue(sym->regsUsed,i)) {
+
 //						fprintf(stderr, "%s:%d function %s uses register %s\n",
 //								__FILE__, __LINE__, OP_SYMBOL(IC_LEFT(ic))->name,
 //								pic16_regWithIdx(i)->name);
 
 						pic16_pushpCodeOp( pic16_popRegFromIdx(i) );
+
 //						pic16_emitpcode(POC_MOVFF, pic16_popCombine2(
 //							PCOR(pic16_popCopyReg( PCOR(pic16_popRegFromIdx(i)))),
 //							&pic16_pc_postdec1, 0));
+
 						_G.nRegsSaved++;
 					}
 				}
@@ -3449,10 +3456,20 @@ static void genEndFunction (iCode *ic)
 		pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_fsr0l));
 		pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_prodh ));
 		pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_prodl ));
-		pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_bsr ));
-		pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_status ));
-		pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_wreg ));
+
+		if(!(_G.interruptvector == 1)) {
+			/* do not restore interrupt vector for WREG,STATUS,BSR
+			 * for high priority interrupt, see genFunction */
+			 
+			pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_bsr ));
+			pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_status ));
+			pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_wreg ));
+		}
 	
+		_G.interruptvector = 0;		/* sanity check */
+
+//		pic16_pBlockConvert2ISR(pb);
+
 
 		/* if debug then send end of function */
 /* 	if (options.debug && currFunc)  */
@@ -9478,9 +9495,10 @@ static void genDataPointerSet(operand *right,
     pic16_aopOp(right,ic,FALSE);
 
     size = AOP_SIZE(right);
-	fprintf(stderr, "%s:%d size= %d\n", __FILE__, __LINE__, size);
 
-#if 1
+//	fprintf(stderr, "%s:%d size= %d\n", __FILE__, __LINE__, size);
+
+#if 0
     if ( AOP_TYPE(result) == AOP_PCODE) {
       fprintf(stderr,"genDataPointerSet   %s, %d\n",
 	      AOP(result)->aopu.pcop->name,

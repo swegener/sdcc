@@ -930,6 +930,8 @@ struct regs * pic16_getRegFromInstruction2(pCode *pc);
 
 extern void pic16_pcode_test(void);
 extern int pic16_debug_verbose;
+extern int pic16_pcode_verbose;
+
 /*-----------------------------------------------------------------*
  * pCode objects.
  *-----------------------------------------------------------------*/

@@ -625,6 +625,23 @@ int checkAddReg(set **set, regs *reg)
   return 0;
 }
 
+int checkAddSym(set **set, symbol *sym)
+{
+  symbol *tmp;
+
+	for(tmp = setFirstItem( *set ); tmp; tmp = setNextItem(*set)) {
+		if(!strcmp(tmp->name, sym->name))break;
+	}
+	
+	if(!tmp) {
+		addSet(set, sym);
+		return 1;
+	}
+
+  return 0;
+}
+
+
 /*-----------------------------------------------------------------*
  * void pic16_groupRegistersInSection - add each register to its   *
  *	corresponding section                                      *

@@ -80,6 +80,6 @@ int pic16_REGallBanks(regs *reg);
 void pic16_setMaxRAM(int size);
 
 int checkAddReg(set **set, regs *reg);
-
+int checkAddSym(set **set, symbol *reg);
 
 #endif  /* __DEVICE_H__ */

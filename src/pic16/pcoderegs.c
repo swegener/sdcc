@@ -387,7 +387,8 @@ void pic16_RemoveUnusedRegisters(void)
   */
   RemoveRegsFromSet(pic16_dynDirectBitRegs);
 
-  if(total_registers_saved) fprintf(stderr, " *** Saved %d registers ***\n", total_registers_saved);
+  if(total_registers_saved && pic16_pcode_verbose)
+  	fprintf(stderr, " *** Saved %d registers ***\n", total_registers_saved);
 }
 
 
@@ -819,7 +820,8 @@ void pic16_pCodeRegOptimizeRegUsage(int level)
     OptimizeRegUsage(pic16_dynStackRegs,level, (OPT_PASSES-passes));
     OptimizeRegUsage(pic16_dynDirectRegs,0, (OPT_PASSES-passes));
 
-    if(total_registers_saved != saved)
+    if((total_registers_saved != saved)
+    	&& (pic16_pcode_verbose))
       fprintf(stderr, " *** pass %d, Saved %d registers, total saved %d ***\n", 
 	      (1+OPT_PASSES-passes),total_registers_saved-saved,total_registers_saved);
       

@@ -3121,13 +3121,14 @@ static char getpBlock_dbName(pBlock *pb)
 }
 void pic16_pBlockConvert2ISR(pBlock *pb)
 {
-  if(!pb)
-    return;
+	if(!pb)return;
 
-  if(pb->cmemmap)
-    pb->cmemmap = NULL;
+	if(pb->cmemmap)pb->cmemmap = NULL;
 
-  pb->dbName = 'I';
+	pb->dbName = 'I';
+
+	if(pic16_pcode_verbose)
+		fprintf(stderr, "%s:%d converting to 'I'interrupt pBlock\n", __FILE__, __LINE__);
 }
 
 void pic16_pBlockConvert2Absolute(pBlock *pb)
@@ -3136,6 +3137,9 @@ void pic16_pBlockConvert2Absolute(pBlock *pb)
 	if(pb->cmemmap)pb->cmemmap = NULL;
 	
 	pb->dbName = 'A';
+	
+	if(pic16_pcode_verbose)
+		fprintf(stderr, "%s:%d converting to 'A'bsolute pBlock\n", __FILE__, __LINE__);
 }
   
 /*-----------------------------------------------------------------*/
@@ -4179,27 +4183,17 @@ void pic16_printpBlock(FILE *of, pBlock *pb)
 
 	if(!of)of=stderr;
 
-#if 0
-	if(pb->dbName == 'A') {
-	  absSym *ab;
-
-		PCF(pb->pcHead)->
-		for(ab=setFirstItem(absSymSet); ab; ab=setNextItem(absSymSet))
-			if(strcmp(ab->name, 
-//		fprintf(of, "%s\tcode\t%d"
-	}
-#endif
-
 	for(pc = pb->pcHead; pc; pc = pc->next) {
 		if(isPCF(pc) && PCF(pc)->fname) {
 			fprintf(of, "S_%s_%s\tcode", PCF(pc)->modname, PCF(pc)->fname);
 			if(pb->dbName == 'A') {
 			  absSym *ab;
-				for(ab=setFirstItem(absSymSet); ab; ab=setNextItem(absSymSet))
+				for(ab=setFirstItem(absSymSet); ab; ab=setNextItem(absSymSet)) {
 					if(!strcmp(ab->name, PCF(pc)->fname)) {
-						fprintf(of, "\t0X%06X", ab->address);
+						fprintf(of, "\t0X%06X\n", ab->address);
 						break;
 					}
+				}
 			}
 			fprintf(of, "\n");
 		}

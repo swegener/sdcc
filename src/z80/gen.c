@@ -235,7 +235,7 @@ void
 emitcode (const char *inst, const char *fmt,...)
 {
   va_list ap;
-  char lb[MAX_INLINEASM];
+  char lb[INITIAL_INLINEASM];
   char *lbp = lb;
 
   va_start (ap, fmt);
@@ -4082,11 +4082,11 @@ release:
 static void
 genInline (iCode * ic)
 {
-  char buffer[MAX_INLINEASM];
-  char *bp = buffer;
-  char *bp1 = buffer;
+  char *buffer, *bp, *bp1;
 
   inLine += (!options.asmpeep);
+
+  buffer = bp = bp1 = Safe_calloc(1, strlen(IC_INLINE(ic)+1));
   strcpy (buffer, IC_INLINE (ic));
 
   /* emit each line as a code */

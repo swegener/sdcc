@@ -710,7 +710,7 @@ static void aopOp (operand *op, iCode *ic, bool result, bool useDP2)
             return;  
 	}
 
-        if (sym->ruonly ) {
+        if (sym->ruonly) {
             int i;
             
             if (useDP2)
@@ -724,7 +724,7 @@ static void aopOp (operand *op, iCode *ic, bool result, bool useDP2)
             aop = op->aop = sym->aop = newAsmop(AOP_STR);
             aop->size = getSize(sym->type);
             for ( i = 0 ; i < fReturnSize_390 ; i++ )
-                aop->aopu.aop_str[i] = fReturn[i];
+	      aop->aopu.aop_str[i] = fReturn[i];
             return;
         }
 
@@ -7014,13 +7014,29 @@ static void emitcodePointerGet (operand *left,
     if (AOP_TYPE(left) != AOP_STR) {
         /* if this is remateriazable */
         if (AOP_TYPE(left) == AOP_IMMD)
+        {
             emitcode("mov","dptr,%s",aopGet(AOP(left),0,TRUE,FALSE,FALSE));
-        else { /* we need to get it byte by byte */
+        }
+        else
+        { /* we need to get it byte by byte */
             _startLazyDPSEvaluation();
-            emitcode("mov","dpl,%s",aopGet(AOP(left),0,FALSE,FALSE,TRUE));
-            emitcode("mov","dph,%s",aopGet(AOP(left),1,FALSE,FALSE,TRUE));
-            emitcode("mov","dpx,%s",aopGet(AOP(left),2,FALSE,FALSE,TRUE));
-            _endLazyDPSEvaluation();
+            if (AOP_TYPE(left) != AOP_DPTR)
+            {
+            	emitcode("mov","dpl,%s",aopGet(AOP(left),0,FALSE,FALSE,TRUE));
+            	emitcode("mov","dph,%s",aopGet(AOP(left),1,FALSE,FALSE,TRUE));
+               	emitcode("mov","dpx,%s",aopGet(AOP(left),2,FALSE,FALSE,TRUE));
+            }
+            else
+            {
+                 /* We need to generate a load to DPTR indirect through DPTR. */
+                 D(emitcode(";", "gencodePointerGet -- indirection special case."););
+                 emitcode("push", "%s", aopGet(AOP(left),0,FALSE,TRUE,TRUE));
+                 emitcode("push", "%s", aopGet(AOP(left),1,FALSE,TRUE,TRUE));
+                 emitcode("mov", "dpx,%s",aopGet(AOP(left),2,FALSE,FALSE,TRUE));
+                 emitcode("pop", "dph");
+                 emitcode("pop", "dpl");
+            }	   
+            _endLazyDPSEvaluation();	    
         }
     }
     /* so dptr know contains the address */
@@ -7076,15 +7092,8 @@ static void genGenPointerGet (operand *left,
             _startLazyDPSEvaluation();
             emitcode("mov","dpl,%s",aopGet(AOP(left),0,FALSE,FALSE,TRUE));
             emitcode("mov","dph,%s",aopGet(AOP(left),1,FALSE,FALSE,TRUE));
-            if (options.model == MODEL_FLAT24)
-            {
-               emitcode("mov", "dpx,%s",aopGet(AOP(left),2,FALSE,FALSE,TRUE));
-               emitcode("mov","b,%s",aopGet(AOP(left),3,FALSE,FALSE,TRUE));
-            }
-            else
-            {
-            	emitcode("mov","b,%s",aopGet(AOP(left),2,FALSE,FALSE,TRUE));
-            }
+            emitcode("mov","dpx,%s",aopGet(AOP(left),2,FALSE,FALSE,TRUE));
+            emitcode("mov","b,%s",aopGet(AOP(left),3,FALSE,FALSE,TRUE));
             _endLazyDPSEvaluation();
         }
     }
@@ -7544,7 +7553,7 @@ static void genFarPointerSet (operand *right,
 	    {
             	emitcode("mov","dpl,%s",aopGet(AOP(result),0,FALSE,FALSE,TRUE));
             	emitcode("mov","dph,%s",aopGet(AOP(result),1,FALSE,FALSE,TRUE));
-               	emitcode("mov", "dpx,%s",aopGet(AOP(result),2,FALSE,FALSE,TRUE));
+               	emitcode("mov","dpx,%s",aopGet(AOP(result),2,FALSE,FALSE,TRUE));
             }
             else
             {

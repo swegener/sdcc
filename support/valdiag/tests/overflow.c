@@ -34,7 +34,7 @@ void foo(void)
 #ifdef TEST2
 void foo(void)
 {
-  i = 1  >> 40;		/* WARNING(GCC)  */
+  i = 1  >> 40;		/* WARNING       */
 
   i = uc >>  7;
   i = 1  >>  7;

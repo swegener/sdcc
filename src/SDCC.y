@@ -85,7 +85,7 @@ value *cenum = NULL  ;  /* current enumeration  type chain*/
 %token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID BIT
 %token STRUCT UNION ENUM ELIPSIS RANGE FAR
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
-%token NAKED
+%token NAKED JAVANATIVE OVERLAY
 %token <yyinline> INLINEASM
 %token IFX ADDRESS_OF GET_VALUE_AT_ADDRESS SPIL UNSPIL GETHBIT
 %token BITWISEAND UNARYMINUS IPUSH IPOP PCALL  ENDFUNCTION JUMPTABLE
@@ -191,6 +191,14 @@ function_attributes
    |  NAKED          {  $$ = newLink ();
                         $$->class = SPECIFIER   ;
 			FUNC_ISNAKED($$)=1;
+                     }
+   |  JAVANATIVE     {  $$ = newLink ();
+                        $$->class = SPECIFIER   ;
+			FUNC_ISJAVANATIVE($$)=1;
+                     }
+   |  OVERLAY        {  $$ = newLink ();
+                        $$->class = SPECIFIER   ;
+			FUNC_ISOVERLAY($$)=1;
                      }
    |  NONBANKED      {$$ = newLink ();
                         $$->class = SPECIFIER   ;
@@ -976,7 +984,7 @@ pointer
          {
 	     $$ = $1 ;		
 	     $$->next = $2 ;
-	     DCL_TYPE($2)=GPOINTER;
+	     DCL_TYPE($2)=port->unqualified_pointer;
 	 }
    | unqualified_pointer type_specifier_list pointer
          {

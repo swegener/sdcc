@@ -1,3 +1,22 @@
+2002-03-02  Sandeep Dutta  <sandeep@ddi.com>
+
+	* src/ds390/peeph.def:
+	Added some more peephole rules
+
+	* src/ds390/gen.c: Various fixes & enhancements
+
+	* src/SDCClrange.c, src/SDCClrange.h:
+	functions "alldefsoutofrange" and "notusedinblock" moved to SDCClrange.c
+
+	* src/ds390/ralloc.c:
+	various fixes & enhancements (ds390) specific
+
+	* src/avr/ralloc.c, src/mcs51/ralloc.c, src/pic/ralloc.c, src/xa51/ralloc.c, src/z80/ralloc.c:
+	Functions "allDefsOutOfRange" & "notUsedinBlock" moved to SDCClrange.c
+	from rallocs.
+
+	* sdcc/src/SDCCcse.c: Better fix for bug # 514308
+
 2002-03-02    <johan@FRIJA>
 
 	* src/SDCCast.c (decorateType): fixed bug #524708

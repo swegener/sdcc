@@ -590,8 +590,7 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool useDP2)
   if (IS_FUNC (sym->type))
     {
       sym->aop = aop = newAsmop (AOP_IMMD);
-      aop->aopu.aop_immd.aop_immd1 = Safe_calloc (1, strlen (sym->rname) + 1);
-      strcpy (aop->aopu.aop_immd.aop_immd1, sym->rname);
+      aop->aopu.aop_immd.aop_immd1 = Safe_strdup(sym->rname);	
       aop->size = FPTRSIZE;
       return aop;
     }
@@ -652,24 +651,32 @@ aopForRemat (symbol * sym)
     }
 
   if (val)
-    sprintf (buffer, "(%s %c 0x%04x)",
-	     OP_SYMBOL (IC_LEFT (ic))->rname,
-	     val >= 0 ? '+' : '-',
-	     abs (val) & 0xffff);
-  else {
+  {
+      SNPRINTF (buffer, sizeof(buffer),
+		"(%s %c 0x%04x)",
+		OP_SYMBOL (IC_LEFT (ic))->rname,
+		val >= 0 ? '+' : '-',
+		abs (val) & 0xffff);
+  }
+  else 
+  {
       if (IS_ASSIGN_ICODE(ic) && isOperandLiteral(IC_RIGHT(ic)))
-	  sprintf(buffer,"0x%x",(int) operandLitValue (IC_RIGHT (ic)));
+      {
+	  SNPRINTF(buffer, sizeof(buffer), 
+		   "0x%x",(int) operandLitValue (IC_RIGHT (ic)));
+      }
       else
-	  strcpy (buffer, OP_SYMBOL (IC_LEFT (ic))->rname);
+      {
+	  strncpyz (buffer, OP_SYMBOL (IC_LEFT (ic))->rname, sizeof(buffer));
+      }
   }
 
-  aop->aopu.aop_immd.aop_immd1 = Safe_calloc (1, strlen (buffer) + 1);
-  strcpy (aop->aopu.aop_immd.aop_immd1, buffer);
+  aop->aopu.aop_immd.aop_immd1 = Safe_strdup(buffer);  
   /* set immd2 field if required */
   if (aop->aopu.aop_immd.from_cast_remat) 
   {
       tsprintf(buffer, sizeof(buffer), "#!constbyte",ptr_type);
-      aop->aopu.aop_immd.aop_immd2 = Safe_strdup(buffer);  
+      aop->aopu.aop_immd.aop_immd2 = Safe_strdup(buffer);
   }
 
   return aop;
@@ -1080,9 +1087,6 @@ aopGet (asmop * aop,
 	bool dname,
 	bool canClobberACC)
 {
-  //char *s = buffer;
-  //char *rs;
-
   /* offset is greater than
      size then zero */
   if (offset > (aop->size - 1) &&
@@ -1267,8 +1271,6 @@ aopGet (asmop * aop,
 static void
 aopPut (asmop * aop, char *s, int offset)
 {
-  char *d = buffer;
-
   if (aop->size && offset > (aop->size - 1))
     {
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
@@ -1281,15 +1283,23 @@ aopPut (asmop * aop, char *s, int offset)
   switch (aop->type)
     {
     case AOP_DIR:
-      if (offset)
-	sprintf (d, "(%s + %d)",
-		 aop->aopu.aop_dir, offset);
-      else
-	sprintf (d, "%s", aop->aopu.aop_dir);
+        if (offset)
+	{
+	    SNPRINTF (buffer, sizeof(buffer),
+		      "(%s + %d)",
+		      aop->aopu.aop_dir, offset);
+	}
+	else
+	{
+	    SNPRINTF (buffer, sizeof(buffer), 
+		     "%s", aop->aopu.aop_dir);
+	}
+	
 
-      if (strcmp (d, s))
-	emitcode ("mov", "%s,%s", d, s);
-
+	if (strcmp (buffer, s))
+	{
+	    emitcode ("mov", "%s,%s", buffer, s);
+	}
       break;
 
     case AOP_REG:
@@ -1305,11 +1315,15 @@ aopPut (asmop * aop, char *s, int offset)
 	      strcmp (s, "r5") == 0 ||
 	      strcmp (s, "r6") == 0 ||
 	      strcmp (s, "r7") == 0)
-	    emitcode ("mov", "%s,%s",
-		      aop->aopu.aop_reg[offset]->dname, s);
-	  else
-	    emitcode ("mov", "%s,%s",
-		      aop->aopu.aop_reg[offset]->name, s);
+	    {
+		emitcode ("mov", "%s,%s",
+			  aop->aopu.aop_reg[offset]->dname, s);
+	    }
+	    else
+	    {
+		emitcode ("mov", "%s,%s",
+			  aop->aopu.aop_reg[offset]->name, s);
+	    }
 	}
       break;
 
@@ -1392,14 +1406,16 @@ aopPut (asmop * aop, char *s, int offset)
 	       strcmp (s, "r6") == 0 ||
 	       strcmp (s, "r7") == 0)
 	{
-	  char buffer[10];
-	  sprintf (buffer, "a%s", s);
+	  char buff[10];
+	  SNPRINTF(buff, sizeof(buff), 
+		   "a%s", s);
 	  emitcode ("mov", "@%s,%s",
-		    aop->aopu.aop_ptr->name, buffer);
+		    aop->aopu.aop_ptr->name, buff);
 	}
-      else
-	emitcode ("mov", "@%s,%s", aop->aopu.aop_ptr->name, s);
-
+	else
+	{
+	    emitcode ("mov", "@%s,%s", aop->aopu.aop_ptr->name, s);
+	}
       break;
 
     case AOP_STK:
@@ -1522,7 +1538,12 @@ reAdjustPreg (asmop * aop)
                       (x->aopu.aop_reg[0] == ds390_regWithIdx(R0_IDX) || \
                       x->aopu.aop_reg[0] == ds390_regWithIdx(R1_IDX) )))
 #define AOP_INDPTRn(x) (AOP_TYPE(x) == AOP_DPTRn)
-#define AOP_USESDPTR(x) (AOP_TYPE(x) == AOP_DPTR || AOP_TYPE(x) == AOP_STR)
+#define AOP_USESDPTR(x) ((AOP_TYPE(x) == AOP_DPTR) || (AOP_TYPE(x) == AOP_STR))
+#define AOP_USESDPTR2(x) ((AOP_TYPE(x) == AOP_DPTR2) || (AOP_TYPE(x) == AOP_DPTRn))
+
+// The following two macros can be used even if the aop has not yet been aopOp'd.
+#define AOP_IS_STR(x) (IS_SYMOP(x) && OP_SYMBOL(x)->ruonly)
+#define AOP_IS_DPTRn(x) (IS_SYMOP(x) && OP_SYMBOL(x)->dptr)
 
 /* Workaround for DS80C390 bug: div ab may return bogus results
  * if A is accessed in instruction immediately before the div.
@@ -1690,8 +1711,7 @@ toBoolean (operand * oper)
    */
   if (opIsGptr (oper))
     {
-      D (emitcode (";", "toBoolean: generic ptr special case.");
-	);
+      D (emitcode (";", "toBoolean: generic ptr special case."););
       size--;
     }
 
@@ -1832,27 +1852,26 @@ static void
 genUminusFloat (operand * op, operand * result)
 {
   int size, offset = 0;
-  char *l;
-  /* for this we just need to flip the
-     first it then copy the rest in place */
-  D (emitcode (";", "genUminusFloat");
-    );
-
+    
+  D(emitcode (";", "genUminusFloat"););
+  
+  /* for this we just copy and then flip the bit */
+    
   _startLazyDPSEvaluation ();
   size = AOP_SIZE (op) - 1;
-  l = aopGet (AOP (op), 3, FALSE, FALSE, TRUE);
-  MOVA (l);
-
-  emitcode ("cpl", "acc.7");
-  aopPut (AOP (result), "a", 3);
 
   while (size--)
-    {
+  {
       aopPut (AOP (result),
 	      aopGet (AOP (op), offset, FALSE, FALSE, FALSE),
 	      offset);
       offset++;
     }
+  
+  MOVA(aopGet (AOP (op), offset, FALSE, FALSE, TRUE));
+
+  emitcode ("cpl", "acc.7");
+  aopPut (AOP (result), "a", offset);    
   _endLazyDPSEvaluation ();
 }
 
@@ -2409,7 +2428,7 @@ static void genSend(set *sendSet)
 	    _startLazyDPSEvaluation ();
 	    if (size>1) {
 		aopOp (IC_LEFT (sic), sic, FALSE, 
-		       (IS_SYMOP(IC_LEFT(sic)) && OP_SYMBOL(IC_LEFT(sic))->ruonly ? FALSE : TRUE));
+		       (AOP_IS_STR(IC_LEFT(sic)) ? FALSE : TRUE));
 	    } else {
 		aopOp (IC_LEFT (sic), sic, FALSE, FALSE);
 	    }
@@ -3297,7 +3316,7 @@ static void genJavaNativeRet(iCode *ic)
     int i, size;
 
     aopOp (IC_LEFT (ic), ic, FALSE, 
-	   (IS_SYMOP(IC_LEFT(ic)) && OP_SYMBOL(IC_LEFT(ic))->ruonly ? FALSE :TRUE));
+	   AOP_IS_STR(IC_LEFT(ic)) ? FALSE :TRUE);
     size = AOP_SIZE (IC_LEFT (ic));
 
     assert (size <= 4);
@@ -3345,7 +3364,7 @@ genRet (iCode * ic)
   /* we have something to return then
      move the return value into place */
   aopOp (IC_LEFT (ic), ic, FALSE, 
-	 (IS_SYMOP(IC_LEFT(ic)) && OP_SYMBOL(IC_LEFT(ic))->ruonly ? FALSE :TRUE));
+	 (AOP_IS_STR(IC_LEFT(ic)) ? FALSE :TRUE));
   size = AOP_SIZE (IC_LEFT (ic));
 
   _startLazyDPSEvaluation ();
@@ -3702,49 +3721,12 @@ adjustArithmeticResult (iCode * ic)
       !sameRegs (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic))) &&
       !sameRegs (AOP (IC_RESULT (ic)), AOP (IC_RIGHT (ic))))
     {
-      char buffer[5];
-      sprintf (buffer, "#%d", pointerCode (getSpec (operandType (IC_LEFT (ic)))));
-      aopPut (AOP (IC_RESULT (ic)), buffer, GPTRSIZE - 1);
+      char buff[5];
+      SNPRINTF (buff, sizeof(buff), 
+		"#%d", pointerCode (getSpec (operandType (IC_LEFT (ic)))));
+      aopPut (AOP (IC_RESULT (ic)), buff, GPTRSIZE - 1);
     }
 }
-
-#ifdef KEVIN_SCREWED_UP
-// Macro to aopOp all three operands of an ic. If this cannot be done, 
-// the IC_LEFT and IC_RIGHT operands will be aopOp'd, and the rc parameter
-// will be set TRUE. The caller must then handle the case specially, noting
-// that the IC_RESULT operand is not aopOp'd.
-#define AOP_OP_3_NOFATAL(ic, rc) \
-    aopOp (IC_RIGHT(ic),ic,FALSE, FALSE); \
-    aopOp (IC_LEFT(ic),ic,FALSE, (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR) || \
-                                  ((OP_SYMBOL(IC_RESULT(ic))->ruonly) && !isOperandEqual(IC_LEFT(ic),IC_RESULT(ic)))); \
-    if (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR2 && \
-        (isOperandInFarSpace(IC_RESULT(ic)) || (OP_SYMBOL(IC_RESULT(ic))->ruonly && !isOperandEqual(IC_LEFT(ic),IC_RESULT(ic))))) \
-    { \
-       /* No can do; DPTR & DPTR2 in use, and we need another. */ \
-       rc = TRUE; \
-    }  \
-    else \
-    { \
-       aopOp (IC_RESULT(ic),ic,TRUE, (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR) || \
-                                     (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR)); \
-       rc = FALSE; \
-       if (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR2 && \
-           AOP_TYPE(IC_RESULT(ic)) == AOP_DPTR2) \
-       { \
-            /* werror(E_INTERNAL_ERROR,__FILE__,__LINE__, */ \
-            fprintf(stderr,                                  \
-                    "Ack: got unexpected DP2! (%s:%d %s:%d)\n", __FILE__, __LINE__, ic->filename, ic->lineno);   \
-       } \
-    }
-
-// aopOp the left & right operands of an ic.
-#define AOP_OP_2(ic) \
-    aopOp (IC_RIGHT(ic),ic,FALSE, FALSE); \
-    aopOp (IC_LEFT(ic),ic,FALSE, (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR));
-
-#else // Kevin didn't screw up...
-
-#define AOP_IS_STR(x) (IS_SYMOP(x) && OP_SYMBOL(x)->ruonly)
 
 // The guts of AOP_OP_3_NOFATAL. Generates the left & right opcodes of an IC,
 // generates the result if possible. If result is generated, returns TRUE; otherwise
@@ -3752,6 +3734,7 @@ adjustArithmeticResult (iCode * ic)
 bool aopOp3(iCode * ic)
 {
     bool dp1InUse, dp2InUse;
+    bool useDp2;
     
     // First, generate the right opcode. DPTR may be used if neither left nor result are
     // of type AOP_STR.
@@ -3761,30 +3744,67 @@ bool aopOp3(iCode * ic)
 //	       AOP_IS_STR(IC_RIGHT(ic)) ? "true" : "false",
 //	       AOP_IS_STR(IC_RESULT(ic)) ? "true" : "false");
 //      );
+//    D(emitcode(";", "aopOp3: AOP_IS_DPTRn left: %s right: %s result: %s",
+//	       AOP_IS_DPTRn(IC_LEFT(ic)) ? "true" : "false",
+//	       AOP_IS_DPTRn(IC_RIGHT(ic)) ? "true" : "false",
+//	       AOP_IS_DPTRn(IC_RESULT(ic)) ? "true" : "false");
+//      );      
+
     
+    // Right uses DPTR unless left or result is an AOP_STR.
     aopOp (IC_RIGHT(ic),ic,FALSE, AOP_IS_STR(IC_LEFT(ic)) || AOP_IS_STR(IC_RESULT(ic)));
     
-    // Now, the left opcode. This can use DPTR if the right didn't AND the result is not
-    // AOP_STR (however, if the result is the same operand as the left, then DPTR may be used).
-    aopOp (IC_LEFT(ic),ic,FALSE, AOP_USESDPTR(IC_RIGHT(ic)) ||
-                                  (AOP_IS_STR(IC_RESULT(ic)) && !isOperandEqual(IC_LEFT(ic),IC_RESULT(ic))));
-    
-    // We've op'd the left. So, if left & result are the same operand, we know aopOp
-    // will succeed, and we can just do it & bail.
-    if (isOperandEqual(IC_LEFT(ic),IC_RESULT(ic)))
+    // if the right used DPTR, left MUST use DPTR2.
+    // if the right used DPTR2, left MUST use DPTR.
+    // if both are still available, we prefer to use DPTR. But if result is an AOP_STR
+    // and left is not an AOP_STR, then we will get better code if we use DP2 for left,
+    // enabling us to assign DPTR to result.
+     
+    if (AOP_USESDPTR(IC_RIGHT(ic)))
     {
-//	D(emitcode(";", "aopOp3: left & result equal"););
+	useDp2 = TRUE;
+    }
+    else if (AOP_USESDPTR2(IC_RIGHT(ic)))
+    {
+	useDp2 = FALSE;
+    }
+    else
+    {
+	if (AOP_IS_STR(IC_RESULT(ic)) && !AOP_IS_STR(IC_LEFT(ic)))
+	{
+	    useDp2 = TRUE;
+	}
+	else
+	{
+	    useDp2 = FALSE;
+	}
+    }
+
+    aopOp(IC_LEFT(ic), ic, FALSE, useDp2);
+    
+    // We've op'd the left & right. So, if left or right are the same operand as result, 
+    // we know aopOp will succeed, and we can just do it & bail.
+    if (isOperandEqual(IC_LEFT(ic),IC_RESULT(ic)) ||
+	isOperandEqual(IC_RIGHT(ic),IC_RESULT(ic)))
+    {
+//	D(emitcode(";", "aopOp3: (left | right) & result equal"););
 	aopOp(IC_RESULT(ic),ic,TRUE, FALSE);
 	return TRUE;
     }
     
     // Note which dptrs are currently in use.
-    dp1InUse = (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR) || (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR) ||
-	        AOP_IS_STR(IC_RIGHT(ic)) || AOP_IS_STR(IC_LEFT(ic));
-    dp2InUse = (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR2) || (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR2);
+    dp1InUse = AOP_USESDPTR(IC_LEFT(ic)) || AOP_USESDPTR(IC_RIGHT(ic));
+    dp2InUse = AOP_USESDPTR2(IC_LEFT(ic)) || AOP_USESDPTR2(IC_RIGHT(ic));
     
-    // OK, now if either left or right uses DPTR and the result is an AOP_STR, we cannot generate it.
+    // OK, now if either left or right uses DPTR and the result is an AOP_STR, we cannot 
+    // generate it.
     if (dp1InUse && AOP_IS_STR(IC_RESULT(ic)))
+    {
+	return FALSE;
+    }
+    
+    // Likewise, if left or right uses DPTR2 and the result is a DPTRn, we cannot generate it.
+    if (dp2InUse && AOP_IS_DPTRn(IC_RESULT(ic)))
     {
 	return FALSE;
     }
@@ -3797,15 +3817,23 @@ bool aopOp3(iCode * ic)
 
     aopOp (IC_RESULT(ic),ic,TRUE, dp1InUse);
 
-    // SOme sanity checking...
-    if (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR2 &&
-	AOP_TYPE(IC_RESULT(ic)) == AOP_DPTR2)
+    // Some sanity checking...
+    if (dp1InUse && AOP_USESDPTR(IC_RESULT(ic)))
     {
 	fprintf(stderr,
-		"Ack: got unexpected DP2! (%s:%d %s:%d)\n",
+		"Internal error: got unexpected DPTR (%s:%d %s:%d)\n",
 		__FILE__, __LINE__, ic->filename, ic->lineno);  
+	emitcode(";", ">>> unexpected DPTR here.");
     }
-	
+    
+    if (dp2InUse && AOP_USESDPTR2(IC_RESULT(ic)))
+    {
+	fprintf(stderr,
+		"Internal error: got unexpected DPTR2 (%s:%d %s:%d)\n",
+		__FILE__, __LINE__, ic->filename, ic->lineno);  
+	emitcode(";", ">>> unexpected DPTR2 here.");
+    }    
+    
     return TRUE;
 }
 
@@ -3821,8 +3849,6 @@ bool aopOp3(iCode * ic)
 #define AOP_OP_2(ic) \
     aopOp (IC_RIGHT(ic),ic,FALSE, AOP_IS_STR(IC_LEFT(ic))); \
     aopOp (IC_LEFT(ic),ic,FALSE, AOP_USESDPTR(IC_RIGHT(ic)));
-
-#endif
 
 // convienience macro.
 #define AOP_SET_LOCALS(ic) \
@@ -3874,7 +3900,7 @@ genPlus (iCode * ic)
   D (emitcode (";", "genPlus "););
 
   /* special cases :- */
-  if ( IS_SYMOP(IC_LEFT(ic)) && OP_SYMBOL(IC_LEFT(ic))->ruonly &&
+  if ( AOP_IS_STR(IC_LEFT(ic)) &&
       isOperandLiteral(IC_RIGHT(ic)) && OP_SYMBOL(IC_RESULT(ic))->ruonly) {
       aopOp (IC_RIGHT (ic), ic, TRUE, FALSE);
       size = floatFromVal (AOP (IC_RIGHT(ic))->aopu.aop_lit);
@@ -3903,6 +3929,7 @@ genPlus (iCode * ic)
   }
 		
   AOP_OP_3_NOFATAL (ic, pushResult);
+    
   if (pushResult)
     {
       D (emitcode (";", "genPlus: must push result: 3 ops in far space"););
@@ -4256,26 +4283,17 @@ genMinusBits (iCode * ic)
 static void
 genMinus (iCode * ic)
 {
-  int size, offset = 0;
-  int rSize;
-  unsigned long lit = 0L;
-  bool pushResult = FALSE;
+    int size, offset = 0;
+    int rSize;
+    unsigned long lit = 0L;
+    bool pushResult = FALSE;
 
-  D (emitcode (";", "genMinus "););
+    D (emitcode (";", "genMinus "););
 
-  aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
-  aopOp (IC_RIGHT (ic), ic, FALSE, 
-	 (AOP_INDPTRn(IC_LEFT(ic)) ? FALSE : (AOP_USESDPTR(IC_LEFT(ic)) ? TRUE : FALSE)));
-  if ((AOP_TYPE (IC_LEFT (ic)) == AOP_DPTR) &&
-      ((AOP_TYPE (IC_RIGHT (ic)) == AOP_DPTR2)
-       || OP_SYMBOL(IC_RESULT(ic))->ruonly))
+    AOP_OP_3_NOFATAL(ic, pushResult);	
+
+    if (!pushResult)
     {
-      pushResult = TRUE;
-    }
-  else
-    {
-      aopOp (IC_RESULT (ic), ic, TRUE, AOP_TYPE (IC_LEFT (ic)) == AOP_DPTR);
-
       /* special cases :- */
       /* if both left & right are in bit space */
       if (AOP_TYPE (IC_LEFT (ic)) == AOP_CRY &&
@@ -4308,18 +4326,19 @@ genMinus (iCode * ic)
   /* if literal, add a,#-lit, else normal subb */
   _startLazyDPSEvaluation ();
   while (size--) {
-      MOVA (aopGet (AOP (IC_LEFT (ic)), offset, FALSE, FALSE, TRUE));
       if (AOP_TYPE (IC_RIGHT (ic)) != AOP_LIT) {
 	  if (AOP_USESDPTR(IC_RIGHT(ic))) {
-	      emitcode ("mov","b,a");
-	      MOVA(aopGet (AOP (IC_RIGHT (ic)), offset, FALSE, FALSE, FALSE));
-	      emitcode ("xch","a,b");
+	      emitcode ("mov","b,%s",
+			aopGet (AOP (IC_RIGHT (ic)), offset, FALSE, FALSE, TRUE));
+	      MOVA(aopGet (AOP (IC_LEFT (ic)), offset, FALSE, FALSE, TRUE));
 	      emitcode ("subb","a,b");
 	  } else {
+	      MOVA (aopGet (AOP (IC_LEFT (ic)), offset, FALSE, FALSE, TRUE));
 	      emitcode ("subb", "a,%s",
 			aopGet (AOP (IC_RIGHT (ic)), offset, FALSE, FALSE, FALSE));
 	  }
       } else {
+	  MOVA (aopGet (AOP (IC_LEFT (ic)), offset, FALSE, FALSE, TRUE));
 	  /* first add without previous c */
 	  if (!offset) {
 	      if (!size && lit==-1) {
@@ -5249,8 +5268,7 @@ genIfxJump (iCode * ic, char *jval)
   symbol *tlbl = newiTempLabel (NULL);
   char *inst;
 
-  D (emitcode (";", "genIfxJump ");
-    );
+  D (emitcode (";", "genIfxJump"););
 
   /* if true label then we jump if condition
      supplied is true */
@@ -6064,7 +6082,7 @@ genAnd (iCode * ic, iCode * ifx)
   int size, offset = 0;
   unsigned long lit = 0L;
   int bytelit = 0;
-  char buffer[10];
+  char buff[10];
   bool pushResult;
 
   D (emitcode (";", "genAnd "););
@@ -6197,8 +6215,9 @@ genAnd (iCode * ic, iCode * ifx)
 	    {
 	      if (ifx)
 		{
-		  sprintf (buffer, "acc.%d", posbit & 0x07);
-		  genIfxJump (ifx, buffer);
+		  SNPRINTF (buff, sizeof(buff), 
+			    "acc.%d", posbit & 0x07);
+		  genIfxJump (ifx, buff);
 		}
 	      else 
 		  {
@@ -6520,7 +6539,7 @@ genOr (iCode * ic, iCode * ifx)
 	outBitC (result);
       // if(bit | ...)
       else if ((AOP_TYPE (result) == AOP_CRY) && ifx)
-	genIfxJump (ifx, "c");
+	   genIfxJump (ifx, "c");
       goto release;
     }
 
@@ -7006,13 +7025,13 @@ genInline (iCode * ic)
 {
   char *buffer, *bp, *bp1;
 
-  D (emitcode (";", "genInline ");
-    );
+  D (emitcode (";", "genInline "); );
 
   _G.inLine += (!options.asmpeep);
 
-  buffer = bp = bp1 = Safe_calloc(1, strlen(IC_INLINE(ic))+1);
-  strcpy (buffer, IC_INLINE (ic));
+  buffer = Safe_strdup(IC_INLINE(ic));
+  bp = buffer;
+  bp1 = buffer;
 
   /* emit each line as a code */
   while (*bp)
@@ -8995,7 +9014,7 @@ genDataPointerGet (operand * left,
 		   iCode * ic)
 {
   char *l;
-  char buffer[256];
+  char buff[256];
   int size, offset = 0;
   aopOp (result, ic, TRUE, FALSE);
 
@@ -9005,11 +9024,17 @@ genDataPointerGet (operand * left,
   _startLazyDPSEvaluation ();
   while (size--)
     {
-      if (offset)
-	sprintf (buffer, "(%s + %d)", l + 1, offset);
-      else
-	sprintf (buffer, "%s", l + 1);
-      aopPut (AOP (result), buffer, offset++);
+	if (offset)
+	{
+	    SNPRINTF (buff, sizeof(buff), 
+		      "(%s + %d)", l + 1, offset);
+	}
+	else
+	{
+	    SNPRINTF (buff, sizeof(buff), 
+		      "%s", l + 1);
+	}
+      aopPut (AOP (result), buff, offset++);
     }
   _endLazyDPSEvaluation ();
 
@@ -9031,7 +9056,7 @@ genNearPointerGet (operand * left,
   char *rname;
   sym_link *rtype, *retype, *letype;
   sym_link *ltype = operandType (left);
-  char buffer[80];
+  char buff[80];
 
   rtype = operandType (result);
   retype = getSpec (rtype);
@@ -9089,12 +9114,14 @@ genNearPointerGet (operand * left,
 	    }
 	  else
 	    {
-	      sprintf (buffer, "@%s", rname);
-	      aopPut (AOP (result), buffer, offset);
+	      SNPRINTF (buff, sizeof(buff), "@%s", rname);
+	      aopPut (AOP (result), buff, offset);
 	    }
 	  offset++;
 	  if (size || pi)
-	    emitcode ("inc", "%s", rname);
+	    {
+		emitcode ("inc", "%s", rname);
+	    }
 	}
     }
 
@@ -9475,7 +9502,7 @@ genGenPointerGet (operand * left,
 
   D (emitcode (";", "genGenPointerGet "); );
 
-  aopOp (left, ic, FALSE, (OP_SYMBOL(left)->ruonly ? FALSE : TRUE));
+  aopOp (left, ic, FALSE, (AOP_IS_STR(left) ? FALSE : TRUE));
 
   /* if the operand is already in dptr
      then we do nothing else we move the value to dptr */
@@ -9492,42 +9519,16 @@ genGenPointerGet (operand * left,
 	}
       else
 	{			/* we need to get it byte by byte */
-	  _startLazyDPSEvaluation ();
-#if 0	// I see no point at all to this code.
-	// So I yanked it. Kill at some future date if no bugs rear their heads.
-	  if (AOP(left)->type==AOP_DPTR2) {
-	    char *l;
-	    l=aopGet(AOP(left),0,FALSE,FALSE,TRUE);
-	    genSetDPTR(0);
-	    _flushLazyDPS();
-	    emitcode ("mov", "dpl,%s", l);
-	    l=aopGet(AOP(left),1,FALSE,FALSE,TRUE);
-	    genSetDPTR(0);
-	    _flushLazyDPS();
-	    emitcode ("mov", "dph,%s", l);
-	    if (options.model == MODEL_FLAT24) {
-	      l=aopGet(AOP(left),2,FALSE,FALSE,TRUE);
-	      genSetDPTR(0);
-	      _flushLazyDPS();
-	      emitcode ("mov", "dpx,%s", l);
-	      emitcode ("mov", "b,%s", aopGet (AOP(left),3,FALSE,FALSE,TRUE));
-	    } else {
-	      emitcode ("mov", "b,%s", aopGet (AOP(left),2,FALSE,FALSE,TRUE));
-	    }
-	  } 
-	  else 
-#endif		
-	  {
+	    _startLazyDPSEvaluation ();
 	    emitcode ("mov", "dpl,%s", aopGet (AOP(left),0,FALSE,FALSE,TRUE));
 	    emitcode ("mov", "dph,%s", aopGet (AOP(left),1,FALSE,FALSE,TRUE));
 	    if (options.model == MODEL_FLAT24) {
-	      emitcode ("mov", "dpx,%s", aopGet (AOP(left),2,FALSE,FALSE,TRUE));
-	      emitcode ("mov", "b,%s", aopGet (AOP(left),3,FALSE,FALSE,TRUE));
+		emitcode ("mov", "dpx,%s", aopGet (AOP(left),2,FALSE,FALSE,TRUE));
+		emitcode ("mov", "b,%s", aopGet (AOP(left),3,FALSE,FALSE,TRUE));
 	    } else {
-	      emitcode ("mov", "b,%s", aopGet (AOP(left),2,FALSE,FALSE,TRUE));
+		emitcode ("mov", "b,%s", aopGet (AOP(left),2,FALSE,FALSE,TRUE));
 	    }
-	  }
-	  _endLazyDPSEvaluation ();
+	    _endLazyDPSEvaluation ();
 	}
     }
 
@@ -9835,7 +9836,7 @@ genDataPointerSet (operand * right,
 		   iCode * ic)
 {
   int size, offset = 0;
-  char *l, buffer[256];
+  char *l, buff[256];
 
   aopOp (right, ic, FALSE, FALSE);
 
@@ -9844,10 +9845,15 @@ genDataPointerSet (operand * right,
   while (size--)
     {
       if (offset)
-	sprintf (buffer, "(%s + %d)", l + 1, offset);
+	{
+	    SNPRINTF (buff, sizeof(buff), "(%s + %d)", l + 1, offset);
+	}
       else
-	sprintf (buffer, "%s", l + 1);
-      emitcode ("mov", "%s,%s", buffer,
+	{
+	    SNPRINTF (buff, sizeof(buff), "%s", l + 1);
+	}
+	
+      emitcode ("mov", "%s,%s", buff,
 		aopGet (AOP (right), offset++, FALSE, FALSE, FALSE));
     }
 
@@ -10185,7 +10191,7 @@ genGenPointerSet (operand * right,
   sym_link *retype = getSpec (operandType (right));
   sym_link *letype = getSpec (operandType (result));
 
-  aopOp (result, ic, FALSE, OP_SYMBOL(result)->ruonly ? FALSE : TRUE);
+  aopOp (result, ic, FALSE, AOP_IS_STR(result) ? FALSE : TRUE);
 
   /* if the operand is already in dptr
      then we do nothing else we move the value to dptr */
@@ -10343,9 +10349,14 @@ genIfx (iCode * ic, iCode * popIc)
 
   /* get the value into acc */
   if (AOP_TYPE (cond) != AOP_CRY)
-    toBoolean (cond);
+    {
+	toBoolean (cond);
+    }
   else
-    isbit = 1;
+    {
+	isbit = 1;
+    }
+    
   /* the result is now in the accumulator */
   freeAsmop (cond, NULL, ic, TRUE);
 
@@ -10356,11 +10367,17 @@ genIfx (iCode * ic, iCode * popIc)
   /* if the condition is  a bit variable */
   if (isbit && IS_ITEMP (cond) &&
       SPIL_LOC (cond))
-    genIfxJump (ic, SPIL_LOC (cond)->rname);
+    {
+	genIfxJump (ic, SPIL_LOC (cond)->rname);
+    }
   else if (isbit && !IS_ITEMP (cond))
-    genIfxJump (ic, OP_SYMBOL (cond)->rname);
+    {
+	genIfxJump (ic, OP_SYMBOL (cond)->rname);
+    }
   else
-    genIfxJump (ic, "a");
+    {
+	genIfxJump (ic, "a");
+    }
 
   ic->generated = 1;
 }
@@ -10388,7 +10405,7 @@ genAddrOf (iCode * ic)
       if (options.stack10bit) {
 	  char buff[10];
 	  tsprintf(buff, sizeof(buff), 
-	  	   "#!constbyte",(options.stack_loc >> 16) & 0xff);
+		   "#!constbyte",(options.stack_loc >> 16) & 0xff);
 	  /* if it has an offset then we need to compute it */
 /* 	  emitcode ("subb", "a,#!constbyte", */
 /* 		    -((sym->stack < 0) ? */
@@ -10467,8 +10484,12 @@ genAddrOf (iCode * ic)
 		       sym->rname,
 		       offset * 8);
 	  }
-      } else
-	  sprintf (s, "#%s", sym->rname);
+      } 
+      else
+      {
+	  SNPRINTF (s, sizeof(s), "#%s", sym->rname);
+      }
+	
       aopPut (AOP (IC_RESULT (ic)), s, offset++);
     }
 
@@ -10993,7 +11014,7 @@ genCast (iCode * ic)
 		    exit(1);
 		}
 	    
-		sprintf(gpValStr, "#0x%d", gpVal);
+		SNPRINTF(gpValStr, sizeof(gpValStr), "#0x%d", gpVal);
 		aopPut (AOP (result), gpValStr, GPTRSIZE - 1);
 	    }
 	  goto release;

@@ -1262,77 +1262,77 @@ int cmdStep (char *s, context *cctxt)
     function *func = NULL;
 
     if (!cctxt || !cctxt->func || !cctxt->func->mod) 
-	fprintf(stdout,"The program is not being run.\n");
+        fprintf(stdout,"The program is not being run.\n");
     else {
-	/* if we are @ the end of a function then set
-	   break points at execution points of the
-	   function in the call stack... */
-	if (cctxt->addr == cctxt->func->sym->eaddr) {
-	    if ((func = STACK_PEEK(callStack))) {
-		if (srcMode == SRC_CMODE)
-		    applyToSet (func->cfpoints,setStepEPBp,STEP,
-				func->mod->c_name);	
-		else
-		    applyToSet (func->afpoints,setStepEPBp,STEP,
-				func->mod->asm_name);
-	    }
-	} else {
-	    /* set breakpoints at all function entry points
-	       and all exepoints of this functions & for
-	       all functions one up in the call stack */
+        /* if we are @ the end of a function then set
+           break points at execution points of the
+           function in the call stack... */
+        if (cctxt->addr == cctxt->func->sym->eaddr) {
+            if ((func = STACK_PEEK(callStack))) {
+                if (srcMode == SRC_CMODE)
+                    applyToSet (func->cfpoints,setStepEPBp,STEP,
+                                func->mod->c_name);	
+                else
+                    applyToSet (func->afpoints,setStepEPBp,STEP,
+                                func->mod->asm_name);
+            }
+        } else {
+            /* set breakpoints at all function entry points
+               and all exepoints of this functions & for
+               all functions one up in the call stack */
 	    
-	    /* all function entry points */
-	    applyToSet(functions,setStepBp); 
+            /* all function entry points */
+            applyToSet(functions,setStepBp); 
 	    
-	    if (srcMode == SRC_CMODE) {
-		/* for all execution points in this function */
-		applyToSet(cctxt->func->cfpoints,setStepEPBp,STEP,
-			   cctxt->func->mod->c_name);
+            if (srcMode == SRC_CMODE) {
+                /* for all execution points in this function */
+                applyToSet(cctxt->func->cfpoints,setStepEPBp,STEP,
+                           cctxt->func->mod->c_name);
 		
-		/* set a break point @ the current function's
-		   exit */
-		setBreakPoint (cctxt->func->sym->eaddr, CODE, STEP , 
-			       stepBpCB, cctxt->func->mod->c_name, 
-			       cctxt->func->exitline);
+                /* set a break point @ the current function's
+                   exit */
+                setBreakPoint (cctxt->func->sym->eaddr, CODE, STEP , 
+                               stepBpCB, cctxt->func->mod->c_name, 
+                               cctxt->func->exitline);
 		
-		/* now break point @ callers execution points */
-		if ((func = STACK_PPEEK(callStack))) {
-		    applyToSet (func->cfpoints,setStepEPBp,STEP,
-				func->mod->c_name);	
-		    /* set bp @ callers exit point */
-		    setBreakPoint (func->sym->eaddr, CODE, STEP , 
-				   stepBpCB, func->mod->c_name, 
-				   func->exitline);
-		}
-	    } else {
-		/* for all execution points in this function */
-		applyToSet(cctxt->func->afpoints,setStepEPBp,STEP,
-			   cctxt->func->mod->asm_name);
+                /* now break point @ callers execution points */
+                if ((func = STACK_PPEEK(callStack))) {
+                    applyToSet (func->cfpoints,setStepEPBp,STEP,
+                                func->mod->c_name);	
+                    /* set bp @ callers exit point */
+                    setBreakPoint (func->sym->eaddr, CODE, STEP , 
+                                   stepBpCB, func->mod->c_name, 
+                                   func->exitline);
+                }
+            } else {
+                /* for all execution points in this function */
+                applyToSet(cctxt->func->afpoints,setStepEPBp,STEP,
+                           cctxt->func->mod->asm_name);
 		
-		/* set a break point @ the current function's
-		   exit */
-		setBreakPoint (cctxt->func->sym->eaddr, CODE, STEP , 
-			       stepBpCB, cctxt->func->mod->asm_name, 
-			       cctxt->func->aexitline);
+                /* set a break point @ the current function's
+                   exit */
+                setBreakPoint (cctxt->func->sym->eaddr, CODE, STEP , 
+                               stepBpCB, cctxt->func->mod->asm_name, 
+                               cctxt->func->aexitline);
 		
-		/* now break point @ callers execution points */
-		if ((func = STACK_PPEEK(callStack))) {
+                /* now break point @ callers execution points */
+                if ((func = STACK_PPEEK(callStack))) {
 		    
-		    applyToSet (func->afpoints,setStepEPBp,STEP,
-				func->mod->asm_name);	
+                    applyToSet (func->afpoints,setStepEPBp,STEP,
+                                func->mod->asm_name);	
 		    
-		    /* set bp @ callers exit point */
-		    setBreakPoint (func->sym->eaddr, CODE, STEP , 
-				   stepBpCB, func->mod->asm_name, 
-				   func->aexitline);
-		}
-	    }
-	}
+                    /* set bp @ callers exit point */
+                    setBreakPoint (func->sym->eaddr, CODE, STEP , 
+                                   stepBpCB, func->mod->asm_name, 
+                                   func->aexitline);
+                }
+            }
+        }
 
-    doingSteps = 1;
-	simGo(2);
-    doingSteps = 0;
-    showfull = 1;
+        doingSteps = 1;
+        simGo(2);
+        doingSteps = 0;
+        showfull = 1;
     }
     return 0;
 }
@@ -1364,65 +1364,65 @@ int cmdNext (char *s, context *cctxt)
        we don't set break point for all function entry
        points */
     if (!cctxt || !cctxt->func || !cctxt->func->mod) 
-	fprintf(stdout,"The program is not being run.\n");
+        fprintf(stdout,"The program is not being run.\n");
     else {
-	/* if we are @ the end of a function then set
-	   break points at execution points of the
-	   function in the call stack... */
-	if (cctxt->addr == cctxt->func->sym->eaddr) {
-	    if ((func = STACK_PEEK(callStack))) {
-		if (srcMode == SRC_CMODE)
-		    applyToSet (func->cfpoints,setStepEPBp,STEP,
-				func->mod->c_name);	
-		else
-		    applyToSet (func->afpoints,setStepEPBp,STEP,
-			       func->mod->asm_name);
-	    }
-	} else {
-	    if (srcMode == SRC_CMODE) {
-		/* for all execution points in this function */
-		applyToSet(cctxt->func->cfpoints,setNextEPBp,NEXT,
-			   cctxt->func->mod->c_name);
-		/* set a break point @ the current function's
-		   exit */
-		setBreakPoint (cctxt->func->sym->eaddr, CODE, NEXT , 
-			       nextBpCB, cctxt->func->mod->c_name, 
-			       cctxt->func->exitline);
+        /* if we are @ the end of a function then set
+           break points at execution points of the
+           function in the call stack... */
+        if (cctxt->addr == cctxt->func->sym->eaddr) {
+            if ((func = STACK_PEEK(callStack))) {
+                if (srcMode == SRC_CMODE)
+                    applyToSet (func->cfpoints,setStepEPBp,NEXT,
+                                func->mod->c_name);	
+                else
+                    applyToSet (func->afpoints,setStepEPBp,NEXT,
+                                func->mod->asm_name);
+            }
+        } else {
+            if (srcMode == SRC_CMODE) {
+                /* for all execution points in this function */
+                applyToSet(cctxt->func->cfpoints,setNextEPBp,NEXT,
+                           cctxt->func->mod->c_name);
+                /* set a break point @ the current function's
+                   exit */
+                setBreakPoint (cctxt->func->sym->eaddr, CODE, NEXT , 
+                               nextBpCB, cctxt->func->mod->c_name, 
+                               cctxt->func->exitline);
 		
-		/* now break point @ callers execution points */	
-		if ((func = STACK_PPEEK(callStack))) {
-		    applyToSet (func->cfpoints,setNextEPBp,NEXT ,
-				func->mod->c_name);	
-		    /* set bp @ callers exit point */
-		    setBreakPoint (func->sym->eaddr, CODE, NEXT , 
-				   stepBpCB, func->mod->c_name, 
-				   func->exitline);
-		}
-	    } else {
-		/* for all execution points in this function */
-		applyToSet(cctxt->func->afpoints,setNextEPBp,NEXT,
-			   cctxt->func->mod->asm_name);
-		/* set a break point @ the current function's
-		   exit */
-		setBreakPoint (cctxt->func->sym->eaddr, CODE, NEXT , 
-			       nextBpCB, cctxt->func->mod->asm_name, 
-			       cctxt->func->aexitline);
+                /* now break point @ callers execution points */	
+                if ((func = STACK_PPEEK(callStack))) {
+                    applyToSet (func->cfpoints,setNextEPBp,NEXT ,
+                                func->mod->c_name);	
+                    /* set bp @ callers exit point */
+                    setBreakPoint (func->sym->eaddr, CODE, NEXT , 
+                                   stepBpCB, func->mod->c_name, 
+                                   func->exitline);
+                }
+            } else {
+                /* for all execution points in this function */
+                applyToSet(cctxt->func->afpoints,setNextEPBp,NEXT,
+                           cctxt->func->mod->asm_name);
+                /* set a break point @ the current function's
+                   exit */
+                setBreakPoint (cctxt->func->sym->eaddr, CODE, NEXT , 
+                               nextBpCB, cctxt->func->mod->asm_name, 
+                               cctxt->func->aexitline);
 		
-		/* now break point @ callers execution points */	
-		if ((func = STACK_PPEEK(callStack))) {
-		    applyToSet (func->cfpoints,setNextEPBp,NEXT ,
-				func->mod->asm_name);	
-		    /* set bp @ callers exit point */
-		    setBreakPoint (func->sym->eaddr, CODE, NEXT , 
-				   stepBpCB, func->mod->asm_name, 
-				   func->aexitline);
-		}
-	    }
-	    doingSteps = 1;
+                /* now break point @ callers execution points */	
+                if ((func = STACK_PPEEK(callStack))) {
+                    applyToSet (func->cfpoints,setNextEPBp,NEXT ,
+                                func->mod->asm_name);	
+                    /* set bp @ callers exit point */
+                    setBreakPoint (func->sym->eaddr, CODE, NEXT , 
+                                   stepBpCB, func->mod->asm_name, 
+                                   func->aexitline);
+                }
+            }
+        }
+        doingSteps = 1;
         simGo(1);	
-	    doingSteps = 0;
+        doingSteps = 0;
         showfull = 1;
-	}
     }    
     return 0;
 }

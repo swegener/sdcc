@@ -734,14 +734,28 @@ static void lnkCSrc (char *s)
 
     line--;
     /* one line can have more than one address : (for loops !)*/
-    if (line < mod->ncLines && line > 0 &&
+    if (line < mod->ncLines && line > 0 /*&&
         ( !mod->cLines[line]->addr ||
-           mod->cLines[line]->level > level )) {
-  mod->cLines[line]->addr = addr;
-  mod->cLines[line]->block = block;
-  mod->cLines[line]->level = level;
-  Dprintf(D_symtab, ("symtab: ccc %s(%d:0x%x) %s",mod->c_name,
-         line+1,addr,mod->cLines[line]->src));
+        mod->cLines[line]->level > level )*/ ) 
+    {
+        if ( mod->cLines[line]->addr )
+        {
+            /* save double line information for exepoints */
+            exePoint *ep ;
+            ep = Safe_calloc(1,sizeof(exePoint));
+            ep->addr =  mod->cLines[line]->addr ;
+            ep->line = line;
+            ep->block= mod->cLines[line]->block;
+            ep->level= mod->cLines[line]->level;
+            addSet(&mod->cfpoints,ep);
+            Dprintf(D_symtab, ("symtab: exe %s(%d:0x%x) %s",mod->c_name,
+                           line+1,addr,mod->cLines[line]->src));
+        }
+        mod->cLines[line]->addr = addr;
+        mod->cLines[line]->block = block;
+        mod->cLines[line]->level = level;
+        Dprintf(D_symtab, ("symtab: ccc %s(%d:0x%x) %s",mod->c_name,
+                           line+1,addr,mod->cLines[line]->src));
     }
     return;
 

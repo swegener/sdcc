@@ -295,6 +295,7 @@ int dispatchCB (unsigned addr, context *ctxt)
     if ((bp = hTabFirstItemWK(bptable,addr)) == NULL) {
       if ( doingSteps == 2 ) return 1;
       if ( doingSteps ) return 0;
+      if ( contsim    ) return 0;
       return simStopBPCB(addr);
     }
 

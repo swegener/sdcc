@@ -179,6 +179,7 @@ typedef struct module {
     int   nasmLines;         /* # of lines in the assembler file */
     srcLine  **cLines;       /* actual source lines */    
     srcLine  **asmLines;     /* actual assembler source lines*/
+    set       *cfpoints;     /* set of double line execution points */   
 } module;
 
 /*-----------------------------------------------------------------*/
@@ -261,6 +262,7 @@ char *gc_strdup(const char *s);
 srcLine **loadFile (char *name, int *nlines);
 extern short fullname;
 extern int srcMode;
+extern char contsim;
 char *searchDirsFname (char *);
 
 #endif

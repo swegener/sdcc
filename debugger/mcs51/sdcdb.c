@@ -46,6 +46,7 @@ context *currCtxt = NULL;
 short fullname = 0;
 short showfull = 0;
 short userinterrupt = 0;
+char contsim = 0;
 char *ssdirl = DATADIR LIB_DIR_SUFFIX ":" DATADIR LIB_DIR_SUFFIX "/small" ;
 char *simArgs[40];
 int nsimArgs = 0;
@@ -472,6 +473,7 @@ static void functionPoints ()
 {
     function *func;
     symbol *sym;
+    exePoint *ep ;
 
     /* for all functions do */
     for ( func = setFirstItem(functions); func;
@@ -506,7 +508,6 @@ static void functionPoints ()
       if (mod->cLines[j]->addr >= sym->addr &&
     mod->cLines[j]->addr <= sym->eaddr ) {
 
-    exePoint *ep ;
 
     /* add it to the execution point */
     if (func->entryline > j)
@@ -523,7 +524,16 @@ static void functionPoints ()
     addSet(&func->cfpoints,ep);
       }
   }
-
+  /* check double line execution points of module */
+  for (ep = setFirstItem(mod->cfpoints); ep;
+       ep = setNextItem(mod->cfpoints))
+  {
+      if (ep->addr >= sym->addr &&
+          ep->addr <= sym->eaddr ) 
+      {
+          addSet(&func->cfpoints,ep);
+      }
+  }
   /* do the same for asm execution points */
   for ( j = 0 ; j < mod->nasmLines ; j++ ) {
       if (mod->asmLines[j]->addr >= sym->addr &&
@@ -843,6 +853,7 @@ static void parseCmdLine (int argc, char **argv)
     int passon_args_flag = 0;  /* if true, pass on args to simulator */
 
     Dprintf(D_sdcdb, ("sdcdb: parseCmdLine\n"));
+    contsim=0;
 
     for ( i = 1; i < argc ; i++) {
   //fprintf(stdout,"%s\n",argv[i]);
@@ -889,6 +900,10 @@ static void parseCmdLine (int argc, char **argv)
           continue;
       }
 #endif
+      if (strncmp(argv[i],"-contsim",8) == 0) {
+          contsim=1;
+          continue;
+      }
 
       /* model string */
       if (strncmp(argv[i],"-m",2) == 0) {

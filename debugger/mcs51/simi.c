@@ -36,6 +36,7 @@
 #endif
 FILE *simin ; /* stream for simulator input */
 FILE *simout; /* stream for simulator output */
+typedef void (*sighandler_t)(int);
 
 int sock = -1; /* socket descriptor to comm with simulator */
 pid_t simPid = -1;
@@ -422,6 +423,7 @@ void simLoadFile (char *s)
 /*-----------------------------------------------------------------*/
 unsigned int simGoTillBp ( unsigned int gaddr)
 {
+    sighandler_t oldsig;
     char *sr;
     unsigned addr ; 
     char *sfmt;
@@ -441,6 +443,8 @@ unsigned int simGoTillBp ( unsigned int gaddr)
       //sleep(1);
       //waitForSim();
 
+      sendSim("reset\n");
+      waitForSim(wait_ms, NULL);
       sendSim("run 0x0\n");
     } else	if (gaddr == -1) { /* resume */
       sendSim ("run\n");
@@ -477,10 +481,16 @@ unsigned int simGoTillBp ( unsigned int gaddr)
         sr++ ;
     }
 
+    oldsig = signal(SIGINT,SIG_IGN);
+    /* get answer of stop command */
+    if ( userinterrupt )
+        waitForSim(wait_ms, NULL);
+
     /* better solution: ask pc */
     sendSim ("pc\n");
     waitForSim(100, NULL);
     sr = simResponse();
+    signal(SIGINT,oldsig);
 
     gaddr = strtol(sr+3,0,0);
     return gaddr;

@@ -1,3 +1,9 @@
+2003-12-16 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCval.c (valPlus, valMinus, valShift): fixed some problems with
+	implicit casts via union; they don't work on big endian systems
+	(possible fix for bug #861138)
+
 2003-12-16 Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
 	(committed by Erik Petrich <epetrich@ivorytower.norman.ok.us> on Frieder's behalf)

@@ -1259,12 +1259,25 @@ valPlus (value * lval, value * rval)
     SPEC_CVAL (val->type).v_float = floatFromVal (lval) + floatFromVal (rval);
   else
     {
-      if (SPEC_USIGN (val->type))
-	SPEC_CVAL (val->type).v_ulong = (TYPE_UDWORD) floatFromVal (lval) +
-	  (TYPE_UDWORD) floatFromVal (rval);
+      if (SPEC_LONG (val->type))
+	{
+	  if (SPEC_USIGN (val->type))
+	    SPEC_CVAL (val->type).v_ulong = (TYPE_UDWORD) floatFromVal (lval) +
+	      (TYPE_UDWORD) floatFromVal (rval);
+	  else
+	    SPEC_CVAL (val->type).v_long = (TYPE_DWORD) floatFromVal (lval) +
+	      (TYPE_DWORD) floatFromVal (rval);
+	}
       else
-	SPEC_CVAL (val->type).v_long = (TYPE_DWORD) floatFromVal (lval) +
-	  (TYPE_DWORD) floatFromVal (rval);
+	{
+	  if (SPEC_USIGN (val->type)) {
+	    SPEC_CVAL (val->type).v_uint = (TYPE_UWORD) floatFromVal (lval) +
+	      (TYPE_UWORD) floatFromVal (rval);
+	  } else {
+	    SPEC_CVAL (val->type).v_int = (TYPE_WORD) floatFromVal (lval) +
+	      (TYPE_WORD) floatFromVal (rval);
+	  }
+	}
     }
   return cheapestVal(val);
 }
@@ -1300,12 +1313,25 @@ valMinus (value * lval, value * rval)
     SPEC_CVAL (val->type).v_float = floatFromVal (lval) - floatFromVal (rval);
   else
     {
-      if (SPEC_USIGN (val->type))
-	SPEC_CVAL (val->type).v_ulong = (TYPE_UDWORD) floatFromVal (lval) -
-	  (TYPE_UDWORD) floatFromVal (rval);
+      if (SPEC_LONG (val->type))
+	{
+	  if (SPEC_USIGN (val->type))
+	    SPEC_CVAL (val->type).v_ulong = (TYPE_UDWORD) floatFromVal (lval) -
+	      (TYPE_UDWORD) floatFromVal (rval);
+	  else
+	    SPEC_CVAL (val->type).v_long = (TYPE_DWORD) floatFromVal (lval) -
+	      (TYPE_DWORD) floatFromVal (rval);
+	}
       else
-	SPEC_CVAL (val->type).v_long = (TYPE_DWORD) floatFromVal (lval) -
-	  (TYPE_DWORD) floatFromVal (rval);
+	{
+	  if (SPEC_USIGN (val->type)) {
+	    SPEC_CVAL (val->type).v_uint = (TYPE_UWORD) floatFromVal (lval) -
+	      (TYPE_UWORD) floatFromVal (rval);
+	  } else {
+	    SPEC_CVAL (val->type).v_int = (TYPE_WORD) floatFromVal (lval) -
+	      (TYPE_WORD) floatFromVal (rval);
+	  }
+	}
     }
   return cheapestVal(val);
 }
@@ -1328,17 +1354,35 @@ valShift (value * lval, value * rval, int lr)
     SPEC_USIGN (val->type) = SPEC_USIGN (lval->etype);
   SPEC_LONG (val->type) = SPEC_LONG (lval->etype);
 
-  if (SPEC_USIGN (val->type))
+  if (SPEC_LONG (val->type))
     {
-      SPEC_CVAL (val->type).v_ulong = lr ?
-	(TYPE_UDWORD) floatFromVal (lval) << (TYPE_UWORD) floatFromVal (rval) : \
-	(TYPE_UDWORD) floatFromVal (lval) >> (TYPE_UWORD) floatFromVal (rval);
+      if (SPEC_USIGN (val->type))
+        {
+          SPEC_CVAL (val->type).v_ulong = lr ?
+	    (TYPE_UDWORD) floatFromVal (lval) << (TYPE_UWORD) floatFromVal (rval) : \
+	    (TYPE_UDWORD) floatFromVal (lval) >> (TYPE_UWORD) floatFromVal (rval);
+        }
+      else
+        {
+          SPEC_CVAL (val->type).v_long = lr ?
+	    (TYPE_DWORD) floatFromVal (lval) << (TYPE_UWORD) floatFromVal (rval) : \
+	    (TYPE_DWORD) floatFromVal (lval) >> (TYPE_UWORD) floatFromVal (rval);
+        }
     }
   else
     {
-      SPEC_CVAL (val->type).v_long = lr ?
-	(TYPE_DWORD) floatFromVal (lval) << (TYPE_UWORD) floatFromVal (rval) : \
-	(TYPE_DWORD) floatFromVal (lval) >> (TYPE_UWORD) floatFromVal (rval);
+      if (SPEC_USIGN (val->type))
+        {
+          SPEC_CVAL (val->type).v_uint = lr ?
+	    (TYPE_UWORD) floatFromVal (lval) << (TYPE_UWORD) floatFromVal (rval) : \
+	    (TYPE_UWORD) floatFromVal (lval) >> (TYPE_UWORD) floatFromVal (rval);
+        }
+      else
+        {
+          SPEC_CVAL (val->type).v_int = lr ?
+	    (TYPE_WORD) floatFromVal (lval) << (TYPE_UWORD) floatFromVal (rval) : \
+	    (TYPE_WORD) floatFromVal (lval) >> (TYPE_UWORD) floatFromVal (rval);
+        }
     }
   return cheapestVal(val);
 }

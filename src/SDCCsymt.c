@@ -318,8 +318,7 @@ pointerTypes (sym_link * ptr, sym_link * type)
     ptr = ptr->next;
 
   /* could not find it */
-  if (!ptr || IS_SPEC (ptr) ||
-      DCL_TYPE (ptr) != UPOINTER)
+  if (!ptr || IS_SPEC (ptr))
     return;
 
   /* change the pointer type depending on the

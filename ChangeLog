@@ -1,3 +1,7 @@
+2004-02-17 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* device/include/c8051f320.h: added. Contributed by Maarten Brock.
+
 2004-02-17 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* doc/sdccman.lyx: added details about the HC08 storage classes and

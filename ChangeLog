@@ -1,3 +1,10 @@
+2003-04-01  Bernhard Held <bernhard@bernhardheld.de>
+
+	* support/regression/generate-cases.py: place generated file in given sub directory
+	* support/regression/ports/host/spec.mk: prevent removal of testfwk.o
+	* support/regression/Makefile: improvements for 'make -j';
+	side effect: it's simpler and faster now
+
 2003-03-31  Borut Razem <borut.razem@siol.net>
 
 	* src/z80/main.c: link-{port} and as-{port} defined without path

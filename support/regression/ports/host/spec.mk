@@ -4,6 +4,9 @@ SDCCFLAGS = -DPORT_HOST=1 -Wall -fsigned-char -DREENTRANT=
 
 EXEEXT = .bin
 
+# otherwise `make` deletes it and `make -j`will fail
+.PRECIOUS: ports/$(PORT)/testfwk$(OBJEXT)
+
 # Required extras
 EXTRAS = ports/$(PORT)/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
 

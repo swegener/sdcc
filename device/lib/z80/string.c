@@ -1,7 +1,7 @@
 /* Dumb strings stub.
    Wanted a quick hack for now - will use the libc version later.
 */
-char *_strcpy(char *dest, const char *source)
+char *strcpy(char *dest, const char *source)
 {
     char *d = dest;
     const char *s = source;
@@ -9,7 +9,7 @@ char *_strcpy(char *dest, const char *source)
     return dest;
 }
 
-void *_memcpy(void *dest, const void *source, int count)
+void *memcpy(void *dest, const void *source, int count)
 {
     char *d = dest;
     const char *s = source;
@@ -19,7 +19,7 @@ void *_memcpy(void *dest, const void *source, int count)
     return dest;
 }
 
-int _strcmp(const char *s1, const char *s2)
+int strcmp(const char *s1, const char *s2)
 {
     char ret = 0;
 

@@ -1755,6 +1755,216 @@ static void packRegsForAccUse (iCode *ic)
     OP_SYMBOL(IC_RESULT(ic))->accuse = 1;
 }
 
+bool opPreservesA(iCode *ic, iCode *uic)
+{
+    /* if the usage has only one operand then we can */
+    if (IC_LEFT(ic) == NULL ||
+	IC_RIGHT(ic) == NULL) 
+	return TRUE;
+
+    if (uic->op != '=' && 
+	!IS_ARITHMETIC_OP(uic) &&
+	!IS_BITWISE_OP(uic)    &&
+	uic->op != EQ_OP &&
+	uic->op != LEFT_OP &&
+	uic->op != RIGHT_OP ) {
+	return FALSE;
+    }
+
+    /* PENDING */
+    if (!IC_LEFT(uic) || !IC_RESULT(ic))
+	return FALSE;
+
+    /** This is confusing :)  Guess for now */
+    if (IC_LEFT(uic)->key == IC_RESULT(ic)->key &&
+	(IS_ITEMP(IC_RIGHT(uic)) ||
+	 (IS_TRUE_SYMOP(IC_RIGHT(uic)))))
+	return TRUE;
+    
+    if (IC_RIGHT(uic)->key == IC_RESULT(ic)->key &&
+	(IS_ITEMP(IC_LEFT(uic)) ||
+	 (IS_TRUE_SYMOP(IC_LEFT(uic)))))
+	return TRUE;
+
+    return FALSE;
+}
+
+/** Pack registers for acc use.
+    When the result of this operation is small and short lived it may
+    be able to be stored in the accumelator.
+ */
+static void packRegsForAccUse2(iCode *ic)
+{
+    iCode *uic;
+    
+    /* if + or - then it has to be one byte result.
+       MLH: Ok.
+     */
+    if ((ic->op == '+' || ic->op == '-')
+	&& getSize(operandType(IC_RESULT(ic))) > 1)
+	return ;
+    
+    /* if shift operation make sure right side is not a literal.
+       MLH: depends.
+     */
+#if 0
+    if (ic->op == RIGHT_OP  &&
+	(isOperandLiteral(IC_RIGHT(ic)) ||
+	  getSize(operandType(IC_RESULT(ic))) > 1))
+	return ;
+	
+    if (ic->op == LEFT_OP &&        
+	( isOperandLiteral(IC_RIGHT(ic)) ||
+	  getSize(operandType(IC_RESULT(ic))) > 1))
+	return ;
+#endif
+	
+    /* has only one definition */
+    if (bitVectnBitsOn(OP_DEFS(IC_RESULT(ic))) > 1) {
+	return;
+    }
+
+    /* Right.  We may be able to propagate it through if:
+       For each in the chain of uses the intermediate is OK.
+    */
+    /* Get next with 'uses result' bit on
+       If this->next == next
+         Validate use of next
+	 If OK, increase count
+    */
+    /* and the usage immediately follows this iCode */
+    if (!(uic = hTabItemWithKey(iCodehTab,
+				bitVectFirstBit(OP_USES(IC_RESULT(ic)))))) {
+	return;
+    }
+
+    {
+	/* Create a copy of the OP_USES bit vect */
+	bitVect *uses = bitVectCopy(OP_USES(IC_RESULT(ic)));
+	int setBit;
+	iCode *scan = ic, *next;
+
+	do {
+	    setBit = bitVectFirstBit(uses);
+	    next = hTabItemWithKey(iCodehTab, setBit);
+	    if (scan->next == next) {
+		bitVectUnSetBit(uses, setBit);
+		/* Still contigous. */
+		if (!opPreservesA(ic, next)) {
+		    return;
+		}
+		scan = next;
+	    }
+	    else {
+		return;
+	    }
+	} while (!bitVectIsZero(uses));
+	OP_SYMBOL(IC_RESULT(ic))->accuse = 1;
+	return;
+    }
+
+    /* OLD CODE FOLLOWS */
+    /* if it is a conditional branch then we definitely can
+       MLH: Depends.
+     */
+#if 0    
+    if (uic->op == IFX ) 
+	goto accuse;
+
+    /* MLH: Depends. */
+    if ( uic->op == JUMPTABLE )
+	return ;
+#endif
+
+    /* if the usage is not is an assignment or an 
+       arithmetic / bitwise / shift operation then not.
+       MLH: Pending:  Invalid.  Our pointer sets are always peechy.
+ */
+#if 0
+    if (POINTER_SET(uic) && 
+	getSize(aggrToPtr(operandType(IC_RESULT(uic)),FALSE)) > 1) {
+	printf("e5 %u\n", getSize(aggrToPtr(operandType(IC_RESULT(uic)),FALSE)));
+	return;
+    }
+#endif
+
+    printf("1\n");
+    if (uic->op != '=' && 
+	!IS_ARITHMETIC_OP(uic) &&
+	!IS_BITWISE_OP(uic)    &&
+	uic->op != LEFT_OP &&
+	uic->op != RIGHT_OP ) {
+	printf("e6\n");
+	return;
+    }
+
+    /* if used in ^ operation then make sure right is not a 
+       literl */
+    if (uic->op == '^' && isOperandLiteral(IC_RIGHT(uic)))
+	return ;
+
+    /* if shift operation make sure right side is not a literal */
+    if (uic->op == RIGHT_OP  &&
+	( isOperandLiteral(IC_RIGHT(uic)) ||
+	  getSize(operandType(IC_RESULT(uic))) > 1))
+	return ;
+
+    if (uic->op == LEFT_OP &&        
+	( isOperandLiteral(IC_RIGHT(uic)) ||
+	  getSize(operandType(IC_RESULT(uic))) > 1))
+	return ;
+	    
+#if 0
+    /* make sure that the result of this icode is not on the
+       stack, since acc is used to compute stack offset */
+    if (IS_TRUE_SYMOP(IC_RESULT(uic)) &&
+	OP_SYMBOL(IC_RESULT(uic))->onStack)
+	return ;
+#endif
+
+#if 0
+    /* if either one of them in far space then we cannot */
+    if ((IS_TRUE_SYMOP(IC_LEFT(uic)) &&
+	 isOperandInFarSpace(IC_LEFT(uic))) ||
+	(IS_TRUE_SYMOP(IC_RIGHT(uic)) &&
+	 isOperandInFarSpace(IC_RIGHT(uic))))
+	return ;
+#endif
+
+    /* if the usage has only one operand then we can */
+    if (IC_LEFT(uic) == NULL ||
+	IC_RIGHT(uic) == NULL) 
+	goto accuse;
+
+    /* make sure this is on the left side if not
+       a '+' since '+' is commutative */
+    if (ic->op != '+' &&
+	IC_LEFT(uic)->key != IC_RESULT(ic)->key)
+	return;
+
+    /* if one of them is a literal then we can */
+    if ((IC_LEFT(uic) && IS_OP_LITERAL(IC_LEFT(uic))) ||
+	(IC_RIGHT(uic) && IS_OP_LITERAL(IC_RIGHT(uic)))) {
+	OP_SYMBOL(IC_RESULT(ic))->accuse = 1;
+	return ;
+    }
+
+    /** This is confusing :)  Guess for now */
+    if (IC_LEFT(uic)->key == IC_RESULT(ic)->key &&
+	(IS_ITEMP(IC_RIGHT(uic)) ||
+	 (IS_TRUE_SYMOP(IC_RIGHT(uic)))))
+	goto accuse;
+    
+    if (IC_RIGHT(uic)->key == IC_RESULT(ic)->key &&
+	(IS_ITEMP(IC_LEFT(uic)) ||
+	 (IS_TRUE_SYMOP(IC_LEFT(uic)))))
+	goto accuse ;
+    return ;
+ accuse:
+    printf("acc ok!\n");
+    OP_SYMBOL(IC_RESULT(ic))->accuse = 1;
+}
+
 /** Does some transformations to reduce register pressure.
  */
 static void packRegisters (eBBlock *ebp)
@@ -1863,6 +2073,7 @@ static void packRegisters (eBBlock *ebp)
 	   only one operand or has two operands but one is literal & the
 	   result of that operation is not on stack then we can leave the
 	   result of this operation in acc:b combination */
+#if 0
 	if ((IS_ARITHMETIC_OP(ic) 
 	     || IS_BITWISE_OP(ic)
 	     || ic->op == LEFT_OP || ic->op == RIGHT_OP
@@ -1870,6 +2081,17 @@ static void packRegisters (eBBlock *ebp)
 	    IS_ITEMP(IC_RESULT(ic)) &&
 	    getSize(operandType(IC_RESULT(ic))) <= 2)
 	    packRegsForAccUse (ic);
+#else
+	if ((POINTER_GET(ic) ||
+	     IS_ARITHMETIC_OP(ic) ||
+	     IS_BITWISE_OP(ic) ||
+	     ic->op == LEFT_OP ||
+	     ic->op == RIGHT_OP
+	     ) &&
+	    IS_ITEMP(IC_RESULT(ic)) &&
+	    getSize(operandType(IC_RESULT(ic))) == 1)
+	    packRegsForAccUse2(ic);
+#endif
     }
 }
   

@@ -18,4 +18,6 @@ $(LIB): peeph.rul $(OBJ)
 peeph.rul: peeph.def
 	$(AWK) -f ../SDCCpeeph.awk peeph.def > peeph.rul
 
+main.o: main.c peeph.rul
+
 include clean.mk

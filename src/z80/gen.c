@@ -859,8 +859,10 @@ void toBoolean(operand *oper)
 	    emitcode("or","a,%s",aopGet(AOP(oper),offset++,FALSE));
     }
     else {
-	CLRC;
-	emitcode("or","a,%s",aopGet(AOP(oper),0,FALSE));
+	if (AOP(oper)->type != AOP_ACC) {
+	    CLRC;
+	    emitcode("or","a,%s",aopGet(AOP(oper),0,FALSE));
+	}
     }
 }
 
@@ -1407,7 +1409,7 @@ static bool genPlusIncr (iCode *ic)
     if (sameRegs(AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic))) &&
 	isPair(AOP(IC_RESULT(ic)))) {
 	while (icount--) {
-	    emitcode("inc", "%s ; 1", getPairName(AOP(IC_RESULT(ic))));
+	    emitcode("inc", "%s", getPairName(AOP(IC_RESULT(ic))));
 	}
 	return TRUE;
     }
@@ -1596,6 +1598,25 @@ static bool genMinusDec (iCode *ic)
         return FALSE;
 
     size = getDataSize(IC_RESULT(ic));
+
+#if 0
+    /* if increment 16 bits in register */
+    if (sameRegs(AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic))) &&
+        (size > 1) &&
+        (icount == 1)) {
+        symbol *tlbl = newiTempLabel(NULL);
+	emitcode("dec","%s",aopGet(AOP(IC_RESULT(ic)),LSB,FALSE));
+	emitcode("jp", "np," LABEL_STR ,tlbl->key+100);
+    
+	emitcode("dec","%s",aopGet(AOP(IC_RESULT(ic)),MSB16,FALSE));
+	if(size == 4) {
+	    assert(0);
+	}
+	emitcode("", LABEL_STR ":",tlbl->key+100);
+        return TRUE;
+    }
+#endif
+
     /* if decrement 16 bits in register */
     if (sameRegs(AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic))) &&
         (size > 1) && isPair(AOP(IC_RESULT(ic)))) {
@@ -1804,7 +1825,7 @@ static void genCmp (operand *left,operand *right,
 		emitcode("cp", "%s^0x80", aopGet(AOP(right), offset, FALSE));
 	    }
 	    else 
-		emitcode("cp", "%s", aopGet(AOP(right), offset, FALSE));
+		emitcode("cp", "%s ; 7", aopGet(AOP(right), offset, FALSE));
         } 
 	else {
             if(AOP_TYPE(right) == AOP_LIT) {
@@ -1972,8 +1993,11 @@ static void gencjneshort(operand *left, operand *right, symbol *lbl)
     if (AOP_TYPE(right) == AOP_LIT &&
         AOP_TYPE(left) != AOP_DIR ) {
         while (size--) {
-	    emitcode("ld", "a,%s", aopGet(AOP(left),offset,FALSE));
-	    emitcode("cp", "a,%s", aopGet(AOP(right),offset,FALSE));
+	    emitcode("ld", "a,%s ; 2", aopGet(AOP(left),offset,FALSE));
+	    if ((AOP_TYPE(right) == AOP_LIT) && lit == 0)
+		emitcode("or", "a,a");
+	    else 
+		emitcode("cp", "a,%s", aopGet(AOP(right),offset,FALSE));
             emitcode("jp", "nz," LABEL_STR , lbl->key+100);
             offset++;
         }
@@ -1990,7 +2014,7 @@ static void gencjneshort(operand *left, operand *right, symbol *lbl)
 		/* PENDING */
                 emitcode("jp","nz," LABEL_STR ,lbl->key+100);
             else {
-		emitcode("cp", "%s", aopGet(AOP(right),offset,FALSE));
+		emitcode("cp", "%s ; 4", aopGet(AOP(right),offset,FALSE));
 		emitcode("jp", "nz," LABEL_STR , lbl->key+100);
 	    }
             offset++;
@@ -2001,7 +2025,7 @@ static void gencjneshort(operand *left, operand *right, symbol *lbl)
         while(size--) {
             char *l = aopGet(AOP(left),offset,FALSE);
             MOVA(aopGet(AOP(right),offset,FALSE));
-	    emitcode("cp", "%s", l);
+	    emitcode("cp", "%s ; 5", l);
 	    emitcode("jr", "nz," LABEL_STR, lbl->key+100);
             offset++;
         }

@@ -1678,7 +1678,7 @@ setBinPaths(const char *argv0)
 
 /* Set system include path */
 static void
-setIncludePath(const char *argv0)
+setIncludePath(const char *datadir)
 {
   char *p;
   char buf[PATH_MAX];
@@ -1688,27 +1688,13 @@ setIncludePath(const char *argv0)
    *
    * 1. - $SDCC_INCLUDE
    * 2. - $SDCC_HOME/PREFIX2DATA_DIR/INCLUDE_DIR_SUFFIX
-   * 2. - path(argv[0])/BIN2DATA_DIR/INCLUDE_DIR_SUFFIX
-   * 3. - DATADIR/INCLUDE_DIR_SUFFIX (only on *nix)
+   * 3. - path(argv[0])/BIN2DATA_DIR/INCLUDE_DIR_SUFFIX
+   * 4. - DATADIR/INCLUDE_DIR_SUFFIX (only on *nix)
    */
 
   if ((p = getenv(SDCC_INCLUDE_NAME)) == NULL) {
-    if ((p = getenv(SDCC_DIR_NAME)) != NULL) {
-      SNPRINTF(buf, sizeof buf, "%s" PREFIX2DATA_DIR INCLUDE_DIR_SUFFIX, p);
-      p = buf;
-    }
-    else {
-      if ((p = getBinPath(argv0)) == NULL)
-        p = ".";
-
-      SNPRINTF(buf, sizeof buf, "%s" BIN2DATA_DIR INCLUDE_DIR_SUFFIX, p);
-      p = buf;
-
-#ifndef _WIN32  /* *nix paltform */
-      if (!pathExists(p))
-        p = DATADIR INCLUDE_DIR_SUFFIX; /* last resort */
-#endif
-    }
+    SNPRINTF(buf, sizeof buf, "%s" INCLUDE_DIR_SUFFIX, datadir);
+    p = buf;
   }
 
   setMainValue ("includedir", p);
@@ -1716,7 +1702,7 @@ setIncludePath(const char *argv0)
 
 /* Set system lib path */
 static void
-setLibPath(const char *argv0)
+setLibPath(const char *datadir)
 {
   char *p;
   char buf[PATH_MAX];
@@ -1726,30 +1712,54 @@ setLibPath(const char *argv0)
    *
    * 1. - $SDCC_LIB
    * 2. - $SDCC_HOME/PREFIX2DATA_DIR/LIB_DIR_SUFFIX/<model>
-   * 2. - path(argv[0])/BIN2DATA_DIR/LIB_DIR_SUFFIX/<model>
-   * 3. - DATADIR/LIB_DIR_SUFFIX/<model> (only on *nix)
+   * 3. - path(argv[0])/BIN2DATA_DIR/LIB_DIR_SUFFIX/<model>
+   * 4. - DATADIR/LIB_DIR_SUFFIX/<model> (only on *nix)
    */
 
   if ((p = getenv(SDCC_LIB_NAME)) == NULL) {
-    if ((p = getenv(SDCC_DIR_NAME)) != NULL) {
-      SNPRINTF(buf, sizeof buf, "%s" PREFIX2DATA_DIR LIB_DIR_SUFFIX, p);
-      p = buf;
-    }
-    else {
-      if ((p = getBinPath(argv0)) == NULL)
-        p = ".";
-
-      SNPRINTF(buf, sizeof buf, "%s" BIN2DATA_DIR LIB_DIR_SUFFIX, p);
-      p = buf;
-
-#ifndef _WIN32  /* *nix palforn */
-      if (!pathExists(p))
-        p = DATADIR LIB_DIR_SUFFIX; /* last resort */
-#endif
-    }
+    SNPRINTF(buf, sizeof buf, "%s" LIB_DIR_SUFFIX, datadir);
+    p = buf;
   }
 
   setMainValue ("libdir", p);
+}
+
+/* Set data path */
+static void
+setDataPaths(const char *argv0)
+{
+  char *p;
+  char buf[PATH_MAX];
+
+  /*
+   * Search logic:
+   *
+   * 1. - $SDCC_HOME/PREFIX2DATA_DIR
+   * 2. - path(argv[0])/BIN2DATA_DIR
+   * 3. - DATADIR (only on *nix)
+   */
+
+  if ((p = getenv(SDCC_DIR_NAME)) != NULL) {
+    SNPRINTF(buf, sizeof buf, "%s" PREFIX2DATA_DIR, p);
+    p = buf;
+  }
+  else {
+    if ((p = getBinPath(argv0)) == NULL)
+      p = ".";
+
+    SNPRINTF(buf, sizeof buf, "%s" BIN2DATA_DIR, p);
+    p = buf;
+
+#ifndef _WIN32  /* *nix paltform */
+    if (!pathExists(p))
+      p = DATADIR; /* last resort */
+#endif
+  }
+
+  setIncludePath(p);
+  setLibPath(p);
+
+  setMainValue ("datadir", p);
 }
 
 static void
@@ -1885,8 +1895,7 @@ main (int argc, char **argv, char **envp)
 
   initValues ();
   setBinPaths(argv[0]);
-  setIncludePath(argv[0]);
-  setLibPath(argv[0]);
+  setDataPaths(argv[0]);
 
   /* initMem() is expensive, but
      initMem() must called before port->finaliseOptions ().

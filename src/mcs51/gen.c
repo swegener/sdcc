@@ -4006,7 +4006,7 @@ genCmp (operand * left, operand * right,
       AOP_TYPE (right) == AOP_CRY)
     {
       emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
-      emitcode ("anl", "c,/%s", AOP (left)->aopu.aop_dir);
+      emitcode ("anl", "c,%s", AOP (left)->aopu.aop_dir);
     }
   else
     {

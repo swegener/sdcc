@@ -108,7 +108,7 @@ VOID
 ihx(i)
 {
 	register Addr_T chksum;
-
+	int byte, bytes, address=0;
 	if (i) {
 		if (hilo == 0) {
 			chksum = rtval[0];
@@ -120,14 +120,33 @@ ihx(i)
 				chksum++;
 		}
 		fprintf(ofp, ":%02X", chksum);
+		// how much bytes?
+		for (i=0, bytes=0; i<rtcnt; i++) {
+		  if (rtflg[i]) {
+		    bytes++;
+		  }
+		}
+		byte=0;
 		for (i = 0; i < rtcnt ; i++) {
-			if (rtflg[i]) {
-				fprintf(ofp, "%02X", rtval[i]);
-				chksum += rtval[i];
-			}
-			if (i == 1) {
-				fprintf(ofp, "00");
-			}
+		  if (rtflg[i]) {
+		    switch (byte) {
+		    case 0: 
+		      address=rtval[0]<<8; 
+		      break;
+		    case 1: 
+		      address+=rtval[1]; 
+		      if ((address+bytes)>0xffff) {
+			fprintf (stderr, "64k boundary cross at %04x\n", address);
+		      }
+		      break;
+		    }
+		    fprintf(ofp, "%02X", rtval[i]);
+		    chksum += rtval[i];
+		    byte++;
+		  }
+		  if (i == 1) {
+		    fprintf(ofp, "00");
+		  }
 		}
 		fprintf(ofp, "%02X\n", (-chksum) & 0xff);
 	} else {

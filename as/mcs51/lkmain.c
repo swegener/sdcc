@@ -420,7 +420,7 @@ link_main()
 		sdp.s_area = NULL;
 		sdp.s_areax = NULL;
 		sdp.s_addr = 0;
-		lastExtendedAddress = -1;
+		// jwk lastExtendedAddress = -1;
 		break;
 
 	case 'M':

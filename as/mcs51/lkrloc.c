@@ -52,7 +52,7 @@
 /* Global which holds the upper 16 bits of the last 32 bit area adress
  * output. Useful only for iHex mode.
  */
-int    lastExtendedAddress;
+int    lastExtendedAddress=-1;
 
 /*)Function	VOID	reloc(c)
  *
@@ -536,10 +536,12 @@ relr()
 		if (extendedAddress != lastExtendedAddress)
 		{
 		
-		    #if 0
-		    printf("output extended linear address record 0x%x\n",
-		    	    extendedAddress);
-		    #endif
+#if 1 // jwk
+		  if (lastExtendedAddress!=-1) {
+		    printf("output extended linear address record 0x%x 0x%x\n",
+			   extendedAddress, lastExtendedAddress);
+		  }
+#endif
 		    
 		    if (rflag)
 		    {

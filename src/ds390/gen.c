@@ -4333,8 +4333,7 @@ genCmpLt (iCode * ic, iCode * ifx)
   sym_link *letype, *retype;
   int sign;
 
-  D (emitcode (";", "genCmpLt ");
-    );
+  D (emitcode (";", "genCmpLt "););
 
   left = IC_LEFT (ic);
   right = IC_RIGHT (ic);
@@ -6848,8 +6847,7 @@ genLeftShift (iCode * ic)
   char *l;
   symbol *tlbl, *tlbl1;
 
-  D (emitcode (";", "genLeftShift ");
-    );
+  D (emitcode (";", "genLeftShift "););
 
   right = IC_RIGHT (ic);
   left = IC_LEFT (ic);
@@ -9230,12 +9228,25 @@ genDjnz (iCode * ic, iCode * ifx)
     return 0;
 
   /* otherwise we can save BIG */
+  D(emitcode(";", "genDjnz"););
+
   lbl = newiTempLabel (NULL);
   lbl1 = newiTempLabel (NULL);
 
   aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
 
-  if (IS_AOP_PREG (IC_RESULT (ic)))
+  if (AOP_NEEDSACC(IC_RESULT(ic)))
+  {
+      /* If the result is accessed indirectly via
+       * the accumulator, we must explicitly write
+       * it back after the decrement.
+       */
+      emitcode ("dec", "%s",
+                 aopGet(AOP(IC_RESULT(ic)), 0, FALSE, FALSE, FALSE));
+      aopPut(AOP(IC_RESULT(ic)), "acc", 0);
+      emitcode ("jnz", "%05d$", lbl->key + 100);
+  }
+  else if (IS_AOP_PREG (IC_RESULT (ic)))
     {
       emitcode ("dec", "%s",
 		aopGet (AOP (IC_RESULT (ic)), 0, FALSE, FALSE, FALSE));

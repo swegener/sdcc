@@ -1737,10 +1737,13 @@ cseBBlock (eBBlock * ebb, int computeOnly,
       /* if jumptable then mark the usage */
       if (ic->op == JUMPTABLE)
 	{
-	  OP_USES(IC_JTCOND (ic))=
-	    bitVectSetBit (OP_USES (IC_JTCOND (ic)), ic->key);
-	  setUsesDefs (IC_JTCOND (ic), ebb->defSet,
-		       ebb->outDefs, &ebb->usesDefs);
+          if (IS_SYMOP (IC_JTCOND (ic)))
+	    {
+	      OP_USES(IC_JTCOND (ic)) =
+	        bitVectSetBit (OP_USES (IC_JTCOND (ic)), ic->key);
+	      setUsesDefs (IC_JTCOND (ic), ebb->defSet,
+		           ebb->outDefs, &ebb->usesDefs);
+	    }
 	  continue;
 	}
 

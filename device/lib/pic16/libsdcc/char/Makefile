@@ -19,6 +19,15 @@ SRCS	=	divschar \
 		modschar \
 		moduchar
 
+#SRCS	=	
+
+#		modschar \
+#		moduchar
+
+#AS_SRCS	=	divchar \
+#		modchar
+
+
 include ../Makefile.rules
 
 
@@ -34,5 +43,7 @@ $(LIB): $(OFILES)
 		else \
 			$(AR) -r $(LIB) $$object ; \
 		fi; \
-		echo adding $$object ; \
+		echo -n "$$object " ; \
 	done ;
+	@echo
+	

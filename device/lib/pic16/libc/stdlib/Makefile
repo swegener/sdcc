@@ -20,24 +20,29 @@ SRCS	= 	atof \
 		free \
 		ltoa \
 		malloc \
+		memfree \
+		memfreemax \
+		memmisc \
 		realloc \
 		x_ftoa \
 		putchar
 
+S_SRCS	= g_ftoa
 
-CFILES	= $(patsubst %,%.c,$(SRCS))
-OFILES	= $(patsubst %.c,%.o,$(CFILES))
+#CFILES	= $(patsubst %,%.c,$(SRCS))
+#OFILES	= $(patsubst %.c,%.o,$(CFILES))
 
+#OPT_FLAGS	+= --stack-auto
 
-DEBUG= --stack-auto
+DEBUG=
 #COMPILE_FLAGS   += --pomit-config-words --pomit-ivt --denable-peeps --optimize-goto --obanksel=2
 COMPILE_FLAGS	+= $(DEBUG)
 
-CFILES	= $(patsubst %,%.c,$(SRCS))
-OFILES	= $(patsubst %.c,%.o,$(CFILES))
+#CFILES	= $(patsubst %,%.c,$(SRCS))
+#OFILES	= $(patsubst %.c,%.o,$(CFILES))
 
-%.o: %.c
-	$(CC) $(CFLAGS) $(COMPILE_FLAGS) -c $<
+#.c.o
+#	$(CC) $(CFLAGS) $(COMPILE_FLAGS) -c $<
 
 build-library: $(OFILES)
 

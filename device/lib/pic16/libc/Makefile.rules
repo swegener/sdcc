@@ -19,19 +19,28 @@ PRJDIR	= ../../../../..
 LIBC_INC_DIR	= $(PRJDIR)/device/include/pic16
 
 #OPT_FLAGS	+= --pstack-model=large
+#OPT_FLAGS	+= --stack-auto
 
-COMPILE_FLAGS	+= $(MODELFLAGS)
-COMPILE_FLAGS	+= $(OPT_FLAGS)
+COMPILE_FLAGS	+= $(MODELFLAGS) $(OPT_FLAGS)
 
 
 CFLAGS	= -I$(LIBC_INC_DIR)
 
 CFILES	= $(patsubst %,%.c,$(SRCS))
-OFILES	= $(patsubst %.c,%.o,$(CFILES))
+COFILES	= $(patsubst %.c,%.o,$(CFILES))
 
-%.o: %.c
+ASFLAGS	= -I$(LIBC_INC_DIR) -p18f452 -D__18F452
+
+SFILES	= $(patsubst %,%.S,$(S_SRCS))
+SOFILES	= $(patsubst %.S,%.o,$(SFILES))
+
+OFILES	= $(COFILES) $(SOFILES)
+
+.c.o:
 	$(CC) $(CFLAGS) $(COMPILE_FLAGS) -c $<
 
+.S.o:
+	$(AS) $(ASFLAGS) -c $<
 
 all: build-library clean-intermediate-no-asm
 

@@ -24,8 +24,8 @@
 
 int atoi(char * s)
 {
-     register int rv=0; 
-     register char sign = 0;
+  int rv=0; 
+  char sign = 0;
 
      /* skip till we find either a digit or '+' or '-' */
      while (*s) {
@@ -36,7 +36,9 @@ int atoi(char * s)
 	s++;
      } 	  
 
-     sign = (*s == '-');
+     if(*s == '-')sign=1;
+
+//     sign = (*s == '-');
      if (*s == '-' || *s == '+') s++;
 
      while (*s && *s >= '0' && *s <= '9') {
@@ -44,6 +46,9 @@ int atoi(char * s)
         s++;
      }
 
-     return (sign ? -rv : rv);
+     if(sign)return (-rv);
+     else return (rv);
+     
+//     return (sign ? -rv : rv);
 }
 

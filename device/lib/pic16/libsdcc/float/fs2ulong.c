@@ -28,6 +28,8 @@ union float_long
   long l;
 };
 
+#define volatile
+
 /* convert float to unsigned long */
 unsigned long __fs2ulong (float a1) _FS_REENTRANT
 {
@@ -47,7 +49,3 @@ unsigned long __fs2ulong (float a1) _FS_REENTRANT
 
   return l;
 }
-
-
-
-

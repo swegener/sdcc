@@ -15,33 +15,54 @@
 
 #define NUMBER_OF_DIGITS 32
 
-void ultoa(unsigned long value, data char *string, unsigned char radix)
+#if _DEBUG
+extern void io_long(unsigned long);
+extern void io_str(char *);
+#endif
+
+
+void ultoa(unsigned long value, data unsigned char* str, unsigned char radix)
 {
-unsigned char index;
-char buffer[NUMBER_OF_DIGITS];  /* space for NUMBER_OF_DIGITS + '\0' */
+  unsigned int index;
+  unsigned char ch;
+  unsigned char buffer[NUMBER_OF_DIGITS];  /* space for NUMBER_OF_DIGITS + '\0' */
 
-  index = NUMBER_OF_DIGITS;
+    index = NUMBER_OF_DIGITS;
+  
+    do {
+      ch = '0' + (value % radix);
+      if ( ch > '9') ch += 'a' - '9' - 1;
 
-  do {
-    buffer[--index] = '0' + (value % radix);
-    if ( buffer[index] > '9') buffer[index] += 'A' - '9' - 1;
-    value /= radix;
-  } while (value != 0);
+#if _DEBUG
+      io_str( "ultoa: " );
+      io_long( value );
+      io_long( (unsigned long) ch );
+#endif
 
-  do {
-    *string++ = buffer[index++];
-  } while ( index < NUMBER_OF_DIGITS );
+      buffer[ --index ] = ch;
+      value /= radix;
+    } while (value != 0);
 
-  *string = 0;  /* string terminator */
+    do {
+      *str++ = buffer[index++];
+    } while ( index < NUMBER_OF_DIGITS );
+
+    *str = 0;  /* string terminator */
 }
 
-void ltoa(long value, data char *string, unsigned char radix)
+void ltoa(long value, data unsigned char* str, unsigned char radix)
 {
+#if _DEBUG
+  io_str( "ltoa: " );
+  io_long( (unsigned long)value );
+#endif
+
   if (value < 0 && radix == 10) {
-    *string++ = '-';
+    *str++ = '-';
     value = -value;
   }
 
-  ultoa(value, string, radix);
-}
 
+
+  ultoa((unsigned long)value, str, radix);
+}

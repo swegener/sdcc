@@ -465,6 +465,36 @@ void gpsimDebug_StackDump(char *fname, int line, char *info)
   gpsimio2_lit('\n');
 }
 
+const char *gptr_fns[4][2] = {
+  { "_gptrget1", "_gptrput1" },
+  { "_gptrget2", "_gptrput2" },
+  { "_gptrget3", "_gptrput3" },
+  { "_gptrget4", "_gptrput4" } };
+
+extern set *externs;
+  
+/* generate a call to the generic pointer read/write functions */
+void pic16_callGenericPointerRW(int rw, int size)
+{
+  char buf[32];
+  symbol *sym;
+
+    if(size>4) {
+      werror(W_POSSBUG2, __FILE__, __LINE__);
+      abort();
+    }
+
+    strcpy(buf, port->fun_prefix);
+    strcat(buf, gptr_fns[size-1][rw]);
+    
+    pic16_emitpcode (POC_CALL, pic16_popGetWithString (buf));
+    
+    sym = newSymbol( buf, 0 );
+    sym->used++;
+    strcpy(sym->rname, buf);
+    checkAddSym(&externs, sym);
+}
+
 
 
 /* check all condition and return appropriate instruction, POC_CPFSGT or POC_CPFFSLT */

@@ -118,6 +118,7 @@ regs *pic16_regWithName(char *name);
 void  pic16_freeAllRegs ();
 void  pic16_deallocateAllRegs ();
 regs *pic16_findFreeReg(short type);
+regs *pic16_findFreeRegNext(short type, regs *creg);
 regs *pic16_allocWithIdx (int idx);
 
 regs *pic16_allocDirReg (operand *op );

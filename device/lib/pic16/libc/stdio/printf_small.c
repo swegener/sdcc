@@ -56,7 +56,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void printf_small(char *fmt, ...) 
+void printf_small(char *fmt, ...) reentrant
 {
   char *ch;
   char radix;
@@ -67,10 +67,8 @@ void printf_small(char *fmt, ...)
   float flt;
   char *str;
   data char *str1;
-//#define str1	str
   long val;
-//  static
-  char buffer[35];
+  static char buffer[16];
   va_list ap ;
 
     ch = fmt;
@@ -78,8 +76,7 @@ void printf_small(char *fmt, ...)
 
     while( *ch ) {			//for (; *fmt ; fmt++ )
         if (*ch == '%') {
-            flong = 0; fstr = 0; fchar = 0;
-            ffloat = 0;
+            flong = fstr = fchar = ffloat = 0;
             radix = 0;
             ch++;
 

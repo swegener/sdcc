@@ -16,7 +16,7 @@ MCUS	= $(shell cat ../pics.build)
 PROCESSORS	= $(MCUS)
 
 
-DIRS	= adc i2c
+DIRS	= adc i2c usart
 
 LOBJS	= $(patsubst %,%/*.o,$(DIRS))
 
@@ -37,7 +37,7 @@ build-libraries:
 build-processor-library:
 	for dir in $(DIRS) ; do	 \
 		$(MAKE) -C $$dir clean ; \
-		$(MAKE) -C $$dir build-mcu-library MCU=18f$(MMCU); \
+		$(MAKE) -C $$dir build-io-lib MCU=18f$(MMCU); \
 	done;
 	gplib -c $(LIB) $(LOBJS)
 	mv -v $(LIB) ../bin

@@ -4247,6 +4247,32 @@ pCodeOp *pic16_newpCodeOpReg(int rIdx)
   return pcop;
 }
 
+pCodeOp *pic16_newpCodeOpRegNotVect(bitVect *bv)
+{
+  pCodeOp *pcop;
+  regs *r;
+  
+    pcop = Safe_calloc(1, sizeof(pCodeOpReg));
+    pcop->name = NULL;
+    
+    r = pic16_findFreeReg(REG_GPR);
+
+    while(r) {
+      if(!bitVectBitValue(bv, r->rIdx)) {
+        PCOR(pcop)->r = r;
+        PCOR(pcop)->rIdx = r->rIdx;
+        pcop->type = r->pc_type;
+        return (pcop);
+      }
+      
+      r = pic16_findFreeRegNext(REG_GPR, r);
+    }
+  
+  return NULL;
+}
+
+      
+
 pCodeOp *pic16_newpCodeOpRegFromStr(char *name)
 {
   pCodeOp *pcop;
@@ -4950,8 +4976,8 @@ char *pic16_pCode2str(char *str, size_t size, pCode *pc)
 			  (((pCodeOpRegBit *)(PCI(pc)->pcop))->bit ));
 			  
 	} else if(PCI(pc)->pcop->type == PO_GPR_BIT) {
-	  SAFE_snprintf(&s,&size,"%s,%d", pic16_get_op_from_instruction(PCI(pc)),PCORB(PCI(pc)->pcop)->bit);
-	}else
+	  SAFE_snprintf(&s,&size,"%s, %d", pic16_get_op_from_instruction(PCI(pc)),PCORB(PCI(pc)->pcop)->bit);
+	} else
 	  SAFE_snprintf(&s,&size,"%s,0 ; ?bug", pic16_get_op_from_instruction(PCI(pc)));
 	//PCI(pc)->pcop->t.bit );
       } else {
@@ -4962,21 +4988,23 @@ char *pic16_pCode2str(char *str, size_t size, pCode *pc)
 	  else
 	    SAFE_snprintf(&s,&size,"(1 << (%s & 7))",pic16_get_op_from_instruction(PCI(pc)));
 
-	}else {
-	  SAFE_snprintf(&s,&size,"%s", pic16_get_op_from_instruction(PCI(pc)));
-
-		if( PCI(pc)->num_ops == 3 || ((PCI(pc)->num_ops == 2) && (PCI(pc)->isAccess))) {
-			if(PCI(pc)->num_ops == 3)
-				SAFE_snprintf(&s,&size,", %c", ( (PCI(pc)->isModReg) ? 'F':'W'));
-
-			r = pic16_getRegFromInstruction(pc);
-//			fprintf(stderr, "%s:%d reg = %p\tname= %s, accessBank= %d\n",
-//					__FUNCTION__, __LINE__, r, (r)?r->name:"<null>", (r)?r->accessBank:-1);
-
-			if(r && !r->accessBank)SAFE_snprintf(&s,&size,", %s", (!pic16_mplab_comp?"B":"BANKED"));
-	  }
 	}
+	else 
+	{
+          SAFE_snprintf(&s,&size,"%s", pic16_get_op_from_instruction(PCI(pc)));
+        }
       }
+	if( PCI(pc)->num_ops == 3 || ((PCI(pc)->num_ops == 2) && (PCI(pc)->isAccess))) {
+	  if(PCI(pc)->num_ops == 3 && !PCI(pc)->isBitInst)
+	    SAFE_snprintf(&s,&size,", %c", ( (PCI(pc)->isModReg) ? 'F':'W'));
+
+          r = pic16_getRegFromInstruction(pc);
+//              fprintf(stderr, "%s:%d reg = %p\tname= %s, accessBank= %d\n",
+//                      __FUNCTION__, __LINE__, r, (r)?r->name:"<null>", (r)?r->accessBank:-1);
+
+          if(r && !r->accessBank)SAFE_snprintf(&s,&size,", %s", (!pic16_mplab_comp?"B":"BANKED"));
+        }
+//      
 
     }
     break;
@@ -4988,7 +5016,7 @@ char *pic16_pCode2str(char *str, size_t size, pCode *pc)
 
   case PC_INFO:
     SAFE_snprintf(&s,&size,"; info ==>");
-    switch(((pCodeInfo *)pc)->type) {
+    switch( PCINF(pc)->type ) {
       case INF_OPTIMIZATION:
           SAFE_snprintf(&s,&size, " [optimization] %s\n", OPT_TYPE_STR[ PCOO(PCINF(pc)->oper1)->type ]);
           break;
@@ -5244,7 +5272,7 @@ static void unlinkpCodeFromBranch(pCode *pcl , pCode *pc)
 
   bprev = NULL;
 
-  if(pcl->type == PC_OPCODE)
+  if(pcl->type == PC_OPCODE || pcl->type == PC_INLINE || pcl->type == PC_ASMDIR)
     b = PCI(pcl)->label;
   else {
     fprintf(stderr, "LINE %d. can't unlink from non opcode\n",__LINE__);
@@ -6537,7 +6565,7 @@ static pCode * findInstructionUsingLabel(pCodeLabel *pcl, pCode *pcs)
 
   for(pc = pcs; pc; pc = pc->next) {
 
-    if(((pc->type == PC_OPCODE) || (pc->type == PC_INLINE)) && 
+    if(((pc->type == PC_OPCODE) || (pc->type == PC_INLINE) || (pc->type == PC_ASMDIR)) && 
        (PCI(pc)->pcop) && 
        (PCI(pc)->pcop->type == PO_LABEL) &&
        (PCOLAB(PCI(pc)->pcop)->key == pcl->key))
@@ -7504,120 +7532,116 @@ static void AnalyzeFlow(int level)
   static int times_called=0;
   pBlock *pb;
 
-	if(!the_pFile) {
-
-		/* remove unused allocated registers before exiting */
-		pic16_RemoveUnusedRegisters();
-	
-	  return;
-	}
+    if(!the_pFile) {
+      /* remove unused allocated registers before exiting */
+      pic16_RemoveUnusedRegisters();
+      return;
+    }
 
 
-  /* if this is not the first time this function has been called,
-     then clean up old flow information */
-	if(times_called++) {
-		for(pb = the_pFile->pbHead; pb; pb = pb->next)
-			unBuildFlow(pb);
+    /* if this is not the first time this function has been called,
+     * then clean up old flow information */
+    if(times_called++) {
+      for(pb = the_pFile->pbHead; pb; pb = pb->next)
+        unBuildFlow(pb);
+        pic16_RegsUnMapLiveRanges();
+    }
+    GpcFlowSeq = 1;
 
-		pic16_RegsUnMapLiveRanges();
-	}
-
-	GpcFlowSeq = 1;
-
-  /* Phase 2 - Flow Analysis - Register Banking
-   *
-   * In this phase, the individual flow blocks are examined
-   * and register banking is fixed.
-   */
+    /* Phase 2 - Flow Analysis - Register Banking
+     *
+     * In this phase, the individual flow blocks are examined
+     * and register banking is fixed.
+     */
 
 #if 0
-	for(pb = the_pFile->pbHead; pb; pb = pb->next)
-		pic16_FixRegisterBanking(pb);
+    for(pb = the_pFile->pbHead; pb; pb = pb->next)
+      pic16_FixRegisterBanking(pb);
 #endif
 
-  /* Phase 2 - Flow Analysis
-   *
-   * In this phase, the pCode is partition into pCodeFlow 
-   * blocks. The flow blocks mark the points where a continuous
-   * stream of instructions changes flow (e.g. because of
-   * a call or goto or whatever).
-   */
+    /* Phase 2 - Flow Analysis
+     *
+     * In this phase, the pCode is partition into pCodeFlow 
+     * blocks. The flow blocks mark the points where a continuous
+     * stream of instructions changes flow (e.g. because of
+     * a call or goto or whatever).
+     */
 
-	for(pb = the_pFile->pbHead; pb; pb = pb->next)
-		pic16_BuildFlow(pb);
-
-
-  /* Phase 2 - Flow Analysis - linking flow blocks
-   *
-   * In this phase, the individual flow blocks are examined
-   * to determine their order of excution.
-   */
-
-	for(pb = the_pFile->pbHead; pb; pb = pb->next)
-		LinkFlow(pb);
-
-  /* Phase 3 - Flow Analysis - Flow Tree
-   *
-   * In this phase, the individual flow blocks are examined
-   * to determine their order of execution.
-   */
-
-	for(pb = the_pFile->pbHead; pb; pb = pb->next)
-		pic16_BuildFlowTree(pb);
+    for(pb = the_pFile->pbHead; pb; pb = pb->next)
+      pic16_BuildFlow(pb);
 
 
-  /* Phase x - Flow Analysis - Used Banks
-   *
-   * In this phase, the individual flow blocks are examined
-   * to determine the Register Banks they use
-   */
+    /* Phase 2 - Flow Analysis - linking flow blocks
+     *
+     * In this phase, the individual flow blocks are examined
+     * to determine their order of excution.
+     */
+
+    for(pb = the_pFile->pbHead; pb; pb = pb->next)
+      LinkFlow(pb);
+
+    /* Phase 3 - Flow Analysis - Flow Tree
+     *
+     * In this phase, the individual flow blocks are examined
+     * to determine their order of execution.
+     */
+
+    for(pb = the_pFile->pbHead; pb; pb = pb->next)
+      pic16_BuildFlowTree(pb);
+
+
+    /* Phase x - Flow Analysis - Used Banks
+     *
+     * In this phase, the individual flow blocks are examined
+     * to determine the Register Banks they use
+     */
 
 #if 0
-	for(pb = the_pFile->pbHead; pb; pb = pb->next)
-		FixBankFlow(pb);
+    for(pb = the_pFile->pbHead; pb; pb = pb->next)
+      FixBankFlow(pb);
 #endif
 
 
-	for(pb = the_pFile->pbHead; pb; pb = pb->next)
-		pic16_pCodeRegMapLiveRanges(pb);
+    for(pb = the_pFile->pbHead; pb; pb = pb->next)
+      pic16_pCodeRegMapLiveRanges(pb);
 
-	pic16_RemoveUnusedRegisters();
+    pic16_RemoveUnusedRegisters();
 
   //  for(pb = the_pFile->pbHead; pb; pb = pb->next)
-	pic16_pCodeRegOptimizeRegUsage(level);
-
-
-	if(!options.nopeep)
-		OptimizepCode('*');
+    pic16_pCodeRegOptimizeRegUsage(level);
 
 
 #if 0
-	for(pb = the_pFile->pbHead; pb; pb = pb->next)
-		DumpFlow(pb);
+    if(!options.nopeep)
+      OptimizepCode('*');
 #endif
 
-  /* debug stuff */ 
-	for(pb = the_pFile->pbHead; pb; pb = pb->next) {
-	  pCode *pcflow;
-		for( pcflow = pic16_findNextpCode(pb->pcHead, PC_FLOW); 
-			(pcflow = pic16_findNextpCode(pcflow, PC_FLOW)) != NULL;
-			pcflow = pcflow->next) {
+#if 0
+    for(pb = the_pFile->pbHead; pb; pb = pb->next)
+      DumpFlow(pb);
+#endif
 
-			FillFlow(PCFL(pcflow));
-		}
-	}
+    /* debug stuff */ 
+    for(pb = the_pFile->pbHead; pb; pb = pb->next) {
+      pCode *pcflow;
+      
+        for( pcflow = pic16_findNextpCode(pb->pcHead, PC_FLOW); 
+          (pcflow = pic16_findNextpCode(pcflow, PC_FLOW)) != NULL;
+	  pcflow = pcflow->next) {
+	    FillFlow(PCFL(pcflow));
+        }
+    }
 
 #if 0
-	for(pb = the_pFile->pbHead; pb; pb = pb->next) {
-	  pCode *pcflow;
+    for(pb = the_pFile->pbHead; pb; pb = pb->next) {
+      pCode *pcflow;
 
-		for( pcflow = pic16_findNextpCode(pb->pcHead, PC_FLOW); 
-			(pcflow = pic16_findNextpCode(pcflow, PC_FLOW)) != NULL;
-			pcflow = pcflow->next) {
-
-			FlowStats(PCFL(pcflow));
-		}
-	}
+        for( pcflow = pic16_findNextpCode(pb->pcHead, PC_FLOW); 
+          (pcflow = pic16_findNextpCode(pcflow, PC_FLOW)) != NULL;
+          pcflow = pcflow->next) {
+            FlowStats(PCFL(pcflow));
+        }
+    }
 #endif
 }
 
@@ -7638,25 +7662,27 @@ void pic16_AnalyzeBanking(void)
 {
   pBlock  *pb;
 
+    /* Phase x - Flow Analysis - Used Banks
+     *
+     * In this phase, the individual flow blocks are examined
+     * to determine the Register Banks they use
+     */
 
-	/* Phase x - Flow Analysis - Used Banks
-	 *
-	 * In this phase, the individual flow blocks are examined
-	 * to determine the Register Banks they use
-	 */
+    AnalyzeFlow(0);
+    AnalyzeFlow(1);
 
-	AnalyzeFlow(0);
-	AnalyzeFlow(1);
+    if(!options.nopeep)
+      OptimizepCode('*');
 
-	if(!the_pFile)return;
 
-	if(!pic16_options.no_banksel) {
-		for(pb = the_pFile->pbHead; pb; pb = pb->next) {
-//			fprintf(stderr, "%s:%d: Fix register banking in pb= 0x%p\n", __FILE__, __LINE__, pb);
-			pic16_FixRegisterBanking(pb);
-		}
-	}
+    if(!the_pFile)return;
 
+    if(!pic16_options.no_banksel) {
+      for(pb = the_pFile->pbHead; pb; pb = pb->next) {
+//        fprintf(stderr, "%s:%d: Fix register banking in pb= 0x%p\n", __FILE__, __LINE__, pb);
+        pic16_FixRegisterBanking(pb);
+      }
+    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -7720,8 +7746,10 @@ static void buildCallTree(void    )
 
       if(isPCF(pc)) {
 	if (PCF(pc)->fname) {
+        char buf[16];
 
-	  if(STRCASECMP(PCF(pc)->fname, "_main") == 0) {
+          sprintf(buf, "%smain", port->fun_prefix);
+	  if(STRCASECMP(PCF(pc)->fname, buf) == 0) {
 	    //fprintf(stderr," found main \n");
 	    pb->cmemmap = NULL;  /* FIXME do we need to free ? */
 	    pb->dbName = 'M';
@@ -8100,7 +8128,7 @@ static void pBlockStats(FILE *of, pBlock *pb)
     fprintf(of,";%d compiler assigned register%c:\n",n, ( (n!=1) ? 's' : ' '));
 
     while (r) {
-      fprintf(of,";   %s\n",r->name);
+      fprintf(of,   ";   %s\n",r->name);
       r = setNextItem(pb->tregisters);
     }
   }

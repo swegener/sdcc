@@ -30,13 +30,14 @@
 
 #include <sdcc-lib.h>
 
-#define MSB_SET(x) ((x >> (8*sizeof(x)-1)) & 1)
+//#define MSB_SET(x)	((x >> (8*sizeof(x)-1)) & 1)
+#define MSB_SET(x)	(x & 0x80)
 
 unsigned char _divuchar (unsigned char a, unsigned char b) _IL_REENTRANT
 {
   unsigned char reste = 0;
   unsigned char count = 8;
-    char c;
+  char c;
 
   do
   {
@@ -50,10 +51,12 @@ unsigned char _divuchar (unsigned char a, unsigned char b) _IL_REENTRANT
     if (reste >= b)
     {
       reste -= b;
+
       // a <- (result = 1)
       a |= 1;
     }
   }
   while (--count);
+
   return a;
 }

@@ -38,12 +38,15 @@
 
 /* following formats are supported :-
    format     output type       argument-type
+     %u*       unsigned            *
+
+     %b	       binary
      %d        decimal             int
      %ld       decimal             long
      %hd       decimal             char
      %x        hexadecimal         int
-     %lx       hexadecimal         long
-     %hx       hexadecimal         char
+     %lxX      hexadecimal         long
+     %hxX      hexadecimal         char
      %o        octal               int
      %lo       octal               long
      %ho       octal               char
@@ -51,65 +54,102 @@
      %s        character           generic pointer
 */
 
+#include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+#if 0
+#define	DPUT(c)	putchar( c )
+#else
+#define DPUT(c)
+#endif
+
+#define ISLONG		(flong)
+#define ISSTR		(fstr)
+#define ISCHAR		(fchar)
+#define HAVESIGN	(nosign)
+
+
+#if 1
+extern void io_long(long);
+extern void io_int(long);
+extern void io_char(char);
+#endif
+
 void printf_tiny(char *fmt, ...) 
 {
-  char *ch;
   char radix;
-  char flong;
-  char fstr;
-  char fchar;
-  char *str;
+  char flong, fstr;
+  char fchar, nosign;
+  char upcase;
+
+  char *str, *ch;
   data char *str1;
   long val;
-//  static
-  char buffer[35];
+//  static char buffer[16];
+  char buffer[16];
   va_list ap ;
 
-    ch = fmt;
     va_start(ap,fmt);
-
+    ch = fmt;
+    
     while( *ch ) {			//for (; *fmt ; fmt++ )
         if (*ch == '%') {
-            flong = fstr = fchar = 0;
+            ISLONG = 0;
+            ISSTR = 0;
+            ISCHAR = 0;
+            HAVESIGN = 0;
             radix = 0;
+            upcase = 0;
             ch++;
 
-            if(*ch == 'l') {
-              flong = 1;
-              ch++;
-            } else
-            if(*ch == 'h') {
-              fchar = 1;
+            if(*ch == 'u') {
+              HAVESIGN = 1;
               ch++;
             }
             
-            if(*ch == 's')fstr = 1;
+            if(*ch == 'l') {
+              ISLONG = 1;
+              ch++;
+            } else
+            if(*ch == 'h') {
+              ISCHAR = 1;
+              ch++;
+            }
+            
+            if(*ch == 's')ISSTR = 1;
             else if(*ch == 'd')radix = 10;
-            else if(*ch == 'x')radix = 16;
+            else if(*ch == 'x'){ radix = 16; upcase = 0; }
+            else if(*ch == 'X'){ radix = 16; upcase = 1; }
             else if(*ch == 'c')radix = 0;
             else if(*ch == 'o')radix = 8;
+            else if(*ch == 'b')radix = 2;
             
-            if(fstr) {
+            if(ISSTR) {
                 str = va_arg(ap, char *);
-                while (*str) putchar(*str++);
+                while(*str) { putchar(*str);str++;}
             } else {
-              if(flong)val = va_arg(ap, long);
+              if(ISLONG)val = va_arg(ap, long);
               else
-              if(fchar)val = va_arg(ap, char);
+              if(ISCHAR)val = va_arg(ap, char);
               else {
                   val = va_arg(ap, int);
               }
-            
+
               if(radix) {
-                ltoa (val, buffer, radix);
+                if(HAVESIGN)
+                  ultoa(val, buffer, radix);
+                else
+                  ltoa (val, buffer, radix);
 
                 str1 = buffer;
-                while ( *str1 ) {
-                  putchar ( *str1++ );
+                while( (*str1) ) {
+                  radix = *str1;
+                  if(upcase)
+                    radix = toupper( radix );
+                  putchar ( radix );
+                  str1++;
                 }
               }	else
                 putchar((char)val);

@@ -27,12 +27,13 @@
 
 #include <sdcc-lib.h>
 
-#define MSB_SET(x) ((x >> (8*sizeof(x)-1)) & 1) 
+//#define MSB_SET(x) ((x >> (8*sizeof(x)-1)) & 1) 
+#define MSB_SET(x)	(x & 0x80)
+
 
 unsigned char _moduchar (unsigned char a, unsigned char b) _IL_REENTRANT
 {
   unsigned char count = 0;
-    
     
   while (!MSB_SET(b))
   {
@@ -44,6 +45,7 @@ unsigned char _moduchar (unsigned char a, unsigned char b) _IL_REENTRANT
     }
     count++;
   }
+
   do
   {
     if (a >= b)

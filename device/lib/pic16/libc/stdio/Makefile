@@ -14,14 +14,25 @@
 include ../Makefile.rules
 
 SRCS	= 	printf_tiny \
-		printf_small
+		printf_small \
+		printf \
+		sprintf \
+		fprintf \
+		vprintf \
+		vsprintf \
+		vfprintf \
+		strmusart \
+		strmmssp \
+		strmgpsim \
+		strmputchar \
+		streams
 
 
 CFILES	= $(patsubst %,%.c,$(SRCS))
 OFILES	= $(patsubst %.c,%.o,$(CFILES))
 
 
-DEBUG= --stack-auto
+DEBUG=
 #COMPILE_FLAGS   += --pomit-config-words --pomit-ivt --no-peep
 COMPILE_FLAGS	+= $(DEBUG)
 

@@ -679,7 +679,7 @@ static asmop *aopForSym (iCode *ic, operand *op, bool result)
         DEBUGpic16_emitcode("; +++ ", "%s:%d\top = %s", __FILE__, __LINE__, pic16_decodeOp(ic->op));
         if((ic->op == '=' /*|| ic->op == CAST*/) && IC_RESULT(ic) && AOP( IC_RESULT(ic) )
           && (AOP_TYPE(IC_RESULT(ic)) == AOP_REG)) {
-          pic16_DumpAop("aopForSym", AOP( IC_RESULT(ic) ));
+//          pic16_DumpAop("aopForSym", AOP( IC_RESULT(ic) ));
           
           for(i=0;i<aop->size;i++)
             aop->aopu.stk.pop[i] = pcop[i] = pic16_popRegFromIdx( AOP(IC_RESULT(ic))->aopu.aop_reg[i]->rIdx);
@@ -1272,7 +1272,7 @@ void pic16_aopOp (operand *op, iCode *ic, bool result)
 	  fprintf (stderr, "%s:%d called for a spillLocation -- assigning WREG instead --- CHECK!\n", __FUNCTION__, __LINE__);
 	  DEBUGpic16_emitcode (";","%s:%d called for a spillLocation -- assigning WREG instead --- CHECK", __FUNCTION__, __LINE__);
 	  assert (getSize(sym->type) <= 1);
-	  aop->aopu.pcop = pic16_popCopyReg (&pic16_pc_wreg);//pic16_popRegFromString("_WREG", getSize(sym->type), 0, op);
+	  aop->aopu.pcop = pic16_popCopyReg (&pic16_pc_wreg);
 	}
         aop->size = getSize(sym->type);
 
@@ -2404,7 +2404,7 @@ static void mov2fp(pCodeOp *dst, asmop *src, int offset)
 
 void pic16_testStackOverflow(void)
 {
-#define	GSTACK_TEST_NAME	"__gstack_test"
+#define	GSTACK_TEST_NAME	"_gstack_test"
 
   pic16_emitpcode(POC_CALL, pic16_popGetWithString( GSTACK_TEST_NAME ));
   
@@ -2412,7 +2412,8 @@ void pic16_testStackOverflow(void)
     symbol *sym;
 
       sym = newSymbol( GSTACK_TEST_NAME , 0 );
-      strcpy(sym->rname, GSTACK_TEST_NAME);
+      sprintf(sym->rname, "%s%s", port->fun_prefix, GSTACK_TEST_NAME);
+//      strcpy(sym->rname, GSTACK_TEST_NAME);
       checkAddSym(&externs, sym);
   }
 
@@ -3657,21 +3658,25 @@ static void genFunction (iCode *ic)
           sprintf(asymname, "ivec_%s", sym->name);
         else
           sprintf(asymname, "ivec_0x%x_%s", FUNC_INTNO(sym->type), sym->name);
-        asym = newSymbol(asymname, 0);
+  
+        /* when an interrupt is declared as naked, do not emit the special
+         * wrapper segment at vector address. The user should take care for
+         * this instead. -- VR */
 
-        /* FIXME: when an interrupt is declared as naked, do not emit the special
-         * wrapper segment at vector address. The user should take care for this
-         * instead. -- VR */
-        
-        apb = pic16_newpCodeChain(NULL, 'A', pic16_newpCodeCharP("; Starting pCode block for absolute section"));
-        pic16_addpBlock( apb );
+        if(!IFFUNC_ISNAKED(ftype) && (FUNC_INTNO(sym->type) =! INTNO_UNSPEC)) {
+          asym = newSymbol(asymname, 0);
+          apb = pic16_newpCodeChain(NULL, 'A', pic16_newpCodeCharP("; Starting pCode block for absolute section"));
+          pic16_addpBlock( apb );
 
-        pic16_addpCode2pBlock(apb, pic16_newpCodeCharP(";-----------------------------------------"));
-        pic16_addpCode2pBlock(apb, pic16_newpCodeFunction(moduleName, asym->name));
-        pic16_addpCode2pBlock(apb, pic16_newpCode(POC_GOTO, pic16_popGetWithString( sym->rname )));
+          pic16_addpCode2pBlock(apb, pic16_newpCodeCharP(";-----------------------------------------"));
+          pic16_addpCode2pBlock(apb, pic16_newpCodeFunction(moduleName, asym->name));
+          pic16_addpCode2pBlock(apb, pic16_newpCode(POC_GOTO, pic16_popGetWithString( sym->rname )));
 		
-        /* mark the end of this tiny function */
-        pic16_addpCode2pBlock(apb,pic16_newpCodeFunction(NULL,NULL));
+          /* mark the end of this tiny function */
+          pic16_addpCode2pBlock(apb,pic16_newpCodeFunction(NULL,NULL));
+        } else {
+          sprintf(asymname, "%s", sym->rname);
+        }
 
 	{
 	  absSym *abSym;
@@ -3685,7 +3690,7 @@ static void genFunction (iCode *ic)
               case 2: abSym->address = 0x000018; break;
               
               default:
-                fprintf(stderr, "no interrupt number is given\n");
+//                fprintf(stderr, "no interrupt number is given\n");
                 abSym->address = -1; break;
             }
 
@@ -3705,7 +3710,6 @@ static void genFunction (iCode *ic)
     pic16_emitcode("","%s:",sym->rname);
     pic16_addpCode2pBlock(pb,pic16_newpCodeFunction(moduleName,sym->rname));
 
-
     {
       absSym *ab;
 
@@ -3716,7 +3720,6 @@ static void genFunction (iCode *ic)
           }
         }
     }
-
 
     if(IFFUNC_ISNAKED(ftype)) {
       DEBUGpic16_emitcode("; ***", "_naked function, no prologue");
@@ -6161,7 +6164,6 @@ static void genCmp (operand *left, operand *right,
         }
       } else {
 
-
         /* unsigned compare */      
         DEBUGpic16_emitcode ("; ***","%s: %d: unsigned compare", __FUNCTION__, __LINE__);
     
@@ -6172,9 +6174,7 @@ static void genCmp (operand *left, operand *right,
           compareAop(&rFalseIfx, ifx, falselbl, right, size, result, sign, 1, NULL, NULL, NULL);
 
         }
-
         if(ifx)ifx->generated = 1;
-
 
         if(AOP_SIZE(result)) {
           pic16_emitpLabel(falselbl->key);
@@ -11169,7 +11169,6 @@ static void genGenPointerGet (operand *left,
 {
   int size, offset, lit;
   sym_link *retype = getSpec(operandType(result));
-  char fgptrget[32];
 
     DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
     pic16_aopOp(left,ic,FALSE);
@@ -11205,31 +11204,10 @@ static void genGenPointerGet (operand *left,
       pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(left),1), pic16_popCopyReg(&pic16_pc_prodl)));
       pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left), 2));
       
-      switch( size ) {
-        case 1: strcpy(fgptrget, "__gptrget1"); break;
-        case 2: strcpy(fgptrget, "__gptrget2"); break;
-        case 3: strcpy(fgptrget, "__gptrget3"); break;
-        case 4: strcpy(fgptrget, "__gptrget4"); break;
-        default:
-          werror(W_POSSBUG2, __FILE__, __LINE__);
-          abort();
-      }
-      
-      pic16_emitpcode(POC_CALL, pic16_popGetWithString( fgptrget ));
+      pic16_callGenericPointerRW(0, size);
       
       assignResultValue(result, 1);
       
-      {
-        symbol *sym;
-
-          sym = newSymbol( fgptrget, 0 );
-          sym->used++;
-          strcpy(sym->rname, fgptrget);
-          checkAddSym(&externs, sym);
-
-//          fprintf(stderr, "%s:%d adding extern symbol %s in externs\n", __FILE__, __LINE__, fgptrget);
-      }
-              
       goto release;
     }
 
@@ -11511,13 +11489,8 @@ static void genPackBits (sym_link    *etype , operand *result,
 				  pic16_emitpcode (POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(result),0), pic16_popCopyReg(&pic16_pc_fsr0l)));
 				  pic16_emitpcode (POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(result),1), pic16_popCopyReg(&pic16_pc_prodl)));
 				  pic16_emitpcode (POC_MOVFW, pic16_popGet(AOP(result),2));
-				  pic16_emitpcode (POC_CALL, pic16_popGetWithString ("__gptrget1"));
-				  {
-				    symbol *sym;
-				    sym = newSymbol( "__gptrget1", 0 );
-				    strcpy(sym->rname, "__gptrget1");
-				    checkAddSym(&externs, sym);
-				  }
+
+                                  pic16_callGenericPointerRW(0, 1);
 				} else {
 				  // data pointer (just 2 byte given)
 			          pic16_loadFSR0( result, 0 );
@@ -11560,13 +11533,8 @@ static void genPackBits (sym_link    *etype , operand *result,
 				  pic16_emitpcode (POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(result),0), pic16_popCopyReg(&pic16_pc_fsr0l)));
 				  pic16_emitpcode (POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(result),1), pic16_popCopyReg(&pic16_pc_prodl)));
 				  pic16_emitpcode (POC_MOVFW, pic16_popGet(AOP(result),2));
-				  pic16_emitpcode (POC_CALL, pic16_popGetWithString ("__gptrput1"));
-				  {
-				    symbol *sym;
-				    sym = newSymbol( "__gptrput1", 0 );
-				    strcpy(sym->rname, "__gptrput1");
-				    checkAddSym(&externs, sym);
-				  }
+                                  
+                                  pic16_callGenericPointerRW(1, 1);
 				} else {
 				  // data pointer (just 2 byte given)
 				  if (!fsr0_setup) pic16_loadFSR0( result, 0 );
@@ -12130,7 +12098,6 @@ static void genGenPointerSet (operand *right,
 {
   int size;
   sym_link *retype = getSpec(operandType(right));
-  char fgptrput[32];
 
     DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
@@ -12173,28 +12140,7 @@ static void genGenPointerSet (operand *right,
                                 pic16_popCopyReg(&pic16_pc_prodl)));
     pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(result), 2));
     
-
-    /* put code here */
-    switch (size) {
-      case 1: strcpy(fgptrput, "__gptrput1"); break;
-      case 2: strcpy(fgptrput, "__gptrput2"); break;
-      case 3: strcpy(fgptrput, "__gptrput3"); break;
-      case 4: strcpy(fgptrput, "__gptrput4"); break;
-      default:
-        werror(W_POSSBUG2, __FILE__, __LINE__);
-        abort();
-    }
-    
-    pic16_emitpcode(POC_CALL, pic16_popGetWithString( fgptrput ));
-    
-    {
-      symbol *sym;
-                  
-        sym = newSymbol( fgptrput, 0 );
-        sym->used++;
-        strcpy(sym->rname, fgptrput);
-        checkAddSym(&externs, sym);
-    }
+    pic16_callGenericPointerRW(1, size);
 
 release:
     pic16_freeAsmop(right,NULL,ic,TRUE);

@@ -258,7 +258,7 @@ _process_pragma(const char *sz)
       while(symname) {
         ssym = Safe_calloc(1, sizeof(sectSym));
         ssym->name = Safe_calloc(1, strlen(symname)+2);
-        sprintf(ssym->name, "_%s", symname);
+        sprintf(ssym->name, "%s%s", port->fun_prefix, symname);
         ssym->reg = NULL;
 
         addSet(&sectSyms, ssym);
@@ -694,11 +694,10 @@ _pic16_finaliseOptions (void)
     {
       char buf[128];
 
-        sprintf(buf, "-D%s -D%s", pic16->name[2], pic16->name[1]);
+        sprintf(buf, "-D%s -D__%s", pic16->name[2], pic16->name[1]);
         *(strrchr(buf, 'f')) = 'F';
         addSet(&asmOptionsSet, Safe_strdup( buf ));
     }
-    
     
     if(STACK_MODEL_LARGE) {
       addSet(&preArgvSet, Safe_strdup("-DSTACK_MODEL_LARGE"));

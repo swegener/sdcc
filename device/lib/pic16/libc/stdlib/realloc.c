@@ -1,79 +1,95 @@
 /*
- * malloc.c - dynamic memory allocation
+ * realloc.c - dynamic memory allocation
  *
  * written by Vangelis Rokas, 2004 (vrokas@otenet.gr)
  *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2, or (at your option) any
+ * later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * 
+ * In other words, you are welcome to use, share and improve this program.
+ * You are forbidden to forbid anyone else to use, share and improve
+ * what you give them.   Help stamp out software-hoarding!  
+ *
+ * $Id$
  */
 
-#include "malloc.h"
+#include <malloc.h>
 
-extern unsigned char _MALLOC_SPEC *_dynamicHeap;			/* pointer to heap */
+extern unsigned char _MALLOC_SPEC *heap;
 
 unsigned char _MALLOC_SPEC *realloc(unsigned char _MALLOC_SPEC *mblock, unsigned char len)
 {
   _malloc_rec _MALLOC_SPEC *pHeap;			/* pointer to block header */
   _malloc_rec _MALLOC_SPEC *temp;
   unsigned char bLen;			/* size of block  */
-  unsigned char eLen;
 
-	if(len > MAX_BLOCK_SIZE)
-		return ((unsigned char _MALLOC_SPEC *)0);
+    if(len >= MAX_BLOCK_SIZE)
+      return ((unsigned char _MALLOC_SPEC *)0);
 
-	len++;		/* increase to count header too */
+    /* if mblock is NULL, then same as malloc */
+    if(!mblock)
+      return (malloc(len));
 
-	pHeap = (_malloc_rec _MALLOC_SPEC *)(mblock-1);
-	bLen = pHeap->bits.count;
+    /* if len is 0, */
+    if(len == 0) {
+      free(mblock);
+      return (malloc(0));
+    }
+    
+    len++;		/* increase to count header too */
 
-	/* new size is same as old, return pointer */
-	if(bLen == len)return (mblock);
+    pHeap = (_malloc_rec _MALLOC_SPEC *)((unsigned int)mblock - 1);
+    bLen = pHeap->bits.count;
 
-	if(bLen > len) {
-		/* new segment is smaller than the old one, that's easy! */
-		pHeap->bits.count = len;
-		temp = pHeap + len;
-		temp->bits.alloc = 0;
-		temp->bits.count = bLen - len;
+    /* new size is same as old, return pointer */
+    if(bLen == len)return (mblock);
 
-		return (((unsigned char _MALLOC_SPEC *)pHeap) + 1);
-	}
+    if(bLen > len) {
+      /* new segment is smaller than the old one, that's easy! */
+      pHeap->bits.count = len;
+      temp = (_malloc_rec _MALLOC_SPEC *)((unsigned int)pHeap + len);
+      temp->bits.alloc = 0;
+      temp->bits.count = bLen - len;
 
-	/* so, new segment has size bigger than the old one
-	 * we can only return a valid pointer only when after
-	 * the block there is an empty block that can be merged
-	 * to produce a new block of the requested size, otherwise
-	 * we return NULL */
+      return ((unsigned char _MALLOC_SPEC *)((unsigned int)pHeap + 1));
+    }
 
-	temp = pHeap + pHeap->bits.count;
-	eLen = bLen;
-	while((temp->datum) && (!temp->bits.alloc) && (eLen < len)) {
-		eLen += temp->bits.count;
-		temp += temp->bits.count;
-	}
+    /* so, new segment has size bigger than the old one, we can return a
+     * valid pointer only when after the block there is an empty block that
+     * can be merged to produce a new block of the requested size, otherwise
+     * we return NULL */
+    temp = _mergeHeapBlock(pHeap, len);
 
-	if(eLen >= len) {
-		int i;
-		/* so we found one, adjust memory blocks */
-		temp = pHeap;
+    if(!temp) {
+      /* no could not find a valid block, return NULL */
+      return ((unsigned char _MALLOC_SPEC *)0);
+    }
 
-		temp->bits.count = len;
-		eLen -= len;
-		temp += len;
+    pHeap = temp;
+    bLen = pHeap->bits.count;
+    
+    /* allocate by filling the fields */
+    pHeap->bits.count = len;
+    pHeap->bits.alloc = 1;
 
-		while(eLen>0) {
-			if(eLen > MAX_BLOCK_SIZE)i = MAX_BLOCK_SIZE;
-			else i = eLen;
+    if(bLen > len) {
+      /* if current block size is greater than the requested one,
+       * create a new empty block at the end of the newly allocated */
+      temp = (_malloc_rec _MALLOC_SPEC *)((unsigned int)pHeap + len);
+      temp->bits.count = bLen - len;
+      temp->bits.alloc = 0;
+    }
 
-			temp->bits.count = i;
-			temp->bits.alloc = 0;
-			temp += i;
-			eLen -= i;
-		}
-
-		return (((unsigned char _MALLOC_SPEC *)pHeap) + 1);
-	}
-
-
-	/* no could not find a valid block, return NULL */
-
-  return ((unsigned char _MALLOC_SPEC *)0);
+  return ((unsigned char _MALLOC_SPEC *)((unsigned int)pHeap + 1));
 }

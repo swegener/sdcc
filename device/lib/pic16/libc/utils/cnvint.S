@@ -24,7 +24,7 @@
 ;
 
 	radix dec
-	list p=18f452
+	list
 	nolist
 
 

@@ -3,7 +3,6 @@
  *
  * written by Vangelis Rokas, 2005 (vrokas@otenet.gr)
  *
- *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public License
  * as published by the Free Software Foundation; either version 2
@@ -30,7 +29,7 @@
  * NOTE that putchar() is declared in stdio.h to
  * have the argument in WCHAR (via the wparam pragma) */
 
-void putchar(char c)
+PUTCHAR(c)
 {
   c;
   _asm

@@ -208,17 +208,25 @@ void dumpiCode(iCode *lic);
 
 int inWparamList(char *s);
 
+#include "device.h"
+
 #define DUMP_FUNCTION_ENTRY	1
 #define DUMP_FUNCTION_EXIT	0
 
 #if DUMP_FUNCTION_ENTRY
-#define FENTRY	pic16_emitpcomment("**{\t%d %s", __LINE__, __FUNCTION__)
+#define FENTRY	if(pic16_options.debgen&2)pic16_emitpcomment("**{\t%d %s", __LINE__, __FUNCTION__)
 #define FENTRY2 if(pic16_options.debgen&2)pic16_emitpcomment("**{\t%d %s", __LINE__, __FUNCTION__)
+#else
+#define FENTRY
+#define FENTRY2
 #endif
 
 #if DUMP_FUNCTION_EXIT
-#define FEXIT	pic16_emitpcomment("; **}", "%d %s", __LINE__, __FUNCTION__)
+#define FEXIT	if(pic16_options.debgen&2)pic16_emitpcomment("; **}", "%d %s", __LINE__, __FUNCTION__)
 #define FEXIT2	if(pic16_options.debgen&2)pic16_emitpcomment("**{\t%d %s", __LINE__, __FUNCTION__)
+#else
+#define FEXIT
+#define FEXIT2
 #endif
 
 #define ERROR	werror(W_POSSBUG2, __FILE__, __LINE__)

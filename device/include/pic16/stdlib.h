@@ -44,11 +44,13 @@ extern int atoi (char *);
 extern long atol (char *);
 
 extern void uitoa(unsigned int, data char *, unsigned char);
-extern void itoa(unsigned int, data char*, unsigned char);
+extern void itoa(int, data char*, unsigned char);
 
-extern void ultoa(unsigned long, data char *, unsigned char);
-extern void ltoa(unsigned long, data char*, unsigned char);
+extern void ultoa(unsigned long, data unsigned char *, unsigned char);
+extern void ltoa(long, data unsigned char*, unsigned char);
 
 extern char x_ftoa(float, data char *, unsigned char, unsigned char);
+
+extern void g_ftoa(data char *, float, char);
 
 #endif	/* __PIC16_STDLIB_H */

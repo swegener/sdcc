@@ -19,6 +19,17 @@ Scott Dattalo	<scott AT dattalo.com>
 
 ======================================================================
 ======================================================================
+2005-Mar-23 Vangelis Rokas
+1. I have added some optimizations that are controlled via enviroment
+variables to allow checking. Later these will be either enabled globally
+or controlled by command line options. The variables are:
+	a. OPTIMIZE_BITFIELD_POINTER_GET : optimizes bit field pointer reads
+
+	b. NO_REG_OPT : there is no register optimization performed by pCode
+			optimizer
+
+
+
 2004-Oct-29 Vangelis Rokas
 1. Function parameters are passed now all via stack. This might
 lower performance, but some issues are solved this way. Later

@@ -302,7 +302,7 @@ typedef enum
   PC_CSOURCE,     /* C-Source Line  */
   PC_ASMDIR,	  /* Assembler directive */
   PC_BAD,         /* Mark the pCode object as being bad */
-  PC_INFO         /* pCode informatio node, used primarily in optimizing */
+  PC_INFO         /* pCode information node, used primarily in optimizing */
 } PC_TYPE;
 
 
@@ -406,6 +406,7 @@ typedef struct pCodeOpBit
 				 just a bit of a register */
 } pCodeOpBit;
 #endif
+
 typedef struct pCodeOpLit
 {
   pCodeOp pcop;
@@ -963,6 +964,7 @@ typedef struct peepCommand {
 #define isPCW(x)        ((PCODE(x)->type == PC_WILD))
 #define isPCCS(x)       ((PCODE(x)->type == PC_CSOURCE))
 #define isPCAD(x)	((PCODE(x)->type == PC_ASMDIR))
+#define isPCINFO(x)     ((PCODE(x)->type == PC_INFO))
 
 #define isCALL(x)       ((isPCI(x)) && (PCI(x)->op == POC_CALL))
 #define isSTATUS_REG(r) ((r)->pc_type == PO_STATUS)
@@ -1012,11 +1014,13 @@ pCodeOp *pic16_newpCodeOpBit(char *name, int bit,int inBitSpace, PIC_OPTYPE subt
 pCodeOp *pic16_newpCodeOpRegFromStr(char *name);
 pCodeOp *pic16_newpCodeOpReg(int rIdx);
 pCodeOp *pic16_newpCodeOp(char *name, PIC_OPTYPE p);
+pCodeOp *pic16_newpCodeOpRegNotVect(bitVect *bv);
 pCodeOp *pic16_pCodeOpCopy(pCodeOp *pcop);
 
 pCode *pic16_newpCodeInfo(INFO_TYPE type, pCodeOp *pcop);
 pCodeOp *pic16_newpCodeOpOpt(OPT_TYPE type, char *key);
 pCodeOp *pic16_newpCodeOpLocalRegs(LR_TYPE type);
+pCodeOp *pic16_newpCodeOpReg(int rIdx);
 
 pCode * pic16_findNextInstruction(pCode *pci);
 pCode * pic16_findNextpCode(pCode *pc, PC_TYPE pct);
@@ -1030,6 +1034,9 @@ char *dumpPicOptype(PIC_OPTYPE type);
 extern void pic16_pcode_test(void);
 extern int pic16_debug_verbose;
 extern int pic16_pcode_verbose;
+
+extern char *LR_TYPE_STR[];
+
 
 #ifndef debugf
 //#define debugf(frm, rest...)       _debugf(__FILE__, __LINE__, frm, rest)

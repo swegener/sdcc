@@ -314,6 +314,7 @@ pic16_decodeOp (unsigned int op)
 		case LABEL:		return "LABEL";
 		case RECEIVE:		return "RECEIVE";
 		case SEND:		return "SEND";
+		case DUMMY_READ_VOLATILE:	return "DUMMY_READ_VOLATILE";
 	}
 	sprintf (buffer, "unkown op %d %c", op, op & 0xff);
 
@@ -446,6 +447,26 @@ regFindFree (set *dRegs)
 
   return NULL;
 }
+
+static regs *
+regFindFreeNext(set *dRegs, regs *creg)
+{
+  regs *dReg;
+
+    if(creg) {
+      /* position at current register */
+      for(dReg = setFirstItem(dRegs); dReg != creg; dReg = setNextItem(dRegs));
+    }
+    
+    for(dReg = setNextItem(dRegs); dReg; dReg = setNextItem(dRegs)) {
+      if(dReg->isFree) {
+        return dReg;
+      }
+    }
+  
+  return NULL;
+}
+
 /*-----------------------------------------------------------------*/
 /* pic16_initStack - allocate registers for a pseudo stack               */
 /*-----------------------------------------------------------------*/
@@ -1078,6 +1099,33 @@ pic16_findFreeReg(short type)
   case REG_STK:
 
     if((dReg = regFindFree(pic16_dynStackRegs)) != NULL)
+      return dReg;
+
+    return NULL;
+
+  case REG_PTR:
+  case REG_CND:
+  case REG_SFR:
+  default:
+    return NULL;
+  }
+}
+
+regs *
+pic16_findFreeRegNext(short type, regs *creg)
+{
+  //  int i;
+  regs* dReg;
+
+  switch (type) {
+  case REG_GPR:
+    if((dReg = regFindFreeNext(pic16_dynAllocRegs, creg)) != NULL)
+      return dReg;
+    return (addSet(&pic16_dynAllocRegs,newReg(REG_GPR, PO_GPR_TEMP,dynrIdx++,NULL,1,0, NULL)));
+
+  case REG_STK:
+
+    if((dReg = regFindFreeNext(pic16_dynStackRegs, creg)) != NULL)
       return dReg;
 
     return NULL;
@@ -2932,13 +2980,32 @@ farSpacePackable (iCode * ic)
   return NULL;
 }
 
+#if 0
+static int packRegsForPointerGet(iCode *ic, eBBlock *ebp)
+{
+  iCode *dic, *sic;
+
+    debugLog ("%d\t%s\n", __LINE__, __FUNCTION__);
+    debugLog ("ic->op = %s\n", pic16_decodeOp( ic->op ) );
+    debugAopGet ("  result:", IC_RESULT (ic));
+    debugAopGet ("  left:", IC_LEFT (ic));
+    debugAopGet ("  right:", IC_RIGHT (ic));
+
+    dic = ic->prev;
+    if((dic->op == '=')
+      && (
+}
+#endif
+
+
+void replaceOperandWithOperand(eBBlock *ebp, iCode *ic, operand *src, iCode *dic, operand *dst);
+
 /*-----------------------------------------------------------------*/
 /* packRegsForAssign - register reduction for assignment           */
 /*-----------------------------------------------------------------*/
 static int
 packRegsForAssign (iCode * ic, eBBlock * ebp)
 {
-
   iCode *dic, *sic;
 
   debugLog ("%d\t%s\n", __LINE__, __FUNCTION__);
@@ -3111,33 +3178,33 @@ pack:
   /* found the definition */
   /* replace the result with the result of */
   /* this assignment and remove this assignment */
-  bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
-  IC_RESULT (dic) = IC_RESULT (ic);
 
-  if (IS_ITEMP (IC_RESULT (dic)) && OP_SYMBOL (IC_RESULT (dic))->liveFrom > dic->seq)
-    {
-      OP_SYMBOL (IC_RESULT (dic))->liveFrom = dic->seq;
-    }
-  /* delete from liverange table also 
-     delete from all the points inbetween and the new
-     one */
-  for (sic = dic; sic != ic; sic = sic->next)
-    {
-      bitVectUnSetBit (sic->rlive, IC_RESULT (ic)->key);
-      if (IS_ITEMP (IC_RESULT (dic)))
-	bitVectSetBit (sic->rlive, IC_RESULT (dic)->key);
-    }
+  
+    bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
+    IC_RESULT (dic) = IC_RESULT (ic);
 
-  remiCodeFromeBBlock (ebp, ic);
-  bitVectUnSetBit(OP_SYMBOL(IC_RESULT(ic))->defs,ic->key);
+    if (IS_ITEMP (IC_RESULT (dic)) && OP_SYMBOL (IC_RESULT (dic))->liveFrom > dic->seq)
+      {
+        OP_SYMBOL (IC_RESULT (dic))->liveFrom = dic->seq;
+      }
+    /* delete from liverange table also 
+       delete from all the points inbetween and the new
+       one */
+    for (sic = dic; sic != ic; sic = sic->next)
+      {
+        bitVectUnSetBit (sic->rlive, IC_RESULT (ic)->key);
+        if (IS_ITEMP (IC_RESULT (dic)))
+          bitVectSetBit (sic->rlive, IC_RESULT (dic)->key);
+      }
 
-	debugLog("  %d\n", __LINE__ );
-  hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);
-  OP_DEFS (IC_RESULT (dic)) = bitVectSetBit (OP_DEFS (IC_RESULT (dic)), dic->key);
-  return 1;
+    remiCodeFromeBBlock (ebp, ic);
+    bitVectUnSetBit(OP_SYMBOL(IC_RESULT(ic))->defs,ic->key);
 
-
+    debugLog("  %d\n", __LINE__ );
+    hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);
+    OP_DEFS (IC_RESULT (dic)) = bitVectSetBit (OP_DEFS (IC_RESULT (dic)), dic->key);
 }
+
 
 #if 1
 
@@ -3977,13 +4044,58 @@ pic16_packRegisters (eBBlock * ebp)
 	OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
       }
 
+
+#if 0
+    /* if this is an arithmetic operation
+     *   && result or left is not rematerializable (so it is a plain arithmetic op)
+     *   && and left is not used after this iCode */
+     
+    if(getenv("OPTIMIZE_NEAR_POINTER_GET"))
+
+    if (IS_ARITHMETIC_OP(ic)
+      && !IS_OP_LITERAL (IC_LEFT (ic))
+      && !OP_SYMBOL (IC_RESULT(ic))->rematiCode
+      && !OP_SYMBOL (IC_LEFT(ic))->rematiCode
+      && (OP_LIVETO (IC_LEFT(ic) ) <= ic->seq)
+      ) {
+        iCode *dic = ic->prev;
+        
+          /* search backwards to find assignment from a remat pointer */
+          while(dic && dic->seq >= OP_LIVEFROM( IC_LEFT(ic) )) {
+
+            /* is it a pointer_get? */
+            if(POINTER_GET(dic)
+              && IS_DATA_PTR(OP_SYM_TYPE (IC_LEFT (dic)))) {
+                fprintf(stderr, "%s:%d `%s' is a data pointer (ic seq: %d)\n", __FILE__, __LINE__,
+                          OP_SYMBOL(IC_LEFT(dic))->rname, dic->seq);
+                          
+                /* so we can replace ic->left with dic->left, & remove assignment */
+                ReplaceOpWithCheaperOp( &IC_LEFT(ic), IC_LEFT(dic) );
+                
+                bitVectUnSetBit(OP_USES( IC_LEFT(ic) ), ic->key);
+                bitVectUnSetBit(OP_DEFS( IC_RESULT(dic) ), dic->key );
+                
+//                dic->op = DUMMY_READ_VOLATILE;
+#if 1
+                remiCodeFromeBBlock(ebp, dic);
+                hTabDeleteItem(&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
+#endif
+                break;
+            }
+            dic = dic->prev;
+          }
+    }
+#endif
+          
     /* mark the pointer usages */
     if (POINTER_SET (ic))
       {
 	OP_SYMBOL (IC_RESULT (ic))->uptr = 1;
 	debugLog ("  marking as a pointer (set) =>");
 	debugAopGet ("  result:", IC_RESULT (ic));
+
       }
+
     if (POINTER_GET (ic))
       {
         if(IS_SYMOP(IC_LEFT(ic))) {

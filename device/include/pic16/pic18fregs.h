@@ -75,4 +75,11 @@
 
 #endif
 
+
+#define Nop()           { _asm nop _endasm; }
+#define ClrWdt()        { _asm clrwdt _endasm; }
+#define Sleep()         { _asm sleep _endasm; }
+#define Reset()         { _asm reset _endasm; }
+
+
 #endif /* __PIC18FREGS_H__ */

@@ -38,16 +38,12 @@ char _modschar (char a, char b) _IL_REENTRANT
   register char r;
   char ta, tb;
 
-	if(a<0)ta = -a; else ta = a;
-	if(b<0)tb = -b; else tb = b;
-	
-//	r = _moduchar((a < 0 ? -a : a),
-//	            (b < 0 ? -b : b));
-	r = _moduchar(ta, tb);
-
-       if (a < 0)
-	    return -r;
-	else
-	    return r;
+    if(a<0)ta = -a; else ta = a;
+    if(b<0)tb = -b; else tb = b;
+    
+    r = _moduchar(ta, tb);
+    
+    if (a < 0) return -r;
+    else return r;
 }        	
 

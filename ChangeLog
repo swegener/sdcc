@@ -1,3 +1,83 @@
+2005-03-31 Vangelis Rokas <vrokas AT users.sourceforge.net>
+
+	* src/pic16/device.c (Pics16[]): added devices 18F2550, 18F4331,
+        18F4455,
+        * (pic16_assignConfigWordValue): disable testing of configuration
+        register value with config mask,
+        * src/pic16/gen.c (pic16_testStackOverflow): prefix stack test
+        function with port->fun_prefix,
+        * (genFunction): when generating a naked interrupt function never
+        create an absolute segment placed in interrupt vector address, place
+        the actual interrupt function at IVA instead, when an interrupt
+        function is generated with unspecified interrupt then do not create
+        the absolute section,
+        * (genGenPointerGet, genGenPointerSet, genPackBits): replace all
+        code for generating a call to generic pointer get/put function with
+        a call to function pic16_callGenericPointer(),
+        * src/pic16/genutils.c (pic16_callGenericPointerRW): NEW, generates
+        the call to the generic pointer get/put functions with prefixing the
+        function name with port->fun_prefix,
+        * src/pic16/glue.c (pic16glue): ifdef-out test of OF_LR_SUPPORT,
+        * src/pic16/main.c (_process_pragma): prefix function with
+        port->fun_prefix,
+        * (_pic16_finaliseOptions): define macro __18Fxxxx macro when
+        calling assembler, old 18Fxxxx macro is deprecated,
+        * src/pic16/pcode.c (unlinkpCodeFromBranch): added PC_INLINE and
+        PC_ASMDIR in while condition,
+        * (findInstruction): add PC_ASMDIR in while condition,
+        * (buildCallTree): prefix main with port->fun_prefix,
+        * (pic16_pCode2str): fixed bug that didn't emit the memory access
+        identifier for variable with banked access in instructions BTFSS,
+        BTFSC, BCF, BSF, BTG
+        * (AnalyzeFlow): moved call to OptimizepCode to pic16_AnalyzeBanking,
+        * src/pic16/pcodepeep.c (pCodeOpCompare): increase size of b to 1024,
+        * src/pic16/pcoderegs.c (pic16_pCodeRegoptimizeRegUsage): don't
+        perform optimization when enviroment variable NO_REG_OPT is set,
+        * (insideLRBlock): NEW, return 1 if register is inside an
+        INF_LOCALREGS block,
+        * (RemoveRegFromLRBlock): remove a register that is completely
+        eliminated by register optimization, but it is still left in local
+        register store/restore in/from stack block,
+        * (Remove2pcodes): after removing register, check to see if it
+        should be removed from local register store/restore in/from stack
+        block,
+        * src/pic16/ralloc.c (pic16_decodeOp): added decode for
+        DUMMY_READ_VOLATILE, 
+
+        * device/include/pic16/adc.h: minor prototype modifications and
+        update,
+        * device/include/pic16/malloc.h: added GPL notice various
+        modifications,
+        * device/include/pic16/stdint.h: NEW, standard header for ints
+        * device/include/pic16/delay.h: NEW, header for delay functions,
+        delay10tcy, delay100tcy, delay1ktcy, delay10ktcy, delay100ktcy,
+        delay1mtcy,
+        * device/include/pic16/signal.h: NEW, header providing helper macros
+        for implementing signal handlers,
+        * device/include/pic16/stdio.h: added prototypes for functions,
+        printf, vprintf, sprintf, vsprintf, fprintf, vfprintf. Added
+        prototypes for stdin and stdout, added macro PUTCHAR to
+        automatically implement putchar function prototype,
+        * device/include/pic16/usart.h: modified and updated USART library,
+        * device/lib/pic16/libio/adc/,
+        * device/lib/pic16/libio/i2c: some modifications to improve library
+        performance,
+        * device/lib/pic16/libc/stdio/: modifications for the new printf*
+        family of functions,
+        * device/lib/pic16/libc/stdlib/: various modifications in the malloc
+        family of functions and other sources,
+        * device/lib/pic16/libio/usart/: NEW, c sources for the usart module
+        of the PIC18Fxx[28] devices,
+        * device/lib/pic16/libc/delay/: NEW, c sources for the delay functions,
+        * device/lib/pic16/libc/utils/: minor modifications in the .S sources,
+        * device/lib/pic16/startup/{crt0i.c, crt0iz.c}: redesign of the
+        _do_cinit function, because the previous failed when local variables
+        where not placed in the same memory bank,
+        * device/lib/pic16/libsdcc/char/: various modifications to improve
+        library performance,
+        * doc/sdccman.lyx: some reorganization of the PIC16 part, added many
+        information on the new functions of the c library and more...
+
 2005-03-28 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCBBlock.c (iCodeBreakDown): fixed bug #1170212

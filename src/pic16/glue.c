@@ -1704,9 +1704,11 @@ pic16glue ()
     /* Put all variables into a cblock */
     pic16_AnalyzeBanking();
 
+#if 0
     if(pic16_options.opt_flags & OF_LR_SUPPORT) {
       pic16_OptimizeLocalRegs();
     }
+#endif
 
     /* remove redundant BANKSELs -- added by RN 2005-01-17 */
     if(pic16_options.opt_banksel > 1) {

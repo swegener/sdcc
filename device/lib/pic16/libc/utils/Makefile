@@ -30,31 +30,19 @@ include ../Makefile.rules
 
 CSRCS	=
 
-SSRCS	=	cnvfrac \
-		cnvint
+S_SRCS	=	cnvfrac \
+		cnvint \
+		cvtdec
 
 SRCS	= $(CSRCS)
-# $(SSRCS)
 
-CFILES	= $(patsubst %,%.c,$(CSRCS))
-SFILES	= $(patsubst %,%.S,$(SSRCS))
-
-COFILES	= $(patsubst %.c,%.o,$(CFILES))
-SOFILES	= $(patsubst %.S,%.o,$(SFILES))
-
-OFILES	= $(COFILES)
-OFILES	+= $(SOFILES)
 
 DEBUG=
 #COMPILE_FLAGS   += --pomit-config-words --pomit-ivt --denable-peeps --optimize-goto --obanksel=2
 COMPILE_FLAGS	+= $(DEBUG)
 
-%.o: %.c
-	$(CC) $(CFLAGS) $(COMPILE_FLAGS) -c $<
 
-%.o: %.S
-	$(AS) -c $<
-
+#all: build-library
 
 build-library: $(OFILES)
 

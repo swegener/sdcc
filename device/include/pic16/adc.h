@@ -79,16 +79,22 @@
 #define ADC_CFG_1A_2R	0x0f
 
 
+/* initialize AD module */
 void adc_open(unsigned char channel, unsigned char fosc, unsigned char pcfg, unsigned char config);
 
+/* shutdown AD module */
 void adc_close(void);
 
+/* begin a conversion */
 void adc_conv(void);
 
-char adc_busy(void);
+/* return 1 if AD is performing a conversion, 0 if done */
+char adc_busy(void) _naked;
 
-int adc_read(void);
+/* get value of convertion */
+int adc_read(void) _naked;
 
-void adc_setchannel(unsigned char channel);
+/* setup conversion channel */
+void adc_setchannel(unsigned char channel) _naked;
 
 #endif

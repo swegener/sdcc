@@ -1739,7 +1739,7 @@ int pic16_pCodeSearchCondition(pCode *pc, unsigned int cond)
  *-----------------------------------------------------------------*/
 static int pCodeOpCompare(pCodeOp *pcops, pCodeOp *pcopd)
 {
-  char b[128], *n2;
+  char b[1024], *n2;
 
   if(!pcops || !pcopd)
     return 0;
@@ -1765,8 +1765,8 @@ static int pCodeOpCompare(pCodeOp *pcops, pCodeOp *pcopd)
     return 0;
   }
 
-  b[0]=0;
-  pic16_get_op(pcops,b,128);
+  memset(b, 0, sizeof(b) );       //b[0]=0;
+  pic16_get_op(pcops,b, sizeof(b) );
 
   n2 = pic16_get_op(pcopd,NULL,0);
 
@@ -2438,16 +2438,16 @@ int pic16_pCodePeepMatchRule(pCode *pc)
 	pcin->prev = pc->prev;
 
 
-#if 0
+#if 1
       {
 	/*     DEBUG    */
 	/* Converted the deleted pCodes into comments */
 
-	char buf[256];
+	char buf[1024];
 	pCodeCSource *pc_cline2=NULL;
 
-	buf[0] = ';';
-	buf[1] = '#';
+//	buf[0] = ';';
+	buf[0] = '#';
 
 	while(pc &&  pc!=pcin) {
 
@@ -2461,7 +2461,7 @@ int pic16_pCodePeepMatchRule(pCode *pc)
 	    }
 	  }
 
-	  pic16_pCode2str(&buf[2], 254, pc);
+	  pic16_pCode2str(&buf[1], sizeof( buf )-1, pc);
 	  pic16_pCodeInsertAfter(pcprev, pic16_newpCodeCharP(buf));
 	  pcprev = pcprev->next;
 	  pc = pc->next;

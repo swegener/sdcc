@@ -6,8 +6,6 @@
 
 unsigned char i2c_drdy(void)
 {
-  if(SSPSTATbits.BF)
-    return (+1);
-  else
-    return (0);
+  if(SSPSTATbits.BF)return (+1);
+  else return (0);
 }

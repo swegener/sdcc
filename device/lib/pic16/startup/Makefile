@@ -23,7 +23,7 @@ SRCS	=	crt0	\
 
 # add nostdinc and nostdlib for this device libraries
 COMPILE_FLAGS	+= $(MODELFLAGS) $(OPT_FLAGS)
-COMPILE_FLAGS	+= --nostdinc --nostdlib
+COMPILE_FLAGS	+= --nostdinc --nostdlib --fommit-frame-pointer
 
 CFILES	= $(patsubst %,%.c,$(SRCS))
 OFILES	= $(patsubst %.c,%.o,$(CFILES))

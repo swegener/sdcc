@@ -44,7 +44,7 @@ all: build-library
 
 build-library: $(LIB)
 
-$(LIB): $(OFILES) clean-intermediate-no-asm
+$(LIB): $(OFILES)
 	@echo Creating $(LIB) ...
 	@for object in $(OFILES) ; do \
 		if [ ! -e $(LIB) ]; then \
@@ -52,5 +52,6 @@ $(LIB): $(OFILES) clean-intermediate-no-asm
 		else \
 			$(AR) -r $(LIB) $$object ; \
 		fi; \
-		echo adding $$object ; \
+		echo -n "$$object " ; \
 	done ;
+	@echo

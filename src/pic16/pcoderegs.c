@@ -289,8 +289,10 @@ static void Remove1pcode(pCode *pc, regs *reg)
 
     if(pcn) {
       if(PCI(pcn)->cline) {
-	//fprintf(stderr, "source line has been optimized completely out\n");
-	//pc->print(stderr,pc);
+#if 0
+	fprintf(stderr, "source line has been optimized completely out\n");
+	pc->print(stderr,pc);
+#endif
       } else {
 	PCI(pcn)->cline = PCI(pc)->cline;
       }
@@ -400,6 +402,67 @@ void pic16_RemoveUnusedRegisters(void)
   	fprintf(stderr, " *** Saved %d registers ***\n", total_registers_saved);
 }
 
+static int insideLRBlock(pCode *pc)
+{
+  pCode *pc1;
+  int t1=-1, t2=-1;
+
+    pc1 = pc->prev;
+    while(pc1) {
+      if(isPCINFO(pc1) && (PCINF(pc1)->type == INF_LOCALREGS)) {
+        t1 = PCOLR (PCINF (pc1)->oper1)->type;
+        break;
+      }
+      pc1 = pc1->prev;
+    }
+    
+    pc1 = pc->next;
+    while(pc1) {
+      if(isPCINFO(pc1) && (PCINF(pc1)->type == INF_LOCALREGS)) {
+        t2 = PCOLR (PCINF (pc1)->oper1)->type;
+        break;
+      }
+    }
+    
+    if((t1 == LR_ENTRY_BEGIN && t2 == LR_ENTRY_END)
+      || (t1 == LR_EXIT_BEGIN && t2 == LR_EXIT_END))
+        return 1;
+
+  return 0;
+}
+
+    
+static void RemoveRegFromLRBlock(regs *reg)
+{
+  if(elementsInSet(reg->reglives.usedpCodes) == 2) {
+    pCode *pc1;
+
+      /* only continue if there are just 2 uses of the register,
+       * in in the local *entry* block and one in the local *exit* block */
+        
+      /* search for entry block */
+      pc1 = indexSet(reg->reglives.usedpCodes, 1);
+
+      if(insideLRBlock( pc1 )) {
+        fprintf(stderr, "usedpCodes[0] inside LR block\n");
+        deleteSetItem(&pc1->pb->tregisters, PCOR(PCI(pc1)->pcop)->r);
+        Remove1pcode(pc1, reg);
+      }
+
+      pc1 = indexSet(reg->reglives.usedpCodes, 0);
+      if(insideLRBlock( pc1 )) {
+        fprintf(stderr, "usedpCodes[1] inside LR block\n");
+        deleteSetItem(&pc1->pb->tregisters, PCOR(PCI(pc1)->pcop)->r);
+        Remove1pcode(pc1, reg);
+      }
+        
+      /* remove r0x00 */
+      reg->isFree = 1;
+      reg->wasUsed = 0;
+  }
+}
+
+        
 
 /*-----------------------------------------------------------------*
  *
@@ -430,6 +493,15 @@ static void Remove2pcodes(pCode *pcflow, pCode *pc1, pCode *pc2, regs *reg, int 
   }
 
   pCodeRegMapLiveRangesInFlow(PCFL(pcflow));
+  
+#if 1
+//  fprintf(stderr, "register %s is used in %d pCodes, assigned in %d pCodes\n", reg->name,
+//      elementsInSet(reg->reglives.usedpCodes),
+//      elementsInSet(reg->reglives.assignedpFlows));
+  
+  RemoveRegFromLRBlock(reg);
+#endif
+  
 }
 
 /*-----------------------------------------------------------------*
@@ -444,6 +516,13 @@ static int regUsedinRange(pCode *pc1, pCode *pc2, regs *reg)
     testreg = pic16_getRegFromInstruction(pc1);
     if(testreg && (testreg->rIdx == reg->rIdx)) {
       return 1;
+    }
+
+    if(PCI(pc1)->is2MemOp) {
+      testreg = pic16_getRegFromInstruction2(pc1);
+      if(testreg && (testreg->rIdx == reg->rIdx)) {
+        return 1;
+      }
     }
 
     pc1 = pic16_findNextInstruction(pc1->next);
@@ -595,19 +674,19 @@ static int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *re
 
 	    if(usesW(pct3))
 	      ; // Remove2pcodes(pcfl_used, pc1, NULL, reg, can_free);
-	    else
+	    else {
 	      Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
-
-	    total_registers_saved++;  // debugging stats.
-	    return 1;
-	    } else {
-	      //fprintf(stderr,"didn't optimize because Z bit is used\n");
-	    }
+	      total_registers_saved++;  // debugging stats.
+	      return 1;
+            }
+          } else {
+//            fprintf(stderr,"didn't optimize because Z bit is used\n");
+	  }
 	}
 #if 0
 	fprintf(stderr, " couldn't optimize\n");
 	if(reg2)
-	  fprintf(stderr, " %s is used in range\n",reg2->name);
+	  fprintf(stderr, " %s is used in range\n", reg2->name);
 	else
 	  fprintf(stderr, " reg2 is NULL\n");
 #endif
@@ -622,10 +701,11 @@ static int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *re
 
 	reg1 = pic16_getRegFromInstruction(pct1);
 	if(reg1 && !regUsedinRange(pc1,pc2,reg1)) {
-	  /*
+	  
+#if 0
 	    fprintf(stderr, "   MOVF/MOVFW. \n");
 	    fprintf(stderr, "     ...optimizing\n");
-	  */
+#endif
 
 	  /*
 	    Change:
@@ -851,42 +931,44 @@ void pic16_pCodeRegOptimizeRegUsage(int level)
   int saved = 0;
   int t = total_registers_saved;
 
-  if(!register_optimization)
-    return;
+    if(getenv("NO_REG_OPT"))
+      return;
 
-#define OPT_PASSES 4
-  passes = OPT_PASSES;
+    if(!register_optimization)
+      return;
 
-  do {
-    saved = total_registers_saved;
+#define OPT_PASSES 8
+    passes = OPT_PASSES;
 
-    /* Identify registers used in one flow sequence */
-    OptimizeRegUsage(pic16_dynAllocRegs,level, (OPT_PASSES-passes));
-    OptimizeRegUsage(pic16_dynStackRegs,level, (OPT_PASSES-passes));
-    OptimizeRegUsage(pic16_dynDirectRegs,0, (OPT_PASSES-passes));
+    do {
+      saved = total_registers_saved;
 
-    if((total_registers_saved != saved)
-    	&& (pic16_pcode_verbose))
-      fprintf(stderr, " *** pass %d, Saved %d registers, total saved %d ***\n", 
-	      (1+OPT_PASSES-passes),total_registers_saved-saved,total_registers_saved);
+      /* Identify registers used in one flow sequence */
+      OptimizeRegUsage(pic16_dynAllocRegs,level, (OPT_PASSES-passes));
+      OptimizeRegUsage(pic16_dynStackRegs,level, (OPT_PASSES-passes));
+      OptimizeRegUsage(pic16_dynDirectRegs,0, (OPT_PASSES-passes));
+
+      if((total_registers_saved != saved)
+        && (pic16_pcode_verbose))
+          fprintf(stderr, " *** pass %d, Saved %d registers, total saved %d ***\n", 
+            (1+OPT_PASSES-passes),total_registers_saved-saved,total_registers_saved);
       
-    passes--;
+          passes--;
 
-  } while( passes && ((total_registers_saved != saved) || (passes==OPT_PASSES-1)) );
+    } while( passes && ((total_registers_saved != saved) || (passes==OPT_PASSES-1)) );
 
-  if(total_registers_saved == t) 
-
-  if(pic16_debug_verbose)
-    fprintf(stderr, "No registers saved on this pass\n");
+    if(total_registers_saved == t) 
+      if(pic16_debug_verbose)
+        fprintf(stderr, "No registers saved on this pass\n");
 
 
 #if 0
-  fprintf(stderr,"dynamically allocated regs:\n");
-  dbg_regusage(pic16_dynAllocRegs);
-  fprintf(stderr,"stack regs:\n");
-  dbg_regusage(pic16_dynStackRegs);
-  fprintf(stderr,"direct regs:\n");
-  dbg_regusage(pic16_dynDirectRegs);
+    fprintf(stderr,"dynamically allocated regs:\n");
+    dbg_regusage(pic16_dynAllocRegs);
+    fprintf(stderr,"stack regs:\n");
+    dbg_regusage(pic16_dynStackRegs);
+    fprintf(stderr,"direct regs:\n");
+    dbg_regusage(pic16_dynDirectRegs);
 #endif
 }
 
@@ -902,7 +984,6 @@ static void  RegsSetUnMapLiveRanges(set *regset)
   while(regset) {
     reg = regset->item;
     regset = regset->next;
-
     
     deleteSet(&reg->reglives.usedpCodes);
     deleteSet(&reg->reglives.usedpFlows);
@@ -914,12 +995,10 @@ static void  RegsSetUnMapLiveRanges(set *regset)
 
 void  pic16_RegsUnMapLiveRanges(void)
 {
-
   RegsSetUnMapLiveRanges(pic16_dynAllocRegs);
   RegsSetUnMapLiveRanges(pic16_dynStackRegs);
   RegsSetUnMapLiveRanges(pic16_dynDirectRegs);
   RegsSetUnMapLiveRanges(pic16_dynProcessorRegs);
   RegsSetUnMapLiveRanges(pic16_dynDirectBitRegs);
   RegsSetUnMapLiveRanges(pic16_dynInternalRegs);
-
 }

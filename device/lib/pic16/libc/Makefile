@@ -13,6 +13,7 @@
 
 
 DIRS	=	ctype \
+		delay \
 		stdlib \
 		stdio \
 		string \

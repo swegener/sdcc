@@ -53,6 +53,11 @@ void pic16_DumpAop(char *prefix, asmop *aop);
 void pic16_DumpSymbol(char *prefix, symbol *sym);
 void pic16_DumpOp(char *prefix, operand *op);
 
+pCodeOp *pic16_popGetWithString(char *str);
+void pic16_callGenericPointerRW(int rw, int size);
+
+
+
 void gpsimio2_pcop(pCodeOp *pcop);
 void gpsimio2_lit(unsigned char lit);
 

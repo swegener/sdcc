@@ -1184,7 +1184,7 @@ char *ft;
 
 	/*Look backward the name path and get rid of the extension, if any*/
 	i=strlen(fn);
-	for(; (fn[i]!='.')&&(fn[i]!='\\')&&(fn[i]!='/')&&(i>=0); i--);
+	for(; (fn[i]!='.')&&(fn[i]!='\\')&&(fn[i]!='/')&&(i>0); i--);
 	if( (fn[i]=='.') && strcmp(ft, "lnk") )
 	{
 		strncpy(fb, fn, i);

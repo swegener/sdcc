@@ -1,3 +1,11 @@
+2004-04-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* link/z80/lkmain.c (afile),
+	* as/hc08/lkmain.c (afile),
+	* as/mcs51/lkmain.c (afile): fix suggested by Maarten Brock to
+	prevent a pointer problem when a filename has no directory and
+	no extension specified.
+
 2004-04-21 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* link/z80/lkmain.c (afile): allow periods in directory names

@@ -9,6 +9,8 @@
 	signedness of modulo, left and right shift
 	* support/Util/SDCCerr.c: added warning "integer overflow in expression"
 	* support/Util/SDCCerr.h: added warning W_INT_OVL
+	* src/SDCCast.c (decorateType): fixed gcc3.3 warning
+	* src/SDCCast.c (ast_print): improved output of constants
 
 2003-08-04  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 

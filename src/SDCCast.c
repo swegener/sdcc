@@ -1997,7 +1997,7 @@ decorateType (ast * tree)
     if (IS_AST_OP(tree) &&
 	(tree->opval.op == CAST || tree->opval.op == '=') &&
 	(getSize(LTYPE(tree)) > getSize(RTYPE(tree))) &&
-	(getSize(RTYPE(tree)) < INTSIZE)) {
+	(getSize(RTYPE(tree)) < (unsigned) INTSIZE)) {
       // this is a cast/assign to a bigger type
       if (IS_AST_OP(tree->right) &&
 	  IS_INTEGRAL(tree->right->ftype) &&
@@ -2781,10 +2781,10 @@ decorateType (ast * tree)
 		      tree->right = NULL;
 		      TTYPE (tree) = tree->opval.val->type;
 		      tree->values.literalFromCast = 1;
-	      } else if (IS_GENPTR(LTYPE(tree)) && !IS_PTR(RTYPE(tree)) && 
+	      } else if (IS_GENPTR(LTYPE(tree)) && !IS_PTR(RTYPE(tree)) &&
 			 ((int)floatFromVal(valFromType(RETYPE(tree)))) !=0 ) /* special case of NULL */  {
 		      sym_link *rest = LTYPE(tree)->next;
-		      werror(W_LITERAL_GENERIC);		      
+		      werror(W_LITERAL_GENERIC);
 		      TTYPE(tree) = newLink(DECLARATOR);
 		      DCL_TYPE(TTYPE(tree)) = FPOINTER;
 		      TTYPE(tree)->next = rest;
@@ -2803,7 +2803,7 @@ decorateType (ast * tree)
       /* if pointer to struct then check names */
       if (IS_PTR(LTYPE(tree)) && IS_STRUCT(LTYPE(tree)->next) &&
 	  IS_PTR(RTYPE(tree)) && IS_STRUCT(RTYPE(tree)->next) &&
-	  strcmp(SPEC_STRUCT(LETYPE(tree))->tag,SPEC_STRUCT(RETYPE(tree))->tag)) 
+	  strcmp(SPEC_STRUCT(LETYPE(tree))->tag,SPEC_STRUCT(RETYPE(tree))->tag))
 	{
 	  werror(W_CAST_STRUCT_PTR,SPEC_STRUCT(RETYPE(tree))->tag,
 		 SPEC_STRUCT(LETYPE(tree))->tag);
@@ -4504,11 +4504,14 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 	/* just get the type        */
 	if (tree->type == EX_VALUE) {
 
-		if (IS_LITERAL (tree->opval.val->etype)) {			
-			fprintf(outfile,"CONSTANT (%p) value = %d, 0x%x, %g", tree,
-				(int) floatFromVal(tree->opval.val),
-				(int) floatFromVal(tree->opval.val),
-			        floatFromVal(tree->opval.val));
+		if (IS_LITERAL (tree->opval.val->etype)) {
+			fprintf(outfile,"CONSTANT (%p) value = ", tree);
+			if (SPEC_USIGN (tree->opval.val->etype))
+				fprintf(outfile,"%u", (TYPE_UDWORD) floatFromVal(tree->opval.val));
+			else
+				fprintf(outfile,"%d", (TYPE_DWORD) floatFromVal(tree->opval.val));
+			fprintf(outfile,", 0x%x, %g", (TYPE_UDWORD) floatFromVal(tree->opval.val),
+			                              floatFromVal(tree->opval.val));
 		} else if (tree->opval.val->sym) {
 			/* if the undefined flag is set then give error message */
 			if (tree->opval.val->sym->undefined) {

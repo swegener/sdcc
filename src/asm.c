@@ -331,6 +331,18 @@ static const ASM_MAPPING _asxxxx_mapping[] =
   },
   {"functionlabeldef", "%s:"},
   {"bankimmeds", "0	; PENDING: bank support"},
+  {"los","(%s & 0xFF)"},
+  {"his","(%s >> 8)"},
+  {"hihis","(%s >> 16)"},
+  {"hihihis","(%s >> 24)"},
+  {"lod","(%d & 0xFF)"},
+  {"hid","(%d >> 8)"},
+  {"hihid","(%d >> 16)"},
+  {"hihihid","(%d >> 24)"},
+  {"lol","(%05d$ & 0xFF)"},
+  {"hil","(%05d$ >> 8)"},
+  {"hihil","(%05d$ >> 16)"},
+  {"hihihil","(%05d$ >> 24)"},
   {NULL, NULL}
 };
 
@@ -369,7 +381,7 @@ static const ASM_MAPPING _gas_mapping[] =
    "; ---------------------------------"
   },
   {"functionlabeldef", "%s:"},
-  {"bankimmeds", "0	; PENDING: bank support"},
+  {"bankimmeds", "0	; PENDING: bank support"},  
   {NULL, NULL}
 };
 

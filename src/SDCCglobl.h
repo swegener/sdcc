@@ -98,7 +98,7 @@ typedef int bool;
 #define PRAGMA_NOOVERLAY   "NOOVERLAY"
 #define PRAGMA_CALLEESAVES "CALLEE-SAVES"
 #define PRAGMA_EXCLUDE     "EXCLUDE"
-#define PRAGMA_EXCLUDE     "OVERLAY"
+#define PRAGMA_OVERLAY     "OVERLAY"
 #define  SMALL_MODEL 0
 #define  LARGE_MODEL 1
 #define  TRUE 1

@@ -1019,6 +1019,9 @@ canOverlayLocals (eBBlock ** ebbs, int count)
 
     return FALSE;
 
+  /* if this is a forces overlay */
+  if (IFFUNC_ISOVERLAY(currFunc->type)) return TRUE;
+
   /* otherwise do thru the blocks and see if there
      any function calls if found then return false */
   for (i = 0; i < count; i++)

@@ -1733,6 +1733,7 @@ getArraySizePtr (operand * op)
 /*-----------------------------------------------------------------*/
 /* perform "usual unary conversions"                               */
 /*-----------------------------------------------------------------*/
+#if 0
 static operand *
 usualUnaryConversions (operand * op)
 {
@@ -1746,6 +1747,7 @@ usualUnaryConversions (operand * op)
     }
   return op;
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* perform "usual binary conversions"                              */
@@ -2745,7 +2747,6 @@ geniCodeLeftShift (operand * left, operand * right)
 {
   iCode *ic;
 
-  left = usualUnaryConversions (left);
   ic = newiCode (LEFT_OP, left, right);
   IC_RESULT (ic) = newiTempOperand (operandType (left), 0);
   ADDTOCHAIN (ic);

@@ -2027,7 +2027,7 @@ getResultTypeFromType (sym_link *type)
 /* addCast - adds casts to a type specified by RESULT_TYPE         */
 /*-----------------------------------------------------------------*/
 static void
-addCast (ast **tree, RESULT_TYPE resultType)
+addCast (ast **tree, RESULT_TYPE resultType, bool upcast)
 {
   sym_link *newLink;
   
@@ -2040,15 +2040,26 @@ addCast (ast **tree, RESULT_TYPE resultType)
 	break;
       case RESULT_TYPE_INT:
 #if 0
-        /* casting from long to int costs additional 4 bytes dram! */
-	if (getSize ((*tree)->etype) <= INTSIZE)
+	if (getSize ((*tree)->etype) > INTSIZE)
+          {
+            /* warn ("Loosing significant digits"); */
+	    return;
+	  }
+#endif
+	/* char: promote to int */
+	if (!upcast ||
+	    getSize ((*tree)->etype) >= INTSIZE)
 	  return;
 	newLink = newIntLink();
 	break;
-#else
-        /* warn ("Loosing significant digits"); */
-	return;
-#endif
+      case RESULT_TYPE_OTHER:
+	if (!upcast)
+	  return;
+        /* long, float: promote to int */
+	if (getSize ((*tree)->etype) >= INTSIZE)
+	  return;
+	newLink = newIntLink();
+	break;
       default:
 	return;
     }
@@ -2508,8 +2519,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
 	  if (getenv ("SDCC_NEWTYPEFLOW"))
 	    {
-	      addCast (&tree->left,  resultType);
-	      addCast (&tree->right, resultType);
+	      addCast (&tree->left,  resultType, FALSE);
+	      addCast (&tree->right, resultType, FALSE);
 	    }
 	  TTYPE (tree) = computeType (LTYPE (tree), RTYPE (tree), FALSE);
 	  TETYPE (tree) = getSpec (TTYPE (tree));
@@ -2726,8 +2737,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       LRVAL (tree) = RRVAL (tree) = 1;
       if (getenv ("SDCC_NEWTYPEFLOW"))
         {
-          addCast (&tree->left,  resultType);
-          addCast (&tree->right, resultType);
+          addCast (&tree->left,  resultType, FALSE);
+          addCast (&tree->right, resultType, FALSE);
         }
       TETYPE (tree) = getSpec (TTYPE (tree) =
 			       computeType (LTYPE (tree),
@@ -2946,8 +2957,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 					      TRUE));
       else
 	{
-          addCast (&tree->left,  resultType);
-          addCast (&tree->right, resultType);
+          addCast (&tree->left,  resultType, FALSE);
+          addCast (&tree->right, resultType, FALSE);
 	  TETYPE (tree) = getSpec (TTYPE (tree) =
 				   computeType (LTYPE (tree),
 					        RTYPE (tree),
@@ -3088,8 +3099,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 					        FALSE));
 	else
           {
-	    addCast (&tree->left,  resultType);
-            addCast (&tree->right, resultType);
+	    addCast (&tree->left,  resultType, TRUE);
+            addCast (&tree->right, resultType, TRUE);
             TETYPE (tree) = getSpec (TTYPE (tree) =
 				     computeType (LTYPE (tree),
 					          RTYPE (tree),
@@ -3199,8 +3210,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 					        FALSE));
 	else
 	  {
-	    addCast (&tree->left,  resultType);
-	    addCast (&tree->right, resultType);
+	    addCast (&tree->left,  resultType, TRUE);
+	    addCast (&tree->right, resultType, TRUE);
 	    TETYPE (tree) = getSpec (TTYPE (tree) =
 				     computeType (LTYPE (tree),
 					          RTYPE (tree),
@@ -3356,7 +3367,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 						  TRUE));
 	  else
 	    {
-	      addCast (&tree->left,  resultType);
+	      addCast (&tree->left,  resultType, TRUE);
 	      TETYPE (tree) = getSpec (TTYPE (tree) =
 				       computeType (LTYPE (tree),
 					            RTYPE (tree),

@@ -1,3 +1,11 @@
+2004-01-27 Bernhard Held <bernhard@bernhardheld.de>
+
+	Fixed promotion, it should be done on AST level:
+	* src/SDCCast.c (addCast): added promotion to int
+	(decorateType): updated call to upCast()
+	* src/SDCCicode.c (geniCodeLeftShift): removed call to
+	usualUnaryConversions()
+
 2004-01-26  Michael Hope  <michaelh@juju.net.nz>
 
 	* support/regression/tests/literalop.c (mulWrapper): Added a

@@ -2144,7 +2144,7 @@ decorateType (ast * tree)
       {
 	sym_link *ltc = (tree->right ? RTYPE (tree) : LTYPE (tree));
 	COPYTYPE (TTYPE (tree), TETYPE (tree), ltc);
-	if (!tree->initMode && IS_CONSTANT (TTYPE (tree)))
+	if (!tree->initMode && IS_CONSTANT(TETYPE(tree)))
 	  werror (E_CODE_WRITE, tree->opval.op==INC_OP ? "++" : "--");
 
 	if (tree->right)
@@ -3124,7 +3124,7 @@ decorateType (ast * tree)
       RRVAL (tree) = 1;
       TETYPE (tree) = getSpec (TTYPE (tree) = LTYPE (tree));
 
-      if (!tree->initMode && IS_CONSTANT (LTYPE (tree)))
+      if (!tree->initMode && IS_CONSTANT (LETYPE (tree)))
 	werror (E_CODE_WRITE, "&= or |= or ^= or >>= or <<=");
 
       if (LRVAL (tree))
@@ -3159,7 +3159,7 @@ decorateType (ast * tree)
 			       computeType (LTYPE (tree),
 					    RTYPE (tree)));
 
-      if (!tree->initMode && IS_CONSTANT (LTYPE (tree)))
+      if (!tree->initMode && IS_CONSTANT (LETYPE (tree)))
 	werror (E_CODE_WRITE, "-=");
 
       if (LRVAL (tree))
@@ -3200,7 +3200,7 @@ decorateType (ast * tree)
 			       computeType (LTYPE (tree),
 					    RTYPE (tree)));
 
-      if (!tree->initMode && IS_CONSTANT (LTYPE (tree)))
+      if (!tree->initMode && IS_CONSTANT (LETYPE (tree)))
 	werror (E_CODE_WRITE, "+=");
 
       if (LRVAL (tree))
@@ -3248,7 +3248,7 @@ decorateType (ast * tree)
       RRVAL (tree) = 1;
       LLVAL (tree) = 1;
       if (!tree->initMode ) {
-	if (IS_CONSTANT (LTYPE (tree)))
+	if ((IS_SPEC(LETYPE(tree)) && IS_CONSTANT (LETYPE (tree))))
 	  werror (E_CODE_WRITE, "=");
       }
       if (LRVAL (tree))

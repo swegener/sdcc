@@ -2559,6 +2559,11 @@ geniCodeDerefPtr (operand * op,int lvl)
 
   op->isGptr = IS_GENPTR (optype);
 
+  /* if the pointer was declared as a constant */
+  /* then we cannot allow assignment to the derefed */
+  if (IS_PTR_CONST (optype))
+    SPEC_CONST (retype) = 1;
+
   op->isaddr = (IS_PTR (rtype) ||
 		IS_STRUCT (rtype) ||
 		IS_INT (rtype) ||

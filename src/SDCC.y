@@ -603,9 +603,6 @@ type_specifier2
    | CODE      {
                   $$ = newLink (SPECIFIER) ;
                   SPEC_SCLS($$) = S_CODE ;                 
-		  if (port->mem.code_ro) {
-		    SPEC_CONST($$) = 1;
-		  }
                }
    | EEPROM      {
                   $$ = newLink (SPECIFIER) ;

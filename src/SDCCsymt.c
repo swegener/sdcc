@@ -348,6 +348,8 @@ pointerTypes (sym_link * ptr, sym_link * type)
      storage class of the type */
   if (IS_SPEC (type))
     {
+      DCL_PTR_CONST (ptr) = SPEC_CONST (type);
+      DCL_PTR_VOLATILE (ptr) = SPEC_VOLATILE (type);
       switch (SPEC_SCLS (type))
 	{
 	case S_XDATA:
@@ -363,6 +365,7 @@ pointerTypes (sym_link * ptr, sym_link * type)
 	  DCL_TYPE (ptr) = POINTER;
 	  break;
 	case S_CODE:
+	  DCL_PTR_CONST (ptr) = port->mem.code_ro;
 	  DCL_TYPE (ptr) = CPOINTER;
 	  break;
 	case S_EEPROM:
@@ -455,26 +458,21 @@ addDecl (symbol * sym, int type, sym_link * p)
     }
 
   /* if the type is an unknown pointer and has
-     a tspec then take the const & volatile
+     a tspec then take the storage class const & volatile
      attribute from the tspec & make it those of this
      symbol */
-
   if (p &&
-      IS_DECL (p) &&
-      DCL_TYPE (p) == UPOINTER &&
+      !IS_SPEC (p) &&
+      //DCL_TYPE (p) == UPOINTER &&
       DCL_TSPEC (p))
     {
-      // only for declarators
-      wassert (IS_DECL(sym->type));
-
       if (!IS_SPEC (sym->etype))
 	{
 	  sym->etype = sym->etype->next = newLink (SPECIFIER);
 	}
-
       SPEC_SCLS (sym->etype) = SPEC_SCLS (DCL_TSPEC (p));
-      DCL_PTR_CONST (sym->type) = SPEC_CONST (DCL_TSPEC (p));
-      DCL_PTR_VOLATILE (sym->type) = SPEC_VOLATILE (DCL_TSPEC (p));
+      SPEC_CONST (sym->etype) = SPEC_CONST (DCL_TSPEC (p));
+      SPEC_VOLATILE (sym->etype) = SPEC_VOLATILE (DCL_TSPEC (p));
       DCL_TSPEC (p) = NULL;
     }
 
@@ -560,7 +558,14 @@ sym_link *
 mergeSpec (sym_link * dest, sym_link * src, char *name)
 {
   if (!IS_SPEC(dest) || !IS_SPEC(src)) {
+#if 0
+    werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "cannot merge declarator");
+    exit (1);
+#else
     werror (E_SYNTAX_ERROR, yytext);
+    // the show must go on
+    return newIntLink();
+#endif
   }
 
   if (SPEC_NOUN(src)) {
@@ -588,6 +593,17 @@ mergeSpec (sym_link * dest, sym_link * src, char *name)
   }
 
   /* copy all the specifications  */
+
+  // we really should do: 
+#if 0
+  if (SPEC_what(src)) {
+    if (SPEC_what(dest)) {
+      werror(W_DUPLICATE_SPEC, "what");
+    }
+    SPEC_what(dst)|=SPEC_what(src);
+  }
+#endif
+  // but there are more important thing right now
 
   SPEC_LONG (dest) |= SPEC_LONG (src);
   dest->select.s._short|=src->select.s._short;

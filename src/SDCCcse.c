@@ -424,6 +424,7 @@ DEFSETFUNC (findPrevIc)
   if (isiCodeEqual (ic, cdp->diCode) &&
       isOperandEqual (cdp->sym, IC_RESULT (cdp->diCode)))
     {
+      *icp = cdp->diCode;
       return 1;
     }
 
@@ -434,6 +435,7 @@ DEFSETFUNC (findPrevIc)
       isOperandEqual (IC_LEFT (ic), IC_RIGHT (cdp->diCode)) &&
       isOperandEqual (IC_RIGHT (ic), IC_LEFT (cdp->diCode)))
     {
+      *icp = cdp->diCode;
       return 1;
     }
 

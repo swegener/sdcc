@@ -263,15 +263,18 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	  if (ival) {
 	    // set ival's lineno to where the symbol was defined
 	    lineno=ival->lineno=sym->lineDef;
-	    
+#if 0	    
 	    // check if this is a constant expression
 	    if (constExprTree(ival->right)) {
 	      allocInfo = 0;
+#endif
 	      eBBlockFromiCode (iCodeFromAst (ival));
 	      allocInfo = 1;
+#if 0
 	    } else {
 	      werror (E_CONST_EXPECTED, "found expression");
 	    }
+#endif
 	  }
 	}	  
 
@@ -1630,6 +1633,9 @@ glue ()
     }
   copyFile (asmFile, code->oFile);
 
+  if (port->genAssemblerEnd) {
+      port->genAssemblerEnd(asmFile);
+  }
   fclose (asmFile);
   applyToSet (tmpfileSet, closeTmpFiles);
   applyToSet (tmpfileNameSet, rmTmpFiles);

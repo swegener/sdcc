@@ -497,18 +497,14 @@ void checkTypeSanity(sym_link *etype, char *name) {
     werror (E_SIGNED_OR_UNSIGNED_INVALID, noun, name);
   }
 
-  if (!SPEC_NOUN(etype)) {
-    // special case for just "signed" or "unsigned" or "long"
-    if (etype->select.s._signed || SPEC_USIGN(etype) || SPEC_LONG(etype)) {
-      SPEC_NOUN(etype)=V_INT;
-    }
-    // special case for just "short"
-    if (etype->select.s._short) {
-      SPEC_NOUN(etype)=V_CHAR; // or maybe V_INT
-    }
+  // special case for "short"
+  if (etype->select.s._short) {
+    SPEC_NOUN(etype) = options.shortisint ? V_INT : V_CHAR;
   }
 
-  // if still no noun (e.g. "const a;" or "data b;") assume an int
+  /* if no noun e.g. 
+     "const a;" or "data b;" or "signed s" or "long l"
+     assume an int */
   if (!SPEC_NOUN(etype)) {
     SPEC_NOUN(etype)=V_INT;
   }
@@ -563,15 +559,15 @@ mergeSpec (sym_link * dest, sym_link * src)
     if (SPEC_what(dest)) {
       werror(W_DUPLICATE_SPEC, "what");
     }
-    SPEC_what(dst)=SPEC_what(src);
+    SPEC_what(dst)|=SPEC_what(src);
   }
 #endif
   // but there are more important thing right now
 
   SPEC_LONG (dest) |= SPEC_LONG (src);
-  dest->select.s._short=src->select.s._short;
+  dest->select.s._short|=src->select.s._short;
   SPEC_USIGN (dest) |= SPEC_USIGN (src);
-  dest->select.s._signed=src->select.s._signed;
+  dest->select.s._signed|=src->select.s._signed;
   SPEC_STAT (dest) |= SPEC_STAT (src);
   SPEC_EXTR (dest) |= SPEC_EXTR (src);
   SPEC_ABSA (dest) |= SPEC_ABSA (src);

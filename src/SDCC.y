@@ -565,7 +565,7 @@ type_specifier2
    | SHORT  {
                $$=newLink();
                $$->class = SPECIFIER   ;
-	       $$->select.s._short = 1      ;
+	       $$->select.s._short = 1 ;
             }
    | INT    {
                $$=newLink();
@@ -580,7 +580,7 @@ type_specifier2
    | SIGNED {
                $$=newLink();
                $$->class = SPECIFIER   ;
-               $$->select.s._signed = 1     ;
+               $$->select.s._signed = 1;
             }
    | UNSIGNED  {
                $$=newLink();
@@ -595,7 +595,6 @@ type_specifier2
    | CONST  {
                $$=newLink();
 	       $$->class = SPECIFIER ;
-	       //SPEC_SCLS($$) = S_CONSTANT ;
 	       SPEC_CONST($$) = 1;
             }
    | VOLATILE  {

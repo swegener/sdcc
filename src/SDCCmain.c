@@ -135,6 +135,8 @@ char DefaultExePath[128];
 #define OPTION_NOSTDINC     "-nostdinc"
 #define OPTION_VERBOSE      "-verbose"
 #define OPTION_LESS_PEDANTIC "-lesspedantic"
+#define OPTION_SHORT_IS_CHAR "-short-is-char"
+#define OPTION_SHORT_IS_INT "-short-is-int"
 
 static const char *_preCmd[] =
 {
@@ -335,6 +337,7 @@ setDefaultOptions ()
   options.nostdlib = 0;
   options.nostdinc = 0;
   options.verbose = 0;
+  options.shortisint = 0;
 
   options.stack10bit=0;
 
@@ -877,6 +880,16 @@ parseCmdLine (int argc, char **argv)
 	      options.verbose = 1;
 	      continue;
 	    }
+
+	  if (strcmp (&argv[i][1], OPTION_SHORT_IS_INT) == 0) {
+	    options.shortisint=1;
+	    continue;
+	  }
+
+	  if (strcmp (&argv[i][1], OPTION_SHORT_IS_CHAR) == 0) {
+	    options.shortisint=0;
+	    continue;
+	  }
           
           if (strcmp (argv[i] +1, OPTION_LESS_PEDANTIC) == 0) 
               {

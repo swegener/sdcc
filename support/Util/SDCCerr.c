@@ -409,7 +409,7 @@ void vwerror (int errNum, va_list marker)
     if (ErrTab[errNum].errIndex != errNum)
     {
         fprintf(_SDCCERRG.out, 
-        	"*** Internal error: error table entry for %d inconsistent.", errNum);
+        	"Internal error: error table entry for %d inconsistent.", errNum);
     }
 
 
@@ -418,22 +418,24 @@ void vwerror (int errNum, va_list marker)
             fatalError++ ;
   
         if ( filename && lineno ) {
-            fprintf(_SDCCERRG.out, "%s(%d):",filename,lineno);
+            fprintf(_SDCCERRG.out, "%s:%d: ",filename,lineno);
         } else if (lineno) {
-            fprintf(_SDCCERRG.out, "at %d:", lineno);
+            fprintf(_SDCCERRG.out, "at %d: ", lineno);
+        } else {
+            fprintf(_SDCCERRG.out, "-:0: ");
         }
     
         switch(ErrTab[errNum].errType)
         {
             case ERROR_LEVEL_ERROR:
-            	fprintf(_SDCCERRG.out, "error   *** ");
+            	fprintf(_SDCCERRG.out, "error: ");
             	break;
             case ERROR_LEVEL_WARNING:
             case ERROR_LEVEL_PEDANTIC:
-            	fprintf(_SDCCERRG.out, "warning *** ");
+            	fprintf(_SDCCERRG.out, "warning: ");
             	break;
             case ERROR_LEVEL_INFO:
-            	fprintf(_SDCCERRG.out, "info    *** ");
+            	fprintf(_SDCCERRG.out, "info: ");
             	break;
 	    default:
 	    	break;            	

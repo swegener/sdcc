@@ -90,9 +90,11 @@ all: checkconf models model-ds390 model-z80 model-gbz80
 objects: build-dir $(OBJECTS) port-specific-objects lib-files
 
 models:
-	for model in $(MODELS); do \
-	  $(MAKE) MODELFLAGS="--model-$$model" PORT=$$model objects; \
-	done
+	if [ "`grep mcs51 ../../ports.build`" = mcs51 ]; then \
+	  for model in $(MODELS); do \
+	    $(MAKE) MODELFLAGS="--model-$$model" PORT=$$model objects; \
+	  done \
+	fi
 
 model-ds390:
 	if [ "`grep ds390 ../../ports.build`" = ds390 ]; then \
@@ -100,10 +102,14 @@ model-ds390:
 	fi
 
 model-z80:
-	$(MAKE) MODELFLAGS="-mz80" PORT=z80 objects-z80 OEXT=.o
+	if [ "`grep z80 ../../ports.build`" = z80 ]; then \
+	  $(MAKE) MODELFLAGS="-mz80" PORT=z80 objects-z80 OEXT=.o; \
+	fi
 
 model-gbz80:
-	$(MAKE) MODELFLAGS="-mgbz80" PORT=gbz80 objects-z80 OEXT=.o
+	if [ "`grep z80 ../../ports.build`" = z80 ]; then \
+	  $(MAKE) MODELFLAGS="-mgbz80" PORT=gbz80 objects-z80 OEXT=.o; \
+	fi
 
 objects-z80: build-dir $(Z80OBJECTS) port-specific-objects
 	cd $(PORTDIR); ls *$(OEXT) > $(PORT).lib

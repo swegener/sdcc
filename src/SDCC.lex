@@ -328,47 +328,67 @@ int check_type()
 
 char strLitBuff[2048]			;
 
-char *stringLiteral ()
-{
-       int ch;
-       char *str = strLitBuff			;
-       
-       *str++ = '\"'			;
-       /* put into the buffer till we hit the */
-       /* first \" */
-       while (1) {
+/*
+ * Change by JTV 2001-05-19 to not concantenate strings
+ * to support ANSI hex and octal escape sequences in string liteals 
+ */
 
-          ch = input()			;
-          if (!ch) 	    break	; /* end of input */
-	  /* if it is a \ then everything allowed */
-	  if (ch == '\\') {
-	     *str++ = ch     ; /* backslash in place */
-	     *str++ = input()		; /* following char in place */
-	     continue			;      /* carry on */
-	     }
-	     
-	 /* if new line we have a new line break */
-	 if (ch == '\n') break		;
-	 
-	 /* if this is a quote then we have work to do */
-	 /* find the next non whitespace character     */
-	 /* if that is a double quote then carry on    */
-	 if (ch == '\"') {
-	 
-	     while ((ch = input()) && isspace(ch)) ;
-	     if (!ch) break		; 
-	     if (ch != '\"') {
-	          unput(ch)			;
-		  break			;
-		  }
-		  
-		  continue		;
-        }
-	*str++  = ch;	  
-     }  
-     *str++ = '\"'			;
-     *str = '\0';
-     return strLitBuff			;
+char *stringLiteral ()
+
+{
+int ch;
+char *str = strLitBuff			;
+
+*str++ = '\"'			;
+/* put into the buffer till we hit the */
+/* first \" */
+
+while (1) 
+  {
+  ch = input()			;
+
+  if (!ch)
+    break	; /* end of input */
+
+  /* if it is a \ then everything allowed */
+
+  if (ch == '\\') 
+    {
+    *str++ = ch     ; /* backslash in place */
+    *str++ = input()		; /* following char in place */
+    continue			;      /* carry on */
+    }
+
+  /* if new line we have a new line break */
+  if (ch == '\n') 
+    break		;
+
+  /* if this is a quote then we have work to do */
+  /* find the next non whitespace character     */
+  /* if that is a double quote then carry on    */
+
+  if (ch == '\"') 
+    {
+    *str++  = ch ;	/* Pass end of this string or substring to evaluator */
+
+    while ((ch = input()) && isspace(ch)) ;
+
+    if (!ch) 
+      break ; 
+
+    if (ch != '\"') 
+      {
+      unput(ch) ;
+      break ;
+      }
+    }
+
+  *str++  = ch;	      /* Put next substring introducer into output string */
+  }  
+
+*str = '\0';
+
+return strLitBuff			;
 }
 
 void doPragma (int op, char *cp)

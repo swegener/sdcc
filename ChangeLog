@@ -1,3 +1,7 @@
+2003-05-22  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/pic16/pcode.c (pic16_get_op_from_instruction): fixed a gcc 3.x warning
+
 2003-05-21    <johan@balder>
 
 	* src/SDCCglue.c (printIval): fixed bug #739934

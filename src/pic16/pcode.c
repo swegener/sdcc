@@ -3647,8 +3647,11 @@ static char *pic16_get_op_from_instruction( pCodeInstruction *pcc)
 
   if(pcc )
     return pic16_get_op(pcc->pcop,NULL,0);
-  
-  return ("ERROR Null: "__FUNCTION__);
+
+  /* gcc 3.2:  warning: concatenation of string literals with __FUNCTION__ is deprecated 
+   *   return ("ERROR Null: "__FUNCTION__);
+   */
+  return ("ERROR Null: pic16_get_op_from_instruction");
 
 }
 

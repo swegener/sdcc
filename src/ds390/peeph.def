@@ -1077,7 +1077,7 @@ replace {
 } by {
         ; Peephole 182a   used 24 bit load of dptr
         mov  dptr,#((%3 << 16) + (%2 << 8) + %1)
-} if 24bitMode
+} if 24bitModeAndPortDS390
 
 // saving 3 byte, 2 cycles, return(float_constant) profits here
 replace {
@@ -1654,14 +1654,14 @@ replace {
 } by {	
 	mov  %1,#(%2 >> 8)
 	xrl  %1,#0x80
-}
+} if portIsDS390
 
 replace {
 	mov  %1,#(( %2 + %3 >> 8 ) ^ 0x80)
 } by {	
 	mov  %1,#((%2 + %3) >> 8)
 	xrl  %1,#0x80
-}
+} if portIsDS390
 
 replace  {
 	mov  %1,a

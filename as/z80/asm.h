@@ -594,6 +594,5 @@ extern	struct	mne	mne[];
 
 /* Machine dependent functions */
 
-extern	VOID		machin();
 extern	VOID		minit();
 

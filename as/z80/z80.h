@@ -187,6 +187,5 @@ extern	int		srch();
 extern	int		comma();
 extern	int		genop();
 extern	int		gixiy();
-extern	VOID		machin();
 extern	VOID		minit();
-
+extern	VOID		machine(struct mne *mp) ;

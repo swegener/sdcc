@@ -13,10 +13,6 @@
 #include <setjmp.h>
 #include <string.h>
 
-//#if !defined(_MSC_VER)
-//#include <alloc.h>
-//#endif
-
 #include "asm.h"
 
 /*)Module	asexpr.c
@@ -88,7 +84,7 @@ expr(esp, n)
 register struct expr *esp;
 int n;
 {
-        register int c, d, p;
+        register int c, p;
         struct area *ap;
         struct expr re;
 
@@ -299,7 +295,7 @@ register struct expr *esp;
         if (c == '-') {
                 expr(esp, 100);
                 abscheck(esp);
-                esp->e_addr = -esp->e_addr;
+                esp->e_addr = 0 - esp->e_addr;
                 return;
         }
         if (c == '~') {

@@ -17,16 +17,13 @@
 #include <setjmp.h>
 #include <string.h>
 
-//#if !defined(_MSC_VER)
-//#include <alloc.h>
-//#endif
-
 #ifdef SDK
 #include <stdlib.h>
 #include <math.h>
 #undef HUGE
 #endif
 #include "asm.h"
+#include "z80.h"
 
 /*)Module	asmain.c
  *
@@ -446,7 +443,7 @@ int i;
  *		char	getnb()		aslex.c
  *		VOID	getst()		aslex.c
  *		sym *	lookup()	assym.c
- *		VOID	machin()	___mch.c
+ *		VOID	machine()	___mch.c
  *		mne *	mlookup()	assym.c
  *		int	more()		aslex.c
  *		VOID *	new()		assym.c
@@ -759,9 +756,9 @@ loop:
 			  {
 				  
 				  f2 = floor(log(fabs(f1))/log(2))+1;
-				  mantissa = (0x1000000*fabs(f1))/exp(f2*log(2));
+				  mantissa = (unsigned int) ((0x1000000*fabs(f1))/exp(f2*log(2))) ;
 				  mantissa &=0xffffff;
-				  exponent = f2 + 0x40;
+				  exponent = (unsigned int) (f2 + 0x40) ;
 				  if (f1<0)
 				      exponent |=0x80;
 			  }

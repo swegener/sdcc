@@ -18,13 +18,6 @@
 #include <string.h>
 #include <malloc.h>
 
-//#include "newalloc.h"
-//#if defined(_MSC_VER)
-//#include <malloc.h>
-//#else
-//#include <alloc.h>
-//#endif
-
 #include "asm.h"
 
 /*)Module	aslist.c

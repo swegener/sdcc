@@ -2,7 +2,7 @@
 
 S51 = ../../sim/ucsim/s51.src/s51
 
-SDCCFLAGS += --lesspedantic -DREENTRANT=reentrant -DGENERIC=_generic
+SDCCFLAGS += --lesspedantic -DREENTRANT=reentrant -DGENERIC=_generic --stack-after-data
 
 OBJEXT = .rel
 EXEEXT = .ihx
@@ -15,12 +15,6 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
 	$(SDCC) $(SDCCFLAGS) $(EXTRAS) $<
 	mv fwk/lib/testfwk.ihx $@
 	mv fwk/lib/testfwk.map $(@:.ihx=.map)
-
-# %$(OBJEXT): %.asm
-#	../../bin/as-z80 -plosgff $@ $<
-
-# %$(OBJEXT): %.s
-#	../../bin/as-z80 -plosgff $@ $<
 
 %$(OBJEXT): %.c
 	$(SDCC) $(SDCCFLAGS) -c $<

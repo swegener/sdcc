@@ -7,7 +7,7 @@
 
 typedef struct 
 { 
-    unsigned char buffer[0x20]; 
+    unsigned char buffer[0x18];
     unsigned char OutPtr, InPtr; 
     unsigned char Count; 
 } Fifo; 

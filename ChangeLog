@@ -1,3 +1,17 @@
+2001-09-09  Bernhard Held <bernhard@bernhardheld.de>
+
+	* support/regression/Makefile: inter-port-clean adjusted for mcs51
+
+	* support/regression/testfwk.c: removed workaround for bug #436344
+
+	* support/regression/tests/bp.c: use less memory with mcs51
+
+	* support/regression/tests/bug-441448.c: use less memory
+
+	* support/regression/tests/ports/mcs51/spec.mk: cleanup, use --stack-after-data
+
+	* support/regression/collate-results.py: typo
+
 2001-09-08  Michael Hope  <michaelh@juju.net.nz>
 
 	* support/regression/tests/fetchoverlap.c: Added new test case.

@@ -182,4 +182,4 @@ clean:
 	rm -rf $(CASES_DIR) $(RESULTS_DIR) *.pyc
 
 inter-port-clean:
-	rm -f  fwk/lib/*.o fwk/lib/*.asm
+	rm -f  fwk/lib/*.o fwk/lib/*.asm fwk/lib/*.rst fwk/lib/*.lst fwk/lib/*.rel

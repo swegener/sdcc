@@ -23,4 +23,4 @@ for line in lines:
         tests = tests + string.atof(ntests)
         cases = cases + string.atof(ncases)
 
-print "%.0f failues, %.0f tests, %.0f test cases" % (failures, tests, cases)
+print "%.0f failures, %.0f tests, %.0f test cases" % (failures, tests, cases)

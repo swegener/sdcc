@@ -3696,7 +3696,7 @@ genMultOneByte (operand * left,
   int size=AOP_SIZE(result);
 
   emitcode (";",__FUNCTION__);
-  if (size<1 || size>=2) {
+  if (size<1 || size>2) {
     // this should never happen
       fprintf (stderr, "size!=1||2 (%d) in %s at line:%d \n", 
 	       AOP_SIZE(result), __FUNCTION__, lineno);

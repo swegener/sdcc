@@ -1,10 +1,10 @@
-PRJDIR		= ..\..
+PRJDIR          = ..\..
 
 OBJECTS         = cppmain.obj intl.obj \
-		cpplib.obj cpplex.obj cppmacro.obj cppexp.obj cppfiles.obj \
-		cpphash.obj cpperror.obj cppinit.obj cppdefault.obj \
-		hashtable.obj mkdeps.obj prefix.obj version.obj mbchar.obj \
-		safe-ctype.obj obstack.obj splay-tree.obj lbasename.obj
+                cpplib.obj cpplex.obj cppmacro.obj cppexp.obj cppfiles.obj \
+                cpphash.obj cpperror.obj cppinit.obj cppdefault.obj \
+                hashtable.obj mkdeps.obj prefix.obj version.obj mbchar.obj \
+                safe-ctype.obj obstack.obj splay-tree.obj lbasename.obj
 
 TARGET          = $(PRJDIR)/bin/sdcpp.exe
 
@@ -12,12 +12,14 @@ TARGET          = $(PRJDIR)/bin/sdcpp.exe
 # ------------------------------------------
 all: $(TARGET)
 
-
 CFLAGS = -I. -I.\libiberty -DHAVE_CONFIG_H
 
 # My rules
 # --------
-$(TARGET): $(OBJECTS)
+auto-host.h: auto-host_vc_in.h
+        copy auto-host_vc_in.h auto-host.h > nul
+
+$(TARGET): auto-host.h $(OBJECTS)
         bcc32 -e$(TARGET) $(OBJECTS)
 
 !include ..\..\Bcc.inc
@@ -26,4 +28,3 @@ safe-ctype.obj: libiberty\safe-ctype.c
 obstack.obj: libiberty\obstack.c
 splay-tree.obj: libiberty\splay-tree.c
 lbasename.obj: libiberty\lbasename.c
-

@@ -2,10 +2,14 @@
 #
 #
 
+
 SHELL		= /bin/sh
 AUTOCONF	= autoconf
 
 PRJDIR		= .
+srcdir          = .
+include $(srcdir)/Makefile.common
+
 SDCC_MISC	= debugger/mcs51 sim/ucsim
 SDCC_LIBS	= support/cpp
 SDCC_ASLINK	= as/mcs51 as link
@@ -17,7 +21,6 @@ PKGS_TINI	= $(SDCC_LIBS) $(SDCC_ASLINK) \
 		  src device/include $(SDCC_PACKIHX)
 PORTS		= mcs51 z80
 
-srcdir          = .
 
 # Compiling entire program or any subproject
 # ------------------------------------------
@@ -26,10 +29,14 @@ all: checkconf sdcc
 tini: checkconf sdcc-tini
 
 sdcc-libs:
+ifeq ($(DISABLE_GC),1)
+	: skip boehm library when disabled by hand.
+else
 ifeq ($(CROSS_LIBGC),1)
 	$(MAKE) -C support/gc -f Makefile.cross
 else
 	$(MAKE) -C support/gc
+endif
 endif
 	for lib in $(SDCC_LIBS); do $(MAKE) -C $$lib; done
 

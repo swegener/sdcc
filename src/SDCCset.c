@@ -402,10 +402,11 @@ int applyToSet ( set *list , int (*somefunc)(void *, va_list ), ...)
     va_list ap;
     int rvalue = 0 ;
     
-    va_start(ap,somefunc);
-    for (lp = list ; lp ; lp = lp->next ) 
-	rvalue += (*somefunc)(lp->item,ap) ;
-    va_end(ap);
+    for (lp = list ; lp ; lp = lp->next ) {
+	  va_start(ap,somefunc);
+	  rvalue += (*somefunc)(lp->item,ap) ;
+	  va_end(ap);
+    }
     return rvalue;
 }
 
@@ -419,11 +420,13 @@ int applyToSetFTrue ( set *list , int (*somefunc)(void *, va_list ), ...)
     va_list ap;
     int rvalue = 0 ;
     
-    va_start(ap,somefunc);
-    for (lp = list ; lp ; lp = lp->next ) 
-	if (rvalue += (*somefunc)(lp->item,ap))
-	    break;
-    va_end(ap);
+    for (lp = list ; lp ; lp = lp->next ) {
+	  va_start(ap,somefunc);
+	  rvalue += (*somefunc)(lp->item,ap);
+	  va_end(ap);
+	  if (rvalue)
+		break;
+    }
     return rvalue;
 }
 

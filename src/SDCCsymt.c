@@ -134,7 +134,7 @@ void  deleteSym ( bucket **stab, void *sym, char *sname)
 	
 	bp->prev->next = bp->next ;
     }
-    
+
 }
 
 /*-----------------------------------------------------------------*/

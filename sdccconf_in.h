@@ -32,6 +32,7 @@
 #undef OPT_DISABLE_GBZ80
 #undef OPT_DISABLE_MCS51
 #undef OPT_DISABLE_AVR
+#undef OPT_DISABLE_GC
 
 #endif
 

@@ -157,7 +157,7 @@ extern FILE *codeOutFile;
 /* forward definitions for functions   */
 ast     *newAst       (int  ,  void  *        );
 void      initAst      (                       );
-ast     *newNode       (int  ,ast *  ,ast *  );
+ast     *newNode       (long  ,ast *  ,ast *  );
 ast     *copyAst      (ast *                 );
 value    *sizeofOp      (link *                 );
 value    *evalStmnt     (ast *                 );

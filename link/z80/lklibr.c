@@ -399,7 +399,7 @@ search()
 
 /* First entry in the library object symbol cache */
 mlibraryfile libr = {
-	"", NULL, NULL
+      0, "", NULL, NULL
 };
 
 int fndsym( char *name )

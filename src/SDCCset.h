@@ -25,26 +25,9 @@
 #ifndef SDCCSET_H
 #define SDCCSET_H
 #include <stdarg.h>
-#ifdef _NO_GC
+#include "sdccconf.h"
+#include "SDCCalloc.h"
 
-#define GC_malloc malloc
-#define GC_free free
-#define GC_realloc realloc
-
-#else
-
-#include "./gc/gc.h" 
-
-#endif
-
-#ifndef ALLOC
-#define  ALLOC(x,sz) if (!(x = GC_malloc(sz)))                          \
-         {                                                           \
-            fprintf(stderr,"out of virtual memory %s , %d",__FILE__,__LINE__);\
-            exit (1);                                                \
-         }
-
-#endif
 
 #ifndef THROWS
 #define THROWS

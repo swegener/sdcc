@@ -11,11 +11,15 @@ USE_ALT_LEX	= 0
 PORTS		= mcs51 z80 avr ds390
 PORT_LIBS	= $(PORTS:%=%/port.a)
 
+ifeq ($(DISABLE_GC),1)
+LIBS		= -lm @LIBS@
+else
 LIBS		= -lgc -lm @LIBS@
 ifeq ($(HAVE_LIBGC), 1)
 else
 LIBDIRS		= -L$(PRJDIR)/support/gc
 LIBGC		= $(PRJDIR)/support/gc/libgc.a
+endif
 endif
 
 #CFLAGS          += -Werror

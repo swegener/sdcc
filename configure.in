@@ -232,6 +232,16 @@ else
     AC_DEFINE_UNQUOTED(OPT_DISABLE_AVR, 0)
 fi
 
+AC_ARG_ENABLE(boehm-gc,--disable-boehm-gc: Excludes sdcc use of libgc.)
+AC_SUBST(DISABLE_GC,1)
+if test "$enable_boehm_gc" = "no"; then
+    AC_DEFINE(OPT_DISABLE_GC, 1)
+    DISABLE_GC=1
+else
+    AC_DEFINE(OPT_DISABLE_GC, 0)
+    DISABLE_GC=0
+fi
+
 # Generating output files
 # ===========================================================================
 AC_CONFIG_SUBDIRS(sim/ucsim)

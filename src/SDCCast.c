@@ -85,7 +85,7 @@ ast  *newAst (int  type, void *op )
 	ex->opval.val = (value *) op;
 	break ;
     case EX_OP     :
-	ex->opval.op   = (int) op ;
+	ex->opval.op   = (long) op ;
 	break ;
     case EX_LINK   :
 	ex->opval.lnk  = (link *) op;
@@ -100,7 +100,7 @@ ast  *newAst (int  type, void *op )
 /*-----------------------------------------------------------------*/
 /* newNode - creates a new node                                    */
 /*-----------------------------------------------------------------*/
-ast  *newNode ( int op,   ast  *left, ast *right   )
+ast  *newNode ( long op,   ast  *left, ast *right   )
 {
     ast  *ex ;
     

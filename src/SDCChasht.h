@@ -26,37 +26,7 @@
 #ifndef SDCCHASHT_H
 #define SDCCHASHT_H
 
-#ifdef _NO_GC
-
-#include <stdlib.h>
-#define GC_malloc malloc
-#define GC_free free
-#define GC_realloc realloc
-#define GC_malloc_atomic malloc
-
-#else
-
-#include "./gc/gc.h" 
-
-#endif
-
-#ifndef ALLOC
-
-#define  ALLOC(x,sz) if (!(x = GC_malloc(sz)))                          \
-         {                                                           \
-            fprintf(stderr,"out of virtual memory %s , %d",__FILE__,__LINE__);\
-            exit (1);                                                \
-         }
-
-#define  ALLOC_ATOMIC(x,sz) if (!(x = GC_malloc_atomic(sz)))                          \
-         {                                                           \
-            fprintf(stderr,"out of virtual memory %s , %d",__FILE__,__LINE__);\
-            exit (1);                                                \
-         }
-
-
-
-#endif
+#include  "SDCCalloc.h"
 
 
 /* hashtable item */

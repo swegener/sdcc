@@ -16,17 +16,7 @@
 #define NATIVE_WIN32		1
 #endif
 
-#ifdef _NO_GC
-
-#define GC_malloc malloc
-#define GC_free free
-#define GC_realloc realloc
-#define GC_malloc_atomic malloc
-#else
-
-#include "./gc/gc.h" 
-
-#endif
+# include  "SDCCalloc.h"
 
 #define SPACE ' '
 #define ZERO  0
@@ -106,17 +96,6 @@ typedef int bool;
 #define EMPTY(x)	(x##StackPtr == 0 ? 1 : 0)
 #endif
 
-#define  ALLOC(x,sz) if (!(x = GC_malloc(sz)))      \
-         {                                          \
-            werror(E_OUT_OF_MEM,__FILE__,(long) sz);\
-            exit (1);                               \
-         }
-
-#define ALLOC_ATOMIC(x,sz)   if (!(x = GC_malloc_atomic(sz)))   \
-         {                                               \
-            werror(E_OUT_OF_MEM,__FILE__,(long) sz);     \
-            exit (1);                                    \
-         }
 
 #define COPYTYPE(start,end,from) (end = getSpec (start = from))
 

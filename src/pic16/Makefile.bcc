@@ -2,7 +2,7 @@
 
 PRJDIR = ../..
 
-OBJ = gen.obj genarith.obj ralloc.obj main.obj glue.obj pcode.obj pcodepeep.obj
+OBJ = gen.obj genarith.obj ralloc.obj main.obj glue.obj pcode.obj pcodepeep.obj graph.obj
 LIB = port.lib
 
 !include $(PRJDIR)/Bcc.inc

@@ -751,8 +751,10 @@ bool isOperandInFarSpace (operand *op)
 	else		
 	    return FALSE;
     }
-
-    etype = getSpec(operandType(op));
+    else
+    {
+    	etype = getSpec(operandType(op));
+    }
     return (IN_FARSPACE(SPEC_OCLS(etype)) ? TRUE : FALSE);
 }
 
@@ -2339,8 +2341,9 @@ static void geniCodeParms ( ast *parms , int *stack, link *fetype)
     }
 
     /* if register parm then make it a send */
-    if ((parms->argSym && IS_REGPARM(parms->argSym->etype)) ||
-	IS_REGPARM(parms->etype)) {
+    if (((parms->argSym && IS_REGPARM(parms->argSym->etype)) ||
+	IS_REGPARM(parms->etype)) && 
+	!IS_RENT(fetype)) {
 	ic = newiCode(SEND,pval,NULL);
 	ADDTOCHAIN(ic);
     } else {

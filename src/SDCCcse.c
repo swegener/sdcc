@@ -1114,6 +1114,15 @@ DEFSETFUNC(delGetPointerSucc)
 static void fixUpTypes(iCode *ic)
 {
 	link *t1 = operandType(IC_LEFT(ic)) ,*t2;
+	
+	extern PORT ds390_port;
+	
+	if (port == &ds390_port)
+	{
+	    /* hack-o-matic! */
+	    return;
+	}
+	
 	/* for pointer_gets if the types of result & left r the
 	   same then change it type of result to next */
 	if (IS_PTR(t1) &&

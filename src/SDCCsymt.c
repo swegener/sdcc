@@ -1019,8 +1019,8 @@ static void  checkSClass ( symbol *sym )
 	    SPEC_SCLS(sym->etype) = (options.useXstack  ?
 				     S_XSTACK : S_STACK ) ;
 	else
-	    SPEC_SCLS(sym->etype) = (options.useXstack  ?
-				     S_XDATA :S_DATA ) ;
+	    SPEC_SCLS(sym->etype) = (options.model  ?
+				     S_XDATA : S_DATA ) ;
     }
 }
 

@@ -143,6 +143,10 @@ extern PORT z80_port;
 #if !OPT_DISABLE_AVR
 extern PORT avr_port;
 #endif
+#if !OPT_DISABLE_DS390
+extern PORT ds390_port;
+#endif
+
 
 PORT *port;
 
@@ -158,6 +162,9 @@ static PORT *_ports[] = {
 #endif
 #if !OPT_DISABLE_AVR
     &avr_port,
+#endif
+#if !OPT_DISABLE_DS390
+    &ds390_port,
 #endif
 };
 

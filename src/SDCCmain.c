@@ -28,6 +28,7 @@
 
 #include "spawn.h"
 #include "SDCCglobl.h"
+#include "config.h"
 
 extern void		initSymt		();
 extern void		initMem			();
@@ -62,6 +63,7 @@ char *libPaths[128] ;
 int nlibPaths = 0;
 char *relFiles[128];
 int nrelFiles = 0;
+bool verboseExec = FALSE;
 //extern int wait (int *);
 char    *preOutName;
 
@@ -749,8 +751,12 @@ int   parseCmdLine ( int argc, char **argv )
 		break;
 
 	    case 'v':
+#if FEATURE_VERBOSE_EXEC
+		verboseExec = TRUE;
+#else
 		printVersionInfo();
 		exit(0);
+#endif
 		break;
 
 		/* preprocessor options */		
@@ -837,6 +843,16 @@ int my_system (const char *cmd, char **cmd_argv)
 	free(dir);
 	i++;
     }
+#if FEATURE_VERBOSE_EXEC
+    if (verboseExec) {
+	char **pCmd = cmd_argv;
+	while (*pCmd) {
+	    printf("%s ", *pCmd);
+	    pCmd++;
+	}
+	printf("\n");
+    }
+#endif
     if (got)
       i= spawnv(P_WAIT,got,cmd_argv) == -1;
     else

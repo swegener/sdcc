@@ -7207,8 +7207,8 @@ void pic16_OptimizeJumps ()
   //fprintf (stderr, "%s:%d: %s\n", __FILE__, __LINE__, __FUNCTION__);
   
   for (pb = the_pFile->pbHead; pb != NULL; pb = pb->next) {
-    iteration = 1;
     int matchedInvertRule = 1;
+    iteration = 1;
     do {
       //fprintf (stderr, "%s:%d: iterating over pBlock %p\n", __FUNCTION__, __LINE__, pb);
       change = 0;
@@ -7248,9 +7248,10 @@ void pic16_OptimizeJumps ()
 
 
 	if (IS_GOTO(pc)) {
-	  label = PCI(pc)->pcop->name;
+	  int dist;
 	  int condBraType = isSkipOnStatus(pc_prev);
-	  int dist = findpCodeLabel(pc, label, MAX_DIST_BRA, &target);
+	  label = PCI(pc)->pcop->name;
+	  dist = findpCodeLabel(pc, label, MAX_DIST_BRA, &target);
 	  if (dist < 0) dist = -dist;
 	  //fprintf (stderr, "distance: %d (", dist); pc->print(stderr, pc);fprintf (stderr, ")\n");
 	  isHandled = 0;

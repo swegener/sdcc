@@ -1,3 +1,8 @@
+2004-12-24 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/pic16/pcode.c: declaring variables other than at the start of a
+	  block is not supported in C by VC6.
+
 2004-12-22 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* applied a previous patch from Raphael Neider that wasn't included

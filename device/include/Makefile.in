@@ -37,10 +37,11 @@ CPPFLAGS        = @CPPFLAGS@ -I$(PRJDIR)
 # ------------------------------------------
 all:
 
-# Compiling and installing everything and runing test
-# ---------------------------------------------------
+# Compiling and installing everything and running test
+# ----------------------------------------------------
 install: all installdirs
-	$(CP) asm/*/features.h *.h $(sdcc_includedir)
+	$(CP) -r asm *.h $(sdcc_includedir)
+	find $(sdcc_includedir) -type d -name 'CVS' -exec rm {} \;
 
 
 # Deleting all the installed files

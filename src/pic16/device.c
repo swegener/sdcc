@@ -496,7 +496,7 @@ static void mapRegister(regs *reg)
 
     do {
 
-      //fprintf(stdout,"mapping %s to address 0x%02x, reg size = %d\n",reg->name, (reg->address+alias+i),reg->size);
+//	fprintf(stdout,"mapping %s to address 0x%02x, reg size = %d\n",reg->name, (reg->address+alias+i),reg->size);
 
       pic16_finalMapping[reg->address + alias + i].reg = reg;
       pic16_finalMapping[reg->address + alias + i].instance = i;
@@ -548,7 +548,7 @@ static int assignRegister(regs *reg, int start_address)
     for (i=start_address; i<=pic->maxRAMaddress; i++) {
 
       if (validAddress(i,reg->size)) {
-	fprintf(stderr, "found valid address = 0x%04x\n", i);
+//	fprintf(stderr, "found valid address = 0x%04x\n", i);
 	reg->address = i;
 	mapRegister(reg);
 	return i;
@@ -590,7 +590,7 @@ void pic16_assignRelocatableRegisters(set *regset, int used)
 
     //fprintf(stdout,"assigning %s isFixed=%d, wasUsed=%d\n",reg->name,reg->isFixed,reg->wasUsed);
 
-    if((!reg->isFixed) && ( used || reg->wasUsed))
+    if((!reg->isFixed) && (used || reg->wasUsed))
       address = assignRegister(reg,address);
 
   }

@@ -222,6 +222,10 @@ optionsTable[] = {
     { 0,    OPTION_PRINT_SEARCH_DIRS, &options.printSearchDirs, "display the directories in the compiler's search path"},
     { 0,    OPTION_MSVC_ERROR_STYLE, &options.vc_err_style, "messages are compatible with Micro$oft visual studio"},
     /* End of options */
+#if 0 /* 10jun03 !OPT_DISABLE_PIC16 */
+    { 0,    "--no-movff",	    &options.no_movff, "disable generating MOVFF opcode in PIC16 port"},
+    { 0,    "--gen-banksel",	    &options.gen_banksel, "enable the generation of banksel assembler directives in PIC16 port"},
+#endif
     { 0,    NULL }
 };
 
@@ -405,9 +409,13 @@ printVersionInfo ()
 
   fprintf (stderr,
 	   "SDCC : ");
-  for (i = 0; i < NUM_PORTS; i++)
+  for (i = 0; i < NUM_PORTS; i++) {
     fprintf (stderr, "%s%s", i == 0 ? "" : "/", _ports[i]->target);
-
+#ifdef DEFAULT_PORT
+	fprintf(stderr, "%s", (&DEFAULT_PORT == _ports[i])?"*":"");
+#endif
+  }
+  
   fprintf (stderr, " " SDCC_VERSION_STR
 #ifdef SDCC_SUB_VERSION_STR
 	   "/" SDCC_SUB_VERSION_STR

@@ -1,3 +1,20 @@
+2003-06-10  Scott Dattalo  <scott@dattalo.com>
+
+	 Scott D. for Vangelis Rokas (vrokas@otenet.gr). I (scott) don't
+	know all the details, but essentially this set of changes enable
+	the pic16 port to generate movff instructions and generate assembler
+	directives, 
+	* src/SDCCmain.c: 
+	* src/pic16/gen.c: 
+	* src/pic16/glue.c:
+	* src/pic16/pcode.c:
+	* src/pic16/device.c:
+	* src/pic16/main.c:
+	* src/pic16/pcode.h:
+	* src/pic16/pcoderegs.c:
+	* src/pic16/ralloc.c:
+	* src/pic16/ralloc.h:
+
 2003-06-08  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	* support/Util/SDCCerr.c, src/SDCCglobl.h, src/SDCCmain.c, doc/sdccman.lyx:

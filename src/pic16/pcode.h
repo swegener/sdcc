@@ -264,7 +264,7 @@ typedef enum
   POC_SUBFWB_D1,
   POC_SWAPF,
   POC_SWAPFW,
-  POC_TRIS, // To be removed
+  POC_TRIS , // To be removed
   POC_TSTFSZ,
   POC_XORLW,
   POC_XORWF,
@@ -287,6 +287,7 @@ typedef enum
   PC_WILD,        /* wildcard - an opcode place holder used 
 		   * in the pCode peep hole optimizer */
   PC_CSOURCE,     /* C-Source Line  */
+  PC_ASMDIR,	  /* Assembler directive */
   PC_BAD          /* Mark the pCode object as being bad */
 } PC_TYPE;
 
@@ -343,6 +344,7 @@ typedef struct pCodeOp
   char *name;
   
 } pCodeOp;
+
 #if 0
 typedef struct pCodeOpBit
 {
@@ -384,6 +386,22 @@ typedef struct pCodeOpReg
   int instance;    // byte # of Multi-byte registers
   struct pBlock *pb;
 } pCodeOpReg;
+
+typedef struct pCodeOpReg2
+{
+  pCodeOp pcop;		// used by default to all references
+  int rIdx;
+  struct regs *r;
+  int instance;		// assume same instance for both operands
+  struct pBlock *pb;
+
+  pCodeOp *pcop2;	// second memory operand
+/*
+  int rIdx1;
+  struct regs *r1;
+*/
+  
+} pCodeOpReg2;
 
 typedef struct pCodeOpRegBit
 {
@@ -456,8 +474,9 @@ typedef struct pCodeComment
 
 } pCodeComment;
 
+
 /*************************************************
-    pCodeComment
+    pCodeCSource
 **************************************************/
 
 typedef struct pCodeCSource
@@ -470,6 +489,19 @@ typedef struct pCodeCSource
   char *file_name;
 
 } pCodeCSource;
+
+
+/*************************************************
+    pCodeAsmDir
+**************************************************/
+
+typedef struct pCodeAsmDir
+{
+  pCode pc;
+  
+  char *directive;
+  char *arg;
+} pCodeAsmDir;
 
 
 /*************************************************
@@ -571,6 +603,7 @@ typedef struct pCodeInstruction
   unsigned int isLit:     1;   /* True if this instruction has an literal operand */
   unsigned int isAccess:   1;   /* True if this instruction has an access RAM operand */
   unsigned int isFastCall: 1;   /* True if this instruction has a fast call/return mode select operand */
+  unsigned int is2MemOp: 1;	/* True is second operand is a memory operand VR - support for MOVFF */
 
   PIC_OPCODE inverted_op;      /* Opcode of instruction that's the opposite of this one */
   unsigned int inCond;   // Input conditions for this instruction
@@ -790,6 +823,7 @@ typedef struct peepCommand {
 #define PCFLINK(x)((pCodeFlowLink *)(x))
 #define PCW(x)    ((pCodeWild *)(x))
 #define PCCS(x)   ((pCodeCSource *)(x))
+#define PCAD(x)	  ((pCodeAsmDir *)(x))
 
 #define PCOP(x)   ((pCodeOp *)(x))
 //#define PCOB(x)   ((pCodeOpBit *)(x))
@@ -797,6 +831,7 @@ typedef struct peepCommand {
 #define PCOI(x)   ((pCodeOpImmd *)(x))
 #define PCOLAB(x) ((pCodeOpLabel *)(x))
 #define PCOR(x)   ((pCodeOpReg *)(x))
+#define PCOR2(x)  ((pCodeOpReg2 *)(x))
 #define PCORB(x)  ((pCodeOpRegBit *)(x))
 #define PCOW(x)   ((pCodeOpWild *)(x))
 
@@ -818,6 +853,7 @@ typedef struct peepCommand {
 #define isPCL(x)        ((PCODE(x)->type == PC_LABEL))
 #define isPCW(x)        ((PCODE(x)->type == PC_WILD))
 #define isPCCS(x)       ((PCODE(x)->type == PC_CSOURCE))
+#define isASMDIR(x)	((PCODE(x)->type == PC_ASMDIR))
 
 #define isCALL(x)       ((isPCI(x)) && (PCI(x)->op == POC_CALL))
 #define isSTATUS_REG(r) ((r)->pc_type == PO_STATUS)
@@ -826,7 +862,13 @@ typedef struct peepCommand {
 #define isACCESS_LOW(r) ((pic16_finalMapping[REG_ADDR(r)].bank == \
                           PIC_BANK_FIRST) && (REG_ADDR(r) < 0x80))
 #define isACCESS_HI(r)  (pic16_finalMapping[REG_ADDR(r)].bank == PIC_BANK_LAST)
+
+/*
 #define isACCESS_BANK(r)(isACCESS_LOW(r) || isACCESS_HI(r))
+*/
+#define isACCESS_BANK(r)	(pic16_finalMapping[(r)->rIdx].isSFR \
+				|| (pic16_finalMapping[(r)->rIdx].reg && pic16_finalMapping[(r)->rIdx].reg->isFixed))
+
 
 #define isPCOLAB(x)     ((PCOP(x)->type) == PO_LABEL)
 
@@ -863,6 +905,7 @@ pCode * pic16_findNextInstruction(pCode *pci);
 pCode * pic16_findNextpCode(pCode *pc, PC_TYPE pct);
 int pic16_isPCinFlow(pCode *pc, pCode *pcflow);
 struct regs * pic16_getRegFromInstruction(pCode *pc);
+struct regs * pic16_getRegFromInstruction2(pCode *pc);
 
 extern void pic16_pcode_test(void);
 

@@ -57,6 +57,11 @@ static int aopIdx (asmop *aop, int offset);
 static int labelOffset=0;
 extern int pic16_debug_verbose;
 static int optimized_for_speed = 0;
+/*
+  hack hack
+
+*/
+int options_no_movff = 1;
 
 /* max_key keeps track of the largest label number used in 
    a function. This is then used to adjust the label offset
@@ -209,8 +214,9 @@ void DEBUGpic16_emitcode (char *inst,char *fmt, ...)
     lineCurr->isDebug  = _G.debugLine;
 
     pic16_addpCode2pBlock(pb,pic16_newpCodeCharP(lb));
-
     va_end(ap);
+
+//	fprintf(stderr, "%s\n", lb);
 }
 
 
@@ -226,6 +232,8 @@ void pic16_emitpcode(PIC_OPCODE poc, pCodeOp *pcop)
     pic16_addpCode2pBlock(pb,pic16_newpCode(poc,pcop));
   else
     DEBUGpic16_emitcode(";","%s  ignoring NULL pcop",__FUNCTION__);
+    
+//    fprintf(stderr, "%s\n", pcop->name);
 }
 
 void pic16_emitpcodeNULLop(PIC_OPCODE poc)
@@ -281,6 +289,8 @@ static regs *getFreePtr (iCode *ic, asmop **aopp, bool result)
     bool r0iu = FALSE , r1iu = FALSE;
     bool r0ou = FALSE , r1ou = FALSE;
 
+
+	//fprintf(stderr, "%s:%d: getting free ptr from ic = %c\n", __FUNCTION__, __LINE__, ic->op);
     /* the logic: if r0 & r1 used in the instruction
     then we are in trouble otherwise */
 
@@ -440,8 +450,10 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
 
     DEBUGpic16_emitcode("; ***","%s %d",__FUNCTION__,__LINE__);
     /* if already has one */
-    if (sym->aop)
+    if (sym->aop) {
+	    DEBUGpic16_emitcode("; ***", "already has sym %s %d", __FUNCTION__, __LINE__);
         return sym->aop;
+    }
 
     /* assign depending on the storage class */
     /* if it is on the stack or indirectly addressable */
@@ -763,14 +775,14 @@ void pic16_aopOp (operand *op, iCode *ic, bool result)
 
     /* if the underlying symbol has a aop */
     if (IS_SYMOP(op) && OP_SYMBOL(op)->aop) {
-      DEBUGpic16_emitcode(";","%d",__LINE__);
+      DEBUGpic16_emitcode(";","%d has symbol",__LINE__);
         op->aop = OP_SYMBOL(op)->aop;
         return;
     }
 
     /* if this is a true symbol */
     if (IS_TRUE_SYMOP(op)) {    
-      //DEBUGpic16_emitcode(";","%d - true symop",__LINE__);
+	DEBUGpic16_emitcode(";","%d - true symop",__LINE__);
       op->aop = aopForSym(ic,OP_SYMBOL(op),result);
       return ;
     }
@@ -785,7 +797,7 @@ void pic16_aopOp (operand *op, iCode *ic, bool result)
 
     sym = OP_SYMBOL(op);
 
-
+	DEBUGpic16_emitcode("; ***", "%d: symbol name = %s", __LINE__, sym->name);
     /* if the type is a conditional */
     if (sym->regType == REG_CND) {
         aop = op->aop = sym->aop = newAsmop(AOP_CRY);
@@ -1245,7 +1257,8 @@ static pCodeOp *popRegFromString(char *str, int size, int offset)
   pCodeOp *pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
   pcop->type = PO_DIR;
 
-  DEBUGpic16_emitcode(";","%d",__LINE__);
+  DEBUGpic16_emitcode(";","%d %s %s",__LINE__, __FUNCTION__, str);
+//  fprintf(stderr, "%s:%d: register name = %s pos = %d/%d\n", __FUNCTION__, __LINE__, str, offset, size);
 
   if(!str)
     str = "BAD_STRING";
@@ -1259,6 +1272,7 @@ static pCodeOp *popRegFromString(char *str, int size, int offset)
   if(PCOR(pcop)->r == NULL) {
     //fprintf(stderr,"%d - couldn't find %s in allocated registers, size =%d\n",__LINE__,aop->aopu.aop_dir,aop->size);
     PCOR(pcop)->r = pic16_allocRegByName (pcop->name,size);
+	//fprintf(stderr, "allocating new register -> %s\n", str);
     DEBUGpic16_emitcode(";","%d  %s   offset=%d - had to alloc by reg name",__LINE__,pcop->name,offset);
   } else {
     DEBUGpic16_emitcode(";","%d  %s   offset=%d",__LINE__,pcop->name,offset);
@@ -1287,6 +1301,24 @@ static pCodeOp *popRegFromIdx(int rIdx)
 
   return pcop;
 }
+
+/*---------------------------------------------------------------------------------*/
+/* pic16_popGet2 - a variant of pic16_popGet to handle two memory operand commands */
+/*                 VR 030601                                                       */
+/*---------------------------------------------------------------------------------*/
+pCodeOp *pic16_popGet2(asmop *aop_src, asmop *aop_dst, int offset)
+{
+  pCodeOpReg2 *pcop2;
+  pCodeOp *temp;
+  
+	pcop2 = (pCodeOpReg2 *)pic16_popGet(aop_src, offset);
+	temp = pic16_popGet(aop_dst, offset);
+	pcop2->pcop2 = temp;
+	
+  return PCOP(pcop2);
+}
+
+
 /*-----------------------------------------------------------------*/
 /* pic16_popGet - asm operator to pcode operator conversion              */
 /*-----------------------------------------------------------------*/
@@ -1322,6 +1354,7 @@ pCodeOp *pic16_popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 
     case AOP_DIR:
       return popRegFromString(aop->aopu.aop_dir, aop->size, offset);
+
 #if 0
 	pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
 	pcop->type = PO_DIR;
@@ -1928,10 +1961,8 @@ static void genCpl (iCode *ic)
         pic16_aopPut(AOP(IC_RESULT(ic)),"a",offset++);
 */
 	if (pic16_sameRegs(AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic))) ) {
-	      DEBUGpic16_emitcode("; ", "same registers");
 	      pic16_emitpcode(POC_COMF,  pic16_popGet(AOP(IC_LEFT(ic)), offset));
 	} else {
-		DEBUGpic16_emitcode(";",  "not sames registers!");
 		pic16_emitpcode(POC_COMFW, pic16_popGet(AOP(IC_LEFT(ic)),offset));
 		pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(IC_RESULT(ic)),offset));
 	}
@@ -5410,7 +5441,7 @@ static void genAnd (iCode *ic, iCode *ifx)
 	switch(lit & 0xff) {
 	case 0x00:
 	  /*  and'ing with 0 has clears the result */
-	  pic16_emitcode("clrf","%s",pic16_aopGet(AOP(result),offset,FALSE,FALSE));
+//	  pic16_emitcode("clrf","%s",pic16_aopGet(AOP(result),offset,FALSE,FALSE));
 	  pic16_emitpcode(POC_CLRF,pic16_popGet(AOP(result),offset));
 	  break;
 	case 0xff:
@@ -5422,7 +5453,7 @@ static void genAnd (iCode *ic, iCode *ifx)
 	    int p = my_powof2( (~lit) & 0xff );
 	    if(p>=0) {
 	      /* only one bit is set in the literal, so use a bcf instruction */
-	      pic16_emitcode("bcf","%s,%d",pic16_aopGet(AOP(left),offset,FALSE,TRUE),p);
+//	      pic16_emitcode("bcf","%s,%d",pic16_aopGet(AOP(left),offset,FALSE,TRUE),p);
 	      pic16_emitpcode(POC_BCF,pic16_newpCodeOpBit(pic16_aopGet(AOP(left),offset,FALSE,FALSE),p,0));
 
 	    } else {
@@ -9187,11 +9218,13 @@ static void genAddrOf (iCode *ic)
   size = AOP_SIZE(IC_RESULT(ic));
   offset = 0;
 
+
   while (size--) {
     pic16_emitpcode(POC_MOVLW, pic16_popGet(AOP(left),offset));
     pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset));
     offset++;
   }
+
 
   pic16_freeAsmop(left,NULL,ic,FALSE);
   pic16_freeAsmop(result,NULL,ic,TRUE);
@@ -9240,7 +9273,7 @@ static void genAssign (iCode *ic)
   right  = IC_RIGHT(ic) ;
 
   DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-
+  
   /* if they are the same */
   if (operandsEqu (IC_RESULT(ic),IC_RIGHT(ic)))
     return ;
@@ -9256,7 +9289,6 @@ static void genAssign (iCode *ic)
 
   /* if the result is a bit */
   if (AOP_TYPE(result) == AOP_CRY) {
-
     /* if the right size is a literal then
        we know what the value is */
     if (AOP_TYPE(right) == AOP_LIT) {
@@ -9309,6 +9341,7 @@ static void genAssign (iCode *ic)
   if(AOP_TYPE(right) == AOP_LIT)
     lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
 
+/* VR - What is this?! */
   if( AOP_TYPE(right) == AOP_DIR  && (AOP_TYPE(result) == AOP_REG) && size==1)  {
   DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
     if(aopIdx(AOP(result),0) == 4) {
@@ -9342,8 +9375,27 @@ static void genAssign (iCode *ic)
       }
     } else {
   DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-      pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(right),offset));
-      pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset));
+
+	if(!options_no_movff) {
+
+	/* This is a hack to turn MOVFW/MOVWF pairs to MOVFF command. It
+	   normally should work, but mind that thw W register live range
+	   is not checked, so if the code generator assumes that the W
+	   is already loaded after such a pair, wrong code will be generated.
+	   
+	   Checking the live range is the next step.
+	   This is experimental code yet and has not been fully tested yet.
+	   USE WITH CARE. Revert to old code by setting 0 to the condition above.
+	   Vangelis Rokas 030603 (vrokas@otenet.gr) */
+	   
+	
+		pic16_emitpcode(POC_MOVFF, pic16_popGet2(AOP(right), AOP(result), offset));
+	} else {
+	/* This is the old code, which is assumed(?!) that works fine(!?) */
+
+		pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(right),offset));
+		pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset));
+	}
     }
 	    
     offset++;
@@ -9356,7 +9408,7 @@ static void genAssign (iCode *ic)
 }   
 
 /*-----------------------------------------------------------------*/
-/* genJumpTab - genrates code for jump table                       */
+/* genJumpTab - generates code for jump table                       */
 /*-----------------------------------------------------------------*/
 static void genJumpTab (iCode *ic)
 {

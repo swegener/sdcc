@@ -168,11 +168,14 @@ static void pCodeRegMapLiveRangesInFlow(pCodeFlow *pcfl)
     reg = pic16_getRegFromInstruction(pc);
 
     if(reg) {
-/*
+
+#if 0
       fprintf(stderr, "flow seq %d, inst seq %d  %s  ",PCODE(pcfl)->seq,pc->seq,reg->name);
-      fprintf(stderr, "addr = 0x%03x, type = %d  rIdx=0x%03x\n",
-	      reg->address,reg->type,reg->rIdx);
-*/
+      fprintf(stderr, "addr = 0x%03x, type = %d  rIdx=0x%03x",
+      	      reg->address,reg->type,reg->rIdx);
+      fprintf(stderr, "command = %s\n", PCI(pc)->mnemonic);
+      	      
+#endif
 
       addSetIfnotP(& (PCFL(pcfl)->registers), reg);
 
@@ -181,8 +184,22 @@ static void pCodeRegMapLiveRangesInFlow(pCodeFlow *pcfl)
 
       if(PCC_REGISTER & PCI(pc)->outCond)
 	addSetIfnotP(& (reg->reglives.assignedpFlows), pcfl);
-
+	
       addSetIfnotP(& (reg->reglives.usedpCodes), pc);
+
+#if 1
+	/* check to see if this pCode has 2 memory operands,
+	   and set up the second operand too */
+	if(PCI(pc)->is2MemOp) {
+			reg = pic16_getRegFromInstruction2(pc);
+
+//			fprintf(stderr, "trying to get second operand from pCode reg= %s\n", reg->name);
+			addSetIfnotP(& (PCFL(pcfl)->registers), reg);
+			addSetIfnotP(& (reg->reglives.usedpCodes), pc);
+
+	}
+#endif
+
     }
 
 
@@ -244,10 +261,12 @@ static void Remove1pcode(pCode *pc, regs *reg)
     return;
 
   deleteSetItem (&(reg->reglives.usedpCodes),pc);
-/*
+
+#if 0
   fprintf(stderr,"removing instruction:\n");
   pc->print(stderr,pc);
-*/
+#endif
+
   if(PCI(pc)->label) {
     pcn = pic16_findNextInstruction(pc->next);
 
@@ -290,9 +309,9 @@ static void  RemoveRegsFromSet(set *regset)
 
     if(used <= 1) {
 
-      //fprintf(stderr," reg %s isfree=%d, wasused=%d\n",reg->name,reg->isFree,reg->wasUsed);
+//	fprintf(stderr," reg %s isfree=%d, wasused=%d\n",reg->name,reg->isFree,reg->wasUsed);
       if(used == 0) {
-	//fprintf(stderr," getting rid of reg %s\n",reg->name);
+//		fprintf(stderr,"%s:%d: getting rid of reg %s\n",__FILE__, __LINE__, reg->name);
 	reg->isFree = 1;
 	reg->wasUsed = 0;
       } else {
@@ -328,7 +347,7 @@ static void  RemoveRegsFromSet(set *regset)
 	    pc->print(stderr,pc);
 	    fprintf(stderr,"reg %s, type =%d\n",r->name, r->type);
 	  }
-	  //fprintf(stderr," removing reg %s because it is used only once\n",reg->name);
+//		fprintf(stderr,"%s:%d: removing reg %s because it is used only once\n",__FILE__, __LINE__, reg->name);
 	  Remove1pcode(pc, reg);
 	  /*
 	    pic16_unlinkpCode(pc);
@@ -650,6 +669,7 @@ static void OptimizeRegUsage(set *fregs, int optimize_multi_uses, int optimize_l
     pcfl_assigned = setFirstItem(reg->reglives.assignedpFlows);
 
     used = elementsInSet(reg->reglives.usedpCodes);
+//	fprintf(stderr, "%s:%d register %s used %d times in pCode\n", __FILE__, __LINE__, reg->name, used);
     if(used == 2) { 
 
       /*

@@ -2,9 +2,9 @@
 
   SDCCralloc.h - header file register allocation
 
-                Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
-		PIC port   - T. Scott Dattalo scott@dattalo.com (2000)
-		PIC16 port   - Martin Dubuc m.dubuc@rogers.com (2002)
+	Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
+	PIC port   - T. Scott Dattalo scott@dattalo.com (2000)
+	PIC16 port   - Martin Dubuc m.dubuc@rogers.com (2002)
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the

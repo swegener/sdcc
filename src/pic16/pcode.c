@@ -19,7 +19,6 @@
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 -------------------------------------------------------------------------*/
 
-
 #include <stdio.h>
 
 #include "common.h"   // Include everything in the SDCC src directory
@@ -71,7 +70,7 @@ static int mnemonics_initialized = 0;
 static hTab *pic16MnemonicsHash = NULL;
 static hTab *pic16pCodePeepCommandsHash = NULL;
 
-
+int options_gen_banksel = 1;
 
 static pFile *the_pFile = NULL;
 static pBlock *pb_dead_pcodes = NULL;
@@ -89,11 +88,11 @@ extern void pic16_RegsUnMapLiveRanges(void);
 extern void pic16_BuildFlowTree(pBlock *pb);
 extern void pic16_pCodeRegOptimizeRegUsage(int level);
 extern int pic16_picIsInitialized(void);
-#if !OPT_DISABLE_PIC
+#if !OPT_DISABLE_PIC || !OPT_DISABLE_PIC16
 // From pic/pcode.c:
 extern void SAFE_snprintf(char **str, size_t *size, const char *format, ...);
 extern int mnem2key(char const *mnem);
-#endif // OPT_DISABLE_PIC
+#endif // OPT_DISABLE_PIC || !OPT_DISABLE_PIC16
 
 /****************************************************************/
 /*                      Forward declarations                    */
@@ -114,7 +113,7 @@ static void pCodePrintLabel(FILE *of, pCode *pc);
 static void pCodePrintFunction(FILE *of, pCode *pc);
 static void pCodeOpPrint(FILE *of, pCodeOp *pcop);
 static char *pic16_get_op_from_instruction( pCodeInstruction *pcc);
-char *pic16_get_op( pCodeOp *pcop,char *buff,size_t buf_size);
+char *pic16_get_op(pCodeOp *pcop,char *buff,size_t buf_size);
 int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd);
 int pic16_pCodePeepMatchRule(pCode *pc);
 static void pBlockStats(FILE *of, pBlock *pb);
@@ -148,6 +147,7 @@ pCodeInstruction pic16_pciADDWF = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_Z) // outCond
@@ -172,6 +172,7 @@ pCodeInstruction pic16_pciADDFW = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_W | PCC_Z) // outCond
@@ -196,6 +197,7 @@ pCodeInstruction pic16_pciADDWFC = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_REGISTER | PCC_C),   // inCond
   (PCC_REGISTER | PCC_Z) // outCond
@@ -220,6 +222,7 @@ pCodeInstruction pic16_pciADDFWC = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_REGISTER | PCC_C),   // inCond
   (PCC_W | PCC_Z) // outCond
@@ -244,6 +247,7 @@ pCodeInstruction pic16_pciADDLW = {
   1,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_LITERAL),   // inCond
   (PCC_W | PCC_Z | PCC_C | PCC_DC | PCC_OV | PCC_N) // outCond
@@ -268,6 +272,7 @@ pCodeInstruction pic16_pciANDLW = {
   1,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_LITERAL),   // inCond
   (PCC_W | PCC_Z | PCC_N) // outCond
@@ -292,6 +297,7 @@ pCodeInstruction pic16_pciANDWF = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_Z | PCC_N) // outCond
@@ -316,6 +322,7 @@ pCodeInstruction pic16_pciANDFW = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_W | PCC_Z) // outCond
@@ -340,6 +347,7 @@ pCodeInstruction pic16_pciBC = { // mdubuc - New
   0,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_REL_ADDR | PCC_C),   // inCond
   PCC_NONE    // outCond
@@ -364,6 +372,7 @@ pCodeInstruction pic16_pciBCF = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_BSF,
   (PCC_REGISTER | PCC_EXAMINE_PCOP),   // inCond
   PCC_REGISTER // outCond
@@ -388,6 +397,7 @@ pCodeInstruction pic16_pciBN = { // mdubuc - New
   0,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_REL_ADDR | PCC_N),   // inCond
   PCC_NONE    // outCond
@@ -412,6 +422,7 @@ pCodeInstruction pic16_pciBNC = { // mdubuc - New
   0,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_REL_ADDR | PCC_C),   // inCond
   PCC_NONE    // outCond
@@ -436,6 +447,7 @@ pCodeInstruction pic16_pciBNN = { // mdubuc - New
   0,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_REL_ADDR | PCC_N),   // inCond
   PCC_NONE    // outCond
@@ -460,6 +472,7 @@ pCodeInstruction pic16_pciBNOV = { // mdubuc - New
   0,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_REL_ADDR | PCC_OV),   // inCond
   PCC_NONE    // outCond
@@ -484,6 +497,7 @@ pCodeInstruction pic16_pciBNZ = { // mdubuc - New
   0,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_REL_ADDR | PCC_Z),   // inCond
   PCC_NONE    // outCond
@@ -508,6 +522,7 @@ pCodeInstruction pic16_pciBOV = { // mdubuc - New
   0,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_REL_ADDR | PCC_OV),   // inCond
   PCC_NONE  // outCond
@@ -532,6 +547,7 @@ pCodeInstruction pic16_pciBRA = { // mdubuc - New
   0,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REL_ADDR,   // inCond
   PCC_NONE    // outCond
@@ -556,6 +572,7 @@ pCodeInstruction pic16_pciBSF = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_BCF,
   (PCC_REGISTER | PCC_EXAMINE_PCOP),   // inCond
   (PCC_REGISTER | PCC_EXAMINE_PCOP) // outCond
@@ -580,6 +597,7 @@ pCodeInstruction pic16_pciBTFSC = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_BTFSS,
   (PCC_REGISTER | PCC_EXAMINE_PCOP),   // inCond
   PCC_EXAMINE_PCOP // outCond
@@ -604,6 +622,7 @@ pCodeInstruction pic16_pciBTFSS = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_BTFSC,
   (PCC_REGISTER | PCC_EXAMINE_PCOP),   // inCond
   PCC_EXAMINE_PCOP // outCond
@@ -628,6 +647,7 @@ pCodeInstruction pic16_pciBTG = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_REGISTER | PCC_EXAMINE_PCOP),   // inCond
   (PCC_REGISTER | PCC_EXAMINE_PCOP) // outCond
@@ -652,6 +672,7 @@ pCodeInstruction pic16_pciBZ = { // mdubuc - New
   0,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_Z,   // inCond
   PCC_NONE // outCond
@@ -676,6 +697,7 @@ pCodeInstruction pic16_pciCALL = {
   0,    // literal operand
   0,    // RAM access bit
   1,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_NONE, // inCond
   PCC_NONE  // outCond
@@ -700,6 +722,7 @@ pCodeInstruction pic16_pciCOMF = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER,  // inCond
   PCC_REGISTER   // outCond
@@ -724,6 +747,7 @@ pCodeInstruction pic16_pciCOMFW = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER,  // inCond
   PCC_W   // outCond
@@ -748,6 +772,7 @@ pCodeInstruction pic16_pciCLRF = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER, // inCond
   PCC_REGISTER  // outCond
@@ -772,6 +797,7 @@ pCodeInstruction pic16_pciCLRWDT = {
   0,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_NONE, // inCond
   PCC_NONE  // outCond
@@ -796,6 +822,7 @@ pCodeInstruction pic16_pciCPFSEQ = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_REGISTER), // inCond
   PCC_NONE  // outCond
@@ -820,6 +847,7 @@ pCodeInstruction pic16_pciCPFSGT = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_REGISTER), // inCond
   PCC_NONE  // outCond
@@ -844,6 +872,7 @@ pCodeInstruction pic16_pciCPFSLT = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_REGISTER), // inCond
   PCC_NONE  // outCond
@@ -868,6 +897,7 @@ pCodeInstruction pic16_pciDAW = {
   0,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_W, // inCond
   (PCC_W | PCC_C) // outCond
@@ -892,6 +922,7 @@ pCodeInstruction pic16_pciDCFSNZ = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER, // inCond
   PCC_REGISTER  // outCond
@@ -916,6 +947,7 @@ pCodeInstruction pic16_pciDCFSNZW = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER, // inCond
   PCC_W  // outCond
@@ -940,6 +972,7 @@ pCodeInstruction pic16_pciDECF = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_REGISTER    // outCond
@@ -964,6 +997,7 @@ pCodeInstruction pic16_pciDECFW = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_W    // outCond
@@ -988,6 +1022,7 @@ pCodeInstruction pic16_pciDECFSZ = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_REGISTER    // outCond
@@ -1012,6 +1047,7 @@ pCodeInstruction pic16_pciDECFSZW = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_W           // outCond
@@ -1036,6 +1072,7 @@ pCodeInstruction pic16_pciGOTO = {
   0,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REL_ADDR,   // inCond
   PCC_NONE    // outCond
@@ -1060,6 +1097,7 @@ pCodeInstruction pic16_pciINCF = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   (PCC_REGISTER | PCC_C | PCC_DC | PCC_Z | PCC_OV | PCC_N) // outCond
@@ -1084,6 +1122,7 @@ pCodeInstruction pic16_pciINCFW = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_W    // outCond
@@ -1108,6 +1147,7 @@ pCodeInstruction pic16_pciINCFSZ = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_REGISTER    // outCond
@@ -1132,6 +1172,7 @@ pCodeInstruction pic16_pciINCFSZW = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_W           // outCond
@@ -1156,6 +1197,7 @@ pCodeInstruction pic16_pciINFSNZ = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_REGISTER    // outCond
@@ -1180,6 +1222,7 @@ pCodeInstruction pic16_pciIORWF = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_Z | PCC_N) // outCond
@@ -1204,6 +1247,7 @@ pCodeInstruction pic16_pciIORFW = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_W | PCC_Z | PCC_N) // outCond
@@ -1228,6 +1272,7 @@ pCodeInstruction pic16_pciIORLW = {
   1,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_LITERAL),   // inCond
   (PCC_W | PCC_Z | PCC_N) // outCond
@@ -1252,6 +1297,7 @@ pCodeInstruction pic16_pciLFSR = { // mdubuc - New
   1,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_REGISTER | PCC_LITERAL), // mdubuc - Should we use a special syntax for
                                 // f (identifies FSRx)?
@@ -1277,6 +1323,7 @@ pCodeInstruction pic16_pciMOVF = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   (PCC_Z | PCC_N) // outCond
@@ -1301,6 +1348,7 @@ pCodeInstruction pic16_pciMOVFW = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   (PCC_W | PCC_Z) // outCond
@@ -1325,6 +1373,7 @@ pCodeInstruction pic16_pciMOVFF = { // mdubuc - New
   0,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  1,	// second memory operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_REGISTER2 // outCond
@@ -1348,6 +1397,7 @@ pCodeInstruction pic16_pciMOVLB = { // mdubuc - New
   1,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_NONE | PCC_LITERAL),   // inCond
   PCC_REGISTER // outCond - BSR
@@ -1371,6 +1421,7 @@ pCodeInstruction pic16_pciMOVLW = {
   1,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_NONE | PCC_LITERAL),   // inCond
   PCC_W // outCond
@@ -1395,6 +1446,7 @@ pCodeInstruction pic16_pciMOVWF = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_W // outCond
@@ -1418,6 +1470,7 @@ pCodeInstruction pic16_pciMULLW = { // mdubuc - New
   1,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_LITERAL),   // inCond
   PCC_REGISTER // outCond - PROD
@@ -1441,6 +1494,7 @@ pCodeInstruction pic16_pciMULWF = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   PCC_REGISTER // outCond - PROD
@@ -1464,6 +1518,7 @@ pCodeInstruction pic16_pciNEGF = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER, // inCond
   (PCC_REGISTER | PCC_C | PCC_DC | PCC_OV | PCC_N) // outCond
@@ -1487,6 +1542,7 @@ pCodeInstruction pic16_pciNOP = {
   0,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_NONE,   // inCond
   PCC_NONE // outCond
@@ -1510,6 +1566,7 @@ pCodeInstruction pic16_pciPOP = { // mdubuc - New
   0,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_NONE,  // inCond
   PCC_NONE   // outCond
@@ -1533,6 +1590,7 @@ pCodeInstruction pic16_pciPUSH = {
   0,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_NONE,  // inCond
   PCC_NONE   // outCond
@@ -1556,6 +1614,7 @@ pCodeInstruction pic16_pciRCALL = { // mdubuc - New
   0,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REL_ADDR,  // inCond
   PCC_NONE   // outCond
@@ -1580,6 +1639,7 @@ pCodeInstruction pic16_pciRETFIE = {
   0,    // literal operand
   0,    // RAM access bit
   1,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_NONE,   // inCond
   PCC_NONE    // outCond (not true... affects the GIE bit too)
@@ -1604,6 +1664,7 @@ pCodeInstruction pic16_pciRETLW = {
   1,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_LITERAL,   // inCond
   PCC_W // outCond
@@ -1628,6 +1689,7 @@ pCodeInstruction pic16_pciRETURN = {
   0,    // literal operand
   0,    // RAM access bit
   1,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_NONE,   // inCond
   PCC_NONE // outCond
@@ -1651,6 +1713,7 @@ pCodeInstruction pic16_pciRLCF = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_C | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_C | PCC_Z | PCC_N) // outCond
@@ -1675,6 +1738,7 @@ pCodeInstruction pic16_pciRLCFW = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_C | PCC_REGISTER),   // inCond
   (PCC_W | PCC_C | PCC_Z | PCC_N) // outCond
@@ -1699,6 +1763,7 @@ pCodeInstruction pic16_pciRLNCF = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   (PCC_REGISTER | PCC_Z | PCC_N) // outCond
@@ -1722,6 +1787,7 @@ pCodeInstruction pic16_pciRLNCFW = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   (PCC_W | PCC_Z | PCC_N) // outCond
@@ -1745,6 +1811,7 @@ pCodeInstruction pic16_pciRRCF = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_C | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_C | PCC_Z | PCC_N) // outCond
@@ -1768,6 +1835,7 @@ pCodeInstruction pic16_pciRRCFW = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_C | PCC_REGISTER),   // inCond
   (PCC_W | PCC_C | PCC_Z | PCC_N) // outCond
@@ -1791,6 +1859,7 @@ pCodeInstruction pic16_pciRRNCF = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   (PCC_REGISTER | PCC_Z | PCC_N) // outCond
@@ -1815,6 +1884,7 @@ pCodeInstruction pic16_pciRRNCFW = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   (PCC_W | PCC_Z | PCC_N) // outCond
@@ -1839,6 +1909,7 @@ pCodeInstruction pic16_pciSETF = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER,  // inCond
   PCC_REGISTER   // outCond
@@ -1863,6 +1934,7 @@ pCodeInstruction pic16_pciSUBLW = {
   1,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_LITERAL),   // inCond
   (PCC_W | PCC_C | PCC_DC | PCC_Z | PCC_OV | PCC_N) // outCond
@@ -1887,6 +1959,7 @@ pCodeInstruction pic16_pciSUBFWB = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_REGISTER | PCC_C),   // inCond
   (PCC_W | PCC_C | PCC_DC | PCC_Z | PCC_OV | PCC_N) // outCond
@@ -1911,6 +1984,7 @@ pCodeInstruction pic16_pciSUBWF = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_Z) // outCond
@@ -1935,6 +2009,7 @@ pCodeInstruction pic16_pciSUBFW = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_W | PCC_Z | PCC_OV | PCC_N) // outCond
@@ -1959,6 +2034,7 @@ pCodeInstruction pic16_pciSUBFWB_D1 = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_REGISTER | PCC_C),   // inCond
   (PCC_REGISTER | PCC_Z | PCC_C | PCC_DC | PCC_OV | PCC_N) // outCond
@@ -1983,6 +2059,7 @@ pCodeInstruction pic16_pciSUBFWB_D0 = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_REGISTER | PCC_C),   // inCond
   (PCC_W | PCC_Z | PCC_C | PCC_DC | PCC_OV | PCC_N) // outCond
@@ -2007,6 +2084,7 @@ pCodeInstruction pic16_pciSUBWFB_D1 = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_REGISTER | PCC_C),   // inCond
   (PCC_REGISTER | PCC_Z | PCC_C | PCC_DC | PCC_OV | PCC_N) // outCond
@@ -2031,6 +2109,7 @@ pCodeInstruction pic16_pciSUBWFB_D0 = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_REGISTER | PCC_C),   // inCond
   (PCC_W | PCC_Z | PCC_C | PCC_DC | PCC_OV | PCC_N) // outCond
@@ -2055,6 +2134,7 @@ pCodeInstruction pic16_pciSWAPF = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_REGISTER),   // inCond
   (PCC_REGISTER) // outCond
@@ -2079,11 +2159,14 @@ pCodeInstruction pic16_pciSWAPFW = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_REGISTER),   // inCond
   (PCC_W) // outCond
 };
 
+
+#if 1
 // mdubuc - Remove TRIS
 
 pCodeInstruction pic16_pciTRIS = {
@@ -2103,10 +2186,12 @@ pCodeInstruction pic16_pciTRIS = {
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
   0,    // literal operand
+  0,	// second memory operand
   POC_NOP,
   PCC_NONE,   // inCond
   PCC_REGISTER // outCond
 };
+#endif
 
 pCodeInstruction pic16_pciTSTFSZ = { // mdubuc - New
   {PC_OPCODE, NULL, NULL, 0, NULL, 
@@ -2127,6 +2212,7 @@ pCodeInstruction pic16_pciTSTFSZ = { // mdubuc - New
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_NONE // outCond
@@ -2151,6 +2237,7 @@ pCodeInstruction pic16_pciXORWF = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_Z | PCC_N) // outCond
@@ -2175,6 +2262,7 @@ pCodeInstruction pic16_pciXORFW = {
   0,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_W | PCC_Z | PCC_N) // outCond
@@ -2199,6 +2287,7 @@ pCodeInstruction pic16_pciXORLW = {
   1,    // literal operand
   1,    // RAM access bit
   0,    // fast call/return mode select bit
+  0,	// second memory operand
   POC_NOP,
   (PCC_W | PCC_LITERAL),   // inCond
   (PCC_W | PCC_Z | PCC_C | PCC_DC | PCC_N) // outCond
@@ -2961,7 +3050,7 @@ pCodeFlowLink *pic16_newpCodeFlowLink(pCodeFlow *pcflow)
 }
 
 /*-----------------------------------------------------------------*/
-/* pic16_newpCodeCSource - create a new pCode Source Symbol              */
+/* pic16_newpCodeCSource - create a new pCode Source Symbol        */
 /*-----------------------------------------------------------------*/
 
 pCode *pic16_newpCodeCSource(int ln, char *f, char *l)
@@ -2992,6 +3081,48 @@ pCode *pic16_newpCodeCSource(int ln, char *f, char *l)
   return ( (pCode *)pccs);
 
 }
+
+
+/*******************************************************************/
+/* pic16_newpCodeAsmDir - create a new pCode Assembler Directive   */
+/*			added by VR 6-Jun-2003                     */
+/*******************************************************************/
+
+pCode *pic16_newpCodeAsmDir(char *asdir, char *argfmt, ...)
+{
+  pCodeAsmDir *pcad;
+  va_list ap;
+  char buffer[256];		// how long can a directive be?!
+  char *lbp=buffer;
+  
+
+	pcad = Safe_calloc(1, sizeof(pCodeAsmDir));
+	pcad->pc.type = PC_ASMDIR;
+	pcad->pc.prev = pcad->pc.next = NULL;
+	pcad->pc.pb = NULL;
+	
+	pcad->pc.destruct = genericDestruct;
+	pcad->pc.print = genericPrint;
+
+	if(asdir && *asdir) {
+		pcad->directive = Safe_strdup( asdir );
+	}
+	
+	va_start(ap, argfmt);
+	
+	if(argfmt && *argfmt)
+		vsprintf(buffer, argfmt, ap);
+	
+	va_end(ap);
+	
+	while(isspace(*lbp))lbp++;
+	
+	if(lbp && *lbp)
+		pcad->arg = Safe_strdup( lbp );
+
+  return ((pCode *)pcad);
+}
+
 /*-----------------------------------------------------------------*/
 /* pCodeLabelDestruct - free memory used by a label.               */
 /*-----------------------------------------------------------------*/
@@ -3517,6 +3648,12 @@ static void genericDestruct(pCode *pc)
     regs *reg = pic16_getRegFromInstruction(pc);
     if(reg)
       deleteSetItem (&(reg->reglives.usedpCodes),pc);
+
+	if(PCI(pc)->is2MemOp) {
+		reg = pic16_getRegFromInstruction2(pc);
+		if(reg)
+			deleteSetItem(&(reg->reglives.usedpCodes), pc);
+	}
   }
 
   /* Instead of deleting the memory used by this pCode, mark
@@ -3532,6 +3669,8 @@ static void genericDestruct(pCode *pc)
   //free(pc);
 
 }
+
+
 
 #if 0
 /*-----------------------------------------------------------------*/
@@ -3616,11 +3755,12 @@ char *pic16_get_op(pCodeOp *pcop,char *buffer, size_t size)
       s = buffer;
       //size = sizeof(buffer);
       if( PCOR(pcop)->instance) {
-	SAFE_snprintf(&s,&size,"(%s + %d)",
-		      pcop->name,
-		      PCOR(pcop)->instance );
+		SAFE_snprintf(&s,&size,"(%s + %d)",
+			pcop->name,
+			PCOR(pcop)->instance );
+	}
 	//fprintf(stderr,"PO_DIR %s\n",buffer);
-      } else
+       else
 	SAFE_snprintf(&s,&size,"%s",pcop->name);
       return buffer;
 
@@ -3633,6 +3773,111 @@ char *pic16_get_op(pCodeOp *pcop,char *buffer, size_t size)
 	return pcop->name;
       }
 
+    }
+  }
+
+  return "NO operand";
+
+}
+
+
+/*-----------------------------------------------------------------*/
+/* pic16_get_op2 - variant to support two memory operand commands  */
+/*-----------------------------------------------------------------*/
+char *pic16_get_op2(pCodeOp *pcop,char *buffer, size_t size)
+{
+  regs *r;
+  static char b[50];
+  char *s;
+  int use_buffer = 1;    // copy the string to the passed buffer pointer
+
+  if(!buffer) {
+    buffer = b;
+    size = sizeof(b);
+    use_buffer = 0;     // Don't bother copying the string to the buffer.
+  } 
+
+#if 0
+	fprintf(stderr, "%s:%d second operand %s is %d\tPO_DIR(%d) PO_GPR_TEMP(%d) PO_IMMEDIATE(%d) PO_INDF0(%d) PO_FSR0(%d)\n",
+		__FUNCTION__, __LINE__, PCOR(PCOR2(pcop)->pcop2)->r->name, PCOR2(pcop)->pcop2->type,
+		PO_DIR, PO_GPR_TEMP, PO_IMMEDIATE, PO_INDF0, PO_FSR0);
+#endif
+
+  if(pcop) {
+    switch(PCOR2(pcop)->pcop2->type) {
+    case PO_INDF0:
+    case PO_FSR0:
+      if(use_buffer) {
+	SAFE_snprintf(&buffer,&size,"%s",PCOR(PCOR2(pcop)->pcop2)->r->name);
+	return buffer;
+      }
+      return PCOR(PCOR2(pcop)->pcop2)->r->name;
+      break;
+    case PO_GPR_TEMP:
+      r = pic16_regWithIdx(PCOR(PCOR2(pcop)->pcop2)->r->rIdx);
+
+      if(use_buffer) {
+	SAFE_snprintf(&buffer,&size,"%s",r->name);
+	return buffer;
+      }
+
+      return r->name;
+
+
+    case PO_IMMEDIATE:
+	break;
+#if 0
+      s = buffer;
+
+      if(PCOI(pcop)->_const) {
+
+	if( PCOI(pcop)->offset && PCOI(pcop)->offset<4) {
+	  SAFE_snprintf(&s,&size,"(((%s+%d) >> %d)&0xff)",
+			pcop->name,
+			PCOI(pcop)->index,
+			8 * PCOI(pcop)->offset );
+	} else
+	  SAFE_snprintf(&s,&size,"LOW(%s+%d)",pcop->name,PCOI(pcop)->index);
+      } else {
+      
+	if( PCOI(pcop)->index) { // && PCOI(pcc->pcop)->offset<4) {
+	  SAFE_snprintf(&s,&size,"(%s + %d)",
+			pcop->name,
+			PCOI(pcop)->index );
+	} else {
+	  if(PCOI(pcop)->offset)
+	    SAFE_snprintf(&s,&size,"(%s >> %d)&0xff",pcop->name, 8*PCOI(pcop)->offset);
+	  else
+	    SAFE_snprintf(&s,&size,"%s",pcop->name);
+	}
+      }
+
+      return buffer;
+#endif
+
+    case PO_DIR:
+      s = buffer;
+      //size = sizeof(buffer);
+      if( PCOR(PCOR2(pcop)->pcop2)->instance) {
+		SAFE_snprintf(&s,&size,"(%s + %d)",
+			PCOR(PCOR2(pcop)->pcop2)->r->name,
+			PCOR(PCOR2(pcop)->pcop2)->instance );
+	}
+	//fprintf(stderr,"PO_DIR %s\n",buffer);
+       else
+	SAFE_snprintf(&s,&size,"%s",PCOR(PCOR2(pcop)->pcop2)->r->name);
+      return buffer;
+
+    default:
+#if 0
+      if  (PCOR2(pcop)->r1->name) {
+	if(use_buffer) {
+	  SAFE_snprintf(&buffer,&size,"%s",PCOR2(pcop)->r1->name);
+	  return buffer;
+	}
+	return PCOR2(pcop)->r1->name;
+      }
+#endif
     }
   }
 
@@ -3672,10 +3917,21 @@ static char *pCode2str(char *str, size_t size, pCode *pc)
   switch(pc->type) {
 
   case PC_OPCODE:
-
     SAFE_snprintf(&s,&size, "\t%s\t", PCI(pc)->mnemonic);
 
     if( (PCI(pc)->num_ops >= 1) && (PCI(pc)->pcop)) {
+
+#if 1
+	if(PCI(pc)->is2MemOp) {
+//		fprintf(stderr, "HELP !\n");
+#if 1
+		SAFE_snprintf(&s,&size, "%s,%s", 
+		pic16_get_op(PCOP(PCI(pc)->pcop), NULL, 0),
+		pic16_get_op2(PCOP(PCI(pc)->pcop), NULL, 0));
+		break;
+#endif
+	}
+#endif
 
       if(PCI(pc)->isBitInst) {
 	if(PCI(pc)->pcop->type == PO_GPR_BIT) {
@@ -3735,6 +3991,9 @@ static char *pCode2str(char *str, size_t size, pCode *pc)
   case PC_CSOURCE:
     SAFE_snprintf(&s,&size,";#CSRC\t%s %d\n; %s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
     break;
+  case PC_ASMDIR:
+  	SAFE_snprintf(&s,&size,"\t%s\t%s\n", PCAD(pc)->directive, PCAD(pc)->arg?PCAD(pc)->arg:"");
+  	break;
 
   case PC_BAD:
     SAFE_snprintf(&s,&size,";A bad pCode is being used\n");
@@ -3785,11 +4044,14 @@ static void genericPrint(FILE *of, pCode *pc)
 
       /* Debug */
       if(pic16_debug_verbose) {
-	fprintf(of, "\t;key=%03x",pc->seq);
+	fprintf(of, "\t;key=%03x %d",pc->seq, __LINE__);
 	if(PCI(pc)->pcflow)
 	  fprintf(of,",flow seq=%03x",PCI(pc)->pcflow->pc.seq);
       }
     }
+    fprintf(of, "\n");
+    break;
+      
 #if 0
     {
       pBranch *dpb = pc->to;   // debug
@@ -3815,8 +4077,8 @@ static void genericPrint(FILE *of, pCode *pc)
       }
     }
 #endif
-    fprintf(of,"\n");
-    break;
+//    fprintf(of,"\n");		// these are moved prior to #if 0
+//    break;
 
   case PC_WILD:
     fprintf(of,";\tWild opcode: id=%d\n",PCW(pc)->id);
@@ -3842,6 +4104,10 @@ static void genericPrint(FILE *of, pCode *pc)
   case PC_CSOURCE:
     fprintf(of,";#CSRC\t%s %d\n;  %s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
     break;
+  case PC_ASMDIR:
+  	fprintf(of, "\t%s\t%s\n", PCAD(pc)->directive, PCAD(pc)->arg?PCAD(pc)->arg:"");
+  	break;
+  	
   case PC_LABEL:
   default:
     fprintf(of,"unknown pCode type %d\n",pc->type);
@@ -4338,6 +4604,73 @@ regs * pic16_getRegFromInstruction(pCode *pc)
   case PO_LITERAL:
     //fprintf(stderr, "pic16_getRegFromInstruction - literal\n");
     break;
+
+  default:
+    //fprintf(stderr, "pic16_getRegFromInstruction - unknown reg type %d\n",PCI(pc)->pcop->type);
+    //genericPrint(stderr, pc);
+    break;
+  }
+
+  return NULL;
+
+}
+
+/*-------------------------------------------------------------------------------*/
+/* pic16_getRegFromInstruction2 - variant to support two memory operand commands */
+/*-------------------------------------------------------------------------------*/
+regs * pic16_getRegFromInstruction2(pCode *pc)
+{
+
+  if(!pc                   || 
+     !isPCI(pc)            ||
+     !PCI(pc)->pcop        ||
+     PCI(pc)->num_ops == 0 ||
+     (PCI(pc)->num_ops == 1))		// accept only 2 operand commands
+    return NULL;
+
+
+/*
+ * operands supported in MOVFF:
+ *  PO_INF0/PO_FSR0
+ *  PO_GPR_TEMP
+ *  PO_IMMEDIATE
+ *  PO_DIR
+ *
+ */
+  switch(PCI(pc)->pcop->type) {
+  case PO_INDF0:
+  case PO_FSR0:
+    return PCOR(PCOR2(PCI(pc)->pcop)->pcop2)->r;
+
+    //    return typeRegWithIdx (PCOR(PCI(pc)->pcop)->rIdx, REG_SFR, 0);
+
+//  case PO_BIT:
+  case PO_GPR_TEMP:
+    //fprintf(stderr, "pic16_getRegFromInstruction - bit or temp\n");
+    return PCOR(PCOR2(PCI(pc)->pcop)->pcop2)->r;
+
+  case PO_IMMEDIATE:
+	break;
+#if 0
+    if(PCOI(PCI(pc)->pcop)->r)
+      return (PCOI(PCI(pc)->pcop)->r);
+
+    //fprintf(stderr, "pic16_getRegFromInstruction - immediate\n");
+    return pic16_dirregWithName(PCI(pc)->pcop->name);
+    //return NULL; // PCOR(PCI(pc)->pcop)->r;
+#endif
+
+  case PO_GPR_BIT:
+	break;
+//    return PCOR2(PCI(pc)->pcop)->r;
+
+  case PO_DIR:
+    //fprintf(stderr, "pic16_getRegFromInstruction - dir\n");
+    return PCOR(PCOR2(PCI(pc)->pcop)->pcop2)->r;
+
+  case PO_LITERAL:
+	break;
+    //fprintf(stderr, "pic16_getRegFromInstruction - literal\n");
 
   default:
     //fprintf(stderr, "pic16_getRegFromInstruction - unknown reg type %d\n",PCI(pc)->pcop->type);
@@ -4907,15 +5240,43 @@ static void BanksUsedFlow(pBlock *pb)
 
 
 /*-----------------------------------------------------------------*/
+/* insertBankSwitch - inserts a bank switch statement in the assembly listing */
 /*-----------------------------------------------------------------*/
 static void insertBankSwitch(int position, pCode *pc, int bsr)
 {
   pCode *new_pc;
+  regs *reg;
 
   if(!pc)
     return;
 
-  new_pc = pic16_newpCode(POC_MOVLB, pic16_newpCodeOpLit(bsr));
+
+/*
+ * if bsr == -1 then do not insert a MOVLB instruction, but rather
+ * insert a BANKSEL assembler directive for the symbol used by
+ * the pCode. This will allow the linker to setup the correct
+ * bank at linking time
+ */
+
+	if(!options_gen_banksel || bsr != -1) {
+		new_pc = pic16_newpCode(POC_MOVLB, pic16_newpCodeOpLit(bsr));
+	} else {
+		/* emit the BANKSEL [symbol] */
+
+		/* IMPORTANT: The following code does not check if a symbol is
+		 * split in multiple banks. This should be corrected. - VR 6/6/2003 */
+
+		reg = pic16_getRegFromInstruction(pc);
+		if(!reg)return;
+		new_pc = pic16_newpCodeAsmDir("BANKSEL", "%s", reg->name);
+		
+		position = 0;		// position is always before (sanity check!)
+	}
+
+#if 0
+	fprintf(stderr, "%s:%d: inserting bank switch\tbank = %d\n", __FUNCTION__, __LINE__, bsr);
+	pc->print(stderr, pc);
+#endif
 
   if(position) {
     /* insert the bank switch after this pc instruction */
@@ -4956,9 +5317,10 @@ static void FixRegisterBankingInFlow(pCodeFlow *pcfl, int cur_bank)
   while(pic16_isPCinFlow(pc,PCODE(pcfl))) {
 
     reg = pic16_getRegFromInstruction(pc);
-#if 0
+
+#if 1
     if(reg) {
-      fprintf(stderr, "  %s  ",reg->name);
+      fprintf(stderr, "%s:%d  %s  ",__FUNCTION__, __LINE__, reg->name);
       fprintf(stderr, "addr = 0x%03x, bank = %d\n",reg->address,REG_BANK(reg));
 
     }
@@ -4972,7 +5334,7 @@ static void FixRegisterBankingInFlow(pCodeFlow *pcfl, int cur_bank)
        * not a skip type instruction */
       pcprev = findPrevpCode(pc->prev, PC_OPCODE);
 
-      if(!pcprev || (pcprev && !isPCI_SKIP(pcprev))) {
+      if(!pcprev || (pcprev && !isPCI_SKIP(pcprev) /* && !isBankInstruction(pcprev)*/)) {
 	int reg_bank;
 
 	reg_bank =  (reg) ? REG_BANK(reg) : 0;
@@ -5079,7 +5441,7 @@ static void FixBankFlow(pBlock *pb)
     entry and exit.
   */
 
-  //fprintf(stderr, "FixBankFlow - Phase 1\n");
+//	fprintf(stderr, "FixBankFlow - Phase 1\n");
 
   for( pcflow = pic16_findNextpCode(pb->pcHead, PC_FLOW); 
        pcflow != NULL;
@@ -5103,7 +5465,7 @@ static void FixBankFlow(pBlock *pb)
     }
   }
 
-  //fprintf(stderr, "FixBankFlow - Phase 2\n");
+//	fprintf(stderr, "FixBankFlow - Phase 2\n");
 
   for( pcflow = pic16_findNextpCode(pb->pcHead, PC_FLOW); 
        pcflow != NULL;
@@ -5565,7 +5927,7 @@ int InstructionRegBank(pCode *pc)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-static void FixRegisterBanking(pBlock *pb)
+static void pic16_FixRegisterBanking(pBlock *pb)
 {
   pCode *pc=NULL;
   pCode *pcprev=NULL;
@@ -5582,7 +5944,8 @@ static void FixRegisterBanking(pBlock *pb)
     return;
   /* loop through all of the flow blocks with in one pblock */
 
-  //fprintf(stderr,"Register banking\n");
+//	fprintf(stderr,"%s:%d: Register banking\n", __FUNCTION__, __LINE__);
+
   cur_bank = 0;
   do {
     /* at this point, pc should point to a PC_FLOW object */
@@ -5592,37 +5955,42 @@ static void FixRegisterBanking(pBlock *pb)
        requirements */
 
     //    do {
-      if(isPCI(pc)) {
-	//genericPrint(stderr, pc);
+      if(isPCI(pc) && !PCI(pc)->is2MemOp) {
+//		genericPrint(stderr, pc);
 
 	reg = pic16_getRegFromInstruction(pc);
 #if 0
 	if(reg) {
-	  fprintf(stderr, "  %s  ",reg->name);
-	  fprintf(stderr, "addr = 0x%03x, bank = %d, bit=%d\n",
-		  reg->address,REG_BANK(reg),reg->isBitField);
+	  fprintf(stderr, "%s:%d:  %s  %d\n",__FUNCTION__, __LINE__, reg->name, reg->rIdx);
+	  fprintf(stderr, "addr = 0x%03x, bank = %d, bit=%d\tmapped = %d sfr=%d fix=%d\n",
+		  reg->address,REG_BANK(reg),reg->isBitField, reg->isMapped,
+		  	pic16_finalMapping[ reg->rIdx ].isSFR, reg->isFixed);
 
 	}
 #endif
 
-	if( ( (reg && !isACCESS_BANK(reg) && REG_BANK(reg)!=cur_bank) || 
-	      ((PCI(pc)->op == POC_CALL) && (cur_bank != 0) ) ) &&
-	    (!isPCI_LIT(pc)) ){
+	/* the !(reg->rIdx==-1) is a temporary hack. It should be changed - VR 6-Jun-2003 */
+	if( ( (reg && !(reg->rIdx==-1) && !isACCESS_BANK(reg) /*&& REG_BANK(reg)!=cur_bank*/ && !isBankInstruction(pc)) || 
+	      ((PCI(pc)->op != POC_CALL) /*&& (cur_bank != 0)*/ ) ) &&
+	    (!isPCI_LIT(pc)) ) {
 
 
 	  /* Examine the instruction before this one to make sure it is
 	   * not a skip type instruction */
 	  pcprev = findPrevpCode(pc->prev, PC_OPCODE);
 
-	  if(!pcprev || (pcprev && !isPCI_SKIP(pcprev))) {
+	  if(!pcprev || (pcprev && !isPCI_SKIP(pcprev) /*&& !isBankInstruction(pcprev)*/)) {
 	    int reg_bank;
 
-	    reg_bank =  (reg) ? REG_BANK(reg) : 0;
-	  
-            if (cur_bank != reg_bank) {
-	      cur_bank = reg_bank;
-	      insertBankSwitch(0, pc, cur_bank);
-	    }
+		reg_bank =  (reg) ? REG_BANK(reg) : 0;
+
+//		fprintf(stderr, "%s:%d add bank = %d\n", __FUNCTION__, __LINE__, reg_bank);
+//		pc->print(stderr, pc);
+
+//		if (cur_bank != reg_bank) {
+			cur_bank = reg_bank;
+			insertBankSwitch(0, pc, (options_gen_banksel)?-1:cur_bank);	//cur_bank);
+//		}
 
 	  }else {
 	    //fprintf(stderr, "Bummer can't switch banks\n");
@@ -5798,8 +6166,10 @@ static void AnalyzeFlow(int level)
    * and register banking is fixed.
    */
 
-  //for(pb = the_pFile->pbHead; pb; pb = pb->next)
-  //FixRegisterBanking(pb);
+#if 0
+	for(pb = the_pFile->pbHead; pb; pb = pb->next)
+		pic16_FixRegisterBanking(pb);
+#endif
 
   /* Phase 2 - Flow Analysis
    *
@@ -5911,8 +6281,9 @@ void pic16_AnalyzeBanking(void)
 
   for(pb = the_pFile->pbHead; pb; pb = pb->next)
     BanksUsedFlow(pb);
+
   for(pb = the_pFile->pbHead; pb; pb = pb->next)
-    FixRegisterBanking(pb);
+    pic16_FixRegisterBanking(pb);
 
 }
 
@@ -6112,7 +6483,9 @@ static void MarkUsedRegisters(set *regset)
   regs *r1,*r2;
 
   for(r1=setFirstItem(regset); r1; r1=setNextItem(regset)) {
+//	fprintf(stderr, "marking register = %s\t", r1->name);
     r2 = pic16_regWithIdx(r1->rIdx);
+//	fprintf(stderr, "to register = %s\n", r2->name);
     r2->isFree = 0;
     r2->wasUsed = 1;
   }

@@ -584,6 +584,8 @@ pic16_dirregWithName (char *name)
 
   hkey = regname2key(name);
 
+//	fprintf(stderr, "%s:%d: name = %s\thash = %d\n", __FUNCTION__, __LINE__, name, hkey);
+
   reg = hTabFirstItemWK(dynDirectRegNames, hkey);
 
   while(reg) {
@@ -655,16 +657,17 @@ pic16_allocDirReg (operand *op )
   /* First, search the hash table to see if there is a register with this name */
   if (SPEC_ABSA ( OP_SYM_ETYPE(op)) && !(IS_BITVAR (OP_SYM_ETYPE(op))) ) {
     reg = regWithIdx (pic16_dynProcessorRegs, SPEC_ADDR ( OP_SYM_ETYPE(op)), 1);
-/*
+
+#if 0
     if(!reg) 
-      fprintf(stderr,"ralloc %s is at fixed address but not a processor reg, addr=0x%x\n",
-	      name, SPEC_ADDR ( OP_SYM_ETYPE(op)));
+      fprintf(stderr,"%s:%d: ralloc %s is at fixed address but not a processor reg, addr=0x%x\n",
+      		__FUNCTION__, __LINE__, name, SPEC_ADDR ( OP_SYM_ETYPE(op)));
     else
-      fprintf(stderr,"ralloc %s at fixed address has already been declared, addr=0x%x\n",
-	      name, SPEC_ADDR ( OP_SYM_ETYPE(op)));
-*/
+      fprintf(stderr,"%s:%d: ralloc %s at fixed address has already been declared, addr=0x%x\n",
+		__FUNCTION__, __LINE__, name, SPEC_ADDR ( OP_SYM_ETYPE(op)));
+#endif
   } else {
-    //fprintf(stderr,"ralloc:%d %s \n", __LINE__,name);
+//  	fprintf(stderr,"ralloc:%d %s \n", __LINE__,name);
     
     reg = pic16_dirregWithName(name);
   }
@@ -1087,14 +1090,17 @@ void pic16_writeUsedRegs(FILE *of)
   pic16_assignRelocatableRegisters(pic16_dynStackRegs,0);
   pic16_assignRelocatableRegisters(pic16_dynDirectRegs,0);
 
-  //pic16_dump_map();
+	//pic16_dump_map();
 
   pic16_dump_cblock(of);
+
+#if 0
   bitEQUs(of,pic16_dynDirectBitRegs);
   aliasEQUs(of,pic16_dynAllocRegs,0);
   aliasEQUs(of,pic16_dynDirectRegs,0);
   aliasEQUs(of,pic16_dynStackRegs,0);
   aliasEQUs(of,pic16_dynProcessorRegs,1);
+#endif
 
 }
 

@@ -1,3 +1,9 @@
+2003-04-08    <johan@CP255758-A>
+
+	* src/mcs51/gen.c (gen51Code): display reg usage in --icode-in-asm
+	* src/mcs51/ralloc.c (serialRegAssign): update the registers in use and save some slocs
+	* src/SDCCicode.h: added riu to show the register usage in --icode-in-asm
+
 2003-04-07  Bernhard Held <bernhard@bernhardheld.de>
 
 	* configure.in: fully support prefix, exec_prefix, datadir, docdir;

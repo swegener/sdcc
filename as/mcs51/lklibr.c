@@ -916,7 +916,7 @@ int buildlibraryindex(void)
 				strcat(str,relfil);
 			}
 
-            if(strchr(str, FSEPX) == NULL)
+            if(strchr(relfil, FSEPX) == NULL)
             {
 				sprintf(&str[strlen(str)], "%crel", FSEPX);
 			}

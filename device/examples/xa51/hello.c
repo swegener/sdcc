@@ -14,7 +14,6 @@ xdata at 0x1234 abs;
 
 void main(void) {
   puts ("Hello world.\n\r");
-  _asm ;johan _endasm;
   if (d2==2) {
     puts ("d2=2");
   } else {

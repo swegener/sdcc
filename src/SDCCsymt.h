@@ -364,8 +364,6 @@ extern sym_link *validateLink(sym_link 	*l,
 #define FUNC_ISOVERLAY(x) (x->funcAttrs.overlay)
 #define IFFUNC_ISOVERLAY(x) (IS_FUNC(x) && FUNC_ISOVERLAY(x))
 
-
-// jwk: I am not sure about this
 #define IFFUNC_ISBANKEDCALL(x) (!IFFUNC_NONBANKED(x) && \
   (options.model == MODEL_LARGE || \
    options.model == MODEL_MEDIUM || \

@@ -78,7 +78,7 @@ static data value_t value;
 
 static unsigned char radix;
 
-// jwk: TODO: this makes the whole dammed thing nonreentrent
+// this makes the whole dammed thing nonreentrent
 static int charsOutputted;
 
 /****************************************************************************/
@@ -530,7 +530,6 @@ get_conversion_spec:
 	length=0;
         lsd = 1;
 
-	//jwk20000814: do this at least once, e.g.: printf ("%d", (int)0);
 	do {
           value.byte[4] = 0;
 	  calculate_digit();

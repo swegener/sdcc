@@ -1,9 +1,3 @@
-//#define LIVERANGEHUNT
-#ifdef LIVERANGEHUNT
-  #define LRH(x) x
-#else
-  #define LRH(x)
-#endif
 /*-------------------------------------------------------------------------
   SDCCcse.c - source file for Common Subexpressions and other utility
 
@@ -118,9 +112,6 @@ replaceAllSymBySym (iCode * ic, operand * from, operand * to, bitVect ** ndpset)
 {
   iCode *lic;
 
-  LRH(printf ("replaceAllSymBySym: from %s to %s\n", 
-	      OP_SYMBOL(from)->name, 
-	      IS_SYMOP(to) ? OP_SYMBOL(to)->name) : "!SYM");
   for (lic = ic; lic; lic = lic->next)
     {
       int siaddr;
@@ -384,9 +375,6 @@ DEFSETFUNC (findCheaperOp)
 	    
         }
 	  
-      LRH(printf ("findCheaperOp: %s < %s\n",\
-	      IS_SYMOP((*opp)) ? OP_SYMBOL((*opp))->name : "!SYM",\
-	      OP_SYMBOL(cop)->name));
       return 1;
 
     }
@@ -436,8 +424,6 @@ DEFSETFUNC (findPrevIc)
   if (isiCodeEqual (ic, cdp->diCode) &&
       isOperandEqual (cdp->sym, IC_RESULT (cdp->diCode)))
     {
-      LRH(printf ("findPrevIc same: %d %d\n", ic->key, cdp->diCode->key));
-	*icp = cdp->diCode;
       return 1;
     }
 
@@ -448,8 +434,6 @@ DEFSETFUNC (findPrevIc)
       isOperandEqual (IC_LEFT (ic), IC_RIGHT (cdp->diCode)) &&
       isOperandEqual (IC_RIGHT (ic), IC_LEFT (cdp->diCode)))
     {
-      LRH(printf ("findPrevIc inter: %d %d\n", ic->key, cdp->diCode->key));
-      *icp = cdp->diCode;
       return 1;
     }
 

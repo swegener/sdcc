@@ -2417,7 +2417,7 @@ genFunction (iCode * ic)
 	             }
 	        }
 	    }
-	    // jwk: this needs a closer look
+	    // TODO: this needs a closer look
 	    SPEC_ISR_SAVED_BANKS(currFunc->etype) = banksToSave;
 	}
     }
@@ -2642,7 +2642,6 @@ genEndFunction (iCode * ic)
 	     * Restore any register banks saved by genFunction
 	     * in reverse order.
 	     */
-	  // jwk: this needs a closer look
 	    unsigned savedBanks = SPEC_ISR_SAVED_BANKS(currFunc->etype);
 	    int ix;
 	  

@@ -544,12 +544,10 @@ relr()
 		if (extendedAddress != lastExtendedAddress)
 		{
 		
-#if 1 // jwk
-		  if (lastExtendedAddress!=-1) {
-		    printf("output extended linear address record 0x%x 0x%x\n",
-			   extendedAddress, lastExtendedAddress);
-		  }
-#endif
+		    if (lastExtendedAddress!=-1) {
+		      printf("output extended linear address record 0x%x 0x%x\n",
+			     extendedAddress, lastExtendedAddress);
+		    }
 		    
 		    if (rflag)
 		    {

@@ -1,9 +1,3 @@
-//#define LIVERANGEHUNT
-#ifdef LIVERANGEHUNT
-  #define LRH(x) x
-#else
-  #define LRH(x)
-#endif
 /*-------------------------------------------------------------------------
 
   SDCCloop.c - source file for loop detection & optimizations
@@ -159,7 +153,6 @@ loopInsert (set ** regionSet, eBBlock * block)
 {
   if (!isinSet (*regionSet, block))
     {
-      LRH(printf ("loopInsert: %s\n", block->entryLabel->name));
       addSetHead (regionSet, block);
       STACK_PUSH (regionStack, block);
     }
@@ -236,7 +229,7 @@ DEFSETFUNC (addToExitsMarkDepth)
   V_ARG (set **, exits);
   V_ARG (int, depth);
   V_ARG (region *, lr);
-  LRH(printf ("addToExitsMarkDepth: %s %d\n", ebp->entryLabel->name, depth));
+
   /* mark the loop depth of this block */
   //if (!ebp->depth)
   if (ebp->depth<depth)
@@ -272,36 +265,13 @@ DEFSETFUNC (createLoop)
   eBBlock *block;
   int dfMin = count ,dfMax =0, i;
 
-  LRH(printf("CreateLoop\n"));
   /* make sure regionStack is empty */
   while (!STACK_EMPTY (regionStack))
     STACK_POP (regionStack);
 
   /* add the entryBlock */
   addSet (&aloop->regBlocks, ep->to);
-#ifdef LIVERANGEHUNT
-  // print regBlocks jwk
-  { 
-    eBBlock *ebp;
-    region *lp=aloop;
-    for (ebp=setFirstItem(lp->regBlocks); ebp; ebp=setNextItem(lp->regBlocks)) {
-      printf ("cl1 %s ", ebp->entryLabel->name);
-    }
-    printf (" %d\n", count);
-  }
-#endif
   loopInsert (&aloop->regBlocks, ep->from);
-#ifdef LIVERANGEHUNT
-  // print regBlocks jwk
-  { 
-    eBBlock *ebp;
-    region *lp=aloop;
-    for (ebp=setFirstItem(lp->regBlocks); ebp; ebp=setNextItem(lp->regBlocks)) {
-      printf ("cl2 %s ", ebp->entryLabel->name);
-    }
-    printf (" %d\n", count);
-  }
-#endif
 
   while (!STACK_EMPTY (regionStack))
     {
@@ -311,36 +281,8 @@ DEFSETFUNC (createLoop)
 	applyToSet (block->predList, insertIntoLoop, &aloop->regBlocks);
     }
 
-#ifdef LIVERANGEHUNT
-  // print regBlocks jwk
-  { 
-    eBBlock *ebp;
-    region *lp=aloop;
-    for (ebp=setFirstItem(lp->regBlocks); ebp; ebp=setNextItem(lp->regBlocks)) {
-      printf ("cl3 %s ", ebp->entryLabel->name);
-    }
-    printf (" %d\n", count);
-  }
-#endif
-
   aloop->entry = ep->to;
 
-#ifdef LIVERANGEHUNT
-  // now also include those blocks that conditionally escape from this loop 
-  for (i=1; i<count; i++) {
-    if (ebbs[i]->hasConditionalExit) {
-      for (block=setFirstItem(aloop->regBlocks); 
-	   block; 
-	   block=setNextItem(aloop->regBlocks)) {
-	if (isinSet(block->predList, ebbs[i])) {
-	  printf ("%s has a forced exit from %s\n", 
-		  ebbs[i]->entryLabel->name, 
-		  block->entryLabel->name);
-	}
-      }
-    }
-  }	
-#else
   /* set max & min dfNum for loopRegion */
   for ( block = setFirstItem(aloop->regBlocks); block; 
 	block = setNextItem(aloop->regBlocks)) {
@@ -359,20 +301,6 @@ DEFSETFUNC (createLoop)
 	  }
       }
   }
-#endif
-
-#ifdef LIVERANGEHUNT
-  printf ("================\n");
-  printf (" loop with entry -- > ");
-  printEntryLabel (aloop->entry, ap);
-  printf ("\n");
-  printf (" loop body --> ");
-  applyToSet (aloop->regBlocks, printEntryLabel);
-  printf ("\n");
-  printf (" loop exits --> ");
-  applyToSet (aloop->exits, printEntryLabel);
-  printf ("\n");
-#endif
 
   /* and if this is a conditional block, the other side of the IFX 
      (if any, that could have a greater dfnum) is too */
@@ -466,9 +394,6 @@ isOperandInvariant (operand * op, region * theLoop, set * lInvars)
 	       !IS_OP_VOLATILE (op) &&
 	       assignmentsToSym (theLoop->regBlocks, op) == 0)
 	opin = 1;
-      LRH(if (opin && IS_SYMOP(op)) {
-	printf("isOperandInvariant: %s\n", OP_SYMBOL(op)->name);
-      });
     }
   else
     opin++;
@@ -550,7 +475,7 @@ loopInvariants (region * theLoop, eBBlock ** ebbs, int count)
 	  int lin, rin;
 	  cseDef *ivar;
 
-	  /* jwk: TODO this is only needed if the call is between
+	  /* TODO this is only needed if the call is between
 	     here and the definition, but I am too lazy to do that now */
 
 	  /* if there are function calls in this block */
@@ -1252,7 +1177,6 @@ createLoopRegions (eBBlock ** ebbs, int count)
   int maxDepth = 0;
   region *lp;
 
-  LRH(printf ("createLoopRegions: %p\n", ebbs));
   /* get all the back edges in the graph */
   if (!applyToSet (graphEdges, backEdges, &bEdges))
     return 0;			/* found no loops */
@@ -1260,18 +1184,6 @@ createLoopRegions (eBBlock ** ebbs, int count)
   /* for each of these back edges get the blocks that */
   /* constitute the loops                             */
   applyToSet (bEdges, createLoop, &allRegion, ebbs,count);
-#ifdef LIVERANGEHUNT
-  // print regBlocks
-  { 
-    eBBlock *ebp;
-    lp=setFirstItem(allRegion);
-    printf ("createLoopRegions: ");
-    for (ebp=setFirstItem(lp->regBlocks); ebp; ebp=setNextItem(lp->regBlocks)) {
-      printf ("%s ", ebp->entryLabel->name);
-    }
-    printf (" %d\n", count);
-  }
-#endif
 
   /* now we will create regions from these loops               */
   /* loops with the same entry points are considered to be the */

@@ -14,8 +14,6 @@
 ** uunet!motown!pipeline!phw
 */
 
-/* (c)2000/2001: hacked a little by johan.knol@iduna.nl for sdcc */
-
 #include <float.h>
 
 union float_long
@@ -77,15 +75,13 @@ float __fsadd (float a1, float a2)
     return (0);
 
   /* normalize */
-  /* jwk: TODO: changing the next two whiles in nested ifs 
-     seriously breaks it. Why?????????????????? */ 
   while (mant1<HIDDEN) {
     mant1 <<= 1;
     exp1--;
   }
 
+  /* round off */
   while (mant1 & 0xff000000) {
-    // round off
     if (mant1&1)
       mant1 += 2;
     mant1 >>= 1 ;

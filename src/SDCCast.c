@@ -1275,7 +1275,7 @@ bool constExprTree (ast *cexpr) {
 	return constExprTree(cexpr->right);
       }
       if (cexpr->opval.op==CAST) {
-	// jwk: cast ignored, maybe we should throw a warning here
+	// cast ignored, maybe we should throw a warning here?
 	return constExprTree(cexpr->right);
       }
       if (cexpr->opval.op=='&') { 

@@ -1,9 +1,3 @@
-//#define LIVERANGEHUNT
-#ifdef LIVERANGEHUNT
-  #define LRH(x) x
-#else
-  #define LRH(x)
-#endif
 /*-------------------------------------------------------------------------
 
   SDCCcflow.c - source file for control flow analysis
@@ -144,7 +138,6 @@ eBBSuccessors (eBBlock ** ebbs, int count)
 		    if (ebbs[j]->ech && ebbs[j]->ech->op==IFX &&
 			(isSymbolEqual(IC_TRUE(ebbs[j]->ech), ebbs[i]->entryLabel) ||
 			 isSymbolEqual(IC_FALSE(ebbs[j]->ech), ebbs[i]->entryLabel))) {
-		      LRH(printf ("%s has a conditional exit from %s\n", ebbs[i]->entryLabel->name, ebbs[j]->entryLabel->name));
 		      ebbs[i]->hasConditionalExit=1;
 		    }
 		  }

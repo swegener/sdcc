@@ -1,9 +1,3 @@
-//#define LIVERANGEHUNT
-#ifdef LIVERANGEHUNT
-  #define LRH(x) x
-#else
-  #define LRH(x)
-#endif
 /*------------------------------------------------------------------------
 
   SDCCralloc.c - source file for register allocation. (8051) specific
@@ -577,7 +571,6 @@ spillThis (symbol * sym)
   if (!(sym->remat || sym->usl.spillLoc))
     createStackSpil (sym);
 
-  LRH(printf("spillThis: %s\n", sym->name));
   /* mark it has spilt & put it in the spilt set */
   sym->isspilt = sym->spillA = 1;
   _G.spiltSet = bitVectSetBit (_G.spiltSet, sym->key);
@@ -725,7 +718,6 @@ spilSomething (iCode * ic, eBBlock * ebp, symbol * forSym)
 
   /* get something we can spil */
   ssym = selectSpil (ic, ebp, forSym);
-  LRH(printf("spilSomething: spilled %s for %s\n", ssym->name, forSym->name));
 
   /* mark it as spilt */
   ssym->isspilt = ssym->spillA = 1;
@@ -1877,7 +1869,7 @@ pack:
     {
       OP_SYMBOL (IC_RESULT (dic))->liveFrom = dic->seq;
     }
-  // jwk: and the otherway around?
+  // TODO: and the otherway around?
 
   /* delete from liverange table also 
      delete from all the points inbetween and the new
@@ -1939,7 +1931,6 @@ findAssignToSym (operand * op, iCode * ic)
   if (!dic)
     return NULL;   /* didn't find any assignment to op */
 
-  LRH(printf ("findAssignToSym: %s\n", OP_SYMBOL(IC_RESULT(dic))->name));
   /* we are interested only if defined in far space */
   /* or in stack space in case of + & - */
   
@@ -2127,7 +2118,6 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
 			 bitVectFirstBit (OP_DEFS (op)))))
     return NULL;
 
-  LRH(printf ("packRegsForOneUse: %s\n", OP_SYMBOL(op)->name));
   /* if that only usage is a cast */
   if (dic->op == CAST) {
     /* to a bigger type */

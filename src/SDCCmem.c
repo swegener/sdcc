@@ -1,9 +1,3 @@
-//#define LIVERANGEHUNT
-#ifdef LIVERANGEHUNT
-  #define LRH(x) x
-#else
-  #define LRH(x)
-#endif
 /*-----------------------------------------------------------------*/
 /* SDCCmem.c - 8051 memory management routines                     */
 /*-----------------------------------------------------------------*/
@@ -852,9 +846,8 @@ allocVariables (symbol * symChain)
       /* then args  processing  */
       if (funcInChain (csym->type))
 	{
-#if 1 // jwk: TODO should have been done already in addDecl() (oclass????)
 	  processFuncArgs (csym);
-#endif
+
 	  /* if register bank specified then update maxRegBank */
 	  if (maxRegBank < FUNC_REGBANK (csym->type))
 	    maxRegBank = FUNC_REGBANK (csym->type);
@@ -1025,10 +1018,7 @@ printAllocInfoSeg (memmap * map, symbol * func, FILE * of)
       if (!sym->allocreq && sym->reqv)
 	{
 	  int i;
-	  if (!OP_SYMBOL(sym->reqv)->nRegs) {
-	    LRH(printf ("*** warning: %s -> %s\n", sym->name, \
-		    OP_SYMBOL(sym->reqv)->name));
-	  }
+
 	  sym = OP_SYMBOL (sym->reqv);
 	  fprintf (of, "registers ");
 	  for (i = 0; i < 4 && sym->regs[i]; i++)

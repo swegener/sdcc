@@ -585,6 +585,22 @@ isPair (asmop * aop)
   return (getPairId (aop) != PAIR_INVALID);
 }
 
+/** Returns TRUE if the registers used in aop cannot be split into high
+    and low halves */
+bool
+isUnsplitable (asmop * aop)
+{
+  switch (getPairId (aop))
+    {
+    case PAIR_IX:
+    case PAIR_IY:
+      return TRUE;
+    default:
+      return FALSE;
+    }
+  return FALSE;
+}
+
 bool
 isPtrPair (asmop * aop)
 {
@@ -1346,6 +1362,11 @@ fetchPairLong (PAIR_ID pairId, asmop * aop, iCode *ic, int offset)
                 if (isUsed)
                   _pop (id);
               }
+          }
+        else if (isUnsplitable(aop))
+          {
+            emit2("push %s", _pairs[getPairId(aop)].name);
+            emit2("pop %s", _pairs[pairId].name);
           }
         else 
           {

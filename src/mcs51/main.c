@@ -212,7 +212,7 @@ static bool cseCostEstimation (iCode *ic, iCode *pdic)
 */
 static const char *_linkCmd[] =
 {
-  "{bindir}{sep}aslink", "-nf", "$1", NULL
+  "aslink", "-nf", "$1", NULL
 };
 
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */

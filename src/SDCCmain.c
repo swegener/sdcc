@@ -862,6 +862,7 @@ parseCmdLine (int argc, char **argv)
 
           if (strcmp (argv[i], OPTION_LESS_PEDANTIC) == 0) 
             {
+	      options.lessPedantic = 1;
               setErrorLogLevel(ERROR_LEVEL_WARNING);
               continue;
             }

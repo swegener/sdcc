@@ -121,7 +121,9 @@ labelIfx (iCode * ic)
 	    {
 
 	      /* get rid of this if */
-	      werror (W_CONTROL_FLOW, loop->filename, loop->lineno);
+	      if (!options.lessPedantic) {
+		werror (W_CONTROL_FLOW, loop->filename, loop->lineno);
+	      }
 	      loop->prev->next = loop->next;
 	      loop->next->prev = loop->prev;
 	      hTabDeleteItem (&labelRef,
@@ -136,7 +138,9 @@ labelIfx (iCode * ic)
 		  IC_FALSE (loop)->key == IC_LABEL (loop->next)->key)
 		{
 		  /* get rid of this if */
-		  werror (W_CONTROL_FLOW, loop->filename, loop->lineno);
+		  if (!options.lessPedantic) {
+		    werror (W_CONTROL_FLOW, loop->filename, loop->lineno);
+		  }
 		  loop->prev->next = loop->next;
 		  loop->next->prev = loop->prev;
 		  hTabDeleteItem (&labelRef,
@@ -156,8 +160,9 @@ labelIfx (iCode * ic)
 	  ((IC_TRUE (loop) && IC_TRUE (loop)->key == IC_LABEL (loop->next)->key) ||
 	   (IC_FALSE (loop) && IC_FALSE (loop)->key == IC_LABEL (loop->next)->key)))
 	{
-
-	  werror (W_CONTROL_FLOW, loop->filename, loop->lineno);
+	  if (!options.lessPedantic) {
+	    werror (W_CONTROL_FLOW, loop->filename, loop->lineno);
+	  }
 	  loop->prev->next = loop->next;
 	  loop->next->prev = loop->prev;
 	  hTabDeleteItem (&labelRef,

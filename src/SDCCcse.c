@@ -1016,7 +1016,9 @@ ifxOptimize (iCode * ic, set * cseSet,
       /* too often, if it does happen then the user pays */
       /* the price */
       computeControlFlow (ebbs, count, 1);
-      werror (W_CONTROL_FLOW, ic->filename, ic->lineno);
+      if (!options.lessPedantic) {
+	werror (W_CONTROL_FLOW, ic->filename, ic->lineno);
+      }
       return;
     }
 
@@ -1030,7 +1032,9 @@ ifxOptimize (iCode * ic, set * cseSet,
 
       remiCodeFromeBBlock (ebb, ic);
       computeControlFlow (ebbs, count, 1);
-      werror (W_CONTROL_FLOW, ic->filename, ic->lineno);
+      if (!options.lessPedantic) {
+	werror (W_CONTROL_FLOW, ic->filename, ic->lineno);
+      }
       return;
     }
 

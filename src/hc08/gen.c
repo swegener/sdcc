@@ -2080,9 +2080,12 @@ asmopToBool (asmop *aop, bool resultInA)
             emitcode ("", "%05d$:", (tlbl->key + 100));
           }
         else
-          werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-                  "Bad rIdx in asmToBool");
-          return;
+          {
+            werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+                    "Bad rIdx in asmToBool");
+            return;
+          }
+        break;
       case AOP_EXT:
         if (resultInA)
           needpula = FALSE;

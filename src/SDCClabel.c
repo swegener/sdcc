@@ -95,6 +95,36 @@ labelGotoNext (iCode * ic)
   return change;
 }
 
+/*-------------------------------------------------------------------*/
+/* deleteIfx - delete an IFX iCode or convert to DUMMY_READ_VOLATILE */
+/*-------------------------------------------------------------------*/
+static void
+deleteIfx (iCode * loop, int key)
+{
+  if (!options.lessPedantic)
+    {
+      werror (W_CONTROL_FLOW, loop->filename, loop->lineno);
+    }
+  hTabDeleteItem (&labelRef, key, loop, DELETE_ITEM, NULL);
+	      
+  /* If the condition was volatile, convert IFX to */
+  /* DUMMY_READ_VOLATILE. Otherwise just delete the */
+  /* IFX iCode */
+  if (IS_OP_VOLATILE (IC_COND (loop)))
+    {
+      IC_RIGHT (loop) = IC_COND (loop);
+      IC_LEFT (loop) = NULL;
+      IC_RESULT (loop) = NULL;
+      loop->op = DUMMY_READ_VOLATILE;
+    }
+  else
+    {
+      loop->prev->next = loop->next;
+      loop->next->prev = loop->prev;
+    }
+}
+
+
 /*-----------------------------------------------------------------*/
 /* labelIfx - special case Ifx elimination                         */
 /*-----------------------------------------------------------------*/
@@ -119,33 +149,16 @@ labelIfx (iCode * ic)
 	  if (IC_TRUE (loop) &&
 	      IC_TRUE (loop)->key == IC_LABEL (loop->next)->key)
 	    {
-
-	      /* get rid of this if */
-	      if (!options.lessPedantic) {
-		werror (W_CONTROL_FLOW, loop->filename, loop->lineno);
-	      }
-	      loop->prev->next = loop->next;
-	      loop->next->prev = loop->prev;
-	      hTabDeleteItem (&labelRef,
-			      (IC_TRUE (loop))->key,
-			      loop, DELETE_ITEM, NULL);
+	      deleteIfx (loop, IC_TRUE (loop)->key);
 	      change++;
-	      continue;
+              continue;
 	    }
 	  else
 	    {
 	      if (IC_FALSE (loop) &&
 		  IC_FALSE (loop)->key == IC_LABEL (loop->next)->key)
 		{
-		  /* get rid of this if */
-		  if (!options.lessPedantic) {
-		    werror (W_CONTROL_FLOW, loop->filename, loop->lineno);
-		  }
-		  loop->prev->next = loop->next;
-		  loop->next->prev = loop->prev;
-		  hTabDeleteItem (&labelRef,
-				  (IC_FALSE (loop))->key,
-				  loop, DELETE_ITEM, NULL);
+		  deleteIfx (loop, IC_FALSE (loop)->key);
 		  change++;
 		  continue;
 		}
@@ -160,14 +173,7 @@ labelIfx (iCode * ic)
 	  ((IC_TRUE (loop) && IC_TRUE (loop)->key == IC_LABEL (loop->next)->key) ||
 	   (IC_FALSE (loop) && IC_FALSE (loop)->key == IC_LABEL (loop->next)->key)))
 	{
-	  if (!options.lessPedantic) {
-	    werror (W_CONTROL_FLOW, loop->filename, loop->lineno);
-	  }
-	  loop->prev->next = loop->next;
-	  loop->next->prev = loop->prev;
-	  hTabDeleteItem (&labelRef,
-			  IC_LABEL (loop->next)->key,
-			  loop, DELETE_ITEM, NULL);
+	  deleteIfx (loop, IC_LABEL (loop->next)->key);
 	  change++;
 	  continue;
 	}

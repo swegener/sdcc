@@ -1347,18 +1347,36 @@ ifxOptimize (iCode * ic, set * cseSet,
       isinSet (ebb->succList, eBBWithEntryLabel (ebbs, label, count)))
     {
 
-      remiCodeFromeBBlock (ebb, ic);
-      computeControlFlow (ebbs, count, 1);
       if (!options.lessPedantic) {
 	werror (W_CONTROL_FLOW, ic->filename, ic->lineno);
       }
-      return;
+      if (IS_OP_VOLATILE (IC_COND (ic)))
+	{
+	  IC_RIGHT (ic) = IC_COND (ic);
+	  IC_LEFT (ic) = NULL;
+	  IC_RESULT (ic) = NULL;
+	  ic->op = DUMMY_READ_VOLATILE;
+	}
+      else
+        {
+	  remiCodeFromeBBlock (ebb, ic);
+	  computeControlFlow (ebbs, count, 1);
+	  return;
+	}      
     }
 
 
   /* if it remains an IFX the update the use Set */
-  OP_USES(IC_COND (ic))=bitVectSetBit (OP_USES (IC_COND (ic)), ic->key);
-  setUsesDefs (IC_COND (ic), ebb->defSet, ebb->outDefs, &ebb->usesDefs);
+  if (ic->op == IFX)
+    {
+      OP_USES(IC_COND (ic))=bitVectSetBit (OP_USES (IC_COND (ic)), ic->key);
+      setUsesDefs (IC_COND (ic), ebb->defSet, ebb->outDefs, &ebb->usesDefs);
+    }
+  else if (ic->op == DUMMY_READ_VOLATILE)
+    {
+      OP_USES(IC_RIGHT (ic))=bitVectSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
+      setUsesDefs (IC_RIGHT (ic), ebb->defSet, ebb->outDefs, &ebb->usesDefs);
+    }
   return;
 }
 

@@ -1987,6 +1987,7 @@ pack:
   return 1;
 }
 
+
 /*------------------------------------------------------------------*/
 /* findAssignToSym : scanning backwards looks for first assig found */
 /*------------------------------------------------------------------*/
@@ -2124,6 +2125,7 @@ static int
 packRegsForSupport (iCode * ic, eBBlock * ebp)
 {
   iCode *dic;
+  int changes = 0;
   
   /* for the left & right operand :- look to see if the
      left was assigned a true symbol in far space in that
@@ -2138,7 +2140,7 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
 	{
 	  /* found it we need to remove it from the block */
 	  reassignAliasedSym (ebp, dic, ic, IC_LEFT(ic));
-	  return 1;
+	  changes++;
 	}
     }
 
@@ -2150,25 +2152,13 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
 
       if (dic)
 	{
-	  /* if this is a subtraction & the result
-	     is a true symbol in far space then don't pack */
-#if 0
-	  if (ic->op == '-' && IS_TRUE_SYMOP (IC_RESULT (dic)))
-	    {
-	      sym_link *etype = getSpec (operandType (IC_RESULT (dic)));
-	      if (IN_FARSPACE (SPEC_OCLS (etype)))
-		return 0;
-	    }
-#endif
-	  /* found it we need to remove it from the
-	     block */
+	  /* found it we need to remove it from the block */
 	  reassignAliasedSym (ebp, dic, ic, IC_RIGHT(ic));
-	  
-	  return 1;
+	  changes++;
 	}
     }
 
-  return 0;
+  return changes;
 }
 
 #define IS_OP_RUONLY(x) (x && IS_SYMOP(x) && OP_SYMBOL(x)->ruonly)
@@ -2502,7 +2492,10 @@ packRegsForAccUse (iCode * ic)
       !IS_BITWISE_OP (uic) &&
       (uic->op != LEFT_OP) &&
       (uic->op != RIGHT_OP) &&
-      (uic->op != GETHBIT))
+      (uic->op != GETHBIT) &&
+      (uic->op != RETURN) &&
+      (uic->op != '~') &&
+      (uic->op != '!'))
     return;
 
 #if 0
@@ -2793,7 +2786,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
 	}
 
       /* reduce for support function calls */
-      if (ic->supportRtn || ic->op == '+' || ic->op == '-')
+      if (ic->supportRtn || (ic->op != IFX && ic->op != JUMPTABLE))
 	packRegsForSupport (ic, ebp);
 
       #if 0
@@ -2905,6 +2898,8 @@ packRegisters (eBBlock ** ebpp, int blockno)
 	   || IS_CONDITIONAL(ic)
 	   || IS_BITWISE_OP (ic)
 	   || ic->op == '='
+           || ic->op == '!'
+           || ic->op == '~'
 	   || ic->op == GETHBIT
 	   || ic->op == LEFT_OP || ic->op == RIGHT_OP || ic->op == CALL
 	   || (ic->op == ADDRESS_OF && isOperandOnStack (IC_LEFT (ic)))

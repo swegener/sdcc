@@ -1299,11 +1299,13 @@ static int packRegsForAssign (iCode *ic,eBBlock *ebp)
 	    dic = NULL;
 	    break;
 	}
+#if 0
 	if (POINTER_SET(dic) && 
 	    IC_RESULT(dic)->key == IC_RESULT(ic)->key ) {
 	    dic = NULL ;
 	    break;
 	}
+#endif
     }
     
     if (!dic)
@@ -1750,15 +1752,20 @@ static void packRegsForAccUse (iCode *ic)
 bool opPreservesA(iCode *ic, iCode *uic)
 {
     /* if the usage has only one operand then we can */
-    if (IC_LEFT(ic) == NULL ||
-	IC_RIGHT(ic) == NULL) 
+    if (IC_LEFT(uic) == NULL ||
+	IC_RIGHT(uic) == NULL) 
 	return TRUE;
+
+    if (getSize(operandType(IC_RESULT(uic))) > 1) {
+	return FALSE;
+    }
 
     if (uic->op != '=' && 
 	!IS_ARITHMETIC_OP(uic) &&
 	!IS_BITWISE_OP(uic)    &&
 	uic->op != EQ_OP &&
 	uic->op != LEFT_OP &&
+	!POINTER_GET(uic) &&
 	uic->op != RIGHT_OP ) {
 	return FALSE;
     }
@@ -1788,7 +1795,7 @@ bool opPreservesA(iCode *ic, iCode *uic)
 static void packRegsForAccUse2(iCode *ic)
 {
     iCode *uic;
-    
+
     /* if + or - then it has to be one byte result.
        MLH: Ok.
      */
@@ -2038,35 +2045,32 @@ static void packRegisters (eBBlock *ebp)
 	    !options.model)
 	    packRegsForOneuse (ic,IC_LEFT(ic),ebp);	
 #endif
-
-	if (!IS_GB) {
-	    /* if pointer set & left has a size more than
+	/* if pointer set & left has a size more than
 	   one and right is not in far space */
-	    if (POINTER_SET(ic)                    &&
-		/* MLH: no such thing.
-		   !isOperandInFarSpace(IC_RIGHT(ic)) && */
-		!OP_SYMBOL(IC_RESULT(ic))->remat   &&
-		!IS_OP_RUONLY(IC_RIGHT(ic))        &&
-		getSize(aggrToPtr(operandType(IC_RESULT(ic)),FALSE)) > 1 )
-
-		packRegsForOneuse (ic,IC_RESULT(ic),ebp);
-
-	    /* if pointer get */
-	    if (POINTER_GET(ic)                    &&
-		/* MLH: dont have far space
-		   !isOperandInFarSpace(IC_RESULT(ic))&& */
-		!OP_SYMBOL(IC_LEFT(ic))->remat     &&
-		!IS_OP_RUONLY(IC_RESULT(ic))         &&
-		getSize(aggrToPtr(operandType(IC_LEFT(ic)),FALSE)) > 1 )
-		packRegsForOneuse (ic,IC_LEFT(ic),ebp);
-	}
-
+	if (POINTER_SET(ic)                    &&
+	    /* MLH: no such thing.
+	       !isOperandInFarSpace(IC_RIGHT(ic)) && */
+	    !OP_SYMBOL(IC_RESULT(ic))->remat   &&
+	    !IS_OP_RUONLY(IC_RIGHT(ic))        &&
+	    getSize(aggrToPtr(operandType(IC_RESULT(ic)),FALSE)) > 1 )
+	    
+	    packRegsForOneuse (ic,IC_RESULT(ic),ebp);
+	
+	/* if pointer get */
+	if (POINTER_GET(ic)                    &&
+	    /* MLH: dont have far space
+	       !isOperandInFarSpace(IC_RESULT(ic))&& */
+	    !OP_SYMBOL(IC_LEFT(ic))->remat     &&
+	    !IS_OP_RUONLY(IC_RESULT(ic))         &&
+	    getSize(aggrToPtr(operandType(IC_LEFT(ic)),FALSE)) > 1 )
+	    packRegsForOneuse (ic,IC_LEFT(ic),ebp);
 	/* pack registers for accumulator use, when the result of an
 	   arithmetic or bit wise operation has only one use, that use is
 	   immediately following the defintion and the using iCode has
 	   only one operand or has two operands but one is literal & the
 	   result of that operation is not on stack then we can leave the
 	   result of this operation in acc:b combination */
+#if 0
 #if 0
 	if ((IS_ARITHMETIC_OP(ic) 
 	     || IS_BITWISE_OP(ic)
@@ -2076,17 +2080,10 @@ static void packRegisters (eBBlock *ebp)
 	    getSize(operandType(IC_RESULT(ic))) <= 2)
 	    packRegsForAccUse (ic);
 #else
-	if (!IS_GB) {
-	    if ((POINTER_GET(ic) ||
-		 IS_ARITHMETIC_OP(ic) ||
-		 IS_BITWISE_OP(ic) ||
-		 ic->op == LEFT_OP ||
-		 ic->op == RIGHT_OP
-		 ) &&
-		IS_ITEMP(IC_RESULT(ic)) &&
-		getSize(operandType(IC_RESULT(ic))) == 1)
-		packRegsForAccUse2(ic);
-	}
+	if (IS_ITEMP(IC_RESULT(ic)) &&
+	    getSize(operandType(IC_RESULT(ic))) == 1)
+	    packRegsForAccUse2(ic);
+#endif
 #endif
     }
 }

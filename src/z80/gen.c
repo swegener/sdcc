@@ -3400,16 +3400,8 @@ static void genGenPointerGet (operand *left,
 	emitcode("ld","%s,%s", ptr, aopGet(AOP(left),0,TRUE));
     else { /* we need to get it byte by byte */
 	if (IS_GB) {
-	    bool hack = 0;
-	    /* PENDING: hack */
-	    if (AOP_SIZE(left) == 1) {
-		hack = 1;
-		AOP_SIZE(left) = 2;
-	    }
 	    emitcode("ld", "e,%s ; 1", aopGet(AOP(left), 0, FALSE));
 	    emitcode("ld", "d,%s ; 2", aopGet(AOP(left), 1, FALSE));
-	    if (hack)
-		AOP_SIZE(left) = 1;
 	}
 	else
 	    fetchHL(AOP(left));
@@ -3611,31 +3603,34 @@ static void genAddrOf (iCode *ic)
     /* if the operand is on the stack then we 
     need to get the stack offset of this
     variable */
-    if (sym->onStack) {
-        /* if it has an offset  then we need to compute it */
-	if (IS_GB) {
+    if (IS_GB) {
+	if (sym->onStack) {
 	    emitcode("lda", "hl,%d+%d+%d(sp)", sym->stack, _pushed, _spoffset);
 	    emitcode("ld", "d,h");
 	    emitcode("ld", "e,l");
-	    aopPut(AOP(IC_RESULT(ic)), "e", 0);
-	    aopPut(AOP(IC_RESULT(ic)), "d", 1);
-	    goto end;
 	}
 	else {
-	    emitcode("push", "de");
+	    emitcode("ld", "de,#%s", sym->rname);
+	}
+	aopPut(AOP(IC_RESULT(ic)), "e", 0);
+	aopPut(AOP(IC_RESULT(ic)), "d", 1);
+    }
+    else {
+	if (sym->onStack) {
+	    /* if it has an offset  then we need to compute it */
+ 	    emitcode("push", "de");
 	    emitcode("push", "ix");
 	    emitcode("pop", "hl");
 	    emitcode("ld", "de,#%d", sym->stack);
 	    emitcode("add", "hl,de");
 	    emitcode("pop", "de");
 	}
+	else {
+	    emitcode("ld", "hl,#%s", sym->rname);
+	}
+	aopPut(AOP(IC_RESULT(ic)), "l", 0);
+	aopPut(AOP(IC_RESULT(ic)), "h", 1);
     }
-    else {
-	emitcode("ld", "hl,#%s", sym->rname);
-    }
-    aopPut(AOP(IC_RESULT(ic)), "l", 0);
-    aopPut(AOP(IC_RESULT(ic)), "h", 1);
-end:
     freeAsmop(IC_RESULT(ic),NULL,ic);
 }
 
@@ -3679,7 +3674,10 @@ static void genAssign (iCode *ic)
 
     if(AOP_TYPE(right) == AOP_LIT)
 	lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
-    if((size > 1) &&
+    if (isPair(AOP(result)) && AOP_TYPE(right) == AOP_LIT) {
+	emitcode("ld", "%s,%s", getPairName(AOP(result)), aopGetWord(AOP(right), 0));
+    }
+    else if((size > 1) &&
        (AOP_TYPE(result) != AOP_REG) &&
        (AOP_TYPE(right) == AOP_LIT) &&
        !IS_FLOAT(operandType(right)) &&

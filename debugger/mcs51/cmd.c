@@ -385,27 +385,31 @@ DEFSETFUNC(symWithAddr)
 /*-----------------------------------------------------------------*/
 static void setBPatModLine (module *mod, int line, char bpType )
 {
-  int next_line;
+    int next_line;
 
     /* look for the first executable line after the line
-       specified & get the break point there */    
+       specified & get the break point there */   
+
+    if ( line < 0 )
+        return;
+
     if (srcMode == SRC_CMODE && line > mod->ncLines) {
-	fprintf(stderr,"No line %d in file \"%s\".\n",
-		line,mod->c_name);
-	return ;
+        fprintf(stderr,"No line %d in file \"%s\".\n",
+                line,mod->c_name);
+        return ;
     }
     
     if (srcMode == SRC_AMODE && line > mod->nasmLines) {
-	fprintf(stderr,"No line %d in file \"%s\".\n",
-		line,mod->asm_name);
-	return ;
+        fprintf(stderr,"No line %d in file \"%s\".\n",
+                line,mod->asm_name);
+        return ;
     }
 
     next_line = line;
     for ( ; next_line < (srcMode == SRC_CMODE ? mod->ncLines : mod->nasmLines ) ; 
 	  next_line++ ) {
 	if (srcMode == SRC_CMODE) {
-	    if (mod->cLines[next_line]->addr) {
+	    if (mod->cLines[next_line]->addr != INT_MAX) {
 		setBreakPoint (mod->cLines[next_line]->addr, CODE, bpType, 
 			       userBpCB, mod->c_name, next_line);
 		return;
@@ -413,7 +417,7 @@ static void setBPatModLine (module *mod, int line, char bpType )
 	    }
 	}
 	else {
-	   if (mod->asmLines[next_line]->addr) {
+	   if (mod->asmLines[next_line]->addr != INT_MAX) {
 	       setBreakPoint (mod->asmLines[next_line]->addr, CODE, bpType, 
 			      userBpCB, mod->asm_name, next_line);
 		return;
@@ -653,10 +657,10 @@ context *discoverContext (unsigned addr, function *func)
 
     /* find the function we are in */
     if (!func && !applyToSet(functions,funcInAddr,addr,&func)) {
-        if (!applyToSet(functions,funcWithName,"main",&func) ||
+        if (!applyToSet(functions,funcWithName,"_main",&func) ||
             !applyToSet(modules,moduleLineWithAddr,addr,&mod,NULL))
         {
-            fprintf(stderr, "Error?:discoverContext: cannot apply addr 0x%x\n",addr);
+            fprintf(stderr, "addr 0x%x in no module/function (runtime env?)\n",addr);
             return NULL;
         }
         currCtxt->func = func;
@@ -933,6 +937,14 @@ static int cmdDisasm (char *s, context *cctxt, int args)
         
     }
     fprintf(stderr,"No function contains specified address.\n");
+    if( saddr >= 0 )
+    {
+        char lbuf[64];
+        sprintf(lbuf,"dis 0x%lx 0 %ld\n",saddr,( eaddr == -1 )?1L:eaddr-saddr);
+        sendSim(lbuf);
+        waitForSim(1000, NULL);
+        fputs(simResponse(),stdout);
+    }
     return 0; 
 }
 /*-----------------------------------------------------------------*/
@@ -1037,7 +1049,11 @@ static int commonSetUserBp(char *s, context *cctxt, char bpType)
 	/* get the lineno */
 	int line = atoi(s) -1;
     Dprintf(D_break, ("commonSetUserBp: b) line:%d \n",line));
-
+    if ( line < 0 )
+    {
+		fprintf(stdout,"linenumber <= 0\n");
+        goto ret;
+    }
 	/* if current context not present then we must get the module
 	   which has main & set the break point @ line number provided
 	   of that module : if current context known then set the bp 
@@ -1233,9 +1249,12 @@ int cmdListAsm (char *s, context *cctxt)
     if (  cctxt && cctxt->func) 
     {
         /* actual line */
-        if (printAsmLine(cctxt->func,cctxt->func->mod,
+        if ( cctxt->addr != INT_MAX )
+        {
+            if (printAsmLine(cctxt->func,cctxt->func->mod,
                          (long)cctxt->addr,(long)cctxt->addr))
             return 0; 
+        }
     }
     return 0;
 }
@@ -1427,7 +1446,7 @@ int cmdDelUserBp (char *s, context *cctxt)
 int cmdStepi (char *s, context *cctxt)
 {
 
-    if (STACK_EMPTY(callStack))
+    if (0 /*STACK_EMPTY(callStack)*/)
         fprintf(stdout,"The program is not being run.\n");
     else 
     {

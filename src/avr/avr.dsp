@@ -40,8 +40,8 @@ RSC=rc.exe
 # PROP Output_Dir "Debug"
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /MLd /W3 /Gm /GX /ZI /Od /I ".." /I "." /I "..\.." /I "..\..\support\util" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /FR /FD /GZ /Zm500 /c
-# ADD CPP /nologo /MLd /W3 /Gm /GX /ZI /Od /I ".." /I "." /I "..\.." /I "..\..\support\util" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /FR /FD /GZ /Zm500 /c
+# ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /I ".." /I "." /I "..\.." /I "..\..\support\util" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /FR /FD /GZ /Zm500 /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I ".." /I "." /I "..\.." /I "..\..\support\util" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /FR /FD /GZ /Zm500 /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -64,7 +64,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /ML /W3 /GX /O2 /I ".." /I "." /I "..\.." /I "..\..\support\util" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /FD /Zm500 /c
-# ADD CPP /nologo /ML /W3 /GX /O2 /I ".." /I "." /I "..\.." /I "..\..\support\util" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /FD /Zm500 /c
+# ADD CPP /nologo /ML /W3 /GX /O2 /I ".." /I "." /I "..\.." /I "..\..\support\util" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /FD /Zm1000 /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe

@@ -1,6 +1,10 @@
 2003-05-24  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	* as/mcs51/lkaomf51.c: Address space 'z' was missing.
+	* src/avr/avr.dsp, src/ds390/ds390.dsp, src/mcs51/mcs51.dsp,
+	  src/pic/pic.dsp, src/pic16/pic16.dsp, src/xa51/xa51.dsp,
+	  src/x80/z80.dsp: peep.rul is bigger now, so /Zm1000 is used
+	  instead of /Zm500.
 
 2003-05-25  Frieder Ferlemann <Frieder.Ferlemann@web.de>
 

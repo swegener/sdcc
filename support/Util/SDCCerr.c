@@ -42,15 +42,15 @@ struct  {
 	char	*errText ;
 } ErrTab [] =
 {
-{  ERROR  ,"error *** Duplicate symbol '%s', symbol IGNORED\n"		      },
-{ ERROR  ,"error *** Syntax Error Declaration ingonerd\n"			      },
+{ ERROR  ,"error *** Duplicate symbol '%s', symbol IGNORED\n"		      },
+{ ERROR  ,"error *** Syntax Error Declaration ignored\n"			      },
 { ERROR  ,"error *** Constant Expected Found Variable\n"                          },
 { ERROR  ,"error *** 'malloc' failed file '%s' for size %ld\n"	              },
 { ERROR  ,"error *** 'fopen' failed on file '%s'\n"		                      },
 { ERROR  ,"error *** Internal Error Oclass invalid '%s'\n"			      },
 { ERROR  ,"error *** Cannot allocate variable '%s'.\n"			      },
 { ERROR  ,"error *** Old style C declaration. IGNORED '%s'\n"		      },
-{ ERROR  ,"error *** Out of stack Space. '%s' not allocted\n"		      },
+{ ERROR  ,"error *** Out of stack Space. '%s' not allocated\n"		      },
 { ERROR  ,"error *** FATAL Compiler Internal Error in file '%s' line number '%d' : %s \nContact Author with source code\n" },
 { ERROR  ,"error *** 'lvalue' required for '%s' operation .\n"		      },
 { ERROR  ,"error *** Creation of temp file failed\n"			      },
@@ -144,7 +144,7 @@ struct  {
 { ERROR  ,"error *** variable '%s' declared in code space must have initialiser\n" },
 { ERROR  ,"error *** operands not integral for assignment operation\n"            },
 { ERROR  ,"error *** too many parameters \n"                                      },
-{ ERROR  ,"error *** to few parameters\n"                                         },
+{ ERROR  ,"error *** too few parameters\n"                                         },
 { ERROR  ,"error *** code not generated for '%s' due to previous errors\n"},
 { WARNING,"warning *** type mismatch for parameter number %d\n"},
 { ERROR  ,"error *** invalid float constant '%s'\n"},

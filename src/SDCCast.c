@@ -556,9 +556,11 @@ void reverseParms (ast *ptree)
 /* processParms  - makes sure the parameters are okay and do some  */
 /*                 processing with them                            */
 /*-----------------------------------------------------------------*/
-int processParms (ast *func, value *defParm,
-      ast *actParm,
-      int *parmNumber)
+int processParms (ast 	*func,
+		  value *defParm,
+      		  ast 	*actParm,
+      		  int 	*parmNumber,
+      		  bool 	rightmost)
 {
     sym_link *fetype = func->etype;
 
@@ -633,8 +635,8 @@ int processParms (ast *func, value *defParm,
         }
         else if ( actParm->type == EX_OP && actParm->opval.op == PARAM)
       {
-      return (processParms (func,NULL,actParm->left,parmNumber) ||
-              processParms (func,NULL,actParm->right,parmNumber) );
+      return (processParms(func,NULL,actParm->left,parmNumber,FALSE) ||
+              processParms(func,NULL,actParm->right,parmNumber,rightmost));
         }
         return 0;
     }
@@ -647,22 +649,27 @@ int processParms (ast *func, value *defParm,
 
     resolveSymbols(actParm);
     /* if this is a PARAM node then match left & right */
-    if ( actParm->type == EX_OP && actParm->opval.op == PARAM) {
-      return (processParms (func,defParm,actParm->left,parmNumber) ||
-              processParms (func,defParm->next, actParm->right,parmNumber) );
+    if ( actParm->type == EX_OP && actParm->opval.op == PARAM) 
+    {
+      return (processParms(func,defParm,actParm->left,parmNumber,FALSE) ||
+              processParms(func,defParm->next, actParm->right,parmNumber,rightmost));
     }
-#if 0
-    /* Pending discussion with Johan. */
-    else {
-      /* if more defined parameters present but no more actual parameters */
-      if (defParm->next) {
-  werror(E_TOO_FEW_PARMS);
-  return 1;
-      }
+    else 
+    {
+        /* If we have found a value node by following only right-hand links,
+         * then we know that there are no more values after us.
+         *
+         * Therefore, if there are more defined parameters, the caller didn't
+         * supply enough.
+         */
+        if (rightmost && defParm->next) 
+        {
+	    werror(E_TOO_FEW_PARMS);
+	    return 1;
+        }
     }
-#endif
-
-    /* the parameter type must be atleast castable */
+    
+    /* the parameter type must be at least castable */
     if (checkType(defParm->type,actParm->ftype) == 0) {
   werror(E_TYPE_MISMATCH_PARM,*parmNumber);
         werror(E_CONTINUE,"defined type ");
@@ -2768,7 +2775,7 @@ ast *decorateType (ast *tree)
 
   if (processParms (tree->left,
         tree->left->args,
-        tree->right,&parmNumber))
+        tree->right,&parmNumber,TRUE))
       goto errorTreeReturn ;
 
   if (options.stackAuto || IS_RENT(LETYPE(tree))) {

@@ -136,5 +136,6 @@
 #define	 W_UNSUPPORTED_MODEL 133	/* Unsupported model, ignored */
 #define	 W_BANKED_WITH_NONBANKED 134	/* banked and nonbanked attributes mixed */
 #define	 W_BANKED_WITH_STATIC 135	/* banked and static mixed */
+#define  W_INT_TO_GEN_PTR_CAST 136	/* Converting integer type to generic pointer. */
 
 void werror(int, ...);

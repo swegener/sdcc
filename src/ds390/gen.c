@@ -7681,17 +7681,54 @@ static void genCast (iCode *ic)
 
 	int p_type;
 	link *type = operandType(right);
-	link *etype = getSpec(type);
 
 	/* pointer to generic pointer */
 	if (IS_GENPTR(ctype)) {
 	    char *l = zero;
 	    
 	    if (IS_PTR(type)) 
+	    {
 		p_type = DCL_TYPE(type);
-	    else {
+	    }
+	    else 
+	    {
+#if OLD_CAST_BEHAVIOR
+		/* KV: we are converting a non-pointer type to
+		 * a generic pointer. This (ifdef'd out) code
+		 * says that the resulting generic pointer 
+		 * should have the same class as the storage
+		 * location of the non-pointer variable.
+		 * 
+		 * For example, converting an int (which happens
+		 * to be stored in DATA space) to a pointer results
+		 * in a DATA generic pointer; if the original int
+		 * in XDATA space, so will be the resulting pointer.
+		 *
+		 * I don't like that behavior, and thus this change:
+		 * all such conversions will be forced to XDATA and
+		 * throw a warning. If you want some non-XDATA
+		 * type, or you want to suppress the warning, you
+		 * must go through an intermediate cast, like so:
+		 *
+		 * char _generic *gp = (char _xdata *)(intVar);
+		 */
+		link *etype = getSpec(type);		 
+
 		/* we have to go by the storage class */
-		p_type = PTR_TYPE(SPEC_OCLS(etype));
+		if (SPEC_OCLS(etype) != generic)
+		{
+		    p_type = PTR_TYPE(SPEC_OCLS(etype));
+		}
+		else
+#endif		
+		{
+		    /* Converting unknown class (i.e. register variable)
+		     * to generic pointer. This is not good, but
+		     * we'll make a guess (and throw a warning).
+		     */
+		    p_type = FPOINTER;
+		    werror(W_INT_TO_GEN_PTR_CAST); 	     
+		}
 	    }
 		
 	    /* the first two bytes are known */
@@ -7703,6 +7740,7 @@ static void genCast (iCode *ic)
 		       offset);
 		offset++;
 	    }
+	    
 	    /* the last byte depending on type */
 	    switch (p_type) {
 	    case IPOINTER:
@@ -7721,7 +7759,7 @@ static void genCast (iCode *ic)
 		
 	    default:
 		/* this should never happen */
-        werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
+        	werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
 		       "got unknown pointer type");
 		exit(1);
 	    }

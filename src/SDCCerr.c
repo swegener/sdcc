@@ -156,7 +156,8 @@ struct  {
 { WARNING,"warning *** Indirect call to a banked function not implemented.\n"},
 { WARNING,"warning *** Model '%s' not supported for %s, ignored.\n"},
 { WARNING,"warning *** Both banked and nonbanked attributes used.  nonbanked wins.\n"},
-{ WARNING,"warning *** Both banked and static used.  static wins.\n"}
+{ WARNING,"warning *** Both banked and static used.  static wins.\n"},
+{ WARNING,"warning *** converting integer type to generic pointer: assuming XDATA\n"}
 };
 
 void	vwerror (int errNum, va_list marker)

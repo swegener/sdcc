@@ -288,7 +288,7 @@ void	printUsage ()
 		 "PreProcessor Options :-\n"
 		 "\t-Dmacro		-	Define Macro\n"		 
 		 "\t-Ipath		-	Include \"*.h\" path\n"
-		 "Note: this is a complete list of options see docs for details\n",
+		 "Note: this is NOT a complete list of options see docs for details\n",
 		 _ports[0]->target
 		 );		
 	exit (0);

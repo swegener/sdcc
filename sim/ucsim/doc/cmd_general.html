@@ -1,0 +1,659 @@
+<html>
+<head>
+<title>General commands of uCsim</title>
+</head>
+
+<body bgcolor="white">
+
+<h2>General commands of uCsim</h2>
+
+                                                              <!-- GENERAL -->
+
+Some commands can be repeated by entering an empty command (just
+pressing ENTER if command console is interactive). This repeats the
+<b>full</b> command entered previously precisely including parameters
+of the command. Repeatable commands are signed with <img
+src="burst.gif" alt="[Repeatable]"> icon.
+
+<p>Some commands accept parameters which in most cases can be
+numbers. Numbers can be entered in C-style form. If the number begins
+whith <tt><b>0x</b></tt> or <tt><b>0X</b></tt> it is interpreted as a
+hexadecimal number. If it begins with <tt><b>0</b></tt> followed by
+digits it is interpreted as octal number. In other cases it is
+interpreted as decimal number.
+
+<p>Every command which changes content of ROM area such as <b><a
+href="#l">l</a></b>, <b><a href="#dl">dl</a></b> or <b><a
+href="#sc">sc</a></b> deletes result of code analyzer and causes to
+re-analyze the code.
+
+
+<a name="show"><h3>show c|w</h3></a>
+
+This command can be used to list licensing information. If <b>c</b>
+option has given, the license is listed. It is first 10 point of the
+version 2 of GNU Genral Public License. Using <b>w</b> parameter the
+command prints out last 2 point of the license ("NO WARRANTY"
+message). If you do not accept GPL simply do not use the program.
+
+
+<a name="dl"><h3>download,dl</h3></a>
+
+Download command. It is same as <a href="#l">load</a> above but it
+reads information from command console which is standard input by
+default. This command stops read records when it detects an "END"
+record which is normaly the last record. This command has two
+equivalent forms <b>download</b> and <b>dl</b>.
+
+<pre>
+$ <font color="#118811">s51 -V</font>
+ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+> <font color="#118811">do
+:03000000020003F8
+:1000030075812078207600D8FC900000AE83AF8203
+:100013009000001200416005E4F0A380F690009F79
+:1000230012004A9000A312004A9000A712006890A1
+:1000330000AD12006875D0001200B50200B3EF6581
+:10004300827003EE658322E493F8740193F97402DA
+:1000530093FE740393F5828E83E869700122E4931F
+:10006300F6A30880F4E493FC740193FD740293FEF9
+:10007300740393FF740493F8740593F582888312D1
+:100083000041700122E493A3A883A9828C838D820B
+:10009300F0A3AC83AD828883898280E3212100B5FC
+:1000A300212100B5000000B500B5000000B500B582
+:0200B30080FECD
+:1000B5007520117501AA850120750102850120228F
+:00000001FF</font>
+197 bytes loaded
+> </pre>
+
+
+<a name="q"><h3>quit</h3></a>
+
+Quit. This command terminates actual console, it does not ask you to
+confirm your intention. Simulator always reads commands from a file so
+end of file condition finishes too. If command console is on standard
+input/output, pressing the CTRL-D will quit just like the quit
+command.
+
+<p>Note that if <a href="invoke.html#Zoption">-Z option</a> was used at
+invokation then the quit command does not terminate the simulator
+program. In this case <a href="#kill">kill</a> command can be used to
+terminate the simulator. See for more information about <a
+href="mulcons.html">using multiple consoles</a>.
+
+<pre>$ <font color="#118811">s51</font>
+ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+> <font color="#118811">q</font>
+$ </pre>
+
+
+<a name="kill"><h3>kill</h3></a>
+
+This kommand terminates the simulator. It does not ask for
+confirmation. It doesn't matter how many consoles are used and what
+commands are running on them.
+
+
+<a name="h"><h3>help,?</h3></a>
+
+Help command. It prints out short description of the commands.
+
+
+<a name="reset"><h3>reset</h3></a>
+
+Reset command. It resets the microcontroller. It has same effect as
+active signal on the RST pin.
+
+<pre>
+$ <font color="#118811">s51 -V remoansi.hex</font>
+ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+58659 bytes read from remoansi.hex
+> <font color="#118811">dr</font>
+000000 00 00 00 00 00 00 00 00 ........
+000000 00 .  ACC= 0x00   0 .  B= 0x00   DPTR= 0x0000 @DPTR= 0x00   0 .
+000000 00 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
+   000000 02 01 60 LJMP  0160
+> <font color="#118811">s 2</font>
+000000 00 00 00 00 00 00 00 00 ........
+000000 00 .  ACC= 0x00   0 .  B= 0x00   DPTR= 0x0000 @DPTR= 0x00   0 .
+000000 00 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
+   000160 c2 90    CLR   P1.0
+000000 00 00 00 00 00 00 00 00 ........
+000000 00 .  ACC= 0x00   0 .  B= 0x00   DPTR= 0x0000 @DPTR= 0x00   0 .
+000000 00 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
+   000162 c2 97    CLR   P1.7
+> <font color="#118811">res</font>
+> <font color="#118811">dr</font>
+000000 00 00 00 00 00 00 00 00 ........
+000000 00 .  ACC= 0x00   0 .  B= 0x00   DPTR= 0x0000 @DPTR= 0x00   0 .
+000000 00 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
+   000000 02 01 60 LJMP  0160
+> </pre>
+
+
+<a name="wi"><h3>wi,Wi string</h3></a>
+
+Searching for specified string in internal RAM area. String is
+interpreted from first non-space sharacter until end of the command
+including spaces. <b>wi</b> command makes case insensitive search and
+<b>Wi</b> can be used to make case sensitive search. Result is a hexa
+dump of memory areas that match with specified string. Most of C-style
+escape sequences can be used in the string: <tt>\f</tt>, <tt>\n</tt>,
+<tt>\r</tt>, <tt>\t</tt>, <tt>\v</tt>, <tt>\a</tt>, <tt>\b</tt>,
+<tt>\0</tt>, and <tt>\0xxx</tt> where <tt>xxx</tt> is an octadecimal
+number of the code of the character.
+
+<pre>
+$ <font color="#118811">s51 remoansi.hex</font>
+ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+58659 bytes read from remoansi.hex
+> <font color="#118811">g</font>
+Simulation started, PC=0x000000
+
+Stop at 00019c: (7) User stopped
+F 00019c
+> <font color="#118811">si 20 Dani DAni</font>
+000014 44 61 6e 69 44 41 6e 69                         DaniDAni
+> <font color="#118811">wi dani</font>
+000014 44 61 6e 69             Dani
+000018 44 41 6e 69             DAni
+> <font color="#118811">Wi Dani</font>
+000014 44 61 6e 69             Dani
+> <font color="#118811">wi dani\0</font>
+000018 44 41 6e 69 00          DAni.
+> </pre>
+
+
+<a name="wx"><h3>wx,Wx string</h3></a>
+
+Search commands. These commands are similar to <a href="#wi"><b>wi,
+Wi</b></a> commands the only difference is that <b>wx,Wx</b> are used
+to search for a string in external memory.
+
+
+<a name="wc"><h3>wc,Wc string</h3></a>
+
+Search commands. These commands are similar to <a href="#wi"><b>wi,
+Wi</b></a> commands the only difference is that <b>wx,Wx</b> are used
+to search for a string in code memory area.
+
+
+<a name="gopt"><h3>gopt [opt]</h3></a>
+
+Get actual value of option(s). Some options can be set by <a
+href="#sopt"><b>sopt</b></a> to modify behavior of the
+simulator. Using <b>gopt</b> you can get actual value of these
+options. If you use this command without parameter you get list of all
+options known by the program. In this way you can figure out which
+options can be used.
+
+<pre>
+$ <font color="#118811">s51 -V</font>
+ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+> <font color="#118811">gopt</font>
+verbose TRUE Verbose flag.
+stopit FALSE Stop if interrupt accepted.
+debug FALSE Debug flag.
+> <font color="#118811">gopt stopit</font>
+stopit FALSE Stop if interrupt accepted.
+> </pre>
+
+This version of the simulator knows about three options. First element
+of the list is name of the option (<b>verbose</b>, <b>debug</b> and
+<b>stopit</b>). This name can be used to identify the option in
+<b>gopt</b> and <a href="#sopt"><b>sopt</b></a> command. Second
+element of the list is the value of the option. In this case type of
+both options is boolean, their value can be TRUE or FALSE. Third
+element is a short description of the option.
+
+<dl><dt><b>verbose</b> <dd>?
+
+<dt><b>debug</b> <dd>Debug flag can be set by <b>-V</b> option of the
+program to TRUE otherwise its default value is FALSE. If it is TRUE,
+the simulator prints out short messages about important events.
+
+<dt><b>stopit</b> <dd>Setting this option to TRUE (default value is
+FALSE) forces execution to stop every time when CPU accepts an
+interrupt. You do not have to use breakpoints to inspect interrupts.
+
+</dl>
+
+
+<a name="sopt"><h3>sopt opt value</h3></a>
+
+Set option value. Options described at previous command (<a
+href="#gopt"><b>gopt</b></a>) can be set using this command. First
+parameter must be an option name and second the new
+value. Interpretation of the value depends on type of the
+option. Value for a boolean type of option interpreted as follows: if
+first character of the value is one of <tt>1</tt>, <tt>t</tt>,
+<tt>T</tt>, <tt>y</tt>, <tt>Y</tt> then value will be TRUE otherwise
+it will be FALSE.
+
+<pre>
+$ <font color="#118811">s51 -V</font>
+ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+> <font color="#118811">gopt</font>
+verbose TRUE Verbose flag.
+stopit FALSE Stop if interrupt accepted.
+debug FALSE Debug messages appears on this console.
+> <font color="#118811">sopt debug t</font>
+> <font color="#118811">gopt</font>
+verbose TRUE Verbose flag.
+stopit FALSE Stop if interrupt accepted.
+debug TRUE Debug messages appears on this console.
+> </pre>
+
+
+<a name="conf"><h3>conf </h3></a>
+
+This command prints out configuration of the simulator:
+
+<pre>
+> <font color="#118811">conf</font>
+ucsim version 0.2.37
+Type of microcontroller: 51 CMOS
+Controller has 8 hardware element(s).
+  timer0[0]
+  timer1[1]
+  uart[0]
+  port[0]
+  port[1]
+  port[2]
+  port[3]
+  irq[0]
+Memories:
+  ROM  size= 0x010000 65536
+  XRAM size= 0x010000 65536
+  IRAM size= 0x000100 256
+  SFR  size= 0x000100 256
+> 
+</pre>
+
+First line contains version number of the program. Second line informs
+about type of the simulated microcontroller. Third line prints out how
+many hardware elements are simulated. Following lines contain
+information about memories. Note that size of the simulated memory
+segment can be bigger than size of addressable part of the memory as
+you see above SFR type of the memory has bigger simulated than
+addressable size.
+
+
+<a name="state"><h3>state</h3></a>
+
+State of the simulator and the simulated microcontroller:
+
+<pre>
+> <font color="#118811">state</font>
+CPU state= OK PC= 0x004349 XTAL= 1.10592e+07
+Total time since last reset= 0.614873 sec (6800004 clks)
+Time in isr = 0.0144227 sec (159504 clks) 2.3%
+Time in idle= 0 sec (0 clks)   0%
+Max value of stack pointer= 0x000049, avg= 0x000026
+> 
+</pre>
+
+The "CPU state" in the first line is an internal information. PC is
+value of the program counter. First line shows XTAL frequency too.
+
+<p>Following lines contain information about simulated time. First,
+full simulated time (elapsed from last reset) is printed out in
+seconds and number of clock periods then same data is printed out
+about time spent in interrupt service routines as well as in idle
+mode. Last data in lines of ISR and IDLE time shows ratio of ISRs,
+Idle times and main program.
+
+<p>Last line infroms about maximum value of the stack pointer and a
+"not very well" calculated average value of it.
+
+
+<a name="file"><h3>file,load "FILE"</h3></a>
+
+Loads file named FILE into the simulated code memory. File must
+contain data in Intel HEX format.
+
+<pre>
+> <font color="#118811">file "../../remo.hex"</font>
+55470 words read from ../../remo.hex
+> 
+</pre>
+
+Don't forget to enclose file name in quotes to make the parameter to
+be a string.
+
+
+<a name="info"><h3>info</h3></a>
+
+This command prints out information about different things which must
+be specified as paramater to the command. Following subcommands are
+known:
+
+<p>info <a href="#info_bp">breakpoints</a>
+<br>info <a href="#info_reg">registers</a>
+<br>info <a href="#info_hw">hardware</a>
+
+
+<a name="info_bp"><h4>info breakpoints</h4></a>
+
+This subcommand prints out information about breakpoints:
+
+<pre>
+> <font color="#118811">b 12</font>
+Breakpoint 1 at 0x00000c: MOV   R7,A
+> <font color="#118811">tb 43</font>
+Breakpoint 2 at 0x00002b: MOV   R7,A
+> <font color="#118811">bse ws f 0x80</font>
+> <font color="#118811">i b</font>
+Num Type       Disp Hit   Cnt   Address  What
+1   fetch      keep 1     1     0x00000c MOV   R7,A
+2   fetch      del  1     1     0x00002b MOV   R7,A
+1   event      keep 1     1     0x000080 ws
+> 
+</pre>
+
+As you see above, the command can be shortened to "i b". The list of
+breakpoints contains 7 columns:
+
+<dl><dt><b>Num</b> <dd>Number of the breakpoint. Normal and event
+breakpoints are numbered separately.
+
+<dt><b>Type</b> <dd>This column shows type of the breakpoint. It can
+be <i>fetch</i> for normal breakpoints or <i>event</i> for event
+breakpoints. First the normal breakpoints are listed and then the
+event breakpoints.
+
+<dt><b>Disp</b> <dd>This shows if the breakpoint is temporary
+(<i>del</i>) or not (<i>keep</i>).
+
+<dt><b>Hit</b> <dd>How many times the breakpoint must be hit before it
+really stops the program.
+
+<dt><b>Cnt</b> <dd>Counter of breakpint hits. This counter decrements
+and the breakpoint is activated if it reaches zero.
+
+<dt><b>Address</b> <dd>Address where the breakpoint is set.
+
+<dt><b>What</b> <dd>For normal breakpoints this field contains
+disassembled instruction where the breakpoint is set. For event
+breakpoints it contains type of event.
+
+</dl>
+
+<a name="info_reg"><h4>info registers</h4></a>
+
+This subcommand prints out full register set of the CPU. Output of
+this command depends of type of CPU.
+
+<h5>Registers of MCS51 family</h5>
+
+<pre>
+$ <font color="#118811">s51 remoansi.hex</font> 
+ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+58659 bytes read from remoansi.hex
+> <font color="#118811">sopt stopit 1</font>
+> <font color="#118811">g</font>
+5
+ * 000023 02 01 1c LJMP  011c
+> <font color="#118811">i r</font>
+000000 18 02 16 ba 00 02 00 0a ........
+000018 4a J  ACC= 0x0a  10 .  B= 0x00   DPTR= 0x16ba @DPTR= 0x00   0 .
+000002 16 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
+ * 000023 02 01 1c LJMP  011c
+> </pre>
+
+In first line the actual register bank is dumped out. Register banks
+reside in internal RAM, address at the begining of the line shows
+start address of actual register bank selected by RS0 and RS1 bits of
+PSW register.
+
+<p>Next two lines begin with value of indirectly addressed internal
+RAM cells. Second line shows IRAM cell pointed by R0 while third line
+shows IRAM addressed by R1.
+
+<p>Second line displays some important registers. First one is the
+accumulator. Its value dumped out in hexadecimal, decimal form and
+then the ASCII character of its value. It is followed by value of the
+B register which is dumped out in hexadecimal form only. Next is DPTR
+register in hexadecimal and then external RAM cell which is addressed
+by DPTR. This is dumped out in hexadecimal, decimal and ASCII too.
+
+<p>In third line you find program status word in hexadecimal and then
+some flag bits of PSW register. Last line is disassembled instruction
+at PC.
+
+<h5>Registers of AVR family</h5>
+
+<pre>
+$ <font color="#118811">savr test_arith.hex</font>
+ucsim 0.2.37, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+> 83 words read from test_arith.hex
+83 words read from test_arith.hex
+> <font color="#118811">run</font>
+
+Stop at 0x000047: (105) User stopped
+F 0x000047
+> <font color="#118811">i r</font>
+000000 00 2c 21 23 20 35 19 14 03 00 00 00 00 00 00 00 .,!# 5..........
+000010 00 01 1e 89 01 00 10 e2 14 00 01 10 00 00 00 00 ................
+ITHSVNZC  SREG= 0x03   3 .
+00000011  SP  = 0x000000
+X= 0x1001 [X]= 0x00   0 .  Y= 0x0000 [Y]= 0x00   0 .  Z= 0x0000 [Z]= 0x00   0 .
+ * 000047 940c 0047 jmp   0x000047
+> 
+</pre>
+
+First two lines show first 32 bytes of internal RAM which is the
+register set of AVR controllers.
+
+<p>At the beginning of next two lines bits of status register are
+printed. These lines present hexadecimal, decimal and ASCII values of
+the status register too, and value of the stack pointer.
+
+<p>Following line shows indirect addressing registers X, Y, and Z as
+well as pointed memory values.
+
+<p>Last line is disassembled instruction ap PC.
+
+<a name="info_hw"><h4>info hardware|hw cathegory [id]</h4></a>
+
+This subcommand prints out information about a unit of the
+controller. Cathegory can be:
+
+<ul><li>timer
+<li>uart
+<li>port
+<li>pca
+<li>interrupt
+<li>wdt
+</ul>
+
+Ouput format of this command depends on CPU family and type of the CPU
+too because requested unit can be different in different type of
+controller even in the same CPU family.
+
+<pre>
+$ <font color="#118811">s51 -t 51</font>
+ucsim 0.2.36, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+> <font color="#118811">i h t</font>
+timer0[0] 0x0000 13 bit timer OFF irq=0 dis prio=0
+timer1[1] 0x0000 13 bit timer OFF irq=0 dis prio=0
+> 
+</pre>
+
+Timer #2 differs a little bit from other timers of MCS51:
+
+<pre>
+$ <font color="#118811">s51 -t 52</font>
+ucsim 0.2.36, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+> <font color="#118811">i h t</font>
+timer0[0] 0x0000 13 bit timer OFF irq=0 dis prio=0
+timer1[1] 0x0000 13 bit timer OFF irq=0 dis prio=0
+timer2[2] 0x0000 reload 0x0000 timer OFF irq=0 dis prio=0
+> 
+</pre>
+
+<p>If the controller contains more than one unit of a cathegory, then
+optional <b>id</b> parameter can be used to select a specific one. If
+<b>id</b> is not used then information is printed about all units
+belonging to specified cathegory.
+
+<pre>
+> <font color="#118811">i h t 1</font>
+timer1[1] 0x0000 13 bit timer OFF irq=0 dis prio=0
+> 
+</pre>
+
+It is possible that there is no unit belonging to some cathegory. It
+is also possible that the specific unit exists but information command
+of that unit is not implemented, in this case you have to check SFRs
+of the unit...
+
+<pre>
+> <font color="#118811">i h pca</font>
+> 
+</pre>
+
+Information you can get about units of MCS51 controllers:
+
+<pre>
+$ <font color="#118811">s51 -t 251</font> 
+ucsim 0.2.37, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+> <font color="#118811">g</font>
+Simulation started, PC=0x000000
+
+Stop at 0x000023: (105) User stopped
+F 0x000023
+> <font color="#118811">i h t</font>
+timer0[0] 0xaa8d 16 bit timer ON irq=0 en prio=0
+timer1[1] 0xfdff 8 bit autoreload timer ON irq=1 dis prio=0
+timer2[2] 0x0000 reload 0x0000 timer OFF irq=0 dis prio=0
+> <font color="#118811">i h u</font>
+uart[0] 8 bit UART timer clocked MultiProc=none irq=en prio=1
+Receiver ON RB8=1 irq=0
+Transmitter TB8=1 irq=1
+> <font color="#118811">i h po</font>
+port[0]
+P0    11111111 0xff 255 . (Value in SFR register)
+Pin0  11111111 0xff 255 . (Output of outside circuits)
+Port0 11111111 0xff 255 . (Value on the port pins)
+port[1]
+P1    11111111 0xff 255 . (Value in SFR register)
+Pin1  11111111 0xff 255 . (Output of outside circuits)
+Port1 11111111 0xff 255 . (Value on the port pins)
+port[2]
+P2    11111111 0xff 255 . (Value in SFR register)
+Pin2  11111111 0xff 255 . (Output of outside circuits)
+Port2 11111111 0xff 255 . (Value on the port pins)
+port[3]
+P3    11111111 0xff 255 . (Value in SFR register)
+Pin3  11111111 0xff 255 . (Output of outside circuits)
+Port3 11111111 0xff 255 . (Value on the port pins)
+> <font color="#118811">i h i</font>
+Interrupts are enabled. Interrupt sources:
+  Handler  En  Pr Req Act Name
+  0x000003 en   1 no  act external #0
+  0x00000b en   0 no  act timer #0
+  0x000013 en   1 no  act external #1
+  0x00001b dis  0 YES act timer #1
+  0x000033 dis  0 no  act PCA counter
+  0x000033 dis  0 no  act PCA module #0
+  0x000033 dis  0 no  act PCA module #1
+  0x000033 dis  0 no  act PCA module #2
+  0x000033 dis  0 no  act PCA module #3
+  0x000033 dis  0 no  act PCA module #4
+  0x000023 en   1 YES act serial transmit
+  0x000023 en   1 no  act serial receive
+  0x00002b dis  0 no  act timer #2 TF2
+  0x00002b dis  0 no  act timer #2 EXF2
+Active interrupt service(s):
+  Pr Handler  PC       Source
+   1 0x000023 0x003672 serial transmit
+>
+</pre>
+
+
+<a name="timer"><h3>timer a|d|g|r|s|v id [value]</h3></a>
+
+Handling of timers. First parameter of timer command determines the
+operation which can be
+
+<dl><dt><b>add (or simply a)</b> <dd>to create a new timer. New timers
+are turned ON by default and initialized to value 0.
+
+<dt><b>del (or simply d)</b> <dd>to remove a timer if you don't need
+it any more.
+
+<dt><b>get (or simply g)</b> <dd>to get value of timers. See comment
+below.
+
+<dt><b>run (or simply r)</b> <dd>to turn a timer ON.
+
+<dt><b>stop (or simply s)</b> <dd>to turn a timer OFF. It still exist
+but doesn't count xtal periods.
+
+<dt><b>value (or simply v)</b> <dd>to set value of the timer (number
+of xtal periods). `param' is the new value.
+
+</dl>
+
+<b>id</b> can be a number or a string. Timers are numbered from 1. You
+can use any number greater than 0 to identify a timer. Or you can use
+a simbolic name, in this case simulator uses the first unused number
+to allocate a new timer:
+
+<pre>
+> <font color="#118811">tim a 3</font>
+> <font color="#118811">tim g 0</font>
+timer #0("time") ON: 0.463255 sec (5123232 clks)
+timer #0("isr") ON: 0.0051888 sec (57384 clks)
+timer #3("unnamed") ON: 0 sec (0 clks)
+> <font color="#118811">tim a "a"</font>
+> <font color="#118811">tim g 0</font>
+timer #0("time") ON: 0.463255 sec (5123232 clks)
+timer #0("isr") ON: 0.0051888 sec (57384 clks)
+timer #1("a") ON: 0 sec (0 clks)
+timer #3("unnamed") ON: 0 sec (0 clks)
+> 
+</pre>
+
+If you use 0 as timer id in "get" operation, simulator prints out
+value of all timers including predefined ones.
+
+<hr>
+
+</body>
+</html>

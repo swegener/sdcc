@@ -1,0 +1,90 @@
+<html>
+<head>
+<title>Commands of s51</title>
+</head>
+
+<body bgcolor="white">
+
+<h1>Command reference of ucsim</h1>
+
+<a href="cmd_general.html">General commands and information</a>
+
+<ul><li><a href="cmd_general.html#h"><b>help,?</b> Help about commands</a>
+<li><a href="cmd_general.html#show"><b>show</b> Show licensing information</a> (<font color="#ff2211">since 0.1.3</font>)
+<li><a href="cmd_general.html#file"><b>file,load FILE</b> Load FILE into ROM</a> (<font
+color="#ff2211">since 0.2.24</font>)<img src="new.gif">
+<li><a href="cmd_general.html#dl"><b>download,dl</b> Download (intel hex) data</a>
+<li><a href="cmd_general.html#q"><b>quit</b> Quit</a>
+(<font color="cmd_general.html#ff2211">changed 0.2.12</font>)
+<li><a href="cmd_general.html#kill"><b>kill</b> Shut down the simulator</a>
+(<font color="#ff2211">since 0.2.12</font>)
+<li><a href="cmd_general.html#reset"><b>reset</b> Reset</a>
+<li><a href="cmd_general.html#wi"><b>wi,Wi</b> Search for string in Internal RAM</a>
+<li><a href="cmd_general.html#wi"><b>wx,Wx</b> Search for string in External RAM</a>
+<li><a href="cmd_general.html#wi"><b>wc,Wc</b> Search for string in ROM</a>
+<li><a href="cmd_general.html#gopt"><b>gopt</b> Get value of option(s)</a>
+<li><a href="cmd_general.html#sopt"><b>sopt</b> Set value of option</a>
+<li><a href="cmd_general.html#conf"><b>conf</b> Configuration</a> (<font color="#ff2211">since 0.2.20</font>)<img src="new.gif">
+<li><a href="cmd_general.html#state"><b>state</b> State of simulator</a> (<font color="#ff2211">since 0.2.19</font>)<img src="new.gif">
+<li><a href="cmd_general.html#info"><b>info</b> Information</a> (<font color="#ff2211">since 0.2.20</font>)<img src="new.gif">
+<li><a href="cmd_general.html#timer"><b>timer a|d|g|r|s|v id [value]</b> Timer add|del|get|run|stop|value</a> (<font color="#ff2211">since 0.2.19</font>)<img src="new.gif">
+</ul>
+
+<a href="cmd_exec.html">Execution</a>
+
+<ul><li><a href="cmd_exec.html#g"><b>g</b> Go</a> (<font color="#ff2211">changed 0.2.12</font>)
+<li><a href="cmd_exec.html#stop"><b>stop</b> Stop</a> (<font color="#ff2211">since 0.2.12</font>)
+<li><a href="cmd_exec.html#s"><b>s</b> Step</a>
+<li><a href="cmd_exec.html#n"><b>n</b> Next</a>
+<li><a href="cmd_exec.html#pc"><b>pc</b> Set/get PC</a> (<font color="#ff2211">since 0.1.5</font>)
+<li><a href="cmd_exec.html#run"><b>run</b> Go</a> (<font color="#ff2211">since 0.2.20</font>)<img src="new.gif">
+</ul>
+
+<a href="cmd_bp.html">Breakpoints</a>
+
+<ul><li><b>bs</b> Set FETCH Breakpoint (<font color="#ff2211">removed
+0.2.20, use <a href="cmd_bp.html#break">break</a> or <a href="cmd_bp.html#tbreak">tbreak</a>
+instead</font>)
+<li><a href="cmd_bp.html#bse"><b>bse</b> Set EVENT Breakpoint</a>
+<li><b>bd</b> Delete FETCH Breakpoint (<font color="#ff2211">removed
+0.2.20</font>, use <a href="cmd_bp.html#clear">clear</a> instead)
+<li><a href="cmd_bp.html#bde"><b>bde</b> Delete EVENT Breakpoint</a>
+<li><a href="cmd_bp.html#ba"><b>ba</b> Delete all breakpoints</a>
+<li><b>bl</b> List Breakpoints (<font color="#ff2211">removed 0.2.20,
+use <a href="cmd_bp.html#info">info breakpoints</a> instead</font>)
+<li><a href="cmd_bp.html#break"><b>break</b> Set fix breakpoint</a> (<font color="#ff2211">since 0.2.20</font>)<img src="new.gif">
+<li><a href="cmd_bp.html#tbreak"><b>tbreak</b> Set fix breakpoint</a> (<font color="#ff2211">since 0.2.20</font>)<img src="new.gif">
+<li><a href="cmd_bp.html#clear"><b>clear</b> Clear fix breakpoint</a> (<font color="#ff2211">since 0.2.20</font>)<img src="new.gif">
+</ul>
+
+<a href="cmd_dump.html">Dump commands</a>
+
+<ul><li><a href="cmd_dump.html#dis"><b>dis</b> Disassemble</a>
+<li><a href="cmd_dump.html#dc"><b>dc</b> Dump code in disass format</a>
+<li><a href="cmd_dump.html#dch"><b>dch</b> Dump code in hex format</a>
+<li><a href="cmd_dump.html#di"><b>di</b> Dump Internal RAM</a>
+<li><a href="cmd_dump.html#dx"><b>dx</b> Dump External RAM</a>
+<li>dr Dump registers</a> (<font color="#ff2211">removed
+0.2.37</font>, use <a href="cmd_general.html#info_reg">info registers</a> instead)
+<li><a href="cmd_dump.html#dp"><b>dp</b> Dump ports</a>
+<li><a href="cmd_dump.html#ds"><b>ds</b> Dump SFR</a>
+<li><a href="cmd_dump.html#db"><b>db</b> Dump bit</a></ul>
+
+<a href="cmd_set.html">Set commands</a>
+
+<ul><li><a href="cmd_set.html#si"><b>si</b> Set Internal RAM</a>
+<li><a href="cmd_set.html#sx"><b>sx</b> Set External RAM</a>
+<li><a href="cmd_set.html#sc"><b>sc</b> Set code (ROM)</a>
+<li><a href="cmd_set.html#ss"><b>ss</b> Set SFR area</a>
+<li><a href="cmd_set.html#sb"><b>sb</b> Set bit</a>
+<li><a href="cmd_set.html#sp"><b>sp</b> Set port pins</a>
+<li><a href="cmd_set.html#fi"><b>fi</b> Fill IRAM area with data</a>
+<li><a href="cmd_set.html#fx"><b>fx</b> Fill XRAM area with data</a>
+<li><a href="cmd_set.html#fs"><b>fs</b> Fill SFR area with data</a>
+<li><a href="cmd_set.html#fc"><b>fc</b> Fill ROM area with data</a>
+</ul>
+
+<hr>
+
+</body>
+</html>

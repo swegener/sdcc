@@ -1,0 +1,206 @@
+<html>
+<head>
+<title>Breakpoints commands of uCsim</title>
+</head>
+
+<body bgcolor="white">
+
+                                                          <!-- BREAKPOINTS -->
+
+<h2>Commands of uCsim to manage breakpoints</h2>
+
+Two kind of breakpoints can be used: fetch and event
+breakpoint. <B>Fetch</b> breakpoints are classical breakpoints. They
+can be placed at any instruction in the code memory. Breakpoint will
+be hit if CPU fetches instruction code from the memory location
+specified by the breakpoint. Only fetching of first byte of the
+instruction hits the breakpoint. If the execution reaches a breakpoint
+it stops <i>before</i> the instruction at location specified by the
+breakpoint would be executed.
+
+<p><b>Event</b> breakpoints are special onces. They cause stop of
+execution if event specified by the breakpoint occures. Events are:
+
+<dl><dt><b>wi</b> <dd>writing into internal RAM at specified location;
+
+<dt><b>ri</b> <dd>reading from internal RAM at specified address;
+
+<dt><b>wx</b> <dd>writing into external RAM at specified location
+(MOVX instruction);
+
+<dt><b>rx</b> <dd>reading from external RAM at specified address (MOVX
+instruction);
+
+<dt><b>ws</b> <dd>writing into SFR area at specified location;
+
+<dt><b>rs</b> <dd>reading from SFR area at specified address;
+
+<dt><b>rc</b> <dd>reading from code memory at specified location (MOVC
+instruction).</dl>
+
+Event breakpoint stops execution <i>after</i> specified event occured.
+
+<p>Every breakpoint can be <b>fix</b> (permanent) or <b>dynamic</b>
+(temporary). Dynamic breakpoints are automatically removed when they
+reached. Some commands place dynamic fetch breakpoints into the code,
+for example <a href="#g"><b>go</b></a> or <a
+href="#n"><b>next</b></a>.
+
+<p>A <b>hit number</b> can be associated to any breakpoint. This hit
+number specifies how many times the breakpoint must be hit before it
+causes the execution to stop. This hit number is 1 by default.
+
+
+<a name="break"><h3>break addr [hit]</h3></a>
+<a name="tbreak"><h3>tbreak addr [hit]</h3></a>
+
+Set fetch breakpoint. The command specifies if the breakpoint will be
+fix (<b>break</b>) or dynamic (temporary) (<b>tbreak</b>). First
+parameter specifies address where the breakpoint must be placed to. It
+should be address of an instruction.
+
+<p>Second parameter is optional and it specifies the hit number. It is
+1 by default.
+
+<pre>
+$ <font color="#118811">s51 remoansi.hex</font>
+ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+58659 bytes read from remoansi.hex
+> <font color="#118811">dc 0 0x10</font>
+   000000 02 01 60 LJMP  0160
+ * 000003 02 00 3c LJMP  003c
+ * 000006 ff       MOV   R7,A
+ * 000007 ff       MOV   R7,A
+ * 000008 ff       MOV   R7,A
+ * 000009 ff       MOV   R7,A
+ * 00000a ff       MOV   R7,A
+ * 00000b 02 3b e0 LJMP  3be0
+ * 00000e ff       MOV   R7,A
+ * 00000f ff       MOV   R7,A
+ * 000010 ff       MOV   R7,A
+> <font color="#118811">break 0x160</font>
+Breakpoint 1 at 0x000160: CLR   P1.0
+> <font color="#118811">tbreak 8 2</font>
+Breakpoint 2 at 0x000008: MOV   R7,A
+> <font color="#118811">g</font>
+Simulation started, PC=0x000000
+Stop at 000160: (4) Breakpoint
+F 000160
+> </pre>
+
+
+<a name="bse"><h3>bse wi|ri|wx|rx|ws|rs|rc f|d addr [hit]</h3></a>
+
+Set event breakpoint. First parameter specifies type of event. See <a
+href="#breakpoints">general description of event breakpoints</a> above
+about meaning of event identifiers. Second parameter specify if the
+breakpoint will be fix (<b>f</b>) or dynamic (<b>d</b>). Third
+parameter specifies address. Remember that this is not an instruction
+address, it is address of the memory cell where specified event should
+occur.
+
+<p>Forth parameter is optional and it specifies the hit number. It is
+1 by default.
+
+<pre>
+$ <font color="#118811">s51 remoansi.hex</font>
+ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+58659 bytes read from remoansi.hex
+> <font color="#118811">dis</font>
+   00d47e 22       RET
+   000000 02 01 60 LJMP  0160
+   000160 c2 90    CLR   P1.0
+   000162 c2 97    CLR   P1.7
+   000164 d2 b5    SETB  P3.5
+   000166 d2 b4    SETB  P3.4
+   000168 75 81 22 MOV   SP,#22
+   00016b 75 d0 00 MOV   PSW,#00
+   00016e 7e 00    MOV   R6,#00
+   000170 7f 00    MOV   R7,#00
+   000172 79 04    MOV   R1,#04
+   000174 12 0d b8 LCALL 0db8
+   000177 0f       INC   R7
+   000178 d9 fa    DJNZ  R1,0174
+   00017a 75 0b 00 MOV   0b,#00
+   00017d 75 0c 00 MOV   0c,#00
+   000180 02 02 2a LJMP  022a
+   000183 78 22    MOV   R0,#22
+   000185 76 00    MOV   @R0,#00
+   000187 d8 fc    DJNZ  R0,0185
+> <font color="#118811">bse wi f 6</font>
+> <font color="#118811">g</font>
+4
+   000170 7f 00    MOV   R7,#00
+> </pre>
+
+
+<a name="clear"><h3>clear [addr...]</h3></a>
+
+Delete fetch breakpoint. Parameter specifies address of breakpoint. If
+there is no breakpoint specified at given address this command prints
+out a warning message.
+
+<p>If parameter is not given then breakpoint at current PC will be
+deleted if it exists. If more than one address is specified then all
+breakpoints at specified addresses will be deleted.
+
+<pre>
+> <font color="#118811">i b</font>
+Num Type       Disp Hit   Cnt   Address  What
+1   fetch      keep 1     1     0x000160 CLR   P1.0
+2   fetch      del  1     1     0x000180 LJMP  022a
+1   event      keep 1     1     0x000006 wi
+> <font color="#118811">clear 160</font>
+No breakpoint at 0000a0
+> <font color="#118811">clear 0x160</font>
+> <font color="#118811">i b</font>
+Num Type       Disp Hit   Cnt   Address  What
+2   fetch      del  1     1     0x000180 LJMP  022a
+1   event      keep 1     1     0x000006 wi
+> </pre>
+
+
+<a name="bde"><h3>bde wi|ri|wx|rx|ws|rs|rc addr</h3></a>
+
+Delete event breakpoint. First parameter must be given to specify type
+of event. Second parameter is address of memory cell which the
+breakpoint is associated to. Continuing example given above:
+
+<pre>
+> <font color="#118811">bl</font>
+D 2(2) 000180 02 LJMP  022a
+F 1(1) 000006 wi
+> <font color="#118811">bde ri 6</font>
+No ri breakpoint at 000006
+> <font color="#118811">bde wi 6</font>
+> <font color="#118811">bl</font>
+D 2(2) 000180 02 LJMP  022a
+> </pre>
+
+
+<a name="ba"><h3>ba</h3></a>
+
+Delete all breakpoints. This command deletes all fetch as well as
+event breakpoints. Be carefull because it does not ask you to confirm
+your intention.
+
+<pre>
+> <font color="#118811">bl</font>
+F 1(1) 000160 c2 CLR   P1.0
+D 2(2) 000180 02 LJMP  022a
+F 1(1) 000006 wi
+> <font color="#118811">ba</font>
+> <font color="#118811">bl</font>
+> </pre>
+
+
+<hr>
+
+</body>
+</html>

@@ -1,0 +1,390 @@
+<html>
+<head>
+<title>Dump commands of uCsim</title>
+</head>
+
+<body bgcolor="white">
+
+                                                                 <!-- DUMP -->
+
+<h2>Dump commands of uCsim</h2>
+
+<a name="dis"><h3><img src="burst.gif" alt="[Repeatable]"> dis
+[start [offset [lines]]]</h3></a>
+
+Disassemble code. This command can be used to list disassembled
+instructions which discovered by the code analyzer. First two
+parameters specify the address where the list starts. First parameter
+is address where the command starts to search an instruction. This
+search goes forward. When the first instruction marked by code
+analyzer found the simulator skips as many instructions as you specify
+in second parameter. If <b>offset</b> is negative the simulator goes
+backward and skips specified number of instructions. Default value of
+<b>start</b> parameter is last address which was listed by previous
+<b>dis</b> command and default value of <b>offset</b> is -1. It means
+you can make continuous list repeating parameterless <b>dis</b>
+command.
+
+<p>In third parameter you can specify how many instructions you want
+to list. Default value is 20.
+
+<pre>
+$ <font color="#118811">s51 remoansi.hex</font>
+ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+58659 bytes read from remoansi.hex
+> <font color="#118811">dis</font>
+   00d47e 22       RET
+   000000 02 01 60 LJMP  0160
+   000160 c2 90    CLR   P1.0
+   000162 c2 97    CLR   P1.7
+   000164 d2 b5    SETB  P3.5
+   000166 d2 b4    SETB  P3.4
+   000168 75 81 22 MOV   SP,#22
+   00016b 75 d0 00 MOV   PSW,#00
+   00016e 7e 00    MOV   R6,#00
+   000170 7f 00    MOV   R7,#00
+   000172 79 04    MOV   R1,#04
+   000174 12 0d b8 LCALL 0db8
+   000177 0f       INC   R7
+   000178 d9 fa    DJNZ  R1,0174
+   00017a 75 0b 00 MOV   0b,#00
+   00017d 75 0c 00 MOV   0c,#00
+   000180 02 02 2a LJMP  022a
+   000183 78 22    MOV   R0,#22
+   000185 76 00    MOV   @R0,#00
+   000187 d8 fc    DJNZ  R0,0185
+> <font color="#118811">bs f 0x180</font>
+> <font color="#118811">bs d 0x189</font>
+> <font color="#118811">dis 0x180 -3 10</font>
+   000178 d9 fa    DJNZ  R1,0174
+   00017a 75 0b 00 MOV   0b,#00
+   00017d 75 0c 00 MOV   0c,#00
+F  000180 02 02 2a LJMP  022a
+   000183 78 22    MOV   R0,#22
+   000185 76 00    MOV   @R0,#00
+   000187 d8 fc    DJNZ  R0,0185
+D  000189 22       RET
+   00018a 90 09 ec MOV   DPTR,#09ec
+   00018d ae 83    MOV   R6,DPH
+> </pre>
+
+If there is an <b>F</b> or <b>D</b> character at the beginning of the
+line, it means that there is a fix or dynamic fetch breakpoint at
+listed address. Next element on the list can be an asterix (<b>*</b>)
+which means that the listed address is not marked by the code
+analyzer. <b>dis</b> lists marked instructions only so asterix never
+appears in the list. Next element of the list is address displayed as
+six digit hexadecimal number. Address is followed by hexadecimal dump
+of instruction's code. Last element of the list is disassembled
+instruction. Every number appeared on the list is hexadecimal number.
+
+
+<a name="dc"><h3><img src="burst.gif" alt="[Repeatable]"> dc
+[start [stop]]</h3></a>
+
+Disassembled dump of code memory area. This command simply produces
+disassambled list of memory area specified by the parameters. Default
+value of <b>start</b> parameter is last address listed by previous
+<b>dc</b> command. If <b>stop</b> parameter is not given 20 lines are
+listed.
+
+<pre>
+$ <font color="#118811">s51 remoansi.hex</font> 
+ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+58659 bytes read from remoansi.hex
+> <font color="#118811">dc</font>
+   000000 02 01 60 LJMP  0160
+ * 000003 02 00 3c LJMP  003c
+ * 000006 ff       MOV   R7,A
+ * 000007 ff       MOV   R7,A
+ * 000008 ff       MOV   R7,A
+ * 000009 ff       MOV   R7,A
+ * 00000a ff       MOV   R7,A
+ * 00000b 02 3b e0 LJMP  3be0
+ * 00000e ff       MOV   R7,A
+ * 00000f ff       MOV   R7,A
+ * 000010 ff       MOV   R7,A
+ * 000011 ff       MOV   R7,A
+ * 000012 ff       MOV   R7,A
+ * 000013 02 00 ac LJMP  00ac
+ * 000016 ff       MOV   R7,A
+ * 000017 ff       MOV   R7,A
+ * 000018 ff       MOV   R7,A
+ * 000019 ff       MOV   R7,A
+ * 00001a ff       MOV   R7,A
+ * 00001b ff       MOV   R7,A
+ * 00001c ff       MOV   R7,A
+> </pre>
+
+
+<a name="dch"><h3><img src="burst.gif" alt="[Repeatable]"> dch
+[start [stop]]</h3></a>
+
+Hexadecimal dump of code memory area from address <b>start</b> to
+address <b>stop</b>. Default value of start address is address of
+following memory cell which was dumped by previous <b>dch</b>
+command. If <b>stop</b> parameter is not given <b>dch</b> command
+lists 10 lines 8 bytes per line.
+
+<pre>
+$ <font color="#118811">s51 remo.hex</font>
+ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+58659 bytes read from remoansi.hex
+> <font color="#118811">wc remo</font>
+0013da 52 65 6d 6f             Remo
+> <font color="#118811">dch 0x13da</font>
+0013da 52 65 6d 6f 20 00 56 65 Remo .Ve
+0013e2 72 73 69 6f 6e 20 31 2e rsion 1.
+0013ea 30 20 00 43 6f 70 79 72 0 .Copyr
+0013f2 69 67 68 74 20 28 63 29 ight (c)
+0013fa 20 00 31 39 39 34 2c 39  .1994,9
+001402 35 20 00 54 61 6c 6b 65 5 .Talke
+00140a 72 20 42 74 2e 00 53 75 r Bt..Su
+001412 6e 64 61 79 2e 00 4d 6f nday..Mo
+00141a 6e 64 61 79 2e 00 54 68 nday..Th
+001422 75 65 73 64 61 79 2e 00 uesday..
+> </pre>
+
+First element in every lines is address of first byte dumped out in
+the line. Next elements are hexadecimal values of bytes followed by
+ASCII charactes of bytes dumped out in the line. If value of the
+memory cell is not printable than a dot is dumped out.
+
+
+<a name="di"><h3><img src="burst.gif" alt="[Repeatable]"> di
+[start [stop]]</h3></a>
+
+Hexadecimal dump of internal RAM area from address <b>start</b> to
+address <b>stop</b>. Default value of start address is address of
+following memory cell which was dumped by previous <b>di</b>
+command. If <b>stop</b> parameter is not given <b>di</b> command
+lists 10 lines 8 bytes per line.
+
+<pre>
+$ <font color="#118811">s51 remoansi.hex</font>
+ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+58659 bytes read from remoansi.hex
+> <font color="#118811">sopt stopit 1</font>
+> <font color="#118811">g</font>
+Simulation started, PC=0x000000
+Stop at 000023: (5) Interrupt
+F 000023
+> <font color="#118811">di</font>
+000000 18 02 16 ba 00 02 00 0a ........
+000008 00 00 00 00 00 00 00 00 ........
+000010 00 00 00 00 00 00 00 00 ........
+000018 4a 00 00 00 00 00 00 00 J.......
+000020 bc 27 06 2d 02 ee 35 8f .'.-..5.
+000028 31 e7 42 01 0e 01 0b 00 1.B.....
+000030 ec 0b 7f 10 7f a9 7e 08 ......~.
+000038 fe 03 09 00 00 00 af 08 ........
+000040 af 08 00 00 00 00 00 00 ........
+000048 00 00 00 00 00 00 00 00 ........
+> </pre>
+
+
+<a name="dx"><h3><img src="burst.gif" alt="[Repeatable]"> dx
+[start [stop]]</h3></a>
+
+Hexadecimal dump of external RAM area from address <b>start</b> to
+address <b>stop</b>. Default value of start address is address of
+following memory cell which was dumped by previous <b>dx</b>
+command. If <b>stop</b> parameter is not given <b>dx</b> command
+lists 10 lines 8 bytes per line.
+
+<pre>
+$ <font color="#118811">s51 remoansi.hex</font>
+ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+58659 bytes read from remoansi.hex
+> <font color="#118811">sopt stopit 1</font>
+> <font color="#118811">g</font>
+Simulation started, PC=0x000000
+Stop at 000023: (5) Interrupt
+F 000023
+> <font color="#118811">dx 0x100</font>
+000100 00 00 00 00 00 00 00 00 ........
+000108 00 00 00 00 00 00 00 00 ........
+000110 00 00 00 00 00 00 00 00 ........
+000118 00 00 00 00 00 00 00 00 ........
+000120 00 00 00 00 00 00 00 00 ........
+000128 00 00 00 00 00 00 00 44 .......D
+000130 61 6e 69 00 00 00 02 02 ani.....
+000138 07 00 00 ff 00 00 07 cb ........
+000140 08 0c 32 00 07 cb 06 05 ..2.....
+000148 02 00 24 00 00 00 00 00 ..$.....
+> </pre>
+
+
+<a name="dp"><h3>dp</h3></a>
+
+Dump out ports. This command shows actual value of ports.
+
+<pre>
+$ <font color="#118811">s51 remoansi.hex</font> 
+ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+58659 bytes read from remoansi.hex
+> <font color="#118811">sopt stopit 1</font>
+> <font color="#118811">g</font>
+5
+ * 000023 02 01 1c LJMP  011c
+> <font color="#118811">dp</font>
+P0    11111111 0xff 255 .    P1    11111110 0xfe 254 .
+Pin0  11111111 0xff 255 .    Pin1  11111111 0xff 255 .
+Port0 11111111 0xff 255 .    Port1 11111110 0xfe 254 .
+
+P2    11111111 0xff 255 .    P3    11111111 0xff 255 .
+Pin2  11111111 0xff 255 .    Pin3  11111111 0xff 255 .
+Port2 11111111 0xff 255 .    Port3 11111111 0xff 255 .
+> </pre>
+
+First lines on the list (labeled with Px) are value of SFRs which are
+internal latch registers. Second lines (labeled with Pinx) are outputs
+of external devices connected to port pins of the
+microcontroller. These values can be set by you using <a
+href="#sp"><b>sp</b></a> command. Third lines (labeled with Portx)
+show actual values can be measured on pins of the device. These values
+are calculated with following pseudo formula:
+
+<p><tt>Portx= Px AND Pinx</tt>
+
+<p>All three values are displayed in binary, hexadecimal, decimal form
+and then the ASCII character of the value is shown.
+
+
+<a name="ds"><h3>ds [addr...]</h3></a>
+
+Print out SFR. This command can be used to get value of all or some
+SFRs. If you do not specify any parameter the <b>ds</b> command simply
+dumps out full SFR area 16 bytes per line.
+
+<pre>
+$ <font color="#118811">s51 remoansi.hex</font> 
+ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+58659 bytes read from remoansi.hex
+> <font color="#118811">sopt stopit 1</font>
+> <font color="#118811">g</font>
+5
+ * 000023 02 01 1c LJMP  011c
+> <font color="#118811">ds</font>
+000080 ff 2a ba 16 00 00 00 00 55 a1 d7 fe 50 fd 00 00 .*......U...P...
+000090 fe 00 00 00 00 00 00 00 7e 00 00 00 00 00 00 00 ........~.......
+0000a0 ff 00 00 00 00 00 00 00 97 00 00 00 00 00 00 00 ................
+0000b0 ff 00 00 00 00 00 00 00 15 00 00 00 00 00 00 00 ................
+0000c0 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+0000d0 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+0000e0 0a 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+0000f0 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+> <font color="#118811">ds p1 0x87</font>
+    P1 fe 254 .
+000087 00   0 .
+> <font color="#118811">ds p2 ip scon</font>
+    P2 ff 255 .
+    IP 15  21 .
+  SCON 7e 126 ~
+> </pre>
+
+If you specify one or more parameter the <b>ds</b> command prints out
+value of registers specified by parameters. Parameter can be an
+address or a symbolic name of the register. Note that the simulator
+implements a register at all address in the address space which is not
+true in real microcontroller where reading of an unimplemented
+register gets undefined value. Value of the registers printed out in
+hexadecimal, decimal, and ASCII form.
+
+<p>Note that different type of controllers can implement different
+registers:
+
+<pre>
+$ <font color="#118811">s51</font>
+ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+> <font color="#118811">ds rcap2l</font>
+> <font color="#118811">q</font>
+$ <font color="#118811">s51 -t 52</font>
+ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+> <font color="#118811">ds rcap2l</font>
+RCAP2L 00   0 .
+> </pre>
+
+
+<a name="db"><h3><img src="burst.gif" alt="[Repeatable]"> db
+addr...</h3></a>
+
+Dump bits. This command can be used to get value of bits. At least one
+parameter must be given. Bit address can be specified in three
+forms. First of all name of the bit can be used if it has any. Direct
+bit address is accepted too and it can be specified by address of IRAM
+or SFR which contains the bit and bit number within the byte separated
+by a dot. If the requested bit is in an SFR the address of the
+register can be specified by its name.
+
+<pre>
+$ <font color="#118811">s51</font>
+ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+> <font color="#118811">db it1 0x20.3 0x43 p2.5</font>
+000088    IT1 0
+000020   20.3 0
+000028   28.3 0
+0000a0   P2.5 1
+> </pre>
+
+Value of bits are printed out one per line. The list starts direct
+address of the bit followed by bit name or address of the memory cell
+or SFR which contains the displayed bit and bit number within the byte
+separated by a dot. At last the value of the bit is shown. Displaying
+a port bit you get value of SFR latch:
+
+<pre>
+> <font color="#118811">sp 1 0x0f</font>
+> <font color="#118811">ss p1 0x55</font>
+000090 55                                              U
+> <font color="#118811">dp</font>
+P0    11111111 0xff 255 .    P1    01010101 0x55  85 U
+Pin0  11111111 0xff 255 .    Pin1  00001111 0x0f  15 .
+Port0 11111111 0xff 255 .    Port1 00000101 0x05   5 .
+
+P2    11111111 0xff 255 .    P3    11111111 0xff 255 .
+Pin2  11111111 0xff 255 .    Pin3  11111111 0xff 255 .
+Port2 11111111 0xff 255 .    Port3 11111111 0xff 255 .
+> <font color="#118811">db p1.2 p1.3 p1.4 p1.5 p1.6</font>
+000090   P1.2 1
+000090   P1.3 0
+000090   P1.4 1
+000090   P1.5 0
+000090   P1.6 1
+> </pre>
+
+
+<hr>
+
+</body>
+</html>

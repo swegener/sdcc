@@ -1,0 +1,141 @@
+#
+# uCsim gui.src/Makefile
+#
+# (c) Drotos Daniel, Talker Bt. 1999
+#
+
+SHELL		= /bin/sh
+CXX		= @CXX@
+CPP		= @CPP@
+CXXCPP		= @CXXCPP@
+RANLIB		= @RANLIB@
+INSTALL		= @INSTALL@
+
+PRJDIR		= ..
+
+DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
+CPPFLAGS        = @CPPFLAGS@ -I. -I$(PRJDIR)
+CFLAGS          = @CFLAGS@ -Wall
+CXXFLAGS        = @CXXFLAGS@ -Wall
+M_OR_MM         = @M_OR_MM@
+
+LIBS		= @LIBS@ -L$(PRJDIR) -lutil -lsim -lcmd
+
+curses_ok	= @curses_ok@
+
+prefix          = @prefix@
+exec_prefix     = @exec_prefix@
+bindir          = @bindir@
+libdir          = @libdir@
+datadir         = @datadir@
+includedir      = @includedir@
+mandir          = @mandir@
+man1dir         = $(mandir)/man1
+man2dir         = $(mandir)/man2
+infodir         = @infodir@
+srcdir          = @srcdir@
+
+PKGS		= serio.src portmon.src
+
+LOBJECTS	= event.o \
+		  view.o frame.o bg.o label.o \
+		  group.o win.o desk.o app.o
+
+
+# Compiling entire program or any subproject
+# ------------------------------------------
+all: gui.src
+
+libs: guilib
+
+ifeq ($(curses_ok),yes)
+gui.src: checkconf guilib a
+else
+gui.src: checkconf guilib
+endif
+	@for pkg in $(PKGS); do\
+	  $(MAKE) -C $$pkg $$pkg ;\
+	done
+
+a: a.o
+	$(CXX) $(LDFLAGS) $(LIBS) a.o -o $@
+
+
+# Compiling and installing everything and runing test
+# ---------------------------------------------------
+install:
+	@for pkg in $(PKGS); do\
+	  cd $$pkg && $(MAKE) install ; cd ..;\
+	done
+
+
+# Deleting all the installed files
+# --------------------------------
+uninstall:
+	@for pkg in $(PKGS); do\
+	  cd $$pkg && $(MAKE) uninstall ; cd ..;\
+	done
+
+
+# Performing self-test
+# --------------------
+check:
+	@for pkg in $(PKGS); do\
+	  cd $$pkg && $(MAKE) check ; cd ..;\
+	done
+
+
+# Performing installation test
+# ----------------------------
+installcheck:
+	@for pkg in $(PKGS); do\
+	  cd $$pkg && $(MAKE) installcheck ; cd ..;\
+	done
+
+
+# Creating installation directories
+# ---------------------------------
+installdirs:
+	@for pkg in $(PKGS); do\
+	  cd $$pkg && $(MAKE) installdirs ; cd ..;\
+	done
+
+
+# Creating dependencies
+# ---------------------
+dep: Makefile.dep
+
+Makefile.dep: *.cc *.h
+	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) *.cc >Makefile.dep
+
+include Makefile.dep
+include clean.mk
+
+#parser.cc: parser.y
+
+#plex.cc: plex.l
+
+# My rules
+# --------
+ifeq ($(curses_ok),yes)
+guilib: libgui.a
+else
+guilib:
+endif
+
+libgui.a: $(LOBJECTS)
+	ar -rcu $*.a $(LOBJECTS)
+	$(RANLIB) $*.a
+
+.cc.o:
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+
+# Remaking configuration
+# ----------------------
+checkconf:
+	@if [ -f $(PRJDIR)/devel ]; then\
+	  $(MAKE) -f conf.mk srcdir="$(srcdir)" PRJDIR="$(PRJDIR)" freshconf;\
+	fi
+
+# End of gui.src/Makefile

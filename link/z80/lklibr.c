@@ -229,7 +229,7 @@ char *libfil;
 #endif /* SDK */
 #endif
 	strcat(str,libfil);
-	if(strchr(str,FSEPX) == NULL) {
+	if(strchr(libfil,FSEPX) == NULL) {
 		sprintf(&str[strlen(str)], "%clib", FSEPX);
 	}
 	if ((fp = fopen(str, "r")) != NULL) {

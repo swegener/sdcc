@@ -1,3 +1,7 @@
+2003-07-17  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+    * link/z80/lklibr.c: fixed bug when there is a '.' in a library path.
+
 2003-07-17  Bernhard Held <bernhard@bernhardheld.de>
 
         * device/lib/Makefile.in: bad fix, reverted to 1.43

@@ -86,7 +86,7 @@ installdirs:
 # ---------------------
 dep: version.h Makefile.dep
 
-Makefile.dep: $(SOURCES) $(SLIBSOURCES) $(SPECIAL) *.h $(PRJDIR)/*.h
+Makefile.dep: version.h $(SOURCES) $(SLIBSOURCES) $(SPECIAL) *.h $(PRJDIR)/*.h
 	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(SOURCES) $(SLIBSOURCES) >Makefile.dep
 
 include Makefile.dep

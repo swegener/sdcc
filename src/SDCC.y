@@ -363,6 +363,9 @@ assignment_expr
 			     case DIV_ASSIGN:
 				     $$ = newNode('=',$1,newNode('/',copyAst($1),$3));
 				     break;
+			     case MOD_ASSIGN:
+			     	     $$ = newNode('=',$1,newNode('%',copyAst($1),$3));
+				     break;
 			     case ADD_ASSIGN:
 				     $$ = newNode('=',$1,newNode('+',copyAst($1),$3));
 				     break;

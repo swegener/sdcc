@@ -5963,7 +5963,11 @@ static void pic16_FixRegisterBanking(pBlock *pb)
 	}
 #endif
 
-#warning Fix this if-conditional
+#if !defined(__BORLANDC__) && !defined(_MSC_VER)
+   #warning Fix this if-conditional
+#else
+    #pragma message( "warning Fix this if-conditional" )
+#endif
 	/* the !(reg->rIdx==-1) is a temporary hack. It should be changed - VR 6-Jun-2003 */
 	if( ( (reg /*&& !(reg->rIdx==-1)*/ && !isACCESS_BANK(reg) && (isBankInstruction(pc)==-1) && !(reg->alias == 0x80) )
 		 /*|| (PCI(pc)->op != POC_CALL)*/ )

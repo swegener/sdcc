@@ -11635,7 +11635,7 @@ if test "${ucsim_cv_CXXggdb+set}" = set; then
 else
   cat >_test_.c <<EOF
 #include <stdio.h>
-void main(void) {}
+int main(void) {return(0);}
 EOF
 $CXX -v -ggdb -c _test_.c 1>&5 2>&5
 if test "$?" = "0"; then
@@ -11648,10 +11648,33 @@ fi
 echo "$as_me:$LINENO: result: $ucsim_cv_CXXggdb" >&5
 echo "${ECHO_T}$ucsim_cv_CXXggdb" >&6
 
-if test "$ucsim_cv_CXXggdb" = "yes"; then
-	gopt="-ggdb"
+
+echo "$as_me:$LINENO: checking whether $CXX accepts -gstabs" >&5
+echo $ECHO_N "checking whether $CXX accepts -gstabs... $ECHO_C" >&6
+if test "${ucsim_cv_CXXgstabs+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-	gopt="-g"
+  cat >_test_.c <<EOF
+#include <stdio.h>
+int main(void) {return(0);}
+EOF
+$CXX -v -gstabs -c _test_.c 1>&5 2>&5
+if test "$?" = "0"; then
+  ucsim_cv_CXXgstabs="yes"
+else
+  ucsim_cv_CXXgstabs="no"
+fi
+rm -f _test_.* a.out
+fi
+echo "$as_me:$LINENO: result: $ucsim_cv_CXXgstabs" >&5
+echo "${ECHO_T}$ucsim_cv_CXXgstabs" >&6
+
+if test "$ucsim_cv_CXXgstabs" = "yes"; then
+   gopt="-gstabs+ -g3"
+elif test "$ucsim_cv_CXXggdb" = "yes"; then
+     gopt="-ggdb -g3"
+else
+     gopt="-g"
 fi
 if test "$CXXFLAGS"x = x ;then
 	CXXFLAGS="$gopt"
@@ -11667,7 +11690,7 @@ if test "${ucsim_cv_CXXpipe+set}" = set; then
 else
   cat >_test_.c <<EOF
 #include <stdio.h>
-void main(void) {}
+int main(void) {return(0);}
 EOF
 $CXX -v -pipe -c _test_.c 1>&5 2>&5
 if test "$?" = "0"; then
@@ -11694,7 +11717,7 @@ if test "${ucsim_cv_CXXfPIC+set}" = set; then
 else
   cat >_test_.c <<EOF
 #include <stdio.h>
-void main(void) {}
+int main(void) {return(0);}
 EOF
 $CXX -v -fPIC -c _test_.c 1>&5 2>&5
 if test "$?" = "0"; then
@@ -11718,7 +11741,7 @@ if test "${ucsim_cv_CXXfpic+set}" = set; then
 else
   cat >_test_.c <<EOF
 #include <stdio.h>
-void main(void) {}
+int main(void) {return(0);}
 EOF
 $CXX -v -fpic -c _test_.c 1>&5 2>&5
 if test "$?" = "0"; then

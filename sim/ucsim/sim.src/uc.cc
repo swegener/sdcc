@@ -47,6 +47,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "timercl.h"
 #include "cmdstatcl.h"
 #include "cmdmemcl.h"
+#include "cmdutil.h"
 
 // local, sim.src
 #include "uccl.h"
@@ -1866,18 +1867,18 @@ cl_error_unknown_code::cl_error_unknown_code(class cl_uc *the_uc)
 void
 cl_error_unknown_code::print(class cl_commander *c)
 {
-  c->dd_printf(get_type_name());
-  c->dd_printf(": unknown instruction code at ");
+  FILE *f= c->get_out();
+  cmd_fprintf(f, "%s: unknown instruction code at ", get_type_name());
   if (uc->rom)
     {
-      c->dd_printf(uc->rom->addr_format, PC);
-      c->dd_printf(" (");
-      c->dd_printf(uc->rom->data_format, uc->rom->get(PC));
-      c->dd_printf(")");
+      cmd_fprintf(f, uc->rom->addr_format, PC);
+      cmd_fprintf(f, " (");
+      cmd_fprintf(f, uc->rom->data_format, uc->rom->get(PC));
+      cmd_fprintf(f, ")");
     }
   else
-    c->dd_printf("0x%06x", PC);
-  c->dd_printf("\n");
+    cmd_fprintf(f, "0x%06x", PC);
+  cmd_fprintf(f, "\n");
 }
 
 

@@ -953,6 +953,16 @@ cl_commander::all_print(char *string, int length)
  * Printing to actual_console
  */
 
+FILE *
+cl_commander::get_out(void)
+{
+  if (actual_console)
+    return(actual_console->get_out());
+  else if (frozen_console)
+    return(frozen_console->get_out());
+  return(0);
+}
+
 int
 cl_commander::dd_printf(char *format, ...)
 {

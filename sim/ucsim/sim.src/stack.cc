@@ -431,7 +431,7 @@ ERROR_CLASS_DEF_PARENT(err_error, stack_tracker, "stack_tracker",
 ERROR_CLASS_DEF_PARENT(err_error,
 		       stack_tracker_wrong_handle,
 		       "stack_tracker_wrong_handle",
-		       error_stack_tracker_class)
+		       error_stack_tracker_class);
 
 cl_error_stack_tracker_wrong_handle::cl_error_stack_tracker_wrong_handle(bool write_op):
   cl_error_stack_tracker()

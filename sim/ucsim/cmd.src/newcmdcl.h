@@ -212,6 +212,7 @@ public:
   void set_fd_set(void);
 
   void prompt(void);
+  FILE *get_out(void);
   int all_printf(char *format, ...);	// print to all consoles
   int all_print(char *string, int length);
   int dd_printf(char *format, ...);	// print to actual_console

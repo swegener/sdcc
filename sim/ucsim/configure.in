@@ -306,7 +306,7 @@ AC_DEFUN(DD_COPT, [
 AC_CACHE_CHECK(whether $$1 accepts -$2,ucsim_cv_$1$2,
 cat >_test_.c <<EOF
 #include <stdio.h>
-void main(void) {}
+int main(void) {return(0);}
 EOF
 $$1 -v -$2 -c _test_.c 1>&5 2>&5
 if test "$?" = "0"; then
@@ -361,10 +361,13 @@ AC_SUBST(M_OR_MM)
 # This is the first time when CFLAGS are set/modified!!
 
 DD_COPT(CXX, ggdb)
-if test "$ucsim_cv_CXXggdb" = "yes"; then
-	gopt="-ggdb"
-else
-	gopt="-g"
+DD_COPT(CXX, gstabs)
+if test "$ucsim_cv_CXXgstabs" = "yes"; then
+   gopt="-gstabs+ -g3"
+elif test "$ucsim_cv_CXXggdb" = "yes"; then
+     gopt="-ggdb -g3"
+else 
+     gopt="-g"
 fi
 if test "$CXXFLAGS"x = x ;then
 	CXXFLAGS="$gopt"

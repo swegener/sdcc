@@ -291,4 +291,50 @@ proc_escape(char *string, int *len)
 }
 
 
+int
+cmd_vfprintf(FILE *f, char *format, va_list ap)
+{
+  int ret;
+  if (!f)
+    return(0);
+#ifdef HAVE_VASPRINTF
+  char *msg= NULL;
+  vasprintf(&msg, format, ap);
+  ret= fprintf(f, "%s", msg);
+  free(msg);
+#else
+#  ifdef HAVE_VSNPRINTF
+  char msg[80*25];
+  vsnprintf(msg, 80*25, format, ap);
+  ret= fprintf(f, "%s", msg);
+#  else
+#    ifdef HAVE_VPRINTF
+  char msg[80*25];
+  vsprintf(msg, format, ap); /* Dangerous */
+  ret= fprintf(f, "%s", msg);
+#    else
+#      ifdef HAVE_DOPRNT
+  /* ??? */
+  /*strcpy(msg, "Unimplemented printf has called.\n");*/
+#      else
+  /*strcpy(msg, "printf can not be implemented, upgrade your libc.\n");*/
+#      endif
+#    endif
+#  endif
+#endif
+  fflush(f);
+  return(ret);
+}
+
+int
+cmd_fprintf(FILE *f, char *format, ...)
+{
+  va_list ap;
+  va_start(ap, format);
+  int ret= cmd_vfprintf(f, format, ap);
+  va_end(ap);
+  return(ret);
+}
+
+
 /* End of cmd.src/cmdutil.cc */

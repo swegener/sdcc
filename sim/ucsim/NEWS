@@ -39,3 +39,9 @@ Bug fixes
 0.5.2
 
 Bug fixes to run sdcc regression tests
+
+
+0.5.3
+
+Eliminate need of flex (for compile)
+Fix of some includes

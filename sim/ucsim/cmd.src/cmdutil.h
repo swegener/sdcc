@@ -43,6 +43,8 @@ extern struct name_entry *get_name_entry(struct name_entry tabl[],
 			      uchar *bitaddr, uchar *bitmask,
 			      char **symname);*/
 extern char *proc_escape(char *string, int *len);
+extern int cmd_vfprintf(FILE *f, char *format, va_list ap);
+extern int cmd_fprintf(FILE *f, char *format, ...);
 
 
 #endif

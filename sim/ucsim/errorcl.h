@@ -44,38 +44,15 @@ enum error_on_off {
 
 const int err_stop= (err_unknown|err_error);
 
-/*
-#define ERROR_METHODS(NAME) \
-enum error_type \
-cl_error_##NAME ::get_type(void)\
-{\
-  return(err_##NAME##_class.get_type());\
-}\
-bool \
-cl_error_##NAME ::is_on(void)\
-{\
-  return(err_##NAME##_class.is_on());\
-}
-*/
-
 #define ERROR_CLASS_DECL(NAME) \
 extern class cl_error_class error_##NAME##_class;\
 class cl_error_##NAME
 
-/*
-#define ERROR_CLASS_DEF(TYPE,NAME,CLASS_NAME) \
-class cl_error_class error_##NAME##_class(TYPE, CLASS_NAME);
-*/
-/*
-#define ERROR_CLASS_DEF_ON(TYPE,NAME,CLASS_NAME,ON) \
-class cl_error_class error_##NAME##_class(TYPE, CLASS_NAME, ON);
-*/
-
 #define ERROR_CLASS_DEF_PARENT(TYPE,NAME,CLASS_NAME,PARENT) \
-class cl_error_class error_##NAME##_class(TYPE, CLASS_NAME, &(PARENT));
+class cl_error_class error_##NAME##_class(TYPE, CLASS_NAME, &(PARENT))
 
 #define ERROR_CLASS_DEF_PARENT_ON(TYPE,NAME,CLASS_NAME,PARENT,ON) \
-class cl_error_class error_##NAME##_class(TYPE, CLASS_NAME, &(PARENT), ON);
+class cl_error_class error_##NAME##_class(TYPE, CLASS_NAME, &(PARENT), ON)
 
 
 extern class cl_list *registered_errors;

@@ -3705,8 +3705,8 @@ static void pCodeLabelDestruct(pCode *pc)
   if(!pc)
     return;
 
-  if((pc->type == PC_LABEL) && PCL(pc)->label)
-    free(PCL(pc)->label);
+//  if((pc->type == PC_LABEL) && PCL(pc)->label)
+//    free(PCL(pc)->label);
 
   /* Instead of deleting the memory used by this pCode, mark
    * the object as bad so that if there's a pointer to this pCode
@@ -5021,11 +5021,11 @@ static void unlinkpCodeFromBranch(pCode *pcl , pCode *pc)
       /* Found a label */
       if(bprev) {
 	bprev->next = b->next;  /* Not first pCode in chain */
-	free(b);
+//	free(b);
       } else {
 	pc->destruct(pc);
 	PCI(pcl)->label = b->next;   /* First pCode in chain */
-	free(b);
+//	free(b);
       }
       return;  /* A label can't occur more than once */
     }
@@ -6319,8 +6319,8 @@ static void exchangeLabels(pCodeLabel *pcl, pCode *pc)
     pCodeOpLabel *pcol = PCOLAB(PCI(pc)->pcop);
 
 //	fprintf(stderr,"changing label key from %d to %d\n",pcol->key, pcl->key);
-    if(pcol->pcop.name)
-      free(pcol->pcop.name);
+//    if(pcol->pcop.name)
+//      free(pcol->pcop.name);
 
     /* If the key is negative, then we (probably) have a label to
      * a function and the name is already defined */
@@ -6647,7 +6647,7 @@ static void pBlockDestruct(pBlock *pb)
     return;
 
 
-  free(pb);
+//  free(pb);
 
 }
 

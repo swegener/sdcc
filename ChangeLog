@@ -1,3 +1,9 @@
+2004-09-23 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/genutils.c (pic16_genNot): fixed bug #1032265,
+	* src/pic16/pcode.c: commented out some calls to free() in order to
+	fix bug #989576,
+
 2004-09-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCicode.h,

@@ -108,9 +108,9 @@ void pic16_genNot (iCode *ic)
 	pic16_toBoolean( IC_LEFT(ic) );
 	
 	tlbl = newiTempLabel(NULL);
-	emitCLRC;
-	pic16_emitpcode(POC_TSTFSZ, pic16_popCopyReg( &pic16_pc_wreg ));
 	emitSETC;
+	pic16_emitpcode(POC_TSTFSZ, pic16_popCopyReg( &pic16_pc_wreg ));
+	emitCLRC;
 	pic16_outBitC( IC_RESULT(ic) );
 
 release:    

@@ -45,7 +45,11 @@
 float sincoshf(const float x, const int iscosh)
 {
     float y, w, z;
-    int sign;
+#ifdef SDCC_mcs51
+	bit sign;
+#else
+	char sign;
+#endif
     
     if (x<0.0) { y=-x; sign=1; }
           else { y=x;  sign=0; }

@@ -39,7 +39,12 @@
 float sincosf(const float x, const int iscos)
 {
     float y, f, r, g, XN;
-    int N, sign;
+    int N;
+#ifdef SDCC_mcs51
+	bit sign;
+#else
+	char sign;
+#endif
 
     if(iscos)
     {

@@ -43,7 +43,11 @@ float expf(const float x)
 {
     int n;
     float xn, g, r, z, y;
-    int sign;
+#ifdef SDCC_mcs51
+	bit sign;
+#else
+	char sign;
+#endif
 
     if(x>=0.0)
         { y=x;  sign=0; }

@@ -36,11 +36,17 @@
 #define K2  0.7320508076 /* sqrt(3)-1 */
 #define K3  1.7320508076 /* sqrt(3)   */
 
+#ifdef SDCC_mcs51
+   #define myconst code
+#else
+   #define myconst const
+#endif
+
 float atanf(const float x) reentrant
 {
     float f, r, g;
     int n=0;
-    static float a[]={  0.0, 0.5235987756, 1.5707963268, 1.0471975512 };
+	static myconst float a[]={  0.0, 0.5235987756, 1.5707963268, 1.0471975512 };
 
     f=fabsf(x);
     if(f>1.0)

@@ -272,10 +272,15 @@ printLine (lineNode * head, FILE * of)
       /* don't indent comments & labels */
       if (head->line &&
 	  (*head->line == ';' ||
-	   head->line[strlen (head->line) - 1] == ':'))
+	   head->line[strlen (head->line) - 1] == ':')) {
 	fprintf (of, "%s\n", head->line);
-      else
+      } else {
+	if (head->isInline && *head->line=='#') {
+	  // comment out preprocessor directives in inline asm
+	  fprintf (of, ";");
+	}
 	fprintf (of, "\t%s\n", head->line);
+      }
       head = head->next;
     }
 }

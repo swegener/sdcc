@@ -436,10 +436,6 @@ value *constVal (char *s)
   SPEC_NOUN (val->type) = V_CHAR;
   SPEC_USIGN (val->type) = 1;
 
-  /* set the _long flag if 'lL' is found */
-  if (strchr (s, 'l') || strchr (s, 'L'))
-    SPEC_LONG (val->type) = 1;
-
   hex = ((strchr (s, 'x') || strchr (s, 'X')) ? 1 : 0);
 
   /* set the octal flag   */
@@ -463,14 +459,17 @@ value *constVal (char *s)
 
   sscanf (s, scanFmt, &sval);
 
+  /* Setup the flags first */
+  /* set the _long flag if 'lL' is found */
+  if (strchr (s, 'l') || strchr (s, 'L'))
+    SPEC_LONG (val->type) = 1;
+
   if (sval<0) { // "-28u" will still be signed and negative
     SPEC_USIGN (val->type) = 0;
     if (sval<-32768) { // check if we have to promote to long
       SPEC_NOUN (val->type) = V_INT;
       SPEC_LONG (val->type) = 1;
-      SPEC_CVAL (val->type).v_long=sval;
     } else {
-      SPEC_CVAL (val->type).v_int=sval;
       if (sval<-128) { // check if we have to promote to int
 	SPEC_NOUN (val->type) = V_INT;
       }
@@ -479,14 +478,35 @@ value *constVal (char *s)
     if (sval>0xffff) { // check if we have to promote to long
       SPEC_NOUN (val->type) = V_INT;
       SPEC_LONG (val->type) = 1;
-      SPEC_CVAL (val->type).v_ulong=sval;
     } else {
-      SPEC_CVAL (val->type).v_uint=sval;
       if (sval>0xff) { // check if we have to promote to int
 	SPEC_NOUN (val->type) = V_INT;
       }
     }
   }
+
+  if (SPEC_LONG (val->type))
+    {
+      if (SPEC_USIGN (val->type))
+        {
+          SPEC_CVAL (val->type).v_ulong = sval;
+        }
+      else
+        {
+          SPEC_CVAL (val->type).v_long = sval;
+        }
+    }
+  else
+    {
+      if (SPEC_USIGN (val->type))
+        {
+          SPEC_CVAL (val->type).v_uint = sval;
+        }
+      else
+        {
+          SPEC_CVAL (val->type).v_int = sval;
+        }
+    }
 
   return val;
 }

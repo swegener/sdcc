@@ -9,7 +9,7 @@ clean:
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------
 distclean: clean
-	rm -f config.cache config.log config.status
+	rm -f config.cache config.log config.status Makefile.common
 	rm -f sdccconf.h main.mk *.dep
 
 

@@ -1,3 +1,7 @@
+2003-03-23  Bernhard Held <bernhard@bernhardheld.de>
+
+	* doc/cdbfile.html: removed, replaced by cdbfileformat.lyx
+
 2003-03-22  Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
 	* src/mcs51/gen.c (genCodePointerGet): quicker code for bug #700797
@@ -10,9 +14,9 @@
 2003-03-21  Bernhard Held <bernhard@bernhardheld.de>
 
 	* support/scripts/sdcc_mingw32: adapted to configure from autoconf 2.54
-	* src/doc/cdbfileformat.lyx: added, written by Lenny Story
-	* src/doc/Makefile: added cdbfileformat.lyx
-	* src/doc/clean.mk: added cdbfileformat.lyx
+	* doc/cdbfileformat.lyx: added, written by Lenny Story
+	* doc/Makefile: added cdbfileformat.lyx
+	* doc/clean.mk: added cdbfileformat.lyx
 
 2003-03-20  Bernhard Held <bernhard@bernhardheld.de>
 

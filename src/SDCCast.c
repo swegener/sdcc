@@ -3322,7 +3322,8 @@ decorateType (ast * tree)
 
       /* if the right is a literal replace the tree */
       if (IS_LITERAL (RETYPE (tree))) {
-        if (IS_PTR (LTYPE (tree)) && !IS_GENPTR (LTYPE (tree)) ) {
+        #if 0
+	if (IS_PTR (LTYPE (tree)) && !IS_GENPTR (LTYPE (tree)) ) {
           /* rewrite      (type *)litaddr
              as           &temp
              and define   type at litaddr temp
@@ -3359,6 +3360,7 @@ decorateType (ast * tree)
           TLVAL (newTree) = 1;
           return newTree;
         }
+	#endif
         if (!IS_PTR (LTYPE (tree))) {
 	  tree->type = EX_VALUE;
 	  tree->opval.val =

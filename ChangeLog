@@ -1,3 +1,7 @@
+2004-01-10 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (decorateType): fixed bug #874046
+
 2004-01-09  Borut Razem <borut.razem@siol.net>
 
 	* support/scripts/sdcc.nsi: remove previous installation

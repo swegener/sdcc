@@ -3602,14 +3602,16 @@ pCodeOp *pic16_newpCodeOpRegFromStr(char *name)
   pCodeOp *pcop;
   regs *r;
 
-  pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
-  PCOR(pcop)->r = r = pic16_allocRegByName(name, 1);
-  PCOR(pcop)->rIdx = PCOR(pcop)->r->rIdx;
-  pcop->type = PCOR(pcop)->r->pc_type;
-  pcop->name = PCOR(pcop)->r->name;
+	pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
+	PCOR(pcop)->r = r = pic16_allocRegByName(name, 1);
+	PCOR(pcop)->rIdx = PCOR(pcop)->r->rIdx;
+	pcop->type = PCOR(pcop)->r->pc_type;
+	pcop->name = PCOR(pcop)->r->name;
 
-  fprintf(stderr, "%s:%d %s allocates register %s rIdx:0x%02x\n",
-  	__FILE__, __LINE__, __FUNCTION__, r->name, r->rIdx);
+	if(pic16_pcode_verbose) {
+		fprintf(stderr, "%s:%d %s allocates register %s rIdx:0x%02x\n",
+			__FILE__, __LINE__, __FUNCTION__, r->name, r->rIdx);
+	}
 
   return pcop;
 }

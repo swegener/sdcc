@@ -1004,10 +1004,16 @@ pic16glue ()
 	fprintf (asmFile, ";\t.area %s\n", port->mem.post_static_name);
 	fprintf (asmFile, ";\t.area %s\n", port->mem.static_name);
 #endif
+
+#if 0
 	/* copy over code */
 	fprintf (asmFile, "%s", iComments2);
 	fprintf (asmFile, "\tcode\n");
 	fprintf (asmFile, "%s", iComments2);
+#endif
+
+	fprintf(asmFile, "; A code from now on!\n");
+	pic16_copypCode(asmFile, 'A');
 
 
 	if(mainf && IFFUNC_HASBODY(mainf->type)) {
@@ -1030,28 +1036,24 @@ pic16glue ()
 
 //	copyFile (stderr, code->oFile);
 
+	fprintf(asmFile, "; I code from now on!\n");
+	pic16_copypCode(asmFile, 'I');
+
+//	if(pic16_debug_verbose)
+		fprintf(asmFile, "; dbName from now on!\n");
+	pic16_copypCode(asmFile, statsg->dbName);
+
 
 	if (port->general.glue_up_main && mainf && IFFUNC_HASBODY(mainf->type)) {
 		fprintf (asmFile,"\tgoto\t__sdcc_program_startup\t;VR2\n");
 	}
-
-
-	fprintf(asmFile, "; I code from now on!\n");
-	pic16_copypCode(asmFile, 'I');
-
-	fprintf(asmFile, "; A code from now on!\n");
-	pic16_copypCode(asmFile, 'A');
-
 	
-	if(pic16_debug_verbose)
-		fprintf(asmFile, "; dbName from now on!\n");
-	pic16_copypCode(asmFile, statsg->dbName);
 
-	if(pic16_debug_verbose)
+//	if(pic16_debug_verbose)
 		fprintf(asmFile, "; X code from now on!\n");
 	pic16_copypCode(asmFile, 'X');
 
-	if(pic16_debug_verbose)
+//	if(pic16_debug_verbose)
 		fprintf(asmFile, "; M code from now on!\n");
 	pic16_copypCode(asmFile, 'M');
 

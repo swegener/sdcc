@@ -398,9 +398,19 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
   return FALSE;
 }
 
+extern set *includeDirsSet;
+extern set *dataDirsSet;
+extern set *libFilesSet;
+
 static void
 _pic16_finaliseOptions (void)
 {
+  char pic16incDir[512];
+  char pic16libDir[512];
+  set *pic16incDirsSet;
+  set *pic16libDirsSet;
+  char devlib[512];
+
 	port->mem.default_local_map = data;
 	port->mem.default_globl_map = data;
 
@@ -408,6 +418,25 @@ _pic16_finaliseOptions (void)
 
 	setMainValue("mcu", pic16_processor_base_name() );
 	addSet(&preArgvSet, Safe_strdup("-DMCU={mcu}"));
+
+	sprintf(pic16incDir, "%s/pic16", INCLUDE_DIR_SUFFIX);
+	sprintf(pic16libDir, "%s/pic16", LIB_DIR_SUFFIX);
+
+	if(!options.nostdinc) {
+		/* setup pic16 include directory */
+		pic16incDirsSet = appendStrSet(dataDirsSet, NULL, pic16incDir);
+		mergeSets(&includeDirsSet, pic16incDirsSet);
+	}
+	
+	if(!options.nostdlib) {
+		/* setup pic16 library directory */
+		pic16libDirsSet = appendStrSet(dataDirsSet, NULL, pic16libDir);
+		mergeSets(&libDirsSet, pic16libDirsSet);
+	
+		/* now add the library for the device */
+		sprintf(devlib, "%s.lib", pic16->name[2]);
+		addSet(&libFilesSet, Safe_strdup(devlib));
+	}
 }
 
 
@@ -651,22 +680,26 @@ oclsExpense (struct memmap *oclass)
 
 /** $1 is always the basename.
     $2 is always the output file.
-    $3 varies
+    $3 -L path and -l libraries
     $l is the list of extra options that should be there somewhere...
     MUST be terminated with a NULL.
 */
 static const char *_linkCmd[] =
 {
-  "gplink", "\"$1.o\"", "-o $1", "$l", NULL
+  "gplink", "$3", "\"$1.o\"", "-o $1", "$l", NULL
 };
 
-/* Sigh. This really is not good. For now, I recommend:
- * sdcc -S -mpic16 file.c
- * the -S option does not compile or link
- */
+
+
+/** $1 is always the basename.
+    $2 is always the output file.
+    $3 varies (nothing currently)
+    $l is the list of extra options that should be there somewhere...
+    MUST be terminated with a NULL.
+*/
 static const char *_asmCmd[] =
 {
-  "gpasm", "$l", "-c", "\"$1.asm\"", NULL
+  "gpasm", "$l", "$3", "-c", "\"$1.asm\"", NULL
 
 };
 

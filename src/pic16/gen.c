@@ -10332,6 +10332,7 @@ void genpic16Code (iCode *lic)
 	
 	if(options.iCodeInAsm) {
 		/* insert here code to print iCode as comment */
+		pic16_emitcomment("; ic:%d: %s", ic->seq, printILine(ic));
 	}
 	
 	/* if the result is marked as

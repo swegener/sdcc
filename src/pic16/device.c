@@ -45,7 +45,7 @@
 #define STRCASECMP strcasecmp
 #endif
 
-static PIC_device Pics[] = {
+static PIC16_device Pics16[] = {
   {
     {"p18f242", "18f242", "pic18f242", "f242"},		// aliases
     (memRange *)NULL,					// ram memory map
@@ -202,14 +202,11 @@ static PIC_device Pics[] = {
 
 };
 
-static int num_of_supported_PICS = sizeof(Pics)/sizeof(PIC_device);
+static int num_of_supported_PICS = sizeof(Pics16)/sizeof(PIC16_device);
 
 #define DEFAULT_PIC "452"
 
-static PIC_device *pic=NULL;
-
-//AssignedMemory *pic16_finalMapping=NULL;
-//int pic16_finalMappingSize=0;
+PIC16_device *pic16=NULL;
 
 #define DEFAULT_CONFIG_BYTE 0xff
 
@@ -265,85 +262,21 @@ extern regs* newReg(short type, short pc_type, int rIdx, char *name, int size, i
 void pic16_setMaxRAM(int size)
 {
   regs * reg;
-  pic->maxRAMaddress = size;
-  stackPos = pic->RAMsize-1;
+  pic16->maxRAMaddress = size;
+  stackPos = pic16->RAMsize-1;
 
-	reg=newReg(REG_SFR, PO_SFR_REGISTER, stackPos, "stack", 1, 0, NULL);
-	addSet(&pic16_fix_udata, reg);
 
-  if (pic->maxRAMaddress < 0) {
-    fprintf(stderr, "invalid \"#pragma maxram 0x%x\" setting\n",
-	    pic->maxRAMaddress);
-    return;
-  }
+	if(USE_STACK) {
+		reg=newReg(REG_SFR, PO_SFR_REGISTER, stackPos, "stack", 1, 0, NULL);
+		addSet(&pic16_fix_udata, reg);
+	}
 
-//  pic16_finalMapping = Safe_calloc(1+pic->maxRAMaddress,
-//			     sizeof(AssignedMemory));
-
-  /* Now initialize the pic16_finalMapping array */
-
-//  for(i=0; i<=pic->maxRAMaddress; i++) {
-//    pic16_finalMapping[i].reg = NULL;
-//    pic16_finalMapping[i].isValid = 0;
-//  }
+	if (pic16->maxRAMaddress < 0) {
+		fprintf(stderr, "invalid \"#pragma maxram 0x%x\" setting\n",
+			pic16->maxRAMaddress);
+	  return;
+	}
 }
-
-/*-----------------------------------------------------------------*
- *-----------------------------------------------------------------*/
-#if 0
-int pic16_isREGinBank(regs *reg, int bank)
-{
-
-  if(!reg || !pic)
-    return 0;
-
-  if(pic16_finalMapping[reg->address].bank == bank)
-    return 1;
-
-  return 0;
-}
-#endif
-/*-----------------------------------------------------------------*
- *-----------------------------------------------------------------*/
-int pic16_REGallBanks(regs *reg)
-{
-
-  if(!reg || !pic)
-    return 0;
-
-  if ((int)reg->address > pic->maxRAMaddress)
-    return 0;
-
-  return 1;
-
-}
-
-/*-----------------------------------------------------------------*
- *-----------------------------------------------------------------*/
-
-/*
- *  pic16_dump_map -- debug stuff
- */
-#if 0
-void pic16_dump_map(void)
-{
-  int i;
-
-  for(i=0; i<=pic->maxRAMaddress; i++) {
-    //fprintf(stdout , "addr 0x%02x is %s\n", i, ((pic16_finalMapping[i].isValid) ? "valid":"invalid"));
-
-    if(pic16_finalMapping[i].isValid) {
-      fprintf(stderr,"addr: 0x%02x",i);
-      if(pic16_finalMapping[i].isSFR)
-	fprintf(stderr," isSFR");
-      if(pic16_finalMapping[i].reg) 
-	fprintf( stderr, "  reg %s", pic16_finalMapping[i].reg->name);
-      fprintf(stderr, "\n");
-    }
-  }
-
-}
-#endif
 
 extern char *iComments2;
 
@@ -439,7 +372,7 @@ void pic16_list_valid_pics(int ncols, int list_alias)
   int i,j,k,l;
 
   if(list_alias)
-    list_alias = sizeof(Pics[0].name) / sizeof(Pics[0].name[0]);
+    list_alias = sizeof(Pics16[0].name) / sizeof(Pics16[0].name[0]);
 
   /* decrement the column number if it's greater than zero */
   ncols = (ncols > 1) ? ncols-1 : 4;
@@ -447,7 +380,7 @@ void pic16_list_valid_pics(int ncols, int list_alias)
   /* Find the device with the longest name */
   for(i=0,longest=0; i<num_of_supported_PICS; i++) {
     for(j=0; j<=list_alias; j++) {
-      k = strlen(Pics[i].name[j]);
+      k = strlen(Pics16[i].name[j]);
       if(k>longest)
 	longest = k;
     }
@@ -459,9 +392,9 @@ void pic16_list_valid_pics(int ncols, int list_alias)
     j = 0;
     do {
 
-      fprintf(stderr,"%s", Pics[i].name[j]);
+      fprintf(stderr,"%s", Pics16[i].name[j]);
       if(col<ncols) {
-	l = longest + 2 - strlen(Pics[i].name[j]);
+	l = longest + 2 - strlen(Pics16[i].name[j]);
 	for(k=0; k<l; k++)
 	  fputc(' ',stderr);
 
@@ -483,7 +416,7 @@ void pic16_list_valid_pics(int ncols, int list_alias)
 /*-----------------------------------------------------------------*
  *  
  *-----------------------------------------------------------------*/
-PIC_device *pic16_find_device(char *name)
+PIC16_device *pic16_find_device(char *name)
 {
 
   int i,j;
@@ -494,8 +427,8 @@ PIC_device *pic16_find_device(char *name)
   for(i = 0; i<num_of_supported_PICS; i++) {
 
     for(j=0; j<PROCESSOR_NAMES; j++)
-      if(!STRCASECMP(Pics[i].name[j], name) )
-	return &Pics[i];
+      if(!STRCASECMP(Pics16[i].name[j], name) )
+	return &Pics16[i];
   }
 
   /* not found */
@@ -507,9 +440,9 @@ PIC_device *pic16_find_device(char *name)
  *-----------------------------------------------------------------*/
 void pic16_init_pic(char *pic_type)
 {
-	pic = pic16_find_device(pic_type);
+	pic16 = pic16_find_device(pic_type);
 
-	if(!pic) {
+	if(!pic16) {
 		if(pic_type)
 			fprintf(stderr, "'%s' was not found.\n", pic_type);
 		else
@@ -530,7 +463,7 @@ void pic16_init_pic(char *pic_type)
  *-----------------------------------------------------------------*/
 int pic16_picIsInitialized(void)
 {
-  if(pic && pic->maxRAMaddress > 0)
+  if(pic16 && pic16->maxRAMaddress > 0)
     return 1;
 
   return 0;
@@ -543,39 +476,12 @@ int pic16_picIsInitialized(void)
 char *pic16_processor_base_name(void)
 {
 
-  if(!pic)
+  if(!pic16)
     return NULL;
 
-  return pic->name[0];
+  return pic16->name[0];
 }
 
-
-#if 0
-/*-----------------------------------------------------------------*
- *-----------------------------------------------------------------*/
-static int validAddress(int address, int reg_size)
-{
-  int i;
-
-#if 0
-  if (pic->maxRAMaddress < 0) {
-    fprintf(stderr, "missing \"#pragma maxram\" setting\n");
-    return 0;
-  }
-//  fprintf(stderr, "validAddress: Checking 0x%04x (max=0x%04x) (reg_size = %d)\n",address, pic->maxRAMaddress, reg_size);
-  if(address > pic->maxRAMaddress)
-    return 0;
-
-  for (i=0; i<reg_size; i++)
-    if(!pic16_finalMapping[address + i].isValid || 
-       pic16_finalMapping[address+i].reg ||
-       pic16_finalMapping[address+i].isSFR )
-      return 0;
-#endif
-
-  return 1;
-}
-#endif
 
 void checkAddReg(set **set, regs *reg)
 {

@@ -1573,9 +1573,18 @@ linkEdit (char **envp)
   if (port->linker.cmd)
     {
       char buffer2[PATH_MAX];
+      set *libSet=NULL;
 
-      /* VR 030517 - gplink needs linker options to set the linker script,*/
-      buildCmdLine (buffer2, port->linker.cmd, dstFileName, scratchFileName, NULL, linkOptionsSet);
+      if(TARGET_IS_PIC16) {
+         /* use $3 to set the linker include directories */
+         libSet = appendStrSet(libDirsSet, "-I\"", "\"");
+
+         /* now add the libraries from command line */
+         mergeSets(&libSet, libFilesSet);
+      }
+      
+      buildCmdLine (buffer2, port->linker.cmd, dstFileName, scratchFileName, (libSet?joinStrSet(libSet):NULL), linkOptionsSet);
+      if(libSet)deleteSet(&libSet);
 
       buildCmdLine2 (buffer, sizeof(buffer), buffer2);
     }

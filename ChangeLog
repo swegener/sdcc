@@ -1,3 +1,22 @@
+2004-01-16 Vangelis Rokas <vrokas@otenet.gr>
+
+	* src/SDCCmain.c (linkEdit): variable $3 of the linker command is
+	loaded with the linker search paths (-L arguments) and the libraries
+	to be linked with the current source (-l arguments). Changes
+	currently will affect only the pic16 port.
+	* src/pic16/main.c (_pic16_finaliseOptions): add to the linker
+	include path the port specific paths and port specific libraries,
+	* gplink command now contains the $3 argument,
+	* src/pic16/device.h,
+	* src/pic16/device.c,: structure PIC_device is made public and
+	renamed to PIC16_device, the same for variable Pics which is renamed
+	to Pics16. Updated all references to them.
+	* src/pic16/glue.c (pic16glue): corrected bug with code
+	initialization which bypassed the variable initializations block.
+	
+	* device/lib/pic16/Makefile.rules: removed --penable-stack from
+	COMPILE_FLAGS and added the --nostdinc option
+
 2004-01-15 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* device/include/mc68hc908jb8.h: Register defs for another member

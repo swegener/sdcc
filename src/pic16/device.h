@@ -82,7 +82,7 @@ typedef struct AssignedMemory {
 
 #define PROCESSOR_NAMES    4
 /* Processor unique attributes */
-typedef struct PIC_device {
+typedef struct PIC16_device {
   char *name[PROCESSOR_NAMES];/* aliases for the processor name */
 
   memRange *ram;              /* RAM memory map */
@@ -92,7 +92,7 @@ typedef struct PIC_device {
   int bankMask;               /* Bitmask that is ANDed with address to extract banking bits */
   int RAMsize;		      /* size of Data RAM - VR 031120 */
   int extMIface;               /* device has external memory interface */
-} PIC_device;
+} PIC16_device;
 
 /* Given a pointer to a register, this macro returns the bank that it is in */
 #define REG_ADDR(r)        ((r)->isBitField ? (((r)->address)>>3) : (r)->address)
@@ -117,7 +117,7 @@ typedef struct {
 
 
 extern pic16_options_t pic16_options;
-
+extern PIC16_device *pic16;
 
 /****************************************/
 void pic16_assignConfigWordValue(int address, int value);

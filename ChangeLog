@@ -1,3 +1,10 @@
+2003-11-13 Frieder Ferlemann <Frieder.Ferlemann@web.de>
+
+	* src/mcs51/main.c: started fixing bug #737001 (SDCC not clearing
+	uninitialized variables) for the mcs51. Set environment variable 
+	SDCC_GENRAMCLEAR to test. 
+	xdata initialization slightly shorter
+
 2003-11-12 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCCsymt.h,

@@ -1,3 +1,7 @@
+2003-01-24    <johan@CP255758-A>
+
+	* src/SDCCast.c (createIvalCharPtr): fixed bug #661910
+
 2003-01-24  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/mcs51/peeph.def: better assembler identation by Frieder

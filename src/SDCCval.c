@@ -355,6 +355,7 @@ value *cheapestVal (value *val) {
     if (sval<0) {
       if (sval>=-128) {
 	SPEC_NOUN(val->type)=V_CHAR;
+	SPEC_CVAL(val->type).v_int &= 0xff;
 	SPEC_LONG(val->type)=0;
       } else {
 	if (sval>=-32768) {
@@ -865,23 +866,26 @@ floatFromVal (value * val)
 
   if (SPEC_NOUN (val->etype) == V_FLOAT)
     return (double) SPEC_CVAL (val->etype).v_float;
-  else
+
+  if (SPEC_LONG (val->etype))
     {
-      if (SPEC_LONG (val->etype))
-	{
-	  if (SPEC_USIGN (val->etype))
-	    return (double) SPEC_CVAL (val->etype).v_ulong;
-	  else
-	    return (double) SPEC_CVAL (val->etype).v_long;
-	}
+      if (SPEC_USIGN (val->etype))
+	return (double) SPEC_CVAL (val->etype).v_ulong;
       else
-	{
-	  if (SPEC_USIGN (val->etype))
-	    return (double) SPEC_CVAL (val->etype).v_uint;
-	  else
-	    return (double) SPEC_CVAL (val->etype).v_int;
-	}
+	return (double) SPEC_CVAL (val->etype).v_long;
     }
+  
+  if (SPEC_NOUN(val->etype)==V_INT) {
+    if (SPEC_USIGN (val->etype))
+      return (double) SPEC_CVAL (val->etype).v_uint;
+    else
+      return (double) SPEC_CVAL (val->etype).v_int;
+  } else { // SPEC_NOUN==V_CHAR
+    if (SPEC_USIGN (val->etype))
+      return (double) ((unsigned char)SPEC_CVAL (val->etype).v_uint);
+    else
+      return (double) ((signed char)SPEC_CVAL (val->etype).v_int);
+  }
 }
 
 
@@ -909,8 +913,13 @@ valUnaryPM (value * val)
 	    SPEC_CVAL (val->etype).v_uint = 0-SPEC_CVAL (val->etype).v_uint;
 	  else
 	    SPEC_CVAL (val->etype).v_int = -SPEC_CVAL (val->etype).v_int;
+	  if (SPEC_NOUN (val->etype)==V_CHAR) {
+	    SPEC_CVAL (val->etype).v_uint &= 0xff;
+	  }
 	}
     }
+  // -(unsigned 3) now really is signed
+  SPEC_USIGN(val->etype)=0;
   return val;
 }
 
@@ -934,6 +943,9 @@ valComplement (value * val)
 	SPEC_CVAL (val->etype).v_uint = ~SPEC_CVAL (val->etype).v_uint;
       else
 	SPEC_CVAL (val->etype).v_int = ~SPEC_CVAL (val->etype).v_int;
+      if (SPEC_NOUN (val->etype)==V_CHAR) {
+	SPEC_CVAL (val->etype).v_uint &= 0xff;
+      }
     }
   return val;
 }
@@ -958,6 +970,9 @@ valNot (value * val)
 	SPEC_CVAL (val->etype).v_uint = !SPEC_CVAL (val->etype).v_uint;
       else
 	SPEC_CVAL (val->etype).v_int = !SPEC_CVAL (val->etype).v_int;
+      if (SPEC_NOUN (val->etype)==V_CHAR) {
+	SPEC_CVAL (val->etype).v_uint &= 0xff;
+      }
     }
   return val;
 }
@@ -1435,17 +1450,12 @@ valCastLiteral (sym_link * dtype, double fval)
       else
 	{
 	  if (SPEC_USIGN (val->etype))
-	    if (SPEC_NOUN (val->etype)==V_CHAR) {
-	      SPEC_CVAL (val->etype).v_uint = (unsigned char)fval;
-	    } else {
-	      SPEC_CVAL (val->etype).v_uint = (unsigned short)fval;
-	    }
+	    SPEC_CVAL (val->etype).v_uint = (unsigned short)fval;
 	  else
-	    if (SPEC_NOUN (val->etype)==V_CHAR) {
-	      SPEC_CVAL (val->etype).v_int = (char)fval;
-	    } else {
-	      SPEC_CVAL (val->etype).v_int = (short)fval;
-	    }
+	    SPEC_CVAL (val->etype).v_int = (short)fval;
+	  if (SPEC_NOUN (val->etype)==V_CHAR) {
+	    SPEC_CVAL (val->etype).v_uint &= 0xff; 
+	  }
 	}
     }
   return val;

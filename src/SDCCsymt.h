@@ -123,9 +123,9 @@ typedef struct specifier
 
     union
       {				/* Values if constant or enum */
-	int v_int;		/* int and char values        */
+	short int v_int;		/* int and char values        */
 	char *v_char;		/* character string           */
-	unsigned v_uint;	/* unsigned int const value   */
+	unsigned short v_uint;	/* unsigned int const value   */
 	long v_long;		/* long constant value        */
 	unsigned long v_ulong;	/* unsigned long constant val */
 	double v_float;		/* floating point constant value */

@@ -38,7 +38,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /G3 /ML /W3 /WX /Gm /GX /ZI /Od /I ".." /I "..\support\util" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FR /J /FD /GZ /c
+# ADD CPP /nologo /G3 /ML /W3 /Gm /GX /ZI /Od /I ".." /I "..\support\util" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FR /J /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -143,6 +143,10 @@ SOURCE=.\SDCClrange.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\SDCCmacro.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\SDCCmain.c
 # End Source File
 # Begin Source File
@@ -168,6 +172,10 @@ SOURCE=.\SDCCset.c
 # Begin Source File
 
 SOURCE=.\SDCCsymt.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCCutil.c
 # End Source File
 # Begin Source File
 

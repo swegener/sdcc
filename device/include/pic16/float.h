@@ -52,7 +52,7 @@
 #define PACK(s,e,m)	((s) | ((unsigned long)(e) << 23) | (m))
 
 
-#if 0
+#if 1
 #define reentrant
 
 float __uchar2fs (unsigned char) reentrant;

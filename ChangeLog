@@ -1,3 +1,6 @@
+2002-08-25  Bernhard Held <bernhard@bernhardheld.de>
+	* support/scripts/inc2h.pl: use gputils or gpasm (from Nathan Hurst)
+
 2002-08-11  Borut Razem <borut.razem@siol.net>
 	* support/Util/NewAlloc.c: removed unneeded #include "sdccconf.h" (suggested by Jesus Calvino-Fraga)
 

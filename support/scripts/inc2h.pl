@@ -28,7 +28,16 @@ $processor = shift;
 $path = shift;
 
 $processor = uc $processor;
-$path = "/usr/share/gpasm" if ($path eq '');
+# Nathan Hurst <njh@mail.csse.monash.edu.au>: find gputils on Debian
+if ($path eq '') {
+    if ( -x "/usr/share/gputils") {
+       $path = "/usr/share/gputils";
+    } elsif ( -x "/usr/share/gpasm") {
+       $path = "/usr/share/gpasm";
+    } else {
+       die "Could not find gpasm includes.\n";
+    }
+}
 
 #
 # Read the symbols at the end of this file.

@@ -943,6 +943,7 @@ pointer
          {
 	     $$ = $1 ;		
 	     $$->next = $2 ;
+	     DCL_TYPE($2)=GPOINTER;
 	 }
    | unqualified_pointer type_specifier_list pointer
          {

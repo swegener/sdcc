@@ -276,6 +276,39 @@ static bool cseCostEstimation (iCode *ic, iCode *pdic)
 }
 
 
+/* Indicate which extended bit operations this port supports */
+static bool
+hasExtBitOp (int op, int size)
+{
+  if (op == RRC
+      || op == RLC
+      || op == GETHBIT
+      || (op == SWAP && size <= 2)
+     )
+    return TRUE;
+  else
+    return FALSE;
+}
+
+/* Indicate the expense of an access to an output storage class */
+static int
+oclsExpense (struct memmap *oclass)
+{
+  /* The hc08's addressing modes allow access to all storage classes */
+  /* inexpensively (<=0) */
+  
+  if (IN_DIRSPACE (oclass))	/* direct addressing mode is fastest */
+    return -2;
+  if (IN_FARSPACE (oclass))	/* extended addressing mode is almost at fast */
+    return -1;
+  if (oclass == istack) /* stack is the slowest, but still faster than */
+    return 0;		/* trying to copy to a temp location elsewhere */
+  
+  return 0; /* anything we missed */
+}
+
+
+
 /** $1 is always the basename.
     $2 is always the output file.
     $3 varies
@@ -374,6 +407,8 @@ PORT hc08_port =
   NULL,				/* process_pragma */
   NULL,				/* getMangledFunctionName */
   NULL,				/* hasNativeMulFor */
+  hasExtBitOp,			/* hasExtBitOp */
+  oclsExpense,			/* oclsExpense */
   TRUE,				/* use_dw_for_init */
   FALSE,			/* little endian */
   0,				/* leave lt */

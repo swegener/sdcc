@@ -5752,6 +5752,66 @@ genGetHbit (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* genSwap - generates code to swap nibbles or bytes               */
+/*-----------------------------------------------------------------*/
+static void
+genSwap (iCode * ic)
+{
+  operand *left, *result;
+
+  D(emitcode (";     genSwap",""));
+
+  left = IC_LEFT (ic);
+  result = IC_RESULT (ic);
+  aopOp (left, ic, FALSE);
+  aopOp (result, ic, FALSE);
+  
+  switch (AOP_SIZE (left))
+    {
+    case 1: /* swap nibbles in byte */
+      MOVA (aopGet (AOP (left), 0, FALSE, FALSE));
+      emitcode ("swap", "a");
+      aopPut (AOP (result), "a", 0, isOperandVolatile (result, FALSE));
+      break;
+    case 2: /* swap bytes in word */
+      if (AOP_TYPE(left) == AOP_REG && sameRegs(AOP(left), AOP(result)))
+	{
+	  MOVA (aopGet (AOP (left), 0, FALSE, FALSE));
+	  aopPut (AOP (result), aopGet (AOP (left), 1, FALSE, FALSE),
+		  0, isOperandVolatile (result, FALSE));
+	  aopPut (AOP (result), "a", 1, isOperandVolatile (result, FALSE));
+	}
+      else if (operandsEqu (left, result))
+	{
+          char * reg = "a";
+	  MOVA (aopGet (AOP (left), 0, FALSE, FALSE));
+	  if (aopGetUsesAcc(AOP (left), 1) || aopGetUsesAcc(AOP (result), 0))
+	    {
+	      emitcode ("mov", "b,a");
+              reg = "b";
+            }
+	  aopPut (AOP (result), aopGet (AOP (left), 1, FALSE, FALSE),
+		  0, isOperandVolatile (result, FALSE));
+	  aopPut (AOP (result), reg, 1, isOperandVolatile (result, FALSE));
+	}
+      else
+	{
+	  aopPut (AOP (result), aopGet (AOP (left), 1, FALSE, FALSE),
+		  0, isOperandVolatile (result, FALSE));
+	  aopPut (AOP (result), aopGet (AOP (left), 0, FALSE, FALSE),
+		  1, isOperandVolatile (result, FALSE));
+	}
+      break;
+    default:
+      wassertl(FALSE, "unsupported SWAP operand size");
+    }
+  
+  freeAsmop (left, NULL, ic, TRUE);
+  freeAsmop (result, NULL, ic, TRUE);
+}
+
+    
+/*-----------------------------------------------------------------*/
 /* AccRol - rotate left accumulator by known count                 */
 /*-----------------------------------------------------------------*/
 static void
@@ -9333,6 +9393,10 @@ gen51Code (iCode * lic)
 
 	case ENDCRITICAL:
 	  genEndCritical (ic);
+	  break;
+
+	case SWAP:
+	  genSwap (ic);
 	  break;
 
 	default:

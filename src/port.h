@@ -249,6 +249,16 @@ typedef struct
     */
     bool (*hasNativeMulFor) (iCode *ic, sym_link *left, sym_link *right);
 
+    /** Returns true if the port has implemented certain bit
+        manipulation iCodes (RRC, RLC, SWAP, GETHBIT)
+    */
+    bool (*hasExtBitOp) (int op, int size);
+    
+    /** Returns the relative expense of accessing a particular output
+        storage class. Larger values indicate higher expense.
+    */
+    int (*oclsExpense) (struct memmap *oclass);
+    
     /** If TRUE, then tprintf and !dw will be used for some initalisers
      */
     bool use_dw_for_init;

@@ -1022,6 +1022,21 @@ isOperandOnStack (operand * op)
 }
 
 /*-----------------------------------------------------------------*/
+/* isOclsExpensive - will return true if accesses to an output     */
+/*                   storage class are expensive                   */
+/*-----------------------------------------------------------------*/
+bool 
+isOclsExpensive (struct memmap *oclass)
+{
+  if (port->oclsExpense)
+    return port->oclsExpense (oclass) > 0;
+
+  /* In the absence of port specific guidance, assume only */
+  /* farspace is expensive. */
+  return IN_FARSPACE (oclass);
+}
+
+/*-----------------------------------------------------------------*/
 /* operandLitValue - literal value of an operand                   */
 /*-----------------------------------------------------------------*/
 double
@@ -1479,6 +1494,7 @@ operandFromSymbol (symbol * sym)
      register equivalent for a local symbol */
   if (sym->level && sym->etype && SPEC_OCLS (sym->etype) &&
       (IN_FARSPACE (SPEC_OCLS (sym->etype)) &&
+      !TARGET_IS_HC08 &&
       (!(options.model == MODEL_FLAT24)) ) &&
       options.stackAuto == 0)
     ok = 0;
@@ -1758,7 +1774,7 @@ geniCodeRValue (operand * op, bool force)
   /* if this is not a temp symbol then */
   if (!IS_ITEMP (op) &&
       !force &&
-      !IN_FARSPACE (SPEC_OCLS (etype)))
+      !(IN_FARSPACE (SPEC_OCLS (etype)) && !TARGET_IS_HC08))
     {
       op = operandFromOperand (op);
       op->isaddr = 0;
@@ -1767,7 +1783,7 @@ geniCodeRValue (operand * op, bool force)
 
   if (IS_SPEC (type) &&
       IS_TRUE_SYMOP (op) &&
-      (!IN_FARSPACE (SPEC_OCLS (etype)) ||
+      (!(IN_FARSPACE (SPEC_OCLS (etype)) && !TARGET_IS_HC08) ||
       (options.model == MODEL_FLAT24) ))
     {
       op = operandFromOperand (op);
@@ -2861,11 +2877,12 @@ geniCodeAssign (operand * left, operand * right, int nosupdate)
   else if (compareType (ltype, rtype) < 0)
     right = geniCodeCast (ltype, right, TRUE);
 
-  /* if left is a true symbol & ! volatile
+  /* If left is a true symbol & ! volatile
      create an assignment to temporary for
      the right & then assign this temporary
-     to the symbol this is SSA . isn't it simple
-     and folks have published mountains of paper on it */
+     to the symbol. This is SSA (static single
+     assignment). Isn't it simple and folks have
+     published mountains of paper on it */
   if (IS_TRUE_SYMOP (left) &&
       !isOperandVolatile (left, FALSE) &&
       isOperandGlobal (left))
@@ -3094,7 +3111,7 @@ geniCodeReceive (value * args)
 	  if (!sym->addrtaken && !IS_VOLATILE (sym->etype))
 	    {
 
-	      if (IN_FARSPACE (SPEC_OCLS (sym->etype)) &&
+	      if ((IN_FARSPACE (SPEC_OCLS (sym->etype)) && !TARGET_IS_HC08) &&
 		  options.stackAuto == 0 &&
 		  (!(options.model == MODEL_FLAT24)) )
 		{
@@ -3757,6 +3774,7 @@ ast2iCode (ast * tree,int lvl)
     case '~':
     case RRC:
     case RLC:
+    case SWAP:
       return geniCodeUnary (geniCodeRValue (left, FALSE), tree->opval.op);
 
     case '!':

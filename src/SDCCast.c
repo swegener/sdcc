@@ -52,6 +52,7 @@ static ast *createIval (ast *, sym_link *, initList *, ast *);
 static ast *createIvalCharPtr (ast *, sym_link *, ast *);
 static ast *optimizeCompare (ast *);
 ast *optimizeRRCRLC (ast *);
+ast *optimizeSWAP (ast *);
 ast *optimizeGetHbit (ast *);
 ast *backPatchLabels (ast *, symbol *, symbol *);
 void PA(ast *t);
@@ -1664,6 +1665,7 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
     case RRC:
     case RLC:
     case GETHBIT:
+    case SWAP:
       if (IS_AST_SYM_VALUE (pbody->left) &&
 	  isSymbolEqual (AST_SYMBOL (pbody->left), sym))
 	return FALSE;
@@ -2408,6 +2410,11 @@ decorateType (ast * tree)
 	ast *wtree = optimizeRRCRLC (tree);
 	if (wtree != tree)
 	  return decorateType (wtree);
+	
+	wtree = optimizeSWAP (tree);
+	if (wtree != tree)
+	  return decorateType (wtree);
+        
 	// fall through
       }
 
@@ -3008,6 +3015,7 @@ decorateType (ast * tree)
       /*----------------------------*/
     case RRC:
     case RLC:
+    case SWAP:
       TTYPE (tree) = LTYPE (tree);
       TETYPE (tree) = LETYPE (tree);
       return tree;
@@ -4346,6 +4354,11 @@ optimizeGetHbit (ast * tree)
   if ((i = (int) AST_LIT_VALUE (tree->left->right)) !=
       (j = (getSize (TTYPE (tree->left->left)) * 8 - 1)))
     return tree;
+      
+  /* make sure the port supports GETHBIT */
+  if (port->hasExtBitOp
+      && !port->hasExtBitOp(GETHBIT, getSize (TTYPE (tree->left->left))))
+    return tree;
 
   return decorateType (newNode (GETHBIT, tree->left->left, NULL));
 
@@ -4398,6 +4411,11 @@ optimizeRRCRLC (ast * root)
 	  (getSize (TTYPE (root->left->left)) * 8 - 1))
 	goto tryNext0;
 
+      /* make sure the port supports RLC */
+      if (port->hasExtBitOp
+          && !port->hasExtBitOp(RLC, getSize (TTYPE (root->left->left))))
+        return root;
+
       /* whew got the first case : create the AST */
       return newNode (RLC, root->left->left, NULL);
     }
@@ -4427,6 +4445,11 @@ tryNext0:
       if (AST_LIT_VALUE (root->left->right) !=
 	  (getSize (TTYPE (root->left->left)) * 8 - 1))
 	goto tryNext1;
+
+      /* make sure the port supports RLC */
+      if (port->hasExtBitOp
+          && !port->hasExtBitOp(RLC, getSize (TTYPE (root->left->left))))
+        return root;
 
       /* whew got the first case : create the AST */
       return newNode (RLC, root->left->left, NULL);
@@ -4459,6 +4482,11 @@ tryNext1:
 	  (getSize (TTYPE (root->left->left)) * 8 - 1))
 	goto tryNext2;
 
+      /* make sure the port supports RRC */
+      if (port->hasExtBitOp
+          && !port->hasExtBitOp(RRC, getSize (TTYPE (root->left->left))))
+        return root;
+
       /* whew got the first case : create the AST */
       return newNode (RRC, root->left->left, NULL);
 
@@ -4489,10 +4517,70 @@ tryNext2:
 	  (getSize (TTYPE (root->left->left)) * 8 - 1))
 	return root;
 
+      /* make sure the port supports RRC */
+      if (port->hasExtBitOp
+          && !port->hasExtBitOp(RRC, getSize (TTYPE (root->left->left))))
+        return root;
+
       /* whew got the first case : create the AST */
       return newNode (RRC, root->left->left, NULL);
 
     }
+
+  /* not found return root */
+  return root;
+}
+
+/*-----------------------------------------------------------------*/
+/* optimizeSWAP :- optimize for nibble/byte/word swaps             */
+/*-----------------------------------------------------------------*/
+ast *
+optimizeSWAP (ast * root)
+{
+  /* will look for trees of the form
+     (?expr << 4) | (?expr >> 4) or
+     (?expr >> 4) | (?expr << 4) will make that
+     into a SWAP : operation ..
+     note : by 4 I mean (number of bits required to hold the
+     variable /2 ) */
+  /* if the root operations is not a | operation the not */
+  if (!IS_BITOR (root))
+    return root;
+
+  /* (?expr << 4) | (?expr >> 4) */
+  if ((IS_LEFT_OP (root->left) && IS_RIGHT_OP (root->right))
+      || (IS_RIGHT_OP (root->left) && IS_LEFT_OP (root->right)))
+    {
+
+      if (!SPEC_USIGN (TETYPE (root->left->left)))
+	return root;
+
+      if (!IS_AST_LIT_VALUE (root->left->right) ||
+	  !IS_AST_LIT_VALUE (root->right->right))
+	return root;
+
+      /* make sure it is the same expression */
+      if (!isAstEqual (root->left->left,
+		       root->right->left))
+	return root;
+
+      if (AST_LIT_VALUE (root->left->right) !=
+	  (getSize (TTYPE (root->left->left)) * 4))
+	return root;
+
+      if (AST_LIT_VALUE (root->right->right) !=
+	  (getSize (TTYPE (root->left->left)) * 4))
+	return root;
+
+      /* make sure the port supports SWAP */
+      if (port->hasExtBitOp
+          && !port->hasExtBitOp(SWAP, getSize (TTYPE (root->left->left))))
+        return root;
+
+      /* found it : create the AST */
+      return newNode (SWAP, root->left->left, NULL);
+    }
+
 
   /* not found return root */
   return root;
@@ -5178,6 +5266,12 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 
 	case RLC:
 		fprintf(outfile,"RLC (%p) type (",tree);
+		printTypeChain(tree->ftype,outfile);
+		fprintf(outfile,")\n");
+		ast_print(tree->left,outfile,indent+2);
+		return ;
+	case SWAP:
+		fprintf(outfile,"SWAP (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
 		ast_print(tree->left,outfile,indent+2);

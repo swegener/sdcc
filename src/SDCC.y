@@ -94,7 +94,7 @@ bool uselessDecl = TRUE;
 %token BITWISEAND UNARYMINUS IPUSH IPOP PCALL  ENDFUNCTION JUMPTABLE
 %token RRC RLC 
 %token CAST CALL PARAM NULLOP BLOCK LABEL RECEIVE SEND ARRAYINIT
-%token DUMMY_READ_VOLATILE ENDCRITICAL
+%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP
 
 %type <yyint>  Interrupt_storage
 %type <sym> identifier  declarator  declarator2 enumerator_list enumerator

@@ -131,6 +131,29 @@ _avr_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 	return TRUE;
 }
 
+/* Indicate which extended bit operations this port supports */
+static bool
+hasExtBitOp (int op, int size)
+{
+  if (op == RRC
+      || op == RLC
+      || op == GETHBIT
+     )
+    return TRUE;
+  else
+    return FALSE;
+}
+
+/* Indicate the expense of an access to an output storage class */
+static int
+oclsExpense (struct memmap *oclass)
+{
+  if (IN_FARSPACE(oclass))
+    return 1;
+    
+  return 0;
+}
+
 /** $1 is always the basename.
     $2 is always the output file.
     $3 varies
@@ -221,6 +244,8 @@ PORT avr_port = {
         NULL,
 	NULL,
         NULL,
+	hasExtBitOp,		/* hasExtBitOp */
+	oclsExpense,		/* oclsExpense */
 	FALSE,
 	TRUE,			/* little endian */
 	0,			/* leave lt */

@@ -4968,7 +4968,55 @@ genGetHbit (iCode * ic)
   emitcode ("rola", "");
   hc08_dirtyReg (hc08_reg_a, FALSE);
   storeRegToFullAop (hc08_reg_a, AOP (result), FALSE);
+  hc08_freeReg (hc08_reg_a);
   
+  freeAsmop (left, NULL, ic, TRUE);
+  freeAsmop (result, NULL, ic, TRUE);
+}
+
+/*-----------------------------------------------------------------*/
+/* genSwap - generates code to swap nibbles or bytes               */
+/*-----------------------------------------------------------------*/
+static void
+genSwap (iCode * ic)
+{
+  operand *left, *result;
+
+  D(emitcode (";     genSwap",""));
+
+  left = IC_LEFT (ic);
+  result = IC_RESULT (ic);
+  aopOp (left, ic, FALSE);
+  aopOp (result, ic, FALSE);
+  
+  switch (AOP_SIZE (left))
+    {
+    case 1: /* swap nibbles in byte */
+      loadRegFromAop (hc08_reg_a, AOP (left), 0);
+      emitcode ("nsa", "");
+      hc08_dirtyReg (hc08_reg_a, FALSE);
+      storeRegToAop (hc08_reg_a, AOP (result), 0);
+      hc08_freeReg (hc08_reg_a);
+      break;
+    case 2: /* swap bytes in a word */
+      if (operandsEqu (left, result))
+        {
+          loadRegFromAop (hc08_reg_a, AOP (left), 0);
+          hc08_useReg (hc08_reg_a);
+          transferAopAop (AOP (left), 1, AOP (result), 0);
+          storeRegToAop (hc08_reg_a, AOP (result), 1);
+          hc08_freeReg (hc08_reg_a);
+        }
+      else
+        {
+          transferAopAop (AOP (left), 0, AOP (result), 1);
+          transferAopAop (AOP (left), 1, AOP (result), 0);
+        }
+      break;
+    default:
+      wassertl(FALSE, "unsupported SWAP operand size");
+    }
+    
   freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
 }
@@ -7629,6 +7677,10 @@ genhc08Code (iCode * lic)
 	case ENDCRITICAL:
 	  genEndCritical (ic);
 	  break;
+	
+        case SWAP:
+	  genSwap (ic);
+          break;
 
 	default:
 	  ic = ic;

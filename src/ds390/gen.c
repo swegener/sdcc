@@ -7332,6 +7332,65 @@ genGetHbit (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* genSwap - generates code to swap nibbles or bytes               */
+/*-----------------------------------------------------------------*/
+static void
+genSwap (iCode * ic)
+{
+  operand *left, *result;
+
+  D(emitcode (";     genSwap",""));
+
+  left = IC_LEFT (ic);
+  result = IC_RESULT (ic);
+  aopOp (left, ic, FALSE, FALSE);
+  aopOp (result, ic, FALSE, AOP_USESDPTR(left));
+  
+  _startLazyDPSEvaluation ();
+  switch (AOP_SIZE (left))
+    {
+    case 1: /* swap nibbles in byte */
+      MOVA (aopGet (AOP (left), 0, FALSE, FALSE, NULL));
+      emitcode ("swap", "a");
+      aopPut (AOP (result), "a", 0);
+      break;
+    case 2: /* swap bytes in word */
+      if (AOP_TYPE(left) == AOP_REG && sameRegs(AOP(left), AOP(result)))
+	{
+	  MOVA (aopGet (AOP (left), 0, FALSE, FALSE, NULL));
+	  aopPut (AOP (result), aopGet (AOP (left), 1, FALSE, FALSE, NULL), 0);
+	  aopPut (AOP (result), "a", 1);
+	}
+      else if (operandsEqu (left, result))
+	{
+          char * reg = "a";
+	  MOVA (aopGet (AOP (left), 0, FALSE, FALSE, NULL));
+	  if (AOP_NEEDSACC (left) || AOP_NEEDSACC (result))
+	    {
+	      emitcode ("mov", "b,a");
+              reg = "b";
+              _G.bInUse=1;
+            }
+	  aopPut (AOP (result), aopGet (AOP (left), 1, FALSE, FALSE, NULL), 0);
+	  aopPut (AOP (result), reg, 1);
+          _G.bInUse=0;
+	}
+      else
+	{
+	  aopPut (AOP (result), aopGet (AOP (left), 1, FALSE, FALSE, NULL), 0);
+	  aopPut (AOP (result), aopGet (AOP (left), 0, FALSE, FALSE, NULL), 1);
+	}
+      break;
+    default:
+      wassertl(FALSE, "unsupported SWAP operand size");
+    }
+  _endLazyDPSEvaluation ();
+  
+  freeAsmop (left, NULL, ic, TRUE);
+  freeAsmop (result, NULL, ic, TRUE);
+}
+
+/*-----------------------------------------------------------------*/
 /* AccRol - rotate left accumulator by known count                 */
 /*-----------------------------------------------------------------*/
 static void
@@ -13118,6 +13177,10 @@ gen390Code (iCode * lic)
 
 	case ENDCRITICAL:
 	  genEndCritical (ic);
+	  break;
+	
+        case SWAP:
+	  genSwap (ic);
 	  break;
           
 #if 0 // obsolete, and buggy for != xdata

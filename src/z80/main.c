@@ -478,6 +478,26 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
   return FALSE;
 }
 
+/* Indicate which extended bit operations this port supports */
+static bool
+hasExtBitOp (int op, int size)
+{
+  if (op == GETHBIT)
+    return TRUE;
+  else
+    return FALSE;
+}
+
+/* Indicate the expense of an access to an output storage class */
+static int
+oclsExpense (struct memmap *oclass)
+{
+  if (IN_FARSPACE(oclass))
+    return 1;
+    
+  return 0;
+}
+
 
 #define LINKCMD "link-{port} -nf {dstfilename}"
 /*
@@ -573,6 +593,8 @@ PORT z80_port =
   _process_pragma,
   _mangleSupportFunctionName,
   _hasNativeMulFor,
+  hasExtBitOp,			/* hasExtBitOp */
+  oclsExpense,			/* oclsExpense */
   TRUE,
   TRUE,				/* little endian */
   0,				/* leave lt */
@@ -670,6 +692,8 @@ PORT gbz80_port =
   _process_pragma,
   _mangleSupportFunctionName,
   _hasNativeMulFor,
+  hasExtBitOp,			/* hasExtBitOp */
+  oclsExpense,			/* oclsExpense */
   TRUE,
   TRUE,				/* little endian */
   0,				/* leave lt */

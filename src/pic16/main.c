@@ -381,6 +381,32 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 */
 }
 
+/* Indicate which extended bit operations this port supports */
+static bool
+hasExtBitOp (int op, int size)
+{
+  if (op == RRC
+      || op == RLC
+      /* || op == GETHBIT */ /* GETHBIT doesn't look complete for PIC */
+     )
+    return TRUE;
+  else
+    return FALSE;
+}
+
+/* Indicate the expense of an access to an output storage class */
+static int
+oclsExpense (struct memmap *oclass)
+{
+  /* The IN_FARSPACE test is compatible with historical behaviour, */
+  /* but I don't think it is applicable to PIC. If so, please feel */
+  /* free to remove this test -- EEP */
+  if (IN_FARSPACE(oclass))
+    return 1;
+    
+  return 0;
+}
+
 /** $1 is always the basename.
     $2 is always the output file.
     $3 varies
@@ -488,6 +514,8 @@ PORT pic16_port =
   _process_pragma,				/* process a pragma */
   NULL,
   _hasNativeMulFor,
+  hasExtBitOp,			/* hasExtBitOp */
+  oclsExpense,			/* oclsExpense */
   FALSE,
   TRUE,				/* little endian */
   0,				/* leave lt */

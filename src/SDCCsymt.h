@@ -74,7 +74,8 @@ enum  { S_FIXED  =  0,
         S_LITERAL    ,
         S_STACK      ,
         S_XSTACK     ,
-        S_BIT        };
+        S_BIT        ,
+        S_FLASH      };
 
 /* specifier is the last in the type-chain */
 typedef struct specifier {
@@ -123,6 +124,7 @@ enum {  POINTER   = 0,       /* pointer to near data */
         PPOINTER     ,       /* paged area pointer   */
         IPOINTER     ,       /* pointer to upper 128 bytes */
 	UPOINTER     ,       /* unknown pointer used only when parsing */
+	FLPOINTER    ,       /* pointer to flash     */
         ARRAY        ,
         FUNCTION     };
 

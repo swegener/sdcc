@@ -762,6 +762,7 @@ void updateSpillLocation ( iCode *ic)
 
     if (ASSIGN_ITEMP_TO_ITEMP(ic) &&
 	!SPIL_LOC(IC_RIGHT(ic))   &&
+	bitVectnBitsOn(OP_USES(IC_RIGHT(ic))) == 0 &&
 	OP_SYMBOL(IC_RESULT(ic))->isreqv) {
 	
 	setype = getSpec(operandType(IC_RESULT(ic)));
@@ -794,6 +795,36 @@ void setUsesDefs (operand *op, bitVect *bdefs,
     
     /* the out defs is an union */
     *oud = bitVectUnion(*oud,adefs);
+}
+
+/*-----------------------------------------------------------------*/
+/* unsetDefsAndUses - clear this operation for the operands        */
+/*-----------------------------------------------------------------*/
+void unsetDefsAndUses ( iCode *ic ) 
+{
+    if ( ic->op == JUMPTABLE)
+	return ;
+
+    /* take away this definition from the def chain of the */
+    /* result & take away from use set of the operands */
+    if (ic->op != IFX) {
+	/* turn off def set */
+	if (IS_SYMOP(IC_RESULT(ic))) {
+	    if ( !POINTER_SET(ic)) 
+		bitVectUnSetBit(OP_DEFS(IC_RESULT(ic)),ic->key);
+	    else
+		bitVectUnSetBit(OP_USES(IC_RESULT(ic)),ic->key);
+	}
+	/* turn off the useSet for the operands */
+	if (IS_SYMOP(IC_LEFT(ic)))
+	    bitVectUnSetBit (OP_USES(IC_LEFT(ic)),ic->key);
+	
+	if (IS_SYMOP(IC_RIGHT(ic)))
+	    bitVectUnSetBit (OP_USES(IC_RIGHT(ic)),ic->key);
+    }
+    else /* must be ifx turn off the use */
+	if (IS_SYMOP(IC_COND(ic)))
+	    bitVectUnSetBit (OP_USES(IC_COND(ic)),ic->key);    
 }
 
 /*-----------------------------------------------------------------*/
@@ -868,36 +899,6 @@ void ifxOptimize (iCode *ic, set *cseSet,
     OP_USES(IC_COND(ic)) = bitVectSetBit(OP_USES(IC_COND(ic)),ic->key);
     setUsesDefs(IC_COND(ic),ebb->defSet,ebb->outDefs,&ebb->usesDefs);
     return ;  
-}
-
-/*-----------------------------------------------------------------*/
-/* unsetDefsAndUses - clear this operation for the operands        */
-/*-----------------------------------------------------------------*/
-void unsetDefsAndUses ( iCode *ic ) 
-{
-    if ( ic->op == JUMPTABLE)
-	return ;
-
-    /* take away this definition from the def chain of the */
-    /* result & take away from use set of the operands */
-    if (ic->op != IFX) {
-	/* turn off def set */
-	if (IS_SYMOP(IC_RESULT(ic))) {
-	    if ( !POINTER_SET(ic)) 
-		bitVectUnSetBit(OP_DEFS(IC_RESULT(ic)),ic->key);
-	    else
-		bitVectUnSetBit(OP_USES(IC_RESULT(ic)),ic->key);
-	}
-	/* turn off the useSet for the operands */
-	if (IS_SYMOP(IC_LEFT(ic)))
-	    bitVectUnSetBit (OP_USES(IC_LEFT(ic)),ic->key);
-	
-	if (IS_SYMOP(IC_RIGHT(ic)))
-	    bitVectUnSetBit (OP_USES(IC_RIGHT(ic)),ic->key);
-    }
-    else /* must be ifx turn off the use */
-	if (IS_SYMOP(IC_COND(ic)))
-	    bitVectUnSetBit (OP_USES(IC_COND(ic)),ic->key);    
 }
 
 /*-----------------------------------------------------------------*/

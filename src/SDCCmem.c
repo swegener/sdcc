@@ -18,6 +18,7 @@ memmap  *reg   = NULL;   /* register space              */
 memmap  *sfrbit= NULL;   /* sfr bit space               */
 memmap  *generic=NULL;   /* is a generic pointer        */
 memmap  *overlay=NULL;   /* overlay segment             */
+memmap  *eeprom =NULL;   /* eeprom location             */
 
 /* this is a set of sets each set containing
    symbols in a single overlay */
@@ -40,7 +41,8 @@ memmap *allocMap (char rspace,     /* sfr space            */
 		  char codemap,    /* this is code space   */
 		  unsigned sloc,   /* starting location    */
 		  const char *name,      /* 2 character name     */
-		  char dbName     
+		  char dbName    , /* debug name                 */
+		  int  ptrType     /* pointer type for this space */
 		  )
 {
 	memmap *map ;
@@ -60,6 +62,7 @@ memmap *allocMap (char rspace,     /* sfr space            */
 	map->sloc   =  sloc ;
 	map->sname = name ;
 	map->dbName = dbName ;
+	map->ptrType= ptrType;
 	if (!(map->oFile = tmpfile())) {
 		werror(E_TMPFILE_FAILED);
 		exit (1);
@@ -82,8 +85,11 @@ void initMem ()
 		   PAGED          -   YES
 		   DIRECT-ACCESS  -   NO
 		   BIT-ACCESS     -   NO
-		   CODE-ACESS     -   NO */
-	xstack	  = allocMap (0, 1, 1, 0, 0, 0, options.xstack_loc, XSTACK_NAME,'A');
+		   CODE-ACESS     -   NO 
+		   DEBUG-NAME     -   'A'
+		   POINTER-TYPE   -   FPOINTER
+	*/
+	xstack	  = allocMap (0, 1, 1, 0, 0, 0, options.xstack_loc, XSTACK_NAME,'A',FPOINTER);
 
 	/* internal stack segment ;   
 	           SFRSPACE       -   NO
@@ -91,8 +97,11 @@ void initMem ()
 		   PAGED          -   NO
 		   DIRECT-ACCESS  -   NO
 		   BIT-ACCESS     -   NO
-		   CODE-ACESS     -   NO */
-	istack	  = allocMap (0, 0, 0, 0, 0, 0,options.stack_loc, ISTACK_NAME,'B');
+		   CODE-ACESS     -   NO 
+		   DEBUG-NAME     -   'B'
+		   POINTER-TYPE   -   POINTER
+	*/
+	istack	  = allocMap (0, 0, 0, 0, 0, 0,options.stack_loc, ISTACK_NAME,'B',POINTER);
 
 	/* code  segment ;   
 	           SFRSPACE       -   NO
@@ -100,8 +109,11 @@ void initMem ()
 		   PAGED          -   NO
 		   DIRECT-ACCESS  -   NO
 		   BIT-ACCESS     -   NO
-		   CODE-ACESS     -   YES */
-	code 	  = allocMap (0, 1, 0, 0, 0, 1, options.code_loc, CODE_NAME,'C');
+		   CODE-ACESS     -   YES 
+		   DEBUG-NAME     -   'C'
+		   POINTER-TYPE   -   CPOINTER
+	*/
+	code 	  = allocMap (0, 1, 0, 0, 0, 1, options.code_loc, CODE_NAME,'C',CPOINTER);
 
 	/* Static segment (code for variables );
 	           SFRSPACE       -   NO
@@ -109,8 +121,11 @@ void initMem ()
 		   PAGED          -   NO
 		   DIRECT-ACCESS  -   NO
 		   BIT-ACCESS     -   NO
-		   CODE-ACESS     -   YES */
-	statsg	  = allocMap (0, 1, 0, 0, 0, 1,0, STATIC_NAME,'D');
+		   CODE-ACESS     -   YES 
+		   DEBUG-NAME     -   'D'
+		   POINTER-TYPE   -   CPOINTER
+	*/
+	statsg	  = allocMap (0, 1, 0, 0, 0, 1,0, STATIC_NAME,'D',CPOINTER);
 
 	/* Data segment - internal storage segment ;
 	           SFRSPACE       -   NO
@@ -118,8 +133,11 @@ void initMem ()
 		   PAGED          -   NO
 		   DIRECT-ACCESS  -   YES
 		   BIT-ACCESS     -   NO
-		   CODE-ACESS     -   NO */	
-	data      = allocMap (0, 0, 0, 1, 0, 0, options.data_loc, DATA_NAME,'E');
+		   CODE-ACESS     -   NO 
+		   DEBUG-NAME     -   'E'
+		   POINTER-TYPE   -   POINTER
+	*/	
+	data      = allocMap (0, 0, 0, 1, 0, 0, options.data_loc, DATA_NAME,'E',POINTER);
 
 	/* overlay segment - same as internal storage segment ;
 	           SFRSPACE       -   NO
@@ -127,8 +145,11 @@ void initMem ()
 		   PAGED          -   NO
 		   DIRECT-ACCESS  -   YES
 		   BIT-ACCESS     -   NO
-		   CODE-ACESS     -   NO */	
-	overlay   = allocMap (0, 0, 0, 1, 0, 0, options.data_loc, DATA_NAME,'E');
+		   CODE-ACESS     -   NO 
+		   DEBUG-NAME     -   'E'
+		   POINTER-TYPE   -   POINTER
+	*/
+	overlay   = allocMap (0, 0, 0, 1, 0, 0, options.data_loc, DATA_NAME,'E',POINTER);
 
 	/* Xternal Data segment - 
 	           SFRSPACE       -   NO
@@ -136,8 +157,11 @@ void initMem ()
 		   PAGED          -   NO
 		   DIRECT-ACCESS  -   NO
 		   BIT-ACCESS     -   NO
-		   CODE-ACESS     -   NO */
-	xdata     = allocMap (0, 1, 0, 0, 0, 0, options.xdata_loc, XDATA_NAME,'F' );
+		   CODE-ACESS     -   NO 
+		   DEBUG-NAME     -   'F'
+		   POINTER-TYPE   -   FPOINTER
+	*/
+	xdata     = allocMap (0, 1, 0, 0, 0, 0, options.xdata_loc, XDATA_NAME,'F',FPOINTER);
 
 	/* Inderectly addressed internal data segment
 	           SFRSPACE       -   NO
@@ -145,8 +169,11 @@ void initMem ()
 		   PAGED          -   NO
 		   DIRECT-ACCESS  -   NO
 		   BIT-ACCESS     -   NO
-		   CODE-ACESS     -   NO */
-	idata     = allocMap (0, 0, 0, 0, 0, 0, options.idata_loc,IDATA_NAME,'G' );
+		   CODE-ACESS     -   NO 
+		   DEBUG-NAME     -   'G'
+		   POINTER-TYPE   -   IPOINTER
+	*/
+	idata     = allocMap (0, 0, 0, 0, 0, 0, options.idata_loc,IDATA_NAME,'G',IPOINTER);
 
 	/* Static segment (code for variables );
 	           SFRSPACE       -   NO
@@ -154,8 +181,11 @@ void initMem ()
 		   PAGED          -   NO
 		   DIRECT-ACCESS  -   YES
 		   BIT-ACCESS     -   YES
-		   CODE-ACESS     -   NO */
-	bit	  = allocMap (0, 0, 0, 1, 1, 0,0, BIT_NAME,'H');
+		   CODE-ACESS     -   NO 
+		   DEBUG-NAME     -   'H'
+		   POINTER-TYPE   -  _NONE_
+	*/
+	bit	  = allocMap (0, 0, 0, 1, 1, 0,0, BIT_NAME,'H',0);
 	
 	/* Special function register space :-
 	           SFRSPACE       -   YES
@@ -163,8 +193,11 @@ void initMem ()
 		   PAGED          -   NO
 		   DIRECT-ACCESS  -   YES
 		   BIT-ACCESS     -   NO
-		   CODE-ACESS     -   NO */
-	sfr        = allocMap (1,0, 0, 1, 0, 0,0, REG_NAME,'I');
+		   CODE-ACESS     -   NO 
+		   DEBUG-NAME     -   'I'
+		   POINTER-TYPE   -   _NONE_
+	*/
+	sfr        = allocMap (1,0, 0, 1, 0, 0,0, REG_NAME,'I',0);
 
 	/* Register space ;
 	           SFRSPACE       -   YES
@@ -172,8 +205,11 @@ void initMem ()
 		   PAGED          -   NO
 		   DIRECT-ACCESS  -   NO
 		   BIT-ACCESS     -   NO
-		   CODE-ACESS     -   NO */
-	reg        = allocMap (1,0, 0, 0, 0, 0, 0,REG_NAME,' ');
+		   CODE-ACESS     -   NO 
+		   DEBUG-NAME     -   ' '
+		   POINTER-TYPE   -   _NONE_
+	*/
+	reg        = allocMap (1,0, 0, 0, 0, 0, 0,REG_NAME,' ',0);
 
 	/* SFR bit space 
 	           SFRSPACE       -   YES
@@ -181,12 +217,15 @@ void initMem ()
 		   PAGED          -   NO
 		   DIRECT-ACCESS  -   YES
 		   BIT-ACCESS     -   YES
-		   CODE-ACESS     -   NO */
-	sfrbit     = allocMap (1,0, 0, 1, 1, 0,0, REG_NAME,'J' );
+		   CODE-ACESS     -   NO 
+		   DEBUG-NAME     -   'J'
+		   POINTER-TYPE   -   _NONE_
+	*/
+	sfrbit     = allocMap (1,0, 0, 1, 1, 0,0, REG_NAME,'J',0);
 
 	/* the unknown map */
-	generic     = allocMap (1,0, 0, 1, 1, 0,0, REG_NAME,' ' );
-
+	generic     = allocMap (1,0, 0, 1, 1, 0,0, REG_NAME,' ',GPOINTER);
+       
 }
 
 /*-----------------------------------------------------------------*/

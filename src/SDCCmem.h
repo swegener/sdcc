@@ -8,19 +8,20 @@
 struct set ;
 struct value ;
 typedef  struct memmap{
-    unsigned char  pageno;/* page no for this variable  */
+    unsigned char  pageno;    /* page no for this variable  */
     const char     *sname;    /*   character prefix for map */
-    char     dbName ;   /* debugger address space name */
-    int      slbl ;    /* label counter for space    */
-    unsigned sloc    ;    /* starting location          */
-    unsigned fmap : 1;    /* 1 = 16bit addressing reqd  */
-    unsigned paged : 1;    /* this is a paged mem space  */
-    unsigned direct: 1;    /* 1= indirect access only    */
-    unsigned bitsp: 1;    /* 1 = bit addressable space  */
-    unsigned codesp:1;    /* 1 = code space             */
-    unsigned regsp: 1;    /* 1= sfr space               */
-    FILE    *oFile   ;    /* object file associated     */
-    struct  set *syms;   /* symbols defined in this segment */
+    char     dbName ;         /* debugger address space name */
+    int      ptrType;         /* pointer Type for this space */
+    int      slbl ;           /* label counter for space    */
+    unsigned sloc    ;        /* starting location          */
+    unsigned fmap : 1;        /* 1 = 16bit addressing reqd  */
+    unsigned paged : 1;       /* this is a paged mem space  */
+    unsigned direct: 1;       /* 1= indirect access only    */
+    unsigned bitsp: 1;        /* 1 = bit addressable space  */
+    unsigned codesp:1;        /* 1 = code space             */
+    unsigned regsp: 1;        /* 1= sfr space               */
+    FILE    *oFile   ;        /* object file associated     */
+    struct  set *syms;        /* symbols defined in this segment */
 } memmap ;
 
 extern FILE	*junkFile ;	
@@ -51,6 +52,7 @@ extern   memmap  *reg   ;    /* register space		   */
 extern   memmap  *_const;    /* constant segment           */
 extern   memmap  *generic;   /* unknown                    */
 extern   memmap  *overlay;   /* the overlay segment        */
+extern   memmap  *eeprom;    /* eepromp space              */
 
 extern   struct  set     *ovrSetSets;
 
@@ -63,7 +65,7 @@ extern   struct  set     *ovrSetSets;
 #define IN_CODESPACE(map)       (map && map->codesp)
 
 /* forward decls for functions    */
-memmap     *allocMap       (char,char,char,char,char,char,unsigned, const char *,char );
+memmap     *allocMap       (char,char,char,char,char,char,unsigned, const char *,char,int );
 void        initMem        (                                );
 void        allocGlobal    (struct symbol  *                );
 void        allocLocal     (struct symbol  *                );

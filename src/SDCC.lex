@@ -108,6 +108,7 @@ struct options  save_options  ;
 "enum"         { count(); return(ENUM); }
 "extern"       { count(); return(EXTERN); }
 "far"          { count(); TKEYWORD(XDATA);  }
+"flash"        { count(); TKEYWORD(FLASH);  }
 "float"        { count(); return(FLOAT); }
 "for"          { count(); return(FOR); }
 "goto"	       { count(); return(GOTO); }
@@ -139,6 +140,7 @@ struct options  save_options  ;
 "xdata"        { count(); TKEYWORD(XDATA); }
 "_data"	       { count(); TKEYWORD(_NEAR); }
 "_code"	       { count(); TKEYWORD(_CODE); }
+"_flash"       { count(); TKEYWORD(_FLASH); }
 "_generic"     { count(); TKEYWORD(_GENERIC); }
 "_near"	       { count(); TKEYWORD(_NEAR); }
 "_xdata"       { count(); TKEYWORD(_XDATA);}

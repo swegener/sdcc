@@ -1,3 +1,18 @@
+2005-02-13 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* device/include/pic16/string.h: modified prototype for memccpy()
+	to memccpy(void *, void *, char, size_t)
+	* src/pic16/gen.c (genFunction, genEndFunction): reenable if-case to
+	check whether to omit frame pointer or not,
+	* (genInline): convert all occurences of "\n" to LF in inline
+	assembler blocks, this helps formatting the inline text,
+	* (pic16_loadFSR0): modified prototype,
+	* (genNearPointerGet, genNearPointerSet): reorganization of code,
+	removed some 8051 legacy code,
+	* (genPackBits): enabled handling bitfields exceeding one byte in size,
+	* src/pic16/ralloc.c (pic16_assignRegisters): clear dynrIdx variable
+	before allocating temporary registers in functions,
+
 2005-02-11 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/tests/bitvars.c: corrected the "fix"

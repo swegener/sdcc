@@ -19,6 +19,7 @@ PRJDIR	= ../../../../..
 
 LIBC_INC_DIR	= $(PRJDIR)/device/include/pic16
 
+#OPT_FLAGS	+= --stack-auto
 COMPILE_FLAGS	+= $(MODELFLAGS) $(OPT_FLAGS)
 
 CFLAGS	= --nostdinc -I$(LIBC_INC_DIR)

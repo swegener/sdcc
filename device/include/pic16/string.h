@@ -58,7 +58,7 @@ extern char *strstr (char *, char *);
 extern char *strtok (char *, char *);
 extern char *strupr (char *);
 
-extern void *memccpy(void *, void *, int, size_t);
+extern void *memccpy(void *, void *, char, size_t);
 extern void *memchr(void *, char, size_t);
 extern int   memcmp (void *, void *, size_t);
 extern void *memcpy (void *, void *, size_t);

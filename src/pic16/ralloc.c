@@ -4255,6 +4255,9 @@ pic16_assignRegisters (eBBlock ** ebbs, int count)
      registers & the type of registers required for each */
   regTypeNum ();
 
+  /* start counting function temporary registers from zero */
+  dynrIdx = 0;
+
   /* and serially allocate registers */
   serialRegAssign (ebbs, count);
 

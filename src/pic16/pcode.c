@@ -6197,8 +6197,9 @@ static void LinkFlow(pBlock *pb)
 
     //fprintf(stderr, "LinkFlow - flow block (seq=%d) ", pcflow->seq);
     if(isPCI_SKIP(pc)) {
-      //fprintf(stderr, "ends with skip\n");
-      //pc->print(stderr,pc);
+//      fprintf(stderr, "ends with skip\n");
+//      pc->print(stderr,pc);
+
       pct=pic16_findNextInstruction(pc->next);
       LinkFlow_pCode(PCI(pc),PCI(pct));
       pct=pic16_findNextInstruction(pct->next);

@@ -2374,6 +2374,7 @@ genPcall (iCode * ic)
 {
   sym_link *dtype;
   symbol *rlbl = newiTempLabel (NULL);
+  bool restoreBank=FALSE;
 
   D (emitcode (";", "genPcall ");
     );
@@ -2387,11 +2388,12 @@ genPcall (iCode * ic)
      the same register bank then we need to save the
      destination registers on the stack */
   dtype = operandType (IC_LEFT (ic));
-  if (dtype &&
+  if (dtype && !IFFUNC_ISNAKED(dtype) &&
       IFFUNC_ISISR (currFunc->type) &&
-      (FUNC_REGBANK (currFunc->type) != FUNC_REGBANK (dtype)))
+      (FUNC_REGBANK (currFunc->type) != FUNC_REGBANK (dtype))) {
     saveRBank (FUNC_REGBANK (dtype), ic, TRUE);
-
+    restoreBank=TRUE;
+  }
 
   /* push the return address on to the stack */
   emitcode ("mov", "a,#%05d$", (rlbl->key + 100));
@@ -2481,14 +2483,12 @@ genPcall (iCode * ic)
     }
 
   /* if register bank was saved then unsave them */
-  if (dtype &&
-      (FUNC_REGBANK (currFunc->type) !=
-       FUNC_REGBANK (dtype)))
+  if (restoreBank)
     unsaveRBank (FUNC_REGBANK (dtype), ic, TRUE);
-
+  
   /* if we hade saved some registers then
      unsave them */
-  if (ic->regsSaved)
+  if (ic->regsSaved && !IFFUNC_CALLEESAVES(dtype))
     unsaveRegisters (ic);
 
 }

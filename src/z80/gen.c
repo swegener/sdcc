@@ -827,7 +827,7 @@ static void fetchLitPair(PAIR_ID pairId, asmop *left, int offset)
 	_G.pairs[pairId].lit = gc_strdup(l);
 	_G.pairs[pairId].offset = offset;
     }
-    if (IS_GB && pairId == PAIR_DE) {
+    if (IS_GB && pairId == PAIR_DE && 0) {
 	if (_G.pairs[pairId].lit && !strcmp(_G.pairs[pairId].lit, l)) {
 	    if (abs(_G.pairs[pairId].offset - offset) < 3) {
 		adjustPair(pair, &_G.pairs[pairId].offset, offset);

@@ -42,6 +42,7 @@ extern char *VersionString;
 extern FILE *codeOutFile;
 set *tmpfileSet = NULL; /* set of tmp file created by the compiler */
 set *tmpfileNameSet = NULL; /* All are unlinked at close. */
+
 /*-----------------------------------------------------------------*/
 /* closeTmpFiles - closes all tmp files created by the compiler    */
 /*                 because of BRAIN DEAD MS/DOS & CYGNUS Libraries */
@@ -240,7 +241,6 @@ static void emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	}
     }
 }
-
 
 /*-----------------------------------------------------------------*/
 /* initPointer - pointer initialization code massaging             */
@@ -718,14 +718,13 @@ void printIval (symbol * sym, link * type, initList * ilist, FILE * oFile)
 /*-----------------------------------------------------------------*/
 /* emitStaticSeg - emitcode for the static segment                 */
 /*-----------------------------------------------------------------*/
-void emitStaticSeg (memmap * map)
+void emitStaticSeg(memmap * map, FILE *out)
 {
     symbol *sym;
     
     /*     fprintf(map->oFile,"\t.area\t%s\n",map->sname); */
-    
-    if (!codeOutFile)
-	codeOutFile = code->oFile;
+    if (!out)
+	out = code->oFile;
 
     /* for all variables in this segment do */
     for (sym = setFirstItem (map->syms); sym;
@@ -747,49 +746,49 @@ void emitStaticSeg (memmap * map)
 
 	    if (!sym->level) { /* global */
 		if (IS_STATIC(sym->etype))
-		    fprintf(codeOutFile,"F%s$",moduleName); /* scope is file */
+		    fprintf(out,"F%s$",moduleName); /* scope is file */
 		else
-		    fprintf(codeOutFile,"G$"); /* scope is global */
+		    fprintf(out,"G$"); /* scope is global */
 	    }
 	    else
 		/* symbol is local */
-		fprintf(codeOutFile,"L%s$",
+		fprintf(out,"L%s$",
 			(sym->localof ? sym->localof->name : "-null-"));
-	    fprintf(codeOutFile,"%s$%d$%d",sym->name,sym->level,sym->block);
+	    fprintf(out,"%s$%d$%d",sym->name,sym->level,sym->block);
 	}
 	
 	/* if it has an absolute address */
 	if (SPEC_ABSA (sym->etype)) {
 	    if ((options.debug || sym->level == 0) && !options.nodebug)
-		fprintf(codeOutFile," == 0x%04x\n", SPEC_ADDR (sym->etype));
+		fprintf(out," == 0x%04x\n", SPEC_ADDR (sym->etype));
 
-	    fprintf (codeOutFile, "%s\t=\t0x%04x\n",
+	    fprintf (out, "%s\t=\t0x%04x\n",
 		     sym->rname,
 		     SPEC_ADDR (sym->etype));
 	}
 	else {
 	    if ((options.debug || sym->level == 0) && !options.nodebug)
-		fprintf(codeOutFile," == .\n");	
+		fprintf(out," == .\n");	
 
 	    /* if it has an initial value */
 	    if (sym->ival) {
-		fprintf (codeOutFile, "%s:\n", sym->rname);
+		fprintf (out, "%s:\n", sym->rname);
 		noAlloc++;
 		resolveIvalSym (sym->ival);
-		printIval (sym, sym->type, sym->ival, codeOutFile);
+		printIval (sym, sym->type, sym->ival, out);
 		noAlloc--;
 	    }
 	    else {
 		/* allocate space */
-		fprintf (codeOutFile, "%s:\n", sym->rname);
+		fprintf (out, "%s:\n", sym->rname);
 		/* special case for character strings */
 		if (IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) &&
 		    SPEC_CVAL (sym->etype).v_char)
-		    printChar (codeOutFile,
+		    printChar (out,
 			       SPEC_CVAL (sym->etype).v_char,
 			       strlen(SPEC_CVAL (sym->etype).v_char)+1);
 		else 
-		    tfprintf(codeOutFile, "\t!ds\n", (unsigned int)getSize (sym->type)& 0xffff);
+		    tfprintf(out, "\t!ds\n", (unsigned int)getSize (sym->type)& 0xffff);
 	    }
 	}
     }
@@ -810,7 +809,8 @@ void emitMaps ()
     emitRegularMap (sfrbit, FALSE,FALSE);
     emitRegularMap (home, TRUE,FALSE);
     emitRegularMap (code, TRUE,FALSE);
-    emitStaticSeg (statsg);
+
+    emitStaticSeg (statsg, code->oFile);
 }
 
 /*-----------------------------------------------------------------*/
@@ -819,7 +819,7 @@ void emitMaps ()
 /*-----------------------------------------------------------------*/
 void flushStatics(void)
 {
-    emitStaticSeg(statsg);
+    emitStaticSeg(statsg, codeOutFile);
     statsg->syms = NULL;
 }
 

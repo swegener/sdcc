@@ -383,10 +383,15 @@ noOverLap (set * itmpStack, symbol * fsym)
   for (sym = setFirstItem (itmpStack); sym;
        sym = setNextItem (itmpStack))
     {
-      if (sym->liveTo >= fsym->liveFrom)
-	return 0;
+            // if sym starts before (or on) our end point
+            // and ends after (or on) our start point, 
+            // it is an overlap.
+	    if (sym->liveFrom <= fsym->liveTo &&
+		sym->liveTo   >= fsym->liveFrom)
+	    {
+	    	return 0;
+	    }
     }
-
   return 1;
 }
 

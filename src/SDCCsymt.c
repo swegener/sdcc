@@ -1725,6 +1725,9 @@ printTypeChain (sym_link * type, FILE * of)
     {
       if (IS_DECL (type))
 	{
+	  if (DCL_PTR_VOLATILE(type)) {
+	    fprintf (of, "volatile ");
+	  }
 	  switch (DCL_TYPE (type))
 	    {
 	    case FUNCTION:
@@ -1771,7 +1774,6 @@ printTypeChain (sym_link * type, FILE * of)
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
 	      break;
-
 	    case ARRAY:
 	      fprintf (of, "array of ");
 	      break;

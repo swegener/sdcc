@@ -447,6 +447,11 @@ loopInvariants (region * theLoop, eBBlock ** ebbs, int count)
 	       IS_OP_PARM (IC_RESULT (ic))))
 	    continue;
 
+	  /* if result depends on a volatile then skip */
+	  if ((IC_LEFT(ic) && isOperandVolatile(IC_LEFT(ic), TRUE)) ||
+	      (IC_RIGHT(ic) && isOperandVolatile(IC_RIGHT(ic), TRUE)))
+	    continue;
+
 	  lin = rin = 0;
 
 	  /* special case */
@@ -1160,7 +1165,6 @@ loopOptimizations (hTab * orderedLoops, eBBlock ** ebbs, int count)
   region *lp;
   int change = 0;
   int k;
-
 
   /* if no loop optimizations requested */
   if (!optimize.loopInvariant &&

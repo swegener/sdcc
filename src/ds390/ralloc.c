@@ -65,12 +65,16 @@ regs regs390[] =
   {REG_GPR, R7_IDX, REG_GPR, "r7", "ar7", "0", 7, 1},
   {REG_PTR, R0_IDX, REG_PTR, "r0", "ar0", "0", 0, 1},
   {REG_PTR, R1_IDX, REG_PTR, "r1", "ar1", "0", 1, 1},
-  {REG_GPR, X8_IDX, REG_GPR, "x8", "x8", "xreg", 0, 1},
-  {REG_GPR, X9_IDX, REG_GPR, "x9", "x9", "xreg", 1, 1},
-  {REG_GPR, X10_IDX, REG_GPR, "x10", "x10", "xreg", 2, 1},
-  {REG_GPR, X11_IDX, REG_GPR, "x11", "x11", "xreg", 3, 1},
-  {REG_GPR, X12_IDX, REG_GPR, "x12", "x12", "xreg", 4, 1},
-  {REG_CND, CND_IDX, REG_CND, "C", "C", "xreg", 0, 1},
+  {REG_GPR, X8_IDX, REG_GPR, "x8", "x8", "xreg", 0, 0},
+  {REG_GPR, X9_IDX, REG_GPR, "x9", "x9", "xreg", 1, 0},
+  {REG_GPR, X10_IDX, REG_GPR, "x10", "x10", "xreg", 2, 0},
+  {REG_GPR, X11_IDX, REG_GPR, "x11", "x11", "xreg", 3, 0},
+  {REG_GPR, X12_IDX, REG_GPR, "x12", "x12", "xreg", 4, 0},
+  {REG_CND, CND_IDX, REG_GPR, "C", "C", "xreg", 0, 0},
+  {REG_GPR, DPL_IDX, REG_GPR, "dpl", "dpl", "dpl", 0, 0},
+  {REG_GPR, DPH_IDX, REG_GPR, "dph", "dph", "dph", 0, 0},
+  {REG_GPR, DPX_IDX, REG_GPR, "dpx", "dpx", "dpx", 0, 0},
+  {REG_GPR, B_IDX, REG_GPR, "b", "b", "b", 0, 0},
 };
 int ds390_nRegs = 13;
 static void spillThis (symbol *);
@@ -383,14 +387,7 @@ noOverLap (set * itmpStack, symbol * fsym)
   for (sym = setFirstItem (itmpStack); sym;
        sym = setNextItem (itmpStack))
     {
-            // if sym starts before (or on) our end point
-            // and ends after (or on) our start point, 
-            // it is an overlap.
-	    if (sym->liveFrom <= fsym->liveTo &&
-		sym->liveTo   >= fsym->liveFrom)
-	    {
-	    	return 0;
-	    }
+	if (bitVectBitValue(sym->clashes,fsym->key)) return 0;
     }
   return 1;
 }
@@ -2573,8 +2570,10 @@ ds390_assignRegisters (eBBlock ** ebbs, int count)
   /* redo that offsets for stacked automatic variables */
   redoStackOffsets ();
 
-  if (options.dump_rassgn)
+  if (options.dump_rassgn) {
     dumpEbbsToFileExt (DUMP_RASSGN, ebbs, count);
+    dumpLiveRanges (DUMP_LRANGE, liveRanges);
+  }
 
   /* do the overlaysegment stuff SDCCmem.c */
   doOverlays (ebbs, count);

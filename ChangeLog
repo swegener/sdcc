@@ -1,3 +1,9 @@
+2004-10-13 Slade Rich <slade_rich AT users.sourceforge.net>
+
+	* src/pic/pcoderegs.c : increased count on regUsedinRange to prevent unnecessary warning.
+	* src/pic/main.c : removed VC warning.
+	* src/pic/gen.c : changed comment.
+
 2004-10-12 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* device/lib/pic16/libsdcc/gptr/gptrput[234].c: an external

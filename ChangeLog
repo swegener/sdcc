@@ -1,5 +1,14 @@
 2004-01-06 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
+	A python script to validate compiler diagnostic messages. It can be
+	used to verify that sdcc complains about bad c source code and
+	gives a good location of the error.
+	* support/valdiag/Makefile,
+	* support/valdiag/valdiag.py,
+	* support/valdiag/tests/*
+
+2004-01-06 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
 	* src/SDCC.y (enum_specifier, enumerator_list, opt_assign_expr),
 	* src/SDCCsymt.c (newEnumType),
 	* src/SDCCsymt.h

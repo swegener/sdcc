@@ -1143,8 +1143,11 @@ serialRegAssign (eBBlock ** ebbs, int count)
 			      /* if none of the liveRanges have a spillLocation then better
 				 to spill this one than anything else already assigned to registers */
 			      if (liveRangesWith(spillable,noSpilLoc,ebbs[i],ic)) {
+				  /* if this is local to this block then we might find a block spil */
+				  if (!(sym->liveFrom >= ebbs[i]->fSeq && sym->liveTo <= ebbs[i]->lSeq)) {
 				      spillThis (sym);
 				      continue;
+				  }
 			      }
 		      }
 	      }

@@ -2590,7 +2590,10 @@ static char *get_op_from_instruction( pCodeInstruction *pcc)
   if(pcc )
     return get_op(pcc->pcop,NULL,0);
   
+  /* gcc 3.2:  warning: concatenation of string literals with __FUNCTION__ is deprecated 
   return ("ERROR Null: "__FUNCTION__);
+  */
+  return ("ERROR Null: get_op_from_instruction");
 
 }
 

@@ -2,6 +2,7 @@
 
 	* as/z80/string.h: removed for gcc 3.2
 	* support/makebin/makebin.c: #include <string.h> for gcc 3.2
+	* src/pic/pcode.c (get_op_from_instruction): fix concatenation of string literals with __FUNCTION__ for gcc 3.2
 
 2003-01-19  Bernhard Held <bernhard@bernhardheld.de>
 

@@ -2,6 +2,7 @@
  * to emulate the serial input and output of an 8051 controller               *
  * main.cc - the main stuff                                                   *
  ******************************************************************************/
+#include "ddconfig.h"
 #include <sys/types.h>
 #include <iostream.h>
 #include <stdlib.h>
@@ -11,7 +12,9 @@
 #include <string.h>
 #include <unistd.h>
 #include <signal.h>
-#include <getopt.h> // FIXME
+#ifdef HAVE_GETOPT_H // fix of bug #533274
+#include <getopt.h>
+#endif
 #include "fileio.hh"
 #include "frontend.hh"
 #include "posix_signal.hh"

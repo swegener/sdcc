@@ -195,30 +195,36 @@ _ds390_getRegName (struct regs *reg)
   return "err";
 }
 
+extern char * iComments2;
+
 static void
 _ds390_genAssemblerPreamble (FILE * of)
 {
+      fputs (iComments2, of);
+      fputs ("; CPU specific extensions\n",of);
+      fputs (iComments2, of);
+
       if (options.model == MODEL_FLAT24)
         fputs (".flat24 on\t\t; 24 bit flat addressing\n", of);
 
-      fputs ("dpx = 0x93\t\t; dpx register unknown to assembler\n", of);
-      fputs ("dps = 0x86\t\t; dps register unknown to assembler\n", of);
-      fputs ("dpl1 = 0x84\t\t; dpl1 register unknown to assembler\n", of);
-      fputs ("dph1 = 0x85\t\t; dph1 register unknown to assembler\n", of);
-      fputs ("dpx1 = 0x95\t\t; dpx1 register unknown to assembler\n", of);
-      fputs ("ap = 0x9C\t\t; ap register unknown to assembler\n", of);
-      fputs ("_ap = 0x9C\t\t; _ap register unknown to assembler\n", of);
-      fputs ("mcnt0 = 0xD1\t\t; mcnt0 register unknown to assembler\n", of);
-      fputs ("mcnt1 = 0xD2\t\t; mcnt1 register unknown to assembler\n", of);
-      fputs ("ma = 0xD3\t\t; ma register unknown to assembler\n", of);
-      fputs ("mb = 0xD4\t\t; mb register unknown to assembler\n", of);
-      fputs ("mc = 0xD5\t\t; mc register unknown to assembler\n", of);
-      fputs ("F1 = 0xD1\t\t; F1 user flag unknown to assembler\n", of);
-      fputs ("esp = 0x9B\t\t; ESP user flag unknown to assembler\n", of);
+      fputs ("dpl1\t=\t0x84\n", of);
+      fputs ("dph1\t=\t0x85\n", of);
+      fputs ("dps\t=\t0x86\n", of);
+      fputs ("dpx\t=\t0x93\n", of);
+      fputs ("dpx1\t=\t0x95\n", of);
+      fputs ("esp\t=\t0x9B\n", of);
+      fputs ("ap\t=\t0x9C\n", of);
+      fputs ("_ap\t=\t0x9C\n", of);
+      fputs ("mcnt0\t=\t0xD1\n", of);
+      fputs ("mcnt1\t=\t0xD2\n", of);
+      fputs ("ma\t=\t0xD3\n", of);
+      fputs ("mb\t=\t0xD4\n", of);
+      fputs ("mc\t=\t0xD5\n", of);
+      fputs ("F1\t=\t0xD1\t; user flag\n", of);
       if (options.parms_in_bank1) {
 	  int i ;
 	  for (i=0; i < 8 ; i++ )
-	      fprintf (of,"b1_%d = 0x%x \n",i,8+i);
+	      fprintf (of,"b1_%d\t=\t0x%02X\n",i,8+i);
       }
 }
 
@@ -1287,8 +1293,6 @@ _ds400_finaliseOptions (void)
       
   }  /* MODEL_FLAT24 */
 }
-
-extern char * iComments2;
 
 static void _ds400_generateRomDataArea(FILE *fp, bool isMain)
 {

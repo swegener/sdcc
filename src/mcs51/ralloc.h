@@ -52,7 +52,6 @@ typedef struct regs
 } regs;
 extern regs regs8051[];
 
-void   assignRegisters (eBBlock **, int );
-regs  *regWithIdx (int);
+regs  *mcs51_regWithIdx (int);
 
 #endif

@@ -64,6 +64,39 @@ void copyFile (FILE * dest, FILE * src)
 }
 
 /*-----------------------------------------------------------------*/
+/* aopLiteral - string from a literal value                        */
+/*-----------------------------------------------------------------*/
+char *aopLiteral (value *val, int offset)
+{
+    char *rs;
+    union {
+        float f;
+        unsigned char c[4];
+    } fl;
+
+    /* if it is a float then it gets tricky */
+    /* otherwise it is fairly simple */
+    if (!IS_FLOAT(val->type)) {
+        unsigned long v = floatFromVal(val);
+
+        v >>= (offset * 8);
+        sprintf(buffer,"#0x%02x",((char) v) & 0xff);
+        ALLOC_ATOMIC(rs,strlen(buffer)+1);
+        return strcpy (rs,buffer);
+    }
+
+    /* it is type float */
+    fl.f = (float) floatFromVal(val);
+#ifdef _BIG_ENDIAN    
+    sprintf(buffer,"#0x%02x",fl.c[3-offset]);
+#else
+    sprintf(buffer,"#0x%02x",fl.c[offset]);
+#endif
+    ALLOC_ATOMIC(rs,strlen(buffer)+1);
+    return strcpy (rs,buffer);
+}
+
+/*-----------------------------------------------------------------*/
 /* emitRegularMap - emit code for maps with no special cases       */
 /*-----------------------------------------------------------------*/
 static void emitRegularMap (memmap * map, bool addPublics, bool arFlag)

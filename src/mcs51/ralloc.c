@@ -92,7 +92,7 @@ void spillThis (symbol *);
 /*-----------------------------------------------------------------*/
 /* allocReg - allocates register of given type                     */
 /*-----------------------------------------------------------------*/
-regs *allocReg (short type)
+static regs *allocReg (short type)
 {
     int i;
 
@@ -123,9 +123,9 @@ regs *allocReg (short type)
 }
 
 /*-----------------------------------------------------------------*/
-/* regWithIdx - returns pointer to register wit index number       */
+/* mcs51_regWithIdx - returns pointer to register wit index number       */
 /*-----------------------------------------------------------------*/
-regs *regWithIdx (int idx)
+regs *mcs51_regWithIdx (int idx)
 {
     int i ;
     
@@ -141,7 +141,7 @@ regs *regWithIdx (int idx)
 /*-----------------------------------------------------------------*/
 /* freeReg - frees a register                                      */
 /*-----------------------------------------------------------------*/
-void freeReg (regs *reg)
+static void freeReg (regs *reg)
 {
     reg->isFree = 1;
 }
@@ -150,7 +150,7 @@ void freeReg (regs *reg)
 /*-----------------------------------------------------------------*/
 /* nFreeRegs - returns number of free registers                    */
 /*-----------------------------------------------------------------*/
-int nFreeRegs (int type)
+static int nFreeRegs (int type)
 {
     int i;
     int nfr=0;
@@ -164,7 +164,7 @@ int nFreeRegs (int type)
 /*-----------------------------------------------------------------*/
 /* nfreeRegsType - free registers with type                         */
 /*-----------------------------------------------------------------*/
-int nfreeRegsType (int type)
+static int nfreeRegsType (int type)
 {
     int nfr ;
     if (type == REG_PTR) {
@@ -179,7 +179,7 @@ int nfreeRegsType (int type)
 /*-----------------------------------------------------------------*/
 /* allDefsOutOfRange - all definitions are out of a range          */
 /*-----------------------------------------------------------------*/
-bool allDefsOutOfRange (bitVect *defs,int fseq, int toseq) 
+static bool allDefsOutOfRange (bitVect *defs,int fseq, int toseq) 
 {
     int i ;
 
@@ -203,7 +203,7 @@ bool allDefsOutOfRange (bitVect *defs,int fseq, int toseq)
 /*-----------------------------------------------------------------*/
 /* computeSpillable - given a point find the spillable live ranges */
 /*-----------------------------------------------------------------*/
-bitVect *computeSpillable (iCode *ic)
+static bitVect *computeSpillable (iCode *ic)
 {
     bitVect *spillable ;
 
@@ -228,7 +228,7 @@ bitVect *computeSpillable (iCode *ic)
 /*-----------------------------------------------------------------*/
 /* noSpilLoc - return true if a variable has no spil location      */
 /*-----------------------------------------------------------------*/
-int noSpilLoc (symbol *sym, eBBlock *ebp,iCode *ic)
+static int noSpilLoc (symbol *sym, eBBlock *ebp,iCode *ic)
 {
     return (sym->usl.spillLoc ? 0 : 1);
 }
@@ -236,7 +236,7 @@ int noSpilLoc (symbol *sym, eBBlock *ebp,iCode *ic)
 /*-----------------------------------------------------------------*/
 /* hasSpilLoc - will return 1 if the symbol has spil location      */
 /*-----------------------------------------------------------------*/
-int hasSpilLoc (symbol *sym, eBBlock *ebp, iCode *ic)
+static int hasSpilLoc (symbol *sym, eBBlock *ebp, iCode *ic)
 {
     return (sym->usl.spillLoc ? 1 : 0);
 }
@@ -244,7 +244,7 @@ int hasSpilLoc (symbol *sym, eBBlock *ebp, iCode *ic)
 /*-----------------------------------------------------------------*/
 /* directSpilLoc - will return 1 if the splilocation is in direct  */
 /*-----------------------------------------------------------------*/
-int directSpilLoc (symbol *sym, eBBlock *ebp, iCode *ic)
+static int directSpilLoc (symbol *sym, eBBlock *ebp, iCode *ic)
 {
     if ( sym->usl.spillLoc &&
 	 (IN_DIRSPACE(SPEC_OCLS(sym->usl.spillLoc->etype))))
@@ -257,7 +257,7 @@ int directSpilLoc (symbol *sym, eBBlock *ebp, iCode *ic)
 /* hasSpilLocnoUptr - will return 1 if the symbol has spil location*/
 /*                    but is not used as a pointer                 */
 /*-----------------------------------------------------------------*/
-int hasSpilLocnoUptr (symbol *sym, eBBlock *ebp, iCode *ic)
+static int hasSpilLocnoUptr (symbol *sym, eBBlock *ebp, iCode *ic)
 {
     return ((sym->usl.spillLoc && !sym->uptr) ? 1 : 0);
 }
@@ -265,7 +265,7 @@ int hasSpilLocnoUptr (symbol *sym, eBBlock *ebp, iCode *ic)
 /*-----------------------------------------------------------------*/
 /* rematable - will return 1 if the remat flag is set              */
 /*-----------------------------------------------------------------*/
-int rematable (symbol *sym, eBBlock *ebp, iCode *ic)
+static int rematable (symbol *sym, eBBlock *ebp, iCode *ic)
 {
     return sym->remat;
 }
@@ -273,7 +273,7 @@ int rematable (symbol *sym, eBBlock *ebp, iCode *ic)
 /*-----------------------------------------------------------------*/
 /* notUsedInBlock - not used in this block                         */
 /*-----------------------------------------------------------------*/
-int notUsedInBlock (symbol *sym, eBBlock *ebp, iCode *ic)
+static int notUsedInBlock (symbol *sym, eBBlock *ebp, iCode *ic)
 {   
     return (!bitVectBitsInCommon(sym->defs,ebp->usesDefs) &&
 	    allDefsOutOfRange (sym->defs,ebp->fSeq,ebp->lSeq));
@@ -419,8 +419,8 @@ void spillLRWithPtrReg (symbol *forSym)
 	bitVectIsZero(_G.regAssigned))
 	return;
 
-    r0 = regWithIdx(R0_IDX);
-    r1 = regWithIdx(R1_IDX);
+    r0 = mcs51_regWithIdx(R0_IDX);
+    r1 = mcs51_regWithIdx(R1_IDX);
 
     /* for all live ranges */
     for (lrsym = hTabFirstItem(liveRanges,&k) ; lrsym ; 

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "main.h"
+#include "ralloc.h"
 
 void mcs51_assignRegisters (eBBlock **ebbs, int count);
 
@@ -14,6 +15,13 @@ static void _mcs51_finaliseOptions(void)
 
 static void _mcs51_setDefaultOptions(void)
 {    
+}
+
+static const char *_mcs51_getRegName(struct regs *reg)
+{
+    if (reg)
+	return reg->name;
+    return "err";
 }
 
 /* Globals */
@@ -43,6 +51,7 @@ PORT mcs51_port = {
     _mcs51_parseOptions,
     _mcs51_finaliseOptions,
     _mcs51_setDefaultOptions,
-    mcs51_assignRegisters
+    mcs51_assignRegisters,
+    _mcs51_getRegName
 };
 

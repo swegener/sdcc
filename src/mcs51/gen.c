@@ -5,24 +5,27 @@
          and -  Jean-Louis VERN.jlvern@writeme.com (1999)
   Bug Fixes  -  Wojciech Stryjewski  wstryj1@tiger.lsu.edu (1999 v2.1.9a)
   
-	 This program is free software; you can redistribute it and/or modify it
-	 under the terms of the GNU General Public License as published by the
-	 Free Software Foundation; either version 2, or (at your option) any
-	 later version.
-	 
-	 This program is distributed in the hope that it will be useful,
-	 but WITHOUT ANY WARRANTY; without even the implied warranty of
-	 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	 GNU General Public License for more details.
-	 
-	 You should have received a copy of the GNU General Public License
-	 along with this program; if not, write to the Free Software
-	 Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-	 
-	 In other words, you are welcome to use, share and improve this program.
-	 You are forbidden to forbid anyone else to use, share and improve
-	 what you give them.   Help stamp out software-hoarding!
-
+  This program is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  
+  In other words, you are welcome to use, share and improve this program.
+  You are forbidden to forbid anyone else to use, share and improve
+  what you give them.   Help stamp out software-hoarding!
+  
+  Notes:
+  000123 mlh	Moved aopLiteral to SDCCglue.c to help the split
+  		Made everything static
 -------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -44,7 +47,10 @@
 
 #include "common.h"
 #include "SDCCpeeph.h"
+#include "ralloc.h"
 #include "gen.h"
+
+char *aopLiteral (value *val, int offset);
 
 /* this is the down and dirty file with all kinds of 
    kludgy & hacky stuff. This is what it is all about
@@ -96,7 +102,7 @@ unsigned char   SRMask[] = {0xFF, 0x7F, 0x3F, 0x1F, 0x0F,
 /*-----------------------------------------------------------------*/
 /* emitcode - writes the code into a file : for now it is simple    */
 /*-----------------------------------------------------------------*/
-void emitcode (char *inst,char *fmt, ...)
+static void emitcode (char *inst,char *fmt, ...)
 {
     va_list ap;
     char lb[MAX_INLINEASM];  
@@ -149,14 +155,14 @@ static regs *getFreePtr (iCode *ic, asmop **aopp, bool result)
     if (!r0iu && !r0ou) {
         ic->rUsed = bitVectSetBit(ic->rUsed,R0_IDX);
         (*aopp)->type = AOP_R0;
-        return (*aopp)->aopu.aop_ptr = regWithIdx(R0_IDX);
+        return (*aopp)->aopu.aop_ptr = mcs51_regWithIdx(R0_IDX);
     }
 
     /* if no usage of r1 then return it */
     if (!r1iu && !r1ou) {
         ic->rUsed = bitVectSetBit(ic->rUsed,R1_IDX);
         (*aopp)->type = AOP_R1;
-        return (*aopp)->aopu.aop_ptr = regWithIdx(R1_IDX);
+        return (*aopp)->aopu.aop_ptr = mcs51_regWithIdx(R1_IDX);
     }    
 
     /* now we know they both have usage */
@@ -165,14 +171,14 @@ static regs *getFreePtr (iCode *ic, asmop **aopp, bool result)
         /* push it if not already pushed */
         if (!_G.r0Pushed) {
             emitcode ("push","%s",
-                      regWithIdx(R0_IDX)->dname);
+                      mcs51_regWithIdx(R0_IDX)->dname);
             _G.r0Pushed++ ;
         }
 
         ic->rUsed = bitVectSetBit(ic->rUsed,R0_IDX);
         (*aopp)->type = AOP_R0;
 
-        return (*aopp)->aopu.aop_ptr = regWithIdx(R0_IDX);
+        return (*aopp)->aopu.aop_ptr = mcs51_regWithIdx(R0_IDX);
     }
 
     /* if r1 not used then */
@@ -181,13 +187,13 @@ static regs *getFreePtr (iCode *ic, asmop **aopp, bool result)
         /* push it if not already pushed */
         if (!_G.r1Pushed) {
             emitcode ("push","%s",
-                      regWithIdx(R1_IDX)->dname);
+                      mcs51_regWithIdx(R1_IDX)->dname);
             _G.r1Pushed++ ;
         }
 
         ic->rUsed = bitVectSetBit(ic->rUsed,R1_IDX);
         (*aopp)->type = AOP_R1;
-        return regWithIdx(R1_IDX);
+        return mcs51_regWithIdx(R1_IDX);
     }
 
 
@@ -361,7 +367,7 @@ static asmop *aopForRemat (symbol *sym)
 /*-----------------------------------------------------------------*/
 /* regsInCommon - two operands have some registers in common       */
 /*-----------------------------------------------------------------*/
-bool regsInCommon (operand *op1, operand *op2)
+static bool regsInCommon (operand *op1, operand *op2)
 {
     symbol *sym1, *sym2;
     int i;
@@ -396,7 +402,7 @@ bool regsInCommon (operand *op1, operand *op2)
 /*-----------------------------------------------------------------*/
 /* operandsEqu - equivalent                                        */
 /*-----------------------------------------------------------------*/
-bool operandsEqu ( operand *op1, operand *op2)
+static bool operandsEqu ( operand *op1, operand *op2)
 {
     symbol *sym1, *sym2;
 
@@ -441,7 +447,7 @@ bool operandsEqu ( operand *op1, operand *op2)
 /*-----------------------------------------------------------------*/
 /* sameRegs - two asmops have the same registers                   */
 /*-----------------------------------------------------------------*/
-bool sameRegs (asmop *aop1, asmop *aop2 )
+static bool sameRegs (asmop *aop1, asmop *aop2 )
 {
     int i;
 
@@ -651,39 +657,6 @@ dealloc:
                 SPIL_LOC(op)->aop = NULL;
         }
     }
-}
-
-/*-----------------------------------------------------------------*/
-/* aopLiteral - string from a literal value                        */
-/*-----------------------------------------------------------------*/
-char *aopLiteral (value *val, int offset)
-{
-    char *rs;
-    union {
-        float f;
-        unsigned char c[4];
-    } fl;
-
-    /* if it is a float then it gets tricky */
-    /* otherwise it is fairly simple */
-    if (!IS_FLOAT(val->type)) {
-        unsigned long v = floatFromVal(val);
-
-        v >>= (offset * 8);
-        sprintf(buffer,"#0x%02x",((char) v) & 0xff);
-        ALLOC_ATOMIC(rs,strlen(buffer)+1);
-        return strcpy (rs,buffer);
-    }
-
-    /* it is type float */
-    fl.f = (float) floatFromVal(val);
-#ifdef _BIG_ENDIAN    
-    sprintf(buffer,"#0x%02x",fl.c[3-offset]);
-#else
-    sprintf(buffer,"#0x%02x",fl.c[offset]);
-#endif
-    ALLOC_ATOMIC(rs,strlen(buffer)+1);
-    return strcpy (rs,buffer);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1041,8 +1014,8 @@ static void reAdjustPreg (asmop *aop)
                         AOP_TYPE(x) == AOP_DPTR || AOP(x)->paged)) 
 
 #define AOP_INPREG(x) (x && (x->type == AOP_REG &&                        \
-                      (x->aopu.aop_reg[0] == regWithIdx(R0_IDX) || \
-                      x->aopu.aop_reg[0] == regWithIdx(R1_IDX) )))
+                      (x->aopu.aop_reg[0] == mcs51_regWithIdx(R0_IDX) || \
+                      x->aopu.aop_reg[0] == mcs51_regWithIdx(R1_IDX) )))
 
 /*-----------------------------------------------------------------*/
 /* genNotFloat - generates not for float operations              */
@@ -1085,7 +1058,7 @@ static void genNotFloat (operand *op, operand *res)
 /*-----------------------------------------------------------------*/
 /* getDataSize - get the operand data size                         */
 /*-----------------------------------------------------------------*/
-int getDataSize(operand *op)
+static int getDataSize(operand *op)
 {
     int size;
     size = AOP_SIZE(op);
@@ -1098,7 +1071,7 @@ int getDataSize(operand *op)
 /*-----------------------------------------------------------------*/
 /* outAcc - output Acc                                             */
 /*-----------------------------------------------------------------*/
-void outAcc(operand *result)
+static void outAcc(operand *result)
 {
     int size, offset;
     size = getDataSize(result);
@@ -1116,7 +1089,7 @@ void outAcc(operand *result)
 /*-----------------------------------------------------------------*/
 /* outBitC - output a bit C                                        */
 /*-----------------------------------------------------------------*/
-void outBitC(operand *result)
+static void outBitC(operand *result)
 {
     /* if the result is bit */
     if (AOP_TYPE(result) == AOP_CRY) 
@@ -1131,7 +1104,7 @@ void outBitC(operand *result)
 /*-----------------------------------------------------------------*/
 /* toBoolean - emit code for orl a,operator(sizeop)                */
 /*-----------------------------------------------------------------*/
-void toBoolean(operand *oper)
+static void toBoolean(operand *oper)
 {
     int size = AOP_SIZE(oper) - 1;
     int offset = 1;
@@ -1349,7 +1322,7 @@ static void saveRegisters(iCode *lic)
 		if (i == R0_IDX)
 		    emitcode("mov","a,b");
 		else
-		    emitcode("mov","a,%s",regWithIdx(i)->name);
+		    emitcode("mov","a,%s",mcs51_regWithIdx(i)->name);
 		emitcode("movx","@r0,a");
 		emitcode("inc","r0");
 	    }
@@ -1360,7 +1333,7 @@ static void saveRegisters(iCode *lic)
     } else
 	for (i = 0 ; i < mcs51_nRegs ; i++) {
 	    if (bitVectBitValue(rsave,i))
-		emitcode("push","%s",regWithIdx(i)->dname);
+		emitcode("push","%s",mcs51_regWithIdx(i)->dname);
 	}
 
     detype = getSpec(operandType(IC_LEFT(ic)));
@@ -1393,7 +1366,7 @@ static void unsaveRegisters (iCode *ic)
 		if (i == R0_IDX)
 		    emitcode("mov","b,a");
 		else
-		    emitcode("mov","%s,a",regWithIdx(i)->name);
+		    emitcode("mov","%s,a",mcs51_regWithIdx(i)->name);
 	    }	    
 
 	}
@@ -1403,7 +1376,7 @@ static void unsaveRegisters (iCode *ic)
     } else
 	for (i =  mcs51_nRegs ; i >= 0 ; i--) {
 	    if (bitVectBitValue(rsave,i))
-		emitcode("pop","%s",regWithIdx(i)->dname);
+		emitcode("pop","%s",mcs51_regWithIdx(i)->dname);
 	}
 
 }  
@@ -1412,7 +1385,7 @@ static void unsaveRegisters (iCode *ic)
 /*-----------------------------------------------------------------*/
 /* pushSide -							   */
 /*-----------------------------------------------------------------*/
-void pushSide(operand * oper, int size)
+static void pushSide(operand * oper, int size)
 {
 	int offset = 0;
 	while (size--) {
@@ -1430,7 +1403,7 @@ void pushSide(operand * oper, int size)
 /*-----------------------------------------------------------------*/
 /* assignResultValue -						   */
 /*-----------------------------------------------------------------*/
-void assignResultValue(operand * oper)
+static void assignResultValue(operand * oper)
 {
 	int offset = 0;
 	int size = AOP_SIZE(oper);
@@ -1949,7 +1922,7 @@ static void genFunction (iCode *ic)
 		    for ( i = 0 ; i < sym->regsUsed->size ; i++) {
 			if (bitVectBitValue(sym->regsUsed,i) ||
                           (mcs51_ptrRegReq && (i == R0_IDX || i == R1_IDX)) )
-			    emitcode("push","%s",regWithIdx(i)->dname);			    
+			    emitcode("push","%s",mcs51_regWithIdx(i)->dname);			    
 		    }
 		}
 		
@@ -1972,7 +1945,7 @@ static void genFunction (iCode *ic)
 		for ( i = 0 ; i < sym->regsUsed->size ; i++) {
 		    if (bitVectBitValue(sym->regsUsed,i) ||
                       (mcs51_ptrRegReq && (i == R0_IDX || i == R1_IDX)) ) {
-			emitcode("push","%s",regWithIdx(i)->dname);
+			emitcode("push","%s",mcs51_regWithIdx(i)->dname);
 			_G.nRegsSaved++;
 		    }
 		}
@@ -2083,7 +2056,7 @@ static void genEndFunction (iCode *ic)
 		    for ( i = sym->regsUsed->size ; i >= 0 ; i--) {
 			if (bitVectBitValue(sym->regsUsed,i) ||
                           (mcs51_ptrRegReq && (i == R0_IDX || i == R1_IDX)) )
-			    emitcode("pop","%s",regWithIdx(i)->dname);
+			    emitcode("pop","%s",mcs51_regWithIdx(i)->dname);
 		    }
 		}
 		
@@ -2136,7 +2109,7 @@ static void genEndFunction (iCode *ic)
 		for ( i = sym->regsUsed->size ; i >= 0 ; i--) {
 		    if (bitVectBitValue(sym->regsUsed,i) ||
                       (mcs51_ptrRegReq && (i == R0_IDX || i == R1_IDX)) )
-			emitcode("pop","%s",regWithIdx(i)->dname);
+			emitcode("pop","%s",mcs51_regWithIdx(i)->dname);
 		}
 	    }
 	    
@@ -2329,7 +2302,7 @@ static bool genPlusIncr (iCode *ic)
 /*-----------------------------------------------------------------*/
 /* outBitAcc - output a bit in acc                                 */
 /*-----------------------------------------------------------------*/
-void outBitAcc(operand *result)
+static void outBitAcc(operand *result)
 {
     symbol *tlbl = newiTempLabel(NULL);
     /* if the result is a bit */
@@ -3574,7 +3547,7 @@ static void genOrOp (iCode *ic)
 /*-----------------------------------------------------------------*/
 /* isLiteralBit - test if lit == 2^n                               */
 /*-----------------------------------------------------------------*/
-int isLiteralBit(unsigned long lit)
+static int isLiteralBit(unsigned long lit)
 {
     unsigned long pw[32] = {1L,2L,4L,8L,16L,32L,64L,128L,
     0x100L,0x200L,0x400L,0x800L,

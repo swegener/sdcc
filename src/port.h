@@ -64,6 +64,9 @@ typedef struct {
     void (*setDefaultOptions)(void);
     /** Does the dirty work. */
     void (*assignRegisters)(eBBlock **, int);
+    /** Returns the register name of a symbol.
+	Used so that 'regs' can be an incomplete type. */
+    const char *(*getRegName)(struct regs *reg);
 } PORT;
 
 extern PORT *port;

@@ -18,9 +18,12 @@
 #include "SDCCcflow.h"
 #include "SDCCdflow.h"
 #include "SDCClrange.h"
-#include "SDCCralloc.h"
 #include "SDCCptropt.h"
 #include "SDCCopt.h"
 
 #include "port.h"
 #include "config.h"
+
+/*
+#include "SDCCralloc.h"
+*/

@@ -762,7 +762,7 @@ void updateSpillLocation ( iCode *ic)
 
     if (ASSIGN_ITEMP_TO_ITEMP(ic) &&
 	!SPIL_LOC(IC_RIGHT(ic))   &&
-	bitVectnBitsOn(OP_USES(IC_RIGHT(ic))) == 0 &&
+        !bitVectBitsInCommon(OP_DEFS(IC_RIGHT(ic)),OP_USES(IC_RESULT(ic))) &&
 	OP_SYMBOL(IC_RESULT(ic))->isreqv) {
 	
 	setype = getSpec(operandType(IC_RESULT(ic)));

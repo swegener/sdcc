@@ -639,9 +639,6 @@ void peepHole (lineNode **pls )
 		else
 		    replaceRule (&spl, mtail,pr);
 		
-		/* if it was the start then replace
-		   the start */
-		
 		/* if restart rule type then
 		   start at the top again */
 		if (pr->restart)

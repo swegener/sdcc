@@ -6,6 +6,7 @@
 	* doc/Makefile: fixed install, added local_icons
 	* sim/ucsim/gui.src/Makefile.in: fixed an old typo
 	* src/mcs51/gen.c (genRightShift): fixed bug #870788
+	* src/ds390/gen.c (genRightShift): fixed bug #870788
 
 2004-01-06 Vangelis Rokas <vrokas@otenet.gr>
 

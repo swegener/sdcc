@@ -8755,7 +8755,7 @@ genRightShiftLiteral (operand * left,
    && (size != 2)
    && (size != 4))
   {
-      D(emitcode (";", "genRightShiftLiteral wimping out"););	
+      D(emitcode (";", "genRightShiftLiteral wimping out"););
       return FALSE;
   }
 
@@ -8949,7 +8949,7 @@ static void
 genRightShift (iCode * ic)
 {
   operand *right, *left, *result;
-  sym_link *retype;
+  sym_link *letype;
   int size, offset;
   char *l;
   symbol *tlbl, *tlbl1;
@@ -8958,9 +8958,9 @@ genRightShift (iCode * ic)
 
   /* if signed then we do it the hard way preserve the
      sign bit moving it inwards */
-  retype = getSpec (operandType (IC_RESULT (ic)));
+  letype = getSpec (operandType (IC_LEFT (ic)));
 
-  if (!SPEC_USIGN (retype))
+  if (!SPEC_USIGN (letype))
     {
       genSignedRightShift (ic);
       return;

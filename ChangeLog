@@ -1,4 +1,18 @@
-2004-11-18 Maarten Brock <sourceforge.brock AT dse.nl>
+2004-11-29 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	Adding support for replacing ljmps with sjmps in jumptables
+	generated for switch statements. For now you need to set the
+	environment variable SDCC_SJMP_JUMPTABLE to enable this.
+	Now 4 algorithms for mcs51 jumptable generation are used:
+	ljmp or sjmp jumptables for up to 16 cases, stack-pushing target
+	addresses loaded pc-relative for up to 112 cases and stack-pushing
+	target addresses loaded with offset from dptr for up to 256 cases.
+
+	* src/SDCCpeeph.c: added peephole conditional labelJTInRange
+	* src/mcs51/main.c: adapted constants for switch table generation
+	* src/mcs51/peeph.def: added 260.x for replacing ljmp with sjmp
+
+2004-11-26 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/printf_large.c (_print_format): fixed bug 1073386
 	* support/regression/tests/bug1057979.c: added test for bug 1073386
@@ -89,7 +103,7 @@
 	* device/lib/_gptrput.c (_gptrput): _naked allows to use ret
 	  instead of sjmp to ret
 	* src/mcs51/peeph.def: added peepholes 3.d-g and 177.g,h provided
-	  by anonymous in RFE #1067986, thanks
+	  by Hubert Sack <hsack2002 AT arcor.de> in RFE #1067986, thanks
 
 2004-11-18 Maarten Brock <sourceforge.brock AT dse.nl>
 

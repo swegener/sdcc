@@ -35,6 +35,8 @@ static const ASM_MAPPING _asxxxx_gb_mapping[] = {
 };
 
 static const ASM_MAPPING _asxxxx_z80_mapping[] = {
+    { "*ixx", "%d(ix)" },
+    { "*iyx", "%d(iy)" },
     { "*hl", "(hl)" },
     { "di", "di" },
     { "ldahli", "ld a,(hl+)" },

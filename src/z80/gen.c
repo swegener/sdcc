@@ -680,8 +680,6 @@ char *aopGetLitWordLong(asmop *aop, int offset, bool with_hash)
     if (aop->size != 2 && aop->type != AOP_HL)
 	return NULL;
 #endif
-    wassert(offset == 0);
-
     /* depending on type */
     switch (aop->type) {
     case AOP_HL:
@@ -689,9 +687,9 @@ char *aopGetLitWordLong(asmop *aop, int offset, bool with_hash)
     case AOP_IMMD:
 	/* PENDING: for re-target */
 	if (with_hash)
-	    tsprintf(s, "!hashedstr", aop->aopu.aop_immd);
+	    tsprintf(s, "!hashedstr + %d", aop->aopu.aop_immd, offset);
 	else
-	    strcpy(s, aop->aopu.aop_immd);
+	    tsprintf(s, "%s + %d", aop->aopu.aop_immd, offset);
 	ALLOC_ATOMIC(rs,strlen(s)+1);
 	strcpy(rs,s);   
 	return rs;
@@ -701,6 +699,8 @@ char *aopGetLitWordLong(asmop *aop, int offset, bool with_hash)
 	/* otherwise it is fairly simple */
 	if (!IS_FLOAT(val->type)) {
 	    unsigned long v = floatFromVal(val);
+	    if (offset == 2)
+		v >>= 16;
 	    if (with_hash)
 		tsprintf(buffer, "!immedword", v);
 	    else
@@ -708,8 +708,17 @@ char *aopGetLitWordLong(asmop *aop, int offset, bool with_hash)
 	    ALLOC_ATOMIC(rs,strlen(buffer)+1);
 	    return strcpy (rs,buffer);
 	}
-	wassert(0);
-	return NULL;
+	else {
+	    /* A float */
+	    Z80_FLOAT f;
+	    convertFloat(&f, floatFromVal(val));
+	    if (with_hash) 
+		tsprintf(buffer, "!immedword", f.w[offset/2]);
+	    else
+		tsprintf(buffer, "!constword", f.w[offset/2]);
+	    ALLOC_ATOMIC(rs,strlen(buffer)+1);
+	    return strcpy (rs,buffer);
+	}
     }
     default:
 	return NULL;
@@ -773,7 +782,7 @@ static void fetchLitPair(PAIR_ID pairId, asmop *left, int offset)
 {
     const char *l;
     const char *pair = _pairs[pairId].name;
-    l = aopGetLitWordLong(left, 0, FALSE);
+    l = aopGetLitWordLong(left, offset, FALSE);
     wassert(l && pair);
 
     if (isPtr(pair)) {
@@ -796,9 +805,11 @@ static void fetchLitPair(PAIR_ID pairId, asmop *left, int offset)
     }
     /* Both a lit on the right and a true symbol on the left */
     /* PENDING: for re-target */
+#if 0
     if (offset)
 	emit2("ld %s,!hashedstr + %d", pair, l, offset);
     else 
+#endif
 	emit2("ld %s,!hashedstr", pair, l);
 }
 
@@ -863,11 +874,6 @@ static void setupPair(PAIR_ID pairId, asmop *aop, int offset)
 	wassert(0);
     }
     _G.pairs[pairId].last_type = aop->type;
-}
-
-static void emitIntLabel(int key)
-{
-    emit2("!tlabeldef", key);
 }
 
 static void emitLabel(int key)
@@ -1350,8 +1356,10 @@ void assignResultValue(operand * oper)
     wassert(size <= 4);
     topInA = requiresHL(AOP(oper));
 
+#if 0
     if (!IS_GB)
 	wassert(size <= 2);
+#endif
     if (IS_GB && size == 4 && requiresHL(AOP(oper))) {
 	/* We do it the hard way here. */
 	emitcode("push", "hl");
@@ -1422,6 +1430,17 @@ static void genIpush (iCode *ic)
     else {
 	if (size == 2) {
 	    fetchHL(AOP(IC_LEFT(ic)));
+	    emitcode("push", "hl");
+	    spillPair(PAIR_HL);
+	    _G.stack.pushed += 2;
+	    goto release;
+	}
+	if (size == 4) {
+	    fetchPairLong(PAIR_HL, AOP(IC_LEFT(ic)), 2);
+	    emitcode("push", "hl");
+	    spillPair(PAIR_HL);
+	    _G.stack.pushed += 2;
+	    fetchPairLong(PAIR_HL, AOP(IC_LEFT(ic)), 0);
 	    emitcode("push", "hl");
 	    spillPair(PAIR_HL);
 	    _G.stack.pushed += 2;

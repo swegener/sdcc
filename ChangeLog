@@ -1,3 +1,10 @@
+2004-04-11 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCicode.c (geniCodeLogic): made it static,
+	(geniCodeLogicAndOr): added in order to fix bug #905492,
+	(ast2iCode): fixed bug #905492
+	* support/regression/tests/bug-905492.c: added
+        
 2004-03-29 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCast.c (addCast): don't cast float to char

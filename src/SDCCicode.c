@@ -2819,7 +2819,7 @@ geniCodeRightShift (operand * left, operand * right)
 /*-----------------------------------------------------------------*/
 /* geniCodeLogic- logic code                                       */
 /*-----------------------------------------------------------------*/
-operand *
+static operand *
 geniCodeLogic (operand * left, operand * right, int op)
 {
   iCode *ic;
@@ -2891,10 +2891,75 @@ geniCodeLogic (operand * left, operand * right, int op)
       op != NE_OP &&
       op != AND_OP &&
       op != OR_OP)
-    ic->supportRtn = 1;
+   ic->supportRtn = 1;
 
   ADDTOCHAIN (ic);
   return IC_RESULT (ic);
+}
+
+/*-----------------------------------------------------------------*/
+/* geniCodeLogicAndOr - && || operations                           */
+/*-----------------------------------------------------------------*/
+static operand *
+geniCodeLogicAndOr (ast *tree, int lvl)
+{
+  iCode *ic;
+  symbol *falseLabel = newiTempLabel (NULL);
+  symbol *trueLabel  = newiTempLabel (NULL);
+  symbol *exitLabel  = newiTempLabel (NULL);
+  operand *op, *result, *condition;
+
+  /* AND_OP and OR_OP are no longer generated because of bug-905492.
+     They can be reenabled by executing the following block. If you find
+     a decent optimization you could start right here:
+  */
+#if 0
+  if (0)
+    {
+       operand *leftOp, *rightOp;
+
+       leftOp  = geniCodeRValue (ast2iCode (tree->left , lvl + 1), FALSE);
+       rightOp = geniCodeRValue (ast2iCode (tree->right, lvl + 1), FALSE);
+
+       return geniCodeLogic (leftOp, rightOp, tree->opval.op);
+    }
+#endif
+
+  /* generate two IFX for the '&&' or '||' op */
+
+  /* evaluate left operand */
+  condition = ast2iCode (tree->left, lvl + 1);
+  op = geniCodeRValue (condition, FALSE);
+
+  /* test left operand */
+  if (tree->opval.op == AND_OP)
+    ic = newiCodeCondition (op, NULL, falseLabel);
+  else /* OR_OP */
+    ic = newiCodeCondition (op, trueLabel, NULL);
+  ADDTOCHAIN (ic);
+  
+  /* evaluate right operand */
+  condition = ast2iCode (tree->right, lvl + 1);
+  op = geniCodeRValue (condition, FALSE);
+  
+  /* test right operand */
+  ic = newiCodeCondition (op, trueLabel, NULL);
+  ADDTOCHAIN (ic);
+  
+  /* store 0 or 1 in result */
+  result = newiTempOperand (newCharLink(), 1);
+  
+  geniCodeLabel (falseLabel);
+  geniCodeAssign (result, operandFromLit (0), 0);
+  /* generate an unconditional goto */
+  geniCodeGoto (exitLabel);
+
+  geniCodeLabel (trueLabel);
+  geniCodeAssign (result, operandFromLit (1), 0);
+
+  geniCodeLabel (exitLabel);
+
+  return result;
 }
 
 /*-----------------------------------------------------------------*/
@@ -3729,6 +3794,8 @@ ast2iCode (ast * tree,int lvl)
       tree->opval.op != '?' &&
       tree->opval.op != CALL &&
       tree->opval.op != IFX &&
+      tree->opval.op != AND_OP &&
+      tree->opval.op != OR_OP &&
       tree->opval.op != LABEL &&
       tree->opval.op != GOTO &&
       tree->opval.op != SWITCH &&
@@ -3907,28 +3974,29 @@ ast2iCode (ast * tree,int lvl)
 	setOperandType (op, UCHARTYPE);
 	return op;
       }
+    case AND_OP:
+    case OR_OP:
+      return geniCodeLogicAndOr (tree, lvl);
     case '>':
     case '<':
     case LE_OP:
     case GE_OP:
     case EQ_OP:
     case NE_OP:
-    case AND_OP:
-    case OR_OP:
       /* different compilers (even different gccs) evaluate
-	 the two calls in a different order. to get the same
-	 result on all machines we've to specify a clear sequence.
+         the two calls in a different order. to get the same
+         result on all machines we've to specify a clear sequence.
       return geniCodeLogic (geniCodeRValue (left, FALSE),
                             geniCodeRValue (right, FALSE),
                             tree->opval.op);
       */
       {
-	operand *leftOp, *rightOp;
+        operand *leftOp, *rightOp;
 
-	rightOp = geniCodeRValue (right, FALSE);
-	leftOp  = geniCodeRValue (left , FALSE);
+        leftOp  = geniCodeRValue (left , FALSE);
+        rightOp = geniCodeRValue (right, FALSE);
 
-	return geniCodeLogic (leftOp, rightOp, tree->opval.op);
+        return geniCodeLogic (leftOp, rightOp, tree->opval.op);
       }
     case '?':
       return geniCodeConditional (tree,lvl);

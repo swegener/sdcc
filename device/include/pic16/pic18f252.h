@@ -767,149 +767,149 @@ extern sfr at 0xfff TOSU;
 
 
 /* Configuration registers locations */
-#define __CONFIG0H	0x300001
-#define __CONFIG1L	0x300002
-#define __CONFIG1H	0x300003
-#define __CONFIG2H	0x300005
-#define __CONFIG3L	0x300006
-#define __CONFIG4L	0x300008
-#define __CONFIG4H	0x300009
-#define __CONFIG5L	0x30000A
-#define __CONFIG5H	0x30000B
-#define __CONFIG6L	0x30000C
-#define __CONFIG6H	0x30000D
+#define __CONFIG1H	0x300001
+#define __CONFIG2L	0x300002
+#define __CONFIG2H	0x300003
+#define __CONFIG3H	0x300005
+#define __CONFIG4L	0x300006
+#define __CONFIG5L	0x300008
+#define __CONFIG5H	0x300009
+#define __CONFIG6L	0x30000A
+#define __CONFIG6H	0x30000B
+#define __CONFIG7L	0x30000C
+#define __CONFIG7H	0x30000D
 
 
 
-/* Oscillator 0H options */
-#define _OSC_RC_OSC2_0H	0xFF	/* RC-OSC2 as RA6 */
-#define _OSC_HS_PLL_0H	0xFE	/* HS-PLL Enabled */
-#define _OSC_EC_OSC2_RA6_0H	0xFD	/* EC-OSC2 as RA6 */
-#define _OSC_EC_OSC2_Clock_Out_0H	0xFC	/* EC-OSC2 as Clock_Out */
-#define _OSC_RC_0H	0xFB	/* RC */
-#define _OSC_HS_0H	0xFA	/* HS */
-#define _OSC_XT_0H	0xF9	/* XT */
-#define _OSC_LP_0H	0xF8	/* LP */
+/* Oscillator 1H options */
+#define _OSC_RC_OSC2_1H	0xFF	/* RC-OSC2 as RA6 */
+#define _OSC_HS_PLL_1H	0xFE	/* HS-PLL Enabled */
+#define _OSC_EC_OSC2_RA6_1H	0xFD	/* EC-OSC2 as RA6 */
+#define _OSC_EC_OSC2_Clock_Out_1H	0xFC	/* EC-OSC2 as Clock_Out */
+#define _OSC_RC_1H	0xFB	/* RC */
+#define _OSC_HS_1H	0xFA	/* HS */
+#define _OSC_XT_1H	0xF9	/* XT */
+#define _OSC_LP_1H	0xF8	/* LP */
 
-/* Osc. Switch Enable 0H options */
-#define _OSCS_OFF_0H	0xFF	/* Disabled */
-#define _OSCS_ON_0H	0xDF	/* Enabled */
+/* Osc. Switch Enable 1H options */
+#define _OSCS_OFF_1H	0xFF	/* Disabled */
+#define _OSCS_ON_1H	0xDF	/* Enabled */
 
-/* Power Up Timer 1L options */
-#define _PUT_OFF_1L	0xFF	/* Disabled */
-#define _PUT_ON_1L	0xFE	/* Enabled */
+/* Power Up Timer 2L options */
+#define _PUT_OFF_2L	0xFF	/* Disabled */
+#define _PUT_ON_2L	0xFE	/* Enabled */
 
-/* Brown Out Detect 1L options */
-#define _BODEN_ON_1L	0xFF	/* Enabled */
-#define _BODEN_OFF_1L	0xFD	/* Disabled */
+/* Brown Out Detect 2L options */
+#define _BODEN_ON_2L	0xFF	/* Enabled */
+#define _BODEN_OFF_2L	0xFD	/* Disabled */
 
-/* Brown Out Voltage 1L options */
-#define _BODENV_2_0V_1L	0xFF	/* 2.0V */
-#define _BODENV_2_7V_1L	0xFB	/* 2.7V */
-#define _BODENV_4_2V_1L	0xF7	/* 4.2V */
-#define _BODENV_4_5V_1L	0xF3	/* 4.5V */
+/* Brown Out Voltage 2L options */
+#define _BODENV_2_0V_2L	0xFF	/* 2.0V */
+#define _BODENV_2_7V_2L	0xFB	/* 2.7V */
+#define _BODENV_4_2V_2L	0xF7	/* 4.2V */
+#define _BODENV_4_5V_2L	0xF3	/* 4.5V */
 
-/* Watchdog Timer 1H options */
-#define _WDT_ON_1H	0xFF	/* Enabled */
-#define _WDT_OFF_1H	0xFE	/* Disabled */
+/* Watchdog Timer 2H options */
+#define _WDT_ON_2H	0xFF	/* Enabled */
+#define _WDT_OFF_2H	0xFE	/* Disabled */
 
-/* Watchdog Postscaler 1H options */
-#define _WDTPS_1_128_1H	0xFF	/* 1:128 */
-#define _WDTPS_1_64_1H	0xFD	/* 1:64 */
-#define _WDTPS_1_32_1H	0xFB	/* 1:32 */
-#define _WDTPS_1_16_1H	0xF9	/* 1:16 */
-#define _WDTPS_1_8_1H	0xF7	/* 1:8 */
-#define _WDTPS_1_4_1H	0xF5	/* 1:4 */
-#define _WDTPS_1_2_1H	0xF3	/* 1:2 */
-#define _WDTPS_1_1_1H	0xF1	/* 1:1 */
+/* Watchdog Postscaler 2H options */
+#define _WDTPS_1_128_2H	0xFF	/* 1:128 */
+#define _WDTPS_1_64_2H	0xFD	/* 1:64 */
+#define _WDTPS_1_32_2H	0xFB	/* 1:32 */
+#define _WDTPS_1_16_2H	0xF9	/* 1:16 */
+#define _WDTPS_1_8_2H	0xF7	/* 1:8 */
+#define _WDTPS_1_4_2H	0xF5	/* 1:4 */
+#define _WDTPS_1_2_2H	0xF3	/* 1:2 */
+#define _WDTPS_1_1_2H	0xF1	/* 1:1 */
 
-/* CCP2 Mux 2H options */
-#define _CCP2MUX_RC1_2H	0xFF	/* RC1 */
-#define _CCP2MUX_RB3_2H	0xFE	/* RB3 */
+/* CCP2 Mux 3H options */
+#define _CCP2MUX_RC1_3H	0xFF	/* RC1 */
+#define _CCP2MUX_RB3_3H	0xFE	/* RB3 */
 
-/* Low Voltage Program 3L options */
-#define _LVP_ON_3L	0xFF	/* Enabled */
-#define _LVP_OFF_3L	0xFB	/* Disabled */
+/* Low Voltage Program 4L options */
+#define _LVP_ON_4L	0xFF	/* Enabled */
+#define _LVP_OFF_4L	0xFB	/* Disabled */
 
-/* Background Debug 3L options */
-#define _BACKBUG_OFF_3L	0xFF	/* Disabled */
-#define _BACKBUG_ON_3L	0x7F	/* Enabled */
+/* Background Debug 4L options */
+#define _BACKBUG_OFF_4L	0xFF	/* Disabled */
+#define _BACKBUG_ON_4L	0x7F	/* Enabled */
 
-/* Stack Overflow Reset 3L options */
-#define _STVR_ON_3L	0xFF	/* Enabled */
-#define _STVR_OFF_3L	0xFE	/* Disabled */
+/* Stack Overflow Reset 4L options */
+#define _STVR_ON_4L	0xFF	/* Enabled */
+#define _STVR_OFF_4L	0xFE	/* Disabled */
 
-/* Code Protect 00200-01FFF 4L options */
-#define _CP_0_OFF_4L	0xFF	/* Disabled */
-#define _CP_0_ON_4L	0xFE	/* Enabled */
+/* Code Protect 00200-01FFF 5L options */
+#define _CP_0_OFF_5L	0xFF	/* Disabled */
+#define _CP_0_ON_5L	0xFE	/* Enabled */
 
-/* Code Protect 02000-03FFF 4L options */
-#define _CP_1_OFF_4L	0xFF	/* Disabled */
-#define _CP_1_ON_4L	0xFD	/* Enabled */
+/* Code Protect 02000-03FFF 5L options */
+#define _CP_1_OFF_5L	0xFF	/* Disabled */
+#define _CP_1_ON_5L	0xFD	/* Enabled */
 
-/* Code Protect 04000-05FFF 4L options */
-#define _CP_2_OFF_4L	0xFF	/* Disabled */
-#define _CP_2_ON_4L	0xFB	/* Enabled */
+/* Code Protect 04000-05FFF 5L options */
+#define _CP_2_OFF_5L	0xFF	/* Disabled */
+#define _CP_2_ON_5L	0xFB	/* Enabled */
 
-/* Code Protect 06000-07FFF 4L options */
-#define _CP_3_OFF_4L	0xFF	/* Disabled */
-#define _CP_3_ON_4L	0xF7	/* Enabled */
+/* Code Protect 06000-07FFF 5L options */
+#define _CP_3_OFF_5L	0xFF	/* Disabled */
+#define _CP_3_ON_5L	0xF7	/* Enabled */
 
-/* Data EE Read Protect 4H options */
-#define _CPD_OFF_4H	0xFF	/* Disabled */
-#define _CPD_ON_4H	0x7F	/* Enabled */
+/* Data EE Read Protect 5H options */
+#define _CPD_OFF_5H	0xFF	/* Disabled */
+#define _CPD_ON_5H	0x7F	/* Enabled */
 
-/* Code Protect Boot 4H options */
-#define _CPB_OFF_4H	0xFF	/* Disabled */
-#define _CPB_ON_4H	0xBF	/* Enabled */
+/* Code Protect Boot 5H options */
+#define _CPB_OFF_5H	0xFF	/* Disabled */
+#define _CPB_ON_5H	0xBF	/* Enabled */
 
-/* Table Write Protect 00200-01FFF 5L options */
-#define _WRT_0_OFF_5L	0xFF	/* Disabled */
-#define _WRT_0_ON_5L	0xFE	/* Enabled */
+/* Table Write Protect 00200-01FFF 6L options */
+#define _WRT_0_OFF_6L	0xFF	/* Disabled */
+#define _WRT_0_ON_6L	0xFE	/* Enabled */
 
-/* Table Write Protect 02000-03FFF 5L options */
-#define _WRT_1_OFF_5L	0xFF	/* Disabled */
-#define _WRT_1_ON_5L	0xFD	/* Enabled */
+/* Table Write Protect 02000-03FFF 6L options */
+#define _WRT_1_OFF_6L	0xFF	/* Disabled */
+#define _WRT_1_ON_6L	0xFD	/* Enabled */
 
-/* Table Write Protect 04000-05FFF 5L options */
-#define _WRT_2_OFF_5L	0xFF	/* Disabled */
-#define _WRT_2_ON_5L	0xFB	/* Enabled */
+/* Table Write Protect 04000-05FFF 6L options */
+#define _WRT_2_OFF_6L	0xFF	/* Disabled */
+#define _WRT_2_ON_6L	0xFB	/* Enabled */
 
-/* Table Write Protect 06000-07FFF 5L options */
-#define _WRT_3_OFF_5L	0xFF	/* Disabled */
-#define _WRT_3_ON_5L	0xF7	/* Enabled */
+/* Table Write Protect 06000-07FFF 6L options */
+#define _WRT_3_OFF_6L	0xFF	/* Disabled */
+#define _WRT_3_ON_6L	0xF7	/* Enabled */
 
-/* Data EE Write Protect 5H options */
-#define _WRTD_OFF_5H	0xFF	/* Disabled */
-#define _WRTD_ON_5H	0x7F	/* Enabled */
+/* Data EE Write Protect 6H options */
+#define _WRTD_OFF_6H	0xFF	/* Disabled */
+#define _WRTD_ON_6H	0x7F	/* Enabled */
 
-/* Table Write Protect Boot 5H options */
-#define _WRTB_OFF_5H	0xFF	/* Disabled */
-#define _WRTB_ON_5H	0xBF	/* Enabled */
+/* Table Write Protect Boot 6H options */
+#define _WRTB_OFF_6H	0xFF	/* Disabled */
+#define _WRTB_ON_6H	0xBF	/* Enabled */
 
-/* Config. Write Protect 5H options */
-#define _WRTC_OFF_5H	0xFF	/* Disabled */
-#define _WRTC_ON_5H	0xDF	/* Enabled */
+/* Config. Write Protect 6H options */
+#define _WRTC_OFF_6H	0xFF	/* Disabled */
+#define _WRTC_ON_6H	0xDF	/* Enabled */
 
-/* Table Read Protect 00200-01FFF 6L options */
-#define _EBTR_0_OFF_6L	0xFF	/* Disabled */
-#define _EBTR_0_ON_6L	0xFE	/* Enabled */
+/* Table Read Protect 00200-01FFF 7L options */
+#define _EBTR_0_OFF_7L	0xFF	/* Disabled */
+#define _EBTR_0_ON_7L	0xFE	/* Enabled */
 
-/* Table Read Protect 02000-03FFF 6L options */
-#define _EBTR_1_OFF_6L	0xFF	/* Disabled */
-#define _EBTR_1_ON_6L	0xFD	/* Enabled */
+/* Table Read Protect 02000-03FFF 7L options */
+#define _EBTR_1_OFF_7L	0xFF	/* Disabled */
+#define _EBTR_1_ON_7L	0xFD	/* Enabled */
 
-/* Table Read Protect 04000-05FFF 6L options */
-#define _EBTR_2_OFF_6L	0xFF	/* Disabled */
-#define _EBTR_2_ON_6L	0xFB	/* Enabled */
+/* Table Read Protect 04000-05FFF 7L options */
+#define _EBTR_2_OFF_7L	0xFF	/* Disabled */
+#define _EBTR_2_ON_7L	0xFB	/* Enabled */
 
-/* Table Read Protect 06000-07FFF 6L options */
-#define _EBTR_3_OFF_6L	0xFF	/* Disabled */
-#define _EBTR_3_ON_6L	0xF7	/* Enabled */
+/* Table Read Protect 06000-07FFF 7L options */
+#define _EBTR_3_OFF_7L	0xFF	/* Disabled */
+#define _EBTR_3_ON_7L	0xF7	/* Enabled */
 
-/* Table Read Protect Boot 6H options */
-#define _EBTRB_OFF_6H	0xFF	/* Disabled */
-#define _EBTRB_ON_6H	0xBF	/* Enabled */
+/* Table Read Protect Boot 7H options */
+#define _EBTRB_OFF_7H	0xFF	/* Disabled */
+#define _EBTRB_ON_7H	0xBF	/* Enabled */
 
 
 /* Device ID locations */

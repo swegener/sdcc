@@ -375,6 +375,7 @@ allocGlobal (symbol * sym)
       return;
     }
 
+  if(!TARGET_IS_PIC16 || (TARGET_IS_PIC16 && sym->level))
   /* register storage class ignored changed to FIXED */
   if (SPEC_SCLS (sym->etype) == S_REGISTER)
     SPEC_SCLS (sym->etype) = S_FIXED;
@@ -392,6 +393,7 @@ allocGlobal (symbol * sym)
   /* if it is fixed, then allocate depending on the  */
   /* current memory model, same for automatics        */
   if (SPEC_SCLS (sym->etype) == S_FIXED ||
+      (TARGET_IS_PIC16 && (SPEC_SCLS (sym->etype) == S_REGISTER) && (sym->level==0)) ||
       SPEC_SCLS (sym->etype) == S_AUTO) {
     if (port->mem.default_globl_map != xdata) {
       /* set the output class */

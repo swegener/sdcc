@@ -76,10 +76,12 @@ set *pic16_dynProcessorRegs=NULL;
 set *pic16_dynDirectRegs=NULL;
 set *pic16_dynDirectBitRegs=NULL;
 set *pic16_dynInternalRegs=NULL;
+set *pic16_dynAccessRegs=NULL;
 
 static hTab *dynDirectRegNames=NULL;
 static hTab *dynAllocRegNames=NULL;
 static hTab *dynProcRegNames=NULL;
+static hTab *dynAccessRegNames=NULL;
 //static hTab  *regHash = NULL;    /* a hash table containing ALL registers */
 
 extern set *sectNames;
@@ -88,6 +90,7 @@ set *pic16_rel_udata=NULL;	/* relocatable uninitialized registers */
 set *pic16_fix_udata=NULL;	/* absolute uninitialized registers */
 set *pic16_equ_data=NULL;	/* registers used by equates */
 set *pic16_int_regs=NULL;	/* internal registers placed in access bank 0 to 0x7f */
+set *pic16_acs_udata=NULL;	/* access bank variables */
 
 set *pic16_builtin_functions=NULL;
 
@@ -513,7 +516,7 @@ allocReg (short type)
 
 	reg->isFree=0;
 
-	debugLog ("%s of type %s for register rIdx: %d\n", __FUNCTION__, debugLogRegType (type), dynrIdx-1);
+//	debugLog ("%s of type %s for register rIdx: %d\n", __FUNCTION__, debugLogRegType (type), dynrIdx-1);
 
 //	fprintf(stderr,"%s:%d: %s\t%s addr= 0x%x\trIdx= 0x%02x isFree: %d\n",
 //		__FILE__, __LINE__, __FUNCTION__, reg->name, reg->address, reg->rIdx, reg->isFree);
@@ -637,6 +640,40 @@ pic16_procregWithName (char *name)
 
 }
 
+/*-----------------------------------------------------------------*/
+/* pic16_accessregWithName - search for register by name           */
+/*-----------------------------------------------------------------*/
+regs *
+pic16_accessregWithName (char *name)
+{
+  int hkey;
+  regs *reg;
+
+  if(!name)
+    return NULL;
+
+  /* hash the name to get a key */
+
+  hkey = regname2key(name);
+
+//	fprintf(stderr, "%s:%d: name = %s\thash = %d\n", __FUNCTION__, __LINE__, name, hkey);
+
+  reg = hTabFirstItemWK(dynAccessRegNames, hkey);
+
+  while(reg) {
+
+    if(STRCASECMP(reg->name, name) == 0) {
+      return(reg);
+    }
+
+    reg = hTabNextItemWK (dynAccessRegNames);
+  
+  }
+
+  return NULL; // name wasn't found in the hash table
+
+}
+
 regs *pic16_regWithName(char *name)
 {
   regs *reg;
@@ -650,6 +687,9 @@ regs *pic16_regWithName(char *name)
   	reg = pic16_allocregWithName( name );
   	if(reg)return reg;
 
+  	reg = pic16_accessregWithName( name );
+  	if(reg)return reg;
+  	
   return NULL;
 }
 
@@ -670,6 +710,18 @@ pic16_allocDirReg (operand *op )
 	}
 
 	name = OP_SYMBOL (op)->rname[0] ? OP_SYMBOL (op)->rname : OP_SYMBOL (op)->name;
+
+
+	if(!SPEC_OCLS( OP_SYM_ETYPE(op))) {
+#if 1
+		if(pic16_debug_verbose)
+		{
+			fprintf(stderr, "%s:%d symbol %s(r:%s) is not assigned to a memmap\n", __FILE__, __LINE__,
+		    		OP_SYMBOL(op)->name, OP_SYMBOL(op)->rname);
+		}
+#endif
+		return NULL;
+	}
 
 	if(!IN_DIRSPACE( SPEC_OCLS( OP_SYM_ETYPE(op)))
 		|| !IN_FARSPACE(SPEC_OCLS( OP_SYM_ETYPE(op))) ) {
@@ -700,14 +752,6 @@ pic16_allocDirReg (operand *op )
 		return NULL;
 	}
 
-	if(!SPEC_OCLS( OP_SYM_ETYPE(op))) {
-		if(pic16_debug_verbose)
-		{
-			fprintf(stderr, "%s:%d symbol %s(r:%s) is not assigned to a memmap\n", __FILE__, __LINE__,
-		    		OP_SYMBOL(op)->name, OP_SYMBOL(op)->rname);
-		}
-		return NULL;
-	}
 
 	debugLog ("%s:%d symbol name %s\n", __FUNCTION__, __LINE__, name);
 //	fprintf(stderr, "%s symbol name %s\n", __FUNCTION__,name);
@@ -786,6 +830,17 @@ pic16_allocDirReg (operand *op )
 
 		reg = newReg(regtype, PO_DIR, rDirectIdx++, name,getSize (OP_SYMBOL (op)->type),0, op);
 		debugLog ("%d  -- added %s to hash, size = %d\n", __LINE__, name,reg->size);
+
+		if( SPEC_SCLS( OP_SYM_ETYPE( op ) ) == S_REGISTER ) {
+			fprintf(stderr, "%s:%d symbol %s is declared as register\n", __FILE__, __LINE__,
+				name);
+				
+			reg->accessBank = 1;
+			checkAddReg(&pic16_dynAccessRegs, reg);
+			hTabAddItem(&dynAccessRegNames, regname2key(name), reg);
+			
+		  return (reg);
+		}
 
 
 //		if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
@@ -1074,6 +1129,7 @@ static void writeSetUsedRegs(FILE *of, set *dRegs)
 extern void pic16_groupRegistersInSection(set *regset);
 
 extern void pic16_dump_equates(FILE *of, set *equs);
+extern void pic16_dump_access(FILE *of, set *section);
 //extern void pic16_dump_map(void);
 extern void pic16_dump_usection(FILE *of, set *section, int fix);
 extern void pic16_dump_isection(FILE *of, set *section, int fix);
@@ -1166,12 +1222,17 @@ void pic16_writeUsedRegs(FILE *of)
 //	fprintf(stderr, "%s: pic16_dynProcessorRegs\n", __FUNCTION__);
 	pic16_groupRegistersInSection(pic16_dynProcessorRegs);
 	
+//	fprintf(stderr, "%s: pic16_dynAccessRegs\n", __FUNCTION__);
+	pic16_groupRegistersInSection(pic16_dynAccessRegs);
 	
 	/* dump equates */
 	pic16_dump_equates(of, pic16_equ_data);
 
 //	pic16_dump_esection(of, pic16_rel_eedata, 0);
 //	pic16_dump_esection(of, pic16_fix_eedata, 0);
+
+	/* dump access bank symbols */
+	pic16_dump_access(of, pic16_acs_udata);
 
 	/* dump initialised data */
 	pic16_dump_isection(of, rel_idataSymSet, 0);

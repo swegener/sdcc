@@ -108,6 +108,7 @@ extern set *pic16_rel_udata;
 extern set *pic16_fix_udata;
 extern set *pic16_equ_data;
 extern set *pic16_int_regs;
+extern set *pic16_acs_udata;
 
 regs *pic16_regWithIdx (int);
 regs *pic16_typeRegWithIdx(int, int, int);

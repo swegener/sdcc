@@ -46,6 +46,7 @@ static char *_pic16_keywords[] =
   "bit",
   "code",
   "critical",
+  "register",
   "data",
   "far",
   "idata",
@@ -126,14 +127,14 @@ _pic16_regparm (sym_link * l)
 {
 	/* for this processor it is simple
 	 * can pass only the first parameter in a register */
-#if 0
-	if(regParmFlg)return 0;
-	regParmFlg = 1;
-  return 1;
-#else
-	regParmFlg++;// = 1;
-  return 1;
-#endif
+	if(pic16_fstack) {
+		if(regParmFlg)return 0;
+		regParmFlg = 1;
+	  return 1;
+	} else {
+		regParmFlg++;// = 1;
+	  return 1;
+	}
 }
 
 
@@ -293,6 +294,7 @@ extern int pic16_debug_verbose;
 extern int pic16_ralloc_debug;
 extern int pic16_pcode_verbose;
 
+int pic16_fstack=0;
 int pic16_enable_peeps=0;
 
 OPTION pic16_optionsTable[]= {
@@ -317,6 +319,7 @@ OPTION pic16_optionsTable[]= {
 	{ 0,	IVT_LOC,	NULL,	"<nnnn> interrupt vector table location"},
 	{ 0,	"--calltree",		&pic16_options.dumpcalltree,	"dump call tree in .calltree file"},
 	{ 0,	MPLAB_COMPAT,		&pic16_mplab_comp,	"enable compatibility mode for MPLAB utilities (MPASM/MPLINK)"},
+	{ 0,	"--fstack",		&pic16_fstack,		"enable stack optimizations"},
 	{ 0,	NULL,		NULL,	NULL}
 	};
 

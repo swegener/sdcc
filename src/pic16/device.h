@@ -46,9 +46,9 @@ typedef struct {
 	
 
 typedef struct {
-	int mask;
+	unsigned int mask;
 	int emit;
-	int value;
+	unsigned int value;
 } configRegInfo_t;
 
 typedef struct {
@@ -112,7 +112,7 @@ extern pic16_options_t pic16_options;
 extern PIC16_device *pic16;
 
 /****************************************/
-void pic16_assignConfigWordValue(int address, int value);
+void pic16_assignConfigWordValue(int address, unsigned int value);
 void pic16_assignIdByteValue(int address, char value);
 int pic16_isREGinBank(regs *reg, int bank);
 int pic16_REGallBanks(regs *reg);
@@ -123,5 +123,6 @@ int PIC16_IS_HWREG_ADDRESS(int address);
 
 int checkAddReg(set **set, regs *reg);
 int checkAddSym(set **set, symbol *reg);
+int checkSym(set *set, symbol *reg);
 
 #endif  /* __DEVICE_H__ */

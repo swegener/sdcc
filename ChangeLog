@@ -1,3 +1,24 @@
+2004-07-30 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/SDCCmem.c (allocGlobal): don't turn S_REGISTER storage class
+	to S_FIXED for pic16 port and when symbol is not in level 0,
+	allocate for S_REGISTER storage class and pic16 port, too,
+	* src/pic16/device.h: prototype for checkSym,
+	* src/pic16/device.c (pic16_dump_access, checkSym): NEW,
+	* (pic16_assignConfigWordValue): test the value and the mask to
+	validate that the value is suitable for the configuration word,
+	* src/pic16/glue.c (pic16_printIvalFuncPtr): use 'externs' to
+	collect extern declared symbols, don't emit symbol twice, check
+	first if symbol is in publics set first,
+	* src/pic16/main.c (_pic16_keywords[]): added keyword 'register',
+	* added command line '--fstack' which enables an experimental
+	feature for stack access, too buggy to be used yet...
+	* src/pic16/ralloc.c (pic16_accessregWithName): NEW,
+	* (pic16_allocDirReg): when register has storage class S_REGISTER
+	allocate in pic16_dynAccessRegs,
+	* device/include/pic16/pic18f????.h: modified configuration word
+	naming convention, words started as CONFIG0H but should be CONFIG1H
+
 2004-07-29 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51reg.h: fixed bug 970993

@@ -131,24 +131,25 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 
 	for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms)) {
 
-#if 1
+#if 0
 		fprintf(stderr, "%s\t%s: sym: %s\tused: %d\textern: %d\tstatic: %d\taggregate: %d\tregister: 0x%x\tfunction: %d\n",
 			__FUNCTION__,
 			map->sname, sym->name, sym->used, IS_EXTERN(sym->etype), IS_STATIC(sym->etype),
-			IS_AGGREGATE(sym->type), SPEC_SCLS(sym->etype), IS_FUNC(sym->type));
+			IS_AGGREGATE(sym->type), (SPEC_SCLS(sym->etype) == S_REGISTER), IS_FUNC(sym->type));
 		printTypeChain( sym->type, stderr );
 		fprintf(stderr, "\n");
 #endif
 
 		/* if extern then add to externs */
 		if (IS_EXTERN (sym->etype)) {
-
 			/* reduce overhead while linking by not declaring
 			 * extern unused external functions (usually declared
 			 * in header files) */
 			if(IS_FUNC(sym->type) && !sym->used)continue;
 			
-			checkAddSym(&externs, sym);
+			/* make sure symbol is not in publics section */
+			if(!checkSym(publics, sym))
+				checkAddSym(&externs, sym);
 			continue;
 		}
 		
@@ -573,7 +574,7 @@ void pic16_printGPointerType (const char *iname, const char *oname, const unsign
 
 
 /* set to 0 to disable debug messages */
-#define DEBUG_PRINTIVAL	1
+#define DEBUG_PRINTIVAL	0
 
 /*-----------------------------------------------------------------*/
 /* pic16_printIvalType - generates ival for int/char               */
@@ -982,15 +983,13 @@ void pic16_printIvalFuncPtr (sym_link * type, initList * ilist, char ptype, void
       pic16_printPointerType (val->sym->rname, ptype, p);
 
       if(IS_FUNC(val->sym->type) && !val->sym->used) {
- 
+        
+        if(!checkSym(publics, val->sym))
+	  checkAddSym(&externs, val->sym);
+        
       	/* this has not been declared as extern
-      	 * so declare it as a late extern just after the symbol */
-      	 if(ptype == 'p') {
-	      	pic16_addpCode2pBlock((pBlock *)p, pic16_newpCodeCharP("declare symbol as extern"));
-	      	pic16_addpCode2pBlock((pBlock *)p, pic16_newpCodeAsmDir("extern", "%s", val->sym->rname));
-	      	pic16_addpCode2pBlock((pBlock *)p, pic16_newpCodeCharP("continue variable declaration"));
-	 } else
-	 if(ptype == 'f') {
+      	 * so declare it as a 'late extern' just after the symbol */
+	if(ptype == 'f') {
 	 	fprintf((FILE *)p, "declare symbol as extern");
 	 	fprintf((FILE *)p, "\textern\t%s\n", val->sym->rname);
 	 	fprintf((FILE *)p, "continue variable declaration");
@@ -1203,7 +1202,7 @@ pic16emitStaticSeg (memmap * map)
        sym = setNextItem (map->syms))
     {
 
-#if 1
+#if 0
 	fprintf(stderr, "%s\t%s: sym: %s\tused: %d\tSPEC_ABSA: %d\tSPEC_AGGREGATE: %d\tCODE: %d\n\
 CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
 		map->sname, sym->name, sym->used, SPEC_ABSA(sym->etype), IS_AGGREGATE(sym->type),

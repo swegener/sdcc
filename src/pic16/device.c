@@ -500,6 +500,24 @@ void pic16_dump_equates(FILE *of, set *equs)
 }
 
 
+void pic16_dump_access(FILE *of, set *section)
+{
+  regs *r;
+
+	r = setFirstItem(section);
+	if(!r)return;
+	
+	fprintf(of, "%s", iComments2);
+	fprintf(of, ";\tAccess bank symbols\n");
+	fprintf(of, "%s", iComments2);
+	
+	fprintf(of, "\tudata_acs\n");
+	for(; r; r = setNextItem(section)) {
+		fprintf(of, "%s\tres\t%d\n", r->name, r->size);
+	}
+}
+
+
 int regCompare(const void *a, const void *b)
 {
   const regs *const *i = a;
@@ -936,6 +954,33 @@ int checkAddSym(set **set, symbol *sym)
   return 0;
 }
 
+int checkSym(set *set, symbol *sym)
+{
+  symbol *tmp;
+
+  	if(!sym)return 0;
+  	
+#if DEUG_CHECK
+	fprintf(stderr, "%s: about to search for SYMbol: %s ... ", __FUNCTION__, sym->name);
+#endif
+
+	for(tmp = setFirstItem( set ); tmp; tmp = setNextItem( set )) {
+		if(!strcmp(tmp->name, sym->name))break;
+	}
+	
+	if(!tmp) {
+#if DEBUG_CHECK
+		fprintf(stderr, "not found\n");
+#endif
+		return 0;
+	}
+
+#if DEBUG_CHECK
+	fprintf(stderr, "found\n");
+#endif
+
+  return 1;
+}
 
 /*-----------------------------------------------------------------*
  * void pic16_groupRegistersInSection - add each register to its   *
@@ -993,8 +1038,12 @@ void pic16_groupRegistersInSection(set *regset)
 			if(!reg->isFixed) {
 				if(reg->pc_type == PO_GPR_TEMP)
 					checkAddReg(&pic16_int_regs, reg);
-				else
-					checkAddReg(&pic16_rel_udata, reg);
+				else {
+					if(reg->accessBank) {
+						checkAddReg(&pic16_acs_udata, reg);
+					} else
+						checkAddReg(&pic16_rel_udata, reg);
+				}
 			}
 		}
 	}
@@ -1012,14 +1061,26 @@ void pic16_groupRegistersInSection(set *regset)
  * This routine will assign a value to that address.
  *
  *-----------------------------------------------------------------*/
-void pic16_assignConfigWordValue(int address, int value)
+void pic16_assignConfigWordValue(int address, unsigned int value)
 {
   int i;
 
         for(i=0;i<pic16->cwInfo.confAddrEnd-pic16->cwInfo.confAddrStart+1;i++) {
                 if((address == pic16->cwInfo.confAddrStart+i)
                   && (pic16->cwInfo.crInfo[i].mask != -1)) {
-//                        fprintf(stderr, "setting location 0x%X to value 0x%x\n", /*address*/ pic16->cwInfo.confAddrStart+i, val
+
+#if 0
+                        fprintf(stderr, "setting location 0x%X to value 0x%x\tmask: 0x%x\ttest: 0x%x\n",
+                        	/*address*/ pic16->cwInfo.confAddrStart+i, (~value)&0xff,
+                        		pic16->cwInfo.crInfo[i].mask,
+                        		(pic16->cwInfo.crInfo[i].mask) & (~value));
+#endif
+
+			if((((pic16->cwInfo.crInfo[i].mask) & (~value))&0xff) != ((~value)&0xff)) {
+				fprintf(stderr, "%s:%d a wrong value has been given for configuration register 0x%x\n",
+					__FILE__, __LINE__, address);
+					return;
+			}
                         pic16->cwInfo.crInfo[i].value = value;
                         pic16->cwInfo.crInfo[i].emit = 1;
                         return;

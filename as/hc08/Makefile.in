@@ -36,7 +36,7 @@ LDFLAGS		= @LDFLAGS@
 
 ASOBJECTS	= asmain.o aslex.o assym.o assubr.o asnoice.o \
 		  asexpr.o asdata.o aslist.o asout.o asstore.o \
-		  h08ext.o h08pst.o h08mch.o h08adr.o strcmpi.o
+		  m08ext.o m08pst.o m08mch.o m08adr.o strcmpi.o
 ASSOURCES	= $(patsubst %.o,%.c,$(ASOBJECTS))
 
 LKOBJECTS	= lkmain.o lkhead.o lkarea.o lkdata.o \
@@ -45,16 +45,16 @@ LKOBJECTS	= lkmain.o lkhead.o lkarea.o lkdata.o \
 		  lkstore.o lknoice.o lkmem.o lkaomf51.o strcmpi.o
 LKSOURCES	= $(patsubst %.o,%.c,$(LKOBJECTS))
 
-ASX8051		= $(PRJDIR)/bin/as-hc08$(EXEEXT)
+ASHC08		= $(PRJDIR)/bin/as-hc08$(EXEEXT)
 ASLINK		= $(PRJDIR)/bin/link-hc08$(EXEEXT)
 
 transform       = @program_transform_name@
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf $(ASX8051) $(ASLINK)
+all: checkconf $(ASHC08) $(ASLINK)
 
-$(ASX8051): $(ASOBJECTS)
+$(ASHC08): $(ASOBJECTS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(ASOBJECTS) 
 
 $(ASLINK): $(LKOBJECTS)
@@ -63,9 +63,9 @@ $(ASLINK): $(LKOBJECTS)
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) $(ASX8051) `echo $(bindir)/asx8051$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(ASHC08) `echo $(bindir)/as-hc08$(EXEEXT)|sed '$(transform)'`
 	$(STRIP) `echo $(bindir)/as-hc08$(EXEEXT)|sed '$(transform)'`
-	$(INSTALL) $(ASLINK) `echo $(bindir)/aslink$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(ASLINK) `echo $(bindir)/link-hc08$(EXEEXT)|sed '$(transform)'`
 	$(STRIP) `echo $(bindir)/link-hc08$(EXEEXT)|sed '$(transform)'`
 
 # Deleting all the installed files

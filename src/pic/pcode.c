@@ -75,7 +75,7 @@ static pBlock *pb_dead_pcodes = NULL;
 /* Hardcoded flags to change the behavior of the PIC port */
 static int peepOptimizing = 1;        /* run the peephole optimizer if nonzero */
 static int functionInlining = 1;      /* inline functions if nonzero */
-int debug_verbose = 1;                /* Set true to inundate .asm file */
+int debug_verbose = 0;                /* Set true to inundate .asm file */
 
 static int GpCodeSequenceNumber = 1;
 int GpcFlowSeq = 1;
@@ -433,6 +433,27 @@ pCodeInstruction pciCLRW = {
   POC_NOP,
   PCC_NONE, // inCond
   PCC_W  // outCond
+};
+
+pCodeInstruction pciCLRWDT = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, 
+   //   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_CLRWDT,
+  "CLRWDT",
+  NULL, // from branch
+  NULL, // to branch
+  NULL, // label
+  NULL, // operand
+  NULL, // flow block
+  NULL, // C source 
+  0,    // num ops
+  0,0,  // dest, bit instruction
+  0,0,  // branch, skip
+  POC_NOP,
+  PCC_NONE, // inCond
+  PCC_NONE  // outCond
 };
 
 pCodeInstruction pciDECF = {
@@ -3587,8 +3608,15 @@ void LinkFlow_pCode(pCodeInstruction *from, pCodeInstruction *to)
 
 }
 
-/*-----------------------------------------------------------------*/
-/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*
+ * void LinkFlow(pBlock *pb)
+ *
+ * In BuildFlow, the PIC code has been partitioned into contiguous
+ * non-branching segments. In LinkFlow, we determine the execution
+ * order of these segments. For example, if one of the segments ends
+ * with a skip, then we know that there are two possible flow segments
+ * to which control may be passed.
+ *-----------------------------------------------------------------*/
 void LinkFlow(pBlock *pb)
 {
   pCode *pc=NULL;
@@ -3663,6 +3691,8 @@ void LinkFlow(pBlock *pb)
     
   }
 }
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/

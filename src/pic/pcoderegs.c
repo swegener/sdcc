@@ -488,10 +488,10 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
     pct2 = findNextInstruction(pc2->next);
 
     if(PCI(pc2)->op == POC_MOVFW) {
-      
+      /*
 	fprintf(stderr, "   MOVWF/MOVFW. instruction after MOVFW is:\n");
 	pct2->print(stderr,pct2);
-      
+      */
 
       if(PCI(pct2)->op == POC_MOVWF) {
 	/*
@@ -600,7 +600,7 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
 	}
       } else if ( (PCI(pct1)->op == POC_MOVWF) &&
 	   (PCI(pc2)->op == POC_MOVFW)) {
-	fprintf(stderr,"movwf MOVWF/MOVFW\n");
+	//fprintf(stderr,"movwf MOVWF/MOVFW\n");
 	if(optimize_level > 1 && can_free) {
 	  pct2 = newpCode(POC_MOVFW, PCI(pc1)->pcop);
 	  pCodeInsertAfter(pc2, pct2);

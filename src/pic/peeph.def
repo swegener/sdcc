@@ -258,12 +258,38 @@ replace restart {
 	movwf	%2
 } if NZ
 
+//replace restart {
+//	movwf	%1
+//	iorlw	0
+//	movf	%1,w
+//} by {
+//	; peep 10 - Removed unnecessary iorlw
+//	movwf	%1
+//	movf	%1
+//} 
+
+// From: Frieder Ferlemann
+
 replace restart {
-	movwf	%1
-	iorlw	0
-	movf	%1,w
+        iorlw   0
 } by {
-	; peep 10 - Removed unnecessary iorlw
-	movwf	%1
-	movf	%1
+        ; peep 10a - Removed unnecessary iorlw
+} if NZ
+
+// From: Frieder Ferlemann
+
+replace restart {
+        xorlw   0
+} by {
+        ; peep 10b - Removed unnecessary xorlw
+} if NZ
+
+// From: Frieder Ferlemann
+
+replace restart {
+        movf    %1,w
+        movwf   %1
+} by {
+        ; peep 11 - Removed redundant move
+        movf    %1,w
 }

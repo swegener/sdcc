@@ -185,6 +185,7 @@ typedef enum
   POC_COMFW,
   POC_CLRF,
   POC_CLRW,
+  POC_CLRWDT,
   POC_DECF,
   POC_DECFW,
   POC_DECFSZ,

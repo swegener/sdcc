@@ -37,6 +37,7 @@ cdbrecs *recsRoot = NULL ;
 set  *modules = NULL;    /* set of all modules */
 set  *functions = NULL ; /* set of functions */
 set  *symbols = NULL   ; /* set of symbols */
+set  *sfrsymbols= NULL ; /* set of symbols of sfr or sbit */
 int nStructs = 0 ;
 structdef **structs = NULL ; /* all structures */
 int nLinkrecs = 0;
@@ -67,7 +68,7 @@ struct cmdtab
        precede the synonym "b" */
     /* break point */
     { "break"    ,  cmdSetUserBp  ,
-      "{b}reak\t\t\t [LINE | FILE:LINE | FILE:FUNCTION | FUNCTION]\n",
+      "{b}reak\t\t\t [LINE | FILE:LINE | FILE:FUNCTION | FUNCTION | *<address>]\n",
     },
     { "b"        ,  cmdSetUserBp  , NULL },
 
@@ -81,15 +82,21 @@ struct cmdtab
     },
     { "c"        ,  cmdContinue   , NULL },
 
-    { "disassemble",cmdDisasmF    , "x disassemble asm commands\n" },
+    { "disassemble",cmdDisasmF    , "disassemble [startaddr [endaddress]]\tdisassemble asm commands\n" },
     { "delete" ,  cmdDelUserBp  ,
       "{d}elete n\t\t clears break point number n\n"
     },
     { "display"    ,  cmdDisplay     ,
-      "display [<variable>]\t print value of given variable each time the program stops\n"
+      "display [/<fmt>] [<variable>]\t print value of given variable each time the program stops\n"
     },
     { "undisplay"  ,  cmdUnDisplay   ,
       "undisplay [<variable>]\t dont display this variable or all\n"
+    },
+    { "down"     ,  cmdDown      ,
+      "down\t\tSelect and print stack frame called by this one.\nAn argument says how many frames down to go.\n"
+    },
+    { "up"       ,  cmdUp      ,
+      "up\t\tSelect and print stack frame that called this one.\nAn argument says how many frames up to go.\n"
     },
     { "d"        ,  cmdDelUserBp  , NULL },
 
@@ -114,20 +121,26 @@ struct cmdtab
       " <copying warranty>\t copying & distribution terms, warranty\n"
     },
     { "set"      ,  cmdSetOption  , "set <srcmode>\t\t toggle between c/asm.\nset variable <var> = >value\t\tset variable to new value\n" },
+    { "stepi"    ,  cmdStepi      ,
+      "stepi\t\t\tStep one instruction exactly.\n"
+    },
     { "step"     ,  cmdStep       ,
-      "{s}tep\t\t\t Step program until it reaches a different source line.\n"
+      "{s}tep\t\t\tStep program until it reaches a different source line.\n"
     },
     { "s"        ,  cmdStep       , NULL },
+    { "nexti"    ,  cmdNexti      ,
+      "nexti\t\t\tStep one instruction, but proceed through subroutine calls.\n"
+    },
     { "next"     ,  cmdNext       ,
-      "{n}ext\t\t\t Step program, proceeding through subroutine calls.\n"
+      "{n}ext\t\t\tStep program, proceeding through subroutine calls.\n"
     },
     { "n"        ,  cmdNext       , NULL },
     { "run"      ,  cmdRun        ,
-      "{r}un\t\t\t Start debugged program. \n"
+      "{r}un\t\t\tStart debugged program. \n"
     },
     { "r"        ,  cmdRun        , NULL },
     { "ptype"    ,  cmdPrintType  ,
-      "{pt}ype <variable>\t print type information of a variable\n"
+      "{pt}ype <variable>\tprint type information of a variable\n"
     },
     { "pt"       ,  cmdPrintType  , NULL },
     { "print"    ,  cmdPrint      ,
@@ -141,13 +154,13 @@ struct cmdtab
       "file <filename>\t\t load symbolic information from <filename>\n"
     },
     { "frame"    ,  cmdFrame      ,
-      "{fr}ame\t\t\t print information about the current Stack\n"
+      "{fr}ame\t\t print information about the current Stack\n"
     },
     { "finish"   ,  cmdFinish     ,
       "{fi}nish\t\t execute till return of current function\n"
     },
     { "fi"       ,  cmdFinish     , NULL },
-    { "where"    ,  cmdWhere      , "where\t\t\t print stack\n" },
+    { "where"    ,  cmdWhere      , "where\t\t print stack\n" },
     { "fr"       ,  cmdFrame      , NULL },
     { "f"        ,  cmdFrame      , NULL },
     { "x /i"     ,  cmdDisasm1    , "x\t\t disassemble one asm command\n" },
@@ -436,6 +449,23 @@ static void loadModules ()
 }
 
 /*-----------------------------------------------------------------*/
+/* generate extra sets of sfr and sbit symbols                     */
+/*-----------------------------------------------------------------*/
+static void specialFunctionRegs ()
+{
+    symbol *sym;
+    for (sym = setFirstItem(symbols);
+         sym ;
+         sym = setNextItem(symbols))
+    {
+        if ( sym->addrspace == 'I' ||
+             sym->addrspace == 'J')
+        {
+            addSet(&sfrsymbols,sym);
+        }
+    }
+}
+/*-----------------------------------------------------------------*/
 /* functionPoints - determine the execution points within a func   */
 /*-----------------------------------------------------------------*/
 static void functionPoints ()
@@ -517,7 +547,7 @@ static void functionPoints ()
 
 #ifdef SDCDB_DEBUG
   if (!( D_sdcdb & sdcdbDebug))
-      return;
+      continue;
 
   Dprintf(D_sdcdb, ("sdcdb: function '%s' has the following C exePoints\n",
          func->sym->name));
@@ -601,6 +631,9 @@ int cmdFile (char *s,context *cctxt)
        module */
     functionPoints();
 
+    /* extract known special function registers */
+    specialFunctionRegs();
+
     /* start the simulator & setup connection to it */
     if ( sock == -1 )
         openSimulator((char **)simArgs,nsimArgs);
@@ -641,7 +674,15 @@ int cmdHelp (char *s, context *cctxt)
         for (i = 0 ; i < (sizeof(cmdTab)/sizeof(struct cmdtab)) ; i++) 
         {
             if ((cmdTab[i].htxt) && !strcmp(cmdTab[i].cmd,s))
-                fprintf(stdout,"%s",cmdTab[i].htxt);             
+            {
+                s = strrchr(cmdTab[i].htxt,'\t');
+                if ( !s )
+                    s = cmdTab[i].htxt;
+                else
+                    s++;
+                fprintf(stdout,"%s",s);
+                break;
+            }
         }
         return 0;
     }

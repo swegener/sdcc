@@ -45,6 +45,73 @@ static char *sbp = simibuff;           /* simulator buffer pointer */
 extern char **environ;
 char simactive = 0;
 
+static memcache_t memCache[NMEM_CACHE];
+
+/*-----------------------------------------------------------------*/
+/* get data from  memory cache/ load cache from simulator          */
+/*-----------------------------------------------------------------*/
+static char *getMemCache(unsigned int addr,int cachenum, int size)
+{
+    char *resp, *buf;
+    unsigned int laddr;
+    memcache_t *cache = &memCache[cachenum];
+
+    if ( cache->size <=   0 ||
+         cache->addr > addr ||
+         cache->addr + cache->size < addr + size )
+    {
+        if ( cachenum == IMEM_CACHE )
+        {
+            sendSim("di 0x0 0xff\n");
+        }
+        else
+        {
+            laddr = addr & 0xffffffc0;
+            sprintf(cache->buffer,"dx 0x%x 0x%x\n",laddr,laddr+0xff );
+            sendSim(cache->buffer);
+        }
+        waitForSim(100,NULL);
+        resp = simResponse();
+        cache->addr = strtol(resp,0,0);
+        buf = cache->buffer;
+        cache->size = 0;
+        while ( *resp && *(resp+1) && *(resp+2))
+        {
+            /* cache is a stringbuffer with ascii data like
+               " 00 00 00 00 00 00 00 00"
+            */
+            resp += 2;
+            laddr = 0;
+            /* skip thru the address part */
+            while (isxdigit(*resp)) resp++;
+            while ( *resp && *resp != '\n')
+            {
+                if ( laddr < 24 )
+                {
+                    laddr++ ;
+                    *buf++ = *resp ;
+                }
+                resp++;
+            }
+            resp++ ;
+            cache->size += 8;
+        }
+        *buf = '\0';
+        if ( cache->addr > addr ||
+             cache->addr + cache->size < addr + size )
+            return NULL;
+    }
+    return cache->buffer + (addr - cache->addr)*3;
+}
+
+/*-----------------------------------------------------------------*/
+/* invalidate memory cache                                         */
+/*-----------------------------------------------------------------*/
+static void invalidateCache( int cachenum )
+{
+    memCache[cachenum].size = 0;  
+}
+
 /*-----------------------------------------------------------------*/
 /* waitForSim - wait till simulator is done its job                */
 /*-----------------------------------------------------------------*/
@@ -74,6 +141,8 @@ void openSimulator (char **args, int nargs)
     int i ;
  Dprintf(D_simi, ("simi: openSimulator\n"));
 
+    invalidateCache(XMEM_CACHE);
+    invalidateCache(IMEM_CACHE);
     /* fork and start the simulator as a subprocess */
     if ((simPid = fork())) {
       Dprintf(D_simi, ("simi: simulator pid %d\n",(int) simPid));
@@ -148,47 +217,89 @@ void sendSim(char *s)
     fflush(simout);
 }
 
-int simSetValue (unsigned int addr,char mem, int size, unsigned long val)
+
+static int getMemString(char *buffer, char wrflag, 
+                        unsigned int addr, char mem, int size )
 {
-    char buffer[40], *s,*prefix;
-    int i;
+    int cachenr = NMEM_CACHE;
+    char *prefix;
+    char *cmd ;
+
+    if ( wrflag )
+        cmd = "set mem";
+    else
+        cmd = "dump";
+    buffer[0] = '\0' ;
+
     switch (mem) 
     {
-        case 'A':
-            prefix = "x";
+        case 'A': /* External stack */
+        case 'F': /* External ram */
+            prefix = "xram";
+            cachenr = XMEM_CACHE;
             break;
-        case 'B':       
-            prefix = "i";
+        case 'C': /* Code */
+        case 'D': /* Code / static segment */
+            prefix = "rom";
             break;
-        case 'C':
-        case 'D':
-            prefix = "c";
+        case 'B': /* Internal stack */  
+        case 'E': /* Internal ram (lower 128) bytes */
+        case 'G': /* Internal ram */
+            prefix = "iram";
+            cachenr = IMEM_CACHE;
             break;
-        case 'E':
-        case 'G':
-            prefix = "i";
+        case 'H': /* Bit addressable */
+        case 'J': /* SBIT space */
+            cachenr = BIT_CACHE;
+            if ( wrflag )
+            {
+                cmd = "set bit";
+            }
+            sprintf(buffer,"%s 0x%x\n",cmd,addr);
+            return cachenr;
             break;
-        case 'F':
-            prefix = "x";
-            break;
-        case 'H':
-            prefix = "bit" ;
-            break;
-        case 'I':
+        case 'I': /* SFR space */
             prefix = "sfr" ;
             break;
-        case 'J':
-            prefix = "sbit" ;
+        case 'R': /* Register space */ 
+            if ( !wrflag )
+            {
+                cachenr = REG_CACHE;
+                sprintf(buffer,"info reg\n");
+                return cachenr;
+            }
+            prefix = "iram";
+            /* get register bank */
+            cachenr = simGetValue (0xd0,'I',1); 
+            addr   += cachenr & 0x18 ;
+            cachenr = IMEM_CACHE;
             break;
-        case 'R':
-            return; /* set registers !! */
-            //prefix = "i" ;
-            break;
-        default:
-            return;
+        default: 
+        case 'Z': /* undefined space code */
+            return cachenr;
     }
-    sprintf(buffer,"set mem %s 0x%x",prefix,addr);
-    s = buffer + strlen(buffer);
+    if ( wrflag )
+        sprintf(buffer,"%s %s 0x%x\n",cmd,prefix,addr,addr);
+    else
+        sprintf(buffer,"%s %s 0x%x 0x%x\n",cmd,prefix,addr,addr+size-1);
+    return cachenr;
+}
+
+int simSetValue (unsigned int addr,char mem, int size, unsigned long val)
+{
+    char cachenr, i;
+    char buffer[40];
+    char *s;
+
+    if ( size <= 0 )
+        return 0;
+
+    cachenr = getMemString(buffer,1,addr,mem,size);
+    if ( cachenr < NMEM_CACHE )
+    {
+        invalidateCache(cachenr);
+    }
+    s = buffer + strlen(buffer) -1;
     for ( i = 0 ; i < size ; i++ )
     {
         sprintf(s," 0x%x", val & 0xff);
@@ -201,107 +312,77 @@ int simSetValue (unsigned int addr,char mem, int size, unsigned long val)
     simResponse();   
 }
 
+
 /*-----------------------------------------------------------------*/
 /* simGetValue - get value @ address for mem space                 */
 /*-----------------------------------------------------------------*/
 unsigned long simGetValue (unsigned int addr,char mem, int size)
 {
     unsigned int b[4] = {0,0,0,0}; /* can be a max of four bytes long */
-    char i;
-    char *prefix;
-    char buffer[20];
+    char cachenr, i;
+    char buffer[40];
     char *resp;
 
-    switch (mem) {
-    case 'A':
-      prefix = "dx";
-      break;
-    case 'B':       
-      prefix = "di";
-      break;
-    case 'C':
-    case 'D':
-    prefix = "dch";
-	break;
-    case 'E':
-    case 'G':
-	prefix = "di";
-	break;
-    case 'F':
-	prefix = "dx";
-	break;
-    case 'H':
-    case 'J':
-//	prefix = "db" ;
-	prefix = "dump" ;
-	break;
-    case 'I':
-	prefix = "ds" ;
-	break;
-    case 'R':
-	prefix = "i r" ;
-	break;
-    default:
-	prefix = "dump" ;
-	break;
-    }
-    
-    /* create the simulator command */
-    sprintf(buffer,"%s 0x%x \n",prefix,addr);
-    sendSim(buffer);
-    waitForSim(100,NULL);
-    resp = simResponse();
+    if ( size <= 0 )
+        return 0;
 
-    /* got the response we need to parse it the response
-       is of the form 
-       [address] [v] [v] [v] ... special case in
-       case of bit variables which case it becomes
-       [address] [assembler bit address] [v] */
-    /* first skip thru white space */
-    while (isspace(*resp)) resp++ ;
+    cachenr = getMemString(buffer,0,addr,mem,size);
 
-    if (strncmp(resp, "0x",2) == 0)
-      resp += 2;
-
-    /* then make the branch for bit variables */
-    /* skip thru the address part */
-    while (isxdigit(*resp)) resp++;
-
-    if (!strcmp(prefix,"i r")) 
+    resp = NULL;
+    if ( cachenr < NMEM_CACHE )
     {
-        /* skip registers */
-        for (i = 0 ; i < addr ; i++ ) 
+        resp = getMemCache(addr,cachenr,size);
+    }
+    if ( !resp )
+    {
+        /* create the simulator command */
+        sendSim(buffer);
+        waitForSim(100,NULL);
+        resp = simResponse();
+
+        /* got the response we need to parse it the response
+           is of the form 
+           [address] [v] [v] [v] ... special case in
+           case of bit variables which case it becomes
+           [address] [assembler bit address] [v] */
+        /* first skip thru white space */
+        while (isspace(*resp)) resp++ ;
+
+        if (strncmp(resp, "0x",2) == 0)
+            resp += 2;
+
+        /* skip thru the address part */
+        while (isxdigit(*resp)) resp++;
+
+        /* then make the branch for bit variables */
+        if ( cachenr == REG_CACHE ) 
         {
-            while (isspace(*resp)) resp++ ;
-            /* skip */
-            while (isxdigit(*resp)) resp++;
+            /* skip registers */
+            for (i = 0 ; i < addr ; i++ ) 
+            {
+                while (isspace(*resp)) resp++ ;
+                /* skip */
+                while (isxdigit(*resp)) resp++;
+            }
         }
-	}
-    
-    if (!strcmp(prefix,"dump")) {
-
-	/* skip white space */
-	while (isspace(*resp)) resp++ ;
-    
-	/* skip thru the assembler bit address */
-	while (!isspace(*resp)) resp++;
-
-	/* white space */
-	while (isspace(*resp)) resp++ ;
-
-	/* scan in the value */
-	sscanf(resp,"%d",&b[0]);
-    } else {
-	
-	for (i = 0 ; i < size ; i++ ) {
-	    /* skip white space */
-	    while (isspace(*resp)) resp++ ;
+    }   
+    /* make the branch for bit variables */
+    if ( cachenr == BIT_CACHE) 
+    {
+        /* skip until newline */
+        while (*resp && *resp != '\n' ) resp++ ;
+        if ( *--resp != '0' )
+            b[0] = 1;
+    }
+    else 
+    {	
+        for (i = 0 ; i < size ; i++ ) 
+        {
+            /* skip white space */
+            while (isspace(*resp)) resp++ ;
 	    
-	    sscanf(resp,"%x",&b[i]);
-	    
-	    /* skip */
-	    while (isxdigit(*resp)) resp++;
-	}
+            b[i] = strtol(resp,&resp,16);
+        }
     }
 
     return b[0] | b[1] << 8 | b[2] << 16 | b[3] << 24 ;
@@ -355,6 +436,8 @@ unsigned int simGoTillBp ( unsigned int gaddr)
     char *sfmt;
     int wait_ms = 1000;
 
+    invalidateCache(XMEM_CACHE);
+    invalidateCache(IMEM_CACHE);
     if (gaddr == 0) {
       /* initial start, start & stop from address 0 */
       char buf[20];
@@ -371,7 +454,15 @@ unsigned int simGoTillBp ( unsigned int gaddr)
       sendSim ("run\n");
       wait_ms = 100;
     }
-    else {
+    else 	if (gaddr == 1 ) { /* nexti */
+      sendSim ("next\n");
+      wait_ms = 100;
+    }
+    else 	if (gaddr == 2 ) { /* stepi */
+      sendSim ("step\n");
+      wait_ms = 100;
+    }
+    else  { 
       printf("Error, simGoTillBp > 0!\n");
       exit(1);
     }
@@ -381,6 +472,22 @@ unsigned int simGoTillBp ( unsigned int gaddr)
     /* get the simulator response */
     svr  = sr = strdup(simResponse());
 
+    if ( gaddr == 1 || gaddr == 2 )
+    {
+        int nl;
+        for ( nl = 0; nl < 3 ; nl++ )
+        {
+            while (*sr && *sr != '\n') sr++ ;
+            sr++ ;
+        }
+        if ( nl < 3 )
+            return 0;
+        gaddr = strtol(sr,0,0);
+        /* empty response */
+        simibuff[0] = '\0';
+        return gaddr;
+        
+    }
     /* figure out the address of the break point the simulators 
        response in a break point situation is of the form 
        [... F* <addr> <disassembled instruction> ] 
@@ -420,6 +527,8 @@ unsigned int simGoTillBp ( unsigned int gaddr)
 /*-----------------------------------------------------------------*/
 void simReset ()
 {
+    invalidateCache(XMEM_CACHE);
+    invalidateCache(IMEM_CACHE);
     sendSim("res\n");
     waitForSim(100,NULL);
 }

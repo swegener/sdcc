@@ -328,12 +328,13 @@ static char *warranty=
 #endif
 
 static void printTypeInfo(link *);
-static void printValAggregates (symbol *,link *,char,unsigned int);
-static void setSymValue(symbol *sym, char *val, context *cctxt);
+static void printValAggregates (symbol *,link *,char,unsigned int,int);
+static void printOrSetSymValue (symbol *sym, context *cctxt, 
+                                int flg, int dnum, int fmt, char *rs, char *val);
 
 int srcMode = SRC_CMODE ;
 static set  *dispsymbols = NULL   ; /* set of displayable symbols */
-
+static int currentFrame = 0;        /* actual displayed frame     */
 /*-----------------------------------------------------------------*/
 /* funcWithName - returns function with name                       */
 /*-----------------------------------------------------------------*/
@@ -351,6 +352,29 @@ DEFSETFUNC(funcWithName)
 	return 1;
     }
     
+    return 0;
+}
+
+/*-----------------------------------------------------------------*/
+/* symWithAddr - look for symbol with sfr / sbit address           */
+/*-----------------------------------------------------------------*/
+DEFSETFUNC(symWithAddr)
+{
+    symbol *sym = item;
+    V_ARG(unsigned long,laddr);
+    V_ARG(int    ,laddrspace);
+    V_ARG(symbol **,rsym);
+
+    if (*rsym)
+        return 0;
+
+    if ( sym->addr == laddr &&
+         sym->addrspace == laddrspace ) 
+    {
+        *rsym = sym;
+        return 1;
+    }
+
     return 0;
 }
 
@@ -618,6 +642,8 @@ context *discoverContext (unsigned addr)
     module   *mod  = NULL;
     int line = 0;
 
+    currentFrame = 0; 
+
     /* find the function we are in */
     if (!applyToSet(functions,funcInAddr,addr,&func)) {
         if (!applyToSet(functions,funcWithName,"main") ||
@@ -721,6 +747,61 @@ void simGo (unsigned int gaddr)
 #endif
     }
     
+}
+
+/*-----------------------------------------------------------------*/
+/* preparePrint - common parse function for                        */
+/*                output, print and display                        */
+/*-----------------------------------------------------------------*/
+static char *preparePrint(char *s, context *cctxt, int *fmt, symbol **sym)
+{
+    char *bp = s+strlen(s) -1;
+    char save_ch ;
+
+    *fmt = FMT_NON;
+    *sym = NULL;
+
+    while (isspace(*s)) s++;
+    if (!*s) 
+        return (char *)0;
+
+    while (isspace(*bp)) bp--;
+    bp++ ;
+    *bp = '\0';
+
+    if ( *s == '/' )
+    {
+        /* format of printout */
+        switch ( *++s )
+        {
+            case 'x':
+                *fmt = FMT_HEX ;
+                break;
+            case 'o':
+                *fmt = FMT_OCT ;
+                break;
+            default:
+            case 'd':
+                *fmt = FMT_DEZ ;
+                break;
+            case 't':
+                *fmt = FMT_BIN ;
+                break;
+        }
+        s++;
+        while (isspace(*s)) s++;
+    }
+    for ( bp = s; *bp && ( isalnum( *bp ) || *bp == '_'); bp++ );
+    save_ch = *bp;
+    if ( *bp )
+        *bp = '\0';
+
+    *sym = symLookup(s,cctxt);
+    *bp = save_ch;
+
+    if ( ! *sym )
+        fprintf(stdout,"No symbol \"%s\" in current context.\n", s);
+    return bp;
 }
 
 static int printAsmLine( function *func, module *m, long saddr, long eaddr)
@@ -1071,23 +1152,19 @@ int cmdSetOption (char *s, context *cctxt)
     if (strncmp(s,"variable ",9) == 0) 
     {
         symbol *sym ;
-        char *val;
+        int fmt;
+        char *rs;
         s += 9;
-        while (isspace(*s)) s++;
-        if (!*s) return 0;
-
-        val = s;
-        while (*val && !isspace(*val) && *val != '=') val++;
-        while (isspace(*val)) *val++ = '\0';
-        if (*val) *val++ = '\0';
-        if (*val)
+        if ( !( rs = preparePrint(s, cctxt, &fmt, &sym )))
+            return 0;
+        s = rs;
+        while (*s && *s != '=') s++;
+        *s++ = '\0';
+        while (isspace(*s)) *s++ = '\0';
+        if (*s)
         {
-            if ((sym = symLookup(s,cctxt))) 
-            {
-                setSymValue(sym,val,cctxt);
+                printOrSetSymValue(sym,cctxt,0,0,0,rs,s);
                 return 0;
-            }   
-            fprintf(stdout,"No symbol \"%s\" in current context.\n",s);
         }
         else
             fprintf(stdout,"No new value for \"%s\".\n",s);
@@ -1143,6 +1220,22 @@ int cmdDelUserBp (char *s, context *cctxt)
 }
 
 /*-----------------------------------------------------------------*/
+/* cmdStepi - single step exactly one instruction                   */
+/*-----------------------------------------------------------------*/
+int cmdStepi (char *s, context *cctxt)
+{
+
+    if (!cctxt || !cctxt->func || !cctxt->func->mod) 
+        fprintf(stdout,"The program is not being run.\n");
+    else 
+    {
+	    simGo(2);	
+        showfull = 1;
+    }
+    return 0;
+}
+
+/*-----------------------------------------------------------------*/
 /* cmdStep - single step thru C source file                        */
 /*-----------------------------------------------------------------*/
 int cmdStep (char *s, context *cctxt)
@@ -1152,9 +1245,6 @@ int cmdStep (char *s, context *cctxt)
     if (!cctxt || !cctxt->func || !cctxt->func->mod) 
 	fprintf(stdout,"The program is not being run.\n");
     else {
-    int origSrcMode = srcMode;
-    if ( *s == 'i' )
-        srcMode = SRC_AMODE;
 	/* if we are @ the end of a function then set
 	   break points at execution points of the
 	   function in the call stack... */
@@ -1220,10 +1310,24 @@ int cmdStep (char *s, context *cctxt)
 	    }
 	}
 
-    srcMode = origSrcMode;
 	simGo(-1);
     showfull = 1;
     }
+    return 0;
+}
+
+/*-----------------------------------------------------------------*/
+/* cmdNexti - next instruction but proceed function call           */
+/*-----------------------------------------------------------------*/
+int cmdNexti (char *s, context *cctxt)
+{
+    if (!cctxt || !cctxt->func || !cctxt->func->mod) 
+        fprintf(stdout,"The program is not being run.\n");
+    else 
+    {
+	    simGo(1);	
+        showfull = 1;
+    }	
     return 0;
 }
 
@@ -1239,10 +1343,6 @@ int cmdNext (char *s, context *cctxt)
     if (!cctxt || !cctxt->func || !cctxt->func->mod) 
 	fprintf(stdout,"The program is not being run.\n");
     else {
-    int origSrcMode = srcMode;
-    if ( *s == 'i' )
-        srcMode = SRC_AMODE;
-	
 	/* if we are @ the end of a function then set
 	   break points at execution points of the
 	   function in the call stack... */
@@ -1295,11 +1395,9 @@ int cmdNext (char *s, context *cctxt)
 				   func->aexitline);
 		}
 	    }
-        srcMode = origSrcMode;
 	    simGo(-1);	
         showfull = 1;
 	}
-    srcMode = origSrcMode;
     }    
     return 0;
 }
@@ -1612,7 +1710,7 @@ static void infoStack(context *ctxt)
     STACK_STARTWALK(callStack) ;
     while ((func = STACK_WALK(callStack))) {
 
-	fprintf(stdout,"#%d 0x%04x %s () at %s:%d\n",i++,
+	fprintf(stdout,"#%d  0x%08x in %s () at %s:%d\n",i++,
 		func->laddr,func->sym->name,
 		func->mod->c_name,func->lline);
     }
@@ -1625,25 +1723,9 @@ static void infoStack(context *ctxt)
 int cmdWhere(char *s, context *cctxt)
 {
 	infoStack(cctxt);
-    showfull = 1;
 	return 0;
 }
 
-/*-----------------------------------------------------------------*/
-/* cmdUp -  Up command                                             */
-/*-----------------------------------------------------------------*/
-int cmdUp(char *s, context *cctxt)
-{
-	return 0;
-}
-
-/*-----------------------------------------------------------------*/
-/* cmdDown - down command                                          */
-/*-----------------------------------------------------------------*/
-int cmdDown(char *s, context *cctxt)
-{
-	return 0;
-}
 
 static int infomode = 0;
 /*-----------------------------------------------------------------*/
@@ -1662,7 +1744,6 @@ int cmdInfo (char *s, context *cctxt)
     /* info frame same as frame */
     if (strcmp(s,"frame") == 0) {
 	cmdFrame (s,cctxt);
-    showfull = 1;
 	return 0;
     }
 
@@ -1686,13 +1767,36 @@ int cmdInfo (char *s, context *cctxt)
     }
 
     /* info stack display call stack */
-    if (strcmp(s,"all-registers") == 0) {
-	fprintf(stdout,"%s",simRegs());
-	fprintf(stdout,"Special Function Registers:\n");
-    sendSim("ds 0x80 0x100\n");
-    waitForSim(100,NULL);
-    fprintf(stdout,simResponse());
-	return 0;
+    if (strcmp(s,"all-registers") == 0) 
+    {
+        int i,j;
+        fprintf(stdout,"%s",simRegs());
+        fprintf(stdout,"Special Function Registers:\n");
+        for ( i = 0 ; i < 0x100 ; i++ )
+        {
+            symbol *sym = NULL;
+            unsigned long val;
+            if (applyToSetFTrue(sfrsymbols,symWithAddr,i,'I',&sym))
+            {
+                val = simGetValue (sym->addr,sym->addrspace,sym->size);
+                fprintf(stdout,"%s=0x%02x",sym->name,val);
+                if ( !(i & 0x07 ))
+                {
+                    for ( j = 0 ; j < 8 ; j++ )
+                    {
+                        sym = NULL;
+                        if (applyToSetFTrue(sfrsymbols,symWithAddr,i+j,'J',&sym))
+                        {
+                            //val = simGetValue (sym->addr,sym->addrspace,sym->size);
+                            fprintf(stdout," %s=%c",sym->name,(val&1)? '1':'0');
+                        }
+                        val >>= 1;
+                    }
+                }
+                fprintf(stdout,"\n");
+            }
+        }
+        return 0;
     }
 
     /* info stack display call stack */
@@ -1863,63 +1967,154 @@ int cmdListSrc (char *s, context *cctxt)
     return 0;
 }
 
-static void setValBasic(symbol *sym, char *val)
+static void setValBasic(symbol *sym, link *type,
+                        char mem, unsigned addr,int size, char *val)
 {
+    char *s;
     union 
     {  	
         float f;     
         unsigned long val;
         long         sval;
         struct {
-            short    lo;
-            short    hi;
+            unsigned short    lo;
+            unsigned short    hi;
         } i;
         unsigned char b[4];
     }v;
 
-    if (IS_FLOAT(sym->type)) 	
+    if (IS_FLOAT(type)) 	
         v.f = strtof(val,NULL);    
     else
-	if (IS_PTR(sym->type))
-	    v.sval = strtol(val,NULL,0);
+	if (IS_PTR(type))
+	    v.val = strtol(val,NULL,0);
 	else
     {
-	    if (IS_SPEC(sym->type) && IS_INTEGRAL(sym->type)) 
+	    if (IS_INTEGRAL(type)) 
         {
-            if (IS_CHAR(sym->etype))
-            { 
-                v.b[0] = val[0];
+            link *etype;
+            if ( type->next )
+                etype = type->next;
+            else
+                etype = type;
+            if (IS_CHAR(etype))
+            {
+                if (( s = strchr(val,'\'')))
+                {
+                    if ( s[1] == '\\' )
+                        v.b[0] = strtol(s+2,NULL,8);
+                    else 
+                        v.b[0] = s[1];
+                }
+                else
+                {
+                    v.b[0] = strtol(val,NULL,0);
+                }
             }
             else
-                if (IS_INT(sym->etype)) 
-                    if (IS_LONG(sym->etype))
-                        if (SPEC_USIGN(sym->etype))
-                            v.val = strtol(val,NULL,0);
-                        else
-                            v.sval = strtol(val,NULL,0);
+                if (IS_INT(etype)) 
+                    if (IS_LONG(etype))
+                        v.val = strtol(val,NULL,0);
                     else
                         v.i.lo = strtol(val,NULL,0);
                 else
-                    v.sval = strtol(val,NULL,0);
+                    v.val = strtol(val,NULL,0);
 	    } 
         else
-            v.sval = strtol(val,NULL,0);
+            v.val = strtol(val,NULL,0);
     }
-    simSetValue(sym->addr,sym->addrspace,sym->size,v.sval);	
+    simSetValue(addr,mem,size,v.val);	
+}
+
+/*-----------------------------------------------------------------*/
+/* printFmtInteger - print value in bin,oct,dez or hex             */
+/*-----------------------------------------------------------------*/
+static void printFmtInteger(char *deffmt,int fmt, long val, 
+                            int sign, int size)
+{
+    static char digits[] = 
+    {
+        '0' , '1' , '2' , '3' , '4' , '5' ,
+        '6' , '7' , '8' , '9' , 'a' , 'b' ,
+        'c' , 'd' , 'e' , 'f' , 'g' , 'h' 
+    };
+    static int radixOfFormat[] = { 0 , 2, 8 ,10, 16  };
+    static int olenOfSize[]    = { 0 , 3, 6 , 8, 11  };
+	char buf[40];
+	char negative = 0;
+	int charPos = 38;
+    int radix;
+
+    if ( fmt == FMT_NON || fmt == FMT_DEZ )
+    {
+        fprintf(stdout,deffmt,val);
+        return;
+    }
+    radix = radixOfFormat[fmt];
+
+    /*
+    if ( sign && val < 0 )
+        negative = 1;
+    */
+
+	if (!negative)
+	    val = -val;
+
+	buf[39] = '\0';
+    while (val <= -radix) 
+    {
+	    buf[charPos--] = digits[-(val % radix)];
+	    val = val / radix;
+	}
+	buf[charPos] = digits[-val];
+
+    switch ( fmt )
+    {
+        case FMT_OCT:
+            radix = olenOfSize[size];
+            break;
+        case FMT_HEX:
+            radix = size << 1;
+            break;
+        case FMT_BIN:
+            radix = size << 3;
+            break;
+    }
+
+    while (charPos > 39 - radix )
+    {
+        buf[--charPos] = '0';
+    } 
+    switch ( fmt )
+    {
+        case FMT_OCT:
+            if ( buf[charPos] != '0' )
+                buf[--charPos] = '0';
+            break;
+        case FMT_HEX:
+            buf[--charPos] = 'x';
+            buf[--charPos] = '0';
+            break;
+    }
+	if (negative) {
+	    buf[--charPos] = '-';
+	}
+    fputs(&buf[charPos],stdout);
 }
 
 /*-----------------------------------------------------------------*/
 /* printValBasic - print value of basic types                      */
 /*-----------------------------------------------------------------*/
-static void printValBasic(symbol *sym,unsigned addr,char mem, int size)
+static void printValBasic(symbol *sym, link *type,
+                          char mem, unsigned addr,int size, int fmt)
 {
     union {  	
 	float f;     
 	unsigned long val;
 	long         sval;
 	struct {
-	    short    lo;
-	    short    hi;
+	    unsigned short    lo;
+	    unsigned short    hi;
 	} i;
 	unsigned char b[4];
     }v;
@@ -1929,41 +2124,55 @@ static void printValBasic(symbol *sym,unsigned addr,char mem, int size)
     
     v.val = simGetValue(addr,mem,size);
     /* if this a floating point number then */
-    if (IS_FLOAT(sym->type)) 	
+    if (IS_FLOAT(type)) 	
 	fprintf(stdout,"%f",v.f);    
     else
-	if (IS_PTR(sym->type))
-	    fprintf(stdout,"0x%x",v.val);
+	if (IS_PTR(type))
+	    fprintf(stdout,"0x%*x",size<<1,v.val);
 	else
-	    if (IS_SPEC(sym->type) && IS_INTEGRAL(sym->type)) {
-		if (IS_CHAR(sym->etype))
-        { 
-		    if ( isprint(v.val))
-                fprintf(stdout,"%d 0x%x '%c'",v.val,v.val,v.val);
+        if (IS_INTEGRAL(type)) 
+        {
+            link *etype;
+            if ( type->next )
+                etype = type->next;
             else
-                fprintf(stdout,"%d 0x%x '\\%o'",v.val,v.val,v.val);
-		}
-        else
-		    if (IS_INT(sym->etype)) 
-			if (IS_LONG(sym->etype))
-			    if (SPEC_USIGN(sym->etype))
-				fprintf(stdout,"%d 0x%x",v.val,v.val);
-			    else
-				fprintf(stdout,"%d 0x%x",v.sval,v.sval);
-			else
-			    fprintf(stdout,"%d 0x%x",v.i.lo,v.i.lo);
-		    else
-			fprintf(stdout,"0x%x",v.val);
+                etype = type;
+            if (IS_CHAR(etype))
+            { 
+                if ( isprint(v.val))
+                    printFmtInteger("'%c'",fmt,(long)v.val,0,size);
+                else
+                    printFmtInteger("'\\%o'",fmt,(long)v.val,0,size);
+            }
+            else
+            {
+                if (IS_INT(etype)) 
+                    if (IS_LONG(etype))
+                        if (SPEC_USIGN(etype))
+                            printFmtInteger("%u",fmt,(long)v.val,0,size);
+                        else
+                            printFmtInteger("%d",fmt,(long)v.sval,1,size);
+                    else
+                        if (SPEC_USIGN(etype))
+                            printFmtInteger("%u",fmt,(long)v.i.lo,0,size);
+                        else
+                            printFmtInteger("%d",fmt,(long)v.i.lo,1,size);
+                else
+                {
+                    if (IS_BITVAR(etype))
+                        fprintf(stdout,"%c",(v.val?'1':'0'));
+                    else
+                        fprintf(stdout,"0x%0*x",size<<1,v.val);
+                }
+            }
 	    } else
-		fprintf(stdout,"0x%x",v.val);
-		
-    
+            fprintf(stdout,"0x%0*x",size<<1,v.val);  
 }
 
 /*-----------------------------------------------------------------*/
 /* printValFunc  - prints function values                          */
 /*-----------------------------------------------------------------*/
-static void printValFunc (symbol *sym)
+static void printValFunc (symbol *sym, int fmt)
 {
     fprintf(stdout,"print function not yet implemented");
 }
@@ -1971,20 +2180,21 @@ static void printValFunc (symbol *sym)
 /*-----------------------------------------------------------------*/
 /* printArrayValue - will print the values of array elements       */
 /*-----------------------------------------------------------------*/
-static void printArrayValue (symbol *sym, char space, unsigned int addr)
+static void printArrayValue (symbol *sym,  link *type,
+                             char space, unsigned int addr, int fmt)
 {
-	link *elem_type = sym->type->next;
+	link *elem_type = type->next;
 	int i;
 	
-	fprintf(stdout," { ");
-	for (i = 0 ; i < DCL_ELEM(sym->type) ; i++) {		
+	fprintf(stdout,"{");
+	for (i = 0 ; i < DCL_ELEM(type) ; i++) {		
 		if (IS_AGGREGATE(elem_type)) {
-			printValAggregates(sym,elem_type,space,addr);		       
+			printValAggregates(sym,elem_type,space,addr,fmt);		       
 		} else {
-			printValBasic(sym,addr,space,getSize(elem_type));
+			printValBasic(sym,elem_type,space,addr,getSize(elem_type),fmt);
 		}
 		addr += getSize(elem_type);
-		if (i != DCL_ELEM(sym->type) -1)
+		if (i != DCL_ELEM(type) -1)
 			fprintf(stdout,",");
 	}
 
@@ -1994,17 +2204,19 @@ static void printArrayValue (symbol *sym, char space, unsigned int addr)
 /*-----------------------------------------------------------------*/
 /* printStructValue - prints structures elements                   */
 /*-----------------------------------------------------------------*/
-static void printStructValue (symbol *sym,link *type, char space, unsigned int addr) 
+static void printStructValue (symbol *sym, link *type, 
+                              char space, unsigned int addr, int fmt) 
 {
 	symbol *fields = SPEC_STRUCT(type)->fields;
-
+    int first = 1;
 	fprintf(stdout," { ");
 	while (fields) {
-		fprintf(stdout,"%s = ",fields->name);
-		if (IS_AGGREGATE(fields->type)) {
-			printValAggregates(fields,fields->type,space, addr);
+		fprintf(stdout,"%s%s = ",(first ? "": ", "),fields->name);
+		first = 0;
+        if (IS_AGGREGATE(fields->type)) {
+			printValAggregates(fields,fields->type,space, addr, fmt);
 		} else {
-			printValBasic(fields,addr,space,getSize(fields->type));
+			printValBasic(fields,fields->type,space,addr,getSize(fields->type), fmt);
 		}
 		addr += getSize(fields->type);
 		fields = fields->next;
@@ -2015,25 +2227,37 @@ static void printStructValue (symbol *sym,link *type, char space, unsigned int a
 /*-----------------------------------------------------------------*/
 /* printValAggregates - print value of aggregates                  */
 /*-----------------------------------------------------------------*/
-static void printValAggregates (symbol *sym, link *type,char space,unsigned int addr)
+static void printValAggregates (symbol *sym, link *type,
+                                char space,unsigned int addr, int fmt)
 {
 
 	if (IS_ARRAY(type)) {
-		printArrayValue(sym, space, addr);
+		printArrayValue(sym, type, space, addr, fmt);
 		return ;
 	}
 
  	if (IS_STRUCT(type)) { 
- 		printStructValue(sym,sym->type,space, addr); 
+ 		printStructValue(sym, type, space, addr, fmt); 
  		return; 
  	} 
 }
 
 /*-----------------------------------------------------------------*/
-/* setSymValue - set     value of a symbol                         */
+/* printOrSetSymValue - print or set value of a symbol             */
 /*-----------------------------------------------------------------*/
-static void setSymValue(symbol *sym, char *val, context *cctxt)
+static void printOrSetSymValue (symbol *sym, context *cctxt, 
+                           int flg, int dnum, int fmt, char *rs, char *val)
 {
+    static char fmtChar[] = " todx ";
+    static int stack = 1;
+	symbol *fields;
+    link *type;
+    unsigned int  addr; 
+    int size, n;
+    char *s, *s2;
+    char save_ch, save_ch2;
+
+    /* if it is on stack then compute address & fall thru */
     if (sym->isonstack) 
     {
         symbol *bp = symLookup("bp",cctxt);
@@ -2045,39 +2269,6 @@ static void setSymValue(symbol *sym, char *val, context *cctxt)
 
         sym->addr = simGetValue(bp->addr,bp->addrspace,bp->size)
             + sym->offset ;      
-    }
-    /* arrays & structures first */
-    if (IS_AGGREGATE(sym->type))
-	{
-    }
-    else
-	/* functions */
-	if (IS_FUNC(sym->type))
-    {
-    }
-	else
-    {
-        setValBasic(sym,val);
-    }
-}
-
-/*-----------------------------------------------------------------*/
-/* printSymValue - print value of a symbol                         */
-/*-----------------------------------------------------------------*/
-static void printSymValue (symbol *sym, context *cctxt, int flg, int dnum)
-{
-    static int stack = 1;
-    unsigned long val;
-    /* if it is on stack then compute address & fall thru */
-    if (sym->isonstack) {
-	symbol *bp = symLookup("bp",cctxt);
-	if (!bp) {
-	    fprintf(stdout,"cannot determine stack frame\n");
-	    return ;
-	}
-
-	sym->addr = simGetValue(bp->addr,bp->addrspace,bp->size)
-	  + sym->offset ;      
     }
     
     /* get the value from the simulator and
@@ -2091,20 +2282,111 @@ static void printSymValue (symbol *sym, context *cctxt, int flg, int dnum)
             fprintf(stdout,"$%d = ",stack++);
             break;
         case 2: 
-            fprintf(stdout,"%d: %s = ",dnum,sym->name);
+            fprintf(stdout,"%d: ", dnum);
+            if ( fmt != FMT_NON )
+                fprintf(stdout,"/%c ",fmtChar[fmt]);
+            fprintf(stdout,"%s%s = ",sym->name,rs);
             break;
     }
+
+    addr = sym->addr;
+    type = sym->type;
+    size = sym->size;
+
+    while ( *rs )
+    {
+        if ( *rs == '[' && IS_ARRAY(type))
+        {
+            s = rs+1;
+            while ( *rs && *rs != ']' ) rs++ ;
+            save_ch = *rs;
+            *rs = '\0' ;
+            if ( ! isdigit(*s ))
+            {
+                /* index seems a variable */
+                for ( s2 = s; *s2 && ( isalnum( *s2 ) || *s2 == '_'); s2++ );
+                save_ch2 = *s2;
+                if ( *s2 )
+                    *s2 = '\0';
+                fields = symLookup(s,cctxt);
+                *s2 = save_ch2;
+                if ( ! fields )
+                {
+                    fprintf(stdout,"Unkown variable \"%s\" for index.\n", s);
+                    return;                    
+                }
+                /* arrays & structures first */
+                if (! IS_INTEGRAL(fields->type))
+                {
+                    fprintf(stdout,"Wrong type of variable \"%s\" for index \n", s);
+                    return;                    
+                }
+                n = simGetValue(fields->addr,fields->addrspace,getSize(fields->type));
+            }
+            else
+            {
+                n = strtol(s,0,0);
+            }
+            if ( n < 0 || n >= DCL_ELEM(type))
+            {
+                fprintf(stdout,"Wrong index %d.\n", n);
+                return;                    
+            }
+            type = type->next;
+            size = getSize(type);
+            addr += size * n;
+            *rs++ = save_ch;
+        }
+        else if ( *rs == '.' && IS_STRUCT(type))
+        {
+            s = rs+1;
+            /* search structure element */
+            for ( rs = s; *rs && ( isalnum( *rs ) || *rs == '_'); rs++ );
+            save_ch = *rs;
+            if ( *rs )
+                *rs = '\0';
+            for (fields = SPEC_STRUCT(type)->fields; fields; fields = fields->next) 
+            {
+                if (!(strcmp(s,fields->name)))
+                    break;
+            }
+            *rs = save_ch;
+            if ( ! fields )
+            {
+                fprintf(stdout,"Unknown field \"%s\" of structure\n", s);
+                return;                    
+            }
+            type = fields->type;
+            size = getSize(type);
+            addr += fields->offset;
+        }
+        else
+            break;
+    }
+
     /* arrays & structures first */
-    if (IS_AGGREGATE(sym->type))
-	printValAggregates(sym,sym->type,sym->addrspace,sym->addr);
+    if (IS_AGGREGATE(type))
+    {
+	    if ( val )
+            fprintf(stdout,"Cannot set aggregate variable\n");
+        else
+            printValAggregates(sym,type,sym->addrspace,addr,fmt);
+    }
     else
 	/* functions */
-	if (IS_FUNC(sym->type))
-	    printValFunc(sym);
-	else 
-	    printValBasic(sym,sym->addr,sym->addrspace,sym->size);
+	if (IS_FUNC(type))
+    {
+	    if ( !val )
+            printValFunc(sym,fmt);
+    }
+	else
+    { 
+	    if ( val )
+            setValBasic  (sym,type,sym->addrspace,addr,size,val);
+        else
+            printValBasic(sym,type,sym->addrspace,addr,size,fmt);
+    }
     if ( flg > 0 ) fprintf(stdout,"\n");
-	    //fprintf(stdout,"(BASIC %x,%c,%d)\n",sym->addr,sym->addrspace,sym->size);
 	
 }
 
@@ -2214,21 +2496,15 @@ static void printTypeInfo(link *p)
 int cmdPrint (char *s, context *cctxt)
 {   
     symbol *sym ;
-    char *bp = s+strlen(s) -1;
+    int fmt;
+    char *rs;
+    if ( !( rs = preparePrint(s, cctxt, &fmt, &sym )))
+        return 0;
 
-    while (isspace(*s)) s++;
-    if (!*s) return 0;
-    while (isspace(*bp)) bp--;
-    bp++ ;
-    *bp = '\0';
-
-    if ((sym = symLookup(s,cctxt))) {
-	printSymValue(sym,cctxt,1,0);
-    } else {
-	fprintf(stdout,
-		"No symbol \"%s\" in current context.\n",	       
-		s);
-    }
+    if ( sym ) 
+    {
+        printOrSetSymValue(sym,cctxt,1,0,fmt,rs,NULL);
+    } 
     return 0;
 }
 
@@ -2238,29 +2514,17 @@ int cmdPrint (char *s, context *cctxt)
 int cmdOutput (char *s, context *cctxt)
 {   
     symbol *sym ;
-    char *bp = s+strlen(s) -1;
+    int fmt;
+    char *rs;
+    if ( !( rs = preparePrint(s, cctxt, &fmt, &sym )))
+        return 0;
 
-    while (isspace(*s)) s++;
-    if (!*s) return 0;
-    while (isspace(*bp)) bp--;
-    bp++ ;
-    *bp = '\0';
-
-    if ((sym = symLookup(s,cctxt))) {
-	printSymValue(sym,cctxt,0,0);
-    } else {
-	fprintf(stdout,
-		"No symbol \"%s\" in current context.",	       
-		s);
-    }
+    if ( sym ) 
+    {
+        printOrSetSymValue(sym,cctxt,0,0,fmt,rs,NULL);
+    } 
     return 0;
 }
-
-typedef struct _dsymbol
-{
-    char *name;
-    int  dnum;
-} dsymbol;
 
 /** find display entry with this number */
 
@@ -2292,7 +2556,7 @@ void displayAll(context *cctxt)
          dsym = setNextItem(dispsymbols)) 
     {
         if ( (sym = symLookup(dsym->name,cctxt)))
-            printSymValue(sym,cctxt,2,dsym->dnum);            
+            printOrSetSymValue(sym,cctxt,2,dsym->dnum,dsym->fmt,dsym->rs,NULL);
     }
 }
 
@@ -2301,31 +2565,24 @@ void displayAll(context *cctxt)
 /*-----------------------------------------------------------------*/
 int cmdDisplay (char *s, context *cctxt)
 {   
-    symbol *sym ;
-    char *bp = s+strlen(s) -1;
     static int dnum = 1;
-
-    while (isspace(*s)) s++;
-    if (!*s)
+    symbol *sym ;
+    int fmt;
+    char *rs;
+    if ( !( rs = preparePrint(s, cctxt, &fmt, &sym )))
     {
         displayAll(cctxt);
         return 0;
     }
-    while (isspace(*bp)) bp--;
-    bp++ ;
-    *bp = '\0';
 
-    if ((sym = symLookup(s,cctxt))) 
+    if ( sym ) 
     {
         dsymbol *dsym = (dsymbol *)Safe_calloc(1,sizeof(dsymbol));
         dsym->dnum = dnum++ ;
         dsym->name = sym->name;
+        dsym->fmt  = fmt;
+        dsym->rs   = gc_strdup(rs);
         addSetHead(&dispsymbols,dsym);
-    }
-    else
-    {
-        fprintf(stdout,"No symbol \"%s\" in current context.\n",	       
-                s);
     }
     return 0;
 }
@@ -2341,6 +2598,13 @@ int cmdUnDisplay (char *s, context *cctxt)
     while (isspace(*s)) s++;
     if (!*s)
     {
+        for (dsym = setFirstItem(dispsymbols);
+             dsym;
+             dsym = setNextItem(dispsymbols))
+        {
+            Safe_free(dsym->rs);
+            Safe_free(dsym); 
+        }
         deleteSet(&dispsymbols);
         return 0;
     }
@@ -2350,6 +2614,8 @@ int cmdUnDisplay (char *s, context *cctxt)
         if (applyToSetFTrue(dispsymbols,dsymWithNumber,dnum,&dsym)) 
         {
             deleteSetItem(&dispsymbols,dsym);
+            Safe_free(dsym->rs);
+            Safe_free(dsym); 
         } 
         else
         {
@@ -2509,23 +2775,85 @@ int cmdSimulator (char *s, context *cctxt)
     return 0;
 }
 
+static int printFrame(int framenr, int getlast)
+{
+    int i;
+    function *func     = NULL;
+    function *lastfunc = NULL;
+
+    STACK_STARTWALK(callStack) ;
+    if ( framenr < 0 )
+        framenr = 0;
+    for ( i = 0; i <= framenr ; i++ )
+    {
+        lastfunc = func;
+        func = STACK_WALK(callStack);
+        if ( !func )
+        {
+            framenr = i-1;
+            break;
+        }
+    }
+    if (! func && getlast )
+        func = lastfunc;
+
+    if ( func )
+    {
+        fprintf(stdout,"#%d  0x%08x in %s () at %s:%d\n",
+                framenr,func->laddr,func->sym->name,func->mod->c_name,func->lline);
+        fprintf(stdout,"\032\032%s:%d:1:beg:0x%08x\n",
+                func->mod->cfullname,func->lline,func->laddr);
+    }
+    else
+        fprintf(stdout,"No stack.\n");
+
+    return framenr;
+}
+
+
+/*-----------------------------------------------------------------*/
+/* cmdUp -  Up command                                             */
+/*-----------------------------------------------------------------*/
+int cmdUp(char *s, context *cctxt)
+{
+    while (isspace(*s)) s++;
+    if ( *s )
+        currentFrame += strtol(s,0,10);
+    else
+        currentFrame++ ;
+
+    currentFrame = printFrame(currentFrame, 1 );
+	return 0;
+}
+
+/*-----------------------------------------------------------------*/
+/* cmdDown - down command                                          */
+/*-----------------------------------------------------------------*/
+int cmdDown(char *s, context *cctxt)
+{
+    while (isspace(*s)) s++;
+    if ( *s )
+        currentFrame -= strtol(s,0,10);
+    else
+        currentFrame-- ;
+
+    currentFrame = printFrame(currentFrame, 1 );
+	return 0;
+}
 /*-----------------------------------------------------------------*/
 /* cmdFrame - Frame command                                        */
 /*-----------------------------------------------------------------*/
 int cmdFrame (char *s, context *cctxt)
 {   
-    function *func ;
+    function *func = NULL;
+    int i, framenr = 0;
 
-    if ((func = STACK_PEEK(callStack))) {
-	fprintf(stdout,"#0  %s () at %s:%d\n",
-		func->sym->name,func->mod->c_name,cctxt->cline);
-
-	if (cctxt->cline < func->mod->ncLines)	    
-	    fprintf(stdout,"%d\t%s",
-		    cctxt->cline,
-		    func->mod->cLines[cctxt->cline]->src);
-    } else
-	fprintf(stdout,"No stack.\n");
+    while (isspace(*s)) s++;
+    if ( *s )
+        framenr = strtol(s,0,10);
+    else
+        framenr = currentFrame;
+    printFrame( framenr, 0 );
     return 0;
 }
 

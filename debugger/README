@@ -4,6 +4,263 @@ SDCDB debugger - Development notes.
 ======================
 
 
+ddd - Notes from Martin Helmling, April 28, 2003
+========================
+
+To fullfill the requirements of 'ddd' ( Data Display Debugger ) to use it at
+graphical frontend to 'sdcdb' some new commands must be implemented.
+
+Now you can run the ddd with the commandline
+
+ddd -debugger 'sdcdb -cpu 8032 <file>'
+
+Following commands are additional implemented:
+
+1. execution:
+
+stepi - Step one instruction exactly using simulator 'step' command.
+nexti - Step one instruction, but proceed through subroutine calls using simulator 'next' command.
+break *<addr> - Set breakpoint at program address
+
+log examples:
+-> "stepi\n"
+<- "Simulator stopped at Address 0x0051\n"
+   "\032\032x.c:31:1:beg:0x00000051\n"
+   "(sdcdb) "
+-> "nexti\n"
+<- "Simulator stopped at Address 0x0055\n"
+   "\032\032x.c:33:1:beg:0x00000055\n"
+   "(sdcdb) "
+
+2. show machine code window:
+
+x /i  - disassemble one asm command
+x disassemble asm commands
+
+log examples:
+-> "x /i 0x00000055\n"
+<- "0x00000055 <main+6>:\t\tmov\tr0,#_l\n"
+   "(sdcdb) "
+-> "disassemble 0x00000055\n"
+<- "Dump of assembler code for function main:\n"
+   "0x0000004f <main>:\t\tmov\tr0,#_ttt\n"
+   "0x00000051 <main+2>:\t\tmov\t@r0,#0x01\n"
+<- "0x00000053 <main+4>:\t\tmov\tr2,#0x09\n"
+   "0x00000055 <main+6>:\t\tmov\tr0,#_l\n"
+...
+   "0x000000c1 <main+114>:\t\tret\n"
+   "End of assembler dump.\n"
+   "(sdcdb) "
+-> "disassemble 0x40 0x45\n"
+<- "Dump of assembler code from 0x00000040 to 0x00000045:\n"
+   "0x00000040 <subfunc1+8>:\t\tinc\tr0\n"
+   "0x00000041 <subfunc1+9>:\t\tmov\t@r0,ar3\n"
+   "0x00000043 <subfunc1+11>:\t\tmov\ta,r3\n"
+   "0x00000044 <subfunc1+12>:\t\trlc\ta\n"
+   "0x00000045 <subfunc1+13>:\t\tsubb\ta,acc\n"
+   "End of assembler dump.\n"
+   "(sdcdb) "
+-> "break x.c:23\n"
+<- "Breakpoint 1 at 0x4b: file x.c, line 23.\n"
+   "(sdcdb) "
+-> "info breakpoints\n"
+<- "Num Type           Disp Enb Address    What\n"
+   "1   breakpoint     keep y   0x0000004b at x.c:23\n"
+   "(sdcdb) "
+->
+
+3. show registers and stack
+
+frame - print information about the current Stack
+where - print stack
+up    - Select and print stack frame that called this one
+down  - Select and print stack frame that called this one
+info registers - show registers
+info all-registers - show also special these function registers,
+                     which are symbolical defined.
+help <cmd> show short help for ddd tooltip info
+log examples:
+
+-> "where\n"
+<- "#0  0x0000004b in subfunc1 () at x.c:23\n"
+   "#1  0x0000004f in main () at x.c:31\n"
+   "(sdcdb) "
+-> "frame\n"
+<- "#0  0x0000004b in subfunc1 () at x.c:23\n"
+   "\032\032x.c:23:1:beg:0x0000004b\n"
+   "(sdcdb) "
+-> "up\n"
+<- "#1  0x0000004f in main () at x.c:31\n"
+   "\032\032x.c:31:1:beg:0x0000004f\n"
+   "(sdcdb) "
+-> "frame\n"
+<- "#1  0x0000004f in main () at x.c:31\n"
+   "\032\032x.c:31:1:beg:0x0000004f\n"
+   "(sdcdb) "
+-> "down\n"
+<- "#0  0x0000004b in subfunc1 () at x.c:23\n"
+   "\032\032x.c:23:1:beg:0x0000004b\n"
+   "(sdcdb) "
+-> "frame\n"
+<- "#0  0x0000004b in subfunc1 () at x.c:23\n"
+   "\032\032x.c:23:1:beg:0x0000004b\n"
+   "(sdcdb) "
+-> "info registers\n"
+<- "R0  : 0x87 135 .\n"
+   "R1  : 0x00 0 .\n"
+   "R2  : 0x05 5 .\n"
+   "R3  : 0x00 0 .\n"
+   "R4  : 0x00 0 .\n"
+   "R5  : 0x08 8 .\n"
+   "R6  : 0x00 0 .\n"
+   "ACC : 0x00 0 .\n"
+   "B   : 0x00 0 .\n"
+   "DPTR: 0x0005 5\n"
+   "@DPTR: 0x00 0 .\n"
+   "PSW  : 0x00 | CY : 0 | AC : 0 | OV : 0 | P : 0\n"
+   "(sdcdb) "
+#  Showing all registers.
+-> "info all-registers\n"
+<- "R0  : 0x87 135 .\n"
+   "R1  : 0x00 0 .\n"
+   "R2  : 0x05 5 .\n"
+   "R3  : 0x00 0 .\n"
+   "R4  : 0x00 0 .\n"
+   "R5  : 0x08 8 .\n"
+   "R6  : 0x00 0 .\n"
+   "ACC : 0x00 0 .\n"
+   "B   : 0x00 0 .\n"
+   "DPTR: 0x0005 5\n"
+   "@DPTR: 0x00 0 .\n"
+   "PSW  : 0x00 | CY : 0 | AC : 0 | OV : 0 | P : 0\n"
+   "Special Function Registers:\n"
+<- "P0=0xff P0_0=1 P0_1=1 P0_2=1 P0_3=1\n"
+   "SP=0x13\n"
+   "(sdcdb) "
+-> "help step\n"
+<- "Step program until it reaches a different source line.\n"
+   "(sdcdb) "
+-> "help stepi\n"
+<- "Step one instruction exactly.\n"
+   "(sdcdb) "
+
+4. show and set variables:
+output  [/<fmt>] <expr1> print value of <expr1> without newline for tooltip of ddd
+print   [/<fmt>] <expr1> print value of <expr1> with newline
+display [/<fmt>] <expr1> print value of <expr1> every time the program is stopped 
+                          or 'display' command without args is used.
+
+set variable <expr1> = <value> 
+
+
+<fmt> is the format for the basic type which is print out. 
+If no format is set the default format is used.
+format is set by ddd  'x' as hex 'o' as octal, 'd' as dezimal and 't' as binary.
+
+<expr1> can by a variable , a array element , a structure element ( [] and . is parsed ).
+indices of arrays may be constants or variables.
+( dereference of pointers and casting today not implemented !! )
+
+log examples:
+code:
+
+typedef unsigned char uchar;
+idata long  l;
+typedef struct _txstate
+{
+    uchar dstatus[4];
+    uchar avalue [8 ];
+} txstate_t;
+
+xdata txstate_t txstates[8];
+
+-> "output l\n"
+<- "5(sdcdb) "
+-> "display l\n"
+<- "(sdcdb) "
+-> "display /x l\n"
+<- "(sdcdb) "
+-> "display\n"
+<- "2: /x l = 0x00000005\n"
+   "1: l = 5\n"
+   "(sdcdb) "
+-> "display /o l\n"
+<- "(sdcdb) "
+-> "display\n"
+<- "3: /o l = 00000000005\n"
+   "2: /x l = 0x00000005\n"
+   "1: l = 5\n"
+   "(sdcdb) "
+-> "display /d l\n"
+<- "(sdcdb) "
+-> "display\n"
+<- "4: /d l = 5\n"
+   "3: /o l = 00000000005\n"
+   "2: /x l = 0x00000005\n"
+   "1: l = 5\n"
+   "(sdcdb) "
+-> "display /t l\n"
+<- "(sdcdb) "
+-> "display\n"
+<- "5: /t l = 00000000000000000000000000000101\n"
+   "4: /d l = 5\n"
+   "3: /o l = 00000000005\n"
+   "2: /x l = 0x00000005\n"
+   "1: l = 5\n"
+   "(sdcdb) "
+-> "output l\n"
+<- "5(sdcdb) "
+-> "print txstates\n"
+<- "$2 = { { dstatus = {\'\\1\',\'\\0\',\'\\0\',\'\\0\'},
+ avalue = {\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\'}},
+ { dstatus = {\'\\0\',\'\\2\',\'\\0\',\'\\0\'},
+ avalue = {\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\'}},
+ { dstatus = {\'\\0\',\'\\0\',\'\\375\',\'\\0\'},
+ avalue = {\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\'}},
+ { dstatus = {\'\\0\',\'\\0\',\'\\0\',\'\\0\'},
+ avalue = {\'\\0\',\'\\0\',\'\\0\',\'\\4\',\'\\0\',\'\\0\',\'\\0\',\
+'\\0\'}}, { dstatus = {\'\\0\',\'\\0\',\'\\0\',\'\\0\'},
+ avalue = {\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\'}},
+ { dstatus = {\'\\0\',\'\\0\',\'\\0\',\'\\0\'},
+ avalue = {\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\'}},
+ { dstatus = {\'\\0\',\'\\0\',\'\\0\',\'\\0\'},
+ avalue = {\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\'}},
+ { dstatus = {\'\\0\',\'\\0\',\'\\0\',\'\\0\'},
+ avalue = {\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\
+0\'}}}\n"
+   "(sdcdb) "
+-> "print txstates[1].dstatus[1]\n"
+<- "$5 = \'\\2\'\n"
+   "(sdcdb) "
+-> "print /x txstates[1].dstatus[1]\n"
+<- "$7 = 0x02\n"
+-> "output txstates[1].dstatus[1]\n"
+<- "\'\\2\'(sdcdb) "
+-> "set variable txstates[1].dstatus[1] = 0x10\n"
+<- "(sdcdb) "
+-> "print /t txstates[1].dstatus[1]\n"
+<- "$9 = 00010000\n"
+-> "print /x txstates[1].dstatus[1]\n"
+<- "$10 = 0x10\n"
+
+-> "output l\n"
+<- "5(sdcdb) "
+-> "set variable l = 2\n"
+<- "(sdcdb) "
+-> "print l\n"
+<- "$15 = 2\n"
+-> "print /x txstates[l].dstatus[2]\n"
+<- "$16 = 0xfd\n"
+
+
+---------------------------------------------------
+
+Implementation Notes:
+
+IMEM and XMEM are cached to optimize the printaut of structures and arrays
+
+
+
 Notes April 23, 2003
 ========================
 Martin Helmling added support for ddd GUI debugger.

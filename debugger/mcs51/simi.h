@@ -26,6 +26,23 @@
 #define  SIMI_H
 
 #define MAX_SIM_BUFF 8*1024
+
+#define MAX_CACHE_SIZE 2048
+/* number of cache */
+#define IMEM_CACHE     0
+#define XMEM_CACHE     1
+#define NMEM_CACHE     2
+/* special index */
+#define  REG_CACHE     3
+#define  BIT_CACHE     4
+
+typedef struct _memcache
+{
+    int addr;
+    int size;
+    char buffer[MAX_CACHE_SIZE];
+} memcache_t;
+
 //#define SIMNAME "s51"
 extern int sock;
 extern char simactive;

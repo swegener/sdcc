@@ -136,6 +136,14 @@ enum {
     MOD_REC
 };
 
+enum {
+    FMT_NON =  0,
+    FMT_BIN =  1,
+    FMT_OCT =  2,
+    FMT_DEZ =  3,
+    FMT_HEX =  4
+};
+
 enum { SRC_CMODE = 1, SRC_AMODE };
 
 /*-----------------------------------------------------------------*/
@@ -222,11 +230,24 @@ typedef struct context {
     int      level ;          /* current level number       */
 } context ;
 
+/*-----------------------------------------------------------------*/
+/*                     symbol display information                  */
+/*-----------------------------------------------------------------*/
+typedef struct _dsymbol
+{
+    char *name;
+    int  dnum;
+    int  fmt;
+    char *rs;
+} dsymbol;
+
+
 extern cdbrecs *recsRoot ;
 extern context *currCtxt ;
 extern set *modules  ; /* set of modules   */
 extern set *functions; /* set of functions */
 extern set *symbols  ; /* set of symbols */
+extern set *sfrsymbols;/* set of symbols of sfr or sbit */
 
 extern char *currModName ;
 extern short userinterrupt ;
@@ -236,6 +257,7 @@ extern struct structdef **structs ; /* all structures */
 extern char *ssdirl; /* source directory search path */
 void **resize (void **, int );
 char  *alloccpy(char *,int );
+char *gc_strdup(const char *s);
 srcLine **loadFile (char *name, int *nlines);
 extern short fullname;
 extern int srcMode;

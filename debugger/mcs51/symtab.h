@@ -239,7 +239,6 @@ void parseFunc (char *);
 module *parseModule (char *, bool  );
 void parseLnkRec (char *);
 symbol *symLookup (char *,context *);
-
 DEFSETFUNC(moduleWithName);
 DEFSETFUNC(moduleWithCName);
 DEFSETFUNC(moduleWithAsmName);

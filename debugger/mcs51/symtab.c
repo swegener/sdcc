@@ -327,6 +327,7 @@ structdef *parseStruct (char *s)
     name = alloccpy(bp,s - bp);
     nsdef = structWithName(name);
     nsdef->fields = NULL;
+    nsdef->size = 0;
     s++;
     while (*s && *s != ']') {
   int offset ;
@@ -342,7 +343,7 @@ structdef *parseStruct (char *s)
       fields = nsdef->fields = sym;
   else
       fields = fields->next = sym;
-
+  nsdef->size += sym->size;
     }
 
     return nsdef;

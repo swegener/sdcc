@@ -617,7 +617,7 @@ funcOfTypeVarg (char *name, char * rtype, int nArgs , char **atypes)
 /*-----------------------------------------------------------------*/
 /* reverseParms - will reverse a parameter tree                    */
 /*-----------------------------------------------------------------*/
-void 
+static void 
 reverseParms (ast * ptree)
 {
   ast *ttree;
@@ -714,13 +714,13 @@ processParms (ast * func,
       if (IS_PTR(ftype) && !IS_GENPTR(ftype))
 	{
 	  newType = newAst_LINK (copyLinkChain(ftype));
-	  DCL_TYPE (newType->opval.lnk) = GPOINTER;
+	  DCL_TYPE (newType->opval.lnk) = port->unqualified_pointer;
 	}
 
       if (IS_AGGREGATE (ftype))
 	{
 	  newType = newAst_LINK (copyLinkChain (ftype));
-	  DCL_TYPE (newType->opval.lnk) = GPOINTER;
+	  DCL_TYPE (newType->opval.lnk) = port->unqualified_pointer;
 	}
       if (newType)
 	{
@@ -4323,7 +4323,7 @@ skipall:
 
   /* we are done freeup memory & cleanup */
   noLineno--;
-  labelKey = 1;
+  if (port->reset_labelKey) labelKey = 1;
   name->key = 0;
   FUNC_HASBODY(name->type) = 1;
   addSet (&operKeyReset, name);

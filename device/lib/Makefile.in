@@ -65,7 +65,7 @@ SOURCES		= _atof.c _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
 		  fabsf.c frexpf.c ldexpf.c expf.c powf.c sincosf.c sinf.c \
 		  cosf.c logf.c log10f.c sqrtf.c tancotf.c tanf.c cotf.c \
 		  asincosf.c asinf.c acosf.c atanf.c atan2f.c sincoshf.c \
-		  sinhf.c coshf.c tanhf.c floorf.c ceilf.c modff.c
+		  sinhf.c coshf.c tanhf.c floorf.c ceilf.c modff.c errno.c
 
 OBJECTS		= $(patsubst %.c,$(PORTDIR)/%.rel,$(SOURCES))
 
@@ -115,7 +115,7 @@ XA51SOURCES      = _atof.c _atoi.c _atol.c _schar2fs.c \
 		  fabsf.c frexpf.c ldexpf.c expf.c powf.c sincosf.c sinf.c \
 		  cosf.c logf.c log10f.c sqrtf.c tancotf.c tanf.c cotf.c \
 		  asincosf.c asinf.c acosf.c atanf.c atan2f.c sincoshf.c \
-		  sinhf.c coshf.c tanhf.c floorf.c ceilf.c modff.c
+		  sinhf.c coshf.c tanhf.c floorf.c ceilf.c modff.c errno.c
 
 XA51OBJECTS      = $(XA51SOURCES:%.c=$(PORTDIR)/%.rel)
 

@@ -38,17 +38,28 @@ static char *_mcs51_keywords[] =     {
 
 void mcs51_assignRegisters (eBBlock **ebbs, int count);
 
-static bool _mcs51_parseOptions(int *pargc, char **argv)
+static bool _mcs51_parseOptions(int *pargc, char **argv, int *i)
 {
+    /* TODO: allow port-specific command line options to specify
+     * segment names here.
+     */
     return FALSE;
 }
 
 static void _mcs51_finaliseOptions(void)
 {
+    /* Hack-o-matic: if we are using the flat24 model,
+     * adjust pointer sizes.
+     */
+    if (options.model == MODEL_FLAT24)
+    {
+        port->s.fptr_size = 3;
+        port->s.gptr_size = 4;
+    } 
 }
 
 static void _mcs51_setDefaultOptions(void)
-{    
+{
 }
 
 static const char *_mcs51_getRegName(struct regs *reg)
@@ -56,6 +67,45 @@ static const char *_mcs51_getRegName(struct regs *reg)
     if (reg)
 	return reg->name;
     return "err";
+}
+
+static void _mcs51_genAssemblerPreamble(FILE *of)
+{
+   if (options.model == MODEL_FLAT24)
+   {
+       fputs(".flat24 on\t\t; 24 bit flat addressing\n", of);
+       fputs("dpx = 0x93\t\t; dpx register unknown to assembler\n", of);
+
+   }
+}
+
+/* Generate interrupt vector table. */
+static int _mcs51_genIVT(FILE *of, symbol **interrupts, int maxInterrupts)
+{
+    int i;
+    
+    if (options.model != MODEL_FLAT24)
+    {
+        /* Let the default code handle it. */
+    	return FALSE;
+    }
+    
+    fprintf (of, "\tajmp\t__sdcc_gsinit_startup\n");
+    
+    /* now for the other interrupts */
+    for (i = 0; i < maxInterrupts; i++) 
+    {
+	if (interrupts[i])
+	{
+	    fprintf(of, "\tljmp\t%s\n\t.ds\t4\n", interrupts[i]->rname);
+	}
+	else
+	{
+	    fprintf(of, "\treti\n\t.ds\t7\n");
+	}
+    }
+    
+    return TRUE;
 }
 
 /** $1 is always the basename.
@@ -112,6 +162,8 @@ PORT mcs51_port = {
     _mcs51_setDefaultOptions,
     mcs51_assignRegisters,
     _mcs51_getRegName ,
-    _mcs51_keywords
-
+    _mcs51_keywords,
+    _mcs51_genAssemblerPreamble,
+    _mcs51_genIVT
 };
+

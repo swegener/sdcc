@@ -145,8 +145,9 @@ static regs *getFreePtr (iCode *ic, asmop **aopp, bool result)
     instruction, in which case we are in trouble */
     if ((r0iu = bitVectBitValue(ic->rUsed,R0_IDX)) &&
         (r1iu = bitVectBitValue(ic->rUsed,R1_IDX))) 
+    {
         goto endOfWorld;      
-
+    }
 
     r0ou = bitVectBitValue(ic->rMask,R0_IDX);
     r1ou = bitVectBitValue(ic->rMask,R1_IDX);
@@ -155,6 +156,7 @@ static regs *getFreePtr (iCode *ic, asmop **aopp, bool result)
     if (!r0iu && !r0ou) {
         ic->rUsed = bitVectSetBit(ic->rUsed,R0_IDX);
         (*aopp)->type = AOP_R0;
+        
         return (*aopp)->aopu.aop_ptr = mcs51_regWithIdx(R0_IDX);
     }
 
@@ -162,6 +164,7 @@ static regs *getFreePtr (iCode *ic, asmop **aopp, bool result)
     if (!r1iu && !r1ou) {
         ic->rUsed = bitVectSetBit(ic->rUsed,R1_IDX);
         (*aopp)->type = AOP_R1;
+
         return (*aopp)->aopu.aop_ptr = mcs51_regWithIdx(R1_IDX);
     }    
 
@@ -174,7 +177,7 @@ static regs *getFreePtr (iCode *ic, asmop **aopp, bool result)
                       mcs51_regWithIdx(R0_IDX)->dname);
             _G.r0Pushed++ ;
         }
-
+        
         ic->rUsed = bitVectSetBit(ic->rUsed,R0_IDX);
         (*aopp)->type = AOP_R0;
 
@@ -190,16 +193,15 @@ static regs *getFreePtr (iCode *ic, asmop **aopp, bool result)
                       mcs51_regWithIdx(R1_IDX)->dname);
             _G.r1Pushed++ ;
         }
-
+        
         ic->rUsed = bitVectSetBit(ic->rUsed,R1_IDX);
         (*aopp)->type = AOP_R1;
         return mcs51_regWithIdx(R1_IDX);
     }
 
-
 endOfWorld :
     /* I said end of world but not quite end of world yet */
-    /* if this is a result then we canpush it on the stack*/
+    /* if this is a result then we can push it on the stack*/
     if (result) {
         (*aopp)->type = AOP_STK;    
         return NULL;
@@ -1904,7 +1906,8 @@ static void genFunction (iCode *ic)
 	    emitcode ("push","dpl");
 	if (!inExcludeList("dph"))
 	    emitcode ("push","dph");
-	
+	if (options.model == MODEL_FLAT24 && !inExcludeList("dpx"))
+	    emitcode ("push", "dpx");	
 	/* if this isr has no bank i.e. is going to
 	   run with bank 0 , then we need to save more
 	   registers :-) */
@@ -2068,6 +2071,8 @@ static void genEndFunction (iCode *ic)
 	    }	    
 	}
 
+	if (options.model == MODEL_FLAT24 && !inExcludeList("dpx"))
+	    emitcode ("pop", "dpx");
 	if (!inExcludeList("dph"))
 	    emitcode ("pop","dph");
 	if (!inExcludeList("dpl"))
@@ -5910,6 +5915,10 @@ static void genFarPointerGet (operand *left,
         else { /* we need to get it byte by byte */
             emitcode("mov","dpl,%s",aopGet(AOP(left),0,FALSE,FALSE));
             emitcode("mov","dph,%s",aopGet(AOP(left),1,FALSE,FALSE));
+            if (options.model == MODEL_FLAT24)
+            {
+               emitcode("mov", "dpx,%s",aopGet(AOP(left),2,FALSE,FALSE));
+            }
         }
     }
     /* so dptr know contains the address */
@@ -5954,6 +5963,10 @@ static void emitcodePointerGet (operand *left,
         else { /* we need to get it byte by byte */
             emitcode("mov","dpl,%s",aopGet(AOP(left),0,FALSE,FALSE));
             emitcode("mov","dph,%s",aopGet(AOP(left),1,FALSE,FALSE));
+            if (options.model == MODEL_FLAT24)
+            {
+               emitcode("mov", "dpx,%s",aopGet(AOP(left),2,FALSE,FALSE));
+            }
         }
     }
     /* so dptr know contains the address */
@@ -6001,7 +6014,15 @@ static void genGenPointerGet (operand *left,
         else { /* we need to get it byte by byte */
             emitcode("mov","dpl,%s",aopGet(AOP(left),0,FALSE,FALSE));
             emitcode("mov","dph,%s",aopGet(AOP(left),1,FALSE,FALSE));
-            emitcode("mov","b,%s",aopGet(AOP(left),2,FALSE,FALSE));
+            if (options.model == MODEL_FLAT24)
+            {
+               emitcode("mov", "dpx,%s",aopGet(AOP(left),2,FALSE,FALSE));
+               emitcode("mov","b,%s",aopGet(AOP(left),3,FALSE,FALSE));
+            }
+            else
+            {
+            	emitcode("mov","b,%s",aopGet(AOP(left),2,FALSE,FALSE));
+            }
         }
     }
     /* so dptr know contains the address */
@@ -6463,6 +6484,10 @@ static void genFarPointerSet (operand *right,
         else { /* we need to get it byte by byte */
             emitcode("mov","dpl,%s",aopGet(AOP(result),0,FALSE,FALSE));
             emitcode("mov","dph,%s",aopGet(AOP(result),1,FALSE,FALSE));
+            if (options.model == MODEL_FLAT24)
+            {
+               emitcode("mov", "dpx,%s",aopGet(AOP(result),2,FALSE,FALSE));
+            }
         }
     }
     /* so dptr know contains the address */
@@ -6510,7 +6535,15 @@ static void genGenPointerSet (operand *right,
         else { /* we need to get it byte by byte */
             emitcode("mov","dpl,%s",aopGet(AOP(result),0,FALSE,FALSE));
             emitcode("mov","dph,%s",aopGet(AOP(result),1,FALSE,FALSE));
-            emitcode("mov","b,%s",aopGet(AOP(result),2,FALSE,FALSE));
+            if (options.model == MODEL_FLAT24)
+            {
+               emitcode("mov", "dpx,%s",aopGet(AOP(result),2,FALSE,FALSE));
+               emitcode("mov","b,%s",aopGet(AOP(result),3,FALSE,FALSE));
+            }
+            else
+            {
+            	emitcode("mov","b,%s",aopGet(AOP(result),2,FALSE,FALSE));
+            }
         }
     }
     /* so dptr know contains the address */
@@ -6928,7 +6961,7 @@ static void genCast (iCode *ic)
 		}
 		
 		/* the first two bytes are known */
-		size = 2;
+		size = GPTRSIZE - 1; 
 		offset = 0 ;
 		while (size--) {
 			aopPut(AOP(result),
@@ -6958,7 +6991,7 @@ static void genCast (iCode *ic)
 			       "got unknown pointer type");
 			exit(1);
 		}
-		aopPut(AOP(result),l,2);	    
+		aopPut(AOP(result),l, GPTRSIZE - 1);	    
 		goto release ;
 	}
 	

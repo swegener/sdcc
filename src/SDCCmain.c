@@ -71,6 +71,7 @@ char    *preOutName;
 
 #define OPTION_LARGE_MODEL "-model-large"
 #define OPTION_SMALL_MODEL "-model-small"
+#define OPTION_FLAT24_MODEL "-model-flat24"
 #define OPTION_STACK_AUTO  "-stack-auto"
 #define OPTION_XSTACK      "-xstack"
 #define OPTION_GENERIC     "-generic"
@@ -296,8 +297,8 @@ static void setDefaultOptions()
     int i ;
 
     for ( i = 0 ; i < 128 ; i++)
-	preArgv[i] = linkOptions [i] =
-	    asmOptions[i] = relFiles[i] = libFiles[i] =
+	preArgv[i] = asmOptions [i] =
+	    linkOptions[i] = relFiles[i] = libFiles[i] =
 	    libPaths[i] = NULL ;
 
     /* first the options part */
@@ -439,14 +440,19 @@ int   parseCmdLine ( int argc, char **argv )
 	    }
 
 	    if (strcmp(&argv[i][1],OPTION_LARGE_MODEL) == 0) {
-		options.model = 1;
+		options.model = MODEL_LARGE;
                 continue;
 	    }
 	    
 	    if (strcmp(&argv[i][1],OPTION_SMALL_MODEL) == 0) {
-		options.model = 0;
+		options.model = MODEL_SMALL;
                 continue;
 	    }
+	    
+	    if (strcmp(&argv[i][1],OPTION_FLAT24_MODEL) == 0) {
+		options.model = MODEL_FLAT24;
+                continue;
+	    }	    
 
 	    if (strcmp(&argv[i][1],OPTION_STACK_AUTO) == 0) {
 		options.stackAuto = 1;
@@ -716,8 +722,14 @@ int   parseCmdLine ( int argc, char **argv )
                 continue;
 	    }
 
-	    if (!port->parseOption(&argc, argv))
+	    if (!port->parseOption(&argc, argv, &i))
+	    {
 		werror(W_UNKNOWN_OPTION,argv[i]);
+	    }
+	    else
+	    {
+	    	continue;
+	    }
 	}      
 
 	/* these are undocumented options */
@@ -904,13 +916,13 @@ int   parseCmdLine ( int argc, char **argv )
 		break ;
 
 	    default:
-		if (!port->parseOption(&argc, argv))
+		if (!port->parseOption(&argc, argv, &i))
 		    werror(W_UNKNOWN_OPTION,argv[i]);
 	    }
 	    continue ;
 	}
 
-	if (!port->parseOption(&argc, argv)) {
+	if (!port->parseOption(&argc, argv, &i)) {
 	    /* no option must be a filename */
 	    processFile(argv[i]);
 	}
@@ -979,6 +991,7 @@ static void linkEdit (char **envp)
 {
     FILE *lnkfile ;
     char *argv[128];
+    char *segName, *c;
 
     int i;
     if (!srcFileName)
@@ -1000,24 +1013,50 @@ static void linkEdit (char **envp)
     
     /*if (options.debug) */
     fprintf(lnkfile,"-z\n");
+
+#define WRITE_SEG_LOC(N, L) \
+    segName = strdup(N); \
+    c = strtok(segName, " \t"); \
+    fprintf (lnkfile,"-b %s = 0x%04x\n", c, L); \
+    if (segName) { free(segName); } 
+    
     /* code segment start */
-    fprintf (lnkfile,"-b CODE = 0x%04x\n",options.code_loc);
-    /* data segment start */
-    fprintf (lnkfile,"-b DSEG = 0x%04x\n",options.data_loc);
+    WRITE_SEG_LOC(CODE_NAME, options.code_loc);
+    
+     /* data segment start */
+     WRITE_SEG_LOC(DATA_NAME, options.data_loc);
+                 
     /* xdata start */
-    fprintf (lnkfile,"-b XSEG = 0x%04x\n",options.xdata_loc);
+    WRITE_SEG_LOC(XDATA_NAME, options. xdata_loc);
+
     /* indirect data */
-    fprintf (lnkfile,"-b ISEG = 0x%04x\n",options.idata_loc);
+    WRITE_SEG_LOC(IDATA_NAME, options.idata_loc);
+
     /* bit segment start */
-    fprintf (lnkfile,"-b BSEG = 0x%04x\n",0);
+    WRITE_SEG_LOC(BIT_NAME, 0);
     
     /* add the extra linker options */
     for (i=0; linkOptions[i] ; i++)
 	fprintf(lnkfile,"%s\n",linkOptions[i]);
 
     /* standard library path */
-    fprintf (lnkfile,"-k %s/%s\n",SDCC_LIB_DIR/*STD_LIB_PATH*/,
-	     ( (options.model==0) ? "small": "large"));
+    switch(options.model)
+    {
+        case MODEL_SMALL:
+       	    c = "small";
+       	    break;
+       	case MODEL_LARGE:
+       	    c = "large";
+       	    break;
+       	case MODEL_FLAT24:
+       	    c = "flat24";
+       	    break;
+        default:
+            werror(W_UNKNOWN_MODEL, __FILE__, __LINE__);
+            c = "unknown";
+            break;
+    }
+    fprintf (lnkfile,"-k %s/%s\n",SDCC_LIB_DIR/*STD_LIB_PATH*/,c);
 	    
     /* other library paths if specified */
     for (i = 0 ; i < nlibPaths ; i++ )
@@ -1096,10 +1135,22 @@ static int preProcess (char **envp)
 	_addToList(preArgv, "-DSDCC_STACK_AUTO");
     
     /* set the macro for large model	*/
-    if ( options.model )
-	_addToList(preArgv, "-DSDCC_MODEL_LARGE");
-    else
-	_addToList(preArgv, "-DSDCC_MODEL_SMALL");
+    switch(options.model)
+    {
+        case MODEL_LARGE:
+	    _addToList(preArgv, "-DSDCC_MODEL_LARGE");
+	    break;
+    	case MODEL_SMALL:
+	    _addToList(preArgv, "-DSDCC_MODEL_SMALL");
+	    break;
+	case MODEL_FLAT24:
+	    _addToList(preArgv, "-DSDCC_MODEL_FLAT24");
+	    break;
+	default:
+	    werror(W_UNKNOWN_MODEL, __FILE__, __LINE__);
+	    break;
+    }	    
+	    
     
     /* add port (processor information to processor */
     sprintf(procDef,"-DSDCC_%s",port->target);

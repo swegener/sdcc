@@ -5,7 +5,7 @@ static char *_z80_keywords[] = { NULL };
 
 void z80_assignRegisters (eBBlock **ebbs, int count);
 
-static bool _z80_parseOptions(int *pargc, char **argv)
+static bool _z80_parseOptions(int *pargc, char **argv, int *i)
 {
     return FALSE;
 }
@@ -95,6 +95,8 @@ PORT z80_port = {
     _z80_setDefaultOptions,
     z80_assignRegisters,
     _z80_getRegName,
-    _z80_keywords
+    _z80_keywords,
+    0,	/* no assembler preamble */
+    0,	/* no local IVT generation code */
 };
 

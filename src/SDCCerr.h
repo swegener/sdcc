@@ -130,4 +130,5 @@
 #define  W_NONPTR2_GENPTR   127         /* non pointer cast to generic pointer */
 #define  W_POSSBUG          128         /* possible code generation error */
 #define  W_PTR_ASSIGN       129         /* incampatible pointer assignment */
+#define  W_UNKNOWN_MODEL    130		/* Unknown memory model */
 void werror(int, ...);

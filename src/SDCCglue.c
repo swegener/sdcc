@@ -30,6 +30,8 @@ symbol *interrupts[256];
 void printIval (symbol *, link *, initList *, FILE *);
 extern int noAlloc;
 set *publics = NULL;		/* public variables */
+
+/* TODO: this should be configurable (DS803C90 uses more than 6) */
 int maxInterrupts = 6;
 extern int maxRegBank ;
 symbol *mainf;
@@ -719,16 +721,25 @@ void createInterruptVect (FILE * vFile)
     
     fprintf (vFile, "\t.area\t%s\n", CODE_NAME);
     fprintf (vFile, "__interrupt_vect:\n");
+
     
-    fprintf (vFile, "\tljmp\t__sdcc_gsinit_startup\n");
+    if (!port->genIVT || ! (port->genIVT(vFile, interrupts, maxInterrupts)))
+    {
+        /* "generic" interrupt table header (if port doesn't specify one).
+         *
+         * Look suspiciously like 8051 code to me...
+         */
+    
+    	fprintf (vFile, "\tljmp\t__sdcc_gsinit_startup\n");
     
     
-    /* now for the other interrupts */
-    for (; i < maxInterrupts; i++) {
-	if (interrupts[i])
-	    fprintf (vFile, "\tljmp\t%s\n\t.ds\t5\n", interrupts[i]->rname);
-	else
-	    fprintf (vFile, "\treti\n\t.ds\t7\n");
+    	/* now for the other interrupts */
+    	for (; i < maxInterrupts; i++) {
+		if (interrupts[i])
+	    		fprintf (vFile, "\tljmp\t%s\n\t.ds\t5\n", interrupts[i]->rname);
+		else
+	    		fprintf (vFile, "\treti\n\t.ds\t7\n");
+    	}
     }
 }
 
@@ -901,6 +912,12 @@ void glue ()
     
     /* print module name */
     fprintf (asmFile, "\t.module %s\n", moduleName);
+    
+    /* Let the port generate any global directives, etc. */
+    if (port->genAssemblerPreamble)
+    {
+    	port->genAssemblerPreamble(asmFile);
+    }
     
     /* print the global variables in this module */
     printPublics (asmFile);

@@ -79,7 +79,7 @@ typedef struct {
     } muldiv;
 
     /** Parses one option + its arguments */
-    bool (*parseOption)(int *pargc, char **argv);
+    bool (*parseOption)(int *pargc, char **argv, int *i);
     /** Called after all the options have been parsed. */
     void (*finaliseOptions)(void);
     /** Called after the port has been selected but before any
@@ -95,6 +95,15 @@ typedef struct {
     /* list of keywords that are used by this
        target (used by lexer) */
     char **keywords; 
+    
+    /* Write any port specific assembler output. */
+    void (*genAssemblerPreamble)(FILE *of);
+    
+    /* Write the port specific IVT. If genIVT is NULL or if
+     * it returns zero, default (8051) IVT generation code
+     * will be used. 
+     */
+    int (*genIVT)(FILE *of, symbol **intTable, int intCount); 
 } PORT;
 
 extern PORT *port;

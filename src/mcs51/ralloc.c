@@ -768,7 +768,7 @@ static regs *getRegGpr (iCode *ic, eBBlock *ebp,symbol *sym)
     if (!mcs51_ptrRegReq)
 	if ((reg = allocReg(REG_PTR)))
 	    return reg ;
-
+	
     /* we have to spil */
     if (!spilSomething (ic,ebp,sym))
 	return NULL ;
@@ -1069,7 +1069,9 @@ static void serialRegAssign (eBBlock **ebbs, int count)
 		
 		/* if we need ptr regs for the right side
 		   then mark it */
-		if (POINTER_GET(ic) && getSize(OP_SYMBOL(IC_LEFT(ic))->type) < 2) {
+		if (POINTER_GET(ic) && getSize(OP_SYMBOL(IC_LEFT(ic))->type) 
+		    <= PTRSIZE) 
+		{
 		    mcs51_ptrRegReq++;
 		    ptrRegSet = 1;
 		}

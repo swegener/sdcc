@@ -142,7 +142,8 @@ struct  {
 { WARNING,"warning *** unreachable code %s(%d)\n"},
 { WARNING,"warning *** non-pointer type cast to _generic pointer\n"},
 { WARNING,"warning *** possible code generation error at line %d,\n send source to sandeep.dutta@usa.net\n"},
-{ WARNING,"warning *** pointer types incompatible \n" }
+{ WARNING,"warning *** pointer types incompatible \n" },
+{ WARNING,"warning *** unknown memory model at %s : %d\n" },
 };
 
 /****************************************************************************/

@@ -163,9 +163,14 @@ struct optimize {
     unsigned    noLoopReverse :1;
 } ;
 
+/* Values for options.model. */
+#define MODEL_SMALL	0
+#define MODEL_LARGE	1
+#define MODEL_FLAT24	2
+
 /* other command line options */
 struct options {
-    int model  : 1     ; /* LARGE == 1 */
+    int model  : 3     ; /* see MODEL_* defines above */
     int stackAuto : 3  ; /* Stack Automatic  */
     int useXstack : 3  ; /* use Xternal Stack */
     int genericPtr: 1  ; /* use generic pointers */

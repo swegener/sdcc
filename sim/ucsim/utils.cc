@@ -121,12 +121,12 @@ vformat_string(char *format, va_list ap)
   return(msg);
 #else
 #  ifdef HAVE_VSNPRINTF
-  char *msg= malloc(80*25);
+  char *msg= (char*)malloc(80*25);
   vsnprintf(msg, 80*25, format, ap);
   return(msg);
 #  else
 #    ifdef HAVE_VPRINTF
-  char *msg= malloc(80*25);
+  char *msg= (char*)malloc(80*25);
   vsprintf(msg, format, ap); /* Dangerous */
   return(msg);
 #    endif

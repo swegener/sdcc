@@ -814,9 +814,9 @@ printIvalCharPtr (symbol * sym, sym_link * type, value * val, FILE * oFile)
 	}
     }
 
-
-  if (val->sym && val->sym->isstrlit)
+  if (val->sym && val->sym->isstrlit && !isinSet(statsg->syms, val->sym)) {
     addSet (&statsg->syms, val->sym);
+  }
 
   return 1;
 }
@@ -994,7 +994,7 @@ emitStaticSeg (memmap * map, FILE * out)
 	    fprintf (out, " == .\n");
 
 	  /* if it has an initial value */
-	  if (!TARGET_IS_MCS51 && !TARGET_IS_DS390 && sym->ival)
+	  if (sym->ival)
 	    {
 	      fprintf (out, "%s:\n", sym->rname);
 	      noAlloc++;

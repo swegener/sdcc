@@ -33,6 +33,7 @@ extern hTab *iCodeSeqhTab;
 int  notUsedInBlock (symbol *, eBBlock *, iCode *);
 bool allDefsOutOfRange (bitVect *, int, int);
 void computeLiveRanges (eBBlock **, int);
+void recomputeLiveRanges (eBBlock **, int);
 
 void setFromRange (operand *, int);
 void setToRange (operand *, int, bool);

@@ -1,3 +1,19 @@
+2003-11-23 Klaus Flittner <klaus_flittner@gmx.de>
+
+	fixed bug #845089
+	* src/SDCCbitv.h,
+	* src/SDCCbitv.c: added function to free a bitvector
+	* src/SDCClrange.h,
+	* src/SDCClrange.c: added function to recompute the liveranges
+	* src/avr/ralloc.c,
+	* src/ds390/ralloc.c,
+	* src/hc08/ralloc.c,
+	* src/mcs51/ralloc.c,
+	* src/pic/ralloc.c,
+	* src/pic16/ralloc.c,
+	* src/xa51/ralloc.c,
+	* src/z80/ralloc.c: recompute the liveranges after register packing
+
 2003-11-21 Klaus Flittner <klaus_flittner@gmx.de>
 
 	* src/SDCCloop.c (newInduction): fixed bug #845630

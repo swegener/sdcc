@@ -50,6 +50,19 @@ newBitVect (int size)
 }
 
 /*-----------------------------------------------------------------*/
+/* freeBitVect - frees the memory used by the bitVector            */
+/*-----------------------------------------------------------------*/
+void
+freeBitVect (bitVect * bvp)
+{
+  if (!bvp)
+    return;
+
+  Safe_free (bvp->vect);
+  Safe_free (bvp);
+}
+
+/*-----------------------------------------------------------------*/
 /* bitVectResize - changes the size of a bit vector                */
 /*-----------------------------------------------------------------*/
 bitVect *

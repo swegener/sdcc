@@ -333,6 +333,28 @@ incUsed (iCode *ic, operand *op)
 }
 
 /*-----------------------------------------------------------------*/
+/* rliveClear - clears the rlive bitVectors                        */
+/*-----------------------------------------------------------------*/
+void
+rliveClear (eBBlock ** ebbs, int count)
+{
+  int i;
+
+  /* for all blocks do */
+  for (i = 0; i < count; i++)
+    {
+      iCode *ic;
+
+      /* for all instructions in this block do */
+      for (ic = ebbs[i]->sch; ic; ic = ic->next)
+        {
+	  freeBitVect (ic->rlive);
+	  ic->rlive = NULL;
+	}
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* rlivePoint - for each point compute the ranges that are alive   */
 /*-----------------------------------------------------------------*/
 void
@@ -646,5 +668,33 @@ computeLiveRanges (eBBlock ** ebbs, int count)
 
   /* compute which overlaps with what */
   computeClash(ebbs, count);
+}
+
+/*-----------------------------------------------------------------*/
+/* recomputeLiveRanges - recomputes the live ranges for variables  */
+/*-----------------------------------------------------------------*/
+void
+recomputeLiveRanges (eBBlock ** ebbs, int count)
+{
+  symbol * sym;
+  int key;
+
+  /* clear all rlive bitVectors */
+  rliveClear (ebbs, count);
+
+  sym = hTabFirstItem (liveRanges, &key);
+  if (sym)
+    {
+      do {
+        sym->used = 0;
+        sym->liveFrom = 0;
+        sym->liveTo = 0;
+        freeBitVect (sym->clashes);
+        sym->clashes = NULL;
+      } while ( (sym = hTabNextItem (liveRanges, &key)));
+    }
+
+  /* do the LR computation again */
+  computeLiveRanges (ebbs, count);
 }
 

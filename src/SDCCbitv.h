@@ -44,6 +44,7 @@ extern int bitVectDefault;
 /*-----------------------------------------------------------------*/
 /* bitvector related functions */
 bitVect *newBitVect (int);
+void freeBitVect (bitVect *);
 bitVect *bitVectResize (bitVect *, int);
 bitVect *bitVectSetBit (bitVect *, int);
 void bitVectUnSetBit (bitVect *, int);

@@ -3014,6 +3014,10 @@ z80_assignRegisters (eBBlock ** ebbs, int count)
   for (i = 0; i < count; i++)
     packRegisters (ebbs[i]);
 
+  /* liveranges probably changed by register packing
+     so we compute them again */
+  recomputeLiveRanges (ebbs, count);
+
   if (options.dump_pack)
     dumpEbbsToFileExt (DUMP_PACK, ebbs, count);
 

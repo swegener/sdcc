@@ -28,14 +28,15 @@
 #define STD_DS390_LIB         "libds390"
 
 // #undef HAVE_SYS_SOCKET_H
-// #undef HAVE_SYS_ISA_DEFS_H	
+// #undef HAVE_SYS_ISA_DEFS_H
 // #undef HAVE_ENDIAN_H
 
 #undef HAVE_STRERROR
 #define HAVE_VSNPRINTF
-#define vsnprintf _vsnprintf	
+#define vsnprintf _vsnprintf
 #undef HAVE_SPRINTF
 #undef HAVE_VSPRINTF
+#undef HAVE_MKSTEMP
 
 #define TYPE_BYTE char
 #define TYPE_WORD short

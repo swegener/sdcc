@@ -42,6 +42,14 @@ union float_long
     long l;
 };
 
+#if defined(SDCC_MATH_LIB) && defined(SDCC_mcs51) && !defined(SDCC_USE_XSTACK) && !defined(SDCC_STACK_AUTO) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
+// Compile the mcs51 assembly version only when all these
+// conditions are met.  Since not all the functions are
+// reentrant, do not compile with --stack-auto is used.
+#define MATH_ASM_MCS51
+#endif
+
+
 /* Functions on the z80 & gbz80 are always reentrant and so the "reentrant" */
 /* keyword is not defined. */
 #if defined(SDCC_z80) || defined(SDCC_gbz80)

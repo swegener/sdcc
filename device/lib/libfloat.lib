@@ -53,3 +53,4 @@ _fsnormalize
 _fsreturnval
 _fsrshift
 _fsswapargs
+_logexpf

@@ -68,7 +68,7 @@ SOURCES		= _atof.c _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
 		  printf_fast.c printf_fast_f.c printf_tiny.c \
 		  assert.c time.c bpx.c \
 		  _fsget1arg.c _fsget2args.c _fsnormalize.c \
-		  _fsreturnval.c _fsrshift.c _fsswapargs.c \
+		  _fsreturnval.c _fsrshift.c _fsswapargs.c _logexpf.c \
 		  fabsf.c frexpf.c ldexpf.c expf.c powf.c sincosf.c sinf.c \
 		  cosf.c logf.c log10f.c sqrtf.c tancotf.c tanf.c cotf.c \
 		  asincosf.c asinf.c acosf.c atanf.c atan2f.c sincoshf.c \

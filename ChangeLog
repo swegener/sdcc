@@ -1,3 +1,12 @@
+2004-12-31 Paul Stoffregen <paul AT pjrc.com>
+
+	* device/lib/logf.c: added mcs51 assembly version
+	* device/lib/expf.c: added mcs51 assembly version
+	* device/lib/_logexpf.c: new shared asm code for expf and logf
+	* device/include/math.h: add defines for assembly math library
+	* device/lib/Makefile.in: build new _logexpf.c
+	* device/lib/libfloat.lib: use new _logexpf.c
+
 2004-12-29 Slade Rich <slade_rich AT users.sourceforge.net>
 
 	* src/pic/device.c

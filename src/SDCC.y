@@ -523,12 +523,12 @@ Interrupt_storage
 
 type_specifier
    : type_specifier2
-   | type_specifier2 AT CONSTANT
+   | type_specifier2 AT constant_expr
         {
            /* add this to the storage class specifier  */
            SPEC_ABSA($1) = 1;   /* set the absolute addr flag */
            /* now get the abs addr from value */
-           SPEC_ADDR($1) = (int) floatFromVal ($3) ;
+           SPEC_ADDR($1) = (int) floatFromVal(constExprValue($3,TRUE)) ;
         }
    ;
 

@@ -38,23 +38,23 @@
 */
 
 #if !defined(SDCC_USE_XSTACK) || defined(_SDCC_NO_ASM_LIB_FUNCS)
-  #if defined(SDCC_ds390)
-    #if !defined(SDCC_STACK_AUTO)
-      #define _MULINT_ASM_LARGE
-    #endif
-  #elif defined(SDCC_mcs51)
-    #if defined(SDCC_MODEL_SMALL)
-      #if defined(SDCC_STACK_AUTO)
-        #define _MULINT_ASM_SMALL_AUTO
-      #else
-        #define _MULINT_ASM_SMALL
-      #endif
-    #else // must be SDCC_MODEL_LARGE
-      #if !defined(SDCC_STACK_AUTO)
-        #define _MULINT_ASM_LARGE
-      #endif
-    #endif
-  #endif
+#  if defined(SDCC_ds390)
+#    if !defined(SDCC_STACK_AUTO)
+#      define _MULINT_ASM_LARGE
+#    endif
+#  elif defined(SDCC_mcs51)
+#    if defined(SDCC_MODEL_SMALL)
+#      if defined(SDCC_STACK_AUTO)
+#        define _MULINT_ASM_SMALL_AUTO
+#      else
+#        define _MULINT_ASM_SMALL
+#      endif
+#    else // must be SDCC_MODEL_LARGE
+#      if !defined(SDCC_STACK_AUTO)
+#        define _MULINT_ASM_LARGE
+#     endif
+#   endif
+#  endif
 #endif
 
 #ifdef _MULINT_ASM_LARGE

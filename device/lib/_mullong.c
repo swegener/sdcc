@@ -35,15 +35,15 @@
 */
 
 #if !defined(SDCC_USE_XSTACK) || defined(_SDCC_NO_ASM_LIB_FUNCS)
-  #if defined(SDCC_mcs51)
-    #if defined(SDCC_MODEL_SMALL)
-      #if defined(SDCC_STACK_AUTO)
-        #define _MULLONG_ASM_SMALL_AUTO
-      #else
-        #define _MULLONG_ASM_SMALL
-      #endif
-    #endif
-  #endif
+#  if defined(SDCC_mcs51)
+#    if defined(SDCC_MODEL_SMALL)
+#      if defined(SDCC_STACK_AUTO)
+#        define _MULLONG_ASM_SMALL_AUTO
+#      else
+#        define _MULLONG_ASM_SMALL
+#      endif
+#    endif
+#  endif
 #endif
 
 #if defined _MULLONG_ASM_SMALL || defined _MULLONG_ASM_SMALL_AUTO

@@ -6,10 +6,10 @@
 
 /* memory segments */
 memmap  *xstack= NULL ;	 /* xternal stack data	       */
-memmap  *istack= NULL;	 /* internal stack	           */
-memmap  *code  = NULL;	 /* code segment	           */
+memmap  *istack= NULL;	 /* internal stack	       */
+memmap  *code  = NULL;	 /* code segment	       */
 memmap  *data  = NULL;	 /* internal data upto 128     */
-memmap  *xdata = NULL;	 /* external data			   */
+memmap  *xdata = NULL;	 /* external data	       */
 memmap  *idata = NULL;	 /* internal data upto 256     */
 memmap  *bit   = NULL;	 /* bit addressable space      */
 memmap  *statsg= NULL;	 /* the constant data segment  */

@@ -844,9 +844,19 @@ static void fetchPairLong(PAIR_ID pairId, asmop *aop, int offset)
     else { /* we need to get it byte by byte */
 	if (pairId == PAIR_HL && IS_GB && requiresHL(aop)) {
 	    aopGet(aop, offset, FALSE);
-	    emit2("!ldahli");
-	    emit2("ld h,!*hl");
-	    emit2("ld l,a");
+	    switch (aop->size) {
+	    case 1:
+		emit2("ld l,!*hl");
+		emit2("ld h,!immedbyte", 0);
+		break;
+	    case 2:
+		emit2("!ldahli");
+		emit2("ld h,!*hl");
+		emit2("ld l,a");
+		break;
+	    default:
+		emit2("; WARNING: mlh woosed out.  This code is invalid.");
+	    }
 	}
 	else if (IS_Z80 && aop->type == AOP_IY) {
 	    /* Instead of fetching relative to IY, just grab directly
@@ -1629,6 +1639,24 @@ static int _opUsesPair(operand *op, iCode *ic, PAIR_ID pairId)
     return ret;
 }
 
+/* This is quite unfortunate */
+static void setArea(int inHome)
+{
+    static int lastArea = 0;
+    
+    if (lastArea != inHome) {
+	if (inHome) {
+	    const char *sz = port->mem.code_name;
+	    port->mem.code_name = "HOME";
+	    emit2("!area", CODE_NAME);
+	    port->mem.code_name = sz;
+	}
+	else
+	    emit2("!area", CODE_NAME);
+	lastArea = inHome;
+    }
+}
+
 /** Emit the code for a call statement 
  */
 static void emitCall(iCode *ic, bool ispcall)
@@ -1798,7 +1826,6 @@ static void emitCall(iCode *ic, bool ispcall)
 static void genCall (iCode *ic)
 {
     link *detype = getSpec(operandType(IC_LEFT(ic)));
-    if (IS_BANKED(detype)) emit2("; call to a banked function");
     emitCall(ic, FALSE);
 }
 
@@ -1836,6 +1863,8 @@ static void genFunction (iCode *ic)
     link *fetype;
 
     nregssaved = 0;
+    setArea(IS_NONBANKED(sym->etype));
+
     /* create the function header */
     emit2("!functionheader", sym->name);
     /* PENDING: portability. */
@@ -1847,7 +1876,6 @@ static void genFunction (iCode *ic)
     /* if critical function then turn interrupts off */
     if (SPEC_CRTCL(fetype))
 	emit2("!di");
-    if (SPEC_BANKED(fetype)) emit2("; Iam banked");
 
     /* if this is an interrupt service routine then
     save acc, b, dpl, dph  */
@@ -2227,7 +2255,10 @@ static void genPlus (iCode *ic)
 	if (AOP_TYPE(IC_LEFT(ic)) == AOP_STK ||
 	    AOP_TYPE(IC_RIGHT(ic)) == AOP_STK ||
 	    AOP_TYPE(IC_RESULT(ic)) == AOP_STK) {
-	    if (size == 2) {
+	    if ((AOP_SIZE(IC_LEFT(ic)) == 2 ||
+		AOP_SIZE(IC_RIGHT(ic)) == 2) &&
+		(AOP_SIZE(IC_LEFT(ic)) <= 2 &&
+		 AOP_SIZE(IC_RIGHT(ic)) <= 2)) {
 		if (getPairId(AOP(IC_RIGHT(ic))) == PAIR_BC) {
 		    /* Swap left and right */
 		    operand *t = IC_RIGHT(ic);
@@ -2389,7 +2420,10 @@ static void genMinus (iCode *ic)
 	if (AOP_TYPE(IC_LEFT(ic)) == AOP_STK ||
 	    AOP_TYPE(IC_RIGHT(ic)) == AOP_STK ||
 	    AOP_TYPE(IC_RESULT(ic)) == AOP_STK) {
-	    if (size == 2) {
+	    if ((AOP_SIZE(IC_LEFT(ic)) == 2 ||
+		AOP_SIZE(IC_RIGHT(ic)) == 2) &&
+		(AOP_SIZE(IC_LEFT(ic)) <= 2 &&
+		 AOP_SIZE(IC_RIGHT(ic)) <= 2)) {
 		PAIR_ID left = getPairId(AOP(IC_LEFT(ic)));
 		PAIR_ID right = getPairId(AOP(IC_RIGHT(ic)));
 
@@ -4822,6 +4856,6 @@ void genZ80Code (iCode *lic)
 	peepHole (&lineHead);
 
     /* now do the actual printing */
-    printLine (lineHead,codeOutFile);
+    printLine (lineHead, codeOutFile);
     return;
 }

@@ -12,6 +12,7 @@ static va_list _iprintf(char *pInto, const char *szFormat, va_list ap)
 {
     char *pStart = pInto;
     char *sz = gc_strdup(szFormat);
+    static int count;
 
     while (*sz) {
 	if (*sz == '%') {
@@ -23,6 +24,16 @@ static va_list _iprintf(char *pInto, const char *szFormat, va_list ap)
 	    /* Name of the code segment */
 	    case 'C':
 		strcpy(pInto, CODE_NAME);
+		pInto = pStart + strlen(pStart);
+		sz++;
+		break;
+	    case 'F':
+		strcpy(pInto, srcFileName);
+		pInto = pStart + strlen(pStart);	
+		sz++;
+		break;
+	    case 'I':
+		sprintf(pInto, "%u", ++count);
 		pInto = pStart + strlen(pStart);
 		sz++;
 		break;
@@ -155,8 +166,8 @@ static const ASM_MAPPING _asxxxx_mapping[] = {
     { "immedword", "#0x%04X" },
     { "immedbyte", "#0x%02X" },
     { "hashedstr", "#%s" },
-    { "lsbimmeds", "#>%s" },
-    { "msbimmeds", "#<%s" },
+    { "lsbimmeds", "#<%s" },
+    { "msbimmeds", "#>%s" },
     { "module", ".module %s" },
     { "global", ".globl %s" },
     { "fileprelude", "" },

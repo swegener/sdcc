@@ -113,7 +113,7 @@ static const ASM_MAPPING _rgbds_mapping[] = {
     { "functionlabeldef", "%s:" },
     { "zero", "$00" },
     { "one", "$01" },
-    { "area", "SECTION \"%s\",%C" },
+    { "area", "SECTION \"%s_%F_%I\",%C" },
     { "areacode", "SECTION \"CODE\",%C" },
     { "areadata", "SECTION \"DATA\",BSS" },
     { "ascii", "DB \"%s\"" },

@@ -420,7 +420,7 @@ link  *mergeSpec ( link *dest, link *src )
     SPEC_BLEN(dest) |= SPEC_BLEN(src);
     SPEC_BSTR(dest) |= SPEC_BSTR(src);
     SPEC_TYPEDEF(dest) |= SPEC_TYPEDEF(src);
-    SPEC_BANKED(dest) |= SPEC_BANKED(src);
+    SPEC_NONBANKED(dest) |= SPEC_NONBANKED(src);
 
     if ( IS_STRUCT(dest) && SPEC_STRUCT(dest) == NULL )
 	SPEC_STRUCT(dest) = SPEC_STRUCT(src);   

@@ -14,13 +14,20 @@ static char _gbz80_defaultRules[] =
 
 Z80_OPTS z80_opts;
 
+typedef enum {
+    /* Must be first */
+    ASM_TYPE_ASXXXX,
+    ASM_TYPE_RGBDS,
+    ASM_TYPE_ISAS
+} ASM_TYPE;
+
 static struct {
-    bool fsetAsmType;
+    ASM_TYPE asmType;
 } _G;
 
 static char *_keywords[] = {
     "sfr",
-    "banked",
+    "nonbanked",
     NULL 
 };
 
@@ -72,10 +79,35 @@ static int _process_pragma(const char *sz)
 {
     if (_startsWith(sz, "bank=")) {
 	char buffer[128];
-	sprintf(buffer, "%s", sz+5);
+	strcpy(buffer, sz+5);
 	_chomp(buffer);
-	if (!strcmp(buffer, "BASE")) {
+	if (isdigit(buffer[0])) {
+	    
+	}
+	else if (!strcmp(buffer, "BASE")) {
 	    strcpy(buffer, "HOME");
+	}
+	if (isdigit(buffer[0])) {
+	    /* Arg was a bank number.  Handle in an ASM independent
+	       way. */
+	    char num[128];
+	    strcpy(num, sz+5);
+	    _chomp(num);
+
+	    switch (_G.asmType) {
+	    case ASM_TYPE_ASXXXX:
+		sprintf(buffer, "CODE_%s", num);
+		break;
+	    case ASM_TYPE_RGBDS:
+		sprintf(buffer, "CODE,BANK[%s]", num);
+		break;
+	    case ASM_TYPE_ISAS:
+		/* PENDING: what to use for ISAS? */
+		sprintf(buffer, "CODE,BANK(%s)", num);
+		break;
+	    default:
+		wassert(0);
+	    }
 	}
 	gbz80_port.mem.code_name = gc_strdup(buffer);
 	code->sname = gbz80_port.mem.code_name;
@@ -161,19 +193,18 @@ static bool _parseOptions(int *pargc, char **argv, int *i)
 		gbz80_port.assembler.cmd = _gbz80_rgbasmCmd;
 		gbz80_port.linker.cmd = _gbz80_rgblinkCmd;
 		gbz80_port.linker.do_link = _gbz80_rgblink;
-		_G.fsetAsmType = TRUE;
+		_G.asmType = ASM_TYPE_RGBDS;
 		return TRUE;
 	    }
 	    else if (!strcmp(argv[*i], "--asm=asxxxx")) {
-		asm_addTree(&_asxxxx_gb);
-		_G.fsetAsmType = TRUE;
+		_G.asmType = ASM_TYPE_ASXXXX;
 		return TRUE;
 	    }
 	    else if (!strcmp(argv[*i], "--asm=isas")) {
 		asm_addTree(&_isas_gb);
 		/* Munge the function prefix */
 		gbz80_port.fun_prefix = "";
-		_G.fsetAsmType = TRUE;
+		_G.asmType = ASM_TYPE_ISAS;
 		return TRUE;
 	    }
 	}
@@ -185,7 +216,7 @@ static void _finaliseOptions(void)
 {
     port->mem.default_local_map = data;
     port->mem.default_globl_map = data;
-    if (!_G.fsetAsmType && IS_GB)
+    if (_G.asmType == ASM_TYPE_ASXXXX && IS_GB)
 	asm_addTree(&_asxxxx_gb);
 }
 

@@ -1,11 +1,21 @@
+2004-06-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c (genPointerGetSetOfs): disabled optimization if
+	computed address is reused
+	* src/hc08/gen.c (genPackBits): fixed offsets in assignments to
+	multi-byte bitfields
+
 2004-06-01 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* src/z80/gen.c: (genArrayInit): must check for pointers too
 
 2004-06-01 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* support/regression/tests/zeropad.c: never meant to commit the
 	  nestedstruct test: removed, added check for GCC version
 
 2004-05-31 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* src/SDCCast.c (createIvalArray): fixed bug 770487 SIGSEGV
 	* src/SDCCglue.c (emitRegularMap): fixed bug 770484 allocation problem
 	* src/SDCCglue.c (initPointer, printIvalType, printIvalStruct,

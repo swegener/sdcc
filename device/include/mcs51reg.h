@@ -79,6 +79,9 @@
    Version 1.0.11 (Sept 19, 2004)
    Dallas DS5000 MCON Register declarations corrected by Radek Zadera / a2i@swipnet.se
 
+   Version 1.0.12 (March 2, 2005)
+   Infineon SAB80C509 Register declarations added Thomas Boje / thomas@boje.name
+
    Adding support for additional microcontrollers:
    -----------------------------------------------
 
@@ -137,6 +140,7 @@
    MICROCONTROLLER_DS8XC520     Dallas DS87C520 and DS83C520 microcontrollers
    MICROCONTROLLER_P80C552      Philips P80C552
    MICROCONTROLLER_P89C668      Philips P89C668
+   MICROCONTROLLER_SAB80C509    Infineon / Siemens SAB80C509
    MICROCONTROLLER_SAB80515     Infineon / Siemens SAB80515 & SAB80535
    MICROCONTROLLER_SAB80515A    Infineon / Siemens SAB80515A
    MICROCONTROLLER_SAB80517     Infineon / Siemens SAB80517
@@ -995,6 +999,138 @@
 #define CCAP4H_AT_0XFE
 #endif
 // end of definitions for the Philips P89C668
+
+
+// definitions for the Infineon / Siemens SAB80509
+#ifdef MICROCONTROLLER_SAB80509
+#ifdef MICROCONTROLLER_DEFINED
+#define MCS51REG_ERROR
+#endif
+#ifndef MICROCONTROLLER_DEFINED
+#define MICROCONTROLLER_DEFINED
+#endif
+#ifdef MCS51REG_ENABLE_WARNINGS
+#warning Selected HW: Infineon / Siemens SAB80509
+#endif
+// 8051 register set without IP
+#define P0
+#define SP
+#define DPL
+#define DPH
+#define PCON__SMOD__PDS__IDLS__x__x__x__PD__IDL
+#define TCON
+#define TMOD
+#define TL0
+#define TL1
+#define TH0
+#define TH1
+#define WDTREL
+#define P1
+#define XPAGE
+#define S0CON__SM0__SM1__SM20__REN0__TB80__RB80__TI0__RI0
+#define IEN2__SAB80517
+
+#define P2
+#define IE__EA_WDT_ET2_ES_ET1_EX1_ET0_EX0
+#define IP0__x__WDTS__IP0_5__IP0_4__IP0_3__IP0_2__IP0_1__IP0_0
+
+#define P3
+#define SYSCON
+#define IEN1__EXEN2__SWDT__EX6__EX5__EX4__EX3__EX2__EADC
+#define IP1__x__x__IP1_5__IP1_4__IP1_3__IP1_2__IP1_1__IP1_0
+
+#define IRCON
+#define CCEN
+#define CCL1
+#define CCH1
+#define CCL2
+#define CCH2
+#define CCL3
+#define CCH3
+#define CCL4
+#define CCH4
+#define CC4EN
+#define S0RELH
+#define S0RELL
+#define S1BUF
+#define S1CON_AT_0X9B
+#define S1RELH
+#define S1RELL
+#define T2CON__T2PS__I3FR__I2FR__T2R1__T2R0__T2CM__T2I1__T2I0
+
+#define PSW
+#define CMEN
+#define CMH0
+#define CML0
+#define CMH1
+#define CML1
+#define CMH2
+#define CML2
+#define CMH3
+#define CML3
+#define CMH4
+#define CML4
+#define CMH5
+#define CML5
+#define CMH6
+#define CML6
+#define CMH7
+#define CML7
+#define CMSEL
+#define CRCL
+#define CRCH
+#define CTCOM_AT_0XE1
+#define CTRELH
+#define CTRELL
+#define TL2
+#define TH2
+#define ADCON0
+#define ADCON1
+#define ADDATH
+#define ADDATL
+
+#define P4_AT_0XE8
+#define DPSEL
+#define ARCON
+#define MD0
+#define MD1
+#define MD2
+#define MD3
+#define MD4
+#define MD5
+#define S0BUF
+
+#define ACC
+
+#define B
+
+#define P5_AT_0XF8
+#define P6_AT_0XFA
+#define P7
+#define P8
+
+#define COMSETL
+#define COMSETH
+#define COMCLRL
+#define COMCLRH
+#define SETMSK
+#define CLRMSK
+#define SYSCON1
+#define FMODE
+#define PRSC
+#define CT1COM
+#define IEN3
+#define IRCON2
+#define EICC1
+#define CC1
+#define CC2
+#define CC3
+#define CC4
+#define CCR
+#define T2
+#define P9_AT_0XF9
+#endif
+// end of definitions for the Infineon / Siemens SAB80509
 
 
 // definitions for the Infineon / Siemens SAB80515 & SAB80535
@@ -1860,6 +1996,26 @@ sfr at 0xDE C1TMA0      ; // DS80C390 specific
 sfr at 0xDF C1TMA1      ; // DS80C390 specific
 #endif
 
+#ifdef CC1
+#undef CC1
+sfr at 0xC2 CC1;
+#endif
+
+#ifdef CC2
+#undef CC2
+sfr at 0xC4 CC2;
+#endif
+
+#ifdef CC3
+#undef CC3
+sfr at 0xC6 CC3;
+#endif
+
+#ifdef CC4
+#undef CC4
+sfr at 0xCE CC4;
+#endif
+
 #ifdef CC4EN
 #undef CC4EN
 sfr at 0xC9 CC4EN       ; // compare/capture 4 enable register SAB80517 specific
@@ -2046,6 +2202,11 @@ sbit at 0xC6 CR         ;
 sbit at 0xC7 CF         ;
 #endif
 
+#ifdef CCR
+#undef CCR
+sfr at 0xCA CCR;
+#endif
+
 #ifdef CH_AT_0XF9
 #undef CH_AT_0XF9
 sfr at 0xF9 CH          ;
@@ -2101,6 +2262,11 @@ sfr at 0x96 CKMOD       ; // DS89C420 specific
 #ifdef CL_AT_0XE9
 #undef CL_AT_0XE9
 sfr at 0xE9 CL          ;
+#endif
+
+#ifdef CLRMSK
+#undef CLRMSK
+sfr at 0xA6 CLRMSK;
 #endif
 
 #ifdef CMEN
@@ -2233,6 +2399,26 @@ sfr at 0xD9 CMOD        ;
 sfr at 0xF7 CMSEL       ; // compare input select SAB80517
 #endif
 
+#ifdef COMCLRH
+#undef COMCLRH
+sfr at 0xA4 COMCLRH;
+#endif
+
+#ifdef COMCLRL
+#undef COMCLRL
+sfr at 0xA3 COMCLRL;
+#endif
+
+#ifdef COMSETH
+#undef COMSETH
+sfr at 0xA2 COMSETH;
+#endif
+
+#ifdef COMSETL
+#undef COMSETL
+sfr at 0xA1 COMSETL;
+#endif
+
 #ifdef COR
 #undef COR
 sfr at 0xCE COR         ; // Dallas DS80C390 specific
@@ -2275,6 +2461,11 @@ sfr at 0xCA CRCL        ; // compare/reload/capture register, low byte SAB80515 
 #ifdef CRCLOW
 #undef CRCLOW
 sfr at 0xC2 CRCLOW      ; // DS5001 specific
+#endif
+
+#ifdef CT1COM
+#undef CT1COM
+sfr at 0xBC CT1COM;
 #endif
 
 #ifdef CTCOM_AT_0XE1
@@ -2440,6 +2631,11 @@ sfr at 0xD2 EECON       ;
 sfr at 0xD3 EETIM       ;
 #endif
 
+#ifdef EICC1
+#undef EICC1
+sfr at 0xBF EICC1;
+#endif
+
 #ifdef EIE__x__x__x__EWDI__EX5__EX4__EX3__EX2
 #undef EIE__x__x__x__EWDI__EX5__EX4__EX3__EX2
 sfr at 0xE8 EIE         ;
@@ -2592,6 +2788,11 @@ sfr at 0xD1 FCON        ;
 sfr at 0xD6 FDATA       ;
 #endif
 
+#ifdef FMODE
+#undef FMODE
+sfr at 0xB3 FMODE;
+#endif
+
 #ifdef IE__EA__x__x__ES__ET1__EX1__ET0__EX0
 #undef IE__EA__x__x__ES__ET1__EX1__ET0__EX0
 sfr at 0xA8 IE          ;
@@ -2731,6 +2932,11 @@ sbit at 0xBF EXEN2      ; // timer2 external reload interrupt enable
 #ifdef IEN2__SAB80517
 #undef IEN2__SAB80517
 sfr at 0x9A IEN2        ; // interrupt enable register 2 SAB80517
+#endif
+
+#ifdef IEN3
+#undef IEN3
+sfr at 0xBE IEN3;
 #endif
 
 #ifdef IP__x__x__x__PS__PT1__PX1__PT0__PX0
@@ -2947,6 +3153,11 @@ sbit at 0xC7 EXF2       ; // timer2 reload flag
 #ifdef IRCON1
 #undef IRCON1
 sfr at 0xD1 IRCON1      ; // interrupt control register - SAB80515 specific
+#endif
+
+#ifdef IRCON2
+#undef IRCON2
+sfr at 0xBF IRCON2;
 #endif
 
 #ifdef MA
@@ -3370,6 +3581,11 @@ sfr at 0xDB P7          ; // Port 7 - SAB80517 specific
 sfr at 0xDD P8          ; // Port 6 - SAB80517 specific
 #endif
 
+#ifdef P9_AT_0XF9
+#undef P9_AT_0XF9
+sfr at 0xF9 P9;
+#endif
+
 #ifdef PCON__SMOD__x__x__x__x__x__x__x
 #undef PCON__SMOD__x__x__x__x__x__x__x
 sfr at 0x87 PCON        ;
@@ -3515,6 +3731,11 @@ sfr at 0xC4 PMR         ; // DS89C420
 #define SWB         0x20
 #define CD0         0x40
 #define CD1         0x80
+#endif
+
+#ifdef PRSC
+#undef PRSC
+sfr at 0xB4 PRSC;
 #endif
 
 #ifdef PSW
@@ -3822,6 +4043,11 @@ sbit at 0xC7 FE_1       ;
 sbit at 0xC7 SM0_FE_1   ;
 #endif
 
+#ifdef SETMSK
+#undef SETMSK
+sfr at 0xA5 SETMSK;
+#endif
+
 #ifdef SP
 #undef SP
 sfr at 0x81 SP          ;
@@ -3964,6 +4190,7 @@ sfr at 0xEE STE         ; // Set enable, P80C552 specific
 #define TG47        0x80
 #endif
 
+
 #ifdef SYSCON
 #undef SYSCON
 sfr at 0xB1 SYSCON      ; // XRAM Controller Access Control
@@ -3972,6 +4199,16 @@ sfr at 0xB1 SYSCON      ; // XRAM Controller Access Control
 #define SYSCON_XMAP1 0x02
 #define SYSCON_RMAP  0x10
 #define SYSCON_EALE  0x20
+#endif
+
+#ifdef SYSCON1
+#undef SYSCON1
+sfr at 0xB2 SYSCON1;
+#endif
+
+#ifdef T2
+#undef T2
+sfr at 0xCC T2;
 #endif
 
 #ifdef T2CON__TF2__EXF2__RCLK__TCLK__EXEN2__TR2__C_T2__CP_RL2
@@ -4278,6 +4515,33 @@ sfr at 0x91 XPAGE       ; // Page Address Register for Extended On-Chip Ram - In
 #define SIO1_VECTOR     5       // 0x2b SIO1 (i2c)
 #define PCA_VECTOR      6       // 0x33 (Programmable Counter Array)
 #define TF2_VECTOR      7       // 0x3B (Timer 2)
+#endif
+
+#ifdef MICROCONTROLLER_SAB80509
+#define RI0_VECTOR      4       // 0x23 serial port 0
+#define TI0_VECTOR      4       // 0x23 serial port 0
+#define TF2_VECTOR      5       // 0x2B timer 2
+#define EX2_VECTOR      5       // 0x2B external interrupt 2
+                                // 0x33
+                                // 0x3B
+#define IADC_VECTOR     8       // 0x43 A/D converter interrupt
+#define IEX2_VECTOR     9       // 0x4B external interrupt 2
+#define IEX3_VECTOR    10       // 0x53 external interrupt 3
+#define IEX4_VECTOR    11       // 0x5B external interrupt 4
+#define IEX5_VECTOR    12       // 0x63 external interrupt 5
+#define IEX6_VECTOR    13       // 0x6B external interrupt 6
+                                // 0x73 not used
+                                // 0x7B not used
+#define SI1_VECTOR     16       // 0x83 serial port 1
+#define RI1_VECTOR     16       // 0x83 serial port 1
+#define TI1_VECTOR     16       // 0x83 serial port 1
+                                // 0x8B not used
+#define ICM_VECTOR     18       // 0x93 compare registers CM0-CM7
+#define CTF_VECTOR     19       // 0x9B compare time overflow
+#define ICS_VECTOR     20       // 0xA3 compare register COMSET
+#define ICR_VECTOR     21       // 0xAB compare register COMCLR
+#define ICC_VECTOR     26       // 0xD3 compare event interrupt ICC10-ICC17
+#define CT1_VECTOR     27       // 0xDB compare timer 1 oveflow
 #endif
 
 #ifdef MICROCONTROLLER_SAB80515

@@ -285,7 +285,9 @@ struct xa_dis_entry disass_xa[]= {
  {0,0x97c0,0xfffc,' ',4, JBC,   BIT_REL8     }, //  JBC bit,rel8               1 0 0 1 0 1 1 1  1 1 0 0 0 0 b b
  {1,0xd500,0xff00,' ',3, JMP,   REL16        }, //  JMP rel16                  1 1 0 1 0 1 0 1  rel16
  {0,0xd670,0xfff8,' ',2, JMP,   IREG         }, //  JMP [Rs]                   1 1 0 1 0 1 1 0  0 1 1 1 0 s s s
- /* JMP(2) */
+ {0,0xd646,0xffff,' ',2, JMP,   A_PLUSDPTR   }, //  JMP [A+dptr]               1 1 0 1 0 1 1 0  0 1 0 0 0 1 1 0
+ {0,0xd660,0xfff8,' ',2, JMP,   IIREG        }, //  JMP [[Rs+]]                1 1 0 1 0 1 1 0  0 1 1 0 0 s s s
+
  {0,0x97a0,0xfffc,' ',4, JNB,   BIT_REL8     }, //  JNB bit,rel8               1 0 0 1 0 1 1 1  1 0 1 0 0 0 b b
  {1,0xee00,0xff00,' ',2, JNZ,   REL8         }, //  JNZ rel8                   1 1 1 0 1 1 1 0  rel8
  {1,0xec00,0xff00,' ',2, JZ,    REL8         }, //  JZ rel8                    1 1 1 0 1 1 0 0  rel8

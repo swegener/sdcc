@@ -185,7 +185,9 @@ enum op_operands {
   IREG_DATA16_REL8,
 
   A_APLUSDPTR,
-  A_APLUSPC
+  A_APLUSPC,
+  A_PLUSDPTR,
+  IIREG
 };
 
 // table of dissassembled instructions

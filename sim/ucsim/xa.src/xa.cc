@@ -668,6 +668,15 @@ cl_xa::disass(t_addr addr, char *sep)
 	        (get_mem(MEM_ROM, addr+immed_offset+0)<<8));
       break;
 
+    case A_PLUSDPTR :
+      strcpy(parm_str, "[A+DPTR]");
+      break;
+
+    case IIREG :
+      sprintf(parm_str, "[[%s]]",
+              w_reg_strs[(code & 0x7)]);
+      break;
+
     default:
       strcpy(parm_str, "???");
     break;

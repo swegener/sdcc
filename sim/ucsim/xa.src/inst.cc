@@ -224,6 +224,10 @@ int cl_xa::inst_ASL(uint code, int operands)
           if ((dst & 0xffff) == 0)
             flags |= BIT_Z;
         break;
+        case 2: // ?
+          // not really sure about the encoding here..
+          NOTDONE_ASSERT;
+        break;
         case 3:  // dword
           //dst = reg4(RI_F0);
           dst = reg2(RI_F0) | (reg2(RI_F0 + 2) << 16);
@@ -262,6 +266,10 @@ int cl_xa::inst_ASL(uint code, int operands)
           if ((dst & 0xffff) == 0)
             flags |= BIT_Z;
         break;
+        case 2: // ?
+          // not really sure about the encoding here..
+          NOTDONE_ASSERT;
+        break;
         case 3:  // dword
           dst = reg1(RI_F0 & 0xe);
           cnt = operands & 0x1f;
@@ -282,9 +290,105 @@ int cl_xa::inst_ASL(uint code, int operands)
   return(resGO);
 }
 
+/* arithmetic shift right */
 int cl_xa::inst_ASR(uint code, int operands)
 {
-  NOTDONE_ASSERT;
+  unsigned int dst, cnt;
+  unsigned char flags;
+
+  /* ASR, dest, count
+    while (count != 0)
+      C = dest.0; dest >>= 1;
+      this is a confusing one...
+  */
+
+  flags = get_psw();
+  flags &= ~BIT_ALL; /* clear these bits */
+
+  switch(operands) {
+    case REG_REG :
+      cnt = reg1(RI_0F) & 0x1f;
+      switch (code & 0xc00) {
+        case 0: // byte
+          dst = reg1(RI_F0);
+          if ((cnt != 0) && (dst & (0x00000001 << (cnt-1))))
+            flags |= BIT_C;
+          if (dst & 0x01)
+            flags |= BIT_C;
+          dst >>= cnt;
+          set_reg1(RI_F0,dst);
+          if ((dst & 0xff) == 0)
+            flags |= BIT_Z;
+        break;
+        case 1: // word
+          dst = reg2(RI_F0);
+          if ((cnt != 0) && (dst & (0x00000001 << (cnt-1))))
+            flags |= BIT_C;
+          dst >>= cnt;
+          set_reg2(RI_F0,dst);
+          if ((dst & 0xffff) == 0)
+            flags |= BIT_Z;
+        break;
+        case 2: // ?
+          // not really sure about the encoding here..
+          NOTDONE_ASSERT;
+        break;
+        case 3:  // dword
+          dst = reg2(RI_F0) | (reg2(RI_F0 + 2) << 16);
+          if ((cnt != 0) && (dst & (0x00000001 << (cnt-1))))
+            flags |= BIT_C;
+          dst >>= cnt;
+          set_reg2(RI_F0,dst & 0xffff);
+          set_reg2(RI_F0+2, (dst>>16) & 0xffff);
+          if (dst == 0)
+            flags |= BIT_Z;
+        break;
+      }
+    break;
+
+    case REG_DATA4 :
+    case REG_DATA5 :
+      switch (code & 0xc00) {
+        case 0: // byte
+          dst = reg1(RI_F0);
+          cnt = operands & 0x0f;
+          if ((cnt != 0) && (dst & (0x00000001 << (cnt-1))))
+            flags |= BIT_C;
+          dst >>= cnt;
+          set_reg1(RI_F0,dst);
+          if ((dst & 0xff) == 0)
+            flags |= BIT_Z;
+        break;
+        case 1: // word
+          dst = reg2(RI_F0);
+          cnt = operands & 0x0f;
+          if ((cnt != 0) && (dst & (0x00000001 << (cnt-1))))
+            flags |= BIT_C;
+          dst >>= cnt;
+          set_reg2(RI_F0,dst);
+          if ((dst & 0xffff) == 0)
+            flags |= BIT_Z;
+        break;
+        case 2: // ?
+          // not really sure about the encoding here..
+          NOTDONE_ASSERT;
+        break;
+        case 3:  // dword
+          dst = reg1(RI_F0 & 0xe);
+          cnt = operands & 0x1f;
+          if ((cnt != 0) && (dst & (0x00000001 << (cnt-1))))
+            flags |= BIT_C;
+          dst >>= cnt;
+          set_reg2(RI_F0,dst & 0xffff);
+          set_reg2(RI_F0+2, (dst>>16) & 0xffff);
+          if (dst == 0)
+            flags |= BIT_Z;
+        break;
+      }
+    break;
+  }
+  set_psw(flags);
+
   return(resGO);
 }
 

@@ -17,14 +17,14 @@
 //
 // added by Jean Louis VERN for
 // his shift stuff
-replace restart {
+replace {
         xch     a,%1
         xch     a,%1
 } by {
         ;       Peephole 2.a    removed redundant xch xch
 }
 
-replace restart {
+replace {
 // saving 2 byte
         mov     %1,#0x00
         mov     a,#0x00
@@ -34,7 +34,7 @@ replace restart {
         mov     %1,a
 }
 
-replace restart {
+replace {
 // saving 1 byte
         mov     %1,#0x00
         clr     a
@@ -44,7 +44,7 @@ replace restart {
         mov     %1,a
 }
 
-replace restart {
+replace {
 // saving 1 byte, loosing 1 cycle but maybe allowing peephole 3.b to start
         mov     %1,#0x00
         mov     %2,#0x00
@@ -2498,7 +2498,7 @@ replace {
 	mov	r%1,a
 	jz	%3
 } by {
-        ;       Peephole 245.a   optimized conditional jump (r%1 and acc not set!)
+        ;       Peephole 245.a  optimized conditional jump (r%1 and acc not set!)
 	jc	%3
 } if labelRefCount %2 1
 
@@ -2516,6 +2516,508 @@ replace {
 	mov	r%1,a
 	jnz	%3
 } by {
-        ;       Peephole 245.b   optimized conditional jump (r%1 and acc not set!)
+        ;       Peephole 245.b  optimized conditional jump (r%1 and acc not set!)
 	jnc	%3
 } if labelRefCount %2 1
+
+
+// rules 246.x apply to f.e. bitfields.c
+replace {
+        mov     dptr,#%1
+        movx    a,@dptr
+        anl     a,#%2
+        movx    @dptr,a
+        mov     dptr,#%1
+        movx    a,@dptr
+        anl     a,#%3
+        movx    @dptr,a
+} by {
+        ;       Peephole 246.a  combined clr/clr 
+        mov     dptr,#%1
+        movx    a,@dptr
+        anl     a,#%2&%3
+        movx    @dptr,a
+}
+
+replace {
+        mov     dptr,#%1
+        movx    a,@dptr
+        orl     a,#%2
+        movx    @dptr,a
+        mov     dptr,#%1
+        movx    a,@dptr
+        orl     a,#%3
+        movx    @dptr,a
+} by {
+        ;       Peephole 246.b  combined set/set 
+        mov     dptr,#%1
+        movx    a,@dptr
+        orl     a,#%2|%3
+        movx    @dptr,a
+}
+
+replace {
+        mov     dptr,#%1
+        movx    a,@dptr
+        orl     a,#%2
+        movx    @dptr,a
+        mov     dptr,#%1
+        movx    a,@dptr
+        anl     a,#%3
+        movx    @dptr,a
+} by {
+        ;       Peephole 246.c  combined set/clr 
+        mov     dptr,#%1
+        movx    a,@dptr
+        orl     a,#%2
+        anl     a,#%3
+        movx    @dptr,a
+}
+
+replace {
+        mov     dptr,#%1
+        movx    a,@dptr
+        anl     a,#%2
+        movx    @dptr,a
+        mov     dptr,#%1
+        movx    a,@dptr
+        orl     a,#%3
+        movx    @dptr,a
+} by {
+        ;       Peephole 246.d  combined clr/set 
+        mov     dptr,#%1
+        movx    a,@dptr
+        anl     a,#%2
+        orl     a,#%3
+        movx    @dptr,a
+}
+
+replace {
+        mov     dptr,#%1
+        movx    a,@dptr
+        orl     a,#%2
+        anl     a,#%3
+        movx    @dptr,a
+        mov     dptr,#%1
+        movx    a,@dptr
+        anl     a,#%4
+        movx    @dptr,a
+} by {
+        ;       Peephole 246.e  combined set/clr/clr 
+        mov     dptr,#%1
+        movx    a,@dptr
+        orl     a,#%2
+        anl     a,#%3&%4
+        movx    @dptr,a
+}
+
+replace {
+        mov     dptr,#%1
+        movx    a,@dptr
+        orl     a,#%2
+        anl     a,#%3
+        movx    @dptr,a
+        mov     dptr,#%1
+        movx    a,@dptr
+        orl     a,#%4
+        movx    @dptr,a
+} by {
+        ;       Peephole 246.f  combined set/clr/set 
+        mov     dptr,#%1
+        movx    a,@dptr
+        orl     a,#%2
+        anl     a,#%3
+        orl     a,#%4
+        movx    @dptr,a
+}
+
+replace {
+        mov     dptr,#%1
+        movx    a,@dptr
+        anl     a,#%2
+        orl     a,#%3
+        movx    @dptr,a
+        mov     dptr,#%1
+        movx    a,@dptr
+        anl     a,#%4
+        movx    @dptr,a
+} by {
+        ;       Peephole 246.g  combined clr/set/clr 
+        mov     dptr,#%1
+        movx    a,@dptr
+        anl     a,#%2
+        orl     a,#%3
+        anl     a,#%4
+        movx    @dptr,a
+}
+
+replace {
+        mov     dptr,#%1
+        movx    a,@dptr
+        anl     a,#%2
+        orl     a,#%3
+        movx    @dptr,a
+        mov     dptr,#%1
+        movx    a,@dptr
+        orl     a,#%4
+        movx    @dptr,a
+} by {
+        ;       Peephole 246.h  combined clr/set/set 
+        mov     dptr,#%1
+        movx    a,@dptr
+        anl     a,#%2
+        orl     a,#%3|%4
+        movx    @dptr,a
+}
+
+
+
+
+// rules 247.x apply to f.e. bitfields.c
+replace {
+        mov     r%5,#%1
+        mov     a,@r%5
+        anl     a,#%2
+        mov     @r%5,a
+        mov     r%5,#%1
+        mov     a,@r%5
+        anl     a,#%3
+        mov     @r%5,a
+} by {
+        ;       Peephole 247.a  combined clr/clr 
+        mov     r%5,#%1
+        mov     a,@r%5
+        anl     a,#%2&%3
+        mov     @r%5,a
+}
+
+replace {
+        mov     r%5,#%1
+        mov     a,@r%5
+        orl     a,#%2
+        mov     @r%5,a
+        mov     r%5,#%1
+        mov     a,@r%5
+        orl     a,#%3
+        mov     @r%5,a
+} by {
+        ;       Peephole 247.b  combined set/set 
+        mov     r%5,#%1
+        mov     a,@r%5
+        orl     a,#%2|%3
+        mov     @r%5,a
+}
+
+replace {
+        mov     r%5,#%1
+        mov     a,@r%5
+        orl     a,#%2
+        mov     @r%5,a
+        mov     r%5,#%1
+        mov     a,@r%5
+        anl     a,#%3
+        mov     @r%5,a
+} by {
+        ;       Peephole 247.c  combined set/clr 
+        mov     r%5,#%1
+        mov     a,@r%5
+        orl     a,#%2
+        anl     a,#%3
+        mov     @r%5,a
+}
+
+replace {
+        mov     r%5,#%1
+        mov     a,@r%5
+        anl     a,#%2
+        mov     @r%5,a
+        mov     r%5,#%1
+        mov     a,@r%5
+        orl     a,#%3
+        mov     @r%5,a
+} by {
+        ;       Peephole 247.d  combined clr/set 
+        mov     r%5,#%1
+        mov     a,@r%5
+        anl     a,#%2
+        orl     a,#%3
+        mov     @r%5,a
+}
+
+replace {
+        mov     r%5,#%1
+        mov     a,@r%5
+        orl     a,#%2
+        anl     a,#%3
+        mov     @r%5,a
+        mov     r%5,#%1
+        mov     a,@r%5
+        anl     a,#%4
+        mov     @r%5,a
+} by {
+        ;       Peephole 247.e  combined set/clr/clr 
+        mov     r%5,#%1
+        mov     a,@r%5
+        orl     a,#%2
+        anl     a,#%3&%4
+        mov     @r%5,a
+}
+
+replace {
+        mov     r%5,#%1
+        mov     a,@r%5
+        orl     a,#%2
+        anl     a,#%3
+        mov     @r%5,a
+        mov     r%5,#%1
+        mov     a,@r%5
+        orl     a,#%4
+        mov     @r%5,a
+} by {
+        ;       Peephole 247.f  combined set/clr/set 
+        mov     r%5,#%1
+        mov     a,@r%5
+        orl     a,#%2
+        anl     a,#%3
+        orl     a,#%4
+        mov     @r%5,a
+}
+
+replace {
+        mov     r%5,#%1
+        mov     a,@r%5
+        anl     a,#%2
+        orl     a,#%3
+        mov     @r%5,a
+        mov     r%5,#%1
+        mov     a,@r%5
+        anl     a,#%4
+        mov     @r%5,a
+} by {
+        ;       Peephole 247.g  combined clr/set/clr 
+        mov     r%5,#%1
+        mov     a,@r%5
+        anl     a,#%2
+        orl     a,#%3
+        anl     a,#%4
+        mov     @r%5,a
+}
+
+replace {
+        mov     r%5,#%1
+        mov     a,@r%5
+        anl     a,#%2
+        orl     a,#%3
+        mov     @r%5,a
+        mov     r%5,#%1
+        mov     a,@r%4
+        orl     a,#%4
+        mov     @r%5,a
+} by {
+        ;       Peephole 247.h  combined clr/set/set 
+        mov     r%5,#%1
+        mov     a,@r%5
+        anl     a,#%2
+        orl     a,#%3|%4
+        mov     @r%5,a
+}
+
+
+// Peepholes 248.x have to be compatible with the keyword volatile.
+// They optimize typical accesses to memory mapped I/O devices:
+// volatile xdata char t; t|=0x01; 
+replace {
+        mov     dptr,%1
+        movx    a,@dptr
+        mov     r%2,a
+        mov     dptr,%1
+        mov     a,%3
+        orl     a,r%2
+        movx    @dptr,a
+} by {
+        ;       Peephole 248.a  optimized or to xdata
+        mov     dptr,%1
+        movx    a,@dptr
+        mov     r%2,a
+        orl     a,%3
+        movx    @dptr,a
+}
+
+// volatile xdata char t; t&=0x01; 
+replace {
+        mov     dptr,%1
+        movx    a,@dptr
+        mov     r%2,a
+        mov     dptr,%1
+        mov     a,%3
+        anl     a,r%2
+        movx    @dptr,a
+} by {
+        ;       Peephole 248.b  optimized and to xdata
+        mov     dptr,%1
+        movx    a,@dptr
+        mov     r%2,a
+        anl     a,%3
+        movx    @dptr,a
+}
+
+// volatile xdata char t; t^=0x01; 
+replace {
+        mov     dptr,%1
+        movx    a,@dptr
+        mov     r%2,a
+        mov     dptr,%1
+        mov     a,%3
+        xrl     a,r%2
+        movx    @dptr,a
+} by {
+        ;       Peephole 248.c  optimized xor to xdata
+        mov     dptr,%1
+        movx    a,@dptr
+        mov     r%2,a
+        xrl     a,%3
+        movx    @dptr,a
+}
+
+// volatile xdata char t; t|=0x01; t&=~0x01; t|=0x01;
+replace {
+        mov     dptr,%1
+        movx    a,@dptr
+        mov     r%2,a
+        orl     a,%3
+        movx    @dptr,a
+
+        mov     dptr,%1
+        movx    a,@dptr
+        mov     r%2,a
+        anl     a,%4
+        movx    @dptr,a
+
+        mov     dptr,%1
+        movx    a,@dptr
+        mov     r%2,a
+        orl     a,%5
+        movx    @dptr,a
+} by {
+        ;       Peephole 248.d  optimized or/and/or to volatile xdata
+        mov     dptr,%1
+        movx    a,@dptr
+        orl     a,%3
+        movx    @dptr,a
+        movx    a,@dptr
+        anl     a,%4
+        movx    @dptr,a
+        movx    a,@dptr
+        mov     r%2,a
+        orl     a,%5
+        movx    @dptr,a
+}
+
+// volatile xdata char t; t&=~0x01; t|=0x01; t&=~0x01;
+replace {
+        mov     dptr,%1
+        movx    a,@dptr
+        mov     r%2,a
+        anl     a,%3
+        movx    @dptr,a
+
+        mov     dptr,%1
+        movx    a,@dptr
+        mov     r%2,a
+        orl     a,%4
+        movx    @dptr,a
+
+        mov     dptr,%1
+        movx    a,@dptr
+        mov     r%2,a
+        anl     a,%5
+        movx    @dptr,a
+} by {
+        ;       Peephole 248.e  optimized and/or/and to volatile xdata
+        mov     dptr,%1
+        movx    a,@dptr
+        anl     a,%3
+        movx    @dptr,a
+        movx    a,@dptr
+        orl     a,%4
+        movx    @dptr,a
+        movx    a,@dptr
+        mov     r%2,a
+        anl     a,%5
+        movx    @dptr,a
+}
+
+// volatile xdata char t; t|=0x01; t&=~0x01;
+replace {
+        mov     dptr,%1
+        movx    a,@dptr
+        mov     r%2,a
+        orl     a,%3
+        movx    @dptr,a
+
+        mov     dptr,%1
+        movx    a,@dptr
+        mov     r%2,a
+        anl     a,%4
+        movx    @dptr,a
+} by {
+        ;       Peephole 248.f  optimized or/and to volatile xdata
+        mov     dptr,%1
+        movx    a,@dptr
+        orl     a,%3
+        movx    @dptr,a
+        movx    a,@dptr
+        mov     r%2,a
+        anl     a,%4
+        movx    @dptr,a
+}
+
+// volatile xdata char t; t&=~0x01; t|=0x01;
+replace {
+        mov     dptr,%1
+        movx    a,@dptr
+        mov     r%2,a
+        anl     a,%3
+        movx    @dptr,a
+
+        mov     dptr,%1
+        movx    a,@dptr
+        mov     r%2,a
+        orl     a,%4
+        movx    @dptr,a
+} by {
+        ;       Peephole 248.g  optimized and/or to volatile xdata
+        mov     dptr,%1
+        movx    a,@dptr
+        anl     a,%3
+        movx    @dptr,a
+        movx    a,@dptr
+        mov     r%2,a
+        orl     a,%4
+        movx    @dptr,a
+}
+
+// volatile xdata char t; t^=0x01; t^=0x01;
+replace {
+        mov     dptr,%1
+        movx    a,@dptr
+        mov     r%2,a
+        xrl     a,%3
+        movx    @dptr,a
+
+        mov     dptr,%1
+        movx    a,@dptr
+        mov     r%2,a
+        xrl     a,%4
+        movx    @dptr,a
+} by {
+        ;       Peephole 248.h  optimized xor/xor to volatile xdata
+        mov     dptr,%1
+        movx    a,@dptr
+        xrl     a,%3
+        movx    @dptr,a
+        movx    a,@dptr
+        mov     r%2,a
+        xrl     a,%4
+        movx    @dptr,a
+}

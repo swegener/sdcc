@@ -393,11 +393,7 @@ noOverLap (set * itmpStack, symbol * fsym)
   for (sym = setFirstItem (itmpStack); sym;
        sym = setNextItem (itmpStack))
     {
-	    if (sym->liveFrom < fsym->liveTo &&
-		sym->liveTo   > fsym->liveTo) return 0;
-
-	    if (sym->liveFrom < fsym->liveFrom &&
-		sym->liveTo > fsym->liveFrom) return 0;
+	if (bitVectBitValue(sym->clashes,fsym->key)) return 0;
     }
 
   return 1;

@@ -125,9 +125,13 @@ regs *pic14_regWithIdx (int idx)
 {
     int i ;
     
+    printf("%s - idx=%d\n",__FUNCTION__,idx);
+
     for (i=0;i < pic14_nRegs;i++)
 	if (regspic14[i].rIdx == idx)
 	    return &regspic14[i];
+
+    return &regspic14[0];
 
     werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
 	   "regWithIdx not found");
@@ -1271,7 +1275,9 @@ static char *rematStr (symbol *sym)
 
     while (1) {
 
+	printf("%s\n",s);
         /* if plus or minus print the right hand side */
+/*
         if (ic->op == '+' || ic->op == '-') {
             sprintf(s,"0x%04x %c ",(int) operandLitValue(IC_RIGHT(ic)),
                     ic->op );
@@ -1279,12 +1285,26 @@ static char *rematStr (symbol *sym)
             ic = OP_SYMBOL(IC_LEFT(ic))->rematiCode;
             continue ;
         }
+*/
+        if (ic->op == '+' || ic->op == '-') {
+            iCode *ric = OP_SYMBOL(IC_LEFT(ic))->rematiCode;
+            sprintf(s,"(%s %c 0x%04x)",
+		    OP_SYMBOL(IC_LEFT(ric))->rname,
+                    ic->op,
+		    (int) operandLitValue(IC_RIGHT(ic)));
+
+	    //s += strlen(s);
+	    //ic = OP_SYMBOL(IC_LEFT(ic))->rematiCode;
+            //continue ;
+	    return buffer;
+        }
 
         /* we reached the end */
         sprintf(s,"%s",OP_SYMBOL(IC_LEFT(ic))->rname);
         break;
     }
 
+	printf("%s\n",buffer);
     return buffer ;
 }
 
@@ -2272,6 +2292,8 @@ void pic14_assignRegisters (eBBlock **ebbs, int count)
 {
     iCode *ic;
     int i ;
+
+    fprintf(stderr,"%s:%s",__FILE__,__FUNCTION__);
 
     setToNull((void *)&_G.funcrUsed);
     pic14_ptrRegReq = _G.stackExtend = _G.dataExtend = 0;

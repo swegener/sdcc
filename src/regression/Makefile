@@ -55,7 +55,13 @@ SIMULATE = simulate
 
 # List the C files to be test here:
 SRC = b.c \
-	compare.c
+	add.c \
+	bool1.c \
+	call1.c \
+	compare.c \
+	compare2.c \
+	for.c \
+	while.c
 
 COD := $(patsubst %.c, %.cod, $(SRC))
 ASM := $(patsubst %.c, %.asm, $(SRC))

@@ -110,7 +110,7 @@ char *pic14aopLiteral (value *val, int offset)
 static void pic14emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 {
     symbol *sym;
-    int i,size;
+    int i,size,bitvars=0;;
 
     if (addPublics)
       fprintf (map->oFile, ";\t.area\t%s\n", map->sname);
@@ -173,13 +173,30 @@ static void pic14emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	}
 	else {
 	    /* allocate space */
-	  //if (options.debug || sym->level == 0)
-	  //fprintf(map->oFile,"==.\n");
+
+	  /* If this is a bit variable, then allocate storage after 8 bits have been declared */
+	  /* unlike the 8051, the pic does not have a separate bit area. So we emulate bit ram */
+	  /* by grouping the bits together into groups of 8 and storing them in the normal ram.*/
+	  if(IS_BITVAR(sym->etype)) {
+	    if((bitvars % 8) == 0) {
+	      fprintf (map->oFile, "  cblock\n");
+	      fprintf (map->oFile, "\tbitfield%d\n", bitvars);
+	      fprintf (map->oFile, "  endc\n");
+	    }
+
+	    fprintf (map->oFile, "%s\tEQU\t( (bitfield%d<<3)+%d)\n",
+		     sym->rname,
+		     bitvars & 0xfff8,
+		     bitvars & 0x0007);
+	      
+	    bitvars++;
+	  } else {
 	    fprintf (map->oFile, "\t%s\n", sym->rname);
 	    if( (size = (unsigned int)getSize (sym->type) & 0xffff)>1) {
 	      for(i=1; i<size; i++)
-		fprintf (map->oFile, "\t%s_%d\n", sym->rname,size);
+		fprintf (map->oFile, "\t%s_%d\n", sym->rname,i);
 	    }
+	  }
 	      //fprintf (map->oFile, "\t.ds\t0x%04x\n", (unsigned int)getSize (sym->type) & 0xffff);
 	}
 	
@@ -957,6 +974,16 @@ void pic14glue ()
     /* Put all variables into a cblock */
     fprintf (asmFile, "\n\n\tcblock  0x13\n\n");
 
+    /* For now, create a "dpl" and a "dph" in the register space */
+    /* of the pic so that we can use the same calling mechanism */
+    /* as the 8051 port */
+    fprintf (asmFile, "%s", iComments2);
+    fprintf (asmFile, "; dpl and dph to emulate the 8051 calling mechanism \n");
+    fprintf (asmFile, "%s", iComments2);
+
+    fprintf (asmFile, "\tdph\n");
+
+
 
     /* copy the sbit segment */
     fprintf (asmFile, "%s", iComments2);
@@ -976,12 +1003,6 @@ void pic14glue ()
     fprintf (asmFile, "; overlayable items in internal ram \n");
     fprintf (asmFile, "%s", iComments2);    
     copyFile (asmFile, ovrFile);
-
-    /* copy the bit segment */
-    fprintf (asmFile, "%s", iComments2);
-    fprintf (asmFile, "; bit data\n");
-    fprintf (asmFile, "%s", iComments2);
-    copyFile (asmFile, bit->oFile);
 
     /* create the stack segment MOF */
     if (mainf && mainf->fbody) {
@@ -1016,6 +1037,15 @@ void pic14glue ()
     
 
     fprintf (asmFile, "\tendc\n");
+
+
+    /* copy the bit segment */
+    fprintf (asmFile, "%s", iComments2);
+    fprintf (asmFile, "; bit data\n");
+    fprintf (asmFile, "%s", iComments2);
+    copyFile (asmFile, bit->oFile);
+
+
     fprintf (asmFile, "\tORG 0\n");
 
     /* copy the interrupt vector table */

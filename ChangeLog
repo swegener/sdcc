@@ -1,5 +1,7 @@
 2003-04-04    <johan@balder>
 
+	* src/SDCCloop.c (DEFSETFUNC): undid the fix for bug #519584
+	* src/SDCCast.c (decorateType): fixed bug #715076
 	* src/SDCC.y: fixed bug #702907
 
 2003-04-03    <johan@balder>

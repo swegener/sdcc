@@ -1,3 +1,9 @@
+//#define LIVERANGEHUNT
+#ifdef LIVERANGEHUNT
+  #define LRH(x) x
+#else
+  #define LRH(x)
+#endif
 /*-----------------------------------------------------------------*/
 /* SDCCmem.c - 8051 memory management routines                     */
 /*-----------------------------------------------------------------*/
@@ -1020,8 +1026,8 @@ printAllocInfoSeg (memmap * map, symbol * func, FILE * of)
 	{
 	  int i;
 	  if (!OP_SYMBOL(sym->reqv)->nRegs) {
-	    printf ("*** warning: %s -> %s\n", sym->name, 
-		    OP_SYMBOL(sym->reqv)->name);
+	    LRH(printf ("*** warning: %s -> %s\n", sym->name, \
+		    OP_SYMBOL(sym->reqv)->name));
 	  }
 	  sym = OP_SYMBOL (sym->reqv);
 	  fprintf (of, "registers ");

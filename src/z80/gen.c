@@ -7491,7 +7491,7 @@ genArrayInit (iCode * ic)
     
   if (type && type->next)
     {
-      if (IS_SPEC(type->next))
+      if (IS_SPEC(type->next) || IS_PTR(type->next))
         {
           elementSize = getSize(type->next);
         }

@@ -1,4 +1,7 @@
 2004-06-01 Maarten Brock <sourceforge.brock AT dse.nl>
+	* src/z80/gen.c: (genArrayInit): must check for pointers too
+
+2004-06-01 Maarten Brock <sourceforge.brock AT dse.nl>
 	* support/regression/tests/zeropad.c: never meant to commit the
 	  nestedstruct test: removed, added check for GCC version
 

@@ -192,7 +192,7 @@ static const char *_linkCmd[] =
 
 static const char *_asmCmd[] =
 {
-  "asx8051", "-plosgff", "$1.asm", NULL
+  "asx8051", "$l", "-plosgff", "$1.asm", NULL
 };
 
 /* Globals */

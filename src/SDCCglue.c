@@ -1354,14 +1354,21 @@ createInterruptVect (FILE * vFile)
 
       fprintf (vFile, "\tljmp\t__sdcc_gsinit_startup\n");
 
-
       /* now for the other interrupts */
       for (; i < maxInterrupts; i++)
 	{
 	  if (interrupts[i])
-	    fprintf (vFile, "\tljmp\t%s\n\t.ds\t5\n", interrupts[i]->rname);
+	    {
+	      fprintf (vFile, "\tljmp\t%s\n", interrupts[i]->rname);
+	      if ( i != maxInterrupts - 1 )
+	 	fprintf (vFile, "\t.ds\t5\n");
+	    }
 	  else
-	    fprintf (vFile, "\treti\n\t.ds\t7\n");
+	    {
+	      fprintf (vFile, "\treti\n");
+	      if ( i != maxInterrupts - 1 )
+		fprintf (vFile, "\t.ds\t7\n");
+	    }
 	}
     }
 }

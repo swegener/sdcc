@@ -1103,7 +1103,7 @@ static void serialRegAssign (eBBlock **ebbs, int count)
 				     OP_SYMBOL(IC_LEFT(ic)),ic->lineno);
 		/* do the same for the right operand */
 		if (IC_RIGHT(ic) && IS_SYMOP(IC_RIGHT(ic)) &&
-		    OP_SYMBOL(IC_RIGHT(ic))->nRegs && ic->op != '=')
+		    OP_SYMBOL(IC_RIGHT(ic))->nRegs)
 			positionRegs(OP_SYMBOL(IC_RESULT(ic)),
 				     OP_SYMBOL(IC_RIGHT(ic)),ic->lineno);
 		

@@ -83,9 +83,9 @@ pcseDef (void *item, va_list ap)
 
 void ReplaceOpWithCheaperOp(operand **op, operand *cop) {
 #ifdef RANGEHUNT
-  printf ("ReplaceOpWithCheaperOp (%s:%d with %s:%d): ", 
-	  OP_SYMBOL((*op))->name, OP_SYMBOL((*op))->isreqv,
-	  OP_SYMBOL(cop)->name, OP_SYMBOL(cop)->isreqv);
+  printf ("ReplaceOpWithCheaperOp %s with %s: ", 
+	  IS_SYMOP((*op)) ? OP_SYMBOL((*op))->name : "!SYM", 
+	  IS_SYMOP(cop) ? OP_SYMBOL(cop)->name : "!SYM");
   // if op is a register equivalent
   if (IS_ITEMP(cop) && OP_SYMBOL((*op))->isreqv) {
     operand **rop = &OP_SYMBOL((*op))->usl.spillLoc->reqv;
@@ -1559,12 +1559,13 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	  /* update the spill location for this */
 	  updateSpillLocation (ic,0);
 
-	  if (POINTER_SET (ic) &&
+	  if (POINTER_SET (ic) && 
 	      !(IS_BITFIELD (OP_SYMBOL (IC_RESULT (ic))->etype)))
 	    {
 	      pdop = NULL;
 	      applyToSetFTrue (cseSet, findCheaperOp, IC_RESULT (ic), &pdop, 0);
-	      if (pdop && IS_ITEMP (pdop) && !computeOnly)
+	      if (pdop && !computeOnly &&
+		  IS_ITEMP (pdop) && IS_PTR(operandType(pdop)))
 		ReplaceOpWithCheaperOp (&IC_RESULT(ic), pdop);
 	    }
 	}

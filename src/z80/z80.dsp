@@ -54,11 +54,19 @@ LIB32=link.exe -lib
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=..\..\support\Util\BuildCmd.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\gen.c
 # End Source File
 # Begin Source File
 
 SOURCE=.\main.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\support\Util\MySystem.c
 # End Source File
 # Begin Source File
 
@@ -72,6 +80,10 @@ SOURCE=.\support.c
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=..\common.h
+# End Source File
 # Begin Source File
 
 SOURCE=.\gen.h

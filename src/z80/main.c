@@ -1,4 +1,6 @@
 #include "z80.h"
+#include "MySystem.h"
+#include "BuildCmd.h"
 
 static char _z80_defaultRules[] =
 {
@@ -149,7 +151,6 @@ _gbz80_rgblink (void)
 {
   FILE *lnkfile;
   const char *sz;
-  char *argv[128];
 
   int i;
   sz = srcFileName;
@@ -182,9 +183,9 @@ _gbz80_rgblink (void)
 
   fclose (lnkfile);
 
-  buildCmdLine (buffer, argv, port->linker.cmd, sz, NULL, NULL, NULL);
+  buildCmdLine (buffer,port->linker.cmd, sz, NULL, NULL, NULL);
   /* call the linker */
-  if (my_system (argv[0], argv))
+  if (my_system (buffer))
     {
       perror ("Cannot exec linker");
       exit (1);

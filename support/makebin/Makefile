@@ -11,6 +11,7 @@ $(BIN): $(OBJ)
 	$(CC) -o $(BIN) $(OBJ)
 
 install: all
+	mkdir -p $(bindir)
 	$(INSTALL) $(BIN) `echo $(bindir)/makebin|sed '$(transform)'`
 
 include clean.mk

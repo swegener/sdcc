@@ -105,6 +105,7 @@ OBSTACK=obstack.o
 # End of variables for you to override.
 
 install: all
+	mkdir -p $(bindir)
 	$(INSTALL) $(TARGET) `echo $(bindir)/sdcpp|sed '$(transform)'`
 	$(STRIP) `echo $(bindir)/sdcpp|sed '$(transform)'`
 

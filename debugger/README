@@ -1,53 +1,43 @@
 sdcc/debugger
--------------
-Notes Aug 4, 2001 - Karl Bongers
 
-The debugger appears to have been broken
-for quite some time.  My guess is that Sandeep originally had it
-working in the 1999-2000 year timeframe, but then changes to the
-command structure in ucSim(simulator) caused it to be busted for
-quite a long time.
-
-I got it working under Linux, a number of ucSim commands
-changed syntax.  Including are:
-Changed "g" command to "run".
-Changed "dr" to "info register".
-Changed l filename.ihx to l "filename.ihx" (the quotes are required
-  by ucSim, and can be a confusing issue with the load(l) command.
-
-Also I had to add a "step" command prior to a "run" command
-when it is desired to resume execution so that ucSim does not
-stop on the same breakpoint we are currently at.
-
-I have not tried compiling or running under Cygwin/Windows.
-
-Issues:
+SDCDB debugger
 ======================
-* The source line #'s may be out of sync with the breakpoints and
-assembly.  I'm not sure, today it seemed close but not exact, while
-yesterday on a diferent test program it seemed several lines off...
+Notes Feb 10, 2002 - Karl Bongers
 
-* An initial "run" command must be issued to start up debugging.  The
-debugger refuses to list code or insert breaks on initial startup.
-The debugger builds up a context as it runs and it doesn't want to
-do the code listings or breaks until it has some context.  This
-doesn't seem right to me, you should be able to insert breaks
-or list code immediately.  This needs to be looked at.
+SDCDB is a debugger for SDCC compiler.  It works as a front
+end to the ucSim simulator/disassembler program.
 
-Work arounds:
+WARNING: SDCDB is EXPERIMENTAL and NOT A FULLY FUNCTIONING TOOL.
+
+SDCDB does hold out promise for a nice debugger tool that
+could integrate well with ucSim and other SDCC tools.  It has
+some nice functionality that could augment ucSim nicely.
+It reads in a lot of symbolic information from the .CDB
+debug files as well as the source code and assembly
+listings referred to in these CDB files.
+This can be used to display your program data, list
+c or asm source code and set breakpoints.
+
+Unfortunately, SDCDB is not quite finished and does not
+function well enough yet to recommend for general use.
+
+
+Usage Notes
 ======================
 Compile with --debug option:
 sdcc --debug hi.c
+This should generate .cdb symbolic debug files.
 
 Load sdcdb, like this:
-sdcdb hi
+sdcdb hi.ihx
 
-Then you need to do an initial "run" command.  It should stop at the
-main() entrypoint and give a message about a non-user breakpoint.
+Then you need to do an initial "run" command.  It should hopefully
+stop somewhere at the main() entrypoint.
 
 Now you should be able to list code, and set breakpoints.  Type
-"c" to continue running to a breakpoint, or type "step" to single
-step.
+"c" to continue running to a breakpoint, or type "s" to single
+step or "n" to skip function calls.  Tpye "help" for a summary
+of commands.
 
 Use a preceeding bang("!") to do s51 simulator commands.  So for
 example:
@@ -58,14 +48,136 @@ give you the program counter and list the current line of assembly.
 will give you the brief command line help listing of ucSim.  But
 this help will scroll of the screen.  So to get a list, I redirect
 stdout to a text file to examine like this:
-sdcdb hi 2>&1 | tee sdcdb.log
+sdcdb hi.ihx 2>&1 | tee sdcdb.log
 
-Slacker Notes:
+Type '.' to toggle to a full time ucSim prompt.
+
+
+SDCDB problem areas.
 ======================
-To debug, it can be helpful to turn on verbose debug dumps
+
+Ok, so what are some of its problems?  Lets try to itemize
+them so we can fix them:
+
+* It hangs sometimes when trying to do step or next.
+
+   This probably has something to do with the context
+   sdcdb tries to build dynamically.  Sdcdb tries to
+   trace program operation by placing hidden breakpoints
+   and stepping threw the simulation between these.
+
+* Does not print variables properly.  Seems to use the
+  wrong address for the variable. (fixed)
+
+* ASM listing not implemented.
+  This should be easy enough to add.  This feature
+  really needs to be implemented before this is a useful
+  tool.  That or addresses of code functions need to be
+  readily available for raw ucSim commands.
+
+* No way to browse symbols, files names.
+  Preferably, it is easy to learn the addresses of variables
+  and functions too.
+  (working on this... see new ls,lm,lf commands)
+
+* Does not allow listing, setting breakpoints or viewing variables
+  before starting the simulation.
+  (I am fixing now, partly fixed)
+
+* p codestr - print on code char * broken, could be CDB info invalid.
+
+
+Changes Made
+======================
+
+Added a -z option.  Any options after -z on sdcdb invocation line
+ are passed directly to ucSim.
+
+Fixed print basic variable command(was not parsing or expecting
+  "0x" in data coming from ucSim).  Dump bit command changed from
+  "db" to "dump".
+
+Add support for the following alternative ucSim binaries:
+ -mz80 - use "uz80" simulator.
+ -mavr - use "uavr" simulator.
+ -mxa - use "uxa" simulator.
+
+  Note that Z80(and probably avr/xa) does not produce enough
+  CDB debugging information to
+  make SDCDB useful.  Hopefully CDB support will be
+  added to these other linkers and code generators.
+
+Added lf,lm,ls commands(list functions, list modules, list symbols).
+ This allows browsing some the CDB information SDCDB pulls in
+ to do the wonderful things it does.
+
+Added '.' prefix/command, used alone switches back and forth
+ from ucSim/SDCDB command mode).  Also when at the (ucsim) prompt,
+ if a command is prefixed with '.' it will route the command to
+ the SDCDB command processor.  (This could obsolete the '!' prefix).
+
+
+======================
+
+Fix any remaining shortcomings above and make sdcdb integrate better with
+ucSim.
+
+Concerning the hanging on next/step instructions:  This is critical
+to fix.  I beleive the problem is related to SDCDB's attempt to
+dynamically track context.  To do this, it sets many temporary break
+points and uses these to progress step by step through the source code.
+It does not seem reliable.  It might be an idea to offer a simplified
+mode of stepping and breakpoints.  Need to study this more.
+
+Make SDCDB integrate better with ucSim.
+I think if sdcdb can act more transparently in regard to ucSim
+it would be used more.  So stress adding value and enhancing
+ucSim operation, and not block or hide the functionality of ucSim.
+
+* combine print "p" & "pt" together.  We have room on the screen,
+might as well print its type, address and value in one command.
+
+* "fr" command prints the current position in the C code.
+Should also print the raw code address for dumping ucSim code.
+
+
+
+Developer Notes:
+======================
+To debug, it might be helpful to turn on verbose debug dumps
 by uncommenting #define SDCDB_DEBUG in sdcdb.h.
 
+Some basic layout:
+sdcdb.c - main shell of the program.
+cmd.c - process user commands typed in.
+simi.c - handle talking to the simulator via a socket connection.
+symtab.c - Misc. functions to translate and process linked list
+  structures(modules, functions, symbols, etc) and CDB file
+  parsing.
+break.c - track and implement break points.
 
-End Notes Aug 4, 2001 - Karl Bongers
---------------
+Understanding the structures and access mechanisms of SDCDB
+is a bit of work.  The structures include generic linked list
+and function access.  These lists are accessed in part by the
+functions from ../../src/SDCCset.c and SDCChash.c.  See the
+cmd.c:infoSymbols() routine to gain some insight into these
+main program structures.  Or type "info symbols" to dump
+out some of these.  The new ls,lm,lf commands are also based
+on showing information about these lists of structures.
+
+Generic functions are used to act on these linked lists of
+structures.  For example, in cmd.c, DEFSETFUNC(funcWithName)
+function will find a function structure with a given name.
+So the linked list of function structures(with the head
+"functions") is traversed and when one is found with a matching
+name, a pointer to the function structure is returned.
+
+The src/SDCCset.c,SDCCset.h contain much of the core helper
+routines to allowed to implement these linked list access
+functions.
+
+The dynamic context tracking is difficult to understand.
+It has some concept of stack use, as in
+cmd.c:printSymValue(), where it can print variables relative
+to the stack pointer.
 

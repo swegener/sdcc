@@ -26,6 +26,7 @@
 #define __MYSYSTEM_H
 
 int my_system (const char *cmd) ;
+FILE *my_popen (const char *cmd) ;
 
 extern char *ExePathList[] ;	  // List of paths to try to locate exeucatbles
 

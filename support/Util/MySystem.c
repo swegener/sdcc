@@ -23,33 +23,34 @@
 -------------------------------------------------------------------------*/
 
 #include "common.h"
+#include "MySystem.h"
 #include "newalloc.h"
-#if defined(_MSC_VER)
+#ifdef _WIN32
 #include <io.h>
 #else
-#include <sys/stat.h>
-#endif
-
-
-#if !defined(__BORLANDC__) && !defined(_MSC_VER)
 #include <unistd.h>
-#else
-// No unistd.h in Borland C++
-extern int access (const char *, int);
-#define X_OK 1
 #endif
 
-/*!
-Call an external program with arguements
-*/
 
 //char *ExePathList[]= {SRCDIR "/bin",PREFIX "/bin", NULL};
 char *ExePathList[] = {NULL, NULL};			/* First entry may be overwritten, so use two. */
 
-int
-my_system (const char *cmd)
+/*!
+Find the comamnd in one of predefined paths
+
+NOTE: this function does't do it's job if:
+- the program name also contains the path
+  (and it seems thet this is always true :-(()
+- there are no spaces in cmd
+- the program name contains space characters
+
+It has to be rewritten.
+*/
+
+static char *
+get_path (const char *cmd)
 {
-  int argsStart, e, i = 0;
+  int argsStart, i = 0;
   char *cmdLine = NULL;
 
   argsStart = strstr (cmd, " ") - cmd;
@@ -63,11 +64,12 @@ my_system (const char *cmd)
       strcat (cmdLine, DIR_SEPARATOR_STRING);
       strncat (cmdLine, cmd, argsStart);	// the command
 
-#if NATIVE_WIN32
+#ifdef _WIN32
       strcat (cmdLine, ".exe");
+      if (access(cmdLine, 0) == 0)
+#else
+      if (access(cmdLine, X_OK) == 0)
 #endif
-
-      if (access (cmdLine, X_OK) == 0)
 	{
 	  // the arguments
 	  strcat (cmdLine, cmd + argsStart);
@@ -78,22 +80,67 @@ my_system (const char *cmd)
       i++;
     }
 
-  if (options.verboseExec)
-    {
-      printf ("+ %s\n", cmdLine ? cmdLine : cmd);
-    }
+  return cmdLine;
+}
 
-  if (cmdLine)
-    {
+
+/*!
+Call an external program with arguements
+*/
+
+int
+my_system (const char *cmd)
+{
+  int e;
+  char *cmdLine = get_path (cmd);
+
+  if (options.verboseExec) {
+      printf ("+ %s\n", cmdLine ? cmdLine : cmd);
+  }
+
+  if (cmdLine) {
       // command found in predefined path
       e = system (cmdLine);
       Safe_free (cmdLine);
-    }
-  else
-    {
+  }
+  else {
       // trust on $PATH
       e = system (cmd);
-    }
+  }
+
   return e;
 }
 
+
+/*!
+Pipe an external program with arguements
+*/
+
+#ifdef _WIN32
+#define popen_read(cmd) _popen((cmd), "rt")
+#else
+#define popen_read(cmd) popen((cmd), "r")
+#endif
+
+FILE *
+my_popen (const char *cmd)
+{
+  FILE *fp;
+  char *cmdLine = get_path (cmd);
+
+  if (options.verboseExec) {
+      printf ("+ %s\n", cmdLine ? cmdLine : cmd);
+  }
+
+  if (cmdLine) {
+      // command found in predefined path
+      fp = popen_read (cmdLine);
+      Safe_free (cmdLine);
+  }
+  else {
+      // trust on $PATH
+      fp = popen_read (cmd);
+  }
+
+  return fp;
+}

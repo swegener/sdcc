@@ -559,7 +559,7 @@ _processC1Arg (char *s)
 	  werror (W_TOO_MANY_SRC, s);
 	  return;
 	}
-      options.out_name = strdup (s);
+      options.out_name = Safe_strdup (s);
     }
   else
     {
@@ -1073,7 +1073,7 @@ linkEdit (char **envp)
     fprintf (lnkfile, "-z\n");
 
 #define WRITE_SEG_LOC(N, L) \
-    segName = strdup(N); \
+    segName = Safe_strdup(N); \
     c = strtok(segName, " \t"); \
     fprintf (lnkfile,"-b %s = 0x%04x\n", c, L); \
     if (segName) { Safe_free(segName); }
@@ -1178,7 +1178,7 @@ linkEdit (char **envp)
   if (strcmp (srcFileName, "temp") == 0)
     {
       /* rename "temp.cdb" to "firstRelFile.cdb" */
-      char *f = strtok (strdup (relFiles[0]), ".");
+      char *f = strtok (Safe_strdup (relFiles[0]), ".");
       f = strcat (f, ".cdb");
       rename ("temp.cdb", f);
       srcFileName = NULL;
@@ -1380,7 +1380,7 @@ _discoverPaths (const char *argv0)
       strcpy (scratchFileName, argv0);
       *strrchr (scratchFileName, DIR_SEPARATOR_CHAR) = '\0';
       setMainValue ("bindir", scratchFileName);
-      ExePathList[0] = gc_strdup (scratchFileName);
+      ExePathList[0] = Safe_strdup (scratchFileName);
     }
   else if (getenv (SDCCDIR_NAME) != NULL)
     {
@@ -1388,7 +1388,7 @@ _discoverPaths (const char *argv0)
       strcpy (scratchFileName, getenv (SDCCDIR_NAME));
       strcat (scratchFileName, buffer);
       setMainValue ("bindir", scratchFileName);
-      ExePathList[0] = gc_strdup (scratchFileName);
+      ExePathList[0] = Safe_strdup (scratchFileName);
     }
   else
     {

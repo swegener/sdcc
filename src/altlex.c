@@ -309,7 +309,7 @@ handle_line (void)
       if (c == '\"')
 	{
 	  *p = '\0';
-	  currFname = gc_strdup (line);
+	  currFname = Safe_strdup (line);
 	}
       filename = currFname;
     }

@@ -106,7 +106,7 @@ mvsprintf(hTab *pvals, const char *pformat, va_list ap)
   _evalMacros(ainto, pvals, atmp);
 
   /* Return a copy of the evaluated string. */
-  return gc_strdup(ainto);
+  return Safe_strdup(ainto);
 }
 
 char *msprintf(hTab *pvals, const char *pformat, ...)

@@ -55,7 +55,7 @@ addToList (const char **list, const char *str)
   /* This is the bad way to do things :) */
   while (*list)
     list++;
-  *list = strdup (str);
+  *list = Safe_strdup (str);
   if (!*list)
     {
       werror (E_OUT_OF_MEM, __FILE__, 0);
@@ -253,7 +253,7 @@ getPrefixFromBinPath (const char *prel)
 
   scratchFileName[strlen(scratchFileName) - strlen(buffer)] = '\0';
 
-  return gc_strdup (scratchFileName);
+  return Safe_strdup (scratchFileName);
 }
 
 /** Returns true if the given path exists.
@@ -285,15 +285,6 @@ void
 populateMainValues (const char **ppin)
 {
   _mainValues = populateStringHash(ppin);
-}
-
-char *
-gc_strdup (const char *s)
-{
-  char *ret;
-  ret = Safe_alloc ( strlen (s) + 1);
-  strcpy (ret, s);
-  return ret;
 }
 
 /** Returns true if sz starts with the string given in key.

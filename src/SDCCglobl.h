@@ -281,11 +281,6 @@ FILE *tempfile (void);
 char *
 tempfilename (void);
 
-/** Creates a duplicate of the string 'sz' a'la strdup but using
-    libgc.
-*/
-char *gc_strdup (const char *sz);
-
 /** An assert() macro that will go out through sdcc's error
     system.
 */

@@ -84,14 +84,14 @@ struct options  save_options  ;
 %%
 "_asm"         {  
   count(); 
-  asmp = asmbuff = Safe_realloc (asmbuff, INITIAL_INLINEASM);
+  asmp = asmbuff = realloc (asmbuff, INITIAL_INLINEASM);
   asmbuffSize=INITIAL_INLINEASM;
   BEGIN(asm) ;
 }
 <asm>"_endasm" { 
   count();
   *asmp = '\0';
-  yylval.yyinline = Safe_alloc (strlen(asmbuff)+1);
+  yylval.yyinline = malloc (strlen(asmbuff)+1);
   strcpy(yylval.yyinline,asmbuff);
   BEGIN(INITIAL);
   return (INLINEASM);
@@ -101,7 +101,7 @@ struct options  save_options  ;
     // increase the buffersize with 50%
     int size=asmp-asmbuff;
     asmbuffSize=asmbuffSize*3/2;
-    asmbuff = Safe_realloc (asmbuff, asmbuffSize); 
+    asmbuff = realloc (asmbuff, asmbuffSize); 
     asmp=asmbuff+size;
   }
   *asmp++ = yytext[0];
@@ -112,7 +112,7 @@ struct options  save_options  ;
     // increase the buffersize with 50%
     int size=asmp-asmbuff;
     asmbuffSize=asmbuffSize*3/2;
-    asmbuff = Safe_realloc (asmbuff, asmbuffSize); 
+    asmbuff = realloc (asmbuff, asmbuffSize); 
     asmp=asmbuff+size;
   }
   *asmp++ = '\n' ;
@@ -288,7 +288,7 @@ int checkCurrFile ( char *s)
 	/* mark the end of the filename */
 	while (*s != '"') s++;
 	*s = '\0';
-	currFname = Safe_alloc (strlen(sb)+1);
+	currFname = malloc (strlen(sb)+1);
 	strcpy(currFname,sb);
 	lineno = yylineno = lNum;
     }
@@ -447,11 +447,11 @@ void doPragma (int op, char *cp)
 	    /* append to the functions already listed
 	       in callee-saves */
 	    for (; options.calleeSaves[i] ;i++);
-	    parseWithComma(&options.calleeSaves[i],strdup(cp));
+	    parseWithComma(&options.calleeSaves[i], Safe_strdup(cp));
 	}
 	break;
     case P_EXCLUDE:
-	parseWithComma(options.excludeRegs,strdup(cp));
+	parseWithComma(options.excludeRegs, Safe_strdup(cp));
 	break;
     case P_LOOPREV:
 	optimize.noLoopReverse = 1;

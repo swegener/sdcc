@@ -45,7 +45,11 @@ functions.
 
 #define MALLOC	GC_malloc
 #define REALLOC GC_realloc
-#define FREE	GC_free
+/* PENDING: This is a mild hack.  If we try to GC_free something
+   allocated with malloc() then the program will segfault.  Might as
+   well drop it and let the garbase collector take care of things.
+*/
+#define FREE(_a)	
 
 #else
 

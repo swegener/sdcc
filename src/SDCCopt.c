@@ -863,13 +863,11 @@ eBBlockFromiCode (iCode * ic)
   if (options.cyclomatic)
     printCyclomatic (ebbs, saveCount);
 
-
   /* convert operations with support routines
      written in C to function calls : Iam doing
      this at this point since I want all the
      operations to be as they are for optimzations */
   convertToFcall (ebbs, count);
-
 
   /* compute the live ranges */
   computeLiveRanges (ebbs, count);
@@ -888,7 +886,6 @@ eBBlockFromiCode (iCode * ic)
   /* throw away blocks */
   setToNull ((void **) &graphEdges);
   ebbs = NULL;
-
 
   return NULL;
 }

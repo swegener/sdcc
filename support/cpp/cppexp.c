@@ -965,7 +965,7 @@ cpp_parse_expr (
 	  if (top != stack)
 	    cpp_error (pfile, "internal error in #if expression");
 	  if (stack != init_stack)
-	    free (stack);
+	    Safe_free (stack);
 	  return top->value;
 	}
       top++;
@@ -994,7 +994,7 @@ cpp_parse_expr (
     }
  syntax_error:
   if (stack != init_stack)
-    free (stack);
+    Safe_free (stack);
   skip_rest_of_line (pfile);
   return 0;
 }

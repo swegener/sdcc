@@ -850,7 +850,7 @@ macro_cleanup (
   if (macro->type == T_DISABLED)
     macro->type = T_MACRO;
   if (macro->type != T_MACRO || pbuf->buf != macro->value.defn->expansion)
-    free (pbuf->buf);
+    Safe_free (pbuf->buf);
   return 0;
 }
 
@@ -861,7 +861,7 @@ file_cleanup (
 {
   if (pbuf->buf)
     {
-      free (pbuf->buf);
+      Safe_free (pbuf->buf);
       pbuf->buf = 0;
     }
   return 0;
@@ -1917,7 +1917,7 @@ cpp_pop_buffer (pfile)
   cpp_buffer *next_buf = CPP_PREV_BUFFER (buf);
   (*buf->cleanup) (buf, pfile);
   CPP_BUFFER (pfile) = next_buf;
-  free (buf);
+  Safe_free (buf);
   return next_buf;
 #endif
 }
@@ -3660,7 +3660,7 @@ delete_assertion (
     {
       struct tokenlist_list *next = tail->next;
       free_token_list (tail->tokens);
-      free (tail);
+      Safe_free (tail);
       tail = next;
     }
 
@@ -3669,7 +3669,7 @@ delete_assertion (
   if (hp == *hp->bucket_hdr)
     *hp->bucket_hdr = hp->next;
 
-  free (hp);
+  Safe_free (hp);
 }
 
 /* Convert a character string literal into a nul-terminated string.
@@ -4390,7 +4390,7 @@ skip_if_group (
 
       temp = pfile->if_stack;
       pfile->if_stack = temp->next;
-      free (temp);
+      Safe_free (temp);
       break;
         default: ;
     }
@@ -4558,7 +4558,7 @@ FIXME!
     }
       }
         }
-      free (temp);
+      Safe_free (temp);
       output_line_command (pfile, 1, same_file);
     }
   return 0;
@@ -5474,7 +5474,7 @@ read_name_map (
         strcpy (ptr->map_to, dirname);
         ptr->map_to[dirlen] = '/';
         strcpy (ptr->map_to + dirlen + 1, to);
-        free (to);
+        Safe_free (to);
       }
 
     ptr->map_next = map_list_ptr->map_list_map;
@@ -5686,7 +5686,7 @@ finclude (
 
   indepth--;
   input_file_stack_tick++;
-  free (fp->buf);
+  Safe_free (fp->buf);
 #endif
   return 1;
 
@@ -5694,7 +5694,7 @@ finclude (
 
   cpp_perror_with_name (pfile, fname);
   close (f);
-  free (fp->buf);
+  Safe_free (fp->buf);
   return 1;
 }
 
@@ -6173,7 +6173,7 @@ push_parse_file (
   for (pend = opts->pending;  pend; )
     {
       struct cpp_pending *next = pend->next;
-      free (pend);
+      Safe_free (pend);
       pend = next;
     }
   opts->pending = NULL;
@@ -6619,7 +6619,7 @@ cpp_handle_options (
                     && (pend->cmd[1] == 'D' || pend->cmd[1] == 'A'))
                   {
                     *ptr = pend->next;
-                    free (pend);
+                    Safe_free (pend);
                   }
                   else
                     ptr = &pend->next;
@@ -6761,13 +6761,13 @@ cpp_cleanup (
 
   if (pfile->token_buffer)
     {
-      free (pfile->token_buffer);
+      Safe_free (pfile->token_buffer);
       pfile->token_buffer = NULL;
     }
 
   if (pfile->deps_buffer)
     {
-      free (pfile->deps_buffer);
+      Safe_free (pfile->deps_buffer);
       pfile->deps_buffer = NULL;
       pfile->deps_allocated_size = 0;
     }
@@ -6776,23 +6776,23 @@ cpp_cleanup (
     {
       IF_STACK_FRAME *temp = pfile->if_stack;
       pfile->if_stack = temp->next;
-      free (temp);
+      Safe_free (temp);
     }
 
   while (pfile->dont_repeat_files)
     {
       struct file_name_list *temp = pfile->dont_repeat_files;
       pfile->dont_repeat_files = temp->next;
-      free (temp->fname);
-      free (temp);
+      Safe_free (temp->fname);
+      Safe_free (temp);
     }
 
   while (pfile->all_include_files)
     {
       struct file_name_list *temp = pfile->all_include_files;
       pfile->all_include_files = temp->next;
-      free (temp->fname);
-      free (temp);
+      Safe_free (temp->fname);
+      Safe_free (temp);
     }
 
   for (i = IMPORT_HASH_SIZE; --i >= 0; )
@@ -6801,8 +6801,8 @@ cpp_cleanup (
       while (imp)
   {
     struct import_file *next = imp->next;
-    free (imp->name);
-    free (imp);
+    Safe_free (imp->name);
+    Safe_free (imp);
     imp = next;
   }
       pfile->import_hash_table[i] = 0;
@@ -6962,7 +6962,7 @@ do_unassert (
     else
       hp->value = tail->next;
     free_token_list (tail->tokens);
-    free (tail);
+    Safe_free (tail);
   } else {
     prev = tail;
   }
@@ -7149,8 +7149,8 @@ free_token_list (
 {
   while (tokens) {
     struct arglist *next = tokens->next;
-    free (tokens->name);
-    free (tokens);
+    Safe_free (tokens->name);
+    Safe_free (tokens);
     tokens = next;
   }
 }

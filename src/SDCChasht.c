@@ -557,7 +557,7 @@ shash_add (hTab ** h, const char *szKey, const char *szValue)
   /* First, delete any that currently exist */
   hTabDeleteByKey (h, key, szKey, _compare);
   /* Now add in ours */
-  hTabAddItemLong (h, key, gc_strdup (szKey), gc_strdup (szValue));
+  hTabAddItemLong (h, key, Safe_strdup (szKey), Safe_strdup (szValue));
 }
 
 const char *

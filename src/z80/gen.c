@@ -5929,7 +5929,7 @@ genZ80Code (iCode * lic)
   iCode *ic;
   int cln = 0;
 
-  /* HACK */
+  /* Hack */
   if (IS_GB)
     {
       _fReturn = _gbz80_return;

@@ -70,7 +70,7 @@ DEFSETFUNC (rmTmpFiles)
   if (name)
     {
       unlink (name);
-      free (name);
+      Safe_free (name);
     }
   return 0;
 }
@@ -1589,7 +1589,7 @@ tempfile (void)
     tmpdir = getenv ("TMPDIR");
   if (tmpdir)
     {
-      char *name = tempnam (tmpdir, "sdcc");
+      char *name = Safe_strdup( tempnam (tmpdir, "sdcc"));
       if (name)
 	{
 	  FILE *fp = fopen (name, "w+b");

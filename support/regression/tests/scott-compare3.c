@@ -116,7 +116,7 @@ void c_a5(void)
 void c_a500(void)
 {
 
-  ASSERT(!(achar0 == 0xa500U));
+  ASSERT(!(achar0 == (unsigned char)0xa500U));
 
   ASSERT(!(aint0 != 0xa500U));
 
@@ -134,7 +134,7 @@ void c_a500(void)
 void c_abcd(void)
 {
 
-  ASSERT(!(achar0 == 0xabcdU));
+  ASSERT(!(achar0 == (unsigned char)0xabcdU));
 
   ASSERT(!(aint0 != 0xabcdU));
 
@@ -142,7 +142,7 @@ void c_abcd(void)
 
   ASSERT(!(aint0 == 0x00cd));
 
-  ASSERT(!(aint0 == 0x1234abcdU));
+  ASSERT(!(aint0 == (unsigned int)0x1234abcdU));
 
 }
 

@@ -151,7 +151,7 @@ _process_pragma (const char *sz)
 	      wassert (0);
 	    }
 	}
-      gbz80_port.mem.code_name = gc_strdup (buffer);
+      gbz80_port.mem.code_name = Safe_strdup (buffer);
       code->sname = gbz80_port.mem.code_name;
       return 0;
     }
@@ -228,12 +228,12 @@ _parseOptions (int *pargc, char **argv, int *i)
 	    case 'o':
 	      /* ROM bank */
 	      sprintf (buffer, "CODE_%u", bank);
-	      gbz80_port.mem.code_name = gc_strdup (buffer);
+	      gbz80_port.mem.code_name = Safe_strdup (buffer);
 	      return TRUE;
 	    case 'a':
 	      /* RAM bank */
 	      sprintf (buffer, "DATA_%u", bank);
-	      gbz80_port.mem.data_name = gc_strdup (buffer);
+	      gbz80_port.mem.data_name = Safe_strdup (buffer);
 	      return TRUE;
 	    }
 	}
@@ -372,7 +372,7 @@ _mangleSupportFunctionName(char *original)
           options.noRegParams ? "s" : "bds"
           );
 
-  return gc_strdup(buffer);
+  return Safe_strdup(buffer);
 }
 
 static const char *

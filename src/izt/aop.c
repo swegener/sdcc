@@ -42,7 +42,7 @@ asmop *_newForSymbol(symbol *sym, iCode *ic)
     else if (IS_FUNC(sym->type)) {
 	// Functions are special.  The symbol is constant and available.
 	aop = _new(AOP_TYPE_IMMEDIATE);
-	aop->u.immediate = gc_strdup(sym->rname);
+	aop->u.immediate = Safe_strdup(sym->rname);
 	// PENDING: Size of a function pointer.
 	aop->size = 2;
     }
@@ -79,7 +79,7 @@ asmop *_newForRemat(symbol *sym)
     sprintf(s, "%s", OP_SYMBOL(IC_LEFT(ic))->rname);
 
     aop->size = getSize(sym->type);
-    aop->u.immediate = gc_strdup(buffer);
+    aop->u.immediate = Safe_strdup(buffer);
     
     return aop;
 };

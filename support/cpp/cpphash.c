@@ -137,14 +137,14 @@ delete_macro (
       for (ap = d->pattern; ap != NULL; ap = nextap)
 	{
 	  nextap = ap->next;
-	  free (ap);
+	  Safe_free (ap);
 	}
       if (d->nargs >= 0)
-	free (d->args.argnames);
-      free (d);
+	Safe_free (d->args.argnames);
+      Safe_free (d);
     }
 
-  free (hp);
+  Safe_free (hp);
 }
 /*
  * install a name in the main hash table, even if it is already there.

@@ -23,7 +23,7 @@ ASOBJECTS       = asmain.obj aslex.obj assym.obj assubr.obj asnoice.obj \
 LKOBJECTS       = lkmain.obj lkhead.obj lkarea.obj lkdata.obj \
                   lkeval.obj lklex.obj lksym.obj lkrloc.obj \
                   lklibr.obj lklist.obj lkihx.obj lks19.obj \
-                  lkstore.obj lknoice.obj lkmem.obj lkomf51.obj
+                  lkstore.obj lknoice.obj lkmem.obj lkaomf51.obj
 
 ASX8051         = $(PRJDIR)/bin/asx8051.exe
 ASLINK          = $(PRJDIR)/bin/aslink.exe

@@ -144,8 +144,10 @@ Line *readLine(FILE *inFile)
     	return NULL;
     }
     bp += 2;	/* Two digits consumed. */    
-    
-    line->data = (Uint8 *)malloc(line->len);
+   
+    /* Hack - always allocate something, even if len is zero.
+     * Avoids special case for len == 0. */
+    line->data = (Uint8 *)malloc(line->len ? line->len : 1);
     if (!line->data)
     {
     	free(line);

@@ -123,6 +123,7 @@ char    *preOutName;
 #define OPTION_NOSTDLIB     "-nostdlib"
 #define OPTION_NOSTDINC     "-nostdinc"
 #define OPTION_VERBOSE      "-verbose"
+#define OPTION_ANSIINT	    "-ansiint"
 static const char *_preCmd[] = {
     "sdcpp", "-Wall", "-lang-c++", "-DSDCC=1", 
     "$l", "-I" SDCC_INCLUDE_DIR, "$1", "$2", NULL
@@ -815,6 +816,11 @@ int   parseCmdLine ( int argc, char **argv )
 	        options.verbose=1;
 		continue;
 	    }
+	    
+	    if (strcmp(&argv[i][1],OPTION_ANSIINT) == 0) {
+	        options.ANSIint=1;
+		continue;
+	    }	    
 
 	    if (!port->parseOption(&argc, argv, &i))
 	    {

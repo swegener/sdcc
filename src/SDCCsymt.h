@@ -357,8 +357,12 @@ extern sym_link *__multypes[3][2];
 extern symbol *__conv[2][3][2];
 
 #define CHARTYPE	__multypes[0][0]
-#define INTTYPE		__multypes[1][0]
 #define UCHARTYPE	__multypes[0][1]
+#define INTTYPE		__multypes[1][0]
+#define UINTTYPE	__multypes[1][1]
+#define LONGTYPE	__multypes[2][0]
+#define ULONGTYPE	__multypes[2][1]
+
 
 extern sym_link *floatType;
 
@@ -368,6 +372,7 @@ extern sym_link *floatType;
 void       initSymt           (                                );
 symbol      *newSymbol        ( char      *, int               );
 sym_link    *newLink          (                                );
+sym_link    *newFloatLink     (				       );
 structdef   *newStruct        ( char      *                    );
 void         addDecl          ( symbol   *, int   , sym_link * );
 sym_link    *mergeSpec        ( sym_link      *, sym_link *    );

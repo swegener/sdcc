@@ -1,4 +1,4 @@
-/* SDCCglobl.h - global macros etc required by all files */
+;/* SDCCglobl.h - global macros etc required by all files */
 #ifndef SDCCGLOBL_H
 #define SDCCGLOBL_H
 #include <memory.h>
@@ -206,6 +206,7 @@ struct options {
     int nostdlib  : 1  ; /* Don't use standard lib files */
     int nostdinc  : 1  ; /* Don't use standard include files */
     int verbose   : 1  ; /* Show what the compiler is doing */
+    int ANSIint   : 1  ;  /* Use ANSI integer promotion rules in expressions. */
 
     char *calleeSaves[128]; /* list of functions using callee save */
     char *excludeRegs[32] ; /* registers excluded from saving */

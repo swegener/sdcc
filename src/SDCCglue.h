@@ -33,4 +33,7 @@ void glue();
 char *aopLiteral (value *, int);
 void flushStatics(void);
 
+extern symbol *interrupts[];
+extern set *publics;
+extern set *tmpfileSet;
 #endif

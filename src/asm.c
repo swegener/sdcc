@@ -60,7 +60,7 @@ static va_list _iprintf(char *pInto, const char *sz, va_list ap)
 		    *p = '\0';
 		    vsprintf(pInto, format, ap);
 		    /* PENDING: Assume that the arg length was an int */
-		    va_arg(ap, int);
+		    (void)va_arg(ap, int);
 		}
 	    }
 	    pInto = pStart + strlen(pStart);
@@ -113,7 +113,7 @@ void tvsprintf(char *buffer, const char *sz, va_list ap)
 	    *p = '\0';
 	    vsprintf(pInto, token, ap);
 	    pInto = buffer + strlen(buffer);
-	    va_arg(ap, int);
+	    (void)va_arg(ap, int);
 	}
 	else {
 	    *pInto++ = *sz++;

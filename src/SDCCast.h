@@ -22,12 +22,13 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
+#ifndef SDCCEXPR_H
+#define SDCCEXPR_H
+
 #include "SDCCglobl.h"
 #include "SDCCsymt.h"
 #include "SDCCval.h"
-
-#ifndef SDCCEXPR_H
-#define SDCCEXPR_H
+#include "SDCCset.h"
 
 #define  EX_OP       0
 #define  EX_VALUE    1
@@ -149,8 +150,9 @@ typedef  struct   ast {
 			  x == AND_ASSIGN || x == OR_ASSIGN || x == INC_OP || x == DEC_OP)
 #define IS_DEREF_OP(x) (( x->opval.op == '*' && x->right == NULL) || x->opval.op == '.')
 
-/* forward declrations for global variables */
+/* forward declarations for global variables */
 extern	ast	*staticAutos	;
+extern FILE *codeOutFile;
 
 /* forward definitions for functions   */
 ast     *newAst       (int  ,  void  *        );
@@ -179,5 +181,9 @@ symbol  *funcOfType     (char *,link *,link *,int,int);
 ast     *initAggregates ( symbol *,initList *, ast *);
 bool     hasSEFcalls    ( ast *);
 void     addSymToBlock (symbol *, ast *) ;
+
+// exported variables 
+extern set *operKeyReset;
+extern int noAlloc;
 
 #endif 

@@ -27,7 +27,6 @@
 int currLineno  = 0;
 set *astList = NULL ;
 set *operKeyReset = NULL;
-extern char *currFname ;
 ast *staticAutos = NULL;
 int labelKey = 1 ;
 
@@ -50,12 +49,8 @@ char  buffer[1024];
 int noLineno = 0;
 int noAlloc = 0 ;
 symbol *currFunc ;
-extern int fatalError ;
-extern int lineno;
-extern char *filename ;
-extern set *publics;
-extern ast  *createIval  (ast *, link *, initList *, ast *);
-extern ast *createIvalCharPtr (ast *, link *, ast *);
+ast  *createIval  (ast *, link *, initList *, ast *);
+ast *createIvalCharPtr (ast *, link *, ast *);
 ast *optimizeRRCRLC ( ast * );
 ast *optimizeGetHbit(ast *);
 ast *backPatchLabels (ast *,symbol *,symbol *);

@@ -165,8 +165,27 @@ typedef struct {
 
 extern PORT *port;
 
-/* Ugly test to see if we are current compiling in DS390 mode. */
+#if !OPT_DISABLE_MCS51
+extern PORT mcs51_port;
+#endif
+#if !OPT_DISABLE_GBZ80
+extern PORT gbz80_port;
+#endif
+#if !OPT_DISABLE_Z80
+extern PORT z80_port;
+#endif
+#if !OPT_DISABLE_AVR
+extern PORT avr_port;
+#endif
+#if !OPT_DISABLE_DS390
 extern PORT ds390_port;
+#endif
+
+/* Test to see if we are current compiling in DS390 mode. */
+#define IS_MCS51_PORT (port == &mcs51_port)
+#define IS_GBZ80_PORT (port == &gbz80_port)
+#define IS_Z80_PORT (port == &z80_port)
+#define IS_AVR_PORT (port == &avr_port)
 #define IS_DS390_PORT (port == &ds390_port)
 
 #endif

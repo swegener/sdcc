@@ -278,4 +278,9 @@ bool     isOperandInFarSpace (operand *);
 operand *opFromOpWithDU (operand *,bitVect *,bitVect *);
 iCode   *copyiCode (iCode *);
 operand *newiTempFromOp( operand *);
+/*-----------------------------------------------------------------*/
+/* declaration of exported variables                               */
+/*-----------------------------------------------------------------*/
+extern char *filename;
+int lineno;
 #endif

@@ -29,8 +29,6 @@ bucket   *TypedefTab[256]  ;  /* the typedef   table  */
 bucket   *LabelTab  [256]  ;  /* the Label     table  */
 bucket   *enumTab   [256]  ;  /* enumerated    table  */
 
-extern   struct set *publics;
-
 /*------------------------------------------------------------------*/
 /* initSymt () - initialises symbol table related stuff             */
 /*------------------------------------------------------------------*/

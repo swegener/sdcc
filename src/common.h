@@ -21,11 +21,8 @@
 #include "SDCClrange.h"
 #include "SDCCptropt.h"
 #include "SDCCopt.h"
+#include "SDCCglue.h"
+#include "SDCCpeeph.h"
 
 #include "asm.h"
 #include "port.h"
-#include "config.h"
-
-/*
-#include "SDCCralloc.h"
-*/

@@ -51,6 +51,7 @@ typedef struct peepRule
 void printLine (lineNode *,FILE *);
 lineNode *newLineNode (char *);
 lineNode *connectLine (lineNode *,lineNode *);
+void initPeepHole(void);
 void peepHole (lineNode **);
 
 #endif

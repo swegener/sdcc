@@ -213,6 +213,9 @@ struct options {
     int c1mode	  : 1  ; /* Act like c1 - no pre-proc, asm or link */
     char *peep_file    ; /* additional rules for peep hole */
     char *out_name     ; /* Asm output name for c1 mode */
+    int nostdlib  : 1  ; /* Don't use standard lib files */
+    int nostdinc  : 1  ; /* Don't use standard include files */
+    int verbose   : 1  ; /* Show what the compiler is doing */
 
     char *calleeSaves[128]; /* list of functions using callee save */
     char *excludeRegs[32] ; /* registers excluded from saving */

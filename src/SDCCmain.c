@@ -31,25 +31,14 @@
 #include "spawn.h"
 #endif
 
-/* This is a bit messy.  We cant include unistd.h as it defines
-   'link' which we also use.
-*/
-int access(const char *path, int mode);
-#define X_OK 1
-int unlink(const char *path);
+// This is a bit messy because we define link ourself
+#define link NoLiNk
+#include <unistd.h>
+#undef link
 
-extern void		initSymt		();
-extern void		initMem			();
-extern void		initExpr		();
-extern void             initiCode               ();
-extern void             initCSupport            ();
-extern void             initPeepHole            ();
-extern void		createObject	();
-extern int		yyparse			();
-extern void             glue ();
-extern struct value    *constVal(char *s);
-extern double            floatFromVal(struct value *);
-extern int              fatalError ;
+//REMOVE ME!!!
+extern int yyparse();
+
 FILE  *srcFile         ;/* source file          */
 FILE  *cdbFile = NULL  ;/* debugger information output file */
 char  *fullSrcFileName ;/* full name for the source file */
@@ -71,7 +60,6 @@ int nlibPaths = 0;
 char *relFiles[128];
 int nrelFiles = 0;
 bool verboseExec = FALSE;
-//extern int wait (int *);
 char    *preOutName;
 
 /* Far functions, far data */
@@ -126,28 +114,13 @@ char    *preOutName;
 #define OPTION_HELP         "-help"
 #define OPTION_CALLEE_SAVES "-callee-saves"
 #define OPTION_NOREGPARMS   "-noregparms"
-
+#define OPTION_NOSTDLIB     "-nostdlib"
+#define OPTION_NOSTDINC     "-nostdinc"
+#define OPTION_VERBOSE      "-verbose"
 static const char *_preCmd[] = {
     "sdcpp", "-Wall", "-lang-c++", "-DSDCC=1", 
     "$l", "-I" SDCC_INCLUDE_DIR, "$1", "$2", NULL
 };
-
-#if !OPT_DISABLE_MCS51
-extern PORT mcs51_port;
-#endif
-#if !OPT_DISABLE_GBZ80
-extern PORT gbz80_port;
-#endif
-#if !OPT_DISABLE_Z80
-extern PORT z80_port;
-#endif
-#if !OPT_DISABLE_AVR
-extern PORT avr_port;
-#endif
-#if !OPT_DISABLE_DS390
-extern PORT ds390_port;
-#endif
-
 
 PORT *port;
 
@@ -356,6 +329,9 @@ static void setDefaultOptions()
     options.genericPtr = 1;   /* default on */
     options.nopeep    = 0;
     options.model = port->general.default_model;
+    options.nostdlib=0;
+    options.nostdinc=0;
+    options.verbose=0;
 
     /* now for the optimizations */
     /* turn on the everything */
@@ -811,6 +787,21 @@ int   parseCmdLine ( int argc, char **argv )
                 continue;
 	    }
 
+	    if (strcmp(&argv[i][1],OPTION_NOSTDLIB) == 0) {
+	        options.nostdlib=1;
+		continue;
+	    }
+
+	    if (strcmp(&argv[i][1],OPTION_NOSTDINC) == 0) {
+	        options.nostdinc=1;
+		continue;
+	    }
+
+	    if (strcmp(&argv[i][1],OPTION_VERBOSE) == 0) {
+	        options.verbose=1;
+		continue;
+	    }
+
 	    if (!port->parseOption(&argc, argv, &i))
 	    {
 		werror(W_UNKNOWN_OPTION,argv[i]);
@@ -968,13 +959,13 @@ int   parseCmdLine ( int argc, char **argv )
 		noAssemble = 1;
 		break;
 
+	    case 'V':
+	      verboseExec = TRUE;
+	      break;
+
 	    case 'v':
-#if FEATURE_VERBOSE_EXEC
-		verboseExec = TRUE;
-#else
 		printVersionInfo();
 		exit(0);
-#endif
 		break;
 
 		/* preprocessor options */		
@@ -1087,16 +1078,17 @@ int my_system (const char *cmd, char **cmd_argv)
         free(dir);
         i++;
     }
-#if FEATURE_VERBOSE_EXEC
+
     if (verboseExec) {
 	char **pCmd = cmd_argv;
+	printf ("+ ");
 	while (*pCmd) {
 	    printf("%s ", *pCmd);
 	    pCmd++;
 	}
 	printf("\n");
     }
-#endif
+
     if (got)
       i= spawnv(P_WAIT,got,cmd_argv) == -1;
     else
@@ -1169,36 +1161,38 @@ static void linkEdit (char **envp)
 	fprintf (lnkfile,"-k %s\n",libPaths[i]);
 
     /* standard library path */
-    if (strcmp(port->target,"ds390")==0) {
-      c="ds390";
-    } else {
-      switch(options.model)
-	{
-        case MODEL_SMALL:
-	  c = "small";
-	  break;
-       	case MODEL_LARGE:
-	  c = "large";
-	  break;
-       	case MODEL_FLAT24:
-	  c = "flat24";
-	  break;
-        default:
-	  werror(W_UNKNOWN_MODEL, __FILE__, __LINE__);
-	  c = "unknown";
-	  break;
-	}
+    if (!options.nostdlib) {
+      if (IS_DS390_PORT) {
+	c="ds390";
+      } else {
+	switch(options.model)
+	  {
+	  case MODEL_SMALL:
+	    c = "small";
+	    break;
+	  case MODEL_LARGE:
+	    c = "large";
+	    break;
+	  case MODEL_FLAT24:
+	    c = "flat24";
+	    break;
+	  default:
+	    werror(W_UNKNOWN_MODEL, __FILE__, __LINE__);
+	    c = "unknown";
+	    break;
+	  }
+      }
+      fprintf (lnkfile,"-k %s/%s\n",SDCC_LIB_DIR/*STD_LIB_PATH*/,c);
+      
+      /* standard library files */
+      if (strcmp(port->target, "ds390")==0) {
+	fprintf (lnkfile,"-l %s\n",STD_DS390_LIB);
+      }
+      fprintf (lnkfile,"-l %s\n",STD_LIB);
+      fprintf (lnkfile,"-l %s\n",STD_INT_LIB);
+      fprintf (lnkfile,"-l %s\n",STD_LONG_LIB);
+      fprintf (lnkfile,"-l %s\n",STD_FP_LIB);
     }
-    fprintf (lnkfile,"-k %s/%s\n",SDCC_LIB_DIR/*STD_LIB_PATH*/,c);
-	    
-    /* standard library files */
-    if (strcmp(port->target, "ds390")==0) {
-      fprintf (lnkfile,"-l %s\n",STD_DS390_LIB);
-    }
-    fprintf (lnkfile,"-l %s\n",STD_LIB);
-    fprintf (lnkfile,"-l %s\n",STD_INT_LIB);
-    fprintf (lnkfile,"-l %s\n",STD_LONG_LIB);
-    fprintf (lnkfile,"-l %s\n",STD_FP_LIB);
 
     /* additional libraries if any */
     for (i = 0 ; i < nlibFiles; i++)
@@ -1216,7 +1210,8 @@ static void linkEdit (char **envp)
 
     buildCmdLine(buffer, argv, port->linker.cmd, srcFileName, NULL, NULL, NULL);
 
-    /* call the linker */
+    if (options.verbose)
+      printf ("sdcc: Calling linker...\n");
     if (my_system(argv[0], argv)) {
 	perror("Cannot exec linker");
 	exit(1);
@@ -1305,6 +1300,9 @@ static int preProcess (char **envp)
 	buildCmdLine(buffer, argv, _preCmd, fullSrcFileName, 
 		      preOutName, srcFileName, preArgv);
 
+	if (options.verbose)
+	  printf ("sdcc: Calling preprocessor...\n");
+
 	if (my_system(argv[0], argv)) {
 	    unlink (preOutName);
 	    perror("Cannot exec Preprocessor");
@@ -1372,15 +1370,17 @@ int main ( int argc, char **argv , char **envp)
 	exit(0);
     }
 	
-    if (srcFileName)
+    if (srcFileName) {
 	preProcess(envp) ;
 
-    if (srcFileName) 
-    {
 	initSymt();
 	initiCode();
 	initCSupport ();
 	initPeepHole();
+
+	if (options.verbose)
+	  printf ("sdcc: Generating code...\n");
+
 	yyparse();
 
 	if (!fatalError) 
@@ -1392,6 +1392,9 @@ int main ( int argc, char **argv , char **envp)
 	    }
 	    if (!options.c1mode)
 	    {
+	        if (options.verbose)
+		  printf ("sdcc: Calling assembler...\n");
+
 		assemble(envp);
 	    }
 	}
@@ -1413,7 +1416,7 @@ int main ( int argc, char **argv , char **envp)
 	if (port->linker.do_link)
 	    port->linker.do_link();
 	else
-	    linkEdit (envp);
+	  linkEdit (envp);
     }
 
     if (yyin && yyin != stdin)

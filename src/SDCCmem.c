@@ -25,9 +25,6 @@ memmap	*home	=NULL;	 /* Unswitchable code bank 	*/
    symbols in a single overlay */
 set *ovrSetSets = NULL;    
 
-extern set *operKeyReset ;
-extern set *tmpfileSet ;
-extern symbol *interrupts[];
 int maxRegBank = 0;
 int fatalError = 0			 ;/* fatal error flag			*/
 

@@ -18,6 +18,8 @@ LIBDIRS		= -L$(PRJDIR)/support/gc
 LIBGC		= $(PRJDIR)/support/gc/libgc.a
 endif
 
+#CFLAGS          += -Werror
+
 ifdef SDCC_SUB_VERSION
 CFLAGS		+= -DSDCC_SUB_VERSION_STR=\"$(SDCC_SUB_VERSION)\"
 endif
@@ -63,7 +65,7 @@ install: all installdirs
 # --------------------------------
 uninstall:
 	rm -f $(bindir)/sdcc
-
+	rm -f $(bindir)/packihx
 
 # Performing self-test
 # --------------------
@@ -99,7 +101,6 @@ $(TARGET): $(OBJECTS) $(PORT_LIBS)
 
 $(PACKIHX): packihx
 	  $(INSTALL) packihx $(PACKIHX)
-	
 
 .c.o:
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@

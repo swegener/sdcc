@@ -59,7 +59,11 @@ extern   memmap  *eeprom;    /* eepromp space              */
 extern   memmap  *eeprom;    /* eepromp space              */
 extern	 memmap	 *home;	     /* Non-banked home space	   */
 
+extern int fatalError;
+
 extern   struct  set     *ovrSetSets;
+
+extern int maxRegBank;
 
 /* easy access macros */
 #define IN_BITSPACE(map)	(map && map->bitsp)

@@ -12,10 +12,7 @@
 
 #define ERROR		0
 #define WARNING		1
-extern FILE *lstFile;
-extern int fatalError ;
-extern int lineno ;
-extern char *filename;
+
 struct  {
 	int		errType ;
 	char	*errText ;

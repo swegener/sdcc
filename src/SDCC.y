@@ -34,7 +34,6 @@
 
 extern int yyerror (char *);
 extern FILE	*yyin;
-extern char srcLstFname[];
 int NestLevel = 0 ;     /* current NestLevel       */
 int stackPtr  = 1 ;     /* stack pointer           */
 int xstackPtr = 0 ;     /* xstack pointer          */

@@ -26,20 +26,22 @@
 #include "asm.h"
 #include <time.h>
 
+// This is a bit messy because we define link ourself
+#define link NoLiNk
+#include <unistd.h>
+#undef link
+
 symbol *interrupts[256];
-/*extern char *aopLiteral (value *, int);*//* drdani Jan 30 2000 */
+
 void printIval (symbol *, link *, initList *, FILE *);
-extern int noAlloc;
 set *publics = NULL;		/* public variables */
 set *externs = NULL;		/* Varibles that are declared as extern */
 
 /* TODO: this should be configurable (DS803C90 uses more than 6) */
 int maxInterrupts = 6;
 int allocInfo = 1;
-extern int maxRegBank ;
 symbol *mainf;
-extern char *VersionString;
-extern FILE *codeOutFile;
+char *VersionString;
 set *tmpfileSet = NULL; /* set of tmp file created by the compiler */
 set *tmpfileNameSet = NULL; /* All are unlinked at close. */
 
@@ -225,7 +227,7 @@ static void emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	    tfprintf(map->oFile, "\t!ds\n", (unsigned int)getSize (sym->type) & 0xffff);
 	}
 	
-	/* if it has a initial value then do it only if
+	/* if it has an initial value then do it only if
 	   it is a global variable */
 	if (sym->ival && sym->level == 0) {
 	    ast *ival = NULL;

@@ -27,7 +27,6 @@
 
 int eBBNum = 0;
 set *graphEdges = NULL ;  /* list of edges in this flow graph */
-extern int labelKey ;
 
 /*-----------------------------------------------------------------*/
 /* printEntryLabel - prints entry label of a ebblock               */

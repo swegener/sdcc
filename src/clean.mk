@@ -2,7 +2,7 @@
 # --------------------------------------------------
 clean:
 	rm -f *core *[%~] *.[oa] *.output
-	rm -f .[a-z]*~
+	rm -f .[a-z]*~ \#*
 	rm -f $(PRJDIR)/bin/sdcc sdcc
 	for port in $(PORTS) ; do\
 	  $(MAKE) -C $$port -f clean.mk clean ;\
@@ -18,6 +18,9 @@ distclean: clean
 # Like clean but some files may still exist
 # -----------------------------------------
 mostlyclean: clean
+	rm -f SDCCy.c
+	rm -f SDCCy.h
+	rm -f SDCClex.c
 
 
 # Deleting everything that can reconstructed by this Makefile. It deletes

@@ -38,8 +38,6 @@ int block;
 int scopeLevel;
 int lvaluereq;
 
-extern int labelKey ;
-
 symbol *returnLabel ; /* function return label */
 symbol *entryLabel  ; /* function entry  label */
 /*-----------------------------------------------------------------*/

@@ -79,6 +79,19 @@ void Areas51 (void)
 {
 	char * rel[]={
 		"XH",
+		"H 7 areas 0 global symbols",
+		"A _CODE size 0 flags 0",		/*Each .rel has one, so...*/
+		"A REG_BANK_0 size 0 flags 4",	/*Register banks are overlayable*/
+		"A REG_BANK_1 size 0 flags 4",
+		"A REG_BANK_2 size 0 flags 4",
+		"A REG_BANK_3 size 0 flags 4",
+		"A BSEG size 0 flags 80",		/*BSEG must be just before BITS*/
+		"A BSEG_BYTES size 0 flags 0",	/*Size will be obtained from BSEG in lnkarea()*/
+		""
+	};
+	
+    char * rel2[]={
+		"XH",
 		"H B areas 0 global symbols",
 		"A _CODE size 0 flags 0",		/*Each .rel has one, so...*/
 		"A REG_BANK_0 size 0 flags 4",	/*Register banks are overlayable*/
@@ -95,11 +108,22 @@ void Areas51 (void)
 	};
 	int j;
 
-	for (j=0; rel[j][0]!=0; j++)
-	{
-		ip=rel[j];
-		link_main();
-	}
+    if(packflag_and_stacksize)
+    {
+	    for (j=0; rel2[j][0]!=0; j++)
+	    {
+		    ip=rel2[j];
+		    link_main();
+	    }
+    }
+    else
+    {
+	    for (j=0; rel[j][0]!=0; j++)
+	    {
+		    ip=rel[j];
+		    link_main();
+	    }
+    }
 	
 	/*Set the start address of the default areas:*/
 	for(ap=areap; ap; ap=ap->a_ap)

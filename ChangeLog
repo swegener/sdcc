@@ -1,3 +1,8 @@
+2004-01-06  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+	* as/mcs51/lkmain.c: stack must be after data when option -Y is not used
+	(default behaviour).
+
 2004-01-06 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	A python script to validate compiler diagnostic messages. It can be

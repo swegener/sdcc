@@ -1926,11 +1926,12 @@ operand *geniCodeAddressOf (operand *op)
     link *optype = operandType(op);
     link *opetype= getSpec(optype);
     
+    /* lvalue check already done in decorateType */
     /* this must be a lvalue */
-    if (!op->isaddr && !IS_AGGREGATE(optype)) {
-	werror (E_LVALUE_REQUIRED,"&");
-	return op;
-    }
+/*     if (!op->isaddr && !IS_AGGREGATE(optype)) { */
+/* 	werror (E_LVALUE_REQUIRED,"&"); */
+/* 	return op; */
+/*     } */
     
     p = newLink();
     p->class = DECLARATOR ;

@@ -23,11 +23,37 @@
 #  Borut Razem
 #  borut.razem@siol.net
 
+# How to create WIN32 setup.exe
+#
+# - unpack WIN32 mingw daily snapshot sdcc-snapshot-i586-mingw32msvc-yyyymmdd.zip
+#   to a clean directory (the option to create directories should be enambled).
+#   A sub directory sdcc is created (referenced as PKGDIR in continuation).
+# - copy files sdcc/support/scripts/sdcc.ico and sdcc/support/scripts/sdcc.nsi
+#   (this file) from the sdcc CVS snapshot to the PKGDIR directory
+# - copy file COPYING from the sdcc CVS snapshot to the PKGDIR directory,
+#   rename it to COPYING.TXT and convert file COPYING to DOS format:
+#   unix2dos COPYING.TXT
+# - run NSIS installer from PKGDIR directory:
+#   "c:\Program Files\NSIS\makensis.exe" sdcc.nsi
+# - A setup file setup.exe is created in PKGDIR directory.
+#   Rename it to sdcc_yyyymmdd_setup.exe and upload it
+#   to sdcc download repository at sourceforge.net
+#
+#
+# How to upload secc setup.exe tosourceforge.net
+#
+# Execute following commands from the cmd prompt:
+# - sftp sdcc.sourceforge.net
+# - cd /home/groups/s/sd/sdcc/htdocs/snapshots/i586-mingw32msvc-setup
+# - put sdcc_yyyymmdd_setup.exe
+# - quit
+
+
 !include "MUI.nsh"
 
 SetCompressor lzma
 
-!define SDCC_ROOT "..\.."
+!define SDCC_ROOT "."
 
 !define FROM_SNAPSHOT
 
@@ -86,13 +112,13 @@ Function .onInit
   StrCmp $R0 "" inst
 
   MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
-  "$(^Name) is already installed. $\n$\nClick `OK` to remove the \
-  previous version or `Cancel` to cancel this upgrade." \
+  "$(^Name) is already installed. $\n$\nClick 'OK' to remove the \
+  previous version or 'Cancel' to cancel this upgrade." \
   IDOK uninst
   Abort
 
 uninst:
-  ;Run the uninstaller
+  ; Run the uninstaller
   ClearErrors
   ExecWait '$R0 _?=$INSTDIR' ;Do not copy the uninstaller to a temp file
 
@@ -106,7 +132,7 @@ uninst:
   Goto done
 inst:
 
-  ; install the new version
+  ; Install the new version
   MessageBox MB_YESNO|MB_ICONQUESTION "This will install $(^Name). Do you wish to continue?" IDYES +2
   Abort
 
@@ -658,4 +684,3 @@ FunctionEnd
 !macroend
 !insertmacro StrStr ""
 !insertmacro StrStr "un."
-

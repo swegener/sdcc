@@ -219,6 +219,15 @@ replace {
 %2:
 } if labelInRange
 
+
+replace {
+        ljmp    %5
+} by {
+	;       Peephole 244    replaced ljmp to ret with ret
+	ret
+} if labelIsReturnOnly
+
+
 replace {
         ljmp    %5
 %1:

@@ -1,3 +1,8 @@
+2003-04-06    Paul Stoffregen <paul@pjrc.com>
+
+	* src/SDCCpeeph.c: added labelIsReturnOnly test
+	* src/mcs51/peeph.def: Peephole 244: replace ljmp to ret with ret
+
 2003-04-05    <johan@balder>
 
 	* src/SDCCcse.c (cseAllBlocks): fixed bug #460088

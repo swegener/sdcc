@@ -276,6 +276,44 @@ FBYNAME (labelInRange)
 }
 
 /*-----------------------------------------------------------------*/
+/* labelIsReturnOnly - Check if label %5 is followed by RET        */
+/*-----------------------------------------------------------------*/
+FBYNAME (labelIsReturnOnly)
+{
+  /* assumes that %5 pattern variable has the label name */
+  const char *label, *p;
+  const lineNode *pl;
+  int len;
+
+  label = hTabItemWithKey (vars, 5);
+  if (!label) return FALSE;
+  len = strlen(label);
+
+  for(pl = currPl; pl; pl = pl->next) {
+	if (pl->line && !pl->isDebug &&
+	  pl->line[strlen(pl->line)-1] == ':') {
+		if (strncmp(pl->line, label, len) == 0) break; /* Found Label */
+		if (strlen(pl->line) != 7 || !isdigit(*(pl->line)) ||
+		  !isdigit(*(pl->line+1)) || !isdigit(*(pl->line+2)) ||
+		  !isdigit(*(pl->line+3)) || !isdigit(*(pl->line+4)) ||
+		  *(pl->line+5) != '$') {
+			return FALSE; /* non-local label encountered */
+		}
+	}
+  }
+  if (!pl) return FALSE; /* did not find the label */
+  pl = pl->next;
+  if (!pl || !pl->line || pl->isDebug) return FALSE; /* next line not valid */
+  p = pl->line;
+  for (p = pl->line; *p && isspace(*p); p++)
+	  ;
+  if (strcmp(p, "ret") == 0) return TRUE;
+  return FALSE;
+}
+
+
+
+/*-----------------------------------------------------------------*/
 /* operandsNotSame - check if %1 & %2 are the same                 */
 /*-----------------------------------------------------------------*/
 FBYNAME (operandsNotSame)
@@ -606,6 +644,9 @@ callFuncByName (char *fname,
     ,
     {
       "portIsDS390", portIsDS390
+    },
+    {
+      "labelIsReturnOnly", labelIsReturnOnly
     },
     {
       "24bitModeAndPortDS390", flat24bitModeAndPortDS390

@@ -3428,7 +3428,7 @@ genMult (iCode * ic)
     }
 
   /* should have been converted to function call */
-  assert (1);
+  assert (0);
 
 release:
   freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
@@ -3577,7 +3577,7 @@ genDiv (iCode * ic)
     }
 
   /* should have been converted to function call */
-  assert (1);
+  assert (0);
 release:
   freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
@@ -3715,7 +3715,7 @@ genMod (iCode * ic)
     }
 
   /* should have been converted to function call */
-  assert (1);
+  assert (0);
 
 release:
   freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));

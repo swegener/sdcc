@@ -2313,7 +2313,7 @@ genMult (iCode * ic)
 	}
 
 	/* should have been converted to function call */
-	assert (1);
+	assert (0);
 
       release:
 	freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
@@ -2328,7 +2328,7 @@ static void
 genDiv (iCode * ic)
 {
 	/* should have been converted to function call */
-	assert (1);
+	assert (0);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2338,7 +2338,7 @@ static void
 genMod (iCode * ic)
 {
 	/* should have been converted to function call */
-	assert (1);
+	assert (0);
 
 }
 
@@ -2371,7 +2371,7 @@ revavrcnd (int type)
 		if (rar[i].rtype == type)
 			return rar[i].type;
 	}
-	assert (1);		/* cannot happen */
+	assert (0);		/* cannot happen */
 	return 0;		/* makes the compiler happy */
 }
 
@@ -2496,7 +2496,7 @@ static void
 genCmpGt (iCode * ic, iCode * ifx)
 {
 	/* should have transformed by the parser */
-	assert (1);
+	assert (0);
 }
 
 /*-----------------------------------------------------------------*/

@@ -218,14 +218,14 @@ function_body
    ;
 
 primary_expr
-   : identifier      {  $$ = newAst(EX_VALUE,symbolVal($1));  }
-   | CONSTANT        {  $$ = newAst(EX_VALUE,$1);  }
+   : identifier      {  $$ = newAst_VALUE(symbolVal($1));  }
+   | CONSTANT        {  $$ = newAst_VALUE($1);  }
    | string_literal  
    | '(' expr ')'    {  $$ = $2 ;                   }
    ;
          
 string_literal
-    : STRING_LITERAL			{ $$ = newAst(EX_VALUE,$1); }
+    : STRING_LITERAL			{ $$ = newAst_VALUE($1); }
     ;
 
 postfix_expr
@@ -241,14 +241,14 @@ postfix_expr
 		      {    
 			$3 = newSymbol($3->name,NestLevel);
 			$3->implicit = 1;
-			$$ = newNode(PTR_OP,newNode('&',$1,NULL),newAst(EX_VALUE,symbolVal($3)));
+			$$ = newNode(PTR_OP,newNode('&',$1,NULL),newAst_VALUE(symbolVal($3)));
 /* 			$$ = newNode('.',$1,newAst(EX_VALUE,symbolVal($3))) ;		        */
 		      }
    | postfix_expr PTR_OP identifier    
                       { 
 			$3 = newSymbol($3->name,NestLevel);
 			$3->implicit = 1;			
-			$$ = newNode(PTR_OP,$1,newAst(EX_VALUE,symbolVal($3)));
+			$$ = newNode(PTR_OP,$1,newAst_VALUE(symbolVal($3)));
 		      }
    | postfix_expr INC_OP   
                       {	$$ = newNode(INC_OP,$1,NULL);}
@@ -267,7 +267,7 @@ unary_expr
    | DEC_OP unary_expr        { $$ = newNode(DEC_OP,NULL,$2);  }
    | unary_operator cast_expr { $$ = newNode($1,$2,NULL)    ;  }
    | SIZEOF unary_expr        { $$ = newNode(SIZEOF,NULL,$2);  }
-   | SIZEOF '(' type_name ')' { $$ = newAst(EX_VALUE,sizeofOp($3)); }
+   | SIZEOF '(' type_name ')' { $$ = newAst_VALUE(sizeofOp($3)); }
    ;
               
 unary_operator
@@ -281,7 +281,7 @@ unary_operator
 
 cast_expr
    : unary_expr
-   | '(' type_name ')' cast_expr { $$ = newNode(CAST,newAst(EX_LINK,$2),$4); }
+   | '(' type_name ')' cast_expr { $$ = newNode(CAST,newAst_LINK($2),$4); }
    ;
 
 multiplicative_expr
@@ -1315,7 +1315,7 @@ expr_opt
 jump_statement          
    : GOTO identifier ';'   { 
                               $2->islbl = 1;
-                              $$ = newAst(EX_VALUE,symbolVal($2)); 
+                              $$ = newAst_VALUE(symbolVal($2)); 
                               $$ = newNode(GOTO,$$,NULL);
                            }
    | CONTINUE ';'          {  
@@ -1325,7 +1325,7 @@ jump_statement
 	   $$ = NULL;
        }
        else {
-	   $$ = newAst(EX_VALUE,symbolVal(STACK_PEEK(continueStack)));      
+	   $$ = newAst_VALUE(symbolVal(STACK_PEEK(continueStack)));      
 	   $$ = newNode(GOTO,$$,NULL);
 	   /* mark the continue label as referenced */
 	   STACK_PEEK(continueStack)->isref = 1;
@@ -1336,7 +1336,7 @@ jump_statement
 	   werror(E_BREAK_CONTEXT);
 	   $$ = NULL;
        } else {
-	   $$ = newAst(EX_VALUE,symbolVal(STACK_PEEK(breakStack)));
+	   $$ = newAst_VALUE(symbolVal(STACK_PEEK(breakStack)));
 	   $$ = newNode(GOTO,$$,NULL);
 	   STACK_PEEK(breakStack)->isref = 1;
        }

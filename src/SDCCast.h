@@ -155,7 +155,11 @@ extern	ast	*staticAutos	;
 extern FILE *codeOutFile;
 
 /* forward definitions for functions   */
-ast     *newAst       (int  ,  void  *        );
+ast* newAst_VALUE(value*val);
+ast* newAst_OP   (unsigned op);
+ast* newAst_LINK (link*val);
+ast* newAst_STMNT(unsigned val);
+
 void      initAst      (                       );
 ast     *newNode       (long  ,ast *  ,ast *  );
 ast     *copyAst      (ast *                 );

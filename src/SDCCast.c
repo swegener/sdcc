@@ -65,6 +65,7 @@ int ptt(ast *tree) {
 /*-----------------------------------------------------------------*/
 /* newAst - creates a fresh node for an expression tree           */
 /*-----------------------------------------------------------------*/
+#if 0
 ast  *newAst (int  type, void *op )
 {
     ast  *ex ;
@@ -96,6 +97,51 @@ ast  *newAst (int  type, void *op )
     
     return ex;
 }
+#endif
+
+static ast* newAst_(unsigned type)
+{
+    ast  *ex ;
+    static int oldLineno = 0 ;
+
+    ALLOC(ex,sizeof(ast));    
+    
+    ex->type = type ;		
+    ex->lineno = (noLineno ? oldLineno : yylineno);
+    ex->filename = currFname ;
+    ex->level = NestLevel ;
+    ex->block = currBlockno ;
+    ex->initMode = inInitMode;
+    return ex;
+}
+
+ast* newAst_VALUE(value*val)
+{
+      ast* ex = newAst_(EX_VALUE);
+      ex->opval.val = val;
+      return ex;
+}
+
+ast* newAst_OP(unsigned op)
+{
+      ast*ex = newAst_(EX_OP);
+      ex->opval.op = op;
+      return ex;
+}
+
+ast* newAst_LINK(link*val)
+{
+      ast* ex = newAst_(EX_LINK);
+      ex->opval.lnk = val;
+      return ex;
+}
+
+ast* newAst_STMNT(unsigned val)
+{
+      ast* ex = newAst_(EX_STMNT);
+      ex->opval.stmnt = val;
+      return ex;
+}
 
 /*-----------------------------------------------------------------*/
 /* newNode - creates a new node                                    */
@@ -104,7 +150,7 @@ ast  *newNode ( long op,   ast  *left, ast *right   )
 {
     ast  *ex ;
     
-    ex = newAst (EX_OP,(void *) op) ;
+    ex = newAst_OP(op) ;
     ex->left    = left ;
     ex->right   = right;
         
@@ -123,11 +169,13 @@ ast *newIfxNode (ast *condAst, symbol *trueLabel, symbol *falseLabel)
 	
 	/* then depending on the expression value */
 	if ( floatFromVal(condAst->opval.val) )
-	    ifxNode = newNode(GOTO, newAst(EX_VALUE,
-					   symbolVal (trueLabel )),NULL);
+	      ifxNode = newNode(GOTO,
+				newAst_VALUE(symbolVal(trueLabel)),
+				NULL);
 	else
-	    ifxNode = newNode(GOTO, newAst(EX_VALUE,
-					   symbolVal (falseLabel )),NULL);
+	      ifxNode = newNode(GOTO,
+				newAst_VALUE(symbolVal(falseLabel)),
+				NULL);
     }
     else {
 	ifxNode = newNode(IFX,condAst,NULL);
@@ -570,7 +618,7 @@ int processParms (ast *func, value *defParm,
 	/* now change the current one to a cast */	
 	actParm->type = EX_OP ;
 	actParm->opval.op = CAST ;
-	actParm->left = newAst(EX_LINK,defParm->type);
+	actParm->left = newAst_LINK(defParm->type);
 	actParm->right= pTree ;
 	actParm->etype= defParm->etype;
 	actParm->ftype= defParm->type;
@@ -623,7 +671,7 @@ ast *createIvalStruct (ast *sym,link *type,initList *ilist)
 	if (!iloop)
 	    break;
 	sflds->implicit = 1;
-	lAst = newNode(PTR_OP,newNode('&',sym,NULL),newAst(EX_VALUE,symbolVal(sflds)));
+	lAst = newNode(PTR_OP,newNode('&',sym,NULL),newAst_VALUE(symbolVal(sflds)));
 	lAst = decorateType(resolveSymbols(lAst));
 	rast = decorateType(resolveSymbols(createIval (lAst, sflds->type, iloop,rast)));
     }
@@ -663,7 +711,7 @@ ast *createIvalArray (ast  *sym, link *type, initList *ilist)
 	ast *aSym ;
 	size++ ;
 
-	aSym = newNode('[',sym,newAst(EX_VALUE,valueFromLit(size-1)));
+	aSym = newNode('[',sym,newAst_VALUE(valueFromLit(size-1)));
 	aSym = decorateType(resolveSymbols(aSym));
 	rast = createIval (aSym,type->next,iloop,rast)   ;
 	iloop = (iloop ? iloop->next : NULL) ;
@@ -718,8 +766,8 @@ ast *createIvalCharPtr (ast *sym, link *type, ast *iexpr)
 			   rast,
 			   newNode('=',
 				   newNode('[',	sym,
-					   newAst(EX_VALUE,valueFromLit(i))),
-				   newAst(EX_VALUE,valueFromLit(*s))));
+					   newAst_VALUE(valueFromLit(i))),
+				   newAst_VALUE(valueFromLit(*s))));
 	    i++;
 	    s++;
 	}
@@ -727,8 +775,8 @@ ast *createIvalCharPtr (ast *sym, link *type, ast *iexpr)
 			   rast,
 			   newNode('=',
 				   newNode('[',	sym,
-					   newAst(EX_VALUE,valueFromLit(i))),
-				   newAst(EX_VALUE,valueFromLit(*s))));
+					   newAst_VALUE(valueFromLit(i))),
+				   newAst_VALUE(valueFromLit(*s))));
 	return decorateType(resolveSymbols(rast));
     }
 
@@ -793,7 +841,7 @@ ast  *createIval  (ast *sym, link *type, initList *ilist, ast *wid)
 /*-----------------------------------------------------------------*/
 ast *initAggregates ( symbol *sym, initList *ival, ast *wid)
 {
-    return createIval (newAst(EX_VALUE,symbolVal(sym)),sym->type,ival,wid);
+    return createIval (newAst_VALUE(symbolVal(sym)),sym->type,ival,wid);
 }
 
 /*-----------------------------------------------------------------*/
@@ -830,7 +878,7 @@ ast	*gatherAutoInit ( symbol *autoChain )
 	    if (IS_AGGREGATE(sym->type))
 		work = initAggregates (sym, sym->ival,NULL);
 	    else
-		work = newNode('=' ,newAst(EX_VALUE,symbolVal(newSym)),
+		work = newNode('=' ,newAst_VALUE(symbolVal(newSym)),
 			       list2expr(sym->ival));
 	    
 	    setAstLineno(work,sym->lineDef);
@@ -849,7 +897,7 @@ ast	*gatherAutoInit ( symbol *autoChain )
 	    if (IS_AGGREGATE(sym->type)) 
 		work = initAggregates (sym,sym->ival,NULL);
 	    else
-		work = newNode('=' ,newAst(EX_VALUE,symbolVal(sym)),
+		work = newNode('=' ,newAst_VALUE(symbolVal(sym)),
 			       list2expr(sym->ival));
 	    
 	    setAstLineno (work,sym->lineDef);
@@ -888,7 +936,7 @@ static value *stringToSymbol (value *val)
     sym->block = sym->level = 0;
     sym->isstrlit = 1;
     /* create an ival */
-    sym->ival = newiList(INIT_NODE,newAst(EX_VALUE,val));
+    sym->ival = newiList(INIT_NODE,newAst_VALUE(val));
     if (noAlloc == 0) {
 	/* allocate it */
 	addSymChain(sym);
@@ -1044,7 +1092,7 @@ bool isLoopCountable (ast *initExpr, ast *condExpr, ast *loopExpr,
 		isSymbolEqual (*sym,AST_SYMBOL(condExpr->left->left))) {
 		
 		*end = newNode('+', condExpr->left->right,
-			       newAst(EX_VALUE,constVal("1")));
+			       newAst_VALUE(constVal("1")));
 		break;
 	    }
 	    return FALSE ;
@@ -1400,8 +1448,8 @@ static void replLoopSym ( ast *body, symbol *sym)
 	    
 	    body->type = EX_OP;
 	    body->opval.op = '-';
-	    body->left = newAst(EX_VALUE,symbolVal(sym));
-	    body->right= newAst(EX_VALUE,constVal("1"));
+	    body->left = newAst_VALUE(symbolVal(sym));
+	    body->right= newAst_VALUE(constVal("1"));
 
 	}
 	    
@@ -1431,30 +1479,28 @@ ast *reverseLoop (ast *loop, symbol *sym, ast *init, ast *end)
     
     /* put it together piece by piece */
     rloop = newNode (NULLOP,
-		     createIf(newAst(EX_VALUE,symbolVal(sym)),
+		     createIf(newAst_VALUE(symbolVal(sym)),
 			      newNode(GOTO,
-				      newAst(EX_VALUE,
-					     symbolVal(AST_FOR(loop,continueLabel))),
+				      newAst_VALUE(symbolVal(AST_FOR(loop,continueLabel))),
 				      NULL),NULL),
 		     newNode('=',
-			     newAst(EX_VALUE,symbolVal(sym)),
+			     newAst_VALUE(symbolVal(sym)),
 			     newNode('-', end,
-				     newAst(EX_VALUE,
-					    constVal("1")))));
+				     newAst_VALUE(constVal("1")))));
 
     replLoopSym(loop->left, sym);
 
     rloop = newNode(NULLOP,
 		    newNode('=',
-			    newAst(EX_VALUE,symbolVal(sym)),
+			    newAst_VALUE(symbolVal(sym)),
 			    newNode('-',end,init)),
 		    createLabel(AST_FOR(loop,continueLabel),
 				newNode(NULLOP,
 					loop->left,
 					newNode(NULLOP,
 						newNode(SUB_ASSIGN,
-							newAst(EX_VALUE,symbolVal(sym)),
-							newAst(EX_VALUE,constVal("1"))),
+							newAst_VALUE(symbolVal(sym)),
+							newAst_VALUE(constVal("1"))),
 						rloop ))));
     
     return decorateType(rloop);
@@ -2615,8 +2661,7 @@ ast *decorateType (ast *tree)
 	if (checkType(currFunc->type->next,RTYPE(tree)) < 0 ) {
 	    tree->right = 
 		decorateType(newNode(CAST,
-				     newAst(EX_LINK,
-					    copyLinkChain(currFunc->type->next)),
+				     newAst_LINK(copyLinkChain(currFunc->type->next)),
 				     tree->right));
 	}
 	
@@ -2863,7 +2908,7 @@ ast  *createLabel  ( symbol  *label,  ast  *stmnt  )
     
     label->islbl = 1;
     label->key = labelKey++ ;
-    rValue =  newNode (LABEL,newAst(EX_VALUE,symbolVal(label)),stmnt);  
+    rValue =  newNode (LABEL,newAst_VALUE(symbolVal(label)),stmnt);  
     rValue->lineno = 0;
     
     return rValue ;
@@ -2996,7 +3041,7 @@ ast *createIf ( ast *condAst, ast *ifBody, ast *elseBody )
     if ( elseBody ) {
 	ifBody = newNode(NULLOP,ifBody,
 			 newNode(GOTO,
-				 newAst(EX_VALUE,symbolVal(ifEnd)),		
+				 newAst_VALUE(symbolVal(ifEnd)),
 				 NULL));
 	/* put the elseLabel on the else body */
 	elseBody = createLabel (ifFalse,elseBody);
@@ -3113,7 +3158,7 @@ ast *createFor ( symbol *trueLabel, symbol *continueLabel ,
 			   newNode(NULLOP,
 				   loopExpr,
 				   newNode(GOTO,
-					   newAst(EX_VALUE,symbolVal(condLabel)),
+					   newAst_VALUE(symbolVal(condLabel)),
 					   NULL)));
     /* now start putting them together */
     forTree = newNode(NULLOP,initExpr,condExpr);
@@ -3156,8 +3201,7 @@ ast *createWhile (symbol *trueLabel, symbol *continueLabel,
     whileBody = newNode(NULLOP,
 			whileBody,
 			newNode(GOTO,
-				newAst(EX_VALUE,
-				       symbolVal(continueLabel)),
+				newAst_VALUE(symbolVal(continueLabel)),
 				createLabel(falseLabel,NULL)));
     
     /* put it all together */
@@ -3375,12 +3419,12 @@ ast  *optimizeCompare ( ast *root )
 	case '>' :
 	case '<' :
 	case NE_OP :
-	    optExpr = newAst(EX_VALUE,constVal("0"));
+	    optExpr = newAst_VALUE(constVal("0"));
 	    break;
 	case GE_OP :
 	case LE_OP :
 	case EQ_OP :
-	    optExpr = newAst(EX_VALUE,constVal("1"));
+	    optExpr = newAst_VALUE(constVal("1"));
 	    break;
 	}
 
@@ -3416,16 +3460,16 @@ ast  *optimizeCompare ( ast *root )
 		
 	    case '<' : /* bit value < 1 means 0 */
 	    case NE_OP :
-		optExpr = newNode('!',newAst(EX_VALUE,vleft),NULL);
+		optExpr = newNode('!',newAst_VALUE(vleft),NULL);
 		break;
 		
 	    case LE_OP : /* bit value <= 1 means no check */
-		optExpr = newAst(EX_VALUE,vright);		
+		optExpr = newAst_VALUE(vright);		
 		break;
 		
 	    case GE_OP : /* bit value >= 1 means only check for = */
 	    case EQ_OP :
-		optExpr = newAst(EX_VALUE,vleft);		
+		optExpr = newAst_VALUE(vleft);		
 		break;
 	    }
 	} else { /* literal is zero */
@@ -3437,7 +3481,7 @@ ast  *optimizeCompare ( ast *root )
 		
 	    case '>' : /* bit value > 0 means 1 */
 	    case NE_OP :
-		optExpr = newAst(EX_VALUE,vleft);	     
+		optExpr = newAst_VALUE(vleft);	     
 		break;
 		
 	    case LE_OP : /* bit value <= 0 means no check */
@@ -3447,7 +3491,7 @@ ast  *optimizeCompare ( ast *root )
 		break;
 		
 	    case EQ_OP : /* bit == 0 means ! of bit */
-		optExpr = newNode('!',newAst(EX_VALUE,vleft),NULL);	      
+		optExpr = newNode('!',newAst_VALUE(vleft),NULL);	      
 		break;
 	    }
 	}		       
@@ -3589,7 +3633,7 @@ ast  *createFunction   (symbol  *name,   ast  *body )
     body = resolveSymbols(body); /* resolve the symbols */
     body = decorateType (body);  /* propagateType & do semantic checks */
     
-    ex = newAst (EX_VALUE, symbolVal(name));    /* create name       */
+    ex = newAst_VALUE(symbolVal(name));    /* create name       */
     ex = newNode (FUNCTION,ex,body);
     ex->values.args = name->args ;
     

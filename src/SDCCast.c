@@ -662,20 +662,7 @@ processParms (ast * func,
 	  return 0;
 	}
 
-      /* The ternary ('?') operator is weird: the ftype of the 
-       * operator is the type of the condition, but it will return a 
-       * (possibly) different type. 
-       */
-      if (IS_TERNARY_OP(actParm))
-      {
-          assert(IS_COLON_OP(actParm->right));
-          assert(actParm->right->left);
-          ftype = actParm->right->left->ftype;
-      }
-      else
-      {
-          ftype = actParm->ftype;
-      }
+      ftype = actParm->ftype;
           
       /* If it's a small integer, upcast to int. */
       if (IS_INTEGRAL (ftype)
@@ -2856,7 +2843,7 @@ decorateType (ast * tree)
 	      return tree->right->right ;
 	  }
       } else {
-	  TTYPE (tree) = RTYPE(tree); // #HACK LTYPE(tree).
+	  TTYPE (tree) = RTYPE(tree);
 	  TETYPE (tree) = getSpec (TTYPE (tree));
       }
       return tree;

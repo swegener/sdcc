@@ -2292,10 +2292,6 @@ geniCodeBitwise (operand * left, operand * right,
 {
   iCode *ic;
 
-  // bitwise operations must be done unsigned
-  // WHY ? causes very bad things to happen with CSE
-  //  SPEC_USIGN(resType)=1;
-
   left = geniCodeCast (resType, left, TRUE);
   right = geniCodeCast (resType, right, TRUE);
 
@@ -2569,7 +2565,7 @@ geniCodeConditional (ast * tree,int lvl)
   true = ast2iCode (tree->right->left,lvl+1);
 
   /* move the value to a new Operand */
-  result = newiTempOperand (operandType (true), 0);
+  result = newiTempOperand (tree->right->ftype, 0);
   geniCodeAssign (result, geniCodeRValue (true, FALSE), 0);
 
   /* generate an unconditional goto */

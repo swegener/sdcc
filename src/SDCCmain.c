@@ -130,6 +130,8 @@ char DefaultExePath[128];
 #define OPTION_NOSTDLIB     "-nostdlib"
 #define OPTION_NOSTDINC     "-nostdinc"
 #define OPTION_VERBOSE      "-verbose"
+#define OPTION_LESS_PEDANTIC "-lesspedantic"
+
 static const char *_preCmd[] =
 {
   "sdcpp", "-Wall", "-lang-c++", "-DSDCC=1",
@@ -933,6 +935,12 @@ parseCmdLine (int argc, char **argv)
 	      options.verbose = 1;
 	      continue;
 	    }
+          
+          if (strcmp (argv[i] +1, OPTION_LESS_PEDANTIC) == 0) 
+              {
+                  setErrorLogLevel(ERROR_LEVEL_WARNINGS);
+                  continue;
+              }
 
 	  if (!port->parseOption (&argc, argv, &i))
 	    {

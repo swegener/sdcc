@@ -162,26 +162,23 @@ static const unsigned char SRMask[] =
    IX-2   temp0 LH
  */
 
-static struct
-  {
-    struct
-      {
+static struct {
+    struct {
 	AOP_TYPE last_type;
 	const char *lit;
 	int offset;
-      }
+    }
     pairs[NUM_PAIRS];
-    struct
-      {
+    struct {
 	int last;
 	int pushed;
 	int param_offset;
 	int offset;
 	int pushed_bc;
 	int pushed_de;
-      }
-    stack;
+    } stack;
     int frameId;
+    int receiveOffset;
     bool flush_statics;
     bool in_home;
   }
@@ -905,6 +902,7 @@ requiresHL (asmop * aop)
 {
   switch (aop->type)
     {
+    case AOP_IY:
     case AOP_HL:
     case AOP_STK:
       return TRUE;
@@ -990,47 +988,46 @@ fetchLitPair (PAIR_ID pairId, asmop * left, int offset)
 static void
 fetchPairLong (PAIR_ID pairId, asmop * aop, int offset)
 {
-  /* if this is remateriazable */
-  if (isLitWord (aop))
-    {
-      fetchLitPair (pairId, aop, offset);
+    /* if this is remateriazable */
+    if (isLitWord (aop)) {
+        fetchLitPair (pairId, aop, offset);
     }
-  else
-    {				/* we need to get it byte by byte */
-      if (pairId == PAIR_HL && IS_GB && requiresHL (aop))
-	{
-	  aopGet (aop, offset, FALSE);
-	  switch (aop->size)
-	    {
-	    case 1:
-	      emit2 ("ld l,!*hl");
-	      emit2 ("ld h,!immedbyte", 0);
-	      break;
-	    case 2:
-	      emit2 ("!ldahli");
-	      emit2 ("ld h,!*hl");
-	      emit2 ("ld l,a");
-	      break;
-	    default:
-	      emit2 ("; WARNING: mlh woosed out.  This code is invalid.");
-	    }
-	}
-      else if (IS_Z80 && aop->type == AOP_IY)
-	{
-	  /* Instead of fetching relative to IY, just grab directly
-	     from the address IY refers to */
-	  char *l = aopGetLitWordLong (aop, offset, FALSE);
-	  wassert (l);
-	  emit2 ("ld %s,(%s)", _pairs[pairId].name, l);
-	}
-      else
-	{
-	  emitcode ("ld", "%s,%s", _pairs[pairId].l, aopGet (aop, offset, FALSE));
-	  emitcode ("ld", "%s,%s", _pairs[pairId].h, aopGet (aop, offset + 1, FALSE));
-	}
-      /* PENDING: check? */
-      if (pairId == PAIR_HL)
-	spillPair (PAIR_HL);
+    else {
+        /* we need to get it byte by byte */
+        if (pairId == PAIR_HL && IS_GB && requiresHL (aop)) {
+            aopGet (aop, offset, FALSE);
+            switch (aop->size) {
+            case 1:
+                emit2 ("ld l,!*hl");
+                emit2 ("ld h,!immedbyte", 0);
+                            break;
+            case 2:
+                emit2 ("!ldahli");
+                emit2 ("ld h,!*hl");
+                emit2 ("ld l,a");
+                break;
+            default:
+                emit2 ("; WARNING: mlh woosed out.  This code is invalid.");
+            }
+        }
+        else if (IS_Z80 && aop->type == AOP_IY) {
+            /* Instead of fetching relative to IY, just grab directly
+               from the address IY refers to */
+            char *l = aopGetLitWordLong (aop, offset, FALSE);
+            wassert (l);
+            emit2 ("ld %s,(%s)", _pairs[pairId].name, l);
+
+            if (aop->size < 2) {
+                emit2("ld %s,!zero", _pairs[pairId].h);
+            }
+        }
+        else {
+            emitcode ("ld", "%s,%s", _pairs[pairId].l, aopGet (aop, offset, FALSE));
+            emitcode ("ld", "%s,%s", _pairs[pairId].h, aopGet (aop, offset + 1, FALSE));
+        }
+        /* PENDING: check? */
+        if (pairId == PAIR_HL)
+            spillPair (PAIR_HL);
     }
 }
 
@@ -1857,9 +1854,9 @@ _isPairUsed (iCode * ic, PAIR_ID pairId)
   switch (pairId)
     {
     case PAIR_DE:
-      if (bitVectBitValue (ic->rUsed, D_IDX))
+      if (bitVectBitValue (ic->rMask, D_IDX))
 	ret++;
-      if (bitVectBitValue (ic->rUsed, E_IDX))
+      if (bitVectBitValue (ic->rMask, E_IDX))
 	ret++;
       break;
     default:
@@ -1909,9 +1906,9 @@ _opUsesPair (operand * op, iCode * ic, PAIR_ID pairId)
 static void
 setArea (int inHome)
 {
-  static int lastArea = 0;
-
   /*
+    static int lastArea = 0;
+
      if (_G.in_home != inHome) {
      if (inHome) {
      const char *sz = port->mem.code_name;
@@ -2122,7 +2119,6 @@ emitCall (iCode * ic, bool ispcall)
 static void
 genCall (iCode * ic)
 {
-  sym_link *detype = getSpec (operandType (IC_LEFT (ic)));
   emitCall (ic, FALSE);
 }
 
@@ -2166,6 +2162,9 @@ genFunction (iCode * ic)
   sym_link *fetype;
 
   nregssaved = 0;
+  // PENDING: HACK
+  _G.receiveOffset = 0;
+
   setArea (IS_NONBANKED (sym->etype));
 
   /* PENDING: hack */
@@ -2198,6 +2197,13 @@ genFunction (iCode * ic)
   _G.stack.pushed_bc = 0;
   _G.stack.pushed_de = 0;
   _G.stack.param_offset = 0;
+
+  /* PENDING: BUG: We don't detect if DE or BC are used in a send set.
+     For now assume the worst and always save.
+  */
+  _G.stack.pushed_bc = 1;
+  _G.stack.pushed_de = 1;
+
   if (sym->regsUsed)
     {
       int i;
@@ -2219,17 +2225,18 @@ genFunction (iCode * ic)
 		}
 	    }
 	}
-      if (_G.stack.pushed_bc)
-	{
+    }
+
+  if (_G.stack.pushed_bc)
+      {
 	  emit2 ("push bc");
 	  _G.stack.param_offset += 2;
-	}
-      if (_G.stack.pushed_de)
-	{
+      }
+  if (_G.stack.pushed_de)
+      {
 	  emit2 ("push de");
 	  _G.stack.param_offset += 2;
-	}
-    }
+      }
 
   /* adjust the stack for the function */
   _G.stack.last = sym->stack;
@@ -3341,6 +3348,8 @@ genCmpEq (iCode * ic, iCode * ifx)
   aopOp ((left = IC_LEFT (ic)), ic, FALSE, FALSE);
   aopOp ((right = IC_RIGHT (ic)), ic, FALSE, FALSE);
   aopOp ((result = IC_RESULT (ic)), ic, TRUE, FALSE);
+
+  emit2("; genCmpEq: left %u, right %u, result %u\n", AOP_SIZE(IC_LEFT(ic)), AOP_SIZE(IC_RIGHT(ic)), AOP_SIZE(IC_RESULT(ic)));
 
   /* Swap operands if it makes the operation easier. ie if:
      1.  Left is a literal.
@@ -5302,10 +5311,16 @@ genReceive (iCode * ic)
     }
   else
     {
-      accInUse++;
-      aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
-      accInUse--;
-      assignResultValue (IC_RESULT (ic));
+        // PENDING: HACK
+        int size;
+        int i;
+
+        aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
+        size = AOP_SIZE(IC_RESULT(ic));
+
+        for (i = 0; i < size; i++) {
+            aopPut(AOP(IC_RESULT(ic)), _fReturn[_G.receiveOffset++], i);
+	}
     }
 
   freeAsmop (IC_RESULT (ic), NULL, ic);

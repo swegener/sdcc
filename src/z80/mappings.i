@@ -60,9 +60,14 @@ static const ASM_MAPPING _asxxxx_z80_mapping[] = {
 		"push\tix\n"
 		"\tld\tix,#0\n"
 		"\tadd\tix,sp\n"
+                "\tld\tb,h\n"
+                "\tld\tc,l\n"
 		"\tld\thl,#-%d\n"
 		"\tadd\thl,sp\n"
-		"\tld\tsp,hl" },
+		"\tld\tsp,hl\n" 
+                "\tld\th,b\n"
+      		"\tld\tl,c"
+        },
     { "leave", 
 		"pop\tix\n"
     },

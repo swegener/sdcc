@@ -3233,6 +3233,23 @@ decorateType (ast * tree)
       /* make sure the type is complete and sane */
       checkTypeSanity(LETYPE(tree), "(cast)");
 
+      /* If code memory is read only, then pointers to code memory */
+      /* implicitly point to constants -- make this explicit       */
+      {
+	sym_link *t = LTYPE(tree);
+	while (t && t->next)
+	  {
+	    if (IS_CODEPTR(t) && port->mem.code_ro)
+	      {
+	        if (IS_SPEC(t->next))
+	          SPEC_CONST (t->next) = 1;
+	        else
+	          DCL_PTR_CONST (t->next) = 1;
+	      }
+	    t = t->next;
+          }
+      }
+
 #if 0
       /* if the right is a literal replace the tree */
       if (IS_LITERAL (RETYPE (tree))) {

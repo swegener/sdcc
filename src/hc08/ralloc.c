@@ -1596,7 +1596,6 @@ rematStr (symbol * sym)
   
   while (1)
     {
-
       /* if plus or minus print the right hand side */
       if (ic->op == '+' || ic->op == '-')
 	{
@@ -1629,7 +1628,7 @@ rematStr (symbol * sym)
       /* we reached the end */
       if (ic->op == ADDRESS_OF)
         sprintf (s, "%s", OP_SYMBOL (IC_LEFT (ic))->rname);
-      else if (ic->op == '=');
+      else if (ic->op == '=')
         sprintf (s, "0x%04x", (int) operandLitValue (IC_RIGHT (ic)) );
       break;
     }

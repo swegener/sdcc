@@ -1,3 +1,8 @@
+2004-01-20 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/hc08/ralloc.c (rematStr): fixed bug #879282
+	* src/SDCCast.c (decorateType): fixed bug #880197
+
 2004-01-20  Michael Hope  <michaelh@juju.net.nz>
 
 	* sim/ucsim/gui.src/serio.src/main.cc: Fixed unconditional use of

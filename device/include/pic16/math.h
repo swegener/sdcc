@@ -1,4 +1,5 @@
-/*  math.h: Floating point math function declarations
+/*-------------------------------------------------------------------------
+   math.h: Floating point math function declarations
 
     Ported to PIC16 port by Vangelis Rokas, 2004 (vrokas@otenet.gr)
     
@@ -16,9 +17,13 @@
 
     You should have received a copy of the GNU Lesser General Public
     License along with this library; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA */
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+-------------------------------------------------------------------------*/
 
-/* Version 1.0 - Initial release */
+/*
+** $Id$
+*/
+
 
 #ifndef __PIC16_MATH_H
 #define __PIC16_MATH_H	1

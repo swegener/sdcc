@@ -24,6 +24,10 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
+/*
+** $Id$
+*/
+
 #ifndef __PIC16_STDIO_H
 #define __PIC16_STDIO_H 1
 

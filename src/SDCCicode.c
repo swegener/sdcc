@@ -2336,7 +2336,7 @@ static void geniCodeSEParms (ast *parms)
 	parms->right->left->lvalue = 1;
 
     parms->opval.oprnd = 
-	geniCodeRValue(ast2iCode (parms),TRUE);	  
+	geniCodeRValue(ast2iCode (parms),FALSE);
    
     parms->type = EX_OPERAND ;
 }
@@ -2416,8 +2416,7 @@ operand *geniCodeCall (operand *left, ast *parms)
     /* take care of parameters with side-effecting
        function calls in them, this is required to take care 
        of overlaying function parameters */
-    if (!options.stackAuto)
-	geniCodeSEParms ( parms );
+    geniCodeSEParms ( parms );
 
     /* first the parameters */
     geniCodeParms ( parms , &stack , getSpec(operandType(left)));

@@ -1,4 +1,9 @@
-2004-06-02 Maarten Brock <sourceforge.brock AT dse.nl>
+2004-06-06 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/pic16/pcode.c (pic16_emitDB): removed double semicolon which fails
+	  compilation on MSVC
+
+2004-06-06 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/sab80515.h: added sfr P6, changed GPL to LGPL
 

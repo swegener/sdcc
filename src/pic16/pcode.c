@@ -4012,7 +4012,7 @@ static int DB_prev = -1;
 void pic16_emitDB(pBlock *pb, char c)
 {
   int l;
-  char *frm, tbuf[8];;
+  char *frm, tbuf[8];
   char frm_alnum[]="%c";
   char frm_other[]="0x%02x";
 

@@ -1692,6 +1692,7 @@ genCpl (iCode * ic)
 {
   int offset = 0;
   int size;
+  symbol *tlbl;
 
   D (emitcode (";", "genCpl ");
     );
@@ -1701,17 +1702,21 @@ genCpl (iCode * ic)
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
   aopOp (IC_RESULT (ic), ic, TRUE, AOP_TYPE (IC_LEFT (ic)) == AOP_DPTR);
 
-  /* if both are in bit space then
-     a special case */
-  if (AOP_TYPE (IC_RESULT (ic)) == AOP_CRY &&
-      AOP_TYPE (IC_LEFT (ic)) == AOP_CRY)
-    {
-
+  /* special case if in bit space */
+  if (AOP_TYPE (IC_RESULT (ic)) == AOP_CRY) {
+    if (AOP_TYPE (IC_LEFT (ic)) == AOP_CRY) {
       emitcode ("mov", "c,%s", IC_LEFT (ic)->aop->aopu.aop_dir);
       emitcode ("cpl", "c");
       emitcode ("mov", "%s,c", IC_RESULT (ic)->aop->aopu.aop_dir);
       goto release;
     }
+    tlbl=newiTempLabel(NULL);
+    emitcode ("cjne", "%s,#0x01,%05d$", 
+	      aopGet(AOP(IC_LEFT(ic)), 0, FALSE,FALSE,TRUE), tlbl->key+100);
+    emitcode ("", "%05d$:", tlbl->key+100);
+    outBitC (IC_RESULT(ic));
+    goto release;
+  }
 
   size = AOP_SIZE (IC_RESULT (ic));
   _startLazyDPSEvaluation ();

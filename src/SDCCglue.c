@@ -317,7 +317,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 /* initPointer - pointer initialization code massaging             */
 /*-----------------------------------------------------------------*/
 value *
-initPointer (initList * ilist)
+initPointer (initList * ilist, sym_link *toType)
 {
 	value *val;
 	ast *expr = list2expr (ilist);
@@ -329,6 +329,17 @@ initPointer (initList * ilist)
 	if ((val = constExprValue (expr, FALSE)))
 		return val;
 	
+	/* (char *)&a */
+	if (IS_AST_OP(expr) && expr->opval.op==CAST &&
+	    IS_AST_OP(expr->right) && expr->right->opval.op=='&') {
+	  if (compareType(toType, expr->left->ftype)!=1) {
+	    werror (W_INIT_WRONG);
+	    printFromToType(expr->left->ftype, toType);
+	  }
+	  // skip the cast ???
+	  expr=expr->right;
+	}
+
 	/* no then we have to do these cludgy checks */
 	/* pointers can be initialized with address of
 	   a variable or address of an array element */
@@ -945,7 +956,7 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
       return;
     }
 
-  if (!(val = initPointer (ilist)))
+  if (!(val = initPointer (ilist, type)))
     return;
 
   /* if character pointer */

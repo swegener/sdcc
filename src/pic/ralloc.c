@@ -3312,18 +3312,18 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
 	if (!IS_SYMOP (op))
 		return NULL;
 	
-		/* only upto 2 bytes since we cannot predict
+	/* only upto 2 bytes since we cannot predict
 	the usage of b, & acc */
 	if (getSize (operandType (op)) > (fReturnSizePic - 2) &&
 		ic->op != RETURN &&
 		ic->op != SEND)
 		return NULL;
 	
-		/* this routine will mark the a symbol as used in one 
-		instruction use only && if the definition is local 
-		(ie. within the basic block) && has only one definition &&
-		that definition is either a return value from a 
-		function or does not contain any variables in
+	/* this routine will mark the a symbol as used in one 
+	instruction use only && if the definition is local 
+	(ie. within the basic block) && has only one definition &&
+	that definition is either a return value from a 
+	function or does not contain any variables in
 	far space */
 	uses = bitVectCopy (OP_USES (op));
 	bitVectUnSetBit (uses, ic->key);	/* take away this iCode */
@@ -4069,7 +4069,7 @@ packRegisters (eBBlock * ebp)
 			
 			packRegsForAccUse (ic);
 		
-  }
+	}
 }
 
 static void

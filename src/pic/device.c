@@ -159,6 +159,7 @@ void setMaxRAM(int size)
 	for(i=0; i<=pic->maxRAMaddress; i++) {
 		finalMapping[i].reg = NULL;
 		finalMapping[i].isValid = 0;
+		finalMapping[i].bank = (i>>7);
 	}
 }
 
@@ -239,9 +240,9 @@ void dump_sfr(FILE *of)
 		} else {
 			if(start>=0) {
 				
-			/* clear the lower 7-bits of the start address of the first
-			* variable declared in this bank. The upper bits for the mid
-			* range pics are the bank select bits.
+				/* clear the lower 7-bits of the start address of the first
+				* variable declared in this bank. The upper bits for the mid
+				* range pics are the bank select bits.
 				*/
 				
 				bank_base = start & 0xfff8;
@@ -632,6 +633,7 @@ void setDefMaxRam(void)
 	setMaxRAM(pic->defMaxRAMaddrs); /* Max RAM has not been included, so use default setting */
 	/* Validate full memory range for use by general purpose RAM */
 	for (i=pic->defMaxRAMaddrs; i--; ) {
+		finalMapping[i].bank = (i>>7);
 		finalMapping[i].isValid = 1;
 	}
 }

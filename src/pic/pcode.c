@@ -57,7 +57,7 @@ peepCommand peepCommands[] = {
 pCodeOpReg pc_status    = {{PO_STATUS,  "STATUS"}, -1, NULL,0,NULL};
 pCodeOpReg pc_indf      = {{PO_INDF,    "INDF"}, -1, NULL,0,NULL};
 pCodeOpReg pc_fsr       = {{PO_FSR,     "FSR"}, -1, NULL,0,NULL};
-pCodeOpReg pc_intcon    = {{PO_INTCON,  ""}, -1, NULL,0,NULL};
+pCodeOpReg pc_intcon    = {{PO_INTCON,  "INTCON"}, -1, NULL,0,NULL};
 pCodeOpReg pc_pcl       = {{PO_PCL,     "PCL"}, -1, NULL,0,NULL};
 pCodeOpReg pc_pclath    = {{PO_PCLATH,  "PCLATH"}, -1, NULL,0,NULL};
 
@@ -1352,7 +1352,7 @@ void  pCodeInitRegisters(void)
 	pc_pcl.r = allocProcessorRegister(IDX_PCL,"PCL", PO_PCL, 0x80);
 	pc_pclath.r = allocProcessorRegister(IDX_PCLATH,"PCLATH", PO_PCLATH, 0x180);
 	pc_fsr.r = allocProcessorRegister(IDX_FSR,"FSR", PO_FSR, 0x180);
-	pc_indf.r = allocProcessorRegister(IDX_INDF,"INDF", PO_INDF, 0x80);
+	pc_indf.r = allocProcessorRegister(IDX_INDF,"INDF", PO_INDF, 0x180);
 	pc_intcon.r = allocProcessorRegister(IDX_INTCON,"INTCON", PO_INTCON, 0x180);
 	
 	pc_status.rIdx = IDX_STATUS;
@@ -3048,7 +3048,7 @@ char *pCode2str(char *str, size_t size, pCode *pc)
 						(((pCodeOpRegBit *)(PCI(pc)->pcop))->bit)&7);
 				} else if(PCI(pc)->pcop->type == PO_GPR_BIT) {
 					SAFE_snprintf(&s,&size,"%s,%d", get_op_from_instruction(PCI(pc)),PCORB(PCI(pc)->pcop)->bit);
-				}else
+				} else
 					SAFE_snprintf(&s,&size,"%s,0 ; ?bug", get_op_from_instruction(PCI(pc)));
 				//PCI(pc)->pcop->t.bit );
 			} else {
@@ -3059,7 +3059,7 @@ char *pCode2str(char *str, size_t size, pCode *pc)
 					else
 						SAFE_snprintf(&s,&size,"(1 << (%s & 7))",get_op_from_instruction(PCI(pc)));
 					
-				}else {
+				} else {
 					SAFE_snprintf(&s,&size,"%s",get_op_from_instruction(PCI(pc)));
 					
 					if( PCI(pc)->num_ops == 2)
@@ -4546,7 +4546,7 @@ static int DoBankSelect(pCode *pc, int cur_bank) {
 		
 		if (!isPCI_LIT(pc)) {
 			
-		/* Examine the instruction before this one to make sure it is
+			/* Examine the instruction before this one to make sure it is
 			* not a skip type instruction */
 			pcprev = findPrevpCode(pc->prev, PC_OPCODE);
 			
@@ -5411,12 +5411,6 @@ void AnalyzeBanking(void)
 	pBlock  *pb;
 	
 	if(!picIsInitialized()) {
-//		fprintf(stderr,"Temporary ERROR: at the moment you have to use\n");
-//		fprintf(stderr,"an include file create by inc2h.pl. See SDCC source:\n");
-//		fprintf(stderr,"support/scripts/inc2h.pl\n");
-//		fprintf(stderr,"this is a nuisance bug that will be fixed shortly\n");
-		
-//		exit(1);
 		setDefMaxRam(); // Max RAM has not been included, so use default setting
 	}
 	

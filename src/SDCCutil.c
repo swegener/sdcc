@@ -27,6 +27,7 @@
 #include <windows.h>
 #endif
 #include <sys/stat.h>
+#include "dbuf.h"
 #include "SDCCglobl.h"
 #include "SDCCmacro.h"
 #include "SDCCutil.h"
@@ -49,163 +50,64 @@ populateStringHash(const char **pin)
   return pret;
 }
 
-/** Given an array of string pointers and another string, adds the
-    string to the end of the list.  The end of the list is assumed to
-    be the first NULL pointer.
+/** Prints elements of the set to the file, each element on new line
 */
 void
-addToList (const char **list, const char *str)
+fputStrSet(FILE *fp, set *list)
 {
-  /* This is the bad way to do things :) */
-  while (*list)
-    list++;
-  *list = Safe_strdup (str);
-  if (!*list)
-    {
-      werror (E_OUT_OF_MEM, __FILE__, 0);
-      exit (1);
-    }
-  *(++list) = NULL;
+  const char *s;
+
+  for (s = setFirstItem(list); s != NULL; s = setNextItem(list)) {
+    fputs(s, fp);
+    fputc('\n', fp);
+  }
 }
 
-/** Given an array of string pointers returns a string containing all
-    of the strings seperated by spaces.  The returned string is on the
-    heap.  The join stops when a NULL pointer is hit.
+/** Prepend / append given strings to each item of string set. The result is in a
+    new string set.
 */
-char *
-join(const char **pplist)
+set *
+appendStrSet(set *list, const char *pre, const char *post)
 {
-    buffer[0] = 0;  
-    
-    while (*pplist)
-    {
-	strncatz(buffer, *pplist, PATH_MAX);
-	strncatz(buffer, " ", PATH_MAX);
-	pplist++;
-    }
+  set *new_list = NULL;
+  const char *item;
+  struct dbuf_s dbuf;
 
-    return buffer;
+  for (item = setFirstItem(list); item != NULL; item = setNextItem(list)) {
+    dbuf_init(&dbuf, PATH_MAX);
+    if (pre != NULL)
+      dbuf_append(&dbuf, pre, strlen(pre));
+    dbuf_append(&dbuf, item, strlen(item));
+    if (post != NULL)
+      dbuf_append(&dbuf, post, strlen(post));
+    addSet(&new_list, (void *)dbuf_c_str(&dbuf));
+    dbuf_detach(&dbuf);
+  }
+
+  return new_list;
 }
 
-/** Given an array of string pointers, returns a string containing all
-    of the strings seperated by spaces.  The returned string is on the
-    heap.  n is the number of strings in the list.
+/** Given a set returns a string containing all of the strings seperated
+    by spaces. The returned string is on the heap.
 */
-char *
-joinn(char **pplist, int n)
+const char *
+joinStrSet(set *list)
 {
-    buffer[0] = 0;  
-    
-    while (n--)
+  const char *s;
+  struct dbuf_s dbuf;
+
+  dbuf_init(&dbuf, PATH_MAX);
+
+  for (s = setFirstItem(list); s != NULL; s = setNextItem(list))
     {
-	strncatz(buffer, *pplist, PATH_MAX);
-	strncatz(buffer, " ", PATH_MAX);
-	pplist++;
+      dbuf_append(&dbuf, s, strlen(s));
+      dbuf_append(&dbuf, " ", 1);
     }
 
-    return buffer;
+  s = dbuf_c_str(&dbuf);
+  dbuf_detach(&dbuf);
+  return s;
 }
-
-/** Returns TRUE if for the host the two path characters are
-    equivalent.
-*/
-static bool
-pathCharsEquivalent(char c1, char c2)
-{
-#if NATIVE_WIN32
-  /* win32 is case insensitive */
-  if (tolower(c1) == tolower(c2))
-    {
-      return TRUE;
-    }
-  /* And / is equivalent to \ */
-  else if (c1 == '/' && c2 == '\\')
-    {
-      return TRUE;
-    }
-  else if (c1 == '\\' && c2 == '/')
-    {
-      return TRUE;
-    }
-  else
-    {
-      return FALSE;
-    }
-#else
-  /* Assume a Unix host where they must match exactly. */
-  return c1 == c2;
-#endif
-}
-
-static char
-pathCharTransform(char c)
-{
-#if NATIVE_WIN32
-  if (c == '/')
-    {
-      return DIR_SEPARATOR_CHAR;
-    }
-  else
-    {
-      return c;
-    }
-#else
-  return c;
-#endif
-}
-
-/** Fixes up a potentially mixed path to the proper representation for
-    the host.  Fixes up in place.
-*/
-static char *
-fixupPath(char *pin)
-{
-  char *p = pin;
-
-  while (*p)
-    {
-      *p = pathCharTransform(*p);
-      p++;
-    }
-  *p = '\0';
-
-  return pin;
-}
-
-/** Returns the characters in p2 past the last matching characters in
-    p1.  
-*/
-char *
-getPathDifference (char *pinto, const char *p1, const char *p2)
-{
-  char *p = pinto;
-
-#if NATIVE_WIN32
-  /* win32 can have a path at the start. */
-  if (strchr(p2, ':'))
-    {
-      p2 = strchr(p2, ':')+1;
-    }
-#endif  
-
-  while (*p1 != '\0' && *p2 != '\0')
-    {
-      if (pathCharsEquivalent(*p1, *p2) == FALSE)
-        {
-          break;
-        }
-      p1++;
-      p2++;
-    }
-  while (*p2)
-    {
-      *p++ = *p2++;
-    }
-  *p = '\0';
-
-  return fixupPath(pinto);
-}
-
 
 /** Given a file with path information in the binary files directory,
     returns the directory component. Used for discovery of bin
@@ -325,7 +227,7 @@ char *strncpyz(char *dest, const char *src, size_t n)
     assert(n > 0);
 
     --n;
-    // paranoia...
+    /* paranoia... */
     if (strlen(src) > n)
     {
 	fprintf(stderr, "strncpyz prevented buffer overrun!\n");
@@ -350,7 +252,7 @@ char *strncatz(char *dest, const char *src, size_t n)
     
     maxToCopy = n - destLen - 1;
     
-    // paranoia...
+    /* paranoia... */
     if (strlen(src) + destLen >= n)
     {
 	fprintf(stderr, "strncatz prevented buffer overrun!\n");

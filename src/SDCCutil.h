@@ -33,33 +33,24 @@
 */
 hTab *populateStringHash(const char **pin);
 
-/** Given an array of string pointers and another string, adds the
-    string to the end of the list.  The end of the list is assumed to
-    be the first NULL pointer.
+/** Prints elements of the set to the file, each element on new line
 */
-void addToList (const char **list, const char *str);
+void fputStrSet(FILE *fp, set *list);
 
-/** Given an array of string pointers returns a string containing all
-    of the strings seperated by spaces.  The returned string is on the
-    heap.  The join stops when a NULL pointer is hit.
+/** Prepend / append given strings to each item of string set. The result is in a
+    new string set.
 */
-char *join(const char **pplist);
+set *appendStrSet(set *list, const char *pre, const char *post);
 
-/** Given an array of string pointers, returns a string containing all
-    of the strings seperated by spaces.  The returned string is on the
-    heap.  n is the number of strings in the list.
+/** Given a set returns a string containing all of the strings seperated
+    by spaces. The returned string is on the heap.
 */
-char *joinn(char **pplist, int n);
+const char *joinStrSet(set *list);
 
-/** Returns the characters in the path p2 past the last matching characters in
-    p1.  Processes in a host dependent way.  For example, on win32 the
-    test is case insensitive and treats '/' and '\' as the same.
-*/
-char *getPathDifference (char *pinto, const char *p1, const char *p2);
-
-/** Given an array of string pointers, returns a string containing all
-    of the strings seperated by spaces.  The returned string is on the
-    heap.  n is the number of strings in the list.
+/** Given a file with path information in the binary files directory,
+    returns the directory component. Used for discovery of bin
+    directory of SDCC installation. Returns NULL if the path is
+    impossible.
 */
 char *getBinPath (const char *prel);
 
@@ -118,7 +109,4 @@ size_t SDCCsnprintf(char *, size_t, const char *, ...);
 #  error "Need at least one of snprintf, vsnprintf, vsprintf!"
 # endif
 
-
-
 #endif
-

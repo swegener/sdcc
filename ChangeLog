@@ -15,6 +15,7 @@
 	* src/xa51/gen.c:       remove old endianess stuff
 	* src/z80/gen.c:        fix endianess check
 	* src/SDCCglue.c:       fix endianess check
+	* src/ds390/peeph.def: fix bug 700036
 
 2003-03-08  Bernhard Held <bernhard@bernhardheld.de>
 

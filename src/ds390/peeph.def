@@ -2370,7 +2370,7 @@ replace {
         sjmp    %1
 %2:
         mov     %3,%4
-%5:
+%1:
         ret
 } by {
         ; Peephole 237a  removed sjmp to ret

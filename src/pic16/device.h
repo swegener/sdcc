@@ -100,6 +100,9 @@ typedef struct {
 	int ivt_loc;
 	int nodefaultlibs;
 	int dumpcalltree;
+	int use_crt;
+	char *crt_name;
+	int no_crt;
 } pic16_options_t;
 
 #define STACK_MODEL_SMALL	(pic16_options.stack_model == 0)

@@ -287,6 +287,7 @@ _process_pragma(const char *sz)
 #define MPLAB_COMPAT	"--mplab-comp"
 
 #define NL_OPT		"--nl="
+#define USE_CRT		"--use-crt="
 
 char *alt_asm=NULL;
 char *alt_link=NULL;
@@ -324,6 +325,8 @@ OPTION pic16_optionsTable[]= {
 	{ 0,	MPLAB_COMPAT,		&pic16_mplab_comp,	"enable compatibility mode for MPLAB utilities (MPASM/MPLINK)"},
 	{ 0,	"--fstack",		&pic16_fstack,		"enable stack optimizations"},
 	{ 0,	NL_OPT,		NULL,				"new line, \"lf\" or \"crlf\""},
+	{ 0,	USE_CRT,	NULL,	"use <crt-o> run-time initialization module"},
+	{ 0,	"--no-crt",	&pic16_options.no_crt,	"do not link any default run-time initialization module"},
 	{ 0,	NULL,		NULL,	NULL}
 	};
 
@@ -400,6 +403,14 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
             }
             return TRUE;
         }
+
+        if(ISOPT(USE_CRT)) {
+          char *tmp;
+        
+            tmp = Safe_strdup( getStringArg(USE_CRT, argv, i, *pargc) );
+            pic16_options.use_crt = 1; pic16_options.no_crt = 0;
+            pic16_options.crt_name = tmp;
+        }
         
   return FALSE;
 }
@@ -475,7 +486,8 @@ static void _pic16_linkEdit(void)
 		addSetHead(&relFilesSet, temp);
 	}
 
-//  	shash_add(&linkValues, "spec_ofiles", "crt0i.o");
+	if(pic16_options.use_crt && !pic16_options.no_crt)
+	    shash_add(&linkValues, "spec_ofiles", pic16_options.crt_name);	//"crt0i.o");
   	shash_add(&linkValues, "ofiles", joinStrSet(relFilesSet));
   	shash_add(&linkValues, "libs", joinStrSet(libFilesSet));
   	
@@ -594,6 +606,9 @@ _pic16_setDefaultOptions (void)
 	pic16_options.ivt_loc = 0x000000;
 	pic16_options.nodefaultlibs = 0;
 	pic16_options.dumpcalltree = 0;
+	pic16_options.use_crt = 1;
+	pic16_options.crt_name = "crt0i";		/* the default crt to link */
+	pic16_options.no_crt = 0;
 }
 
 static const char *

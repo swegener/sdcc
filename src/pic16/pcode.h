@@ -300,8 +300,33 @@ typedef enum
 		   * in the pCode peep hole optimizer */
   PC_CSOURCE,     /* C-Source Line  */
   PC_ASMDIR,	  /* Assembler directive */
-  PC_BAD          /* Mark the pCode object as being bad */
+  PC_BAD,         /* Mark the pCode object as being bad */
+  PC_INFO         /* pCode informatio node, used primarily in optimizing */
 } PC_TYPE;
+
+
+/***********************************************************************
+ *  INFO_TYPE  - information node types
+ ***********************************************************************/
+
+typedef enum
+{
+  INF_OPTIMIZATION,      /* structure contains optimization information */
+} INFO_TYPE;
+
+
+
+/***********************************************************************
+ *  OPT_TYPE  - optimization node types
+ ***********************************************************************/
+
+typedef enum
+{
+  OPT_BEGIN,             /* mark beginning of optimization block */
+  OPT_END,               /* mark ending of optimization block */
+} OPT_TYPE;
+
+
 
 /************************************************/
 /***************  Structures ********************/
@@ -445,6 +470,17 @@ typedef struct pCodeOpWild
 
 } pCodeOpWild;
 
+
+typedef struct pCodeOpOpt
+{
+  pCodeOp pcop;
+  
+  OPT_TYPE type;          /* optimization node type */
+  
+  char *key;              /* key by which a block is identified */
+} pCodeOpOpt;
+
+  
 
 /*************************************************
     pCode
@@ -703,6 +739,22 @@ typedef struct pCodeWild
 
 } pCodeWild;
 
+
+/*************************************************
+    pInfo
+    
+    Here are stored generic informaton
+*************************************************/
+typedef struct pInfo
+{
+  pCode pc;
+  
+  INFO_TYPE type;	/* info node type */
+  
+  pCodeOp *oper1;	/* info node arguments */
+} pInfo;
+  
+
 /*************************************************
     pBlock
 
@@ -863,6 +915,7 @@ typedef struct peepCommand {
 #define PCOR(x)   ((pCodeOpReg *)(x))
 #define PCOR2(x)  ((pCodeOpReg2 *)(x))
 #define PCORB(x)  ((pCodeOpRegBit *)(x))
+#define PCOO(x)   ((pCodeOpOpt *)(x))
 #define PCOW(x)   ((pCodeOpWild *)(x))
 #define PCOW2(x)  (PCOW(PCOW(x)->pcop2))
 #define PBR(x)    ((pBranch *)(x))

@@ -1617,7 +1617,8 @@ pic16glue ()
 	addSetHead(&tmpfileSet,ovrFile);
 	pic16_pCodeInitRegisters();
 
-	if (mainf && IFFUNC_HASBODY(mainf->type)) {
+
+	if (pic16_options.no_crt && mainf && IFFUNC_HASBODY(mainf->type)) {
 	  pBlock *pb = pic16_newpCodeChain(NULL,'X',pic16_newpCodeCharP("; Starting pCode block"));
 
 		pic16_addpBlock(pb);
@@ -1774,35 +1775,16 @@ pic16glue ()
 	fprintf (asmFile, "; global & static initialisations\n");
 	fprintf (asmFile, "%s", iComments2);
     
-#if 0
-	/* copy over code */
-	fprintf (asmFile, "%s", iComments2);
-	fprintf (asmFile, "\tcode\n");
-	fprintf (asmFile, "%s", iComments2);
-#endif
-
 	if(pic16_debug_verbose)
 		fprintf(asmFile, "; A code from now on!\n");
 	pic16_copypCode(asmFile, 'A');
 
 
-	if(mainf && IFFUNC_HASBODY(mainf->type)) {
-		fprintf(asmFile, "\tcode\n");
-		fprintf(asmFile,"__sdcc_gsinit_startup:\n");
-
-#if 0
-		/* FIXME 8051 legacy (?!) - VR 20-Jun-2003 */
-		/* if external stack is specified then the
-		 * higher order byte of the xdatalocation is
-		 * going into P2 and the lower order going into */
-	
-		if (options.useXstack) {
-			fprintf(asmFile,";\tmov\tP2,#0x%02x\n",
-					(((unsigned int)options.xdata_loc) >> 8) & 0xff);
-			fprintf(asmFile,";\tmov\t_spx,#0x%02x\n",
-					(unsigned int)options.xdata_loc & 0xff);
+	if(pic16_options.no_crt) {
+		if(mainf && IFFUNC_HASBODY(mainf->type)) {
+			fprintf(asmFile, "\tcode\n");
+			fprintf(asmFile,"__sdcc_gsinit_startup:\n");
 		}
-#endif
 	}
 
 //	copyFile (stderr, code->oFile);
@@ -1815,8 +1797,10 @@ pic16glue ()
 	pic16_copypCode(asmFile, statsg->dbName);
 
 
-	if (port->general.glue_up_main && mainf && IFFUNC_HASBODY(mainf->type)) {
-		fprintf (asmFile,"\tgoto\t__sdcc_program_startup\n");
+	if(pic16_options.no_crt) {
+		if (port->general.glue_up_main && mainf && IFFUNC_HASBODY(mainf->type)) {
+			fprintf (asmFile,"\tgoto\t__sdcc_program_startup\n");
+		}
 	}
 	
 

@@ -1085,6 +1085,7 @@ void pic16_genPlus (iCode *ic)
 
 	}
 
+	assert( 0 );
 	// TODO: 	anything from here to before "release:" is probably obsolete and should be removed
 	//		when the regression tests are stable
 

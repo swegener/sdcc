@@ -21,6 +21,9 @@ extern FSR0H;
 extern TABLAT;
 extern POSTINC0;
 
+/* global variable for forcing gplink to add _cinit section */
+char __uflags = 0;
+
 /* external reference to the user's main routine */
 extern void main (void);
 

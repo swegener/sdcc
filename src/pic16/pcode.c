@@ -3739,6 +3739,13 @@ pCode *pic16_newpCodeLabelFORCE(char *name, int key)
   return ( (pCode *)pcl );
 }
 
+#if 0
+pCode *pic16_newpCodeInfo(INFO_TYPE type, pCodeOp *pcop)
+{
+
+}
+#endif
+
 
 /*-----------------------------------------------------------------*/
 /* newpBlock - create and return a pointer to a new pBlock         */
@@ -3780,6 +3787,8 @@ pBlock *pic16_newpCodeChain(memmap *cm,char c, pCode *pc)
 
   return pB;
 }
+
+
 
 /*-----------------------------------------------------------------*/
 /* pic16_newpCodeOpLabel - Create a new label given the key              */
@@ -4049,6 +4058,21 @@ pCodeOp *pic16_newpCodeOpRegFromStr(char *name)
 
   return pcop;
 }
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+pCodeOp *pic16_newpCodeOpOpt(OPT_TYPE type, char *key)
+{
+  pCodeOpOpt *pcop;
+
+  	pcop = Safe_calloc(1, sizeof(pCodeOpOpt));
+  	
+  	pcop->type = type;
+  	pcop->key = Safe_strdup( key );
+
+  return (PCOP(pcop));
+}
+
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
@@ -4758,6 +4782,11 @@ char *pic16_pCode2str(char *str, size_t size, pCode *pc)
 
   case PC_BAD:
     SAFE_snprintf(&s,&size,";A bad pCode is being used\n");
+    break;
+
+  case PC_INFO:
+    SAFE_snprintf(&s,&size,"; PC INFO pcode\n");
+    break;
   }
 
   return str;

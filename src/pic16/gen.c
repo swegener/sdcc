@@ -58,7 +58,7 @@ static asmop *newAsmop (short type);
 static pCodeOp *pic16_popRegFromString(char *str, int size, int offset, operand *op);
 extern pCode *pic16_newpCodeAsmDir(char *asdir, char *argfmt, ...);
 static void mov2w (asmop *aop, int offset);
-static int aopIdx (asmop *aop, int offset);
+//static int aopIdx (asmop *aop, int offset);
 
 int pic16_labelOffset=0;
 extern int pic16_debug_verbose;
@@ -873,6 +873,7 @@ static asmop *aopForRemat (operand *op) // x symbol *sym)
   return aop;        
 }
 
+#if 0
 static int aopIdx (asmop *aop, int offset)
 {
   if(!aop)
@@ -884,6 +885,8 @@ static int aopIdx (asmop *aop, int offset)
   return aop->aopu.aop_reg[offset]->rIdx;
 
 }
+#endif
+
 /*-----------------------------------------------------------------*/
 /* regsInCommon - two operands have some registers in common       */
 /*-----------------------------------------------------------------*/
@@ -6601,10 +6604,41 @@ static void genAnd (iCode *ic, iCode *ifx)
     } else {
       symbol *tlbl = newiTempLabel(NULL);
       int sizel = AOP_SIZE(left);
+
+      /* here to add patch from Aaron */
       if(size)
-	pic16_emitcode("setb","c");
-      while(sizel--){
-	if((bytelit = ((lit >> (offset*8)) & 0x0FFL)) != 0x0L){
+        emitSETC;			//pic16_emitcode("setb","c");
+
+
+      while(sizel--) {
+        if((bytelit = ((lit >> (offset*8)) & 0x0FFL)) != 0x0L){
+
+
+          /* patch provided by Aaron Colwell */
+          if((posbit = isLiteralBit(bytelit)) != 0) {
+              pic16_emitpcode(((rIfx.condition) ? POC_BTFSS : POC_BTFSC ),
+                              pic16_newpCodeOpBit(pic16_aopGet(AOP(left),
+                                                offset,FALSE,
+                                                FALSE),
+                                                (posbit-1),0, PO_GPR_REGISTER));
+
+              pic16_emitpcode(POC_BRA, pic16_popGetLabel(tlbl->key));
+          } else {
+              if (bytelit == 0xff) {
+                  /* Aaron had a MOVF instruction here, changed to MOVFW cause
+                   * a peephole could optimize it out -- VR */
+                  pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left), offset));
+              } else {
+                  pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left), offset));
+                  pic16_emitpcode(POC_ANDLW, pic16_popGetLit(bytelit));
+              }
+
+              pic16_emitpcode(((rIfx.condition) ? POC_BZ : POC_BNZ),
+                            pic16_popGetLabel(tlbl->key));
+          }
+        
+#if 0
+          /* old code, left here for reference -- VR 09/2004 */
 	  MOVA( pic16_aopGet(AOP(left),offset,FALSE,FALSE));
 	  // byte ==  2^n ?
 	  if((posbit = isLiteralBit(bytelit)) != 0)
@@ -6614,22 +6648,27 @@ static void genAnd (iCode *ic, iCode *ifx)
 	      pic16_emitcode("anl","a,%s",
 			     pic16_aopGet(AOP(right),offset,FALSE,TRUE));
 	    pic16_emitcode("jnz","%05d_DS_",tlbl->key+100);
-	  }
+          }
+#endif
 	}
 	offset++;
       }
       // bit = left & literal
-      if(size){
-	pic16_emitcode("clr","c");
-	pic16_emitcode("","%05d_DS_:",tlbl->key+100);
+      if(size) {
+        emitCLRC;
+        pic16_emitpLabel(tlbl->key);
       }
       // if(left & literal)
-      else{
-	if(ifx)
-	  jmpTrueOrFalse(ifx, tlbl);
-	goto release ;
+      else {
+        if(ifx) {
+          pic16_emitpcode(POC_BRA, pic16_popGetLabel(rIfx.lbl->key));
+          pic16_emitpLabel(tlbl->key);
+          ifx->generated = 1;
+        }
+        goto release;
       }
     }
+
     pic16_outBitC(result);
     goto release ;
   }
@@ -10895,12 +10934,15 @@ static void genAssign (iCode *ic)
 
 
 
+#if 0
 /* VR - What is this?! */
   if( AOP_TYPE(right) == AOP_DIR  && (AOP_TYPE(result) == AOP_REG) && size==1)  {
-  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
     if(aopIdx(AOP(result),0) == 4) {
-  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-	assert(0);
+
+      /* this is a workaround to save value of right into wreg too,
+       * value of wreg is going to be used later */
+      DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
       pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(right),offset));
       pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset));
       goto release;
@@ -10908,6 +10950,7 @@ static void genAssign (iCode *ic)
 //	assert(0);
       DEBUGpic16_emitcode ("; WARNING","%s  %d ignoring register storage",__FUNCTION__,__LINE__);
   }
+#endif
 
   know_W=-1;
   while (size--) {

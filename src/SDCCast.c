@@ -3326,13 +3326,13 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
       /* if left is a literal then do it */
       if (IS_LITERAL (LTYPE (tree)))
-	{
-	  tree->type = EX_VALUE;
-	  tree->opval.val = valComplement (valFromType (LETYPE (tree)));
-	  tree->left = NULL;
-	  TETYPE (tree) = TTYPE (tree) = tree->opval.val->type;
-	  return tree;
-	}
+        {
+          tree->type = EX_VALUE;
+          tree->opval.val = valComplement (valFromType (LETYPE (tree)));
+          tree->left = NULL;
+          TETYPE (tree) = TTYPE (tree) = tree->opval.val->type;
+          return addCast (tree, resultType, TRUE);
+        }
       tree->left = addCast (tree->left, resultType, TRUE);
       LRVAL (tree) = 1;
       COPYTYPE (TTYPE (tree), TETYPE (tree), LTYPE (tree));

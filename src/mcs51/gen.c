@@ -3451,9 +3451,7 @@ genMinus (iCode * ic)
   else
     {
       asmop *leftOp, *rightOp;
-      bool borrow;
 
-      borrow = FALSE;
       leftOp = AOP(IC_LEFT(ic));
       rightOp = AOP(IC_RIGHT(ic));
 
@@ -3462,7 +3460,7 @@ genMinus (iCode * ic)
 	  if (aopGetUsesAcc(rightOp, offset)) {
 	    wassertl(!aopGetUsesAcc(leftOp, offset), "accumulator clash");
 	    MOVA (aopGet(rightOp, offset, FALSE, TRUE));
-	    if (borrow) {
+	    if (offset > 0) {
 	      emitcode( "cpl", "c");
 	    } else {
 	      emitcode( "setb", "c");
@@ -3471,12 +3469,13 @@ genMinus (iCode * ic)
 	    emitcode("cpl", "a");
 	  } else {
 	    MOVA (aopGet (leftOp, offset, FALSE, FALSE));
-	    emitcode ((borrow? "subb" : "sub"), "a,%s",
+	    if (offset == 0)
+	      CLRC;
+	    emitcode ("subb", "a,%s",
 		      aopGet(rightOp, offset, FALSE, TRUE));
 	  }
 
 	  aopPut (AOP (IC_RESULT (ic)), "a", offset++);
-	  borrow = TRUE;  /* subsequent subtracts must propagate borrow */
 	}
     }
   

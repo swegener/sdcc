@@ -41,8 +41,8 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Debug"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /MLd /W3 /Gm /GX /ZI /Od /I ".." /I "..\support\util" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FR /FD /GZ /c
-# ADD CPP /nologo /MLd /W3 /Gm /GX /ZI /Od /I ".." /I "..\support\util" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FR /FD /GZ /c
+# ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /I ".." /I "..\support\util" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FR /FD /GZ /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "." /I ".." /I "..\support\util" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FR /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -67,15 +67,15 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /ML /W3 /GX /O2 /I ".." /I "..\support\util" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /FD /c
-# ADD CPP /nologo /ML /W3 /GX /O2 /I ".." /I "..\support\util" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /FD /c
+# ADD CPP /nologo /ML /W3 /GX /O2 /I "." /I ".." /I "..\support\util" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 mcs51\Release\port.lib z80\Release\port.lib avr\Release\port.lib ds390\Release\port.lib pic\Release\port.lib /nologo /subsystem:console /pdb:none /machine:I386 /out:"..\bin_vc\sdcc.exe" /pdbtype:sept
-# ADD LINK32 mcs51\Release\port.lib z80\Release\port.lib avr\Release\port.lib ds390\Release\port.lib pic\Release\port.lib /nologo /subsystem:console /pdb:none /machine:I386 /out:"..\bin_vc\sdcc.exe" /pdbtype:sept
+# ADD BASE LINK32 mcs51\Release\port.lib z80\Release\port.lib avr\Release\port.lib ds390\Release\port.lib pic\Release\port.lib /nologo /subsystem:console /pdb:none /machine:I386 /out:"..\bin_vc\sdcc.exe"
+# ADD LINK32 mcs51\Release\port.lib z80\Release\port.lib avr\Release\port.lib ds390\Release\port.lib pic\Release\port.lib /nologo /subsystem:console /pdb:none /machine:I386 /out:"..\bin_vc\sdcc.exe"
 
 !ENDIF 
 
@@ -89,6 +89,14 @@ LINK32=link.exe
 # Begin Source File
 
 SOURCE=.\asm.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\support\Util\BuildCmd.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\support\Util\MySystem.c
 # End Source File
 # Begin Source File
 

@@ -104,7 +104,7 @@ static void
 pic14emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 {
   symbol *sym;
-  int i, size, bitvars = 0;;
+  int bitvars = 0;;
 
   if (addPublics)
     fprintf (map->oFile, ";\t.area\t%s\n", map->sname);
@@ -183,16 +183,20 @@ pic14emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	   {
 	     fprintf (map->oFile, "%s\tres\t%d\n", sym->rname,getSize (sym->type) & 0xffff);
 	     /*
-	     if ((size = (unsigned int) getSize (sym->type) & 0xffff) > 1)
-	       {
-		 for (i = 1; i < size; i++)
-		   fprintf (map->oFile, "\t%s_%d\n", sym->rname, i);
-	       }
+	     {
+	       int i, size;
+
+	       if ((size = (unsigned int) getSize (sym->type) & 0xffff) > 1)
+		 {
+		   for (i = 1; i < size; i++)
+		     fprintf (map->oFile, "\t%s_%d\n", sym->rname, i);
+		 }
+	     }
 	     */
 	   }
 	 //fprintf (map->oFile, "\t.ds\t0x%04x\n", (unsigned int)getSize (sym->type) & 0xffff);
        }
-	
+
     /* if it has a initial value then do it only if
        it is a global variable */
     if (sym->ival && sym->level == 0) {

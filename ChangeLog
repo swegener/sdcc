@@ -4,7 +4,8 @@
 	* as/z80/Makefile: remove trailing slash of BUILDIR
 	* as/z80/clean.mk: new EXEEXT
 	* Makefile.common.in: add to CFLAGS (and others), don't replace it
-	* support/cpp2/Makefile.in: new EXEEXT 
+	* support/cpp2/Makefile.in: new EXEEXT
+	* src/pic/glue.c (pic14emitRegularMap): fixed warning
 
 2003-04-24  Bernhard Held <bernhard@bernhardheld.de>
 

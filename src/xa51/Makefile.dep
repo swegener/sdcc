@@ -1,0 +1,23 @@
+gen.o: gen.c ../SDCCglobl.h ../../sdccconf.h \
+ ../../support/Util/SDCCerr.h ../../support/Util/newalloc.h \
+ ../common.h ../SDCCmem.h ../SDCCast.h ../SDCCsymt.h ../SDCChasht.h \
+ ../SDCCval.h ../SDCCset.h ../SDCCy.h ../SDCCbitv.h ../SDCCicode.h \
+ ../SDCClabel.h ../SDCCBBlock.h ../SDCCloop.h ../SDCCcse.h \
+ ../SDCCcflow.h ../SDCCdflow.h ../SDCClrange.h ../SDCCptropt.h \
+ ../SDCCopt.h ../SDCCglue.h ../SDCCpeeph.h ../asm.h ../port.h ralloc.h \
+ gen.h
+main.o: main.c ../common.h ../SDCCglobl.h ../../sdccconf.h \
+ ../../support/Util/SDCCerr.h ../SDCCmem.h ../SDCCast.h ../SDCCsymt.h \
+ ../SDCChasht.h ../SDCCval.h ../SDCCset.h ../SDCCy.h ../SDCCbitv.h \
+ ../SDCCicode.h ../SDCClabel.h ../SDCCBBlock.h ../SDCCloop.h \
+ ../SDCCcse.h ../SDCCcflow.h ../SDCCdflow.h ../SDCClrange.h \
+ ../SDCCptropt.h ../SDCCopt.h ../SDCCglue.h ../SDCCpeeph.h ../asm.h \
+ ../port.h ../../support/Util/newalloc.h main.h ralloc.h gen.h \
+ peeph.rul
+ralloc.o: ralloc.c ../common.h ../SDCCglobl.h ../../sdccconf.h \
+ ../../support/Util/SDCCerr.h ../SDCCmem.h ../SDCCast.h ../SDCCsymt.h \
+ ../SDCChasht.h ../SDCCval.h ../SDCCset.h ../SDCCy.h ../SDCCbitv.h \
+ ../SDCCicode.h ../SDCClabel.h ../SDCCBBlock.h ../SDCCloop.h \
+ ../SDCCcse.h ../SDCCcflow.h ../SDCCdflow.h ../SDCClrange.h \
+ ../SDCCptropt.h ../SDCCopt.h ../SDCCglue.h ../SDCCpeeph.h ../asm.h \
+ ../port.h ../../support/Util/newalloc.h ralloc.h gen.h

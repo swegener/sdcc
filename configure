@@ -2801,9 +2801,9 @@ if test "$enable_xa51_port" = "no"; then
 EOF
 
 else
-    #echo xa51 >>ports.build // not yet
+    echo xa51 >>ports.build
     cat >> confdefs.h <<EOF
-#define OPT_DISABLE_XA51 1 // not yet
+#define OPT_DISABLE_XA51 0
 EOF
 
 fi

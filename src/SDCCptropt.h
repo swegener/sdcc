@@ -27,5 +27,6 @@
 #define SDCCPTROPT_H 1
 
 void ptrPostIncDecOpt (iCode *);
+int ptrAddition (iCode *);
 
 #endif

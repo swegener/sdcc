@@ -77,6 +77,11 @@ unsigned int pic16aopLiteral (value *val, int offset);
 const char *pic16_AopType(short type);
 static iCode *ifxForOp ( operand *op, iCode *ic );
 
+void pic16_pushpCodeOp(pCodeOp *pcop);
+void pic16_poppCodeOp(pCodeOp *pcop);
+
+
+
 #define BYTEofLONG(l,b) ( (l>> (b<<3)) & 0xff)
 
 /* this is the down and dirty file with all kinds of 
@@ -88,12 +93,24 @@ static char *zero = "#0x00";
 static char *one  = "#0x01";
 static char *spname = "sp";
 
+
+/*
+ * Function return value policy (MSB-->LSB):
+ *  8 bits	-> WREG
+ * 16 bits	-> PRODL:WREG
+ * 24 bits	-> PRODH:PRODL:WREG
+ * 32 bits	-> FSR0L:PRODH:PRODL:WREG
+ * >32 bits	-> on stack, and FSR0 points to the beginning
+ *
+ */
+ 
+
 char *fReturnpic16[] = {"temp1","temp2","temp3","temp4" };
 //char *fReturn390[] = {"dpl","dph","dpx", "b","a" };
 unsigned pic16_fReturnSizePic = 4; /* shared with ralloc.c */
 static char **fReturn = fReturnpic16;
 
-static char *accUse[] = {"a","b"};
+static char *accUse[] = {"WREG"};
 
 //static short rbank = -1;
 
@@ -186,14 +203,11 @@ void DEBUGpic16_pic16_AopTypeSign(int line_no, operand *left, operand *right, op
 
 }
 
-void pic16_emitcomment (char *fmt, ...)
+void pic16_emitpcomment (char *fmt, ...)
 {
     va_list ap;
     char lb[INITIAL_INLINEASM];  
     char *lbp = lb;
-
-    if(!pic16_debug_verbose)
-      return;
 
     va_start(ap,fmt);   
 
@@ -495,6 +509,9 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
     /* if it is on the stack or indirectly addressable */
     /* space we need to assign either r0 or r1 to it   */    
     if ((sym->onStack && !options.stack10bit) || sym->iaccess) {
+
+	DEBUGpic16_emitcode("; ***", "sum->onStack || sym->iaccess");
+	
         sym->aop = aop = newAsmop(0);
         aop->aopu.aop_ptr = getFreePtr(ic,&aop,result);
         aop->size = getSize(sym->type);
@@ -564,7 +581,7 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
         sym->aop = aop = newAsmop (AOP_CRY);
         aop->aopu.aop_dir = sym->rname ;
         aop->size = getSize(sym->type);
-	//DEBUGpic16_emitcode(";","%d sym->rname = %s, size = %d",__LINE__,sym->rname,aop->size);
+	DEBUGpic16_emitcode(";","%d sym->rname = %s, size = %d",__LINE__,sym->rname,aop->size);
         return aop;
     }
     /* if it is in direct space */
@@ -573,6 +590,7 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
         aop->aopu.aop_dir = sym->rname ;
         aop->size = getSize(sym->type);
 	DEBUGpic16_emitcode(";","%d sym->rname = %s, size = %d",__LINE__,sym->rname,aop->size);
+	pic16_allocDirReg( IC_LEFT(ic) );
         return aop;
     }
 
@@ -592,24 +610,29 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
     /* in which case DPTR gets the address */
     sym->aop = aop = newAsmop(AOP_PCODE);
 
-    aop->aopu.pcop = pic16_popGetImmd(sym->rname,0,0);
-    PCOI(aop->aopu.pcop)->_const = IN_CODESPACE(space);
-    PCOI(aop->aopu.pcop)->index = 0;
+/* change the next if to 1 to revert to good old immediate code */
+	if(IN_CODESPACE(space)) {
+		aop->aopu.pcop = pic16_popGetImmd(sym->rname, 0, 0);
+		PCOI(aop->aopu.pcop)->_const = IN_CODESPACE(space);
+		PCOI(aop->aopu.pcop)->index = 0;
+	} else {
+		/* try to allocate via direct register */
+		aop->aopu.pcop = pic16_popRegFromString(sym->rname, getSize(sym->type), 0);
+//		aop->size = getSize( sym->type );
+	}
 
-    DEBUGpic16_emitcode(";","%d: rname %s, val %d, const = %d",
-			__LINE__,sym->rname, 0, PCOI(aop->aopu.pcop)->_const);
+	DEBUGpic16_emitcode(";","%d: rname %s, val %d, const = %d",
+		__LINE__,sym->rname, 0, PCOI(aop->aopu.pcop)->_const);
 
-    pic16_allocDirReg (IC_LEFT(ic));
+	pic16_allocDirReg (IC_LEFT(ic));
 
-    aop->size = FPTRSIZE; 
-/*
-    DEBUGpic16_emitcode(";","%d size = %d, name =%s",__LINE__,aop->size,sym->rname);
-    sym->aop = aop = newAsmop(AOP_DPTR);
-    pic16_emitcode ("mov","dptr,#%s", sym->rname);
-    aop->size = getSize(sym->type);
+	if(IN_DIRSPACE( space ))
+		aop->size = PTRSIZE;
+	else if(IN_CODESPACE( space ))
+		aop->size = FPTRSIZE;
+	else aop->size = AOP_SIZE( IC_LEFT(ic) );
 
     DEBUGpic16_emitcode(";","%d size = %d",__LINE__,aop->size);
-*/
 
     /* if it is in code space */
     if (IN_CODESPACE(space))
@@ -624,48 +647,77 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
 static asmop *aopForRemat (operand *op) // x symbol *sym)
 {
   symbol *sym = OP_SYMBOL(op);
-  iCode *ic = NULL;
+  iCode *ic = NULL, *oldic;
   asmop *aop = newAsmop(AOP_PCODE);
   int val = 0;
   int offset = 0;
+  int viaimmd=0;
 
-  ic = sym->rematiCode;
 
-  DEBUGpic16_emitcode(";","%s %d",__FUNCTION__,__LINE__);
-  if(IS_OP_POINTER(op)) {
-    DEBUGpic16_emitcode(";","%s %d IS_OP_POINTER",__FUNCTION__,__LINE__);
-  }
-  for (;;) {
-    if (ic->op == '+') {
-      val += (int) operandLitValue(IC_RIGHT(ic));
-    } else if (ic->op == '-') {
-      val -= (int) operandLitValue(IC_RIGHT(ic));
-    } else
-      break;
+	ic = sym->rematiCode;
+
+	DEBUGpic16_emitcode(";","%s %d",__FUNCTION__,__LINE__);
 	
-    ic = OP_SYMBOL(IC_LEFT(ic))->rematiCode;
-  }
+	if(IS_OP_POINTER(op)) {
+		DEBUGpic16_emitcode(";","%s %d IS_OP_POINTER",__FUNCTION__,__LINE__);
+	}
 
-  offset = OP_SYMBOL(IC_LEFT(ic))->offset;
-  aop->aopu.pcop = pic16_popGetImmd(OP_SYMBOL(IC_LEFT(ic))->rname,0,val);
+	for (;;) {
+		oldic = ic;
+
+//		pic16_emitpcomment("ic: %s\n", printILine(ic));
+	
+		if (ic->op == '+') {
+			val += (int) operandLitValue(IC_RIGHT(ic));
+		} else if (ic->op == '-') {
+			val -= (int) operandLitValue(IC_RIGHT(ic));
+		} else
+			break;
+		
+		ic = OP_SYMBOL(IC_LEFT(ic))->rematiCode;
+	}
+
+	offset = OP_SYMBOL(IC_LEFT(ic))->offset;
+
+	if(!op->isaddr)viaimmd++; else viaimmd=0;
+		
+/* set the following if to 1 to revert to good old immediate code */
+	if(IN_CODESPACE( SPEC_OCLS( OP_SYM_ETYPE(op)))
+		|| viaimmd) {
+
+		pic16_emitpcomment("%s:%d immediate", __FILE__, __LINE__);
+
+		aop->aopu.pcop = pic16_popGetImmd(OP_SYMBOL(IC_LEFT(ic))->rname, 0, val);
+
 #if 0
-  PCOI(aop->aopu.pcop)->_const = IS_PTR_CONST(operandType(op));
+		PCOI(aop->aopu.pcop)->_const = IS_PTR_CONST(operandType(op));
 #else
-  PCOI(aop->aopu.pcop)->_const = IS_CODEPTR(operandType(op));
+		PCOI(aop->aopu.pcop)->_const = IS_CODEPTR(operandType(op));
 #endif
-  PCOI(aop->aopu.pcop)->index = val;
 
-  DEBUGpic16_emitcode(";","%d: rname %s, val %d, const = %d",
-		      __LINE__,OP_SYMBOL(IC_LEFT(ic))->rname,
+		PCOI(aop->aopu.pcop)->index = val;
+	} else {
+		pic16_emitpcomment("%s:%d dir", __FILE__, __LINE__);
+
+		aop->aopu.pcop = pic16_popRegFromString(OP_SYMBOL(IC_LEFT(ic))->rname, getSize( OP_SYMBOL( IC_LEFT(ic))->type), val);
+//		aop->size = AOP_SIZE( IC_LEFT(ic) );
+	}
+
+
+	DEBUGpic16_emitcode(";","%d: rname %s, val %d, const = %d",
+		__LINE__,OP_SYMBOL(IC_LEFT(ic))->rname,
 #if 0
-		      val, IS_PTR_CONST(operandType(op)));
+		val, IS_PTR_CONST(operandType(op)));
 #else
-		      val, IS_CODEPTR(operandType(op)));
+		val, IS_CODEPTR(operandType(op)));
 #endif
 
-  //    DEBUGpic16_emitcode(";","aop type  %s",pic16_AopType(AOP_TYPE(IC_LEFT(ic))));
+//	DEBUGpic16_emitcode(";","aop type  %s",pic16_AopType(AOP_TYPE(IC_LEFT(ic))));
 
-  pic16_allocDirReg (IC_LEFT(ic));
+	pic16_allocDirReg (IC_LEFT(ic));
+
+	if(IN_CODESPACE( SPEC_OCLS( OP_SYM_ETYPE(op)) ))
+		aop->code = 1;
 
   return aop;        
 }
@@ -798,7 +850,7 @@ void pic16_aopOp (operand *op, iCode *ic, bool result)
     if (!op)
         return ;
 
-//	DEBUGpic16_emitcode(";","%d",__LINE__);
+//	DEBUGpic16_emitcode(";","%s %d",__FUNCTION__, __LINE__);
 
     /* if this a literal */
     if (IS_OP_LITERAL(op)) {
@@ -870,16 +922,22 @@ void pic16_aopOp (operand *op, iCode *ic, bool result)
             return;
         }
 
+#if 1
 	if (sym->accuse) {
 	    int i;
             aop = op->aop = sym->aop = newAsmop(AOP_ACC);
             aop->size = getSize(sym->type);
-            for ( i = 0 ; i < 2 ; i++ )
-                aop->aopu.aop_str[i] = accUse[i];
+            for ( i = 0 ; i < 1 ; i++ ) {
+		aop->aopu.aop_str[i] = accUse[i];
+//                aop->aopu.pcop = pic16_popRegFromString("WREG", aop->size, sym->usl.spillLoc->offset);
+	    }
+	    fprintf(stderr, "%s:%d allocating AOP_ACC for sym= %s\n", __FILE__, __LINE__, sym->name);
 	    DEBUGpic16_emitcode(";","%d size=%d",__LINE__,aop->size);
             return;  
 	}
+#endif
 
+#if 1
         if (sym->ruonly ) {
 	  /*
 	  sym->aop = op->aop = aop = newAsmop(AOP_PCODE);
@@ -898,7 +956,7 @@ void pic16_aopOp (operand *op, iCode *ic, bool result)
 	  DEBUGpic16_emitcode(";","%d",__LINE__);
 	  return;
         }
-
+#endif
         /* else spill location  */
 	if (sym->usl.spillLoc && getSize(sym->type) != getSize(sym->usl.spillLoc->type)) {
 	    /* force a new aop if sizes differ */
@@ -1158,7 +1216,9 @@ char *pic16_aopGet (asmop *aop, int offset, bool bit16, bool dname)
 	
     case AOP_ACC:
         DEBUGpic16_emitcode(";Warning -pic port ignoring get(AOP_ACC)","%d",__LINE__);
-	return "AOP_accumulator_bug";
+//        fprintf(stderr, "%s:%d Warning -pic port ignoring get(AOP_ACC)\n",__FILE__, __LINE__);
+//        assert( 0 );
+	return aop->aopu.aop_str[offset];	//->"AOP_accumulator_bug";
 
     case AOP_LIT:
 	sprintf(s,"0x%02x", pic16aopLiteral (aop->aopu.aop_lit,offset));
@@ -1204,14 +1264,16 @@ char *pic16_aopGet (asmop *aop, int offset, bool bit16, bool dname)
 /*-----------------------------------------------------------------*/
 pCodeOp *pic16_popGetTempReg(void)
 {
-
   pCodeOp *pcop;
 
-  pcop = pic16_newpCodeOp(NULL, PO_GPR_TEMP);
-  if(pcop && pcop->type == PO_GPR_TEMP && PCOR(pcop)->r) {
-    PCOR(pcop)->r->wasUsed=1;
-    PCOR(pcop)->r->isFree=0;
-  }
+	pcop = pic16_newpCodeOp(NULL, PO_GPR_TEMP);
+	if(pcop && pcop->type == PO_GPR_TEMP && PCOR(pcop)->r) {
+		PCOR(pcop)->r->wasUsed=1;
+		PCOR(pcop)->r->isFree=0;
+
+		/* push value on stack */
+		pic16_pushpCodeOp( pcop );
+	}
 
   return pcop;
 }
@@ -1221,10 +1283,11 @@ pCodeOp *pic16_popGetTempReg(void)
 /*-----------------------------------------------------------------*/
 void pic16_popReleaseTempReg(pCodeOp *pcop)
 {
-
-  if(pcop && pcop->type == PO_GPR_TEMP && PCOR(pcop)->r)
-    PCOR(pcop)->r->isFree = 1;
-
+	if(pcop && pcop->type == PO_GPR_TEMP && PCOR(pcop)->r) {
+		PCOR(pcop)->r->isFree = 1;
+		
+		pic16_poppCodeOp( pcop );
+	}
 }
 /*-----------------------------------------------------------------*/
 /* pic16_popGetLabel - create a new pCodeOp of type PO_LABEL             */
@@ -1259,7 +1322,7 @@ pCodeOp *pic16_popCopyReg(pCodeOpReg *pc)
   pcor->rIdx = pc->rIdx;
   pcor->r->wasUsed=1;
 
-  //DEBUGpic16_emitcode ("; ***","%s  , copying %s, rIdx=%d",__FUNCTION__,pc->pcop.name,pc->rIdx);
+//  DEBUGpic16_emitcode ("; ***","%s  , copying %s, rIdx=%d",__FUNCTION__,pc->pcop.name,pc->rIdx);
 
   return PCOP(pcor);
 }
@@ -1337,9 +1400,9 @@ static pCodeOp *pic16_popRegFromString(char *str, int size, int offset)
 
 	//fprintf(stderr, "allocating new register -> %s\n", str);
 
-    DEBUGpic16_emitcode(";","%d  %s   offset=%d - had to alloc by reg name",__LINE__,pcop->name,offset);
+//    DEBUGpic16_emitcode(";","%d  %s   size= %d offset=%d - had to alloc by reg name",__LINE__,pcop->name,size,offset);
   } else {
-    DEBUGpic16_emitcode(";","%d  %s   offset=%d",__LINE__,pcop->name,offset);
+//    DEBUGpic16_emitcode(";","%d  %s   size= %d offset=%d",__LINE__,pcop->name,size,offset);
   }
   PCOR(pcop)->instance = offset;
 
@@ -1391,9 +1454,9 @@ pCodeOp *pic16_popGet2(asmop *aop_src, asmop *aop_dst, int offset)
 /*--------------------------------------------------------------------------------.-*/
 pCodeOp *pic16_popGet2p(pCodeOp *src, pCodeOp *dst)
 {
-	pCodeOpReg2 *pcop2;
+  pCodeOpReg2 *pcop2;
  
-	pcop2 = (pCodeOpReg2 *) src;
+	pcop2 = (pCodeOpReg2 *)src;
 	pcop2->pcop2 = dst;
 	
 	return PCOP(pcop2);
@@ -1428,17 +1491,16 @@ pCodeOp *pic16_popCombine2(pCodeOpReg *src, pCodeOpReg *dst, int noalloc)
 pCodeOp *pic16_popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 {
   //char *s = buffer ;
-    //char *rs;
-
-    pCodeOp *pcop;
+  char *rs;
+  pCodeOp *pcop;
 
     //DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
     /* offset is greater than
     size then zero */
 
-    if (offset > (aop->size - 1) &&
-        aop->type != AOP_LIT)
-      return NULL;  //zero;
+//    if (offset > (aop->size - 1) &&
+//        aop->type != AOP_LIT)
+//      return NULL;  //zero;
 
     /* depending on type */
     switch (aop->type) {
@@ -1447,15 +1509,42 @@ pCodeOp *pic16_popGet (asmop *aop, int offset) //, bool bit16, bool dname)
     case AOP_R1:
     case AOP_DPTR:
     case AOP_DPTR2:
-    case AOP_ACC:
         DEBUGpic16_emitcode(";8051 legacy","%d type = %s",__LINE__,pic16_AopType(aop->type));
         fprintf(stderr, ";8051 legacy %d type = %s\n",__LINE__,pic16_AopType(aop->type));
+	assert( 0 );
 	return NULL;
-	
+
+
+
     case AOP_IMMD:
       DEBUGpic16_emitcode(";","%d\tAOP_IMMD",__LINE__);
       return pic16_popGetImmd(aop->aopu.aop_immd,offset,0);
 
+    case AOP_ACC:
+	fprintf(stderr, "%s:%d returning register AOP_ACC %s\n", __FILE__, __LINE__, aop->aopu.aop_str[offset]);
+
+	int rIdx = IDX_WREG;		//aop->aopu.aop_reg[offset]->rIdx;
+
+	DEBUGpic16_emitcode(";","%d\tAOP_ACC", __LINE__);
+	
+	pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
+	PCOR(pcop)->rIdx = rIdx;
+	PCOR(pcop)->r = pic16_typeRegWithIdx(rIdx, REG_SFR, 1);	// pic16_regWithIdx(rIdx);
+	PCOR(pcop)->r->wasUsed=1;
+	PCOR(pcop)->r->isFree=0;
+
+	PCOR(pcop)->instance = offset;
+	pcop->type = PCOR(pcop)->r->pc_type;
+//	rs = aop->aopu.aop_reg[offset]->name;
+//	DEBUGpic16_emitcode(";","%d register idx = %d name =%s",__LINE__,rIdx,rs);
+	return pcop;
+
+
+	return pic16_popRegFromString(aop->aopu.aop_str[offset], aop->size, offset);
+//      return pic16_newpCodeOpRegFromStr(aop->aopu.aop_str[offset]);
+
+//	assert( 0 );
+	
     case AOP_DIR:
       DEBUGpic16_emitcode(";","%d\tAOP_DIR", __LINE__);
       return pic16_popRegFromString(aop->aopu.aop_dir, aop->size, offset);
@@ -1465,6 +1554,7 @@ pCodeOp *pic16_popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 	int rIdx = aop->aopu.aop_reg[offset]->rIdx;
 
 	DEBUGpic16_emitcode(";","%d\tAOP_REG", __LINE__);
+	
 	pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
 	PCOR(pcop)->rIdx = rIdx;
 	PCOR(pcop)->r = pic16_regWithIdx(rIdx);
@@ -1473,8 +1563,8 @@ pCodeOp *pic16_popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 
 	PCOR(pcop)->instance = offset;
 	pcop->type = PCOR(pcop)->r->pc_type;
-	//rs = aop->aopu.aop_reg[offset]->name;
-	//DEBUGpic16_emitcode(";","%d regiser idx = %d name =%s",__LINE__,rIdx,rs);
+	rs = aop->aopu.aop_reg[offset]->name;
+	DEBUGpic16_emitcode(";","%d regiser idx = %d name =%s",__LINE__,rIdx,rs);
 	return pcop;
       }
 
@@ -1506,11 +1596,20 @@ pCodeOp *pic16_popGet (asmop *aop, int offset) //, bool bit16, bool dname)
       */
 
     case AOP_PCODE:
-      DEBUGpic16_emitcode(";","pic16_popGet AOP_PCODE (%s) %d %s",pic16_pCodeOpType(aop->aopu.pcop),
+      DEBUGpic16_emitcode(";","pic16_popGet AOP_PCODE (%s) %d %s offset %d",pic16_pCodeOpType(aop->aopu.pcop),
 			  __LINE__, 
-			  ((aop->aopu.pcop->name)? (aop->aopu.pcop->name) : "no name"));
+			  ((aop->aopu.pcop->name)? (aop->aopu.pcop->name) : "no name"), offset);
       pcop = pic16_pCodeOpCopy(aop->aopu.pcop);
+#if 1
+	switch( aop->aopu.pcop->type ) {
+		case PO_DIR: PCOR(pcop)->instance = offset; break;
+		case PO_IMMEDIATE: PCOI(pcop)->offset = offset; break;
+		default:
+			assert( 0 );	/* should never reach here */;
+	}
+#else
       PCOI(pcop)->offset = offset;
+#endif
       return pcop;
     }
 
@@ -1769,14 +1868,16 @@ static void mov2w (asmop *aop, int offset)
 }
 
 
-void pic16_pushpCodeOpReg(pCodeOpReg *pcop)
+/* push pcop into stack */
+void pic16_pushpCodeOp(pCodeOp *pcop)
 {
-	pic16_emitpcode(POC_MOVFF, pic16_popCombine2(pcop, &pic16_pc_postdec1, 0));
+	pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pcop, pic16_popCopyReg(&pic16_pc_postdec1)));
 }
 
-void pic16_poppCodeOpReg(pCodeOpReg *pcop)
+/* pop pcop from stack */
+void pic16_poppCodeOp(pCodeOp *pcop)
 {
-	pic16_emitpcode(POC_MOVFF, pic16_popCombine2(&pic16_pc_preinc1, pcop, 0));
+	pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_preinc1), pcop));
 }
 
 
@@ -2279,46 +2380,109 @@ static void pushSide(operand * oper, int size)
 #endif
 }
 
+void pic16_loadFromReturn(operand *op, int offset, pCodeOp *src)
+{
+//		(AOP(left)->aopu.pcop->type == PO_DIR)?
+
+	if(AOP(op)->aopu.pcop->type == PO_IMMEDIATE) {
+		pic16_emitpcode(POC_MOVFW, src);
+		pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(op), offset));
+	} else {
+		pic16_emitpcode(POC_MOVFF, pic16_popGet2p(
+			src, pic16_popGet(AOP(op), offset)));
+	}
+}
+
+
 /*-----------------------------------------------------------------*/
-/* assignResultValue -						   */
+/* assignResultValue - assign results to oper, rescall==1 is       */
+/*                     called from genCall() or genPCall()         */
 /*-----------------------------------------------------------------*/
-static void assignResultValue(operand * oper)
+static void assignResultValue(operand * oper, int rescall)
 {
   int size = AOP_SIZE(oper);
 
 	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	DEBUGpic16_pic16_AopType(__LINE__,oper,NULL,NULL);
 
-	if(!GpsuedoStkPtr) {
-//		DEBUGpic16_emitcode("; ", "pop %d", GpsuedoStkPtr);
-		/* The last byte in the assignment is in W */
-		size--;
-		pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(oper),size));
-		GpsuedoStkPtr++;
-	}
-
-	while (size--) {
-//		DEBUGpic16_emitcode("; ", "POC_MOVLW %d", GpsuedoStkPtr);
-//		DEBUGpic16_emitcode("; ", "POC_MOVFW PLUSW2");
+	if(rescall) {
+		/* assign result from a call/pcall function() */
 		
-#if STACK_SUPPORT
-		if(USE_STACK) {
-			popaopidx(AOP(oper), size, GpsuedoStkPtr);
-		} else {
-			pic16_emitpcode(POC_MOVFW, pic16_popRegFromIdx(GpsuedoStkPtr-1 + pic16_Gstack_base_addr));
-		}
-#else
-		pic16_emitpcode(POC_MOVFW, pic16_popRegFromIdx(GpsuedoStkPtr-1 + pic16_Gstack_base_addr));
-#endif	/* STACK_SUPPORT */
-		GpsuedoStkPtr++;
+		/* function results are stored in a special order,
+		 * see top of file with Function return policy, or manual */
 
+		if(size <= 4) {
+			/* 8-bits, result in WREG */
+			pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(oper), 0));
+			
+			if(size>1) {
+				/* 16-bits, result in PRODL:WREG */
+				pic16_loadFromReturn(oper, 1, pic16_popCopyReg(&pic16_pc_prodl));
+//				pic16_emitpcode(POC_MOVFF,
+//					pic16_popGet2p(pic16_popCopyReg(&pic16_pc_prodl), pic16_popGet(AOP(oper), 1)));
+			}
+			
+			if(size>2) {
+				/* 24-bits, result in PRODH:PRODL:WREG */
+				pic16_loadFromReturn(oper, 2, pic16_popCopyReg(&pic16_pc_prodl));
+
+//				pic16_emitpcode(POC_MOVFF,
+//					pic16_popGet2p(pic16_popCopyReg(&pic16_pc_prodh), pic16_popGet(AOP(oper), 2)));
+			}
+			
+			if(size>3) {
+				/* 32-bits, result in FSR0L:PRODH:PRODL:WREG */
+				pic16_loadFromReturn(oper, 3, pic16_popCopyReg(&pic16_pc_prodl));
+
+//				pic16_emitpcode(POC_MOVFF,
+//					pic16_popGet2p(pic16_popCopyReg(&pic16_pc_fsr0l), pic16_popGet(AOP(oper), 3)));
+			}
+		} else {
+			/* >32-bits, result on stack, and FSR0 points to beginning.
+			 * Fix stack when done */
+			 
+			while (size--) {
+//				DEBUGpic16_emitcode("; ", "POC_MOVLW %d", GpsuedoStkPtr);
+//				DEBUGpic16_emitcode("; ", "POC_MOVFW PLUSW2");
+		
+				popaopidx(AOP(oper), size, GpsuedoStkPtr);
+				GpsuedoStkPtr++;
+			}
+			
+			/* fix stack */
+			pic16_emitpcode(POC_MOVLW, pic16_popGetLit( AOP_SIZE(oper) ));
+			pic16_emitpcode(POC_ADDWF, pic16_popCopyReg( &pic16_pc_fsr1l ));
+			if(STACK_MODEL_LARGE) {
+				emitSKPNC;
+				pic16_emitpcode(POC_INCF, pic16_popCopyReg( &pic16_pc_fsr1h ));
+			}
+		}			
+	} else {
+		if(!GpsuedoStkPtr) {
+//			DEBUGpic16_emitcode("; ", "pop %d", GpsuedoStkPtr);
+			/* The last byte in the assignment is in W */
+			size--;
+			pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(oper),size));
+			GpsuedoStkPtr++;
+		}
+
+		while (size--) {
+//			DEBUGpic16_emitcode("; ", "POC_MOVLW %d", GpsuedoStkPtr);
+//			DEBUGpic16_emitcode("; ", "POC_MOVFW PLUSW2");
+		
+			popaopidx(AOP(oper), size, GpsuedoStkPtr);
+			GpsuedoStkPtr++;
+
+#if 0
 #if STACK_SUPPORT
 		if(!USE_STACK)
 			pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(oper),size));
 #else
 		pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(oper),size));
 #endif
+#endif
 
+		}
 	}
 		
 }
@@ -2573,16 +2737,8 @@ static void genCall (iCode *ic)
 					 * register. The last byte of the last parameter is
 					 * passed in W. */
 
-#if STACK_SUPPORT
-					if(USE_STACK) {
-						pushw();
-						--psuedoStkPtr;		// sanity check
-					} else {
-						pic16_emitpcode(POC_MOVWF, pic16_popRegFromIdx(--psuedoStkPtr + pic16_Gstack_base_addr));
-					}
-#else
-					pic16_emitpcode(POC_MOVWF, pic16_popRegFromIdx(--psuedoStkPtr + pic16_Gstack_base_addr));
-#endif	/* STACK_SUPPORT */
+					pushw();
+					--psuedoStkPtr;		// sanity check
 				}
 			
 				firstTimeThruLoop=0;
@@ -2611,7 +2767,7 @@ static void genCall (iCode *ic)
 		pic16_aopOp(IC_RESULT(ic),ic,FALSE);
 		_G.accInUse--;
 
-		assignResultValue(IC_RESULT(ic));
+		assignResultValue(IC_RESULT(ic), 1);
 
 		DEBUGpic16_emitcode ("; ","%d left %s",__LINE__,
 			 pic16_AopType(AOP_TYPE(IC_RESULT(ic))));
@@ -2619,8 +2775,7 @@ static void genCall (iCode *ic)
 		pic16_freeAsmop(IC_RESULT(ic),NULL, ic,TRUE);
 	}
 
-#if STACK_SUPPORT
-	if(USE_STACK && stackParms>0) {
+	if(stackParms>0) {
 		pic16_emitpcode(POC_MOVLW, pic16_popGetLit(stackParms));
 		pic16_emitpcode(POC_ADDWF, pic16_popCopyReg( &pic16_pc_fsr1l ));
 		if(STACK_MODEL_LARGE) {
@@ -2628,7 +2783,6 @@ static void genCall (iCode *ic)
 			pic16_emitpcode(POC_INCF, pic16_popCopyReg( &pic16_pc_fsr1h ));
 		}
 	}
-#endif
 
 	/* adjust the stack for parameters if required */
 //	fprintf(stderr, "%s:%d: %s ic->parmBytes= %d\n", __FILE__, __LINE__, OP_SYMBOL(IC_LEFT(ic))->name, ic->parmBytes);
@@ -2734,7 +2888,7 @@ static void genPcall (iCode *ic)
         pic16_aopOp(IC_RESULT(ic),ic,FALSE);
         _G.accInUse--;
 	
-	assignResultValue(IC_RESULT(ic));
+	assignResultValue(IC_RESULT(ic), 1);
 
         pic16_freeAsmop(IC_RESULT(ic),NULL,ic,TRUE);
     }
@@ -2826,6 +2980,42 @@ static void genFunction (iCode *ic)
 	max_key=0;
 	GpsuedoStkPtr=0;
 	_G.nRegsSaved = 0;
+
+	ftype = operandType(IC_LEFT(ic));
+
+	if(/*!IFFUNC_ISNAKED(ftype) &&*/ IFFUNC_ISISR(ftype)) {
+		/* create an absolute section at the interrupt vector:
+		 * that is 0x0008 for interrupt 1, 0x0018 interrupt 2 */
+	  int ivec;
+	  symbol *asym;
+	  char asymname[128];
+	  
+		{
+		  int i;
+
+			sym = OP_SYMBOL( IC_LEFT(ic));
+			for(i=1;i<=2;i++)
+				if(STRCASECMP(interrupts[i]->name, sym->name))break;
+			
+			if(i>2) {
+				fprintf(stderr, "PIC16 port: %s:%d: interrupt function but cannot locate symbol (%s)\n",
+					__FILE__, __LINE__, sym->name);
+				exit(-1);
+			}
+			ivec = i;
+		}
+		sprintf(asymname, "ivec_%s", sym->name);
+		asym = newSymbol(asymname, 0);
+		pic16_emitcode(";","-----------------------------------------");
+		pic16_emitcode(";"," interrupt vector %d for function %s", ivec, sym->name);
+		pic16_emitcode(";","-----------------------------------------");
+		pic16_addpCode2pBlock(pb, pic16_newpCodeFunction(moduleName, asym->name));
+		pic16_emitpcode(POC_GOTO, pic16_popGetWithString( sym->rname ));
+		
+		pic16_pBlockConvert2Absolute(pb);
+	}
+
+
 	/* create the function header */
 	pic16_emitcode(";","-----------------------------------------");
 	pic16_emitcode(";"," function %s",(sym = OP_SYMBOL(IC_LEFT(ic)))->name);
@@ -2845,49 +3035,42 @@ static void genFunction (iCode *ic)
 		
 	}
 
-	ftype = operandType(IC_LEFT(ic));
 
 	if(IFFUNC_ISNAKED(ftype)) {
 		DEBUGpic16_emitcode("; ***", "_naked function, no prologue");
 		return;
 	}
 	
-
 	/* if critical function then turn interrupts off */
 	if (IFFUNC_ISCRITICAL(ftype))
 		pic16_emitcode("clr","ea");
 
-	/* here we need to generate the equates for the
-	 * register bank if required */
-#if 0
-	if (FUNC_REGBANK(ftype) != rbank) {
-	  int i ;
-
-		rbank = FUNC_REGBANK(ftype);
-		for ( i = 0 ; i < pic16_nRegs ; i++ ) {
-			if (strcmp(regspic16[i].base,"0") == 0)
-				pic16_emitcode("","%s = 0x%02x",
-					regspic16[i].dname,
-					8*rbank+regspic16[i].offset);
-			else
-				pic16_emitcode ("","%s = %s + 0x%02x",
-					regspic16[i].dname,
-                			regspic16[i].base,
-					*rbank+regspic16[i].offset);
-		}
-	}
-#endif
-
 	/* if this is an interrupt service routine then
 	 * save acc, b, dpl, dph  */
 	if (IFFUNC_ISISR(sym->type)) {
+	  int i;
+		/* an ISR should save: WREG, STATUS, BSR, PRODL, PRODH */
+		pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_wreg ));
+		pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_status ));
+		pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_bsr ));
+		pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_prodl ));
+		pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_prodh ));
+		pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_fsr0l ));
+		pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_fsr0h ));
+
+
+#if 0
+		/* VR -- this is the old code which clears STATUS register for
+		 * the ISR routine. Why? */
 		pic16_emitpcode(POC_MOVWF,  pic16_popCopyReg(&pic16_pc_wsave));
 		pic16_emitpcode(POC_SWAPFW, pic16_popCopyReg(&pic16_pc_status));
 		pic16_emitpcode(POC_CLRF,   pic16_popCopyReg(&pic16_pc_status));
 		pic16_emitpcode(POC_MOVWF,  pic16_popCopyReg(&pic16_pc_ssave));
+#endif
 
 		pic16_pBlockConvert2ISR(pb);
-#if 0  
+
+#if 0
 		if (!inExcludeList("acc")) 	    
 			pic16_emitcode ("push","acc");	
 		if (!inExcludeList("b"))
@@ -2896,57 +3079,29 @@ static void genFunction (iCode *ic)
 			pic16_emitcode ("push","dpl");
 		if (!inExcludeList("dph"))
 			pic16_emitcode ("push","dph");
-		
-		if (options.model == MODEL_FLAT24 && !inExcludeList("dpx")) {
-			pic16_emitcode ("push", "dpx");
+#endif
 
-			/* Make sure we're using standard DPTR */
-			pic16_emitcode ("push", "dps");
-			pic16_emitcode ("mov", "dps, #0x00");
-			if (options.stack10bit) {	
-				/* This ISR could conceivably use DPTR2. Better save it. */
-				pic16_emitcode ("push", "dpl1");
-				pic16_emitcode ("push", "dph1");
-				pic16_emitcode ("push", "dpx1");
+		/* if any registers used */
+		if (sym->regsUsed) {
+			/* save the registers used */
+			DEBUGpic16_emitcode("; **", "Saving used registers in stack");
+			for ( i = 0 ; i < sym->regsUsed->size ; i++) {
+				if (bitVectBitValue(sym->regsUsed,i)) {
+//					fprintf(stderr, "%s:%d function %s uses register %s\n",
+//							__FILE__, __LINE__, OP_SYMBOL(IC_LEFT(ic))->name,
+//							pic16_regWithIdx(i)->name);
+
+					pic16_pushpCodeOp( pic16_popRegFromIdx(i) );
+					_G.nRegsSaved++;
+				}
 			}
 		}
-
-		/* if this isr has no bank i.e. is going to
-		 * run with bank 0 , then we need to save more
-		 * registers :-) */
-		if (!FUNC_REGBANK(sym->type)) {
-
-			/* if this function does not call any other
-			 * function then we can be economical and
-			 * save only those registers that are used */
-			if (! IFFUNC_HASFCALL(sym->type)) {
-			  int i;
-
-				/* if any registers used */
-				if (sym->regsUsed) {
-					/* save the registers used */
-					for ( i = 0 ; i < sym->regsUsed->size ; i++) {
-						if (bitVectBitValue(sym->regsUsed,i) ||
-							(pic16_ptrRegReq && (i == R0_IDX || i == R1_IDX)) )
-						pic16_emitcode("push","junk");//"%s",pic16_regWithIdx(i)->dname);			    
-					}
-				}
-
-			} else {
-				/* this function has  a function call cannot
-				 * determines register usage so we will have the
-				 * entire bank */
-				saverbank(0,ic,FALSE);
-			}	    
-		}
-#endif
 	} else {
-#if STACK_SUPPORT
 		/* emit code to setup stack frame if user enabled,
 		 * and function is not main() */
 	 
 //		fprintf(stderr, "function name: %s\n", sym->name);
-		if(USE_STACK && strcmp(sym->name, "main")) {
+		if(strcmp(sym->name, "main")) {
 			if(!options.ommitFramePtr || sym->regsUsed) {
 			/* setup the stack frame */
 				pic16_emitpcode(POC_MOVFF, pic16_popCombine2( &pic16_pc_fsr2l, &pic16_pc_postdec1, 0));
@@ -2955,7 +3110,6 @@ static void genFunction (iCode *ic)
 					pic16_emitpcode(POC_MOVFF, pic16_popCombine2( &pic16_pc_fsr1h, &pic16_pc_fsr2h, 0));
 			}
 		}
-#endif
 
 		/* if callee-save to be used for this function
 		* then save the registers being used in this function */
@@ -2965,11 +3119,7 @@ static void genFunction (iCode *ic)
 //			fprintf(stderr, "%s:%d function sym->regsUsed= %p\n", __FILE__, __LINE__, sym->regsUsed);
 			
 			/* if any registers used */
-			if (sym->regsUsed
-#if STACK_SUPPORT
-				&& USE_STACK
-#endif
-				) {
+			if (sym->regsUsed) {
 				/* save the registers used */
 				DEBUGpic16_emitcode("; **", "Saving used registers in stack");
 				for ( i = 0 ; i < sym->regsUsed->size ; i++) {
@@ -2978,7 +3128,7 @@ static void genFunction (iCode *ic)
 //								__FILE__, __LINE__, OP_SYMBOL(IC_LEFT(ic))->name,
 //								pic16_regWithIdx(i)->name);
 
-						pic16_pushpCodeOpReg( PCOR(pic16_popRegFromIdx(i) ));
+						pic16_pushpCodeOp( pic16_popRegFromIdx(i) );
 //						pic16_emitpcode(POC_MOVFF, pic16_popCombine2(
 //							PCOR(pic16_popCopyReg( PCOR(pic16_popRegFromIdx(i)))),
 //							&pic16_pc_postdec1, 0));
@@ -3084,101 +3234,68 @@ static void genEndFunction (iCode *ic)
     if (FUNC_REGBANK(sym->type) || FUNC_ISISR(sym->type))
         pic16_emitcode ("pop","psw");
 
-    if (IFFUNC_ISISR(sym->type)) {
+	if (IFFUNC_ISISR(sym->type)) {
 
-	/* now we need to restore the registers */
-	/* if this isr has no bank i.e. is going to
-	   run with bank 0 , then we need to save more
-	   registers :-) */
-	if (!FUNC_REGBANK(sym->type)) {
-	    
-	    /* if this function does not call any other
-	       function then we can be economical and
-	       save only those registers that are used */
-	    if (! IFFUNC_HASFCALL(sym->type)) {
-		int i;
+		/* now we need to restore the registers */
 		
 		/* if any registers used */
 		if (sym->regsUsed) {
-		    /* save the registers used */
-		    for ( i = sym->regsUsed->size ; i >= 0 ; i--) {
-			if (bitVectBitValue(sym->regsUsed,i) ||
-                          (pic16_ptrRegReq && (i == R0_IDX || i == R1_IDX)) )
-			  pic16_emitcode("pop","junk");//"%s",pic16_regWithIdx(i)->dname);
-		    }
+		  int i;
+
+			/* restore registers used */
+			DEBUGpic16_emitcode("; **", "Restoring used registers from stack");
+			for ( i = sym->regsUsed->size; i >= 0; i--) {
+				if (bitVectBitValue(sym->regsUsed,i)) {
+//					fprintf(stderr, "%s:%d function %s uses register %s\n",
+//							__FILE__, __LINE__, OP_SYMBOL(IC_LEFT(ic))->name,
+//							pic16_regWithIdx(i)->name);
+        
+					pic16_emitpcode(POC_MOVFF, pic16_popCombine2(
+							&pic16_pc_preinc1,
+							PCOR(pic16_popCopyReg( PCOR(pic16_popRegFromIdx(i)))), 0));
+				}
+			}
 		}
-		
-	    } else {
-		/* this function has  a function call cannot
-		   determines register usage so we will have the
-		   entire bank */
-		unsaverbank(0,ic,FALSE);
-	    }	    
-	}
-#if 0
-	if (options.model == MODEL_FLAT24 && !inExcludeList("dpx"))
-	{
-	    if (options.stack10bit)
-	    {
-	        pic16_emitcode ("pop", "dpx1");
-	        pic16_emitcode ("pop", "dph1");
-	        pic16_emitcode ("pop", "dpl1");
-	    }	
-	    pic16_emitcode ("pop", "dps");
-	    pic16_emitcode ("pop", "dpx");
-	}
-	if (!inExcludeList("dph"))
-	    pic16_emitcode ("pop","dph");
-	if (!inExcludeList("dpl"))
-	    pic16_emitcode ("pop","dpl");
-	if (!inExcludeList("b"))
-	    pic16_emitcode ("pop","b");
-	if (!inExcludeList("acc"))
-	    pic16_emitcode ("pop","acc");
-
-        if (IFFUNC_ISCRITICAL(sym->type))
-            pic16_emitcode("setb","ea");
-#endif
-
-	/* if debug then send end of function */
-/* 	if (options.debug && currFunc) { */
-	if (currFunc) {
-	    _G.debugLine = 1;
-	    pic16_emitcode(";","C$%s$%d$%d$%d ==.",
-		     FileBaseName(ic->filename),currFunc->lastLine,
-		     ic->level,ic->block); 
-	    if (IS_STATIC(currFunc->etype))	    
-		pic16_emitcode(";","XF%s$%s$0$0 ==.",moduleName,currFunc->name); 
-	    else
-		pic16_emitcode(";","XG$%s$0$0 ==.",currFunc->name);
-	    _G.debugLine = 0;
-	}
 	
-//	pic16_emitcode ("reti","");
+		pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_fsr0h ));
+		pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_fsr0l));
+		pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_prodh ));
+		pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_prodl ));
+		pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_bsr ));
+		pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_status ));
+		pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_wreg ));
+	
 
-	pic16_emitpcode(POC_CLRF,   pic16_popCopyReg(&pic16_pc_status));
-	pic16_emitpcode(POC_SWAPFW, pic16_popCopyReg(&pic16_pc_ssave));
-	pic16_emitpcode(POC_MOVWF,  pic16_popCopyReg(&pic16_pc_status));
-	pic16_emitpcode(POC_SWAPF,  pic16_popCopyReg(&pic16_pc_wsave));
-	pic16_emitpcode(POC_SWAPFW, pic16_popCopyReg(&pic16_pc_wsave));
-
+		/* if debug then send end of function */
+/* 	if (options.debug && currFunc)  */
+		if (currFunc) {
+			_G.debugLine = 1;
+			pic16_emitcode(";","C$%s$%d$%d$%d ==.",
+					FileBaseName(ic->filename),currFunc->lastLine,
+					ic->level,ic->block); 
+			if (IS_STATIC(currFunc->etype))	    
+				pic16_emitcode(";","XF%s$%s$0$0 ==.",moduleName,currFunc->name); 
+			else
+				pic16_emitcode(";","XG$%s$0$0 ==.",currFunc->name);
+			_G.debugLine = 0;
+		}
+	
 #if 0
-	pic16_addpCode2pBlock(pb,pic16_newpCodeLabel("END_OF_INTERRUPT",-1));
+		pic16_emitpcode(POC_CLRF,   pic16_popCopyReg(&pic16_pc_status));
+		pic16_emitpcode(POC_SWAPFW, pic16_popCopyReg(&pic16_pc_ssave));
+		pic16_emitpcode(POC_MOVWF,  pic16_popCopyReg(&pic16_pc_status));
+		pic16_emitpcode(POC_SWAPF,  pic16_popCopyReg(&pic16_pc_wsave));
+		pic16_emitpcode(POC_SWAPFW, pic16_popCopyReg(&pic16_pc_wsave));
 #endif
 
-	pic16_emitpcodeNULLop(POC_RETFIE);
-
-    }
-    else {
-        if (IFFUNC_ISCRITICAL(sym->type))
-            pic16_emitcode("setb","ea");
+		pic16_emitpcodeNULLop(POC_RETFIE);
+	}
+	else {
+		if (IFFUNC_ISCRITICAL(sym->type))
+			pic16_emitcode("setb","ea");
 	
 	/* if any registers used */
-	if (sym->regsUsed
-#if STACK_SUPPORT
-		&& USE_STACK
-#endif
-	) {
+	if (sym->regsUsed) {
 	  int i;
 		/* save the registers used */
 		DEBUGpic16_emitcode("; **", "Restoring used registers from stack");
@@ -3209,21 +3326,19 @@ static void genEndFunction (iCode *ic)
 	    _G.debugLine = 0;
 	}
 
-#if STACK_SUPPORT
 	/* insert code to restore stack frame, if user enabled it
 	 * and function is not main() */
 	 
-	if(USE_STACK && strcmp(sym->name, "main")) {
+	if(strcmp(sym->name, "main")) {
 		if(!options.ommitFramePtr || sym->regsUsed) {
 			/* restore stack frame */
 			if(STACK_MODEL_LARGE)
 				pic16_emitpcode(POC_MOVFF,
-					pic16_popCombine2( &pic16_pc_postinc1, &pic16_pc_fsr2h, 0));
+					pic16_popCombine2( &pic16_pc_preinc1, &pic16_pc_fsr2h, 0));
 			pic16_emitpcode(POC_MOVFF,
-					pic16_popCombine2( &pic16_pc_postinc1, &pic16_pc_fsr2l, 0));
+					pic16_popCombine2( &pic16_pc_preinc1, &pic16_pc_fsr2l, 0));
 		}
 	}
-#endif
 
         pic16_emitcode ("return","");
 	pic16_emitpcodeNULLop(POC_RETURN);
@@ -3234,73 +3349,141 @@ static void genEndFunction (iCode *ic)
 
 }
 
+
+void pic16_storeForReturn(operand *op, int offset, pCodeOp *dest)
+{
+//		(AOP(left)->aopu.pcop->type == PO_DIR)?
+
+	if(AOP(op)->aopu.pcop->type == PO_IMMEDIATE) {
+		pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(op), offset));
+		pic16_emitpcode(POC_MOVWF, dest);
+	} else {
+		pic16_emitpcode(POC_MOVFF, pic16_popGet2p(
+			pic16_popGet(AOP(op), offset), dest));
+	}
+}
+
 /*-----------------------------------------------------------------*/
 /* genRet - generate code for return statement                     */
 /*-----------------------------------------------------------------*/
 static void genRet (iCode *ic)
 {
-  int size,offset = 0 , pushed = 0;
-    
-  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-  /* if we have no return value then
-     just generate the "ret" */
-  if (!IC_LEFT(ic)) 
-    goto jumpret;       
-    
-  /* we have something to return then
-     move the return value into place */
-  pic16_aopOp(IC_LEFT(ic),ic,FALSE);
-  size = AOP_SIZE(IC_LEFT(ic));
-    
-  while (size--) {
-    char *l ;
-    if (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR) {
-      /* #NOCHANGE */
-      l = pic16_aopGet(AOP(IC_LEFT(ic)),offset++,
-		 FALSE,TRUE);
-      pic16_emitcode("push","%s",l);
-      pushed++;
-    } else {
-	DEBUGpic16_emitcode(";", "%d", __LINE__);
-      l = pic16_aopGet(AOP(IC_LEFT(ic)),offset,
-		 FALSE,FALSE);
-	DEBUGpic16_emitcode(";", "%d l= %s", __LINE__, l);	 
-      if (strcmp(fReturn[offset],l)) {
-	if( ( (AOP(IC_LEFT(ic))->type) == AOP_IMMD) ||
-	    ((AOP(IC_LEFT(ic))->type) == AOP_LIT) ) {
-	  pic16_emitpcode(POC_MOVLW, pic16_popGet(AOP(IC_LEFT(ic)),offset));
-	}else {
-	  pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(IC_LEFT(ic)),offset));
-	}
-	if(size) {
-	  pic16_emitpcode(POC_MOVWF, pic16_popRegFromIdx(offset + pic16_Gstack_base_addr));
-	}
-	offset++;
-      }
-    }
-  }    
+  int size;
+  operand *left;
 
-  if (pushed) {
-    while(pushed) {
-      pushed--;
-      if (strcmp(fReturn[pushed],"a"))
-	pic16_emitcode("pop",fReturn[pushed]);
-      else
-	pic16_emitcode("pop","acc");
-    }
-  }
-  pic16_freeAsmop (IC_LEFT(ic),NULL,ic,TRUE);
-    
- jumpret:
-  /* generate a jump to the return label
-     if the next is not the return statement */
-  if (!(ic->next && ic->next->op == LABEL &&
-	IC_LABEL(ic->next) == returnLabel)) {
+	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+	/* if we have no return value then
+	 * just generate the "ret" */
 	
-    pic16_emitpcode(POC_GOTO,pic16_popGetLabel(returnLabel->key));
-    pic16_emitcode("goto","_%05d_DS_",returnLabel->key+100 + labelOffset);
-  }
+	if (!IC_LEFT(ic)) 
+		goto jumpret;       
     
+	/* we have something to return then
+	 * move the return value into place */
+	pic16_aopOp((left=IC_LEFT(ic)),ic,FALSE);
+	size = AOP_SIZE(IC_LEFT(ic));
+
+	if(size <= 4) {
+		if(size>3) {
+			pic16_storeForReturn(IC_LEFT(ic), 3, pic16_popCopyReg(&pic16_pc_fsr0l));
+//			pic16_emitpcode(POC_MOVFF,
+//				pic16_popGet2p(pic16_popGet(AOP(IC_LEFT(ic)), 3), pic16_popCopyReg(&pic16_pc_fsr0l)));
+		}
+		if(size>2) {
+			pic16_storeForReturn(IC_LEFT(ic), 2, pic16_popCopyReg(&pic16_pc_prodh));
+//			pic16_emitpcode(POC_MOVFF,
+//				pic16_popGet2p(pic16_popGet(AOP(IC_LEFT(ic)), 2), pic16_popCopyReg(&pic16_pc_prodh)));
+		}
+		if(size>1) {
+			pic16_storeForReturn(IC_LEFT(ic), 1, pic16_popCopyReg(&pic16_pc_prodl));
+//			pic16_emitpcode(POC_MOVFF,
+//				pic16_popGet2p(pic16_popGet(AOP(IC_LEFT(ic)), 1), pic16_popCopyReg(&pic16_pc_prodl)));
+		}
+
+		pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(IC_LEFT(ic)), 0));
+
+//		pic16_storeForReturn(IC_LEFT(ic), 0, pic16_popCopyReg(&pic16_pc_wreg));
+//		pic16_emitpcode(POC_MOVFF,
+//			pic16_popGet2p(pic16_popGet(AOP(IC_LEFT(ic)), 0), pic16_popCopyReg(&pic16_pc_wreg)));
+
+	} else {
+		/* >32-bits, setup stack and FSR0 */
+		while (size--) {
+//			DEBUGpic16_emitcode("; ", "POC_MOVLW %d", GpsuedoStkPtr);
+//			DEBUGpic16_emitcode("; ", "POC_MOVFW PLUSW2");
+
+			pic16_pushpCodeOp( pic16_popGet( AOP( IC_LEFT(ic) ), size) );
+
+//			popaopidx(AOP(oper), size, GpseudoStkPtr);
+			GpsuedoStkPtr++;
+		}
+			
+		/* setup FSR0 */
+		pic16_emitpcode(POC_MOVFF, pic16_popGet2p(
+			pic16_popCopyReg(&pic16_pc_fsr1l), pic16_popCopyReg(&pic16_pc_fsr0l)));
+
+		if(STACK_MODEL_LARGE) {
+			pic16_emitpcode(POC_MOVFF, pic16_popGet2p(
+				pic16_popCopyReg(&pic16_pc_fsr1h), pic16_popCopyReg(&pic16_pc_fsr0h)));
+		} else {
+			pic16_emitpcode(POC_CLRF, pic16_popCopyReg( &pic16_pc_fsr1h ) );
+		}
+	}
+				
+#if 0
+	/* old code, left here for reference -- VR */    
+	while (size--) {
+	  char *l ;
+
+		if (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR) {
+			/* #NOCHANGE */
+			l = pic16_aopGet(AOP(IC_LEFT(ic)),offset++, FALSE,TRUE);
+			pic16_emitpcomment("push %s",l);
+			pushed++;
+		} else {
+			DEBUGpic16_emitcode(";", "%d", __LINE__);
+			l = pic16_aopGet(AOP(IC_LEFT(ic)),offset, FALSE,FALSE);
+			DEBUGpic16_emitcode(";", "%d l= %s", __LINE__, l);	 
+			
+			if (strcmp(fReturn[offset],l)) {
+				if( ( (AOP(IC_LEFT(ic))->type) == AOP_IMMD)
+					|| ((AOP(IC_LEFT(ic))->type) == AOP_LIT) ) {
+					pic16_emitpcode(POC_MOVLW, pic16_popGet(AOP(IC_LEFT(ic)),offset));
+				} else {
+					pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(IC_LEFT(ic)),offset));
+				}
+				
+				if(size) {
+					pic16_emitpcode(POC_MOVWF, pic16_popRegFromIdx(offset + pic16_Gstack_base_addr));
+				}
+				offset++;
+			}
+		}
+	}    
+
+	if (pushed) {
+		while(pushed) {
+			pushed--;
+			if (strcmp(fReturn[pushed],"a"))
+				pic16_emitcode("pop",fReturn[pushed]);
+			else
+				pic16_emitcode("pop","acc");
+		}
+	}
+#endif
+
+
+	pic16_freeAsmop (IC_LEFT(ic),NULL,ic,TRUE);
+    
+jumpret:
+	/* generate a jump to the return label
+	 * if the next is not the return statement */
+	if (!(ic->next && ic->next->op == LABEL
+		&& IC_LABEL(ic->next) == returnLabel)) {
+	
+		pic16_emitpcode(POC_GOTO,pic16_popGetLabel(returnLabel->key));
+		pic16_emitcode("goto","_%05d_DS_",returnLabel->key+100 + labelOffset);
+	}
 }
 
 /*-----------------------------------------------------------------*/
@@ -3375,30 +3558,17 @@ static void genMultOneByte (operand *left,
   if(size == 1) {
 
     if (AOP_TYPE(right) == AOP_LIT){
-      pic16_emitcode("multiply ","lit val:%s by variable %s and store in %s", 
+      pic16_emitpcomment("multiply lit val:%s by variable %s and store in %s", 
 		     pic16_aopGet(AOP(right),0,FALSE,FALSE), 
 		     pic16_aopGet(AOP(left),0,FALSE,FALSE), 
 		     pic16_aopGet(AOP(result),0,FALSE,FALSE));
-      pic16_emitcode("call","genMultLit");
     } else {
-      pic16_emitcode("multiply ","variable :%s by variable %s and store in %s", 
+      pic16_emitpcomment("multiply variable :%s by variable %s and store in %s", 
 		     pic16_aopGet(AOP(right),0,FALSE,FALSE), 
 		     pic16_aopGet(AOP(left),0,FALSE,FALSE), 
 		     pic16_aopGet(AOP(result),0,FALSE,FALSE));
-      pic16_emitcode("call","pic16_genMult8X8_8");
-
     }
     pic16_genMult8X8_8 (left, right,result);
-
-
-    /* signed or unsigned */
-    //pic16_emitcode("mov","b,%s", pic16_aopGet(AOP(right),0,FALSE,FALSE));
-    //l = pic16_aopGet(AOP(left),0,FALSE,FALSE);
-    //MOVA(l);       
-    //pic16_emitcode("mul","ab");
-    /* if result size = 1, mul signed = mul unsigned */
-    //pic16_aopPut(AOP(result),"a",0);
-
   } else {  // (size > 1)
 
     pic16_emitcode("multiply (size>1) ","variable :%s by variable %s and store in %s", 
@@ -3488,7 +3658,7 @@ static void genMult (iCode *ic)
     pic16_emitcode("multiply ","sizes are greater than 2... need to insert proper algor.");
 
     /* should have been converted to function call */
-    //assert(0) ;
+	assert(0) ;
 
 release :
     pic16_freeAsmop(left,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
@@ -6338,19 +6508,22 @@ static void genInline (iCode *ic)
   char *buffer, *bp, *bp1;
     
 	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+
 	_G.inLine += (!options.asmpeep);
 
 	buffer = bp = bp1 = Safe_calloc(1, strlen(IC_INLINE(ic))+1);
 	strcpy(buffer,IC_INLINE(ic));
 
+//	fprintf(stderr, "%s:%d inline asm : < %s >\n", __FILE__, __LINE__, buffer);
+
 	/* emit each line as a code */
 	while (*bp) {
 		if (*bp == '\n') {
 			*bp++ = '\0';
-			
+
 			if(*bp1)
 #if 0
-				pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir(bp1, NULL));
+				pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir(bp1, NULL)); // inline directly, no process
 #else
 				pic16_addpCode2pBlock(pb, pic16_AssembleLine(bp1, 1));
 #endif
@@ -6369,13 +6542,15 @@ static void genInline (iCode *ic)
 
 	if ((bp1 != bp) && *bp1)
 #if 0
-		pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir(bp1, NULL));
+		pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir(bp1, NULL)); // inline directly, no process
 #else
 		pic16_addpCode2pBlock(pb, pic16_AssembleLine(bp1, 1));
 #endif
 
-	Safe_free(buffer);
-	_G.inLine -= (!options.asmpeep);
+
+    Safe_free(buffer);
+
+    _G.inLine -= (!options.asmpeep);
 }
 
 /*-----------------------------------------------------------------*/
@@ -6468,6 +6643,10 @@ static void genRLC (iCode *ic)
   pic16_freeAsmop(result,NULL,ic,TRUE);
 }
 
+
+/* gpasm can get the highest order bit with HIGH/UPPER
+ * so the following probably is not needed -- VR */
+ 
 /*-----------------------------------------------------------------*/
 /* genGetHbit - generates code get highest order bit               */
 /*-----------------------------------------------------------------*/
@@ -6542,78 +6721,83 @@ static void AccRol (int shCount)
 /*-----------------------------------------------------------------*/
 static void AccLsh (int shCount)
 {
-    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    switch(shCount){
-        case 0 :
+	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+	switch(shCount){
+		case 0 :
 			return;
-            break;
-        case 1 :
-            pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
-            break;
-        case 2 :
-            pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
-            pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
-            break;
-        case 3 :
-            pic16_emitpcode(POC_SWAPFW,pic16_popCopyReg(&pic16_pc_wreg));
-            pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
-            break;
-        case 4 :
-            pic16_emitpcode(POC_SWAPFW,pic16_popCopyReg(&pic16_pc_wreg));
-            break;
-        case 5 :
-            pic16_emitpcode(POC_SWAPFW,pic16_popCopyReg(&pic16_pc_wreg));
-            pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
-            break;
-        case 6 :
-            pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
-            pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
-            break;
-        case 7 :
-            pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
-            break;
-    }
-    pic16_emitpcode(POC_ANDLW,pic16_popGetLit(SLMask[shCount]));
+			break;
+		case 1 :
+			pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+			break;
+		case 2 :
+			pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+			pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+			break;
+		case 3 :
+			pic16_emitpcode(POC_SWAPFW,pic16_popCopyReg(&pic16_pc_wreg));
+			pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+			break;
+		case 4 :
+			pic16_emitpcode(POC_SWAPFW,pic16_popCopyReg(&pic16_pc_wreg));
+			break;
+		case 5 :
+			pic16_emitpcode(POC_SWAPFW,pic16_popCopyReg(&pic16_pc_wreg));
+			pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+			break;
+		case 6 :
+			pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+			pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+			break;
+		case 7 :
+			pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+			break;
+	}
 
+	pic16_emitpcode(POC_ANDLW,pic16_popGetLit(SLMask[shCount]));
 }
 
 /*-----------------------------------------------------------------*/
 /* AccRsh - right shift accumulator by known count                 */
 /*-----------------------------------------------------------------*/
-static void AccRsh (int shCount)
+static void AccRsh (int shCount, int andmask)
 {
-    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    switch(shCount){
-        case 0 :
-			return;
-            break;
-        case 1 :
-            pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
-            break;
-        case 2 :
-            pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
-            pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
-            break;
-        case 3 :
-            pic16_emitpcode(POC_SWAPFW,pic16_popCopyReg(&pic16_pc_wreg));
-            pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
-            break;
-        case 4 :
-            pic16_emitpcode(POC_SWAPFW,pic16_popCopyReg(&pic16_pc_wreg));
-            break;
-        case 5 :
-            pic16_emitpcode(POC_SWAPFW,pic16_popCopyReg(&pic16_pc_wreg));
-            pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
-            break;
-        case 6 :
-            pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
-            pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
-            break;
-        case 7 :
-            pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
-            break;
-    }
-    pic16_emitpcode(POC_ANDLW,pic16_popGetLit(SRMask[shCount]));
+	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+	switch(shCount){
+		case 0 :
+			return; break;
+		case 1 :
+			pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+//			andmask = 0;	/* no need */
+			break;
+		case 2 :
+			pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+			pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+//			andmask = 0;	/* no need */
+			break;
+		case 3 :
+			pic16_emitpcode(POC_SWAPFW,pic16_popCopyReg(&pic16_pc_wreg));
+			pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+			break;
+		case 4 :
+			pic16_emitpcode(POC_SWAPFW,pic16_popCopyReg(&pic16_pc_wreg));
+			break;
+		case 5 :
+			pic16_emitpcode(POC_SWAPFW,pic16_popCopyReg(&pic16_pc_wreg));
+			pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+			break;
+		case 6 :
+			pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+			pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+			break;
+		case 7 :
+			pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+			break;
+	}
+	
+	if(andmask)
+		pic16_emitpcode(POC_ANDLW,pic16_popGetLit(SRMask[shCount]));
+	else
+		DEBUGpic16_emitcode("; ***", "%s omitting masking the result", __FUNCTION__);
 }
 
 #if 0
@@ -7254,7 +7438,7 @@ static void shiftRLeftOrResult (operand *left, int offl,
     
     pic16_emitpcode(POC_MOVFW,pic16_popGet(AOP(left),offl));
     /* shift right accumulator */
-    AccRsh(shCount);
+    AccRsh(shCount, 1);
     /* or with result */
     /* back to result */
     pic16_emitpcode(POC_IORWF,pic16_popGet(AOP(result),offr));
@@ -8208,49 +8392,53 @@ static void genUnpackBits (operand *result, char *rname, int ptype)
     sym_link *etype;
     int offset = 0 ;
 
-    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    etype = getSpec(operandType(result));
+	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+	etype = getSpec(operandType(result));
 
-    /* read the first byte  */
-    switch (ptype) {
-
-    case POINTER:
-    case IPOINTER:
-	pic16_emitcode("mov","a,@%s",rname);
-	break;
+	/* read the first byte  */
+	switch (ptype) {
+		case POINTER:
+		case IPOINTER:
+		case PPOINTER:
+		case FPOINTER:
+		case GPOINTER:
+			pic16_emitpcode(POC_MOVFW, pic16_popCopyReg(&pic16_pc_indf0));
+			break;
+		case CPOINTER:
+			pic16_emitcode("clr","a");
+			pic16_emitcode("movc","a","@a+dptr");
+			break;
+	}
 	
-    case PPOINTER:
-	pic16_emitcode("movx","a,@%s",rname);
-	break;
-	
-    case FPOINTER:
-	pic16_emitcode("movx","a,@dptr");
-	break;
 
-    case CPOINTER:
-	pic16_emitcode("clr","a");
-	pic16_emitcode("movc","a","@a+dptr");
-	break;
+	/* if we have bitdisplacement then it fits   */
+	/* into this byte completely or if length is */
+	/* less than a byte                          */
+	if ((shCnt = SPEC_BSTR(etype)) || 
+		(SPEC_BLEN(etype) <= 8))  {
 
-    case GPOINTER:
-	pic16_emitcode("lcall","__gptrget");
-	break;
-    }
+		/* shift right acc */
+		AccRsh(shCnt, 0);
 
-    /* if we have bitdisplacement then it fits   */
-    /* into this byte completely or if length is */
-    /* less than a byte                          */
-    if ((shCnt = SPEC_BSTR(etype)) || 
-        (SPEC_BLEN(etype) <= 8))  {
+		pic16_emitpcode(POC_ANDLW, pic16_popGetLit(
+			(((unsigned char) -1)>>(8 - SPEC_BLEN(etype))) & SRMask[ shCnt ]));
 
-        /* shift right acc */
-        AccRsh(shCnt);
+/* VR -- normally I would use the following, but since we use the hack,
+ * to avoid the masking from AccRsh, why not mask it right now? */
 
-        pic16_emitcode("anl","a,#0x%02x",
-                 ((unsigned char) -1)>>(8 - SPEC_BLEN(etype)));
-        pic16_aopPut(AOP(result),"a",offset);
-        return ;
-    }
+/*
+		pic16_emitpcode(POC_ANDLW, pic16_popGetLit(((unsigned char) -1)>>(8 - SPEC_BLEN(etype))));
+*/
+
+		pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result), 0));
+	  return ;
+	}
+
+
+
+	fprintf(stderr, "SDCC pic16 port error: the port currently does not support\n");
+	fprintf(stderr, "bitfields of size >=8. Instead of generating wrong code, bailling out...\n");
+	exit(-1);
 
     /* bit field did not fit in a byte  */
     rlen = SPEC_BLEN(etype) - 8;
@@ -8304,42 +8492,79 @@ static void genUnpackBits (operand *result, char *rname, int ptype)
     return ;
 }
 
-#if 0
-/*-----------------------------------------------------------------*/
-/* genDataPointerGet - generates code when ptr offset is known     */
-/*-----------------------------------------------------------------*/
-static void genDataPointerGet (operand *left, 
-			       operand *result, 
-			       iCode *ic)
+
+static void genDataPointerGet(operand *left,
+			      operand *result,
+			      iCode *ic)
 {
-  int size , offset = 0;
+  int size, offset = 0, leoffset=0 ;
+
+	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+	pic16_aopOp(result, ic, FALSE);
+
+	size = AOP_SIZE(result);
+//	fprintf(stderr, "%s:%d size= %d\n", __FILE__, __LINE__, size);
 
 
-  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+#if 0
+	/* The following tests may save a redudant movff instruction when
+	 * accessing unions */
+	 
+	/* if they are the same */
+	if (operandsEqu (left, result)) {
+		DEBUGpic16_emitcode("; ***", "left and result operands are equ/same");
+		goto release;
+	}
 
-
-  /* optimization - most of the time, left and result are the same
-   * address, but different types. for the pic code, we could omit
-   * the following
-   */
-
-  pic16_aopOp(result,ic,TRUE);
-
-  DEBUGpic16_pic16_AopType(__LINE__,left,NULL,result);
-
-  pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left),0));
-
-  size = AOP_SIZE(result);
-
-  while (size--) {
-    pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset));
-    offset++;
-  }
-
-  pic16_freeAsmop(left,NULL,ic,TRUE);
-  pic16_freeAsmop(result,NULL,ic,TRUE);
-}
+	/* if they are the same registers */
+	if (pic16_sameRegs(AOP(left),AOP(result))) {
+		DEBUGpic16_emitcode("; ***", "left and result registers are same");
+		goto release;
+	}
 #endif
+
+#if 0
+	if ( AOP_TYPE(left) == AOP_PCODE) {
+		fprintf(stderr,"genDataPointerGet   %s, %d\n",
+				AOP(left)->aopu.pcop->name,
+				(AOP(left)->aopu.pcop->type == PO_DIR)?
+				PCOR(AOP(left)->aopu.pcop)->instance:
+				PCOI(AOP(left)->aopu.pcop)->offset);
+	}
+#endif
+
+	if(AOP(left)->aopu.pcop->type == PO_DIR)
+		leoffset=PCOR(AOP(left)->aopu.pcop)->instance;
+
+	DEBUGpic16_pic16_AopType(__LINE__,left,NULL,result);
+
+	while (size--) {
+		DEBUGpic16_emitcode("; ***", "%s loop offset=%d leoffset=%d", __FUNCTION__, offset, leoffset);
+		
+		if(AOP(result)->aopu.pcop->type == PO_IMMEDIATE
+			|| AOP(left)->aopu.pcop->type == PO_IMMEDIATE) {
+			mov2w(AOP(left), leoffset);
+			pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result), offset));
+		} else {
+			pic16_emitpcode(POC_MOVFF, pic16_popGet2p(
+				pic16_popGet(AOP(left), leoffset),
+				pic16_popGet(AOP(result), offset)));
+		}
+
+		offset++;
+		leoffset++;
+	}
+
+//release:
+    pic16_freeAsmop(result,NULL,ic,TRUE);
+}
+
+void pic16_loadFSR0(operand *op)
+{
+	pic16_emitpcode(POC_LFSR, pic16_popGetLit2(0, pic16_popGet(AOP(op), 0)));
+}
+
+
 /*-----------------------------------------------------------------*/
 /* genNearPointerGet - pic16_emitcode for near pointer fetch             */
 /*-----------------------------------------------------------------*/
@@ -8349,68 +8574,79 @@ static void genNearPointerGet (operand *left,
 {
     asmop *aop = NULL;
     //regs *preg = NULL ;
-    char *rname ;
     sym_link *rtype, *retype;
     sym_link *ltype = operandType(left);    
-    //char buffer[80];
 
-    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
-    rtype = operandType(result);
-    retype= getSpec(rtype);
+	rtype = operandType(result);
+	retype= getSpec(rtype);
     
-    pic16_aopOp(left,ic,FALSE);
+	pic16_aopOp(left,ic,FALSE);
+
+	/* if left is rematerialisable and
+	 * result is not bit variable type and
+	 * the left is pointer to data space i.e
+	 * lower 128 bytes of space */
+	if (AOP_TYPE(left) == AOP_PCODE
+		&& !IS_BITFIELD(retype)
+		&& DCL_TYPE(ltype) == POINTER) {
+
+		genDataPointerGet (left,result,ic);
+		pic16_freeAsmop(left, NULL, ic, TRUE);
+	  return ;
+	}
     
-    /* if left is rematerialisable and
-       result is not bit variable type and
-       the left is pointer to data space i.e
-       lower 128 bytes of space */
-    if (AOP_TYPE(left) == AOP_PCODE &&  //AOP_TYPE(left) == AOP_IMMD &&
-	!IS_BITVAR(retype)         &&
-	DCL_TYPE(ltype) == POINTER) {
-      //genDataPointerGet (left,result,ic);
-	return ;
-    }
-    
-    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
 	/* if the value is already in a pointer register
-       then don't need anything more */
-    if (!AOP_INPREG(AOP(left))) {
-	/* otherwise get a free pointer register */
-    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-/*
-	aop = newAsmop(0);
-	preg = getFreePtr(ic,&aop,FALSE);
-	pic16_emitcode("mov","%s,%s",
-		preg->name,
-		pic16_aopGet(AOP(left),0,FALSE,TRUE));
-	rname = preg->name ;
-*/
-    rname ="BAD";
-    } else
-	rname = pic16_aopGet(AOP(left),0,FALSE,FALSE);
+	 * then don't need anything more */
+	if (!AOP_INPREG(AOP(left))) {
+		/* otherwise get a free pointer register */
+		DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+		
+		/* VR -- the whole concept is to load FSR0 with the address of the symbol */
+		pic16_loadFSR0( left );
+	}
+//	 else
+//	rname = pic16_aopGet(AOP(left),0,FALSE,FALSE);
     
     pic16_aopOp (result,ic,FALSE);
     
       /* if bitfield then unpack the bits */
     if (IS_BITFIELD(retype)) 
-	genUnpackBits (result,rname,POINTER);
+	genUnpackBits (result, NULL, POINTER);
     else {
 	/* we have can just get the values */
       int size = AOP_SIZE(result);
-      int offset = 0 ;	
+      int offset = 0;	
 	
       DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
-      pic16_emitpcode(POC_MOVFW,pic16_popGet(AOP(left),0));
-      pic16_emitpcode(POC_MOVWF,pic16_popCopyReg(&pic16_pc_fsr0));
+
+	/* fsr0 is loaded already -- VR */
+//	pic16_loadFSR0( left );
+
+//      pic16_emitpcode(POC_MOVFW,pic16_popGet(AOP(left),0));
+//      pic16_emitpcode(POC_MOVWF,pic16_popCopyReg(&pic16_pc_fsr0));
       while(size--) {
-	pic16_emitpcode(POC_MOVFW,pic16_popCopyReg(&pic16_pc_indf0));
-	pic16_emitpcode(POC_MOVWF,pic16_popGet(AOP(result),offset++));
+
+	if(size) {
+		pic16_emitpcode(POC_MOVFF,
+			pic16_popGet2p(pic16_popCopyReg(&pic16_pc_indf0),
+				pic16_popGet(AOP(result), offset++)));
+	} else {
+		pic16_emitpcode(POC_MOVFF,
+			pic16_popGet2p(pic16_popCopyReg(&pic16_pc_postinc0),
+				pic16_popGet(AOP(result), offset++)));
+	}
+      }
+#if 0
+//	pic16_emitpcode(POC_MOVFW,pic16_popCopyReg(&pic16_pc_postinc0));
+//	pic16_emitpcode(POC_MOVWF,pic16_popGet(AOP(result),offset++));
 	if(size)
 	  pic16_emitpcode(POC_INCF,pic16_popCopyReg(&pic16_pc_fsr0));
-      }
+#endif
 /*
 	while (size--) {
 	    if (IS_AOP_PREG(result) || AOP_TYPE(result) == AOP_STK ) {
@@ -8444,9 +8680,9 @@ static void genNearPointerGet (operand *left,
 	    !OP_SYMBOL(left)->remat &&
 	    ( OP_SYMBOL(left)->liveTo > ic->seq ||
 	      ic->depth )) {
-	    int size = AOP_SIZE(result) - 1;
-	    while (size--)
-		pic16_emitcode("dec","%s",rname);
+//	    int size = AOP_SIZE(result) - 1;
+//	    while (size--)
+//		pic16_emitcode("dec","%s",rname);
 	}
     }
 
@@ -8644,8 +8880,8 @@ static void genCodePointerGet (operand *left,
 static void genGenPointerGet (operand *left,
                               operand *result, iCode *ic)
 {
-	int size, offset, lit;
-	sym_link *retype = getSpec(operandType(result));
+  int size, offset, lit;
+  sym_link *retype = getSpec(operandType(result));
 
 	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	pic16_aopOp(left,ic,FALSE);
@@ -8659,6 +8895,9 @@ static void genGenPointerGet (operand *left,
 		lit = (unsigned)floatFromVal(AOP(left)->aopu.aop_lit);
 		// load FSR0 from immediate
 		pic16_emitpcode(POC_LFSR,pic16_popGetLit2(0,pic16_popGetLit(lit)));
+
+//		pic16_loadFSR0( left );
+
 		offset = 0;
 		while(size--) {
 			if(size) {
@@ -8837,71 +9076,83 @@ static void genPackBits (sym_link    *etype ,
                          operand *right ,
                          char *rname, int p_type)
 {
-    int shCount = 0 ;
-    int offset = 0  ;
-    int rLen = 0 ;
-    int blen, bstr ;   
-    char *l ;
+  int shCnt = 0 ;
+  int offset = 0  ;
+  int rLen = 0 ;
+  int blen, bstr ;   
+  char *l ;
 
-    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    blen = SPEC_BLEN(etype);
-    bstr = SPEC_BSTR(etype);
+	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+	blen = SPEC_BLEN(etype);
+	bstr = SPEC_BSTR(etype);
 
-    l = pic16_aopGet(AOP(right),offset++,FALSE,FALSE);
-    MOVA(l);   
+	if(AOP_TYPE(right) == AOP_LIT) {
+		pic16_emitpcode(POC_MOVLW, pic16_popGet(AOP(right), 0));
+		offset++;
+	} else
+		pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(right), offset++));
 
-    /* if the bit lenth is less than or    */
-    /* it exactly fits a byte then         */
-    if (SPEC_BLEN(etype) <= 8 )  {
-        shCount = SPEC_BSTR(etype) ;
+/*	l = pic16_aopGet(AOP(right),offset++,FALSE,FALSE);
+	MOVA(l);   
+*/
+	/* if the bit lenth is less than or    */
+	/* it exactly fits a byte then         */
+	if((shCnt=SPEC_BSTR(etype))
+		|| SPEC_BLEN(etype) <= 8 )  {
 
-        /* shift left acc */
-        AccLsh(shCount);
+		/* shift left acc */
+		AccLsh(shCnt);
 
-        if (SPEC_BLEN(etype) < 8 ) { /* if smaller than a byte */
+		/* using PRODL as a temporary register here */
+		pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_prodl));
+
+		switch (p_type) {
+			case FPOINTER:
+			case POINTER:
+			case GPOINTER:
+				pic16_emitpcode(POC_MOVFW, pic16_popCopyReg(&pic16_pc_indf0));
+//				pic16_emitcode ("mov","b,a");
+//				pic16_emitcode("mov","a,@%s",rname);
+				break;
+		}
+#if 1
+		pic16_emitpcode(POC_ANDLW, pic16_popGetLit(
+			(unsigned char)((unsigned char)(0xff << (blen+bstr)) |
+					(unsigned char)(0xff >> (8-bstr))) ));
+		pic16_emitpcode(POC_IORFW, pic16_popCopyReg(&pic16_pc_prodl));
+		pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_indf0));
+#endif
+
+#if 0
+		pic16_emitcode ("anl","a,#0x%02x",(unsigned char)
+					((unsigned char)(0xFF << (blen+bstr)) | 
+					(unsigned char)(0xFF >> (8-bstr)) ) );
+		pic16_emitcode ("orl","a,b");
+		if (p_type == GPOINTER)
+			pic16_emitcode("pop","b");
+
+		
+		switch (p_type) {
+			case POINTER:
+				pic16_emitcode("mov","@%s,a",rname);
+				break;
+			case FPOINTER:
+				pic16_emitcode("movx","@dptr,a");
+				break;
+			case GPOINTER:
+				DEBUGpic16_emitcode(";lcall","__gptrput");
+				break;
+		}
+#endif
+
+	  return;
+	}
 
 
-            switch (p_type) {
-                case POINTER:
-                    pic16_emitcode ("mov","b,a");
-                    pic16_emitcode("mov","a,@%s",rname);
-                    break;
+	fprintf(stderr, "SDCC pic16 port error: the port currently does not support\n");
+	fprintf(stderr, "bitfields of size >=8. Instead of generating wrong code, bailling out...\n");
+	exit(-1);
 
-                case FPOINTER:
-                    pic16_emitcode ("mov","b,a");
-                    pic16_emitcode("movx","a,@dptr");
-                    break;
-
-                case GPOINTER:
-                    pic16_emitcode ("push","b");
-                    pic16_emitcode ("push","acc");
-                    pic16_emitcode ("lcall","__gptrget");
-                    pic16_emitcode ("pop","b");
-                    break;
-            }
-
-            pic16_emitcode ("anl","a,#0x%02x",(unsigned char)
-                      ((unsigned char)(0xFF << (blen+bstr)) | 
-                       (unsigned char)(0xFF >> (8-bstr)) ) );
-            pic16_emitcode ("orl","a,b");
-            if (p_type == GPOINTER)
-                pic16_emitcode("pop","b");
-        }
-    }
-
-    switch (p_type) {
-        case POINTER:
-            pic16_emitcode("mov","@%s,a",rname);
-            break;
-
-        case FPOINTER:
-            pic16_emitcode("movx","@dptr,a");
-            break;
-
-        case GPOINTER:
-            DEBUGpic16_emitcode(";lcall","__gptrput");
-            break;
-    }
 
     /* if we r done */
     if ( SPEC_BLEN(etype) <= 8 )
@@ -8909,6 +9160,8 @@ static void genPackBits (sym_link    *etype ,
 
     pic16_emitcode("inc","%s",rname);
     rLen = SPEC_BLEN(etype) ;     
+
+
 
     /* now generate for lengths greater than one byte */
     while (1) {
@@ -8994,65 +9247,53 @@ static void genDataPointerSet(operand *right,
 			      operand *result,
 			      iCode *ic)
 {
-    int size, offset = 0 ;
-    char *l, buffer[256];
+    int size, offset = 0, resoffset=0 ;
 
     DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
     pic16_aopOp(right,ic,FALSE);
-    
-    l = pic16_aopGet(AOP(result),0,FALSE,TRUE);
+
     size = AOP_SIZE(right);
-/*
+	fprintf(stderr, "%s:%d size= %d\n", __FILE__, __LINE__, size);
+
+#if 1
     if ( AOP_TYPE(result) == AOP_PCODE) {
       fprintf(stderr,"genDataPointerSet   %s, %d\n",
 	      AOP(result)->aopu.pcop->name,
+		(AOP(result)->aopu.pcop->type == PO_DIR)?
+	      PCOR(AOP(result)->aopu.pcop)->instance:
 	      PCOI(AOP(result)->aopu.pcop)->offset);
     }
-*/
+#endif
 
-    // tsd, was l+1 - the underline `_' prefix was being stripped
-    while (size--) {
-      if (offset) {
-	sprintf(buffer,"(%s + %d)",l,offset);
-	fprintf(stderr,"%s:%d: oops  %s\n",__FILE__, __LINE__, buffer);
-      } else
-	sprintf(buffer,"%s",l);
+	if(AOP(result)->aopu.pcop->type == PO_DIR)
+		resoffset=PCOR(AOP(result)->aopu.pcop)->instance;
 
-	if (AOP_TYPE(right) == AOP_LIT) {
-	  unsigned int lit = (unsigned int) floatFromVal (AOP(IC_RIGHT(ic))->aopu.aop_lit);
-	  lit = lit >> (8*offset);
-	  if(lit&0xff) {
-	    pic16_emitcode("movlw","%d",lit);
-	    pic16_emitcode("movwf","%s",buffer);
+	while (size--) {
+		if (AOP_TYPE(right) == AOP_LIT) {
+		  unsigned int lit = (unsigned int) floatFromVal (AOP(IC_RIGHT(ic))->aopu.aop_lit);
 
-	    pic16_emitpcode(POC_MOVLW, pic16_popGetLit(lit&0xff));
-	    //pic16_emitpcode(POC_MOVWF, pic16_popRegFromString(buffer));
-	    pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),0));
-
-	  } else {
-	    pic16_emitcode("clrf","%s",buffer);
-	    //pic16_emitpcode(POC_CLRF, pic16_popRegFromString(buffer));
-	    pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(result),0));
-	  }
-	}else {
-	  pic16_emitcode("movf","%s,w",pic16_aopGet(AOP(right),offset,FALSE,FALSE));
-	  pic16_emitcode("movwf","%s",buffer);
-
-	  pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(right),offset));
-	  //pic16_emitpcode(POC_MOVWF, pic16_popRegFromString(buffer));
-	  pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),0));
-
+			lit = lit >> (8*offset);
+			if(lit&0xff) {
+				pic16_emitpcode(POC_MOVLW, pic16_popGetLit(lit&0xff));
+				pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),resoffset));
+			} else {
+				pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(result),resoffset));
+			}
+		} else {
+			mov2w(AOP(right), offset);
+			pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),resoffset));
+		}
+		offset++;
+		resoffset++;
 	}
 
-	offset++;
-    }
-
     pic16_freeAsmop(right,NULL,ic,TRUE);
-    pic16_freeAsmop(result,NULL,ic,TRUE);
 }
 
+
+
 /*-----------------------------------------------------------------*/
-/* genNearPointerSet - pic16_emitcode for near pointer put                */
+/* genNearPointerSet - pic16_emitcode for near pointer put         */
 /*-----------------------------------------------------------------*/
 static void genNearPointerSet (operand *right,
                                operand *result, 
@@ -9062,121 +9303,114 @@ static void genNearPointerSet (operand *right,
   char *l;
   sym_link *retype;
   sym_link *ptype = operandType(result);
-
+  sym_link *resetype;
     
-  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-  retype= getSpec(operandType(right));
-
-  pic16_aopOp(result,ic,FALSE);
-
+	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+	retype= getSpec(operandType(right));
+	resetype = getSpec(operandType(result));
+  
+	pic16_aopOp(result,ic,FALSE);
     
-  /* if the result is rematerializable &
-     in data space & not a bit variable */
-  //if (AOP_TYPE(result) == AOP_IMMD &&
-  if (AOP_TYPE(result) == AOP_PCODE &&  //AOP_TYPE(result) == AOP_IMMD &&
-      DCL_TYPE(ptype) == POINTER   &&
-      !IS_BITVAR(retype)) {
-    genDataPointerSet (right,result,ic);
-    pic16_freeAsmop(result,NULL,ic,TRUE);
-    return;
-  }
+	/* if the result is rematerializable &
+	 * in data space & not a bit variable */
+	
+	/* and result is not a bit variable */
+	if (AOP_TYPE(result) == AOP_PCODE
+//		&& AOP_TYPE(result) == AOP_IMMD
+		&& DCL_TYPE(ptype) == POINTER
+		&& !IS_BITFIELD(retype)
+		&& !IS_BITFIELD(resetype)) {
 
-  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-  pic16_aopOp(right,ic,FALSE);
-  DEBUGpic16_pic16_AopType(__LINE__,NULL,right,result);
+		genDataPointerSet (right,result,ic);
+		pic16_freeAsmop(result,NULL,ic,TRUE);
+	  return;
+	}
 
-  /* if the value is already in a pointer register
-     then don't need anything more */
-  if (!AOP_INPREG(AOP(result))) {
-    /* otherwise get a free pointer register */
-    //aop = newAsmop(0);
-    //preg = getFreePtr(ic,&aop,FALSE);
-    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    //pic16_emitcode("mov","%s,%s",
-    //         preg->name,
-    //         pic16_aopGet(AOP(result),0,FALSE,TRUE));
-    //rname = preg->name ;
-    //pic16_emitcode("movwf","fsr0");
-    pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(result),0));
-    pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_fsr0));
-    pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(right),0));
-    pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_indf0));
-    goto release;
+	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+	pic16_aopOp(right,ic,FALSE);
+	DEBUGpic16_pic16_AopType(__LINE__,NULL,right,result);
 
-  }// else
+	/* if the value is already in a pointer register
+	 * then don't need anything more */
+	if (!AOP_INPREG(AOP(result))) {
+		/* otherwise get a free pointer register */
+		DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+
+		pic16_loadFSR0( result );
+	}
+//	else
 //	rname = pic16_aopGet(AOP(result),0,FALSE,FALSE);
 
-  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
-  /* if bitfield then unpack the bits */
-  if (IS_BITFIELD(retype)) {
-    werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
-	   "The programmer is obviously confused");
-//	genPackBits (retype,right,"BAD",POINTER);
-    exit(1);
-  }
-  else {
-    /* we have can just get the values */
-    int size = AOP_SIZE(right);
-    int offset = 0 ;    
+	/* if bitfield then unpack the bits */
+	if (IS_BITFIELD(resetype)) {
+		genPackBits (resetype, right, NULL, POINTER);
+	} else {
+		/* we have can just get the values */
+	  int size = AOP_SIZE(right);
+	  int offset = 0 ;    
 
-    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    while (size--) {
-      l = pic16_aopGet(AOP(right),offset,FALSE,TRUE);
-      if (*l == '@' ) {
-	//MOVA(l);
-	//pic16_emitcode("mov","@%s,a",rname);
-	pic16_emitcode("movf","indf0,w ;1");
-      } else {
+		DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+		while (size--) {
+			l = pic16_aopGet(AOP(right),offset,FALSE,TRUE);
+			if (*l == '@' ) {
+				//MOVA(l);
+				//pic16_emitcode("mov","@%s,a",rname);
+				pic16_emitcode("movf","indf0,w ;1");
+			} else {
 
-	if (AOP_TYPE(right) == AOP_LIT) {
-	  unsigned int lit = (unsigned int) floatFromVal (AOP(IC_RIGHT(ic))->aopu.aop_lit);
-	  if(lit) {
-	    pic16_emitcode("movlw","%s",l);
-	    pic16_emitcode("movwf","indf0 ;2");
-	  } else 
-	    pic16_emitcode("clrf","indf0");
-	}else {
-	  pic16_emitcode("movf","%s,w",l);
-	  pic16_emitcode("movwf","indf0 ;2");
+				if (AOP_TYPE(right) == AOP_LIT) {
+				  unsigned int lit = (unsigned int) floatFromVal (AOP(IC_RIGHT(ic))->aopu.aop_lit);
+
+					if(lit) {
+						pic16_emitcode("movlw","%s",l);
+						pic16_emitcode("movwf","indf0 ;2");
+					} else 
+						pic16_emitcode("clrf","indf0");
+				} else {
+					pic16_emitcode("movf","%s,w",l);
+					pic16_emitcode("movwf","indf0 ;2");
+				}
+				//pic16_emitcode("mov","@%s,%s",rname,l);
+			}
+			if (size)
+				pic16_emitcode("incf","fsr0,f ;3");
+			//pic16_emitcode("inc","%s",rname);
+			offset++;
+		}
 	}
-	//pic16_emitcode("mov","@%s,%s",rname,l);
-      }
-      if (size)
-	pic16_emitcode("incf","fsr0,f ;3");
-      //pic16_emitcode("inc","%s",rname);
-      offset++;
-    }
-  }
 
-  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-  /* now some housekeeping stuff */
-  if (aop) {
-    /* we had to allocate for this iCode */
-    pic16_freeAsmop(NULL,aop,ic,TRUE);
-  } else { 
-    /* we did not allocate which means left
-       already in a pointer register, then
-       if size > 0 && this could be used again
-       we have to point it back to where it 
-       belongs */
-    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    if (AOP_SIZE(right) > 1 &&
-	!OP_SYMBOL(result)->remat &&
-	( OP_SYMBOL(result)->liveTo > ic->seq ||
-	  ic->depth )) {
-      int size = AOP_SIZE(right) - 1;
-      while (size--)
-	pic16_emitcode("decf","fsr0,f");
-      //pic16_emitcode("dec","%s",rname);
-    }
-  }
+	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+	/* now some housekeeping stuff */
+	if (aop) {
+		/* we had to allocate for this iCode */
+		pic16_freeAsmop(NULL,aop,ic,TRUE);
+	} else { 
+		/* we did not allocate which means left
+		 * already in a pointer register, then
+		 * if size > 0 && this could be used again
+		 * we have to point it back to where it 
+		 * belongs */
+		DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+		if (AOP_SIZE(right) > 1
+			&& !OP_SYMBOL(result)->remat
+			&& ( OP_SYMBOL(result)->liveTo > ic->seq
+				|| ic->depth )) {
 
-  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-  /* done */
- release:
-  pic16_freeAsmop(right,NULL,ic,TRUE);
-  pic16_freeAsmop(result,NULL,ic,TRUE);
+		  int size = AOP_SIZE(right) - 1;
+
+			while (size--)
+				pic16_emitcode("decf","fsr0,f");
+			//pic16_emitcode("dec","%s",rname);
+		}
+	}
+
+	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+	/* done */
+//release:
+	pic16_freeAsmop(right,NULL,ic,TRUE);
+	pic16_freeAsmop(result,NULL,ic,TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -9328,7 +9562,6 @@ static void genGenPointerSet (operand *right,
 
 	DEBUGpic16_pic16_AopType(__LINE__,NULL,right,result);
 
-
 	/* if the operand is already in dptr 
 		then we do nothing else we move the value to dptr */
 	if (AOP_TYPE(result) != AOP_STR) {
@@ -9376,7 +9609,6 @@ static void genGenPointerSet (operand *right,
 			} 
 			// right = ACC
 			DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-
 			pic16_emitpcode(POC_MOVWF,pic16_popCopyReg(&pic16_pc_indf0));
 			goto release;
     	} // if (AOP_TYPE(result) != AOP_IMMD)
@@ -9534,41 +9766,6 @@ static void genIfx (iCode *ic, iCode *popIc)
 /*-----------------------------------------------------------------*/
 /* genAddrOf - generates code for address of                       */
 /*-----------------------------------------------------------------*/
-#if 0
-static void genAddrOf (iCode *ic)
-{
-  operand *right, *result, *left;
-  int size, offset ;
-
-  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-
-
-  //pic16_aopOp(IC_RESULT(ic),ic,FALSE);
-
-  pic16_aopOp((left=IC_LEFT(ic)),ic,FALSE);
-  pic16_aopOp((right=IC_RIGHT(ic)),ic,FALSE);
-  pic16_aopOp((result=IC_RESULT(ic)),ic,TRUE);
-
-  DEBUGpic16_pic16_AopType(__LINE__,left,right,result);
-
-  size = AOP_SIZE(IC_RESULT(ic));
-  offset = 0;
-
-
-  while (size--) {
-    pic16_emitpcode(POC_MOVLW, pic16_popGet(AOP(left),offset));
-    pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset));
-    offset++;
-  }
-
-
-  pic16_freeAsmop(left,NULL,ic,FALSE);
-  pic16_freeAsmop(result,NULL,ic,TRUE);
-
-}
-
-#else	/* new genAddrOf */
-
 static void genAddrOf (iCode *ic)
 {
   operand *result, *left;
@@ -9624,7 +9821,6 @@ static void genAddrOf (iCode *ic)
 	pic16_freeAsmop(left, NULL, ic, FALSE);
 }
 
-#endif	/* new genAddrOf */
 
 #if 0
 /*-----------------------------------------------------------------*/
@@ -10350,7 +10546,7 @@ static void genReceive (iCode *ic)
 {    
 	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
-	if (isOperandInFarSpace(IC_RESULT(ic)) && 
+	if (isOperandInFarSpace(IC_RESULT(ic)) &&
 		( OP_SYMBOL(IC_RESULT(ic))->isspilt ||
 		IS_TRUE_SYMOP(IC_RESULT(ic))) ) {
 
@@ -10378,7 +10574,7 @@ static void genReceive (iCode *ic)
 		_G.accInUse++;
 		pic16_aopOp(IC_RESULT(ic),ic,FALSE);  
 		_G.accInUse--;
-		assignResultValue(IC_RESULT(ic));	
+		assignResultValue(IC_RESULT(ic), 0);
 	}
 
 	pic16_freeAsmop(IC_RESULT(ic),NULL,ic,TRUE);
@@ -10436,12 +10632,8 @@ void genpic16Code (iCode *lic)
     }
 #endif
 
-//    dumpiCode(lic);
-
     for (ic = lic ; ic ; ic = ic->next ) {
 
-//      fprintf(stderr, "; VR = %c %x\n", ic->op, ic->op);
-//      DEBUGpic16_emitcode("; VR", "");
       DEBUGpic16_emitcode(";ic ", "\t%c 0x%x",ic->op, ic->op);
 	if ( cln != ic->lineno ) {
 	    if ( options.debug ) {
@@ -10463,7 +10655,7 @@ void genpic16Code (iCode *lic)
 	
 	if(options.iCodeInAsm) {
 		/* insert here code to print iCode as comment */
-		pic16_emitcomment("; ic:%d: %s", ic->seq, printILine(ic));
+		pic16_emitpcomment("ic:%d: %s", ic->seq, printILine(ic));
 	}
 	
 	/* if the result is marked as

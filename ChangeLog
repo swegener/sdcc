@@ -1,3 +1,98 @@
+2004-02-20 Vangelis Rokas <vrokas AT otenet.gr>
+	   Hans-Juergen Dorn <hans.dorn AT apl-landau.de>
+
+	* doc/sdccman.lyx: removed PIC16 from PIC16 Port Specific Options,
+	removed -penable-stack, added comment for stack pragma, added
+	warning for not initializing the stack/frame registers, removed
+	comment at interrupts section
+
+	Stack is made permanent, there is no ability to disable stack usage.
+	* src/pic16/device.h,
+	* src/pic16/device.c: removed all references to USE_STACK macro,
+	* src/pic16/device.c (pic16_dump_section): when no elements in
+	rlist, free rlist before return,
+	* (pic16_dump_int_registers): NEW, internal registers are a new set
+	of general purpose registers reused by each function,
+	* (checkAddReg): returns 1 if registers is added to set,
+	* (pic16_groupRegistersInSection): when a registers is of type
+	PO_GPR_TEMP add it in pic16_int_regs and not in pic16_rel_udata,
+	* src/pic16/device.h: memRange and Assigned Memory are deleted,
+	SRCASECMP macro is moved here from device.c
+	* src/pic16/genarith.c (pic16_pCodeOpType): added cases for
+	PO_PCLATU, PO_PRODL, PO_PRODH,
+	* (pic16_pCodeOpType, genMinus, 
+	changed compares to "a" register, with AOP_ACC,
+	* (pic16_genPlus): fixed some bugs and indented properly,
+	* (pic16_addSign): changed size to size+offset in the MOVWF
+	instruction,
+	* (pic16_genUMult8XLit_8): NEW, uses processor MULLW instruction to
+	multiply 8-bit operand by literal, result is 8-bit,
+	* (pic16_genUMult8X8_8): NEW, uses processor MULWF instruction to
+	multiply 2 8-bit operand, result is 8-bit,
+	* (pic16_genMult8X8_8): modified to call genUMult8X*_8 functions and not
+	genUMult8X*_16,
+	* src/pic16/gen.c: changed accUse to contain WREG only,
+	* (pic16_emitcomment): renamed to pic16_emitpcomment,
+	* (aopForSym): allocated dir register when IN_DIRSPACE(space) is,
+	true, do not use immediate addressing any more unless sym is a
+	pointer in codespace,
+	* (aopForRemat): do not use immediate addressing when symbol not in
+	codespace and when symbol's address is requested,
+	* (aopOp): for-loop in if(sym->accUse) is modified for the new
+	accUse size (= 1),
+	* (aopGet): added case for AOP_ACC and don't return "accumulator
+	bug" but WREG instead,
+	* (popGetTempReg): pushes contents of temporary register in stack,
+	* (popReleaseTempReg): pops contents of temporary register from
+	stack. Use popGetTempReg/popReleaseTempReg in aligned pairs,
+	* (pic16_popGet): separated case AOP_ACC to return register WREG
+	from processor registers, AOP_PCODE not checks if pcop is PO_DIR
+	or PO_IMMEDIATE and initializes their instance/offset appropriately,
+	* The whole issue with aopForSym,aopForRemat,popGet) is to minimize
+	the use of immediate pointers to certain cases only.
+
+	* (pic16_pushpCodeOpReg, pic16_poppCodeOpReg): use pic16_popGet2p,
+	* (pic16_loadFromReturn, pic16_storeForReturn: NEW,
+	* (assignResultValue, genCall, genRet): modified to use the new
+	function return value scheme with WREG,PRODL,PRODH,FSR0L and FSR0,
+	genPcall is still broken,
+	* (genFunction): added code to create 'A' type pBlocks when
+	interrupt functions are generated, code not extensively tested yet,
+	ISRs push WREG,STATUS,BSR,PRODL,PRODH,FSR0L,FSR0H registers on stack,
+	* (genEndFunction): modified so ISRs pop stored registers from stack,
+	* (genMultOneByte): cleanup,
+	* (AccRsh): added flag andmask, to and result with appropriate mask,
+	* (genUnpackBits,genPackBits): fixed and can handle bit fields,
+	* (genDataPointerGet): fixed and reenabled its use,
+	* (genNearDataPointerGet): bugs fixed,
+	* (genDataPointerSet): bugs fixed,
+	* src/pic16/genutils.c: added functions pic16_DumpValue,pic16_DumpAop,
+	pic16_DumpSymbol, pic16_DumpOp,
+	* src/pic16/genutils.h: function prototypes for the above functions,
+	* src/pic16/glue.c: new flags initsfpnt, to initialize stack/frame
+	pointers,
+	* (pic16emitRegularMap): many many many improvements, but needs a
+	major cleanup,
+	* src/pic16/main.c: enable_stack in pic16_options is removed,
+	* (_pic16_parseOptions): removed command line options -penable-stack,
+	* (_process_pragma): emit stack symbol only when stack pragma is
+	processed,
+	* src/pic16/pcode.c: pic16_pc_fsr0 is removed, all operations are
+	redirected to FSR0L/FSR0H pair,
+	* (pic16_get_op, pic16_get_op2): modifications and improvements,
+	* (pic16_getRegFromInstruction, pic16_getRegFromInstruction2): added
+	cases PO_PRODL,PO_PRODH, pic16_getRegFromInstruction2 returns sane
+	for immediates,
+	* (insertBankSwitch): modified to handle cases like: (alfa + 1)
+	* (dumpPicOptype): NEW,
+	* src/pic16/pcode.h: added PO_PCLATU,PO_PRODL,PO_PRODH in enum,
+	* src/pic16/pcoderegs.c (pCodeRegMapLiveRangesInFlow): fixed bug
+	with movff instruction,
+	* src/pic16/ralloc.c: renamed typeRegWithIdx to pic16_typeRegWithIdx,
+	added pic16_int_regs, some packRegsFor* functions are commented out,
+	because produce errors,
+	* src/pic16/NOTES: minor modifications
+
 2004-02-18  Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* as/mcs51/aslink.h, as/mcs51/lkarea.c, as/mcs51/lkdata.c, as/mcs51/lkmain.c,

@@ -1718,10 +1718,10 @@ Install paths
 \begin_inset  Tabular
 <lyxtabular version="3" rows="5" columns="4">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -3469,7 +3469,7 @@ It tries to document SDCC for several processor architectures in one document
 
  currently matches SDCC for mcs51 and DS390 best and does give too few informati
 on about f.e.
- Z80, PIC and HC08.
+ Z80, PIC14, PIC16 and HC08.
 \layout Itemize
 
 There are many references pointing away from this documentation.
@@ -6176,47 +6176,6 @@ status Collapsed
 \series default 
  generate code for DS390 Arithmetic Accelerator.
  
-\layout Subsection
-
-PIC Options
-\begin_inset LatexCommand \index{Options PIC}
-
-\end_inset 
-
-
-\begin_inset LatexCommand \index{PIC options}
-
-\end_inset 
-
-
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
--
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--gen-banksel
-\begin_inset LatexCommand \index{-\/-gen-banksel}
-
-\end_inset 
-
-
-\series default 
- enable the generation of banksel assembler directives in the PIC16
-\begin_inset LatexCommand \index{PIC16}
-
-\end_inset 
-
- port.
 \layout Subsection
 
 Z80 Options
@@ -12301,8 +12260,8 @@ For signed & unsigned int (16 bit) and long (32 bit) variables, division,
 \begin_inset  Tabular
 <lyxtabular version="3" rows="11" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -12595,8 +12554,8 @@ SDCC supports IEEE (single precision 4 bytes) floating point numbers.The
 \begin_inset  Tabular
 <lyxtabular version="3" rows="17" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -13918,8 +13877,8 @@ The compiler creates the following #defines
 \begin_inset  Tabular
 <lyxtabular version="3" rows="10" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -14712,7 +14671,7 @@ status Collapsed
  no local variables.
 \layout Subsection
 
-PIC16 Port Specific Options
+Port Specific Options
 \layout Standard
 
 The port specific options appear after the global options in the sdcc --help
@@ -14782,31 +14741,6 @@ status Collapsed
 
 -pleave-reset-vector Used in conjuction with the previous command, instructs
  the port NOT to omit the reset vector.
-\layout List
-\labelwidthstring 00.00.0000
-
--
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--penable-stack Enables stack usage.
- All new development is done with stack enabled.
- This command line soon will be deprecated and stack will be enabled by
- default.
- For the time being it must be entered if one wants to have stack.
-\newline 
-
-\series bold 
-This option is deprecated.
- Stack is enabled by default in the port and there is no way to disable
- it.
- It is left here only for reference.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -14923,8 +14857,8 @@ PIC16 port defines the following preprocessor macros while translating a
 \begin_inset  Tabular
 <lyxtabular version="3" rows="2" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -14985,10 +14919,10 @@ PIC16 port uses the following directories for searching header files and
 \begin_inset  Tabular
 <lyxtabular version="3" rows="3" columns="4">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -15023,7 +14957,7 @@ Command prefix
 \end_inset 
 </cell>
 </row>
-<row topline="true" bottomline="true">
+<row topline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -15124,6 +15058,9 @@ It is important to initialize the stack, otherwise strange things can happen.
 
 .
 \newline 
+The stack pragma should be used only once in a project.
+ Multiple pragmas may result in indeterminate behaviour of the program.
+\newline 
 If you omit setting the pragma the port emits a warning message before linking.
  If not initializing the stack is desired ignore the message.
 \layout LyX-Code
@@ -15207,9 +15144,9 @@ Memory model affects the default size of pointers within the source.
 \begin_inset  Tabular
 <lyxtabular version="3" rows="3" columns="3">
 <features>
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -15359,9 +15296,9 @@ large
 \begin_inset  Tabular
 <lyxtabular version="3" rows="3" columns="3">
 <features>
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -15445,6 +15382,14 @@ Frame pointer FSR2
 \end_inset 
 
 
+\layout Standard
+
+
+\series bold 
+Currently stack and frame pointers should be initialized explicit by the
+ user at the desired Data RAM position (see 4.5.5 Pragma Stack).
+ Uninitialized stack and frame pointers can result in unexpected behavior
+ of the resulting binary.
 \layout Subsection
 
 Function return values
@@ -15459,8 +15404,8 @@ Return values from functions are placed to the appropriate registers following
 \begin_inset  Tabular
 <lyxtabular version="3" rows="6" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -15609,11 +15554,6 @@ NOTE that when the _naked attribute is specified for an interrupt routine,
 \end_inset 
 
 .
-\layout Standard
-
-Currently interrupt enable flags are left unaffected when entering an interrupt
- routine.
- This may change in the future.
 \layout Chapter
 
 Debugging with SDCDB
@@ -17371,7 +17311,7 @@ Documentation
 \begin_inset  Tabular
 <lyxtabular version="3" rows="10" columns="2">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="0(null)">
+<column alignment="left" valignment="top" leftline="true" width="0">
 <column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">

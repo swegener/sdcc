@@ -32,12 +32,18 @@ struct pCodeOp;
 enum
   {
     AOP_LIT = 1,
-    AOP_REG, AOP_DIR,
-    AOP_DPTR, AOP_DPTR2, AOP_R0, AOP_R1,
-    AOP_STK, AOP_IMMD, AOP_STR,
-    AOP_CRY, AOP_ACC,
+    AOP_REG,
+    AOP_DIR,
+    AOP_DPTR,
+    AOP_DPTR2,
+    AOP_R0,
+    AOP_R1,
+    AOP_STK,
+    AOP_IMMD,
+    AOP_STR,
+    AOP_CRY,
+    AOP_ACC,
     AOP_PCODE
-
   };
 
 /* type asmop : a homogenised type for 

@@ -11,10 +11,32 @@ For any questions please ask the current port
 developers.
 
 Current developer:
-Vangelis Rokas	<vrokas@otenet.gr>
+Vangelis Rokas	<vrokas AT otenet.gr>
 
 Other people to contact:
-Scott Dattalo	<scott@dattalo.com>
+Scott Dattalo	<scott AT dattalo.com>
+
+======================================================================
+======================================================================
+2004-Feb-20 Vangelis Rokas
+Major update with many bugfixes.
+
+1. The most of the pic16 regression tests (former pic regression tests) pass
+successfully. Many thanks to Hans Dorn who did a great job with the
+arithmetic, shift and pointer functions.
+
+2. Bit fields now work properly.
+
+3. Stack is permanently enabled. Command argument -pstack-enable is deleted
+and no more recognized by the port.
+
+
+2004-Feb-07 Vangelis Rokas
+
+1. Fixed a bug so that compiler allocated internal registered, will
+be shared along multiple sources via '.registers' section placed
+in absolute data memory address 0x0000. Registers 0x00 to 0x7f are
+considered as internal since they can be used for fast access.
 
 
 

@@ -46,7 +46,7 @@
 /* since the pack the registers depending strictly on the MCU      */
 /*-----------------------------------------------------------------*/
 
-static regs *typeRegWithIdx (int idx, int type, int fixed);
+regs *pic16_typeRegWithIdx (int idx, int type, int fixed);
 extern void genpic16Code (iCode *);
 extern void pic16_assignConfigWordValue(int address, int value);
 
@@ -78,9 +78,10 @@ set *pic16_dynInternalRegs=NULL;
 static hTab  *dynDirectRegNames= NULL;
 //static hTab  *regHash = NULL;    /* a hash table containing ALL registers */
 
-set *pic16_rel_udata=NULL;
-set *pic16_fix_udata=NULL;
-set *pic16_equ_data=NULL;
+set *pic16_rel_udata=NULL;	/* relocatable uninitialized registers */
+set *pic16_fix_udata=NULL;	/* absolute uninitialized registers */
+set *pic16_equ_data=NULL;	/* registers used by equates */
+set *pic16_int_regs=NULL;	/* internal registers placed in access bank 0 to 0x7f */
 
 set *pic16_builtin_functions=NULL;
 
@@ -488,12 +489,8 @@ allocReg (short type)
   	return NULL;
 #endif
 
-#if STACK_SUPPORT
-	if(USE_STACK) {
-		/* try to reuse some unused registers */
-		reg = regFindFree( pic16_dynAllocRegs );
-	}
-#endif
+	/* try to reuse some unused registers */
+	reg = regFindFree( pic16_dynAllocRegs );
 
 	if(!reg) {
 		reg = newReg(REG_GPR, PO_GPR_TEMP, dynrIdx++, NULL, 1, 0, NULL);
@@ -501,7 +498,7 @@ allocReg (short type)
 	}
 	reg->isFree=0;
 
-	debugLog ("%s of type %s\n", __FUNCTION__, debugLogRegType (type));
+//	debugLog ("%s of type %s\n", __FUNCTION__, debugLogRegType (type));
 
 //	fprintf(stderr,"%s:%d: %s\t%s addr= 0x%x\trIdx= 0x%02x isFree: %d\n",
 //		__FILE__, __LINE__, __FUNCTION__, reg->name, reg->address, reg->rIdx, reg->isFree);
@@ -511,10 +508,8 @@ allocReg (short type)
 		reg->isLocal = 1;	/* this is a local frame register */
 	}
 	
-#if STACK_SUPPORT
 	if (currFunc)
 		currFunc->regsUsed = bitVectSetBit (currFunc->regsUsed, reg->rIdx);
-#endif
  
   return (reg);		// addSet(&pic16_dynAllocRegs,reg);
 
@@ -661,11 +656,14 @@ pic16_allocDirReg (operand *op )
 //				reg->type = REG_SFR;
 //			}
 
-		if (IS_BITVAR (OP_SYM_ETYPE(op))) {
-			addSet(&pic16_dynDirectBitRegs, reg);
-			reg->isBitField = 1;
-		} else
-			addSet(&pic16_dynDirectRegs, reg);
+			if (IS_BITVAR (OP_SYM_ETYPE(op))) {
+//				fprintf(stderr, "%s:%d adding %s in bit registers\n", __FILE__, __LINE__, reg->name);
+				addSet(&pic16_dynDirectBitRegs, reg);
+				reg->isBitField = 1;
+			} else {
+//				fprintf(stderr, "%s:%d adding %s in direct registers\n", __FILE__, __LINE__, reg->name);
+				checkAddReg(&pic16_dynDirectRegs, reg);
+			}
 	
 		} else {
 			debugLog ("  -- %s is declared at address 0x30000x\n",name);
@@ -722,8 +720,7 @@ pic16_allocRegByName (char *name, int size)
 /*-----------------------------------------------------------------*/
 /* RegWithIdx - returns pointer to register with index number       */
 /*-----------------------------------------------------------------*/
-static regs *
-typeRegWithIdx (int idx, int type, int fixed)
+regs *pic16_typeRegWithIdx (int idx, int type, int fixed)
 {
 
   regs *dReg;
@@ -774,13 +771,13 @@ pic16_regWithIdx (int idx)
 {
   regs *dReg;
 
-  if( (dReg = typeRegWithIdx(idx,REG_GPR,0)) != NULL)
+  if( (dReg = pic16_typeRegWithIdx(idx,REG_GPR,0)) != NULL)
     return dReg;
 
-  if( (dReg = typeRegWithIdx(idx,REG_SFR,0)) != NULL)
+  if( (dReg = pic16_typeRegWithIdx(idx,REG_SFR,0)) != NULL)
     return dReg;
 
-  if( (dReg = typeRegWithIdx(idx,REG_STK,0)) != NULL)
+  if( (dReg = pic16_typeRegWithIdx(idx,REG_STK,0)) != NULL)
     return dReg;
 
   return NULL;
@@ -930,7 +927,7 @@ extern void pic16_groupRegistersInSection(set *regset);
 extern void pic16_dump_equates(FILE *of, set *equs);
 //extern void pic16_dump_map(void);
 extern void pic16_dump_section(FILE *of, set *section, int fix);
-
+extern void pic16_dump_int_registers(FILE *of, set *section);
 
 static void packBits(set *bregs)
 {
@@ -953,7 +950,7 @@ static void packBits(set *bregs)
     if(breg->isFixed) {
       //fprintf(stderr,"packing bit at fixed address = 0x%03x\n",breg->address);
 
-      bitfield = typeRegWithIdx (breg->address >> 3, -1 , 1);
+      bitfield = pic16_typeRegWithIdx (breg->address >> 3, -1 , 1);
       breg->rIdx = breg->address & 7;
       breg->address >>= 3;
 
@@ -1082,18 +1079,15 @@ void pic16_writeUsedRegs(FILE *of)
 //	pic16_dump_map();
 //	pic16_dump_cblock(of);
 
+	/* dump equates */
 	pic16_dump_equates(of, pic16_equ_data);
 	
+	/* dump internal registers */
+	pic16_dump_int_registers(of, pic16_int_regs);
+	
+	/* dump other variables */
 	pic16_dump_section(of, pic16_rel_udata, 0);
 	pic16_dump_section(of, pic16_fix_udata, 1);
-	
-#if 0
-	bitEQUs(of,pic16_dynDirectBitRegs);
-	aliasEQUs(of,pic16_dynAllocRegs,0);
-	aliasEQUs(of,pic16_dynDirectRegs,0);
-	aliasEQUs(of,pic16_dynStackRegs,0);
-	aliasEQUs(of,pic16_dynProcessorRegs,1);
-#endif
 
 }
 
@@ -2800,14 +2794,6 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 
     }
 
-#if 0
-	if(ic->op == CALL || ic->op == PCALL) {
-		addSet(&pic16_builtin_functions, OP_SYMBOL( IC_LEFT(ic)));
-		debugLog ("%d This is a call, function: %s\n", __LINE__, OP_SYMBOL(IC_LEFT(ic))->name);
-		return 0;
-	}
-#endif
-
   /* find the definition of iTempNN scanning backwards if we find a 
      a use of the true symbol before we find the definition then 
      we cannot pack */
@@ -2874,6 +2860,17 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
       	}
 #endif
 
+
+#if 1
+      if( IS_SYMOP( IC_RESULT(dic)) &&
+      	IS_BITFIELD( OP_SYMBOL(IC_RESULT(dic))->etype ) ) {
+
+      	  debugLog (" %d - result is bitfield\n", __LINE__);
+      	  dic = NULL;
+      	  break;
+      	}
+#endif
+
       if (IS_SYMOP (IC_RESULT (dic)) &&
 	  IC_RESULT (dic)->key == IC_RIGHT (ic)->key)
 	{
@@ -2916,6 +2913,25 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 
   if (!dic)
     return 0;			/* did not find */
+
+#if 1
+	/* This code is taken from the hc08 port. Do not know
+	 * if it fits for pic16, but I leave it here just in case */
+
+	/* if assignment then check that right is not a bit */
+	if (ASSIGNMENT (dic) && !POINTER_SET (dic)) {
+	  sym_link *etype = operandType (IC_RIGHT (dic));
+
+		if (IS_BITFIELD (etype)) {
+			/* if result is a bit too then it's ok */
+			etype = operandType (IC_RESULT (dic));
+			if (!IS_BITFIELD (etype)) {
+				debugLog(" %d bitfields\n");
+			  return 0;
+			}
+		}
+	}
+#endif
 
   /* if the result is on stack or iaccess then it must be
      the same atleast one of the operands */
@@ -3144,7 +3160,7 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
 
   /* only upto 2 bytes since we cannot predict
      the usage of b, & acc */
-  if (getSize (operandType (op)) > (pic16_fReturnSizePic - 2) &&
+  if (getSize (operandType (op)) > (pic16_fReturnSizePic - 3) &&	/* was 2, changed to 3 -- VR */
       ic->op != RETURN &&
       ic->op != SEND)
     return NULL;
@@ -3410,6 +3426,7 @@ packRegsForAccUse (iCode * ic)
       IC_LEFT (uic)->key != IC_RESULT (ic)->key)
     return;
 
+#if 1
   debugLog ("  %s:%d\n", __FUNCTION__,__LINE__);
   /* if one of them is a literal then we can */
   if ( ((IC_LEFT (uic) && IS_OP_LITERAL (IC_LEFT (uic))) ||
@@ -3419,6 +3436,7 @@ packRegsForAccUse (iCode * ic)
       OP_SYMBOL (IC_RESULT (ic))->accuse = 1;
       return;
     }
+#endif
 
   debugLog ("  %s:%d\n", __FUNCTION__,__LINE__);
   /* if the other one is not on stack then we can */
@@ -3560,11 +3578,15 @@ static void isData(sym_link *sl)
 	}
 }
 
-#define NO_packRegsForSupport	1
-#define NO_packRegsForAccUse	1
-#define NO_packRegsForOneuse	1
-#define NO_cast_peep		1
 
+/* set if conditional to 1 to disable optimizations */
+
+#define NO_packRegsForAccUse
+#if 0
+#define NO_packRegsForSupport
+#define NO_packRegsForOneuse
+//#define NO_cast_peep
+#endif
 /*--------------------------------------------------------------------*/
 /* pic16_packRegisters - does some transformations to reduce          */
 /*                   register pressure                                */
@@ -3647,6 +3669,19 @@ pic16_packRegisters (eBBlock * ebp)
       debugAopGet ("  result:", IC_RESULT (ic));
       printSymType("     ", OP_SYMBOL(IC_RESULT(ic))->type);
     }
+
+    if(IS_TRUE_SYMOP ( IC_RIGHT(ic))) {
+      debugAopGet ("  right:", IC_RIGHT (ic));
+      printSymType("    ", OP_SYMBOL(IC_RIGHT(ic))->type);
+//      pic16_allocDirReg(IC_RIGHT(ic));
+    }
+
+    if(IS_TRUE_SYMOP ( IC_RESULT(ic))) {
+      debugAopGet ("  result:", IC_RESULT (ic));
+      printSymType("     ", OP_SYMBOL(IC_RESULT(ic))->type);
+//      pic16_allocDirReg(IC_RESULT(ic));
+    }
+
 
     if (POINTER_SET (ic))
 	debugLog ("  %d - Pointer set\n", __LINE__);
@@ -3768,7 +3803,7 @@ pic16_packRegisters (eBBlock * ebp)
 
 	debugLog(" %d\n", __LINE__);
 
-#if NO_packRegsForSupport
+#ifndef NO_packRegsForSupport
     /* reduce for support function calls */
     if (ic->supportRtn || ic->op == '+' || ic->op == '-')
       packRegsForSupport (ic, ebp);
@@ -3779,7 +3814,7 @@ pic16_packRegisters (eBBlock * ebp)
     if (ic->op == RECEIVE)
       packForReceive (ic, ebp);
 
-#if NO_packRegsForOneuse
+#ifndef NO_packRegsForOneuse
     /* some cases the redundant moves can
        can be eliminated for return statements */
     if ((ic->op == RETURN || ic->op == SEND) &&
@@ -3788,7 +3823,7 @@ pic16_packRegisters (eBBlock * ebp)
       packRegsForOneuse (ic, IC_LEFT (ic), ebp);
 #endif
 
-#if NO_packRegsForOneuse
+#ifndef NO_packRegsForOneuse
     /* if pointer set & left has a size more than
        one and right is not in far space */
     if (POINTER_SET (ic) &&
@@ -3800,7 +3835,7 @@ pic16_packRegisters (eBBlock * ebp)
       packRegsForOneuse (ic, IC_RESULT (ic), ebp);
 #endif
 
-#if NO_packRegsForOneuse
+#ifndef NO_packRegsForOneuse
     /* if pointer get */
     if (POINTER_GET (ic) &&
 	!isOperandInFarSpace (IC_RESULT (ic)) &&
@@ -3812,7 +3847,7 @@ pic16_packRegisters (eBBlock * ebp)
       debugLog("%d - return from packRegsForOneuse\n", __LINE__);
 #endif
 
-#if NO_cast_peep
+#ifndef NO_cast_peep
     /* if this is cast for intergral promotion then
        check if only use of  the definition of the 
        operand being casted/ if yes then replace
@@ -3882,7 +3917,7 @@ pic16_packRegisters (eBBlock * ebp)
       }
 
 
-#if NO_packRegsForAccUse
+#ifndef NO_packRegsForAccUse
     /* pack registers for accumulator use, when the
        result of an arithmetic or bit wise operation
        has only one use, that use is immediately following
@@ -3899,7 +3934,7 @@ pic16_packRegisters (eBBlock * ebp)
 
 	 ) &&
 	IS_ITEMP (IC_RESULT (ic)) &&
-	getSize (operandType (IC_RESULT (ic))) <= 2)
+	getSize (operandType (IC_RESULT (ic))) <= 1)
 
       packRegsForAccUse (ic);
 #endif

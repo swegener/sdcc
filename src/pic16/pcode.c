@@ -60,7 +60,7 @@ pCodeOpReg pic16_pc_pclath    = {{PO_PCLATH,  "PCLATH"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_wreg      = {{PO_WREG,    "WREG"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_bsr       = {{PO_BSR,     "BSR"}, -1, NULL,0,NULL};
 
-pCodeOpReg pic16_pc_fsr0	= {{PO_FSR0,	"FSR0"}, -1, NULL,0,NULL}; //deprecated !
+//pCodeOpReg pic16_pc_fsr0	= {{PO_FSR0,	"FSR0"}, -1, NULL,0,NULL}; //deprecated !
 
 pCodeOpReg pic16_pc_fsr0l	= {{PO_FSR0,	"FSR0L"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_fsr0h	= {{PO_FSR0,	"FSR0H"}, -1, NULL, 0, NULL};
@@ -87,7 +87,8 @@ pCodeOpReg pic16_pc_postdec2	= {{PO_INDF0,	"POSTDEC2"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_preinc2		= {{PO_INDF0,	"PREINC2"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_plusw2		= {{PO_INDF0,	"PLUSW2"}, -1, NULL, 0, NULL};
 
-
+pCodeOpReg pic16_pc_prodl	= {{PO_PRODL, "PRODL"}, -1, NULL, 0, NULL};
+pCodeOpReg pic16_pc_prodh	= {{PO_PRODH, "PRODH"}, -1, NULL, 0, NULL};
 
 pCodeOpReg pic16_pc_kzero     = {{PO_GPR_REGISTER,  "KZ"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_wsave     = {{PO_GPR_REGISTER,  "WSAVE"}, -1, NULL,0,NULL};
@@ -149,6 +150,7 @@ extern pCodeOp *pic16_popCopyReg(pCodeOpReg *pc);
 pCodeOp *pic16_popCopyGPR2Bit(pCodeOp *pc, int bitval);
 void pic16_pCodeRegMapLiveRanges(pBlock *pb);
 
+char *dumpPicOptype(PIC_OPTYPE type);
 
 /****************************************************************/
 /*                    PIC Instructions                          */
@@ -2558,7 +2560,7 @@ void  pic16_pCodeInitRegisters(void)
 	pic16_pc_intcon.r = pic16_allocProcessorRegister(IDX_INTCON,"INTCON", PO_INTCON, 0x80);
 	pic16_pc_wreg.r = pic16_allocProcessorRegister(IDX_WREG,"WREG", PO_WREG, 0x80);
 
-	pic16_pc_fsr0.r = pic16_allocProcessorRegister(IDX_FSR0,"FSR0", PO_FSR0, 0x80); // deprecated !
+//	pic16_pc_fsr0.r = pic16_allocProcessorRegister(IDX_FSR0,"FSR0", PO_FSR0, 0x80); // deprecated !
 
 	pic16_pc_fsr0l.r = pic16_allocProcessorRegister(IDX_FSR0L, "FSR0L", PO_FSR0, 0x80);
 	pic16_pc_fsr0h.r = pic16_allocProcessorRegister(IDX_FSR0H, "FSR0H", PO_FSR0, 0x80);
@@ -2585,12 +2587,15 @@ void  pic16_pCodeInitRegisters(void)
 	pic16_pc_preinc2.r = pic16_allocProcessorRegister(IDX_PREINC2, "PREINC2", PO_INDF0, 0x80);
 	pic16_pc_plusw2.r = pic16_allocProcessorRegister(IDX_PLUSW2, "PLUSW2", PO_INDF0, 0x80);
 	
+	pic16_pc_prodl.r = pic16_allocProcessorRegister(IDX_PRODL, "PRODL", PO_PRODL, 0x80);
+	pic16_pc_prodh.r = pic16_allocProcessorRegister(IDX_PRODH, "PRODH", PO_PRODH, 0x80);
+	
 	pic16_pc_status.rIdx = IDX_STATUS;
 	pic16_pc_intcon.rIdx = IDX_INTCON;
 	pic16_pc_pcl.rIdx = IDX_PCL;
 	pic16_pc_pclath.rIdx = IDX_PCLATH;
 	pic16_pc_wreg.rIdx = IDX_WREG;
-	pic16_pc_fsr0.rIdx = IDX_FSR0;
+//	pic16_pc_fsr0.rIdx = IDX_FSR0;
 	pic16_pc_fsr0l.rIdx = IDX_FSR0L;
 	pic16_pc_fsr0h.rIdx = IDX_FSR0H;
 	pic16_pc_fsr1l.rIdx = IDX_FSR1L;
@@ -2612,6 +2617,8 @@ void  pic16_pCodeInitRegisters(void)
 	pic16_pc_postdec2.rIdx = IDX_POSTDEC2;
 	pic16_pc_preinc2.rIdx = IDX_PREINC2;
 	pic16_pc_plusw2.rIdx = IDX_PLUSW2;
+	pic16_pc_prodl.rIdx = IDX_PRODL;
+	pic16_pc_prodh.rIdx = IDX_PRODH;
 	
 	pic16_pc_kzero.r = pic16_allocInternalRegister(IDX_KZ,"KZ",PO_GPR_REGISTER,0);
 	pic16_pc_ssave.r = pic16_allocInternalRegister(IDX_SSAVE,"SSAVE", PO_GPR_REGISTER, 0x80);
@@ -3535,7 +3542,7 @@ pCodeOp *pic16_newpCodeOpImmd(char *name, int offset, int index, int code_space)
 		PCOI(pcop)->r = r;
 		
 		if(r) {
-			fprintf(stderr, "%s:%d %s reg %s exists\n",__FILE__, __LINE__, __FUNCTION__, name);
+//			fprintf(stderr, "%s:%d %s reg %s exists\n",__FILE__, __LINE__, __FUNCTION__, name);
 			PCOI(pcop)->rIdx = r->rIdx;
 		} else {
 //			fprintf(stderr, "%s:%d %s reg %s doesn't exist\n",
@@ -3649,10 +3656,10 @@ pCodeOp *pic16_newpCodeOpRegFromStr(char *name)
 	pcop->type = PCOR(pcop)->r->pc_type;
 	pcop->name = PCOR(pcop)->r->name;
 
-	if(pic16_pcode_verbose) {
-		fprintf(stderr, "%s:%d %s allocates register %s rIdx:0x%02x\n",
-			__FILE__, __LINE__, __FUNCTION__, r->name, r->rIdx);
-	}
+//	if(pic16_pcode_verbose) {
+//		fprintf(stderr, "%s:%d %s allocates register %s rIdx:0x%02x\n",
+//			__FILE__, __LINE__, __FUNCTION__, r->name, r->rIdx);
+//	}
 
   return pcop;
 }
@@ -3969,123 +3976,84 @@ char *pic16_get_op(pCodeOp *pcop,char *buffer, size_t size)
   char *s;
   int use_buffer = 1;    // copy the string to the passed buffer pointer
 
-  if(!buffer) {
-    buffer = b;
-    size = sizeof(b);
-    use_buffer = 0;     // Don't bother copying the string to the buffer.
-  } 
+	if(!buffer) {
+		buffer = b;
+		size = sizeof(b);
+		use_buffer = 0;     // Don't bother copying the string to the buffer.
+	} 
 
-  if(pcop) {
-    switch(pcop->type) {
-    case PO_INDF0:
-    case PO_FSR0:
-      if(use_buffer) {
-	SAFE_snprintf(&buffer,&size,"%s",PCOR(pcop)->r->name);
-	return buffer;
-      }
-      return PCOR(pcop)->r->name;
-      break;
-    case PO_GPR_TEMP:
-      r = pic16_regWithIdx(PCOR(pcop)->r->rIdx);
+	if(pcop) {
+		switch(pcop->type) {
+			case PO_PRODL:
+			case PO_PRODH:
+			case PO_INDF0:
+			case PO_FSR0:
+				if(use_buffer) {
+					SAFE_snprintf(&buffer,&size,"%s",PCOR(pcop)->r->name);
+					return buffer;
+				}
+				return PCOR(pcop)->r->name;
+				break;
+			case PO_GPR_TEMP:
+				r = pic16_regWithIdx(PCOR(pcop)->r->rIdx);
+				if(use_buffer) {
+					SAFE_snprintf(&buffer,&size,"%s",r->name);
+					return buffer;
+				}
+				return r->name;
 
-      if(use_buffer) {
-	SAFE_snprintf(&buffer,&size,"%s",r->name);
-	return buffer;
-      }
+			case PO_IMMEDIATE:
+				s = buffer;
+				if(PCOI(pcop)->offset && PCOI(pcop)->offset<4) {
+					if(PCOI(pcop)->index) {
+						SAFE_snprintf(&s,&size, "%s(%s + %d)",
+							immdmod[ PCOI(pcop)->offset ],
+							pcop->name,
+							PCOI(pcop)->index);
+					} else {
+						SAFE_snprintf(&s,&size,"%s(%s)",
+							immdmod[ PCOI(pcop)->offset ],
+							pcop->name);
+					}
+				} else {
+					if(PCOI(pcop)->index) {
+						SAFE_snprintf(&s,&size, "%s(%s + %d)",
+							immdmod[ 0 ],
+							pcop->name,
+							PCOI(pcop)->index);
+					} else {
+						SAFE_snprintf(&s,&size, "%s(%s)",
+							immdmod[ 0 ],
+							pcop->name);
+					}
+				}
+				return buffer;
 
-      return r->name;
+			case PO_DIR:
+				s = buffer;
+//				size = sizeof(buffer);
+				if( PCOR(pcop)->instance) {
+					SAFE_snprintf(&s,&size,"(%s + %d)",
+						pcop->name,
+						PCOR(pcop)->instance );
+				} else {
+					SAFE_snprintf(&s,&size,"%s",pcop->name);
+				}
+				return buffer;
 
+			default:
+				if(pcop->name) {
+					if(use_buffer) {
+						SAFE_snprintf(&buffer,&size,"%s",pcop->name);
+						return buffer;
+					}
+				return pcop->name;
+				}
 
-    case PO_IMMEDIATE:
-	s = buffer;
-
-	if(PCOI(pcop)->offset && PCOI(pcop)->offset<4) {
-		if(PCOI(pcop)->index) {
-			SAFE_snprintf(&s,&size, "%s(%s + %d)",
-				immdmod[ PCOI(pcop)->offset ],
-				pcop->name,
-				PCOI(pcop)->index);
-		} else {
-			SAFE_snprintf(&s,&size,"%s(%s)",
-				immdmod[ PCOI(pcop)->offset ],
-				pcop->name);
-		}
-	} else {
-		if(PCOI(pcop)->index) {
-			SAFE_snprintf(&s,&size, "%s(%s + %d)",
-				immdmod[ 0 ],
-				pcop->name,
-				PCOI(pcop)->index);
-		} else {
-			SAFE_snprintf(&s,&size, "%s(%s)",
-				immdmod[ 0 ],
-				pcop->name);
-		}
-	}
-		
-#if 0
-	if(PCOI(pcop)->_const) {
-		if( PCOI(pcop)->offset && PCOI(pcop)->offset<4) {
-			if(PCOI(pcop)->index) {
-				SAFE_snprintf(&s,&size,"%s(%s + %d)",
-					immdmod[ PCOI(pcop)->offset ],
-					pcop->name,
-					PCOI(pcop)->index);
-			} else {
-				SAFE_snprintf(&s,&size,"%s(%s)",
-					immdmod[ PCOI(pcop)->offset ],
-					pcop->name);
-			}
-
-		} else {
-			if(PCOI(pcop)->index)
-				SAFE_snprintf(&s,&size,"LOW(%s+%d)",pcop->name,PCOI(pcop)->index);
-			else
-				SAFE_snprintf(&s,&size,"LOW(%s)",pcop->name);
-		}
-	} else {
-		if( PCOI(pcop)->index) { // && PCOI(pcc->pcop)->offset<4) 
-			SAFE_snprintf(&s,&size,"(%s + %d)",
-				pcop->name,
-				PCOI(pcop)->index );
-		} else {
-			if(PCOI(pcop)->offset)
-				SAFE_snprintf(&s,&size,"(%s >> %d)&0xff",pcop->name, 8*PCOI(pcop)->offset);
-			else
-				SAFE_snprintf(&s,&size,"(%s)",pcop->name);
 		}
 	}
-#endif
 
-	return buffer;
-
-    case PO_DIR:
-      s = buffer;
-      //size = sizeof(buffer);
-      if( PCOR(pcop)->instance) {
-		SAFE_snprintf(&s,&size,"(%s + %d)",
-			pcop->name,
-			PCOR(pcop)->instance );
-	}
-	//fprintf(stderr,"PO_DIR %s\n",buffer);
-       else
-	SAFE_snprintf(&s,&size,"%s",pcop->name);
-      return buffer;
-
-    default:
-      if  (pcop->name) {
-	if(use_buffer) {
-	  SAFE_snprintf(&buffer,&size,"%s",pcop->name);
-	  return buffer;
-	}
-	return pcop->name;
-      }
-
-    }
-  }
-
-  return "NO operand";
-
+  return "NO operand1";
 }
 
 /*-----------------------------------------------------------------*/
@@ -4098,11 +4066,11 @@ char *pic16_get_op2(pCodeOp *pcop,char *buffer, size_t size)
   char *s;
   int use_buffer = 1;    // copy the string to the passed buffer pointer
 
-  if(!buffer) {
-    buffer = b;
-    size = sizeof(b);
-    use_buffer = 0;     // Don't bother copying the string to the buffer.
-  } 
+	if(!buffer) {
+		buffer = b;
+		size = sizeof(b);
+		use_buffer = 0;     // Don't bother copying the string to the buffer.
+	} 
 
 #if 0
 	fprintf(stderr, "%s:%d second operand %s is %d\tPO_DIR(%d) PO_GPR_TEMP(%d) PO_IMMEDIATE(%d) PO_INDF0(%d) PO_FSR0(%d)\n",
@@ -4110,88 +4078,78 @@ char *pic16_get_op2(pCodeOp *pcop,char *buffer, size_t size)
 		PO_DIR, PO_GPR_TEMP, PO_IMMEDIATE, PO_INDF0, PO_FSR0);
 #endif
 
-  if(pcop) {
-    switch(PCOR2(pcop)->pcop2->type) {
-    case PO_INDF0:
-    case PO_FSR0:
-      if(use_buffer) {
-	SAFE_snprintf(&buffer,&size,"%s",PCOR(PCOR2(pcop)->pcop2)->r->name);
-	return buffer;
-      }
-      return PCOR(PCOR2(pcop)->pcop2)->r->name;
-      break;
-    case PO_GPR_TEMP:
-      r = pic16_regWithIdx(PCOR(PCOR2(pcop)->pcop2)->r->rIdx);
+	if(pcop) {
+		switch(PCOR2(pcop)->pcop2->type) {
+			case PO_PRODL:
+			case PO_PRODH:
+			case PO_INDF0:
+			case PO_FSR0:
+				if(use_buffer) {
+					SAFE_snprintf(&buffer,&size,"%s",PCOR(PCOR2(pcop)->pcop2)->r->name);
+					return buffer;
+				}
+				return PCOR(PCOR2(pcop)->pcop2)->r->name;
+				break;
+			case PO_GPR_TEMP:
+				r = pic16_regWithIdx(PCOR(PCOR2(pcop)->pcop2)->r->rIdx);
 
-      if(use_buffer) {
-	SAFE_snprintf(&buffer,&size,"%s",r->name);
-	return buffer;
-      }
+				if(use_buffer) {
+					SAFE_snprintf(&buffer,&size,"%s",r->name);
+					return buffer;
+				}
+				return r->name;
 
-      return r->name;
-
-
-    case PO_IMMEDIATE:
-	break;
+			case PO_IMMEDIATE:
+					assert( 0 );
+				break;
 #if 0
-      s = buffer;
+				s = buffer;
 
-      if(PCOI(pcop)->_const) {
-
-	if( PCOI(pcop)->offset && PCOI(pcop)->offset<4) {
-	  SAFE_snprintf(&s,&size,"(((%s+%d) >> %d)&0xff)",
-			pcop->name,
-			PCOI(pcop)->index,
-			8 * PCOI(pcop)->offset );
-	} else
-	  SAFE_snprintf(&s,&size,"LOW(%s+%d)",pcop->name,PCOI(pcop)->index);
-      } else {
-      
-	if( PCOI(pcop)->index) { // && PCOI(pcc->pcop)->offset<4) {
-	  SAFE_snprintf(&s,&size,"(%s + %d)",
-			pcop->name,
-			PCOI(pcop)->index );
-	} else {
-	  if(PCOI(pcop)->offset)
-	    SAFE_snprintf(&s,&size,"(%s >> %d)&0xff",pcop->name, 8*PCOI(pcop)->offset);
-	  else
-	    SAFE_snprintf(&s,&size,"%s",pcop->name);
-	}
-      }
-
-      return buffer;
+				if(PCOI(pcop)->_const) {
+					if( PCOI(pcop)->offset && PCOI(pcop)->offset<4) {
+						SAFE_snprintf(&s,&size,"(((%s+%d) >> %d)&0xff)",
+							pcop->name,
+							PCOI(pcop)->index,
+							8 * PCOI(pcop)->offset );
+					} else
+						SAFE_snprintf(&s,&size,"LOW(%s+%d)",pcop->name,PCOI(pcop)->index);
+				} else {
+      					if( PCOI(pcop)->index) {
+						SAFE_snprintf(&s,&size,"(%s + %d)",
+							pcop->name,
+							PCOI(pcop)->index );
+					} else {
+						if(PCOI(pcop)->offset)
+							SAFE_snprintf(&s,&size,"(%s >> %d)&0xff",pcop->name, 8*PCOI(pcop)->offset);
+						else
+							SAFE_snprintf(&s,&size,"%s",pcop->name);
+					}
+				}
+				return buffer;
 #endif
+			case PO_DIR:
+				s = buffer;
+				if( PCOR(PCOR2(pcop)->pcop2)->instance) {
+					SAFE_snprintf(&s,&size,"(%s + %d)",
+						PCOR(PCOR2(pcop)->pcop2)->r->name,
+						PCOR(PCOR2(pcop)->pcop2)->instance );
+				} else {
+					SAFE_snprintf(&s,&size,"%s",PCOR(PCOR2(pcop)->pcop2)->r->name);
+				}
+				return buffer;
 
-    case PO_DIR:
-      s = buffer;
-      //size = sizeof(buffer);
-      if( PCOR(PCOR2(pcop)->pcop2)->instance) {
-		SAFE_snprintf(&s,&size,"(%s + %d)",
-			PCOR(PCOR2(pcop)->pcop2)->r->name,
-			PCOR(PCOR2(pcop)->pcop2)->instance );
+			default:
+				if(PCOR(PCOR2(pcop)->pcop2)->r->name) {
+					if(use_buffer) {
+						SAFE_snprintf(&buffer,&size,"%s",PCOR(PCOR2(pcop)->pcop2)->r->name);
+						return buffer;
+					}
+					return PCOR(PCOR2(pcop)->pcop2)->r->name;
+				}
+		}
 	}
-	//fprintf(stderr,"PO_DIR %s\n",buffer);
-       else
-	SAFE_snprintf(&s,&size,"%s",PCOR(PCOR2(pcop)->pcop2)->r->name);
-      return buffer;
 
-    default:
-#if 0
-      if  (PCOR2(pcop)->r1->name) {
-	if(use_buffer) {
-	  SAFE_snprintf(&buffer,&size,"%s",PCOR2(pcop)->r1->name);
-	  return buffer;
-	}
-	return PCOR2(pcop)->r1->name;
-      }
-#else
-      break;
-#endif
-    }
-  }
-
-  return "NO operand";
-
+  return "NO operand2";
 }
 
 /*-----------------------------------------------------------------*/
@@ -4275,7 +4233,7 @@ static char *pic16_pCode2str(char *str, size_t size, pCode *pc)
 	    SAFE_snprintf(&s,&size,"(1 << (%s & 7))",pic16_get_op_from_instruction(PCI(pc)));
 
 	}else {
-	  SAFE_snprintf(&s,&size,"%s",pic16_get_op_from_instruction(PCI(pc)));
+	  SAFE_snprintf(&s,&size,"%s", pic16_get_op_from_instruction(PCI(pc)));
 
 		if( PCI(pc)->num_ops == 3 || ((PCI(pc)->num_ops == 2) && (PCI(pc)->isAccess))) {
 			if(PCI(pc)->num_ops == 3)
@@ -4368,7 +4326,6 @@ static void genericPrint(FILE *of, pCode *pc)
       pic16_pCode2str(str, 256, pc);
 
       fprintf(of,"%s",str);
-
       /* Debug */
       if(pic16_debug_verbose) {
 	fprintf(of, "\t;key=%03x",pc->seq);
@@ -4897,7 +4854,15 @@ regs * pic16_getRegFromInstruction(pCode *pc)
      (PCI(pc)->num_ops == 1 && PCI(pc)->isFastCall))
     return NULL;
 
+#if 0
+  fprintf(stderr, "pic16_getRegFromInstruction - reg type %s (%d)\n",
+  	dumpPicOptype( PCI(pc)->pcop->type), PCI(pc)->pcop->type);
+#endif
+
   switch(PCI(pc)->pcop->type) {
+  case PO_PRODL:
+  case PO_PRODH:
+
   case PO_INDF0:
   case PO_FSR0:
     return PCOR(PCI(pc)->pcop)->r;
@@ -4928,13 +4893,13 @@ regs * pic16_getRegFromInstruction(pCode *pc)
     break;
 
   default:
-    //fprintf(stderr, "pic16_getRegFromInstruction - unknown reg type %d\n",PCI(pc)->pcop->type);
-    //genericPrint(stderr, pc);
+//	fprintf(stderr, "pic16_getRegFromInstruction - unknown reg type %d\n",PCI(pc)->pcop->type);
+//	genericPrint(stderr, pc);
+//	assert( 0 );
     break;
   }
 
   return NULL;
-
 }
 
 /*-------------------------------------------------------------------------------*/
@@ -4951,6 +4916,11 @@ regs * pic16_getRegFromInstruction2(pCode *pc)
     return NULL;
 
 
+#if 0
+  fprintf(stderr, "pic16_getRegFromInstruction2 - reg type %s (%d)\n",
+  	dumpPicOptype( PCI(pc)->pcop->type), PCI(pc)->pcop->type);
+#endif
+
 /*
  * operands supported in MOVFF:
  *  PO_INF0/PO_FSR0
@@ -4960,6 +4930,9 @@ regs * pic16_getRegFromInstruction2(pCode *pc)
  *
  */
   switch(PCI(pc)->pcop->type) {
+  case PO_PRODL:
+  case PO_PRODH:
+
   case PO_INDF0:
   case PO_FSR0:
     return PCOR(PCOR2(PCI(pc)->pcop)->pcop2)->r;
@@ -4968,17 +4941,17 @@ regs * pic16_getRegFromInstruction2(pCode *pc)
 
 //  case PO_BIT:
   case PO_GPR_TEMP:
-    //fprintf(stderr, "pic16_getRegFromInstruction - bit or temp\n");
+    //fprintf(stderr, "pic16_getRegFromInstruction2 - bit or temp\n");
     return PCOR(PCOR2(PCI(pc)->pcop)->pcop2)->r;
 
   case PO_IMMEDIATE:
-	break;
-#if 0
-    if(PCOI(PCI(pc)->pcop)->r)
-      return (PCOI(PCI(pc)->pcop)->r);
+//	break;
+#if 1
+//    if(PCOI(PCI(pc)->pcop)->r)
+//      return (PCOI(PCOR2(PCI(pc)->pcop)->pcop2)->r);
 
-    //fprintf(stderr, "pic16_getRegFromInstruction - immediate\n");
-    return pic16_dirregWithName(PCI(pc)->pcop->name);
+    //fprintf(stderr, "pic16_getRegFromInstruction2 - immediate\n");
+    return pic16_dirregWithName(PCOR(PCOR2(PCI(pc)->pcop)->pcop2)->r->name);
     //return NULL; // PCOR(PCI(pc)->pcop)->r;
 #endif
 
@@ -4987,15 +4960,15 @@ regs * pic16_getRegFromInstruction2(pCode *pc)
 //    return PCOR2(PCI(pc)->pcop)->r;
 
   case PO_DIR:
-    //fprintf(stderr, "pic16_getRegFromInstruction - dir\n");
+    //fprintf(stderr, "pic16_getRegFromInstruction2 - dir\n");
     return PCOR(PCOR2(PCI(pc)->pcop)->pcop2)->r;
 
   case PO_LITERAL:
 	break;
-    //fprintf(stderr, "pic16_getRegFromInstruction - literal\n");
+    //fprintf(stderr, "pic16_getRegFromInstruction2 - literal\n");
 
   default:
-    //fprintf(stderr, "pic16_getRegFromInstruction - unknown reg type %d\n",PCI(pc)->pcop->type);
+    //fprintf(stderr, "pic16_getRegFromInstruction2 - unknown reg type %d\n",PCI(pc)->pcop->type);
     //genericPrint(stderr, pc);
     break;
   }
@@ -5512,7 +5485,7 @@ static void insertBankSwitch(int position, pCode *pc, int bsr)
 
 		reg = pic16_getRegFromInstruction(pc);
 		if(!reg)return;
-		new_pc = pic16_newpCodeAsmDir("BANKSEL", "%s", reg->name);
+		new_pc = pic16_newpCodeAsmDir("BANKSEL", "%s", pic16_get_op_from_instruction(PCI(pc)));
 		
 		position = 0;		// position is always before (sanity check!)
 	}
@@ -5702,7 +5675,7 @@ static pCode * findInstructionUsingLabel(pCodeLabel *pcl, pCode *pcs)
 
   for(pc = pcs; pc; pc = pc->next) {
 
-    if((pc->type == PC_OPCODE) && 
+    if(((pc->type == PC_OPCODE) || (pc->type == PC_INLINE)) && 
        (PCI(pc)->pcop) && 
        (PCI(pc)->pcop->type == PO_LABEL) &&
        (PCOLAB(PCI(pc)->pcop)->key == pcl->key))
@@ -5726,7 +5699,7 @@ static void exchangeLabels(pCodeLabel *pcl, pCode *pc)
 
     pCodeOpLabel *pcol = PCOLAB(PCI(pc)->pcop);
 
-    //fprintf(stderr,"changing label key from %d to %d\n",pcol->key, pcl->key);
+//	fprintf(stderr,"changing label key from %d to %d\n",pcol->key, pcl->key);
     if(pcol->pcop.name)
       free(pcol->pcop.name);
 
@@ -5795,7 +5768,7 @@ static void pBlockRemoveUnusedLabels(pBlock *pb)
       pcl = PCL(PCI(pc)->label->pc);
     else continue;
 
-    //fprintf(stderr," found  A LABEL !!! key = %d, %s\n", pcl->key,pcl->label);
+	//fprintf(stderr," found  A LABEL !!! key = %d, %s\n", pcl->key,pcl->label);
 
     /* This pCode is a label, so search the pBlock to see if anyone
      * refers to it */
@@ -6931,4 +6904,40 @@ void pic16_InlinepCode(void)
   for(pb = the_pFile->pbHead; pb; pb = pb->next)
     unBuildFlow(pb);
 
+}
+
+char *pic_optype_names[]={
+	"PO_NONE",         // No operand e.g. NOP
+	"PO_W",              // The working register (as a destination)
+	"PO_WREG",           // The working register (as a file register)
+	"PO_STATUS",         // The 'STATUS' register
+	"PO_BSR",            // The 'BSR' register
+	"PO_FSR0",           // The "file select register" (in PIC18 family it's one 
+	                     // of three)
+	"PO_INDF0",          // The Indirect register
+	"PO_INTCON",         // Interrupt Control register
+	"PO_GPR_REGISTER",   // A general purpose register
+	"PO_GPR_BIT",        // A bit of a general purpose register
+	"PO_GPR_TEMP",       // A general purpose temporary register
+	"PO_SFR_REGISTER",   // A special function register (e.g. PORTA)
+	"PO_PCL",            // Program counter Low register
+	"PO_PCLATH",         // Program counter Latch high register
+	"PO_PCLATU",         // Program counter Latch upper register
+	"PO_PRODL",          // Product Register Low
+	"PO_PRODH",          // Product Register High
+	"PO_LITERAL",        // A constant
+	"PO_REL_ADDR",       // A relative address
+	"PO_IMMEDIATE",      //  (8051 legacy)
+	"PO_DIR",            // Direct memory (8051 legacy)
+	"PO_CRY",            // bit memory (8051 legacy)
+	"PO_BIT",            // bit operand.
+	"PO_STR",            //  (8051 legacy)
+	"PO_LABEL",
+	"PO_WILD"            // Wild card operand in peep optimizer
+};
+
+
+char *dumpPicOptype(PIC_OPTYPE type)
+{
+	return (pic_optype_names[ type ]);
 }

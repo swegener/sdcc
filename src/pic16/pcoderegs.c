@@ -170,6 +170,7 @@ static void pCodeRegMapLiveRangesInFlow(pCodeFlow *pcfl)
     if(reg) {
 
 #if 0
+      fprintf(stderr, "reg= %p\n", reg);
       fprintf(stderr, "flow seq %d, inst seq %d  %s  ",PCODE(pcfl)->seq,pc->seq,reg->name);
       fprintf(stderr, "addr = 0x%03x, type = %d  rIdx=0x%03x",
       	      reg->address,reg->type,reg->rIdx);
@@ -184,7 +185,7 @@ static void pCodeRegMapLiveRangesInFlow(pCodeFlow *pcfl)
 
       if(PCC_REGISTER & PCI(pc)->outCond)
 	addSetIfnotP(& (reg->reglives.assignedpFlows), pcfl);
-	
+
       addSetIfnotP(& (reg->reglives.usedpCodes), pc);
 
 #if 1
@@ -195,6 +196,13 @@ static void pCodeRegMapLiveRangesInFlow(pCodeFlow *pcfl)
 
 //			fprintf(stderr, "trying to get second operand from pCode reg= %s\n", reg->name);
 			addSetIfnotP(& (PCFL(pcfl)->registers), reg);
+
+			if((PCC_REGISTER | PCC_LITERAL) & PCI(pc)->inCond)
+				addSetIfnotP(& (reg->reglives.usedpFlows), pcfl);
+
+			if(PCC_REGISTER & PCI(pc)->outCond)
+				addSetIfnotP(& (reg->reglives.assignedpFlows), pcfl);
+			
 			addSetIfnotP(& (reg->reglives.usedpCodes), pc);
 
 	}
@@ -677,12 +685,13 @@ static void OptimizeRegUsage(set *fregs, int optimize_multi_uses, int optimize_l
        * instructions are examined. If possible, they're optimized out.
        */
 
-/*
+#if 0
       fprintf (stderr, "OptimizeRegUsage: %s  addr=0x%03x rIdx=0x%03x type=%d used=%d\n",
 	       reg->name,
 	       reg->address,
 	       reg->rIdx, reg->type, used);
-*/
+#endif
+
       pc1 = setFirstItem(reg->reglives.usedpCodes);
       pc2 = setNextItem(reg->reglives.usedpCodes);
 
@@ -712,7 +721,7 @@ static void OptimizeRegUsage(set *fregs, int optimize_multi_uses, int optimize_l
 	//fprintf(stderr,"WARNING %s: reg %s used without being assigned\n",__FUNCTION__,reg->name);
 
       } else {
-	//fprintf(stderr,"WARNING %s: reg %s assigned without being used\n",__FUNCTION__,reg->name);
+//		fprintf(stderr,"WARNING %s: reg %s assigned without being used\n",__FUNCTION__,reg->name);
 	Remove2pcodes(pcfl_assigned, pc1, pc2, reg, 1);
 	total_registers_saved++;  // debugging stats.
       }

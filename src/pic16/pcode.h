@@ -157,6 +157,9 @@ typedef enum
   PO_SFR_REGISTER,   // A special function register (e.g. PORTA)
   PO_PCL,            // Program counter Low register
   PO_PCLATH,         // Program counter Latch high register
+  PO_PCLATU,         // Program counter Latch upper register
+  PO_PRODL,          // Product Register Low
+  PO_PRODH,          // Product Register High
   PO_LITERAL,        // A constant
   PO_REL_ADDR,       // A relative address
   PO_IMMEDIATE,      //  (8051 legacy)
@@ -371,7 +374,7 @@ typedef struct pCodeOpLit2
 typedef struct pCodeOpImmd
 {
   pCodeOp pcop;
-  int offset;           /* low,med, or high byte of immediat value */
+  int offset;           /* low,high or upper byte of immediate value */
   int index;            /* add this to the immediate value */
   unsigned _const:1;    /* is in code space    */
 
@@ -921,6 +924,7 @@ extern pCodeOpReg pic16_pc_intcon;
 extern pCodeOpReg pic16_pc_pcl;
 extern pCodeOpReg pic16_pc_pclath;
 extern pCodeOpReg pic16_pc_wreg;
+extern pCodeOpReg pic16_pc_bsr;
 extern pCodeOpReg pic16_pc_fsr0;
 extern pCodeOpReg pic16_pc_fsr0l;
 extern pCodeOpReg pic16_pc_fsr0h;
@@ -943,6 +947,8 @@ extern pCodeOpReg pic16_pc_postinc2;
 extern pCodeOpReg pic16_pc_postdec2;
 extern pCodeOpReg pic16_pc_preinc2;
 extern pCodeOpReg pic16_pc_plusw2;
+extern pCodeOpReg pic16_pc_prodl;
+extern pCodeOpReg pic16_pc_prodh;
 
 extern pCodeOpReg pic16_pc_kzero;
 extern pCodeOpReg pic16_pc_wsave;     /* wsave and ssave are used to save W and the Status */

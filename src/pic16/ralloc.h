@@ -31,8 +31,6 @@
 
 #include "pcoderegs.h"
 
-/* set STACK_SUPPORT to 1 to compile code for stack */
-#define STACK_SUPPORT 1
 extern unsigned int stackPos;
 
 enum
@@ -108,8 +106,10 @@ extern set *pic16_builtin_functions;
 extern set *pic16_rel_udata;
 extern set *pic16_fix_udata;
 extern set *pic16_equ_data;
+extern set *pic16_int_regs;
 
 regs *pic16_regWithIdx (int);
+regs *pic16_typeRegWithIdx(int, int, int);
 regs *pic16_dirregWithName (char *name );
 void  pic16_freeAllRegs ();
 void  pic16_deallocateAllRegs ();
@@ -119,12 +119,12 @@ regs *pic16_allocWithIdx (int idx);
 regs *pic16_allocDirReg (operand *op );
 regs *pic16_allocRegByName (char *name, int size );
 
+regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alias, operand *refop);
+
 /* Define register address that are constant across PIC16 family */
 #define IDX_TMR0    0xfd6
 #define IDX_PCL     0xff9
 #define IDX_STATUS  0xfd8
-#define IDX_PORTA   0xf80
-#define IDX_PORTB   0xf81
 #define IDX_PCLATH  0xffa
 #define IDX_INTCON  0xff2
 #define IDX_WREG    0xfe8
@@ -154,6 +154,9 @@ regs *pic16_allocRegByName (char *name, int size );
 #define IDX_POSTDEC2	0xfdd
 #define IDX_PREINC2		0xfdc
 #define IDX_PLUSW2		0xfdb
+
+#define IDX_PRODL	0xff3
+#define IDX_PRODH	0xff4
 
 #define IDX_KZ      0x7fff   /* Known zero - actually just a general purpose reg. */
 #define IDX_WSAVE   0x7ffe

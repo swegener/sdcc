@@ -39,17 +39,10 @@
 #include "ralloc.h"
 #include "device.h"
 
-#if defined(__BORLANDC__) || defined(_MSC_VER)
-#define STRCASECMP stricmp
-#else
-#define STRCASECMP strcasecmp
-#endif
 
 static PIC16_device Pics16[] = {
   {
     {"p18f242", "18f242", "pic18f242", "f242"},		// aliases
-    (memRange *)NULL,					// ram memory map
-    (memRange *)NULL,					// sfr memory map
     0,
     0x300,						// bank mask
     0x300,						// RAMsize
@@ -58,8 +51,6 @@ static PIC16_device Pics16[] = {
 
   {
     {"p18f252", "18f252", "pic18f252", "f252"},		// aliases
-    (memRange *)NULL,					// ram memory map
-    (memRange *)NULL,					// sfr memory map
     0,
     0x600,						// bank mask
     0x600,						// RAMsize
@@ -68,8 +59,6 @@ static PIC16_device Pics16[] = {
 
   {
     {"p18f442", "18f442", "pic18f442", "f442"},		// aliases
-    (memRange *)NULL,					// ram memory map
-    (memRange *)NULL,					// sfr memory map
     0,
     0x300,						// bank mask
     0x300,						// RAMsize
@@ -78,8 +67,6 @@ static PIC16_device Pics16[] = {
 
   {
     {"p18f452", "18f452", "pic18f452", "f452"},		// aliases
-    (memRange *)NULL,					// ram memory map
-    (memRange *)NULL,					// sfr memory map
     0,
     0x600,						// bank mask
     0x600,						// RAMsize
@@ -88,8 +75,6 @@ static PIC16_device Pics16[] = {
 
   {
     {"p18f248", "18f248", "pic18f248", "f248"},		// aliases
-    (memRange *)NULL,					// ram memory map
-    (memRange *)NULL,					// sfr memory map
     0,
     0x300,						// bank mask
     0x300,						// RAMsize
@@ -98,8 +83,6 @@ static PIC16_device Pics16[] = {
 
   {
     {"p18f258", "18f258", "pic18f258", "f258"},		// aliases
-    (memRange *)NULL,					// ram memory map
-    (memRange *)NULL,					// sfr memory map
     0,
     0x600,						// bank mask
     0x600,						// RAMsize
@@ -108,8 +91,6 @@ static PIC16_device Pics16[] = {
 
   {
     {"p18f448", "18f448", "pic18f448", "f448"},		// aliases
-    (memRange *)NULL,					// ram memory map
-    (memRange *)NULL,					// sfr memory map
     0,
     0x300,						// bank mask
     0x300,						// RAMsize
@@ -118,8 +99,6 @@ static PIC16_device Pics16[] = {
 
   {
     {"p18f458", "18f458", "pic18f458", "f458"},		// aliases
-    (memRange *)NULL,					// ram memory map
-    (memRange *)NULL,					// sfr memory map
     0,
     0x600,						// bank mask
     0x600,						// RAMsize
@@ -128,8 +107,6 @@ static PIC16_device Pics16[] = {
 
   {
     {"p18f6520", "18f6520", "pic18f6520", "f6520"},	// aliases
-    (memRange *)NULL,					// ram memory map
-    (memRange *)NULL,					// sfr memory map
     0,
     0x800,						// bank mask
     0x800,						// RAMsize
@@ -138,8 +115,6 @@ static PIC16_device Pics16[] = {
 
   {
     {"p18f6620", "18f6620", "pic18f6620", "f6620"},	// aliases
-    (memRange *)NULL,					// ram memory map
-    (memRange *)NULL,					// sfr memory map
     0,
     0xf00,						// bank mask
     0xf00,						// RAMsize
@@ -147,8 +122,6 @@ static PIC16_device Pics16[] = {
   },
   {
     {"p18f6680", "18f6680", "pic18f6680", "f6680"},	// aliases
-    (memRange *)NULL,					// ram memory map
-    (memRange *)NULL,					// sfr memory map
     0,
     0xc00,						// bank mask
     0xc00,						// RAMsize
@@ -156,8 +129,6 @@ static PIC16_device Pics16[] = {
   },
   {
     {"p18f6720", "18f6720", "pic18f6720", "f6720"},	// aliases
-    (memRange *)NULL,					// ram memory map
-    (memRange *)NULL,					// sfr memory map
     0,
     0xf00,						// bank mask
     0xf00,						// RAMsize
@@ -165,8 +136,6 @@ static PIC16_device Pics16[] = {
   },
   {
     {"p18f8520", "18f8520", "pic18f8520", "f8520"},	// aliases
-    (memRange *)NULL,					// ram memory map
-    (memRange *)NULL,					// sfr memory map
     0,
     0x800,						// bank mask
     0x800,						// RAMsize
@@ -174,8 +143,6 @@ static PIC16_device Pics16[] = {
   },
   {
     {"p18f8620", "18f8620", "pic18f8620", "f8620"},	// aliases
-    (memRange *)NULL,					// ram memory map
-    (memRange *)NULL,					// sfr memory map
     0,
     0xf00,						// bank mask
     0xf00,						// RAMsize
@@ -183,8 +150,6 @@ static PIC16_device Pics16[] = {
   },
   {
     {"p18f8680", "18f8680", "pic18f8680", "f8680"},	// aliases
-    (memRange *)NULL,					// ram memory map
-    (memRange *)NULL,					// sfr memory map
     0,
     0xc00,						// bank mask
     0x800,						// RAMsize
@@ -192,8 +157,6 @@ static PIC16_device Pics16[] = {
   },
   {
     {"p18f8720", "18f8720", "pic18f8720", "f8720"},	// aliases
-    (memRange *)NULL,					// ram memory map
-    (memRange *)NULL,					// sfr memory map
     0,
     0xf00,						// bank mask
     0xf00,						// RAMsize
@@ -261,15 +224,8 @@ extern regs* newReg(short type, short pc_type, int rIdx, char *name, int size, i
 
 void pic16_setMaxRAM(int size)
 {
-  regs * reg;
-  pic16->maxRAMaddress = size;
-  stackPos = pic16->RAMsize-1;
-
-
-	if(USE_STACK) {
-		reg=newReg(REG_SFR, PO_SFR_REGISTER, stackPos, "stack", 1, 0, NULL);
-		addSet(&pic16_fix_udata, reg);
-	}
+	pic16->maxRAMaddress = size;
+	stackPos = pic16->RAMsize-1;
 
 	if (pic16->maxRAMaddress < 0) {
 		fprintf(stderr, "invalid \"#pragma maxram 0x%x\" setting\n",
@@ -331,7 +287,10 @@ void pic16_dump_section(FILE *of, set *section, int fix)
 	/* sort symbols according to their address */
 	qsort(rlist, elementsInSet(section), sizeof(regs *), regCompare);
 	
-	if(!i)return;
+	if(!i) {
+		if(rlist)free(rlist);
+	  return;
+	}
 	
 	if(!fix) {
 		fprintf(of, "\n\n\tudata\n");
@@ -359,6 +318,35 @@ void pic16_dump_section(FILE *of, set *section, int fix)
 	free(rlist);
 }
 
+void pic16_dump_int_registers(FILE *of, set *section)
+{
+  regs *r, *rprev;
+  int i;
+  regs **rlist;
+
+	/* put all symbols in an array */
+	rlist = Safe_calloc(elementsInSet(section), sizeof(regs *));
+	r = rlist[0]; i = 0;
+	for(rprev = setFirstItem(section); rprev; rprev = setNextItem(section)) {
+		rlist[i] = rprev; i++;
+	}
+
+	/* sort symbols according to their address */
+	qsort(rlist, elementsInSet(section), sizeof(regs *), regCompare);
+	
+	if(!i) {
+		if(rlist)free(rlist);
+	  return;
+	}
+	
+	fprintf(of, "\n\n; Internal registers\n");
+	
+	fprintf(of, "%s\tudata_ovr\t0x0000\n", ".registers");
+	for(r = setFirstItem(section); r; r = setNextItem(section))
+		fprintf(of, "%s\tres\t%d\n", r->name, r->size);
+
+	free(rlist);
+}
 
 
 
@@ -489,7 +477,10 @@ char *pic16_processor_base_name(void)
 }
 
 
-void checkAddReg(set **set, regs *reg)
+/*
+ * return 1 if register wasn't found and added, 0 otherwise
+ */
+int checkAddReg(set **set, regs *reg)
 {
   regs *tmp;
 
@@ -498,8 +489,12 @@ void checkAddReg(set **set, regs *reg)
 		if(!strcmp(tmp->name, reg->name))break;
 	}
 	
-	if(!tmp)
+	if(!tmp) {
 		addSet(set, reg);
+		return 1;
+	}
+
+  return 0;
 }
 
 /*-----------------------------------------------------------------*
@@ -523,9 +518,10 @@ void pic16_groupRegistersInSection(set *regset)
 				checkAddReg(&pic16_fix_udata, reg);
 			} else
 			if(!reg->isFixed) {
-//				fprintf(stderr, "%s:%d adding symbol %s in relocatable udata section\n",
-//					__FILE__, __LINE__, reg->name);
-				checkAddReg(&pic16_rel_udata, reg);
+				if(reg->pc_type == PO_GPR_TEMP)
+					checkAddReg(&pic16_int_regs, reg);
+				else
+					checkAddReg(&pic16_rel_udata, reg);
 			}
 		}
 	}

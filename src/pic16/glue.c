@@ -27,6 +27,7 @@
 #include "ralloc.h"
 #include "pcode.h"
 #include "newalloc.h"
+#include "gen.h"
 #include "device.h"
 #include "main.h"
 
@@ -55,6 +56,8 @@ extern char *iComments1;
 extern char *iComments2;
 //extern void emitStaticSeg (memmap * map);
 
+extern int initsfpnt;
+
 extern DEFSETFUNC (closeTmpFiles);
 extern DEFSETFUNC (rmTmpFiles);
 
@@ -71,7 +74,6 @@ void  pic16_pCodeInitRegisters(void);
 pCodeOp *pic16_popGetLit(unsigned int lit);
 pCodeOp *pic16_popGetLit2(unsigned int lit, pCodeOp *arg2);
 pCodeOp *pic16_popCopyReg(pCodeOpReg *pc);
-pCodeOp *pic16_popCombine2(pCodeOpReg *src, pCodeOpReg *dst);
 
 /*-----------------------------------------------------------------*/
 /* aopLiteral - string from a literal value                        */
@@ -118,7 +120,8 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 		/* print the area name */
 	for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms)) {
 #if 0
-		fprintf(stderr, "\t%s: sym: %s\tused: %d\n", map->sname, sym->name, sym->used);
+		fprintf(stderr, "\t%s: sym: %s\tused: %d\textern: %d\n",
+			map->sname, sym->name, sym->used, IS_EXTERN(sym->etype));
 		printTypeChain( sym->type, stderr );
 		printf("\n");
 #endif
@@ -128,23 +131,44 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 				addSetHead(&externs, sym);
 			continue;
 		}
+		
 		/* if allocation required check is needed
 		 *  then check if the symbol really requires
 		 * allocation only for local variables */
 		 if (arFlag && !IS_AGGREGATE (sym->type) &&
 			!(sym->_isparm && !IS_REGPARM (sym->etype)) &&
-			!sym->allocreq && sym->level)
-			
+			!sym->allocreq && sym->level) {
+
+			fprintf(stderr, "%s:%d special case, continuing...\n", __FILE__, __LINE__);
+
 			continue;
+		}
 
 		/* if global variable & not static or extern
 		 * and addPublics allowed then add it to the public set */
 		if ((sym->used) && (sym->level == 0 ||
 			(sym->_isparm && !IS_REGPARM (sym->etype))) &&
 			addPublics &&
-			!IS_STATIC (sym->etype) && !IS_FUNC(sym->type))
-		
+			!IS_STATIC (sym->etype) && !IS_FUNC(sym->type)) {
+//		  regs *reg;
+		  
 			addSetHead (&publics, sym);
+
+//			reg = pic16_allocRegByName(sym->name, sym->size);	//( operandFromSymbol( sym ));
+//			checkAddReg(&pic16_rel_udata, reg);
+
+		} else
+			if(IS_STATIC(sym->etype)) {
+			  regs *reg;
+				/* add it to udata list */
+
+				fprintf(stderr, "%s:%d adding %s (%s) remat=%d\n", __FILE__, __LINE__,
+					sym->name, sym->rname, sym->remat);
+					
+						//, OP_SYMBOL(operandFromSymbol(sym))->name);
+				reg = pic16_allocDirReg( operandFromSymbol( sym ));
+				checkAddReg(&pic16_rel_udata, reg);
+			}
 
 		/* if extern then do nothing or is a function
 		 * then do nothing */
@@ -187,23 +211,42 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 			fprintf (map->oFile, "%s\tEQU\t0x%04x\n",
 				sym->rname,
 				SPEC_ADDR (sym->etype));
-#if 1
+
 			/* emit only if it is global */
 			if(sym->level == 0) {
 			  regs *reg;
 			  operand *op;
-//				fprintf(stderr, "%s: implicit add of symbol = %s\n", __FUNCTION__, sym->name);
-				op = operandFromSymbol( sym );
-				reg = pic16_allocDirReg( op );
-				if(reg) {
-					//continue;
-					checkAddReg(&pic16_fix_udata, reg);
-					/* and add to globals list */
-					addSetHead(&publics, sym);
+
+				reg = pic16_dirregWithName( sym->name );
+				if(!reg) {
+					fprintf(stderr, "%s:%d: implicit add of symbol = %s\n",
+							__FUNCTION__, __LINE__, sym->name);
+
+					op = operandFromSymbol( sym );
+					reg = pic16_allocDirReg( op );
+					if(reg) {
+						if(checkAddReg(&pic16_fix_udata, reg)) {
+							/* and add to globals list if not exist */
+							addSetHead(&publics, sym);
+						}
+					}
 				}
 			}
-#endif
 		} else {
+			if(!sym->used && (sym->level == 0)) {
+			  regs *reg;
+
+				/* symbol not used, just declared probably, but its in
+				 * level 0, so we must declare it fine as global */
+				
+//				fprintf(stderr, "EXTRA symbol declaration sym= %s\n", sym->name);
+				reg = pic16_allocDirReg( operandFromSymbol( sym ) );
+				if(checkAddReg(&pic16_rel_udata, reg)) {
+					addSetHead(&publics, sym);
+//					addSetHead(&externs, sym);
+				}
+			}
+
 			/* allocate space */
 			/* If this is a bit variable, then allocate storage after 8 bits have been declared */
 			/* unlike the 8051, the pic does not have a separate bit area. So we emulate bit ram */
@@ -811,18 +854,11 @@ pic16glue ()
 		/* entry point @ start of CSEG */
 		pic16_addpCode2pBlock(pb,pic16_newpCodeLabel("__sdcc_program_startup\t;VR1",-1));
 
-		if(USE_STACK) {
-#if 0
-			pic16_addpCode2pBlock(pb, pic16_newpCode(POC_LFSR,
-				pic16_popGetLit2(1, pic16_popGetLit(stackPos))));
-			pic16_addpCode2pBlock(pb, pic16_newpCode(POC_LFSR,
-				pic16_popGetLit2(2, pic16_popGetLit(stackPos))));
-#else
+		if(initsfpnt) {
 			pic16_addpCode2pBlock(pb, pic16_newpCode(POC_LFSR,
 				pic16_popGetLit2(1, pic16_newpCodeOpRegFromStr("stack"))));
 			pic16_addpCode2pBlock(pb, pic16_newpCode(POC_LFSR,
 				pic16_popGetLit2(2, pic16_newpCodeOpRegFromStr("stack"))));
-#endif
 		}
 
 		/* put in the call to main */

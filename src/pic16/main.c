@@ -30,6 +30,7 @@
 #include "device.h"
 #include "SDCCutil.h"
 #include "glue.h"
+#include "pcode.h"
 //#include "gen.h"
 
 
@@ -87,7 +88,6 @@ _pic16_init (void)
 	asm_addTree (&asm_asxxxx_mapping);
 	pic16_pCodeInitRegisters();
 	maxInterrupts = 2;
-	
 
 	/* set pic16 port options to defaults */
 	pic16_options.gen_banksel = 0;
@@ -95,7 +95,6 @@ _pic16_init (void)
 	pic16_options.omit_configw = 0;
 	pic16_options.omit_ivt = 0;
 	pic16_options.leave_reset = 0;
-	pic16_options.enable_stack = 0;
 	pic16_options.stack_model = 0;			/* 0 for 'small', 1 for 'large' */
 }
 
@@ -118,6 +117,8 @@ _pic16_regparm (sym_link * l)
 }
 
 
+int initsfpnt=0;		/* set to 1 if source provides a pragma for stack
+				 * so glue() later emits code to initialize stack/frame pointers */
 set *absSymSet;
 
 static int
@@ -143,10 +144,16 @@ _process_pragma(const char *sz)
 	if(startsWith(ptr, "stack")) {
 	  char *stackPosS = strtok((char *)NULL, WHITE);
 	  value *stackPosVal;
+	  regs *reg;
 
 //	  	fprintf(stderr, "Initializing stack pointer to 0x%x\n", (int)floatFromVal(constVal(stackPos)));
 		stackPosVal = constVal( stackPosS );
 		stackPos = (unsigned int)floatFromVal( stackPosVal );
+
+		reg=newReg(REG_SFR, PO_SFR_REGISTER, stackPos, "stack", 1, 0, NULL);
+		addSet(&pic16_fix_udata, reg);
+		
+		initsfpnt = 1;		// force glue() to initialize stack/frame pointers */
 
 	  return 0;
 	}
@@ -205,7 +212,6 @@ OPTION pic16_optionsTable[]= {
 	{ 0,	"--pomit-config-words",	&pic16_options.omit_configw,	"omit the generation of configuration words"},
 	{ 0,	"--pomit-ivt",		&pic16_options.omit_ivt,	"omit the generation of the Interrupt Vector Table"},
 	{ 0,	"--pleave-reset-vector",&pic16_options.leave_reset,	"when omitting IVT leave RESET vector"},
-	{ 0,	"--penable-stack",	&pic16_options.enable_stack,	"enable the use of stack"},
 	{ 0,	STACK_MODEL,	NULL,	"use stack model 'small' (default) or 'large'"},
 
 	{ 0,	"--debug-xtra",		&pic16_debug_verbose,	"show more debug info in assembly output"},
@@ -252,7 +258,8 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
 {
   int j=0;
 //  set *tset;
-
+  char *stkmodel;
+  
   /* TODO: allow port-specific command line options to specify
    * segment names here.
    */
@@ -267,13 +274,12 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
 
 
 	if(ISOPT(STACK_MODEL)) {
-		switch(*getStringArg(STACK_MODEL, argv, i, *pargc)) {
-			case 's': pic16_options.stack_model = 0; break;
-			case 'l': pic16_options.stack_model = 1; break;
-			
-			default:
-				fprintf(stderr, "Unknown stack model");
-				exit(-1);
+		stkmodel = getStringArg(STACK_MODEL, argv, i, *pargc);
+		if(STRCASECMP(stkmodel, "small"))pic16_options.stack_model = 0;
+		else if(STRCASECMP(stkmodel, "large"))pic16_options.stack_model = 1;
+		else {
+			fprintf(stderr, "Unknown stack model: %s", stkmodel);
+			exit(-1);
 		}
 		return TRUE;
 	}
@@ -614,7 +620,7 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
   //  sym_link *test = NULL;
   //  value *val;
 
-  fprintf(stderr,"checking for native mult\n");
+//  fprintf(stderr,"checking for native mult\n");
 
   if ( ic->op != '*')
     {

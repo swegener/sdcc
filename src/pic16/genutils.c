@@ -162,3 +162,246 @@ release:
 }
 #endif	/* defined(GEN_Cpl) */
 
+
+
+/*-----------------------------------------------------------------*/
+/* Helper function to dump operand into comment lines              */
+/*-----------------------------------------------------------------*/
+
+void pic16_DumpValue(char *prefix, value *val)
+{
+//	char s[INITIAL_INLINEASM];  
+	if(!val) return;
+
+	DEBUGpic16_emitcode (";", " %s Dump value",prefix);
+	DEBUGpic16_emitcode (";", " %s name:%s",prefix,val->name);
+}
+
+void pic16_DumpPcodeOp(char *prefix, pCodeOp *pcop)
+{
+//	char s[INITIAL_INLINEASM];  
+	if(!pcop) return;
+
+	DEBUGpic16_emitcode (";", " %s Dump pCodeOp",prefix);
+	DEBUGpic16_emitcode (";", " %s name:%s",prefix,pcop->name);
+	if(pcop->type == PO_NONE) {
+		DEBUGpic16_emitcode (";", " %s type:PO_NONE",prefix);
+	}
+	if(pcop->type == PO_W) {
+		DEBUGpic16_emitcode (";", " %s type:PO_W",prefix);
+	}
+	if(pcop->type == PO_WREG) {
+		DEBUGpic16_emitcode (";", " %s type:PO_WREG",prefix);
+	}
+	if(pcop->type == PO_STATUS) {
+		DEBUGpic16_emitcode (";", " %s type:PO_STATUS",prefix);
+	}
+	if(pcop->type == PO_BSR) {
+		DEBUGpic16_emitcode (";", " %s type:PO_BSR",prefix);
+	}
+	if(pcop->type == PO_FSR0) {
+		DEBUGpic16_emitcode (";", " %s type:PO_FSR0",prefix);
+	}
+	if(pcop->type == PO_INDF0) {
+		DEBUGpic16_emitcode (";", " %s type:PO_INDF0",prefix);
+	}
+	if(pcop->type == PO_INTCON) {
+		DEBUGpic16_emitcode (";", " %s type:PO_INTCON",prefix);
+	}
+	if(pcop->type == PO_GPR_REGISTER) {
+		DEBUGpic16_emitcode (";", " %s type:PO_GPR_REGISTER",prefix);
+	}
+	if(pcop->type == PO_GPR_BIT) {
+		DEBUGpic16_emitcode (";", " %s type:PO_GPR_BIT",prefix);
+	}
+	if(pcop->type == PO_GPR_TEMP) {
+		DEBUGpic16_emitcode (";", " %s type:PO_GPR_TEMP",prefix);
+	}
+	if(pcop->type == PO_SFR_REGISTER) {
+		DEBUGpic16_emitcode (";", " %s type:PO_SFR_REGISTER",prefix);
+	}
+	if(pcop->type == PO_PCL) {
+		DEBUGpic16_emitcode (";", " %s type:PO_PCL",prefix);
+	}
+	if(pcop->type == PO_PCLATH) {
+		DEBUGpic16_emitcode (";", " %s type:PO_PCLATH",prefix);
+	}
+	if(pcop->type == PO_LITERAL) {
+		DEBUGpic16_emitcode (";", " %s type:PO_LITERAL",prefix);
+		DEBUGpic16_emitcode (";", " %s lit:%s",prefix,PCOL(pcop)->lit);
+	}
+	if(pcop->type == PO_REL_ADDR) {
+		DEBUGpic16_emitcode (";", " %s type:PO_REL_ADDR",prefix);
+	}
+	if(pcop->type == PO_IMMEDIATE) {
+		DEBUGpic16_emitcode (";", " %s type:PO_IMMEDIATE",prefix);
+	}
+	if(pcop->type == PO_DIR) {
+		DEBUGpic16_emitcode (";", " %s type:PO_DIR",prefix);
+	}
+	if(pcop->type == PO_CRY) {
+		DEBUGpic16_emitcode (";", " %s type:PO_CRY",prefix);
+	}
+	if(pcop->type == PO_BIT) {
+		DEBUGpic16_emitcode (";", " %s type:PO_BIT",prefix);
+	}
+	if(pcop->type == PO_STR) {
+		DEBUGpic16_emitcode (";", " %s type:PO_STR",prefix);
+	}
+	if(pcop->type == PO_LABEL) {
+		DEBUGpic16_emitcode (";", " %s type:PO_LABEL",prefix);
+	}
+	if(pcop->type == PO_WILD) {
+		DEBUGpic16_emitcode (";", " %s type:PO_WILD",prefix);
+	}
+}
+
+
+
+void pic16_DumpAop(char *prefix, asmop *aop)
+{
+	char s[INITIAL_INLINEASM];  
+	if(!aop) return;
+
+	DEBUGpic16_emitcode (";", " %s Dump asmop",prefix);
+	if (aop->type == AOP_LIT)
+	{
+		DEBUGpic16_emitcode (";", " %s type:AOP_LIT",prefix);
+		sprintf(s,"%s (aopu.aop_lit)",prefix);
+		pic16_DumpValue(s,aop->aopu.aop_lit);
+	}
+	if (aop->type == AOP_REG)
+		DEBUGpic16_emitcode (";", " %s type:AOP_REG",prefix);
+	if (aop->type == AOP_DIR)
+	{
+		DEBUGpic16_emitcode (";", " %s type:AOP_DIR",prefix);
+		DEBUGpic16_emitcode (";", " %s aopu.aop_dir:%s",prefix,aop->aopu.aop_dir);
+	}
+	if (aop->type == AOP_DPTR)
+		DEBUGpic16_emitcode (";", " %s type:AOP_DPTR",prefix);
+	if (aop->type == AOP_DPTR2)
+		DEBUGpic16_emitcode (";", " %s type:AOP_DPTR2",prefix);
+	if (aop->type == AOP_R0)
+		DEBUGpic16_emitcode (";", " %s type:AOP_R0",prefix);
+	if (aop->type == AOP_R1)
+		DEBUGpic16_emitcode (";", " %s type:AOP_R1",prefix);
+	if (aop->type == AOP_STK)
+		DEBUGpic16_emitcode (";", " %s type:AOP_STK",prefix);
+	if (aop->type == AOP_IMMD)
+	{
+		DEBUGpic16_emitcode (";", " %s type:AOP_IMMD",prefix);
+		DEBUGpic16_emitcode (";", " %s aopu.aop_immd:%s",prefix,aop->aopu.aop_immd);
+	}
+	if (aop->type == AOP_STR)
+	{
+		DEBUGpic16_emitcode (";", " %s type:AOP_STR",prefix);
+		DEBUGpic16_emitcode (";", " %s aopu.aop_str:%s/%s/%s/%s",prefix,aop->aopu.aop_str[0],
+				aop->aopu.aop_str[1],aop->aopu.aop_str[2],aop->aopu.aop_str[3]);
+	}
+	if (aop->type == AOP_CRY)
+		DEBUGpic16_emitcode (";", " %s type:AOP_CRY",prefix);
+	if (aop->type == AOP_ACC)
+		DEBUGpic16_emitcode (";", " %s type:AOP_ACC",prefix);
+	if (aop->type == AOP_PCODE)
+	{
+		DEBUGpic16_emitcode (";", " %s type:AOP_PCODE",prefix);
+		sprintf(s,"%s (aopu.pcop)",prefix);
+		pic16_DumpPcodeOp(s,aop->aopu.pcop);
+	}
+
+
+	DEBUGpic16_emitcode (";", " %s coff:%d",prefix,aop->coff);
+	DEBUGpic16_emitcode (";", " %s size:%d",prefix,aop->size);
+	DEBUGpic16_emitcode (";", " %s code:%d",prefix,aop->code);
+	DEBUGpic16_emitcode (";", " %s paged:%d",prefix,aop->paged);
+	DEBUGpic16_emitcode (";", " %s freed:%d",prefix,aop->freed);
+
+}
+
+void pic16_DumpSymbol(char *prefix, symbol *sym)
+{
+	char s[INITIAL_INLINEASM];  
+	if(!sym) return;
+
+	DEBUGpic16_emitcode (";", " %s Dump symbol",prefix);
+	DEBUGpic16_emitcode (";", " %s name:%s",prefix,sym->name);
+	DEBUGpic16_emitcode (";", " %s rname:%s",prefix,sym->rname);
+	DEBUGpic16_emitcode (";", " %s level:%d",prefix,sym->level);
+	DEBUGpic16_emitcode (";", " %s block:%d",prefix,sym->block);
+	DEBUGpic16_emitcode (";", " %s key:%d",prefix,sym->key);
+	DEBUGpic16_emitcode (";", " %s implicit:%d",prefix,sym->implicit);
+	DEBUGpic16_emitcode (";", " %s undefined:%d",prefix,sym->undefined);
+	DEBUGpic16_emitcode (";", " %s _isparm:%d",prefix,sym->_isparm);
+	DEBUGpic16_emitcode (";", " %s ismyparm:%d",prefix,sym->ismyparm);
+	DEBUGpic16_emitcode (";", " %s isitmp:%d",prefix,sym->isitmp);
+	DEBUGpic16_emitcode (";", " %s islbl:%d",prefix,sym->islbl);
+	DEBUGpic16_emitcode (";", " %s isref:%d",prefix,sym->isref);
+	DEBUGpic16_emitcode (";", " %s isind:%d",prefix,sym->isind);
+	DEBUGpic16_emitcode (";", " %s isinvariant:%d",prefix,sym->isinvariant);
+	DEBUGpic16_emitcode (";", " %s cdef:%d",prefix,sym->cdef);
+	DEBUGpic16_emitcode (";", " %s addrtaken:%d",prefix,sym->addrtaken);
+	DEBUGpic16_emitcode (";", " %s isreqv:%d",prefix,sym->isreqv);
+	DEBUGpic16_emitcode (";", " %s udChked:%d",prefix,sym->udChked);
+	DEBUGpic16_emitcode (";", " %s isLiveFcall:%d",prefix,sym->isLiveFcall);
+	DEBUGpic16_emitcode (";", " %s isspilt:%d",prefix,sym->isspilt);
+	DEBUGpic16_emitcode (";", " %s spillA:%d",prefix,sym->spillA);
+	DEBUGpic16_emitcode (";", " %s remat:%d",prefix,sym->remat);
+	DEBUGpic16_emitcode (";", " %s isptr:%d",prefix,sym->isptr);
+	DEBUGpic16_emitcode (";", " %s uptr:%d",prefix,sym->uptr);
+	DEBUGpic16_emitcode (";", " %s isFree:%d",prefix,sym->isFree);
+	DEBUGpic16_emitcode (";", " %s islocal:%d",prefix,sym->islocal);
+	DEBUGpic16_emitcode (";", " %s blockSpil:%d",prefix,sym->blockSpil);
+	DEBUGpic16_emitcode (";", " %s remainSpil:%d",prefix,sym->remainSpil);
+	DEBUGpic16_emitcode (";", " %s stackSpil:%d",prefix,sym->stackSpil);
+	DEBUGpic16_emitcode (";", " %s onStack:%d",prefix,sym->onStack);
+	DEBUGpic16_emitcode (";", " %s iaccess:%d",prefix,sym->iaccess);
+	DEBUGpic16_emitcode (";", " %s ruonly:%d",prefix,sym->ruonly);
+	DEBUGpic16_emitcode (";", " %s spildir:%d",prefix,sym->spildir);
+	DEBUGpic16_emitcode (";", " %s ptrreg:%d",prefix,sym->ptrreg);
+	DEBUGpic16_emitcode (";", " %s noSpilLoc:%d",prefix,sym->noSpilLoc);
+	DEBUGpic16_emitcode (";", " %s isstrlit:%d",prefix,sym->isstrlit);
+	DEBUGpic16_emitcode (";", " %s accuse:%d",prefix,sym->accuse);
+	DEBUGpic16_emitcode (";", " %s dptr:%d",prefix,sym->dptr);
+	DEBUGpic16_emitcode (";", " %s allocreq:%d",prefix,sym->allocreq);
+	DEBUGpic16_emitcode (";", " %s stack:%d",prefix,sym->stack);
+	DEBUGpic16_emitcode (";", " %s xstack:%d",prefix,sym->xstack);
+	DEBUGpic16_emitcode (";", " %s nRegs:%d",prefix,sym->nRegs);
+	DEBUGpic16_emitcode (";", " %s regType:%d",prefix,sym->regType);
+
+	// struct regs !!!
+
+	if(sym->aop)
+	{
+		sprintf(s,"%s (aop)",prefix);
+		pic16_DumpAop(s,sym->aop);
+	} else {
+		DEBUGpic16_emitcode (";", " %s aop:NULL",prefix);
+	}
+}
+
+void pic16_DumpOp(char *prefix, operand *op)
+{
+	char s[INITIAL_INLINEASM];  
+	if(!op) return;
+
+	DEBUGpic16_emitcode (";", " %s Dump operand",prefix);
+	if(IS_SYMOP(op))
+		DEBUGpic16_emitcode (";", " %s type: SYMBOL",prefix);
+	if(IS_VALOP(op))
+		DEBUGpic16_emitcode (";", " %s type: VALUE",prefix);
+	if(IS_TYPOP(op))
+		DEBUGpic16_emitcode (";", " %s type: TYPE",prefix);
+	DEBUGpic16_emitcode (";", " %s isaddr:%d",prefix,op->isaddr);
+	DEBUGpic16_emitcode (";", " %s isvolatile:%d",prefix,op->isvolatile);
+	DEBUGpic16_emitcode (";" ," %s isGlobal:%d",prefix,op->isGlobal);
+	DEBUGpic16_emitcode (";", " %s isPtr:%d",prefix,op->isPtr);
+	DEBUGpic16_emitcode (";", " %s isGptr:%d",prefix,op->isGptr);
+	DEBUGpic16_emitcode (";", " %s isParm:%d",prefix,op->isParm);
+	DEBUGpic16_emitcode (";", " %s isLiteral:%d",prefix,op->isLiteral);
+	DEBUGpic16_emitcode (";", " %s key:%d",prefix,op->key);
+	if(IS_SYMOP(op)) {
+		sprintf(s,"%s (symOperand)",prefix);
+		pic16_DumpSymbol(s,op->operand.symOperand);
+	}
+
+}

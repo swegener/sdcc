@@ -939,9 +939,9 @@ static void tokenizeLineNode(char *ln)
   if(!ln || !*ln)
     return;
 
+//	fprintf(stderr, "%s:%d: processing %s\n", __FILE__, __LINE__, ln); 
 
   while(*ln) {
-
     if(isspace(*ln)) {
       // add a SPACE token and eat the extra spaces.
       tokArr[tokIdx++].tt = PCT_SPACE;
@@ -2196,6 +2196,9 @@ pCodeOp *pic16_pCodeOpCopy(pCodeOp *pcop)
   case PO_INTCON:
   case PO_PCL:
   case PO_PCLATH:
+  case PO_PCLATU:
+  case PO_PRODL:
+  case PO_PRODH:
   case PO_REL_ADDR:
     //DFPRINTF((stderr,"pCodeOpCopy register type %d\n", pcop->type));
     pcopnew = Safe_calloc(1,sizeof(pCodeOp) );

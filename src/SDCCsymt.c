@@ -1178,6 +1178,7 @@ checkSClass (symbol * sym)
       sym->ival = NULL;
     }
 
+#if 0
   /* if this is an automatic symbol then */
   /* storage class will be ignored and   */
   /* symbol will be allocated on stack/  */
@@ -1193,6 +1194,23 @@ checkSClass (symbol * sym)
       werror (E_AUTO_ASSUMED, sym->name);
       SPEC_SCLS (sym->etype) = S_AUTO;
     }
+#else
+  /* if this is an atomatic symbol */
+  if (sym->level && (options.stackAuto || reentrant)) {
+    if ((SPEC_SCLS (sym->etype) == S_AUTO ||
+	 SPEC_SCLS (sym->etype) == S_FIXED ||
+	 SPEC_SCLS (sym->etype) == S_REGISTER ||
+	 SPEC_SCLS (sym->etype) == S_STACK ||
+	 SPEC_SCLS (sym->etype) == S_XSTACK)) {
+      SPEC_SCLS (sym->etype) = S_AUTO;
+    } else {
+      /* storage class may only be specified for statics */
+      if (!IS_STATIC(sym->etype)) {
+	werror (E_AUTO_ASSUMED, sym->name);
+      }
+    }
+  }
+#endif
   
   /* automatic symbols cannot be given   */
   /* an absolute address ignore it      */

@@ -582,35 +582,27 @@ allocLocal (symbol * sym)
   /* this is automatic           */
 
   /* if it to be placed on the stack */
-  if (options.stackAuto || reentrant)
-    {
-
-      sym->onStack = 1;
-      if (options.useXstack)
-	{
-	  /* PENDING: stack direction for xstack */
-	  SPEC_OCLS (sym->etype) = xstack;
-	  SPEC_STAK (sym->etype) = sym->stack = (xstackPtr + 1);
-	  xstackPtr += getSize (sym->type);
-	}
-      else
-	{
-	  SPEC_OCLS (sym->etype) = istack;
-	  if (port->stack.direction > 0)
-	    {
-	      SPEC_STAK (sym->etype) = sym->stack = (stackPtr + 1);
-	      stackPtr += getSize (sym->type);
-	    }
-	  else
-	    {
-	      stackPtr -= getSize (sym->type);
-	      SPEC_STAK (sym->etype) = sym->stack = stackPtr;
-	    }
-	}
-      allocIntoSeg (sym);
-      return;
+  if (options.stackAuto || reentrant) {
+    sym->onStack = 1;
+    if (options.useXstack) {
+      /* PENDING: stack direction for xstack */
+      SPEC_OCLS (sym->etype) = xstack;
+      SPEC_STAK (sym->etype) = sym->stack = (xstackPtr + 1);
+      xstackPtr += getSize (sym->type);
+    } else {
+      SPEC_OCLS (sym->etype) = istack;
+      if (port->stack.direction > 0) {
+	SPEC_STAK (sym->etype) = sym->stack = (stackPtr + 1);
+	stackPtr += getSize (sym->type);
+      } else {
+	stackPtr -= getSize (sym->type);
+	SPEC_STAK (sym->etype) = sym->stack = stackPtr;
+      }
     }
-
+    allocIntoSeg (sym);
+    return;
+  }
+  
   /* else depending on the storage class specified */
   if (SPEC_SCLS (sym->etype) == S_XDATA)
     {

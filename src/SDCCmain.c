@@ -370,13 +370,13 @@ printUsage ()
 {
     int i;
     printVersionInfo();
-    fprintf (stderr,
+    fprintf (stdout,
              "Usage : sdcc [options] filename\n"
              "Options :-\n"
              );
     
     for (i = 0; i < LENGTH(optionsTable); i++) {
-        fprintf(stderr, "  %c%c  %-20s  %s\n", 
+        fprintf(stdout, "  %c%c  %-20s  %s\n", 
                 optionsTable[i].shortOpt !=0 ? '-' : ' ',
                 optionsTable[i].shortOpt !=0 ? optionsTable[i].shortOpt : ' ',
                 optionsTable[i].longOpt != NULL ? optionsTable[i].longOpt : "",

@@ -15,5 +15,4 @@ $(LIB): $(OBJ)
 	ar r $(LIB) $(OBJ)
 	ranlib $(LIB)
 
-clean:
-	rm -f $(LIB) *.o *~
+include clean.mk

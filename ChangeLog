@@ -1,3 +1,6 @@
+2002-08-11  Borut Razem <borut.razem@siol.net>
+	* support/Util/NewAlloc.c: removed unneeded #include "sdccconf.h" (suggested by Jesus Calvino-Fraga)
+
 2002-08-10  Borut Razem <borut.razem@siol.net>
 	* src/SDCCmain.c (main):
 	file preOutName was unlinked before closed. This seems to be OK on UNIX and cygwin
@@ -22,12 +25,12 @@
 	* sdcc/as/mcs51/asm.h: definition of PATH_MAX for MSC
 
 	* sdcc/src/SDCCast.c: solved MSC error in function decorateType()
-  
+
 	* sdcc/src/SDCC.y: added missing ending ';' to rules to get rid of bison warnings
-  
+
 	* dcc/src/ds390/ralloc.c, sdcc/src/mcs51/ralloc.c:
 	added return 0 statements after assert() to make compiler happy
-  
+
 	* sdcc/src/xa51/peeph.rul, sdcc/src/xa51/peeph.def, sdcc/src/z80/ralloc.c:
 	added newline in the def file to keep MSC compiler satisfied
 

@@ -38,7 +38,6 @@ functions.
 #include <memory.h>
 #include <assert.h>
 #include "newalloc.h"
-#include "sdccconf.h"
 
 #if OPT_ENABLE_LIBGC
 #include <gc/gc.h>
@@ -272,4 +271,3 @@ void freeTrace(allocTrace *ptrace)
   ptrace->palloced = NULL;
   ptrace->max = 0;
 }
-

@@ -293,7 +293,8 @@ void tint() interrupt 1 using 1
 */
 unsigned char codigo(unsigned char tc1,unsigned char tc2,unsigned char tc3,unsigned char tc4)
 {
-	unsigned char red;
+//	unsigned char red;
+	unsigned char red = 0;
 
 	if (tc1 != 0x00)
 	{

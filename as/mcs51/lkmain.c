@@ -1359,13 +1359,15 @@ char *usetxt[] = {
 	"  -i	Intel Hex as file[IHX]",
 	"  -s	Motorola S19 as file[S19]",
 	"  -j	Produce NoICE debug as file[NOI]",
-	"  -z   Produce SDCdb debug as file[cdb]",
+	"  -z	Produce SDCdb debug as file[cdb]",
 /*	"List:", */
 	"  -u	Update listing file(s) with link data as file(s)[.RST]",
 	"Miscellaneous:\n"
 	"  -a	[iram-size] Check for internal RAM overflow",
 	"  -v	[xram-size] Check for external RAM overflow",
 	"  -w	[code-size] Check for code overflow",
+	"  -y	Generate memory usage summary file[mem]",
+	"  -Y	[stack-size] Pack internal ram and allocate space for stack",
 	"End:",
 	"  -e	or null line terminates input",
 	0

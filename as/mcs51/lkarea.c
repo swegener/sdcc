@@ -487,7 +487,7 @@ VOID lnkarea2 (void)
 	struct sym *sp;
 	int j;
     struct area *dseg_ap=NULL;
-	struct sym *sp_dseg_s, *sp_dseg_l;
+	struct sym *sp_dseg_s=NULL, *sp_dseg_l=NULL;
 
 	for(j=0; j<256; j++) idatamap[j]=' ';
 
@@ -555,11 +555,14 @@ VOID lnkarea2 (void)
 	}
 
     /*Compute the size of DSEG*/
-    dseg_ap->a_addr=0;
-    dseg_ap->a_size=0;
-    for(j=0; j<0x80; j++) if(idatamap[j]!=' ') dseg_ap->a_size++;
-    sp_dseg_s->s_addr=0;
-    sp_dseg_l->s_addr=dseg_ap->a_size;
+	if(dseg_ap!=NULL)
+	{
+		dseg_ap->a_addr=0;
+		dseg_ap->a_size=0;
+		for(j=0; j<0x80; j++) if(idatamap[j]!=' ') dseg_ap->a_size++;
+	}
+    if(sp_dseg_s!=NULL) sp_dseg_s->s_addr=0;
+    if(sp_dseg_l!=NULL) sp_dseg_l->s_addr=dseg_ap->a_size;
 
 #if 0
     /*Print the memory map*/

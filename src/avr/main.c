@@ -91,9 +91,12 @@ static void _avr_finaliseOptions(void)
        BIT-ACCESS     -   NO
        CODE-ACESS     -   NO 
        DEBUG-NAME     -   'B'
-       POINTER-TYPE   -   POINTER
+       POINTER-TYPE   -   FPOINTER
     */
     istack	  = allocMap (0, 1, 0, 0, 0, 0,options.stack_loc, ISTACK_NAME,'B',FPOINTER);
+
+    /* also change xdata to be direct space since we can use lds/sts */
+    xdata->direct = 1;
 
 }
 

@@ -28,9 +28,9 @@
 enum {
     AOP_LIT = 1,
     AOP_REG, AOP_DIR, 
-    AOP_DPTR,AOP_R0,AOP_R1,
+    AOP_DPTR,AOP_X,AOP_Z,
     AOP_STK ,AOP_IMMD, AOP_STR,
-    AOP_CRY, AOP_ACC };
+    AOP_CRY, AOP_ACC , AOP_STK_D};
 
 /* type asmop : a homogenised type for 
    all the different spaces an operand can be
@@ -59,11 +59,12 @@ typedef struct asmop {
 	value *aop_lit ;       /* if literal */
 	regs  *aop_reg[4];     /* array of registers */
 	char  *aop_dir ;       /* if direct  */
-	regs  *aop_ptr ;       /* either -> to r0 or r1 */
+	regs  *aop_ptr ;       /* either -> R26 or R30 */
 	char  *aop_immd;       /* if immediate others are implied */	
 	int    aop_stk ;       /* stack offset when AOP_STK */
 	char  *aop_str[4];     /* just a string array containing the location */
     } aopu;
+    regs  *aop_ptr2;       /* either -> R27 or R31 */
 } asmop;
 
 void gen51Code (iCode *);

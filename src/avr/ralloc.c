@@ -111,8 +111,7 @@ static regs *allocReg (short type)
 	    regsAVR[i].isFree ) {
 	    regsAVR[i].isFree = 0;
 	    if (currFunc)
-		currFunc->regsUsed = 
-		    bitVectSetBit(currFunc->regsUsed,i);
+		currFunc->regsUsed = bitVectSetBit(currFunc->regsUsed,i);
 	    return &regsAVR[i];
 	}
 	/* other wise look for specific type
@@ -746,6 +745,31 @@ static regs *getRegPtr (iCode *ic, eBBlock *ebp, symbol *sym)
 }
 
 /*-----------------------------------------------------------------*/
+/* getRegScr - will try for SCR if not a GPR type if not spil      */
+/*-----------------------------------------------------------------*/
+static regs *getRegScr (iCode *ic, eBBlock *ebp, symbol *sym)
+{
+    regs *reg;
+
+ tryAgain:
+    /* try for a ptr type */
+    if ((reg = allocReg(REG_SCR))) 
+	return reg;    
+
+    /* try for gpr type */
+    if ((reg = allocReg(REG_GPR)))        
+	return reg;    
+
+    /* we have to spil */
+    if (!spilSomething (ic,ebp,sym))
+	return NULL ;
+
+    /* this looks like an infinite loop but 
+       in really selectSpil will abort  */
+    goto tryAgain ;    
+}
+
+/*-----------------------------------------------------------------*/
 /* getRegGpr - will try for GPR if not spil                        */
 /*-----------------------------------------------------------------*/
 static regs *getRegGpr (iCode *ic, eBBlock *ebp,symbol *sym)
@@ -1064,6 +1088,8 @@ static void serialRegAssign (eBBlock **ebbs, int count)
 		for (j = 0 ; j < sym->nRegs ;j++ ) {
 		    if (sym->regType == REG_PTR)
 			sym->regs[j] = getRegPtr(ic,ebbs[i],sym);
+		    else if (sym->regType == REG_SCR) 
+			sym->regs[j] = getRegScr(ic,ebbs[i],sym);
 		    else
 			sym->regs[j] = getRegGpr(ic,ebbs[i],sym);
 
@@ -1214,10 +1240,17 @@ static void createRegMask (eBBlock **ebbs, int count)
 		    continue ;
 
 		/* for all the registers allocated to it */
-		for (k = 0 ; k < sym->nRegs ;k++)
-		    if (sym->regs[k])
+		for (k = 0 ; k < sym->nRegs ;k++) {
+		    if (sym->regs[k]) {
 			ic->rMask =
 			    bitVectSetBit(ic->rMask,sym->regs[k]->rIdx);
+			/* special case for X & Z registers */
+			if (k == R26_IDX || k == R27_IDX)
+			    ic->rMask = bitVectSetBit(ic->rMask,X_IDX);
+			if (k == R30_IDX || k == R31_IDX)
+			    ic->rMask = bitVectSetBit(ic->rMask,Z_IDX);
+		    }
+		}
 	    }
 	}
     }
@@ -2221,20 +2254,17 @@ static void setDefaultRegs(eBBlock **ebbs,int count)
 
     /* if no pointer registers required in this function
        then mark r26-27 & r30-r31 as GPR & free */
+    regsAVR[R26_IDX].isFree =
+	regsAVR[R27_IDX].isFree =
+	regsAVR[R30_IDX].isFree =
+	regsAVR[R31_IDX].isFree = 1;
+
     if (!avr_ptrRegReq) {
-	regsAVR[R26_IDX].isFree =
-	    regsAVR[R27_IDX].isFree =
-	    regsAVR[R30_IDX].isFree =
-	    regsAVR[R31_IDX].isFree = 1;
 	regsAVR[R26_IDX].type =
 	    regsAVR[R27_IDX].type =
 	    regsAVR[R30_IDX].type =
 	    regsAVR[R31_IDX].type = REG_GPR ;	
     } else {
-	regsAVR[R26_IDX].isFree =
-	    regsAVR[R27_IDX].isFree =
-	    regsAVR[R30_IDX].isFree =
-	    regsAVR[R31_IDX].isFree = 1;
 	regsAVR[R26_IDX].type =
 	    regsAVR[R27_IDX].type =
 	    regsAVR[R30_IDX].type =
@@ -2254,7 +2284,7 @@ static void setDefaultRegs(eBBlock **ebbs,int count)
     if (!currFunc->hasFcall) {
 	/* mark the parameter regs as GPR */
 	for (i= R16_IDX ; i <= R23_IDX ;i++) {
-	    regsAVR[i].type = REG_GPR;
+	    regsAVR[i].type = REG_SCR;
 	    regsAVR[i].isFree = 1;
 	}
 	preAssignParms(ebbs[0]->sch);
@@ -2328,8 +2358,9 @@ void avr_assignRegisters (eBBlock **ebbs, int count)
     ic = iCodeLabelOptimize(iCodeFromeBBlock (ebbs,count));
 
 
-    genAVRCode(ic);
-
+    /*    genAVRCode(ic); */
+    for (; ic ; ic = ic->next)
+	    piCode(ic,stdout);
     /* free up any _G.stackSpil locations allocated */   
     applyToSet(_G.stackSpil,deallocStackSpil);
     _G.slocNum = 0;

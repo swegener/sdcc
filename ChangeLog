@@ -1,3 +1,7 @@
+2002-01-26  Bernhard Held  <bernhard@bernhardheld.de>
+
+	* src/SDCCast.c (funcOfType): fix usage of double --float-reent
+
 2002-01-22  Bernhard Held  <bernhard@bernhardheld.de>
 
 	* support/regression/fwk/lib/testfwk.c (main): Removed workaround for bug #505387

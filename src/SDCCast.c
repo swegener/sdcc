@@ -505,7 +505,7 @@ funcOfType (char *name, sym_link * type, sym_link * argType,
   DCL_TYPE (sym->type) = FUNCTION;
   sym->type->next = copyLinkChain (type);
   sym->etype = getSpec (sym->type);
-  FUNC_ISREENT(sym->type) = rent;
+  FUNC_ISREENT(sym->type) = rent ? 1 : 0;
 
   /* if arguments required */
   if (nArgs)

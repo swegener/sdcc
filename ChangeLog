@@ -1,3 +1,7 @@
+2004-06-21 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCClrange.c (computeClash): fixed bug #971834
+
 2004-06-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/mcs51/gen.c (genCmp): fixed bug #975903
@@ -9,7 +13,7 @@
 	* src/mcs51/gen.c (operandsEqu): fixed bug #976283
 	* src/SDCCmain.c (parseCmdLine): report --unknown-option only once
 
-2004-06-08 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+2004-06-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCcse.c (cseBBlock): fixed bug #966963
 

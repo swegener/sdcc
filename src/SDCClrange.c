@@ -535,7 +535,9 @@ computeClash (eBBlock ** ebbs, int count)
 		      IS_ITEMP(IC_RESULT(ic)) &&
 		      (IS_ITEMP(IC_LEFT(ic)) || IS_ITEMP(IC_RIGHT(ic))))
 		    {
-		      if (OP_SYMBOL(IC_RESULT(ic))->key == key1)
+		      if (OP_SYMBOL(IC_RESULT(ic))->key == key1
+			  && sym1->liveFrom == ic->seq
+			  && sym2->liveTo == ic->seq)
 		        {
 		          if (IS_SYMOP(IC_LEFT(ic)))
 			    if (OP_SYMBOL(IC_LEFT(ic))->key == key2)
@@ -545,7 +547,9 @@ computeClash (eBBlock ** ebbs, int count)
 			      continue;
 			}
 
-		      if (OP_SYMBOL(IC_RESULT(ic))->key == key2)
+		      if (OP_SYMBOL(IC_RESULT(ic))->key == key2
+			  && sym2->liveFrom == ic->seq
+			  && sym1->liveTo == ic->seq)
 		        {
 		          if (IS_SYMOP(IC_LEFT(ic)))
 			    if (OP_SYMBOL(IC_LEFT(ic))->key == key1)

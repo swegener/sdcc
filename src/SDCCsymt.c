@@ -1623,7 +1623,6 @@ processFuncArgs (symbol * func, int ignoreName)
          and as port dictates
          not inhibited by command line option or #pragma */
       if (!func->hasVargs &&
-	  !options.noregparms &&
 	  !IS_RENT (func->etype) &&
 	  (*port->reg_parm) (val->type))
 	{

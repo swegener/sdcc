@@ -93,7 +93,6 @@ typedef int bool;
 #define PRAGMA_NOOVERLAY   "NOOVERLAY"
 #define PRAGMA_CALLEESAVES "CALLEE-SAVES"
 #define PRAGMA_EXCLUDE     "EXCLUDE"
-#define PRAGMA_NOREGPARMS  "NOREGPARMS"
 #define  SMALL_MODEL 0
 #define  LARGE_MODEL 1
 #define  TRUE 1
@@ -212,7 +211,6 @@ struct options
     int debug:1;		/* generate extra debug info */
     int nodebug:1;		/* Generate no debug info. */
     int stackOnData:1;		/* stack after data segment  */
-    int noregparms:1;		/* do not pass parameters in registers */
     int c1mode:1;		/* Act like c1 - no pre-proc, asm or link */
     char *peep_file;		/* additional rules for peep hole */
     char *out_name;		/* Asm output name for c1 mode */

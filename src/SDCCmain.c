@@ -127,7 +127,6 @@ char DefaultExePath[128];
 #define OPTION_C1_MODE   "-c1mode"
 #define OPTION_HELP         "-help"
 #define OPTION_CALLEE_SAVES "-callee-saves"
-#define OPTION_NOREGPARMS   "-noregparms"
 #define OPTION_NOSTDLIB     "-nostdlib"
 #define OPTION_NOSTDINC     "-nostdinc"
 #define OPTION_VERBOSE      "-verbose"
@@ -754,12 +753,6 @@ parseCmdLine (int argc, char **argv)
 	      continue;
 	    }
 
-	  if (strcmp (&argv[i][1], OPTION_NOREGPARMS) == 0)
-	    {
-	      options.noregparms = 1;
-	      continue;
-	    }
-
 	  if (strcmp (&argv[i][1], OPTION_PEEP_FILE) == 0)
 	    {
 	      if (argv[i][1 + strlen (OPTION_PEEP_FILE)])
@@ -958,65 +951,6 @@ parseCmdLine (int argc, char **argv)
 	    }
 	}
 
-      /* these are undocumented options */
-      /* if preceded by '/' then turn off certain optmizations, used
-         for debugging only these are also the legacy options from
-         version 1.xx will be removed gradually.
-         It may be an absolute filename.
-       */
-      if (*argv[i] == '/' && strlen (argv[i]) < 3)
-	{
-	  switch (argv[i][1])
-	    {
-
-	    case 'p':
-	      optimize.ptrArithmetic = 0;
-	      break;
-
-	    case 'L':
-	      switch (argv[i][2])
-		{
-		case '\0':
-		  optimize.label1 =
-		    optimize.label2 =
-		    optimize.label3 =
-		    optimize.label4 = 0;
-		  break;
-		case '1':
-		  optimize.label1 = 0;
-		  break;
-		case '2':
-		  optimize.label2 = 0;
-		  break;
-		case '3':
-		  optimize.label3 = 0;
-		  break;
-		case '4':
-		  optimize.label4 = 0;
-		  break;
-		}
-	      break;
-
-	    case 'l':
-	      switch (argv[i][2])
-		{
-		case 'i':
-		  optimize.loopInvariant = 0;
-		  break;
-		case 'n':
-		  optimize.loopInduction = 0;
-		  break;
-
-
-		}
-	      break;
-	    case 'g':
-	      optimize.global_cse = 0;
-	      break;
-
-	    }
-	  continue;
-	}
 
       /* if preceded by  '-' then option */
       if (*argv[i] == '-')

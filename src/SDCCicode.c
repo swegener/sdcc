@@ -229,7 +229,8 @@ printOperand (operand * op, FILE * file)
 	       op->key,
 	       OP_LIVEFROM (op), OP_LIVETO (op),
 	       OP_SYMBOL (op)->stack,
-	       op->isaddr, OP_SYMBOL (op)->isreqv, OP_SYMBOL (op)->remat,OP_SYMBOL(op)->noSpilLoc,
+	       op->isaddr, OP_SYMBOL (op)->isreqv, 
+	       OP_SYMBOL (op)->remat,OP_SYMBOL(op)->noSpilLoc,
 	       OP_SYMBOL(op)->ruonly
 	);
       {
@@ -2871,10 +2872,11 @@ geniCodeCall (operand * left, ast * parms,int lvl)
   geniCodeParms (parms, NULL, &stack, getSpec (operandType (left)), OP_SYMBOL (left),lvl);
 
   /* now call : if symbol then pcall */
-  if (IS_OP_POINTER (left) || IS_ITEMP(left))
+  if (IS_OP_POINTER (left) || IS_ITEMP(left)) {
     ic = newiCode (PCALL, left, NULL);
-  else
+  } else {
     ic = newiCode (CALL, left, NULL);
+  }
 
   type = copyLinkChain (operandType (left)->next);
   etype = getSpec (type);

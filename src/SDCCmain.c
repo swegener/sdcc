@@ -283,6 +283,9 @@ static PORT *_ports[] =
 #if !OPT_DISABLE_TININative
   &tininative_port,
 #endif
+#if !OPT_DISABLE_XA51
+  &xa51_port,
+#endif
 };
 
 #define NUM_PORTS (sizeof(_ports)/sizeof(_ports[0]))

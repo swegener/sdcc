@@ -283,5 +283,8 @@ extern PORT tlcs900h_port;
 #if !OPT_DISABLE_TININative
 extern PORT tininative_port;
 #endif
+#if !OPT_DISABLE_XA51
+extern PORT xa51_port;
+#endif
 
 #endif /* PORT_INCLUDE*/

@@ -48,7 +48,7 @@ set *publics = NULL;		/* public variables */
 set *externs = NULL;		/* Varibles that are declared as extern */
 
 /* TODO: this should be configurable (DS803C90 uses more than 6) */
-int maxInterrupts = 6;
+unsigned maxInterrupts = 6;
 int allocInfo = 1;
 symbol *mainf;
 extern char *VersionString;
@@ -112,7 +112,7 @@ aopLiteralLong (value * val, int offset, int size)
 	/* if it is a float then it gets tricky */
 	/* otherwise it is fairly simple */
 	if (!IS_FLOAT (val->type)) {
-		unsigned long v = floatFromVal (val);
+		unsigned long v = (unsigned long) floatFromVal (val);
 
 		v >>= (offset * 8);
 		switch (size) {
@@ -1060,7 +1060,7 @@ flushStatics (void)
 void 
 createInterruptVect (FILE * vFile)
 {
-  int i = 0;
+  unsigned i = 0;
   mainf = newSymbol ("main", 0);
   mainf->block = 0;
 

@@ -274,7 +274,7 @@ struct cpp_reader {
 
 /* Make sure PFILE->token_buffer has space for at least N more characters. */
 #define CPP_RESERVE(PFILE, N) \
-  (CPP_WRITTEN (PFILE) + N > (PFILE)->token_buffer_size \
+  ((int) (CPP_WRITTEN (PFILE) + N) > (PFILE)->token_buffer_size \
    && (cpp_grow_buffer (PFILE, N), 0))
 
 /* Append string STR (of length N) to PFILE's output buffer.

@@ -83,7 +83,7 @@ SDCC Compiler User Guide
 
 
 \size normal 
-SDCC 2.4.6
+SDCC 2.4.7
 \size footnotesize 
 
 \newline 
@@ -13964,15 +13964,6 @@ External Stack
 
 \layout Standard
 
-
-\series bold 
-Attention
-\series default 
-: this option wasn't maintained for a long time and is quite buggy.
- Small programs might work.
- You've been warned!
-\layout Standard
-
 The external stack (-
 \begin_inset ERT
 status Collapsed
@@ -13993,8 +13984,9 @@ status Collapsed
 
 \end_inset 
 
- memory (usually at the start of the external ram segment) and is 256 bytes
- in size.
+ memory (usually at the start of the external ram segment) and uses all
+ unused space in pdata (max.
+ 256 bytes).
  When -
 \begin_inset ERT
 status Collapsed
@@ -14030,7 +14022,8 @@ status Collapsed
 
  option, all parameters and local variables are allocated on the external
  stack (note: support libraries will need to be recompiled with the same
- options).
+ options.
+ There is a predefined target in the library makefile).
 \layout Standard
 
 The compiler outputs the higher order address byte of the external ram segment

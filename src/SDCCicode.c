@@ -323,7 +323,6 @@ printOperand (operand * op, FILE * file)
 	      fprintf (file, "]");
 	    }
 	}
-
 #endif
       break;
 
@@ -700,7 +699,7 @@ newiTempLabel (char *s)
 
   if (s)
     {
-	itmplbl = newSymbol (s, 1);
+      itmplbl = newSymbol (s, 1);
     }
   else
     {
@@ -2001,7 +2000,12 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
 	// if not a pointer to a function
 	if (!(IS_CODEPTR(type) && IS_FUNC(type->next) && IS_FUNC(optype))) {
 	  if (implicit) { // if not to generic, they have to match
-	    if ((!IS_GENPTR(type) && (DCL_TYPE(optype) != DCL_TYPE(type)))) {
+	    if (!IS_GENPTR(type) &&
+                !((DCL_TYPE(optype) == DCL_TYPE(type)) ||
+                  ((DCL_TYPE(optype) == POINTER) && (DCL_TYPE(type) == IPOINTER))
+                 )
+               )
+            {
 	      werror(E_INCOMPAT_PTYPES);
 	      errors++;
 	    }

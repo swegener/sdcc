@@ -283,7 +283,6 @@ replace {
 %1:
 } if labelInRange
 
-
 replace {
 	clr	a
 	cjne	%1,%2,%3
@@ -323,11 +322,23 @@ replace {
 %3:
 	jnz	%4
 } by {
-	;	Peephole 115	jump optimization
+	;	Peephole 115.a	jump optimization
 	cjne	%1,%2,%3
 	sjmp	%4
 %3:
 } if labelRefCount %3 1
+
+replace {
+	mov	%1,a
+	cjne	%1,#0x00,%2
+	sjmp	%3
+%2:
+} by {
+	;	Peephole 115.b	jump optimization
+	mov	%1,a
+	jz	%3
+%2:
+}
 
 replace {
 	clr	a
@@ -3496,29 +3507,63 @@ replace {
 %2:
 } if labelRefCount %2 0
 
-// applies to f.e. malloc.c
-replace {
-	jnz	%1
-%2:
-	mov	%3,#0x00
-	mov	%4,#0x00
-} by {
-	;	Peephole 256.c	loading %3,%4 with zero from a
-	jnz	%1
-	mov	%3,a
-	mov	%4,a
-} if labelRefCount %2 0
-
 // applies to f.e. bug-905492.c
 replace {
 	jnz	%1
 %2:
 	mov	%3,#0x00
 } by {
-	;	Peephole 256.d	loading %3 with zero from a
+	;	Peephole 256.c	loading %3 with zero from a
 	jnz	%1
+%2:
 	mov	%3,a
 } if labelRefCount %2 0
+
+// applies to f.e. malloc.c
+replace {
+	jnz	%1
+%2:
+	mov	%4,%5
+	mov	%3,#0x00
+} by {
+	;	Peephole 256.d	loading %3 with zero from a
+	jnz	%1
+%2:
+	mov	%4,%5
+	mov	%3,a
+} if labelRefCount(%2 0),operandsNotRelated('a' %4)
+
+replace {
+	jnz	%1
+%2:
+	mov	%4,%5
+	mov	%6,%7
+	mov	%3,#0x00
+} by {
+	;	Peephole 256.e	loading %3 with zero from a
+	jnz	%1
+%2:
+	mov	%4,%5
+	mov	%6,%7
+	mov	%3,a
+} if labelRefCount(%2 0),operandsNotRelated('a' %4 %6)
+
+replace {
+	jnz	%1
+%2:
+	mov	%4,%5
+	mov	%6,%7
+	mov	%8,%9
+	mov	%3,#0x00
+} by {
+	;	Peephole 256.f	loading %2 with zero from a
+	jnz	%1
+%2:
+	mov	%4,%5
+	mov	%6,%7
+	mov	%8,%9
+	mov	%3,a
+} if labelRefCount(%2 0),operandsNotRelated('a' %4 %6 %8)
 
 
 // unsigned char i=8; do{ } while(--i != 0);
@@ -4152,7 +4197,7 @@ replace {
 // applies to: a = (a << 1) | (a >> 15);
 replace {
 	mov	a,%1
-	add	a,%1
+	rlc	a
 	mov	%1,a
 	mov	a,%2
 	rlc	a
@@ -4173,7 +4218,6 @@ replace {
 
 // applies to: a = (a << 15) | (a >> 1);
 replace {
-	clr	c
 	mov	a,%1
 	rrc	a
 	mov	%1,a

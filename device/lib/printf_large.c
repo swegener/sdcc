@@ -34,23 +34,6 @@
   #endif
 #endif
 
-#if defined(SDCC_mcs51)
-  #if defined(SDCC_STACK_AUTO)
-    #if defined(SDCC_USE_XSTACK)
-      #define NEAR pdata
-    #else
-      //strange enough "idata" doesn't work
-      #define NEAR data
-    #endif
-  #elif defined(SDCC_MODEL_LARGE)
-    #define NEAR xdata
-  #else
-    #define NEAR data
-  #endif
-#else
-  #define NEAR
-#endif
-
 #if defined(__ds390)
 #define USE_FLOATS 1
 #endif
@@ -60,6 +43,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <sdcc-lib.h>
 
 #define PTR value.ptr
 
@@ -641,7 +625,7 @@ get_conversion_spec:
         // with radix "radix"
 #ifndef ASM_ALLOWED
         unsigned char store[6];
-        unsigned char NEAR *pstore = &store[5];
+        unsigned char _AUTOMEM *pstore = &store[5];
 #endif
 
         // store value in byte[0] (LSB) ... byte[3] (MSB)
@@ -711,8 +695,7 @@ _endasm;
 #endif
           length++;
           lsd = !lsd;
-        } while( (value.byte[0] != 0) || (value.byte[1] != 0) ||
-                 (value.byte[2] != 0) || (value.byte[3] != 0) );
+        } while( value.ul );
 
         if (width == 0)
         {

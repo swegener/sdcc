@@ -1,3 +1,37 @@
+2004-12-09 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/sdcc-lib.h: inserted LGPL, added includes
+	  asm/ds390/features.h and asm/mcs51/features.h
+	* device/include/asm/default/features.h,
+	* device/include/asm/gbz80/features.h,
+	* device/include/asm/z80/features.h: added empty _AUTOMEM
+	  and _STATMEM
+	* device/include/asm/ds390/features.h,
+	* device/include/asm/mcs51/features.h: added files with defines for
+	  _AUTOMEM and _STATMEM indicating automatic and static storage class
+	* device/lib/printf_large.c (_print_format): optimized & used _AUTOMEM
+	* doc/sdccman.lyx: version 2.4.7, updated xstack documentation
+	* src/SDCCicode.c (geniCodeCast),
+	* src/SDCCsymt.c (compareType): allow cast of data-ptr to idata-ptr
+	* src/SDCCloop.c (loopInduction): removed unused variable lr
+	* src/SDCCopt.c (convilong, convertToFcall): moved "easy special case"
+	  to convertToFcall to include char modulo (RFE 1065037), added check
+	  if left operand is unsigned and use abs of literal value
+	* src/SDCCpeeph.c (setFromConditionArgs): removed double quotes option
+	  as it doesn't work after conversion from peephole.def to peephole.rul
+	* src/mcs51/gen.c (toBoolean): added check for size,
+	  (genModOneByte): optimized code for signed char modulo a literal
+	  power of 2 (thanks to Hubert Sack),
+	  (genRRC): removed unnecessary "clr c",
+	  (genRLC): replaced "add a,acc" with cheaper "rlc a"
+	* src/mcs51/peeph.def: renamed 115 to 115.a, added rule 115.b: another
+	  jump optimization,
+	  swapped rules 256.c and 256.d,
+	  extended 256.d by using new multiple checks (thanks Erik),
+	  added rules 256.e and 256.f,
+	  updated rule 261.a and 261.b to new generated code
+	* support/regression/tests/muldiv.c: added test div/mod by a power of 2
+
 2004-12-07 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCloop.c (basicInduction, loopInduction): fixed several

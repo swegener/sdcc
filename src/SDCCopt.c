@@ -397,33 +397,7 @@ convilong (iCode * ic, eBBlock * ebp, sym_link * type, int op)
   int su;
   int bytesPushed=0;
 
-  // Easy special case which avoids function call: modulo by a literal power 
-  // of two can be replaced by a bitwise AND.
-  if (op == '%' && isOperandLiteral(IC_RIGHT(ic)))
-  {
-      unsigned litVal = (unsigned)(operandLitValue(IC_RIGHT(ic)));
-      
-      // See if literal value is a power of 2.
-      while (litVal && !(litVal & 1))
-      {
-	  litVal >>= 1;
-      }
-      if (litVal)
-      {
-	  // discard first high bit set.
-	  litVal >>= 1;
-      }
-	  
-      if (!litVal)
-      {
-	  ic->op = BITWISEAND;
-	  IC_RIGHT(ic) = operandFromLit(operandLitValue(IC_RIGHT(ic)) - 1);
-	  return;
-      }
-  }
-    
   remiCodeFromeBBlock (ebp, ic);    
-    
     
   /* depending on the type */
   for (bwd = 0; bwd < 3; bwd++)
@@ -581,6 +555,32 @@ convertToFcall (eBBlock ** ebbs, int count)
 	      else if (IS_FLOAT (operandType (IC_LEFT (ic))))
 		cnvToFloatCast (ic, ebbs[i]);
 	    }
+
+          // Easy special case which avoids function call: modulo by a literal power
+          // of two can be replaced by a bitwise AND.
+          if (ic->op == '%' && isOperandLiteral(IC_RIGHT(ic)) &&
+              IS_UNSIGNED(operandType(IC_LEFT(ic))))
+            {
+              unsigned litVal = abs(operandLitValue(IC_RIGHT(ic)));
+
+              // See if literal value is a power of 2.
+              while (litVal && !(litVal & 1))
+                {
+                  litVal >>= 1;
+                }
+              if (litVal)
+                {
+                  // discard lowest set bit.
+                  litVal >>= 1;
+                }
+
+              if (!litVal)
+                {
+                  ic->op = BITWISEAND;
+                  IC_RIGHT(ic) = operandFromLit(operandLitValue(IC_RIGHT(ic)) - 1);
+                  continue;
+                }
+            }
 
 	  /* if long / int mult or divide or mod */
 	  if (ic->op == '*' || ic->op == '/' || ic->op == '%')

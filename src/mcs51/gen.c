@@ -1601,7 +1601,7 @@ toBoolean (operand * oper)
   size = AOP_SIZE (oper) - 1;
   offset = 1;
   MOVA (aopGet (AOP (oper), 0, FALSE, FALSE));
-  if (AccUsed && (AOP (oper)->type != AOP_ACC))
+  if (size && AccUsed && (AOP (oper)->type != AOP_ACC))
     {
       pushedB = pushB ();
       emitcode("mov", "b,a");
@@ -4698,6 +4698,61 @@ genModOneByte (operand * left,
   lUnsigned = SPEC_USIGN (getSpec (operandType (left)));
   rUnsigned = SPEC_USIGN (getSpec (operandType (right)));
 
+  /* if right is a literal, check it for 2^n */
+  if (AOP_TYPE(right) == AOP_LIT)
+    {
+      unsigned char val = abs(operandLitValue(right));
+      symbol *lbl2 = NULL;
+
+      switch (val)
+        {
+          case 1: /* sometimes it makes sense (on tricky code and hardware)... */
+          case 2:
+          case 4:
+          case 8:
+          case 16:
+          case 32:
+          case 64:
+          case 128:
+            if (lUnsigned)
+              werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+                      "modulus of unsigned char by 2^n literal shouldn't be processed here");
+              /* because iCode should have been changed to genAnd  */
+              /* see file "SDCCopt.c", function "convertToFcall()" */
+
+            MOVA (aopGet (AOP (left), 0, FALSE, FALSE));
+            emitcode ("mov", "c,acc.7");
+            emitcode ("anl", "a,#0x%02x", val - 1);
+            lbl = newiTempLabel (NULL);
+            emitcode ("jz", "%05d$", (lbl->key + 100));
+            emitcode ("jnc", "%05d$", (lbl->key + 100));
+            emitcode ("orl", "a,#0x%02x", 0xff ^ (val - 1));
+            if (size)
+              {
+                int size2 = size;
+                int offs2 = offset;
+
+                aopPut (AOP (result), "a", 0, isOperandVolatile (result, FALSE));
+                while (size2--)
+                  aopPut (AOP (result), "#0xff", offs2++, isOperandVolatile (result, FALSE));
+                lbl2 = newiTempLabel (NULL);
+                emitcode ("sjmp", "%05d$", (lbl2->key + 100));
+              }
+            emitcode ("", "%05d$:", (lbl->key + 100));
+            aopPut (AOP (result), "a", 0, isOperandVolatile (result, FALSE));
+            while (size--)
+              aopPut (AOP (result), zero, offset++, isOperandVolatile (result, FALSE));
+            if (lbl2)
+              {
+                emitcode ("", "%05d$:", (lbl2->key + 100));
+              }
+            return;
+
+          default:
+            break;
+        }
+    }
+
   pushedB = pushB ();
 
   /* signed or unsigned */
@@ -4722,7 +4777,7 @@ genModOneByte (operand * left,
   /* modulus: sign of the right operand has no influence on the result! */
   if (AOP_TYPE(right) == AOP_LIT)
     {
-      signed char val = (char) floatFromVal (AOP (right)->aopu.aop_lit);
+      signed char val = (char) operandLitValue(right);
 
       if (!rUnsigned && val < 0)
         emitcode ("mov", "b,#0x%02x", -val);
@@ -4833,7 +4888,7 @@ genMod (iCode * ic)
 
   D(emitcode (";     genMod",""));
 
-  /* assign the amsops */
+  /* assign the asmops */
   aopOp (left, ic, FALSE);
   aopOp (right, ic, FALSE);
   aopOp (result, ic, TRUE);
@@ -6565,7 +6620,7 @@ genRRC (iCode * ic)
       emitcode ("rr", "a");
       goto release;
   }
-  CLRC;
+  /* no need to clear carry, bit7 will be written later */
   while (size--)
     {
       l = aopGet (AOP (left), offset, FALSE, FALSE);
@@ -6617,7 +6672,7 @@ genRLC (iCode * ic)
               emitcode("rl","a");
               goto release;
       }
-      emitcode ("add", "a,acc");
+      emitcode("rlc","a"); /* bit0 will be written later */
       if (AOP_SIZE (result) > 1)
         aopPut (AOP (result), "a", offset++, isOperandVolatile (result, FALSE));
       while (size--)

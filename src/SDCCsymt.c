@@ -1894,7 +1894,10 @@ compareType (sym_link * dest, sym_link * src)
           if (IS_PTR (dest) && IS_GENPTR (src) && IS_VOID(src->next)) {
             return -1;
           }
-          if (IS_PTR (src) && IS_GENPTR (dest))
+          if (IS_PTR (src) && 
+              (IS_GENPTR (dest) ||
+               ((DCL_TYPE(src) == POINTER) && (DCL_TYPE(dest) == IPOINTER))
+             ))
             return -1;
           if (IS_PTR (dest) && IS_ARRAY (src)) {
             value *val=aggregateToPointer (valFromType(src));

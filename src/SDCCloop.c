@@ -1018,7 +1018,6 @@ loopInduction (region * loopReg, eBBlock ** ebbs, int count)
 	{
 	  operand *aSym;
 	  long litVal;
-	  int lr = 0;
 
 	  /* consider only * & / */
 	  if (ic->op != '*' && ic->op != '/')

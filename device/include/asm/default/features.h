@@ -5,5 +5,7 @@
 
 #define _REENTRANT	reentrant
 #define _CODE		code
+#define _AUTOMEM
+#define _STATMEM
 
 #endif

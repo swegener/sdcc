@@ -762,8 +762,8 @@ error:
 /*------------------------------------------------------------------*/
 /* setFromConditionArgs - parse a peephole condition's arguments    */
 /* to produce a set of strings, one per argument. Variables %x will */
-/* be replaced with their values. String literals (in single or     */
-/* double quotes) are accepted an return in unquoted form.          */
+/* be replaced with their values. String literals (in single quotes)*/
+/* are accepted and return in unquoted form.                         */
 /*------------------------------------------------------------------*/
 static set *
 setFromConditionArgs (char *cmdLine, hTab * vars)
@@ -798,7 +798,7 @@ setFromConditionArgs (char *cmdLine, hTab * vars)
           else
             goto error;
         }
-      else if (*cmdLine == '"' || *cmdLine == '\'' )
+      else if (*cmdLine == '\'' )
         {
           char quote = *cmdLine;
           
@@ -855,7 +855,7 @@ FBYNAME (operandsNotRelated)
   if (!operands)
     {
       fprintf (stderr,
-               "*** internal error: operandsUnrelated peephole restriction"
+               "*** internal error: operandsNotRelated peephole restriction"
                " malformed: %s\n", cmdLine);
       return FALSE;
     }  

@@ -1,3 +1,10 @@
+2003-04-23  Karl Bongers(apply patches for Martin Helmling)
+
+	 * debugger/mcs51/sdcdb.c,simi.c,cmd.c,..
+	 Martin Helmling added support for ddd GUI debugger.
+	 Code added to display assembly, set variables, and other commands
+	 to interface to ddd.
+
 2003-04-23  Bernhard Held <bernhard@bernhardheld.de>
 
 	* as/Makefile: fix target clean

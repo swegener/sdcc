@@ -2,6 +2,46 @@ sdcc/debugger
 
 SDCDB debugger
 ======================
+Notes April 23, 2003
+
+Martin Helmling added support for ddd GUI debugger.
+Code added to display assembly, set variables, and other commands
+to interface to ddd.
+
+From Martins email:
+
+in the attachment is my actual patch.
+
+The 'up' and 'down' stack commands are not implemented.
+But the features for 'ddd' to see bopth the c source and the assembler 
+works,
+also the display of variables.
+Set variables are only implemented for basic types.
+Register variables can also displayed, but here I think a problem in the 
+*.cdb file exists.
+Sometimes the register name not exists:
+
+S:LcacheTxAnalogValue$offset$1$1({1}SC:U),E,0,0
+S:LcacheTxAnalogValue$i$1$1({1}SC:S),R,0,0,[]
+S:LcacheTxAnalogValue$val$1$1({4}ST__00020000:S),E,0,0
+S:LcacheTxAnalogValue$value$1$1({1}SC:U),R,0,0,[]
+S:LcacheTxAnalogValue$sloc0$1$0({4}SL:U),E,0,0
+S:LsetRelays$addr$1$1({1}SC:U),R,0,0,[r2]
+S:LsetRelays$state$1$1({1}SC:U),R,0,0,[r3]
+S:LsetRelays$value$1$1({1}SC:U),R,0,0,[r5]
+S:L_main$i$1$1({1}SC:U),R,0,0,[]
+S:L_main$j$1$1({1}SC:U),R,0,0,[r3]
+S:L_main$ok$1$1({1}SC:U),R,0,0,[r3]
+
+the empty [] I mean !!
+
+Is this a known bug  in sdcc ?
+
+Also sometimes not the correct breakpoints for stepping found  in sdcdb. 
+I try to fix this tomorrow.
+
+
+
 Notes Feb 10, 2002 - Karl Bongers
 
 SDCDB is a debugger for SDCC compiler.  It works as a front

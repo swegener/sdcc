@@ -226,6 +226,9 @@ extern set *modules  ; /* set of modules   */
 extern set *functions; /* set of functions */
 extern set *symbols  ; /* set of symbols */
 
+extern char *currModName ;
+extern short userinterrupt ;
+extern short showfull ;
 extern int nStructs ;
 extern struct structdef **structs ; /* all structures */
 extern char *ssdirl; /* source directory search path */

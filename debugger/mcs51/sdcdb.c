@@ -39,6 +39,8 @@ int nLinkrecs = 0;
 linkrec **linkrecs = NULL; /* all linkage editor records */
 context *currCtxt = NULL;
 short fullname = 0;
+short showfull = 0;
+short userinterrupt = 0;
 char *ssdirl = DATADIR LIB_DIR_SUFFIX ":" DATADIR LIB_DIR_SUFFIX "/small" ;
 char *simArgs[40];
 int nsimArgs = 0;
@@ -75,19 +77,20 @@ struct cmdtab
     },
     { "c"        ,  cmdContinue   , NULL },
 
+    { "disassemble",cmdDisasmF    , "x disassemble asm commands\n" },
     { "delete" ,  cmdDelUserBp  ,
       "{d}elete n\t\t clears break point number n\n"
     },
+    { "display"    ,  cmdDisplay     ,
+      "display [<variable>]\t print value of given variable each time the program stops\n"
+    },
+    { "undisplay"  ,  cmdUnDisplay   ,
+      "undisplay [<variable>]\t dont display this variable or all\n"
+    },
     { "d"        ,  cmdDelUserBp  , NULL },
 
-    { "help"     ,  cmdHelp       ,
-      "{h|?}elp\t\t this message\n"
-    },
-    { "?"        ,  cmdHelp       , NULL },
-    { "h"        ,  cmdHelp       , NULL },
-
     { "info"     ,  cmdInfo       ,
-      "info <break stack frame registers>\n"
+      "info <break stack frame registers all-registers>\n"
       "\t list all break points, call-stack, frame or register information\n"
     },
 
@@ -106,7 +109,7 @@ struct cmdtab
       "show"
       " <copying warranty>\t copying & distribution terms, warranty\n"
     },
-    { "set"      ,  cmdSetOption  , "set <srcmode>\t\t toggle between c/asm.\n" },
+    { "set"      ,  cmdSetOption  , "set <srcmode>\t\t toggle between c/asm.\nset variable <var> = >value\t\tset variable to new value\n" },
     { "step"     ,  cmdStep       ,
       "{s}tep\t\t\t Step program until it reaches a different source line.\n"
     },
@@ -126,6 +129,9 @@ struct cmdtab
     { "print"    ,  cmdPrint      ,
       "{p}rint <variable>\t print value of given variable\n"
     },
+    { "output"   ,  cmdOutput      ,
+      "output <variable>\t print value of given variable without $ and newline \n"
+    },
     { "p"        ,  cmdPrint      , NULL },
     { "file"     ,  cmdFile       ,
       "file <filename>\t\t load symbolic information from <filename>\n"
@@ -137,14 +143,22 @@ struct cmdtab
       "{fi}nish\t\t execute till return of current function\n"
     },
     { "fi"       ,  cmdFinish     , NULL },
+    { "where"    ,  cmdWhere      , "where\t\t\t print stack\n" },
     { "fr"       ,  cmdFrame      , NULL },
     { "f"        ,  cmdFrame      , NULL },
+    { "x /i"     ,  cmdDisasm1    , "x\t\t disassemble one asm command\n" },
     { "!"        ,  cmdSimulator  ,
       "!<simulator command>\t send a command directly to the simulator\n"
     },
     { "."        ,  cmdSimulator  ,
       ".{cmd}\t switch from simulator or debugger command mode\n"
     },
+    { "help"     ,  cmdHelp       ,
+      "{h|?}elp\t [CMD_NAME | 0,1,2,3(help page)] (general help or specific help)\n"
+    },
+    { "?"        ,  cmdHelp       , NULL },
+    { "h"        ,  cmdHelp       , NULL },
+
     { "quit"     ,  cmdQuit       ,
       "{q}uit\t\t\t \"Watch me now. Iam going Down. My name is Bobby Brown\"\n"
     },
@@ -581,7 +595,8 @@ int cmdFile (char *s,context *cctxt)
     functionPoints();
 
     /* start the simulator & setup connection to it */
-    openSimulator((char **)simArgs,nsimArgs);
+    if ( sock == -1 )
+        openSimulator((char **)simArgs,nsimArgs);
     fprintf(stdout,"%s",simResponse());
     /* now send the filename to be loaded to the simulator */
     sprintf(buffer,"%s.ihx",s);
@@ -613,6 +628,15 @@ int cmdHelp (char *s, context *cctxt)
       endline = ((*s - '0') * 20) + 20;
       if (endline > 0)
         startline = endline - 20;
+    }
+    else if (*s)
+    {
+        for (i = 0 ; i < (sizeof(cmdTab)/sizeof(struct cmdtab)) ; i++) 
+        {
+            if ((cmdTab[i].htxt) && !strcmp(cmdTab[i].cmd,s))
+                fprintf(stdout,"%s",cmdTab[i].htxt);             
+        }
+        return 0;
     }
 
     for (i = 0 ; i < (sizeof(cmdTab)/sizeof(struct cmdtab)) ; i++) {
@@ -693,15 +717,17 @@ int interpretCmd (char *s)
         rv = (*cmdTab[i].cmdfunc)(s + strlen(cmdTab[i].cmd),currCtxt);
 
         /* if full name then give the file name & position */
-        if (fullname && currCtxt && currCtxt->func) {
+        if (fullname && showfull && currCtxt && currCtxt->func) {
+          showfull = 0;
           if (srcMode == SRC_CMODE)
-            fprintf(stdout,"\032\032%s:%d:1\n",
+            fprintf(stdout,"\032\032%s:%d:1:beg:0x%08x\n",
                     currCtxt->func->mod->cfullname,
-                    currCtxt->cline+1);
+                    currCtxt->cline,currCtxt->addr);
           else
-            fprintf(stdout,"\032\032%s:%d:1\n",
+            fprintf(stdout,"\032\032%s:%d:1:beg:0x%08x\n",
                     currCtxt->func->mod->afullname,
-                    currCtxt->asmline+1);
+                    currCtxt->asmline,currCtxt->addr);
+          displayAll(currCtxt);
         }
         goto ret;
       }
@@ -875,6 +901,53 @@ static void parseCmdLine (int argc, char **argv)
 }
 
 /*-----------------------------------------------------------------*/
+/* setsignals -  catch some signals                                */
+/*-----------------------------------------------------------------*/
+#include <signal.h>
+static void
+bad_signal(int sig)
+{
+    if ( simactive )
+        closeSimulator();
+    exit(1);
+}
+
+static void
+sigintr(int sig)
+{
+    /* may be interrupt from user: stop debugger ( also simulator ??) */
+    userinterrupt = 1;
+}
+
+/* the only child can be the simulator */
+static void sigchld(int sig)
+{
+    /* the only child can be the simulator */
+    int status, retpid;
+    retpid = wait ( &status );
+    /* if ( retpid == simPid ) */
+    simactive = 0;
+}
+
+static void
+setsignals()
+{
+    signal(SIGHUP , bad_signal);		
+    signal(SIGINT , sigintr );	
+    signal(SIGTERM, bad_signal);	
+    signal(SIGCHLD, sigchld );
+
+    signal(SIGPIPE, SIG_IGN);
+    signal(SIGABRT, bad_signal);
+    signal(SIGALRM, bad_signal);
+    signal(SIGFPE,  bad_signal);
+    signal(SIGILL,  bad_signal);
+    signal(SIGPIPE, bad_signal);
+    signal(SIGQUIT, bad_signal);
+    signal(SIGSEGV, bad_signal);
+}
+
+/*-----------------------------------------------------------------*/
 /* main -                                                          */
 /*-----------------------------------------------------------------*/
 
@@ -888,6 +961,7 @@ int main ( int argc, char **argv)
     simArgs[nsimArgs++] = "-r 9756";
     /* parse command line */
 
+    setsignals();
     parseCmdLine(argc,argv);
 
     commandLoop();

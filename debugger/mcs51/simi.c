@@ -37,7 +37,7 @@
 FILE *simin ; /* stream for simulator input */
 FILE *simout; /* stream for simulator output */
 
-int sock ; /* socket descriptor to comm with simulator */
+int sock = -1; /* socket descriptor to comm with simulator */
 pid_t simPid;
 static char simibuff[MAX_SIM_BUFF];    /* sim buffer       */
 static char regBuff[MAX_SIM_BUFF];
@@ -63,7 +63,7 @@ Dprintf(D_simi, ("waitForSim start(%d)\n", timeout_ms));
 
     // MS_SLEEP(timeout_ms); dont need, in blocking mode.
 
-    while ((ch = fgetc(simin))) {
+    while ((ch = fgetc(simin)) > 0 ) {
       *sbp++ = ch;
     }
     *sbp = 0;
@@ -180,9 +180,65 @@ char *simResponse()
 /*-----------------------------------------------------------------*/
 void sendSim(char *s)
 {
+    if ( ! simout ) 
+        return;
+
     Dprintf(D_simi, ("sendSim-->%s", s));  // s has LF at end already
     fputs(s,simout);
     fflush(simout);
+}
+
+int simSetValue (unsigned int addr,char mem, int size, unsigned long val)
+{
+    char buffer[40], *s,*prefix;
+    int i;
+    switch (mem) 
+    {
+        case 'A':
+            prefix = "x";
+            break;
+        case 'B':       
+            prefix = "i";
+            break;
+        case 'C':
+        case 'D':
+            prefix = "c";
+            break;
+        case 'E':
+        case 'G':
+            prefix = "i";
+            break;
+        case 'F':
+            prefix = "x";
+            break;
+        case 'H':
+            prefix = "bit" ;
+            break;
+        case 'I':
+            prefix = "sfr" ;
+            break;
+        case 'J':
+            prefix = "sbit" ;
+            break;
+        case 'R':
+            return; /* set registers !! */
+            //prefix = "i" ;
+            break;
+        default:
+            return;
+    }
+    sprintf(buffer,"set mem %s 0x%x",prefix,addr);
+    s = buffer + strlen(buffer);
+    for ( i = 0 ; i < size ; i++ )
+    {
+        sprintf(s," 0x%x", val & 0xff);
+        s += strlen(s);
+        val >>= 8;
+    }
+    sprintf(s,"\n");
+    sendSim(buffer);
+    waitForSim(100,NULL);
+    simResponse();   
 }
 
 /*-----------------------------------------------------------------*/
@@ -205,7 +261,7 @@ unsigned long simGetValue (unsigned int addr,char mem, int size)
       break;
     case 'C':
     case 'D':
-	prefix = "dch";
+    prefix = "dch";
 	break;
     case 'E':
     case 'G':
@@ -221,7 +277,13 @@ unsigned long simGetValue (unsigned int addr,char mem, int size)
 	break;
     case 'I':
 	prefix = "ds" ;
-	break;	
+	break;
+    case 'R':
+	prefix = "i r" ;
+	break;
+    default:
+	prefix = "dump" ;
+	break;
     }
     
     /* create the simulator command */
@@ -244,6 +306,17 @@ unsigned long simGetValue (unsigned int addr,char mem, int size)
     /* then make the branch for bit variables */
     /* skip thru the address part */
     while (isxdigit(*resp)) resp++;
+
+    if (!strcmp(prefix,"i r")) 
+    {
+        /* skip registers */
+        for (i = 0 ; i < addr ; i++ ) 
+        {
+            while (isspace(*resp)) resp++ ;
+            /* skip */
+            while (isxdigit(*resp)) resp++;
+        }
+	}
     
     if (!strcmp(prefix,"dump")) {
 
@@ -427,10 +500,11 @@ char  *simRegs()
          
     resp  = simResponse();
 
+#if 0
     return resp;
 
-#if 0
-  Take this out(2-09-02) cant see as its that useful to reformat, karl.
+#else
+    /*Take this out(2-09-02) cant see as its that useful to reformat, karl.*/
   
     /* the response is of the form 
        XXXXXX R0 R1 R2 R3 R4 R5 R6 R7 ........
@@ -507,12 +581,18 @@ F  0x006d 75 87 80 MOV   PCON,#80
 /*-----------------------------------------------------------------*/
 void closeSimulator ()
 {
-
+    if ( ! simin || ! simout || sock == -1 )
+    {
+        simactive = 0;
+        return;
+    }
     sendSim("q\n");
     kill (simPid,SIGKILL);
     fclose (simin);
     fclose (simout);
     shutdown(sock,2);   
     close(sock);    
-    
+    sock = -1;
 }
+
+

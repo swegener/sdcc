@@ -217,12 +217,12 @@ void listUSERbp ()
   fprintf(stdout,"No breakpoints.\n");
   return ;
     }
-    fprintf(stdout,"Num Address What\n");
+    fprintf(stdout,"Num Type           Disp Enb Address    What\n");
     for ( bp = hTabFirstItem(bptable,&k) ; bp ;
     bp = hTabNextItem(bptable,&k)) {
 
   if (bp->bpType == USER ) {
-      fprintf(stdout,"%-3d 0x%04x  at %s:%d\n",
+      fprintf(stdout,"%-3d breakpoint     keep y   0x%08x at %s:%d\n",
         bp->bpnum,bp->addr,
         bp->filename,bp->lineno);
 

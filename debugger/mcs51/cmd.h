@@ -45,6 +45,16 @@ extern int cmdInfo      (char *, context *);
 extern int cmdShow      (char *, context *);
 extern int cmdFinish    (char *, context *);
 
+extern int cmdUp        (char *, context *);
+extern int cmdDown      (char *, context *);
+extern int cmdWhere     (char *, context *);
+extern int cmdOutput    (char *, context *);
+extern int cmdDisasm1   (char *, context *);
+extern int cmdDisasmF   (char *, context *);
+extern int cmdDisplay   (char *, context *);
+extern int cmdUnDisplay (char *, context *);
+extern void displayAll  (context *);
+
 extern int cmdListModules (char *s, context *cctxt);
 extern int cmdListFunctions (char *s, context *cctxt);
 extern int cmdListSymbols (char *s, context *cctxt);

@@ -27,6 +27,7 @@
 
 #define MAX_SIM_BUFF 8*1024
 //#define SIMNAME "s51"
+extern int sock;
 extern char simactive;
 void  openSimulator (char **,int);
 void waitForSim(int timeout_ms, char *expect);
@@ -40,5 +41,5 @@ void  simReset ();
 char  *simRegs() ;
 unsigned int simGoTillBp (unsigned int);
 unsigned long simGetValue (unsigned int ,char , int );
-
+int simSetValue (unsigned int ,char , int, unsigned long );
 #endif

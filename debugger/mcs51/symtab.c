@@ -25,7 +25,6 @@
 #include "symtab.h"
 #include "newalloc.h"
 
-extern char *currModName ;
 structdef *structWithName (char *);
 
 /*------------------------------------------------------------------*/
@@ -281,8 +280,20 @@ symbol *parseSymbol (char *s, char **rs)
     /* get the stack offset */
     s++;
     nsym->offset = strtol(s,&s,10);
-    *rs = s;
 
+    if ( nsym->addrspace == 'R' )
+    {
+        /* get registeroffset */
+        while (*s && *s != '[') s++ ;
+        s++ ;
+        if ( *s == 'r' )
+        {
+            nsym->addr = strtol(s+1,&s,10);
+        }
+        while (*s && *s != ']') s++ ;
+    }
+
+    *rs = s;
     addSet(&symbols,nsym);
 
     return nsym;

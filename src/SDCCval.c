@@ -450,7 +450,8 @@ value *constVal (char *s)
   /* create the scan string */
   scanFmt[scI++] = '%';
 
-  scanFmt[scI++] = 'L';
+  scanFmt[scI++] = 'l';
+  scanFmt[scI++] = 'l';
 
   if (octal)
     scanFmt[scI++] = 'o';

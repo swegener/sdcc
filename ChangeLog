@@ -1,3 +1,33 @@
+2004-08-29 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* device/lib/pic16/Makefile.common.in: added $(MM) to fix `make clean`
+	* Makefile.common.in,
+	* as/Makefile,
+	* as/hc08/Makefile.in,
+	* as/mcs51/Makefile.in,
+	* as/z80/Makefile.in,
+	* debugger/mcs51/Makefile.in,
+	* device/include/Makefile.in,
+	* device/lib/Makefile.in,
+	* doc/Makefile,
+	* link/Makefile,
+	* link/z80/Makefile.in,
+	* packihx/Makefile.in,
+	* sim/ucsim/main_in.mk,
+	* sim/ucsim/avr.src/Makefile.in,
+	* sim/ucsim/doc/Makefile.in,
+	* sim/ucsim/gui.src/serio.src/Makefile.in,
+	* sim/ucsim/hc08.src/Makefile.in,
+	* sim/ucsim/s51.src/Makefile.in,
+	* sim/ucsim/xa.src/Makefile.in,
+	* sim/ucsim/z80.src/Makefile.in,
+	* src/Makefile.in,
+	* support/cpp2/Makefile.in,
+	* support/librarian/Makefile,
+	* support/makebin/Makefile: added DESTDIR to the install path proposed
+	by "Maciej 'Agaran' Pijanka" <agaran AT pld-linux.org>
+	* doc/sdccman.lyx: added DESTDIR documentation
+
 2004-08-29 Vangelis Rokas (vrokas AT otenet.gr>
 
 	* src/pic16/gen.c (genFunction, genEndFunction): fixed return
@@ -17,6 +47,7 @@
 	* device/lib/_mullong.c: defined an alternate struct layout for big
 	endian ports (hc08)
 
+>>>>>>> 1.812
 2004-08-28 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (shiftL2Left2Result): fix for bug-500536 regression

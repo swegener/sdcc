@@ -2,6 +2,12 @@
  */
 #include <testfwk.h>
 
+#ifdef __mcs51
+#define XDATA xdata
+#else
+#define XDATA
+#endif
+
 void 
 func( unsigned char a )
 {
@@ -11,7 +17,7 @@ func( unsigned char a )
 void
 testBadPromotion(void)
 {
-  unsigned char c=*((unsigned char*)(0xa000));
+  unsigned char c=*((unsigned XDATA char*)(0xa000));
   
   func(c); 
   

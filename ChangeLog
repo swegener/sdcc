@@ -1,3 +1,17 @@
+2002-03-14  Scott Dattalo <scott@dattalo.com>
+	* /src/port.h:
+	Added "char *Processor" field to the port structure.
+
+	* /src/SDCCmain.c:
+	Added -p option. Allows port dependent processor to be specified.
+
+	* all ports:
+	Initialized the new field char *Processor field to NULL in all ports
+
+	* /src/pic/*:
+	Compiler generated registers for interrupt context saving
+	were not getting allocated.
+		
 2002-03-16  Sandeep Dutta  <sandeep@ddi.com>
 
 	* /src/SDCCast.c:
@@ -5,6 +19,19 @@
 	if a) left shifting more than size of operand or b) when assigned
 	to something size > size of left side
 
+2002-03-14  Scott Dattalo <scott@dattalo.com>
+	* src/pic/*
+	tons of changes. Register allocation has been 
+	rewritten. Added customization for the various PICs. Flow
+	analysis is restructured. ...
+
+	* src/pic/device.h:
+	Added
+
+	* src/pic/device.c:
+	Added. device.c is a PIC port hack to accomodate variations
+	in PIC devices.
+	
 2002-03-04  johanknol  <johanknol@manik>
 
 	* /src/SDCCval.c: fixed

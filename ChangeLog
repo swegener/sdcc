@@ -1,3 +1,9 @@
+2005-02-10 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/bitvars.c,
+	* support/regression/tests/bitwise.c,
+	* support/regression/tests/rotate.c: "fixed" problems on Alpha
+
 2005-02-10 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/pcode.c (assignToSameBank) : fixed cast to pointer of

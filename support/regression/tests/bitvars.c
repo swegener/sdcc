@@ -14,6 +14,12 @@
 #define NO_BITS
 #endif
 
+#if defined __GNUC__
+  #if (__GNUC__ < 3)
+  //since this fails on GCC 2.95.4 on alpha and I don't know how to detect alpha...
+  #define NO_BITS
+#endif
+
 #ifndef NO_BITS
 
 #define TYPE_{type}
@@ -38,7 +44,7 @@ testBits(void)
 #ifndef NO_BITS
   bool x = 2;
   ASSERT (foo(x,3,4) == 6);
-  
+
   ASSERT (complement (~_0, 1));
   ASSERT (complement (~_1, 1));
 

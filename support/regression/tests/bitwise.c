@@ -1,5 +1,5 @@
 /** Test the bitwise operators.
-    
+
     type: char, short, long
     attr: volatile,
     storage: static,
@@ -29,5 +29,10 @@ testTwoOpBitwise(void)
     ASSERT(({type})(left ^ 0xc1ec) == ({type})0xFC1B);
     ASSERT(({type})(0x3df7 ^ right) == ({type})0xFC1B);
 
+#if defined (__GNUC__) && (__GNUC__ < 3)
+    // long is 64 bits on GCC 2.95.4 on alpha and I don't know how to detect alpha...
+    ASSERT(({type})(~left) == ({type})0xFFFFFFFFFFFFC208);
+#else
     ASSERT(({type})(~left) == ({type})0xFFFFC208);
+#endif
 }

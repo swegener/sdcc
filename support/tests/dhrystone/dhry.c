@@ -154,7 +154,7 @@ int main(void)
     for (Run_Index = 1; Run_Index <= Number_Of_Runs; ++Run_Index) {
 	DPRINTF(("Run_Index = %d\n", Run_Index));
 	if (!(Run_Index & 1023))
-	    printf("Loops: %u\r", Run_Index);
+	    printf("Loops: %u\r\n", Run_Index);
 	Proc_5();
 	Proc_4();
 	/* Ch_1_Glob == 'A', Ch_2_Glob == 'B', Bool_Glob == true */
@@ -280,9 +280,9 @@ int main(void)
     printf ("        should be:   %d\n", (int)7);
     printf ("Enum_Loc:            %d\n", Enum_Loc);
     printf ("        should be:   %d\n", (int)1);
-    printf ("Str_1_Loc:           %s\n", Str_1_Loc);
+    printf ("Str_1_Loc:           %s\n", (char _generic *)Str_1_Loc);
     printf ("        should be:   DHRYSTONE PROGRAM, 1'ST STRING\n");
-    printf ("Str_2_Loc:           %s\n", Str_2_Loc);
+    printf ("Str_2_Loc:           %s\n", (char _generic *)Str_2_Loc);
     printf ("        should be:   DHRYSTONE PROGRAM, 2'ND STRING\n");
     printf ("\n");
 #endif

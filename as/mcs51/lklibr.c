@@ -182,7 +182,7 @@ char *libfil;
 	if (libfil[0] == '/') { libfil++; }
 #endif
 	strcat(str,libfil);
-	if(strchr(str,FSEPX) == NULL) {
+	if(strchr(libfil,FSEPX) == NULL) {
 		sprintf(&str[strlen(str)], "%clib", FSEPX);
 	}
 	if ((fp = fopen(str, "r")) != NULL) {
@@ -398,7 +398,7 @@ char *name;
 		    } else {
 			strcat(str,relfil);
 		    }
-		    if(strchr(str,FSEPX) == NULL) {
+		    if(strchr(relfil,FSEPX) == NULL) {
 			sprintf(&str[strlen(str)], "%crel", FSEPX);
 		    }
 /*3*/		    if ((fp = fopen(str, "r")) != NULL) {

@@ -886,10 +886,6 @@ killDeadCode (eBBlock ** ebbs, int count)
 	      if (IC_LEFT(ic) && isOperandVolatile (IC_LEFT (ic), TRUE))
 		continue;
 
-	      /* if the right operand is volatile then continue */
-	      if (IC_RIGHT(ic) && isOperandVolatile (IC_RIGHT (ic), TRUE))
-		continue;
-
 
 	      /* if the result is a temp & isaddr then skip */
 	      if (IC_RESULT (ic) && POINTER_SET (ic))

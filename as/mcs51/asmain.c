@@ -815,7 +815,7 @@ loop:
 		p = optsdcc;
 		if ((c = getnb()) != 0) {
 			do {
-				if (p < &tb[NINPUT-1])
+				if (p < &optsdcc[NINPUT-1])
 					*p++ = c;
 			} while ((c = get()) != 0);
 		}

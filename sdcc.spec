@@ -17,7 +17,7 @@ BuildRoot:     %{_tmppath}/%{name}-%{version}-build
 
 %description
 SDCC is a C compiler for 8051 class and similar microcontrollers.
-The packge includes the compiler, assemblers and linkers, a device
+The package includes the compiler, assemblers and linkers, a device
 simulator and a core library. The processors supported (to a varying
 degree) include the 8051, ds390, z80, hc08, and PIC.
 

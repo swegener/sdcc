@@ -927,7 +927,7 @@ fetchLitSpecial (asmop * aop, bool negate, bool xor)
   if (xor)
     v ^= 0x8000;
   if (negate)
-    v = -v;
+    v = 0-v;
   v &= 0xFFFF;
 
   tsprintf (buffer, "!immedword", v);

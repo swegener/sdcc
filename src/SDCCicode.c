@@ -839,9 +839,6 @@ isOperandGlobal (operand * op)
 int 
 isOperandVolatile (operand * op, bool chkTemp)
 {
-  sym_link *optype;
-  sym_link *opetype;
-
   if (IS_ITEMP (op) && !chkTemp)
     return 0;
 

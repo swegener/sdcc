@@ -4,7 +4,8 @@
 
 	Adding version extension according to ChangeLog CVS revision
 	* src/Makefile.in (target all): added dependency 'version.h'
-	* (rule version.h): added rule to create version.h from ChangeLog
+	* (rule version.h): added rule to create version.h from ChangeLog,
+	* (rule dep): added dependency version.h,
 	* src/version.awk: AWK script to create version.h
 	* src/SDCCdwarf2.c (dwWriteModule),
 	* src/SDCCglue.c (initialComments),

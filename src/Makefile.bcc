@@ -20,12 +20,15 @@ SLIBOBJS        = $(SLIB)/SDCCerr.obj $(SLIB)/NewAlloc.obj $(SLIB)/MySystem.obj 
 
 TARGET          = $(PRJDIR)/bin/sdcc.exe
 
-all: $(TARGET)
+all: version.h $(TARGET)
 
 ports: $(PORT_LIBS)
 
 $(TARGET): $(OBJECTS) $(SLIBOBJS) ports
         $(CC) -e$(TARGET) $(OBJECTS) $(SLIBOBJS) $(PORT_LIBS) $(LIBGC)
+
+version.h: ../ChangeLog
+        gawk -f version.awk $< > $@
 
 mcs51/port.lib:
         cd mcs51

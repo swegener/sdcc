@@ -84,7 +84,7 @@ installdirs:
 
 # Creating dependencies
 # ---------------------
-dep: Makefile.dep
+dep: version.h Makefile.dep
 
 Makefile.dep: $(SOURCES) $(SLIBSOURCES) $(SPECIAL) *.h $(PRJDIR)/*.h
 	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(SOURCES) $(SLIBSOURCES) >Makefile.dep

@@ -9,6 +9,7 @@
 	src/pic/Makefile.bcc, src/pic16/Makefile.bcc, src/xa15/Makefile.bcc,
 	src/z80/Makefile.bcc: Borland Makefile cleanup
 	* as/z80/Makefile.bcc: Added Borland Makefile
+	* support/cpp2/borland.h: Removed
 
 2003-02-10  Bernhard Held <bernhard@bernhardheld.de>
 

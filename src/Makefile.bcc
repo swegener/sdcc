@@ -23,7 +23,7 @@ all: $(TARGET)
 
 ports: $(PORT_LIBS)
 
-$(TARGET): ports $(OBJECTS) $(SLIBOBJS)
+$(TARGET): $(OBJECTS) $(SLIBOBJS) ports
         $(CC) -e$(TARGET) $(OBJECTS) $(SLIBOBJS) $(PORT_LIBS) $(LIBGC)
 
 mcs51/port.lib:
@@ -62,4 +62,4 @@ SDCCy.c: SDCC.y
         $(YACC) -d -v -o $< SDCC.y
 
 SDCClex.c: SDCC.lex SDCCy.h
-        $(LEX) -o $< SDCC.lex
+        $(LEX) -o$< SDCC.lex

@@ -1,3 +1,11 @@
+2001-12-17  Bernhard Held  <bernhard@bernhardheld.de>
+
+	* support/regression/Makefile: added test for mcs51 model large
+
+	* support/regression/ports/mcs51-large/spec.mk: added test for mcs51 model large
+
+	* support/regression/ports/gbz80/spec.mk: added -mgbz80
+
 2001-12-05  Michael Hope  <michaelh@juju.net.nz>
 
 	* src/diff.1 (Index): Many, many optmisiations.  Dhrystone up to 201.

@@ -1,3 +1,7 @@
+2004-09-01 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/sprintf.c: forgot to add this file before previous commit
+
 2004-09-01 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/gen.c (genPackBits): added operand right in function

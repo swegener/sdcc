@@ -1488,7 +1488,7 @@ checkType (sym_link * dest, sym_link * src)
 }
 
 /*------------------------------------------------------------------*/
-/* inCalleeSaveList - return 1 if found in calle save list          */
+/* inCalleeSaveList - return 1 if found in callee save list          */
 /*------------------------------------------------------------------*/
 bool 
 inCalleeSaveList (char *s)
@@ -1649,13 +1649,16 @@ checkFunction (symbol * sym)
   if (SPEC_INTRTN (csym->etype) != SPEC_INTRTN (sym->etype))
     {
       werror (E_PREV_DEF_CONFLICT, csym->name, "interrupt");
-      return 0;
     }
 
   if (SPEC_BANK (csym->etype) != SPEC_BANK (sym->etype))
     {
       werror (E_PREV_DEF_CONFLICT, csym->name, "using");
-      return 0;
+    }
+
+  if (SPEC_NAKED (csym->etype) != SPEC_NAKED (sym->etype))
+    {
+      werror (E_PREV_DEF_CONFLICT, csym->name, "_naked");
     }
 
   /* compare expected agrs with actual args */

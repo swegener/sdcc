@@ -2210,7 +2210,7 @@ packForPush (iCode * ic, eBBlock * ebp)
   /* make sure the right side does not have any definitions
      inbetween */
   dbv = OP_DEFS(IC_RIGHT(dic));
-  for (lic = ic; lic != dic ; lic = lic->prev) {
+  for (lic = ic; lic && lic != dic ; lic = lic->prev) {
 	  if (bitVectBitValue(dbv,lic->key)) return ;
   }
   /* make sure they have the same type */

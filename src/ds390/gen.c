@@ -1758,7 +1758,8 @@ saveRegisters (iCode * lic)
 
   /* if the registers have been saved already then
      do nothing */
-  if (ic->regsSaved || (OP_SYMBOL (IC_LEFT (ic))->calleeSave))
+  if (ic->regsSaved || (OP_SYMBOL (IC_LEFT (ic))->calleeSave) ||
+      SPEC_NAKED(OP_SYM_ETYPE(IC_LEFT(ic))))
     return;
 
   /* find the registers in use at this time
@@ -1796,16 +1797,8 @@ saveRegisters (iCode * lic)
       }
 
   detype = getSpec (operandType (IC_LEFT (ic)));
-
-#if 0 // why should we do this here??? jwk20011105
-  if (detype &&
-      (SPEC_BANK (currFunc->etype) != SPEC_BANK (detype)) &&
-      IS_ISR (currFunc->etype) &&
-      !ic->bankSaved)
-    saveRBank (SPEC_BANK (detype), ic, TRUE);
-#endif
-
 }
+
 /*-----------------------------------------------------------------*/
 /* unsaveRegisters - pop the pushed registers                      */
 /*-----------------------------------------------------------------*/
@@ -2183,11 +2176,11 @@ genCall (iCode * ic)
 
   D (emitcode (";", "genCall "););
 
-  /* if we are calling a function that is not using
+  /* if we are calling a not _naked function that is not using
      the same register bank then we need to save the
      destination registers on the stack */
   detype = getSpec (operandType (IC_LEFT (ic)));
-  if (detype &&
+  if (detype && !SPEC_NAKED(detype) &&
       (SPEC_BANK (currFunc->etype) != SPEC_BANK (detype)) &&
       IS_ISR (currFunc->etype))
   {

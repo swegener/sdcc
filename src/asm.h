@@ -27,6 +27,7 @@ struct _ASM_MAPPINGS
 extern const ASM_MAPPINGS asm_asxxxx_mapping;
 extern const ASM_MAPPINGS asm_gas_mapping;
 extern const ASM_MAPPINGS asm_a390_mapping;
+extern const ASM_MAPPINGS asm_xa_asm_mapping;
 
 /** Last entry has szKey = NULL.
  */

@@ -57,7 +57,7 @@ static int regParmFlg = 0;	/* determine if we can register a parameter */
 static void
 _xa51_init (void)
 {
-  asm_addTree (&asm_asxxxx_mapping);
+  asm_addTree (&asm_xa_asm_mapping);
 }
 
 static void

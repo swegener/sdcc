@@ -972,7 +972,13 @@ static void genPointerGet (iCode * ic, iCode *pi) {
       } else {
 	instr=MOVW;
       }
-      emitcode (instr, "%s,[%s]", AOP_NAME(result)[0], AOP_NAME(left)[0]);
+      // if result=onstack
+      if (AOP_TYPE(result)==AOP_STK) {
+	emitcode (instr, "r0,[%s]", AOP_NAME(left)[0]);
+	emitcode (instr, "%s,r0", AOP_NAME(result)[0]);
+      } else {
+	emitcode (instr, "%s,[%s]", AOP_NAME(result)[0], AOP_NAME(left)[0]);
+      }
       if (AOP_SIZE(result) > 2) {
 	// result is generic pointer
 	sym_link *optype=operandType(left);
@@ -996,7 +1002,7 @@ static void genPointerGet (iCode * ic, iCode *pi) {
 	  emitcode ("mov", "%s,r0", AOP_NAME(result)[0]);
 	}
       } else {
-	if (AOP_SIZE(result)==3) {
+	if (AOP_SIZE(result)==1) {
 	  emitcode ("mov.b", "%s,%s", AOP_NAME(result)[0], AOP_NAME(left)[0]);
 	} else {
 	  emitcode ("mov.w", "%s,%s", AOP_NAME(result)[0], AOP_NAME(left)[0]);
@@ -1229,18 +1235,33 @@ static void genAssign (iCode * ic) {
   } else {
     instr=MOVW;
   }
-  emitcode (instr, "%s,%s",
-	    result->aop->name[0], right->aop->name[0]);
+  if (AOP_TYPE(right)==AOP_STK && AOP_TYPE(result)==AOP_STK) {
+    emitcode (instr, "%s,%s", size==1 ? "r0l":"r0", right->aop->name[0]);
+    emitcode (instr, "%s,%s", AOP_NAME(result)[0], size==1 ? "r0l":"r0");
+  } else {
+    emitcode (instr, "%s,%s",
+	      result->aop->name[0], right->aop->name[0]);
+  }
   if (AOP_SIZE(result) > 2) {
+    if (AOP_TYPE(right)==AOP_LIT) {
+      emitcode (instr, "%s,%s", result->aop->name[1], 
+		*AOP_NAME(right)[1] ? AOP_NAME(right)[1] : "#0x00");
+      return;
+    }
     if (size==3) {
       instr=MOVB;
     } else {
       instr=MOVW;
     }
-    emitcode (instr, "%s,%s",
-	      result->aop->name[1], right->aop->name[1]);
+    if (AOP_TYPE(right)==AOP_STK && AOP_TYPE(result)==AOP_STK) {
+      emitcode (instr, "%s,%s", size==1 ? "r0l":"r0", right->aop->name[1]);
+      emitcode (instr, "%s,%s", AOP_NAME(result)[1], size==1 ? "r0l":"r0");
+    } else {
+      emitcode (instr, "%s,%s",
+		result->aop->name[1], right->aop->name[1]);
+    }
+    return;
   }
-  
 }
 
 /*-----------------------------------------------------------------*/

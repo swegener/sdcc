@@ -1143,7 +1143,7 @@ emitMaps ()
 
   emitStaticSeg (statsg, code->oFile);
   if (port->genXINIT) {
-    fprintf (code->oFile, "\t.area\t%s\n", xinit->sname);
+    tfprintf (code->oFile, "\t!area\n", xinit->sname);
     emitStaticSeg (xinit, code->oFile);
   }
   inInitMode--;

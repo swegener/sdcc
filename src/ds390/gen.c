@@ -1792,15 +1792,15 @@ saveRegisters (iCode * lic)
     for (i = 0; i < ds390_nRegs; i++)
       {
 	if (bitVectBitValue (rsave, i))
-	  emitcode ("push", "%s ;jwk saveRegisters", ds390_regWithIdx (i)->dname);
+	  emitcode ("push", "%s", ds390_regWithIdx (i)->dname);
       }
 
   detype = getSpec (operandType (IC_LEFT (ic)));
-  if (detype &&
+  if (/* why would we do this?: jwk20010511 */ 0 &&
+      detype &&
       (SPEC_BANK (currFunc->etype) != SPEC_BANK (detype)) &&
       IS_ISR (currFunc->etype) &&
       !ic->bankSaved)
-
     saverbank (SPEC_BANK (detype), ic, TRUE);
 
 }
@@ -1841,7 +1841,7 @@ unsaveRegisters (iCode * ic)
     for (i = ds390_nRegs; i >= 0; i--)
       {
 	if (bitVectBitValue (rsave, i))
-	  emitcode ("pop", "%s ;jwk unsaveRegisters", ds390_regWithIdx (i)->dname);
+	  emitcode ("pop", "%s", ds390_regWithIdx (i)->dname);
       }
 
 }
@@ -1963,7 +1963,7 @@ genIpush (iCode * ic)
 	      MOVA (l);
 	      l = "acc";
 	    }
-	  emitcode ("push", "%s ;jwk genIpush: !parm", l);
+	  emitcode ("push", "%s", l);
 	}
       _endLazyDPSEvaluation ();
       return;
@@ -2000,7 +2000,7 @@ genIpush (iCode * ic)
 	  emitcode ("push", "acc");
 	}
       else
-	emitcode ("push", "%s ;jwk genIpush", l);
+	emitcode ("push", "%s", l);
     }
   _endLazyDPSEvaluation ();
 
@@ -2029,7 +2029,7 @@ genIpop (iCode * ic)
   _startLazyDPSEvaluation ();
   while (size--)
     {
-      emitcode ("pop", "%s ;jwk genIpop", aopGet (AOP (IC_LEFT (ic)), offset--,
+      emitcode ("pop", "%s", aopGet (AOP (IC_LEFT (ic)), offset--,
 				     FALSE, TRUE, TRUE));
     }
   _endLazyDPSEvaluation ();
@@ -2149,13 +2149,9 @@ static void
 genCall (iCode * ic)
 {
   sym_link *detype;
+  int bankSwitched=0;
 
-  D (emitcode (";", "genCall ");
-    );
-
-  /* if caller saves & we have not saved then */
-  if (!ic->regsSaved)
-    saveRegisters (ic);
+  D (emitcode (";", "genCall "););
 
   /* if we are calling a function that is not using
      the same register bank then we need to save the
@@ -2164,10 +2160,19 @@ genCall (iCode * ic)
   if (detype &&
       (SPEC_BANK (currFunc->etype) != SPEC_BANK (detype)) &&
       IS_ISR (currFunc->etype) &&
-      !ic->bankSaved)
-
-    saverbank (SPEC_BANK (detype), ic, TRUE);
-
+      !ic->bankSaved) {
+    bankSwitched=1;
+  }
+  
+  /* if caller saves & we have not saved then */
+  if (!ic->regsSaved) {
+    if (bankSwitched) {
+      // no need to save if we switch banks
+    } else {
+      saveRegisters (ic);
+    }
+  }
+  
   /* if send set is not empty the assign */
   if (_G.sendSet)
     {
@@ -2189,7 +2194,7 @@ genCall (iCode * ic)
 	      if (strcmp (l, fReturn[offset])) {
 		genSetDPTR(0);
 		_flushLazyDPS();
-		emitcode ("mov", "%s,%s ;jwk lazy genCall",
+		emitcode ("mov", "%s,%s",
 			  fReturn[offset],
 			  l);
 	      }
@@ -2200,6 +2205,11 @@ genCall (iCode * ic)
 	}
       _G.sendSet = NULL;
     }
+
+  if (bankSwitched) {
+    saverbank(SPEC_BANK(detype), ic, TRUE);
+  }
+
   /* make the call */
   emitcode ("lcall", "%s", (OP_SYMBOL (IC_LEFT (ic))->rname[0] ?
 			    OP_SYMBOL (IC_LEFT (ic))->rname :
@@ -2258,18 +2268,16 @@ genCall (iCode * ic)
       else
 	for (i = 0; i < ic->parmBytes; i++)
 	  emitcode ("dec", "%s", spname);
-
     }
 
   /* if register bank was saved then pop them */
-  if (ic->bankSaved)
+  if (bankSwitched) {
     unsaverbank (SPEC_BANK (detype), ic, TRUE);
-
-  /* if we hade saved some registers then unsave them */
-  if (ic->regsSaved && !(OP_SYMBOL (IC_LEFT (ic))->calleeSave))
-    unsaveRegisters (ic);
-
-
+  } else {
+    /* if we have saved some registers then unsave them */
+    if (ic->regsSaved && !(OP_SYMBOL (IC_LEFT (ic))->calleeSave))
+      unsaveRegisters (ic);
+  }
 }
 
 /*-----------------------------------------------------------------*/
@@ -2284,7 +2292,6 @@ genPcall (iCode * ic)
   D (emitcode (";", "genPcall ");
     );
 
-
   /* if caller saves & we have not saved then */
   if (!ic->regsSaved)
     saveRegisters (ic);
@@ -2297,7 +2304,6 @@ genPcall (iCode * ic)
       IS_ISR (currFunc->etype) &&
       (SPEC_BANK (currFunc->etype) != SPEC_BANK (detype)))
     saverbank (SPEC_BANK (detype), ic, TRUE);
-
 
   /* push the return address on to the stack */
   emitcode ("mov", "a,#%05d$", (rlbl->key + 100));
@@ -8142,15 +8148,15 @@ genGenPointerGet (operand * left,
 	    l=aopGet(AOP(left),0,FALSE,FALSE,TRUE);
 	    genSetDPTR(0);
 	    _flushLazyDPS();
-	    emitcode ("mov", "dpl,%s ;jwk lazy genGenPointerGet", l);
+	    emitcode ("mov", "dpl,%s", l);
 	    l=aopGet(AOP(left),1,FALSE,FALSE,TRUE);
 	    genSetDPTR(0);
 	    _flushLazyDPS();
-	    emitcode ("mov", "dph,%s ;jwk lazy genGenPointerGet", l);
+	    emitcode ("mov", "dph,%s", l);
 	    l=aopGet(AOP(left),2,FALSE,FALSE,TRUE);
 	    genSetDPTR(0);
 	    _flushLazyDPS();
-	    emitcode ("mov", "dpx,%s ;jwk lazy genGenPointerGet", l);
+	    emitcode ("mov", "dpx,%s", l);
 	    emitcode ("mov", "b,%s", aopGet (AOP(left),3,FALSE,FALSE,TRUE));
 	  } else {
 	    emitcode ("mov", "dpl,%s", aopGet (AOP(left),0,FALSE,FALSE,TRUE));

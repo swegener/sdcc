@@ -66,6 +66,10 @@
    #ifdef MCS51REG_DISABLE_WARNINGS added - B. Torok / bela.torok@kssg.ch
    Support for the Philips P80C552 added - Bernhard Held / Bernhard.Held@otelo-online.de
 
+   Version 1.0.8 (Feb 28, 2002)
+   Dallas DS89C420 definitions corrected by B. Torok / bela.torok@kssg.ch
+   Revised by lanius@ewetel.net
+
 
    Adding support for additional microcontrollers:
    -----------------------------------------------
@@ -553,7 +557,7 @@
 #define P1_EXT__INT5__INT4__INT3__INT2__TXD1__RXD1__T2EX__T2
 #define WDCON
 #define EIE__x__x__x__EWDI__EX5__EX4__EX3__EX2
-#define EIP__x__x__x__PWDI__PX5__PX4__PX3__PX2__PX1__PX0
+#define EIP__x__x__x__PWDI__PX5__PX4__PX3__PX2
 #endif
 // end of definitions for the Dallas DS80C320 and DS80C323 microcontrollers
 
@@ -686,7 +690,6 @@
 #endif
 // end of definitions for the Dallas DS80C390
 
-
 // definitions for the Dallas DS89C420 microcontroller
 #ifdef MICROCONTROLLER_DS89C420
 #ifdef MICROCONTROLLER_DEFINED
@@ -728,7 +731,7 @@
 #define TL2
 #define TH2
 // DS8XC420 specific registers
-#define ACON__PAGEE__PAGES__PAGE0__x__x__x__x__x
+#define ACON__PAGEE__PAGES1__PAGES0__x__x__x__x__x
 #define DPL1
 #define DPH1
 #define DPS__ID1__ID0__TSL__AID__x__x__x__SEL
@@ -737,26 +740,25 @@
 #define IP0__x__LPS1__LPT2__LPS0__LPT1__LPX1__LPT0__LPX0
 #define IP1__x__MPS1__MPT2__MPS0__MPT1__MPX1__MPT0__MPX0
 #define EXIF__IE5__IE4__IE3__IE2__CKRY__RGMD__RGSL__BGS
-#define PMR__CD1__CD0__SWB__x__XTOFF__ALEOFF__DME1_DME0
+#define PMR__CD1__CD0__SWB__CTM__4X_2X__ALEON__DME1__DME0
 #define SADDR0
 #define SADDR1
 #define SADEN0
 #define SADEN1
 #define SCON1
 #define SBUF1
-#define STATUS__PIP__HIP__LIP__x__SPTA1__SPRA1__SPTA0__SPRA0
-
+#define STATUS__PIS2__PIS1__PIS0__x__SPTA1__SPRA1__SPTA0__SPRA0
 #define TA
 #define T2MOD__x__x__x__x__x__x__T2OE__DCEN
 #define P1_EXT__INT5__INT4__INT3__INT2__TXD1__RXD1__T2EX__T2
-#define WDCON
-#define ROMSIZE__HBPF__BPF__TE__MOVCX__PRAME__RMS2__RMS1__RMS0
+#define ROMSIZE__x__x__x__x__PRAME__RMS2__RMS1__RMS0
 #define WDCON
 #define EIE__x__x__x__EWDI__EX5__EX4__EX3__EX2
-#define EIP__x__x__x__PWDI__PX5__PX4__PX3__PX2__PX1__PX0
+#define EIP0__x__x__x__LPWDI__LPX5__LPX4__LPX3__LPX2
+#define EIP1__x__x__x__MPWDI__MPX5__MPX4__MPX3__MPX2
+#define FCNTL__FBUSY__FERR__x__x__FC3__FC2__FC1__FC0
 #endif
 // end of definitions for the Dallas DS89C420 microcontroller
-
 
 // definitions for the Dallas DS87C520 and DS83C520 microcontrollers
 #ifdef MICROCONTROLLER_DS8XC520
@@ -804,7 +806,7 @@
 #define DPS__x__x__x__x__x__x__x__SEL
 #define CKCON
 #define EXIF__IE5__IE4__IE3__IE2__XT_RG__RGMD__RGSL__BGS
-#define PMR__CD1__CD0__SWB__x__XTOFF__ALEOFF__DME1_DME0
+#define PMR__CD1__CD0__SWB__x__XTOFF__ALEOFF__DME1__DME0
 #define SADDR0
 #define SADDR1
 #define SADEN0
@@ -820,7 +822,7 @@
 #define BP2
 #define WDCON
 #define EIE__x__x__x__EWDI__EX5__EX4__EX3__EX2
-#define EIP__x__x__x__PWDI__PX5__PX4__PX3__PX2__PX1__PX0
+#define EIP__x__x__x__PWDI__PX5__PX4__PX3__PX2
 #endif
 // end of definitions for the Dallas DS87C520 and DS83C520 microcontrollers
 
@@ -1142,7 +1144,7 @@
 #ifndef MICROCONTROLLER_DEFINED
 #define MICROCONTROLLER_DEFINED
 #ifdef MCS51REG_ENABLE_WARNINGS
-#warning No microcontroller defined! 
+#warning No microcontroller defined!
 #warning Code generated for the 8051
 #endif
 // 8051 register set
@@ -1211,13 +1213,13 @@
 sfr at 0xE0 ACC  ;
 #endif
 
-#ifdef ACON__PAGEE__PAGES__PAGE0__x__x__x__x__x
-#undef ACON__PAGEE__PAGES__PAGE0__x__x__x__x__x
+#ifdef ACON__PAGEE__PAGES1__PAGES0__x__x__x__x__x
+#undef ACON__PAGEE__PAGES1__PAGES0__x__x__x__x__x
 sfr at 0x9D ACON   ; // DS89C420 specific
 // Not directly accessible bits
-#define PAGE0   0x20
-#define PAGES   0x40
-#define PAGEE   0x80
+#define PAGES0   0x20
+#define PAGES1   0x40
+#define PAGEE    0x80
 #endif
 
 #ifdef ACON__x__x__x__x__x__SA__AM1__AM0
@@ -2057,8 +2059,8 @@ sbit at 0xEE C0IE   ;
 sbit at 0xEF CANBIE ;
 #endif
 
-#ifdef EIP__x__x__x__PWDI__PX5__PX4__PX3__PX2__PX1__PX0
-#undef EIP__x__x__x__PWDI__PX5__PX4__PX3__PX2__PX1__PX0
+#ifdef EIP__x__x__x__PWDI__PX5__PX4__PX3__PX2
+#undef EIP__x__x__x__PWDI__PX5__PX4__PX3__PX2
 sfr at 0xF8 EIP  ;
 // Bit registers DS80C320 specific
 sbit at 0xF8 PX2    ;
@@ -2080,6 +2082,28 @@ sbit at 0xFC PWDI   ;
 sbit at 0xFD C1IP   ;
 sbit at 0xFE C0IP   ;
 sbit at 0xFF CANBIP ;
+#endif
+
+#ifdef EIP0__x__x__x__LPWDI__LPX5__LPX4__LPX3__LPX2
+#undef EIP0__x__x__x__LPWDI__LPX5__LPX4__LPX3__LPX2
+sfr at 0xF8 EIP0  ;
+// Bit registers DS89C420 specific
+sbit at 0xF8 LPX2    ;
+sbit at 0xF9 LPX3    ;
+sbit at 0xFA LPX4    ;
+sbit at 0xFB LPX5    ;
+sbit at 0xFC LPWDI   ;
+#endif
+
+#ifdef EIP1__x__x__x__MPWDI__MPX5__MPX4__MPX3__MPX2
+#undef EIP1__x__x__x__MPWDI__MPX5__MPX4__MPX3__MPX2
+sfr at 0xF1 EIP1  ;
+// Not directly accessible Bits DS89C420 specific
+#define MPX2   0x01
+#define MPX3   0x02
+#define MPX4   0x04
+#define MPX5   0x08
+#define MPWDI  0x10
 #endif
 
 #ifdef ESP
@@ -2131,6 +2155,23 @@ sfr at 0x91 EXIF  ;
 #define IE5    0x80
 #endif
 
+#ifdef FCNTL__FBUSY__FERR__x__x__FC3__FC2__FC1__FC0
+#undef FCNTL__FBUSY__FERR__x__x__FC3__FC2__FC1__FC0
+sfr at 0xD5 FCNTL  ;
+// Not directly accessible DS89C420 specific
+#define FC0    0x01
+#define FC1    0x02
+#define FC2    0x04
+#define FC3    0x08
+#define FERR   0x40
+#define FBUSY  0x80
+#endif
+
+#ifdef FDATA
+#undef FDATA
+sfr at 0xD6 FDATA  ;
+#endif
+
 #ifdef IE__EA__x__x__ES__ET1__EX1__ET0__EX0
 #undef IE__EA__x__x__ES__ET1__EX1__ET0__EX0
 sfr at 0xA8 IE   ;
@@ -2159,7 +2200,7 @@ sbit at 0xAF EA   ;
 #ifdef IE__EA__EAD__ES1__ES0__ET1__EX1__ET0__EX0
 #undef IE__EA__EAD__ES1__ES0__ET1__EX1__ET0__EX0
 sfr at 0xA8 IE		; // same as IEN0 - Interrupt enable 0, P80C552 specific
-sfr at 0xA8 IEN0    ; // alternate name   
+sfr at 0xA8 IEN0    ; // alternate name
 // Bit registers
 sbit at 0xA8 EX0	;
 sbit at 0xA9 ET0	;
@@ -2168,7 +2209,7 @@ sbit at 0xAB ET1	;
 sbit at 0xAC ES0	;
 sbit at 0xAD ES1	;
 sbit at 0xAE EAD	;
-sbit at 0xAF EA		;
+sbit at 0xAF EEA	;
 #endif
 
 #ifdef IE__EA__ES1__ET2__ES__ET1__EX1__ET0__EX0
@@ -2839,8 +2880,8 @@ sfr at 0x87 PCON ;
 #define SMOD_0          0x80  ; same as SMOD
 #endif
 
-#ifdef PMR__CD1__CD0__SWB__x__XTOFF__ALEOFF__DME1_DME0
-#undef PMR__CD1__CD0__SWB__x__XTOFF__ALEOFF__DME1_DME0
+#ifdef PMR__CD1__CD0__SWB__x__XTOFF__ALEOFF__DME1__DME0
+#undef PMR__CD1__CD0__SWB__x__XTOFF__ALEOFF__DME1__DME0
 sfr at 0xC4 PMR  ;   // DS87C520, DS83C520
 // Not directly accessible bits
 #define DME0    0x01
@@ -2859,6 +2900,20 @@ sfr at 0xC4 PMR  ;   // DS80C390
 #define ALEOFF  0x04
 #define XTOFF   0x08
 #define _4X_2X  0x10
+#define SWB     0x20
+#define CD0     0x40
+#define CD1     0x80
+#endif
+
+#ifdef PMR__CD1__CD0__SWB__CTM__4X_2X__ALEON__DME1__DME0
+#undef PMR__CD1__CD0__SWB__CTM__4X_2X__ALEON__DME1__DME0
+sfr at 0xC4 PMR  ;   // DS89C420
+// Not directly accessible bits
+#define DME0	0x01
+#define DME1	0x02
+#define ALEON   0x04
+#define _4X_2X  0x08
+#define CTM     0x10
 #define SWB     0x20
 #define CD0     0x40
 #define CD1     0x80
@@ -2915,6 +2970,16 @@ sfr at 0xC2 ROMSIZE  ;   // DS87C520, DS83C520
 #define RSM0    0x01
 #define RSM1    0x02
 #define RSM2    0x04
+#endif
+
+#ifdef ROMSIZE__x__x__x__x__PRAME__RMS2__RMS1__RMS0
+#undef ROMSIZE__x__x__x__x__PRAME__RMS2__RMS1__RMS0
+sfr at 0xC2 ROMSIZE  ;   // DS89C420
+// Not directly accessible bits
+#define RSM0    0x01
+#define RSM1    0x02
+#define RSM2    0x04
+#define PRAME   0x08
 #endif
 
 #ifdef ROMSIZE__HBPF__BPF__TE__MOVCX__PRAME__RMS2__RMS1__RMS0
@@ -2976,7 +3041,7 @@ sfr at 0x98 S0CON ; // serial channel 0 control register P80C552 specific
 //sbit at 0x9E SM1  ;
 //sbit at 0x9F SM0  ;
 #endif
- 
+
 #ifdef S0CON__SM0__SM1__SM20__REN0__TB80__RB80__TI0__RI0
 #undef S0CON__SM0__SM1__SM20__REN0__TB80__RB80__TI0__RI0
 // serial channel 0 buffer register SAB80517 specific(same as stock SCON)
@@ -2989,9 +3054,7 @@ sbit at 0x9C REN0  ;
 sbit at 0x9D SM20  ;
 sbit at 0x9E SM1  ;
 sbit at 0x9F SM0  ;
-
 #endif
-
 
 #ifdef S0RELL
 #undef S0RELL
@@ -3204,6 +3267,32 @@ sfr at 0xC5 STATUS ;
 #define LIP  0x20
 #define HIP  0x40
 #define PIP  0x80
+#endif
+
+#ifdef STATUS__PIP__HIP__LIP__x__SPTA1__SPRA1__SPTA0__SPRA0
+#undef STATUS__PIP__HIP__LIP__x__SPTA1__SPRA1__SPTA0__SPRA0
+sfr at 0xC5 STATUS ; // DS80C390 specific
+// Not directly accessible Bits.
+#define SPRA0  0x01
+#define SPTA0  0x02
+#define SPRA1  0x04
+#define SPTA1  0x08
+#define LIP    0x20
+#define HIP    0x40
+#define PIP    0x80
+#endif
+
+#ifdef STATUS__PIS2__PIS1__PIS0__x__SPTA1__SPRA1__SPTA0__SPRA0
+#undef STATUS__PIS2__PIS1__PIS0__x__SPTA1__SPRA1__SPTA0__SPRA0
+sfr at 0xC5 STATUS ; // DS89C420 specific
+// Not directly accessible Bits.
+#define SPRA0  0x01
+#define SPTA0  0x02
+#define SPRA1  0x04
+#define SPTA1  0x08
+#define PIS0   0x20
+#define PIS1   0x40
+#define PIS2   0x80
 #endif
 
 #ifdef STATUS__PIP__HIP__LIP__x__SPTA1__SPRA1__SPTA0__SPRA0
@@ -3466,7 +3555,7 @@ sfr at 0x96 WCON   ;   // AT89S53 specific
 
 #ifdef WDCON
 #undef WDCON
-// DS80C320 - 390 specific
+// DS80C320 - 390, DS89C420, etc. specific
 sfr at 0xD8 WDCON ;
 //  Bit registers
 sbit at 0xD8 RWT    ;
@@ -3488,7 +3577,6 @@ sfr at 0x86 WDTREL    ; // Watchdof Timer reload register
 #undef XPAGE
 sfr at 0x91 XPAGE     ; // Page Address Register for Extended On-Chip Ram - Infineon / Siemens SAB80515A specific
 #endif
-
 
 /////////////////////////
 /// Interrupt vectors ///
@@ -3599,3 +3687,4 @@ sfr at 0x91 XPAGE     ; // Page Address Register for Extended On-Chip Ram - Infi
 #endif
 
 #endif	// End of the header -> #ifndef MCS51REG_H
+

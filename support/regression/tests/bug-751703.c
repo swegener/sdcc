@@ -1,9 +1,10 @@
 /* bug-751703.c
 
-   If test_index is char, loses high bit when indexes table 
-   workaround is to use [(unsigned int) test_index] 
+  Make sure extern within local scope binds to global
+  scope and is not optimized inappropriately.
  */
-#include <testfwk.h>
+
+#include "testfwk.h"
 
 int x = 1;
 int y = 2;

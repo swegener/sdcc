@@ -1641,7 +1641,7 @@ dwWriteLineNumber (dwline * lp)
       curOffset = lp->offset;
 
       dwWriteByte (NULL, DW_LNS_advance_line, NULL);
-      dwWriteULEB128 (NULL, lp->line - 1, NULL);
+      dwWriteSLEB128 (NULL, lp->line - 1, NULL);
       curLine = lp->line;
 
       dwWriteByte (NULL, DW_LNS_copy, NULL);
@@ -1713,7 +1713,7 @@ dwWriteLineNumber (dwline * lp)
 	  curOffset = lp->offset;
 	
 	  dwWriteByte (NULL, DW_LNS_advance_line, NULL);
-	  dwWriteULEB128 (NULL, deltaLine, NULL);
+	  dwWriteSLEB128 (NULL, deltaLine, NULL);
 	  curLine = lp->line;
 	  
 	  dwWriteByte (NULL, DW_LNS_copy, NULL);
@@ -2272,15 +2272,46 @@ dwTagFromType (sym_link * type, dwtag * parent)
 		{
 		  dwtag * memtp;
 		  dwloc * lp;
-		  
+
+		  if (IS_BITFIELD (field->type) && !SPEC_BLEN(field->type))
+		    {
+		      field = field->next;
+		      continue;
+		    }
+
 		  memtp = dwNewTag (DW_TAG_member);
 		  if (*(field->name))
 		    dwAddTagAttr (memtp, dwNewAttrString (DW_AT_name,
 							  field->name));
-		  subtp = dwTagFromType (field->type, tp);
-		  dwAddTagAttr (memtp, dwNewAttrTagRef (DW_AT_type, subtp));
-		  if (!subtp->parent)
-		    dwAddTagChild (parent, subtp);
+		  if (IS_BITFIELD (field->type))
+		    {
+		      int blen = SPEC_BLEN (field->type);
+		      int bstr = SPEC_BSTR (field->type);
+		      sym_link * type;
+		      
+		      dwAddTagAttr (memtp,
+				    dwNewAttrConst (DW_AT_byte_size,
+						    (blen+7)/8));
+		      dwAddTagAttr (memtp,
+				    dwNewAttrConst (DW_AT_bit_size, blen));
+		      dwAddTagAttr (memtp,
+				    dwNewAttrConst (DW_AT_bit_offset,
+						    ((blen+7) & ~7)
+						    - (blen+bstr)));
+		      if (blen < 8)
+		        type = typeFromStr ("uc");
+		      else
+		        type = typeFromStr ("ui");
+		      subtp = dwTagFromType (type, tp);
+		      dwAddTagAttr (memtp, dwNewAttrTagRef (DW_AT_type, subtp));
+		    }
+		  else
+		    {
+		      subtp = dwTagFromType (field->type, tp);
+		      dwAddTagAttr (memtp, dwNewAttrTagRef (DW_AT_type, subtp));
+		      if (!subtp->parent)
+			dwAddTagChild (parent, subtp);
+		    }
 
 		  lp = dwNewLoc (DW_OP_plus_uconst, NULL, field->offset);
 		  dwAddTagAttr (memtp,
@@ -2421,7 +2452,8 @@ int dwCloseFile(void)
 {
   if(!dwarf2FilePtr) return 0;
   
-  fclose(dwarf2FilePtr);
+  /* Don't explicitly close the file; this will be done automatically */
+  dwarf2FilePtr = NULL;
   
   return 1;
 }
@@ -2516,7 +2548,7 @@ dwWriteSymbolInternal (symbol *sym)
   dwattr * funcap;
   int inregs = 0;
 
-  if (!sym->level)
+  if (!sym->level || IS_EXTERN (sym->etype))
     scopetp = dwRootTag;
   else
     {

@@ -1,3 +1,17 @@
+2004-05-17 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCval.c (valForArray): applied Maarteen Brock's patch #947682
+	which fixes bug #543481
+	* support/regression/tests/bug-751703.c: fixed comments left from a
+	cut and paste error
+	* src/SDCCdwarf2.c (dwCloseFile): don't explicitly close a temp file
+	* src/SDCCdwarf2.c (dwTagFromType): added bitfield support
+	* src/SDCCdwarf2.c (dwWriteSymbolInternal): handle extern within local
+	scopes
+	* src/SDCCdwarf2.c (dwWriteLineNumber): line number deltas are signed
+	* src/SDCCmain.c (processFile, parseCmdLine): non-alphanumeric chars
+	are now	changed to underscores in moduleName
+
 2004-05-15 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* as/mcs51/lkmem.c: better fix for bug #954173

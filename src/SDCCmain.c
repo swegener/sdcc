@@ -58,8 +58,10 @@ char *fullDstFileName;		/* full name for the output file; */
 char *dstFileName;		/* destination file name without extension */
 char *dstPath = "";		/* path for the output files; */
 				/* "" is equivalent with cwd */
-char *moduleName;		/* module name is source file without path and extension */
+char *moduleNameBase;		/* module name base is source file without path and extension */
                                 /* can be NULL while linking without compiling */
+char *moduleName;		/* module name is same as module name base, but with all */
+				/* non-alphanumeric characters replaced with underscore */
 int currRegBank = 0;
 int RegBankUsed[4] = {1, 0, 0, 0}; /*JCF: Reg Bank 0 used by default*/
 struct optimize optimize;
@@ -606,7 +608,12 @@ processFile (char *s)
           fext--;
         }
 #endif
+      moduleNameBase = Safe_strdup ( fext );
       moduleName = Safe_strdup ( fext );
+      
+      for (fext = moduleName; *fext; fext++)
+        if (!isalnum (*fext))
+	  *fext = '_';
       return;
     }
 
@@ -1235,11 +1242,11 @@ parseCmdLine (int argc, char **argv)
       /* use the modulename from the C-source */
       if (fullSrcFileName)
         {
-	  size_t bufSize = strlen (dstPath) + strlen (moduleName) + 1;
+	  size_t bufSize = strlen (dstPath) + strlen (moduleNameBase) + 1;
 
 	  dstFileName = Safe_alloc (bufSize);
           strncpyz (dstFileName, dstPath, bufSize);
-          strncatz (dstFileName, moduleName, bufSize);
+          strncatz (dstFileName, moduleNameBase, bufSize);
         }
       /* use the modulename from the first object file */
       else if ((s = peekSet(relFilesSet)) != NULL)

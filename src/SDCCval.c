@@ -1699,7 +1699,7 @@ valForArray (ast * arrExpr)
     DCL_TYPE (val->type) = EEPPOINTER;
   else
     DCL_TYPE (val->type) = POINTER;
-  val->type->next = arrExpr->left->ftype;
+  val->type->next = arrExpr->left->ftype->next;
   val->etype = getSpec (val->type);
   return val;
 }

@@ -72,6 +72,14 @@ static void _mcs51_finaliseOptions(void)
         fReturn = fReturn390;
         fReturnSize = 5;
     } 
+
+    if (options.model) {
+	port->mem.default_local_map = xdata;
+	port->mem.default_globl_map = xdata;
+    } else {
+	port->mem.default_local_map = data;
+	port->mem.default_globl_map = data;
+    }
 }
 
 static void _mcs51_setDefaultOptions(void)
@@ -171,7 +179,9 @@ PORT mcs51_port = {
 	"RSEG    (DATA)",
 	"GSINIT  (CODE)",
 	"OSEG    (OVR,DATA)",
-	"GSFINAL (CODE)"
+	"GSFINAL (CODE)",
+	NULL,
+	NULL
     },
     { 
 	+1, 1, 4, 1, 1

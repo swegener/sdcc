@@ -1274,6 +1274,7 @@ int main ( int argc, char **argv , char **envp)
     if (port->init)
 	port->init();
     
+    initMem();
     setDefaultOptions();
     parseCmdLine(argc,argv);
 
@@ -1290,7 +1291,6 @@ int main ( int argc, char **argv , char **envp)
     if (srcFileName) {
 
 	initSymt();
-	initMem();	  	    
 	initiCode();
 	initCSupport ();
 	initPeepHole();

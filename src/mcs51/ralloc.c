@@ -441,7 +441,6 @@ static symbol *createStackSpil (symbol *sym)
 {
     symbol *sloc= NULL;
     int useXstack, model, noOverlay;
-    int stackAuto;
 
     char slocBuffer[30];
 
@@ -472,7 +471,7 @@ static symbol *createStackSpil (symbol *sym)
     /* set the type to the spilling symbol */
     sloc->type = copyLinkChain(sym->type);
     sloc->etype = getSpec(sloc->type);
-    SPEC_SCLS(sloc->etype) = S_AUTO ;    
+    SPEC_SCLS(sloc->etype) = S_DATA ;
     SPEC_EXTR(sloc->etype) = 0;
 
     /* we don't allow it to be allocated`
@@ -486,7 +485,6 @@ static symbol *createStackSpil (symbol *sym)
     useXstack = options.useXstack;
     model = options.model;
     noOverlay = options.noOverlay;
-    stackAuto = options.stackAuto;
     options.noOverlay = 1;
     options.model = options.useXstack = 0;
 
@@ -495,7 +493,6 @@ static symbol *createStackSpil (symbol *sym)
     options.useXstack = useXstack;
     options.model     = model;
     options.noOverlay = noOverlay;
-    options.stackAuto = stackAuto;
     sloc->isref = 1; /* to prevent compiler warning */
     
     /* if it is on the stack then update the stack */

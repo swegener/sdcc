@@ -1768,8 +1768,8 @@ ast *decorateType (ast *tree)
 		    if (SPEC_SCLS(tree->left->etype) == S_IDATA)
 			DCL_TYPE(p) = IPOINTER ;
 		    else
-			if (SPEC_SCLS(tree->left->etype) == S_FLASH)
-			    DCL_TYPE(p) = FLPOINTER ;
+			if (SPEC_SCLS(tree->left->etype) == S_EEPROM)
+			    DCL_TYPE(p) = EEPPOINTER ;
 			else
 			    DCL_TYPE(p) = POINTER ;
 

@@ -75,7 +75,7 @@ enum  { S_FIXED  =  0,
         S_STACK      ,
         S_XSTACK     ,
         S_BIT        ,
-        S_FLASH      };
+        S_EEPROM      };
 
 /* specifier is the last in the type-chain */
 typedef struct specifier {
@@ -124,7 +124,7 @@ enum {  POINTER   = 0,       /* pointer to near data */
         PPOINTER     ,       /* paged area pointer   */
         IPOINTER     ,       /* pointer to upper 128 bytes */
 	UPOINTER     ,       /* unknown pointer used only when parsing */
-	FLPOINTER    ,       /* pointer to flash     */
+	EEPPOINTER   ,       /* pointer to eeprom     */
         ARRAY        ,
         FUNCTION     };
 
@@ -278,7 +278,7 @@ typedef struct symbol {
 			             DCL_TYPE(x) == GPOINTER   ||    \
 			             DCL_TYPE(x) == IPOINTER   ||    \
 			             DCL_TYPE(x) == PPOINTER   ||    \
-			             DCL_TYPE(x) == FLPOINTER  ||    \
+			             DCL_TYPE(x) == EEPPOINTER ||    \
                                      DCL_TYPE(x) == CPOINTER   ||    \
                                      DCL_TYPE(x) == UPOINTER  ))
 #define IS_PTR_CONST(x) (IS_PTR(x) && DCL_PTR_CONST(x))

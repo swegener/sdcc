@@ -57,7 +57,7 @@ typedef struct {
 	int max_base_size;
     } s;
 
-    /** Names for all the memory regions */
+    /** memory regions related stuff */
     struct {
 	const char *xstack_name;
 	const char *istack_name;
@@ -70,6 +70,8 @@ typedef struct {
 	const char *static_name;
 	const char *overlay_name;
 	const char *post_static_name;
+	struct memmap *default_local_map ; /* default location for auto vars */
+	struct memmap *default_globl_map ; /* default location for globl vars*/
     } mem;
     
     /* stack related information */

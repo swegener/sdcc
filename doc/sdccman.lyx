@@ -7978,9 +7978,8 @@ at
  <address>
 \emph default 
  keyword, in addition to a storage class, e.g.:
-\newline 
+\layout Verse
 
-\newline 
 
 \family typewriter 
 xdata
@@ -7994,11 +7993,8 @@ xdata
 \end_inset 
 
  0x8000 unsigned char PORTA_8255 ;
-\newline 
+\layout Standard
 
-\family default 
-
-\newline 
 In the above example the PORTA_8255 will be allocated to the location 0x8000
  of the external ram.
  Note that this feature is provided to give the programmer access to 
@@ -8031,9 +8027,8 @@ memory mapped
 \newline 
 Absolute address can be specified for variables in all storage classes,
  e.g.:
-\newline 
+\layout Verse
 
-\newline 
 
 \family typewriter 
 bit
@@ -8047,11 +8042,8 @@ bit
 \end_inset 
 
  0x02 bvar;
-\newline 
+\layout Standard
 
-\newline 
-
-\family default 
 The above example will allocate the variable at offset 0x02 in the bit-addressab
 le space.
  There is no real advantage to assigning absolute addresses to variables
@@ -8060,11 +8052,10 @@ le space.
  For example, if you have a routine that uses one or more of the microcontroller
  I/O pins, and such pins are different for two different hardwares, you
  can declare the I/O pins in you routine using
-\newline 
+\layout Verse
+
 
 \family typewriter 
-
-\newline 
 extern bit SDI;
 \newline 
 extern bit SCLK;
@@ -8144,15 +8135,11 @@ mask/=2;
 }
 \newline 
 }
-\newline 
+\layout Standard
 
-\newline 
-
-\family default 
 Then, someplace in the code for the first hardware you would use
-\newline 
+\layout Verse
 
-\newline 
 
 \family typewriter 
 bit at 0x80 SDI;\SpecialChar ~
@@ -8178,15 +8165,11 @@ bit CPOL;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 /*This is a variable, let the linker allocate this one*/
-\newline 
+\layout Standard
 
-\newline 
-
-\family default 
 Similarly, for the second hardware you would use
-\newline 
+\layout Verse
 
-\newline 
 
 \family typewriter 
 bit at 0x83 SDI;\SpecialChar ~
@@ -8212,19 +8195,12 @@ bit CPOL;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 /*This is a variable, let the linker allocate this one*/
-\newline 
+\layout Standard
 
-\newline 
-
-\family default 
 and you can use the same hardware dependant routine without changes, as
  for example in a library.
  This is somehow similar to sbit, but only one absolute address has to be
  specified in the whole project.
-\family typewriter 
-
-\newline 
-
 \layout Subsection
 
 Startup Code

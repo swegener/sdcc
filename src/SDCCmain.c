@@ -150,10 +150,14 @@ static int _setPort(const char *name)
 /*-----------------------------------------------------------------*/
 void	printVersionInfo ()
 {
-    
+    int i;
 
-	fprintf (stderr					,
-		"SDCC : MCU 8051 %s "
+    fprintf (stderr,
+	     "SDCC : ");
+    for (i=0; i<NUM_PORTS; i++)
+	fprintf(stderr, "%s%s", i==0 ? "" : "/", _ports[i]->target);
+
+    fprintf(stderr, " %s `"
 #ifdef __CYGWIN32__
 		" (CYGWIN32)\n"
 #else
@@ -163,8 +167,8 @@ void	printVersionInfo ()
 		" (UNIX) \n"
 # endif
 #endif
-		 , VersionString
-		    );
+	    , VersionString
+	    );
 }
 
 /*-----------------------------------------------------------------*/
@@ -176,6 +180,8 @@ void	printUsage ()
 	fprintf (stderr,
 		 "Usage : [options] filename\n"
 		 "Options :-\n"
+		 "\t-m<proc>             -     Target processor <proc>.  Default %s\n"
+		 "\t                           Try --version for supported values of <proc>\n"
 		 "\t--model-large        -     Large Model\n"
 		 "\t--model-small        -     Small Model (default)\n"
 		 "\t--stack-auto         -     Stack automatic variables\n"
@@ -192,7 +198,9 @@ void	printUsage ()
 		 "PreProcessor Options :-\n"
 		 "\t-Dmacro		-	Define Macro\n"		 
 		 "\t-Ipath		-	Include \"*.h\" path\n"
-		 "Note: this is a complete list of options see docs for details\n");		
+		 "Note: this is a complete list of options see docs for details\n",
+		 _ports[0]->target
+		 );		
 	exit (0);
 }
 

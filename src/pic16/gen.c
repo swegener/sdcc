@@ -1254,9 +1254,16 @@ void pic16_aopOp (operand *op, iCode *ic, bool result)
 
 	sym->aop = op->aop = aop = newAsmop(AOP_PCODE);
 	//aop->aopu.pcop = pic16_popGetImmd(sym->usl.spillLoc->rname,0,sym->usl.spillLoc->offset);
-	aop->aopu.pcop = pic16_popRegFromString(sym->usl.spillLoc->rname, 
-					  getSize(sym->type), 
-					  sym->usl.spillLoc->offset, op);
+	if (sym->usl.spillLoc && sym->usl.spillLoc->rname) {
+	  aop->aopu.pcop = pic16_popRegFromString(sym->usl.spillLoc->rname, 
+						  getSize(sym->type), 
+						  sym->usl.spillLoc->offset, op);
+	} else {
+	  fprintf (stderr, "%s:%d called for a spillLocation -- assigning WREG instead --- CHECK!\n", __FUNCTION__, __LINE__);
+	  DEBUGpic16_emitcode (";","%s:%d called for a spillLocation -- assigning WREG instead --- CHECK", __FUNCTION__, __LINE__);
+	  assert (getSize(sym->type) <= 1);
+	  aop->aopu.pcop = pic16_popCopyReg (&pic16_pc_wreg);//pic16_popRegFromString("_WREG", getSize(sym->type), 0, op);
+	}
         aop->size = getSize(sym->type);
 
         return;
@@ -2046,7 +2053,9 @@ pCodeOp *pic16_popGet (asmop *aop, int offset) //, bool bit16, bool dname)
       switch( aop->aopu.pcop->type ) {
         case PO_DIR: PCOR(pcop)->instance += offset; break;
         case PO_IMMEDIATE: PCOI(pcop)->offset = offset; break;
+        case PO_WREG: assert (offset==0); break;
         default:
+	  fprintf (stderr, "%s: unhandled aop->aopu.pcop->type %d\n", __FUNCTION__, aop->aopu.pcop->type);
           assert( 0 );	/* should never reach here */;
       }
       return pcop;

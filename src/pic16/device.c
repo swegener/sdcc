@@ -578,7 +578,7 @@ void pic16_dump_usection(FILE *of, set *section, int fix)
 	}
 	
 	if(!i) {
-		if(rlist)free(rlist);
+		if(rlist)Safe_free(rlist);
 	  return;
 	}
 
@@ -633,7 +633,7 @@ void pic16_dump_usection(FILE *of, set *section, int fix)
 			rprev = r;
 		}
 	}
-	free(rlist);
+	Safe_free(rlist);
 }
 
 void pic16_dump_gsection(FILE *of, set *sections)
@@ -676,7 +676,7 @@ void pic16_dump_isection(FILE *of, set *section, int fix)
 	}
 	
 	if(!i) {
-		if(slist)free(slist);
+		if(slist)Safe_free(slist);
 	  return;
 	}
 
@@ -742,7 +742,7 @@ void pic16_dump_isection(FILE *of, set *section, int fix)
 			sprev = s;
 		}
 	}
-	free(slist);
+	Safe_free(slist);
 }
 
 
@@ -763,7 +763,7 @@ void pic16_dump_int_registers(FILE *of, set *section)
 	qsort(rlist, elementsInSet(section), sizeof(regs *), regCompare);
 	
 	if(!i) {
-		if(rlist)free(rlist);
+		if(rlist)Safe_free(rlist);
 	  return;
 	}
 	
@@ -775,7 +775,7 @@ void pic16_dump_int_registers(FILE *of, set *section)
 		statistics.intsize += r->size;
 	}
 
-	free(rlist);
+	Safe_free(rlist);
 }
 
 

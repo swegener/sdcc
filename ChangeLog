@@ -1,3 +1,13 @@
+2005-01-23 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/{device.c,pcode.c}: s/free/Safe_free/g for
+	  Safe_[mc]?alloc()'ed variables
+	* src/pic16/gen.c (pic16_aopOp,pic16_popGet): added handling
+	  of (byte sized) temporaries (assign them to WREG for now)
+	* src/pic16/main.c (_process_pragma): fixed nasty malloc bug
+	  (used sizeof(set *sectSyms) instead of sizeof(struct sectSym)),
+	  this might fix SIGSEGVs on MinGW...
+
 2005-01-23 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/gen.c: fixed bug #1106975,

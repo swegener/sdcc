@@ -3730,7 +3730,7 @@ static void destructpCodeFlow(pCode *pc)
   pc->type = PC_BAD;
   pic16_addpCode2pBlock(pb_dead_pcodes, pc);
 
-//  free(pc);
+//  Safe_free(pc);
 
 }
 
@@ -3871,7 +3871,7 @@ static void pCodeLabelDestruct(pCode *pc)
     return;
 
 //  if((pc->type == PC_LABEL) && PCL(pc)->label)
-//    free(PCL(pc)->label);
+//    Safe_free(PCL(pc)->label);
 
   /* Instead of deleting the memory used by this pCode, mark
    * the object as bad so that if there's a pointer to this pCode
@@ -3882,7 +3882,7 @@ static void pCodeLabelDestruct(pCode *pc)
   pc->type = PC_BAD;
   pic16_addpCode2pBlock(pb_dead_pcodes, pc);
 
-//  free(pc);
+//  Safe_free(pc);
 
 }
 
@@ -4671,7 +4671,7 @@ static void genericDestruct(pCode *pc)
   pc->type = PC_BAD;
   pic16_addpCode2pBlock(pb_dead_pcodes, pc);
 
-  //free(pc);
+  //Safe_free(pc);
 }
 
 
@@ -5263,11 +5263,11 @@ static void unlinkpCodeFromBranch(pCode *pcl , pCode *pc)
       /* Found a label */
       if(bprev) {
 	bprev->next = b->next;  /* Not first pCode in chain */
-//	free(b);
+//	Safe_free(b);
       } else {
 	pc->destruct(pc);
 	PCI(pcl)->label = b->next;   /* First pCode in chain */
-//	free(b);
+//	Safe_free(b);
       }
       return;  /* A label can't occur more than once */
     }
@@ -6001,7 +6001,7 @@ static void unBuildFlow(pBlock *pb)
 
       pc->seq = 0;
       if(PCI(pc)->pcflow) {
-	//free(PCI(pc)->pcflow);
+	//Safe_free(PCI(pc)->pcflow);
 	PCI(pc)->pcflow = NULL;
       }
 
@@ -6562,7 +6562,7 @@ static void exchangeLabels(pCodeLabel *pcl, pCode *pc)
 
 //	fprintf(stderr,"changing label key from %d to %d\n",pcol->key, pcl->key);
 //    if(pcol->pcop.name)
-//      free(pcol->pcop.name);
+//      Safe_free(pcol->pcop.name);
 
     /* If the key is negative, then we (probably) have a label to
      * a function and the name is already defined */
@@ -6649,7 +6649,7 @@ static void pBlockRemoveUnusedLabels(pBlock *pb)
       } else {
 	unlinkpCodeFromBranch(pc, PCODE(pcl));
 	/*if(pc->label->next == NULL && pc->label->pc == NULL) {
-	  free(pc->label);
+	  Safe_free(pc->label);
 	}*/
       }
 
@@ -7442,7 +7442,7 @@ static void pBlockDestruct(pBlock *pb)
     return;
 
 
-//  free(pb);
+//  Safe_free(pb);
 
 }
 
@@ -8196,7 +8196,7 @@ static set *register_usage(pBlock *pb)
 	  DFPRINTF((stderr,"Cool found register collision nIdx=%d moving to %d\n",
 		  r1->rIdx, newreg->rIdx));
 	  r2->rIdx = newreg->rIdx;
-	  //if(r2->name) free(r2->name);
+	  //if(r2->name) Safe_free(r2->name);
 	  if(newreg->name)
 	    r2->name = Safe_strdup(newreg->name);
 	  else

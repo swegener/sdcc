@@ -256,7 +256,7 @@ _process_pragma(const char *sz)
 	  int found=0;
 	  
 	  	while(symname) {
-	  		ssym = Safe_calloc(1, sizeof(sectSyms));
+	  		ssym = Safe_calloc(1, sizeof(sectSym));
 			ssym->name = Safe_calloc(1, strlen(symname)+2);
 			sprintf(ssym->name, "_%s", symname);
 	  		ssym->reg = NULL;

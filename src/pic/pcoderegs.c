@@ -317,7 +317,7 @@ void  RemoveRegsFromSet(set *regset)
 
 	pc = setFirstItem(reg->reglives.usedpCodes);
 
-	if(reg->type == REG_SFR) {
+	if(reg->type == REG_SFR || reg->type == REG_STK) {
 	  //fprintf(stderr, "not removing SFR reg %s even though used only once\n",reg->name);
 	  continue;
 	}
@@ -660,7 +660,7 @@ void OptimizeRegUsage(set *fregs, int optimize_multi_uses, int optimize_level)
     reg = fregs->item;
     fregs = fregs->next;
 
-    if(reg->type == REG_SFR) {
+    if(reg->type == REG_SFR || reg->type == REG_STK) {
       //fprintf(stderr,"skipping SFR: %s\n",reg->name);
       continue;
     }

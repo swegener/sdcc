@@ -1,3 +1,8 @@
+2003-04-29  Scott Dattalo  <scott@dattalo.com>
+
+	* src/pic/pcoderegs.c Applied patch from Jim Hawkridge <jim@jimhawkridge.uk.eu.org>
+	that tame's the PIC's over-aggressive optimizer.
+
 2003-04-29  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	 * src.dsw, link/z80/aslink.h, link/z80/linkz80.dsp: z80 linker

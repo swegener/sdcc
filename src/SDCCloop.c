@@ -1044,7 +1044,7 @@ loopInduction (region * loopReg, eBBlock ** ebbs, int count)
       /* add the induction variable vector to the last
          block in the loop */
       lastBlock->isLastInLoop = 1;
-      lastBlock->linds = indVect;
+      lastBlock->linds = bitVectUnion(lastBlock->linds,indVect);
     }
 
   setToNull ((void **) &indVars);

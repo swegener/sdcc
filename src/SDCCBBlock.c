@@ -196,6 +196,10 @@ dumpEbbsToFileExt (int id, eBBlock ** ebbs, int count)
       bitVectDebugOn (ebbs[i]->ldefs, of);
       fprintf (of, "\npointers Set bitvector :");
       bitVectDebugOn (ebbs[i]->ptrsSet, of);
+      if (ebbs[i]->isLastInLoop) {
+	      fprintf (of, "\nInductions Set bitvector :");
+	      bitVectDebugOn (ebbs[i]->linds, of);
+      }
       fprintf (of, "\n----------------------------------------------------------------\n");
       printiCChain (ebbs[i]->sch, of);
     }

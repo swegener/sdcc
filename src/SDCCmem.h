@@ -79,7 +79,7 @@ extern int maxRegBank;
 #define IN_CODESPACE(map)       (map && map->codesp)
 #define IN_REGSP(map)		(map && map->regsp)
 #define PTR_TYPE(map)           (map ? (map->ptrType ? map->ptrType : POINTER)\
-                                     : GPOINTER)
+                                     : port->unqualified_pointer)
 
 /* forward decls for functions    */
 memmap *allocMap (char, char, char, char, char, char, unsigned, const char *, char, int);

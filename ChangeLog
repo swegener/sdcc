@@ -1,3 +1,11 @@
+2003-11-04  Borut Razem <borut.razem@siol.net>
+
+	* configure, configure.in, sdcc_vc_in.h, sdcconf_in.h: reverted changes,
+	  made 2003-11-04
+	* support/Util/NewAlloc.c, as/hc08/lklibr.c, as/mcs51/lklibr.c,
+	  as/z80/aslist.c, as/z80/assym.c: removed inclusion of nonstandard malloc.h;
+	  malloc is declared in standard stdlib.h
+
 2003-11-06 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* device/lib/hc08/Makefile: need to clean .rel not .o files
@@ -22,7 +30,7 @@
 	* src/hc08/gen.c,
 	* src/ds390/gen.c,
 	* src/mcs51/gen.c: added support for the SWAP iCode (RFE #834167)
-        
+
 2003-11-04 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCCcse.c (ifxOptimize),
@@ -34,7 +42,7 @@
 
 2003-11-04  Borut Razem <borut.razem@siol.net>
 
-	* configure, configure.in, sdcc_vc_in.h, sdcconf.h,
+	* configure, configure.in, sdcc_vc_in.h, sdcconf_in.h,
 	  support/Util/NewAlloc.c, as/hc08/lklibr.c, as/mcs51/lklibr.c,
 	  as/z80/aslist.c, as/z80/assym.c: decision to include malloc.h
 	  transferred to configure

@@ -2293,7 +2293,11 @@ genFunction (iCode * ic)
 
   /* if critical function then turn interrupts off */
   if (IFFUNC_ISCRITICAL (ftype))
-    emitcode ("clr", "ea");
+    {
+      emitcode ("mov", "c,ea");
+      emitcode ("push", "psw"); /* save old ea via c in psw */
+      emitcode ("clr", "ea");
+    }
 
   /* here we need to generate the equates for the
      register bank if required */
@@ -2712,7 +2716,10 @@ genEndFunction (iCode * ic)
 	emitcode ("pop", "acc");
 
       if (IFFUNC_ISCRITICAL (sym->type))
-	emitcode ("setb", "ea");
+        {
+	  emitcode ("pop", "psw"); /* restore ea via c in psw */
+	  emitcode ("mov", "ea,c");
+        }
 
       /* if debug then send end of function */
       if (options.debug && currFunc)
@@ -2733,7 +2740,10 @@ genEndFunction (iCode * ic)
   else
     {
       if (IFFUNC_ISCRITICAL (sym->type))
-	emitcode ("setb", "ea");
+        {
+	  emitcode ("pop", "psw"); /* restore ea via c in psw */
+	  emitcode ("mov", "ea,c");
+        }
 
       if (IFFUNC_CALLEESAVES(sym->type))
 	{

@@ -32,7 +32,8 @@
 static struct {
     ERROR_LOG_LEVEL logLevel;
     FILE *out;
-    int style; /* 1=MSVC */
+    int style;                        /* 1=MSVC */
+    char disabled[MAX_ERROR_WARNING]; /* 1=warning disabled*/
 } _SDCCERRG;
 
 extern char *filename ;
@@ -350,7 +351,7 @@ struct
 { E_TWO_OR_MORE_STORAGE_CLASSES, ERROR_LEVEL_ERROR,
     "two or more storage classes in declaration for '%s'" },
 { W_EXCESS_INITIALIZERS, ERROR_LEVEL_WARNING,
-    "excess elements in %s initializer after `%s'" },
+    "excess elements in %s initializer after '%s'" },
 { E_ARGUMENT_MISSING, ERROR_LEVEL_ERROR,
    "Option %s requires an argument." },
 { W_STRAY_BACKSLASH, ERROR_LEVEL_WARNING,
@@ -421,15 +422,13 @@ SetErrorOut - Set the error output file
 */
 
 FILE *SetErrorOut(FILE *NewErrorOut)
-
 {
     _SDCCERRG.out = NewErrorOut ;
 
-return NewErrorOut ;
+    return NewErrorOut ;
 }
 
-void
-setErrorLogLevel (ERROR_LOG_LEVEL level)
+void setErrorLogLevel (ERROR_LOG_LEVEL level)
 {
     _SDCCERRG.logLevel = level;
 }
@@ -447,39 +446,37 @@ void vwerror (int errNum, va_list marker)
         _SDCCERRG.out = DEFAULT_ERROR_OUT;
     }
 
-    if (ErrTab[errNum].errIndex != errNum)
-    {
+    if (ErrTab[errNum].errIndex != errNum) {
         fprintf(_SDCCERRG.out, 
-        	"Internal error: error table entry for %d inconsistent.", errNum);
+                "Internal error: error table entry for %d inconsistent.", errNum);
     }
 
-
-    if (ErrTab[errNum].errType >= _SDCCERRG.logLevel) {
+    if ((ErrTab[errNum].errType >= _SDCCERRG.logLevel) && (!_SDCCERRG.disabled[errNum])) {
         if ( ErrTab[errNum].errType == ERROR_LEVEL_ERROR )
             fatalError++ ;
   
         if ( filename && lineno ) {
-			if(_SDCCERRG.style)
-				fprintf(_SDCCERRG.out, "%s(%d) : ",filename,lineno);
-			else
-				fprintf(_SDCCERRG.out, "%s:%d: ",filename,lineno);
-         } else if (lineno) {
+            if(_SDCCERRG.style)
+                fprintf(_SDCCERRG.out, "%s(%d) : ",filename,lineno);
+            else
+                fprintf(_SDCCERRG.out, "%s:%d: ",filename,lineno);
+        } else if (lineno) {
             fprintf(_SDCCERRG.out, "at %d: ", lineno);
         } else {
             fprintf(_SDCCERRG.out, "-:0: ");
         }
-    
+
         switch(ErrTab[errNum].errType)
         {
             case ERROR_LEVEL_ERROR:
-            	fprintf(_SDCCERRG.out, "error: ");
+            	fprintf(_SDCCERRG.out, "error %d: ", errNum);
             	break;
             case ERROR_LEVEL_WARNING:
             case ERROR_LEVEL_PEDANTIC:
-            	fprintf(_SDCCERRG.out, "warning: ");
+                fprintf(_SDCCERRG.out, "warning %d: ", errNum);
             	break;
             case ERROR_LEVEL_INFO:
-            	fprintf(_SDCCERRG.out, "info: ");
+            	fprintf(_SDCCERRG.out, "info %d: ", errNum);
             	break;
 	    default:
 	    	break;            	
@@ -487,8 +484,7 @@ void vwerror (int errNum, va_list marker)
     
         vfprintf(_SDCCERRG.out, ErrTab[errNum].errText,marker);
         fprintf(_SDCCERRG.out, "\n");
-    }
-    else {
+    } else {
         /* Below the logging level, drop. */
     }
 }
@@ -555,7 +551,19 @@ style - Change the output error style to MSVC
 -------------------------------------------------------------------------------
 */
 
-void    MSVC_style (int style)
+void MSVC_style (int style)
 {
     _SDCCERRG.style = style;
+}
+
+/*
+-------------------------------------------------------------------------------
+disabled - Disable output of specified warning
+-------------------------------------------------------------------------------
+*/
+
+void setWarningDisabled (int errNum)
+{
+    if ((errNum < MAX_ERROR_WARNING) && (ErrTab[errNum].errType <= ERROR_LEVEL_WARNING))
+        _SDCCERRG.disabled[errNum] = 1;
 }

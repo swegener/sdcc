@@ -25,15 +25,18 @@ SOURCES = _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
           _fsneq.c _fssub.c _gptrget.c _gptrput.c \
           _sint2fs.c _iscntrl.c _isdigit.c _isgraph.c \
           _islower.c _isprint.c _ispunct.c _isspace.c \
-          _isupper.c _isxdigit.c _slong2fs.c _memcmp.c \
-          _memcpy.c _memset.c _modsint.c _modslong.c \
-          _moduint.c _modulong.c _mulint.c _mullong.c \
+          _isupper.c _isxdigit.c _slong2fs.c \
+          _memcmp.c _memcpy.c _memmove.c _memset.c \
+          _modsint.c _modslong.c _moduint.c _modulong.c \
+          _mulint.c _mullong.c \
           _ser.c _setjmp.c \
           _spx.c _startup.c _strchr.c _strcmp.c _strcpy.c \
           _strcspn.c _strlen.c _strncat.c _strncmp.c \
           _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
-          _strstr.c _strtok.c _uchar2fs.c _uint2fs.c \
-          _ulong2fs.c malloc.c serial.c ser_ir.c printfl.c \
+          _strstr.c _strtok.c \
+          _uchar2fs.c _uint2fs.c _ulong2fs.c \
+          calloc.c malloc.c realloc.c free.c \
+          serial.c ser_ir.c printfl.c \
           printf_large.c vprintf.c puts.c gets.c \
           assert.c _strcat.c time.c printf_fast.c bpx.c
 

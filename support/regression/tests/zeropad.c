@@ -26,6 +26,16 @@ typedef unsigned int size_t;
 # define code
 #endif
 
+const char *string1 = "\x00\x01";
+const char string2[] = "\x00\x01";
+
+#ifndef PORT_HOST
+#pragma disable_warning 147 //no warning about excess initializers (W_EXCESS_INITIALIZERS)
+//array will be truncated but warning will be suppressed
+//if truncation is incorrect, other ASSERTs will fail with high probability
+char STORAGE trunc[2] = {'a', 'b', 'c'};
+#endif
+
 char STORAGE array[5] = {'a', 'b', 'c'};
 
 #if TEST_G
@@ -64,6 +74,9 @@ struct y STORAGE incompletestruct = {
 void
 testZeropad(void)
 {
+  ASSERT(string1[1] == '\x01');
+  ASSERT(string2[1] == '\x01');
+
   ASSERT(array[2] == 'c');
   ASSERT(array[4] == 0);
 

@@ -1,3 +1,21 @@
+2004-07-27 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* added lib/calloc.c, lib/free.c, lib/realloc.c, include/stddef.h
+	* updated lib/malloc.c, lib/libsdcc.lib, lib/Makefile.in, include/malloc.h
+	* src/SDCC.lex (doPragma): added pragma disable_warning <nnn>
+	* src/SDCCmain.c (parseCmdLine): added option --disable-warning <nnn>
+	* src/ds390/gen.c (genPlusIncr): fixed bug when incrementing generic pointers
+	* support/Util/SDCCerr.c (vwerror): suppress disabled warnings and output
+	  error/warning numbers,
+	  added function setWarningDisabled()
+	* support/Util/SDCCerr.h: added setWarningDisabled() and MAX_ERROR_WARNING
+	* support/regression/ports/mcs51-stack-auto/spec.mk: added dependencies
+	  _memcmp.c _memmove.c calloc.c realloc.c free.c
+	* support/regression/tests/malloc.c: added tests for new functionality
+	* support/regression/tests/zeropad.c: added tests for truncated initializers
+	  and initialized char arrays starting with '\x0'
+	* src/mcs51/peeph.def: fixed regression, added peephole 177.f
+
 2004-07-26 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* support/valdiag/tests/overflow.c: fixed warning on (1 >> 40)
@@ -5,7 +23,7 @@
 2004-07-26 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* doc/sdccman.lyx: updated example in section "Absolute Addressing"
-	* src/mcs51/peeph.def: added contributed fix for "bug" #995347 as 
+	* src/mcs51/peeph.def: added contributed fix for "bug" #995347 as
 	peephole 177.e. Thanks to anonymous
 
 2004-07-25 Vangelis Rokas <vrokas AT otenet.gr>

@@ -58,7 +58,7 @@ static builtins __ds390_builtins[] = {
     { "__builtin_memcmp_x2x","c",3,{"cx*","cx*","i"}}, /* void __builtin_memcmp_x2x (xdata char *,xdata char *,int) */
     { "__builtin_memcmp_c2x","c",3,{"cx*","cp*","i"}}, /* void __builtin_memcmp_c2x (xdata char *,code  char *,int) */
     { NULL , NULL,0, {NULL}} 			   /* mark end of table */
-};    
+};
 void ds390_assignRegisters (eBBlock ** ebbs, int count);
 
 static int regParmFlg = 0;	/* determine if we can register a parameter */
@@ -78,7 +78,6 @@ _ds390_reset_regparm ()
 static int
 _ds390_regparm (sym_link * l)
 {
-
     if (options.parms_in_bank1 == 0) {
 	/* simple can pass only the first parameter in a register */
 	if (regParmFlg)
@@ -102,7 +101,7 @@ _ds390_regparm (sym_link * l)
 	    return 0;
 	}
 	regParmFlg += size ;
-	return regParmFlg - size + 1;	
+	return regParmFlg - size + 1;
     }
 }
 
@@ -145,9 +144,9 @@ _ds390_finaliseOptions (void)
 
     port->stack.isr_overhead += 2;	/* Will save dpx on ISR entry. */
 
-    port->stack.call_overhead += 2;	/* This acounts for the extra byte 
+    port->stack.call_overhead += 2;	/* This acounts for the extra byte
 				 * of return addres on the stack.
-				 * but is ugly. There must be a 
+				 * but is ugly. There must be a
 				 * better way.
 				 */
 
@@ -161,11 +160,11 @@ _ds390_finaliseOptions (void)
     } else {
 	if (!options.stack_loc) options.stack_loc = 0x400008;
     }
-    
+
     /* generate native code 16*16 mul/div */
-    if (options.useAccelerator) 
+    if (options.useAccelerator)
 	    port->support.muldiv=2;
-    else 
+    else
 	    port->support.muldiv=1;
 
      /* Fixup the memory map for the stack; it is now in
@@ -298,11 +297,11 @@ static bool cseCostEstimation (iCode *ic, iCode *pdic)
     sym_link *result_type = operandType(result);
     //sym_link *right_type  = (right ? operandType(right) : 0);
     //sym_link *left_type   = (left  ? operandType(left)  : 0);
-    
+
     /* if it is a pointer then return ok for now */
     if (IC_RESULT(ic) && IS_PTR(result_type)) return 1;
-    
-    /* if bitwise | add & subtract then no since mcs51 is pretty good at it 
+
+    /* if bitwise | add & subtract then no since mcs51 is pretty good at it
        so we will cse only if they are local (i.e. both ic & pdic belong to
        the same basic block */
     if (IS_BITWISE_OP(ic) || ic->op == '+' || ic->op == '-') {
@@ -310,7 +309,7 @@ static bool cseCostEstimation (iCode *ic, iCode *pdic)
 	if (ic->eBBlockNum == pdic->eBBlockNum) return 1;
 	else return 0;
     }
-	
+
     /* for others it is cheaper to do the cse */
     return 1;
 }
@@ -340,7 +339,7 @@ oclsExpense (struct memmap *oclass)
 {
   if (IN_FARSPACE(oclass))
     return 1;
-    
+
   return 0;
 }
 
@@ -348,7 +347,7 @@ static int
 instructionSize(char *inst, char *op1, char *op2)
 {
   int isflat24 = (options.model == MODEL_FLAT24);
-  
+
   #define ISINST(s) (strncmp(inst, (s), sizeof(s)-1) == 0)
   #define IS_A(s) (*(s) == 'a' && *(s+1) == '\0')
   #define IS_C(s) (*(s) == 'c' && *(s+1) == '\0')
@@ -357,7 +356,7 @@ instructionSize(char *inst, char *op1, char *op2)
 
   /* Based on the current (2003-08-22) code generation for the
      small library, the top instruction probability is:
-   
+
        57% mov/movx/movc
         6% push
         6% pop
@@ -387,7 +386,7 @@ instructionSize(char *inst, char *op1, char *op2)
       if (IS_A (op2) || IS_Rn (op2) || IS_atRi (op2)) return 2;
       return 3;
     }
-  
+
   if (ISINST ("push")) return 2;
   if (ISINST ("pop")) return 2;
 
@@ -418,7 +417,7 @@ instructionSize(char *inst, char *op1, char *op2)
   if (ISINST ("acall")) return 2+isflat24;
   if (ISINST ("ajmp")) return 2+isflat24;
 
-    
+
   if (ISINST ("add") || ISINST ("addc") || ISINST ("subb") || ISINST ("xch"))
     {
       if (IS_Rn(op2) || IS_atRi(op2)) return 1;
@@ -471,7 +470,7 @@ ds390newAsmLineNode (int currentDPS)
   aln->regsWritten = NULL;
   aln->initialized = 0;
   aln->currentDPS = currentDPS;
-  
+
   return aln;
 }
 
@@ -535,7 +534,7 @@ ds390operandCompare (const void *key, const void *member)
   return strcmp((const char *)key, ((ds390operanddata *)member)->name);
 }
 
-static void      
+static void
 updateOpRW (asmLineNode *aln, char *op, char *optype, int currentDPS)
 {
   ds390operanddata *opdat;
@@ -543,7 +542,7 @@ updateOpRW (asmLineNode *aln, char *op, char *optype, int currentDPS)
   int regIdx1 = -1;
   int regIdx2 = -1;
   int regIdx3 = -1;
-  
+
   dot = strchr(op, '.');
   if (dot)
     *dot = '\0';
@@ -551,7 +550,7 @@ updateOpRW (asmLineNode *aln, char *op, char *optype, int currentDPS)
   opdat = bsearch (op, ds390operandDataTable,
 		   sizeof(ds390operandDataTable)/sizeof(ds390operanddata),
 		   sizeof(ds390operanddata), ds390operandCompare);
-  
+
   if (opdat)
     {
       regIdx1 = opdat->regIdx1;
@@ -572,7 +571,7 @@ updateOpRW (asmLineNode *aln, char *op, char *optype, int currentDPS)
 	  regIdx3 = DPX1_IDX;
 	}
     }
-    
+
   if (strchr(optype,'r'))
     {
       if (regIdx1 >= 0)
@@ -674,7 +673,7 @@ static ds390opcodedata ds390opcodeDataTable[] =
     {"xchd", "",  "",   "rw", "rw"},
     {"xrl",  "",  "",   "rw", "r"},
   };
-  
+
 static int
 ds390opcodeCompare (const void *key, const void *member)
 {
@@ -692,9 +691,9 @@ asmLineNodeFromLineNode (lineNode *ln, int currentDPS)
   ds390opcodedata *opdat;
 
   aln->initialized = 1;
-  
+
   p = ln->line;
-  
+
   while (*p && isspace(*p)) p++;
   for (op = inst, opsize=1; *p; p++)
     {
@@ -708,7 +707,7 @@ asmLineNodeFromLineNode (lineNode *ln, int currentDPS)
 
   if (*p == ';' || *p == ':' || *p == '=')
     return aln;
-    
+
   while (*p && isspace(*p)) p++;
   if (*p == '=')
     return aln;
@@ -719,7 +718,7 @@ asmLineNodeFromLineNode (lineNode *ln, int currentDPS)
         *op++ = tolower(*p), opsize++;
     }
   *op = '\0';
-  
+
   if (*p == ',') p++;
   for (op = op2, opsize=1; *p && *p != ','; p++)
     {
@@ -796,7 +795,8 @@ static const char *_linkCmd[] =
   "aslink", "-nf", "\"$1\"", NULL
 };
 
-/* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */   static const char *_asmCmd[] =
+/* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
+static const char *_asmCmd[] =
 {
   "asx8051", "$l", "$3", "\"$1.asm\"", NULL
 };
@@ -940,31 +940,31 @@ static void _tininative_finaliseOptions (void)
     }
     port->s.fptr_size = 3;
     port->s.gptr_size = 4;
-    
+
     port->stack.isr_overhead += 2;	/* Will save dpx on ISR entry. */
-    
-    port->stack.call_overhead += 2;	/* This acounts for the extra byte 
+
+    port->stack.call_overhead += 2;	/* This acounts for the extra byte
 					 * of return addres on the stack.
-					 * but is ugly. There must be a 
+					 * but is ugly. There must be a
 					 * better way.
 					 */
-    
+
     port->mem.default_local_map = xdata;
     port->mem.default_globl_map = xdata;
-    
+
     if (!options.stack10bit) {
 	options.stack10bit = 1;
 	fprintf(stderr,"TININative supports only stack10bit \n");
     }
-    
+
     if (!options.stack_loc) options.stack_loc = 0x400008;
-    
+
     /* generate native code 16*16 mul/div */
-    if (options.useAccelerator) 
+    if (options.useAccelerator)
 	port->support.muldiv=2;
-    else 
+    else
 	port->support.muldiv=1;
-    
+
     /* Fixup the memory map for the stack; it is now in
      * far space and requires a FPOINTER to access it.
      */
@@ -973,7 +973,7 @@ static void _tininative_finaliseOptions (void)
     options.cc_only =1;
 }
 
-static int _tininative_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts) 
+static int _tininative_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 {
     return 1;
 }
@@ -1024,7 +1024,7 @@ static void _tininative_do_assemble (set *asmOptions)
     buildCmdLine(buffer,a390Cmd,dstFileName,NULL,NULL,asmOptions);
     if (my_system(buffer)) {
 	exit(1);
-    }    
+    }
 }
 
 /* list of key words used by TININative */
@@ -1099,7 +1099,7 @@ static builtins __tininative_builtins[] = {
     { "System_GetCurrentProcessId","c",0,{NULL}},      /* char System_GetCurrentProcessId() */
     { "System_GetCurrentThreadId","c",0,{NULL}},       /* char System_GetCurrentThreadId() */
     { NULL , NULL,0, {NULL}} 			   /* mark end of table */
-};    
+};
 
 static const char *_a390Cmd[] =
 {
@@ -1217,7 +1217,7 @@ _ds400_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 {
     /* We can't generate a static IVT, since the boot rom creates one
      * for us in rom_init.
-     * 
+     *
      * we must patch it as part of the C startup.
      */
      fprintf (of, ";\tDS80C400 IVT must be generated at runtime.\n");
@@ -1228,7 +1228,7 @@ _ds400_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
      return TRUE;
 }
 
-    
+
 
 static void
 _ds400_finaliseOptions (void)
@@ -1240,7 +1240,7 @@ _ds400_finaliseOptions (void)
   // hackhack: we're a superset of the 390.
   addSet(&preArgvSet, Safe_strdup("-DSDCC_ds390"));
   addSet(&preArgvSet, Safe_strdup("-D__ds390"));
-    
+
   /* Hack-o-matic: if we are using the flat24 model,
    * adjust pointer sizes.
    */
@@ -1264,9 +1264,9 @@ _ds400_finaliseOptions (void)
 
     port->stack.isr_overhead += 2;	/* Will save dpx on ISR entry. */
 
-    port->stack.call_overhead += 2;	/* This acounts for the extra byte 
+    port->stack.call_overhead += 2;	/* This acounts for the extra byte
 				 * of return addres on the stack.
-				 * but is ugly. There must be a 
+				 * but is ugly. There must be a
 				 * better way.
 				 */
 
@@ -1281,11 +1281,11 @@ _ds400_finaliseOptions (void)
 	if (!options.stack_loc) options.stack_loc = 0xffdc00;
 	// assumes IDM1:0 = 1:0, CMA = 1.
     }
-    
+
     /* generate native code 16*16 mul/div */
-    if (options.useAccelerator) 
+    if (options.useAccelerator)
 	    port->support.muldiv=2;
-    else 
+    else
 	    port->support.muldiv=1;
 
      /* Fixup the memory map for the stack; it is now in
@@ -1297,10 +1297,10 @@ _ds400_finaliseOptions (void)
     if (options.parms_in_bank1) {
 	addSet(&preArgvSet, Safe_strdup("-DSDCC_PARMS_IN_BANK1"));
     }
-     
+
     // the DS400 rom calling interface uses register bank 3.
     RegBankUsed[3] = 1;
-      
+
   }  /* MODEL_FLAT24 */
 }
 

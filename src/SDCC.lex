@@ -414,8 +414,9 @@ enum pragma_id {
      P_EXCLUDE,
      P_NOIV,
      P_LOOPREV,
-     P_OVERLAY_      /* I had a strange conflict with P_OVERLAY while */
+     P_OVERLAY_,     /* I had a strange conflict with P_OVERLAY while */
                      /* cross-compiling for MINGW32 with gcc 3.2 */
+     P_DISABLEWARN
 };
 
 
@@ -484,6 +485,8 @@ static void copyAndFreeOptimize(struct optimize *dest, struct optimize *src)
 
 static void doPragma(int op, char *cp)
 {
+  int i;
+
   switch (op) {
   case P_SAVE:
     {
@@ -560,6 +563,13 @@ static void doPragma(int op, char *cp)
 
   case P_OVERLAY_:
     break; /* notyet */
+
+  case P_DISABLEWARN:
+    if (sscanf(cp, "%d", &i) && (i<MAX_ERROR_WARNING))
+      {
+        setWarningDisabled(i);
+      }
+    break;
   }
 }
 
@@ -590,6 +600,7 @@ static int process_pragma(char *s)
     { "noiv",           P_NOIV,         0 },
     { "overlay",        P_OVERLAY_,     0 },
     { "less_pedantic",  P_LESSPEDANTIC, 0 },
+    { "disable_warning",P_DISABLEWARN,  0 },
 
     /*
      * The following lines are deprecated pragmas,

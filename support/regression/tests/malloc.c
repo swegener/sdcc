@@ -16,9 +16,15 @@ void
 testMalloc(void)
 {
   void XDATA *p1, *p2, *p3;
-  
+  char *p;
+  unsigned char i;
+
 #if !defined(__gbz80) && !defined(__z80) && !defined(__GNUC__)
-  init_dynamic_memory((MEMHEADER xdata *)heap, sizeof(heap));
+  init_dynamic_memory((MEMHEADER XDATA *)heap, sizeof(heap));
+
+  p1 = malloc(200);
+  ASSERT(p1 == NULL);
+  LOG(("p1 == NULL when out of memory\n"));
 #endif
 
   p1 = malloc(5);
@@ -36,6 +42,34 @@ testMalloc(void)
 #else
   LOG(("p2: %u\n", (unsigned) p2));
 #endif
+
+  p = (char*)p2;
+  for (i=0; i<20; i++, p++)
+    *p = i;
+
+  p2 = realloc(p2, 25);
+  ASSERT(p2 != NULL);
+#ifdef PORT_HOST
+  LOG(("p2, after expanding realloc: %p\n", p2));
+#else
+  LOG(("p2, after expanding realloc: %u\n", (unsigned) p2));
+#endif
+
+  p = (char*)p2;
+  for (i=0; i<20; i++, p++)
+    ASSERT(*p == i);
+
+  p2 = realloc(p2, 15);
+  ASSERT(p2 != NULL);
+#ifdef PORT_HOST
+  LOG(("p2, after shrinking realloc: %p\n", p2));
+#else
+  LOG(("p2, after shrinking realloc: %u\n", (unsigned) p2));
+#endif
+
+  p = (char*)p2;
+  for (i=0; i<15; i++, p++)
+    ASSERT(*p == i);
 
   free(p2);
 

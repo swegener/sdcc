@@ -140,51 +140,49 @@ static int _lazyDPS = 0;        /* if non-zero, we are doing lazy evaluation of 
 /* emitcode - writes the code into a file : for now it is simple    */
 /*-----------------------------------------------------------------*/
 static void
-emitcode (char *inst, char *fmt,...)
+emitcode (char *inst, const char *fmt,...)
 {
-    va_list ap;
-    char lb[INITIAL_INLINEASM];
-    char *lbp = lb;
+  va_list ap;
+  char lb[INITIAL_INLINEASM];
+  char *lbp = lb;
 
-    va_start (ap, fmt);
+  va_start (ap, fmt);
 
-    if (inst && *inst)
+  if (inst && *inst)
     {
-        if (fmt && *fmt)
+      if (fmt && *fmt)
         {
-            SNPRINTF (lb, sizeof(lb), "%s\t", inst);
+          SNPRINTF (lb, sizeof(lb), "%s\t", inst);
         }
-        else
+      else
         {
-            SNPRINTF (lb, sizeof(lb), "%s", inst);
+          SNPRINTF (lb, sizeof(lb), "%s", inst);
         }
 
-        tvsprintf (lb + strlen(lb), sizeof(lb) - strlen(lb),
-                   fmt, ap);
+      tvsprintf (lb + strlen(lb), sizeof(lb) - strlen(lb), fmt, ap);
     }
-    else
+  else
     {
-        tvsprintf (lb, sizeof(lb), fmt, ap);
+      tvsprintf (lb, sizeof(lb), fmt, ap);
     }
 
-
-    while (isspace (*lbp))
+  while (isspace (*lbp))
     {
-        lbp++;
+      lbp++;
     }
 
-    if (lbp && *lbp)
+  if (lbp && *lbp)
     {
-        lineCurr = (lineCurr ?
-                    connectLine (lineCurr, newLineNode (lb)) :
-                    (lineHead = newLineNode (lb)));
+      lineCurr = (lineCurr ?
+                  connectLine (lineCurr, newLineNode (lb)) :
+                  (lineHead = newLineNode (lb)));
     }
 
-    lineCurr->isInline = _G.inLine;
-    lineCurr->isDebug = _G.debugLine;
-    lineCurr->ic = _G.current_iCode;
-    lineCurr->aln = ds390newAsmLineNode(_currentDPS);
-    va_end (ap);
+  lineCurr->isInline = _G.inLine;
+  lineCurr->isDebug = _G.debugLine;
+  lineCurr->ic = _G.current_iCode;
+  lineCurr->aln = ds390newAsmLineNode(_currentDPS);
+  va_end (ap);
 }
 
 /*-----------------------------------------------------------------*/
@@ -730,7 +728,7 @@ aopForRemat (symbol * sym)
 {
   iCode *ic = sym->rematiCode;
   asmop *aop = newAsmop (AOP_IMMD);
-  int ptr_type =0;
+  int ptr_type = 0;
   int val = 0;
 
   for (;;)
@@ -870,7 +868,6 @@ operandsEqu (operand * op1, operand * op2)
       && strcmp (sym1->rname, sym2->rname) == 0)
     return TRUE;
 
-
   /* if left is a tmp & right is not */
   if (IS_ITEMP (op1) &&
       !IS_ITEMP (op2) &&
@@ -987,7 +984,6 @@ aopOp (operand * op, iCode * ic, bool result, bool useDP2)
      e) can be a return use only */
 
   sym = OP_SYMBOL (op);
-
 
   /* if the type is a conditional */
   if (sym->regType == REG_CND)
@@ -2536,12 +2532,12 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
 
   if (aop)
   {
-       freeAsmop (NULL, aop, ic, TRUE);
+    freeAsmop (NULL, aop, ic, TRUE);
   }
 
   if (ic)
   {
-      ic->bankSaved = 1;
+    ic->bankSaved = 1;
   }
 }
 
@@ -3791,54 +3787,55 @@ genPlusIncr (iCode * ic)
 
       if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
           IS_AOP_PREG (IC_RESULT (ic)))
-      {
-        emitcode ("cjne", "%s,#0,!tlabel", l, tlbl->key + 100);
-      }
+        {
+          emitcode ("cjne", "%s,#0,!tlabel", l, tlbl->key + 100);
+        }
       else
-      {
+        {
           emitcode ("clr", "a");
           emitcode ("cjne", "a,%s,!tlabel", l, tlbl->key + 100);
-      }
+        }
 
       l = aopGet (AOP (IC_RESULT (ic)), MSB16, FALSE, FALSE, NULL);
       emitcode ("inc", "%s", l);
       if (size > 2)
         {
-            if (!strcmp(l, "acc"))
+          if (!strcmp(l, "acc"))
             {
                 emitcode("jnz", "!tlabel", tlbl->key + 100);
             }
-            else if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
-                     IS_AOP_PREG (IC_RESULT (ic)))
+          else if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
+                   IS_AOP_PREG (IC_RESULT (ic)))
             {
                 emitcode ("cjne", "%s,#0,!tlabel", l, tlbl->key + 100);
             }
-            else
+          else
             {
                 emitcode ("cjne", "a,%s,!tlabel", l, tlbl->key + 100);
             }
 
-            l = aopGet (AOP (IC_RESULT (ic)), MSB24, FALSE, FALSE, NULL);
-            emitcode ("inc", "%s", l);
+          l = aopGet (AOP (IC_RESULT (ic)), MSB24, FALSE, FALSE, NULL);
+          emitcode ("inc", "%s", l);
         }
       if (size > 3)
         {
-            if (!strcmp(l, "acc"))
+          if (!strcmp(l, "acc"))
             {
                 emitcode("jnz", "!tlabel", tlbl->key + 100);
             }
-            else if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
-                     IS_AOP_PREG (IC_RESULT (ic)))
+          else if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
+                   IS_AOP_PREG (IC_RESULT (ic)))
             {
                 emitcode ("cjne", "%s,#0,!tlabel", l, tlbl->key + 100);
             }
-            else
+          else
             {
                 emitcode ("cjne", "a,%s,!tlabel", l, tlbl->key + 100);
             }
 
-            l = aopGet (AOP (IC_RESULT (ic)), MSB32, FALSE, FALSE, NULL);
-            emitcode ("inc", "%s", l);  }
+          l = aopGet (AOP (IC_RESULT (ic)), MSB32, FALSE, FALSE, NULL);
+          emitcode ("inc", "%s", l);
+        }
 
       if (emitTlbl)
         {
@@ -3849,8 +3846,12 @@ genPlusIncr (iCode * ic)
 
   if (AOP_TYPE(IC_RESULT(ic))==AOP_STR && IS_ITEMP(IC_RESULT(ic)) &&
       !AOP_USESDPTR(IC_LEFT(ic)) && icount <= 5 && size <= 3 &&
-      options.model == MODEL_FLAT24 ) {
-
+      options.model == MODEL_FLAT24 )
+    {
+      if (IC_RESULT(ic)->isGptr)
+        {
+          emitcode ("mov","b,%s",aopGet(AOP (IC_LEFT (ic)), 3, FALSE, FALSE, NULL));
+        }
       switch (size) {
       case 3:
           emitcode ("mov","dpx,%s",aopGet(AOP (IC_LEFT (ic)), 2, FALSE, FALSE, NULL));
@@ -10185,31 +10186,31 @@ genGenPointerGet (operand * left,
      then we do nothing else we move the value to dptr */
   if (AOP_TYPE (left) != AOP_STR)
     {
-      /* if this is remateriazable */
+      /* if this is rematerializable */
       if (AOP_TYPE (left) == AOP_IMMD)
         {
           emitcode ("mov", "dptr,%s", aopGet (AOP (left), 0, TRUE, FALSE, NULL));
           if (AOP(left)->aopu.aop_immd.from_cast_remat)
             {
-                MOVB(aopGet(AOP (left), AOP_SIZE(left)-1, FALSE, FALSE, NULL));
+              MOVB(aopGet(AOP (left), AOP_SIZE(left)-1, FALSE, FALSE, NULL));
             }
-            else
+          else
             {
-                emitcode ("mov", "b,#%d", pointerCode (retype));
+              emitcode ("mov", "b,#%d", pointerCode (retype));
             }
         }
       else
         {                       /* we need to get it byte by byte */
-            _startLazyDPSEvaluation ();
-            emitcode ("mov", "dpl,%s", aopGet (AOP(left),0,FALSE,FALSE,NULL));
-            emitcode ("mov", "dph,%s", aopGet (AOP(left),1,FALSE,FALSE,NULL));
-            if (options.model == MODEL_FLAT24) {
-                emitcode ("mov", "dpx,%s", aopGet (AOP(left),2,FALSE,FALSE,NULL));
-                emitcode ("mov", "b,%s", aopGet (AOP(left),3,FALSE,FALSE,NULL));
-            } else {
-                emitcode ("mov", "b,%s", aopGet (AOP(left),2,FALSE,FALSE,NULL));
-            }
-            _endLazyDPSEvaluation ();
+          _startLazyDPSEvaluation ();
+          emitcode ("mov", "dpl,%s", aopGet (AOP(left),0,FALSE,FALSE,NULL));
+          emitcode ("mov", "dph,%s", aopGet (AOP(left),1,FALSE,FALSE,NULL));
+          if (options.model == MODEL_FLAT24) {
+              emitcode ("mov", "dpx,%s", aopGet (AOP(left),2,FALSE,FALSE,NULL));
+              emitcode ("mov", "b,%s", aopGet (AOP(left),3,FALSE,FALSE,NULL));
+          } else {
+              emitcode ("mov", "b,%s", aopGet (AOP(left),2,FALSE,FALSE,NULL));
+          }
+          _endLazyDPSEvaluation ();
         }
     }
 
@@ -10311,11 +10312,12 @@ genPointerGet (iCode * ic, iCode *pi)
     }
   /* special case when cast remat */
   if (p_type == GPOINTER && OP_SYMBOL(left)->remat &&
-      IS_CAST_ICODE(OP_SYMBOL(left)->rematiCode)) {
-          left = IC_RIGHT(OP_SYMBOL(left)->rematiCode);
-          type = operandType (left);
-          p_type = DCL_TYPE (type);
-  }
+      IS_CAST_ICODE(OP_SYMBOL(left)->rematiCode))
+    {
+      left = IC_RIGHT(OP_SYMBOL(left)->rematiCode);
+      type = operandType (left);
+      p_type = DCL_TYPE (type);
+    }
   /* now that we have the pointer type we assign
      the pointer values */
   switch (p_type)
@@ -13432,7 +13434,6 @@ gen390Code (iCode * lic)
 
   for (ic = lic; ic; ic = ic->next)
     {
-
       _G.current_iCode = ic;
 
       if (ic->lineno && cln != ic->lineno)

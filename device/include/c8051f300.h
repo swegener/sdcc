@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
    Register Declarations for the Cygnal C8051F30x Processor Range
 
-   Copyright (C) 2003 - Maarten Brock, sourceforge.brock@dse.nl
+   Copyright (C) 2004 - Maarten Brock, sourceforge.brock@dse.nl
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -15,11 +15,12 @@
 
    You should have received a copy of the GNU Lesser General Public
    License along with this library; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 -------------------------------------------------------------------------*/
 
 #ifndef C8051F300_H
 #define C8051F300_H
+
 
 /*  BYTE Registers  */
 sfr at 0x80 P0       ;	/* PORT 0                                        */
@@ -62,7 +63,7 @@ sfr at 0xC8 TMR2CN   ;	/* TIMER 2 CONTROL                               */
 sfr at 0xCA RCAP2L   ;	/* TIMER 2 CAPTURE REGISTER - LOW BYTE           */
 sfr at 0xCA TMR2RLL  ;	/* TIMER 2 CAPTURE REGISTER - LOW BYTE           */
 sfr at 0xCB RCAP2H   ;	/* TIMER 2 CAPTURE REGISTER - HIGH BYTE          */
-sfr at 0xCB TMR2RLH  ;	/* TIMER 2 CAPTURE REGISTER - LOW BYTE           */
+sfr at 0xCB TMR2RLH  ;	/* TIMER 2 CAPTURE REGISTER - HIGH BYTE          */
 sfr at 0xCC TL2      ;	/* TIMER 2 - LOW BYTE                            */
 sfr at 0xCC TMR2L    ;	/* TIMER 2 - LOW BYTE                            */
 sfr at 0xCD TH2      ;	/* TIMER 2 - HIGH BYTE                           */
@@ -160,14 +161,14 @@ sbit at 0xBC PS0     ;	/* IP.4 - SERIAL PORT PRIORITY                   */
 sbit at 0xBD PT2     ;	/* IP.5 - TIMER 2 PRIORITY                       */
 
 /*  SMB0CN  0xC0 */
-sbit at 0xC0 SMBTOE  ;	/* SMB0CN.0 - SMBUS 0 TIMEOUT ENABLE             */
-sbit at 0xC1 SMBFTE  ;	/* SMB0CN.1 - SMBUS 0 FREE TIMER ENABLE          */
-sbit at 0xC2 AA      ;	/* SMB0CN.2 - SMBUS 0 ASSERT/ACKNOWLEDGE FLAG    */
-sbit at 0xC3 SI      ;	/* SMB0CN.3 - SMBUS 0 INTERRUPT PENDING FLAG     */
+sbit at 0xC0 SI      ;	/* SMB0CN.0 - SMBUS 0 INTERRUPT PENDING FLAG     */
+sbit at 0xC1 ACK     ;	/* SMB0CN.1 - SMBUS 0 ACKNOWLEDGE FLAG           */
+sbit at 0xC2 ARBLOST ;	/* SMB0CN.2 - SMBUS 0 ARBITRATION LOST INDICATOR */
+sbit at 0xC3 ACKRQ   ;	/* SMB0CN.3 - SMBUS 0 ACKNOWLEDGE REQUEST        */
 sbit at 0xC4 STO     ;	/* SMB0CN.4 - SMBUS 0 STOP FLAG                  */
 sbit at 0xC5 STA     ;	/* SMB0CN.5 - SMBUS 0 START FLAG                 */
-sbit at 0xC6 ENSMB   ;	/* SMB0CN.6 - SMBUS 0 ENABLE                     */
-sbit at 0xC7 BUSY    ;	/* SMB0CN.7 - SMBUS 0 BUSY                       */
+sbit at 0xC6 TXMODE  ;	/* SMB0CN.6 - SMBUS 0 TRANSMIT MODE INDICATOR    */
+sbit at 0xC7 MASTER  ;	/* SMB0CN.7 - SMBUS 0 MASTER/SLAVE INDICATOR     */
 
 /*  TMR2CN  0xC8 */
 sbit at 0xC8 T2XCLK  ;	/* TMR2CN.0 - TIMER 2 EXTERNAL CLOCK SELECT      */
@@ -219,7 +220,7 @@ sbit at 0xFF CP0EN   ;  /* CPT0CN.7 - Comparator0 Enable Bit             */
 /* Predefined SFR Bit Masks */
 
 #define IDLE              0x01    /* PCON                                */
-#define STOP              0x01    /* PCON                                */
+#define STOP              0x02    /* PCON                                */
 #define T1M               0x10    /* CKCON                               */
 #define PSWE              0x01    /* PSCTL                               */
 #define PSEE              0x02    /* PSCTL                               */
@@ -232,6 +233,9 @@ sbit at 0xFF CP0EN   ;  /* CPT0CN.7 - Comparator0 Enable Bit             */
 #define TOG               0x04    /* PCA0CPMn                            */
 #define MAT               0x08    /* PCA0CPMn                            */
 #define ECOM              0x40    /* PCA0CPMn                            */
+#define CP0E              0x10    /* XBR1                                */
+#define CP0OEN            0x10    /* XBR1                                */
+#define CP0AE             0x20    /* XBR1                                */
 #define CP0AOEN           0x20    /* XBR1                                */
 
 #endif

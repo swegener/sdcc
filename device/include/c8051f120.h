@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU Lesser General Public
    License along with this library; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 -------------------------------------------------------------------------*/
 
 #ifndef C8051F120_H
@@ -416,12 +416,15 @@ sbit at 0xFF P7_7    ;
 /* Predefined SFR Bit Masks */
 
 #define IDLE              0x01    /* PCON                                */
-#define STOP              0x01    /* PCON                                */
+#define STOP              0x02    /* PCON                                */
 #define ECCF              0x01    /* PCA0CPMn                            */
 #define PWM               0x02    /* PCA0CPMn                            */
 #define TOG               0x04    /* PCA0CPMn                            */
 #define MAT               0x08    /* PCA0CPMn                            */
+#define CAPN              0x10    /* PCA0CPMn                            */
+#define CAPP              0x20    /* PCA0CPMn                            */
 #define ECOM              0x40    /* PCA0CPMn                            */
+#define PWM16             0x80    /* PCA0CPMn                            */
 #define PORSF             0x02    /* RSTSRC                              */
 #define SWRSF             0x10    /* RSTSRC                              */
 

@@ -1,3 +1,7 @@
+2005-03-19 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/makefile.in: added abs.c and labs.c
+
 2005-03-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/stdint.h: added

@@ -55,6 +55,7 @@ SOURCES		= _atof.c _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
 		  _memcmp.c _memcpy.c _memmove.c _memset.c \
 		  _modsint.c _modslong.c _moduint.c _modulong.c \
 		  _mulint.c _mullong.c \
+		  abs.c labs.c \
 		  _ser.c _setjmp.c \
 		  _spx.c _startup.c \
 		  _strcat.c _strchr.c _strcmp.c _strcpy.c \
@@ -89,6 +90,7 @@ Z80SOURCES      = _atof.c _atoi.c \
 		  assert.c \
 		  _modslong.c _modulong.c \
 		  _mullong.c \
+		  abs.c labs.c \
 		  _divslong.c _divulong.c \
 		  calloc.c malloc.c realloc.c free.c \
 		  printf_large.c sprintf.c vprintf.c puts.c gets.c \
@@ -113,6 +115,7 @@ XA51SOURCES      = _atof.c _atoi.c _atol.c _schar2fs.c \
 		  _isupper.c _isxdigit.c _slong2fs.c _memcmp.c \
 		  _memcpy.c _memmove.c _memset.c _modsint.c _modslong.c \
 		  _moduint.c _modulong.c _mulint.c _mullong.c \
+		  abs.c labs.c \
 		  _strcat.c _strchr.c _strcmp.c _strcpy.c \
 		  _strcspn.c _strlen.c _strncat.c _strncmp.c \
 		  _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
@@ -141,6 +144,7 @@ HC08SOURCES	= _atof.c _atoi.c _atol.c _schar2fs.c \
 		  _slong2fs.c \
 		  _memcmp.c _memcpy.c _memmove.c _memset.c \
 		  _modsint.c _modslong.c _moduint.c _modulong.c \
+		  abs.c labs.c \
 		  _spx.c _startup.c \
 		  _strcat.c _strchr.c _strcmp.c _strcpy.c \
 		  _strcspn.c _strlen.c _strncat.c _strncmp.c \

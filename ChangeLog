@@ -1,5 +1,7 @@
 2001-10-07  Michael Hope  <michaelh@juju.net.nz>
 
+	* src/z80/gen.c (setupPair): Added 'extended stack' support for the z80.  Can now have local variables or parameters of more than 127 bytes in size.  Increadibly slow, but it will work.  Currently anything involving the carry flag.
+
 	* support/Util/NewAlloc.c (freeTrace): Changed free for the gc case to not free at all.  Fixes runtime segfault.
 
 	* support/regression/tests/scott-compare3.c (c_abcd): Fixed up casts.

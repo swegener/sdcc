@@ -15,8 +15,8 @@ verifyBlock(char *p, char val, int len)
   return 1;
 }
 
-char
-spoil(char a)
+int
+spoil(int a)
 {
   return a;
 }
@@ -42,7 +42,7 @@ void
 testBP(void)
 {
   char above[ABOVE_MEM_SIZE];
-  char f;
+  int f;
   char below[BELOW_MEM_SIZE];
 
   memset(above, ABOVE_MEM_TEST_SIZE, sizeof(above));
@@ -56,4 +56,5 @@ testBP(void)
 
   ASSERT(verifyBlock(above, ABOVE_MEM_TEST_SIZE, sizeof(above)));
   ASSERT(verifyBlock(below, BELOW_MEM_TEST_SIZE, sizeof(below)));
+
 }

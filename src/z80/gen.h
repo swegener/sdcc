@@ -53,7 +53,9 @@ typedef enum
     /* Is in H and L */
     AOP_HLREG,
     /* Simple literal. */
-    AOP_SIMPLELIT
+    AOP_SIMPLELIT,
+    /* Is in the extended stack pointer (IY on the Z80) */
+    AOP_EXSTK
   }
 AOP_TYPE;
 

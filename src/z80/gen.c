@@ -167,10 +167,6 @@ static struct
 // PENDING
 #define ACC_NAME	_pairs[PAIR_AF].h
 
-#define RESULTONSTACK(x) \
-                         (IC_RESULT(x) && IC_RESULT(x)->aop && \
-                         IC_RESULT(x)->aop->type == AOP_STK )
-
 enum 
   {
     LSB,
@@ -539,8 +535,21 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool requires_a)
   /* Assign depending on the storage class */
   if (sym->onStack || sym->iaccess)
     {
-      emitDebug ("; AOP_STK for %s", sym->rname);
-      sym->aop = aop = newAsmop (AOP_STK);
+      /* The pointer that is used depends on how big the offset is.
+         Normally everything is AOP_STK, but for offsets of < -127 or
+         > 128 on the Z80 an extended stack pointer is used.
+      */
+      if (IS_Z80 && (sym->stack < -127 || sym->stack > (int)(128-getSize (sym->type))))
+        {
+          emitDebug ("; AOP_EXSTK for %s", sym->rname);
+          sym->aop = aop = newAsmop (AOP_EXSTK);
+        }
+      else
+        {
+          emitDebug ("; AOP_STK for %s", sym->rname);
+          sym->aop = aop = newAsmop (AOP_STK);
+        }
+
       aop->size = getSize (sym->type);
       aop->aopu.aop_stk = sym->stack;
       return aop;
@@ -1038,6 +1047,7 @@ requiresHL (asmop * aop)
     case AOP_IY:
     case AOP_HL:
     case AOP_STK:
+    case AOP_EXSTK:
       return TRUE;
     default:
       return FALSE;
@@ -1150,12 +1160,39 @@ setupPair (PAIR_ID pairId, asmop * aop, int offset)
   switch (aop->type)
     {
     case AOP_IY:
+      wassertl (pairId == PAIR_IY, "AOP_IY must be in IY");
       fetchLitPair (pairId, aop, 0);
       break;
+
     case AOP_HL:
       fetchLitPair (pairId, aop, offset);
       _G.pairs[pairId].offset = offset;
       break;
+
+    case AOP_EXSTK:
+      wassertl (IS_Z80, "Only the Z80 has an extended stack");
+      wassertl (pairId == PAIR_IY, "The Z80 extended stack must be in IY");
+
+      {
+	int offset = aop->aopu.aop_stk + _G.stack.offset;
+
+        if (_G.pairs[pairId].last_type == aop->type &&
+            _G.pairs[pairId].offset == offset)
+          {
+            /* Already setup */
+          }
+        else
+          {
+            /* PENDING: Do this better. */
+            sprintf (buffer, "%d", offset + _G.stack.pushed);
+            emit2 ("ld iy,!hashedstr", buffer);
+            emit2 ("add iy,sp");
+            _G.pairs[pairId].last_type = aop->type;
+            _G.pairs[pairId].offset = offset;
+          }
+      }
+      break;
+
     case AOP_STK:
       {
 	/* Doesnt include _G.stack.pushed */
@@ -1260,6 +1297,13 @@ aopGet (asmop * aop, int offset, bool bit16)
       wassert (IS_Z80);
       setupPair (PAIR_IY, aop, offset);
       tsprintf (s, "!*iyx", offset);
+
+      return traceAlloc(&_G.trace.aops, Safe_strdup(s));
+
+    case AOP_EXSTK:
+      wassert (IS_Z80);
+      setupPair (PAIR_IY, aop, offset);
+      tsprintf (s, "!*iyx", offset, offset);
 
       return traceAlloc(&_G.trace.aops, Safe_strdup(s));
 
@@ -1398,14 +1442,17 @@ aopPut (asmop * aop, const char *s, int offset)
 
     case AOP_IY:
       wassert (!IS_GB);
-      setupPair (PAIR_IY, aop, offset);
       if (!canAssignToPtr (s))
 	{
 	  emit2 ("ld a,%s", s);
+          setupPair (PAIR_IY, aop, offset);
 	  emit2 ("ld !*iyx,a", offset);
 	}
       else
-	emit2 ("ld !*iyx,%s", offset, s);
+        {
+          setupPair (PAIR_IY, aop, offset);
+          emit2 ("ld !*iyx,%s", offset, s);
+        }
       break;
 
     case AOP_HL:
@@ -1419,6 +1466,21 @@ aopPut (asmop * aop, const char *s, int offset)
       setupPair (PAIR_HL, aop, offset);
 
       emit2 ("ld !*hl,%s", s);
+      break;
+
+    case AOP_EXSTK:
+      wassert (!IS_GB);
+      if (!canAssignToPtr (s))
+	{
+	  emit2 ("ld a,%s", s);
+          setupPair (PAIR_IY, aop, offset);
+	  emit2 ("ld !*iyx,a", offset);
+	}
+      else
+        {
+          setupPair (PAIR_IY, aop, offset);
+          emit2 ("ld !*iyx,%s", offset, s);
+        }
       break;
 
     case AOP_STK:

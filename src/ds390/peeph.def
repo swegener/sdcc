@@ -1916,3 +1916,19 @@ replace {
 } by {
 	addc 	a, ap
 }
+
+replace {
+	inc 	dps
+	mov	dps, #0x%1
+} by {
+	mov     dps, #0x%1
+}
+
+replace {
+	dec 	dps
+	mov	dps, #0x%1
+} by {
+	mov     dps, #0x%1
+}
+
+

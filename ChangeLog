@@ -1,6 +1,7 @@
 2003-05-14  Bernhard Held <bernhard@bernhardheld.de>
 
-        * device/lib/_strtok.c: fixed bug #734355 by Lenny Story and Tim Woodall 
+        * device/lib/_strtok.c: fixed bug #734355 by Lenny Story and Tim Woodall
+	* src/SDCCutil.c: include ctype.h for win32
 
 2003-05-13  Bernhard Held <bernhard@bernhardheld.de>
 

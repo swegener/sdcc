@@ -23,6 +23,7 @@
 -------------------------------------------------------------------------*/
 
 #ifdef _WIN32
+#include <ctype.h>
 #include <windows.h>
 #endif
 #include <sys/stat.h>

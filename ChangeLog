@@ -1,6 +1,7 @@
 2003-03-15  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/mcs51/ralloc.c (packRegsForAssign): fixed bug #703541
+	* src/ds390/gen.c (genAddrOf): fixed bug #704087
 
 2003-03-13    <johan@balder>
 

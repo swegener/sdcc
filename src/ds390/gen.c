@@ -10564,13 +10564,13 @@ genAddrOf (iCode * ic)
       if (offset) {
 	  switch (offset) {
 	  case 1:
-	      tsprintf(s, sizeof(s), "!his",sym->rname);
+	      tsprintf(s, sizeof(s), "#!his",sym->rname);
 	      break;
 	  case 2:
-	      tsprintf(s, sizeof(s), "!hihis",sym->rname);
+	      tsprintf(s, sizeof(s), "#!hihis",sym->rname);
 	      break;
 	  case 3:
-	      tsprintf(s, sizeof(s), "!hihihis",sym->rname);
+	      tsprintf(s, sizeof(s), "#!hihihis",sym->rname);
 	      break;
 	  default: /* should not need this (just in case) */
 	      SNPRINTF (s, sizeof(s), "#(%s >> %d)",

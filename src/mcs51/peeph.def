@@ -2102,3 +2102,85 @@ replace {
 %1:
         ret
 }
+
+// applies to f.e. device/lib/log10f.c
+replace {
+        mov     %1,%9
+        mov     %2,%10
+        mov     %3,%11
+        mov     %4,%12
+        
+        mov     %5,%13
+        mov     %6,%14
+        mov     %7,%15
+        mov     %8,%16
+	
+        mov     %9,%1
+        mov     %10,%2
+        mov     %11,%3
+        mov     %12,%4
+} by {
+        mov     %1,%9
+        mov     %2,%10
+        mov     %3,%11
+        mov     %4,%12
+        
+        mov     %5,%13
+        mov     %6,%14
+        mov     %7,%15
+        mov     %8,%16
+        ;       Peephole 238a  removed 4 redundant moves
+} if operandsNotSame8 %1 %2 %3 %4 %5 %6 %7 %8
+
+// applies to device/lib/log10f.c
+replace {
+        mov     %1,%5
+        mov     %2,%6
+        mov     %3,%7
+        mov     %4,%8
+        
+        mov     %5,%1
+        mov     %6,%2
+        mov     %7,%3
+} by {
+        mov     %1,%5
+        mov     %2,%6
+        mov     %3,%7
+        mov     %4,%8
+        ;       Peephole 238b  removed 3 redundant moves
+} if operandsNotSame7 %1 %2 %3 %4 %5 %6 %7
+
+// applies to f.e. device/lib/time.c
+replace {
+        mov     %1,%5
+        mov     %2,%6
+        
+        mov     %3,%7
+        mov     %4,%8
+	
+        mov     %5,%1
+        mov     %6,%2
+} by {
+        mov     %1,%5
+        mov     %2,%6
+        
+        mov     %3,%7
+        mov     %4,%8
+        ;       Peephole 238c  removed 2 redundant moves
+} if operandsNotSame4 %1 %2 %3 %4
+
+// applies to f.e. support/regression/tests/bug-524209.c
+replace {
+        mov     %1,%4
+        mov     %2,%5
+        mov     %3,%6
+	
+        mov     %4,%1
+        mov     %5,%2
+        mov     %6,%3
+} by {
+        mov     %1,%4
+        mov     %2,%5
+        mov     %3,%6
+        ;       Peephole 238d  removed 3 redundant moves
+} if operandsNotSame6 %1 %2 %3 %4 %5 %6 

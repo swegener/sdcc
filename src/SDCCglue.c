@@ -107,7 +107,6 @@ copyFile (FILE * dest, FILE * src)
 char *
 aopLiteralLong (value * val, int offset, int size)
 {
-	char *rs;
 	union {
 		float f;
 		unsigned char c[4];
@@ -127,17 +126,18 @@ aopLiteralLong (value * val, int offset, int size)
 		v >>= (offset * 8);
 		switch (size) {
 		case 1:
-			tsprintf (buffer, "!immedbyte", (unsigned int) v & 0xff);
+			tsprintf (buffer, sizeof(buffer), 
+				  "!immedbyte", (unsigned int) v & 0xff);
 			break;
 		case 2:
-			tsprintf (buffer, "!immedword", (unsigned int) v & 0xffff);
+			tsprintf (buffer, sizeof(buffer), 
+				  "!immedword", (unsigned int) v & 0xffff);
 			break;
 		default:
 			/* Hmm.  Too big for now. */
 			assert (0);
 		}
-		rs = Safe_calloc (1, strlen (buffer) + 1);
-		return strcpy (rs, buffer);
+		return Safe_strdup (buffer);
 	}
 
 	/* PENDING: For now size must be 1 */
@@ -146,12 +146,13 @@ aopLiteralLong (value * val, int offset, int size)
 	/* it is type float */
 	fl.f = (float) floatFromVal (val);
 #ifdef _BIG_ENDIAN
-	tsprintf (buffer, "!immedbyte", fl.c[3 - offset]);
+	tsprintf (buffer, sizeof(buffer), 
+		  "!immedbyte", fl.c[3 - offset]);
 #else
-	tsprintf (buffer, "!immedbyte", fl.c[offset]);
+	tsprintf (buffer, sizeof(buffer), 
+		  "!immedbyte", fl.c[offset]);
 #endif
-	rs = Safe_calloc (1, strlen (buffer) + 1);
-	return strcpy (rs, buffer);
+	return Safe_strdup (buffer);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1466,12 +1467,12 @@ glue (void)
   /* -o option overrides default name? */
   if ((noAssemble || options.c1mode) && fullDstFileName)
     {
-      strcpy (scratchFileName, fullDstFileName);
+      strncpyz (scratchFileName, fullDstFileName, PATH_MAX);
     }
   else
     {
-      strcpy (scratchFileName, dstFileName);
-      strcat (scratchFileName, port->assembler.file_ext);
+      strncpyz (scratchFileName, dstFileName, PATH_MAX);
+      strncatz (scratchFileName, port->assembler.file_ext, PATH_MAX);
     }
 
   if (!(asmFile = fopen (scratchFileName, "w")))

@@ -56,7 +56,7 @@ iemit (const char *szFormat,...)
 
   va_start (ap, szFormat);
 
-  tvsprintf (buffer, szFormat, ap);
+  tvsprintf (buffer, sizeof(buffer), szFormat, ap);
 
   _tidyUp (buffer);
 

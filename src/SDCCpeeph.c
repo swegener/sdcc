@@ -554,8 +554,7 @@ newPeepRule (lineNode * match,
 
   if (cond && *cond)
     {
-      pr->cond = Safe_alloc ( strlen (cond) + 1);
-      strcpy (pr->cond, cond);
+      pr->cond = Safe_strdup (cond);
     }
   else
     pr->cond = NULL;
@@ -580,8 +579,7 @@ newLineNode (char *line)
   lineNode *pl;
 
   pl = Safe_alloc ( sizeof (lineNode));
-  pl->line = Safe_alloc ( strlen (line) + 1);
-  strcpy (pl->line, line);
+  pl->line = Safe_strdup (line);
   return pl;
 }
 
@@ -1316,8 +1314,7 @@ readFileIntoBuffer (char *fname)
 	    }
 	  else
 	    {
-	      rs = Safe_alloc ( strlen (lb) + 1);
-	      strcpy (rs, lb);
+	      rs = Safe_strdup (lb);
 	    }
 	  nch = 0;
 	}
@@ -1335,8 +1332,7 @@ readFileIntoBuffer (char *fname)
 	}
       else
 	{
-	  rs = Safe_alloc ( strlen (lb) + 1);
-	  strcpy (rs, lb);
+	  rs = Safe_strdup (lb);
 	}
     }
   return rs;

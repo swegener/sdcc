@@ -283,7 +283,7 @@ extern int NestLevel;		/* NestLevel                 SDCC.y   */
 extern int stackPtr;		/* stack pointer             SDCC.y   */
 extern int xstackPtr;		/* external stack pointer    SDCC.y   */
 extern int reentrant;		/* /X flag has been sent     SDCC.y */
-extern char buffer[];		/* general buffer      SDCCgen.c   */
+extern char buffer[PATH_MAX];	/* general buffer      	     SDCCmain.c   */
 extern int currRegBank;		/* register bank being used   SDCCgens.c   */
 extern int RegBankUsed[4];	/* JCF: register banks used	  SDCCmain.c   */
 extern struct symbol *currFunc;	/* current function    SDCCgens.c */

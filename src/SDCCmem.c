@@ -519,7 +519,7 @@ allocParms (value * val)
 	{ /* allocate them in the automatic space */
 	  /* generate a unique name  */
 	  sprintf (lval->sym->rname, "%s%s_PARM_%d", port->fun_prefix, currFunc->name, pNum);
-	  strcpy (lval->name, lval->sym->rname);
+	  strncpyz (lval->name, lval->sym->rname, sizeof(lval->name));
 	  
 	  /* if declared in external storage */
 	  if (SPEC_SCLS (lval->etype) == S_XDATA)
@@ -576,10 +576,11 @@ deallocParms (value * val)
       if (lval->sym->rname[0])
 	{
 	  char buffer[SDCC_NAME_MAX];
-	  strcpy (buffer, lval->sym->rname);
+	  strncpyz (buffer, lval->sym->rname, sizeof(buffer));
 	  lval->sym = copySymbol (lval->sym);
-	  strcpy (lval->sym->rname, buffer);
-	  strcpy (lval->name, strcpy (lval->sym->name, lval->sym->rname));
+	  strncpyz (lval->sym->rname, buffer, sizeof(lval->sym->rname));
+	  strncpyz (lval->sym->name, buffer, sizeof(lval->sym->name));
+	  strncpyz (lval->name, buffer, sizeof(lval->name)); 
 	  addSym (SymbolTab, lval->sym, lval->sym->name,
 		  lval->sym->level, lval->sym->block, 1);
 	  lval->sym->_isparm = 1;

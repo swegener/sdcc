@@ -53,15 +53,16 @@ _findMapping (const char *szKey)
 // Append a string onto another, and update the pointer to the end of
 // the new string.
 static char *
-_appendAt (char *at, char *onto, const char *sz)
+_appendAt (char *at, char *onto, const char *sz, size_t *max)
 {
   wassert (at && onto && sz);
-  strcpy (at, sz);
-  return at + strlen (sz);
+  strncpyz (at, sz, *max);
+  *max -= strlen (at);
+  return at + strlen (at);
 }
 
 void 
-tvsprintf (char *buffer, const char *format, va_list ap)
+tvsprintf (char *buffer, size_t len, const char *format, va_list ap)
 {
   // Under Linux PPC va_list is a structure instead of a primitive type,
   // and doesnt like being passed around.  This version turns everything
@@ -74,19 +75,20 @@ tvsprintf (char *buffer, const char *format, va_list ap)
 
   // This is acheived by expanding the tokens and zero arg formats into
   // one big format string, which is passed to the native printf.
-  static int count;
-  char noTokens[INITIAL_INLINEASM];
-  char newFormat[INITIAL_INLINEASM];
-  char *pInto = noTokens;
-  char *p;
-  char token[MAX_TOKEN_LEN];
-  const char *sz = format;
+  static int 	count;
+  char 		noTokens[INITIAL_INLINEASM];
+  char 		newFormat[INITIAL_INLINEASM];
+  char 		*pInto = noTokens;
+  size_t 	pIntoLen = sizeof(noTokens);
+  char 		*p;
+  char 		token[MAX_TOKEN_LEN];
+  const char 	*sz = format;
 
   // NULL terminate it to let strlen work.
   *pInto = '\0';
 
   /* First pass: expand all of the macros */
-  while (*sz)
+  while (pIntoLen && *sz)
     {
       if (*sz == '!')
 	{
@@ -103,7 +105,7 @@ tvsprintf (char *buffer, const char *format, va_list ap)
 	  /* Now find the token in the token list */
 	  if ((t = _findMapping (token)))
 	    {
-	      pInto = _appendAt (pInto, noTokens, t);
+	      pInto = _appendAt (pInto, noTokens, t, &pIntoLen);
 	    }
 	  else
 	    {
@@ -114,16 +116,25 @@ tvsprintf (char *buffer, const char *format, va_list ap)
       else
         {
           *pInto++ = *sz++;
+	  pIntoLen--;
         }
     }
 
+  if (!pIntoLen)
+  {
+      fprintf(stderr,
+		"Internal error: tvsprintf overflowed on pass one.\n");
+      // Might as well go on...
+  }
+    
   *pInto = '\0';
 
   /* Second pass: Expand any macros that we own */
   sz = noTokens;
   pInto = newFormat;
+  pIntoLen = sizeof(newFormat);
 
-  while (*sz)
+  while (pIntoLen && *sz)
     {
       if (*sz == '%')
 	{
@@ -133,48 +144,79 @@ tvsprintf (char *buffer, const char *format, va_list ap)
 	    {
 	    case 'C':
 	      // Code segment name.
-	      pInto = _appendAt (pInto, newFormat, CODE_NAME);
+	      pInto = _appendAt (pInto, newFormat, CODE_NAME, &pIntoLen);
               sz++;
 	      break;
 	    case 'F':
 	      // Source file name.
-	      pInto = _appendAt (pInto, newFormat, fullSrcFileName);
+	      pInto = _appendAt (pInto, newFormat, fullSrcFileName, &pIntoLen);
               sz++;
 	      break;
             case 'N':
               // Current function name.
-              pInto = _appendAt (pInto, newFormat, currFunc->rname);
+              pInto = _appendAt (pInto, newFormat, currFunc->rname, &pIntoLen);
               sz++;
               break;
 	    case 'I':
 	      {
 		// Unique ID.
 		char id[20];
-		sprintf (id, "%u", ++count);
-		pInto = _appendAt (pInto, newFormat, id);
+		SNPRINTF (id, sizeof(id), "%u", ++count);
+		pInto = _appendAt (pInto, newFormat, id, &pIntoLen);
                 sz++;
 		break;
 	      }
 	    default:
 	      // Not one of ours.  Copy until the end.
 	      *pInto++ = '%';
-	      while (!isalpha (*sz))
+	      pIntoLen--;
+	      while (pIntoLen && !isalpha (*sz))
 		{
 		  *pInto++ = *sz++;
+		  pIntoLen--;
 		}
-	      *pInto++ = *sz++;
+		if (pIntoLen)
+		{
+		    *pInto++ = *sz++;
+		    pIntoLen--;
+		}
 	    }
 	}
       else
 	{
 	  *pInto++ = *sz++;
+	  pIntoLen--;
 	}
     }
 
+  if (!pIntoLen)
+  {
+      fprintf(stderr,
+		"Internal error: tvsprintf overflowed on pass two.\n");
+      // Might as well go on...
+  }    
+    
   *pInto = '\0';
 
   // Now do the actual printing
-  vsprintf (buffer, newFormat, ap);
+#if defined(HAVE_VSNPRINTF)
+    {
+	int wrlen;
+	wrlen = vsnprintf (buffer, len, newFormat, ap);
+	
+	if (wrlen < 0 || wrlen >= len)
+	{
+	    fprintf(stderr, "Internal error: tvsprintf truncated.\n");
+	}
+    }
+    
+#else    
+    vsprintf (buffer, newFormat, ap);
+    if (strlen(buffer) >= len)
+    {
+	fprintf(stderr, "Internal error: tvsprintf overflowed.\n");
+    }
+#endif    
 }
 
 void 
@@ -184,16 +226,18 @@ tfprintf (FILE * fp, const char *szFormat,...)
   char buffer[INITIAL_INLINEASM];
 
   va_start (ap, szFormat);
-  tvsprintf (buffer, szFormat, ap);
+  tvsprintf (buffer, INITIAL_INLINEASM, szFormat, ap);
+  va_end(ap);
   fputs (buffer, fp);
 }
 
 void 
-tsprintf (char *buffer, const char *szFormat,...)
+tsprintf (char *buffer, size_t len, const char *szFormat,...)
 {
   va_list ap;
   va_start (ap, szFormat);
-  tvsprintf (buffer, szFormat, ap);
+  tvsprintf (buffer, len, szFormat, ap);
+  va_end(ap);
 }
 
 void 
@@ -271,7 +315,7 @@ char *printCLine (char *srcFile, int lineno) {
       perror ("printCLine");
       exit (1);
     }
-    strcpy (lastSrcFile, srcFile);
+    strncpyz (lastSrcFile, srcFile, PATH_MAX);
   }
   if (lineno<inLineNo) {
     fseek (inFile, 0, SEEK_SET);

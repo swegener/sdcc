@@ -755,7 +755,7 @@ copyValue (value * src)
 
   dest = newValue ();
   dest->sym = copySymbol (src->sym);
-  strcpy (dest->name, src->name);
+  strncpyz (dest->name, src->name, SDCC_NAME_MAX);
   dest->type = (src->type ? copyLinkChain (src->type) : NULL);
   dest->etype = (src->type ? getSpec (dest->type) : NULL);
 

@@ -186,8 +186,7 @@ copyAstValues (ast * dest, ast * src)
       break;
 
     case INLINEASM:
-      dest->values.inlineasm = Safe_alloc (strlen (src->values.inlineasm) + 1);
-      strcpy (dest->values.inlineasm, src->values.inlineasm);
+      dest->values.inlineasm =  Safe_strdup(src->values.inlineasm);
       break;
 
     case ARRAYINIT:
@@ -1170,7 +1169,7 @@ stringToSymbol (value * val)
 
   sprintf (name, "_str_%d", charLbl++);
   sym = newSymbol (name, 0);	/* make it @ level 0 */
-  strcpy (sym->rname, name);
+  strncpyz (sym->rname, name, SDCC_NAME_MAX);
 
   /* copy the type from the value passed */
   sym->type = copyLinkChain (val->type);
@@ -1315,7 +1314,7 @@ constExprValue (ast * cexpr, int check)
 	  val->sym = cexpr->opval.val->sym;
 	  val->sym->type = copyLinkChain (cexpr->ftype);
 	  val->sym->etype = getSpec (val->sym->type);
-	  strcpy (val->name, cexpr->opval.val->sym->rname);
+	  strncpyz (val->name, cexpr->opval.val->sym->rname, SDCC_NAME_MAX);
 	  return val;
 	}
 

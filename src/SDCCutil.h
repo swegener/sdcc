@@ -26,6 +26,7 @@
 #define SDCCUTIL_H
 
 #include "SDCChasht.h"
+#include <stdarg.h>
 
 /* PENDING: Hacks as I can't work autoconf */
 #define BINDIR	PREFIX "/bin"
@@ -74,7 +75,7 @@ void setMainValue (const char *pname, const char *pvalue);
 
 void populateMainValues (const char **ppin);
 
-void buildCmdLine2 (char *pbuffer, const char *pcmd);
+void buildCmdLine2 (char *pbuffer, const char *pcmd, size_t len);
 
 /** Returns true if sz starts with the string given in key.
  */
@@ -87,6 +88,41 @@ void chomp (char *sz);
 
 hTab *
 getRuntimeVariables(void);
+
+/* strncpy() with guaranteed NULL termination. */
+char *strncpyz(char *dest, const char *src, size_t n);
+
+/* like strncat() with guaranteed NULL termination
+ * The passed size should be the size of the dest buffer, not the number of 
+ * bytes to copy.
+ */
+char *strncatz(char *dest, const char *src, size_t n);
+
+/* snprintf, by hook or by crook. */
+size_t SDCCsnprintf(char *, size_t, const char *, ...);
+
+# if defined(HAVE_VSNPRINTF)
+
+// best option: we can define our own snprintf which logs errors.
+#  define SNPRINTF SDCCsnprintf
+
+# elif defined(HAVE_SPRINTF)
+
+// if we can't build a safe snprintf for lack of vsnprintf but there
+// is a native snprintf, use it.
+#  define SNPRINTF snprintf
+
+# elif defined(HAVE_VSPRINTF)
+
+// we can at least define our own unsafe version.
+#  define SNPRINTF SDCCsnprintf
+
+# else
+// We don't have a native snprintf nor the functions we need to write one.
+#  error "Need at least one of snprintf, vsnprintf, vsprintf!"
+# endif
+
+
 
 #endif
 

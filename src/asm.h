@@ -1,9 +1,9 @@
 #ifndef ASM_PORT_INCLUDE
 #define ASM_PORT_INCLUDE
 
-void tfprintf (FILE * fp, const char *szFormat,...);
-void tsprintf (char *buffer, const char *szFormat,...);
-void tvsprintf (char *buffer, const char *szFormat, va_list ap);
+void tfprintf (FILE * fp, const char *szFormat, ...);
+void tsprintf (char *buffer, size_t len, const char *szFormat, ...);
+void tvsprintf (char *buffer, size_t len, const char *szFormat, va_list ap);
 
 typedef struct
   {

@@ -617,7 +617,7 @@ newiTemp (char *s)
   else
     sprintf (buffer, "iTemp%d", iTempNum++);
   itmp = newSymbol (buffer, 1);
-  strcpy (itmp->rname, itmp->name);
+  strncpyz (itmp->rname, itmp->name, SDCC_NAME_MAX);
   itmp->isitmp = 1;
 
   return itmp;

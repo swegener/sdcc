@@ -71,18 +71,16 @@ addToList (const char **list, const char *str)
 char *
 join(const char **pplist)
 {
-  char *pinto = buffer;
-
-  while (*pplist)
+    buffer[0] = 0;  
+    
+    while (*pplist)
     {
-      strcpy(pinto, *pplist);
-      pinto += strlen(*pplist);
-      *pinto++ = ' ';
-      pplist++;
+	strncatz(buffer, *pplist, PATH_MAX);
+	strncatz(buffer, " ", PATH_MAX);
+	pplist++;
     }
-  *pinto = '\0';
 
-  return buffer;
+    return buffer;
 }
 
 /** Given an array of string pointers, returns a string containing all
@@ -92,19 +90,16 @@ join(const char **pplist)
 char *
 joinn(char **pplist, int n)
 {
-  char *pinto = buffer;
-  *pinto = '\0';
-
-  while (n--)
+    buffer[0] = 0;  
+    
+    while (n--)
     {
-      strcpy(pinto, *pplist);
-      pinto += strlen(*pplist);
-      *pinto++ = ' ';
-      pplist++;
+	strncatz(buffer, *pplist, PATH_MAX);
+	strncatz(buffer, " ", PATH_MAX);
+	pplist++;
     }
-  *pinto = '\0';
 
-  return buffer;
+    return buffer;
 }
 
 /** Returns TRUE if for the host the two path characters are
@@ -231,7 +226,7 @@ getPathDifference (char *pinto, const char *p1, const char *p2)
 char *
 getPrefixFromBinPath (const char *prel)
 {
-  strcpy(scratchFileName, prel);
+  strncpyz(scratchFileName, prel, PATH_MAX);
   /* Strip off the /sdcc at the end */
   *strrchr(scratchFileName, DIR_SEPARATOR_CHAR) = '\0';
   /* Compute what the difference between the prefix and the bin dir
@@ -278,14 +273,14 @@ setMainValue (const char *pname, const char *pvalue)
 }
 
 void
-buildCmdLine2 (char *pbuffer, const char *pcmd)
+buildCmdLine2 (char *pbuffer, const char *pcmd, size_t len)
 {
   char *poutcmd;
   assert(pbuffer && pcmd);
   assert(_mainValues);
 
   poutcmd = msprintf(_mainValues, pcmd);
-  strcpy(pbuffer, poutcmd);
+  strncpyz(pbuffer, poutcmd, len);
 }
 
 void
@@ -318,3 +313,76 @@ getRuntimeVariables(void)
 {
   return _mainValues;
 }
+
+
+/* strncpy() with guaranteed NULL termination. */
+char *strncpyz(char *dest, const char *src, size_t n)
+{
+    assert(n > 0);
+    
+    // paranoia...
+    if (strlen(src) >= n)
+    {
+	fprintf(stderr, "strncpyz prevented buffer overrun!\n");
+    }
+    
+    strncpy(dest, src, n);
+    dest[n - 1] = 0;
+    return dest;
+}
+
+/* like strncat() with guaranteed NULL termination
+ * The passed size should be the size of the dest buffer, not the number of 
+ * bytes to copy.
+ */
+char *strncatz(char *dest, const char *src, size_t n)
+{
+    size_t maxToCopy;
+    size_t destLen = strlen(dest);
+    
+    assert(n > 0);
+    assert(n > destLen);
+    
+    maxToCopy = n - destLen - 1;
+    
+    // paranoia...
+    if (strlen(src) + destLen >= n)
+    {
+	fprintf(stderr, "strncatz prevented buffer overrun!\n");
+    }
+    
+    strncat(dest, src, maxToCopy);
+    dest[n - 1] = 0;
+    return dest;
+}
+
+
+#if defined(HAVE_VSNPRINTF) || defined(have_VSPRINTF)
+size_t SDCCsnprintf(char *dst, size_t n, const char *fmt, ...)
+{
+    va_list args;
+    int  len;
+    
+    va_start(args, fmt);
+    
+# if defined(HAVE_VSNPRINTF)    
+    len = vsnprintf(dst, n, fmt, args);
+# else
+    vsprintf(dst, fmt, args);
+    len = strlen(dst) + 1;
+# endif    
+    
+    va_end(args);
+    
+    /* on some gnu systems, vsnprintf returns -1 if output is truncated.
+     * In the C99 spec, vsnprintf returns the number of characters that 
+     * would have been written, were space available.
+     */
+    if ((len < 0) || len >= n)
+    {
+	fprintf(stderr, "internal error: sprintf truncated.\n");
+    }
+    return len;
+}
+
+#endif

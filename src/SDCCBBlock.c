@@ -102,8 +102,8 @@ FILE *appendDumpFile (int id) {
 
   if (!dumpFilesPtr->filePtr) {
     // not used before, create it
-    strcpy (scratchFileName, dstFileName);
-    strcat (scratchFileName, dumpFilesPtr->ext);
+    strncpyz (scratchFileName, dstFileName, PATH_MAX);
+    strncatz (scratchFileName, dumpFilesPtr->ext, PATH_MAX);
     if (!(dumpFilesPtr->filePtr = fopen (scratchFileName, "w"))) {
       werror (E_FILE_OPEN_ERR, scratchFileName);
       exit (1);

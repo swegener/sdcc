@@ -402,7 +402,7 @@ _vemit2 (const char *szFormat, va_list ap)
 {
   char buffer[256];
 
-  tvsprintf (buffer, szFormat, ap);
+  tvsprintf (buffer, sizeof(buffer), szFormat, ap);
 
   _tidyUp (buffer);
   _G.lines.current = (_G.lines.current ?
@@ -1079,8 +1079,6 @@ isLitWord (asmop * aop)
 char *
 aopGetLitWordLong (asmop * aop, int offset, bool with_hash)
 {
-  char *s = buffer;
-
   /* depending on type */
   switch (aop->type)
     {
@@ -1090,17 +1088,20 @@ aopGetLitWordLong (asmop * aop, int offset, bool with_hash)
       /* PENDING: for re-target */
       if (with_hash)
         {
-          tsprintf (s, "!hashedstr + %d", aop->aopu.aop_immd, offset);
+          tsprintf (buffer, sizeof(buffer), 
+		    "!hashedstr + %d", aop->aopu.aop_immd, offset);
         }
       else if (offset == 0)
         {
-          tsprintf (s, "%s", aop->aopu.aop_immd);
+          tsprintf (buffer, sizeof(buffer),
+		    "%s", aop->aopu.aop_immd);
         }
       else
         {
-          tsprintf (s, "%s + %d", aop->aopu.aop_immd, offset);
+          tsprintf (buffer, sizeof(buffer), 
+		    "%s + %d", aop->aopu.aop_immd, offset);
         }
-      return traceAlloc(&_G.trace.aops, Safe_strdup(s));
+      return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
 
     case AOP_LIT:
       {
@@ -1125,9 +1126,9 @@ aopGetLitWordLong (asmop * aop, int offset, bool with_hash)
               }
 
 	    if (with_hash)
-	      tsprintf (buffer, "!immedword", v);
+	      tsprintf (buffer, sizeof(buffer), "!immedword", v);
 	    else
-	      tsprintf (buffer, "!constword", v);
+	      tsprintf (buffer, sizeof(buffer), "!constword", v);
 
             return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
 	  }
@@ -1149,9 +1150,9 @@ aopGetLitWordLong (asmop * aop, int offset, bool with_hash)
             i = fl.c[offset] | (fl.c[offset+1]<<8);
 #endif
 	    if (with_hash)
-	      tsprintf (buffer, "!immedword", i);
+	      tsprintf (buffer, sizeof(buffer), "!immedword", i);
 	    else
-	      tsprintf (buffer, "!constword", i);
+	      tsprintf (buffer, sizeof(buffer), "!constword", i);
 
             return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
 	  }
@@ -1476,15 +1477,15 @@ emitLabel (int key)
 static const char *
 aopGet (asmop * aop, int offset, bool bit16)
 {
-  char *s = buffer;
+  // char *s = buffer;
 
   /* offset is greater than size then zero */
   /* PENDING: this seems a bit screwed in some pointer cases. */
   if (offset > (aop->size - 1) &&
       aop->type != AOP_LIT) 
     {
-      tsprintf (s, "!zero");
-      return traceAlloc(&_G.trace.aops, Safe_strdup(s));
+      tsprintf (buffer, sizeof(buffer), "!zero");
+      return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
     }
 
   /* depending on type */
@@ -1493,38 +1494,38 @@ aopGet (asmop * aop, int offset, bool bit16)
     case AOP_IMMD:
       /* PENDING: re-target */
       if (bit16)
-	tsprintf (s, "!immedwords", aop->aopu.aop_immd);
+	tsprintf (buffer, sizeof(buffer), "!immedwords", aop->aopu.aop_immd);
       else
 	switch (offset)
 	  {
 	  case 2:
-	    tsprintf (s, "!bankimmeds", aop->aopu.aop_immd);
+	    tsprintf (buffer, sizeof(buffer), "!bankimmeds", aop->aopu.aop_immd);
 	    break;
 	  case 1:
-	    tsprintf (s, "!msbimmeds", aop->aopu.aop_immd);
+	    tsprintf (buffer, sizeof(buffer), "!msbimmeds", aop->aopu.aop_immd);
 	    break;
 	  case 0:
-	    tsprintf (s, "!lsbimmeds", aop->aopu.aop_immd);
+	    tsprintf (buffer, sizeof(buffer), "!lsbimmeds", aop->aopu.aop_immd);
 	    break;
 	  default:
 	    wassertl (0, "Fetching from beyond the limits of an immediate value.");
 	  }
 
-      return traceAlloc(&_G.trace.aops, Safe_strdup(s));
+      return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
 
     case AOP_DIR:
       wassert (IS_GB);
       emit2 ("ld a,(%s+%d)", aop->aopu.aop_dir, offset);
-      sprintf (s, "a");
+      SNPRINTF (buffer, sizeof(buffer), "a");
 
-      return traceAlloc(&_G.trace.aops, Safe_strdup(s));
+      return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
 
     case AOP_SFR:
       wassert (IS_GB);
       emit2 ("ldh a,(%s+%d)", aop->aopu.aop_dir, offset);
-      sprintf (s, "a");
+      SNPRINTF (buffer, sizeof(buffer), "a");
 
-      return traceAlloc(&_G.trace.aops, Safe_strdup(s));
+      return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
 
     case AOP_REG:
       return aop->aopu.aop_reg[offset]->name;
@@ -1532,38 +1533,39 @@ aopGet (asmop * aop, int offset, bool bit16)
     case AOP_HL:
       wassert (IS_GB);
       setupPair (PAIR_HL, aop, offset);
-      tsprintf (s, "!*hl");
+      tsprintf (buffer, sizeof(buffer), "!*hl");
 
-      return traceAlloc(&_G.trace.aops, Safe_strdup (s));
+      return traceAlloc(&_G.trace.aops, Safe_strdup (buffer));
 
     case AOP_IY:
       wassert (IS_Z80);
       setupPair (PAIR_IY, aop, offset);
-      tsprintf (s, "!*iyx", offset);
+      tsprintf (buffer, sizeof(buffer), "!*iyx", offset);
 
-      return traceAlloc(&_G.trace.aops, Safe_strdup(s));
+      return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
 
     case AOP_EXSTK:
       wassert (IS_Z80);
       setupPair (PAIR_IY, aop, offset);
-      tsprintf (s, "!*iyx", offset, offset);
+      tsprintf (buffer, sizeof(buffer), "!*iyx", offset, offset);
 
-      return traceAlloc(&_G.trace.aops, Safe_strdup(s));
+      return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
 
     case AOP_STK:
       if (IS_GB)
 	{
 	  setupPair (PAIR_HL, aop, offset);
-	  tsprintf (s, "!*hl");
+	  tsprintf (buffer, sizeof(buffer), "!*hl");
 	}
       else
 	{
 	  if (aop->aopu.aop_stk >= 0)
 	    offset += _G.stack.param_offset;
-	  tsprintf (s, "!*ixx", aop->aopu.aop_stk + offset);
+	  tsprintf (buffer, sizeof(buffer),
+		    "!*ixx", aop->aopu.aop_stk + offset);
 	}
 
-      return traceAlloc(&_G.trace.aops, Safe_strdup(s));
+      return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
 
     case AOP_CRY:
       wassertl (0, "Tried to fetch from a bit variable");
@@ -1575,8 +1577,8 @@ aopGet (asmop * aop, int offset, bool bit16)
 	}
       else
         {
-          tsprintf(s, "!zero");
-          return traceAlloc(&_G.trace.aops, Safe_strdup(s));
+          tsprintf(buffer, sizeof(buffer), "!zero");
+          return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
         }
 
     case AOP_HLREG:
@@ -1591,9 +1593,10 @@ aopGet (asmop * aop, int offset, bool bit16)
         unsigned long v = aop->aopu.aop_simplelit;
         
         v >>= (offset * 8);
-        tsprintf (s, "!immedbyte", (unsigned int) v & 0xff);
+        tsprintf (buffer, sizeof(buffer), 
+		  "!immedbyte", (unsigned int) v & 0xff);
         
-        return traceAlloc(&_G.trace.aops, Safe_strdup(s));
+        return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
       }
     case AOP_STR:
       aop->coff = offset;
@@ -1601,9 +1604,10 @@ aopGet (asmop * aop, int offset, bool bit16)
 
     case AOP_PAIRPTR:
       setupPair (aop->aopu.aop_pairId, aop, offset);
-      sprintf (s, "(%s)", _pairs[aop->aopu.aop_pairId].name);
+      SNPRINTF (buffer, sizeof(buffer), 
+		"(%s)", _pairs[aop->aopu.aop_pairId].name);
 
-      return traceAlloc(&_G.trace.aops, Safe_strdup(s));
+      return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
 
     default:
       break;
@@ -1659,7 +1663,7 @@ aopPut (asmop * aop, const char *s, int offset)
     }
 
   // PENDING
-  tsprintf(buffer2, s);
+  tsprintf(buffer2, sizeof(buffer2), s);
   s = buffer2;
 
   /* will assign value to value */
@@ -6040,7 +6044,8 @@ genGenPointerGet (operand * left,
       /* Just do it */
       if (isPtrPair (AOP (left)))
 	{
-	  tsprintf (buffer, "!*pair", getPairName (AOP (left)));
+	  tsprintf (buffer, sizeof(buffer), 
+		    "!*pair", getPairName (AOP (left)));
 	  aopPut (AOP (result), buffer, 0);
 	}
       else
@@ -6059,7 +6064,7 @@ genGenPointerGet (operand * left,
       while (size--) 
         {
           char at[20];
-          tsprintf (at, "!*iyx", offset);
+          tsprintf (at, sizeof(at), "!*iyx", offset);
           aopPut (AOP (result), at, offset);
           offset++;
         }
@@ -7577,7 +7582,7 @@ fetchLitSpecial (asmop * aop, bool negate, bool xor)
     v = 0-v;
   v &= 0xFFFF;
 
-  tsprintf (buffer, "!immedword", v);
+  tsprintf (buffer, sizeof(buffer), "!immedword", v);
   return traceAlloc(&_G.trace.aops, Safe_strdup (buffer));
 }
 

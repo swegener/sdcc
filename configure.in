@@ -117,7 +117,7 @@ AC_DEFINE_UNQUOTED(HEADER_FD, ${sdcc_cv_fd})
 # Checking for functions
 # ===========================================================================
 AC_CHECK_FUNCS(strlen strcpy strcat strstr strcmp strerror strtok strdup)
-AC_CHECK_FUNCS(strchr memcpy)
+AC_CHECK_FUNCS(strchr memcpy vsnprintf snprintf vsprintf)
 dnl AC_CHECK_FUNCS(getline)
 dnl AC_CHECK_FUNCS(getdelim)
 AC_CHECK_FUNCS(fgets)

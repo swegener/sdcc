@@ -159,33 +159,47 @@ static unsigned char SRMask[] =
 static void
 emitcode (char *inst, char *fmt,...)
 {
-  va_list ap;
-  char lb[INITIAL_INLINEASM];
-  char *lbp = lb;
-
-  va_start (ap, fmt);
-
-  if (inst && *inst)
+    va_list ap;
+    char lb[INITIAL_INLINEASM];
+    char *lbp = lb;
+    
+    va_start (ap, fmt);
+    
+    if (inst && *inst)
     {
-      if (fmt && *fmt)
-	sprintf (lb, "%s\t", inst);
-      else
-	sprintf (lb, "%s", inst);
-      tvsprintf (lb + (strlen (lb)), fmt, ap);
+	if (fmt && *fmt)
+	{
+	    SNPRINTF (lb, sizeof(lb), "%s\t", inst);
+	}
+	else
+	{
+	    SNPRINTF (lb, sizeof(lb), "%s", inst);
+	}
+	
+	tvsprintf (lb + strlen(lb), sizeof(lb) - strlen(lb), 
+		   fmt, ap);
     }
-  else
-    tvsprintf (lb, fmt, ap);
+    else
+    {
+	tvsprintf (lb, sizeof(lb), fmt, ap);
+    }
+    
 
-  while (isspace (*lbp))
-    lbp++;
+    while (isspace (*lbp))
+    {
+	lbp++;
+    }
 
-  if (lbp && *lbp)
-    lineCurr = (lineCurr ?
-		connectLine (lineCurr, newLineNode (lb)) :
-		(lineHead = newLineNode (lb)));
-  lineCurr->isInline = _G.inLine;
-  lineCurr->isDebug = _G.debugLine;
-  va_end (ap);
+    if (lbp && *lbp)
+    {
+	lineCurr = (lineCurr ?
+		    connectLine (lineCurr, newLineNode (lb)) :
+		    (lineHead = newLineNode (lb)));
+    }
+    
+    lineCurr->isInline = _G.inLine;
+    lineCurr->isDebug = _G.debugLine;
+    va_end (ap);
 }
 
 /*-----------------------------------------------------------------*/
@@ -652,10 +666,10 @@ aopForRemat (symbol * sym)
   aop->aopu.aop_immd.aop_immd1 = Safe_calloc (1, strlen (buffer) + 1);
   strcpy (aop->aopu.aop_immd.aop_immd1, buffer);
   /* set immd2 field if required */
-  if (aop->aopu.aop_immd.from_cast_remat) {
-	  tsprintf(buffer,"#!constbyte",ptr_type);
-	  aop->aopu.aop_immd.aop_immd2 = Safe_calloc (1, strlen (buffer) + 1);
-	  strcpy (aop->aopu.aop_immd.aop_immd2, buffer);
+  if (aop->aopu.aop_immd.from_cast_remat) 
+  {
+      tsprintf(buffer, sizeof(buffer), "#!constbyte",ptr_type);
+      aop->aopu.aop_immd.aop_immd2 = Safe_strdup(buffer);  
   }
 
   return aop;
@@ -1066,8 +1080,8 @@ aopGet (asmop * aop,
 	bool dname,
 	bool canClobberACC)
 {
-  char *s = buffer;
-  char *rs;
+  //char *s = buffer;
+  //char *rs;
 
   /* offset is greater than
      size then zero */
@@ -1100,10 +1114,8 @@ aopGet (asmop * aop,
 	  emitcode ("movx", "a,@%s", aop->aopu.aop_ptr->name);
 	  return (dname ? "acc" : "a");
 	}
-      sprintf (s, "@%s", aop->aopu.aop_ptr->name);
-      rs = Safe_calloc (1, strlen (s) + 1);
-      strcpy (rs, s);
-      return rs;
+      SNPRINTF (buffer, sizeof(buffer), "@%s", aop->aopu.aop_ptr->name);
+      return Safe_strdup(buffer);	
 
     case AOP_DPTRn:
 	assert(offset <= 3);
@@ -1160,44 +1172,60 @@ aopGet (asmop * aop,
       return (dname ? "acc" : "a");
 
     case AOP_IMMD:
-      if (aop->aopu.aop_immd.from_cast_remat && (offset == (aop->size-1))) {
-	      sprintf(s,"%s",aop->aopu.aop_immd.aop_immd2);
-      } else if (bit16)
-	sprintf (s, "#%s", aop->aopu.aop_immd.aop_immd1);
-      else if (offset) {
+      if (aop->aopu.aop_immd.from_cast_remat && (offset == (aop->size-1))) 
+      {
+	  SNPRINTF(buffer, sizeof(buffer), 
+		   "%s",aop->aopu.aop_immd.aop_immd2);
+      } 
+      else if (bit16)
+      {
+	 SNPRINTF(buffer, sizeof(buffer), 
+		  "#%s", aop->aopu.aop_immd.aop_immd1);
+      }
+      else if (offset) 
+      {
 	  switch (offset) {
 	  case 1:
-	      tsprintf(s,"#!his",aop->aopu.aop_immd.aop_immd1);
+	      tsprintf(buffer, sizeof(buffer),
+		       "#!his",aop->aopu.aop_immd.aop_immd1);
 	      break;
 	  case 2:
-	      tsprintf(s,"#!hihis",aop->aopu.aop_immd.aop_immd1);
+	      tsprintf(buffer, sizeof(buffer), 
+		       "#!hihis",aop->aopu.aop_immd.aop_immd1);
 	      break;
 	  case 3:
-	      tsprintf(s,"#!hihihis",aop->aopu.aop_immd.aop_immd1);
+	      tsprintf(buffer, sizeof(buffer),
+		       "#!hihihis",aop->aopu.aop_immd.aop_immd1);
 	      break;
 	  default: /* should not need this (just in case) */
-	      sprintf (s, "#(%s >> %d)",
+	      SNPRINTF (buffer, sizeof(buffer), 
+			"#(%s >> %d)",
 		       aop->aopu.aop_immd.aop_immd1,
 		       offset * 8);
 	  }
       }
       else
-	sprintf (s, "#%s",
-		 aop->aopu.aop_immd.aop_immd1);
-      rs = Safe_calloc (1, strlen (s) + 1);
-      strcpy (rs, s);
-      return rs;
+      {
+	SNPRINTF (buffer, sizeof(buffer), 
+		  "#%s", aop->aopu.aop_immd.aop_immd1);
+      }
+      return Safe_strdup(buffer);	
 
     case AOP_DIR:
       if (offset)
-	sprintf (s, "(%s + %d)",
+      {
+	SNPRINTF (buffer, sizeof(buffer),
+		  "(%s + %d)",
 		 aop->aopu.aop_dir,
 		 offset);
+      }
       else
-	sprintf (s, "%s", aop->aopu.aop_dir);
-      rs = Safe_calloc (1, strlen (s) + 1);
-      strcpy (rs, s);
-      return rs;
+      {
+	SNPRINTF(buffer, sizeof(buffer), 
+		 "%s", aop->aopu.aop_dir);
+      }
+
+      return Safe_strdup(buffer);
 
     case AOP_REG:
       if (dname)
@@ -10359,7 +10387,8 @@ genAddrOf (iCode * ic)
       /* if 10 bit stack */
       if (options.stack10bit) {
 	  char buff[10];
-	  tsprintf(buff,"#!constbyte",(options.stack_loc >> 16) & 0xff);
+	  tsprintf(buff, sizeof(buff), 
+	  	   "#!constbyte",(options.stack_loc >> 16) & 0xff);
 	  /* if it has an offset then we need to compute it */
 /* 	  emitcode ("subb", "a,#!constbyte", */
 /* 		    -((sym->stack < 0) ? */
@@ -10425,16 +10454,16 @@ genAddrOf (iCode * ic)
       if (offset) {
 	  switch (offset) {
 	  case 1:
-	      tsprintf(s,"!his",sym->rname);
+	      tsprintf(s, sizeof(s), "!his",sym->rname);
 	      break;
 	  case 2:
-	      tsprintf(s,"!hihis",sym->rname);
+	      tsprintf(s, sizeof(s), "!hihis",sym->rname);
 	      break;
 	  case 3:
-	      tsprintf(s,"!hihihis",sym->rname);
+	      tsprintf(s, sizeof(s), "!hihihis",sym->rname);
 	      break;
 	  default: /* should not need this (just in case) */
-	      sprintf (s, "#(%s >> %d)",
+	      SNPRINTF (s, sizeof(s), "#(%s >> %d)",
 		       sym->rname,
 		       offset * 8);
 	  }

@@ -1200,10 +1200,8 @@ pCodeInstruction pciXORLW = {
 #define MAX_PIC14MNEMONICS 100
 pCodeInstruction *pic14Mnemonics[MAX_PIC14MNEMONICS];
 
-/* This definition needs to be part of configure.in */
-// #define USE_VSNPRINTF
 
-#ifdef USE_VSNPRINTF
+#ifdef HAVE_VSNPRINTF
   // Alas, vsnprintf is not ANSI standard, and does not exist
   // on Solaris (and probably other non-Gnu flavored Unixes).
 
@@ -1238,7 +1236,7 @@ void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...)
 
 }
 
-#else  //  USE_VSNPRINTF
+#else  //  HAVE_VSNPRINTF
 
 // This version is *not* safe, despite the name.
 
@@ -1268,7 +1266,7 @@ void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...)
 
 }
 
-#endif    //  USE_VSNPRINTF
+#endif    //  HAVE_VSNPRINTF
     
 
 extern  void initStack(int base_address, int size);

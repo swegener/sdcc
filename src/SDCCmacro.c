@@ -31,16 +31,17 @@ enum
   };
 
 void
-_evalMacros(char *apinto, hTab *pvals, const char *pfrom)
+_evalMacros(char *apinto, hTab *pvals, const char *pfrom, size_t alen)
 {
-  bool fdidsomething = FALSE;
-  char *pinto = apinto;
+  bool  fdidsomething = FALSE;
+  char  *pinto = apinto;
+  size_t plen = alen;
 
   assert(pinto);
   assert(pvals);
   assert(pfrom);
 
-  while (*pfrom)
+  while (plen && *pfrom)
     {
       if (*pfrom == '{')
         {
@@ -57,6 +58,11 @@ _evalMacros(char *apinto, hTab *pvals, const char *pfrom)
               wassertl(0, "Unterminated macro expansion");
             }
           /* Pull out the macro name */
+	  if (pend - pfrom >= MAX_MACRO_NAME_LENGTH)
+	  {
+	      wassertl(0, "macro name too long");
+	  }
+	    
           strncpy(name, pfrom, pend-pfrom);
           name[pend-pfrom] = '\0';
 
@@ -70,8 +76,9 @@ _evalMacros(char *apinto, hTab *pvals, const char *pfrom)
             }
 
           /* Replace */
-          strcpy(pinto, pval);
+          strncpy(pinto, pval, plen);
           pinto += strlen(pval);
+	  plen -= plen > strlen(pval) ? strlen(pval) : plen;
           fdidsomething = TRUE;
 
           pfrom = pend+1;
@@ -80,17 +87,23 @@ _evalMacros(char *apinto, hTab *pvals, const char *pfrom)
         {
           /* Pass through */
           *pinto++ = *pfrom++;
+	  plen--;
         }
     }
 
+  if (!plen)
+  {
+      wassertl(0, "macro expansion too long");
+  }
+    
   *pinto = '\0';
 
   /* If we did something then recursivly expand any expanded macros */
   if (fdidsomething)
     {
       char ainto[MAX_STRING_LENGTH];
-      _evalMacros(ainto, pvals, apinto);
-      strcpy(apinto, ainto);
+      _evalMacros(ainto, pvals, apinto, MAX_STRING_LENGTH);
+      strncpyz(apinto, ainto, alen);
     }
 }
 
@@ -101,11 +114,11 @@ mvsprintf(hTab *pvals, const char *pformat, va_list ap)
   char atmp[MAX_STRING_LENGTH];
 
   /* Recursivly evaluate all the macros in the string */
-  _evalMacros(ainto, pvals, pformat);
+  _evalMacros(ainto, pvals, pformat, MAX_STRING_LENGTH);
   /* Evaluate all the arguments */
   vsprintf(atmp, ainto, ap);
   /* Recursivly evaluate any macros that were used as arguments */
-  _evalMacros(ainto, pvals, atmp);
+  _evalMacros(ainto, pvals, atmp, MAX_STRING_LENGTH);
 
   /* Return a copy of the evaluated string. */
   return Safe_strdup(ainto);

@@ -93,8 +93,7 @@ struct options  save_options  ;
 <asm>"_endasm" { 
   count();
   *asmp = '\0';
-  yylval.yyinline = malloc (strlen(asmbuff)+1);
-  strcpy(yylval.yyinline,asmbuff);
+  yylval.yyinline = strdup (asmbuff);
   BEGIN(INITIAL);
   return (INLINEASM);
 }
@@ -295,8 +294,7 @@ int checkCurrFile ( char *s)
 	/* mark the end of the filename */
 	while (*s != '"') s++;
 	*s = '\0';
-	currFname = malloc (strlen(sb)+1);
-	strcpy(currFname,sb);
+	currFname = strdup (sb);
 	lineno = yylineno = lNum;
     }
     filename = currFname ;
@@ -327,11 +325,11 @@ int check_type()
 {
 	/* check if it is in the typedef table */
 	if (findSym(TypedefTab,NULL,yytext)) {
-		strcpy(yylval.yychar,yytext);
+		strncpyz(yylval.yychar,yytext, SDCC_NAME_MAX);
 		return (TYPE_NAME) ;
 	}
 	else   {
-		strcpy (yylval.yychar,yytext);
+		strncpyz (yylval.yychar,yytext, SDCC_NAME_MAX);
 		return(IDENTIFIER);
 	}
 }
@@ -412,6 +410,13 @@ char *stringLiteral () {
     *str++  = ch; /* Put next substring introducer into output string */
   }  
   *str = '\0';
+  
+  /* If we aren't going to fix it, at least trap it. */
+  if (strlen(strLitBuff) >= sizeof(strLitBuff))
+  {
+  	fprintf(stderr, "Internal error: strLitBuff overflowed.\n");
+	exit(-1);
+  }
   
   return strLitBuff;
 }

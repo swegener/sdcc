@@ -6,7 +6,10 @@
 
 int foo = 16; 
 
-extern void f( int x ); 
+void f( int x )
+{
+  UNUSED(x);
+}
 
 void g(int bar) 
 { 

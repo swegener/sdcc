@@ -29,6 +29,6 @@
 void
 buildCmdLine (char *into, const char **cmds,
 	      const char *p1, const char *p2,
-	      const char *p3, const char **list) ;
+	      const char *p3, const char * const *list) ;
 
 #endif

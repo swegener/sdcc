@@ -31,7 +31,7 @@
 void
 buildCmdLine (char *into, const char **cmds,
 	      const char *p1, const char *p2,
-	      const char *p3, const char **list)
+	      const char *p3, const char * const *list)
 {
   const char *p, *from;
 
@@ -66,7 +66,7 @@ buildCmdLine (char *into, const char **cmds,
 	      break;
 	    case 'l':
 	      {
-		const char **tmp = list;
+		const char *const *tmp = list;
 		if (tmp)
 		  {
 		    while (*tmp)

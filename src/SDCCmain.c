@@ -146,7 +146,7 @@ optionsTable[] = {
     { 'M',  NULL,                   NULL, "Preprocessor option" },
     { 'V',  NULL,                   &verboseExec, "Execute verbosely.  Show sub commands as they are run" },
     { 'S',  NULL,                   &noAssemble, "Compile only; do not assemble or link" },
-    { 'W',  NULL,                   NULL, "Pass through options to the assembler (a) or linker (l)" },
+    { 'W',  NULL,                   NULL, "Pass through options to the pre-processor (p), assembler (a) or linker (l)" },
     { 'L',  NULL,                   NULL, "Add the next field to the library search path" },
     { 'l',  NULL,                   NULL, "Include the given library in the link" },
     { 0,    OPTION_LARGE_MODEL,     NULL, "external data space is used" },
@@ -935,23 +935,25 @@ parseCmdLine (int argc, char **argv)
                 break;
 
 	    case 'W':
+              /* pre-processer options */
+              if (argv[i][2] == 'p')
+                {
+                  parseWithComma ((char **)preArgv, getStringArg("-Wp", argv, &i, argc));
+                }
 	      /* linker options */
-	      if (argv[i][2] == 'l')
+	      else if (argv[i][2] == 'l')
 		{
-                    parseWithComma(linkOptions, getStringArg("-Wl", argv, &i, argc));
+                  parseWithComma(linkOptions, getStringArg("-Wl", argv, &i, argc));
 		}
-	      else
-		{
-		  /* assembler options */
-		  if (argv[i][2] == 'a')
-		    {
-			parseWithComma ((char **) asmOptions, getStringArg("-Wa", argv, &i, argc));
-		    }
-		  else
-		    {
-		      werror (W_UNKNOWN_OPTION, argv[i]);
-		    }
-		}
+              /* assembler options */
+	      else if (argv[i][2] == 'a')
+                {
+                  parseWithComma ((char **) asmOptions, getStringArg("-Wa", argv, &i, argc));
+                }
+              else
+                {
+                  werror (W_UNKNOWN_OPTION, argv[i]);
+                }
 	      break;
 
 	    case 'v':

@@ -1,5 +1,7 @@
 2001-11-04  Michael Hope  <michaelh@juju.net.nz>
 
+	* src/SDCCmain.c (parseCmdLine): Added support for -Wp.
+
 	* support/regression/tests/bug-478094.c: Added.
 
 	* src/z80/gen.c (commitPair): Fixed silly gbz80/z80 commit to static bug.

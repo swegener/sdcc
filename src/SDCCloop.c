@@ -1,4 +1,4 @@
-//#define LIVERANGEHUNT
+#define LIVERANGEHUNT
 #ifdef LIVERANGEHUNT
   #define LRH(x) x
 #else
@@ -341,6 +341,13 @@ DEFSETFUNC (createLoop)
       }
     LRH(printf("****** %d %d %d %x %s\n", ebbs[i]->dfnum, dfMin, dfMax, ebbs[i]->partOfLoop, ebbs[i]->entryLabel->name));
   }
+
+  /* and if this is a conditional block, the other side of the IFX 
+     (if any, that could have a greater dfnum) is too */
+  {
+    // just a burp, but I'm getting close :)
+  }
+  
 
   /* now add it to the set */
   addSetHead (allRegion, aloop);

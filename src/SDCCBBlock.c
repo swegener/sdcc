@@ -191,7 +191,8 @@ dumpEbbsToFileExt (int id, eBBlock ** ebbs, int count)
       fprintf (of, "Basic Block %s : loop Depth(lSeq) = %d(%d) noPath = %d , lastinLoop = %d\n",
 	       ebbs[i]->entryLabel->name,
 	       ebbs[i]->depth,
-	       ebbs[i]->depth ? findLoopEndSeq(ebbs[i]->partOfLoop) : 0,
+	       (0 /* for now */ &
+		ebbs[i]->depth) ? findLoopEndSeq(ebbs[i]->partOfLoop) : 0,
 	       ebbs[i]->noPath,
 	       ebbs[i]->isLastInLoop);
       fprintf (of, "\ndefines bitVector :");

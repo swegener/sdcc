@@ -3,7 +3,7 @@
 
 # path to uCsim
 # path to uCsim
-SZ80A = $(SDCC_DIR)/sim/ucsim/sz80.src/sz80
+SZ80A = $(SDCC_DIR)/sim/ucsim/z80.src/sz80
 SZ80B = $(SDCC_DIR)/bin/sz80
 
 UCZ80 = $(shell if [ -f $(SZ80A) ]; then echo $(SZ80A); else echo $(SZ80B); fi)

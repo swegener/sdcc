@@ -2319,11 +2319,13 @@ static int isLiteralBit(unsigned long lit)
 	return 0;
 }
 
-
+enum { AVR_AND = 0, AVR_OR, AVR_XOR };
+static char *bopnames_lit[] = {"andi","ori"};
+static char *bopnames[] = {"and","or","eor"};
 /*-----------------------------------------------------------------*/
-/* genAnd  - code for and                                          */
+/* genBitWise - generate bitwise operations                        */
 /*-----------------------------------------------------------------*/
-static void genAnd (iCode *ic, iCode *ifx)
+static void genBitWise(iCode *ic, iCode *ifx, int bitop)
 {
 	operand *left, *right, *result;
 	int size, offset=0;
@@ -2338,10 +2340,11 @@ static void genAnd (iCode *ic, iCode *ifx)
 	size = AOP_SIZE(left);
 	offset = 0;
 	if (ifx) { /* used only for jumps */
-		if (AOP_TYPE(right) == AOP_LIT) {
+		if (AOP_TYPE(right) == AOP_LIT && 
+		    (bitop == AVR_AND || bitop == AVR_OR)) {
 			int lit = (int) floatFromVal (AOP(right)->aopu.aop_lit);
 			int p2 = powof2(lit);
-			if (p2) { /* right side is a power of 2 */
+			if (bitop == AVR_AND && p2) { /* right side is a power of 2 */
 				l = aopGet(AOP(left),p2 / 8);
 				if (IC_TRUE(ifx)) {
 					emitcode("sbrc","%s,%d",l,(p2 % 8));
@@ -2354,11 +2357,11 @@ static void genAnd (iCode *ic, iCode *ifx)
 				int eh = OP_SYMBOL(left)->liveTo <= ic->seq;
 				if (size == 1) {
 					if (eh) {
-						emitcode("andi","%s,lo8(%d)",
+						emitcode(bopnames_lit[bitop],"%s,lo8(%d)",
 							 aopGet(AOP(IC_LEFT(ic)),0), lit);
 					} else {
 						MOVR0(aopGet(AOP(IC_LEFT(ic)),0));
-						emitcode("andi","r0,lo8(%d)",lit);
+						emitcode(bopnames_lit[bitop],"r0,lo8(%d)",lit);
 					}
 					lbl = newiTempLabel(NULL);
 					if (IC_TRUE(ifx)) {
@@ -2372,8 +2375,8 @@ static void genAnd (iCode *ic, iCode *ifx)
 				} else if (size == 2) {
 					emitcode("mov","r24,%s",aopGet(AOP(IC_LEFT(ic)),0));
 					emitcode("mov","r25,%s",aopGet(AOP(IC_LEFT(ic)),1));
-					emitcode("andi","r24,lo8(%d)",lit);
-					emitcode("andi","r25,hi8(%d)",lit);
+					emitcode(bopnames_lit[bitop],"r24,lo8(%d)",lit);
+					emitcode(bopnames_lit[bitop],"r25,hi8(%d)",lit);
 					emitcode("sbiw","r24,0");
 					lbl = newiTempLabel(NULL);
 					if (IC_TRUE(ifx)) {
@@ -2389,7 +2392,7 @@ static void genAnd (iCode *ic, iCode *ifx)
 					lbl1 = newiTempLabel(NULL);					
 					while (size--) {
 						if (eh) {
-							emitcode("andi","%s,lo8(%d)",
+							emitcode(bopnames_lit[bitop],"%s,lo8(%d)",
 							 aopGet(AOP(IC_LEFT(ic)),offset), lit);
 						} else {
 							MOVR0(aopGet(AOP(IC_LEFT(ic)),offset));
@@ -2413,16 +2416,16 @@ static void genAnd (iCode *ic, iCode *ifx)
 			int reh = OP_SYMBOL(right)->liveTo <= ic->seq;
 			if (size == 1) {
 				if (eh) {
-					emitcode("and","%s,%s",
+					emitcode(bopnames[bitop],"%s,%s",
 						 aopGet(AOP(IC_LEFT(ic)),0),
 						 aopGet(AOP(IC_RIGHT(ic)),0));
 				} else if (reh) {
-					emitcode("and","%s,%s",
+					emitcode(bopnames[bitop],"%s,%s",
 						 aopGet(AOP(IC_RIGHT(ic)),0),
 						 aopGet(AOP(IC_LEFT(ic)),0));
 				} else {
 					MOVR0(aopGet(AOP(IC_LEFT(ic)),0));
-					emitcode("andi","r0,%s",aopGet(AOP(IC_RIGHT(ic)),0));
+					emitcode(bopnames[bitop],"r0,%s",aopGet(AOP(IC_RIGHT(ic)),0));
 				}
 				lbl = newiTempLabel(NULL);
 				if (IC_TRUE(ifx)) {
@@ -2436,8 +2439,8 @@ static void genAnd (iCode *ic, iCode *ifx)
 			} else if (size == 2) {
 				emitcode("mov","r24,%s",aopGet(AOP(IC_LEFT(ic)),0));
 				emitcode("mov","r25,%s",aopGet(AOP(IC_LEFT(ic)),1));
-				emitcode("andi","r24,%s",aopGet(AOP(IC_RIGHT(ic)),0));
-				emitcode("andi","r25,%s",aopGet(AOP(IC_RIGHT(ic)),1));
+				emitcode(bopnames[bitop],"r24,%s",aopGet(AOP(IC_RIGHT(ic)),0));
+				emitcode(bopnames[bitop],"r25,%s",aopGet(AOP(IC_RIGHT(ic)),1));
 				emitcode("sbiw","r24,0");
 				lbl = newiTempLabel(NULL);
 				if (IC_TRUE(ifx)) {
@@ -2453,16 +2456,16 @@ static void genAnd (iCode *ic, iCode *ifx)
 				lbl1 = newiTempLabel(NULL);					
 				while (size--) {
 					if (eh) {
-						emitcode("and","%s,%s",
+						emitcode(bopnames[bitop],"%s,%s",
 							 aopGet(AOP(IC_LEFT(ic)),offset),
 							 aopGet(AOP(IC_RIGHT(ic)),offset));
 					} else if (reh) {
-						emitcode("and","%s,%s",
+						emitcode(bopnames[bitop],"%s,%s",
 							 aopGet(AOP(IC_RIGHT(ic)),offset),
 							 aopGet(AOP(IC_LEFT(ic)),offset));
 					} else {
 						MOVR0(aopGet(AOP(IC_LEFT(ic)),offset));
-						emitcode("andi","r0,%s",aopGet(AOP(IC_RIGHT(ic)),offset));
+						emitcode(bopnames[bitop],"r0,%s",aopGet(AOP(IC_RIGHT(ic)),offset));
 					}
 					emitcode("brne","L%05d",lbl->key);
 					offset++;
@@ -2485,19 +2488,19 @@ static void genAnd (iCode *ic, iCode *ifx)
 	samerr = sameRegs(AOP(IC_RESULT(ic)),AOP(IC_RIGHT(ic)));
 	while (size--) {
 		if (samerl) {
-			if (AOP_TYPE(IC_RIGHT(ic)) == AOP_LIT) {
-				emitcode("andi","%s,%s(%d)",aopGet(AOP(IC_LEFT(ic)),offset),
+			if (AOP_TYPE(IC_RIGHT(ic)) == AOP_LIT && (bitop == AVR_AND || bitop == AVR_OR)) {
+				emitcode(bopnames_lit[bitop],"%s,%s(%d)",aopGet(AOP(IC_LEFT(ic)),offset),
 					 larray[offset],(int) floatFromVal (AOP(right)->aopu.aop_lit));
 			} else {
-				emitcode("and","%s,%s",aopGet(AOP(IC_LEFT(ic)),offset),
+				emitcode(bopnames[bitop],"%s,%s",aopGet(AOP(IC_LEFT(ic)),offset),
 					 aopGet(AOP(IC_RIGHT(ic)),offset));
 			}
 		} else if (samerr) {
-			emitcode("and","%s,%s",aopGet(AOP(IC_RIGHT(ic)),offset),
+			emitcode(bopnames[bitop],"%s,%s",aopGet(AOP(IC_RIGHT(ic)),offset),
 				 aopGet(AOP(IC_LEFT(ic)),offset));
 		} else {
 			aopPut(AOP(IC_RESULT(ic)),aopGet(IC_LEFT(ic),offset),offset);
-			emitcode("and",aopGet(AOP(IC_RESULT(ic)),offset),
+			emitcode(bopnames[bitop],aopGet(AOP(IC_RESULT(ic)),offset),
 				 aopGet(AOP(IC_RIGHT(ic)),offset));
 		}
 		offset++;
@@ -2509,23 +2512,19 @@ release :
 }
 
 /*-----------------------------------------------------------------*/
+/* genAnd  - code for and                                          */
+/*-----------------------------------------------------------------*/
+static void genAnd (iCode *ic, iCode *ifx)
+{
+	genBitWise(ic,ifx,AVR_AND);
+}
+
+/*-----------------------------------------------------------------*/
 /* genOr  - code for or                                            */
 /*-----------------------------------------------------------------*/
 static void genOr (iCode *ic, iCode *ifx)
 {
-	operand *left, *right, *result;
-	int size, offset=0;
-	unsigned long lit = 0L;
-
-	aopOp((left = IC_LEFT(ic)),ic,FALSE);
-	aopOp((right= IC_RIGHT(ic)),ic,FALSE);
-	aopOp((result=IC_RESULT(ic)),ic,TRUE);
-
-
-	release :
-		freeAsmop(left,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
-	freeAsmop(right,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
-	freeAsmop(result,NULL,ic,TRUE);     
+	genBitWise(ic,ifx,AVR_OR);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2533,20 +2532,7 @@ static void genOr (iCode *ic, iCode *ifx)
 /*-----------------------------------------------------------------*/
 static void genXor (iCode *ic, iCode *ifx)
 {
-	operand *left, *right, *result;
-	int size, offset=0;
-	unsigned long lit = 0L;
-
-	aopOp((left = IC_LEFT(ic)),ic,FALSE);
-	aopOp((right= IC_RIGHT(ic)),ic,FALSE);
-	aopOp((result=IC_RESULT(ic)),ic,TRUE);
-
-
-
-	release :
-		freeAsmop(left,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
-	freeAsmop(right,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
-	freeAsmop(result,NULL,ic,TRUE);     
+	genBitWise(ic,ifx,AVR_XOR);
 }
 
 /*-----------------------------------------------------------------*/

@@ -87,37 +87,47 @@ _ds390_finaliseOptions (void)
   /* Hack-o-matic: if we are using the flat24 model,
    * adjust pointer sizes.
    */
-  if (options.model != MODEL_FLAT24)
-    {
+  if (options.model != MODEL_FLAT24)  {
       fprintf (stderr,
-	       "*** error: ds390 port only supports the flat24 model.\n");
-      exit (1);
-    }
-  port->s.fptr_size = 3;
-  port->s.gptr_size = 4;
-  port->stack.isr_overhead++;	/* Will save dpx on ISR entry. */
-#if 1
-  port->stack.call_overhead++;	/* This acounts for the extra byte 
+	       "*** warning: ds390 port small and large model experimental.\n");
+      if (options.model == MODEL_LARGE)
+      {
+        port->mem.default_local_map = xdata;
+        port->mem.default_globl_map = xdata;
+      }
+      else
+      {
+        port->mem.default_local_map = data;
+        port->mem.default_globl_map = data;
+      }
+  }
+  else {
+    port->s.fptr_size = 3;
+    port->s.gptr_size = 4;
+
+    port->stack.isr_overhead++;	/* Will save dpx on ISR entry. */
+
+    port->stack.call_overhead++;	/* This acounts for the extra byte 
 				 * of return addres on the stack.
 				 * but is ugly. There must be a 
 				 * better way.
 				 */
-#endif
 
-  port->mem.default_local_map = xdata;
-  port->mem.default_globl_map = xdata;
+    port->mem.default_local_map = xdata;
+    port->mem.default_globl_map = xdata;
 
-  if (!options.stack10bit)
+    if (!options.stack10bit)
     {
     fprintf (stderr,
 	     "*** error: ds390 port only supports the 10 bit stack mode.\n");
     }
 
-  /* Fixup the memory map for the stack; it is now in
-   * far space and requires a FPOINTER to access it.
-   */
-  istack->fmap = 1;
-  istack->ptrType = FPOINTER;
+     /* Fixup the memory map for the stack; it is now in
+     * far space and requires a FPOINTER to access it.
+     */
+    istack->fmap = 1;
+    istack->ptrType = FPOINTER;
+  }  /* MODEL_FLAT24 */
 }
 
 static void
@@ -138,16 +148,15 @@ _ds390_getRegName (struct regs *reg)
 static void
 _ds390_genAssemblerPreamble (FILE * of)
 {
-  if (options.model == MODEL_FLAT24)
-    {
-      fputs (".flat24 on\t\t; 24 bit flat addressing\n", of);
+      if (options.model == MODEL_FLAT24)
+        fputs (".flat24 on\t\t; 24 bit flat addressing\n", of);
+
       fputs ("dpx = 0x93\t\t; dpx register unknown to assembler\n", of);
       fputs ("dps = 0x86\t\t; dps register unknown to assembler\n", of);
       fputs ("dpl1 = 0x84\t\t; dpl1 register unknown to assembler\n", of);
       fputs ("dph1 = 0x85\t\t; dph1 register unknown to assembler\n", of);
       fputs ("dpx1 = 0x95\t\t; dpx1 register unknown to assembler\n", of);
       fputs ("ap = 0x9C\t\t; ap register unknown to assembler\n", of);
-    }
 }
 
 /* Generate interrupt vector table. */

@@ -64,8 +64,11 @@ static char *spname;
 #define D(x) x
 
 unsigned fReturnSizeDS390 = 5;	/* shared with ralloc.c */
-static char *fReturn[] =
+static char *fReturn24[] =
 {"dpl", "dph", "dpx", "b", "a"};
+static char *fReturn16[] =
+{"dpl", "dph", "b", "a"};
+static char **fReturn = fReturn24;
 static char *accUse[] =
 {"a", "b"};
 
@@ -456,13 +459,15 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool useDP2)
 
       if (useDP2)
 	{
-	  emitcode ("mov", "dpx1,#0x40");
+	  if (options.model == MODEL_FLAT24)
+	    emitcode ("mov", "dpx1,#0x40");
 	  emitcode ("mov", "dph1,#0x00");
 	  emitcode ("mov", "dpl1, a");
 	}
       else
 	{
-	  emitcode ("mov", "dpx,#0x40");
+	  if (options.model == MODEL_FLAT24)
+ 	    emitcode ("mov", "dpx,#0x40");
 	  emitcode ("mov", "dph,#0x00");
 	  emitcode ("mov", "dpl, a");
 	}
@@ -8258,7 +8263,8 @@ genFarPointerGet (operand * left,
 	    {
 	      emitcode ("mov", "dpl,%s", aopGet (AOP (left), 0, FALSE, FALSE, TRUE));
 	      emitcode ("mov", "dph,%s", aopGet (AOP (left), 1, FALSE, FALSE, TRUE));
-	      emitcode ("mov", "dpx,%s", aopGet (AOP (left), 2, FALSE, FALSE, TRUE));
+	      if (options.model == MODEL_FLAT24)
+		emitcode ("mov", "dpx,%s", aopGet (AOP (left), 2, FALSE, FALSE, TRUE));
 	    }
 	  else
 	    {
@@ -8267,7 +8273,8 @@ genFarPointerGet (operand * left,
 		);
 	      emitcode ("push", "%s", aopGet (AOP (left), 0, FALSE, TRUE, TRUE));
 	      emitcode ("push", "%s", aopGet (AOP (left), 1, FALSE, TRUE, TRUE));
-	      emitcode ("mov", "dpx,%s", aopGet (AOP (left), 2, FALSE, FALSE, TRUE));
+	      if (options.model == MODEL_FLAT24)
+		emitcode ("mov", "dpx,%s", aopGet (AOP (left), 2, FALSE, FALSE, TRUE));
 	      emitcode ("pop", "dph");
 	      emitcode ("pop", "dpl");
 	    }
@@ -8333,7 +8340,8 @@ emitcodePointerGet (operand * left,
 	    {
 	      emitcode ("mov", "dpl,%s", aopGet (AOP (left), 0, FALSE, FALSE, TRUE));
 	      emitcode ("mov", "dph,%s", aopGet (AOP (left), 1, FALSE, FALSE, TRUE));
-	      emitcode ("mov", "dpx,%s", aopGet (AOP (left), 2, FALSE, FALSE, TRUE));
+	      if (options.model == MODEL_FLAT24)
+	        emitcode ("mov", "dpx,%s", aopGet (AOP (left), 2, FALSE, FALSE, TRUE));
 	    }
 	  else
 	    {
@@ -8342,7 +8350,8 @@ emitcodePointerGet (operand * left,
 		);
 	      emitcode ("push", "%s", aopGet (AOP (left), 0, FALSE, TRUE, TRUE));
 	      emitcode ("push", "%s", aopGet (AOP (left), 1, FALSE, TRUE, TRUE));
-	      emitcode ("mov", "dpx,%s", aopGet (AOP (left), 2, FALSE, FALSE, TRUE));
+	      if (options.model == MODEL_FLAT24)
+	        emitcode ("mov", "dpx,%s", aopGet (AOP (left), 2, FALSE, FALSE, TRUE));
 	      emitcode ("pop", "dph");
 	      emitcode ("pop", "dpl");
 	    }
@@ -8417,16 +8426,24 @@ genGenPointerGet (operand * left,
 	    genSetDPTR(0);
 	    _flushLazyDPS();
 	    emitcode ("mov", "dph,%s", l);
-	    l=aopGet(AOP(left),2,FALSE,FALSE,TRUE);
-	    genSetDPTR(0);
-	    _flushLazyDPS();
-	    emitcode ("mov", "dpx,%s", l);
-	    emitcode ("mov", "b,%s", aopGet (AOP(left),3,FALSE,FALSE,TRUE));
+	    if (options.model == MODEL_FLAT24) {
+	      l=aopGet(AOP(left),2,FALSE,FALSE,TRUE);
+	      genSetDPTR(0);
+	      _flushLazyDPS();
+	      emitcode ("mov", "dpx,%s", l);
+	      emitcode ("mov", "b,%s", aopGet (AOP(left),3,FALSE,FALSE,TRUE));
+	    } else {
+	      emitcode ("mov", "b,%s", aopGet (AOP(left),2,FALSE,FALSE,TRUE));
+	    }
 	  } else {
 	    emitcode ("mov", "dpl,%s", aopGet (AOP(left),0,FALSE,FALSE,TRUE));
 	    emitcode ("mov", "dph,%s", aopGet (AOP(left),1,FALSE,FALSE,TRUE));
-	    emitcode ("mov", "dpx,%s", aopGet (AOP(left),2,FALSE,FALSE,TRUE));
-	    emitcode ("mov", "b,%s", aopGet (AOP(left),3,FALSE,FALSE,TRUE));
+	    if (options.model == MODEL_FLAT24) {
+	      emitcode ("mov", "dpx,%s", aopGet (AOP(left),2,FALSE,FALSE,TRUE));
+	      emitcode ("mov", "b,%s", aopGet (AOP(left),3,FALSE,FALSE,TRUE));
+	    } else {
+	      emitcode ("mov", "b,%s", aopGet (AOP(left),2,FALSE,FALSE,TRUE));
+	    }
 	  }
 	  _endLazyDPSEvaluation ();
 	}
@@ -8930,7 +8947,8 @@ genFarPointerSet (operand * right,
 	    {
 	      emitcode ("mov", "dpl,%s", aopGet (AOP (result), 0, FALSE, FALSE, TRUE));
 	      emitcode ("mov", "dph,%s", aopGet (AOP (result), 1, FALSE, FALSE, TRUE));
-	      emitcode ("mov", "dpx,%s", aopGet (AOP (result), 2, FALSE, FALSE, TRUE));
+	      if (options.model == MODEL_FLAT24)
+	        emitcode ("mov", "dpx,%s", aopGet (AOP (result), 2, FALSE, FALSE, TRUE));
 	    }
 	  else
 	    {
@@ -8939,7 +8957,8 @@ genFarPointerSet (operand * right,
 		);
 	      emitcode ("push", "%s", aopGet (AOP (result), 0, FALSE, TRUE, TRUE));
 	      emitcode ("push", "%s", aopGet (AOP (result), 1, FALSE, TRUE, TRUE));
-	      emitcode ("mov", "dpx,%s", aopGet (AOP (result), 2, FALSE, FALSE, TRUE));
+	      if (options.model == MODEL_FLAT24)
+	        emitcode ("mov", "dpx,%s", aopGet (AOP (result), 2, FALSE, FALSE, TRUE));
 	      emitcode ("pop", "dph");
 	      emitcode ("pop", "dpl");
 	    }
@@ -9005,8 +9024,12 @@ genGenPointerSet (operand * right,
 	{			/* we need to get it byte by byte */
 	  emitcode ("mov", "dpl,%s", aopGet (AOP (result), 0, FALSE, FALSE, TRUE));
 	  emitcode ("mov", "dph,%s", aopGet (AOP (result), 1, FALSE, FALSE, TRUE));
-	  emitcode ("mov", "dpx,%s", aopGet (AOP (result), 2, FALSE, FALSE, TRUE));
-	  emitcode ("mov", "b,%s", aopGet (AOP (result), 3, FALSE, FALSE, TRUE));
+	  if (options.model == MODEL_FLAT24) {
+	    emitcode ("mov", "dpx,%s", aopGet (AOP (result), 2, FALSE, FALSE, TRUE));
+	    emitcode ("mov", "b,%s", aopGet (AOP (result), 3, FALSE, FALSE, TRUE));
+	  } else {
+	    emitcode ("mov", "b,%s", aopGet (AOP (result), 2, FALSE, FALSE, TRUE));
+	  }
 	}
       _endLazyDPSEvaluation ();
     }
@@ -9916,6 +9939,14 @@ gen390Code (iCode * lic)
 
   lineHead = lineCurr = NULL;
 
+  if (options.model == MODEL_FLAT24) {
+    fReturnSizeDS390 = 5;
+    fReturn = fReturn24;
+  } else {
+    fReturnSizeDS390 = 4;
+    fReturn = fReturn16;
+    options.stack10bit=0;
+  }
 #if 0
   //REMOVE ME!!!
   /* print the allocation information */

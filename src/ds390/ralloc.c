@@ -508,7 +508,11 @@ createStackSpil (symbol * sym)
   /* set the type to the spilling symbol */
   sloc->type = copyLinkChain (sym->type);
   sloc->etype = getSpec (sloc->type);
-  SPEC_SCLS (sloc->etype) = options.model ? S_XDATA : S_DATA;
+  if (options.model == MODEL_SMALL) {
+    SPEC_SCLS (sloc->etype) = S_DATA;
+  } else {
+    SPEC_SCLS (sloc->etype) = S_XDATA;
+  }
   SPEC_EXTR (sloc->etype) = 0;
 
   /* we don't allow it to be allocated`

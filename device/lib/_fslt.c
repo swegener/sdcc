@@ -32,13 +32,11 @@ char __fslt (float a1, float a2)
   fl1.f = a1;
   fl2.f = a2;
 
-#if 0
-  if (fl1.l<0 && fl2.l<0)
-    {
-      fl1.l ^= SIGNBIT;
-      fl2.l ^= SIGNBIT;
-    }
-#endif
+  if (fl1.l<0 && fl2.l<0) {
+    if (fl2.l < fl1.l)
+      return (1);
+    return (0);
+  }
 
   if (fl1.l < fl2.l)
     return (1);

@@ -159,17 +159,6 @@ _endasm;
 
 #define DEFAULT_FLOAT_PRECISION 6
 
-float output_floatE(float f, char decimals)
-{
-  signed char exp;
-  char sign = '+';
-
-  if (f < 0) { f = -f; sign = '-'; }
-  for (exp = 0; f >= 10.0; exp++) f /=10.0;
-  for (       ; f < 1.0;   exp--) f *=10.0;
-  printf("%c%d.%d%fe%d\n", sign, decimals+2, decimals, f, exp); 
-} 
-
 static void output_float (float f, unsigned char reqWidth, 
 			  signed char reqDecimals,
 			  bit left, bit zero, bit sign, bit space)

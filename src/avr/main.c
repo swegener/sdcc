@@ -40,7 +40,7 @@ static int regParmFlg = 0;	/* determine if we can register a parameter */
 static void
 _avr_init (void)
 {
-  asm_addTree (&asm_asxxxx_mapping);
+  asm_addTree (&asm_gas_mapping);
 }
 
 static void
@@ -142,12 +142,12 @@ _avr_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 */
 static const char *_linkCmd[] =
 {
-  "aslink", "-nf", "$1", NULL
+  "avr-ld", "", "$1", NULL
 };
 
 static const char *_asmCmd[] =
 {
-  "asx8051", "-plosgffc", "$1.asm", NULL
+  "avr-as", "", "$1.asm", NULL
 };
 
 /* Globals */

@@ -70,8 +70,7 @@ static char *larray[4] =
 {"lo8", "hi8", "hlo8", "hhi8"};
 static char *tscr[4] =
 {"r0", "r1", "r24", "r25"};
-static struct
-  {
+static struct {
     short xPushed;
     short zPushed;
     short accInUse;
@@ -79,8 +78,7 @@ static struct
     short debugLine;
     short nRegsSaved;
     set *sendSet;
-  }
-_G;
+} _G;
 
 extern int avr_ptrRegReq;
 extern int avr_nRegs;
@@ -123,20 +121,18 @@ emitcode (char *inst, char *fmt,...)
 
   va_start (ap, fmt);
 
-  if (inst && *inst)
-    {
-      if (fmt && *fmt)
-	sprintf (lb, "%s\t", inst);
-      else
-	sprintf (lb, "%s", inst);
-      vsprintf (lb + (strlen (lb)), fmt, ap);
-    }
+  if (inst && *inst) {
+    if (fmt && *fmt)
+      sprintf (lb, "%s\t", inst);
+    else
+      sprintf (lb, "%s", inst);
+    vsprintf (lb + (strlen (lb)), fmt, ap);
+  }
   else
     vsprintf (lb, fmt, ap);
-
-  while (isspace (*lbp))
-    lbp++;
-
+  
+  while (isspace (*lbp)) lbp++;
+  
   if (lbp && *lbp)
     lineCurr = (lineCurr ?
 		connectLine (lineCurr, newLineNode (lb)) :
@@ -161,17 +157,15 @@ getFreePtr (iCode * ic, asmop ** aopp, bool result, bool zonly)
   /* first check if x & z are used by this
      instruction, in which case we are in trouble */
   if ((xiu = bitVectBitValue (ic->rUsed, X_IDX)) &&
-      (ziu = bitVectBitValue (ic->rUsed, Z_IDX)))
-    {
-      goto endOfWorld;
-    }
+      (ziu = bitVectBitValue (ic->rUsed, Z_IDX))) {
+    goto endOfWorld;
+  }
 
   xou = bitVectBitValue (ic->rMask, X_IDX);
   zou = bitVectBitValue (ic->rMask, Z_IDX);
 
   /* if no usage of Z then return it */
-  if (!ziu && !zou)
-    {
+  if (!ziu && !zou) {
       ic->rUsed = bitVectSetBit (ic->rUsed, Z_IDX);
       (*aopp)->type = AOP_Z;
 
@@ -5420,17 +5414,11 @@ genAVRCode (iCode * lic)
     {
       cdbSymbol (currFunc, cdbFile, FALSE, TRUE);
       _G.debugLine = 1;
-      if (IS_STATIC (currFunc->etype))
-	emitcode ("", "F%s$%s$0$0 ==.", moduleName, currFunc->name);
-      else
-	emitcode ("", "G$%s$0$0 ==.", currFunc->name);
+      emitcode("",".type %s,@function",currFunc->name);
       _G.debugLine = 0;
     }
   /* stack pointer name */
-  if (options.useXstack)
-    spname = "_spx";
-  else
-    spname = "sp";
+  spname = "sp";
 
 
   for (ic = lic; ic; ic = ic->next)

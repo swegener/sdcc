@@ -8179,8 +8179,13 @@ genCast (iCode * ic)
 	    p_type = DCL_TYPE (type);
 	  else
 	    {
-	      /* we have to go by the storage class */
-	      p_type = PTR_TYPE (SPEC_OCLS (etype));
+	      if (SPEC_SCLS(etype)==S_REGISTER) {
+		// let's assume it is a generic pointer
+		p_type=GPOINTER;
+	      } else {
+		/* we have to go by the storage class */
+		p_type = PTR_TYPE (SPEC_OCLS (etype));
+	      }
 	    }
 
 	  /* the first two bytes are known */
@@ -8206,7 +8211,10 @@ genCast (iCode * ic)
 	    case CPOINTER:
 	      l = "#0x02";
 	      break;
-	    case PPOINTER:
+	    case GPOINTER:
+	      l = "0x03";
+	      break;
+	    case PPOINTER: // what the fck is this?
 	      l = "#0x03";
 	      break;
 

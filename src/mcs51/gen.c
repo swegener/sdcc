@@ -3285,7 +3285,6 @@ genMultOneByte (operand * left,
   symbol *lbl;
   int size=AOP_SIZE(result);
 
-  //emitcode (";",__FUNCTION__);
   if (size<1 || size>2) {
     // this should never happen
       fprintf (stderr, "size!=1||2 (%d) in %s at line:%d \n", 
@@ -3323,7 +3322,6 @@ genMultOneByte (operand * left,
 
   //emitcode (";", "signed");
   emitcode ("clr", "F0"); // reset sign flag
-  emitcode ("mov", "b,%s", aopGet (AOP (right), 0, FALSE, FALSE));
   MOVA (aopGet (AOP (left), 0, FALSE, FALSE));
 
   lbl=newiTempLabel(NULL);
@@ -3334,22 +3332,24 @@ genMultOneByte (operand * left,
   emitcode ("inc", "a");
 
   emitcode ("", "%05d$:", lbl->key+100);
-  emitcode ("xch", "a,b");
 
   /* if literal */
   if (AOP_TYPE(right)==AOP_LIT) {
+    signed char val=floatFromVal (AOP (right)->aopu.aop_lit);
     /* AND literal negative */
-    if ((int) floatFromVal (AOP (right)->aopu.aop_lit) < 0) {
-      // two's complement for literal<0
-      emitcode ("xrl", "PSW,#0x20"); // xrl sign flag
-      emitcode ("cpl", "a");
-      emitcode ("inc", "a");
+    if (val < 0) {
+      emitcode ("cpl", "F0"); // complement sign flag
+      emitcode ("mov", "b,#%02x", -val);
+    } else {
+      emitcode ("mov", "b,#%02x", val);
     }
   } else {
     lbl=newiTempLabel(NULL);
+    emitcode ("mov", "b,a");
+    emitcode ("mov", "a,%s", aopGet (AOP (right), 0, FALSE, FALSE));
     emitcode ("jnb", "acc.7,%05d$", lbl->key+100);
     // right side is negative, 8-bit two's complement
-    emitcode ("xrl", "PSW,#0x20"); // xrl sign flag
+    emitcode ("cpl", "F0"); // complement sign flag
     emitcode ("cpl", "a");
     emitcode ("inc", "a");
     emitcode ("", "%05d$:", lbl->key+100);

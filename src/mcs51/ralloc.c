@@ -2190,7 +2190,8 @@ static void packRegisters (eBBlock *ebp)
 	    link *toType = operandType(IC_LEFT(ic));
 
 	    if (IS_INTEGRAL(fromType) && IS_INTEGRAL(toType) &&
-		getSize(fromType) != getSize(toType) ) {
+		getSize(fromType) != getSize(toType)  &&
+		SPEC_USIGN(fromType) == SPEC_USIGN(toType)) {
 
 		iCode *dic = packRegsForOneuse(ic,IC_RIGHT(ic),ebp);
 		if (dic) {

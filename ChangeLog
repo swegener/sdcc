@@ -1,3 +1,7 @@
+2003-05-18    <johan@balder>
+
+	* src/ds390/gen.c (genArrayInit): removed obsolete and buggy ARRAYINIT
+	* src/ds390/main.c (genArrayInit): removed obsolete and buggy ARRAYINIT	
 2003-05-17  Karl Bongers(apply patches from Martin Helmling)
 
 	* debugger/mcs51/sdcdb.c,cmd.c,break.c and .h files.

@@ -10632,6 +10632,7 @@ release:
 
 }
 
+#if 0 // obsolete, and buggy for != xdata
 /*-----------------------------------------------------------------*/
 /* genArrayInit - generates code for address of                       */
 /*-----------------------------------------------------------------*/
@@ -10740,6 +10741,7 @@ genArrayInit (iCode * ic)
     
     freeAsmop (IC_LEFT(ic), NULL, ic, TRUE);
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* genFarFarAssign - assignment when both are in far space         */
@@ -12971,9 +12973,11 @@ gen390Code (iCode * lic)
 	  else addSet (&_G.sendSet, ic);
 	  break;
 
+#if 0 // obsolete, and buggy for != xdata
 	case ARRAYINIT:
 	    genArrayInit(ic);
 	    break;
+#endif
 	    
 	default:
 	  ic = ic;

@@ -63,22 +63,22 @@ bool cl_xa::get_bit(int bit) {
 }
 
 void cl_xa::set_bit(int bit, int value) {
+  int i;
   short offset=0;
   if (bit>=0x200) {
     // in sfr space
     bit-=0x200;
     offset=0x400;
   }
-#if 0
+
   i = get_byte_direct(offset + (bit/8));
   if (value) {
-    set_byte_direct(offset + (bit/8), i | (1 << (bit%8) );
+    set_byte_direct(offset + (bit/8), i | (1 << (bit%8)) );
     //mem_direct[offset + (bit/8)] |= (1 << (bit%8));
   } else {
-    set_byte_direct( offset + (bit/8), i & ~(1 << (bit%8) );
+    set_byte_direct(offset + (bit/8), i & ~(1 << (bit%8)) );
     //mem_direct[offset + (bit/8)] &= ~(1 << (bit%8));
   }
-#endif
 }
 
 #define RI_F0 ((code >> 4) & 0xf)
@@ -209,7 +209,7 @@ int cl_xa::inst_BPL(uint code, int operands)
 int cl_xa::inst_BR(uint code, int operands)
 {
   short jmpAddr = fetch1()*2;
-  PC=(PC+jmpAddr)&0xfffffffe;
+  PC=(PC+jmpAddr)&0xfffffe;
   return(resGO);
 }
 
@@ -353,12 +353,12 @@ int cl_xa::inst_DJNZ(uint code, int operands)
          unsigned short tmp = mov2(0, reg2(RI_F0)-1);
          set_reg2(RI_F0, tmp);
          if (tmp != 0)
-           PC = (PC + addr) & 0xfffffffe;
+           PC = (PC + addr) & 0xfffffe;
        } else {
          unsigned char tmp = mov1(0, reg1(RI_F0)-1);
          set_reg1(RI_F0, tmp);
          if (tmp != 0)
-           PC = (PC + addr) & 0xfffffffe;
+           PC = (PC + addr) & 0xfffffe;
        }
     }
     break;
@@ -427,7 +427,7 @@ int cl_xa::inst_JMP(uint code, int operands)
     case REL16:
     {
       jmpAddr = (signed short)fetch2()*2;
-      PC = (PC + jmpAddr) & 0xfffffffe;
+      PC = (PC + jmpAddr) & 0xfffffe;
     }
     break;
     case IREG:

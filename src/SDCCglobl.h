@@ -237,6 +237,7 @@ struct options
     int noCcodeInAsm;           /* hide c-code from asm */
     int iCodeInAsm;             /* show i-code in asm */
     int printSearchDirs;        /* display the directories in the compiler's search path */
+	int vc_err_style;           /* errors and warnings are compatible with Micro$oft visual studio */
   };
 
 /* forward definition for variables accessed globally */

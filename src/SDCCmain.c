@@ -120,6 +120,7 @@ char buffer[PATH_MAX * 2];
 #define OPTION_NO_CCODE_IN_ASM	"--no-c-code-in-asm"
 #define OPTION_ICODE_IN_ASM	"--i-code-in-asm"
 #define OPTION_PRINT_SEARCH_DIRS "--print-search-dirs"
+#define OPTION_MSVC_ERROR_STYLE "--vc"
 
 static const OPTION
 optionsTable[] = {
@@ -219,6 +220,7 @@ optionsTable[] = {
     { 0,    OPTION_NO_CCODE_IN_ASM, &options.noCcodeInAsm, "don't include c-code as comments in the asm file"},
     { 0,    OPTION_ICODE_IN_ASM,    &options.iCodeInAsm, "include i-code as comments in the asm file"},
     { 0,    OPTION_PRINT_SEARCH_DIRS, &options.printSearchDirs, "display the directories in the compiler's search path"},
+    { 0,    OPTION_MSVC_ERROR_STYLE, &options.vc_err_style, "messages are compatible with Micro$oft visual studio"},
     /* End of options */
     { 0,    NULL }
 };

@@ -6288,6 +6288,30 @@ status Collapsed
 
 \series default 
  Display the directories in the compiler's search path
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-vc
+\begin_inset LatexCommand \index{-\/-print-search-dirs}
+
+\end_inset 
+
+
+\series default 
+ Display the errors and warnings using MSVC style, so you can use SDCC with
+ visual studio
 \layout Subsubsection
 
 Intermediate Dump Options
@@ -9907,6 +9931,67 @@ standard error
 \end_inset 
 
 .
+ I you happen to have visual studio installed in your windows machine, you
+ can use it to compile your sources using a custom build and the SDCC -
+\emph on 
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+
+\emph default 
+-vc option.
+ Something like this should work:
+\newline 
+
+\newline 
+
+\series bold 
+c:
+\backslash 
+sdcc
+\backslash 
+bin
+\backslash 
+sdcc.exe -
+\series default 
+\emph on 
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+
+\series bold 
+\emph default 
+-vc -
+\series default 
+\emph on 
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+
+\series bold 
+\emph default 
+-model-large -c $(InputPath)
 \layout Section
 \pagebreak_top 
 SDCC Technical Data

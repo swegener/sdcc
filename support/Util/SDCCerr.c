@@ -20,6 +20,7 @@
 #include <stdlib.h>
 
 #include "SDCCerr.h"
+#include "../../src/SDCCglobl.h"
 
 
 #define USE_STDOUT_FOR_ERRORS		0
@@ -433,8 +434,11 @@ void vwerror (int errNum, va_list marker)
             fatalError++ ;
   
         if ( filename && lineno ) {
-            fprintf(_SDCCERRG.out, "%s:%d: ",filename,lineno);
-        } else if (lineno) {
+			if(options.vc_err_style)
+				fprintf(_SDCCERRG.out, "%s(%d) : ",filename,lineno);
+			else
+				fprintf(_SDCCERRG.out, "%s:%d: ",filename,lineno);
+         } else if (lineno) {
             fprintf(_SDCCERRG.out, "at %d: ", lineno);
         } else {
             fprintf(_SDCCERRG.out, "-:0: ");

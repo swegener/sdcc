@@ -1,3 +1,9 @@
+2003-06-08  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+	* support/Util/SDCCerr.c, src/SDCCglobl.h, src/SDCCmain.c, doc/sdccman.lyx:
+	added option --vc, so sdcc errors and warnings are compatible with 
+	Microsoft Visual Studio.
+
 2003-06-07  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	* device/lib/_atof.c, device/lib/Makefile.in, device/include/stdlib.h,

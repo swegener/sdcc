@@ -1,3 +1,7 @@
+2003-04-12  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/pic/pcoderegs.c (Remove1pcode): fix warning on alpha
+
 2003-04-11 kevin Vigor <kevin@vigor.nu>
 
 	* ds390/gen.c ds390/peeph.def: fix bug 706781

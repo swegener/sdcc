@@ -273,7 +273,7 @@ static void Remove1pcode(pCode *pc, regs *reg, int debug_code)
     */
 
     char buff1[256];
-    int size = 256;
+    size_t size = 256;
 
     char *pbuff,**ppbuff;
     pbuff = buff1;

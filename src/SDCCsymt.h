@@ -457,6 +457,8 @@ extern sym_link *validateLink(sym_link 	*l,
 #define IS_BITVAR(x) (IS_SPEC(x) && (x->select.s.noun == V_BITFIELD || \
                                      x->select.s.noun  == V_BIT ||   \
                                      x->select.s.noun == V_SBIT ))
+#define IS_BIT(x) (IS_SPEC(x) && (x->select.s.noun  == V_BIT ||   \
+                                  x->select.s.noun == V_SBIT ))
 #define IS_FLOAT(x)  (IS_SPEC(x) && x->select.s.noun == V_FLOAT)
 #define IS_ARITHMETIC(x) (IS_INTEGRAL(x) || IS_FLOAT(x))
 #define IS_AGGREGATE(x) (IS_ARRAY(x) || IS_STRUCT(x))
@@ -502,6 +504,18 @@ extern sym_link *floatType;
 
 #include "SDCCval.h"
 
+typedef enum
+{
+  RESULT_TYPE_NONE = 0,	/* operands will be promoted to int */
+  RESULT_CHECK = 0, /* TODO: replace all occurences with the appropriate type and remove me */
+  RESULT_TYPE_BIT,
+  RESULT_TYPE_CHAR,
+  RESULT_TYPE_INT,
+  RESULT_TYPE_OTHER,	/* operands will be promoted to int */
+  RESULT_TYPE_IFX,
+  RESULT_TYPE_NOPROM,	/* operands will be promoted to int */
+} RESULT_TYPE;
+
 /* forward definitions for the symbol table related functions */
 void initSymt ();
 symbol *newSymbol (char *, int);
@@ -541,7 +555,7 @@ int funcInChain (sym_link *);
 void addSymChain (symbol *);
 sym_link *structElemType (sym_link *, value *);
 symbol *getStructElement (structdef *, symbol *);
-sym_link *computeType (sym_link *, sym_link *, bool promoteCharToInt);
+sym_link *computeType (sym_link *, sym_link *, RESULT_TYPE, char);
 void processFuncArgs (symbol *);
 int isSymbolEqual (symbol *, symbol *);
 int powof2 (TYPE_UDWORD);

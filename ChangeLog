@@ -1,3 +1,24 @@
+2004-03-06 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* sim/ucsim/configure.in,
+	* sim/ucsim/configure,
+	* sim/ucsim/doc/Makefile.in: use docdir
+	* src/SDCC.y: fixed sbit atrributes
+	* src/SDCCast.c (getResultTypeFromType): added support for bitfields
+	* src/SDCCast.c (decorateType): |^& need special promotion handling
+	* src/SDCCast.h,
+	* src/SDCCsymt.h: moved definition of RESULT_TYPE
+	* src/SDCCsymt.h (computeType),
+	* src/SDCCicode.c: computeType() needs op
+	* src/SDCCsymt.c (checkTypeSanity),
+	* doc/sddman.lyx: "plain" bitfields are unsigned
+	* src/SDCCsymt.c (computeTypeOr): added
+	* src/SDCCsymt.c (computeType): added support for bitfields, fixed
+	|^& ops
+	* src/SDCCval.c (val*): computeType() needs op
+	* src/SDCCval.c (valCastLiteral): fixed casting of bitfields
+	* support/regression/tests/onebyte.c: added tests for |^&
+
 2004-03-06 Hans Dorn <hjdorn AT users.sourceforge.net>
 
 	* src/pic16/gen.c: (genpic16Code) use copy of printILine's output

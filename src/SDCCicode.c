@@ -45,7 +45,6 @@ symbol *entryLabel;		/* function entry  label */
 
 /*-----------------------------------------------------------------*/
 /* forward definition of some functions */
-operand *geniCodeDivision (operand *, operand *, bool);
 operand *geniCodeAssign (operand *, operand *, int);
 static operand *geniCodeArray (operand *, operand *,int);
 static operand *geniCodeArray2Ptr (operand *);
@@ -1703,10 +1702,11 @@ setOperandType (operand * op, sym_link * type)
     }
 
 }
+
 /*-----------------------------------------------------------------*/
 /* Get size in byte of ptr need to access an array                 */
 /*-----------------------------------------------------------------*/
-int
+static int
 getArraySizePtr (operand * op)
 {
   sym_link *ltype = operandType(op);
@@ -1766,7 +1766,7 @@ usualUnaryConversions (operand * op)
 
 static sym_link *
 usualBinaryConversions (operand ** op1, operand ** op2,
-                        bool resultIsInt, char op)
+                        RESULT_TYPE resultType, char op)
 {
   sym_link *ctype;
   sym_link *rtype = operandType (*op2);
@@ -1804,10 +1804,10 @@ usualBinaryConversions (operand ** op1, operand ** op2,
       && (   (IS_CHAR (getSpec (ltype)) && !IS_UNSIGNED (getSpec (ltype)))
 	  || (IS_CHAR (getSpec (rtype)) && !IS_UNSIGNED (getSpec (rtype)))))
     /* one or two signed char operands: promote to int */
-    resultIsInt = TRUE;
+    resultType = RESULT_TYPE_INT;
 #endif
   
-  ctype = computeType (ltype, rtype, resultIsInt);
+  ctype = computeType (ltype, rtype, resultType, op);
 
 #ifdef OLDONEBYTEOPS
 
@@ -2069,8 +2069,8 @@ geniCodeGoto (symbol * label)
 /*-----------------------------------------------------------------*/
 /* geniCodeMultiply - gen intermediate code for multiplication     */
 /*-----------------------------------------------------------------*/
-operand *
-geniCodeMultiply (operand * left, operand * right, bool resultIsInt)
+static operand *
+geniCodeMultiply (operand * left, operand * right, RESULT_TYPE resultType)
 {
   iCode *ic;
   int p2 = 0;
@@ -2086,7 +2086,7 @@ geniCodeMultiply (operand * left, operand * right, bool resultIsInt)
     p2 = powof2 ((TYPE_UDWORD) floatFromVal (right->operand.valOperand));
   }
 
-  resType = usualBinaryConversions (&left, &right, resultIsInt, '*');
+  resType = usualBinaryConversions (&left, &right, resultType, '*');
 #if 1
   rtype = operandType (right);
   retype = getSpec (rtype);
@@ -2100,12 +2100,12 @@ geniCodeMultiply (operand * left, operand * right, bool resultIsInt)
      efficient in most cases than 2 bytes result = 2 bytes << literal
      if port has 1 byte muldiv */
   if (p2 && !IS_FLOAT (letype)
-      && !((resultIsInt) && (getSize (resType) != getSize (ltype))
+      && !((resultType != RESULT_TYPE_INT) && (getSize (resType) != getSize (ltype))
            && (port->support.muldiv == 1))
       && strcmp (port->target, "pic14") != 0  /* don't shift for pic */
       && strcmp (port->target, "pic16") != 0)
     {
-      if ((resultIsInt) && (getSize (resType) != getSize (ltype)))
+      if ((resultType == RESULT_TYPE_INT) && (getSize (resType) != getSize (ltype)))
 	{
 	  /* LEFT_OP need same size for left and result, */
 	  left = geniCodeCast (resType, left, TRUE);
@@ -2130,8 +2130,8 @@ geniCodeMultiply (operand * left, operand * right, bool resultIsInt)
 /*-----------------------------------------------------------------*/
 /* geniCodeDivision - gen intermediate code for division           */
 /*-----------------------------------------------------------------*/
-operand *
-geniCodeDivision (operand * left, operand * right, bool resultIsInt)
+static operand *
+geniCodeDivision (operand * left, operand * right, RESULT_TYPE resultType)
 {
   iCode *ic;
   int p2 = 0;
@@ -2141,7 +2141,7 @@ geniCodeDivision (operand * left, operand * right, bool resultIsInt)
   sym_link *ltype = operandType (left);
   sym_link *letype = getSpec (ltype);
 
-  resType = usualBinaryConversions (&left, &right, resultIsInt, '/');
+  resType = usualBinaryConversions (&left, &right, resultType, '/');
 
   /* if the right is a literal & power of 2
      and left is unsigned then make it a
@@ -2168,8 +2168,8 @@ geniCodeDivision (operand * left, operand * right, bool resultIsInt)
 /*-----------------------------------------------------------------*/
 /* geniCodeModulus  - gen intermediate code for modulus            */
 /*-----------------------------------------------------------------*/
-operand *
-geniCodeModulus (operand * left, operand * right, bool resultIsInt)
+static operand *
+geniCodeModulus (operand * left, operand * right, RESULT_TYPE resultType)
 {
   iCode *ic;
   sym_link *resType;
@@ -2180,7 +2180,7 @@ geniCodeModulus (operand * left, operand * right, bool resultIsInt)
     return operandFromValue (valMod (left->operand.valOperand,
 				     right->operand.valOperand));
 
-  resType = usualBinaryConversions (&left, &right, resultIsInt, '%');
+  resType = usualBinaryConversions (&left, &right, resultType, '%');
 
   /* now they are the same size */
   ic = newiCode ('%', left, right);
@@ -2231,8 +2231,8 @@ subtractExit:
 /*-----------------------------------------------------------------*/
 /* geniCodeSubtract - generates code for subtraction               */
 /*-----------------------------------------------------------------*/
-operand *
-geniCodeSubtract (operand * left, operand * right)
+static operand *
+geniCodeSubtract (operand * left, operand * right, RESULT_TYPE resultType)
 {
   iCode *ic;
   int isarray = 0;
@@ -2255,12 +2255,15 @@ geniCodeSubtract (operand * left, operand * right)
     {
       isarray = left->isaddr;
       right = geniCodeMultiply (right,
-				operandFromLit (getSize (ltype->next)), (getArraySizePtr(left) >= INTSIZE));
+				operandFromLit (getSize (ltype->next)),
+				(getArraySizePtr(left) >= INTSIZE) ?
+				  RESULT_TYPE_INT :
+				  RESULT_TYPE_CHAR);
       resType = copyLinkChain (IS_ARRAY (ltype) ? ltype->next : ltype);
     }
   else
     {				/* make them the same size */
-      resType = usualBinaryConversions (&left, &right, FALSE, '-');
+      resType = usualBinaryConversions (&left, &right, resultType, '-');
     }
 
   ic = newiCode ('-', left, right);
@@ -2279,8 +2282,8 @@ geniCodeSubtract (operand * left, operand * right)
 /*-----------------------------------------------------------------*/
 /* geniCodeAdd - generates iCode for addition                      */
 /*-----------------------------------------------------------------*/
-operand *
-geniCodeAdd (operand * left, operand * right, int lvl)
+static operand *
+geniCodeAdd (operand * left, operand * right, RESULT_TYPE resultType, int lvl)
 {
   iCode *ic;
   sym_link *resType;
@@ -2308,7 +2311,11 @@ geniCodeAdd (operand * left, operand * right, int lvl)
 	  size  = operandFromLit (getSize (ltype->next));
 	  SPEC_USIGN (getSpec (operandType (size))) = 1;
 	  indexUnsigned = IS_UNSIGNED (getSpec (operandType (right)));
-	  right = geniCodeMultiply (right, size, (getArraySizePtr(left) >= INTSIZE));
+	  right = geniCodeMultiply (right,
+				    size,
+				    (getArraySizePtr(left) >= INTSIZE) ?
+				      RESULT_TYPE_INT :
+				      RESULT_TYPE_CHAR);
 	  /* Even if right is a 'unsigned char',
 	     the result will be a 'signed int' due to the promotion rules.
 	     It doesn't make sense when accessing arrays, so let's fix it here: */
@@ -2319,7 +2326,7 @@ geniCodeAdd (operand * left, operand * right, int lvl)
     }
   else
     { // make them the same size
-      resType = usualBinaryConversions (&left, &right, FALSE, '+');
+      resType = usualBinaryConversions (&left, &right, resultType, '+');
     }
 
   /* if they are both literals then we know */
@@ -2401,12 +2408,22 @@ geniCodeArray (operand * left, operand * right, int lvl)
 	  left = geniCodeRValue (left, FALSE);
 	}
 
-      return geniCodeDerefPtr (geniCodeAdd (left, right, lvl), lvl);
+      return geniCodeDerefPtr (geniCodeAdd (left,
+					    right,
+					    (getArraySizePtr(left) >= INTSIZE) ?
+					      RESULT_TYPE_INT :
+					      RESULT_TYPE_CHAR,
+					    lvl),
+			       lvl);
     }
   size = operandFromLit (getSize (ltype->next));
   SPEC_USIGN (getSpec (operandType (size))) = 1;
   indexUnsigned = IS_UNSIGNED (getSpec (operandType (right)));
-  right = geniCodeMultiply (right, size, (getArraySizePtr(left) >= INTSIZE));
+  right = geniCodeMultiply (right,
+			    size,
+			    (getArraySizePtr(left) >= INTSIZE) ?
+			      RESULT_TYPE_INT :
+			      RESULT_TYPE_CHAR);
   /* Even if right is a 'unsigned char', the result will be a 'signed int' due to the promotion rules.
      It doesn't make sense when accessing arrays, so let's fix it here: */
   if (indexUnsigned)
@@ -2909,7 +2926,7 @@ geniCodeLogic (operand * left, operand * right, int op)
         }
     }
 
-  ctype = usualBinaryConversions (&left, &right, FALSE, ' ');
+  ctype = usualBinaryConversions (&left, &right, RESULT_TYPE_NONE, ' ');
 
   ic = newiCode (op, left, right);
   IC_RESULT (ic) = newiTempOperand (newCharLink (), 1);
@@ -3498,7 +3515,7 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
   /* if the min is not zero then we no make it zero */
   if (min)
     {
-      cond = geniCodeSubtract (cond, operandFromLit (min));
+      cond = geniCodeSubtract (cond, operandFromLit (min), RESULT_TYPE_CHAR);
       if (!IS_LITERAL(getSpec(operandType(cond))))
         setOperandType (cond, UCHARTYPE);
     }
@@ -3866,31 +3883,34 @@ ast2iCode (ast * tree,int lvl)
     case '/':
       return geniCodeDivision (geniCodeRValue (left, FALSE),
 			       geniCodeRValue (right, FALSE),
-			       IS_INT (tree->ftype));
+			       getResultTypeFromType (tree->ftype));
 
     case '%':
       return geniCodeModulus (geniCodeRValue (left, FALSE),
 			      geniCodeRValue (right, FALSE),
-			      IS_INT (tree->ftype));
+			      getResultTypeFromType (tree->ftype));
     case '*':
       if (right)
 	return geniCodeMultiply (geniCodeRValue (left, FALSE),
 				 geniCodeRValue (right, FALSE),
-				 IS_INT (tree->ftype));
+				 getResultTypeFromType (tree->ftype));
       else
 	return geniCodeDerefPtr (geniCodeRValue (left, FALSE),lvl);
 
     case '-':
       if (right)
 	return geniCodeSubtract (geniCodeRValue (left, FALSE),
-				 geniCodeRValue (right, FALSE));
+				 geniCodeRValue (right, FALSE),
+				 getResultTypeFromType (tree->ftype));
       else
 	return geniCodeUnaryMinus (geniCodeRValue (left, FALSE));
 
     case '+':
       if (right)
 	return geniCodeAdd (geniCodeRValue (left, FALSE),
-			    geniCodeRValue (right, FALSE),lvl);
+			    geniCodeRValue (right, FALSE),
+			    getResultTypeFromType (tree->ftype),
+			    lvl);
       else
 	return geniCodeRValue (left, FALSE);	/* unary '+' has no meaning */
 
@@ -3981,7 +4001,8 @@ ast2iCode (ast * tree,int lvl)
 	geniCodeAssign (left,
 		geniCodeMultiply (geniCodeRValue (operandFromOperand (left),
 						  FALSE),
-				  geniCodeRValue (right, FALSE),FALSE), 0);
+				  geniCodeRValue (right, FALSE), FALSE),
+				  getResultTypeFromType (tree->ftype));
 
     case DIV_ASSIGN:
       return
@@ -3989,7 +4010,7 @@ ast2iCode (ast * tree,int lvl)
 		geniCodeDivision (geniCodeRValue (operandFromOperand (left),
 						  FALSE),
 				  geniCodeRValue (right, FALSE),
-				  IS_INT (tree->ftype)),
+				  getResultTypeFromType (tree->ftype)),
 			0);
     case MOD_ASSIGN:
       return
@@ -3997,7 +4018,7 @@ ast2iCode (ast * tree,int lvl)
 		 geniCodeModulus (geniCodeRValue (operandFromOperand (left),
 						  FALSE),
 				  geniCodeRValue (right, FALSE),
-				  IS_INT (tree->ftype)),
+				  getResultTypeFromType (tree->ftype)),
 			0);
     case ADD_ASSIGN:
       {
@@ -4013,7 +4034,10 @@ ast2iCode (ast * tree,int lvl)
 	return geniCodeAssign (left,
 		     geniCodeAdd (geniCodeRValue (operandFromOperand (left),
 						  FALSE),
-				  right,lvl), 0);
+				  right,
+				  getResultTypeFromType (tree->ftype),
+				  lvl),
+			       0);
       }
     case SUB_ASSIGN:
       {
@@ -4032,7 +4056,9 @@ ast2iCode (ast * tree,int lvl)
 	  geniCodeAssign (left,
 		geniCodeSubtract (geniCodeRValue (operandFromOperand (left),
 						  FALSE),
-				  right), 0);
+				  right,
+				  getResultTypeFromType (tree->ftype)),
+			  0);
       }
     case LEFT_ASSIGN:
       return

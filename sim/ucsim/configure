@@ -467,7 +467,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS AWK VERSION VERSIONHI VERSIONLO VERSIONP enable_ucsim enable_dlso enable_51 enable_avr enable_z80 enable_hc08 enable_xa enable_serio CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT CXXCPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB STRIP build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS ac_ct_CC LN_S ECHO ac_ct_STRIP CPP EGREP LIBTOOL LIBTOOL_DEPS dl_ok DL panel_ok curses_ok CURSES_LIBS M_OR_MM SHAREDLIB PICOPT dlso_ok LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS AWK VERSION VERSIONHI VERSIONLO VERSIONP enable_ucsim enable_dlso enable_51 enable_avr enable_z80 enable_hc08 enable_xa enable_serio CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT CXXCPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB STRIP build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS ac_ct_CC LN_S ECHO ac_ct_STRIP CPP EGREP LIBTOOL LIBTOOL_DEPS dl_ok DL panel_ok curses_ok CURSES_LIBS M_OR_MM SHAREDLIB PICOPT dlso_ok docdir LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -940,6 +940,10 @@ ac_env_CPP_set=${CPP+set}
 ac_env_CPP_value=$CPP
 ac_cv_env_CPP_set=${CPP+set}
 ac_cv_env_CPP_value=$CPP
+ac_env_docdir_set=${docdir+set}
+ac_env_docdir_value=$docdir
+ac_cv_env_docdir_set=${docdir+set}
+ac_cv_env_docdir_value=$docdir
 
 #
 # Report the --help message.
@@ -1045,6 +1049,7 @@ Some influential environment variables:
   CC          C compiler command
   CFLAGS      C compiler flags
   CPP         C preprocessor
+  docdir      documentation installation directory
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -4883,7 +4888,7 @@ test "x$enable_libtool_lock" != xno && enable_libtool_lock=yes
 case $host in
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4886 "configure"' > conftest.$ac_ext
+  echo '#line 4891 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -5430,7 +5435,7 @@ chmod -w .
 save_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS -o out/conftest2.$ac_objext"
 compiler_c_o=no
-if { (eval echo configure:5433: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>out/conftest.err; } && test -s out/conftest2.$ac_objext; then
+if { (eval echo configure:5438: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>out/conftest.err; } && test -s out/conftest2.$ac_objext; then
   # The compiler can only warn and ignore the option if not recognized
   # So say no if there are warnings
   if test -s out/conftest.err; then
@@ -7275,7 +7280,7 @@ else
     lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 7278 "configure"
+#line 7283 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -7373,7 +7378,7 @@ else
     lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 7376 "configure"
+#line 7381 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12721,6 +12726,12 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
+# *nix default: "${datadir}/sdcc/doc"
+
+if test "${docdir}" = ""; then
+    docdir="\${datadir}"/sdcc/doc
+fi
+
 
 # Generating output files
 # ===========================================================================
@@ -13401,6 +13412,7 @@ s,@M_OR_MM@,$M_OR_MM,;t t
 s,@SHAREDLIB@,$SHAREDLIB,;t t
 s,@PICOPT@,$PICOPT,;t t
 s,@dlso_ok@,$dlso_ok,;t t
+s,@docdir@,$docdir,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF

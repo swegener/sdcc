@@ -466,6 +466,12 @@ fi
 AC_DEFINE_UNQUOTED(_A_, "${A}")
 AC_DEFINE_UNQUOTED(_M_, "${M}")
 
+# *nix default: "${datadir}/sdcc/doc"
+AC_ARG_VAR(docdir, documentation installation directory)
+if test "${docdir}" = ""; then
+    docdir="\${datadir}"/sdcc/doc
+fi
+AC_SUBST(docdir)
 
 # Generating output files
 # ===========================================================================

@@ -170,17 +170,6 @@ ast;
 			  x == AND_ASSIGN || x == OR_ASSIGN || x == INC_OP || x == DEC_OP)
 #define IS_DEREF_OP(x) (( x->opval.op == '*' && x->right == NULL) || x->opval.op == '.')
 
-typedef enum
-{
-  RESULT_TYPE_NONE = 0,
-  RESULT_CHECK = 0, /* TODO: replace all occurences with the appropriate type and remove me */
-  RESULT_TYPE_BIT,
-  RESULT_TYPE_CHAR,
-  RESULT_TYPE_INT,
-  RESULT_TYPE_OTHER,
-  RESULT_TYPE_IFX,
-} RESULT_TYPE;
-
 /* forward declarations for global variables */
 extern ast *staticAutos;
 extern FILE *codeOutFile;

@@ -24,6 +24,8 @@
 #include "common.h"
 #include "newalloc.h"
 
+#include "SDCCsymt.h"
+
 value *aggregateToPointer (value *val);
 void printTypeChainRaw (sym_link * start, FILE * of);
 
@@ -564,6 +566,14 @@ void checkTypeSanity(sym_link *etype, char *name) {
      assume an int */
   if (!SPEC_NOUN(etype)) {
     SPEC_NOUN(etype)=V_INT;
+  }
+
+  /* ISO/IEC 9899 J.3.9 implementation defined behaviour: */
+  /* a "plain" int bitfield is unsigned */
+  if (SPEC_NOUN(etype)==V_BIT ||
+      SPEC_NOUN(etype)==V_SBIT) {
+    if (!etype->select.s._signed)
+      SPEC_USIGN(etype) = 1;
   }
 
   if (etype->select.s._signed && SPEC_USIGN(etype)) {
@@ -1579,16 +1589,84 @@ cleanUpLevel (bucket ** table, int level)
 }
 
 /*------------------------------------------------------------------*/
+/* computeTypeOr - computes the resultant type from two types       */
+/*------------------------------------------------------------------*/
+static sym_link *
+computeTypeOr (sym_link * etype1, sym_link * etype2, sym_link * reType)
+{
+  /* sanity check */
+  assert (IS_CHAR (etype1) && IS_CHAR (etype2));
+
+  if (SPEC_USIGN (etype1) == SPEC_USIGN (etype2))
+    {
+      SPEC_USIGN (reType) = SPEC_USIGN (etype1);
+      return reType;
+    }
+  
+  if (SPEC_USIGN (etype1))
+    {
+      if (   IS_LITERAL (etype2)
+	  && floatFromVal (valFromType (etype2)) >= 0)
+	SPEC_USIGN (reType) = 1;
+      else
+	{
+	  /* promote to int */
+	  SPEC_USIGN (reType) = 0;
+	  SPEC_NOUN (reType) = V_INT;
+	}
+    }
+  else /* etype1 signed */
+    {
+      if (   IS_LITERAL (etype2)
+	  && floatFromVal (valFromType (etype2)) <= 127)
+	SPEC_USIGN (reType) = 0;
+      else
+	{
+	  /* promote to int */
+	  SPEC_USIGN (reType) = 0;
+	  SPEC_NOUN (reType) = V_INT;
+	}
+    }
+
+  if (SPEC_USIGN (etype2))
+    {
+      if (   IS_LITERAL (etype1)
+	  && floatFromVal (valFromType (etype1)) >= 0)
+	SPEC_USIGN (reType) = 1;
+      else
+	{
+	  /* promote to int */
+	  SPEC_USIGN (reType) = 0;
+	  SPEC_NOUN (reType) = V_INT;
+	}
+    }
+  else /* etype2 signed */
+    {
+      if (   IS_LITERAL (etype1)
+	  && floatFromVal (valFromType (etype1)) <= 127)
+	SPEC_USIGN (reType) = 0;
+      else
+	{
+	  /* promote to int */
+	  SPEC_USIGN (reType) = 0;
+	  SPEC_NOUN (reType) = V_INT;
+	}
+    }
+  return reType;
+}
+
+/*------------------------------------------------------------------*/
 /* computeType - computes the resultant type from two types         */
 /*------------------------------------------------------------------*/
 sym_link *
-computeType (sym_link * type1, sym_link * type2, bool promoteCharToInt)
+computeType (sym_link * type1, sym_link * type2,
+             RESULT_TYPE resultType, char op)
 {
   sym_link *rType;
   sym_link *reType;
   sym_link *etype1 = getSpec (type1);
   sym_link *etype2;
-   
+
   etype2 = type2 ? getSpec (type2) : type1;
 
   /* if one of them is a float then result is a float */
@@ -1598,12 +1676,28 @@ computeType (sym_link * type1, sym_link * type2, bool promoteCharToInt)
   if (IS_FLOAT (etype1) || IS_FLOAT (etype2))
     rType = newFloatLink ();
   else
+    /* if both are bitvars choose the larger one */
+  if (IS_BITVAR (etype1) && IS_BITVAR (etype2))
+    {
+      rType = SPEC_BLEN (etype1) >= SPEC_BLEN (etype2) ?
+		copyLinkChain (type1) : copyLinkChain (type1);
+    }
     /* if only one of them is a bit variable
        then the other one prevails */
-  if (IS_BITVAR (etype1) && !IS_BITVAR (etype2))
-    rType = copyLinkChain (type2);
+  else if (IS_BITVAR (etype1) && !IS_BITVAR (etype2))
+    {
+      rType = copyLinkChain (type2);
+      /* bitfield can have up to 16 bits */
+      if (getSize (etype1) > 1)
+        SPEC_NOUN (getSpec (rType)) = V_INT;
+    }
   else if (IS_BITVAR (etype2) && !IS_BITVAR (etype1))
-    rType = copyLinkChain (type1);
+    {
+      rType = copyLinkChain (type1);
+      /* bitfield can have up to 16 bits */
+      if (getSize (etype2) > 1)
+        SPEC_NOUN (getSpec (rType)) = V_INT;
+    }
   else
     /* if one of them is a pointer or array then that
        prevails */
@@ -1621,8 +1715,60 @@ computeType (sym_link * type1, sym_link * type2, bool promoteCharToInt)
   /* avoid conflicting types */
   reType->select.s._signed = 0;
 
-  if (IS_CHAR (reType) && promoteCharToInt)
-    SPEC_NOUN (reType) = V_INT;
+  /* if result is a literal then make not so */
+  if (IS_LITERAL (reType))
+    SPEC_SCLS (reType) = S_REGISTER;
+
+  switch (resultType)
+    {
+      case RESULT_TYPE_CHAR:
+	if (IS_BITVAR (reType))
+	  {
+	    SPEC_NOUN (reType) = V_CHAR;
+	    SPEC_SCLS (reType) = 0;
+	    SPEC_USIGN (reType) = 0;
+	    return rType;
+	  }
+	break;
+      case RESULT_TYPE_INT:
+      case RESULT_TYPE_NONE:
+	if (IS_BIT (reType))
+	  {
+	    SPEC_NOUN (reType) = V_CHAR;
+	    SPEC_SCLS (reType) = 0;
+	    SPEC_USIGN (reType) = 0;
+	    return rType;
+	  }
+	else if (IS_BITFIELD (reType))
+	  {
+	    /* could be smarter, but it depends on the op */
+	    /* this is for the worst case: a multiplication of 4 * 4 bit */
+	    SPEC_NOUN (reType) = SPEC_BLEN (reType) <= 4 ? V_CHAR : V_INT;
+	    SPEC_SCLS (reType) = 0;
+	    SPEC_USIGN (reType) = 0;
+	    return rType;
+	  }
+	else if (IS_CHAR (reType))
+	  {
+	    if (op == '|' || op == '^')
+	      return computeTypeOr (etype1, etype2, reType);
+	    else if (   op == '&'
+		     && SPEC_USIGN (etype1) != SPEC_USIGN (etype2))
+	      {
+		SPEC_USIGN (reType) = 1;
+		return rType;
+	      }
+	    else
+	      {
+		SPEC_NOUN (reType) = V_INT;
+		SPEC_USIGN (reType) = 0;
+		return rType;
+	      }
+	  }
+	break;
+      default:
+	break;
+    }
 
   /* SDCC's sign promotion:
      - if one or both operands are unsigned, the resultant type will be unsigned
@@ -1638,7 +1784,7 @@ computeType (sym_link * type1, sym_link * type2, bool promoteCharToInt)
      - if the result of an operation with two char's is promoted to a
        larger type, the result will be signed.
 
-     More sophisticated is the last one:
+     More sophisticated are these:
      - if the result of an operation with two char's is a char again,
        the result will only then be unsigned, if both operands are
        unsigned. In all other cases the result will be signed.
@@ -1653,6 +1799,8 @@ computeType (sym_link * type1, sym_link * type2, bool promoteCharToInt)
 	unsigned; this helps to avoid overflow:
 		2 * 100 =  200;
 
+     - ToDo: document '|', '^' and '&'
+     
      Homework: - why is (200 * 200 < 0) true?
 	       - why is { char l = 200, r = 200; (r * l > 0) } true?
   */
@@ -1678,10 +1826,6 @@ computeType (sym_link * type1, sym_link * type2, bool promoteCharToInt)
     SPEC_USIGN (reType) = 1;
   else
     SPEC_USIGN (reType) = 0;
-
-  /* if result is a literal then make not so */
-  if (IS_LITERAL (reType))
-    SPEC_SCLS (reType) = S_REGISTER;
 
   return rType;
 }

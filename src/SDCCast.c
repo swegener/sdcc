@@ -2019,10 +2019,18 @@ RESULT_TYPE
 getResultTypeFromType (sym_link *type)
 {
   /* type = getSpec (type); */
-  if (IS_BITVAR (type))
+  if (IS_BIT (type))
     return RESULT_TYPE_BIT;
   if (IS_BITFIELD (type))
-    return RESULT_TYPE_CHAR;
+    {
+      int blen = SPEC_BLEN (type);
+      
+      if (blen <= 1)
+        return RESULT_TYPE_BIT;
+      if (blen <= 8)
+        return RESULT_TYPE_CHAR;
+      return RESULT_TYPE_INT;
+    }
   if (IS_CHAR (type))
     return RESULT_TYPE_CHAR;
   if (   IS_INT (type)
@@ -2556,7 +2564,10 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
 	  tree->left  = addCast (tree->left,  resultType, FALSE);
 	  tree->right = addCast (tree->right, resultType, FALSE);
-	  TTYPE (tree) = computeType (LTYPE (tree), RTYPE (tree), FALSE);
+	  TTYPE (tree) = computeType (LTYPE (tree),
+				      RTYPE (tree),
+				      resultType,
+				      tree->opval.op);
 	  TETYPE (tree) = getSpec (TTYPE (tree));
 
           /* if left is a literal exchange left & right */
@@ -2774,7 +2785,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       TETYPE (tree) = getSpec (TTYPE (tree) =
 			       computeType (LTYPE (tree),
 					    RTYPE (tree),
-					    FALSE));
+					    resultType,
+					    tree->opval.op));
 
       return tree;
 
@@ -2806,7 +2818,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       TETYPE (tree) = getSpec (TTYPE (tree) =
 			       computeType (LTYPE (tree),
 					    RTYPE (tree),
-		               resultType == RESULT_TYPE_CHAR ? FALSE : TRUE));
+					    resultType,
+					    tree->opval.op));
 
       /* if right is a literal and */
       /* left is also a division by a literal then */
@@ -2872,7 +2885,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       TETYPE (tree) = getSpec (TTYPE (tree) =
 			       computeType (LTYPE (tree),
 					    RTYPE (tree),
-		               resultType == RESULT_TYPE_CHAR ? FALSE : TRUE));
+					    resultType,
+					    tree->opval.op));
       return tree;
 
       /*------------------------------------------------------------------*/
@@ -2987,7 +3001,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       TETYPE (tree) = getSpec (TTYPE (tree) =
 				   computeType (LTYPE (tree),
 					        RTYPE (tree),
-		               resultType == RESULT_TYPE_CHAR ? FALSE : TRUE));
+						resultType,
+						tree->opval.op));
 
       return tree;
 
@@ -3121,8 +3136,9 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           tree->right = addCast (tree->right, resultType, TRUE);
           TETYPE (tree) = getSpec (TTYPE (tree) =
 				     computeType (LTYPE (tree),
-					          RTYPE (tree),
-		               resultType == RESULT_TYPE_CHAR ? FALSE : TRUE));
+						  RTYPE (tree),
+						  resultType,
+						  tree->opval.op));
 	}
 	
       return tree;
@@ -3226,8 +3242,9 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	  tree->right = addCast (tree->right, resultType, TRUE);
 	  TETYPE (tree) = getSpec (TTYPE (tree) =
 				     computeType (LTYPE (tree),
-					          RTYPE (tree),
-		               resultType == RESULT_TYPE_CHAR ? FALSE : TRUE));
+						  RTYPE (tree),
+						  resultType,
+						  tree->opval.op));
 	}
 
       LRVAL (tree) = RRVAL (tree) = 1;
@@ -3374,8 +3391,9 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	  tree->left = addCast (tree->left, resultType, TRUE);
 	  TETYPE (tree) = getSpec (TTYPE (tree) =
 				       computeType (LTYPE (tree),
-					            NULL,
-			       resultType == RESULT_TYPE_CHAR ? FALSE : TRUE));
+						    NULL,
+						    resultType,
+						    tree->opval.op));
 	}
       else /* RIGHT_OP */
 	{
@@ -3858,7 +3876,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	  goto errorTreeReturn;
 	}
 
-      TTYPE (tree) = computeType (LTYPE (tree), RTYPE (tree), FALSE);
+      TTYPE (tree) = computeType (LTYPE (tree), RTYPE (tree),
+                                  resultType, tree->opval.op);
       TETYPE (tree) = getSpec (TTYPE (tree));
       return tree;
 
@@ -3941,7 +3960,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       TETYPE (tree) = getSpec (TTYPE (tree) =
 			       computeType (LTYPE (tree),
 					    RTYPE (tree),
-					    FALSE));
+					    RESULT_TYPE_NOPROM,
+					    tree->opval.op));
 
       if (!tree->initMode && IS_CONSTANT (LETYPE (tree)))
 	werror (E_CODE_WRITE, "-=");
@@ -3983,7 +4003,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       TETYPE (tree) = getSpec (TTYPE (tree) =
 			       computeType (LTYPE (tree),
 					    RTYPE (tree),
-					    FALSE));
+					    RESULT_TYPE_NOPROM,
+					    tree->opval.op));
 
       if (!tree->initMode && IS_CONSTANT (LETYPE (tree)))
 	werror (E_CODE_WRITE, "+=");

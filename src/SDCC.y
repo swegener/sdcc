@@ -702,6 +702,8 @@ sfr_reg_bit
                $$ = newLink(SPECIFIER) ;
                SPEC_NOUN($$) = V_SBIT;
                SPEC_SCLS($$) = S_SBIT;
+	       SPEC_BLEN($$) = 1;
+	       SPEC_BSTR($$) = 0;
 	       ignoreTypedefType = 1;
             }
    |  sfr_attributes

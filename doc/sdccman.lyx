@@ -8275,7 +8275,16 @@ Apart from this 8051 specific storage class most architectures support ANSI-C
 
 \end_inset 
 
- 
+
+\newline 
+
+\layout Standard
+
+In accordance with ISO/IEC 9899 bits and bitfields without an explicit signed
+ modifier are implemented as unsigned.
+\layout Standard
+
+
 \begin_inset Foot
 collapsed false
 

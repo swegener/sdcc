@@ -1162,12 +1162,27 @@ bool constExprTree (ast *cexpr) {
   switch (cexpr->type) 
     {
     case EX_VALUE:
-      return (IS_AST_LIT_VALUE(cexpr));
+      if (IS_AST_LIT_VALUE(cexpr)) {
+	// this is a literal
+	return TRUE;
+      }
+      if (IS_AST_SYM_VALUE(cexpr) && IS_FUNC(AST_SYMBOL(cexpr)->type)) {
+	// a function's address will never change
+	return TRUE;
+      }
+      return FALSE;
     case EX_LINK:
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
 	      "unexpected link in expression tree\n");
       return FALSE;
     case EX_OP:
+      if (cexpr->opval.op==ARRAYINIT) {
+	// this is a list of literals
+	return TRUE;
+      }
+      if (cexpr->opval.op=='=') {
+	return constExprTree(cexpr->right);
+      }
       if (cexpr->opval.op==CAST) {
 	// jwk: cast ignored, maybe we should throw a warning here
 	return constExprTree(cexpr->right);

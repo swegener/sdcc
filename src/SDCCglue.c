@@ -260,7 +260,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	  }
 	  codeOutFile = statsg->oFile;
 
-#if 1
+#if 0
 	  if (ival) {
 	    // set ival's lineno to where the symbol was defined
 	    lineno=ival->lineno=sym->lineDef;
@@ -271,9 +271,9 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 #else
 	  if (ival) {
 	    // set ival's lineno to where the symbol was defined
-	    lineno=ival->lineno=sym->lineDef;
+	    setAstLineno (ival, lineno=sym->lineDef);
 	    // check if this is a constant expression
-	    if (constExprTree(ival->right)) {
+	    if (constExprTree(ival)) {
 	      allocInfo = 0;
 	      eBBlockFromiCode (iCodeFromAst (ival));
 	      allocInfo = 1;
@@ -391,10 +391,10 @@ initPointer (initList * ilist)
 		   (&some_struct)->element */
 		if (IS_AST_OP (expr->left) &&
 		    expr->left->opval.op == PTR_OP &&
-		    IS_ADDRESS_OF_OP (expr->left->left))
-			return valForStructElem (expr->left->left->left,
-						 expr->left->right);
-
+		    IS_ADDRESS_OF_OP (expr->left->left)) {
+		  return valForStructElem (expr->left->left->left,
+					   expr->left->right);
+		}
 	}
 	/* case 3. (((char *) &a) +/- constant) */
 	if (IS_AST_OP (expr) &&

@@ -311,7 +311,7 @@ struct
 { W_POSSBUG, ERROR_LEVEL_WARNING,
    "possible code generation error at line %d,\n"
    " send source to sandeep.dutta@usa.net" },
-{ E_INCOMPAT_PTYPES, ERROR_LEVEL_WARNING,
+{ E_INCOMPAT_PTYPES, ERROR_LEVEL_ERROR,
    "pointer types incompatible " },
 { W_UNKNOWN_MODEL, ERROR_LEVEL_WARNING,
    "unknown memory model at %s : %d" },

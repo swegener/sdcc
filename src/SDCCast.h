@@ -198,6 +198,7 @@ ast *createFor (symbol *, symbol *, symbol *, symbol *, ast *, ast *, ast *, ast
 void eval2icode (ast *);
 value *constExprValue (ast *, int);
 bool constExprTree (ast *);
+int setAstLineno (ast *, int);
 symbol *funcOfType (char *, sym_link *, sym_link *, int, int);
 symbol * funcOfTypeVarg (char *, char * , int , char **);
 ast *initAggregates (symbol *, initList *, ast *);

@@ -994,7 +994,7 @@ emitStaticSeg (memmap * map, FILE * out)
 	    fprintf (out, " == .\n");
 
 	  /* if it has an initial value */
-	  if (sym->ival)
+	  if (!TARGET_IS_MCS51 && !TARGET_IS_DS390 && sym->ival)
 	    {
 	      fprintf (out, "%s:\n", sym->rname);
 	      noAlloc++;

@@ -1,6 +1,7 @@
 2003-04-30  Bernhard Held <bernhard@bernhardheld.de>
 
 	* support/regression/tests/float.c: workaround 33 bit hex constant
+	* support/regression/tests/simplefloat.c: fix division for host
 
 2003-04-29  Scott Dattalo  <scott@dattalo.com>
 

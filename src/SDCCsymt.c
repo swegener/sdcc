@@ -790,7 +790,7 @@ addSymChain (symbol * symHead)
 
   for (; sym != NULL; sym = sym->next)
     {
-
+      changePointer(sym);
       /* if already exists in the symbol table then check if
          the previous was an extern definition if yes then
          then check if the type match, if the types match then

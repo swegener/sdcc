@@ -111,6 +111,7 @@ ast;
 
 /* easy access macros   */
 #define  IS_AST_OP(x)			(x && x->type == EX_OP)
+#define IS_CALLOP(x)   (IS_AST_OP(x) && x->opval.op == CALL)
 #define IS_BITOR(x) (IS_AST_OP(x) && x->opval.op == '|')
 #define IS_BITAND(x) (IS_AST_OP(x) && x->opval.op == '&' && \
 		      x->left && x->right )

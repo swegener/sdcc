@@ -434,9 +434,10 @@ mergeSpec (sym_link * dest, sym_link * src)
   if (SPEC_NOUN (dest) != SPEC_NOUN (src) && !SPEC_NOUN (dest))
     SPEC_NOUN (dest) = SPEC_NOUN (src);
 
-  if (!SPEC_SCLS (dest))	/* if destination has no storage class */
+  /* if destination has no storage class */
+  if (!SPEC_SCLS (dest) || (SPEC_SCLS(dest) == S_CONSTANT && SPEC_SCLS (src)))
     SPEC_SCLS (dest) = SPEC_SCLS (src);
-
+  /* special case for const */
   /* copy all the specifications  */
   SPEC_LONG (dest) |= SPEC_LONG (src);
   SPEC_SHORT (dest) |= SPEC_SHORT (src);
@@ -1709,6 +1710,10 @@ isSymbolEqual (symbol * dest, symbol * src)
   return (!strcmp (dest->name, src->name));
 }
 
+void PT(sym_link *type)
+{
+	printTypeChain(type,0);
+}
 /*-----------------------------------------------------------------*/
 /* printTypeChain - prints the type chain in human readable form   */
 /*-----------------------------------------------------------------*/

@@ -1691,7 +1691,7 @@ reverseLoop (ast * loop, symbol * sym, ast * init, ast * end)
 void 
 pushTypeCastToLeaves (sym_link * type, ast * node, ast ** parentPtr)
 {
-  if (!node)
+  if (!node || IS_CALLOP(node))
     {
       /* WTF? We should never get here. */
       return;

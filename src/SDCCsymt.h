@@ -427,6 +427,7 @@ symbol;
 #define IS_ARITHMETIC(x) (IS_INTEGRAL(x) || IS_FLOAT(x))
 #define IS_AGGREGATE(x) (IS_ARRAY(x) || IS_STRUCT(x))
 #define IS_LITERAL(x)   (IS_SPEC(x)  && x->select.s.sclass == S_LITERAL)
+#define IS_CODE(x)      (IS_SPEC(x)  && SPEC_SCLS(x) == S_CODE)
 #define IS_REGPARM(x)   (IS_SPEC(x) && SPEC_REGPARM(x))
 
 /* forward declaration for the global vars */

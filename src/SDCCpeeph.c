@@ -1011,6 +1011,12 @@ peepHole (lineNode ** pls)
   lineNode *mtail = NULL;
   bool restart;
 
+#if !OPT_DISABLE_PIC
+  /* The PIC port uses a different peep hole optimizer based on "pCode" */
+  if (TARGET_IS_PIC)
+    return;
+#endif
+
   assert(labelHash == NULL);
 
   do

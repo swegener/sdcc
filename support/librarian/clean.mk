@@ -6,4 +6,3 @@ clean:
 	rm -f $(PRJDIR)/bin/sdcclib$(EXEEXT)
 
 distclean realclean: clean
-	rm -f config.* Makefile

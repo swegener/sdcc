@@ -67,10 +67,12 @@
 // family codes of devices
 #define DIR_FAMILY 0x01
 #define TEMP_FAMILY 0x10
+#define NVRAM64K_FAMILY 0x0c
 #define SWITCH_FAMILY 0x12
 #define COUNT_FAMILY 0x1D
 #define ATOD_FAMILY 0X20
 #define THERMO_FAM 0x21
+#define SBATTERY_FAM  0x26
 // this is weird, the DS2502 should be 0x09
 #define DS2502_FAMILY 0x89
 

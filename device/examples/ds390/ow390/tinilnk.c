@@ -1,3 +1,7 @@
+#define DEBUG_OW_COM 0
+#if DEBUG_OW_COM
+#include <stdio.h>
+#endif
 //---------------------------------------------------------------------------
 // Copyright (C) 2000 Dallas Semiconductor Corporation, All Rights Reserved.
 // 
@@ -146,16 +150,22 @@ int WriteCOM(int portnum, int outlen, uchar *outbuf)
 {
   int i;
 
-  //printf ("WriteCOM(%d, %d,...): ", portnum, outlen, outbuf);
+#if DEBUG_OW_COM
+  printf ("WriteCOM(%d, %d,...): ", portnum, outlen, outbuf);
+#endif
 
   // hush the compiler
   portnum;
 
   for (i=0; i<outlen; i++) {
-    //printf ("%02x ", outbuf[i]);
+#if DEBUG_OW_COM
+    printf ("%02x ", outbuf[i]);
+#endif
     Serial1PutChar(outbuf[i]);
   }
-  //printf ("\n");
+#if DEBUG_OW_COM
+  printf ("\n");
+#endif
   return TRUE;
 }  
 
@@ -175,16 +185,22 @@ int ReadCOM(int portnum, int inlen, uchar *inbuf)
 {  
   int i;
 
-  //printf ("ReadCOM(%d,%d,...): ", portnum, inlen);
+#if DEBUG_OW_COM
+  printf ("ReadCOM(%d,%d,...): ", portnum, inlen);
+#endif
 
   // hush the compiler
   portnum;
 
   for (i=0; i<inlen; i++) {
     inbuf[i]=Serial1GetChar();
-    //printf ("%02x ", inbuf[i]);
+#if DEBUG_OW_COM
+    printf ("%02x ", inbuf[i]&0xff);
+#endif
   }
-  //printf ("\n");
+#if DEBUG_OW_COM
+  printf ("\n");
+#endif
   
    // success, so return desired length
    return i;
@@ -242,7 +258,6 @@ void BreakCOM(int portnum)
 void SetBaudCOM(int portnum, int new_baud)
 {
   unsigned long baud;
-  //printf ("SetBaudCOM(%d,%d)\n", portnum, new_baud);
 
   portnum; // hush the compiler
 

@@ -1,3 +1,7 @@
+#define DEBUG_OW_LLU 0
+#if DEBUG_OW_LLU
+#include <stdio.h>
+#endif
 //---------------------------------------------------------------------------
 // Copyright (C) 2000 Dallas Semiconductor Corporation, All Rights Reserved.
 // 
@@ -61,6 +65,9 @@ int owTouchReset(int portnum)
    uchar readbuffer[10],sendpacket[10];
    int sendlen=0;
 
+#if DEBUG_OW_LLU
+   printf ("owTouchReset\n");
+#endif
    // make sure normal level
    owLevel(portnum,MODE_NORMAL);
 
@@ -261,6 +268,9 @@ int owSpeed(int portnum, int new_speed)
    short sendlen=0;
    int rt = FALSE;
    
+#if DEBUG_OW_LLU
+   printf ("starting owSpeed: %d\n", new_speed);
+#endif
    // check if change from current mode
    if (((new_speed == MODE_OVERDRIVE) &&
         (USpeed[portnum] != SPEEDSEL_OD)) ||
@@ -308,7 +318,9 @@ int owSpeed(int portnum, int new_speed)
          }
       }
    }
-
+#if DEBUG_OW_LLU
+   printf ("owSpeed: %d\n", rt);
+#endif
    // return the current speed
    return (USpeed[portnum] == SPEEDSEL_OD) ? MODE_OVERDRIVE : MODE_NORMAL;
 }
@@ -333,6 +345,9 @@ int owLevel(int portnum, int new_level)
    short sendlen=0;
    short rt=FALSE;
 
+#if DEBUG_OW_LLU
+   printf ("owLevel: %d\n", new_level);
+#endif
    // check if need to change level
    if (new_level != ULevel[portnum])
    {

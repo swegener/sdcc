@@ -1,3 +1,7 @@
+#define DEBUG_OW_TRNU 0
+#if DEBUG_OW_TRNU
+#include <stdio.h>
+#endif
 //---------------------------------------------------------------------------
 // Copyright (C) 2000 Dallas Semiconductor Corporation, All Rights Reserved.
 // 
@@ -107,8 +111,9 @@ int owBlock(int portnum, int do_reset, uchar *tran_buf, int tran_len)
    if (WriteCOM(portnum,sendlen,sendpacket)) 
    {
       // read back the response 
-      if (ReadCOM(portnum,tran_len,tran_buf) == tran_len)
-         return TRUE;
+     if (ReadCOM(portnum,tran_len,tran_buf) == tran_len) {
+       return TRUE;
+     }
    }
 
    // an error occured so re-sync with DS2480
@@ -155,6 +160,9 @@ int owReadPacketStd(int portnum, int do_access, int start_page, uchar *read_buf)
    uchar sendpacket[50];
    ushort lastcrc16;
 
+#if DEBUG_OW_TRNU
+   printf ("owReadPacketStd: %d %d\n", do_access, start_page);
+#endif
    // check if access header is done 
    // (only use if in sequention read with one access at begining)
    if (do_access)
@@ -205,9 +213,14 @@ int owReadPacketStd(int portnum, int do_access, int start_page, uchar *read_buf)
          // verify the CRC16 is correct           
          if (lastcrc16 == 0xB001) 
            return length;        // return number of byte in record
+#if DEBUG_OW_TRNU
+	 printf ("owReadPacketStd: crc error in page %d\n", start_page);
+#endif
       }  
    }
-
+#if DEBUG_OW_TRNU
+   printf ("owReadPacketStd: block>29 : %d\n", length);
+#endif
    // failed block or incorrect CRC
    return -1;
 }
@@ -254,9 +267,16 @@ int owWritePacketStd(int portnum, int start_page, uchar *write_buf,
    int i,buffer_cnt=0,start_address,do_access;
    ushort lastcrc16;
 
+#if DEBUG_OW_TRNU
+   printf ("owWritePacketStd: %d %d\n", start_page, write_len);
+#endif
    // check to see if data too long to fit on device
-   if (write_len > 29)
+   if (write_len > 29) {
+#if DEBUG_OW_TRNU
+     printf ("owWritePacketStd: too long\n");
+#endif
      return FALSE;
+   }
               
    // seed crc with page number           
    setcrc16(portnum,(ushort)start_page); 
@@ -280,12 +300,20 @@ int owWritePacketStd(int portnum, int start_page, uchar *write_buf,
    if (!is_eprom)
    {
       // write the page
-      if (!Write_Scratchpad(portnum,construct_buffer,start_page,buffer_cnt))
-         return FALSE;
+     if (!Write_Scratchpad(portnum,construct_buffer,start_page,buffer_cnt)) {
+#if DEBUG_OW_TRNU
+       printf ("owWritePacketStd: couldn't Write_Scratchpad\n");
+#endif
+       return FALSE;
+     }
    
       // copy the scratchpad            
-      if (!Copy_Scratchpad(portnum,start_page,buffer_cnt))
-         return FALSE;
+     if (!Copy_Scratchpad(portnum,start_page,buffer_cnt)) {
+#if DEBUG_OW_TRNU
+       printf ("owWritePacketStd: couldn't Copy_Scratchpad\n");
+#endif
+       return FALSE;
+     }
      
       // copy scratch pad was good then success
       return TRUE;
@@ -428,6 +456,9 @@ int Write_Scratchpad(int portnum, uchar *write_buf, int start_page, int write_le
    int i,sendlen=0;
    uchar sendpacket[50];
    
+#if DEBUG_OW_TRNU
+   printf ("Write_Scratchpad: %d %d\n", start_page, write_len);
+#endif
    // match command
    sendpacket[sendlen++] = 0x55;    
    for (i = 0; i < 8; i++)
@@ -436,6 +467,7 @@ int Write_Scratchpad(int portnum, uchar *write_buf, int start_page, int write_le
    sendpacket[sendlen++] = 0x0F;     
    // write the target address
    sendpacket[sendlen++] = ((start_page << 5) & 0xFF);    
+   _asm ;johan 1 _endasm;
    sendpacket[sendlen++] = (start_page >> 3);
 
    // write packet bytes 
@@ -461,20 +493,31 @@ int Write_Scratchpad(int portnum, uchar *write_buf, int start_page, int write_le
       if (owBlock(portnum,TRUE,sendpacket,sendlen))
       {
          // check address and offset of scratchpad read
-         if ((sendpacket[10] != (int)((start_page << 5) & 0xFF)) ||
-             (sendpacket[11] != (int)(start_page >> 3)) ||
-             (sendpacket[12] != (int)(write_len - 1)))
-            return FALSE;
+	if ((sendpacket[10] != (int)((start_page << 5) & 0xFF)) ||
+	    (sendpacket[11] != (int)(start_page >> 3)) ||
+	    (sendpacket[12] != (int)(write_len - 1))) {
+#if DEBUG_OW_TRNU
+	   printf ("\nWrite_Scratchpad: check failed\n");
+#endif
+	   //return FALSE;
+	 }
 
          // verify each data byte
          for (i = 0; i < write_len; i++)
-            if (sendpacket[i+13] != write_buf[i])
-               return FALSE;
+	   if (sendpacket[i+13] != write_buf[i]) {
+#if DEBUG_OW_TRNU
+	     printf ("\nWrite_Scratchpad: data check failed\n");
+#endif
+	     return FALSE;
+	   }
 
          // must have verified
          return TRUE;
       }
-   }
+   } 
+#if DEBUG_OW_TRNU
+   printf ("\nWrite_Scratchpad: owBlock failed\n");
+#endif
    
    // failed a block tranfer
    return FALSE;
@@ -497,6 +540,10 @@ int Copy_Scratchpad(int portnum, int start_page, int write_len)
 {
    int i,sendlen=0;
    uchar sendpacket[50];
+
+#if DEBUG_OW_TRNU
+   printf ("Copy_Scratchpad: %d %d\n", start_page, write_len);
+#endif
    
    // match command
    sendpacket[sendlen++] = 0x55;    
@@ -506,11 +553,16 @@ int Copy_Scratchpad(int portnum, int start_page, int write_len)
    sendpacket[sendlen++] = 0x55;     
    // write the target address
    sendpacket[sendlen++] = ((start_page << 5) & 0xFF);    
+   _asm ;johan 2 _endasm;
    sendpacket[sendlen++] = (start_page >> 3);
    sendpacket[sendlen++] = write_len - 1;
    // read copy result
    sendpacket[sendlen++] = 0xFF;
-
+   
+#if DEBUG_OW_TRNU
+   printf ("Copy_Scratchpad: %d, %02x %02x %02x %02x\n", sendlen,
+	   sendpacket[10],sendpacket[11],sendpacket[12],sendpacket[13]);
+#endif
    // send/recieve the transfer buffer   
    if (owBlock(portnum,TRUE,sendpacket,sendlen))
    {
@@ -518,12 +570,25 @@ int Copy_Scratchpad(int portnum, int start_page, int write_len)
       if ((sendpacket[10] != (int)((start_page << 5) & 0xFF)) ||
           (sendpacket[11] != (int)(start_page >> 3)) ||
           (sendpacket[12] != (int)(write_len - 1)) ||
-          (sendpacket[13] & 0xF0))
-         return FALSE;
-      else
+          (sendpacket[13] & 0xF0)) {
+#if DEBUG_OW_TRNU
+	printf ("Copy_Scratchpad: %d, check failed: %02x %02x %02x %02x\n",
+		sendlen,
+		sendpacket[10],sendpacket[11],sendpacket[12],sendpacket[13]);
+#endif
+	return FALSE;
+      }
+      else {
+#if DEBUG_OW_TRNU
+	printf ("Copy_Scratchpad: %02x %02x %02x %02x\n",
+		sendpacket[10],sendpacket[11],sendpacket[12],sendpacket[13]);
+#endif
          return TRUE;   
+      }
    }
-      
+#if DEBUG_OW_TRNU
+   printf ("Copy_Scratchpad: owBlock failed\n");
+#endif
    // failed a block tranfer
    return FALSE;
 }

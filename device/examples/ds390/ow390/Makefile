@@ -1,18 +1,18 @@
 #CC = sdcc
 CC = /home/johan/sdcc/bin/sdcc
 
-MFLAGS = -mds390 --model-flat24 --stack-10bit
+MFLAGS = -mds390
 LFLAGS = --xram-loc 0x180080 --code-loc 0x10000 -Wl-r
 
 TARGETS = tstfind.hex temp.hex swtloop.hex swtoper.hex counter.hex \
-	tstow.hex thermodl.hex
+	tstow.hex thermodl.hex gethumd.hex
 
 OW_OBJECTS = ownetu.rel owsesu.rel owllu.rel owlli.rel owtrnu.rel \
 	crcutil.rel tinilnk.rel findtype.rel ds2480ut.rel owfile.rel
 
-SENSOR_OBJECTS = temp10.rel  swt12.rel cnt1d.rel thermo21.rel
+SENSOR_OBJECTS = temp10.rel  swt12.rel cnt1d.rel thermo21.rel ad26.rel
 
-TINI_TEST_OBJECTS = time.rel
+TINI_TEST_OBJECTS =
 
 all: ow.lib sensors.lib $(TINI_TEST_OBJECTS) $(TARGETS)
 

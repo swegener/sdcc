@@ -121,7 +121,7 @@ int main() //short argc, char **argv)
             if (ReadTemperature(portnum, FamilySN[i],&current_temp))
             {  
                PrintSerialNum(FamilySN[i]);
-               printf("     %5.1f \n", current_temp); 
+               printf("     %5.2f \n", current_temp); 
             }
             else
                printf("     Error reading temperature, verify device present:%d\n",

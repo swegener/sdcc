@@ -1,3 +1,7 @@
+#define DEBUG_OW_NETU 0
+#if DEBUG_OW_NETU
+#include <stdio.h>
+#endif
 //---------------------------------------------------------------------------
 // Copyright (C) 2000 Dallas Semiconductor Corporation, All Rights Reserved.
 // 
@@ -111,7 +115,10 @@ int owNext(int portnum, int do_reset, int alarm_only)
       // reset the search
       LastDiscrepancy[portnum] = 0;
       LastDevice[portnum] = FALSE;
-      LastFamilyDiscrepancy[portnum] = 0;          
+      LastFamilyDiscrepancy[portnum] = 0;  
+#if DEBUG_OW_NETU
+      printf ("owNext: no (more) devices\n");
+#endif
       return FALSE;
    }
 
@@ -231,7 +238,10 @@ int owNext(int portnum, int do_reset, int alarm_only)
             // reset the search
             LastDiscrepancy[portnum] = 0;
             LastDevice[portnum] = FALSE;
-            LastFamilyDiscrepancy[portnum] = 0;          
+            LastFamilyDiscrepancy[portnum] = 0;        
+#if DEBUG_OW_NETU
+	    printf ("owNext: check results failed\n");
+#endif
             return FALSE;
          }
          // successful search
@@ -249,7 +259,15 @@ int owNext(int portnum, int do_reset, int alarm_only)
             LastDiscrepancy[portnum] = tmp_last_desc;
             return TRUE;
          }
+      } else {
+#if DEBUG_OW_NETU
+	printf ("owNext: ReadCOM failed\n");
+#endif
       }
+   } else {
+#if DEBUG_OW_NETU
+     printf ("owNext: WriteCOM failed\n");
+#endif
    }
 
    // an error occured so re-sync with DS2480
@@ -473,6 +491,9 @@ int owOverdriveAccess(int portnum)
    uchar sendpacket[8];
    int i, bad_echo = FALSE;
 
+#if DEBUG_OW_NETU
+   printf ("owOverdriveAccess\n");
+#endif
    // make sure normal level
    owLevel(portnum,MODE_NORMAL);
 
@@ -501,8 +522,12 @@ int owOverdriveAccess(int portnum)
                if (sendpacket[i] != SerialNum[portnum][i])
                   bad_echo = TRUE;
             // if echo ok then success
-            if (!bad_echo)
+            if (!bad_echo) {
+#if DEBUG_OW_NETU
+	      printf ("owOverdriveAccess success\n");
+#endif
                return TRUE;               
+	    }
          }
       }
    }

@@ -1,3 +1,7 @@
+#define DEBUG_OW_FILE 0
+#if DEBUG_OW_FILE
+#include <stdio.h>
+#endif
 //---------------------------------------------------------------------------
 // Copyright (C) 2000 Dallas Semiconductor Corporation, All Rights Reserved.
 // 
@@ -55,9 +59,13 @@
 //
 int owReadFile(int portnum, uchar *filename, uchar *buf)
 {  
-   uchar dirpg=0,pgbuf[32],filepg=0,pglen;
-   short bufcnt=0,i;
+  uchar dirpg=0,pgbuf[32],filepg=0;
+  char pglen;
+  ushort bufcnt=0,i;
                
+#if DEBUG_OW_FILE
+   printf ("owReadFile: %s\n", filename);
+#endif
    // loop read directory pages until the file entry is found
    do
    {
@@ -88,6 +96,9 @@ int owReadFile(int portnum, uchar *filename, uchar *buf)
          {
             // get the file starting page number
             filepg = pgbuf[i+5];
+#if DEBUG_OW_FILE
+	    printf ("owReadFile: file %s starts at %d\n", filename, filepg);
+#endif
             break;
          }
       }
@@ -108,14 +119,16 @@ int owReadFile(int portnum, uchar *filename, uchar *buf)
       pglen = owReadPacketStd(portnum,TRUE,filepg,pgbuf);  
       
       // check result of read
-      if (pglen <= 0)
-         return READ_ERROR;
+      if (pglen <= 0) {
+	return READ_ERROR;
+      }
    
       // append the page data to the buffer
       for (i = 0; i < (pglen - 1); i++)
          buf[bufcnt++] = pgbuf[i];
 
       // get the next file page (from page pointer) 
+      _asm ;johan _endasm;
       filepg = pgbuf[pglen-1];
    }
    while (filepg);
@@ -154,6 +167,9 @@ int owFormatWriteFile(int portnum, uchar *filename, int fllen, uchar *buf)
       bmpg2[] = { 0,0,0,0,0 }, pgbuf[32];   
    int i,numdirpgs,flpg,bmpg1len,bmpg2len,cntleft,pos,numpgs;
 
+#if DEBUG_OW_FILE
+   printf ("owFormatWriteFile: %s %d\n", filename, fllen);
+#endif
    // calculate the number of pages needed to write the file
    numpgs = (fllen / 28) + ((fllen % 28) ? 1 : 0);
    

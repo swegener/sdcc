@@ -64,7 +64,7 @@ int owAcquire(int portnum, char *port_zstr, char *return_msg)
               " aborting.\nClosing port %s.\n",port_zstr,port_zstr);
       return FALSE;
    }
-   //printf (return_msg); // TODO: tini bug
+   printf (return_msg); // TODO: tini bug
 
    // detect DS2480
    if (DS2480Detect(portnum))

@@ -1,3 +1,8 @@
+2003-02-18  Frieder Ferlemann <Frieder.Ferlemann@web.de>
+
+        * src/SDCCpeeph.c: added peephole conditions testing for same arguments
+        * src/mcs51/peeph.def: added rules 238a-d which remove redundant moves
+
 2003-02-18    <johan@balder>
 
 	* as/mcs51/asmain.c (asmbl): module can start with a digit

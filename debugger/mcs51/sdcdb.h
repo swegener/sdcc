@@ -48,20 +48,23 @@ typedef short bool;
 #define min(a,b) (a < b ? a : b)
 #endif
 
-//#ifndef ALLOC
-//#define  ALLOC(x,sz) if (!(x = calloc(1, sz)))                          \
-//         {                                                           \
-//            fprintf(stderr,"sdcdb: out of memory\n"); \
-//            exit (1);                                                \
-//         }
-//#endif
-//#ifndef ALLOC_ATOMIC
-//#define ALLOC_ATOMIC(x,sz)   if (!(x = calloc(1, sz)))   \
-//         {                                               \
-//            fprintf(stderr,"sdcdb: out of memory\n"); \
-//            exit (1);                                    \
-//         }
-//#endif
+/* 
+ * #ifndef ALLOC
+ * #define  ALLOC(x,sz) if (!(x = calloc(1, sz)))                          \
+ *          {                                                           \
+ *             fprintf(stderr,"sdcdb: out of memory\n"); \
+ *             exit (1);                                                \
+ *          }
+ * #endif
+ * #ifndef ALLOC_ATOMIC
+ * #define ALLOC_ATOMIC(x,sz)   if (!(x = calloc(1, sz)))   \
+ *          {                                               \
+ *             fprintf(stderr,"sdcdb: out of memory\n"); \
+ *             exit (1);                                    \
+ *          }
+ * #endif
+ */
+
 /* generalpurpose stack related macros */
 #define  STACK_DCL(stack,type,size)                   \
          typedef  type  t_##stack   ;                 \

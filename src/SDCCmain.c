@@ -502,7 +502,7 @@ processFile (char *s)
 	{
 	  werror (E_FILE_OPEN_ERR, s);
 	  exit (1);
-	}
+ 	}
 
       /* copy the file name into the buffer */
       strcpy (buffer, s);
@@ -1266,10 +1266,14 @@ preProcess (char **envp)
       setMainValue ("cppextraopts", join(preArgv));
       
       if (!preProcOnly)
-	preOutName = strdup (tmpnam (NULL));
+      {
+        preOutName = strdup (tmpnam (NULL));
 
-      setMainValue ("cppoutfilename", preOutName);
-
+        setMainValue ("cppoutfilename", preOutName);
+      }
+      else
+        setMainValue ("cppoutfilename", "notexistent_fixme");	// Fix me!
+	
       if (options.verbose)
 	printf ("sdcc: Calling preprocessor...\n");
 

@@ -341,6 +341,7 @@ void Serial1Init (unsigned long baud, unsigned char buffered) {
   if (baud==0) {
     ES1=0; // disable interrupt
     SCON1 &= 0xef; // disable receiver
+    return; // and don't touch it
   }
 
   ES1 = 0; // disable channel 1 interrupt

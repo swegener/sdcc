@@ -2007,7 +2007,7 @@ reassignAliasedSym (eBBlock *ebp, iCode *assignment, iCode *use, operand *op)
 
   /* update the sym's liverange */
   if ( OP_LIVETO(op) < ic->seq )
-    setToRange(op, ic->seq, FALSE);
+    setToRange(op, ic->seq, FALSE, OP_SYMBOL(op)->level);
 
   /* remove the assignment iCode now that its result is unused */
   remiCodeFromeBBlock (ebp, assignment);

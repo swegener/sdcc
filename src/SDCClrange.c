@@ -175,11 +175,16 @@ setFromRange (operand * op, int from)
 /* setToRange - set the range to for an operand                    */
 /*-----------------------------------------------------------------*/
 void 
-setToRange (operand * op, int to, bool check)
+setToRange (operand * op, int to, bool check, int fromLevel)
 {
   /* only for compiler defined temps */
   if (!IS_ITEMP (op))
     return;
+
+  if (fromLevel > OP_SYMBOL(op)->level) {
+    // this is from an inner block and thus has no authority
+    return;
+  }
 
   OP_SYMBOL (op)->key = op->key;
   hTabAddItemIfNotP (&liveRanges, op->key, OP_SYMBOL (op));
@@ -315,17 +320,9 @@ operandLUse (operand * op, eBBlock ** ebbs,
 	  /* found it : mark */
 	  if (lic) torange = lic->prev->seq;
       }
-      /* if this is the last use then if this block belongs 
-         to a  loop &  some definition  comes into the loop 
-         then extend the live range to  the end of the loop */
-      if (ebp->partOfLoop 
-	  && hasIncomingDefs (ebp->partOfLoop, op))
-	{
-	  torange = findLoopEndSeq (ebp->partOfLoop);
-	}
-      
+
       op = operandFromOperand (op);
-      setToRange (op, torange, FALSE);
+      setToRange (op, torange, FALSE, ebp->entryLabel->level);
     }
   ic->uses = bitVectSetBit (ic->uses, op->key);
 
@@ -427,10 +424,10 @@ markLiveRanges (eBBlock * ebp, eBBlock ** ebbs, int count)
   bitVect *defsUsed = NULL;
   bitVect *defsNotUsed = NULL;
   int i;
+
   /* for all the instructions */
   for (ic = ebp->sch; ic; ic = ic->next)
     {
-
       if (ic->op == CALL || ic->op == PCALL)
 	{
 	  setFromRange (IC_RESULT (ic), ic->seq);
@@ -439,7 +436,8 @@ markLiveRanges (eBBlock * ebp, eBBlock ** ebbs, int count)
 	     and take it away from the defs for the block */
 	  if (bitVectIsZero (OP_SYMBOL (IC_RESULT (ic))->uses))
 	    {
-	      setToRange (IC_RESULT (ic), ic->seq, FALSE);
+	      setToRange (IC_RESULT (ic), ic->seq, FALSE, 
+			  ebp->entryLabel->level);
 	      bitVectUnSetBit (ebp->defSet, ic->key);
 	    }
 	}
@@ -511,7 +509,8 @@ markLiveRanges (eBBlock * ebp, eBBlock ** ebbs, int count)
 		  defUsedAfterLoop (IC_RESULT (dic), ebp->lSeq))
 		continue;
 
-	      setToRange (IC_RESULT (dic), (ebp->lSeq), FALSE);
+	      setToRange (IC_RESULT (dic), (ebp->lSeq), FALSE, 
+			  ebp->entryLabel->level);
 	    }
 	}
     }
@@ -541,8 +540,8 @@ markLiveRanges (eBBlock * ebp, eBBlock ** ebbs, int count)
 	  if (bitVectBitValue (defsNotUsed, i) &&
 	      (dic = hTabItemWithKey (iCodehTab, i)))
 	    {
-
-	      setToRange (IC_RESULT (dic), (ebp->fSeq - 1), TRUE);
+	      setToRange (IC_RESULT (dic), (ebp->fSeq - 1), TRUE,
+			  ebp->entryLabel->level);
 	    }
 	}
     }

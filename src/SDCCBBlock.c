@@ -188,9 +188,9 @@ dumpEbbsToFileExt (int id, eBBlock ** ebbs, int count)
   for (i = 0; i < count; i++)
     {
       fprintf (of, "\n----------------------------------------------------------------\n");
-      fprintf (of, "Basic Block %s (df:%d bb:%d): loop Depth = %d noPath = %d lastinLoop = %d\n",
+      fprintf (of, "Basic Block %s (df:%d bb:%d lvl:%d): loop Depth = %d noPath = %d lastinLoop = %d\n",
 	       ebbs[i]->entryLabel->name,
-	       ebbs[i]->dfnum, ebbs[i]->bbnum,
+	       ebbs[i]->dfnum, ebbs[i]->bbnum, ebbs[i]->entryLabel->level,
 	       ebbs[i]->depth,
 	       ebbs[i]->noPath,
 	       ebbs[i]->isLastInLoop);

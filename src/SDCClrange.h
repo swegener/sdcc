@@ -35,6 +35,6 @@ bool allDefsOutOfRange (bitVect *, int, int);
 void computeLiveRanges (eBBlock **, int);
 
 void setFromRange (operand *, int);
-void setToRange (operand *, int, bool);
+void setToRange (operand *, int, bool, int);
 
 #endif

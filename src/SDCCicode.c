@@ -1861,7 +1861,7 @@ geniCodeSubtract (operand * left, operand * right)
     {
       isarray = left->isaddr;
       right = geniCodeMultiply (right,
-				operandFromLit (getSize (ltype->next)), (getArraySizePtr(left) == INTSIZE));
+				operandFromLit (getSize (ltype->next)), (getArraySizePtr(left) >= INTSIZE));
       resType = copyLinkChain (IS_ARRAY (ltype) ? ltype->next : ltype);
     }
   else
@@ -1912,7 +1912,7 @@ geniCodeAdd (operand * left, operand * right)
     {
       isarray = left->isaddr;
       size  =	operandFromLit (getSize (ltype->next));
-      right = geniCodeMultiply (right, size, (getArraySizePtr(left) == INTSIZE));
+      right = geniCodeMultiply (right, size, (getArraySizePtr(left) >= INTSIZE));
       resType = copyLinkChain (ltype);
     }
   else
@@ -2020,7 +2020,7 @@ geniCodeArray (operand * left, operand * right)
     }
 
   right = geniCodeMultiply (right,
-			    operandFromLit (getSize (ltype->next)), (getArraySizePtr(left) == INTSIZE));
+			    operandFromLit (getSize (ltype->next)), (getArraySizePtr(left) >= INTSIZE));
 
   /* we can check for limits here */
   if (isOperandLiteral (right) &&

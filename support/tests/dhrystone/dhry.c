@@ -53,6 +53,7 @@
 #define clock() ClockTicks()
 #define CLOCKS_PER_SEC 1000
 #undef PRINT_T_STATES
+#define memcpy(d,s,l) memcpyx(d,s,l)
 #else
 /** For clock() */
 #include <time.h>

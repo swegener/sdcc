@@ -203,26 +203,24 @@ deleteSetItem (set ** list, void *item)
     return;
 
   /* if this item is at the head of the list */
-  if ((*list)->item == item)
-    {
-      lp = *list;
-      *list = (*list)->next;
-      return;
-    }
+  if ((*list)->item == item) {
+    lp = *list;
+    *list = (*list)->next;
+    Safe_free (lp);
+    return;
+  }
 
   /* find the item in the list */
-  for (lp = *list; lp->next; lp = lp->next)
-    {
-      if (lp->next->item == item)	/* the next one is it */
-	{
-	  lp1 = lp->next;	/* this one will need to be freed */
-	  lp->next = lp->next->next;	/* take out of list */
-	  return;
-	}
+  for (lp = *list; lp->next; lp = lp->next) {
+    if (lp->next->item == item) { /* the next one is it */
+      lp1 = lp->next;             /* this one will need to be freed */
+      lp->next = lp->next->next;  /* take out of list */
+      Safe_free (lp1);
+      return;
     }
+  }
 
   /* could not find it */
-  return;
 }
 
 /*-----------------------------------------------------------------*/

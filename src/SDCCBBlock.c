@@ -419,6 +419,7 @@ addiCodeToeBBlock (eBBlock * ebp, iCode * ic, iCode * ip)
 void 
 remiCodeFromeBBlock (eBBlock * ebb, iCode * ic)
 {
+  wassert (ic->seq>=ebb->fSeq && ic->seq<=ebb->lSeq);
   if (ic->prev)
     ic->prev->next = ic->next;
   else

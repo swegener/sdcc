@@ -117,20 +117,20 @@ iCodeTable codeTable[] =
 
 // this makes it more easy to catch bugs
 struct bitVect *OP_DEFS(struct operand *op) {
-  assert (IS_SYMOP(op));
+  wassert (IS_SYMOP(op));
   return OP_SYMBOL(op)->defs;
 }
 struct bitVect *OP_DEFS_SET(struct operand *op, struct bitVect *bv) {
-  assert (IS_SYMOP(op));
+  wassert (IS_SYMOP(op));
   OP_SYMBOL(op)->defs=bv;
   return bv;
 }
 struct bitVect *OP_USES(struct operand *op) {
-  assert (IS_SYMOP(op));
+  wassert (IS_SYMOP(op));
   return OP_SYMBOL(op)->uses;
 }
 struct bitVect *OP_USES_SET(struct operand *op, struct bitVect *bv) {
-  assert (IS_SYMOP(op));
+  wassert (IS_SYMOP(op));
   OP_SYMBOL(op)->uses=bv;
   return bv;
 }

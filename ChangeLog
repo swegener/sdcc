@@ -1,3 +1,8 @@
+2003-01-30    <johan@balder>
+
+	* src/SDCCBBlock.c: automatic bug detection
+	* src/SDCCicode.c: automatic bug detection
+
 2003-01-29  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	* src/SDCCglobl.h:   now --xram-size 0 works

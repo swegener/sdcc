@@ -21,7 +21,7 @@
 #ifndef SDK_VERSION_STRING
 #define SDK_VERSION_STRING 	"3.0.0"
 #endif
-#ifdef TARGET_STRING
+#ifndef TARGET_STRING
 #define TARGET_STRING		"gbz80"
 #endif
 

@@ -23,12 +23,12 @@
 -------------------------------------------------------------------------*/
 
 #include <tinibios.h>
-
 #include <stdio.h>
+#include <time.h>
 #include <ctype.h>
 
 /* this is the address of the ds1315 phantom time chip, although
-   it doesn't really matter as long as it's in the 300000-3ffff
+   it doesn't really matter as long as it's in the 300000-3fffff
    range since the chip only uses CE3*
 */
 
@@ -36,11 +36,6 @@ xdata at 0x310000 static volatile unsigned char rtc;
 
 // this is the 64bit pattern that has to be recognized by the ds1315
 code unsigned char rtcMagic[8]={0xc5,0x3a,0xa3,0x5c,0xc5,0x3a,0xa3,0x5c};
-
-static struct RTCDate{
-  int year;
-  unsigned char month, day, weekDay, hour, minute, second, hundredth;
-};
 
 #define BCDtoINT(x) (((x)&0x0f)+((x)>>4)*10)
 #define INTtoBCD(x) (((x)%10)+(((x)/10)<<4))
@@ -59,7 +54,7 @@ static void RtcSync(void) {
   }
 }
 
-unsigned char RtcRead(struct RTCDate *rtcDate) {
+unsigned char RtcRead(struct tm *rtcDate) {
   unsigned char rtcBytes[8];
   unsigned char byte,bitMask;
 
@@ -73,14 +68,14 @@ unsigned char RtcRead(struct RTCDate *rtcDate) {
       }
     }
   }
-  rtcDate->year=2000 + BCDtoINT(rtcBytes[7]);
-  rtcDate->month=BCDtoINT(rtcBytes[6]);
-  rtcDate->day=BCDtoINT(rtcBytes[5]);
-  rtcDate->weekDay=rtcBytes[4]&0x07;
-  rtcDate->hour=BCDtoINT(rtcBytes[3]);
-  rtcDate->minute=BCDtoINT(rtcBytes[2]);
-  rtcDate->second=BCDtoINT(rtcBytes[1]);
-  rtcDate->hundredth=BCDtoINT(rtcBytes[0]);
+  rtcDate->tm_year=BCDtoINT(rtcBytes[7]+100); // year since 1900
+  rtcDate->tm_mon=BCDtoINT(rtcBytes[6])-1; // jan=0
+  rtcDate->tm_mday=BCDtoINT(rtcBytes[5]);
+  rtcDate->tm_wday=(rtcBytes[4]&0x07)-1; // monday=0?
+  rtcDate->tm_hour=BCDtoINT(rtcBytes[3]);
+  rtcDate->tm_min=BCDtoINT(rtcBytes[2]);
+  rtcDate->tm_sec=BCDtoINT(rtcBytes[1]);
+  rtcDate->tm_hundredth=BCDtoINT(rtcBytes[0]);
   if ((rtcBytes[4]&0x30) || (rtcBytes[3]&0x80)) {
     //oscillator not running, reset not active or in 12h mode
     return 0;
@@ -88,18 +83,19 @@ unsigned char RtcRead(struct RTCDate *rtcDate) {
   return 1;
 }
 
-void RtcWrite(struct RTCDate *rtcDate) {
+void RtcWrite(struct tm *rtcDate) {
   unsigned char rtcBytes[8];
   unsigned char byte,bitMask;
 
-  rtcBytes[7]=INTtoBCD(rtcDate->year-2000);
-  rtcBytes[6]=INTtoBCD(rtcDate->month);
-  rtcBytes[5]=INTtoBCD(rtcDate->day);
-  rtcBytes[4]=INTtoBCD(rtcDate->weekDay)&0x07; //set 24h  mode
-  rtcBytes[3]=INTtoBCD(rtcDate->hour)&0x3f; // oscilator on, reset on
-  rtcBytes[2]=INTtoBCD(rtcDate->minute);
-  rtcBytes[1]=INTtoBCD(rtcDate->second);
-  rtcBytes[0]=INTtoBCD(rtcDate->hundredth);
+  rtcBytes[7]=INTtoBCD(rtcDate->tm_year-100);
+  rtcBytes[6]=INTtoBCD(rtcDate->tm_mon)+1;
+  rtcBytes[5]=INTtoBCD(rtcDate->tm_mday);
+  rtcBytes[4]=(INTtoBCD(rtcDate->tm_wday)+1)&0x07; //set 24h  mode
+  rtcBytes[3]=INTtoBCD(rtcDate->tm_hour)&0x3f; // oscilator on, reset on
+  rtcBytes[2]=INTtoBCD(rtcDate->tm_min);
+  rtcBytes[1]=INTtoBCD(rtcDate->tm_sec);
+  //rtcBytes[0]=INTtoBCD(rtcDate->hundredth);
+  rtcBytes[0]=0;
 
   RtcSync();
 

@@ -110,6 +110,7 @@ struct options  save_options  ;
 "far"          { count(); TKEYWORD(XDATA);  }
 "eeprom"       { count(); TKEYWORD(EEPROM);  }
 "float"        { count(); return(FLOAT); }
+"flash"        { count(); TKEYWORD(CODE);}
 "for"          { count(); return(FOR); }
 "goto"	       { count(); return(GOTO); }
 "idata"        { count(); TKEYWORD(IDATA);}
@@ -127,6 +128,7 @@ struct options  save_options  ;
 "short"        { count(); return(SHORT); }
 "signed"       { count(); return(SIGNED); }
 "sizeof"       { count(); return(SIZEOF); }
+"sram"         { count(); TKEYWORD(XDATA);}
 "static"       { count(); return(STATIC); }
 "struct"       { count(); return(STRUCT); }
 "switch"       { count(); return(SWITCH); }
@@ -141,8 +143,10 @@ struct options  save_options  ;
 "_data"	       { count(); TKEYWORD(_NEAR); }
 "_code"	       { count(); TKEYWORD(_CODE); }
 "_eeprom"      { count(); TKEYWORD(_EEPROM); }
+"_flash"       { count(); TKEYWORD(_CODE); }
 "_generic"     { count(); TKEYWORD(_GENERIC); }
 "_near"	       { count(); TKEYWORD(_NEAR); }
+"_sram"        { count(); TKEYWORD(_XDATA);}
 "_xdata"       { count(); TKEYWORD(_XDATA);}
 "_pdata"       { count(); TKEYWORD(_PDATA); }
 "_idata"       { count(); TKEYWORD(_IDATA); }

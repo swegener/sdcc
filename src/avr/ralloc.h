@@ -51,7 +51,8 @@ typedef struct regs
     char *dname;         /* name when direct access needed */
     char *base ;         /* base address */
     short offset;        /* offset from the base */
-    unsigned isFree :1;  /* is currently unassigned  */    
+    unsigned isFree :1;  /* is currently unassigned  */
+    unsigned saveReq:1;  /* save required @ function entry ? */
 } regs;
 extern regs regsAVR[];
 

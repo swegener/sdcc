@@ -1060,7 +1060,7 @@ operand *operandFromSymbol (symbol *sym)
 {
     operand *op ;
     iCode *ic ;
-    
+    int ok =1 ;
     /* if the symbol's type is a literal */
     /* then it is an enumerator type     */
     if (IS_LITERAL(sym->etype) && SPEC_ENUM(sym->etype)) 
@@ -1084,6 +1084,11 @@ operand *operandFromSymbol (symbol *sym)
     
     /* under the following conditions create a
        register equivalent for a local symbol */
+    if (sym->level && sym->etype && SPEC_OCLS(sym->etype) &&
+	IN_FARSPACE(SPEC_OCLS(sym->etype))  &&
+	options.stackAuto == 0)
+	ok =0;
+
     if (!IS_AGGREGATE(sym->type) &&     /* not an aggregate */
 	!IS_FUNC(sym->type)      &&     /* not a function   */
 	!sym->_isparm            &&     /* not a parameter  */
@@ -1093,7 +1098,7 @@ operand *operandFromSymbol (symbol *sym)
 	!IS_VOLATILE(sym->etype) &&     /* not declared as volatile */
 	!IS_STATIC(sym->etype)   &&     /* and not declared static  */
 	!sym->islbl              &&     /* not a label */
-	!IN_FARSPACE(SPEC_OCLS(sym->etype)) && /* not in far space */
+	ok                       &&     /* farspace check */
 	!IS_BITVAR(sym->etype)          /* not a bit variable */
 	) {
 	
@@ -1106,7 +1111,7 @@ operand *operandFromSymbol (symbol *sym)
 	OP_SYMBOL(sym->reqv)->islocal = 1;
 	SPIL_LOC(sym->reqv) = sym;
     }
-
+   
     if (!IS_AGGREGATE(sym->type)) {
 	op = newOperand();
 	op->type = SYMBOL;
@@ -2411,16 +2416,19 @@ static void geniCodeReceive (value *args)
 
 	    /* we will use it after all optimizations
 	       and before liveRange calculation */	    
-	    if (!sym->addrtaken && 
-		!IS_VOLATILE(sym->etype) &&
-		!IN_FARSPACE(SPEC_OCLS(sym->etype))) {
-		opl = newiTempOperand(args->type,0);
-		sym->reqv = opl ;	    
-		sym->reqv->key = sym->key ;
-		OP_SYMBOL(sym->reqv)->key = sym->key;
-		OP_SYMBOL(sym->reqv)->isreqv = 1;
-		OP_SYMBOL(sym->reqv)->islocal= 0;
-		SPIL_LOC(sym->reqv) =  sym;
+	    if (!sym->addrtaken && !IS_VOLATILE(sym->etype)) {
+
+		if(IN_FARSPACE(SPEC_OCLS(sym->etype)) &&
+		   options.stackAuto == 0) {
+		} else {
+		    opl = newiTempOperand(args->type,0);
+		    sym->reqv = opl ;	    
+		    sym->reqv->key = sym->key ;
+		    OP_SYMBOL(sym->reqv)->key = sym->key;
+		    OP_SYMBOL(sym->reqv)->isreqv = 1;
+		    OP_SYMBOL(sym->reqv)->islocal= 0;
+		    SPIL_LOC(sym->reqv) =  sym;
+		}
 	    }
 
 	    ic = newiCode(RECEIVE,NULL,NULL);

@@ -19,15 +19,19 @@ static char *_avr_keywords[] =     {
     "at",
     "code",
     "critical",
-    "eeprom"
+    "eeprom",
     "interrupt",
     "sfr",
     "sbit",
     "xdata",
     "_code",
-    "_eeprom"
+    "_eeprom",
     "_generic",
     "_xdata",
+    "sram" ,
+    "_sram",
+    "flash",
+    "_flash",
     NULL
 };
 
@@ -41,7 +45,7 @@ static void _avr_reset_regparm()
 static int _avr_regparm( link *l)
 {
     /* the first eight bytes will be passed in
-       registers r0-r7. but we won't split variables
+       registers r16-r23. but we won't split variables
        i.e. if not enough registers left to hold
        the parameter then the whole parameter along
        with rest of the parameters go onto the stack */
@@ -163,7 +167,7 @@ PORT avr_port = {
 	NULL,
     },
     { 
-	+1, 1, 4, 1, 1
+	-1, 1, 4, 1, 1
     },
     /* avr has an 8 bit mul */
     {

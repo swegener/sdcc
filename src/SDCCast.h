@@ -49,6 +49,7 @@ typedef struct ast
     unsigned rvalue:1;
     unsigned lvalue:1;
     unsigned initMode:1;
+    unsigned reversed:1;
     int level;			/* level for expr */
     int block;			/* block number   */
     int seqPoint;		/* sequence point */

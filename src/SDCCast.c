@@ -218,6 +218,7 @@ copyAst (ast * src)
   dest->lineno = src->lineno;
   dest->level = src->level;
   dest->funcName = src->funcName;
+  dest->reversed = src->reversed;
 
   if (src->ftype)
     dest->etype = getSpec (dest->ftype = copyLinkChain (src->ftype));
@@ -630,11 +631,12 @@ reverseParms (ast * ptree)
     return;
 
   /* top down if we find a nonParm tree then quit */
-  if (ptree->type == EX_OP && ptree->opval.op == PARAM)
+  if (ptree->type == EX_OP && ptree->opval.op == PARAM && !ptree->reversed)
     {
       ttree = ptree->left;
       ptree->left = ptree->right;
       ptree->right = ttree;
+      ptree->reversed = 1;
       reverseParms (ptree->left);
       reverseParms (ptree->right);
     }

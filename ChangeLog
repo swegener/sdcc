@@ -1,3 +1,8 @@
+2004-10-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.h (struct ast),
+	* src/SDCCast.c (reverseParms, copyAst): fixed bug #1040577
+
 2004-10-20 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: added include/pic16/*.h to the setup

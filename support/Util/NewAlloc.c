@@ -30,6 +30,7 @@ functions.
 #include <stdio.h>
 #include <malloc.h>
 #include <stdlib.h>
+#include <string.h>
 #include <memory.h>
 
 #include "newalloc.h"

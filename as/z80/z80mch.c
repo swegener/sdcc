@@ -542,7 +542,7 @@ struct mne *mp;
 	case S_DJNZ:
 	case S_JR:
 		if ((v1 = admode(CND)) != 0 && rf != S_DJNZ) {
-#else GAMEBOY
+#else /* GAMEBOY */
 	case S_JR:
 		if ((v1 = admode(CND)) != 0) {
 #endif /* GAMEBOY */

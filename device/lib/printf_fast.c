@@ -176,7 +176,7 @@ printf_str_space:
 	lcall	printf_space
 	pop	dph
 	pop	dpl
-#endif FIELD_WIDTH
+#endif // FIELD_WIDTH
 
 printf_str_loop:
 	lcall	__gptrget

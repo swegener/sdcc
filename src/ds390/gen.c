@@ -48,7 +48,7 @@
 #endif
 #endif
 
-// #define BETTER_LITERAL_SHIFT
+#define BETTER_LITERAL_SHIFT
 
 char *aopLiteral (value * val, int offset);
 

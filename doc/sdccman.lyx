@@ -325,16 +325,171 @@ If you can think of some more, please send them to the list.
 Installation
 \layout Subsection
 
-Linux/Unix Installation
+Install and search paths
+\layout Standard
+
+Linux (and other gcc-builds like Solaris, Cygwin, Mingw and OSX) by default
+ install in /usr/local.
+ You can override this when configuring with --prefix-path.
+ Subdirs used will be bin, share/sdcc/include, share/sdcc/lib and share/sdcc/doc.
+\newline 
+Windows MSVC and Borland builds will install in one single tree (e.g.
+ /sdcc) with subdirs bin, lib, include and doc.
+\newline 
+
+\newline 
+The paths searched when running the compiler are as follows (the first catch
+ wins):
+\layout Enumerate
+
+Binary files (preprocessor, assembler and linker):
+\newline 
+- the path of argv[0] (if available)
+\newline 
+- getenv(
+\begin_inset Quotes sld
+\end_inset 
+
+SDCC_BIN_PATH
+\begin_inset Quotes srd
+\end_inset 
+
+)
+\newline 
+- getenv(
+\begin_inset Quotes sld
+\end_inset 
+
+SDCCHOME
+\begin_inset Quotes srd
+\end_inset 
+
+)/bin
+\newline 
+- $PATH
+\layout Enumerate
+
+Include files:
+\newline 
+- -I dir
+\newline 
+- getenv(
+\begin_inset Quotes sld
+\end_inset 
+
+SDCC_INCLUDE_PATH
+\begin_inset Quotes srd
+\end_inset 
+
+)
+\newline 
+- getenv(
+\begin_inset Quotes sld
+\end_inset 
+
+SDCCHOME)/include
+\newline 
+- /usr/local/share/sdcc/include (gcc builds)
+\newline 
+- path(arv[0])/../include and then /sdcc/include (windoze msvc and borland
+ builds)
+\layout Enumerate
+
+Library files (the 
+\shape italic 
+model
+\shape default 
+ is auto-appended by the compiler, e.g.
+ small, large, z80, ds390 etc.):
+\newline 
+- -L dir
+\newline 
+- getenv(
+\begin_inset Quotes sld
+\end_inset 
+
+SDCC_LIB_PATH
+\begin_inset Quotes srd
+\end_inset 
+
+)/
+\shape italic 
+model
+\shape default 
+
+\newline 
+- getenv(
+\begin_inset Quotes sld
+\end_inset 
+
+SDCCHOME
+\begin_inset Quotes srd
+\end_inset 
+
+)/lib/
+\shape italic 
+model
+\shape default 
+
+\newline 
+- /usr/local/share/sdcc/lib/
+\shape italic 
+model
+\shape default 
+ (gcc builds)
+\newline 
+- path(argv[0])/../lib/
+\shape italic 
+model
+\shape default 
+ and then /sdcc/lib/
+\shape italic 
+model
+\shape default 
+ (windoze msvc and borland builds)
+\layout Enumerate
+
+Documentation (although never really searched for, you have to do that yourself
+ :):
+\newline 
+- getenv(
+\begin_inset Quotes sld
+\end_inset 
+
+SDCCHOME
+\begin_inset Quotes srd
+\end_inset 
+
+)/doc
+\newline 
+- /usr/local/share/sdcc/doc (gcc builds)
+\newline 
+- /sdcc/doc (windoze msvc and borland builds)
+\layout Standard
+
+So, for windoze it is highly recommended to set the environment variable
+ SDCCHOME to prevent needless usage of -I and -L.
+\layout Subsection
+
+Linux and other gcc-based systems (cygwin, mingw, osx)
 \layout Enumerate
 
 
 \series medium 
-Download the source package, it will be named something like sdcc-
+Download the source package
 \series default 
-x
+ either from the SDCC CVS repository or from the 
+\begin_inset LatexCommand \url[nightly snapshots]{http://sdcc.sourceforge.net/snap.php}
+
+\end_inset 
+
+
 \series medium 
-.x.x.tgz.
+, it will be named something like sdcc
+\series default 
+.src
+\series medium 
+.tgz.
 \layout Enumerate
 
 
@@ -347,7 +502,7 @@ Bring up a command line terminal, such as xterm.
 Unpack the file using a command like: 
 \family sans 
 \series bold 
-"tar -xzf sdcc-x.x.x.tgz
+"tar -xzf sdcc.src.tgz
 \family default 
 \series default 
 "
@@ -408,14 +563,7 @@ Type
  the documentation to the install directories.
 \layout Subsection
 
-Windows Installation
-\layout Standard
-
-
-\emph on 
-<pending: is this complete? where is borland, mingw>
-\newline 
-
+Windows 
 \layout Subsubsection
 
 Windows Install Using a Binary Package
@@ -424,7 +572,7 @@ Windows Install Using a Binary Package
 Download the binary package and unpack it using your favorite unpacking
  tool (gunzip, WinZip, etc).
  This should unpack to a group of sub-directories.
- An example directory structure after unpacking is: c:
+ An example directory structure after unpacking the mingw package is: c:
 \backslash 
 usr
 \backslash 
@@ -453,97 +601,42 @@ sdcc
 lib for the include and libraries.
 \layout Enumerate
 
-Adjust your environment PATH to include the location of the bin directory.
- For example, make a setsdcc.bat file with the following: set PATH=c:
-\backslash 
-usr
-\backslash 
-local
-\backslash 
-bin;%PATH%
-\layout Enumerate
-
-When you compile with sdcc, you may need to specify the location of the
- lib and include folders.
- For example, sdcc test.c -I c:
-\backslash 
-usr
-\backslash 
-local
-\backslash 
-share
-\backslash 
-sdcc
-\backslash 
-include -L c:
-\backslash 
-usr
-\backslash 
-local
-\backslash 
-share
-\backslash 
-sdcc
-\backslash 
-lib
-\backslash 
-small
+Adjust your environment variable PATH to include the location of the bin
+ directory or start sdcc using the full path.
 \layout Subsubsection
 
-Windows Install Using Cygwin
-\layout Enumerate
+Windows Install Using Cygwin and Mingw
+\layout Standard
 
-
-\series medium 
-Download and install the cygwin package from the redhat site
+Follow the instruction in 
+\series bold 
+Linux and other gcc-based systems
 \series default 
-
-\begin_inset LatexCommand \htmlurl{http://sources.redhat.com/cygwin/}
-
-\end_inset 
-
-
-\series medium 
 .
- Currently, this involved downloading a small install program which then
- automates downloading and installing 
-\series default 
-selected parts of
-\series medium 
- the package
-\series default 
- (a large 80M byte sized dowload for the whole thing)
-\series medium 
-.
-
-\series default 
- 
-\layout Enumerate
-
-
-\series medium 
-Bring up a 
-\series default 
-Unix/Bash 
-\series medium 
-command line terminal from the Cygwin menu.
-\layout Enumerate
-
-
-\series medium 
-Follow the instructions in the preceding Linux/Unix installation section
 \layout Subsubsection
 
 Windows Install Using Microsoft Visual C++ 6.0/NET
 \layout Standard
 
-(By Jesus Calvino-Fraga (jesus@ieee.org) Jan/31/2003, many thanks to "Borut
- Razem" <borut.razem@siol.net> for fixing all the sources, projects, and workspace
- so to build SDCC with Visual C++).
-\newline 
 
-\newline 
-SDCC is distributed with all the projects, workspaces, and files you need
+\series medium 
+Download the source package
+\series default 
+ either from the SDCC CVS repository or from the 
+\begin_inset LatexCommand \url[nightly snapshots]{http://sdcc.sourceforge.net/snap.php}
+
+\end_inset 
+
+
+\series medium 
+, it will be named something like sdcc
+\series default 
+.src
+\series medium 
+.tgz.
+
+\series default 
+ SDCC is distributed with all the projects, workspaces, and files you need
  to build it using Visual C++ 6.0/NET.
  The workspace name is 'sdcc.dsw'.
  Please note that as it is now, all the executables are created in a folder
@@ -693,6 +786,14 @@ That is it.
 bin_vc to sdcc
 \backslash 
 bin, and you can compile using sdcc.
+\layout Subsubsection
+
+Windows Install Using Borland ......
+\layout Standard
+
+
+\shape italic 
+<pending>
 \layout Subsection
 
 Testing out the SDCC Compiler
@@ -952,43 +1053,7 @@ Compile this by typing
 Install Trouble-shooting
 \layout Subsubsection
 
-SDCC cannot find libraries or header files.
-\layout Standard
-
-The default installation assumes the libraries and header files are located
- at 
-\begin_inset Quotes eld
-\end_inset 
-
-/usr/local/share/sdcc/lib
-\begin_inset Quotes erd
-\end_inset 
-
- and 
-\begin_inset Quotes eld
-\end_inset 
-
-/usr/local/share/sdcc/include
-\begin_inset Quotes erd
-\end_inset 
-
-.
- An alternative is to specify these locations as compiler options like this:
- 
-\family sans 
-\series bold 
-"sdcc\SpecialChar ~
--L\SpecialChar ~
-/usr/local/sdcc/lib/small\SpecialChar ~
--I\SpecialChar ~
-/usr/local/sdcc/include\SpecialChar ~
-test.c"
-\family default 
-\series default 
-.
-\layout Subsubsection
-
-SDCC does not compile correctly.
+SDCC does not build correctly.
 \layout Standard
 
 A thing to try is starting from scratch by unpacking the .tgz source package
@@ -1113,7 +1178,9 @@ bin/share/sdcc/lib/small/ - Object & library files for small model library
 \newline 
 bin/share/sdcc/lib/large/ - Object & library files for large model library
 \newline 
-bin/share/sdcc/lib/ds390/ - Object & library files forDS80C390 library
+bin/share/sdcc/lib/ds390/ - Object & library files for DS80C390 library
+\newline 
+bin/share/sdcc/lib/z80/ - Object & library files for Z80 library
 \newline 
 
 \newline 
@@ -1708,6 +1775,16 @@ Linker Options
 
 
 \series bold 
+-o\SpecialChar ~
+<path/file> 
+\series default 
+the output path resp.
+ file where everything will be placed
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
 -L\SpecialChar ~
 --lib-path
 \bar under 
@@ -1748,17 +1825,16 @@ Linker Options
 \series bold 
 --stack-loc
 \series default 
-<Value> The initial value of the stack pointer.
- The default value of the stack pointer is 0x07 if only register bank 0
- is used, if other register banks are used then the stack pointer is initialized
- to the location above the highest register bank used.
- eg.
- if register banks 1 & 2 are used the stack pointer will default to location
- 0x18.
- The value entered can be in Hexadecimal or Decimal format, eg.
+<Value> By default the stack is placed after the data segment.
+ Using this option the stack can be placed anywhere in the internal memory
+ space of the 8051.
+ The value entered can be in Hexadecimal or Decimal format, e.g.
  --stack-loc 0x20 or --stack-loc 32.
- If all four register banks are used the stack will be placed after the
- data segment (equivalent to --stack-after-data)
+ Since the sp register is incremented before a push or call, the initial
+ sp will be set to one byte prior the provided value.
+ The provided value should not overlap any other memory areas such as used
+ register banks or the data segment and with enough space for the current
+ application.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -2081,27 +2157,6 @@ When this option is used the compiler will generate debug information, that
 
 
 \series bold 
-\emph on 
---regextend
-\bar under 
- 
-\series default 
-\bar default 
- This option is obsolete and isn't supported anymore.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
-\emph on 
---noregparms
-\series default 
- This option is obsolete and isn't supported anymore.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
 --peep-file
 \series default 
 <filename> This option can be used to use additional rules to be used by
@@ -2234,8 +2289,26 @@ cyclomatic complexity
 \series bold 
 --iram-size
 \series default 
-<Value> Causes the linker to check if the interal ram usage is within limits
+<Value> Causes the linker to check if the internal ram usage is within limits
  of the given value.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--xram-size
+\series default 
+<Value> Causes the linker to check if the external ram usage is within limits
+ of the given value.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+--code-size
+\series default 
+<Value> Causes the linker to check if the code usage is within limits of
+ the given value.
 \layout List
 \labelwidthstring 00.00.0000
 

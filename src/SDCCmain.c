@@ -89,10 +89,6 @@ int ds390_jammed = 0;
 char scratchFileName[PATH_MAX];
 char buffer[PATH_MAX * 2];
 
-// In MSC VC6 default search path for exe's to path for this
-
-char DefaultExePath[128];
-
 #define OPTION_HELP	"-help"
 
 #define LENGTH(_a)	(sizeof(_a)/sizeof(*(_a)))
@@ -476,8 +472,6 @@ parseWithComma (char **dest, char *src)
 
 /*-----------------------------------------------------------------*/
 /* setParseWithComma - separates string with comma to a set        */
-/*                                                                 */
-/* CAUTION: set items are no strdup-ed!                            */
 /*-----------------------------------------------------------------*/
 void
 setParseWithComma (set **dest, char *src)
@@ -1629,8 +1623,8 @@ preProcess (char **envp)
 	}
       else
 	{
-	  /* Have to set cppoutfilename to something, even if piping */
-	  setMainValue ("cppoutfilename", "");
+	  /* Piping: set cppoutfilename to NULL, to avoid empty quotes */
+	  setMainValue ("cppoutfilename", NULL);
 	}
 
       if (options.verbose)
@@ -1727,7 +1721,7 @@ _discoverPaths (const char *argv0)
       strncpyz (scratchFileName, argv0, sizeof(scratchFileName));
       *strrchr (scratchFileName, DIR_SEPARATOR_CHAR) = '\0';
       setMainValue ("bindir", scratchFileName);
-      ExePathList[0] = Safe_strdup (scratchFileName);
+      addSet(&binPathSet, Safe_strdup (scratchFileName));
     }
   else if (getenv (SDCCDIR_NAME) != NULL)
     {
@@ -1735,12 +1729,12 @@ _discoverPaths (const char *argv0)
       strncpyz (scratchFileName, getenv (SDCCDIR_NAME), sizeof(scratchFileName));
       strncatz (scratchFileName, buffer, sizeof(scratchFileName));
       setMainValue ("bindir", scratchFileName);
-      ExePathList[0] = Safe_strdup (scratchFileName);
+      addSet(&binPathSet, Safe_strdup (scratchFileName));
     }
   else
     {
       setMainValue ("bindir", BINDIR);
-      ExePathList[0] = BINDIR;
+      addSet(&binPathSet, BINDIR);
     }
 
   do

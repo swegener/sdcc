@@ -29,6 +29,7 @@
 int iCodeSeq = 0;
 hTab *liveRanges = NULL;
 hTab *iCodehTab = NULL;
+hTab *iCodeSeqhTab = NULL;
 
 /*-----------------------------------------------------------------*/
 /* sequenceiCode - creates a sequence number for the iCode & add   */
@@ -48,6 +49,7 @@ sequenceiCode (eBBlock ** ebbs, int count)
 	  ic->seq = ++iCodeSeq;
 	  ic->depth = ebbs[i]->depth;
 	  hTabAddItem (&iCodehTab, ic->key, ic);
+	  hTabAddItem (&iCodeSeqhTab, ic->seq, ic);
 	}
       ebbs[i]->lSeq = iCodeSeq;
     }
@@ -663,6 +665,8 @@ computeLiveRanges (eBBlock ** ebbs, int count)
   iCodeSeq = 0;
   setToNull ((void **) &iCodehTab);
   iCodehTab = newHashTable (iCodeKey);
+  setToNull ((void **) &iCodeSeqhTab);
+  iCodeSeqhTab = newHashTable (iCodeKey);
   sequenceiCode (ebbs, count);
 
   /* call routine to mark the from & to live ranges for

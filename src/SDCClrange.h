@@ -28,6 +28,7 @@
 
 extern hTab *liveRanges;
 extern hTab *iCodehTab;
+extern hTab *iCodeSeqhTab;
 
 void computeLiveRanges (eBBlock **, int);
 

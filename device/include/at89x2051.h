@@ -29,9 +29,7 @@
 #ifndef AT892051_H
 #define AT892051_H
 
-#if BelaCompletedHisOrHerQuestAndAdaptedTheLibraries
 #warning This file (at89x2051.h) is obsolete, use include <at89x051.h> !
-#endif
 
 /* BYTE addressable registers */
 sfr at 0x81 SP          ;

@@ -192,6 +192,12 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	  !sym->allocreq && sym->level)
 	continue;
 
+      /* for bitvar locals and parameters */
+      if (!arFlag && !sym->allocreq && sym->level 
+	  && !SPEC_ABSA (sym->etype)) {
+	continue;
+      }
+
       /* if global variable & not static or extern
          and addPublics allowed then add it to the public set */
       if ((sym->level == 0 ||

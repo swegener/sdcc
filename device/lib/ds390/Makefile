@@ -2,7 +2,7 @@ CC = ../../../bin/sdcc
 
 #VERBOSE = --verbose
 
-OBJECTS = startup390.rel serial390.rel 
+OBJECTS = startup390.rel serial390.rel memcpyx.rel
 
 SOURCES = $(patsubst %.rel,%.c,$(OBJECTS))
 

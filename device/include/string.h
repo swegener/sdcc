@@ -76,6 +76,10 @@ extern void _generic *memcpy (void _generic *, void _generic *, int )  ;
 extern int            memcmp (void _generic *, void _generic *, int )  ;
 extern void _generic *memset (void _generic *, unsigned char  , int )  ;
 
+#if SDCC_ds390
+extern void _xdata *memcpyx(void _xdata *, void _xdata *, int);
+#endif
+
 #endif
 
 #endif

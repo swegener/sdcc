@@ -1,3 +1,20 @@
+2004-04-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCpeeph.c (replaceRule): support empty replacement peephole
+	rules
+	* src/SDCCmain.c,
+	* src/SDCCglobl.h,
+	* src/SDCCpeeph.c (getPeepLine): new option --no-peep-comments omits
+	comments from the peephole optimizer replacement rules
+	* src/SDCCmem.c (printAllocInfoSeg): give actual location of spilled
+	symbols
+	* src/SDCCcse.c (updateSpillLocation),
+	* src/SDCCopt.c (killDeadCode, findReqv): better tracking of register
+	equivalents
+	* src/hc08/ralloc.c (regTypeNum): pseudo symbols must be in DATA only
+	* src/hc08/main.c (_hc08_finaliseOptions): made pointers to stack
+	objects far pointers
+
 2004-04-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCsymt.h: a missing part of my last change

@@ -126,6 +126,7 @@ char buffer[PATH_MAX * 2];
 #define OPTION_USE_STDOUT       "--use-stdout"
 #define OPTION_STACK_SIZE	"--stack-size"
 #define OPTION_PACK_IRAM	"--pack-iram"
+#define OPTION_NO_PEEP_COMMENTS	"--no-peep-comments"
 
 static const OPTION
 optionsTable[] = {
@@ -226,6 +227,7 @@ optionsTable[] = {
     { 0,    OPTION_NO_XINIT_OPT,    &options.noXinitOpt, "don't memcpy initialized xram from code"},
     { 0,    OPTION_NO_CCODE_IN_ASM, &options.noCcodeInAsm, "don't include c-code as comments in the asm file"},
     { 0,    OPTION_ICODE_IN_ASM,    &options.iCodeInAsm, "include i-code as comments in the asm file"},
+    { 0,    OPTION_NO_PEEP_COMMENTS, &options.noPeepComments, "don't include peephole optimizer comments"},
     { 0,    OPTION_PRINT_SEARCH_DIRS, &options.printSearchDirs, "display the directories in the compiler's search path"},
     { 0,    OPTION_MSVC_ERROR_STYLE, &options.vc_err_style, "messages are compatible with Micro$oft visual studio"},
     { 0,    OPTION_USE_STDOUT, &options.use_stdout, "send errors to stdout instead of stderr"},

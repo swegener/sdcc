@@ -771,6 +771,51 @@ replaceRegEqv (eBBlock ** ebbs, int count)
 }
 
 /*-----------------------------------------------------------------*/
+/* findReqv - search for a register equivalent                     */
+/*-----------------------------------------------------------------*/
+operand *
+findReqv (symbol * prereqv, eBBlock ** ebbs, int count)
+{
+  int i;
+  iCode * ic;
+  
+  /* for all blocks do */
+  for (i=0; i<count; i++)
+    {
+      /* for all instructions in the block do */
+      for (ic = ebbs[i]->sch; ic; ic = ic->next)
+	{
+	  if (ic->op == IFX)
+	    {
+	      if (IS_ITEMP (IC_COND (ic))
+		  && OP_SYMBOL (IC_COND (ic))->prereqv == prereqv)
+		return IC_COND (ic);
+	    }
+	  else if (ic->op == JUMPTABLE)
+	    {
+	      if (IS_ITEMP (IC_JTCOND (ic))
+		  && OP_SYMBOL (IC_JTCOND (ic))->prereqv == prereqv)
+		return IC_JTCOND (ic);
+	    }
+	  else
+	    {
+	      if (IS_ITEMP (IC_LEFT (ic))
+		  && OP_SYMBOL (IC_LEFT (ic))->prereqv == prereqv)
+		return IC_LEFT (ic);
+	      if (IS_ITEMP (IC_RIGHT (ic))
+		  && OP_SYMBOL (IC_RIGHT (ic))->prereqv == prereqv)
+		return IC_RIGHT (ic);
+	      if (IS_ITEMP (IC_RESULT (ic))
+		  && OP_SYMBOL (IC_RESULT (ic))->prereqv == prereqv)
+		return IC_RESULT (ic);
+	    }
+	}
+    }
+  
+  return NULL;
+}
+
+/*-----------------------------------------------------------------*/
 /* killDeadCode - eliminates dead assignments                      */
 /*-----------------------------------------------------------------*/
 int 
@@ -902,6 +947,29 @@ killDeadCode (eBBlock ** ebbs, int count)
 
 		  /* and defset of the block */
 		  bitVectUnSetBit (ebbs[i]->defSet, ic->key);
+
+		  /* If this is the last of a register equivalent, */
+		  /* look for a successor register equivalent. */
+		  bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
+		  if (IS_ITEMP (IC_RESULT (ic))
+		      && OP_SYMBOL (IC_RESULT (ic))->isreqv
+		      && bitVectIsZero (OP_DEFS (IC_RESULT (ic))))
+		    {
+		      symbol * resultsym = OP_SYMBOL (IC_RESULT (ic));
+		      symbol * prereqv = resultsym->prereqv;
+		      
+		      if (OP_SYMBOL (prereqv->reqv) == resultsym)
+			{
+			  operand * newreqv;
+
+			  IC_RESULT (ic) = NULL;
+			  newreqv = findReqv (prereqv, ebbs, count);
+			  if (newreqv)
+			    {
+			      prereqv->reqv = newreqv;
+			    }
+			}
+		    }
 
 		  /* delete the result */
 		  IC_RESULT (ic) = NULL;

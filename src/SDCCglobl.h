@@ -243,6 +243,7 @@ struct options
     int noXinitOpt;             /* don't optimize initialized xdata */
     int noCcodeInAsm;           /* hide c-code from asm */
     int iCodeInAsm;             /* show i-code in asm */
+    int noPeepComments;		/* hide peephole optimizer comments */
     int printSearchDirs;        /* display the directories in the compiler's search path */
     int vc_err_style;           /* errors and warnings are compatible with Micro$oft visual studio */
     int use_stdout;             /* send errors to stdout instead of stderr */

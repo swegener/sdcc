@@ -1296,10 +1296,13 @@ updateSpillLocation (iCode * ic, int induction)
 			if (!OP_SYMBOL(IC_RIGHT (ic))->noSpilLoc &&
 			    !IS_VOLATILE (setype) &&
 			    !IN_FARSPACE (SPEC_OCLS (setype)) &&
-			    !OTHERS_PARM (OP_SYMBOL (IC_RESULT (ic))))
+			    !OTHERS_PARM (OP_SYMBOL (IC_RESULT (ic)))) {
 
 				SPIL_LOC (IC_RIGHT (ic)) =
 					SPIL_LOC (IC_RESULT (ic));
+				OP_SYMBOL (IC_RIGHT (ic))->prereqv =
+					OP_SYMBOL (IC_RESULT (ic))->prereqv;
+			}
 		}
 		/* special case for inductions */
 		if (induction && 
@@ -1307,6 +1310,8 @@ updateSpillLocation (iCode * ic, int induction)
 		    !OP_SYMBOL(IC_RESULT (ic))->noSpilLoc &&
 		    !SPIL_LOC(IC_RESULT(ic))) {
 			SPIL_LOC (IC_RESULT (ic)) = SPIL_LOC (IC_RIGHT (ic));
+			OP_SYMBOL (IC_RESULT (ic))->prereqv =
+				OP_SYMBOL (IC_RIGHT (ic))->prereqv;
 		}
 	}
 }

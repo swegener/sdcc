@@ -994,11 +994,18 @@ printAllocInfoSeg (memmap * map, symbol * func, FILE * of)
 	  int i;
 
 	  sym = OP_SYMBOL (sym->reqv);
-	  fprintf (of, "to registers ");
-	  for (i = 0; i < 4 && sym->regs[i]; i++)
-	    fprintf (of, "%s ", port->getRegName (sym->regs[i]));
-	  fprintf (of, "\n");
-	  continue;
+	  if (!sym->isspilt || sym->remat)
+	    {
+	      fprintf (of, "to registers ");
+	      for (i = 0; i < 4 && sym->regs[i]; i++)
+		fprintf (of, "%s ", port->getRegName (sym->regs[i]));
+	      fprintf (of, "\n");
+	      continue;
+	    }
+	  else
+	    {
+	      sym = sym->usl.spillLoc;
+	    }
 	}
 
       /* if on stack */

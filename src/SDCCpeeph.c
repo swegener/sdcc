@@ -945,6 +945,7 @@ getPeepLine (lineNode ** head, char **bpp)
 {
   char lines[MAX_PATTERN_LEN];
   char *lp;
+  int isComment;
 
   lineNode *currL = NULL;
   char *bp = *bpp;
@@ -975,18 +976,22 @@ getPeepLine (lineNode ** head, char **bpp)
       lp = lines;
       while ((*bp != '\n' && *bp != '}') && *bp)
 	*lp++ = *bp++;
-
       *lp = '\0';
-      if (!currL)
-	*head = currL = newLineNode (lines);
-      else
-	currL = connectLine (currL, newLineNode (lines));
-
+      
       lp = lines;
       while (*lp && isspace(*lp))
         lp++;
-      if (*lp==';')
-        currL->isComment = 1;
+      isComment = (*lp == ';');
+        
+      if (!isComment || (isComment && !options.noPeepComments))
+	{
+	  if (!currL)
+	    *head = currL = newLineNode (lines);
+	  else
+	    currL = connectLine (currL, newLineNode (lines));
+	  currL->isComment = isComment;
+	}
+
     }
 
   *bpp = bp;
@@ -1558,23 +1563,35 @@ replaceRule (lineNode ** shead, lineNode * stail, peepRule * pr)
       lhead = comment;
     }
 
-  /* determine which iCodes the replacment lines relate to */
-  reassociate_ic(*shead,stail,lhead,cl);
+  if (lhead)
+    {
+      /* determine which iCodes the replacment lines relate to */
+      reassociate_ic(*shead,stail,lhead,cl);
 
-  /* now we need to connect / replace the original chain */
-  /* if there is a prev then change it */
-  if ((*shead)->prev)
-    {
-      (*shead)->prev->next = lhead;
-      lhead->prev = (*shead)->prev;
+      /* now we need to connect / replace the original chain */
+      /* if there is a prev then change it */
+      if ((*shead)->prev)
+	{
+	  (*shead)->prev->next = lhead;
+	  lhead->prev = (*shead)->prev;
+	}
+      *shead = lhead;
+      /* now for the tail */
+      if (stail && stail->next)
+	{
+	  stail->next->prev = cl;
+	  if (cl)
+	    cl->next = stail->next;
+	}
     }
-  *shead = lhead;
-  /* now for the tail */
-  if (stail && stail->next)
+  else
     {
-      stail->next->prev = cl;
-      if (cl)
-	cl->next = stail->next;
+      /* the replacement is empty - delete the source lines */
+      if ((*shead)->prev)
+        (*shead)->prev->next = stail->next;
+      if (stail->next)
+        stail->next->prev = (*shead)->prev;
+      *shead = stail->next;
     }
 }
 

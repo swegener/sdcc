@@ -128,6 +128,7 @@ _hc08_finaliseOptions (void)
       port->mem.default_globl_map = data;
     }
 
+  istack->ptrType = FPOINTER;
 }
 
 static void

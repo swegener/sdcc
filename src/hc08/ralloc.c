@@ -1739,9 +1739,9 @@ regTypeNum (eBBlock *ebbs)
 	      (ic = hTabItemWithKey (iCodehTab,
 				     bitVectFirstBit (sym->defs))) &&
 	      POINTER_GET (ic) &&
-	      !IS_BITVAR (sym->etype))
+	      !IS_BITVAR (sym->etype) &&
+	      (aggrToPtrDclType (operandType (IC_LEFT (ic)), FALSE) == POINTER))
 	    {
-
 
 	      if (ptrPseudoSymSafe (sym, ic))
 		{

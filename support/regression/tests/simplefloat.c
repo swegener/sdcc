@@ -20,7 +20,11 @@ void
 testDiv(void)
 {
 #if !PORT_HOST
-  volatile float left, right;
+#ifdef __mcs51
+  idata at 0xd0
+#endif
+  volatile float left;
+  volatile float right;
 
   left = 17;
   right = 343;

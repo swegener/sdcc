@@ -2,6 +2,8 @@
 
 	* src/mcs51/gen.c (genFunction): avoid excess "inc sp"
 
+	* support/regression/tests/simplefloat.c: Port to mcs51.
+
 2001-11-25  Michael Hope  <michaelh@juju.net.nz>
 	* support/regression/tests/bug-485362.c: Added.
 

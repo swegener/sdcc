@@ -31,6 +31,14 @@
 
 #define PTR value.p 
 
+#ifdef SDCC_ds390
+#define NULL_STRING "<NULL>"
+#define NULL_STRING_LENGTH 6
+#endif
+
+/* XSPEC is defined in stdio.h and used here to place
+   auto variables in XSEG */
+
 /****************************************************************************/
 
 typedef char _generic *ptr_t;
@@ -62,7 +70,7 @@ static bit   lsd;
 /* this one NEEDS to be in data */
 static data value_t value;
 
-static xdata unsigned short radix;
+static unsigned short radix;
 
 /****************************************************************************/
 
@@ -82,7 +90,8 @@ static void output_char( char c ) reentrant
 
 static void output_digit( unsigned char n ) reentrant
 {
-  output_char( n <= 9 ? '0'+n : (lower_case ? n+(char)('a'-10) : n+(char)('A'-10)) );
+  output_char( n <= 9 ? '0'+n : 
+	       (lower_case ? n+(char)('a'-10) : n+(char)('A'-10)) );
 }
 
 /*--------------------------------------------------------------------------*/
@@ -103,7 +112,7 @@ static void calculate_digit( void )
   {
 _asm
   clr  c
-  mov  a,_value+0
+  mov  a,_value+0  
   rlc  a
   mov  _value+0,a
   mov  a,_value+1
@@ -144,12 +153,12 @@ static void output_float (float f, unsigned char reqWidth,
 			  signed char reqDecimals,
 			  bit left, bit zero, bit sign, bit space)
 {
-  char negative=0;
-  long integerPart;
-  float decimalPart;
-  char fpBuffer[128];
-  char fpBI=0, fpBD;
-  unsigned char minWidth, i;
+  XSPEC char negative=0;
+  XSPEC long integerPart;
+  XSPEC float decimalPart;
+  XSPEC char fpBuffer[128];
+  XSPEC char fpBI=0, fpBD;
+  XSPEC unsigned char minWidth, i;
 
   // save the sign
   if (f<0) {
@@ -246,10 +255,10 @@ int vsprintf (const char *buf, const char *format, va_list ap)
   bit            long_argument;
   bit            float_argument;
 
-  unsigned char  width;
-  signed char decimals;
-  unsigned char  length;
-  char           c;
+  XSPEC unsigned char  width;
+  XSPEC signed char decimals;
+  XSPEC unsigned char  length;
+  XSPEC char           c;
 
   output_ptr = buf;
   if ( !buf )
@@ -261,6 +270,12 @@ int vsprintf (const char *buf, const char *format, va_list ap)
     output_to_string = 1;
   }
 
+#ifdef SDCC_ds390
+  if (format==0) {
+    format=NULL_STRING;
+  }
+#endif
+ 
   while( c=*format++ )
   {
     if ( c=='%' )
@@ -337,7 +352,16 @@ get_conversion_spec:
       case 'S':
 	PTR = va_arg(ap,ptr_t);
 
+#ifdef SDCC_ds390
+	if (PTR==0) {
+	  PTR=NULL_STRING;
+	  length=NULL_STRING_LENGTH;
+	} else {
+	  length = strlen(PTR);
+	}
+#else
 	length = strlen(PTR);
+#endif
 	if ( ( !left_justify ) && (length < width) )
 	{
 	  width -= length;
@@ -363,7 +387,7 @@ get_conversion_spec:
       case 'P':
 	PTR = va_arg(ap,ptr_t);
 
-#ifdef SDCC_MODEL_FLAT24
+#ifdef SDCC_ds390
 	output_char(memory_id[(value.byte[3] > 3) ? 4 : value.byte[3]] );
 	output_char(':');
 	output_char('0');
@@ -376,7 +400,8 @@ get_conversion_spec:
 	output_char(':');
 	output_char('0');
 	output_char('x');
-	if ((value.byte[2] != 0x00 /* DSEG */) && (value.byte[2] != 0x03 /* SSEG */))
+	if ((value.byte[2] != 0x00 /* DSEG */) && 
+	    (value.byte[2] != 0x03 /* SSEG */))
 	  output_2digits( value.byte[1] );
 	output_2digits( value.byte[0] );
 #endif
@@ -413,11 +438,14 @@ get_conversion_spec:
       if (float_argument) {
 	value.f=va_arg(ap,float);
 #if !USE_FLOATS
+	PTR="<NO FLOAT>";
+	while (c=*PTR++)
+	  output_char (c);
 	// treat as long hex
-	radix=16;
-	long_argument=1;
-	zero_padding=1;
-	width=8;
+	//radix=16;
+	//long_argument=1;
+	//zero_padding=1;
+	//width=8;
 #else
 	// ignore b and l conversion spec for now
 	output_float(value.f, width, decimals, left_justify, zero_padding, 

@@ -6014,6 +6014,7 @@ AccAXRsh (char *x, int shCount)
       emitcode ("mov", "c,acc.7");
       AccAXLrl1 (x);		// ABBBBBBC:CDDDDDDA
 
+      emitcode ("mov", "c,acc.7");
       AccAXLrl1 (x);		// BBBBBBCC:DDDDDDAA
 
       emitcode ("xch", "a,%s", x);	// DDDDDDAA:BBBBBBCC
@@ -6103,6 +6104,7 @@ AccAXRshS (char *x, int shCount)
       emitcode ("mov", "c,acc.7");
       AccAXLrl1 (x);		// ABBBBBBC:CDDDDDDA
 
+      emitcode ("mov", "c,acc.7");
       AccAXLrl1 (x);		// BBBBBBCC:DDDDDDAA
 
       emitcode ("xch", "a,%s", x);	// DDDDDDAA:BBBBBBCC
@@ -6667,7 +6669,12 @@ shiftRLong (operand * left, int offl,
     if (sign) {
       emitcode ("rlc", "a");
       emitcode ("subb", "a,acc");
-      emitcode ("xch", "a,%s", aopGet(AOP(left), MSB32, FALSE, FALSE));
+      if (isSameRegs)
+        emitcode ("xch", "a,%s", aopGet(AOP(left), MSB32, FALSE, FALSE));
+      else {
+        aopPut (AOP (result), "a", MSB32);
+        MOVA (aopGet (AOP (left), MSB32, FALSE, FALSE));
+      }
     } else {
       aopPut (AOP(result), zero, MSB32);
     }
@@ -6684,7 +6691,7 @@ shiftRLong (operand * left, int offl,
   if (isSameRegs && offl==MSB16) {
     emitcode ("xch", "a,%s",aopGet (AOP (left), MSB24, FALSE, FALSE));
   } else {
-    aopPut (AOP (result), "a", MSB32);
+    aopPut (AOP (result), "a", MSB32-offl);
     MOVA (aopGet (AOP (left), MSB24, FALSE, FALSE));
   }
 
@@ -6692,7 +6699,7 @@ shiftRLong (operand * left, int offl,
   if (isSameRegs && offl==1) {
     emitcode ("xch", "a,%s",aopGet (AOP (left), MSB16, FALSE, FALSE));
   } else {
-    aopPut (AOP (result), "a", MSB24);
+    aopPut (AOP (result), "a", MSB24-offl);
     MOVA (aopGet (AOP (left), MSB16, FALSE, FALSE));
   }
   emitcode ("rrc", "a");

@@ -67,6 +67,7 @@ set *setFromSet (set *);
 int isSetsEqual (set *, set *);
 set *subtractFromSet (set *, set *, int);
 int elementsInSet (set *);
+void *indexSet(set *, int);
 set *intersectSetsWith (set *, set *, int (*cFunc) (void *, void *), int);
 int isSetsEqualWith (set *, set *, int (*cFunc) (void *, void *));
 void *peekSet (set *);

@@ -444,6 +444,7 @@ pic16emitStaticSeg (memmap * map)
       if (!IS_STATIC (sym->etype))
 	addSetHead (&publics, sym);
 
+#if 0
       /* print extra debug info if required */
       if (options.debug || sym->level == 0)
 	{
@@ -466,6 +467,7 @@ pic16emitStaticSeg (memmap * map)
 	  fprintf (code->oFile, "%s_%d_%d", sym->name, sym->level, sym->block);
 
 	}
+#endif
 
       /* if it has an absolute address */
       if (SPEC_ABSA (sym->etype))
@@ -677,6 +679,7 @@ pic16emitOverlay (FILE * afile)
 	  if (IS_FUNC (sym->type))
 	    continue;
 
+#if 0
 	  /* print extra debug info if required */
 	  if (options.debug || sym->level == 0)
 	    {
@@ -696,6 +699,7 @@ pic16emitOverlay (FILE * afile)
 			 (sym->localof ? sym->localof->name : "-null-"));
 	      fprintf (afile, "%s_%d_%d", sym->name, sym->level, sym->block);
 	    }
+#endif
 
 	  /* if is has an absolute address then generate
 	     an equate for this no need to allocate space */
@@ -774,7 +778,7 @@ pic16glue ()
 
   /* print the global struct definitions */
   if (options.debug)
-    cdbStructBlock (0,cdbFile);
+    cdbStructBlock (0);	//,cdbFile);
 
   vFile = tempfile();
   /* PENDING: this isnt the best place but it will do */

@@ -977,7 +977,8 @@ void packBits(set *bregs)
       breg->address >>= 3;
 
       if(!bitfield) {
-	sprintf (buffer, "fbitfield%02x", breg->address);
+	//sprintf (buffer, "fbitfield%02x", breg->address);
+	sprintf (buffer, "0x%02x", breg->address);
 	//fprintf(stderr,"new bit field\n");
 	bitfield = newReg(REG_SFR, PO_GPR_BIT,breg->address,buffer,1,0);
 	bitfield->isBitField = 1;

@@ -1,3 +1,42 @@
+2003-05-18  Vangelis Rokas (vrokas@otenet.gr)
+
+	* configure.in: configure for pic16 port,
+	    added --disable-pic16-port
+	* sdccconf_in.h: added macro OPT_DISABLE_PIC16
+	* src/SDCCmain.c: linkOptions is changed to set *,
+	    added if/endif conditional macros to remove options help
+	    messages from optionsTable when a port is not configured, added
+	    support for the PIc16 port in the ports table, when executing
+	    the compiler with no port specified on command line, a default
+	    port is selected with the new macro DEFAULT_PORT which is
+	    defined in port.h, in setDefaultOptions() linkOptions is removed
+	    from initialization assignment, since now it is a set,
+	    parseCmdLine uses setParseWithComma for linkOptions, in
+	    linkEdit() linkOptions are accessed with new function indexSet()
+	    which returns the i'th item of a set variable. See SDCCset.c, in
+	    linkEdit() when calling buildCmdLine(), added linkOptions as
+	    last argument. Now users can pass arguments to gplink via the
+	    -Wl option, main() uses pic16glue() to glue up pic16 programs
+	* src/SDCCpeeph.c: various changes to support pic16
+	* src/SDCCset.c: added function  void *indexSet(set *, int)  to
+	    return the i'th item of the set
+	* src/SDCCset.h: added function prototype for indexSet()
+	* src/SDCCsymt.c: in checkSClass(), added support for PIC16
+	* src/clean.mk: added pic16 in CLEANALLPORTS variable
+	* src/port.h: added TARGET_ID_PIC16,TARGET_IS_PIC16 macro,
+	    added macro DEFAULT_PORT
+	* src/pic/main.c: corrected arguments of gplnk in _linkCmd
+	* src/pic16/gen.c: bug fix in genCpl(), now the correct code is
+	    generated
+	* src/pic16/glue.c: commented out some error producing lines
+	* src/pic16/main.c: __config directives are commented out to stop
+            gpasm complaining and test the linkage with gplink, _linkCmd and
+            _asmCmd changed to be more gplink and gpasm friendly
+	* src/pic16/peeph.def: peep rule 3 is commented out, since it
+	    produced an error when parsed, peep rule 12 is added to utilize
+	    movff, but it is commented out since the pCode does not support
+	    yet a command with 2 address arguments
+
 2003-05-18    <johan@balder>
 
 	* src/ds390/gen.c (genArrayInit): removed obsolete and buggy ARRAYINIT

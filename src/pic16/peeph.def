@@ -105,6 +105,7 @@
 // Also, notice that this snippet is not valid if
 // it follows another skip
 
+
 replace restart {
         _NOTBITSKIP_	%1
 	_BITSKIP_	%2
@@ -161,16 +162,16 @@ replace restart {
 } if NZ
 
 // peep 3
-replace restart {
-	decf	%1,f
-	movf	%1,w
-	btfss	_STATUS,z
-	goto	%2
-} by {
-	;     peep 3 - decf/mov/skpz to decfsz
-	decfsz	%1,f
-	 goto	%2
-}
+//replace restart {
+/	decf	%1,f
+///	movf	%1,w
+//	btfss	_STATUS,z
+//	goto	%2
+//} by {
+//	;     peep 3 - decf/mov/skpz to decfsz
+//	decfsz	%1,f
+//	 goto	%2
+//}
 
 
 replace restart {
@@ -283,3 +284,14 @@ replace restart {
         ;     peep 11 - Removed redundant move
         movf    %1,w
 }
+
+
+// From: Vangelis Rokas (vrokas@otenet.gr)
+
+//replace {
+//	movf	%1,W
+//	movwf	%2
+//} by {
+//	;	peep 12 - Use movff to move source to dest
+//	movff	%1, %2
+//}

@@ -458,7 +458,7 @@ static int validAddress(int address, int reg_size)
     fprintf(stderr, "missing \"#pragma maxram\" setting\n");
     return 0;
   }
-  //  fprintf(stderr, "validAddress: Checking 0x%04x\n",address);
+//  fprintf(stderr, "validAddress: Checking 0x%04x (max=0x%04x) (reg_size = %d)\n",address, pic->maxRAMaddress, reg_size);
   if(address > pic->maxRAMaddress)
     return 0;
 
@@ -522,7 +522,7 @@ static int assignRegister(regs *reg, int start_address)
 {
   int i;
 
-  //fprintf(stderr,"%s -  %s start_address = 0x%03x\n",__FUNCTION__,reg->name, start_address);
+	//fprintf(stderr,"%s -  %s start_address = 0x%03x\n",__FUNCTION__,reg->name, start_address);
   if(reg->isFixed) {
 
     if (validAddress(reg->address,reg->size)) {
@@ -548,6 +548,7 @@ static int assignRegister(regs *reg, int start_address)
     for (i=start_address; i<=pic->maxRAMaddress; i++) {
 
       if (validAddress(i,reg->size)) {
+	fprintf(stderr, "found valid address = 0x%04x\n", i);
 	reg->address = i;
 	mapRegister(reg);
 	return i;

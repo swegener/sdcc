@@ -789,11 +789,6 @@ picglue ()
     cdbStructBlock (0);
 
   vFile = tempfile();
-  /* PENDING: this isnt the best place but it will do */
-  if (port->general.glue_up_main) {
-    /* create the interrupt vector table */
-    pic14createInterruptVect (vFile);
-  }
 
   addSetHead(&tmpfileSet,vFile);
     
@@ -802,6 +797,11 @@ picglue ()
   /* do the overlay segments */
   pic14emitOverlay(ovrFile);
 
+  /* PENDING: this isnt the best place but it will do */
+  if (port->general.glue_up_main) {
+    /* create the interrupt vector table */
+    pic14createInterruptVect (vFile);
+  }
 
   AnalyzepCode('*');
 

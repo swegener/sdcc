@@ -17,7 +17,7 @@ static char _defaultRules[] =
 #include "peeph.rul"
 };
 
-/* list of key words used by msc51 */
+/* list of key words used by pic16 */
 static char *_pic16_keywords[] =
 {
   "at",
@@ -240,6 +240,8 @@ _pic16_genAssemblerPreamble (FILE * of)
 
   fprintf (of, "\tlist\tp=%s\n",&name[1]);
   fprintf (of, "\tinclude \"%s.inc\"\n",name);
+
+#if 0
   fprintf (of, "\t__config _CONFIG1H,0x%x\n",pic16_getConfigWord(0x300001));
   fprintf (of, "\t__config _CONFIG2L,0x%x\n",pic16_getConfigWord(0x300002));
   fprintf (of, "\t__config _CONFIG2H,0x%x\n",pic16_getConfigWord(0x300003));
@@ -251,6 +253,8 @@ _pic16_genAssemblerPreamble (FILE * of)
   fprintf (of, "\t__config _CONFIG6H,0x%x\n",pic16_getConfigWord(0x30000b));
   fprintf (of, "\t__config _CONFIG7L,0x%x\n",pic16_getConfigWord(0x30000c));
   fprintf (of, "\t__config _CONFIG7H,0x%x\n",pic16_getConfigWord(0x30000d));
+#endif
+
   fprintf (of, "\tradix dec\n");
 }
 
@@ -336,7 +340,7 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 */
 static const char *_linkCmd[] =
 {
-  "aslink", "-nf", "$1", NULL
+  "gplink", "\"$1.o\"", "-o $1", "$l", NULL
 };
 
 /* Sigh. This really is not good. For now, I recommend:
@@ -345,7 +349,7 @@ static const char *_linkCmd[] =
  */
 static const char *_asmCmd[] =
 {
-  "gpasm", "-c  -I /usr/local/share/gpasm/header", "$1.asm", NULL
+  "gpasm", "-c  -I /usr/local/share/gputils/header", "\"$1.asm\"", NULL
 
 };
 

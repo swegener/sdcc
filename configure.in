@@ -577,6 +577,17 @@ else
     AC_DEFINE_UNQUOTED(OPT_DISABLE_PIC, 0)
 fi
 
+AC_ARG_ENABLE(pic16-port,
+            AC_HELP_STRING([--disable-pic16-port],
+                           [Excludes the PIC port]))
+echo pic16 >>ports.all
+if test "$enable_pic16_port" = "no"; then
+    AC_DEFINE_UNQUOTED(OPT_DISABLE_PIC16, 1)
+else
+    echo pic16 >>ports.build
+    AC_DEFINE_UNQUOTED(OPT_DISABLE_PIC16, 0)
+fi
+
 AC_ARG_ENABLE(xa51-port,
             AC_HELP_STRING([--disable-xa51-port],
                            [Excludes the XA51 port]))

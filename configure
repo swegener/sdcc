@@ -875,6 +875,7 @@ Optional Features:
   --disable-ds390-port    Excludes the DS390 port
   --disable-ds400-port    Excludes the DS400 port
   --disable-pic-port      Excludes the PIC port
+  --disable-pic16-port    Excludes the PIC16 port
   --disable-xa51-port     Excludes the XA51 port
   --disable-ucsim         Disables configuring and building of ucsim
   --disable-device-lib-build
@@ -6578,6 +6579,25 @@ else
     echo pic >>ports.build
     cat >>confdefs.h <<_ACEOF
 #define OPT_DISABLE_PIC 0
+_ACEOF
+
+fi
+
+# Check whether --enable-pic16-port or --disable-pic16-port was given.
+if test "${enable_pic16_port+set}" = set; then
+  enableval="$enable_pic16_port"
+
+fi;
+echo pic16 >>ports.all
+if test "$enable_pic16_port" = "no"; then
+    cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_PIC16 1
+_ACEOF
+
+else
+    echo pic16 >>ports.build
+    cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_PIC16 0
 _ACEOF
 
 fi

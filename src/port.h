@@ -14,6 +14,7 @@
 #define TARGET_ID_AVR      4
 #define TARGET_ID_DS390    5
 #define TARGET_ID_PIC      6
+#define TARGET_ID_PIC16	   7
 #define TARGET_ID_XA51     9
 #define TARGET_ID_DS400	   10
 
@@ -27,6 +28,7 @@
 #define TARGET_IS_DS390 (port->id==TARGET_ID_DS390)
 #define TARGET_IS_DS400 (port->id==TARGET_ID_DS400)
 #define TARGET_IS_PIC   (port->id==TARGET_ID_PIC)
+#define TARGET_IS_PIC16	(port->id==TARGET_ID_PIC16)
 #define TARGET_IS_XA51 (port->id==TARGET_ID_XA51)
 
 #define MAX_BUILTIN_ARGS	16
@@ -280,6 +282,9 @@ extern PORT ds390_port;
 #if !OPT_DISABLE_PIC
 extern PORT pic_port;
 #endif
+#if !OPT_DISABLE_PIC16
+extern PORT pic16_port;
+#endif
 #if !OPT_DISABLE_TININative
 extern PORT tininative_port;
 #endif
@@ -289,5 +294,7 @@ extern PORT xa51_port;
 #if !OPT_DISABLE_DS400
 extern PORT ds400_port;
 #endif
+
+#define DEFAULT_PORT	pic16_port
 
 #endif /* PORT_INCLUDE*/

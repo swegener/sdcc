@@ -264,6 +264,8 @@ void pic16_emitcode (char *inst,char *fmt, ...)
     lineCurr->isInline = _G.inLine;
     lineCurr->isDebug  = _G.debugLine;
 
+// VR    fprintf(stderr, "lb = <%s>\n", lbp);
+
     if(pic16_debug_verbose)
       pic16_addpCode2pBlock(pb,pic16_newpCodeCharP(lb));
 
@@ -1919,10 +1921,22 @@ static void genCpl (iCode *ic)
 
     size = AOP_SIZE(IC_RESULT(ic));
     while (size--) {
+/*
         char *l = pic16_aopGet(AOP(IC_LEFT(ic)),offset,FALSE,FALSE);
         MOVA(l);       
         pic16_emitcode("cpl","a");
         pic16_aopPut(AOP(IC_RESULT(ic)),"a",offset++);
+*/
+	if (pic16_sameRegs(AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic))) ) {
+	      DEBUGpic16_emitcode("; ", "same registers");
+	      pic16_emitpcode(POC_COMF,  pic16_popGet(AOP(IC_LEFT(ic)), offset));
+	} else {
+		DEBUGpic16_emitcode(";",  "not sames registers!");
+		pic16_emitpcode(POC_COMFW, pic16_popGet(AOP(IC_LEFT(ic)),offset));
+		pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(IC_RESULT(ic)),offset));
+	}
+	offset++;
+
     }
 
 
@@ -9909,6 +9923,7 @@ void genpic16Code (iCode *lic)
     pb = pic16_newpCodeChain(GcurMemmap,0,pic16_newpCodeCharP("; Starting pCode block"));
     pic16_addpBlock(pb);
 
+#if 0
     /* if debug information required */
     if (options.debug && currFunc) { 
       if (currFunc) {
@@ -9924,11 +9939,13 @@ void genpic16Code (iCode *lic)
 	_G.debugLine = 0;
       }
     }
-
+#endif
 
     for (ic = lic ; ic ; ic = ic->next ) {
 
-      DEBUGpic16_emitcode(";ic","");
+//      fprintf(stderr, "; VR = %c %x\n", ic->op, ic->op);
+//      DEBUGpic16_emitcode("; VR", "");
+      DEBUGpic16_emitcode(";ic ", "\t%c 0x%x",ic->op, ic->op);
 	if ( cln != ic->lineno ) {
 	    if ( options.debug ) {
 		_G.debugLine = 1;
@@ -10160,3 +10177,4 @@ void genpic16Code (iCode *lic)
 
     return;
 }
+

@@ -1144,9 +1144,9 @@ checkSClass (symbol * sym, int isProto)
   /* if absolute address given then it mark it as
      volatile -- except in the PIC port */
 
-#if !OPT_DISABLE_PIC
+#if !OPT_DISABLE_PIC || !OPT_DISABLE_PIC16
   /* The PIC port uses a different peep hole optimizer based on "pCode" */
-  if (!TARGET_IS_PIC)
+  if (!TARGET_IS_PIC && !TARGET_IS_PIC16)
 #endif
 
     if (IS_ABSOLUTE (sym->etype))

@@ -66,7 +66,7 @@ struct options options;
 int preProcOnly = 0;
 int noAssemble = 0;
 set *asmOptions = NULL;         /* set of assembler options */
-char *linkOptions[128];
+set /*char*/ *linkOptions=NULL;		/* set of linker options [128]; */
 char *libFiles[128];
 int nlibFiles = 0;
 char *libPaths[128];
@@ -140,10 +140,14 @@ optionsTable[] = {
     { 0,    OPTION_LARGE_MODEL,     NULL, "external data space is used" },
     { 0,    OPTION_MEDIUM_MODEL,    NULL, "not supported" },
     { 0,    OPTION_SMALL_MODEL,     NULL, "internal data space is used (default)" },
+#if !OPT_DISABLE_DS390
     { 0,    OPTION_FLAT24_MODEL,    NULL, "use the flat24 model for the ds390 (default)" },
+#endif
     { 0,    "--stack-auto",         &options.stackAuto, "Stack automatic variables" },
+#if !OPT_DISABLE_DS390
     { 0,    OPTION_STACK_8BIT,      NULL, "use the 8bit stack for the ds390 (not supported yet)" },
     { 0,    "--stack-10bit",        &options.stack10bit, "use the 10bit stack for ds390 (default)" },
+#endif
     { 0,    "--xstack",             &options.useXstack, "Use external stack" },
     { 0,    OPTION_NO_GCSE,         NULL, "Disable the GCSE optimisation" },
     { 0,    OPTION_NO_LABEL_OPT,    NULL, "Disable label optimisation" },
@@ -198,11 +202,19 @@ optionsTable[] = {
     { 0,    "--profile",            &options.profile, "On supported ports, generate extra profiling information" },
     { 0,    "--fommit-frame-pointer", &options.ommitFramePtr, "Leave out the frame pointer." },
     { 0,    "--all-callee-saves",   &options.all_callee_saves, "callee will always save registers used" },
+#if !OPT_DISABLE_DS390
     { 0,    "--use-accelerator",    &options.useAccelerator,"generate code for  DS390 Arithmetic Accelerator"},
+#endif
     { 0,    "--stack-probe",   	    &options.stack_probe,"insert call to function __stack_probe at each function prologue"},
+#if !OPT_DISABLE_TININative
     { 0,    "--tini-libid",   	    NULL,"<nnnn> LibraryID used in -mTININative"},
+#endif
+#if !OPT_DISABLE_DS390
     { 0,    "--protect-sp-update",  &options.protect_sp_update,"DS390 - will disable interrupts during ESP:SP updates"},
+#endif
+#if !OPT_DISABLE_DS390 || !OPT_DISABLE_MCS51
     { 0,    "--parms-in-bank1",	    &options.parms_in_bank1,"MCS51/DS390 - use Bank1 for parameter passing"},
+#endif
     { 0,    OPTION_NO_XINIT_OPT,    &options.noXinitOpt, "don't memcpy initialized xram from code"},
     { 0,    OPTION_NO_CCODE_IN_ASM, &options.noCcodeInAsm, "don't include c-code as comments in the asm file"},
     { 0,    OPTION_ICODE_IN_ASM,    &options.iCodeInAsm, "include i-code as comments in the asm file"},
@@ -268,6 +280,9 @@ static PORT *_ports[] =
 #if !OPT_DISABLE_PIC
   &pic_port,
 #endif
+#if !OPT_DISABLE_PIC16
+  &pic16_port,
+#endif
 #if !OPT_DISABLE_TININative
   &tininative_port,
 #endif
@@ -283,6 +298,9 @@ static PORT *_ports[] =
 
 #if !OPT_DISABLE_PIC
 extern void picglue ();
+#endif
+#if !OPT_DISABLE_PIC16
+extern void pic16glue();
 #endif
 
 /** Sets the port to the one given by the command line option.
@@ -347,8 +365,15 @@ _findPort (int argc, char **argv)
 	}
       argv++;
     }
+
   /* Use the first in the list */
-  port = _ports[0];
+#if defined(DEFAULT_PORT)
+	/* VR - 13/5/2003 DEFAULT_PORT is defined in port.h */
+	port = &DEFAULT_PORT;
+#else
+	port = _ports[0];
+#endif
+
 }
 
 /* search through the command line options for the processor */
@@ -500,7 +525,7 @@ setDefaultOptions ()
   int i;
 
   for (i = 0; i < 128; i++)
-    preArgv[i] = linkOptions[i] = relFiles[i] = libFiles[i] = libPaths[i] = NULL;
+    preArgv[i] = /*linkOptions[i] = */relFiles[i] = libFiles[i] = libPaths[i] = NULL;
 
   /* first the options part */
   options.stack_loc = 0;	/* stack pointer initialised to 0 */
@@ -1096,7 +1121,7 @@ parseCmdLine (int argc, char **argv)
 	      /* linker options */
 	      else if (argv[i][2] == 'l')
 		{
-                  parseWithComma(linkOptions, getStringArg("-Wl", argv, &i, argc));
+                  setParseWithComma(&linkOptions, getStringArg("-Wl", argv, &i, argc));
 		}
               /* assembler options */
 	      else if (argv[i][2] == 'a')
@@ -1340,9 +1365,9 @@ linkEdit (char **envp)
   }
 
   /* add the extra linker options */
-  for (i = 0; linkOptions[i]; i++)
-    fprintf (lnkfile, "%s\n", linkOptions[i]);
-
+  for (i = 0; i<elementsInSet(linkOptions); i++)
+    fprintf (lnkfile, "%s\n", (char *)indexSet(linkOptions, i));
+  
   /* other library paths if specified */
   for (i = 0; i < nlibPaths; i++)
     fprintf (lnkfile, "-k %s\n", libPaths[i]);
@@ -1467,13 +1492,18 @@ linkEdit (char **envp)
   if (port->linker.cmd)
     {
       char buffer2[PATH_MAX];
-      buildCmdLine (buffer2, port->linker.cmd, dstFileName, scratchFileName, NULL, NULL);
-      buildCmdLine2 (buffer, buffer2, sizeof(buffer));
+
+	/* VR 030517 - gplink needs linker options to set the linker script,*/
+	buildCmdLine (buffer2, port->linker.cmd, dstFileName, scratchFileName, NULL, linkOptions);
+
+	buildCmdLine2 (buffer, buffer2, sizeof(buffer));
     }
   else
     {
       buildCmdLine2 (buffer, port->linker.mcmd, sizeof(buffer));
     }
+
+//  if (options.verbose)fprintf(stderr, "linker command line: %s\n", buffer);
 
   system_ret = my_system (buffer);
   /* TODO: most linker don't have a -o parameter */
@@ -1978,8 +2008,18 @@ main (int argc, char **argv, char **envp)
 #if !OPT_DISABLE_PIC
         picglue ();
 #endif
-      }
-      else {
+
+      } else
+      if(TARGET_IS_PIC16) {
+	/* PIC16 port misc improvements Vangelis Rokas - 6-May-2003
+	  Generate .asm files for gpasm (just like PIC target) but use
+	  pic16glue()
+	*/
+      
+#if !OPT_DISABLE_PIC16
+	pic16glue();
+#endif
+      } else {
         glue ();
       }
 

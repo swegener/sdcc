@@ -739,12 +739,7 @@ processParms (ast * func,
   /* the parameter type must be at least castable */
   if (compareType (defParm->type, actParm->ftype) == 0) {
     werror (E_INCOMPAT_TYPES);
-    fprintf (stderr, "type --> '");
-    printTypeChain (actParm->ftype, stderr);
-    fprintf (stderr, "' ");
-    fprintf (stderr, "assigned to type --> '");
-    printTypeChain (defParm->type, stderr);
-    fprintf (stderr, "'\n");
+    printFromToType (actParm->ftype, defParm->type);
     return 1;
   }
 
@@ -791,6 +786,7 @@ ast *
 createIvalStruct (ast * sym, sym_link * type, initList * ilist)
 {
   ast *rast = NULL;
+  ast *lAst;
   symbol *sflds;
   initList *iloop;
 
@@ -805,8 +801,6 @@ createIvalStruct (ast * sym, sym_link * type, initList * ilist)
 
   for (; sflds; sflds = sflds->next, iloop = (iloop ? iloop->next : NULL))
     {
-      ast *lAst;
-
       /* if we have come to end */
       if (!iloop)
 	break;
@@ -3052,12 +3046,7 @@ decorateType (ast * tree)
       if (IS_VOID (LTYPE (tree)))
 	{
 	  werror (E_CAST_ZERO);
-	  fprintf (stderr, "type --> '");
-	  printTypeChain (RTYPE (tree), stderr);
-	  fprintf (stderr, "' ");
-	  fprintf (stderr, "assigned to type --> '");
-	  printTypeChain (LTYPE (tree), stderr);
-	  fprintf (stderr, "'\n");
+	  printFromToType(RTYPE(tree), LTYPE(tree));
 	}
 
       TETYPE (tree) = getSpec (TTYPE (tree) =
@@ -3117,11 +3106,7 @@ decorateType (ast * tree)
       if (compareType (currFunc->type->next, RTYPE (tree)) == 0)
 	{
 	  werror (W_RETURN_MISMATCH);
-	  fprintf (stderr, "from type '");
-	  printTypeChain (RTYPE(tree), stderr);
-	  fprintf (stderr, "' to type '");
-	  printTypeChain (currFunc->type->next, stderr);
-	  fprintf (stderr, "'\n");
+	  printFromToType (RTYPE(tree), currFunc->type->next);
 	  goto errorTreeReturn;
 	}
 

@@ -1658,13 +1658,7 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
     }
   }
   if (errors) {
-    /* fprintf (stderr, "%s%s %d: ", op->operand.symOperand->name,
-       implicit?"(implicit)":"", errors); */
-    fprintf (stderr, "from type '");
-    printTypeChain (optype, stderr);
-    fprintf (stderr, "' to type '");
-    printTypeChain (type, stderr);
-    fprintf (stderr, "'\n");
+    printFromToType (optype, type);
   }
 
   /* if they are the same size create an assignment */
@@ -2118,8 +2112,10 @@ geniCodeStruct (operand * left, operand * right, bool islval)
   SPEC_OCLS (retype) = SPEC_OCLS (etype);
   SPEC_VOLATILE (retype) |= SPEC_VOLATILE (etype);
 
+#if 1 // jwk
   if (IS_PTR (element->type))
     setOperandType (IC_RESULT (ic), aggrToPtr (operandType (IC_RESULT (ic)), TRUE));
+#endif
 
   IC_RESULT (ic)->isaddr = (!IS_AGGREGATE (element->type));
 
@@ -2708,11 +2704,6 @@ geniCodeParms (ast * parms, value *argVals, int *stack,
   if (argVals==NULL) {
     // first argument
     argVals=FUNC_ARGS(func->type);
-  }
-
-  if (parms->argSym || 
-      (parms->type!=EX_OP && parms->type!=EX_OPERAND)) {
-    fprintf (stderr, "What the fuck??\n");
   }
 
   /* if this is a param node then do the left & right */

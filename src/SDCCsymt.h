@@ -487,7 +487,8 @@ void *findSymWithLevel (bucket **, struct symbol *);
 void *findSymWithBlock (bucket **, struct symbol *, int);
 void changePointer (symbol * sym);
 void checkTypeSanity(sym_link *etype, char *name);
-/* noun strings */
-extern char *nounName(sym_link *);
+
+extern char *nounName(sym_link *); /* noun strings */
+extern void printFromToType (sym_link *, sym_link *);
 
 #endif

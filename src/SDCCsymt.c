@@ -26,6 +26,14 @@
 
 value *aggregateToPointer (value *val);
 
+void printFromToType(sym_link *from, sym_link *to) {
+  fprintf (stderr, "from type '");
+  printTypeChain (from, stderr);
+  fprintf (stderr, "'\nto type '");
+  printTypeChain (to, stderr);
+  fprintf (stderr, "'\n");
+}
+
 /* noun strings */
 char *nounName(sym_link *sl) {
   switch (SPEC_NOUN(sl)) 
@@ -543,10 +551,6 @@ mergeSpec (sym_link * dest, sym_link * src, char *name)
   if (!IS_SPEC(dest) || !IS_SPEC(src)) {
     werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "cannot merge declarator");
     exit (1);
-  }
-
-  if (getenv("DEBUG_mergeSpec")) {
-    fprintf (stderr, "mergeSpec: \"%s\"\n", name);
   }
 
   if (SPEC_NOUN(src)) {
@@ -1119,9 +1123,6 @@ checkSClass (symbol * sym, int isProto)
   if (getenv("DEBUG_SANITY")) {
     fprintf (stderr, "checkSClass: %s \n", sym->name);
   }
-  if (strcmp(sym->name, "_testsGlobal")==0) {
-    printf ("oach\n");
-  }
   
   /* type is literal can happen foe enums change
      to auto */
@@ -1563,8 +1564,8 @@ aggregateToPointer (value * val)
 	case S_FIXED:
 	  if (SPEC_OCLS(val->etype)) {
 	    DCL_TYPE(val->type)=PTR_TYPE(SPEC_OCLS(val->etype));
+	    break;
 	  }
-	  break;
 
 	  if (TARGET_IS_DS390)
 	    {
@@ -1675,12 +1676,7 @@ checkFunction (symbol * sym, symbol *csym)
   if (compareType (csym->type, sym->type) <= 0)
     {
       werror (E_PREV_DEF_CONFLICT, csym->name, "type");
-      werror (W_CONTINUE, "previous definition type ");
-      printTypeChain (csym->type, stderr);
-      fprintf (stderr, "\n");
-      werror (W_CONTINUE, "current definition type ");
-      printTypeChain (sym->type, stderr);
-      fprintf (stderr, "\n");
+      printFromToType(csym->type, sym->type);
       return 0;
     }
 
@@ -1731,6 +1727,7 @@ checkFunction (symbol * sym, symbol *csym)
       if (compareType (exargs->type, checkValue->type) <= 0)
 	{
 	  werror (E_ARG_TYPE, argCnt);
+	  printFromToType(exargs->type, checkValue->type);
 	  return 0;
 	}
     }

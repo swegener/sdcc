@@ -561,11 +561,21 @@ _hash (const char *sz)
 void 
 shash_add (hTab ** h, const char *szKey, const char *szValue)
 {
+  char *val;
   int key = _hash (szKey);
-  /* First, delete any that currently exist */
-  hTabDeleteByKey (h, key, szKey, _compare);
+
+  /* Find value of the item */
+  val = (char *)hTabFindByKey(*h, key, szKey, _compare);
+  /* Delete any that currently exist */
+  hTabDeleteByKey(h, key, szKey, _compare);
+  /* Deallocate old value in not NULL */
+  if (val != NULL)
+    Safe_free(val);
+  /* Duplicate new value if not NULL */
+  if (szValue != NULL)
+    szValue = Safe_strdup(szValue);
   /* Now add in ours */
-  hTabAddItemLong (h, key, Safe_strdup (szKey), Safe_strdup (szValue));
+  hTabAddItemLong (h, key, Safe_strdup (szKey), (void *)szValue);
 }
 
 const char *

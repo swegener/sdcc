@@ -40,7 +40,7 @@ ASSOURCES	= $(patsubst %.o,%.c,$(ASOBJECTS))
 LKOBJECTS	= lkmain.o lkhead.o lkarea.o lkdata.o \
 		  lkeval.o lklex.o lksym.o lkrloc.o \
 		  lklibr.o lklist.o lkihx.o lks19.o \
-		  lkstore.o lknoice.o
+		  lkstore.o lknoice.o lkmem.o lkomf51.o
 LKSOURCES	= $(patsubst %.o,%.c,$(LKOBJECTS))
 
 ASX8051		= $(PRJDIR)/bin/asx8051

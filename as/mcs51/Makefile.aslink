@@ -7,7 +7,7 @@ TARGETS=$(SDCCDIR)/bin/aslink
 ALLOBJECTS= lkmain.o lkhead.o lkarea.o lkdata.o\
              lkeval.o lklex.o lksym.o lkrloc.o\
              lklibr.o lklist.o lkihx.o lks19.o\
-             lkstore.o lknoice.o 
+             lkstore.o lknoice.o lkmem.o lkomf51.o
 all:: $(TARGETS)
 
 clean::
@@ -54,6 +54,12 @@ lkstore.o : lkstore.c aslink.h
 
 lknoice.o : lknoice.c aslink.h
 	$(CC) $(CFLAGS) $(LDFLAGS) -c -o lknoice.o lknoice.c
+
+lkmem.o : lkmem.c aslink.h
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o lkmem.o lkmem.c
+
+lkomf51.o : lkomf51.c aslink.h
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o lkomf51.o lkomf51.c
 
 $(TARGETS): $(ALLOBJECTS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(ALLOBJECTS) 

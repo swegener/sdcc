@@ -1,3 +1,7 @@
+2003-12-11 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/z80/ralloc.c: set DISABLE_PACK_HL = 1 as a temporary fix to bug #855165
+
 2003-12-10 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCCdebug.c (outputDebugSymbols, outputDebugStackSymbols, dumpSymInfo):

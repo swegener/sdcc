@@ -2230,7 +2230,7 @@ ast *decorateType (ast *tree)
 	/*----------------------------*/
 	/*         casting            */
 	/*----------------------------*/
-    case CAST   :  /* change the type   */
+    case CAST:  /* change the type   */
 	/* cannot cast to an aggregate type */
 	if (IS_AGGREGATE(LTYPE(tree))) {
 	    werror(E_CAST_ILLEGAL);
@@ -2261,7 +2261,7 @@ ast *decorateType (ast *tree)
 	/*       logical &&, ||       */
 	/*----------------------------*/
     case AND_OP:
-    case OR_OP :
+    case OR_OP:
 	/* each must me arithmetic type or be a pointer */
 	if (!IS_PTR(LTYPE(tree)) && 
 	    !IS_ARRAY(LTYPE(tree)) && 

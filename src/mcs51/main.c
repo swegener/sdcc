@@ -243,5 +243,6 @@ PORT mcs51_port =
   0,				/* leave == */
   FALSE,                        /* No array initializer support. */
   cseCostEstimation,
+  NULL, 			/* no builtin functions */
   PORT_MAGIC
 };

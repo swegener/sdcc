@@ -2067,6 +2067,8 @@ packRegsDPTRuse (iCode * lic, operand * op, eBBlock * ebp)
     for (; ic && ic->seq <= OP_SYMBOL(op)->liveTo;
 	 ic = hTabNextItem(iCodeSeqhTab,&key)) {
 
+	if (SKIP_IC3(ic)) continue;
+
 	/* if PCALL cannot be sure give up */
 	if (ic->op == PCALL) return NULL;
 

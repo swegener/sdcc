@@ -513,6 +513,7 @@ PORT z80_port =
   0,				/* leave == */
   TRUE,                         /* Array initializer support. */	
   0,                            /* no CSE cost estimation yet */
+  NULL, 			/* no builtin functions */
   PORT_MAGIC
 };
 
@@ -596,5 +597,6 @@ PORT gbz80_port =
   0,				/* leave == */
   TRUE,                         /* Array initializer support. */
   0,                            /* no CSE cost estimation yet */
+  NULL, 			/* no builtin functions */
   PORT_MAGIC
 };

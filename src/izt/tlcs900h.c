@@ -209,5 +209,6 @@ PORT tlcs900h_port =
   0,				/* leave == */
   FALSE,                        /* No array initializer support. */	
   0,                            /* no CSE cost estimation yet */
+  NULL, 			/* no builtin functions */
   PORT_MAGIC
 };

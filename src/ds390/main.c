@@ -43,7 +43,11 @@ static char *_ds390_keywords[] =
   NULL
 };
 
-
+static builtins __ds390_builtins[] = {
+    { "__builtin_memcpy_x2x","v",3,{"cx*","cx*","i"}}, /* void __builtin_memcpy_x2x (xdata char *,xdata char *,int) */
+    { "__builtin_memcpy_c2x","v",3,{"cx*","cp*","i"}}, /* void __builtin_memcpy_c2x (xdata char *,code  char *,int) */
+    { NULL , NULL,0, {NULL}} 			   /* mark end of table */
+};    
 void ds390_assignRegisters (eBBlock ** ebbs, int count);
 
 static int regParmFlg = 0;	/* determine if we can register a parameter */
@@ -120,6 +124,8 @@ _ds390_finaliseOptions (void)
     {
     fprintf (stderr,
 	     "*** error: ds390 port only supports the 10 bit stack mode.\n");
+    } else {
+	if (!options.stack_loc) options.stack_loc = 0x400000;
     }
     
     /* generate native code 16*16 mul/div */
@@ -323,5 +329,6 @@ PORT ds390_port =
   0,				/* leave == */
   TRUE,                         /* we support array initializers. */
   cseCostEstimation,
+  __ds390_builtins,             /* table of builtin functions */
   PORT_MAGIC
 };

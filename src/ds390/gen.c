@@ -473,13 +473,13 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool useDP2)
 				     ((short) sym->stack)) >> 8) & 0xff);
       if (useDP2) {
 	  if (options.model == MODEL_FLAT24)
-	      emitcode ("mov", "dpx1,#0x40");
+	      emitcode ("mov", "dpx1,#0x%02x", (options.stack_loc >> 16) & 0xff);
 	  TR_DPTR("#2");
 	  emitcode ("mov", "dph1,a");
 	  emitcode ("mov", "dpl1,b");
       } else {
 	  if (options.model == MODEL_FLAT24)
-	      emitcode ("mov", "dpx,#0x40");
+	      emitcode ("mov", "dpx,#0x%02x", (options.stack_loc >> 16) & 0xff);
 	  emitcode ("mov", "dph,a");
 	  emitcode ("mov", "dpl,b");
       }
@@ -9928,15 +9928,17 @@ genAddrOf (iCode * ic)
       
       /* if 10 bit stack */
       if (options.stack10bit) {
+	  char buff[10];
+	  sprintf(buff,"#0x%02x",(options.stack_loc >> 16) & 0xff);
 	  /* if it has an offset then we need to compute it */
-      emitcode ("subb", "a,#0x%02x",
-		-((sym->stack < 0) ?
-		  ((short) (sym->stack - _G.nRegsSaved)) :
-		  ((short) sym->stack)) & 0xff);
-      emitcode ("mov","b,a");
-      emitcode ("mov","a,#0x%02x",(-((sym->stack < 0) ?
-				     ((short) (sym->stack - _G.nRegsSaved)) :
-				     ((short) sym->stack)) >> 8) & 0xff);
+	  emitcode ("subb", "a,#0x%02x",
+		    -((sym->stack < 0) ?
+		      ((short) (sym->stack - _G.nRegsSaved)) :
+		      ((short) sym->stack)) & 0xff);
+	  emitcode ("mov","b,a");
+	  emitcode ("mov","a,#0x%02x",(-((sym->stack < 0) ?
+					 ((short) (sym->stack - _G.nRegsSaved)) :
+					 ((short) sym->stack)) >> 8) & 0xff);
 	  if (sym->stack) {
 	      emitcode ("mov", "a,_bpx");
 	      emitcode ("add", "a,#0x%02x", ((sym->stack < 0) ? 
@@ -9949,12 +9951,12 @@ genAddrOf (iCode * ic)
 					      ((short) sym->stack )) >> 8) & 0xff);
 	      aopPut (AOP (IC_RESULT (ic)), "b", 0);
 	      aopPut (AOP (IC_RESULT (ic)), "a", 1);
-	      aopPut (AOP (IC_RESULT (ic)), "#0x40", 2);
+	      aopPut (AOP (IC_RESULT (ic)), buff, 2);
 	  } else {
 	      /* we can just move _bp */
 	      aopPut (AOP (IC_RESULT (ic)), "_bpx", 0);
 	      aopPut (AOP (IC_RESULT (ic)), "_bpx+1", 1);
-	      aopPut (AOP (IC_RESULT (ic)), "#0x40", 2);
+	      aopPut (AOP (IC_RESULT (ic)), buff, 2);
 	  }	  
       } else {
 	  /* if it has an offset then we need to compute it */
@@ -10727,6 +10729,140 @@ genReceive (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* genMemcpyX2X - gen code for memcpy xdata to xdata               */
+/*-----------------------------------------------------------------*/
+static void genMemcpyX2X( iCode *ic, int nparms, operand **parms, int fromc)
+{
+    operand *from , *to , *count;
+    symbol *lbl;
+
+    /* we know it has to be 3 parameters */
+    assert (nparms == 3);
+    
+    to = parms[0];
+    from = parms[1];
+    count = parms[2];
+
+    aopOp (from, ic->next, FALSE, FALSE);
+
+    /* get from into DPTR1 */
+    emitcode ("mov", "dpl1,%s", aopGet (AOP (from), 0, FALSE, FALSE, TRUE));
+    emitcode ("mov", "dph1,%s", aopGet (AOP (from), 1, FALSE, FALSE, TRUE));
+    if (options.model == MODEL_FLAT24) {
+	emitcode ("mov", "dpx1,%s", aopGet (AOP (from), 2, FALSE, FALSE, TRUE));
+    }
+
+    freeAsmop (from, NULL, ic, FALSE);
+    aopOp (to, ic, FALSE, FALSE);
+    /* get "to" into DPTR */
+    /* if the operand is already in dptr
+       then we do nothing else we move the value to dptr */
+    if (AOP_TYPE (to) != AOP_STR) {
+	/* if already in DPTR then we need to push */
+	if (AOP_TYPE(to) == AOP_DPTR) {
+	    emitcode ("push", "%s", aopGet (AOP (to), 0, FALSE, TRUE, TRUE));
+	    emitcode ("push", "%s", aopGet (AOP (to), 1, FALSE, TRUE, TRUE));
+	    if (options.model == MODEL_FLAT24)
+		emitcode ("mov", "dpx,%s", aopGet (AOP (to), 2, FALSE, FALSE, TRUE));
+	    emitcode ("pop", "dph");
+	    emitcode ("pop", "dpl");	    
+	} else {
+	    _startLazyDPSEvaluation ();
+	    /* if this is remateriazable */
+	    if (AOP_TYPE (to) == AOP_IMMD) {
+		emitcode ("mov", "dptr,%s", aopGet (AOP (to), 0, TRUE, FALSE, FALSE));
+	    } else {			/* we need to get it byte by byte */
+		emitcode ("mov", "dpl,%s", aopGet (AOP (to), 0, FALSE, FALSE, TRUE));
+		emitcode ("mov", "dph,%s", aopGet (AOP (to), 1, FALSE, FALSE, TRUE));
+		if (options.model == MODEL_FLAT24) {
+		    emitcode ("mov", "dpx,%s", aopGet (AOP (to), 2, FALSE, FALSE, TRUE));
+		}
+	    }
+	    _endLazyDPSEvaluation ();
+	}
+    }
+    freeAsmop (to, NULL, ic, FALSE);
+
+    aopOp (count, ic->next->next, FALSE,FALSE);
+    lbl =newiTempLabel(NULL);
+
+    /* now for the actual copy */
+    if (AOP_TYPE(count) == AOP_LIT && 
+	(int)floatFromVal (AOP(count)->aopu.aop_lit) <= 256) {
+	emitcode (";","OH! JOY auto increment with djnz (very fast)");
+	emitcode ("mov", "dps, #0x21"); 	/* Select DPTR2 & auto-toggle. */
+	emitcode ("mov", "b,%s",aopGet(AOP(count),0,FALSE,FALSE,FALSE));
+	emitcode ("","%05d$:",lbl->key+100);
+	if (fromc) {
+	    emitcode ("clr","a");
+	    emitcode ("movc", "a,@a+dptr");
+	} else 
+	    emitcode ("movx", "a,@dptr");
+	emitcode ("movx", "@dptr,a");
+	emitcode ("inc", "dptr");
+	emitcode ("inc", "dptr");
+	emitcode ("djnz","b,%05d$",lbl->key+100);
+    } else {
+	symbol *lbl1 = newiTempLabel(NULL);
+	
+	emitcode (";"," Auto increment but no djnz");
+	emitcode ("mov","ap,%s",aopGet (AOP (count), 0, FALSE, TRUE, TRUE));
+	emitcode ("mov","b,%s",aopGet (AOP (count), 1, FALSE, TRUE, TRUE));
+	emitcode ("mov", "dps, #0x21"); 	/* Select DPTR2 & auto-toggle. */
+	emitcode ("","%05d$:",lbl->key+100);
+	if (fromc) {
+	    emitcode ("clr","a");
+	    emitcode ("movc", "a,@a+dptr");
+	} else 
+	    emitcode ("movx", "a,@dptr");
+	emitcode ("movx", "@dptr,a");
+	emitcode ("inc", "dptr");
+	emitcode ("inc", "dptr");
+	emitcode ("mov","a,b");
+	emitcode ("orl","a,ap");
+	emitcode ("jz","%05d$",lbl1->key+100);
+	emitcode ("mov","a,ap");
+	emitcode ("add","a,#0xFF");
+	emitcode ("mov","ap,a");
+	emitcode ("mov","a,b");
+	emitcode ("addc","a,#0xFF");
+	emitcode ("mov","b,a");
+	emitcode ("sjmp","%05d$",lbl->key+100);
+	emitcode ("","%05d$:",lbl1->key+100);
+    }
+    emitcode ("mov", "dps, #0"); 
+    freeAsmop (count, NULL, ic, FALSE);
+
+}
+
+/*-----------------------------------------------------------------*/
+/* genBuiltIn - calls the appropriate function to  generating code */
+/* for a built in function 					   */
+/*-----------------------------------------------------------------*/
+static void genBuiltIn (iCode *ic)
+{
+    operand *bi_parms[MAX_BUILTIN_ARGS];
+    int nbi_parms;
+    iCode *bi_iCode;
+    symbol *bif;
+
+    /* get all the arguments for a built in function */
+    bi_iCode = getBuiltinParms(ic,&nbi_parms,bi_parms);
+
+    /* which function is it */
+    bif = OP_SYMBOL(IC_LEFT(bi_iCode));
+    if (strcmp(bif->name,"__builtin_memcpy_x2x")==0) {
+	genMemcpyX2X(bi_iCode,nbi_parms,bi_parms,0);
+    } else if (strcmp(bif->name,"__builtin_memcpy_c2x")==0) {
+	genMemcpyX2X(bi_iCode,nbi_parms,bi_parms,1);
+    } else {
+	werror(E_INTERNAL_ERROR,"unknown builtin function encountered\n");
+	return ;
+    }
+    return ;    
+}
+
+/*-----------------------------------------------------------------*/
 /* gen390Code - generate code for Dallas 390 based controllers     */
 /*-----------------------------------------------------------------*/
 void
@@ -10973,7 +11109,8 @@ gen390Code (iCode * lic)
 	  break;
 
 	case SEND:
-	  addSet (&_G.sendSet, ic);
+	  if (ic->builtinSEND) genBuiltIn(ic);
+	  else addSet (&_G.sendSet, ic);
 	  break;
 
 	case ARRAYINIT:

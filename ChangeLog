@@ -1,3 +1,9 @@
+2004-02-29  Borut Razem <borut.razem AT siol.net>
+
+	* src/Makefile.in, src/SDCCutil.c, support/Util/findme.c,
+	support/Util/findme.h, support/Util/system.h: enhance binary relative
+	search for lib and include by using findProgramPath()
+
 2004-02-28 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCpeeph.h,

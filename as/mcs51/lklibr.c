@@ -54,7 +54,7 @@ typedef struct slibrarysymbol mlibrarysymbol;
 typedef struct slibrarysymbol *pmlibrarysymbol;
 
 struct slibrarysymbol {
-	char name[NCPS];
+	char * name; /*Warning: allocate memory before using*/
 	pmlibrarysymbol next;
 };
 
@@ -63,16 +63,19 @@ typedef struct slibraryfile *pmlibraryfile;
 
 struct slibraryfile {
 	int loaded;
-	char *libspc;
-	char *str;
-	char relfil[PATH_MAX];
-	char filename[PATH_MAX];
+	char * libspc;
+	char * relfil; /*Warning: allocate memory before using*/
+	char * filename; /*Warning: allocate memory before using*/
     long offset; //if > 0, the embedded file offset in the library file libspc
 	pmlibrarysymbol symbols;
 	pmlibraryfile next;
 };
 
+/* First entry in the library object symbol cache */
+pmlibraryfile libr=NULL;
+
 int buildlibraryindex();
+void freelibraryindex (void);
 #endif /* INDEXLIB */
 
 /*)Function	VOID	addpath()
@@ -166,7 +169,7 @@ addlib()
     }
     if(foundcount == 0)
     {
-        printf("?ASlink-Warning-Couldn't find library '%s'\n", ip);
+        fprintf(stderr, "?ASlink-Warning-Couldn't find library '%s'\n", ip);
     }
 }
 
@@ -380,10 +383,13 @@ search()
 			}
 		}
 	}
+#ifdef INDEXLIB
+    freelibraryindex();
+#endif
 }
 
 /*Load a .rel file embedded in a sdcclib file*/
-void LoadRel(FILE * libfp, char * ModName)
+void LoadRel(char * libfname, FILE * libfp, char * ModName)
 {
 	char str[NINPUT+2];
 	int state=0;
@@ -403,7 +409,8 @@ void LoadRel(FILE * libfp, char * ModName)
 					if(EQ(str, ModName)) state=1;
 					else
 					{
-						printf("Bad offset in library file str=%s, Modname=%s\n", str, ModName);
+						fprintf(stderr, "?Aslink-Error-Bad offset in library file %s(%s)\n",
+                            libfname, ModName);
 						lkexit(1);
 					}
 				}
@@ -549,7 +556,7 @@ int SdccLib(char * PathLib, FILE * libfp, char * DirLib, char * SymName)
 						
 						/*Jump to where the .rel begins and load it.*/
 						fseek(libfp, lbfh->offset, SEEK_SET);
-						LoadRel(libfp, ModName);
+						LoadRel(PathLib, libfp, ModName);
 
 						/* if cdb information required & .adb file present */
 						if (dflag && dfp)
@@ -644,9 +651,6 @@ int SdccLib(char * PathLib, FILE * libfp, char * DirLib, char * SymName)
 
 #ifdef INDEXLIB
 
-/* First entry in the library object symbol cache */
-mlibraryfile libr;
-
 int fndsym( char *name )
 {
 	struct lbfile *lbfh, *lbf;
@@ -657,16 +661,15 @@ int fndsym( char *name )
     int numfound=0;
 
 	/* Build the index if this is the first call to fndsym */
-	if (libr.next==NULL)
-		buildlibraryindex();
+	if (libr==NULL)	buildlibraryindex();
 	
 	/* Iterate through all library object files */
-	ThisLibr = libr.next;
-    FirstFound = libr.next; /*So gcc stops whining*/
+	ThisLibr = libr;
+    FirstFound = libr; /*So gcc stops whining*/
 	while (ThisLibr)
     {
 		/* Iterate through all symbols in an object file */
-		ThisSym = ThisLibr->symbols->next;
+		ThisSym = ThisLibr->symbols;
 
 		while (ThisSym)
         {
@@ -688,9 +691,9 @@ int fndsym( char *name )
 						lbf->next = lbfh;
 					}
 					lbfh->libspc = ThisLibr->libspc;
-					lbfh->filspc = ThisLibr->str;
+					lbfh->filspc = ThisLibr->filename;
 					lbfh->relfil = (char *) new (strlen(ThisLibr->relfil) + 1);
-					strcpy(lbfh->relfil,ThisLibr->relfil);
+					strcpy(lbfh->relfil, ThisLibr->relfil);
                     lbfh->offset = ThisLibr->offset;
                     if(lbfh->offset>0)
                     { /*For an embedded object file in a library*/
@@ -739,12 +742,12 @@ int fndsym( char *name )
                     {
                         if(numfound==1)
                         {
-                            printf("?Aslink-Warning-Definition of public symbol '%s'"
+                            fprintf(stderr, "?Aslink-Warning-Definition of public symbol '%s'"
                                    " found more than once:\n", name);
-                            printf("   Library: '%s', Module: '%s'\n",
+                            fprintf(stderr, "   Library: '%s', Module: '%s'\n",
                                     FirstFound->libspc, FirstFound->relfil);
                         }
-                        printf("   Library: '%s', Module: '%s'\n",
+                        fprintf(stderr, "   Library: '%s', Module: '%s'\n",
                                 ThisLibr->libspc, ThisLibr->relfil);
                         numfound++;
                     }
@@ -761,6 +764,7 @@ pmlibraryfile buildlibraryindex_SdccLib(char * PathLib, FILE * libfp, char * Dir
 {
 	char ModName[NCPS]="";
 	char FLine[MAXLINE+1];
+    char buff[PATH_MAX];
 	int state=0;
 	long IndexOffset=0, FileOffset;
     pmlibrarysymbol ThisSym = NULL;
@@ -795,27 +799,29 @@ pmlibraryfile buildlibraryindex_SdccLib(char * PathLib, FILE * libfp, char * Dir
 					sscanf(FLine, "%s %ld", ModName, &FileOffset);
 					state=2;
 
-                    /*create a new libraryfile object for this module*/
-					This->next = (pmlibraryfile)new( sizeof( mlibraryfile ));
-					if (This->next == NULL)
+                    /*Create a new libraryfile object for this module*/
+                    if(libr==NULL)
                     {
-						printf("panic: can't allocate memory.\n");
-						exit(-1);
-					}
-
-					This=This->next;
+                        libr=This=(pmlibraryfile)new( sizeof( mlibraryfile ));
+                    }
+                    else
+                    {
+					    This->next=(pmlibraryfile)new( sizeof( mlibraryfile ));
+					    This=This->next;
+                    }
 					This->next = NULL;
-					This->loaded=-1; /*Kind of useless, but...*/
+					This->loaded=-1;
                     This->offset=FileOffset+IndexOffset;
 					This->libspc=PathLib;
+                    
+                    This->relfil=(char *)new(strlen(ModName)+1);
 					strcpy(This->relfil, ModName);
-
-                    sprintf(This->filename, "%s%s%crel", DirLib, ModName, FSEPX);
-
-                    This->str=This->filename;
-
-					ThisSym = This->symbols = (pmlibrarysymbol)malloc( sizeof(mlibrarysymbol));
-					ThisSym->next = NULL;
+                    
+                    sprintf(buff, "%s%s%crel", DirLib, ModName, FSEPX);
+                    This->filename=(char *)new(strlen(buff)+1);
+                    strcpy(This->filename, buff);
+                    
+                    This->symbols=ThisSym=NULL; /*Start a new linked list of symbols*/
 				}
                 else if(EQ(FLine, "</INDEX>"))
 				{
@@ -832,14 +838,17 @@ pmlibraryfile buildlibraryindex_SdccLib(char * PathLib, FILE * libfp, char * Dir
                 else
 				{
 					/*Add the symbols*/
-					ThisSym->next = (pmlibrarysymbol)malloc(sizeof(mlibrarysymbol));
-					ThisSym=ThisSym->next;
-					if (ThisSym == NULL)
+                    if(ThisSym==NULL) /*First symbol of the current module*/
                     {
-						printf("panic: can't allocate memory.\n");
-						exit(-2);
-					}
+					    ThisSym=This->symbols=(pmlibrarysymbol)new(sizeof(mlibrarysymbol));
+                    }
+                    else
+                    {
+					    ThisSym->next = (pmlibrarysymbol)new(sizeof(mlibrarysymbol));
+    					ThisSym=ThisSym->next;
+                    }
 					ThisSym->next=NULL;
+                    ThisSym->name=(char *)new(strlen(FLine)+1);
 					strcpy(ThisSym->name, FLine);
                 }
             break;
@@ -861,13 +870,11 @@ int buildlibraryindex(void)
 {
 	FILE *libfp, *fp;
 	struct lbname *lbnh;
-	char relfil[NINPUT+2], *str, *path;
+	char relfil[NINPUT+2], str[PATH_MAX], *path;
 	char buf[NINPUT+2], c;
 	char symname[NINPUT+2];
-	pmlibraryfile This;
+	pmlibraryfile This=NULL;
 	pmlibrarysymbol ThisSym;
-
-	This=&libr;
 
 	/*
 	 * Search through every library in the linked list "lbnhead".
@@ -877,7 +884,7 @@ int buildlibraryindex(void)
     {
 		if ((libfp = fopen(lbnh->libspc, "r")) == NULL)
 		{
-			fprintf(stderr, "Cannot open library file %s\n",
+			fprintf(stderr, "?Aslink-Error-Cannot open library file %s\n",
 				lbnh->libspc);
 			lkexit(1);
 		}
@@ -895,8 +902,7 @@ int buildlibraryindex(void)
             chop_crlf(relfil);
             if (path != NULL)
             {
-				str = (char *)new(strlen(path)+strlen(relfil)+6);
-				strcpy(str,path);
+				strcpy(str, path);
 #ifdef	OTHERSYSTEM
 				if (str[strlen(str)-1] != '/')
 				{
@@ -906,14 +912,13 @@ int buildlibraryindex(void)
 			}
             else
             {
-				str = (char *)new(strlen(relfil) + 5);
+                strcpy(str, "");
 			}
 
             if(strcmp(relfil, "<SDCCLIB>")==0)
 			{
-                /*Get the built in index of a library*/
+                /*Get the built in index of this library*/
 				This=buildlibraryindex_SdccLib(lbnh->libspc, libfp, str, This);
-				free(str);
 				break; /*get the index for next library*/
 			}
                 
@@ -936,22 +941,28 @@ int buildlibraryindex(void)
             if ((fp = fopen(str, "r")) != NULL)
             {
                 /* Opened OK - create a new libraryfile object for it */
-                This->next = (pmlibraryfile)new( sizeof( mlibraryfile ));
-                if (This->next == NULL)
+                if(libr==NULL)
                 {
-	                printf("panic: can't allocate memory.\n");
-	                exit(-1);
+                    libr=This=(pmlibraryfile)new( sizeof( mlibraryfile ));
                 }
-
-			    This=This->next;
+                else
+                {
+					This->next=(pmlibraryfile)new( sizeof( mlibraryfile ));
+			        This=This->next;
+                }
 			    This->next = NULL;
 			    This->loaded=-1;
-                This->offset=-1; /*There should be a rel file*/
+                This->offset=-1; /*We have a stand alone .rel file*/
+				This->libspc = lbnh->libspc;
+                
+                This->relfil=(char *)new(strlen(relfil)+1);
+				strcpy(This->relfil, relfil);
+                
+                This->filename=(char *)new(strlen(str)+1);
+				strcpy(This->filename, str);
 
-				strcpy( This->filename, str );
-
-				ThisSym = This->symbols = (pmlibrarysymbol)malloc( sizeof(mlibrarysymbol));
-				ThisSym->next = NULL;
+                /*Start a new linked list of symbols for this module:*/
+                This->symbols=ThisSym=NULL;
 
 				/*
 				 * Read in the object file.  Look for lines that
@@ -982,28 +993,62 @@ int buildlibraryindex(void)
 					/* If it's an actual symbol, record it */
     				if (c == 'D')
                     {
-						ThisSym->next = (pmlibrarysymbol)malloc(sizeof(mlibrarysymbol));
-						ThisSym=ThisSym->next;
-						if (ThisSym == NULL)
+                        if(ThisSym==NULL)
                         {
-							printf("panic: can't allocate memory.\n");
-							exit(-2);
-						}
+				            ThisSym=This->symbols=(pmlibrarysymbol)new(sizeof(mlibrarysymbol));
+                        }
+                        else
+                        {
+						    ThisSym->next=(pmlibrarysymbol)new(sizeof(mlibrarysymbol));
+						    ThisSym=ThisSym->next;
+                        }
 						This->loaded=0;
 						ThisSym->next=NULL;
-						This->str = str;
-						strcpy(This->relfil,relfil);
+                        ThisSym->name=(char *)new(strlen(symname)+1);
 						strcpy(ThisSym->name, symname);
-						This->libspc = lbnh->libspc;
 					}
 				} /* Closes while - read object file */
 				fclose(fp);
 			} /* Closes if object file opened OK */
+            else
+            {
+			    fprintf(stderr, "?Aslink-Warning-Cannot open library module %s\n", str);
+            }
 		} /* Ends while - processing all in libr */
 		fclose(libfp);
 	} /* Ends good open of libr file */
 	return 0;
 }
+
+/*Release all memory allocated for the in-memory library index*/
+void freelibraryindex (void)
+{
+	pmlibraryfile ThisLibr, ThisLibr2Free;
+	pmlibrarysymbol ThisSym, ThisSym2Free;
+
+	ThisLibr = libr;
+
+    while (ThisLibr)
+    {
+		ThisSym = ThisLibr->symbols;
+
+		while (ThisSym)
+        {
+            free(ThisSym->name);
+            ThisSym2Free=ThisSym;
+            ThisSym=ThisSym->next;
+            free(ThisSym2Free);
+        }
+        free(ThisLibr->filename);
+        free(ThisLibr->relfil);
+        ThisLibr2Free=ThisLibr;
+        ThisLibr=ThisLibr->next;
+        free(ThisLibr2Free);
+    }
+    
+    libr=NULL;
+}
+
 #else /* INDEXLIB */
 
 int
@@ -1028,7 +1073,7 @@ char *name;
 	{
 		if ((libfp = fopen(lbnh->libspc, "r")) == NULL)
 		{
-			fprintf(stderr, "Cannot open library file %s\n",
+			fprintf(stderr, "?Aslink-Error-Cannot open library file %s\n",
 				lbnh->libspc);
 			lkexit(1);
 		}
@@ -1175,7 +1220,7 @@ void loadfile_SdccLib(char * libspc, char * module, long offset)
 	if ((fp = fopen(libspc,"r")) != NULL)
 	{
 		fseek(fp, offset, SEEK_SET);
-		LoadRel(fp, module);
+		LoadRel(libspc, fp, module);
 		fclose(fp);
 	}
 }
@@ -1260,3 +1305,4 @@ char *filspc;
 		fclose(fp);
 	}
 }
+

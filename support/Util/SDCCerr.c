@@ -355,6 +355,8 @@ struct
     "stray '\\' at column %d" },
 { W_NEWLINE_IN_STRING, ERROR_LEVEL_WARNING,
     "newline in string constant" },
+{ E_CANNOT_USE_GENERIC_POINTER, ERROR_LEVEL_ERROR,
+    "cannot use generic pointer %s to initialize %s" },
 };
 
 /*

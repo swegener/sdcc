@@ -160,6 +160,7 @@ static void
 emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 {
   symbol *sym;
+  ast *ival = NULL;
 
   if (addPublics)
     {
@@ -254,7 +255,6 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
          it is a global variable */
       if (sym->ival && sym->level == 0)
 	{
-	  ast *ival = NULL;
 
 	  if (IS_AGGREGATE (sym->type))
 	    ival = initAggregates (sym, sym->ival, NULL);
@@ -263,6 +263,10 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 		     decorateType (resolveSymbols (list2expr (sym->ival))));
 	  codeOutFile = statsg->oFile;
 	  allocInfo = 0;
+
+	  // set ival's lineno to where the symbol was defined
+	  ival->lineno=sym->lineDef;
+
 	  eBBlockFromiCode (iCodeFromAst (ival));
 	  allocInfo = 1;
 	  sym->ival = NULL;
@@ -431,7 +435,7 @@ printChar (FILE * ofile, char *s, int plen)
 /* return the generic pointer high byte for a given pointer type.  */
 /*-----------------------------------------------------------------*/
 int 
-pointerTypeToGPByte (const int p_type)
+pointerTypeToGPByte (const int p_type, const char *iname, const char *oname)
 {
   switch (p_type)
     {
@@ -442,6 +446,9 @@ pointerTypeToGPByte (const int p_type)
       /* hack - if we get a generic pointer, we just assume
        * it's an FPOINTER (i.e. in XDATA space).
        */
+      werror (E_CANNOT_USE_GENERIC_POINTER, iname, oname);
+      exit (1);
+      // fall through
     case FPOINTER:
       return 1;
     case CPOINTER:
@@ -487,11 +494,11 @@ printPointerType (FILE * oFile, const char *name)
 /* printGPointerType - generates ival for generic pointer type     */
 /*-----------------------------------------------------------------*/
 void 
-printGPointerType (FILE * oFile, const char *name,
+printGPointerType (FILE * oFile, const char *iname, const char *oname,
 		   const unsigned int type)
 {
-  _printPointerType (oFile, name);
-  fprintf (oFile, ",#0x%02x\n", pointerTypeToGPByte (type));
+  _printPointerType (oFile, iname);
+  fprintf (oFile, ",#0x%02x\n", pointerTypeToGPByte (type, iname, oname));
 }
 
 /*-----------------------------------------------------------------*/
@@ -719,7 +726,7 @@ printIvalFuncPtr (sym_link * type, initList * ilist, FILE * oFile)
 
   val = list2val (ilist);
   /* check the types   */
-  if ((dLvl = checkType (val->type, type->next)) <= 0)
+  if ((dLvl = compareType (val->type, type->next)) <= 0)
     {
       tfprintf (oFile, "\t!dw !constword\n", 0);
       return;
@@ -783,10 +790,17 @@ printIvalCharPtr (symbol * sym, sym_link * type, value * val, FILE * oFile)
 	}
       else if (size == GPTRSIZE)
 	{
-	  /* PENDING: 0x02 or 0x%02x, CDATA? */
-	  printGPointerType (oFile, val->name,
-			     (IS_PTR (val->type) ? DCL_TYPE (val->type) :
-			      PTR_TYPE (SPEC_OCLS (val->etype))));
+	  int type;
+	  if (IS_PTR (val->type)) {
+	    type = DCL_TYPE (val->type);
+	  } else {
+	    type = PTR_TYPE (SPEC_OCLS (val->etype));
+	  }
+	  if (val->sym && val->sym->isstrlit) {
+	    // this is a literal string
+	    type=CPOINTER;
+	  }
+	  printGPointerType (oFile, val->name, sym->name, type);
 	}
       else
 	{
@@ -855,7 +869,7 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
       return;
 
   /* check the type      */
-  if (checkType (type, val->type) == 0)
+  if (compareType (type, val->type) == 0)
     werror (E_INIT_WRONG);
 
   /* if val is literal */
@@ -896,7 +910,7 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
     }
   else if (size == GPTRSIZE)
     {
-      printGPointerType (oFile, val->name,
+      printGPointerType (oFile, val->name, sym->name,
 			 (IS_PTR (val->type) ? DCL_TYPE (val->type) :
 			  PTR_TYPE (SPEC_OCLS (val->etype))));
     }

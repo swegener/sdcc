@@ -1261,8 +1261,7 @@ _findPort (int argc, char **argv)
 {
   _validatePorts ();
 
-  argc--;
-  while (argc)
+  while (argc--)
     {
       if (!strncmp (*argv, "-m", 2))
 	{
@@ -1270,7 +1269,6 @@ _findPort (int argc, char **argv)
 	  return;
 	}
       argv++;
-      argc--;
     }
   /* Use the first in the list */
   port = _ports[0];

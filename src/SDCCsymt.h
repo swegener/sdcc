@@ -427,7 +427,7 @@ unsigned int bitsForType (sym_link *);
 sym_link *newIntLink ();
 sym_link *newCharLink ();
 sym_link *newLongLink ();
-int checkType (sym_link *, sym_link *);
+int compareType (sym_link *, sym_link *);
 int checkFunction (symbol *);
 void cleanUpLevel (bucket **, int);
 void cleanUpBlock (bucket **, int);

@@ -1021,7 +1021,7 @@ isOperandEqual (operand * left, operand * right)
       return (floatFromVal (left->operand.valOperand) ==
 	      floatFromVal (right->operand.valOperand));
     case TYPE:
-      if (checkType (left->operand.typeOperand,
+      if (compareType (left->operand.typeOperand,
 		     right->operand.typeOperand) == 1)
 	return 1;
     }
@@ -1513,7 +1513,7 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
     }
 
   /* if the operand is already the desired type then do nothing */
-  if (checkType (type, optype) == 1)
+  if (compareType (type, optype) == 1)
     return op;
 
   /* if this is a literal then just change the type & return */
@@ -1529,7 +1529,7 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
       !IS_GENPTR (type))
     {
       werror (E_INCOMPAT_CAST);
-      werror (E_CONTINUE, "from type '");
+      fprintf (stderr, "from type '");
       printTypeChain (optype, stderr);
       fprintf (stderr, "' to type '");
       printTypeChain (type, stderr);
@@ -2501,12 +2501,12 @@ geniCodeAssign (operand * left, operand * right, int nosupdate)
 
   /* first check the type for pointer assignement */
   if (left->isaddr && IS_PTR (ltype) && IS_ITEMP (left) &&
-      checkType (ltype, rtype) < 0)
+      compareType (ltype, rtype) < 0)
     {
-      if (checkType (ltype->next, rtype) < 0)
+      if (compareType (ltype->next, rtype) < 0)
 	right = geniCodeCast (ltype->next, right, TRUE);
     }
-  else if (checkType (ltype, rtype) < 0)
+  else if (compareType (ltype, rtype) < 0)
     right = geniCodeCast (ltype, right, TRUE);
 
   /* if left is a true symbol & ! volatile
@@ -3286,7 +3286,7 @@ ast2iCode (ast * tree,int lvl)
 	sym_link *rtype = operandType (right);
 	sym_link *ltype = operandType (left);
 	if (IS_PTR (rtype) && IS_ITEMP (right)
-	    && right->isaddr && checkType (rtype->next, ltype) == 1)
+	    && right->isaddr && compareType (rtype->next, ltype) == 1)
 	  right = geniCodeRValue (right, TRUE);
 	else
 	  right = geniCodeRValue (right, FALSE);
@@ -3318,7 +3318,7 @@ ast2iCode (ast * tree,int lvl)
 	sym_link *rtype = operandType (right);
 	sym_link *ltype = operandType (left);
 	if (IS_PTR (rtype) && IS_ITEMP (right)
-	    && right->isaddr && checkType (rtype->next, ltype) == 1)
+	    && right->isaddr && compareType (rtype->next, ltype) == 1)
 	  right = geniCodeRValue (right, TRUE);
 	else
 	  right = geniCodeRValue (right, FALSE);
@@ -3334,7 +3334,7 @@ ast2iCode (ast * tree,int lvl)
 	sym_link *rtype = operandType (right);
 	sym_link *ltype = operandType (left);
 	if (IS_PTR (rtype) && IS_ITEMP (right)
-	    && right->isaddr && checkType (rtype->next, ltype) == 1)
+	    && right->isaddr && compareType (rtype->next, ltype) == 1)
 	  {
 	    right = geniCodeRValue (right, TRUE);
 	  }

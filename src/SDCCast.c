@@ -738,7 +738,7 @@ processParms (ast * func,
     }
 
   /* the parameter type must be at least castable */
-  if (checkType (defParm->type, actParm->ftype) == 0)
+  if (compareType (defParm->type, actParm->ftype) == 0)
     {
       werror (E_TYPE_MISMATCH_PARM, *parmNumber);
       werror (E_CONTINUE, "defined type ");
@@ -750,7 +750,7 @@ processParms (ast * func,
     }
 
   /* if the parameter is castable then add the cast */
-  if (checkType (defParm->type, actParm->ftype) < 0)
+  if (compareType (defParm->type, actParm->ftype) < 0)
     {
       ast *pTree = resolveSymbols (copyAst (actParm));
 
@@ -2724,7 +2724,7 @@ decorateType (ast * tree)
       /* if they are pointers they must be castable */
       if (IS_PTR (LTYPE (tree)) && IS_PTR (RTYPE (tree)))
 	{
-	  if (checkType (LTYPE (tree), RTYPE (tree)) == 0)
+	  if (compareType (LTYPE (tree), RTYPE (tree)) == 0)
 	    {
 	      werror (E_COMPARE_OP);
 	      fprintf (stderr, "comparing type ");
@@ -2741,7 +2741,7 @@ decorateType (ast * tree)
 	  if (!((IS_PTR (LTYPE (tree)) && IS_LITERAL (RTYPE (tree))) ||
 		(IS_PTR (RTYPE (tree)) && IS_LITERAL (LTYPE (tree)))))
 
-	    if (checkType (LTYPE (tree), RTYPE (tree)) == 0)
+	    if (compareType (LTYPE (tree), RTYPE (tree)) == 0)
 	      {
 		werror (E_COMPARE_OP);
 		fprintf (stderr, "comparing type ");
@@ -2798,7 +2798,7 @@ decorateType (ast * tree)
 
     case ':':
       /* if they don't match we have a problem */
-      if (checkType (LTYPE (tree), RTYPE (tree)) == 0)
+      if (compareType (LTYPE (tree), RTYPE (tree)) == 0)
 	{
 	  werror (E_TYPE_MISMATCH, "conditional operator", " ");
 	  goto errorTreeReturn;
@@ -2963,7 +2963,7 @@ decorateType (ast * tree)
 	}
 
       /* they should either match or be castable */
-      if (checkType (LTYPE (tree), RTYPE (tree)) == 0)
+      if (compareType (LTYPE (tree), RTYPE (tree)) == 0)
 	{
 	  werror (E_TYPE_MISMATCH, "assignment", " ");
 	  fprintf (stderr, "type --> '");
@@ -3053,7 +3053,7 @@ decorateType (ast * tree)
       if (!tree->right)
 	goto voidcheck;
 
-      if (checkType (currFunc->type->next, RTYPE (tree)) == 0)
+      if (compareType (currFunc->type->next, RTYPE (tree)) == 0)
 	{
 	  werror (E_RETURN_MISMATCH);
 	  goto errorTreeReturn;
@@ -3068,7 +3068,7 @@ decorateType (ast * tree)
 	}
 
       /* if there is going to be a casing required then add it */
-      if (checkType (currFunc->type->next, RTYPE (tree)) < 0)
+      if (compareType (currFunc->type->next, RTYPE (tree)) < 0)
 	{
 #if 0 && defined DEMAND_INTEGER_PROMOTION
 	  if (IS_INTEGRAL (currFunc->type->next))

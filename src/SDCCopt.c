@@ -193,7 +193,7 @@ cnvToFloatCast (iCode * ic, eBBlock * ebp)
     {
       for (su = 0; su < 2; su++)
 	{
-	  if (checkType (type, __multypes[bwd][su]) == 1)
+	  if (compareType (type, __multypes[bwd][su]) == 1)
 	    {
 	      func = __conv[0][bwd][su];
 	      goto found;
@@ -262,7 +262,7 @@ cnvFromFloatCast (iCode * ic, eBBlock * ebp)
     {
       for (su = 0; su < 2; su++)
 	{
-	  if (checkType (type, __multypes[bwd][su]) == 1)
+	  if (compareType (type, __multypes[bwd][su]) == 1)
 	    {
 	      func = __conv[1][bwd][su];
 	      goto found;
@@ -332,7 +332,7 @@ convilong (iCode * ic, eBBlock * ebp, sym_link * type, int op)
     {
       for (su = 0; su < 2; su++)
 	{
-	  if (checkType (type, __multypes[bwd][su]) == 1)
+	  if (compareType (type, __multypes[bwd][su]) == 1)
 	    {
 	      if (op == '*')
 		func = __muldiv[0][bwd][su];

@@ -821,7 +821,7 @@ algebraicOpts (iCode * ic)
 	  SET_ISADDR (IC_RESULT (ic), 0);
 	}
       /* if casting to the same */
-      if (checkType (operandType (IC_RESULT (ic)),
+      if (compareType (operandType (IC_RESULT (ic)),
 		     operandType (IC_RIGHT (ic))) == 1)
 	{
 	  ic->op = '=';
@@ -1224,7 +1224,7 @@ fixUpTypes (iCode * ic)
   /* for pointer_gets if the types of result & left r the
      same then change it type of result to next */
   if (IS_PTR (t1) &&
-      checkType (t2 = operandType (IC_RESULT (ic)), t1) == 1)
+      compareType (t2 = operandType (IC_RESULT (ic)), t1) == 1)
     {
       setOperandType (IC_RESULT (ic), t2->next);
     }
@@ -1496,7 +1496,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	  !computeOnly)
 	{
 	  applyToSet (cseSet, findPrevIc, ic, &pdic);
-	  if (pdic && checkType (operandType (IC_RESULT (pdic)),
+	  if (pdic && compareType (operandType (IC_RESULT (pdic)),
 				 operandType (IC_RESULT (ic))) != 1)
 	    pdic = NULL;
 	}

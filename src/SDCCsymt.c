@@ -935,7 +935,7 @@ addSymChain (symbol * symHead)
 	  if (IS_EXTERN (csym->etype))
 	    {
 	      /* do types match ? */
-	      if (checkType (csym->type, sym->type) != 1)
+	      if (compareType (csym->type, sym->type) != 1)
 		/* no then error */
 		werror (E_DUPLICATE, csym->name);
 
@@ -956,7 +956,7 @@ addSymChain (symbol * symHead)
 	  /* then check the type with the current one         */
 	  if (IS_EXTERN (csym->etype))
 	    {
-	      if (checkType (csym->type, sym->type) <= 0)
+	      if (compareType (csym->type, sym->type) <= 0)
 		werror (W_EXTERN_MISMATCH, csym->name);
 	    }
 	}
@@ -1428,10 +1428,10 @@ computeType (sym_link * type1, sym_link * type2)
 }
 
 /*------------------------------------------------------------------*/
-/* checkType - will do type check return 1 if match                 */
+/* compareType - will do type check return 1 if match                 */
 /*------------------------------------------------------------------*/
 int 
-checkType (sym_link * dest, sym_link * src)
+compareType (sym_link * dest, sym_link * src)
 {
   if (!dest && !src)
     return 1;
@@ -1448,13 +1448,13 @@ checkType (sym_link * dest, sym_link * src)
       if (IS_DECL (src))
 	{
 	  if (DCL_TYPE (src) == DCL_TYPE (dest))
-	    return checkType (dest->next, src->next);
+	    return compareType (dest->next, src->next);
 	  else if (IS_PTR (src) && IS_PTR (dest))
 	    return -1;
 	  else if (IS_PTR (dest) && IS_ARRAY (src))
 	    return -1;
 	  else if (IS_PTR (dest) && IS_FUNC (dest->next) && IS_FUNC (src))
-	    return -1 * checkType (dest->next, src);
+	    return -1 * compareType (dest->next, src);
 	  else
 	    return 0;
 	}
@@ -1660,7 +1660,7 @@ checkFunction (symbol * sym)
     }
 
   /* check the return value type   */
-  if (checkType (csym->type, sym->type) <= 0)
+  if (compareType (csym->type, sym->type) <= 0)
     {
       werror (E_PREV_DEF_CONFLICT, csym->name, "type");
       werror (E_CONTINUE, "previous definition type ");
@@ -1716,7 +1716,7 @@ checkFunction (symbol * sym)
 	  checkValue = acargs;
 	}
 
-      if (checkType (exargs->type, checkValue->type) <= 0)
+      if (compareType (exargs->type, checkValue->type) <= 0)
 	{
 	  werror (E_ARG_TYPE, argCnt);
 	  return 0;

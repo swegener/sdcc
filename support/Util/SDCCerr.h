@@ -166,6 +166,7 @@ SDCCERR - SDCC Standard error handler
 #define	E_ARGUMENT_MISSING	148	/* Option requires an argument. */
 #define W_STRAY_BACKSLASH 149
 #define W_NEWLINE_IN_STRING 150 
+#define E_CANNOT_USE_GENERIC_POINTER 151
 
 /** Describes the maximum error level that will be logged.  Any level
  *  includes all of the levels listed after it.

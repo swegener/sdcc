@@ -764,13 +764,27 @@ basicInduction (region * loopReg, eBBlock ** ebbs, int count)
 	{
 
 	  operand *aSym;
-	  unsigned long litValue;
+	  long litValue;
 	  induction *ip;
 	  iCode *indIc;
 	  eBBlock *owner = NULL;
 	  int nexits;
+          sym_link *optype;
 
-	  /* look for assignments of the form */
+	  /* To find an induction variable, we need to */
+          /* find within the loop three iCodes in this */
+          /* general form:                             */
+          /*                                           */
+          /* ddic: iTempB    := symbolVar              */
+          /* dic:  iTempA    := iTempB + lit           */
+          /*    or iTempA    := iTempB - lit           */
+          /*    or iTempA    := lit + iTempB           */
+          /* ic:   symbolVar := iTempA                 */
+          /*                                           */
+          /* (symbolVar may also be an iTemp if it is  */
+          /*  register equivalent)                     */
+          
+          /* look for assignments of the form */
 	  /*   symbolVar := iTempNN */
 	  if (ic->op != '=')
 	    continue;
@@ -793,6 +807,15 @@ basicInduction (region * loopReg, eBBlock ** ebbs, int count)
 	  if (addressTaken (loopReg->regBlocks, IC_RESULT (ic)))
 	    continue;
 
+          /* Only consider variables with integral type. */
+          /* (2004/12/06 - EEP - ds390 fails regression tests unless */
+          /* pointers are also considered for induction (due to some */
+          /* register alloctaion bugs). Remove !IS_PTR clause when */
+          /* that gets fixed) */
+          optype = operandType (IC_RIGHT (ic));
+          if (!IS_INTEGRAL (optype) && !IS_PTR (optype))
+            continue;
+
 	  /* find the definition for the result in the block */
 	  if (!(dic = findDefInRegion (setFromSet (loopReg->regBlocks),
 				       IC_RIGHT (ic), &owner)))
@@ -801,14 +824,30 @@ basicInduction (region * loopReg, eBBlock ** ebbs, int count)
 	  /* if not +/- continue */
 	  if (dic->op != '+' && dic->op != '-')
 	    continue;
-
+	  
 	  /* make sure definition is of the form  a +/- c */
 	  if (!IS_OP_LITERAL (IC_LEFT (dic)) && !IS_OP_LITERAL (IC_RIGHT (dic)))
 	    continue;
+          
+          /* make sure the definition found is the only one */
+          if (assignmentsToSym (loopReg->regBlocks, IC_RIGHT (ic)) > 1)
+	    continue;
 
-	  aSym = (IS_OP_LITERAL (IC_RIGHT (dic)) ?
-	      (litValue = (unsigned long) operandLitValue (IC_RIGHT (dic)), IC_LEFT (dic)) :
-	      (litValue = (unsigned long) operandLitValue (IC_LEFT (dic)), IC_RIGHT (dic)));
+	  if (IS_OP_LITERAL (IC_RIGHT (dic)))
+            {
+              aSym = IC_LEFT (dic);
+              litValue = (long) operandLitValue (IC_RIGHT (dic));
+            }
+          else
+            {
+              /* For minus, the literal must not be on the left side. */
+              /* (Actually, this case could be handled, but it's probably */
+              /* not worth the extra code) */
+              if (dic->op == '-')
+                continue;
+              aSym = IC_RIGHT (dic);
+              litValue = (long) operandLitValue (IC_LEFT (dic));
+            }
 
 	  if (!isOperandEqual (IC_RESULT (ic), aSym) &&
 	      !isOperandEqual (IC_RIGHT (ic), aSym))
@@ -948,7 +987,7 @@ int
 loopInduction (region * loopReg, eBBlock ** ebbs, int count)
 {
   int change = 0;
-  eBBlock *lBlock, *lastBlock = NULL;
+  eBBlock *lBlock, *owner, *lastBlock = NULL;
   set *indVars = NULL;
   set *basicInd = NULL;
 
@@ -967,7 +1006,7 @@ loopInduction (region * loopReg, eBBlock ** ebbs, int count)
        lBlock = setNextItem (loopReg->regBlocks))
     {
 
-      iCode *ic, *indIc;
+      iCode *ic, *indIc, *dic;
       induction *ip;
 
       /* last block is the one with the highest block
@@ -978,14 +1017,18 @@ loopInduction (region * loopReg, eBBlock ** ebbs, int count)
       for (ic = lBlock->sch; ic; ic = ic->next)
 	{
 	  operand *aSym;
-	  unsigned long litVal;
+	  long litVal;
 	  int lr = 0;
 
 	  /* consider only * & / */
 	  if (ic->op != '*' && ic->op != '/')
 	    continue;
 
-	  /* if the result has more definitions then */
+          /* only consider variables with integral type */
+          if (!IS_INTEGRAL (operandType (IC_RESULT (ic))))
+            continue;
+	  
+          /* if the result has more definitions then */
 	  if (assignmentsToSym (loopReg->regBlocks, IC_RESULT (ic)) > 1)
 	    continue;
 
@@ -995,9 +1038,19 @@ loopInduction (region * loopReg, eBBlock ** ebbs, int count)
 		(IS_OP_LITERAL (IC_LEFT (ic)) && IS_SYMOP (IC_RIGHT (ic)))))
 	    continue;
 
-	  aSym = (IS_SYMOP (IC_LEFT (ic)) ?
-	  (lr = 1, litVal = (unsigned long) operandLitValue (IC_RIGHT (ic)), IC_LEFT (ic)) :
-		  (litVal = (unsigned long) operandLitValue (IC_LEFT (ic)), IC_RIGHT (ic)));
+	  if (IS_SYMOP (IC_LEFT (ic)))
+            {
+              aSym = IC_LEFT (ic);
+              litVal = (long) operandLitValue (IC_RIGHT (ic));
+            }
+          else
+            {
+              /* For division, the literal must not be on the left side */
+              if (ic->op == '/')
+                continue;
+              aSym = IC_RIGHT (ic);
+              litVal = (long) operandLitValue (IC_LEFT (ic));
+            }
 
 	  ip = NULL;
 	  /* check if this is an induction variable */
@@ -1034,32 +1087,23 @@ loopInduction (region * loopReg, eBBlock ** ebbs, int count)
 	  addSet (&indVars,
 		newInduction (IC_RESULT (ic), ip->op, litVal, indIc, NULL));
 
-	  /* now change this instruction */
-	  ic->op = ip->op;
-	  if (lr)
-	    {
-	      IC_LEFT (ic) = operandFromOperand (IC_RESULT (ic));
-	      IC_RIGHT (ic) = operandFromLit (litVal);
-	    }
-	  else
-	    {
-	      IC_RIGHT (ic) = operandFromOperand (IC_RESULT (ic));
-	      IC_LEFT (ic) = operandFromLit (litVal);
-	    }
-
-	  /* we need somemore initialisation code */
-	  /* we subtract the litVal from itself if increment */
-	  if (ic->op == '+')
-	    {
-	      indIc = newiCode ('-',
-				operandFromOperand (IC_RESULT (ic)),
-				operandFromLit (litVal));
-	      indIc->lineno = ic->lineno;
-	      IC_RESULT (indIc) = operandFromOperand (IC_RESULT (ic));
-
-	      addSet (&indVars,
-		newInduction (IC_RESULT (ic), ip->op, litVal, indIc, NULL));
-	    }
+	  /* Replace mul/div with assignment to self; killDeadCode() will */
+          /* clean this up since we can't use remiCodeFromeBBlock() here. */
+          ic->op = '=';
+          IC_LEFT (ic) = NULL;
+          IC_RIGHT (ic) = IC_RESULT (ic);
+          
+          /* Insert an update of the induction variable just before */
+          /* the update of the basic induction variable. */
+          indIc = newiCode (ip->op,
+                            operandFromOperand (IC_RESULT (ic)),
+                            operandFromLit (litVal));
+          IC_RESULT (indIc) = operandFromOperand (IC_RESULT (ic));
+	  owner = NULL;
+          dic = findDefInRegion (setFromSet (loopReg->regBlocks), aSym, &owner);
+          assert (dic);
+	  addiCodeToeBBlock (owner, indIc, dic);
+          
 	}
     }
 

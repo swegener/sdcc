@@ -1,3 +1,8 @@
+2004-12-07 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCloop.c (basicInduction, loopInduction): fixed several
+	  induction related bugs, including first part of bug #1074377
+
 2004-12-05 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* applied patch from bug-report #1076292,

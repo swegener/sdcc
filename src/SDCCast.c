@@ -2127,7 +2127,7 @@ decorateType (ast * tree)
       /* if bit field then error */
       if (IS_BITVAR (tree->left->etype))
 	{
-	  werror (E_ILLEGAL_ADDR, "addrress of bit variable");
+	  werror (E_ILLEGAL_ADDR, "address of bit variable");
 	  goto errorTreeReturn;
 	}
 
@@ -2143,7 +2143,13 @@ decorateType (ast * tree)
 	  goto errorTreeReturn;
 	}
 
-      if (LRVAL (tree))
+      if (IS_LITERAL(LTYPE(tree)))
+	{
+	  werror (E_ILLEGAL_ADDR, "address of literal");
+	  goto errorTreeReturn;
+	}
+
+     if (LRVAL (tree))
 	{
 	  werror (E_LVALUE_REQUIRED, "address of");
 	  goto errorTreeReturn;

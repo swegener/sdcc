@@ -268,6 +268,19 @@ allocIntoSeg (symbol * sym)
 }
 
 /*-----------------------------------------------------------------*/
+/* deleteFromSeg - deletes a symbol from segment used when a var   */
+/* 		   firest declared as "extern" then no extern      */
+/*-----------------------------------------------------------------*/
+void deleteFromSeg(symbol *sym)
+{
+    if (SPEC_OCLS(sym->etype)) {
+	memmap *segment = SPEC_OCLS (sym->etype);	
+	deleteSetItem(&segment->syms,sym);
+    }
+}
+
+
+/*-----------------------------------------------------------------*/
 /* allocGlobal - assigns the output segment to a global var       */
 /*-----------------------------------------------------------------*/
 void 

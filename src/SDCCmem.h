@@ -95,4 +95,5 @@ void overlay2data ();
 void redoStackOffsets ();
 void printAllocInfo (struct symbol *, FILE *);
 void doOverlays (struct eBBlock **, int count);
+void deleteFromSeg(struct symbol *);
 #endif

@@ -169,7 +169,7 @@ void ser_puts(unsigned char *s)
 {
   unsigned char c;
   while (c= *s++) {
-    if (c == LF) ser_putc(CR);
+    if (c == '\n') ser_putc('\r');
     ser_putc (c);
   }
 }
@@ -182,9 +182,9 @@ void ser_gets(unsigned char *s, unsigned char len)
   pos = 0;
   while (pos <= len) {
     c = ser_getc();
-    if (c == CR) continue;        // discard CR's
+    if (c == '\r') continue;        // discard CR's
     s[pos++] = c;
-    if (c == LF) break;           // NL terminates
+    if (c == '\n') break;           // NL terminates
   }
   s[pos] = '\0';                  // terminate string
 }

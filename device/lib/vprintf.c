@@ -22,6 +22,12 @@
    You are forbidden to forbid anyone else to use, share and improve
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
+
+/* this module uses some global variables instead function parameters, so: */
+#ifdef SDCC_STACK_AUTO
+#warning "this module cannot yet be use as a reentrant one"
+#endif
+
 #ifdef __ds390
 #define USE_FLOATS 1
 #endif
@@ -252,14 +258,14 @@ static void output_float (float f, unsigned char reqWidth,
 
 int vsprintf (const char *buf, const char *format, va_list ap)
 {
-  bit            left_justify;
-  bit            zero_padding;
-  bit            prefix_sign;
-  bit            prefix_space;
-  bit            signed_argument;
-  bit            char_argument;
-  bit            long_argument;
-  bit            float_argument;
+  static bit            left_justify;
+  static bit            zero_padding;
+  static bit            prefix_sign;
+  static bit            prefix_space;
+  static bit            signed_argument;
+  static bit            char_argument;
+  static bit            long_argument;
+  static bit            float_argument;
 
   unsigned char  width;
   signed char decimals;

@@ -29,7 +29,11 @@ unsigned int _divuint (unsigned int a, unsigned int b)
 {
 	unsigned int reste = 0	;
 	unsigned char count = 16;
+#ifdef SDCC_STACK_AUTO
+	unsigned char c;
+#else
 	bit c;
+#endif
 
 	do{
 		// reste:a <- 0;

@@ -65,7 +65,6 @@ unsigned long _mululong (unsigned long a, unsigned long b)
 
         t.i.hi = bcast(a)->b.b0 * bcast(b)->b.b2;       // A
         t.i.lo = bcast(a)->b.b0 * bcast(b)->b.b0;       // A
-	_asm ;johan _endasm;
         t.b.b3 += bcast(a)->b.b3 *
                                   bcast(b)->b.b0;       // G
         t.b.b3 += bcast(a)->b.b2 *

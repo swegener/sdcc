@@ -98,6 +98,10 @@ static void saverbank (int, iCode *, bool);
 #define CLRC    emitcode("clr","c")
 #define SETC    emitcode("setb","c")
 
+// A scratch register which will be used to hold
+// result bytes from operands in far space via DPTR2.
+#define DP2_RESULT_REG	"ap"
+
 static lineNode *lineHead = NULL;
 static lineNode *lineCurr = NULL;
 
@@ -899,7 +903,7 @@ dealloc:
 /*------------------------------------------------------------------*/
 /* aopGet - for fetching value of the aop                           */
 /*                    */
-/* Set canClobberACC if you are aure it is OK to clobber the value  */
+/* Set canClobberACC if you are sure it is OK to clobber the value  */
 /* in the accumulator. Set it FALSE otherwise; FALSE is always safe, */
 /* just less efficient.               */
 /*------------------------------------------------------------------*/
@@ -958,7 +962,7 @@ aopGet (asmop * aop,
 	  genSetDPTR (1);
 	  if (!canClobberACC)
 	    {
-	      emitcode ("xch", "a, ap");
+	      emitcode ("xch", "a, %s", DP2_RESULT_REG);
 	    }
 	}
 
@@ -992,8 +996,8 @@ aopGet (asmop * aop,
 	  genSetDPTR (0);
 	  if (!canClobberACC)
 	    {
-	      emitcode ("xch", "a, ap");
-	      return "ap";
+	      emitcode ("xch", "a, %s", DP2_RESULT_REG);
+	      return DP2_RESULT_REG;
 	    }
 	}
       return (dname ? "acc" : "a");
@@ -2501,7 +2505,7 @@ genFunction (iCode * ic)
 	      emitcode ("push", "dpl1");
 	      emitcode ("push", "dph1");
 	      emitcode ("push", "dpx1");
-	      emitcode ("push", "ap");
+	      emitcode ("push",  DP2_RESULT_REG);
 	    }
 	}
       /* if this isr has no bank i.e. is going to
@@ -2709,7 +2713,7 @@ genEndFunction (iCode * ic)
 	{
 	  if (options.stack10bit)
 	    {
-	      emitcode ("pop", "ap");
+	      emitcode ("pop", DP2_RESULT_REG);
 	      emitcode ("pop", "dpx1");
 	      emitcode ("pop", "dph1");
 	      emitcode ("pop", "dpl1");
@@ -3126,6 +3130,8 @@ adjustArithmeticResult (iCode * ic)
     }
 }
 
+// Macro to aopOp all three operands of an ic. Will fatal if this cannot be done
+// (because all three operands are in far space).
 #define AOP_OP_3(ic) \
     aopOp (IC_RIGHT(ic),ic,FALSE, FALSE); \
     aopOp (IC_LEFT(ic),ic,FALSE, (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR)); \
@@ -3139,6 +3145,10 @@ adjustArithmeticResult (iCode * ic)
                "Ack: three operands in far space! (%s:%d %s:%d)\n", __FILE__, __LINE__, ic->filename, ic->lineno);   \
     }
 
+// Macro to aopOp all three operands of an ic. If this cannot be done, 
+// the IC_LEFT and IC_RIGHT operands will be aopOp'd, and the rc parameter
+// will be set TRUE. The caller must then handle the case specially, noting
+// that the IC_RESULT operand is not aopOp'd.
 #define AOP_OP_3_NOFATAL(ic, rc) \
     aopOp (IC_RIGHT(ic),ic,FALSE, FALSE); \
     aopOp (IC_LEFT(ic),ic,FALSE, (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR)); \
@@ -3162,14 +3172,47 @@ adjustArithmeticResult (iCode * ic)
        } \
     }
 
+// aopOp the left & right operands of an ic.
 #define AOP_OP_2(ic) \
     aopOp (IC_RIGHT(ic),ic,FALSE, FALSE); \
     aopOp (IC_LEFT(ic),ic,FALSE, (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR));
 
+// convienience macro.
 #define AOP_SET_LOCALS(ic) \
     left = IC_LEFT(ic); \
     right = IC_RIGHT(ic); \
     result = IC_RESULT(ic);
+
+
+// Given an integer value of pushedSize bytes on the stack,
+// adjust it to be resultSize bytes, either by discarding
+// the most significant bytes or by zero-padding.
+//
+// On exit from this macro, pushedSize will have been adjusted to
+// equal resultSize, and ACC may be trashed.
+#define ADJUST_PUSHED_RESULT(pushedSize, resultSize) 		\
+      /* If the pushed data is bigger than the result,		\
+       * simply discard unused bytes. Icky, but works.		\
+       */							\
+      while (pushedSize > resultSize)				\
+      {								\
+	  D (emitcode (";", "discarding unused result byte."););\
+	  emitcode ("pop", "acc");				\
+	  pushedSize--;						\
+      }								\
+      if (pushedSize < resultSize)				\
+      {								\
+	  emitcode ("clr", "a");				\
+	  /* Conversly, we haven't pushed enough here.		\
+	   * just zero-pad, and all is well.			\
+	   */							\
+	  while (pushedSize < resultSize)			\
+	  {							\
+	      emitcode("push", "acc");				\
+	      pushedSize++;					\
+	  }							\
+      }								\
+      assert(pushedSize == resultSize);
 
 /*-----------------------------------------------------------------*/
 /* genPlus - generates code for addition                           */
@@ -3181,16 +3224,14 @@ genPlus (iCode * ic)
   bool pushResult = FALSE;
   int rSize;
 
-  D (emitcode (";", "genPlus ");
-    );
+  D (emitcode (";", "genPlus "););
 
   /* special cases :- */
 
   AOP_OP_3_NOFATAL (ic, pushResult);
   if (pushResult)
     {
-      D (emitcode (";", "genPlus: must push result: 3 ops in far space");
-	);
+      D (emitcode (";", "genPlus: must push result: 3 ops in far space"););
     }
 
   if (!pushResult)
@@ -3297,38 +3338,13 @@ genPlus (iCode * ic)
       size = getDataSize (IC_LEFT (ic));
       rSize = getDataSize (IC_RESULT (ic));
 
-      /* If the pushed data is bigger than the result,
-       * simply discard unused bytes. Icky, but works.
-       *
-       * Should we throw a warning here? We're losing data...
-       */
-      while (size > rSize)
-	{
-	  D (emitcode (";", "discarding unused result byte.");
-	    );
-	  emitcode ("pop", "acc");
-	  size--;
-	  offset--;
-	}
-      if (size < rSize)
-	{
-	  emitcode ("clr", "a");
-	  /* Conversly, we haven't pushed enough here.
-	   * just zero-pad, and all is well.
-	   */
-	  while (size < rSize)
-	    {
-	      emitcode ("push", "acc");
-	      size++;
-	      offset++;
-	    }
-	}
+      ADJUST_PUSHED_RESULT(size, rSize);
 
       _startLazyDPSEvaluation ();
       while (size--)
 	{
 	  emitcode ("pop", "acc");
-	  aopPut (AOP (IC_RESULT (ic)), "a", --offset);
+	  aopPut (AOP (IC_RESULT (ic)), "a", size);
 	}
       _endLazyDPSEvaluation ();
     }
@@ -3535,8 +3551,7 @@ genMinus (iCode * ic)
   unsigned long lit = 0L;
   bool pushResult = FALSE;
 
-  D (emitcode (";", "genMinus ");
-    );
+  D (emitcode (";", "genMinus "););
 
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
   aopOp (IC_RIGHT (ic), ic, FALSE, TRUE);
@@ -3616,37 +3631,15 @@ genMinus (iCode * ic)
       size = getDataSize (IC_LEFT (ic));
       rSize = getDataSize (IC_RESULT (ic));
 
-      /* If the pushed data is bigger than the result,
-       * simply discard unused bytes. Icky, but works.
-       *
-       * Should we throw a warning here? We're losing data...
-       */
-      while (size > getDataSize (IC_RESULT (ic)))
-	{
-	  emitcode (";", "discarding unused result byte.");
-	  emitcode ("pop", "acc");
-	  size--;
-	  offset--;
-	}
-      if (size < rSize)
-	{
-	  emitcode ("clr", "a");
-	  /* Conversly, we haven't pushed enough here.
-	   * just zero-pad, and all is well.
-	   */
-	  while (size < rSize)
-	    {
-	      emitcode ("push", "acc");
-	      size++;
-	      offset++;
-	    }
-	}
+      ADJUST_PUSHED_RESULT(size, rSize);
 
+      _startLazyDPSEvaluation ();
       while (size--)
 	{
 	  emitcode ("pop", "acc");
-	  aopPut (AOP (IC_RESULT (ic)), "a", --offset);
+	  aopPut (AOP (IC_RESULT (ic)), "a", size);
 	}
+      _endLazyDPSEvaluation ();
     }
 
   adjustArithmeticResult (ic);
@@ -3786,8 +3779,7 @@ genMult (iCode * ic)
   operand *right = IC_RIGHT (ic);
   operand *result = IC_RESULT (ic);
 
-  D (emitcode (";", "genMult ");
-    );
+  D (emitcode (";", "genMult "););
 
   /* assign the amsops */
   AOP_OP_3 (ic);
@@ -4677,13 +4669,12 @@ genAndOp (iCode * ic)
   operand *left, *right, *result;
   symbol *tlbl;
 
-  D (emitcode (";", "genAndOp ");
-    );
+  D (emitcode (";", "genAndOp "););
 
   /* note here that && operations that are in an
      if statement are taken away by backPatchLabels
      only those used in arthmetic operations remain */
-  AOP_OP_3 (ic);
+  AOP_OP_2 (ic);
   AOP_SET_LOCALS (ic);
 
   /* if both are bit variables */
@@ -4692,6 +4683,10 @@ genAndOp (iCode * ic)
     {
       emitcode ("mov", "c,%s", AOP (left)->aopu.aop_dir);
       emitcode ("anl", "c,%s", AOP (right)->aopu.aop_dir);
+      freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+      freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  
+      aopOp (result,ic,FALSE, FALSE);
       outBitC (result);
     }
   else
@@ -4701,12 +4696,13 @@ genAndOp (iCode * ic)
       emitcode ("jz", "%05d$", tlbl->key + 100);
       toBoolean (right);
       emitcode ("", "%05d$:", tlbl->key + 100);
+      freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+      freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  
+      aopOp (result,ic,FALSE, FALSE);
       outBitAcc (result);
     }
-
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (result, NULL, ic, TRUE);
+    freeAsmop (result, NULL, ic, TRUE);
 }
 
 
@@ -4719,13 +4715,12 @@ genOrOp (iCode * ic)
   operand *left, *right, *result;
   symbol *tlbl;
 
-  D (emitcode (";", "genOrOp ");
-    );
+  D (emitcode (";", "genOrOp "););
 
   /* note here that || operations that are in an
      if statement are taken away by backPatchLabels
      only those used in arthmetic operations remain */
-  AOP_OP_3 (ic);
+  AOP_OP_2 (ic);
   AOP_SET_LOCALS (ic);
 
   /* if both are bit variables */
@@ -4734,6 +4729,11 @@ genOrOp (iCode * ic)
     {
       emitcode ("mov", "c,%s", AOP (left)->aopu.aop_dir);
       emitcode ("orl", "c,%s", AOP (right)->aopu.aop_dir);
+      freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+      freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  
+      aopOp (result,ic,FALSE, FALSE);
+      
       outBitC (result);
     }
   else
@@ -4743,11 +4743,14 @@ genOrOp (iCode * ic)
       emitcode ("jnz", "%05d$", tlbl->key + 100);
       toBoolean (right);
       emitcode ("", "%05d$:", tlbl->key + 100);
+      freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+      freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  
+      aopOp (result,ic,FALSE, FALSE);
+      
       outBitAcc (result);
     }
 
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (result, NULL, ic, TRUE);
 }
 
@@ -4818,6 +4821,52 @@ jmpTrueOrFalse (iCode * ic, symbol * tlbl)
   ic->generated = 1;
 }
 
+// Generate code to perform a bit-wise logic operation
+// on two operands in far space (assumed to already have been 
+// aopOp'd by the AOP_OP_3_NOFATAL macro), storing the result
+// in far space. This requires pushing the result on the stack
+// then popping it into the result.
+static void
+genFarFarLogicOp(iCode *ic, char *logicOp)
+{
+      int size, resultSize, compSize;
+      int offset = 0;
+      
+      D(emitcode(";", "%s special case for 3 far operands.", logicOp););
+      compSize = AOP_SIZE(IC_LEFT(ic)) < AOP_SIZE(IC_RIGHT(ic)) ? 
+      		  AOP_SIZE(IC_LEFT(ic)) : AOP_SIZE(IC_RIGHT(ic));
+      
+      _startLazyDPSEvaluation();
+      for (size = compSize; (size--); offset++)
+      {
+      	  MOVA (aopGet (AOP (IC_LEFT(ic)), offset, FALSE, FALSE, TRUE));
+      	  emitcode ("mov", "%s, acc", DP2_RESULT_REG);
+      	  MOVA (aopGet (AOP (IC_RIGHT(ic)), offset, FALSE, FALSE, TRUE));
+      	  
+      	  emitcode (logicOp, "a,%s", DP2_RESULT_REG);
+      	  emitcode ("push", "acc");
+      }
+      _endLazyDPSEvaluation();
+     
+      freeAsmop (IC_LEFT(ic), NULL, ic, RESULTONSTACK (ic) ? FALSE : TRUE);
+      freeAsmop (IC_RIGHT(ic), NULL, ic, RESULTONSTACK (ic) ? FALSE : TRUE);
+      aopOp (IC_RESULT(ic),ic,TRUE, FALSE);
+     
+      resultSize = AOP_SIZE(IC_RESULT(ic));
+
+      ADJUST_PUSHED_RESULT(compSize, resultSize);
+
+      _startLazyDPSEvaluation();
+      while (compSize--)
+      {
+	  emitcode ("pop", "acc");
+	  aopPut (AOP (IC_RESULT (ic)), "a", compSize);
+      }
+      _endLazyDPSEvaluation();
+      freeAsmop(IC_RESULT (ic), NULL, ic, TRUE);
+}
+
+
 /*-----------------------------------------------------------------*/
 /* genAnd  - code for and                                          */
 /*-----------------------------------------------------------------*/
@@ -4829,12 +4878,18 @@ genAnd (iCode * ic, iCode * ifx)
   unsigned long lit = 0L;
   int bytelit = 0;
   char buffer[10];
+  bool pushResult;
 
-  D (emitcode (";", "genAnd ");
-    );
+  D (emitcode (";", "genAnd "););
 
-  AOP_OP_3 (ic);
+  AOP_OP_3_NOFATAL (ic, pushResult);
   AOP_SET_LOCALS (ic);
+
+  if (pushResult)
+  {
+      genFarFarLogicOp(ic, "anl");
+      return;
+  }  
 
 #ifdef DEBUG_TYPE
   emitcode ("", "; Type res[%d] = l[%d]&r[%d]",
@@ -5125,6 +5180,7 @@ release:
   freeAsmop (result, NULL, ic, TRUE);
 }
 
+
 /*-----------------------------------------------------------------*/
 /* genOr  - code for or                                            */
 /*-----------------------------------------------------------------*/
@@ -5134,12 +5190,19 @@ genOr (iCode * ic, iCode * ifx)
   operand *left, *right, *result;
   int size, offset = 0;
   unsigned long lit = 0L;
+  bool 	   pushResult;
 
-  D (emitcode (";", "genOr ");
-    );
+  D (emitcode (";", "genOr "););
 
-  AOP_OP_3 (ic);
+  AOP_OP_3_NOFATAL (ic, pushResult);
   AOP_SET_LOCALS (ic);
+
+  if (pushResult)
+  {
+      genFarFarLogicOp(ic, "orl");
+      return;
+  }
+
 
 #ifdef DEBUG_TYPE
   emitcode ("", "; Type res[%d] = l[%d]&r[%d]",
@@ -5423,12 +5486,18 @@ genXor (iCode * ic, iCode * ifx)
   operand *left, *right, *result;
   int size, offset = 0;
   unsigned long lit = 0L;
+  bool pushResult;
 
-  D (emitcode (";", "genXor ");
-    );
+  D (emitcode (";", "genXor "););
 
-  AOP_OP_3 (ic);
+  AOP_OP_3_NOFATAL (ic, pushResult);
   AOP_SET_LOCALS (ic);
+
+  if (pushResult)
+  {
+      genFarFarLogicOp(ic, "xrl");
+      return;
+  }  
 
 #ifdef DEBUG_TYPE
   emitcode ("", "; Type res[%d] = l[%d]&r[%d]",
@@ -9175,7 +9244,7 @@ genDjnz (iCode * ic, iCode * ifx)
     }
   else
     {
-      emitcode ("djnz", "%s,%05d$", aopGet (AOP (IC_RESULT (ic)), 0, FALSE, FALSE, FALSE),
+      emitcode ("djnz", "%s,%05d$", aopGet (AOP (IC_RESULT (ic)), 0, FALSE, TRUE, FALSE),
 		lbl->key + 100);
     }
   emitcode ("sjmp", "%05d$", lbl1->key + 100);

@@ -2658,7 +2658,7 @@ decorateType (ast * tree)
       /* a left shift must be done with at least 16bits */
       if ((tree->opval.op==LEFT_OP) && (getSize(LTYPE(tree))<2)) {
 	// insert a cast
-	if (IS_AST_SYM_VALUE(tree->left)) {
+	if (IS_AST_SYM_VALUE(tree->left) || IS_AST_OP(tree->left)) {
 	  tree->left = 
 	    decorateType (newNode (CAST,
 				   newAst_LINK(copyLinkChain(LTYPE(tree))),

@@ -4208,6 +4208,9 @@ hasInc (operand *op, iCode *ic)
   iCode *lic = ic->next;
   int isize ;
   
+  /* this could from a cast, e.g.: "(char xdata *) 0x7654;" */
+  if (!IS_SYMOP(op)) return NULL;
+
   if (IS_BITVAR(retype)||!IS_PTR(type)) return NULL;
   isize = getSize(type->next);
   while (lic) {

@@ -130,25 +130,7 @@ static void emitcode (char *inst,char *fmt, ...)
 	if (fmt && *fmt)
 	    sprintf(lb,"%s\t",inst);
 	else
-#if 1
-	{
-	  /* for some reason the parser throws in a mysterious "Y" at 
-	     the end of inline assembly code.
-	     Do a make in device/lib and you know all about it.
-	  */
-	  int i=0;
-	  while(inst[i]==' ')
-	    i++;
-	  if (strcmp(&inst[i],"Y")==0) {
-	    fprintf (stderr, "===> BEWARE of the inline Y bug hack <===\n");
-	    return;
-	  } else {
 	    sprintf(lb,"%s",inst);
-	  }
-	}	
-#else
-	    sprintf(lb,"%s",inst);
-#endif
         vsprintf(lb+(strlen(lb)),fmt,ap);
     }  else
         vsprintf(lb,fmt,ap);

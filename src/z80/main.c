@@ -440,7 +440,7 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 }
 
 #define LINKCMD \
-    "{bindir}{sep}link-{port} -n -c -- {z80bases} -m -j" \
+    "link-{port} -n -c -- {z80bases} -m -j" \
     " {z80libspec}" \
     " {z80extralibfiles} {z80extralibpaths}" \
     " {z80outputtypeflag} {linkdstfilename}" \
@@ -449,7 +449,7 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
     " {z80extraobj}"
 
 #define ASMCMD \
-    "{bindir}{sep}as-{port} -plosgff {objdstfilename} {dstfilename}{asmext}"
+    "as-{port} -plosgff {objdstfilename} {dstfilename}{asmext}"
 
 /* Globals */
 PORT z80_port =

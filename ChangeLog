@@ -1,3 +1,14 @@
+2003-03-30  Borut Razem <borut.razem@siol.net>
+
+	* support/Util/BuildCmd.c, support/Util/BuildCmd.h: rewrite buildCmdLine(),
+	  changed type of list parameter to set
+	* src/ds390/main.c: changed type of parameter asmOptions to set in _tininative_do_assemble()
+	* src/port.h: changed type of do_assemble() parameter to set
+	* src/SDCCmain.c: type of asmOptions changed to set, introduced setParseWithComma(),
+	  sdcpp defined without path, removed variable VersionString
+	* src/SDCCglobl.h: included "SDCCset.h", added declaration of setParseWithComma()
+	* src/SDCCglue.c: removed variable VersionString, inroduced spacesToUnderscores()
+
 2003-03-30  Scott Dattalo  <scott@dattalo.com>
 
 	* src/pic/gen.c: Commit patch from Steve Tell <tell@telltronics.org> that fixes

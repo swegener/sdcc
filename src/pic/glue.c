@@ -275,6 +275,94 @@ printIvalType (symbol *sym, sym_link * type, initList * ilist, pBlock *pb)
 }
 
 /*-----------------------------------------------------------------*/
+/* printIvalBitFields - generate initializer for bitfields         */
+/*-----------------------------------------------------------------*/
+static void printIvalBitFields(symbol **sym, initList **ilist, pBlock *pb ) 
+{
+	value *val ;
+	symbol *lsym = *sym;
+	initList *lilist = *ilist ;
+	unsigned long ival = 0;
+	int size =0;
+	
+	
+	do {
+		unsigned long i;
+		val = list2val(lilist);
+		if (size) {
+			if (SPEC_BLEN(lsym->etype) > 8) {
+				size += ((SPEC_BLEN (lsym->etype) / 8) + 
+					(SPEC_BLEN (lsym->etype) % 8 ? 1 : 0));
+			}
+		} else {
+			size = ((SPEC_BLEN (lsym->etype) / 8) + 
+				(SPEC_BLEN (lsym->etype) % 8 ? 1 : 0));
+		}
+		i = (unsigned long)floatFromVal(val);
+		i <<= SPEC_BSTR (lsym->etype);
+		ival |= i;
+		if (! ( lsym->next &&
+			(IS_BITFIELD(lsym->next->type)) &&
+			(SPEC_BSTR(lsym->next->etype)))) break;
+		lsym = lsym->next;
+		lilist = lilist->next;
+	} while (1);
+	switch (size) {
+	case 1:
+		//tfprintf (oFile, "\t!db !constbyte\n",ival);
+		addpCode2pBlock(pb,newpCode(POC_RETLW,newpCodeOpLit(ival)));
+		break;
+		
+	case 2:
+		//tfprintf (oFile, "\t!dw !constword\n",ival);
+		addpCode2pBlock(pb,newpCode(POC_RETLW,newpCodeOpLit(ival>>8)));
+		addpCode2pBlock(pb,newpCode(POC_RETLW,newpCodeOpLit(ival)));
+		break;
+	case 4:
+		//tfprintf (oFile, "\t!db  !constword,!constword\n",(ival >> 8) & 0xffff, (ival & 0xffff));
+		addpCode2pBlock(pb,newpCode(POC_RETLW,newpCodeOpLit(ival>>24)));
+		addpCode2pBlock(pb,newpCode(POC_RETLW,newpCodeOpLit(ival>>16)));
+		addpCode2pBlock(pb,newpCode(POC_RETLW,newpCodeOpLit(ival>>8)));
+		addpCode2pBlock(pb,newpCode(POC_RETLW,newpCodeOpLit(ival)));
+		break;
+	}
+	*sym = lsym;
+	*ilist = lilist;
+}
+
+/*-----------------------------------------------------------------*/
+/* printIvalStruct - generates initial value for structures        */
+/*-----------------------------------------------------------------*/
+static void printIvalStruct (symbol * sym, sym_link * type, initList * ilist, pBlock *pb)
+{
+	symbol *sflds;
+	initList *iloop = NULL;
+	
+	sflds = SPEC_STRUCT (type)->fields;
+	
+	if (ilist) {
+		if (ilist->type != INIT_DEEP) {
+			werrorfl (sym->fileDef, sym->lineDef, E_INIT_STRUCT, sym->name);
+			return;
+		}
+		
+		iloop = ilist->init.deep;
+	}
+	
+	for (; sflds; sflds = sflds->next, iloop = (iloop ? iloop->next : NULL)) {
+		if (IS_BITFIELD(sflds->type)) {
+			printIvalBitFields(&sflds,&iloop,pb);
+		} else {
+			printIval (sym, sflds->type, iloop, pb);
+		}
+	}
+	if (iloop) {
+		werrorfl (sym->fileDef, sym->lineDef, W_EXCESS_INITIALIZERS, "struct", sym->name);
+	}
+	return;
+}
+
+/*-----------------------------------------------------------------*/
 /* printIvalChar - generates initital value for character array    */
 /*-----------------------------------------------------------------*/
 static int 
@@ -330,63 +418,54 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
 				pBlock *pb)
 {
 	initList *iloop;
-	int lcnt = 0, size = 0;
+	unsigned size = 0;
 	
 	if(!pb)
 		return;
-	
-	/* take care of the special   case  */
-	/* array of characters can be init  */
-	/* by a string                      */
-	if (IS_CHAR (type->next)) {
-		//fprintf(stderr,"%s:%d - is_char\n",__FUNCTION__,__LINE__);
-		if (!IS_LITERAL(list2val(ilist)->etype)) {
-			werror (W_INIT_WRONG);
-			return;
-		}
-		if (printIvalChar (type,
-			(ilist->type == INIT_DEEP ? ilist->init.deep : ilist),
-			pb, SPEC_CVAL (sym->etype).v_char))
-			return;
-	}
-	/* not the special case             */
-	if (ilist->type != INIT_DEEP)
-	{
-		werror (E_INIT_STRUCT, sym->name);
-		return;
-	}
-	
-	iloop = ilist->init.deep;
-	lcnt = DCL_ELEM (type);
-	
-	for (;;)
-	{
-		//fprintf(stderr,"%s:%d - is_char\n",__FUNCTION__,__LINE__);
-		size++;
-		printIval (sym, type->next, iloop, pb);
-		iloop = (iloop ? iloop->next : NULL);
-		
-		
-		/* if not array limits given & we */
-		/* are out of initialisers then   */
-		if (!DCL_ELEM (type) && !iloop)
-			break;
-		
-		/* no of elements given and we    */
-		/* have generated for all of them */
-		if (!--lcnt) {
-			/* if initializers left */
-			if (iloop) {
-				werror (W_EXCESS_INITIALIZERS, "array", sym->name, sym->lineDef);
+	if (ilist) {
+		/* take care of the special   case  */
+		/* array of characters can be init  */
+		/* by a string                      */
+		if (IS_CHAR (type->next)) {
+			//fprintf(stderr,"%s:%d - is_char\n",__FUNCTION__,__LINE__);
+			if (!IS_LITERAL(list2val(ilist)->etype)) {
+				werror (W_INIT_WRONG);
+				return;
 			}
-			break;
+			if (printIvalChar (type,
+				(ilist->type == INIT_DEEP ? ilist->init.deep : ilist),
+				pb, SPEC_CVAL (sym->etype).v_char))
+				return;
+		}
+		/* not the special case */
+		if (ilist->type != INIT_DEEP) {
+			werrorfl (ilist->filename, ilist->lineno, E_INIT_STRUCT, sym->name);
+			return;
+		}
+
+		for (iloop=ilist->init.deep; iloop; iloop=iloop->next) {
+			if ((++size > DCL_ELEM(type)) && DCL_ELEM(type)) {
+				werrorfl (sym->fileDef, sym->lineDef, W_EXCESS_INITIALIZERS, "array", sym->name);
+				break;
+			}
+			printIval (sym, type->next, iloop, pb);
 		}
 	}
-	
-	/* if we have not been given a size  */
-	if (!DCL_ELEM (type))
+
+	if (DCL_ELEM(type)) {
+		// pad with zeros if needed
+		if (size<DCL_ELEM(type)) {
+			size = (DCL_ELEM(type) - size) * getSize(type->next);
+			while (size--) {
+				//tfprintf (oFile, "\t!db !constbyte\n", 0);
+				addpCode2pBlock(pb,newpCode(POC_RETLW,newpCodeOpLit(0)));
+			}
+		}
+	} else {
+		// we have not been given a size, but we now know it
 		DCL_ELEM (type) = size;
-	
+	}
+
 	return;
 }
 
@@ -403,7 +482,7 @@ printIval (symbol * sym, sym_link * type, initList * ilist, pBlock *pb)
 	if (IS_STRUCT (type))
 	{
 		//fprintf(stderr,"%s struct\n",__FUNCTION__);
-		//printIvalStruct (sym, type, ilist, oFile);
+		printIvalStruct (sym, type, ilist, pb);
 		return;
 	}
 	

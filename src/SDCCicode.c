@@ -3293,8 +3293,9 @@ ast2iCode (ast * tree,int lvl)
 
     case '[':			/* array operation */
       {
-	sym_link *ltype = operandType (left);
-	left = geniCodeRValue (left, IS_PTR (ltype->next) ? TRUE : FALSE);
+	//sym_link *ltype = operandType (left);
+	//left = geniCodeRValue (left, IS_PTR (ltype->next) ? TRUE : FALSE);
+	left = geniCodeRValue (left, FALSE);
 	right = geniCodeRValue (right, TRUE);
       }
 

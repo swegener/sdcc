@@ -61,12 +61,3 @@ replace {
         ld      (hl),a
         ld      %1,a
 }
-replace {
-	ld	(hl),%1
-	ld	a,%2
-	sub	a,(hl)
-} by {
-	ld	(hl),%1
-	ld	a,%2
-	sub	a,%1
-}

@@ -2243,9 +2243,14 @@ packRegsForAccUse (iCode * ic)
 
   /* make sure that the result of this icode is not on the
      stack, since acc is used to compute stack offset */
+#if 0
   if (IS_TRUE_SYMOP (IC_RESULT (uic)) &&
       OP_SYMBOL (IC_RESULT (uic))->onStack)
     return;
+#else
+  ifSymbolOnStack(IC_RESULT(uic))
+    return;
+#endif
 
   /* if either one of them in far space then we cannot */
   if ((IS_TRUE_SYMOP (IC_LEFT (uic)) &&

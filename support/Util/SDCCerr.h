@@ -173,6 +173,7 @@ SDCCERR - SDCC Standard error handler
 #define W_PTR2INTEGRAL_NOCAST 155
 #define W_SYMBOL_NAME_TOO_LONG 156
 #define W_CAST_STRUCT_PTR 157 /* pointer to different structure types */
+#define W_IF_ALWAYS_TRUE 158
 
 /** Describes the maximum error level that will be logged.  Any level
  *  includes all of the levels listed after it.

@@ -241,7 +241,7 @@ struct
 { W_DOUBLE_UNSUPPORTED, ERROR_LEVEL_WARNING,
    "type 'double' not supported assuming 'float'" },
 { W_IF_NEVER_TRUE, ERROR_LEVEL_WARNING,
-   "if-statement condition always false.if-statement not generated" },
+   "if-statement condition always false, if-statement not generated" },
 { W_FUNC_NO_RETURN, ERROR_LEVEL_WARNING,
    "no 'return' statement found for function '%s'" },
 { W_PRE_PROC_WARNING, ERROR_LEVEL_WARNING,
@@ -370,6 +370,8 @@ struct
     "symbol name too long, truncated to %d chars" },
 { W_CAST_STRUCT_PTR,ERROR_LEVEL_WARNING,
 	  "cast of struct %s * to struct %s * " },
+{ W_IF_ALWAYS_TRUE, ERROR_LEVEL_WARNING,
+   "if-statement condition always true, if-statement not generated" },
 };
 
 /*

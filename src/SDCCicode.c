@@ -918,6 +918,7 @@ isOperandInDirSpace (operand * op)
 /*-----------------------------------------------------------------*/
 /* isOperandOnStack - will return true if operand is on stack      */
 /*-----------------------------------------------------------------*/
+#if 0
 bool 
 isOperandOnStack (operand * op)
 {
@@ -933,6 +934,27 @@ isOperandOnStack (operand * op)
 
   return ((IN_STACK (etype)) ? TRUE : FALSE);
 }
+#else
+bool 
+isOperandOnStack (operand * op)
+{
+  sym_link *etype;
+
+  if (!op)
+    return FALSE;
+
+  if (!IS_SYMOP (op))
+    return FALSE;
+
+  etype = getSpec (operandType (op));
+  if (IN_STACK (etype) ||
+      OP_SYMBOL(op)->onStack ||
+      (SPIL_LOC(op) && SPIL_LOC(op)->onStack))
+    return TRUE;
+
+  return FALSE;
+}
+#endif
 
 /*-----------------------------------------------------------------*/
 /* operandLitValue - literal value of an operand                   */

@@ -1911,8 +1911,11 @@ geniCodeAdd (operand * left, operand * right)
   if (IS_PTR (ltype))
     {
       isarray = left->isaddr;
-      size  =	operandFromLit (getSize (ltype->next));
-      right = geniCodeMultiply (right, size, (getArraySizePtr(left) >= INTSIZE));
+      // there is no need to multiply with 1
+      if (getSize(ltype->next)!=1) {
+	size  =	operandFromLit (getSize (ltype->next));
+	right = geniCodeMultiply (right, size, (getArraySizePtr(left) >= INTSIZE));
+      }
       resType = copyLinkChain (ltype);
     }
   else

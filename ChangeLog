@@ -1,3 +1,8 @@
+2003-12-12 Frieder Ferlemann <Frieder.Ferlemann@web.de>
+
+	* src/mcs51/main.c(_mcs51_genRAMCLEAR): using r0 instead of r1/r2.
+	Apparently this did not see much testing (endless loop)
+
 2003-12-11 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/z80/ralloc.c: set DISABLE_PACK_HL = 1 as a temporary fix to bug #855165

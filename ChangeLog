@@ -1,3 +1,7 @@
+2003-05-09    <johan@balder>
+
+	* src/SDCCglue.c: fixed bug #597940
+
 2003-05-05  Karl Bongers(apply patches from Martin Helmling)
 
 	* debugger/mcs51/sdcdb.c,simi.c,cmd.c,symtab.c and .h files.

@@ -35,7 +35,7 @@
 #include <sdcc-lib.h>
 
 #ifdef SDCC_STACK_AUTO
-#warning Make sure you recompile _is*.c files as 'reentrant'
+/* #warning Make sure you recompile _is*.c files as 'reentrant' */
 
 extern char  iscntrl   (unsigned char ) _REENTRANT ;
 extern char  isdigit   (unsigned char ) _REENTRANT ;

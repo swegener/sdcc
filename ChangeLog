@@ -1,3 +1,10 @@
+2003-08-17  Frieder Ferlemann <Frieder.Ferlemann@web.de>
+
+	The first rules relate to bitfields, the last speed up
+	access to xdata mapped I/O devices.
+
+	* src/mcs51/peeph.def: added 24 peepholes 246.x - 248.x
+
 2003-08-16  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	Cleaned up genPackBits and genUnpackBits and added two helper
@@ -218,7 +225,7 @@
 	* link\z80\lkdata.c
 	* link\z80\lklibr.c
 	* link\z80\lkmain.c
-	* src\SDCCglue.c 
+	* src\SDCCglue.c
 
 2003-07-28  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 

@@ -51,7 +51,6 @@ testLogicalAnd(void)
     ASSERT(true && !false);
     ASSERT(!false && true);
 
-    /* PENDING: Doesn't work. */
     /* Test that the evaluation is aborted on the first false. */
     if (true && false && neverGetHere()) {
         /* Tested using neverGetHere() */
@@ -80,7 +79,6 @@ testLogicalOr(void)
     ASSERT(!true || !false);
     ASSERT(false || true);
 
-    /* PENDING: Doesn't work in sdcc. */
     /* Test that the evaluation is aborted on the first hit. */
     if (false || true || neverGetHere()) {
         /* Tested using neverGetHere() */

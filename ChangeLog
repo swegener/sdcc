@@ -1,3 +1,8 @@
+2004-03-28 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* device/lib/large/Makefile: fixed parallel execution by
+	replacing `make` by `$(MAKE)`
+
 2004-03-28 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (genPointerGetSetOfs): correctly handle 1 byte array

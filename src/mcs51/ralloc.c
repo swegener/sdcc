@@ -2183,8 +2183,6 @@ accuse:
 /*-----------------------------------------------------------------*/
 /* packForPush - hueristics to reduce iCode for pushing            */
 /*-----------------------------------------------------------------*/
-catchMe() {}
-
 static void
 packForPush (iCode * ic, eBBlock * ebp)
 {

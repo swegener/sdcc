@@ -1,3 +1,7 @@
+2001-01-04  Bernhard Held  <bernhard@bernhardheld.de>
+
+	* support/regression/ports/mcs51/support.c: correct setup of timer / UART
+
 2001-01-03  Bernhard Held  <bernhard@bernhardheld.de>
 
 	* src/SDCCsymt.c (processFuncArgs): fix #498307 by Johan

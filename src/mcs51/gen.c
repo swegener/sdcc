@@ -89,7 +89,7 @@ _G;
 extern int mcs51_ptrRegReq;
 extern int mcs51_nRegs;
 extern FILE *codeOutFile;
-static void saverbank (int, iCode *, bool);
+static void saveRBank (int, iCode *, bool);
 #define RESULTONSTACK(x) \
                          (IC_RESULT(x) && IC_RESULT(x)->aop && \
                          IC_RESULT(x)->aop->type == AOP_STK )
@@ -1483,12 +1483,14 @@ saveRegisters (iCode * lic)
       }
 
   detype = getSpec (operandType (IC_LEFT (ic)));
+
+#if 0 // why should we do this here??? jwk20011105
   if (detype &&
       (SPEC_BANK (currFunc->etype) != SPEC_BANK (detype)) &&
       IS_ISR (currFunc->etype) &&
       !ic->bankSaved)
-
-    saverbank (SPEC_BANK (detype), ic, TRUE);
+    saveRBank (SPEC_BANK (detype), ic, TRUE);
+#endif
 
 }
 /*-----------------------------------------------------------------*/
@@ -1703,10 +1705,10 @@ genIpop (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* unsaverbank - restores the resgister bank from stack            */
+/* unsaveRBank - restores the resgister bank from stack            */
 /*-----------------------------------------------------------------*/
 static void
-unsaverbank (int bank, iCode * ic, bool popPsw)
+unsaveRBank (int bank, iCode * ic, bool popPsw)
 {
   int i;
   asmop *aop;
@@ -1755,10 +1757,10 @@ unsaverbank (int bank, iCode * ic, bool popPsw)
 }
 
 /*-----------------------------------------------------------------*/
-/* saverbank - saves an entire register bank on the stack          */
+/* saveRBank - saves an entire register bank on the stack          */
 /*-----------------------------------------------------------------*/
 static void
-saverbank (int bank, iCode * ic, bool pushPsw)
+saveRBank (int bank, iCode * ic, bool pushPsw)
 {
   int i;
   asmop *aop;
@@ -1815,21 +1817,6 @@ genCall (iCode * ic)
 {
   sym_link *detype;
 
-  /* if caller saves & we have not saved then */
-  if (!ic->regsSaved)
-    saveRegisters (ic);
-
-  /* if we are calling a function that is not using
-     the same register bank then we need to save the
-     destination registers on the stack */
-  detype = getSpec (operandType (IC_LEFT (ic)));
-  if (detype &&
-      (SPEC_BANK (currFunc->etype) != SPEC_BANK (detype)) &&
-      IS_ISR (currFunc->etype) &&
-      !ic->bankSaved)
-
-    saverbank (SPEC_BANK (detype), ic, TRUE);
-
   /* if send set is not empty the assign */
   if (_G.sendSet)
     {
@@ -1855,6 +1842,22 @@ genCall (iCode * ic)
 	}
       _G.sendSet = NULL;
     }
+
+  /* if we are calling a function that is not using
+     the same register bank then we need to save the
+     destination registers on the stack */
+  detype = getSpec (operandType (IC_LEFT (ic)));
+  if (detype &&
+      (SPEC_BANK (currFunc->etype) != SPEC_BANK (detype)) &&
+      IS_ISR (currFunc->etype) &&
+      !ic->bankSaved) {
+    saveRBank (SPEC_BANK (detype), ic, TRUE);
+  } else /* no need to save if we just saved the whole bank */ {
+    /* if caller saves & we have not saved then */
+    if (!ic->regsSaved)
+      saveRegisters (ic);
+  }
+
   /* make the call */
   emitcode ("lcall", "%s", (OP_SYMBOL (IC_LEFT (ic))->rname[0] ?
 			    OP_SYMBOL (IC_LEFT (ic))->rname :
@@ -1895,7 +1898,7 @@ genCall (iCode * ic)
 
   /* if register bank was saved then pop them */
   if (ic->bankSaved)
-    unsaverbank (SPEC_BANK (detype), ic, TRUE);
+    unsaveRBank (SPEC_BANK (detype), ic, TRUE);
 
   /* if we hade saved some registers then unsave them */
   if (ic->regsSaved && !(OP_SYMBOL (IC_LEFT (ic))->calleeSave))
@@ -1925,7 +1928,7 @@ genPcall (iCode * ic)
   if (detype &&
       IS_ISR (currFunc->etype) &&
       (SPEC_BANK (currFunc->etype) != SPEC_BANK (detype)))
-    saverbank (SPEC_BANK (detype), ic, TRUE);
+    saveRBank (SPEC_BANK (detype), ic, TRUE);
 
 
   /* push the return address on to the stack */
@@ -2008,7 +2011,7 @@ genPcall (iCode * ic)
   if (detype &&
       (SPEC_BANK (currFunc->etype) !=
        SPEC_BANK (detype)))
-    unsaverbank (SPEC_BANK (detype), ic, TRUE);
+    unsaveRBank (SPEC_BANK (detype), ic, TRUE);
 
   /* if we hade saved some registers then
      unsave them */
@@ -2148,9 +2151,9 @@ genFunction (iCode * ic)
 	  else
 	    {
 	      /* this function has  a function call cannot
-	         determines register usage so we will have the
+	         determines register usage so we will have to push the
 	         entire bank */
-	      saverbank (0, ic, FALSE);
+	      saveRBank (0, ic, FALSE);
 	    }
 	}
     }
@@ -2311,9 +2314,9 @@ genEndFunction (iCode * ic)
 	  else
 	    {
 	      /* this function has  a function call cannot
-	         determines register usage so we will have the
+	         determines register usage so we will have to pop the
 	         entire bank */
-	      unsaverbank (0, ic, FALSE);
+	      unsaveRBank (0, ic, FALSE);
 	    }
 	}
 

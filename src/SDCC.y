@@ -58,6 +58,8 @@ STACK_DCL(blockNum,int,MAX_NEST_LEVEL*3)
 value *cenum = NULL  ;  /* current enumeration  type chain*/
 
 %}
+%expect 6
+
 %union {
     symbol     *sym ;      /* symbol table pointer       */
     structdef  *sdef;      /* structure definition       */
@@ -747,6 +749,9 @@ struct_declaration
            symbol *sym ;
            for ( sym = $2 ; sym != NULL ; sym = sym->next ) {
 	       
+	       /* make the symbol one level up */
+	       sym->level-- ;
+
 	       pointerTypes(sym->type,copyLinkChain($1));
 	       if (!sym->type) {
 		   sym->type = copyLinkChain($1);

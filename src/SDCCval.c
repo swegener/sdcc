@@ -890,17 +890,10 @@ floatFromVal (value * val)
 	return (double) SPEC_CVAL (val->etype).v_long;
     }
   
-  if (SPEC_NOUN(val->etype)==V_INT) {
-    if (SPEC_USIGN (val->etype))
-      return (double) SPEC_CVAL (val->etype).v_uint;
-    else
-      return (double) SPEC_CVAL (val->etype).v_int;
-  } else { // SPEC_NOUN==V_CHAR
-    if (SPEC_USIGN (val->etype))
-      return (double) ((unsigned char)SPEC_CVAL (val->etype).v_uint);
-    else
-      return (double) ((signed char)SPEC_CVAL (val->etype).v_int);
-  }
+  if (SPEC_USIGN (val->etype))
+    return (double) SPEC_CVAL (val->etype).v_uint;
+  else
+    return (double) SPEC_CVAL (val->etype).v_int;
 }
 
 
@@ -928,9 +921,6 @@ valUnaryPM (value * val)
 	    SPEC_CVAL (val->etype).v_uint = 0-SPEC_CVAL (val->etype).v_uint;
 	  else
 	    SPEC_CVAL (val->etype).v_int = -SPEC_CVAL (val->etype).v_int;
-	  if (SPEC_NOUN (val->etype)==V_CHAR) {
-	    SPEC_CVAL (val->etype).v_uint &= 0xff;
-	  }
 	}
     }
   // -(unsigned 3) now really is signed

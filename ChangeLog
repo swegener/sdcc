@@ -1,3 +1,7 @@
+2004-01-07  Borut Razem <borut.razem@siol.net>
+
+	* support/scripts/sdcc.nsi: update PATH
+
 2004-01-07 Bernhard Held <bernhard@bernhardheld.de>
 
 	* device/include/Makefile.in: fix install

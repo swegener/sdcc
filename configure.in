@@ -195,7 +195,7 @@ AC_SUBST(HAVE_LIBGC)
 
 # Generating output files
 # ===========================================================================
-AC_CONFIG_SUBDIRS(sim/mcs51)
+AC_CONFIG_SUBDIRS(sim/ucsim)
 AC_OUTPUT(main.mk:main_in.mk
 support/gc/Makefile
 src/Makefile

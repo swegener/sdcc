@@ -1,4 +1,4 @@
-PRJDIR 	= ../..
+PRJDIR = ../..
 
 include $(PRJDIR)/Makefile.common
 
@@ -16,7 +16,7 @@ $(BINS): $(OBJS)
 	$(CC) $(LDFLAGS) -o $(BINS) $(OBJS)
 
 %.o:	%.c
-	$(CC) -c $(CFLAGS) -I$(TOPDIR)/as/$(PORT) -o $@ $<
+	$(CC) -c $(CFLAGS) -I$(PRJDIR)/as/$(PORT) -o $@ $<
 
 clean:
 	rm -f $(OBJS) $(BINS)

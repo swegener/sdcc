@@ -8,11 +8,11 @@ all:
 
 _z80: clean
 	make -C z80
-	cp z80/as$(E) $(TOPDIR)/bin/as-z80$(E)
+	cp z80/as$(E) $(PRJDIR)/bin/as-z80$(E)
 
 _gbz80: clean
 	make -C z80 "OPTS=-DGAMEBOY"
-	cp z80/as$(E) $(TOPDIR)/bin/as-gbz80$(E)
+	cp z80/as$(E) $(PRJDIR)/bin/as-gbz80$(E)
 
 clean:
 	make -C z80 clean

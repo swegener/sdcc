@@ -184,7 +184,7 @@ enum {
 
 /* other command line options */
 struct options {
-    int model;	       ; /* see MODEL_* defines above */
+    int model;	         /* see MODEL_* defines above */
     int stackAuto : 3  ; /* Stack Automatic  */
     int useXstack : 3  ; /* use Xternal Stack */
     int stack10bit : 3;  /* use 10 bit stack (flat24 model only) */

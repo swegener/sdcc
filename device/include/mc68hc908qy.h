@@ -249,8 +249,8 @@ VOLXDATA UINT8 at 0xfe0b BRKSCR;  /* Break Status and Control Register */
 VOLXDATA UINT8 at 0xfe0c LVISR;   /* LVI Status Register */
   #define LVIOUT ((struct _hc08_bits *)(&LVISR))->bit7
 
-VOLXDATA UINT8 at 0xfebe FLBPR;   /* FLASH Block Protect Register */
-VOLXDATA UINT8 at 0xfec0 OSCTRIMVAL; /* Oscillator Trim Value */
+VOLXDATA UINT8 at 0xffbe FLBPR;   /* FLASH Block Protect Register */
+VOLXDATA UINT8 at 0xffc0 OSCTRIMVAL; /* Oscillator Trim Value */
 VOLXDATA UINT8 at 0xffff COPCTL;  /* COP Control Register */
 
 

@@ -1871,10 +1871,11 @@ void PT(sym_link *type)
 /*-----------------------------------------------------------------*/
 /* printTypeChain - prints the type chain in human readable form   */
 /*-----------------------------------------------------------------*/
-void 
-printTypeChain (sym_link * type, FILE * of)
+void
+printTypeChain (sym_link * start, FILE * of)
 {
   int nlr = 0;
+  sym_link * type, * search;
 
   if (!of)
     {
@@ -1882,61 +1883,65 @@ printTypeChain (sym_link * type, FILE * of)
       nlr = 1;
     }
 
+  /* print the chain as it is written in the source: */
+  /* start with the last entry                       */
+  for (type = start; type && type->next; type = type->next)
+    ;
   while (type)
     {
       if (IS_DECL (type))
 	{
-	  if (DCL_PTR_VOLATILE(type)) {
+	  if (DCL_PTR_VOLATILE (type)) {
 	    fprintf (of, "volatile ");
 	  }
 	  switch (DCL_TYPE (type))
 	    {
 	    case FUNCTION:
-	      fprintf (of, "function ");
+	      fprintf (of, "function");
 	      break;
 	    case GPOINTER:
-	      fprintf (of, "generic * ");
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
+	      fprintf (of, "generic *");
 	      break;
 	    case CPOINTER:
-	      fprintf (of, "code * ");
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
+	      fprintf (of, "code *");
 	      break;
 	    case FPOINTER:
-	      fprintf (of, "far * ");
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
+	      fprintf (of, "far *");
 	      break;
 	    case EEPPOINTER:
-	      fprintf (of, "eeprom * ");
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
+	      fprintf (of, "eeprom * ");
 	      break;
 
 	    case POINTER:
-	      fprintf (of, "near * ");
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
+	      fprintf (of, "near *");
 	      break;
 	    case IPOINTER:
-	      fprintf (of, "idata *");
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
+	      fprintf (of, "idata *");
 	      break;
 	    case PPOINTER:
-	      fprintf (of, "pdata *");
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
+	      fprintf (of, "pdata *");
 	      break;
 	    case UPOINTER:
-	      fprintf (of, "unkown *");
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
+	      fprintf (of, "unkown *");
 	      break;
 	    case ARRAY:
-	      fprintf (of, "array of ");
+	      fprintf (of, "array of");
 	      break;
 	    }
 	}
@@ -1954,19 +1959,19 @@ printTypeChain (sym_link * type, FILE * of)
 	    case V_INT:
 	      if (IS_LONG (type))
 		fprintf (of, "long ");
-	      fprintf (of, "int ");
+	      fprintf (of, "int");
 	      break;
 
 	    case V_CHAR:
-	      fprintf (of, "char ");
+	      fprintf (of, "char");
 	      break;
 
 	    case V_VOID:
-	      fprintf (of, "void ");
+	      fprintf (of, "void");
 	      break;
 
 	    case V_FLOAT:
-	      fprintf (of, "float ");
+	      fprintf (of, "float");
 	      break;
 
 	    case V_STRUCT:
@@ -1974,7 +1979,7 @@ printTypeChain (sym_link * type, FILE * of)
 	      break;
 
 	    case V_SBIT:
-	      fprintf (of, "sbit ");
+	      fprintf (of, "sbit");
 	      break;
 
 	    case V_BIT:
@@ -1982,15 +1987,20 @@ printTypeChain (sym_link * type, FILE * of)
 	      break;
 
 	    case V_DOUBLE:
-	      fprintf (of, "double ");
+	      fprintf (of, "double");
 	      break;
 
 	    default:
-	      fprintf (of, "unknown type ");
+	      fprintf (of, "unknown type");
 	      break;
 	    }
 	}
-      type = type->next;
+	/* search entry in list before "type" */
+    for (search = start; search && search->next != type;)
+       search = search->next;
+    type = search;
+    if (type)
+      fputc (' ', of);
     }
   if (nlr)
     fprintf (of, "\n");
@@ -1999,7 +2009,7 @@ printTypeChain (sym_link * type, FILE * of)
 /*-----------------------------------------------------------------*/
 /* cdbTypeInfo - print the type information for debugger           */
 /*-----------------------------------------------------------------*/
-void 
+void
 cdbTypeInfo (sym_link * type, FILE * of)
 {
   fprintf (of, "{%d}", getSize (type));

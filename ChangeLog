@@ -1,3 +1,7 @@
+2001-10-03 Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCsymt.c: sequence of specifiers in pintTypeChain() corrected
+
 2001-10-01 Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCglue.c: test, if win32api is available for MINGW

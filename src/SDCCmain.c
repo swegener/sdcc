@@ -2156,7 +2156,8 @@ main (int argc, char **argv, char **envp)
 
       yyparse ();
 
-      pclose(yyin);
+      if (pclose(yyin))
+        fatalError = 1;
       deleteSetItem(&pipeSet, yyin);
 
       if (fatalError) {

@@ -54,7 +54,7 @@ extern int   memcmp (void *, void *, size_t )  ;
 extern void *memset (void *, unsigned char  , size_t )  ;
 extern void *memmove (void *, void *, size_t )  ;
 
-#if SDCC_ds390
+#ifdef SDCC_ds390
 extern void xdata * memcpyx(void xdata *, void xdata *, int) _naked;
 #endif
 

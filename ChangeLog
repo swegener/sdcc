@@ -1,3 +1,10 @@
+2004-05-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* device/include/string.h: applied Stas Sergeev's patch to make this
+	header file compatible with the preprocessor -Wundef option
+	* src/SDCCmain.c (main): abort compilation if preprocessor reports
+	failure (fixes bug #941458)
+
 2004-05-21 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCopt.c (killDeadCode): fixed bug #907733

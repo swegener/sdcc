@@ -34,7 +34,6 @@ CPPFLAGS        = @CPPFLAGS@ -I$(PRJDIR)
 # ------------------------------------------
 all:
 
-
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs

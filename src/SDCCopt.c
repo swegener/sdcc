@@ -613,13 +613,7 @@ isLocalWithoutDef (symbol * sym)
 {
   if (!IS_AUTO (sym))
     return 0;
-  #if 0
-  if (!sym->level)
-    return 0;
   
-  if (IS_STATIC (sym->etype))
-    return 0;
-  #endif
   if (IS_VOLATILE (sym->type))
     return 0;
   

@@ -25,6 +25,9 @@
 #ifndef __MYSYSTEM_H
 #define __MYSYSTEM_H
 
+#include <stdio.h>
+#include "SDCCset.h"
+
 extern set *binPathSet; /* set of binary paths */
 
 int my_system(const char *cmd);

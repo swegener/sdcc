@@ -791,8 +791,8 @@ struct_declarator
 
 enum_specifier
    : ENUM            '{' enumerator_list '}' {
-                                                addSymChain ($3);
-                                                allocVariables(reverseSyms($3)) ;
+                                                //addSymChain ($3);
+                                                //allocVariables(reverseSyms($3)) ;
                                                 $$ = copyLinkChain(cenum->type);
                                              }
    | ENUM identifier '{' enumerator_list '}' {
@@ -806,8 +806,8 @@ enum_specifier
                                                    werror(E_DUPLICATE_TYPEDEF,csym->name);
 
                                                 addSym ( enumTab,$2,$2->name,$2->level,$2->block, 0);
-						addSymChain ($4);
-                                                allocVariables (reverseSyms($4));
+						//addSymChain ($4);
+                                                //allocVariables (reverseSyms($4));
                                                 $$ = copyLinkChain(cenum->type);
                                                 SPEC_SCLS(getSpec($$)) = 0 ;
                                              }
@@ -838,15 +838,17 @@ enumerator_list
    ;
 
 enumerator
-   : identifier opt_assign_expr  {
-                                    /* make the symbol one level up */
-                                    $1->level-- ;
-                                    $1->type = copyLinkChain($2->type); 
-                                    $1->etype= getSpec($1->type);
-				    SPEC_ENUM($1->etype) = 1;
-                                    $$ = $1 ;
-
-                                 }
+   : identifier opt_assign_expr  
+     {
+       /* make the symbol one level up */
+       $1->level-- ;
+       $1->type = copyLinkChain($2->type); 
+       $1->etype= getSpec($1->type);
+       SPEC_ENUM($1->etype) = 1;
+       $$ = $1 ;
+       // do this now, so we can use it for the next enums in the list
+       addSymChain($1);
+     }
    ;
 
 opt_assign_expr

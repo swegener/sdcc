@@ -621,6 +621,7 @@ mergeSpec (sym_link * dest, sym_link * src, char *name)
   SPEC_BLEN (dest) |= SPEC_BLEN (src);
   SPEC_BSTR (dest) |= SPEC_BSTR (src);
   SPEC_TYPEDEF (dest) |= SPEC_TYPEDEF (src);
+  SPEC_ENUM (dest) |= SPEC_ENUM (src);
 
   if (IS_STRUCT (dest) && SPEC_STRUCT (dest) == NULL)
     SPEC_STRUCT (dest) = SPEC_STRUCT (src);

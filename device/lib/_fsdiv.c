@@ -89,7 +89,7 @@ float __fsdiv (float a1, float a2)
   result &= ~HIDDEN;
 
   /* pack up and go home */
-  fl1.l = PACK (sign ? 1<<31 : 0, (unsigned long) exp, result);
+  fl1.l = PACK (sign ? 1ul<<31 : 0, (unsigned long) exp, result);
   return (fl1.f);
 }
 

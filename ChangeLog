@@ -1,6 +1,6 @@
 2003-09-21  Bernhard Held <bernhard@bernhardheld.de>
 
-	* device/lib/_fsmul.c: replaced (1<<31) by (1ul<<31)
+	* device/lib/_fsdiv.c: replaced (1<<31) by (1ul<<31)
 
 2003-09-19  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 

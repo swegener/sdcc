@@ -217,10 +217,20 @@ replace {
         ljmp %5
 %2:
 } by {
-        ; Peephole 112   removed ljmp by inverse jump logic
+       ; Peephole 112   removed ljmp by inverse jump logic
         jb   %1,%5
 %2:
 } if labelInRange
+
+replace {
+        ljmp %5
+%1:
+} by {
+        ; Peephole 132   changed ljmp to sjmp
+        sjmp %5
+%1:
+} if labelInRange
+
 
 replace {
         clr  a
@@ -489,15 +499,6 @@ replace {
         dec  %1         
         mov  %2,%1      
 }
-
-replace {
-        ljmp %5
-%1:
-} by {
-        ; Peephole 132   changed ljmp to sjmp
-        sjmp %5
-%1:
-} if labelInRange
 
 replace {
         mov  r%1,%2
@@ -845,7 +846,8 @@ replace {
 } by {
         ; Peephole 164   removed sjmp by inverse jump logic
         jb   %3,%2
-%1:}
+%1:
+}
 
 replace {
         jb   %3,%1
@@ -854,7 +856,8 @@ replace {
 } by {
         ; Peephole 165   removed sjmp by inverse jump logic
         jnb  %3,%2
-%1:}
+%1:
+}
 
 replace {
         mov  %1,%2

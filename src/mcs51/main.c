@@ -8,6 +8,33 @@
 #include "main.h"
 #include "ralloc.h"
 
+/* list of key words used by msc51 */
+static char *_mcs51_keywords[] =     {
+    "at",
+    "bit",
+    "code",
+    "critical",
+    "data",
+    "far",
+    "idata",
+    "interrupt",
+    "near",
+    "pdata",
+    "reentrant",
+    "sfr",
+    "sbit",
+    "using",
+    "xdata",
+    "_data",
+    "_code",
+    "_generic",
+    "_near",
+    "_xdata",
+    "_pdata",
+    "_idata",
+    NULL
+};
+
 
 void mcs51_assignRegisters (eBBlock **ebbs, int count);
 
@@ -71,5 +98,7 @@ PORT mcs51_port = {
     _mcs51_finaliseOptions,
     _mcs51_setDefaultOptions,
     mcs51_assignRegisters,
-    _mcs51_getRegName
+    _mcs51_getRegName ,
+    _mcs51_keywords
+
 };

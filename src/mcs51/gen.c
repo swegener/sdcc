@@ -4161,12 +4161,13 @@ static void genXor (iCode *ic, iCode *ifx)
                 // c = bit ^ val
                 // if val>>1 != 0, result = 1
                 emitcode("setb","c");
-                while(sizer--){
+                while(sizer){
                     MOVA(aopGet(AOP(right),sizer-1,FALSE,FALSE));
                     if(sizer == 1)
                         // test the msb of the lsb
                         emitcode("anl","a,#0xfe");
                     emitcode("jnz","%05d$",tlbl->key+100);
+		    sizer--;
                 }
                 // val = (0,1)
                 emitcode("rrc","a");

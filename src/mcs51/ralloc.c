@@ -1802,7 +1802,7 @@ static iCode *packRegsForOneuse (iCode *ic, operand *op , eBBlock *ebp)
 	   operation is a '*','/' or '%' then 'b' may
 	   cause a problem */
 	if (( dic->op == '%' || dic->op == '/' || dic->op == '*') &&
-	    getSize(aggrToPtr(operandType(op),FALSE)) >= 3)
+	    getSize(operandType(op)) >= 3)
 		return NULL;
 
 	/* if left or right or result is in far space */

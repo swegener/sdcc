@@ -1146,7 +1146,8 @@ int cseBBlock ( eBBlock *ebb, int computeOnly,
 		deleteGetPointers(&cseSet,&ptrSetSet,IC_LEFT(ic),ebb);
 		ebb->ptrsSet = bitVectSetBit(ebb->ptrsSet,IC_LEFT(ic)->key);
 		for (i = 0 ; i < count ;ebbs[i++]->visited = 0);
-		applyToSet(ebb->succList,delGetPointerSucc,IC_LEFT(ic),ebb->dfnum);
+		applyToSet(ebb->succList,delGetPointerSucc,
+			   IC_LEFT(ic),ebb->dfnum);
 	    }
 	    continue;
 	}
@@ -1166,6 +1167,16 @@ int cseBBlock ( eBBlock *ebb, int computeOnly,
 	/* do some algebraic optimizations if possible */
 	algebraicOpts (ic);
 	while (constFold(ic,cseSet));
+
+	/* small klugde */
+	if (POINTER_GET(ic) && !IS_PTR(operandType(IC_LEFT(ic)))) {
+	    setOperandType(IC_LEFT(ic),
+			   aggrToPtr(operandType(IC_LEFT(ic)),FALSE));
+	}
+	if (POINTER_SET(ic) && !IS_PTR(operandType(IC_RESULT(ic)))) {
+	    setOperandType(IC_RESULT(ic),
+			   aggrToPtr(operandType(IC_RESULT(ic)),FALSE));
+	}
 
 	/* if this is a condition statment then */
 	/* check if the condition can be replaced */
@@ -1212,7 +1223,8 @@ int cseBBlock ( eBBlock *ebb, int computeOnly,
 		       for the same pointer visible if yes
 		       then change this into an assignment */
 		    pdop = NULL;
-		    if (applyToSetFTrue(cseSet,findPointerSet,IC_LEFT(ic),&pdop)){
+		    if (applyToSetFTrue(cseSet,findPointerSet,IC_LEFT(ic),&pdop) &&
+			!bitVectBitValue(ebb->ptrsSet,pdop->key)){
 			ic->op = '=';
 			IC_LEFT(ic) = NULL;
 			IC_RIGHT(ic) = pdop;

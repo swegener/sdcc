@@ -2773,7 +2773,7 @@ ast *backPatchLabels (ast *tree, symbol *trueLabel, symbol *falseLabel )
     
     /* change not */
     if (IS_NOT(tree)) {
-	tree->left = backPatchLabels (tree->left,trueLabel,falseLabel);
+	tree->left = backPatchLabels (tree->left,falseLabel,trueLabel);
 	
 	/* if the left is already a IFX */
 	if ( ! IS_IFX(tree->left) ) 

@@ -1017,10 +1017,7 @@ static void assemble (char **envp)
 
     asmArgs[0] = port->assembler.exec_name;
     
-/*     if (options.debug) */
     asmArgs[1] = port->assembler.debug_opts;
-/*     else */
-/* 	asmArgs[1] = port->assembler.plain_opts; */
 
     /* add the extra options if any */
     for (; asmOptions[i-2] ; i++)

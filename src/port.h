@@ -9,8 +9,11 @@
 typedef struct {
     /** Target name used for -m */
     const char *target;
+
     /** Target name string, used for --help */
     const char *target_name;
+
+    /* assembler related information */
     struct {
 	/** Command to run (eg as-z80) */
 	const char *exec_name;
@@ -21,10 +24,13 @@ typedef struct {
 	/** TRUE if the output file name should be pre-pended to the args */
 	bool requires_output_name;
     } assembler;
+
+    /* linker related info */
     struct {
 	/** Command to run (eg link-z80) */
 	const char *exec_name;
     } linker;
+
     /** Basic type sizes */
     struct {
 	int char_size;
@@ -38,6 +44,7 @@ typedef struct {
 	int float_size;
 	int max_base_size;
     } s;
+
     /** Names for all the memory regions */
     struct {
 	const char *xstack_name;
@@ -51,6 +58,8 @@ typedef struct {
 	const char *static_name;
 	const char *overlay_name;
     } mem;
+    
+    /* stack related information */
     struct {
 	/** -1 for grows down (z80), +1 for grows up (mcs51) */
 	int direction;
@@ -65,10 +74,12 @@ typedef struct {
 	
     } stack;
     struct {
-	/** One more than the smallest mul/div operation the processor can do nativley 
+	/** One more than the smallest 
+	    mul/div operation the processor can do nativley 
 	    Eg if the processor has an 8 bit mul, nativebelow is 2 */
 	int nativebelow;
     } muldiv;
+
     /** Parses one option + its arguments */
     bool (*parseOption)(int *pargc, char **argv);
     /** Called after all the options have been parsed. */
@@ -78,9 +89,14 @@ typedef struct {
     void (*setDefaultOptions)(void);
     /** Does the dirty work. */
     void (*assignRegisters)(eBBlock **, int);
+    
     /** Returns the register name of a symbol.
 	Used so that 'regs' can be an incomplete type. */
     const char *(*getRegName)(struct regs *reg);
+
+    /* list of keywords that are used by this
+       target (used by lexer) */
+    char **keywords; 
 } PORT;
 
 extern PORT *port;

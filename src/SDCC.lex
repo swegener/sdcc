@@ -33,13 +33,7 @@ IS       (u|U|l|L)*
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include "SDCCglobl.h"
-#include "SDCCsymt.h"
-#include "SDCCval.h"
-#include "SDCCast.h"
-#include "SDCCy.h"
-#include "SDCChasht.h"
-#include "SDCCmem.h"
+#include "common.h"
     
 char *stringLiteral();
 char *currFname;
@@ -57,10 +51,12 @@ int yywrap YY_PROTO((void))
 {
    return(1);
 }
-
+#define TKEYWORD(token) return (isTargetKeyword(yytext) ? token :\
+			        check_type(yytext))
 char asmbuff[MAX_INLINEASM]			;
 char *asmp ;
-extern int check_type		(	   );
+extern int check_type		();
+ extern int isTargetKeyword     ();
 extern int checkCurrFile	(char *);
 extern int processPragma	(char *);
 extern int printListing		(int   );
@@ -94,39 +90,39 @@ struct options  save_options  ;
 <asm>.         { *asmp++ = yytext[0]	; }
 <asm>\n        { count(); *asmp++ = '\n' ;}
 "/*"	       { comment(); }
-"at"	       { count(); return(AT)  ; }
-"auto"	    { count(); return(AUTO); }
-"bit"	       { count(); return(BIT) ; }
-"break"      { count(); return(BREAK); }
-"case"       { count(); return(CASE); }
+"at"	       { count(); TKEYWORD(AT)  ; }
+"auto"	       { count(); return(AUTO); }
+"bit"	       { count(); TKEYWORD(BIT) ; }
+"break"        { count(); return(BREAK); }
+"case"         { count(); return(CASE); }
 "char"         { count(); return(CHAR); }
-"code"         { count(); return(CODE); }
+"code"         { count(); TKEYWORD(CODE); }
 "const"        { count(); return(CONST); }
 "continue"     { count(); return(CONTINUE); }
-"critical"     { count(); return(CRITICAL); } 
-"data"	       { count(); return(DATA);   }
+"critical"     { count(); TKEYWORD(CRITICAL); } 
+"data"	       { count(); TKEYWORD(DATA);   }
 "default"      { count(); return(DEFAULT); }
 "do"           { count(); return(DO); }
 "double"       { count(); werror(W_DOUBLE_UNSUPPORTED);return(FLOAT); }
 "else"         { count(); return(ELSE); }
 "enum"         { count(); return(ENUM); }
 "extern"       { count(); return(EXTERN); }
-"far"          { count(); return(XDATA);  }
+"far"          { count(); TKEYWORD(XDATA);  }
 "float"        { count(); return(FLOAT); }
 "for"          { count(); return(FOR); }
 "goto"	       { count(); return(GOTO); }
-"idata"        { count(); return(IDATA);}
+"idata"        { count(); TKEYWORD(IDATA);}
 "if"           { count(); return(IF); }
 "int"          { count(); return(INT); }
 "interrupt"    { count(); return(INTERRUPT);}
 "long"	       { count(); return(LONG); }
-"near"		   { count(); return(DATA);}
+"near"	       { count(); TKEYWORD(DATA);}
 "pdata"        { count(); return(PDATA); }
-"reentrant"    { count(); return(REENTRANT);}
+"reentrant"    { count(); TKEYWORD(REENTRANT);}
 "register"     { count(); return(REGISTER); }
 "return"       { count(); return(RETURN); }
-"sfr"	       { count(); return(SFR)	; }
-"sbit"	       { count(); return(SBIT)	; }
+"sfr"	       { count(); TKEYWORD(SFR)	; }
+"sbit"	       { count(); TKEYWORD(SBIT)	; }
 "short"        { count(); return(SHORT); }
 "signed"       { count(); return(SIGNED); }
 "sizeof"       { count(); return(SIZEOF); }
@@ -138,17 +134,17 @@ struct options  save_options  ;
 "unsigned"     { count(); return(UNSIGNED); }
 "void"         { count(); return(VOID); }
 "volatile"     { count(); return(VOLATILE); }
-"using"        { count(); return(USING); }
+"using"        { count(); TKEYWORD(USING); }
 "while"        { count(); return(WHILE); }
-"xdata"        { count(); return(XDATA); }
-"_data"		   { count(); return(_NEAR); }
-"_code"		   { count(); return(_CODE); }
-"_generic"	   { count(); return(_GENERIC); }
-"_near"		   { count(); return(_NEAR); }
-"_xdata"       { count(); return(_XDATA);}
-"_pdata" { count () ; return(_PDATA); }
-"_idata" { count () ; return(_IDATA); }
-"..."		   { count(); return(VAR_ARGS);}
+"xdata"        { count(); TKEYWORD(XDATA); }
+"_data"	       { count(); TKEYWORD(_NEAR); }
+"_code"	       { count(); TKEYWORD(_CODE); }
+"_generic"     { count(); TKEYWORD(_GENERIC); }
+"_near"	       { count(); TKEYWORD(_NEAR); }
+"_xdata"       { count(); TKEYWORD(_XDATA);}
+"_pdata"       { count(); TKEYWORD(_PDATA); }
+"_idata"       { count(); TKEYWORD(_IDATA); }
+"..."	       { count(); return(VAR_ARGS);}
 {L}({L}|{D})*  { count(); return(check_type()); }
 0[xX]{H}+{IS}? { count(); yylval.val = constVal(yytext); return(CONSTANT); }
 0{D}+{IS}?     { count(); yylval.val = constVal(yytext); return(CONSTANT); }
@@ -180,8 +176,8 @@ struct options  save_options  ;
 "=="           { count(); return(EQ_OP); }
 "!="           { count(); return(NE_OP); }
 ";"            { count(); return(';'); }
-"{"			   { count()	; NestLevel++ ;  return('{'); }
-"}"			   { count(); NestLevel--; return('}'); }
+"{"	       { count(); NestLevel++ ;  return('{'); }
+"}"	       { count(); NestLevel--; return('}'); }
 ","            { count(); return(','); }
 ":"            { count(); return(':'); }
 "="            { count(); return('='); }
@@ -495,5 +491,21 @@ int process_pragma(char *s)
     }
 
     werror(W_UNKNOWN_PRAGMA,cp);
+    return 0;
+}
+
+/* will return 1 if the string is a part
+   of a target specific keyword */
+int isTargetKeyword(char *s)
+{
+    int i;
+    
+    if (port->keywords == NULL)
+	return 0;
+    for ( i = 0 ; port->keywords[i] ; i++ ) {
+	if (strcmp(port->keywords[i],s) == 0)
+	    return 1;
+    }
+    
     return 0;
 }

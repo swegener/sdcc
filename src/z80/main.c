@@ -1,6 +1,8 @@
 #include "common.h"
 #include "ralloc.h"
 
+static char *_z80_keywords[] = { NULL };
+
 void z80_assignRegisters (eBBlock **ebbs, int count);
 
 static bool _z80_parseOptions(int *pargc, char **argv)
@@ -78,6 +80,7 @@ PORT z80_port = {
     _z80_finaliseOptions,
     _z80_setDefaultOptions,
     z80_assignRegisters,
-    _z80_getRegName
+    _z80_getRegName,
+    _z80_keywords
 };
 

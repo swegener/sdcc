@@ -30,7 +30,7 @@ int maxRegBank = 0;
 int fatalError = 0			 ;/* fatal error flag			*/
 
 /*-----------------------------------------------------------------*/
-/* allocMap - allocates a memory map							   */
+/* allocMap - allocates a memory map				   */
 /*-----------------------------------------------------------------*/
 memmap *allocMap (char rspace,     /* sfr space            */
                   char farmap,     /* far or near segment  */

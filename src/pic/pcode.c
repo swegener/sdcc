@@ -1594,9 +1594,12 @@ void pBlockConvert2ISR(pBlock *pb)
 void movepBlock2Head(char dbName)
 {
 	pBlock *pb;
-	
+
+	if (!the_pFile)
+		return;
+
 	pb = the_pFile->pbHead;
-	
+
 	while(pb) {
 		
 		if(getpBlock_dbName(pb) == dbName) {

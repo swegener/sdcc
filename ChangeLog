@@ -1,3 +1,10 @@
+2003-01-26    <johan@balder>
+
+	* src/SDCClrange.c:  fixed Bernhard's "char * code ptr = &c"
+	* src/SDCCsymt.h: fixed bug #673374
+	* src/SDCCglue.c: fixed bug #661910
+	* src/SDCCast.c: fixed bug #458099 and 673374
+
 2003-01-26  Bernhard Held <bernhard@bernhardheld.de>
 
 	* as/mcs51/strcmpi.c: added, provides as_strcmpi(); strcmpi() is not ANSI

@@ -5,10 +5,14 @@ TOPDIR = ../../..
 SCC = $(TOPDIR)/bin/sdcc -mz80
 SAS = $(TOPDIR)/bin/as-z80
 
-OBJ = div.o mul.o putchar.o printf.o shift.o stubs.o # asm_strings.o string.s
+OBJ = div.o mul.o putchar.o printf.o shift.o stubs.o \
+	asm_strings.o
+
 LIB = z80.lib
 CC = $(SCC)
 AS = $(SAS)
+ASFLAGS = -plosgff
+
 CFLAGS = -I../../include -I.
 
 all: $(LIB) crt0.o
@@ -19,6 +23,9 @@ $(LIB): $(OBJ) Makefile _dummy
 
 .c.o:
 	$(CC) $(CFLAGS) -c $<
+
+.s.o:
+	$(AS) $(ASFLAGS) $@ $<
 
 _dummy:
 

@@ -79,25 +79,26 @@ __muluint_rrx_hds::
 	;; Register used: AF,BC,DE,HL
 .mul16:
 .mulu16:
-	LD	HL,#0x00	; Product = 0
-	LD	A,#15		; Count = bit length - 1
-	;; Shift-and-add algorithm
-	;; If MSB of multiplier is 1, add multiplicand to partial product
-	;; Shift partial product, multiplier left 1 bit
-.mlp:
-	SLA	E		; Shift multiplier left 1 bit
-	RL	D
-	jp	NC,.mlp1	; Jump if MSB of multiplier = 0
-	ADD	HL,BC		; Add multiplicand to partial product
-.mlp1:
-	ADD	HL,HL		; Shift partial product left
-	DEC	A
-	jp	NZ,.mlp		; Continue until count = 0
-	;; Add multiplicand one last time if MSB of multiplier is 1
-	BIT	7,D		; Get MSB of multiplier
-	JR	Z,.mend		; Exit if MSB of multiplier is 0
-	ADD	HL,BC		; Add multiplicand to product
-.mend:
-				; HL = result
-	ret
+        ld      hl,#0
+        ld      a,b
+        ; ld c,c
+        ld      b,#16
 
+        ;; Optimise for the case when this side has 8 bits of data or
+        ;; less.  This is often the case with support address calls.
+        or      a
+        jp      nz,1$
+        
+        ld      b,#8
+        ld      a,c
+1$:
+        ;; Taken from z88dk, which originally borrowed from the
+        ;; Spectrum rom.
+        add     hl,hl
+        rl      c
+        rla                     ;DLE 27/11/98
+        jr      nc,2$
+        add     hl,de
+2$:     
+        djnz    1$
+        ret

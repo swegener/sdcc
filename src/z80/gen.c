@@ -1,6 +1,33 @@
 /*-------------------------------------------------------------------------
   gen.c - Z80 specific code generator.
+     
+  Michael Hope <michaelh@juju.net.nz> 2000
+  Based on the mcs51 generator -
+      Sandeep Dutta . sandeep.dutta@usa.net (1998)
+   and -  Jean-Louis VERN.jlvern@writeme.com (1999)
 
+  This program is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+  In other words, you are welcome to use, share and improve this program.
+  You are forbidden to forbid anyone else to use, share and improve
+  what you give them.   Help stamp out software-hoarding!
+
+-------------------------------------------------------------------------*/
+
+/*
   Benchmarks on dhry.c 2.1 with 32766 loops and a 10ms clock:
                                        ticks dhry  size
   Base with asm strcpy / strcmp / memcpy: 23198 141 1A14
@@ -29,32 +56,29 @@
   5. Optimised strcmp further		21660 151 228C
   6. Optimised memcpy by unroling	20885 157 2201
   7. After turning loop induction on	19862 165 236D
+  8. Same as 7 but with more info	
+  9. With asm optimised strings		17030 192 2223
 
-  Michael Hope <michaelh@juju.net.nz> 2000
-  Based on the mcs51 generator -
-      Sandeep Dutta . sandeep.dutta@usa.net (1998)
-   and -  Jean-Louis VERN.jlvern@writeme.com (1999)
-
-  This program is free software; you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by the
-  Free Software Foundation; either version 2, or (at your option) any
-  later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
-  In other words, you are welcome to use, share and improve this program.
-  You are forbidden to forbid anyone else to use, share and improve
-  what you give them.   Help stamp out software-hoarding!
-
--------------------------------------------------------------------------*/
+  10 and below are with asm strings off.
+  
+  Apparent advantage of turning on regparams:
+  1.  Cost of push
+        Decent case is push of a constant 
+          - ld hl,#n; push hl: (10+11)*nargs
+  2.  Cost of pull from stack
+        Using asm with ld hl, etc
+          - ld hl,#2; add hl,sp; (ld bc,(hl); hl+=2)*nargs
+            10+11+(7+6+7+6)*nargs
+  3.  Cost of fixing stack
+          - pop hl*nargs
+            10*nargs
+  
+  So cost is (10+11+7+6+7+10)*nargs+10+11 
+      = 51*nargs+21
+      = 123 for mul, div, strcmp, strcpy
+  Saving of (98298+32766+32766+32766)*123 = 24181308
+  At 192 d/s for 682411768t, speed up to 199.  Hmm.
+*/
 
 #include <stdio.h>
 #include <stdlib.h>

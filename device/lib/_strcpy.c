@@ -24,6 +24,8 @@
 #include "string.h" 
 #include <sdcc-lib.h>
 
+#if !_SDCC_PORT_PROVIDES_STRCPY
+
 #define NULL (void *)0
 
 char _generic *strcpy (
@@ -45,3 +47,5 @@ char _generic *strcpy (
     return d;
 #endif
 }
+
+#endif

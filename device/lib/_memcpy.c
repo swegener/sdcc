@@ -24,6 +24,8 @@
 #include "string.h" 
 #include <sdcc-lib.h>
 
+#if !_SDCC_PORT_PROVIDES_MEMCPY
+
 #define NULL (void *)0
 
 #pragma NOINDUCTION
@@ -72,3 +74,4 @@ void _generic * memcpy (
 	return(ret);
 #endif
 }
+#endif

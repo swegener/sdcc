@@ -128,7 +128,7 @@ inline assembler code
 \newline 
 
 \newline 
-SDCC also provides an option (--cyclomatic) to report the relative complexity
+SDCC also provides an option (\-\-cyclomatic) to report the relative complexity
  of a function.
  These functions can then be further optimized, or hand coded in assembly
  if needed.
@@ -1064,7 +1064,7 @@ A thing to try is starting from scratch by unpacking the .tgz source package
 \newline 
 
 \family typewriter 
-./configure 2&>1 | tee configure.log
+./configure 2>&1 | tee configure.log
 \family default 
 
 \newline 
@@ -1076,7 +1076,7 @@ and build it like:
 \newline 
 
 \family typewriter 
-make 2&>1 | tee make.log
+make 2>&1 | tee make.log
 \family default 
 
 \newline 

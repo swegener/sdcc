@@ -1,5 +1,9 @@
 2003-10-09  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
+	* src/SDCCmain.c: removed some unintended changes
+
+2003-10-09  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
 	* src/SDCCmain.c (setParseWithComma): fixed bug #816685
 	* src/z80/gen.c: fixed part of bug #817589
 	* src/SDCCsymt.c (checkFunction): fixed bug #817895

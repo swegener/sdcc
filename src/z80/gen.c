@@ -632,6 +632,7 @@ static char *aopGet (asmop *aop, int offset, bool bit16)
     char *rs;
 
     /* offset is greater than size then zero */
+    /* PENDING: this seems a bit screwed in some pointer cases. */
     if (offset > (aop->size - 1) &&
         aop->type != AOP_LIT)
         return zero;
@@ -1361,6 +1362,7 @@ static void genFunction (iCode *ic)
     emitcode(";","-----------------------------------------");
 
     emitcode("","%s:",sym->rname);
+    emitcode("", "__%s_start:", sym->rname);
     fetype = getSpec(operandType(IC_LEFT(ic)));
 
     /* if critical function then turn interrupts off */
@@ -1443,6 +1445,7 @@ static void genEndFunction (iCode *ic)
 	}
 	emitcode("pop", "bc");
 	emitcode("ret", "");
+	emitcode("", "__%s_end:", sym->rname);
     }
     _pushed = 0;
     _spoffset = 0;
@@ -2027,15 +2030,16 @@ static void genCmp (operand *left,operand *right,
 	    }
             while (size--) {
 		/* Do a long subtract */
-		if (!sign || size) 
+		if (!sign || size ) {
 		    MOVA(aopGet(AOP(left),offset,FALSE));
+		}
                 if (sign && size == 0) {
 		    emitcode("ld", "a,%s", _fTmp[0]);
 		    emitcode("sbc", "a,%s", _fTmp[1]);
 		}
 		else {
 		    /* Subtract through, propagating the carry */
-		    emitcode("sbc","a,%s",aopGet(AOP(right),offset++,FALSE));
+		    emitcode("sbc","a,%s ; 2",aopGet(AOP(right),offset++,FALSE));
 		}
             }
         }
@@ -2648,10 +2652,12 @@ static void genOr (iCode *ic, iCode *ifx)
             if(AOP_TYPE(right) == AOP_LIT){
                 if(((lit >> (offset*8)) & 0x0FFL) == 0x00L)
                     continue;
-                else 
-		    emitcode("or","%s,%s; 5",
-			     aopGet(AOP(left),offset,FALSE),
-			     aopGet(AOP(right),offset,FALSE));
+                else {
+		    MOVA(aopGet(AOP(right),offset,FALSE));
+		    emitcode("or","a,%s; 5",
+			     aopGet(AOP(left),offset,FALSE));
+		    aopPut(AOP(result),"a ; 8", offset);
+		}
             } else {
 		if (AOP_TYPE(left) == AOP_ACC) 
 		    emitcode("or","a,%s ; 6",aopGet(AOP(right),offset,FALSE));
@@ -3394,8 +3400,16 @@ static void genGenPointerGet (operand *left,
 	emitcode("ld","%s,%s", ptr, aopGet(AOP(left),0,TRUE));
     else { /* we need to get it byte by byte */
 	if (IS_GB) {
-	    emitcode("ld", "e,%s", aopGet(AOP(left), 0, FALSE));
-	    emitcode("ld", "d,%s", aopGet(AOP(left), 1, FALSE));
+	    bool hack = 0;
+	    /* PENDING: hack */
+	    if (AOP_SIZE(left) == 1) {
+		hack = 1;
+		AOP_SIZE(left) = 2;
+	    }
+	    emitcode("ld", "e,%s ; 1", aopGet(AOP(left), 0, FALSE));
+	    emitcode("ld", "d,%s ; 2", aopGet(AOP(left), 1, FALSE));
+	    if (hack)
+		AOP_SIZE(left) = 1;
 	}
 	else
 	    fetchHL(AOP(left));

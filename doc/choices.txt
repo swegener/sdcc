@@ -1,0 +1,38 @@
+Some of the implementation choices
+----------------------------------
+
+gbz80:
+
+Load from direct space:
+  Alternatives:
+  1.  Via HL
+	ld hl,#dir
+	ld x,(hl)
+	inc hl
+	ld y,(hl)
+  2.  Via a
+  	ld a,(dir)
+	ld x,a
+	ld a,(dir+1)
+	ld x,a
+  1 is bad when x or y involve HL (1b)
+  					8	16	32
+     1 = 12 + n*(8+8) - 8  		20	36	68
+     1b = n*(12+12+8)			32	64	128
+     2 = n*(16+4)			20	40	80
+  So choose 2.
+
+  Hmm.  (2) is too hard to support in the current model.
+
+On stack word push
+   1.	 lda  hl,x(sp)
+	 ld   a,(hl+)
+	 ld   h,(hl)
+	 ld   l,a
+	 push hl
+   2.	 lda  hl,x(sp)
+	 ld   e,(hl)
+	 inc  hl
+	 ld   d,(hl)
+   1 = d + 8 + 8 + 4
+   2 = d + 8 + 8 + 8

@@ -2226,7 +2226,7 @@ geniCodeArray (operand * left, operand * right,int lvl)
 {
   iCode *ic;
   sym_link *ltype = operandType (left);
-
+  
   if (IS_PTR (ltype))
     {
       if (IS_PTR (ltype->next) && left->isaddr)
@@ -2258,6 +2258,7 @@ geniCodeArray (operand * left, operand * right,int lvl)
 
   IC_RESULT (ic)->isaddr = (!IS_AGGREGATE (ltype->next));
   ADDTOCHAIN (ic);
+  
   return IC_RESULT (ic);
 }
 
@@ -2348,7 +2349,7 @@ geniCodePostInc (operand * op)
 /* geniCodePreInc - generate code for preIncrement                 */
 /*-----------------------------------------------------------------*/
 operand *
-geniCodePreInc (operand * op)
+geniCodePreInc (operand * op, bool lvalue)
 {
   iCode *ic;
   sym_link *optype = operandType (op);
@@ -2374,8 +2375,11 @@ geniCodePreInc (operand * op)
   IC_RESULT (ic) = result = newiTempOperand (roptype, 0);
   ADDTOCHAIN (ic);
 
-
-  return geniCodeAssign (op, result, 0);
+  (void) geniCodeAssign (op, result, 0);
+  if (lvalue)
+    return op;
+  else
+    return result;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2428,7 +2432,7 @@ geniCodePostDec (operand * op)
 /* geniCodePreDec - generate code for pre  decrement               */
 /*-----------------------------------------------------------------*/
 operand *
-geniCodePreDec (operand * op)
+geniCodePreDec (operand * op, bool lvalue)
 {
   iCode *ic;
   sym_link *optype = operandType (op);
@@ -2454,8 +2458,11 @@ geniCodePreDec (operand * op)
   IC_RESULT (ic) = result = newiTempOperand (roptype, 0);
   ADDTOCHAIN (ic);
 
-
-  return geniCodeAssign (op, result, 0);
+  (void) geniCodeAssign (op, result, 0);
+  if (lvalue)
+    return op;
+  else
+    return result;
 }
 
 
@@ -3612,13 +3619,13 @@ ast2iCode (ast * tree,int lvl)
       if (left)
 	return geniCodePostInc (left);
       else
-	return geniCodePreInc (right);
+	return geniCodePreInc (right, tree->lvalue);
 
     case DEC_OP:		/* decrement operator */
       if (left)
 	return geniCodePostDec (left);
       else
-	return geniCodePreDec (right);
+	return geniCodePreDec (right, tree->lvalue);
 
     case '&':			/* bitwise and or address of operator */
       if (right)

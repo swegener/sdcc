@@ -1,3 +1,10 @@
+2003-10-19 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCicode.c (geniCodePreInc, geniCodePreDec, ast2iCode):
+	Fixed bug #818696
+	* src/SDCCast.c (ast_print): Fixed --dumptree so that preincrement
+	and predecrement operand is displayed
+
 2003-10-13 Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCval.c (valMinus): fixed bug #826041

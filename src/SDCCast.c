@@ -1596,7 +1596,7 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
       return TRUE;
 
 /*------------------------------------------------------------------*/
-    case INC_OP:		/* incerement operator unary so left only */
+    case INC_OP:
     case DEC_OP:
 
       /* sure we are not sym is not modified */
@@ -2221,7 +2221,7 @@ decorateType (ast * tree)
       /*----------------------------*/
       /*  ++/-- operation           */
       /*----------------------------*/
-    case INC_OP:		/* increment operator unary so left only */
+    case INC_OP:
     case DEC_OP:
       {
 	sym_link *ltc = (tree->right ? RTYPE (tree) : LTYPE (tree));
@@ -4985,18 +4985,28 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		/*----------------------------*/
 		/*  ++/-- operation           */
 		/*----------------------------*/
-	case INC_OP:		/* incerement operator unary so left only */
+	case INC_OP:
+        	if (tree->left)
+		  fprintf(outfile,"post-");
+		else
+		  fprintf(outfile,"pre-");
 		fprintf(outfile,"INC_OP (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->left,outfile,indent+2); /* postincrement case */
+		ast_print(tree->right,outfile,indent+2); /* preincrement case */
 		return ;
 
 	case DEC_OP:
+        	if (tree->left)
+		  fprintf(outfile,"post-");
+		else
+		  fprintf(outfile,"pre-");
 		fprintf(outfile,"DEC_OP (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->left,outfile,indent+2); /* postdecrement case */
+		ast_print(tree->right,outfile,indent+2); /* predecrement case */
 		return ;
 
 		/*------------------------------------------------------------------*/

@@ -2,3 +2,8 @@
 
 Redirection of output of commands.
 
+0.4.1-pre4
+
+Redesigned of option handling.
+Start of libtool introduction.
+

@@ -4042,11 +4042,14 @@ genMult (iCode * ic)
   int count, i;
   /* If true then the final operation should be a subtract */
   bool active = FALSE;
+  bool byteResult;
 
   /* Shouldn't occur - all done through function calls */
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
   aopOp (IC_RIGHT (ic), ic, FALSE, FALSE);
   aopOp (IC_RESULT (ic), ic, TRUE, FALSE);
+  
+  byteResult =  (AOP_SIZE (IC_RESULT (ic)) == 1);
 
   if (AOP_SIZE (IC_LEFT (ic)) > 2 ||
       AOP_SIZE (IC_RIGHT (ic)) > 2 ||
@@ -4077,10 +4080,13 @@ genMult (iCode * ic)
   if ( AOP_SIZE (IC_LEFT (ic)) == 1 && !SPEC_USIGN (getSpec (operandType ( IC_LEFT (ic)))))
     {
       emit2 ("ld e,%s", aopGet (AOP (IC_LEFT (ic)), LSB, FALSE));
-      emit2 ("ld a,e");
-      emit2 ("rlc a");
-      emit2 ("sbc a,a");
-      emit2 ("ld d,a");
+      if (!byteResult)
+        {
+          emit2 ("ld a,e");
+          emit2 ("rlc a");
+          emit2 ("sbc a,a");
+          emit2 ("ld d,a");
+	}
     }
   else
     {
@@ -4102,7 +4108,8 @@ genMult (iCode * ic)
           if (active == FALSE)
             {
               emit2 ("ld l,e");
-              emit2 ("ld h,d");
+              if (!byteResult)
+	        emit2 ("ld h,d");
             }
           else
             {
@@ -4121,7 +4128,10 @@ genMult (iCode * ic)
       _G.stack.pushedDE = FALSE;
     }
 
-  commitPair ( AOP (IC_RESULT (ic)), PAIR_HL);
+  if (byteResult)
+    aopPut (AOP (IC_RESULT (ic)), _pairs[PAIR_HL].l, 0);
+  else
+    commitPair ( AOP (IC_RESULT (ic)), PAIR_HL);
 
   freeAsmop (IC_LEFT (ic), NULL, ic);
   freeAsmop (IC_RIGHT (ic), NULL, ic);

@@ -878,7 +878,10 @@ killDeadCode (eBBlock ** ebbs, int count)
 		  bool volRight = IS_SYMOP (IC_RIGHT (ic)) 
 				  && isOperandVolatile (IC_RIGHT (ic), FALSE);
 
-		  
+		  /* a dead address-of operation should die, even if volatile */
+		  if (ic->op == ADDRESS_OF)
+		    volLeft = FALSE;
+
 		  if (ic->next && ic->seqPoint == ic->next->seqPoint
 		      && (ic->next->op == '+' || ic->next->op == '-'))
 		    {

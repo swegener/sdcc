@@ -1,3 +1,9 @@
+2004-01-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/z80/gen.c (genMult): handle single byte result product
+	* src/SDCCopt.c (killDeadCode): never convert ADDRESS_OF iCode to
+	DUMMY_READ_VOLATILE (fixed bug #886367)
+
 2004-01-27 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* support/regression/tests/libmullong.c: fixed logic, on little endian

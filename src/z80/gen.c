@@ -2082,9 +2082,9 @@ emitCall (iCode * ic, bool ispcall)
     }
 
   /* adjust the stack for parameters if required */
-  if (IC_LEFT (ic)->parmBytes)
+  if (ic->parmBytes)
     {
-      int i = IC_LEFT (ic)->parmBytes;
+      int i = ic->parmBytes;
       _G.stack.pushed -= i;
       if (IS_GB)
 	{

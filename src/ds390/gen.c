@@ -2243,17 +2243,17 @@ genCall (iCode * ic)
 
   /* adjust the stack for parameters if
      required */
-  if (IC_LEFT (ic)->parmBytes)
+  if (ic->parmBytes)
     {
       int i;
-      if (IC_LEFT (ic)->parmBytes > 3)
+      if (ic->parmBytes > 3)
 	{
 	  emitcode ("mov", "a,%s", spname);
-	  emitcode ("add", "a,#0x%02x", (-IC_LEFT (ic)->parmBytes) & 0xff);
+	  emitcode ("add", "a,#0x%02x", (-ic->parmBytes) & 0xff);
 	  emitcode ("mov", "%s,a", spname);
 	}
       else
-	for (i = 0; i < IC_LEFT (ic)->parmBytes; i++)
+	for (i = 0; i < ic->parmBytes; i++)
 	  emitcode ("dec", "%s", spname);
 
     }
@@ -2368,17 +2368,17 @@ genPcall (iCode * ic)
 
   /* adjust the stack for parameters if
      required */
-  if (IC_LEFT (ic)->parmBytes)
+  if (ic->parmBytes)
     {
       int i;
-      if (IC_LEFT (ic)->parmBytes > 3)
+      if (ic->parmBytes > 3)
 	{
 	  emitcode ("mov", "a,%s", spname);
-	  emitcode ("add", "a,#0x%02x", (-IC_LEFT (ic)->parmBytes) & 0xff);
+	  emitcode ("add", "a,#0x%02x", (-ic->parmBytes) & 0xff);
 	  emitcode ("mov", "%s,a", spname);
 	}
       else
-	for (i = 0; i < IC_LEFT (ic)->parmBytes; i++)
+	for (i = 0; i < ic->parmBytes; i++)
 	  emitcode ("dec", "%s", spname);
 
     }

@@ -579,6 +579,7 @@ copyiCode (iCode * ic)
   nic->filename = ic->filename;
   nic->block = ic->block;
   nic->level = ic->level;
+  nic->parmBytes = ic->parmBytes;
 
   /* deal with the special cases first */
   switch (ic->op)
@@ -1071,7 +1072,6 @@ newiTempFromOp (operand * op)
   nop->noSpilLoc = op->noSpilLoc;
   nop->usesDefs = op->usesDefs;
   nop->isParm = op->isParm;
-  nop->parmBytes = op->parmBytes;
   return nop;
 }
 
@@ -1095,7 +1095,6 @@ operandFromOperand (operand * op)
   nop->noSpilLoc = op->noSpilLoc;
   nop->usesDefs = op->usesDefs;
   nop->isParm = op->isParm;
-  nop->parmBytes = op->parmBytes;
 
   switch (nop->type)
     {
@@ -1157,7 +1156,6 @@ operandFromSymbol (symbol * sym)
       op->key = sym->key;
       op->isvolatile = isOperandVolatile (op, TRUE);
       op->isGlobal = isOperandGlobal (op);
-      op->parmBytes = sym->argStack;
       return op;
     }
 
@@ -2749,7 +2747,7 @@ geniCodeCall (operand * left, ast * parms)
   geniCodeParms (parms, &stack, getSpec (operandType (left)), OP_SYMBOL (left));
 
   /* now call : if symbol then pcall */
-  if (IS_ITEMP (left))
+  if (IS_OP_POINTER (left))
     ic = newiCode (PCALL, left, NULL);
   else
     ic = newiCode (CALL, left, NULL);
@@ -2763,7 +2761,7 @@ geniCodeCall (operand * left, ast * parms)
   ADDTOCHAIN (ic);
 
   /* stack adjustment after call */
-  left->parmBytes = stack;
+  ic->parmBytes = stack;
 
   return result;
 }

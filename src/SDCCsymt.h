@@ -265,8 +265,6 @@ typedef struct symbol
     int liveTo;			/* live to sequence number */
     int used;			/* no. of times this was used */
     int recvSize;		/* size of first argument  */
-    int argStack;		/* stacks used by parameters */
-
   }
 symbol;
 

@@ -2086,7 +2086,6 @@ _makeRegParam (symbol * sym)
   while (val)
     {
       SPEC_REGPARM (val->etype) = 1;
-      sym->argStack -= getSize (val->type);
       val = val->next;
     }
 }

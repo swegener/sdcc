@@ -536,7 +536,6 @@ funcOfType (char *name, sym_link * type, sym_link * argType,
 	    int nArgs, int rent)
 {
   symbol *sym;
-  int argStack = 0;
   /* create the symbol */
   sym = newSymbol (name, 0);
 
@@ -549,7 +548,6 @@ funcOfType (char *name, sym_link * type, sym_link * argType,
 
       while (nArgs--)
 	{
-	  argStack += getSize (type);
 	  args->type = copyLinkChain (argType);
 	  args->etype = getSpec (args->type);
 	  if (!nArgs)
@@ -568,7 +566,6 @@ funcOfType (char *name, sym_link * type, sym_link * argType,
   /* save it */
   addSymChain (sym);
   sym->cdef = 1;
-  sym->argStack = (rent ? argStack : 0);
   allocVariables (sym);
   return sym;
 

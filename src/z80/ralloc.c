@@ -1980,7 +1980,7 @@ packRegsForHLUse (iCode * ic)
 
   if (ic->op == ADDRESS_OF && uic->op == IPUSH)
     goto hluse;
-  if (ic->op == CALL && IC_LEFT (ic)->parmBytes == 0 && (uic->op == '-' || uic->op == '+'))
+  if (ic->op == CALL && ic->parmBytes == 0 && (uic->op == '-' || uic->op == '+'))
     goto hluse;
   return;
 hluse:

@@ -87,7 +87,6 @@ typedef struct operand
     unsigned int noSpilLoc:1;	/* cannot be assigned a spil location */
 
     unsigned key;
-    int parmBytes;
     union
       {
 	struct symbol *symOperand;	/* operand is of type symbol */
@@ -176,6 +175,9 @@ typedef struct iCode
 
     int lineno;			/* file & lineno for debug information */
     char *filename;
+    
+    int parmBytes;		/* if call/pcall, count of parameter bytes 
+    				   on stack */
   }
 iCode;
 

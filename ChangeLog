@@ -1,5 +1,15 @@
 2003-08-16  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
+	Cleaned up genPackBits and genUnpackBits and added two helper
+	functions, emitPtrByteGet & emitPtrByteSet. Added optimizations
+	for literal assignments in genPackBits (thanks to Frieder for
+	reminding me).
+
+	* src/mcs51/gen.c
+	* src/ds390/gen.c
+
+2003-08-16  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
 	Fixed bug #748310 (pointer to function type mishandled when the
 	function name is omitted). Also fixed a SIGSEGV when a function
 	attribute (reentrant, etc) is used on a non-function or on a

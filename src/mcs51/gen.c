@@ -7113,113 +7113,135 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
-/* genUnpackBits - generates code for unpacking bits               */
+/* emitPtrByteGet - emits code to get a byte into A through a      */
+/*                  pointer register (R0, R1, or DPTR). The        */
+/*                  original value of A can be preserved in B.     */
 /*-----------------------------------------------------------------*/
 static void
-genUnpackBits (operand * result, char *rname, int ptype)
+emitPtrByteGet (char *rname, int p_type, bool preserveAinB)
 {
-  int shCnt;
-  int rlen = 0;
-  sym_link *etype;
-  int offset = 0;
-  int rsize;
-
-  D(emitcode (";     genUnpackBits",""));
-
-  etype = getSpec (operandType (result));
-  rsize = getSize (operandType (result));
-  /* read the first byte  */
-  switch (ptype)
+  switch (p_type)
     {
-
-    case POINTER:
     case IPOINTER:
+    case POINTER:
+      if (preserveAinB)
+        emitcode ("mov", "b,a");
       emitcode ("mov", "a,@%s", rname);
       break;
 
     case PPOINTER:
+      if (preserveAinB)
+        emitcode ("mov", "b,a");
       emitcode ("movx", "a,@%s", rname);
       break;
-
+      
     case FPOINTER:
+      if (preserveAinB)
+        emitcode ("mov", "b,a");
       emitcode ("movx", "a,@dptr");
       break;
 
     case CPOINTER:
+      if (preserveAinB)
+        emitcode ("mov", "b,a");
       emitcode ("clr", "a");
       emitcode ("movc", "a,@a+dptr");
       break;
 
     case GPOINTER:
+      if (preserveAinB)
+        {
+          emitcode ("push", "b");
+          emitcode ("push", "acc");
+        }
       emitcode ("lcall", "__gptrget");
+      if (preserveAinB)
+        emitcode ("pop", "b");
       break;
     }
+}
 
-  rlen = SPEC_BLEN (etype);
-
-  /* if we have bitdisplacement then it fits   */
-  /* into this byte completely or if length is */
-  /* less than a byte                          */
-  if ((shCnt = SPEC_BSTR (etype)) ||
-      (SPEC_BLEN (etype) <= 8))
+/*-----------------------------------------------------------------*/
+/* emitPtrByteSet - emits code to set a byte from src through a    */
+/*                  pointer register (R0, R1, or DPTR).            */
+/*-----------------------------------------------------------------*/
+static void
+emitPtrByteSet (char *rname, int p_type, char *src)
+{
+  switch (p_type)
     {
+    case IPOINTER:
+    case POINTER:
+      if (*src=='@')
+        {
+          MOVA (src);
+          emitcode ("mov", "@%s,a", rname);
+        }
+      else
+        emitcode ("mov", "@%s,%s", rname, src);
+      break;
 
-      /* shift right acc */
-      AccRsh (shCnt);
+    case PPOINTER:
+      MOVA (src);
+      emitcode ("movx", "@%s,a", rname);
+      break;
+      
+    case FPOINTER:
+      MOVA (src);
+      emitcode ("movx", "@dptr,a");
+      break;
 
-      emitcode ("anl", "a,#0x%02x",
-		((unsigned char) -1) >> (8 - SPEC_BLEN (etype)));
+    case GPOINTER:
+      MOVA (src);
+      emitcode ("lcall", "__gptrput");
+      break;
+    }
+}
+
+/*-----------------------------------------------------------------*/
+/* genUnpackBits - generates code for unpacking bits               */
+/*-----------------------------------------------------------------*/
+static void
+genUnpackBits (operand * result, char *rname, int ptype)
+{
+  int offset = 0;	/* result byte offset */
+  int rsize;		/* result size */
+  int rlen = 0;		/* remaining bitfield length */
+  sym_link *etype;	/* bitfield type information */
+  int blen;		/* bitfield length */
+  int bstr;		/* bitfield starting bit within byte */
+
+  D(emitcode (";     genUnpackBits",""));
+
+  etype = getSpec (operandType (result));
+  rsize = getSize (operandType (result));
+  blen = SPEC_BLEN (etype);
+  bstr = SPEC_BSTR (etype);
+
+  /* If the bitfield length is less than a byte */
+  if (blen < 8)
+    {
+      emitPtrByteGet (rname, ptype, FALSE);
+      AccRsh (bstr);
+      emitcode ("anl", "a,#0x%02x", ((unsigned char) -1) >> (8 - blen));
       aopPut (AOP (result), "a", offset++, isOperandVolatile (result, FALSE));
       goto finish;
     }
 
-  /* bit field did not fit in a byte  */
-  aopPut (AOP (result), "a", offset++, isOperandVolatile (result, FALSE));
-
-  while (1)
+  /* Bit field did not fit in a byte. Copy all
+     but the partial byte at the end.  */
+  for (rlen=blen;rlen>=8;rlen-=8)
     {
-
-      switch (ptype)
-	{
-	case POINTER:
-	case IPOINTER:
-	  emitcode ("inc", "%s", rname);
-	  emitcode ("mov", "a,@%s", rname);
-	  break;
-
-	case PPOINTER:
-	  emitcode ("inc", "%s", rname);
-	  emitcode ("movx", "a,@%s", rname);
-	  break;
-
-	case FPOINTER:
-	  emitcode ("inc", "dptr");
-	  emitcode ("movx", "a,@dptr");
-	  break;
-
-	case CPOINTER:
-	  emitcode ("clr", "a");
-	  emitcode ("inc", "dptr");
-	  emitcode ("movc", "a,@a+dptr");
-	  break;
-
-	case GPOINTER:
-	  emitcode ("inc", "dptr");
-	  emitcode ("lcall", "__gptrget");
-	  break;
-	}
-
-      rlen -= 8;
-      /* if we are done */
-      if (rlen < 8)
-	break;
-
+      emitPtrByteGet (rname, ptype, FALSE);
       aopPut (AOP (result), "a", offset++, isOperandVolatile (result, FALSE));
-
+      if (rlen>8)
+        emitcode ("inc", "%s", rname);
     }
 
+  /* Handle the partial byte at the end */
   if (rlen)
     {
+      emitPtrByteGet (rname, ptype, FALSE);
       emitcode ("anl", "a,#0x%02x", ((unsigned char) -1) >> (8-rlen));
       aopPut (AOP (result), "a", offset++, isOperandVolatile (result, FALSE));
     }
@@ -7720,6 +7742,8 @@ genPointerGet (iCode * ic, iCode *pi)
 
 }
 
+
+
 /*-----------------------------------------------------------------*/
 /* genPackBits - generates code for packed bit storage             */
 /*-----------------------------------------------------------------*/
@@ -7728,172 +7752,125 @@ genPackBits (sym_link * etype,
 	     operand * right,
 	     char *rname, int p_type)
 {
-  int shCount = 0;
-  int offset = 0;
-  int rLen = 0;
-  int blen, bstr;
-  char *l;
+  int offset = 0;	/* source byte offset */
+  int rlen = 0;		/* remaining bitfield length */
+  int blen;		/* bitfield length */
+  int bstr;		/* bitfield starting bit within byte */
+  int litval;		/* source literal value (if AOP_LIT) */
+  unsigned char mask;	/* bitmask within current byte */
 
   D(emitcode (";     genPackBits",""));
 
   blen = SPEC_BLEN (etype);
   bstr = SPEC_BSTR (etype);
 
-  l = aopGet (AOP (right), offset++, FALSE, FALSE);
-  MOVA (l);
-
-  /* if the bit lenth is less than or    */
-  /* it exactly fits a byte then         */
-  if (SPEC_BLEN (etype) <= 8)
+  /* If the bitfield length is less than a byte */
+  if (blen < 8)
     {
-      unsigned char mask = ((unsigned char) (0xFF << (blen + bstr)) |
-		            (unsigned char) (0xFF >> (8 - bstr)));
-      shCount = SPEC_BSTR (etype);
+      mask = ((unsigned char) (0xFF << (blen + bstr)) |
+	      (unsigned char) (0xFF >> (8 - bstr)));
 
-      /* shift left acc */
-      AccLsh (shCount);
+      if (AOP_TYPE (right) == AOP_LIT)
+        {
+          /* Case with a bitfield length <8 and literal source
+          */
+          litval = (int) floatFromVal (AOP (right)->aopu.aop_lit);
+          litval <<= bstr;
+          litval &= (~mask) & 0xff;
+          emitPtrByteGet (rname, p_type, FALSE);
+          if ((mask|litval)!=0xff)
+            emitcode ("anl","a,#0x%02x", mask);
+          if (litval)
+            emitcode ("orl","a,#0x%02x", litval);
+        }
+      else
+        {
+          if ((blen==1) && (p_type!=GPOINTER))
+            {
+              /* Case with a bitfield length == 1 and no generic pointer
+              */
+              if (AOP_TYPE (right) == AOP_CRY)
+                emitcode ("mov", "c,%s", AOP(right)->aopu.aop_dir);
+              else
+                {
+                  MOVA (aopGet (AOP (right), 0, FALSE, FALSE));
+                  emitcode ("rrc","a");
+                }
+              emitPtrByteGet (rname, p_type, FALSE);
+              emitcode ("mov","acc.%d,c",bstr);
+            }
+          else
+            {
+              /* Case with a bitfield length < 8 and arbitrary source
+              */
+              MOVA (aopGet (AOP (right), 0, FALSE, FALSE));
+              /* shift and mask source value */
+              AccLsh (bstr);
+              emitcode ("anl", "a,#0x%02x", (~mask) & 0xff);
 
-      if (SPEC_BLEN (etype) < 8)
-	{			/* if smaller than a byte */
+    	      /* transfer A to B and get next byte */
+              emitPtrByteGet (rname, p_type, TRUE);
 
-	  emitcode ("anl", "a,#0x%02x", (~mask) & 0xff);
+              emitcode ("anl", "a,#0x%02x", mask);
+              emitcode ("orl", "a,b");
+              if (p_type == GPOINTER)
+                emitcode ("pop", "b");
+           }
+        }
 
-	  switch (p_type)
-	    {
-	    case POINTER:
-	      emitcode ("mov", "b,a");
-	      emitcode ("mov", "a,@%s", rname);
-	      break;
-
-	    case FPOINTER:
-	      emitcode ("mov", "b,a");
-	      emitcode ("movx", "a,@dptr");
-	      break;
-
-	    case GPOINTER:
-	      emitcode ("push", "b");
-	      emitcode ("push", "acc");
-	      emitcode ("lcall", "__gptrget");
-	      emitcode ("pop", "b");
-	      break;
-	    }
-
-	  emitcode ("anl", "a,#0x%02x", mask);
-	  emitcode ("orl", "a,b");
-	  if (p_type == GPOINTER)
-	    emitcode ("pop", "b");
-	}
+      emitPtrByteSet (rname, p_type, "a");
+      return;
     }
 
-  switch (p_type)
+  /* Bit length is greater than 7 bits. In this case, copy  */
+  /* all except the partial byte at the end                 */
+  for (rlen=blen;rlen>=8;rlen-=8)
     {
-    case POINTER:
-      emitcode ("mov", "@%s,a", rname);
-      break;
-
-    case FPOINTER:
-      emitcode ("movx", "@dptr,a");
-      break;
-
-    case GPOINTER:
-      emitcode ("lcall", "__gptrput");
-      break;
+      emitPtrByteSet (rname, p_type, 
+                      aopGet (AOP (right), offset++, FALSE, FALSE) );
+      if (rlen>8)
+        emitcode ("inc", "%s", rname);
     }
 
-  /* if we r done */
-  if (SPEC_BLEN (etype) <= 8)
-    return;
-
-  emitcode ("inc", "%s", rname);
-  rLen = SPEC_BLEN (etype);
-
-  /* now generate for lengths greater than one byte */
-  while (1)
+  /* If there was a partial byte at the end */
+  if (rlen)
     {
+      mask = (((unsigned char) -1 << rlen) & 0xff);
+      
+      if (AOP_TYPE (right) == AOP_LIT)
+        {
+          /* Case with partial byte and literal source
+          */
+          litval = (int) floatFromVal (AOP (right)->aopu.aop_lit);
+          litval >>= (blen-rlen);
+          litval &= (~mask) & 0xff;
+          emitPtrByteGet (rname, p_type, FALSE);
+          if ((mask|litval)!=0xff)
+            emitcode ("anl","a,#0x%02x", mask);
+          if (litval)
+            emitcode ("orl","a,#0x%02x", litval);
+        }
+      else
+        {
+          /* Case with partial byte and arbitrary source
+          */
+          MOVA (aopGet (AOP (right), offset++, FALSE, FALSE));
+          emitcode ("anl", "a,#0x%02x", (~mask) & 0xff);
 
-      l = aopGet (AOP (right), offset++, FALSE, TRUE);
+	  /* transfer A to B and get next byte */
+          emitPtrByteGet (rname, p_type, TRUE);
 
-      rLen -= 8;
-      if (rLen < 8)
-	break;
-
-      switch (p_type)
-	{
-	case POINTER:
-	  if (*l == '@')
-	    {
-	      MOVA (l);
-	      emitcode ("mov", "@%s,a", rname);
-	    }
-	  else
-	    emitcode ("mov", "@%s,%s", rname, l);
-	  break;
-
-	case FPOINTER:
-	  MOVA (l);
-	  emitcode ("movx", "@dptr,a");
-	  break;
-
-	case GPOINTER:
-	  MOVA (l);
-	  emitcode ("lcall", "__gptrput");
-	  break;
-	}
-      emitcode ("inc", "%s", rname);
+          emitcode ("anl", "a,#0x%02x", mask);
+          emitcode ("orl", "a,b");
+          if (p_type == GPOINTER)
+            emitcode ("pop", "b");
+        }
+      emitPtrByteSet (rname, p_type, "a");
     }
 
-  MOVA (l);
-
-  /* last last was not complete */
-  if (rLen)
-    {
-      emitcode ("anl", "a,#0x%02x",
-                (~(((unsigned char) -1 << rLen) & 0xff)) &0xff);
-
-      /* save the byte & read byte */
-      switch (p_type)
-	{
-	case POINTER:
-	  emitcode ("mov", "b,a");
-	  emitcode ("mov", "a,@%s", rname);
-	  break;
-
-	case FPOINTER:
-	  emitcode ("mov", "b,a");
-	  emitcode ("movx", "a,@dptr");
-	  break;
-
-	case GPOINTER:
-	  emitcode ("push", "b");
-	  emitcode ("push", "acc");
-	  emitcode ("lcall", "__gptrget");
-	  emitcode ("pop", "b");
-	  break;
-	}
-
-      emitcode ("anl", "a,#0x%02x", (((unsigned char) -1 << rLen) & 0xff));
-      emitcode ("orl", "a,b");
-    }
-
-  if (p_type == GPOINTER)
-    emitcode ("pop", "b");
-
-  switch (p_type)
-    {
-
-    case POINTER:
-      emitcode ("mov", "@%s,a", rname);
-      break;
-
-    case FPOINTER:
-      emitcode ("movx", "@dptr,a");
-      break;
-
-    case GPOINTER:
-      emitcode ("lcall", "__gptrput");
-      break;
-    }
 }
+
+
 /*-----------------------------------------------------------------*/
 /* genDataPointerSet - remat pointer to data space                 */
 /*-----------------------------------------------------------------*/

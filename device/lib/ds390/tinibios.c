@@ -44,7 +44,8 @@ unsigned char _sdcc_external_startup(void)
   // CKCON|=0xc0;
 
   // default stretch cycles for MOVX
-  CKCON = (CKCON&0xf8)|(CPU_MOVX_STRETCH&0x07);
+  //CKCON = (CKCON&0xf8)|(CPU_MOVX_STRETCH&0x07);
+  CKCON=0xf9;
 
   // use internal 4k RAM as data(stack) memory at 0x400000 and
   // move CANx memory access to 0x401000 and upwards
@@ -61,12 +62,12 @@ unsigned char _sdcc_external_startup(void)
     pop ar0; lsb
 
 
-    mov _ESP,#0x00; reinitialize the stack
-    mov _SP,#0x00
-
     mov _TA,#0xaa; timed access
     mov _TA,#0x55
     mov _ACON,#0x06; 24 bit addresses, 10 bit stack at 0x400000
+
+    mov _ESP,#0x00; reinitialize the stack
+    mov _SP,#0x00
 
     ; restore the 24-bit return address
     push ar0; lsb
@@ -357,7 +358,7 @@ void Serial1Init (unsigned long baud, unsigned char buffered) {
   // set the baud rate
   Serial1Baud(baud);
   
-  serial0Buffered=buffered;
+  serial1Buffered=buffered;
 
   if (buffered) {
     RI_1=TI_1=0; // clear "pending" interrupts
@@ -455,8 +456,7 @@ void Serial1Flush() {
 
 // now let's go for the clock stuff
 
-//#define TIMER_0_RELOAD_VALUE 18432000L/2/1000 // appr. 1ms
-
+// these REALLY need to be in data space for the irq routine!
 static data unsigned long milliSeconds=0;
 static data unsigned int timer0ReloadValue;
 
@@ -469,27 +469,55 @@ void ClockInit() {
   case 2:  // not tested yet
   default: timerReloadValue/=2; break;
   }
-  timer0ReloadValue=timerReloadValue;
+  timer0ReloadValue=~timerReloadValue;
   // initialise timer 0
   ET0=0; // disable timer interrupts initially
   TCON = (TCON&0xcc)|0x00; // stop timer, clear overflow
   TMOD = (TMOD&0xf0)|0x01; // 16 bit counter
-  CKCON|=0x80; // timer uses xtal/4
+  CKCON|=0x08; // timer uses xtal/4
   
-  TL0=~(timer0ReloadValue&0xff);
-  TH0=~(timer0ReloadValue>>8);
+  TL0=timer0ReloadValue&0xff;
+  TH0=timer0ReloadValue>>8;
   
   ET0=1; // enable timer interrupts
   TR0=1; // start timer
 }
 
+// This needs to be SUPER fast. What we really want is:
+
+#if 0
 void ClockIrqHandler (void) interrupt 1 {
-  // we have lost some time here
-  TL0=~(timer0ReloadValue&0xff);
-  TH0=~(timer0ReloadValue>>8);
+  TL0=timer0ReloadValue&0xff;
+  TH0=timer0ReloadValue>>8;
   milliSeconds++;
-  // that's all for now :)
 }
+#else
+// but look at the code, and the pushes and pops, so:
+#pragma EXCLUDE b,dpl,dph,dpx
+void ClockIrqHandler (void) interrupt 1 {
+  _asm
+    mov _TL0,_timer0ReloadValue
+    mov _TH0,_timer0ReloadValue+1
+    mov a,#0x01
+    add a,_milliSeconds+0
+    mov _milliSeconds,a
+    jnc _ClockIrqHandlerDone
+    clr a
+    addc a,_milliSeconds+1
+    mov _milliSeconds+1,a
+    jnc _ClockIrqHandlerDone
+    clr a
+    addc a,_milliSeconds+2
+    mov _milliSeconds+1,a
+    jnc _ClockIrqHandlerDone
+    clr a
+    addc a,_milliSeconds+3
+    mov _milliSeconds+1,a
+   _ClockIrqHandlerDone:
+  _endasm;
+}
+#pragma EXCLUDE NONE
+#endif
 
 // we can't just use milliSeconds
 unsigned long ClockTicks(void) {

@@ -1,4 +1,5 @@
-#include "i2clole.h"
+#include <tinibios.h>
+
 #include "pcf8591.h"
 
 unsigned char ReadPCF8591(char address, char channel) {

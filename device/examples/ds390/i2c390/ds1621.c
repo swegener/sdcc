@@ -1,7 +1,6 @@
-#include "i2clole.h"
+#include <tinibios.h>
+
 #include "ds1621.h"
-
-
 
 float ReadDS1621(char address) {
   float temperature;

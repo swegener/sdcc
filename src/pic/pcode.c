@@ -1434,7 +1434,7 @@ void addpBlock(pBlock *pb)
 
   if(!the_pFile) {
     /* First time called, we'll pass through here. */
-    _ALLOC(the_pFile,sizeof(the_pFile));
+    _ALLOC(the_pFile,sizeof(pFile));
     the_pFile->pbHead = the_pFile->pbTail = pb;
     the_pFile->functions = NULL;
     return;
@@ -2466,6 +2466,10 @@ set *register_usage(pBlock *pb)
 
 
   pBlockStats(stderr,pb);  // debug
+
+  // Mark the registers in this block as used.
+
+  MarkUsedRegisters(pb->registers);
   if(registersInCallPath) {
     /* registers were used in the functions this pBlock has called */
     /* so now, we need to see if these collide with the ones we are */
@@ -2516,8 +2520,8 @@ set *register_usage(pBlock *pb)
       r1 = setNextItem(registersInCallPath);
     }
 
-  } else
-    MarkUsedRegisters(pb->registers);
+  }// else
+  //    MarkUsedRegisters(pb->registers);
 
   registers = unionSets(pb->registers, registersInCallPath, THROW_NONE);
 

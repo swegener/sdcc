@@ -3406,6 +3406,9 @@ static void genCmp (operand *left,operand *right,
   unsigned long lit = 0L,i = 0;
 
   DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+  DEBUGpic14_emitcode ("; ***","true ifx is %s",((IC_TRUE(ifx) == NULL) ? "false" : "true"));
+  DEBUGpic14_emitcode ("; ***","false ifx is %s",((IC_FALSE(ifx) == NULL) ? "false" : "true"));
+
   /* if left & right are bit variables */
   if (AOP_TYPE(left) == AOP_CRY &&
       AOP_TYPE(right) == AOP_CRY ) {
@@ -3429,67 +3432,94 @@ static void genCmp (operand *left,operand *right,
     } else {
 
       if(AOP_TYPE(right) == AOP_LIT) {
-
-	DEBUGpic14_emitcode(";right lit","%d",sign);
+	symbol *lbl = newiTempLabel(NULL);
 
 	lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
-	//default:
-/*	if( lit == 0 ){
-	  emitpcode(POC_MOVFW, popGet(AOP(left),0,FALSE,FALSE));
-	  while(--size) 
-	    emitpcode(POC_IORFW, popGet(AOP(left),++offset,FALSE,FALSE));
 
-	  genSkipz(ifx,IC_TRUE(ifx) == NULL);
-	} else {
-*/
-	  while(size--) {
-	    i = (lit >> (size*8)) & 0xff;
-	    if(i == 0) {
-	      emitpcode(POC_MOVFW, popGet(AOP(left),size,FALSE,FALSE));
-	      genSkipz(ifx,IC_TRUE(ifx) == NULL);
-	    } else {
-	      emitpcode(POC_MOVLW, popGetLit(i));
-	      emitpcode(POC_SUBFW, popGet(AOP(left),size,FALSE,FALSE));
-	      genSkipc(ifx,IC_TRUE(ifx) == NULL);
-	    }
+	DEBUGpic14_emitcode(";right lit","lit = %d,sign=%d",lit,sign);
+
+	size--;
+	i = (lit >> (size*8)) & 0xff;
+	if(sign) {
+	  if(i & 0x80) {
+	    emitpcode(POC_BTFSS, newpCodeOpBit(aopGet(AOP(left),size,FALSE,FALSE),7,0));
+	  } else {
+	    emitpcode(POC_BTFSC, newpCodeOpBit(aopGet(AOP(left),size,FALSE,FALSE),7,0));
 	  }
-  //	}
+	  emitpcode(POC_GOTO,popGetLabel(lbl->key));
+	}
+
+	emitpcode(POC_MOVLW, popGetLit(i));
+	emitpcode(POC_SUBFW, popGet(AOP(left),size,FALSE,FALSE));
+	while(size--) {
+	  i = (lit >> (size*8)) & 0xff;
+	  emitpcode(POC_MOVLW, popGetLit(i));
+	  emitSKPNC;
+	  emitpcode(POC_SUBFW, popGet(AOP(left),size,FALSE,FALSE));
+	}
+
+	genSkipc(ifx,IC_TRUE(ifx) == NULL);
+	if(sign)
+	  emitpLabel(lbl->key);
+
 	ifx->generated = 1;
 	return;
       }
 
       if(AOP_TYPE(left) == AOP_LIT) {
+	//symbol *lbl = newiTempLabel(NULL);
 
-	DEBUGpic14_emitcode(";left lit","%d",sign);
+	lit = (unsigned long)(floatFromVal(AOP(left)->aopu.aop_lit));
 
-	offset = 0;
-	lit = (unsigned long)(floatFromVal(AOP(left)->aopu.aop_lit))+1;
+	DEBUGpic14_emitcode(";left lit","lit = %d,sign=%d",lit,sign);
 
-	if( lit == 0 ){
-	  emitpcode(POC_MOVFW, popGet(AOP(right),0,FALSE,FALSE));
-	  while(--size)
-	    emitpcode(POC_IORFW, popGet(AOP(right),++offset,FALSE,FALSE));
-
-	  genSkipz(ifx,IC_TRUE(ifx) != NULL);
+	if(size==1) {
+	  if(sign) {
+	    if(lit & 0x80) {
+	      emitpcode(POC_BTFSS, newpCodeOpBit(aopGet(AOP(right),0,FALSE,FALSE),7,0));
+	    } else {
+	      emitpcode(POC_BTFSC, newpCodeOpBit(aopGet(AOP(right),0,FALSE,FALSE),7,0));
+	    }
+	    if(IC_TRUE(ifx) != NULL)
+	      emitpcode(POC_GOTO,popGetLabel(IC_TRUE(ifx)->key));
+	    else
+	      emitpcode(POC_GOTO,popGetLabel(IC_FALSE(ifx)->key));
+	  }
+	  emitpcode(POC_MOVLW, popGetLit((lit+1) & 0xff));
+	  emitpcode(POC_SUBFW, popGet(AOP(right),0,FALSE,FALSE));
+	  genSkipc(ifx,IC_TRUE(ifx)!=NULL);
 	} else {
+	  size--;
+	  //lit++;
+	  i = (lit >> (size*8)) & 0xff;
 
+	  if(sign) {
+	    if(i & 0x80) {
+	      emitpcode(POC_BTFSS, newpCodeOpBit(aopGet(AOP(right),size,FALSE,FALSE),7,0));
+	    } else {
+	      emitpcode(POC_BTFSC, newpCodeOpBit(aopGet(AOP(right),size,FALSE,FALSE),7,0));
+	    }
+	    if(IC_TRUE(ifx) != NULL)
+	      emitpcode(POC_GOTO,popGetLabel(IC_TRUE(ifx)->key));
+	    else
+	      emitpcode(POC_GOTO,popGetLabel(IC_FALSE(ifx)->key));
+	  }
+
+	  emitpcode(POC_MOVFW, popGet(AOP(right),size,FALSE,FALSE));
+	  emitpcode(POC_SUBLW, popGetLit((i)&0xff));
 	  while(size--) {
 	    i = (lit >> (size*8)) & 0xff;
-	    if(i == 0) {
-	      emitpcode(POC_MOVFW, popGet(AOP(right),size,FALSE,FALSE));
-	      genSkipz(ifx,IC_TRUE(ifx) != NULL);
-	    } else if( i == 1 ) {
-	      emitpcode(POC_DECFW, popGet(AOP(right),size,FALSE,FALSE));
-	      genSkipz(ifx,IC_TRUE(ifx) != NULL);
-
-	    } else {
-	      emitpcode(POC_MOVLW, popGetLit(i));
-	      emitpcode(POC_SUBFW, popGet(AOP(right),size,FALSE,FALSE));
-
-	      genSkipc(ifx,IC_TRUE(ifx) != NULL);
-	    }
+	    emitpcode(POC_MOVFW, popGet(AOP(right),size,FALSE,FALSE));
+	    emitSKPNC;
+	    emitpcode(POC_SUBLW, popGetLit((i)&0xff));
 	  }
+	  genSkipc(ifx,IC_TRUE(ifx) == NULL);
+
 	}
+/*
+	if(sign)
+	  emitpLabel(lbl->key);
+*/
 	ifx->generated = 1;
 	return;
       }
@@ -4427,14 +4457,10 @@ static void genAnd (iCode *ic, iCode *ifx)
 	  }
 	} else {
 	  if (AOP_TYPE(left) == AOP_ACC) {
-	    pic14_emitcode("?iorwf","%s,w",aopGet(AOP(right),offset,FALSE,FALSE));
 	    emitpcode(POC_ANDFW,popGet(AOP(right),offset,FALSE,FALSE));
-
 	  } else {		    
-	    pic14_emitcode("movf","%s,w",aopGet(AOP(right),offset,FALSE,FALSE));
-	    pic14_emitcode("?iorwf","%s,f",aopGet(AOP(left),offset,FALSE,FALSE));
 	    emitpcode(POC_MOVFW,popGet(AOP(right),offset,FALSE,FALSE));
-	    emitpcode(POC_ANDFW,popGet(AOP(left),offset,FALSE,FALSE));
+	    emitpcode(POC_ANDWF,popGet(AOP(left),offset,FALSE,FALSE));
 
 	  }
 	}
@@ -4558,6 +4584,11 @@ static void genOr (iCode *ic, iCode *ifx)
         left = tmp;
     }
 
+    DEBUGpic14_emitcode ("; ","result %s, left %s, right %s",
+			 AopType(AOP_TYPE(result)),
+			 AopType(AOP_TYPE(left)),
+			 AopType(AOP_TYPE(right)));
+
     if(AOP_TYPE(right) == AOP_LIT)
         lit = (unsigned long)floatFromVal (AOP(right)->aopu.aop_lit);
 
@@ -4604,30 +4635,49 @@ static void genOr (iCode *ic, iCode *ifx)
 			 AOP(result)->aopu.aop_dir,
 			 AOP(result)->aopu.aop_dir);
 	      } else {
+		if( AOP_TYPE(result) == AOP_ACC) {
+		  emitpcode(POC_MOVLW, popGetLit(0));
+		  emitpcode(POC_BTFSS, popGet(AOP(right),0,FALSE,FALSE));
+		  emitpcode(POC_BTFSC, popGet(AOP(left),0,FALSE,FALSE));
+		  emitpcode(POC_MOVLW, popGetLit(1));
 
-		emitpcode(POC_BCF,   popGet(AOP(result),0,FALSE,FALSE));
-		emitpcode(POC_BTFSS, popGet(AOP(right),0,FALSE,FALSE));
-		emitpcode(POC_BTFSC, popGet(AOP(left),0,FALSE,FALSE));
-		emitpcode(POC_BSF,   popGet(AOP(result),0,FALSE,FALSE));
+		} else {
 
-		pic14_emitcode("bcf","(%s >> 3), (%s & 7)",
-			 AOP(result)->aopu.aop_dir,
-			 AOP(result)->aopu.aop_dir);
-		pic14_emitcode("btfss","(%s >> 3), (%s & 7)",
-			 AOP(right)->aopu.aop_dir,
-			 AOP(right)->aopu.aop_dir);
-		pic14_emitcode("btfsc","(%s >> 3), (%s & 7)",
-			 AOP(left)->aopu.aop_dir,
-			 AOP(left)->aopu.aop_dir);
-		pic14_emitcode("bsf","(%s >> 3), (%s & 7)",
-			 AOP(result)->aopu.aop_dir,
-			 AOP(result)->aopu.aop_dir);
+		  emitpcode(POC_BCF,   popGet(AOP(result),0,FALSE,FALSE));
+		  emitpcode(POC_BTFSS, popGet(AOP(right),0,FALSE,FALSE));
+		  emitpcode(POC_BTFSC, popGet(AOP(left),0,FALSE,FALSE));
+		  emitpcode(POC_BSF,   popGet(AOP(result),0,FALSE,FALSE));
+
+		  pic14_emitcode("bcf","(%s >> 3), (%s & 7)",
+				 AOP(result)->aopu.aop_dir,
+				 AOP(result)->aopu.aop_dir);
+		  pic14_emitcode("btfss","(%s >> 3), (%s & 7)",
+				 AOP(right)->aopu.aop_dir,
+				 AOP(right)->aopu.aop_dir);
+		  pic14_emitcode("btfsc","(%s >> 3), (%s & 7)",
+				 AOP(left)->aopu.aop_dir,
+				 AOP(left)->aopu.aop_dir);
+		  pic14_emitcode("bsf","(%s >> 3), (%s & 7)",
+				 AOP(result)->aopu.aop_dir,
+				 AOP(result)->aopu.aop_dir);
+		}
 	      }
-            }
-            else{
+            } else {
                 // c = bit | val;
                 symbol *tlbl = newiTempLabel(NULL);
                 pic14_emitcode(";XXX "," %s,%d",__FILE__,__LINE__);
+
+
+		emitpcode(POC_BCF,   popGet(AOP(result),0,FALSE,FALSE));
+		if( AOP_TYPE(right) == AOP_ACC) {
+		  emitpcode(POC_IORLW, popGetLit(0));
+		  emitSKPNZ;
+		  emitpcode(POC_BTFSC, popGet(AOP(left),0,FALSE,FALSE));
+		  emitpcode(POC_BSF,   popGet(AOP(result),0,FALSE,FALSE));
+		}
+
+
+
                 if(!((AOP_TYPE(result) == AOP_CRY) && ifx))
                     pic14_emitcode(";XXX setb","c");
                 pic14_emitcode(";XXX jb","%s,%05d_DS_",
@@ -4688,6 +4738,7 @@ static void genOr (iCode *ic, iCode *ifx)
 
     /* if left is same as result */
     if(pic14_sameRegs(AOP(result),AOP(left))){
+      int know_W = -1;
       for(;size--; offset++,lit>>=8) {
 	if(AOP_TYPE(right) == AOP_LIT){
 	  if((lit & 0xff) == 0)
@@ -4697,14 +4748,13 @@ static void genOr (iCode *ic, iCode *ifx)
 	    int p = my_powof2(lit & 0xff);
 	    if(p>=0) {
 	      /* only one bit is set in the literal, so use a bsf instruction */
-	      emitpcode(POC_BSF,   popGet(AOP(left),offset,FALSE,FALSE));
-	      pic14_emitcode("bsf","%s,%d",aopGet(AOP(left),offset,FALSE,TRUE),p);
+	      emitpcode(POC_BSF,
+			newpCodeOpBit(aopGet(AOP(left),offset,FALSE,FALSE),p,0));
 	    } else {
-	      emitpcode(POC_MOVLW, popGetLit(lit & 0xff));
+	      if(know_W != (lit & 0xff))
+		emitpcode(POC_MOVLW, popGetLit(lit & 0xff));
+	      know_W = lit & 0xff;
 	      emitpcode(POC_IORWF, popGet(AOP(left),offset,FALSE,FALSE));
-
-	      pic14_emitcode("movlw","0x%x", (lit & 0xff));
-	      pic14_emitcode("iorwf","%s,f",aopGet(AOP(left),offset,FALSE,TRUE),p);
 	    }
 		    
 	  }
@@ -4731,6 +4781,7 @@ static void genOr (iCode *ic, iCode *ifx)
             symbol *tlbl = newiTempLabel(NULL);
             int sizer = max(AOP_SIZE(left),AOP_SIZE(right));
 	    pic14_emitcode(";XXX "," %s,%d",__FILE__,__LINE__);
+
 
             if(size)
                 pic14_emitcode(";XXX setb","c");
@@ -8104,121 +8155,117 @@ static void genFarFarAssign (operand *result, operand *right, iCode *ic)
 /*-----------------------------------------------------------------*/
 static void genAssign (iCode *ic)
 {
-    operand *result, *right;
-    int size, offset ;
-	unsigned long lit = 0L;
+  operand *result, *right;
+  int size, offset,know_W;
+  unsigned long lit = 0L;
 
-    result = IC_RESULT(ic);
-    right  = IC_RIGHT(ic) ;
+  result = IC_RESULT(ic);
+  right  = IC_RIGHT(ic) ;
 
-    DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+  DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
-    /* if they are the same */
-    if (operandsEqu (IC_RESULT(ic),IC_RIGHT(ic)))
-        return ;
+  /* if they are the same */
+  if (operandsEqu (IC_RESULT(ic),IC_RIGHT(ic)))
+    return ;
 
-    aopOp(right,ic,FALSE);
-    aopOp(result,ic,TRUE);
+  aopOp(right,ic,FALSE);
+  aopOp(result,ic,TRUE);
 
-    /* if they are the same registers */
-    if (pic14_sameRegs(AOP(right),AOP(result)))
-        goto release;
+  DEBUGpic14_emitcode ("; ","result %s, right %s, size = %d",
+		       AopType(AOP_TYPE(IC_RESULT(ic))),
+		       AopType(AOP_TYPE(IC_RIGHT(ic))),
+		       AOP_SIZE(result));
 
-    /* if the result is a bit */
-    if (AOP_TYPE(result) == AOP_CRY) {
+  /* if they are the same registers */
+  if (pic14_sameRegs(AOP(right),AOP(result)))
+    goto release;
 
-        /* if the right size is a literal then
-        we know what the value is */
-        if (AOP_TYPE(right) == AOP_LIT) {
+  /* if the result is a bit */
+  if (AOP_TYPE(result) == AOP_CRY) {
+
+    /* if the right size is a literal then
+       we know what the value is */
+    if (AOP_TYPE(right) == AOP_LIT) {
 	  
-	  emitpcode(  ( ((int) operandLitValue(right)) ? POC_BSF : POC_BCF),
-		      popGet(AOP(result),0,FALSE,FALSE));
+      emitpcode(  ( ((int) operandLitValue(right)) ? POC_BSF : POC_BCF),
+		  popGet(AOP(result),0,FALSE,FALSE));
 
-            if (((int) operandLitValue(right))) 
-	      pic14_emitcode("bsf","(%s >> 3),(%s & 7)",
+      if (((int) operandLitValue(right))) 
+	pic14_emitcode("bsf","(%s >> 3),(%s & 7)",
 		       AOP(result)->aopu.aop_dir,
 		       AOP(result)->aopu.aop_dir);
-            else
-	      pic14_emitcode("bcf","(%s >> 3),(%s & 7)",
-		 AOP(result)->aopu.aop_dir,
-		 AOP(result)->aopu.aop_dir);
-            goto release;
-        }
-
-        /* the right is also a bit variable */
-        if (AOP_TYPE(right) == AOP_CRY) {
-	  emitpcode(POC_BCF,    popGet(AOP(result),0,FALSE,FALSE));
-	  emitpcode(POC_BTFSC,  popGet(AOP(right),0,FALSE,FALSE));
-	  emitpcode(POC_BSF,    popGet(AOP(result),0,FALSE,FALSE));
-
-	  pic14_emitcode("bcf","(%s >> 3),(%s & 7)",
-		   AOP(result)->aopu.aop_dir,
-		   AOP(result)->aopu.aop_dir);
-	  pic14_emitcode("btfsc","(%s >> 3),(%s & 7)",
-		   AOP(right)->aopu.aop_dir,
-		   AOP(right)->aopu.aop_dir);
-	  pic14_emitcode("bsf","(%s >> 3),(%s & 7)",
-		   AOP(result)->aopu.aop_dir,
-		   AOP(result)->aopu.aop_dir);
-	  goto release ;
-        }
-
-        /* we need to or */
-	emitpcode(POC_BCF,    popGet(AOP(result),0,FALSE,FALSE));
-        pic14_toBoolean(right);
-	emitSKPZ;
-	emitpcode(POC_BSF,    popGet(AOP(result),0,FALSE,FALSE));
-        //aopPut(AOP(result),"a",0);
-        goto release ;
+      else
+	pic14_emitcode("bcf","(%s >> 3),(%s & 7)",
+		       AOP(result)->aopu.aop_dir,
+		       AOP(result)->aopu.aop_dir);
+      goto release;
     }
 
-    /* bit variables done */
-    /* general case */
-    size = AOP_SIZE(result);
-    offset = 0 ;
-    if(AOP_TYPE(right) == AOP_LIT)
-	lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
-    if((AOP_TYPE(result) != AOP_REG) &&
-       (AOP_TYPE(right) == AOP_LIT) &&
-       !IS_FLOAT(operandType(right)) &&
-       (lit < 256L)){
+    /* the right is also a bit variable */
+    if (AOP_TYPE(right) == AOP_CRY) {
+      emitpcode(POC_BCF,    popGet(AOP(result),0,FALSE,FALSE));
+      emitpcode(POC_BTFSC,  popGet(AOP(right),0,FALSE,FALSE));
+      emitpcode(POC_BSF,    popGet(AOP(result),0,FALSE,FALSE));
 
-	while (size--) {
-	  if((unsigned int)((lit >> (size*8)) & 0x0FFL)== 0) {
-	    //pic14_emitcode("clrf","%s", aopGet(AOP(result),size,FALSE,FALSE));
-	      emitpcode(POC_CLRF,popGet(AOP(result),size,FALSE,FALSE));
-	    }else {
-	      emitpcode(POC_MOVLW,popGet(AOP(right),size,FALSE,FALSE));
-	      emitpcode(POC_MOVWF,popGet(AOP(result),size,FALSE,FALSE));
-	      //pic14_emitcode("movlw","%s", aopGet(AOP(right),size,FALSE,FALSE));
-	      //pic14_emitcode("movwf","%s", aopGet(AOP(result),size,FALSE,FALSE));
-	    }
-	}
+      pic14_emitcode("bcf","(%s >> 3),(%s & 7)",
+		     AOP(result)->aopu.aop_dir,
+		     AOP(result)->aopu.aop_dir);
+      pic14_emitcode("btfsc","(%s >> 3),(%s & 7)",
+		     AOP(right)->aopu.aop_dir,
+		     AOP(right)->aopu.aop_dir);
+      pic14_emitcode("bsf","(%s >> 3),(%s & 7)",
+		     AOP(result)->aopu.aop_dir,
+		     AOP(result)->aopu.aop_dir);
+      goto release ;
+    }
+
+    /* we need to or */
+    emitpcode(POC_BCF,    popGet(AOP(result),0,FALSE,FALSE));
+    pic14_toBoolean(right);
+    emitSKPZ;
+    emitpcode(POC_BSF,    popGet(AOP(result),0,FALSE,FALSE));
+    //aopPut(AOP(result),"a",0);
+    goto release ;
+  }
+
+  /* bit variables done */
+  /* general case */
+  size = AOP_SIZE(result);
+  offset = 0 ;
+  if(AOP_TYPE(right) == AOP_LIT)
+    lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
+
+  know_W=-1;
+  while (size--) {
+    if(AOP_TYPE(right) == AOP_LIT) {
+      if(lit&0xff) {
+	if(know_W != (lit&0xff))
+	  emitpcode(POC_MOVLW,popGetLit(lit&0xff));
+	know_W = lit&0xff;
+	emitpcode(POC_MOVWF, popGet(AOP(result),offset,FALSE,FALSE));
+      } else
+	emitpcode(POC_CLRF, popGet(AOP(result),offset,FALSE,FALSE));
+
+      lit >>= 8;
+
+    } else if (AOP_TYPE(right) == AOP_CRY) {
+      emitpcode(POC_CLRF, popGet(AOP(result),offset,FALSE,FALSE));
+      if(offset == 0) {
+	emitpcode(POC_BTFSS, popGet(AOP(right),0,FALSE,FALSE));
+	emitpcode(POC_INCF, popGet(AOP(result),0,FALSE,FALSE));
+      }
     } else {
-	while (size--) {
-	  if(AOP_TYPE(right) == AOP_LIT) {
-	    emitpcode(POC_MOVLW, popGet(AOP(right),offset,FALSE,FALSE));
-	    emitpcode(POC_MOVWF, popGet(AOP(result),offset,FALSE,FALSE));
-
-	  } else if (AOP_TYPE(right) == AOP_CRY) {
-	    emitpcode(POC_CLRF, popGet(AOP(result),offset,FALSE,FALSE));
-	    if(offset == 0) {
-	      emitpcode(POC_BTFSS, popGet(AOP(right),0,FALSE,FALSE));
-	      emitpcode(POC_INCF, popGet(AOP(result),0,FALSE,FALSE));
-	    }
-	  } else {
-	    emitpcode(POC_MOVFW, popGet(AOP(right),offset,FALSE,FALSE));
-	    emitpcode(POC_MOVWF, popGet(AOP(result),offset,FALSE,FALSE));
-	  }
-	    
-	  //pic14_emitcode("movwf","%s", aopGet(AOP(result),offset,FALSE,FALSE));
-	  offset++;
-	}
+      emitpcode(POC_MOVFW, popGet(AOP(right),offset,FALSE,FALSE));
+      emitpcode(POC_MOVWF, popGet(AOP(result),offset,FALSE,FALSE));
     }
+	    
+    offset++;
+  }
+
     
-release:
-    freeAsmop (right,NULL,ic,FALSE);
-    freeAsmop (result,NULL,ic,TRUE);
+ release:
+  freeAsmop (right,NULL,ic,FALSE);
+  freeAsmop (result,NULL,ic,TRUE);
 }   
 
 /*-----------------------------------------------------------------*/

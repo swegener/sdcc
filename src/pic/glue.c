@@ -1106,7 +1106,7 @@ picglue ()
     
 
   /* Put all variables into a cblock */
-  fprintf (asmFile, "\n\n\tcblock  0x0c\n\n");
+  fprintf (asmFile, "\n\n\tcblock  0x20\n\n");
 
   for(i=0; i<pic14_nRegs; i++) {
     if(regspic14[i].wasUsed && (regspic14[i].offset>=0x0c) )

@@ -162,9 +162,9 @@ _pic14_getRegName (struct regs *reg)
 static void
 _pic14_genAssemblerPreamble (FILE * of)
 {
-  fprintf (of, "\tlist\tp=16c84\n");
+  fprintf (of, "\tlist\tp=16f877\n");
   fprintf (of, "\t__config _wdt_off\n");
-  fprintf (of, "\ninclude \"p16c84.inc\"\n");
+  fprintf (of, "\ninclude \"p16f877.inc\"\n");
 }
 
 /* Generate interrupt vector table. */

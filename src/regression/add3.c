@@ -68,6 +68,17 @@ void add_char2char(void)
 
 }
 
+void add_compound_char(void)
+{
+  char0 = char1+5;
+
+  if(char0 != 9)
+    failures++;
+
+  if((char0+char1) != 13)
+    failures++;
+}
+
 void add_int2int(void)
 {
   if(int0 != 4)
@@ -84,6 +95,18 @@ void add_int2int(void)
     failures++;
 
 }
+
+void add_compound_int(void)
+{
+  int0 = int1+5;
+
+  if(int0 != 9)
+    failures++;
+
+  if((int0+int1) != 13)
+    failures++;
+}
+
 
 void add_lit2long(void)
 {
@@ -179,9 +202,15 @@ void main(void)
   char1 = char0 + 1;
   add_char2char();
 
+  char1=4;
+  add_compound_char();
+
   int0 = 4;
   int1 = int0 + 1;
   add_int2int();
+
+  int1=4;
+  add_compound_int();
 
   add_lit2long();
   add_lit2ulong();

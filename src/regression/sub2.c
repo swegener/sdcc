@@ -121,6 +121,31 @@ void assign_char2int(void)
 
 }
 
+
+void sub_compound_char(void)
+{
+
+  char0 = char1 - 5;
+  if(char0 != 4)
+    failures++;
+
+  if((char1 - char0 - 5) != 0)
+    failures++;
+
+}
+
+void sub_compound_int(void)
+{
+
+  int0 = int1 - 5;
+  if(int0 != 4)
+    failures++;
+
+  if((int1 - int0 - 5) != 0)
+    failures++;
+
+}
+
 void main(void)
 {
 
@@ -138,6 +163,12 @@ void main(void)
   char0 = 0x7f;
   char1 = -5;
   assign_char2int();
+
+  char1 = 9;
+  sub_compound_char();
+  
+  int1 = 9;
+  sub_compound_int();
 
   success = failures;
   done();

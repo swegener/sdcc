@@ -58,6 +58,9 @@ _G;
 int pic14_ptrRegReq;		/* one byte pointer register required */
 
 /* pic14 registers */
+/* A nasty, awful, disgusting hack for register declarations */
+#ifdef p16c84
+
 regs regspic14[] =
 {
 
@@ -84,6 +87,39 @@ regs regspic14[] =
   {REG_PTR, PO_FSR, 4, "FSR", "FSR", 4, 1, 0},
 
 };
+#else
+regs regspic14[] =
+{
+  {REG_GPR, PO_GPR_TEMP, 0x20, "r0x20", "r0x20", 0x20, 1, 0},
+  {REG_GPR, PO_GPR_TEMP, 0x21, "r0x21", "r0x21", 0x21, 1, 0},
+  {REG_GPR, PO_GPR_TEMP, 0x22, "r0x22", "r0x22", 0x22, 1, 0},
+  {REG_GPR, PO_GPR_TEMP, 0x23, "r0x23", "r0x23", 0x23, 1, 0},
+  {REG_GPR, PO_GPR_TEMP, 0x24, "r0x24", "r0x24", 0x24, 1, 0},
+  {REG_GPR, PO_GPR_TEMP, 0x25, "r0x25", "r0x25", 0x25, 1, 0},
+  {REG_GPR, PO_GPR_TEMP, 0x26, "r0x26", "r0x26", 0x26, 1, 0},
+  {REG_GPR, PO_GPR_TEMP, 0x27, "r0x27", "r0x27", 0x27, 1, 0},
+  {REG_GPR, PO_GPR_TEMP, 0x28, "r0x28", "r0x28", 0x28, 1, 0},
+  {REG_GPR, PO_GPR_TEMP, 0x29, "r0x29", "r0x29", 0x29, 1, 0},
+  {REG_GPR, PO_GPR_TEMP, 0x2A, "r0x2A", "r0x2A", 0x2A, 1, 0},
+  {REG_GPR, PO_GPR_TEMP, 0x2B, "r0x2B", "r0x2B", 0x2B, 1, 0},
+  {REG_GPR, PO_GPR_TEMP, 0x2C, "r0x2C", "r0x2C", 0x2C, 1, 0},
+  {REG_GPR, PO_GPR_TEMP, 0x2D, "r0x2D", "r0x2D", 0x2D, 1, 0},
+  {REG_GPR, PO_GPR_TEMP, 0x2E, "r0x2E", "r0x2E", 0x2E, 1, 0},
+  {REG_GPR, PO_GPR_TEMP, 0x2F, "r0x2F", "r0x2F", 0x2F, 1, 0},
+  {REG_GPR, PO_GPR_TEMP, 0x30, "r0x30", "r0x30", 0x30, 1, 0},
+  {REG_GPR, PO_GPR_TEMP, 0x31, "r0x31", "r0x31", 0x31, 1, 0},
+  {REG_GPR, PO_GPR_TEMP, 0x32, "r0x32", "r0x32", 0x32, 1, 0},
+  {REG_GPR, PO_GPR_TEMP, 0x33, "r0x33", "r0x33", 0x33, 1, 0},
+  {REG_GPR, PO_GPR_TEMP, 0x34, "r0x34", "r0x34", 0x34, 1, 0},
+  {REG_GPR, PO_GPR_TEMP, 0x35, "r0x35", "r0x35", 0x35, 1, 0},
+  {REG_GPR, PO_GPR_TEMP, 0x36, "r0x36", "r0x36", 0x36, 1, 0},
+  {REG_GPR, PO_GPR_TEMP, 0x37, "r0x37", "r0x37", 0x37, 1, 0},
+
+  {REG_PTR, PO_FSR, 4, "FSR", "FSR", 4, 1, 0},
+
+};
+
+#endif
 
 int pic14_nRegs = sizeof (regspic14) / sizeof (regs);
 static void spillThis (symbol *);

@@ -104,6 +104,24 @@ void and_lit2ulong(void)
     failures++;
 }
 
+/*-----------*/
+void and_uchar2uchar(void)
+{
+
+  uchar0 &= uchar1;
+
+  if(uchar0 != 0x0f)
+    failures++;
+
+  uchar1 &= 0xf7;
+
+  uchar0 = uchar1 & 0xfe;
+
+  if(uchar0 != 0x06)
+    failures++;
+
+}
+
 void main(void)
 {
 
@@ -115,6 +133,10 @@ void main(void)
 
   ulong0 = 0xffffffff;
   and_lit2ulong();
+
+  uchar0 = 0xff;
+  uchar1 = 0x0f;
+  and_uchar2uchar();
 
   success = failures;
   done();

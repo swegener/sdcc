@@ -88,6 +88,15 @@ typedef enum
   }
 STORAGE_CLASS;
 
+#define TF_LONG     0x00000001             /* type long int */
+#define TF_SHORT    0x00000002             /* type short    */
+#define TF_UNSIGNED 0x00000004             /* type is unsigned */
+#define TF_STATIC   0x00000008             /* type is static   */
+#define TF_EXTERN   0x00000010             /* type is extern   */
+#define TF_ABSADDR  0x00000020             /* type has absolute address */
+#define TF_REENT    0x00000040             /* type of func is reentrant func */
+#define TF_INTRRNT  0x00000080             /* is an interrupt routine */
+
 /* specifier is the last in the type-chain */
 typedef struct specifier
   {

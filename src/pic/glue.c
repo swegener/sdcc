@@ -25,7 +25,9 @@
 #include "../common.h"
 #include <time.h>
 #include "ralloc.h"
+#include "pcode.h"
 #include "newalloc.h"
+
 
 extern symbol *interrupts[256];
 void printIval (symbol *, sym_link *, initList *, FILE *);
@@ -71,41 +73,55 @@ aopLiteral (value * val, int offset)
      void printIvalPtr (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
 #endif
 
+/*-----------------------------------------------------------------*/
+/* Allocation macros that replace those in SDCCalloc.h             */
+/*   Why? I dunno. I ran across a bug with those macros that       */
+/*   I couldn't fix, but I could work around...                    */
+/*-----------------------------------------------------------------*/
+
+#define  _ALLOC(x,sz) if (!(x = calloc((sz),1) ))      \
+         {                                          \
+            werror(E_OUT_OF_MEM,__FILE__,(long) sz);\
+            exit (1);                               \
+         }
+
+#define _ALLOC_ATOMIC(x,y) if (!((x) = malloc(y)))   \
+         {                                               \
+            werror(E_OUT_OF_MEM,__FILE__,(long) y);     \
+            exit (1);                                    \
+         }
+
 
 /*-----------------------------------------------------------------*/
 /* aopLiteral - string from a literal value                        */
 /*-----------------------------------------------------------------*/
-     char *pic14aopLiteral (value * val, int offset)
+int pic14aopLiteral (value *val, int offset)
 {
-  char *rs;
-  union
-    {
-      float f;
-      unsigned char c[4];
-    }
-  fl;
+  union {
+    float f;
+    unsigned char c[4];
+  } fl;
 
   /* if it is a float then it gets tricky */
   /* otherwise it is fairly simple */
-  if (!IS_FLOAT (val->type))
-    {
-      unsigned long v = floatFromVal (val);
+  if (!IS_FLOAT(val->type)) {
+    unsigned long v = floatFromVal(val);
 
-      v >>= (offset * 8);
-      sprintf (buffer, "0x%02x", ((char) v) & 0xff);
-      rs = Safe_calloc (1, strlen (buffer) + 1);
-      return strcpy (rs, buffer);
-    }
+    //v >>= (offset * 8);
+    return ( (v >> (offset * 8)) & 0xff);
+    //sprintf(buffer,"0x%02x",((char) v) & 0xff);
+    //_ALLOC_ATOMIC(rs,strlen(buffer)+1);
+    //return strcpy (rs,buffer);
+  }
 
   /* it is type float */
-  fl.f = (float) floatFromVal (val);
-#ifdef _BIG_ENDIAN
-  sprintf (buffer, "0x%02x", fl.c[3 - offset]);
+  fl.f = (float) floatFromVal(val);
+#ifdef _BIG_ENDIAN    
+  return fl.c[3-offset];
 #else
-  sprintf (buffer, "0x%02x", fl.c[offset]);
+  return fl.c[offset];
 #endif
-  rs = Safe_calloc (1, strlen (buffer) + 1);
-  return strcpy (rs, buffer);
+
 }
 
 
@@ -214,21 +230,21 @@ pic14emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	    }
 	  //fprintf (map->oFile, "\t.ds\t0x%04x\n", (unsigned int)getSize (sym->type) & 0xffff);
 	}
-
-      /* if it has a initial value then do it only if
-         it is a global variable */
-      if (sym->ival && sym->level == 0)
-	{
-	  ast *ival = NULL;
-
-	  if (IS_AGGREGATE (sym->type))
-	    ival = initAggregates (sym, sym->ival, NULL);
-	  else
-	    ival = newNode ('=', newAst_VALUE (symbolVal (sym)),
-		     decorateType (resolveSymbols (list2expr (sym->ival))));
-	  codeOutFile = statsg->oFile;
-	  eBBlockFromiCode (iCodeFromAst (ival));
-	  sym->ival = NULL;
+	
+	/* if it has a initial value then do it only if
+	   it is a global variable */
+	if (sym->ival && sym->level == 0) {
+	    ast *ival = NULL;
+	    
+	    if (IS_AGGREGATE (sym->type))
+		ival = initAggregates (sym, sym->ival, NULL);
+	    else
+		ival = newNode ('=', newAst_VALUE(symbolVal (sym)),
+				decorateType (resolveSymbols (list2expr (sym->ival))));
+	    codeOutFile = statsg->oFile;
+	    GcurMemmap = statsg;
+	    eBBlockFromiCode (iCodeFromAst (ival));
+	    sym->ival = NULL;
 	}
     }
 }
@@ -978,81 +994,81 @@ pic14emitOverlay (FILE * afile)
 void
 pic14glue ()
 {
+
   FILE *vFile;
   FILE *asmFile;
-  FILE *ovrFile = tempfile ();
+  FILE *ovrFile = tempfile();
   int i;
 
-  addSetHead (&tmpfileSet, ovrFile);
+  addSetHead(&tmpfileSet,ovrFile);
   /* print the global struct definitions */
   if (options.debug)
-    cdbStructBlock (0, cdbFile);
+    cdbStructBlock (0,cdbFile);
 
-  vFile = tempfile ();
+  vFile = tempfile();
   /* PENDING: this isnt the best place but it will do */
-  if (port->general.glue_up_main)
-    {
-      /* create the interrupt vector table */
-      pic14createInterruptVect (vFile);
-    }
+  if (port->general.glue_up_main) {
+    /* create the interrupt vector table */
+    pic14createInterruptVect (vFile);
+  }
 
-  addSetHead (&tmpfileSet, vFile);
-
+  addSetHead(&tmpfileSet,vFile);
+    
   /* emit code for the all the variables declared */
   pic14emitMaps ();
   /* do the overlay segments */
-  pic14emitOverlay (ovrFile);
+  pic14emitOverlay(ovrFile);
+
+
+  pcode_test();
+
 
   /* now put it all together into the assembler file */
   /* create the assembler file name */
+    
+  if (!options.c1mode) {
+    sprintf (buffer, srcFileName);
+    strcat (buffer, ".asm");
+  }
+  else {
+    strcpy(buffer, options.out_name);
+  }
 
-  if (!options.c1mode)
-    {
-      sprintf (buffer, srcFileName);
-      strcat (buffer, ".asm");
-    }
-  else
-    {
-      strcpy (buffer, options.out_name);
-    }
-
-  if (!(asmFile = fopen (buffer, "w")))
-    {
-      werror (E_FILE_OPEN_ERR, buffer);
-      exit (1);
-    }
-
+  if (!(asmFile = fopen (buffer, "w"))) {
+    werror (E_FILE_OPEN_ERR, buffer);
+    exit (1);
+  }
+    
   /* initial comments */
   pic14initialComments (asmFile);
-
+    
   /* print module name */
   fprintf (asmFile, ";\t.module %s\n", moduleName);
-
+    
   /* Let the port generate any global directives, etc. */
   if (port->genAssemblerPreamble)
     {
-      port->genAssemblerPreamble (asmFile);
+      port->genAssemblerPreamble(asmFile);
     }
-
+    
   /* print the global variables in this module */
   pic14printPublics (asmFile);
-
+    
 
   /* copy the sfr segment */
   fprintf (asmFile, "%s", iComments2);
   fprintf (asmFile, "; special function registers\n");
   fprintf (asmFile, "%s", iComments2);
   copyFile (asmFile, sfr->oFile);
-
+    
 
   /* Put all variables into a cblock */
   fprintf (asmFile, "\n\n\tcblock  0x13\n\n");
 
-  for (i = 0; i < pic14_nRegs; i++)
-    {
-      if (regspic14[i].wasUsed && (regspic14[i].offset >= 0x0c))
-	fprintf (asmFile, "\t%s\n", regspic14[i].name);
-    }
+  for(i=0; i<pic14_nRegs; i++) {
+    if(regspic14[i].wasUsed && (regspic14[i].offset>=0x0c) )
+      fprintf (asmFile, "\t%s\n",regspic14[i].name);
+  }
   //fprintf (asmFile, "\tr0x0C\n");
   //fprintf (asmFile, "\tr0x0D\n");
 
@@ -1072,7 +1088,7 @@ pic14glue ()
   fprintf (asmFile, "; special function bits \n");
   fprintf (asmFile, "%s", iComments2);
   copyFile (asmFile, sfrbit->oFile);
-
+    
   /* copy the data segment */
   fprintf (asmFile, "%s", iComments2);
   fprintf (asmFile, "; internal ram data\n");
@@ -1083,42 +1099,40 @@ pic14glue ()
   /* create the overlay segments */
   fprintf (asmFile, "%s", iComments2);
   fprintf (asmFile, "; overlayable items in internal ram \n");
-  fprintf (asmFile, "%s", iComments2);
+  fprintf (asmFile, "%s", iComments2);    
   copyFile (asmFile, ovrFile);
 
   /* create the stack segment MOF */
-  if (mainf && mainf->fbody)
-    {
-      fprintf (asmFile, "%s", iComments2);
-      fprintf (asmFile, "; Stack segment in internal ram \n");
-      fprintf (asmFile, "%s", iComments2);
-      fprintf (asmFile, ";\t.area\tSSEG\t(DATA)\n"
-	       ";__start__stack:\n;\t.ds\t1\n\n");
-    }
+  if (mainf && mainf->fbody) {
+    fprintf (asmFile, "%s", iComments2);
+    fprintf (asmFile, "; Stack segment in internal ram \n");
+    fprintf (asmFile, "%s", iComments2);    
+    fprintf (asmFile, ";\t.area\tSSEG\t(DATA)\n"
+	     ";__start__stack:\n;\t.ds\t1\n\n");
+  }
 
   /* create the idata segment */
   fprintf (asmFile, "%s", iComments2);
   fprintf (asmFile, "; indirectly addressable internal ram data\n");
   fprintf (asmFile, "%s", iComments2);
   copyFile (asmFile, idata->oFile);
-
+    
   /* if external stack then reserve space of it */
-  if (mainf && mainf->fbody && options.useXstack)
-    {
-      fprintf (asmFile, "%s", iComments2);
-      fprintf (asmFile, "; external stack \n");
-      fprintf (asmFile, "%s", iComments2);
-      fprintf (asmFile, ";\t.area XSEG (XDATA)\n");	/* MOF */
-      fprintf (asmFile, ";\t.ds 256\n");
-    }
-
-
+  if (mainf && mainf->fbody && options.useXstack ) {
+    fprintf (asmFile, "%s", iComments2);
+    fprintf (asmFile, "; external stack \n");
+    fprintf (asmFile, "%s", iComments2);
+    fprintf (asmFile,";\t.area XSEG (XDATA)\n"); /* MOF */
+    fprintf (asmFile,";\t.ds 256\n");
+  }
+	
+	
   /* copy xtern ram data */
   fprintf (asmFile, "%s", iComments2);
   fprintf (asmFile, "; external ram data\n");
   fprintf (asmFile, "%s", iComments2);
   copyFile (asmFile, xdata->oFile);
-
+    
 
   fprintf (asmFile, "\tendc\n");
 
@@ -1133,63 +1147,61 @@ pic14glue ()
   fprintf (asmFile, "\tORG 0\n");
 
   /* copy the interrupt vector table */
-  if (mainf && mainf->fbody)
-    {
-      fprintf (asmFile, "%s", iComments2);
-      fprintf (asmFile, "; interrupt vector \n");
-      fprintf (asmFile, "%s", iComments2);
-      copyFile (asmFile, vFile);
-    }
-
+  if (mainf && mainf->fbody) {
+    fprintf (asmFile, "%s", iComments2);
+    fprintf (asmFile, "; interrupt vector \n");
+    fprintf (asmFile, "%s", iComments2);
+    copyFile (asmFile, vFile);
+  }
+    
   /* copy global & static initialisations */
   fprintf (asmFile, "%s", iComments2);
   fprintf (asmFile, "; global & static initialisations\n");
   fprintf (asmFile, "%s", iComments2);
-
-  /* Everywhere we generate a reference to the static_name area,
-   * (which is currently only here), we immediately follow it with a
+    
+  /* Everywhere we generate a reference to the static_name area, 
+   * (which is currently only here), we immediately follow it with a 
    * definition of the post_static_name area. This guarantees that
    * the post_static_name area will immediately follow the static_name
    * area.
    */
-  fprintf (asmFile, ";\t.area %s\n", port->mem.static_name);	/* MOF */
+  fprintf (asmFile, ";\t.area %s\n", port->mem.static_name); /* MOF */
   fprintf (asmFile, ";\t.area %s\n", port->mem.post_static_name);
   fprintf (asmFile, ";\t.area %s\n", port->mem.static_name);
-
-  if (mainf && mainf->fbody)
-    {
-      fprintf (asmFile, "__sdcc_gsinit_startup:\n");
-      /* if external stack is specified then the
-         higher order byte of the xdatalocation is
-         going into P2 and the lower order going into
-         spx */
-      if (options.useXstack)
-	{
-	  fprintf (asmFile, ";\tmov\tP2,#0x%02x\n",
-		   (((unsigned int) options.xdata_loc) >> 8) & 0xff);
-	  fprintf (asmFile, ";\tmov\t_spx,#0x%02x\n",
-		   (unsigned int) options.xdata_loc & 0xff);
-	}
-
-      /* initialise the stack pointer */
-      /* if the user specified a value then use it */
-      if (options.stack_loc)
-	fprintf (asmFile, ";\tmov\tsp,#%d\n", options.stack_loc);
-      else
-	/* no: we have to compute it */
-      if (!options.stackOnData && maxRegBank <= 3)
-	fprintf (asmFile, ";\tmov\tsp,#%d\n", ((maxRegBank + 1) * 8) - 1);
-      else
-	fprintf (asmFile, ";\tmov\tsp,#__start__stack\n");	/* MOF */
-
-      fprintf (asmFile, ";\tlcall\t__sdcc_external_startup\n");
-      fprintf (asmFile, ";\tmov\ta,dpl\n");
-      fprintf (asmFile, ";\tjz\t__sdcc_init_data\n");
-      fprintf (asmFile, ";\tljmp\t__sdcc_program_startup\n");
-      fprintf (asmFile, ";__sdcc_init_data:\n");
-
+    
+  if (mainf && mainf->fbody) {
+    fprintf (asmFile,"__sdcc_gsinit_startup:\n");
+    /* if external stack is specified then the
+       higher order byte of the xdatalocation is
+       going into P2 and the lower order going into
+       spx */
+    if (options.useXstack) {
+      fprintf(asmFile,";\tmov\tP2,#0x%02x\n",
+	      (((unsigned int)options.xdata_loc) >> 8) & 0xff);
+      fprintf(asmFile,";\tmov\t_spx,#0x%02x\n",
+	      (unsigned int)options.xdata_loc & 0xff);
     }
-  copyFile (asmFile, statsg->oFile);
+
+    /* initialise the stack pointer */
+    /* if the user specified a value then use it */
+    if (options.stack_loc) 
+      fprintf(asmFile,";\tmov\tsp,#%d\n",options.stack_loc);
+    else 
+      /* no: we have to compute it */
+      if (!options.stackOnData && maxRegBank <= 3)
+	fprintf(asmFile,";\tmov\tsp,#%d\n",((maxRegBank + 1) * 8) -1); 
+      else
+	fprintf(asmFile,";\tmov\tsp,#__start__stack\n"); /* MOF */
+
+    fprintf (asmFile,";\tlcall\t__sdcc_external_startup\n");
+    fprintf (asmFile,";\tmov\ta,dpl\n");
+    fprintf (asmFile,";\tjz\t__sdcc_init_data\n");
+    fprintf (asmFile,";\tljmp\t__sdcc_program_startup\n");
+    fprintf (asmFile,";__sdcc_init_data:\n");
+	
+  }
+  //copyFile (asmFile, statsg->oFile);
+  copypCode(asmFile, statsg->dbName);
 
   if (port->general.glue_up_main && mainf && mainf->fbody)
     {
@@ -1197,42 +1209,43 @@ pic14glue ()
        * This area is guaranteed to follow the static area
        * by the ugly shucking and jiving about 20 lines ago.
        */
-      fprintf (asmFile, ";\t.area %s\n", port->mem.post_static_name);
-      fprintf (asmFile, ";\tljmp\t__sdcc_program_startup\n");
+      fprintf(asmFile, ";\t.area %s\n", port->mem.post_static_name);
+      fprintf (asmFile,";\tljmp\t__sdcc_program_startup\n");
     }
-
+	
   /* copy over code */
   fprintf (asmFile, "%s", iComments2);
   fprintf (asmFile, "; code\n");
   fprintf (asmFile, "%s", iComments2);
   fprintf (asmFile, ";\t.area %s\n", port->mem.code_name);
-  if (mainf && mainf->fbody)
-    {
+  if (mainf && mainf->fbody) {
+	
+    /* entry point @ start of CSEG */
+    fprintf (asmFile,"__sdcc_program_startup:\n");
+	
+    /* put in the call to main */
+    fprintf(asmFile,"\tcall\t_main\n");
+    if (options.mainreturn) {
 
-      /* entry point @ start of CSEG */
-      fprintf (asmFile, "__sdcc_program_startup:\n");
+      fprintf(asmFile,";\treturn from main ; will return to caller\n");
+      fprintf(asmFile,"\treturn\n");
 
-      /* put in the call to main */
-      fprintf (asmFile, "\tcall\t_main\n");
-      if (options.mainreturn)
-	{
-
-	  fprintf (asmFile, ";\treturn from main ; will return to caller\n");
-	  fprintf (asmFile, "\treturn\n");
-
-	}
-      else
-	{
-
-	  fprintf (asmFile, ";\treturn from main will lock up\n");
-	  fprintf (asmFile, "\tgoto\t$\n");
-	}
+    } else {
+	           
+      fprintf(asmFile,";\treturn from main will lock up\n");
+      fprintf(asmFile,"\tgoto\t$\n");
     }
-  copyFile (asmFile, code->oFile);
+  }
 
-  fprintf (asmFile, "\tend\n");
+  AnalyzepCode(code->dbName);
+  //copyFile (asmFile, code->oFile);
+  copypCode(asmFile, code->dbName);
+
+  printCallTree(stderr);
+
+  fprintf (asmFile,"\tend\n");
 
   fclose (asmFile);
-  applyToSet (tmpfileSet, closeTmpFiles);
-  applyToSet (tmpfileNameSet, rmTmpFiles);
+  applyToSet(tmpfileSet,closeTmpFiles);
+  applyToSet(tmpfileNameSet, rmTmpFiles);
 }

@@ -2,7 +2,7 @@ PRJDIR = ../..
 
 # !include $(PRJDIR)/Makefile.common
 
-OBJ = gen.obj ralloc.obj main.obj
+OBJ = gen.obj ralloc.obj main.obj pcode.obj
 LIB = port.lib
 
 !include ..\..\Bcc.inc
@@ -15,7 +15,7 @@ main.obj: main.c peeph.rul
 $(LIB): peeph.rul $(OBJ)
 	del $(LIB)
 	tlib /a $(LIB) +gen.obj +ralloc.obj +main.obj
-	
+
 peeph.rul: peeph.def
         gawk -f ../SDCCpeeph.awk peeph.def > peeph.rul
 

@@ -1977,6 +1977,11 @@ geniCodePtrPtrSubtract (operand * left, operand * right)
   ADDTOCHAIN (ic);
 
 subtractExit:
+  if (IS_VOID(ltype->next) || IS_VOID(rtype->next)) {
+    return result;
+  }
+
+  // should we really do this? is this ANSI?
   return geniCodeDivision (result,
 			   operandFromLit (getSize (ltype->next)));
 }

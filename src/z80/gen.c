@@ -1832,9 +1832,11 @@ commitPair (asmop * aop, PAIR_ID id)
   if (id == PAIR_HL && requiresHL (aop) && IS_GB)
     {
       emit2 ("ld a,l");
-      emit2 ("ld d,h");
+      if (aop->size>1)
+        emit2 ("ld d,h");
       aopPut (aop, "a", 0);
-      aopPut (aop, "d", 1);
+      if (aop->size>1)
+        aopPut (aop, "d", 1);
     }
   else
     {
@@ -1849,7 +1851,8 @@ commitPair (asmop * aop, PAIR_ID id)
       else
         {
           aopPut (aop, _pairs[id].l, 0);
-          aopPut (aop, _pairs[id].h, 1);
+          if (aop->size>1)
+            aopPut (aop, _pairs[id].h, 1);
         }
     }
 }

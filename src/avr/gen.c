@@ -293,28 +293,28 @@ emitcode (char *inst, char *fmt, ...)
 static iCode *
 hasInc (operand *op, iCode *ic)
 {
-  sym_link *type = operandType(op);
-  sym_link *retype = getSpec (type);
-  iCode *lic = ic->next;
-  int isize ;
+	sym_link *type = operandType(op);
+	sym_link *retype = getSpec (type);
+	iCode *lic = ic->next;
+	int isize ;
   
-  if (IS_BITVAR(retype)||!IS_PTR(type)) return NULL;
-  isize = getSize(type->next);
-  while (lic) {
-    /* if operand of the form op = op + <sizeof *op> */
-    if (lic->op == '+' && isOperandEqual(IC_LEFT(lic),op) &&
-	isOperandEqual(IC_RESULT(lic),op) && 
-	isOperandLiteral(IC_RIGHT(lic)) &&
-	operandLitValue(IC_RIGHT(lic)) == isize) {
-      return lic;
-    }
-    /* if the operand used or deffed */
-    if (bitVectBitValue(ic->uses,op->key) || ((unsigned) ic->defKey == op->key)) {
-      return NULL;
-    }
-    lic = lic->next;
-  }
-  return NULL;
+	if (IS_BITVAR(retype)||!IS_PTR(type)) return NULL;
+	isize = getSize(type->next);
+	while (lic) {
+		/* if operand of the form op = op + <sizeof *op> */
+		if (lic->op == '+' && isOperandEqual(IC_LEFT(lic),op) &&
+		    isOperandEqual(IC_RESULT(lic),op) && 
+		    isOperandLiteral(IC_RIGHT(lic)) &&
+		    operandLitValue(IC_RIGHT(lic)) == isize) {
+			return lic;
+		}
+		/* if the operand used or deffed */
+		if (bitVectBitValue(OP_USES(op),lic->key) || ((unsigned) lic->defKey == op->key)) {
+			return NULL;
+		}
+		lic = lic->next;
+	}
+	return NULL;
 }
 
 /*-----------------------------------------------------------------*/

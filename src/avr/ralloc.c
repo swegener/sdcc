@@ -56,37 +56,37 @@ int avr_ptrRegReq;		/* pointer register required */
 /* AVR registers */
 regs regsAVR[] = {
 	{REG_GPR|REG_PAIR, R0_IDX, REG_GPR|REG_PAIR, "r0", "r0", "", 0, 0, 0},	/* scratch */
-	{REG_GPR, R1_IDX, REG_GPR	  , "r1", "r1", "", 0, 0, 0},	/* scratch */
+	{REG_GPR, R1_IDX, REG_GPR	  , "r1", "r1", "", 0, 0, 0},		/* scratch */
 	{REG_GPR|REG_PAIR, R2_IDX, REG_GPR|REG_PAIR, "r2", "r2", "", 0, 1, 1},	/* gpr */
-	{REG_GPR, R3_IDX, REG_GPR	  , "r3", "r3", "", 0, 1, 1},	/* gpr */
+	{REG_GPR, R3_IDX, REG_GPR	  , "r3", "r3", "", 0, 1, 1},		/* gpr */
 	{REG_GPR|REG_PAIR, R4_IDX, REG_GPR|REG_PAIR, "r4", "r4", "", 0, 1, 1},	/* gpr */
-	{REG_GPR, R5_IDX, REG_GPR	  , "r5", "r5", "", 0, 1, 1},	/* gpr */
+	{REG_GPR, R5_IDX, REG_GPR	  , "r5", "r5", "", 0, 1, 1},		/* gpr */
 	{REG_GPR|REG_PAIR, R6_IDX, REG_GPR|REG_PAIR, "r6", "r6", "", 0, 1, 1},	/* gpr */
-	{REG_GPR, R7_IDX, REG_GPR	  , "r7", "r7", "", 0, 1, 1},	/* gpr */
+	{REG_GPR, R7_IDX, REG_GPR	  , "r7", "r7", "", 0, 1, 1},		/* gpr */
 	{REG_GPR|REG_PAIR, R8_IDX, REG_GPR|REG_PAIR, "r8", "r8", "", 0, 1, 1},	/* gpr */
-	{REG_GPR, R9_IDX, REG_GPR	  , "r9", "r9", "", 0, 1, 1},	/* gpr */
+	{REG_GPR, R9_IDX, REG_GPR	  , "r9", "r9", "", 0, 1, 1},		/* gpr */
 	{REG_GPR|REG_PAIR, R10_IDX,REG_GPR|REG_PAIR, "r10", "r10","",0, 1, 1},	/* gpr */
-	{REG_GPR, R11_IDX,REG_GPR	  , "r11", "r11","",0, 1, 1},	/* gpr */
+	{REG_GPR, R11_IDX,REG_GPR	  , "r11", "r11","",0, 1, 1},		/* gpr */
 	{REG_GPR|REG_PAIR, R12_IDX,REG_GPR|REG_PAIR, "r12", "r12","",0, 1, 1},	/* gpr */
-	{REG_GPR, R13_IDX,REG_GPR	  , "r13", "r13","",0, 1, 1},	/* gpr */
+	{REG_GPR, R13_IDX,REG_GPR	  , "r13", "r13","",0, 1, 1},		/* gpr */
 	{REG_GPR|REG_PAIR, R14_IDX,REG_GPR|REG_PAIR, "r14", "r14","",0, 1, 1},	/* gpr */
-	{REG_GPR, R15_IDX,REG_GPR	  , "r15", "r15","",0, 1, 1},	/* gpr */
+	{REG_GPR, R15_IDX,REG_GPR	  , "r15", "r15","",0, 1, 1},		/* gpr */
 	{REG_GPR|REG_PAIR, R16_IDX,REG_GPR|REG_PAIR, "r16", "r16","",0, 1, 0},	/* parm/gpr */
-	{REG_GPR, R17_IDX,REG_GPR	  , "r17", "r17","",0, 1, 0},	/* parm/gpr */
+	{REG_GPR, R17_IDX,REG_GPR	  , "r17", "r17","",0, 1, 0},		/* parm/gpr */
 	{REG_GPR|REG_PAIR, R18_IDX,REG_GPR|REG_PAIR, "r18", "r18","",0, 1, 0},	/* parm/gpr */
-	{REG_GPR, R19_IDX,REG_GPR	  , "r19", "r19","",0, 1, 0},	/* parm/gpr */
+	{REG_GPR, R19_IDX,REG_GPR	  , "r19", "r19","",0, 1, 0},		/* parm/gpr */
 	{REG_GPR|REG_PAIR, R20_IDX,REG_GPR|REG_PAIR, "r20", "r20","",0, 1, 0},	/* parm/gpr */
-	{REG_GPR, R21_IDX,REG_GPR	  , "r21", "r21","",0, 1, 0},	/* parm/gpr */
+	{REG_GPR, R21_IDX,REG_GPR	  , "r21", "r21","",0, 1, 0},		/* parm/gpr */
 	{REG_GPR|REG_PAIR, R22_IDX,REG_GPR|REG_PAIR, "r22", "r22","",0, 1, 0},	/* parm/gpr */
-	{REG_GPR, R23_IDX,REG_GPR	  , "r23", "r23","",0, 1, 0},	/* parm/gpr */
+	{REG_GPR, R23_IDX,REG_GPR	  , "r23", "r23","",0, 1, 0},		/* parm/gpr */
 	{REG_GPR|REG_PAIR, R24_IDX,REG_GPR|REG_PAIR, "r24", "r24","",0, 0, 0},	/* scratch  */
-	{REG_GPR, R25_IDX,REG_GPR	  , "r25", "r25","",0, 0, 0},	/* scratch */
+	{REG_GPR, R25_IDX,REG_GPR	  , "r25", "r25","",0, 0, 0},		/* scratch */
 	{REG_GPR|REG_PAIR, R26_IDX,REG_GPR|REG_PAIR, "r26", "r26","",0, 1, 1},	/* used as pointer reg X */
-	{REG_GPR, R27_IDX,REG_GPR	  , "r27", "r27","",0, 1, 1},	/* used as pointer reg X */
+	{REG_GPR, R27_IDX,REG_GPR	  , "r27", "r27","",0, 1, 1},		/* used as pointer reg X */
 	{REG_GPR|REG_PAIR, R28_IDX,REG_GPR|REG_PAIR, "r28", "r28","",0, 1, 0},	/* stack frame Y */
-	{REG_GPR, R29_IDX,REG_GPR	  , "r29", "r29","",0, 1, 0},	/* stack frame Y */
+	{REG_GPR, R29_IDX,REG_GPR	  , "r29", "r29","",0, 1, 0},		/* stack frame Y */
 	{REG_GPR|REG_PAIR, R30_IDX,REG_GPR|REG_PAIR, "r30", "r30","",0, 1, 1},	/* used as pointer reg Z */
-	{REG_GPR, R31_IDX,REG_GPR	  , "r31", "r31","",0, 1, 1},	/* used as pointer reg Z */
+	{REG_GPR, R31_IDX,REG_GPR	  , "r31", "r31","",0, 1, 1},		/* used as pointer reg Z */
 	{REG_PTR, X_IDX, REG_PTR, "X", "X", "", 0, 1, 0},
 	{REG_PTR, Z_IDX, REG_PTR, "Z", "Z", "", 0, 1, 0},
 };

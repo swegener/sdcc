@@ -8,19 +8,19 @@
    under the terms of the GNU General Public License as published by the
    Free Software Foundation; either version 2, or (at your option) any
    later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-   
+
    In other words, you are welcome to use, share and improve this program.
    You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!  
+   what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
 #include "common.h"
@@ -34,7 +34,7 @@ hTab *iCodeSeqhTab = NULL;
 /*-----------------------------------------------------------------*/
 /* hashiCodeKeys - add all iCodes to the hash table                */
 /*-----------------------------------------------------------------*/
-void 
+void
 hashiCodeKeys (eBBlock ** ebbs, int count)
 {
   int i;
@@ -43,14 +43,14 @@ hashiCodeKeys (eBBlock ** ebbs, int count)
     {
       iCode *ic;
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
-	hTabAddItem (&iCodehTab, ic->key, ic);
+        hTabAddItem (&iCodehTab, ic->key, ic);
     }
 }
 
 /*-----------------------------------------------------------------*/
 /* sequenceiCode - creates a sequence number for the iCode & add   */
 /*-----------------------------------------------------------------*/
-void 
+void
 sequenceiCode (eBBlock ** ebbs, int count)
 {
   int i;
@@ -94,7 +94,7 @@ setFromRange (operand * op, int from)
 /*-----------------------------------------------------------------*/
 /* setToRange - set the range to for an operand                    */
 /*-----------------------------------------------------------------*/
-void 
+void
 setToRange (operand * op, int to, bool check)
 {
   /* only for compiler defined temps */
@@ -143,16 +143,16 @@ markLiveRanges (eBBlock ** ebbs, int count)
 {
   int i, key;
   symbol *sym;
-  
+
   for (i = 0; i < count; i++)
     {
       iCode *ic;
-      
+
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
 	  if (ic->op == CALL || ic->op == PCALL)
-	      if (bitVectIsZero (OP_SYMBOL (IC_RESULT (ic))->uses))
-		bitVectUnSetBit (ebbs[i]->defSet, ic->key);
+	    if (bitVectIsZero (OP_SYMBOL (IC_RESULT (ic))->uses))
+              bitVectUnSetBit (ebbs[i]->defSet, ic->key);
 
 	  /* for all iTemps alive at this iCode */
 	  for (key = 1; key < ic->rlive->size; key++)
@@ -237,7 +237,7 @@ findNextUseSym (eBBlock *ebp, iCode *ic, symbol * sym)
 	      return 1;
 	    }
 	   continue;
-	 }
+	}
 
       if (uic->op == IFX)
         {
@@ -247,7 +247,7 @@ findNextUseSym (eBBlock *ebp, iCode *ic, symbol * sym)
 	      return 1;
 	    }
 	   continue;
-	 }
+	}
 
       if (IS_ITEMP (IC_LEFT (uic)))
         if (IC_LEFT (uic)->key == sym->key)
@@ -477,6 +477,8 @@ rlivePoint (eBBlock ** ebbs, int count)
       if (ebbs[i]->ech)
         alive = bitVectCplAnd ( bitVectCopy (ebbs[i]->ech->rlive), alive);
 
+      if(!alive)
+        continue;
       for (key = 1; key < alive->size; key++)
         {
 	  if (!bitVectBitValue (alive, key))
@@ -526,7 +528,7 @@ computeClash (eBBlock ** ebbs, int count)
 		    continue;
 
 		  sym2 = hTabItemWithKey(liveRanges, key2);
-		  
+
 		  if (!sym2->isitmp)
 		    continue;
 
@@ -599,7 +601,6 @@ allDefsOutOfRange (bitVect * defs, int fseq, int toseq)
       if (bitVectBitValue (defs, i) &&
 	  (ic = hTabItemWithKey (iCodehTab, i)) &&
 	  (ic->seq >= fseq && ic->seq <= toseq))
-
 	return FALSE;
 
     }
@@ -625,11 +626,11 @@ void
 adjustIChain (eBBlock ** ebbs, int count)
 {
   int i;
-  
+
   for (i = 0; i < count; i++)
     {
       iCode *ic;
-      
+
       if (ebbs[i]->noPath)
         continue;
 
@@ -641,7 +642,7 @@ adjustIChain (eBBlock ** ebbs, int count)
       while (ic->prev)
         ic = ic->prev;
       ebbs[i]->sch = ic;
-      
+
       ic = ebbs[i]->ech;
       while (ic->next)
         ic = ic->next;

@@ -3,7 +3,7 @@
 # path to uCsim
 S51 = $(SDCC_DIR)/sim/ucsim/s51.src/s51
 
-SDCCFLAGS +=-mds390 --lesspedantic -DREENTRANT=reentrant --stack-after-data --debug
+SDCCFLAGS +=-mds390 --lesspedantic -DREENTRANT=reentrant --stack-after-data
 
 OBJEXT = .rel
 EXEEXT = .ihx

@@ -6873,8 +6873,20 @@ genLeftShift (iCode * ic)
      more that 32 bits make no sense anyway, ( the
      largest size of an object can be only 32 bits ) */
 
-  emitcode ("mov", "b,%s", aopGet (AOP (right), 0, FALSE, FALSE, FALSE));
-  emitcode ("inc", "b");
+  if (AOP_TYPE (right) == AOP_LIT)
+  {
+      /* Really should be handled by genLeftShiftLiteral,
+       * but since I'm too lazy to fix that today, at least we can make
+       * some small improvement.
+       */
+       emitcode("mov", "b,#0x%02x",
+       	        ((int) floatFromVal (AOP (right)->aopu.aop_lit)) + 1);
+  }
+  else
+  {
+  	emitcode ("mov", "b,%s", aopGet (AOP (right), 0, FALSE, FALSE, FALSE));
+  	emitcode ("inc", "b");
+  }
   freeAsmop (right, NULL, ic, TRUE);
   aopOp (left, ic, FALSE, FALSE);
   aopOp (result, ic, FALSE, AOP_TYPE (left) == AOP_DPTR);
@@ -7189,8 +7201,7 @@ genSignedRightShift (iCode * ic)
   char *l;
   symbol *tlbl, *tlbl1;
 
-  D (emitcode (";", "genSignedRightShift ");
-    );
+  D (emitcode (";", "genSignedRightShift "););
 
   /* we do it the hard way put the shift count in b
      and loop thru preserving the sign */
@@ -7214,8 +7225,20 @@ genSignedRightShift (iCode * ic)
      more that 32 bits make no sense anyway, ( the
      largest size of an object can be only 32 bits ) */
 
-  emitcode ("mov", "b,%s", aopGet (AOP (right), 0, FALSE, FALSE, FALSE));
-  emitcode ("inc", "b");
+  if (AOP_TYPE (right) == AOP_LIT)
+  {
+      /* Really should be handled by genRightShiftLiteral,
+       * but since I'm too lazy to fix that today, at least we can make
+       * some small improvement.
+       */
+       emitcode("mov", "b,#0x%02x",
+       	        ((int) floatFromVal (AOP (right)->aopu.aop_lit)) + 1);
+  }
+  else
+  {
+  	emitcode ("mov", "b,%s", aopGet (AOP (right), 0, FALSE, FALSE, FALSE));
+  	emitcode ("inc", "b");
+  }
   freeAsmop (right, NULL, ic, TRUE);
   aopOp (left, ic, FALSE, FALSE);
   aopOp (result, ic, FALSE, AOP_TYPE (left) == AOP_DPTR);
@@ -7303,8 +7326,7 @@ genRightShift (iCode * ic)
   char *l;
   symbol *tlbl, *tlbl1;
 
-  D (emitcode (";", "genRightShift ");
-    );
+  D (emitcode (";", "genRightShift "););
 
   /* if signed then we do it the hard way preserve the
      sign bit moving it inwards */
@@ -7344,9 +7366,21 @@ genRightShift (iCode * ic)
      only the lower order byte since shifting
      more that 32 bits make no sense anyway, ( the
      largest size of an object can be only 32 bits ) */
-
-  emitcode ("mov", "b,%s", aopGet (AOP (right), 0, FALSE, FALSE, FALSE));
-  emitcode ("inc", "b");
+  
+  if (AOP_TYPE (right) == AOP_LIT)
+  {
+      /* Really should be handled by genRightShiftLiteral,
+       * but since I'm too lazy to fix that today, at least we can make
+       * some small improvement.
+       */
+       emitcode("mov", "b,#0x%02x",
+       	        ((int) floatFromVal (AOP (right)->aopu.aop_lit)) + 1);
+  }
+  else
+  {
+  	emitcode ("mov", "b,%s", aopGet (AOP (right), 0, FALSE, FALSE, FALSE));
+  	emitcode ("inc", "b");
+  }
   freeAsmop (right, NULL, ic, TRUE);
   aopOp (left, ic, FALSE, FALSE);
   aopOp (result, ic, FALSE, AOP_TYPE (left) == AOP_DPTR);

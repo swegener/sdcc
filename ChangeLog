@@ -1,3 +1,11 @@
+2002-02-20  Sandeep Dutta  <sandeep@ddi.com>
+
+	* src/SDCCloop.c:
+	Fixed BUG #519583. If a conditional block ended in a return/break
+	statement inside a loop, it was not being considered part of the loop.
+
+	* src/SDCCcflow.c: Removed fix (Fixed in SDCCloop.c)
+
 2002-02-10  Karl Bongers <karl@turbobit.com>
 
 	* debugger/*:

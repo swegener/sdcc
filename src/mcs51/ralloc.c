@@ -2825,8 +2825,9 @@ packRegisters (eBBlock ** ebpp, int blockno)
           IC_LEFT (ic) == IC_RESULT (ic->prev) &&
           isOperandEqual (IC_RESULT(ic), IC_RIGHT(ic->prev)))
         {
-          bitVectUnSetBit (OP_SYMBOL (IC_RESULT (ic->prev))->defs,
-                                      ic->prev->key);
+          int key = ic->prev->key;
+
+          bitVectUnSetBit (OP_SYMBOL (IC_RESULT (ic->prev))->defs, key);
           ReplaceOpWithCheaperOp (&IC_LEFT (ic), IC_RESULT (ic));
           if (/*IS_ITEMP (IC_RESULT (ic->prev)) && */
               OP_SYMBOL (IC_RESULT (ic->prev))->liveFrom > ic->seq)
@@ -2844,7 +2845,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
 
           remiCodeFromeBBlock (ebp, ic->prev);
           // bitVectUnSetBit (OP_SYMBOL (IC_RESULT (ic))->defs, ic->key);
-          hTabDeleteItem (&iCodehTab, ic->prev->key, ic->prev, DELETE_ITEM, NULL);
+          hTabDeleteItem (&iCodehTab, key, ic->prev, DELETE_ITEM, NULL);
           // OP_DEFS (IC_RESULT (ic->prev)) = bitVectSetBit (OP_DEFS (IC_RESULT (ic->prev)), ic->prev->key);
         }
 

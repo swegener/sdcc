@@ -1474,6 +1474,45 @@ int pCodeSearchCondition(pCode *pc, unsigned int cond)
 
   return 0;
 }
+
+int pCodePeepMatchLabels(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
+{
+  int labindex;
+
+  /* Check for a label associated with this wild pCode */
+  // If the wild card has a label, make sure the source code does too.
+  if(pcd->label) {
+    pCode *pcl;
+
+    if(!pcs->label)
+      return 0;
+
+    pcl = pcd->label->pc;
+    //labindex = PCOW(pcl)->id;
+    labindex = -PCL(pcl)->key;
+    fprintf(stderr,"label id = %d (labindex = %d)\n",PCL(pcl)->key,labindex);
+    if(peepBlock->vars[labindex] == NULL) {
+      // First time to encounter this label
+      peepBlock->vars[labindex] = PCL(pcs->label->pc)->label;
+      fprintf(stderr,"first time for a label: %d %s\n",labindex, peepBlock->vars[labindex]);
+    } else {
+      if(strcmp(peepBlock->vars[labindex],PCL(pcs->label->pc)->label) != 0) {
+	fprintf(stderr,"labels don't match\n");
+	return 0;
+      }
+      fprintf(stderr,"matched a label\n");
+    }
+  } else {
+    fprintf(stderr,"destination doesn't have a label\n");
+
+    if(pcs->label)
+      return 0;
+  }
+
+  return 1;
+    
+}
+
 /*-----------------------------------------------------------------*/
 /* pCodePeepMatchLine - Compare source and destination pCodes to   */
 /*                      see they're the same.                      */
@@ -1516,6 +1555,9 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
       fprintf(stderr,"%s comparing\n",__FUNCTION__);
       pcs->print(stderr,pcs);
       pcd->print(stderr,pcd);
+
+      if(!pCodePeepMatchLabels(peepBlock, pcs, pcd))
+	return 0;
 
       /* Compare the operands */
       if(PCI(pcd)->pcop) {
@@ -1564,7 +1606,6 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 
   if((pcd->type == PC_WILD) && (pcs->type == PC_OPCODE)) {
 
-    int labindex;
 
     index = PCW(pcd)->id;
 
@@ -1574,31 +1615,8 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 
     peepBlock->wildpCodes[PCW(pcd)->id] = pcs;
 
-    /* Check for a label associated with this wild pCode */
-    // If the wild card has a label, make sure the source code does too.
-    if(pcd->label) {
-      pCode *pcl;
-
-      if(!pcs->label)
-	return 0;
-
-      pcl = pcd->label->pc;
-      //labindex = PCOW(pcl)->id;
-      labindex = -PCL(pcl)->key;
-      fprintf(stderr,"label id = %d (labindex = %d)\n",PCL(pcl)->key,labindex);
-      if(peepBlock->vars[labindex] == NULL) {
-	// First time to encounter this label
-	peepBlock->vars[labindex] = PCL(pcs->label->pc)->label;
-	fprintf(stderr,"first time for a label: %d %s\n",labindex, peepBlock->vars[labindex]);
-      } else {
-	if(strcmp(peepBlock->vars[labindex],PCL(pcs->label->pc)->label) != 0) {
-	  fprintf(stderr,"labels don't match\n");
-	  return 0;
-	}
-	fprintf(stderr,"matched a label\n");
-      }
-    } else 
-      fprintf(stderr,"wild card doesn't have a label\n");
+    if(!pCodePeepMatchLabels(peepBlock, pcs, pcd))
+      return 0;
 
     if(PCW(pcd)->operand) {
       PCOW(PCI(pcd)->pcop)->matched = PCI(pcs)->pcop;

@@ -1989,46 +1989,53 @@ static void genMod (iCode *ic)
 /*-----------------------------------------------------------------*/
 static void genCmpGt (iCode *ic, iCode *ifx)
 {
-    operand *left, *right, *result;
-    link *letype , *retype;
-    int lsize,rsize,offset;
-    int sign ;
-    char *brtype;
-    
-    left = IC_LEFT(ic);
-    right= IC_RIGHT(ic);
-    result = IC_RESULT(ic);
+    /* should have transformed by the parser */
+    assert(1);
+}
 
-    letype = getSpec(operandType(left));
-    retype =getSpec(operandType(right));
-    sign =  !(SPEC_USIGN(letype) | SPEC_USIGN(retype));
-    /* assign the amsops */
-    aopOp (left,ic,FALSE);
-    aopOp (right,ic,FALSE);
+enum {
+    AVR_EQ = 0,
+    AVR_NE,
+    AVR_LT,
+    AVR_GE
+};
 
-    lsize = AOP_SIZE(AOP(left));
-    rsize = AOP_SIZE(AOP(right));
-    /* ifx present then result used for jump only */
-    if (ifx) {
-	    if (lsize == 1) {
-		    if (AOP_TYPE(AOP(right)) == AOP_LIT) {
-			    emitcode("cpi","%s,lo8(%d+1)",aopGet(AOP(left),0),(int)
-				     floatFromVal(AOP(IC_RIGHT(ic))->aopu.aop_lit));
-			    brtype = "lo"
-		    } else if (AOP_TYPE(AOP(left)) == AOP_LIT) {
-			    
-		    }
-	    }
-    } else {
-	    aopOp (result,ic,TRUE);
-	    /* result used for computation */	    
+/*-----------------------------------------------------------------*/
+/* revavrcnd - reverse a conditional for avr                       */
+/*-----------------------------------------------------------------*/
+static int revavrcnd(int type)
+{
+    static struct {
+	int type, rtype;
+    } rar[] = { { AVR_EQ, AVR_NE}, {AVR_LT, AVR_GE}};
+    int i;
+
+    for (i = 0 ; i < (sizeof(rar)/sizeof(rar[0]));i++) {
+	if (rar[i].type == type) return rar[i].rtype;
+	if (rar[i].rtype== type) return rar[i].type;
     }
+    assert(1); /* cannot happen */
+}
 
+static char *br_name[4] = {"breq","brne","brlt","brge"};
+static char *br_uname[4]= {"breq","brne","brlo","brcc"};
 
- release:
-    freeAsmop(left,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
-    freeAsmop(right,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
-    freeAsmop(result,NULL,ic,TRUE); 
+/*-----------------------------------------------------------------*/
+/* genBranch - generate the branch instruction                     */
+/*-----------------------------------------------------------------*/
+static void genBranch (iCode *ifx, int br_type, int sign)
+{
+    int tj = (IC_TRUE(ifx) ? 1 : 0) ;
+
+    if (tj) { /* if true jump */
+	char *nm = (sign ? br_name[br_type] : br_uname[br_type]);
+	emitcode(nm,"L%05d",IC_TRUE(ifx)->key);
+    } else { /* if false jump */
+	int rtype = revavrcnd(br_type);
+	char *nm = (sign ? br_name[rtype] : br_uname[rtype]);
+	emitcode(nm,"L%05d",IC_FALSE(ifx)->key);
+    }
+    ifx->generated = 1;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2038,7 +2045,8 @@ static void genCmpLt (iCode *ic, iCode *ifx)
 {
     operand *left, *right, *result;
     link *letype , *retype;
-    int sign ;
+    symbol *lbl;
+    int sign, size, offset =0;
 
     left = IC_LEFT(ic);
     right= IC_RIGHT(ic);
@@ -2052,91 +2060,50 @@ static void genCmpLt (iCode *ic, iCode *ifx)
     aopOp (left,ic,FALSE);
     aopOp (right,ic,FALSE);
     aopOp (result,ic,TRUE);
+    size = AOP_SIZE(AOP(left));
 
-    genCmp(left, right, result, ifx, sign);
+    if (ifx) {
+	if (size == 1) {
+	    if (AOP_TYPE(AOP(right)) == AOP_LIT) {
+		emitcode("cpi","%s,lo8(%d)",aopGet(AOP(left),0),
+			 (int) floatFromVal (AOP(IC_RIGHT(ic))->aopu.aop_lit));
+		genBranch(ifx,AVR_LT);
+	    } else { /* right != literal */
+		emitcode("cp","%s,%s",aopGet(AOP(left),0),aopGet(AOP(right),0));
+		genBranch(ifx,AVR_LT);
+	} else { /* size != 1 */
+	    while (size--) {
+		if (offset = 0) 
+		    emitcode("cp","%s,%s",aopGet(AOP(left),0),aopGet(AOP(right),0));
+		else
+		    emitcode("cpc","%s,%s",aopGet(AOP(left),offset),aopGet(AOP(right),offset));
+		offset++;
+	    }
+	    genBranch(ifx,AVR_LT);
+	}
+    } else { /* no ifx */
+	emitCode("clr","r0");
+	while (size--) {
+	    if (offset = 0) 
+		emitcode("cp","%s,%s",aopGet(AOP(left),0),aopGet(AOP(right),0));
+	    else
+		emitcode("cpc","%s,%s",aopGet(AOP(left),offset),aopGet(AOP(right),offset));
+	    offset++;
+	}
+	lbl = newiTempLabel(NULL);
+	if (sign) emitcode(br_uname[AVR_GE],"L%05d",lbl->key);
+	else emitcode(br_name[AVR_GE],"L%05d",lbl->key);
+	emitcode("inc","r0");
+	emitcode("","L%05d:",lbl->key);
+	aopPut(AOP(result),"r0",0);
+	size = AOP_SIZE(AOP(result)) - 1;
+	offset = 1;
+	while (size--) aopPut(AOP(result),zero,offset++);
+    }
 
     freeAsmop(left,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
     freeAsmop(right,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
     freeAsmop(result,NULL,ic,TRUE); 
-}
-
-/*-----------------------------------------------------------------*/
-/* gencjneshort - compare and jump if not equal                    */
-/*-----------------------------------------------------------------*/
-static void gencjneshort(operand *left, operand *right, symbol *lbl)
-{
-    int size = max(AOP_SIZE(left),AOP_SIZE(right));
-    int offset = 0;
-    unsigned long lit = 0L;
-
-    /* if the left side is a literal or 
-    if the right is in a pointer register and left 
-    is not */
-    if ((AOP_TYPE(left) == AOP_LIT) || 
-        (IS_AOP_PREG(right) && !IS_AOP_PREG(left))) {
-        operand *t = right;
-        right = left;
-        left = t;
-    }
-    if(AOP_TYPE(right) == AOP_LIT)
-        lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
-
-    /* if the right side is a literal then anything goes */
-    if (AOP_TYPE(right) == AOP_LIT &&
-        AOP_TYPE(left) != AOP_DIR ) {
-        while (size--) {
-            emitcode("cjne","%s,%s,%05d$",
-                     aopGet(AOP(left),offset,FALSE,FALSE),
-                     aopGet(AOP(right),offset,FALSE,FALSE),
-                     lbl->key+100);
-            offset++;
-        }
-    }
-
-    /* if the right side is in a register or in direct space or
-    if the left is a pointer register & right is not */    
-    else if (AOP_TYPE(right) == AOP_REG ||
-             AOP_TYPE(right) == AOP_DIR || 
-             (AOP_TYPE(left) == AOP_DIR && AOP_TYPE(right) == AOP_LIT) ||
-             (IS_AOP_PREG(left) && !IS_AOP_PREG(right))) {
-        while (size--) {
-            MOVA(aopGet(AOP(left),offset,FALSE,FALSE));
-            if((AOP_TYPE(left) == AOP_DIR && AOP_TYPE(right) == AOP_LIT) &&
-               ((unsigned int)((lit >> (offset*8)) & 0x0FFL) == 0))
-                emitcode("jnz","%05d$",lbl->key+100);
-            else
-                emitcode("cjne","a,%s,%05d$",
-                         aopGet(AOP(right),offset,FALSE,TRUE),
-                         lbl->key+100);
-            offset++;
-        }
-    } else {
-        /* right is a pointer reg need both a & b */
-        while(size--) {
-            char *l = aopGet(AOP(left),offset,FALSE,FALSE);
-            if(strcmp(l,"b"))
-                emitcode("mov","b,%s",l);
-            MOVA(aopGet(AOP(right),offset,FALSE,FALSE));
-            emitcode("cjne","a,b,%05d$",lbl->key+100);    
-            offset++;
-        }
-    }
-}
-
-/*-----------------------------------------------------------------*/
-/* gencjne - compare and jump if not equal                         */
-/*-----------------------------------------------------------------*/
-static void gencjne(operand *left, operand *right, symbol *lbl)
-{
-    symbol *tlbl  = newiTempLabel(NULL);
-
-    gencjneshort(left, right, lbl);
-
-    emitcode("mov","a,%s",one);
-    emitcode("sjmp","%05d$",tlbl->key+100);
-    emitcode("","%05d$:",lbl->key+100);
-    emitcode("clr","a");
-    emitcode("","%05d$:",tlbl->key+100);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2160,108 +2127,6 @@ static void genCmpEq (iCode *ic, iCode *ifx)
         IC_LEFT(ic) = t;
     }
 
-    if(ifx && !AOP_SIZE(result)){
-        symbol *tlbl;
-        /* if they are both bit variables */
-        if (AOP_TYPE(left) == AOP_CRY &&
-            ((AOP_TYPE(right) == AOP_CRY) || (AOP_TYPE(right) == AOP_LIT))) {
-            if(AOP_TYPE(right) == AOP_LIT){
-                unsigned long lit = (unsigned long)floatFromVal(AOP(IC_RIGHT(ic))->aopu.aop_lit);
-                if(lit == 0L){
-                    emitcode("mov","c,%s",AOP(left)->aopu.aop_dir);
-                    emitcode("cpl","c");
-                } else if(lit == 1L) {
-                    emitcode("mov","c,%s",AOP(left)->aopu.aop_dir);
-                } else {
-                    emitcode("clr","c");
-                }
-                /* AOP_TYPE(right) == AOP_CRY */
-            } else {
-                symbol *lbl = newiTempLabel(NULL);
-                emitcode("mov","c,%s",AOP(left)->aopu.aop_dir);
-                emitcode("jb","%s,%05d$",AOP(right)->aopu.aop_dir,(lbl->key+100));
-                emitcode("cpl","c");
-                emitcode("","%05d$:",(lbl->key+100));
-            }
-            /* if true label then we jump if condition
-            supplied is true */
-            tlbl = newiTempLabel(NULL);
-            if ( IC_TRUE(ifx) ) {
-                emitcode("jnc","%05d$",tlbl->key+100);
-                emitcode("ljmp","%05d$",IC_TRUE(ifx)->key+100);
-            } else {
-                emitcode("jc","%05d$",tlbl->key+100);
-                emitcode("ljmp","%05d$",IC_FALSE(ifx)->key+100);
-            }
-            emitcode("","%05d$:",tlbl->key+100);                
-        } else {
-            tlbl = newiTempLabel(NULL);
-            gencjneshort(left, right, tlbl);
-            if ( IC_TRUE(ifx) ) {
-                emitcode("ljmp","%05d$",IC_TRUE(ifx)->key+100);
-                emitcode("","%05d$:",tlbl->key+100);                
-            } else {
-                symbol *lbl = newiTempLabel(NULL);
-                emitcode("sjmp","%05d$",lbl->key+100);
-                emitcode("","%05d$:",tlbl->key+100);                
-                emitcode("ljmp","%05d$",IC_FALSE(ifx)->key+100);
-                emitcode("","%05d$:",lbl->key+100);             
-            }
-        }
-        /* mark the icode as generated */
-        ifx->generated = 1;
-        goto release ;
-    }
-
-    /* if they are both bit variables */
-    if (AOP_TYPE(left) == AOP_CRY &&
-        ((AOP_TYPE(right) == AOP_CRY) || (AOP_TYPE(right) == AOP_LIT))) {
-        if(AOP_TYPE(right) == AOP_LIT){
-            unsigned long lit = (unsigned long)floatFromVal(AOP(IC_RIGHT(ic))->aopu.aop_lit);
-            if(lit == 0L){
-                emitcode("mov","c,%s",AOP(left)->aopu.aop_dir);
-                emitcode("cpl","c");
-            } else if(lit == 1L) {
-                emitcode("mov","c,%s",AOP(left)->aopu.aop_dir);
-            } else {
-                emitcode("clr","c");
-            }
-            /* AOP_TYPE(right) == AOP_CRY */
-        } else {
-            symbol *lbl = newiTempLabel(NULL);
-            emitcode("mov","c,%s",AOP(left)->aopu.aop_dir);
-            emitcode("jb","%s,%05d$",AOP(right)->aopu.aop_dir,(lbl->key+100));
-            emitcode("cpl","c");
-            emitcode("","%05d$:",(lbl->key+100));
-        }
-        /* c = 1 if egal */
-        if (AOP_TYPE(result) == AOP_CRY && AOP_SIZE(result)){
-            outBitC(result);
-            goto release ;
-        }
-        if (ifx) {
-            genIfxJump (ifx,"c");
-            goto release ;
-        }
-        /* if the result is used in an arithmetic operation
-        then put the result in place */
-        outBitC(result);
-    } else {
-        gencjne(left,right,newiTempLabel(NULL));    
-        if (AOP_TYPE(result) == AOP_CRY && AOP_SIZE(result)) {
-            aopPut(AOP(result),"a",0);
-            goto release ;
-        }
-        if (ifx) {
-            genIfxJump (ifx,"a");
-            goto release ;
-        }
-        /* if the result is used in an arithmetic operation
-        then put the result in place */
-        if (AOP_TYPE(result) != AOP_CRY) 
-            outAcc(result);
-        /* leave the result in acc */
-    }
 
 release:
     freeAsmop(left,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
@@ -6094,13 +5959,15 @@ void gen51Code (iCode *lic)
 	    break;
 	    
 	case LE_OP:
+	    genCmpLe (ic,ifxForOp(IC_RESULT(ic),ic));
+	    break
+
 	case GE_OP:
+	    genCmpGe (ic,ifxForOp(IC_RESULT(ic),ic));
+	    break;
+
 	case NE_OP:
-	    
-	    /* note these two are xlated by algebraic equivalence
-	       during parsing SDCC.y */
-	    werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
-		   "got '>=' or '<=' shouldn't have come here");
+	    genCmpNe (ic,ifxForOp(IC_RESULT(ic),ic));	    
 	    break;	
 	    
 	case EQ_OP:

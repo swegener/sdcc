@@ -1,3 +1,7 @@
+2003-05-24  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+	 * doc/sdccman.lyx: updated information about .adb files (fixed bug 742649)
+	 
 2003-05-22  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/pic16/pcode.c (pic16_get_op_from_instruction): fixed a gcc 3.x warning

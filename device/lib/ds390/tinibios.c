@@ -499,7 +499,6 @@ void ClockIrqHandler (void) interrupt 1 _naked
   _asm
     push acc
     push psw
-    mov  psw, #0x0
     mov _TL0,_timer0ReloadValue
     mov _TH0,_timer0ReloadValue+1
     clr a

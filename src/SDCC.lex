@@ -391,7 +391,7 @@ static char *stringLiteral(void)
         case '\\':
           if ((ch = input()) != '\n') {
             werror(W_STRAY_BACKSLASH, column);
-            my_unput(ch);
+            my_unput((char)ch);
           }
           else {
             lineno = ++mylineno;
@@ -409,7 +409,7 @@ static char *stringLiteral(void)
         goto out;
 
       if (ch != '\"') {
-        my_unput(ch) ;
+        my_unput((char)ch) ;
         goto out;
       }
       break;

@@ -11352,7 +11352,8 @@ will generate the following code:
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- andl\SpecialChar ~
+ anl\SpecialChar ~
+\SpecialChar ~
  a,#0x01 
 \newline 
 000F F5*02\SpecialChar ~

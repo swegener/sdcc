@@ -2,6 +2,7 @@
 
 	* src/mcs51/main.c: fixed bug #838385. Thanks to Josef Pavlik for finding and fixing
 	* doc/sdccman.lyx: changed from 'article' to 'book'
+	* doc/Makefile: readded test_suite_spec and cdbfileformat
 
 2003-11-08 Bernhard Held <bernhard@bernhardheld.de>
 

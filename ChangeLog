@@ -1,3 +1,7 @@
+2001-08-30  Michael Hope  <michaelh@juju.net.nz>
+
+	* src/z80/gen.c (genPlus): Changed bad long add for gb to a fall through.
+
 2001-08-29  Michael Hope  <michaelh@juju.net.nz>
 
 	* link/z80/aslink.h: Fixed long file name support.  Is now based off PATH_MAX instead of a constant.

@@ -2842,7 +2842,7 @@ genPlus (iCode * ic)
 	    }
 	  else if (size == 4)
 	    {
-	      wassertl (0, "Hit bad case for add");
+              // Fall through
 	    }
 	}
     }

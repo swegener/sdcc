@@ -581,10 +581,12 @@ allocLocal (symbol * sym)
 
   /* this is automatic           */
 
+#ifdef JWK20010916
   if (!IS_SPEC(sym->type) && SPEC_OCLS(sym->etype)) {
     allocIntoSeg (sym);
     return;
   }
+#endif
 
   /* if it to be placed on the stack */
   if (options.stackAuto || reentrant) {

@@ -744,16 +744,20 @@ processParms (ast * func,
 	}
     }
 
+
   /* the parameter type must be at least castable */
   if (compareType (defParm->type, actParm->ftype) == 0)
     {
       castError++;
     }
 
+#ifdef JWK20010916
   if (!IS_SPEC(defParm->type) && !IS_SPEC(actParm->ftype)) {
     // now we have two pointers, check if they point to the same
-    sym_link *dtype=defParm->type->next, *atype=actParm->ftype->next;
+    sym_link *dtype=defParm->type, *atype=actParm->ftype;
     do {
+      dtype=dtype->next;
+      atype=atype->next;
       if (
 	  (dtype->next && !atype->next) ||
 	  (!dtype->next && atype->next) ||
@@ -768,6 +772,8 @@ processParms (ast * func,
       }
     }
   }
+#endif
+
   if (castError) {
     werror (W_INCOMPAT_CAST);
     fprintf (stderr, "type --> '");
@@ -777,8 +783,6 @@ processParms (ast * func,
     printTypeChain (defParm->type, stderr);
     fprintf (stderr, "'\n");
   }
-
-    
 
   /* if the parameter is castable then add the cast */
   if (compareType (defParm->type, actParm->ftype) < 0)

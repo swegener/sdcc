@@ -42,7 +42,7 @@ BUILDDIR        = build
 PORT            = z80
 PORTDIR         = $(BUILDDIR)/$(PORT)
 
-SOURCES		= _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
+SOURCES		= _atof.c _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
 		  _decdptr.c _divsint.c _divslong.c _divuint.c \
 		  _divulong.c _fs2schar.c _fs2sint.c _fs2slong.c \
 		  _fs2uchar.c _fs2uint.c _fs2ulong.c _fsadd.c \
@@ -69,7 +69,7 @@ SOURCES		= _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
 
 OBJECTS		= $(patsubst %.c,$(PORTDIR)/%.rel,$(SOURCES))
 
-Z80SOURCES      = _atoi.c \
+Z80SOURCES      = _atof.c _atoi.c \
 		  _iscntrl.c _isdigit.c _isgraph.c \
 		  _islower.c _isprint.c _ispunct.c _isspace.c \
 		  _isupper.c _isxdigit.c _memcmp.c \
@@ -94,7 +94,7 @@ Z80SOURCES      = _atoi.c \
 
 Z80OBJECTS      = $(Z80SOURCES:%.c=$(PORTDIR)/%.o)
 
-XA51SOURCES      = _atoi.c _atol.c _schar2fs.c \
+XA51SOURCES      = _atof.c _atoi.c _atol.c _schar2fs.c \
 		  _divsint.c _divslong.c _divuint.c \
 		  _divulong.c _fs2schar.c _fs2sint.c _fs2slong.c \
 		  _fs2uchar.c _fs2uint.c _fs2ulong.c _fsadd.c \

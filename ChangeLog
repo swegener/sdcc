@@ -1,3 +1,8 @@
+2003-06-07  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+	* device/lib/_atof.c, device/lib/Makefile.in, device/include/stdlib.h,
+	  device/lib/libfloat.lib: added atof function.
+
 2003-06-04  Bernhard Held <bernhard@bernhardheld.de>
 
 	* doc/sdccman.lyx: updated to Lyx 1.3
@@ -55,7 +60,7 @@
 	* device/lib/z80/stubs.s
 	* src/SDCCsymt.c (initCSupport)
 
-2003-05-24  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+2003-05-25  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	* as/mcs51/lkaomf51.c: Address space 'z' was missing.
 	* src/avr/avr.dsp, src/ds390/ds390.dsp, src/mcs51/mcs51.dsp,

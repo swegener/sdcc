@@ -1,3 +1,7 @@
+2004-12-02 Slade Rich <slade_rich AT users.sourceforge.net>
+
+	* src/pic/pcode.c : fixed a problem where banksel was not being inserted.
+
 2004-12-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCpeeph.c (callFuncByName): support combined peephole rule

@@ -804,6 +804,12 @@ createIvalStruct (ast * sym, sym_link * type, initList * ilist)
       lAst = decorateType (resolveSymbols (lAst));
       rast = decorateType (resolveSymbols (createIval (lAst, sflds->type, iloop, rast)));
     }
+
+  if (iloop) {
+    werror (W_EXCESS_INITIALIZERS, "struct", 
+	    sym->opval.val->sym->name, sym->opval.val->sym->lineDef);
+  }
+
   return rast;
 }
 
@@ -1109,11 +1115,12 @@ gatherAutoInit (symbol * autoChain)
       /* if there is an initial value */
       if (sym->ival && SPEC_SCLS (sym->etype) != S_CODE)
 	{
-	  if (IS_AGGREGATE (sym->type))
+	  if (IS_AGGREGATE (sym->type)) {
 	    work = initAggregates (sym, sym->ival, NULL);
-	  else
+	  } else {
 	    work = newNode ('=', newAst_VALUE (symbolVal (sym)),
 			    list2expr (sym->ival));
+	  }
 
 	  setAstLineno (work, sym->lineDef);
 	  sym->ival = NULL;

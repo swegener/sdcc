@@ -72,7 +72,7 @@ static bit   lsd;
 /* this one NEEDS to be in data */
 static data value_t value;
 
-static unsigned short radix;
+static unsigned char radix;
 
 // jwk: TODO: this makes the whole dammed thing nonreentrent
 static int charsOutputted;

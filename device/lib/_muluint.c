@@ -79,7 +79,7 @@ unsigned int _muluint (unsigned int a, unsigned int b)
 // we have to do it the hard way
 
 union uu {
-  struct { unsigned short lo,hi ;} s;
+  struct { unsigned char lo,hi ;} s;
   unsigned int t;
 };
 

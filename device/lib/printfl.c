@@ -29,14 +29,14 @@
    format     output type       argument-type
      %d        decimal             int
      %ld       decimal             long
-     %hd       decimal             short/char
+     %hd       decimal             char
      %x        hexadecimal         int
      %lx       hexadecimal         long
-     %hx       hexadecimal         short/char
+     %hx       hexadecimal         char
      %o        octal               int
      %lo       octal               long
-     %ho       octal               short/char
-     %c        character           char/short
+     %ho       octal               char
+     %c        character           char
      %s        character           _generic pointer
 */
 
@@ -51,7 +51,7 @@ static data volatile char ch;
 static data char radix ;
 static bit  long_flag = 0;
 static bit  string_flag =0;
-static bit  short_flag = 0;
+static bit  char_flag = 0;
 static bit sign;
 static char * data str ;
 static data long val;
@@ -72,7 +72,7 @@ static void pval(void)
 	if (!long_flag) {
 	  lval &= 0x0000ffff;
 	}
-        if (short_flag) {
+        if (char_flag) {
 	  lval &= 0x000000ff;
 	}
 
@@ -80,7 +80,7 @@ static void pval(void)
         {
 #if 1
                 if(radix != 16)  ch = (lval % radix) + '0';
-                else ch = "0123456789ABCDEF"[(unsigned short)lval & 0x0f];
+                else ch = "0123456789ABCDEF"[(unsigned char)lval & 0x0f];
                 _asm push _ch _endasm;
                 lval /= radix;
 #else
@@ -112,7 +112,7 @@ void printf_small (char * fmt, ... ) reentrant
 
     for (; *fmt ; fmt++ ) {
         if (*fmt == '%') {
-            long_flag = string_flag = short_flag = 0;
+            long_flag = string_flag = char_flag = 0;
             fmt++ ;
             switch (*fmt) {
             case 'l':
@@ -120,7 +120,7 @@ void printf_small (char * fmt, ... ) reentrant
                 fmt++;
                 break;
             case 'h':
-                short_flag = 1;
+                char_flag = 1;
                 fmt++;
             }
 
@@ -151,8 +151,8 @@ void printf_small (char * fmt, ... ) reentrant
             if (long_flag)
                 val = va_arg(ap,long);
             else
-                if (short_flag)
-                    val = va_arg(ap,short);
+                if (char_flag)
+                    val = va_arg(ap,char);
                 else
                     val = va_arg(ap,int);
 

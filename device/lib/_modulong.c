@@ -28,7 +28,7 @@
 
 unsigned long  _modulong (unsigned long a ,unsigned long b)
 {
-    unsigned short count = 0;
+    unsigned char count = 0;
     
     
         while (!MSB_SET(b)) {

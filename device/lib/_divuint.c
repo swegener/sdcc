@@ -28,7 +28,7 @@
 unsigned int _divuint (unsigned int a, unsigned int b)
 {
 	unsigned int reste = 0	;
-	unsigned short count = 16;
+	unsigned char count = 16;
 	bit c;
 
 	do{

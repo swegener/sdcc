@@ -83,7 +83,7 @@ __fsmul (float a1, float a2)
   volatile union float_long fl1, fl2;
   volatile unsigned long result;
   volatile int exp;
-  short sign;
+  char sign;
 
   fl1.f = a1;
   fl2.f = a2;

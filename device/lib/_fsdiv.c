@@ -77,7 +77,7 @@ __fsdiv (float a1, float a2)
   volatile unsigned long mask;
   volatile long mant1, mant2;
   volatile int exp ;
-  short sign;
+  char sign;
 
   fl1.f = a1;
   fl2.f = a2;

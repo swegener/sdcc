@@ -28,7 +28,7 @@ unsigned long _divulong (unsigned long a, unsigned long b)
 {
 	unsigned long reste = 0L;
 	unsigned char count = 32;
-	short c;
+	char c;
 
 	do{
 		// reste:a <- 0;

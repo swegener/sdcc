@@ -142,10 +142,10 @@ ser_printString(char *String)
   }
 }
 
-short
+char
 ser_charAvail(void)
 {
-  short ret = 0;
+  char ret = 0;
 
   if (ser_rxIndexIn != ser_rxIndexOut) {
     ret = 1;

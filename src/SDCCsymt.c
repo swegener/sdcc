@@ -1594,7 +1594,6 @@ processFuncArgs (symbol * func, int ignoreName)
   value *val;
   int pNum = 1;
 
-
   /* if this function has variable argument list */
   /* then make the function a reentrant one    */
   if (func->hasVargs)
@@ -1639,10 +1638,19 @@ processFuncArgs (symbol * func, int ignoreName)
       pNum++;
     }
 
-  /* if this function is reentrant or */
-  /* automatics r 2b stacked then nothing */
-  if (IS_RENT (func->etype) || options.stackAuto)
-    return;
+  /* if this is an internal generated function call */
+  if (func->cdef) {
+    /* ignore --stack-auto for this one, we don't know how it is compiled */
+    /* simply trust on --int-long-reent or --float-reent */
+    if (IS_RENT(func->etype)) {
+      return;
+    }
+  } else {
+    /* if this function is reentrant or */
+    /* automatics r 2b stacked then nothing */
+    if (IS_RENT (func->etype) || options.stackAuto)
+      return;
+  }
 
   val = func->args;
   pNum = 1;

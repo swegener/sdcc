@@ -1,3 +1,9 @@
+2004-02-20 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/pic16/ralloc.c (packRegsForAccUse):  disabled functions with #if
+	to eliminate build warnings.
+	* src/pic16/gen.c (pic16_popGet): fixed for gcc 2.95.4 
+
 2004-02-20 Vangelis Rokas <vrokas AT otenet.gr>
 	   Hans-Juergen Dorn <hans.dorn AT apl-landau.de>
 

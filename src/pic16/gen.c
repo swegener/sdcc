@@ -1521,9 +1521,10 @@ pCodeOp *pic16_popGet (asmop *aop, int offset) //, bool bit16, bool dname)
       return pic16_popGetImmd(aop->aopu.aop_immd,offset,0);
 
     case AOP_ACC:
-	fprintf(stderr, "%s:%d returning register AOP_ACC %s\n", __FILE__, __LINE__, aop->aopu.aop_str[offset]);
-
+      {
 	int rIdx = IDX_WREG;		//aop->aopu.aop_reg[offset]->rIdx;
+
+	fprintf(stderr, "%s:%d returning register AOP_ACC %s\n", __FILE__, __LINE__, aop->aopu.aop_str[offset]);
 
 	DEBUGpic16_emitcode(";","%d\tAOP_ACC", __LINE__);
 	
@@ -1540,10 +1541,11 @@ pCodeOp *pic16_popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 	return pcop;
 
 
-	return pic16_popRegFromString(aop->aopu.aop_str[offset], aop->size, offset);
+//	return pic16_popRegFromString(aop->aopu.aop_str[offset], aop->size, offset);
 //      return pic16_newpCodeOpRegFromStr(aop->aopu.aop_str[offset]);
 
 //	assert( 0 );
+      }
 	
     case AOP_DIR:
       DEBUGpic16_emitcode(";","%d\tAOP_DIR", __LINE__);

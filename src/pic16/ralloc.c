@@ -3307,6 +3307,8 @@ isBitwiseOptimizable (iCode * ic)
 /*-----------------------------------------------------------------*/
 /* packRegsForAccUse - pack registers for acc use                  */
 /*-----------------------------------------------------------------*/
+#if 0
+
 static void
 packRegsForAccUse (iCode * ic)
 {
@@ -3460,6 +3462,7 @@ accuse:
 
 
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* packForPush - hueristics to reduce iCode for pushing            */

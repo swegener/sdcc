@@ -243,7 +243,7 @@ merge_command(const char *command, const char *params)
 
 
 /*!
- * check if the path is absolute
+ * check if the path is relative or absolute (if contains the dir separator)
  */
 
 static int

@@ -717,7 +717,7 @@ void createInterruptVect (FILE * vFile)
 	return;
     }
     
-    fprintf (vFile, "\t.area\tCODE (CODE)\n");
+    fprintf (vFile, "\t.area\t%s\n", CODE_NAME);
     fprintf (vFile, "__interrupt_vect:\n");
     
     fprintf (vFile, "\tljmp\t__sdcc_gsinit_startup\n");

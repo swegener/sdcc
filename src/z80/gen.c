@@ -340,10 +340,10 @@ bool operandsEqu ( operand *op1, operand *op2)
 
     /* if they are the same */
     if (sym1 == sym2)
-        return TRUE ;
+        return 1;
 
     if (strcmp(sym1->rname,sym2->rname) == 0)
-        return TRUE;
+        return 2;
 
 
     /* if left is a tmp & right is not */
@@ -351,15 +351,16 @@ bool operandsEqu ( operand *op1, operand *op2)
         !IS_ITEMP(op2) &&
         sym1->isspilt  &&
         (sym1->usl.spillLoc == sym2))
-        return TRUE;
+        return 3;
 
     if (IS_ITEMP(op2)  && 
         !IS_ITEMP(op1) &&
         sym2->isspilt  &&
+	sym1->level > 0 &&
         (sym2->usl.spillLoc == sym1))
-        return TRUE ;
+        return 4;
 
-    return FALSE ;
+    return FALSE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1696,8 +1697,7 @@ static void genCmp (operand *left,operand *right,
 			/* Just load in the top most bit */
                         MOVA(aopGet(AOP(left),AOP_SIZE(left)-1,FALSE));
                         if(!(AOP_TYPE(result) == AOP_CRY && AOP_SIZE(result)) && ifx) {
-			    assert(0);
-                            genIfxJump (ifx,"acc.7");
+                            genIfxJump (ifx,"7");
                             return;
                         }
                         else    
@@ -1711,7 +1711,24 @@ static void genCmp (operand *left,operand *right,
                 MOVA(aopGet(AOP(left),offset,FALSE));
                 if (sign && size == 0) {
 		    /* Case where it's signed and we've hit the end */
-		    assert(0);
+		    /* PENDING: This is almost certanitly wrong.
+		       On the 8051 xrl doesnt change C, but xor does.
+		    */
+                    emitcode("xor","a,#0x80");
+                    if (AOP_TYPE(right) == AOP_LIT){
+                        unsigned long lit = (unsigned long)
+			    floatFromVal(AOP(right)->aopu.aop_lit);
+                        emitcode("sbc","a,#0x%02x",
+				 0x80 ^ (unsigned int)((lit >> (offset*8)) & 0x0FFL));
+                    } else {
+			/* The bad way... */
+			emitcode("push", "af");
+                        emitcode("ld","a,%s",aopGet(AOP(right),offset++,FALSE));
+			emitcode("xor", "a,#0x80");
+			emitcode("ld", "l,a");
+			emitcode("pop", "af");
+                        emitcode("sbc","a,l");
+                    }
                 } else {
 		    /* Subtract through, propagating the carry */
 		    if (offset==0) {
@@ -1843,7 +1860,15 @@ static void gencjneshort(operand *left, operand *right, symbol *lbl)
             offset++;
         }
     } else {
-	assert(0);
+        /* right is a pointer reg need both a & b */
+	/* PENDING: is this required? */
+        while(size--) {
+            char *l = aopGet(AOP(left),offset,FALSE);
+            MOVA(aopGet(AOP(right),offset,FALSE));
+	    emitcode("cp", "%s", l);
+	    emitcode("jr", "nz," LABEL_STR, lbl->key+100);
+            offset++;
+        }
     }
 }
 
@@ -2576,7 +2601,9 @@ static void shiftL2Left2Result (operand *left, int offl,
 	/* Copy left into result */
 	movLeft2Result(left,offl, result, offr, 0);
     }
-    if (AOP(result)->type == AOP_REG) {
+    /* PENDING: for now just see if it'll work. */
+    /*if (AOP(result)->type == AOP_REG) { */
+    {
 	int size = 2;
 	int offset = 0;
 	symbol *tlbl , *tlbl1;
@@ -2601,10 +2628,6 @@ static void shiftL2Left2Result (operand *left, int offl,
 	    emitcode("dec", "a");
 	    emitcode("jp","nz," LABEL_STR ,tlbl->key+100);
 	}
-    }
-    else {
-	/* PENDING: do something */
-	assert(0);
     }
 }
 
@@ -3266,11 +3289,13 @@ static void genAssign (iCode *ic)
     result = IC_RESULT(ic);
     right  = IC_RIGHT(ic) ;
 
+#if 1
     /* Dont bother assigning if they are the same */
     if (operandsEqu (IC_RESULT(ic),IC_RIGHT(ic))) {
-	emitcode("", "; (operands are equal)");
+	emitcode("", "; (operands are equal %u)", operandsEqu(IC_RESULT(ic),IC_RIGHT(ic)));
         return;
     }
+#endif
 
     aopOp(right,ic,FALSE);
     aopOp(result,ic,TRUE);
@@ -3328,7 +3353,28 @@ release:
 /*-----------------------------------------------------------------*/
 static void genJumpTab (iCode *ic)
 {
-    assert(0);
+    symbol *jtab;
+    char *l;
+
+    aopOp(IC_JTCOND(ic),ic,FALSE);
+    /* get the condition into accumulator */
+    l = aopGet(AOP(IC_JTCOND(ic)),0,FALSE);
+    MOVA(l);
+    emitcode("push", "de");
+    emitcode("ld", "e,%s", l);
+    emitcode("ld", "d,#0");
+    jtab = newiTempLabel(NULL);
+    emitcode("ld", "hl,#" LABEL_STR, jtab->key+100);
+    emitcode("add", "hl,de");
+    emitcode("add", "hl,de");
+    freeAsmop(IC_JTCOND(ic),NULL,ic);
+    emitcode("pop", "de");
+    emitcode("jp", "(hl)");
+    emitcode("","%05d$:",jtab->key+100);
+    /* now generate the jump labels */
+    for (jtab = setFirstItem(IC_JTLABELS(ic)) ; jtab;
+         jtab = setNextItem(IC_JTLABELS(ic)))
+        emitcode("jp", LABEL_STR, jtab->key+100);
 }
 
 /*-----------------------------------------------------------------*/

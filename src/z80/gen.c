@@ -1786,17 +1786,21 @@ static bool genPlusIncr (iCode *ic)
 
     /* if increment 16 bits in register */
     if (sameRegs(AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic))) &&
-        (size > 1) &&
-        (icount == 1)) {
-        symbol *tlbl = newiTempLabel(NULL);
-	emitcode("inc","%s",aopGet(AOP(IC_RESULT(ic)),LSB,FALSE));
-	emit2("!shortjp nz,!tlabel", tlbl->key+100);
-    
-	emitcode("inc","%s",aopGet(AOP(IC_RESULT(ic)),MSB16,FALSE));
-	if(size == 4) {
-	    wassert(0);
+        size > 1 &&
+        icount == 1
+	) {
+	int offset = 0;
+	symbol *tlbl = NULL;
+	while (size--) {
+	    if (offset) {
+		emitLabel(tlbl->key+100);
+	    }
+	    emitcode("inc","%s",aopGet(AOP(IC_RESULT(ic)), offset++, FALSE));
+	    if (size) {
+		tlbl = newiTempLabel(NULL);
+		emit2("!shortjp nz,!tlabel", tlbl->key+100);
+	    }
 	}
-	emitLabel(tlbl->key+100);
         return TRUE;
     }
 

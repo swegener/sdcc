@@ -797,7 +797,7 @@ aopOp (operand * op, iCode * ic, bool result, bool useDP2)
 	      /* a AOP_STR uses DPTR, but DPTR is already in use;
 	       * we're just hosed.
 	       */
-	      fprintf (stderr, "*** Internal error: AOP_STR with DPTR in use!\n");
+	      fprintf (stderr, "*** Internal error: AOP_STR with DPTR in use! for operand %s\n",sym->name);
 	    }
 
 	  aop = op->aop = sym->aop = newAsmop (AOP_STR);
@@ -2310,6 +2310,7 @@ genCall (iCode * ic)
   /* if we need assign a result value */
   if ((IS_ITEMP (IC_RESULT (ic)) &&
        (OP_SYMBOL (IC_RESULT (ic))->nRegs ||
+	OP_SYMBOL (IC_RESULT (ic))->accuse ||
 	OP_SYMBOL (IC_RESULT (ic))->spildir)) ||
       IS_TRUE_SYMOP (IC_RESULT (ic)))
     {
@@ -2584,15 +2585,17 @@ genFunction (iCode * ic)
       rbank = FUNC_REGBANK (ftype);
       for (i = 0; i < ds390_nRegs; i++)
 	{
-	  if (strcmp (regs390[i].base, "0") == 0)
-	    emitcode ("", "%s = 0x%02x",
-		      regs390[i].dname,
-		      8 * rbank + regs390[i].offset);
-	  else
-	    emitcode ("", "%s = %s + 0x%02x",
-		      regs390[i].dname,
-		      regs390[i].base,
-		      8 * rbank + regs390[i].offset);
+	  if (regs390[i].print) {
+	      if (strcmp (regs390[i].base, "0") == 0)
+		  emitcode ("", "%s = 0x%02x",
+			    regs390[i].dname,
+			    8 * rbank + regs390[i].offset);
+	      else
+		  emitcode ("", "%s = %s + 0x%02x",
+			    regs390[i].dname,
+			    regs390[i].base,
+			    8 * rbank + regs390[i].offset);
+	  }
 	}
     }
 
@@ -8838,14 +8841,14 @@ genFarPointerGet (operand * left,
 	  _flushLazyDPS ();
 
 	  emitcode ("movx", "a,@dptr");
-	  if (size || pi)
+	  if (size || (pi && AOP_TYPE (left) != AOP_IMMD))
 	    emitcode ("inc", "dptr");
 
 	  aopPut (AOP (result), "a", offset++);
 	}
       _endLazyDPSEvaluation ();
     }
-  if (pi && AOP_TYPE (left) != AOP_IMMD && AOP_TYPE (left) != AOP_STR) {
+  if (pi && AOP_TYPE (left) != AOP_IMMD) {
     aopPut ( AOP (left), "dpl", 0);
     aopPut ( AOP (left), "dph", 1);
     if (options.model == MODEL_FLAT24)
@@ -8921,13 +8924,13 @@ emitcodePointerGet (operand * left,
 
 	  emitcode ("clr", "a");
 	  emitcode ("movc", "a,@a+dptr");
-	  if (size || pi)
+	  if (size || (pi && AOP_TYPE (left) != AOP_IMMD))
 	    emitcode ("inc", "dptr");
 	  aopPut (AOP (result), "a", offset++);
 	}
       _endLazyDPSEvaluation ();
     }
-  if (pi && AOP_TYPE (left) != AOP_IMMD && AOP_TYPE (left) != AOP_STR) {
+  if (pi && AOP_TYPE (left) != AOP_IMMD) {
     aopPut ( AOP (left), "dpl", 0);
     aopPut ( AOP (left), "dph", 1);
     if (options.model == MODEL_FLAT24)
@@ -8952,7 +8955,7 @@ genGenPointerGet (operand * left,
 
   D (emitcode (";", "genGenPointerGet "); );
 
-  aopOp (left, ic, FALSE, TRUE);
+  aopOp (left, ic, FALSE, (OP_SYMBOL(left)->ruonly ? FALSE : TRUE));
 
   /* if the operand is already in dptr
      then we do nothing else we move the value to dptr */
@@ -9017,12 +9020,12 @@ genGenPointerGet (operand * left,
 	{
 	  emitcode ("lcall", "__gptrget");
 	  aopPut (AOP (result), "a", offset++);
-	  if (size || pi)
+	  if (size || (pi && AOP_TYPE (left) != AOP_IMMD))
 	    emitcode ("inc", "dptr");
 	}
     }
 
-  if (pi && AOP_TYPE (left) != AOP_IMMD && AOP_TYPE (left) != AOP_STR) {
+  if (pi && AOP_TYPE (left) != AOP_IMMD) {
     aopPut ( AOP (left), "dpl", 0);
     aopPut ( AOP (left), "dph", 1);
     if (options.model == MODEL_FLAT24) {
@@ -9563,13 +9566,13 @@ genFarPointerSet (operand * right,
 	  _flushLazyDPS ();
 
 	  emitcode ("movx", "@dptr,a");
-	  if (size || pi)
+	  if (size || (pi && AOP_TYPE (result) != AOP_IMMD))
 	    emitcode ("inc", "dptr");
 	}
       _endLazyDPSEvaluation ();
     }
 
-  if (pi && AOP_TYPE (result) != AOP_STR && AOP_TYPE (result) != AOP_IMMD) {
+  if (pi && AOP_TYPE (result) != AOP_IMMD) {
     aopPut (AOP(result),"dpl",0);
     aopPut (AOP(result),"dph",1);
     if (options.model == MODEL_FLAT24)
@@ -9591,7 +9594,7 @@ genGenPointerSet (operand * right,
   sym_link *retype = getSpec (operandType (right));
   sym_link *letype = getSpec (operandType (result));
 
-  aopOp (result, ic, FALSE, TRUE);
+  aopOp (result, ic, FALSE, OP_SYMBOL(result)->ruonly ? FALSE : TRUE);
 
   /* if the operand is already in dptr
      then we do nothing else we move the value to dptr */
@@ -9641,13 +9644,13 @@ genGenPointerSet (operand * right,
 	  _flushLazyDPS ();
 
 	  emitcode ("lcall", "__gptrput");
-	  if (size || pi)
+	  if (size || (pi && AOP_TYPE (result) != AOP_IMMD))
 	    emitcode ("inc", "dptr");
 	}
       _endLazyDPSEvaluation ();
     }
 
-  if (pi && AOP_TYPE (result) != AOP_STR && AOP_TYPE (result) != AOP_IMMD) {
+  if (pi && AOP_TYPE (result) != AOP_IMMD) {
     aopPut (AOP(result),"dpl",0);
     aopPut (AOP(result),"dph",1);
     if (options.model == MODEL_FLAT24) {

@@ -1932,3 +1932,19 @@ replace {
 }
 
 
+replace {
+	add	a,#%2
+	mov	dpl,a
+	clr  a
+	addc	a,#(%2 >> 8)
+	mov	dph,a
+	clr  a
+	addc	a,#(%2 >> 16)
+	mov	dpx,a
+	clr	a
+	movc	a,@a+dptr
+} by {
+	; Peephole 227.a movc optimize
+	mov	dptr,#%2
+	movc	a,@a+dptr
+}

@@ -53,6 +53,7 @@ typedef struct regs
     char *base;			/* base address */
     short offset;		/* offset from the base */
     unsigned isFree:1;		/* is currently unassigned  */
+    int  print;                 /* needs to be printed*/
   }
 regs;
 extern regs regs390[];

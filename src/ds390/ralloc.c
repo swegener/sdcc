@@ -57,24 +57,24 @@ int ds390_ptrRegReq;		/* one byte pointer register required */
 regs regs390[] =
 {
 
-  {REG_GPR, R2_IDX, REG_GPR, "r2", "ar2", "0", 2, 1},
-  {REG_GPR, R3_IDX, REG_GPR, "r3", "ar3", "0", 3, 1},
-  {REG_GPR, R4_IDX, REG_GPR, "r4", "ar4", "0", 4, 1},
-  {REG_GPR, R5_IDX, REG_GPR, "r5", "ar5", "0", 5, 1},
-  {REG_GPR, R6_IDX, REG_GPR, "r6", "ar6", "0", 6, 1},
-  {REG_GPR, R7_IDX, REG_GPR, "r7", "ar7", "0", 7, 1},
-  {REG_PTR, R0_IDX, REG_PTR, "r0", "ar0", "0", 0, 1},
-  {REG_PTR, R1_IDX, REG_PTR, "r1", "ar1", "0", 1, 1},
-  {REG_GPR, X8_IDX, REG_GPR, "x8", "x8", "xreg", 0, 0},
-  {REG_GPR, X9_IDX, REG_GPR, "x9", "x9", "xreg", 1, 0},
-  {REG_GPR, X10_IDX, REG_GPR, "x10", "x10", "xreg", 2, 0},
-  {REG_GPR, X11_IDX, REG_GPR, "x11", "x11", "xreg", 3, 0},
-  {REG_GPR, X12_IDX, REG_GPR, "x12", "x12", "xreg", 4, 0},
-  {REG_CND, CND_IDX, REG_GPR, "C", "C", "xreg", 0, 0},
-  {REG_GPR, DPL_IDX, REG_GPR, "dpl", "dpl", "dpl", 0, 0},
-  {REG_GPR, DPH_IDX, REG_GPR, "dph", "dph", "dph", 0, 0},
-  {REG_GPR, DPX_IDX, REG_GPR, "dpx", "dpx", "dpx", 0, 0},
-  {REG_GPR, B_IDX, REG_GPR, "b", "b", "b", 0, 0},
+  {REG_GPR, R2_IDX, REG_GPR, "r2", "ar2", "0", 2, 1, 1},
+  {REG_GPR, R3_IDX, REG_GPR, "r3", "ar3", "0", 3, 1, 1},
+  {REG_GPR, R4_IDX, REG_GPR, "r4", "ar4", "0", 4, 1, 1},
+  {REG_GPR, R5_IDX, REG_GPR, "r5", "ar5", "0", 5, 1, 1},
+  {REG_GPR, R6_IDX, REG_GPR, "r6", "ar6", "0", 6, 1, 1},
+  {REG_GPR, R7_IDX, REG_GPR, "r7", "ar7", "0", 7, 1, 1},
+  {REG_PTR, R0_IDX, REG_PTR, "r0", "ar0", "0", 0, 1, 1},
+  {REG_PTR, R1_IDX, REG_PTR, "r1", "ar1", "0", 1, 1, 1},
+  {REG_GPR, X8_IDX, REG_GPR, "x8", "x8", "xreg", 0, 0, 0},
+  {REG_GPR, X9_IDX, REG_GPR, "x9", "x9", "xreg", 1, 0, 0},
+  {REG_GPR, X10_IDX, REG_GPR, "x10", "x10", "xreg", 2, 0, 0},
+  {REG_GPR, X11_IDX, REG_GPR, "x11", "x11", "xreg", 3, 0, 0},
+  {REG_GPR, X12_IDX, REG_GPR, "x12", "x12", "xreg", 4, 0, 0},
+  {REG_CND, CND_IDX, REG_GPR, "C", "C", "xreg", 0, 0, 0},
+  {REG_GPR, DPL_IDX, REG_GPR, "dpl", "dpl", "dpl", 0, 0, 0},
+  {REG_GPR, DPH_IDX, REG_GPR, "dph", "dph", "dph", 0, 0, 0},
+  {REG_GPR, DPX_IDX, REG_GPR, "dpx", "dpx", "dpx", 0, 0, 0},
+  {REG_GPR, B_IDX, REG_GPR, "b", "b", "b", 0, 0, 0},
 };
 int ds390_nRegs = 13;
 static void spillThis (symbol *);
@@ -1347,7 +1347,15 @@ createRegMask (eBBlock ** ebbs, int count)
 			  "createRegMask cannot find live range");
 		  exit (0);
 		}
-
+	      
+	      /* special case for ruonly */
+	      if (sym->ruonly) {
+		  int size = getSize(sym->type);
+		  int j = DPL_IDX;
+		  for (k = 0 ; k < size; k++ )
+		      ic->rMask = bitVectSetBit (ic->rMask, j++);
+		  continue ;
+	      }
 	      /* if no register assigned to it */
 	      if (!sym->nRegs || sym->isspilt)
 		continue;
@@ -1873,156 +1881,77 @@ right:
 
 
 /*-----------------------------------------------------------------*/
-/* packRegsForOneuse : - will reduce some registers for single Use */
+/* packRegsDPTRuse : - will reduce some registers for single Use */
 /*-----------------------------------------------------------------*/
 static iCode *
-packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
+packRegsDPTRuse (iCode * lic, operand * op, eBBlock * ebp)
 {
-#if 1
+    /* go thru entire liveRange of this variable & check for
+       other possible usage of DPTR , if we don't find it the
+       assign this to DPTR (ruonly)
+    */
+    int i, key;
+    symbol *sym;
+    iCode *ic, *dic;
+    sym_link *type, *etype;
+    
+    if (OP_SYMBOL(op)->remat) return NULL; 
 
-  /* I can't figure out how to make this safe yet. */
-  if ((int)ic+(int)op+(int)ebp) {
-    return 0;
-  } else {
-    return 0;
-  }
-  return NULL;
-
-#else
-  bitVect *uses;
-  iCode *dic, *sic;
-
-  /* if returning a literal then do nothing */
-  if (!IS_SYMOP (op))
-    return NULL;
-
-  /* only upto 2 bytes since we cannot predict
-     the usage of b, & acc */
-  if (getSize (operandType (op)) > (fReturnSizeDS390 - 2))
-    return 0;
-
-  if (ic->op != RETURN &&
-      ic->op != SEND &&
-      !POINTER_SET (ic) &&
-      !POINTER_GET (ic))
-    return NULL;
-  
-  /* this routine will mark the a symbol as used in one 
-     instruction use only && if the defintion is local 
-     (ie. within the basic block) && has only one definition &&
-     that definiion is either a return value from a 
-     function or does not contain any variables in
-     far space */
-  uses = bitVectCopy (OP_USES (op));
-  bitVectUnSetBit (uses, ic->key);	/* take away this iCode */
-  if (!bitVectIsZero (uses))	/* has other uses */
-    return NULL;
-
-  /* if it has only one defintion */
-  if (bitVectnBitsOn (OP_DEFS (op)) > 1)
-    return NULL;		/* has more than one definition */
-
-  /* get the that definition */
-  if (!(dic =
-	hTabItemWithKey (iCodehTab,
-			 bitVectFirstBit (OP_DEFS (op)))))
-    return NULL;
-
-  /* if that only usage is a cast */
-  if (dic->op == CAST) {
-    /* to a bigger type */
-    if (getSize(OP_SYM_TYPE(IC_RESULT(dic))) > 
-	getSize(OP_SYM_TYPE(IC_RIGHT(dic)))) {
-      /* than we can not, since we cannot predict the usage of b & acc */
-      return NULL;
-    }
-  }
-
-  /* found the definition now check if it is local */
-  if (dic->seq < ebp->fSeq ||
-      dic->seq > ebp->lSeq)
-    return NULL;		/* non-local */
-
-  /* now check if it is the return from
-     a function call */
-  if (dic->op == CALL || dic->op == PCALL)
-    {
-      if (ic->op != SEND && ic->op != RETURN)
-	{
-	  OP_SYMBOL (op)->ruonly = 1;
-	  return dic;
-	}
-      dic = dic->next;
-    }
-
-
-  /* otherwise check that the definition does
-     not contain any symbols in far space */
-  if (isOperandInFarSpace (IC_LEFT (dic)) ||
-      isOperandInFarSpace (IC_RIGHT (dic)) ||
-      IS_OP_RUONLY (IC_LEFT (ic)) ||
-      IS_OP_RUONLY (IC_RIGHT (ic)))
-    {
-      return NULL;
-    }
-
-  /* if pointer set then make sure the pointer
-     is one byte */
-  if (POINTER_SET (dic) &&
-      !IS_DATA_PTR (aggrToPtr (operandType (IC_RESULT (dic)), FALSE)))
-    return NULL;
-
-  if (POINTER_GET (dic) &&
-      !IS_DATA_PTR (aggrToPtr (operandType (IC_LEFT (dic)), FALSE)))
-    return NULL;
-
-  sic = dic;
-
-  /* also make sure the intervenening instructions
-     don't have any thing in far space */
-  for (dic = dic->next; dic && dic != ic; dic = dic->next)
-    {
-
-      /* if there is an intervening function call then no */
-      if (dic->op == CALL || dic->op == PCALL)
-	return NULL;
-      /* if pointer set then make sure the pointer
-         is one byte */
-      if (POINTER_SET (dic) &&
-	  !IS_DATA_PTR (aggrToPtr (operandType (IC_RESULT (dic)), FALSE)))
-	return NULL;
-
-      if (POINTER_GET (dic) &&
-	  !IS_DATA_PTR (aggrToPtr (operandType (IC_LEFT (dic)), FALSE)))
-	return NULL;
-
-      /* if address of & the result is remat the okay */
-      if (dic->op == ADDRESS_OF &&
-	  OP_SYMBOL (IC_RESULT (dic))->remat)
-	continue;
-
-      /* if operand has size of three or more & this
-         operation is a '*','/' or '%' then 'b' may
-         cause a problem */
-      if ((dic->op == '%' || dic->op == '/' || dic->op == '*') &&
-	  getSize (operandType (op)) >= 3)
-	return NULL;
-
-      /* if left or right or result is in far space */
-      if (isOperandInFarSpace (IC_LEFT (dic)) ||
-	  isOperandInFarSpace (IC_RIGHT (dic)) ||
-	  isOperandInFarSpace (IC_RESULT (dic)) ||
-	  IS_OP_RUONLY (IC_LEFT (dic)) ||
-	  IS_OP_RUONLY (IC_RIGHT (dic)) ||
-	  IS_OP_RUONLY (IC_RESULT (dic)))
-	{
-	  return NULL;
+    /* first check if any overlapping liverange has already been
+       assigned to DPTR */
+    if (OP_SYMBOL(op)->clashes) {
+	for (i = 0 ; i < OP_SYMBOL(op)->clashes->size ; i++ ) {
+	    if (bitVectBitValue(OP_SYMBOL(op)->clashes,i)) {
+		sym = hTabItemWithKey(liveRanges,i);
+		if (sym->ruonly) return NULL ;
+	    }
 	}
     }
 
-  OP_SYMBOL (op)->ruonly = 1;
-  return sic;
-#endif
+    /* no then go thru this guys live range */
+    dic = ic = hTabFirstItemWK(iCodeSeqhTab,OP_SYMBOL(op)->liveFrom);
+    for (; ic && ic->seq <= OP_SYMBOL(op)->liveTo;
+	 ic = hTabNextItem(iCodeSeqhTab,&key)) {
+
+	/* if PCALL cannot be sure give up */
+	if (ic->op == PCALL) return NULL;
+
+	/* if CALL then make sure it is VOID || return value not used */
+	if (ic->op == CALL) {
+	    if (OP_SYMBOL(IC_RESULT(ic))->liveTo == 
+		OP_SYMBOL(IC_RESULT(ic))->liveFrom) continue ;
+	    etype = getSpec(type = operandType(IC_RESULT(ic)));
+	    if (getSize(type) == 0) continue ;
+	    return NULL ;
+	}
+
+	/* special case of add with a [remat] */
+	if (ic->op == '+' && 
+	    OP_SYMBOL(IC_LEFT(ic))->remat ) continue ;
+
+	/* general case */
+	if (IC_RESULT(ic) && IS_SYMOP(IC_RESULT(ic)) && 
+	    !isOperandEqual(IC_RESULT(ic),op) &&
+	    (isOperandInFarSpace(IC_RESULT(ic)) || 
+	     OP_SYMBOL(IC_RESULT(ic))->onStack)) return NULL;
+
+	if (IC_RIGHT(ic) && IS_SYMOP(IC_RIGHT(ic)) && 
+	    !isOperandEqual(IC_RIGHT(ic),op) &&
+	    (OP_SYMBOL(IC_RIGHT(ic))->liveTo > ic->seq || 
+	     IS_TRUE_SYMOP(IC_RIGHT(ic))) &&
+	    (isOperandInFarSpace(IC_RIGHT(ic)) || 
+	     OP_SYMBOL(IC_RIGHT(ic))->onStack)) return NULL;
+
+	if (IC_LEFT(ic) && IS_SYMOP(IC_LEFT(ic)) && 
+	    !isOperandEqual(IC_LEFT(ic),op) &&
+	    (OP_SYMBOL(IC_LEFT(ic))->liveTo > ic->seq || 
+	     IS_TRUE_SYMOP(IC_LEFT(ic)))&&
+	    (isOperandInFarSpace(IC_LEFT(ic)) || 
+	     OP_SYMBOL(IC_LEFT(ic))->onStack)) return NULL;
+
+    }
+    OP_SYMBOL(op)->ruonly = 1;
+    return dic;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2410,10 +2339,12 @@ packRegisters (eBBlock * ebp)
 
       /* some cases the redundant moves can
          can be eliminated for return statements */
-      if ((ic->op == RETURN || ic->op == SEND) &&
+      if ((ic->op == RETURN || ic->op == SEND) &&	  
 	  !isOperandInFarSpace (IC_LEFT (ic)) &&
-	  !options.model)
-	packRegsForOneuse (ic, IC_LEFT (ic), ebp);
+	  !options.model) {
+	 
+	  packRegsDPTRuse (ic, IC_LEFT (ic), ebp);
+      }
 
       /* if pointer set & left has a size more than
          one and right is not in far space */
@@ -2421,19 +2352,20 @@ packRegisters (eBBlock * ebp)
 	  !isOperandInFarSpace (IC_RIGHT (ic)) &&
 	  !OP_SYMBOL (IC_RESULT (ic))->remat &&
 	  !IS_OP_RUONLY (IC_RIGHT (ic)) &&
-	  getSize (aggrToPtr (operandType (IC_RESULT (ic)), FALSE)) > 1)
-
-	packRegsForOneuse (ic, IC_RESULT (ic), ebp);
+	  getSize (aggrToPtr (operandType (IC_RESULT (ic)), FALSE)) > 1) {
+	  
+	  packRegsDPTRuse (ic, IC_RESULT (ic), ebp);
+      }
 
       /* if pointer get */
       if (POINTER_GET (ic) &&
 	  !isOperandInFarSpace (IC_RESULT (ic)) &&
 	  !OP_SYMBOL (IC_LEFT (ic))->remat &&
 	  !IS_OP_RUONLY (IC_RESULT (ic)) &&
-	  getSize (aggrToPtr (operandType (IC_LEFT (ic)), FALSE)) > 1)
+	  getSize (aggrToPtr (operandType (IC_LEFT (ic)), FALSE)) > 1) {
 
-	packRegsForOneuse (ic, IC_LEFT (ic), ebp);
-
+	  packRegsDPTRuse (ic, IC_LEFT (ic), ebp);
+      }
 
       /* if this is cast for intergral promotion then
          check if only use of  the definition of the 
@@ -2450,7 +2382,7 @@ packRegisters (eBBlock * ebp)
 	      SPEC_USIGN (fromType) == SPEC_USIGN (toType))
 	    {
 
-	      iCode *dic = packRegsForOneuse (ic, IC_RIGHT (ic), ebp);
+	      iCode *dic = packRegsDPTRuse (ic, IC_RIGHT (ic), ebp);
 	      if (dic)
 		{
 		  if (IS_ARITHMETIC_OP (dic))
@@ -2473,7 +2405,7 @@ packRegisters (eBBlock * ebp)
 	      if (compareType (operandType (IC_RIGHT (ic)),
 			     operandType (IC_LEFT (ic))) == 1)
 		{
-		  iCode *dic = packRegsForOneuse (ic, IC_RIGHT (ic), ebp);
+		  iCode *dic = packRegsDPTRuse (ic, IC_RIGHT (ic), ebp);
 		  if (dic)
 		    {
 		      IC_RESULT (dic) = IC_RESULT (ic);
@@ -2509,14 +2441,14 @@ packRegisters (eBBlock * ebp)
       if ((IS_ARITHMETIC_OP (ic)
 	   || IS_CONDITIONAL(ic)
 	   || IS_BITWISE_OP (ic)
-	   || ic->op == LEFT_OP || ic->op == RIGHT_OP
+	   || ic->op == LEFT_OP || ic->op == RIGHT_OP || ic->op == CALL
 	   || (ic->op == ADDRESS_OF && isOperandOnStack (IC_LEFT (ic)))
 	  ) &&
 	  IS_ITEMP (IC_RESULT (ic)) &&
 	  getSize (operandType (IC_RESULT (ic))) <= 2)
 
 	packRegsForAccUse (ic);
-
+      
     }
 }
 
@@ -2531,7 +2463,7 @@ ds390_assignRegisters (eBBlock ** ebbs, int count)
 
   setToNull ((void *) &_G.funcrUsed);
   ds390_ptrRegReq = _G.stackExtend = _G.dataExtend = 0;
-  ds390_nRegs = 8;
+  ds390_nRegs = 18;
   if (options.model != MODEL_FLAT24) options.stack10bit = 0;
   /* change assignments this will remove some
      live ranges reducing some register pressure */
@@ -2590,6 +2522,7 @@ ds390_assignRegisters (eBBlock ** ebbs, int count)
   setToNull ((void **) &_G.stackSpil);
   setToNull ((void **) &_G.spiltSet);
   /* mark all registers as free */
+  ds390_nRegs = 8;
   freeAllRegs ();
 
   return;

@@ -858,3 +858,64 @@ void redoStackOffsets ()
 	    cdbSymbol(sym,cdbFile,FALSE,FALSE);	
     }
 }
+
+/*-----------------------------------------------------------------*/
+/* printAllocInfoSeg- print the allocation for a given section     */
+/*-----------------------------------------------------------------*/
+static void printAllocInfoSeg ( memmap *map, symbol *func, FILE *of)
+{
+    symbol *sym;
+    
+    if (!map) return;
+    if (!map->syms) return;
+
+    for (sym = setFirstItem(map->syms); sym;
+	 sym = setNextItem(map->syms)) {
+	
+	if (sym->level == 0) continue;
+	if (sym->localof != func) continue ;
+	fprintf(of,";%-25s Allocated to ",sym->name);
+
+	/* if assigned to registers */
+	if (!sym->allocreq && sym->reqv) {
+	    int i;
+	    sym = OP_SYMBOL(sym->reqv);
+	    fprintf(of,"registers ");
+	    for (i = 0 ; i < 4 && sym->regs[i] ; i++)
+		fprintf(of,"%s ",port->getRegName(sym->regs[i]));
+	    fprintf(of,"\n");
+	    continue ;
+	}
+
+	/* if on stack */
+	if (sym->onStack) {
+	    fprintf(of,"stack - offset %d\n",sym->stack);
+	    continue;
+	}
+	
+	/* otherwise give rname */
+	fprintf(of,"in memory with name '%s'\n",sym->rname);
+    }
+}
+
+/*-----------------------------------------------------------------*/
+/* printAllocInfo - prints allocation information for a function   */
+/*-----------------------------------------------------------------*/
+void printAllocInfo( symbol * func, FILE *of)
+{
+    if (!of) of = stdout;
+
+    /* must be called after register allocation is complete */
+    fprintf(of,";------------------------------------------------------------\n");
+    fprintf(of,";Allocation info for local variables in function '%s'\n",func->name);
+    fprintf(of,";------------------------------------------------------------\n");
+    
+    printAllocInfoSeg(xstack,func,of);
+    printAllocInfoSeg(istack,func,of);
+    printAllocInfoSeg(code,func,of);
+    printAllocInfoSeg(data,func,of);
+    printAllocInfoSeg(xdata,func,of);
+    printAllocInfoSeg(idata,func,of);
+    printAllocInfoSeg(sfr,func,of);
+    printAllocInfoSeg(sfrbit,func,of);
+}

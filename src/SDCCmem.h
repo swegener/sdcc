@@ -79,5 +79,5 @@ int         allocVariables (struct symbol  *                );
 void        overlay2Set    (                                );
 void        overlay2data   (                                );
 void        redoStackOffsets(                               );
-
+void        printAllocInfo (struct symbol *, FILE *);
 #endif

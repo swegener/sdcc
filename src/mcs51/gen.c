@@ -53,6 +53,7 @@
 #include "gen.h"
 
 char *aopLiteral (value *val, int offset);
+extern int allocInfo;
 
 /* this is the down and dirty file with all kinds of 
    kludgy & hacky stuff. This is what it is all about
@@ -7421,6 +7422,9 @@ void gen51Code (iCode *lic)
 
     lineHead = lineCurr = NULL;
 
+    /* print the allocation information */
+    if (allocInfo)
+	printAllocInfo( currFunc, codeOutFile);
     /* if debug information required */
 /*     if (options.debug && currFunc) { */
     if (currFunc) {
@@ -7656,6 +7660,6 @@ void gen51Code (iCode *lic)
 	peepHole (&lineHead);
 
     /* now do the actual printing */
-    printLine (lineHead,codeOutFile);
+    printLine (lineHead,codeOutFile);    
     return;
 }

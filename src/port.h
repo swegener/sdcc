@@ -30,6 +30,8 @@ typedef struct {
 	const char *debug_opts;
 	/** Arguments for normal assembly mode.  PENDING: ignored */
 	const char *plain_opts;
+	/* print externs as global */
+	int externGlobal;
     } assembler;
 
     /* linker related info */

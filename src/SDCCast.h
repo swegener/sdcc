@@ -145,7 +145,7 @@ typedef  struct   ast {
 
 #define IS_ASSIGN_OP(x) ( x == '=' || x == ADD_ASSIGN || x == SUB_ASSIGN ||\
 			  x == MUL_ASSIGN || x == DIV_ASSIGN || x == XOR_ASSIGN ||\
-			  x == AND_ASSIGN || x == OR_ASSIGN)
+			  x == AND_ASSIGN || x == OR_ASSIGN || x == INC_OP || x == DEC_OP)
 #define IS_DEREF_OP(x) (( x->opval.op == '*' && x->right == NULL) || x->opval.op == '.')
 
 /* forward declrations for global variables */

@@ -1155,6 +1155,7 @@ BIN2DATA_DIR
 \layout Standard
 
 ..
+\backslash 
 
 \end_inset 
 </cell>
@@ -1673,10 +1674,10 @@ Install paths
 \begin_inset  Tabular
 <lyxtabular version="3" rows="5" columns="4">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="0">
-<column alignment="left" valignment="top" leftline="true" width="0">
-<column alignment="left" valignment="top" leftline="true" width="0">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -2069,9 +2070,9 @@ $PATH
 \begin_inset  Tabular
 <lyxtabular version="3" rows="6" columns="3">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="0">
-<column alignment="left" valignment="top" leftline="true" width="0">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0in">
+<column alignment="block" valignment="top" leftline="true" width="1.5in">
+<column alignment="block" valignment="top" leftline="true" width="1.5in">
+<column alignment="block" valignment="top" leftline="true" rightline="true" width="0in">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -2160,8 +2161,6 @@ status Collapsed
 
 \layout Standard
 
-
-\size small 
 $SDCC_INCLUDE
 \end_inset 
 </cell>
@@ -2188,11 +2187,13 @@ $SDCC_INCLUDE
 
 \layout Standard
 
-
-\size footnotesize 
 $SDCC_HOME/
+\newline 
+
 \emph on 
-$PREFIX2DATA_DIR/$INCLUDE_DIR_SUFFIX
+$PREFIX2DATA_DIR/
+\newline 
+$INCLUDE_DIR_SUFFIX
 \end_inset 
 </cell>
 <cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
@@ -2200,9 +2201,11 @@ $PREFIX2DATA_DIR/$INCLUDE_DIR_SUFFIX
 
 \layout Standard
 
-
-\size small 
-$SDCC_ HOME/share/sdcc/include
+$SDCC_ HOME/
+\newline 
+share/sdcc/
+\newline 
+include
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -2210,8 +2213,6 @@ $SDCC_ HOME/share/sdcc/include
 
 \layout Standard
 
-
-\size small 
 $SDCC_HOME
 \backslash 
 include
@@ -2224,11 +2225,17 @@ include
 
 \layout Standard
 
-
-\size small 
 path(argv[0])/
+\newline 
+
 \emph on 
-$BIN2DATADIR/$INCLUDE_DIR_SUFFIX
+$BIN2DATADIR/
+\emph default 
+
+\newline 
+
+\emph on 
+$INCLUDE_DIR_SUFFIX
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -2236,7 +2243,49 @@ $BIN2DATADIR/$INCLUDE_DIR_SUFFIX
 
 \layout Standard
 
-path(argv[0])/../sdcc/include
+path(argv[0])/
+\newline 
+../sdcc/include
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -2259,9 +2308,14 @@ include
 \layout Standard
 
 
-\size small 
 \emph on 
-$DATADIR/$INCLUDE_DIR_SUFFIX
+$DATADIR/
+\emph default 
+
+\newline 
+
+\emph on 
+$INCLUDE_DIR_SUFFIX
 \end_inset 
 </cell>
 <cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
@@ -2269,7 +2323,9 @@ $DATADIR/$INCLUDE_DIR_SUFFIX
 
 \layout Standard
 
-/usr/local/share/sdcc/include
+/usr/local/share/sdcc/
+\newline 
+include
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -8176,8 +8232,8 @@ Interrupt numbers and the corresponding address & descriptions for the Standard
 <lyxtabular version="3" rows="7" columns="3">
 <features>
 <column alignment="center" valignment="top" leftline="true" width="0in">
-<column alignment="left" valignment="top" leftline="true" width="0in">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0in">
+<column alignment="center" valignment="top" leftline="true" width="0in">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0in">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -9652,8 +9708,8 @@ For signed & unsigned int (16 bit) and long (32 bit) variables, division,
 \begin_inset  Tabular
 <lyxtabular version="3" rows="11" columns="2">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="0">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -9946,8 +10002,8 @@ SDCC supports IEEE (single precision 4 bytes) floating point numbers.The
 \begin_inset  Tabular
 <lyxtabular version="3" rows="17" columns="2">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="0">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -10993,8 +11049,8 @@ The compiler creates the following #defines
 \begin_inset  Tabular
 <lyxtabular version="3" rows="10" columns="2">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="0">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -12805,9 +12861,9 @@ Tools
 \begin_inset  Tabular
 <lyxtabular version="3" rows="12" columns="3">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="0pt">
-<column alignment="left" valignment="top" leftline="true" width="0pt">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
+<column alignment="center" valignment="top" leftline="true" width="0pt">
+<column alignment="center" valignment="top" leftline="true" width="0pt">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0pt">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -13213,9 +13269,9 @@ Related open source tools
 \begin_inset  Tabular
 <lyxtabular version="3" rows="8" columns="3">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="0pt">
-<column alignment="left" valignment="top" leftline="true" width="30line%">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
+<column alignment="center" valignment="top" leftline="true" width="0pt">
+<column alignment="block" valignment="top" leftline="true" width="30line%">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0pt">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -13505,9 +13561,9 @@ Related documentation / recommended reading
 \begin_inset  Tabular
 <lyxtabular version="3" rows="5" columns="3">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="0pt">
-<column alignment="left" valignment="top" leftline="true" width="30line%">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
+<column alignment="center" valignment="top" leftline="true" width="0pt">
+<column alignment="block" valignment="top" leftline="true" width="30line%">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0pt">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text

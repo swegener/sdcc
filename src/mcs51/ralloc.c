@@ -2387,17 +2387,17 @@ packRegsForAccUse (iCode * ic)
     return;
 #endif
 
+  /* if the usage has only one operand then we can */
+  if (IC_LEFT (uic) == NULL ||
+      IC_RIGHT (uic) == NULL)
+    goto accuse;
+
   /* if the other operand uses the accumulator then we cannot */
   if ( (IC_LEFT(uic)->key == IC_RESULT(ic)->key &&
 	operandUsesAcc(IC_RIGHT(uic))) ||
        (IC_RIGHT(uic)->key == IC_RESULT(ic)->key &&
 	operandUsesAcc(IC_LEFT(uic))) ) 
     return;
-
-  /* if the usage has only one operand then we can */
-  if (IC_LEFT (uic) == NULL ||
-      IC_RIGHT (uic) == NULL)
-    goto accuse;
 
   /* make sure this is on the left side if not commutative */
   /* except for '-', which has been written to be able to

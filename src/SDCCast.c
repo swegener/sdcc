@@ -610,7 +610,6 @@ processParms (ast * func,
 	      int *parmNumber,
 	      bool rightmost)
 {
-  int castError=0;
   sym_link *fetype = func->etype;
 
   /* if none of them exist */
@@ -746,35 +745,7 @@ processParms (ast * func,
 
 
   /* the parameter type must be at least castable */
-  if (compareType (defParm->type, actParm->ftype) == 0)
-    {
-      castError++;
-    }
-
-#ifdef JWK20010916
-  if (!IS_SPEC(defParm->type) && !IS_SPEC(actParm->ftype)) {
-    // now we have two pointers, check if they point to the same
-    sym_link *dtype=defParm->type, *atype=actParm->ftype;
-    do {
-      dtype=dtype->next;
-      atype=atype->next;
-      if (
-	  (dtype->next && !atype->next) ||
-	  (!dtype->next && atype->next) ||
-	  compareType (dtype, atype)!=1) {
-	castError++;
-      }
-    } while (dtype->next && atype->next);
-    if (IS_SPEC(dtype) && IS_SPEC(atype)) {
-      // ok so far, we have two etypes, they must have the same SCLASS
-      if (SPEC_SCLS(dtype)!=SPEC_SCLS(atype)) {
-	castError++;
-      }
-    }
-  }
-#endif
-
-  if (castError) {
+  if (compareType (defParm->type, actParm->ftype) == 0) {
     werror (W_INCOMPAT_CAST);
     fprintf (stderr, "type --> '");
     printTypeChain (actParm->ftype, stderr);

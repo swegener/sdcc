@@ -377,7 +377,7 @@ initPointer (initList * ilist)
 	}
  wrong:
 	werror (W_INIT_WRONG);
-	return NULL;
+	return constVal("0");
 
 }
 

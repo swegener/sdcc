@@ -72,6 +72,9 @@ static data value_t value;
 
 static unsigned short radix;
 
+// jwk: TODO: this makes the whole dammed thing nonreentrent
+static int charsOutputted;
+
 /****************************************************************************/
 
 static void output_char( char c ) reentrant
@@ -84,6 +87,7 @@ static void output_char( char c ) reentrant
   {
     putchar( c );
   }
+  charsOutputted++;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -259,6 +263,9 @@ int vsprintf (const char *buf, const char *format, va_list ap)
   XSPEC signed char decimals;
   XSPEC unsigned char  length;
   XSPEC char           c;
+
+  // reset output chars
+  charsOutputted=0;
 
   output_ptr = buf;
   if ( !buf )
@@ -596,7 +603,12 @@ _endasm;
        
   // Copy \0 to the end of buf
   // Modified by JB 17/12/99
-  if (output_to_string) output_char(0);
+  if (output_to_string) {
+    output_char(0);
+    return charsOutputted-1;
+  } else {
+    return charsOutputted;
+  }
 }
 
 /*--------------------------------------------------------------------------*/

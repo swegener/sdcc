@@ -23,7 +23,10 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
-#define P2_PAGES_PDATA 0 /* not all devices use P2 to page pdata memory */
+/* not all devices use P2 to page pdata memory, therefore __XPAGE was 
+   introduced. On some targets __XPAGE itself is a paged SFR so it is 
+   not save for all platforms to set this */
+#define USE_PDATA_PAGING_REGISTER 0
 
 void
 _gptrput (char *gptr, char c)
@@ -67,9 +70,9 @@ _gptrput (char *gptr, char c)
 	sjmp    00005$
 
  00004$:
-#if P2_PAGES_PDATA
+#if USE_PDATA_PAGING_REGISTER
 	pop     acc
-	mov     dph,p2	        ; p2 holds high byte for pdata access
+	mov     dph,__XPAGE     ; __XPAGE (usually p2) holds high byte for pdata access
 	movx    @dptr,a
 #else
 	pop     acc

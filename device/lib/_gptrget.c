@@ -23,7 +23,10 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
-#define P2_PAGES_PDATA 0 /* not all devices use P2 to page pdata memory */
+/* not all devices use P2 to page pdata memory, therefore __XPAGE was 
+   introduced. On some targets __XPAGE itself is a paged SFR so it is 
+   not save for all platforms to set this */
+#define USE_PDATA_PAGING_REGISTER 0
 
 /* the  return value is expected to be in acc, and not in the standard
  * location dpl. Therefore we choose return type void here: */
@@ -82,8 +85,8 @@ _gptrget (char *gptr)
 ;   pointer to xternal stack or pdata
 ;
  00004$:
-#if P2_PAGES_PDATA
-        mov     dph,p2          ; p2 holds high byte for pdata access
+#if USE_PDATA_PAGING_REGISTER
+        mov     dph,__XPAGE     ; __XPAGE (usually p2) holds high byte for pdata access
         movx    a,@dptr
 #else
     	push 	ar0

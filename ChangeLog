@@ -1,3 +1,7 @@
+2005-03-28 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCBBlock.c (iCodeBreakDown): fixed bug #1170212
+
 2005-03-26 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/gen.c (genSkipc): fixed semantics (execute branch

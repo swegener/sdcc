@@ -518,13 +518,13 @@ iCodeBreakDown (iCode * ic)
   iCode *loop = ic;
   ebbIndex *ebbi;
   
-  ebbi = Safe_alloc (sizeof (ebbIndex *));
+  ebbi = Safe_alloc (sizeof (ebbIndex));
   ebbi->count = 0;
   ebbi->dfOrder = NULL; /* no depth first order information yet */
 
   /* allocate for the first entry */
 
-  ebbs = Safe_alloc (sizeof (eBBlock **));
+  ebbs = Safe_alloc (sizeof (eBBlock *));
   ebbi->bbOrder = ebbs;
 
   while (loop)
@@ -544,7 +544,7 @@ iCodeBreakDown (iCode * ic)
       /* allocate for the next one. Remember to clear the new */
       /*  pointer at the end, that was created by realloc. */
 
-      ebbs = Safe_realloc (ebbs, (ebbi->count + 1) * sizeof (eBBlock **));
+      ebbs = Safe_realloc (ebbs, (ebbi->count + 1) * sizeof (eBBlock *));
       ebbi->bbOrder = ebbs;
 
       ebbs[ebbi->count] = 0;
@@ -589,7 +589,7 @@ iCodeBreakDown (iCode * ic)
 
 	      /* if we have stopped at the block , allocate for an extra one */
 
-	      ebbs = Safe_realloc (ebbs, (ebbi->count + 1) * sizeof (eBBlock **));
+	      ebbs = Safe_realloc (ebbs, (ebbi->count + 1) * sizeof (eBBlock *));
 	      ebbi->bbOrder = ebbs;
 
 	      ebbs[ebbi->count] = 0;

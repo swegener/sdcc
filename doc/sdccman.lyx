@@ -2,7 +2,14 @@
 \lyxformat 221
 \textclass article
 \begin_preamble
-\usepackage[colorlinks=true,linkcolor=blue]{hyperref}
+\usepackage[
+  pdftitle={SDCC Compiler User Guide},
+  pdfauthor={SDCC development team},
+  pdfsubject={installation, user manual},
+  pdfkeywords={8032, 8051, ansi, c, compiler, CPU, DS390, 
+               embedded, GPL, manual, mcs51, PIC, small, Z80},
+  colorlinks=true,
+  linkcolor=blue] {hyperref}
 \date{}
 \end_preamble
 \language english
@@ -56,7 +63,15 @@ Two resp.
 SDCC Compiler User Guide
 \layout Standard
 \align center 
-2003-05-28
+2003-06-02
+\layout Comment
+
+The strings enclosed in $ are automatically updated by cvs:
+\layout Standard
+\align center 
+
+\size scriptsize 
+cvs: $Revision$ $Date$
 \layout Standard
 
 
@@ -444,7 +459,7 @@ If you can think of some more, please see the chapter 9 about filing feature
 \end_inset 
 
 
-\begin_inset LatexCommand \index{Feature requests}
+\begin_inset LatexCommand \index{Feature request}
 
 \end_inset 
 
@@ -11905,7 +11920,7 @@ Related open source tools
 
 
 \begin_inset  Tabular
-<lyxtabular version="3" rows="5" columns="3">
+<lyxtabular version="3" rows="7" columns="3">
 <features>
 <column alignment="center" valignment="top" leftline="true" width="0pt">
 <column alignment="center" valignment="top" leftline="true" width="0pt">
@@ -12027,7 +12042,7 @@ objdump
 
 \layout Standard
 
-Object file conversion
+Object file conversion, ...
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -12036,6 +12051,78 @@ Object file conversion
 \layout Standard
 
 Part of binutils (should be there anyway)
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+doxygen
+\begin_inset LatexCommand \index{doxygen}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Source code documentation system
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset LatexCommand \url{http://www.doxygen.org}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+splint
+\begin_inset LatexCommand \index{splint}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Statically checks c sources
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset LatexCommand \url{http://www.splint.org}
+
+\end_inset 
+
+
 \end_inset 
 </cell>
 </row>
@@ -12092,7 +12179,7 @@ Related documentation / recommended reading
 
 
 \begin_inset  Tabular
-<lyxtabular version="3" rows="4" columns="3">
+<lyxtabular version="3" rows="5" columns="3">
 <features>
 <column alignment="center" valignment="top" leftline="true" width="0pt">
 <column alignment="center" valignment="top" leftline="true" width="0pt">
@@ -12111,7 +12198,7 @@ Name
 
 \layout Standard
 
-Subject
+Subject / Title
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -12129,6 +12216,9 @@ Where to get
 
 \layout Standard
 
+S.
+ S.
+ Muchnick
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -12136,7 +12226,7 @@ Where to get
 
 \layout Standard
 
-Compiler architecture
+Advanced Compiler Design and Implementation
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -12145,6 +12235,51 @@ Compiler architecture
 \layout Standard
 
 bookstore
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+c-refcard.pdf
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+C Reference Card
+\begin_inset LatexCommand \index{C Reference card}
+
+\end_inset 
+
+, 2 pages
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset LatexCommand \url{http://www.refcards.com/about/c.html}
+
+\end_inset 
+
+
 \end_inset 
 </cell>
 </row>
@@ -12163,6 +12298,11 @@ test_suite_spec.pdf
 \layout Standard
 
 sdcc regression test
+\begin_inset LatexCommand \index{Regression test}
+
+\end_inset 
+
+
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">

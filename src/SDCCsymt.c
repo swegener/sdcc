@@ -1798,7 +1798,7 @@ processFuncArgs (symbol * func)
 
   /* if this function has variable argument list */
   /* then make the function a reentrant one    */
-  if (IFFUNC_HASVARARGS(funcType))
+  if (IFFUNC_HASVARARGS(funcType) || options.stackAuto)
     FUNC_ISREENT(funcType)=1;
 
   /* check if this function is defined as calleeSaves
@@ -1828,6 +1828,8 @@ processFuncArgs (symbol * func)
 	  (*port->reg_parm) (val->type))
 	{
 	  SPEC_REGPARM (val->etype) = 1;
+	} else if (IFFUNC_ISREENT(funcType)) {
+	    FUNC_HASSTACKPARM(funcType) = 1;
 	}
 
       if (IS_AGGREGATE (val->type))
@@ -2350,6 +2352,7 @@ _mangleFunctionName(char *in)
 /*                      'x' - xdata                                */
 /*                      'p' - code                                 */
 /*                      'd' - data                                 */                     
+/*                      'F' - function                             */                     
 /* examples : "ig*" - generic int *				   */
 /*            "cx*" - char xdata *                                 */
 /*            "ui" -  unsigned int                                 */
@@ -2396,6 +2399,7 @@ sym_link *typeFromStr (char *s)
 	case 'x':
 	case 'p':
 	case 'd':
+	case 'F':
 	    assert(*(s+1)=='*');
 	    nr = newLink();
 	    nr->next = r;
@@ -2413,6 +2417,14 @@ sym_link *typeFromStr (char *s)
 		break;
 	    case 'd':
 		DCL_TYPE(r) = POINTER;
+		break;
+	    case 'F':
+		DCL_TYPE(r) = FUNCTION;
+		nr = newLink();
+		nr->next = r;
+		r = nr;
+		r->class = DECLARATOR ;
+		DCL_TYPE(r) = CPOINTER;
 		break;
 	    }
 	    s++;

@@ -209,6 +209,7 @@ typedef struct sym_link
       unsigned builtin;		/* is a builtin function      */
       unsigned javaNative;    	/* is a JavaNative Function (TININative ONLY) */
       unsigned overlay;    	/* force parameters & locals into overlay segment */
+      unsigned hasStackParms;   /* function has parameters on stack */
     } funcAttrs;
 
     struct sym_link *next;	/* next element on the chain  */
@@ -325,6 +326,7 @@ symbol;
 #define IFFUNC_RBANK(x) (IS_FUNC(x) && FUNC_RBANK(x))
 #define FUNC_INTNO(x) (x->funcAttrs.intno)
 #define FUNC_REGBANK(x) (x->funcAttrs.regbank)
+#define FUNC_HASSTACKPARM(x) (x->funcAttrs.hasStackParms)
 
 #define FUNC_ISREENT(x) (x->funcAttrs.reent)
 #define IFFUNC_ISREENT(x) (IS_FUNC(x) && FUNC_ISREENT(x))
@@ -342,6 +344,7 @@ symbol;
 #define IFFUNC_ISJAVANATIVE(x) (IS_FUNC(x) && FUNC_ISJAVANATIVE(x))
 #define FUNC_ISOVERLAY(x) (x->funcAttrs.overlay)
 #define IFFUNC_ISOVERLAY(x) (IS_FUNC(x) && FUNC_ISOVERLAY(x))
+
 
 // jwk: I am not sure about this
 #define IFFUNC_ISBANKEDCALL(x) (!IFFUNC_NONBANKED(x) && \

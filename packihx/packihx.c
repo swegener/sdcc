@@ -20,7 +20,7 @@
 typedef struct _Line
 {
     Uint8 		len;		/* length of data portion of record. */
-    Uint16   		offset;
+    Uint16      offset;
     Uint8		type;
     Uint8		*data;		
     Uint8		checksum;
@@ -98,7 +98,7 @@ Line *readLine(FILE *inFile)
     	{
     	    return NULL;
     	}
-	++lineno;
+        ++lineno;
     
     	if (!buffer[0] || buffer[0] == '\r' || buffer[0] == '\n')
     	{
@@ -153,7 +153,7 @@ Line *readLine(FILE *inFile)
         return NULL;
     }
     
-    for (i = 0; i < line->len; i++)
+    for (i = 0; i < (unsigned)line->len; i++)
     {
         if (getHexByte(bp, &(line->data[i])))
         {
@@ -175,7 +175,7 @@ Line *readLine(FILE *inFile)
     	free(line);
     	return NULL;
     }
-    bp += 2;	/* Two digits consumed. */   
+    /* bp += 2; */    /* Two digits consumed. */
         
     return line;
 }
@@ -184,7 +184,7 @@ Line *readLine(FILE *inFile)
 Uint16 lineChecksum(unsigned len, unsigned offset, unsigned type, 
 		    const Uint8 *data)
 {
-    Uint16 	checksum = 0;
+    Uint16  checksum;
     unsigned 	i;
      
     checksum = len + type + (offset >> 8) + 
@@ -300,7 +300,7 @@ int flushPendingData(void)
 int writeLine(Line *line)
 {
     static Uint16 lastExtendedOffset = 0;
-    int		  rc = 0;
+    int       rc;
     
     if (line->type)
     {
@@ -341,7 +341,7 @@ int writeLine(Line *line)
     }
     else
     {
-        if (pendingOffset + pendingLen != line->offset)
+        if (pendingOffset + pendingLen != (unsigned)line->offset)
         {
             /* This line is not contigous with the last one. Dump pending. */
             if (flushPendingData())

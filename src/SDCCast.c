@@ -4265,27 +4265,40 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 	}
 	
 	if (tree->opval.op == FUNCTION) {
-		fprintf(outfile,"FUNCTION (%p) type (",tree);
+	        int arg=0;
+		value *args=FUNC_ARGS(tree->left->opval.val->type);
+		fprintf(outfile,"FUNCTION (%s=%p) type (", 
+			tree->left->opval.val->name, tree);
 		printTypeChain (tree->ftype,outfile);
+		fprintf(outfile,") args (");
+		do {
+		  if (arg) {
+		    fprintf (outfile, ", ");
+		  }
+		  printTypeChain (args->type, outfile);
+		  arg++;
+		  args=args->next;
+		} while (args);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent);
+		ast_print(tree->right,outfile,indent);
 		return ;
 	}
 	if (tree->opval.op == BLOCK) {
 		symbol *decls = tree->values.sym;
-		INDENT(indent+4,outfile);
+		INDENT(indent,outfile);
 		fprintf(outfile,"{\n");
 		while (decls) {
 			INDENT(indent+4,outfile);
-			fprintf(outfile,"DECLARE SYMBOL %s, type(",decls->name);
+			fprintf(outfile,"DECLARE SYMBOL (%s=%p) type (",
+				decls->name, decls);
 			printTypeChain(decls->type,outfile);
 			fprintf(outfile,")\n");
 			
 			decls = decls->next;			
 		}
 		ast_print(tree->right,outfile,indent+4);
-		INDENT(indent+4,outfile);
+		INDENT(indent,outfile);
 		fprintf(outfile,"}\n");
 		return;
 	}
@@ -4318,7 +4331,8 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 			} else {
 				fprintf(outfile,"SYMBOL ");
 			}
-			fprintf(outfile,"(%p) name= %s ",tree,tree->opval.val->sym->name);
+			fprintf(outfile,"(%s=%p)",
+				tree->opval.val->sym->name,tree);
 		}
 		if (tree->ftype) {
 			fprintf(outfile," type (");
@@ -4591,7 +4605,9 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		/*         casting            */
 		/*----------------------------*/
 	case CAST:			/* change the type   */
-		fprintf(outfile,"CAST (%p) type (",tree);
+		fprintf(outfile,"CAST (%p) from type (",tree);
+		printTypeChain(tree->right->ftype,outfile);
+		fprintf(outfile,") to type (");
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
 		ast_print(tree->right,outfile,indent+4);
@@ -4888,5 +4904,5 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 
 void PA(ast *t)
 {
-	ast_print(t,stdout,1);
+	ast_print(t,stdout,0);
 }

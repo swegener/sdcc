@@ -1912,7 +1912,7 @@ printTypeChain (sym_link * start, FILE * of)
     }
 
   if (start==NULL) {
-    fprintf (of, "**err**");
+    fprintf (of, "void");
     return;
   }
 

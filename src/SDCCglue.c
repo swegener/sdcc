@@ -260,7 +260,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	  allocInfo = 1;
 
 	  /* if the ival was a symbol, delete it from its segment */
-	  if (symIval=AST_SYMBOL(sym->ival->init.node)) {
+	  if ((symIval=AST_SYMBOL(sym->ival->init.node))) {
 	    segment = SPEC_OCLS (symIval->etype);
 	    deleteSetItem (&segment->syms, symIval);
 	  }

@@ -1,7 +1,8 @@
 2003-04-13  Borut Razem <borut.razem@siol.net>
 
 	* doc/sdccman.lyx: updated info about #pragma SAVE/RESTORE nesting
-	* configure.in, configure: fixed problems on cygwin/WinCVS environmet with ports.* line endings
+	* configure.in, configure: fixed problems on cygwin/WinCVS environmet with ports.* line endings;
+	  fixed mingw problem in adl_NORMALIZE_PATH
 
 2003-04-12  Borut Razem <borut.razem@siol.net>
 

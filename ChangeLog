@@ -1,3 +1,8 @@
+2004-01-12 Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCast.c (decorateType): replacing 'ul > 0' by  '!ul' results
+	in simpler and even better code
+
 2004-01-11 Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCicode.c (operandOperation): fixed bug #874819

@@ -3488,13 +3488,11 @@ decorateType (ast * tree)
 	    }
 	  if (tree->opval.op == '>')
 	    {
-	      tree->opval.op = '?';
-	      tree->right = newNode (':',
-				     newAst_VALUE (constVal ("1")),
-				     tree->right); /* val 0 */
-	      tree->right->lineno = tree->lineno;
-	      tree->right->left->lineno = tree->lineno;
-	      decorateType (tree->right);
+	      tree->opval.op = '!';
+	      tree->right = NULL;
+	      LRVAL (tree) = 1;
+	      TTYPE (tree) = TETYPE (tree) = newCharLink ();
+	      return tree;
 	    }
         }
       /* if they are both literal then */

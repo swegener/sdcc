@@ -198,6 +198,25 @@ dw		{LIST; return DW;}
 byte		{LIST; return DB;}
 bit		{LIST; return BITDEF;}
 reg		{LIST; return REGDEF;}
+area		{LIST; return AREA;}
+ds		{LIST; return DS;}
+DSEG		{LIST; yylval = AREA_DSEG; return AREA_NAME;}
+OSEG		{LIST; yylval = AREA_OSEG; return AREA_NAME;}
+ISEG		{LIST; yylval = AREA_ISEG; return AREA_NAME;}
+BSEG		{LIST; yylval = AREA_BSEG; return AREA_NAME;}
+XSEG		{LIST; yylval = AREA_XSEG; return AREA_NAME;}
+XISEG		{LIST; yylval = AREA_XISEG; return AREA_NAME;}
+GSINIT		{LIST; yylval = AREA_GSINIT; return AREA_NAME;}
+GSFINAL		{LIST; yylval = AREA_GSFINAL; return AREA_NAME;}
+HOME		{LIST; yylval = AREA_HOME; return AREA_NAME;}
+CSEG		{LIST; yylval = AREA_CSEG; return AREA_NAME;}
+module		{LIST; return MODULE;}
+globl		{LIST; return GLOBL;}
+\(DATA\)	{LIST; return AREA_DESC;}
+\(OVR,DATA\)	{LIST; return AREA_DESC;}
+\(BIT\)		{LIST; return AREA_DESC;}
+\(XDATA\)	{LIST; return AREA_DESC;}
+\(CODE\)	{LIST; return AREA_DESC;}
 low		{LIST; return LOW;}
 high		{LIST; return HIGH;}
 >>		{LIST; return RSHIFT;}

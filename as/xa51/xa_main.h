@@ -42,6 +42,27 @@ struct target {
         char *name;
         struct target *next; };
 
+struct area_struct {
+	int alloc_position;
+};
+
+extern int current_area;
+
+#define MEM_POS (area[current_area].alloc_position)
+
+#define AREA_CSEG	0
+#define AREA_DSEG	1
+#define AREA_OSEG	2
+#define AREA_ISEG	3
+#define AREA_BSEG	4
+#define AREA_XSEG	5
+#define AREA_XISEG	6
+#define AREA_GSINIT	7
+#define AREA_GSFINAL	8
+#define AREA_HOME	9
+#define NUM_AREAS	10
+
+extern struct area_struct area[NUM_AREAS];
 
 extern FILE *yyin;
 extern char *yytext;

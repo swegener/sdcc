@@ -56,6 +56,8 @@ static int bitmask[]={1, 2, 4, 8, 16, 32, 64, 128};
 %token WORD BIT NUMBER CHAR STRING EOL LOCAL_LABEL
 %token ORG EQU DB DW BITDEF REGDEF LOW HIGH
 %token RSHIFT LSHIFT
+%token AREA AREA_NAME AREA_DESC DS
+%token MODULE GLOBL 
 
 %left '&' '|' '^'
 %left RSHIFT LSHIFT
@@ -69,10 +71,18 @@ all:           line
              | line all;
 
 line:          linesymbol ':' linenosym {
-			if (p1) build_sym_list(symbol_name);
-			if (p2) assign_value(symbol_name, mem);
-			mem += $3; }
-             | linenosym {mem += $1;}
+			if (p1) {
+				build_sym_list(symbol_name);
+				if (current_area == AREA_BSEG) {
+					mk_bit(symbol_name);
+				}
+			}
+			if (p1 || p2) assign_value(symbol_name, MEM_POS);
+			MEM_POS += $3;
+		}
+             | linenosym {
+			MEM_POS += $1;
+		}
 
 linenosym:     directive EOL {
 			if (p3) out(op, $1);
@@ -88,12 +98,13 @@ linenosym:     directive EOL {
 		}
 	     | error EOL	/* try to recover from any parse error */
 
+
 directive:     '.' ORG expr {
-			mem = $3;
+			MEM_POS = $3;
 			$$ = 0;
 		}
 	     | ORG expr {
-			mem = $2;
+			MEM_POS = $2;
 			$$ = 0;
 		}
              | '.' EQU symbol ',' expr { 
@@ -145,8 +156,38 @@ directive:     '.' ORG expr {
 	     | dw_directive words {
 			$$ = dw_count;
 		}
+	     | '.' AREA AREA_NAME AREA_DESC {
+			if ($3 < 0 || $3 >= NUM_AREAS) {
+				error("Illegal Area Directive");
+			}
+			symbol_name[0] = '\0';
+			current_area = $3;
+			$$ = 0;
+		}
+	     | '.' MODULE WORD {
+			/* ignore module definition */
+			$$ = 0;
+		}
+	     | '.' GLOBL WORD {
+			/* ignore global symbol declaration */
+			$$ = 0;
+		}
+	     | '.' DS expr {
+			/* todo: if CSEG, emit some filler bytes */
+			$$ = $3;
+		}
 
 db_directive:	DB {db_count = 0;}
+
+
+linesymbol:    WORD  { 
+			strcpy(symbol_name, lex_sym_name);
+			if (!strchr(lex_sym_name, ':')) {
+				/* non-local label, remember base name */
+				strcpy(base_symbol_name, lex_sym_name);
+			}
+			if (is_target(symbol_name)) pad_with_nop();
+		}
 
 bytes:		  byte_element
 		| bytes ',' byte_element
@@ -184,14 +225,6 @@ word_element:	expr {
 		}
 
 
-linesymbol:    WORD  { 
-			strcpy(symbol_name, lex_sym_name);
-			if (!strchr(lex_sym_name, ':')) {
-				/* non-local label, remember base name */
-				strcpy(base_symbol_name, lex_sym_name);
-			}
-			if (is_target(symbol_name)) pad_with_nop();
-		}
 
 symbol:     WORD  {
 		strcpy(symbol_name, lex_sym_name);
@@ -917,20 +950,20 @@ instruction:
 | JMP jmpaddr {
 	$$ = 3;
 	op[0] = 0xD5;
-	op[1] = msb(rel16(mem + $$, $2));
-	op[2] = lsb(rel16(mem + $$, $2));
+	op[1] = msb(rel16(MEM_POS + $$, $2));
+	op[2] = lsb(rel16(MEM_POS + $$, $2));
   }
 
 | CALL jmpaddr {
         $$ = 3;
         op[0] = 0xC5;
-        op[1] = msb(rel16(mem + $$, $2));
-        op[2] = lsb(rel16(mem + $$, $2));
+        op[1] = msb(rel16(MEM_POS + $$, $2));
+        op[2] = lsb(rel16(MEM_POS + $$, $2));
   }
 | branch_inst jmpaddr {
 	$$ = 2;
 	op[0] = branch_opcode;
-	op[1] = rel8(mem + $$, $2);
+	op[1] = rel8(MEM_POS + $$, $2);
   }
 | CJNE REG ',' expr ',' jmpaddr {
         $$ = 4;
@@ -938,7 +971,7 @@ instruction:
 	op[0] = 0xE2 + size * 8;
 	op[1] = reg($2) * 16 + msb(direct_addr($4));
 	op[2] = lsb(direct_addr($4));
-	op[3] = rel8(mem + $$, $6);
+	op[3] = rel8(MEM_POS + $$, $6);
   }
 | CJNE REG ',' '#' expr ',' jmpaddr {
 	size  = find_size1(inst_size, $2);
@@ -946,13 +979,13 @@ instruction:
 		$$ = 4;
 		op[0] = 0xE3;
 		op[1] = reg($2) * 16;
-		op[2] = rel8(mem + $$, $7);
+		op[2] = rel8(MEM_POS + $$, $7);
 		op[3] = imm_data8($5);
 	} else {
 		$$ = 5;
 		op[0] = 0xEB;
 		op[1] = reg($2) * 16;
-		op[2] = rel8(mem + $$, $7);
+		op[2] = rel8(MEM_POS + $$, $7);
 		op[3] = msb(imm_data16($5));
 		op[4] = lsb(imm_data16($5));
 	}
@@ -963,13 +996,13 @@ instruction:
 		$$ = 4;
 		op[0] = 0xE3;
 		op[1] = reg_indirect($3) * 16 + 8;
-		op[2] = rel8(mem + $$, $9);
+		op[2] = rel8(MEM_POS + $$, $9);
 		op[3] = imm_data8($7);
 	} else {
 		$$ = 5;
 		op[0] = 0xEB;
 		op[1] = reg_indirect($3) * 16 + 8;
-		op[2] = rel8(mem + $$, $9);
+		op[2] = rel8(MEM_POS + $$, $9);
 		op[3] = msb(imm_data16($7));
 		op[4] = lsb(imm_data16($7));
 	}
@@ -979,7 +1012,7 @@ instruction:
 	size  = find_size1(inst_size, $2);
 	op[0] = 0x87 + size * 8;
 	op[1] = reg($2) * 16 + 8;
-	op[2] = rel8(mem + $$, $4);
+	op[2] = rel8(MEM_POS + $$, $4);
   }
 
 
@@ -989,7 +1022,7 @@ instruction:
 	op[0] = 0xE2 + size * 8;
 	op[1] = msb(direct_addr($2)) + 8;
 	op[2] = lsb(direct_addr($2));
-	op[3] = rel8(mem + $$, $4);
+	op[3] = rel8(MEM_POS + $$, $4);
   }
 
 | JB bit ',' jmpaddr {
@@ -997,7 +1030,7 @@ instruction:
 	op[0] = 0x97;
 	op[1] = 0x80 + msb(bit_addr($2));
 	op[2] = lsb(bit_addr($2));
-	op[3] = rel8(mem + $$, $4);
+	op[3] = rel8(MEM_POS + $$, $4);
   }
 
 | JBC bit ',' jmpaddr {
@@ -1005,7 +1038,7 @@ instruction:
 	op[0] = 0x97;
 	op[1] = 0xC0 + msb(bit_addr($2));
 	op[2] = lsb(bit_addr($2));
-	op[3] = rel8(mem + $$, $4);
+	op[3] = rel8(MEM_POS + $$, $4);
   }
 
 | JNB bit ',' jmpaddr {
@@ -1013,7 +1046,7 @@ instruction:
 	op[0] = 0x97;
 	op[1] = 0xA0 + msb(bit_addr($2));
 	op[2] = lsb(bit_addr($2));
-	op[3] = rel8(mem + $$, $4);
+	op[3] = rel8(MEM_POS + $$, $4);
   }
 
 

@@ -37,12 +37,17 @@ extern char *yytext;
 extern char last_line_text[];
 struct symbol *sym_list=NULL;
 struct target *targ_list=NULL;
-int lineno=1, mem=0;   /* mem is location in memory */
+int lineno=1;
 int p1=0, p2=0, p3=0;
 int expr_result, expr_ok, jump_dest, inst;
 int opcode, operand;
 char symbol_name[1000];
+struct area_struct area[NUM_AREAS];
+int current_area=AREA_CSEG;
 
+
+/* "mem" is replaced by area[current_area].alloc_position */
+/* int mem=0; */   /* mem is location in memory */
 
 /* add symbols to list when we find their definition in pass #1 */
 /* we will evaluate their values in pass #2, and figure out if */
@@ -266,11 +271,11 @@ void out(int *byte_list, int num)
 {
 	int i, first=1;
 
-	if (num > 0) fprintf(list_fp, "%06X: ", mem);
+	if (num > 0) fprintf(list_fp, "%06X: ", MEM_POS);
 	else fprintf(list_fp, "\t");
 
 	for (i=0; i<num; i++) {
-		hexout(byte_list[i], mem+i, 0);
+		hexout(byte_list[i], MEM_POS + i, 0);
 		if (!first && (i % 4) == 0) fprintf(list_fp, "\t");
 		fprintf(list_fp, "%02X", byte_list[i]);
 		if ((i+1) % 4 == 0) {
@@ -299,9 +304,9 @@ void pad_with_nop()
 
 	last_line_text[0] = '\0';
 
-	for(num=0; (mem + num) % BRANCH_SPACING; num++) ;
+	for(num=0; (MEM_POS + num) % BRANCH_SPACING; num++) ;
 	if (p3) out(nops, num);
-	mem += num;
+	MEM_POS += num;
 }
 
 /* print branch out of bounds error */
@@ -314,13 +319,13 @@ void boob_error()
 }
 
 /* output the jump either direction on carry */
-/* jump_dest and mem must have the proper values */
+/* jump_dest and MEM_POS must have the proper values */
 
 /* 
 void do_jump_on_carry()
 {
 	if (p3) {
-		operand = REL4(jump_dest, mem);
+		operand = REL4(jump_dest, MEM_POS);
 		if (operand < 0) {
 			operand *= -1;
 			operand -= 1;
@@ -348,6 +353,28 @@ int binary2int(char *str)
 }
 
 void print_usage();
+
+
+/* todo: someday this will allow the user to control where the */
+/* various memory areas go, and it will take care of assigning */
+/* positions to area which follow others (such as OSEG getting */
+/* set just after DSEG on the 2nd and 3rd passes when we have */
+/* leared the size needed for each segment */
+
+void init_areas(void)
+{
+	area[AREA_CSEG].alloc_position = 0;
+	area[AREA_DSEG].alloc_position = 0x30;
+	area[AREA_OSEG].alloc_position = 0x80;
+	area[AREA_ISEG].alloc_position = 0;
+	area[AREA_BSEG].alloc_position = 0;
+	area[AREA_XSEG].alloc_position = 0;
+	area[AREA_XISEG].alloc_position = 0;
+	area[AREA_GSINIT].alloc_position = 0;
+	area[AREA_GSFINAL].alloc_position = 0;
+	area[AREA_HOME].alloc_position = 0;
+}
+
 
 /* pass #1 (p1=1) find all symbol defs and branch target names */
 /* pass #2 (p2=1) align branch targets, evaluate all symbols */
@@ -398,10 +425,11 @@ int main(int argc, char **argv)
 
 	printf("    Building Symbol Table:\n");
 	p1 = 1;
-	mem = 0;
+	//mem = 0;
+	init_areas();
 	yyparse();
 	flag_targets();
-	// print_symbol_table();
+	print_symbol_table();
 	check_redefine();
 	p1 = 0;
 	p2 = 1;
@@ -409,7 +437,8 @@ int main(int argc, char **argv)
 	yyrestart(yyin);
 	lineno = 1;
 	printf("    Aligning Branch Targets:\n");
-	mem = 0;
+	//mem = 0;
+	init_areas();
 	yyparse();
 	// print_symbol_table();
 	p2 = 0;
@@ -418,7 +447,8 @@ int main(int argc, char **argv)
 	yyrestart(yyin);
 	lineno = 1;
 	printf("    Generating Object Code:\n");
-	mem = 0;
+	//mem = 0;
+	init_areas();
 	yyparse();
 	fclose(yyin);
 	hexout(0, 0, 1);  /* flush and close intel hex file output */

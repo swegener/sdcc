@@ -29,7 +29,7 @@
 //#define SIMNAME "s51"
 extern char simactive;
 void  openSimulator (char **,int);
-void  waitForSim ();
+void waitForSim(int timeout_ms, char *expect);
 void  closeSimulator ();
 void  sendSim(char *);
 char *simResponse();

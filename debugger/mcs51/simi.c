@@ -44,40 +44,69 @@ static char regBuff[MAX_SIM_BUFF];
 static char *sbp = simibuff;           /* simulator buffer pointer */
 extern char **environ;
 char simactive = 0;
-/*-----------------------------------------------------------------*/
-/* readSim - reads one character into simulator buffer             */
-/*-----------------------------------------------------------------*/
-void readSim(int resetp)
-{
-    int ch ;
-    /* if reset required then point to beginning of buffer */
-    if (resetp)
-	sbp = simibuff;
-    
-    Dprintf(D_simi, ("readSim: reading from sim["));
 
-    while ((ch = fgetc(simin))) {
 
-#ifdef SDCDB_DEBUG	
- if (D_simi) {
-  	fputc(ch,stdout);
- }
+#if 0
+#define MS_SLEEP(_ms) usleep(_ms * 1000)
 #endif
-
-	*sbp++ = ch;    
-    }
-
-    Dprintf(D_simi, ("] end readSim\n"));
-
-    *sbp = '\0';
-}
 
 /*-----------------------------------------------------------------*/
 /* waitForSim - wait till simulator is done its job                */
 /*-----------------------------------------------------------------*/
-void waitForSim()
+void waitForSim(int timeout_ms, char *expect)
 {
-    readSim(TRUE);
+  int i=0;
+  int ch;
+
+Dprintf(D_simi, ("waitForSim start(%d)\n", timeout_ms));
+    sbp = simibuff;
+
+    // MS_SLEEP(timeout_ms); dont need, in blocking mode.
+
+    while ((ch = fgetc(simin))) {
+      *sbp++ = ch;
+    }
+    *sbp = 0;
+    Dprintf(D_simi, ("waitForSim(%d) got[%s]\n", timeout_ms, simibuff));
+
+#if 0
+  hmmmm, I guess we are not running non-blocking, we may still
+  need this code...Im not sure how the above works, it must block
+  until something gets into the buffer, then fgetc() reads down the
+  buffer...
+    do {
+      while ((ch = fgetc(simin))) {
+        *sbp++ = ch;
+      }
+      *sbp = 0;
+printf("got1[%s]\n", simibuff);
+      MS_SLEEP(20);
+      timeout_ms -= 20;
+printf("..\n");
+
+      if (expect) {
+        if (strstr(expect, sbp)) {
+          timeout_ms = 0;
+        }
+      } else if (sbp != simibuff) {
+        timeout_ms = 0;
+      }
+
+      /* pull in data one more time after delay to try and
+         guarentee we pull in complete responce line */
+      if (timeout_ms <= 0) {
+printf(",,\n");
+        while ((ch = fgetc(simin))) {
+          *sbp++ = ch;
+        }
+        *sbp = 0;
+printf("got2[%s]\n", simibuff);
+      }
+    }
+    while (timeout_ms > 0);
+printf("...\n");
+#endif
+
 }
 
 /*-----------------------------------------------------------------*/
@@ -88,29 +117,18 @@ void openSimulator (char **args, int nargs)
     struct sockaddr_in sin;     
     int retry = 0;
     int i ;
-
-#if 0
-    char *simargs[32] = { "s51","-P","-r 9756", NULL };
-    
-    /* create the arguments */
-    for ( i = 0 ; i < nargs ;i++) {
-	simargs[i+3] = args[i];       
-    }
-    simargs[i+3]= NULL;
-#endif
+ Dprintf(D_simi, ("openSimulator\n"));
 
     /* fork and start the simulator as a subprocess */
     if ((simPid = fork())) {
       Dprintf(D_simi, ("simulator pid %d\n",(int) simPid));
     }
     else {
-	
-	/* we are in the child process : start the simulator */
-//	if (execvp("s51",simargs) < 0) {
-	if (execvp(args[0],args) < 0) {
-	    perror("cannot exec simulator");
-	    exit(1);
-	}	
+      /* we are in the child process : start the simulator */
+      if (execvp(args[0],args) < 0) {
+        perror("cannot exec simulator");
+        exit(1);
+      }
     }
     
  try_connect:
@@ -145,8 +163,8 @@ void openSimulator (char **args, int nargs)
 	exit(1);
     }
 
-    /* now that we have opend wait for the prompt */
-    waitForSim();
+    /* now that we have opened, wait for the prompt */
+    waitForSim(200,NULL);
     simactive = 1;
 }
 /*-----------------------------------------------------------------*/
@@ -209,7 +227,7 @@ unsigned long simGetValue (unsigned int addr,char mem, int size)
     /* create the simulator command */
     sprintf(buffer,"%s 0x%x \n",prefix,addr);
     sendSim(buffer);
-    waitForSim();
+    waitForSim(100,NULL);
     resp = simResponse();
 
     /* got the response we need to parse it the response
@@ -266,7 +284,7 @@ void simSetBP (unsigned int addr)
 
     sprintf(buff,"break 0x%x\n",addr);
     sendSim(buff);
-    waitForSim();
+    waitForSim(100,NULL);
 }
 
 /*-----------------------------------------------------------------*/
@@ -278,7 +296,7 @@ void simClearBP (unsigned int addr)
 
     sprintf(buff,"clear 0x%x\n",addr);
     sendSim(buff);
-    waitForSim();  
+    waitForSim(100,NULL);
 }
 
 /*-----------------------------------------------------------------*/
@@ -291,7 +309,7 @@ void simLoadFile (char *s)
     sprintf(buff,"l \"%s\"\n",s);
     printf(buff);
     sendSim(buff);
-    waitForSim();    
+    waitForSim(500,NULL);
 }
 
 /*-----------------------------------------------------------------*/
@@ -302,11 +320,12 @@ unsigned int simGoTillBp ( unsigned int gaddr)
     char *sr, *svr;
     unsigned addr ; 
     char *sfmt;
+    int wait_ms = 1000;
 
-    /* kpb: new code 8-03-01 */
     if (gaddr == 0) {
       /* initial start, start & stop from address 0 */
-     	char buf[20];
+      char buf[20];
+
          // this program is setting up a bunch of breakpoints automatically
          // at key places.  Like at startup & main() and other function
          // entry points.  So we don't need to setup one here..
@@ -314,32 +333,17 @@ unsigned int simGoTillBp ( unsigned int gaddr)
       //sleep(1);
       //waitForSim();
 
-     	sendSim("run 0x0\n");
-      sleep(1);  /* do I need this? */
+      sendSim("run 0x0\n");
     } else	if (gaddr == -1) { /* resume */
-
-      // try adding this(kpb)
-      sendSim("step\n");
-      usleep(100000);
-      waitForSim();
-
-     	sendSim ("run\n");
+      sendSim ("run\n");
+      wait_ms = 100;
     }
     else {
       printf("Error, simGoTillBp > 0!\n");
       exit(1);
     }
 
-#if 0
-    if (gaddr != -1) {
-	char buf[20];
-	sprintf(buf,"g 0x%x\n",gaddr);
-	sendSim(buf);
-    } else	
-	sendSim ("g\n");
-#endif
-    
-    waitForSim();
+    waitForSim(wait_ms, NULL);
     
     /* get the simulator response */
     svr  = sr = strdup(simResponse());
@@ -349,19 +353,18 @@ unsigned int simGoTillBp ( unsigned int gaddr)
        [... F* <addr> <disassembled instruction> ] 
        we will ignore till we get F* then parse the address */
     while (*sr) {
-	
-	if (strncmp(sr,"Stop at",7) == 0) {
-	    sr += 7;
-	    sfmt = "%x";
-	    break;
-	} 
-	    
-	if (*sr == 'F' && ( *(sr+1) == '*' || *(sr+1) == ' ')) {
-	    sr += 2;
-	    sfmt = "%x";
-	    break;
-	}
-	sr++;
+      if (strncmp(sr,"Stop at",7) == 0) {
+          sr += 7;
+          sfmt = "%x";
+          break;
+      } 
+
+      if (*sr == 'F' && ( *(sr+1) == '*' || *(sr+1) == ' ')) {
+          sr += 2;
+          sfmt = "%x";
+          break;
+      }
+      sr++;
     }
 
     if (!*sr) {
@@ -385,7 +388,7 @@ unsigned int simGoTillBp ( unsigned int gaddr)
 void simReset ()
 {
     sendSim("res\n");
-    waitForSim();
+    waitForSim(100,NULL);
 }
 
 /*-----------------------------------------------------------------*/
@@ -419,10 +422,9 @@ char  *simRegs()
     int i;
 
     sendSim("info registers\n");
-    //kpb(8-5-01) sendSim("dr\n");
 
-    waitForSim();
-    /* make it some more readable */
+    waitForSim(100,NULL);
+         
     resp  = simResponse();
 
     return resp;

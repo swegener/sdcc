@@ -1925,7 +1925,7 @@ int cmdSimulator (char *s, context *cctxt)
     strcpy(tmpstr, s);
     strcat(tmpstr, "\n");
     sendSim(tmpstr);
-    waitForSim();
+    waitForSim(200,NULL);
     fprintf(stdout,"%s",simResponse());
     return 0;
 }

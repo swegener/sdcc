@@ -40,7 +40,7 @@ linkrec **linkrecs = NULL; /* all linkage editor records */
 context *currCtxt = NULL;
 short fullname = 0;
 char *ssdirl = SDCC_LIB_DIR ":" SDCC_LIB_DIR "/small" ;
-char *simArgs[20];
+char *simArgs[40];
 int nsimArgs = 0;
 char model_str[20];
 
@@ -765,6 +765,8 @@ static void parseCmdLine (int argc, char **argv)
     int i ;
     char *filename = NULL;
     int passon_args_flag = 0;  /* if true, pass on args to simulator */
+
+    Dprintf(D_sdcdb, ("parseCmdLine\n"));
 
     for ( i = 1; i < argc ; i++) {
   //fprintf(stdout,"%s\n",argv[i]);

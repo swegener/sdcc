@@ -1,5 +1,15 @@
 2001-11-04  Michael Hope  <michaelh@juju.net.nz>
 
+	* device/include/malloc.h: Added z80 and gbz80 support.
+
+	* device/lib/gbz80/heap.s: Added.
+
+	* device/lib/z80/heap.s: Added.
+
+	* device/lib/malloc.c: Added z80 and gbz80 support.
+
+	* support/regression/tests/malloc.c (testMalloc): Added.
+
 	* src/SDCCmain.c (parseCmdLine): Added support for -Wp.
 
 	* support/regression/tests/bug-478094.c: Added.

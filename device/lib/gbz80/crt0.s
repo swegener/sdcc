@@ -44,6 +44,7 @@ init:
         
 	.area	_DATA
         .area   _BSS
+        .area   _HEAP
 
         .area   _CODE
 __clock::

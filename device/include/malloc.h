@@ -22,10 +22,17 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 /* malloc.h */
-#define MEMHEADER   struct MAH// Memory Allocation Header
-
 #ifndef __SDCC51_MALLOC_H
 #define __SDCC51_MALLOC_H
+#include <sdcc-lib.h>
+
+#if _SDCC_MALLOC_TYPE_MLH
+void *malloc (unsigned int);
+void free(void *p);
+
+#else
+
+#define MEMHEADER   struct MAH// Memory Allocation Header
 
 MEMHEADER
 {
@@ -48,6 +55,7 @@ extern void init_dynamic_memory(MEMHEADER xdata *  , unsigned int );
 extern void xdata * malloc (unsigned int );
 extern void free (void xdata *  p);
 
+#endif
 #endif
 
 #endif

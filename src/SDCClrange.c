@@ -422,11 +422,11 @@ void markLiveRanges (eBBlock *ebp, eBBlock **ebbs, int count)
 
     /* for all the definitions in the block */
     /* compute and set the live from        */
-    if ( ebp->defSet && ! bitVectIsZero(ebp->defSet)) {
-	for ( i = 0 ; i < ebp->defSet->size ; i++ ) {
+    if ( ebp->ldefs && ! bitVectIsZero(ebp->ldefs)) {
+	for ( i = 0 ; i < ebp->ldefs->size ; i++ ) {
 	    iCode *dic;	    
 	    
-	    if (bitVectBitValue(ebp->defSet,i) &&	   
+	    if (bitVectBitValue(ebp->ldefs,i) &&	   
 		(dic = hTabItemWithKey(iCodehTab,i))) {
 		
 		/* if the definition has a from & it is greater */

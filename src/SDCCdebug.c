@@ -17,11 +17,15 @@ void outputDebugStackSymbols(void)
   {
     symbol *sym;
 
-    for (sym = setFirstItem (xstack->syms); sym; sym = setNextItem (xstack->syms))
-      debugFile->writeSymbol(sym);
+    if (xstack) {
+      for (sym = setFirstItem (xstack->syms); sym; sym = setNextItem (xstack->syms))
+        debugFile->writeSymbol(sym);
+    }
 
-    for (sym = setFirstItem (istack->syms); sym; sym = setNextItem (istack->syms))
-      debugFile->writeSymbol(sym);
+    if (istack) {
+      for (sym = setFirstItem (istack->syms); sym; sym = setNextItem (istack->syms))
+        debugFile->writeSymbol(sym);
+    }
   }
 
 }
@@ -52,39 +56,57 @@ void outputDebugSymbols(void)
   {
     symbol *sym;
            
-    for (sym = setFirstItem (data->syms); sym; sym = setNextItem (data->syms))
-      debugFile->writeSymbol(sym);        
+    if (data) {
+      for (sym = setFirstItem (data->syms); sym; sym = setNextItem (data->syms))
+        debugFile->writeSymbol(sym);
+    }
 
-    for (sym = setFirstItem (idata->syms); sym; sym = setNextItem (idata->syms))
-      debugFile->writeSymbol(sym);        
+    if (idata) {
+      for (sym = setFirstItem (idata->syms); sym; sym = setNextItem (idata->syms))
+        debugFile->writeSymbol(sym);
+    }
 
-    for (sym = setFirstItem (bit->syms); sym; sym = setNextItem (bit->syms))
-      debugFile->writeSymbol(sym);        
+    if (bit) {
+      for (sym = setFirstItem (bit->syms); sym; sym = setNextItem (bit->syms))
+        debugFile->writeSymbol(sym);
+    }
 
-    for (sym = setFirstItem (xdata->syms); sym; sym = setNextItem (xdata->syms))
-      debugFile->writeSymbol(sym);        
+    if (xdata) {
+      for (sym = setFirstItem (xdata->syms); sym; sym = setNextItem (xdata->syms))
+        debugFile->writeSymbol(sym);
+    }
 
-    if(port->genXINIT) {
+    if(port->genXINIT && xidata) {
       for (sym = setFirstItem (xidata->syms); sym; sym = setNextItem (xidata->syms))
 	debugFile->writeSymbol(sym);        
     }
 
-    for (sym = setFirstItem (sfr->syms); sym; sym = setNextItem (sfr->syms))
-      debugFile->writeSymbol(sym);        
+    if (sfr) {
+      for (sym = setFirstItem (sfr->syms); sym; sym = setNextItem (sfr->syms))
+        debugFile->writeSymbol(sym);
+    }
 
-    for (sym = setFirstItem (sfrbit->syms); sym; sym = setNextItem (sfrbit->syms))
-      debugFile->writeSymbol(sym);        
+    if (sfrbit) {
+      for (sym = setFirstItem (sfrbit->syms); sym; sym = setNextItem (sfrbit->syms))
+        debugFile->writeSymbol(sym);
+    }
 
-    for (sym = setFirstItem (home->syms); sym; sym = setNextItem (home->syms))
-      debugFile->writeSymbol(sym);        
+    if (home) {
+      for (sym = setFirstItem (home->syms); sym; sym = setNextItem (home->syms))
+        debugFile->writeSymbol(sym);
+    }
 
-    for (sym = setFirstItem (code->syms); sym; sym = setNextItem (code->syms))
-      debugFile->writeSymbol(sym);        
+    if (code) {
+      for (sym = setFirstItem (code->syms); sym; sym = setNextItem (code->syms))
+        debugFile->writeSymbol(sym);
+    }
 
-    for (sym = setFirstItem (statsg->syms); sym; sym = setNextItem (statsg->syms))
-      debugFile->writeSymbol(sym);        
+    if (statsg) {
+      for (sym = setFirstItem (statsg->syms); sym; sym = setNextItem (statsg->syms))
+        debugFile->writeSymbol(sym);
+    }
 
-    if(port->genXINIT) {
+    if(port->genXINIT && xinit) {
       for (sym = setFirstItem (xinit->syms); sym; sym = setNextItem (xinit->syms))
 	debugFile->writeSymbol(sym);        
     }
@@ -97,6 +119,9 @@ void outputDebugSymbols(void)
 void dumpSymInfo(char *pcName, memmap *memItem)
 {
   symbol *sym;
+
+  if (!memItem)
+    return;
 
   printf("--------------------------------------------\n");
   printf(" %s\n", pcName);

@@ -1,3 +1,8 @@
+2003-12-10 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCdebug.c (outputDebugSymbols, outputDebugStackSymbols, dumpSymInfo):
+	gracefully handle NULL memmap pointers
+
 2003-12-08 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCCopt.c (killDeadCode): change iCode type to DUMMY_READ_VOLATILE

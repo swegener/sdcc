@@ -75,11 +75,7 @@ char *preOutName;
 
 // In MSC VC6 default search path for exe's to path for this
 
-#if defined(_MSC_VER)
-
-char DefaultExePath[_MAX_PATH];
-
-#endif
+char DefaultExePath[128];
 
 /* Far functions, far data */
 #define OPTION_LARGE_MODEL "-model-large"
@@ -1273,7 +1269,7 @@ char *try_dir[] =
 
 //char *try_dir[]= {SRCDIR "/bin",PREFIX "/bin", NULL};
 char *try_dir[] =
-{NULL};
+{NULL, NULL}; /* First entry may be overwritten, so use two. */
 
 #endif
 
@@ -1533,6 +1529,7 @@ linkEdit (char **envp)
   buildCmdLine (buffer, port->linker.cmd, srcFileName, NULL, NULL, NULL);
   if (my_system (buffer))
     {
+      perror ("Cannot exec linker");
       exit (1);
     }
 #else
@@ -1565,6 +1562,7 @@ assemble (char **envp)
   buildCmdLine (buffer, port->assembler.cmd, srcFileName, NULL, NULL, asmOptions);
   if (my_system (buffer))
     {
+      perror ("Cannot exec assembler");
       exit (1);
     }
 #else
@@ -1648,6 +1646,7 @@ preProcess (char **envp)
 		    preOutName, srcFileName, preArgv);
       if (my_system (buffer))
 	{
+	  perror ("Cannot exec Preprocessor");
 	  exit (1);
 	}
 #else
@@ -1736,6 +1735,14 @@ main (int argc, char **argv, char **envp)
 
     if (i == 0)
       DefaultExePath[0] = '\0';
+  }
+#else
+
+  if (strchr(argv[0], '/'))
+  {
+      strcpy(DefaultExePath, argv[0]);
+      *(strrchr(DefaultExePath, '/')) = 0;
+      try_dir[0] = DefaultExePath;
   }
 
 #endif

@@ -34,7 +34,10 @@ enum
     R0_IDX, R1_IDX, DPL_IDX, 
     DPH_IDX, DPX_IDX, B_IDX, X8_IDX,
     X9_IDX, X10_IDX, X11_IDX,
-    X12_IDX, CND_IDX 
+    X12_IDX, CND_IDX ,
+    A_IDX, DPL1_IDX, DPH1_IDX,
+    DPX1_IDX, DPS_IDX, AP_IDX,
+    END_IDX
   };
 
 

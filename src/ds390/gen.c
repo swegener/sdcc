@@ -79,6 +79,7 @@ static struct
     short dptrInUse;
     short dptr1InUse;
     set *sendSet;
+    iCode *current_iCode;
   }
 _G;
 
@@ -130,6 +131,9 @@ static unsigned char SRMask[] =
 				emitcode ("","!tlabeldef",lbl->key+100);	\
     			}}
 
+static int _currentDPS;		/* Current processor DPS. */
+static int _desiredDPS;		/* DPS value compiler thinks we should be using. */
+static int _lazyDPS = 0;	/* if non-zero, we are doing lazy evaluation of DPS changes. */
 
 /*-----------------------------------------------------------------*/
 /* emitcode - writes the code into a file : for now it is simple    */
@@ -177,6 +181,8 @@ emitcode (char *inst, char *fmt,...)
     
     lineCurr->isInline = _G.inLine;
     lineCurr->isDebug = _G.debugLine;
+    lineCurr->ic = _G.current_iCode;
+    lineCurr->aln = ds390newAsmLineNode(_currentDPS);
     va_end (ap);
 }
 
@@ -310,9 +316,6 @@ newAsmop (short type)
   return aop;
 }
 
-static int _currentDPS;		/* Current processor DPS. */
-static int _desiredDPS;		/* DPS value compiler thinks we should be using. */
-static int _lazyDPS = 0;	/* if non-zero, we are doing lazy evaluation of DPS changes. */
 
 /*-----------------------------------------------------------------*/
 /* genSetDPTR: generate code to select which DPTR is in use (zero  */
@@ -3018,6 +3021,11 @@ genFunction (iCode * ic)
 			emitcode ("push", "%s", ds390_regWithIdx (i)->dname);
 		    }
 		}
+	      else if (ds390_ptrRegReq)
+	        {
+		  emitcode ("push", "%s", ds390_regWithIdx (R0_IDX)->dname);
+		  emitcode ("push", "%s", ds390_regWithIdx (R1_IDX)->dname);
+		}
 
 	    }
 	  else
@@ -3146,6 +3154,12 @@ genFunction (iCode * ic)
 		    }
 		}
 	    }
+	  else if (ds390_ptrRegReq)
+	    {
+	      emitcode ("push", "%s", ds390_regWithIdx (R0_IDX)->dname);
+	      emitcode ("push", "%s", ds390_regWithIdx (R1_IDX)->dname);
+	      _G.nRegsSaved += 2;
+	    }
 	}
     }
 
@@ -3242,6 +3256,11 @@ static void
 genEndFunction (iCode * ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
+  lineNode *lnp = lineCurr;
+  bitVect *regsUsed;
+  bitVect *regsUsedPrologue;
+  bitVect *regsUnneeded;
+  int idx;
 
   D (emitcode (";", "genEndFunction "););
 
@@ -3338,6 +3357,11 @@ genEndFunction (iCode * ic)
 			emitcode ("pop", "%s", ds390_regWithIdx (i)->dname);
 		    }
 		}
+	      else if (ds390_ptrRegReq)
+	        {
+		  emitcode ("pop", "%s", ds390_regWithIdx (R1_IDX)->dname);
+		  emitcode ("pop", "%s", ds390_regWithIdx (R0_IDX)->dname);
+		}
 
 	    }
 	  else
@@ -3433,6 +3457,11 @@ genEndFunction (iCode * ic)
 		    emitcode ("pop", "%s", ds390_regWithIdx (i)->dname);
 		}
 	    }
+	  else if (ds390_ptrRegReq)
+	    {
+	       emitcode ("pop", "%s", ds390_regWithIdx (R1_IDX)->dname);
+	       emitcode ("pop", "%s", ds390_regWithIdx (R0_IDX)->dname);
+	    }
 
 	}
 
@@ -3453,6 +3482,102 @@ genEndFunction (iCode * ic)
       emitcode ("ret", "");
     }
 
+  if (!port->peep.getRegsRead || !port->peep.getRegsWritten)
+    return;
+  
+  /* If this was an interrupt handler using bank 0 that called another */
+  /* function, then all registers must be saved; nothing to optimized. */
+  if (IFFUNC_ISISR (sym->type) && IFFUNC_HASFCALL(sym->type)
+      && !FUNC_REGBANK(sym->type))
+    return;
+    
+  /* Compute the registers actually used */
+  regsUsed = newBitVect (ds390_nRegs);
+  regsUsedPrologue = newBitVect (ds390_nRegs);
+  while (lnp)
+    {
+      if (lnp->ic && lnp->ic->op == FUNCTION)
+        regsUsedPrologue = bitVectUnion (regsUsedPrologue, port->peep.getRegsWritten(lnp));
+      else
+        regsUsed = bitVectUnion (regsUsed, port->peep.getRegsWritten(lnp));
+      
+      if (lnp->ic && lnp->ic->op == FUNCTION && lnp->prev
+          && lnp->prev->ic && lnp->prev->ic->op != FUNCTION)
+	break;
+      if (!lnp->prev)
+        break;
+      lnp = lnp->prev;
+    }
+
+  if (bitVectBitValue (regsUsedPrologue, DPS_IDX)
+      && !bitVectBitValue (regsUsed, DPS_IDX))
+    {
+      bitVectUnSetBit (regsUsedPrologue, DPS_IDX);
+    }
+    
+  if (bitVectBitValue (regsUsedPrologue, CND_IDX)
+      && !bitVectBitValue (regsUsed, CND_IDX))
+    {
+      regsUsed = bitVectUnion (regsUsed, regsUsedPrologue);
+      if (IFFUNC_ISISR (sym->type) && !FUNC_REGBANK(sym->type)
+          && !sym->stack)
+        bitVectUnSetBit (regsUsed, CND_IDX);
+    }
+  else
+    regsUsed = bitVectUnion (regsUsed, regsUsedPrologue);
+    
+  /* If this was an interrupt handler that called another function */
+  /* function, then assume working registers may be modified by it. */
+  if (IFFUNC_ISISR (sym->type) && IFFUNC_HASFCALL(sym->type))
+    {
+      regsUsed = bitVectSetBit (regsUsed, AP_IDX);
+      regsUsed = bitVectSetBit (regsUsed, DPX1_IDX);
+      regsUsed = bitVectSetBit (regsUsed, DPL1_IDX);
+      regsUsed = bitVectSetBit (regsUsed, DPH1_IDX);
+      regsUsed = bitVectSetBit (regsUsed, DPX_IDX);
+      regsUsed = bitVectSetBit (regsUsed, DPL_IDX);
+      regsUsed = bitVectSetBit (regsUsed, DPH_IDX);
+      regsUsed = bitVectSetBit (regsUsed, DPS_IDX);
+      regsUsed = bitVectSetBit (regsUsed, B_IDX);
+      regsUsed = bitVectSetBit (regsUsed, A_IDX);
+      regsUsed = bitVectSetBit (regsUsed, CND_IDX);
+    }
+
+  /* Remove the unneeded push/pops */
+  regsUnneeded = newBitVect (ds390_nRegs);
+  while (lnp)
+    {
+      if (lnp->ic && (lnp->ic->op == FUNCTION || lnp->ic->op == ENDFUNCTION))
+        {
+	  if (!strncmp(lnp->line, "push", 4))
+	    {
+	      idx = bitVectFirstBit (port->peep.getRegsRead(lnp));
+	      if (idx>=0 && !bitVectBitValue (regsUsed, idx))
+	        {
+	          connectLine (lnp->prev, lnp->next);
+		  regsUnneeded = bitVectSetBit (regsUnneeded, idx);
+		}
+	    }
+	  if (!strncmp(lnp->line, "pop", 3) || !strncmp(lnp->line, "mov", 3))
+	    {
+	      idx = bitVectFirstBit (port->peep.getRegsWritten(lnp));
+	      if (idx>=0 && !bitVectBitValue (regsUsed, idx))
+	        {
+		  connectLine (lnp->prev, lnp->next);
+		  regsUnneeded = bitVectSetBit (regsUnneeded, idx);
+		}
+	    }
+	}
+      lnp = lnp->next;
+    }  
+  
+  for (idx = 0; idx < regsUnneeded->size; idx++)
+    if (bitVectBitValue (regsUnneeded, idx))
+      emitcode ("", ";\teliminated unneeded push/pop %s", ds390_regWithIdx (idx)->dname);
+  
+  freeBitVect (regsUnneeded);
+  freeBitVect (regsUsed);
+  freeBitVect (regsUsedPrologue);
 }
 
 /*-----------------------------------------------------------------*/
@@ -13294,6 +13419,8 @@ gen390Code (iCode * lic)
   for (ic = lic; ic; ic = ic->next)
     {
 
+      _G.current_iCode = ic;
+      
       if (ic->lineno && cln != ic->lineno)
 	{
 	  if (options.debug)

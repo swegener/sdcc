@@ -1,3 +1,19 @@
+2004-03-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/ds390/ralloc.h,
+	* src/ds390/ralloc.c (ds390_regWithIdx),
+	* src/ds390/gen.c (emitcode),
+	* src/ds390/main.h,
+	* src/ds390/main.c (instructionSize, ds390newAsmLineNode, updateOpRW,
+	ds390opcodeCompare, asmLineNodeFromLineNode, getInstructionSize,
+	ds390operandCompare, getRegsRead, getRegsWritten,
+	initializeAsmLineNode): customized instruction size calculation for
+	ds390, started basis for some register optimizations
+	* src/ds390/gen.c (gen390Code, emitcode): associate iCodes with
+	corresponding assembly output
+	* src/ds390/gen.c (genFunction, genEndFunction): added case to handle
+	missing push/pop of r0/r1. Optimized push/pops
+
 2004-03-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/mcs51/main.c (instructionSize): fixed ACALL size

@@ -77,7 +77,13 @@ regs regs390[] =
   {REG_GPR, X10_IDX, REG_GPR, "x10", "x10", "xreg", 2, 0, 0},
   {REG_GPR, X11_IDX, REG_GPR, "x11", "x11", "xreg", 3, 0, 0},
   {REG_GPR, X12_IDX, REG_GPR, "x12", "x12", "xreg", 4, 0, 0},
-  {REG_CND, CND_IDX, REG_GPR, "C", "C", "xreg", 0, 0, 0},
+  {REG_CND, CND_IDX, REG_GPR, "C", "psw", "xreg", 0, 0, 0},
+  {0, DPL1_IDX, 0, "dpl1", "dpl1", "dpl1", 0, 0, 0},
+  {0, DPH1_IDX, 0, "dph1", "dph1", "dph1", 0, 0, 0},
+  {0, DPX1_IDX, 0, "dpx1", "dpx1", "dpx1", 0, 0, 0},
+  {0, DPS_IDX, 0, "dps", "dps", "dps", 0, 0, 0},
+  {0, A_IDX, 0, "a", "acc", "acc", 0, 0, 0},
+  {0, AP_IDX, 0, "ap", "ap", "ap", 0, 0, 0},
 };
 int ds390_nRegs = 13;
 static void spillThis (symbol *);
@@ -130,7 +136,7 @@ ds390_regWithIdx (int idx)
 {
   int i;
 
-  for (i = 0; i < ds390_nRegs; i++)
+  for (i = 0; i < sizeof(regs390)/sizeof(regs); i++)
     if (regs390[i].rIdx == idx)
       return &regs390[i];
 

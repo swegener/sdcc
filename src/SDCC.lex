@@ -569,27 +569,51 @@ static int process_pragma(char *s)
 #define PRAGMA_STR  "#pragma"
 #define PRAGMA_LEN  ((sizeof PRAGMA_STR) - 1)
 
-  static struct pragma_s {
-    const char *name;
-    enum pragma_id id;
-  } pragma_tbl[] = {
-    { "SAVE",           P_SAVE },
-    { "RESTORE",        P_RESTORE },
-    { "NOINDUCTION",    P_NOINDUCTION },
-    { "NOINVARIANT",    P_NOINVARIANT },
-    { "NOLOOPREVERSE",  P_LOOPREV },
-    { "INDUCTION",      P_INDUCTION },
-    { "STACKAUTO",      P_STACKAUTO },
-    { "NOJTBOUND",      P_NOJTBOUND },
-    { "NOGCSE",         P_NOGCSE },
-    { "NOOVERLAY",      P_NOOVERLAY },
-    { "CALLEE-SAVES",   P_CALLEE_SAVES },
-    { "EXCLUDE",        P_EXCLUDE },
-    { "NOIV",           P_NOIV },
-    { "OVERLAY",        P_OVERLAY_ },
-    { "LESS_PEDANTIC",  P_LESSPEDANTIC },
+  static struct pragma_s
+    {
+      const char *name;
+      enum pragma_id id;
+      char deprecated;
+    } pragma_tbl[] = {
+    { "save",           P_SAVE,         0 },
+    { "restore",        P_RESTORE,      0 },
+    { "noinduction",    P_NOINDUCTION,  0 },
+    { "noinvariant",    P_NOINVARIANT,  0 },
+    { "noloopreverse",  P_LOOPREV,      0 },
+    { "induction",      P_INDUCTION,    0 },
+    { "stackauto",      P_STACKAUTO,    0 },
+    { "nojtbound",      P_NOJTBOUND,    0 },
+    { "nogcse",         P_NOGCSE,       0 },
+    { "nooverlay",      P_NOOVERLAY,    0 },
+    { "callee_saves",   P_CALLEE_SAVES, 0 },
+    { "exclude",        P_EXCLUDE,      0 },
+    { "noiv",           P_NOIV,         0 },
+    { "overlay",        P_OVERLAY_,     0 },
+    { "less_pedantic",  P_LESSPEDANTIC, 0 },
+
+    /*
+     * The following lines are deprecated pragmas,
+     * only for bacward compatibility.
+     * They should be removed in next major release after 1.4.0
+     */
+
+    { "SAVE",           P_SAVE,         1 },
+    { "RESTORE",        P_RESTORE,      1 },
+    { "NOINDUCTION",    P_NOINDUCTION,  1 },
+    { "NOINVARIANT",    P_NOINVARIANT,  1 },
+    { "NOLOOPREVERSE",  P_LOOPREV,      1 },
+    { "INDUCTION",      P_INDUCTION,    1 },
+    { "STACKAUTO",      P_STACKAUTO,    1 },
+    { "NOJTBOUND",      P_NOJTBOUND,    1 },
+    { "NOGCSE",         P_NOGCSE,       1 },
+    { "NOOVERLAY",      P_NOOVERLAY,    1 },
+    { "CALLEE-SAVES",   P_CALLEE_SAVES, 1 },
+    { "EXCLUDE",        P_EXCLUDE,      1 },
+    { "NOIV",           P_NOIV,         1 },
+    { "OVERLAY",        P_OVERLAY_,     1 },
+    { "LESS_PEDANTIC",  P_LESSPEDANTIC, 1 },
   };
-  char *cp ;
+  char *cp;
   int i;
 
   /* find the pragma */
@@ -610,17 +634,22 @@ static int process_pragma(char *s)
   if (port->process_pragma && !port->process_pragma(cp))
     return 0;
 
-  for (i = 0; i < NELEM(pragma_tbl); i++) {
-    /* now compare and do what needs to be done */
-    size_t len = strlen(pragma_tbl[i].name);
+  for (i = 0; i < NELEM(pragma_tbl); i++)
+    {
+      /* now compare and do what needs to be done */
+      size_t len = strlen(pragma_tbl[i].name);
 
-    if (strncmp(cp, pragma_tbl[i].name, len) == 0) {
-      doPragma(pragma_tbl[i].id, cp + len);
-      return 0;
+      if (strncmp(cp, pragma_tbl[i].name, len) == 0)
+        {
+          if (pragma_tbl[i].deprecated != 0)
+            werror(W_DEPRECATED_PRAGMA, pragma_tbl[i].name);
+
+          doPragma(pragma_tbl[i].id, cp + len);
+          return 0;
+        }
     }
-  }
 
-  werror(W_UNKNOWN_PRAGMA,cp);
+  werror(W_UNKNOWN_PRAGMA, cp);
   return 0;
 }
 

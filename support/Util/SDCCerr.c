@@ -396,7 +396,7 @@ struct
 { E_FUNC_ATTR, ERROR_LEVEL_ERROR,
     "function attribute following non-function declaration"},
 { W_SAVE_RESTORE, ERROR_LEVEL_PEDANTIC,
-    "unmatched #pragma SAVE and #pragma RESTORE" },
+    "unmatched #pragma save and #pragma restore" },
 { E_INVALID_CRITICAL, ERROR_LEVEL_ERROR,
     "not allowed in a critical section" },
 { E_NOT_ALLOWED, ERROR_LEVEL_ERROR,
@@ -405,6 +405,8 @@ struct
     "'%s' is not a %s tag" },
 { E_ENUM_NON_INTEGER, ERROR_LEVEL_ERROR,
    "enumeration constant not an integer" },
+{ W_DEPRECATED_PRAGMA, ERROR_LEVEL_WARNING,
+   "pragma %s is deprecated, please see documentation for details" },
 };
 
 /*

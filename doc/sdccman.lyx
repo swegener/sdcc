@@ -5997,8 +5997,8 @@ status Collapsed
  A warning message will be generated when this happens and the compiler
  will indicate the number of extra bytes it allocated.
  It is recommended that this option NOT be used, #pragma\SpecialChar ~
-NOGCSE
-\begin_inset LatexCommand \index{\#pragma NOGCSE}
+nogcse
+\begin_inset LatexCommand \index{\#pragma nogcse}
 
 \end_inset 
 
@@ -6034,8 +6034,8 @@ status Collapsed
  explained for the previous option.
  For more details of loop optimizations performed see section Loop Invariants.
  It is recommended that this option NOT be used, #pragma\SpecialChar ~
-NOINVARIANT
-\begin_inset LatexCommand \index{\#pragma NOINVARIANT}
+noinvariant
+\begin_inset LatexCommand \index{\#pragma noinvariant}
 
 \end_inset 
 
@@ -6065,8 +6065,8 @@ status Collapsed
  Will not do loop induction optimizations, see section strength reduction
  for more details.
  It is recommended that this option is NOT used, #pragma\SpecialChar ~
-NOINDUCTION
-\begin_inset LatexCommand \index{\#pragma NOINDUCTION}
+noinduction
+\begin_inset LatexCommand \index{\#pragma noinduction}
 
 \end_inset 
 
@@ -6112,8 +6112,8 @@ status Collapsed
 \SpecialChar ~
 Switch Statements for more details.
  It is recommended that this option is NOT used, #pragma\SpecialChar ~
-NOJTBOUND
-\begin_inset LatexCommand \index{\#pragma NOJTBOUND}
+nojtbound
+\begin_inset LatexCommand \index{\#pragma nojtbound}
 
 \end_inset 
 
@@ -6520,8 +6520,8 @@ status Collapsed
 
 -callee-saves option string.
  Also see #pragma\SpecialChar ~
-CALLEE-SAVES
-\begin_inset LatexCommand \index{\#pragma CALLEE-SAVES}
+callee_saves
+\begin_inset LatexCommand \index{\#pragma callee\_saves}
 
 \end_inset 
 
@@ -9160,8 +9160,8 @@ Note that the compiler (not the linkage editor) makes the decision for overlayin
 g the data items.
  Functions that are called from an interrupt service routine should be preceded
  by a #pragma\SpecialChar ~
-NOOVERLAY
-\begin_inset LatexCommand \index{\#pragma NOOVERLAY}
+nooverlay
+\begin_inset LatexCommand \index{\#pragma nooverlay}
 
 \end_inset 
 
@@ -9173,7 +9173,7 @@ Also note that the compiler does not do any processing of inline assembler
  of a function into the overlay segment if the inline assembler code calls
  other c-functions that might use the overlay.
  In that case the #pragma\SpecialChar ~
-NOOVERLAY should be used.
+nooverlay should be used.
 \layout Standard
 
 Parameters and local variables of functions that contain 16 or 32 bit multiplica
@@ -9193,10 +9193,10 @@ tion
 
 
 \family typewriter 
-#pragma SAVE 
+#pragma save 
 \newline 
-#pragma NOOVERLAY
-\begin_inset LatexCommand \index{\#pragma NOOVERLAY}
+#pragma nooverlay
+\begin_inset LatexCommand \index{\#pragma nooverlay}
 
 \end_inset 
 
@@ -9214,7 +9214,7 @@ P3 = errcd;
 \newline 
 } 
 \newline 
-#pragma RESTORE 
+#pragma restore 
 \newline 
 
 \newline 
@@ -9258,11 +9258,11 @@ errcd
 set_error
 \emph default 
  would be assigned to the overlayable segment if the #pragma\SpecialChar ~
-NOOVERLAY was
+nooverlay was
  not present, this could cause unpredictable runtime behavior when called
  from an interrupt service routine.
  The #pragma\SpecialChar ~
-NOOVERLAY ensures that the parameters and local variables for
+nooverlay ensures that the parameters and local variables for
  the function are NOT overlayed.
 \layout Section
 
@@ -9735,8 +9735,8 @@ Calling other functions from an interrupt service routine is not recommended,
  avoid it if possible.
  Note that when some function is called from an interrupt service routine
  it should be preceded by a #pragma\SpecialChar ~
-NOOVERLAY
-\begin_inset LatexCommand \index{\#pragma NOOVERLAY}
+nooverlay
+\begin_inset LatexCommand \index{\#pragma nooverlay}
 
 \end_inset 
 
@@ -11203,8 +11203,8 @@ reti\SpecialChar ~
 ; MUST explicitly include ret or reti in _naked function
 \layout Standard
 
-The related #pragma directive EXCLUDE
-\begin_inset LatexCommand \index{\#pragma EXCLUDE}
+The related directive #pragma exclude
+\begin_inset LatexCommand \index{\#pragma exclude}
 
 \end_inset 
 
@@ -13202,45 +13202,45 @@ Pragmas
 SDCC supports the following #pragma directives:
 \layout Itemize
 
-SAVE
-\begin_inset LatexCommand \index{\#pragma SAVE}
+save
+\begin_inset LatexCommand \index{\#pragma save}
 
 \end_inset 
 
- - this will save all current options to the SAVE/RESTORE stack.
- See RESTORE.
+ - this will save all current options to the save/restore stack.
+ See restore.
 \layout Itemize
 
-RESTORE
-\begin_inset LatexCommand \index{\#pragma RESTORE}
+restore
+\begin_inset LatexCommand \index{\#pragma restore}
 
 \end_inset 
 
  - will restore saved options from the last save.
- SAVEs & RESTOREs can be nested.
- SDCC uses a SAVE/RESTORE stack: SAVE pushes current options to the stack,
- RESTORE pulls current options from the stack.
- See SAVE.
+ saves & restores can be nested.
+ SDCC uses a save/restore stack: save pushes current options to the stack,
+ restore pulls current options from the stack.
+ See save.
 \layout Itemize
 
-NOGCSE
-\begin_inset LatexCommand \index{\#pragma NOGCSE}
+nogcse
+\begin_inset LatexCommand \index{\#pragma nogcse}
 
 \end_inset 
 
  - will stop global common subexpression elimination.
 \layout Itemize
 
-NOINDUCTION
-\begin_inset LatexCommand \index{\#pragma NOINDUCTION}
+noinduction
+\begin_inset LatexCommand \index{\#pragma noinduction}
 
 \end_inset 
 
  - will stop loop induction optimizations.
 \layout Itemize
 
-NOJTBOUND
-\begin_inset LatexCommand \index{\#pragma NOJTBOUND}
+nojtbound
+\begin_inset LatexCommand \index{\#pragma nojtbound}
 
 \end_inset 
 
@@ -13254,8 +13254,8 @@ NOJTBOUND
 .
 \layout Itemize
 
-NOOVERLAY
-\begin_inset LatexCommand \index{\#pragma NOOVERLAY}
+nooverlay
+\begin_inset LatexCommand \index{\#pragma nooverlay}
 
 \end_inset 
 
@@ -13263,8 +13263,8 @@ NOOVERLAY
  function.
 \layout Itemize
 
-LESS_PEDANTIC
-\begin_inset LatexCommand \index{\#pragma LESS\_PEDANTIC}
+less_pedantic
+\begin_inset LatexCommand \index{\#pragma less\_pedantic}
 
 \end_inset 
 
@@ -13272,20 +13272,20 @@ LESS_PEDANTIC
  your own now ;-(
 \layout Itemize
 
-NOLOOPREVERSE
-\begin_inset LatexCommand \index{\#pragma NOLOOPREVERSE}
+noloopreverse
+\begin_inset LatexCommand \index{\#pragma noloopreverse}
 
 \end_inset 
 
  - Will not do loop reversal optimization
 \layout Itemize
 
-EXCLUDE
-\begin_inset LatexCommand \index{\#pragma EXCLUDE}
+exclude
+\begin_inset LatexCommand \index{\#pragma exclude}
 
 \end_inset 
 
- NONE | {acc[,b[,dpl[,dph]]] - The exclude pragma disables generation of
+ none | {acc[,b[,dpl[,dph]]] - The exclude pragma disables generation of
  pair of push/pop
 \begin_inset LatexCommand \index{push/pop}
 
@@ -13300,17 +13300,17 @@ EXCLUDE
  The directive should be placed immediately before the ISR function definition
  and it affects ALL ISR functions following it.
  To enable the normal register saving for ISR functions use #pragma\SpecialChar ~
-EXCLUDE\SpecialChar ~
+exclude\SpecialChar ~
 none
-\begin_inset LatexCommand \index{\#pragma EXCLUDE}
+\begin_inset LatexCommand \index{\#pragma exclude}
 
 \end_inset 
 
 .
 \layout Itemize
 
-NOIV
-\begin_inset LatexCommand \index{\#pragma NOIV}
+noiv
+\begin_inset LatexCommand \index{\#pragma noiv}
 
 \end_inset 
 
@@ -13334,8 +13334,8 @@ NOIV
 about interrupts.
 \layout Itemize
 
-CALLEE-SAVES
-\begin_inset LatexCommand \index{\#pragma CALLEE-SAVES}
+callee_saves
+\begin_inset LatexCommand \index{\#pragma callee\_saves}
 
 \end_inset 
 
@@ -13372,12 +13372,15 @@ status Collapsed
 
 -callee-saves command line option is used, the function names specified
  in #pragma\SpecialChar ~
-CALLEE-SAVES
-\begin_inset LatexCommand \index{\#pragma CALLEE-SAVES}
+callee_saves
+\begin_inset LatexCommand \index{\#pragma callee\_saves}
 
 \end_inset 
 
  is appended to the list of functions specified in the command line.
+\layout Standard
+
+SDCPP supports the following #pragma directives:
 \layout Itemize
 
 preproc_asm
@@ -13401,8 +13404,8 @@ The pragma's are intended to be used to turn-on or off certain optimizations
 
 
 \family typewriter 
-#pragma SAVE
-\begin_inset LatexCommand \index{\#pragma SAVE}
+#pragma save
+\begin_inset LatexCommand \index{\#pragma save}
 
 \end_inset 
 
@@ -13415,8 +13418,8 @@ The pragma's are intended to be used to turn-on or off certain optimizations
 \SpecialChar ~
 /* save the current settings */ 
 \newline 
-#pragma NOGCSE
-\begin_inset LatexCommand \index{\#pragma NOGCSE}
+#pragma nogcse
+\begin_inset LatexCommand \index{\#pragma nogcse}
 
 \end_inset 
 
@@ -13427,8 +13430,8 @@ The pragma's are intended to be used to turn-on or off certain optimizations
 \SpecialChar ~
 /* turnoff global subexpression elimination */ 
 \newline 
-#pragma NOINDUCTION
-\begin_inset LatexCommand \index{\#pragma NOINDUCTION}
+#pragma noinduction
+\begin_inset LatexCommand \index{\#pragma noinduction}
 
 \end_inset 
 
@@ -13454,8 +13457,8 @@ int foo ()
 \newline 
 } 
 \newline 
-#pragma RESTORE
-\begin_inset LatexCommand \index{\#pragma RESTORE}
+#pragma restore
+\begin_inset LatexCommand \index{\#pragma restore}
 
 \end_inset 
 
@@ -13463,7 +13466,7 @@ int foo ()
 \layout Standard
 
 The compiler will generate a warning message when extra space is allocated.
- It is strongly recommended that the SAVE and RESTORE pragma's be used when
+ It is strongly recommended that the save and restore pragma's be used when
  changing options for a function.
 \layout Section
 
@@ -16993,8 +16996,8 @@ status Collapsed
 \end_inset 
 
 -noinduction option) or for a given function only using #pragma\SpecialChar ~
-NOINDUCTION
-\begin_inset LatexCommand \index{\#pragma NOINDUCTION}
+noinduction
+\begin_inset LatexCommand \index{\#pragma noinduction}
 
 \end_inset 
 
@@ -17589,8 +17592,8 @@ then both the switch statements will be implemented using jump-tables whereas
  You might also consider inserting dummy cases 0 and 5 to 8 in this example.
  
 \newline 
-The pragma NOJTBOUND
-\begin_inset LatexCommand \index{\#pragma NOJTBOUND}
+The pragma nojtbound
+\begin_inset LatexCommand \index{\#pragma nojtbound}
 
 \end_inset 
 

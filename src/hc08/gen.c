@@ -68,6 +68,7 @@ static struct
     int stackPushes;
     short regsinuse;
     set *sendSet;
+    iCode *current_iCode;
   }
 _G;
 
@@ -168,6 +169,7 @@ emitcode (char *inst, char *fmt,...)
 		(lineHead = newLineNode (lb)));
   lineCurr->isInline = _G.inLine;
   lineCurr->isDebug = _G.debugLine;
+  lineCurr->ic = _G.current_iCode;
 
   //printf("%s\n", lb);
   va_end (ap);
@@ -7210,6 +7212,7 @@ genJumpTab (iCode * ic)
   emitcode ("add","1,s");
   transferRegReg (hc08_reg_a, hc08_reg_x, TRUE);
   loadRegFromConst (hc08_reg_h, zero);
+  pullReg (hc08_reg_a);
 
   jtab = newiTempLabel (NULL);
   emitcode ("jmp", "%05d$,x", jtab->key + 100);
@@ -7597,7 +7600,8 @@ genhc08Code (iCode * lic)
 
   for (ic = lic; ic; ic = ic->next)
     {
-
+      _G.current_iCode = ic;
+      
       if (ic->lineno && cln != ic->lineno)
 	{
 	  if (options.debug)

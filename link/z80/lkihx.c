@@ -127,7 +127,7 @@ ihx(i)
 				fprintf(ofp, "00");
 			}
 		}
-		fprintf(ofp, "%02X\n", (-chksum) & 0xff);
+		fprintf(ofp, "%02X\n", (0-chksum) & 0xff);
 	} else {
 		fprintf(ofp, ":00000001FF\n");
 	}

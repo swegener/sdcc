@@ -227,7 +227,7 @@ term()
 		return(v);
 	}
 	if (c == '-') {
-		return(-expr(100));
+		return(0-expr(100));
 	}
 	if (c == '~') {
 		return(~expr(100));

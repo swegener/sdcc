@@ -171,7 +171,7 @@ VOID gb(int in)
     chk = 0;
     for(pos = 0x0134; pos < 0x014D; pos++)
       chk += cart[pos/SEGSIZE][pos%SEGSIZE];
-    cart[0x014D/SEGSIZE][0x014D%SEGSIZE] = 0xE7 - (chk&0xFF);
+    cart[0x014D/SEGSIZE][0x014D%SEGSIZE] = (unsigned char)(0xE7 - (chk&0xFF));
     /* Update checksum */
     chk = 0;
     cart[0x014E/SEGSIZE][0x014E%SEGSIZE] = 0;
@@ -179,8 +179,8 @@ VOID gb(int in)
     for(i = 0; i < NBSEG; i++)
       for(pos = 0; pos < SEGSIZE; pos++)
 	chk += cart[i][pos];
-    cart[0x014E/SEGSIZE][0x014E%SEGSIZE] = (chk>>8)&0xFF;
-    cart[0x014F/SEGSIZE][0x014F%SEGSIZE] = chk&0xFF;
+    cart[0x014E/SEGSIZE][0x014E%SEGSIZE] = (unsigned char)((chk>>8)&0xFF);
+    cart[0x014F/SEGSIZE][0x014F%SEGSIZE] = (unsigned char)(chk&0xFF);
 
     for(i = 0; i < NBSEG; i++)
       fwrite(cart[i], 1, SEGSIZE, ofp);

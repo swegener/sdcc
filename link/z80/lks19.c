@@ -116,7 +116,7 @@ s19(i)
 				chksum += rtval[i];
 			}
 		}
-		fprintf(ofp, "%02X\n", (-chksum-1) & 0xff);
+		fprintf(ofp, "%02X\n", (0-chksum-1) & 0xff);
 	} else {
 		fprintf(ofp, "S9030000FC\n");
 	}

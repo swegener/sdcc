@@ -448,7 +448,7 @@ extern	char	*rp;		/*	pointer into the LST file
 extern	char	rb[NINPUT];	/*	LST file text line being
 				 *	address relocated
 				 */
-extern	char	ctype[];	/*	array of character types, one per
+extern	unsigned char	ctype[];	/*	array of character types, one per
 				 *	ASCII character
 				 */
 

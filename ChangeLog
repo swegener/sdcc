@@ -1,3 +1,7 @@
+2001-10-07    <johan@FRIJA>
+
+	* device/lib/gets.c (gets): fixed the return value.
+
 2001-10-06  Michael Hope  <michaelh@juju.net.nz>
 
 	* src/SDCCpeeph.c (peepHole): Fixed all leaks.  Added trace support for freeing lines.  Optimised restart logic to re-run instead of restart.  Now compiles dscan.c on ~60MB instead of ~200MB.

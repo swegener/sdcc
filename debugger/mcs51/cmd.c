@@ -576,6 +576,8 @@ void simGo (unsigned int gaddr)
     unsigned int addr ;
     context *ctxt;
     int rv;
+    static int initial_break_flag = 0;
+
  top:    
     addr = simGoTillBp (gaddr);
 
@@ -594,7 +596,14 @@ void simGo (unsigned int gaddr)
        if not then we continue with the execution 
        of the program */
     if (!rv) {
-      fprintf(stdout, "Stopping at non-user breakpoint\n");
+      if (!initial_break_flag) {
+        initial_break_flag = 1;  // kludge to stop only at first run
+        fprintf(stdout, "Stopping at entry.  You can now list and set breakpoints\n");
+      }
+      else {
+       	gaddr = -1;
+       	goto top ;
+      }
 
 // notes: kpb
 // I took this out, after running "run" it would just keep re-running

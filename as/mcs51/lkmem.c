@@ -237,7 +237,7 @@ int summary(struct area * areap)
 
 	if(Ram[5].Size!=0)
 	{
-		sprintf(buff, "%ld bytes in DRAM wasted.  "
+		sprintf(buff, "%ld bytes in data memory wasted.  "
 		            "SDCC link could use: --data-loc 0x%02lx\n",
 					Ram[5].Size, Ram[6].Start-Ram[5].Size);
 		REPORT_WARNING(buff, 1);
@@ -246,7 +246,7 @@ int summary(struct area * areap)
 	if((Ram[6].Start+Ram[6].Size)>Ram[6].Max)
 	{
 		k=(Ram[6].Start+Ram[6].Size)-Ram[6].Max;
-		sprintf(buff, "Insufficient DRAM memory.  "
+		sprintf(buff, "Insufficient space in data memory.   "
 					"%d byte%s short.\n", k, (k==1)?"":"s");
 		REPORT_ERROR(buff, 1);
 	}

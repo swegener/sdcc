@@ -1,3 +1,8 @@
+2003-07-23  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+	* as/mcs51/lkmem.c: Changed message "Insufficient DRAM memory" to
+	"Insufficient space in data memory".
+
 2003-07-20  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/mcs51/gen.c: fixed bug #771358

@@ -4014,10 +4014,10 @@ pCodeOp *pic16_newpCodeOpLit(int lit)
   pcop->type = PO_LITERAL;
 
   pcop->name = NULL;
-//  if(lit>=0)
-    sprintf(s,"0x%02hhx",(char)(lit));
-//  else
-//    sprintf(s, "%i", lit);
+  if(lit>=0)
+    sprintf(s,"0x%02hhx", lit);
+  else
+    sprintf(s, "%i", lit);
   
   if(s)
     pcop->name = Safe_strdup(s);
@@ -4041,7 +4041,7 @@ pCodeOp *pic16_newpCodeOpLit2(int lit, pCodeOp *arg2)
 
   pcop->name = NULL;
   if(lit>=0) {
-    sprintf(s,"0x%02x, %s",lit, tb);
+    sprintf(s,"0x%02x, %s", lit, tb);
     if(s)
       pcop->name = Safe_strdup(s);
   }

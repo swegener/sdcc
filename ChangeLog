@@ -1,3 +1,11 @@
+2005-01-04 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/gen.c (aopForSym, genEndFunction): applied some fixes
+	from Raphael Neider,
+	* src/pic16/pcode.c (pic16_newpCodeOpLit): removed casting to char
+	for 8-bit literals. This fixes some literal operands which are sign
+	extended to 16-bits ints when instruction needs only 8-bits.
+
 2004-12-31 Paul Stoffregen <paul AT pjrc.com>
 
 	* device/lib/logf.c: added mcs51 assembly version

@@ -680,11 +680,20 @@ static asmop *aopForSym (iCode *ic, operand *op, bool result)
 	for(i=0;i<aop->size;i++) {
 
 	  /* initialise for stack access via frame pointer */
-	  // operands on stack are accessible via "FSR2 - index" with index starting at 0 for the first operand
-	  pic16_emitpcode(POC_MOVLW, pic16_popGetLit((sym->stack + 1 + i /*+ _G.stack_lat*/)));
-	  pic16_emitpcode(POC_MOVFF, pic16_popGet2p(
-	                  pic16_popCopyReg(&pic16_pc_plusw2), pcop[i]));
-        }
+          // operands on stack are accessible via "FSR2 + index" with index
+          // starting at 2 for arguments and growing from 0 downwards for
+          // local variables (index == 0 is not assigned so we add one here)
+	  {
+	    int soffs = sym->stack;
+	    if (soffs <= 0) {
+	      assert (soffs < 0);
+	      soffs++;
+	    } // if
+	    pic16_emitpcode(POC_MOVLW, pic16_popGetLit(soffs + i /*+ _G.stack_lat*/));
+	    pic16_emitpcode(POC_MOVFF, pic16_popGet2p(
+	                    pic16_popCopyReg(&pic16_pc_plusw2), pcop[i]));
+	  }
+	}
 	
 	if(_G.accInUse) {
 		pic16_poppCodeOp( pic16_popCopyReg(&pic16_pc_wreg) );
@@ -1300,14 +1309,21 @@ void pic16_freeAsmop (operand *op, asmop *aaop, iCode *ic, bool pop)
 
               /* we must store the result on stack */
               if((op == IC_RESULT(ic)) && RESULTONSTA(ic)) {
+                // operands on stack are accessible via "FSR2 + index" with index
+                // starting at 2 for arguments and growing from 0 downwards for
+                // local variables (index == 0 is not assigned so we add one here)
+                int soffs = OP_SYMBOL(IC_RESULT(ic))->stack;
+                if (soffs <= 0) {
+                  assert (soffs < 0);
+                  soffs++;
+                } // if
                 if(_G.accInUse)pic16_pushpCodeOp( pic16_popCopyReg(&pic16_pc_wreg) );
                 for(i=0;i<aop->size;i++) {
-                  /* initialise for stack access via frame pointer */
-                  // operands on stack are accessible via "FSR2 - index" with index starting at 0 for the first operand
-                  pic16_emitpcode(POC_MOVLW, pic16_popGetLit((OP_SYMBOL(IC_RESULT(ic))->stack + 1 + i /*+ _G.stack_lat*/)));
-                  pic16_emitpcode(POC_MOVFF, pic16_popGet2p(
+		  /* initialise for stack access via frame pointer */
+		  pic16_emitpcode(POC_MOVLW, pic16_popGetLit(soffs + i /*+ _G.stack_lat*/));
+		  pic16_emitpcode(POC_MOVFF, pic16_popGet2p(
                         aop->aopu.stk.pop[i], pic16_popCopyReg(&pic16_pc_plusw2)));
-                }
+		}
 	
                 if(_G.accInUse)pic16_poppCodeOp( pic16_popCopyReg(&pic16_pc_wreg) );
               }
@@ -1480,7 +1496,7 @@ char *pic16_aopGet (asmop *aop, int offset, bool bit16, bool dname)
 	return (rs);
 
     case AOP_LIT:
-	sprintf(s,"0x%02x", pic16aopLiteral (aop->aopu.aop_lit,offset));
+	sprintf(s,"0X%02x", pic16aopLiteral (aop->aopu.aop_lit,offset));
 	rs = Safe_calloc(1,strlen(s)+1);
 	strcpy(rs,s);   
 	return rs;
@@ -3681,23 +3697,6 @@ static void genEndFunction (iCode *ic)
       /* TODO: add code here -- VR */
     }
     
-    if ((IFFUNC_ISREENT(sym->type) || options.stackAuto)
-          && sym->stack) {
-      if (sym->stack == 1) {
-        pic16_emitpcode(POC_INFSNZ, pic16_popCopyReg(&pic16_pc_fsr1l));
-        pic16_emitpcode(POC_INCF, pic16_popCopyReg(&pic16_pc_fsr1h));
-      } else {
-        // we have to add more than one...
-        pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_postinc1)); // this holds a return value!
-        pic16_emitpcode(POC_MOVLW, pic16_popGetLit(sym->stack-1));
-        pic16_emitpcode(POC_ADDWF, pic16_popCopyReg(&pic16_pc_fsr1l));
-        emitSKPNC;
-        pic16_emitpcode(POC_INCF, pic16_popCopyReg(&pic16_pc_fsr1h));
-        pic16_emitpcode(POC_COMF,  pic16_popCopyReg(&pic16_pc_wreg)); // WREG = -(WREG+1)!
-        pic16_emitpcode(POC_MOVFW, pic16_popCopyReg(&pic16_pc_plusw1)); // this holds a retrun value!
-      }
-    }
-
 //    sym->regsUsed = _G.fregsUsed;
     
     /* now we need to restore the registers */
@@ -3716,6 +3715,23 @@ static void genEndFunction (iCode *ic)
         }
         pic16_emitpinfo(INF_LOCALREGS, pic16_newpCodeOpLocalRegs(LR_EXIT_END));
 
+    }
+
+    if ((IFFUNC_ISREENT(sym->type) || options.stackAuto)
+          && sym->stack) {
+      if (sym->stack == 1) {
+        pic16_emitpcode(POC_INFSNZ, pic16_popCopyReg(&pic16_pc_fsr1l));
+        pic16_emitpcode(POC_INCF, pic16_popCopyReg(&pic16_pc_fsr1h));
+      } else {
+        // we have to add more than one...
+        pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_postinc1)); // this holds a return value!
+        pic16_emitpcode(POC_MOVLW, pic16_popGetLit(sym->stack-1));
+        pic16_emitpcode(POC_ADDWF, pic16_popCopyReg(&pic16_pc_fsr1l));
+        emitSKPNC;
+        pic16_emitpcode(POC_INCF, pic16_popCopyReg(&pic16_pc_fsr1h));
+        pic16_emitpcode(POC_COMF,  pic16_popCopyReg(&pic16_pc_wreg)); // WREG = -(WREG+1)!
+        pic16_emitpcode(POC_MOVFW, pic16_popCopyReg(&pic16_pc_plusw1)); // this holds a retrun value!
+      }
     }
 
     if(strcmp(sym->name, "main")) {
@@ -12038,18 +12054,23 @@ static void genAddrOf (iCode *ic)
                   OP_SYMBOL(left)->name, OP_SYMBOL(left)->stack);
 #endif
 
-      pic16_emitpcode(POC_MOVFF, pic16_popGet2p(
-                      pic16_popCopyReg(&pic16_pc_fsr2l),
-                      pic16_popGet(AOP(result), 0)));
-      pic16_emitpcode(POC_MOVFF, pic16_popGet2p(
-                      pic16_popCopyReg(&pic16_pc_fsr2h),
-                      pic16_popGet(AOP(result), 1)));
-     
-      // operands on stack are accessible via "FSR2 - index" with index starting at 0 for the first operand
-      pic16_emitpcode(POC_MOVLW, pic16_popGetLit( - (OP_SYMBOL( IC_LEFT(ic))->stack + 1 ) /*+ _G.stack_lat*/));
-      pic16_emitpcode(POC_SUBWF, pic16_popGet(AOP(result), 0));
-      emitSKPC;
-      pic16_emitpcode(POC_DECF, pic16_popGet(AOP(result), 1));
+      // operands on stack are accessible via "FSR2 + index" with index
+      // starting at 2 for arguments and growing from 0 downwards for
+      // local variables (index == 0 is not assigned so we add one here)
+      {
+	int soffs = OP_SYMBOL( IC_LEFT(ic))->stack;
+	if (soffs <= 0) {
+	  assert (soffs < 0);
+	  soffs++;
+	} // if
+	DEBUGpic16_emitcode("*!*", "accessing stack symbol at offset=%d", soffs);
+	pic16_emitpcode(POC_MOVLW , pic16_popGetLit( soffs & 0x00FF ));
+	pic16_emitpcode(POC_ADDFW , pic16_popCopyReg(&pic16_pc_fsr2l));
+	pic16_emitpcode(POC_MOVWF , pic16_popGet(AOP(result), 0));
+	pic16_emitpcode(POC_MOVLW , pic16_popGetLit( (soffs >> 8) & 0x00FF ));
+	pic16_emitpcode(POC_ADDFWC, pic16_popCopyReg(&pic16_pc_fsr2h));
+	pic16_emitpcode(POC_MOVWF , pic16_popGet(AOP(result), 1));
+      }
 
       goto release;
     }

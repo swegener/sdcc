@@ -43,10 +43,12 @@ TARGET		= $(PRJDIR)/bin/sdcc$(EXEEXT)
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: ports checkconf $(TARGET)
+all: checkconf $(TARGET)
 
-ports:
-	for i in $(PORTS); do $(MAKE) -C $$i; done
+*/port.a: FORCE 
+	$(MAKE) -C `dirname $@`
+ 
+FORCE:
 
 $(PRJDIR)/support/gc/libgc.a:
 	cd $(PRJDIR)/support/gc && $(MAKE)

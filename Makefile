@@ -63,7 +63,7 @@ sdcc-misc:
 sdcc-packihx:
 	$(MAKE) -C $(SDCC_PACKIHX)
 
-sdcc-device:
+sdcc-device: sdcc-cc sdcc-aslink
 	$(MAKE) -C device/include
 	$(MAKE) -C device/lib
 

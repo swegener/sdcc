@@ -1,3 +1,7 @@
+2003-03-31  Bernhard Held <bernhard@bernhardheld.de>
+
+	* Makefile, src/Makefile.in: add dependencies, so that 'make -j' works
+
 2003-03-30  Borut Razem <borut.razem@siol.net>
 
 	* support/Util/BuildCmd.c, support/Util/BuildCmd.h: rewrite buildCmdLine(),

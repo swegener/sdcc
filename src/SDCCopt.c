@@ -613,8 +613,6 @@ static void printCyclomatic (eBBlock **ebbs, int count)
     werror(I_CYCLOMATIC,currFunc->name,nEdges,nNodes, nEdges - nNodes + 2);
 }
 
-#ifdef POST_2_2_1
-/* Turn this on when it's safe to destablize */     
 /*-----------------------------------------------------------------*/
 /* discardDeadParamReceives - remove any RECEIVE opcodes which     */
 /* refer to dead variables. 					   */
@@ -646,7 +644,6 @@ static void discardDeadParamReceives(eBBlock **ebbs, int count)
         }
     }
 }
-#endif
 
 /*-----------------------------------------------------------------*/
 /* eBBlockFromiCode - creates extended basic blocks from iCode     */
@@ -776,13 +773,10 @@ eBBlock **eBBlockFromiCode (iCode *ic)
     if (options.dump_range)
 	dumpEbbsToFileExt(".dumprange",ebbs,count);
 
-#ifdef POST_2_2_1
-    /* Turn this on when it's safe to destablize */	
     /* Now that we have the live ranges, discard parameter
      * receives for unused parameters.
      */
     discardDeadParamReceives(ebbs,count);
-#endif
 
     /* allocate registers & generate code */   
     port->assignRegisters(ebbs,count);      

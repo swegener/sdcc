@@ -1104,22 +1104,33 @@ bool genMinusDec (iCode *ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* addSign - complete with sign                                    */
+/* addSign - propogate sign bit to higher bytes                    */
 /*-----------------------------------------------------------------*/
 void addSign(operand *result, int offset, int sign)
 {
-    int size = (pic14_getDataSize(result) - offset);
-    DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    if(size > 0){
-        if(sign){
-            pic14_emitcode("rlc","a");
-            pic14_emitcode("subb","a,acc");
-            while(size--)
-                aopPut(AOP(result),"a",offset++); 
-        } else
-            while(size--)
-                aopPut(AOP(result),"#0",offset++);
-    }
+  int size = (pic14_getDataSize(result) - offset);
+  DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+
+  if(size > 0){
+    if(sign && offset) {
+
+      if(size == 1) {
+	emitpcode(POC_CLRF,popGet(AOP(result),offset));
+	emitpcode(POC_BTFSC,newpCodeOpBit(aopGet(AOP(result),offset-1,FALSE,FALSE),7,0));
+	emitpcode(POC_DECF, popGet(AOP(result),offset));
+      } else {
+
+	emitpcode(POC_MOVLW, popGetLit(0));
+	emitpcode(POC_BTFSC, newpCodeOpBit(aopGet(AOP(result),offset-1,FALSE,FALSE),7,0));
+	emitpcode(POC_MOVLW, popGetLit(0xff));
+	while(size--)
+	  emitpcode(POC_MOVWF, popGet(AOP(result),size));
+
+      }
+    } else
+      while(size--)
+	emitpcode(POC_CLRF,popGet(AOP(result),offset++));
+  }
 }
 
 /*-----------------------------------------------------------------*/

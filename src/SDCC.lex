@@ -63,26 +63,6 @@ extern int processPragma	(char *);
 extern int printListing		(int   );
 struct optimize save_optimize ;
 struct options  save_options  ;
-
- enum {
-     P_SAVE = 1,
-     P_RESTORE ,
-     P_NOINDUCTION,
-     P_NOINVARIANT,
-     P_INDUCTION ,
-     P_STACKAUTO ,
-     P_NOJTBOUND ,
-     P_NOOVERLAY ,
-     P_LESSPEDANTIC,
-     P_NOGCSE    ,
-     P_CALLEE_SAVES,
-     P_EXCLUDE   ,
-     P_NOIV      ,
-     P_LOOPREV   ,
-     P_OVERLAY_	     /* I had a strange conflict with P_OVERLAY while */
-     		     /* cross-compiling for MINGW32 with gcc 3.2 */
- };
-
 %}
 %x asm
 %%
@@ -425,158 +405,184 @@ out:
   return (char *)dbuf_c_str(&dbuf);
 }
 
+
+enum pragma_id {
+     P_SAVE = 1,
+     P_RESTORE ,
+     P_NOINDUCTION,
+     P_NOINVARIANT,
+     P_INDUCTION ,
+     P_STACKAUTO ,
+     P_NOJTBOUND ,
+     P_NOOVERLAY ,
+     P_LESSPEDANTIC,
+     P_NOGCSE    ,
+     P_CALLEE_SAVES,
+     P_EXCLUDE   ,
+     P_NOIV      ,
+     P_LOOPREV   ,
+     P_OVERLAY_      /* I had a strange conflict with P_OVERLAY while */
+                     /* cross-compiling for MINGW32 with gcc 3.2 */
+};
+
+
+/* SAVE/RESTORE stack */
+#define SAVE_RESTORE_SIZE 128
+
+STACK_DCL(options_stack, struct options *, SAVE_RESTORE_SIZE)
+STACK_DCL(optimize_stack, struct optimize *, SAVE_RESTORE_SIZE)
+
+
 void doPragma (int op, char *cp)
 {
-    switch (op) {
-    case P_SAVE:
-	memcpy(&save_options,&options,sizeof(options));
-	memcpy(&save_optimize,&optimize,sizeof(optimize));
-	break;
-    case P_RESTORE:
-	memcpy(&options,&save_options,sizeof(options));
-	memcpy(&optimize,&save_optimize,sizeof(optimize));
-	break;
-    case P_NOINDUCTION:
-	optimize.loopInduction = 0 ;
-	break;
-    case P_NOINVARIANT:
-	optimize.loopInvariant = 0 ;
-	break;
-    case P_INDUCTION:
-        optimize.loopInduction = 1 ;
-        break;
-    case P_STACKAUTO:
-	options.stackAuto = 1;
-	break;
-    case P_NOJTBOUND:
-	optimize.noJTabBoundary = 1;
-	break;
-    case P_NOGCSE:
-	optimize.global_cse = 0;
-	break;
-    case P_NOOVERLAY:
-	options.noOverlay = 1;
-	break;
-    case P_LESSPEDANTIC:
-        options.lessPedantic = 1;
-	break;
-    case P_CALLEE_SAVES:
-	{
-	    int i=0;
-	    /* append to the functions already listed
-	       in callee-saves */
-	    for (; options.calleeSaves[i] ;i++);
-	    parseWithComma(&options.calleeSaves[i], Safe_strdup(cp));
-	}
-	break;
-    case P_EXCLUDE:
-	parseWithComma(options.excludeRegs, Safe_strdup(cp));
-	break;
-    case P_NOIV:
-	options.noiv = 1;
-	break;
-    case P_LOOPREV:
-	optimize.noLoopReverse = 1;
-	break;
-    case P_OVERLAY_:
-	break; /* notyet */
+  switch (op) {
+  case P_SAVE:
+    {
+      struct options *optionsp;
+      struct optimize *optimizep;
+
+      optionsp = Safe_malloc(sizeof (struct options));
+      *optionsp = options;
+      STACK_PUSH(options_stack, optionsp);
+
+      optimizep = Safe_malloc(sizeof (struct optimize));
+      *optimizep = optimize;
+      STACK_PUSH(optimize_stack, optimizep);
     }
+    break;
+
+  case P_RESTORE:
+    {
+      struct options *optionsp;
+      struct optimize *optimizep;
+
+      optionsp = STACK_POP(options_stack);
+      options = *optionsp;
+      Safe_free(optionsp);
+
+      optimizep = STACK_POP(optimize_stack);
+      optimize = *optimizep;
+      Safe_free(optimizep);
+    }
+    break;
+
+  case P_NOINDUCTION:
+    optimize.loopInduction = 0 ;
+    break;
+
+  case P_NOINVARIANT:
+    optimize.loopInvariant = 0 ;
+    break;
+
+  case P_INDUCTION:
+    optimize.loopInduction = 1 ;
+    break;
+
+  case P_STACKAUTO:
+    options.stackAuto = 1;
+    break;
+
+  case P_NOJTBOUND:
+    optimize.noJTabBoundary = 1;
+    break;
+
+  case P_NOGCSE:
+    optimize.global_cse = 0;
+    break;
+
+  case P_NOOVERLAY:
+    options.noOverlay = 1;
+    break;
+
+  case P_LESSPEDANTIC:
+    options.lessPedantic = 1;
+    break;
+
+  case P_CALLEE_SAVES:
+    {
+      int i=0;
+      /* append to the functions already listed
+         in callee-saves */
+      for (; options.calleeSaves[i] ;i++);
+        parseWithComma(&options.calleeSaves[i], Safe_strdup(cp));
+    }
+    break;
+
+  case P_EXCLUDE:
+    parseWithComma(options.excludeRegs, Safe_strdup(cp));
+    break;
+
+  case P_NOIV:
+    options.noiv = 1;
+    break;
+
+  case P_LOOPREV:
+    optimize.noLoopReverse = 1;
+    break;
+
+  case P_OVERLAY_:
+    break; /* notyet */
+  }
 }
 
 int process_pragma(char *s)
 {
-    char *cp ;
-    /* find the pragma */
-    while (strncmp(s,"#pragma",7))
-	s++;
-    s += 7;
+#define NELEM(x)  (sizeof (x) / sizeof (x)[0])
+#define PRAGMA    "#pragma"
+
+  static struct pragma_s {
+    const char *name;
+    enum pragma_id id;
+  } pragma_tbl[] = {
+    { "SAVE",           P_SAVE },
+    { "RESTORE",        P_RESTORE },
+    { "NOINDUCTION",    P_NOINDUCTION },
+    { "NOINVARIANT",    P_NOINVARIANT },
+    { "NOLOOPREVERSE",  P_LOOPREV },
+    { "INDUCTION",      P_INDUCTION },
+    { "STACKAUTO",      P_STACKAUTO },
+    { "NOJTBOUND",      P_NOJTBOUND },
+    { "NOGCSE",         P_NOGCSE },
+    { "NOOVERLAY",      P_NOOVERLAY },
+    { "CALLEE-SAVES",   P_CALLEE_SAVES },
+    { "EXCLUDE",        P_EXCLUDE },
+    { "NOIV",           P_NOIV },
+    { "OVERLAY",        P_OVERLAY_ },
+    { "LESS_PEDANTIC",  P_LESSPEDANTIC },
+  };
+  char *cp ;
+  int i;
+
+  /* find the pragma */
+  while (strncmp(s, PRAGMA, (sizeof PRAGMA) - 1))
+    s++;
+  s += (sizeof PRAGMA) - 1;
     
-    /* look for the directive */
-    while(isspace(*s)) s++;
+  /* look for the directive */
+  while(isspace(*s))
+    s++;
 
-    cp = s;
-    /* look for the end of the directive */
-    while ((! isspace(*s)) && 
-	   (*s != '\n')) 
-	s++ ;    
+  cp = s;
+  /* look for the end of the directive */
+  while ((!isspace(*s)) && (*s != '\n')) 
+    s++ ;    
 
-    /* First give the port a chance */
-    if (port->process_pragma && !port->process_pragma(cp))
-	return 0;
-
-    /* now compare and do what needs to be done */
-    if (strncmp(cp,PRAGMA_SAVE,strlen(PRAGMA_SAVE)) == 0) {
-	doPragma(P_SAVE,cp+strlen(PRAGMA_SAVE));
-	return 0;
-    }
-
-    if (strncmp(cp,PRAGMA_RESTORE,strlen(PRAGMA_RESTORE)) == 0) {
-	doPragma (P_RESTORE,cp+strlen(PRAGMA_RESTORE));
-	return 0;
-    }
-
-    if (strncmp(cp,PRAGMA_NOINDUCTION,strlen(PRAGMA_NOINDUCTION)) == 0) {
-	doPragma (P_NOINDUCTION,cp+strlen(PRAGMA_NOINDUCTION))	;
-	return 0;
-    }
-
-    if (strncmp(cp,PRAGMA_NOINVARIANT,strlen(PRAGMA_NOINVARIANT)) == 0) {
-	doPragma (P_NOINVARIANT,NULL)	;
-	return 0;
-    }
-
-    if (strncmp(cp,PRAGMA_INDUCTION,strlen(PRAGMA_INDUCTION)) == 0) {
-	doPragma (P_INDUCTION,NULL)	;
-	return 0;
-    }
-
-    if (strncmp(cp,PRAGMA_STACKAUTO,strlen(PRAGMA_STACKAUTO)) == 0) {
-	doPragma (P_STACKAUTO,NULL);
-	return 0;
-    }
-
-    if (strncmp(cp,PRAGMA_NOJTBOUND,strlen(PRAGMA_NOJTBOUND)) == 0) {
-	doPragma (P_NOJTBOUND,NULL);
-	return 0;
-    }
-
-    if (strncmp(cp,PRAGMA_NOGCSE,strlen(PRAGMA_NOGCSE)) == 0) {
-	doPragma (P_NOGCSE,NULL);
-	return 0;
-    }
-
-    if (strncmp(cp,PRAGMA_NOOVERLAY,strlen(PRAGMA_NOOVERLAY)) == 0) {
-	doPragma (P_NOOVERLAY,NULL);
-	return 0;
-    }
-    
-    if (strncmp(cp,PRAGMA_LESSPEDANTIC,strlen(PRAGMA_LESSPEDANTIC)) == 0) {
-	doPragma(P_LESSPEDANTIC,cp+strlen(PRAGMA_LESSPEDANTIC));
-	return 0;
-    }
-    
-    if (strncmp(cp,PRAGMA_CALLEESAVES,strlen(PRAGMA_CALLEESAVES)) == 0) {
-	doPragma(P_CALLEE_SAVES,cp+strlen(PRAGMA_CALLEESAVES));
-	return 0;
-    }
-    
-    if (strncmp(cp,PRAGMA_EXCLUDE,strlen(PRAGMA_EXCLUDE)) == 0) {
-	doPragma(P_EXCLUDE,cp+strlen(PRAGMA_EXCLUDE));
-	return 0;
-    }
-
-    if (strncmp(cp,PRAGMA_NOIV,strlen(PRAGMA_NOIV)) == 0) {
-	doPragma(P_NOIV,cp+strlen(PRAGMA_NOIV));
-	return 0;
-    }
-
-    if (strncmp(cp,PRAGMA_NOLOOPREV,strlen(PRAGMA_NOLOOPREV)) == 0) {
-	doPragma(P_LOOPREV,NULL);
-	return 0;
-    }
-
-    werror(W_UNKNOWN_PRAGMA,cp);
+  /* First give the port a chance */
+  if (port->process_pragma && !port->process_pragma(cp))
     return 0;
+
+  for (i = 0; i < NELEM(pragma_tbl); i++) {
+    /* now compare and do what needs to be done */
+    size_t len = strlen(pragma_tbl[i].name);
+
+    if (strncmp(cp, pragma_tbl[i].name, len) == 0) {
+      doPragma(pragma_tbl[i].id, cp + len);
+      return 0;
+    }
+  }
+
+  werror(W_UNKNOWN_PRAGMA,cp);
+  return 0;
 }
 
 /* will return 1 if the string is a part

@@ -42,3 +42,4 @@ printfl
 printf_large
 vprintf
 assert
+time

@@ -3,6 +3,7 @@
 #define TINIBIOS_H
 
 #include <ds80c390.h>
+#include <time.h>
 
 #define Serial0GetChar getchar
 #define Serial0PutChar putchar
@@ -50,13 +51,9 @@ void CpuSpeed(unsigned int speed);
 #define CPU_MOVX_STRETCH 0x01
 
 // from rtc390.c
-static struct RTCDate{
-  int year;
-  unsigned char month, day, weekDay, hour, minute, second, hundredth;
-};
-
-unsigned char RtcRead(struct RTCDate *rtcDate);
-void RtcWrite(struct RTCDate *rtcDate);
+#define HAVE_RTC
+unsigned char RtcRead(struct tm *rtcDate);
+void RtcWrite(struct tm *rtcDate);
 
 // from lcd390.c
 extern void LcdInit(void);

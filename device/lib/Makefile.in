@@ -51,7 +51,7 @@ OBJECTS		= _atoi.rel _atol.rel _autobaud.rel _bp.rel _schar2fs.rel \
 		  _strstr.rel _strtok.rel _uchar2fs.rel _uint2fs.rel \
 		  _ulong2fs.rel malloc.rel serial.rel ser_ir.rel printfl.rel \
 		  printf_large.rel vprintf.rel puts.rel gets.rel \
-		  assert.rel _strcat.rel
+		  assert.rel _strcat.rel time.rel
 SOURCES		= $(patsubst %.rel,%.c,$(OBJECTS))
 
 include incl.mk

@@ -3223,7 +3223,7 @@ replace {
         jc      %3
 %4:
         mov     a,%2
-        add     a,acc
+        add     a,%2
         add     a,%2
         mov     dptr,%5
         jmp     @a+dptr

@@ -83,7 +83,7 @@ static struct
   }
 _G;
 
-static void saverbank (int, iCode *, bool);
+static void saveRBank (int, iCode *, bool);
 
 #define RESULTONSTACK(x) \
                          (IC_RESULT(x) && IC_RESULT(x)->aop && \
@@ -1796,12 +1796,14 @@ saveRegisters (iCode * lic)
       }
 
   detype = getSpec (operandType (IC_LEFT (ic)));
-  if (/* why would we do this?: jwk20010511 */ 0 &&
-      detype &&
+
+#if 0 // why should we do this here??? jwk20011105
+  if (detype &&
       (SPEC_BANK (currFunc->etype) != SPEC_BANK (detype)) &&
       IS_ISR (currFunc->etype) &&
       !ic->bankSaved)
-    saverbank (SPEC_BANK (detype), ic, TRUE);
+    saveRBank (SPEC_BANK (detype), ic, TRUE);
+#endif
 
 }
 /*-----------------------------------------------------------------*/
@@ -2038,10 +2040,10 @@ genIpop (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* unsaverbank - restores the resgister bank from stack            */
+/* unsaveRBank - restores the resgister bank from stack            */
 /*-----------------------------------------------------------------*/
 static void
-unsaverbank (int bank, iCode * ic, bool popPsw)
+unsaveRBank (int bank, iCode * ic, bool popPsw)
 {
   int i;
   asmop *aop;
@@ -2090,10 +2092,10 @@ unsaverbank (int bank, iCode * ic, bool popPsw)
 }
 
 /*-----------------------------------------------------------------*/
-/* saverbank - saves an entire register bank on the stack          */
+/* saveRBank - saves an entire register bank on the stack          */
 /*-----------------------------------------------------------------*/
 static void
-saverbank (int bank, iCode * ic, bool pushPsw)
+saveRBank (int bank, iCode * ic, bool pushPsw)
 {
   int i;
   asmop *aop;
@@ -2149,30 +2151,10 @@ static void
 genCall (iCode * ic)
 {
   sym_link *detype;
-  int bankSwitched=0;
 
-  D (emitcode (";", "genCall "););
+  D (emitcode (";", "genCall ");
+    );
 
-  /* if we are calling a function that is not using
-     the same register bank then we need to save the
-     destination registers on the stack */
-  detype = getSpec (operandType (IC_LEFT (ic)));
-  if (detype &&
-      (SPEC_BANK (currFunc->etype) != SPEC_BANK (detype)) &&
-      IS_ISR (currFunc->etype) &&
-      !ic->bankSaved) {
-    bankSwitched=1;
-  }
-  
-  /* if caller saves & we have not saved then */
-  if (!ic->regsSaved) {
-    if (bankSwitched) {
-      // no need to save if we switch banks
-    } else {
-      saveRegisters (ic);
-    }
-  }
-  
   /* if send set is not empty the assign */
   if (_G.sendSet)
     {
@@ -2206,8 +2188,19 @@ genCall (iCode * ic)
       _G.sendSet = NULL;
     }
 
-  if (bankSwitched) {
-    saverbank(SPEC_BANK(detype), ic, TRUE);
+  /* if we are calling a function that is not using
+     the same register bank then we need to save the
+     destination registers on the stack */
+  detype = getSpec (operandType (IC_LEFT (ic)));
+  if (detype &&
+      (SPEC_BANK (currFunc->etype) != SPEC_BANK (detype)) &&
+      IS_ISR (currFunc->etype) &&
+      !ic->bankSaved) {
+    saveRBank (SPEC_BANK (detype), ic, TRUE);
+  } else /* no need to save if we just saved the whole bank */ {
+    /* if caller saves & we have not saved then */
+    if (!ic->regsSaved)
+      saveRegisters (ic);
   }
 
   /* make the call */
@@ -2268,16 +2261,18 @@ genCall (iCode * ic)
       else
 	for (i = 0; i < ic->parmBytes; i++)
 	  emitcode ("dec", "%s", spname);
+
     }
 
   /* if register bank was saved then pop them */
-  if (bankSwitched) {
-    unsaverbank (SPEC_BANK (detype), ic, TRUE);
-  } else {
-    /* if we have saved some registers then unsave them */
-    if (ic->regsSaved && !(OP_SYMBOL (IC_LEFT (ic))->calleeSave))
-      unsaveRegisters (ic);
-  }
+  if (ic->bankSaved)
+    unsaveRBank (SPEC_BANK (detype), ic, TRUE);
+
+  /* if we hade saved some registers then unsave them */
+  if (ic->regsSaved && !(OP_SYMBOL (IC_LEFT (ic))->calleeSave))
+    unsaveRegisters (ic);
+
+
 }
 
 /*-----------------------------------------------------------------*/
@@ -2292,6 +2287,7 @@ genPcall (iCode * ic)
   D (emitcode (";", "genPcall ");
     );
 
+
   /* if caller saves & we have not saved then */
   if (!ic->regsSaved)
     saveRegisters (ic);
@@ -2303,7 +2299,8 @@ genPcall (iCode * ic)
   if (detype &&
       IS_ISR (currFunc->etype) &&
       (SPEC_BANK (currFunc->etype) != SPEC_BANK (detype)))
-    saverbank (SPEC_BANK (detype), ic, TRUE);
+    saveRBank (SPEC_BANK (detype), ic, TRUE);
+
 
   /* push the return address on to the stack */
   emitcode ("mov", "a,#%05d$", (rlbl->key + 100));
@@ -2396,7 +2393,7 @@ genPcall (iCode * ic)
   if (detype &&
       (SPEC_BANK (currFunc->etype) !=
        SPEC_BANK (detype)))
-    unsaverbank (SPEC_BANK (detype), ic, TRUE);
+    unsaveRBank (SPEC_BANK (detype), ic, TRUE);
 
   /* if we hade saved some registers then
      unsave them */
@@ -2554,9 +2551,9 @@ genFunction (iCode * ic)
 	  else
 	    {
 	      /* this function has  a function call cannot
-	         determines register usage so we will have the
+	         determines register usage so we will have to push the
 	         entire bank */
-	      saverbank (0, ic, FALSE);
+	      saveRBank (0, ic, FALSE);
 	    }
 	}
     }
@@ -2720,9 +2717,9 @@ genEndFunction (iCode * ic)
 	  else
 	    {
 	      /* this function has  a function call cannot
-	         determines register usage so we will have the
+	         determines register usage so we will have to pop the
 	         entire bank */
-	      unsaverbank (0, ic, FALSE);
+	      unsaveRBank (0, ic, FALSE);
 	    }
 	}
 
@@ -2844,14 +2841,12 @@ genRet (iCode * ic)
       else
 	{
 	  /* Since A is the last element of fReturn,
-	   * it is OK to clobber it in the aopGet.
+	   * is is OK to clobber it in the aopGet.
 	   */
 	  l = aopGet (AOP (IC_LEFT (ic)), offset,
 		      FALSE, FALSE, TRUE);
 	  if (strcmp (fReturn[offset], l))
-	  {
 	    emitcode ("mov", "%s,%s", fReturn[offset++], l);
-	  }
 	}
     }
   _endLazyDPSEvaluation ();

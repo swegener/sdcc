@@ -892,7 +892,7 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist)
 	    ast *aSym;
 	    
 	    aSym = newNode ('[', sym, newAst_VALUE (valueFromLit ((float) (size++))));
-	    //aSym = decorateType (resolveSymbols (aSym));
+	    aSym = decorateType (resolveSymbols (aSym));
 	    rast = createIval (aSym, type->next, iloop, rast);
 	    iloop = (iloop ? iloop->next : NULL);
 	    if (!iloop)

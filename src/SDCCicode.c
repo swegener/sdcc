@@ -136,7 +136,14 @@ void checkConstantRange(sym_link *ltype, value *val, char *msg, int pedantic) {
   char message[132]="";
   int warnings=0;
   int negative=0;
-  long v=SPEC_CVAL(val->type).v_long;
+  long v;
+
+  if (SPEC_LONG(val->type)) {
+    v=SPEC_CVAL(val->type).v_long;
+  } else {
+    v=SPEC_CVAL(val->type).v_int;
+  }
+
 
 #if 0
   // this could be a good idea

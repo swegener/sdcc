@@ -827,7 +827,7 @@ charVal (char *s)
 	}
     }
   else				/* not a backslash */
-    SPEC_CVAL (val->type).v_int = (unsigned char)*s;
+    SPEC_CVAL (val->type).v_uint = (unsigned char)*s;
 
   return val;
 }

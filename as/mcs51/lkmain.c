@@ -17,9 +17,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <alloc.h>
-#include <unistd.h>
 #include "aslink.h"
 
+/* yuck - but including unistd.h causes problems on Cygwin by redefining
+ * addr_t.
+ */
+extern int unlink(const char *);
 
 /*)Module	lkmain.c
  *

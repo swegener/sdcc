@@ -963,6 +963,8 @@ static void  checkSClass ( symbol *sym )
 	 ( SPEC_SCLS(sym->etype) != S_AUTO      &&
 	   SPEC_SCLS(sym->etype) != S_FIXED     &&
 	   SPEC_SCLS(sym->etype) != S_REGISTER  &&
+	   SPEC_SCLS(sym->etype) != S_STACK     &&
+	   SPEC_SCLS(sym->etype) != S_XSTACK    &&
 	   SPEC_SCLS(sym->etype) != S_CONSTANT  )) {
 
 	werror(E_AUTO_ASSUMED,sym->name) ;
@@ -1005,10 +1007,10 @@ static void  checkSClass ( symbol *sym )
     /* the storage class to reflect where the var will go */
     if ( sym->level && SPEC_SCLS(sym->etype) == S_FIXED) {
 	if ( options.stackAuto || (currFunc && IS_RENT(currFunc->etype)))
-	    SPEC_SCLS(sym->etype) = (options.model  ?
+	    SPEC_SCLS(sym->etype) = (options.useXstack  ?
 				     S_XSTACK : S_STACK ) ;
 	else
-	    SPEC_SCLS(sym->etype) = (options.model  ?
+	    SPEC_SCLS(sym->etype) = (options.useXstack  ?
 				     S_XDATA :S_DATA ) ;
     }
 }

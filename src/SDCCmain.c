@@ -116,7 +116,7 @@ char    *preOutName;
 #define OPTION_NOREGPARMS   "-noregparms"
 
 static const char *_preCmd[] = {
-    "sdcpp", "-version", "-Wall", "-lang-c++", "-DSDCC=1", 
+    "sdcpp", "-Wall", "-lang-c++", "-DSDCC=1", 
     "-I" SDCC_INCLUDE_DIR, "$l", "$1", "$2", NULL
 };
 
@@ -1083,6 +1083,7 @@ static void assemble (char **envp)
 static int preProcess (char **envp)
 {
     char *argv[128];
+    char procDef[128];
 
     preOutName = NULL;
 
@@ -1100,6 +1101,10 @@ static int preProcess (char **envp)
     else
 	_addToList(preArgv, "-DSDCC_MODEL_SMALL");
     
+    /* add port (processor information to processor */
+    sprintf(procDef,"-DSDCC_%s",port->target);
+    _addToList(preArgv,procDef);
+
     if (!preProcOnly)
 	preOutName = strdup(tmpnam(NULL));
 

@@ -2007,7 +2007,7 @@ static bool
 isBitwiseOptimizable (iCode * ic)
 {
   sym_link *ltype = getSpec (operandType (IC_LEFT (ic)));
-  sym_link *rtype = getSpec (operandType (IC_RIGHT (ic)));
+  // jwk sym_link *rtype = getSpec (operandType (IC_RIGHT (ic)));
 
   /* bitwise operations are considered optimizable
      under the following conditions (Jean-Louis VERN) 

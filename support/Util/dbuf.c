@@ -1,8 +1,8 @@
 /*
   dbuf.c - Dynamic buffer implementation
-  version 1.1.0, March 28th, 2003
+  version 1.1.1, April 11th, 2003
 
-  Copyright (c) 2003 Borut Razem
+  Copyright (c) 2002-2003 Borut Razem
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages

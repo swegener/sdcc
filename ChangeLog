@@ -1,3 +1,9 @@
+2003-01-24  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/Makefile.in: remove spawn.o
+	* src/SDCCmain.c: remove spawn.h
+	* src/SDCCmain.c (printVersionInfo): report MINGW32 instead of UNIX
+
 2003-01-24    <johan@CP255758-A>
 
 	* src/ds390/gen.c (aopOp): fixed bug #667458

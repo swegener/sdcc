@@ -26,7 +26,7 @@ OBJECTS 	= SDCCy.o SDCChasht.o SDCCmain.o \
 		  SDCCsymt.o SDCCopt.o SDCCast.o SDCCmem.o SDCCval.o \
 		  SDCCicode.o SDCCbitv.o SDCCset.o SDCClabel.o \
 		  SDCCBBlock.o SDCCloop.o SDCCcse.o SDCCcflow.o SDCCdflow.o \
-		  SDCClrange.o SDCCptropt.o SDCCpeeph.o SDCCglue.o spawn.o \
+		  SDCClrange.o SDCCptropt.o SDCCpeeph.o SDCCglue.o \
 		  asm.o SDCCmacro.o SDCCutil.o
 
 SPECIAL		= SDCCy.h 

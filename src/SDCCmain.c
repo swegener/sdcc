@@ -34,8 +34,6 @@
 
 #if NATIVE_WIN32
 #include <process.h>
-#else
-#include "spawn.h"
 #endif
 
 #if !defined(__BORLANDC__) && !defined(_MSC_VER)
@@ -383,16 +381,18 @@ printVersionInfo ()
            " (" __DATE__ ")"
 #ifdef __CYGWIN__
 	   " (CYGWIN)\n"
+#elif defined __MINGW32__
+	   " (MINGW32) \n"
 #else
-#ifdef __DJGPP__
+#  ifdef __DJGPP__
 	   " (DJGPP) \n"
-#else
-#if defined(_MSC_VER)
+#  else
+#    if defined(_MSC_VER)
 	   " (WIN32) \n"
-#else
+#    else
 	   " (UNIX) \n"
-#endif
-#endif
+#    endif
+#  endif
 #endif
 
 	   ,VersionString

@@ -3645,10 +3645,21 @@ static void
 packForPush (iCode * ic, eBBlock * ebp)
 {
   iCode *dic;
-
+  
   debugLog ("%s\n", __FUNCTION__);
   if (ic->op != IPUSH || !IS_ITEMP (IC_LEFT (ic)))
     return;
+
+#if 0
+  {
+    int n1, n2;
+
+      n1 = bitVectnBitsOn( OP_DEFS(IC_LEFT(ic)));
+      n2 = bitVectnBitsOn( OP_USES(IC_LEFT(ic)));
+      debugf3("defs: %d\tuses: %d\t%s\n", n1, n2, printILine(ic));
+      debugf2("IC_LEFT(ic): from %d to %d\n", OP_LIVEFROM(IC_LEFT(ic)), OP_LIVETO(IC_LEFT(ic)));
+  }
+#endif
 
   /* must have only definition & one usage */
   if (bitVectnBitsOn (OP_DEFS (IC_LEFT (ic))) != 1 ||
@@ -3660,12 +3671,26 @@ packForPush (iCode * ic, eBBlock * ebp)
 			       bitVectFirstBit (OP_DEFS (IC_LEFT (ic))))))
     return;
 
+  /* if definition is not assignment,
+   * or is not pointer (because pointer might have changed) */
   if (dic->op != '=' || POINTER_SET (dic))
     return;
+
+  /* we must ensure that we can use the delete the assignment,
+   * because the source might have been modified in between.
+   * Until I know how to fix this, I'll use the adhoc fix
+   * to check the liveranges */
+  if((OP_LIVEFROM(IC_RIGHT(dic))==0) || (OP_LIVETO(IC_RIGHT(dic))==0))
+    return;
+//  debugf2("IC_RIGHT(dic): from %d to %d\n", OP_LIVEFROM(IC_RIGHT(dic)), OP_LIVETO(IC_RIGHT(dic)));
+  
+
 
   /* we now we know that it has one & only one def & use
      and the that the definition is an assignment */
   IC_LEFT (ic) = IC_RIGHT (dic);
+  
+  debugf("remiCodeFromeBBlock: %s\n", printILine(dic));
 
   remiCodeFromeBBlock (ebp, dic);
   bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
@@ -3690,33 +3715,32 @@ static void isData(sym_link *sl)
 {
   FILE *of = stderr;
 
-	if(!pic16_ralloc_debug)return;
-	
-	if(!sl)return;
+    if(!pic16_ralloc_debug)return;
+    
+    if(!sl)return;
+    
+    if(debugF)
+      of = debugF;
 
-	if(debugF)
-		of = debugF;
-
-	for ( ; sl; sl=sl->next) {
-		if(!IS_DECL(sl) ) {
-			switch (SPEC_SCLS(sl)) {
-				case S_DATA: fprintf (of, "data "); break;
-				case S_XDATA: fprintf (of, "xdata "); break;
-				case S_SFR: fprintf (of, "sfr "); break;
-				case S_SBIT: fprintf (of, "sbit "); break;
-				case S_CODE: fprintf (of, "code "); break;
-				case S_IDATA: fprintf (of, "idata "); break;
-				case S_PDATA: fprintf (of, "pdata "); break;
-				case S_LITERAL: fprintf (of, "literal "); break;
-				case S_STACK: fprintf (of, "stack "); break;
-				case S_XSTACK: fprintf (of, "xstack "); break;
-				case S_BIT: fprintf (of, "bit "); break;
-				case S_EEPROM: fprintf (of, "eeprom "); break;
-				default: break;
-			}
-
-		}
-	}
+    for ( ; sl; sl=sl->next) {
+      if(!IS_DECL(sl) ) {
+        switch (SPEC_SCLS(sl)) {
+          case S_DATA: fprintf (of, "data "); break;
+          case S_XDATA: fprintf (of, "xdata "); break;
+          case S_SFR: fprintf (of, "sfr "); break;
+          case S_SBIT: fprintf (of, "sbit "); break;
+          case S_CODE: fprintf (of, "code "); break;
+          case S_IDATA: fprintf (of, "idata "); break;
+          case S_PDATA: fprintf (of, "pdata "); break;
+          case S_LITERAL: fprintf (of, "literal "); break;
+          case S_STACK: fprintf (of, "stack "); break;
+          case S_XSTACK: fprintf (of, "xstack "); break;
+          case S_BIT: fprintf (of, "bit "); break;
+          case S_EEPROM: fprintf (of, "eeprom "); break;
+          default: break;
+        }
+      }
+    }
 }
 
 
@@ -3745,8 +3769,6 @@ pic16_packRegisters (eBBlock * ebp)
       {
 //		debugLog("%d\n", __LINE__);
 	/* find assignment of the form TrueSym := iTempNN:1 */
-	/* see BUGLOG0001 for workaround with the CAST - VR */
-//	if ( (ic->op == '=' || ic->op == CAST) && !POINTER_SET (ic) ) // patch 11
  	if ( (ic->op == '=') && !POINTER_SET (ic) ) // patch 11
 	  change += packRegsForAssign (ic, ebp);
 	/* debug stuff */
@@ -3818,46 +3840,43 @@ pic16_packRegisters (eBBlock * ebp)
 
 
     if (POINTER_SET (ic))
-	debugLog ("  %d - Pointer set\n", __LINE__);
-
-
-		/* Look for two subsequent iCodes with */
-		/*   iTemp := _c;         */
-		/*   _c = iTemp & op;     */
-		/* and replace them by    */
-		/*   iTemp := _c;         */
-		/*   _c = _c & op;        */
-		if ((ic->op == BITWISEAND || ic->op == '|' || ic->op == '^') &&
-			ic->prev &&
-			ic->prev->op == '=' &&
-			IS_ITEMP (IC_LEFT (ic)) &&
-			IC_LEFT (ic) == IC_RESULT (ic->prev) &&
-			isOperandEqual (IC_RESULT(ic), IC_RIGHT(ic->prev)))
+      debugLog ("  %d - Pointer set\n", __LINE__);
+      
+      /* Look for two subsequent iCodes with */
+      /*   iTemp := _c;         */
+      /*   _c = iTemp & op;     */
+      /* and replace them by    */
+      /*   iTemp := _c;         */
+      /*   _c = _c & op;        */
+      if ((ic->op == BITWISEAND || ic->op == '|' || ic->op == '^')
+        && ic->prev
+        && ic->prev->op == '='
+        && IS_ITEMP (IC_LEFT (ic))
+        && IC_LEFT (ic) == IC_RESULT (ic->prev)
+        && isOperandEqual (IC_RESULT(ic), IC_RIGHT(ic->prev)))
         {
-			iCode* ic_prev = ic->prev;
-			symbol* prev_result_sym = OP_SYMBOL (IC_RESULT (ic_prev));
+          iCode* ic_prev = ic->prev;
+          symbol* prev_result_sym = OP_SYMBOL (IC_RESULT (ic_prev));
 			
-			ReplaceOpWithCheaperOp (&IC_LEFT (ic), IC_RESULT (ic));
-			if (IC_RESULT (ic_prev) != IC_RIGHT (ic))
+          ReplaceOpWithCheaperOp (&IC_LEFT (ic), IC_RESULT (ic));
+          if (IC_RESULT (ic_prev) != IC_RIGHT (ic)) {
+            bitVectUnSetBit (OP_USES (IC_RESULT (ic_prev)), ic->key);
+            if (/*IS_ITEMP (IC_RESULT (ic_prev)) && */
+              prev_result_sym->liveTo == ic->seq)
             {
-				bitVectUnSetBit (OP_USES (IC_RESULT (ic_prev)), ic->key);
-				if (/*IS_ITEMP (IC_RESULT (ic_prev)) && */
-					prev_result_sym->liveTo == ic->seq)
-                {
-					prev_result_sym->liveTo = ic_prev->seq;
-                }
+              prev_result_sym->liveTo = ic_prev->seq;
             }
-			bitVectSetBit (OP_USES (IC_RESULT (ic)), ic->key);
-			
-			bitVectSetBit (ic->rlive, IC_RESULT (ic)->key);
-			
-			if (bitVectIsZero (OP_USES (IC_RESULT (ic_prev))))
-            {
-				bitVectUnSetBit (ic->rlive, IC_RESULT (ic)->key);
-				bitVectUnSetBit (OP_DEFS (IC_RESULT (ic_prev)), ic_prev->key);
-				remiCodeFromeBBlock (ebp, ic_prev);
-				hTabDeleteItem (&iCodehTab, ic_prev->key, ic_prev, DELETE_ITEM, NULL);
-            }
+          }
+          bitVectSetBit (OP_USES (IC_RESULT (ic)), ic->key);
+          
+          bitVectSetBit (ic->rlive, IC_RESULT (ic)->key);
+
+          if (bitVectIsZero (OP_USES (IC_RESULT (ic_prev)))) {
+            bitVectUnSetBit (ic->rlive, IC_RESULT (ic)->key);
+            bitVectUnSetBit (OP_DEFS (IC_RESULT (ic_prev)), ic_prev->key);
+            remiCodeFromeBBlock (ebp, ic_prev);
+            hTabDeleteItem (&iCodehTab, ic_prev->key, ic_prev, DELETE_ITEM, NULL);
+          }
         }
 		
     /* if this is an itemp & result of a address of a true sym 
@@ -4078,6 +4097,12 @@ pic16_packRegisters (eBBlock * ebp)
       }
     }
 #endif
+
+#if 1
+    /* there are some problems with packing variables
+     * it seems that the live range estimator doesn't
+     * estimate correctly the liveranges of some symbols */
+     
     /* pack for PUSH 
        iTempNN := (some variable in farspace) V1
        push iTempNN ;
@@ -4088,7 +4113,7 @@ pic16_packRegisters (eBBlock * ebp)
       {
 	packForPush (ic, ebp);
       }
-
+#endif
 
 #ifndef NO_packRegsForAccUse
     /* pack registers for accumulator use, when the

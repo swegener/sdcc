@@ -175,6 +175,7 @@ bool pic16_genMinusDec (iCode *ic);
 void pic16_addSign(operand *result, int offset, int sign);
 void pic16_genMinusBits (iCode *ic);
 void pic16_genMinus (iCode *ic);
+void pic16_genLeftShiftLiteral (operand *left, operand *right, operand *result, iCode *ic);
 
 pCodeOp *pic16_popGet2p(pCodeOp *src, pCodeOp *dst);
 void pic16_emitpcomment (char *fmt, ...);
@@ -199,11 +200,25 @@ void pic16_outBitC(operand *result);
 void pic16_toBoolean(operand *oper);
 void pic16_freeAsmop (operand *op, asmop *aaop, iCode *ic, bool pop);
 const char *pic16_pCodeOpType(  pCodeOp *pcop);
+int pic16_my_powof2 (unsigned long num);
 
 
 void dumpiCode(iCode *lic);
 
 int inWparamList(char *s);
 
+#define DUMP_FUNCTION_ENTRY	1
+#define DUMP_FUNCTION_EXIT	0
 
+#if DUMP_FUNCTION_ENTRY
+#define FENTRY	pic16_emitpcomment("**{\t%d %s", __LINE__, __FUNCTION__)
+#define FENTRY2 if(pic16_options.debgen&2)pic16_emitpcomment("**{\t%d %s", __LINE__, __FUNCTION__)
+#endif
+
+#if DUMP_FUNCTION_EXIT
+#define FEXIT	pic16_emitpcomment("; **}", "%d %s", __LINE__, __FUNCTION__)
+#define FEXIT2	if(pic16_options.debgen&2)pic16_emitpcomment("**{\t%d %s", __LINE__, __FUNCTION__)
+#endif
+
+#define ERROR	werror(W_POSSBUG2, __FILE__, __LINE__)
 #endif

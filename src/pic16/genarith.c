@@ -167,10 +167,11 @@ const char *pic16_pCodeOpSubType(pCodeOp *pcop)
 /*-----------------------------------------------------------------*/
 bool pic16_genPlusIncr (iCode *ic)
 {
-    unsigned int icount ;
-    unsigned int size = pic16_getDataSize(IC_RESULT(ic));
+  unsigned int icount ;
+  unsigned int size = pic16_getDataSize(IC_RESULT(ic));
 
-    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+    FENTRY;
+
     DEBUGpic16_emitcode ("; ","result %s, left %s, right %s",
 			 pic16_AopType(AOP_TYPE(IC_RESULT(ic))),
 			 pic16_AopType(AOP_TYPE(IC_LEFT(ic))),
@@ -280,8 +281,7 @@ void pic16_outBitAcc(operand *result)
 /*-----------------------------------------------------------------*/
 void pic16_genPlusBits (iCode *ic)
 {
-
-  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+  FENTRY;
 
   DEBUGpic16_emitcode ("; ","result %s, left %s, right %s",
 		       pic16_AopType(AOP_TYPE(IC_RESULT(ic))),
@@ -425,7 +425,8 @@ static void adjustArithmeticResult(iCode *ic)
 /*-----------------------------------------------------------------*/
 static void genAddLit2byte (operand *result, int offr, int lit)
 {
-
+  FENTRY;
+  
   switch(lit & 0xff) {
   case 0:
     break;
@@ -465,7 +466,7 @@ static void genAddLit (iCode *ic, int lit)
   operand *result;
   operand *left;
 
-  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+    FENTRY;
 
 
   left = IC_LEFT(ic);
@@ -779,13 +780,12 @@ static void genAddLit (iCode *ic, int lit)
 /*-----------------------------------------------------------------*/
 void pic16_genPlus (iCode *ic)
 {
-	int i, size, offset = 0;
-	operand *result, *left, *right;
+  int i, size, offset = 0;
+  operand *result, *left, *right;
 
-	/* special cases :- */
-	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-
-
+    FENTRY;
+    
+    /* special cases :- */
 	result = IC_RESULT(ic);
 	left = IC_LEFT(ic);
 	right = IC_RIGHT(ic);
@@ -1153,7 +1153,7 @@ bool pic16_genMinusDec (iCode *ic)
     unsigned int icount ;
     unsigned int size = pic16_getDataSize(IC_RESULT(ic));
 
-    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+    FENTRY;
     /* will try to generate an increment */
     /* if the right side is not a literal 
     we cannot */
@@ -1286,7 +1286,8 @@ void pic16_addSign(operand *result, int offset, int sign)
 void pic16_genMinusBits (iCode *ic)
 {
     symbol *lbl = newiTempLabel(NULL);
-    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+
+    FENTRY;
     if (AOP_TYPE(IC_RESULT(ic)) == AOP_CRY){
         pic16_emitcode("mov","c,%s",AOP(IC_LEFT(ic))->aopu.aop_dir);
         pic16_emitcode("jnb","%s,%05d_DS_",AOP(IC_RIGHT(ic))->aopu.aop_dir,(lbl->key+100));
@@ -1313,7 +1314,7 @@ void pic16_genMinus (iCode *ic)
   int size, offset = 0, same=0;
   unsigned long lit = 0L;
 
-  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+    FENTRY;
   pic16_aopOp (IC_LEFT(ic),ic,FALSE);
   pic16_aopOp (IC_RIGHT(ic),ic,FALSE);
   pic16_aopOp (IC_RESULT(ic),ic,TRUE);
@@ -1607,7 +1608,7 @@ void pic16_genUMult8XLit_8 (operand *left,
   int size = AOP_SIZE(result);
   int i;
 
-	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+    FENTRY;
 	DEBUGpic16_pic16_AopType(__LINE__,left,right,result);
 
 	if (AOP_TYPE(right) != AOP_LIT){
@@ -1703,8 +1704,8 @@ void pic16_genUMult16XLit_16 (operand *left,
   int same;
 
 
-	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-
+    FENTRY;
+    
 	if (AOP_TYPE(right) != AOP_LIT){
 		fprintf(stderr,"%s %d - right operand is not a literal\n",__FILE__,__LINE__);
 		exit(1);
@@ -1815,8 +1816,8 @@ void pic16_genUMult8X8_8 (operand *left,
 			   operand *result)
 
 {
-	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-
+  FENTRY;
+  
 
 	if (AOP_TYPE(right) == AOP_LIT) {
 		pic16_genUMult8XLit_8(left,right,result);
@@ -1880,7 +1881,7 @@ void pic16_genUMult16X16_16 (operand *left,
 {
   pCodeOp *pct1, *pct2, *pct3, *pct4;
 
-	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+    FENTRY;
 
 
 	if (AOP_TYPE(right) == AOP_LIT) {
@@ -2007,12 +2008,12 @@ void pic16_genMult8X8_8 (operand *left,
 			 operand *right,
 			 operand *result)
 {
-	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-
-	if(AOP_TYPE(right) == AOP_LIT)
-		pic16_genUMult8XLit_8(left,right,result);
-	else
-		pic16_genUMult8X8_8(left,right,result);
+  FENTRY;
+  
+  if(AOP_TYPE(right) == AOP_LIT)
+    pic16_genUMult8XLit_8(left,right,result);
+  else
+    pic16_genUMult8X8_8(left,right,result);
 }
 
 
@@ -2023,13 +2024,12 @@ void pic16_genMult16X16_16 (operand *left,
 			 operand *right,
 			 operand *result)
 {
-	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-
-	if (AOP_TYPE(right) == AOP_LIT)
-		pic16_genUMult16XLit_16(left,right,result);
-	else
-		pic16_genUMult16X16_16(left,right,result);
-
+  FENTRY;
+  
+  if (AOP_TYPE(right) == AOP_LIT)
+    pic16_genUMult16XLit_16(left,right,result);
+  else
+    pic16_genUMult16X16_16(left,right,result);
 }
 
 
@@ -2047,8 +2047,8 @@ void pic16_genUMult32XLit_32 (operand *left,
   int same;
 
 
-	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-
+    FENTRY;
+    
 	if (AOP_TYPE(right) != AOP_LIT){
 		fprintf(stderr,"%s %d - right operand is not a literal\n",__FILE__,__LINE__);
 		exit(1);
@@ -2159,9 +2159,8 @@ void pic16_genUMult32X32_32 (operand *left,
 {
   pCodeOp *pct1, *pct2, *pct3, *pct4;
 
-	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-
-
+    FENTRY;
+    
 	if (AOP_TYPE(right) == AOP_LIT) {
 		pic16_genUMult8XLit_8(left,right,result);
 	  return;
@@ -2246,13 +2245,12 @@ void pic16_genMult32X32_32 (operand *left,
 			 operand *right,
 			 operand *result)
 {
-	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-
-	if (AOP_TYPE(right) == AOP_LIT)
-		pic16_genUMult32XLit_32(left,right,result);
-	else
-		pic16_genUMult32X32_32(left,right,result);
-
+  FENTRY;
+  
+  if (AOP_TYPE(right) == AOP_LIT)
+    pic16_genUMult32XLit_32(left,right,result);
+  else
+    pic16_genUMult32X32_32(left,right,result);
 }
 
 

@@ -233,7 +233,7 @@ printOperand (operand * op, FILE * file)
 
     case SYMBOL:
 #define REGA 1
-#ifdef REGA
+#if REGA
       fprintf (file, "%s [k%d lr%d:%d so:%d]{ ia%d a2p%d re%d rm%d nos%d ru%d dp%d}",		/*{ar%d rm%d ru%d p%d a%d u%d i%d au%d k%d ks%d}"  , */
 	       (OP_SYMBOL (op)->rname[0] ? OP_SYMBOL (op)->rname : OP_SYMBOL (op)->name),
 	       op->key,
@@ -277,19 +277,53 @@ printOperand (operand * op, FILE * file)
 	    }
 	}
 #else
-      fprintf (file, "%s", (OP_SYMBOL (op)->rname[0] ?
-			    OP_SYMBOL (op)->rname : OP_SYMBOL (op)->name));
+
+      fprintf (file, "%s ", (OP_SYMBOL (op)->rname[0] ? OP_SYMBOL (op)->rname : OP_SYMBOL (op)->name));
+
+#if 0
+
+      fprintf (file, "[lr%d:%d so:%d]",
+	       OP_LIVEFROM (op), OP_LIVETO (op),
+	       OP_SYMBOL (op)->stack
+	);
+#endif
+
+#if 1
+      {
+	fprintf (file, "{");
+	printTypeChain (operandType (op), file);
+	if (SPIL_LOC (op) && IS_ITEMP (op))
+	  fprintf (file, "}{ sir@ %s", SPIL_LOC (op)->rname);
+	fprintf (file, "}");
+
+      }
+#endif
+
       /* if assigned to registers */
-      if (OP_SYMBOL (op)->nRegs && !OP_SYMBOL (op)->isspilt)
+      if (OP_SYMBOL (op)->nRegs)
 	{
-	  int i;
-	  fprintf (file, "[");
-	  for (i = 0; i < OP_SYMBOL (op)->nRegs; i++)
-	    fprintf (file, "%s ", (OP_SYMBOL (op)->regs[i] ?
-				   OP_SYMBOL (op)->regs[i]->name :
-				   "err"));
-	  fprintf (file, "]");
+	  if (OP_SYMBOL (op)->isspilt)
+	    {
+	      if (!OP_SYMBOL (op)->remat)
+		if (OP_SYMBOL (op)->usl.spillLoc)
+		  fprintf (file, "[%s]", (OP_SYMBOL (op)->usl.spillLoc->rname[0] ?
+				       OP_SYMBOL (op)->usl.spillLoc->rname :
+				       OP_SYMBOL (op)->usl.spillLoc->name));
+		else
+		  fprintf (file, "[err]");
+	      else
+		fprintf (file, "[remat]");
+	    }
+	  else
+	    {
+	      int i;
+	      fprintf (file, "[");
+	      for (i = 0; i < OP_SYMBOL (op)->nRegs; i++)
+		fprintf (file, "%s ", port->getRegName (OP_SYMBOL (op)->regs[i]));
+	      fprintf (file, "]");
+	    }
 	}
+
 #endif
       break;
 
@@ -2095,8 +2129,8 @@ geniCodeMultiply (operand * left, operand * right, RESULT_TYPE resultType)
   if (p2 && !IS_FLOAT (letype)
       && !((resultType == RESULT_TYPE_INT) && (getSize (resType) != getSize (ltype))
            && (port->support.muldiv == 1))
-      && strcmp (port->target, "pic14") != 0  /* don't shift for pic */
-      && strcmp (port->target, "pic16") != 0)
+      && strcmp (port->target, "pic16") != 0  /* don't shift for pic */
+      && strcmp (port->target, "pic14") != 0)
     {
       if ((resultType == RESULT_TYPE_INT) && (getSize (resType) != getSize (ltype)))
 	{

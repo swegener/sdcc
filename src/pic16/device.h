@@ -105,6 +105,7 @@ typedef struct {
   int ip_stack;
   unsigned long opt_flags;
   int gstack;
+  unsigned int debgen;
 } pic16_options_t;
 
 #define STACK_MODEL_SMALL	(pic16_options.stack_model == 0)

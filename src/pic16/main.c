@@ -650,6 +650,7 @@ _pic16_setDefaultOptions (void)
   pic16_options.no_crt = 0;			/* use crt by default */
   pic16_options.ip_stack = 1;		/* set to 1 to enable ipop/ipush for stack */
   pic16_options.gstack = 0;
+  pic16_options.debgen = 0;
 }
 
 static const char *

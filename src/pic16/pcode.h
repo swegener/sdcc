@@ -1029,6 +1029,9 @@ extern int pic16_pcode_verbose;
 #ifndef debugf
 //#define debugf(frm, rest...)       _debugf(__FILE__, __LINE__, frm, rest)
 #define debugf(frm, rest)	_debugf(__FILE__, __LINE__, frm, rest)
+#define debugf2(frm, arg1, arg2)	_debugf(__FILE__, __LINE__, frm, arg1, arg2)
+#define debugf3(frm, arg1, arg2, arg3)	_debugf(__FILE__, __LINE__, frm, arg1, arg2, arg3)
+
 #endif
 
 extern void _debugf(char *f, int l, char *frm, ...);

@@ -1,3 +1,27 @@
+2004-12-05 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* applied patch from bug-report #1076292,
+	* applied patches for genAnd and Goto-optimizations for Raphael
+	Neider,
+	* src/SDCCicode.c (printOperand): fixed !REGA source to compile and
+	dump a less iCode information,
+	* src/pic16/device.h (pic16_options_t): added field debgen,
+	* src/pic16/gen.h: added macros DUMP_FUNCTION_ENTRY,
+	DUMP_FUNCTION_EXIT, FENTRY, FENTRY2,
+	* src/pic16/gen.c (my_powof2): renamed to pic16_my_powof2 and made
+	puclic,
+	* (various functions): added macros FENTRY and FENTRY2 to functions,
+	to emit function prologue,
+	* (various functions): fixed indentation,
+	* (genNearPointerGet): fixed loading of FSR0,
+	* (genPackBits): applied patch from Raphael Neider to fix updating
+	of FSR0 and touching only the modified bits,
+	* src/pic16/genarith.c (various functions): added macros FENTRY to
+	emit function prologue in comments,
+	* src/pic16/pcode.h: added functions debugf2, debugf3,
+	* src/pic16/ralloc.c: partial fix for packForPush caused
+	segmentation fault,
+
 2004-12-04 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/peeph.def: added 261.a,b (16 bit rotate) by Stas Sergeev

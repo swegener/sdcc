@@ -7069,7 +7069,7 @@ void pic16_OptimizeJumps ()
   pCode *pc_prev = NULL;
   pCode *pc_next = NULL;
   pBlock *pb;
-	int isHandled = 0;
+  int isHandled = 0;
   int opt=0, toofar=0, jumptabs=0, opt_cond = 0, cond_toofar=0, opt_reorder = 0;
   
   if (!the_pFile) return;
@@ -7086,6 +7086,7 @@ void pic16_OptimizeJumps ()
 	int dist = findpCodeLabel(pc, label, MAX_DIST_BRA);
 	if (dist < 0) dist = -dist;
 	//fprintf (stderr, "distance: %d (", dist); pc->print(stderr, pc);fprintf (stderr, ")\n");
+	isHandled = 0;
 
 	if (condBraType != -1 && hasNoLabel(pc)) {
 	  if (dist < MAX_DIST_BCC) {

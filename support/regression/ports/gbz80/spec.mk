@@ -2,7 +2,7 @@
 
 EMU = $(SDCC_EXTRA_DIR)/emu/rrgb/rrgb
 
-SDCCFLAGS += --lesspedantic -DREENTRANT= -DGENERIC=
+SDCCFLAGS += --lesspedantic -DREENTRANT=
 
 EXEEXT = .gb
 

@@ -1895,43 +1895,43 @@ printTypeChain (sym_link * type, FILE * of)
 	      fprintf (of, "function ");
 	      break;
 	    case GPOINTER:
-	      fprintf (of, "_generic * ");
+	      fprintf (of, "generic * ");
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
 	      break;
 	    case CPOINTER:
-	      fprintf (of, "_code * ");
+	      fprintf (of, "code * ");
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
 	      break;
 	    case FPOINTER:
-	      fprintf (of, "_far * ");
+	      fprintf (of, "far * ");
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
 	      break;
 	    case EEPPOINTER:
-	      fprintf (of, "_eeprom * ");
+	      fprintf (of, "eeprom * ");
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
 	      break;
 
 	    case POINTER:
-	      fprintf (of, "_near * ");
+	      fprintf (of, "near * ");
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
 	      break;
 	    case IPOINTER:
-	      fprintf (of, "_idata *");
+	      fprintf (of, "idata *");
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
 	      break;
 	    case PPOINTER:
-	      fprintf (of, "_pdata *");
+	      fprintf (of, "pdata *");
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
 	      break;
 	    case UPOINTER:
-	      fprintf (of, " _unkown *");
+	      fprintf (of, "unkown *");
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
 	      break;

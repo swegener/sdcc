@@ -17,16 +17,16 @@ typedef unsigned char uchar;
 
 typedef struct s_devsw {
 	uchar	minors; 	/* # of minor device numbers */
-	int	(*dev_init)(uchar NAME(minor));
-	int	(*dev_open)(uchar NAME(minor));
-	int	(*dev_close)(uchar NAME(minor));
-	int	(*dev_read)(uchar NAME(minor), uchar NAME(w));
-	int	(*dev_write)(uchar NAME(minor), uchar NAME(w));
-	int	(*dev_ioctl)(uchar NAME(minor), int cmd, void *data);
+	int	(*dev_init)(uchar NAME(minor)) REENTRANT;
+	int	(*dev_open)(uchar NAME(minor)) REENTRANT;
+	int	(*dev_close)(uchar NAME(minor)) REENTRANT;
+	int	(*dev_read)(uchar NAME(minor), uchar NAME(w)) REENTRANT;
+	int	(*dev_write)(uchar NAME(minor), uchar NAME(w)) REENTRANT;
+	int	(*dev_ioctl)(uchar NAME(minor), int cmd, void *data) REENTRANT;
 } devsw_t;
 
 static int
-_init(uchar minor)
+_init(uchar minor) REENTRANT
 {
   return minor;
 }

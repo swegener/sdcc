@@ -1,3 +1,12 @@
+2001-10-01 Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCsymt.c: no more _modifier in printTypeChain()
+	* support/regression/tests/driverstruct.c: REENTRANT for mcs51
+	* support/regression/ports/gbz80/spec.mk: removed GENERIC
+	* support/regression/ports/host/spec.mk: removed GENERIC
+	* support/regression/ports/mcs51/spec.mk: removed GENERIC
+	* support/regression/ports/z80/spec.mk: removed GENERIC
+
 2001-10-01    <johan@FRIJA>
 
 	* src/SDCC.y: fixed bug #466586 part 1

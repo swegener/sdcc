@@ -25,10 +25,8 @@
 #ifndef REG51_H
 #define REG51_H
 
-#if BelaCompletedHisOrHerQuestAndAdaptedTheLibraries
 #warning This file (reg51.h) is obsolete, depending on your harware
 #warning use include <8051.h>, or include <8052.h>!
-#endif
 
 /*  BYTE Register  */
 sfr at 0x80 P0   ;
@@ -148,3 +146,13 @@ sfr at 0xCB RCAP2H;
 sfr at 0xCA RCAP2L;
 
 #endif
+
+
+
+
+
+
+
+
+
+

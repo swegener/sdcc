@@ -1,10 +1,14 @@
+2004-02-03 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c: removed non-standard C nameless struct/union
+
 2005-02-04 Slade Rich <slade_rich AT users.sourceforge.net>
 
 	* src/pic/gen.c : Fix for bugs #1080519 & #1115662.
 
 2004-02-03 Maarten Brock <sourceforge.brock AT dse.nl>
 
-	* device/include/mcs51/c8051f120.h: added decalrations for sbit port 2,3&4
+	* device/include/mcs51/c8051f120.h: added declarations for sbit port 2,3&4
 
 2005-02-02 Raphael Neider <rneider AT web.de>
 

@@ -64,6 +64,11 @@ static char *accUse[] =
 
 static unsigned short rbank = -1;
 
+#define R0INB	_G.bu.bs.r0InB
+#define R1INB	_G.bu.bs.r1InB
+#define OPINB	_G.bu.bs.OpInB
+#define BINUSE	_G.bu.BInUse
+
 static struct
   {
     short r0Pushed;
@@ -75,9 +80,9 @@ static struct
             short r0InB : 2;//2 so we can see it overflow
             short r1InB : 2;//2 so we can see it overflow
             short OpInB : 2;//2 so we can see it overflow
-          } ;
+          } bs;
         short BInUse;
-      } ;
+      } bu;
     short accInUse;
     short inLine;
     short debugLine;
@@ -190,7 +195,7 @@ pushB (void)
 {
   bool pushedB = FALSE;
 
-  if (_G.BInUse)
+  if (BINUSE)
     {
       emitcode ("push", "b");
 //    printf("B was in use !\n");
@@ -198,7 +203,7 @@ pushB (void)
     }
   else
     {
-      _G.OpInB++;
+      OPINB++;
     }
   return pushedB;
 }
@@ -215,7 +220,7 @@ popB (bool pushedB)
     }
   else
     {
-      _G.OpInB--;
+      OPINB--;
     }
 }
 
@@ -269,7 +274,7 @@ getFreePtr (iCode * ic, asmop ** aopp, bool result)
         {
           emitcode ("mov", "b,%s",
                     mcs51_regWithIdx (R0_IDX)->dname);
-          _G.r0InB++;
+          R0INB++;
         }
       else if (!_G.r0Pushed)
         {
@@ -293,7 +298,7 @@ getFreePtr (iCode * ic, asmop ** aopp, bool result)
         {
           emitcode ("mov", "b,%s",
                     mcs51_regWithIdx (R1_IDX)->dname);
-          _G.r1InB++;
+          R1INB++;
         }
       else if (!_G.r1Pushed)
         {
@@ -886,10 +891,10 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
   switch (aop->type)
     {
     case AOP_R0:
-      if (_G.r0InB)
+      if (R0INB)
         {
           emitcode ("mov", "r0,b");
-          _G.r0InB--;
+          R0INB--;
         }
       else if (_G.r0Pushed)
         {
@@ -903,10 +908,10 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
       break;
 
     case AOP_R1:
-      if (_G.r1InB)
+      if (R1INB)
         {
           emitcode ("mov", "r1,b");
-          _G.r1InB--;
+          R1INB--;
         }
       if (_G.r1Pushed)
         {
@@ -1001,7 +1006,7 @@ freeForBranchAsmop (operand * op)
   switch (aop->type)
     {
     case AOP_R0:
-      if (_G.r0InB)
+      if (R0INB)
         {
           emitcode ("mov", "r0,b");
         }
@@ -1012,7 +1017,7 @@ freeForBranchAsmop (operand * op)
       break;
 
     case AOP_R1:
-      if (_G.r1InB)
+      if (R1INB)
         {
           emitcode ("mov", "r1,b");
         }
@@ -5229,7 +5234,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
         {
           char *l;
           //if B in use: push B; mov B,left; mov A,right; clrc; subb A,B; pop B; jnz
-          wassertl(!_G.BInUse, "B was in use");
+          wassertl(!BINUSE, "B was in use");
           l = aopGet (AOP (left), offset, FALSE, FALSE);
           if (strcmp (l, "b"))
             emitcode ("mov", "b,%s", l);
@@ -5788,7 +5793,7 @@ genAnd (iCode * ic, iCode * ifx)
                           break;
                   default: emitcode ("mov", "c,acc.%d", posbit & 0x07);
                           break;
-                }            
+                }
             }
           // if(left &  2^n)
           else
@@ -9838,7 +9843,7 @@ genJumpTab (iCode * ic)
           (AOP_TYPE (IC_JTCOND (ic)) == AOP_R1 && _G.r1Pushed))
         {
           // (MB) what if B is in use???
-          wassertl(!_G.BInUse, "B was in use");
+          wassertl(!BINUSE, "B was in use");
           emitcode ("mov", "b,%s", l);
           l = "b";
         }

@@ -11,7 +11,9 @@
 
 /* MSVC 6 does not have __FUNCTION__ preprocessor macro defined */
 
+#if defined(_MSC_VER) && (_MSC_VER < 1300)
 #define __FUNCTION__ __FILE__
+#endif
 
 #undef PREFIX
 #undef DATADIR

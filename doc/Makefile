@@ -8,7 +8,10 @@ all: $(MANUAL).html $(MANUAL).pdf $(MANUAL).txt \
 
 install:
 	$(INSTALL) -d $(docdir)
-	cp -rf *.html *.txt *.pdf $(MANUAL).html $(TSS).html z80 avr $(docdir)
+	cp -rf *.html *.txt z80 avr $(docdir)
+	$(shell if [ -f $(MANUAL).html ]; then cp -rf $(MANUAL).html $(docdir); fi)
+	$(shell if [ -f $(TSS).html    ]; then cp -rf $(TSS).html    $(docdir); fi)
+	$(shell if [ -f *.pdf          ]; then cp -rf *.pdf          $(docdir); fi)
 
 uninstall:
 	rm -rf $(docdir)
@@ -25,7 +28,7 @@ $(TSS).html: $(TSS).tex
 %.txt: %.lyx
 	lyx -e text $<
 
-%.pdf: %.tex %.dvi
+%.pdf: %.dvi
 	which pdflatex > /dev/null && pdflatex $* || dvipdf $*
 
 %.dvi: %.tex
@@ -41,24 +44,4 @@ $(TSS).html: $(TSS).tex
 	# the glossary, not implemented yet
 	# makeindex -s l2hglo.ist -o $@ $<
 
-# Deleting all files created by building the program
-# --------------------------------------------------
-clean:
-# The directories are still in CVS, so don't delete them
-#	rm -rf $(MANUAL).html $(TSS).html
-	rm -f $(MANUAL).html/* $(TSS).html/*
-	rm -f $(MANUAL).txt $(TSS).txt *.pdf *.dvi *.tex *.ind *.glo *.aux *.idx *.ilg *.log *.toc
-
-# Deleting all files created by configuring or building the program
-# -----------------------------------------------------------------
-distclean: clean
-
-# Like clean but some files may still exist
-# -----------------------------------------
-mostlyclean: clean
-
-# Deleting everything that can reconstructed by this Makefile. It deletes
-# everything deleted by distclean plus files created by bison, etc.
-# -----------------------------------------------------------------------
-realclean: distclean
-
+include clean.mk

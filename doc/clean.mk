@@ -1,11 +1,19 @@
-# remove intermediate file, not the final pdf's and html's
-# because these are needed for the distribution
 clean:
-	rm -rf *.tex *.aux *.dvi *.idx *.ilg *.ind *.log *.toc *~ \#* \
-		*.ps */*.css */*.pl *.gif core
+# The directories are still in CVS, so don't delete them
+#       rm -rf $(MANUAL).html $(TSS).html
+	rm -f $(MANUAL).html/* $(TSS).html/*
+	rm -rf $(MANUAL).txt $(TSS).txt *.pdf *.tex *.aux *.dvi *.idx *.ilg \
+		*.ind *.log *.toc *~ \#* *.ps */*.css */*.pl *.gif core *.glo
 
-# now get rid of the generated pdf's and html's as well
-superclean: clean
-	rm -rf *.pdf $(MANUAL).html $(TSS).html
+# Deleting all files created by configuring or building the program
+# -----------------------------------------------------------------
+distclean: clean
 
-distclean: superclean
+# Like clean but some files may still exist
+# -----------------------------------------
+mostlyclean: clean
+
+# Deleting everything that can reconstructed by this Makefile. It deletes
+# everything deleted by distclean plus files created by bison, etc.
+# -----------------------------------------------------------------------
+realclean: distclean

@@ -311,7 +311,7 @@ ac_includes_default="\
 ac_subdirs_all="$ac_subdirs_all support/cpp2"
 ac_subdirs_all="$ac_subdirs_all packihx"
 ac_subdirs_all="$ac_subdirs_all sim/ucsim"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS AWK VERSION VERSIONHI VERSIONLO VERSIONP CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB LEX LEXLIB LEX_OUTPUT_ROOT YACC AUTOCONF STRIP AS CP LYX LATEX LATEX2HTML PDFLATEX DVIPDF EGREP M_OR_MM include_dir_suffix lib_dir_suffix docdir OPT_ENABLE_UCSIM OPT_ENABLE_DEVICE_LIB_BUILD OPT_ENABLE_PACKIHX subdirs LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS AWK VERSION VERSIONHI VERSIONLO VERSIONP CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB LEX LEXLIB LEX_OUTPUT_ROOT YACC AUTOCONF STRIP AS CP LYX LATEX LATEX2HTML PDFLATEX DVIPDF EGREP M_OR_MM sdccconf_h_dir_separator include_dir_suffix lib_dir_suffix docdir OPT_ENABLE_UCSIM OPT_ENABLE_DEVICE_LIB_BUILD OPT_ENABLE_PACKIHX subdirs LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -780,6 +780,22 @@ ac_env_CPP_set=${CPP+set}
 ac_env_CPP_value=$CPP
 ac_cv_env_CPP_set=${CPP+set}
 ac_cv_env_CPP_value=$CPP
+ac_env_sdccconf_h_dir_separator_set=${sdccconf_h_dir_separator+set}
+ac_env_sdccconf_h_dir_separator_value=$sdccconf_h_dir_separator
+ac_cv_env_sdccconf_h_dir_separator_set=${sdccconf_h_dir_separator+set}
+ac_cv_env_sdccconf_h_dir_separator_value=$sdccconf_h_dir_separator
+ac_env_include_dir_suffix_set=${include_dir_suffix+set}
+ac_env_include_dir_suffix_value=$include_dir_suffix
+ac_cv_env_include_dir_suffix_set=${include_dir_suffix+set}
+ac_cv_env_include_dir_suffix_value=$include_dir_suffix
+ac_env_lib_dir_suffix_set=${lib_dir_suffix+set}
+ac_env_lib_dir_suffix_value=$lib_dir_suffix
+ac_cv_env_lib_dir_suffix_set=${lib_dir_suffix+set}
+ac_cv_env_lib_dir_suffix_value=$lib_dir_suffix
+ac_env_docdir_set=${docdir+set}
+ac_env_docdir_value=$docdir
+ac_cv_env_docdir_set=${docdir+set}
+ac_cv_env_docdir_value=$docdir
 
 #
 # Report the --help message.
@@ -879,6 +895,13 @@ Some influential environment variables:
   CXX         C++ compiler command
   CXXFLAGS    C++ compiler flags
   CPP         C preprocessor
+  sdccconf_h_dir_separator
+              needed in sdccconf.h: either "/" (default) or "\\"
+  include_dir_suffix
+              appended to datadir to define SDCC's include directory
+  lib_dir_suffix
+              appended to datadir to define SDCC's library root directory
+  docdir      documentation installation directory
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -1343,8 +1366,6 @@ fi
 VERSIONHI=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $1}'`
 VERSIONLO=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $2}'`
 VERSIONP=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $3}'`
-# Assume no special extension
-EXEEXT=`echo $EXEEXT`
 
 echo "$as_me:$LINENO: result: ${VERSION}" >&5
 echo "${ECHO_T}${VERSION}" >&6
@@ -6103,89 +6124,60 @@ esac
 # And we want to preserve the macros (e.g. ${prefix}) in the Makefiles.
 # The variables in the Makefiles are replaced by AC_SUBST()
 #
-# In sdccconf.h the '/' in paths are replaced by "\\" (normalized).
+# In sdccconf.h the '/' in paths can be replaced by "\\" (normalized), if
+#
 # The macros are expanded for the header.
 # The variables in the header are replaced by AC_*DEFINE*()
+# sdccconf_h_dir_separator contains a backslash.
 
-echo "$as_me:$LINENO: checking -mno-cygwin" >&5
-echo $ECHO_N "checking -mno-cygwin... $ECHO_C" >&6
-  case ${CFLAGS} in
-      *-mno-cygwin*)
-	  MINGW32_HOST="yes"
-	  ;;
-      *)
-	  MINGW32_HOST="no"
-	  ;;
-  esac
-echo "$as_me:$LINENO: result: $MINGW32_HOST" >&5
-echo "${ECHO_T}$MINGW32_HOST" >&6
-
-echo "$as_me:$LINENO: checking host mingw32" >&5
-echo $ECHO_N "checking host mingw32... $ECHO_C" >&6
-  case ${host} in
-      *mingw32*)
-	  MINGW32_HOST="yes"
-	  ;;
-  esac
-echo "$as_me:$LINENO: result: $MINGW32_HOST" >&5
-echo "${ECHO_T}$MINGW32_HOST" >&6
-
-if test "${MINGW32_HOST}" = "no"; then
-    dir_separator="/"
-else
-    dir_separator="\\\\"
+if test "${sdccconf_h_dir_separator}" = ""; then
+    sdccconf_h_dir_separator="/"
 fi
-
 
 # Makefiles
 ###########
 
 # include_dir_suffix:
-# *nix    default: "sdcc/include"
-# mingw32 default: "include"
-  if test "${MINGW32_HOST}" = "no"; then
-	include_dir_suffix="sdcc/include"
-  else
-	include_dir_suffix="include"
-  fi
+# *nix default: "sdcc/include"
+
+
+if test "${include_dir_suffix}" = ""; then
+    include_dir_suffix="sdcc/include"
+fi
 
 
 # lib_dir_suffix:
-# *nix    default: "sdcc/lib"
-# mingw32 default: "lib"
-  if test "${MINGW32_HOST}" = "no"; then
-	lib_dir_suffix="sdcc/lib"
-  else
-	lib_dir_suffix="lib"
-  fi
+# *nix default: "sdcc/lib"
+
+if test "${lib_dir_suffix}" = ""; then
+    lib_dir_suffix="sdcc/lib"
+fi
 
 
 # docdir:
-# *nix    default: "${datadir}/sdcc/doc"
-# mingw32 default: "${datadir}/doc"
-  if test "${MINGW32_HOST}" = "no"; then
-	doc_suffix="/sdcc/doc"
-  else
-	doc_suffix="/doc"
-  fi
-  docdir="\${datadir}"${doc_suffix}
+# *nix default: "${datadir}/sdcc/doc"
+
+if test "${docdir}" = ""; then
+    docdir="\${datadir}"/sdcc/doc
+fi
+
+
 
 
 # sdccconf.h
 ############
 
 cat >>confdefs.h <<_ACEOF
-#define DIR_SEPARATOR_STRING "${dir_separator}"
+#define DIR_SEPARATOR_STRING "${sdccconf_h_dir_separator}"
 _ACEOF
 
 cat >>confdefs.h <<_ACEOF
-#define DIR_SEPARATOR_CHAR   '${dir_separator}'
+#define DIR_SEPARATOR_CHAR   '${sdccconf_h_dir_separator}'
 _ACEOF
 
 
 # prefix:
-# *nix    default: "NONE", ${ac_default_prefix}: "/usr/local"
-# mingw32 default: "/sdcc"
+# default: "NONE", ${ac_default_prefix}: "/usr/local"
 
   test "x$prefix" = xNONE && prefix="$ac_default_prefix"
   test "x$exec_prefix" = xNONE && exec_prefix='${prefix}'
@@ -6204,7 +6196,7 @@ _ACEOF
   :*:) ;;
 esac
 # squeze repeated slashes
-case $dir_separator in
+case $sdccconf_h_dir_separator in
 # if the path contains any backslashes, turn slashes into backslashes
 
 # Bernhard Held 2003-04-06
@@ -6212,7 +6204,7 @@ case $dir_separator in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) ac_ndu=`echo "[$]ac_ndu" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
+ *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6243,7 +6235,7 @@ _ACEOF
   :*:) ;;
 esac
 # squeze repeated slashes
-case $dir_separator in
+case $sdccconf_h_dir_separator in
 # if the path contains any backslashes, turn slashes into backslashes
 
 # Bernhard Held 2003-04-06
@@ -6251,7 +6243,7 @@ case $dir_separator in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) ac_ndu=`echo "[$]ac_ndu" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
+ *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6282,7 +6274,7 @@ _ACEOF
   :*:) ;;
 esac
 # squeze repeated slashes
-case $dir_separator in
+case $sdccconf_h_dir_separator in
 # if the path contains any backslashes, turn slashes into backslashes
 
 # Bernhard Held 2003-04-06
@@ -6290,7 +6282,7 @@ case $dir_separator in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) ac_ndu=`echo "[$]ac_ndu" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
+ *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6302,8 +6294,7 @@ _ACEOF
 
 
 # datadir:
-# *nix    default: "${prefix}/share"
-# mingw32 default: "/sdcc"
+# default: "${prefix}/share"
 
   test "x$prefix" = xNONE && prefix="$ac_default_prefix"
   test "x$exec_prefix" = xNONE && exec_prefix='${prefix}'
@@ -6322,7 +6313,7 @@ _ACEOF
   :*:) ;;
 esac
 # squeze repeated slashes
-case $dir_separator in
+case $sdccconf_h_dir_separator in
 # if the path contains any backslashes, turn slashes into backslashes
 
 # Bernhard Held 2003-04-06
@@ -6330,7 +6321,7 @@ case $dir_separator in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) ac_ndu=`echo "[$]ac_ndu" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
+ *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6351,7 +6342,7 @@ case ":$norm_inc_dir_suffix:" in
   :*:) ;;
 esac
 # squeze repeated slashes
-case $dir_separator in
+case $sdccconf_h_dir_separator in
 # if the path contains any backslashes, turn slashes into backslashes
 
 # Bernhard Held 2003-04-06
@@ -6359,7 +6350,7 @@ case $dir_separator in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) norm_inc_dir_suffix=`echo "[$]norm_inc_dir_suffix" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) norm_inc_dir_suffix=`echo "$norm_inc_dir_suffix" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
+ *\\*) norm_inc_dir_suffix=`echo "$norm_inc_dir_suffix" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) norm_inc_dir_suffix=`echo "$norm_inc_dir_suffix" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6377,7 +6368,7 @@ case ":$norm_lib_dir_suffix:" in
   :*:) ;;
 esac
 # squeze repeated slashes
-case $dir_separator in
+case $sdccconf_h_dir_separator in
 # if the path contains any backslashes, turn slashes into backslashes
 
 # Bernhard Held 2003-04-06
@@ -6385,7 +6376,7 @@ case $dir_separator in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) norm_lib_dir_suffix=`echo "[$]norm_lib_dir_suffix" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) norm_lib_dir_suffix=`echo "$norm_lib_dir_suffix" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
+ *\\*) norm_lib_dir_suffix=`echo "$norm_lib_dir_suffix" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) norm_lib_dir_suffix=`echo "$norm_lib_dir_suffix" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6435,7 +6426,7 @@ case '/' in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) _lcl_from=`echo "[$]_lcl_from" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_from=`echo "$_lcl_from" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
+ *\\*) _lcl_from=`echo "$_lcl_from" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) _lcl_from=`echo "$_lcl_from" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6456,7 +6447,7 @@ case '/' in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) _lcl_to=`echo "[$]_lcl_to" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_to=`echo "$_lcl_to" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
+ *\\*) _lcl_to=`echo "$_lcl_to" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) _lcl_to=`echo "$_lcl_to" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6502,7 +6493,7 @@ case "$_lcl_notation" in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) _lcl_result_tmp=`echo "[$]_lcl_result_tmp" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
+ *\\*) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6517,7 +6508,7 @@ case ":$bin2data_dir:" in
   :*:) ;;
 esac
 # squeze repeated slashes
-case $dir_separator in
+case $sdccconf_h_dir_separator in
 # if the path contains any backslashes, turn slashes into backslashes
 
 # Bernhard Held 2003-04-06
@@ -6525,7 +6516,7 @@ case $dir_separator in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) bin2data_dir=`echo "[$]bin2data_dir" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) bin2data_dir=`echo "$bin2data_dir" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
+ *\\*) bin2data_dir=`echo "$bin2data_dir" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) bin2data_dir=`echo "$bin2data_dir" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6574,7 +6565,7 @@ case '/' in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) _lcl_from=`echo "[$]_lcl_from" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_from=`echo "$_lcl_from" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
+ *\\*) _lcl_from=`echo "$_lcl_from" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) _lcl_from=`echo "$_lcl_from" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6595,7 +6586,7 @@ case '/' in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) _lcl_to=`echo "[$]_lcl_to" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_to=`echo "$_lcl_to" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
+ *\\*) _lcl_to=`echo "$_lcl_to" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) _lcl_to=`echo "$_lcl_to" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6641,7 +6632,7 @@ case "$_lcl_notation" in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) _lcl_result_tmp=`echo "[$]_lcl_result_tmp" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
+ *\\*) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6656,7 +6647,7 @@ case ":$prefix2bin_dir:" in
   :*:) ;;
 esac
 # squeze repeated slashes
-case $dir_separator in
+case $sdccconf_h_dir_separator in
 # if the path contains any backslashes, turn slashes into backslashes
 
 # Bernhard Held 2003-04-06
@@ -6664,7 +6655,7 @@ case $dir_separator in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) prefix2bin_dir=`echo "[$]prefix2bin_dir" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) prefix2bin_dir=`echo "$prefix2bin_dir" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
+ *\\*) prefix2bin_dir=`echo "$prefix2bin_dir" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) prefix2bin_dir=`echo "$prefix2bin_dir" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6713,7 +6704,7 @@ case '/' in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) _lcl_from=`echo "[$]_lcl_from" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_from=`echo "$_lcl_from" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
+ *\\*) _lcl_from=`echo "$_lcl_from" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) _lcl_from=`echo "$_lcl_from" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6734,7 +6725,7 @@ case '/' in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) _lcl_to=`echo "[$]_lcl_to" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_to=`echo "$_lcl_to" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
+ *\\*) _lcl_to=`echo "$_lcl_to" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) _lcl_to=`echo "$_lcl_to" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6780,7 +6771,7 @@ case "$_lcl_notation" in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) _lcl_result_tmp=`echo "[$]_lcl_result_tmp" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
+ *\\*) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6795,7 +6786,7 @@ case ":$prefix2data_dir:" in
   :*:) ;;
 esac
 # squeze repeated slashes
-case $dir_separator in
+case $sdccconf_h_dir_separator in
 # if the path contains any backslashes, turn slashes into backslashes
 
 # Bernhard Held 2003-04-06
@@ -6803,7 +6794,7 @@ case $dir_separator in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) prefix2data_dir=`echo "[$]prefix2data_dir" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) prefix2data_dir=`echo "$prefix2data_dir" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
+ *\\*) prefix2data_dir=`echo "$prefix2data_dir" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) prefix2data_dir=`echo "$prefix2data_dir" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6843,11 +6834,11 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 cat >>confdefs.h <<_ACEOF
-#define STD_xa51_LIB "xa51"
+#define STD_XA51_LIB "libxa51"
 _ACEOF
 
 
-# environment variables
+# SDCC runtime environment variables
 sdcc_dir_name="SDCC_HOME"
 cat >>confdefs.h <<_ACEOF
 #define SDCC_DIR_NAME "${sdcc_dir_name}"
@@ -7787,6 +7778,7 @@ s,@PDFLATEX@,$PDFLATEX,;t t
 s,@DVIPDF@,$DVIPDF,;t t
 s,@EGREP@,$EGREP,;t t
 s,@M_OR_MM@,$M_OR_MM,;t t
+s,@sdccconf_h_dir_separator@,$sdccconf_h_dir_separator,;t t
 s,@include_dir_suffix@,$include_dir_suffix,;t t
 s,@lib_dir_suffix@,$lib_dir_suffix,;t t
 s,@docdir@,$docdir,;t t

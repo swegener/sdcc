@@ -18,8 +18,6 @@ fi
 VERSIONHI=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $1}'`
 VERSIONLO=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $2}'`
 VERSIONP=`echo $VERSION|$AWK 'BEGIN {FS="."} {print $3}'`
-# Assume no special extension
-EXEEXT=`echo $EXEEXT`
 
 AC_MSG_RESULT(${VERSION})
 AC_SUBST(VERSION)
@@ -156,7 +154,7 @@ case ifelse($2,,"[$]$1",$2) in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) $1=`echo "[$]$1" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) $1=`echo "[$]$1" | sed 's,[[\\/]][[\\/]]*,\\\\\\\\,g'` ;;
+ *\\*) $1=`echo "[$]$1" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\\\\\,g' | sed 's,^[[\\/]],\\\\\\\\,'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) $1=`echo "[$]$1" | sed 's,\(.\)[[\\/]][[\\/]]*,\1/,g'` ;;
@@ -381,121 +379,95 @@ AC_C_BIGENDIAN
 # And we want to preserve the macros (e.g. ${prefix}) in the Makefiles.
 # The variables in the Makefiles are replaced by AC_SUBST()
 #
-# In sdccconf.h the '/' in paths are replaced by "\\" (normalized).
+# In sdccconf.h the '/' in paths can be replaced by "\\" (normalized), if
+#
 # The macros are expanded for the header.
 # The variables in the header are replaced by AC_*DEFINE*()
-
-AC_MSG_CHECKING(-mno-cygwin)
-  case ${CFLAGS} in
-      *-mno-cygwin*)
-	  MINGW32_HOST="yes"
-	  ;;
-      *)
-	  MINGW32_HOST="no"
-	  ;;
-  esac
-AC_MSG_RESULT($MINGW32_HOST)
-
-AC_MSG_CHECKING(host mingw32)
-  case ${host} in
-      *mingw32*)
-	  MINGW32_HOST="yes"
-	  ;;
-  esac
-AC_MSG_RESULT($MINGW32_HOST)
-
-if test "${MINGW32_HOST}" = "no"; then
-    dir_separator="/"
-else
-    dir_separator="\\\\"
+# sdccconf_h_dir_separator contains a backslash.
+AC_ARG_VAR(sdccconf_h_dir_separator, needed in sdccconf.h: either "/" (default) or "\\")
+if test "${sdccconf_h_dir_separator}" = ""; then
+    sdccconf_h_dir_separator="/"
 fi
-
 
 # Makefiles
 ###########
 
 # include_dir_suffix:
-# *nix    default: "sdcc/include"
-# mingw32 default: "include"
-  if test "${MINGW32_HOST}" = "no"; then
-	include_dir_suffix="sdcc/include"
-  else
-	include_dir_suffix="include"
-  fi
+# *nix default: "sdcc/include"
+
+AC_ARG_VAR(include_dir_suffix, appended to datadir to define SDCC's include directory)
+if test "${include_dir_suffix}" = ""; then
+    include_dir_suffix="sdcc/include"
+fi
 AC_SUBST(include_dir_suffix)
 
 # lib_dir_suffix:
-# *nix    default: "sdcc/lib"
-# mingw32 default: "lib"
-  if test "${MINGW32_HOST}" = "no"; then
-	lib_dir_suffix="sdcc/lib"
-  else
-	lib_dir_suffix="lib"
-  fi
+# *nix default: "sdcc/lib"
+AC_ARG_VAR(lib_dir_suffix, appended to datadir to define SDCC's library root directory)
+if test "${lib_dir_suffix}" = ""; then
+    lib_dir_suffix="sdcc/lib"
+fi
 AC_SUBST(lib_dir_suffix)
 
 # docdir:
-# *nix    default: "${datadir}/sdcc/doc"
-# mingw32 default: "${datadir}/doc"
-  if test "${MINGW32_HOST}" = "no"; then
-	doc_suffix="/sdcc/doc"
-  else
-	doc_suffix="/doc"
-  fi
-  docdir="\${datadir}"${doc_suffix}
+# *nix default: "${datadir}/sdcc/doc"
+AC_ARG_VAR(docdir, documentation installation directory)
+if test "${docdir}" = ""; then
+    docdir="\${datadir}"/sdcc/doc
+fi
 AC_SUBST(docdir)
+
+AC_SUBST(EXEEXT)
 
 # sdccconf.h
 ############
 
-AC_DEFINE_UNQUOTED(DIR_SEPARATOR_STRING, "${dir_separator}")
-AC_DEFINE_UNQUOTED(DIR_SEPARATOR_CHAR  , '${dir_separator}')
+AC_DEFINE_UNQUOTED(DIR_SEPARATOR_STRING, "${sdccconf_h_dir_separator}")
+AC_DEFINE_UNQUOTED(DIR_SEPARATOR_CHAR  , '${sdccconf_h_dir_separator}')
 
 # prefix:
-# *nix    default: "NONE", ${ac_default_prefix}: "/usr/local"
-# mingw32 default: "/sdcc"
+# default: "NONE", ${ac_default_prefix}: "/usr/local"
 AC_EXPAND(prefix, ac_default_prefix, expanded_prefix)
-AC_NORMALIZE_DEFINE_UNQUOTED(expanded_prefix, PREFIX, dir_separator)
+AC_NORMALIZE_DEFINE_UNQUOTED(expanded_prefix, PREFIX, sdccconf_h_dir_separator)
 
 # exec_prefix:
 # default: "${prefix}"
 AC_EXPAND(exec_prefix, expanded_prefix, expanded_exec_prefix)
-AC_NORMALIZE_DEFINE_UNQUOTED(expanded_exec_prefix, EXEC_PREFIX, dir_separator)
+AC_NORMALIZE_DEFINE_UNQUOTED(expanded_exec_prefix, EXEC_PREFIX, sdccconf_h_dir_separator)
 
 # bindir:
 # default: "${exec_prefix}/bin"
 AC_EXPAND(bindir, "NONE", expanded_bindir)
-AC_NORMALIZE_DEFINE_UNQUOTED(expanded_bindir, BINDIR, dir_separator)
+AC_NORMALIZE_DEFINE_UNQUOTED(expanded_bindir, BINDIR, sdccconf_h_dir_separator)
 
 # datadir:
-# *nix    default: "${prefix}/share"
-# mingw32 default: "/sdcc"
+# default: "${prefix}/share"
 AC_EXPAND(datadir, "NONE", expanded_datadir)
-AC_NORMALIZE_DEFINE_UNQUOTED(expanded_datadir, DATADIR, dir_separator)
+AC_NORMALIZE_DEFINE_UNQUOTED(expanded_datadir, DATADIR, sdccconf_h_dir_separator)
 
 # include/lib suffix
 norm_inc_dir_suffix=${include_dir_suffix}
-adl_NORMALIZE_PATH([norm_inc_dir_suffix], [$dir_separator])
+adl_NORMALIZE_PATH([norm_inc_dir_suffix], [$sdccconf_h_dir_separator])
 AC_DEFINE_UNQUOTED(INCLUDE_DIR_SUFFIX,
                    DIR_SEPARATOR_STRING "${norm_inc_dir_suffix}")
 norm_lib_dir_suffix=${lib_dir_suffix}
-adl_NORMALIZE_PATH([norm_lib_dir_suffix], [$dir_separator])
+adl_NORMALIZE_PATH([norm_lib_dir_suffix], [$sdccconf_h_dir_separator])
 AC_DEFINE_UNQUOTED(LIB_DIR_SUFFIX,
                    DIR_SEPARATOR_STRING "${norm_lib_dir_suffix}")
 
 # relative paths
 adl_COMPUTE_RELATIVE_PATHS([expanded_bindir:expanded_datadir:bin2data_dir])
-adl_NORMALIZE_PATH(bin2data_dir, [$dir_separator])
+adl_NORMALIZE_PATH(bin2data_dir, [$sdccconf_h_dir_separator])
 AC_DEFINE_UNQUOTED(BIN2DATA_DIR,
                    DIR_SEPARATOR_STRING "${bin2data_dir}")
 
 adl_COMPUTE_RELATIVE_PATHS([expanded_prefix:expanded_bindir:prefix2bin_dir])
-adl_NORMALIZE_PATH(prefix2bin_dir, [$dir_separator])
+adl_NORMALIZE_PATH(prefix2bin_dir, [$sdccconf_h_dir_separator])
 AC_DEFINE_UNQUOTED(PREFIX2BIN_DIR,
                    DIR_SEPARATOR_STRING "${prefix2bin_dir}")
 
 adl_COMPUTE_RELATIVE_PATHS([expanded_prefix:expanded_datadir:prefix2data_dir])
-adl_NORMALIZE_PATH(prefix2data_dir, [$dir_separator])
+adl_NORMALIZE_PATH(prefix2data_dir, [$sdccconf_h_dir_separator])
 if test "${prefix2data_dir}" = "."; then
     # small optimization for Mingw32; otherwise Borut will complain ;-)
     AC_DEFINE_UNQUOTED(PREFIX2DATA_DIR, "")
@@ -510,9 +482,9 @@ AC_DEFINE_UNQUOTED(STD_INT_LIB,   "libint")
 AC_DEFINE_UNQUOTED(STD_LONG_LIB,  "liblong")
 AC_DEFINE_UNQUOTED(STD_FP_LIB,    "libfloat")
 AC_DEFINE_UNQUOTED(STD_DS390_LIB, "libds390")
-AC_DEFINE_UNQUOTED(STD_xa51_LIB,  "xa51")
+AC_DEFINE_UNQUOTED(STD_XA51_LIB,  "libxa51")
 
-# environment variables
+# SDCC runtime environment variables
 sdcc_dir_name="SDCC_HOME"
 AC_DEFINE_UNQUOTED(SDCC_DIR_NAME, "${sdcc_dir_name}")
 

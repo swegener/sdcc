@@ -1,5 +1,5 @@
 #!/bin/sh
-# Script to compile with mingw32
+# Script to crosscompile with mingw32
 TOOLSPREFIX=/usr/local/cross-tools/i386-mingw32msvc/bin
 
 export CC=$TOOLSPREFIX/gcc
@@ -7,12 +7,17 @@ export CXX=$TOOLSPREFIX/g++
 export RANLIB=$TOOLSPREFIX/ranlib
 export STRIP=$TOOLSPREFIX/strip
 
-export SDCCCONFIGUREFLAGS="--prefix=/sdcc --disable-device-lib-build \
---disable-ucsim --program-suffix=.exe --datadir=/sdcc \
+export SDCCCONFIGUREFLAGS=" \
+--prefix=/sdcc \
+--datadir=/sdcc \
+docdir=/sdcc/doc \
+include_dir_suffix=include \
+lib_dir_suffix=lib \
+sdccconf_h_dir_separator=\\\\ \
+--disable-device-lib-build \
+--disable-ucsim \
+--program-suffix=.exe \
 --host=i586-mingw32msvc --build=unknown-unknown-linux-gnu"
 
 ./configure $SDCCCONFIGUREFLAGS
 make 2>&1 | tee make.log
-
-
-

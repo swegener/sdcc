@@ -1,0 +1,15 @@
+#!/bin/sh
+# Script to "cross" compile with mingw32 under Cygwin
+
+./configure -C \
+CFLAGS="-mno-cygwin -O2" \
+LDFLAGS="-mno-cygwin" \
+--prefix="/sdcc" \
+--datadir="/sdcc" \
+docdir="/sdcc/doc" \
+include_dir_suffix="include" \
+lib_dir_suffix="lib" \
+sdccconf_h_dir_separator="\\\\" \
+--disable-ucsim
+
+make 2>&1 | tee make.log

@@ -41,6 +41,7 @@ OPT_ENABLE_PACKIHX = @OPT_ENABLE_PACKIHX@
 
 SLIB			= $(PRJDIR)/support/Util
 
+EXEEXT          = @EXEEXT@
 transform       = @program_transform_name@
 
 # Flags

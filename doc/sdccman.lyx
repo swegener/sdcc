@@ -330,21 +330,115 @@ If you can think of some more, please send them to the list.
 Installation
 \layout Subsection
 
-Configure variables
+Configure Options
 \layout Standard
 
-The install paths and default search paths are defined when running 'configure'.
- The defaults can be overriden by
+The install paths, search paths and other options are defined when running
+ 'configure'.
+ The defaults can be overriden by:
+\layout List
+\labelwidthstring 00.00.0000
+
+---prefix see tabel below
+\layout List
+\labelwidthstring 00.00.0000
+
+---exec_prefix see tabel below
+\layout List
+\labelwidthstring 00.00.0000
+
+---bindir see tabel below
+\layout List
+\labelwidthstring 00.00.0000
+
+---datadir see tabel below
+\layout List
+\labelwidthstring 00.00.0000
+
+docdir environment variable, see tabel below
+\layout List
+\labelwidthstring 00.00.0000
+
+include_dir_suffix environment variable, see tabel below
+\layout List
+\labelwidthstring 00.00.0000
+
+lib_dir_suffix environment variable, see tabel below
+\layout List
+\labelwidthstring 00.00.0000
+
+sdccconf_h_dir_separator environment variable, either / or 
+\backslash 
+
+\backslash 
+ makes sense here.
+ This character will only be used in sdccconf.h; don't forget it's a C-header,
+ therefore a double-backslash is needed there.
+\layout List
+\labelwidthstring 00.00.0000
+
+---disable-mcs51-port Excludes the Intel mcs51 port
+\layout List
+\labelwidthstring 00.00.0000
+
+---disable-gbz80-port Excludes the Gameboy gbz80 port
+\layout List
+\labelwidthstring 00.00.0000
+
+---disable-z80-port Excludes the z80 port
+\layout List
+\labelwidthstring 00.00.0000
+
+---disable-avr-port Excludes the AVR port
+\layout List
+\labelwidthstring 00.00.0000
+
+---disable-ds390-port Excludes the DS390 port
+\layout List
+\labelwidthstring 00.00.0000
+
+---disable-pic-port Excludes the PIC port
+\layout List
+\labelwidthstring 00.00.0000
+
+---disable-xa51-port Excludes the XA51 port
+\layout List
+\labelwidthstring 00.00.0000
+
+---disable-ucsim Disables configuring and building of ucsim
+\layout List
+\labelwidthstring 00.00.0000
+
+---disable-device-lib-build Disables automatically building device libraries
+\layout List
+\labelwidthstring 00.00.0000
+
+---disable-packihx Disables building packihx
+\layout List
+\labelwidthstring 00.00.0000
+
+---enable-libgc Use the Bohem memory allocator.
+ Lower runtime footprint.
 \layout Standard
 
-...
- TBD
+Furthermore the environment variables CC, CFLAGS, ...
+ the tools and their arguments can be influenced.
+ Please see `configure ---help` and the man/info pages of `configure` for
+ details.
 \newline 
 
 \newline 
-These configure variables are compiled into the binaries, and can only be
+The names of the standard libraries STD_LIB, STD_INT_LIB, STD_LONG_LIB,
+ STD_FP_LIB, STD_DS390_LIB, STD_XA51_LIB and the environment variables SDCC_DIR_
+NAME, SDCC_INCLUDE_NAME, SDCC_LIB_NAME are defined by `configure` too.
+ At the moment it's not possible to change the default settings (it was
+ simply never required.
+\newline 
+
+\newline 
+These configure options are compiled into the binaries, and can only be
  changed by rerunning 'configure' and recompiling SDCC.
- The configure variables are written in 
+ The configure options are written in 
 \emph on 
 italics
 \emph default 
@@ -353,7 +447,15 @@ italics
 \newline 
 
 \newline 
-Cygwin is handled like a *nix, Mingw32 however belongs to the Win32 builds.
+The settings for 
+\begin_inset Quotes sld
+\end_inset 
+
+Win32 builds
+\begin_inset Quotes srd
+\end_inset 
+
+ are used by the SDCC team to build the official Win32 binaries.
  The SDCC team uses Mingw32 to build the official Windows binaries, because
  it's
 \layout Enumerate
@@ -367,8 +469,10 @@ a gcc compiler and last but not least
 the binaries can be built by cross compiling on Sourceforge's compile farm.
 \layout Standard
 
-The other Win32 builds using Borland, VC or whatever don't use 'configure',
- but they (hopefully) use the default Win32 paths.
+See the examples, how to pass the Win32 settings to 'configure'.
+ The other Win32 builds using Borland, VC or whatever don't use 'configure',
+ but a header file sdcc_vc_in.h is the same as sdccconf.h built by 'configure'
+ for Win32.
 \newline 
 
 \newline 
@@ -397,7 +501,7 @@ Variable
 
 \layout Standard
 
-*nix default
+default
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -405,7 +509,7 @@ Variable
 
 \layout Standard
 
-Win32 default
+Win32 builds
 \end_inset 
 </cell>
 </row>
@@ -674,7 +778,7 @@ Variable (computed)
 
 \layout Standard
 
-*nix default
+default
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -682,7 +786,7 @@ Variable (computed)
 
 \layout Standard
 
-Win32 default
+Win32 builds
 \end_inset 
 </cell>
 </row>
@@ -776,6 +880,341 @@ share/sdcc
 \end_inset 
 
 
+\newline 
+
+\newline 
+Examples:
+\layout LyX-Code
+
+./configure
+\layout LyX-Code
+
+./configure ---prefix=
+\begin_inset Quotes srd
+\end_inset 
+
+/usr/bin
+\begin_inset Quotes srd
+\end_inset 
+
+ ---datadir=
+\begin_inset Quotes srd
+\end_inset 
+
+/usr/share
+\begin_inset Quotes srd
+\end_inset 
+
+
+\layout LyX-Code
+
+./configure ---disable-avr-port ---disable-xa51-port
+\layout Standard
+
+To crosscompile on linux for Mingw32 (see also 'sdcc/support/scripts/sdcc_mingw3
+2'):
+\layout LyX-Code
+
+./configure 
+\backslash 
+
+\layout LyX-Code
+
+  CC=
+\begin_inset Quotes srd
+\end_inset 
+
+i586-mingw32msvc-gcc
+\begin_inset Quotes srd
+\end_inset 
+
+ CXX=
+\begin_inset Quotes srd
+\end_inset 
+
+i586-mingw32msvc-g++
+\begin_inset Quotes srd
+\end_inset 
+
+ 
+\backslash 
+
+\layout LyX-Code
+
+  RANLIB=
+\begin_inset Quotes srd
+\end_inset 
+
+i586-mingw32msvc-ranlib
+\begin_inset Quotes srd
+\end_inset 
+
+ 
+\backslash 
+
+\layout LyX-Code
+
+  STRIP=
+\begin_inset Quotes srd
+\end_inset 
+
+i586-mingw32msvc-strip
+\begin_inset Quotes srd
+\end_inset 
+
+ 
+\backslash 
+
+\layout LyX-Code
+
+  ---prefix=
+\begin_inset Quotes srd
+\end_inset 
+
+/sdcc
+\begin_inset Quotes srd
+\end_inset 
+
+ 
+\backslash 
+
+\layout LyX-Code
+
+  ---datadir=
+\begin_inset Quotes srd
+\end_inset 
+
+/sdcc
+\begin_inset Quotes srd
+\end_inset 
+
+ 
+\backslash 
+
+\layout LyX-Code
+
+  docdir=
+\begin_inset Quotes srd
+\end_inset 
+
+/sdcc/doc
+\begin_inset Quotes srd
+\end_inset 
+
+ 
+\backslash 
+
+\layout LyX-Code
+
+  include_dir_suffix=
+\begin_inset Quotes srd
+\end_inset 
+
+include
+\begin_inset Quotes srd
+\end_inset 
+
+ 
+\backslash 
+
+\layout LyX-Code
+
+  lib_dir_suffix=
+\begin_inset Quotes srd
+\end_inset 
+
+lib
+\begin_inset Quotes srd
+\end_inset 
+
+ 
+\backslash 
+
+\layout LyX-Code
+
+  sdccconf_h_dir_separator=
+\begin_inset Quotes srd
+\end_inset 
+
+
+\backslash 
+
+\backslash 
+
+\backslash 
+
+\backslash 
+
+\begin_inset Quotes srd
+\end_inset 
+
+ 
+\backslash 
+
+\layout LyX-Code
+
+  ---disable-device-lib-build 
+\backslash 
+
+\layout LyX-Code
+
+  ---disable-ucsim 
+\backslash 
+
+\layout LyX-Code
+
+  ---program-suffix=
+\begin_inset Quotes srd
+\end_inset 
+
+.exe
+\begin_inset Quotes srd
+\end_inset 
+
+ 
+\backslash 
+
+\layout LyX-Code
+
+  ---host=i586-mingw32msvc ---build=unknown-unknown-linux-gnu
+\layout Standard
+
+To 
+\begin_inset Quotes sld
+\end_inset 
+
+cross
+\begin_inset Quotes srd
+\end_inset 
+
+compile on Cygwin for Mingw32(see also sdcc/support/scripts/sdcc_cygwin_mingw32)
+:
+\layout LyX-Code
+
+./configure -C 
+\backslash 
+
+\layout LyX-Code
+
+  CFLAGS=
+\begin_inset Quotes srd
+\end_inset 
+
+-mno-cygwin -O2
+\begin_inset Quotes srd
+\end_inset 
+
+ 
+\backslash 
+
+\layout LyX-Code
+
+  LDFLAGS=
+\begin_inset Quotes srd
+\end_inset 
+
+-mno-cygwin
+\begin_inset Quotes srd
+\end_inset 
+
+ 
+\backslash 
+
+\layout LyX-Code
+
+  ---prefix=
+\begin_inset Quotes srd
+\end_inset 
+
+/sdcc
+\begin_inset Quotes srd
+\end_inset 
+
+ 
+\backslash 
+
+\layout LyX-Code
+
+  ---datadir=
+\begin_inset Quotes srd
+\end_inset 
+
+/sdcc
+\begin_inset Quotes srd
+\end_inset 
+
+ 
+\backslash 
+
+\layout LyX-Code
+
+  docdir=
+\begin_inset Quotes srd
+\end_inset 
+
+/sdcc/doc
+\begin_inset Quotes srd
+\end_inset 
+
+ 
+\backslash 
+
+\layout LyX-Code
+
+  include_dir_suffix=
+\begin_inset Quotes srd
+\end_inset 
+
+include
+\begin_inset Quotes srd
+\end_inset 
+
+ 
+\backslash 
+
+\layout LyX-Code
+
+  lib_dir_suffix=
+\begin_inset Quotes srd
+\end_inset 
+
+lib
+\begin_inset Quotes srd
+\end_inset 
+
+ 
+\backslash 
+
+\layout LyX-Code
+
+  sdccconf_h_dir_separator=
+\begin_inset Quotes srd
+\end_inset 
+
+
+\backslash 
+
+\backslash 
+
+\backslash 
+
+\backslash 
+
+\begin_inset Quotes srd
+\end_inset 
+
+ 
+\backslash 
+
+\layout LyX-Code
+
+  ---disable-ucsim
+\layout Standard
+
+'configure' is quite slow on Cygwin (at least on windows before Win2000/XP).
+ The option '--C' turns on caching, which gives a little bit extra speed.
+ However if options are changed, it can be necessary to delete the config.cache
+ file.
 \layout Subsection
 
 Install paths
@@ -806,7 +1245,7 @@ Path
 
 \layout Standard
 
-*nix default
+default
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -814,7 +1253,7 @@ Path
 
 \layout Standard
 
-Win32 default
+Win32 builds
 \end_inset 
 </cell>
 </row>
@@ -867,7 +1306,7 @@ bin
 <lyxtabular version="3" rows="2" columns="3">
 <features>
 <column alignment="block" valignment="top" leftline="true" width="1.6in">
-<column alignment="center" valignment="top" leftline="true" width="0in">
+<column alignment="left" valignment="top" leftline="true" width="0in">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="0in">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -883,7 +1322,7 @@ Path
 
 \layout Standard
 
-*nix default
+default
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -891,7 +1330,7 @@ Path
 
 \layout Standard
 
-Win32 default
+Win32 builds
 \end_inset 
 </cell>
 </row>
@@ -967,7 +1406,7 @@ Path
 
 \layout Standard
 
-*nix default
+default
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -975,7 +1414,7 @@ Path
 
 \layout Standard
 
-Win32 default
+Win32 builds
 \end_inset 
 </cell>
 </row>
@@ -1044,7 +1483,7 @@ Path
 
 \layout Standard
 
-*nix default
+default
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -1052,7 +1491,7 @@ Path
 
 \layout Standard
 
-Win32 default
+Win32 builds
 \end_inset 
 </cell>
 </row>
@@ -1093,9 +1532,19 @@ doc
 \end_inset 
 
 
+\newline 
+
+\newline 
+The install paths can still be changed during `make install` with e.g.:
+\layout LyX-Code
+
+make install prefix=$(HOME)/local/sdcc
+\layout Standard
+
+Of course this doesn't change the search paths compiled into the binaries.
 \layout Subsection
 
-Search paths
+Search Paths
 \layout Standard
 
 Some search paths or parts of them are determined by configure variables
@@ -1136,7 +1585,7 @@ Search path
 
 \layout Standard
 
-*nix default
+default
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -1144,7 +1593,7 @@ Search path
 
 \layout Standard
 
-Win32 default
+Win32 builds
 \end_inset 
 </cell>
 </row>
@@ -1262,7 +1711,7 @@ Search path
 
 \layout Standard
 
-*nix default
+default
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -1270,7 +1719,7 @@ Search path
 
 \layout Standard
 
-Win32 default
+Win32 builds
 \end_inset 
 </cell>
 </row>
@@ -1534,7 +1983,7 @@ Search path
 
 \layout Standard
 
-*nix default
+default
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -1542,7 +1991,7 @@ Search path
 
 \layout Standard
 
-Win32 default
+Win32 builds
 \end_inset 
 </cell>
 </row>
@@ -1837,7 +2286,10 @@ Don't delete any of the stray spaces in the table above without checking
 The option ---nostdlib disables the last two search paths.
 \layout Subsection
 
-Linux and other gcc-based systems (cygwin, mingw32, osx)
+Building SDCC
+\layout Subsubsection
+
+Building SDCC on Linux
 \layout Enumerate
 
 
@@ -1931,8 +2383,15 @@ Type
 \series default 
  This copies the binary executables, the include files, the libraries and
  the documentation to the install directories.
+\layout Subsubsection
+
+Building SDCC on OSX 2.x
 \layout Standard
 
+Follow the instruction for Linux.
+\newline 
+
+\newline 
 On OSX 2.x it was reported, that the default gcc (version 3.1 20020420 (prerelease
 )) fails to compile SDCC.
  Fortunately there's also gcc 2.9.x installed, which works fine.
@@ -1940,9 +2399,21 @@ On OSX 2.x it was reported, that the default gcc (version 3.1 20020420 (prerelea
 \layout LyX-Code
 
 ./configure CC=gcc2 CXX=g++2
-\layout Subsection
+\layout Subsubsection
 
-Windows 
+Crosscompiling SDCC on Linux for Windows
+\layout Standard
+
+With the Mingw32 gcc crosscompiler it's easy to compile SDCC for Win32.
+ See section 'Configure Options'.
+\layout Subsubsection
+
+Building SDCC on Windows 
+\layout Standard
+
+With the exception of Cygwin the SDCC binaries uCsim and sdcdb can't be
+ built on Windows.
+ They use Unix-sockets, which are not available on Win32.
 \layout Subsubsection
 
 Windows Install Using a Binary Package
@@ -1954,27 +2425,13 @@ Download the binary package and unpack it using your favorite unpacking
  An example directory structure after unpacking the mingw32 package is:
  c:
 \backslash 
-usr
-\backslash 
-local
+sdcc
 \backslash 
 bin for the executables, c:
-\backslash 
-usr
-\backslash 
-local
-\backslash 
-share
 \backslash 
 sdcc
 \backslash 
 include and c:
-\backslash 
-usr
-\backslash 
-local
-\backslash 
-share
 \backslash 
 sdcc
 \backslash 
@@ -1985,14 +2442,152 @@ Adjust your environment variable PATH to include the location of the bin
  directory or start sdcc using the full path.
 \layout Subsubsection
 
-Windows Install Using Cygwin and Mingw32
+Building SDCC using Cygwin and Mingw32
 \layout Standard
 
-Follow the instruction in 
-\series bold 
-Linux and other gcc-based systems
-\series default 
+For building and installing a Cygwin executable follow the instructions
+ for Linux.
+\newline 
+
+\newline 
+On Cygwin a 
+\begin_inset Quotes sld
+\end_inset 
+
+native
+\begin_inset Quotes srd
+\end_inset 
+
+ Win32-binary can be built, which will not need the Cygwin-DLL.
+ For the necessary 'configure' options see section 'configure options' or
+ the script 'sdcc/support/scripts/sdcc_cygwinmingw32'.
+\newline 
+
+\newline 
+In order to install Cygwin on Windows download setup.exe from 
+\begin_inset LatexCommand \url[www.cygwin.com]{http://www.cygwin.com/}
+
+\end_inset 
+
 .
+ Run it, set the 
+\begin_inset Quotes sld
+\end_inset 
+
+default text file type
+\begin_inset Quotes srd
+\end_inset 
+
+ to 
+\begin_inset Quotes sld
+\end_inset 
+
+unix
+\begin_inset Quotes srd
+\end_inset 
+
+ and download/install at least the following packages.
+ Some packages are selected by default, others will be automatically selected
+ because of dependencies with the manually selected packages.
+ Never deselect these packages!
+\layout Itemize
+
+flex
+\layout Itemize
+
+bison
+\layout Itemize
+
+gcc ; version 3.x is fine, no need to use the old 2.9x
+\layout Itemize
+
+binutils ; selected with gcc
+\layout Itemize
+
+make
+\layout Itemize
+
+rxvt ; a nice console, which makes life much easier under windoze (see below)
+\layout Itemize
+
+man ; not really needed for building SDCC, but you'll miss it sooner or
+ later
+\layout Itemize
+
+less ; not really needed for building SDCC, but you'll miss it sooner or
+ later
+\layout Itemize
+
+cvs ; only if you use CVS access
+\layout Standard
+
+If you want to develop something you'll need:
+\layout Itemize
+
+python ; for the regression tests
+\layout Itemize
+
+gdb ; the gnu debugger, together with the nice GUI 
+\begin_inset Quotes sld
+\end_inset 
+
+insight
+\begin_inset Quotes srd
+\end_inset 
+
+
+\layout Itemize
+
+openssh ; to access the CF or commit changes
+\layout Itemize
+
+autoconf and autoconf-devel ; if you want to fight with 'configure', don't
+ use autoconf-stable!
+\layout Standard
+
+rxvt is a nice console with history.
+ Replace in your cygwin.bat the line
+\layout LyX-Code
+
+bash --login -i 
+\layout Standard
+
+with (one line):
+\layout LyX-Code
+
+rxvt -sl 1000 -fn "Lucida Console-12" -sr -cr red
+\layout LyX-Code
+
+     -bg black -fg white -geometry 100x65 -e bash --login
+\layout Standard
+
+Text selected with the mouse is automatically copied to the clipboard, pasting
+ works with shift-insert.
+\newline 
+
+\newline 
+The other good tip is to make sure you have no //c/-style paths anywhere,
+ use /cygdrive/c/ instead.
+ Using // invokes a network lookup which is very slow.
+ If you think 
+\begin_inset Quotes sld
+\end_inset 
+
+cygdrive
+\begin_inset Quotes srd
+\end_inset 
+
+ is too long, you can change it with e.g.
+\layout LyX-Code
+
+mount -s -u -c /mnt
+\layout Standard
+
+SDCC sources use the unix line ending LF.
+ Life is much easier, if you store the source tree on a drive, which is
+ mount in binary mode.
+ And use an editor which can handle LF-only line endings.
+ Make sure not to commit files with windows line endings.
 \layout Subsubsection
 
 Windows Install Using Microsoft Visual C++ 6.0/NET
@@ -2213,6 +2808,13 @@ del /s *.obj *.lib *.rul
  from the sdcc directory.
 \layout Subsection
 
+Building the Documentation
+\layout Standard
+
+...
+ coming soon
+\layout Subsection
+
 Testing out the SDCC Compiler
 \layout Standard
 
@@ -2401,7 +3003,7 @@ SDCC does not build correctly.
 
 A thing to try is starting from scratch by unpacking the .tgz source package
  again in an empty directory.
- Confure it like:
+ Configure it like:
 \newline 
 
 \newline 

@@ -35,6 +35,43 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "xacl.h"
 #include "regsxa.h"
 
+
+void cl_xa::store1(t_addr addr, unsigned char val)
+{
+  if (addr < 0x2000) {
+    set_idata1(addr, val);
+  } else {
+    set_xdata1(addr, val);
+  }
+}
+
+void cl_xa::store2(t_addr addr, unsigned char val)
+{
+  if (addr < 0x2000) {
+    set_idata2(addr, val);
+  } else {
+    set_xdata2(addr, val);
+  }
+}
+
+unsigned char cl_xa::get1(t_addr addr)
+{
+  if (addr < 0x2000) {
+    return get_idata1(addr);
+  } else {
+    return get_xdata1(addr);
+  }
+}
+
+unsigned short cl_xa::get2(t_addr addr)
+{
+  if (addr < 0x2000) {
+    return get_idata2(addr);
+  } else {
+    return get_xdata2(addr);
+  }
+}
+
 int cl_xa::get_reg(int word_flag, unsigned int index)
 {
   int result;

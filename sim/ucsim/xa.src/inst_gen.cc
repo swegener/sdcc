@@ -173,16 +173,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
     break;
 
     case REG_DATA8 :
+#if 0
+      {
+        unsigned char dat = fetch();
+        unsigned char res;
+        res = FUNC1( reg1(RI_F0), dat);
+        set_reg1( RI_F0, res );
+   printf("reg_data8 code=%x dat=%x, res=%x r=%x\n", code, dat, res, reg1( RI_F0) );
+      }
+#endif
       set_reg1( RI_F0, FUNC1( reg1(RI_F0), fetch()) );
     break;
 
     case REG_DATA16 :
       {
         unsigned short dat = fetch2();
-        //unsigned short res;
-        //res = FUNC2( reg2(RI_F0), dat);
-        //set_reg2( RI_F0, res );
-//printf("reg_data16 code=%x dat=%x, res=%x\n", code, dat, res);
         set_reg2( RI_F0, FUNC2( reg2(RI_F0), dat) );
       }
     break;

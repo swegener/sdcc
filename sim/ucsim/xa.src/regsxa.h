@@ -55,6 +55,26 @@ struct t_regs
 #define get_byte_direct(addr) sfr->get((t_addr) (addr))
 #define get_word_direct(addr) (sfr->get((t_addr) (addr)) | (sfr->get((t_addr) (addr+1)) << 8) )
 
+/* store to idata(onchip) ram */
+#define set_idata2(addr, val) { iram->set((t_addr) (addr), (val) & 0xff); \
+                            iram->set((t_addr) (addr+1), ((val) >> 8) & 0xff); }
+#define set_idata1(addr, val) iram->set((t_addr) (addr), (val) )
+
+/* get from idata(onchip) ram */
+#define get_idata1(addr) iram->get((t_addr) (addr))
+#define get_idata2(addr) (iram->get((t_addr) (addr)) | (iram->get((t_addr) (addr+1)) << 8) )
+
+/* store to xdata(external) ram */
+#define set_xdata2(addr, val) { ram->set((t_addr) (addr), (val) & 0xff); \
+                            ram->set((t_addr) (addr+1), ((val) >> 8) & 0xff); }
+#define set_xdata1(addr, val) ram->set((t_addr) (addr), val)
+
+/* get from xdata(external) ram */
+#define get_xdata1(addr) ram->get((t_addr) (addr))
+#define get_xdata2(addr) (ram->get((t_addr) (addr)) | (ram->get((t_addr) (addr+1)) << 8) )
+
+#if 0
+  moved to inst.cc as functions
 /* store to ram */
 #define store2(addr, val) { ram->set((t_addr) (addr), (val) & 0xff); \
                             ram->set((t_addr) (addr+1), ((val) >> 8) & 0xff); }
@@ -63,6 +83,7 @@ struct t_regs
 /* get from ram */
 #define get1(addr) ram->get((t_addr) (addr))
 #define get2(addr) (ram->get((t_addr) (addr)) | (ram->get((t_addr) (addr+1)) << 8) )
+#endif
 
 /* get from code */
 #define getcode1(addr) rom->get((t_addr) (addr))
@@ -77,7 +98,7 @@ struct t_regs
 #define reg1(_index) (unsigned char)get_reg(0, (_index))
 
 #define set_reg1(_index, _value) { \
-  set_byte_direct((REGS_OFFSET+(_index<<1)), _value); \
+  set_byte_direct((REGS_OFFSET+(_index)), _value); \
 }
 
 #define set_reg2(_index, _value) { \

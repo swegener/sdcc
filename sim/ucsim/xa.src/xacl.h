@@ -85,6 +85,12 @@ public:
 
   virtual int exec_inst(void);
   virtual int get_reg(int word_flag, unsigned int index);
+
+  virtual void store1(t_addr addr, unsigned char val);
+  virtual void store2(t_addr addr, unsigned char val);
+  virtual unsigned char get1(t_addr addr);
+  virtual unsigned short get2(t_addr addr);
+
   virtual bool get_bit(int bit);
   virtual void set_bit(int bit, int value);
 

@@ -392,7 +392,7 @@ long
 cl_uc::read_hex_file(const char *name)
 {
   FILE *f;
-  char c;
+  int c;
   long written= 0, recnum= 0;
 
   uchar dnum;     // data number

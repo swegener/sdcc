@@ -406,7 +406,7 @@ getPairName (asmop * aop)
 	  break;
 	}
     }
-  else if (aop->type == AOP_STR)
+  else if (aop->type == AOP_STR || aop->type == AOP_HLREG)
     {
       switch (*aop->aopu.aop_str[0])
 	{
@@ -445,7 +445,7 @@ getPairId (asmop * aop)
 	      return PAIR_HL;
 	    }
 	}
-      if (aop->type == AOP_STR)
+      if (aop->type == AOP_STR || aop->type == AOP_HLREG)
 	{
 	  if (!strcmp (aop->aopu.aop_str[0], "c") && !strcmp (aop->aopu.aop_str[1], "b"))
 	    {
@@ -840,9 +840,8 @@ aopOp (operand * op, iCode * ic, bool result, bool requires_a)
 
               aop->aopu.aop_str[0] = _pairs[PAIR_AF].h;
 	    }
-	  else if (sym->accuse == ACCUSE_HL)
+	  else if (sym->accuse == ACCUSE_SCRATCH)
 	    {
-	      wassert (!IS_GB);
 	      aop = op->aop = sym->aop = newAsmop (AOP_HLREG);
 	      aop->size = getSize (sym->type);
               wassertl(aop->size <= 2, "Internal error: Caching in HL, but too big to fit in HL");
@@ -1062,6 +1061,7 @@ requiresHL (asmop * aop)
     case AOP_HL:
     case AOP_STK:
     case AOP_EXSTK:
+    case AOP_HLREG:
       return TRUE;
     default:
       return FALSE;
@@ -1656,6 +1656,7 @@ movLeft2Result (operand * left, int offl,
 		operand * result, int offr, int sign)
 {
   const char *l;
+
   if (!sameRegs (AOP (left), AOP (result)) || (offl != offr))
     {
       l = aopGet (AOP (left), offl, FALSE);
@@ -1675,6 +1676,33 @@ movLeft2Result (operand * left, int offl,
     }
 }
 
+static void
+movLeft2ResultLong (operand * left, int offl,
+		operand * result, int offr, int sign,
+                int size)
+{
+  if (size == 1)
+    {
+      movLeft2Result (left, offl, result, offr, sign);
+    }
+  else
+    {
+      wassertl (offl == 0 && offr == 0, "Only implemented for zero offset");
+      wassertl (size == 2, "Only implemented for two bytes or one");
+
+      if ( IS_GB && requiresHL ( AOP (left)) && getPairId ( AOP (result)) == PAIR_HL)
+        {
+          emit2 ("ld a,%s", aopGet (AOP (left), LSB, FALSE));
+          emit2 ("ld h,%s", aopGet (AOP (left), MSB16, FALSE));
+          emit2 ("ld l,a");
+        }
+      else
+        {
+          movLeft2Result (left, offl, result, offr, sign);
+          movLeft2Result (left, offl+1, result, offr+1, sign);
+        }
+    }
+}
 
 /** Put Acc into a register set
  */
@@ -1974,6 +2002,25 @@ assignResultValue (operand * oper)
 	  aopPut (AOP (oper), _fReturn[size], size);
 	}
     }
+}
+
+/** Simple restore that doesn't take into account what is used in the
+    return.
+*/
+static void
+_restoreRegsAfterCall(void)
+{
+  if (_G.stack.pushedDE)
+    {
+      _pop ( PAIR_DE);
+      _G.stack.pushedDE = FALSE;
+    }
+  if (_G.stack.pushedBC)
+    {
+      _pop ( PAIR_BC);
+      _G.stack.pushedBC = FALSE;
+    }
+  _G.saves.saved = FALSE;
 }
 
 static void
@@ -2784,7 +2831,7 @@ genPlusIncr (iCode * ic)
     {
       if (isLitWord (AOP (IC_LEFT (ic))))
 	{
-	  fetchLitPair (getPairId (AOP (IC_RESULT (ic))), AOP (IC_LEFT (ic)), icount);
+          fetchLitPair (getPairId (AOP (IC_RESULT (ic))), AOP (IC_LEFT (ic)), icount);
 	  return TRUE;
 	}
       if (isPair (AOP (IC_LEFT (ic))) && resultId == PAIR_HL && icount > 2)
@@ -2800,8 +2847,7 @@ genPlusIncr (iCode * ic)
 	{
 	  if (icount > 2)
 	    return FALSE;
-	  movLeft2Result (IC_LEFT (ic), 0, IC_RESULT (ic), 0, 0);
-	  movLeft2Result (IC_LEFT (ic), 1, IC_RESULT (ic), 1, 0);
+	  movLeft2ResultLong (IC_LEFT (ic), 0, IC_RESULT (ic), 0, 0, 2);
 	}
       while (icount--)
 	{
@@ -3187,8 +3233,7 @@ genMinusDec (iCode * ic)
   /* If result is a pair */
   if (isPair (AOP (IC_RESULT (ic))))
     {
-      movLeft2Result (IC_LEFT (ic), 0, IC_RESULT (ic), 0, 0);
-      movLeft2Result (IC_LEFT (ic), 1, IC_RESULT (ic), 1, 0);
+      movLeft2ResultLong (IC_LEFT (ic), 0, IC_RESULT (ic), 0, 0, 2);
       while (icount--)
 	emit2 ("dec %s", getPairName (AOP (IC_RESULT (ic))));
       return TRUE;
@@ -3300,7 +3345,10 @@ genMinus (iCode * ic)
 	      emit2 ("ld a,%s", _pairs[left].h);
 	      emit2 ("sbc a,%s", _pairs[right].h);
 
-	      aopPut (AOP (IC_RESULT (ic)), "a", 1);
+              if ( AOP_SIZE (IC_RESULT (ic)) > 1)
+                {
+                  aopPut (AOP (IC_RESULT (ic)), "a", 1);
+                }
 	      aopPut (AOP (IC_RESULT (ic)), "e", 0);
 	      goto release;
 	    }
@@ -6189,16 +6237,10 @@ genArrayInit (iCode * ic)
 
   aopOp (IC_LEFT(ic), ic, FALSE, FALSE);
 
-  if (AOP_TYPE(IC_LEFT(ic)) == AOP_IMMD)
-    {
-      /* Emit the support function call and the destination address. */
-      emit2("call __initrleblock");
-      emit2(".dw %s", aopGetWord (AOP(IC_LEFT(ic)), 0));
-    }
-  else
-    {
-      wassertl (0, "Unexpected operand to genArrayInit.\n");
-    }
+  _saveRegsForCall(ic, 0);
+
+  fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
+  emit2 ("call __initrleblock");
     
   type = operandType(IC_LEFT(ic));
     
@@ -6241,6 +6283,10 @@ genArrayInit (iCode * ic)
   _rleFlush(&rle);
   /* Mark the end of the run. */
   emit2(".db 0");
+
+  _restoreRegsAfterCall();
+
+  spillCached ();
 
   freeAsmop (IC_LEFT(ic), NULL, ic);
 }
@@ -6517,6 +6563,7 @@ genZ80Code (iCode * lic)
 	  break;
 
 	case ARRAYINIT:
+	  emitDebug ("; genArrayInit");
           genArrayInit(ic);
           break;
 	    

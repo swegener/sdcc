@@ -22,8 +22,8 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
-#ifndef SDCCGEN51_H
-#define SDCCGEN51_H
+#ifndef Z80GEN_H
+#define Z80GEN_H
 
 typedef enum
   {

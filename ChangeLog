@@ -1,3 +1,15 @@
+2001-10-28  Michael Hope  <michaelh@juju.net.nz>
+
+	* src/z80/gen.c (genArrayInit): Made it work for on stack arrays.
+
+	* src/z80/main.c (gbz80_port =): Added rle support to the gbz80 port.
+
+	* src/z80/gen.c (genMinus): Fixed for where the result is one byte.
+	(movLeft2ResultLong): Created.
+
+	* src/z80/ralloc.c (packRegsForHLUse): Added a couple of simple cases for the GB.
+	(joinPushes): Added.  Joins two char pushes into a word push.
+
 2001-10-27  Michael Hope  <michaelh@juju.net.nz>
 
 	* support/cpp2/Makefile.in (install): Added creation of dest dir.

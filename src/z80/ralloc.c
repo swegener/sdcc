@@ -63,7 +63,8 @@ enum
     D_ALLOC = 0,
     D_ALLOC2 = 0,
     D_ACCUSE2 = 0,
-    D_ACCUSE2_VERBOSE = 0
+    D_ACCUSE2_VERBOSE = 0,
+    D_HLUSE = 0
   };
 
 #if 1
@@ -2017,34 +2018,63 @@ packRegsForHLUse (iCode * ic)
 {
   iCode *uic;
 
-  if (IS_GB)
-    return;
-
   /* has only one definition */
   if (bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) > 1)
-    return;
+    {
+      D (D_HLUSE, ("  + Dropping as has more than one def\n"));
+      return;
+    }
 
   /* has only one use */
   if (bitVectnBitsOn (OP_USES (IC_RESULT (ic))) > 1)
-    return;
+    {
+      D (D_HLUSE, ("  + Dropping as has more than one use\n"));
+      return;
+    }
 
   /* and the usage immediately follows this iCode */
   if (!(uic = hTabItemWithKey (iCodehTab,
 			       bitVectFirstBit (OP_USES (IC_RESULT (ic))))))
-    return;
+    {
+      D (D_HLUSE, ("  + Dropping as usage isn't in this block\n"));
+      return;
+    }
 
   if (ic->next != uic)
-    return;
+    {
+      D (D_HLUSE, ("  + Dropping as usage doesn't follow this\n"));
+      return;
+    }
 
-  if (ic->op == CAST && uic->op == IPUSH)
-    goto hluse;
-  if (ic->op == ADDRESS_OF && uic->op == IPUSH)
-    goto hluse;
-  if (ic->op == CALL && ic->parmBytes == 0 && (uic->op == '-' || uic->op == '+'))
-    goto hluse;
+  if (IS_Z80)
+    {
+      if (ic->op == CAST && uic->op == IPUSH)
+        goto hluse;
+      if (ic->op == ADDRESS_OF && uic->op == IPUSH)
+        goto hluse;
+      if (ic->op == CALL && ic->parmBytes == 0 && (uic->op == '-' || uic->op == '+'))
+        goto hluse;
+    }
+  else if (IS_GB)
+    {
+      /* Case of assign a constant to offset in a static array. */
+      if (ic->op == '+' && IS_VALOP (IC_RIGHT (ic)))
+        {
+          if (uic->op == '=' && POINTER_SET (uic))
+            {
+              goto hluse;
+            }
+          else if (uic->op == IPUSH)
+            {
+              goto hluse;
+            }
+        }
+    }
+
+  D (D_HLUSE, ("  + Dropping as it's a bad op\n"));
   return;
 hluse:
-  OP_SYMBOL (IC_RESULT (ic))->accuse = ACCUSE_HL;
+  OP_SYMBOL (IC_RESULT (ic))->accuse = ACCUSE_SCRATCH;
 }
 
 static bool 
@@ -2533,6 +2563,62 @@ packRegisters (eBBlock * ebp)
     }
 }
 
+/** Joins together two byte constant pushes into one word push.
+ */
+static iCode *
+joinPushes (iCode *lic)
+{
+  iCode *ic, *uic;
+
+  for (ic = lic; ic; ic = ic->next)
+    {
+      int first, second;
+      value *val;
+
+      uic = ic->next;
+
+      /* Anything past this? */
+      if (uic == NULL)
+        {
+          continue;
+        }
+      /* This and the next pushes? */
+      if (ic->op != IPUSH || uic->op != IPUSH)
+        {
+          continue;
+        }
+      /* Both literals? */
+      if ( !IS_OP_LITERAL (IC_LEFT (ic)) || !IS_OP_LITERAL (IC_LEFT (uic)))
+        {
+          continue;
+        }
+      /* Both characters? */
+      if ( getSize (operandType (IC_LEFT (ic))) != 1 || getSize (operandType (IC_LEFT (uic))) != 1)
+        {
+          continue;
+        }
+      /* Pull out the values, make a new type, and create the new iCode for it.
+       */
+      first = (int)operandLitValue ( IC_LEFT (ic));
+      second = (int)operandLitValue ( IC_LEFT (uic));
+
+      sprintf (buffer, "%u", ((first << 8) | (second & 0xFF)) & 0xFFFFU);
+      val = constVal (buffer);
+      SPEC_NOUN (val->type) = V_INT;
+      IC_LEFT (ic)->operand.valOperand = val;
+      
+      /* Now remove the second one from the list. */
+      ic->next = uic->next;
+      if (uic->next)
+        {
+          /* Patch up the reverse link */
+          uic->next->prev = ic;
+        }
+    }
+
+  return lic;
+}
+
 /*-----------------------------------------------------------------*/
 /* assignRegisters - assigns registers to each live range as need  */
 /*-----------------------------------------------------------------*/
@@ -2600,6 +2686,8 @@ z80_assignRegisters (eBBlock ** ebbs, int count)
 
   /* now get back the chain */
   ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbs, count));
+
+  ic = joinPushes (ic);
 
   /* redo that offsets for stacked automatic variables */
   redoStackOffsets ();

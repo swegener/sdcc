@@ -4353,7 +4353,7 @@ hasInc (operand *op, iCode *ic)
       return NULL;
     }
     /* if GOTO or IFX */
-    if (lic->op == IFX || lic->op == GOTO) break;
+    if (lic->op == IFX || lic->op == GOTO || lic->op == LABEL) break;
     lic = lic->next;
   }
   return NULL;

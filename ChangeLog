@@ -1,5 +1,12 @@
 2004-05-28 Vangelis Rokas <vrokas AT otenet.gr>
 
+	* src/pic16/glue.c,
+	* src/pic16/ralloc.h,
+	* src/pic16/ralloc.cc: prefixed IS_CONFIG_ADDRESS with PIC16_
+	to fix conflict with pic port
+
+2004-05-28 Vangelis Rokas <vrokas AT otenet.gr>
+
 	* src/pic16/glue.c (pic16emitStaticSeg): do not print as publics or
 	externs configuration variables,
 	* src/pic16/ralloc.h,

@@ -623,7 +623,7 @@ pic16emitStaticSeg (memmap * map)
 
 		/* do not emit if it is a config word declaration */
 		if(!SPEC_ABSA(sym->etype)
-			|| (SPEC_ABSA(sym->etype) && !IS_CONFIG_ADDRESS(SPEC_ADDR(sym->etype))))
+			|| (SPEC_ABSA(sym->etype) && !PIC16_IS_CONFIG_ADDRESS(SPEC_ADDR(sym->etype))))
 			checkAddSym(&externs, sym);
 	  continue;
 	}
@@ -634,7 +634,7 @@ pic16emitStaticSeg (memmap * map)
 
 		/* do not emit if it is a config word declaration */
 		if(!SPEC_ABSA(sym->etype)
-			|| (SPEC_ABSA(sym->etype) && !IS_CONFIG_ADDRESS(SPEC_ADDR(sym->etype))))
+			|| (SPEC_ABSA(sym->etype) && !PIC16_IS_CONFIG_ADDRESS(SPEC_ADDR(sym->etype))))
 				checkAddSym(&publics, sym);
 	}
 

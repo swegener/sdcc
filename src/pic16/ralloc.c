@@ -557,7 +557,7 @@ pic16_dirregWithName (char *name)
   return NULL; // name wasn't found in the hash table
 }
 
-int IS_CONFIG_ADDRESS(int address)
+int PIC16_IS_CONFIG_ADDRESS(int address)
 {
 
   return address >= 0x300000 && address <= 0x300000d;
@@ -660,7 +660,7 @@ pic16_allocDirReg (operand *op )
 	    	  return NULL;
 		}
 
-		if(!IS_CONFIG_ADDRESS(address)) {
+		if(!PIC16_IS_CONFIG_ADDRESS(address)) {
 //			fprintf(stderr,"%s:allocating new reg %s\n",__FUNCTION__, name);
 
 			/* this is an error, why added? -- VR */
@@ -2788,7 +2788,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 
   /* if this is at an absolute address, then get the address. */
   if (SPEC_ABSA ( OP_SYM_ETYPE(IC_RESULT(ic))) ) {
-    if(IS_CONFIG_ADDRESS( SPEC_ADDR ( OP_SYM_ETYPE(IC_RESULT(ic))))) {
+    if(PIC16_IS_CONFIG_ADDRESS( SPEC_ADDR ( OP_SYM_ETYPE(IC_RESULT(ic))))) {
       debugLog ("  %d - found config word declaration\n", __LINE__);
       if(IS_VALOP(IC_RIGHT(ic))) {
 	debugLog ("  setting config word to %x\n", 

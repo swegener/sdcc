@@ -6907,9 +6907,10 @@ static void genFarPointerGet (operand *left,
             _flushLazyDPS();
             
             emitcode("movx","a,@dptr");
-            aopPut(AOP(result),"a",offset++);
             if (size)
-                emitcode("inc","dptr");
+                emitcode("inc","dptr");	    
+
+            aopPut(AOP(result),"a",offset++);
         }
         _endLazyDPSEvaluation();
     }

@@ -41,11 +41,29 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name librarian
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name as_hc08
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name link_hc08
+    End Project Dependency
 }}}
 
 ###############################################################################
 
 Project: "as_gbz80"=.\as\as_gbz80.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "as_hc08"=.\as\hc08\as_hc08.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -199,6 +217,18 @@ Package=<4>
 ###############################################################################
 
 Project: "librarian"=.\support\librarian\librarian.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "link_hc08"=.\as\hc08\link_hc08.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

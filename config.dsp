@@ -65,11 +65,13 @@ SOURCE=.\sdcc_vc_in.h
 
 !IF  "$(CFG)" == "config - Win32 Release"
 
+USERDEP__SDCC_=".version"	
 # Begin Custom Build
 InputPath=.\sdcc_vc_in.h
 
 "sdcc_vc.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	gawk -f configure_vc.awk sdcc_vc_in.h > sdcc_vc.h
+
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "config - Win32 Debug"
@@ -79,6 +81,7 @@ InputPath=.\sdcc_vc_in.h
 
 "sdcc_vc.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	gawk -f configure_vc.awk sdcc_vc_in.h > sdcc_vc.h
+
 # End Custom Build
 
 !ENDIF 

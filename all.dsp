@@ -90,6 +90,34 @@ InputPath=".\bin_vc\as-gbz80.exe"
 # End Source File
 # Begin Source File
 
+SOURCE=".\bin_vc\as-hc08.exe"
+
+!IF  "$(CFG)" == "all - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\bin_vc\as-hc08.exe
+
+"bin\as-hc08.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\as-hc08.exe bin /y > nul
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "all - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build
+InputPath=.\bin_vc\as-hc08.exe
+
+"bin\as-hc08.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\as-hc08.exe bin /y > nul
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=".\bin_vc\as-z80.exe"
 
 !IF  "$(CFG)" == "all - Win32 Release"
@@ -198,6 +226,34 @@ InputPath=".\bin_vc\link-gbz80.exe"
 
 ".\bin\link-gbz80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy bin_vc\link-gbz80.exe  bin /y > nul
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=".\bin_vc\link-hc08.exe"
+
+!IF  "$(CFG)" == "all - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\bin_vc\link-hc08.exe
+
+".\bin\link-hc08.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\link-hc08.exe  bin /y > nul
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "all - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build
+InputPath=.\bin_vc\link-hc08.exe
+
+".\bin\link-hc08.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy bin_vc\link-hc08.exe  bin /y > nul
 
 # End Custom Build
 

@@ -1,5 +1,9 @@
 2004-09-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/hc08/ralloc.c (canUseAccOperand): fixed comparison bug
+
+2004-09-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* device/lib/gbz80/printf.c,
 	* device/lib/z80/printf.c: removed define for NULL
 

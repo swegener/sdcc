@@ -1,3 +1,11 @@
+2003-03-28  Borut Razem <borut.razem@siol.net>
+
+	* src/SDCC.lex: Fix for bug #711240: dynamic buffer handling of C
+          literal strings in stringLiteral()
+	* support/Util/dbuf.c, support/Util/dbuf.h: added: dynamic buffer handling
+	* src/Makefile.bcc, src/Makefile.in, src\src.dsp: added support/Util/dbuf.c
+          to the project
+
 2003-03-27  Paul Stoffregen <paul@pjrc.com>
 
 	* src/SDCCpeeph.c (pcDistance): accurate byte distance for mcs51

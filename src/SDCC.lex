@@ -35,7 +35,8 @@ IS       (u|U|l|L)*
 #include <ctype.h>
 #include "common.h"
 #include "newalloc.h"
-    
+#include "dbuf.h"
+
 char *stringLiteral();
 char *currFname;
 
@@ -334,91 +335,93 @@ int check_type()
 	}
 }
 
-char strLitBuff[2048]; // TODO: this is asking for the next bug :)
-
 /*
  * Change by JTV 2001-05-19 to not concantenate strings
  * to support ANSI hex and octal escape sequences in string liteals 
  */
 
-char *stringLiteral () {
+char *stringLiteral()
+{
+#define STR_BUF_CHUNCK_LEN  1024
   int ch;
-  char *str = strLitBuff;
-  
-  *str++ = '\"';
+  static struct dbuf_s dbuf;
+  char buf[2];
+
+  if (dbuf.alloc == 0)
+    dbuf_init(&dbuf, STR_BUF_CHUNCK_LEN);
+  else
+    dbuf_set_size(&dbuf, 0);
+
+
+  dbuf_append(&dbuf, "\"", 1);
   /* put into the buffer till we hit the first \" */
-  
-  while (1) {
-    ch = input();
-    
-    if (!ch)
-      break; /* end of input */
-    
-    /* if it is a \ then escape char's are allowed */
-    if (ch == '\\') {
-      ch=input();
-      if (ch=='\n') {
-	/* \<newline> is a continuator */
-	lineno=++yylineno;
-	column=0;
-	continue;
+
+  while ((ch = input()) != 0) {
+    switch (ch) {
+    case '\\':
+      /* if it is a \ then escape char's are allowed */
+      ch = input();
+      if (ch == '\n') {
+        /* \<newline> is a continuator */
+        lineno = ++yylineno;
+        column = 0;
       }
-      *str++ = '\\'; /* backslash in place */
-      *str++ = ch; /* get the escape char, no further check */
-      continue; /* carry on */
-    }
-    
-    /* if new line we have a new line break, which is illegal */
-    if (ch == '\n') {
-      werror (W_NEWLINE_IN_STRING);
-      *str++ = '\n';
-      lineno=++yylineno;
-      column=0;
-      continue;
-    }
-    
-    /* if this is a quote then we have work to do */
-    /* find the next non whitespace character     */
-    /* if that is a double quote then carry on    */
-    if (ch == '\"') {
-      *str++  = ch ; /* Pass end of this string or substring to evaluator */
+      else {
+        buf[0] = '\\';
+        buf[1] = ch;
+        dbuf_append(&dbuf, buf, 2); /* get the escape char, no further check */
+      }
+      break; /* carry on */
+
+    case '\n':
+      /* if new line we have a new line break, which is illegal */
+      werror(W_NEWLINE_IN_STRING);
+      dbuf_append(&dbuf, "\n", 1);
+      lineno = ++yylineno;
+      column = 0;
+      break;
+
+    case '"':
+      /* if this is a quote then we have work to do */
+      /* find the next non whitespace character     */
+      /* if that is a double quote then carry on    */
+      dbuf_append(&dbuf, "\"", 1);  /* Pass end of this string or substring to evaluator */
       while ((ch = input()) && (isspace(ch) || ch=='\\')) {
-	switch (ch) {
-	case '\\':
-	  if ((ch=input())!='\n') {
-	    werror (W_STRAY_BACKSLASH, column);
-	    unput(ch);
-	  } else {
-	    lineno=++yylineno;
-	    column=0;
-	  }
-	  break;
-	case '\n':
-	  yylineno++;
-	  break;
-	}
+        switch (ch) {
+        case '\\':
+          if ((ch = input()) != '\n') {
+            werror(W_STRAY_BACKSLASH, column);
+            unput(ch);
+          }
+          else {
+            lineno = ++yylineno;
+            column = 0;
+          }
+          break;
+
+        case '\n':
+          yylineno++;
+          break;
+        }
       }
 
       if (!ch) 
-	break; 
+        goto out;
 
       if (ch != '\"') {
-	unput(ch) ;
-	break ;
+        unput(ch) ;
+        goto out;
       }
+      break;
+
+    default:
+      buf[0] = ch;
+      dbuf_append(&dbuf, buf, 1);  /* Put next substring introducer into output string */
     }
-    *str++  = ch; /* Put next substring introducer into output string */
-  }  
-  *str = '\0';
-  
-  /* If we aren't going to fix it, at least trap it. */
-  if (strlen(strLitBuff) >= sizeof(strLitBuff))
-  {
-  	fprintf(stderr, "Internal error: strLitBuff overflowed.\n");
-	exit(-1);
   }
-  
-  return strLitBuff;
+
+out:
+  return (char *)dbuf_c_str(&dbuf);
 }
 
 void doPragma (int op, char *cp)

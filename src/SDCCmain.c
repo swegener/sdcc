@@ -135,7 +135,7 @@ char DefaultExePath[128];
 static const char *_preCmd[] =
 {
   "sdcpp", "-Wall", "-lang-c++", "-DSDCC=1",
-  "$l", "-I" SDCC_INCLUDE_DIR, "$1", "$2", NULL
+  "$l", "$1", "$2", NULL
 };
 
 PORT *port;
@@ -1461,6 +1461,10 @@ preProcess (char **envp)
 	  break;
 	}
 
+      /* standard include path */
+      if (!options.nostdinc) {
+	_addToList (preArgv, "-I" SDCC_INCLUDE_DIR);
+      }
 
       /* add port (processor information to processor */
       sprintf (procDef, "-DSDCC_%s", port->target);

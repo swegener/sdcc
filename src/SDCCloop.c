@@ -131,7 +131,7 @@ intersectLoopSucc (set * lexits, eBBlock ** ebbs)
 
   if (!exit)
     return NULL;
-  
+
   succVect = bitVectCopy (exit->succVect);
 
   for (exit = setNextItem (lexits); exit;
@@ -148,7 +148,7 @@ intersectLoopSucc (set * lexits, eBBlock ** ebbs)
 /*-----------------------------------------------------------------*/
 /* loopInsert will insert a block into the loop set                */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 loopInsert (set ** regionSet, eBBlock * block)
 {
   if (!isinSet (*regionSet, block))
@@ -188,7 +188,7 @@ DEFSETFUNC (isNotInBlocks)
 /* hasIncomingDefs - has definitions coming into the loop. i.e.    */
 /* check to see if the preheaders outDefs has any definitions      */
 /*-----------------------------------------------------------------*/
-int 
+int
 hasIncomingDefs (region * lreg, operand * op)
 {
   eBBlock *preHdr = lreg->entry->preHeader;
@@ -202,7 +202,7 @@ hasIncomingDefs (region * lreg, operand * op)
 /* findLoopEndSeq - will return the sequence number of the last    */
 /* iCode with the maximum dfNumber in the region                   */
 /*-----------------------------------------------------------------*/
-int 
+int
 findLoopEndSeq (region * lreg)
 {
   eBBlock *block;
@@ -313,7 +313,7 @@ DEFSETFUNC (addDefInExprs)
 /*-----------------------------------------------------------------*/
 /* assignmentsToSym - for a set of blocks determine # time assigned */
 /*-----------------------------------------------------------------*/
-int 
+int
 assignmentsToSym (set * sset, operand * sym)
 {
   eBBlock *ebp;
@@ -339,7 +339,7 @@ assignmentsToSym (set * sset, operand * sym)
 /*-----------------------------------------------------------------*/
 /* isOperandInvariant - determines if an operand is an invariant   */
 /*-----------------------------------------------------------------*/
-int 
+int
 isOperandInvariant (operand * op, region * theLoop, set * lInvars)
 {
   int opin = 0;
@@ -393,7 +393,7 @@ DEFSETFUNC (pointerAssigned)
   /* is dangerous                                            */
   if (!bitVectIsZero (ebp->ptrsSet))
     return 1;
-  
+
   return 0;
 }
 
@@ -416,7 +416,7 @@ DEFSETFUNC (hasNonPtrUse)
 /*-----------------------------------------------------------------*/
 /* loopInvariants - takes loop invariants out of region            */
 /*-----------------------------------------------------------------*/
-int 
+int
 loopInvariants (region * theLoop, eBBlock ** ebbs, int count)
 {
   eBBlock *lBlock;
@@ -431,8 +431,8 @@ loopInvariants (region * theLoop, eBBlock ** ebbs, int count)
       theLoop->exits == NULL)
     return 0;
 
-  /* we will do the elimination for those blocks        */
-  /* in the loop that dominates all exits from the loop */
+  /* we will do the elimination for those blocks       */
+  /* in the loop that dominate all exits from the loop */
   for (lBlock = setFirstItem (theLoop->regBlocks); lBlock;
        lBlock = setNextItem (theLoop->regBlocks))
     {
@@ -479,7 +479,7 @@ loopInvariants (region * theLoop, eBBlock ** ebbs, int count)
 
 	  if (SKIP_IC (ic) || POINTER_SET (ic) || ic->op == IFX)
 	    continue;
-	  
+
 	  /* iTemp assignment from a literal may be invariant, but it
 	     will needlessly increase register pressure if the
 	     iCode(s) that use this iTemp are not also invariant */
@@ -499,7 +499,7 @@ loopInvariants (region * theLoop, eBBlock ** ebbs, int count)
 	    continue;
 
 	  lin = rin = 0;
-	  
+
 	  /* special case */
 	  /* if address of then it is an invariant */
 	  if (ic->op == ADDRESS_OF &&
@@ -513,14 +513,14 @@ loopInvariants (region * theLoop, eBBlock ** ebbs, int count)
 		 that the pointer set does not exist in
 		 any of the blocks */
 	      if (POINTER_GET (ic) &&
-		  (applyToSet (theLoop->regBlocks, 
+		  (applyToSet (theLoop->regBlocks,
 			       pointerAssigned, IC_LEFT (ic))))
 		lin = 0;
 	  }
-	  
+
 	  /* do the same for right */
 	  rin = isOperandInvariant (IC_RIGHT (ic), theLoop, lInvars);
-	  
+
 	  /* if this is a POINTER_GET then special case, make sure all
 	     usages within the loop are POINTER_GET any other usage
 	     would mean that this is not an invariant , since the pointer
@@ -531,11 +531,11 @@ loopInvariants (region * theLoop, eBBlock ** ebbs, int count)
 
 
           /* if both the left & right are invariants : then check that */
-	  /* this definition exists in the out definition of all the  */
-	  /* blocks, this will ensure that this is not assigned any   */
-	  /* other value in the loop , and not used in this block     */
+	  /* this definition exists in the out definition of all the   */
+	  /* blocks, this will ensure that this is not assigned any    */
+	  /* other value in the loop, and not used in this block       */
 	  /* prior to this definition which means only this definition */
-	  /* is used in this loop                                     */
+	  /* is used in this loop                                      */
 	  if (lin && rin && IC_RESULT (ic))
 	    {
 	      eBBlock *sBlock;
@@ -577,6 +577,20 @@ loopInvariants (region * theLoop, eBBlock ** ebbs, int count)
 		    }
 		  else if (bitVectBitsInCommon (sBlock->defSet, OP_DEFS (IC_RESULT (ic))))
 		    break;
+
+                  if (IC_RESULT(ic))
+                    {
+                      iCode *ic2;
+                      /* check that this definition is not assigned */
+                      /* any other value in this block */
+                      for (ic2 = sBlock->sch; ic2; ic2 = ic2->next)
+                        {
+                          if ((ic != ic2) && (isOperandEqual(IC_RESULT(ic), IC_RESULT(ic2))))
+                            break;
+                        }
+                      if (ic2) /* found another definition */
+                        break;
+                    }
 		}
 
 	      if (sBlock)
@@ -590,7 +604,7 @@ loopInvariants (region * theLoop, eBBlock ** ebbs, int count)
 	      /* now we know it is a true invariant */
 	      /* remove it from the insts chain & put */
 	      /* in the invariant set                */
-	      
+
               OP_SYMBOL (IC_RESULT (ic))->isinvariant = 1;
               SPIL_LOC (IC_RESULT (ic)) = NULL;
 	      remiCodeFromeBBlock (lBlock, ic);
@@ -655,7 +669,7 @@ loopInvariants (region * theLoop, eBBlock ** ebbs, int count)
 /*-----------------------------------------------------------------*/
 /* addressTaken - returns true if the symbol is found in the addrof */
 /*-----------------------------------------------------------------*/
-int 
+int
 addressTaken (set * sset, operand * sym)
 {
   set *loop;
@@ -881,7 +895,7 @@ basicInduction (region * loopReg, eBBlock ** ebbs, int count)
 
 			  eBBlock *eblock = NULL;
 			  int j;
-			  
+
 			  /* Need to search for bbnum == i since ebbs is  */
 			  /* sorted by dfnum; a direct index won't do.  */
 			  for (j=0; j<count; j++)
@@ -930,7 +944,7 @@ basicInduction (region * loopReg, eBBlock ** ebbs, int count)
 /*-----------------------------------------------------------------*/
 /* loopInduction - remove induction variables from a loop          */
 /*-----------------------------------------------------------------*/
-int 
+int
 loopInduction (region * loopReg, eBBlock ** ebbs, int count)
 {
   int change = 0;
@@ -1221,7 +1235,7 @@ createLoopRegions (eBBlock ** ebbs, int count)
 /*-----------------------------------------------------------------*/
 /* loopOptimizations - identify region & remove invariants & ind   */
 /*-----------------------------------------------------------------*/
-int 
+int
 loopOptimizations (hTab * orderedLoops, eBBlock ** ebbs, int count)
 {
   region *lp;

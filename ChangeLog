@@ -1,3 +1,7 @@
+2003-02-15    <johan@balder>
+
+	* src/asm.c: new options: --no-c-code-in-asm and --i-code-in-asm
+
 2003-02-14  Bernhard Held <bernhard@bernhardheld.de>
 
 	* doc/sdccman.lyx: Environment variables, -o and other minor things

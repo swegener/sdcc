@@ -2148,8 +2148,10 @@ decorateType (ast * tree)
 
       if (IS_FUNC (LTYPE (tree)))
 	{
-	  werror (E_ILLEGAL_ADDR, "address of function");
-	  goto errorTreeReturn;
+	  // this ought to be ignored
+	  return (tree->left);
+	  //werror (E_ILLEGAL_ADDR, "address of function");
+	  //goto errorTreeReturn;
 	}
 
       if (IS_LITERAL(LTYPE(tree)))

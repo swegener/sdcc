@@ -796,6 +796,11 @@ printIvalFuncPtr (sym_link * type, initList * ilist, FILE * oFile)
 
   val = list2val (ilist);
 
+  if (!val) {
+    // an error has been thrown allready
+    val=constVal("0");
+  }
+
   if (IS_LITERAL(val->etype)) {
     if (compareType(type,val->etype)==0) {
       werror (E_INCOMPAT_TYPES);

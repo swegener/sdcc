@@ -22,14 +22,14 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
-D        [0-9]
-L        [a-zA-Z_]
-H        [a-fA-F0-9]
-E        [Ee][+-]?{D}+
-FS       (f|F|l|L)
-IS       (u|U|l|L)*
-%{
+D       [0-9]
+L       [a-zA-Z_]
+H       [a-fA-F0-9]
+E       [Ee][+-]?{D}+
+FS      (f|F|l|L)
+IS      (u|U|l|L)*
 
+%{
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -37,63 +37,51 @@ IS       (u|U|l|L)*
 #include "newalloc.h"
 #include "dbuf.h"
 
-static char *stringLiteral(void);
-char *currFname;
+#define TKEYWORD(token) return (isTargetKeyword(yytext) ? token :\
+                                check_type())
 
 extern int lineno, column;
 extern char *filename;
-int  mylineno = 1;
+
+/* global definitions */
+char *currFname;
+int mylineno = 1;
+
+/* local definitions */
+static struct optimize save_optimize;
+static struct options save_options;
+static struct dbuf_s asmbuff;
+
+/* forward declarations */
+static char *stringLiteral(void);
 static void count(void);
 static int process_pragma(char *);
-static void my_unput(char c);
-
-#define TKEYWORD(token) return (isTargetKeyword(yytext) ? token :\
-                                check_type())
-char *asmbuff=NULL;
-int asmbuffSize=0;
-char *asmp ;
 static int check_type(void);
 static int isTargetKeyword(char *s);
-static int checkCurrFile (char *s);
-struct optimize save_optimize;
-struct options  save_options;
+static int checkCurrFile(char *s);
 %}
 
 %x asm
 %%
-"_asm"         {  
-  count(); 
-  asmp = asmbuff = realloc (asmbuff, INITIAL_INLINEASM);
-  asmbuffSize=INITIAL_INLINEASM;
-  BEGIN(asm) ;
-}
-<asm>"_endasm" { 
+"_asm"         {
   count();
-  *asmp = '\0';
-  yylval.yyinline = strdup (asmbuff);
+  assert(asmbuff.alloc == 0 && asmbuff.len == 0 && asmbuff.buf == NULL);
+  dbuf_init(&asmbuff, INITIAL_INLINEASM);
+  BEGIN(asm);
+}
+<asm>"_endasm" {
+  count();
+  yylval.yyinline = dbuf_c_str(&asmbuff);
+  dbuf_detach(&asmbuff);
   BEGIN(INITIAL);
   return (INLINEASM);
 }
-<asm>.         { 
-  if (asmp-asmbuff >= asmbuffSize-2) {
-    /* increase the buffersize with 50% */
-    int size=asmp-asmbuff;
-    asmbuffSize=asmbuffSize*3/2;
-    asmbuff = realloc (asmbuff, asmbuffSize); 
-    asmp=asmbuff+size;
-  }
-  *asmp++ = yytext[0];
+<asm>\n        {
+  count();
+  dbuf_append(&asmbuff, yytext, 1);
 }
-<asm>\n        { 
-  count(); 
-  if (asmp-asmbuff >= asmbuffSize-3) {
-    /* increase the buffersize with 50% */
-    int size=asmp-asmbuff;
-    asmbuffSize=asmbuffSize*3/2;
-    asmbuff = realloc (asmbuff, asmbuffSize); 
-    asmp=asmbuff+size;
-  }
-  *asmp++ = '\n' ;
+<asm>.         {
+  dbuf_append(&asmbuff, yytext, 1);
 }
 "at"	       { count(); TKEYWORD(AT)  ; }
 "auto"	       { count(); return(AUTO); }
@@ -215,11 +203,11 @@ struct options  save_options;
 "\n"		   { count(); }
 [ \t\v\f]      { count(); }
 \\ {
-  char ch=input();
-  if (ch!='\n') {
+  int ch = input();
+  if (ch != '\n') {
     /* that could have been removed by the preprocessor anyway */
     werror (W_STRAY_BACKSLASH, column);
-    my_unput(ch);
+    unput(ch);
   }
 }
 .			   { count()	; }
@@ -362,12 +350,12 @@ static char *stringLiteral(void)
       /* find the next non whitespace character     */
       /* if that is a double quote then carry on    */
       dbuf_append(&dbuf, "\"", 1);  /* Pass end of this string or substring to evaluator */
-      while ((ch = input()) && (isspace(ch) || ch=='\\')) {
+      while ((ch = input()) && (isspace(ch) || ch == '\\')) {
         switch (ch) {
         case '\\':
           if ((ch = input()) != '\n') {
             werror(W_STRAY_BACKSLASH, column);
-            my_unput((char)ch);
+            unput(ch);
           }
           else {
             lineno = ++mylineno;
@@ -385,7 +373,7 @@ static char *stringLiteral(void)
         goto out;
 
       if (ch != '\"') {
-        my_unput((char)ch) ;
+        unput(ch) ;
         goto out;
       }
       break;
@@ -639,11 +627,6 @@ static int isTargetKeyword(char *s)
     }
     
     return 0;
-}
-
-static void my_unput(char c)
-{
-  yyunput(c, (yytext_ptr));
 }
 
 int yywrap(void)

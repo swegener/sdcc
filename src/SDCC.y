@@ -66,12 +66,12 @@ bool uselessDecl = TRUE;
     symbol     *sym ;      /* symbol table pointer       */
     structdef  *sdef;      /* structure definition       */
     char       yychar[SDCC_NAME_MAX+1];
-    sym_link       *lnk ;      /* declarator  or specifier   */
+    sym_link   *lnk ;      /* declarator  or specifier   */
     int        yyint;      /* integer value returned     */
     value      *val ;      /* for integer constant       */
     initList   *ilist;     /* initial list               */
-    char       *yyinline; /* inlined assembler code */
-    ast       *asts;     /* expression tree            */
+    const char *yyinline;  /* inlined assembler code     */
+    ast        *asts;      /* expression tree            */
 }
 
 %token <yychar> IDENTIFIER TYPE_NAME

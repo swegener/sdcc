@@ -1513,6 +1513,13 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	  if (pdic && compareType (operandType (IC_RESULT (pdic)),
 				 operandType (IC_RESULT (ic))) != 1)
 	    pdic = NULL;
+
+	  // TODO: this must go, a weak fix for bug #467035
+	  if (pdic && (pdic->level > ic->level)) {
+	    // pdic was inside an inner loop
+	    pdic = NULL;
+	  }
+	  
 	}
 
       /* if found then eliminate this and add to */
@@ -1523,11 +1530,6 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	  if (IS_ITEMP (IC_RESULT (ic)))
 	    {
 	      
-	      if (pdic->level > ic->level) {
-		// pdic was inside an inner loop
-		continue;
-	      }
-
 	      /* replace in the remaining of this block */
 	      replaceAllSymBySym (ic->next, IC_RESULT (ic), IC_RESULT (pdic), &ebb->ndompset);
 	      /* remove this iCode from inexpressions of all

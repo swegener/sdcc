@@ -143,7 +143,7 @@ int main(void)
 
     /* 32766 is the highest value for a 16 bitter */
 #if DEBUG
-    Number_Of_Runs = 3000;
+    Number_Of_Runs = 1;
 #else
     Number_Of_Runs = 32766;
 #endif    
@@ -207,9 +207,9 @@ int main(void)
 	DPRINTF(("Int_1_Loc %d == 3, Int_2_Loc %d == 3, Int_3_Loc %d == 7\n",
 	       Int_1_Loc, Int_2_Loc, Int_3_Loc));
 
-	Int_2_Loc = Int_2_Loc * Int_1_Loc;
-	Int_1_Loc = Int_2_Loc / Int_3_Loc;
-	Int_2_Loc = 7 * (Int_2_Loc - Int_3_Loc) - Int_1_Loc;
+	Int_2_Loc = Int_2_Loc * Int_1_Loc; /* i2 = 3 * 3 = 9 */
+	Int_1_Loc = Int_2_Loc / Int_3_Loc; /* i1 = 9 / 7 = 1 */
+	Int_2_Loc = 7 * (Int_2_Loc - Int_3_Loc) - Int_1_Loc; /* i2 = 7 * (9 - 7) - 1 */
 	/* Int_1_Loc == 1, Int_2_Loc == 13, Int_3_Loc == 7 */
 	DPRINTF(("Int_1_Loc %d == 1, Int_2_Loc %d == 13, Int_3_Loc %d == 7\n",
 	       Int_1_Loc, Int_2_Loc, Int_3_Loc));
@@ -302,7 +302,13 @@ void Proc_1 (REG Rec_Pointer Ptr_Val_Par)
     /* Local variable, initialized with Ptr_Val_Par->Ptr_Comp,    */
     /* corresponds to "rename" in Ada, "with" in Pascal           */
   
-    structassign (*Ptr_Val_Par->Ptr_Comp, *Ptr_Glob); 
+#if !defined(SDCC_ds390)    
+    structassign (*Ptr_Val_Par->Ptr_Comp, *Ptr_Glob);
+#else
+    /* I have no idea why this is necessary... */
+    memcpyx((void xdata *)*Ptr_Val_Par->Ptr_Comp, (void xdata *)*Ptr_Glob, 
+	   sizeof(Rec_Type));
+#endif
     Ptr_Val_Par->variant.var_1.Int_Comp = 5;
     Next_Record->variant.var_1.Int_Comp 
         = Ptr_Val_Par->variant.var_1.Int_Comp;

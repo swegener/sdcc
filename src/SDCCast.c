@@ -593,13 +593,10 @@ int processParms (ast *func, value *defParm,
     {
         ast *newType = NULL;
         
-        printf("oogie ");
-        
 	if (IS_CAST_OP(actParm) 
 	 || (IS_AST_LIT_VALUE(actParm) && actParm->values.literalFromCast))
 	{
 	   /* Parameter was explicitly typecast; don't touch it. */
-	   printf("typecast.\n");
 	   return 0;
 	}    
         
@@ -632,14 +629,7 @@ int processParms (ast *func, value *defParm,
 	    actParm->left = newType;
 	    actParm->right= parmCopy;
 	    decorateType(actParm);
-	    
-	    printf("boogie\n");
         }
-        else
-        {
-            printf("nada\n");
-        }
-        
         return 0;
     }        
         

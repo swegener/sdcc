@@ -129,7 +129,7 @@ typedef struct {
 	options are parsed. */
     void (*setDefaultOptions)(void);
     /** Does the dirty work. */
-    void (*assignRegisters)(eBBlock **, int);
+    void (*assignRegisters)(struct eBBlock **, int);
     
     /** Returns the register name of a symbol.
 	Used so that 'regs' can be an incomplete type. */
@@ -161,6 +161,14 @@ typedef struct {
     /** If TRUE, then tprintf and !dw will be used for some initalisers
      */
     bool use_dw_for_init;
+
+    /* condition transformations */
+    bool lt_nge ;     /* transform (a < b)  to !(a >= b)  */
+    bool gt_nle ;     /* transform (a > b)  to !(a <= b)  */
+    bool le_ngt ;     /* transform (a <= b) to !(a > b)   */
+    bool ge_nlt ;     /* transform (a >= b) to !(a < b)   */
+    bool ne_neq ;     /* transform a != b --> ! (a == b)  */
+    bool eq_nne ;     /* transform a == b --> ! (a != b)  */
 } PORT;
 
 extern PORT *port;

@@ -31,6 +31,7 @@
 #include "SDCCval.h"
 #include "SDCCmem.h"
 #include "SDCCast.h"
+#include "port.h"
 
 extern int yyerror (char *);
 extern FILE	*yyin;
@@ -287,41 +288,40 @@ shift_expr
 
 relational_expr
    : shift_expr
-   | relational_expr '<' shift_expr    { $$ = newNode('<',$1,$3); }
-   | relational_expr '>' shift_expr    { $$ = newNode('>',$1,$3); }
+   | relational_expr '<' shift_expr    { 
+	$$ = (port->lt_nge ? 
+	      newNode('!',newNode(GE_OP,$1,$3),NULL) :
+	      newNode('<', $1,$3));
+   }
+   | relational_expr '>' shift_expr    { 
+	   $$ = (port->gt_nle ? 
+		 newNode('!',newNode(LE_OP,$1,$3),NULL) :
+		 newNode('>',$1,$3));
+   }
    | relational_expr LE_OP shift_expr  { 
-       /* $$ = newNode(LE_OP,$1,$3); */
-       /* getting 8051 specific here : will change
-	  LE_OP operation to "not greater than" i.e.
-	  ( a <= b ) === ( ! ( a > b )) */
-       $$ = newNode('!', 
-		    newNode('>', $1 , $3 ),
-		    NULL);
+	   $$ = (port->le_ngt ? 
+		 newNode('!', newNode('>', $1 , $3 ), NULL) :
+		 newNode(LE_OP,$1,$3));
    }
    | relational_expr GE_OP shift_expr  { 
-       /* $$ = newNode(GE_OP,$1,$3) ; */
-       /* getting 8051 specific here : will change
-	  GE_OP operation to "not less than" i.e.
-	  ( a >= b ) === ( ! ( a < b )) */
-       $$ = newNode('!',
-		    newNode('<', $1 , $3 ),
-		    NULL);
+	   $$ = (port->ge_nlt ? 
+		 newNode('!', newNode('<', $1 , $3 ), NULL) :
+		 newNode(GE_OP,$1,$3));
    }
    ;
 
 equality_expr
    : relational_expr
-   | equality_expr EQ_OP relational_expr  { $$ = newNode(EQ_OP,$1,$3);}
-   | equality_expr NE_OP relational_expr  
-          { 
-              /* $$ = newNode(NE_OP,$1,$3); */
-	      /* NE_OP changed :            
-		 expr1 != expr2 is equivalent to
-		 (! expr1 == expr2) */
-	      $$ = newNode('!',
-			   newNode(EQ_OP,$1,$3),
-			   NULL);
-	  }       
+   | equality_expr EQ_OP relational_expr  { 
+    $$ = (port->eq_nne ? 
+	  newNode('!',newNode(NE_OP,$1,$3),NULL) : 
+	  newNode(EQ_OP,$1,$3));
+   }
+   | equality_expr NE_OP relational_expr { 
+       $$ = (port->ne_neq ? 
+	     newNode('!', newNode(EQ_OP,$1,$3), NULL) : 
+	     newNode(NE_OP,$1,$3));
+   }       
    ;
 
 and_expr

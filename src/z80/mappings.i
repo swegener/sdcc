@@ -9,7 +9,7 @@ static const ASM_MAPPING _asxxxx_gb_mapping[] = {
     { "enter", "push bc" },
     { "enterx", 
       "push bc\n"
-      "lda sp,-%d(sp)" },
+      "\tlda sp,-%d(sp)" },
     { "leave", 
       "pop bc\n"
       "\tret"

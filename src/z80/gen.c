@@ -685,7 +685,7 @@ char *aopGetLitWordLong(asmop *aop, int offset, bool with_hash)
     case AOP_IMMD:
 	/* PENDING: for re-target */
 	if (with_hash)
-	    tsprintf(s, "!hashed", aop->aopu.aop_immd);
+	    tsprintf(s, "!hashedstr", aop->aopu.aop_immd);
 	else
 	    strcpy(s, aop->aopu.aop_immd);
 	ALLOC_ATOMIC(rs,strlen(s)+1);
@@ -1027,7 +1027,7 @@ static void aopPut (asmop *aop, char *s, int offset)
     case AOP_HL:
 	wassert(IS_GB);
 	/* PENDING: for re-target */
-	if (!strcmp(s, "!*hl")) {
+	if (!strcmp(s, "!*hl") || !strcmp(s, "(hl)") || !strcmp(s, "[hl]")) {
 	    emit2("ld a,!*hl");
 	    s = "a";
 	}
@@ -1039,7 +1039,7 @@ static void aopPut (asmop *aop, char *s, int offset)
     case AOP_STK:
 	if (IS_GB) {
 	    /* PENDING: re-target */
-	    if (!strcmp("!*hl", s)) {
+	    if (!strcmp(s, "!*hl") || !strcmp(s, "(hl)") || !strcmp(s, "[hl]")) {
 		emit2("ld a,!*hl");
 		s = "a";
 	    }
@@ -1493,7 +1493,7 @@ static void emitCall (iCode *ic, bool ispcall)
 	    _G.stack.pushed += 2;
 	    
 	    fetchHL(AOP(IC_LEFT(ic)));
-	    emit2("jp", "!*hl");
+	    emit2("jp !*hl");
 	    emit2("!tlabeldef", (rlbl->key+100));
 	    _G.stack.pushed -= 2;
 	}
@@ -1595,6 +1595,8 @@ static void genFunction (iCode *ic)
     nregssaved = 0;
     /* create the function header */
     emit2("!functionheader", sym->name);
+    /* PENDING: portability. */
+    emit2("__%s_start:", sym->rname);
     emit2("!functionlabeldef", sym->rname);
 
     fetype = getSpec(operandType(IC_LEFT(ic)));
@@ -1652,6 +1654,8 @@ static void genEndFunction (iCode *ic)
 	    emit2("!leavex", _G.stack.offset);
 	else
 	    emit2("!leave");
+	/* PENDING: portability. */
+	emit2("__%s_end:", sym->rname);
     }
     _G.stack.pushed = 0;
     _G.stack.offset = 0;
@@ -2772,9 +2776,10 @@ static void genAnd (iCode *ic, iCode *ifx)
 		    wassert(0);
 		}
 		else {
-		    MOVA(aopGet(AOP(right),offset,FALSE));
-		    emitcode("and","%s,a",
-			     aopGet(AOP(left),offset,FALSE));
+		    MOVA(aopGet(AOP(left),offset,FALSE));
+		    emitcode("and","a,%s",
+			     aopGet(AOP(right),offset,FALSE));
+		    emitcode("ld", "%s,a", aopGet(AOP(left),offset,FALSE));
 		}
             }
         }

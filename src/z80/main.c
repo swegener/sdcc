@@ -27,7 +27,7 @@ static void _z80_init(void)
 static void _gbz80_init(void)
 {
     z80_opts.sub = SUB_GBZ80;
-    asm_addTree(&_rgbds_gb);
+    asm_addTree(&_asxxxx_gb);
 }
 
 static int regParmFlg = 0; /* determine if we can register a parameter */
@@ -145,17 +145,17 @@ PORT z80_port = {
 	1, 1, 2, 4, 2, 2, 2, 1, 4, 4
     },
     {
-	"XSEG",
-	"STACK",
-	"CODE",
-	"DATA",
-	"ISEG",
-	"XSEG",
-	"BSEG",
-	"RSEG",
-	"GSINIT",
-	"OVERLAY",
-	"GSFINAL",
+	"_XSEG",
+	"_STACK",
+	"_CODE",
+	"_DATA",
+	"_ISEG",
+	"_XSEG",
+	"_BSEG",
+	"_RSEG",
+	"_GSINIT",
+	"_OVERLAY",
+	"_GSFINAL",
 	NULL,
 	NULL,
 	1
@@ -203,17 +203,17 @@ PORT gbz80_port = {
 	1, 1, 2, 4, 2, 2, 2, 1, 4, 4
     },
     {
-	"XSEG",
-	"STACK",
-	"CODE",
-	"DATA",
-	"ISEG",
-	"XSEG",
-	"BSEG",
-	"RSEG",
-	"GSINIT",
-	"OVERLAY",
-	"GSFINAL",
+	"_XSEG",
+	"_STACK",
+	"_CODE",
+	"_DATA",
+	"_ISEG",
+	"_XSEG",
+	"_BSEG",
+	"_RSEG",
+	"_GSINIT",
+	"_OVERLAY",
+	"_GSFINAL",
 	NULL,
 	NULL,
 	1

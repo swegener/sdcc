@@ -1607,6 +1607,8 @@ operand *geniCodeAdd (operand *left, operand *right )
 	size = 
 	    operandFromLit(getSize(ltype->next));
 	right = geniCodeMultiply (right ,size);
+	if (getSize(ltype) > 1) 
+		right = geniCodeCast(INTTYPE,right,TRUE);
 	resType = copyLinkChain(ltype);
     }
     else { /* make them the same size */

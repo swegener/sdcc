@@ -31,7 +31,7 @@ enum
     AOP_REG, AOP_DIR,
     AOP_STK, AOP_IMMD, AOP_STR,
     AOP_CRY, 
-    AOP_EXT, AOP_SOF,
+    AOP_EXT, AOP_SOF, AOP_DUMMY
   };
 
 enum

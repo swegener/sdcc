@@ -762,7 +762,10 @@ storeRegToAop (regs *reg, asmop *aop, int loffset)
       return;
     }
 
-    switch (regidx)
+  if (aop->type == AOP_DUMMY)
+    return;
+    
+  switch (regidx)
     {
       case A_IDX:
         if ((aop->type == AOP_REG) && (loffset < aop->size))
@@ -944,6 +947,8 @@ storeConstToAop (char *c, asmop *aop, int loffset)
         if (loffset>(aop->size-1))
           break;
         loadRegFromConst (aop->aopu.aop_reg[loffset], c);
+        break;
+      case AOP_DUMMY:
         break;
       default:
         if (hc08_reg_a->isFree)
@@ -1155,7 +1160,10 @@ accopWithAop (char *accop, asmop *aop, int loffset)
       accopWithAop (accop, aop->stk_aop[loffset], 0);
       return;
     }
-    
+
+  if (aop->type == AOP_DUMMY)
+    return;
+
   if (aop->type == AOP_REG)
     {
       pushReg (aop->aopu.aop_reg[loffset], FALSE);
@@ -1237,6 +1245,8 @@ rmwWithAop (char *rmwop, asmop *aop, int loffset)
         rmwWithReg (rmwop, hc08_reg_a);
 	storeRegToAop (hc08_reg_a, aop, loffset);
         pullOrFreeReg (hc08_reg_a, needpula);
+        break;
+      case AOP_DUMMY:
         break;
       default:
         emitcode (rmwop, "%s", aopAdrStr (aop, loffset, FALSE));
@@ -1689,27 +1699,27 @@ aopOp (operand * op, iCode * ic, bool result)
 	}
 #endif
       /* else spill location  */
-//      printf("checking spill loc\n");
-//      if (sym->usl.spillLoc && getSize(sym->type) != getSize(sym->usl.spillLoc->type)) {
-      if (sym->usl.spillLoc && sym->usl.spillLoc->aop
-          && sym->usl.spillLoc->aop->size != getSize (sym->type))
+      if (sym->usl.spillLoc)
         {
-	  /* force a new aop if sizes differ */
-	  sym->usl.spillLoc->aop = NULL;
-	  //printf ("forcing new aop\n");
-        }
-      sym->aop = op->aop = aop =
-	aopForSym (ic, sym->usl.spillLoc, result);
+          if (sym->usl.spillLoc->aop
+              && sym->usl.spillLoc->aop->size != getSize (sym->type))
+            {
+	      /* force a new aop if sizes differ */
+	      sym->usl.spillLoc->aop = NULL;
+	      //printf ("forcing new aop\n");
+            }
+	  sym->aop = op->aop = aop = aopForSym (ic, sym->usl.spillLoc, result);
+	  aop->size = getSize (sym->type);
+	  aop->op = op;
+	  aop->isaddr = op->isaddr;
+	  //printf ("spill symbol %s\n", OP_SYMBOL (op)->name);
+	  //printf (" with size = %d\n", aop->size);
+	  return;
+	}
+      
+      /* else must be a dummy iTemp */
+      sym->aop = op->aop = aop = newAsmop (AOP_DUMMY);
       aop->size = getSize (sym->type);
-      aop->op = op;
-      aop->isaddr = op->isaddr;
-      //printf ("spill symbol %s\n", OP_SYMBOL (op)->name);
-      //printf (" with size = %d\n", aop->size);
-      /* if (aop->isaddr & IS_ITEMP (op))
-        {
-          aop->psize=aop->size;
-          aop->size = getSize( operandType (op)->next);
-        } */
       return;
     }
 
@@ -1871,6 +1881,9 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
   switch (aop->type)
     {
 
+    case AOP_DUMMY:
+      return zero;
+      
     case AOP_IMMD:
       if (aop->aopu.aop_immd.from_cast_remat && (loffset == (aop->size-1))) {
 	      sprintf(s,"%s",aop->aopu.aop_immd.aop_immd2);
@@ -3427,7 +3440,7 @@ genMultOneByte (operand * left,
 		operand * right,
 		operand * result)
 {
-  sym_link *opetype = operandType (result);
+  /* sym_link *opetype = operandType (result); */
   symbol *tlbl1, *tlbl2, *tlbl3, *tlbl4;
   int size=AOP_SIZE(result);
   bool negLiteral = FALSE;

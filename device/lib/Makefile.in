@@ -33,15 +33,15 @@ srcdir          = @srcdir@
 CPPFLAGS        = -I$(INCDIR) 
 CFLAGS		= 
 
-OBJECTS		= _atoi.rel _atol.rel _autobaud.rel _bp.rel _char2fs.rel \
+OBJECTS		= _atoi.rel _atol.rel _autobaud.rel _bp.rel _schar2fs.rel \
 		  _decdptr.rel _divsint.rel _divslong.rel _divuint.rel \
-		  _divulong.rel _fs2char.rel _fs2int.rel _fs2long.rel \
+		  _divulong.rel _fs2schar.rel _fs2sint.rel _fs2slong.rel \
 		  _fs2uchar.rel _fs2uint.rel _fs2ulong.rel _fsadd.rel \
 		  _fsdiv.rel _fseq.rel _fsgt.rel _fslt.rel _fsmul.rel \
 		  _fsneq.rel _fssub.rel _gptrget.rel _gptrput.rel \
-		  _int2fs.rel _iscntrl.rel _isdigit.rel _isgraph.rel \
+		  _sint2fs.rel _iscntrl.rel _isdigit.rel _isgraph.rel \
 		  _islower.rel _isprint.rel _ispunct.rel _isspace.rel \
-		  _isupper.rel _isxdigit.rel _long2fs.rel _memcmp.rel \
+		  _isupper.rel _isxdigit.rel _slong2fs.rel _memcmp.rel \
 		  _memcpy.rel _memset.rel _modsint.rel _modslong.rel \
 		  _moduint.rel _modulong.rel _mulsint.rel _muluint.rel \
 		  _mululong.rel _muslong.rel _ser.rel _setjmp.rel \

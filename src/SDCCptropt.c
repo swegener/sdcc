@@ -173,7 +173,6 @@ static int pattern2 (iCode *sic)
 	pgs->next = sh;
 	sh->prev = pgs;
 	return 1;
-	return 1;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -185,4 +184,37 @@ ptrPostIncDecOpt (iCode * sic)
 {
 	if (pattern1(sic)) return ;
 	pattern2(sic);
+}
+
+/*-----------------------------------------------------------------------*/
+/* addPattern1 - transform addition to pointer of variables              */
+/*-----------------------------------------------------------------------*/
+static int addPattern1(iCode *ic)
+{
+	iCode *dic;
+	operand *tmp;
+	/* transform :
+	   iTempAA = iTempBB + iTempCC
+	   iTempDD = iTempAA + CONST
+	   to
+	   iTempAA = iTempBB + CONST
+	   iTempDD = iTempAA + iTempCC
+	*/
+	if (!isOperandLiteral(IC_RIGHT(ic))) return 0;
+	if ((dic=findBackwardDef(IC_LEFT(ic),ic->prev)) == NULL) return 0;
+	if (bitVectnBitsOn(OP_SYMBOL(IC_RESULT(dic))->uses) > 1) return 0;
+	if (dic->op != '+') return 0;
+	tmp = IC_RIGHT(ic);
+	IC_RIGHT(ic) = IC_RIGHT(dic);
+	IC_RIGHT(dic) = tmp;
+	return 1;
+}
+
+/*-----------------------------------------------------------------------*/
+/* ptrAddition - optimize pointer additions                              */
+/*-----------------------------------------------------------------------*/
+int ptrAddition (iCode *sic)
+{
+	if (addPattern1(sic)) return 1;
+	return 0;
 }

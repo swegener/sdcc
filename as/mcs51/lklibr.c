@@ -668,7 +668,6 @@ int fndsym( char *name )
 
 		while (ThisSym)
         {
-            //printf("ThisSym->name=%s\n", ThisSym->name);
 			if (!strcmp(ThisSym->name, name))
             {
 				if ((!ThisLibr->loaded) && (numfound==0))
@@ -797,11 +796,7 @@ pmlibraryfile buildlibraryindex_SdccLib(char * PathLib, FILE * libfp, char * Dir
 					This->libspc=PathLib;
 					strcpy(This->relfil, ModName);
 
-                    #ifdef SDK
-                    sprintf(This->filename, "%s%s%co", DirLib, ModName, FSEPX);
-                    #else /* SDK */
                     sprintf(This->filename, "%s%s%crel", DirLib, ModName, FSEPX);
-                    #endif /* SDK */
 
                     This->str=This->filename;
 

@@ -454,27 +454,25 @@ value *constVal (char *s)
 
   /* Setup the flags first */
   /* set the _long flag if 'lL' is found */
-  if (strchr (s, 'l') || strchr (s, 'L'))
+  if (strchr (s, 'l') || strchr (s, 'L')) {
+    SPEC_NOUN (val->type) = V_INT;
     SPEC_LONG (val->type) = 1;
+  }
 
   if (sval<0) { // "-28u" will still be signed and negative
     SPEC_USIGN (val->type) = 0;
-    if (sval<-32768) { // check if we have to promote to long
+    if (sval<-128) { // check if we have to promote to int
       SPEC_NOUN (val->type) = V_INT;
-      SPEC_LONG (val->type) = 1;
-    } else {
-      if (sval<-128) { // check if we have to promote to int
-	SPEC_NOUN (val->type) = V_INT;
-      }
     }
-  } else {
-    if (sval>0xffff) { // check if we have to promote to long
-      SPEC_NOUN (val->type) = V_INT;
+    if (sval<-32768) { // check if we have to promote to long int
       SPEC_LONG (val->type) = 1;
-    } else {
-      if (sval>0xff) { // check if we have to promote to int
-	SPEC_NOUN (val->type) = V_INT;
-      }
+    }
+  } else { // >=0
+    if (sval>0xff) { // check if we have to promote to int
+      SPEC_NOUN (val->type) = V_INT;
+    }
+    if (sval>0xffff) { // check if we have to promote to long int
+      SPEC_LONG (val->type) = 1;
     }
   }
 
@@ -1004,7 +1002,7 @@ valMult (value * lval, value * rval)
 			   IS_FLOAT (rval->etype) ? V_FLOAT : V_INT);
   SPEC_SCLS (val->type) = S_LITERAL;	/* will remain literal */
   SPEC_USIGN (val->type) = (SPEC_USIGN (lval->etype) & SPEC_USIGN (rval->etype));
-  SPEC_LONG (val->type) = (SPEC_LONG (lval->etype) | SPEC_LONG (rval->etype));
+  SPEC_LONG (val->type) = 1;
 
   if (IS_FLOAT (val->type))
     SPEC_CVAL (val->type).v_float = floatFromVal (lval) * floatFromVal (rval);
@@ -1018,15 +1016,6 @@ valMult (value * lval, value * rval)
 	  else
 	    SPEC_CVAL (val->type).v_long = (long) floatFromVal (lval) *
 	      (long) floatFromVal (rval);
-	}
-      else
-	{
-	  if (SPEC_USIGN (val->type))
-	    SPEC_CVAL (val->type).v_uint = (unsigned) floatFromVal (lval) *
-	      (unsigned) floatFromVal (rval);
-	  else
-	    SPEC_CVAL (val->type).v_int = (int) floatFromVal (lval) *
-	      (int) floatFromVal (rval);
 	}
     }
   return cheapestVal(val);
@@ -1144,7 +1133,7 @@ valPlus (value * lval, value * rval)
     SPEC_USIGN (rval->etype) &&
     (floatFromVal(lval)+floatFromVal(rval))>=0;
     
-  SPEC_LONG (val->type) = (SPEC_LONG (lval->etype) | SPEC_LONG (rval->etype));
+  SPEC_LONG (val->type) = 1;
 
   if (IS_FLOAT (val->type))
     SPEC_CVAL (val->type).v_float = floatFromVal (lval) + floatFromVal (rval);
@@ -1158,16 +1147,6 @@ valPlus (value * lval, value * rval)
 	  else
 	    SPEC_CVAL (val->type).v_long = (long) floatFromVal (lval) +
 	      (long) floatFromVal (rval);
-	}
-      else
-	{
-	  if (SPEC_USIGN (val->type)) {
-	    SPEC_CVAL (val->type).v_uint = (unsigned) floatFromVal (lval) +
-	      (unsigned) floatFromVal (rval);
-	  } else {
-	    SPEC_CVAL (val->type).v_int = (int) floatFromVal (lval) +
-	      (int) floatFromVal (rval);
-	  }
 	}
     }
   return cheapestVal(val);
@@ -1237,7 +1216,7 @@ valShift (value * lval, value * rval, int lr)
   val->type = val->etype = newIntLink ();
   SPEC_SCLS (val->type) = S_LITERAL;	/* will remain literal */
   SPEC_USIGN (val->type) = (SPEC_USIGN (lval->etype) & SPEC_USIGN (rval->etype));
-  SPEC_LONG (val->type) = (SPEC_LONG (lval->etype) | SPEC_LONG (rval->etype));
+  SPEC_LONG (val->type) = 1;
 
   if (SPEC_LONG (val->type))
     {
@@ -1249,18 +1228,6 @@ valShift (value * lval, value * rval, int lr)
 	SPEC_CVAL (val->type).v_long = lr ?
 	  (long) floatFromVal (lval) << (long) floatFromVal (rval) : \
 	  (long) floatFromVal (lval) >> (long) floatFromVal (rval);
-    }
-  else
-    {
-      if (SPEC_USIGN (val->type)) {
-	SPEC_CVAL (val->type).v_uint = lr ? 
-	  (unsigned) floatFromVal (lval) << (unsigned) floatFromVal (rval) :\
-	  (unsigned) floatFromVal (lval) >> (unsigned) floatFromVal (rval);
-      } else {
-	SPEC_CVAL (val->type).v_int = lr ?
-	  (int) floatFromVal (lval) << (int) floatFromVal (rval) : \
-	  (int) floatFromVal (lval) >> (int) floatFromVal (rval);
-      }
     }
 
   return cheapestVal(val);

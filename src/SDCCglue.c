@@ -256,12 +256,14 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 
 	  // set ival's lineno to where the symbol was defined
 	  if (ival) ival->lineno=sym->lineDef;
-
 	  eBBlockFromiCode (iCodeFromAst (ival));
 	  allocInfo = 1;
 
-	  /* if the ival was a symbol, delete it from its segment */
-	  if (IS_AST_SYM_VALUE(sym->ival->init.node)) {
+	  /* if the ival is a symbol assigned to an aggregate,
+	     (bug #458099 -> #462479)
+	     we don't need it anymore, so delete it from its segment */
+	  if (IS_AST_SYM_VALUE(sym->ival->init.node) &&
+	      IS_AGGREGATE (sym->type) ) {
 	    symIval=AST_SYMBOL(sym->ival->init.node);
 	    segment = SPEC_OCLS (symIval->etype);
 	    deleteSetItem (&segment->syms, symIval);

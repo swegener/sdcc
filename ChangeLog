@@ -1,3 +1,13 @@
+2003-11-26 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCC.y (pointer): fixed bug #846006
+	* support/Util/SDCCerr.c: made W_PTR_TYPE_INVALID message clearer
+	* src/SDCCast.c (decorateType): fixed bug #846009
+	* src/ds390/peeph.def,        
+	* src/ds390/gen.c (genAnd, genOr),
+	* src/mcs51/peeph.def,        
+	* src/mcs51/gen.c (genAnd, genOr): fixed bug #846777
+
 2003-11-25 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	Fixed several common-sub-expression bugs (#772861, #768380, & #755323)

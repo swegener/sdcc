@@ -1042,10 +1042,14 @@ pointer
    : unqualified_pointer { $$ = $1 ;}
    | unqualified_pointer type_specifier_list   
          {
-	     $$ = $1  ;		
-	     DCL_TSPEC($1) = $2;
-             DCL_PTR_CONST($1) = SPEC_CONST($2);
-             DCL_PTR_VOLATILE($1) = SPEC_VOLATILE($2);
+	     $$ = $1  ;
+             if (IS_SPEC($2)) {
+	         DCL_TSPEC($1) = $2;
+                 DCL_PTR_CONST($1) = SPEC_CONST($2);
+                 DCL_PTR_VOLATILE($1) = SPEC_VOLATILE($2);
+             }
+             else
+                 werror (W_PTR_TYPE_INVALID);
 	 }
    | unqualified_pointer pointer         
          {

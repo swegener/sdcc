@@ -3055,3 +3055,16 @@ replace {
         movx    @dptr,a
 }
 
+replace {
+        jnz     %1
+%1:
+} by {
+        ;       Peephole 249a    jump optimization
+} if labelRefCount %1 1
+
+replace {
+        jz      %1
+%1:
+} by {
+        ;       Peephole 249b    jump optimization
+} if labelRefCount %1 1

@@ -4922,6 +4922,8 @@ genAnd (iCode * ic, iCode * ifx)
 	    {
 	      if (ifx)
 		jmpTrueOrFalse (ifx, tlbl);
+              else
+	        emitcode ("", "%05d$:", tlbl->key + 100);
 	      goto release;
 	    }
 	}
@@ -5012,6 +5014,8 @@ genAnd (iCode * ic, iCode * ifx)
 	    }
 	  else if (ifx)
 	    jmpTrueOrFalse (ifx, tlbl);
+          else
+	    emitcode ("", "%05d$:", tlbl->key + 100);
 	}
       else
 	{
@@ -5298,6 +5302,8 @@ genOr (iCode * ic, iCode * ifx)
 	    }
 	  else if (ifx)
 	    jmpTrueOrFalse (ifx, tlbl);
+	  else
+	    emitcode ("", "%05d$:", tlbl->key + 100);
 	}
       else
 	for (; (size--); offset++)

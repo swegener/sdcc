@@ -2693,3 +2693,17 @@ replace {
         jz      %4
 %1:
 } if labelRefCount %1 1
+
+replace {
+        jnz     %1
+%1:
+} by {
+        ;       Peephole 243a    jump optimization
+} if labelRefCount %1 1
+
+replace {
+        jz      %1
+%1:
+} by {
+        ;       Peephole 243b    jump optimization
+} if labelRefCount %1 1

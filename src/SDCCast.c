@@ -2383,7 +2383,7 @@ decorateType (ast * tree)
 	  goto errorTreeReturn;
 	}
 
-      if (SPEC_SCLS (tree->left->etype) == S_REGISTER)
+      if (LETYPE(tree) && SPEC_SCLS (tree->left->etype) == S_REGISTER)
 	{
 	  werror (E_ILLEGAL_ADDR, "address of register variable");
 	  goto errorTreeReturn;
@@ -2406,7 +2406,9 @@ decorateType (ast * tree)
 	  werror (E_LVALUE_REQUIRED, "address of");
 	  goto errorTreeReturn;
 	}
-      if (SPEC_SCLS (tree->left->etype) == S_CODE)
+      if (!LETYPE (tree))
+        DCL_TYPE (p) = POINTER;
+      else if (SPEC_SCLS (tree->left->etype) == S_CODE)
 	DCL_TYPE (p) = CPOINTER;
       else if (SPEC_SCLS (tree->left->etype) == S_XDATA)
 	DCL_TYPE (p) = FPOINTER;

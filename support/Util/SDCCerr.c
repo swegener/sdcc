@@ -276,7 +276,7 @@ struct
 { W_CONTROL_FLOW, ERROR_LEVEL_PEDANTIC,
    "conditional flow changed by optimizer '%s(%d)':so said EVELYN the modified DOG" },
 { W_PTR_TYPE_INVALID, ERROR_LEVEL_WARNING,
-   "invalid type specifier for pointer type specifier ignored" },
+   "invalid type specifier for pointer type; specifier ignored" },
 { W_IMPLICIT_FUNC, ERROR_LEVEL_WARNING,
    "function '%s' implicit declaration" },
 { W_CONTINUE, ERROR_LEVEL_WARNING,

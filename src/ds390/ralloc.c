@@ -1076,7 +1076,8 @@ static void serialRegAssign (eBBlock **ebbs, int count)
 		
 		/* if we need ptr regs for the right side
 		   then mark it */
-		if (POINTER_GET(ic) && getSize(OP_SYMBOL(IC_LEFT(ic))->type) 
+		if (POINTER_GET(ic) && IS_SYMOP(IC_LEFT(ic))
+		 && getSize(OP_SYMBOL(IC_LEFT(ic))->type) 
 		    <= PTRSIZE) 
 		{
 		    ds390_ptrRegReq++;

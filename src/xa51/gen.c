@@ -312,7 +312,7 @@ char *opRegName(operand *op, int offset, char *opName) {
 
   if (IS_SYMOP(op)) {
     if (OP_SYMBOL(op)->onStack) {
-      sprintf (aop->name[0], "[r7+%d+0+%d+%d]", sym->stack, 
+      sprintf (opName, "[r7+%d+0+%d+%d]", OP_SYMBOL(op)->stack, 
 	       FUNC_ISISR(currFunc->type) ? 6 : 4, _G.nRegsSaved);
       return opName;
     }

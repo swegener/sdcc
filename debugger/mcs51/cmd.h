@@ -32,6 +32,8 @@ extern int cmdJump      (char *, context *);
 extern int cmdListSrc   (char *, context *);
 extern int cmdListAsm   (char *, context *);
 extern int cmdSetOption (char *, context *);
+extern int cmdCondition (char *, context *);
+extern int cmdIgnore    (char *, context *);
 extern int cmdContinue  (char *, context *);
 extern int cmdDelUserBp (char *, context *);
 extern int cmdStep      (char *, context *);
@@ -65,5 +67,6 @@ extern int cmdListFunctions (char *s, context *cctxt);
 extern int cmdListSymbols (char *s, context *cctxt);
 
 extern void setMainContext( void);
+int conditionIsTrue( char *s, context *cctxt);
 
 #endif

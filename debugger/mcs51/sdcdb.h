@@ -263,6 +263,7 @@ void **resize (void **, int );
 char  *alloccpy(char *,int );
 char *gc_strdup(const char *s);
 srcLine **loadFile (char *name, int *nlines);
+
 extern short fullname;
 extern int srcMode;
 extern char contsim;

@@ -1,3 +1,7 @@
+2003-05-28  Karl Bongers(patches from Martin Helmling)
+	* debugger/mcs51/sdcdb.c,cmd.c,break.c and .h files. Martin adds
+	  condition and ignore commands.
+
 2003-05-28  Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
 	* doc/sdccman.lyx: Changes all over, index improved, smaller margins. The manual

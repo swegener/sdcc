@@ -330,8 +330,9 @@ static char *warranty=
 
 static void printTypeInfo(link *);
 static void printValAggregates (symbol *,link *,char,unsigned int,int);
-static void printOrSetSymValue (symbol *sym, context *cctxt, 
-                                int flg, int dnum, int fmt, char *rs, char *val);
+static  int printOrSetSymValue (symbol *sym, context *cctxt, 
+                                int flg, int dnum, int fmt, 
+                                char *rs, char *val, char cmp);
 
 int srcMode = SRC_CMODE ;
 static set  *dispsymbols = NULL   ; /* set of displayable symbols */
@@ -1272,7 +1273,7 @@ int cmdSetOption (char *s, context *cctxt)
         while (isspace(*s)) *s++ = '\0';
         if (*s)
         {
-                printOrSetSymValue(sym,cctxt,0,0,0,rs,s);
+                printOrSetSymValue(sym,cctxt,0,0,0,rs,s,'\0');
                 return 0;
         }
         else
@@ -1298,6 +1299,52 @@ int cmdContinue (char *s, context *cctxt)
     fprintf(stdout,"Continuing.\n");
     simGo(-1);
     showfull = 1;
+    return 0;
+}
+
+/*-----------------------------------------------------------------*/
+/* cmdIgnore - set ignorecount for breakpoint                      */
+/*-----------------------------------------------------------------*/
+int cmdIgnore (char *s, context *cctxt)
+{   
+    int bpnum, cnt ;
+    while (isspace(*s)) s++;
+    if (!*s ) 
+    {
+        fprintf(stdout,"Argument required (breakpoint number).\n");
+        return 0;
+    }
+    bpnum = strtol(s,&s,10);
+    while (isspace(*s)) s++;
+    if (!*s ) 
+    {
+        fprintf(stdout,"Second argument (specified ignore-count) is missing.");
+        return 0;
+    }
+    cnt = strtol(s,0,10);
+    setUserbpIgnCount(bpnum,cnt);
+    return 0;
+}
+
+/*-----------------------------------------------------------------*/
+/* cmdCondition - set condition for breakpoint                     */
+/*-----------------------------------------------------------------*/
+int cmdCondition (char *s, context *cctxt)
+{   
+    int bpnum ;
+    while (isspace(*s)) s++;
+    if (!*s ) 
+    {
+        fprintf(stdout,"Argument required (breakpoint number).\n");
+        return 0;
+    }
+    bpnum = strtol(s,&s,10);
+    while (isspace(*s)) s++;
+    if (*s)
+        s = Safe_strdup(s);
+    else
+        s = NULL;
+    setUserbpCondition(bpnum,s);
     return 0;
 }
 
@@ -1566,6 +1613,7 @@ int cmdRun (char *s, context *cctxt)
         fprintf(stdout,"No executable file specified.\nUse the \"file\" command.\n");
         return 0;
     }
+    resetHitCount();
 	simGo(0);
     } else {
 	
@@ -1577,6 +1625,7 @@ int cmdRun (char *s, context *cctxt)
 	fgets(buff,sizeof(buff),stdin);
 	if (toupper(buff[0]) == 'Y') {
 	    simReset();
+        resetHitCount();
 	    simGo(0);
 	}
     }
@@ -2260,8 +2309,7 @@ int cmdListSrc (char *s, context *cctxt)
     return 0;
 }
 
-static void setValBasic(symbol *sym, link *type,
-                        char mem, unsigned addr,int size, char *val)
+static unsigned long getValBasic(symbol *sym, link *type, char *val)
 {
     char *s;
     union 
@@ -2316,7 +2364,7 @@ static void setValBasic(symbol *sym, link *type,
         else
             v.val = strtol(val,NULL,0);
     }
-    simSetValue(addr,mem,size,v.val);	
+    return v.val;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2540,8 +2588,9 @@ static void printValAggregates (symbol *sym, link *type,
 /*-----------------------------------------------------------------*/
 /* printOrSetSymValue - print or set value of a symbol             */
 /*-----------------------------------------------------------------*/
-static void printOrSetSymValue (symbol *sym, context *cctxt, 
-                           int flg, int dnum, int fmt, char *rs, char *val)
+static int printOrSetSymValue (symbol *sym, context *cctxt, 
+                                int flg, int dnum, int fmt, char *rs, 
+                                char *val, char cmp )
 {
     static char fmtChar[] = " todx ";
     static int stack = 1;
@@ -2559,7 +2608,7 @@ static void printOrSetSymValue (symbol *sym, context *cctxt,
         if (!bp) 
         {
             fprintf(stdout,"cannot determine stack frame\n");
-            return ;
+            return 1;
         }
 
         sym->addr = simGetValue(bp->addr,bp->addrspace,bp->size)
@@ -2607,14 +2656,14 @@ static void printOrSetSymValue (symbol *sym, context *cctxt,
                 *s2 = save_ch2;
                 if ( ! fields )
                 {
-                    fprintf(stdout,"Unkown variable \"%s\" for index.\n", s);
-                    return;                    
+                    fprintf(stdout,"Unknown variable \"%s\" for index.\n", s);
+                    return 1;                    
                 }
                 /* arrays & structures first */
                 if (! IS_INTEGRAL(fields->type))
                 {
                     fprintf(stdout,"Wrong type of variable \"%s\" for index \n", s);
-                    return;                    
+                    return 1;                    
                 }
                 n = simGetValue(fields->addr,fields->addrspace,getSize(fields->type));
             }
@@ -2625,7 +2674,7 @@ static void printOrSetSymValue (symbol *sym, context *cctxt,
             if ( n < 0 || n >= DCL_ELEM(type))
             {
                 fprintf(stdout,"Wrong index %d.\n", n);
-                return;                    
+                return 1;                    
             }
             type = type->next;
             size = getSize(type);
@@ -2649,7 +2698,7 @@ static void printOrSetSymValue (symbol *sym, context *cctxt,
             if ( ! fields )
             {
                 fprintf(stdout,"Unknown field \"%s\" of structure\n", s);
-                return;                    
+                return 1;                    
             }
             type = fields->type;
             size = getSize(type);
@@ -2663,7 +2712,10 @@ static void printOrSetSymValue (symbol *sym, context *cctxt,
     if (IS_AGGREGATE(type))
     {
 	    if ( val )
-            fprintf(stdout,"Cannot set aggregate variable\n");
+        {
+            fprintf(stdout,"Cannot set/compare aggregate variable\n");
+            return 1;
+        }
         else
             printValAggregates(sym,type,sym->addrspace,addr,fmt);
     }
@@ -2673,16 +2725,41 @@ static void printOrSetSymValue (symbol *sym, context *cctxt,
     {
 	    if ( !val )
             printValFunc(sym,fmt);
+        else
+            return 1;
     }
 	else
     { 
 	    if ( val )
-            setValBasic  (sym,type,sym->addrspace,addr,size,val);
+        {
+            unsigned long newval;
+            newval = getValBasic(sym,type,val);
+
+            if ( cmp )
+            {
+                unsigned long lval;
+                lval = simGetValue(addr,sym->addrspace,size);
+                switch ( cmp )
+                {
+                    case '<' : return ( lval <  newval ? 1:0 ); break;
+                    case '>' : return ( lval >  newval ? 1:0 ); break;
+                    case 'l' : return ( lval <= newval ? 1:0 ); break;
+                    case 'g' : return ( lval >= newval ? 1:0 ); break;
+                    case '=' : return ( lval == newval ? 1:0 ); break;
+                    case '!' : return ( lval != newval ? 1:0 ); break;
+                }
+            }
+            else
+            {
+                simSetValue(addr,sym->addrspace,size,newval);	
+                return 1;
+            }
+        }
         else
             printValBasic(sym,type,sym->addrspace,addr,size,fmt);
     }
     if ( flg > 0 ) fprintf(stdout,"\n");
-	
+	return 0;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2786,6 +2863,42 @@ static void printTypeInfo(link *p)
 }
 
 /*-----------------------------------------------------------------*/
+/* conditionIsTrue - compare variable with constant value        */
+/*-----------------------------------------------------------------*/
+int conditionIsTrue( char *s, context *cctxt)
+{   
+    symbol *sym = NULL;
+    int fmt;
+    char *rs, *dup, cmp_char;
+    dup = s = Safe_strdup(s);
+    if ( !( rs = preparePrint(s, cctxt, &fmt, &sym )) || !sym)
+        fmt = 1;
+    else if (!( s =  strpbrk(rs,"<>=!")))
+        fmt = 1;
+    else
+    {
+        cmp_char = *s;    
+        *s++ = '\0';
+        if ( *s == '=' )
+        {
+            /* if <= or >= an other char is used 
+             * == or !=  not checked in switch 
+             */
+            switch( cmp_char )
+            {
+                case '>': cmp_char = 'g' ; break;
+                case '<': cmp_char = 'l' ; break;
+            }
+            s++ ;
+        }
+        while (isspace(*s)) *s++ = '\0';
+        fmt = printOrSetSymValue(sym,cctxt,0,0,0,rs,s,cmp_char);
+    }
+    Safe_free(dup);
+    return fmt;
+}
+
+/*-----------------------------------------------------------------*/
 /* cmdPrint - print value of variable                              */
 /*-----------------------------------------------------------------*/
 int cmdPrint (char *s, context *cctxt)
@@ -2798,7 +2911,7 @@ int cmdPrint (char *s, context *cctxt)
 
     if ( sym ) 
     {
-        printOrSetSymValue(sym,cctxt,1,0,fmt,rs,NULL);
+        printOrSetSymValue(sym,cctxt,1,0,fmt,rs,NULL,'\0');
     } 
     return 0;
 }
@@ -2816,7 +2929,7 @@ int cmdOutput (char *s, context *cctxt)
 
     if ( sym ) 
     {
-        printOrSetSymValue(sym,cctxt,0,0,fmt,rs,NULL);
+        printOrSetSymValue(sym,cctxt,0,0,fmt,rs,NULL,'\0');
     } 
     return 0;
 }
@@ -2851,7 +2964,8 @@ void displayAll(context *cctxt)
          dsym = setNextItem(dispsymbols)) 
     {
         if ( (sym = symLookup(dsym->name,cctxt)))
-            printOrSetSymValue(sym,cctxt,2,dsym->dnum,dsym->fmt,dsym->rs,NULL);
+            printOrSetSymValue(sym,cctxt,2,dsym->dnum,dsym->fmt,
+                               dsym->rs,NULL,'\0');
     }
 }
 

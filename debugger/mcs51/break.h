@@ -47,24 +47,23 @@ typedef struct breakp
     char     *filename;      /* file name */
     int      lineno  ;       /* lineno */
     int (*callBack)
-          (unsigned,char,char,int,context *);/* address of call back
+          (unsigned,struct breakp *,context *);/* address of call back
                                          * function */
     char *commands;
+    int  ignoreCnt;
+    int  hitCnt;
+    char *condition;
 } breakp;
 
 
 #define BP_CALLBACK(func) \
     int func (unsigned addr, \
-	     char addrType, \
-	     char bpType  , \
-	     int bpnum    ,\
+	     breakp *bp, \
 	     context *ctxt)
 
 #define EXTERN_BP_CALLBACK(func) \
     extern int func (unsigned addr, \
-	     char addrType, \
-	     char bpType  , \
-	     int bpnum    ,\
+	     breakp *bp, \
 	     context *ctxt)
 
 extern char userBpPresent;
@@ -72,9 +71,13 @@ extern char doingSteps;
 
 
 int setBreakPoint (unsigned , char , char, 
-		    int (*callBack)(unsigned,char,char,int,context *),char *, int);
+		    int (*callBack)(unsigned,breakp *bp,context *),char *, int);
 
-extern long getLastBreakptNumber(void);
+long getLastBreakptNumber(void);
+void resetHitCount(void);
+void setUserbpCommand   (int , char *);
+void setUserbpCondition (int , char *);
+void setUserbpIgnCount  (int , int   );
 
 void  clearUSERbp ( unsigned int  );
 void  deleteSTEPbp();

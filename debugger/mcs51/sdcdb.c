@@ -89,8 +89,14 @@ struct cmdtab
     { "continue" ,  cmdContinue   ,
       "{c}ontinue\t\t Continue program being debugged, after breakpoint.\n"
     },
+    { "condition" ,  cmdCondition   ,
+      "condition brkpoint_number expr\t\tSet condition for breakpoint.\n"
+    },
+    { "ignore" ,  cmdIgnore  ,
+      "brkpoint_number count\t\tSet ignore count for breakpoint.\n"
+    },
     { "commands" ,  cmdCommands  ,
-      "commands [brkpoint number]\t\tSetting commands for breakpoint.\n"
+      "commands [brkpoint_number]\t\tSetting commands for breakpoint.\n"
     },
     { "c"        ,  cmdContinue   , NULL },
 
@@ -842,10 +848,17 @@ static int   stopcmdlist;
 /*-----------------------------------------------------------------*/
 char *getNextCmdLine()
 {
+    //fprintf(stderr,"getNextCmdLine() actualcmdfile=%p\n",actualcmdfile);
     if (!actualcmdfile)
         return NULL;
+    fprintf(stdout,">");
+    fflush(stdout);
     if (fgets(cmdbuff,sizeof(cmdbuff),actualcmdfile) == NULL)
+    {
+        // fprintf(stderr,"getNextCmdLine() returns null\n");
         return NULL;
+    }
+    //fprintf(stderr,"getNextCmdLine() returns: %s",cmdbuff);
     return cmdbuff;
 }
 
@@ -877,6 +890,8 @@ static void commandLoop(FILE *cmdfile)
             fflush(stdout);
         }
 
+        //fprintf(stderr,"commandLoop actualcmdfile=%p cmdfile=%p\n",
+        //        actualcmdfile,cmdfile);
         if (fgets(cmdbuff,sizeof(cmdbuff),cmdfile) == NULL)
             break;
 
@@ -1091,7 +1106,8 @@ static void sigchld(int sig)
 static void
 setsignals()
 {
-    signal(SIGHUP , bad_signal);		
+    signal(SIGHUP , SIG_IGN);		
+    signal(SIGCONT, SIG_IGN);		
     signal(SIGINT , sigintr );	
     signal(SIGTERM, bad_signal);	
     signal(SIGCHLD, sigchld );

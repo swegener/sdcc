@@ -4,6 +4,15 @@ SDCDB debugger - Development notes.
 ======================
 
 
+ddd - Notes from Martin Helmling, May   23, 2003
+========================
+
+Additionally following new commands work:
+
+ignore <breakpointnumber> <ignorecount> - ignore the breakpoint n times
+condition <breakpointnumber> <variable> <|>|<=|>=|==|!= <constant> - break condition
+commands - see gdb description -
+
 ddd - Notes from Martin Helmling, April 28, 2003
 ========================
 

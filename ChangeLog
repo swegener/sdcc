@@ -1,3 +1,10 @@
+2003-04-28  Karl Bongers(apply patches for Martin Helmling)
+
+	 * debugger/mcs51/sdcdb.c,simi.c,cmd.c,symtab.c and .h files.
+	 * Some notes on ddd usage added in debugger/README
+	 Martin Helmling adding more features and fixes for ddd GUI debugger.
+	 Code added for nexti, stepi, up, down, and other adjustments.
+
 2003-04-28  Scott Dattalo  <scott@DATTALO.COM>
 
 	* src/pic/pCodepeep.c non-wildcard asmops are now handled

@@ -712,6 +712,15 @@ static void aopOp (operand *op, iCode *ic, bool result, bool useDP2)
 
         if (sym->ruonly ) {
             int i;
+            
+            if (useDP2)
+            {
+                /* a AOP_STR uses DPTR, but DPTR is already in use; 
+                 * we're just hosed.
+                 */
+                fprintf(stderr, "*** Internal error: AOP_STR with DPTR in use!\n");
+            }
+            
             aop = op->aop = sym->aop = newAsmop(AOP_STR);
             aop->size = getSize(sym->type);
             for ( i = 0 ; i < fReturnSize_390 ; i++ )

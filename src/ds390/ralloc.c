@@ -1720,6 +1720,14 @@ static int packRegsForSupport (iCode *ic, eBBlock *ebp)
 /*-----------------------------------------------------------------*/
 static iCode *packRegsForOneuse (iCode *ic, operand *op , eBBlock *ebp)
 {
+#if 1
+    
+    /* I can't figure out how to make this safe yet. */
+    ic; op; ebp;
+    return NULL;
+    
+    
+#else
     bitVect *uses ;
     iCode *dic, *sic;
 
@@ -1836,7 +1844,7 @@ static iCode *packRegsForOneuse (iCode *ic, operand *op , eBBlock *ebp)
 	        
     OP_SYMBOL(op)->ruonly = 1;
     return sic;
-	
+#endif	
 }
 
 /*-----------------------------------------------------------------*/

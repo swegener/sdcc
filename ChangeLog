@@ -1,3 +1,7 @@
+2003-06-02  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCglue.c (tempfileandname): added check for missing TMP/TEMP/TMPDIR variable
+
 2003-05-29  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/pic/device.c: added 16F819, patch by "David I. Lehn" <dlehn@vt.edu>

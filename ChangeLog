@@ -1,3 +1,11 @@
+2003-09-10  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+	When checking for duplicated modules, use absolute paths
+	instead of relative paths.  Files changed:
+
+	* as/mcs51/lklib.c
+	* link/z80/lklib.c
+
 2003-09-09  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCCicode.c (geniCodeLogic): fixed bug #797572

@@ -2150,8 +2150,6 @@ decorateType (ast * tree)
 	{
 	  // this ought to be ignored
 	  return (tree->left);
-	  //werror (E_ILLEGAL_ADDR, "address of function");
-	  //goto errorTreeReturn;
 	}
 
       if (IS_LITERAL(LTYPE(tree)))
@@ -2736,12 +2734,16 @@ decorateType (ast * tree)
 	      LRVAL (tree) = 1;
       }
 #else
+#if 0 // this is already checked, now this could be explicit
       /* if pointer to struct then check names */
       if (IS_PTR(LTYPE(tree)) && IS_STRUCT(LTYPE(tree)->next) &&
 	  IS_PTR(RTYPE(tree)) && IS_STRUCT(RTYPE(tree)->next) &&
-	  strcmp(SPEC_STRUCT(LETYPE(tree))->tag,SPEC_STRUCT(RETYPE(tree))->tag)) {
-	      werror(W_CAST_STRUCT_PTR,SPEC_STRUCT(RETYPE(tree))->tag,SPEC_STRUCT(LETYPE(tree))->tag);
-      }
+	  strcmp(SPEC_STRUCT(LETYPE(tree))->tag,SPEC_STRUCT(RETYPE(tree))->tag)) 
+	{
+	  werror(W_CAST_STRUCT_PTR,SPEC_STRUCT(RETYPE(tree))->tag,
+		 SPEC_STRUCT(LETYPE(tree))->tag);
+	}
+#endif
       /* if the right is a literal replace the tree */
       if (IS_LITERAL (RETYPE (tree)) && !IS_PTR (LTYPE (tree))) {
 	tree->type = EX_VALUE;

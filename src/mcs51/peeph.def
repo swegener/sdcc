@@ -70,12 +70,6 @@ replace {
 } if notVolatile %1
 
 replace {
-        mov     a,acc
-} by {
-        ;       Peephole 100.a  removed redundant mov
-}
-
-replace {
         mov     a,%1
         movx    @dptr,a
         inc     dptr
@@ -3208,4 +3202,39 @@ replace {
         ljmp    %1
 %2:
         ret
+}
+
+// applies to f.e. funptrs.c
+// saves one byte if %1 is a register or @register
+replace {
+        mov     a,%1
+        add     a,acc
+} by {
+        ;       Peephole 254    optimized left shift
+        mov     a,%1
+        add     a,%1
+} if notVolatile %1
+
+// applies to f.e. switch.c
+replace {
+        clr     c
+        mov     a,#%1
+        subb    a,%2
+        jc      %3
+%4:
+        mov     a,%2
+        add     a,acc
+        add     a,%2
+        mov     dptr,%5
+        jmp     @a+dptr
+} by {
+        ;       Peephole 255    optimized jump table index calculation
+        mov     a,%2
+        cjne    a,#(%1+0x01),.+1
+        jnc     %3
+%4:
+        add     a,%2
+        add     a,%2
+        mov     dptr,%5
+        jmp     @a+dptr
 }

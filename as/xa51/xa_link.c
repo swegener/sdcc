@@ -45,10 +45,15 @@
 #include "xa_version.h"
 
 enum {
-  CSEG=0,
+  CSEG=1,
   DSEG,
   XSEG,
   BSEG,
+  XINIT,
+  XISEG,
+  GSINIT,
+  GSFINAL,
+  HOME,
   MAX_SEGMENTS
 };
 
@@ -58,10 +63,16 @@ struct SEGMENT {
   int start;
   int current;
 } segments[MAX_SEGMENTS]={
-  {CSEG, "CSEG", 0, 0},
-  {DSEG, "DSEG", 0, 0},
-  {XSEG, "XSEG", 0, 0},
-  {BSEG, "BSEG", 0, 0}
+  {0,       "????",    0, 0},
+  {CSEG,    "CSEG",    0, 0},
+  {DSEG,    "DSEG",    0, 0},
+  {XSEG,    "XSEG",    0, 0},
+  {BSEG,    "BSEG",    0, 0},
+  {XINIT,   "XINIT",   0, 0},
+  {XISEG,   "XISEG",   0, 0},
+  {GSINIT,  "GSINIT",  0, 0},
+  {GSFINAL, "GSFINAL", 0, 0},
+  {HOME,    "HOME",    0, 0},
 };
 
 char *libPaths[128];
@@ -70,6 +81,26 @@ char *libFiles[128];
 int nlibFiles=0;
 
 static char outFileName[PATH_MAX];
+
+int currentArea=0;
+
+int getAreaID(char *area) {
+  int i;
+  for (i=1; i<MAX_SEGMENTS; i++) {
+    if (strcmp(segments[i].name, area)==0) {
+      return segments[i].id;
+    }
+  }
+  return 0;
+}
+
+void addToRefs(char *ref) {
+  fprintf (stderr, "Ref: %s\n", ref);
+}
+
+void addToDefs(char *def, int address) {
+  fprintf (stderr, "Def: %s 0x%04x\n", def, address);
+}
 
 void syntaxError (char *err) {
   fprintf (stderr, "error while parsing '%s'\n", err);
@@ -107,6 +138,9 @@ void readModule(char *module) {
   double hisVersion;
   char line[132];
   FILE *relModule;
+  char moduleName[PATH_MAX];
+  int areas, globals;
+  int currentLine=1;
 
   if ((relModule=fopen(module, "r"))==NULL) {
     perror (module);
@@ -116,7 +150,7 @@ void readModule(char *module) {
 
   // first we need to check if this is a valid file
   if (sscanf(fgets(line, 132, relModule), 
-      "SDCCXA rel, version %lf", &hisVersion)!=1) {
+	     "SDCCXA rel, version %lf", &hisVersion)!=1) {
     fprintf (stderr, "%s is not a valid input file\n", module);
     exit (1);
   }
@@ -125,9 +159,96 @@ void readModule(char *module) {
 	     "we(%1.1f) != %s(%1.1f)\n", 
 	     version, module, hisVersion);
   }
+  currentLine++;
+  
+  // H 7 areas 168 global symbols
+  if (sscanf(fgets(line, 132, relModule),
+	     "H %d areas %d global symbols",
+	     &areas, &globals)!=2) {
+    syntaxError(line);
+  }
+  currentLine++;
 
-  // 
-  fprintf (stderr, "Wow! This seems a nice module: v %1.1f.\n", hisVersion);
+  // M module
+  if (sscanf(fgets(line, 132, relModule),
+	     "M %s", moduleName)!=1) {
+    syntaxError(line);
+  }
+  fprintf (stderr, "module %s has %d area%s and %d globals\n",
+	   moduleName, areas, areas==1?"":"s", globals);
+  currentLine++;
+
+  // now for the ASTR tags
+  while (fgets(line, 132, relModule)) {
+    switch (line[0]) 
+      {
+      case 'A': {
+	char area[32];
+	int size, flags;
+	if (sscanf(line, "A %[^ ] size %d flags %d",
+		   area, &size, &flags)!=3) {
+	  fprintf (stderr, "%s:%d error in A record line\n", module, 
+		   currentLine);
+	  exit (1);
+	}
+	// do we know this area?
+	if (!(currentArea=getAreaID(area))) {
+	  fprintf (stderr, "%s:%d unknown area: %s\n", module,
+		   currentLine, area);
+	  exit (1);
+	}
+	fprintf (stderr, "Area: %s size: %d\n", area, size);
+	// never mind about the size and flags for now
+	break;
+      }
+      case 'S': {
+	char symbol[132];
+	char refdef[132];
+	unsigned int address;
+	if (sscanf(line, "S %[^ ] %s", symbol, refdef)!=2) {
+	  fprintf (stderr, "%s:%d syntax error near \"%s\"\n",
+		   module, currentLine, line);
+	  exit (1);
+	}
+	if (strncmp(refdef, "Ref", 3)==0) {
+	  addToRefs(symbol);
+	} else if (strncmp(refdef, "Def", 3)==0) {
+	  sscanf (refdef, "Def%04x", &address);
+	  addToDefs(symbol, address);
+	} else {
+	  fprintf (stderr, "%s:%d found invalid symbol definition \"%s\"\n", 
+		   module, currentLine, line);
+	  exit (1);
+	}
+	break;
+      }
+      case 'T': {
+	unsigned int address;
+	unsigned int byte;
+	char *tline=NULL;
+	if (sscanf(strtok(&line[2], " "), "%04x", &address)!=1) {
+	  fprintf (stderr, "%s:%d error in T record\n", module, currentLine);
+	  exit (1);
+	}
+	fprintf (stderr, "%04x:", address);
+	for ( ;
+	      (tline=strtok(NULL, " \t\n")) && 
+		(sscanf(tline, "%02x", &byte)==1);
+	      fprintf (stderr, " %02x", byte))
+	  ; // how about that one, hey?
+	fprintf (stderr, "\n");
+	break;
+      }
+      case 'R':
+	fprintf (stderr, "%s", line);
+	break;
+      default:
+	fprintf (stderr, "%s:%d unknown record \"%s\"\n",
+		 module, currentLine, line);
+	break;
+      }
+    currentLine++;
+  }
   // that's all for now, thanks for watching */
   fclose (relModule);
 }
@@ -192,6 +313,8 @@ int main(int argc, char **argv) {
 			   &segments[s].start)!=1) {
 		  syntaxError(linkCommand);
 		}
+		fprintf (stderr, "%s starts at 0x%04x\n", segments[s].name,
+			 segments[s].start);
 		break;
 	      }
 	    }

@@ -382,17 +382,20 @@ void out(int *byte_list, int num) {
   
   if (last_area!=current_area) {
     // emit area information
-    fprintf (frel, "A %s size %d flags 0\n", 
-	     areaToString(current_area),
-	     area[current_area].size);
-    area[current_area].defsEmitted=1;
-    if  (!area[current_area].defsEmitted) {
-      for (p=sym_list; p; p=p->next) {
-	if (p->isdef && p->area==current_area) {
-	  if (debug || p->name[strlen(p->name)-1]!='$') {
-	    fprintf (frel, "S %s Def%04x\n", p->name, p->value);
+    if (area[current_area].size) {
+      fprintf (frel, "A %s size %d flags 0\n", 
+	       areaToString(current_area),
+	       area[current_area].size);
+      if  (!area[current_area].defsEmitted) {
+	for (p=sym_list; p; p=p->next) {
+	  if (p->isdef && p->area==current_area) {
+	    // skip temp labels
+	    if (p->name[strlen(p->name)-1]!='$') {
+	      fprintf (frel, "S %s Def%04x\n", p->name, p->value);
+	    }
 	  }
 	}
+	area[current_area].defsEmitted=1;
       }
     }
     last_area=current_area;
@@ -401,7 +404,7 @@ void out(int *byte_list, int num) {
       current_area==AREA_GSFINAL ||
       current_area==AREA_XINIT) {
     if (num) {
-      fprintf (frel, "T %02x %02x", (MEM_POS>>16)&0xff, MEM_POS&0xff);
+      fprintf (frel, "T %04x", MEM_POS);
       for (i=0; i<num; i++) {
 	fprintf (frel, " %02x", byte_list[i]);
       }
@@ -497,13 +500,6 @@ int binary2int(char *str)
 
 void print_usage(int);
 
-
-/* todo: someday this will allow the user to control where the */
-/* various memory areas go, and it will take care of assigning */
-/* positions to area which follow others (such as OSEG getting */
-/* set just after DSEG on the 2nd and 3rd passes when we have */
-/* leared the size needed for each segment */
-
 void init_areas(void)
 {
   area[AREA_CSEG].start=area[AREA_CSEG].alloc_position = 0;
@@ -527,17 +523,12 @@ void relPrelude() {
     if ((area[i].size=area[i].alloc_position-area[i].start)) {
       areas++;
     }
-#if 0
-    current_area=i;
-    sprintf (buffer, "s_%s", areaToString(i));
-    build_sym_list (buffer);
-    buffer[0]='l';
-    build_sym_list (buffer);
-#endif
   }
   for (p=sym_list; p; p=p->next) {
     if (p->isdef) {
-      if (debug || p->name[strlen(p->name)-1]!='$') {
+      // skip temp labels, sfr and sbit
+      if (p->name[strlen(p->name)-1]!='$' &&
+	  p->area) {
 	globals++;
       }
     }

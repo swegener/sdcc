@@ -180,7 +180,6 @@ newIfxNode (ast * condAst, symbol * trueLabel, symbol * falseLabel)
   /* if this is a literal then we already know the result */
   if (condAst->etype && IS_LITERAL (condAst->etype))
     {
-
       /* then depending on the expression value */
       if (floatFromVal (condAst->opval.val))
 	ifxNode = newNode (GOTO,
@@ -2791,8 +2790,9 @@ decorateType (ast * tree)
       /* conditional operator  '?'  */
 /*----------------------------*/
     case '?':
-      /* the type is one on the left */
-      TTYPE (tree) = LTYPE (tree);
+      /* the type is value of the colon operator (on the right) */
+      assert(IS_COLON_OP(tree->right));
+      TTYPE (tree) = RTYPE(tree); // #HACK LTYPE(tree).
       TETYPE (tree) = getSpec (TTYPE (tree));
       return tree;
 

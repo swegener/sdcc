@@ -1699,12 +1699,22 @@ geniCodeMultiply (operand * left, operand * right,int resultIsInt)
     return operandFromValue (valMult (left->operand.valOperand,
 				      right->operand.valOperand));
 
+  if (IS_LITERAL(retype)) {
+    p2 = powof2 ((unsigned long) floatFromVal (right->operand.valOperand));
+  }
+
   if (resultIsInt)
     {
       saveOption = options.ANSIint;
       options.ANSIint = 0;
     }
   resType = usualBinaryConversions (&left, &right);
+#if 1
+  rtype = operandType (right);
+  retype = getSpec (rtype);
+  ltype = operandType (left);
+  letype = getSpec (ltype);
+#endif
   if (resultIsInt)
     {
       options.ANSIint = saveOption;
@@ -1714,11 +1724,12 @@ geniCodeMultiply (operand * left, operand * right,int resultIsInt)
 
   /* if the right is a literal & power of 2 */
   /* then make it a left shift              */
-  /*code generated for 1 byte * 1 byte literal = 2 bytes result is more efficient in most cases */
-  /*than 2 bytes result = 2 bytes << literal if port as 1 byte muldiv */
-  if (IS_LITERAL (retype) && !IS_FLOAT (letype) &&
-      !((resultIsInt) && (getSize (resType) != getSize (ltype)) && (1 == port->muldiv.native_below)) &&
-   (p2 = powof2 ((unsigned long) floatFromVal (right->operand.valOperand))))
+  /* code generated for 1 byte * 1 byte literal = 2 bytes result is more 
+     efficient in most cases than 2 bytes result = 2 bytes << literal 
+     if port has 1 byte muldiv */
+  if (p2 && !IS_FLOAT (letype) &&
+      !((resultIsInt) && (getSize (resType) != getSize (ltype)) && 
+	(port->muldiv.native_below == 1)))
     {
       if ((resultIsInt) && (getSize (resType) != getSize (ltype)))
 	{
@@ -1726,7 +1737,7 @@ geniCodeMultiply (operand * left, operand * right,int resultIsInt)
 	  left = geniCodeCast (resType, left, TRUE);
 	  ltype = operandType (left);
 	}
-      ic = newiCode (LEFT_OP, left, operandFromLit (p2));	/* left shift */
+      ic = newiCode (LEFT_OP, left, operandFromLit (p2)); /* left shift */
     }
   else
     {

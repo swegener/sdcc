@@ -224,7 +224,7 @@ union uu {
 unsigned int
 _muluint (unsigned int a, unsigned int b)	// in future: _mulint
 {
-#if defined(SDCC_MODEL_LARGE) || defined(SDCC_ds390)		// still needed for large + stack-auto
+#if !defined(SDCC_STACK_AUTO) && (defined(SDCC_MODEL_LARGE) || defined(SDCC_ds390))	// still needed for large
 	union uu xdata *x;
 	union uu xdata *y;
 	union uu t;

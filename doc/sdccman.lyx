@@ -330,156 +330,1215 @@ If you can think of some more, please send them to the list.
 Installation
 \layout Subsection
 
-Install and search paths
+Install paths
 \layout Standard
 
-Linux (and other gcc-builds like Solaris, Cygwin, Mingw32 and OSX) by default
- install in /usr/local.
- You can override this when configuring with ---prefix-path.
- Subdirs used will be bin, share/sdcc/include, share/sdcc/lib and share/sdcc/doc.
-\newline 
-Windows MSVC and Borland builds will install in one single tree (e.g.
- /sdcc) with subdirs bin, lib, include and doc.
+The install paths and default search paths are defined when running 'configure'.
+ The defaults can be overriden by
+\layout Standard
+
+...
+ TBA
 \newline 
 
 \newline 
-The paths searched when running the compiler are as follows (the first catch
- wins):
+These configure variables are compiled into the binaries, and can only be
+ changed by rerunning 'configure' and recompiling SDCC.
+ The configure variables are written in 
+\emph on 
+italics
+\emph default 
+ to distinguish them from run time variables (see next section).
+\newline 
+
+\newline 
+The defaults are:
+\newline 
+
+\newline 
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="7" columns="3">
+<features>
+<column alignment="left" valignment="top" leftline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Variable
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+*nix default
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Win32 default
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+PREFIX
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+/usr/local
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\backslash 
+sdcc
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+DATADIR
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+$PREFIX
+\emph default 
+/share/sdcc
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+$PREFIX
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+BIN_DIR_SUFFIX
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+bin
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+bin
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+SEARCH_SUFFIX
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+share/sdcc
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+INCLUDE_DIR_SUFFIX
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+include
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+include
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+LIB_DIR_SUFFIX
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+lib
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+lib
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\newline 
+
+\newline 
+Cygwin is handled like a *nix, Mingw32 however belongs to the Win32 builds.
+ The SDCC team uses Mingw32 to build the official Windows binaries, because
+ it's
 \layout Enumerate
 
-Binary files (preprocessor, assembler and linker):
-\newline 
-- the path of argv[0] (if available)
-\newline 
-- getenv(
-\begin_inset Quotes sld
-\end_inset 
-
-SDCC_BIN_PATH
-\begin_inset Quotes srd
-\end_inset 
-
-)
-\newline 
-- getenv(
-\begin_inset Quotes sld
-\end_inset 
-
-SDCCHOME
-\begin_inset Quotes srd
-\end_inset 
-
-)/bin
-\newline 
-- $PATH
+open source, 
 \layout Enumerate
 
-Include files:
-\newline 
-- -I dir
-\newline 
-- getenv(
-\begin_inset Quotes sld
-\end_inset 
-
-SDCC_INCLUDE_PATH
-\begin_inset Quotes srd
-\end_inset 
-
-)
-\newline 
-- getenv(
-\begin_inset Quotes sld
-\end_inset 
-
-SDCCHOME
-\begin_inset Quotes srd
-\end_inset 
-
-)/include
-\newline 
-- /usr/local/share/sdcc/include (gcc builds)
-\newline 
-- path(arv[0])/../include and then /sdcc/include (as a last resort for windoze
- msvc and borland builds)
+a gcc compiler and last but not least
 \layout Enumerate
 
-Library files (the 
+the binaries can be built by cross compiling on Sourceforge's compile farm.
+\layout Standard
+
+The other Win32 builds using Borland, VC or whatever don't use 'configure',
+ but they (hopefully) use the default Win32 paths.
+\newline 
+
+\newline 
+1.
+ Binary files (preprocessor, assembler and linker)
+\layout Standard
+
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features>
+<column alignment="left" valignment="top" leftline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Path
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+*nix default
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Win32 default
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+$PREFIX/$BIN_DIR_SUFFIX
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+/usr/local/bin
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\backslash 
+sdcc
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+ 
+\newline 
+
+\newline 
+2.
+ Include files
+\layout Standard
+
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features>
+<column alignment="left" valignment="top" leftline="true" width="1.6in">
+<column alignment="center" valignment="top" leftline="true" width="0pt">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0pt">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Path
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+*nix default
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Win32 default
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+$DATADIR/
+\newline 
+$INCLUDE_DIR_SUFFIX
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+/usr/local/share/sdcc/include
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\backslash 
+sdcc
+\backslash 
+include
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\newline 
+
+\newline 
+3.
+ Library files (the 
 \shape italic 
 model
 \shape default 
  is auto-appended by the compiler, e.g.
- small, large, z80, ds390 etc.):
-\newline 
-- -L dir
-\newline 
-- getenv(
-\begin_inset Quotes sld
-\end_inset 
-
-SDCC_LIB_PATH
-\begin_inset Quotes srd
-\end_inset 
-
-)/
-\shape italic 
-model
-\shape default 
-
-\newline 
-- getenv(
-\begin_inset Quotes sld
-\end_inset 
-
-SDCCHOME
-\begin_inset Quotes srd
-\end_inset 
-
-)/lib/
-\shape italic 
-model
-\shape default 
-
-\newline 
-- /usr/local/share/sdcc/lib/
-\shape italic 
-model
-\shape default 
- (gcc builds)
-\newline 
-- path(argv[0])/../lib/
-\shape italic 
-model
-\shape default 
- and then /sdcc/lib/
-\shape italic 
-model
-\shape default 
- (as a last resort for windoze msvc and borland builds)
-\layout Enumerate
-
-Documentation (although never really searched for, you have to do that yourself
- :):
-\newline 
-- getenv(
-\begin_inset Quotes sld
-\end_inset 
-
-SDCCHOME
-\begin_inset Quotes srd
-\end_inset 
-
-)/doc
-\newline 
-- /usr/local/share/sdcc/doc (gcc builds)
-\newline 
-- /sdcc/doc (windoze msvc and borland builds)
+ small, large, z80, ds390 etc.)
 \layout Standard
 
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features>
+<column alignment="left" valignment="top" leftline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Path
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+*nix default
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Win32 default
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+$DATADIR/$LIB_DIR_SUFFIX
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+/usr/local/share/sdcc/lib
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\backslash 
+sdcc
+\backslash 
+lib
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\newline 
+
+\newline 
+4.
+ Documentation
+\layout Standard
+
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features>
+<column alignment="left" valignment="top" leftline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Path
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+*nix default
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Win32 default
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+$DATADIR/
+\emph default 
+doc
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+/usr/local/share/sdcc/doc
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\backslash 
+sdcc
+\backslash 
+doc
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Subsection
+
+Search paths
+\layout Standard
+
+Some search paths or parts of them are determined by configure variables
+ (in 
+\emph on 
+italics
+\emph default 
+, see section above).
+ Other search paths are determined by environment variables during runtime.
+ 
+\newline 
+The paths searched when running the compiler are as follows (the first catch
+ wins):
+\newline 
+
+\newline 
+1.
+ Binary files (preprocessor, assembler and linker)
+\newline 
+ 
+\begin_inset  Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features>
+<column alignment="left" valignment="top" leftline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Search path
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+*nix default
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Win32 default
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+$SDCC_HOME/
+\emph on 
+$BIN_DIR_SUFFIX
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+$SDCC_HOME/bin
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+$SDCC_HOME
+\backslash 
+bin
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Path of argv[0] (if available)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Path of argv[0]
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Path of argv[0]
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+$PATH
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+$PATH
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+$PATH
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+ 
+\newline 
+
+\newline 
+2.
+ Include files
+\newline 
+ 
+\begin_inset  Tabular
+<lyxtabular version="3" rows="6" columns="3">
+<features>
+<column alignment="left" valignment="top" leftline="true" width="1.5in">
+<column alignment="left" valignment="top" leftline="true" width="1.5in">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Search path
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+*nix default
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Win32 default
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+---I dir
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+---I dir
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+---I dir
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+$SDCC_INCLUDE_PATH
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+$SDCC_INCLUDE_PATH
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+$SDCC_INCLUDE_PATH
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+$SDCC_HOME/
+\newline 
+
+\emph on 
+$SEARCH_SUFFIX/
+\newline 
+$INCLUDE_DIR_SUFFIX
+\end_inset 
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+$SDCC_HOME/
+\newline 
+share/sdcc/
+\newline 
+include
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+$SDCC_HOME
+\backslash 
+include
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+path(arv[0])/../
+\newline 
+
+\emph on 
+$SEARCH_SUFFIX/
+\emph default 
+
+\newline 
+
+\emph on 
+$INCLUDE_DIR_SUFFIX
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+(not on *nix)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+path(arv[0])
+\backslash 
+..
+\backslash 
+include
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+$DATADIR/
+\newline 
+
+\emph on 
+$INCLUDE_DIR_SUFFIX
+\end_inset 
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+/usr/local/share/
+\newline 
+sdcc/include
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+(not on Win32)
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+ 
+\newline 
+
+\newline 
+ The option ---nostdinc disables the last two search paths.
+\newline 
+
+\newline 
+3.
+ Library files (the 
+\shape italic 
+model
+\shape default 
+ is auto-appended by the compiler, e.g.
+ small, large, z80, ds390 etc.)
+\newline 
+ 
+\begin_inset  Tabular
+<lyxtabular version="3" rows="6" columns="3">
+<features>
+<column alignment="left" valignment="top" leftline="true" width="1.7in">
+<column alignment="left" valignment="top" leftline="true" width="1.6in">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Search path
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+*nix default
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Win32 default
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+---L dir
+\end_inset 
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+---L dir
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+---L dir
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+$SDCC_LIB_PATH/<
+\shape italic 
+model
+\shape default 
+>
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+$SDCC_LIB_PATH/<
+\shape italic 
+model
+\shape default 
+>
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+$SDCC_LIB_PATH
+\backslash 
+<
+\shape italic 
+model
+\shape default 
+>
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+$SDCC_HOME/
+\newline 
+
+\emph on 
+$SEARCH_SUFFIX/
+\newline 
+$LIB_DIR_SUFFIX
+\emph default 
+/<
+\shape italic 
+model
+\shape default 
+>
+\end_inset 
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+$SDCC_HOME/
+\newline 
+share/sdcc/
+\newline 
+lib/<
+\shape italic 
+model
+\shape default 
+>
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+$SDCC_HOME
+\backslash 
+lib
+\backslash 
+<
+\shape italic 
+model
+\shape default 
+>
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+path(arv[0])/../
+\emph on 
+
+\newline 
+$SEARCH_SUFFIX/
+\emph default 
+
+\newline 
+
+\emph on 
+$LIB_DIR_SUFFIX/
+\emph default 
+<
+\shape italic 
+model
+\shape default 
+>
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+(not on *nix)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+path(arv[0])
+\backslash 
+..
+\backslash 
+lib
+\backslash 
+<
+\shape italic 
+model
+\shape default 
+>
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+$DATADIR/
+\newline 
+$LIB_DIR_SUFFIX/
+\emph default 
+<
+\shape italic 
+model
+\shape default 
+>
+\end_inset 
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+/usr/local/share/sdcc/
+\newline 
+lib/<
+\shape italic 
+model
+\shape default 
+>
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\backslash 
+sdcc
+\backslash 
+lib
+\backslash 
+<
+\shape italic 
+model
+\shape default 
+>
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\newline 
+ 
+\newline 
+The option ---nostdlib disables the last two search paths.
+\newline 
+
+\newline 
 So, for windoze it is highly recommended to set the environment variable
- SDCCHOME to prevent needless usage of -I and -L options.
- For gcc-builds SDCCHOME should only be set when sdcc is installed in non-standa
-rd paths.
+ SDCC_HOME to prevent needless usage of -I and -L options.
+ For *nix-builds SDCC_HOME should only be set when sdcc is installed in
+ non-standard paths.
 \layout Subsection
 
 Linux and other gcc-based systems (cygwin, mingw32, osx)
@@ -500,7 +1559,11 @@ Download the source package
 \series default 
 .src
 \series medium 
-.tgz.
+.t
+\series default 
+ar.
+\series medium 
+gz.
 \layout Enumerate
 
 
@@ -513,7 +1576,7 @@ Bring up a command line terminal, such as xterm.
 Unpack the file using a command like: 
 \family sans 
 \series bold 
-"tar -xzf sdcc.src.tgz
+"tar -xzf sdcc.src.tar.gz
 \family default 
 \series default 
 "

@@ -235,7 +235,8 @@ typedef enum
   PC_FUNCTION,    /* Function start or end  */
   PC_WILD,        /* wildcard - an opcode place holder used 
 		   * in the pCode peep hole optimizer */
-  PC_CSOURCE      /* C-Source Line  */
+  PC_CSOURCE,     /* C-Source Line  */
+  PC_BAD          /* Mark the pCode object as being bad */
 } PC_TYPE;
 
 /************************************************/
@@ -605,6 +606,7 @@ typedef struct pBlock
   set *function_calls;
   set *tregisters;
 
+  set *FlowTree;
   unsigned visited:1;       /* set true if traversed in call tree */
 
   unsigned seq;             /* sequence number of this pBlock */

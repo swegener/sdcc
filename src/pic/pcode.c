@@ -70,15 +70,18 @@ static hTab *pic14pCodePeepCommandsHash = NULL;
 
 
 static pFile *the_pFile = NULL;
+static pBlock *pb_dead_pcodes = NULL;
 
 /* Hardcoded flags to change the behavior of the PIC port */
 static int peepOptimizing = 1;        /* run the peephole optimizer if nonzero */
 static int functionInlining = 1;      /* inline functions if nonzero */
 
 static int GpCodeSequenceNumber = 1;
-static int GpcFlowSeq = 1;
+int GpcFlowSeq = 1;
 
 extern void RemoveUnusedRegisters(void);
+extern void BuildFlowTree(pBlock *pb);
+extern void pCodeRegOptimizeRegUsage(void);
 
 /****************************************************************/
 /*                      Forward declarations                    */
@@ -103,6 +106,7 @@ char *get_op( pCodeOp *pcop,char *buff,int buf_size);
 int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd);
 int pCodePeepMatchRule(pCode *pc);
 void pBlockStats(FILE *of, pBlock *pb);
+pBlock *newpBlock(void);
 extern void pCodeInsertAfter(pCode *pc1, pCode *pc2);
 extern pCodeOp *popCopyReg(pCodeOpReg *pc);
 pCodeOp *popCopyGPR2Bit(pCodeOp *pc, int bitval);
@@ -1228,6 +1232,9 @@ void  pCodeInitRegisters(void)
   pc_wsave.rIdx = IDX_WSAVE;
   pc_ssave.rIdx = IDX_SSAVE;
 
+  /* probably should put this in a separate initialization routine */
+  pb_dead_pcodes = newpBlock();
+
 }
 
 /*-----------------------------------------------------------------*/
@@ -1915,6 +1922,7 @@ pBlock *newpBlock(void)
   PpB->function_entries = PpB->function_exits = PpB->function_calls = NULL;
   PpB->tregisters = NULL;
   PpB->visited = 0;
+  PpB->FlowTree = NULL;
 
   return PpB;
 
@@ -2335,13 +2343,34 @@ void unlinkpCode(pCode *pc)
     pc->prev = pc->next = NULL;
   }
 }
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+
 static void genericDestruct(pCode *pc)
 {
-  //fprintf(stderr,"warning, calling default pCode destructor\n");
 
   unlinkpCode(pc);
 
-  free(pc);
+  if(isPCI(pc)) {
+    /* For instructions, tell the register (if there's one used)
+     * that it's no longer needed */
+    regs *reg = getRegFromInstruction(pc);
+    if(reg)
+      deleteSetItem (&(reg->reglives.usedpCodes),pc);
+  }
+
+  /* Instead of deleting the memory used by this pCode, mark
+   * the object as bad so that if there's a pointer to this pCode
+   * dangling around somewhere then (hopefully) when the type is
+   * checked we'll catch it.
+   */
+
+  pc->type = PC_BAD;
+
+  addpCode2pBlock(pb_dead_pcodes, pc);
+
+  //free(pc);
 
 }
 
@@ -2538,9 +2567,11 @@ char *pCode2str(char *str, int size, pCode *pc)
     SAFE_snprintf(&s,&size,";\t--FLOW change\n");
     break;
   case PC_CSOURCE:
-  SAFE_snprintf(&s,&size,";#CSRC\t%s %d\n; %s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
+    SAFE_snprintf(&s,&size,";#CSRC\t%s %d\n; %s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
     break;
 
+  case PC_BAD:
+    SAFE_snprintf(&s,&size,";A bad pCode is being used\n");
   }
 
   return str;
@@ -2881,6 +2912,9 @@ static void genericAnalyze(pCode *pc)
     fprintf(stderr,"analyze PC_FLOW\n");
 
     return;
+  case PC_BAD:
+    fprintf(stderr,,";A bad pCode is being used\n");
+
   }
 }
 #endif
@@ -4548,6 +4582,15 @@ void AnalyzeBanking(void)
   for(pb = the_pFile->pbHead; pb; pb = pb->next)
     LinkFlow(pb);
 
+  /* Phase 3 - Flow Analysis - Flow Tree
+   *
+   * In this phase, the individual flow blocks are examined
+   * to determine their order of excution.
+   */
+  /*
+  for(pb = the_pFile->pbHead; pb; pb = pb->next)
+    BuildFlowTree(pb);
+  */
 
   /* Phase x - Flow Analysis - Used Banks
    *
@@ -4572,6 +4615,9 @@ void AnalyzeBanking(void)
     pCodeRegMapLiveRanges(pb);
 
   RemoveUnusedRegisters();
+
+  //  for(pb = the_pFile->pbHead; pb; pb = pb->next)
+  pCodeRegOptimizeRegUsage();
 
 /*
   for(pb = the_pFile->pbHead; pb; pb = pb->next)

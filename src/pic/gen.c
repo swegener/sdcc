@@ -36,10 +36,6 @@
 #include "SDCCglobl.h"
 #include "newalloc.h"
 
-#if defined(_MSC_VER)
-#define __FUNCTION__		__FILE__
-#endif
-
 #ifdef HAVE_SYS_ISA_DEFS_H
 #include <sys/isa_defs.h>
 #else
@@ -468,9 +464,9 @@ static asmop *aopForRemat (symbol *sym)
     DEBUGpic14_emitcode(";","%s %d",__FUNCTION__,__LINE__);
     for (;;) {
     	if (ic->op == '+')
-	    val += operandLitValue(IC_RIGHT(ic));
+	    val += (int) operandLitValue(IC_RIGHT(ic));
 	else if (ic->op == '-')
-	    val -= operandLitValue(IC_RIGHT(ic));
+	    val -= (int) operandLitValue(IC_RIGHT(ic));
 	else
 	    break;
 	
@@ -681,7 +677,7 @@ void aopOp (operand *op, iCode *ic, bool result)
 	}
 
         if (sym->ruonly ) {
-            int i;
+            unsigned i;
             aop = op->aop = sym->aop = newAsmop(AOP_STR);
             aop->size = getSize(sym->type);
             for ( i = 0 ; i < fReturnSizePic ; i++ )
@@ -7032,7 +7028,7 @@ static void genDataPointerSet(operand *right,
 	    sprintf(buffer,"%s",l);
 
 	if (AOP_TYPE(right) == AOP_LIT) {
-	  unsigned int lit = floatFromVal (AOP(IC_RIGHT(ic))->aopu.aop_lit);
+	  unsigned int lit = (unsigned int) floatFromVal (AOP(IC_RIGHT(ic))->aopu.aop_lit);
 	  lit = lit >> (8*offset);
 	  if(lit&0xff) {
 	    pic14_emitcode("movlw","%d",lit);
@@ -7131,7 +7127,7 @@ static void genNearPointerSet (operand *right,
             } else {
 
 	      if (AOP_TYPE(right) == AOP_LIT) {
-		unsigned int lit = floatFromVal (AOP(IC_RIGHT(ic))->aopu.aop_lit);
+		unsigned int lit = (unsigned int) floatFromVal (AOP(IC_RIGHT(ic))->aopu.aop_lit);
 		if(lit) {
 		  pic14_emitcode("movlw","%s",l);
 		  pic14_emitcode("movwf","indf ;2");

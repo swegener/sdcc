@@ -105,7 +105,7 @@ int pic14aopLiteral (value *val, int offset)
   /* if it is a float then it gets tricky */
   /* otherwise it is fairly simple */
   if (!IS_FLOAT(val->type)) {
-    unsigned long v = floatFromVal(val);
+    unsigned long v = (unsigned long) floatFromVal(val);
 
     //v >>= (offset * 8);
     return ( (v >> (offset * 8)) & 0xff);

@@ -59,21 +59,6 @@
 #include "pcode.h"
 #include "gen.h"
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*-----------------------------------------------------------------*/
 /* genPlusIncr :- does addition with increment if possible         */
 /*-----------------------------------------------------------------*/
@@ -97,7 +82,7 @@ bool genPlusIncr (iCode *ic)
     DEBUGpic14_emitcode ("; ","%s  %d",__FUNCTION__,__LINE__);
     /* if the literal value of the right hand side
        is greater than 1 then it is faster to add */
-    if ((icount =  floatFromVal (AOP(IC_RIGHT(ic))->aopu.aop_lit)) > 2)
+    if ((icount = (unsigned int) floatFromVal (AOP(IC_RIGHT(ic))->aopu.aop_lit)) > 2)
         return FALSE ;
     
     /* if increment 16 bits in register */
@@ -383,7 +368,7 @@ void genPlus (iCode *ic)
     if(AOP(IC_RIGHT(ic))->type == AOP_LIT) {
       /* Add a literal to something else */
       bool know_W=0;
-      unsigned lit = floatFromVal(AOP(IC_RIGHT(ic))->aopu.aop_lit);
+      unsigned lit = (unsigned) floatFromVal(AOP(IC_RIGHT(ic))->aopu.aop_lit);
       unsigned l1=0;
 
       offset = 0;

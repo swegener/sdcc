@@ -1007,16 +1007,16 @@ picglue ()
   addSet(&s,&b);
   addSet(&s,&c);
 
-  fprintf(stdout,"\n\n\n******************\n\n\n");
+  DFPRINTF((stderr,"\n\n\n******************\n\n\n"));
   for(t=s; t; t=t->next) {
     if(t->item) 
-      fprintf(stdout,"Set item %d\n",*(char *)t->item);
+      DFPRINTF((stderr,"Set item %d\n",*(char *)t->item));
   }
 
   s =reverseSet(s);
   for(t=s; t; t=t->next) {
     if(t->item) 
-      fprintf(stdout,"Set item %d\n",*(char *)t->item);
+      DFPRINTF((stderr,"Set item %d\n",*(char *)t->item));
   }
 
   addSetHead(&tmpfileSet,ovrFile);
@@ -1056,12 +1056,9 @@ picglue ()
 
 
   AnalyzepCode('*'); //code->dbName);
+#ifdef PCODE_DEBUG
   printCallTree(stderr);
-
-  //pCodePeepInit();
-
-  //OptimizepCode(code->dbName);
-
+#endif
 
   /* print the global struct definitions */
   if (options.debug)
@@ -1140,9 +1137,6 @@ picglue ()
   fprintf (asmFile, "; dpl and dph to emulate the 8051 calling mechanism \n");
   fprintf (asmFile, "%s", iComments2);
 
-  fprintf (asmFile, "\tdph\n");
-
-
 
   /* copy the sbit segment */
   fprintf (asmFile, "%s", iComments2);
@@ -1155,6 +1149,8 @@ picglue ()
   fprintf (asmFile, "; internal ram data\n");
   fprintf (asmFile, "%s", iComments2);
   copyFile (asmFile, data->oFile);
+
+  fprintf (asmFile, "\tendc\n");
 
 
   /* create the overlay segments */
@@ -1194,9 +1190,6 @@ picglue ()
   fprintf (asmFile, "%s", iComments2);
   copyFile (asmFile, xdata->oFile);
     
-
-  fprintf (asmFile, "\tendc\n");
-
 
   /* copy the bit segment */
   fprintf (asmFile, "%s", iComments2);

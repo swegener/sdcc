@@ -1124,11 +1124,8 @@ pCodeOp *popGetWithString(char *str)
 pCodeOp *popRegFromString(char *str)
 {
 
-  pCodeOp *pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
-  pcop->type = PO_GPR_REGISTER;
-
-  PCOR(pcop)->rIdx = -1;
-  PCOR(pcop)->r = NULL;
+  pCodeOp *pcop = Safe_calloc(1,sizeof(pCodeOp) );
+  pcop->type = PO_DIR;
 
   DEBUGpic14_emitcode(";","%d",__LINE__);
   pcop->name = Safe_strdup( ( (str) ? str : "BAD STRING"));
@@ -9167,18 +9164,19 @@ void genpic14Code (iCode *lic)
     addpBlock(pb);
 
     /* if debug information required */
-/*     if (options.debug && currFunc) { */
-    if (currFunc) {
+    if (options.debug && currFunc) { 
+      if (currFunc) {
 	cdbSymbol(currFunc,cdbFile,FALSE,TRUE);
 	_G.debugLine = 1;
 	if (IS_STATIC(currFunc->etype)) {
-	    pic14_emitcode("",";F%s$%s$0$0     %d",moduleName,currFunc->name,__LINE__);
-	    //addpCode2pBlock(pb,newpCodeLabel(moduleName,currFunc->name));
+	  pic14_emitcode("",";F%s$%s$0$0     %d",moduleName,currFunc->name,__LINE__);
+	  //addpCode2pBlock(pb,newpCodeLabel(moduleName,currFunc->name));
 	} else {
-	    pic14_emitcode("",";G$%s$0$0   %d",currFunc->name,__LINE__);
-	    //addpCode2pBlock(pb,newpCodeLabel(NULL,currFunc->name));
+	  pic14_emitcode("",";G$%s$0$0   %d",currFunc->name,__LINE__);
+	  //addpCode2pBlock(pb,newpCodeLabel(NULL,currFunc->name));
 	}
 	_G.debugLine = 0;
+      }
     }
 
 
@@ -9395,14 +9393,15 @@ void genpic14Code (iCode *lic)
     /* now we are ready to call the 
        peep hole optimizer */
     if (!options.nopeep) {
-      printf("peep hole optimizing\n");
-	peepHole (&lineHead);
+      peepHole (&lineHead);
     }
     /* now do the actual printing */
     printLine (lineHead,codeOutFile);
 
-    printf("printing pBlock\n\n");
+#ifdef PCODE_DEBUG
+    DFPRINTF((stderr,"printing pBlock\n\n"));
     printpBlock(stdout,pb);
+#endif
 
     return;
 }

@@ -873,7 +873,7 @@ void pic14initMnemonics(void)
   pci = hTabFirstItem(pic14MnemonicsHash, &key);
 
   while(pci) {
-    fprintf( stderr, "element %d key %d, mnem %s\n",i++,key,pci->mnemonic);
+    DFPRINTF((stderr, "element %d key %d, mnem %s\n",i++,key,pci->mnemonic));
     pci = hTabNextItem(pic14MnemonicsHash, &key);
   }
 
@@ -977,7 +977,7 @@ void copypCode(FILE *of, char dbName)
 void pcode_test(void)
 {
 
-  printf("pcode is alive!\n");
+  DFPRINTF((stderr,"pcode is alive!\n"));
 
   //initMnemonics();
 
@@ -2079,9 +2079,15 @@ void AnalyzepBlock(pBlock *pb)
   if(!pb)
     return;
 
-  /* Find all of the registers used in this pBlock */
+  /* Find all of the registers used in this pBlock 
+   * by looking at each instruction and examining it's
+   * operands
+   */
   for(pc = pb->pcHead; pc; pc = pc->next) {
+
+    /* Is this an instruction with operands? */
     if(pc->type == PC_OPCODE && PCI(pc)->pcop) {
+
       if(PCI(pc)->pcop->type == PO_GPR_TEMP) {
 
 	/* Loop through all of the registers declared so far in
@@ -2111,7 +2117,7 @@ void AnalyzepBlock(pBlock *pb)
       if(PCI(pc)->pcop->type == PO_GPR_REGISTER) {
 	if(PCOR(PCI(pc)->pcop)->r) {
 	  pic14_allocWithIdx (PCOR(PCI(pc)->pcop)->r->rIdx);
-	  fprintf(stderr,"found register in pblock: reg 0x%x\n",PCOR(PCI(pc)->pcop)->r->rIdx);
+	  DFPRINTF((stderr,"found register in pblock: reg 0x%x\n",PCOR(PCI(pc)->pcop)->r->rIdx));
 	} else {
 	  if(PCI(pc)->pcop->name)
 	    fprintf(stderr,"ERROR: %s is a NULL register\n",PCI(pc)->pcop->name );
@@ -2135,11 +2141,11 @@ int OptimizepBlock(pBlock *pb)
   if(!pb || !peepOptimizing)
     return 0;
 
-  fprintf(stderr," Optimizing pBlock: %c\n",getpBlock_dbName(pb));
+  DFPRINTF((stderr," Optimizing pBlock: %c\n",getpBlock_dbName(pb)));
   for(pc = pb->pcHead; pc; pc = pc->next)
     matches += pCodePeepMatchRule(pc);
   if(matches)
-    fprintf(stderr," Optimizing pBlock: %c - matches=%d\n",getpBlock_dbName(pb),matches);
+    DFPRINTF((stderr," Optimizing pBlock: %c - matches=%d\n",getpBlock_dbName(pb),matches));
   return matches;
 
 }
@@ -2191,7 +2197,7 @@ void pBlockRemoveUnusedLabels(pBlock *pb)
        * So, unlink the pCode label from it's pCode chain
        * and destroy the label */
 
-      fprintf(stderr," !!! REMOVED A LABEL !!! key = %d\n", pcl->key);
+      DFPRINTF((stderr," !!! REMOVED A LABEL !!! key = %d\n", pcl->key));
 
       if(pc->type == PC_LABEL) {
 	unlinkPC(pc);
@@ -2274,7 +2280,7 @@ void OptimizepCode(char dbName)
   if(!the_pFile)
     return;
 
-  fprintf(stderr," Optimizing pCode\n");
+  DFPRINTF((stderr," Optimizing pCode\n"));
 
   do {
     for(pb = the_pFile->pbHead; pb; pb = pb->next) {
@@ -2309,13 +2315,13 @@ void AnalyzepCode(char dbName)
   i = 0;
   do {
 
-    fprintf(stderr," Analyzing pCode: PASS #%d\n",i+1);
+    DFPRINTF((stderr," Analyzing pCode: PASS #%d\n",i+1));
 
     /* First, merge the labels with the instructions */
     for(pb = the_pFile->pbHead; pb; pb = pb->next) {
       if('*' == dbName || getpBlock_dbName(pb) == dbName) {
 
-	fprintf(stderr," analyze and merging block %c\n",dbName);
+	DFPRINTF((stderr," analyze and merging block %c\n",dbName));
 	pBlockMergeLabels(pb);
 	AnalyzepBlock(pb);
       }
@@ -2542,8 +2548,9 @@ set *register_usage(pBlock *pb)
 
   }
 
-
+#ifdef PCODE_DEBUG
   pBlockStats(stderr,pb);  // debug
+#endif
 
   // Mark the registers in this block as used.
 
@@ -2555,7 +2562,7 @@ set *register_usage(pBlock *pb)
 
     regs *r1,*r2, *newreg;
 
-    fprintf(stderr,"comparing registers\n");
+    DFPRINTF((stderr,"comparing registers\n"));
 
     r1 = setFirstItem(registersInCallPath);
     while(r1) {
@@ -2569,12 +2576,12 @@ set *register_usage(pBlock *pb)
 
 
 	  if(!newreg) {
-	    fprintf(stderr,"Bummer, no more registers.\n");
+	    DFPRINTF((stderr,"Bummer, no more registers.\n"));
 	    exit(1);
 	  }
 
-	  fprintf(stderr,"Cool found register collision nIdx=%d moving to %d\n",
-		  r1->rIdx, newreg->rIdx);
+	  DFPRINTF((stderr,"Cool found register collision nIdx=%d moving to %d\n",
+		  r1->rIdx, newreg->rIdx));
 	  r2->rIdx = newreg->rIdx;
 	  //if(r2->name) free(r2->name);
 	  if(newreg->name)
@@ -2604,15 +2611,15 @@ set *register_usage(pBlock *pb)
   //    MarkUsedRegisters(pb->registers);
 
   registers = unionSets(pb->registers, registersInCallPath, THROW_NONE);
-
+#ifdef PCODE_DEBUG
   if(registers) 
-    fprintf(stderr,"returning regs\n");
+    DFPRINTF((stderr,"returning regs\n"));
   else
-    fprintf(stderr,"not returning regs\n");
+    DFPRINTF((stderr,"not returning regs\n"));
 
-  fprintf(stderr,"pBlock after register optim.\n");
+  DFPRINTF((stderr,"pBlock after register optim.\n"));
   pBlockStats(stderr,pb);  // debug
-
+#endif
 
   return registers;
 }
@@ -2757,7 +2764,7 @@ void printCallTree(FILE *of)
 
   fprintf(of, "\npBlock statistics\n");
   for(pb = the_pFile->pbHead; pb;  pb = pb->next )
-    pBlockStats(stderr,pb);
+    pBlockStats(of,pb);
 
 
 

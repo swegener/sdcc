@@ -66,6 +66,26 @@ struct regs;
 #define __PCODE_H__
 
 /***********************************************************************
+ * debug stuff
+ * 
+ * The DFPRINTF macro will call fprintf if PCODE_DEBUG is defined.
+ * The macro is used like:
+ *
+ * DPRINTF(("%s #%d\n","test", 1));
+ *
+ * The double parenthesis (()) are necessary
+ * 
+ ***********************************************************************/
+//#define PCODE_DEBUG
+
+#ifdef PCODE_DEBUG
+#define DFPRINTF(args) (fprintf args)
+#else
+#define DFPRINTF(args) ;
+#endif
+
+
+/***********************************************************************
  *  PIC status bits - this will move into device dependent headers
  ***********************************************************************/
 #define PIC_C_BIT    0

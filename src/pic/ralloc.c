@@ -2173,7 +2173,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
       if (IS_TRUE_SYMOP (IC_RESULT (dic)) &&
 	  IS_OP_VOLATILE (IC_RESULT (dic)))
 	{
-	  debugLog ("  %d - \n", __LINE__);
+	  debugLog ("  %d - dic is VOLATILE \n", __LINE__);
 	  dic = NULL;
 	  break;
 	}
@@ -2181,7 +2181,9 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
       if (IS_SYMOP (IC_RESULT (dic)) &&
 	  IC_RESULT (dic)->key == IC_RIGHT (ic)->key)
 	{
-	  debugLog ("  %d - dic key == ic key -- pointer set=%c\n", __LINE__, ((POINTER_SET (dic)) ? 'Y' : 'N'));
+	  /* A previous result was assigned to the same register - we'll our definition */
+	  debugLog ("  %d - dic result key == ic right key -- pointer set=%c\n",
+		    __LINE__, ((POINTER_SET (dic)) ? 'Y' : 'N'));
 	  if (POINTER_SET (dic))
 	    dic = NULL;
 
@@ -2192,7 +2194,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 	  (IC_RIGHT (dic)->key == IC_RESULT (ic)->key ||
 	   IC_RIGHT (dic)->key == IC_RIGHT (ic)->key))
 	{
-	  debugLog ("  %d - \n", __LINE__);
+	  debugLog ("  %d - dic right key == ic rightor result key\n", __LINE__);
 	  dic = NULL;
 	  break;
 	}
@@ -2201,7 +2203,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 	  (IC_LEFT (dic)->key == IC_RESULT (ic)->key ||
 	   IC_LEFT (dic)->key == IC_RIGHT (ic)->key))
 	{
-	  debugLog ("  %d - \n", __LINE__);
+	  debugLog ("  %d - dic left key == ic rightor result key\n", __LINE__);
 	  dic = NULL;
 	  break;
 	}
@@ -2209,7 +2211,8 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
       if (POINTER_SET (dic) &&
 	  IC_RESULT (dic)->key == IC_RESULT (ic)->key)
 	{
-	  debugLog ("  %d - \n", __LINE__);
+	  debugLog ("  %d - dic result key == ic result key -- pointer set=Y\n",
+		    __LINE__);
 	  dic = NULL;
 	  break;
 	}
@@ -2238,6 +2241,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
     }
 pack:
   debugLog ("  packing. removing %s\n", OP_SYMBOL (IC_RIGHT (ic))->rname);
+  debugLog ("  replacing with %s\n", OP_SYMBOL (IC_RESULT (dic))->rname);
   /* found the definition */
   /* replace the result with the result of */
   /* this assignment and remove this assignment */
@@ -3126,7 +3130,7 @@ pic14_assignRegisters (eBBlock ** ebbs, int count)
   int i;
 
   debugLog ("<><><><><><><><><><><><><><><><><>\nstarting\t%s:%s", __FILE__, __FUNCTION__);
-  debugLog ("ebbs before optimizing:\n");
+  debugLog ("\nebbs before optimizing:\n");
   dumpEbbsToDebug (ebbs, count);
 
   setToNull ((void *) &_G.funcrUsed);

@@ -208,9 +208,13 @@ static const char *_linkCmd[] =
   "aslink", "-nf", "$1", NULL
 };
 
+/* Sigh. This really is not good. For now, I recommend:
+ * sdcc -S -mpic14 file.c
+ * the -S option does not compile or link
+ */
 static const char *_asmCmd[] =
 {
-  "gpasm", NULL, NULL, NULL
+  "gpasm", "-c  -I /usr/local/share/gpasm/header", "$1.asm", NULL
 
 };
 

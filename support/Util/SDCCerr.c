@@ -1,26 +1,34 @@
 /*
-===============================================================================
-ERROR - Standard error handler
-
-
-===============================================================================
-*/
+ * SDCCerr - Standard error handler
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Library General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ */
 
 #include <stdio.h>
 
-#include "sdccerr.h"
+#include "SDCCerr.h"
 
 #define USE_STDOUT_FOR_ERRORS		0
 
 #if USE_STDOUT_FOR_ERRORS
-
-static FILE *ErrorOut = stdout ;
-
+#define DEFAULT_ERROR_OUT	stdout
 #else
-
-static FILE *ErrorOut = stderr ;
-
+#define DEFAULT_ERROR_OUT	stderr
 #endif
+
+static FILE *ErrorOut ;
 
 #define ERROR		0
 #define WARNING		1
@@ -196,6 +204,9 @@ vwerror - Output a standard eror message with variable number of arguements
 void vwerror (int errNum, va_list marker)
 
 {
+if (!ErrorOut)
+	ErrorOut = DEFAULT_ERROR_OUT ;
+
 if ( ErrTab[errNum].errType == ERROR )
     fatalError++ ;
 

@@ -343,6 +343,7 @@ static const ASM_MAPPING _asxxxx_mapping[] =
   {"hil","(%05d$ >> 8)"},
   {"hihil","(%05d$ >> 16)"},
   {"hihihil","(%05d$ >> 24)"},
+  {"equ","="},
   {NULL, NULL}
 };
 
@@ -385,6 +386,58 @@ static const ASM_MAPPING _gas_mapping[] =
   {NULL, NULL}
 };
 
+static const ASM_MAPPING _a390_mapping[] =
+{
+  {"labeldef", "%s:"},
+  {"slabeldef", "%s:"},
+  {"tlabeldef", "L%05d:"},
+  {"tlabel", "L%05d"},
+  {"immed", "#"},
+  {"zero", "#0"},
+  {"one", "#1"},
+  {"area", "; SECTION NOT SUPPORTED"},
+  {"areacode", "; SECTION NOT SUPPORTED"},
+  {"areadata", "; SECTION NOT SUPPORTED"},
+  {"areahome", "; SECTION NOT SUPPORTED"},
+  {"ascii", "db \"%s\""},
+  {"ds", "; STORAGE NOT SUPPORTED"},
+  {"db", "db"},
+  {"dbs", "db \"%s\""},
+  {"dw", "dw"},
+  {"dws", "dw %s"},
+  {"constbyte", "0%02xh"},
+  {"constword", "0%04xh"},
+  {"immedword", "#0%04Xh"},
+  {"immedbyte", "#0%02Xh"},
+  {"hashedstr", "#%s"},
+  {"lsbimmeds", "#<%s"},
+  {"msbimmeds", "#>%s"},
+  {"module", "; .file \"%s.c\""},
+  {"global", "; .globl %s"},
+  {"fileprelude", ""},
+  {"functionheader",
+   "; ---------------------------------\n"
+   "; Function %s\n"
+   "; ---------------------------------"
+  },
+  {"functionlabeldef", "%s:"},
+  {"bankimmeds", "0	; PENDING: bank support"},  
+  {"los","(%s & 0FFh)"},
+  {"his","((%s / 256) & 0FFh)"},
+  {"hihis","((%s / 65536) & 0FFh)"},
+  {"hihihis","((%s / 16777216) & 0FFh)"},
+  {"lod","(%d & 0FFh)"},
+  {"hid","((%d / 256) & 0FFh)"},
+  {"hihid","((%d / 65536) & 0FFh)"},
+  {"hihihid","((%d / 16777216) & 0FFh)"},
+  {"lol","(L%05d & 0FFh)"},
+  {"hil","((L%05d / 256) & 0FFh)"},
+  {"hihil","((L%05d / 65536) & 0FFh)"},
+  {"hihihil","((L%09d / 16777216) & 0FFh)"},
+  {"equ"," equ"},
+  {NULL, NULL}
+};
+
 const ASM_MAPPINGS asm_asxxxx_mapping =
 {
   NULL,
@@ -395,4 +448,10 @@ const ASM_MAPPINGS asm_gas_mapping =
 {
   NULL,
   _gas_mapping
+};
+
+const ASM_MAPPINGS asm_a390_mapping =
+{
+  NULL,
+  _a390_mapping
 };

@@ -1687,7 +1687,7 @@ create_definition (
   }
       }
     /* now everything from bp before limit is the definition. */
-    defn = collect_expansion (pfile, bp, limit, -1, NULL_PTR);
+    defn = collect_expansion (pfile, bp, limit, -1,(struct arglist *) NULL_PTR);
     defn->args.argnames = (U_CHAR *) "";
   }
 
@@ -7323,7 +7323,7 @@ cpp_read_check_assertion (
   else
     result = check_assertion (pfile,
             pfile->token_buffer + name_start, name_length,
-            0, NULL_PTR);
+            0, (struct arglist *)NULL_PTR);
   CPP_ADJUST_WRITTEN (pfile, - name_length);  /* pop */
   return result;
 }

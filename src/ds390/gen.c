@@ -2786,6 +2786,7 @@ static void genPlus (iCode *ic)
 {
     int size, offset = 0;
     bool pushResult = FALSE;
+    int  rSize;
 
     D(emitcode(";", "genPlus "););
 
@@ -2883,18 +2884,32 @@ static void genPlus (iCode *ic)
         aopOp (IC_RESULT(ic),ic,TRUE, FALSE);
 
         size = getDataSize(IC_LEFT(ic));
-
+	rSize = getDataSize(IC_RESULT(ic));
+	
 	/* If the pushed data is bigger than the result,
 	 * simply discard unused bytes. Icky, but works.
 	 *
 	 * Should we throw a warning here? We're losing data...
 	 */
-	while (size > getDataSize(IC_RESULT(ic)))
+	while (size > rSize)
 	{
-	   emitcode(";", "discarding unused result byte.");
+	   D(emitcode(";", "discarding unused result byte."););
 	   emitcode("pop", "acc");
 	   size--;
 	   offset--; 
+	}
+	if (size < rSize)
+	{
+	    emitcode("clr", "a");
+	    /* Conversly, we haven't pushed enough here.
+	     * just zero-pad, and all is well. 
+	     */
+	    while (size < rSize)
+	    {
+	    	emitcode("push", "acc");
+	    	size++;
+	    	offset++;
+	    }
 	}
 
         while(size--)
@@ -3083,6 +3098,7 @@ static void genMinusBits (iCode *ic)
 static void genMinus (iCode *ic)
 {
     int size, offset = 0;
+    int rSize;
     unsigned long lit = 0L;
     bool pushResult = FALSE;
 
@@ -3157,6 +3173,7 @@ static void genMinus (iCode *ic)
         aopOp (IC_RESULT(ic),ic,TRUE, FALSE);
 
         size = getDataSize(IC_LEFT(ic));
+        rSize = getDataSize(IC_RESULT(ic));
 
 	/* If the pushed data is bigger than the result,
 	 * simply discard unused bytes. Icky, but works.
@@ -3169,6 +3186,19 @@ static void genMinus (iCode *ic)
 	   emitcode("pop", "acc");
 	   size--;
 	   offset--; 
+	}
+	if (size < rSize)
+	{
+	    emitcode("clr", "a");
+	    /* Conversly, we haven't pushed enough here.
+	     * just zero-pad, and all is well. 
+	     */
+	    while (size < rSize)
+	    {
+	    	emitcode("push", "acc");
+	    	size++;
+	    	offset++;
+	    }
 	}
 
         while(size--)

@@ -65,7 +65,7 @@ _pic14_init (void)
 }
 
 static void
-_pic14_reset_regparm ()
+_pic14_reset_regparm (void)
 {
 	regParmFlg = 0;
 }

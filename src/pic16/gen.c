@@ -7074,6 +7074,7 @@ static void genCmpEq (iCode *ic, iCode *ifx)
   int preserve_result = 0;
   int generate_result = 0;
   int i=0;
+  unsigned long lit = -1;
 
   FENTRY;
   
@@ -7098,6 +7099,10 @@ static void genCmpEq (iCode *ic, iCode *ifx)
       left = tmp;
     }
 
+  if (AOP_TYPE(right) == AOP_LIT) {
+    lit = (unsigned long) floatFromVal (AOP(right)->aopu.aop_lit);
+  }
+
   if ( regsInCommon(left, result) || regsInCommon(right, result) )
     preserve_result = 1;
 
@@ -7119,9 +7124,11 @@ static void genCmpEq (iCode *ic, iCode *ifx)
           else
             pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left), i));
         }
-      if(is_LitOp(right))
-        pic16_emitpcode(POC_XORLW, pic16_popGet(AOP(right), i)); 
-      else
+      if(is_LitOp(right)) {
+        if (is_LitOp(left) || (0 != ((lit >> (8*i))&0x00FF))) {
+          pic16_emitpcode(POC_XORLW, pic16_popGet(AOP(right), i)); 
+        }
+      } else
         pic16_emitpcode(POC_XORFW, pic16_popGet(AOP(right), i)); 
 
       pic16_emitpcode(POC_BNZ,pic16_popGetLabel(falselbl->key));

@@ -8899,18 +8899,18 @@ int assignToSameBank (int bank0, int bank1, int doAbs)
   } // if
 
   // now assign bank eff1 to bank eff0
-  pbank0 = (pseudoBank *) hTabFindByKey (coerce, eff0 % coerce->size, (void *) eff0, &comparePtr);
+  pbank0 = (pseudoBank *) hTabFindByKey (coerce, eff0 % coerce->size, (void *)((char*)0+eff0), &comparePtr);
   if (!pbank0) {
     pbank0 = Safe_calloc (1, sizeof (pseudoBank));
     pbank0->bank = eff0;
     pbank0->size = 1;
     pbank0->ref = 1;
-    hTabAddItemLong (&coerce, eff0 % coerce->size, (void *) eff0, (void *) pbank0);
+    hTabAddItemLong (&coerce, eff0 % coerce->size, (void *)((char*)0+eff0), (void *) pbank0);
   } // if
 
   pbank1 = NULL;
   hitem = hTabSearch (coerce, eff1 % coerce->size);
-  while (hitem && hitem->pkey != (void *)eff1)
+  while (hitem && hitem->pkey != (void *)((char*)0+eff1))
     hitem = hitem->next;
 
   if (hitem) pbank1 = (pseudoBank *) hitem->item;
@@ -8941,7 +8941,7 @@ int assignToSameBank (int bank0, int bank1, int doAbs)
   if (hitem)
     hitem->item = pbank0;
   else  
-    hTabAddItemLong (&coerce, eff1 % coerce->size, (void *) eff1, (void *) pbank0);
+    hTabAddItemLong (&coerce, eff1 % coerce->size, (void *)((char*)0+eff1), (void *) pbank0);
   pbank0->ref++;
 
   //fprintf (stderr, "%s:%d: leaving.\n", __FUNCTION__, __LINE__);

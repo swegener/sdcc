@@ -26,6 +26,7 @@ M_OR_MM         = @M_OR_MM@
 LIB_LIST	= sim cmd sim util
 UCSIM_LIBS	= $(patsubst %,-l%,$(LIB_LIST))
 UCSIM_LIB_FILES	= $(patsubst %,lib%.a,$(LIB_LIST))
+LIBS		= @LIBS@
 
 prefix          = @prefix@
 exec_prefix     = @exec_prefix@
@@ -107,7 +108,7 @@ ucsim_app: libs ucsim
 
 ucsim: $(UCSIM_OBJECTS) $(UCSIM_LIB_FILES)
 	echo $(UCSIM_LIB_FILES)
-	$(CXX) $(CXXFLAGS) -o $@ $< -L$(PRJDIR) $(UCSIM_LIBS)
+	$(CXX) $(CXXFLAGS) -o $@ $< -L$(PRJDIR) $(UCSIM_LIBS) $(LIBS)
 
 .cc.o:
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@

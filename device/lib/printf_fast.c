@@ -31,6 +31,7 @@ static bit long_flag, short_flag, print_zero_flag, negative_flag;
 
 #ifdef FIELD_WIDTH
 static bit field_width_flag;
+static bit leading_zero_flag;
 static data unsigned char field_width;
 #endif
 
@@ -64,6 +65,7 @@ printf_format:
 	clr	_negative_flag
 #ifdef FIELD_WIDTH
 	clr	_field_width_flag
+	clr	_leading_zero_flag
 	mov	_field_width, #0
 #endif
 
@@ -80,6 +82,10 @@ printf_format_loop:
 	jnc	printf_nondigit2
 #ifdef FIELD_WIDTH
 printf_digit:
+	jnz	printf_digit_2
+	cjne	a, _field_width, printf_digit_2
+	setb	_leading_zero_flag
+printf_digit_2:
 	setb	_field_width_flag
 	mov	r1, a
 	mov	a, _field_width
@@ -163,6 +169,7 @@ printf_string:
 
 #ifdef FIELD_WIDTH
 	jnb	_field_width_flag, printf_str_loop
+	clr	_leading_zero_flag	// never leading zeros for strings
 	push	dpl
 	push	dph
 printf_str_fw_loop:
@@ -660,6 +667,10 @@ printf_bcd_add10:
 printf_space_loop:
 	//mov	a, #' '
 	mov	a, #32
+	jnb	_leading_zero_flag, printf_space_output
+	//mov	a, #'0'
+	mov	a, #48
+printf_space_output:
 	lcall	printf_putchar
 	dec	_field_width
 printf_space:

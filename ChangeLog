@@ -1,5 +1,9 @@
 2003-04-06    Paul Stoffregen <paul@pjrc.com>
 
+	* device/lib/printf_fast.c: added leading zero format ("%06d", etc)
+
+2003-04-06    Paul Stoffregen <paul@pjrc.com>
+
 	* src/SDCCpeeph.c: added labelIsReturnOnly test
 	* src/mcs51/peeph.def: Peephole 244: replace ljmp to ret with ret
 

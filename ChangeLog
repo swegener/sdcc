@@ -1,4 +1,8 @@
 2004-11-25 Vangelis Rokas <vrokas AT otenet.gr>
+        * src/pic16/pcode.c: fixed bug which may produce error in non-GNU
+        compilers
+ 
+2004-11-25 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/device.h,
 	* src/pic16/genarith.c,

@@ -56,6 +56,7 @@ ast *optimizeRRCRLC (ast *);
 ast *optimizeGetHbit (ast *);
 ast *backPatchLabels (ast *, symbol *, symbol *);
 int inInitMode = 0;
+memmap *GcurMemmap=NULL;  /* points to the memmap that's currently active */
 FILE *codeOutFile;
 int 
 ptt (ast * tree)
@@ -4073,6 +4074,7 @@ createFunction (symbol * name, ast * body)
     }
 
   /* create the node & generate intermediate code */
+  GcurMemmap = code;
   codeOutFile = code->oFile;
   piCode = iCodeFromAst (ex);
 
@@ -4087,6 +4089,7 @@ createFunction (symbol * name, ast * body)
   /* if there are any statics then do them */
   if (staticAutos)
     {
+      GcurMemmap = statsg;
       codeOutFile = statsg->oFile;
       eBBlockFromiCode (iCodeFromAst (decorateType (resolveSymbols (staticAutos))));
       staticAutos = NULL;

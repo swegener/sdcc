@@ -45,7 +45,7 @@ extern TABLAT;
 extern PRODL;
 extern PRODH;
 
-void _gptrget3(void)
+void _gptrget3(void) _naked
 {
   _asm
     /* decode generic pointer MSB (in WREG) bits 6 and 7:

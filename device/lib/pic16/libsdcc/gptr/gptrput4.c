@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------
 
-   gptrput1.c :- put 1 byte value at generic pointer
+   gptrput4.c :- put 4 byte value at generic pointer
 
    Adopted for pic16 port by Vangelis Rokas, 2004 (vrokas@otenet.gr)
 
@@ -44,7 +44,7 @@ extern TABLAT;
 extern PRODL;
 extern PRODH;
 
-void _gptrput4(void)
+void _gptrput4(void) _naked
 {
   _asm
     /* decode generic pointer MSB (in WREG) bits 6 and 7:

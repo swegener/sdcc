@@ -1,5 +1,10 @@
 2004-10-03 Vangelis Rokas <vrokas AT otenet.gr>
 
+	* device/include/pic16/stdio.h,
+	* device/include/pic16/stdlib.h,
+	* device/include/pic16/math.h: NEW
+	* device/lib/pic16/libsdcc/gptr/*.c (gptrget*, gptrput*): functions
+	declared as _naked to reduce overhead
 	* device/lib/Makefile.in (target port-specific-objects-pic16):
 	changed * to *.* so to ignore the CVS directory,
 	* src/pic16/gen.c (pic16_freeAsmop): added code to store result of

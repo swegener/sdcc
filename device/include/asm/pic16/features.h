@@ -13,12 +13,11 @@
 #ifndef __PIC16_ASM_FEATURES_H
 #define __PIC16_ASM_FEATURES_H   1
 
-#if 0
-#define _IL_REENTRANT	reentrant
-#define _FS_REENTRANT	reentrant
-#else
+#define _REENTRANT
+
 #define _IL_REENTRANT
 #define _FS_REENTRANT
-#endif
+#define _MATH_REENTRANT
 
-#endif
+
+#endif	/* __PIC16_ASM_FEATURES_H */

@@ -1,3 +1,40 @@
+2004-02-06  Vangelis Rokas <vrokas AT otenet.gr>
+
+	* device.c (regCompare): registers are sorted by ascending
+	address and increasing size,
+	* main.c (_pic16_finaliseOptions): removed the declaration
+	of compiler macro MCU. Now a macro of the format pic18fxxxx
+	will be defined from the command line
+
+2004-02-06  Hans-Juergen Dorn <hans.dorn AT apl-landau.de>
+	    patch committed by Vangelis Rokas <vrokas AT otenet.gr>
+
+	* pcode.c (pic16initMnemonics): fixed typo in assignment to PCOP_RLNCF
+	PCOP_RLCF was overwritten!
+	* gen.c (genSkip) commented out calls to pic16_emitcode,
+	* (genCmpEQ) fixed "long" compares, only high word did get compared,
+	* (genlshTwo),
+	* (genRRC) added debugging info,
+	* (shiftL2Left2Result) Fixed bug, if offr > offl. Result got
+	overwritten while shifting,
+	* (shiftR2Left2Result) Fixed bug, if offr < offl. Result got
+	overwritten while shifting,
+	* (AccLsh),
+	* (AccRsh),
+	* (shiftLLeftOrResult),
+	* (shiftRLeftOrResult),
+	* (shiftRLong),
+	* (shiftLLong) Implemented with pic16_emitpcode
+	* (genlshFour) Replaced pic16_aopPut with pic16_emitpcode,
+	* (genLeftShift) Fixed bug, operand for shift by variable always
+	was "and"ed with 0x0f,
+	* (genLeftShiftLiteral),
+	* (genrshTwo),
+	* (genRightShiftLiteral) added debugging info,
+	* (genrshFour) added comment,
+	* (genRightShift) determined signedness from operand "left"
+	instead of "result"
+
 2004-02-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCicode.c (geniCodeParms),

@@ -2691,7 +2691,7 @@ void pic16initMnemonics(void)
   pic16Mnemonics[POC_RETURN] = &pic16_pciRETURN;
   pic16Mnemonics[POC_RLCF] = &pic16_pciRLCF;
   pic16Mnemonics[POC_RLCFW] = &pic16_pciRLCFW;
-  pic16Mnemonics[POC_RLCF] = &pic16_pciRLNCF;
+  pic16Mnemonics[POC_RLNCF] = &pic16_pciRLNCF; // was [POC_RLCF] !!!
   pic16Mnemonics[POC_RLNCFW] = &pic16_pciRLNCFW;
   pic16Mnemonics[POC_RRCF] = &pic16_pciRRCF;
   pic16Mnemonics[POC_RRCFW] = &pic16_pciRRCFW;

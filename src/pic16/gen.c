@@ -3809,6 +3809,7 @@ static void genIfxJump (iCode *ic, char *jval)
 /*-----------------------------------------------------------------*/
 static void genSkip(iCode *ifx,int status_bit)
 {
+  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
   if(!ifx)
     return;
 
@@ -3829,7 +3830,7 @@ static void genSkip(iCode *ifx,int status_bit)
     }
 
     pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_TRUE(ifx)->key));
-    pic16_emitcode("goto","_%05d_DS_",IC_TRUE(ifx)->key+100+labelOffset);
+    // pic16_emitcode("goto","_%05d_DS_",IC_TRUE(ifx)->key+100+labelOffset);
 
   } else {
 
@@ -3848,7 +3849,7 @@ static void genSkip(iCode *ifx,int status_bit)
       break;
     }
     pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_FALSE(ifx)->key));
-    pic16_emitcode("goto","_%05d_DS_",IC_FALSE(ifx)->key+100+labelOffset);
+    // pic16_emitcode("goto","_%05d_DS_",IC_FALSE(ifx)->key+100+labelOffset);
 
   }
 
@@ -4965,6 +4966,8 @@ static void genCmpEq (iCode *ic, iCode *ifx)
     operand *left, *right, *result;
     unsigned long lit = 0L;
     int size,offset=0;
+    symbol *falselbl  = newiTempLabel(NULL);
+
 
     DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
@@ -4993,10 +4996,12 @@ static void genCmpEq (iCode *ic, iCode *ifx)
 
 
     if(ifx && !AOP_SIZE(result)){
+    	DEBUGpic16_emitcode ("; ***","%s  %d CASE 1",__FUNCTION__,__LINE__);
         symbol *tlbl;
         /* if they are both bit variables */
         if (AOP_TYPE(left) == AOP_CRY &&
             ((AOP_TYPE(right) == AOP_CRY) || (AOP_TYPE(right) == AOP_LIT))) {
+    		DEBUGpic16_emitcode ("; ***","%s  %d CASE 11",__FUNCTION__,__LINE__);
             if(AOP_TYPE(right) == AOP_LIT){
                 unsigned long lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
                 if(lit == 0L){
@@ -5027,96 +5032,102 @@ static void genCmpEq (iCode *ic, iCode *ifx)
             }
             pic16_emitcode("","%05d_DS_:",tlbl->key+100+labelOffset);
 
-	    {
-	      /* left and right are both bit variables, result is carry */
-	      resolvedIfx rIfx;
+	    	{
+	      	/* left and right are both bit variables, result is carry */
+	      		resolvedIfx rIfx;
 	      
-	      resolveIfx(&rIfx,ifx);
+	      		resolveIfx(&rIfx,ifx);
 
-	      pic16_emitpcode(POC_MOVLW,pic16_popGet(AOP(left),0));
-	      pic16_emitpcode(POC_ANDFW,pic16_popGet(AOP(left),0));
-	      pic16_emitpcode(POC_BTFSC,pic16_popGet(AOP(right),0));
-	      pic16_emitpcode(POC_ANDLW,pic16_popGet(AOP(left),0));
-	      genSkipz2(&rIfx,0);
-	    }
+	      		pic16_emitpcode(POC_MOVLW,pic16_popGet(AOP(left),0));
+	      		pic16_emitpcode(POC_ANDFW,pic16_popGet(AOP(left),0));
+	      		pic16_emitpcode(POC_BTFSC,pic16_popGet(AOP(right),0));
+	      		pic16_emitpcode(POC_ANDLW,pic16_popGet(AOP(left),0));
+	      		genSkipz2(&rIfx,0);
+	    	}
         } else {
 
-	  /* They're not both bit variables. Is the right a literal? */
-	  if(AOP_TYPE(right) == AOP_LIT) {
-	    lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
+   			DEBUGpic16_emitcode ("; ***","%s  %d CASE 12",__FUNCTION__,__LINE__);
+
+	  		/* They're not both bit variables. Is the right a literal? */
+	  		if(AOP_TYPE(right) == AOP_LIT) {
+	    		lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
 	    
-	    switch(size) {
+	    		switch(size) {
 
-	    case 1:
-	      switch(lit & 0xff) {
-	      case 1:
-		if ( IC_TRUE(ifx) ) {
-		  pic16_emitpcode(POC_DECFW,pic16_popGet(AOP(left),offset));
-		  emitSKPNZ;
-		  pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_TRUE(ifx)->key));
-		} else {
-		  pic16_emitpcode(POC_DECFSZW,pic16_popGet(AOP(left),offset));
-		  pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_FALSE(ifx)->key));
-		}
-		break;
-	      case 0xff:
-		if ( IC_TRUE(ifx) ) {
-		  pic16_emitpcode(POC_INCFW,pic16_popGet(AOP(left),offset));
-		  emitSKPNZ;
-		  pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_TRUE(ifx)->key));
-		} else {
-		  pic16_emitpcode(POC_INCFSZW,pic16_popGet(AOP(left),offset));
-		  pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_FALSE(ifx)->key));
-		}
-		break;
-	      default:
-		pic16_emitpcode(POC_MOVFW,pic16_popGet(AOP(left),offset));
-		if(lit)
-		  pic16_emitpcode(POC_XORLW,pic16_popGetLit(lit & 0xff));
-		genSkip(ifx,'z');
-	      }
+	    			case 1:
+	      				switch(lit & 0xff) {
+	      					case 1:
+								if ( IC_TRUE(ifx) ) {
+		  							pic16_emitpcode(POC_DECFW,pic16_popGet(AOP(left),offset));
+		  							emitSKPNZ;
+		  							pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_TRUE(ifx)->key));
+								} else {
+		  							pic16_emitpcode(POC_DECFSZW,pic16_popGet(AOP(left),offset));
+		  							pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_FALSE(ifx)->key));
+								}
+								break;
+	      					case 0xff:
+								if ( IC_TRUE(ifx) ) {
+		  							pic16_emitpcode(POC_INCFW,pic16_popGet(AOP(left),offset));
+		  							emitSKPNZ;
+		  							pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_TRUE(ifx)->key));
+								} else {
+		  							pic16_emitpcode(POC_INCFSZW,pic16_popGet(AOP(left),offset));
+		  							pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_FALSE(ifx)->key));
+								}
+								break;
+	      					default:
+								pic16_emitpcode(POC_MOVFW,pic16_popGet(AOP(left),offset));
+								if(lit)
+		  							pic16_emitpcode(POC_XORLW,pic16_popGetLit(lit & 0xff));
+								genSkip(ifx,'z');
+	      				} // switch lit
 
 
-	      /* end of size == 1 */
-	      break;
+	      				/* end of size == 1 */
+	      				break;
 	      
-	    case 2:
-	      genc16bit2lit(left,lit,offset);
-	      genSkip(ifx,'z');
-	      break;
-	      /* end of size == 2 */
+	    			case 2:
+	      				genc16bit2lit(left,lit,offset);
+	      				genSkip(ifx,'z');
+	      				break;
+	      				/* end of size == 2 */
 
-	    default:
-	      /* size is 4 */
-	      if(lit==0) {
-		pic16_emitpcode(POC_MOVFW,pic16_popGet(AOP(left),0));
-		pic16_emitpcode(POC_IORFW,pic16_popGet(AOP(left),1));
-		pic16_emitpcode(POC_IORFW,pic16_popGet(AOP(left),2));
-		pic16_emitpcode(POC_IORFW,pic16_popGet(AOP(left),3));
+	    			default:
+	      				/* size is 4 */
+	      				if(lit==0) {
+		    				pic16_emitpcode(POC_MOVFW,pic16_popGet(AOP(left),0));
+		    				pic16_emitpcode(POC_IORFW,pic16_popGet(AOP(left),1));
+		    				pic16_emitpcode(POC_IORFW,pic16_popGet(AOP(left),2));
+		    				pic16_emitpcode(POC_IORFW,pic16_popGet(AOP(left),3));
+	      					genSkip(ifx,'z');
+	      				} else {
+		    				/* search for patterns that can be optimized */
 
-	      } else {
+		    				genc16bit2lit(left,lit,0);
+		    				lit >>= 16;
+		    				if(lit) {
+								if(IC_TRUE(ifx))
+      								emitSKPZ; // if hi word unequal
+								else
+      								emitSKPNZ; // if hi word equal
+								// fail early
+    							pic16_emitpcode(POC_GOTO,pic16_popGetLabel(falselbl->key));
+		      					genc16bit2lit(left,lit,2);
+	      						genSkip(ifx,'z');
+		    				} else {
+		      					pic16_emitpcode(POC_IORFW,pic16_popGet(AOP(left),2));
+		      					pic16_emitpcode(POC_IORFW,pic16_popGet(AOP(left),3));
+	      						genSkip(ifx,'z');
+		    				}
+			      		}
+						pic16_emitpLabel(falselbl->key);
+						break;
 
-		/* search for patterns that can be optimized */
-
-		genc16bit2lit(left,lit,0);
-		lit >>= 16;
-		if(lit) {
-		  genSkipz(ifx,IC_TRUE(ifx) == NULL);
-		  //genSkip(ifx,'z');
-		  genc16bit2lit(left,lit,2);
-		} else {
-		  pic16_emitpcode(POC_IORFW,pic16_popGet(AOP(left),2));
-		  pic16_emitpcode(POC_IORFW,pic16_popGet(AOP(left),3));
-
-		}
-		
-	      }
-
-	      genSkip(ifx,'z');
-	    }
+	    		} // switch size
 	  
-	    ifx->generated = 1;
-	    goto release ;
+	    		ifx->generated = 1;
+	    		goto release ;
 	    
 
 	  } else if(AOP_TYPE(right) == AOP_CRY ) {
@@ -5136,11 +5147,11 @@ static void genCmpEq (iCode *ic, iCode *ifx)
 	    if ( IC_TRUE(ifx) ) {
 	      emitSKPNZ;
 	      pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_TRUE(ifx)->key));
-	      pic16_emitcode(" goto","_%05d_DS_",IC_TRUE(ifx)->key+100+labelOffset);
+	      // pic16_emitcode(" goto","_%05d_DS_",IC_TRUE(ifx)->key+100+labelOffset);
 	    } else {
 	      emitSKPZ;
 	      pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_FALSE(ifx)->key));
-	      pic16_emitcode(" goto","_%05d_DS_",IC_FALSE(ifx)->key+100+labelOffset);
+	      // pic16_emitcode(" goto","_%05d_DS_",IC_FALSE(ifx)->key+100+labelOffset);
 	    }
 
 	  } else {
@@ -5194,6 +5205,7 @@ static void genCmpEq (iCode *ic, iCode *ifx)
     /* if they are both bit variables */
     if (AOP_TYPE(left) == AOP_CRY &&
         ((AOP_TYPE(right) == AOP_CRY) || (AOP_TYPE(right) == AOP_LIT))) {
+    	DEBUGpic16_emitcode ("; ***","%s  %d CASE 2",__FUNCTION__,__LINE__);
         if(AOP_TYPE(right) == AOP_LIT){
             unsigned long lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
             if(lit == 0L){
@@ -5226,7 +5238,7 @@ static void genCmpEq (iCode *ic, iCode *ifx)
         pic16_outBitC(result);
     } else {
       
-      DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+      DEBUGpic16_emitcode ("; ***","%s  %d CASE 3",__FUNCTION__,__LINE__);
       gencjne(left,right,result,ifx);
 /*
       if(ifx) 
@@ -6346,6 +6358,8 @@ static void genRRC (iCode *ic)
   operand *left , *result ;
   int size, offset = 0, same;
 
+  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+
   /* rotate right with carry */
   left = IC_LEFT(ic);
   result=IC_RESULT(ic);
@@ -6357,6 +6371,8 @@ static void genRRC (iCode *ic)
   same = pic16_sameRegs(AOP(result),AOP(left));
 
   size = AOP_SIZE(result);    
+
+  DEBUGpic16_emitcode ("; ***","%s  %d size:%d same:%d",__FUNCTION__,__LINE__,size,same);
 
   /* get the lsb and put it into the carry */
   pic16_emitpcode(POC_RRCFW, pic16_popGet(AOP(left),size-1));
@@ -6497,20 +6513,38 @@ static void AccRol (int shCount)
 static void AccLsh (int shCount)
 {
     DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    if(shCount != 0){
-        if(shCount == 1)
-            pic16_emitcode("add","a,acc");
-        else 
-	    if(shCount == 2) {
-            pic16_emitcode("add","a,acc");
-            pic16_emitcode("add","a,acc");
-        } else {
-            /* rotate left accumulator */
-            AccRol(shCount);
-            /* and kill the lower order bits */
-            pic16_emitcode("anl","a,#0x%02x", SLMask[shCount]);
-        }
+    switch(shCount){
+        case 0 :
+			return;
+            break;
+        case 1 :
+            pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+            break;
+        case 2 :
+            pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+            pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+            break;
+        case 3 :
+            pic16_emitpcode(POC_SWAPFW,pic16_popCopyReg(&pic16_pc_wreg));
+            pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+            break;
+        case 4 :
+            pic16_emitpcode(POC_SWAPFW,pic16_popCopyReg(&pic16_pc_wreg));
+            break;
+        case 5 :
+            pic16_emitpcode(POC_SWAPFW,pic16_popCopyReg(&pic16_pc_wreg));
+            pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+            break;
+        case 6 :
+            pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+            pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+            break;
+        case 7 :
+            pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+            break;
     }
+    pic16_emitpcode(POC_ANDLW,pic16_popGetLit(SLMask[shCount]));
+
 }
 
 /*-----------------------------------------------------------------*/
@@ -6519,17 +6553,37 @@ static void AccLsh (int shCount)
 static void AccRsh (int shCount)
 {
     DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    if(shCount != 0){
-        if(shCount == 1){
-            CLRC;
-            pic16_emitcode("rrc","a");
-        } else {
-            /* rotate right accumulator */
-            AccRol(8 - shCount);
-            /* and kill the higher order bits */
-            pic16_emitcode("anl","a,#0x%02x", SRMask[shCount]);
-        }
+    switch(shCount){
+        case 0 :
+			return;
+            break;
+        case 1 :
+            pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+            break;
+        case 2 :
+            pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+            pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+            break;
+        case 3 :
+            pic16_emitpcode(POC_SWAPFW,pic16_popCopyReg(&pic16_pc_wreg));
+            pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+            break;
+        case 4 :
+            pic16_emitpcode(POC_SWAPFW,pic16_popCopyReg(&pic16_pc_wreg));
+            break;
+        case 5 :
+            pic16_emitpcode(POC_SWAPFW,pic16_popCopyReg(&pic16_pc_wreg));
+            pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+            break;
+        case 6 :
+            pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+            pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+            break;
+        case 7 :
+            pic16_emitpcode(POC_RLNCFW,pic16_popCopyReg(&pic16_pc_wreg));
+            break;
     }
+    pic16_emitpcode(POC_ANDLW,pic16_popGetLit(SRMask[shCount]));
 }
 
 #if 0
@@ -6867,11 +6921,23 @@ static void movLeft2Result (operand *left, int offl,
 static void shiftL2Left2Result (operand *left, int offl,
                                 operand *result, int offr, int shCount)
 {
+  int same = pic16_sameRegs(AOP(result), AOP(left));
+  int i;
 
+  DEBUGpic16_emitcode ("; ***","%s  %d shCount:%d same:%d offl:%d offr:%d",__FUNCTION__,__LINE__,shCount,same,offl,offr);
 
-  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+  if (same && (offl != offr)) { // shift bytes
+    if (offr > offl) {
+       for(i=1;i>-1;i--) {
+         pic16_emitpcode(POC_MOVFW,pic16_popGet(AOP(result),offl+i));
+         pic16_emitpcode(POC_MOVWF,pic16_popGet(AOP(result),offr+i));
+       }
+    } else { // just treat as different later on
+  		same = 0;
+    }
+  }
 
-  if(pic16_sameRegs(AOP(result), AOP(left))) {
+  if(same) {
     switch(shCount) {
     case 0:
       break;
@@ -6884,9 +6950,9 @@ static void shiftL2Left2Result (operand *left, int offl,
       pic16_emitpcode(POC_RLCF,  pic16_popGet(AOP(result),offr+MSB16));
 
       while(--shCount) {
-	emitCLRC;
-	pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(result),offr));
-	pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(result),offr+MSB16));
+		emitCLRC;
+		pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(result),offr));
+		pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(result),offr+MSB16));
       }
 
       break;
@@ -6900,8 +6966,8 @@ static void shiftL2Left2Result (operand *left, int offl,
       pic16_emitpcode(POC_XORWF, pic16_popGet(AOP(result),offr));
       pic16_emitpcode(POC_ADDWF, pic16_popGet(AOP(result),offr+MSB16));
       if(shCount >=5) {
-	pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(result),offr));
-	pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(result),offr+MSB16));
+		pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(result),offr));
+		pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(result),offr+MSB16));
       }
       break;
     case 6:
@@ -6940,9 +7006,9 @@ static void shiftL2Left2Result (operand *left, int offl,
       pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offr+MSB16));
 
       while(--shCount) {
-	emitCLRC;
-	pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(result),offr));
-	pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(result),offr+MSB16));
+		emitCLRC;
+		pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(result),offr));
+		pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(result),offr+MSB16));
       }
       break;
 
@@ -6959,8 +7025,8 @@ static void shiftL2Left2Result (operand *left, int offl,
 
 
       if(shCount == 5) {
-	pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(result),offr));
-	pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(result),offr+MSB16));
+		pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(result),offr));
+		pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(result),offr+MSB16));
       }
       break;
     case 6:
@@ -6995,29 +7061,21 @@ static void shiftR2Left2Result (operand *left, int offl,
                                 operand *result, int offr,
                                 int shCount, int sign)
 {
-  int same=0;
+  int same = pic16_sameRegs(AOP(result), AOP(left));
+  int i;
+  DEBUGpic16_emitcode ("; ***","%s  %d shCount:%d same:%d sign:%d",__FUNCTION__,__LINE__,shCount,same,sign);
 
-  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-  same = pic16_sameRegs(AOP(result), AOP(left));
+  if (same && (offl != offr)) { // shift right bytes
+    if (offr < offl) {
+       for(i=0;i<2;i++) {
+         pic16_emitpcode(POC_MOVFW,pic16_popGet(AOP(result),offl+i));
+         pic16_emitpcode(POC_MOVWF,pic16_popGet(AOP(result),offr+i));
+       }
+    } else { // just treat as different later on
+  		same = 0;
+    }
+  }
 
-  if(same && ((offl + MSB16) == offr)){
-    same=1;
-    /* don't crash result[offr] */
-    MOVA(pic16_aopGet(AOP(left),offl,FALSE,FALSE));
-    pic16_emitcode("xch","a,%s", pic16_aopGet(AOP(left),offl+MSB16,FALSE,FALSE));
-  }
-/* else {
-    movLeft2Result(left,offl, result, offr);
-    MOVA(pic16_aopGet(AOP(left),offl+MSB16,FALSE,FALSE));
-  }
-*/
-  /* a:x >> shCount (x = lsb(result))*/
-/*
-  if(sign)
-    AccAXRshS( pic16_aopGet(AOP(result),offr,FALSE,FALSE) , shCount);
-  else {
-    AccAXRsh( pic16_aopGet(AOP(result),offr,FALSE,FALSE) , shCount);
-*/
   switch(shCount) {
   case 0:
     break;
@@ -7041,9 +7099,9 @@ static void shiftR2Left2Result (operand *left, int offl,
 
     while(--shCount) {
       if(sign)
-	pic16_emitpcode(POC_RLCFW,pic16_popGet(AOP(result),offr+MSB16));
+		pic16_emitpcode(POC_RLCFW,pic16_popGet(AOP(result),offr+MSB16));
       else
-	emitCLRC;
+		emitCLRC;
       pic16_emitpcode(POC_RRCF,pic16_popGet(AOP(result),offr+MSB16));
       pic16_emitpcode(POC_RRCF,pic16_popGet(AOP(result),offr));
     }
@@ -7147,13 +7205,13 @@ static void shiftLLeftOrResult (operand *left, int offl,
                                 operand *result, int offr, int shCount)
 {
     DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    MOVA(pic16_aopGet(AOP(left),offl,FALSE,FALSE));
+
+    pic16_emitpcode(POC_MOVFW,pic16_popGet(AOP(left),offl));
     /* shift left accumulator */
     AccLsh(shCount);
     /* or with result */
-    pic16_emitcode("orl","a,%s", pic16_aopGet(AOP(result),offr,FALSE,FALSE));
     /* back to result */
-    pic16_aopPut(AOP(result),"a",offr);
+    pic16_emitpcode(POC_IORWF,pic16_popGet(AOP(result),offr));
 }
 
 /*-----------------------------------------------------------------*/
@@ -7163,13 +7221,13 @@ static void shiftRLeftOrResult (operand *left, int offl,
                                 operand *result, int offr, int shCount)
 {
     DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    MOVA(pic16_aopGet(AOP(left),offl,FALSE,FALSE));
+    
+    pic16_emitpcode(POC_MOVFW,pic16_popGet(AOP(left),offl));
     /* shift right accumulator */
     AccRsh(shCount);
     /* or with result */
-    pic16_emitcode("orl","a,%s", pic16_aopGet(AOP(result),offr,FALSE,FALSE));
     /* back to result */
-    pic16_aopPut(AOP(result),"a",offr);
+    pic16_emitpcode(POC_IORWF,pic16_popGet(AOP(result),offr));
 }
 
 /*-----------------------------------------------------------------*/
@@ -7188,7 +7246,7 @@ static void genlshTwo (operand *result,operand *left, int shCount)
 {
     int size;
     
-    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+    DEBUGpic16_emitcode ("; ***","%s  %d shCount:%d",__FUNCTION__,__LINE__,shCount);
     size = pic16_getDataSize(result);
 
     /* if shCount >= 8 */
@@ -7215,64 +7273,63 @@ static void genlshTwo (operand *result,operand *left, int shCount)
 
 /*-----------------------------------------------------------------*/
 /* shiftLLong - shift left one long from left to result            */
-/* offl = LSB or MSB16                                             */
+/* offr = LSB or MSB16                                             */
 /*-----------------------------------------------------------------*/
 static void shiftLLong (operand *left, operand *result, int offr )
 {
-    char *l;
     int size = AOP_SIZE(result);
+    int same = pic16_sameRegs(AOP(left),AOP(result));
+	int i;
 
-    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    if(size >= LSB+offr){
-        l = pic16_aopGet(AOP(left),LSB,FALSE,FALSE);
-        MOVA(l);
-        pic16_emitcode("add","a,acc");
-	if (pic16_sameRegs(AOP(left),AOP(result)) && 
-	    size >= MSB16+offr && offr != LSB )
-	    pic16_emitcode("xch","a,%s",
-		     pic16_aopGet(AOP(left),LSB+offr,FALSE,FALSE));
-	else	    
-	    pic16_aopPut(AOP(result),"a",LSB+offr);
-    }
+    DEBUGpic16_emitcode ("; ***","%s  %d  offr:%d size:%d",__FUNCTION__,__LINE__,offr,size);
+
+	if (same && (offr == MSB16)) { //shift one byte
+		for(i=size-1;i>=MSB16;i--) {
+			pic16_emitpcode(POC_MOVFW,pic16_popGet(AOP(left),i-1));
+			pic16_emitpcode(POC_MOVWF,pic16_popGet(AOP(left),i));
+		}
+	} else {
+		pic16_emitpcode(POC_MOVFW,pic16_popGet(AOP(left),LSB+offr));
+	}
+	
+    if (size >= LSB+offr ){
+		if (same) {
+			pic16_emitpcode(POC_ADDWF,pic16_popGet(AOP(left),LSB+offr));
+		} else {
+			pic16_emitpcode(POC_ADDFW,pic16_popGet(AOP(left),LSB));
+			pic16_emitpcode(POC_MOVWF,pic16_popGet(AOP(result),LSB+offr));
+		}
+	 }
 
     if(size >= MSB16+offr){
-	if (!(pic16_sameRegs(AOP(result),AOP(left)) && size >= MSB16+offr && offr != LSB) ) {
-	    l = pic16_aopGet(AOP(left),MSB16,FALSE,FALSE);
-	    MOVA(l);
-	}
-        pic16_emitcode("rlc","a");
-	if (pic16_sameRegs(AOP(left),AOP(result)) && 
-	    size >= MSB24+offr && offr != LSB)
-	    pic16_emitcode("xch","a,%s",
-		     pic16_aopGet(AOP(left),MSB16+offr,FALSE,FALSE));
-	else	    
-	    pic16_aopPut(AOP(result),"a",MSB16+offr);
+		if (same) {
+			pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(left),MSB16+offr));
+		} else {
+			pic16_emitpcode(POC_RLCFW, pic16_popGet(AOP(left),MSB16));
+			pic16_emitpcode(POC_MOVWF,pic16_popGet(AOP(result),MSB16+offr));
+		}
     }
 
     if(size >= MSB24+offr){
-	if (!(pic16_sameRegs(AOP(left),AOP(left)) && size >= MSB24+offr && offr != LSB)) {
-	    l = pic16_aopGet(AOP(left),MSB24,FALSE,FALSE);
-	    MOVA(l);
-	}
-        pic16_emitcode("rlc","a");
-	if (pic16_sameRegs(AOP(left),AOP(result)) && 
-	    size >= MSB32+offr && offr != LSB )
-	    pic16_emitcode("xch","a,%s",
-		     pic16_aopGet(AOP(left),MSB24+offr,FALSE,FALSE));
-	else	    
-	    pic16_aopPut(AOP(result),"a",MSB24+offr);
+		if (same) {
+			pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(left),MSB24+offr));
+		} else {
+			pic16_emitpcode(POC_RLCFW, pic16_popGet(AOP(left),MSB24));
+			pic16_emitpcode(POC_MOVWF,pic16_popGet(AOP(result),MSB24+offr));
+		}
     }
 
     if(size > MSB32+offr){
-	if (!(pic16_sameRegs(AOP(result),AOP(left)) && size >= MSB32+offr && offr != LSB)) {
-	    l = pic16_aopGet(AOP(left),MSB32,FALSE,FALSE);
-	    MOVA(l);	
-	}
-        pic16_emitcode("rlc","a");
-        pic16_aopPut(AOP(result),"a",MSB32+offr);
+		if (same) {
+			pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(left),MSB32+offr));
+		} else {
+			pic16_emitpcode(POC_RLCFW, pic16_popGet(AOP(left),MSB32));
+			pic16_emitpcode(POC_MOVWF,pic16_popGet(AOP(result),MSB32+offr));
+		}
     }
     if(offr != LSB)
-        pic16_aopPut(AOP(result),zero,LSB);       
+		pic16_emitpcode(POC_CLRF,pic16_popGet(AOP(result),LSB));
+
 }
 
 /*-----------------------------------------------------------------*/
@@ -7294,9 +7351,11 @@ static void genlshFour (operand *result, operand *left, int shCount)
             shiftL1Left2Result(left, LSB, result, MSB32, shCount);
         else
             movLeft2Result(left, LSB, result, MSB32);
-        pic16_aopPut(AOP(result),zero,LSB);
-        pic16_aopPut(AOP(result),zero,MSB16);
-        pic16_aopPut(AOP(result),zero,MSB32);
+
+		pic16_emitpcode(POC_CLRF,pic16_popGet(AOP(result),LSB));
+		pic16_emitpcode(POC_CLRF,pic16_popGet(AOP(result),MSB16));
+		pic16_emitpcode(POC_CLRF,pic16_popGet(AOP(result),MSB24));
+
         return;
     }
 
@@ -7311,8 +7370,8 @@ static void genlshFour (operand *result, operand *left, int shCount)
             movLeft2Result(left, MSB16, result, MSB32);
             movLeft2Result(left, LSB, result, MSB24);
         }
-        pic16_aopPut(AOP(result),zero,MSB16);
-        pic16_aopPut(AOP(result),zero,LSB);
+		pic16_emitpcode(POC_CLRF,pic16_popGet(AOP(result),LSB));
+		pic16_emitpcode(POC_CLRF,pic16_popGet(AOP(result),MSB16));
         return;
     }    
 
@@ -7331,7 +7390,7 @@ static void genlshFour (operand *result, operand *left, int shCount)
                 movLeft2Result(left, MSB24, result, MSB32);
                 movLeft2Result(left, MSB16, result, MSB24);
                 movLeft2Result(left, LSB, result, MSB16);
-                pic16_aopPut(AOP(result),zero,LSB);
+				pic16_emitpcode(POC_CLRF,pic16_popGet(AOP(result),LSB));
             }
             else if(shCount == 1)
                 shiftLLong(left, result, MSB16);
@@ -7339,15 +7398,16 @@ static void genlshFour (operand *result, operand *left, int shCount)
                 shiftL2Left2Result(left, MSB16, result, MSB24, shCount);
                 shiftL1Left2Result(left, LSB, result, MSB16, shCount);
                 shiftRLeftOrResult(left, LSB, result, MSB24, 8 - shCount);
-                pic16_aopPut(AOP(result),zero,LSB);
+				pic16_emitpcode(POC_CLRF,pic16_popGet(AOP(result),LSB));
             }
         }
     }
 
     /* 1 <= shCount <= 7 */
-    else if(shCount <= 2){
+    else if(shCount <= 3)
+    { 
         shiftLLong(left, result, LSB);
-        if(shCount == 2)
+        while(--shCount >= 1)
             shiftLLong(result, result, LSB);
     }
     /* 3 <= shCount <= 7, optimize */
@@ -7369,7 +7429,7 @@ static void genLeftShiftLiteral (operand *left,
     int shCount = (int) floatFromVal (AOP(right)->aopu.aop_lit);
     int size;
 
-    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+    DEBUGpic16_emitcode ("; ***","%s  %d shCount:%d",__FUNCTION__,__LINE__,shCount);
     pic16_freeAsmop(right,NULL,ic,TRUE);
 
     pic16_aopOp(left,ic,FALSE);
@@ -7519,8 +7579,8 @@ static void genLeftShift (iCode *ic)
 
       tlbl = newiTempLabel(NULL);
       if (!pic16_sameRegs(AOP(left),AOP(result))) {
-	pic16_emitpcode(POC_MOVFW,  pic16_popGet(AOP(left),0));
-	pic16_emitpcode(POC_MOVWF,  pic16_popGet(AOP(result),0));
+		pic16_emitpcode(POC_MOVFW,  pic16_popGet(AOP(left),0));
+		pic16_emitpcode(POC_MOVWF,  pic16_popGet(AOP(result),0));
       }
 
       pic16_emitpcode(POC_COMFW,  pic16_popGet(AOP(right),0));
@@ -7582,7 +7642,8 @@ static void genLeftShift (iCode *ic)
   pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(right),0));
 
   /* offset should be 0, 1 or 3 */
-  pic16_emitpcode(POC_ANDLW, pic16_popGetLit(0x07 + ((offset&3) << 3)));
+  
+  pic16_emitpcode(POC_ANDLW, pic16_popGetLit((size<<3)-1));
   emitSKPNZ;
   pic16_emitpcode(POC_GOTO,  pic16_popGetLabel(tlbl1->key));
 
@@ -7625,7 +7686,7 @@ static void genrshOne (operand *result, operand *left,
 static void genrshTwo (operand *result,operand *left,
                        int shCount, int sign)
 {
-  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+  DEBUGpic16_emitcode ("; ***","%s  %d shCount:%d",__FUNCTION__,__LINE__,shCount);
   /* if shCount >= 8 */
   if (shCount >= 8) {
     shCount -= 8 ;
@@ -7656,30 +7717,59 @@ static void shiftRLong (operand *left, int offl,
                         operand *result, int sign)
 {
     DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    if(!sign)
-        pic16_emitcode("clr","c");
-    MOVA(pic16_aopGet(AOP(left),MSB32,FALSE,FALSE));
+    int size = AOP_SIZE(result);
+    int same = pic16_sameRegs(AOP(left),AOP(result));
+	int i;
+
+    DEBUGpic16_emitcode ("; ***","%s  %d  offl:%d size:%d",__FUNCTION__,__LINE__,offl,size);
+
+	if (same && (offl == MSB16)) { //shift one byte right
+		for(i=MSB16;i<size;i++) {
+			pic16_emitpcode(POC_MOVFW,pic16_popGet(AOP(left),i));
+			pic16_emitpcode(POC_MOVWF,pic16_popGet(AOP(left),i-1));
+		}
+	}
+
     if(sign)
-        pic16_emitcode("mov","c,acc.7");
-    pic16_emitcode("rrc","a");
-    pic16_aopPut(AOP(result),"a",MSB32-offl);
-    if(offl == MSB16)
+		pic16_emitpcode(POC_RLCFW,pic16_popGet(AOP(left),MSB32));
+	else
+		emitCLRC;
+
+	if (same) {
+		if (offl == LSB)
+    		pic16_emitpcode(POC_RRCF, pic16_popGet(AOP(left),MSB32));
+	} else {
+    	pic16_emitpcode(POC_RRCFW, pic16_popGet(AOP(left),MSB32));
+    	pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),MSB32-offl));
+	}
+
+    if(offl == MSB16) {
         /* add sign of "a" */
         pic16_addSign(result, MSB32, sign);
+	}
 
-    MOVA(pic16_aopGet(AOP(left),MSB24,FALSE,FALSE));
-    pic16_emitcode("rrc","a");
-    pic16_aopPut(AOP(result),"a",MSB24-offl);
+	if (same) {
+    	pic16_emitpcode(POC_RRCF, pic16_popGet(AOP(left),MSB24));
+	} else {
+    	pic16_emitpcode(POC_RRCFW, pic16_popGet(AOP(left),MSB24));
+    	pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),MSB24-offl));
+	}
+	
+	if (same) {
+    	pic16_emitpcode(POC_RRCF, pic16_popGet(AOP(left),MSB16));
+	} else {
+    	pic16_emitpcode(POC_RRCFW, pic16_popGet(AOP(left),MSB16));
+    	pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),MSB16-offl));
+	}
 
-    MOVA(pic16_aopGet(AOP(left),MSB16,FALSE,FALSE));
-    pic16_emitcode("rrc","a");
-    pic16_aopPut(AOP(result),"a",MSB16-offl);
-
-    if(offl == LSB){
-        MOVA(pic16_aopGet(AOP(left),LSB,FALSE,FALSE));
-        pic16_emitcode("rrc","a");
-        pic16_aopPut(AOP(result),"a",LSB);
-    }
+	if (same) {
+    	pic16_emitpcode(POC_RRCF, pic16_popGet(AOP(left),LSB));
+	} else {
+    	if(offl == LSB){
+    		pic16_emitpcode(POC_RRCFW, pic16_popGet(AOP(left),LSB));
+    		pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),LSB));
+    	}
+	}
 }
 
 /*-----------------------------------------------------------------*/
@@ -7719,7 +7809,7 @@ static void genrshFour (operand *result, operand *left,
       movLeft2Result(left, MSB32, result, MSB24);
       pic16_addSign(result, MSB32, sign);
     }
-    else{
+    else{ //shcount >= 2
       shiftR2Left2Result(left, MSB16, result, LSB, shCount, 0);
       shiftLLeftOrResult(left, MSB32, result, MSB16, 8 - shCount);
       /* the last shift is signed */
@@ -7753,11 +7843,12 @@ static void genRightShiftLiteral (operand *left,
   int shCount = (int) floatFromVal (AOP(right)->aopu.aop_lit);
   int lsize,res_size;
 
-  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
   pic16_freeAsmop(right,NULL,ic,TRUE);
 
   pic16_aopOp(left,ic,FALSE);
   pic16_aopOp(result,ic,FALSE);
+
+  DEBUGpic16_emitcode ("; ***","%s  %d shCount:%d result:%d left:%d",__FUNCTION__,__LINE__,shCount,AOP_SIZE(result),AOP_SIZE(left));
 
 #if VIEW_SIZE
   pic16_emitcode("; shift right ","result %d, left %d",AOP_SIZE(result),
@@ -7968,17 +8059,17 @@ static void genSignedRightShift (iCode *ic)
 static void genRightShift (iCode *ic)
 {
     operand *right, *left, *result;
-    sym_link *retype ;
+    sym_link *letype ;
     int size, offset;
     char *l;
     symbol *tlbl, *tlbl1 ;
 
     /* if signed then we do it the hard way preserve the
     sign bit moving it inwards */
-    retype = getSpec(operandType(IC_RESULT(ic)));
+    letype = getSpec(operandType(IC_LEFT(ic)));
     DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
-    if (!SPEC_USIGN(retype)) {
+    if (!SPEC_USIGN(letype)) {
         genSignedRightShift (ic);
         return ;
     }

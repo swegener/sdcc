@@ -302,8 +302,14 @@ int regCompare(const void *a, const void *b)
   const regs *const *i = a;
   const regs *const *j = b;
 
+	/* sort primarily by the address */
 	if( (*i)->address > (*j)->address)return 1;
 	if( (*i)->address < (*j)->address)return -1;
+	
+	/* and secondarily by size */
+	if( (*i)->size > (*j)->size)return 1;
+	if( (*i)->size < (*j)->size)return -1;
+
 
   return 0;
 }

@@ -416,8 +416,8 @@ _pic16_finaliseOptions (void)
 
 	options.all_callee_saves = 1;		// always callee saves
 
-	setMainValue("mcu", pic16_processor_base_name() );
-	addSet(&preArgvSet, Safe_strdup("-DMCU={mcu}"));
+	setMainValue("mcu", pic16->name[2] );
+	addSet(&preArgvSet, Safe_strdup("-D{mcu}"));
 
 	sprintf(pic16incDir, "%s/pic16", INCLUDE_DIR_SUFFIX);
 	sprintf(pic16libDir, "%s/pic16", LIB_DIR_SUFFIX);

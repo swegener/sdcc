@@ -11,9 +11,6 @@
 
 #include <stdio.h>
 #include <string.h>
-//#if !defined(_MSC_VER)
-//#include <alloc.h>
-//#endif
 #include "aslink.h"
 
 /*)Module	lkihx.c
@@ -148,7 +145,7 @@ ihx(i)
 		    fprintf(ofp, "00");
 		  }
 		}
-		fprintf(ofp, "%02X\n", (-chksum) & 0xff);
+		fprintf(ofp, "%02X\n", (0-chksum) & 0xff);
 	} else {
 		fprintf(ofp, ":00000001FF\n");
 	}
@@ -184,5 +181,5 @@ ihxEntendedLinearAddress(Addr_T a)
      */ 
     chksum = 2 + 4 + (a & 0xff) + ((a >> 8) & 0xff);    
     
-    fprintf(ofp, ":02000004%04X%02X\n", a & 0xffff, (-chksum) & 0xff);
+    fprintf(ofp, ":02000004%04X%02X\n", a & 0xffff, (0-chksum) & 0xff);
 }

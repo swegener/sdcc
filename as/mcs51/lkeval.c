@@ -11,9 +11,6 @@
 
 #include <stdio.h>
 #include <string.h>
-//#if !defined(_MSC_VER)
-//#include <alloc.h>
-//#endif
 #include "aslink.h"
 
 /*)Module	lkeval.c
@@ -229,7 +226,7 @@ term()
 		return(v);
 	}
 	if (c == '-') {
-		return(-expr(100));
+		return(0-expr(100));
 	}
 	if (c == '~') {
 		return(~expr(100));

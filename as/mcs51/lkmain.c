@@ -14,13 +14,9 @@
  *           - use a_type == 0 as "virgin area" flag: set == 1 if -b
  */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-//#if defined(_MSC_VER)
-//#include <stdlib.h>
-//#else
-//#include <alloc.h>
-//#endif
 #include "aslink.h"
 
 /* yuck - but including unistd.h causes problems on Cygwin by redefining

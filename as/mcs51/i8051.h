@@ -113,6 +113,5 @@ extern struct PreDef preDef[];
 
 	/* i51mch.c */
 extern	int		comma();
-extern	VOID		machin();
 extern	VOID		minit();
 extern	int		reg();

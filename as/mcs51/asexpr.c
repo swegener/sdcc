@@ -338,7 +338,7 @@ register struct expr *esp;
         if (c == '-') {
                 expr(esp, 100);
                 abscheck(esp);
-                esp->e_addr = -esp->e_addr;
+                esp->e_addr = 0-esp->e_addr;
                 return;
         }
         if (c == '~') {

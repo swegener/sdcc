@@ -15,13 +15,9 @@
  *
  */
 
+#include <malloc.h>
 #include <stdio.h>
 #include <string.h>
-//#if defined(_MSC_VER)
-//#include <malloc.h>
-//#else
-//#include <alloc.h>
-//#endif
 #include "aslink.h"
 
 /*)Module	lklibr.c

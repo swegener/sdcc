@@ -11,9 +11,6 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include <string.h>
-//#if !defined(_MSC_VER)
-//#include <alloc.h>
-//#endif
 #include "aslink.h"
 
 static void DefineGlobal( char *name, Addr_T value, int page );

@@ -11,13 +11,13 @@
  * 29-Oct-97 JLH pass ";!" comments to output file
  */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <setjmp.h>
 #include <string.h>
 
 #include "asm.h"
 
-extern VOID machine(struct mne *);
 /*)Module	asmain.c
  *
  *	The module asmain.c includes the command argument parser,
@@ -451,7 +451,7 @@ int i;
  *		char	getnb()		aslex.c
  *		VOID	getst()		aslex.c
  *		sym *	lookup()	assym.c
- *		VOID	machin()	___mch.c
+ *		VOID	machine()	___mch.c
  *		mne *	mlookup()	assym.c
  *		int	more()		aslex.c
  *		VOID *	new()		assym.c

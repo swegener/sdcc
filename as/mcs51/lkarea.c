@@ -15,9 +15,6 @@
 
 #include <stdio.h>
 #include <string.h>
-//#if !defined(_MSC_VER)
-//#include <alloc.h>
-//#endif
 #include "aslink.h"
 
 /*)Module	lkarea.c

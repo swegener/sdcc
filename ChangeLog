@@ -12,6 +12,8 @@
 	* clean.mk: fixed removal of files in bin/CVS/
 	* device/lib/clean.mk: fixed removal of directories small and large
 	* support/Util/SDCCerr.c: changed W_INT_OVL to ERROR_LEVEL_PEDANTIC
+	* src/SDCCicode.c,
+	* src/SDCCval.c: removed superflous test for pedantic
 
 2003-10-05  Borut Razem <borut.razem@siol.net>
 

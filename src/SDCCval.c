@@ -1113,8 +1113,7 @@ valMult (value * lval, value * rval)
                        (TYPE_UWORD) floatFromVal (rval);
 
       SPEC_CVAL (val->type).v_uint = (TYPE_UWORD) ul;
-      if (!options.lessPedantic &&
-          ul != (TYPE_UWORD) ul)
+      if (ul != (TYPE_UWORD) ul)
         werror (W_INT_OVL);
     }
   else /* int */
@@ -1123,8 +1122,7 @@ valMult (value * lval, value * rval)
                      (TYPE_WORD) floatFromVal (rval);
 
       SPEC_CVAL (val->type).v_int = (TYPE_WORD) l;
-      if (!options.lessPedantic &&
-          l != (TYPE_WORD) l)
+      if (l != (TYPE_WORD) l)
         werror (W_INT_OVL);
     }
   return cheapestVal(val);

@@ -1094,8 +1094,7 @@ operandOperation (operand * left, operand * right,
 			       (TYPE_UWORD) operandLitValue (right);
 
 	      retval = operandFromValue (valCastLiteral (type, (TYPE_UWORD) ul));
-	      if (!options.lessPedantic &&
-		  ul != (TYPE_UWORD) ul)
+	      if (ul != (TYPE_UWORD) ul)
 		werror (W_INT_OVL);
 	    }
 	  else /* signed int */
@@ -1105,8 +1104,7 @@ operandOperation (operand * left, operand * right,
 			     (TYPE_WORD) operandLitValue (right);
 
 	      retval = operandFromValue (valCastLiteral (type, (TYPE_WORD) l));
-	      if (!options.lessPedantic &&
-		  l != (TYPE_WORD) l)
+	      if (l != (TYPE_WORD) l)
 		werror (W_INT_OVL);
 	    }
 	}

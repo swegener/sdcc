@@ -39,10 +39,11 @@ unsigned char *acharP = 0;
 struct chars
   {
     unsigned char c0, c1;
+    unsigned int  i0, i1;
   };
 
 
-struct chars char_struct;
+struct chars struct1;
 
 void
 done ()
@@ -56,12 +57,12 @@ void
 struct_test (void)
 {
 
-  if (char_struct.c0 || char_struct.c1)
+  if (struct1.c0 || struct1.c1)
     failures++;
 
-  char_struct.c0++;
+  struct1.c0++;
 
-  if (char_struct.c0 != 1)
+  if (struct1.c0 != 1)
     failures++;
 }
 
@@ -79,16 +80,28 @@ ptr_to_struct (struct chars *p)
     failures++;
 }
 
+void add_chars(void)
+{
+
+  achar0 = struct1.c0 + struct1.c1;
+
+  if(achar0 != 1)
+    failures++;
+}
 
 void
 main (void)
 {
 
 
-  char_struct.c0 = 0;
-  char_struct.c1 = 0;
+  struct1.c0 = 0;
+  struct1.c1 = 0;
   struct_test ();
-  ptr_to_struct (&char_struct);
+  ptr_to_struct (&struct1);
+
+  struct1.c0 = 0;
+  struct1.c1 = 1;
+  add_chars();
 
   success = failures;
   done ();

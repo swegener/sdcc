@@ -28,6 +28,8 @@
 #ifndef SDCCRALLOC_H
 #define SDCCRALLOC_H 1
 
+
+
 enum
   {
     R2_IDX = 0, R3_IDX, R4_IDX,
@@ -41,11 +43,15 @@ enum
 #define REG_PTR 0x01
 #define REG_GPR 0x02
 #define REG_CND 0x04
+#define REG_SFR 0x08
+
 /* definition for the registers */
 typedef struct regs
   {
     short type;			/* can have value 
-				   REG_GPR, REG_PTR or REG_CND */
+				 * REG_GPR, REG_PTR or REG_CND 
+				 * This like the "meta-type" */
+    short pc_type;              /* pcode type */
     short rIdx;			/* index into register table */
     //    short otype;        
     char *name;			/* name */

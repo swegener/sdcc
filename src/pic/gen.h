@@ -81,4 +81,92 @@ void genpic14Code (iCode *);
 extern unsigned fReturnSizePic;
 //extern char **fReturn;
 
+
+#define AOP(op) op->aop
+#define AOP_TYPE(op) AOP(op)->type
+#define AOP_SIZE(op) AOP(op)->size
+#define IS_AOP_PREG(x) (AOP(x) && (AOP_TYPE(x) == AOP_R1 || \
+                       AOP_TYPE(x) == AOP_R0))
+
+#define AOP_NEEDSACC(x) (AOP(x) && (AOP_TYPE(x) == AOP_CRY ||  \
+                        AOP_TYPE(x) == AOP_DPTR || AOP_TYPE(x) == AOP_DPTR2 || \
+                         AOP(x)->paged)) 
+
+#define AOP_INPREG(x) (x && (x->type == AOP_REG &&                        \
+                      (x->aopu.aop_reg[0] == pic14_regWithIdx(R0_IDX) || \
+                      x->aopu.aop_reg[0] == pic14_regWithIdx(R1_IDX) )))
+
+#define RESULTONSTACK(x) \
+                         (IC_RESULT(x) && IC_RESULT(x)->aop && \
+                         IC_RESULT(x)->aop->type == AOP_STK )
+
+#define MOVA(x) if (strcmp(x,"a") && strcmp(x,"acc")) pic14_emitcode(";XXX mov","a,%s  %s,%d",x,__FILE__,__LINE__);
+#define CLRC    pic14_emitcode(";XXX clr","c %s,%d",__FILE__,__LINE__);
+
+#define BIT_NUMBER(x) (x & 7)
+#define BIT_REGISTER(x) (x>>3)
+
+
+#define LSB     0
+#define MSB16   1
+#define MSB24   2
+#define MSB32   3
+
+
+#define FUNCTION_LABEL_INC  20
+
+/*-----------------------------------------------------------------*/
+/* Macros for emitting skip instructions                           */
+/*-----------------------------------------------------------------*/
+
+#define emitSKPC    emitpcode(POC_BTFSS,popCopyGPR2Bit(&pc_status,PIC_C_BIT))
+#define emitSKPNC   emitpcode(POC_BTFSC,popCopyGPR2Bit(&pc_status,PIC_C_BIT))
+#define emitSKPZ    emitpcode(POC_BTFSS,popCopyGPR2Bit(&pc_status,PIC_Z_BIT))
+#define emitSKPNZ   emitpcode(POC_BTFSC,popCopyGPR2Bit(&pc_status,PIC_Z_BIT))
+#define emitSKPDC   emitpcode(POC_BTFSS,popCopyGPR2Bit(&pc_status,PIC_DC_BIT))
+#define emitSKPNDC  emitpcode(POC_BTFSC,popCopyGPR2Bit(&pc_status,PIC_DC_BIT))
+#define emitCLRZ    emitpcode(POC_BCF,  popCopyGPR2Bit(&pc_status,PIC_Z_BIT))
+#define emitCLRC    emitpcode(POC_BCF,  popCopyGPR2Bit(&pc_status,PIC_C_BIT))
+#define emitCLRDC   emitpcode(POC_BCF,  popCopyGPR2Bit(&pc_status,PIC_DC_BIT))
+#define emitSETZ    emitpcode(POC_BSF,  popCopyGPR2Bit(&pc_status,PIC_Z_BIT))
+#define emitSETC    emitpcode(POC_BSF,  popCopyGPR2Bit(&pc_status,PIC_C_BIT))
+#define emitSETDC   emitpcode(POC_BSF,  popCopyGPR2Bit(&pc_status,PIC_DC_BIT))
+
+int pic14_getDataSize(operand *op);
+void emitpcode(PIC_OPCODE poc, pCodeOp *pcop);
+void pic14_emitcode (char *inst,char *fmt, ...);
+void DEBUGpic14_emitcode (char *inst,char *fmt, ...);
+asmop *newAsmop (short type);
+bool pic14_sameRegs (asmop *aop1, asmop *aop2 );
+char *aopGet (asmop *aop, int offset, bool bit16, bool dname);
+
+
+bool genPlusIncr (iCode *ic);
+void pic14_outBitAcc(operand *result);
+void genPlusBits (iCode *ic);
+void genPlus (iCode *ic);
+bool genMinusDec (iCode *ic);
+void addSign(operand *result, int offset, int sign);
+void genMinusBits (iCode *ic);
+void genMinus (iCode *ic);
+
+
+pCodeOp *popGetLabel(unsigned int key);
+pCodeOp *popCopyReg(pCodeOpReg *pc);
+pCodeOp *popCopyGPR2Bit(pCodeOpReg *pc, int bitval);
+pCodeOp *popGetLit(unsigned int lit);
+pCodeOp *popGetWithString(char *str);
+pCodeOp *popRegFromString(char *str);
+pCodeOp *popGet (asmop *aop, int offset, bool bit16, bool dname);
+
+
+void aopPut (asmop *aop, char *s, int offset);
+void pic14_outAcc(operand *result);
+void aopOp (operand *op, iCode *ic, bool result);
+void pic14_outBitC(operand *result);
+void pic14_toBoolean(operand *oper);
+void freeAsmop (operand *op, asmop *aaop, iCode *ic, bool pop);
+
+
+
 #endif

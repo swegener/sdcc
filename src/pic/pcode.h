@@ -19,7 +19,8 @@
    
 -------------------------------------------------------------------------*/
 
-#include "ralloc.h"
+//#include "ralloc.h"
+struct regs;
 
 /*
    Post code generation
@@ -290,7 +291,7 @@ typedef struct pCodeOpReg
 {
   pCodeOp pcop;    // Can be either GPR or SFR
   int rIdx;        // Index into the register table
-  regs *r;
+  struct regs *r;
   struct pBlock *pb;
 } pCodeOpReg;
 
@@ -580,9 +581,9 @@ extern void pcode_test(void);
  * pCode objects.
  *-----------------------------------------------------------------*/
 
-extern pCodeOp pc_status;
-extern pCodeOp pc_indf;
-extern pCodeOp pc_fsr;
+extern pCodeOpReg pc_status;
+extern pCodeOpReg pc_indf;
+extern pCodeOpReg pc_fsr;
 
 
 ////////////////////   DELETE THIS ///////////////////

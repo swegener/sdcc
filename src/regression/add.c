@@ -133,7 +133,7 @@ void add_bits(void)
 
 #if SUPPORT_BIT_ARITHMETIC
   bit2 = bit1+bit3;
-  if(bit2)
+  if(!bit2)
     failures++;
 
   bit3 = bit4+bit5+bit6+bit7+bit0;

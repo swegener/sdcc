@@ -60,7 +60,9 @@ SRC = b.c \
 	call1.c \
 	compare.c \
 	compare2.c \
+	compare3.c \
 	for.c \
+	struct1.c \
 	sub.c \
 	while.c
 

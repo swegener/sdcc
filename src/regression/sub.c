@@ -153,9 +153,9 @@ void sub_bits(void)
 }
 #endif
 
-/* add_bit2uchar(void) - assumes bit0 = 1, achar0 = 7  */
+/* sub_bit2uchar(void) - assumes bit0 = 1, achar0 = 7  */
 
-void add_bit2uchar(void)
+void sub_bit2uchar(void)
 {
 
   achar0 -= bit0;
@@ -168,14 +168,14 @@ void add_bit2uchar(void)
 
 }
 
-void add_bit2uint(void)
+void sub_bit2uint(void)
 {
 
   if(aint0 != bit11)
     failures++;
 
-  aint0 += bit0;
-  if(aint0!=1)
+  aint0 -= bit0;
+  if(aint0!=0xffff)
     failures++;
 
 }
@@ -198,8 +198,8 @@ void main(void)
 
   achar0 = 7;
   bit0 = 1;
-  add_bit2uchar();
-  //add_bit2uint();
+  sub_bit2uchar();
+  sub_bit2uint();
 #endif
 
 

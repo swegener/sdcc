@@ -7,7 +7,8 @@
 #include "common.h"
 #include "main.h"
 #include "ralloc.h"
-#include "gen.h"
+//#include "gen.h"
+
 
 static char _defaultRules[] =
 {
@@ -42,6 +43,7 @@ static char *_pic14_keywords[] =
   NULL
 };
 
+void  pCodeInitRegisters(void);
 
 void pic14_assignRegisters (eBBlock ** ebbs, int count);
 
@@ -51,6 +53,7 @@ static void
 _pic14_init (void)
 {
   asm_addTree (&asm_asxxxx_mapping);
+  pCodeInitRegisters();
 }
 
 static void

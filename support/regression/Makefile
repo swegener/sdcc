@@ -63,6 +63,9 @@ GENERATE_CASES = generate-cases.py
 # files and how to run the emulator.
 ALL_PORTS = $(filter-out CVS mcs51 gbz80,$(notdir $(wildcard $(PORTS_DIR)/*)))
 
+# These  ports will be cleaned with 'make clean'
+CLEAN_PORTS = $(filter-out CVS,$(notdir $(wildcard $(PORTS_DIR)/*)))                                                                 
+
 all: test-ports
 
 # Test all of the ports
@@ -179,8 +182,10 @@ $(RESULTS): $(SUB_RESULTS)
 
 # BeginGeneric rules
 
-clean:
+clean: inter-port-clean
 	rm -rf $(CASES_DIR) $(RESULTS_DIR) *.pyc
+	for i in $(CLEAN_PORTS); do $(MAKE) -f $(PORTS_DIR)/$$i/spec.mk _clean PORT=$$i; done
 
 inter-port-clean:
-	rm -f  fwk/lib/*.o fwk/lib/*.asm fwk/lib/*.rst fwk/lib/*.lst fwk/lib/*.rel
+	rm -f  fwk/lib/*.o fwk/lib/*.asm fwk/lib/*.rst fwk/lib/*.lst fwk/lib/*.rel \
+               fwk/lib/*.ihx fwk/lib/*.map fwk/lib/*.sym                                                                                 

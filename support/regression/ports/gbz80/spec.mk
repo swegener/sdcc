@@ -28,3 +28,6 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
 	$(EMU) -m $< > $@
 	-grep -n FAIL $@ /dev/null || true
 
+_clean:
+	rm -f ports/$(PORT)/*.lst ports/$(PORT)/*.o ports/$(PORT)/*.sym
+

@@ -36,3 +36,6 @@ fwk/lib/testfwk$(OBJEXT): fwk/lib/testfwk.c
 	$(RRZ80) --maxruntime=3 --mapfile=$(<:.bin=.sym) $< > $@
 	-grep -n FAIL $@ /dev/null || true
 
+_clean:
+	rm -f ports/$(PORT)/*.lst ports/$(PORT)/*.o ports/$(PORT)/*.sym
+

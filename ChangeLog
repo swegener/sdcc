@@ -1,3 +1,18 @@
+2001-10-21  Bernhard Held  <bernhard@bernhardheld.de>
+
+	* support/regression/Makefile: Improved clean
+
+	* support/regression/ports/gbz80/spec.mk: Added clean
+
+	* support/regression/ports/host/spec.mk: Added clean
+
+	* support/regression/ports/z80/spec.mk: Added clean
+
+	* support/regression/ports/mcs51/spec.mk: Added clean, little improvements
+
+	* support/regression/ports/mcs51/timeout.c: little improvements
+
+
 2001-10-16  Bernhard Held  <bernhard@bernhardheld.de>
 
 	* support/regression/port/mcs51/spec.mk: add timeout for uCsim

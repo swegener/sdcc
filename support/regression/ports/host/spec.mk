@@ -17,3 +17,7 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
 
 %$(OBJEXT): %.c fwk/include/*.h
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
+
+_clean:
+	rm -f ports/$(PORT)/support.o
+

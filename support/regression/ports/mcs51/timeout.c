@@ -66,14 +66,6 @@ sigchld_handler (int signum)
   int pid;
   int status;
   int exit_status = 0;
-  struct rlimit rl;
-
-  /* remove limitation for CPU time */
-  if (getrlimit (RLIMIT_CPU, &rl) == 0)
-    {
-      rl.rlim_cur = rl.rlim_max;
-      setrlimit (RLIMIT_CPU, &rl);
-    }
 
   while (1)
     {
@@ -93,6 +85,7 @@ main (int argc, char * const *argv)
 {
   /* if getrlimit() / setrlimit() succeed, then no fork is neeeded */
   int flagNoFork = 0;
+  int old_stderr;
   long timeout;
   pid_t pid_child;
   struct rlimit rl;
@@ -119,18 +112,48 @@ main (int argc, char * const *argv)
     }
 
   if (flagNoFork)
-    /* the CPU-time is limited: simple execvp */
-    return execvp (argv[2], argv + 2);
+    { /* the CPU-time is limited: simple execvp */
+
+      /* s51 prints warnings on stderr:                                  */
+      /* serial input/output interface connected to a non-terminal file. */
+      /* We'll redirect here stderr to stdout, which will be redirected  */
+      /* to /dev/null by the shell. The shell could also redirect stderr */
+      /* to /dev/null, but then this program doesn't have the chance to  */
+      /* output any real error. */
+      old_stderr = dup (STDERR_FILENO);
+      dup2 (STDOUT_FILENO, STDERR_FILENO);
+      /* shouldn't return */
+      execvp (argv[2], argv + 2);
+      /* restore stderr */
+      dup2 (old_stderr, STDERR_FILENO);
+      perror (argv[2]);
+      return 1; /* Error */
+    }
   else
     {
       /* do it the hard way: fork/exec */
       signal (SIGCHLD, sigchld_handler);
       pid_child = fork();
       if (pid_child == 0)
-        return execvp (argv[2], argv + 2);
+        {
+           /* s51 prints warnings on stderr:                                  */
+           /* serial input/output interface connected to a non-terminal file. */
+           /* We'll redirect here stderr to stdout, which will be redirected  */
+           /* to /dev/null by the shell. The shell could also redirect stderr */
+           /* to /dev/null, but then this program doesn't have the chance to  */
+           /* output any real error. */
+           old_stderr = dup (STDERR_FILENO);
+           dup2 (STDOUT_FILENO, STDERR_FILENO);
+           /* shouldn't return */
+           execvp (argv[2], argv + 2);
+           /* restore stderr */
+           dup2 (old_stderr, STDERR_FILENO);
+           perror (argv[2]);
+           return 1; /* Error */
+        }
       else
         {
-	  /* this timeout is hopefully aborted by a SIGCHLD */
+          /* this timeout is hopefully aborted by a SIGCHLD */
           sleep (timeout);
           fprintf (stderr, PROGNAME ": timeout, killing child %s\n", argv[2]);
           kill (pid_child, SIGTERM);

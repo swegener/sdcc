@@ -32,13 +32,28 @@ void external_startup(void) {
   //PSWH &= 0xf0;	/* start interupt system */
 }
 
+#define SIMULATOR 1
+
+#ifdef SIMULATOR
+void putchar(char c) {
+  _asm
+    mov.b r0l, [r7+2]
+    trap #0EH;
+  _endasm;
+}
+void exit_simulator(void) {
+  _asm
+    trap #0FH;
+  _endasm;
+}
+#else
 void putchar(char c) {
   while(!TI0) 
     ;
   S0BUF = c;
   TI0 = 0;
 }
-
+#endif
 
 char getchar(void) {
   char	c;
@@ -61,5 +76,10 @@ int kbhit(void) {
 }
 
 void main(void) {
+  putchar('1');
+  putchar('2');
+  putchar('3');
+  putchar('\n');
   puts ("Hello world.\n\r");
+  exit_simulator();
 }

@@ -4762,7 +4762,7 @@ void genAVRCode (iCode *lic)
       if ( options.debug ) {
         _G.debugLine = 1;
         emitcode("","C$%s$%d$%d$%d ==.",
-           ic->filename,ic->lineno,
+           FileBaseName(ic->filename),ic->lineno,
            ic->level,ic->block);
         _G.debugLine = 0;
       }

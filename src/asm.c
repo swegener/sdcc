@@ -15,6 +15,20 @@
 
 static hTab *_h;
 
+char * FileBaseName(char * fileFullName)
+{
+	char * p = fileFullName;
+
+	while (*fileFullName) {
+		if((*fileFullName=='/')||(*fileFullName=='\\')||(*fileFullName==':')) {
+			p = fileFullName;
+			p++;
+		}
+		fileFullName++;
+	}
+	return p;
+}
+
 static const char *_findMapping(const char *szKey)
 {
     return shash_find(_h, szKey);

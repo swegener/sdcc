@@ -191,6 +191,8 @@ extern PORT avr_port;
 #endif
 #if !OPT_DISABLE_DS390
 extern PORT ds390_port;
+#else
+PORT ds390_port;
 #endif
 #if !OPT_DISABLE_PIC
 extern PORT pic14_port;

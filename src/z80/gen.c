@@ -2001,7 +2001,7 @@ static void genEndFunction (iCode *ic)
   if (options.debug && currFunc) {
       debugLine = 1;
       emitcode("","C$%s$%d$%d$%d ==.",
-         ic->filename,currFunc->lastLine,
+         FileBaseName(ic->filename),currFunc->lastLine,
          ic->level,ic->block);
       if (IS_STATIC(currFunc->etype))
     emitcode("","XF%s$%s$0$0 ==.",moduleName,currFunc->name);
@@ -4711,7 +4711,7 @@ void genZ80Code (iCode *lic)
       if ( options.debug ) {
     debugLine = 1;
     emitcode("","C$%s$%d$%d$%d ==.",
-       ic->filename,ic->lineno,
+       FileBaseName(ic->filename),ic->lineno,
        ic->level,ic->block);
     debugLine = 0;
       }

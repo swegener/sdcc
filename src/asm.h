@@ -27,4 +27,6 @@ extern const ASM_MAPPINGS asm_asxxxx_mapping;
  */
 void asm_addTree(const ASM_MAPPINGS *pMappings);
 
+char * FileBaseName(char * fileFullName);
+
 #endif

@@ -277,7 +277,7 @@ set *unionSetsWith (set *list1 , set *list2, int (*cFunc)(),int throw)
     /* now for all those in list2 which does not */
     /* already exist in the list add             */
     for (lp = list2 ; lp ; lp = lp->next )
-  if (!isinSetWith(un,lp->item,cFunc))
+  if (!isinSetWith(un,lp->item,(int(*)(void*,void*))cFunc))
       addSet (&un,lp->item);
 
     switch (throw) {

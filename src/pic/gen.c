@@ -2406,7 +2406,7 @@ static void genEndFunction (iCode *ic)
   if (currFunc) {
       _G.debugLine = 1;
       emitcode(";","C$%s$%d$%d$%d ==.",
-         ic->filename,currFunc->lastLine,
+         FileBaseName(ic->filename),currFunc->lastLine,
          ic->level,ic->block);
       if (IS_STATIC(currFunc->etype))
     emitcode(";","XF%s$%s$0$0 ==.",moduleName,currFunc->name);
@@ -2440,7 +2440,7 @@ static void genEndFunction (iCode *ic)
   if (currFunc) {
       _G.debugLine = 1;
       emitcode(";","C$%s$%d$%d$%d ==.",
-         ic->filename,currFunc->lastLine,
+         FileBaseName(ic->filename),currFunc->lastLine,
          ic->level,ic->block);
       if (IS_STATIC(currFunc->etype))
     emitcode(";","XF%s$%s$0$0 ==.",moduleName,currFunc->name);
@@ -8486,7 +8486,7 @@ void genpic14Code (iCode *lic)
       if ( options.debug ) {
     _G.debugLine = 1;
     emitcode("",";C$%s$%d$%d$%d ==.",
-       ic->filename,ic->lineno,
+       FileBaseName(ic->filename),ic->lineno,
        ic->level,ic->block);
     _G.debugLine = 0;
       }

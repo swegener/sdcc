@@ -38,6 +38,11 @@ char	*rp;		/*	pointer into the LST file
 char	rb[NINPUT];	/*	LST file text line being
 			 *	address relocated
 			 */
+
+char sdccopt[NINPUT]="";
+char sdccopt_module[NINPUT]="";
+char curr_module[NINPUT]="";
+
 int	oflag;		/*	Output file type flag
 			 */
 int	mflag;		/*	Map output flag

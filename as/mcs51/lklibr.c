@@ -128,16 +128,16 @@ addlib()
 
 	if (lbphead == NULL)
     {
-		foundcount+=addfile(NULL,ip);
+		foundcount=addfile(NULL, ip);
 	}
     else
     {
 	    for (lbph=lbphead; lbph; lbph=lbph->next)
         {
-		    foundcount+=addfile(lbph->path,ip);
+		    foundcount+=addfile(lbph->path, ip);
 	    }
     }
-    if(foundcount==0)
+    if(foundcount == 0)
     {
         printf("?ASlink-Warning-Couldn't find library '%s'\n", ip);
     }
@@ -238,7 +238,7 @@ int addfile(char * path, char * libfil)
 
     if(path==NULL)
     {
-        /*'path' can not be null since it is needed to find the '.o' files associated with
+        /*'path' can not be null since it is needed to find the '.rel' files associated with
         the library.  So, get 'path' from 'str' and then chop it off and recreate 'libfil'.
         That way putting 'path' and 'libfil' together will result into the original filepath
         as contained in 'str'.*/

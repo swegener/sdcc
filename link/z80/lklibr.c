@@ -177,16 +177,16 @@ addlib()
 
 	if (lbphead == NULL)
     {
-		foundcount+=addfile(NULL, ip);
+		foundcount=addfile(NULL, ip);
 	}
     else
     {
 	    for (lbph=lbphead; lbph; lbph=lbph->next)
         {
-		    foundcount+=addfile(lbph->path,ip);
+		    foundcount+=addfile(lbph->path, ip);
 	    }
     }
-    if(foundcount==0)
+    if(foundcount == 0)
     {
         printf("\n?ASlink-Warning-Couldn't find library '%s'", ip);
     }

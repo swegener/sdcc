@@ -327,7 +327,8 @@ struct	sym
 #define	S_ORG		24	/* .org */
 #define	S_MODUL		25	/* .module */
 #define	S_ASCIS		26	/* .ascis */
-#define	S_FLAT24	27      /* .flat24 */
+#define	S_FLAT24	27  /* .flat24 */
+#define	S_OPTSDCC	28  /* .optsdcc */
 
 
 /*
@@ -478,6 +479,8 @@ extern	char	tb[NTITL];	/*	Title string buffer
 				 */
 extern	char	stb[NSBTL];	/*	Subtitle string buffer
 				 */
+extern  char	optsdcc[NINPUT];	/*	sdcc compile options 
+			 */
 extern 	int	flat24Mode;	/* 	non-zero if we are using DS390 24 bit 
 			 	 *	flat mode (via .flat24 directive). 
 			 	 */

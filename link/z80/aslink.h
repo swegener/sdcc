@@ -452,6 +452,10 @@ extern	char	ctype[];	/*	array of character types, one per
 				 *	ASCII character
 				 */
 
+extern char sdccopt[NINPUT];
+extern char sdccopt_module[NINPUT];
+extern char curr_module[NINPUT];
+
 /*
  *	Character Type Definitions
  */

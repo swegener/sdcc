@@ -488,6 +488,29 @@ link()
 	if ((c=endline()) == 0) { return; }
 	switch (c) {
 
+    case 'O': /*For some important sdcc options*/
+        if (pass == 0)
+        {
+            if(strlen(sdccopt)==0)
+            {
+                strcpy(sdccopt, &ip[1]);
+                strcpy(sdccopt_module, curr_module);
+            }
+            else
+            {
+                if(strcmp(sdccopt, &ip[1])!=0)
+                {
+				    fprintf(stderr,
+				    "?ASlink-Warning-Conflicting sdcc options:\n"
+                    "   \"%s\" in module \"%s\" and\n"
+                    "   \"%s\" in module \"%s\".\n",
+                    sdccopt, sdccopt_module, &ip[1], curr_module);
+				    lkerr++;
+                }
+            }
+        }
+		break;
+
 	case 'X':
 		radix = 16;
 		break;
@@ -517,7 +540,10 @@ link()
 
 	case 'M':
 		if (pass == 0)
+        {
+            strcpy(curr_module, &ip[1]);
 			module();
+        }
 		break;
 
 	case 'A':

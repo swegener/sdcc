@@ -850,6 +850,19 @@ loop:
 		lmode = SLIST;
 		break;
 
+    case S_OPTSDCC:
+		p = optsdcc;
+		if ((c = getnb()) != 0) {
+			do {
+				if (p < &tb[NINPUT-1])
+					*p++ = c;
+			} while ((c = get()) != 0);
+		}
+		*p = 0;
+		unget(c);
+		lmode = SLIST;
+        break;
+
 	case S_GLOBL:
 		do {
 			getid(id, -1);

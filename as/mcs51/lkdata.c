@@ -42,6 +42,11 @@ char	*rp;		/*	pointer into the LST file
 char	rb[NINPUT];	/*	LST file text line being
 			 *	address relocated
 			 */
+
+char sdccopt[NINPUT]="";
+char sdccopt_module[NINPUT]="";
+char curr_module[NINPUT]="";
+
 int     dflag;          /*      Debug information output flag
 			 */
 int	oflag;		/*	Output file type flag

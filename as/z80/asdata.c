@@ -121,6 +121,8 @@ char	tb[NTITL];	/*	Title string buffer
 			 */
 char	stb[NSBTL];	/*	Subtitle string buffer
 			 */
+char	optsdcc[NINPUT];	/*	sdcc compile options 
+			 */
 
 char	symtbl[] = { "Symbol Table" };
 char	aretbl[] = { "Area Table" };

@@ -56,6 +56,7 @@ struct	mne	mne[] = {
     { NULL,	".org",		S_ORG,		0,	0 },
     { NULL,	".module",	S_MODUL,	0,	0 },
     { NULL,	".ascis",	S_ASCIS,	0,	0 },
+    { NULL, ".optsdcc",	S_OPTSDCC,	0,	0},
 
 	/* z80 / hd64180 */
 

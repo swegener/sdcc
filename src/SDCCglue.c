@@ -1572,6 +1572,33 @@ glue (void)
   /* print module name */
   tfprintf (asmFile, "\t!module\n",
     spacesToUnderscores (moduleBuf, moduleName, sizeof moduleBuf));
+  if(mcs51_like)
+  {
+    fprintf (asmFile, "\t.optsdcc -m%s", port->target);
+
+    switch(options.model)
+    {
+        case MODEL_SMALL:   fprintf (asmFile, " --model-small");   break;
+        case MODEL_COMPACT: fprintf (asmFile, " --model-compact"); break;
+        case MODEL_MEDIUM:  fprintf (asmFile, " --model-medium");  break;
+        case MODEL_LARGE:   fprintf (asmFile, " --model-large");   break;
+        case MODEL_FLAT24:  fprintf (asmFile, " --model-flat24");  break;
+        case MODEL_PAGE0:   fprintf (asmFile, " --model-page0");   break;
+        default: break;
+    }
+    if(options.stackAuto)      fprintf (asmFile, " --stack-auto");
+    if(options.useXstack)      fprintf (asmFile, " --xstack");
+    if(options.intlong_rent)   fprintf (asmFile, " --int-long-rent");
+    if(options.float_rent)     fprintf (asmFile, " --float-rent");
+    if(options.noRegParams)    fprintf (asmFile, " --no-reg-params");
+    if(options.parms_in_bank1) fprintf (asmFile, " --parms-in-bank1");
+    fprintf (asmFile, "\n");
+  }
+  else if(TARGET_IS_Z80 || TARGET_IS_GBZ80 )
+  {
+    fprintf (asmFile, "\t.optsdcc -m%s\n", port->target);
+  }
+
   tfprintf (asmFile, "\t!fileprelude\n");
 
   /* Let the port generate any global directives, etc. */

@@ -1,3 +1,29 @@
+2003-07-29  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+    Linker now complaints if linked modules have conflicting options, for
+    example, one compiled using --model-large and another one compiled with
+    --model-small.  The following files were modified:
+
+    * as\mcs51\asdata.c
+    * as\mcs51\aslink.h
+    * as\mcs51\asm.h
+    * as\mcs51\asmain.c
+    * as\mcs51\asout.c
+    * as\mcs51\i51pst.c
+    * as\mcs51\lkdata.c
+    * as\mcs51\lklibr.c
+    * as\mcs51\lkmain.c
+    * as\z80\asdata.c
+    * as\z80\asm.h
+    * as\z80\asmain.c
+    * as\z80\asout.c
+    * as\z80\z80pst.c
+    * link\z80\aslink.h
+    * link\z80\lkdata.c
+    * link\z80\lklibr.c
+    * link\z80\lkmain.c
+    * src\SDCCglue.c 
+
 2003-07-28  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
     *link/z80/aslink.h, link/z80/lklibr.c, as/mcs51/aslink.h,

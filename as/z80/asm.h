@@ -272,6 +272,7 @@ struct	sym
 #ifdef SDK
 # define S_FLOAT        27      /* .df */
 #endif
+#define	S_OPTSDCC	28  /* .optsdcc */
 
 /*
  *	The tsym structure is a linked list of temporary
@@ -413,6 +414,8 @@ extern	char	tb[NTITL];	/*	Title string buffer
 				 */
 extern	char	stb[NSBTL];	/*	Subtitle string buffer
 				 */
+extern  char	optsdcc[NINPUT];    /*	sdcc compile options 
+			     */
 extern	char	symtbl[];	/*	string "Symbol Table"
 				 */
 extern	char	aretbl[];	/*	string "Area Table"

@@ -925,6 +925,11 @@ outgsd()
 		putc('\n', ofp);
 	}
 
+    /*
+     * Sdcc compile options
+     */
+	if (strlen(optsdcc)) fprintf(ofp, "O %s\n", optsdcc);
+
 	/*
 	 * Global references and absolutes.
 	 */

@@ -17,11 +17,14 @@ $(PORTS_DIR)/$(PORT)/%.c: $(PORTS_DIR)/mcs51/%.c
 SOURCES = _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
           _decdptr.c _divsint.c _divslong.c _divuint.c \
           _divulong.c _fs2schar.c _fs2sint.c _fs2slong.c \
-          _fs2uchar.c _fs2uint.c _fs2ulong.c _fsadd.c \
-          _fsdiv.c _fseq.c _fsgt.c _fslt.c _fsmul.c \
+          _fs2uchar.c _fs2uint.c _fs2ulong.c \
+          _fsadd.c _fssub.c _fsdiv.c _fsmul.c \
+          _fseq.c _fsneq.c _fsgt.c _fslt.c _fscmp.c \
           fabsf.c sqrtf.c logf.c log10f.c powf.c tanf.c \
           errno.c frexpf.c ldexpf.c tancotf.c \
-          _fsneq.c _fssub.c _gptrget.c _gptrput.c \
+          _fsget1arg.c _fsget2args.c _fsnormalize.c \
+          _fsreturnval.c _fsrshift.c _fsswapargs.c \
+          _gptrget.c _gptrput.c \
           _sint2fs.c _iscntrl.c _isdigit.c _isgraph.c \
           _islower.c _isprint.c _ispunct.c _isspace.c \
           _isupper.c _isxdigit.c _slong2fs.c \

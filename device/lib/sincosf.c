@@ -66,7 +66,7 @@ float sincosf(const float x, const int iscos)
     N=((y*iPI)+0.5); /*y is positive*/
 
     /*If N is odd change sign*/
-    if(N&1) sign=~sign;
+    if(N&1) sign=!sign;
 
     XN=N;
     /*Cosine required? (is done here to keep accuracy)*/

@@ -1,3 +1,9 @@
+2004-12-28 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/sincosf.c (sincosf): don't invert bit/bool by ~
+	* support/regression/ports/mcs51-stack-auto/spec.mk: added new _fs.. files
+	  to the SOURCES
+
 2004-12-28 Paul Stoffregen <paul AT pjrc.com>
 
 	* device/lib/printf_fast_f.c: same as printf_fast, but
@@ -59,7 +65,7 @@
 	* device/lib/printf_tiny.c: printf for mcs51 in only 267 bytes,
 	  and fully reentrant and register bank neutral.
 	* device/lib/printf_fast.c: added float (not enabled by default),
-	  added compact/slower integer (also not enabled by default), 
+	  added compact/slower integer (also not enabled by default),
 	  improved size/speed of fast integer code, other minor changes
 	* device/include/stdio.h, device/lib/Makefile.in,
 	  device/lib/libsdcc.lib: integrate printf_tiny into mcs51 build

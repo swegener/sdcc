@@ -1,22 +1,18 @@
 	.area _CODE
-_putchar::
-	lda	hl,2(sp)
-	ld	l,(hl)
-	ld	a,#0
-	rst	0x00
-	ret
-	
-.if 0
-_putchar::
-	push	ix
-	ld	ix,#0
-	add	ix,sp
+_putchar::       
+_putchar_rr_s:: 
+        ld      hl,#2
+        add     hl,sp
+        
+        ld      l,(hl)
+        ld      a,#1
+        rst     0x08
+        
+        ret
+           
+_putchar_rr_dbs::
+        ld      l,e
+	ld	a,#1
+        rst     0x08
 
-	ld	l,4(ix)
-	ld	a,#0
-	out	(0xff),a
-
-	pop	ix
-	ret
-.endif
-			
+        ret

@@ -45,16 +45,6 @@ __clock::
         rst     0x08
 	ret
 	
-_getsp::
-	ld	hl,#0
-	add	hl,sp
-	ret
-
-__printTStates::	
-	ld	a,#3
-	out	(0xff),a
-	ret
-
 _exit::
 	;; Exit - special code to the emulator
 	ld	a,#0

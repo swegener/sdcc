@@ -1,126 +1,178 @@
 	;; Originally from GBDK by Pascal Felber.
 	.area	_CODE
 
-__divschar::
-	push	bc
-	lda	hl,4(sp)
-	
-	ld	c,(hl)
-	inc	hl
-	ld	e,(hl)
-	call	.div8
+__divschar_rrx_s::       
+        ld      hl,#2+1
+        add     hl,sp
+        
+        ld      e,(hl)
+        dec     hl
+        ld      l,(hl)
+        
+        ;; Fall through
+__divschar_rrx_hds::
+        ld      c,l
+        
+        call    .div8
 
-	ld	e,c
-	pop	bc
+	ld	l,c
+        ld      h,b
+        	
 	ret
 	
-__modschar::
-	push	bc
-	lda	hl,4(sp)
-	ld	c,(hl)
-	inc	hl
-	ld	e,(hl)
-	call	.div8
+__modschar_rrx_s::       
+        ld      hl,#2+1
+        add     hl,sp
+        
+        ld      e,(hl)
+        dec     hl
+        ld      l,(hl)
+        
+        ;; Fall through
+__modschar_rrx_hds::
+        ld      c,l
 
-	;;  Result in e
-	pop	bc
+       	call	.div8
+
+	ld	l,e
+        ld      h,d
+        	
 	ret
 
-__divsint::
-	push	bc
-	lda	hl,4(sp)
-	ld	c,(hl)
-	inc	hl
-	ld	b,(hl)
-	inc	hl
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
+__divsint_rrx_s::        
+        ld      hl,#2+3
+        add     hl,sp
+        
+        ld      d,(hl)
+        dec     hl
+        ld      e,(hl)
+        dec     hl
+        ld      a,(hl)
+        dec     hl
+        ld      l,(hl)
+        ld      h,a
+        
+        ;; Fall through
+__divsint_rrx_hds::
+	ld	b,h
+	ld	c,l
+
 	call	.div16
 
-	ld	e,c
-	ld	d,b
-
-	pop	bc
+	ld	l,c
+	ld	h,b
+	
 	ret
 	
-__modsint::
-	push	bc
-	lda	hl,4(sp)
+__modsint_rrx_s::
+        ld      hl,#2+3
+        add     hl,sp
+        
+        ld      d,(hl)
+        dec     hl
+        ld      e,(hl)
+        dec     hl
+        ld      a,(hl)
+        dec     hl
+        ld      l,(hl)
+        ld      h,a
 
-	ld	c,(hl)
-	inc	hl
-	ld	b,(hl)
-	inc	hl
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
+        ;; Fall through
+__modsint_rrx_hds::
+	ld	b,h
+	ld	c,l
+
 	call	.div16
 
-	;; Result in de
-	pop	bc
+	ld	l,e
+	ld	h,d
+	
 	ret
 
 	;; Unsigned
-__divuchar::	
-	push	bc
-	lda	hl,4(sp)
-	
-	ld	c,(hl)
-	inc	hl
-	ld	e,(hl)
+__divuchar_rrx_s::       
+        ld      hl,#2+1
+        add     hl,sp
+        
+        ld      e,(hl)
+        dec     hl
+        ld      l,(hl)
+        
+        ;; Fall through
+__divuchar_rrx_hds::
+        ld      c,l
 	call	.divu8
 
-	ld	e,c
-	
-	pop	bc
+	ld	l,c
+        ld      h,b
+        
 	ret
 	
-__moduchar::
-	push	bc
-	lda	hl,4(sp)
-	
-	ld	c,(hl)
-	inc	hl
-	ld	e,(hl)
+__moduchar_rrx_s::       
+        ld      hl,#2+1
+        add     hl,sp
+        
+        ld      e,(hl)
+        dec     hl
+        ld      l,(hl)
+        
+        ;; Fall through
+__moduchar_rrx_hds::
+        ld      c,l
 	call	.divu8
 
-	;; Result in e
-	pop	bc
-	ret
+	ld	l,e
+        ld      h,d
 
-__divuint::
-	push	bc
-	lda	hl,4(sp)
-	ld	c,(hl)
-	inc	hl
-	ld	b,(hl)
-	inc	hl
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
+        ret
+
+__divuint_rrx_s::                
+        ld      hl,#2+3
+        add     hl,sp
+        
+        ld      d,(hl)
+        dec     hl
+        ld      e,(hl)
+        dec     hl
+        ld      a,(hl)
+        dec     hl
+        ld      l,(hl)
+        ld      h,a
+
+        ;; Fall through
+__divuint_rrx_hds::
+	ld	b,h
+	ld	c,l
 	call	.divu16
 
-	ld	e,c
-	ld	d,b
+	ld	l,c
+	ld	h,b
 	
-	pop	bc
 	ret
 	
-__moduint::
-	push	bc
-	lda	hl,4(sp)
-	ld	c,(hl)
-	inc	hl
-	ld	b,(hl)
-	inc	hl
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
+__moduint_rrx_s::                
+        ld      hl,#2+3
+        add     hl,sp
+        
+        ld      d,(hl)
+        dec     hl
+        ld      e,(hl)
+        dec     hl
+        ld      a,(hl)
+        dec     hl
+        ld      l,(hl)
+        ld      h,a
+        ;; Fall through
+        
+__moduint_rrx_hds::
+	ld	b,h
+	ld	c,l
+
 	call	.divu16
 
-	;; Result in de
-	pop	bc
+	ld	l,e
+	ld	h,d
+	
 	ret
 	
 .div8::

@@ -1,5 +1,5 @@
-	;; Generic crt0.s for a Z80
-	.globl	__main
+	;; Generic crt0.s for a GBZ80
+	.globl	_main
 
 	.area _HEADER (ABS)
 	;; Reset vector
@@ -31,32 +31,33 @@ init:
 	ld	sp,#0xdfff        
 
 	;; Use _main instead of main to bypass sdcc's intelligence
-	call	__main
+	call	_main
 	jp	_exit
 
 	;; Ordering of segments for the linker.
 	.area	_CODE
+        .area   _GSINIT
+        .area   _GSFINAL
+        
 	.area	_DATA
+        .area   _BSS
 
+        .area   _CODE
 __clock::
 	ld	a,#2
-	rst	0x00
+	rst	0x08
 	ret
 	
-_getsp::
-	ld	hl,#0
-	add	hl,sp
-	ret
-
-__printTStates::	
-	ld	a,#3
-	rst	0x00
-	ret
-		
 _exit::
 	;; Exit - special code to the emulator
-	ld	a,#1
-	rst	0x00
+	ld	a,#0
+	rst	0x08
 1$:
 	halt
 	jr	1$
+
+        .area   _GSINIT
+gsinit::	
+
+        .area   _GSFINAL
+        ret

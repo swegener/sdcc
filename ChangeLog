@@ -1,5 +1,7 @@
 2001-08-30  Michael Hope  <michaelh@juju.net.nz>
 
+	* device/lib/gbz80/crt0.s (init): Fixed up support for the gbz80 such that it will at least run (and fail badly) the regression tests.
+
 	* src/z80/gen.c (genPlus): Changed bad long add for gb to a fall through.
 
 2001-08-29  Michael Hope  <michaelh@juju.net.nz>

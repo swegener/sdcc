@@ -61,7 +61,7 @@ GENERATE_CASES = generate-cases.py
 # The port name must be the same as the one used in the SDCC '-mxxx' argument.
 # Each port must have a spec.mk which describes how to build the object
 # files and how to run the emulator.
-ALL_PORTS = $(filter-out CVS mcs51,$(notdir $(wildcard $(PORTS_DIR)/*)))
+ALL_PORTS = $(filter-out CVS mcs51 gbz80,$(notdir $(wildcard $(PORTS_DIR)/*)))
 
 all: test-ports
 
@@ -72,6 +72,10 @@ test-ports:
 # Helper rule for testing the z80 port only
 test-z80:
 	$(MAKE) inter-port-clean test-port PORT=z80
+
+# Helper rule for testing the z80 port only
+test-gbz80:
+	$(MAKE) inter-port-clean test-port PORT=gbz80
 
 # Helper rule for testing the mcs51 small model port only
 test-mcs51:

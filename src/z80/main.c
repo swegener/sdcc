@@ -28,6 +28,8 @@ ASM_TYPE;
 static struct
   {
     ASM_TYPE asmType;
+    /* determine if we can register a parameter */    
+    int regParams;
   }
 _G;
 
@@ -57,12 +59,10 @@ _gbz80_init (void)
   z80_opts.sub = SUB_GBZ80;
 }
 
-static int regParmFlg = 0;	/* determine if we can register a parameter */
-
 static void
 _reset_regparm ()
 {
-  regParmFlg = 0;
+  _G.regParams = 0;
 }
 
 static int
@@ -74,13 +74,13 @@ _reg_parm (sym_link * l)
     }
   else 
     {
-      if (regParmFlg == 2)
+      if (_G.regParams == 2)
         {
           return FALSE;
         }
       else
         {
-          regParmFlg++;
+          _G.regParams++;
           return TRUE;
         }
     }
@@ -276,7 +276,15 @@ _setDefaultOptions (void)
   options.noRegParams = 1;
   /* Default code and data locations. */
   options.code_loc = 0x200;
-  options.data_loc = 0x8000;
+
+  if (IS_GB) 
+    {
+      options.data_loc = 0xC000;
+    }
+  else
+    {
+      options.data_loc = 0x8000;
+    }
 
   optimize.global_cse = 1;
   optimize.label1 = 1;
@@ -312,17 +320,10 @@ _mangleSupportFunctionName(char *original)
 {
   char buffer[128];
 
-  if (TARGET_IS_Z80) 
-    {
-      sprintf(buffer, "%s_rr%s_%s", original,
-              options.profile ? "f" : "x",
-              options.noRegParams ? "s" : "bds"
-              );
-    }
-  else 
-    {
-      strcpy(buffer, original);
-    }
+  sprintf(buffer, "%s_rr%s_%s", original,
+          options.profile ? "f" : "x",
+          options.noRegParams ? "s" : "bds"
+          );
 
   return gc_strdup(buffer);
 }
@@ -331,7 +332,9 @@ static const char *
 _getRegName (struct regs *reg)
 {
   if (reg)
-    return reg->name;
+    {
+      return reg->name;
+    }
   assert (0);
   return "err";
 }
@@ -342,6 +345,15 @@ _getRegName (struct regs *reg)
     $l is the list of extra options that should be there somewhere...
     MUST be terminated with a NULL.
 */
+static const char *_z80_asmCmd[] =
+{
+    "as-z80", 
+    "-plosgff", 
+    "$1.o", 
+    "$1.asm", 
+    NULL
+};
+
 static const char *_z80_linkCmd[] =
 {
     "link-z80", 
@@ -360,6 +372,33 @@ static const char *_z80_linkCmd[] =
     NULL
 };
 
+static const char *_gbz80_asmCmd[] =
+{
+    "as-gbz80", 
+    "-plosgff", 
+    "$1.o", 
+    "$1.asm", 
+    NULL
+};
+
+static const char *_gbz80_linkCmd[] =
+{
+    "link-z80", 
+    "-n",                       // Don't echo output
+    "-c",                       // Command line input
+    "--",                       // Again, command line input...
+    "-b_CODE=0x200",            // Code starts at 0x200
+    "-b_DATA=0xC000",           // RAM starts at 0xC000
+    "-j",                       // Output a symbol file as well
+    "-k" SDCC_LIB_DIR "/gbz80", // Library path
+    "-lgbz80.lib",              // Library to use
+    "-z",                       // Output Gameboy image
+    "$1.gb",                    // Output to
+    SDCC_LIB_DIR "/gbz80/crt0.o",// Link in crt0 first
+    "$1.o",                     // Actual code
+    NULL
+};
+
 /* sprintf that appends to the string. */
 static void
 _saprintf(char *pinto, const char *format, ...)
@@ -372,20 +411,21 @@ _saprintf(char *pinto, const char *format, ...)
 }
 
 static void
-_z80_link(void)
+_link(const char *portName, const char *portExt, const char *portOutputType)
 {
     int i;
     // PENDING
     char buffer[2048];
 
     sprintf(buffer, 
-            "link-z80 "
+            "link-%s "
             "-n "                       // Don't echo output
             "-c "                       // Command line input
             "-- "                       // Again, command line input...
             "-b_CODE=0x%04X "           // Code starts at 0x200
             "-b_DATA=0x%04X "           // RAM starts at 0x8000
             "-j ",                      // Output a symbol file as well
+            portName,
             options.code_loc,
             options.data_loc
             );
@@ -393,8 +433,9 @@ _z80_link(void)
     // Add the standard lib in.
     if (options.nostdlib == FALSE) {
         _saprintf(buffer,
-                  "-k" SDCC_LIB_DIR "/z80 "   // Library path
-                  "-lz80.lib "                // Library to use
+                  "-k" SDCC_LIB_DIR "/%s "    // Library path
+                  "-l%s.lib ",                // Library to use
+                  portName, portName
                   );
     }
 
@@ -407,14 +448,15 @@ _z80_link(void)
     }
 
     _saprintf(buffer,
-              "-i "                       // Output Intel IHX
-              "%s.ihx ",                  // Output to
-              srcFileName
+              "-%s "                      // Output type
+              "%s.%s ",                   // Output to
+              portOutputType, srcFileName, portExt
               );
 
     if (options.nostdlib == FALSE) {
         _saprintf(buffer, 
-                  SDCC_LIB_DIR "/z80/crt0.o " // Link in crt0 first
+                  SDCC_LIB_DIR "/%s/crt0.o ", // Link in crt0 first
+                  portName
                   );
     }
 
@@ -434,27 +476,17 @@ _z80_link(void)
     }
 }
 
-static const char *_z80_asmCmd[] =
+static void
+_z80_link(void)
 {
-    "as-z80", "-plosgff", "$1.o", "$1.asm", NULL
-};
+  _link("z80", "ihx", "i");
+}
 
-/** $1 is always the basename.
-    $2 is always the output file.
-    $3 varies
-    $l is the list of extra options that should be there somewhere...
-    MUST be terminated with a NULL.
-*/
-static const char *_gbz80_linkCmd[] =
+static void
+_gbz80_link(void)
 {
-    // PENDING
-    "link-gbz80", "-nf", "$1", NULL
-};
-
-static const char *_gbz80_asmCmd[] =
-{
-    "as-gbz80", "-plosgff", "$1.o", "$1.asm", NULL
-};
+  _link("gbz80", "gb", "z");
+}
 
 /* Globals */
 PORT z80_port =
@@ -550,20 +582,20 @@ PORT gbz80_port =
     _gbz80_asmCmd,
     "-plosgff",			/* Options with debug */
     "-plosgff",			/* Options without debug */
-    1,
+    0,
     ".asm"
   },
   {
     _gbz80_linkCmd,
-    NULL,
+    _gbz80_link,
     ".o"
   },
   {
     _gbz80_defaultRules
   },
   {
-	/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
-    1, 1, 2, 4, 2, 2, 2, 1, 4, 4
+    /* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
+    1, 2, 2, 4, 2, 2, 2, 1, 4, 4
   },
   {
     "XSEG",
@@ -602,7 +634,7 @@ PORT gbz80_port =
   _reset_regparm,
   _reg_parm,
   _process_pragma,
-  NULL,
+  _mangleSupportFunctionName,
   TRUE,
   0,				/* leave lt */
   0,				/* leave gt */

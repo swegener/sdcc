@@ -26,7 +26,7 @@
 -------------------------------------------------------------------------*/
 #include <string.h>
 
-void *memccpy (void *dst, void *src, int c, size_t acount) 
+void *memccpy (void *dst, void *src, char c, size_t acount) 
 {
   void *ret = dst;
   char *d = dst;

@@ -1,3 +1,10 @@
+2005-02-14 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic16/libc/string/memccpy.c: changed 3rd argument to char
+	* src/SDCC.lex (process_pragma): fixed to make disable_warning work for PIC16
+	* src/pic16/gen.c (aopForSym, calls to pic16_aopOp): prevent unneccessary
+	  retrievals of result operand's value on assignment
+
 2005-02-13 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* device/include/pic16/string.h: modified prototype for memccpy()

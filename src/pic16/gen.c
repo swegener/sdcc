@@ -702,7 +702,10 @@ static asmop *aopForSym (iCode *ic, operand *op, bool result)
 
 #if 1
 	DEBUGpic16_emitcode(";","%d sym->rname = %s, size = %d stack = %d",__LINE__,sym->rname,aop->size, sym->stack);
-	
+
+	// we do not need to load the value if it is to be defined...
+	if (result) return aop;
+
 	if(_G.accInUse) {
 		pic16_pushpCodeOp( pic16_popCopyReg(&pic16_pc_wreg) );
 	}
@@ -7596,7 +7599,7 @@ static void genAndOp (iCode *ic)
     only those used in arthmetic operations remain */
     pic16_aopOp((left=IC_LEFT(ic)),ic,FALSE);
     pic16_aopOp((right=IC_RIGHT(ic)),ic,FALSE);
-    pic16_aopOp((result=IC_RESULT(ic)),ic,FALSE);
+    pic16_aopOp((result=IC_RESULT(ic)),ic,TRUE);
 
     DEBUGpic16_pic16_AopType(__LINE__,left,right,result);
 
@@ -7645,7 +7648,7 @@ static void genOrOp (iCode *ic)
     only those used in arthmetic operations remain */
     pic16_aopOp((left=IC_LEFT(ic)),ic,FALSE);
     pic16_aopOp((right=IC_RIGHT(ic)),ic,FALSE);
-    pic16_aopOp((result=IC_RESULT(ic)),ic,FALSE);
+    pic16_aopOp((result=IC_RESULT(ic)),ic,TRUE);
 
     DEBUGpic16_pic16_AopType(__LINE__,left,right,result);
 
@@ -8687,7 +8690,7 @@ static void genRRC (iCode *ic)
   left = IC_LEFT(ic);
   result=IC_RESULT(ic);
   pic16_aopOp (left,ic,FALSE);
-  pic16_aopOp (result,ic,FALSE);
+  pic16_aopOp (result,ic,TRUE);
 
   DEBUGpic16_pic16_AopType(__LINE__,left,NULL,result);
 
@@ -8732,7 +8735,7 @@ static void genRLC (iCode *ic)
   left = IC_LEFT(ic);
   result=IC_RESULT(ic);
   pic16_aopOp (left,ic,FALSE);
-  pic16_aopOp (result,ic,FALSE);
+  pic16_aopOp (result,ic,TRUE);
 
   DEBUGpic16_pic16_AopType(__LINE__,left,NULL,result);
 
@@ -9767,7 +9770,7 @@ void pic16_genLeftShiftLiteral (operand *left,
     pic16_freeAsmop(right,NULL,ic,TRUE);
 
     pic16_aopOp(left,ic,FALSE);
-    pic16_aopOp(result,ic,FALSE);
+    pic16_aopOp(result,ic,TRUE);
 
     size = getSize(operandType(result));
 
@@ -10375,7 +10378,7 @@ static void genRightShiftLiteral (operand *left,
   pic16_freeAsmop(right,NULL,ic,TRUE);
 
   pic16_aopOp(left,ic,FALSE);
-  pic16_aopOp(result,ic,FALSE);
+  pic16_aopOp(result,ic,TRUE);
 
   DEBUGpic16_emitcode ("; ***","%s  %d shCount:%d result:%d left:%d",__FUNCTION__,__LINE__,shCount,AOP_SIZE(result),AOP_SIZE(left));
 
@@ -10723,7 +10726,7 @@ static void genGenericShift (iCode *ic, int isShiftLeft) {
 
   pic16_aopOp(right,ic,FALSE);
   pic16_aopOp(left,ic,FALSE);
-  pic16_aopOp(result,ic,FALSE);
+  pic16_aopOp(result,ic,TRUE);
 
   sign = !SPEC_USIGN(operandType (left));
   signedCount = !SPEC_USIGN(operandType (right));
@@ -11030,7 +11033,7 @@ static void genDataPointerGet(operand *left,
   int size, offset = 0, leoffset=0 ;
 
 	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-	pic16_aopOp(result, ic, FALSE);
+	pic16_aopOp(result, ic, TRUE);
 
 	size = AOP_SIZE(result);
 //	fprintf(stderr, "%s:%d size= %d\n", __FILE__, __LINE__, size);
@@ -11139,7 +11142,7 @@ static void genNearPointerGet (operand *left,
     }
     
     DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    pic16_aopOp (result,ic,FALSE);
+    pic16_aopOp (result,ic,TRUE);
     
     DEBUGpic16_pic16_AopType(__LINE__, left, NULL, result);
 
@@ -11278,7 +11281,7 @@ static void genPagedPointerGet (operand *left,
 	rname = pic16_aopGet(AOP(left),0,FALSE,FALSE);
     
     pic16_freeAsmop(left,NULL,ic,TRUE);
-    pic16_aopOp (result,ic,FALSE);
+    pic16_aopOp (result,ic,TRUE);
 
     /* if bitfield then unpack the bits */
     if (IS_BITFIELD(retype)) 
@@ -11356,7 +11359,7 @@ static void genFarPointerGet (operand *left,
     }
     /* so dptr know contains the address */
     pic16_freeAsmop(left,NULL,ic,TRUE);
-    pic16_aopOp(result,ic,FALSE);
+    pic16_aopOp(result,ic,TRUE);
 
     /* if bit then unpack */
     if (IS_BITFIELD(retype)) 
@@ -11508,7 +11511,7 @@ static void genGenPointerGet (operand *left,
 
     DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
     pic16_aopOp(left,ic,FALSE);
-    pic16_aopOp(result,ic,FALSE);
+    pic16_aopOp(result,ic,TRUE);
     size = AOP_SIZE(result);
 
     DEBUGpic16_pic16_AopType(__LINE__,left,NULL,result);

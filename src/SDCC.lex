@@ -692,6 +692,10 @@ static int process_pragma(char *s)
   while ((!isspace(*s)) && (*s != '\n'))
     s++ ;
 
+  /* skip separating whitespace */
+  while (isspace(*s) && (*s != '\n'))
+    s++;
+
   /* First give the port a chance */
   if (port->process_pragma && !port->process_pragma(cp))
     return 0;
@@ -706,7 +710,7 @@ static int process_pragma(char *s)
           if (pragma_tbl[i].deprecated != 0)
             werror(W_DEPRECATED_PRAGMA, pragma_tbl[i].name);
 
-          doPragma(pragma_tbl[i].id, cp + len);
+          doPragma(pragma_tbl[i].id, s);
           return 0;
         }
     }

@@ -1296,6 +1296,7 @@ parseCmdLine (int argc, char **argv)
       else
 	werror (E_FILE_OPEN_ERR, scratchFileName);
     }
+  MSVC_style(options.vc_err_style);
   return 0;
 }
 

@@ -244,4 +244,12 @@ fatal - Output a standard eror message with variable number of arguements and
 
 void    fatal (int exitCode, int errNum, ... ) ;
 
+/*
+-------------------------------------------------------------------------------
+style - Change the output error style to MSVC
+-------------------------------------------------------------------------------
+*/
+
+void    MSVC_style (int style) ;
+
 #endif

@@ -20,8 +20,6 @@
 #include <stdlib.h>
 
 #include "SDCCerr.h"
-#include "../../src/SDCCglobl.h"
-
 
 #define USE_STDOUT_FOR_ERRORS		0
 
@@ -34,6 +32,7 @@
 static struct {
     ERROR_LOG_LEVEL logLevel;
     FILE *out;
+	int style; // 1=MSVC
 } _SDCCERRG;
 
 extern char *filename ;
@@ -434,7 +433,7 @@ void vwerror (int errNum, va_list marker)
             fatalError++ ;
   
         if ( filename && lineno ) {
-			if(options.vc_err_style)
+			if(_SDCCERRG.style)
 				fprintf(_SDCCERRG.out, "%s(%d) : ",filename,lineno);
 			else
 				fprintf(_SDCCERRG.out, "%s:%d: ",filename,lineno);
@@ -497,4 +496,15 @@ void fatal (int exitCode, int errNum, ... )
     va_end( marker );
 
     exit(exitCode);
+}
+
+/*
+-------------------------------------------------------------------------------
+style - Change the output error style to MSVC
+-------------------------------------------------------------------------------
+*/
+
+void    MSVC_style (int style)
+{
+	_SDCCERRG.style=style;
 }

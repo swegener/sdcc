@@ -1617,12 +1617,18 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 
       /* Alternate code */
       if (pdic && IS_ITEMP(IC_RESULT(ic))) {
+	if (POINTER_GET(ic) && (pdic->level < ic->level)) {
+	  /* Mmm, found an equivalent pointer get at a lower level. 
+	     This could be a loop however with the same pointer set 
+	     later on */
+	} else {
 	  /* if previous definition found change this to an assignment */
 	  ic->op = '=';
 	  IC_LEFT(ic) = NULL;
 	  IC_RIGHT(ic) = operandFromOperand(IC_RESULT(pdic));
 	  SET_ISADDR(IC_RESULT(ic),0);
 	  SET_ISADDR(IC_RIGHT (ic),0);	  
+	}
       }
 
       if (!(POINTER_SET (ic)) && IC_RESULT (ic)) {

@@ -49,8 +49,8 @@ static void buildLabelRefCountHash (lineNode * head);
 
 static bool matchLine (char *, char *, hTab **);
 
-#define FBYNAME(x) int x (hTab *vars, lineNode *currPl, lineNode *head, \
-        const char *cmdLine)
+#define FBYNAME(x) int x (hTab *vars, lineNode *currPl, lineNode *endPl, \
+	lineNode *head, const char *cmdLine)
 
 #if !OPT_DISABLE_PIC
 void  peepRules2pCode(peepRule *);
@@ -311,6 +311,41 @@ FBYNAME (labelIsReturnOnly)
   return FALSE;
 }
 
+
+/*-----------------------------------------------------------------*/
+/* okToRemoveSLOC - Check if label %1 is a SLOC and not other      */
+/* usage of it in the code depends on a value from this section    */
+/*-----------------------------------------------------------------*/
+FBYNAME (okToRemoveSLOC)
+{
+  const lineNode *pl;
+  const char *sloc, *p;
+  int dummy1, dummy2, dummy3;
+
+  /* assumes that %1 as the SLOC name */
+  sloc = hTabItemWithKey (vars, 1);
+  if (sloc == NULL) return FALSE;
+  p = strstr(sloc, "sloc");
+  if (p == NULL) return FALSE;
+  p += 4;
+  if (sscanf(p, "%d_%d_%d", &dummy1, &dummy2, &dummy3) != 3) return FALSE;
+  /*TODO: ultra-paranoid: get funtion name from "head" and check that */
+  /* the sloc name begins with that.  Probably not really necessary */
+
+  /* Look for any occurance of this SLOC before the peephole match */
+  for (pl = currPl->prev; pl; pl = pl->prev) {
+	if (pl->line && !pl->isDebug && !pl->isComment
+	  && *pl->line != ';' && strstr(pl->line, sloc))
+		return FALSE;
+  }
+  /* Look for any occurance of this SLOC after the peephole match */
+  for (pl = endPl->next; pl; pl = pl->next) {
+	if (pl->line && !pl->isDebug && !pl->isComment
+	  && *pl->line != ';' && strstr(pl->line, sloc))
+		return FALSE;
+  }
+  return TRUE; /* safe for a peephole to remove it :) */
+}
 
 
 /*-----------------------------------------------------------------*/
@@ -589,12 +624,13 @@ int
 callFuncByName (char *fname,
 		hTab * vars,
 		lineNode * currPl,
+		lineNode * endPl,
 		lineNode * head)
 {
   struct ftab
   {
     char *fname;
-    int (*func) (hTab *, lineNode *, lineNode *, const char *);
+    int (*func) (hTab *, lineNode *, lineNode *, lineNode *, const char *);
   }
   ftab[] =
   {
@@ -649,6 +685,9 @@ callFuncByName (char *fname,
       "labelIsReturnOnly", labelIsReturnOnly
     },
     {
+      "okToRemoveSLOC", okToRemoveSLOC
+    },
+    {
       "24bitModeAndPortDS390", flat24bitModeAndPortDS390
     }
   };
@@ -667,7 +706,7 @@ callFuncByName (char *fname,
     {
 	if (strcmp (ftab[i].fname, funcName) == 0)
 	{
-	    rc = (*ftab[i].func) (vars, currPl, head,
+	    rc = (*ftab[i].func) (vars, currPl, endPl, head,
 				  funcArgs);
 	}
     }
@@ -1117,7 +1156,7 @@ matchRule (lineNode * pl,
       /* if this rule has additional conditions */
       if (pr->cond)
 	{
-	  if (callFuncByName (pr->cond, pr->vars, pl, head))
+	  if (callFuncByName (pr->cond, pr->vars, pl, spl, head))
 	    {
 	      *mtail = spl;
 	      return TRUE;

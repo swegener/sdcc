@@ -2218,7 +2218,11 @@ ast *decorateType (ast *tree)
 	    return tree;
 	}
 	LRVAL(tree) = RRVAL(tree) = 1;
-	COPYTYPE(TTYPE(tree),TETYPE(tree),LTYPE(tree));
+	if (IS_LITERAL(LTYPE(tree)) && !IS_LITERAL(RTYPE(tree))) {	    
+	    COPYTYPE(TTYPE(tree),TETYPE(tree),RTYPE(tree));	
+	} else {
+	    COPYTYPE(TTYPE(tree),TETYPE(tree),LTYPE(tree));
+	}
 	return tree ;
         
 	/*------------------------------------------------------------------*/

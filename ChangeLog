@@ -1,4 +1,5 @@
 2004-08-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
 	* src/z80/main.c: enabled "critical" keyword
 	* src/z80/mappings.i,
 	* src/z80/gen.c (genFunction, genEndFunction): support for interrupt

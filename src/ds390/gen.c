@@ -110,7 +110,8 @@ static void saveRBank (int, iCode *, bool);
                          IC_RESULT(x)->aop->type == AOP_STK )
 
 /* #define MOVA(x) if (strcmp(x,"a") && strcmp(x,"acc")) emitcode("mov","a,%s",x); */
-#define MOVA(x) { char *_mova_tmp = strdup(x); \
+#define MOVA(x) { \
+    	         char *_mova_tmp = strdup(x); \
                  if (strcmp(_mova_tmp,"a") && strcmp(_mova_tmp,"acc")) \
                  { \
                     emitcode("mov","a,%s",_mova_tmp); \
@@ -1081,6 +1082,9 @@ dealloc:
     }
 }
 
+#define DEFAULT_ACC_WARNING 0
+static int saveAccWarn = DEFAULT_ACC_WARNING;
+
 /*-------------------------------------------------------------------*/
 /* aopGet - for fetching value of the aop                            */
 /*                    						     */
@@ -1141,11 +1145,18 @@ aopGet (asmop *aop,
       if (aop->type == AOP_DPTR2)
 	{
 	  genSetDPTR (1);
-	  if (saveAcc)
+	}
+	
+      if (saveAcc)
+	{
+	    TR_AP("#1");
+	    if (aop->type != AOP_DPTR2)
 	    {
-		    TR_AP("#1");
-		    emitcode ("xch", "a, %s", saveAcc);
+		if (saveAccWarn) { fprintf(stderr, "saveAcc for DPTR...\n"); }
+		emitcode(";", "spanky: saveAcc for DPTR");
 	    }
+	    
+	    emitcode ("xch", "a, %s", saveAcc);
 	}
 
       _flushLazyDPS ();
@@ -1176,12 +1187,18 @@ aopGet (asmop *aop,
       if (aop->type == AOP_DPTR2)
 	{
 	  genSetDPTR (0);
-	  if (saveAcc)
-	    {
+	}
+	
+	if (saveAcc)
+	{
        TR_AP("#2");
 	      emitcode ("xch", "a, %s", saveAcc);
+	      if (strcmp(saveAcc, "_ap"))
+	      {
+		  emitcode(";", "spiffy: non _ap return from aopGet.");
+	      }
+		  
 	      return saveAcc;
-	    }
 	}
       return (dname ? "acc" : "a");
 
@@ -1732,8 +1749,11 @@ toBoolean (operand * oper)
   if (AOP_NEEDSACC (oper) && size)
     {
       usedB = TRUE;
-      emitcode ("push", "b");
-      MOVB (aopGet (AOP (oper), 0, FALSE, FALSE, "b"));
+      if (_G.bInUse)
+      {
+	  emitcode ("push", "b");
+      }
+      MOVB (aopGet (AOP (oper), 0, FALSE, FALSE, NULL));
     }
   else
     {
@@ -1758,7 +1778,11 @@ toBoolean (operand * oper)
   if (usedB)
     {
       emitcode ("mov", "a,b");
-      emitcode ("pop", "b");
+      if (_G.bInUse)
+      {
+	  emitcode ("pop", "b");
+      }
+	
     }
 }
 
@@ -5406,36 +5430,28 @@ genCmp (operand * left, operand * right,
 	  CLRC;
 	  while (size--)
 	    {
-	      //emitcode (";", "genCmp #1: %d/%d/%d", size, sign, offset);
+	      // emitcode (";", "genCmp #1: %d/%d/%d", size, sign, offset);
 	      MOVA (aopGet (AOP (left), offset, FALSE, FALSE, NULL));
-	      //emitcode (";", "genCmp #2");
+	      // emitcode (";", "genCmp #2");
 	      if (sign && (size == 0))
 		{
-		    //emitcode (";", "genCmp #3");
+		  // emitcode (";", "genCmp #3");
 		  emitcode ("xrl", "a,#!constbyte",0x80);
 		  if (AOP_TYPE (right) == AOP_LIT)
 		    {
 		      unsigned long lit = (unsigned long)
 		      floatFromVal (AOP (right)->aopu.aop_lit);
-		      //emitcode (";", "genCmp #3.1");
+		      // emitcode (";", "genCmp #3.1");
 		      emitcode ("subb", "a,#!constbyte",
 				0x80 ^ (unsigned int) ((lit >> (offset * 8)) & 0x0FFL));
 		    }
 		  else
 		    {
-		      //emitcode (";", "genCmp #3.2");
-		      if (AOP_NEEDSACC (right) && AOP_TYPE(right) != AOP_DPTR2)
-			{
-			  emitcode ("push", "acc");
-			}
-			
+		      // emitcode (";", "genCmp #3.2");
+		      saveAccWarn = 0;	
 		      MOVB(aopGet (AOP (right), offset++, FALSE, FALSE, "b"));
+		      saveAccWarn = DEFAULT_ACC_WARNING;
 		      emitcode ("xrl", "b,#!constbyte",0x80);
-			
-		      if (AOP_NEEDSACC (right) && AOP_TYPE(right) != AOP_DPTR2)
-			{
-			  emitcode ("pop", "acc");
-			}
 		      emitcode ("subb", "a,b");
 		    }
 		}
@@ -5443,21 +5459,10 @@ genCmp (operand * left, operand * right,
 		{
 		  const char *s;
 
-		  //emitcode (";", "genCmp #4");
-		  if (AOP_NEEDSACC (right))
-		    {
-		      /* Yuck!! */
-		      //emitcode (";", "genCmp #4.1");
-		      emitcode ("xch", "a, b");
-		      MOVA (aopGet (AOP (right), offset++, FALSE, FALSE, NULL));
-		      emitcode ("xch", "a, b");	
-		      s = "b";
-		    }
-		  else
-		    {
-		      //emitcode (";", "genCmp #4.2");
-		      s = aopGet (AOP (right), offset++, FALSE, FALSE, DP2_RESULT_REG);
-		    }
+		  // emitcode (";", "genCmp #4");
+		  saveAccWarn = 0;
+		  s = aopGet (AOP (right), offset++, FALSE, FALSE, "b");
+		  saveAccWarn = DEFAULT_ACC_WARNING;
 
 		  emitcode ("subb", "a,%s", s);
 		}
@@ -8320,7 +8325,7 @@ genLeftShift (iCode * ic)
       _startLazyDPSEvaluation ();
       while (size--)
 	{
-	  l = aopGet (AOP (left), offset, FALSE, TRUE, DP2_RESULT_REG);
+	  l = aopGet (AOP (left), offset, FALSE, TRUE, NULL);
 	  if (*l == '@' && (IS_AOP_PREG (result)))
 	    {
 

@@ -77,6 +77,10 @@ set *pic16_dynInternalRegs=NULL;
 static hTab  *dynDirectRegNames= NULL;
 //static hTab  *regHash = NULL;    /* a hash table containing ALL registers */
 
+set *pic16_rel_udata=NULL;
+set *pic16_fix_udata=NULL;
+
+
 static int dynrIdx=0x20;
 static int rDirectIdx=0;
 
@@ -436,43 +440,48 @@ static int regname2key(char const *name)
 /*-----------------------------------------------------------------*/
 /* newReg - allocate and init memory for a new register            */
 /*-----------------------------------------------------------------*/
-static regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alias)
+static regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alias, operand *refop)
 {
 
   regs *dReg;
 
-  dReg = Safe_calloc(1,sizeof(regs));
-  dReg->type = type;
-  dReg->pc_type = pc_type;
-  dReg->rIdx = rIdx;
-  if(name) 
-    dReg->name = Safe_strdup(name);
-  else {
-    sprintf(buffer,"r0x%02X", dReg->rIdx);
-    if(type == REG_STK)
-      *buffer = 's';
-    dReg->name = Safe_strdup(buffer);
-  }
-  //fprintf(stderr,"newReg: %s, rIdx = 0x%02x\n",dReg->name,rIdx);
-  dReg->isFree = 0;
-  dReg->wasUsed = 1;
-  if(type == REG_SFR) {
-    dReg->isFixed = 1;
-    dReg->address = rIdx;
-  } else {
-    dReg->isFixed = 0;
-    dReg->address = 0;
-  }
+	dReg = Safe_calloc(1,sizeof(regs));
+	dReg->type = type;
+	dReg->pc_type = pc_type;
+	dReg->rIdx = rIdx;
+	if(name) 
+		dReg->name = Safe_strdup(name);
+	else {
+		sprintf(buffer,"r0x%02X", dReg->rIdx);
+		if(type == REG_STK)
+			*buffer = 's';
+			dReg->name = Safe_strdup(buffer);
+	}
 
-  dReg->isMapped = 0;
-  dReg->isEmitted = 0;
-  dReg->size = size;
-  dReg->alias = alias;
-  dReg->reg_alias = NULL;
-  dReg->reglives.usedpFlows = newSet();
-  dReg->reglives.assignedpFlows = newSet();
+//	fprintf(stderr,"newReg: %s, rIdx = 0x%02x\n",dReg->name,rIdx);
+	dReg->isFree = 0;
+	dReg->wasUsed = 1;
 
-  hTabAddItem(&dynDirectRegNames, regname2key(name), dReg);
+//	dReg->isMapped = 0;
+	dReg->isEmitted = 0;
+	dReg->accessBank = 0;
+
+	if(type == REG_SFR) {
+		dReg->isFixed = 1;
+		dReg->address = rIdx;
+	} else {
+		dReg->isFixed = 0;
+		dReg->address = 0;
+	}
+  	
+	dReg->size = size;
+	dReg->alias = alias;
+	dReg->reg_alias = NULL;
+	dReg->reglives.usedpFlows = newSet();
+	dReg->reglives.assignedpFlows = newSet();
+	dReg->regop = refop;
+  
+	hTabAddItem(&dynDirectRegNames, regname2key(name), dReg);
 
   return dReg;
 }
@@ -525,7 +534,7 @@ void pic16_initStack(int base_address, int size)
   //fprintf(stderr,"initStack");
 
   for(i = 0; i<size; i++)
-    addSet(&pic16_dynStackRegs,newReg(REG_STK, PO_GPR_TEMP,base_address++,NULL,1,0));
+    addSet(&pic16_dynStackRegs,newReg(REG_STK, PO_GPR_TEMP,base_address++,NULL,1,0, NULL));
 }
 
 /*-----------------------------------------------------------------*
@@ -533,11 +542,13 @@ void pic16_initStack(int base_address, int size)
 regs *
 pic16_allocProcessorRegister(int rIdx, char * name, short po_type, int alias)
 {
-  regs * reg = newReg(REG_SFR, po_type, rIdx, name, 1, alias);
+  regs *reg = newReg(REG_SFR, po_type, rIdx, name, 1, alias, NULL);
 
-	if(reg)reg->wasUsed = 0;
-	
-  //fprintf(stderr,"pic16_allocProcessorRegister %s addr =0x%x\n",name,rIdx);
+//	fprintf(stderr,"%s: %s addr =0x%x\n",__FUNCTION__, name,rIdx);
+
+	reg->wasUsed = 0;		// we do not know if they are going to be used at all
+	reg->accessBank = 1;		// implicit add access Bank
+
   return addSet(&pic16_dynProcessorRegs, reg);
 }
 
@@ -547,9 +558,10 @@ pic16_allocProcessorRegister(int rIdx, char * name, short po_type, int alias)
 regs *
 pic16_allocInternalRegister(int rIdx, char * name, short po_type, int alias)
 {
-  regs * reg = newReg(REG_GPR, po_type, rIdx, name,1,alias);
+  regs * reg = newReg(REG_GPR, po_type, rIdx, name,1,alias, NULL);
 
-  //fprintf(stderr,"pic16_allocInternalRegister %s addr =0x%x\n",name,rIdx);
+//  fprintf(stderr,"pic16_allocInternalRegister %s addr =0x%x\n",name,rIdx);
+
   if(reg) {
     reg->wasUsed = 0;
     return addSet(&pic16_dynInternalRegs,reg);
@@ -568,7 +580,7 @@ allocReg (short type)
   //fprintf(stderr,"allocReg\n");
 
 
-  return addSet(&pic16_dynAllocRegs,newReg(REG_GPR, PO_GPR_TEMP,dynrIdx++,NULL,1,0));
+  return addSet(&pic16_dynAllocRegs,newReg(REG_GPR, PO_GPR_TEMP,dynrIdx++,NULL,1,0, NULL));
 
 }
 
@@ -636,11 +648,17 @@ pic16_allocDirReg (operand *op )
   //if (SPEC_ABSA ( OP_SYM_ETYPE(op)) && (*name == '_'))
   //name++;
 
+  /* The above hack is not necessery anymore, since .asm include files are not
+   * used by current implementation of the port -- VR 03-Jan-04 */
+
   debugLog ("%s symbol name %s\n", __FUNCTION__,name);
+//  fprintf(stderr, "%s symbol name %s\n", __FUNCTION__,name);
   {
     if(SPEC_CONST ( OP_SYM_ETYPE(op)) && (IS_CHAR ( OP_SYM_ETYPE(op)) )) {
       debugLog(" %d  const char\n",__LINE__);
       debugLog(" value = %s \n",SPEC_CVAL( OP_SYM_ETYPE(op)));
+//      fprintf(stderr, " %d  const char\n",__LINE__);
+//      fprintf(stderr, " value = %s \n",SPEC_CVAL( OP_SYM_ETYPE(op)));
     }
 
     debugLog("  %d  storage class %d \n",__LINE__,SPEC_SCLS( OP_SYM_ETYPE(op)));
@@ -690,12 +708,12 @@ pic16_allocDirReg (operand *op )
      * a new one and put it in the hash table AND in the 
      * dynDirectRegNames set */
     if(!IS_CONFIG_ADDRESS(address)) {
-      //fprintf(stderr,"allocating new reg %s\n",name);
+      //fprintf(stderr,"%s:allocating new reg %s\n",__FUNCTION__, name);
 
-      reg = newReg(REG_GPR, PO_DIR, rDirectIdx++, name,getSize (OP_SYMBOL (op)->type),0 );
-      debugLog ("  -- added %s to hash, size = %d\n", name,reg->size);
+      reg = newReg(REG_GPR, PO_DIR, rDirectIdx++, name,getSize (OP_SYMBOL (op)->type),0, op);
+      debugLog ("%d  -- added %s to hash, size = %d\n", __LINE__, name,reg->size);
 
-      //hTabAddItem(&dynDirectRegNames, regname2key(name), reg);
+      //hTabAddItem(&dynDirectRegNames, regname2key(name), reg);	/* commented out */
 
       if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
 
@@ -711,7 +729,18 @@ pic16_allocDirReg (operand *op )
 
     } else {
       debugLog ("  -- %s is declared at address 0x30000x\n",name);
+      fprintf(stderr, "  -- %s is declared at address 0x30000x\n",name);
 
+/*
+	fprintf(stderr, "  setting config word to %x\n", 
+		  (int) floatFromVal (op->operand.valOperand));	//IC_RIGHT(ic)->operand.valOperand));
+
+	pic16_assignConfigWordValue(  SPEC_ADDR ( OP_SYM_ETYPE(IC_RESULT(ic))),
+				(int) floatFromVal (IC_RIGHT(ic)->operand.valOperand));
+*/
+
+
+      return NULL;
     }
   }
 
@@ -747,11 +776,12 @@ pic16_allocRegByName (char *name, int size)
      * a new one and put it in the hash table AND in the 
      * dynDirectRegNames set */
     //fprintf (stderr,"%s symbol name %s\n", __FUNCTION__,name);
-    reg = newReg(REG_GPR, PO_DIR, rDirectIdx++, name,size,0 );
+    reg = newReg(REG_GPR, PO_DIR, rDirectIdx++, name,size,0, NULL);
 
-    debugLog ("  -- added %s to hash, size = %d\n", name,reg->size);
+    debugLog ("%d  -- added %s to hash, size = %d\n", __LINE__, name,reg->size);
+    //fprintf(stderr, "  -- added %s to hash, size = %d\n", name,reg->size);
 
-    //hTabAddItem(&dynDirectRegNames, regname2key(name), reg);
+    //hTabAddItem(&dynDirectRegNames, regname2key(name), reg);	/* initially commented out */
     addSet(&pic16_dynDirectRegs, reg);
   }
 
@@ -843,6 +873,7 @@ pic16_allocWithIdx (int idx)
     debugLog ("Found a Stack Register!\n");
   } else if( (dReg = regWithIdx ( pic16_dynProcessorRegs, idx,0)) != NULL ) {
     debugLog ("Found a Processor Register!\n");
+    fprintf(stderr, "Found a processor register! %s\n", dReg->name);
   } else if( (dReg = regWithIdx ( pic16_dynInternalRegs, idx,0)) != NULL ) {
     debugLog ("Found an Internal Register!\n");
   } else {
@@ -874,7 +905,7 @@ pic16_findFreeReg(short type)
   case REG_GPR:
     if((dReg = regFindFree(pic16_dynAllocRegs)) != NULL)
       return dReg;
-    return addSet(&pic16_dynAllocRegs,newReg(REG_GPR, PO_GPR_TEMP,dynrIdx++,NULL,1,0));
+    return addSet(&pic16_dynAllocRegs,newReg(REG_GPR, PO_GPR_TEMP,dynrIdx++,NULL,1,0, NULL));
 
   case REG_STK:
 
@@ -896,8 +927,8 @@ pic16_findFreeReg(short type)
 static void
 freeReg (regs * reg)
 {
-  debugLog ("%s\n", __FUNCTION__);
-  reg->isFree = 1;
+	debugLog ("%s\n", __FUNCTION__);
+	reg->isFree = 1;
 }
 
 
@@ -955,10 +986,10 @@ static void writeSetUsedRegs(FILE *of, set *dRegs)
 }
 #endif
 
-extern void pic16_assignFixedRegisters(set *regset);
-extern void pic16_assignRelocatableRegisters(set *regset,int used);
+extern void pic16_groupRegistersInSection(set *regset);
+
 extern void pic16_dump_map(void);
-extern void pic16_dump_cblock(FILE *of);
+extern void pic16_dump_section(FILE *of, char *sname, set *section, int fix);
 
 
 static void packBits(set *bregs)
@@ -989,7 +1020,7 @@ static void packBits(set *bregs)
       if(!bitfield) {
 	sprintf (buffer, "fbitfield%02x", breg->address);
 	//fprintf(stderr,"new bit field\n");
-	bitfield = newReg(REG_SFR, PO_GPR_BIT,breg->address,buffer,1,0);
+	bitfield = newReg(REG_SFR, PO_GPR_BIT,breg->address,buffer,1,0, NULL);
 	bitfield->isBitField = 1;
 	bitfield->isFixed = 1;
 	bitfield->address = breg->address;
@@ -1008,7 +1039,7 @@ static void packBits(set *bregs)
 	bit_no=0;
 	sprintf (buffer, "bitfield%d", byte_no);
 	//fprintf(stderr,"new relocatable bit field\n");
-	relocbitfield = newReg(REG_GPR, PO_GPR_BIT,rDirectIdx++,buffer,1,0);
+	relocbitfield = newReg(REG_GPR, PO_GPR_BIT,rDirectIdx++,buffer,1,0, NULL);
 	relocbitfield->isBitField = 1;
 	addSet(&pic16_dynDirectRegs,relocbitfield);
 	//hTabAddItem(&dynDirectRegNames, regname2key(buffer), relocbitfield);
@@ -1085,29 +1116,41 @@ static void aliasEQUs(FILE *of, set *fregs, int use_rIdx)
 
 void pic16_writeUsedRegs(FILE *of) 
 {
-  packBits(pic16_dynDirectBitRegs);
+	packBits(pic16_dynDirectBitRegs);
 
+	pic16_groupRegistersInSection(pic16_dynAllocRegs);
+	pic16_groupRegistersInSection(pic16_dynInternalRegs);
+	pic16_groupRegistersInSection(pic16_dynStackRegs);
+	pic16_groupRegistersInSection(pic16_dynDirectRegs);
+	pic16_groupRegistersInSection(pic16_dynDirectBitRegs);
+	pic16_groupRegistersInSection(pic16_dynProcessorRegs);
+	
+	
+#if 0
+	pic16_assignFixedRegisters(pic16_dynAllocRegs);
+	pic16_assignFixedRegisters(pic16_dynStackRegs);
+	pic16_assignFixedRegisters(pic16_dynDirectRegs);
+	pic16_assignFixedRegisters(pic16_dynProcessorRegs);
 
-  pic16_assignFixedRegisters(pic16_dynAllocRegs);
-  pic16_assignFixedRegisters(pic16_dynStackRegs);
-  pic16_assignFixedRegisters(pic16_dynDirectRegs);
-  pic16_assignFixedRegisters(pic16_dynProcessorRegs);
+	pic16_assignRelocatableRegisters(pic16_dynDirectBitRegs, 0);
+	pic16_assignRelocatableRegisters(pic16_dynInternalRegs,0);
+	pic16_assignRelocatableRegisters(pic16_dynAllocRegs,0);
+	pic16_assignRelocatableRegisters(pic16_dynStackRegs,0);
+	pic16_assignRelocatableRegisters(pic16_dynDirectRegs,0);
+#endif
 
-  pic16_assignRelocatableRegisters(pic16_dynInternalRegs,0);
-  pic16_assignRelocatableRegisters(pic16_dynAllocRegs,0);
-  pic16_assignRelocatableRegisters(pic16_dynStackRegs,0);
-  pic16_assignRelocatableRegisters(pic16_dynDirectRegs,0);
+//	pic16_dump_map();
+//	pic16_dump_cblock(of);
 
-	//pic16_dump_map();
-
-  pic16_dump_cblock(of);
+	pic16_dump_section(of, "ud1", pic16_rel_udata, 0);
+	pic16_dump_section(of, "ud2", pic16_fix_udata, 1);
 
 #if 0
-  bitEQUs(of,pic16_dynDirectBitRegs);
-  aliasEQUs(of,pic16_dynAllocRegs,0);
-  aliasEQUs(of,pic16_dynDirectRegs,0);
-  aliasEQUs(of,pic16_dynStackRegs,0);
-  aliasEQUs(of,pic16_dynProcessorRegs,1);
+	bitEQUs(of,pic16_dynDirectBitRegs);
+	aliasEQUs(of,pic16_dynAllocRegs,0);
+	aliasEQUs(of,pic16_dynDirectRegs,0);
+	aliasEQUs(of,pic16_dynStackRegs,0);
+	aliasEQUs(of,pic16_dynProcessorRegs,1);
 #endif
 
 }
@@ -2441,6 +2484,7 @@ regTypeNum ()
        sym = hTabNextItem (liveRanges, &k)) {
 
     debugLog ("  %d - %s\n", __LINE__, sym->rname);
+    //fprintf(stderr,"  %d - %s\n", __LINE__, sym->rname);
 
     /* if used zero times then no registers needed */
     if ((sym->liveTo - sym->liveFrom) == 0)
@@ -2688,8 +2732,8 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 
   iCode *dic, *sic;
 
-  debugLog ("%s\n", __FUNCTION__);
-
+  debugLog ("%d\t%s\n", __LINE__, __FUNCTION__);
+  debugLog ("ic->op = %s\n", decodeOp( ic->op ) );
   debugAopGet ("  result:", IC_RESULT (ic));
   debugAopGet ("  left:", IC_LEFT (ic));
   debugAopGet ("  right:", IC_RIGHT (ic));
@@ -2701,9 +2745,14 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
       if(IS_VALOP(IC_RIGHT(ic))) {
 	debugLog ("  setting config word to %x\n", 
 		  (int) floatFromVal (IC_RIGHT(ic)->operand.valOperand));
+	fprintf(stderr, "  setting config word to %x\n", 
+		  (int) floatFromVal (IC_RIGHT(ic)->operand.valOperand));
 	pic16_assignConfigWordValue(  SPEC_ADDR ( OP_SYM_ETYPE(IC_RESULT(ic))),
 				(int) floatFromVal (IC_RIGHT(ic)->operand.valOperand));
       }
+
+
+ 	debugLog(" %d\n", __LINE__);
 
       /* remove the assignment from the iCode chain. */
 
@@ -2715,23 +2764,28 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 
     }
   }
+	debugLog(" %d - actuall processing\n", __LINE__ );
 
   if (!IS_ITEMP (IC_RESULT (ic))) {
     pic16_allocDirReg(IC_RESULT (ic));
     debugLog ("  %d - result is not temp\n", __LINE__);
   }
-/*
+
+#if 0
   if (IC_LEFT (ic) && !IS_ITEMP (IC_LEFT (ic))) {
     debugLog ("  %d - left is not temp, allocating\n", __LINE__);
     pic16_allocDirReg(IC_LEFT (ic));
   }
-*/
+#endif
 
+/* See BUGLOG0001 - VR */
+#if 1
   if (!IS_ITEMP (IC_RIGHT (ic))) {
     debugLog ("  %d - not packing - right is not temp\n", __LINE__);
     pic16_allocDirReg(IC_RIGHT (ic));
     return 0;
   }
+#endif
 
   if (OP_SYMBOL (IC_RIGHT (ic))->isind ||
       OP_LIVETO (IC_RIGHT (ic)) > ic->seq)
@@ -2770,6 +2824,23 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
       if (SKIP_IC2 (dic))
 	continue;
 
+	debugLog("%d\tSearching for iTempNN\n", __LINE__);
+
+#if 0
+	if(IS_TRUE_SYMOP( IC_RESULT(dic))) {
+		debugLog("%d - dic result is a TRUE_SYMOP\n", __LINE__);
+		debugAopGet(" result is ", IC_RESULT(dic));
+	}
+	if(IS_TRUE_SYMOP( IC_LEFT(dic))) {
+		debugLog("%d - dic left is a SYMOP\n", __LINE__);
+		debugAopGet("   left is ", IC_LEFT(dic));
+	}
+	if(IS_TRUE_SYMOP( IC_RIGHT(dic))) {
+		debugLog("%d - dic right is a SYMOP\n", __LINE__);
+		debugAopGet("  right is ", IC_RIGHT(dic));
+	}
+#endif
+
       if (IS_TRUE_SYMOP (IC_RESULT (dic)) &&
 	  IS_OP_VOLATILE (IC_RESULT (dic)))
 	{
@@ -2777,6 +2848,26 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 	  dic = NULL;
 	  break;
 	}
+
+#if 0
+      if (IS_TRUE_SYMOP( IC_RIGHT (dic)) &&
+      		IS_OP_VOLATILE (IC_RIGHT(dic)))
+      	{
+      	  debugLog ("  %d - dic right is VOLATILE\n", __LINE__);
+      	  dic = NULL;
+      	  break;
+      	}
+#endif
+
+#if 0
+      if (IS_TRUE_SYMOP( IC_LEFT (dic)) &&
+      		IS_OP_VOLATILE (IC_LEFT(dic)))
+      	{
+      	  debugLog ("  %d - dic left is VOLATILE\n", __LINE__);
+      	  dic = NULL;
+      	  break;
+      	}
+#endif
 
       if (IS_SYMOP (IC_RESULT (dic)) &&
 	  IC_RESULT (dic)->key == IC_RIGHT (ic)->key)
@@ -2864,6 +2955,8 @@ pack:
 
   remiCodeFromeBBlock (ebp, ic);
   bitVectUnSetBit(OP_SYMBOL(IC_RESULT(ic))->defs,ic->key);
+
+	debugLog("  %d\n", __LINE__ );
   hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);
   OP_DEFS (IC_RESULT (dic)) = bitVectSetBit (OP_DEFS (IC_RESULT (dic)), dic->key);
   return 1;
@@ -3218,24 +3311,29 @@ packRegsForAccUse (iCode * ic)
        getSize (operandType (IC_RESULT (ic))) > 1))
     return;
 
+  debugLog ("  %s:%d\n", __FUNCTION__,__LINE__);
   if (ic->op == LEFT_OP &&
       (isOperandLiteral (IC_RIGHT (ic)) ||
        getSize (operandType (IC_RESULT (ic))) > 1))
     return;
 
+  debugLog ("  %s:%d\n", __FUNCTION__,__LINE__);
   if (IS_BITWISE_OP (ic) &&
       getSize (operandType (IC_RESULT (ic))) > 1)
     return;
 
 
+  debugLog ("  %s:%d\n", __FUNCTION__,__LINE__);
   /* has only one definition */
   if (bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) > 1)
     return;
 
+  debugLog ("  %s:%d\n", __FUNCTION__,__LINE__);
   /* has only one use */
   if (bitVectnBitsOn (OP_USES (IC_RESULT (ic))) > 1)
     return;
 
+  debugLog ("  %s:%d\n", __FUNCTION__,__LINE__);
   /* and the usage immediately follows this iCode */
   if (!(uic = hTabItemWithKey (iCodehTab,
 			       bitVectFirstBit (OP_USES (IC_RESULT (ic))))))
@@ -3457,6 +3555,7 @@ static void isData(sym_link *sl)
   }
     
 }
+
 /*--------------------------------------------------------------------*/
 /* pic16_packRegisters - does some transformations to reduce          */
 /*                   register pressure                                */
@@ -3480,7 +3579,7 @@ pic16_packRegisters (eBBlock * ebp)
     /* TrueSym := iTempNN:1             */
     for (ic = ebp->sch; ic; ic = ic->next)
       {
-
+//		debugLog("%d\n", __LINE__);
 	/* find assignment of the form TrueSym := iTempNN:1 */
 	/* see BUGLOG0001 for workaround with the CAST - VR */
 	if ((ic->op == '=' || ic->op == CAST) && !POINTER_SET (ic))
@@ -3506,20 +3605,28 @@ pic16_packRegisters (eBBlock * ebp)
     if(IS_SYMOP ( IC_LEFT(ic))) {
       sym_link *etype = getSpec (operandType (IC_LEFT (ic)));
 
-      debugAopGet ("  left:", IC_LEFT (ic));
-#if 0
+      debugAopGet ("x  left:", IC_LEFT (ic));
+#if 1
       if(IS_PTR_CONST(OP_SYMBOL(IC_LEFT(ic))->type))
 #else
       if(IS_CODEPTR(OP_SYMBOL(IC_LEFT(ic))->type))
 #endif
 	debugLog ("    is a pointer\n");
 
+      if(IS_PTR(OP_SYMBOL(IC_LEFT(ic))->type))
+        debugLog ("    is a ptr\n");
+
       if(IS_OP_VOLATILE(IC_LEFT(ic)))
 	debugLog ("    is volatile\n");
 
       isData(etype);
 
-      printSymType("   ", OP_SYMBOL(IC_LEFT(ic))->type);
+	if(IS_OP_VOLATILE(IC_LEFT(ic))) {
+	    debugLog ("  %d - left is not temp, allocating\n", __LINE__);
+	    pic16_allocDirReg(IC_LEFT (ic));
+	}
+
+      printSymType("c  ", OP_SYMBOL(IC_LEFT(ic))->type);
     }
 
     if(IS_SYMOP ( IC_RIGHT(ic))) {
@@ -3600,8 +3707,11 @@ pic16_packRegisters (eBBlock * ebp)
 	debugAopGet ("  left:", IC_LEFT (ic));
       }
 
+	//debugLog("  %d   %s\n", __LINE__, __FUNCTION__);
+
     if (!SKIP_IC2 (ic))
       {
+	//debugLog("  %d   %s\n", __LINE__, __FUNCTION__ );
 	/* if we are using a symbol on the stack
 	   then we should say pic16_ptrRegReq */
 	if (ic->op == IFX && IS_SYMOP (IC_COND (ic)))
@@ -3612,6 +3722,8 @@ pic16_packRegisters (eBBlock * ebp)
 			       OP_SYMBOL (IC_JTCOND (ic))->iaccess) ? 1 : 0);
 	else
 	  {
+
+		//debugLog("   %d   %s\n", __LINE__, __FUNCTION__ );
 	    if (IS_SYMOP (IC_LEFT (ic)))
 	      pic16_ptrRegReq += ((OP_SYMBOL (IC_LEFT (ic))->onStack ||
 				   OP_SYMBOL (IC_LEFT (ic))->iaccess) ? 1 : 0);
@@ -3644,6 +3756,8 @@ pic16_packRegisters (eBBlock * ebp)
 	OP_SYMBOL (IC_RESULT (ic))->regType = REG_CND;
 	continue;
       }
+
+	debugLog(" %d\n", __LINE__);
 
     /* reduce for support function calls */
     if (ic->supportRtn || ic->op == '+' || ic->op == '-')
@@ -3679,7 +3793,7 @@ pic16_packRegisters (eBBlock * ebp)
 	getSize (aggrToPtr (operandType (IC_LEFT (ic)), FALSE)) > 1)
 
       packRegsForOneuse (ic, IC_LEFT (ic), ebp);
-
+      debugLog("%d - return from packRegsForOneuse\n", __LINE__);
 
     /* if this is cast for intergral promotion then
        check if only use of  the definition of the 
@@ -3701,6 +3815,7 @@ pic16_packRegisters (eBBlock * ebp)
 	if (dic) {
 		
 	  if (IS_ARITHMETIC_OP (dic)) {
+		    debugLog("   %d   %s\n", __LINE__, __FUNCTION__ );
 		    
 	    bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
 	    IC_RESULT (dic) = IC_RESULT (ic);
@@ -3722,7 +3837,9 @@ pic16_packRegisters (eBBlock * ebp)
 		
 	  iCode *dic = packRegsForOneuse (ic, IC_RIGHT (ic), ebp);
 	  if (dic) {
-		    
+
+		   debugLog(" %d\n", __LINE__);
+
 	    bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
 	    IC_RESULT (dic) = IC_RESULT (ic);
 	    bitVectUnSetBit(OP_SYMBOL(IC_RESULT(ic))->defs,ic->key);
@@ -3845,6 +3962,7 @@ pic16_assignRegisters (eBBlock ** ebbs, int count)
 
     while(reg) {
       debugLog("  -- #%d reg = %s  key %d, rIdx = %d, size %d\n",i++,reg->name,hkey, reg->rIdx,reg->size);
+//      fprintf(stderr, "  -- #%d reg = %s  key %d, rIdx = %d, size %d\n",i++,reg->name,hkey, reg->rIdx,reg->size);
       reg = hTabNextItem(dynDirectRegNames, &hkey);
     }
 

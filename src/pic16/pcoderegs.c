@@ -321,7 +321,7 @@ static void  RemoveRegsFromSet(set *regset)
 	pc = setFirstItem(reg->reglives.usedpCodes);
 
 	if(reg->type == REG_SFR) {
-	  //fprintf(stderr, "not removing SFR reg %s even though used only once\n",reg->name);
+		fprintf(stderr, "not removing SFR reg %s even though used only once\n",reg->name);
 	  continue;
 	}
 
@@ -660,10 +660,10 @@ static void OptimizeRegUsage(set *fregs, int optimize_multi_uses, int optimize_l
     reg = fregs->item;
     fregs = fregs->next;
 
-    if(reg->type == REG_SFR) {
-      //fprintf(stderr,"skipping SFR: %s\n",reg->name);
-      continue;
-    }
+	if(reg->type == REG_SFR) {
+//		fprintf(stderr,"skipping SFR: %s\n",reg->name);
+		continue;
+	}
 
     pcfl_used = setFirstItem(reg->reglives.usedpFlows);
     pcfl_assigned = setFirstItem(reg->reglives.assignedpFlows);
@@ -723,7 +723,7 @@ static void OptimizeRegUsage(set *fregs, int optimize_multi_uses, int optimize_l
       if(used && !pcfl_used && pcfl_assigned) {
 	pCode *pc;
 
-	//fprintf(stderr,"WARNING %s: reg %s assigned without being used\n",__FUNCTION__,reg->name);
+//		fprintf(stderr,"WARNING %s: reg %s assigned without being used\n",__FUNCTION__,reg->name);
 
 	pc = setFirstItem(reg->reglives.usedpCodes);
 	while(pc) {

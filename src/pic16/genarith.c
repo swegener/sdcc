@@ -180,8 +180,8 @@ bool pic16_genPlusIncr (iCode *ic)
     
     DEBUGpic16_emitcode ("; ","%s  %d",__FUNCTION__,__LINE__);
     /* if the literal value of the right hand side
-       is greater than 1 then it is faster to add */
-    if ((icount = (unsigned int) floatFromVal (AOP(IC_RIGHT(ic))->aopu.aop_lit)) > 1)		// this was > 2 why? VR
+       is greater than 2 then it is faster to add */
+    if ((icount = (unsigned int) floatFromVal (AOP(IC_RIGHT(ic))->aopu.aop_lit)) > 2)
         return FALSE ;
     
     /* if increment 16 bits in register */
@@ -226,7 +226,6 @@ bool pic16_genPlusIncr (iCode *ic)
 
       return TRUE;
     }
-
 
 
     /* if the sizes are greater than 1 then we cannot */

@@ -27,6 +27,8 @@
 #include "ralloc.h"
 #include "pcode.h"
 #include "newalloc.h"
+#include "device.h"
+#include "main.h"
 
 
 #ifdef WORDS_BIGENDIAN
@@ -41,6 +43,7 @@ extern symbol *interrupts[256];
 static void printIval (symbol * sym, sym_link * type, initList * ilist, pBlock *pb);
 extern int noAlloc;
 extern set *publics;
+extern set *externs;
 extern unsigned maxInterrupts;
 extern int maxRegBank;
 extern symbol *mainf;
@@ -65,6 +68,10 @@ extern void printPublics (FILE * afile);
 
 extern void printChar (FILE * ofile, char *s, int plen);
 void  pic16_pCodeInitRegisters(void);
+pCodeOp *pic16_popGetLit(unsigned int lit);
+pCodeOp *pic16_popGetLit2(unsigned int lit, unsigned int lit2);
+pCodeOp *pic16_popCopyReg(pCodeOpReg *pc);
+pCodeOp *pic16_popCombine2(pCodeOpReg *src, pCodeOpReg *dst);
 
 /*-----------------------------------------------------------------*/
 /* aopLiteral - string from a literal value                        */
@@ -94,7 +101,6 @@ int pic16aopLiteral (value *val, int offset)
 
 }
 
-
 /*-----------------------------------------------------------------*/
 /* emitRegularMap - emit code for maps with no special cases       */
 /*-----------------------------------------------------------------*/
@@ -104,7 +110,10 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
   symbol *sym;
   int i, size, bitvars = 0;;
 
+//	fprintf(stderr, "%s:%d map name= %s\n", __FUNCTION__, __LINE__, map->sname);
+	
   if (addPublics)
+
     fprintf (map->oFile, ";\t.area\t%s\n", map->sname);
 
   /* print the area name */
@@ -112,9 +121,17 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
        sym = setNextItem (map->syms))
     {
 
-      /* if extern then do nothing */
-      if (IS_EXTERN (sym->etype))
+#if 0
+	fprintf(stderr, "\t%s: sym: %s\tused: %d\n", map->sname, sym->name, sym->used);
+	printTypeChain( sym->type, stderr );
+	printf("\n");
+#endif
+
+      /* if extern then add to externs */
+      if (IS_EXTERN (sym->etype)) {
+	addSetHead(&externs, sym);
 	continue;
+      }
 
       /* if allocation required check is needed
          then check if the symbol really requires
@@ -126,7 +143,7 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 
       /* if global variable & not static or extern
          and addPublics allowed then add it to the public set */
-      if ((sym->level == 0 ||
+      if ((sym->used) && (sym->level == 0 ||
 	   (sym->_isparm && !IS_REGPARM (sym->etype))) &&
 	  addPublics &&
 	  !IS_STATIC (sym->etype))
@@ -136,12 +153,13 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
          then do nothing */
       if (IS_FUNC (sym->type))
 	continue;
+
 #if 0
       /* print extra debug info if required */
       if (options.debug || sym->level == 0)
 	{
 
-	  cdbSymbol (sym, cdbFile, FALSE, FALSE);
+	  cdbWriteSymbol (sym);	//, cdbFile, FALSE, FALSE);
 
 	  if (!sym->level)	/* global */
 	    if (IS_STATIC (sym->etype))
@@ -155,16 +173,40 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	}
 #endif
 
+	/* FIXME -- VR
+	 * The equates are nice, but do not allow relocatable objects to
+	 * be created in the form that I (VR) want to make SDCC to work */
+
       /* if is has an absolute address then generate
          an equate for this no need to allocate space */
       if (SPEC_ABSA (sym->etype))
 	{
 	  //if (options.debug || sym->level == 0)
-	  //fprintf (map->oFile,"; == 0x%04x\n",SPEC_ADDR (sym->etype));
+//	  fprintf (stderr,"; %s == 0x%04x\t\treqv= %p nRegs= %d\n",
+//	  	sym->name, SPEC_ADDR (sym->etype), sym->reqv, sym->regType);
 
 	  fprintf (map->oFile, "%s\tEQU\t0x%04x\n",
 		   sym->rname,
 		   SPEC_ADDR (sym->etype));
+
+#if 1
+	  /* emit only if it is global */
+	  if(sym->level == 0) {
+	    regs *reg;
+	    operand *op;
+
+//		fprintf(stderr, "%s: implicit add of symbol = %s\n", __FUNCTION__, sym->name);
+		op = operandFromSymbol( sym );
+		reg = pic16_allocDirReg( op );
+		if(reg) {
+			//continue;
+
+			checkAddReg(&pic16_fix_udata, reg);
+			/* and add to globals list */
+			addSetHead(&publics, sym);
+		}
+	  }
+#endif
 	}
       else
 	{
@@ -189,11 +231,25 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	  //fprintf (map->oFile, "\t.ds\t0x%04x\n", (unsigned int)getSize (sym->type) & 0xffff);
 	}
 	
-	/* if it has a initial value then do it only if
+
+	/* FIXME -- VR Fix the following, so that syms to be placed
+	 * in the idata section and let linker decide about their fate */
+
+	/* if it has an initial value then do it only if
 	   it is a global variable */
+//	if(sym->ival && sym->level == 0) 
+		
+
+#if 1
 	if (sym->ival && sym->level == 0) {
 	    ast *ival = NULL;
-	    
+
+//		if(SPEC_OCLS(sym->etype)==data) {
+//			fprintf(stderr, "%s: sym %s placed in data\n", map->sname, sym->name);
+//		}
+
+//		fprintf(stderr, "'%s': sym '%s' has initial value\n", map->sname, sym->name);
+
 	    if (IS_AGGREGATE (sym->type))
 		ival = initAggregates (sym, sym->ival, NULL);
 	    else
@@ -204,6 +260,7 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	    eBBlockFromiCode (iCodeFromAst (ival));
 	    sym->ival = NULL;
 	}
+#endif
     }
 }
 
@@ -435,6 +492,14 @@ pic16emitStaticSeg (memmap * map)
   for (sym = setFirstItem (map->syms); sym;
        sym = setNextItem (map->syms))
     {
+
+#if 1
+	fprintf(stderr, "\t%s: sym: %s\tused: %d\n", map->sname, sym->name, sym->used);
+	printTypeChain( sym->type, stderr );
+	printf("\n");
+#endif
+
+
       /* if it is "extern" then do nothing */
       if (IS_EXTERN (sym->etype))
 	continue;
@@ -545,7 +610,6 @@ pic16emitMaps ()
 static void
 pic16createInterruptVect (FILE * vFile)
 {
-  unsigned i = 0;
   mainf = newSymbol ("main", 0);
   mainf->block = 0;
 
@@ -566,35 +630,18 @@ pic16createInterruptVect (FILE * vFile)
       return;
     }
 
-/*
- * update started by Vangelis Rokas on 19-Jun-2003
- * all fprintf() calls are prefixed with ';' so they seem
- * as comments to the assembler. I (VR) removed them */
+	if((!pic16_options.omit_ivt) || (pic16_options.omit_ivt && pic16_options.leave_reset)) {
+		fprintf (vFile, ";\t.area\t%s\n", CODE_NAME);
+		fprintf(vFile, ".intvecs\tcode\t0x0000\n");
+		fprintf (vFile, "__interrupt_vect:\n");
 
-//  fprintf (vFile, "\t.area\t%s\n", CODE_NAME);
-	fprintf(vFile, "\tcode\t0x0000\n");
-  fprintf (vFile, "__interrupt_vect:\n");
-
-
-  if (!port->genIVT || !(port->genIVT (vFile, interrupts, maxInterrupts)))
-    {
-      /* "generic" interrupt table header (if port doesn't specify one).
-
-       * Look suspiciously like 8051 code to me...
-       */
-
-      fprintf (vFile, ";\tljmp\t__sdcc_gsinit_startup\n");
-
-
-      /* now for the other interrupts */
-      for (; i < maxInterrupts; i++)
-	{
-	  if (interrupts[i])
-	    fprintf (vFile, ";\tljmp\t%s\n;\t.ds\t5\n", interrupts[i]->rname);
-	  else
-	    fprintf (vFile, ";\treti\n;\t.ds\t7\n");
+		/* this is an overkill since WE are the port,
+		 * and we know if we have a genIVT function! */
+		if(port->genIVT) {
+			port->genIVT(vFile, interrupts, maxInterrupts);
+		}
 	}
-    }
+	
 }
 
 
@@ -611,23 +658,36 @@ pic16initialComments (FILE * afile)
 }
 
 /*-----------------------------------------------------------------*/
-/* printPublics - generates .global for publics                    */
+/* printPublics - generates global declarations for publics        */
 /*-----------------------------------------------------------------*/
 static void
 pic16printPublics (FILE * afile)
 {
   symbol *sym;
 
-  fprintf (afile, "%s", iComments2);
-  fprintf (afile, "; publics variables in this module\n");
-  fprintf (afile, "%s", iComments2);
+	fprintf (afile, "%s", iComments2);
+	fprintf (afile, "; publics variables in this module\n");
+	fprintf (afile, "%s", iComments2);
 
-  for (sym = setFirstItem (publics); sym;
-       sym = setNextItem (publics))
-    fprintf (afile, ";\t.globl %s\n", sym->rname);
+	for (sym = setFirstItem (publics); sym; sym = setNextItem (publics))
+		fprintf(afile, "\tglobal %s\n", sym->rname);
 }
 
+/*-----------------------------------------------------------------*/
+/* printExterns - generates extern declarations for externs        */
+/*-----------------------------------------------------------------*/
+static void
+pic16_printExterns(FILE *afile)
+{
+  symbol *sym;
 
+	fprintf(afile, "%s", iComments2);
+	fprintf(afile, "; extern variables to this module\n");
+	fprintf(afile, "%s", iComments2);
+	
+	for(sym = setFirstItem(externs); sym; sym = setNextItem(externs))
+		fprintf(afile, "\textern %s\n", sym->rname);
+}
 
 /*-----------------------------------------------------------------*/
 /* emitOverlay - will emit code for the overlay stuff              */
@@ -771,6 +831,17 @@ pic16glue ()
     }
   }
 
+#if STACK_SUPPORT
+	if(USE_STACK) {
+	  pBlock *pb = pic16_newpCodeChain(NULL, 'X', pic16_newpCodeCharP("; Setup stack & frame register"));
+
+		pic16_addpBlock(pb);
+		pic16_addpCode2pBlock(pb, pic16_newpCode(POC_LFSR, pic16_popGetLit2(1, stackPos)));
+		pic16_addpCode2pBlock(pb, pic16_newpCode(POC_LFSR, pic16_popGetLit2(2, stackPos)));
+
+	}
+#endif
+
 
   /* At this point we've got all the code in the form of pCode structures */
   /* Now it needs to be rearranged into the order it should be placed in the */
@@ -790,7 +861,8 @@ pic16glue ()
   /* PENDING: this isnt the best place but it will do */
   if (port->general.glue_up_main) {
     /* create the interrupt vector table */
-    pic16createInterruptVect (vFile);
+
+	pic16createInterruptVect (vFile);
   }
 
   addSetHead(&tmpfileSet,vFile);
@@ -803,16 +875,20 @@ pic16glue ()
 
 	pic16_AnalyzepCode('*');
 
-  //#ifdef PCODE_DEBUG
-  //pic16_printCallTree(stderr);
-  //#endif
+#if 0
+	{
+	  FILE *cFile;
+		sprintf(buffer, dstFileName);
+		strcat(buffer, ".calltree");
+		cFile = fopen(buffer, "w");
+		pic16_printCallTree( cFile );
+		fclose(cFile);
+	}
+#endif
 
   pic16_InlinepCode();
-
   pic16_AnalyzepCode('*');
-
   pic16_pcode_test();
-
 
   /* now put it all together into the assembler file */
   /* create the assembler file name */
@@ -844,15 +920,19 @@ pic16glue ()
       port->genAssemblerPreamble(asmFile);
     }
     
+  /* print the extern variables to this module */
+  pic16_printExterns(asmFile);
+  
   /* print the global variables in this module */
   pic16printPublics (asmFile);
-    
 
+#if 0
   /* copy the sfr segment */
   fprintf (asmFile, "%s", iComments2);
   fprintf (asmFile, "; special function registers\n");
   fprintf (asmFile, "%s", iComments2);
   copyFile (asmFile, sfr->oFile);
+#endif
     
 
   /* Put all variables into a cblock */
@@ -871,15 +951,21 @@ pic16glue ()
     fprintf (asmFile, "; Stack segment in internal ram \n");
     fprintf (asmFile, "%s", iComments2);    
     fprintf (asmFile, ";\t.area\tSSEG\t(DATA)\n"
-	     ";__start__stack:\n;\t.ds\t1\n\n");
+    	";__start__stack:\n;\t.ds\t1\n\n");
   }
 
+#if 0
+	/* no indirect data in pic */
   /* create the idata segment */
   fprintf (asmFile, "%s", iComments2);
   fprintf (asmFile, "; indirectly addressable internal ram data\n");
   fprintf (asmFile, "%s", iComments2);
   copyFile (asmFile, idata->oFile);
-    
+#endif
+
+
+#if 0
+	/* no xdata in pic */
   /* if external stack then reserve space of it */
   if (mainf && IFFUNC_HASBODY(mainf->type) && options.useXstack ) {
     fprintf (asmFile, "%s", iComments2);
@@ -888,14 +974,16 @@ pic16glue ()
     fprintf (asmFile,";\t.area XSEG (XDATA)\n"); /* MOF */
     fprintf (asmFile,";\t.ds 256\n");
   }
-	
-	
+#endif
+
+#if 0	
+	/* no xdata in pic */
   /* copy xtern ram data */
   fprintf (asmFile, "%s", iComments2);
   fprintf (asmFile, "; external ram data\n");
   fprintf (asmFile, "%s", iComments2);
   copyFile (asmFile, xdata->oFile);
-    
+#endif
 
   /* copy the bit segment */
   fprintf (asmFile, "%s", iComments2);
@@ -906,7 +994,6 @@ pic16glue ()
 
 /* the following is commented out. the CODE directive will be
    used instead before code */
-   
 //  fprintf (asmFile, "\tORG 0\n");
 
   /* copy the interrupt vector table */
@@ -922,6 +1009,8 @@ pic16glue ()
   fprintf (asmFile, "; global & static initialisations\n");
   fprintf (asmFile, "%s", iComments2);
     
+#if 0
+  /* FIXME 8051 Legacy -- VR */
   /* Everywhere we generate a reference to the static_name area, 
    * (which is currently only here), we immediately follow it with a 
    * definition of the post_static_name area. This guarantees that
@@ -931,12 +1020,13 @@ pic16glue ()
   fprintf (asmFile, ";\t.area %s\n", port->mem.static_name); /* MOF */
   fprintf (asmFile, ";\t.area %s\n", port->mem.post_static_name);
   fprintf (asmFile, ";\t.area %s\n", port->mem.static_name);
+#endif
 
   if (mainf && IFFUNC_HASBODY(mainf->type)) {
     fprintf (asmFile,"__sdcc_gsinit_startup:\n");
 
 #if 0
-	/* 8051 legacy (?!) - VR 20-Jun-2003 */
+	/* FIXME 8051 legacy (?!) - VR 20-Jun-2003 */
     /* if external stack is specified then the
        higher order byte of the xdatalocation is
        going into P2 and the lower order going into
@@ -951,25 +1041,26 @@ pic16glue ()
 
   }
 
+  /* copy over code */
+  fprintf (asmFile, "%s", iComments2);
+  fprintf (asmFile, "\tcode\n");
+  fprintf (asmFile, "%s", iComments2);
+  fprintf (asmFile, ";\t.area %s\n", port->mem.code_name);
+
   if (port->general.glue_up_main && mainf && IFFUNC_HASBODY(mainf->type))
     {
       /* This code is generated in the post-static area.
        * This area is guaranteed to follow the static area
        * by the ugly shucking and jiving about 20 lines ago.
        */
-      fprintf(asmFile, ";\t.area %s\n", port->mem.post_static_name);
+//      fprintf(asmFile, ";\t.area %s\n", port->mem.post_static_name);
       fprintf (asmFile,"\tgoto\t__sdcc_program_startup\n");
     }
 	
-  /* copy over code */
-  fprintf (asmFile, "%s", iComments2);
-  fprintf (asmFile, "; code\n");
-  fprintf (asmFile, "%s", iComments2);
-  fprintf (asmFile, ";\t.area %s\n", port->mem.code_name);
 
   //copyFile (stderr, code->oFile);
 
-//		fprintf(asmFile, "; I code from now on!\n");
+		fprintf(asmFile, "; I code from now on!\n");
 	pic16_copypCode(asmFile, 'I');
 
 	
@@ -979,9 +1070,12 @@ pic16glue ()
 
 		fprintf(asmFile, "; X code from now on!\n");
 	pic16_copypCode(asmFile, 'X');
+
 		fprintf(asmFile, "; M code from now on!\n");
 	pic16_copypCode(asmFile, 'M');
+
 	pic16_copypCode(asmFile, code->dbName);
+
 	pic16_copypCode(asmFile, 'P');
 
 	fprintf (asmFile,"\tend\n");

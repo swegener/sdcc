@@ -360,6 +360,14 @@ typedef struct pCodeOpLit
   int lit;
 } pCodeOpLit;
 
+typedef struct pCodeOpLit2
+{
+  pCodeOp pcop;
+  int lit;
+  int lit2;
+} pCodeOpLit2;
+
+
 typedef struct pCodeOpImmd
 {
   pCodeOp pcop;
@@ -396,11 +404,6 @@ typedef struct pCodeOpReg2
   struct pBlock *pb;
 
   pCodeOp *pcop2;	// second memory operand
-/*
-  int rIdx1;
-  struct regs *r1;
-*/
-  
 } pCodeOpReg2;
 
 typedef struct pCodeOpRegBit
@@ -501,6 +504,8 @@ typedef struct pCodeAsmDir
   
   char *directive;
   char *arg;
+
+  pBranch *label;
 } pCodeAsmDir;
 
 
@@ -604,11 +609,14 @@ typedef struct pCodeInstruction
   unsigned int isAccess:   1;   /* True if this instruction has an access RAM operand */
   unsigned int isFastCall: 1;   /* True if this instruction has a fast call/return mode select operand */
   unsigned int is2MemOp: 1;	/* True is second operand is a memory operand VR - support for MOVFF */
+  unsigned int is2LitOp: 1;	/* True if instruction takes 2 literal operands VR - support for LFSR */
 
   PIC_OPCODE inverted_op;      /* Opcode of instruction that's the opposite of this one */
   unsigned int inCond;   // Input conditions for this instruction
   unsigned int outCond;  // Output conditions for this instruction
 
+#define PCI_MAGIC	0x6e12
+  unsigned int pci_magic;	// sanity check for pci initialization
 } pCodeInstruction;
 
 
@@ -859,15 +867,24 @@ typedef struct peepCommand {
 #define isSTATUS_REG(r) ((r)->pc_type == PO_STATUS)
 #define isBSR_REG(r)    ((r)->pc_type == PO_BSR)
 
+#if 0
+/* these are deprecated since when creating relocatable code, the register
+   address is not known (except of course of the SFRs and the Fixed registers)
+*/
+
+
 #define isACCESS_LOW(r) ((pic16_finalMapping[REG_ADDR(r)].bank == \
                           PIC_BANK_FIRST) && (REG_ADDR(r) < 0x80))
 #define isACCESS_HI(r)  (pic16_finalMapping[REG_ADDR(r)].bank == PIC_BANK_LAST)
+#define isACCESS_BANK(r)	(isACCESS_LOW(r) || isACCESS_HI(r))
 
-/*
-#define isACCESS_BANK(r)(isACCESS_LOW(r) || isACCESS_HI(r))
-*/
-#define isACCESS_BANK(r)	(pic16_finalMapping[(r)->rIdx].isSFR \
-				|| (pic16_finalMapping[(r)->rIdx].reg && pic16_finalMapping[(r)->rIdx].reg->isFixed))
+#endif
+
+//#define isACCESS_BANK(r)	(REG_ADDR(r)!= 0)
+#define isACCESS_BANK(r)	(r->accessBank)
+// && pic16_finalMapping[REG_ADDR(r)].isSFR)
+//				|| (pic16_finalMapping[(r)->rIdx].reg && pic16_finalMapping[(r)->rIdx].reg->isFixed))
+
 
 
 #define isPCOLAB(x)     ((PCOP(x)->type) == PO_LABEL)
@@ -889,6 +906,7 @@ void pic16_addpBlock(pBlock *pb);                  // Add a pBlock to a pFile
 void pic16_copypCode(FILE *of, char dbName);       // Write all pBlocks with dbName to *of
 void pic16_movepBlock2Head(char dbName);           // move pBlocks around
 void pic16_AnalyzepCode(char dbName);
+void pic16_AssignRegBanks(void);
 void pic16_printCallTree(FILE *of);
 void pCodePeepInit(void);
 void pic16_pBlockConvert2ISR(pBlock *pb);
@@ -896,6 +914,7 @@ void pic16_pBlockConvert2ISR(pBlock *pb);
 pCodeOp *pic16_newpCodeOpLabel(char *name, int key);
 pCodeOp *pic16_newpCodeOpImmd(char *name, int offset, int index, int code_space);
 pCodeOp *pic16_newpCodeOpLit(int lit);
+pCodeOp *pic16_newpCodeOpLit2(int lit, int lit2);
 pCodeOp *pic16_newpCodeOpBit(char *name, int bit,int inBitSpace);
 pCodeOp *pic16_newpCodeOpRegFromStr(char *name);
 pCodeOp *pic16_newpCodeOp(char *name, PIC_OPTYPE p);
@@ -920,6 +939,15 @@ extern pCodeOpReg pic16_pc_fsr0;
 extern pCodeOpReg pic16_pc_pcl;
 extern pCodeOpReg pic16_pc_pclath;
 extern pCodeOpReg pic16_pc_wreg;
+extern pCodeOpReg pic16_pc_fsr1l;
+extern pCodeOpReg pic16_pc_fsr1h;
+extern pCodeOpReg pic16_pc_fsr2l;
+extern pCodeOpReg pic16_pc_fsr2h;
+extern pCodeOpReg pic16_pc_postinc1;
+extern pCodeOpReg pic16_pc_postdec1;
+extern pCodeOpReg pic16_pc_preinc2;
+extern pCodeOpReg pic16_pc_plusw2;
+
 extern pCodeOpReg pic16_pc_kzero;
 extern pCodeOpReg pic16_pc_wsave;     /* wsave and ssave are used to save W and the Status */
 extern pCodeOpReg pic16_pc_ssave;     /* registers during an interrupt */

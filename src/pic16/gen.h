@@ -163,6 +163,7 @@ pCodeOp *pic16_popGetLabel(unsigned int key);
 pCodeOp *pic16_popCopyReg(pCodeOpReg *pc);
 pCodeOp *pic16_popCopyGPR2Bit(pCodeOp *pc, int bitval);
 pCodeOp *pic16_popGetLit(unsigned int lit);
+pCodeOp *pic16_popGetLit2(unsigned int lit, unsigned int lit2);
 pCodeOp *popGetWithString(char *str);
 pCodeOp *pic16_popGet (asmop *aop, int offset);//, bool bit16, bool dname);
 pCodeOp *pic16_popGetTempReg(void);

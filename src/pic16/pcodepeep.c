@@ -1517,7 +1517,7 @@ static int pCodeOpCompare(pCodeOp *pcops, pCodeOp *pcopd)
   if(!pcops || !pcopd)
     return 0;
 
-#if 1
+#if 0
   fprintf(stderr," Comparing operands %s",
 	  pic16_get_op( pcops,NULL,0));
 

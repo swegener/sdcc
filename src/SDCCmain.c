@@ -228,9 +228,6 @@ optionsTable[] = {
 #if !OPT_DISABLE_Z80 || !OPT_DISABLE_GBZ80
     { 0,    "--no-std-crt0", &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.o"},
 #endif
-#if !OPT_DISABLE_PIC16
-    { 0,    "--gen-banksel",	    &options.gen_banksel, "enable the generation of banksel assembler directives in PIC16 port"},
-#endif
     /* End of options */
     { 0,    NULL }
 };
@@ -650,7 +647,7 @@ _setModel (int model, const char *sz)
 /** Gets the string argument to this option.  If the option is '--opt'
     then for input of '--optxyz' or '--opt xyz' returns xyz.
 */
-static char *
+char *
 getStringArg(const char *szStart, char **argv, int *pi, int argc)
 {
   if (argv[*pi][strlen(szStart)])
@@ -676,7 +673,7 @@ getStringArg(const char *szStart, char **argv, int *pi, int argc)
 /** Gets the integer argument to this option using the same rules as
     getStringArg.
 */
-static int
+int
 getIntArg(const char *szStart, char **argv, int *pi, int argc)
 {
     return (int)floatFromVal(constVal(getStringArg(szStart, argv, pi, argc)));

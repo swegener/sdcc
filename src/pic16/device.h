@@ -71,13 +71,13 @@ typedef struct AssignedMemory {
  * pic16_finalMapping - Dynamically allocated array that records the register assignments
  */
 
-extern AssignedMemory *pic16_finalMapping;
+//extern AssignedMemory *pic16_finalMapping;
 
 /*
  * pic16_finalMappingSize - Size of register assignments that pic16_finalMapping can hold
  */
 
-extern int pic16_finalMappingSize;
+//extern int pic16_finalMappingSize;
 
 
 #define PROCESSOR_NAMES    4
@@ -96,9 +96,27 @@ typedef struct PIC_device {
 
 /* Given a pointer to a register, this macro returns the bank that it is in */
 #define REG_ADDR(r)        ((r)->isBitField ? (((r)->address)>>3) : (r)->address)
-#define REG_BANK(r)        (pic16_finalMapping[REG_ADDR(r)].bank)
-#define REG_isALIASED(r)   (pic16_finalMapping[REG_ADDR(r)].alias != 0)
-#define REG_isVALID(r)     (pic16_finalMapping[REG_ADDR(r)].isValid)
+//#define REG_BANK(r)        (pic16_finalMapping[REG_ADDR(r)].bank)
+//#define REG_isALIASED(r)   (pic16_finalMapping[REG_ADDR(r)].alias != 0)
+//#define REG_isVALID(r)     (pic16_finalMapping[REG_ADDR(r)].isValid)
+
+
+typedef struct {
+	int gen_banksel;
+	int opt_banksel;
+	int omit_configw;
+	int omit_ivt;
+	int leave_reset;
+	int enable_stack;
+	int stack_model;
+} pic16_options_t;
+
+#define USE_STACK	(pic16_options.enable_stack)
+#define STACK_MODEL_SMALL	(pic16_options.stack_model == 0)
+#define STACK_MODEL_LARGE	(pic16_options.stack_model == 1)
+
+
+extern pic16_options_t pic16_options;
 
 
 /****************************************/
@@ -108,5 +126,8 @@ int pic16_isREGinBank(regs *reg, int bank);
 int pic16_REGallBanks(regs *reg);
 void pic16_addMemRange(memRange *r, int type);
 void pic16_setMaxRAM(int size);
+
+void checkAddReg(set **set, regs *reg);
+
 
 #endif  /* __DEVICE_H__ */

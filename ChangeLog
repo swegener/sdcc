@@ -1,3 +1,93 @@
+2004-01-06 Vangelis Rokas <vrokas@otenet.gr>
+
+	PIC16 port related changes:
+	* device.c: removed pic16_finalMapping and pic16_finalMappingSize,
+	added variable stackPos,
+
+	* gen.c: genCall, assignResultValue: added support for
+	pushing/retrieving function parameters to/from stack,
+	genFunction,genEndFunction: setup stack frame for the
+	generated function,
+	genAddrOf: will be changed according to bug 863624
+	
+	* added files genutils.c and genutils.h which contain gen*
+	debugged and optimised functions extracted from gen.c
+	
+	* glue.c: added variable 'externs' which holds extern symbols,
+	pic16emitRegularMap: is modified to properly handle relocatable
+	 symbols under the new scheme,
+	pic16createInterruptVect: is modified
+	pic16printPublics: is modified to emit 'global'	assembler directives,
+	added pic16_printExterns to print extern symbols,
+	pic16glue: initializes stack/frame pointer in the beginning of
+	the assembly output. Temporary hack, will be corrected later,
+	because gplink yet does not support stack and SDCC does not
+	yet support a type of crt0.o object to create the final binary.
+	
+	* Removed many lines that contain 8051 legacy code.
+	* The code is finally placed under a 'code' directive.
+	* Added port specific options.
+	
+	* _process_pragma: simplified since now we do not need *special*
+	include file to define SFR registers. But a separate header
+	will be needed. This will be developed later.
+	* _pic16_parseOptions: added, parses port specific options:
+	--pgen-banksel,	--obanksel=, --pomit-config-words, --pomit-ivt,
+	--pleave-reset-vector, --penable-stack, --pstack-model, --debug-xtra
+	--preplace-udata-with=
+	
+	* _pic16_setDefaultOptions: modified to initialize section names,
+	but hack is temporarly out of order since it needs improvement.
+	* _pic16_genAssemblerPreamble: configuration words are emitted by
+	their address instead of their name. This part is incomplete and
+	supports only the 18Fxx2 devices. Other devices will emit an error
+	during assembly since they do not contain the same set of config
+	registers
+	* _pic16_genIVT: is modified,
+	
+	* pcode.c: added definitions for some hardware registers that are needed
+	for stack support
+	* added flag is2LitOp and variable pci_magic in pCodeInstruction.
+	All PCI entries are updated. Now LFSR is supported.
+	* Removed pic16_pciTRIS is mentioned by mdubuc in source
+	* added pic16_newpCodeOpLit2 to support instructions with
+	two literal arguments
+	* pic16_pCode2str: corrected code that emits assembler instructions
+	with two literal operands and those that have an access bit modifier
+	* genericPrint: now PC_ASMDIR pCodes, can emit a label if it exists,
+	this fixes a bug which caused some labels to be lost, when an
+	assembler directive was added, i.e. banksel,
+	* pic16_FixRegisterBanking: improved logic that causes the insertion
+	of bank switching,
+	* InlineFunction: functions that are called once, are not any more
+	inlined. This can be a port option in the future,
+	
+	* pcode.h: added pCodeOpLit2 and added variable label in pCodeAsmDir
+	
+	* ralloc.c: added pic16_rel_udata and pic16_fix_udata variables which
+	hold the corresponding uninitialized symbols,
+	* pic16_allocProcessorRegister: registers have explicit marked the
+	accessBank field,
+	* pic16_allocInternalRegister: registers are explicit marked as
+	not used,
+	* pic16_writeUsedRegs: pic16_dynDirectBitRegs was missing from the
+	processing list, so bit registers were lost,
+	* 
+
+	* ralloc.h: added field 'accessBank' and original symbol operand
+	in register definition,
+	* removed the field isMapped from register definition,
+
+	** Several functions have been removed from various sources:
+	BanksUsedFlow2,BanksUsedFlow,FixBankFlow,InstructionRegBank,
+	pic16_addMemRange,pic16_isREGinBank,pic16_dump_map,pic16_dump_cblock
+	isSFR,validAddress,mapRegister,assignRegister,pic16_assignFixedRegisters
+	pic16_assignRelocatableRegisters
+	
+	** others have been introduced:
+	pic16_areRegsSame,pic16_dump_section,checkAddReg,pic16_groupRegistersInSection
+	pic16_popGetLit2,pic16_popCombine2,pushw,pushaop
+	
 2004-01-05 Vangelis Rokas <vrokas@otenet.gr>
 
 	* support/scripts/inc2h.pl: changed definition of BIT_AT

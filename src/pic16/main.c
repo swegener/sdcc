@@ -67,6 +67,9 @@ static char *_pic16_keywords[] =
 };
 
 
+pic16_sectioninfo_t pic16_sectioninfo;
+
+
 extern char *pic16_processor_base_name(void);
 
 void  pic16_pCodeInitRegisters(void);
@@ -75,12 +78,24 @@ void pic16_assignRegisters (eBBlock ** ebbs, int count);
 
 static int regParmFlg = 0;	/* determine if we can register a parameter */
 
+pic16_options_t pic16_options;
+
 static void
 _pic16_init (void)
 {
-  asm_addTree (&asm_asxxxx_mapping);
-  pic16_pCodeInitRegisters();
-  maxInterrupts = 2;
+	asm_addTree (&asm_asxxxx_mapping);
+	pic16_pCodeInitRegisters();
+	maxInterrupts = 2;
+	
+
+	/* set pic16 port options to defaults */
+	pic16_options.gen_banksel = 0;
+	pic16_options.opt_banksel = 0;
+	pic16_options.omit_configw = 0;
+	pic16_options.omit_ivt = 0;
+	pic16_options.leave_reset = 0;
+	pic16_options.enable_stack = 0;
+	pic16_options.stack_model = 0;			/* 0 for 'small', 1 for 'large' */
 }
 
 static void
@@ -101,76 +116,256 @@ _pic16_regparm (sym_link * l)
   return 1;
 }
 
+
 static int
 _process_pragma(const char *sz)
 {
   static const char *WHITE = " \t";
   char	*ptr = strtok((char *)sz, WHITE);
 
-  if (startsWith (ptr, "memmap"))
-    {
-      char	*start;
-      char	*end;
-      char	*type;
-      char	*alias;
+	if (startsWith (ptr, "maxram")) {
+	  char *maxRAM = strtok((char *)NULL, WHITE);
 
-      start = strtok((char *)NULL, WHITE);
-      end = strtok((char *)NULL, WHITE);
-      type = strtok((char *)NULL, WHITE);
-      alias = strtok((char *)NULL, WHITE);
+		if (maxRAM != (char *)NULL) {
+		  int maxRAMaddress;
+		  value *maxRAMVal;
 
-      if (start != (char *)NULL
-	  && end != (char *)NULL
-	  && type != (char *)NULL) {
-	value		*startVal = constVal(start);
-	value		*endVal = constVal(end);
-	value		*aliasVal;
-	memRange	r;
-
-	if (alias == (char *)NULL) {
-	  aliasVal = constVal(0);
-	} else {
-	  aliasVal = constVal(alias);
+			maxRAMVal = constVal(maxRAM);
+			maxRAMaddress = (int)floatFromVal(maxRAMVal);
+			pic16_setMaxRAM(maxRAMaddress);
+		}
 	}
-
-	r.start_address = (int)floatFromVal(startVal);
-	r.end_address = (int)floatFromVal(endVal);
-	r.alias = (int)floatFromVal(aliasVal);
-	r.bank = (r.start_address >> 7) & 0xf;
-
-	if (strcmp(type, "RAM") == 0) {
-	  pic16_addMemRange(&r, 0);
-	} else if (strcmp(type, "SFR") == 0) {
-	  pic16_addMemRange(&r, 1);
-	} else {
-	  return 1;
-	}
-      }
-
-      return 0;
-    } else if (startsWith (ptr, "maxram")) {
-      char *maxRAM = strtok((char *)NULL, WHITE);
-
-      if (maxRAM != (char *)NULL) {
-	int	maxRAMaddress;
-	value 	*maxRAMVal;
-
-	maxRAMVal = constVal(maxRAM);
-	maxRAMaddress = (int)floatFromVal(maxRAMVal);
-	pic16_setMaxRAM(maxRAMaddress);
-      }
 	
-      return 0;
-    }
-  return 1;
+	if(startsWith(ptr, "stack")) {
+	  char *stackPosS = strtok((char *)NULL, WHITE);
+	  value *stackPosVal;
+
+//	  	fprintf(stderr, "Initializing stack pointer to 0x%x\n", (int)floatFromVal(constVal(stackPos)));
+		stackPosVal = constVal( stackPosS );
+		stackPos = (unsigned int)floatFromVal( stackPosVal );
+	}
+
+  return 0;
 }
+
+#define REP_UDATA	"--preplace-udata-with="
+#define REP_UDATAACS	"--preplace-udata-acs-with="
+#define REP_UDATAOVR	"--preplace-udata-ovr-with="
+#define REP_UDATASHR	"--preplace-udata-sht-with="
+
+#define NAME_CODE	"--psection-code-name="
+#define NAME_IDATA	"--psection-idata-name="
+#define NAME_UDATA	"--psection-udata-name="
+#define NAME_UDATAACS	"--psection-udata-acs-name="
+#define NAME_UDATAOVR	"--psection-udata-ovr-name="
+#define NAME_UDATASHR	"--psection-udata-shr-name="
+
+#define ADDR_CODE	"--psection-code-addr="
+#define ADDR_IDATA	"--psection-idata-addr="
+#define ADDR_UDATA	"--psection-udata-addr="
+#define ADDR_UDATAACS	"--psection-udata-acs-addr="
+#define ADDR_UDATAOVR	"--psection-udata-ovr-addr="
+#define ADDR_UDATASHR	"--psection-udata-shr-addr="
+
+#define STACK_MODEL	"--pstack-model="
+#define OPT_BANKSEL	"--obanksel="
+
+
+extern int pic16_debug_verbose;
+
+OPTION pic16_optionsTable[]= {
+	{ 0,	"--pgen-banksel",	&pic16_options.gen_banksel,	"generate BANKSEL assembler directives"},
+	{ 0,	OPT_BANKSEL,		NULL,				"set banksel optimization level (default=0 no)"},
+	{ 0,	"--pomit-config-words",	&pic16_options.omit_configw,	"omit the generation of configuration words"},
+	{ 0,	"--pomit-ivt",		&pic16_options.omit_ivt,	"omit the generation of the Interrupt Vector Table"},
+	{ 0,	"--pleave-reset-vector",&pic16_options.leave_reset,	"when omitting IVT leave RESET vector"},
+	{ 0,	"--penable-stack",	&pic16_options.enable_stack,	"enable the use of stack"},
+	{ 0,	STACK_MODEL,	NULL,	"use stack model 'small' (default) or 'large'"},
+
+	{ 0,	"--debug-xtra",		&pic16_debug_verbose,	"show more debug info in assembly output"},
+	{ 0,	REP_UDATA,	NULL,	"Place udata variables at another section: udata_acs, udata_ovr, udata_shr"},
+
+#if 0
+	/* these may not be in any use -- VR */
+	{ 0,	AT_UDATAACS,	NULL,	"Emit udata_acs variables at another section"},
+	{ 0,	AT_UDATAOVR,	NULL,	"Emit udata_ovr variables at another section"},
+	{ 0,	AT_UDATASHR,	NULL,	"Emit udata_shr variables at another section"},
+#endif
+
+#if 0
+	/* commented out for the time being -- VR */
+	{ 0,	NAME_CODE,	NULL,	"Set code section name[,address]"},
+	{ 0,	NAME_IDATA,	NULL,	"Set idata section name[,address]"},
+	{ 0,	NAME_UDATA,	NULL,	"Set udata section name[,address]"},
+	{ 0,	NAME_UDATAACS,	NULL,	"Set udata_acs section name[,address]"},
+	{ 0,	NAME_UDATAOVR,	NULL,	"Set udata_ovr section name[,address]"},
+	{ 0,	NAME_UDATASHR,	NULL,	"Set udata_shr section name[,address]"},
+	
+	{ 0,	ADDR_CODE,	NULL,	"Set code section address"},
+	{ 0,	ADDR_IDATA,	NULL,	"Set idata section address"},
+	{ 0,	ADDR_UDATA,	NULL,	"Set udata section address"},
+	{ 0,	ADDR_UDATAACS,	NULL,	"Set udata_acs section address"},
+	{ 0,	ADDR_UDATAOVR,	NULL,	"Set udata_ovr section address"},
+	{ 0,	ADDR_UDATASHR,	NULL,	"Set udata_shr section address"},
+#endif
+
+	{ 0,	NULL,		NULL,	NULL}
+	};
+
+
+#define ISOPT(str)	!strncmp(argv[ *i ], str, strlen(str) )
+
+extern char *getStringArg(const char *,  char **, int *, int);
+extern int getIntArg(const char *, char **, int *, int);
 
 static bool
 _pic16_parseOptions (int *pargc, char **argv, int *i)
 {
+  int j=0;
+//  set *tset;
+
   /* TODO: allow port-specific command line options to specify
    * segment names here.
    */
+	/* check for arguments that have associated an integer variable */
+	while(pic16_optionsTable[j].pparameter) {
+		if(ISOPT( pic16_optionsTable[j].longOpt )) {
+			(*pic16_optionsTable[j].pparameter)++;
+			return TRUE;
+		}
+		j++;
+	}
+
+
+	if(ISOPT(STACK_MODEL)) {
+		switch(*getStringArg(STACK_MODEL, argv, i, *pargc)) {
+			case 's': pic16_options.stack_model = 0; break;
+			case 'l': pic16_options.stack_model = 1; break;
+			
+			default:
+				fprintf(stderr, "Unknown stack model");
+				exit(-1);
+		}
+		return TRUE;
+	}
+
+	if(ISOPT(OPT_BANKSEL)) {
+		pic16_options.opt_banksel = getIntArg(OPT_BANKSEL, argv, i, *pargc);
+		return TRUE;
+	}
+
+	if(ISOPT(REP_UDATA)) {
+		pic16_sectioninfo.at_udata = Safe_strdup(getStringArg(REP_UDATA, argv, i, *pargc));
+		return TRUE;
+	}
+	
+/*
+	if(ISOPT(AT_UDATAACS)) {
+		pic16_sectioninfo.at_udataacs = Safe_strdup( getStringArg(AT_UDATAACS, argv, i, *pargc));
+		return TRUE;
+	}
+
+	if(ISOPT(AT_UDATAOVR)) {
+		pic16_sectioninfo.at_udataovr = Safe_strdup( getStringArg(AT_UDATAOVR, argv, i, *pargc));
+		return TRUE;
+	}
+	
+	if(ISOPT(AT_UDATASHR)) {
+		pic16_sectioninfo.at_udatashr = Safe_strdup( getStringArg(AT_UDATASHR, argv, i, *pargc));
+		return TRUE;
+	}
+*/
+
+#if 0
+	if(ISOPT(ADDR_CODE)) {
+		pic16_sectioninfo.addr_code = getIntArg(ADDR_CODE, argv, i, *pargc);
+		return TRUE;
+	}
+	
+	if(ISOPT(ADDR_IDATA)) {
+		pic16_sectioninfo.addr_idata = getIntArg(ADDR_IDATA, argv, i, *pargc);
+		return TRUE;
+	}
+	
+	if(ISOPT(ADDR_UDATA)) {
+		pic16_sectioninfo.addr_udata = getIntArg(ADDR_UDATA, argv, i, *pargc);
+		return TRUE;
+	}
+	
+	if(ISOPT(ADDR_UDATAACS)) {
+		pic16_sectioninfo.addr_udataacs = getIntArg(ADDR_UDATAACS, argv, i, *pargc);
+		return TRUE;
+	}
+	
+	if(ISOPT(ADDR_UDATAOVR)) {
+		pic16_sectioninfo.addr_udataovr = getIntArg(ADDR_UDATAOVR, argv, i, *pargc);
+		return TRUE;
+	}
+	
+	if(ISOPT(ADDR_UDATASHR)) {
+		pic16_sectioninfo.addr_udatashr = getIntArg(ADDR_UDATASHR, argv, i, *pargc);
+		return TRUE;
+	}
+
+	tset = newSet();
+	
+	if(ISOPT(NAME_CODE)) {
+		setParseWithComma(&tset, getStringArg(NAME_CODE, argv, i, *pargc));
+		if(elementsInSet(tset) > 0)
+			pic16_sectioninfo.name_code = Safe_strdup( (char *)indexSet(tset, 0));
+		if(elementsInSet(tset) > 1)
+			pic16_sectioninfo.addr_code = atoi( (char *)indexSet(tset, 1));
+		return TRUE;
+	}
+
+	if(ISOPT(NAME_IDATA)) {
+		setParseWithComma(&tset, getStringArg(NAME_IDATA, argv, i, *pargc));
+		if(elementsInSet(tset) > 0)
+			pic16_sectioninfo.name_idata = Safe_strdup( (char *)indexSet(tset, 0));
+		if(elementsInSet(tset) > 1)
+			pic16_sectioninfo.addr_idata = atoi( (char *)indexSet(tset, 1));
+		return TRUE;
+	}
+
+	if(ISOPT(NAME_UDATA)) {
+		setParseWithComma(&tset, getStringArg(NAME_UDATA, argv, i, *pargc));
+		if(elementsInSet(tset) > 0)
+			pic16_sectioninfo.name_udata = Safe_strdup( (char *)indexSet(tset, 0));
+		if(elementsInSet(tset) > 1)
+			pic16_sectioninfo.addr_udata = atoi( (char *)indexSet(tset, 1));
+		return TRUE;
+	}
+
+	if(ISOPT(NAME_UDATAACS)) {
+		setParseWithComma(&tset, getStringArg(NAME_UDATAACS, argv, i, *pargc));
+		if(elementsInSet(tset) > 0)
+			pic16_sectioninfo.name_udataacs = Safe_strdup( (char *)indexSet(tset, 0));
+		if(elementsInSet(tset) > 1)
+			pic16_sectioninfo.addr_udataacs = atoi( (char *)indexSet(tset, 1));
+		return TRUE;
+	}
+
+	if(ISOPT(NAME_UDATAOVR)) {
+		setParseWithComma(&tset, getStringArg(NAME_UDATAOVR, argv, i, *pargc));
+		if(elementsInSet(tset) > 0)
+			pic16_sectioninfo.name_udataovr = Safe_strdup( (char *)indexSet(tset, 0));
+		if(elementsInSet(tset) > 1)
+			pic16_sectioninfo.addr_udataovr = atoi( (char *)indexSet(tset, 1));
+		return TRUE;
+	}
+
+	if(ISOPT(NAME_UDATASHR)) {
+		setParseWithComma(&tset, getStringArg(NAME_UDATASHR, argv, i, *pargc));
+		if(elementsInSet(tset) > 0)
+			pic16_sectioninfo.name_udatashr = Safe_strdup( (char *)indexSet(tset, 0));
+		if(elementsInSet(tset) > 1)
+			pic16_sectioninfo.addr_udatashr = atoi( (char *)indexSet(tset, 1));
+		return TRUE;
+	}
+
+	deleteSet( &tset );
+#endif
+
   return FALSE;
 }
 
@@ -246,6 +441,27 @@ _pic16_finaliseOptions (void)
 static void
 _pic16_setDefaultOptions (void)
 {
+	/* initialize to defaults section locations, names and addresses */
+	pic16_sectioninfo.at_udata	= "udata";
+	pic16_sectioninfo.at_udataacs	= "udata_acs";
+	pic16_sectioninfo.at_udataovr	= "udata_ovr";
+	pic16_sectioninfo.at_udatashr	= "udata_shr";
+
+	/* initialize to nothing, so let linker decide about their names */
+	pic16_sectioninfo.name_code	=
+	pic16_sectioninfo.name_idata	=
+	pic16_sectioninfo.name_udata	=
+	pic16_sectioninfo.name_udataacs =
+	pic16_sectioninfo.name_udataovr =
+	pic16_sectioninfo.name_udatashr = "";
+
+	/* initialize to -1, so let linker decide about their address */
+	pic16_sectioninfo.addr_code	=
+	pic16_sectioninfo.addr_idata	=
+	pic16_sectioninfo.addr_udata	=
+	pic16_sectioninfo.addr_udataacs =
+	pic16_sectioninfo.addr_udataovr =
+	pic16_sectioninfo.addr_udatashr = -1;
 }
 
 static const char *
@@ -257,32 +473,42 @@ _pic16_getRegName (struct regs *reg)
 }
 
 
+#if 0
+static  char *_pic16_mangleFunctionName(char *sz)
+{
+	fprintf(stderr, "mangled function name: %s\n", sz);
+
+  return sz;
+}
+#endif
+
+
 static void
 _pic16_genAssemblerPreamble (FILE * of)
 {
-  char * name = pic16_processor_base_name();
+  char *name = pic16_processor_base_name();
 
-  if(!name) {
+	if(!name) {
+		name = "p18f452";
+		fprintf(stderr,"WARNING: No Pic has been selected, defaulting to %s\n",name);
+	}
 
-    name = "p18f452";
-    fprintf(stderr,"WARNING: No Pic has been selected, defaulting to %s\n",name);
-  }
+	fprintf (of, "\tlist\tp=%s\n",&name[1]);
 
-  fprintf (of, "\tlist\tp=%s\n",&name[1]);
-  fprintf (of, "\tinclude \"%s.inc\"\n",name);
-
-  fprintf (of, "\t__config _CONFIG1H,0x%x\n",pic16_getConfigWord(0x300001));
-  fprintf (of, "\t__config _CONFIG2L,0x%x\n",pic16_getConfigWord(0x300002));
-  fprintf (of, "\t__config _CONFIG2H,0x%x\n",pic16_getConfigWord(0x300003));
-  fprintf (of, "\t__config _CONFIG3H,0x%x\n",pic16_getConfigWord(0x300005));
-  fprintf (of, "\t__config _CONFIG4L,0x%x\n",pic16_getConfigWord(0x300006));
-  fprintf (of, "\t__config _CONFIG5L,0x%x\n",pic16_getConfigWord(0x300008));
-  fprintf (of, "\t__config _CONFIG5H,0x%x\n",pic16_getConfigWord(0x300009));
-  fprintf (of, "\t__config _CONFIG6L,0x%x\n",pic16_getConfigWord(0x30000a));
-  fprintf (of, "\t__config _CONFIG6H,0x%x\n",pic16_getConfigWord(0x30000b));
-  fprintf (of, "\t__config _CONFIG7L,0x%x\n",pic16_getConfigWord(0x30000c));
-  fprintf (of, "\t__config _CONFIG7H,0x%x\n",pic16_getConfigWord(0x30000d));
-
+	if(!pic16_options.omit_configw) {
+		fprintf (of, "\t__config 0x%x,0x%x\n", 0x300001, pic16_getConfigWord(0x300001));
+		fprintf (of, "\t__config 0x%x,0x%x\n", 0x300002, pic16_getConfigWord(0x300002));
+		fprintf (of, "\t__config 0x%x,0x%x\n", 0x300003, pic16_getConfigWord(0x300003));
+		fprintf (of, "\t__config 0x%x,0x%x\n", 0x300005, pic16_getConfigWord(0x300005));
+		fprintf (of, "\t__config 0x%x,0x%x\n", 0x300006, pic16_getConfigWord(0x300006));
+		fprintf (of, "\t__config 0x%x,0x%x\n", 0x300008, pic16_getConfigWord(0x300008));
+		fprintf (of, "\t__config 0x%x,0x%x\n", 0x300009, pic16_getConfigWord(0x300009));
+		fprintf (of, "\t__config 0x%x,0x%x\n", 0x30000a, pic16_getConfigWord(0x30000a));
+		fprintf (of, "\t__config 0x%x,0x%x\n", 0x30000b, pic16_getConfigWord(0x30000b));
+		fprintf (of, "\t__config 0x%x,0x%x\n", 0x30000c, pic16_getConfigWord(0x30000c));
+		fprintf (of, "\t__config 0x%x,0x%x\n", 0x30000d, pic16_getConfigWord(0x30000d));
+	}
+	
   fprintf (of, "\tradix dec\n");
 }
 
@@ -290,55 +516,34 @@ _pic16_genAssemblerPreamble (FILE * of)
 static int
 _pic16_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 {
-#if 0
-  int i;
-#endif
-
-#if 0
-	if (options.model != MODEL_FLAT24) {
-	/* Let the default code handle it. */
-	  return FALSE;
-	}
-#endif
-
 	/* PIC18F family has only two interrupts, the high and the low
 	 * priority interrupts, which reside at 0x0008 and 0x0018 respectively - VR */
 
-	fprintf(of, "; RESET vector\n");
-	fprintf(of, "\tgoto\t__sdcc_gsinit_startup\n");
-	fprintf(of, "\tres 4\n");
+	if((!pic16_options.omit_ivt) || (pic16_options.omit_ivt && pic16_options.leave_reset)) {
+		fprintf(of, "; RESET vector\n");
+		fprintf(of, "\tgoto\t__sdcc_gsinit_startup\n");
+	}
+	
+	if(!pic16_options.omit_ivt) {
+		fprintf(of, "\tres 4\n");
 
 
-	fprintf(of, "; High priority interrupt vector 0x0008\n");
-	if(interrupts[1]) {
-		fprintf(of, "\tgoto\t%s\n", interrupts[1]->rname);
-		fprintf(of, "\tres\t12\n"); 
-	} else {
-		fprintf(of, "\tretfie\n");
-		fprintf(of, "\tres\t14\n");
-	}
+		fprintf(of, "; High priority interrupt vector 0x0008\n");
+		if(interrupts[1]) {
+			fprintf(of, "\tgoto\t%s\n", interrupts[1]->rname);
+			fprintf(of, "\tres\t12\n"); 
+		} else {
+			fprintf(of, "\tretfie\n");
+			fprintf(of, "\tres\t14\n");
+		}
 
-	fprintf(of, "; Low priority interrupt vector 0x0018\n");
-	if(interrupts[2]) {
-		fprintf(of, "\tgoto\t%s\n", interrupts[2]->rname);
-	} else {
-		fprintf(of, "\tretfie\n");
+		fprintf(of, "; Low priority interrupt vector 0x0018\n");
+		if(interrupts[2]) {
+			fprintf(of, "\tgoto\t%s\n", interrupts[2]->rname);
+		} else {
+			fprintf(of, "\tretfie\n");
+		}
 	}
-#if 0
-  /* now for the other interrupts */
-  for (i = 0; i < maxInterrupts; i++)
-    {
-	fprintf(of, "; %s priority interrupt vector 0x%s\n", (i==0)?"high":"low", (i==0)?"0008":"0018");
-      if (interrupts[i])
-	{
-	  fprintf (of, "\tgoto\t%s\n\tres\t4\n", interrupts[i]->rname);
-	}
-      else
-	{
-	  fprintf (of, "\tretfie\n\tres\t7\n");
-	}
-    }
-#endif
 
   return TRUE;
 }
@@ -440,7 +645,7 @@ PORT pic16_port =
   TARGET_ID_PIC16,
   "pic16",
   "MCU PIC16",			/* Target name */
-  "p18f442",                    /* Processor */
+  "p18f452",                    /* Processor */
   {
     pic16glue,
     TRUE,			/* Emit glue around main */
@@ -448,32 +653,35 @@ PORT pic16_port =
     MODEL_SMALL
   },
   {
-    _asmCmd,
-    NULL,
-    NULL,
-    NULL,
-	//"-plosgffc",          /* Options with debug */
-	//"-plosgff",           /* Options without debug */
-    0,
-    ".asm",
+    _asmCmd,			/* assembler command and arguments */
+    NULL,			/* alternate macro based form */
+    NULL,			/* arguments for debug mode */
+    NULL,			/* arguments for normal mode */
+    0,				/* print externs as global */
+    ".asm",			/* assembler file extension */
     NULL			/* no do_assemble function */
   },
   {
-    _linkCmd,
-    NULL,
-    NULL,
-    ".rel"
+    _linkCmd,			/* linker command and arguments */
+    NULL,			/* alternate macro based form */
+    NULL,			/* no do_link function */
+    ".rel"			/* extension for object files */
   },
   {
     _defaultRules
   },
   {
-	/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
-    1, 2, 2, 4, 2, 2, 2, 1, 4, 4
-	/* TSD - I changed the size of gptr from 3 to 1. However, it should be
-	   2 so that we can accomodate the PIC's with 4 register banks (like the
-	   16f877)
-	 */
+	/* Sizes */
+    1,		/* char */
+    2,		/* short */
+    2,		/* int */
+    4,		/* long */
+    2,		/* ptr */
+    2,		/* fptr, this should be changed to 3 for far pointers (see Microchip) */
+    2,		/* gptr */
+    1,		/* bit */
+    4,		/* float */
+    4		/* max */
   },
   {
     "XSEG    (XDATA)",		// xstack
@@ -492,11 +700,20 @@ PORT pic16_port =
     NULL,			// xinit
     NULL,			// default location for auto vars
     NULL,			// default location for global vars
-    1				// code is read only
+    1				// code is read only 1=yes
   },
-  { NULL, NULL },
   {
-    +1, 1, 4, 1, 1, 0
+    NULL,		/* genExtraAreaDeclaration */
+    NULL		/* genExatrAreaLinkOptions */
+  },
+  {
+	/* stack related information */
+    -1,			/* -1 stack grows downwards, +1 upwards */
+    1,			/* extra overhead when calling between banks */
+    4,			/* extra overhead when the function is an ISR */
+    1,			/* extra overhead for a function call */
+    1,			/* re-entrant space */
+    0			/* 'banked' call overhead, mild overlap with bank_overhead */
   },
     /* pic16 has an 8 bit mul */
   {
@@ -505,7 +722,7 @@ PORT pic16_port =
   "_",
   _pic16_init,
   _pic16_parseOptions,
-  NULL,
+  pic16_optionsTable,
   _pic16_finaliseOptions,
   _pic16_setDefaultOptions,
   pic16_assignRegisters,
@@ -518,11 +735,11 @@ PORT pic16_port =
   _pic16_reset_regparm,
   _pic16_regparm,
   _process_pragma,				/* process a pragma */
-  NULL,
+  NULL,				//_pic16_mangleFunctionName,				/* mangles function name */
   _hasNativeMulFor,
   hasExtBitOp,			/* hasExtBitOp */
   oclsExpense,			/* oclsExpense */
-  FALSE,
+  FALSE,			
   TRUE,				/* little endian */
   0,				/* leave lt */
   0,				/* leave gt */

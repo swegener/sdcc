@@ -31,6 +31,9 @@
 
 #include "pcoderegs.h"
 
+/* set STACK_SUPPORT to 1 to compile code for stack */
+#define STACK_SUPPORT 1
+extern unsigned int stackPos;
 
 enum
   {
@@ -70,14 +73,16 @@ typedef struct regs
     unsigned isFree:1;		/* is currently unassigned  */
     unsigned wasUsed:1;		/* becomes true if register has been used */
     unsigned isFixed:1;         /* True if address can't change */
-    unsigned isMapped:1;        /* The Register's address has been mapped to physical RAM */
+//    unsigned isMapped:1;        /* The Register's address has been mapped to physical RAM */
     unsigned isBitField:1;      /* True if reg is type bit OR is holder for several bits */
     unsigned isEmitted:1;       /* True if the reg has been written to a .asm file */
+    unsigned accessBank:1;	/* True if the reg is explicit placed in access bank */
     unsigned address;           /* reg's address if isFixed | isMapped is true */
     unsigned size;              /* 0 for byte, 1 for int, 4 for long */
     unsigned alias;             /* Alias mask if register appears in multiple banks */
     struct regs *reg_alias;     /* If more than one register share the same address 
 				 * then they'll point to each other. (primarily for bits)*/
+    operand *regop;		/* reference to the operand used to create the register */
     pCodeRegLives reglives; /* live range mapping */
   }
 regs;
@@ -97,6 +102,8 @@ extern set *pic16_dynDirectRegs;
 extern set *pic16_dynDirectBitRegs;
 extern set *pic16_dynInternalRegs;
 
+extern set *pic16_rel_udata;
+extern set *pic16_fix_udata;
 
 regs *pic16_regWithIdx (int);
 regs *pic16_dirregWithName (char *name );
@@ -119,6 +126,15 @@ regs *pic16_allocRegByName (char *name, int size );
 #define IDX_PCLATH  0xffa
 #define IDX_INTCON  0xff2
 #define IDX_WREG    0xfe8
+
+#define IDX_FSR1L	0xfe1
+#define IDX_FSR1H	0xfe2
+#define IDX_FSR2L	0xfd9
+#define IDX_FSR2H	0xfda
+#define IDX_POSTINC1	0xfe6
+#define IDX_POSTDEC1	0xfe5
+#define IDX_PREINC2	0xfdc
+#define IDX_PLUSW2	0xfdb
 
 #define IDX_KZ      0x7fff   /* Known zero - actually just a general purpose reg. */
 #define IDX_WSAVE   0x7ffe

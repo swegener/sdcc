@@ -1,3 +1,7 @@
+2004-02-09 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCcse.c (algebraicOpts): copy operands before modification
+
 2004-02-09 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCsymt.h,

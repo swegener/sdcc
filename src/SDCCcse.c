@@ -914,6 +914,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
 	      else
 		{
 	          ic->op = CAST;
+		  IC_LEFT (ic) = operandFromOperand (IC_LEFT (ic));
 		  IC_LEFT (ic)->type = TYPE;
 		  IC_LEFT (ic)->isLiteral = 0;
 		  setOperandType (IC_LEFT (ic), operandType (IC_RESULT (ic)));
@@ -952,7 +953,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
 	          ic->op = CAST;
 		  op = IC_RIGHT (ic);
 		  IC_RIGHT (ic) = IC_LEFT (ic);
-		  IC_LEFT (ic) = op;
+		  IC_LEFT (ic) = operandFromOperand (op);
 		  IC_LEFT (ic)->type = TYPE;
 		  IC_LEFT (ic)->isLiteral = 0;
 		  setOperandType (IC_LEFT (ic), operandType (IC_RESULT (ic)));

@@ -1083,9 +1083,12 @@ doOverlays (eBBlock ** ebbs, int count)
 void 
 printAllocInfo (symbol * func, FILE * of)
 {
+  if (!func)
+	return;
+    
   if (!of)
     of = stdout;
-
+    
   /* must be called after register allocation is complete */
   fprintf (of, ";------------------------------------------------------------\n");
   fprintf (of, ";Allocation info for local variables in function '%s'\n", func->name);

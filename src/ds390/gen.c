@@ -12697,7 +12697,7 @@ gen390Code (iCode * lic)
   }
 #if 1
   /* print the allocation information */
-  if (allocInfo)
+  if (allocInfo && currFunc)
     printAllocInfo (currFunc, codeOutFile);
 #endif
   /* if debug information required */

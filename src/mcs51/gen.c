@@ -8879,7 +8879,7 @@ gen51Code (iCode * lic)
   lineHead = lineCurr = NULL;
 
   /* print the allocation information */
-  if (allocInfo)
+  if (allocInfo && currFunc)
     printAllocInfo (currFunc, codeOutFile);
   /* if debug information required */
   if (options.debug && currFunc)

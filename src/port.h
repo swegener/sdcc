@@ -63,6 +63,8 @@ typedef struct
 	const char *plain_opts;
 	/* print externs as global */
 	int externGlobal;
+	/* assembler file extension */
+	const char *file_ext;
       }
     assembler;
 

@@ -1297,7 +1297,7 @@ glue ()
   if (!options.c1mode)
     {
       sprintf (buffer, srcFileName);
-      strcat (buffer, ".asm");
+      strcat (buffer, port->assembler.file_ext);
     }
   else
     {

@@ -241,19 +241,27 @@ static asmop *newAsmop (short type)
     return aop;
 }
 
-/* #define DPS_OPT */ /* turn this on after some more testing. */
+/* #define LAZY_DPS_OPT */ /* turn this on after some more testing. */
 
-static int _currentDPS;
-static int _desiredDPS;
-static int _lazyDPS = 0;
+static int _currentDPS;	  /* Current processor DPS. */
+static int _desiredDPS;	  /* DPS value compiler thinks we should be using. */
+static int _lazyDPS = 0;  /* if non-zero, we are doing lazy evaluation of DPS changes. */
 
+/*-----------------------------------------------------------------*/
+/* genSetDPTR: generate code to select which DPTR is in use (zero  */
+/* selects standard DPTR (DPL/DPH/DPX), non-zero selects DS390 	   */
+/* alternate DPTR (DPL1/DPH1/DPX1).				   */
+/*-----------------------------------------------------------------*/
 static void genSetDPTR(int n)
 {
-#ifdef DPS_OPT
+
+#ifdef LAZY_DPS_OPT
+    /* If we are doing lazy evaluation, simply note the desired
+     * change, but don't emit any code yet.
+     */
     if (_lazyDPS)
     {
         _desiredDPS = n;
-        /* emitcode(";", "_desiredDPS = %d", n); */
         return;
     }
 #endif
@@ -268,30 +276,43 @@ static void genSetDPTR(int n)
     }
 }
 
-static void _startAopGetLoop(void)
+/*-----------------------------------------------------------------*/
+/* _startLazyDPSEvaluation: call to start doing lazy DPS evaluation*/
+/* 								   */
+/* Any code that operates on DPTR (NB: not on the individual 	   */
+/* components, like DPH) *must* call _flushLazyDPS() before using  */
+/* DPTR within a lazy DPS evaluation block.			   */
+/*								   */
+/* Note that aopPut and aopGet already contain the proper calls to */
+/* _flushLazyDPS, so it is safe to use these calls within a lazy   */
+/* DPS evaluation block.					   */
+/* 								   */
+/* Also, _flushLazyDPS must be called before any flow control 	   */
+/* operations that could potentially branch out of the block.	   */
+/*							           */
+/* Lazy DPS evaluation is simply an optimization (though an 	   */
+/* important one), so if in doubt, leave it out.		   */
+/*-----------------------------------------------------------------*/
+static void _startLazyDPSEvaluation(void)
 {
    _currentDPS = 0;
    _desiredDPS = 0;
    _lazyDPS = 1;
 }
 
-static void _endAopGetLoop(void)
-{
-   _lazyDPS = 0;
-   if (_currentDPS)
-   {
-       genSetDPTR(0);
-   }
-   _currentDPS = 0;
-   _desiredDPS = 0;
-}
-
-static void _aopFlushDPS(void)
+/*-----------------------------------------------------------------*/
+/* _flushLazyDPS: emit code to force the actual DPS setting to the */
+/* desired one. Call before using DPTR within a lazy DPS evaluation*/
+/* block.							   */
+/*-----------------------------------------------------------------*/
+static void _flushLazyDPS(void)
 {
     if (!_lazyDPS)
     {
+        /* nothing to do. */
         return;
     }
+    
     if (_desiredDPS != _currentDPS)
     {
     	if (_desiredDPS)
@@ -303,9 +324,27 @@ static void _aopFlushDPS(void)
     	    emitcode("dec", "dps");
     	}
     	_currentDPS = _desiredDPS;
-    	/* emitcode(";", "_currentDPS = _desiredDPS = %d", _currentDPS); */
     }
 }
+
+/*-----------------------------------------------------------------*/
+/* _endLazyDPSEvaluation: end lazy DPS evaluation block. 	   */
+/*								   */
+/* Forces us back to the safe state (standard DPTR selected).	   */
+/*-----------------------------------------------------------------*/
+static void _endLazyDPSEvaluation(void)
+{
+   if (_currentDPS)
+   {
+       genSetDPTR(0);
+       _flushLazyDPS();
+   }
+   _lazyDPS = 0;
+   _currentDPS = 0;
+   _desiredDPS = 0;
+}
+
+
 
 /*-----------------------------------------------------------------*/
 /* pointerCode - returns the code for a pointer type               */
@@ -433,7 +472,7 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result, bool useDP2)
     if (useDP2)
     {        
         genSetDPTR(1);
-        _aopFlushDPS();
+        _flushLazyDPS();
     	emitcode ("mov","dptr,#%s", sym->rname);
         genSetDPTR(0);
     }    
@@ -860,7 +899,7 @@ static char *aopGet (asmop *aop,
             }
    	}
     
-    	_aopFlushDPS();
+    	_flushLazyDPS();
     
 	while (offset > aop->coff) {
 	    emitcode ("inc","dptr");
@@ -1012,7 +1051,7 @@ static void aopPut (asmop *aop, char *s, int offset)
     	{
             genSetDPTR(1);
     	}
-    	_aopFlushDPS();
+    	_flushLazyDPS();
     
 	if (aop->code) {
 	    werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
@@ -1190,7 +1229,7 @@ static void reAdjustPreg (asmop *aop)
             if (aop->type == AOP_DPTR2)
     	    {
                 genSetDPTR(1);
-                _aopFlushDPS();
+                _flushLazyDPS();
     	    } 
             while (size--)
             {
@@ -1265,7 +1304,7 @@ static void genNotFloat (operand *op, operand *res)
     size = AOP_SIZE(op) - 1;
     offset = 1;
 
-    _startAopGetLoop();
+    _startLazyDPSEvaluation();
     l = aopGet(op->aop,offset++,FALSE,FALSE,TRUE);
     MOVA(l);    
 
@@ -1274,7 +1313,7 @@ static void genNotFloat (operand *op, operand *res)
                  aopGet(op->aop,
                         offset++,FALSE,FALSE,FALSE));
     }
-    _endAopGetLoop();
+    _endLazyDPSEvaluation();
     tlbl = newiTempLabel(NULL);
 
     tlbl = newiTempLabel(NULL);
@@ -1378,7 +1417,7 @@ static void toBoolean(operand *oper)
        	size--;
     }
 
-    _startAopGetLoop();
+    _startLazyDPSEvaluation();
     if (AOP_NEEDSACC(oper))
     {
         emitcode("push", "b");
@@ -1399,7 +1438,7 @@ static void toBoolean(operand *oper)
             emitcode("orl","a,%s",aopGet(AOP(oper),offset++,FALSE,FALSE,FALSE));
 	}
     }
-    _endAopGetLoop();
+    _endLazyDPSEvaluation();
     
     if (AOP_NEEDSACC(oper))
     {
@@ -1478,14 +1517,14 @@ static void genCpl (iCode *ic)
     } 
 
     size = AOP_SIZE(IC_RESULT(ic));
-    _startAopGetLoop();
+    _startLazyDPSEvaluation();
     while (size--) {
         char *l = aopGet(AOP(IC_LEFT(ic)),offset,FALSE,FALSE,TRUE);
         MOVA(l);       
         emitcode("cpl","a");
         aopPut(AOP(IC_RESULT(ic)),"a",offset++);
     }
-    _endAopGetLoop();
+    _endLazyDPSEvaluation();
 
 
 release:
@@ -1505,7 +1544,7 @@ static void genUminusFloat(operand *op,operand *result)
     first it then copy the rest in place */
     D(emitcode(";", "genUminusFloat"););
     
-    _startAopGetLoop();
+    _startLazyDPSEvaluation();
     size = AOP_SIZE(op) - 1;
     l = aopGet(AOP(op),3,FALSE,FALSE,TRUE);
     MOVA(l);    
@@ -1519,7 +1558,7 @@ static void genUminusFloat(operand *op,operand *result)
                offset);
         offset++;
     }
-    _endAopGetLoop();
+    _endLazyDPSEvaluation();
 }
 
 /*-----------------------------------------------------------------*/
@@ -1561,7 +1600,7 @@ static void genUminus (iCode *ic)
     size = AOP_SIZE(IC_LEFT(ic));
     offset = 0 ;
     //CLRC ;
-    _startAopGetLoop();
+    _startLazyDPSEvaluation();
     while(size--) {
         char *l = aopGet(AOP(IC_LEFT(ic)),offset,FALSE,FALSE,TRUE);
         if (!strcmp(l,"a")) {
@@ -1577,7 +1616,7 @@ static void genUminus (iCode *ic)
         }       
         aopPut(AOP(IC_RESULT(ic)),"a",offset++);
     }
-    _endAopGetLoop();
+    _endLazyDPSEvaluation();
 
     /* if any remaining bytes in the result */
     /* we just need to propagate the sign   */
@@ -1700,7 +1739,7 @@ static void unsaveRegisters (iCode *ic)
 static void pushSide(operand * oper, int size)
 {
 	int offset = 0;
-	_startAopGetLoop();
+	_startLazyDPSEvaluation();
 	while (size--) {
 		char *l = aopGet(AOP(oper),offset++,FALSE,TRUE,FALSE);
 		if (AOP_TYPE(oper) != AOP_REG &&
@@ -1711,7 +1750,7 @@ static void pushSide(operand * oper, int size)
 		} else
 			emitcode("push","%s",l);
 	}
-	_endAopGetLoop();
+	_endLazyDPSEvaluation();
 }
 
 /*-----------------------------------------------------------------*/
@@ -1721,10 +1760,13 @@ static void assignResultValue(operand * oper)
 {
 	int offset = 0;
 	int size = AOP_SIZE(oper);
+	
+	_startLazyDPSEvaluation();
 	while (size--) {
 		aopPut(AOP(oper),fReturn[offset],offset);
 		offset++;
 	}
+	_endLazyDPSEvaluation();
 }
 
 
@@ -1746,7 +1788,7 @@ static void genXpush (iCode *ic)
     emitcode("mov","%s,_spx",r->name);
 
     size = AOP_SIZE(IC_LEFT(ic));
-    _startAopGetLoop();
+    _startLazyDPSEvaluation();
     while(size--) {
 
 	char *l = aopGet(AOP(IC_LEFT(ic)),
@@ -1756,7 +1798,7 @@ static void genXpush (iCode *ic)
 	emitcode("inc","%s",r->name);
 
     }
-    _endAopGetLoop();
+    _endLazyDPSEvaluation();
 
 	
     emitcode("mov","_spx,%s",r->name);
@@ -1787,7 +1829,7 @@ static void genIpush (iCode *ic)
         aopOp(IC_LEFT(ic),ic,FALSE, FALSE);
         size = AOP_SIZE(IC_LEFT(ic));
         /* push it on the stack */
-        _startAopGetLoop();
+        _startLazyDPSEvaluation();
         while(size--) {
             l = aopGet(AOP(IC_LEFT(ic)),offset++,FALSE,TRUE,TRUE);
             if (*l == '#') {
@@ -1796,7 +1838,7 @@ static void genIpush (iCode *ic)
             }
             emitcode("push","%s",l);
         }
-        _endAopGetLoop();
+        _endLazyDPSEvaluation();
         return ;        
     }
 
@@ -1819,7 +1861,7 @@ static void genIpush (iCode *ic)
 	// pushSide(IC_LEFT(ic), AOP_SIZE(IC_LEFT(ic)));
     size = AOP_SIZE(IC_LEFT(ic));
 
-    _startAopGetLoop();
+    _startLazyDPSEvaluation();
     while (size--) {
         l = aopGet(AOP(IC_LEFT(ic)),offset++,FALSE,TRUE,FALSE);
         if (AOP_TYPE(IC_LEFT(ic)) != AOP_REG && 
@@ -1830,7 +1872,7 @@ static void genIpush (iCode *ic)
         } else
             emitcode("push","%s",l);
     }
-    _endAopGetLoop();
+    _endLazyDPSEvaluation();
 
     freeAsmop(IC_LEFT(ic),NULL,ic,TRUE);
 }
@@ -1852,13 +1894,13 @@ static void genIpop (iCode *ic)
     aopOp(IC_LEFT(ic),ic,FALSE, FALSE);
     size = AOP_SIZE(IC_LEFT(ic));
     offset = (size-1);
-    _startAopGetLoop();
+    _startLazyDPSEvaluation();
     while (size--)
     {
         emitcode("pop","%s",aopGet(AOP(IC_LEFT(ic)),offset--,
                                    FALSE,TRUE,TRUE));
     }
-    _endAopGetLoop();
+    _endLazyDPSEvaluation();
 
     freeAsmop(IC_LEFT(ic),NULL,ic,TRUE);
 }
@@ -1988,7 +2030,7 @@ static void genCall (iCode *ic)
             aopOp(IC_LEFT(sic),sic,FALSE, TRUE);
 	    size = AOP_SIZE(IC_LEFT(sic));
 	    
-	    _startAopGetLoop();
+	    _startLazyDPSEvaluation();
 	    while (size--) {
 		char *l = aopGet(AOP(IC_LEFT(sic)),offset,
 				FALSE, FALSE, TRUE);
@@ -1998,7 +2040,7 @@ static void genCall (iCode *ic)
 			     l);
 		offset++;
 	    }
-	    _endAopGetLoop();
+	    _endLazyDPSEvaluation();
 	    freeAsmop (IC_LEFT(sic),NULL,sic,TRUE);
 	}
 	_G.sendSet = NULL;
@@ -2014,16 +2056,29 @@ static void genCall (iCode *ic)
           OP_SYMBOL(IC_RESULT(ic))->spildir )) ||
         IS_TRUE_SYMOP(IC_RESULT(ic)) ) {
 
+#ifdef LAZY_DPS_OPT
+	/* Not really related to LAZY_DPS_OPT, but don't want
+	 * another testing flag right now...
+	 */
+        _G.accInUse++;
+        aopOp(IC_RESULT(ic),ic,FALSE, TRUE);
+        _G.accInUse--;
+                                     
+        assignResultValue(IC_RESULT(ic));
+                                                  
+        freeAsmop(IC_RESULT(ic),NULL, ic,TRUE);
+                                                                      
+#else
 	if (!isOperandInFarSpace(IC_RESULT(ic)))
 	{
-        _G.accInUse++;
+            _G.accInUse++;
             aopOp(IC_RESULT(ic),ic,FALSE, FALSE);
-        _G.accInUse--;
+            _G.accInUse--;
 
-	assignResultValue(IC_RESULT(ic));
+	    assignResultValue(IC_RESULT(ic));
 		
-        freeAsmop(IC_RESULT(ic),NULL, ic,TRUE);
-    }
+            freeAsmop(IC_RESULT(ic),NULL, ic,TRUE);
+    	}
         else
         {
             /* Result is in far space, and requires DPTR to access
@@ -2056,7 +2111,8 @@ static void genCall (iCode *ic)
 		aopPut(AOP(IC_RESULT(ic)),"a",++offset);
     	    }
     	    freeAsmop(IC_RESULT(ic),NULL,ic,TRUE);
-        }
+	}
+#endif	
     }
 
     /* adjust the stack for parameters if 
@@ -2139,7 +2195,7 @@ static void genPcall (iCode *ic)
 	    
 	    	aopOp(IC_LEFT(sic),sic,FALSE, FALSE);
 	    	size = AOP_SIZE(IC_LEFT(sic));
-	    	_startAopGetLoop();
+	    	_startLazyDPSEvaluation();
 	    	while (size--) 
 	    	{
 			char *l = aopGet(AOP(IC_LEFT(sic)),offset,
@@ -2152,7 +2208,7 @@ static void genPcall (iCode *ic)
 			}
 			offset++;
 	    	}
-	    	_endAopGetLoop();
+	    	_endLazyDPSEvaluation();
 	    	freeAsmop (IC_LEFT(sic),NULL,sic,TRUE);
 	    }
 	    _G.sendSet = NULL;
@@ -2582,7 +2638,7 @@ static void genRet (iCode *ic)
     aopOp(IC_LEFT(ic),ic,FALSE, TRUE);
     size = AOP_SIZE(IC_LEFT(ic));
     
-    _startAopGetLoop();
+    _startLazyDPSEvaluation();
     while (size--) {
 	    char *l ;
 	    if (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR) {
@@ -2597,7 +2653,7 @@ static void genRet (iCode *ic)
 			    emitcode("mov","%s,%s",fReturn[offset++],l);
 	    }
     }
-    _endAopGetLoop();    
+    _endLazyDPSEvaluation();    
 
     if (pushed) {
 	while(pushed) {
@@ -2784,12 +2840,12 @@ static bool genPlusIncr (iCode *ic)
             aopPut(AOP(IC_RESULT(ic)),"a",0);
         } else {
 	    
-	    _startAopGetLoop();
+	    _startLazyDPSEvaluation();
             while (icount--) 
             {
                 emitcode ("inc","%s",aopGet(AOP(IC_LEFT(ic)),0,FALSE,FALSE,FALSE));
             }
-            _endAopGetLoop();
+            _endLazyDPSEvaluation();
         }
 	
         return TRUE ;
@@ -2942,13 +2998,13 @@ static void genPlus (iCode *ic)
             outBitC(IC_RESULT(ic));
         } else {
             size = getDataSize(IC_RESULT(ic));
-            _startAopGetLoop();
+            _startLazyDPSEvaluation();
             while (size--) {
                 MOVA(aopGet(AOP(IC_RIGHT(ic)),offset,FALSE,FALSE,TRUE));
                 emitcode("addc","a,#00");
                 aopPut(AOP(IC_RESULT(ic)),"a",offset++);
             }
-            _endAopGetLoop();
+            _endLazyDPSEvaluation();
         }
         goto release ;
     }
@@ -2961,7 +3017,7 @@ static void genPlus (iCode *ic)
     }
     size = getDataSize(pushResult ? IC_LEFT(ic) : IC_RESULT(ic));
 
-    _startAopGetLoop();
+    _startLazyDPSEvaluation();
     while(size--)
     {
 	if (AOP_TYPE(IC_LEFT(ic)) == AOP_ACC) 
@@ -2992,7 +3048,7 @@ static void genPlus (iCode *ic)
         }
         offset++;
     }
-    _endAopGetLoop();
+    _endLazyDPSEvaluation();
    
     if (pushResult)
     {
@@ -3153,12 +3209,12 @@ static bool genMinusDec (iCode *ic)
         AOP_TYPE(IC_RESULT(ic)) == AOP_REG &&
         sameRegs(AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic)))) {
 
-	_startAopGetLoop();
+	_startLazyDPSEvaluation();
         while (icount--) 
         {
             emitcode ("dec","%s",aopGet(AOP(IC_RESULT(ic)),0,FALSE,FALSE,FALSE));
         }
-        _endAopGetLoop();
+        _endLazyDPSEvaluation();
 
         return TRUE ;
     }
@@ -3261,7 +3317,7 @@ static void genMinus (iCode *ic)
 
 
     /* if literal, add a,#-lit, else normal subb */
-    _startAopGetLoop();
+    _startLazyDPSEvaluation();
     while (size--) {
         MOVA(aopGet(AOP(IC_LEFT(ic)),offset,FALSE,FALSE,TRUE));
         if (AOP_TYPE(IC_RIGHT(ic)) != AOP_LIT)  
@@ -3287,7 +3343,7 @@ static void genMinus (iCode *ic)
         }
         offset++;
     }
-    _endAopGetLoop();
+    _endLazyDPSEvaluation();
 
     if (pushResult)
     {
@@ -5162,7 +5218,7 @@ static void genRRC (iCode *ic)
     offset = size - 1 ;
     CLRC;
     
-    _startAopGetLoop();
+    _startLazyDPSEvaluation();
     while (size--) {
         l = aopGet(AOP(left),offset,FALSE,FALSE,TRUE);
         MOVA(l);
@@ -5170,7 +5226,7 @@ static void genRRC (iCode *ic)
         if (AOP_SIZE(result) > 1)
             aopPut(AOP(result),"a",offset--);
     }
-    _endAopGetLoop();
+    _endLazyDPSEvaluation();
     
     /* now we need to put the carry into the
     highest order byte of the result */
@@ -5213,7 +5269,7 @@ static void genRLC (iCode *ic)
             aopPut(AOP(result),"a",offset++);
         }
             
-        _startAopGetLoop();
+        _startLazyDPSEvaluation();
         while (size--) {
             l = aopGet(AOP(left),offset,FALSE,FALSE,TRUE);
             MOVA(l);
@@ -5221,7 +5277,7 @@ static void genRLC (iCode *ic)
             if (AOP_SIZE(result) > 1)
                 aopPut(AOP(result),"a",offset++);
         }
-        _endAopGetLoop();
+        _endLazyDPSEvaluation();
     }
     /* now we need to put the carry into the
     highest order byte of the result */
@@ -5999,7 +6055,7 @@ static void genLeftShift (iCode *ic)
 
         size = AOP_SIZE(result);
         offset=0;
-        _startAopGetLoop();
+        _startLazyDPSEvaluation();
         while (size--) {
             l = aopGet(AOP(left),offset,FALSE,TRUE,FALSE);
             if (*l == '@' && (IS_AOP_PREG(result))) {
@@ -6010,7 +6066,7 @@ static void genLeftShift (iCode *ic)
                 aopPut(AOP(result),l,offset);
             offset++;
         }
-        _endAopGetLoop();
+        _endLazyDPSEvaluation();
     }
 
     tlbl = newiTempLabel(NULL);
@@ -6041,14 +6097,14 @@ static void genLeftShift (iCode *ic)
     MOVA(l);
     emitcode("add","a,acc");         
     aopPut(AOP(result),"a",offset++);
-    _startAopGetLoop();
+    _startLazyDPSEvaluation();
     while (--size) {
         l = aopGet(AOP(result),offset,FALSE,FALSE,TRUE);
         MOVA(l);
         emitcode("rlc","a");         
         aopPut(AOP(result),"a",offset++);
     }
-    _endAopGetLoop();
+    _endLazyDPSEvaluation();
     reAdjustPreg(AOP(result));
 
     emitcode("","%05d$:",tlbl1->key+100);
@@ -6291,7 +6347,7 @@ static void genSignedRightShift (iCode *ic)
 
         size = AOP_SIZE(result);
         offset=0;
-        _startAopGetLoop();
+        _startLazyDPSEvaluation();
         while (size--) {
             l = aopGet(AOP(left),offset,FALSE,TRUE,FALSE);
             if (*l == '@' && IS_AOP_PREG(result)) {
@@ -6302,7 +6358,7 @@ static void genSignedRightShift (iCode *ic)
                 aopPut(AOP(result),l,offset);
             offset++;
         }
-        _endAopGetLoop();
+        _endLazyDPSEvaluation();
     }
 
     /* mov the highest order bit to OVR */    
@@ -6332,14 +6388,14 @@ static void genSignedRightShift (iCode *ic)
     emitcode("sjmp","%05d$",tlbl1->key+100);
     emitcode("","%05d$:",tlbl->key+100);    
     emitcode("mov","c,ov");
-    _startAopGetLoop();
+    _startLazyDPSEvaluation();
     while (size--) {
         l = aopGet(AOP(result),offset,FALSE,FALSE,TRUE);
         MOVA(l);
         emitcode("rrc","a");         
         aopPut(AOP(result),"a",offset--);
     }
-    _endAopGetLoop();
+    _endLazyDPSEvaluation();
     reAdjustPreg(AOP(result));
     emitcode("","%05d$:",tlbl1->key+100);
     emitcode("djnz","b,%05d$",tlbl->key+100);
@@ -6412,7 +6468,7 @@ static void genRightShift (iCode *ic)
 
         size = AOP_SIZE(result);
         offset=0;
-        _startAopGetLoop();
+        _startLazyDPSEvaluation();
         while (size--) {
             l = aopGet(AOP(left),offset,FALSE,TRUE,FALSE);
             if (*l == '@' && IS_AOP_PREG(result)) {
@@ -6423,7 +6479,7 @@ static void genRightShift (iCode *ic)
                 aopPut(AOP(result),l,offset);
             offset++;
         }
-        _endAopGetLoop();
+        _endLazyDPSEvaluation();
     }
 
     tlbl = newiTempLabel(NULL);
@@ -6449,14 +6505,14 @@ static void genRightShift (iCode *ic)
     emitcode("sjmp","%05d$",tlbl1->key+100);
     emitcode("","%05d$:",tlbl->key+100);    
     CLRC;
-    _startAopGetLoop();
+    _startLazyDPSEvaluation();
     while (size--) {
         l = aopGet(AOP(result),offset,FALSE,FALSE,TRUE);
         MOVA(l);
         emitcode("rrc","a");         
         aopPut(AOP(result),"a",offset--);
     }
-    _endAopGetLoop();
+    _endLazyDPSEvaluation();
     reAdjustPreg(AOP(result));
 
     emitcode("","%05d$:",tlbl1->key+100);
@@ -6590,7 +6646,7 @@ static void genDataPointerGet (operand *left,
     /* get the string representation of the name */
     l = aopGet(AOP(left),0,FALSE,TRUE,FALSE);
     size = AOP_SIZE(result);
-    _startAopGetLoop();
+    _startLazyDPSEvaluation();
     while (size--) {
 	if (offset)
 	    sprintf(buffer,"(%s + %d)",l+1,offset);
@@ -6598,7 +6654,7 @@ static void genDataPointerGet (operand *left,
 	    sprintf(buffer,"%s",l+1);
 	aopPut(AOP(result),buffer,offset++);
     }
-    _endAopGetLoop();
+    _endLazyDPSEvaluation();
 
     freeAsmop(left,NULL,ic,TRUE);
     freeAsmop(result,NULL,ic,TRUE);
@@ -6801,7 +6857,7 @@ static void genFarPointerGet (operand *left,
         else 
         { 
             /* we need to get it byte by byte */
-            _startAopGetLoop();
+            _startLazyDPSEvaluation();
 	    if (AOP_TYPE(left) != AOP_DPTR)
 	    {
             	emitcode("mov","dpl,%s",aopGet(AOP(left),0,FALSE,FALSE,TRUE));
@@ -6818,7 +6874,7 @@ static void genFarPointerGet (operand *left,
                  emitcode("pop", "dph");
                  emitcode("pop", "dpl");
             }
-            _endAopGetLoop();
+            _endLazyDPSEvaluation();
         }
     }
     /* so dptr know contains the address */
@@ -6861,11 +6917,11 @@ static void emitcodePointerGet (operand *left,
         if (AOP_TYPE(left) == AOP_IMMD)
             emitcode("mov","dptr,%s",aopGet(AOP(left),0,TRUE,FALSE,FALSE));
         else { /* we need to get it byte by byte */
-            _startAopGetLoop();
+            _startLazyDPSEvaluation();
             emitcode("mov","dpl,%s",aopGet(AOP(left),0,FALSE,FALSE,TRUE));
             emitcode("mov","dph,%s",aopGet(AOP(left),1,FALSE,FALSE,TRUE));
             emitcode("mov","dpx,%s",aopGet(AOP(left),2,FALSE,FALSE,TRUE));
-            _endAopGetLoop();
+            _endLazyDPSEvaluation();
         }
     }
     /* so dptr know contains the address */
@@ -6911,7 +6967,7 @@ static void genGenPointerGet (operand *left,
 	    emitcode("mov","b,#%d",pointerCode(retype));
 	}
         else { /* we need to get it byte by byte */
-            _startAopGetLoop();
+            _startLazyDPSEvaluation();
             emitcode("mov","dpl,%s",aopGet(AOP(left),0,FALSE,FALSE,TRUE));
             emitcode("mov","dph,%s",aopGet(AOP(left),1,FALSE,FALSE,TRUE));
             if (options.model == MODEL_FLAT24)
@@ -6923,7 +6979,7 @@ static void genGenPointerGet (operand *left,
             {
             	emitcode("mov","b,%s",aopGet(AOP(left),2,FALSE,FALSE,TRUE));
             }
-            _endAopGetLoop();
+            _endLazyDPSEvaluation();
         }
     }
     /* so dptr know contains the address */
@@ -7388,7 +7444,7 @@ static void genFarPointerSet (operand *right,
         else 
         {
             /* we need to get it byte by byte */
-            _startAopGetLoop();
+            _startLazyDPSEvaluation();
 	    if (AOP_TYPE(result) != AOP_DPTR)
 	    {
             	emitcode("mov","dpl,%s",aopGet(AOP(result),0,FALSE,FALSE,TRUE));
@@ -7405,7 +7461,7 @@ static void genFarPointerSet (operand *right,
                  emitcode("pop", "dph");
                  emitcode("pop", "dpl");
             }
-            _endAopGetLoop();
+            _endLazyDPSEvaluation();
         }
     }
     /* so dptr know contains the address */
@@ -7419,7 +7475,7 @@ static void genFarPointerSet (operand *right,
         size = AOP_SIZE(right);
         offset = 0 ;
 
-	_startAopGetLoop();
+	_startLazyDPSEvaluation();
         while (size--) {
             char *l = aopGet(AOP(right),offset++,FALSE,FALSE,TRUE);
             MOVA(l);
@@ -7427,7 +7483,7 @@ static void genFarPointerSet (operand *right,
             if (size)
                 emitcode("inc","dptr");
         }
-        _endAopGetLoop();
+        _endLazyDPSEvaluation();
     }
 
     freeAsmop(right,NULL,ic,TRUE);
@@ -7447,7 +7503,7 @@ static void genGenPointerSet (operand *right,
     /* if the operand is already in dptr 
     then we do nothing else we move the value to dptr */
     if (AOP_TYPE(result) != AOP_STR) {
-    	_startAopGetLoop();
+    	_startLazyDPSEvaluation();
         /* if this is remateriazable */
         if (AOP_TYPE(result) == AOP_IMMD) {
             emitcode("mov","dptr,%s",aopGet(AOP(result),0,TRUE,FALSE,FALSE));
@@ -7459,7 +7515,7 @@ static void genGenPointerSet (operand *right,
             emitcode("mov","dpx,%s",aopGet(AOP(result),2,FALSE,FALSE,TRUE));
             emitcode("mov","b,%s",aopGet(AOP(result),3,FALSE,FALSE,TRUE));
         }
-        _endAopGetLoop();
+        _endLazyDPSEvaluation();
     }
     /* so dptr know contains the address */
     freeAsmop(result,NULL,ic,TRUE);
@@ -7672,7 +7728,7 @@ static void genFarFarAssign (operand *result, operand *right, iCode *ic)
     D(emitcode(";", "genFarFarAssign "););
 
     /* first push the right side on to the stack */
-    _startAopGetLoop();
+    _startLazyDPSEvaluation();
     while (size--) {
 	l = aopGet(AOP(right),offset++,FALSE,FALSE,TRUE);
 	MOVA(l);
@@ -7688,7 +7744,7 @@ static void genFarFarAssign (operand *result, operand *right, iCode *ic)
 	aopPut(AOP(result),"a",--offset);
     }
     freeAsmop(result,NULL,ic,FALSE);
-    _endAopGetLoop();
+    _endLazyDPSEvaluation();
 	
 }
 
@@ -7764,14 +7820,41 @@ static void genAssign (iCode *ic)
     offset = 0 ;
     if(AOP_TYPE(right) == AOP_LIT)
 	lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
+    
     if((size > 1) &&
        (AOP_TYPE(result) != AOP_REG) &&
        (AOP_TYPE(right) == AOP_LIT) &&
-       !IS_FLOAT(operandType(right)) &&
-       (lit < 256L)){
+       !IS_FLOAT(operandType(right)) 
+#ifndef LAZY_DPS_OPT       
+       && (lit < 256L)
+#endif       
+       )
+    {
+#ifdef LAZY_DPS_OPT    
+	D(emitcode(";", "Kevin's better literal load code"););
+	_startLazyDPSEvaluation();
+	while (size && ((unsigned int)((lit >> (offset*8)) & 0xff) != 0))
+	{
+	    aopPut(AOP(result),
+	       	   aopGet(AOP(right),offset,FALSE,FALSE,TRUE),
+	       	   offset);
+	    offset++;
+	    size--;
+	}
+	/* And now fill the rest with zeros. */
+	if (size)
+	{
+	    emitcode("clr","a");
+	}
+	while (size--)
+	{
+	    aopPut(AOP(result), "a", offset++);
+	}
+	_endLazyDPSEvaluation();
+#else
 	emitcode("clr","a");
 	
-	_startAopGetLoop();
+	_startLazyDPSEvaluation();
 	while (size--) 
 	{
 	    if((unsigned int)((lit >> (size*8)) & 0x0FFL)== 0)
@@ -7781,9 +7864,12 @@ static void genAssign (iCode *ic)
 		       aopGet(AOP(right),size,FALSE,FALSE,FALSE),
 		       size);
 	}
-	_endAopGetLoop();
-    } else {
-	_startAopGetLoop();
+	_endLazyDPSEvaluation();
+#endif	
+    } 
+    else 
+    {
+	_startLazyDPSEvaluation();
 	while (size--) 
 	{
 	    aopPut(AOP(result),
@@ -7791,7 +7877,7 @@ static void genAssign (iCode *ic)
 		   offset);
 	    offset++;
 	}
-	_endAopGetLoop();
+	_endLazyDPSEvaluation();
     }
     
 release:
@@ -7885,14 +7971,14 @@ static void genCast (iCode *ic)
         /* if they in different places then copy */
         size = AOP_SIZE(result);
         offset = 0 ;
-        _startAopGetLoop();
+        _startLazyDPSEvaluation();
         while (size--) {
             aopPut(AOP(result),
                    aopGet(AOP(right),offset,FALSE,FALSE,FALSE),
                    offset);
             offset++;
         }
-        _endAopGetLoop();
+        _endLazyDPSEvaluation();
         goto release;
     }
 
@@ -7955,14 +8041,14 @@ static void genCast (iCode *ic)
 	    /* the first two bytes are known */
 	    size = GPTRSIZE - 1; 
 	    offset = 0 ;
-	    _startAopGetLoop();
+	    _startLazyDPSEvaluation();
 	    while (size--) {
 		aopPut(AOP(result),
 		       aopGet(AOP(right),offset,FALSE,FALSE,FALSE),
 		       offset);
 		offset++;
 	    }
-	    _endAopGetLoop();
+	    _endLazyDPSEvaluation();
 	    
 	    /* the last byte depending on type */
 	    switch (p_type) {
@@ -7993,14 +8079,14 @@ static void genCast (iCode *ic)
 	/* just copy the pointers */
 	size = AOP_SIZE(result);
 	offset = 0 ;
-	_startAopGetLoop();
+	_startLazyDPSEvaluation();
 	while (size--) {
 	    aopPut(AOP(result),
 		   aopGet(AOP(right),offset,FALSE,FALSE,FALSE),
 		   offset);
 	    offset++;
 	}
-	_endAopGetLoop();
+	_endLazyDPSEvaluation();
 	goto release ;
     }
     
@@ -8009,14 +8095,14 @@ static void genCast (iCode *ic)
     /* we move to result for the size of source */
     size = AOP_SIZE(right);
     offset = 0 ;
-    _startAopGetLoop();
+    _startLazyDPSEvaluation();
     while (size--) {
         aopPut(AOP(result),
                aopGet(AOP(right),offset,FALSE,FALSE,FALSE),
                offset);
         offset++;
     }
-    _endAopGetLoop();
+    _endLazyDPSEvaluation();
 
     /* now depending on the sign of the source && destination */
     size = AOP_SIZE(result) - AOP_SIZE(right);

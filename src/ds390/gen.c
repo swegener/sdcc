@@ -241,7 +241,7 @@ static asmop *newAsmop (short type)
     return aop;
 }
 
-/* #define LAZY_DPS_OPT */ /* turn this on after some more testing. */
+/* #define LAZY_DPS_OPT */  /* turn this on after some more testing. */
 
 static int _currentDPS;	  /* Current processor DPS. */
 static int _desiredDPS;	  /* DPS value compiler thinks we should be using. */
@@ -1180,32 +1180,6 @@ static void aopPut (asmop *aop, char *s, int offset)
 
 }
 
-
-#if 0
-/*-----------------------------------------------------------------*/
-/* pointToEnd :- points to the last byte of the operand            */
-/*-----------------------------------------------------------------*/
-static void pointToEnd (asmop *aop)
-{
-    int count ;
-    if (!aop)
-        return ;
-
-    aop->coff = count = (aop->size - 1);
-    switch (aop->type) {
-        case AOP_R0 :
-        case AOP_R1 :
-            while (count--)
-                emitcode("inc","%s",aop->aopu.aop_ptr->name);
-            break;
-        case AOP_DPTR :
-            while (count--)
-                emitcode("inc","dptr");
-            break;
-    }
-
-}
-#endif
 
 /*-----------------------------------------------------------------*/
 /* reAdjustPreg - points a register back to where it should        */
@@ -3083,11 +3057,13 @@ static void genPlus (iCode *ic)
 	    }
 	}
 
+	_startLazyDPSEvaluation();
         while(size--)
         {
             emitcode("pop", "acc");
             aopPut(AOP(IC_RESULT(ic)), "a", --offset);
         }
+        _endLazyDPSEvaluation();
     }
 
     adjustArithmeticResult(ic);
@@ -6888,12 +6864,18 @@ static void genFarPointerGet (operand *left,
         size = AOP_SIZE(result);
         offset = 0 ;
 
+	_startLazyDPSEvaluation();
         while (size--) {
+            
+            genSetDPTR(0);
+            _flushLazyDPS();
+            
             emitcode("movx","a,@dptr");
             aopPut(AOP(result),"a",offset++);
             if (size)
                 emitcode("inc","dptr");
         }
+        _endLazyDPSEvaluation();
     }
 
     freeAsmop(result,NULL,ic,TRUE);
@@ -7479,6 +7461,10 @@ static void genFarPointerSet (operand *right,
         while (size--) {
             char *l = aopGet(AOP(right),offset++,FALSE,FALSE,TRUE);
             MOVA(l);
+            
+            genSetDPTR(0);
+            _flushLazyDPS();
+            
             emitcode("movx","@dptr,a");
             if (size)
                 emitcode("inc","dptr");
@@ -7528,13 +7514,19 @@ static void genGenPointerSet (operand *right,
         size = AOP_SIZE(right);
         offset = 0 ;
 
+	_startLazyDPSEvaluation();
         while (size--) {
             char *l = aopGet(AOP(right),offset++,FALSE,FALSE,TRUE);
             MOVA(l);
+            
+            genSetDPTR(0);
+            _flushLazyDPS();
+            
             emitcode("lcall","__gptrput");
             if (size)
                 emitcode("inc","dptr");
         }
+        _endLazyDPSEvaluation();
     }
 
     freeAsmop(right,NULL,ic,TRUE);
@@ -7850,12 +7842,12 @@ static void genAssign (iCode *ic)
        (AOP_TYPE(result) != AOP_REG) &&
        (AOP_TYPE(right) == AOP_LIT) &&
        !IS_FLOAT(operandType(right)) 
-#ifndef LAZY_DPS_OPT       
+#ifndef LAZY_DPS_OPT
        && (lit < 256L)
 #endif       
        )
     {
-#ifdef LAZY_DPS_OPT    
+#ifdef LAZY_DPS_OPT
 	D(emitcode(";", "Kevin's better literal load code"););
 	_startLazyDPSEvaluation();
 	while (size && ((unsigned int)((lit >> (offset*8)) & 0xff) != 0))

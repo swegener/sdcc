@@ -17,6 +17,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "SDCCerr.h"
 
@@ -477,3 +478,19 @@ void werror (int errNum, ... )
     va_end( marker );
 }
 
+
+/*
+-------------------------------------------------------------------------------
+fatal - Output a standard eror message with variable number of arguements and
+        call exit()
+-------------------------------------------------------------------------------
+*/
+void fatal (int exitCode, int errNum, ... )
+{
+    va_list	marker;
+    va_start(marker,errNum);
+    vwerror(errNum, marker);
+    va_end( marker );
+
+    exit(exitCode);
+}

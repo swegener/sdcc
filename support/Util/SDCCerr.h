@@ -235,4 +235,13 @@ werror - Output a standard eror message with variable number of arguements
 
 void	werror (int errNum, ... ) ;
 
+/*
+-------------------------------------------------------------------------------
+fatal - Output a standard eror message with variable number of arguements and
+        call exit()
+-------------------------------------------------------------------------------
+*/
+
+void    fatal (int exitCode, int errNum, ... ) ;
+
 #endif

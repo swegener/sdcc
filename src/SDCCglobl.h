@@ -251,13 +251,14 @@ extern int cNestLevel;		/* block nest level  SDCCval.c      */
 extern int currBlockno;		/* sequentail block number */
 extern struct optimize optimize;
 extern struct options options;
-extern int maxInterrupts;
+extern unsigned maxInterrupts;
 
 /* Visible from SDCCmain.c */
 extern int nrelFiles;
 extern char *relFiles[128];
 extern char *libFiles[128];
 extern int nlibFiles;
+extern bool verboseExec ;
 
 /*
    void buildCmdLine(char *into, char **args, const char **cmds, 

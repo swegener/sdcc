@@ -26,6 +26,8 @@
 #include <ctype.h>
 #include "newalloc.h"
 #include "SDCCerr.h"
+#include "BuildCmd.h"
+#include "MySystem.h"
 
 #if NATIVE_WIN32
 #include <process.h>
@@ -40,8 +42,10 @@
 
 #else
 // No unistd.h in Borland C++
+/*
 extern int access (const char *, int);
 #define X_OK 1
+*/
 
 #endif
 
@@ -209,68 +213,6 @@ _validatePorts (void)
 	}
     }
 }
-
-void
-buildCmdLine (char *into, const char **cmds,
-	      const char *p1, const char *p2,
-	      const char *p3, const char **list)
-{
-  const char *p, *from;
-
-  *into = '\0';
-
-  while (*cmds)
-    {
-
-      from = *cmds;
-      cmds++;
-
-      /* See if it has a '$' anywhere - if not, just copy */
-      if ((p = strchr (from, '$')))
-	{
-	  strncat (into, from, p - from);
-	  /* seperate it */
-	  strcat (into, " ");
-	  from = p + 2;
-	  p++;
-	  switch (*p)
-	    {
-	    case '1':
-	      if (p1)
-		strcat (into, p1);
-	      break;
-	    case '2':
-	      if (p2)
-		strcat (into, p2);
-	      break;
-	    case '3':
-	      if (p3)
-		strcat (into, p3);
-	      break;
-	    case 'l':
-	      {
-		const char **tmp = list;
-		if (tmp)
-		  {
-		    while (*tmp)
-		      {
-			strcat (into, *tmp);
-			strcat (into, " ");
-			tmp++;
-		      }
-		  }
-		break;
-	      }
-	    default:
-	      assert (0);
-	    }
-	}
-      strcat (into, from);	// this includes the ".asm" from "$1.asm"
-
-      strcat (into, " ");
-    }
-}
-
 /*-----------------------------------------------------------------*/
 /* printVersionInfo - prints the version info        */
 /*-----------------------------------------------------------------*/
@@ -1133,70 +1075,6 @@ parseCmdLine (int argc, char **argv)
 }
 
 /*-----------------------------------------------------------------*/
-/* my_system - will call a program with arguments                  */
-/*-----------------------------------------------------------------*/
-
-
-
-
-//char *try_dir[]= {SRCDIR "/bin",PREFIX "/bin", NULL};
-char *try_dir[] =
-{NULL, NULL};			/* First entry may be overwritten, so use two. */
-
-
-int
-my_system (const char *cmd)
-{
-  int argsStart, e, i = 0;
-  char *cmdLine = NULL;
-
-  argsStart = strstr (cmd, " ") - cmd;
-
-  // try to find the command in predefined path's
-  while (try_dir[i])
-    {
-      cmdLine = (char *) Safe_malloc (strlen (try_dir[i]) + strlen (cmd) + 10);
-      strcpy (cmdLine, try_dir[i]);	// the path
-
-      strcat (cmdLine, DIR_SEPARATOR_STRING);
-      strncat (cmdLine, cmd, argsStart);	// the command
-
-#if NATIVE_WIN32
-      strcat (cmdLine, ".exe");
-#endif
-
-      if (access (cmdLine, X_OK) == 0)
-	{
-	  // the arguments
-	  strcat (cmdLine, cmd + argsStart);
-	  break;
-	}
-      free (cmdLine);
-      cmdLine = NULL;
-      i++;
-    }
-
-  if (verboseExec)
-    {
-      printf ("+ %s\n", cmdLine ? cmdLine : cmd);
-    }
-
-  if (cmdLine)
-    {
-      // command found in predefined path
-      e = system (cmdLine);
-      free (cmdLine);
-    }
-  else
-    {
-      // trust on $PATH
-      e = system (cmd);
-    }
-  return e;
-}
-
-
-/*-----------------------------------------------------------------*/
 /* linkEdit : - calls the linkage editor  with options             */
 /*-----------------------------------------------------------------*/
 static void
@@ -1493,7 +1371,7 @@ main (int argc, char **argv, char **envp)
     {
       strcpy (DefaultExePath, argv[0]);
       *(strrchr (DefaultExePath, DIR_SEPARATOR_CHAR)) = 0;
-      try_dir[0] = DefaultExePath;
+      ExePathList[0] = DefaultExePath;
     }
 
 

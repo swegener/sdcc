@@ -1397,7 +1397,6 @@ pack:
         
     remiCodeFromeBBlock(ebp,ic);
     return 1;
-    
 }
 
 /** Scanning backwards looks for first assig found.
@@ -1799,7 +1798,40 @@ static void packRegsForAccUse (iCode *ic)
 	goto accuse ;
     return ;
  accuse:
-    OP_SYMBOL(IC_RESULT(ic))->accuse = 1;
+    OP_SYMBOL(IC_RESULT(ic))->accuse = ACCUSE_A;
+}
+
+static void packRegsForHLUse (iCode *ic)
+{
+    iCode *uic;
+
+    if (IS_GB)
+	return;
+
+    /* has only one definition */
+    if (bitVectnBitsOn(OP_DEFS(IC_RESULT(ic))) > 1)
+	return ;
+
+    /* has only one use */
+    if (bitVectnBitsOn(OP_USES(IC_RESULT(ic))) > 1)
+	return ;
+
+    /* and the usage immediately follows this iCode */
+    if (!(uic = hTabItemWithKey(iCodehTab,
+				bitVectFirstBit(OP_USES(IC_RESULT(ic))))))
+	return ;
+
+    if (ic->next != uic)
+	return ;
+
+    if (ic->op == ADDRESS_OF && uic->op == IPUSH)
+	goto hluse;
+    if (ic->op == CALL && IC_LEFT(ic)->parmBytes == 0 && (uic->op == '-' || uic->op == '+'))
+	goto hluse;
+    return;
+ hluse:
+    printf("Hey, it worked!\n");
+    OP_SYMBOL(IC_RESULT(ic))->accuse = ACCUSE_HL;
 }
 
 bool opPreservesA(iCode *ic, iCode *uic)
@@ -1860,7 +1892,7 @@ bool opPreservesA(iCode *ic, iCode *uic)
 
 /** Pack registers for acc use.
     When the result of this operation is small and short lived it may
-    be able to be stored in the accumelator.
+    be able to be stored in the accumulator.
 
     Note that the 'A preserving' list is currently emperical :)e
  */
@@ -2160,6 +2192,10 @@ static void packRegisters (eBBlock *ebp)
 	   only one operand or has two operands but one is literal & the
 	   result of that operation is not on stack then we can leave the
 	   result of this operation in acc:b combination */
+
+	if (IS_ITEMP(IC_RESULT(ic))) {
+	    packRegsForHLUse(ic);
+	}
 #if 0
 	if ((IS_ARITHMETIC_OP(ic) 
 	     || IS_BITWISE_OP(ic)

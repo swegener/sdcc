@@ -35,33 +35,59 @@ static const ASM_MAPPING _asxxxx_gb_mapping[] = {
 };
 
 static const ASM_MAPPING _asxxxx_z80_mapping[] = {
+    /* We want to prepend the _ */
+    { "area", ".area _%s" },
+    { "areacode", ".area _%s" },
+    { "areadata", ".area _%s" },
     { "*ixx", "%d(ix)" },
     { "*iyx", "%d(iy)" },
     { "*hl", "(hl)" },
     { "di", "di" },
-    { "ldahli", "ld a,(hl+)" },
-    { "ldahlsp", "lda hl,%d(sp)" },
-    { "ldaspsp", "lda sp,%d(sp)" },
+    { "ldahli", 
+		"ld a,(hl)\n"
+		"\tinc\thl" },
+    { "ldahlsp", 
+		"ld hl,#%d\n"
+		"\tadd\thl,sp" },
+    { "ldaspsp", 
+		"ld hl,#%d\n"
+		"\tadd\thl,sp\n"
+		"\tld\tsp,hl" },
     { "*pair", "(%s)" },
-    { "shortjp", "jr" },
-    { "enter", "push bc" },
+    { "shortjp", "jp" },
+    { "enter", 
+		"push bc\n"
+		"\tpush\tde\n"
+		"\tpush\tix\n"
+		"\tld\tix,#0\n"
+		"\tadd\tix,sp" },
     { "enterx", 
-      "push bc\n"
-      "lda sp,-%d(sp)" },
+      		"push bc\n"
+		"\tpush\tde\n"
+		"\tpush\tix\n"
+		"\tld\tix,#0\n"
+		"\tadd\tix,sp\n"
+		"\tld\thl,#-%d\n"
+		"\tadd\thl,sp\n"
+		"\tld\tsp,hl" },
     { "leave", 
-      "pop bc\n"
-      "\tret"
+		"pop\tix\n"
+		"\tpop\tde\n"
+      		"\tpop\tbc\n"
+      		"\tret"
     },
     { "leavex", 
-      "lda sp,%d(sp)\n"
-      "\tpop bc\n"
-      "\tret"
+		"ld sp,ix\n"
+		"\tpop\tix\n"
+		"\tpop\tde\n"
+      		"\tpop\tbc\n"
+      		"\tret"
     },
     { "pusha", 
-      "push af\n"
-      "\tpush bc\n"
-      "\tpush de\n"
-      "\tpush hl"
+      		"push af\n"
+      		"\tpush\tbc\n"
+      		"\tpush\tde\n"
+      		"\tpush\thl"
     },
     { "adjustsp", "lda sp,-%d(sp)" },
     { NULL, NULL }

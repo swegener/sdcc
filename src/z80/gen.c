@@ -71,6 +71,7 @@ static char **_fTmp;
 static char zero[20];
 
 static char *accUse[] = {"a" };
+static char *hlUse[] = { "l", "h" };
 short rbank = -1;
 short accInUse = 0 ;
 short inLine = 0;
@@ -595,11 +596,22 @@ static void aopOp (operand *op, iCode *ic, bool result, bool requires_a)
 
 	if (sym->accuse) {
 	    int i;
-            aop = op->aop = sym->aop = newAsmop(AOP_ACC);
-            aop->size = getSize(sym->type);
-            for ( i = 0 ; i < 2 ; i++ )
-                aop->aopu.aop_str[i] = accUse[i];
-            return;  
+	    if (sym->accuse == ACCUSE_A) {
+		aop = op->aop = sym->aop = newAsmop(AOP_ACC);
+		aop->size = getSize(sym->type);
+		for ( i = 0 ; i < 2 ; i++ )
+		    aop->aopu.aop_str[i] = accUse[i];
+	    }
+	    else if (sym->accuse == ACCUSE_HL) {
+		wassert(!IS_GB);
+		aop = op->aop = sym->aop = newAsmop(AOP_HLREG);
+		aop->size = getSize(sym->type);
+		for ( i = 0 ; i < 2 ; i++ )
+		    aop->aopu.aop_str[i] = hlUse[i];
+	    }
+	    else
+		wassert(0);
+	    return;
 	}
 
         if (sym->ruonly ) {
@@ -826,6 +838,13 @@ static void fetchPairLong(PAIR_ID pairId, asmop *aop, int offset)
 	    emit2("ld h,!*hl");
 	    emit2("ld l,a");
 	}
+	else if (IS_Z80 && aop->type == AOP_IY) {
+	    /* Instead of fetching relative to IY, just grab directly
+	       from the address IY refers to */
+	    char *l = aopGetLitWordLong(aop, offset, FALSE);
+	    wassert(l);
+	    emit2("ld %s,(%s)", _pairs[pairId].name, l);
+	}
 	else {
 	    emitcode("ld", "%s,%s", _pairs[pairId].l, aopGet(aop, offset, FALSE));
 	    emitcode("ld", "%s,%s", _pairs[pairId].h, aopGet(aop, offset+1, FALSE));
@@ -852,6 +871,8 @@ static void setupPair(PAIR_ID pairId, asmop *aop, int offset)
 
     switch (aop->type) {
     case AOP_IY:
+	fetchLitPair(pairId, aop, 0);
+	break;
     case AOP_HL:
 	fetchLitPair(pairId, aop, offset);
 	_G.pairs[pairId].offset = offset;
@@ -967,6 +988,10 @@ static char *aopGet(asmop *aop, int offset, bool bit16)
 	}
 	return "!zero";
 
+    case AOP_HLREG:
+	wassert(offset < 2);
+	return aop->aopu.aop_str[offset];
+
     case AOP_LIT:
 	return aopLiteral (aop->aopu.aop_lit,offset);
 	
@@ -1038,8 +1063,11 @@ static void aopPut (asmop *aop, char *s, int offset)
 	break;
 	
     case AOP_REG:
-	emitcode("ld","%s,%s",
-		 aop->aopu.aop_reg[offset]->name,s);
+	if (!strcmp(s, "!*hl"))
+	    emit2("ld %s,!*hl", aop->aopu.aop_reg[offset]->name);
+	else
+	    emit2("ld %s,%s",
+		  aop->aopu.aop_reg[offset]->name, s);
 	break;
 	
     case AOP_IY:
@@ -1120,6 +1148,11 @@ static void aopPut (asmop *aop, char *s, int offset)
 	    if (strcmp(aop->aopu.aop_str[offset],s))
 		emitcode ("ld","%s,%s",aop->aopu.aop_str[offset],s);
 	}
+	break;
+
+    case AOP_HLREG:
+	wassert(offset < 2);
+	emit2("ld %s,%s", aop->aopu.aop_str[offset], s);
 	break;
 
     default :
@@ -1404,11 +1437,18 @@ static void genIpush (iCode *ic)
 	else {
 	    offset = size;
 	    while (size--) {
-		l = aopGet(AOP(IC_LEFT(ic)), --offset, FALSE);
 		/* Simple for now - load into A and PUSH AF */
-		emitcode("ld", "a,%s", l);
-		emitcode("push", "af");
-		emitcode("inc", "sp");
+		if (AOP(IC_LEFT(ic))->type == AOP_IY) {
+		    char *l = aopGetLitWordLong(AOP(IC_LEFT(ic)), --offset, FALSE);
+		    wassert(l);
+		    emit2("ld a,(%s)", l);
+		}
+		else {
+		    l = aopGet(AOP(IC_LEFT(ic)), --offset, FALSE);
+		    emit2("ld a,%s", l);
+		}
+		emit2("push af");
+		emit2("inc sp");
 		_G.stack.pushed++;
 	    }
 	}
@@ -1448,8 +1488,15 @@ static void genIpush (iCode *ic)
 	}
 	offset = size;
 	while (size--) {
-	    l = aopGet(AOP(IC_LEFT(ic)), --offset, FALSE);
-	    emitcode("ld", "a,%s", l);
+	    if (AOP(IC_LEFT(ic))->type == AOP_IY) {
+		char *l = aopGetLitWordLong(AOP(IC_LEFT(ic)), --offset, FALSE);
+		wassert(l);
+		emit2("ld a,(%s)", l);
+	    }
+	    else {
+		l = aopGet(AOP(IC_LEFT(ic)), --offset, FALSE);
+		emit2("ld a,%s", l);
+	    }
 	    emitcode("push", "af");
 	    emitcode("inc", "sp");
 	    _G.stack.pushed++;
@@ -2776,6 +2823,9 @@ static void genAnd (iCode *ic, iCode *ifx)
                         if(bytelit != 0x0FFL)
                             emitcode("and","a,%s",
                                      aopGet(AOP(right),offset,FALSE));
+			else
+			    /* For the flags */
+			    emit2("or a,a");
                         emit2("!shortjp nz,!tlabel", tlbl->key+100);
                     }
                 }
@@ -3155,13 +3205,8 @@ static void shiftR2Left2Result (operand *left, int offl,
                                 operand *result, int offr,
                                 int shCount, int sign)
 {
-    if(sameRegs(AOP(result), AOP(left)) &&
-       ((offl + MSB16) == offr)){
-	wassert(0);
-    } else {
-	movLeft2Result(left, offl, result, offr, 0);
-	movLeft2Result(left, offl+1, result, offr+1, 0);
-    }
+    movLeft2Result(left, offl, result, offr, 0);
+    movLeft2Result(left, offl+1, result, offr+1, 0);
 
     if (sign) {
 	wassert(0);
@@ -3564,7 +3609,6 @@ static void genrshTwo (operand *result,operand *left,
     if (shCount >= 8) {
         shCount -= 8 ;
         if (shCount) {
-	    wassert(0);
             shiftR1Left2Result(left, MSB16, result, LSB,
                                shCount, sign);
 	}
@@ -4007,8 +4051,8 @@ static void genAssign (iCode *ic)
 
     if(AOP_TYPE(right) == AOP_LIT)
 	lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
-    if (isPair(AOP(result)) && isLitWord(AOP(right))) {
-	emitcode("ld", "%s,%s", getPairName(AOP(result)), aopGetWord(AOP(right), 0));
+    if (isPair(AOP(result))) {
+	fetchPair(getPairId(AOP(result)), AOP(right));
     }
     else if((size > 1) &&
        (AOP_TYPE(result) != AOP_REG) &&
@@ -4040,7 +4084,7 @@ static void genAssign (iCode *ic)
 	    offset++;
 	}
     }
-    else if (size == 2 && requiresHL(AOP(right)) && requiresHL(AOP(result))) {
+    else if (size == 2 && requiresHL(AOP(right)) && requiresHL(AOP(result)) && IS_GB) {
 	/* Special case.  Load into a and d, then load out. */
 	MOVA(aopGet(AOP(right), 0, FALSE));
 	emitcode("ld", "e,%s", aopGet(AOP(right), 1, FALSE));

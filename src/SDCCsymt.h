@@ -201,9 +201,13 @@ typedef struct symbol {
     unsigned onStack    :1      ;  /* this symbol allocated on the stack */
     unsigned iaccess    :1      ;  /* indirect access      */
     unsigned ruonly     :1      ;  /* used in return statement only */
-    unsigned accuse     :1      ;  /* can be left in the accumulator */
     unsigned spildir    :1      ;  /* spilt in direct space */
     unsigned ptrreg     :1      ;  /* this symbol assigned to a ptr reg */
+    unsigned accuse             ;  /* can be left in the accumulator
+				      On the Z80 accuse is devided into
+				      ACCUSE_A and ACCUSE_HL as the idea
+				      is quite similar.
+				   */
 
     int      stack              ;  /* offset on stack      */
     int      xstack             ;  /* offset on xternal stack */

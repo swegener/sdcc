@@ -48,7 +48,9 @@ typedef enum {
     /* Is pointed to by HL */
     AOP_HL,
     /* Is in A */
-    AOP_ACC 
+    AOP_ACC,
+    /* Is in H and L */
+    AOP_HLREG
 } AOP_TYPE;
 
 /* type asmop : a homogenised type for 

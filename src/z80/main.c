@@ -246,6 +246,7 @@ PORT z80_port = {
     0,	/* no local IVT generation code */
     _reset_regparm,
     _reg_parm,
+    _process_pragma,
     TRUE
 };
 

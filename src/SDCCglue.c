@@ -357,6 +357,7 @@ void printChar (FILE * ofile, char *s, int plen)
 	if (p != buf) {
 	    *p = '\0';
 	    tfprintf(ofile, "\t!ascii\n", buf);
+	    p = buf;
 	}
 	
 	if (len > 60)

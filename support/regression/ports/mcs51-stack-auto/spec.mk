@@ -5,8 +5,8 @@
 LIBSRCDIR = ../../device/lib
 LIBDIR    = gen/$(PORT)/lib
 
-LIBSDCCFLAGS+=--stack-auto
-SDCCFLAGS   +=$(LIBSDCCFLAGS) --int-long-reent --float-reent --nostdlib -L$(LIBDIR) -llibsdcc -llibint -lliblong -llibfloat
+LIBSDCCFLAGS+=--stack-auto --int-long-reent --float-reent
+SDCCFLAGS   +=$(LIBSDCCFLAGS) --nostdlib -L$(LIBDIR) -llibsdcc -llibint -lliblong -llibfloat
 
 # copy support.c
 $(PORTS_DIR)/$(PORT)/%.c: $(PORTS_DIR)/mcs51/%.c

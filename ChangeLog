@@ -1,5 +1,10 @@
 2003-12-20 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
+	* device/lib/ds390/tinibios.c (CpuSpeed): suppress unreachable code
+	warning
+
+2003-12-20 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
 	* src/SDCCast.h,
 	* src/SDCCast.c (newAst_),
 	* src/SDCCicode.h,

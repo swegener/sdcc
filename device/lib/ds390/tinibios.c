@@ -134,8 +134,10 @@ unsigned int cpuSpeed;
 
 void CpuSpeed(unsigned int speed) {
 
+  #if 0
   while (0 && (EXIF&0x04))
     ; // cpu operates from ring buffer
+  #endif
   PMR = 0x80; // div4, CTM off, multiplier 2x
   switch (speed) 
     {

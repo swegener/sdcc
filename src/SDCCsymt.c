@@ -1587,6 +1587,10 @@ aggregateToPointer (value * val)
 	      DCL_TYPE (val->type) = GPOINTER;
 	      break;
 	    }
+	  if (options.model==MODEL_LARGE) {
+	    DCL_TYPE (val->type) = FPOINTER;
+	    break;
+	  }
 	  /* fall through! */
 	case S_AUTO:
 	case S_DATA:

@@ -1386,7 +1386,7 @@ aopPut (asmop * aop, char *s, int offset)
 		}
 	      {
 		/* set C, if a >= 1 */
-		emitcode ("add", "a,0xff");
+		emitcode ("add", "a,#0xff");
 		emitcode ("mov", "%s,c", aop->aopu.aop_dir);
 	      }
 	    }

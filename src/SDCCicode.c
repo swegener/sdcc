@@ -2047,7 +2047,7 @@ geniCodeMultiply (operand * left, operand * right, RESULT_TYPE resultType)
      efficient in most cases than 2 bytes result = 2 bytes << literal
      if port has 1 byte muldiv */
   if (p2 && !IS_FLOAT (letype)
-      && !((resultType != RESULT_TYPE_INT) && (getSize (resType) != getSize (ltype))
+      && !((resultType == RESULT_TYPE_INT) && (getSize (resType) != getSize (ltype))
            && (port->support.muldiv == 1))
       && strcmp (port->target, "pic14") != 0  /* don't shift for pic */
       && strcmp (port->target, "pic16") != 0)

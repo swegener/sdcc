@@ -6,6 +6,8 @@
 	needed for literals of LEFT_OP and '+'
 	* src/SDCCicode.c (geniCodeLogic): I must have been braindead when I
 	introduced RESULT_TYPE_NOPROM
+	(geniCodeMultiply): fixed logic for decision if mul is optimized to 
+	left shift
 	* src/SDCCsymt.c (computeType): op is int; added RESULT_TYPE_OTHER;
 	limited promotion to int only for '*'
 	* src/SDCCsymt.h (computeType): op is int, removed RESULT_TYPE_NOPROM

@@ -1995,6 +1995,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
       /* left operand */
       /* and left is a symbol  */
       if (IS_SYMOP (IC_LEFT (ic)) &&
+          !IS_BITFIELD (OP_SYM_ETYPE (IC_LEFT (ic))) &&
           !computeOnly && ic->op != ADDRESS_OF)
         {
 

@@ -1,3 +1,9 @@
+2005-03-12 Vangelis Rokas <vrokas AT users.sourceforge.net>
+
+	* src/SDCCcse.c (cseBBlock): inside 'do operand lookup' loop test if
+	left is a bitfield, if yes, then don't optimize assignment. Perhaps
+	this can be optimized more?
+
 2005-03-10 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/gen.c (pic16_loadFSR0, genPackBits, genUnpackBits,

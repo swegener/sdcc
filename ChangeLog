@@ -1,3 +1,8 @@
+2004-07-20 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/glue.c (pic16emitRegularMap): unused functions marked as
+	external are not declared as extern to reduce overhead while linking
+
 2004-07-20 Maarten Brock <sourceforge.brock AT dse.nl>
 
         * src/SDCCast.c (decorateType): removed buggy fix for bug #979599

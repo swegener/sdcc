@@ -12,7 +12,13 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include <string.h>
+
+#if defined(_MSC_VER)
+#include <malloc.h>
+#else
 #include <alloc.h>
+#endif
+
 #include "asm.h"
 
 /*)Module	assym.c

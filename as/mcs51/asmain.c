@@ -14,7 +14,9 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include <string.h>
+#if !defined(_MSC_VER)
 #include <alloc.h>
+#endif
 #include "asm.h"
 
 extern VOID machine(struct mne *);
@@ -1147,9 +1149,9 @@ char *usetxt[] = {
 	"  a    all user symbols made global",
 	"  l    create list   output file1[LST]",
 	"  o    create object output file1[REL]",
-        "  s    create symbol output file1[SYM]",
-        "  p    disable listing pagination",
-        "  f    flag relocatable references by `    in listing file",
+	"  s    create symbol output file1[SYM]",
+	"  p    disable listing pagination",
+	"  f    flag relocatable references by `    in listing file",
 	" ff    flag relocatable references by mode in listing file",
 	"",
 	0

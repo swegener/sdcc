@@ -25,7 +25,13 @@
 #ifndef SDCCSET_H
 #define SDCCSET_H
 #include <stdarg.h>
-#include "sdccconf.h"
+
+#if defined(_MSC_VER)
+#	include "sdcc_vc.h"
+#else
+#	include "sdccconf.h"
+#endif		// _MSC_VER
+
 #include "SDCCalloc.h"
 
 

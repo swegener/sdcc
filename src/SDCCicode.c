@@ -2138,7 +2138,7 @@ operand *geniCodeRightShift (operand *left, operand *right)
     return IC_RESULT(ic) ;  
 }
 
-#ifdef __BORLANDC__
+#if defined(__BORLANDC__) || defined(_MSC_VER)
 #define LONG_LONG __int64
 #else
 #define LONG_LONG long long

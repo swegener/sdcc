@@ -22,7 +22,16 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  You are forbidden to forbid anyone else to use, share and improve
  what you give them.   Help stamp out software-hoarding!  */
 
+#if defined(_MSC_VER)
+
+#include "..\..\sdcc_vc.h"
+#include <io.h>
+
+#else
+
 #include "sdccconf.h"
+
+#endif
 
 #ifdef EMACS
 #define NO_SHORTNAMES
@@ -86,6 +95,7 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #else
 #ifndef VMS
 #ifndef USG
+#if !defined(_MSC_VER)
 #include <sys/time.h>		/* for __DATE__ and __TIME__ */
 #include <sys/resource.h>
 #else
@@ -93,6 +103,7 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // #include <sys/times.h>
 #include <time.h>
 #include <fcntl.h>
+#endif  // _MSC_VER
 #endif /* USG */
 #endif /* not VMS */
 #endif

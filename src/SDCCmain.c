@@ -32,10 +32,14 @@
 #endif
 
 // This is a bit messy because we define link ourself
-#ifndef __BORLANDC__
+#if !defined(__BORLANDC__) && !defined(_MSC_VER)
+
+#if 0		// Wasn't this fixed already
 #define link NoLiNk
 #include <unistd.h>
 #undef link
+#endif
+
 #else
 // No unistd.h in Borland C++
 extern int access(const char *, int);
@@ -1054,7 +1058,17 @@ int   parseCmdLine ( int argc, char **argv )
 /*-----------------------------------------------------------------*/
 /* my_system - will call a program with arguments                  */
 /*-----------------------------------------------------------------*/
+
+#if defined(_MSC_VER)
+
+char *try_dir[]= {NULL};			// TODO : Fill in some default search list
+
+#else
+
 char *try_dir[]= {SRCDIR "/bin",PREFIX "/bin", NULL};
+
+#endif
+
 int my_system (const char *cmd, char **cmd_argv)
 {    
     char *dir, *got= NULL; int i= 0;
@@ -1104,7 +1118,10 @@ int my_system (const char *cmd, char **cmd_argv)
     }
 
     if (got)
+		{
       i= spawnv(P_WAIT,got,cmd_argv) == -1;
+		free(got) ;
+		}
     else
       i= spawnvp(P_WAIT,cmd,cmd_argv) == -1;
     if (i) {

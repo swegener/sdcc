@@ -43,7 +43,7 @@
 #ifdef HAVE_ENDIAN_H
 #include <endian.h>
 #else
-#ifndef __BORLANDC__
+#if !defined(__BORLANDC__) && !defined(_MSC_VER)
 #warning "Cannot determine ENDIANESS of this machine assuming LITTLE_ENDIAN"
 #warning "If you running sdcc on an INTEL 80x86 Platform you are okay"
 #endif
@@ -2286,7 +2286,7 @@ static int resultRemat (iCode *ic)
     return 0;
 }
 
-#ifdef __BORLANDC__
+#if defined(__BORLANDC__) || defined(_MSC_VER)
 #define STRCASECMP stricmp
 #else
 #define STRCASECMP strcasecmp

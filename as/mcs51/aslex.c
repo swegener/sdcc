@@ -15,7 +15,9 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include <string.h>
+#if !defined(_MSC_VER)
 #include <alloc.h>
+#endif
 #include "asm.h"
 
 /*)Module	aslex.c
@@ -163,7 +165,7 @@ char *id;
 	do {
 		if (p < &id[NCPS])
 			*p++ = c;
-	} while (ctype[c=get()] & (0xFF - (SPACE|ILL)));
+	} while (ctype[c=get()] &	(~(SPACE|ILL)));
 	unget(c);
 	while (p < &id[NCPS])
 		*p++ = 0;

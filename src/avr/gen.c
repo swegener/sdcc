@@ -36,7 +36,7 @@
 #ifdef HAVE_ENDIAN_H
 #include <endian.h>
 #else
-#ifndef __BORLANDC__
+#if !defined(__BORLANDC__) && !defined(_MSC_VER)
 #warning "Cannot determine ENDIANESS of this machine assuming LITTLE_ENDIAN"
 #warning "If you running sdcc on an INTEL 80x86 Platform you are okay"
 #endif
@@ -330,10 +330,12 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
 
 	/* only remaining is code / eeprom which will need pointer reg */
 	/* if it is in code space */
+
+	sym->aop = aop = newAsmop(0);
+
 	if (IN_CODESPACE(space))
 		aop->code = 1;
 
-	sym->aop = aop = newAsmop(0);
 	aop->aopu.aop_ptr = getFreePtr(ic,&aop,result,aop->code);
 	aop->size = getSize(sym->type);
 	emitcode ("ldi","%s,lo8(%s)",aop->aopu.aop_ptr->name,sym->rname);
@@ -1440,7 +1442,7 @@ static int resultRemat (iCode *ic)
 	return 0;
 }
 
-#ifdef __BORLANDC__
+#if defined(__BORLANDC__) || defined(_MSC_VER)
 #define STRCASECMP stricmp
 #else
 #define STRCASECMP strcasecmp

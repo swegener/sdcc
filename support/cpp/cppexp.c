@@ -24,6 +24,10 @@ Written by Per Bothner 1994. */
 
 /* Parse a C expression from text in a string  */
 
+#if defined(_MSC_VER)
+#include <malloc.h>
+#endif
+
 #include "config.h"   
 #include "cpplib.h"
 

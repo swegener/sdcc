@@ -1,4 +1,4 @@
-/* asexpr.c */
+	/* asexpr.c */
 
 /*
  * (C) Copyright 1989-1995
@@ -12,7 +12,9 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include <string.h>
+#if !defined(_MSC_VER)
 #include <alloc.h>
+#endif
 #include "asm.h"
 
 /*)Module	asexpr.c

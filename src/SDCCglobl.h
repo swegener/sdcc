@@ -6,12 +6,23 @@
 #include <stdlib.h>
 #include <setjmp.h>
 #include <stdio.h>
-#include "sdccconf.h"
+
+#if defined(_MSC_VER)
+#	include "sdcc_vc.h"
+#else
+#	include "sdccconf.h"
+#endif	// _MSC_VER
+
 #include "SDCCerr.h"
+
+#if defined(_MSC_VER)
+#	define NATIVE_WIN32 		1
+#endif
 
 #ifdef __BORLANDC__
 #define NATIVE_WIN32 		1
 #endif
+
 #ifdef __MINGW32__
 #define NATIVE_WIN32		1
 #endif

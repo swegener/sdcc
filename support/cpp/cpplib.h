@@ -100,7 +100,7 @@ extern int cpp_handle_options PARAMS ((cpp_reader*, int, char**));
 extern enum cpp_token cpp_get_token PARAMS ((struct parse_marker*));
 extern void cpp_skip_hspace PARAMS((cpp_reader*));
 extern enum cpp_token cpp_get_non_space_token PARAMS ((cpp_reader *));
-
+extern int cpp_read_check_assertion (cpp_reader *pfile) ;
 
 /* Maintain and search list of included files, for #import.  */
 

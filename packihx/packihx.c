@@ -14,7 +14,15 @@
 #include <ctype.h>
 #include <assert.h>
 
+#if defined(_MSC_VER)
+
+typedef unsigned char Uint8 ;
+typedef unsigned Uint16 ;
+
+#else
+
 #include "config.h"
+#endif
 
 /* A cooked line of input. */
 typedef struct _Line

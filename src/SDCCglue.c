@@ -26,13 +26,14 @@
 #include "asm.h"
 #include <time.h>
 
-#ifndef __BORLANDC__
+#if	!defined(__BORLANDC__) && !defined(_MSC_VER)
 #if 0 /* This should no longer be necessary. */
 // This is a bit messy because we define link ourself
 #define link NoLiNk
 #include <unistd.h>
 #undef link
 #else
+
 #include <unistd.h>
 #endif
 #else

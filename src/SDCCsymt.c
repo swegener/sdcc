@@ -1016,11 +1016,21 @@ static void  checkSClass ( symbol *sym )
     /* the storage class to reflect where the var will go */
     if ( sym->level && SPEC_SCLS(sym->etype) == S_FIXED) {
 	if ( options.stackAuto || (currFunc && IS_RENT(currFunc->etype)))
+	{
 	    SPEC_SCLS(sym->etype) = (options.useXstack  ?
 				     S_XSTACK : S_STACK ) ;
+	}
 	else
-	    SPEC_SCLS(sym->etype) = (options.model  ?
+	{
+	    /* hack-o-matic! I see no reason why the useXstack option should ever
+	     * control this allcoation, but the code was originally that way, and
+	     * changing it for non-390 ports breaks the compiler badly.
+	     */
+	    extern PORT ds390_port;
+	    bool useXdata = (port == &ds390_port) ? options.model : options.useXstack;
+	    SPEC_SCLS(sym->etype) = (useXdata  ?
 				     S_XDATA : S_DATA ) ;
+	}
     }
 }
 

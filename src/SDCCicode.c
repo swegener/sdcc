@@ -2292,7 +2292,8 @@ geniCodeBitwise (operand * left, operand * right,
   iCode *ic;
 
   // bitwise operations must be done unsigned
-  SPEC_USIGN(resType)=1;
+  // WHY ? causes very bad things to happen with CSE
+  //  SPEC_USIGN(resType)=1;
 
   left = geniCodeCast (resType, left, TRUE);
   right = geniCodeCast (resType, right, TRUE);

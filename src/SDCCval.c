@@ -312,6 +312,63 @@ symbolVal (symbol * sym)
   return val;
 }
 
+/*--------------------------------------------------------------------*/
+/* cheapestVal - convert a val to the cheapest as possible value      */
+/*--------------------------------------------------------------------*/
+value *cheapestVal (value *val) {
+  long sval=0;
+  unsigned long uval=0;
+
+  if (IS_FLOAT(val->type) || IS_CHAR(val->type))
+    return val;
+
+  if (SPEC_LONG(val->type)) {
+    if (SPEC_USIGN(val->type)) {
+      uval=SPEC_CVAL(val->type).v_ulong;
+    } else {
+      sval=SPEC_CVAL(val->type).v_long;
+    }
+  } else {
+    if (SPEC_USIGN(val->type)) {
+      uval=SPEC_CVAL(val->type).v_uint;
+    } else {
+      sval=SPEC_CVAL(val->type).v_int;
+    }
+  }
+
+  if (SPEC_USIGN(val->type)) {
+    if (uval<=0xff) {
+      SPEC_NOUN(val->type)=V_CHAR;
+      SPEC_LONG(val->type)=0;
+    } else {
+      if (uval<=0xffff) {
+	SPEC_LONG(val->type)=0;
+      }
+    }
+  } else {
+    if (sval<0) {
+      if (sval>=-128) {
+	SPEC_NOUN(val->type)=V_CHAR;
+	SPEC_LONG(val->type)=0;
+      } else {
+	if (sval>=-32768) {
+	  SPEC_LONG(val->type)=0;
+	}
+      }
+    } else {
+      if (sval<=127) {
+	SPEC_NOUN(val->type)=V_CHAR;
+	SPEC_LONG(val->type)=0;
+      } else {
+	if (sval<=32767) {
+	  SPEC_LONG(val->type)=0;
+	}
+      }
+    }
+  }
+  return val;
+}
+
 /*-----------------------------------------------------------------*/
 /* valueFromLit - creates a value from a literal                   */
 /*-----------------------------------------------------------------*/
@@ -401,7 +458,7 @@ value *constVal (char *s)
 
   if (sval<0) { // "-28u" will still be signed and negative
     SPEC_USIGN (val->type) = 0;
-    if (sval<-32768) { // check if have to promote to long
+    if (sval<-32768) { // check if we have to promote to long
       SPEC_NOUN (val->type) = V_INT;
       SPEC_LONG (val->type) = 1;
       SPEC_CVAL (val->type).v_long=sval;
@@ -672,7 +729,7 @@ copyValueChain (value * src)
 }
 
 /*------------------------------------------------------------------*/
-/* copyValue - copies contents of a vlue to a fresh one             */
+/* copyValue - copies contents of a value to a fresh one            */
 /*------------------------------------------------------------------*/
 value *
 copyValue (value * src)
@@ -827,7 +884,7 @@ floatFromVal (value * val)
 
 
 /*------------------------------------------------------------------*/
-/* valUnaryPM - dones the unary +/- operation on a constant         */
+/* valUnaryPM - does the unary +/- operation on a constant          */
 /*------------------------------------------------------------------*/
 value *
 valUnaryPM (value * val)
@@ -853,7 +910,6 @@ valUnaryPM (value * val)
 	}
     }
   return val;
-
 }
 
 /*------------------------------------------------------------------*/
@@ -919,7 +975,7 @@ valMult (value * lval, value * rval)
   SPEC_NOUN (val->type) = (IS_FLOAT (lval->etype) ||
 			   IS_FLOAT (rval->etype) ? V_FLOAT : V_INT);
   SPEC_SCLS (val->type) = S_LITERAL;	/* will remain literal */
-  SPEC_USIGN (val->type) = (SPEC_USIGN (lval->etype) | SPEC_USIGN (rval->etype));
+  SPEC_USIGN (val->type) = (SPEC_USIGN (lval->etype) & SPEC_USIGN (rval->etype));
   SPEC_LONG (val->type) = (SPEC_LONG (lval->etype) | SPEC_LONG (rval->etype));
 
   if (IS_FLOAT (val->type))
@@ -945,7 +1001,7 @@ valMult (value * lval, value * rval)
 	      (int) floatFromVal (rval);
 	}
     }
-  return val;
+  return cheapestVal(val);
 }
 
 /*------------------------------------------------------------------*/
@@ -969,7 +1025,7 @@ valDiv (value * lval, value * rval)
   SPEC_NOUN (val->type) = (IS_FLOAT (lval->etype) ||
 			   IS_FLOAT (rval->etype) ? V_FLOAT : V_INT);
   SPEC_SCLS (val->etype) = S_LITERAL;
-  SPEC_USIGN (val->type) = (SPEC_USIGN (lval->etype) | SPEC_USIGN (rval->etype));
+  SPEC_USIGN (val->type) = (SPEC_USIGN (lval->etype) & SPEC_USIGN (rval->etype));
   SPEC_LONG (val->type) = (SPEC_LONG (lval->etype) | SPEC_LONG (rval->etype));
 
   if (IS_FLOAT (val->type))
@@ -979,7 +1035,8 @@ valDiv (value * lval, value * rval)
       if (SPEC_LONG (val->type))
 	{
 	  if (SPEC_USIGN (val->type))
-	    SPEC_CVAL (val->type).v_ulong = (unsigned long) floatFromVal (lval) /
+	    SPEC_CVAL (val->type).v_ulong = 
+	      (unsigned long) floatFromVal (lval) /
 	      (unsigned long) floatFromVal (rval);
 	  else
 	    SPEC_CVAL (val->type).v_long = (long) floatFromVal (lval) /
@@ -990,22 +1047,13 @@ valDiv (value * lval, value * rval)
 	  if (SPEC_USIGN (val->type)) {
 	    SPEC_CVAL (val->type).v_uint = (unsigned) floatFromVal (lval) /
 	      (unsigned) floatFromVal (rval);
-	    if (/* IS_CHAR (lval->etype) && IS_CHAR (rval->etype) && */
-		(SPEC_CVAL (val->type).v_uint <=255)) {
-	      SPEC_NOUN (val->type) = V_CHAR;
-	    }
 	  } else {
 	    SPEC_CVAL (val->type).v_int = (int) floatFromVal (lval) /
 	      (int) floatFromVal (rval);
-	    if (/* IS_CHAR (lval->etype) && IS_CHAR (rval->etype) && */
-		(SPEC_CVAL (val->type).v_int >=-128) &&
-		(SPEC_CVAL (val->type).v_int <=127)) {
-	      SPEC_NOUN (val->type) = V_CHAR;
-	    }
 	  }
 	}
     }
-  return val;
+  return cheapestVal(val);
 }
 
 /*------------------------------------------------------------------*/
@@ -1022,7 +1070,7 @@ valMod (value * lval, value * rval)
   val->type->class = SPECIFIER;
   SPEC_NOUN (val->type) = V_INT;	/* type is int */
   SPEC_SCLS (val->type) = S_LITERAL;	/* will remain literal */
-  SPEC_USIGN (val->type) = (SPEC_USIGN (lval->etype) | SPEC_USIGN (rval->etype));
+  SPEC_USIGN (val->type) = (SPEC_USIGN (lval->etype) & SPEC_USIGN (rval->etype));
   SPEC_LONG (val->type) = (SPEC_LONG (lval->etype) | SPEC_LONG (rval->etype));
 
   if (SPEC_LONG (val->type))
@@ -1039,22 +1087,13 @@ valMod (value * lval, value * rval)
       if (SPEC_USIGN (val->type)) {
 	SPEC_CVAL (val->type).v_uint = (unsigned) floatFromVal (lval) %
 	  (unsigned) floatFromVal (rval);
-	if (/* IS_CHAR (lval->etype) && IS_CHAR (rval->etype) && */
-	    (SPEC_CVAL (val->type).v_uint <=255)) {
-	  SPEC_NOUN (val->type) = V_CHAR;
-	}
       } else {
 	SPEC_CVAL (val->type).v_int = (unsigned) floatFromVal (lval) %
 	  (unsigned) floatFromVal (rval);
-	if (/* IS_CHAR (lval->etype) && IS_CHAR (rval->etype) && */
-	    (SPEC_CVAL (val->type).v_int >=-128) &&
-	    (SPEC_CVAL (val->type).v_int <=127)) {
-	  SPEC_NOUN (val->type) = V_CHAR;
-	}
       }
     }
 
-  return val;
+  return cheapestVal(val);
 }
 
 /*------------------------------------------------------------------*/
@@ -1072,7 +1111,11 @@ valPlus (value * lval, value * rval)
   SPEC_NOUN (val->type) = (IS_FLOAT (lval->etype) ||
 			   IS_FLOAT (rval->etype) ? V_FLOAT : V_INT);
   SPEC_SCLS (val->type) = S_LITERAL;	/* will remain literal */
-  SPEC_USIGN (val->type) = (SPEC_USIGN (lval->etype) | SPEC_USIGN (rval->etype));
+  SPEC_USIGN (val->type) = 
+    SPEC_USIGN (lval->etype) &&
+    SPEC_USIGN (rval->etype) &&
+    (floatFromVal(lval)+floatFromVal(rval))>=0;
+    
   SPEC_LONG (val->type) = (SPEC_LONG (lval->etype) | SPEC_LONG (rval->etype));
 
   if (IS_FLOAT (val->type))
@@ -1093,22 +1136,13 @@ valPlus (value * lval, value * rval)
 	  if (SPEC_USIGN (val->type)) {
 	    SPEC_CVAL (val->type).v_uint = (unsigned) floatFromVal (lval) +
 	      (unsigned) floatFromVal (rval);
-	    if (/* IS_CHAR (lval->etype) && IS_CHAR (rval->etype) && */
-		(SPEC_CVAL (val->type).v_uint <=255)) {
-	      SPEC_NOUN (val->type) = V_CHAR;
-	    }
 	  } else {
 	    SPEC_CVAL (val->type).v_int = (int) floatFromVal (lval) +
 	      (int) floatFromVal (rval);
-	    if (/* IS_CHAR (lval->etype) && IS_CHAR (rval->etype) && */
-		(SPEC_CVAL (val->type).v_int >=-128) &&
-		(SPEC_CVAL (val->type).v_int <=127)) {
-	      SPEC_NOUN (val->type) = V_CHAR;
-	    }
 	  }
 	}
     }
-  return val;
+  return cheapestVal(val);
 }
 
 /*------------------------------------------------------------------*/
@@ -1126,7 +1160,11 @@ valMinus (value * lval, value * rval)
   SPEC_NOUN (val->type) = (IS_FLOAT (lval->etype) ||
 			   IS_FLOAT (rval->etype) ? V_FLOAT : V_INT);
   SPEC_SCLS (val->type) = S_LITERAL;	/* will remain literal */
-  SPEC_USIGN (val->type) = (SPEC_USIGN (lval->etype) | SPEC_USIGN (rval->etype));
+  SPEC_USIGN (val->type) = 
+    SPEC_USIGN (lval->etype) &&
+    SPEC_USIGN (rval->etype) &&
+    (floatFromVal(lval)-floatFromVal(rval))>=0;
+
   SPEC_LONG (val->type) = (SPEC_LONG (lval->etype) | SPEC_LONG (rval->etype));
 
   if (IS_FLOAT (val->type))
@@ -1149,21 +1187,13 @@ valMinus (value * lval, value * rval)
 	  if (SPEC_USIGN (val->type)) {
 	    SPEC_CVAL (val->type).v_uint = (unsigned) floatFromVal (lval) -
 	      (unsigned) floatFromVal (rval);
-	    if (/* IS_CHAR (lval->etype) && IS_CHAR (rval->etype) && */
-		(SPEC_CVAL (val->type).v_uint <=255)) {
-	      SPEC_NOUN (val->type) = V_CHAR;
-	    }
 	  } else {
-	    SPEC_CVAL (val->type).v_int = (int) floatFromVal (lval) - (int) floatFromVal (rval);
-	    if (/* IS_CHAR (lval->etype) && IS_CHAR (rval->etype) && */
-		(SPEC_CVAL (val->type).v_int >=-128) &&
-		(SPEC_CVAL (val->type).v_int <=127)) {
-	      SPEC_NOUN (val->type) = V_CHAR;
-	    }
+	    SPEC_CVAL (val->type).v_int = (int) floatFromVal (lval) - 
+	      (int) floatFromVal (rval);
 	  }
 	}
     }
-  return val;
+  return cheapestVal(val);
 }
 
 /*------------------------------------------------------------------*/
@@ -1178,7 +1208,7 @@ valShift (value * lval, value * rval, int lr)
   val = newValue ();
   val->type = val->etype = newIntLink ();
   SPEC_SCLS (val->type) = S_LITERAL;	/* will remain literal */
-  SPEC_USIGN (val->type) = (SPEC_USIGN (lval->etype) | SPEC_USIGN (rval->etype));
+  SPEC_USIGN (val->type) = (SPEC_USIGN (lval->etype) & SPEC_USIGN (rval->etype));
   SPEC_LONG (val->type) = (SPEC_LONG (lval->etype) | SPEC_LONG (rval->etype));
 
   if (SPEC_LONG (val->type))
@@ -1198,23 +1228,14 @@ valShift (value * lval, value * rval, int lr)
 	SPEC_CVAL (val->type).v_uint = lr ? 
 	  (unsigned) floatFromVal (lval) << (unsigned) floatFromVal (rval) :\
 	  (unsigned) floatFromVal (lval) >> (unsigned) floatFromVal (rval);
-	if (/* IS_CHAR (lval->etype) && IS_CHAR (rval->etype) && */
-	    (SPEC_CVAL (val->type).v_uint <=255)) {
-	  SPEC_NOUN (val->type) = V_CHAR;
-	}
       } else {
 	SPEC_CVAL (val->type).v_int = lr ?
 	  (int) floatFromVal (lval) << (int) floatFromVal (rval) : \
 	  (int) floatFromVal (lval) >> (int) floatFromVal (rval);
-	if (/* IS_CHAR (lval->etype) && IS_CHAR (rval->etype) && */
-	    (SPEC_CVAL (val->type).v_int >=-128) &&
-	    (SPEC_CVAL (val->type).v_int <=127)) {
-	  SPEC_NOUN (val->type) = V_CHAR;
-	}
       }
     }
 
-  return val;
+  return cheapestVal(val);
 }
 
 /*------------------------------------------------------------------*/
@@ -1229,7 +1250,8 @@ valCompare (value * lval, value * rval, int ctype)
   val = newValue ();
   val->type = val->etype = newCharLink ();
   val->type->class = SPECIFIER;
-  SPEC_NOUN (val->type) = V_INT;	/* type is int */
+  SPEC_NOUN (val->type) = V_CHAR;	/* type is char */
+  SPEC_USIGN (val->type) = 1;
   SPEC_SCLS (val->type) = S_LITERAL;	/* will remain literal */
 
   switch (ctype)
@@ -1342,7 +1364,7 @@ valBitwise (value * lval, value * rval, int op)
       break;
     }
 
-  return val;
+  return cheapestVal(val);
 }
 
 /*------------------------------------------------------------------*/
@@ -1358,6 +1380,7 @@ valLogicAndOr (value * lval, value * rval, int op)
   val->type = val->etype = newCharLink ();
   val->type->class = SPECIFIER;
   SPEC_SCLS (val->type) = S_LITERAL;	/* will remain literal */
+  SPEC_USIGN (val->type) = 0;
 
   switch (op)
     {

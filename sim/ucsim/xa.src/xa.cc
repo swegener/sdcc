@@ -402,16 +402,16 @@ cl_xa::disass(t_addr addr, char *sep)
       immed_offset += 4;
     break;
     case DIRECT_DATA8 :
-      sprintf(parm_str, "#%04d 0x%02x",
-              ((code & 0x3) << 8) | get_mem(MEM_ROM, addr+immed_offset),
-              get_mem(MEM_ROM, addr+immed_offset+1) );
+      sprintf(parm_str, "0x%03x,#0x%02x",
+              ((code & 0x0070) << 4) | get_mem(MEM_ROM, addr+immed_offset),
+              get_mem(MEM_ROM, addr+immed_offset+1));
       immed_offset += 3;
     break;
     case DIRECT_DATA16 :
-      sprintf(parm_str, "#%04d 0x%04x",
-              ((code & 0x3) << 8) | get_mem(MEM_ROM, addr+immed_offset),
-              (short)((get_mem(MEM_ROM, addr+immed_offset+2)) |
-                     (get_mem(MEM_ROM, addr+immed_offset+1)<<8)) );
+      sprintf(parm_str, "%0x03x,#0x%04x",
+              ((code & 0x0070) << 4) | get_mem(MEM_ROM, addr+immed_offset),
+              get_mem(MEM_ROM, addr+immed_offset+2) +
+	      (get_mem(MEM_ROM, addr+immed_offset+1)<<8));
       immed_offset += 3;
     break;
 
@@ -445,6 +445,10 @@ cl_xa::disass(t_addr addr, char *sep)
       sprintf(parm_str, "%s",
               reg_strs[((code >> 4) & 0xf)] );
     break;
+    case IREG_ALONE :
+      sprintf(parm_str, "[%s]",
+              reg_strs[((code >> 4) & 0xf)] );
+    break;
     case ADDR24 :
       strcpy(parm_str, "ADDR24");
     break;
@@ -454,6 +458,19 @@ cl_xa::disass(t_addr addr, char *sep)
     case DIRECT_REL8 :
       strcpy(parm_str, "DIRECT_REL8");
     break;
+
+    case REL8 :
+      //strcpy(parm_str, "REL8");
+      sprintf(parm_str, "0x%04x",
+	      (get_mem(MEM_ROM, addr+1)*2+addr+len)&0xfffe);
+    break;
+    case REL16 :
+      //strcpy(parm_str, "REL16");
+      sprintf(parm_str, "0x%04x",
+	      (((get_mem(MEM_ROM, addr+1)<<8) |
+	      get_mem(MEM_ROM, addr+2))*2+addr+len)&0xfffe);
+    break;
+
     default:
       strcpy(parm_str, "???");
     break;

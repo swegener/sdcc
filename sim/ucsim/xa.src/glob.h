@@ -91,6 +91,7 @@ JMP,
 CALL,
 RET,
 Bcc,
+BEQ,
 JB,
 JNB,
 CJNE,
@@ -136,7 +137,7 @@ enum op_operands {
 // odd-ball ones
   NO_OPERANDS,  // for NOP
   C_BIT,
-  NOTC_BIT,
+  C_NOTBIT,
   REG_DATA4,
   IREG_DATA4,
   IREGINC_DATA4,
@@ -145,9 +146,13 @@ enum op_operands {
   DIRECT_DATA4,
 
   REG_ALONE,
+  IREG_ALONE,
   ADDR24,
   REG_REL8,
-  DIRECT_REL8
+  DIRECT_REL8,
+
+  REL8,
+  REL16,
 };
 
 // table of dissassembled instructions

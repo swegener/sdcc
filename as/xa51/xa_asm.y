@@ -84,7 +84,7 @@ line:          linesymbol ':' linenosym {
 		}
 
 linenosym:     directive EOL {
-			if (p3) out(op, $1);
+	                if (p3) out(op, $1);
 			$$ = $1;
 		}
              | instruction EOL {
@@ -138,7 +138,7 @@ directive:     '.' ORG expr {
                         $$ = 0;
                 }
 	     | bitsymbol BITDEF expr {
-			if (p1) {
+	                if (p1) {
                                 build_sym_list(symbol_name);
                                 mk_bit(symbol_name);
                         }
@@ -182,6 +182,10 @@ directive:     '.' ORG expr {
 		}
 	     | '.' GLOBL WORD {
 			/* ignore global symbol declaration */
+			$$ = 0;
+		}
+	     | '.' GLOBL bit {
+			/* ignore bit symbol declaration */
 			$$ = 0;
 		}
 	     | '.' DS expr {

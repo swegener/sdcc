@@ -446,7 +446,7 @@ bool aopIsPtr(operand *op) {
   }
 }
       
-char *opRegName(operand *op, int offset, char *opName) {
+char *opRegName(operand *op, int offset, char *opName, bool decorate) {
 
   if (IS_SYMOP(op)) {
     if (OP_SYMBOL(op)->onStack) {
@@ -471,17 +471,21 @@ char *opRegName(operand *op, int offset, char *opName) {
       }
       // fall through
     case V_CHAR:
-      sprintf (opName, "#0x%02x", SPEC_CVAL(OP_VALUE(op)->type).v_int);
+      sprintf (opName, "#%s0x%02x", decorate?"(char)":"", 
+	       SPEC_CVAL(OP_VALUE(op)->type).v_int);
       break;
     case V_INT:
       if (SPEC_LONG(OP_VALUE(op)->type)) {
-	sprintf (opName, "#0x%02lx", SPEC_CVAL(OP_VALUE(op)->type).v_long);
+	sprintf (opName, "#%s0x%02lx", decorate?"(long)":"",
+		 SPEC_CVAL(OP_VALUE(op)->type).v_long);
       } else {
-	sprintf (opName, "#0x%02x", SPEC_CVAL(OP_VALUE(op)->type).v_int);
+	sprintf (opName, "#%s0x%02x", decorate?"(int)":"",
+		 SPEC_CVAL(OP_VALUE(op)->type).v_int);
       }
       break;
     case V_FLOAT:
-      sprintf (opName, "#%f", SPEC_CVAL(OP_VALUE(op)->type).v_float);
+      sprintf (opName, "#%s%f", decorate?"(float)":"",
+	       SPEC_CVAL(OP_VALUE(op)->type).v_float);
       break;
     default: 
       bailOut("opRegName: unexpected noun");
@@ -553,7 +557,7 @@ char * printOp (operand *op) {
     strcat (line, "unknown");
     return line;
   } else if (IS_VALOP(op)) {
-    opRegName(op, 0, line);
+    opRegName(op, 0, line, 1);
   } else if (IS_TYPOP(op)) {
     sprintf (line, "[");
     if (isPtr) {
@@ -694,10 +698,43 @@ static void genUminus (iCode * ic) {
 }
 
 /*-----------------------------------------------------------------*/
-/* genIpush - genrate code for pushing this gets a little complex  */
+/* genIpush - generate code for pushing                            */
 /*-----------------------------------------------------------------*/
 static void genIpush (iCode * ic) {
+  operand *left=IC_LEFT(ic);
+
   printIc ("genIpush", ic, 0,1,0);
+  aopOp(left,FALSE,FALSE);
+  if (AOP_TYPE(left)==AOP_LIT) {
+    switch (AOP_SIZE(left)) 
+      {
+      case 1:
+	emitcode ("mov", "r1l,%s", AOP_NAME(left)[0]);
+	emitcode ("push", "r1l");
+	return;
+      case 2:
+	emitcode ("mov", "r1,%s", AOP_NAME(left)[0]);
+	emitcode ("push", "r1");
+	return;
+      case 3:
+	emitcode ("mov", "r1l,%s", AOP_NAME(left)[1]);
+	emitcode ("push", "r1l");
+	emitcode ("mov", "r1,%s", AOP_NAME(left)[0]);
+	emitcode ("push", "r1");
+	return;
+      case 4:
+	emitcode ("mov", "r1,%s", AOP_NAME(left)[1]);
+	emitcode ("push", "r1");
+	emitcode ("mov", "r1,%s", AOP_NAME(left)[0]);
+	emitcode ("push", "r1");
+	return;
+      }
+  } else {
+    if (AOP_SIZE(left)>2) {
+      emitcode ("push", "%s", AOP_NAME(left)[1]);
+    }
+    emitcode ("push", "%s", AOP_NAME(left)[0]);
+  }
 }
 
 /*-----------------------------------------------------------------*/
@@ -711,8 +748,37 @@ static void genIpop (iCode * ic) {
 /* genCall - generates a call statement                            */
 /*-----------------------------------------------------------------*/
 static void genCall (iCode * ic) {
-  emitcode (";", "genCall %s result=%s", OP_SYMBOL(IC_LEFT(ic))->name,
+  operand *result=IC_RESULT(ic);
+
+  emitcode (";", "genCall(%d) %s result=%s", ic->lineno,
+	    OP_SYMBOL(IC_LEFT(ic))->name,
 	    printOp (IC_RESULT(ic)));
+  emitcode ("call", "%s", OP_SYMBOL(IC_LEFT(ic))->rname);
+
+  /* if we need to assign a result value */
+  if (IS_ITEMP (IC_RESULT(ic)) &&
+      OP_SYMBOL (IC_RESULT (ic))->nRegs) {
+    aopOp(result,FALSE,FALSE);
+    switch (AOP_SIZE(result))
+      {
+      case 1:
+	emitcode ("mov", "%s,r0l", AOP_NAME(result)[0]);
+	return;
+      case 2:
+	emitcode ("mov", "%s,r0", AOP_NAME(result)[0]);
+	return;
+      case 3:
+	// generic pointer
+	emitcode ("mov", "%s,r1l", AOP_NAME(result)[1]);
+	emitcode ("mov", "%s,r0", AOP_NAME(result)[0]);
+	return;
+      case 4:
+	emitcode ("mov", "%s,r1", AOP_NAME(result)[1]);
+	emitcode ("mov", "%s,r0", AOP_NAME(result)[0]);
+	return;
+      }
+    bailOut("genCall");
+  }
 }
 
 /*-----------------------------------------------------------------*/
@@ -987,14 +1053,6 @@ static iCode *hasInc (operand *op, iCode *ic, int osize) {
   while (lic) {
     /* if operand of the form op = op + <sizeof *op> */
     if (lic->op == '+') {
-      fprintf (stderr, "isOperandEqual(IC_LEFT(lic),op):%d\n",
-	       isOperandEqual(IC_LEFT(lic),op));
-      fprintf (stderr, "isOperandEqual(IC_RESULT(lic),op):%d\n",
-	       isOperandEqual(IC_RESULT(lic),op));
-      fprintf (stderr, "isOperandLiteral(IC_RIGHT(lic)):%d\n",
-	       isOperandLiteral(IC_RIGHT(lic)));
-      fprintf (stderr, "operandLitValue(IC_RIGHT(lic)) %f %d\n",
-	       operandLitValue(IC_RIGHT(lic)), isize);
       if (isOperandEqual(IC_LEFT(lic),op) &&
 	  //isOperandEqual(IC_RESULT(lic),op) && 
 	  isOperandLiteral(IC_RIGHT(lic)) &&

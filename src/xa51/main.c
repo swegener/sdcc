@@ -136,18 +136,24 @@ static void _xa51_genXINIT (FILE * of) {
 static void
 _xa51_genAssemblerPreamble (FILE * of)
 {
+  symbol *mainExists=newSymbol("main", 0);
+  mainExists->block=0;
+
   fprintf (of, "_errno\tsfr\t0x00; to keep the fp-lib's happy for now\n\n");
-  fprintf (of, "\t.area CSEG\t(CODE)\n");
-  fprintf (of, "__interrupt_vect:\n");
-  fprintf (of, "\t.dw\t0x8f00\n");
-  fprintf (of, "\t.dw\t__sdcc_gsinit_startup\n");
-  fprintf (of, "\n");
-  fprintf (of, "__sdcc_gsinit_startup:\n");
-  fprintf (of, "\tmov\tr7,#0x%04x\n", options.stack_loc);
-  fprintf (of, "\tcall\t_external_startup\n");
-  _xa51_genXINIT(of);
-  fprintf (of, "\tcall\t_main\n");
-  fprintf (of, "\treset\t;main should not return\n");
+
+  if ((mainExists=findSymWithLevel(SymbolTab, mainExists))) {
+    fprintf (of, "\t.area CSEG\t(CODE)\n");
+    fprintf (of, "__interrupt_vect:\n");
+    fprintf (of, "\t.dw\t0x8f00\n");
+    fprintf (of, "\t.dw\t__sdcc_gsinit_startup\n");
+    fprintf (of, "\n");
+    fprintf (of, "__sdcc_gsinit_startup:\n");
+    fprintf (of, "\tmov\tr7,#0x%04x\n", options.stack_loc);
+    fprintf (of, "\tcall\t_external_startup\n");
+    _xa51_genXINIT(of);
+    fprintf (of, "\tcall\t_main\n");
+    fprintf (of, "\treset\t;main should not return\n");
+  }
 }
 
 /* dummy linker for now */

@@ -78,6 +78,7 @@ char *op_mnemonic_str[] = {
 "CALL",
 "RET",
 "Bcc",
+"BEQ",
 "JB",
 "JNB",
 "CJNE",
@@ -102,7 +103,7 @@ struct xa_dis_entry disass_xa[]= {
  {0xff00,0xffff,' ',1,NOP, NO_OPERANDS     }, //  BRPT  1 1 1 1 1 1 1 1
 
  {0x0840,0xfffc,' ',3,ANL, C_BIT           }, //  ANL C, bit                 0 0 0 0 1 0 0 0  0 1 0 0 0 0 b b
- {0x0850,0xfffc,' ',3,ANL, NOTC_BIT        }, //  ANL C, /bit                0 0 0 0 1 0 0 0  0 1 0 1 0 0 b b
+ {0x0850,0xfffc,' ',3,ANL, C_NOTBIT        }, //  ANL C, /bit                0 0 0 0 1 0 0 0  0 1 0 1 0 0 b b
  {0x0850,0xfffc,' ',3,ASL, REG_REG         }, //  ASL Rd, Rs                 1 1 0 0 S S 0 1  d d d d s s s s
  {0x900c,0xf70f,' ',2,CPL, REG_ALONE       }, //  CPL Rd                     1 0 0 1 S 0 0 0  d d d d 1 0 1 0
  {0xe708,0xff00,' ',2,DIV_w, REG_REG       }, //  DIV.w Rd, Rs               1 1 1 0 0 1 1 1  d d d d s s s s
@@ -342,7 +343,12 @@ struct xa_dis_entry disass_xa[]= {
  {0x9607,0xff8f,' ',4,XOR, DIRECT_DATA8    },  // XOR direct, #data8         1 0 0 1 0 1 1 0  0 b b b 0 1 1 1
  {0x9e07,0xff8f,' ',5,XOR, DIRECT_DATA16   },  // XOR direct, #data16        1 0 0 1 0 1 1 0  0 b b b 0 1 1 1
 
-  { 0x0000,   0x00,   0, 1, BAD_OPCODE, REG_REG}
+ {0xc500,0xff00,' ',3,CALL, REL16          },  // CALL rel16                 1 1 0 0 0 1 0 1  rel16
+ {0xc600,0xfff8,' ',2,CALL, IREG_ALONE     },  // CALL [Rs]                  1 1 0 0 0 1 1 0  0 0 0 0 0 s s s
+
+ {0xf300,0xff00,' ',2,BEQ, REL8            },  // BEQ rel8                   1 1 1 1 0 0 1 1  rel8
+
+ {0x0000,0x0000,  0,1,BAD_OPCODE, REG_REG}
 };
 
 

@@ -232,8 +232,8 @@ void print_symbol_table()
 #else
     if (p->issfr) {
       fprintf (sym_fp, "%-5s", "SFR");
-    } else if (p->isbit) {
-      fprintf (sym_fp, "%-5s", "BIT");
+    } else if (p->isbit && !p->area) {
+      fprintf (sym_fp, "%-5s", "SBIT");
     } else {
       fprintf (sym_fp, "%-5s", areaToString(p->area));
     }
@@ -326,17 +326,19 @@ void out(int *byte_list, int num)
 	if (num > 0) fprintf(list_fp, "%06X: ", MEM_POS);
 	else fprintf(list_fp, "\t");
 
-	for (i=0; i<num; i++) {
-		hexout(byte_list[i], MEM_POS + i, 0);
-		if (!first && (i % 4) == 0) fprintf(list_fp, "\t");
-		fprintf(list_fp, "%02X", byte_list[i]);
-		if ((i+1) % 4 == 0) {
-			if (first) fprintf(list_fp, "\t%s\n", last_line_text);
-			else fprintf(list_fp, "\n");
-			first = 0;
-		} else {
-			if (i<num-1) fprintf(list_fp, " ");
-		}
+	if (current_area==AREA_CSEG || current_area==AREA_XINIT) {
+	  for (i=0; i<num; i++) {
+	    hexout(byte_list[i], MEM_POS + i, 0);
+	    if (!first && (i % 4) == 0) fprintf(list_fp, "\t");
+	    fprintf(list_fp, "%02X", byte_list[i]);
+	    if ((i+1) % 4 == 0) {
+	      if (first) fprintf(list_fp, "\t%s\n", last_line_text);
+	      else fprintf(list_fp, "\n");
+	      first = 0;
+	    } else {
+	      if (i<num-1) fprintf(list_fp, " ");
+	    }
+	  }
 	}
 	if (first) {
 		if (num < 3) fprintf(list_fp, "\t");

@@ -66,7 +66,9 @@ cl_xa::inst_ADD(uint code)
 {
   int operands = code >> 16;  // kludgy, param info
 
+#undef FUNC1
 #define FUNC1 add1
+#undef FUNC2
 #define FUNC2 add2
 #include "inst_gen.cc"
 
@@ -78,7 +80,9 @@ cl_xa::inst_ADDC(uint code)
 {
   int operands = code >> 16;  // kludgy, param info
 
+#undef FUNC1
 #define FUNC1 addc1
+#undef FUNC2
 #define FUNC2 addc2
 #include "inst_gen.cc"
 

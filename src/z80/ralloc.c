@@ -1187,6 +1187,12 @@ rUmaskForOp (operand * op)
   return rumask;
 }
 
+bitVect *
+z80_rUmaskForOp (operand * op)
+{
+  return rUmaskForOp (op);
+}
+
 /** Returns bit vector of registers used in iCode.
  */
 bitVect *

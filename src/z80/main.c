@@ -68,11 +68,22 @@ _reset_regparm ()
 static int
 _reg_parm (sym_link * l)
 {
-  if (regParmFlg == 2)
-    return 0;
-
-  regParmFlg++;
-  return 1;
+  if (options.noRegParams) 
+    {
+      return FALSE;
+    }
+  else 
+    {
+      if (regParmFlg == 2)
+        {
+          return FALSE;
+        }
+      else
+        {
+          regParmFlg++;
+          return TRUE;
+        }
+    }
 }
 
 static bool
@@ -262,7 +273,7 @@ _setDefaultOptions (void)
   options.mainreturn = 1;
   /* first the options part */
   options.intlong_rent = 1;
-
+  options.noRegParams = 1;
   /* Default code and data locations. */
   options.code_loc = 0x200;
   options.data_loc = 0x8000;
@@ -274,6 +285,49 @@ _setDefaultOptions (void)
   optimize.label4 = 1;
   optimize.loopInvariant = 1;
   optimize.loopInduction = 0;
+}
+
+/* Mangaling format:
+    _fun_policy_params
+    where:
+      policy is the function policy
+      params is the parameter format
+
+   policy format:
+    rs
+    where:
+      r is 'r' for reentrant, 's' for static functions
+      s is 'c' for callee saves, 'r' for caller saves
+    examples:
+      rr - reentrant, caller saves
+   params format:
+    A combination of register short names and s to signify stack variables.
+    examples:
+      bds - first two args appear in BC and DE, the rest on the stack
+      s - all arguments are on the stack.
+*/
+static char *
+_mangleSupportFunctionName(char *original)
+{
+  char buffer[128];
+
+  if (TARGET_IS_Z80) 
+    {
+      if (options.noRegParams) 
+        {
+          sprintf(buffer, "%s_rr_s", original);
+        }
+      else 
+        {
+          sprintf(buffer, "%s_rr_bds", original);
+        }
+    }
+  else 
+    {
+      strcpy(buffer, original);
+    }
+
+  return gc_strdup(buffer);
 }
 
 static const char *
@@ -457,7 +511,7 @@ PORT z80_port =
   },
     /* Z80 has no native mul/div commands */
   {
-    0, 2
+    0, 0
   },
   "_",
   _z80_init,
@@ -472,6 +526,7 @@ PORT z80_port =
   _reset_regparm,
   _reg_parm,
   _process_pragma,
+  _mangleSupportFunctionName,
   TRUE,
   0,				/* leave lt */
   0,				/* leave gt */
@@ -549,6 +604,7 @@ PORT gbz80_port =
   _reset_regparm,
   _reg_parm,
   _process_pragma,
+  NULL,
   TRUE,
   0,				/* leave lt */
   0,				/* leave gt */

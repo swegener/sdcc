@@ -214,6 +214,7 @@ struct options
     char *out_name;		/* Asm output name for c1 mode */
     int nostdlib;		/* Don't use standard lib files */
     int nostdinc;		/* Don't use standard include files */
+    int noRegParams;            /* Disable passing some parameters in registers */
     int verbose;		/* Show what the compiler is doing */
     int shortis8bits;           /* treat short like int or char */
 
@@ -259,8 +260,9 @@ extern int nrelFiles;
 extern char *relFiles[128];
 extern char *libFiles[128];
 extern int nlibFiles;
-extern int nlibPaths;
 extern char *libPaths[128];
+extern int nlibPaths;
+
 extern bool verboseExec ;
 
 void parseWithComma (char **, char *);

@@ -18,7 +18,7 @@ $(LIB): $(OBJ) Makefile _dummy
 	for i in $(OBJ); do echo $$i >> $(LIB); done
 
 .c.o:
-	$(CC) $(CFLAGS) -c $@
+	$(CC) $(CFLAGS) -c $<
 
 _dummy:
 

@@ -287,6 +287,7 @@ PORT pic_port =
   _pic14_reset_regparm,
   _pic14_regparm,
   NULL,
+  NULL,
   FALSE,
   0,				/* leave lt */
   0,				/* leave gt */

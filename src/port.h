@@ -201,6 +201,10 @@ typedef struct
     */
     int (*process_pragma) (const char *sz);
 
+    /** Mangles a support function name to reflect the calling model. 
+     */
+    char *(*getMangledFunctionName) (char *szOrginial);
+
     /** If TRUE, then tprintf and !dw will be used for some initalisers
      */
     bool use_dw_for_init;

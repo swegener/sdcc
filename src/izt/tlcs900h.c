@@ -196,6 +196,7 @@ PORT tlcs900h_port =
   _tlcs900h_reset_regparm,
   _tlcs900h_regparm,
   NULL,
+  NULL,
   FALSE,
   0,				/* leave lt */
   0,				/* leave gt */

@@ -386,7 +386,7 @@ found:
 	{
 	  newic = newiCode (IPUSH, IC_RIGHT (ic), NULL);
 	  newic->parmPush = 1;
-	  bytesPushed=getSize(type);
+	  bytesPushed += getSize(type);
 	}
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
@@ -398,7 +398,7 @@ found:
 	{
 	  newic = newiCode (IPUSH, IC_LEFT (ic), NULL);
 	  newic->parmPush = 1;
-	  bytesPushed=getSize(type);
+	  bytesPushed += getSize(type);
 	}
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;

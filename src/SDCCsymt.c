@@ -2254,6 +2254,19 @@ _makeRegParam (symbol * sym)
     }
 }
 
+static char *
+_mangleFunctionName(char *in)
+{
+  if (port->getMangledFunctionName) 
+    {
+      return port->getMangledFunctionName(in);
+    }
+  else
+    {
+      return in;
+    }
+}
+
 /*-----------------------------------------------------------------*/
 /* initCSupport - create functions for C support routines          */
 /*-----------------------------------------------------------------*/
@@ -2319,12 +2332,12 @@ initCSupport ()
 	      if (tofrom)
 		{
 		  sprintf (buffer, "__fs2%s%s", ssu[su], sbwd[bwd]);
-		  __conv[tofrom][bwd][su] = funcOfType (buffer, __multypes[bwd][su], floatType, 1, options.float_rent);
+		  __conv[tofrom][bwd][su] = funcOfType (_mangleFunctionName(buffer), __multypes[bwd][su], floatType, 1, options.float_rent);
 		}
 	      else
 		{
 		  sprintf (buffer, "__%s%s2fs", ssu[su], sbwd[bwd]);
-		  __conv[tofrom][bwd][su] = funcOfType (buffer, floatType, __multypes[bwd][su], 1, options.float_rent);
+		  __conv[tofrom][bwd][su] = funcOfType (_mangleFunctionName(buffer), floatType, __multypes[bwd][su], 1, options.float_rent);
 		}
 	    }
 	}
@@ -2340,7 +2353,7 @@ initCSupport ()
 		       smuldivmod[muldivmod],
 		       ssu[su],
 		       sbwd[bwd]);
-              __muldiv[muldivmod][bwd][su] = funcOfType (buffer, __multypes[bwd][su], __multypes[bwd][su], 2, options.intlong_rent);
+              __muldiv[muldivmod][bwd][su] = funcOfType (_mangleFunctionName(buffer), __multypes[bwd][su], __multypes[bwd][su], 2, options.intlong_rent);
 	      SPEC_NONBANKED (__muldiv[muldivmod][bwd][su]->etype) = 1;
 	      if (bwd < port->muldiv.force_reg_param_below)
 		_makeRegParam (__muldiv[muldivmod][bwd][su]);

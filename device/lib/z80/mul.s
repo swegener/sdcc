@@ -1,10 +1,18 @@
 	;; Originally from GBDK by Pascal Felber.
 	
 	.area	_CODE
-	
-__mulschar::
+
+__mulschar_rr_s::
+        ld      hl,#2
+        add     hl,sp
+
+        ld      e,(hl)
+        inc     hl
+        ld      l,(hl)                
+
+        ;; Fall through
+__mulschar_rr_hds::
         ;; Need to sign extend before going in.
-        push    bc
         ld      c,l
         
         ld      a,l
@@ -19,13 +27,29 @@ __mulschar::
 
         jp      .mul16
 
-__muluchar::
-__mulsint::
-__muluint::
+__muluchar_rr_s::
+__mulsint_rr_s::
+__muluint_rr_s::
+        ld      hl,#2
+        add     hl,sp
+        
+        ld      e,(hl)
+        inc     hl
+        ld      d,(hl)
+        inc     hl
+        ld      a,(hl)
+        inc     hl
+        ld      h,(hl)
+        ld      l,a
+
+        ;; Fall through
+        
+__muluchar_rr_hds::
+__mulsint_rr_hds::
+__muluint_rr_hds::
 	;; Parameters:
 	;;	HL, DE (left, right irrelivent)
 	;; Must preserve BC
-	push	bc
 	ld	b,h
 	ld	c,l
 	
@@ -61,6 +85,5 @@ __muluint::
 	ADD	HL,BC		; Add multiplicand to product
 .mend:
 				; HL = result
-	pop	bc
 	ret
 

@@ -134,6 +134,7 @@ optionsTable[] = {
     { 'S',  NULL,                   &noAssemble, "Assemble only" },
     { 'W',  NULL,                   NULL, "Pass through options to the assembler (a) or linker (l)" },
     { 'L',  NULL,                   NULL, "Add the next field to the library search path" },
+    { 'l',  NULL,                   NULL, "Include the given library in the link" },
     { 0,    OPTION_LARGE_MODEL,     NULL, "Far functions, far data" },
     { 0,    OPTION_MEDIUM_MODEL,    NULL, "Far functions, near data" },
     { 0,    OPTION_SMALL_MODEL,     NULL, "Small model (default)" },
@@ -174,6 +175,7 @@ optionsTable[] = {
     { 0,    "--nooverlay",          &options.noOverlay, NULL },
     { 0,    "--main-return",        &options.mainreturn, "Issue a return after main()" },
     { 0,    "--no-peep",            &options.nopeep, "Disable the peephole assembly file optimisation" },
+    { 0,    "--no-reg-params",      &options.noRegParams, "On some ports, disable passing some parameters in registers" },
     { 0,    "--peep-asm",           &options.asmpeep, NULL },
     { 0,    "--debug",              &options.debug, "Enable debugging symbol output" },
     { 'v',  OPTION_VERSION,         NULL, "Display sdcc's version" },
@@ -288,8 +290,7 @@ _validatePorts (void)
     {
       if (_ports[i]->magic != PORT_MAGIC)
 	{
-	  printf ("Error: port %s is incomplete.\n", _ports[i]->target);
-	  wassert (0);
+	  wassertl (0, "Port definition structure is incomplete");
 	}
     }
 }
@@ -886,6 +887,10 @@ parseCmdLine (int argc, char **argv)
 
 	    case 'L':
                 libPaths[nlibPaths++] = getStringArg("-L", argv, &i);
+                break;
+
+            case 'l':
+                libFiles[nlibFiles++] = getStringArg("-l", argv, &i);
                 break;
 
 	    case 'W':

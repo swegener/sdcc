@@ -5,7 +5,7 @@ TOPDIR = ../../..
 SCC = $(TOPDIR)/bin/sdcc -mz80
 SAS = $(TOPDIR)/bin/as-z80
 
-OBJ = div.o mul.o putchar.o string.o printf.o # asm_strings.o
+OBJ = div.o mul.o putchar.o printf.o # asm_strings.o string.s
 LIB = z80.lib
 CC = $(SCC)
 AS = $(SAS)
@@ -18,7 +18,7 @@ $(LIB): $(OBJ) Makefile _dummy
 	for i in $(OBJ); do echo $$i >> $(LIB); done
 
 .c.o:
-	$(CC) $(CFLAGS) -c $@
+	$(CC) $(CFLAGS) -c $<
 
 _dummy:
 

@@ -48,12 +48,18 @@
 /** For printf */
 #include <stdio.h>
 
-#ifdef SDCC_ds390
+#if defined(SDCC_ds390)
 #include <tinibios.h>
 #define clock() ClockTicks()
 #define CLOCKS_PER_SEC 1000
 #undef PRINT_T_STATES
 #define memcpy(d,s,l) memcpyx(d,s,l)
+
+#elif defined(__z80)
+int _clock(void);
+#define clock _clock
+#define CLOCKS_PER_SEC	10
+
 #else
 /** For clock() */
 #include <time.h>
@@ -70,7 +76,7 @@ void _printTStates(void);
 
 /** Set to one to print more messages about expected values etc. 
  */
-#define DEBUG	0
+#define DEBUG	1
 
 #if DEBUG
 #define DPRINTF(_a) printf _a
@@ -282,7 +288,7 @@ int main(void)
     printf ("        should be:   DHRYSTONE PROGRAM, 2'ND STRING\n");
     printf ("\n");
 #endif
-    printf("Dhrystones/s = %lu\n", (unsigned long)Number_Of_Runs / (runTime/CLOCKS_PER_SEC));
+    //    printf("Dhrystones/s = %lu\n", (unsigned long)Number_Of_Runs / (runTime/CLOCKS_PER_SEC));
     printf("MIPS = d/s/1757 = (sigh, need floats...)\n");
 #ifdef PRINT_T_STATES    
     _printTStates();

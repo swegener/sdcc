@@ -1743,7 +1743,17 @@ _saveRegsForCall(iCode *ic, int sendSetSize)
     bool deInUse, bcInUse;
     bool deSending;
     bool bcInRet = FALSE, deInRet = FALSE;
-    bitVect *rInUse = bitVectCplAnd (bitVectCopy (ic->rMask), ic->rUsed);
+    bitVect *rInUse;
+
+    if (IC_RESULT(ic))
+      {
+        rInUse = bitVectCplAnd (bitVectCopy (ic->rMask), z80_rUmaskForOp (IC_RESULT(ic)));
+      }
+    else 
+      {
+        /* Has no result, so in use is all of in use */
+        rInUse = ic->rMask;
+      }
 
     deInUse = bitVectBitValue (rInUse, D_IDX) || bitVectBitValue(rInUse, E_IDX);
     bcInUse = bitVectBitValue (rInUse, B_IDX) || bitVectBitValue(rInUse, C_IDX);
@@ -1964,6 +1974,51 @@ isInHome (void)
   return _G.in_home;
 }
 
+static int
+_opUsesPair (operand * op, iCode * ic, PAIR_ID pairId)
+{
+  int ret = 0;
+  asmop *aop;
+  symbol *sym = OP_SYMBOL (op);
+
+  if (sym->isspilt || sym->nRegs == 0)
+    return 0;
+
+  aopOp (op, ic, FALSE, FALSE);
+
+  aop = AOP (op);
+  if (aop->type == AOP_REG)
+    {
+      int i;
+      for (i = 0; i < aop->size; i++)
+	{
+	  if (pairId == PAIR_DE)
+	    {
+	      emit2 ("; name %s", aop->aopu.aop_reg[i]->name);
+	      if (!strcmp (aop->aopu.aop_reg[i]->name, "e"))
+		ret++;
+	      if (!strcmp (aop->aopu.aop_reg[i]->name, "d"))
+		ret++;
+	    }
+          else if (pairId == PAIR_BC)
+            {
+	      emit2 ("; name %s", aop->aopu.aop_reg[i]->name);
+	      if (!strcmp (aop->aopu.aop_reg[i]->name, "c"))
+		ret++;
+	      if (!strcmp (aop->aopu.aop_reg[i]->name, "b"))
+		ret++;
+            }
+	  else
+	    {
+	      wassert (0);
+	    }
+	}
+    }
+
+  freeAsmop (IC_LEFT (ic), NULL, ic);
+  return ret;
+}
+
 /** Emit the code for a call statement
  */
 static void
@@ -1984,10 +2039,30 @@ emitCall (iCode * ic, bool ispcall)
     {
       iCode *sic;
       int send = 0;
+      int nSend = elementsInSet(_G.sendSet);
+      bool swapped = FALSE;
 
       int _z80_sendOrder[] = {
-        PAIR_BC, PAIR_DE, PAIR_INVALID
+        PAIR_BC, PAIR_DE
       };
+
+      if (nSend > 1) {
+        /* Check if the parameters are swapped.  If so route through hl instead. */
+        wassertl (nSend == 2, "Pedantic check.  Code only checks for the two send items case.");
+
+        sic = setFirstItem(_G.sendSet);
+        sic = setNextItem(_G.sendSet);
+
+        if (_opUsesPair (IC_LEFT(sic), sic, _z80_sendOrder[0])) {
+          /* The second send value is loaded from one the one that holds the first
+             send, i.e. it is overwritten. */
+          /* Cache the first in HL, and load the second from HL instead. */
+          emit2 ("ld h,%s", _pairs[_z80_sendOrder[0]].h);
+          emit2 ("ld l,%s", _pairs[_z80_sendOrder[0]].l);
+
+          swapped = TRUE;
+        }
+      }
 
       for (sic = setFirstItem (_G.sendSet); sic;
            sic = setNextItem (_G.sendSet))
@@ -1998,8 +2073,20 @@ emitCall (iCode * ic, bool ispcall)
           size = AOP_SIZE (IC_LEFT (sic));
           wassertl (size <= 2, "Tried to send a parameter that is bigger than two bytes");
           wassertl (_z80_sendOrder[send] != PAIR_INVALID, "Tried to send more parameters than we have registers for");
-          
-          fetchPair(_z80_sendOrder[send], AOP (IC_LEFT (sic)));
+
+          // PENDING: Mild hack
+          if (swapped == TRUE && send == 1) {
+            if (size > 1) {
+              emit2 ("ld %s,h", _pairs[_z80_sendOrder[send]].h);
+            }
+            else {
+              emit2 ("ld %s,!zero", _pairs[_z80_sendOrder[send]].h);
+            }
+            emit2 ("ld %s,l", _pairs[_z80_sendOrder[send]].l);
+          }
+          else {
+            fetchPair(_z80_sendOrder[send], AOP (IC_LEFT (sic)));
+          }
 
           send++;
           freeAsmop (IC_LEFT (sic), NULL, sic);
@@ -2075,6 +2162,7 @@ emitCall (iCode * ic, bool ispcall)
   if (ic->parmBytes)
     {
       int i = ic->parmBytes;
+
       _G.stack.pushed -= i;
       if (IS_GB)
 	{
@@ -5682,40 +5770,4 @@ _isPairUsed (iCode * ic, PAIR_ID pairId)
   return ret;
 }
 
-static int
-_opUsesPair (operand * op, iCode * ic, PAIR_ID pairId)
-{
-  int ret = 0;
-  asmop *aop;
-  symbol *sym = OP_SYMBOL (op);
-
-  if (sym->isspilt || sym->nRegs == 0)
-    return 0;
-
-  aopOp (op, ic, FALSE, FALSE);
-
-  aop = AOP (op);
-  if (aop->type == AOP_REG)
-    {
-      int i;
-      for (i = 0; i < aop->size; i++)
-	{
-	  if (pairId == PAIR_DE)
-	    {
-	      emit2 ("; name %s", aop->aopu.aop_reg[i]->name);
-	      if (!strcmp (aop->aopu.aop_reg[i]->name, "e"))
-		ret++;
-	      if (!strcmp (aop->aopu.aop_reg[i]->name, "d"))
-		ret++;
-	    }
-	  else
-	    {
-	      wassert (0);
-	    }
-	}
-    }
-
-  freeAsmop (IC_LEFT (ic), NULL, ic);
-  return ret;
-}
 */

@@ -203,6 +203,7 @@ PORT avr_port = {
 	_avr_genIVT,
 	_avr_reset_regparm,
 	_avr_regparm,
+        NULL,
 	NULL,
 	FALSE,
 	0,			/* leave lt */

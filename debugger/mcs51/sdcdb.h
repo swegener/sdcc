@@ -32,7 +32,6 @@
 #include <ctype.h>
 #include <limits.h>
 #include "sdccconf.h"
-#include "src/SDCCalloc.h"
 #include "src/SDCCset.h"
 #include "src/SDCChasht.h"
 
@@ -50,14 +49,14 @@ typedef short bool;
 #endif
 
 #ifndef ALLOC
-#define  ALLOC(x,sz) if (!(x = GC_malloc(sz)))                          \
+#define  ALLOC(x,sz) if (!(x = calloc(1, sz)))                          \
          {                                                           \
             fprintf(stderr,"sdcdb: out of memory\n"); \
             exit (1);                                                \
          }
 #endif
 #ifndef ALLOC_ATOMIC
-#define ALLOC_ATOMIC(x,sz)   if (!(x = GC_malloc_atomic(sz)))   \
+#define ALLOC_ATOMIC(x,sz)   if (!(x = calloc(1, sz)))   \
          {                                               \
             fprintf(stderr,"sdcdb: out of memory\n"); \
             exit (1);                                    \

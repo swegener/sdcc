@@ -29,15 +29,6 @@ all: checkconf sdcc
 tini: checkconf sdcc-tini
 
 sdcc-libs:
-ifeq ($(DISABLE_GC),1)
-	: skip boehm library when disabled by hand.
-else
-ifeq ($(CROSS_LIBGC),1)
-	$(MAKE) -C support/gc -f Makefile.cross
-else
-	$(MAKE) -C support/gc
-endif
-endif
 	for lib in $(SDCC_LIBS); do $(MAKE) -C $$lib; done
 
 sdcc-cc: sdcc-libs

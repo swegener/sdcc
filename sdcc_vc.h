@@ -33,8 +33,6 @@
 #undef OPT_DISABLE_MCS51
 #undef OPT_DISABLE_AVR
 
-#define OPT_DISABLE_GC			1
-
 #endif
 
 /* End of config.h */

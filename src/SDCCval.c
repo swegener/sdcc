@@ -402,7 +402,7 @@ value *strVal  ( char	*s )
     SPEC_NOUN(val->etype)   =  V_CHAR   ;
     SPEC_SCLS(val->etype)   =  S_LITERAL;
     
-    ALLOC_ATOMIC(SPEC_CVAL(val->etype).v_char,strlen(s)+1);
+    ALLOC(SPEC_CVAL(val->etype).v_char,strlen(s)+1);
     copyStr (SPEC_CVAL(val->etype).v_char,s);
     return val;
 }

@@ -276,7 +276,7 @@ peepRule *newPeepRule (lineNode *match  ,
     pr->restart = restart;
 
     if (cond && *cond) {
-    ALLOC_ATOMIC(pr->cond,strlen(cond)+1);
+    ALLOC(pr->cond,strlen(cond)+1);
     strcpy(pr->cond,cond);
     } else
     pr->cond = NULL ;
@@ -300,7 +300,7 @@ lineNode *newLineNode (char *line)
     lineNode *pl;
 
     ALLOC(pl,sizeof(lineNode));
-    ALLOC_ATOMIC(pl->line,strlen(line)+1);
+    ALLOC(pl->line,strlen(line)+1);
     strcpy(pl->line,line);
     return pl;
 }
@@ -506,7 +506,7 @@ static void bindVar (int key, char **s, hTab **vtab)
     *s = vvx ;
     *vv = '\0';
     /* got value */
-    ALLOC_ATOMIC(vvx,strlen(vval)+1);
+    ALLOC(vvx,strlen(vval)+1);
     strcpy(vvx,vval);
     hTabAddItem(vtab,key,vvx);
 
@@ -911,10 +911,10 @@ static char *readFileIntoBuffer (char *fname)
         lb[nch] = '\0';
         /* copy it into allocated buffer */
         if (rs) {
-        rs = GC_realloc(rs,strlen(rs)+strlen(lb)+1);
+        rs = realloc(rs,strlen(rs)+strlen(lb)+1);
         strcat(rs,lb);
         } else {
-        ALLOC_ATOMIC(rs,strlen(lb)+1);
+        ALLOC(rs,strlen(lb)+1);
         strcpy(rs,lb);
         }
         nch = 0 ;
@@ -926,10 +926,10 @@ static char *readFileIntoBuffer (char *fname)
     lb[nch] = '\0';
     /* copy it into allocated buffer */
     if (rs) {
-        rs = GC_realloc(rs,strlen(rs)+strlen(lb)+1);
+        rs = realloc(rs,strlen(rs)+strlen(lb)+1);
         strcat(rs,lb);
     } else {
-        ALLOC_ATOMIC(rs,strlen(lb)+1);
+        ALLOC(rs,strlen(lb)+1);
         strcpy(rs,lb);
     }
     }

@@ -121,7 +121,7 @@ char *aopLiteralLong(value *val, int offset, int size)
 	    /* Hmm.  Too big for now. */
 	    assert(0);
 	}
-        ALLOC_ATOMIC(rs,strlen(buffer)+1);
+        ALLOC(rs,strlen(buffer)+1);
         return strcpy (rs,buffer);
     }
 
@@ -135,7 +135,7 @@ char *aopLiteralLong(value *val, int offset, int size)
 #else
     tsprintf(buffer, "!immedbyte", fl.c[offset]);
 #endif
-    ALLOC_ATOMIC(rs,strlen(buffer)+1);
+    ALLOC(rs,strlen(buffer)+1);
     return strcpy (rs,buffer);
 }
 
@@ -1375,7 +1375,7 @@ FILE *tempfile(void)
 char *gc_strdup(const char *s)
 {
     char *ret;
-    ALLOC_ATOMIC(ret, strlen(s)+1);
+    ALLOC(ret, strlen(s)+1);
     strcpy(ret, s);
     return ret;
 }

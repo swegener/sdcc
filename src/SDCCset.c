@@ -23,6 +23,7 @@
 -------------------------------------------------------------------------*/
 
 #include <stdio.h>
+#include <malloc.h>
 #include <assert.h>
 #include "SDCCset.h"
 
@@ -33,7 +34,11 @@ set *newSet  ()
 {
   set *lp ;
 
-  ALLOC(lp,sizeof(set)) ;
+  lp = calloc(1, sizeof(set));
+  if (lp == 0) {
+	fprintf(stderr, "out of virtual memory: %s\n", __FILE__);
+	exit(1);
+  }
 
   lp->item = lp->curr= lp->next = NULL;
   return lp;
@@ -498,6 +503,6 @@ void setToNull (void **item )
 
     if (! *item )
 	return ;
-    GC_free(*item);  
+    free(*item);  
     *item = NULL ;
 }

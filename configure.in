@@ -60,6 +60,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(getopt.h)
 AC_CHECK_HEADERS(unistd.h)
 AC_CHECK_HEADERS(endian.h)
+AC_CHECK_HEADERS(malloc.h)
 AC_CHECK_HEADERS(sys/isa_defs.h)
 AC_CHECK_HEADERS(sys/socket.h)
 AC_HEADER_DIRENT
@@ -199,9 +200,6 @@ AC_DEFINE_UNQUOTED(PREFIX, "${prefix}")
 AC_DEFINE_UNQUOTED(DATADIR, "${sdcc_datadir}")
 AC_DEFINE_UNQUOTED(SRCDIR, "${config_in}")
 
-# mlh: dont compile libgc if it's available locally
-AC_CHECK_LIB(gc,GC_malloc,HAVE_LIBGC=1)
-AC_SUBST(HAVE_LIBGC)
 
 # Now handle the port selection
 AC_ARG_ENABLE(z80-port,--disable-z80-port: Excludes the z80 port)
@@ -232,16 +230,6 @@ else
     AC_DEFINE_UNQUOTED(OPT_DISABLE_AVR, 0)
 fi
 
-AC_ARG_ENABLE(boehm-gc,--disable-boehm-gc: Excludes sdcc use of libgc.)
-AC_SUBST(DISABLE_GC,1)
-if test "$enable_boehm_gc" = "no"; then
-    AC_DEFINE(OPT_DISABLE_GC, 1)
-    DISABLE_GC=1
-else
-    AC_DEFINE(OPT_DISABLE_GC, 0)
-    DISABLE_GC=0
-fi
-
 # Generating output files
 # ===========================================================================
 AC_CONFIG_SUBDIRS(sim/ucsim)
@@ -250,8 +238,6 @@ AC_CONFIG_SUBDIRS(packihx)
 #as/z80/Makefile
 #link/z80/Makefile
 AC_OUTPUT(main.mk:main_in.mk
-support/gc/Makefile
-support/gc/Makefile.cross
 src/Makefile
 as/mcs51/Makefile
 support/cpp/Makefile

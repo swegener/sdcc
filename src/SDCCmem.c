@@ -45,7 +45,7 @@ memmap *allocMap (char rspace,     /* sfr space            */
 {
 	memmap *map ;
 
-	if (!(map = GC_malloc(sizeof(memmap)))) {
+	if (!(map = calloc(sizeof(memmap), 1))) {
 		werror(E_OUT_OF_MEM,__FILE__,sizeof(memmap));
 		exit (1);
 	}

@@ -27,8 +27,6 @@
 #define NATIVE_WIN32		1
 #endif
 
-# include  "SDCCalloc.h"
-
 #define SPACE ' '
 #define ZERO  0
 
@@ -90,9 +88,16 @@ typedef int bool;
     type *type##FreeStack [size]  ; \
     int   type##StackPtr = 0      ;
 
-#define ALLOCTYPE(type,size) if (!(type##Pool = GC_malloc(size*sizeof(type))))   \
+#define  ALLOC(x,sz) if (!(x = calloc(1, sz)))      \
+         {                                          \
+            werror(E_OUT_OF_MEM,__FILE__,(long) sz);\
+            exit (1);                               \
+         }
+
+
+#define ALLOCTYPE(type,size) if (!(type##Pool = calloc(1, size*sizeof(type))))\
          {                                                            \
-            werror(E_OUT_OF_MEM,__FILE__,(long) size);				 \
+            werror(E_OUT_OF_MEM,__FILE__,(long) size);		      \
             exit (1);                                                \
          }
 

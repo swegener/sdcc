@@ -13,7 +13,6 @@ CPP		= @CPP@
 INSTALL		= @INSTALL@
 
 PRJDIR		= ../..
-DISABLE_GC	= @DISABLE_GC@
 
 srcdir		= @srcdir@
 prefix		= @prefix@
@@ -33,13 +32,8 @@ CFLAGS		= @CFLAGS@
 M_OR_MM		= @M_OR_MM@
 LDFLAGS		= @LDFLAGS@
 
-ifeq ($(DISABLE_GC),1)
 LIBS            = @LIBS@
 LIBDIRS         =
-else
-LIBS            = -lgc @LIBS@
-LIBDIRS         = -L$(PRJDIR)/support/gc
-endif
 
 
 OBJECTS		= sdcdb.o symtab.o simi.o $(PRJDIR)/src/SDCCset.o \
@@ -53,9 +47,6 @@ TARGET		= $(PRJDIR)/bin/sdcdb
 # Compiling entire program or any subproject
 # ------------------------------------------
 all: checkconf $(TARGET)
-
-$(PRJDIR)/support/gc/libgc.a:
-	cd $(PRJDIR)/support/gc && $(MAKE)
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------

@@ -56,7 +56,7 @@ hTab *newHashTable (int size)
     
     ALLOC(htab,sizeof(hTab));  
 
-    if (!(htab->table = GC_malloc((size +1)* sizeof(hashtItem *)))) {
+    if (!(htab->table = calloc((size +1),  sizeof(hashtItem *)))) {
 	fprintf(stderr,"out of virtual memory %s %d\n",
 		__FILE__,(size +1)* sizeof(hashtItem *)); 
 	exit(1);
@@ -76,8 +76,8 @@ void hTabAddItemLong(hTab **htab, int key, void *pkey, void *item)
     
     if (key > (*htab)->size ) {	
 	int i;       
-	(*htab)->table = GC_realloc ((*htab)->table, 
-				     (key*2 + 2)*sizeof(hashtItem *));
+	(*htab)->table = realloc ((*htab)->table, 
+				  (key*2 + 2)*sizeof(hashtItem *));
 	for ( i = (*htab)->size +1; i <= (key*2 + 1); i++ )
 	    (*htab)->table[i] = NULL ;
 	(*htab)->size = key*2 + 1;
@@ -174,12 +174,12 @@ void hTabDeleteAll(hTab * p)
 	    if (!(jc = p->table[i])) continue;
 	    jn = jc->next; 
 	    while(jc){ 
-		GC_free(jc);
+		free(jc);
 		if((jc=jn)) jn = jc->next;
 	    } 
 	    p->table[i] = NULL ;
 	}     
-	GC_free(p->table);
+	free(p->table);
     }
 }
 

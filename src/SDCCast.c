@@ -206,7 +206,7 @@ void copyAstValues (ast *dest,ast *src)
 	break ;
 	
     case INLINEASM:
-	ALLOC_ATOMIC(dest->values.inlineasm,strlen(src->values.inlineasm));
+	ALLOC(dest->values.inlineasm,strlen(src->values.inlineasm));
 	strcpy(dest->values.inlineasm,src->values.inlineasm);
 
     case FOR:

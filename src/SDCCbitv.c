@@ -65,7 +65,7 @@ bitVect *bitVectResize (bitVect *bvp, int size)
 
     bvp->size = size;
     bvp->bSize= bSize;
-    bvp->vect = GC_realloc(bvp->vect, bSize);
+    bvp->vect = realloc(bvp->vect, bSize);
     return bvp;
 }
 

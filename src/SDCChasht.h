@@ -26,7 +26,6 @@
 #ifndef SDCCHASHT_H
 #define SDCCHASHT_H
 
-#include  "SDCCalloc.h"
 
 
 /* hashtable item */

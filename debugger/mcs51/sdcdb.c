@@ -183,9 +183,9 @@ void **resize (void **array, int newSize)
     void **vptr;
 
     if (array)
-	vptr = GC_realloc(array,newSize*(sizeof(void **)));
+	vptr = realloc(array,newSize*(sizeof(void **)));
     else
-	vptr = GC_malloc(sizeof(void **));
+	vptr = calloc(1, sizeof(void **));
     
     if (!vptr) {
 	fprintf(stderr,"sdcdb: out of memory \n");

@@ -400,12 +400,15 @@ eBBlock **iCodeBreakDown (iCode *ic, int *count)
 	/* put it in the array */
 	ebbs[(*count)++] = ebb ;
 	
-	/* allocate for the next one */
-	if (!(ebbs = GC_realloc(ebbs,(*count + 1)*sizeof(eBBlock **)))) {
+	  /* allocate for the next one. Remember to clear the new */
+	  /*  pointer at the end, that was created by realloc. */
+	if (!(ebbs = realloc(ebbs,(*count + 1)*sizeof(eBBlock **)))) {
 	    werror(E_OUT_OF_MEM,__FILE__,(*count + 1)*sizeof(eBBlock **)); 
 	    exit (1);
 	}
-	
+
+	ebbs[*count] = 0;
+
 	/* if this one ends in a goto or a conditional */
 	/* branch then check if the block it is going  */
 	/* to already exists, if yes then this could   */
@@ -442,10 +445,11 @@ eBBlock **iCodeBreakDown (iCode *ic, int *count)
 		
 		(*count)++ ;
 		/* if we have stopped at the block , allocate for an extra one */
-		if (!(ebbs = GC_realloc(ebbs,(*count + 1)*sizeof(eBBlock **)))) {
+		if (!(ebbs = realloc(ebbs,(*count + 1)*sizeof(eBBlock **)))) {
 		    werror(E_OUT_OF_MEM,__FILE__,(*count + 1)*sizeof(eBBlock **)); 
 		    exit (1);
 		}
+		ebbs[*count] = 0;
 		
 		/* then move the block down one count */  
 		pBlock = ebbs[j = i];

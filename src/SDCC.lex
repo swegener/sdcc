@@ -262,7 +262,7 @@ int checkCurrFile ( char *s)
 	/* mark the end of the filename */
 	while (*s != '"') s++;
 	*s = '\0';
-	ALLOC_ATOMIC(currFname,strlen(sb)+1);
+	ALLOC(currFname,strlen(sb)+1);
 	strcpy(currFname,sb);
 	yylineno = lNum - 2;
     }

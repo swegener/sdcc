@@ -32,8 +32,6 @@
 #	include "sdccconf.h"
 #endif		// _MSC_VER
 
-#include "SDCCalloc.h"
-
 
 #ifndef THROWS
 #define THROWS

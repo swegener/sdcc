@@ -34,18 +34,8 @@ infodir         = @infodir@
 srcdir          = @srcdir@
 
 # Flags
-HAVE_LIBGC	= @HAVE_LIBGC@
-DISABLE_GC      = @DISABLE_GC@
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 CPPFLAGS        = @CPPFLAGS@ -I$(PRJDIR)
-ifeq ($(DISABLE_GC),1)
-# Skip the Boehm GC library in special, manually configured cases.
-else
-ifeq ($(HAVE_LIBGC),1)
-else
-CPPFLAGS 	+= -I$(PRJDIR)/support
-endif
-endif
 CFLAGS          = @CFLAGS@ -Wall
 M_OR_MM         = @M_OR_MM@
 

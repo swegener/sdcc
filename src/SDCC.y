@@ -1113,7 +1113,7 @@ statement
    | jump_statement
    | INLINEASM  ';'      {
                             ast *ex = newNode(INLINEASM,NULL,NULL);
-			    ALLOC_ATOMIC(ex->values.inlineasm,strlen($1));
+			    ALLOC(ex->values.inlineasm,strlen($1));
 			    strcpy(ex->values.inlineasm,$1);			    
 			    $$ = ex;
                          }   

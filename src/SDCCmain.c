@@ -417,7 +417,7 @@ static void processFile (char *s)
 	
 	/* get rid of the "." */
 	strtok(buffer,".");
-	ALLOC_ATOMIC(srcFileName,strlen(buffer)+1);
+	ALLOC(srcFileName,strlen(buffer)+1);
 	strcpy(srcFileName,buffer);
 
 	/* get rid of any path information 
@@ -430,7 +430,7 @@ static void processFile (char *s)
 	       *(fext-1) != '/'   &&
 	       *(fext-1) != ':')
 	    fext--;
-	ALLOC_ATOMIC(moduleName,strlen(fext)+1);
+	ALLOC(moduleName,strlen(fext)+1);
 	strcpy(moduleName,fext);
 	
 	return ;

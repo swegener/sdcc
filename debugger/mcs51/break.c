@@ -103,7 +103,7 @@ void deleteSTEPbp ()
 	    if (hTabSearch(bptable,bp->addr) == NULL) 
 		simClearBP (bp->addr);	    
 
-	    GC_free(bp);
+	    free(bp);
 	}
     }
   
@@ -133,7 +133,7 @@ void deleteNEXTbp ()
 		
 	    }	    
 	    
-	    GC_free(bp);
+	    free(bp);
 	}
     }
 

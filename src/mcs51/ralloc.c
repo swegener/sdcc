@@ -44,6 +44,7 @@ static struct
     bitVect *spiltSet;
     set *stackSpil;
     bitVect *regAssigned;
+    bitVect *totRegAssigned;    /* final set of LRs that got into registers */
     short blockSpil;
     int slocNum;
     bitVect *funcrUsed;		/* registers used in a function */
@@ -76,6 +77,7 @@ regs regs8051[] =
 };
 int mcs51_nRegs = 13;
 static void spillThis (symbol *);
+static void freeAllRegs ();
 
 /*-----------------------------------------------------------------*/
 /* allocReg - allocates register of given type                     */
@@ -179,6 +181,14 @@ nfreeRegsType (int type)
   return nFreeRegs (type);
 }
 
+/*-----------------------------------------------------------------*/
+/* useReg - marks a register  as used                              */
+/*-----------------------------------------------------------------*/
+static void
+useReg (regs * reg)
+{
+  reg->isFree = 0;
+}
 
 /*-----------------------------------------------------------------*/
 /* allDefsOutOfRange - all definitions are out of a range          */
@@ -514,6 +524,7 @@ createStackSpil (symbol * sym)
   SPEC_SCLS (sloc->etype) = S_DATA;
   SPEC_EXTR (sloc->etype) = 0;
   SPEC_STAT (sloc->etype) = 0;
+  SPEC_VOLATILE(sloc->etype) = 0;
 
   /* we don't allow it to be allocated`
      onto the external stack since : so we
@@ -597,10 +608,11 @@ spillThis (symbol * sym)
 
 
   /* mark it has spilt & put it in the spilt set */
-  sym->isspilt = 1;
+  sym->isspilt = sym->spillA = 1;
   _G.spiltSet = bitVectSetBit (_G.spiltSet, sym->key);
 
   bitVectUnSetBit (_G.regAssigned, sym->key);
+  bitVectUnSetBit (_G.totRegAssigned, sym->key);
 
   for (i = 0; i < sym->nRegs; i++)
 
@@ -620,7 +632,7 @@ spillThis (symbol * sym)
     }
 
   if (sym->usl.spillLoc && !sym->remat)
-    sym->usl.spillLoc->allocreq = 1;
+    sym->usl.spillLoc->allocreq++;
   return;
 }
 
@@ -654,7 +666,7 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
 			   sym->usl.spillLoc->name));
       sym->spildir = 1;
       /* mark it as allocation required */
-      sym->usl.spillLoc->allocreq = 1;
+      sym->usl.spillLoc->allocreq++;
       return sym;
     }
 
@@ -699,7 +711,7 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
 
       sym = leastUsedLR (selectS);
       /* mark this as allocation required */
-      sym->usl.spillLoc->allocreq = 1;
+      sym->usl.spillLoc->allocreq++;
       return sym;
     }
 
@@ -708,7 +720,7 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
     {
 
       sym = leastUsedLR (selectS);
-      sym->usl.spillLoc->allocreq = 1;
+      sym->usl.spillLoc->allocreq++;
       return sym;
     }
 
@@ -720,7 +732,7 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
 
       /* return a created spil location */
       sym = createStackSpil (leastUsedLR (selectS));
-      sym->usl.spillLoc->allocreq = 1;
+      sym->usl.spillLoc->allocreq++;
       return sym;
     }
 
@@ -744,12 +756,13 @@ spilSomething (iCode * ic, eBBlock * ebp, symbol * forSym)
   ssym = selectSpil (ic, ebp, forSym);
 
   /* mark it as spilt */
-  ssym->isspilt = 1;
+  ssym->isspilt = ssym->spillA = 1;
   _G.spiltSet = bitVectSetBit (_G.spiltSet, ssym->key);
 
   /* mark it as not register assigned &
      take it away from the set */
   bitVectUnSetBit (_G.regAssigned, ssym->key);
+  bitVectUnSetBit (_G.totRegAssigned, ssym->key);
 
   /* mark the registers as free */
   for (i = 0; i < ssym->nRegs; i++)
@@ -851,6 +864,41 @@ tryAgain:
 }
 
 /*-----------------------------------------------------------------*/
+/* getRegPtrNoSpil - get it cannot split                           */
+/*-----------------------------------------------------------------*/
+static regs *getRegPtrNoSpil()
+{
+  regs *reg;
+
+  /* try for a ptr type */
+  if ((reg = allocReg (REG_PTR)))
+    return reg;
+
+  /* try for gpr type */
+  if ((reg = allocReg (REG_GPR)))
+    return reg;
+
+  assert(0);
+}
+
+/*-----------------------------------------------------------------*/
+/* getRegGprNoSpil - get it cannot split                           */
+/*-----------------------------------------------------------------*/
+static regs *getRegGprNoSpil()
+{
+
+  regs *reg;
+  if ((reg = allocReg (REG_GPR)))
+    return reg;
+
+  if (!mcs51_ptrRegReq)
+    if ((reg = allocReg (REG_PTR)))
+      return reg;
+
+  assert(0);
+}
+
+/*-----------------------------------------------------------------*/
 /* symHasReg - symbol has a given register                         */
 /*-----------------------------------------------------------------*/
 static bool
@@ -949,6 +997,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 		  result->regs[i] = getRegGpr (ic, ebp, result);
 
 	      _G.regAssigned = bitVectSetBit (_G.regAssigned, result->key);
+	      _G.totRegAssigned = bitVectSetBit (_G.totRegAssigned, result->key);
 
 	    }
 
@@ -978,10 +1027,11 @@ reassignLR (operand * op)
   int i;
 
   /* not spilt any more */
-  sym->isspilt = sym->blockSpil = sym->remainSpil = 0;
+  sym->isspilt = sym->spillA = sym->blockSpil = sym->remainSpil = 0;
   bitVectUnSetBit (_G.spiltSet, sym->key);
 
   _G.regAssigned = bitVectSetBit (_G.regAssigned, sym->key);
+  _G.totRegAssigned = bitVectSetBit (_G.totRegAssigned, sym->key);
 
   _G.blockSpil--;
 
@@ -1031,15 +1081,16 @@ willCauseSpill (int nr, int rt)
 /* ult and operand, if this happens make sure they are in the same */
 /* position as the operand otherwise chaos results                 */
 /*-----------------------------------------------------------------*/
-static void
-positionRegs (symbol * result, symbol * opsym, int lineno)
+static int
+positionRegs (symbol * result, symbol * opsym)
 {
   int count = min (result->nRegs, opsym->nRegs);
   int i, j = 0, shared = 0;
+  int change = 0;
 
   /* if the result has been spilt then cannot share */
   if (opsym->isspilt)
-    return;
+    return 0;
 again:
   shared = 0;
   /* first make sure that they actually share */
@@ -1060,8 +1111,10 @@ xchgPositions:
       regs *tmp = result->regs[i];
       result->regs[i] = result->regs[j];
       result->regs[j] = tmp;
+      change ++;
       goto again;
     }
+  return change;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1093,7 +1146,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 	    /* if result is present && is a true symbol */
 	    if (IC_RESULT (ic) && ic->op != IFX &&
 		IS_TRUE_SYMOP (IC_RESULT (ic)))
-		OP_SYMBOL (IC_RESULT (ic))->allocreq = 1;
+		OP_SYMBOL (IC_RESULT (ic))->allocreq++;
 
 	    /* take away registers from live
 	       ranges that end at this instruction */
@@ -1175,6 +1228,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 		}
 		/* else we assign registers to it */
 		_G.regAssigned = bitVectSetBit (_G.regAssigned, sym->key);
+		_G.totRegAssigned = bitVectSetBit (_G.totRegAssigned, sym->key);
 
 		for (j = 0; j < sym->nRegs; j++) {
 		    if (sym->regType == REG_PTR)
@@ -1198,13 +1252,13 @@ serialRegAssign (eBBlock ** ebbs, int count)
 		if (IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)) &&
 		    OP_SYMBOL (IC_LEFT (ic))->nRegs && ic->op != '=') {
 		    positionRegs (OP_SYMBOL (IC_RESULT (ic)),
-				  OP_SYMBOL (IC_LEFT (ic)), ic->lineno);
+				  OP_SYMBOL (IC_LEFT (ic)));
 		}
 		/* do the same for the right operand */
 		if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic)) &&
 		    OP_SYMBOL (IC_RIGHT (ic))->nRegs) {
 		    positionRegs (OP_SYMBOL (IC_RESULT (ic)),
-				  OP_SYMBOL (IC_RIGHT (ic)), ic->lineno);
+				  OP_SYMBOL (IC_RIGHT (ic)));
 		}
 
 		if (ptrRegSet) {
@@ -1214,6 +1268,98 @@ serialRegAssign (eBBlock ** ebbs, int count)
 
 	    }
 	}
+    }
+}
+
+/*-----------------------------------------------------------------*/
+/* fillGaps - Try to fill in the Gaps left by Pass1                */
+/*-----------------------------------------------------------------*/
+static void fillGaps()
+{
+    symbol *sym =NULL;
+    int key =0;    
+    
+    if (getenv("DISABLE_FILL_GAPS")) return;
+    
+    /* look for livernages that was spilt by the allocator */
+    for (sym = hTabFirstItem(liveRanges,&key) ; sym ; 
+	 sym = hTabNextItem(liveRanges,&key)) {
+
+	int i;
+	int pdone = 0;
+
+	if (!sym->spillA || !sym->clashes || sym->remat) continue ;
+
+	/* find the liveRanges this one clashes with, that are
+	   still assigned to registers & mark the registers as used*/
+	for ( i = 0 ; i < sym->clashes->size ; i ++) {
+	    int k;
+	    symbol *clr;
+
+	    if (bitVectBitValue(sym->clashes,i) == 0 ||    /* those that clash with this */
+		bitVectBitValue(_G.totRegAssigned,i) == 0) /* and are still assigned to registers */
+		continue ;
+
+	    assert (clr = hTabItemWithKey(liveRanges,i));
+	 
+	    /* mark these registers as used */
+	    for (k = 0 ; k < clr->nRegs ; k++ ) 
+		useReg(clr->regs[k]);
+	}
+
+	if (willCauseSpill(sym->nRegs,sym->regType)) {
+	    /* NOPE :( clear all registers & and continue */
+	    freeAllRegs();
+	    continue ;
+	}
+
+	/* THERE IS HOPE !!!! */
+	for (i=0; i < sym->nRegs ; i++ ) {
+		sym->regs[i] = getRegGprNoSpil ();		  
+	}
+
+	/* for all its definitions check if the registers
+	   allocated needs positioning NOTE: we can position
+	   only ONCE if more than One positioning required 
+	   then give up */
+	sym->isspilt = 0;
+	for (i = 0 ; i < sym->defs->size ; i++ ) {
+	    if (bitVectBitValue(sym->defs,i)) {
+		iCode *ic;
+		if (!(ic = hTabItemWithKey(iCodehTab,i))) continue ;
+		if (SKIP_IC(ic)) continue;
+		assert(isSymbolEqual(sym,OP_SYMBOL(IC_RESULT(ic)))); /* just making sure */
+		/* if left is assigned to registers */
+		if (IS_SYMOP(IC_LEFT(ic)) && 
+		    bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_LEFT(ic))->key)) {
+		    pdone += positionRegs(sym,OP_SYMBOL(IC_LEFT(ic)));
+		}
+		if (IS_SYMOP(IC_RIGHT(ic)) && 
+		    bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_RIGHT(ic))->key)) {
+		    pdone += positionRegs(sym,OP_SYMBOL(IC_RIGHT(ic)));
+		}
+		if (pdone > 1) break;
+	    }
+	}
+	/* had to position more than once GIVE UP */
+	if (pdone > 1) {
+	    /* UNDO all the changes we made to try this */
+	    sym->isspilt = 0;
+	    for (i=0; i < sym->nRegs ; i++ ) {
+		if (sym->regType == REG_PTR)
+		    sym->regs[i] = getRegPtrNoSpil ();
+		else
+		    sym->regs[i] = getRegGprNoSpil ();
+	    }
+	    freeAllRegs();
+	    D(printf ("Fill Gap gave up due to positioning for %s in function %s\n",sym->name, currFunc ? currFunc->name : "UNKNOWN"));
+	    continue ;	    
+	}
+	D(printf ("FILLED GAP for %s in function %s\n",sym->name, currFunc ? currFunc->name : "UNKNOWN"));
+	_G.totRegAssigned = bitVectSetBit(_G.totRegAssigned,sym->key);
+	sym->isspilt = sym->spillA = 0 ;
+	sym->usl.spillLoc->allocreq--;
+	freeAllRegs();
     }
 }
 
@@ -2537,6 +2683,7 @@ mcs51_assignRegisters (eBBlock ** ebbs, int count)
   int i;
 
   setToNull ((void *) &_G.funcrUsed);
+  setToNull ((void *) &_G.totRegAssigned);
   mcs51_ptrRegReq = _G.stackExtend = _G.dataExtend = 0;
   mcs51_nRegs = 8;
 
@@ -2554,6 +2701,9 @@ mcs51_assignRegisters (eBBlock ** ebbs, int count)
 
   /* and serially allocate registers */
   serialRegAssign (ebbs, count);
+
+  freeAllRegs ();
+  fillGaps();
 
   /* if stack was extended then tell the user */
   if (_G.stackExtend)

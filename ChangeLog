@@ -1,3 +1,33 @@
+2001-12-24  Sandeep Dutta  <sandeep@ddi.com>
+
+	* /src/ds390/gen.c, /src/ds390/main.c, /src/ds390/peeph.def, /src/ds390/ralloc.c:
+	ALPHA version for -mTININative
+
+	* /src/izt/i186.c, /src/izt/tlcs900h.c, /src/mcs51/main.c, /src/pic/main.c, /src/z80/main.c, /src/avr/main.c:
+	updated to reflect changes in the port structure
+
+	* /src/port.h:
+	added function do_assemble (similar to do_link) if non-null this function
+	will be called to do assembly (-mTININative) requires a multi command
+	assembly
+	added function genAssemblerEnd will be called to generate assembler Epilogue
+
+	* /src/SDCCsymt.c:
+	added _JavaNative to debug info printing
+
+	* /src/SDCCmain.c: added option --tini-libid
+	added port->do_assemble function (-mTININative) has a multi command assemble
+
+	* /src/SDCCglue.c: Disabled "constExpr" check
+	added port->genAssemblerEnd function
+
+	* /src/SDCCglobl.h: Added option --tini-libid value
+
+	* /src/SDCCast.h:
+	tookout optimizeCompare from the header (has no external references)
+
+	* /src/SDCCast.c: made one more function "static"
+
 2001-12-23  Michael Hope  <michaelh@juju.net.nz>
 
 	* src/z80/mappings.i: Added z80asm support.

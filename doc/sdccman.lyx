@@ -6974,13 +6974,15 @@ Pragmas
 SDCC supports the following #pragma directives.
 \layout Itemize
 
-SAVE - this will save all the current options.
+SAVE - this will save all current options to the SAVE/RESTORE stack.
+ See RESTORE.
 \layout Itemize
 
 RESTORE - will restore the saved options from the last save.
- Note that SAVEs & RESTOREs cannot be nested.
- SDCC uses the same buffer to save the options each time a SAVE is called.
- (jwk burps: either fix that or throw a warning)
+ SAVEs & RESTOREs can be nested.
+ SDCC uses a SAVE/RESTORE stack: SAVE pushes current options to the stack,
+ RESTORE pulls current optios from the stack.
+ See SAVE.
 \layout Itemize
 
 NOGCSE - will stop global subexpression elimination.

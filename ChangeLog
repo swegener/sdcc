@@ -1,3 +1,8 @@
+2003-01-29  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+	* src/SDCCglobl.h:   now --xram-size 0 works
+	* src/SDCCmain.c:    now --xram-size 0 works
+
 2003-01-29    <johan@balder>
 
 	* src/almosteverything: changed OP_DEFS and OP_USES from macros to functions to catch symbol abuse (a hot topic in the bug list :)

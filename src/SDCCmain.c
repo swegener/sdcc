@@ -910,6 +910,7 @@ parseCmdLine (int argc, char **argv)
 	  if (strcmp (argv[i], OPTION_XRAM_SIZE) == 0)
 	    {
                 options.xram_size = getIntArg(OPTION_IRAM_SIZE, argv, &i, argc);
+                options.xram_size_set = TRUE;
                 continue;
 	    }
 
@@ -1228,7 +1229,7 @@ linkEdit (char **envp)
     fprintf (lnkfile, "-a 0x%04x\n", options.iram_size);
 
   /* if xram size specified */
-  if (options.xram_size)
+  if (options.xram_size_set)
     fprintf (lnkfile, "-v 0x%04x\n", options.xram_size);
 
   /* if code size specified */

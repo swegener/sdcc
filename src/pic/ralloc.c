@@ -45,6 +45,7 @@
 /*-----------------------------------------------------------------*/
 
 extern void genpic14Code (iCode *);
+extern void assignConfigWordValue(int address, int value);
 
 /* Global data */
 static struct
@@ -64,12 +65,12 @@ _G;
 int pic14_ptrRegReq;		/* one byte pointer register required */
 
 
-static set *dynAllocRegs=NULL;
-static set *dynStackRegs=NULL;
-static set *dynProcessorRegs=NULL;
-static set *dynDirectRegs=NULL;
-static set *dynDirectBitRegs=NULL;
-static set *dynInternalRegs=NULL;
+set *dynAllocRegs=NULL;
+set *dynStackRegs=NULL;
+set *dynProcessorRegs=NULL;
+set *dynDirectRegs=NULL;
+set *dynDirectBitRegs=NULL;
+set *dynInternalRegs=NULL;
 
 static hTab  *dynDirectRegNames= NULL;
 
@@ -440,6 +441,8 @@ static regs* newReg(short type, short pc_type, int rIdx, char *name, int size, i
   dReg->size = size;
   dReg->alias = alias;
   dReg->reg_alias = NULL;
+  dReg->reglives.usedpFlows = newSet();
+  dReg->reglives.assignedpFlows = newSet();
 
   return dReg;
 }
@@ -711,13 +714,47 @@ allocRegByName (char *name, int size)
 /*-----------------------------------------------------------------*/
 /* RegWithIdx - returns pointer to register with index number       */
 /*-----------------------------------------------------------------*/
-static regs *
+regs *
 typeRegWithIdx (int idx, int type, int fixed)
 {
 
   regs *dReg;
 
   debugLog ("%s - requesting index = 0x%x\n", __FUNCTION__,idx);
+
+  switch (type) {
+
+  case REG_GPR:
+    if( (dReg = regWithIdx ( dynAllocRegs, idx, fixed)) != NULL) {
+
+      debugLog ("Found a Dynamic Register!\n");
+      return dReg;
+    }
+    if( (dReg = regWithIdx ( dynDirectRegs, idx, fixed)) != NULL ) {
+      debugLog ("Found a Direct Register!\n");
+      return dReg;
+    }
+
+    break;
+  case REG_STK:
+    if( (dReg = regWithIdx ( dynStackRegs, idx, fixed)) != NULL ) {
+      debugLog ("Found a Stack Register!\n");
+      return dReg;
+    }
+    break;
+  case REG_SFR:
+    if( (dReg = regWithIdx ( dynProcessorRegs, idx, fixed)) != NULL ) {
+      debugLog ("Found a Processor Register!\n");
+      return dReg;
+    }
+
+  case REG_CND:
+  case REG_PTR:
+  default:
+    break;
+  }
+
+#if 0
 
   if( (dReg = regWithIdx ( dynAllocRegs, idx, fixed)) != NULL) {
 
@@ -739,18 +776,15 @@ typeRegWithIdx (int idx, int type, int fixed)
     debugLog ("Found a Processor Register!\n");
     return dReg;
   }
-/*
-  if( (dReg = regWithIdx ( dynDirectBitRegs, idx, fixed)) != NULL ) {
+#endif
+
+  /*
+    if( (dReg = regWithIdx ( dynDirectBitRegs, idx, fixed)) != NULL ) {
     debugLog ("Found a bit Register!\n");
     return dReg;
-  }
-*/
-/*
-  fprintf(stderr,"%s %d - requested register: 0x%x\n",__FUNCTION__,__LINE__,idx);
-  werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-	  "regWithIdx not found");
-  exit (1);
-*/
+    }
+  */
+
   return NULL;
 }
 
@@ -760,8 +794,18 @@ typeRegWithIdx (int idx, int type, int fixed)
 regs *
 pic14_regWithIdx (int idx)
 {
+  regs *dReg;
 
-  return typeRegWithIdx(idx,-1,0);
+  if( (dReg = typeRegWithIdx(idx,REG_GPR,0)) != NULL)
+    return dReg;
+
+  if( (dReg = typeRegWithIdx(idx,REG_SFR,0)) != NULL)
+    return dReg;
+
+  if( (dReg = typeRegWithIdx(idx,REG_STK,0)) != NULL)
+    return dReg;
+
+  return NULL;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1001,7 +1045,7 @@ void aliasEQUs(FILE *of, set *fregs)
   for (reg = setFirstItem(fregs) ; reg ;
        reg = setNextItem(fregs)) {
 
-    if(!reg->isEmitted)
+    if(!reg->isEmitted && reg->wasUsed)
       fprintf (of, "%s\tEQU\t0x%03x\n",
 	       reg->name,
 	       reg->address);
@@ -1017,7 +1061,7 @@ void writeUsedRegs(FILE *of)
   assignFixedRegisters(dynStackRegs);
   assignFixedRegisters(dynDirectRegs);
 
-  assignRelocatableRegisters(dynInternalRegs,1);
+  assignRelocatableRegisters(dynInternalRegs,0);
   assignRelocatableRegisters(dynAllocRegs,0);
   assignRelocatableRegisters(dynStackRegs,0);
   assignRelocatableRegisters(dynDirectRegs,0);
@@ -1031,6 +1075,7 @@ void writeUsedRegs(FILE *of)
   aliasEQUs(of,dynStackRegs);
 
 }
+
 #if 0
 /*-----------------------------------------------------------------*/
 /* allDefsOutOfRange - all definitions are out of a range          */
@@ -2467,6 +2512,7 @@ DEFSETFUNC (markRegFree)
 
 DEFSETFUNC (deallocReg)
 {
+  fprintf(stderr,"deallocting register %s\n",((regs *)item)->name);
   ((regs *)item)->isFree = 1;
   ((regs *)item)->wasUsed = 0;
 
@@ -3765,7 +3811,7 @@ pic14_assignRegisters (eBBlock ** ebbs, int count)
   setToNull ((void **) &_G.stackSpil);
   setToNull ((void **) &_G.spiltSet);
   /* mark all registers as free */
-  pic14_freeAllRegs ();
+  //pic14_freeAllRegs ();
 
   debugLog ("leaving\n<><><><><><><><><><><><><><><><><>\n");
   debugLogClose ();

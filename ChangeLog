@@ -1,4 +1,14 @@
-2002-05-10  Scott Dattal <scott@dattalo.com>
+2002-06-22  Scott Dattalo <scott@dattalo.com>
+	* src/pic/*: Numerous bug fixes. Flow analysis has been enhanced. 
+	- Rewrote the register banking algorithm. 
+	- Added pCode live-range analysis to registers (for now, only non-used and 
+	singly-used registers optimized away)
+
+	* src/pic/pcoderegs.[ch]: Added new files for pCode live-range analysis
+
+	* support/scripts/inc2h.pl Kevin L. Pauba <klpauba@cox.net> submitted this perl script for converting MicroChip include files into SDCC Pic include files.
+	
+2002-05-10  Scott Dattalo <scott@dattalo.com>
 	* src/pic/*: Added support for multiplication. Fixed many,many bugs.
 	
 2002-04-22  Michael Hope  <michaelh@vroom>

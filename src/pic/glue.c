@@ -866,8 +866,8 @@ picglue ()
     
 
   /* Put all variables into a cblock */
-  writeUsedRegs(asmFile);
   AnalyzeBanking();
+  writeUsedRegs(asmFile);
 
   /* create the overlay segments */
   fprintf (asmFile, "%s", iComments2);

@@ -28,6 +28,7 @@
 #ifndef SDCCRALLOC_H
 #define SDCCRALLOC_H 1
 
+#include "pcoderegs.h"
 
 
 enum
@@ -68,11 +69,25 @@ typedef struct regs
     unsigned alias;             /* Alias mask if register appears in multiple banks */
     struct regs *reg_alias;     /* If more than one register share the same address 
 				 * then they'll point to each other. (primarily for bits)*/
+    pCodeRegLives reglives; /* live range mapping */
   }
 regs;
 extern regs regspic14[];
 extern int pic14_nRegs;
 extern int Gstack_base_addr;
+
+/*
+  As registers are created, they're added to a set (based on the
+  register type). Here are the sets of registers that are supported
+  in the PIC port:
+*/
+extern set *dynAllocRegs;
+extern set *dynStackRegs;
+extern set *dynProcessorRegs;
+extern set *dynDirectRegs;
+extern set *dynDirectBitRegs;
+extern set *dynInternalRegs;
+
 
 regs *pic14_regWithIdx (int);
 regs *dirregWithName (char *name );
@@ -80,6 +95,8 @@ void  pic14_freeAllRegs ();
 void  pic14_deallocateAllRegs ();
 regs *pic14_findFreeReg(short type);
 regs *pic14_allocWithIdx (int idx);
+regs *typeRegWithIdx (int idx, int type, int fixed);
+
 regs *allocDirReg (operand *op );
 regs *allocRegByName (char *name, int size );
 

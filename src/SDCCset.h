@@ -54,6 +54,7 @@ set;
 #define V_ARG(type,var) type var = va_arg(ap,type)
 
 /* set related functions */
+set *newSet (void);
 void *addSet (set **, void *);
 void *addSetHead (set **, void *);
 void *getSet (set **);

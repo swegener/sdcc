@@ -607,9 +607,9 @@ void assignRelocatableRegisters(set *regset, int used)
   for (reg = setFirstItem(regset) ; reg ; 
        reg = setNextItem(regset)) {
 
-    // fprintf(stdout,"assigning %s\n",reg->name);
+    //fprintf(stdout,"assigning %s isFixed=%d, wasUsed=%d\n",reg->name,reg->isFixed,reg->wasUsed);
 
-    if((!reg->isFixed) && ( (used==0) || reg->wasUsed))
+    if((!reg->isFixed) && ( used || reg->wasUsed))
       address = assignRegister(reg,address);
 
   }
@@ -630,7 +630,7 @@ void assignConfigWordValue(int address, int value)
   if(CONFIG_WORD_ADDRESS == address)
     config_word = value;
 
-  fprintf(stderr,"setting config word to 0x%x\n",value);
+  //fprintf(stderr,"setting config word to 0x%x\n",value);
 
 }
 /*-----------------------------------------------------------------*

@@ -1405,7 +1405,8 @@ int pCodeOpCompare(pCodeOp *pcops, pCodeOp *pcopd)
   }
 
   b[0]=0;
-  get_op(pcops,b,sizeof(b));
+  get_op(pcops,b,50);
+
   n2 = get_op(pcopd,NULL,0);
 
   if( !n2 || strcmp(b,n2)) {
@@ -1424,7 +1425,7 @@ int pCodeOpCompare(pCodeOp *pcops, pCodeOp *pcopd)
     break;
   }
 
-  //  fprintf(stderr,"  - pass\n");
+  //fprintf(stderr,"  - pass\n");
 
   return 1;
 }

@@ -78,26 +78,13 @@ static int functionInlining = 1;      /* inline functions if nonzero */
 static int GpCodeSequenceNumber = 1;
 static int GpcFlowSeq = 1;
 
-#define isPCI(x)        ((PCODE(x)->type == PC_OPCODE))
-#define isPCI_BRANCH(x) ((PCODE(x)->type == PC_OPCODE) &&  PCI(x)->isBranch)
-#define isPCI_SKIP(x)   ((PCODE(x)->type == PC_OPCODE) &&  PCI(x)->isSkip)
-#define isPCI_BITSKIP(x)((PCODE(x)->type == PC_OPCODE) &&  PCI(x)->isSkip && PCI(x)->isBitInst)
-#define isPCFL(x)       ((PCODE(x)->type == PC_FLOW))
-#define isPCF(x)        ((PCODE(x)->type == PC_FUNCTION))
-#define isPCL(x)        ((PCODE(x)->type == PC_LABEL))
-#define isPCW(x)        ((PCODE(x)->type == PC_WILD))
-#define isPCCS(x)       ((PCODE(x)->type == PC_CSOURCE))
-
-#define isCALL(x)       ((isPCI(x)) && (PCI(x)->op == POC_CALL))
-#define isSTATUS_REG(r) ((r)->pc_type == PO_STATUS)
-
-#define isPCOLAB(x)     ((PCOP(x)->type) == PO_LABEL)
+extern void RemoveUnusedRegisters(void);
 
 /****************************************************************/
 /*                      Forward declarations                    */
 /****************************************************************/
 
-static void unlinkPC(pCode *pc);
+void unlinkpCode(pCode *pc);
 #if 0
 static void genericAnalyze(pCode *pc);
 static void AnalyzeGOTO(pCode *pc);
@@ -119,6 +106,12 @@ void pBlockStats(FILE *of, pBlock *pb);
 extern void pCodeInsertAfter(pCode *pc1, pCode *pc2);
 extern pCodeOp *popCopyReg(pCodeOpReg *pc);
 pCodeOp *popCopyGPR2Bit(pCodeOp *pc, int bitval);
+void pCodeRegMapLiveRanges(pBlock *pb);
+
+
+/****************************************************************/
+/*                    PIC Instructions                          */
+/****************************************************************/
 
 pCodeInstruction pciADDWF = {
   {PC_OPCODE, NULL, NULL, 0, NULL, 
@@ -410,7 +403,7 @@ pCodeInstruction pciCLRF = {
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
   POC_NOP,
-  PCC_REGISTER, // inCond
+  PCC_NONE, // inCond
   PCC_REGISTER  // outCond
 };
 
@@ -431,7 +424,7 @@ pCodeInstruction pciCLRW = {
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
   POC_NOP,
-  PCC_W, // inCond
+  PCC_NONE, // inCond
   PCC_W  // outCond
 };
 
@@ -1805,6 +1798,9 @@ pCode *newpCodeFlow(void )
   pcflow->ToConflicts = 0;
 
   pcflow->end = NULL;
+
+  pcflow->registers = newSet();
+
   return ( (pCode *)pcflow);
 
 }
@@ -2322,7 +2318,7 @@ void printpBlock(FILE *of, pBlock *pb)
 /*                                                                 */
 /*-----------------------------------------------------------------*/
 
-static void unlinkPC(pCode *pc)
+void unlinkpCode(pCode *pc)
 {
 
 
@@ -2343,7 +2339,7 @@ static void genericDestruct(pCode *pc)
 {
   //fprintf(stderr,"warning, calling default pCode destructor\n");
 
-  unlinkPC(pc);
+  unlinkpCode(pc);
 
   free(pc);
 
@@ -2371,33 +2367,38 @@ char *get_op(pCodeOp *pcop,char *buffer, int size)
   regs *r;
   static char b[50];
   char *s;
-  //  int size;
+  int use_buffer = 1;    // copy the string to the passed buffer pointer
 
   if(!buffer) {
     buffer = b;
     size = sizeof(b);
+    use_buffer = 0;     // Don't bother copying the string to the buffer.
   } 
 
   if(pcop) {
     switch(pcop->type) {
     case PO_INDF:
     case PO_FSR:
-      //fprintf(stderr,"get_op getting register name rIdx=%d\n",PCOR(pcc->pcop)->rIdx);
-      //r = pic14_regWithIdx(PCOR(pcc->pcop)->rIdx);
-      //return r->name;
+      if(use_buffer) {
+	SAFE_snprintf(&buffer,&size,"%s",PCOR(pcop)->r->name);
+	return buffer;
+      }
       return PCOR(pcop)->r->name;
       break;
     case PO_GPR_TEMP:
       r = pic14_regWithIdx(PCOR(pcop)->r->rIdx);
-      //fprintf(stderr,"getop: getting %s\nfrom:\n",r->name); //pcc->pcop->name);
+
+      if(use_buffer) {
+	SAFE_snprintf(&buffer,&size,"%s",r->name);
+	return buffer;
+      }
+
       return r->name;
 
-      //    case PO_GPR_BIT:
-      //      return PCOR(pcc->pcop)->r)->name;
+
     case PO_IMMEDIATE:
       s = buffer;
-      //size = sizeof(buffer);
-      //fprintf(stderr,"PO_IMMEDIATE name = %s  offset = %d\n",pcc->pcop->name,PCOI(pcc->pcop)->offset);
+
       if(PCOI(pcop)->_const) {
 
 	if( PCOI(pcop)->offset && PCOI(pcop)->offset<4) {
@@ -2432,8 +2433,13 @@ char *get_op(pCodeOp *pcop,char *buffer, int size)
       return buffer;
 
     default:
-      if  (pcop->name)
+      if  (pcop->name) {
+	if(use_buffer) {
+	  SAFE_snprintf(&buffer,&size,"%s",pcop->name);
+	  return buffer;
+	}
 	return pcop->name;
+      }
 
     }
   }
@@ -3093,7 +3099,7 @@ regs * getRegFromInstruction(pCode *pc)
   switch(PCI(pc)->pcop->type) {
   case PO_INDF:
   case PO_FSR:
-    return pic14_regWithIdx(PCOR(PCI(pc)->pcop)->rIdx);
+    return typeRegWithIdx (PCOR(PCI(pc)->pcop)->rIdx, REG_SFR, 0);
 
   case PO_BIT:
   case PO_GPR_TEMP:
@@ -3160,10 +3166,11 @@ void AnalyzepBlock(pBlock *pb)
 
 	if(!r) {
 	  /* register wasn't found */
-	  r = Safe_calloc(1, sizeof(regs));
-	  memcpy(r,PCOR(PCI(pc)->pcop)->r, sizeof(regs));
-	  addSet(&pb->tregisters, r);
-	  PCOR(PCI(pc)->pcop)->r = r;
+	  //r = Safe_calloc(1, sizeof(regs));
+	  //memcpy(r,PCOR(PCI(pc)->pcop)->r, sizeof(regs));
+	  //addSet(&pb->tregisters, r);
+	  addSet(&pb->tregisters, PCOR(PCI(pc)->pcop)->r);
+	  //PCOR(PCI(pc)->pcop)->r = r;
 	  //fprintf(stderr,"added register to pblock: reg %d\n",r->rIdx);
 	}/* else 
 	  fprintf(stderr,"found register in pblock: reg %d\n",r->rIdx);
@@ -3311,7 +3318,7 @@ void unBuildFlow(pBlock *pb)
       PCI(pc)->pcflow = NULL;
       pc = pcn;
     } else if(isPCFL(pc)) {
-      unlinkPC(pc);
+      unlinkpCode(pc);
       pc->destruct(pc);
     } else 
       pc = pcn;
@@ -4202,7 +4209,7 @@ void pBlockRemoveUnusedLabels(pBlock *pb)
 
       DFPRINTF((stderr," !!! REMOVED A LABEL !!! key = %d, %s\n", pcl->key,pcl->label));
       if(pc->type == PC_LABEL) {
-	unlinkPC(pc);
+	unlinkpCode(pc);
 	pCodeLabelDestruct(pc);
       } else {
 	unlinkpCodeFromBranch(pc, PCODE(pcl));
@@ -4247,7 +4254,7 @@ void pBlockMergeLabels(pBlock *pb)
 	pCode *pcn = pc->next;
 
 	// Unlink the pCode label from it's pCode chain
-	unlinkPC(pc);
+	unlinkpCode(pc);
 	
 	//fprintf(stderr,"Merged label key = %d\n",PCL(pc)->key);
 	// And link it into the instruction's pBranch labels. (Note, since
@@ -4277,7 +4284,7 @@ void pBlockMergeLabels(pBlock *pb)
 	pCode *pcn = pc->next;
 
 	// Unlink the pCode label from it's pCode chain
-	unlinkPC(pc);
+	unlinkpCode(pc);
 	PCI(pcnext)->cline = PCCS(pc);
 	//fprintf(stderr, "merging CSRC\n");
 	//genericPrint(stderr,pcnext);
@@ -4560,6 +4567,12 @@ void AnalyzeBanking(void)
   for(pb = the_pFile->pbHead; pb; pb = pb->next)
     FixBankFlow(pb);
 
+
+  for(pb = the_pFile->pbHead; pb; pb = pb->next)
+    pCodeRegMapLiveRanges(pb);
+
+  RemoveUnusedRegisters();
+
 /*
   for(pb = the_pFile->pbHead; pb; pb = pb->next)
     DumpFlow(pb);
@@ -4668,7 +4681,8 @@ void buildCallTree(void    )
   /* Re-allocate the registers so that there are no collisions
    * between local variables when one function call another */
 
-  pic14_deallocateAllRegs();
+  // this is weird...
+  //  pic14_deallocateAllRegs();
 
   for(pb = the_pFile->pbHead; pb; pb = pb->next) {
     if(!pb->visited)

@@ -241,8 +241,11 @@ typedef enum
 /************************************************/
 /***************  Structures ********************/
 /************************************************/
+/* These are here as forward references - the 
+ * full definition of these are below           */
 struct pCode;
 struct pCodeWildBlock;
+struct pCodeRegLives;
 
 /*************************************************
   pBranch
@@ -423,6 +426,7 @@ typedef struct pCodeCSource
  causes a branch, a Flow object will be inserted into
  the pCode chain to mark the beginning of the next
  contiguous chunk.
+
 **************************************************/
 
 typedef struct pCodeFlow
@@ -450,6 +454,8 @@ typedef struct pCodeFlow
 
   int FromConflicts;
   int ToConflicts;
+
+  set *registers;/* Registers used in this flow */
 
 } pCodeFlow;
 
@@ -710,7 +716,6 @@ typedef struct peepCommand {
   char *cmd;
 } peepCommand;
 
-
 /*************************************************
     pCode Macros
 
@@ -735,6 +740,25 @@ typedef struct peepCommand {
 #define PBR(x)    ((pBranch *)(x))
 
 #define PCWB(x)   ((pCodeWildBlock *)(x))
+
+
+/*
+  macros for checking pCode types
+*/
+#define isPCI(x)        ((PCODE(x)->type == PC_OPCODE))
+#define isPCI_BRANCH(x) ((PCODE(x)->type == PC_OPCODE) &&  PCI(x)->isBranch)
+#define isPCI_SKIP(x)   ((PCODE(x)->type == PC_OPCODE) &&  PCI(x)->isSkip)
+#define isPCI_BITSKIP(x)((PCODE(x)->type == PC_OPCODE) &&  PCI(x)->isSkip && PCI(x)->isBitInst)
+#define isPCFL(x)       ((PCODE(x)->type == PC_FLOW))
+#define isPCF(x)        ((PCODE(x)->type == PC_FUNCTION))
+#define isPCL(x)        ((PCODE(x)->type == PC_LABEL))
+#define isPCW(x)        ((PCODE(x)->type == PC_WILD))
+#define isPCCS(x)       ((PCODE(x)->type == PC_CSOURCE))
+
+#define isCALL(x)       ((isPCI(x)) && (PCI(x)->op == POC_CALL))
+#define isSTATUS_REG(r) ((r)->pc_type == PO_STATUS)
+
+#define isPCOLAB(x)     ((PCOP(x)->type) == PO_LABEL)
 
 /*-----------------------------------------------------------------*
  * pCode functions.
@@ -766,6 +790,11 @@ pCodeOp *newpCodeOpBit(char *name, int bit,int inBitSpace);
 pCodeOp *newpCodeOpRegFromStr(char *name);
 pCodeOp *newpCodeOp(char *name, PIC_OPTYPE p);
 pCodeOp *pCodeOpCopy(pCodeOp *pcop);
+
+pCode * findNextInstruction(pCode *pci);
+pCode * findNextpCode(pCode *pc, PC_TYPE pct);
+int isPCinFlow(pCode *pc, pCode *pcflow);
+struct regs * getRegFromInstruction(pCode *pc);
 
 extern void pcode_test(void);
 

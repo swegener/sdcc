@@ -31,7 +31,7 @@
 /* newSet - will allocate & return a new set entry             */
 /*-----------------------------------------------------------------*/
 set *
-newSet ()
+newSet (void)
 {
   set *lp;
 

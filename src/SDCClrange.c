@@ -280,7 +280,9 @@ useDefLoopCheck (operand * op, iCode * ic)
 		  OP_SYMBOL (op)->name,
 		  ic->filename, ic->lineno);
 	}
+#if 0 // this will create a segfault: bug #498971
       OP_SYMBOL (op)->isspilt = 1;
+#endif
     }
 }
 

@@ -2274,9 +2274,20 @@ decorateType (ast * tree)
 	}
 
       LRVAL (tree) = RRVAL (tree) = 1;
-      TETYPE (tree) = getSpec (TTYPE (tree) =
-			       computeType (LTYPE (tree),
-					    RTYPE (tree)));
+      /* promote result to int if left & right are char / short 
+	 this will facilitate hardware multiplies 8bit x 8bit = 16bit */
+      if ((IS_CHAR(LETYPE(tree)) || IS_SHORT(LETYPE(tree))) && 
+	   (IS_CHAR(RETYPE(tree)) || IS_SHORT(RETYPE(tree)))) {
+	      TETYPE (tree) = getSpec (TTYPE (tree) =
+				       computeType (LTYPE (tree),
+						    RTYPE (tree)));
+	      SPEC_NOUN(TETYPE(tree)) = V_INT;
+	      SPEC_SHORT(TETYPE(tree))=0;
+      } else {
+	      TETYPE (tree) = getSpec (TTYPE (tree) =
+				       computeType (LTYPE (tree),
+						    RTYPE (tree)));
+      }
       return tree;
 
 /*------------------------------------------------------------------*/

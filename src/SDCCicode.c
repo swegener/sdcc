@@ -1647,7 +1647,8 @@ geniCodeGoto (symbol * label)
 /* geniCodeMultiply - gen intermediate code for multiplication     */
 /*-----------------------------------------------------------------*/
 operand *
-geniCodeMultiply (operand * left, operand * right, bool ptrSizeCalculation)
+geniCodeMultiply (operand * left, operand * right, bool ptrSizeCalculation,
+		  int resultIsInt)
 {
   iCode *ic;
   int p2 = 0;
@@ -1674,19 +1675,20 @@ geniCodeMultiply (operand * left, operand * right, bool ptrSizeCalculation)
       options.ANSIint = saveOption;
     }
   else {
-    resType = usualBinaryConversions (&left, &right);
-    if (IS_DS390_PORT) {
-      /* jwk char*char=int
-	 Now be can use the 16bit result of "mul a,b" instead of explicit
-	 casts and support function calls as with --ansiint
-      */
-      if ((IS_CHAR(letype) || IS_SHORT(letype)) && 
-	   (IS_CHAR(retype) || IS_SHORT(retype))) {
-	SPEC_NOUN(getSpec(resType))=V_INT;
-	SPEC_SHORT(getSpec(resType))=0;
-      }
-    }
+	  resType = usualBinaryConversions (&left, &right);
+	  /*     if (IS_DS390_PORT) { */
+	  /* jwk char*char=int
+	     Now be can use the 16bit result of "mul a,b" instead of explicit
+	     casts and support function calls as with --ansiint
+	  */
+	  /*       if ((IS_CHAR(letype) || IS_SHORT(letype)) &&  */
+	  /* 	   (IS_CHAR(retype) || IS_SHORT(retype))) { */
+	  if (resultIsInt) {
+		  SPEC_NOUN(getSpec(resType))=V_INT;
+		  SPEC_SHORT(getSpec(resType))=0;
+	  }
   }
+/*   } */
 
   /* if the right is a literal & power of 2 */
   /* then make it a left shift              */
@@ -1838,7 +1840,7 @@ geniCodeSubtract (operand * left, operand * right)
     {
       isarray = left->isaddr;
       right = geniCodeMultiply (right,
-			      operandFromLit (getSize (ltype->next)), TRUE);
+			      operandFromLit (getSize (ltype->next)), TRUE, FALSE);
       resType = copyLinkChain (IS_ARRAY (ltype) ? ltype->next : ltype);
     }
   else
@@ -1892,7 +1894,7 @@ geniCodeAdd (operand * left, operand * right)
       size =
 	operandFromLit (getSize (ltype->next));
 
-      right = geniCodeMultiply (right, size, (getSize (ltype) != 1));
+      right = geniCodeMultiply (right, size, (getSize (ltype) != 1),FALSE);
 
       resType = copyLinkChain (ltype);
     }
@@ -2002,7 +2004,7 @@ geniCodeArray (operand * left, operand * right)
 
   /* array access */
   right = geniCodeMultiply (right,
-			    operandFromLit (getSize (ltype->next)), TRUE);
+			    operandFromLit (getSize (ltype->next)), TRUE,FALSE);
 
   /* we can check for limits here */
   if (isOperandLiteral (right) &&
@@ -3254,7 +3256,7 @@ ast2iCode (ast * tree)
     case '*':
       if (right)
 	return geniCodeMultiply (geniCodeRValue (left, FALSE),
-				 geniCodeRValue (right, FALSE), FALSE);
+				 geniCodeRValue (right, FALSE), FALSE,IS_INT(tree->ftype));
       else
 	return geniCodeDerefPtr (geniCodeRValue (left, FALSE));
 
@@ -3330,7 +3332,7 @@ ast2iCode (ast * tree)
 	geniCodeAssign (left,
 		geniCodeMultiply (geniCodeRValue (operandFromOperand (left),
 						  FALSE),
-				  geniCodeRValue (right, FALSE), FALSE), 0);
+				  geniCodeRValue (right, FALSE), FALSE,FALSE), 0);
 
     case DIV_ASSIGN:
       return

@@ -524,9 +524,31 @@ void checkTypeSanity(sym_link *etype, char *name) {
 /*------------------------------------------------------------------*/
 /* mergeSpec - merges two specifiers and returns the new one        */
 /*------------------------------------------------------------------*/
+#define LAST_MINUTE_2_3_0_FIX
 sym_link *
 mergeSpec (sym_link * dest, sym_link * src, char *name)
 {
+
+#ifdef LAST_MINUTE_2_3_0_FIX
+  sym_link *symlink;
+
+  if (!IS_SPEC(dest)) {
+    // This should not happen
+    fprintf (stderr, "*** internal error: can't merge declarators\n");
+  }
+  if (!IS_SPEC(src)) {
+    // here we have a declarator as source, reverse them
+    symlink=src;
+    src=dest;
+    dest=symlink;
+    while (!IS_SPEC(dest)) {
+      // and find the specifier
+      dest=dest->next;
+    }
+  } else {
+    symlink=dest;
+  }
+#endif
 
   if (getenv("DEBUG_mergeSpec")) {
     fprintf (stderr, "mergeSpec: \"%s\"\n", name);
@@ -592,7 +614,11 @@ mergeSpec (sym_link * dest, sym_link * src, char *name)
   if (IS_STRUCT (dest) && SPEC_STRUCT (dest) == NULL)
     SPEC_STRUCT (dest) = SPEC_STRUCT (src);
 
+#ifdef LAST_MINUTE_2_3_0_FIX
+  return symlink;
+#else
   return dest;
+#endif
 }
 
 /*------------------------------------------------------------------*/

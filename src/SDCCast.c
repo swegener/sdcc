@@ -593,7 +593,7 @@ int processParms (ast *func, value *defParm,
     if (!defParm && actParm && func->hasVargs )
     {
         ast *newType = NULL;
-        
+      
 	if (IS_CAST_OP(actParm) 
 	 || (IS_AST_LIT_VALUE(actParm) && actParm->values.literalFromCast))
 	{
@@ -630,6 +630,11 @@ int processParms (ast *func, value *defParm,
 	    actParm->left = newType;
 	    actParm->right= parmCopy;
 	    decorateType(actParm);
+        }
+        else if ( actParm->type == EX_OP && actParm->opval.op == PARAM) 
+    	{
+	    return (processParms (func,NULL,actParm->left,parmNumber) ||
+	            processParms (func,NULL,actParm->right,parmNumber) );
         }
         return 0;
     }        

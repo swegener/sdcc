@@ -1,6 +1,7 @@
 2004-01-07 Bernhard Held <bernhard@bernhardheld.de>
 
 	* device/include/Makefile.in: fix install
+	* doc/Makefile: fix install
 
 2004-01-07 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 

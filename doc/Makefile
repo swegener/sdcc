@@ -17,7 +17,7 @@ install:
 	if [ -f $(MANUAL).pdf             ]; then cp -rf $(MANUAL).pdf  $(docdir); fi
 	if [ -f $(TSS).pdf                ]; then cp -rf $(TSS).pdf     $(docdir); fi
 	if [ -f $(CDB).pdf                ]; then cp -rf $(CDB).pdf     $(docdir); fi
-	find $(docdir) -name "CVS" -type d | xargs rm -r
+	find $(docdir) -name CVS -type d -exec rm -r {} \;
 	rm -f $(docdir)/*/WARNINGS $(docdir)/*/*.pl $(docdir)/*/images.*
 
 uninstall:

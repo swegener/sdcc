@@ -1003,7 +1003,12 @@ aopPut (asmop * aop, char *s, int offset)
       if (strcmp (s, "a") == 0)
 	emitcode ("push", "acc");
       else
-	emitcode ("push", "%s", s);
+	if (*s=='@') {
+	  MOVA(s);
+	  emitcode ("push", "acc");
+	} else {
+	  emitcode ("push", s);
+	}
 
       break;
 

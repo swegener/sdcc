@@ -6552,7 +6552,7 @@ fi;
 echo ds400 >>ports.all
 if test "$enable_ds400_port" = "no"; then
     cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_DS300 1
+#define OPT_DISABLE_DS400 1
 _ACEOF
 
 else

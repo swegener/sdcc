@@ -560,7 +560,7 @@ AC_ARG_ENABLE(ds400-port,
                            [Excludes the DS400 port]))
 echo ds400 >>ports.all
 if test "$enable_ds400_port" = "no"; then
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_DS300, 1)
+    AC_DEFINE_UNQUOTED(OPT_DISABLE_DS400, 1)
 else
     echo ds400 >>ports.build
     AC_DEFINE_UNQUOTED(OPT_DISABLE_DS400, 0)

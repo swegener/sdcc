@@ -26,6 +26,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+
+// Bernhard's ToDo list:
+
+// - add sfr-descriptions to s51.src/glob.cc
+// - implement math accelerator
+// - consider ACON bits
+// - proc_write_sp (*aof_SP); insert this at the appropriate places
+// - buy some memory to run s51 with 2*4 Meg ROM/XRAM
+
 #include "ddconfig.h"
 
 #include <stdio.h>
@@ -329,11 +338,13 @@ t_uc390::get_mem_size (enum mem_class type)
       case MEM_ROM:
         return 128*1024;	// 4*1024*1024; 4 Meg possible
       case MEM_XRAM:
-        return 128*1024 + 1024;	// 4*1024*1024 + 1024; 4 Meg + 1k possible
+        return 128*1024;	// 4*1024*1024; 4 Meg possible
       case MEM_IRAM:
         return 256;
       case MEM_SFR:
         return 256;
+      case MEM_IXRAM:
+        return 4*1024;		// internal XRAM
       case MEM_TYPES:
       default:
         return 0;
@@ -349,12 +360,10 @@ t_uc390::read_mem(enum mem_class type, t_mem addr)
   if (type == MEM_XRAM &&
       flat24_flag &&
       addr >= 0x400000)
-    addr -= 0x400000 - get_mem_size (MEM_XRAM) + 1024;
-/*
-    addr -= 0x400000;
-    addr += get_mem_size (MEM_XRAM);
-    addr -= 1024;
-*/
+    {
+      addr -= 0x400000;
+      type = MEM_IXRAM;
+    }
   return t_uc51::read_mem (type, addr);
 }
 
@@ -364,7 +373,10 @@ t_uc390::get_mem (enum mem_class type, t_addr addr)
   if (type == MEM_XRAM &&
       flat24_flag &&
       addr >= 0x400000)
-    addr -= 0x400000 - get_mem_size (MEM_XRAM) + 1024;
+    {
+      addr -= 0x400000;
+      type = MEM_IXRAM;
+    }
   return t_uc51::get_mem (type, addr);
 }
 
@@ -374,7 +386,10 @@ t_uc390::write_mem (enum mem_class type, t_addr addr, t_mem val)
   if (type == MEM_XRAM &&
       flat24_flag &&
       addr >= 0x400000)
-    addr -= 0x400000 - get_mem_size (MEM_XRAM) + 1024;
+    {
+      addr -= 0x400000;
+      type = MEM_IXRAM;
+    }
   t_uc51::write_mem (type, addr, val);
 }
 
@@ -384,7 +399,10 @@ t_uc390::set_mem (enum mem_class type, t_addr addr, t_mem val)
   if (type == MEM_XRAM &&
       flat24_flag &&
       addr >= 0x400000)
-    addr -= 0x400000 - get_mem_size (MEM_XRAM) + 1024;
+    {
+      addr -= 0x400000;
+      type = MEM_IXRAM;
+    }
   t_uc51::set_mem (type, addr, val);
 }
 
@@ -406,7 +424,7 @@ t_uc390::push_byte (uchar uc)
         sfr->add (ESP, 1);
       sp10 = (get_mem (MEM_SFR, ESP) & 0x3) * 256 +
              get_mem (MEM_SFR, SP);
-      write_mem (MEM_XRAM, sp10 + 0x400000, uc);
+      write_mem (MEM_IXRAM, sp10, uc);
       res = 0;
     }
   else
@@ -420,8 +438,6 @@ t_uc390::push_byte (uchar uc)
     }
   return res;
 }
-
-//    proc_write_sp (*aof_SP); TODO
 
 uchar
 t_uc390::pop_byte (int *Pres)
@@ -437,7 +453,7 @@ t_uc390::pop_byte (int *Pres)
       sfr->add (SP, -1);
       if (get_mem (MEM_SFR, SP) == 0xff) /* underflow SP */
         sfr->add (ESP, -1);
-      uc = get_mem (MEM_XRAM, sp10 + 0x400000);
+      uc = get_mem (MEM_IXRAM, sp10);
       *Pres = 0;
     }
   else
@@ -1168,7 +1184,7 @@ t_uc390::print_regs(class cl_console *con)
     /* SA: 10 bit stack */
     con->printf ("SP10 0x%03x %3d\n",
                  (sfr->get (ESP) & 3) * 256 + sfr->get (SP),
-                 get_mem (MEM_XRAM, (sfr->get (ESP) & 3) * 256 + sfr->get (SP) + 0x400000)
+                 get_mem (MEM_IXRAM, (sfr->get (ESP) & 3) * 256 + sfr->get (SP))
                 );
   else
     con->printf ("SP 0x%02x %3d\n",

@@ -40,18 +40,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 char delimiters[]= " ,;\t\r\n";
 
 struct id_element mem_ids[]= {
-  { MEM_ROM , "ROM " },
-  { MEM_XRAM, "XRAM" },
-  { MEM_IRAM, "IRAM" },
-  { MEM_SFR , "SFR " },
+  { MEM_ROM  , "ROM  " },
+  { MEM_XRAM , "XRAM " },
+  { MEM_IRAM , "IRAM " },
+  { MEM_SFR  , "SFR  " },
+  { MEM_IXRAM, "IXRAM" },
   { 0, 0 }
 };
 
 struct id_element mem_classes[]= {
-  { MEM_ROM , "rom" },
-  { MEM_XRAM, "xram" },
-  { MEM_IRAM, "iram" },
-  { MEM_SFR , "sfr" },
+  { MEM_ROM  , "rom" },
+  { MEM_XRAM , "xram" },
+  { MEM_IRAM , "iram" },
+  { MEM_SFR  , "sfr" },
+  { MEM_IXRAM, "ixram" },
   { 0, 0 }
 };
 
@@ -63,7 +65,7 @@ struct id_element cpu_states[]= {
 };
 
 
-char *warranty= 
+char *warranty=
 "                            NO WARRANTY
 
   11. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY

@@ -96,6 +96,7 @@ enum mem_class
   MEM_XRAM,
   MEM_IRAM,
   MEM_SFR,
+  MEM_IXRAM,
   MEM_TYPES
 };
 

@@ -26,7 +26,7 @@
 
 #define EQ(A,B) !strcmp((A),(B))
 #define MEMSIZE 0x10000
-#define DODUMP 1
+//#define DODUMP 1
 
 typedef struct
 {

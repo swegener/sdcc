@@ -5,7 +5,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; version 2.
  *
- * Foobar is distributed in the hope that it will be useful,
+ * Paul's XA51 Assembler is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -182,7 +182,7 @@ directive:     '.' ORG expr {
 db_directive:	DB {db_count = 0;}
 
 
-linesymbol:    WORD  { 
+linesymbol:    normal_or_bit_symbol  { 
 			strcpy(symbol_name, lex_sym_name);
 			if (!strchr(lex_sym_name, ':')) {
 				/* non-local label, remember base name */
@@ -190,6 +190,9 @@ linesymbol:    WORD  {
 			}
 			if (is_target(symbol_name)) pad_with_nop();
 		}
+
+normal_or_bit_symbol: WORD {$$ = $1;}
+		| BIT {$$ = $1;}
 
 bytes:		  byte_element
 		| bytes ',' byte_element

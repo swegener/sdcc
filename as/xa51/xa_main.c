@@ -17,11 +17,12 @@
 /* adapted from the osu8asm project, 1995 */
 /* http://www.pjrc.com/tech/osu8/index.html */
 
-#define printf(x...) fprintf(stderr,x)
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#define printf(x...) fprintf(stderr,x)
 
 #include "xa_main.h"
 

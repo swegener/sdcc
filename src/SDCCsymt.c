@@ -1921,6 +1921,10 @@ processFuncArgs (symbol * func)
 	  SPEC_STAT (val->etype) = SPEC_STAT (val->sym->etype) =
 	    SPEC_STAT (func->etype);
 	}
+      if (!isinSet(operKeyReset, val->sym)) {
+	addSet (&operKeyReset, val->sym);
+	applyToSet (operKeyReset, resetParmKey);
+      }
       val = val->next;
     }
 }

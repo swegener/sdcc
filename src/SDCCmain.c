@@ -87,7 +87,7 @@ int ds390_jammed = 0;
 
 // Globally accessible scratch buffer for file names.
 char scratchFileName[PATH_MAX];
-char buffer[PATH_MAX];
+char buffer[PATH_MAX * 2];
 
 // In MSC VC6 default search path for exe's to path for this
 
@@ -560,7 +560,7 @@ processFile (char *s)
  	}
 
       /* copy the file name into the buffer */
-      strncpyz (buffer, s, PATH_MAX);
+      strncpyz (buffer, s, sizeof(buffer));
 
       /* get rid of the "."-extension */
 
@@ -1032,7 +1032,8 @@ parseCmdLine (int argc, char **argv)
                 char *p;
 
                 /* copy the file name into the buffer */
-                strncpyz(buffer, getStringArg("-o", argv, &i, argc), PATH_MAX);
+                strncpyz(buffer, getStringArg("-o", argv, &i, argc), 
+			 sizeof(buffer));
                 /* point to last character */
                 p = buffer + strlen (buffer) - 1;
                 if (*p == DIR_SEPARATOR_CHAR)
@@ -1213,7 +1214,7 @@ parseCmdLine (int argc, char **argv)
           char *objectName;
 	  size_t bufSize;
 
-          strncpyz (buffer, relFiles[0], PATH_MAX);
+          strncpyz (buffer, relFiles[0], sizeof(buffer));
           /* remove extension (it must be .rel) */
           *strrchr (buffer, '.') = '\0';
           /* remove path */
@@ -1422,11 +1423,11 @@ linkEdit (char **envp)
     {
       char buffer2[PATH_MAX];
       buildCmdLine (buffer2, port->linker.cmd, dstFileName, scratchFileName, NULL, NULL);
-      buildCmdLine2 (buffer, buffer2, PATH_MAX);
+      buildCmdLine2 (buffer, buffer2, sizeof(buffer));
     }
   else
     {
-      buildCmdLine2 (buffer, port->linker.mcmd, PATH_MAX);
+      buildCmdLine2 (buffer, port->linker.mcmd, sizeof(buffer));
     }
 
   system_ret = my_system (buffer);
@@ -1501,8 +1502,9 @@ assemble (char **envp)
         strncpyz (scratchFileName, fullDstFileName, sizeof(scratchFileName));
     } else {
         /* the assembled file gets the name of the first modul */
-        strncpyz (scratchFileName, dstFileName, PATH_MAX);
-        strncatz (scratchFileName, port->linker.rel_ext, PATH_MAX);
+        strncpyz (scratchFileName, dstFileName, sizeof(scratchFileName));
+        strncatz (scratchFileName, port->linker.rel_ext, 
+		  sizeof(scratchFileName));
     }
 
     if (port->assembler.do_assemble) {
@@ -1615,7 +1617,7 @@ preProcess (char **envp)
       if (options.verbose)
 	printf ("sdcc: Calling preprocessor...\n");
 
-      buildCmdLine2 (buffer, _preCmd, PATH_MAX);
+      buildCmdLine2 (buffer, _preCmd, sizeof(buffer));
 
       if (my_system (buffer))
 	{
@@ -1713,7 +1715,7 @@ _discoverPaths (const char *argv0)
     {
       getPathDifference (buffer, PREFIX, BINDIR);
       strncpyz (scratchFileName, getenv (SDCCDIR_NAME), sizeof(scratchFileName));
-      strncatz (scratchFileName, buffer, PATH_MAX);
+      strncatz (scratchFileName, buffer, sizeof(scratchFileName));
       setMainValue ("bindir", scratchFileName);
       ExePathList[0] = Safe_strdup (scratchFileName);
     }

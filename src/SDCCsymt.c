@@ -1935,43 +1935,43 @@ printTypeChain (sym_link * start, FILE * of)
 	    case GPOINTER:
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
-	      fprintf (of, "* generic ");
+	      fprintf (of, "generic * ");
 	      break;
 	    case CPOINTER:
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
-	      fprintf (of, "* code ");
+	      fprintf (of, "code * ");
 	      break;
 	    case FPOINTER:
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
-	      fprintf (of, "* xdata ");
+	      fprintf (of, "xdata * ");
 	      break;
 	    case EEPPOINTER:
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
-	      fprintf (of, "* eeprom ");
+	      fprintf (of, "eeprom * ");
 	      break;
 
 	    case POINTER:
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
-	      fprintf (of, "* near ");
+	      fprintf (of, "near *");
 	      break;
 	    case IPOINTER:
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
-	      fprintf (of, "* idata ");
+	      fprintf (of, "idata * ");
 	      break;
 	    case PPOINTER:
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
-	      fprintf (of, "* pdata ");
+	      fprintf (of, "pdata * ");
 	      break;
 	    case UPOINTER:
 	      if (DCL_PTR_CONST (type))
 		fprintf (of, "const ");
-	      fprintf (of, "* unkown ");
+	      fprintf (of, "unkown * ");
 	      break;
 	    case ARRAY:
 	      fprintf (of, "[] ");

@@ -1618,7 +1618,8 @@ aopPut (asmop * aop, const char *s, int offset)
 static void
 commitPair (asmop * aop, PAIR_ID id)
 {
-  if (id == PAIR_HL && requiresHL (aop))
+  /* PENDING: Verify this. */
+  if (id == PAIR_HL && requiresHL (aop) && IS_GB)
     {
       emit2 ("ld a,l");
       emit2 ("ld d,h");
@@ -1627,8 +1628,19 @@ commitPair (asmop * aop, PAIR_ID id)
     }
   else
     {
-      aopPut (aop, _pairs[id].l, 0);
-      aopPut (aop, _pairs[id].h, 1);
+      /* Special cases */
+      if (id == PAIR_HL && aop->type == AOP_IY && aop->size == 2)
+        {
+          char *l = aopGetLitWordLong (aop, 0, FALSE);
+          wassert (l);
+
+          emit2 ("ld (%s),%s", l, _pairs[id].name);
+        }
+      else
+        {
+          aopPut (aop, _pairs[id].l, 0);
+          aopPut (aop, _pairs[id].h, 1);
+        }
     }
 }
 

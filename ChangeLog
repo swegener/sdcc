@@ -1,3 +1,9 @@
+2001-11-04  Michael Hope  <michaelh@juju.net.nz>
+
+	* support/regression/tests/bug-478094.c: Added.
+
+	* src/z80/gen.c (commitPair): Fixed silly gbz80/z80 commit to static bug.
+
 2001-11-04  Bernhard Held  <bernhard@bernhardheld.de>
 
 	* sdcc/sim/ucsim/s51.src/uc390cl.h: Improvement for ds390 to run regression tests

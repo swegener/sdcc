@@ -1885,6 +1885,11 @@ printTypeChain (sym_link * start, FILE * of)
       nlr = 1;
     }
 
+  if (start==NULL) {
+    fprintf (of, "**err**");
+    return;
+  }
+
   /* print the chain as it is written in the source: */
   /* start with the last entry                       */
   for (type = start; type && type->next; type = type->next)

@@ -1101,9 +1101,9 @@ isOperandEqual (operand * left, operand * right)
   return 0;
 }
 
-/*-----------------------------------------------------------------*/
-/* isiCodeEqual - comapres two iCodes are returns true if yes      */
-/*-----------------------------------------------------------------*/
+/*-------------------------------------------------------------------*/
+/* isiCodeEqual - compares two iCodes are equal, returns true if yes */
+/*-------------------------------------------------------------------*/
 int 
 isiCodeEqual (iCode * left, iCode * right)
 {
@@ -1137,6 +1137,7 @@ isiCodeEqual (iCode * left, iCode * right)
 	  if (!isSymbolEqual (IC_FALSE (left), IC_FALSE (right)))
 	    return 0;
 	}
+      
       return 1;
     }
   return 0;

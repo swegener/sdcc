@@ -752,6 +752,7 @@ processParms (ast * func,
     fprintf (stderr, "assigned to type --> '");
     printTypeChain (defParm->type, stderr);
     fprintf (stderr, "'\n");
+    return 1;
   }
 
   /* if the parameter is castable then add the cast */

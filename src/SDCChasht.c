@@ -143,7 +143,6 @@ void hTabDeleteItem (hTab **htab, int key ,
             htipp=&(htip->next);
         }
 	
-	/*          GC_free(htip); */
     }
     
     (*htab)->nItems-- ;

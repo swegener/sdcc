@@ -380,13 +380,11 @@ noOverLap (set * itmpStack, symbol * fsym)
 {
   symbol *sym;
 
-
   for (sym = setFirstItem (itmpStack); sym;
        sym = setNextItem (itmpStack))
     {
-      if (sym->liveTo > fsym->liveFrom)
+      if (sym->liveTo >= fsym->liveFrom)
 	return 0;
-
     }
 
   return 1;

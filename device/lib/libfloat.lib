@@ -4,6 +4,7 @@ _fsdiv
 _fseq
 _fsgt
 _fslt
+_fscmp
 _fsmul
 _fsneq
 _fssub

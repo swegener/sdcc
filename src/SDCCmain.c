@@ -1351,6 +1351,12 @@ parseCmdLine (int argc, char **argv)
       options.float_rent++;
     }
 
+  /* mcs51 has an assembly coded float library that's always reentrant */
+  if (TARGET_IS_MCS51)
+    {
+      options.float_rent++;
+    }
+
   /* set up external stack location if not explicitly specified */
   if (!options.xstack_loc)
     options.xstack_loc = options.xdata_loc;

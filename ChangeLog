@@ -1,5 +1,20 @@
 2004-12-27 Paul Stoffregen <paul AT pjrc.com>
 
+	* src/SDCCmain.c: make --float-reent default for mcs51
+	* device/lib/_fsadd.c: added mcs51 assembly version
+	* device/lib/_fssub.c: added mcs51 assembly version
+	* device/lib/_fsmul.c: added mcs51 assembly version
+	* device/lib/_fsdiv.c: added mcs51 assembly version
+	* device/lib/_fseq.c: added mcs51 assembly version
+	* device/lib/_fsneq.c: added mcs51 assembly version
+	* device/lib/_fsgt.c: added mcs51 assembly version
+	* device/lib/_fslt.c: added mcs51 assembly version
+	* device/lib/_fscmp.c: shared code for fseq,fsgt,fslt,fsneq
+	* device/lib/Makefile.in: add _fscmp to build
+	* device/lib/libfloat.lib: add _fscmp to build
+
+2004-12-27 Paul Stoffregen <paul AT pjrc.com>
+
 	* device/lib/_fs2slong.c: added mcs51 assembly version
 	* device/lib/_fs2sint.c: added mcs51 assembly version
 	* device/lib/_fs2schar.c: added mcs51 assembly version

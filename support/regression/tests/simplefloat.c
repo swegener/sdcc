@@ -20,7 +20,7 @@ void
 testDiv(void)
 {
 #if !PORT_HOST
-#ifdef __mcs51
+#if defined __mcs51 && !defined (SDCC_STACK_AUTO)
   idata at 0xd0
 #endif
   volatile float left;

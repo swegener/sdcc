@@ -59,9 +59,9 @@ typedef struct
         const char **cmd;
         /** Alternate macro based form. */
         const char *mcmd;
-        /** Arguments for debug mode.  PENDING: ignored */
+        /** Arguments for debug mode. */
 	const char *debug_opts;
-        /** Arguments for normal assembly mode.  PENDING: ignored */
+        /** Arguments for normal assembly mode. */
 	const char *plain_opts;
 	/* print externs as global */
 	int externGlobal;

@@ -1,5 +1,17 @@
 2001-10-03 Bernhard Held <bernhard@bernhardheld.de>
 
+	* src/SDCCmain.c: distinguish between assembler debug and plain options
+
+	* src/avr/main.c:   remove standard assembler options
+
+	* src/ds390/main.c: remove standard assembler options
+
+	* src/mcs51/main.c: remove standard assembler options
+
+	* src/port.h: removed "PENDING" comment
+
+2001-10-03 Bernhard Held <bernhard@bernhardheld.de>
+
 	* src/device/lib/_mulint.c  : new, with assember functions
 
 	* src/device/lib/_mullong.c : new, with assember functions

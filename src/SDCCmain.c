@@ -1193,7 +1193,9 @@ assemble (char **envp)
 {
   if (port->assembler.cmd)
     {
-      buildCmdLine (buffer, port->assembler.cmd, srcFileName, NULL, NULL, asmOptions);
+      buildCmdLine (buffer, port->assembler.cmd, srcFileName, NULL,
+                    options.debug ? port->assembler.debug_opts : port->assembler.plain_opts,
+                    asmOptions);
     }
   else
     {

@@ -8,14 +8,12 @@
 
 #if defined(PORT_HOST)
 #  include "../../../../../sdccconf.h"
+#  define mullong(a,b) mullong_wrapper(a,b)
 #  if defined(type_c) && !defined(WORDS_BIGENDIAN)
 #    define _SDCC_NO_ASM_LIB_FUNCS 1
 #    define near
 #    define long int
 #    include "../../../../../device/lib/_mullong.c"
-#    define mullong(a,b) mullong_wrapper(a,b)
-#  else
-#    define mullong(a,b) mullong_wrapper(a,b)
 #  endif
 #else
 #  if defined(type_c)
@@ -50,9 +48,8 @@ mullong_wrapper (long a, long b)
       return a * b;
   }
 }
-#endif
 
-#if defined(WORDS_BIGENDIAN)
+#else
 
 long
 mullong_wrapper (long a, long b)

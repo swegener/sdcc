@@ -1,3 +1,8 @@
+2004-01-27 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* support/regression/tests/libmullong.c: fixed logic, on little endian
+	hosts we ended without a mullong_wrapper()
+
 2004-01-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* ChangeLog: changed "@" to " AT " in hopes of reducing spam and

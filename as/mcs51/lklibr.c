@@ -25,6 +25,7 @@
 #include <malloc.h>
 #endif
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "aslink.h"
 
@@ -359,11 +360,10 @@ embedded in the library file.*/
 int SdccLib(char * PathLib, FILE * libfp, char * DirLib, char * SymName)
 {
 	struct lbfile *lbfh, *lbf;
-	char name[NCPS]="";
 	char ModName[NCPS]="";
 	char FLine[MAXLINE+1];
 	int state=0;
-	long IndexOffset, FileOffset;
+	long IndexOffset=0, FileOffset;
 
 	while(!feof(libfp))
     {

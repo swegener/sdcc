@@ -956,7 +956,7 @@ addSymChain (symbol * symHead)
          then check if the type match, if the types match then
          delete the current entry and add the new entry      */
       if ((csym = findSymWithLevel (SymbolTab, sym)) &&
-	  csym->level == sym->level && csym->localof == sym->localof) {
+	  csym->level == sym->level) {
 	
 	/* one definition extern ? */
 	if (IS_EXTERN (csym->etype) || IS_EXTERN (sym->etype)) {

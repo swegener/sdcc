@@ -264,7 +264,9 @@ _pic16_genAssemblerPreamble (FILE * of)
 static int
 _pic16_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 {
+#if 0
   int i;
+#endif
 
 #if 0
   if (options.model != MODEL_FLAT24)

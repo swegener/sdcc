@@ -307,8 +307,8 @@ mv ports ports.build
 
 # Generating output files
 # ===========================================================================
-AC_CONFIG_SUBDIRS(sim/ucsim)
 AC_CONFIG_SUBDIRS(support/cpp2)
+AC_CONFIG_SUBDIRS(sim/ucsim)
 # MLH: removed as the rules are already in Makefile.common
 #AC_CONFIG_SUBDIRS(packihx)
 #as/z80/Makefile

@@ -13,6 +13,7 @@
 	* as/mcs51/Makefile.asx8051: new module strcmpi
 	* as/mcs51/Makefil.bcc: new module strcmpi
 	* as/mcs51/Makefile.in: new module strcmpi
+	* sim/ucsim/s51.src/uc390.cc (get_mem_size): make RAM big enough for tinibios
 
 2003-01-26    <johan@balder>
 

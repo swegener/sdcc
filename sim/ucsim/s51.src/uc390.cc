@@ -390,9 +390,12 @@ t_uc390::get_mem_size (enum mem_class type)
   switch (type)
     {
       case MEM_ROM:
-        return 128*1024;	// 4*1024*1024; 4 Meg possible
+        return 128*1024;	  // 128 kByte; 4 MByte possible
       case MEM_XRAM:
-        return 128*1024;	// 4*1024*1024; 4 Meg possible
+	/* tinibios copies 128 bytes of the Interrupt Vector Table
+	   to 0x100000. This is exactly the minimum of memory to run ucSim
+	   without any error. */
+        return 1*1024*1024 + 128; // 1 MByte + 128 bytes; 4 Mbytes possible
       case MEM_IRAM:
         return 256;
       case MEM_SFR:

@@ -273,7 +273,12 @@ static asmop *
 aopForSym (iCode * ic, symbol * sym, bool result)
 {
   asmop *aop;
-  memmap *space = SPEC_OCLS (sym->etype);
+  memmap *space;
+
+  wassertl (ic != NULL, "Got a null iCode");
+  wassertl (sym != NULL, "Got a null symbol");
+
+  space = SPEC_OCLS (sym->etype);
 
   /* if already has one */
   if (sym->aop)

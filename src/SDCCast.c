@@ -970,7 +970,9 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr)
       {
 	symbol *sym=AST_SYMBOL(iexpr);
 	memmap *segment=SPEC_OCLS(sym->etype);
-	deleteSetItem(&segment->syms, sym);
+	if (segment) {
+	  deleteSetItem(&segment->syms, sym);
+	}
       }
       
       return decorateType(resolveSymbols (rast));

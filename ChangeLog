@@ -2,6 +2,7 @@
 
 	* src/SDCCglue.c (emitRegularMap): fixed bug #458099 again
 	* src/SDCCast.c (createIvalCharPtr): fixed bug #661910
+	(createIvalCharPtr): an ival doesn't always have a storage class anymore
 
 2003-01-24  Bernhard Held <bernhard@bernhardheld.de>
 

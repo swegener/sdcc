@@ -290,6 +290,7 @@ hasInc (operand *op, iCode *ic)
 	int isize ;
   
 	if (IS_BITVAR(retype)||!IS_PTR(type)) return NULL;
+	if (IS_AGGREGATE(type->next)) return NULL;
 	isize = getSize(type->next);
 	while (lic) {
 		/* if operand of the form op = op + <sizeof *op> */

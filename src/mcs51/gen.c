@@ -4357,7 +4357,9 @@ hasInc (operand *op, iCode *ic,int osize)
   if (!IS_SYMOP(op)) return NULL;
 
   if (IS_BITVAR(retype)||!IS_PTR(type)) return NULL;
+  if (IS_AGGREGATE(type->next)) return NULL;
   if (osize != (isize = getSize(type->next))) return NULL;
+
   while (lic) {
     /* if operand of the form op = op + <sizeof *op> */
     if (lic->op == '+' && isOperandEqual(IC_LEFT(lic),op) &&

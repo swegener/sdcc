@@ -153,13 +153,33 @@ _mcs51_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
   return FALSE;
 }
 
+/* Generate code to clear XSEG and idata memory. 
+   This clears XSEG, DSEG, BSEG, OSEG, SSEG */
+static void _mcs51_genRAMCLEAR (FILE * of) {
+  fprintf (of, ";	_mcs51_genRAMCLEAR() start\n");
+  fprintf (of, "	mov	r1,#l_XSEG\n");
+  fprintf (of, "	mov	a,r1\n");
+  fprintf (of, "	orl	a,#(l_XSEG >> 8)\n");
+  fprintf (of, "	jz	00005$\n");
+  fprintf (of, "	mov	r2,#((l_XSEG + 255) >> 8)\n");
+  fprintf (of, "	mov	dptr,#s_XSEG\n");
+  fprintf (of, "	clr     a\n");
+  fprintf (of, "00004$:	movx	@dptr,a\n");
+  fprintf (of, "	inc	dptr\n");
+  fprintf (of, "	djnz	r1,00004$\n");
+  fprintf (of, "	djnz	r2,00004$\n");
+  /* r1 is zero now. Clearing 256 byte assuming 128 byte devices don't mind */
+  fprintf (of, "00005$:	mov	@r1,a\n");   
+  fprintf (of, "	djnz	r1,00005$\n");
+  fprintf (of, ";	_mcs51_genRAMCLEAR() end\n");
+}
+
 /* Generate code to copy XINIT to XISEG */
 static void _mcs51_genXINIT (FILE * of) {
   fprintf (of, ";	_mcs51_genXINIT() start\n");
   fprintf (of, "	mov	r1,#l_XINIT\n");
-  fprintf (of, "	mov	r2,#(l_XINIT >> 8)\n");
   fprintf (of, "	mov	a,r1\n");
-  fprintf (of, "	orl	a,r2\n");
+  fprintf (of, "	orl	a,#(l_XINIT >> 8)\n");
   fprintf (of, "	jz	00003$\n");
   fprintf (of, "	mov	r2,#((l_XINIT+255) >> 8)\n");
   fprintf (of, "	mov	dptr,#s_XINIT\n");
@@ -177,6 +197,8 @@ static void _mcs51_genXINIT (FILE * of) {
   fprintf (of, "	mov	p2,#0xFF\n");
   fprintf (of, "00003$:\n");
   fprintf (of, ";	_mcs51_genXINIT() end\n");
+  
+  if (getenv("SDCC_GENRAMCLEAR")) _mcs51_genRAMCLEAR (of);
 }
 
 

@@ -1,3 +1,18 @@
+2004-09-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCicode.h,
+	* src/SDCCicode.c (isiCodeInFunctionCall),
+	* src/avr/ralloc.c (selectSpil),
+	* src/pic/ralloc.c (selectSpil),
+	* src/pic16/ralloc.c (selectSpil),
+	* src/ds390/ralloc.c (selectSpil),
+	* src/hc08/ralloc.c (selectSpil),
+	* src/xa51/ralloc.c (selectSpil),
+	* src/mcs51/ralloc.c (selectSpil): Don't use remainSpil to spill to the
+	stack in the middle of a function call sequence (fixes bug #1020268)
+	* src/SDCCicode.c (geniCodeJumpTable): fixed error in computing the
+	costs associated with the minimum switch case.
+
 2004-09-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCC.lex: fixed bug #1030549

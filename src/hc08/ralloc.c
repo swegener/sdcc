@@ -738,7 +738,9 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
 
       /* check if there are any live ranges that not
          used in the remainder of the block */
-      if (!_G.blockSpil && (selectS = liveRangesWith (lrcs, notUsedInRemaining, ebp, ic)))
+      if (!_G.blockSpil &&
+          !isiCodeInFunctionCall (ic) &&       
+          (selectS = liveRangesWith (lrcs, notUsedInRemaining, ebp, ic)))
 	{
 	  sym = leastUsedLR (selectS);
 	  if (sym != forSym)

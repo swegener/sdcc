@@ -326,6 +326,7 @@ operand *opFromOpWithDU (operand *, bitVect *, bitVect *);
 iCode *copyiCode (iCode *);
 operand *newiTempFromOp (operand *);
 iCode *getBuiltinParms (iCode *,int *, operand **);
+int isiCodeInFunctionCall (iCode *);
 /*-----------------------------------------------------------------*/
 /* declaration of exported variables                               */
 /*-----------------------------------------------------------------*/

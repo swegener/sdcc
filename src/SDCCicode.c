@@ -399,6 +399,9 @@ PRINTFUNC (picGenericOne)
   if (ic->op == SEND || ic->op == RECEIVE) {
       fprintf(of,"{argreg = %d}",ic->argreg);
   }
+  if (ic->op == IPUSH) {
+      fprintf(of,"{parmPush = %d}",ic->parmPush);
+  }
   fprintf (of, "\n");
 }
 
@@ -1037,6 +1040,40 @@ isOclsExpensive (struct memmap *oclass)
   /* In the absence of port specific guidance, assume only */
   /* farspace is expensive. */
   return IN_FARSPACE (oclass);
+}
+
+/*-----------------------------------------------------------------*/
+/* isiCodeInFunctionCall - return TRUE if an iCode is between a    */
+/*   CALL/PCALL and the first IPUSH/SEND associated with the call  */
+/*-----------------------------------------------------------------*/
+int
+isiCodeInFunctionCall (iCode * ic)
+{
+  iCode * lic = ic;
+  
+  /* Find the next CALL/PCALL */
+  while (lic)
+    {
+      if (lic->op == CALL || lic->op == PCALL)
+        break;
+      lic = lic->next;
+    }
+  
+  if (!lic)
+    return FALSE;
+
+  /* A function call was found. Scan backwards and see if an */
+  /* IPUSH or SEND is encountered */
+  while (ic)
+    {
+      if (lic != ic && (ic->op == CALL || ic->op == PCALL))
+        return FALSE;
+      if (ic->op == SEND || (ic->op == IPUSH && ic->parmPush))
+        return TRUE;
+      ic = ic->prev;
+    }
+  
+  return FALSE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -3491,7 +3528,7 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
   int needRangeCheck = !optimize.noJTabBoundary
                        || tree->values.switchVals.swDefault;
   sym_link *cetype = getSpec (operandType (cond));
-  int sizeofMinCost, sizeofMaxCost;
+  int sizeofMinCost, sizeofZeroMinCost, sizeofMaxCost;
   int sizeofMatchJump, sizeofJumpTable;
   int sizeIndex;
 
@@ -3527,11 +3564,14 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
   
   /* Compute the size cost of the range check and subtraction. */
   sizeofMinCost = 0;
+  sizeofZeroMinCost = 0;
   sizeofMaxCost = 0;
   if (needRangeCheck)
     {
       if (!(min==0 && IS_UNSIGNED (cetype)))
         sizeofMinCost = port->jumptableCost.sizeofRangeCompare[sizeIndex];
+      if (!IS_UNSIGNED (cetype))
+        sizeofZeroMinCost = port->jumptableCost.sizeofRangeCompare[sizeIndex];
       sizeofMaxCost = port->jumptableCost.sizeofRangeCompare[sizeIndex];
     }
   if (min)
@@ -3540,11 +3580,18 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
   /* If the size cost of handling a non-zero minimum exceeds the */
   /* cost of extending the range down to zero, then it might be */
   /* better to extend the range to zero. */
-  if (min > 0 && sizeofMinCost >= (min * port->jumptableCost.sizeofElement))
+  if (min > 0 && (sizeofMinCost-sizeofZeroMinCost)
+                 >= (min * port->jumptableCost.sizeofElement))
     {
       /* Only extend the jump table if it would still be manageable. */
       if (1 + max <= port->jumptableCost.maxCount)
-        min = 0;
+        {
+          min = 0;
+          if (IS_UNSIGNED (cetype))
+            sizeofMinCost = 0;
+          else
+            sizeofMinCost = port->jumptableCost.sizeofRangeCompare[sizeIndex];
+        }
     }
     
   /* Compute the total size cost of a jump table. */
@@ -3554,7 +3601,7 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
 
   /* Compute the total size cost of a match & jump sequence */
   sizeofMatchJump = cnt * port->jumptableCost.sizeofMatchJump[sizeIndex];
-  
+
   /* If the size cost of the jump table is uneconomical then exit */
   if (sizeofMatchJump <  sizeofJumpTable)
     return 0;

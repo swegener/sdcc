@@ -86,6 +86,7 @@ typedef struct structdef
     unsigned char level;	/* Nesting level         */
     struct symbol *fields;	/* pointer to fields     */
     unsigned size;		/* sizeof the table in bytes  */
+    int type;			/* STRUCT or UNION */
   }
 structdef;
 

@@ -1,3 +1,7 @@
+2004-01-01 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCsymt.h: missing from yesterday's commits
+
 2003-12-31 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCC.y (struct_or_union_specifier),

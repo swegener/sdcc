@@ -31,17 +31,19 @@
 #include "SDCCset.h"
 #include "SDCCmem.h"
 
-#define  EX_OP       0
-#define  EX_VALUE    1
-#define  EX_LINK     2
-#define  EX_STMNT    3
-#define  EX_OPERAND  4
+typedef enum {
+  EX_OP=0,
+  EX_VALUE,
+  EX_LINK,
+  EX_STMNT,
+  EX_OPERAND
+} ASTTYPE;
 
 /* expression tree   */
 typedef struct ast
   {
 
-    unsigned type:3;
+    ASTTYPE type;
     unsigned decorated:1;
     unsigned isError:1;
     unsigned funcName:1;

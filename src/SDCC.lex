@@ -211,6 +211,12 @@ static int checkCurrFile(char *s);
 .			   { count()	; }
 %%
 
+/* flex 2.5.31 undefines yytext_ptr, so we have to define it again */
+#ifndef yytext_ptr
+#define yytext_ptr yytext
+#endif
+
+
 static int checkCurrFile (char *s)
 {
     char lineNum[10]			;

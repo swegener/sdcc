@@ -1,3 +1,7 @@
+2003-10-19  Borut Razem <borut.razem@siol.net>
+
+	* src/SDCC.lex: fixed bug #825944 - defined yytext_ptr to make it compile with flex 2.5.31
+
 2003-10-19 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCCicode.c (geniCodePreInc, geniCodePreDec, ast2iCode):

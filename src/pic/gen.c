@@ -6777,10 +6777,12 @@ static void shiftR2Left2Result (operand *left, int offl,
     /* don't crash result[offr] */
     MOVA(aopGet(AOP(left),offl,FALSE,FALSE));
     pic14_emitcode("xch","a,%s", aopGet(AOP(left),offl+MSB16,FALSE,FALSE));
-  } else {
+  }
+/* else {
     movLeft2Result(left,offl, result, offr);
     MOVA(aopGet(AOP(left),offl+MSB16,FALSE,FALSE));
   }
+*/
   /* a:x >> shCount (x = lsb(result))*/
 /*
   if(sign)
@@ -6880,15 +6882,17 @@ static void shiftR2Left2Result (operand *left, int offl,
       emitpcode(POC_MOVWF,popGet(AOP(result),offr+MSB16));
       emitpcode(POC_RLFW, popGet(AOP(left),offl+MSB16));
       emitpcode(POC_MOVWF,popGet(AOP(result),offr));
-      emitpcode(POC_RLFW,  popGet(AOP(result),offr+MSB16));
+      emitpcode(POC_RLF,  popGet(AOP(result),offr+MSB16));
+      emitpcode(POC_RLF,  popGet(AOP(result),offr));
+      emitpcode(POC_RLFW, popGet(AOP(result),offr+MSB16));
       emitpcode(POC_ANDLW,popGetLit(0x03));
       if(sign) {
 	emitpcode(POC_BTFSC, 
 		  newpCodeOpBit(aopGet(AOP(result),offr+MSB16,FALSE,FALSE),0,0));
 	emitpcode(POC_IORLW,popGetLit(0xfc));
       }
-      emitpcode(POC_MOVWF,popGet(AOP(result),offr));
-      emitpcode(POC_RLF,  popGet(AOP(result),offr));
+      emitpcode(POC_MOVWF,popGet(AOP(result),offr+MSB16));
+      //emitpcode(POC_RLF,  popGet(AOP(result),offr));
 
 	
     }

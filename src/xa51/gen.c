@@ -1234,7 +1234,7 @@ static void genPointerGet (iCode * ic, iCode *pi) {
     symbol *tlbl1=newiTempLabel(NULL);
     symbol *tlbl2=newiTempLabel(NULL);
     emitcode ("cmp", "%s,#0x%02x", AOP_NAME(left)[1], CPOINTER);
-    emitcode ("bne", "%05d$", tlbl1->key+100);
+    emitcode ("beq", "%05d$", tlbl1->key+100);
     // far/near pointer
     if (pi) {
       emitcode ("mov", "%s,[%s+]", AOP_NAME(result)[0], AOP_NAME(left)[0]);

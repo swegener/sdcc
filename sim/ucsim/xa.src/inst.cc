@@ -96,7 +96,6 @@ bool cl_xa::get_bit(int bit) {
   }
   result = get_byte_direct(offset + (bit/8)) & (1 << (bit%8));
   return result;
-  //return mem_direct[offset + (bit/8)] & (1 << (bit%8));
 }
 
 void cl_xa::set_bit(int bit, int value) {
@@ -111,10 +110,8 @@ void cl_xa::set_bit(int bit, int value) {
   i = get_byte_direct(offset + (bit/8));
   if (value) {
     set_byte_direct(offset + (bit/8), i | (1 << (bit%8)) );
-    //mem_direct[offset + (bit/8)] |= (1 << (bit%8));
   } else {
     set_byte_direct(offset + (bit/8), i & ~(1 << (bit%8)) );
-    //mem_direct[offset + (bit/8)] &= ~(1 << (bit%8));
   }
 }
 
@@ -507,6 +504,12 @@ int cl_xa::inst_JB(uint code, int operands)
 }
 int cl_xa::inst_JBC(uint code, int operands)
 {
+  short bitAddr=((code&0x3)<<8) + fetch1();
+  short jmpAddr = (fetch1() * 2);
+  if (get_bit(bitAddr)) {
+    PC = (PC+jmpAddr)&0xfffffe;
+  }
+  set_bit(bitAddr);
   return(resGO);
 }
 int cl_xa::inst_JNB(uint code, int operands)
@@ -516,7 +519,6 @@ int cl_xa::inst_JNB(uint code, int operands)
   if (!get_bit(bitAddr)) {
     PC = (PC+jmpAddr)&0xfffffe;
   }
-  return(resGO);
   return(resGO);
 }
 int cl_xa::inst_JMP(uint code, int operands)
@@ -558,6 +560,20 @@ int cl_xa::inst_JZ(uint code, int operands)
 }
 int cl_xa::inst_LEA(uint code, int operands)
 {
+  switch (operands) {
+    case REG_REGOFF8:
+      {
+	char offset=fetch1();
+	set_reg2(RI_70, reg2(RI_07)+offset);
+	break;
+      }
+    case REG_REGOFF16:
+      {
+	short offset=fetch2();
+	set_reg2(RI_70, reg2(RI_07)+offset);
+	break;
+      }
+  }
   return(resGO);
 }
 int cl_xa::inst_LSR(uint code, int operands)

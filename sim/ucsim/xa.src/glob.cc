@@ -206,10 +206,10 @@ struct xa_dis_entry disass_xa[]= {
  {0,0x0850,0xfffc,' ',2,ANL, C_NOTBIT        }, //  ANL C, /bit                0 0 0 0 1 0 0 0  0 1 0 1 0 0 b b
  {0,0xc150,0xf300,' ',2,ASL, REG_REG         }, //  ASL Rd, Rs                 1 1 0 0 S S 0 1  d d d d s s s s
  {0,0xdd00,0xff00,' ',2,ASL, REG_DATA5       }, //  ASL Rd, #data5 (dword)     1 1 0 1 1 1 0 1  d d d #data5
- {0,0xd100,0xf300,' ',2,ASL, REG_DATA4       }, //  ASL Rd, #data4             1 1 0 1 S S 0 1  d d d d #data4
+ {0,0xd100,0xf700,' ',2,ASL, REG_DATA4       }, //  ASL Rd, #data4             1 1 0 1 S S 0 1  d d d d #data4
  {0,0xc250,0xf300,' ',2,ASR, REG_REG         }, //  ASR Rd, Rs                 1 1 0 0 S S 1 0  d d d d s s s s
  {0,0xde00,0xff00,' ',2,ASR, REG_DATA5       }, //  ASR Rd, #data5 (dword)     1 1 0 1 1 1 1 0  d d d #data5
- {0,0xd200,0xf300,' ',2,ASR, REG_DATA4       }, //  ASR Rd, #data4             1 1 0 1 S S 1 0  d d d d #data4
+ {0,0xd200,0xf700,' ',2,ASR, REG_DATA4       }, //  ASR Rd, #data4             1 1 0 1 S S 1 0  d d d d #data4
  {1,0xf000,0xff00,' ',2,BCC, REL8            }, //  BCC rel8                   1 1 1 1 0 0 0 0  rel8
  {1,0xf100,0xff00,' ',2,BCS, REL8            }, //  BCS rel8                   1 1 1 1 0 0 0 1  rel8
  {1,0xf300,0xff00,' ',2,BEQ, REL8            }, //  BEQ rel8                   1 1 1 1 0 0 1 1  rel8

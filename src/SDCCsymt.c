@@ -786,7 +786,9 @@ int funcInChain (link *lnk)
 link *structElemType (link *stype, value *id ,value **argsp)
 {
     symbol *fields = (SPEC_STRUCT(stype) ? SPEC_STRUCT(stype)->fields : NULL);
-    
+    link *type, *etype;
+    link *petype = getSpec(stype);
+
     if ( ! fields || ! id)
 	return NULL ;
        
@@ -796,7 +798,10 @@ link *structElemType (link *stype, value *id ,value **argsp)
 	    if (argsp) {
 		*argsp = fields->args;
 	    }
-	    return copyLinkChain (fields->type) ;
+	    type = copyLinkChain (fields->type) ;
+	    etype=getSpec(type);
+	    SPEC_SCLS(etype) = SPEC_SCLS(petype);
+	    return type;
 	}
 	fields = fields->next ;
     }
@@ -833,6 +838,7 @@ int   compStructSize (int su, structdef  *sdef )
     /* for the identifiers  */
     loop = sdef->fields ;
     while ( loop ) {
+	int pbvar =0;
 
 	/* create the internal name for this variable */
 	sprintf (loop->rname,"_%s",loop->name);
@@ -875,9 +881,13 @@ int   compStructSize (int su, structdef  *sdef )
 	if (funcInChain(loop->type)) {
 	    processFuncArgs (loop, 1);
 	}
-
+	pbvar = loop->bitVar;
 	loop = loop->next ;
-
+	/* if this is a bitvar & the previous one was not */
+	if (loop && loop->bitVar && pbvar == 0) {
+		bitOffset = 0;
+		sum++;
+	}
 	/* if this is not a bitfield but the */
 	/* previous one was and did not take */
 	/* the whole byte then pad the rest  */

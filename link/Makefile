@@ -9,3 +9,7 @@ all:
 
 clean:
 	$(MAKE) -C z80 clean
+
+
+# dummy install target to prevent warnings
+install:

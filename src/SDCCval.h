@@ -20,9 +20,10 @@
   You are forbidden to forbid anyone else to use, share and improve
   what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
-#include "SDCCsymt.h"
 #ifndef SDCCVAL_H
 #define SDCCVAL_H
+
+#include "SDCCsymt.h"
 
 /* value wrapper */
 typedef struct value

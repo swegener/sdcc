@@ -1084,14 +1084,11 @@ valMult (value * lval, value * rval)
 
   /* create a new value */
   val = newValue ();
-  val->type = val->etype = newLink (SPECIFIER);
-  SPEC_NOUN (val->type) = (IS_FLOAT (lval->etype) ||
-			   IS_FLOAT (rval->etype) ? V_FLOAT : V_INT);
-  SPEC_SCLS  (val->type) = S_LITERAL;	/* will remain literal */
-  SPEC_LONG  (val->type) = (SPEC_LONG  (lval->etype) | SPEC_LONG  (rval->etype));
-  SPEC_USIGN (val->type) = SPEC_USIGN (computeType (lval->etype,
-						    rval->etype,
-						    TRUE));
+  val->type = val->etype = computeType (lval->etype,
+					rval->etype,
+					TRUE);
+  SPEC_SCLS (val->etype) = S_LITERAL; /* will remain literal */
+
   if (IS_FLOAT (val->type))
     SPEC_CVAL (val->type).v_float = floatFromVal (lval) * floatFromVal (rval);
       /* signed and unsigned mul are the same, as long as the precision of the
@@ -1136,14 +1133,10 @@ valDiv (value * lval, value * rval)
 
   /* create a new value */
   val = newValue ();
-  val->type = val->etype = newLink(SPECIFIER);
-  SPEC_NOUN (val->type) = (IS_FLOAT (lval->etype) ||
-			   IS_FLOAT (rval->etype) ? V_FLOAT : V_INT);
-  SPEC_SCLS (val->etype) = S_LITERAL;
-  SPEC_LONG  (val->type) = (SPEC_LONG  (lval->etype) | SPEC_LONG  (rval->etype));
-  SPEC_USIGN (val->type) = SPEC_USIGN (computeType (lval->etype,
-						    rval->etype,
-						    FALSE));
+  val->type = val->etype = computeType (lval->etype,
+					rval->etype,
+					TRUE);
+  SPEC_SCLS (val->etype) = S_LITERAL; /* will remain literal */
 
   if (IS_FLOAT (val->type))
     SPEC_CVAL (val->type).v_float = floatFromVal (lval) / floatFromVal (rval);
@@ -1177,14 +1170,11 @@ valMod (value * lval, value * rval)
   value *val;
 
   /* create a new value */
-  val = newValue ();
-  val->type = val->etype = newLink (SPECIFIER);
-  SPEC_NOUN (val->type) = V_INT;	/* type is int */
-  SPEC_SCLS (val->type) = S_LITERAL;	/* will remain literal */
-  SPEC_LONG  (val->type) = (SPEC_LONG  (lval->etype) | SPEC_LONG  (rval->etype));
-  SPEC_USIGN (val->type) = SPEC_USIGN (computeType (lval->etype,
-						    rval->etype,
-						    TRUE));
+  val = newValue();
+  val->type = val->etype = computeType (lval->etype,
+					rval->etype,
+					TRUE);
+  SPEC_SCLS (val->etype) = S_LITERAL; /* will remain literal */
 
   if (SPEC_LONG (val->type))
     {
@@ -1216,15 +1206,12 @@ valPlus (value * lval, value * rval)
   value *val;
 
   /* create a new value */
-  val = newValue ();
-  val->type = val->etype = newLink (SPECIFIER);
-  SPEC_NOUN (val->type) = (IS_FLOAT (lval->etype) ||
-			   IS_FLOAT (rval->etype) ? V_FLOAT : V_INT);
-  SPEC_SCLS  (val->type) = S_LITERAL;	/* will remain literal */
-  SPEC_LONG  (val->type) = (SPEC_LONG  (lval->etype) | SPEC_LONG  (rval->etype));
-  SPEC_USIGN (val->type) = SPEC_USIGN (computeType (lval->etype,
-						    rval->etype,
-						    TRUE));
+  val = newValue();
+  val->type = val->etype = computeType (lval->etype,
+					rval->etype,
+					TRUE);
+  SPEC_SCLS (val->etype) = S_LITERAL; /* will remain literal */
+  
   if (IS_FLOAT (val->type))
     SPEC_CVAL (val->type).v_float = floatFromVal (lval) + floatFromVal (rval);
   else  if (SPEC_LONG (val->type))
@@ -1257,15 +1244,12 @@ valMinus (value * lval, value * rval)
   value *val;
 
   /* create a new value */
-  val = newValue ();
-  val->type = val->etype = newLink (SPECIFIER);
-  SPEC_NOUN (val->type) = (IS_FLOAT (lval->etype) ||
-			   IS_FLOAT (rval->etype) ? V_FLOAT : V_INT);
-  SPEC_SCLS (val->type) = S_LITERAL;	/* will remain literal */
-  SPEC_LONG  (val->type) = (SPEC_LONG  (lval->etype) | SPEC_LONG  (rval->etype));
-  SPEC_USIGN (val->type) = SPEC_USIGN (computeType (lval->etype,
-						    rval->etype,
-						    TRUE));
+  val = newValue();
+  val->type = val->etype = computeType (lval->etype,
+					rval->etype,
+					TRUE);
+  SPEC_SCLS (val->etype) = S_LITERAL; /* will remain literal */
+  
   if (IS_FLOAT (val->type))
     SPEC_CVAL (val->type).v_float = floatFromVal (lval) - floatFromVal (rval);
   else  if (SPEC_LONG (val->type))
@@ -1298,14 +1282,12 @@ valShift (value * lval, value * rval, int lr)
   value *val;
 
   /* create a new value */
-  val = newValue ();
-  val->type = val->etype = newIntLink ();
-  SPEC_SCLS (val->type) = S_LITERAL;	/* will remain literal */
-  SPEC_NOUN  (val->etype) = V_INT;
-  /* 'unsigned char' promotes to 'signed int' */
-  if (!IS_CHAR (lval->etype))
-    SPEC_USIGN (val->type) = SPEC_USIGN (lval->etype);
-  SPEC_LONG (val->type) = SPEC_LONG (lval->etype);
+  val = newValue();
+  val->type = val->etype = computeType (lval->etype,
+					NULL,
+					/* promote left shift */
+					lr ? TRUE : FALSE);
+  SPEC_SCLS (val->etype) = S_LITERAL; /* will remain literal */
 
   if (getSize (val->type) * 8 <= (TYPE_UDWORD) floatFromVal (rval) &&
        /* left shift */

@@ -1,3 +1,14 @@
+2004-02-26 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/Makefile.in (dep): include SLIBOBJS in dependency check
+	* src/SDCCast.c (decorateType): catch another small optimization
+	with '?' operator
+	* src/SDCCsymt.c (computeType): added comments and cosmetic changes
+	* src/SDCCval.c (valMult, valDiv, valMod, valPlus, valMinus, valShift):
+	modified to finally use computeType() all over SDCC,
+	see Feature Request #877103
+	* src/SDCCval.h: cosmetic
+
 2004-02-23 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCast.c (decorateType): fixed bug #902362
@@ -15,7 +26,7 @@
 
 	* src/pic16/ralloc.c (packRegsForAccUse):  disabled functions with #if
 	to eliminate build warnings.
-	* src/pic16/gen.c (pic16_popGet): fixed for gcc 2.95.4 
+	* src/pic16/gen.c (pic16_popGet): fixed for gcc 2.95.4
 
 2004-02-20 Vangelis Rokas <vrokas AT otenet.gr>
 	   Hans-Juergen Dorn <hans.dorn AT apl-landau.de>

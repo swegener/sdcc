@@ -37,6 +37,7 @@ else
 OBJECTS		+= SDCClex.o
 endif
 
+SLIBSOURCES	= $(patsubst %.o,$(SLIB)/%.c,$(SLIBOBJS))
 SOURCES		= $(patsubst %.o,%.c,$(OBJECTS))
 
 TARGET		= $(PRJDIR)/bin/sdcc$(EXEEXT)
@@ -85,8 +86,8 @@ installdirs:
 # ---------------------
 dep: Makefile.dep
 
-Makefile.dep: $(SOURCES) $(SPECIAL) *.h $(PRJDIR)/*.h
-	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(SOURCES) >Makefile.dep
+Makefile.dep: $(SOURCES) $(SLIBSOURCES) $(SPECIAL) *.h $(PRJDIR)/*.h
+	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(SOURCES) $(SLIBSOURCES) >Makefile.dep
 
 include Makefile.dep
 include clean.mk

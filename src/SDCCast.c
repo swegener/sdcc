@@ -2288,7 +2288,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
     resultTypeProp = resultTypePropagate (tree, resultType);
 
     if (tree->opval.op == '?')
-      dtl = decorateType (tree->left, RESULT_TYPE_NONE);
+      dtl = decorateType (tree->left, RESULT_TYPE_IFX);
     else
       dtl = decorateType (tree->left, resultTypeProp);
 

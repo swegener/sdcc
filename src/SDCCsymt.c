@@ -1556,25 +1556,57 @@ computeType (sym_link * type1, sym_link * type2, bool promoteCharToInt)
   if (IS_CHAR (reType) && promoteCharToInt)
     SPEC_NOUN (reType) = V_INT;
 
+  /* SDCC's sign promotion:
+     - if one or both operands are unsigned, the resultant type will be unsigned
+       (except char, see below)
+     - if an operand is promoted to a larger type (char -> int, int -> long),
+       the larger type will be signed
+
+     SDCC tries hard to avoid promotion to int and does 8 bit calculation as
+     much as possible. We're leaving ISO IEC 9899 here and have to extrapolate
+     the standard. The standard demands, that the result has to be the same
+     "as if" the promotion would have been performed:
+
+     - if the result of an operation with two char's is promoted to a
+       larger type, the result will be signed.
+
+     More sophisticated is the last one:
+     - if the result of an operation with two char's is a char again,
+       the result will only then be unsigned, if both operands are
+       unsigned. In all other cases the result will be signed.
+
+       This seems to be contradictionary to the first two rules, but it makes
+       real sense (all types are char's):
+
+	A signed char can be negative; this must be preserved in the result
+		-1 * 100 = -100;
+
+	Only if both operands are unsigned it's safe to make the result
+	unsigned; this helps to avoid overflow:
+		2 * 100 =  200;
+
+     Homework: - why is (200 * 200 < 0) true?
+	       - why is { char l = 200, r = 200; (r * l > 0) } true?
+  */
+
   if (!IS_FLOAT (reType)
-      && (   (   SPEC_USIGN (etype1)
-              /* if this operand is promoted to a larger
-		 type don't check it's signedness */
-	      && (getSize (etype1) >= getSize (reType))
-	      /* char has to handled as it would have
-		 been promoted to int */
+      && (   (SPEC_USIGN (etype1)
+              /* if this operand is promoted to a larger type,
+		 then it will be promoted to a signed type */
+	      && !(getSize (etype1) < getSize (reType))
+              /* char require special handling */
 	      && !IS_CHAR (etype1))
-	      /* same for 2nd operand */  
-	  || (   SPEC_USIGN (etype2)
-	      && (getSize (etype2) >= getSize (reType))
+	  || /* same for 2nd operand */  
+	     (SPEC_USIGN (etype2)
+	      && !(getSize (etype2) < getSize (reType))
 	      && !IS_CHAR (etype2))
-	  /* if both are unsigned char and not promoted
-	     let the result be unsigned too */
-	  || (   SPEC_USIGN (etype1)
+	  || /* if both are 'unsigned char' and not promoted
+		let the result be unsigned too */
+	     (   SPEC_USIGN (etype1)
 	      && SPEC_USIGN (etype2)
 	      && IS_CHAR (etype1)
 	      && IS_CHAR (etype2)
-	      && !promoteCharToInt)))
+	      && IS_CHAR (reType))))
     SPEC_USIGN (reType) = 1;
   else
     SPEC_USIGN (reType) = 0;

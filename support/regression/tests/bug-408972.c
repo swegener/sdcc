@@ -11,10 +11,7 @@ long leftShiftLong (long l) {
 
 
 int leftShiftIntMasked (int v) { 
-  /* PENDING: Disabled.
-     return ((v & 0xff00U) << 3); 
-  */
-  return v;
+  return ((v & 0xff00U) << 3); 
 } 
 
 int leftShiftIntMasked2 (int v) { 

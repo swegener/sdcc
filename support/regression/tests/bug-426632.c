@@ -1,12 +1,12 @@
+/* bug-436632.c
+   PENDING
+*/
 #include <testfwk.h>
 
 typedef struct { 
-    unsigned char year; /* Current 
-			 * year (with offset 1900) */ 
-    unsigned char month; /* Month (1 = 
-			  * Jan., ..., 12 = Dec.) */ 
-    unsigned char day; /* Day of 
-			* month (1 to 31) */ 
+    unsigned char year; /* Current year (with offset 1900) */ 
+    unsigned char month; /* Month (1 = Jan., ..., 12 = Dec.) */ 
+    unsigned char day; /* Day of month (1 to 31) */ 
 } DATE_STRUCT; 
 
 unsigned char year; 

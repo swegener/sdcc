@@ -1,3 +1,9 @@
+2004-06-25 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/mcs51/peeph.def: added peepholes 182.d (return 0.0), 
+	256 (range check), 257 (do while), 258.a-f (bit banging 
+	f.e. on 3-wire SPI bus)
+
 2004-06-21 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCClrange.c (findNextUseSym): fixed a live range bug with
@@ -40,7 +46,7 @@
 	* src/pic16/pcode.c (pic16_emitDB): number of DBs emitted is not
 	configurable and set 8
 
-2004-06-07 Vangelis Rokas <vrokas AT otenet.gr>
+2004-06-08 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* .version: increased version number to 2.4.2,
 

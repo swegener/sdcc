@@ -133,7 +133,9 @@ syminit()
 struct sym *
 newsym()
 {
-	register int c, i, nglob;
+  register unsigned i ;
+  register unsigned nglob ;
+	register int c ;
 	struct sym *tsp;
 	struct sym **s;
 	char id[NCPS];

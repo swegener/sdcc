@@ -1,3 +1,4 @@
+void CatchMe() {}
 /*----------------------------------------------------------------------
     SDCCval.c :- has routine to do all kinds of fun stuff with the
                 value wrapper & with initialiser lists.
@@ -225,7 +226,7 @@ valueFromLit (double lit)
       return constVal (buffer);
     }
 
-  sprintf (buffer, "%lf", lit);
+  sprintf (buffer, "%f", lit);
   return constFloatVal (buffer);
 }
 

@@ -1745,6 +1745,9 @@ _saveRegsForCall(iCode *ic, int sendSetSize)
     bool bcInRet = FALSE, deInRet = FALSE;
     bitVect *rInUse;
 
+#if 1
+    rInUse = bitVectCplAnd (bitVectCopy (ic->rMask), ic->rUsed);
+#else
     if (IC_RESULT(ic))
       {
         rInUse = bitVectCplAnd (bitVectCopy (ic->rMask), z80_rUmaskForOp (IC_RESULT(ic)));
@@ -1754,6 +1757,7 @@ _saveRegsForCall(iCode *ic, int sendSetSize)
         /* Has no result, so in use is all of in use */
         rInUse = ic->rMask;
       }
+#endif
 
     deInUse = bitVectBitValue (rInUse, D_IDX) || bitVectBitValue(rInUse, E_IDX);
     bcInUse = bitVectBitValue (rInUse, B_IDX) || bitVectBitValue(rInUse, C_IDX);
@@ -2026,6 +2030,8 @@ emitCall (iCode * ic, bool ispcall)
 {
   sym_link *detype = getSpec (operandType (IC_LEFT (ic)));
 
+  bitVect *rInUse = bitVectCplAnd (bitVectCopy (ic->rMask), ic->rUsed);
+
   /* if caller saves & we have not saved then */
   if (!ic->regsSaved)
     {
@@ -2193,13 +2199,55 @@ emitCall (iCode * ic, bool ispcall)
 
   if (_G.stack.pushedDE) 
     {
-      _pop(PAIR_DE);
+      bool dInUse = bitVectBitValue(rInUse, D_IDX);
+      bool eInUse = bitVectBitValue(rInUse, E_IDX);
+
+      if (dInUse && eInUse) 
+        {
+          _pop (PAIR_DE);
+        }
+      else if (dInUse)
+        {
+          _pop(PAIR_HL);
+          emit2 ("ld d,h");
+        }
+      else if (eInUse)
+        {
+          _pop(PAIR_HL);
+          emit2 ("ld e,l");
+        }
+      else
+        {
+          wassertl (0, "Neither D or E were in use but it was pushed.");
+        }
       _G.stack.pushedDE = FALSE;
     }
   
   if (_G.stack.pushedBC) 
     {
-      _pop(PAIR_BC);
+      bool bInUse = bitVectBitValue(rInUse, B_IDX);
+      bool cInUse = bitVectBitValue(rInUse, C_IDX);
+
+      // If both B and C are used in the return value, then we won't get
+      // here.
+      if (bInUse && cInUse) 
+        {
+          _pop (PAIR_BC);
+        }
+      else if (bInUse)
+        {
+          _pop(PAIR_HL);
+          emit2 ("ld b,h");
+        }
+      else if (cInUse)
+        {
+          _pop(PAIR_HL);
+          emit2 ("ld c,l");
+        }
+      else
+        {
+          wassertl (0, "Neither B or C were in use but it was pushed.");
+        }
       _G.stack.pushedBC = FALSE;
     }
 }
@@ -3145,7 +3193,7 @@ genCmp (operand * left, operand * right,
 	     If the left or the right is a lit:
 	     Load -lit into HL, add to right via, check sense.
 	   */
-	  if (size == 2 && (AOP_TYPE (right) == AOP_LIT || AOP_TYPE (left) == AOP_LIT))
+	  if (IS_GB && size == 2 && (AOP_TYPE (right) == AOP_LIT || AOP_TYPE (left) == AOP_LIT))
 	    {
 	      PAIR_ID id = PAIR_DE;
 	      asmop *lit = AOP (right);

@@ -9,10 +9,11 @@
 #include "common.h"
 #include "asm.h"
 
-#if defined __MINGW32__
+#ifdef _WIN32
    // for O_BINARY in _pipe()
 #  include <fcntl.h>
-#elif !defined(__BORLANDC__) && !defined(_MSC_VER)
+#  include <io.h>
+#else
    // for pipe and close
 #  include <unistd.h>
 #endif
@@ -266,12 +267,16 @@ char *printILine (iCode *ic) {
   int filedes[2];
   FILE *pipeStream;
   iCodeTable *icTab=getTableEntry(ic->op);
-  
-#if defined __MINGW32__
-  assert(_pipe(filedes, 256, O_BINARY)!=-1); // forget it
+  int res;
+
+#ifdef _WIN32
+  res = _pipe(filedes, 256, O_BINARY);
 #else
-  assert(pipe(filedes)!=-1); // forget it
+  res = pipe(filedes);
 #endif
+  assert(res != -1); // forget it
+  if (res == -1)
+    return "";  // return empty line if pipe creation failed
 
   // stuff the pipe with the readable icode
   pipeStream=fdopen(filedes[1],"w");

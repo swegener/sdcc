@@ -116,7 +116,8 @@ Sandeep Dutta
 
 \end_inset 
 
-, etc), Zilog Z80 based MCUs, and the Dallas DS80C390 variant.
+, etc), Dallas DS80C390 variants, Motorola HC08 and Zilog Z80 based MCUs
+ .
  It can be retargetted for other microprocessors, support for Microchip
  PIC, Atmel AVR is under development.
  The entire source code for the compiler is distributed under GPL.
@@ -640,7 +641,7 @@ status Collapsed
 /
 \end_inset 
 
--z80-port Excludes the z80 port
+-disable-z80-port Excludes the z80 port
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -669,6 +670,20 @@ status Collapsed
 \end_inset 
 
 -disable-ds390-port Excludes the DS390 port
+\layout List
+\labelwidthstring 00.00.0000
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-disable-hc08-port Excludes the HC08 port
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -776,7 +791,7 @@ The names of the standard libraries STD_LIB, STD_INT_LIB, STD_LONG_LIB,
  STD_FP_LIB, STD_DS390_LIB, STD_XA51_LIB and the environment variables SDCC_DIR_
 NAME, SDCC_INCLUDE_NAME, SDCC_LIB_NAME are defined by `configure` too.
  At the moment it's not possible to change the default settings (it was
- simply never required.
+ simply never required).
 \newline 
 
 \newline 
@@ -3390,8 +3405,13 @@ This documentation is in some aspects different from a commercial documentation:
 
 It tries to document SDCC for several processor architectures in one document
  (commercially these probably would be separate documents/products).
- This document currently matches SDCC for mcs51 and DS390 best and does
- give too few information about f.e.
+ This document
+\begin_inset LatexCommand \index{Status of documentation}
+
+\end_inset 
+
+ currently matches SDCC for mcs51 and DS390 best and does give too few informati
+on about f.e.
  Z80 and PIC.
 \layout Itemize
 
@@ -3407,8 +3427,23 @@ There are many references pointing away from this documentation.
 \begin_inset Quotes sld
 \end_inset 
 
-some processors which are targetted by SDCC can be implemented in a field
- programmable array
+some processors which are targetted by SDCC can be implemented in a 
+\emph on 
+f
+\emph default 
+ield 
+\emph on 
+p
+\emph default 
+rogrammable 
+\emph on 
+g
+\emph default 
+ate 
+\emph on 
+a
+\emph default 
+rray
 \begin_inset LatexCommand \index{fpga (field programmable array)}
 
 \end_inset 
@@ -4503,6 +4538,24 @@ Processor Selection Options
 \end_inset 
 
  processor.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-mhc08
+\begin_inset LatexCommand \index{-mhc08}
+
+\end_inset 
+
+
+\series default 
+ Generate code for the Motorola HC08
+\begin_inset LatexCommand \index{HC08}
+
+\end_inset 
+
+ family of processors (added Oct 2003).
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -7351,7 +7404,12 @@ Paged xdata access is currently not as straightforward as using the other
  The following example writes 0x01 to the address pointed to.
  Please note, pdata access physically accesses xdata memory.
  The high byte of the address is determined by port P2 (or in case of some
- 8051 variants by a separate Special Function Register).
+ 8051 variants by a separate Special Function Register, see section
+\begin_inset LatexCommand \ref{sub:MCS51-variants}
+
+\end_inset 
+
+).
 \layout Verse
 
 
@@ -8755,11 +8813,12 @@ about Overlaying and section
 
 \SpecialChar ~
 about Functions using private banks.
-\newline 
-
 \layout Subsection
 
-Critical Functions
+Enabling and Disabling Interrupts
+\layout Subsubsection
+
+Critical Functions and Critical Statements
 \layout Standard
 
 A special keyword may be associated with a function declaring it as 
@@ -8774,8 +8833,7 @@ critical
 
  upon entry to a critical function and restore the interrupt enable to the
  previous state before returning.
- Note that nesting critical functions will need one additional byte on the
- stack
+ Nesting critical functions will need one additional byte on the stack
 \begin_inset LatexCommand \index{stack}
 
 \end_inset 
@@ -8814,6 +8872,102 @@ int foo () critical
 The critical attribute maybe used with other attributes like 
 \emph on 
 reentrant.
+\emph default 
+
+\newline 
+The keyword 
+\emph on 
+critical
+\emph default 
+ may also be used to disable interrupts more locally:
+\layout Verse
+
+
+\family typewriter 
+critical{ i++; }
+\layout Standard
+
+More than one statement could have been included in the block.
+\layout Subsubsection
+
+Enabling and Disabling Interrupts directly
+\layout Standard
+
+Interrupts
+\begin_inset LatexCommand \index{interrupt}
+
+\end_inset 
+
+ can also be disabled and enabled directly (8051):
+\layout Verse
+
+
+\family typewriter 
+EA = 0;
+\layout Verse
+
+
+\family typewriter 
+...
+\layout Verse
+
+
+\family typewriter 
+EA = 1;
+\layout Standard
+
+Note: it is sometimes sufficient to disable only a specific interrupt source
+ like f.e.
+ a timer or serial interrupt by manipulating an 
+\emph on 
+interrupt mask
+\begin_inset LatexCommand \index{interrupt mask}
+
+\end_inset 
+
+
+\emph default 
+ register.
+ Usually the time during which interrupts are disabled should be kept as
+ short as possible.
+ This minimizes both 
+\emph on 
+interrupt latency
+\emph default 
+
+\begin_inset LatexCommand \index{interrupt latency}
+
+\end_inset 
+
+ (the time between the occurrence of the interrupt and the execution of
+ the first code in the interrupt routine) and 
+\emph on 
+interrupt jitter
+\emph default 
+
+\begin_inset LatexCommand \index{interrupt jitter}
+
+\end_inset 
+
+ (the difference between the shortest and the longest interrupt latency).
+\layout Standard
+
+You can reenable interrupts within an interrupt routine and on some architecture
+s you can make use of two (or more) levels of 
+\emph on 
+interrupt priorities
+\emph default 
+
+\begin_inset LatexCommand \index{interrupt priority}
+
+\end_inset 
+
+.
+ On architectures which don't support interrupt priorities these can be
+ implemented by manipulating the interrupt mask and reenabling interrupts
+ within the interrupt routine.
+ Don't add complexity unless you have to.
+ 
 \layout Subsection
 
 Functions using private banks
@@ -9418,7 +9572,7 @@ xrl\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-; we could do an ANL a,#0x0f here to use a smaller buffer
+; we could do an ANL a,#0x0f here to use a smaller buffer (see below)
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -9516,7 +9670,7 @@ _head
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-;
+; we could do an ANL _head,#0x0f here to use a smaller buffer (see above)
 \newline 
 t_b_end$:
 \newline 
@@ -10231,7 +10385,7 @@ _asm_func_PARM_2:
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-.ds     1 
+.ds    1 
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -16638,8 +16792,8 @@ If you have ported some library or want to share experience about some code
 \end_inset 
 
 C, CAN, Ethernet, Profibus, Modbus, USB, SPI, JTAG ...), Media (IDE, Memory
- cards, eeprom, flash...), En-/Decryption, remote debugging, Keyboard, LCD,
- RTC, FPGA, PID then the sdcc-user mailing list 
+ cards, eeprom, flash...), En-/Decryption, Remote debugging, Realtime kernel,
+ Keyboard, LCD, RTC, FPGA, PID then the sdcc-user mailing list 
 \begin_inset LatexCommand \url{http://sourceforge.net/mail/?group_id=599}
 
 \end_inset 
@@ -16960,7 +17114,12 @@ MCS51 processors are available from many vendors and come in many different
  
 \layout Subsubsection*
 
-pdata access by SFR 
+pdata access by SFR
+\begin_inset LatexCommand \index{sfr}
+
+\end_inset 
+
+ 
 \layout Standard
 
 With the upcome of devices with internal xdata and flash memory devices
@@ -17026,6 +17185,8 @@ regressions tests
 \emph default 
  as MCS51 and DS390 ports, so floating point support, support for long variables
  and bitfield support is fine.
+ See mailing lists and forums about interrupt routines and access to I/O
+ memory.
 \layout Standard
 
 As always, the code is the authoritative reference - see z80/ralloc.c and
@@ -17037,6 +17198,17 @@ As always, the code is the authoritative reference - see z80/ralloc.c and
  Return values are stored in HL.
  One bad side effect of using IX as the base pointer is that a functions
  stack frame is limited to 127 bytes - this will be fixed in a later version.
+\layout Subsubsection
+
+The HC08 port
+\layout Standard
+
+The port to the Motorola HC08
+\begin_inset LatexCommand \index{HC08}
+
+\end_inset 
+
+ family has been added in October 2003, thank you Erik!
 \layout Subsection
 
 Retargetting for other MCUs.

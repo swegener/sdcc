@@ -3528,7 +3528,17 @@ static void destructpCodeFlow(pCode *pc)
   deleteSet(&PCFL(pc)->registers);
   deleteSet(&PCFL(pc)->from);
   deleteSet(&PCFL(pc)->to);
-  free(pc);
+
+  /* Instead of deleting the memory used by this pCode, mark
+   * the object as bad so that if there's a pointer to this pCode
+   * dangling around somewhere then (hopefully) when the type is
+   * checked we'll catch it.
+   */
+
+  pc->type = PC_BAD;
+  pic16_addpCode2pBlock(pb_dead_pcodes, pc);
+
+//  free(pc);
 
 }
 
@@ -3671,7 +3681,16 @@ static void pCodeLabelDestruct(pCode *pc)
   if((pc->type == PC_LABEL) && PCL(pc)->label)
     free(PCL(pc)->label);
 
-  free(pc);
+  /* Instead of deleting the memory used by this pCode, mark
+   * the object as bad so that if there's a pointer to this pCode
+   * dangling around somewhere then (hopefully) when the type is
+   * checked we'll catch it.
+   */
+
+  pc->type = PC_BAD;
+  pic16_addpCode2pBlock(pb_dead_pcodes, pc);
+
+//  free(pc);
 
 }
 
@@ -4401,15 +4420,13 @@ static void genericDestruct(pCode *pc)
    */
 
   pc->type = PC_BAD;
-
   pic16_addpCode2pBlock(pb_dead_pcodes, pc);
 
   //free(pc);
-
 }
 
 
-
+void DEBUGpic16_emitcode (char *inst,char *fmt, ...);
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 /* modifiers for constant immediate */

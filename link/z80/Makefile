@@ -27,7 +27,7 @@ clean:
 	rm -rf $(OBJS) $(BINS) $(OBJDIR)
 
 _link-z80:
-	$(MAKE) EXT=-z80$(E)
+	$(MAKE) EXT=-z80$(E) PORT=z80
 
 _link-gbz80:
-	$(MAKE) EXT=-gbz80$(E)
+	$(MAKE) EXT=-gbz80$(E) OPTS=-DGAMEBOY PORT=z80

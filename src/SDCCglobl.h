@@ -233,6 +233,7 @@ struct options
   };
 
 /* forward definition for variables accessed globally */
+extern char *yytext;
 extern char *currFname;
 extern char *srcFileName;	/* source file name without the extenstion */
 extern char *moduleName;	/* source file name without path & extension */

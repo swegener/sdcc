@@ -167,7 +167,7 @@ function_definition
 
 using_reentrant
    : using_reentrant_interrupt
-   | using_reentrant_interrupt using_reentrant { $$ = mergeSpec($1,$2); }
+   | using_reentrant_interrupt using_reentrant { $$ = mergeSpec($1,$2,"using_reentrant"); }
    ;
 
 using_reentrant_interrupt
@@ -480,11 +480,11 @@ declaration_specifiers
        sym_link *lnk = $2 ;
        while (lnk && !IS_SPEC(lnk->next))
 	 lnk = lnk->next;
-       lnk->next = mergeSpec($1,lnk->next);
+       lnk->next = mergeSpec($1,lnk->next, yytext);
        $$ = $2 ;
      }
      else
-       $$ = mergeSpec($1,$2); 
+       $$ = mergeSpec($1,$2, yytext);
    }
    | type_specifier				    { $$ = $1; }
    | type_specifier declaration_specifiers          { 
@@ -494,11 +494,11 @@ declaration_specifiers
        sym_link *lnk = $2 ;
        while (lnk && !IS_SPEC(lnk->next))
 	 lnk = lnk->next;
-       lnk->next = mergeSpec($1,lnk->next);
+       lnk->next = mergeSpec($1,lnk->next, yytext);
        $$ = $2 ;
      }
      else
-       $$ = mergeSpec($1,$2); 
+       $$ = mergeSpec($1,$2, yytext);
    }
    ;
 
@@ -996,7 +996,7 @@ far_near
 
 type_specifier_list
    : type_specifier
-   | type_specifier_list type_specifier         {  $$ = mergeSpec ($1,$2); }
+   | type_specifier_list type_specifier         {  $$ = mergeSpec ($1,$2, "type_specifier_list"); }
    ;
 
 parameter_identifier_list

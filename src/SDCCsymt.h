@@ -403,7 +403,7 @@ sym_link *newLink ();
 sym_link *newFloatLink ();
 structdef *newStruct (char *);
 void addDecl (symbol *, int, sym_link *);
-sym_link *mergeSpec (sym_link *, sym_link *);
+sym_link *mergeSpec (sym_link *, sym_link *, char *name);
 sym_link *cloneSpec (sym_link *);
 symbol *reverseSyms (symbol *);
 sym_link *reverseLink (sym_link *);

@@ -412,7 +412,7 @@ addDecl (symbol * sym, int type, sym_link * p)
     {
       if (IS_SPEC (sym->etype) && IS_SPEC (head) && head == tail)
 	{
-	  sym->etype = mergeSpec (sym->etype, head);
+	  sym->etype = mergeSpec (sym->etype, head, sym->name);
 	}
       else
 	{
@@ -525,8 +525,12 @@ void checkTypeSanity(sym_link *etype, char *name) {
 /* mergeSpec - merges two specifiers and returns the new one        */
 /*------------------------------------------------------------------*/
 sym_link *
-mergeSpec (sym_link * dest, sym_link * src)
+mergeSpec (sym_link * dest, sym_link * src, char *name)
 {
+
+  if (getenv("DEBUG_mergeSpec")) {
+    fprintf (stderr, "mergeSpec: \"%s\"\n", name);
+  }
 
   if (SPEC_NOUN(src)) {
     if (!SPEC_NOUN(dest)) {
@@ -536,7 +540,7 @@ mergeSpec (sym_link * dest, sym_link * src)
       if (getenv("DEBUG_SANITY")) {
 	fprintf (stderr, "mergeSpec: ");
       }
-      werror(E_TWO_OR_MORE_DATA_TYPES, yylval.yychar);
+      werror(E_TWO_OR_MORE_DATA_TYPES, name);
     }
   }
   
@@ -548,7 +552,7 @@ mergeSpec (sym_link * dest, sym_link * src)
       if (getenv("DEBUG_SANITY")) {
 	fprintf (stderr, "mergeSpec: ");
       }
-      werror(E_TWO_OR_MORE_STORAGE_CLASSES, yylval.yychar);
+      werror(E_TWO_OR_MORE_STORAGE_CLASSES, name);
     }
   }
 

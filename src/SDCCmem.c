@@ -563,8 +563,9 @@ deallocParms (value * val)
       if (!lval->sym->isref)
 	{
 	  lval->sym->allocreq = 0;
-	  werror (W_NO_REFERENCE, currFunc->name,
-		  "function argument", lval->sym->name);
+	    werror (W_NO_REFERENCE, 
+		    currFunc ? currFunc->name : "(unknown)",
+		    "function argument", lval->sym->name);
 	}
 
       /* move the rname if any to the name for both val & sym */
@@ -741,7 +742,8 @@ deallocLocal (symbol * csym)
 	}
       /* if not used give a warning */
       if (!sym->isref && !IS_STATIC (sym->etype))
-	werror (W_NO_REFERENCE, currFunc->name,
+	werror (W_NO_REFERENCE, 
+		currFunc ? currFunc->name : "(unknown)",
 		"local variable", sym->name);
       /* now delete it from the symbol table */
       deleteSym (SymbolTab, sym, sym->name);

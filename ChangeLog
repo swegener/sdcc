@@ -1,3 +1,7 @@
+2003-07-18  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/z80/gen.c: fixed some right shift bugs (#772726 among them)
+
 2003-07-17  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
     * link/z80/lklibr.c: fixed bug when there is a '.' in a library path.

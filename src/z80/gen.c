@@ -5965,13 +5965,16 @@ genRightShift (iCode * ic)
       return;
     }
 
+  emit2 ("ld a,%s", aopGet (AOP (right), 0, FALSE));
+  emit2 ("inc a");
+  freeAsmop (right, NULL, ic);
+
   aopOp (left, ic, FALSE, FALSE);
   aopOp (result, ic, FALSE, FALSE);
 
   /* now move the left to the result if they are not the
      same */
-  if (!sameRegs (AOP (left), AOP (result)) &&
-      AOP_SIZE (result) > 1)
+  if (!sameRegs (AOP (left), AOP (result)))
     {
 
       size = AOP_SIZE (result);
@@ -5983,10 +5986,6 @@ genRightShift (iCode * ic)
 	  offset++;
 	}
     }
-
-  emit2 ("ld a,%s", aopGet (AOP (right), 0, FALSE));
-  emit2 ("inc a");
-  freeAsmop (right, NULL, ic);
 
   tlbl = newiTempLabel (NULL);
   tlbl1 = newiTempLabel (NULL);

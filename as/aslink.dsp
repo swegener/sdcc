@@ -32,13 +32,13 @@ RSC=rc.exe
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "msc51\Debug"
-# PROP BASE Intermediate_Dir "msc51\Debug"
+# PROP BASE Output_Dir "mcs51\Debug"
+# PROP BASE Intermediate_Dir "mcs51\Debug"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir "msc51\Debug"
-# PROP Intermediate_Dir "msc51\Debug"
+# PROP Output_Dir "mcs51\Debug"
+# PROP Intermediate_Dir "mcs51\Debug"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "INDEXLIB" /D "MLH_MAP" /D "SDK" /FR /FD /GZ /c

@@ -1100,4 +1100,5 @@ printAllocInfo (symbol * func, FILE * of)
   printAllocInfoSeg (idata, func, of);
   printAllocInfoSeg (sfr, func, of);
   printAllocInfoSeg (sfrbit, func, of);
+  fprintf (of, ";------------------------------------------------------------\n");
 }

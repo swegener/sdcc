@@ -154,9 +154,8 @@ aopLiteral (value * val, int offset)
 static void 
 emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 {
-  symbol *sym, *symIval;
+  symbol *sym;
   ast *ival = NULL;
-  memmap *segment;
 
   if (!map)
     return;
@@ -242,10 +241,8 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	  sprintf (newSym->rname,"__xinit_%s", sym->rname);
 	  SPEC_CONST(newSym->etype)=1;
 	  SPEC_STAT(newSym->etype)=1;
-	  //addSym (SymbolTab, newSym, newSym->name, 0, 0, 1);
-	  if (!IS_AGGREGATE(sym->type)) {
-	    resolveIvalSym(newSym->ival);
-	  }
+	  resolveIvalSym(newSym->ival);
+
 	  // add it to the "XINIT (CODE)" segment
 	  addSet(&xinit->syms, newSym);
 	  sym->ival=NULL;
@@ -275,18 +272,6 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	    allocInfo = 1;
 	  }
 	}	  
-
-	/* if the ival is a symbol assigned to an aggregate,
-	   (bug #458099 -> #462479)
-	   we don't need it anymore, so delete it from its segment */
-	if (sym->ival && sym->ival->type == INIT_NODE &&
-	    IS_AST_SYM_VALUE(sym->ival->init.node) &&
-	    IS_AGGREGATE (sym->type) ) {
-	  symIval=AST_SYMBOL(sym->ival->init.node);
-	  segment = SPEC_OCLS (symIval->etype);
-	  deleteSetItem (&segment->syms, symIval);
-	}
-	
 	sym->ival = NULL;
       }
 

@@ -950,6 +950,13 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr)
 			       newNode ('[', sym,
 				   newAst_VALUE (valueFromLit ((float) i))),
 			       newAst_VALUE (valueFromLit (*s))));
+
+      // now we don't need iexpr's symbol anymore
+      {
+	symbol *sym=AST_SYMBOL(iexpr);
+	memmap *segment=SPEC_OCLS(sym->etype);
+	deleteSetItem(&segment->syms, sym);
+      }
       return decorateType (resolveSymbols (rast));
     }
 

@@ -3085,7 +3085,8 @@ genRet (iCode * ic)
 
   /* we have something to return then
      move the return value into place */
-  aopOp (IC_LEFT (ic), ic, FALSE, TRUE);
+  aopOp (IC_LEFT (ic), ic, FALSE, 
+	 (IS_SYMOP(IC_LEFT(ic)) && OP_SYMBOL(IC_LEFT(ic))->ruonly ? FALSE :TRUE));
   size = AOP_SIZE (IC_LEFT (ic));
 
   _startLazyDPSEvaluation ();

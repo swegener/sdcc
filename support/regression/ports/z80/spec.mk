@@ -3,7 +3,7 @@
 
 RRZ80 = $(SDCC_EXTRA_DIR)/emu/rrz80/rrz80
 
-SDCCFLAGS += --lesspedantic --profile
+SDCCFLAGS += --lesspedantic --profile -DREENTRANT= -DGENERIC= --dumpall
 
 EXEEXT = .bin
 
@@ -23,6 +23,9 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
 
 %$(OBJEXT): %.s
 	../../bin/as-z80 -plosgff $@ $<
+
+%$(OBJEXT): %.c
+	$(SDCC) $(SDCCFLAGS) -c $<
 
 # PENDING: Path to sdcc-extra
 %.out: %$(EXEEXT)

@@ -72,6 +72,10 @@ test-ports:
 test-z80:
 	$(MAKE) inter-port-clean test-port PORT=z80
 
+# Helper rule for testing the mcs51 small model port only
+test-mcs51:
+	$(MAKE) inter-port-clean test-port PORT=mcs51
+
 # Helper rule for testing the host cc only
 test-host:
 	$(MAKE) inter-port-clean clean test-port PORT=host
@@ -109,7 +113,7 @@ ifdef PORT
 include $(PORTS_DIR)/$(PORT)/spec.mk
 endif
 
-SDCCFLAGS += -Ifwk/include
+SDCCFLAGS += -Ifwk/include -Itests
 
 # List of intermediate files to keep.  Pretty much keep everything as
 # disk space is free.

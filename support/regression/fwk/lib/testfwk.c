@@ -9,6 +9,7 @@
 #define BROKEN_DIV_MOD		1
 
 void _putchar(char c);
+void _exitEmu(void);
 
 #if BROKEN_DIV_MOD
 int __div(int num, int denom)
@@ -56,7 +57,7 @@ static void _printn(int n)
     _putchar('0' + rem);
 }
 
-void __printf(const char *szFormat, ...)
+void __printf(const char *szFormat, ...) REENTRANT
 {
     va_list ap;
     va_start(ap, szFormat);
@@ -65,7 +66,7 @@ void __printf(const char *szFormat, ...)
         if (*szFormat == '%') {
             switch (*++szFormat) {
             case 's': {
-                const char *sz = va_arg(ap, const char *);
+                char GENERIC *sz = va_arg(ap, char GENERIC *);
                 while (*sz) {
                     _putchar(*sz++);
                 }
@@ -123,5 +124,5 @@ main(void)
            __numFailures, __numTests, numCases
            );
 
-    return __numFailures;
+    _exitEmu();
 }

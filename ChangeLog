@@ -1,3 +1,8 @@
+2004-04-30 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* as/hc08/m08pst.c,
+	* src/SDCCglue.c: sdccopt works for the hc08 port now
+
 2004-04-27 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCicode.c (geniCodePreInc, geniCodePreDec): fixed bug #942130

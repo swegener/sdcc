@@ -1656,7 +1656,7 @@ glue (void)
     if(options.parms_in_bank1) fprintf (asmFile, " --parms-in-bank1");
     fprintf (asmFile, "\n");
   }
-  else if(TARGET_IS_Z80 || TARGET_IS_GBZ80 )
+  else if(TARGET_IS_Z80 || TARGET_IS_GBZ80 || TARGET_IS_HC08)
   {
     fprintf (asmFile, "\t.optsdcc -m%s\n", port->target);
   }

@@ -78,7 +78,7 @@ newAst_ (unsigned type)
   ex = Safe_alloc ( sizeof (ast));
 
   ex->type = type;
-  ex->lineno = (noLineno ? oldLineno : yylineno);
+  ex->lineno = (noLineno ? oldLineno : mylineno);
   ex->filename = currFname;
   ex->level = NestLevel;
   ex->block = currBlockno;
@@ -4314,7 +4314,7 @@ createFunction (symbol * name, ast * body)
       addSymChain (name);
       allocVariables (name);
     }
-  name->lastLine = yylineno;
+  name->lastLine = mylineno;
   currFunc = name;
 
   /* set the stack pointer */

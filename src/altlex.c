@@ -47,7 +47,7 @@ extern char *filename;
 
 FILE *yyin;
 
-int yylineno;
+int mylineno;
 char *currFname;
 char *yytext;
 
@@ -292,8 +292,8 @@ handle_line (void)
   if (line[0] == '\0')
     error ("Error in number in #line");
   /* This is weird but cpp seems to add an extra three to the line no */
-  yylineno = atoi (line) - 3;
-  lineno = yylineno;
+  mylineno = atoi (line) - 3;
+  lineno = mylineno;
   /* Fetch the filename if there is one */
   while (c == '\t' || c == ' ')
     c = GETC ();
@@ -325,8 +325,8 @@ static INLINE int
 check_newline (void)
 {
   int c;
-  yylineno++;
-  lineno = yylineno;
+  mylineno++;
+  lineno = mylineno;
 
   /* Skip any leading white space */
   c = GETC ();

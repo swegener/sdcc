@@ -1,3 +1,13 @@
+2003-05-19  Bernhard Held <bernhard@bernhardheld.de>
+
+	Applied patch from bug 737905 (renamed yylineo to mylineno):
+	* src/altlex.c
+	* src/SDCCast.c
+	* src/SDCglobl.h
+	* src/SDCC.lex
+	* src/SDCCsymt.c
+	* src/SDCCval.c	
+
 2003-05-19  Scott Dattalo  <scott@dattalo.com>
 
 	* src/pic16/pcode.c: Cleaned warnings

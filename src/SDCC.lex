@@ -22,6 +22,8 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
+%option noyywrap
+
 D        [0-9]
 L        [a-zA-Z_]
 H        [a-fA-F0-9]
@@ -42,15 +44,33 @@ char *currFname;
 
 extern int lineno, column;
 extern char *filename ;
-int   yylineno = 1               ;
+int   mylineno = 1               ;
 void count()                     ;
 int process_pragma(char *);
 #undef yywrap
+
+#ifndef YYPROTO
+
+#ifdef YY_USE_PROTOS
+#define YY_PROTO(proto) proto
+#else
+#define YY_PROTO(proto) ()
+#endif
+
+#endif
 
 int yywrap YY_PROTO((void))
 {
    return(1);
 }
+
+static void yyunput (int, char *);
+
+static void my_unput(char c)
+{
+  yyunput(c, (yytext_ptr));
+}
+
 #define TKEYWORD(token) return (isTargetKeyword(yytext) ? token :\
 			        check_type(yytext))
 char *asmbuff=NULL;
@@ -64,6 +84,7 @@ extern int printListing		(int   );
 struct optimize save_optimize ;
 struct options  save_options  ;
 %}
+
 %x asm
 %%
 "_asm"         {  
@@ -224,7 +245,7 @@ struct options  save_options  ;
   if (ch!='\n') {
     // that could have been removed by the preprocessor anyway
     werror (W_STRAY_BACKSLASH, column);
-    unput(ch);
+    my_unput(ch);
   }
 }
 .			   { count()	; }
@@ -257,7 +278,7 @@ int checkCurrFile ( char *s)
     /* set the current line number to   */
     /* line number if printFlag is on   */
     if (!*s) {		
-      lineno = yylineno = lNum ;
+      lineno = mylineno = lNum ;
       return 0;
     }
     
@@ -269,7 +290,7 @@ int checkCurrFile ( char *s)
     /* in c1mode fullSrcFileName is NULL */
     if ( fullSrcFileName &&
          strncmp(s,fullSrcFileName,strlen(fullSrcFileName)) == 0) {
-      lineno = yylineno = lNum;					
+      lineno = mylineno = lNum;					
       currFname = fullSrcFileName ;
     }  else {
 	char *sb = s;
@@ -277,7 +298,7 @@ int checkCurrFile ( char *s)
 	while (*s != '"') s++;
 	*s = '\0';
 	currFname = strdup (sb);
-	lineno = yylineno = lNum;
+	lineno = mylineno = lNum;
     }
     filename = currFname ;
     return 0;
@@ -292,7 +313,7 @@ void count()
   for (i = 0; yytext[i] != '\0'; i++)   {				
     if (yytext[i] == '\n')      {         
       column = 0;
-      lineno = ++yylineno ;
+      lineno = ++mylineno ;
     }
     else 
       if (yytext[i] == '\t')
@@ -344,7 +365,7 @@ char *stringLiteral()
       ch = input();
       if (ch == '\n') {
         /* \<newline> is a continuator */
-        lineno = ++yylineno;
+        lineno = ++mylineno;
         column = 0;
       }
       else {
@@ -358,7 +379,7 @@ char *stringLiteral()
       /* if new line we have a new line break, which is illegal */
       werror(W_NEWLINE_IN_STRING);
       dbuf_append(&dbuf, "\n", 1);
-      lineno = ++yylineno;
+      lineno = ++mylineno;
       column = 0;
       break;
 
@@ -372,16 +393,16 @@ char *stringLiteral()
         case '\\':
           if ((ch = input()) != '\n') {
             werror(W_STRAY_BACKSLASH, column);
-            unput(ch);
+            my_unput(ch);
           }
           else {
-            lineno = ++yylineno;
+            lineno = ++mylineno;
             column = 0;
           }
           break;
 
         case '\n':
-          yylineno++;
+          mylineno++;
           break;
         }
       }
@@ -390,7 +411,7 @@ char *stringLiteral()
         goto out;
 
       if (ch != '\"') {
-        unput(ch) ;
+        my_unput(ch) ;
         goto out;
       }
       break;
@@ -607,9 +628,9 @@ int yyerror(char *s)
 {
    fflush(stdout);
 
-   if (yylineno && filename) {
+   if (mylineno && filename) {
      fprintf(stdout,"\n%s:%d: %s: token -> '%s' ; column %d\n",
-	     filename,yylineno,
+	     filename,mylineno,
 	     s,yytext,column);
      fatalError++;
    } else {

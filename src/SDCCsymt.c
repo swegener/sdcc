@@ -290,7 +290,7 @@ newSymbol (char *name, int scope)
   strncpyz (sym->name, name, sizeof(sym->name));	/* copy the name */
   sym->level = scope;		/* set the level    */
   sym->block = currBlockno;
-  sym->lineDef = yylineno;	/* set the line number */
+  sym->lineDef = mylineno;	/* set the line number */
   return sym;
 }
 

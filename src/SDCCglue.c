@@ -299,7 +299,21 @@ value *initPointer (initList *ilist)
 	    expr->left->opval.op == PTR_OP &&
 	    IS_ADDRESS_OF_OP(expr->left->left))
 		return valForStructElem(expr->left->left->left,
-					expr->left->right);	
+					expr->left->right);
+
+    }
+    /* case 3. (((char *) &a) +/- constant) */
+    if (IS_AST_OP(expr) && 
+	(expr->opval.op == '+' || expr->opval.op == '-') &&
+	IS_AST_OP(expr->left) && expr->left->opval.op == CAST &&
+	IS_AST_OP(expr->left->right) && 
+	expr->left->right->opval.op == '&' &&
+	IS_AST_LIT_VALUE(expr->right)) {
+	
+	return valForCastAggr(expr->left->right->left,
+			      expr->left->left->opval.lnk,
+			      expr->right,expr->opval.op);
+	
     }
 
  wrong:    

@@ -1290,3 +1290,25 @@ value *valForStructElem(ast *structT, ast *elemT)
     val->etype = getSpec(val->type);
     return val; 
 }
+
+/*-----------------------------------------------------------------*/
+/* valForCastAggr - will return value for a cast of an aggregate   */
+/*                  plus minus a constant                          */
+/*-----------------------------------------------------------------*/
+value *valForCastAggr (ast *aexpr, link *type, ast *cnst, int op)
+{
+    value *val;
+
+    if (!IS_AST_SYM_VALUE(aexpr)) return NULL;
+    if (!IS_AST_LIT_VALUE(cnst)) return NULL;
+
+    val = newValue();
+
+    sprintf(val->name,"(%s %c %d)",
+	   AST_SYMBOL(aexpr)->rname, op,
+	   getSize(type->next)*(int)AST_LIT_VALUE(cnst));
+
+    val->type = type;
+    val->etype = getSpec(val->type);
+    return val;
+}

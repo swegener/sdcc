@@ -95,5 +95,5 @@ value                   *constFloatVal    (char *               );
 int                      getNelements     (link *, initList *   );
 value                   *valForArray      (struct ast  *        );
 value                   *valForStructElem (struct ast  *, struct ast *);
- 
+value                   *valForCastAggr   (struct ast *, link *, struct ast *, int ) ;
 #endif

@@ -1,3 +1,12 @@
+2004-09-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCcse.h (struct cseDef),
+	* src/SDCCcse.c (cseBBlock, newCseDef, ifFromAddrTaken): purge CSEs
+	over a function call if the CSE is derived from a symbol whose
+	address has been taken (fixes bug #1029883)
+	* support/regression/tests/bug-1029883: a new regression test for
+	this bug
+
 2004-09-18 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (emitinline): fixed bug #1029778

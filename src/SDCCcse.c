@@ -42,6 +42,7 @@ newCseDef (operand * sym, iCode * ic)
   cdp->key = sym->key;
   cdp->ancestors = newBitVect(iCodeKey);
   cdp->fromGlobal = 0;
+  cdp->fromAddrTaken = 0;
 
   if (ic->op!=IF && ic->op!=JUMPTABLE)
     {
@@ -49,11 +50,13 @@ newCseDef (operand * sym, iCode * ic)
         {
           bitVectSetBit (cdp->ancestors, IC_LEFT (ic)->key);
           cdp->fromGlobal |= isOperandGlobal (IC_LEFT (ic));
+          cdp->fromAddrTaken |= OP_SYMBOL (IC_LEFT (ic))->addrtaken;
         }
       if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic)))
         {
           bitVectSetBit (cdp->ancestors, IC_RIGHT (ic)->key);
           cdp->fromGlobal |= isOperandGlobal (IC_RIGHT (ic));
+          cdp->fromAddrTaken |= OP_SYMBOL (IC_RIGHT (ic))->addrtaken;
         }
     }
 
@@ -79,6 +82,7 @@ updateCseDefAncestors(cseDef *cdp, set * cseSet)
                 {
                   cdp->ancestors = bitVectUnion (cdp->ancestors, loop->ancestors);
                   cdp->fromGlobal |= loop->fromGlobal;
+                  cdp->fromAddrTaken |= loop->fromAddrTaken;
                   break;
                 }
             }
@@ -93,6 +97,7 @@ updateCseDefAncestors(cseDef *cdp, set * cseSet)
                 {
                   cdp->ancestors = bitVectUnion (cdp->ancestors, loop->ancestors);
                   cdp->fromGlobal |= loop->fromGlobal;
+                  cdp->fromAddrTaken |= loop->fromAddrTaken;
                   break;
                 }
             }
@@ -531,6 +536,18 @@ DEFSETFUNC (ifDefGlobal)
 
   return (isOperandGlobal (cdp->sym));
 }
+
+/*-------------------------------------------------------------------*/
+/* ifFromAddrTaken - if definition is derived from a symbol whose    */
+/*                   address was taken                               */
+/*-------------------------------------------------------------------*/
+DEFSETFUNC (ifFromAddrTaken)
+{
+  cseDef *cdp = item;
+
+  return cdp->fromAddrTaken;
+}
+
 
 /*-----------------------------------------------------------------*/
 /* ifAnyGetPointer - if get pointer icode                          */
@@ -1819,8 +1836,12 @@ cseBBlock (eBBlock * ebb, int computeOnly,
              since they can be modified by the function call */
           deleteItemIf (&cseSet, ifDefGlobal);
 
-          /* and also itemps derived from globals */
+          /* and also iTemps derived from globals */
           deleteItemIf (&cseSet, ifFromGlobal);
+          
+          /* Delete iTemps derived from symbols whose address */
+          /* has been taken */
+          deleteItemIf (&cseSet, ifFromAddrTaken);
 
           /* delete all getpointer iCodes from cseSet, this should
              be done only for global arrays & pointers but at this

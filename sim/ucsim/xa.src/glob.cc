@@ -202,8 +202,8 @@ struct xa_dis_entry disass_xa[]= {
  {0,0x9605,0xff8f,' ',4, AND,DIRECT_DATA8    },  // AND direct, #data8         1 0 0 1 0 1 1 0  0 b b b 0 1 0 1 
  {0,0x9e05,0xff8f,' ',5, AND,DIRECT_DATA16   },  // AND direct, #data16        1 0 0 1 0 1 1 0  1 b b b 0 1 0 1 
 
- {0,0x0840,0xfffc,' ',2,ANL, CY_BIT          }, //  ANL C, bit                 0 0 0 0 1 0 0 0  0 1 0 0 0 0 b b
- {0,0x0850,0xfffc,' ',2,ANL, CY_NOTBIT       }, //  ANL C, /bit                0 0 0 0 1 0 0 0  0 1 0 1 0 0 b b
+ {0,0x0840,0xfffc,' ',3,ANL, CY_BIT          }, //  ANL C, bit                 0 0 0 0 1 0 0 0  0 1 0 0 0 0 b b lsbbit
+ {0,0x0850,0xfffc,' ',3,ANL, CY_NOTBIT       }, //  ANL C, /bit                0 0 0 0 1 0 0 0  0 1 0 1 0 0 b b lsbbit
  {0,0xc150,0xf300,' ',2,ASL, REG_REG         }, //  ASL Rd, Rs                 1 1 0 0 S S 0 1  d d d d s s s s
  {0,0xdd00,0xff00,' ',2,ASL, REG_DATA5       }, //  ASL Rd, #data5 (dword)     1 1 0 1 1 1 0 1  d d d #data5
  {0,0xd100,0xf700,' ',2,ASL, REG_DATA4       }, //  ASL Rd, #data4             1 1 0 1 S S 0 1  d d d d #data4

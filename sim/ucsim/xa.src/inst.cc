@@ -35,6 +35,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "xacl.h"
 #include "regsxa.h"
 
+#define NOTDONE_ASSERT { printf("**********Instr not done at %d!\n", __LINE__); }
 
 void cl_xa::store1(t_addr addr, unsigned char val)
 {
@@ -144,6 +145,7 @@ int cl_xa::inst_ADDC(uint code, int operands)
 
 int cl_xa::inst_ADDS(uint code, int operands)
 {
+  NOTDONE_ASSERT;
   return(resGO);
 }
 
@@ -157,18 +159,132 @@ int cl_xa::inst_AND(uint code, int operands)
   return(resGO);
 }
 
+/* logical AND bit with Carry flag */
 int cl_xa::inst_ANL(uint code, int operands)
 {
+ unsigned char flags;
+ unsigned short bitAddr = (code&0x03 << 8) + fetch();
+ flags = get_psw();
+
+  if (flags & BIT_C) {
+    /* have work to do */
+    switch(operands) {
+      case CY_BIT :
+        if (!get_bit(bitAddr)) {
+          set_psw(flags & ~BIT_C);
+        }
+      break;
+
+      case CY_NOTBIT :
+        if (get_bit(bitAddr)) {
+          set_psw(flags & ~BIT_C);
+        }
+      break;
+    }
+  }
+
   return(resGO);
 }
 
+/* arithmetic shift left */
 int cl_xa::inst_ASL(uint code, int operands)
 {
+  unsigned int dst, cnt;
+  unsigned char flags;
+
+  /* ASL, dest, count
+    while (count != 0)
+      C = dest.80H; dest <<= 1; if sign chg then set V=1
+      this is a confusing one...
+  */
+
+  flags = get_psw();
+  flags &= ~BIT_ALL; /* clear these bits */
+
+  switch(operands) {
+    //{0,0xc150,0xf300,' ',2,ASL, REG_REG         }, //  ASL Rd, Rs                 1 1 0 0 S S 0 1  d d d d s s s s
+    case REG_REG :
+      cnt = reg1(RI_0F) & 0x1f;
+      switch (code & 0xc00) {
+        case 0: // byte
+          dst = reg1(RI_F0);
+          dst <<= cnt;
+          set_reg1(RI_F0,dst);
+          if (dst & 0x100)
+            flags |= BIT_C;
+          if ((dst & 0xff) == 0)
+            flags |= BIT_Z;
+        break;
+        case 1: // word
+          dst = reg2(RI_F0);
+          dst <<= cnt;
+          set_reg2(RI_F0,dst);
+          if (dst & 0x10000)
+            flags |= BIT_C;
+          if ((dst & 0xffff) == 0)
+            flags |= BIT_Z;
+        break;
+        case 3:  // dword
+          //dst = reg4(RI_F0);
+          dst = reg2(RI_F0) | (reg2(RI_F0 + 2) << 16);
+          if ((cnt != 0) && (dst & (0x80000000 >> (cnt-1)))) {
+            flags |= BIT_C;
+          }
+          dst <<= cnt;
+          set_reg2(RI_F0,dst & 0xffff);
+          set_reg2(RI_F0+2, (dst>>16) & 0xffff);
+          if (dst == 0)
+            flags |= BIT_Z;
+        break;
+      }
+    break;
+
+    case REG_DATA4 :
+    case REG_DATA5 :
+      switch (code & 0xc00) {
+        case 0: // byte
+          dst = reg1(RI_F0);
+          cnt = operands & 0x0f;
+          dst <<= cnt;
+          set_reg1(RI_F0,dst);
+          if (dst & 0x100)
+            flags |= BIT_C;
+          if ((dst & 0xff) == 0)
+            flags |= BIT_Z;
+        break;
+        case 1: // word
+          dst = reg2(RI_F0);
+          cnt = operands & 0x0f;
+          dst <<= cnt;
+          set_reg2(RI_F0,dst);
+          if (dst & 0x10000)
+            flags |= BIT_C;
+          if ((dst & 0xffff) == 0)
+            flags |= BIT_Z;
+        break;
+        case 3:  // dword
+          dst = reg1(RI_F0 & 0xe);
+          cnt = operands & 0x1f;
+          if ((cnt != 0) && (dst & (0x80000000 >> (cnt-1)))) {
+            flags |= BIT_C;
+          }
+          dst <<= cnt;
+          set_reg2(RI_F0,dst & 0xffff);
+          set_reg2(RI_F0+2, (dst>>16) & 0xffff);
+          if (dst == 0)
+            flags |= BIT_Z;
+        break;
+      }
+    break;
+  }
+  set_psw(flags);
+
   return(resGO);
 }
 
 int cl_xa::inst_ASR(uint code, int operands)
 {
+  NOTDONE_ASSERT;
   return(resGO);
 }
 
@@ -231,6 +347,7 @@ int cl_xa::inst_BGT(uint code, int operands)
 }
 int cl_xa::inst_BKPT(uint code, int operands)
 {
+  NOTDONE_ASSERT;
   return(resGO);
 }
 int cl_xa::inst_BL(uint code, int operands)
@@ -428,14 +545,17 @@ int cl_xa::inst_CMP(uint code, int operands)
 }
 int cl_xa::inst_CPL(uint code, int operands)
 {
+  NOTDONE_ASSERT;
   return(resGO);
 }
 int cl_xa::inst_DA(uint code, int operands)
 {
+  NOTDONE_ASSERT;
   return(resGO);
 }
 int cl_xa::inst_DIV(uint code, int operands)
 {
+  NOTDONE_ASSERT;
   return(resGO);
 }
 
@@ -485,11 +605,13 @@ int cl_xa::inst_DJNZ(uint code, int operands)
 
 int cl_xa::inst_FCALL(uint code, int operands)
 {
+  NOTDONE_ASSERT;
   return(resGO);
 }
 
 int cl_xa::inst_FJMP(uint code, int operands)
 {
+  NOTDONE_ASSERT;
   return(resGO);
 }
 
@@ -578,6 +700,7 @@ int cl_xa::inst_LEA(uint code, int operands)
 }
 int cl_xa::inst_LSR(uint code, int operands)
 {
+  NOTDONE_ASSERT;
   return(resGO);
 }
 int cl_xa::inst_MOV(uint code, int operands)
@@ -648,26 +771,32 @@ int cl_xa::inst_MOVC(uint code, int operands)
 }
 int cl_xa::inst_MOVS(uint code, int operands)
 {
+  NOTDONE_ASSERT;
   return(resGO);
 }
 int cl_xa::inst_MOVX(uint code, int operands)
 {
+  NOTDONE_ASSERT;
   return(resGO);
 }
 int cl_xa::inst_MUL(uint code, int operands)
 {
+  NOTDONE_ASSERT;
   return(resGO);
 }
 int cl_xa::inst_NEG(uint code, int operands)
 {
+  NOTDONE_ASSERT;
   return(resGO);
 }
 int cl_xa::inst_NOP(uint code, int operands)
 {
+  NOTDONE_ASSERT;
   return(resGO);
 }
 int cl_xa::inst_NORM(uint code, int operands)
 {
+  NOTDONE_ASSERT;
   return(resGO);
 }
 int cl_xa::inst_OR(uint code, int operands)
@@ -682,6 +811,7 @@ int cl_xa::inst_OR(uint code, int operands)
 
 int cl_xa::inst_ORL(uint code, int operands)
 {
+  NOTDONE_ASSERT;
   return(resGO);
 }
 
@@ -823,6 +953,7 @@ int cl_xa::inst_PUSH(uint code, int operands)
 }
 int cl_xa::inst_RESET(uint code, int operands)
 {
+  NOTDONE_ASSERT;
   return(resGO);
 }
 int cl_xa::inst_RET(uint code, int operands)
@@ -862,18 +993,22 @@ int cl_xa::inst_RETI(uint code, int operands)
 }
 int cl_xa::inst_RL(uint code, int operands)
 {
+  NOTDONE_ASSERT;
   return(resGO);
 }
 int cl_xa::inst_RLC(uint code, int operands)
 {
+  NOTDONE_ASSERT;
   return(resGO);
 }
 int cl_xa::inst_RR(uint code, int operands)
 {
+  NOTDONE_ASSERT;
   return(resGO);
 }
 int cl_xa::inst_RRC(uint code, int operands)
 {
+  NOTDONE_ASSERT;
   return(resGO);
 }
 int cl_xa::inst_SETB(uint code, int operands)
@@ -935,6 +1070,7 @@ int cl_xa::inst_TRAP(uint code, int operands)
 
 int cl_xa::inst_XCH(uint code, int operands)
 {
+  NOTDONE_ASSERT;
   return(resGO);
 }
 int cl_xa::inst_XOR(uint code, int operands)

@@ -593,10 +593,13 @@ int processParms (ast *func, value *defParm,
     {
         ast *newType = NULL;
         
+        printf("oogie ");
+        
 	if (IS_CAST_OP(actParm) 
 	 || (IS_AST_LIT_VALUE(actParm) && actParm->values.literalFromCast))
 	{
 	   /* Parameter was explicitly typecast; don't touch it. */
+	   printf("typecast.\n");
 	   return 0;
 	}    
         
@@ -613,6 +616,12 @@ int processParms (ast *func, value *defParm,
             DCL_TYPE(newType->opval.lnk) = GPOINTER;
         }
         
+        if (IS_AGGREGATE(actParm->ftype))
+        {
+            newType = newAst_LINK(copyLinkChain(actParm->ftype));
+            DCL_TYPE(newType->opval.lnk) = GPOINTER;
+        }
+        
         if (newType)
         {
      	    /* cast required; change this op to a cast. */
@@ -623,6 +632,12 @@ int processParms (ast *func, value *defParm,
 	    actParm->left = newType;
 	    actParm->right= parmCopy;
 	    decorateType(actParm);
+	    
+	    printf("boogie\n");
+        }
+        else
+        {
+            printf("nada\n");
         }
         
         return 0;

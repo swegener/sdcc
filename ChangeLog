@@ -1,3 +1,9 @@
+2003-03-10  Bernhard Held <bernhard@bernhardheld.de>
+
+	* support/regression/ports/mcs51/spec.mk: increase timeout for CF's sparc to 30s
+	* support/regression/ports/ds390/spec.mk: increase timeout for CF's sparc to 25s
+	* support/regression/ports/xa51/spec.mk: fix typo
+
 2003-03-09  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCglobl.h: PATH_MAX is already defined in mingw32 headers

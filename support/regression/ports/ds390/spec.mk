@@ -23,10 +23,10 @@ EXTRAS = $(PORTS_DIR)/$(PORT)/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJ
 $(PORTS_DIR)/$(PORT)/testfwk$(OBJEXT): fwk/lib/testfwk.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 	
-# run simulator with 10 seconds timeout
+# run simulator with 25 seconds timeout
 %.out: %$(EXEEXT) fwk/lib/timeout
 	mkdir -p `dirname $@`
-	-fwk/lib/timeout 20 $(S51) -tds390f -S in=/dev/null,out=$@ $< < $(PORTS_DIR)/ds390/uCsim.cmd >/dev/null || \
+	-fwk/lib/timeout 25 $(S51) -tds390f -S in=/dev/null,out=$@ $< < $(PORTS_DIR)/ds390/uCsim.cmd >/dev/null || \
           echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(EXEEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
 	-grep -n FAIL $@ /dev/null || true
 

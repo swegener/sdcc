@@ -25,7 +25,7 @@ EXTRAS = $(PORTS_DIR)/$(PORT)/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJ
 $(PORTS_DIR)/$(PORT)/%$(OBJEXT): fwk/lib/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
-# run simulator with 10 seconds timeout
+# run simulator with 1 second timeout
 %.out: %$(EXEEXT) fwk/lib/timeout
 	mkdir -p `dirname $@`
 	-fwk/lib/timeout 1 $(SXA) -S in=/dev/null,out=$@ $< < $(PORTS_DIR)/xa51/uCsim.cmd >/dev/null || \

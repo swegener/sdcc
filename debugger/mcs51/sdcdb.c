@@ -61,7 +61,7 @@ struct cmdtab
        precede the synonym "b" */
     /* break point */
     { "break"    ,  cmdSetUserBp  ,
-      "{b}reak\t\t\t [LINE |  FILE:LINE | FILE:FUNCTION | FUNCTION]\n",
+      "{b}reak\t\t\t [LINE | FILE:LINE | FILE:FUNCTION | FUNCTION]\n",
     },
     { "b"        ,  cmdSetUserBp  , NULL },
 
@@ -87,27 +87,26 @@ struct cmdtab
     { "h"        ,  cmdHelp       , NULL },
 
     { "info"     ,  cmdInfo       ,
-      "info"
-      "\t {break}\t list all break points\n"
-      "\t {stack}\t information about call stack\n"
-      "\t {frame}\t current frame information\n"
-      "\t {registers}\t display value of all registers\n"
+      "info <break stack frame registers>\n"
+      "\t list all break points, call-stack, frame or register information\n"
     },
 
     { "listasm"  ,  cmdListAsm    ,
       "listasm {la}\t\t list assembler code for the current C line\n"
     },
     { "la"       ,  cmdListAsm    , NULL },
+    { "ls"       ,  cmdListSymbols  , "ls,lf,lm\t\t list symbols,functions,modules\n" },
+    { "lf"       ,  cmdListFunctions, NULL },
+    { "lm"       ,  cmdListModules  , NULL },
     { "list"     ,  cmdListSrc    ,
       "{l}ist\t\t\t [LINE | FILE:LINE | FILE:FUNCTION | FUNCTION]\n"
     },
     { "l"        ,  cmdListSrc    , NULL },
     { "show"     ,  cmdShow       ,
       "show"
-      "\t {copying}\t copying & distribution terms\n"
-      "\t {warranty}\t warranty information\n"
+      " <copying warranty>\t copying & distribution terms, warranty\n"
     },
-    { "set"      ,  cmdSetOption  , NULL },
+    { "set"      ,  cmdSetOption  , "set <srcmode>\t\t toggle between c/asm.\n" },
     { "step"     ,  cmdStep       ,
       "{s}tep\t\t\t Step program until it reaches a different source line.\n"
     },
@@ -142,6 +141,9 @@ struct cmdtab
     { "f"        ,  cmdFrame      , NULL },
     { "!"        ,  cmdSimulator  ,
       "!<simulator command>\t send a command directly to the simulator\n"
+    },
+    { "."        ,  cmdSimulator  ,
+      ".{cmd}\t switch from simulator or debugger command mode\n"
     },
     { "quit"     ,  cmdQuit       ,
       "{q}uit\t\t\t \"Watch me now. Iam going Down. My name is Bobby Brown\"\n"
@@ -600,67 +602,107 @@ int cmdFile (char *s,context *cctxt)
 int cmdHelp (char *s, context *cctxt)
 {
     int i ;
+    int endline = 999;
+    int startline = 0;
+
+    while (isspace(*s))
+      ++s;
+    if (isdigit(*s)) {
+      endline = ((*s - '0') * 20) + 20;
+      if (endline > 0)
+        startline = endline - 20;
+    }
 
     for (i = 0 ; i < (sizeof(cmdTab)/sizeof(struct cmdtab)) ; i++) {
 
-  /* command string matches */
-  if (cmdTab[i].htxt)
-      fprintf(stdout,"%s",cmdTab[i].htxt);
+      /* command string matches */
+      
+      if ((cmdTab[i].htxt) && (i >= startline))
+        fprintf(stdout,"%s",cmdTab[i].htxt);
+      if (i == endline)
+        break;
     }
 
     return 0;
 }
 
 #define MAX_CMD_LEN 512
-char *prompt = "(sdcdb) ";
-char cmdbuff[MAX_CMD_LEN];
+static char cmdbuff[MAX_CMD_LEN];
+static int sim_cmd_mode = 0;
 
-/*-----------------------------------------------------------------*/
-/* interpretCmd - interpret and do the command                     */
-/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------
+ interpretCmd - interpret and do the command.  Return 0 to continue,
+   return 1 to exit program.
+|-----------------------------------------------------------------*/
 int interpretCmd (char *s)
 {
     static char *pcmd = NULL;
     int i ;
     int rv = 0 ;
+
     /* if nothing & previous command exists then
        execute the previous command again */
     if (*s == '\n' && pcmd)
-  strcpy(s,pcmd);
+      strcpy(s,pcmd);
+
     /* if previous command exists & is different
        from the current command then copy it */
     if (pcmd) {
-  if (strcmp(pcmd,s)) {
-      free(pcmd);
-      pcmd = strdup(s);
-  }
+      if (strcmp(pcmd,s)) {
+         free(pcmd);
+         pcmd = strdup(s);
+      }
     } else
-  pcmd = strdup(s);
-    /* lookup the command table and do the
-       task required */
+      pcmd = strdup(s);
+
+    /* lookup the command table and do the task required */
     strtok(s,"\n");
+
+    if (sim_cmd_mode) {
+      if (strcmp(s,".") == 0) {
+        sim_cmd_mode = 0;
+        return 0;
+      }
+      else if (s[0] == '.') {
+        /* kill the preceeding '.' and pass on as SDCDB command */
+        char *s1 = s+1;
+        char *s2 = s;
+        while (*s1 != 0)
+          *s2++ = *s1++;
+        *s2 = 0;
+      } else {
+        cmdSimulator (s, currCtxt);
+        return 0;
+      }
+    } else {
+      if (strcmp(s,".") ==0) {
+        sim_cmd_mode = 1;
+        return 0;
+      }
+    }
 
     for (i = 0 ; i < (sizeof(cmdTab)/sizeof(struct cmdtab)) ; i++) {
 
-  /* command string matches */
-  if (strncmp(s,cmdTab[i].cmd,strlen(cmdTab[i].cmd)) == 0) {
-      if (!cmdTab[i].cmdfunc)
-    return 1;
-      rv = (*cmdTab[i].cmdfunc)(s + strlen(cmdTab[i].cmd),currCtxt);
+      /* command string matches */
+      if (strncmp(s,cmdTab[i].cmd,strlen(cmdTab[i].cmd)) == 0) {
+        if (!cmdTab[i].cmdfunc)
+          return 1;
 
-      /* if full name then give the file name & position */
-      if (fullname && currCtxt && currCtxt->func) {
-    if (srcMode == SRC_CMODE)
-        fprintf(stdout,"\032\032%s:%d:1\n",
-          currCtxt->func->mod->cfullname,
-          currCtxt->cline+1);
-    else
-        fprintf(stdout,"\032\032%s:%d:1\n",
-          currCtxt->func->mod->afullname,
-          currCtxt->asmline+1);
+        rv = (*cmdTab[i].cmdfunc)(s + strlen(cmdTab[i].cmd),currCtxt);
+
+        /* if full name then give the file name & position */
+        if (fullname && currCtxt && currCtxt->func) {
+          if (srcMode == SRC_CMODE)
+            fprintf(stdout,"\032\032%s:%d:1\n",
+                    currCtxt->func->mod->cfullname,
+                    currCtxt->cline+1);
+          else
+            fprintf(stdout,"\032\032%s:%d:1\n",
+                    currCtxt->func->mod->afullname,
+                    currCtxt->asmline+1);
+        }
+        goto ret;
       }
-      goto ret;
-  }
     }
 
     fprintf(stdout,"Undefined command: \"%s\".  Try \"help\".\n",s);
@@ -673,18 +715,32 @@ int interpretCmd (char *s)
 /*-----------------------------------------------------------------*/
 void commandLoop()
 {
+ char *prompt = "(sdcdb) ";
+ char *sim_prompt = "(sim) ";
 
-    while (1) {
-  fprintf(stdout,"%s",prompt);
-  fflush(stdout);
+  while (1) {
+    if (sim_cmd_mode)
+      printf("%s",sim_prompt);
+    else
+      fprintf(stdout,"%s",prompt);
 
-  if (fgets(cmdbuff,sizeof(cmdbuff),stdin) == NULL)
+    fflush(stdout);
+
+    if (fgets(cmdbuff,sizeof(cmdbuff),stdin) == NULL)
       break;
 
-  if (interpretCmd(cmdbuff))
-      break;
-
+#if 0
+    /* make a way to go into "ucSim" mode */
+    if (cmdbuff[0] == '$') {
+      if (sim_cmd_mode) sim_cmd_mode = 0;
+      else sim_cmd_mode = 1;
+      continue;
     }
+#endif
+
+    if (interpretCmd(cmdbuff))
+      break;
+  }
 }
 
 /*-----------------------------------------------------------------*/
@@ -708,9 +764,15 @@ static void parseCmdLine (int argc, char **argv)
 {
     int i ;
     char *filename = NULL;
-    char buffer[100];
+    int passon_args_flag = 0;  /* if true, pass on args to simulator */
+
     for ( i = 1; i < argc ; i++) {
-  fprintf(stdout,"%s\n",argv[i]);
+  //fprintf(stdout,"%s\n",argv[i]);
+
+  if (passon_args_flag) { /* if true, pass on args to simulator */
+    simArgs[nsimArgs++] = strdup(argv[i]);
+    continue;
+  }
 
   /* if this is an option */
   if (argv[i][0] == '-') {
@@ -743,6 +805,24 @@ static void parseCmdLine (int argc, char **argv)
     continue;
       }
 
+      /* model string */
+      if (strncmp(argv[i],"-m",2) == 0) {
+        strncpy(model_str, &argv[i][2], 15);
+        if (strcmp(model_str,"avr") == 0)
+          simArgs[0] = "savr";
+        else if (strcmp(model_str,"xa") == 0)
+          simArgs[0] = "sxa";
+        else if (strcmp(model_str,"z80") == 0)
+          simArgs[0] = "sz80";
+        continue ;
+      }
+
+      /* -z all remaining options are for simulator */
+      if (strcmp(argv[i],"-z") == 0) {
+        passon_args_flag = 1;
+        continue ;
+      }
+
       /* the simulator arguments */
 
       /* cpu */
@@ -763,34 +843,16 @@ static void parseCmdLine (int argc, char **argv)
       }
 
       /* serial port */
-      if (strcmp(argv[i],"-s") == 0) {
+      if ( (strcmp(argv[i],"-S") == 0) ||
+           (strcmp(argv[i],"-s") == 0)) {
         simArgs[nsimArgs++] = "-s";
         simArgs[nsimArgs++] = strdup(argv[++i]);
-        continue ;
-      }
-
-      if (strcmp(argv[i],"-S") == 0) {
-        simArgs[nsimArgs++] = "-s";
-        simArgs[nsimArgs++] = strdup(argv[++i]);
-        continue ;
-      }
-
-      /* model string */
-      if (strncmp(argv[i],"-m",2) == 0) {
-        strncpy(model_str, &argv[i][2], 15);
-        if (strcmp(model_str,"avr") == 0)
-          simArgs[0] = "savr";
-        else if (strcmp(model_str,"rrz80") == 0)
-          simArgs[0] = "rrz80";
-        else if (strcmp(model_str,"xa") == 0)
-          simArgs[0] = "sxa";
-        else if (strcmp(model_str,"z80") == 0)
-          simArgs[0] = "sz80";
         continue ;
       }
 
       fprintf(stderr,"unknown option %s --- ignored\n",
         argv[i]);
+
   } else {
       /* must be file name */
       if (filename) {
@@ -815,6 +877,7 @@ static void parseCmdLine (int argc, char **argv)
 int main ( int argc, char **argv)
 {
     printVersionInfo();
+    printf("WARNING: SDCDB is EXPERIMENTAL and NOT A FULLY FUNCTIONING TOOL.\n");
 
     simArgs[nsimArgs++] = "s51";
     simArgs[nsimArgs++] = "-P";

@@ -26,7 +26,7 @@
 #define  SIMI_H
 
 #define MAX_SIM_BUFF 8*1024
-#define SIMNAME "s51"
+//#define SIMNAME "s51"
 extern char simactive;
 void  openSimulator (char **,int);
 void  waitForSim ();

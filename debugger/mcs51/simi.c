@@ -198,7 +198,8 @@ unsigned long simGetValue (unsigned int addr,char mem, int size)
 	break;
     case 'H':
     case 'J':
-	prefix = "db" ;
+//	prefix = "db" ;
+	prefix = "dump" ;
 	break;
     case 'I':
 	prefix = "ds" ;
@@ -219,11 +220,14 @@ unsigned long simGetValue (unsigned int addr,char mem, int size)
     /* first skip thru white space */
     while (isspace(*resp)) resp++ ;
 
+    if (strncmp(resp, "0x",2) == 0)
+      resp += 2;
+
     /* then make the branch for bit variables */
     /* skip thru the address part */
     while (isxdigit(*resp)) resp++;
     
-    if (!strcmp(prefix,"db")) {
+    if (!strcmp(prefix,"dump")) {
 
 	/* skip white space */
 	while (isspace(*resp)) resp++ ;
@@ -421,6 +425,11 @@ char  *simRegs()
     /* make it some more readable */
     resp  = simResponse();
 
+    return resp;
+
+#if 0
+  Take this out(2-09-02) cant see as its that useful to reformat, karl.
+  
     /* the response is of the form 
        XXXXXX R0 R1 R2 R3 R4 R5 R6 R7 ........
        XXXXXX XX . ACC=0xxx dd cc B=0xxx dd cc DPTR= 0xxxxx @DPTR= 0xxx dd cc
@@ -487,8 +496,7 @@ F  0x006d 75 87 80 MOV   PCON,#80
 	    getValueStr(resp,"P="));
 
     return regBuff;
-    
-    
+#endif
 
 }
 

@@ -544,27 +544,33 @@ symbol *symLookup (char *name, context *ctxt)
 {
     symbol *sym = NULL ;
 
-    /* first try & find a local variable for the
-       given name */
-    if ( applyToSet(symbols,symLocal,
+    if ((ctxt) && (ctxt->func) &&
+        (ctxt->func->sym) && (ctxt->func->sym->name)) {
+      /* first try & find a local variable for the given name */
+      if ( applyToSet(symbols,symLocal,
         name,
         ctxt->func->sym->name,
         ctxt->block,
         ctxt->level,
         &sym))
-  return sym;
+         return sym;
+      sym = NULL;
+    }
 
-    sym = NULL;
-    /* then try local to this module */
-    if (applyToSet(symbols,symLocal,
-       name,
-       ctxt->func->mod->name,
-       0,0,&sym))
-  return sym;
-    sym = NULL;
+    if ((ctxt) && (ctxt->func) &&
+        (ctxt->func->mod) && (ctxt->func->mod->name)) {
+      /* then try local to this module */
+      if (applyToSet(symbols,symLocal,
+          name,
+          ctxt->func->mod->name,
+          0,0,&sym))
+             return sym;
+      sym = NULL;
+    }
+
     /* no:: try global */
     if ( applyToSet(symbols,symGlobal,name,&sym))
-  return sym;
+      return sym;
 
     /* cannot find return null */
     return NULL;

@@ -28,7 +28,14 @@
 #include "break.h"
 #include "cmd.h"
 
-int listLines = 10;
+/* default number of lines to list out */
+int listLines = 16;
+
+/* mainly used to retain a reference to the active module being
+   listed.  May be used as a general context for other commands if
+   no better context is available */
+static module *list_mod = NULL;
+
 EXTERN_STACK_DCL(callStack,function *,1024);
 
 #if defined(__APPLE__) && defined(__MACH__)
@@ -350,6 +357,8 @@ DEFSETFUNC(funcWithName)
 /*-----------------------------------------------------------------*/
 static void setBPatModLine (module *mod, int line)
 {
+  int next_line;
+
     /* look for the first executable line after the line
        specified & get the break point there */    
     if (srcMode == SRC_CMODE && line > mod->ncLines) {
@@ -364,23 +373,29 @@ static void setBPatModLine (module *mod, int line)
 	return ;
     }
 
-    for ( ; line < (srcMode == SRC_CMODE ? mod->ncLines : mod->nasmLines ) ; 
-	  line++ ) {
+    next_line = line;
+    for ( ; next_line < (srcMode == SRC_CMODE ? mod->ncLines : mod->nasmLines ) ; 
+	  next_line++ ) {
 	if (srcMode == SRC_CMODE) {
-	    if (mod->cLines[line]->addr) {
-		setBreakPoint (mod->cLines[line]->addr, CODE, USER, 
-			       userBpCB, mod->c_name, line);
-		break;
+	    if (mod->cLines[next_line]->addr) {
+		setBreakPoint (mod->cLines[next_line]->addr, CODE, USER, 
+			       userBpCB, mod->c_name, next_line);
+		return;
+//		break;
 	    }
 	}
 	else {
-	   if (mod->asmLines[line]->addr) {
-	       setBreakPoint (mod->asmLines[line]->addr, CODE, USER, 
-			      userBpCB, mod->asm_name, line);
-	       break;
+	   if (mod->asmLines[next_line]->addr) {
+	       setBreakPoint (mod->asmLines[next_line]->addr, CODE, USER, 
+			      userBpCB, mod->asm_name, next_line);
+		return;
+//	       break;
 	   } 
 	}
     }
+
+    	fprintf(stderr,"No line %d or after in file \"%s\"..\n",
+        		line,mod->c_name);
 
     return;
 }
@@ -707,9 +722,13 @@ int cmdSetUserBp (char *s, context *cctxt)
 		else 
 		    setBPatModLine(func->mod,line);
 	    } else 
-		setBPatModLine(cctxt->func->mod,line);			
+		setBPatModLine(cctxt->func->mod,line);
 	} else {
-		fprintf(stdout,"No symbol information currently\n");
+		if (list_mod) {
+			setBPatModLine(list_mod,line);
+		} else {
+		  fprintf(stdout,"Sdcdb fails to have module symbol context at %d\n", __LINE__);
+		}
 	}
 	
 	goto ret;
@@ -1012,6 +1031,276 @@ int cmdRun (char *s, context *cctxt)
     return 0;
 }
 
+/*-----------------------------------------------------------------
+ cmdListSymbols - list symbols
+|-----------------------------------------------------------------*/
+int cmdListSymbols (char *s, context *cctxt)
+{
+    int our_verbose = 0;
+    symbol *sy;
+    int i;
+
+    if (strstr(s, "v1")) {
+      our_verbose = 1;
+    } else if (strstr(s, "v2")) {
+      our_verbose = 2;
+    }
+
+    printf("[symbols]\n");
+    sy = setFirstItem(symbols);
+    i = 0;
+    for (;;) {
+      if (sy == NULL)
+        break;
+      if (our_verbose <= 1)
+        printf("<%s>", sy->name);
+
+      if (our_verbose > 1) {
+        printf("  %d) name:%s, size:%d, level:%d block:%d\n", i,
+          sy->name, sy->size, sy->level, sy->block);
+        printf("    isonstack:%d, isfunc:%d, offset:%d addr:%d\n",
+          sy->isonstack, sy->isfunc, sy->offset, sy->addr);
+        printf("    eaddr:%d, addr_type:%c, type:%x etype:%x\n",
+          sy->eaddr, sy->addr_type, sy->type, sy->etype);
+        printf("    scopetype:%c, sname:%s, rname:%s addrspace:%c\n",
+          sy->scopetype, sy->sname, sy->rname, sy->addrspace);
+        printf("    next:%x\n", sy->next);
+      }
+      ++i;
+      sy = setNextItem(symbols);
+    }
+    printf("   %d symbols\n", i);
+    return 0;
+}
+
+/*-----------------------------------------------------------------
+ cmdListFunctions - list functions.
+|-----------------------------------------------------------------*/
+int cmdListFunctions (char *s, context *cctxt)
+{
+    function *f;
+    int i;
+    int our_verbose = 0;
+
+    if (strstr(s, "v1")) {
+      our_verbose = 1;
+    } else if (strstr(s, "v2")) {
+      our_verbose = 2;
+    }
+
+    printf("[functions]\n");
+    f = setFirstItem(functions);
+    i = 0;
+    for (;;) {
+      if (f == NULL)
+        break;
+      if (our_verbose) {
+        printf("  %d) sym:%x, modName:%s, mod:%x\n", i,
+          f->sym, f->modName, f->mod);
+        printf("    entryline:%d, aentryline:%d, exitline:%d, aexitline:%d\n",
+                f->entryline, f->aentryline, f->exitline, f->aexitline);
+        printf("    cfpoints:%x, afpoints:%x, laddr:%x, lline:%d\n",
+                f->cfpoints, f->afpoints, f->laddr, f->lline);
+      }
+      else {
+        printf("<%s>", f->modName);
+      }
+      ++i;
+      f = setNextItem(functions);
+    }
+    printf("   %d functions\n", i);
+    return 0;
+}
+
+/*-----------------------------------------------------------------
+ cmdListModules - list functions.
+|-----------------------------------------------------------------*/
+int cmdListModules (char *s, context *cctxt)
+{
+    module *m;
+    srcLine *cs, *as;
+    int i, mi;
+    int our_verbose = 0;
+
+    if (strstr(s, "v1")) {
+      our_verbose = 1;
+    } else if (strstr(s, "v2")) {
+      our_verbose = 2;
+    }
+
+    printf("[modules]\n");
+    m = setFirstItem(modules);
+    mi = 0;
+    for (;;) {
+      if (m == NULL)
+        break;
+
+      if (our_verbose >= 0) {
+      printf("  %d) cfullname:%s, afullname:%s, name:%s\n", ++mi,
+        m->cfullname, m->afullname, m->name);
+      printf("    c_name:%s, asm_name:%s, ncLines:%d, nasmLines:%d\n",
+              m->c_name, m->asm_name, m->ncLines, m->nasmLines);
+      printf("    cLines:%x, asmLines:%x\n",
+              m->cLines, m->asmLines);
+      }
+      if (our_verbose > 2) {
+        i = 0;
+        if (m->cLines) {
+          cs = m->cLines[i++];
+          printf("    [cLines] ");
+          while (cs) {
+            if (our_verbose)
+              printf("   (%d) addr:%x, block:%d, level:%d, src:%s\n",
+                 i, cs->addr, cs->block, cs->level, cs->src);
+            cs = m->cLines[i++];
+          }
+          if (!our_verbose)
+              printf("%d records", i);
+        }
+        i = 0;
+        if (m->asmLines) {
+          as = m->asmLines[i++];
+          printf("    [asmLines] ");
+          while (as) {
+            if (our_verbose)
+              printf("   (%d) addr:%x, block:%d, level:%d, src:%s\n",
+                 i, as->addr, as->block, as->level, as->src);
+            as = m->asmLines[i++];
+          }
+          if (!our_verbose)
+              printf("%d records", i);
+        }
+        printf("\n");
+      }
+
+      m = setNextItem(modules);
+    }
+    return 0;
+}
+
+/*-----------------------------------------------------------------
+ infoSymbols - This is really just a tool to dump all these
+   huge program structures out into human readable form.
+|-----------------------------------------------------------------*/
+static void infoSymbols(context *ctxt)
+{
+  int our_verbose = 0;
+
+  printf("[context:%x] func:%x modName:%s addr:%x\n",
+    ctxt, ctxt->func, ctxt->modName, ctxt->addr);
+
+  printf("  cline:%d asmline:%d block:%d level:%d\n",
+    ctxt->cline, ctxt->asmline, ctxt->level);
+
+  printf("[globals] currCtxt:%x, modules:%x, functions:%x symbols:%x\n",
+    currCtxt, modules, functions, symbols);
+  printf("  nStructs:%d, structs:%x, ssdirl:%s\n",
+    nStructs, structs, ssdirl);
+
+  /**************** modules *******************/
+  {
+    module *m;
+    srcLine *cs, *as;
+    int i, mi;
+    printf("[modules]\n");
+    m = setFirstItem(modules);
+    mi = 0;
+    for (;;) {
+      if (m == NULL)
+        break;
+      printf("  %d) cfullname:%s, afullname:%s, name:%s\n", ++mi,
+        m->cfullname, m->afullname, m->name);
+      printf("    c_name:%s, asm_name:%s, ncLines:%d, nasmLines:%d\n",
+              m->c_name, m->asm_name, m->ncLines, m->nasmLines);
+      printf("    cLines:%x, asmLines:%x\n",
+              m->cLines, m->asmLines);
+      i = 0;
+      if (m->cLines) {
+        cs = m->cLines[i++];
+        printf("    [cLines] ");
+        while (cs) {
+          if (our_verbose)
+            printf("   (%d) addr:%x, block:%d, level:%d, src:%s\n",
+               i, cs->addr, cs->block, cs->level, cs->src);
+          cs = m->cLines[i++];
+        }
+        if (!our_verbose)
+            printf("%d records", i);
+      }
+      i = 0;
+      if (m->asmLines) {
+        as = m->asmLines[i++];
+        printf("    [asmLines] ");
+        while (as) {
+          if (our_verbose)
+            printf("   (%d) addr:%x, block:%d, level:%d, src:%s\n",
+               i, as->addr, as->block, as->level, as->src);
+          as = m->asmLines[i++];
+        }
+        if (!our_verbose)
+            printf("%d records", i);
+      }
+      printf("\n");
+
+      m = setNextItem(modules);
+    }
+  }
+
+  /**************** functions *******************/
+  {
+    function *f;
+    int i;
+    printf("[functions]\n");
+    f = setFirstItem(functions);
+    i = 0;
+    for (;;) {
+      if (f == NULL)
+        break;
+      if (our_verbose) {
+        printf("  %d) sym:%x, modName:%s, mod:%x\n", i,
+          f->sym, f->modName, f->mod);
+        printf("    entryline:%d, aentryline:%d, exitline:%d, aexitline:%d\n",
+                f->entryline, f->aentryline, f->exitline, f->aexitline);
+        printf("    cfpoints:%x, afpoints:%x, laddr:%x, lline:%d\n",
+                f->cfpoints, f->afpoints, f->laddr, f->lline);
+      }
+      ++i;
+      f = setNextItem(functions);
+    }
+    if (!our_verbose)
+      printf("   %d functions\n", i);
+  }
+
+  /**************** symbols *******************/
+  {
+    symbol *s;
+    int i;
+    printf("[symbols]\n");
+    s = setFirstItem(symbols);
+    i = 0;
+    for (;;) {
+      if (s == NULL)
+        break;
+      if (our_verbose) {
+        printf("  %d) name:%s, size:%d, level:%d block:%d\n", i,
+          s->name, s->size, s->level, s->block);
+        printf("    isonstack:%d, isfunc:%d, offset:%d addr:%d\n",
+          s->isonstack, s->isfunc, s->offset, s->addr);
+        printf("    eaddr:%d, addr_type:%c, type:%x etype:%x\n",
+          s->eaddr, s->addr_type, s->type, s->etype);
+        printf("    scopetype:%c, sname:%s, rname:%s addrspace:%c\n",
+          s->scopetype, s->sname, s->rname, s->addrspace);
+        printf("    next:%x\n", s->next);
+      }
+      ++i;
+      s = setNextItem(symbols);
+    }
+    if (!our_verbose)
+      printf("   %d symbols\n", i);
+  }
+
+}
+
 /*-----------------------------------------------------------------*/
 /* infoStack - print call stack information                        */
 /*-----------------------------------------------------------------*/
@@ -1061,6 +1350,14 @@ int cmdInfo (char *s, context *cctxt)
 	return 0;
     }
 
+    /* info stack display call stack */
+    if (strcmp(s,"symbols") == 0) {
+      /* dump out symbols we have read in */
+      fprintf(stdout,"Dumping symbols...\n");
+      infoSymbols(cctxt);
+      return 0;
+    }
+
     fprintf(stdout,"Undefined info command: \"%s\".  Try \"help\n",s);
     return 0;
 
@@ -1084,7 +1381,6 @@ int cmdListSrc (char *s, context *cctxt)
     static int currline = 0;
     int i =0 ;
     int pline = 0;
-    static module *mod = NULL;
     int llines = listLines;
 
     while (*s && isspace(*s)) s++;
@@ -1095,15 +1391,19 @@ int cmdListSrc (char *s, context *cctxt)
        FILE:LINE     - filename line number
        FUNCTION      - list a function
        FILE:FUNCTION - function in file */
-    if (!cctxt || !cctxt->func || !cctxt->func->mod) {
-	fprintf(stdout,"No symbol table is loaded.  Use the \"file\" command.\n");
-	return 0;
-    }
+
     if (*s) {
 	/* case a) LINE */
 	if (isdigit(*s)) {
 	    sscanf(s,"%d",&pline);
-	    mod = cctxt->func->mod;
+	    if (!cctxt || !cctxt->func || !cctxt->func->mod) {
+	      if (!list_mod) {
+	        fprintf(stdout,"Sdcdb fails to have a proper context at %d.\n", __LINE__);
+	        return 0;
+	      }
+	    }
+	    else
+	      list_mod = cctxt->func->mod;
 	}
 	else {
 	    char *bp;
@@ -1115,25 +1415,26 @@ int cmdListSrc (char *s, context *cctxt)
 		bp ++;
 		if (isdigit(*bp)) {
 		    /* FILE:LINE */
+		    list_mod=NULL;  /* bug fix 2-09-02, moduleWithCName expects mod to be null */
 		    if (srcMode == SRC_CMODE) {
-			if (!applyToSet(modules,moduleWithCName,s,&mod)) {
-			    fprintf (stderr,"No source file named %s.\n",s);
+			if (!applyToSet(modules,moduleWithCName,s,&list_mod)) {
+			    fprintf (stderr,"No c source file named %s.\n",s);
 			    return 0;
 			}
 		    } else {
-			if (!applyToSet(modules,moduleWithAsmName,s,&mod)) {
+			if (!applyToSet(modules,moduleWithAsmName,s,&list_mod)) {
 			    fprintf (stderr,"No source file named %s.\n",s);
 			    return 0;
 			}
 		    }
-		    sscanf(bp,"%d",&pline); 	 		    
+		    sscanf(bp,"%d",&pline);
 		} else {
 		    /* FILE:FUCTION */
 		    if (!applyToSet(functions,funcWithNameModule,bp,s,&func)) {
 			fprintf(stdout,"Function \"%s\" not defined.\n",bp);
 			return 0;
 		    }
-		    mod = func->mod;
+		    list_mod = func->mod;
 		    if (srcMode == SRC_CMODE) {
 			pline = func->entryline;
 			llines = func->exitline - func->entryline + 1;
@@ -1150,7 +1451,7 @@ int cmdListSrc (char *s, context *cctxt)
 		    return 0;
 		}
 		else {
-		    mod = func->mod;
+		    list_mod = func->mod;
 		    if (srcMode == SRC_CMODE) {
 			pline = func->entryline;
 			llines = func->exitline - func->entryline + 1; 
@@ -1159,7 +1460,7 @@ int cmdListSrc (char *s, context *cctxt)
 			llines = func->aexitline - func->aentryline + 1; 
 		    }
 		}
-	    }	    	    
+	    }
 	}
     } else {
 	/* if no line specified & we had listed
@@ -1167,25 +1468,36 @@ int cmdListSrc (char *s, context *cctxt)
 	if (currline)
 	    pline = currline ;
 	else {
-	    mod = cctxt->func->mod;
+	    if (!cctxt || !cctxt->func || !cctxt->func->mod) {
+	      fprintf(stdout,"Missing context at %d. Try list filename:lineno\n", __LINE__);
+	      return 0;
+	    }
+	    list_mod = cctxt->func->mod;
 	    if (srcMode == SRC_CMODE)
 		pline = cctxt->cline;
 	    else
 		pline = cctxt->asmline;
 	}
     }
+
+    if (!list_mod) {
+      fprintf(stdout,"Sdcdb fails to have a valid module context at %d.\n", __LINE__);
+      return 0;
+    }
     
+    if (llines > listLines) llines = listLines;
+
     for ( i = 0 ; i < llines ; i++ ) {
 	if (srcMode == SRC_CMODE) {
-	    if ( (pline + i) >= mod->ncLines )
+	    if ( (pline + i) >= list_mod->ncLines )
 		break;
 	    fprintf(stdout,"%d\t%s",pline + i,
-		    mod->cLines[pline +i]->src);
+		    list_mod->cLines[pline +i]->src);
 	} else {
-	    if ( (pline + i) >= mod->nasmLines )
+	    if ( (pline + i) >= list_mod->nasmLines )
 		break;
 	    fprintf(stdout,"%d\t%s",pline + i,
-		    mod->asmLines[pline +i]->src);
+		    list_mod->asmLines[pline +i]->src);
 	}
     }
     currline = pline + i ;
@@ -1340,6 +1652,7 @@ static void printSymValue (symbol *sym, context *cctxt)
 	else {
 	    printValBasic(sym,sym->addr,sym->addrspace,sym->size);
 	    fprintf(stdout,"\n");
+	    //fprintf(stdout,"(BASIC %x,%c,%d)\n",sym->addr,sym->addrspace,sym->size);
 	}
 }
 
@@ -1457,11 +1770,6 @@ int cmdPrint (char *s, context *cctxt)
     bp++ ;
     *bp = '\0';
 
-    if (!cctxt || !cctxt->func) {
-	fprintf(stdout,"No symbol \"%s\" in current context.\n",
-		s);
-	return 0;
-    }
     if ((sym = symLookup(s,cctxt))) {
 	printSymValue(sym,cctxt);
     } else {
@@ -1486,18 +1794,12 @@ int cmdPrintType (char *s, context *cctxt)
     bp++ ;
     *bp = '\0';
 
-    if (!cctxt || !cctxt->func) {
-	fprintf(stdout,"No symbol \"%s\" in current context.\n",
-		s);
-	return 0;
-    }
-
     if ((sym = symLookup(s,cctxt))) {
 	printTypeInfo(sym->type);
 	fprintf(stdout,"\n");
     } else {
 	fprintf(stdout,
-		"No symbol \"%s\" in current context.\n",	       
+		"No symbol \"%s\" in current context.\n",
 		s);
     }
     return 0;   

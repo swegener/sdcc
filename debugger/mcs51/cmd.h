@@ -44,4 +44,9 @@ extern int cmdFile      (char *, context *);
 extern int cmdInfo      (char *, context *);
 extern int cmdShow      (char *, context *);
 extern int cmdFinish    (char *, context *);
+
+extern int cmdListModules (char *s, context *cctxt);
+extern int cmdListFunctions (char *s, context *cctxt);
+extern int cmdListSymbols (char *s, context *cctxt);
+
 #endif

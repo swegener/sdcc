@@ -1,5 +1,10 @@
 2004-02-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
+	* src/mcs51/ralloc.c (packRegsForAssign, reassignAliasedSym): fixed
+	bug #895752 and a better fix for bug #716790
+
+2004-02-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
 	* src/SDCCsymt.c (processFuncArgs): fixed bug #896796
 
 2004-02-14 Frieder Ferlemann <Frieder.Ferlemann AT web.de>

@@ -1893,7 +1893,6 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
       return 0;
     }
 
-
   /* if the true symbol is defined in far space or on stack
      then we should not since this will increase register pressure */
   if (isOperandInFarSpace(IC_RESULT(ic)) && !farSpacePackable(ic)) {
@@ -1905,19 +1904,19 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
      we cannot */
   for (dic = ic->prev; dic; dic = dic->prev)
     {
-
-#if 0 /* jwk: This collides with 1.43 but I really see no need for
-	 this anymore. It fixes bug #716790 and substantially improves 
-	 redundant register usage around function calls.
-      */
-
-      /* if there is a function call then don't pack it */
+      int crossedCall = 0;
+      
+      /* We can pack across a function call only if it's a local */
+      /* variable or our parameter. Never pack global variables */
+      /* or parameters to a function we call. */
       if ((dic->op == CALL || dic->op == PCALL))
 	{
-	  dic = NULL;
-	  break;
+	  if (!OP_SYMBOL (IC_RESULT (ic))->ismyparm
+	      && !OP_SYMBOL (IC_RESULT (ic))->islocal)
+	    {
+	      crossedCall = 1;
+	    }
 	}
-#endif
 
       if (SKIP_IC2 (dic))
 	continue;
@@ -1966,12 +1965,19 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 	      break;
 	    }
 
-          if (POINTER_SET (dic) &&
+          if (IS_SYMOP (IC_RESULT (dic)) &&
 	      IC_RESULT (dic)->key == IC_RESULT (ic)->key)
 	    {
 	      dic = NULL;
 	      break;
 	    }
+	    
+	  if (crossedCall)
+	    {
+	      dic = NULL;
+	      break;
+	    }
+	  
 	}
     }
 
@@ -2055,7 +2061,6 @@ findAssignToSym (operand * op, iCode * ic)
      other uses.
   */
      
-
   for (dic = ic->prev; dic; dic = dic->prev)
     {
 
@@ -2168,7 +2173,8 @@ reassignAliasedSym (eBBlock *ebp, iCode *assignment, iCode *use, operand *op)
   /* update the sym of the used operand */
   OP_SYMBOL(op) = OP_SYMBOL(IC_RIGHT(assignment));
   op->key = OP_SYMBOL(op)->key;
-
+  OP_SYMBOL(op)->accuse = 0;
+  
   /* update the sym's liverange */
   if ( OP_LIVETO(op) < ic->seq )
     setToRange(op, ic->seq, FALSE);

@@ -531,12 +531,13 @@ bindVar (int key, char **s, hTab ** vtab)
 
   /* first get the value of the variable */
   vvx = *s;
-  /* the value is ended by a ',' or space or newline or null */
+  /* the value is ended by a ',' or space or newline or null or ) */
   while (*vvx &&
 	 *vvx != ',' &&
 	 !isspace (*vvx) &&
 	 *vvx != '\n' &&
-	 *vvx != ':')
+	 *vvx != ':' &&
+	 *vvx != ')')
     {
       char ubb = 0;
       /* if we find a '(' then we need to balance it */

@@ -1762,13 +1762,3 @@ replace {
 } by {
 	; removed dec/inc pair
 }
-
-replace {
-	mov     dps, #0x00
-	mov     dp%1,a
-	mov     dps, #0x01
-} by {
-	; Peephole 222 removed DPS abuse.
-	mov     dp%1,a
-        mov     dps, #0x01
-}

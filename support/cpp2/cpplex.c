@@ -38,6 +38,7 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #include "system.h"
 #include "cpplib.h"
 #include "cpphash.h"
+#include <assert.h>
 
 /* MULTIBYTE_CHARS support only works for native compilers.
    ??? Ideally what we want is to model widechar support after
@@ -84,6 +85,7 @@ static cppchar_t handle_newline PARAMS ((cpp_buffer *, cppchar_t));
 static cppchar_t skip_escaped_newlines PARAMS ((cpp_buffer *, cppchar_t));
 static cppchar_t get_effective_char PARAMS ((cpp_buffer *));
 
+static int skip_asm_block PARAMS ((cpp_reader *, int));
 static int skip_block_comment PARAMS ((cpp_reader *));
 static int skip_line_comment PARAMS ((cpp_reader *));
 static void adjust_column PARAMS ((cpp_reader *));
@@ -94,6 +96,8 @@ static int unescaped_terminator_p PARAMS ((cpp_reader *, const U_CHAR *));
 static void parse_string PARAMS ((cpp_reader *, cpp_token *, cppchar_t));
 static void unterminated PARAMS ((cpp_reader *, int));
 static int trigraph_ok PARAMS ((cpp_reader *, cppchar_t));
+static unsigned int copy_text_chars (char *, const char *, unsigned int, int);
+static void save_asm PARAMS ((cpp_reader *, cpp_token *, const U_CHAR *, int));
 static void save_comment PARAMS ((cpp_reader *, cpp_token *, const U_CHAR *));
 static void lex_percent PARAMS ((cpp_buffer *, cpp_token *));
 static void lex_dot PARAMS ((cpp_reader *, cpp_token *));
@@ -305,8 +309,9 @@ get_effective_char (buffer)
    seeing _endasm.  Returns non-zero if _asm terminated by EOF, zero
    otherwise.  */
 static int
-skip_asm_block (pfile)
+skip_asm_block (pfile, read_ahead)
      cpp_reader *pfile;
+     int read_ahead;
 {
 #define _ENDASM_STR "endasm"
 #define _ENDASM_LEN ((sizeof _ENDASM_STR) - 1)
@@ -319,7 +324,17 @@ skip_asm_block (pfile)
   pfile->state.lexing_comment = 1;
   while (buffer->cur != buffer->rlimit)
     {
-      prev_space = is_space(c), c = *buffer->cur++;
+      if (read_ahead != EOF)
+        {
+          prev_space = 0;
+          c = buffer->read_ahead;
+          read_ahead = EOF;
+        }
+      else
+        {
+          prev_space = is_space(c);
+          c = *buffer->cur++;
+        }
 
     next_char:
       /* FIXME: For speed, create a new character class of characters
@@ -779,33 +794,70 @@ parse_string (pfile, token, terminator)
   POOL_COMMIT (pool, token->val.str.len + 1);
 }
 
+/* Count and copy characters from src to dest, excluding CRs:
+   CRs are automatically generated, because the output is
+   opened in TEXT mode. If dest == NULL, only count chars */
+static unsigned int
+copy_text_chars (dest, src, len, read_ahead)
+     char *dest;
+     const char *src;
+     unsigned int len;
+     int read_ahead;
+{
+  unsigned int n = 0;
+  const char *p;
+
+  if (read_ahead != EOF && read_ahead != '\r')
+    {
+      if (dest != NULL)
+        *dest++ = read_ahead;
+      ++n;
+    }
+
+  for (p = src; p != src + len; ++p)
+    {
+      assert(*p != '\0');
+
+      if (*p != '\r')
+        {
+          if (dest != NULL)
+            *dest++ = *p;
+          ++n;
+        }
+    }
+
+    return n;
+}
+
 /* SDCC _asm specific */
 /* The stored comment includes the comment start and any terminator.  */
 static void
-save_asm (pfile, token, from)
+save_asm (pfile, token, from, read_ahead)
      cpp_reader *pfile;
      cpp_token *token;
      const unsigned char *from;
+     int read_ahead;
 {
 #define _ASM_STR  "_asm"
 #define _ASM_LEN  ((sizeof _ASM_STR) - 1)
 
   unsigned char *buffer;
-  unsigned int len;
+  unsigned int text_len, len;
 
-  len = pfile->buffer->cur - from + _ASM_LEN; /* + _ASM_LEN for the initial '_asm'.  */
-  /* C++ _asm block probably (not definitely) has moved past a new
-     line, which we don't want to save in the comment.  */
-  if (pfile->buffer->read_ahead != EOF)
-    len--;
-  buffer = _cpp_pool_alloc (&pfile->ident_pool, len);
-  
+  /* ignore read_ahead if it is a CR */ 
+  if (read_ahead == '\r')
+    read_ahead = EOF;
+  len = pfile->buffer->cur - from;
+  /* + _ASM_LEN for the initial '_asm'.  */
+  text_len = copy_text_chars (NULL, from, len, read_ahead) + _ASM_LEN;
+  buffer = _cpp_pool_alloc (&pfile->ident_pool, text_len);
+
   token->type = CPP_ASM;
-  token->val.str.len = len;
+  token->val.str.len = text_len;
   token->val.str.text = buffer;
 
   memcpy (buffer, _ASM_STR, _ASM_LEN);
-  memcpy (buffer + _ASM_LEN, from, len - _ASM_LEN);
+  copy_text_chars (buffer + _ASM_LEN, from, len, read_ahead);
 }
 
 /* The stored comment includes the comment start and any terminator.  */
@@ -816,21 +868,23 @@ save_comment (pfile, token, from)
      const unsigned char *from;
 {
   unsigned char *buffer;
-  unsigned int len;
-  
-  len = pfile->buffer->cur - from + 1; /* + 1 for the initial '/'.  */
+  unsigned int text_len, len;
+
+  len = pfile->buffer->cur - from;
   /* C++ comments probably (not definitely) have moved past a new
      line, which we don't want to save in the comment.  */
   if (pfile->buffer->read_ahead != EOF)
     len--;
-  buffer = _cpp_pool_alloc (&pfile->ident_pool, len);
-  
+  /* + 1 for the initial '/'.  */
+  text_len = copy_text_chars (NULL, from, len, EOF) + 1;
+  buffer = _cpp_pool_alloc (&pfile->ident_pool, text_len);
+
   token->type = CPP_COMMENT;
-  token->val.str.len = len;
+  token->val.str.len = text_len;
   token->val.str.text = buffer;
 
   buffer[0] = '/';
-  memcpy (buffer + 1, from, len - 1);
+  copy_text_chars (buffer + 1, from, len, EOF);
 }
 
 /* Subroutine of lex_token to handle '%'.  A little tricky, since we
@@ -1061,11 +1115,13 @@ _cpp_lex_token (pfile, result)
       /* handle _asm ... _endasm ;  */
       else if (result->val.node == pfile->spec_nodes.n__asm)
         {
+          int read_ahead = buffer->read_ahead;
+
           comment_start = buffer->cur;
           result->type = CPP_ASM;
-          skip_asm_block (pfile);
+          skip_asm_block (pfile, read_ahead);
           /* Save the _asm block as a token in its own right.  */
-          save_asm (pfile, result, comment_start);
+          save_asm (pfile, result, comment_start, read_ahead);
         }
       /* Convert named operators to their proper types.  */
       else if (result->val.node->flags & NODE_OPERATOR)

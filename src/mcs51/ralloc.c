@@ -1597,10 +1597,7 @@ regTypeNum (eBBlock *ebbs)
 	    }
 
 	  /* if the symbol has only one definition &
-	     that definition is a get_pointer and the
-	     pointer we are getting is rematerializable and
-	     in "data" space */
-
+	     that definition is a get_pointer */
 	  if (bitVectnBitsOn (sym->defs) == 1 &&
 	      (ic = hTabItemWithKey (iCodehTab,
 				     bitVectFirstBit (sym->defs))) &&
@@ -1610,10 +1607,10 @@ regTypeNum (eBBlock *ebbs)
 	    {
 
 
-	      /* if remat in data space */
+	      /* and that pointer is remat in data space */
 	      if (OP_SYMBOL (IC_LEFT (ic))->remat &&
 		  !IS_CAST_ICODE(OP_SYMBOL (IC_LEFT (ic))->rematiCode) &&
-		  DCL_TYPE (aggrToPtr (sym->type, FALSE)) == POINTER)
+		  DCL_TYPE (aggrToPtr (operandType(IC_LEFT(ic)), FALSE)) == POINTER)
 		{
 		  /* create a psuedo symbol & force a spil */
 		  symbol *psym = newSymbol (rematStr (OP_SYMBOL (IC_LEFT (ic))), 1);

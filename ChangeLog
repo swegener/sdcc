@@ -1,3 +1,9 @@
+2004-03-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCloop.c (basicInduction): fixed bug with loop induction
+	in loops with multiple exits (reported as incorrect registers
+	used by Martin Helmling in Sdcc-user list)
+
 2004-03-12 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/ds390/main.c (_ds390_genAssemblerPreamble): cosmetic change,

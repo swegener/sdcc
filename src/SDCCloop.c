@@ -131,7 +131,7 @@ intersectLoopSucc (set * lexits, eBBlock ** ebbs)
 
   if (!exit)
     return NULL;
-
+  
   succVect = bitVectCopy (exit->succVect);
 
   for (exit = setNextItem (lexits); exit;
@@ -827,7 +827,6 @@ basicInduction (region * loopReg, eBBlock ** ebbs, int count)
 	  if (nexits == 1)
 	    {
 	      eBBlock *exit = setFirstItem (loopReg->exits);
-
 	      /* if it is the same block then there is no
 	         need to move it about */
 	      if (exit != lBlock)
@@ -865,7 +864,18 @@ basicInduction (region * loopReg, eBBlock ** ebbs, int count)
 		      if (bitVectBitValue (loopSuccs, i))
 			{
 
-			  eBBlock *eblock = ebbs[i];
+			  eBBlock *eblock = NULL;
+			  int j;
+			  
+			  /* Need to search for bbnum == i since ebbs is  */
+			  /* sorted by dfnum; a direct index won't do.  */
+			  for (j=0; j<count; j++)
+			    if (ebbs[j]->bbnum == i)
+			      {
+			        eblock = ebbs[j];
+				break;
+			      }
+			  assert(eblock);
 
 			  /* if the successor does not belong to the loop
 			     and will be executed after the loop : then

@@ -115,7 +115,7 @@ typedef short bool;
 #define  STACK_WALK(stack)    (w_##stack >= (stack + sizeof(stack)/sizeof(*stack)) \
 			       ? NULL : *w_##stack++ )
 
-#include "../sdcc.src/SDCCbitv.h"
+#include "src/SDCCbitv.h"
 
 enum {
     SYM_REC = 1,

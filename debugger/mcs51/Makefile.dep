@@ -1,4 +1,18 @@
+sdcdb.o: sdcdb.c sdcdb.h ../../sdccconf.h ../../support/gc/gc.h \
+ ../../src/SDCCset.h ../../src/SDCChasht.h ../../src/SDCCbitv.h \
+ symtab.h simi.h break.h cmd.h
+symtab.o: symtab.c sdcdb.h ../../sdccconf.h ../../support/gc/gc.h \
+ ../../src/SDCCset.h ../../src/SDCChasht.h ../../src/SDCCbitv.h \
+ symtab.h
+simi.o: simi.c sdcdb.h ../../sdccconf.h ../../support/gc/gc.h \
+ ../../src/SDCCset.h ../../src/SDCChasht.h ../../src/SDCCbitv.h simi.h
 SDCCset.o: ../../src/SDCCset.c ../../src/SDCCset.h \
  ../../support/gc/gc.h
+break.o: break.c sdcdb.h ../../sdccconf.h ../../support/gc/gc.h \
+ ../../src/SDCCset.h ../../src/SDCChasht.h ../../src/SDCCbitv.h \
+ symtab.h break.h simi.h
+cmd.o: cmd.c sdcdb.h ../../sdccconf.h ../../support/gc/gc.h \
+ ../../src/SDCCset.h ../../src/SDCChasht.h ../../src/SDCCbitv.h \
+ symtab.h simi.h break.h cmd.h
 SDCChasht.o: ../../src/SDCChasht.c ../../src/SDCChasht.h \
  ../../support/gc/gc.h

@@ -246,4 +246,4 @@ extern PORT i186_port;
 extern PORT tlcs900h_port;
 #endif
 
-#endif PORT_INCLUDE
+#endif /* PORT_INCLUDE*/

@@ -27,6 +27,16 @@
 #include <stdlib.h>
 #include "aslink.h"
 
+#ifdef __CYGWIN__
+void ToCygWin(char * filspc)
+{
+    char posix_path[PATH_MAX];
+    void cygwin_conv_to_full_posix_path(char * win_path, char * posix_path);
+    cygwin_conv_to_full_posix_path(filspc, posix_path);
+    strcpy(filspc, posix_path);
+}
+#endif
+
 /*)Module	lklibr.c
  *
  *	The module lklibr.c contains the functions which
@@ -459,6 +469,7 @@ int fndsym( char *name )
 		ThisSym = ThisLibr->symbols->next;
 
 		while (ThisSym) {
+            //printf("ThisSym->name=%s\n", ThisSym->name);
 			if (!strcmp(ThisSym->name, name)) {
 				if (!ThisLibr->loaded) {
 					/* Object file is not loaded - add it to the list */
@@ -1039,6 +1050,10 @@ void loadfile_SdccLib(char * libspc, char * module, long offset)
 {
 	FILE *fp;
 
+#ifdef __CYGWIN__
+    ToCygWin(libspc);
+#endif
+
 	if ((fp = fopen(libspc,"r")) != NULL)
 	{
 		fseek(fp, offset, SEEK_SET);
@@ -1118,6 +1133,10 @@ char *filspc;
 	char str[NINPUT+2];
 	int i;
 
+#ifdef __CYGWIN__
+    ToCygWin(filspc);
+#endif
+
 	if ((fp = fopen(filspc,"r")) != NULL) {
 		while (fgets(str, NINPUT, fp) != NULL) {
 			str[NINPUT+1] = '\0';
@@ -1129,4 +1148,9 @@ char *filspc;
 		}
 		fclose(fp);
 	}
+    else
+    {
+        printf("Couldn't find file %s\n", filspc);
+        exit(-4);
+    }
 }

@@ -2512,7 +2512,7 @@ initCSupport ()
 
   for (bwd = 0; bwd < 3; bwd++)
     {
-      sym_link *l;
+      sym_link *l = NULL;
       switch (bwd)
 	{
 	case 0:

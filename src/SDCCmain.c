@@ -22,6 +22,7 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
+#include <signal.h>
 #include "common.h"
 #include <ctype.h>
 #include "newalloc.h"
@@ -1735,6 +1736,33 @@ initValues (void)
 
 }
 
+static void
+sig_handler (int signal)
+{
+  char *sig_string;
+
+  switch (signal)
+    {
+    case SIGABRT:
+      sig_string = "SIGABRT";
+      break;
+    case SIGTERM:
+      sig_string = "SIGTERM";
+      break;
+    case SIGINT:
+      sig_string = "SIGINT";
+      break;
+    case SIGSEGV:
+      sig_string = "SIGSEGV";
+      break;
+    default:
+      sig_string = "Unknown?";
+      break;
+    }
+  fprintf (stderr, "Catched signal %d: %s\n", signal, sig_string);
+  exit (1);
+}
+
 /*
  * main routine
  * initialises and calls the parser
@@ -1756,7 +1784,14 @@ main (int argc, char **argv, char **envp)
   /* install atexit handler */
   atexit(rm_tmpfiles);
 
-  /* Before parsing the command line options, do a 
+  /* install signal handler;
+     it's only purpuse is to call exit() to remove temp files */
+  signal (SIGABRT, sig_handler);
+  signal (SIGTERM, sig_handler);
+  signal (SIGINT , sig_handler);
+  signal (SIGSEGV, sig_handler);
+
+  /* Before parsing the command line options, do a
    * search for the port and processor and initialize
    * them if they're found. (We can't gurantee that these
    * will be the first options specified).

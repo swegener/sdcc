@@ -184,7 +184,7 @@ static void
 cnvToFloatCast (iCode * ic, eBBlock * ebp)
 {
   iCode *ip, *newic;
-  symbol *func;
+  symbol *func = NULL;
   sym_link *type = operandType (IC_RIGHT (ic));
   int linenno = ic->lineno;
   int bwd, su;
@@ -257,7 +257,7 @@ static void
 cnvFromFloatCast (iCode * ic, eBBlock * ebp)
 {
   iCode *ip, *newic;
-  symbol *func;
+  symbol *func = NULL;
   sym_link *type = operandType (IC_LEFT (ic));
   int lineno = ic->lineno;
   int bwd, su;

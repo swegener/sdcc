@@ -2,6 +2,12 @@
 
 	* device/lib/_mulint.c: small fix for large/ds390 --int-long-reent resp. --stack-auto
 	* device/lib/printfl.c: fix a ds390 bug by making it portable
+	* src/SDCCsymt.c (initCSupport): fix compile warning on Cygwin
+	* src/SDCCopt.c (cnvToFloatCast): fix compile warning on Cygwin
+	* src/SDCCopt.c (cnvFromFloatCast): fix compile warning on Cygwin
+	* debugger/mcs51/cmd.c: converted multi-line string literals
+	* sim/ucsim/globals.cc: converted multi-line string literals
+	* src/SDCCmain.c: introduced signal handler to remove temp files
 
 2003-02-05  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 

@@ -1,3 +1,10 @@
+2004-02-13 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCicode.c (usualBinaryConversions): removed pic16 from ports
+	which can't handle SDCC_NEWONEBYTEOPS,
+	(geniCodeMultiply): removed conversion from mult to shift for pic14
+	and pic16
+
 2004-02-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.h,
@@ -23,7 +30,7 @@
 	promotion behaviour; env. var. SDCC_NEWONEBYTEOPS selects the new,
 	SDCC_OLDONEBYTEOPS selects the old behaviour
 	* src/SDCCsymt.c (computeType): type2 can be NULL (for LEFT_OP);
-	changed again and commented promotion rule (it's still not perfect)
+	changed again and commented promotion rule
 	* src/SDCCval.c (valDiv): promotion no longer necessary
 	* src/ds390/gen.c (genMultOneByte) (genDivOneByte) (genModOneByte),
 	* src/mcs51/gen.c (genMultOneByte) (genDivOneByte) (genModOneByte):

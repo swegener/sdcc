@@ -629,6 +629,10 @@ adjustIChain (eBBlock ** ebbs, int count)
         continue;
 
       ic = ebbs[i]->sch;
+
+      /* is there any code for this eBBlock? (e.g. ROM assignment) */
+      if(!ic)continue;
+
       while (ic->prev)
         ic = ic->prev;
       ebbs[i]->sch = ic;

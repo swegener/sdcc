@@ -1,3 +1,9 @@
+2004-01-02 Vangelis Rokas <vrokas@otenet.gr>
+
+	* src/SDCClrange.c: fixed bug 869095 that caused segfault
+	in certain cases, e.g. when ROM assignment, patch provided
+	from Albert den Haan.
+
 2004-01-01 Bernhard Held <bernhard@bernhardheld.de>
 
 	Many signedness and type propagation fixes:

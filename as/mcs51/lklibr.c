@@ -460,7 +460,7 @@ char *name;
 			fclose(libfp);		       
 			/* if cdb information required & cdb file present */
 			if (dflag && dfp) {
-			    FILE *xfp = afile(str,"cdb",0);
+			    FILE *xfp = afile(str,"adb",0); //JCF: Nov 30, 2002
 			    if (xfp) {
 				copyfile(dfp,xfp);
 				fclose(xfp);

@@ -1,3 +1,14 @@
+2002-12-10  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+    * in \sdcc\as\mcs51\ changed these files in order to create an
+    aomf51 file: aslink.h, lkdta.c, lklex.c, lklibr.c, lklist.c,
+    lkmain.c.  Also added: lkmem.c and lkaomf51.c.  Changed the 
+    following files to include the previous two files: aslink.dsp,
+    Makefile.aslink, Makefile.bcc, and Makefile.in.
+
+    * Changed \sdcc\src\SDCCmain.c so it creates files with extension
+    .adb instead of .cdb
+    
 2002-11-09  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	* \sdcc\as\mcs51\lklist.c: Now reports memory usage using the

@@ -244,7 +244,8 @@ char *argv[];
 	syminit();
 	
 	if (dflag){
-	    dfp = afile("temp", "cdb", 1);
+	    //dfp = afile("temp", "cdb", 1);
+		dfp = afile(linkp->f_idp,"cdb",1); //JCF: Nov 30, 2002
 	    if (dfp == NULL) 
 		lkexit(1);
 	}
@@ -339,6 +340,9 @@ char *argv[];
 			reloc('E');
 		}
 	}
+	//JCF:
+	CreateAOMF51();
+
 	lkexit(lkerr);
 	return 0;
 }
@@ -378,14 +382,15 @@ int i;
 	if (rfp != NULL) fclose(rfp);
 	if (sfp != NULL) fclose(sfp);
 	if (tfp != NULL) fclose(tfp);
-	if (dfp != NULL) {
+	if (dfp != NULL) fclose(dfp);
+	/*if (dfp != NULL)
 	    FILE *xfp = afile(linkp->f_idp,"cdb",1);
 	    dfp = freopen("temp.cdb","r",dfp);
 	    copyfile(xfp,dfp);
 	    fclose(xfp);
 	    fclose(dfp);
 	    unlink("temp.cdb");
-	}
+	}*/
 	exit(i);
 }
 
@@ -1111,7 +1116,7 @@ char *ft;
 	}
 	*p2++ = 0;	
 	if ((fp = fopen(fb, omode)) == NULL) {
-	    if (strcmp(ft,"cdb")) {
+	    if (strcmp(ft,"adb")) {
 		fprintf(stderr, "%s: cannot %s.\n", fb, wf?"create":"open");
 		lkerr++;
 	    }

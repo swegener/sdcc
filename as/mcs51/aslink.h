@@ -80,11 +80,16 @@
 #endif
 
 /*
- * PATH_AMX
+ * PATH_MAX
  */
 #include <limits.h>
 #ifndef PATH_MAX		/* POSIX, but not required   */
-#define PATH_MAX 255		/* define a reasonable value */
+ #if defined(__BORLANDC__) || defined(_MSC_VER)
+  #include <stdlib.h>
+  #define PATH_MAX	_MAX_PATH
+ #else
+  #define PATH_MAX	255	/* define a reasonable value */
+ #endif
 #endif
 
 /*
@@ -449,7 +454,7 @@ extern	char	*rp;		/*	pointer into the LST file
 extern	char	rb[NINPUT];	/*	LST file text line being
 				 *	address relocated
 				 */
-extern	char	ctype[];	/*	array of character types, one per
+extern	unsigned char	ctype[];	/*	array of character types, one per
 				 *	ASCII character
 				 */
 
@@ -749,8 +754,12 @@ extern char 		*StoreString( char *str );
 /* lknoice.c */
 extern void             DefineNoICE( char *name, Addr_T value, int page );
 
-/* JCF: lksmry.c */
+/* JCF: lkmem.c */
 extern int summary(struct area * xp);
+
+/* JCF: lkaomf51.c */
+extern void SaveLinkedFilePath(char * filepath);
+extern void CreateAOMF51(void);
 
 /* SD added this to change
 	strcmpi --> strcmp (strcmpi NOT ANSI) */

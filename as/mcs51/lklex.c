@@ -503,13 +503,14 @@ loop:	if (pflag && cfp && cfp->f_type == F_STD)
 				sfp = afile(fid, "rel", 0);
 				/* if a .cdb file exists then copy it over */
 				if (dflag && sfp && dfp && pass == 0) {
-				    FILE *xfp = afile(fid,"cdb",0);
+				    FILE *xfp = afile(fid,"adb",0); //JCF: Nov 30, 2002
 				    if (xfp) {
 					copyfile(dfp,xfp);
 					fclose(xfp);
 				    }
 				}
 				if (uflag && pass != 0) {
+				 SaveLinkedFilePath(fid); //Save the linked path for aomf51
 				 if ((tfp = afile(fid, "lst", 0)) != NULL) {
 				  if ((rfp = afile(fid, "rst", 1)) == NULL) {
 					fclose(tfp);

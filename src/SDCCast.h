@@ -209,6 +209,7 @@ ast *initAggregates (symbol *, initList *, ast *);
 bool hasSEFcalls (ast *);
 void addSymToBlock (symbol *, ast *);
 void freeStringSymbol(symbol *);
+DEFSETFUNC(resetParmKey);
 
 // exported variables 
 extern set *operKeyReset;

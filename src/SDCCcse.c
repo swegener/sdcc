@@ -1,3 +1,9 @@
+//#define LIVERANGEHUNT
+#ifdef LIVERANGEHUNT
+  #define LRH(x) x
+#else
+  #define LRH(x)
+#endif
 /*-------------------------------------------------------------------------
   SDCCcse.c - source file for Common Subexpressions and other utility
 
@@ -81,6 +87,28 @@ pcseDef (void *item, va_list ap)
   return 1;
 }
 
+void ReplaceOpWithCheaperOp(operand **op, operand *cop) {
+#ifdef RANGEHUNT
+  printf ("ReplaceOpWithCheaperOp (%s:%d with %s:%d): ", 
+	  OP_SYMBOL((*op))->name, OP_SYMBOL((*op))->isreqv,
+	  OP_SYMBOL(cop)->name, OP_SYMBOL(cop)->isreqv);
+  // if op is a register equivalent
+  if (IS_ITEMP(cop) && OP_SYMBOL((*op))->isreqv) {
+    operand **rop = &OP_SYMBOL((*op))->usl.spillLoc->reqv;
+    if (isOperandEqual(*rop, *op)) {
+      printf ("true");
+      *rop=cop;
+      OP_SYMBOL((*op))->isreqv=0;
+      OP_SYMBOL(cop)->isreqv=1;
+    } else {
+      printf ("false");
+    }
+  }
+  printf ("\n");
+#endif
+  *op=cop;
+}
+
 /*-----------------------------------------------------------------*/
 /* replaceAllSymBySym - replaces all operands by operand in an     */
 /*                      instruction chain                          */
@@ -90,6 +118,7 @@ replaceAllSymBySym (iCode * ic, operand * from, operand * to, bitVect ** ndpset)
 {
   iCode *lic;
 
+  LRH(printf ("replaceAllSymBySym: from %s to %s\n", OP_SYMBOL(from)->name, OP_SYMBOL(to)->name));
   for (lic = ic; lic; lic = lic->next)
     {
       int siaddr;
@@ -329,7 +358,9 @@ DEFSETFUNC (findCheaperOp)
 	  *opp = operandFromOperand (*opp);
 	  (*opp)->isaddr = cop->isaddr;
 	}
-
+      LRH(printf ("findCheaperOp: %s < %s\n",\
+	      IS_SYMOP((*opp)) ? OP_SYMBOL((*opp))->name : "!SYM",\
+	      OP_SYMBOL(cop)->name));
       return 1;
 
     }
@@ -379,6 +410,7 @@ DEFSETFUNC (findPrevIc)
   if (isiCodeEqual (ic, cdp->diCode) &&
       isOperandEqual (cdp->sym, IC_RESULT (cdp->diCode)))
     {
+      LRH(printf ("findPrevIc same: %d %d\n", ic->key, cdp->diCode->key));
 	*icp = cdp->diCode;
       return 1;
     }
@@ -390,6 +422,7 @@ DEFSETFUNC (findPrevIc)
       isOperandEqual (IC_LEFT (ic), IC_RIGHT (cdp->diCode)) &&
       isOperandEqual (IC_RIGHT (ic), IC_LEFT (cdp->diCode)))
     {
+      LRH(printf ("findPrevIc inter: %d %d\n", ic->key, cdp->diCode->key));
       *icp = cdp->diCode;
       return 1;
     }
@@ -886,7 +919,6 @@ algebraicOpts (iCode * ic)
 void 
 updateSpillLocation (iCode * ic, int induction)
 {
-
 	sym_link *setype;
 
 	if (POINTER_SET (ic))
@@ -1016,7 +1048,7 @@ ifxOptimize (iCode * ic, set * cseSet,
       applyToSetFTrue (cseSet, findCheaperOp, IC_COND (ic), &pdop, 0);
       if (pdop)
 	{
-	  IC_COND (ic) = pdop;
+	  ReplaceOpWithCheaperOp(&IC_COND (ic), pdop);
 	  (*change)++;
 	}
     }
@@ -1334,6 +1366,7 @@ static int isSignedOp (iCode *ic)
  	return 0;
     }
  }
+
 /*-----------------------------------------------------------------*/
 /* cseBBlock - common subexpression elimination for basic blocks   */
 /*             this is the hackiest kludgiest routine in the whole */
@@ -1433,7 +1466,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	      pdop = NULL;
 	      applyToSetFTrue (cseSet, findCheaperOp, IC_LEFT (ic), &pdop, 0);
 	      if (pdop)
-		IC_LEFT (ic) = pdop;
+		ReplaceOpWithCheaperOp(&IC_LEFT(ic), pdop);
 	    }
 	  /* the lookup could have changed it */
 	  if (IS_SYMOP (IC_LEFT (ic)))
@@ -1515,7 +1548,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	      pdop = NULL;
 	      applyToSetFTrue (cseSet, findCheaperOp, IC_RESULT (ic), &pdop, 0);
 	      if (pdop && IS_ITEMP (pdop) && !computeOnly)
-		IC_RESULT (ic) = pdop;
+		ReplaceOpWithCheaperOp (&IC_RESULT(ic), pdop);
 	    }
 	}
 
@@ -1543,7 +1576,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 			   this variable .. unsafe to remove any POINTER_GETs */
 			if (bitVectBitValue(ebb->ndompset,IC_LEFT(ic)->key))
 			    ebb->ptrsSet = bitVectSetBit(ebb->ptrsSet,pdop->key);
-		      IC_LEFT (ic) = pdop;
+			ReplaceOpWithCheaperOp(&IC_LEFT(ic), pdop);
 		      change = 1;
 		    }
 		  /* check if there is a pointer set
@@ -1555,14 +1588,14 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 		    {
 		      ic->op = '=';
 		      IC_LEFT (ic) = NULL;
-		      IC_RIGHT (ic) = pdop;
+		      ReplaceOpWithCheaperOp(&IC_RIGHT(ic), pdop);
 		      SET_ISADDR (IC_RESULT (ic), 0);
 		    }
 
 		}
 	      else
 		{
-		  IC_LEFT (ic) = pdop;
+		  ReplaceOpWithCheaperOp(&IC_LEFT(ic), pdop);
 		  change = 1;
 		}
 	    }
@@ -1574,13 +1607,12 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 
 	  pdop = NULL;
 	  applyToSetFTrue (cseSet, findCheaperOp, IC_RIGHT (ic), &pdop, checkSign);
-	  if (pdop)
-	    {
-	      IC_RIGHT (ic) = pdop;
-	      change = 1;
-	    }
+	  if (pdop) {
+	    ReplaceOpWithCheaperOp(&IC_RIGHT(ic), pdop);
+	    change = 1;
+	  }
 	}
-
+	
       /* if left or right changed then do algebraic */
       if (change)
 	{
@@ -1590,7 +1622,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 
       /* if after all this it becomes a assignment to self
          then delete it and continue */
-      if (ASSIGNMENT_TO_SELF (ic) && !OTHERS_PARM(OP_SYMBOL(IC_RESULT(ic))))
+      if (ASSIGNMENT_TO_SELF (ic))
 	{
 	  remiCodeFromeBBlock (ebb, ic);
 	  continue;

@@ -1,3 +1,9 @@
+//#define LIVERANGEHUNT
+#ifdef LIVERANGEHUNT
+  #define LRH(x) x
+#else
+  #define LRH(x)
+#endif
 /*------------------------------------------------------------------------
 
   SDCCralloc.c - source file for register allocation. (8051) specific
@@ -571,7 +577,7 @@ spillThis (symbol * sym)
   if (!(sym->remat || sym->usl.spillLoc))
     createStackSpil (sym);
 
-
+  LRH(printf("spillThis: %s\n", sym->name));
   /* mark it has spilt & put it in the spilt set */
   sym->isspilt = sym->spillA = 1;
   _G.spiltSet = bitVectSetBit (_G.spiltSet, sym->key);
@@ -719,6 +725,7 @@ spilSomething (iCode * ic, eBBlock * ebp, symbol * forSym)
 
   /* get something we can spil */
   ssym = selectSpil (ic, ebp, forSym);
+  LRH(printf("spilSomething: spilled %s for %s\n", ssym->name, forSym->name));
 
   /* mark it as spilt */
   ssym->isspilt = ssym->spillA = 1;
@@ -1168,6 +1175,9 @@ serialRegAssign (eBBlock ** ebbs, int count)
 		    continue;		      
 		}
 
+		if (strcmp(sym->name,"iTemp121")==0) {
+		  printf ("Oops\n");
+		}
 		/* if it has a spillocation & is used less than
 		   all other live ranges then spill this */
 		if (willCS) {
@@ -1563,6 +1573,30 @@ regTypeNum (eBBlock *ebbs)
 	      continue;
 	    }
 
+#ifdef RANGEHUNT
+	  /* if this symbol has only one usage and that is an assignment
+	     to a ruonly, we don't need registers */
+	  // if this symbol has only one def
+	  if (bitVectnBitsOn (sym->defs)==1) {
+	    printf ("sym: %s has only one usage", sym->name);
+	    // find that usage
+	    if ((ic = hTabItemWithKey (iCodehTab, bitVectFirstBit (sym->defs)))) {
+	      if (ic->op==CALL) {
+		printf (" for a call ");
+		// if this is only assigned to a ruonly
+		if ((ic = hTabItemWithKey (iCodehTab, bitVectFirstBit (sym->defs)))) {
+		  if (ic->op=='=') {
+		    if (OP_SYMBOL(IC_RESULT(ic))->ruonly) {
+		      printf("regTypeNum: %s assigned to %s\n", \
+			     sym->name, OP_SYMBOL(IC_RESULT(ic))->name); 
+		    }
+		  }
+		}
+	      }
+	    }
+	  }
+#endif
+
 	  /* if the symbol has only one definition &
 	     that definition is a get_pointer */
 	  if (bitVectnBitsOn (sym->defs) == 1 &&
@@ -1593,7 +1627,7 @@ regTypeNum (eBBlock *ebbs)
 		  /* now this really is an assignment to itself, make it so;
 		     it will be optimized out later */
 		  ic->op='=';
-		  IC_RIGHT(ic)=IC_RESULT(ic);
+		  ReplaceOpWithCheaperOp(&IC_RIGHT(ic), IC_RESULT(ic));
 		  IC_LEFT(ic)=NULL;
 #endif
 		  continue;
@@ -1630,7 +1664,7 @@ regTypeNum (eBBlock *ebbs)
 	/* registers for true symbols we will */
 	/* see how things go                  */
 	sym->nRegs = 0;
-    }
+	  }
 
 }
 
@@ -1731,15 +1765,14 @@ static int
 packRegsForAssign (iCode * ic, eBBlock * ebp)
 {
   iCode *dic, *sic;
-  //sym_link *etype = operandType (IC_RIGHT (ic));
 
   if (!IS_ITEMP (IC_RIGHT (ic)) ||
       OP_SYMBOL (IC_RIGHT (ic))->isind ||
-      OP_LIVETO (IC_RIGHT (ic)) > ic->seq
-      /* why? || IS_BITFIELD (etype) */ )
+      OP_LIVETO (IC_RIGHT (ic)) > ic->seq)
     {
       return 0;
     }
+
 
   /* if the true symbol is defined in far space or on stack
      then we should not since this will increase register pressure */
@@ -1835,12 +1868,14 @@ pack:
   /* replace the result with the result of */
   /* this assignment and remove this assignment */
   bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
-  IC_RESULT (dic) = IC_RESULT (ic);
+  ReplaceOpWithCheaperOp(&IC_RESULT (dic), IC_RESULT (ic));
 
   if (IS_ITEMP (IC_RESULT (dic)) && OP_SYMBOL (IC_RESULT (dic))->liveFrom > dic->seq)
     {
       OP_SYMBOL (IC_RESULT (dic))->liveFrom = dic->seq;
     }
+  // jwk: and the otherway around?
+
   /* delete from liverange table also 
      delete from all the points inbetween and the new
      one */
@@ -1856,7 +1891,6 @@ pack:
   hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);
   OP_DEFS_SET ((IC_RESULT (dic)), bitVectSetBit (OP_DEFS (IC_RESULT (dic)), dic->key));
   return 1;
-
 }
 
 /*------------------------------------------------------------------*/
@@ -1902,6 +1936,7 @@ findAssignToSym (operand * op, iCode * ic)
   if (!dic)
     return NULL;   /* didn't find any assignment to op */
 
+  LRH(printf ("findAssignToSym: %s\n", OP_SYMBOL(IC_RESULT(dic))->name));
   /* we are interested only if defined in far space */
   /* or in stack space in case of + & - */
   
@@ -2089,6 +2124,7 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
 			 bitVectFirstBit (OP_DEFS (op)))))
     return NULL;
 
+  LRH(printf ("packRegsForOneUse: %s\n", OP_SYMBOL(op)->name));
   /* if that only usage is a cast */
   if (dic->op == CAST) {
     /* to a bigger type */
@@ -2190,7 +2226,6 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
 
   OP_SYMBOL (op)->ruonly = 1;
   return sic;
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -2487,7 +2522,7 @@ packForPush (iCode * ic, eBBlock ** ebpp, int blockno)
 
   /* we now we know that it has one & only one def & use
      and the that the definition is an assignment */
-  IC_LEFT (ic) = IC_RIGHT (dic);
+  ReplaceOpWithCheaperOp(&IC_LEFT (ic), IC_RIGHT (dic));
   remiCodeFromeBBlock (ebp, dic);
   hTabDeleteItem (&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
 }
@@ -2640,12 +2675,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
       if ((ic->op == RETURN || (ic->op == SEND && ic->argreg == 1)) &&
 	  !isOperandInFarSpace (IC_LEFT (ic)) &&
 	  options.model == MODEL_SMALL) {
-	if (0 && options.stackAuto) {
-	  /* we should check here if acc will be clobbered for stack
-	     offset calculations */
-	} else {
-	  packRegsForOneuse (ic, IC_LEFT (ic), ebp);
-	}
+	packRegsForOneuse (ic, IC_LEFT (ic), ebp);
       }
 
       /* if pointer set & left has a size more than
@@ -2655,7 +2685,6 @@ packRegisters (eBBlock ** ebpp, int blockno)
 	  !OP_SYMBOL (IC_RESULT (ic))->remat &&
 	  !IS_OP_RUONLY (IC_RIGHT (ic)) &&
 	  getSize (aggrToPtr (operandType (IC_RESULT (ic)), FALSE)) > 1)
-
 	packRegsForOneuse (ic, IC_RESULT (ic), ebp);
 
       /* if pointer get */
@@ -2664,7 +2693,6 @@ packRegisters (eBBlock ** ebpp, int blockno)
 	  !OP_SYMBOL (IC_LEFT (ic))->remat &&
 	  !IS_OP_RUONLY (IC_RESULT (ic)) &&
 	  getSize (aggrToPtr (operandType (IC_LEFT (ic)), FALSE)) > 1)
-
 	packRegsForOneuse (ic, IC_LEFT (ic), ebp);
 
 
@@ -2689,7 +2717,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
 		  if (IS_ARITHMETIC_OP (dic))
 		    {		       
 		      bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
-		      IC_RESULT (dic) = IC_RESULT (ic);
+		      ReplaceOpWithCheaperOp(&IC_RESULT (dic), IC_RESULT (ic));
 		      remiCodeFromeBBlock (ebp, ic);
 		      bitVectUnSetBit(OP_SYMBOL(IC_RESULT(ic))->defs,ic->key);
 		      hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);
@@ -2712,7 +2740,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
 		  if (dic)
 		    {
 		      bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
-		      IC_RESULT (dic) = IC_RESULT (ic);
+		      ReplaceOpWithCheaperOp(&IC_RESULT (dic), IC_RESULT (ic));
 		      remiCodeFromeBBlock (ebp, ic);
 		      bitVectUnSetBit(OP_SYMBOL(IC_RESULT(ic))->defs,ic->key);
 		      hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);

@@ -307,7 +307,9 @@ allocGlobal (symbol * sym)
 	      "%s%s", port->fun_prefix, sym->name);
 
   /* add it to the operandKey reset */
-  addSet (&operKeyReset, sym);
+  if (!isinSet (operKeyReset, sym)) {
+    addSet(&operKeyReset, sym);
+  }
 
   /* if this is a literal e.g. enumerated type */
   /* put it in the data segment & do nothing   */
@@ -586,7 +588,9 @@ deallocParms (value * val)
 	  addSym (SymbolTab, lval->sym, lval->sym->name,
 		  lval->sym->level, lval->sym->block, 1);
 	  lval->sym->_isparm = 1;
-	  addSet (&operKeyReset, lval->sym);
+	  if (!isinSet (operKeyReset, lval->sym)) {
+	    addSet(&operKeyReset, lval->sym);
+	  }
 	}
 
     }
@@ -1015,6 +1019,10 @@ printAllocInfoSeg (memmap * map, symbol * func, FILE * of)
       if (!sym->allocreq && sym->reqv)
 	{
 	  int i;
+	  if (!OP_SYMBOL(sym->reqv)->nRegs) {
+	    printf ("*** warning: %s -> %s\n", sym->name, 
+		    OP_SYMBOL(sym->reqv)->name);
+	  }
 	  sym = OP_SYMBOL (sym->reqv);
 	  fprintf (of, "registers ");
 	  for (i = 0; i < 4 && sym->regs[i]; i++)

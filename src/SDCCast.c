@@ -4281,7 +4281,7 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		INDENT(indent,outfile);
 		fprintf(outfile,"{\n");
 		while (decls) {
-			INDENT(indent+4,outfile);
+			INDENT(indent+2,outfile);
 			fprintf(outfile,"DECLARE SYMBOL (%s=%p) type (",
 				decls->name, decls);
 			printTypeChain(decls->type,outfile);
@@ -4289,7 +4289,7 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 			
 			decls = decls->next;			
 		}
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->right,outfile,indent+2);
 		INDENT(indent,outfile);
 		fprintf(outfile,"}\n");
 		return;
@@ -4356,8 +4356,8 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"ARRAY_OP (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return;
 
 		/*------------------------------------------------------------------*/
@@ -4368,8 +4368,8 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"STRUCT_ACCESS (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return ;
 
 		/*------------------------------------------------------------------*/
@@ -4380,8 +4380,8 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"PTR_ACCESS (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return ;
 
 		/*------------------------------------------------------------------*/
@@ -4392,14 +4392,14 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"INC_OP (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
 		return ;
 
 	case DEC_OP:
 		fprintf(outfile,"DEC_OP (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
 		return ;
 
 		/*------------------------------------------------------------------*/
@@ -4411,14 +4411,14 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 			fprintf(outfile,"& (%p) type (",tree);
 			printTypeChain(tree->ftype,outfile);
 			fprintf(outfile,")\n");
-			ast_print(tree->left,outfile,indent+4);
-			ast_print(tree->right,outfile,indent+4);
+			ast_print(tree->left,outfile,indent+2);
+			ast_print(tree->right,outfile,indent+2);
 		} else {
 			fprintf(outfile,"ADDRESS_OF (%p) type (",tree);
 			printTypeChain(tree->ftype,outfile);
 			fprintf(outfile,")\n");
-			ast_print(tree->left,outfile,indent+4);
-			ast_print(tree->right,outfile,indent+4);
+			ast_print(tree->left,outfile,indent+2);
+			ast_print(tree->right,outfile,indent+2);
 		}
 		return ;
 		/*----------------------------*/
@@ -4428,8 +4428,8 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"OR (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return ;
 		/*------------------------------------------------------------------*/
 		/*----------------------------*/
@@ -4439,8 +4439,8 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"XOR (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return ;
 		
 		/*------------------------------------------------------------------*/
@@ -4451,8 +4451,8 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"DIV (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return ;
 		/*------------------------------------------------------------------*/
 		/*----------------------------*/
@@ -4462,8 +4462,8 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"MOD (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return ;
 
 		/*------------------------------------------------------------------*/
@@ -4475,7 +4475,7 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 			fprintf(outfile,"DEREF (%p) type (",tree);
 			printTypeChain(tree->ftype,outfile);
 			fprintf(outfile,")\n");
-			ast_print(tree->left,outfile,indent+4);
+			ast_print(tree->left,outfile,indent+2);
 			return ;
 		}			
 		/*------------------------------------------------------------------*/
@@ -4485,8 +4485,8 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"MULT (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return ;
 
 
@@ -4500,7 +4500,7 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 			fprintf(outfile,"UPLUS (%p) type (",tree);
 			printTypeChain(tree->ftype,outfile);
 			fprintf(outfile,")\n");
-			ast_print(tree->left,outfile,indent+4);
+			ast_print(tree->left,outfile,indent+2);
 		} else {
 			/*------------------------------------------------------------------*/
 			/*----------------------------*/
@@ -4509,8 +4509,8 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 			fprintf(outfile,"ADD (%p) type (",tree);
 			printTypeChain(tree->ftype,outfile);
 			fprintf(outfile,")\n");
-			ast_print(tree->left,outfile,indent+4);
-			ast_print(tree->right,outfile,indent+4);
+			ast_print(tree->left,outfile,indent+2);
+			ast_print(tree->right,outfile,indent+2);
 		}
 		return;
 		/*------------------------------------------------------------------*/
@@ -4522,7 +4522,7 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 			fprintf(outfile,"UMINUS (%p) type (",tree);
 			printTypeChain(tree->ftype,outfile);
 			fprintf(outfile,")\n");
-			ast_print(tree->left,outfile,indent+4);
+			ast_print(tree->left,outfile,indent+2);
 		} else {
 			/*------------------------------------------------------------------*/
 			/*----------------------------*/
@@ -4531,8 +4531,8 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 			fprintf(outfile,"SUB (%p) type (",tree);
 			printTypeChain(tree->ftype,outfile);
 			fprintf(outfile,")\n");
-			ast_print(tree->left,outfile,indent+4);
-			ast_print(tree->right,outfile,indent+4);
+			ast_print(tree->left,outfile,indent+2);
+			ast_print(tree->right,outfile,indent+2);
 		}
 		return;
 		/*------------------------------------------------------------------*/
@@ -4543,7 +4543,7 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"COMPL (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
 		return ;
 		/*------------------------------------------------------------------*/
 		/*----------------------------*/
@@ -4553,7 +4553,7 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"NOT (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
 		return ;
 		/*------------------------------------------------------------------*/
 		/*----------------------------*/
@@ -4563,34 +4563,34 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"RRC (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
 		return ;
 
 	case RLC:
 		fprintf(outfile,"RLC (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
 		return ;
 	case GETHBIT:
 		fprintf(outfile,"GETHBIT (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
 		return ;
 	case LEFT_OP:
 		fprintf(outfile,"LEFT_SHIFT (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return ;
 	case RIGHT_OP:
 		fprintf(outfile,"RIGHT_SHIFT (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return ;
 		/*------------------------------------------------------------------*/
 		/*----------------------------*/
@@ -4602,22 +4602,22 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,") to type (");
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->right,outfile,indent+2);
 		return ;
 		
 	case AND_OP:
 		fprintf(outfile,"ANDAND (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return ;
 	case OR_OP:
 		fprintf(outfile,"OROR (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return ;
 		
 		/*------------------------------------------------------------------*/
@@ -4628,43 +4628,43 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"GT(>) (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return ;
 	case '<':
 		fprintf(outfile,"LT(<) (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return ;
 	case LE_OP:
 		fprintf(outfile,"LE(<=) (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return ;
 	case GE_OP:
 		fprintf(outfile,"GE(>=) (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return ;
 	case EQ_OP:
 		fprintf(outfile,"EQ(==) (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return ;
 	case NE_OP:
 		fprintf(outfile,"NE(!=) (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		/*------------------------------------------------------------------*/
 		/*----------------------------*/
 		/*             sizeof         */
@@ -4681,16 +4681,16 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"QUEST(?) (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return;
 
 	case ':':
 		fprintf(outfile,"COLON(:) (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return ;
 		
 		/*------------------------------------------------------------------*/
@@ -4701,50 +4701,50 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"MULASS(*=) (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return;
 	case DIV_ASSIGN:
 		fprintf(outfile,"DIVASS(/=) (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return;
 	case AND_ASSIGN:
 		fprintf(outfile,"ANDASS(&=) (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return;
 	case OR_ASSIGN:
 		fprintf(outfile,"ORASS(*=) (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return;
 	case XOR_ASSIGN:
 		fprintf(outfile,"XORASS(*=) (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return;
 	case RIGHT_ASSIGN:
 		fprintf(outfile,"RSHFTASS(>>=) (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return;
 	case LEFT_ASSIGN:
 		fprintf(outfile,"LSHFTASS(*=) (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return;
 		/*------------------------------------------------------------------*/
 		/*----------------------------*/
@@ -4754,8 +4754,8 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"SUBASS(-=) (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return;
 		/*------------------------------------------------------------------*/
 		/*----------------------------*/
@@ -4765,8 +4765,8 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"ADDASS(+=) (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return;
 		/*------------------------------------------------------------------*/
 		/*----------------------------*/
@@ -4776,8 +4776,8 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"ASSIGN(=) (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return;	    
 		/*------------------------------------------------------------------*/
 		/*----------------------------*/
@@ -4787,8 +4787,8 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"COMMA(,) (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return;
 		/*------------------------------------------------------------------*/
 		/*----------------------------*/
@@ -4799,14 +4799,14 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"CALL (%p) type (",tree);
 		printTypeChain(tree->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		ast_print(tree->right,outfile,indent+2);
 		return;
 	case PARAM:
 		fprintf(outfile,"PARMS\n");
-		ast_print(tree->left,outfile,indent+4);
-		if (tree->right && !IS_AST_PARAM(tree->right)) {
-			ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
+		if (tree->right /*&& !IS_AST_PARAM(tree->right)*/) {
+			ast_print(tree->right,outfile,indent+2);
 		}
 		return ;
 		/*------------------------------------------------------------------*/
@@ -4817,15 +4817,15 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"RETURN (%p) type (",tree);
 		printTypeChain(tree->right->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->right,outfile,indent+2);
 		return ;
 		/*------------------------------------------------------------------*/
 		/*----------------------------*/
 		/*     label statement        */
 		/*----------------------------*/
 	case LABEL :
-		fprintf(outfile,"LABEL (%p)",tree);
-		ast_print(tree->left,outfile,indent+4);
+		fprintf(outfile,"LABEL (%p)\n",tree);
+		ast_print(tree->left,outfile,indent+2);
 		ast_print(tree->right,outfile,indent);
 		return;
 		/*------------------------------------------------------------------*/
@@ -4838,7 +4838,7 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 			fprintf(outfile,"SWITCH (%p) ",tree);
 			ast_print(tree->left,outfile,0);
 			for (val = tree->values.switchVals.swVals; val ; val = val->next) {
-				INDENT(indent+4,outfile);
+				INDENT(indent+2,outfile);
 				fprintf(outfile,"CASE 0x%x GOTO _case_%d_%d\n",
 					(int) floatFromVal(val),
 					tree->values.switchVals.swNum,
@@ -4853,7 +4853,7 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		/*----------------------------*/
 	case IFX:
 		fprintf(outfile,"IF (%p) \n",tree);
-		ast_print(tree->left,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
 		if (tree->trueLabel) {
 			INDENT(indent,outfile);
 			fprintf(outfile,"NE(!=) 0 goto %s\n",tree->trueLabel->name);
@@ -4862,7 +4862,7 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 			INDENT(indent,outfile);
 			fprintf(outfile,"EQ(==) 0 goto %s\n",tree->falseLabel->name);
 		}
-		ast_print(tree->right,outfile,indent+4);
+		ast_print(tree->right,outfile,indent+2);
 		return ;
 		/*------------------------------------------------------------------*/
 		/*----------------------------*/
@@ -4871,22 +4871,22 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 	case FOR:
 		fprintf(outfile,"FOR (%p) \n",tree);
 		if (AST_FOR( tree, initExpr)) {
-			INDENT(indent+4,outfile);
+			INDENT(indent+2,outfile);
 			fprintf(outfile,"INIT EXPR ");
-			ast_print(AST_FOR(tree, initExpr),outfile,indent+4);
+			ast_print(AST_FOR(tree, initExpr),outfile,indent+2);
 		}
 		if (AST_FOR( tree, condExpr)) {
-			INDENT(indent+4,outfile);
+			INDENT(indent+2,outfile);
 			fprintf(outfile,"COND EXPR ");
-			ast_print(AST_FOR(tree, condExpr),outfile,indent+4);
+			ast_print(AST_FOR(tree, condExpr),outfile,indent+2);
 		}
 		if (AST_FOR( tree, loopExpr)) {
-			INDENT(indent+4,outfile);
+			INDENT(indent+2,outfile);
 			fprintf(outfile,"LOOP EXPR ");
-			ast_print(AST_FOR(tree, loopExpr),outfile,indent+4);
+			ast_print(AST_FOR(tree, loopExpr),outfile,indent+2);
 		}
 		fprintf(outfile,"FOR LOOP BODY \n");
-		ast_print(tree->left,outfile,indent+4);
+		ast_print(tree->left,outfile,indent+2);
 		return ;
 	default:
 	    return ;

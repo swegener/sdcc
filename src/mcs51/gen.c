@@ -6792,7 +6792,7 @@ genUnpackBits (operand * result, char *rname, int ptype)
 
     case CPOINTER:
       emitcode ("clr", "a");
-      emitcode ("movc", "a,%s", "@a+dptr");
+      emitcode ("movc", "a,@a+dptr");
       break;
 
     case GPOINTER:
@@ -6845,7 +6845,7 @@ genUnpackBits (operand * result, char *rname, int ptype)
 	case CPOINTER:
 	  emitcode ("clr", "a");
 	  emitcode ("inc", "dptr");
-	  emitcode ("movc", "a", "@a+dptr");
+	  emitcode ("movc", "a,@a+dptr");
 	  break;
 
 	case GPOINTER:

@@ -1,3 +1,17 @@
+2003-12-20 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCast.h,
+	* src/SDCCast.c (newAst_),
+	* src/SDCCicode.h,
+	* src/SDCCicode.c (ast2iCode, newiCode),
+	* src/SDCCglobl.h,
+	* src/SDCC.y (logical_and_expr, logical_or_expr, conditional_expr,
+	expr, statement, expression_statement, selection_statement,
+	iteration_statement, expr_opt, jump_statement): foundation for tracking
+	sequence points
+	* src/SDCCopt.c (killDeadCode): fixed bug #861580 (needs the sequence
+	point code too)
+
 2003-12-19 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* support/Util/SDCCerr.c,

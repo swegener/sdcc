@@ -265,6 +265,7 @@ extern char *dstPath;		/* path for the output files; */
 				/* "" is equivalent with cwd */
 extern char *moduleName;	/* module name is source file without path and extension */
 				/* can be NULL while linking without compiling */
+extern int seqPointNo;		/* current sequence point */
 extern int currLineno;		/* current line number    */
 extern int mylineno;		/* line number of the current file SDCC.lex */
 extern FILE *yyin;		/* */

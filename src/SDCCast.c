@@ -84,6 +84,7 @@ newAst_ (unsigned type)
   ex->level = NestLevel;
   ex->block = currBlockno;
   ex->initMode = inInitMode;
+  ex->seqPoint = seqPointNo;
   return ex;
 }
 

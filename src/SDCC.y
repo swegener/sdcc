@@ -45,6 +45,7 @@ int reentrant = 0 ;
 int blockNo   = 0 ;     /* sequential block number  */
 int currBlockno=0 ;
 int inCritical= 0 ;
+int seqPointNo= 1 ;	/* sequence point number */
 extern int yylex();
 int yyparse(void);
 extern int noLineno ;
@@ -373,21 +374,21 @@ inclusive_or_expr
 
 logical_and_expr
    : inclusive_or_expr
-   | logical_and_expr AND_OP inclusive_or_expr 
-                                 { $$ = newNode(AND_OP,$1,$3);}
+   | logical_and_expr AND_OP { seqPointNo++;} inclusive_or_expr 
+                                 { $$ = newNode(AND_OP,$1,$4);}
    ;
 
 logical_or_expr
    : logical_and_expr
-   | logical_or_expr OR_OP logical_and_expr  
-                                 { $$ = newNode(OR_OP,$1,$3); }
+   | logical_or_expr OR_OP { seqPointNo++;} logical_and_expr  
+                                 { $$ = newNode(OR_OP,$1,$4); }
    ;
 
 conditional_expr
    : logical_or_expr
-   | logical_or_expr '?' logical_or_expr ':' conditional_expr  
+   | logical_or_expr '?' { seqPointNo++;} logical_or_expr ':' conditional_expr  
                      {
-                        $$ = newNode(':',$3,$5) ;
+                        $$ = newNode(':',$4,$6) ;
                         $$ = newNode('?',$1,$$) ;
                      }                        
    ;
@@ -465,7 +466,7 @@ assignment_operator
 
 expr
    : assignment_expr
-   | expr ',' assignment_expr { $$ = newNode(',',$1,$3);}
+   | expr ',' { seqPointNo++;} assignment_expr { $$ = newNode(',',$1,$4);}
    ;
 
 constant_expr
@@ -1297,8 +1298,11 @@ statement
    | jump_statement
    | critical_statement
    | INLINEASM  ';'      {
-                            ast *ex = newNode(INLINEASM,NULL,NULL);
+                            ast *ex;
+			    seqPointNo++;
+			    ex = newNode(INLINEASM,NULL,NULL);
 			    ex->values.inlineasm = strdup($1);
+			    seqPointNo++;
 			    $$ = ex;
                          } 
    ;
@@ -1401,7 +1405,7 @@ statement_list
 
 expression_statement
    : ';'                { $$ = NULL;}
-   | expr ';' 
+   | expr ';'           { $$ = $1; seqPointNo++;} 
    ;
 
 else_statement
@@ -1411,11 +1415,17 @@ else_statement
 
   
 selection_statement
-   : IF '(' expr ')'  statement else_statement { noLineno++ ; $$ = createIf ($3, $5, $6 ); noLineno--;}
+   : IF '(' expr ')' { seqPointNo++;} statement else_statement
+                           {
+			      noLineno++ ;
+			      $$ = createIf ($3, $6, $7 );
+			      noLineno--;
+			   }
    | SWITCH '(' expr ')'   { 
                               ast *ex ;                              
                               static   int swLabel = 0 ;
 
+			      seqPointNo++;
                               /* create a node for expression  */
                               ex = newNode(SWITCH,$3,NULL);
                               STACK_PUSH(swStk,ex);   /* save it in the stack */
@@ -1484,16 +1494,17 @@ for : FOR { /* create & push continue, break & body labels */
    ;
 
 iteration_statement  
-   : while '(' expr ')'  statement 
+   : while '(' expr ')' { seqPointNo++;}  statement 
                          { 
 			   noLineno++ ;
 			   $$ = createWhile ( $1, STACK_POP(continueStack),
-					      STACK_POP(breakStack), $3, $5 ); 
+					      STACK_POP(breakStack), $3, $6 ); 
 			   $$->lineno = $1->lineDef ;
 			   noLineno-- ;
 			 }
    | do statement   WHILE '(' expr ')' ';' 
                         { 
+			  seqPointNo++; 
 			  noLineno++ ; 
 			  $$ = createDo ( $1 , STACK_POP(continueStack), 
 					  STACK_POP(breakStack), $5, $2);
@@ -1528,8 +1539,8 @@ iteration_statement
 ;
 
 expr_opt
-	:			{ $$ = NULL ; }
-	|	expr
+	:			{ $$ = NULL ; seqPointNo++; }
+	|	expr		{ $$ = $1 ; seqPointNo++; }
 	;
 
 jump_statement          
@@ -1562,6 +1573,7 @@ jump_statement
        }
    }
    | RETURN ';'            {
+       seqPointNo++;
        if (inCritical) {
 	   werror(E_INVALID_CRITICAL);
 	   $$ = NULL;
@@ -1570,6 +1582,7 @@ jump_statement
        }
    }
    | RETURN expr ';'       {
+       seqPointNo++;
        if (inCritical) {
 	   werror(E_INVALID_CRITICAL);
 	   $$ = NULL;

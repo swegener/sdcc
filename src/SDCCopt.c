@@ -824,6 +824,18 @@ killDeadCode (eBBlock ** ebbs, int count)
 		  bool volRight = IS_SYMOP (IC_RIGHT (ic)) 
 				  && isOperandVolatile (IC_RIGHT (ic), FALSE);
 
+		  
+		  if (ic->next && ic->seqPoint == ic->next->seqPoint
+		      && (ic->next->op == '+' || ic->next->op == '-'))
+		    {
+		      if (isOperandEqual (IC_LEFT(ic), IC_LEFT(ic->next))
+		          || isOperandEqual (IC_LEFT(ic), IC_RIGHT(ic->next)))
+		        volLeft = FALSE;
+		      if (isOperandEqual (IC_RIGHT(ic), IC_LEFT(ic->next))
+		          || isOperandEqual (IC_RIGHT(ic), IC_RIGHT(ic->next)))
+		        volRight = FALSE;
+		    }
+		  
 		  change = 1;
 		  gchange++;
 		  

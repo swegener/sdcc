@@ -130,6 +130,7 @@ typedef struct iCode
     unsigned int op;		/* operation defined */
     int key;			/* running key for this iCode */
     int seq;			/* sequence number within routine */
+    int seqPoint;		/* sequence point */
     short depth;		/* loop depth of this iCode */
     short level;		/* scope level */
     short block;		/* sequential block number */

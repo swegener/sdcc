@@ -51,6 +51,7 @@ typedef struct ast
     unsigned initMode:1;
     int level;			/* level for expr */
     int block;			/* block number   */
+    int seqPoint;		/* sequence point */
     /* union of values expression can have */
     union
       {

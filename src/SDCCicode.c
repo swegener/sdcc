@@ -38,6 +38,7 @@ char *filename;
 int lineno;
 int block;
 int scopeLevel;
+int seqPoint;
 
 symbol *returnLabel;		/* function return label */
 symbol *entryLabel;		/* function entry  label */
@@ -572,6 +573,7 @@ newiCode (int op, operand * left, operand * right)
 
   ic = Safe_alloc ( sizeof (iCode));
 
+  ic->seqPoint = seqPoint;
   ic->lineno = lineno;
   ic->filename = filename;
   ic->block = block;
@@ -1426,7 +1428,7 @@ operandFromOperand (operand * op)
   nop->isLiteral = op->isLiteral;
   nop->usesDefs = op->usesDefs;
   nop->isParm = op->isParm;
-
+  
   switch (nop->type)
     {
     case SYMBOL:
@@ -3593,6 +3595,8 @@ ast2iCode (ast * tree,int lvl)
     block = tree->block;
   if (tree->level)
     scopeLevel = tree->level;
+  if (tree->seqPoint)
+    seqPoint = tree->seqPoint;
 
   if (tree->type == EX_VALUE)
     return operandFromValue (tree->opval.val);

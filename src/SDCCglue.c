@@ -395,7 +395,7 @@ printChar (FILE * ofile, char *s, int plen)
       i = 60;
       while (i && *s && pplen < plen)
 	{
-	  if (*s < ' ' || *s == '\"')
+	  if (*s < ' ' || *s == '\"' || *s=='\\')
 	    {
 	      *p = '\0';
 	      if (p != buf)

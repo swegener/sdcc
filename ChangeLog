@@ -6,6 +6,7 @@
 	* my tab spacing is 8, yours too?)
         * device/lib/_ser.c: process RX bytes earlier than TX bytes
         * device/lib/serial.c: process RX bytes earlier than TX bytes
+        * src/mcs51/gen.c(genGenPointerGet/Set): removed writing of type after postincrement
         
 2003-07-18  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 

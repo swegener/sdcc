@@ -816,6 +816,7 @@ allocVariables (symbol * symChain)
 	  if (csym && csym->level == sym->level)
 	    werror (E_DUPLICATE_TYPEDEF, sym->name);
 
+	  SPEC_EXTR (sym->etype) = 0;
 	  addSym (TypedefTab, sym, sym->name, sym->level, sym->block, 0);
 	  continue;		/* go to the next one         */
 	}

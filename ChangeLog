@@ -1,5 +1,9 @@
 2004-05-18 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
+	* src/SDCCmem.c (allocVariables): fixed bug #955321
+
+2004-05-18 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
 	* src/hc08/main.c (_hc08_genAssemblerEnd),
 	* src/SDCCdwarf2.c (dwOpenFile, dwCloseFile, dwWriteFunction,
 	dwWriteModule, dwWriteCLine, dwWriteALine, dwarf2FinalizeFile):

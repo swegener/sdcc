@@ -442,13 +442,13 @@ addDecl (symbol * sym, int type, sym_link * p)
 	}
     }
 
-  /* if the type is a unknown pointer and has
+  /* if the type is an unknown pointer and has
      a tspec then take the storage class const & volatile
      attribute from the tspec & make it those of this
      symbol */
   if (p &&
       !IS_SPEC (p) &&
-      DCL_TYPE (p) == UPOINTER &&
+      //DCL_TYPE (p) == UPOINTER &&
       DCL_TSPEC (p))
     {
       if (!IS_SPEC (sym->etype))

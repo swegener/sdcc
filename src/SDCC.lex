@@ -170,16 +170,6 @@ struct options  save_options  ;
 "_naked"       { count(); TKEYWORD(NAKED); }
 "while"        { count(); return(WHILE); }
 "xdata"        { count(); TKEYWORD(XDATA); }
-"_data"	       { count(); TKEYWORD(_NEAR); }
-"_code"	       { count(); TKEYWORD(_CODE); }
-"_eeprom"      { count(); TKEYWORD(_EEPROM); }
-"_flash"       { count(); TKEYWORD(_CODE); }
-"_generic"     { count(); TKEYWORD(_GENERIC); }
-"_near"	       { count(); TKEYWORD(_NEAR); }
-"_sram"        { count(); TKEYWORD(_XDATA);}
-"_xdata"       { count(); TKEYWORD(_XDATA);}
-"_pdata"       { count(); TKEYWORD(_PDATA); }
-"_idata"       { count(); TKEYWORD(_IDATA); }
 "..."	       { count(); return(VAR_ARGS);}
 {L}({L}|{D})*  { count(); return(check_type()); }
 0[xX]{H}+{IS}? { count(); yylval.val = constVal(yytext); return(CONSTANT); }

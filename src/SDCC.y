@@ -83,7 +83,7 @@ value *cenum = NULL  ;  /* current enumeration  type chain*/
 %token TYPEDEF EXTERN STATIC AUTO REGISTER CODE EEPROM INTERRUPT SFR AT SBIT
 %token REENTRANT USING  XDATA DATA IDATA PDATA VAR_ARGS CRITICAL NONBANKED BANKED
 %token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID BIT
-%token STRUCT UNION ENUM ELIPSIS RANGE FAR _XDATA _CODE _GENERIC _NEAR _PDATA _IDATA _EEPROM
+%token STRUCT UNION ENUM ELIPSIS RANGE FAR
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 %token NAKED
 %token <yyinline> INLINEASM
@@ -103,7 +103,7 @@ value *cenum = NULL  ;  /* current enumeration  type chain*/
 %type <lnk> storage_class_specifier struct_or_union_specifier
 %type <lnk> declaration_specifiers  sfr_reg_bit type_specifier2
 %type <lnk> using_reentrant using_reentrant_interrupt enum_specifier
-%type <lnk> abstract_declarator abstract_declarator2 far_near_pointer far_near
+%type <lnk> abstract_declarator abstract_declarator2 unqualified_pointer
 %type <val> parameter_type_list parameter_list parameter_declaration opt_assign_expr
 %type <sdef> stag opt_stag
 %type <asts> primary_expr
@@ -933,18 +933,18 @@ declarator2
    ;
 
 pointer
-   : far_near_pointer { $$ = $1 ;}
-   | far_near_pointer type_specifier_list   
+   : unqualified_pointer { $$ = $1 ;}
+   | unqualified_pointer type_specifier_list   
          {
 	     $$ = $1  ;		
 	     DCL_TSPEC($1) = $2;
 	 }
-   | far_near_pointer pointer         
+   | unqualified_pointer pointer         
          {
 	     $$ = $1 ;		
 	     $$->next = $2 ;
 	 }
-   | far_near_pointer type_specifier_list pointer
+   | unqualified_pointer type_specifier_list pointer
          {
 	     $$ = $1 ;  	     
 	     if (IS_SPEC($2) && DCL_TYPE($3) == UPOINTER) {
@@ -966,6 +966,7 @@ pointer
 		 case S_CODE:
 		     DCL_PTR_CONST($3) = 1;
 		     DCL_TYPE($3) = CPOINTER ;
+		     break;
 		 case S_EEPROM:
 		     DCL_TYPE($3) = EEPPOINTER;
 		     break;
@@ -979,26 +980,12 @@ pointer
 	 }
    ;
 
-far_near_pointer
-   :  far_near '*'   {
-                        if ($1 == NULL) {
-                           $$ = newLink();
-                           DCL_TYPE($$) = POINTER ;
-                        }
-                        else
-                           $$ = $1 ;
+unqualified_pointer
+   :  '*'   
+      {
+	$$ = newLink();
+	DCL_TYPE($$)=UPOINTER;
       }
-   ;
-
-far_near
-   : _XDATA    { $$ = newLink() ; DCL_TYPE($$) = FPOINTER ; }
-   | _CODE     { $$ = newLink() ; DCL_TYPE($$) = CPOINTER ;  DCL_PTR_CONST($$) = 1;}
-   | _PDATA    { $$ = newLink() ; DCL_TYPE($$) = PPOINTER ; } 
-   | _IDATA    { $$ = newLink() ; DCL_TYPE($$) = IPOINTER ; }
-   | _NEAR     { $$ = NULL ; }
-   | _GENERIC  { $$ = newLink() ; DCL_TYPE($$) = GPOINTER ; } 
-   | _EEPROM   { $$ = newLink() ; DCL_TYPE($$) = EEPPOINTER ;} 
-   |           { $$ = newLink() ; DCL_TYPE($$) = UPOINTER ; }
    ;
 
 type_specifier_list

@@ -873,7 +873,7 @@ operandsEqu (operand * op1, operand * op2)
       IS_ITEMP (op1) &&
       sym2->isspilt &&
       sym1->isspilt &&
-      (sym1->usl.spillLoc == sym1->usl.spillLoc))
+      (sym1->usl.spillLoc == sym2->usl.spillLoc))
     return TRUE;
     
   return FALSE;

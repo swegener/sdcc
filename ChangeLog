@@ -1,3 +1,8 @@
+2004-01-12 Klaus Flittner <klaus_flittner@gmx.de>
+
+	* src/ds390/gen.c (operandsEqu): fixed a little typo, that prevented
+	the spilllocations to be compared correctly
+
 2004-01-12 Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCast.c (decorateType): fixed bug introduced today

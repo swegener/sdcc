@@ -2925,7 +2925,7 @@ registers :-) */
 /*-----------------------------------------------------------------*/
 static void genRet (iCode *ic)
 {
-	int size, pushed = 0;
+	int size,offset = 0 , pushed = 0;
 	
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	/* if we have no return value then
@@ -2933,7 +2933,7 @@ static void genRet (iCode *ic)
 	if (!IC_LEFT(ic)) 
 		goto jumpret;		
 	
-	/* we have something to return then
+		/* we have something to return then
 	move the return value into place */
 	aopOp(IC_LEFT(ic),ic,FALSE);
 	size = AOP_SIZE(IC_LEFT(ic));
@@ -2942,23 +2942,26 @@ static void genRet (iCode *ic)
 		char *l ;
 		if (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR) {
 			/* #NOCHANGE */
-			l = aopGet(AOP(IC_LEFT(ic)),size,FALSE,TRUE);
+			l = aopGet(AOP(IC_LEFT(ic)),offset++,
+				FALSE,TRUE);
 			pic14_emitcode("push","%s",l);
 			pushed++;
 		} else {
-			l = aopGet(AOP(IC_LEFT(ic)),size,FALSE,FALSE);
-			if (strcmp(fReturn[size],l)) {
+			l = aopGet(AOP(IC_LEFT(ic)),offset,
+				FALSE,FALSE);
+			if (strcmp(fReturn[offset],l)) {
 				if ((((AOP(IC_LEFT(ic))->type) == AOP_PCODE) && 
 					AOP(IC_LEFT(ic))->aopu.pcop->type == PO_IMMEDIATE) ||
 					( (AOP(IC_LEFT(ic))->type) == AOP_IMMD) ||
 					( (AOP(IC_LEFT(ic))->type) == AOP_LIT) ) {
-					emitpcode(POC_MOVLW, popGet(AOP(IC_LEFT(ic)),size));
+					emitpcode(POC_MOVLW, popGet(AOP(IC_LEFT(ic)),offset));
 				}else {
-					emitpcode(POC_MOVFW, popGet(AOP(IC_LEFT(ic)),size));
+					emitpcode(POC_MOVFW, popGet(AOP(IC_LEFT(ic)),offset));
 				}
 				if(size) {
 					emitpcode(POC_MOVWF,popRegFromIdx(Gstack_base_addr+1-size));
 				}
+				offset++;
 			}
 		}
 	}
@@ -2975,7 +2978,7 @@ static void genRet (iCode *ic)
 	freeAsmop (IC_LEFT(ic),NULL,ic,TRUE);
 	
 jumpret:
-	/* generate a jump to the return label
+/* generate a jump to the return label
 	if the next is not the return statement */
 	if (!(ic->next && ic->next->op == LABEL &&
 		IC_LABEL(ic->next) == returnLabel)) {

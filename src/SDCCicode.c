@@ -398,6 +398,10 @@ piCode (void *item, FILE * of)
   return 1;
 }
 
+void PICC(iCode *ic)
+{
+	printiCChain(ic,stdout);
+}
 /*-----------------------------------------------------------------*/
 /* printiCChain - prints intermediate code for humans              */
 /*-----------------------------------------------------------------*/

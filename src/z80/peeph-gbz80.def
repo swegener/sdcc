@@ -11,6 +11,12 @@ replace restart {
 	ld	a,(hl+)
 }
 replace restart {
+        ld      (hl),a
+        dec     hl
+} by {
+        ld      (hl-),a
+}
+replace restart {
 	ld	a,[hl]
 	inc	hl
 } by {

@@ -22,6 +22,18 @@ testAdd(void)
   
   result = left+right;
   ASSERT(result == (39-120));
+
+  left = -39;
+  right = 80;
+  
+  result = left+right;
+  ASSERT(result == (-39+80));
+
+  left = -39;
+  right = -70;
+  
+  result = left+right;
+  ASSERT(result == (-39-70));
 }
 
 void 
@@ -40,4 +52,16 @@ testSub(void)
   
   result = left-right;
   ASSERT(result == (39+76));
+
+  left = -12;
+  right = 56;
+  
+  result = left-right;
+  ASSERT(result == (-12-56));
+  
+  left = -39;
+  right = -20;
+  
+  result = left-right;
+  ASSERT(result == (-39+20));
 }

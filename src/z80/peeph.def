@@ -102,4 +102,9 @@ replace restart {
 } by {
         xor     a,a
 }
-        
+replace restart {
+        ld      e,#0x00
+        ld      d,#0x00
+} by {
+        ld      de,#0x0000
+}

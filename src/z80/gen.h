@@ -51,7 +51,9 @@ typedef enum
     /* Is in A */
     AOP_ACC,
     /* Is in H and L */
-    AOP_HLREG
+    AOP_HLREG,
+    /* Simple literal. */
+    AOP_SIMPLELIT
   }
 AOP_TYPE;
 
@@ -74,6 +76,7 @@ typedef struct asmop
         char *aop_immd;         /* if immediate others are implied */
         int aop_stk;            /* stack offset when AOP_STK */
         const char *aop_str[4]; /* just a string array containing the location */
+        unsigned long aop_simplelit; /* Just the value. */
       }
     aopu;
   }

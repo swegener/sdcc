@@ -64,6 +64,10 @@ testMul(void)
     ASSERT(i*-3 == 30);
 }
 
+void mark(void)
+{
+}
+
 void
 testDiv(void)
 {
@@ -73,6 +77,7 @@ testDiv(void)
     LOG(("i/5 == 20 = %u\n", (int)i/5));
     ASSERT(i/5 == 20);
     LOG(("i/-4 == -25 = %u\n", (int)i/-4));
+    mark();
     ASSERT(i/-4 == -25);
 
     i = -50;

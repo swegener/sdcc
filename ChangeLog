@@ -1,4 +1,17 @@
+2001-09-02  Michael Hope  <michaelh@juju.net.nz>
+
+	* src/z80/gen.c (fetchLitPair): Changed so that it properly caches direct space references.
+
+	* support/regression/tests/addsub.c: Added cases to cover all the +, - combinations.
+
+	* support/regression/tests/uminus.c: Added a test for the unary minus operator.
+
+	* src/z80/gen.c (genUminus): Fixed add, sub, and uminus on the gbz80 port for longs.  Had to shift some functions about to do it.
+
 2001-09-01  Michael Hope  <michaelh@juju.net.nz>
+
+	* src/z80/gen.c: Fixed up generator to pass the regresion tests, specifically fixing loads for longs, genCmp, and turned on the map file.
+	(genCmp): Fixed up genCmp for the GB with longs.
 
 	* device/lib/gbz80/Makefile: Fixed up all the libraries to pass the regression tests.
 

@@ -1,3 +1,10 @@
+2004-01-13 Vangelis Rokas <vrokas@otenet.gr>
+
+	Added portion of GNU PIC Library under the directory
+	device/include/pic16 and device/lib/pic16. These files
+	contain the declarations of SFRs for the PIC18Fxx2 devices.
+	The directory is initialized via configure from toplevel.
+	
 2004-01-12 Klaus Flittner <klaus_flittner@gmx.de>
 
 	* src/ds390/gen.c (operandsEqu): fixed a little typo, that prevented

@@ -28,7 +28,7 @@
 #warning "this module cannot yet be use as a reentrant one"
 #endif
 
-#ifdef __ds390
+#if defined(__ds390)
 #define USE_FLOATS 1
 #endif
 
@@ -159,12 +159,23 @@ _endasm;
 
 #define DEFAULT_FLOAT_PRECISION 6
 
+float output_floatE(float f, char decimals)
+{
+  signed char exp;
+  char sign = '+';
+
+  if (f < 0) { f = -f; sign = '-'; }
+  for (exp = 0; f >= 10.0; exp++) f /=10.0;
+  for (       ; f < 1.0;   exp--) f *=10.0;
+  printf("%c%d.%d%fe%d\n", sign, decimals+2, decimals, f, exp); 
+} 
+
 static void output_float (float f, unsigned char reqWidth, 
 			  signed char reqDecimals,
 			  bit left, bit zero, bit sign, bit space)
 {
   char negative=0;
-  long integerPart;
+  unsigned long integerPart;
   float decimalPart;
   char fpBuffer[128];
   char fpBI=0, fpBD;
@@ -174,6 +185,31 @@ static void output_float (float f, unsigned char reqWidth,
   if (f<0) {
     negative=1;
     f=-f;
+  }
+
+  if (f>0x00ffffff) {
+    // this part is from Frank van der Hulst
+    signed char exp;
+    
+    for (exp = 0; f >= 10.0; exp++) f /=10.0;
+    for (       ; f < 1.0;   exp--) f *=10.0;
+
+    if (negative) {
+      putchar ('-');
+    } else {
+      if (sign) {
+	putchar ('+');
+      }
+    }
+    output_float(f, 0, reqDecimals, 0, 0, 0, 0);
+    putchar ('e');
+    if (exp<0) {
+      putchar ('-');
+      exp = -exp;
+    }
+    putchar ('0'+exp/10);
+    putchar ('0'+exp%10);
+    return;
   }
 
   // split the float

@@ -1045,14 +1045,14 @@ char *ft;
 	register char *p1, *p2, *p3;
 	register int c;
 	FILE *fp;
-	char fb[FILSPC];
+	char fb[FILENAME_MAX];
 	char *omode = (wf ? (wf == 2 ? "a" : "w") : "r");
 
 	p1 = fn;
 	p2 = fb;
 	p3 = ft;
 	while ((c = *p1++) != 0 && c != FSEPX) {
-		if (p2 < &fb[FILSPC-4])
+		if (p2 < &fb[FILENAME_MAX-4])
 			*p2++ = c;
 	}
 	*p2++ = FSEPX;
@@ -1064,7 +1064,7 @@ char *ft;
 		}
 	}
 	while ((c = *p3++) != 0) {
-		if (p2 < &fb[FILSPC-1])
+		if (p2 < &fb[FILENAME_MAX-1])
 			*p2++ = c;
 	}
 	*p2++ = 0;	

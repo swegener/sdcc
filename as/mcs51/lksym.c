@@ -477,15 +477,11 @@ VOID *
 new(n)
 unsigned int n;
 {
-	register char *p,*q;
-	register unsigned int i;
+	register char *p;
 
-	if ((p = (char *) malloc(n)) == NULL) {
+	if ((p = (char *) calloc(n, 1)) == NULL) {
 		fprintf(stderr, "Out of space!\n");
 		lkexit(1);
-	}
-	for (i=0,q=p; i<n; i++) {
-		*q++ = 0;
 	}
 	return (p);
 }

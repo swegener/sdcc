@@ -86,12 +86,11 @@
 
 #define NCPS	80		/* characters per symbol (JLH: change from 8) */
 #define	NDATA	16		/* actual data */
-#define	NINPUT	128		/* Input buffer size */
+#define	NINPUT	FILENAME_MAX	/* Input buffer size (BH: change from 128) */
 #define	NHASH	64		/* Buckets in hash table */
 #define	HMASK	077		/* Hash mask */
 #define	NLPP	60		/* Lines per page */
 #define	NTXT	16		/* T values */
-#define	FILSPC	80		/* File spec length */
 
 /*
  *	The "R_" relocation constants define values used in

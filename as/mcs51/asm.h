@@ -85,7 +85,7 @@
 #define NCPS	80		/* Chars. per symbol (JLH: change from 8) */
 #define	HUGE	1000		/* A huge number */
 #define NERR	3		/* Errors per line */
-#define NINPUT	128		/* Input buffer size */
+#define	NINPUT	FILENAME_MAX	/* Input buffer size (BH: change from 128) */
 #define NCODE	128		/* Listing code buffer size */
 #define NTITL	64		/* Title buffer size */
 #define	NSBTL	64		/* SubTitle buffer size */
@@ -95,7 +95,6 @@
 #define	MAXFIL	6		/* Maximum command line input files */
 #define	MAXINC	6		/* Maximum nesting of include files */
 #define	MAXIF	10		/* Maximum nesting of if/else/endif */
-#define	FILSPC	80		/* Chars. in filespec */
 
 #define NLIST	0		/* No listing */
 #define SLIST	1		/* Source only */
@@ -371,16 +370,16 @@ extern	int	iflvl[MAXIF+1];	/*	array of IF-ELSE-ENDIF flevel
 				 *	values indexed by tlevel
 				 */
 extern	char
-	afn[FILSPC];		/*	afile() temporary filespec
+	afn[FILENAME_MAX];		/*	afile() temporary filespec
 				 */
 extern	char
-	srcfn[MAXFIL][FILSPC];	/*	array of source file names
+	srcfn[MAXFIL][FILENAME_MAX];	/*	array of source file names
 				 */
 extern	int
 	srcline[MAXFIL];	/*	current source file line
 				 */
 extern	char
-	incfn[MAXINC][FILSPC];	/*	array of include file names
+	incfn[MAXINC][FILENAME_MAX];	/*	array of include file names
 				 */
 extern	int
 	incline[MAXINC];	/*	current include file line

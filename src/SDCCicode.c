@@ -3038,7 +3038,7 @@ geniCodeSEParms (ast * parms,int lvl)
 /*-----------------------------------------------------------------*/
 value *
 geniCodeParms (ast * parms, value *argVals, int *stack, 
-	       sym_link * fetype, symbol * func,int lvl)
+	       sym_link * ftype, int lvl)
 {
   iCode *ic;
   operand *pval;
@@ -3048,17 +3048,14 @@ geniCodeParms (ast * parms, value *argVals, int *stack,
 
   if (argVals==NULL) {
     // first argument
-    if (IS_CODEPTR(func->type))
-      argVals = FUNC_ARGS (func->type->next);
-    else
-      argVals = FUNC_ARGS (func->type);
+    argVals = FUNC_ARGS (ftype);
   }
 
   /* if this is a param node then do the left & right */
   if (parms->type == EX_OP && parms->opval.op == PARAM)
     {
-      argVals=geniCodeParms (parms->left, argVals, stack, fetype, func,lvl);
-      argVals=geniCodeParms (parms->right, argVals, stack, fetype, func,lvl);
+      argVals=geniCodeParms (parms->left, argVals, stack, ftype, lvl);
+      argVals=geniCodeParms (parms->right, argVals, stack, ftype, lvl);
       return argVals;
     }
 
@@ -3082,18 +3079,18 @@ geniCodeParms (ast * parms, value *argVals, int *stack,
     }
 
   /* if register parm then make it a send */
-  if ((IS_REGPARM (parms->etype) && !IFFUNC_HASVARARGS(func->type)) ||
-      IFFUNC_ISBUILTIN(func->type))
+  if ((IS_REGPARM (parms->etype) && !IFFUNC_HASVARARGS(ftype)) ||
+      IFFUNC_ISBUILTIN(ftype))
     {
       ic = newiCode (SEND, pval, NULL);
       ic->argreg = SPEC_ARGREG(parms->etype);
-      ic->builtinSEND = FUNC_ISBUILTIN(func->type);
+      ic->builtinSEND = FUNC_ISBUILTIN(ftype);
       ADDTOCHAIN (ic);
     }
   else
     {
       /* now decide whether to push or assign */
-      if (!(options.stackAuto || IFFUNC_ISREENT (func->type)))
+      if (!(options.stackAuto || IFFUNC_ISREENT (ftype)))
 	{
 
 	  /* assign */
@@ -3127,6 +3124,7 @@ geniCodeCall (operand * left, ast * parms,int lvl)
   iCode *ic;
   operand *result;
   sym_link *type, *etype;
+  sym_link *ftype;
   int stack = 0;
 
   if (!IS_FUNC(OP_SYMBOL(left)->type) && 
@@ -3140,8 +3138,12 @@ geniCodeCall (operand * left, ast * parms,int lvl)
      of overlaying function parameters */
   geniCodeSEParms (parms,lvl);
 
+  ftype = operandType (left);
+  if (IS_CODEPTR (ftype))
+    ftype = ftype->next;
+    
   /* first the parameters */
-  geniCodeParms (parms, NULL, &stack, getSpec (operandType (left)), OP_SYMBOL (left),lvl);
+  geniCodeParms (parms, NULL, &stack, ftype, lvl);
 
   /* now call : if symbol then pcall */
   if (IS_OP_POINTER (left) || IS_ITEMP(left)) {
@@ -3150,7 +3152,7 @@ geniCodeCall (operand * left, ast * parms,int lvl)
     ic = newiCode (CALL, left, NULL);
   }
 
-  type = copyLinkChain (operandType (left)->next);
+  type = copyLinkChain (ftype->next);
   etype = getSpec (type);
   SPEC_EXTR (etype) = 0;
   IC_RESULT (ic) = result = newiTempOperand (type, 1);

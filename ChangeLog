@@ -1,3 +1,12 @@
+2004-02-06 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (decorateType),
+	* src/SDCCicode.c (geniCodeParms, geniCodeCall): fixed bugs in my ANSI
+	function pointer implementation
+	* support/regression/tests/funptrs.c: added tests to verify both forms
+	of function pointers work correctly. Added tests to verify parameters
+	are passed in the correct order.
+
 2004-02-06  Vangelis Rokas <vrokas AT otenet.gr>
 
 	* device.c (regCompare): registers are sorted by ascending

@@ -4046,29 +4046,30 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	  werrorfl (tree->filename, tree->lineno, E_FUNCTION_EXPECTED);
 	  goto errorTreeReturn;
 	}
-	      
-      parmNumber = 1;
 
-      if (processParms (tree->left,
-			IS_CODEPTR(LTYPE(tree)) ?
-			  FUNC_ARGS(tree->left->ftype->next)
-			  : FUNC_ARGS(tree->left->ftype),
-			tree->right, &parmNumber, TRUE)) {
-	goto errorTreeReturn;
+      {
+	sym_link *functype;      
+	parmNumber = 1;
+
+	if (IS_CODEPTR(LTYPE(tree)))
+	  functype = LTYPE (tree)->next;
+	else
+	  functype = LTYPE (tree);
+
+	if (processParms (tree->left, FUNC_ARGS(functype),
+			  tree->right, &parmNumber, TRUE)) {
+	  goto errorTreeReturn;
+        }
+
+	if ((options.stackAuto || IFFUNC_ISREENT (functype)) && 
+	    !IFFUNC_ISBUILTIN(functype))
+	  {
+	    reverseParms (tree->right);
+	  }
+
+	TTYPE (tree) = functype->next;
+	TETYPE (tree) = getSpec (TTYPE (tree));
       }
-
-      if ((options.stackAuto || IFFUNC_ISREENT (LTYPE (tree))) && 
-	  !IFFUNC_ISBUILTIN(LTYPE(tree)))
-	{
-	  reverseParms (tree->right);
-	}
-
-      if (IS_CODEPTR(LTYPE(tree))) {
-	TTYPE(tree) = LTYPE(tree)->next->next;
-      } else {
-	TTYPE(tree) = LTYPE(tree)->next;
-      }
-      TETYPE (tree) = getSpec (TTYPE (tree));
       return tree;
 
       /*------------------------------------------------------------------*/

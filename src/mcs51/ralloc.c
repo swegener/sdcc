@@ -443,6 +443,8 @@ static symbol *createStackSpil (symbol *sym)
     int useXstack, model, noOverlay;
     int stackAuto;
 
+    char slocBuffer[30];
+
     /* first go try and find a free one that is already 
        existing on the stack */
     if (applyToSet(_G.stackSpil,isFree,&sloc, sym)) {
@@ -458,8 +460,14 @@ static symbol *createStackSpil (symbol *sym)
        we need to allocate this on the stack : this is really a
        hack!! but cannot think of anything better at this time */
 	
-    sprintf(buffer,"sloc%d",_G.slocNum++);
-    sloc = newiTemp(buffer);
+    if (sprintf(slocBuffer,"sloc%d",_G.slocNum++) >= sizeof(slocBuffer))
+    {
+	fprintf(stderr, "***Internal error: slocBuffer overflowed: %s:%d\n",
+		__FILE__, __LINE__);
+	exit(1);	
+    }
+
+    sloc = newiTemp(slocBuffer);
 
     /* set the type to the spilling symbol */
     sloc->type = copyLinkChain(sym->type);

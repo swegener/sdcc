@@ -1,0 +1,28 @@
+PRJDIR = ../..
+
+# !include $(PRJDIR)/Makefile.common
+
+OBJ = gen.obj ralloc.obj main.obj gbz80.obj
+LIB = port.lib
+
+CFLAGS  = -6 -O -g0 -I.. -I. -I..\.. -I..\..\support
+
+.c.obj:
+        BCC32 -c $(CFLAGS) $(CPPFLAGS) $<
+
+all: $(LIB)
+
+main.obj: main.c peeph.rul
+gbz80.obj: gbz80.c peeph-gbz80.rul
+
+$(LIB): peeph.rul $(OBJ)
+	del $(LIB)
+        tlib /a $(LIB) +gen.obj +ralloc.obj +main.obj +gbz80.obj
+	
+peeph.rul: peeph.def
+        gawk -f ../SDCCpeeph.awk peeph.def > peeph.rul
+
+peeph-gbz80.rul: peeph-gbz80.def
+        gawk -f ../SDCCpeeph.awk peeph-gbz80.def > peeph-gbz80.rul
+
+# include clean.mk

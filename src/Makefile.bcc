@@ -1,0 +1,69 @@
+# Generated automatically from Makefile.in by configure.
+#
+#
+#
+
+PRJDIR		= ..
+
+# !include $(PRJDIR)/Makefile.common
+
+PORTS		= mcs51 z80
+PORT_LIBS       = mcs51/port.lib z80/port.lib
+
+LIBS		= -lgc 
+LIBDIRS		= -L$(PRJDIR)/support/gc
+LIBGC           = $(PRJDIR)/support/gc/gc.lib
+
+OBJECTS         = SDCCy.obj SDCClex.obj SDCCerr.obj SDCChasht.obj SDCCmain.obj \
+                  SDCCsymt.obj SDCCopt.obj SDCCast.obj SDCCmem.obj SDCCval.obj \
+                  SDCCicode.obj SDCCbitv.obj SDCCset.obj SDCClabel.obj \
+                  SDCCBBlock.obj SDCCloop.obj SDCCcse.obj SDCCcflow.obj SDCCdflow.obj \
+                  SDCClrange.obj SDCCptropt.obj SDCCpeeph.obj SDCCglue.obj
+
+TARGET          = $(PRJDIR)/bin/sdcc.exe
+
+# Compiling entire program or any subproject
+# ------------------------------------------
+all: $(LIBGC) $(TARGET)
+
+ports:
+#        for i in $(PORTS); do $(MAKE) -C $$i; done
+
+#$(PRJDIR)/support/gc/libgc.a:
+#        cd $(PRJDIR)/support/gc && $(MAKE)
+
+
+!include Makefile.dep
+#!include clean.mk
+
+
+# My rules
+# --------
+$(TARGET): $(OBJECTS) $(PORT_LIBS)
+        bcc32 -e$(TARGET) $(OBJECTS) $(PORT_LIBS) $(LIBGC)
+
+CFLAGS  = -6 -O -g0 -I. -I.. -I..\support
+
+.c.obj:
+        BCC32 -c $(CFLAGS) $(CPPFLAGS) $<
+
+SDCCy.h: SDCCy.c
+
+SDCCy.c: SDCC.y
+	$(YACC) -d -v -o $@ $<
+
+SDCClex.c: SDCC.lex SDCCy.h
+	$(LEX) -t $< >$@
+
+.y.c:
+	rm -f $*.cc $*.h
+	$(YACC) -d $<
+	mv y.tab.c $*.cc
+	mv y.tab.h $*.h
+
+.l.c:
+	rm -f $*.cc
+	$(LEX) -t $< >$*.cc
+
+
+

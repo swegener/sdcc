@@ -67,6 +67,8 @@ int pcseDef (void *item, va_list ap)
     cseDef *cdp = item;
     iCodeTable *icTab ;
 
+    (void)ap;
+    
     if (!cdp->sym)
 	fprintf(stdout,"**null op**");
     printOperand(cdp->sym,stdout);
@@ -854,7 +856,7 @@ void ifxOptimize (iCode *ic, set *cseSet,
     /* if the conditional is a literal then */
     if (IS_OP_LITERAL(IC_COND(ic))) {	       
 
-	if ( operandLitValue(IC_COND(ic)) && IC_TRUE(ic)) {
+	if ( (operandLitValue(IC_COND(ic)) != 0.0) && IC_TRUE(ic)) {
 	    
 	    /* change to a goto */
 	    ic->op = GOTO ;

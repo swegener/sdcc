@@ -2140,6 +2140,12 @@ operand *geniCodeRightShift (operand *left, operand *right)
     return IC_RESULT(ic) ;  
 }
 
+#ifdef __BORLANDC__
+#define LONG_LONG __int64
+#else
+#define LONG_LONG long long
+#endif
+
 /*-----------------------------------------------------------------*/
 /* geniCodeLogic- logic code                                       */
 /*-----------------------------------------------------------------*/
@@ -2156,7 +2162,7 @@ operand *geniCodeLogic (operand *left, operand *right, int op )
 	int nbits = bitsForType(ltype);
 	long v = operandLitValue(right);
 
-	if (v > ((long long) 1 << nbits) && v > 0)
+	if (v > ((LONG_LONG) 1 << nbits) && v > 0)
 	    werror(W_CONST_RANGE," compare operation ");
     }
 
@@ -2249,7 +2255,7 @@ operand *geniCodeAssign (operand *left, operand *right, int nosupdate)
 	int nbits = bitsForType(ltype);
 	long v = operandLitValue(right);
 
-	if (v > ((long long)1 << nbits) && v > 0)
+	if (v > ((LONG_LONG)1 << nbits) && v > 0)
 	    werror(W_CONST_RANGE," = operation");
     }
     /* if the left & right type don't exactly match */

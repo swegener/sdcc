@@ -40,8 +40,10 @@
 #ifdef HAVE_ENDIAN_H
 #include <endian.h>
 #else
+#ifndef __BORLANDC__
 #warning "Cannot determine ENDIANESS of this machine assuming LITTLE_ENDIAN"
 #warning "If you running sdcc on an INTEL 80x86 Platform you are okay"
+#endif
 #endif
 #endif
 
@@ -1872,6 +1874,12 @@ static int resultRemat (iCode *ic)
     return 0;
 }
 
+#ifdef __BORLANDC__
+#define STRCASECMP stricmp
+#else
+#define STRCASECMP strcasecmp
+#endif
+
 /*-----------------------------------------------------------------*/
 /* inExcludeList - return 1 if the string is in exclude Reg list   */
 /*-----------------------------------------------------------------*/
@@ -1880,12 +1888,12 @@ static bool inExcludeList(char *s)
     int i =0;
     
     if (options.excludeRegs[i] &&
-	strcasecmp(options.excludeRegs[i],"none") == 0)
+    STRCASECMP(options.excludeRegs[i],"none") == 0)
 	return FALSE ;
 
     for ( i = 0 ; options.excludeRegs[i]; i++) {
 	if (options.excludeRegs[i] &&
-	    strcasecmp(s,options.excludeRegs[i]) == 0)
+        STRCASECMP(s,options.excludeRegs[i]) == 0)
 	    return TRUE;
     }
     return FALSE ;

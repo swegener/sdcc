@@ -24,7 +24,12 @@
 
 #include "common.h"
 #include <ctype.h>
+
+#ifdef __BORLANDC__
+#include <process.h>
+#else
 #include "spawn.h"
+#endif
 
 /* This is a bit messy.  We cant include unistd.h as it defines
    'link' which we also use.
@@ -979,15 +984,40 @@ int   parseCmdLine ( int argc, char **argv )
 char *try_dir[]= {SRCDIR "/bin",PREFIX "/bin", NULL};
 int my_system (const char *cmd, char **cmd_argv)
 {    
-
     char *dir, *got= NULL; int i= 0;
-    while (!got && try_dir[i]) {
-	dir= (char*)malloc(strlen(try_dir[i])+strlen(cmd)+10);
-	strcpy(dir, try_dir[i]); strcat(dir, "/"); strcat(dir, cmd);
-	if (access(dir, X_OK) == 0)
-	    got= strdup(dir);
-	free(dir);
-	i++;
+    #ifdef __BORLANDC__
+    char *r;
+    #endif
+
+    while (!got && try_dir[i])
+    {
+        dir= (char*)malloc(strlen(try_dir[i])+strlen(cmd)+10);
+        strcpy(dir, try_dir[i]);
+        strcat(dir, "/");
+        strcat(dir, cmd);
+
+        #ifdef __BORLANDC__
+        strcat(dir, ".exe");
+
+        /* Mung slashes into backslashes to keep WIndoze happy. */
+	r = dir;
+
+        while (*r)
+        {
+            if (*r == '/')
+            {
+                *r = '\\';
+            }
+            r++;
+        }
+        #endif
+
+        if (access(dir, X_OK) == 0)
+        {
+            got= strdup(dir);
+        }
+        free(dir);
+        i++;
     }
 #if FEATURE_VERBOSE_EXEC
     if (verboseExec) {
@@ -1288,8 +1318,8 @@ int main ( int argc, char **argv , char **envp)
 	fclose(yyin);
 
     if (preOutName && !options.c1mode) {
-	unlink(preOutName);
-	free(preOutName);
+        unlink(preOutName);
+        free(preOutName);
     }
     return 0;
     

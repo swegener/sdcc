@@ -106,11 +106,23 @@ pCodeOpReg pic16_pc_eecon2	= {{PO_SFR_REGISTER, "EECON2"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_eedata	= {{PO_SFR_REGISTER, "EEDATA"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_eeadr	= {{PO_SFR_REGISTER, "EEADR"}, -1, NULL, 0, NULL};
 
-
-
 pCodeOpReg pic16_pc_kzero     = {{PO_GPR_REGISTER,  "KZ"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_wsave     = {{PO_GPR_REGISTER,  "WSAVE"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_ssave     = {{PO_GPR_REGISTER,  "SSAVE"}, -1, NULL,0,NULL};
+
+pCodeOpReg *pic16_stackpnt_lo;
+pCodeOpReg *pic16_stackpnt_hi;
+pCodeOpReg *pic16_stack_postinc;
+pCodeOpReg *pic16_stack_postdec;
+pCodeOpReg *pic16_stack_preinc;
+pCodeOpReg *pic16_stack_plusw;
+
+pCodeOpReg *pic16_framepnt_lo;
+pCodeOpReg *pic16_framepnt_hi;
+pCodeOpReg *pic16_frame_postinc;
+pCodeOpReg *pic16_frame_postdec;
+pCodeOpReg *pic16_frame_preinc;
+pCodeOpReg *pic16_frame_plusw;
 
 pCodeOpReg pic16_pc_gpsimio   = {{PO_GPR_REGISTER, "GPSIMIO"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_gpsimio2  = {{PO_GPR_REGISTER, "GPSIMIO2"}, -1, NULL, 0, NULL};
@@ -2969,6 +2981,20 @@ void  pic16_pCodeInitRegisters(void)
 	pic16_pc_fsr1h.r = pic16_allocProcessorRegister(IDX_FSR1H, "FSR1H", PO_FSR0, 0x80);
 	pic16_pc_fsr2l.r = pic16_allocProcessorRegister(IDX_FSR2L, "FSR2L", PO_FSR0, 0x80);
 	pic16_pc_fsr2h.r = pic16_allocProcessorRegister(IDX_FSR2H, "FSR2H", PO_FSR0, 0x80);
+
+	pic16_stackpnt_lo = &pic16_pc_fsr1l;
+	pic16_stackpnt_hi = &pic16_pc_fsr1h;
+	pic16_stack_postdec = &pic16_pc_postdec1;
+	pic16_stack_postinc = &pic16_pc_postinc1;
+	pic16_stack_preinc = &pic16_pc_preinc1;
+	pic16_stack_plusw = &pic16_pc_plusw1;
+	
+	pic16_framepnt_lo = &pic16_pc_fsr2l;
+	pic16_framepnt_hi = &pic16_pc_fsr2h;
+	pic16_frame_postdec = &pic16_pc_postdec2;
+	pic16_frame_postinc = &pic16_pc_postinc2;
+	pic16_frame_preinc = &pic16_pc_preinc2;
+	pic16_frame_plusw = &pic16_pc_plusw2;
 
 	pic16_pc_indf0.r = pic16_allocProcessorRegister(IDX_INDF0,"INDF0", PO_INDF0, 0x80);
 	pic16_pc_postinc0.r = pic16_allocProcessorRegister(IDX_POSTINC0, "POSTINC0", PO_INDF0, 0x80);
@@ -7839,7 +7865,7 @@ static void pic16_convertLocalRegs2Support(pCode *pcstart, pCode *pcend, int cou
     pc = pcstart;
 //    if(!entry) {
 //      pic16_pCodeInsertAfter(pc, pct = pic16_newpCode(POC_MOVFF, pic16_popGet2p(
-//              pic16_popCopyReg(&pic16_pc_fsr0l), pic16_popCopyReg(&pic16_pc_fsr2l)))); pc = pct;
+//              pic16_popCopyReg(&pic16_pc_fsr0l), pic16_popCopyReg(pic16_framepnt_lo)))); pc = pct;
 //    }
     		
     pic16_pCodeInsertAfter(pc, pct=pic16_newpCode(POC_LFSR, pic16_popGetLit2(0, pic16_popGetWithString(r->name)))); pc = pct;
@@ -7848,7 +7874,7 @@ static void pic16_convertLocalRegs2Support(pCode *pcstart, pCode *pcend, int cou
 
 //    if(!entry) {
 //      pic16_pCodeInsertAfter(pc, pct = pic16_newpCode(POC_MOVFF, pic16_popGet2p(
-//              pic16_popCopyReg(&pic16_pc_fsr2l), pic16_popCopyReg(&pic16_pc_fsr0l)))); pc = pct;
+//              pic16_popCopyReg(pic16_framepnt_lo), pic16_popCopyReg(&pic16_pc_fsr0l)))); pc = pct;
 //    }
 
     

@@ -1,3 +1,17 @@
+2005-01-12 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/pcode.[ch]: introduced pic16_stackpnt_*,
+	pic16_framepnt_*, pic16_stack_*, pic1_frame_* pointer variables to
+	access stack and frame pointers. They are initially assigned to
+	point at pic16_pc_fsr1[lh] and pic16_pc_fsr2[lh] variables and other
+	accessing SFRs. Updated all occurences of modification of stack or
+	frame pointer in gen.c and pcode.c,
+	* src/pic16/ralloc.c (serialRegAssign): fixed two bugs with
+	assigning of a literal value to pointers,
+	* src/pic16/main.c (pic16_finiliseOptions): set pre-processor define
+	flag STACK_MODEL_SMALL or STACK_MODEL_LARGE according to the model
+	selected
+
 2005-01-11 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* doc/sdccman.lyx: update documentation about stack pragma, added

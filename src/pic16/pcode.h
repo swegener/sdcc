@@ -1047,15 +1047,15 @@ extern pCodeOpReg pic16_pc_status;
 extern pCodeOpReg pic16_pc_intcon;
 extern pCodeOpReg pic16_pc_pcl;
 extern pCodeOpReg pic16_pc_pclath;
-extern pCodeOpReg pic16_pc_pclatu; // patch 14
+extern pCodeOpReg pic16_pc_pclatu;
 extern pCodeOpReg pic16_pc_wreg;
-extern pCodeOpReg pic16_pc_tosl; // patch 14
-extern pCodeOpReg pic16_pc_tosh; // patch 14
-extern pCodeOpReg pic16_pc_tosu; // patch 14
-extern pCodeOpReg pic16_pc_tblptrl; // patch 15
-extern pCodeOpReg pic16_pc_tblptrh; //
-extern pCodeOpReg pic16_pc_tblptru; //
-extern pCodeOpReg pic16_pc_tablat;  // patch 15
+extern pCodeOpReg pic16_pc_tosl;
+extern pCodeOpReg pic16_pc_tosh;
+extern pCodeOpReg pic16_pc_tosu;
+extern pCodeOpReg pic16_pc_tblptrl;
+extern pCodeOpReg pic16_pc_tblptrh;
+extern pCodeOpReg pic16_pc_tblptru;
+extern pCodeOpReg pic16_pc_tablat;
 extern pCodeOpReg pic16_pc_bsr;
 extern pCodeOpReg pic16_pc_fsr0;
 extern pCodeOpReg pic16_pc_fsr0l;
@@ -1090,6 +1090,20 @@ extern pCodeOpReg pic16_pc_eeadr;
 extern pCodeOpReg pic16_pc_kzero;
 extern pCodeOpReg pic16_pc_wsave;     /* wsave and ssave are used to save W and the Status */
 extern pCodeOpReg pic16_pc_ssave;     /* registers during an interrupt */
+
+extern pCodeOpReg *pic16_stackpnt_lo;
+extern pCodeOpReg *pic16_stackpnt_hi;
+extern pCodeOpReg *pic16_stack_postinc;
+extern pCodeOpReg *pic16_stack_postdec;
+extern pCodeOpReg *pic16_stack_preinc;
+extern pCodeOpReg *pic16_stack_plusw;
+
+extern pCodeOpReg *pic16_framepnt_lo;
+extern pCodeOpReg *pic16_framepnt_hi;
+extern pCodeOpReg *pic16_frame_postinc;
+extern pCodeOpReg *pic16_frame_postdec;
+extern pCodeOpReg *pic16_frame_preinc;
+extern pCodeOpReg *pic16_frame_plusw;
 
 extern pCodeOpReg pic16_pc_gpsimio;
 extern pCodeOpReg pic16_pc_gpsimio2;

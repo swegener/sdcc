@@ -704,7 +704,7 @@ static asmop *aopForSym (iCode *ic, operand *op, bool result)
 	    } // if
 	    pic16_emitpcode(POC_MOVLW, pic16_popGetLit(soffs + i /*+ _G.stack_lat*/));
 	    pic16_emitpcode(POC_MOVFF, pic16_popGet2p(
-	                    pic16_popCopyReg(&pic16_pc_plusw2), pcop[i]));
+	                    pic16_popCopyReg( pic16_frame_plusw ), pcop[i]));
 	  }
 	}
 	
@@ -1335,7 +1335,7 @@ void pic16_freeAsmop (operand *op, asmop *aaop, iCode *ic, bool pop)
 		  /* initialise for stack access via frame pointer */
 		  pic16_emitpcode(POC_MOVLW, pic16_popGetLit(soffs + i /*+ _G.stack_lat*/));
 		  pic16_emitpcode(POC_MOVFF, pic16_popGet2p(
-                        aop->aopu.stk.pop[i], pic16_popCopyReg(&pic16_pc_plusw2)));
+                        aop->aopu.stk.pop[i], pic16_popCopyReg(pic16_frame_plusw)));
 		}
 	
                 if(_G.accInUse)pic16_poppCodeOp( pic16_popCopyReg(&pic16_pc_wreg) );
@@ -2304,7 +2304,7 @@ void pic16_testStackOverflow(void)
 void pic16_pushpCodeOp(pCodeOp *pcop)
 {
 //	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-  pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pcop, pic16_popCopyReg(&pic16_pc_postdec1)));
+  pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pcop, pic16_popCopyReg( pic16_stack_postdec )));	//&pic16_pc_postdec1)));
   if(pic16_options.gstack)
     pic16_testStackOverflow();
     
@@ -2313,7 +2313,7 @@ void pic16_pushpCodeOp(pCodeOp *pcop)
 /* pop pcop from stack */
 void pic16_poppCodeOp(pCodeOp *pcop)
 {
-  pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_preinc1), pcop));
+  pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg( pic16_stack_preinc ), pcop));
   if(pic16_options.gstack)
     pic16_testStackOverflow();
 }
@@ -2325,7 +2325,7 @@ void pic16_poppCodeOp(pCodeOp *pcop)
 void pushw(void)
 {
   DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-  pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_postdec1));
+  pic16_emitpcode(POC_MOVWF, pic16_popCopyReg( pic16_stack_postdec ));	//&pic16_pc_postdec1));
   if(pic16_options.gstack)
     pic16_testStackOverflow();
 }
@@ -2340,13 +2340,12 @@ void pushaop(asmop *aop, int offset)
 
   if(is_LitAOp(aop)) {
     pic16_emitpcode(POC_MOVLW, pic16_popGet(aop, offset));
-    pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_postdec1));
+    pic16_emitpcode(POC_MOVWF, pic16_popCopyReg( pic16_stack_postdec )); 	//&pic16_pc_postdec1));
   } else {
     pic16_emitpcode(POC_MOVFF,
-      pic16_popGet2p(pic16_popGet(aop, offset), pic16_popCopyReg(&pic16_pc_postdec1)));
+      pic16_popGet2p(pic16_popGet(aop, offset), pic16_popCopyReg( pic16_stack_postdec )));	//&pic16_pc_postdec1)));
   }
 
-//  pic16_emitpcode(POC_MOVFF, pic16_popCombine2(PCOR(pic16_popGet(aop, offset)), &pic16_pc_postdec1, 0));
   if(pic16_options.gstack)
     pic16_testStackOverflow();
 }
@@ -2357,7 +2356,7 @@ void pushaop(asmop *aop, int offset)
 void popaop(asmop *aop, int offset)
 {
   DEBUGpic16_emitcode("; ***", "%s  %d", __FUNCTION__, __LINE__);
-  pic16_emitpcode(POC_MOVFF, pic16_popCombine2(&pic16_pc_preinc1, PCOR(pic16_popGet(aop, offset)), 0));
+  pic16_emitpcode(POC_MOVFF, pic16_popCombine2(pic16_stack_preinc, PCOR(pic16_popGet(aop, offset)), 0));
   if(pic16_options.gstack)
     pic16_testStackOverflow();
 }
@@ -2371,7 +2370,7 @@ void popaopidx(asmop *aop, int offset, int index)
     if(STACK_MODEL_LARGE)ofs++;
 
     pic16_emitpcode(POC_MOVLW, pic16_popGetLit(index + ofs));
-    pic16_emitpcode(POC_MOVFF, pic16_popCombine2(&pic16_pc_plusw2, PCOR(pic16_popGet(aop, offset)), 0));
+    pic16_emitpcode(POC_MOVFF, pic16_popCombine2(pic16_frame_plusw, PCOR(pic16_popGet(aop, offset)), 0));
     if(pic16_options.gstack)
       pic16_testStackOverflow();
 }
@@ -2925,10 +2924,10 @@ static void assignResultValue(operand * oper, int rescall)
 			
 	/* fix stack */
 	pic16_emitpcode(POC_MOVLW, pic16_popGetLit( AOP_SIZE(oper) ));
-	pic16_emitpcode(POC_ADDWF, pic16_popCopyReg( &pic16_pc_fsr1l ));
+	pic16_emitpcode(POC_ADDWF, pic16_popCopyReg( pic16_stackpnt_lo ));	//&pic16_pc_fsr1l ));
 	if(STACK_MODEL_LARGE) {
 	  emitSKPNC;
-	  pic16_emitpcode(POC_INCF, pic16_popCopyReg( &pic16_pc_fsr1h ));
+	  pic16_emitpcode(POC_INCF, pic16_popCopyReg( pic16_stackpnt_hi ));	//&pic16_pc_fsr1h ));
 	}
       }			
     } else {
@@ -3293,14 +3292,14 @@ static void genCall (iCode *ic)
     
     if(stackParms>0) {
       if(stackParms == 1) {
-        pic16_emitpcode(POC_INCF, pic16_popCopyReg(&pic16_pc_fsr1l));
+        pic16_emitpcode(POC_INCF, pic16_popCopyReg(pic16_stackpnt_lo ));	//&pic16_pc_fsr1l));
       } else {
         pic16_emitpcode(POC_MOVLW, pic16_popGetLit(stackParms));
-        pic16_emitpcode(POC_ADDWF, pic16_popCopyReg( &pic16_pc_fsr1l ));
+        pic16_emitpcode(POC_ADDWF, pic16_popCopyReg( pic16_stackpnt_lo ));	//&pic16_pc_fsr1l ));
       }
       if(STACK_MODEL_LARGE) {
         emitSKPNC;
-        pic16_emitpcode(POC_INCF, pic16_popCopyReg( &pic16_pc_fsr1h ));
+        pic16_emitpcode(POC_INCF, pic16_popCopyReg( pic16_stackpnt_hi ));	//&pic16_pc_fsr1h ));
       }
     }
 
@@ -3427,11 +3426,10 @@ static void genPcall (iCode *ic)
     
     if(stackParms>0) {
       pic16_emitpcode(POC_MOVLW, pic16_popGetLit(stackParms));
-      pic16_emitpcode(POC_ADDWF, pic16_popCopyReg( &pic16_pc_fsr1l ));
+      pic16_emitpcode(POC_ADDWF, pic16_popCopyReg( pic16_stackpnt_lo ));
       if(STACK_MODEL_LARGE) {
-        /* this implies that stackParms < 256 !!! -- VR */
         emitSKPNC;
-        pic16_emitpcode(POC_INCF, pic16_popCopyReg( &pic16_pc_fsr1h ));
+        pic16_emitpcode(POC_INCF, pic16_popCopyReg( pic16_stackpnt_hi ));
       }
     }
 }
@@ -3628,12 +3626,12 @@ static void genFunction (iCode *ic)
       if(1  /*!options.ommitFramePtr || sym->regsUsed*/) {
         /* setup the stack frame */
         if(STACK_MODEL_LARGE)
-          pic16_pushpCodeOp(pic16_popCopyReg(&pic16_pc_fsr2h));
-        pic16_pushpCodeOp(pic16_popCopyReg(&pic16_pc_fsr2l));
-//        pic16_emitpcode(POC_MOVFF, pic16_popCombine2( &pic16_pc_fsr2l, &pic16_pc_postdec1, 0));
-        pic16_emitpcode(POC_MOVFF, pic16_popCombine2( &pic16_pc_fsr1l, &pic16_pc_fsr2l, 0));
+          pic16_pushpCodeOp(pic16_popCopyReg(pic16_framepnt_hi));
+        pic16_pushpCodeOp(pic16_popCopyReg(pic16_framepnt_lo));
+
+        pic16_emitpcode(POC_MOVFF, pic16_popCombine2( pic16_stackpnt_lo, pic16_framepnt_lo, 0));
         if(STACK_MODEL_LARGE)
-          pic16_emitpcode(POC_MOVFF, pic16_popCombine2( &pic16_pc_fsr1h, &pic16_pc_fsr2h, 0));
+          pic16_emitpcode(POC_MOVFF, pic16_popCombine2( pic16_stackpnt_hi, pic16_framepnt_hi, 0));
       }
     }
 
@@ -3643,9 +3641,9 @@ static void genFunction (iCode *ic)
       if (sym->stack > 127)werror(W_STACK_OVERFLOW, sym->name);
 
       pic16_emitpcode(POC_MOVLW, pic16_popGetLit(sym->stack));
-      pic16_emitpcode(POC_SUBWF, pic16_popCopyReg(&pic16_pc_fsr1l));
+      pic16_emitpcode(POC_SUBWF, pic16_popCopyReg( pic16_stackpnt_lo ));	//&pic16_pc_fsr1l));
       emitSKPC;
-      pic16_emitpcode(POC_DECF, pic16_popCopyReg(&pic16_pc_fsr1h));
+      pic16_emitpcode(POC_DECF, pic16_popCopyReg( pic16_stackpnt_hi ));		//&pic16_pc_fsr1h));
     }
           
     if(inWparamList(sym->name)) {
@@ -3733,17 +3731,17 @@ static void genEndFunction (iCode *ic)
     if ((IFFUNC_ISREENT(sym->type) || options.stackAuto)
           && sym->stack) {
       if (sym->stack == 1) {
-        pic16_emitpcode(POC_INFSNZ, pic16_popCopyReg(&pic16_pc_fsr1l));
-        pic16_emitpcode(POC_INCF, pic16_popCopyReg(&pic16_pc_fsr1h));
+        pic16_emitpcode(POC_INFSNZ, pic16_popCopyReg( pic16_stackpnt_lo ));
+        pic16_emitpcode(POC_INCF, pic16_popCopyReg( pic16_stackpnt_hi ));
       } else {
         // we have to add more than one...
-        pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_postinc1)); // this holds a return value!
+        pic16_emitpcode(POC_MOVWF, pic16_popCopyReg( pic16_stack_postinc ));	// this holds a return value!
         pic16_emitpcode(POC_MOVLW, pic16_popGetLit(sym->stack-1));
-        pic16_emitpcode(POC_ADDWF, pic16_popCopyReg(&pic16_pc_fsr1l));
+        pic16_emitpcode(POC_ADDWF, pic16_popCopyReg( pic16_stackpnt_lo ));
         emitSKPNC;
-        pic16_emitpcode(POC_INCF, pic16_popCopyReg(&pic16_pc_fsr1h));
+        pic16_emitpcode(POC_INCF, pic16_popCopyReg( pic16_stackpnt_hi ));
         pic16_emitpcode(POC_COMF,  pic16_popCopyReg(&pic16_pc_wreg)); // WREG = -(WREG+1)!
-        pic16_emitpcode(POC_MOVFW, pic16_popCopyReg(&pic16_pc_plusw1)); // this holds a retrun value!
+        pic16_emitpcode(POC_MOVFW, pic16_popCopyReg(pic16_stack_plusw)); // this holds a retrun value!
       }
     }
 
@@ -3751,10 +3749,8 @@ static void genEndFunction (iCode *ic)
       if(1/*!options.ommitFramePtr ||*/ /*sym->regsUsed*/) {
         /* restore stack frame */
         if(STACK_MODEL_LARGE)
-          pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_fsr2h ));
-//          pic16_emitpcode(POC_MOVFF, pic16_popCombine2( &pic16_pc_preinc1, &pic16_pc_fsr2h, 0));
-        pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_fsr2l ));
-//        pic16_emitpcode(POC_MOVFF, pic16_popCombine2( &pic16_pc_preinc1, &pic16_pc_fsr2l, 0));
+          pic16_poppCodeOp( pic16_popCopyReg( pic16_framepnt_hi ));
+        pic16_poppCodeOp( pic16_popCopyReg( pic16_framepnt_lo ));
       }
     }
 
@@ -3889,13 +3885,13 @@ static void genRet (iCode *ic)
 			
 		/* setup FSR0 */
 		pic16_emitpcode(POC_MOVFF, pic16_popGet2p(
-			pic16_popCopyReg(&pic16_pc_fsr1l), pic16_popCopyReg(&pic16_pc_fsr0l)));
+			pic16_popCopyReg( pic16_stackpnt_lo ), pic16_popCopyReg(&pic16_pc_fsr0l)));
 
 		if(STACK_MODEL_LARGE) {
 			pic16_emitpcode(POC_MOVFF, pic16_popGet2p(
-				pic16_popCopyReg(&pic16_pc_fsr1h), pic16_popCopyReg(&pic16_pc_fsr0h)));
+				pic16_popCopyReg( pic16_stackpnt_hi ), pic16_popCopyReg(&pic16_pc_fsr0h)));
 		} else {
-			pic16_emitpcode(POC_CLRF, pic16_popCopyReg( &pic16_pc_fsr1h ) );
+			pic16_emitpcode(POC_CLRF, pic16_popCopyReg( pic16_stackpnt_hi ));
 		}
 	}
 				
@@ -12486,10 +12482,10 @@ static void genAddrOf (iCode *ic)
 	} // if
 	DEBUGpic16_emitcode("*!*", "accessing stack symbol at offset=%d", soffs);
 	pic16_emitpcode(POC_MOVLW , pic16_popGetLit( soffs & 0x00FF ));
-	pic16_emitpcode(POC_ADDFW , pic16_popCopyReg(&pic16_pc_fsr2l));
+	pic16_emitpcode(POC_ADDFW , pic16_popCopyReg(pic16_framepnt_lo));
 	pic16_emitpcode(POC_MOVWF , pic16_popGet(AOP(result), 0));
 	pic16_emitpcode(POC_MOVLW , pic16_popGetLit( (soffs >> 8) & 0x00FF ));
-	pic16_emitpcode(POC_ADDFWC, pic16_popCopyReg(&pic16_pc_fsr2h));
+	pic16_emitpcode(POC_ADDFWC, pic16_popCopyReg(pic16_framepnt_hi));
 	pic16_emitpcode(POC_MOVWF , pic16_popGet(AOP(result), 1));
       }
 

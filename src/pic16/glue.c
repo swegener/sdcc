@@ -175,15 +175,9 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 		  
 			checkAddSym(&publics, sym);
 		} else
-#if 1
                         /* new version */
 			if(IS_STATIC(sym->etype)
 				&& !sym->ival) /* && !sym->level*/ {
-#else
-                        /* old version */
-                        if(IS_STATIC(sym->etype)
-                                && !(sym->ival && !sym->level)) {
-#endif
 			  regs *reg;
                           sectSym *ssym;
                           int found=0;
@@ -205,9 +199,11 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 
                                   if(!found)
                                     checkAddReg(&pic16_rel_udata, reg);
+#if 0
                                   else
-                                    debugf("Coudld not find %s in pic16_rel_udata. Check!\n", reg->name);
+                                    debugf("Did find %s in pic16_rel_udata already. Check!\n", reg->name);
 //				    checkAddSym(&publics, sym);
+#endif
 
                                 }
 			}

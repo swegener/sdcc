@@ -2342,7 +2342,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 
 	      /* if we need ptr regs for the right side
 	         then mark it */
-	      if (POINTER_GET (ic) && getSize (OP_SYMBOL (IC_LEFT (ic))->type)
+	      if (POINTER_GET (ic) && IS_SYMOP( IC_LEFT(ic) ) && getSize (OP_SYMBOL (IC_LEFT (ic))->type)
 		  <= (unsigned) PTRSIZE)
 		{
 		  pic16_ptrRegReq++;
@@ -3943,9 +3943,11 @@ pic16_packRegisters (eBBlock * ebp)
       }
     if (POINTER_GET (ic))
       {
-	OP_SYMBOL (IC_LEFT (ic))->uptr = 1;
-	debugLog ("  marking as a pointer (get) =>");
-	debugAopGet ("  left:", IC_LEFT (ic));
+        if(IS_SYMOP(IC_LEFT(ic))) {
+          OP_SYMBOL (IC_LEFT (ic))->uptr = 1;
+          debugLog ("  marking as a pointer (get) =>");
+          debugAopGet ("  left:", IC_LEFT (ic));
+        }
       }
 
 	//debugLog("  %d   %s\n", __LINE__, __FUNCTION__);

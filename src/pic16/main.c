@@ -253,7 +253,9 @@ _process_pragma(const char *sz)
 
                         nsym = newSymbol(symname, 0);
                         strcpy(nsym->rname, ssym->name);
+#if 0
 			checkAddSym(&publics, nsym);
+#endif
 
 			found = 0;
 			for(snam=setFirstItem(sectNames);snam;snam=setNextItem(sectNames)) {
@@ -270,8 +272,10 @@ _process_pragma(const char *sz)
 			
 			ssym->section = snam;
 				
-//	  		fprintf(stderr, "%s:%d placing symbol %s at section %s (%p)\n", __FILE__, __LINE__,
-//	  		 	ssym->name, snam->name, snam);
+#if 1
+	  		fprintf(stderr, "%s:%d placing symbol %s at section %s (%p)\n", __FILE__, __LINE__,
+	  		 	ssym->name, snam->name, snam);
+#endif
 
 	  		symname = strtok((char *)NULL, WHITE);
 		}
@@ -589,6 +593,12 @@ _pic16_finaliseOptions (void)
     if(!pic16_options.no_crt) {
       pic16_options.omit_ivt = 1;
       pic16_options.leave_reset = 0;
+    }
+    
+    if(STACK_MODEL_LARGE) {
+      addSet(&preArgvSet, Safe_strdup("-DSTACK_MODEL_LARGE"));
+    } else {
+      addSet(&preArgvSet, Safe_strdup("-DSTACK_MODEL_SMALL"));
     }
 }
 

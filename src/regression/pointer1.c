@@ -113,7 +113,6 @@ main (void)
   if(buff[achar0 + 7] != 4+7)
     failures++;
 
-  //  dummy = buff[5];
   dummy = buff[achar0];
 
   if(dummy != 4)

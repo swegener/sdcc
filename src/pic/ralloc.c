@@ -454,7 +454,7 @@ static regs* newReg(short type, short pc_type, int rIdx, char *name, int size, i
       *buffer = 's';
     dReg->name = Safe_strdup(buffer);
   }
-  //fprintf(stderr,"newReg: %s, rIdx = 0x%02x\n",dReg->name,rIdx);
+  fprintf(stderr,"newReg: %s, rIdx = 0x%02x\n",dReg->name,rIdx);
   dReg->isFree = 0;
   dReg->wasUsed = 1;
   if(type == REG_SFR)
@@ -949,8 +949,7 @@ void writeSetUsedRegs(FILE *of, set *dRegs)
 extern void assignFixedRegisters(set *regset);
 extern void assignRelocatableRegisters(set *regset,int used);
 extern void dump_map(void);
-extern void dump_cblock(FILE *of);
-
+extern void dump_sfr(FILE *of);
 
 void packBits(set *bregs)
 {
@@ -968,10 +967,10 @@ void packBits(set *bregs)
 
     breg = regset->item;
     breg->isBitField = 1;
-    //fprintf(stderr,"bit reg: %s\n",breg->name);
+    fprintf(stderr,"bit reg: %s\n",breg->name);
 
     if(breg->isFixed) {
-      //fprintf(stderr,"packing bit at fixed address = 0x%03x\n",breg->address);
+      fprintf(stderr,"packing bit at fixed address = 0x%03x\n",breg->address);
 
       bitfield = typeRegWithIdx (breg->address >> 3, -1 , 1);
       breg->rIdx = breg->address & 7;
@@ -979,12 +978,13 @@ void packBits(set *bregs)
 
       if(!bitfield) {
 	sprintf (buffer, "fbitfield%02x", breg->address);
-	//fprintf(stderr,"new bit field\n");
+	fprintf(stderr,"new bit field\n");
 	bitfield = newReg(REG_SFR, PO_GPR_BIT,breg->address,buffer,1,0);
 	bitfield->isBitField = 1;
 	bitfield->isFixed = 1;
 	bitfield->address = breg->address;
-	addSet(&dynDirectRegs,bitfield);
+	//addSet(&dynDirectRegs,bitfield);
+	addSet(&dynInternalRegs,bitfield);
 	//hTabAddItem(&dynDirectRegNames, regname2key(buffer), bitfield);
       } else {
 	//fprintf(stderr,"  which is occupied by %s (addr = %d)\n",bitfield->name,bitfield->address);
@@ -998,10 +998,11 @@ void packBits(set *bregs)
 	byte_no++;
 	bit_no=0;
 	sprintf (buffer, "bitfield%d", byte_no);
-	//fprintf(stderr,"new relocatable bit field\n");
+	fprintf(stderr,"new relocatable bit field\n");
 	relocbitfield = newReg(REG_GPR, PO_GPR_BIT,rDirectIdx++,buffer,1,0);
 	relocbitfield->isBitField = 1;
-	addSet(&dynDirectRegs,relocbitfield);
+	//addSet(&dynDirectRegs,relocbitfield);
+	addSet(&dynInternalRegs,relocbitfield);
 	//hTabAddItem(&dynDirectRegNames, regname2key(buffer), relocbitfield);
 
       }
@@ -1054,7 +1055,8 @@ void aliasEQUs(FILE *of, set *fregs, int use_rIdx)
   for (reg = setFirstItem(fregs) ; reg ;
        reg = setNextItem(fregs)) {
 
-    if(!reg->isEmitted && reg->wasUsed) {
+    //if(!reg->isEmitted && reg->wasUsed) {
+    if(reg->wasUsed) {
       if(use_rIdx)
 	fprintf (of, "%s\tEQU\t0x%03x\n",
 		 reg->name,
@@ -1072,25 +1074,33 @@ void writeUsedRegs(FILE *of)
 {
   packBits(dynDirectBitRegs);
 
-
   assignFixedRegisters(dynAllocRegs);
+  printf("assignFixedRegisters(dynAllocRegs);\n");
   assignFixedRegisters(dynStackRegs);
+  printf("assignFixedRegisters(dynStackRegs);\n");
   assignFixedRegisters(dynDirectRegs);
+  printf("assignFixedRegisters(dynDirectRegs);\n");
 
   assignRelocatableRegisters(dynInternalRegs,0);
+  printf("assignRelocatableRegisters(dynInternalRegs,0);\n");
   assignRelocatableRegisters(dynAllocRegs,0);
+  printf("assignRelocatableRegisters(dynAllocRegs,0);\n");
   assignRelocatableRegisters(dynStackRegs,0);
+  printf("assignRelocatableRegisters(dynStackRegs,0);\n");
+/*
   assignRelocatableRegisters(dynDirectRegs,0);
-
+  printf("assignRelocatableRegisters(dynDirectRegs,0);\n");
+*/
   //dump_map();
 
-  dump_cblock(of);
+  dump_sfr(of);
   bitEQUs(of,dynDirectBitRegs);
+/*
   aliasEQUs(of,dynAllocRegs,0);
   aliasEQUs(of,dynDirectRegs,0);
   aliasEQUs(of,dynStackRegs,0);
   aliasEQUs(of,dynProcessorRegs,1);
-
+*/
 }
 
 #if 0

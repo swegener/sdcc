@@ -1,3 +1,9 @@
+2003-04-22  Scott Dattalo  <scott@dattalo.com>
+
+	* src/pic Added object file support for the PIC port
+	* src/pic Applied patch from Craig Franklin (this started the object file support)
+	* src/regression Updated the PIC regression tests for object files
+
 2003-04-20  Borut Razem <borut.razem@siol.net>
 
 	* sdcc/as/mcs51/lklex.c: make getfid() more robust and fixed gcc warning:

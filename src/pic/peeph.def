@@ -164,7 +164,7 @@ replace restart {
 replace restart {
 	decf	%1,f
 	movf	%1,w
-	btfss	_STATUS,z
+	btfss	STATUS,z
 	goto	%2
 } by {
 	;     peep 3 - decf/mov/skpz to decfsz

@@ -203,14 +203,16 @@ void dump_map(void)
 
 }
 
-void dump_cblock(FILE *of)
+void dump_sfr(FILE *of)
 {
+
   int start=-1;
   int addr=0;
   int bank_base;
+  static int udata_flag=0;
 
   //dump_map();   /* display the register map */
-
+  fprintf(stdout,";dump_sfr  \n");
   if (pic->maxRAMaddress < 0) {
     fprintf(stderr, "missing \"#pragma maxram\" setting\n");
     return;
@@ -236,28 +238,24 @@ void dump_cblock(FILE *of)
 	 * assumes that the first register in the contiguous group
 	 * of registers represents the bank for the whole group */
 
-	fprintf(of,"  cblock  0X%04X\t; Bank %d\n",start,finalMapping[start].bank);
-
-	for( ; start < addr; start++) {
-	  if((finalMapping[start].reg) && !finalMapping[start].reg->isEmitted ) {
-	    fprintf(of,"\t%s",finalMapping[start].reg->name);
-
-	    /* If this register is aliased in multiple banks, then
-	     * mangle the variable name with the alias address: */
-	    if(finalMapping[start].alias & start)
-	      fprintf(of,"_%x",bank_base);
-
-	    if(finalMapping[start].instance)
-	      fprintf(of,"_%d",finalMapping[start].instance);
-
-	    
-	    fputc('\n',of);
-
-	    //finalMapping[start].reg->isEmitted = 1;
-	  }
+	if ( (start != addr) && (!udata_flag) ) {
+	  udata_flag = 1;
+          //fprintf(of,"\tudata\n");
 	}
 
-	fprintf(of,"  endc\n");
+	for( ; start < addr; start++) {
+	  if((finalMapping[start].reg) && 
+             (!finalMapping[start].reg->isEmitted) &&
+             (!finalMapping[start].instance) && 
+	     (!finalMapping[start].isSFR)) {
+
+	    fprintf(of,"%s\tres\t%i\n",
+                    finalMapping[start].reg->name, 
+                    finalMapping[start].reg->size);
+
+	    finalMapping[start].reg->isEmitted = 1;
+	  }
+	}
 
 	start = -1;
       }
@@ -454,7 +452,7 @@ void mapRegister(regs *reg)
 
     do {
 
-      //fprintf(stdout,"mapping %s to address 0x%02x, reg size = %d\n",reg->name, (reg->address+alias+i),reg->size);
+      fprintf(stdout,"mapping %s to address 0x%02x, reg size = %d\n",reg->name, (reg->address+alias+i),reg->size);
 
       finalMapping[reg->address + alias + i].reg = reg;
       finalMapping[reg->address + alias + i].instance = i;
@@ -468,7 +466,7 @@ void mapRegister(regs *reg)
     } while (alias>=0);
   }
 
-  //  fprintf(stderr,"%s - %s addr = 0x%03x, size %d\n",__FUNCTION__,reg->name, reg->address,reg->size);
+  fprintf(stderr,"%s - %s addr = 0x%03x, size %d\n",__FUNCTION__,reg->name, reg->address,reg->size);
 
   reg->isMapped = 1;
 
@@ -480,7 +478,7 @@ int assignRegister(regs *reg, int start_address)
 {
   int i;
 
-  //fprintf(stderr,"%s -  %s start_address = 0x%03x\n",__FUNCTION__,reg->name, start_address);
+  fprintf(stderr,"%s -  %s start_address = 0x%03x\n",__FUNCTION__,reg->name, start_address);
   if(reg->isFixed) {
 
     if (validAddress(reg->address,reg->size)) {
@@ -545,7 +543,7 @@ void assignRelocatableRegisters(set *regset, int used)
   for (reg = setFirstItem(regset) ; reg ; 
        reg = setNextItem(regset)) {
 
-    //fprintf(stdout,"assigning %s isFixed=%d, wasUsed=%d\n",reg->name,reg->isFixed,reg->wasUsed);
+    fprintf(stdout,"assigning %s isFixed=%d, wasUsed=%d\n",reg->name,reg->isFixed,reg->wasUsed);
 
     if((!reg->isFixed) && ( used || reg->wasUsed))
       address = assignRegister(reg,address);

@@ -50,12 +50,12 @@ peepCommand peepCommands[] = {
 
 
 // Eventually this will go into device dependent files:
-pCodeOpReg pc_status    = {{PO_STATUS,  "_STATUS"}, -1, NULL,0,NULL};
+pCodeOpReg pc_status    = {{PO_STATUS,  "STATUS"}, -1, NULL,0,NULL};
 pCodeOpReg pc_indf      = {{PO_INDF,    "INDF"}, -1, NULL,0,NULL};
 pCodeOpReg pc_fsr       = {{PO_FSR,     "FSR"}, -1, NULL,0,NULL};
 pCodeOpReg pc_intcon    = {{PO_INTCON,  ""}, -1, NULL,0,NULL};
 pCodeOpReg pc_pcl       = {{PO_PCL,     "PCL"}, -1, NULL,0,NULL};
-pCodeOpReg pc_pclath    = {{PO_PCLATH,  "_PCLATH"}, -1, NULL,0,NULL};
+pCodeOpReg pc_pclath    = {{PO_PCLATH,  "PCLATH"}, -1, NULL,0,NULL};
 
 pCodeOpReg pc_kzero     = {{PO_GPR_REGISTER,  "KZ"}, -1, NULL,0,NULL};
 pCodeOpReg pc_wsave     = {{PO_GPR_REGISTER,  "WSAVE"}, -1, NULL,0,NULL};
@@ -75,7 +75,7 @@ static pBlock *pb_dead_pcodes = NULL;
 /* Hardcoded flags to change the behavior of the PIC port */
 static int peepOptimizing = 1;        /* run the peephole optimizer if nonzero */
 static int functionInlining = 1;      /* inline functions if nonzero */
-int debug_verbose = 1;                /* Set true to inundate .asm file */
+int debug_verbose = 0;                /* Set true to inundate .asm file */
 
 // static int GpCodeSequenceNumber = 1;
 int GpcFlowSeq = 1;
@@ -1285,9 +1285,9 @@ void  pCodeInitRegisters(void)
   initStack(0xfff, 8);
   init_pic(port->processor);
 
-  pc_status.r = allocProcessorRegister(IDX_STATUS,"_STATUS", PO_STATUS, 0x80);
+  pc_status.r = allocProcessorRegister(IDX_STATUS,"STATUS", PO_STATUS, 0x80);
   pc_pcl.r = allocProcessorRegister(IDX_PCL,"PCL", PO_PCL, 0x80);
-  pc_pclath.r = allocProcessorRegister(IDX_PCLATH,"_PCLATH", PO_PCLATH, 0x80);
+  pc_pclath.r = allocProcessorRegister(IDX_PCLATH,"PCLATH", PO_PCLATH, 0x80);
   pc_fsr.r = allocProcessorRegister(IDX_FSR,"FSR", PO_FSR, 0x80);
   pc_indf.r = allocProcessorRegister(IDX_INDF,"INDF", PO_INDF, 0x80);
   pc_intcon.r = allocProcessorRegister(IDX_INTCON,"INTCON", PO_INTCON, 0x80);
@@ -1567,6 +1567,7 @@ void copypCode(FILE *of, char dbName)
     if(getpBlock_dbName(pb) == dbName) {
       pBlockStats(of,pb);
       printpBlock(of,pb);
+      fprintf (of, "\n");
     }
   }
 
@@ -2537,10 +2538,19 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
       if(PCOI(pcop)->_const) {
 
 	if( PCOI(pcop)->offset && PCOI(pcop)->offset<4) {
-	  SAFE_snprintf(&s,&size,"(((%s+%d) >> %d)&0xff)",
-			pcop->name,
-			PCOI(pcop)->index,
-			8 * PCOI(pcop)->offset );
+	  switch(PCOI(pcop)->offset) {
+	  case 0:
+	    SAFE_snprintf(&s,&size,"low %s",pcop->name);
+	    break;
+	  case 1:
+	    SAFE_snprintf(&s,&size,"high %s",pcop->name);
+	    break;
+	  default:
+	    SAFE_snprintf(&s,&size,"(((%s+%d) >> %d)&0xff)",
+			  pcop->name,
+			  PCOI(pcop)->index,
+			  8 * PCOI(pcop)->offset );
+	  }
 	} else
 	  SAFE_snprintf(&s,&size,"LOW(%s+%d)",pcop->name,PCOI(pcop)->index);
       } else {
@@ -2550,10 +2560,16 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 			pcop->name,
 			PCOI(pcop)->index );
 	} else {
-	  if(PCOI(pcop)->offset)
-	    SAFE_snprintf(&s,&size,"(%s >> %d)&0xff",pcop->name, 8*PCOI(pcop)->offset);
-	  else
+	  switch(PCOI(pcop)->offset) {
+	  case 0:
 	    SAFE_snprintf(&s,&size,"%s",pcop->name);
+	    break;
+	  case 1:
+	    SAFE_snprintf(&s,&size,"high %s",pcop->name);
+	    break;
+	  default:
+	    SAFE_snprintf(&s,&size,"(%s >> %d)&0xff",pcop->name, 8*PCOI(pcop)->offset);
+	  }
 	}
       }
 

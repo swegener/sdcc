@@ -239,7 +239,6 @@ _pic14_genAssemblerPreamble (FILE * of)
   }
 
   fprintf (of, "\tlist\tp=%s\n",&name[1]);
-  fprintf (of, "\t__CONFIG 0x%x\n",getConfigWord(0x2007));
   fprintf (of, "\tradix dec");
   fprintf (of, "\ninclude \"%s.inc\"\n",name);
 }
@@ -328,20 +327,13 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 */
 static const char *_linkCmd[] =
 {
-  "aslink", "-nf", "$1", NULL
+  "gplink", "-nf", "$1", NULL
 };
 
-/* Sigh. This really is not good. For now, I recommend:
- * sdcc -S -mpic14 file.c
- * the -S option does not compile or link
- */
 static const char *_asmCmd[] =
 {
-  /* This should be:
-   * "gpasm", "-c  -I \"{datadir}\" -o \"$2\"", "\"$1.asm\"", NULL
-   * but unfortunately buildCmdLine() doesn't expand {xxx} macros.
-   */
-  "gpasm", "-c  -I \"/usr/local/share/gpasm/header\" -o \"$2\"", "\"$1.asm\"", NULL
+  "gpasm", "-c", "$1.asm", NULL
+
 };
 
 /* Globals */
@@ -350,7 +342,7 @@ PORT pic_port =
   TARGET_ID_PIC,
   "pic14",
   "MCU pic",			/* Target name */
-  "p16f877",                    /* Processor */
+  "",                    /* Processor */
   {
     TRUE,			/* Emit glue around main */
     MODEL_SMALL | MODEL_LARGE | MODEL_FLAT24,
@@ -371,7 +363,7 @@ PORT pic_port =
     _linkCmd,
     NULL,
     NULL,
-    ".rel"
+    ".o"
   },
   {
     _defaultRules
@@ -387,14 +379,14 @@ PORT pic_port =
   {
     "XSEG    (XDATA)",
     "STACK   (DATA)",
-    "CSEG    (CODE)",
+    "code",
     "DSEG    (DATA)",
     "ISEG    (DATA)",
     "XSEG    (XDATA)",
     "BSEG    (BIT)",
     "RSEG    (DATA)",
     "GSINIT  (CODE)",
-    "OSEG    (OVR,DATA)",
+    "udata_ovr",
     "GSFINAL (CODE)",
     "HOME	 (CODE)",
     NULL, // xidata

@@ -12,8 +12,6 @@ unsigned int uint1 = 0;
 unsigned char uchar0 = 0;
 unsigned char uchar1 = 0;
 
-unsigned char call3(void);
-
 void dput(unsigned char val)
 {
 	PORTB = val;
